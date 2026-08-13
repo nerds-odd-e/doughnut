@@ -103,7 +103,7 @@ guides gradual alignment (tests, UI, OpenAPI, packages).
 |------|---------|
 | **Subscription** | Following a shared notebook (from the Bazaar or a Circle) with a daily assimilation quota |
 | **Assimilation** | First-pass intake of a note into the learner’s memory schedule |
-| **Recall** | Spaced review of assimilated material |
+| **Recall** | Spaced retrieval of assimilated material: the learner must produce the knowledge. Doughnut names this **recall**, not **review**. |
 | **Recall question** | A single recall prompt (kinds: spelling, AI-generated, predefined, …) |
 | **Memory tracking** | Whether a notebook participates in assimilation and recall (notebook setting). Tracker-level opt-out is skip recall. |
 | **Property memory tracker** | Recall tracking keyed by a property or relationship label |
@@ -155,7 +155,7 @@ guides gradual alignment (tests, UI, OpenAPI, packages).
    - Use **Tutor** for whoever conducts a Learning Session — not *teacher*,
      *coach*, or *instructor*.
    - Use **Learning Session** for the commissioned unit; reserve **recall** for
-     the ordinary spaced review Doughnut conducts itself.
+     the ordinary spaced activity Doughnut conducts itself.
    - Say a Learning Session is **commissioned** (by the Learning Orchestrator)
      and later **recorded** (from a Learning Session Report).
 
@@ -174,6 +174,9 @@ guides gradual alignment (tests, UI, OpenAPI, packages).
 
 - Product language converges on fewer overloaded words (**link**,
   **learning**, **layout**).
+- Product language names spaced retrieval **recall**, not **review**, so the
+  glossary matches the philosophy (recall is better than review) and stays
+  distinct from FSRS/Anki vocabulary.
 - Humans and agents share an explicit dictionary instead of inferring synonyms.
 - Some existing strings (`space setting`) become known debt until renamed.
 - Circles, notebook groups, and folders stay clearly separated in speech.
@@ -205,4 +208,6 @@ guides gradual alignment (tests, UI, OpenAPI, packages).
 - Supersedes: (none)
 - Superseded by: (none)
 - Links: playbook [README.md](./README.md); ADR-0000
-  [use-adrs-accepted.md](./0000-use-adrs-accepted.md); [Open Knowledge Format](https://cloud.google.com/blog/products/data-analytics/how-the-open-knowledge-format-can-improve-data-sharing)
+  [use-adrs-accepted.md](./0000-use-adrs-accepted.md); ADR 0003
+  [spaced-repetition scheduling policy](./0003-spaced-repetition-scheduling-policy.md)
+  (FSRS **review** = Doughnut **recall**); [Open Knowledge Format](https://cloud.google.com/blog/products/data-analytics/how-the-open-knowledge-format-can-improve-data-sharing)

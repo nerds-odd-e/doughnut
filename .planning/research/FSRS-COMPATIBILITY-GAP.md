@@ -287,6 +287,7 @@ If O1=B and O10=middle option, ADR Decision could be organized as:
 |------|-------|----------|----------------|
 | 2026-08-05 | Late-success penalty (symmetric `abs(delay)` shrink) | **Shipped** — overdue correct keeps on-time increment; not the same as FSRS overdue reward | `735b96623a`; `lateCorrectAnswerDoesNotShortenTheNextInterval` |
 | 2026-08-13 | Doc correction | Research/gap docs no longer describe the shipped penalty as a live bug | This file; SUMMARY / FEATURES / ARCHITECTURE / PITFALLS / SEED-004 |
+| 2026-08-13 | Naming: FSRS review vs Doughnut recall | **Decided** — keep **recall**; FSRS review is a compatibility alias only | ADR 0001 § Recall not review; ADR 0003 Decision |
 
 ---
 

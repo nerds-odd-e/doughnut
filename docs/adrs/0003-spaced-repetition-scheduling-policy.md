@@ -36,6 +36,18 @@ missing the due time valid memory evidence.
 
 ## Decision
 
+Finalized choices live here. Move items from **Working draft** into this
+section as they are locked.
+
+### Recall, not FSRS "review"
+
+Keep **recall**. FSRS **review** is the same activity; Doughnut names it recall
+because **recall is better than review**. Glossary: [ADR 0001](./0001-ubiquitous-language.md).
+Do not use **review** as a Doughnut domain noun. When citing FSRS, pair once
+(**review (FSRS) = recall**) then use Doughnut terms.
+
+## Working draft
+
 ### Evidence and scheduling are separate
 
 1. Graded recall outcome and actual elapsed time since the previous graded
@@ -113,7 +125,7 @@ tracker.
 
 #### Accidental match (spelling)
 
-An accidental match is a spelling answer that fails the reviewed note but names
+An accidental match is a spelling answer that fails the note under recall but names
 another accessible note (title or plain alias).
 
 1. It is negative evidence, but strictly weaker than incorrect recall on the
@@ -125,10 +137,10 @@ another accessible note (title or plain alias).
 
 #### Overlap (declared, non-distinguishing spelling)
 
-Overlap is when the reviewed note **explicitly declares** overlap with another
+Overlap is when the note under recall **explicitly declares** overlap with another
 note and the spelling answer would also be accepted by that note — correct in
 isolation, but non-distinguishing. Undirected title/alias collision without
-declaration is accidental match when the answer fails the reviewed note.
+declaration is accidental match when the answer fails the note under recall.
 
 1. Not a successful recall: no memory-strength growth; do not advance as
    correct.
@@ -171,7 +183,7 @@ means to the Tutor; this section defines what it does to the schedule.
    must never leave a tracker due at the instant its score was recorded.
 6. Otherwise schedule the next recall from the updated memory state through the
    normal interval path. Do not apply the incorrect-recall relearning override: a
-   commissioned tracker is reviewed only when the learner commissions another
+   commissioned tracker is due only when the learner commissions another
    Learning Session, so a short forced retry window would express nothing.
 7. A Tutor session carries no trustworthy effort evidence, so effort is neutral.
 8. A late session does not weaken the result. The score is the evidence, per the
@@ -209,6 +221,8 @@ assert the resulting schedule movement, not the internal measure.
 
 ## Consequences
 
+- Doughnut says **recall**, not FSRS **review**, for the spaced activity
+  (see **Decision**).
 - Busy users are judged on demonstrated recall, not schedule compliance.
 - Correct overdue recalls must not create a positive-feedback workload loop.
 - Accidental match and declared overlap remain first-class outcomes with
@@ -279,7 +293,7 @@ boundary or sufficient current memory state is persisted.
 ## Related
 
 - Working discussion (gap + open issues toward finalizing this ADR): [`.planning/research/FSRS-COMPATIBILITY-GAP.md`](../../.planning/research/FSRS-COMPATIBILITY-GAP.md)
-- ADR 0001 [ubiquitous language](./0001-ubiquitous-language.md) — commissioned learning terms
+- ADR 0001 [ubiquitous language](./0001-ubiquitous-language.md) — **recall** (not FSRS **review**); commissioned learning terms
 - ADR 0005 [commissioned learning session protocol](./0005-commissioned-learning-session-protocol.md) — what a score means to the Tutor
 - Anki answer semantics: <https://docs.ankiweb.net/studying.html#answer-buttons>
 - FSRS algorithm and overdue-review behavior: <https://github.com/open-spaced-repetition/awesome-fsrs/wiki/The-Algorithm>
