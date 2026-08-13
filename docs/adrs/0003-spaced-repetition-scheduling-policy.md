@@ -50,6 +50,18 @@ because **recall is better than review**. Glossary: [ADR 0001](./0001-ubiquitous
 Do not use **review** as a Doughnut domain noun. When citing FSRS, pair once
 (**review (FSRS) = recall**) then use Doughnut terms.
 
+### Whole-hour elapsed-time precision
+
+Use **whole elapsed hours** as the recall-transition time input. Measure the
+duration between the current recall time and `lastRecalledAt`, then discard any
+sub-hour remainder. This is elapsed duration, independent of the learner's time
+zone or whether the timestamps fall on the same calendar day.
+
+Doughnut's morning/afternoon recall windows make day precision too coarse: two
+recalls in different halves of one day can have meaningful elapsed time. C1 does
+not add a separate same-day transition; a future Stability/Difficulty behavior
+may introduce an explicit short-term rule without changing this decision.
+
 ## Working draft
 
 ### Recall inputs and scheduling are separate
@@ -228,10 +240,10 @@ assert the resulting schedule movement, not the internal measure.
    a zero persisted interval is not allowed.
 2. User-configured spacing remains an input, subject to these safety
    properties.
-3. Internal strength representations, interval tables, increments, rounding,
-   and any future stability/retrievability model are implementation details.
-   Policy tests must assert observable schedule behavior, not internal
-   indexes.
+3. Internal strength representations, interval tables, increments, interval
+   rounding, and any future stability/retrievability model are implementation
+   details. Elapsed-time input precision is fixed by the Decision above. Policy
+   tests must assert observable schedule behavior, not internal indexes.
 4. This ADR does not require FSRS. A smaller compatible algorithm may ship
    first; the internal model may change later without changing these rules.
 5. Persisting a due-time projection remains allowed and currently required. Its
@@ -249,6 +261,8 @@ assert the resulting schedule movement, not the internal measure.
   questions, and is the first place this policy quantifies an adjustment.
 - Implementations must distinguish observed retention time from deviation
   relative to a queue target.
+- Recall transitions use whole elapsed hours; sub-hour recall timing does not
+  create a fractional transition input.
 - While history is incomplete, the due-time projection stays operationally
   authoritative for due work even though it is conceptually derived.
 - A rebuildable projection needs additional scheduler state or complete

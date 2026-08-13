@@ -126,8 +126,9 @@ Already detailed in research SUMMARY / ARCHITECTURE; summarized for tracking:
 | C4 | Parallel entry points | Spelling / MCQ / commissioned / manual mark | Divergent semantics risk |
 | C5 | Policy tests on index floats | Early-recall tests encode old semantics | Miss schedule traps |
 | C6 | Frequent-failure count vs accidental | Query treats `correct=false`; ADR says incorrect-only | Product decision |
-| C7 | No Difficulty state | Single index only | Blocks full FSRS parity |
+| C7 | No Stability / Difficulty state | Single index only | Blocks full FSRS parity; migrate in its own later behavior slice, not C1 |
 | C8 | Incomplete recall history for optimizer/replay | Known | FSRS fitting / rebuild deferred |
+| C9 | No lapse count | No persisted `lapses`; no current external behavior consumes it | Add only with the later behavior that needs it, not as unused C1 structure |
 
 ---
 
@@ -149,7 +150,54 @@ Do not reopen unless a stronger reason appears:
 
 ---
 
-## 7. Open issues (discussion queue)
+## 7. Decided delivery boundaries
+
+These decisions constrain implementation ordering without prematurely settling every
+long-term FSRS policy choice.
+
+### C1 — recall-time state cohesion
+
+1. Keep the current persisted tracker as the C1 aggregate:
+   `lastRecalledAt`, `nextRecallAt`, `recallCount`, and
+   `forgettingCurveIndex`.
+2. Express elapsed time directly in **hours**, matching Doughnut's current
+   hour-based scheduler and preserving the distinction between the morning and
+   afternoon halves of a day.
+3. Every state-changing recall advances `lastRecalledAt`: correct, incorrect,
+   accidental match, and Tutor feedback. Overlap and no-feedback are no-ops. A
+   pure administrative schedule edit is not a recall.
+4. Repair legacy `lastRecalledAt` values from the latest trustworthy persisted
+   timestamp. For each tracker, take the maximum of its current
+   `lastRecalledAt`, the latest non-overlap `Answer.createdAt`, and the latest
+   `SessionItem.feedbackRecordedAt`. This preserves valid existing/manual
+   anchors while repairing trackers whose last action was incorrect or Tutor
+   feedback. Do **not** bulk-rewrite `nextRecallAt`.
+5. C1 needs a data-repair migration but no schema change. It does not add
+   `RecallLog`, Stability, Difficulty, or lapses, and it does not rename
+   `nextRecallAt` to `due`/`dueAt` or `recallCount` to `reps`.
+
+### Later behavior slices
+
+1. **Stability / Difficulty migration:** migrate
+   `forgettingCurveIndex` to persisted Stability and Difficulty only in its own
+   behavior slice, when those states actually drive scheduling. Any schema
+   preparation belongs immediately with that behavior.
+2. **Lapses:** introduce persisted `lapses` only with the first external behavior
+   that consumes it (for example, lapse-sensitive scheduling, reporting, or
+   fitting). Do not add a write-only counter in C1.
+3. **Strictly-future scheduling (C3):** deliver separately from C1. After every
+   state-changing recall, require `nextRecallAt > recalledAt`; overlap remains a
+   no-op. If the calculated interval is non-positive, the current recommendation
+   is to use the first positive configured spacing, falling back to 24 hours only
+   when none exists. The invariant is decided; the fallback remains subject to
+   confirmation after the explanation in O13.
+4. **FSRS overdue reward (C2):** do not bundle it into C1. Whether longer
+   elapsed time should earn a bounded Stability increase remains an independent
+   behavior decision in O5.
+
+---
+
+## 8. Open issues (discussion queue)
 
 Check off as decided. Record the decision in one line; then fold into ADR 0003.
 
@@ -169,7 +217,10 @@ Check off as decided. Record the decision in one line; then fold into ADR 0003.
 - [ ] Require Difficulty in v1 of the policy  
 
 **Why it matters:** FSRS’s main structural novelty vs SM-2 is D⊥S. Without D, “compatible” is mostly about using the recall result and elapsed time explicitly.
-**Recommendation to discuss:** Stability-compatible wording now; Difficulty **allowed/reserved**, not required for first retrofit.
+**Delivery decision:** Do **not** introduce or migrate Stability/Difficulty in
+C1. Migrate both in their own later behavior slice.
+**Still open:** Whether ADR 0003 should name Stability/Difficulty as the target
+vocabulary before that migration exists.
 
 ### O3. Grade ontology: map or extend?
 
@@ -197,7 +248,8 @@ Check off as decided. Record the decision in one line; then fold into ADR 0003.
 - [ ] Linear lateness bonus (SM-2-ish) — generally poorer fit  
 
 **Why it matters:** The **minimum bar is already shipped** (overdue ≥ on-time). Open FSRS goes further: longer elapsed → lower R → **larger** (bounded) stability increase. Doughnut does not implement that reward. It only makes FSRS-sense **after C1**, because the reward is “elapsed was long,” not “you missed the queue.”  
-**Recommendation to discuss:** Keep the shipped minimum bar in ADR; decide whether the next behavior slice is C1 only, or C1 plus a bounded FSRS-like reward.
+**Delivery decision:** C1 does not add the reward. Keep the shipped minimum bar
+in ADR; decide separately whether C2 should add a bounded FSRS-like reward.
 
 ### O6. Interval source: space table vs request retention
 
@@ -248,23 +300,86 @@ Proposed replacement options:
 
 ### O11. Same-day / early recalls
 
-FSRS short-term stability vs Doughnut early discount relative to **due**.
+An FSRS “same-day” rule is not merely a calendar grouping. FSRS-6 uses a
+separate short-term stability update when elapsed days are zero, and FSRS
+implementations can also apply minute/hour learning and relearning steps. It is
+a distinct memory-transition path for short-term recalls.
 
-- [ ] After C1 fix, early = elapsed ≪ expected interval → weaker growth (retention-based)  
-- [ ] Explicit same-day rule (cap growth / short-term S) separate from multi-day  
+- [x] C1 passes elapsed time in hours; it does not collapse elapsed time to days
+- [ ] Keep one duration-based transition until the Stability/Difficulty migration
+- [ ] Later adopt an explicit FSRS short-term transition and learning/relearning steps
+- [ ] If a special rule is added, define its boundary by elapsed duration/state rather than user-local calendar date
 
-**Recommendation to discuss:** Retention-based early weakening first; optional same-day rule later if same-day recalls are common.
+**Why hours:** Doughnut already groups daily activity into morning and afternoon
+halves. Day precision would make those observably different recalls look
+simultaneous; hour precision preserves their elapsed time.
+**Recommendation:** C1 should use the current whole-hour precision with no
+special calendar-day branch. Revisit the FSRS short-term formula together with
+the Stability/Difficulty behavior slice, where it can update real short-term
+memory state rather than act as an isolated exception.
+**Decision status:** Hour precision is decided. The eventual same-day/short-term
+policy remains open.
 
 ### O12. Monitoring / rollout
 
 - [ ] What observables after policy change? (interval length distribution, success rate, % due-immediate after correct)  
-- [ ] Any one-time data fix? (ADR says no bulk reinterpret — confirm)  
+- [x] Backfill `lastRecalledAt` from the latest trustworthy Answer/Tutor-feedback timestamp, taking the maximum with its current value
+- [x] Do not bulk-rewrite `nextRecallAt`
+- [ ] Define rollback criteria for the C1 data repair
 
-**Recommendation to discuss:** No bulk `nextRecallAt` rewrite; monitor post-release as ADR Consequences already say.
+**Recommendation to discuss:** Monitor post-release as ADR Consequences already
+say. The anchor backfill repairs known stale state; it is not a history replay or
+a reinterpretation of legacy due times.
+
+### O13. Strictly-future scheduling
+
+“Strictly future” means that after a state-changing recall at time `t`, the
+persisted projection must satisfy `nextRecallAt > t`, not merely
+`nextRecallAt >= t`. Doughnut selects due trackers with `nextRecallAt <= now`, so
+equality makes a tracker immediately selectable again even though the learner
+just graded it.
+
+Ordinary incorrect already projects 12 hours ahead, and commissioned feedback
+already guards against a non-positive interval. Ordinary correct and accidental
+paths still rely on the spacing table and can project zero hours at the lower
+bound.
+
+- [x] Deliver the invariant as C3, separately from C1
+- [x] Apply it to correct, incorrect, accidental match, and Tutor feedback
+- [x] Keep overlap as a no-op
+- [ ] Confirm the fallback: first positive configured spacing; 24 hours only if none exists
+
+**Recommendation:** Adopt that fallback because it respects user configuration
+and matches the existing commissioned-feedback precedent. Test the public recall
+entry points by asserting the observable schedule rather than internal index
+values. This is independent of the same-day policy: a future due time may still
+be later on the same day.
+
+### O14. FSRS engine, version, and parameter ownership
+
+- [ ] Use an open-FSRS library or maintain a Doughnut implementation
+- [ ] Pin which FSRS major algorithm defines compatibility and how upgrades are decided
+- [ ] Store global defaults, per-user desired retention, and fitted parameters at which scopes
+- [ ] Decide when incomplete history is sufficient for fitting and how fallback parameters are selected
+
+**Why it matters:** “Adopt Stability/Difficulty later” does not settle which
+algorithm version updates those states or who owns the parameters. These choices
+belong to the eventual FSRS behavior slice, not C1.
+
+### O15. Lapse semantics and consumer
+
+- [x] Do not add `lapses` in C1
+- [x] Add it only with an external behavior that consumes it
+- [ ] Define which Doughnut outcomes increment it (incorrect only vs accidental/Tutor thresholds)
+- [ ] Choose the first consumer: scheduling, learner-visible reporting, or parameter fitting
+
+**Why it matters:** FSRS cards persist lapse count, but an unused counter would
+be speculative structure. Its outcome semantics should be decided by the
+behavior that first needs it.
 
 ---
 
-## 8. Suggested ADR 0003 final-shape outline (for discussion)
+## 9. Suggested ADR 0003 final-shape outline (for discussion)
 
 If O1=B and O10=middle option, ADR Decision could be organized as:
 
@@ -281,7 +396,7 @@ If O1=B and O10=middle option, ADR Decision could be organized as:
 
 ---
 
-## 9. Decision log
+## 10. Decision log
 
 | Date | Issue | Decision | Where recorded |
 |------|-------|----------|----------------|
@@ -289,10 +404,13 @@ If O1=B and O10=middle option, ADR Decision could be organized as:
 | 2026-08-13 | Doc correction | Research/gap docs no longer describe the shipped penalty as a live bug | This file; SUMMARY / FEATURES / ARCHITECTURE / PITFALLS / SEED-004 |
 | 2026-08-13 | Naming: FSRS review vs Doughnut recall | **Decided** — keep **recall**; FSRS review is a compatibility alias only | ADR 0001 § Recall not review; ADR 0003 Decision |
 | 2026-08-13 | C1 correction and scheduling vocabulary | **Decided** — describe persisted state and recall-transition inputs directly; C1 is explicit elapsed-time/state cohesion, not a persisted-`nextRecallAt` subtraction bug; `RecallLog` is deferred | This file; ADR 0003; supporting research |
+| 2026-08-13 | C1 persistence and migration boundary | **Decided** — keep current fields and hour precision; backfill stale `lastRecalledAt` from trustworthy Answer/Tutor-feedback timestamps; no schema or bulk-due rewrite | This file §7, O11–O12 |
+| 2026-08-13 | FSRS state delivery order | **Decided** — migrate Stability/Difficulty in a later behavior slice; introduce lapses only with behavior that consumes it | This file §7, O2, O15 |
+| 2026-08-13 | Strictly-future scheduling | **Decided** — a separate C3 behavior applies the invariant to every state-changing recall; exact fallback awaits confirmation | This file §7, O13 |
 
 ---
 
-## 10. Related
+## 11. Related
 
 - [ADR 0003](../../docs/adrs/0003-spaced-repetition-scheduling-policy.md) — policy draft to finalize  
 - [SEED-004](../seeds/SEED-004-close-spaced-repetition-scheduling-policy-gap.md) — implementation trigger after policy  

@@ -12,7 +12,7 @@ ADR 0003 defines safety properties for how a graded recall transitions persisted
 
 **Remaining primary gap is C1:** `MemoryTracker.recalledSuccessfully` passes a `delayInHours` measured from a recomputed expected recall time (`lastRecalledAt + current interval`) into `ForgettingCurve.succeeded`. For early success, the formula is algebraically equivalent to scaling by `elapsed / current interval`; it does not read persisted `nextRecallAt`. The remaining problems are the misleading due-relative contract and the fact that `recallFailed` does not advance `lastRecalledAt`, so a later recall can span across a failure. Overdue answers get the on-time increment only — **not** the FSRS overdue reward (longer elapsed → lower R → larger bounded stability).
 
-**Policy-first retrofit, not library migration.** No new runtime libraries. Keep Java / Spring Boot / MySQL / Vue unchanged. Make elapsed time and recall-anchor updates explicit; verify with **observable schedule tests** (`nextRecallAt` strictly after grade, interval monotonicity, outcome-specific non-movement) — not `forgettingCurveIndex` magic numbers. FSRS, `RecallLog` persistence/replay, and bulk `nextRecallAt` migration are deferred per ADR.
+**Policy-first retrofit, not library migration.** No new runtime libraries. Keep Java / Spring Boot / MySQL / Vue unchanged. Make elapsed time and recall-anchor updates explicit; repair stale legacy `lastRecalledAt` anchors from trustworthy Answer/Tutor-feedback timestamps; verify with **observable schedule tests** (`nextRecallAt` strictly after grade, interval monotonicity, outcome-specific non-movement) — not `forgettingCurveIndex` magic numbers. FSRS, `RecallLog` persistence/replay, and bulk `nextRecallAt` migration are deferred per ADR.
 
 ## Key Discoveries
 
@@ -35,7 +35,7 @@ ADR 0003 defines safety properties for how a graded recall transitions persisted
 | Frequent-failure warning | Informational API (`wrongCount`, `threshold`, `periodDays`); no schedule side effect by design |
 | Effort | Thinking-time adjustment clamped; null = neutral |
 | Spacing table | `SpacedRepetitionAlgorithm` + user space intervals unchanged |
-| Schema | Existing `forgetting_curve_index`, `next_recall_at`, `last_recalled_at` sufficient for C1; `RecallLog` is deferred |
+| Persistence | Existing `forgetting_curve_index`, `next_recall_at`, `last_recalled_at` are sufficient for C1; no schema change, but a legacy anchor data repair is required; `RecallLog` is deferred |
 
 ### Stack
 

@@ -88,7 +88,7 @@ advance the anchor.
 | Central schedule apply for recall mutations | Avoids divergent spelling / MCQ / manual paths |
 | `ForgettingCurve.succeeded` | Consume explicit elapsed hours |
 | Shared post-grade strictly-future guard | Pattern already exists on commissioned path |
-| DB schema | No change expected for C1; `RecallLog` / rebuild-from-history deferred |
+| DB schema | No schema change for C1; repair legacy `lastRecalledAt` from trustworthy Answer/Tutor-feedback timestamps; `RecallLog` / rebuild-from-history deferred |
 
 ## Anti-patterns observed / to avoid
 
@@ -99,7 +99,7 @@ advance the anchor.
 
 ## Data already present
 
-`forgetting_curve_index`, `next_recall_at`, `last_recalled_at`, `quiz_answer.outcome`, `quiz_answer.thinking_time_ms`, user space intervals — sufficient for C1 without new persistence. A unified `RecallLog` remains deferred.
+`forgetting_curve_index`, `next_recall_at`, `last_recalled_at`, `quiz_answer.outcome`, `quiz_answer.thinking_time_ms`, user space intervals — sufficient for C1 without new schema. C1 still needs a one-time repair of stale `last_recalled_at` values from the latest trustworthy non-overlap Answer or Tutor-feedback timestamp. A unified `RecallLog` remains deferred.
 
 ## Sources
 

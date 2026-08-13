@@ -15,7 +15,7 @@
 | Java 25 | Domain policy math (`ForgettingCurve`, commissioned feedback policy) |
 | Spring Boot 4.1 | Orchestration, transactions (`MemoryTrackerService`, grading, learning sessions) |
 | Spring Data JPA + MySQL | `forgetting_curve_index`, `next_recall_at`, `last_recalled_at` — sufficient; no event store |
-| Flyway | Present; **no migration expected** for C1 |
+| Flyway | Present; C1 needs a data-repair migration for stale `last_recalled_at`, but no schema change |
 | Vue 3 + TypeScript | Displays due state; sends `thinkingTimeMs`; overlap retry UX — no client-side scheduling |
 
 ## In-house modules
