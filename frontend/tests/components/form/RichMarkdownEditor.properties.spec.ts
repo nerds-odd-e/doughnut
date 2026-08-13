@@ -18,6 +18,13 @@ import {
 } from "./propertiesTestSupport"
 import { createRichMarkdownEditorTestHarness } from "./richMarkdownEditorTestHarness"
 
+const twoPropertyMarkdown = `---
+alpha: one
+beta: two
+---
+
+Body line`
+
 describe("RichMarkdownEditor properties", () => {
   const h = createRichMarkdownEditorTestHarness()
 
@@ -172,13 +179,7 @@ Workshop body.`
   })
 
   it("removing one property row emits markdown without that key and retains the rest", async () => {
-    const markdown = `---
-alpha: one
-beta: two
----
-
-Body line`
-    const wrapper = await h.mountEditor(markdown)
+    const wrapper = await h.mountEditor(twoPropertyMarkdown)
 
     await expandAndClickPropertyRowRemove(wrapper, propertyRowSelector("alpha"))
 
@@ -187,14 +188,20 @@ Body line`
     expect(last).toContain("beta:")
   })
 
-  it("caret toggles options panel and rows expand independently", async () => {
-    const markdown = `---
-alpha: one
-beta: two
----
+  it("removing an expanded property leaves remaining rows collapsed", async () => {
+    const wrapper = await h.mountEditor(twoPropertyMarkdown)
 
-Body line`
-    const wrapper = await h.mountEditor(markdown)
+    await expandAndClickPropertyRowRemove(wrapper, propertyRowSelector("alpha"))
+
+    const betaRow = wrapper.find(propertyRowSelector("beta")).element
+    expect(propertyRowOptionsPanelEl(betaRow)).toBeNull()
+    expect(
+      propertyRowOptionsToggleEl(betaRow).getAttribute("aria-expanded")
+    ).toBe("false")
+  })
+
+  it("caret toggles options panel and rows expand independently", async () => {
+    const wrapper = await h.mountEditor(twoPropertyMarkdown)
     const rows = propertyRows(wrapper.element)
 
     const alphaRow = propertyRowSelector("alpha")

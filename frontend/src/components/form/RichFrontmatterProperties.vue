@@ -32,7 +32,7 @@
     >
       <RichFrontmatterEditablePropertyRow
         v-for="(_, idx) in propertyRows"
-        :key="idx"
+        :key="rowClientIds[idx]"
         v-model="propertyRows[idx]!"
         :idx="idx"
         :wiki-titles="wikiTitles"
@@ -110,6 +110,7 @@ import RichFrontmatterInsertForm from "@/components/form/RichFrontmatterInsertFo
 import { richFrontmatterIsReadmeContextKey } from "@/components/form/richFrontmatterProvide"
 import WikidataAssociationDialog from "@/components/notes/WikidataAssociationDialog.vue"
 import type { WikiTitle } from "@generated/doughnut-backend-api"
+import { usePropertyRowClientIds } from "@/composables/usePropertyRowClientIds"
 import { useRichFrontmatterPropertyEditing } from "@/composables/useRichFrontmatterPropertyEditing"
 import { useWikidataPropertyDialog } from "@/composables/useWikidataPropertyDialog"
 import {
@@ -147,6 +148,7 @@ provide(
 
 const parsed = computed(() => parseNoteContentMarkdown(props.contentMarkdown))
 const propertyRows = ref<PropertyRow[]>([])
+const rowClientIds = usePropertyRowClientIds(propertyRows)
 const insertOpen = ref(false)
 const draftKey = ref("")
 const draftValue = ref("")
