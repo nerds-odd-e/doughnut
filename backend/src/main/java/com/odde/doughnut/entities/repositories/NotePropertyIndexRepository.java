@@ -29,14 +29,10 @@ public interface NotePropertyIndexRepository extends JpaRepository<NotePropertyI
           + MemoryTracker.JPA_WHERE_NOT_COMMISSIONED_TARGET_TRACKER
           + " WHERE iBlock.note = n AND iBlock.propertyKey = i.propertyKey"
           + " AND tBlock.deletedAt IS NULL"
-          + " AND COALESCE(tBlock.recallSetting.skipMemoryTracking, FALSE) = FALSE"
           + " AND tmtBlock IS NULL"
           + ") ";
 
-  String unassimilatedWhereClause =
-      " WHERE mt IS NULL"
-          + " AND COALESCE(n.recallSetting.skipMemoryTracking, FALSE) = FALSE"
-          + " AND n.deletedAt IS NULL ";
+  String unassimilatedWhereClause = " WHERE mt IS NULL" + " AND n.deletedAt IS NULL ";
 
   String unassimilatedDedupeByExactKey =
       " AND i.itemIndex = (SELECT MIN(i2.itemIndex) FROM NotePropertyIndex i2"

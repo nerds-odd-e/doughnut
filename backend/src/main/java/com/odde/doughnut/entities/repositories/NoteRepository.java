@@ -145,11 +145,7 @@ public interface NoteRepository extends CrudRepository<Note, Integer>, NoteStruc
               + "WHERE n.id IN :ids")
   List<Note> hydrateNonDeletedNotesWithNotebookAndFolderByIds(@Param("ids") List<Integer> ids);
 
-  String recallWhereClause =
-      " WHERE "
-          + "   rp IS NULL "
-          + "   AND COALESCE(n.recallSetting.skipMemoryTracking, FALSE) = FALSE "
-          + "   AND n.deletedAt IS NULL ";
+  String recallWhereClause = " WHERE " + "   rp IS NULL " + "   AND n.deletedAt IS NULL ";
 
   String joinMemoryTracker =
       " LEFT JOIN n.memoryTrackers rp ON rp.user.id = :userId"

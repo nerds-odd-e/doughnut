@@ -52,32 +52,11 @@ Inject `"Skip Memory Tracking": true` skip-recalls via assimilate and does not s
 
 ---
 
-### Phase 4 — Assimilation ignores the note skip flag — Behavior — planned
+### Phase 4 — Assimilation ignores the note skip flag — Behavior — done
 
-**Observable**
+Dropped skip-flag predicates from `NoteRepository.recallWhereClause` and `NotePropertyIndexRepository` (unassimilated properties + wiki-link gate). `recall_pages` E2E still 2 passing.
 
-- Pre: An unassimilated note with the flag set is excluded from note and property assimilation; a flagged wiki-link target unblocks properties without a tracker.
-- Trigger: Next assimilation unit.
-- Post: The flag is ignored. The note is a normal candidate. A wiki-link target blocks properties until it has a note-level tracker (including skipped) or is deleted. Notebook skip and skip-recall trackers still exclude.
-
-**Tests**
-
-- Phase 2 backend tests stay green. Do not add a test that sets the dying flag.
-
-**Production (one commit, both predicates — one behavior)**
-
-- Remove `COALESCE(n.recallSetting.skipMemoryTracking, FALSE) = FALSE` from `NoteRepository.recallWhereClause`.
-- Remove the same from `NotePropertyIndexRepository` (`unassimilatedWhereClause` and `targetNoteKeyGateWhere`).
-- Grep production Java: no remaining reads except the embeddable field.
-
-**Verify**
-
-```bash
-CURSOR_DEV=true nix develop -c pnpm backend:test_only
-CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/recall/recall_pages.feature
-```
-
-**Stop-safe:** Checkbox gone; queues ignore the flag. Dead field remains on API/DB.
+**Learning:** `RobotsTests.openApiDocsMatchCommittedYaml` failed on a pre-existing `writeOnly` yaml drift, not this JPQL change. Not fixed here.
 
 ---
 
