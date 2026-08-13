@@ -1,7 +1,14 @@
 import { NoteController } from "@generated/doughnut-backend-api/sdk.gen"
 import { describe, it, expect } from "vitest"
+import type { VueWrapper } from "@vue/test-utils"
 import helper, { mockSdkService } from "@tests/helpers"
 import NoteRecallSettingForm from "@/components/recall/NoteRecallSettingForm.vue"
+
+function checkInputByField(wrapper: VueWrapper, field: string) {
+  return wrapper
+    .findAllComponents({ name: "CheckInput" })
+    .find((c) => c.props("field") === field)
+}
 
 describe("NoteRecallSettingForm", () => {
   const defaultProps = {
@@ -19,18 +26,22 @@ describe("NoteRecallSettingForm", () => {
     mockSdkService(NoteController, "updateNoteRecallSetting", undefined)
   })
 
+  it("should not show skip memory tracking checkbox", () => {
+    const wrapper = helper
+      .component(NoteRecallSettingForm)
+      .withProps(defaultProps)
+      .mount()
+
+    expect(checkInputByField(wrapper, "skipMemoryTracking")).toBeUndefined()
+  })
+
   it("should show remember spelling checkbox when isLinkNote is false", () => {
     const wrapper = helper
       .component(NoteRecallSettingForm)
       .withProps({ ...defaultProps, isLinkNote: false })
       .mount()
 
-    const checkInputs = wrapper.findAllComponents({ name: "CheckInput" })
-    const rememberSpellingInput = checkInputs.find(
-      (c) => c.props("field") === "rememberSpelling"
-    )
-
-    expect(rememberSpellingInput).toBeDefined()
+    expect(checkInputByField(wrapper, "rememberSpelling")).toBeDefined()
   })
 
   it("should hide remember spelling checkbox when isLinkNote is true", () => {
@@ -39,12 +50,7 @@ describe("NoteRecallSettingForm", () => {
       .withProps({ ...defaultProps, isLinkNote: true })
       .mount()
 
-    const checkInputs = wrapper.findAllComponents({ name: "CheckInput" })
-    const rememberSpellingInput = checkInputs.find(
-      (c) => c.props("field") === "rememberSpelling"
-    )
-
-    expect(rememberSpellingInput).toBeUndefined()
+    expect(checkInputByField(wrapper, "rememberSpelling")).toBeUndefined()
   })
 
   describe("Remember Spelling checkbox disabled state", () => {
@@ -54,12 +60,9 @@ describe("NoteRecallSettingForm", () => {
         .withProps({ ...defaultProps, noteContent: "" })
         .mount()
 
-      const checkInputs = wrapper.findAllComponents({ name: "CheckInput" })
-      const rememberSpellingInput = checkInputs.find(
-        (c) => c.props("field") === "rememberSpelling"
-      )
-
-      expect(rememberSpellingInput?.props("disabled")).toBe(true)
+      expect(
+        checkInputByField(wrapper, "rememberSpelling")?.props("disabled")
+      ).toBe(true)
     })
 
     it("should be disabled when noteContent is undefined", () => {
@@ -68,12 +71,9 @@ describe("NoteRecallSettingForm", () => {
         .withProps({ ...defaultProps, noteContent: undefined })
         .mount()
 
-      const checkInputs = wrapper.findAllComponents({ name: "CheckInput" })
-      const rememberSpellingInput = checkInputs.find(
-        (c) => c.props("field") === "rememberSpelling"
-      )
-
-      expect(rememberSpellingInput?.props("disabled")).toBe(true)
+      expect(
+        checkInputByField(wrapper, "rememberSpelling")?.props("disabled")
+      ).toBe(true)
     })
 
     it("should be disabled when noteContent is whitespace only", () => {
@@ -82,12 +82,9 @@ describe("NoteRecallSettingForm", () => {
         .withProps({ ...defaultProps, noteContent: "   " })
         .mount()
 
-      const checkInputs = wrapper.findAllComponents({ name: "CheckInput" })
-      const rememberSpellingInput = checkInputs.find(
-        (c) => c.props("field") === "rememberSpelling"
-      )
-
-      expect(rememberSpellingInput?.props("disabled")).toBe(true)
+      expect(
+        checkInputByField(wrapper, "rememberSpelling")?.props("disabled")
+      ).toBe(true)
     })
 
     it("should be enabled when noteContent has text", () => {
@@ -96,12 +93,9 @@ describe("NoteRecallSettingForm", () => {
         .withProps({ ...defaultProps, noteContent: "Some content" })
         .mount()
 
-      const checkInputs = wrapper.findAllComponents({ name: "CheckInput" })
-      const rememberSpellingInput = checkInputs.find(
-        (c) => c.props("field") === "rememberSpelling"
-      )
-
-      expect(rememberSpellingInput?.props("disabled")).toBeFalsy()
+      expect(
+        checkInputByField(wrapper, "rememberSpelling")?.props("disabled")
+      ).toBeFalsy()
     })
 
     it("should show error message when disabled", () => {
@@ -139,12 +133,9 @@ describe("NoteRecallSettingForm", () => {
         })
         .mount()
 
-      const checkInputs = wrapper.findAllComponents({ name: "CheckInput" })
-      const rememberSpellingInput = checkInputs.find(
-        (c) => c.props("field") === "rememberSpelling"
-      )
-
-      expect(rememberSpellingInput?.props("modelValue")).toBe(false)
+      expect(
+        checkInputByField(wrapper, "rememberSpelling")?.props("modelValue")
+      ).toBe(false)
     })
 
     it("should enable checkbox when noteContent changes from empty to having content", async () => {
@@ -153,16 +144,15 @@ describe("NoteRecallSettingForm", () => {
         .withProps({ ...defaultProps, noteContent: "" })
         .mount()
 
-      const getRememberSpellingInput = () =>
-        wrapper
-          .findAllComponents({ name: "CheckInput" })
-          .find((c) => c.props("field") === "rememberSpelling")
-
-      expect(getRememberSpellingInput()?.props("disabled")).toBe(true)
+      expect(
+        checkInputByField(wrapper, "rememberSpelling")?.props("disabled")
+      ).toBe(true)
 
       await wrapper.setProps({ noteContent: "This is the definition" })
 
-      expect(getRememberSpellingInput()?.props("disabled")).toBe(false)
+      expect(
+        checkInputByField(wrapper, "rememberSpelling")?.props("disabled")
+      ).toBe(false)
     })
   })
 })

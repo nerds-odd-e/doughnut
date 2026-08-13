@@ -17,13 +17,6 @@
     :disabled="isSpellingDisabled"
     @update:model-value="updateModelValue({ rememberSpelling: $event })"
   />
-  <CheckInput
-    scope-name="recall_setting"
-    field="skipMemoryTracking"
-    :model-value="formData.skipMemoryTracking"
-    :error-message="errors.skipMemoryTracking"
-    @update:model-value="updateModelValue({ skipMemoryTracking: $event })"
-  />
 </template>
 
 <script lang="ts">
