@@ -1,6 +1,6 @@
 # Close recall-time state cohesion (C1)
 
-**Status:** In progress — Phases 1–9 complete; Phase 10 next
+**Status:** In progress — Phases 1–10 complete; Phase 11 blocked on production repair snapshot
 **Plan type:** Ad-hoc phased delivery
 **Created:** 2026-08-13
 **Refined:** 2026-08-13 for small, green commit boundaries
@@ -108,7 +108,7 @@ timestamps without changing `nextRecallAt`.
 | 7 | Behavior | Done | Overlap is protected as a no-anchor-mutation outcome |
 | 8 | Behavior | Done | Recorded Tutor Feedback is protected as an anchor-moving outcome |
 | 9 | Behavior | Done | Missing Tutor Feedback is protected as a no-mutation outcome |
-| 10 | Structure | Planned | A default-off repair gate enables only the next repair behavior |
+| 10 | Structure | Done | A default-off repair gate enables only the next repair behavior |
 | 11 | Behavior | Planned | Legacy normal Answers repair stale anchors |
 | 12 | Behavior | Planned | Legacy accidental-match Answers repair stale anchors; overlap does not |
 | 13 | Behavior | Planned | Legacy Tutor Feedback repairs stale anchors |
@@ -358,7 +358,7 @@ transition changed all four and failed exactly this assertion.
 ## Phase 10 — Add the recall-anchor repair gate
 
 **Type:** Structure
-**Status:** Planned
+**Status:** Done
 **Enables only:** Phase 11
 
 **Structural outcome:** A dedicated `${recall_anchor_repair}` Flyway placeholder
@@ -375,6 +375,11 @@ Before Phase 11's production push, Jidoka requires the affected-row count and an
 export of `(id, last_recalled_at, next_recall_at)` for recovery.
 
 **Verification:** `CURSOR_DEV=true nix develop -c pnpm backend:verify`.
+
+**Learning:** The new placeholder defaults off in every application profile and
+is enabled only by the production MIG command, whose focused script test went
+red→green. Extracting the production profile to `application-prod.yml` kept
+configuration files below 250 lines without changing profile behavior.
 
 **Stop-safe:** No behavior or data changes; this structure enables only the
 immediately following normal-Answer repair.

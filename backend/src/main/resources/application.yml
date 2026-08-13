@@ -29,6 +29,7 @@ spring:
   flyway:
     placeholders:
       embedding_column: "embedding_raw VARBINARY(6144) NOT NULL"
+      recall_anchor_repair: "1=0"
       tz_repair: "1=0"
   jpa:
     generate-ddl: false
@@ -98,6 +99,7 @@ spring:
     clean-disabled: true
     placeholders:
       embedding_column: "embedding_raw VARBINARY(6144) NOT NULL"
+      recall_anchor_repair: "1=0"
       tz_repair: "1=0"
   jpa:
     generate-ddl: false
@@ -132,94 +134,6 @@ springdoc:
 ---
 spring:
   config:
-    activate:
-      on-profile: prod
-  task:
-    scheduling:
-      pool:
-        size: 3
-  logging:
-    level:
-      root: INFO
-      org.springframework: INFO
-      org.springframework.web: INFO
-      com.odde.doughnut: INFO
-      org.hibernate: WARN
-      com.zaxxer.hikari: WARN
-  web:
-    resources:
-      cache:
-        cachecontrol:
-          max-age: 365d
-          no-store: false
-          no-cache: false
-  servlet:
-    multipart:
-      max-file-size: 100MB
-      max-request-size: 100MB
-  datasource:
-    url: jdbc:mysql://db-server:3306/doughnut?connectionTimeZone=UTC&forceConnectionTimeZoneToSession=true
-    username: doughnut
-    password: ${MYSQL_PASSWORD}
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    hikari:
-      connection-timeout: 20000
-      minimum-idle: 5
-      maximum-pool-size: 12
-      idle-timeout: 300000
-      max-lifetime: 1200000
-      auto-commit: true
-      connection-test-query: SELECT 1
-      validation-timeout: 5000
-      leak-detection-threshold: 60000
-  flyway:
-    clean-disabled: true
-    placeholders:
-      embedding_column: "embedding VECTOR(1536) USING VARBINARY NOT NULL"
-      tz_repair: "1=0"
-  jpa:
-    generate-ddl: false
-    show-sql: false
-    properties.hibernate:
-      enable_lazy_load_no_trans: true
-      globally_quoted_identifiers: true
-      globally_quoted_identifiers_skip_column_definitions: true
-    open-in-view: false
-  redis:
-    host: 127.0.0.1
-    port: 6380
-    timeout: 2000ms
-    connect-timeout: 2000ms
-  security:
-    oauth2:
-      client:
-        registration:
-          github:
-            clientId: ${OAUTH2_github_client_id}
-            clientSecret: ${OAUTH2_github_client_secret}
-  github_for_issues:
-    repo: nerds-odd-e/doughnut
-    token: ${GITHUB_FOR_ISSUES_API_TOKEN}
-  openai:
-    token: ${OPENAI_API_TOKEN}
-question:
-  regeneration:
-    times: 0
-doughnut:
-  # prod: book PDF bytes live in this bucket (GcsBookStorage). Non-prod uses DB storage instead.
-  book-pdf:
-    gcs:
-      bucket: doughnut-book-pdf-carbon-syntax-298809
-server:
-  error:
-    include-stacktrace: never
-  forward-headers-strategy: FRAMEWORK
-springdoc:
-  api-docs:
-    enabled: false
----
-spring:
-  config:
     import: db-dev.properties
     activate:
       on-profile: dev
@@ -242,6 +156,7 @@ spring:
   flyway:
     placeholders:
       embedding_column: "embedding_raw VARBINARY(6144) NOT NULL"
+      recall_anchor_repair: "1=0"
       tz_repair: "1=0"
   jpa:
     generate-ddl: false
