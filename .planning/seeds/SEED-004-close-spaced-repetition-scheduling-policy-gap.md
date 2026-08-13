@@ -38,15 +38,17 @@ model first (not a full FSRS migration).
 ## Breadcrumbs
 
 - `docs/adrs/0003-spaced-repetition-scheduling-policy.md` — **authoritative policy** to implement and verify against
+- `.planning/research/FSRS-COMPATIBILITY-GAP.md` — Doughnut ↔ open FSRS gap + open issues to settle before finalizing ADR 0003
 - `docs/adrs/0001-ubiquitous-language.md` — spaced-repetition schedule / space setting glossary
 - `docs/adrs/0005-commissioned-learning-session-protocol.md` — Tutor score meaning (ADR 0003 § commissioned feedback)
 - `backend/src/main/java/com/odde/doughnut/algorithms/` — spaced-repetition math
 - `backend/src/main/java/com/odde/doughnut/services/MemoryTrackerService.java` — tracker scheduling entry points
-- `.planning/STATE.md` — operator item: human review of Proposed ADR 0003
+- `.planning/STATE.md` — operator item: resolve FSRS gap open issues, then finalize ADR 0003
 
 ## Notes
 
-- ADR status is Proposed; approval and implementation can proceed in parallel but should not drift from the written policy.
+- ADR status is Proposed; settle FSRS-COMPATIBILITY-GAP open issues before treating 0003 as final shape.
+- Approval and implementation can proceed after the written policy is stable; do not drift from it.
 - Policy tests must assert observable schedule behavior, not internal strength indexes.
 - Tests that require late correct answers to lose strength solely for lateness must be replaced (per ADR consequences).
 - Rebuildable due-time projection from history alone is explicitly deferred; preserve transactional consistency with the existing `nextRecallAt` projection.

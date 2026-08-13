@@ -55,10 +55,16 @@ Details: [PITFALLS.md](./PITFALLS.md). Architecture: [ARCHITECTURE.md](./ARCHITE
 
 ## Open questions
 
-- **Accidental match vs frequent-failure:** Current wrong-count query treats `correct=false` (includes accidental match); ADR says incorrect-only. Product decision needed.
-- **ADR 0003 status:** Still Proposed — human approval or explicit drift tracking before shipping policy changes.
+Tracked and expanded (including Doughnut ↔ open FSRS compatibility) in
+**[FSRS-COMPATIBILITY-GAP.md](./FSRS-COMPATIBILITY-GAP.md)** — settle those issues
+before finalizing ADR 0003.
+
+Prior short list (still open there as O5 / O8 / O9 / O10):
+
+- **Accidental match vs frequent-failure:** Current wrong-count query treats `correct=false` (includes accidental match); ADR says incorrect-only.
+- **ADR 0003 status / FSRS stance:** Still Proposed — decide semantic vs vocabulary vs migration commitment.
 - **Bounded lateness bonus:** ADR allows; not required for removing the late-success penalty.
-- **Manual `markAsRecalled` / `updateForgettingCurve`:** Clarify whether admin/bypass paths must follow the same evidence rules.
+- **Manual `markAsRecalled` / `updateForgettingCurve`:** Same evidence rules vs explicit escape hatch.
 
 ## Confidence
 

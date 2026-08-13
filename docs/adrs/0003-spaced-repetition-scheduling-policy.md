@@ -271,6 +271,7 @@ boundary or sufficient current memory state is persisted.
 
 ## Related
 
+- Working discussion (gap + open issues toward finalizing this ADR): [`.planning/research/FSRS-COMPATIBILITY-GAP.md`](../../.planning/research/FSRS-COMPATIBILITY-GAP.md)
 - ADR 0001 [ubiquitous language](./0001-ubiquitous-language.md) — commissioned learning terms
 - ADR 0005 [commissioned learning session protocol](./0005-commissioned-learning-session-protocol.md) — what a score means to the Tutor
 - Anki answer semantics: <https://docs.ankiweb.net/studying.html#answer-buttons>
