@@ -1,6 +1,6 @@
 # Close recall-time state cohesion (C1)
 
-**Status:** In progress — Phase 1 complete; Phase 2 next
+**Status:** In progress — Phases 1–2 complete; Phase 3 next
 **Plan type:** Ad-hoc phased delivery
 **Created:** 2026-08-13
 **Refined:** 2026-08-13 for small, green commit boundaries
@@ -100,7 +100,7 @@ timestamps without changing `nextRecallAt`.
 | Phase | Type | Status | One commit outcome |
 |------:|------|--------|--------------------|
 | 1 | Behavior | Done | Correct recall is proven independent of persisted due projection |
-| 2 | Behavior | Planned | Correct recall is proven to use whole-hour precision |
+| 2 | Behavior | Done | Correct recall is proven to use whole-hour precision |
 | 3 | Structure | Planned | Success transition speaks elapsed hours without schedule changes |
 | 4 | Behavior | Planned | Ordinary incorrect recall becomes the new anchor |
 | 5 | Behavior | Planned | A correct recall after failure is proven to use the failure anchor |
@@ -141,7 +141,7 @@ structure changes.
 ## Phase 2 — Protect whole-hour precision
 
 **Type:** Behavior (existing-behavior regression)
-**Status:** Planned
+**Status:** Done
 
 - **Precondition:** Two otherwise identical trackers are recalled after the
   same number of whole hours, with one recall also carrying a sub-hour remainder.
@@ -154,8 +154,11 @@ production change.
 
 **Verification:** `CURSOR_DEV=true nix develop -c pnpm backend:test_only`.
 
-**Stop-safe:** The accepted ADR precision is executable before terminology and
-formula structure change.
+**Learning:** The existing transition produced the same schedule after 300
+hours and after 300 hours 30 minutes while retaining each exact grade timestamp.
+
+**Stop-safe:** The C1 precision chosen in Proposed ADR 0003 is executable before
+terminology and formula structure change.
 
 ## Phase 3 — Express success in elapsed hours
 

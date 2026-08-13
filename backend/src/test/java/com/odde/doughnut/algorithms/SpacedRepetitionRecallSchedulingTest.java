@@ -35,4 +35,32 @@ class SpacedRepetitionRecallSchedulingTest {
         TimestampOperations.getDiffInHours(laterProjection.getNextRecallAt(), gradeTime);
     assertThat(earlierInterval, equalTo(laterInterval));
   }
+
+  @Test
+  void correctRecallIntervalUsesWholeElapsedHours() {
+    MakeMe makeMe = MakeMe.makeMeWithoutFactoryService();
+    User user = makeMe.aUser().withSpaceIntervals("3, 6, 9, 12, 15").inMemoryPlease();
+    Note note = makeMe.aNote().inMemoryPlease();
+    MemoryTracker wholeHourRecall =
+        makeMe.aMemoryTrackerFor(note).by(user).afterNthStrictRecall(3).inMemoryPlease();
+    MemoryTracker recallWithSubHourRemainder =
+        makeMe.aMemoryTrackerFor(note).by(user).afterNthStrictRecall(3).inMemoryPlease();
+    Timestamp wholeHourGradeTime =
+        TimestampOperations.addHoursToTimestamp(wholeHourRecall.getLastRecalledAt(), 300);
+    Timestamp gradeTimeWithSubHourRemainder =
+        Timestamp.from(wholeHourGradeTime.toInstant().plusSeconds(30 * 60));
+
+    wholeHourRecall.recalledSuccessfully(wholeHourGradeTime, null);
+    recallWithSubHourRemainder.recalledSuccessfully(gradeTimeWithSubHourRemainder, null);
+
+    long wholeHourInterval =
+        TimestampOperations.getDiffInHours(wholeHourRecall.getNextRecallAt(), wholeHourGradeTime);
+    long subHourRemainderInterval =
+        TimestampOperations.getDiffInHours(
+            recallWithSubHourRemainder.getNextRecallAt(), gradeTimeWithSubHourRemainder);
+    assertThat(subHourRemainderInterval, equalTo(wholeHourInterval));
+    assertThat(wholeHourRecall.getLastRecalledAt(), equalTo(wholeHourGradeTime));
+    assertThat(
+        recallWithSubHourRemainder.getLastRecalledAt(), equalTo(gradeTimeWithSubHourRemainder));
+  }
 }
