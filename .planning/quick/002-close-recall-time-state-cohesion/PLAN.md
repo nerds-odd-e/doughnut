@@ -1,6 +1,6 @@
 # Close recall-time state cohesion (C1)
 
-**Status:** In progress — Phases 1–10 complete; Phase 11 blocked on production repair snapshot
+**Status:** In progress — Phases 1–10 complete; Phase 11 next
 **Plan type:** Ad-hoc phased delivery
 **Created:** 2026-08-13
 **Refined:** 2026-08-13 for small, green commit boundaries
@@ -373,6 +373,12 @@ production repair deployment. No migration consumes it yet.
 
 Before Phase 11's production push, Jidoka requires the affected-row count and an
 export of `(id, last_recalled_at, next_recall_at)` for recovery.
+
+**Production snapshot:** 130 affected normal-Answer trackers on 2026-08-13.
+Recovery export stored outside the repository at
+`/Users/terryyin/.codex/recovery/doughnut/recall-anchor/2026-08-13T103119Z/normal-answer-anchors-before-repair.tsv`
+(mode `600`, SHA-256
+`1ef465ced5d60a02b3951021bbe25e922d59f6648bbbdecf6dd0ec5b353df240`).
 
 **Verification:** `CURSOR_DEV=true nix develop -c pnpm backend:verify`.
 
