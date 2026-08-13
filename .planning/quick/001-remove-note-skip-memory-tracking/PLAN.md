@@ -76,27 +76,9 @@ Inject column removed. E2E uses `the notes "…" are skip-recalled` (assimilate-
 
 ---
 
-### Phase 7 — `note.skip_memory_tracking` column dropped — Behavior — planned
+### Phase 7 — `note.skip_memory_tracking` column dropped — Behavior — done
 
-**Observable**
-
-- Pre: `note.skip_memory_tracking` still exists.
-- Trigger: Migrate the database.
-- Post: The column is gone. Notebook `skip_memory_tracking_entirely` remains.
-
-**Production**
-
-- New Flyway `V300000247__drop_note_skip_memory_tracking.sql` (next free version if 247 is taken): `ALTER TABLE note DROP COLUMN skip_memory_tracking;`
-- Do not edit `V100000000__baseline.sql`.
-- Regenerate `docs/database-erd.md` (`database-erd` skill) if note columns are listed.
-
-**Verify**
-
-```bash
-CURSOR_DEV=true nix develop -c pnpm backend:test_only
-```
-
-**Stop-safe:** Schema matches the removed concept.
+`V300000247__drop_note_skip_memory_tracking.sql`. Baseline and notebook `skip_memory_tracking_entirely` untouched. ERD skipped (no note columns listed).
 
 ---
 
