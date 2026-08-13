@@ -1,6 +1,6 @@
 # Close recall-time state cohesion (C1)
 
-**Status:** In progress — Phases 1–8 complete; Phase 9 next
+**Status:** In progress — Phases 1–9 complete; Phase 10 next
 **Plan type:** Ad-hoc phased delivery
 **Created:** 2026-08-13
 **Refined:** 2026-08-13 for small, green commit boundaries
@@ -107,7 +107,7 @@ timestamps without changing `nextRecallAt`.
 | 6 | Behavior | Done | Accidental match is protected as an anchor-moving outcome |
 | 7 | Behavior | Done | Overlap is protected as a no-anchor-mutation outcome |
 | 8 | Behavior | Done | Recorded Tutor Feedback is protected as an anchor-moving outcome |
-| 9 | Behavior | Planned | Missing Tutor Feedback is protected as a no-mutation outcome |
+| 9 | Behavior | Done | Missing Tutor Feedback is protected as a no-mutation outcome |
 | 10 | Structure | Planned | A default-off repair gate enables only the next repair behavior |
 | 11 | Behavior | Planned | Legacy normal Answers repair stale anchors |
 | 12 | Behavior | Planned | Legacy accidental-match Answers repair stale anchors; overlap does not |
@@ -332,7 +332,7 @@ time; restoring only the old anchor made exactly this assertion fail.
 ## Phase 9 — Protect missing Feedback as no mutation
 
 **Type:** Behavior (existing-behavior regression)
-**Status:** Planned
+**Status:** Done
 
 - **Precondition:** A commissioned tracker has an existing anchor and a Tutor
   report contains no accepted Feedback for it.
@@ -348,6 +348,10 @@ a defect.
 
 - `CURSOR_DEV=true nix develop -c pnpm backend:test_only`
 - `CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/learning_session/commissioned_learning_session.feature`
+
+**Learning:** The all-lines-rejected controller path now snapshots anchor,
+count, strength, and due projection together; a deliberately injected Feedback
+transition changed all four and failed exactly this assertion.
 
 **Stop-safe:** Both sides of the trustworthy-grade boundary are now covered.
 

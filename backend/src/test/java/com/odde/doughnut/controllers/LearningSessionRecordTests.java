@@ -11,6 +11,7 @@ import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.SessionItem;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import java.sql.Timestamp;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 
 class LearningSessionRecordTests extends LearningSessionControllerTestBase {
@@ -77,7 +78,15 @@ class LearningSessionRecordTests extends LearningSessionControllerTestBase {
     Timestamp dayTwo = makeMe.aTimestamp().of(1, 9).please();
     testabilitySettings.timeTravelTo(dayTwo);
 
-    Notebook notebook = spanishNotebook(dayTwo);
+    SpanishNotebookFixture fixture = spanishNotebookFixture(dayTwo);
+    Notebook notebook = fixture.notebook();
+    MemoryTracker holaTracker = fixture.holaTracker();
+    var trackerStateBefore =
+        List.of(
+            holaTracker.getLastRecalledAt(),
+            holaTracker.getRecallCount(),
+            holaTracker.getForgettingCurveIndex(),
+            holaTracker.getNextRecallAt());
     long sessionsBefore = learningSessionRepository.count();
 
     RecordLearningSessionResponse response =
@@ -95,6 +104,13 @@ class LearningSessionRecordTests extends LearningSessionControllerTestBase {
     assertThat(response.getRecordedItems(), empty());
     assertThat(response.getRejectedEntries(), hasSize(2));
     assertThat(learningSessionRepository.count(), equalTo(sessionsBefore));
+    assertThat(
+        List.of(
+            holaTracker.getLastRecalledAt(),
+            holaTracker.getRecallCount(),
+            holaTracker.getForgettingCurveIndex(),
+            holaTracker.getNextRecallAt()),
+        equalTo(trackerStateBefore));
   }
 
   @Test
