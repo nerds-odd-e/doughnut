@@ -1,11 +1,7 @@
 package com.odde.doughnut.testability;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.odde.doughnut.algorithms.NoteContentMarkdown;
 import com.odde.doughnut.controllers.dto.Randomization;
 import com.odde.doughnut.entities.*;
-import com.odde.doughnut.entities.repositories.CircleRepository;
-import com.odde.doughnut.entities.repositories.FolderRepository;
 import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.entities.repositories.NotebookRepository;
 import com.odde.doughnut.entities.repositories.UserRepository;
@@ -13,9 +9,8 @@ import com.odde.doughnut.factoryServices.EntityPersister;
 import com.odde.doughnut.services.BazaarService;
 import com.odde.doughnut.services.CircleService;
 import com.odde.doughnut.services.GithubService;
-import com.odde.doughnut.services.NotebookService;
 import com.odde.doughnut.services.UserService;
-import com.odde.doughnut.services.WikiTitleCacheService;
+import com.odde.doughnut.testability.model.NotesTestData;
 import com.odde.doughnut.testability.model.PredefinedQuestionsTestData;
 import com.odde.doughnut.utils.TimestampOperations;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -26,7 +21,6 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.stream.Collectors;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.logging.log4j.util.Strings;
@@ -47,15 +41,12 @@ class TestabilityRestController {
   @Autowired NoteRepository noteRepository;
   @Autowired NotebookRepository notebookRepository;
   @Autowired UserRepository userRepository;
-  @Autowired CircleRepository circleRepository;
   @Autowired EntityPersister entityPersister;
   @Autowired CircleService circleService;
   @Autowired TestabilitySettings testabilitySettings;
   @Autowired BazaarService bazaarService;
   @Autowired UserService userService;
-  @Autowired NotebookService notebookService;
-  @Autowired FolderRepository folderRepository;
-  @Autowired WikiTitleCacheService wikiTitleCacheService;
+  @Autowired InjectNotesWorker injectNotesWorker;
 
   @PostMapping("/clean_db_and_reset_testability_settings")
   @Transactional
@@ -91,146 +82,6 @@ class TestabilityRestController {
     entityPersister.save(user);
   }
 
-  static class NoteTestData {
-    @JsonProperty("Title")
-    public String title;
-
-    @JsonProperty("Content")
-    @Setter
-    private String content;
-
-    @JsonProperty("Skip Memory Tracking")
-    @Setter
-    private Boolean skipMemoryTracking;
-
-    @JsonProperty("Remember Spelling")
-    @Setter
-    private Boolean rememberSpelling;
-
-    @JsonProperty("Image Url")
-    @Setter
-    private String imageUrl;
-
-    @JsonProperty("Image Mask")
-    @Setter
-    private String imageMask;
-
-    @Schema(
-        name = "Folder",
-        description =
-            "Notebook-local folder path (segments separated by /). E2E/testability only: missing"
-                + " folder rows are created here, then the note is assigned that folder. Production"
-                + " note APIs do not accept or infer folder paths.")
-    @JsonProperty("Folder")
-    @Getter
-    @Setter
-    private String folder;
-
-    private Note buildNote(Timestamp currentUTCTimestamp) {
-      Note note = new Note();
-      note.setTitle(new DisplayName(title));
-      note.setContent(content);
-      note.setUpdatedAt(currentUTCTimestamp);
-      if (skipMemoryTracking != null) {
-        note.getRecallSetting().setSkipMemoryTracking(skipMemoryTracking);
-      }
-      if (rememberSpelling != null) {
-        note.getRecallSetting().setRememberSpelling(rememberSpelling);
-      }
-
-      String url = imageUrl != null ? imageUrl.trim() : "";
-      boolean hasImage = !Strings.isBlank(url);
-      String mask = imageMask != null ? imageMask : "";
-      note.setContent(
-          NoteContentMarkdown.mergeNoteImageScalarsIntoContent(
-              note.getContent() != null ? note.getContent() : "", hasImage, url, mask));
-
-      note.setUpdatedAt(currentUTCTimestamp);
-      return note;
-    }
-  }
-
-  @Schema(name = "NotesTestData")
-  static class NotesTestData {
-    @Getter @Setter private List<NoteTestData> noteTestData;
-    @Setter private String externalIdentifier;
-    @Setter private String circleName; // optional
-
-    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
-    @Getter
-    @Setter
-    private String notebookName;
-
-    private Map<String, Note> buildIndividualNotes(Timestamp currentUTCTimestamp) {
-      Map<String, Note> titleNoteMap = new LinkedHashMap<>();
-      for (NoteTestData noteTestData : noteTestData) {
-        titleNoteMap.put(noteTestData.title, noteTestData.buildNote(currentUTCTimestamp));
-      }
-      return titleNoteMap;
-    }
-
-    private void buildNoteTree(
-        Notebook notebook,
-        Timestamp currentUTCTimestamp,
-        Map<String, Note> titleNoteMap,
-        EntityPersister entityPersister) {
-      for (NoteTestData injection : noteTestData) {
-        Note note = titleNoteMap.get(injection.title);
-        note.initializeNewNote(notebook, currentUTCTimestamp, injection.title);
-        notebook.setUpdatedAt(currentUTCTimestamp);
-        entityPersister.merge(notebook);
-      }
-    }
-
-    private void saveByOriginalOrder(
-        Map<String, Note> titleNoteMap, EntityPersister entityPersister) {
-      noteTestData.forEach(inject -> entityPersister.save(titleNoteMap.get(inject.title)));
-    }
-  }
-
-  private void applyExplicitFolderPlacements(
-      List<NoteTestData> injections, Map<String, Note> titleNoteMap, Timestamp now) {
-    for (NoteTestData injection : injections) {
-      if (Strings.isBlank(injection.getFolder())) {
-        continue;
-      }
-      Note note = titleNoteMap.get(injection.title);
-      Folder folder = resolveOrCreateFolderPath(note.getNotebook(), injection.getFolder(), now);
-      note.setFolder(folder);
-    }
-  }
-
-  private Folder resolveOrCreateFolderPath(Notebook notebook, String folderPath, Timestamp now) {
-    Folder parent = null;
-    for (String rawSegment : folderPath.split("/")) {
-      String name = rawSegment.trim();
-      if (name.isEmpty()) {
-        continue;
-      }
-      Integer parentFolderId = parent == null ? null : parent.getId();
-      DisplayName segmentName = new DisplayName(name);
-      List<Folder> candidates =
-          folderRepository.findCandidateChildContainers(
-              notebook.getId(), parentFolderId, segmentName);
-      if (!candidates.isEmpty()) {
-        parent = candidates.getFirst();
-        continue;
-      }
-      Folder created = new Folder();
-      created.setNotebook(notebook);
-      created.setParentFolder(parent);
-      created.setName(segmentName);
-      created.setCreatedAt(now);
-      created.setUpdatedAt(now);
-      entityPersister.save(created);
-      parent = created;
-    }
-    if (parent == null) {
-      throw new RuntimeException("Folder path resolved to no folder: `" + folderPath + "`");
-    }
-    return parent;
-  }
-
   @Schema(name = "ShareToBazaarRequest")
   @Getter
   @Setter
@@ -242,65 +93,11 @@ class TestabilityRestController {
   @PostMapping("/inject_notes")
   @Transactional
   public Map<String, Integer> injectNotes(@RequestBody NotesTestData notesTestData) {
-    if (Strings.isEmpty(notesTestData.externalIdentifier)) {
+    if (Strings.isEmpty(notesTestData.getExternalIdentifier())) {
       throw new RuntimeException("externalIdentifier is required and cannot be empty");
     }
-    if (Strings.isEmpty(notesTestData.notebookName)) {
-      throw new RuntimeException("notebookName is required and cannot be empty");
-    }
-    final User user = getUserModelByExternalIdentifier(notesTestData.externalIdentifier);
-    Ownership ownership = getOwnership(notesTestData, user);
-    Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
-
-    List<NoteTestData> injections =
-        Optional.ofNullable(notesTestData.getNoteTestData()).orElseGet(Collections::emptyList);
-    notesTestData.setNoteTestData(injections);
-    if (injections.isEmpty()) {
-      Optional<Notebook> existingNotebook =
-          notebookRepository.findFirstByNameAndDeletedAtIsNullOrderByIdAsc(
-              new DisplayName(notesTestData.notebookName));
-      if (existingNotebook.isPresent()) {
-        Notebook nb = existingNotebook.get();
-        if (!Objects.equals(nb.getOwnership().getId(), ownership.getId())) {
-          throw new RuntimeException(
-              "Notebook named `"
-                  + notesTestData.notebookName
-                  + "` exists but belongs to different ownership.");
-        }
-        return Collections.emptyMap();
-      }
-      notebookService.createNotebookForOwnership(
-          ownership, user, currentUTCTimestamp, notesTestData.notebookName, null);
-      return Collections.emptyMap();
-    }
-
-    Notebook notebook =
-        notebookRepository
-            .findFirstByNameAndDeletedAtIsNullOrderByIdAsc(
-                new DisplayName(notesTestData.notebookName))
-            .map(
-                nb -> {
-                  if (!Objects.equals(nb.getOwnership().getId(), ownership.getId())) {
-                    throw new RuntimeException(
-                        "Notebook named `"
-                            + notesTestData.notebookName
-                            + "` exists but belongs to different ownership.");
-                  }
-                  return nb;
-                })
-            .orElseGet(
-                () ->
-                    notebookService.createNotebookForOwnership(
-                        ownership, user, currentUTCTimestamp, notesTestData.notebookName, null));
-    Map<String, Note> titleNoteMap = notesTestData.buildIndividualNotes(currentUTCTimestamp);
-    notesTestData.buildNoteTree(notebook, currentUTCTimestamp, titleNoteMap, this.entityPersister);
-    applyExplicitFolderPlacements(injections, titleNoteMap, currentUTCTimestamp);
-    notesTestData.saveByOriginalOrder(titleNoteMap, this.entityPersister);
-    for (Note note : titleNoteMap.values()) {
-      wikiTitleCacheService.refreshForNote(note, user);
-    }
-    return titleNoteMap.values().stream()
-        .collect(Collectors.toMap(note -> note.getTitle(), Note::getId));
+    User user = getUserModelByExternalIdentifier(notesTestData.getExternalIdentifier());
+    return injectNotesWorker.inject(notesTestData, user);
   }
 
   @PostMapping("/inject-predefined-questions")
@@ -311,14 +108,6 @@ class TestabilityRestController {
         predefinedQuestionsTestData.buildPredefinedQuestions(this.noteRepository);
     predefinedQuestions.forEach(question -> entityPersister.save(question));
     return predefinedQuestions;
-  }
-
-  private Ownership getOwnership(NotesTestData notesTestData, User user) {
-    if (notesTestData.circleName != null) {
-      Circle circle = circleRepository.findByName(notesTestData.circleName);
-      return circle.getOwnership();
-    }
-    return user.getOwnership();
   }
 
   @PostMapping("/share_to_bazaar")

@@ -11,6 +11,8 @@ import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.NoteRealmService;
+import com.odde.doughnut.testability.model.NotesTestData;
+import com.odde.doughnut.testability.model.NotesTestData.NoteTestData;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -34,11 +36,11 @@ class TestabilityInjectNotesFolderPlacementTest {
   @Test
   void injectNotes_assignsExplicitFolderPathsForNestedNotes() {
     var user = makeMe.aUser().please();
-    var data = new TestabilityRestController.NotesTestData();
+    var data = new NotesTestData();
     data.setNotebookName("Folder inject nb");
     data.setExternalIdentifier(user.getExternalIdentifier());
 
-    List<TestabilityRestController.NoteTestData> rows = new ArrayList<>();
+    List<NoteTestData> rows = new ArrayList<>();
     rows.add(row("LeSS in Action", null));
     rows.add(row("TDD", "LeSS in Action"));
     rows.add(row("TPP", "LeSS in Action/TDD"));
@@ -63,11 +65,11 @@ class TestabilityInjectNotesFolderPlacementTest {
   @Test
   void injectNotes_folderSegmentNeedNotMatchAParentNoteSameTitle() {
     var user = makeMe.aUser().please();
-    var data = new TestabilityRestController.NotesTestData();
+    var data = new NotesTestData();
     data.setNotebookName("Atlas nb");
     data.setExternalIdentifier(user.getExternalIdentifier());
 
-    List<TestabilityRestController.NoteTestData> rows = new ArrayList<>();
+    List<NoteTestData> rows = new ArrayList<>();
     rows.add(row("Germany", "World"));
     rows.add(row("Japan", "World"));
     data.setNoteTestData(rows);
@@ -86,10 +88,10 @@ class TestabilityInjectNotesFolderPlacementTest {
   void injectNotes_singleNotebookRootNoteIsReadableByOwner()
       throws UnexpectedNoAccessRightException {
     User user = makeMe.aUser().please();
-    var data = new TestabilityRestController.NotesTestData();
+    var data = new NotesTestData();
     data.setNotebookName("90s hits");
     data.setExternalIdentifier(user.getExternalIdentifier());
-    List<TestabilityRestController.NoteTestData> rows = new ArrayList<>();
+    List<NoteTestData> rows = new ArrayList<>();
     rows.add(row("Who Let the Dogs Out", null));
     data.setNoteTestData(rows);
 
@@ -101,8 +103,8 @@ class TestabilityInjectNotesFolderPlacementTest {
     assertThat(realm.getId(), equalTo(note.getId()));
   }
 
-  private static TestabilityRestController.NoteTestData row(String title, String folder) {
-    TestabilityRestController.NoteTestData n = new TestabilityRestController.NoteTestData();
+  private static NoteTestData row(String title, String folder) {
+    NoteTestData n = new NoteTestData();
     n.title = title;
     n.setFolder(folder);
     return n;

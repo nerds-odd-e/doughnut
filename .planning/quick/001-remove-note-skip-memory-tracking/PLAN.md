@@ -44,24 +44,11 @@ Callers use `aMemoryTrackerFor(…).removedFromTracking()`. `NoteBuilder.skipMem
 
 ---
 
-### Phase 3 — Injected “Skip Memory Tracking” skip-recalls the note — Structure — planned
+### Phase 3 — Injected “Skip Memory Tracking” skip-recalls the note — Structure — done
 
-**Why:** Enables Phase 4 without breaking E2E that still use the inject column.
+Inject `"Skip Memory Tracking": true` skip-recalls via assimilate and does not set the note flag. Feature tables unchanged. Inject-notes extracted to `InjectNotesWorker` / `NotesTestData` (controller size).
 
-**No user-facing change.** Interim testability: the column stays until Phase 6.
-
-**Work**
-
-- `TestabilityRestController.NoteTestData`: `"Skip Memory Tracking": true` must assimilate with request `skipMemoryTracking: true` (skipped tracker) and **must not** set `NoteRecallSetting.skipMemoryTracking`.
-- Feature tables unchanged.
-
-**Verify**
-
-```bash
-CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/recall/recall_pages.feature
-```
-
-**Stop-safe:** Production unchanged. E2E isolation already uses skip-recall.
+**Learning:** JSON property now lives on `NotesTestData` / `NoteTestData` in `testability/model/`. Phase 6 should remove it there, not only on the old controller inner class.
 
 ---
 
@@ -139,7 +126,7 @@ CURSOR_DEV=true nix develop -c pnpm frontend:test tests/components/recall/NoteRe
 - Add a Gherkin step that skip-recalls injected notes by title (testability assimilate with `skipMemoryTracking: true`).
 - Replace inject-column rows with that step. Titles that were `true`: English (recall/assimilation/CLI), Shape (bazaar background only), SibOne/SibTwo (`recall_quiz_ai_question`), Overlap/Partner (`overlap_try_again`).
 - Delete unused step `I have a notebook {string} with a note {string} which skips memory tracking`.
-- Remove `NoteTestData` `@JsonProperty("Skip Memory Tracking")`.
+- Remove `@JsonProperty("Skip Memory Tracking")` from `backend/src/main/java/com/odde/doughnut/testability/model/NotesTestData.java` (`NoteTestData`).
 
 **Do not change** bazaar “I change notebook … to skip recall”.
 
