@@ -3408,10 +3408,8 @@ components:
             $ref: "#/components/schemas/NoteTestData"
         externalIdentifier:
           type: string
-          writeOnly: true
         circleName:
           type: string
-          writeOnly: true
         notebookName:
           type: string
       required:
@@ -3860,8 +3858,6 @@ components:
       type: object
       properties:
         rememberSpelling:
-          type: boolean
-        skipMemoryTracking:
           type: boolean
         level:
           type: integer

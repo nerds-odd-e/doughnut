@@ -60,35 +60,11 @@ Dropped skip-flag predicates from `NoteRepository.recallWhereClause` and `NotePr
 
 ---
 
-### Phase 5 — Note recall-setting API has no skipMemoryTracking — Behavior — planned
+### Phase 5 — Note recall-setting API has no skipMemoryTracking — Behavior — done
 
-**Observable**
+Removed `skipMemoryTracking` from `NoteRecallSetting`. Regenerated OpenAPI/client. Assimilation request skip-recall unchanged. DB column remains.
 
-- Pre: `NoteRecallSetting` still has `skipMemoryTracking` (OpenAPI + generated client + save body).
-- Trigger: Read or save note recall settings.
-- Post: The field is absent from that API. Assimilation request `skipMemoryTracking` (skip recall) is unchanged.
-
-**Tests first**
-
-- Frontend fixtures that pass `skipMemoryTracking` on `NoteRecallSetting` fail after regen — fix them (`NoteRecallSettingForm.spec.ts`, `noteToolbarTestHelpers.ts`, any `makeMe` recall-setting literals).
-
-**Production**
-
-- Remove the field from `NoteRecallSetting.java` only (leave the DB column).
-- Remove any remaining `setSkipMemoryTracking` on the note embeddable (testability must already skip-recall from Phase 3).
-- `CURSOR_DEV=true nix develop -c pnpm generateTypeScript` — do not hand-edit generated API.
-
-**Verify**
-
-```bash
-CURSOR_DEV=true nix develop -c pnpm generateTypeScript
-CURSOR_DEV=true nix develop -c pnpm backend:test_only
-CURSOR_DEV=true nix develop -c pnpm frontend:test tests/components/recall/NoteRecallSettingForm.spec.ts
-```
-
-**Grep:** `NoteRecallSetting.skipMemoryTracking` gone. Hits must be notebook entirely or `AssimilationRequestDTO`.
-
-**Stop-safe:** API no longer carries the note flag. DB column and E2E inject column may still exist.
+**Learning:** Regen also dropped incidental `NotesTestData` `writeOnly` yaml that had been failing `RobotsTests`. Left as generator output. Phase 4’s OpenAPI-drift note is resolved.
 
 ---
 

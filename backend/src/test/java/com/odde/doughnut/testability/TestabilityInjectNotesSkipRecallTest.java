@@ -47,6 +47,5 @@ class TestabilityInjectNotesSkipRecallTest {
 
     assertThat(trackers, hasSize(1));
     assertThat(trackers.get(0).getRemovedFromTracking(), equalTo(true));
-    assertThat(note.getRecallSetting().getSkipMemoryTracking(), equalTo(false));
   }
 }

@@ -129,6 +129,8 @@ export type NoteTestData = {
 
 export type NotesTestData = {
     noteTestData?: Array<NoteTestData>;
+    externalIdentifier?: string;
+    circleName?: string;
     notebookName: string;
 };
 
@@ -361,7 +363,6 @@ export type RelationshipLiteralSearchHit = {
 
 export type NoteRecallSetting = {
     rememberSpelling?: boolean;
-    skipMemoryTracking?: boolean;
     level?: number;
 };
 
@@ -1163,13 +1164,6 @@ export type UserListingPage = {
     totalPages?: number;
 };
 
-export type NotesTestDataWritable = {
-    noteTestData?: Array<NoteTestData>;
-    externalIdentifier?: string;
-    circleName?: string;
-    notebookName: string;
-};
-
 export type SubscriptionWritable = {
     name?: string;
     id: number;
@@ -1474,7 +1468,7 @@ export type SetOpenAiTokenResponses = {
 };
 
 export type InjectNotesData = {
-    body: NotesTestDataWritable;
+    body: NotesTestData;
     path?: never;
     query?: never;
     url: '/api/testability/inject_notes';

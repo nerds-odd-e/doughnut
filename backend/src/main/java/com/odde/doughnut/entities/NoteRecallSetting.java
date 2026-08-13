@@ -13,10 +13,5 @@ public class NoteRecallSetting {
   @Setter
   private Boolean rememberSpelling = false;
 
-  @Column(name = "skip_memory_tracking")
-  @Getter
-  @Setter
-  private Boolean skipMemoryTracking = false;
-
   @Getter @Setter private Integer level = defaultLevel;
 }

@@ -37,17 +37,7 @@ export function noteToolbarProps(
 }
 
 export function mockDefaultNoteRecallInfo() {
-  mockSdkService(
-    NoteController,
-    "getNoteInfo",
-    makeMe.aNoteRecallInfo
-      .recallSetting({
-        level: 0,
-        rememberSpelling: false,
-        skipMemoryTracking: false,
-      })
-      .please()
-  )
+  mockSdkService(NoteController, "getNoteInfo", makeMe.aNoteRecallInfo.please())
 }
 
 type NoteToolbarMountOptions = {

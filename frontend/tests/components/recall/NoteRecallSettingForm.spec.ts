@@ -16,7 +16,6 @@ describe("NoteRecallSettingForm", () => {
     noteRecallSetting: {
       level: 0,
       rememberSpelling: false,
-      skipMemoryTracking: false,
     },
     noteContent: "some body text",
     isLinkNote: false,
