@@ -28,6 +28,8 @@ class MemoryTrackerRecallAnchorRepairMigrationTest {
 
   private static final String NORMAL_ANSWER_REPAIR_MIGRATION =
       "db/migration/V300000248__repair_memory_tracker_recall_anchor_from_answers.sql";
+  private static final String ACCIDENTAL_MATCH_REPAIR_MIGRATION =
+      "db/migration/V300000249__repair_memory_tracker_recall_anchor_from_accidental_matches.sql";
 
   @Autowired DataSource dataSource;
   private Connection connection;
@@ -83,11 +85,59 @@ class MemoryTrackerRecallAnchorRepairMigrationTest {
     assertThat(readTrackerState(trackerId).lastRecalledAt(), is(currentAnchor));
   }
 
+  @Test
+  void doesNotRepairAccidentalMatchAnchorsWhenPlaceholderDefaultsToNoOp() throws Exception {
+    Timestamp originalAnchor = timestamp("2026-01-01 08:00:00");
+    long trackerId = insertMemoryTracker(originalAnchor, timestamp("2026-02-01 08:00:00"));
+    insertAnswer(trackerId, timestamp("2026-01-03 08:00:00"), true, "ACCIDENTAL_MATCH");
+
+    assertThat(runAccidentalMatchRepair("1=0"), is(0));
+
+    assertThat(readTrackerState(trackerId).lastRecalledAt(), is(originalAnchor));
+  }
+
+  @Test
+  void repairsToLatestAccidentalMatchWithoutChangingDueAndIsIdempotent() throws Exception {
+    Timestamp originalAnchor = timestamp("2026-01-01 08:00:00");
+    Timestamp due = timestamp("2026-02-01 08:00:00");
+    Timestamp latestAccidentalMatch = timestamp("2026-01-03 08:00:00");
+    long trackerId = insertMemoryTracker(originalAnchor, due);
+    insertAnswer(trackerId, timestamp("2026-01-02 08:00:00"), true, "ACCIDENTAL_MATCH");
+    insertAnswer(trackerId, latestAccidentalMatch, true, "ACCIDENTAL_MATCH");
+    insertAnswer(trackerId, timestamp("2026-01-04 08:00:00"), true, "OVERLAP");
+
+    assertThat(runAccidentalMatchRepair("1=1"), is(1));
+    TrackerState repaired = readTrackerState(trackerId);
+    assertThat(repaired.lastRecalledAt(), is(latestAccidentalMatch));
+    assertThat(repaired.nextRecallAt(), is(due));
+
+    assertThat(runAccidentalMatchRepair("1=1"), is(0));
+    assertThat(readTrackerState(trackerId), is(repaired));
+  }
+
+  @Test
+  void preservesAnAnchorLaterThanTheLatestAccidentalMatch() throws Exception {
+    Timestamp currentAnchor = timestamp("2026-01-05 08:00:00");
+    long trackerId = insertMemoryTracker(currentAnchor, timestamp("2026-02-01 08:00:00"));
+    insertAnswer(trackerId, timestamp("2026-01-03 08:00:00"), true, "ACCIDENTAL_MATCH");
+
+    assertThat(runAccidentalMatchRepair("1=1"), is(0));
+
+    assertThat(readTrackerState(trackerId).lastRecalledAt(), is(currentAnchor));
+  }
+
   private int runNormalAnswerRepair(String placeholder) throws Exception {
+    return runRepair(NORMAL_ANSWER_REPAIR_MIGRATION, placeholder);
+  }
+
+  private int runAccidentalMatchRepair(String placeholder) throws Exception {
+    return runRepair(ACCIDENTAL_MATCH_REPAIR_MIGRATION, placeholder);
+  }
+
+  private int runRepair(String migrationResource, String placeholder) throws Exception {
     String migrationSql =
         StreamUtils.copyToString(
-            new ClassPathResource(NORMAL_ANSWER_REPAIR_MIGRATION).getInputStream(),
-            StandardCharsets.UTF_8);
+            new ClassPathResource(migrationResource).getInputStream(), StandardCharsets.UTF_8);
     try (Statement repair = connection.createStatement()) {
       return repair.executeUpdate(migrationSql.replace("${recall_anchor_repair}", placeholder));
     }

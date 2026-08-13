@@ -1,6 +1,6 @@
 # Close recall-time state cohesion (C1)
 
-**Status:** In progress — Phases 1–11 complete; Phase 12 next
+**Status:** In progress — Phases 1–12 complete; Phase 13 next
 **Plan type:** Ad-hoc phased delivery
 **Created:** 2026-08-13
 **Refined:** 2026-08-13 for small, green commit boundaries
@@ -424,7 +424,7 @@ history remain unchanged but no worse than before.
 ## Phase 12 — Repair accidental-match anchors and exclude overlap
 
 **Type:** Behavior
-**Status:** Planned
+**Status:** Done
 
 - **Precondition:** A legacy tracker has an `ACCIDENTAL_MATCH` Answer newer than
   its current/Phase-11-repaired anchor; another may have only newer `OVERLAP`.
@@ -441,6 +441,15 @@ history remain unchanged but no worse than before.
 The SQL selects exactly `outcome = 'ACCIDENTAL_MATCH'` and uses the same gate.
 
 **Verification:** `CURSOR_DEV=true nix develop -c pnpm backend:verify`.
+
+**Production preflight:** After Phase 11 deployed, no production tracker had a
+latest `ACCIDENTAL_MATCH` Answer newer than its persisted anchor, so no recovery
+export was needed for this migration.
+
+**Learning:** Migration `V300000249` selects exactly `ACCIDENTAL_MATCH`, leaves
+`OVERLAP` excluded, advances only a stale anchor, and preserves
+`next_recall_at`. Default-off, later-current, due-preservation, and idempotence
+cases are covered in the shared recall-anchor migration test capability.
 
 **Stop-safe:** All currently trustworthy Answer outcomes are repaired; overlap
 remains excluded.
