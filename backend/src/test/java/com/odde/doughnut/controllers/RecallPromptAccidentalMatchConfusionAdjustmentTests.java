@@ -16,6 +16,7 @@ import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.MemoryTrackerService;
 import java.sql.Timestamp;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -40,161 +41,175 @@ class RecallPromptAccidentalMatchConfusionAdjustmentTests extends RecallPromptCo
     answerDTO = spellingAnswer(matchedNote.getTitle());
   }
 
-  @Test
-  void shouldWeakenUniqueMatchedSpellingTrackerWithoutRecallCredit()
-      throws UnexpectedNoAccessRightException {
-    float strengthBefore = matchedSpellingTracker.getForgettingCurveIndex();
-    Timestamp dueBefore = matchedSpellingTracker.getNextRecallAt();
-    Timestamp lastRecalledBefore = matchedSpellingTracker.getLastRecalledAt();
-    Integer recallCountBefore = matchedSpellingTracker.getRecallCount();
-    Timestamp now = testabilitySettings.getCurrentUTCTimestamp();
-    int wrongCountBefore =
-        memoryTrackerService.countWrongAnswersInPeriod(matchedSpellingTracker, now, 14);
+  @Nested
+  class UniqueMatch {
 
-    controller.answerSpelling(recallPrompt, answerDTO);
+    @Test
+    void shouldWeakenUniqueMatchedSpellingTrackerWithoutRecallCredit()
+        throws UnexpectedNoAccessRightException {
+      float strengthBefore = matchedSpellingTracker.getForgettingCurveIndex();
+      Timestamp dueBefore = matchedSpellingTracker.getNextRecallAt();
+      Timestamp lastRecalledBefore = matchedSpellingTracker.getLastRecalledAt();
+      Integer recallCountBefore = matchedSpellingTracker.getRecallCount();
+      Timestamp now = testabilitySettings.getCurrentUTCTimestamp();
+      int wrongCountBefore =
+          memoryTrackerService.countWrongAnswersInPeriod(matchedSpellingTracker, now, 14);
 
-    assertThat(
-        matchedSpellingTracker.getForgettingCurveIndex(),
-        equalTo(strengthBefore - ForgettingCurve.DEFAULT_FORGETTING_CURVE_INDEX_INCREMENT));
-    assertThat(matchedSpellingTracker.getLastRecalledAt(), equalTo(lastRecalledBefore));
-    assertThat(matchedSpellingTracker.getRecallCount(), equalTo(recallCountBefore));
-    assertThat(
-        matchedSpellingTracker.getNextRecallAt(),
-        equalTo(matchedSpellingTracker.calculateNextRecallAt()));
-    assertFalse(matchedSpellingTracker.getNextRecallAt().after(dueBefore));
-    assertThat(
-        memoryTrackerService.countWrongAnswersInPeriod(matchedSpellingTracker, now, 14),
-        equalTo(wrongCountBefore));
-    assertLinkedConfusionAdjustedTracker(matchedSpellingTracker);
-  }
+      controller.answerSpelling(recallPrompt, answerDTO);
 
-  @Test
-  void shouldNotDropMatchedSpellingTrackerBelowStrengthFloor()
-      throws UnexpectedNoAccessRightException {
-    matchedSpellingTracker.setForgettingCurveIndex(ForgettingCurve.DEFAULT_FORGETTING_CURVE_INDEX);
-    matchedSpellingTracker.setNextRecallAt(matchedSpellingTracker.calculateNextRecallAt());
-    makeMe.entityPersister.save(matchedSpellingTracker);
-
-    controller.answerSpelling(recallPrompt, answerDTO);
-
-    assertThat(
-        matchedSpellingTracker.getForgettingCurveIndex(),
-        equalTo(ForgettingCurve.DEFAULT_FORGETTING_CURVE_INDEX));
-  }
-
-  @Test
-  void shouldNotPostponeAlreadyDueMatchedSpellingTracker() throws UnexpectedNoAccessRightException {
-    Timestamp alreadyDue = testabilitySettings.getCurrentUTCTimestamp();
-    matchedSpellingTracker.setNextRecallAt(alreadyDue);
-    makeMe.entityPersister.save(matchedSpellingTracker);
-
-    controller.answerSpelling(recallPrompt, answerDTO);
-
-    assertFalse(matchedSpellingTracker.getNextRecallAt().after(alreadyDue));
-  }
-
-  @Test
-  void shouldWeakenUniqueMatchedUnderstandingTrackerWhenSpellingIsAbsent()
-      throws UnexpectedNoAccessRightException {
-    Note understandingNote = ownedNoteTitled("Understanding Match Title");
-    MemoryTracker understandingTracker = ownedTracker(understandingNote);
-    answerDTO = spellingAnswer(understandingNote.getTitle());
-    float strengthBefore = understandingTracker.getForgettingCurveIndex();
-
-    controller.answerSpelling(recallPrompt, answerDTO);
-
-    assertThat(
-        understandingTracker.getForgettingCurveIndex(),
-        equalTo(strengthBefore - ForgettingCurve.DEFAULT_FORGETTING_CURVE_INDEX_INCREMENT));
-    assertLinkedConfusionAdjustedTracker(understandingTracker);
-  }
-
-  @Test
-  void shouldPreferActiveSpellingWhenUnderstandingAlsoExists()
-      throws UnexpectedNoAccessRightException {
-    MemoryTracker understandingTracker = ownedTracker(matchedSpellingTracker.getNote());
-    float understandingStrengthBefore = understandingTracker.getForgettingCurveIndex();
-
-    controller.answerSpelling(recallPrompt, answerDTO);
-
-    assertLinkedConfusionAdjustedTracker(matchedSpellingTracker);
-    assertThat(
-        understandingTracker.getForgettingCurveIndex(), equalTo(understandingStrengthBefore));
-  }
-
-  @ParameterizedTest
-  @CsvSource({"removedFromTracking", "deletedAt"})
-  void shouldFallBackToUnderstandingWhenSpellingTrackerBecomesInactive(String inactivationMethod)
-      throws UnexpectedNoAccessRightException {
-    MemoryTracker understandingTracker = ownedTracker(matchedSpellingTracker.getNote());
-    if ("removedFromTracking".equals(inactivationMethod)) {
-      matchedSpellingTracker.setRemovedFromTracking(true);
-    } else {
-      matchedSpellingTracker.setDeletedAt(testabilitySettings.getCurrentUTCTimestamp());
+      assertThat(
+          matchedSpellingTracker.getForgettingCurveIndex(),
+          equalTo(strengthBefore - ForgettingCurve.DEFAULT_FORGETTING_CURVE_INDEX_INCREMENT));
+      assertThat(matchedSpellingTracker.getLastRecalledAt(), equalTo(lastRecalledBefore));
+      assertThat(matchedSpellingTracker.getRecallCount(), equalTo(recallCountBefore));
+      assertThat(
+          matchedSpellingTracker.getNextRecallAt(),
+          equalTo(matchedSpellingTracker.calculateNextRecallAt()));
+      assertFalse(matchedSpellingTracker.getNextRecallAt().after(dueBefore));
+      assertThat(
+          memoryTrackerService.countWrongAnswersInPeriod(matchedSpellingTracker, now, 14),
+          equalTo(wrongCountBefore));
+      assertLinkedConfusionAdjustedTracker(matchedSpellingTracker);
     }
-    makeMe.entityPersister.save(matchedSpellingTracker);
 
-    controller.answerSpelling(recallPrompt, answerDTO);
+    @Test
+    void shouldNotDropMatchedSpellingTrackerBelowStrengthFloor()
+        throws UnexpectedNoAccessRightException {
+      matchedSpellingTracker.setForgettingCurveIndex(
+          ForgettingCurve.DEFAULT_FORGETTING_CURVE_INDEX);
+      matchedSpellingTracker.setNextRecallAt(matchedSpellingTracker.calculateNextRecallAt());
+      makeMe.entityPersister.save(matchedSpellingTracker);
 
-    assertLinkedConfusionAdjustedTracker(understandingTracker);
+      controller.answerSpelling(recallPrompt, answerDTO);
+
+      assertThat(
+          matchedSpellingTracker.getForgettingCurveIndex(),
+          equalTo(ForgettingCurve.DEFAULT_FORGETTING_CURVE_INDEX));
+    }
+
+    @Test
+    void shouldNotPostponeAlreadyDueMatchedSpellingTracker()
+        throws UnexpectedNoAccessRightException {
+      Timestamp alreadyDue = testabilitySettings.getCurrentUTCTimestamp();
+      matchedSpellingTracker.setNextRecallAt(alreadyDue);
+      makeMe.entityPersister.save(matchedSpellingTracker);
+
+      controller.answerSpelling(recallPrompt, answerDTO);
+
+      assertFalse(matchedSpellingTracker.getNextRecallAt().after(alreadyDue));
+    }
+
+    @Test
+    void shouldWeakenUniqueMatchedUnderstandingTrackerWhenSpellingIsAbsent()
+        throws UnexpectedNoAccessRightException {
+      Note understandingNote = ownedNoteTitled("Understanding Match Title");
+      MemoryTracker understandingTracker = ownedTracker(understandingNote);
+      answerDTO = spellingAnswer(understandingNote.getTitle());
+      float strengthBefore = understandingTracker.getForgettingCurveIndex();
+
+      controller.answerSpelling(recallPrompt, answerDTO);
+
+      assertThat(
+          understandingTracker.getForgettingCurveIndex(),
+          equalTo(strengthBefore - ForgettingCurve.DEFAULT_FORGETTING_CURVE_INDEX_INCREMENT));
+      assertLinkedConfusionAdjustedTracker(understandingTracker);
+    }
+
+    @Test
+    void shouldPreferActiveSpellingWhenUnderstandingAlsoExists()
+        throws UnexpectedNoAccessRightException {
+      MemoryTracker understandingTracker = ownedTracker(matchedSpellingTracker.getNote());
+      float understandingStrengthBefore = understandingTracker.getForgettingCurveIndex();
+
+      controller.answerSpelling(recallPrompt, answerDTO);
+
+      assertLinkedConfusionAdjustedTracker(matchedSpellingTracker);
+      assertThat(
+          understandingTracker.getForgettingCurveIndex(), equalTo(understandingStrengthBefore));
+    }
+
+    @ParameterizedTest
+    @CsvSource({"removedFromTracking", "deletedAt"})
+    void shouldFallBackToUnderstandingWhenSpellingTrackerBecomesInactive(String inactivationMethod)
+        throws UnexpectedNoAccessRightException {
+      MemoryTracker understandingTracker = ownedTracker(matchedSpellingTracker.getNote());
+      if ("removedFromTracking".equals(inactivationMethod)) {
+        matchedSpellingTracker.setRemovedFromTracking(true);
+      } else {
+        matchedSpellingTracker.setDeletedAt(testabilitySettings.getCurrentUTCTimestamp());
+      }
+      makeMe.entityPersister.save(matchedSpellingTracker);
+
+      controller.answerSpelling(recallPrompt, answerDTO);
+
+      assertLinkedConfusionAdjustedTracker(understandingTracker);
+    }
   }
 
-  @Test
-  void shouldNotSelectPropertyTracker() throws UnexpectedNoAccessRightException {
-    Note note = ownedNoteTitled("Property Match Title");
-    MemoryTracker propertyTracker =
-        makeMe
-            .aMemoryTrackerFor(note)
-            .forgettingCurveAndNextRecallAt(200.0f)
-            .propertyKey("topic")
-            .please();
-    assertIneligibleTrackerIsUnchangedAndUnlinked(note, propertyTracker);
+  @Nested
+  class Eligibility {
+
+    @Test
+    void shouldNotSelectPropertyTracker() throws UnexpectedNoAccessRightException {
+      Note note = ownedNoteTitled("Property Match Title");
+      MemoryTracker propertyTracker =
+          makeMe
+              .aMemoryTrackerFor(note)
+              .forgettingCurveAndNextRecallAt(200.0f)
+              .propertyKey("topic")
+              .please();
+      assertIneligibleTrackerIsUnchangedAndUnlinked(note, propertyTracker);
+    }
+
+    @Test
+    void shouldNotSelectCommissionedTracker() throws UnexpectedNoAccessRightException {
+      Note note = ownedNoteTitled("Commissioned Match Title");
+      MemoryTracker commissionedTracker =
+          makeMe
+              .aMemoryTrackerFor(note)
+              .forgettingCurveAndNextRecallAt(200.0f)
+              .commissioned()
+              .please();
+      assertIneligibleTrackerIsUnchangedAndUnlinked(note, commissionedTracker);
+    }
+
+    @Test
+    void shouldNotCreateOrLinkTrackerWhenMatchedNoteHasNoneEligible()
+        throws UnexpectedNoAccessRightException {
+      Note note = ownedNoteTitled("Bare Match Title");
+      answerDTO = spellingAnswer(note.getTitle());
+
+      controller.answerSpelling(recallPrompt, answerDTO);
+
+      assertThat(recallPrompt.getAnswer().getConfusionAdjustedMemoryTracker(), nullValue());
+      assertThat(
+          memoryTrackerRepository.findByUserAndNote(currentUser.getUser().getId(), note.getId()),
+          hasSize(0));
+    }
   }
 
-  @Test
-  void shouldNotSelectCommissionedTracker() throws UnexpectedNoAccessRightException {
-    Note note = ownedNoteTitled("Commissioned Match Title");
-    MemoryTracker commissionedTracker =
-        makeMe
-            .aMemoryTrackerFor(note)
-            .forgettingCurveAndNextRecallAt(200.0f)
-            .commissioned()
-            .please();
-    assertIneligibleTrackerIsUnchangedAndUnlinked(note, commissionedTracker);
-  }
+  @Nested
+  class Ambiguous {
 
-  @Test
-  void shouldNotCreateOrLinkTrackerWhenMatchedNoteHasNoneEligible()
-      throws UnexpectedNoAccessRightException {
-    Note note = ownedNoteTitled("Bare Match Title");
-    answerDTO = spellingAnswer(note.getTitle());
+    @Test
+    void shouldLeaveAmbiguousMatchedTrackersUnchanged() throws UnexpectedNoAccessRightException {
+      String sharedTitle = "Shared Accidental Title";
+      MemoryTracker firstTracker = ownedSpellingTracker(ownedNoteTitled(sharedTitle));
+      MemoryTracker secondTracker = ownedSpellingTracker(ownedNoteTitled(sharedTitle));
+      float firstStrengthBefore = firstTracker.getForgettingCurveIndex();
+      float secondStrengthBefore = secondTracker.getForgettingCurveIndex();
+      Timestamp firstDueBefore = firstTracker.getNextRecallAt();
+      Timestamp secondDueBefore = secondTracker.getNextRecallAt();
+      answerDTO = spellingAnswer(sharedTitle);
 
-    controller.answerSpelling(recallPrompt, answerDTO);
+      controller.answerSpelling(recallPrompt, answerDTO);
 
-    assertThat(recallPrompt.getAnswer().getConfusionAdjustedMemoryTracker(), nullValue());
-    assertThat(
-        memoryTrackerRepository.findByUserAndNote(currentUser.getUser().getId(), note.getId()),
-        hasSize(0));
-  }
-
-  @Test
-  void shouldLeaveAmbiguousMatchedTrackersUnchanged() throws UnexpectedNoAccessRightException {
-    String sharedTitle = "Shared Accidental Title";
-    MemoryTracker firstTracker = ownedSpellingTracker(ownedNoteTitled(sharedTitle));
-    MemoryTracker secondTracker = ownedSpellingTracker(ownedNoteTitled(sharedTitle));
-    float firstStrengthBefore = firstTracker.getForgettingCurveIndex();
-    float secondStrengthBefore = secondTracker.getForgettingCurveIndex();
-    Timestamp firstDueBefore = firstTracker.getNextRecallAt();
-    Timestamp secondDueBefore = secondTracker.getNextRecallAt();
-    answerDTO = spellingAnswer(sharedTitle);
-
-    controller.answerSpelling(recallPrompt, answerDTO);
-
-    assertThat(recallPrompt.getAnswer().getConfusionAdjustedMemoryTracker(), nullValue());
-    assertThat(firstTracker.getForgettingCurveIndex(), equalTo(firstStrengthBefore));
-    assertThat(secondTracker.getForgettingCurveIndex(), equalTo(secondStrengthBefore));
-    assertThat(firstTracker.getNextRecallAt(), equalTo(firstDueBefore));
-    assertThat(secondTracker.getNextRecallAt(), equalTo(secondDueBefore));
+      assertThat(recallPrompt.getAnswer().getConfusionAdjustedMemoryTracker(), nullValue());
+      assertThat(firstTracker.getForgettingCurveIndex(), equalTo(firstStrengthBefore));
+      assertThat(secondTracker.getForgettingCurveIndex(), equalTo(secondStrengthBefore));
+      assertThat(firstTracker.getNextRecallAt(), equalTo(firstDueBefore));
+      assertThat(secondTracker.getNextRecallAt(), equalTo(secondDueBefore));
+    }
   }
 
   private Note ownedNoteTitled(String title) {
