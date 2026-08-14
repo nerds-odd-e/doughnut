@@ -1,6 +1,7 @@
 import type { Note } from "@generated/doughnut-backend-api"
 import {
   assimilateButtonSelector,
+  removeFromRecallButtonSelector,
   skipButtonSelector,
 } from "./assimilationPanelTestSupport"
 import { flushPromises } from "@vue/test-utils"
@@ -43,11 +44,27 @@ export async function clickPropertyAssimilate(propertyKey: string) {
   await flushPromises()
 }
 
-export async function clickPropertySkipAndConfirm(propertyKey: string) {
-  const skip = assimilationPropertyRow(propertyKey).querySelector(
-    skipButtonSelector
+async function clickPropertyRowControlAndConfirm(
+  propertyKey: string,
+  selector: string
+) {
+  const control = assimilationPropertyRow(propertyKey).querySelector(
+    selector
   ) as HTMLInputElement
-  skip.click()
+  control.click()
   usePopups().popups.done(true)
   await flushPromises()
+}
+
+export async function clickPropertySkipAndConfirm(propertyKey: string) {
+  await clickPropertyRowControlAndConfirm(propertyKey, skipButtonSelector)
+}
+
+export async function clickPropertyRemoveFromRecallAndConfirm(
+  propertyKey: string
+) {
+  await clickPropertyRowControlAndConfirm(
+    propertyKey,
+    removeFromRecallButtonSelector
+  )
 }

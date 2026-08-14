@@ -51,42 +51,22 @@ function noteLevelControlElements(
   )
 }
 
-function noteLevelReviveElements(doc: Document | ParentNode): Element[] {
-  return noteLevelControlElements(doc, reviveButtonSelector)
-}
-
-function noteLevelSkipElements(doc: Document | ParentNode): Element[] {
-  return noteLevelControlElements(doc, skipButtonSelector)
-}
-
-function noteLevelReturnToSequenceElements(
-  doc: Document | ParentNode
-): Element[] {
-  return noteLevelControlElements(doc, returnToSequenceButtonSelector)
-}
-
-function noteLevelRemoveFromRecallElements(
-  doc: Document | ParentNode
-): Element[] {
-  return noteLevelControlElements(doc, removeFromRecallButtonSelector)
-}
-
-const noteLevelSecondaryActionElements = {
-  revive: noteLevelReviveElements,
-  skip: noteLevelSkipElements,
-  returnToSequence: noteLevelReturnToSequenceElements,
-  removeFromRecall: noteLevelRemoveFromRecallElements,
+export const secondaryActionSelectors = {
+  revive: reviveButtonSelector,
+  skip: skipButtonSelector,
+  returnToSequence: returnToSequenceButtonSelector,
+  removeFromRecall: removeFromRecallButtonSelector,
 } as const
+
+export type AssimilationSecondaryAction = keyof typeof secondaryActionSelectors
 
 export function expectOtherNoteLevelSecondaryActionsAbsent(
   doc: Document | ParentNode,
-  present: keyof typeof noteLevelSecondaryActionElements
+  present: AssimilationSecondaryAction
 ) {
-  for (const [name, elements] of Object.entries(
-    noteLevelSecondaryActionElements
-  )) {
+  for (const [name, selector] of Object.entries(secondaryActionSelectors)) {
     if (name === present) continue
-    expect(elements(doc)).to.have.length(0)
+    expect(noteLevelControlElements(doc, selector)).to.have.length(0)
   }
 }
 

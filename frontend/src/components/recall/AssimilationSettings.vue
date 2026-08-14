@@ -66,6 +66,7 @@
                   :skipped-from-assimilation-sequence="
                     isSkippedFromAssimilationSequence(noteRecallInfo, row.key)
                   "
+                  :show-remove-from-recall="showRemoveFromRecall(row.key)"
                   @assimilate="
                     emit('assimilate', {
                       skipMemoryTracking: false,
@@ -76,6 +77,9 @@
                   @revive="emit('revive', { propertyKey: row.key })"
                   @return-to-sequence="
                     emit('returnToSequence', { propertyKey: row.key })
+                  "
+                  @remove-from-recall="
+                    emit('removeFromRecall', { propertyKey: row.key })
                   "
                 />
               </span>
@@ -105,7 +109,7 @@
           :skipped-from-assimilation-sequence="
             isSkippedFromAssimilationSequence(noteRecallInfo)
           "
-          :show-remove-from-recall="showRemoveFromRecall"
+          :show-remove-from-recall="showRemoveFromRecall()"
           :show-commissioned-option="showCommissionedOption"
           :show-spelling-option="showSpellingOption"
           @assimilate="emit('assimilate', { skipMemoryTracking: false })"
@@ -124,7 +128,7 @@
           "
           @revive="emit('revive', {})"
           @return-to-sequence="emit('returnToSequence', {})"
-          @remove-from-recall="emit('removeFromRecall')"
+          @remove-from-recall="emit('removeFromRecall', {})"
         />
       </div>
     </div>
@@ -156,8 +160,8 @@ import { usePendingAssimilationProperty } from "@/composables/usePendingAssimila
 import { computed, ref, toRef } from "vue"
 import {
   hasNoteLevelTrackerOfType,
-  activeUnderstandingNoteLevelTrackers,
-} from "./noteLevelMemoryTrackers"
+  activeUnderstandingTrackers,
+} from "./assimilationMemoryTrackers"
 
 const { note, noteInfoLoaded, assimilateDisabled, assimilatingPropertyKey } =
   defineProps<{
@@ -174,7 +178,7 @@ const emit = defineEmits<{
   (e: "skip", request: { propertyKey?: string }): void
   (e: "revive", request: { propertyKey?: string }): void
   (e: "returnToSequence", request: { propertyKey?: string }): void
-  (e: "removeFromRecall"): void
+  (e: "removeFromRecall", request: { propertyKey?: string }): void
   (e: "refinementContentUpdated"): void
 }>()
 
@@ -220,11 +224,8 @@ const showSpellingOption = computed(
     !hasNoteLevelTrackerOfType(noteRecallInfo.value?.memoryTrackers, "SPELLING")
 )
 
-const showRemoveFromRecall = computed(
-  () =>
-    activeUnderstandingNoteLevelTrackers(noteRecallInfo.value?.memoryTrackers)
-      .length > 0
-)
+const showRemoveFromRecall = (propertyKey?: string) =>
+  activeUnderstandingTrackers(noteRecallInfo.value, propertyKey).length > 0
 
 const reloadNoteInfo = async () => {
   await noteInfoBarRef.value?.reload()

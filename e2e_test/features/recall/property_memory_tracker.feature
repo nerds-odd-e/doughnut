@@ -115,6 +115,17 @@ Feature: Property memory tracker
     Then I should see a property memory tracker for "topic"
 
   @disableOpenAiService
+  Scenario: Remove from recall on assimilation settings for a property
+    Given I assimilated one note "Vitamins" at the current time
+    And I am viewing assimilation settings for note "Vitamins"
+    And I expand assimilation properties
+    Then I should see Remove from recall for property "topic"
+    When I remove property "topic" from recall
+    Then I should see Revive for property "topic"
+    When I start assimilation from the menu
+    Then I should see the no more notes to assimilate toast
+
+  @disableOpenAiService
   Scenario: Note-level assimilation stays available after property-only assimilation
     Given I am viewing assimilation settings for note "Vitamins"
     Then assimilate for property "topic" should be disabled

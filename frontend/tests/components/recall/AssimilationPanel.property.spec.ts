@@ -1,5 +1,6 @@
 import {
   AssimilationSequenceSkipController,
+  MemoryTrackerController,
   NoteController,
 } from "@generated/doughnut-backend-api/sdk.gen"
 import { flushPromises } from "@vue/test-utils"
@@ -13,6 +14,7 @@ import {
 import { mockedGoToNextAssimilation } from "./assimilationPanelMocks"
 import {
   clickPropertyAssimilate,
+  clickPropertyRemoveFromRecallAndConfirm,
   clickPropertySkipAndConfirm,
   expandAssimilationPropertiesSection,
   noteWithAssimilationProperties,
@@ -27,7 +29,9 @@ import {
 } from "./assimilationPanelTestSupport"
 import {
   clickPropertyReturnToSequence,
+  propertyRemoveFromRecallButton,
   propertyReturnToSequenceButton,
+  propertyReviveButton,
   propertySkipButton,
 } from "./assimilationSettingsTestSupport"
 
@@ -121,6 +125,55 @@ describe("AssimilationPanel property assimilation", () => {
     expect(assimilateSpy).not.toHaveBeenCalled()
     expect(propertySkipButton("topic")).not.toBeNull()
     expect(propertyReturnToSequenceButton("topic")).toBeNull()
+    wrapper.unmount()
+  })
+
+  it("removes a property tracker from recall and shows Revive", async () => {
+    let removedFromTracking = false
+    mockSdkServiceWithImplementation(NoteController, "getNoteInfo", () =>
+      makeMe.aNoteRecallInfo
+        .memoryTrackers([
+          makeMe.aMemoryTracker
+            .id(7)
+            .withPropertyKey("topic")
+            .removedFromTracking(removedFromTracking)
+            .please(),
+        ])
+        .please()
+    )
+    const removeSpy = mockSdkService(
+      MemoryTrackerController,
+      "removeFromRepeating",
+      makeMe.aMemoryTracker
+        .id(7)
+        .withPropertyKey("topic")
+        .removedFromTracking(true)
+        .please()
+    )
+    removeSpy.mockImplementation(async () => {
+      removedFromTracking = true
+      return wrapSdkResponse(
+        makeMe.aMemoryTracker
+          .id(7)
+          .withPropertyKey("topic")
+          .removedFromTracking(true)
+          .please()
+      )
+    })
+    const wrapper = mountPanelWithProperties()
+    await flushPromises()
+    await expandAssimilationPropertiesSection()
+
+    await clickPropertyRemoveFromRecallAndConfirm("topic")
+
+    expect(removeSpy).toHaveBeenCalledWith({
+      path: { memoryTracker: 7 },
+    })
+    expect(skipSequenceSpy).not.toHaveBeenCalled()
+    expect(mockedGoToNextAssimilation).not.toHaveBeenCalled()
+    expect(propertyReviveButton("topic")).not.toBeNull()
+    expect(propertySkipButton("topic")).toBeNull()
+    expect(propertyRemoveFromRecallButton("topic")).toBeNull()
     wrapper.unmount()
   })
 })

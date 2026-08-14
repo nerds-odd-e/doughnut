@@ -96,6 +96,23 @@ When('I return property {string} to the sequence', (propertyKey: string) => {
   start.assumeAssimilationPage().returnPropertyToSequenceOnPanel(propertyKey)
 })
 
+Then(
+  'I should see Remove from recall for property {string}',
+  (propertyKey: string) => {
+    start
+      .assumeAssimilationPage()
+      .expectRemoveFromRecallForProperty(propertyKey)
+  }
+)
+
+When('I remove property {string} from recall', (propertyKey: string) => {
+  start.assumeAssimilationPage().removePropertyFromRecallOnPanel(propertyKey)
+})
+
+Then('I should see Revive for property {string}', (propertyKey: string) => {
+  start.assumeAssimilationPage().expectReviveForProperty(propertyKey)
+})
+
 Then('I should see Skip on the assimilation panel', () => {
   start.assumeAssimilationPage().expectSkipOnPanel()
 })

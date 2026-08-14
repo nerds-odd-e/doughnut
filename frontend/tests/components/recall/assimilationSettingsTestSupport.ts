@@ -10,6 +10,7 @@ import {
 } from "./assimilationPropertyTestSupport"
 import {
   assimilateButtonSelector,
+  removeFromRecallButtonSelector,
   skipButtonSelector,
 } from "./assimilationPanelTestSupport"
 import { afterEach, beforeEach } from "vitest"
@@ -66,6 +67,12 @@ export function propertyReturnToSequenceButton(propertyKey: string) {
   ) as HTMLInputElement
 }
 
+export function propertyRemoveFromRecallButton(propertyKey: string) {
+  return assimilationPropertyRow(propertyKey).querySelector(
+    removeFromRecallButtonSelector
+  ) as HTMLInputElement
+}
+
 export async function clickPropertySkip(propertyKey: string) {
   propertySkipButton(propertyKey).click()
   await flushPromises()
@@ -78,6 +85,11 @@ export async function clickPropertyRevive(propertyKey: string) {
 
 export async function clickPropertyReturnToSequence(propertyKey: string) {
   propertyReturnToSequenceButton(propertyKey).click()
+  await flushPromises()
+}
+
+export async function clickPropertyRemoveFromRecall(propertyKey: string) {
+  propertyRemoveFromRecallButton(propertyKey).click()
   await flushPromises()
 }
 

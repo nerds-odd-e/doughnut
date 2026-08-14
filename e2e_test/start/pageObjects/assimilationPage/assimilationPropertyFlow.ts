@@ -2,8 +2,9 @@ import { waitUntilAppIsNotBusy } from '../../pageBase'
 import {
   assimilationPropertyRow,
   assimilateButtonSelector,
+  removeFromRecallButtonSelector,
   returnToSequenceButtonSelector,
-  reviveButtonSelector,
+  secondaryActionSelectors,
   skipButtonSelector,
 } from './shared'
 
@@ -16,6 +17,26 @@ const clickPropertyRowButton = (
     .within(() => {
       cy.get(buttonSelector).scrollIntoView().click()
     })
+}
+
+const confirmPropertyRowButton = (
+  propertyKey: string,
+  buttonSelector: string
+) => {
+  clickPropertyRowButton(propertyKey, buttonSelector)
+  cy.findByRole('button', { name: 'OK' }).click()
+  waitUntilAppIsNotBusy()
+}
+
+const expectPropertySecondaryAction = (
+  propertyKey: string,
+  present: keyof typeof secondaryActionSelectors
+) => {
+  assimilationPropertyRow(propertyKey).within(() => {
+    for (const [name, selector] of Object.entries(secondaryActionSelectors)) {
+      cy.get(selector).should(name === present ? 'exist' : 'not.exist')
+    }
+  })
 }
 
 export function assimilationPropertyFlow() {
@@ -53,25 +74,27 @@ export function assimilationPropertyFlow() {
       return this
     },
     skipPropertyOnPanel(propertyKey: string) {
-      clickPropertyRowButton(propertyKey, skipButtonSelector)
-      cy.findByRole('button', { name: 'OK' }).click()
-      waitUntilAppIsNotBusy()
+      confirmPropertyRowButton(propertyKey, skipButtonSelector)
       return this
     },
     expectSkipForProperty(propertyKey: string) {
-      assimilationPropertyRow(propertyKey).within(() => {
-        cy.get(skipButtonSelector).should('exist')
-        cy.get(returnToSequenceButtonSelector).should('not.exist')
-        cy.get(reviveButtonSelector).should('not.exist')
-      })
+      expectPropertySecondaryAction(propertyKey, 'skip')
       return this
     },
     expectReturnToSequenceForProperty(propertyKey: string) {
-      assimilationPropertyRow(propertyKey).within(() => {
-        cy.get(returnToSequenceButtonSelector).should('exist')
-        cy.get(skipButtonSelector).should('not.exist')
-        cy.get(reviveButtonSelector).should('not.exist')
-      })
+      expectPropertySecondaryAction(propertyKey, 'returnToSequence')
+      return this
+    },
+    expectRemoveFromRecallForProperty(propertyKey: string) {
+      expectPropertySecondaryAction(propertyKey, 'removeFromRecall')
+      return this
+    },
+    expectReviveForProperty(propertyKey: string) {
+      expectPropertySecondaryAction(propertyKey, 'revive')
+      return this
+    },
+    removePropertyFromRecallOnPanel(propertyKey: string) {
+      confirmPropertyRowButton(propertyKey, removeFromRecallButtonSelector)
       return this
     },
     returnPropertyToSequenceOnPanel(propertyKey: string) {

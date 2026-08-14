@@ -47,8 +47,8 @@ import {
 } from "@/composables/useAssimilationSequenceSkip"
 import {
   hasUnderstandingNoteLevelTracker,
-  activeUnderstandingNoteLevelTrackers,
-} from "./noteLevelMemoryTrackers"
+  activeUnderstandingTrackers,
+} from "./assimilationMemoryTrackers"
 import {
   trackersToRevive,
   useReviveMemoryTracker,
@@ -158,9 +158,14 @@ const processReturnToSequence = async ({
   }
 }
 
-const processRemoveFromRecall = async () => {
-  const trackers = activeUnderstandingNoteLevelTrackers(
-    noteRecallInfo.value?.memoryTrackers
+const processRemoveFromRecall = async ({
+  propertyKey,
+}: {
+  propertyKey?: string
+} = {}) => {
+  const trackers = activeUnderstandingTrackers(
+    noteRecallInfo.value,
+    propertyKey
   )
   if (trackers.length === 0) {
     return

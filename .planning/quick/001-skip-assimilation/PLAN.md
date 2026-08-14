@@ -1,6 +1,6 @@
 # Assimilation-sequence skip
 
-**Status:** in progress (Phase 14 next)  
+**Status:** in progress (Phase 15 next)  
 **Type mix:** Structure then Behavior
 
 Each phase is one commit: **Behavior** (one observable) or **Structure** (only what the **immediate next** behavior needs). Size for ~5 minutes wall-clock including targeted tests.
@@ -100,7 +100,7 @@ Permanent artifacts stay capability-named (no phase numbers in product files).
 | 11 | Behavior | Skip a property in the sequence (done) |
 | 12 | Behavior | Assimilate a skipped property (done) |
 | 13 | Behavior | Return to sequence (property) (done) |
-| 14 | Behavior | Remove from recall on assimilation settings (property) |
+| 14 | Behavior | Remove from recall on assimilation settings (property) (done) |
 | 15 | Behavior | Migrate property-level dummy skips (`recall_count = 0`) |
 | 16 | Structure | Drop `skipMemoryTracking` on assimilate + testability wording |
 | 17 | Structure | Notebook Skip Memory Tracking E2E language |
@@ -248,15 +248,11 @@ Permanent artifacts stay capability-named (no phase numbers in product files).
 ## Phase 14 — Remove from recall on assimilation settings (property)
 
 - **Type:** Behavior  
-- **Status:** planned
+- **Status:** done
 
-**Pre-condition:** Active property understanding tracker.  
-**Trigger:** **Remove from recall** on that property row.  
-**Post-condition:** Property tracker removed from tracking; **Revive** on that row; **Skip** hidden.
+**Done:** Assimilated property rows show **Remove from recall** (existing `removeFromRepeating`), not Skip. After remove: Revive on that row; property stays out of the sequence. Shared `activeUnderstandingTrackers` helper.
 
-**Tests:** Same property feature.
-
-**Done when:** Assimilated properties show Remove from recall, not Skip.
+**Learning:** Tracker selection lives in `assimilationMemoryTrackers.ts` (renamed from note-level-only module).
 
 ---
 

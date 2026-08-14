@@ -4,12 +4,14 @@ import { assimilateButtonSelector } from "./assimilationPanelTestSupport"
 import {
   assimilationPropertyRow,
   clickPropertyAssimilate,
+  clickPropertyRemoveFromRecall,
   clickPropertyRevive,
   clickPropertyReturnToSequence,
   clickPropertySkip,
   getNoteInfoSpy,
   mountAssimilationSettingsReady,
   propertyAssimilateButton,
+  propertyRemoveFromRecallButton,
   propertyReturnToSequenceButton,
   propertyReviveButton,
   propertySkipButton,
@@ -79,6 +81,7 @@ describe("AssimilationSettings", () => {
     expect(propertyReturnToSequenceButton("topic")).not.toBeNull()
     expect(propertySkipButton("topic")).toBeNull()
     expect(propertyReviveButton("topic")).toBeNull()
+    expect(propertyRemoveFromRecallButton("topic")).toBeNull()
     expect(propertySkipButton("url")).not.toBeNull()
     expect(propertyReturnToSequenceButton("url")).toBeNull()
 
@@ -110,11 +113,37 @@ describe("AssimilationSettings", () => {
 
       expect(propertyReviveButton("topic")).not.toBeNull()
       expect(propertySkipButton("topic")).toBeNull()
+      expect(propertyRemoveFromRecallButton("topic")).toBeNull()
       expect(propertySkipButton("url")).not.toBeNull()
       expect(propertyReviveButton("url")).toBeNull()
 
       await clickPropertyRevive("topic")
       expect(wrapper.emitted("revive")).toEqual([[{ propertyKey: "topic" }]])
     })
+  })
+
+  it("shows Remove from recall on an assimilated property", async () => {
+    getNoteInfoSpy.mockResolvedValue(
+      wrapSdkResponse(
+        makeMe.aNoteRecallInfo
+          .memoryTrackers([
+            makeMe.aMemoryTracker.id(1).withPropertyKey("topic").please(),
+          ])
+          .please()
+      )
+    )
+    await mountAssimilationSettingsReady()
+
+    expect(propertyRemoveFromRecallButton("topic")).not.toBeNull()
+    expect(propertySkipButton("topic")).toBeNull()
+    expect(propertyReviveButton("topic")).toBeNull()
+    expect(propertyReturnToSequenceButton("topic")).toBeNull()
+    expect(propertySkipButton("url")).not.toBeNull()
+    expect(propertyRemoveFromRecallButton("url")).toBeNull()
+
+    await clickPropertyRemoveFromRecall("topic")
+    expect(wrapper.emitted("removeFromRecall")).toEqual([
+      [{ propertyKey: "topic" }],
+    ])
   })
 })
