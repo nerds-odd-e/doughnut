@@ -6,6 +6,9 @@ import { Then, When } from '@badeball/cypress-cucumber-preprocessor'
 import start from '../start'
 import { assumeMemoryTrackerPage } from '../start/pageObjects/memoryTrackerPage'
 
+// The assimilation page labels understanding tracker rows as 'normal'
+// (NoteInfoMemoryTracker.vue trackerTypeLabel), so the 'understanding' kind
+// maps to the 'normal' row label when opening the note-level tracker.
 function openNoteLevelTracker(
   noteTitle: string,
   kind: 'understanding' | 'spelling'
