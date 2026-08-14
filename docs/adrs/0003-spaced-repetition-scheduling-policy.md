@@ -62,6 +62,40 @@ recalls in different halves of one day can have meaningful elapsed time. C1 does
 not add a separate same-day transition; a future Stability/Difficulty behavior
 may introduce an explicit short-term rule without changing this decision.
 
+### Accidental-match and overlap transitions
+
+An **accidental match** is a spelling answer that fails the note under recall
+but names another accessible note by title or plain alias. Unless the notes have
+a declared overlap, the answer has the following consequences:
+
+1. The spelling tracker under recall receives the ordinary incorrect-recall
+   transition, including its full negative memory-state adjustment and
+   relearning projection. It advances `lastRecalledAt` and `recallCount` and
+   counts as a failed recall for that tracker.
+2. A secondary **confusion adjustment** applies only when the answer matches
+   exactly one accessible note and that learner has an eligible active tracker
+   for it. Prefer its spelling tracker; otherwise use its note-level
+   understanding tracker. Never select a property or commissioned tracker, a
+   removed or deleted tracker, or create a tracker implicitly.
+3. The confusion adjustment is strictly weaker than ordinary incorrect recall.
+   It reduces the selected tracker's memory strength and recomputes its due-work
+   projection from its existing recall anchor. It must not advance
+   `lastRecalledAt`, increment `recallCount`, count as a failed recall, or move
+   an already scheduled recall later.
+4. The primary incorrect transition and any secondary confusion adjustment are
+   one atomic grading operation. The secondary adjustment must remain durably
+   attributable to the accidental-match answer that caused it.
+5. When no eligible secondary tracker exists, or more than one accessible note
+   matches, only the tracker under recall changes. Do not choose a matched note
+   arbitrarily.
+
+A declared **overlap** is a separate, non-distinguishing outcome: the answer is
+accepted by the note under recall, that note explicitly declares overlap with
+another accessible note, and the same answer is accepted by the declared note.
+Neither tracker receives recall credit, an incorrect transition, or a confusion
+adjustment; their schedule fields remain unchanged, and the learner may retry
+with a more specific answer in the same session.
+
 ## Working draft
 
 ### Recall inputs and scheduling are separate
@@ -115,8 +149,8 @@ assimilation target** include understanding note-level trackers only — a
 spelling tracker does not consume either (same as a commissioned tracker for
 that queue).
 
-Spelling recall grading (accidental match, overlap) is unchanged; see Graded
-outcomes.
+Spelling recall grading follows the locked accidental-match and overlap
+transitions in the Decision section.
 
 ### Graded outcomes
 
@@ -162,33 +196,6 @@ tracker.
    `threshold`, `periodDays`). No confirm action and no tracker deletion.
 3. **Property trackers:** The warning names the property when the tracker is
    property-keyed.
-
-#### Accidental match (spelling)
-
-An accidental match is a spelling answer that fails the note under recall but names
-another accessible note (title or plain alias).
-
-1. Its negative memory-state adjustment is strictly weaker than incorrect
-   recall on the same tracker state.
-2. After grading, schedule a future recall from the updated memory state using
-   the normal interval path — not the incorrect-recall relearning override.
-3. Earliness or lateness does not change the grade; timing follows the
-   recall-input/scheduling separation above.
-
-#### Overlap (declared, non-distinguishing spelling)
-
-Overlap is when the note under recall **explicitly declares** overlap with another
-note and the spelling answer would also be accepted by that note — correct in
-isolation, but non-distinguishing. Undirected title/alias collision without
-declaration is accidental match when the answer fails the note under recall.
-
-1. Not a successful recall: no memory-strength growth; do not advance as
-   correct.
-2. Not an incorrect or accidental-match recall: no those penalties; do not
-   change the tracker's schedule fields.
-3. Do not count toward the frequent-failure wrong-answer count.
-4. Allow same-session retry with a more specific answer. Retry grades under
-   the normal outcome rules (correct, incorrect, or accidental match).
 
 ### Commissioned learning session feedback
 
@@ -268,8 +275,11 @@ assert the resulting schedule movement, not the internal measure.
 - Correct overdue recalls must not create a positive-feedback workload loop.
 - A spelling memory tracker is extra title practice the learner opts into; it
   does not consume assimilation due or the daily assimilation target.
-- Accidental match and declared overlap remain first-class outcomes with
-  distinct scheduling rules.
+- A non-overlap accidental match fully fails the spelling tracker under recall
+  and may also weaken one unambiguously matched spelling or understanding
+  tracker without fabricating recall credit for it.
+- Declared overlap remains a first-class no-credit, no-penalty outcome with a
+  same-session retry.
 - Tutor Feedback becomes a grading source alongside Doughnut's own recall
   questions, and is the first place this policy quantifies an adjustment.
 - Implementations must distinguish observed retention time from deviation

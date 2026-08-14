@@ -60,6 +60,19 @@ class AssimilationControllerAssimilateTests extends ControllerTestBase {
     }
 
     @Test
+    void assimilatingSkippedPropertyDeletesMatchingSkipRow() {
+      Note note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
+      makeMe.anAssimilationSequenceSkipFor(note).propertyKey("a part of").please();
+
+      controller.assimilate(
+          AssimilationControllerTestSupport.assimilatePropertyRequest(note, "a part of"));
+
+      assertThat(
+          skipRepository.findByUserAndNoteAndPropertyKey(currentUser.getUser(), note, "a part of"),
+          is(Optional.empty()));
+    }
+
+    @Test
     void assimilatingCommissionedOnlyNoteCreatesUnderstandingAndLeavesCommissioned() {
       Note note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
       makeMe.aMemoryTrackerFor(note).commissioned().please();

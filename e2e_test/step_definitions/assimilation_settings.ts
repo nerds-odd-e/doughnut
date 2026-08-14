@@ -58,6 +58,13 @@ When(
   }
 )
 
+When(
+  'I assimilate property {string} on the assimilation panel',
+  (propertyKey: string) => {
+    start.assumeAssimilationPage().assimilateProperty(propertyKey)
+  }
+)
+
 Then(
   'assimilate for property {string} should be disabled',
   (propertyKey: string) => {

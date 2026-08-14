@@ -61,6 +61,33 @@ Feature: Property memory tracker
     And I should see Skip for property "topic"
 
   @disableOpenAiService
+  Scenario: Assimilating a skipped property creates a property understanding tracker
+    Given I am re-logged in as "another_old_learner"
+    And I have a notebook "Property skip assimilate"
+    And I have a note "Minerals" under notebook "Property skip assimilate" with content:
+      """
+      ---
+      topic: calcium
+      ---
+
+      Body.
+      """
+    And It's day 1, 8 hour
+    And I assimilated one note "Minerals" at the current time
+    When I start assimilation from the menu
+    Then I should see pending assimilation property "topic"
+    When I skip property "topic" on the assimilation panel
+    Then I should see the no more notes to assimilate toast
+    When I visit note "Minerals"
+    And I open assimilation settings
+    And I expand assimilation properties
+    And I assimilate property "topic" on the assimilation panel
+    Then I should see the no more notes to assimilate toast
+    When I visit note "Minerals"
+    And I open assimilation settings
+    Then I should see a property memory tracker for "topic"
+
+  @disableOpenAiService
   Scenario: Note-level assimilation stays available after property-only assimilation
     Given I am viewing assimilation settings for note "Vitamins"
     Then assimilate for property "topic" should be disabled

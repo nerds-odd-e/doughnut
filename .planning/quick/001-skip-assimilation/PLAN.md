@@ -1,6 +1,6 @@
 # Assimilation-sequence skip
 
-**Status:** in progress (Phase 12 next)  
+**Status:** in progress (Phase 13 next)  
 **Type mix:** Structure then Behavior
 
 Each phase is one commit: **Behavior** (one observable) or **Structure** (only what the **immediate next** behavior needs). Size for ~5 minutes wall-clock including targeted tests.
@@ -98,7 +98,7 @@ Permanent artifacts stay capability-named (no phase numbers in product files).
 | 9 | Behavior | Return to sequence (note) (done) |
 | 10 | Behavior | Remove from recall on assimilation settings (note) (done) |
 | 11 | Behavior | Skip a property in the sequence (done) |
-| 12 | Behavior | Assimilate a skipped property |
+| 12 | Behavior | Assimilate a skipped property (done) |
 | 13 | Behavior | Return to sequence (property) |
 | 14 | Behavior | Remove from recall on assimilation settings (property) |
 | 15 | Behavior | Migrate property-level dummy skips (`recall_count = 0`) |
@@ -226,15 +226,11 @@ Permanent artifacts stay capability-named (no phase numbers in product files).
 ## Phase 12 — Assimilate a skipped property
 
 - **Type:** Behavior  
-- **Status:** planned
+- **Status:** done
 
-**Pre-condition:** Property sequence-skip row, no property understanding tracker.  
-**Trigger:** **Assimilate** on that property row.  
-**Post-condition:** Property understanding tracker; skip row gone.
+**Done:** Controller test + E2E: assimilating a skipped property creates the understanding tracker and deletes the matching skip row. Production already deleted skip at tracker grain (Phase 5); no production change.
 
-**Tests:** Same property feature + assimilate controller.
-
-**Done when:** XOR invariant holds at property grain.
+**Learning:** Skip can still show on an assimilated property row until Phases 13–14.
 
 ---
 

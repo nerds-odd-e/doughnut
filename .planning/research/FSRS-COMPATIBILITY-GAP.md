@@ -100,13 +100,12 @@ and Stability/Retrievability, never queue deviation.
 Commissioned learning remains cadence-driven and does not inherit the 12-hour
 ordinary-recall rule.
 
-### O8. Accidental match in frequent-failure reporting
+### O8. Accidental match in frequent-failure reporting — resolved
 
-- Count incorrect only.
-- Count incorrect plus accidental match.
-- Use separate thresholds.
-
-**Recommendation to discuss:** incorrect only, matching the current ADR draft.
+The prompted spelling tracker receives the ordinary incorrect-recall transition,
+so its accidental-match answer counts as a failed recall. A secondary confusion
+adjustment is not a recall of the matched tracker and does not contribute to that
+tracker's failure count. See the locked accidental-match transition in ADR 0003.
 
 ### O9. Manual and administrative schedule paths
 
