@@ -31,6 +31,7 @@ spring:
       embedding_column: "embedding_raw VARBINARY(6144) NOT NULL"
       recall_anchor_repair: "1=0"
       tz_repair: "1=0"
+      dummy_note_sequence_skip_convert: "1=0"
   jpa:
     generate-ddl: false
     show-sql: false
@@ -101,6 +102,7 @@ spring:
       embedding_column: "embedding_raw VARBINARY(6144) NOT NULL"
       recall_anchor_repair: "1=0"
       tz_repair: "1=0"
+      dummy_note_sequence_skip_convert: "1=0"
   jpa:
     generate-ddl: false
     show-sql: false
@@ -158,6 +160,7 @@ spring:
       embedding_column: "embedding_raw VARBINARY(6144) NOT NULL"
       recall_anchor_repair: "1=0"
       tz_repair: "1=0"
+      dummy_note_sequence_skip_convert: "1=0"
   jpa:
     generate-ddl: false
     show-sql: true

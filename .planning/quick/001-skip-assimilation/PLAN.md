@@ -1,6 +1,6 @@
 # Assimilation-sequence skip
 
-**Status:** in progress (Phase 8 next)  
+**Status:** in progress (Phase 9 next)  
 **Type mix:** Structure then Behavior
 
 Each phase is one commit: **Behavior** (one observable) or **Structure** (only what the **immediate next** behavior needs). Size for ~5 minutes wall-clock including targeted tests.
@@ -94,7 +94,7 @@ Permanent artifacts stay capability-named (no phase numbers in product files).
 | 5 | Behavior | Assimilate (understanding) a skipped note (done) |
 | 6 | Behavior | Remember spelling a skipped note (done) |
 | 7 | Behavior | Assimilate as commissioned a skipped note (done) |
-| 8 | Behavior | Migrate note-level dummy skips (`recall_count = 0`) |
+| 8 | Behavior | Migrate note-level dummy skips (`recall_count = 0`) (done) |
 | 9 | Behavior | Return to sequence (note) |
 | 10 | Behavior | Remove from recall on assimilation settings (note) |
 | 11 | Behavior | Skip a property in the sequence |
@@ -182,19 +182,11 @@ Permanent artifacts stay capability-named (no phase numbers in product files).
 ## Phase 8 — Convert note-level dummy skipped trackers (`recall_count = 0`)
 
 - **Type:** Behavior  
-- **Status:** planned
+- **Status:** done
 
-**Pre-condition:** Live note-level `UNDERSTANDING` tracker, `removed_from_tracking`, `recall_count = 0`.  
-**Trigger:** Migration applies.  
-**Post-condition:** Matching skip row; tracker `deleted_at`; note stays out of the sequence; assimilate-from-note available.
+**Done:** Gated Flyway `V300000254` inserts matching `assimilation_sequence_skip` rows and soft-deletes live note-level `UNDERSTANDING` dummies (`removed_from_tracking`, `recall_count = 0`, empty `property_key`). Does not convert `recall_count > 0` or property-level rows. Placeholder `dummy_note_sequence_skip_convert` defaults to `1=0` in all Flyway profiles (including prod). JDBC harness `NoteLevelDummySequenceSkipConversionTest` covers no-op vs enabled selection.
 
-Do not convert `recall_count > 0` or property-level rows.
-
-**Tests:** Migration SQL is the source of truth. Optional one JDBC test of row selection (note-level, understanding, removed, count 0, empty `property_key`). Runtime already covered by Phases 4–5.
-
-**Command:** `CURSOR_DEV=true nix develop -c pnpm backend:test_only`
-
-**Done when:** Those production dummy note skips are sequence-skip rows.
+**Learning:** Production dummy conversion does **not** run until a deliberate deploy sets `dummy_note_sequence_skip_convert=1=1`. Remove the JDBC harness after that production application (gated-migration policy). Phase 9 does not depend on the gate.
 
 ---
 

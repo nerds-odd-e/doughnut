@@ -31,6 +31,11 @@ public class MemoryTrackerBuilder extends EntityBuilder<MemoryTracker> {
     return this;
   }
 
+  public MemoryTrackerBuilder recallCount(int recallCount) {
+    entity.setRecallCount(recallCount);
+    return this;
+  }
+
   @Override
   protected void beforeCreate(boolean needPersist) {}
 

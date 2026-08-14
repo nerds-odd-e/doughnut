@@ -2,19 +2,19 @@
 gsd_state_version: 1.0
 milestone: null
 milestone_name: null
-current_phase: 8
-current_phase_name: Convert note-level dummy skipped trackers
+current_phase: 9
+current_phase_name: Return to sequence (note)
 status: in_progress
-stopped_at: "Paused after Phase 7 wrap-up; resume execute-plan at Phase 8"
-last_updated: "2026-08-14T04:40:00Z"
+stopped_at: "Paused after Phase 8 wrap-up; resume execute-plan at Phase 9"
+last_updated: "2026-08-14T05:10:00Z"
 last_activity: 2026-08-14
-last_activity_desc: Phases 1–7 done; next is migrate note-level dummy skips
+last_activity_desc: Phases 1–8 done; next is Return to sequence on assimilation settings
 progress:
   total_phases: 17
-  completed_phases: 7
+  completed_phases: 8
   total_plans: 1
   completed_plans: 0
-  percent: 41
+  percent: 47
 ---
 
 # Project State
@@ -27,7 +27,9 @@ See: `.planning/PROJECT.md`
 
 ## Current Position
 
-Ad-hoc plan in progress: [`.planning/quick/001-skip-assimilation/PLAN.md`](quick/001-skip-assimilation/PLAN.md). **Phases 1–7 done.** Next: Phase 8 (migrate note-level dummy skipped trackers with `recall_count = 0`).
+Ad-hoc plan in progress: [`.planning/quick/001-skip-assimilation/PLAN.md`](quick/001-skip-assimilation/PLAN.md). **Phases 1–8 done.** Next: Phase 9 (Return to sequence on a note-level sequence skip).
+
+**Ops leftover:** production dummy-skip conversion is gated. Enable `spring.flyway.placeholders.dummy_note_sequence_skip_convert=1=1` on a deliberate deploy, then revert to `1=0`. JDBC harness `NoteLevelDummySequenceSkipConversionTest` is temporary until that application.
 
 **Recently shipped:** note toolbar keeps on-state Audio/Assimilation on the bar; other actions overflow from the right into More options. Production hard-delete incident response (2026-08-12) — [MILESTONES.md](MILESTONES.md).
 
@@ -35,5 +37,6 @@ Ad-hoc plan in progress: [`.planning/quick/001-skip-assimilation/PLAN.md`](quick
 
 ## Operator Next Steps
 
-- Continue execute-plan: Phase 8 of `.planning/quick/001-skip-assimilation/PLAN.md`
+- Continue execute-plan: Phase 9 of `.planning/quick/001-skip-assimilation/PLAN.md`
+- Enable production dummy-skip conversion (`dummy_note_sequence_skip_convert=1=1`) on a deliberate deploy when ready
 - Or continue ADR 0003: resolve open issues in `.planning/research/FSRS-COMPATIBILITY-GAP.md`
