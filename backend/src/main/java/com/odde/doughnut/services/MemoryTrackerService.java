@@ -14,6 +14,7 @@ import com.odde.doughnut.entities.repositories.RecallPromptRepository;
 import com.odde.doughnut.factoryServices.EntityPersister;
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -89,6 +90,19 @@ public class MemoryTrackerService {
       return isThresholdExceeded(memoryTracker, currentUTCTimestamp);
     }
     return false;
+  }
+
+  public Optional<MemoryTracker> findActiveNoteLevelSpellingTracker(User user, Note note) {
+    return userService.getMemoryTrackersFor(user, note).stream()
+        .filter(MemoryTracker::isActive)
+        .filter(MemoryTracker::isNoteLevelTracker)
+        .filter(MemoryTracker::isSpelling)
+        .findFirst();
+  }
+
+  public void applyConfusionAdjustment(MemoryTracker tracker) {
+    tracker.adjustForConfusion();
+    entityPersister.save(tracker);
   }
 
   public void delete(MemoryTracker memoryTracker) {

@@ -2,6 +2,13 @@ import { waitUntilAppIsNotBusy } from '../../pageBase'
 import { assumeMemoryTrackerPage } from '../memoryTrackerPage'
 import { propertyMemoryTrackerRowLabel } from './shared'
 
+function openTrackerRow(rowText: string) {
+  cy.contains('tr', rowText).click()
+  cy.url().should('include', '/memory-trackers/')
+  waitUntilAppIsNotBusy()
+  return assumeMemoryTrackerPage()
+}
+
 export function assimilationPropertyMemoryTrackerExpectations() {
   return {
     expectPropertyMemoryTracker(propertyKey: string, recallCount = 0) {
@@ -20,10 +27,7 @@ export function assimilationPropertyMemoryTrackerExpectations() {
       return this
     },
     openPropertyMemoryTracker(propertyKey: string) {
-      cy.contains('tr', propertyMemoryTrackerRowLabel(propertyKey)).click()
-      cy.url().should('include', '/memory-trackers/')
-      waitUntilAppIsNotBusy()
-      return assumeMemoryTrackerPage()
+      return openTrackerRow(propertyMemoryTrackerRowLabel(propertyKey))
     },
     expectMemoryTrackerInfo(expected: { [key: string]: string }[]) {
       for (const k in expected) {
@@ -38,10 +42,10 @@ export function assimilationPropertyMemoryTrackerExpectations() {
       return this
     },
     removeMemoryTrackerFromRecall(type: 'normal' | 'spelling') {
-      cy.contains('tr', type).click()
-      cy.url().should('include', '/memory-trackers/')
-      waitUntilAppIsNotBusy()
-      return assumeMemoryTrackerPage().removeFromRecall()
+      return this.openNoteLevelMemoryTracker(type).removeFromRecall()
+    },
+    openNoteLevelMemoryTracker(type: 'normal' | 'spelling') {
+      return openTrackerRow(type)
     },
   }
 }

@@ -68,4 +68,8 @@ public class ForgettingCurve {
   public float failed() {
     return add(-DEFAULT_FORGETTING_CURVE_INDEX_INCREMENT * 2);
   }
+
+  float confusionAdjusted() {
+    return add(-DEFAULT_FORGETTING_CURVE_INDEX_INCREMENT);
+  }
 }

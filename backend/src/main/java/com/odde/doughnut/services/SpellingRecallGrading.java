@@ -106,6 +106,15 @@ final class SpellingRecallGrading {
         Answer gradedAnswer = recallPrompt.getAnswer();
         gradedAnswer.setMatchedNoteId(matches.getFirst().getId().longValue());
         gradedAnswer.setOutcome(AnswerOutcome.ACCIDENTAL_MATCH);
+        if (matches.size() == 1) {
+          memoryTrackerService
+              .findActiveNoteLevelSpellingTracker(user, matches.getFirst())
+              .ifPresent(
+                  target -> {
+                    memoryTrackerService.applyConfusionAdjustment(target);
+                    gradedAnswer.setConfusionAdjustedMemoryTracker(target);
+                  });
+        }
       }
     }
 

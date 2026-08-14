@@ -197,6 +197,13 @@ public class MemoryTracker extends EntityIdentifiedByIdOnly {
     }
   }
 
+  public void adjustForConfusion() {
+    Timestamp existingDue = getNextRecallAt();
+    setForgettingCurveIndex(forgettingCurve().confusionAdjusted());
+    Timestamp projected = calculateNextRecallAt();
+    setNextRecallAt(projected.after(existingDue) ? existingDue : projected);
+  }
+
   @JsonIgnore
   public boolean isActive() {
     return deletedAt == null && !Boolean.TRUE.equals(removedFromTracking);

@@ -5,6 +5,31 @@ const expectMemoryTrackerPage = () => {
   cy.findByRole('heading', { name: 'Memory Tracker' }).should('be.visible')
 }
 
+const labeledValue = (label: string) =>
+  cy
+    .contains('span.font-semibold', label)
+    .siblings('span')
+    .invoke('text')
+    .then((text) => text.trim())
+
+const recordLabeledValueAs = (label: string, alias: string) => {
+  labeledValue(label).then((text) => {
+    cy.wrap(text).as(alias)
+  })
+}
+
+const expectLabeledValueUnchanged = (
+  label: string,
+  alias: string,
+  message: (recorded: string) => string
+) => {
+  labeledValue(label).then((actual) => {
+    cy.get<string>(`@${alias}`).then((recorded) => {
+      expect(actual, message(recorded)).to.equal(recorded)
+    })
+  })
+}
+
 const assumeMemoryTrackerPage = () => {
   return {
     removeFromRecall() {
@@ -37,38 +62,32 @@ const assumeMemoryTrackerPage = () => {
     },
     expectRecallCount(count: number) {
       expectMemoryTrackerPage()
-      cy.contains('span.font-semibold', 'Recall Count:')
-        .parent()
-        .should('contain', String(count))
+      labeledValue('Recall Count:').then((text) => {
+        expect(text).to.equal(String(count))
+      })
       return assumeMemoryTrackerPage()
     },
     expectLastRecallTimeTwelveHoursBeforeNextRecall() {
       expectMemoryTrackerPage()
-      cy.contains('span.font-semibold', 'Last Recall Time:')
-        .siblings('span')
-        .invoke('text')
-        .then((lastRecallTime) => {
-          cy.contains('span.font-semibold', 'Next Recall Time:')
-            .siblings('span')
-            .invoke('text')
-            .then((nextRecallTime) => {
-              const intervalInHours =
-                (new Date(nextRecallTime.trim()).getTime() -
-                  new Date(lastRecallTime.trim()).getTime()) /
-                3_600_000
-              expect(
-                intervalInHours,
-                `Expected Last Recall Time (${lastRecallTime.trim()}) to be the incorrect grade time, 12 hours before Next Recall Time (${nextRecallTime.trim()})`
-              ).to.equal(12)
-            })
+      labeledValue('Last Recall Time:').then((lastRecallTime) => {
+        labeledValue('Next Recall Time:').then((nextRecallTime) => {
+          const intervalInHours =
+            (new Date(nextRecallTime).getTime() -
+              new Date(lastRecallTime).getTime()) /
+            3_600_000
+          expect(
+            intervalInHours,
+            `Expected Last Recall Time (${lastRecallTime}) to be the incorrect grade time, 12 hours before Next Recall Time (${nextRecallTime})`
+          ).to.equal(12)
         })
+      })
       return assumeMemoryTrackerPage()
     },
     expectTrackerType(type: string) {
       expectMemoryTrackerPage()
-      cy.contains('span.font-semibold', 'Type:')
-        .parent()
-        .should('contain', type)
+      labeledValue('Type:').then((text) => {
+        expect(text).to.equal(type)
+      })
       return assumeMemoryTrackerPage()
     },
     expectNoteTitle(noteTitle: string) {
@@ -82,6 +101,39 @@ const assumeMemoryTrackerPage = () => {
       cy.findByTestId('focused-property-indicator')
         .should('be.visible')
         .and('contain.text', `Focused property: ${propertyKey}`)
+      return assumeMemoryTrackerPage()
+    },
+    captureSchedule() {
+      expectMemoryTrackerPage()
+      recordLabeledValueAs('Last Recall Time:', 'recordedLastRecallTime')
+      recordLabeledValueAs('Next Recall Time:', 'recordedNextRecallTime')
+      recordLabeledValueAs('Recall Count:', 'recordedRecallCount')
+      return assumeMemoryTrackerPage()
+    },
+    expectBroughtForwardWithoutRecallCredit() {
+      expectMemoryTrackerPage()
+      expectLabeledValueUnchanged(
+        'Last Recall Time:',
+        'recordedLastRecallTime',
+        (recorded) =>
+          `Last Recall Time should stay ${recorded} without recall credit`
+      )
+      expectLabeledValueUnchanged(
+        'Recall Count:',
+        'recordedRecallCount',
+        (recorded) =>
+          `Recall Count should stay ${recorded} without recall credit`
+      )
+      labeledValue('Next Recall Time:').then((nextRecallTime) => {
+        cy.get<string>('@recordedNextRecallTime').then((recorded) => {
+          const next = new Date(nextRecallTime).getTime()
+          const before = new Date(recorded).getTime()
+          expect(
+            next,
+            `Next Recall Time (${nextRecallTime}) should be earlier than recorded ${recorded}`
+          ).to.be.lessThan(before)
+        })
+      })
       return assumeMemoryTrackerPage()
     },
   }

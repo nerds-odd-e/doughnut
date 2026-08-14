@@ -1,6 +1,6 @@
 # Accidental-match confusion adjustment
 
-**Status:** in progress (Phase 3 next)  
+**Status:** in progress (Phase 4 next)  
 **Type mix:** Behavior and Structure  
 **Context:** [CONTEXT.md](CONTEXT.md)
 
@@ -22,7 +22,7 @@ tracker and still permits retry.
 |---|---|---|---|
 | 1 | Behavior | done | Accidental match fully fails the prompted spelling tracker |
 | 2 | Structure | done | An answer can durably identify one confusion-adjusted tracker |
-| 3 | Behavior | planned | A unique matched spelling tracker receives the weaker adjustment without recall credit |
+| 3 | Behavior | done | A unique matched spelling tracker receives the weaker adjustment without recall credit |
 | 4 | Behavior | planned | A unique matched understanding tracker is used when no active spelling tracker exists |
 | 5 | Behavior | planned | Ambiguous matches adjust none of the matched trackers |
 | 6 | Behavior | planned | Declared overlap leaves both trackers unchanged |
@@ -54,39 +54,16 @@ advance `lastRecalledAt` or `recallCount`.
 ## Phase 3 — Weaken a unique matched spelling tracker
 
 - **Type:** Behavior
-- **Status:** planned
-- **Precondition:** A non-overlap accidental answer for A matches exactly one
-  accessible B; the learner has an active note-level spelling tracker for B.
-- **Trigger:** Submit the spelling answer for A.
-- **Postcondition:** A receives Phase 1's full failure. B's spelling strength is
-  reduced by the weaker adjustment and its due projection is no later, while
-  B's `lastRecalledAt`, `recallCount`, and failed-recall count remain unchanged.
-  The answer durably references B's adjusted tracker.
+- **Status:** done
+- **Shipped:** Unique accessible match with an active note-level spelling
+  tracker on B: `adjustForConfusion` reduces index by 10 (floor 100),
+  recomputes due from unchanged `lastRecalledAt`, and never postpones.
+  Anchor, `recallCount`, and failed-recall count stay put. Answer links
+  `confusionAdjustedMemoryTracker`. Selection only when `matches.size() == 1`.
 
-### Test-first work
-
-1. Add a controller-boundary test with real A and B trackers. Capture B's
-   strength, due time, recall anchor, count, and threshold count; confirm the
-   test fails before production changes.
-2. Add a capability-named E2E scheduling scenario that records B's visible
-   Memory Tracker state, submits the accidental answer for A, and observes that
-   B is brought forward without recall credit.
-3. Add a cohesive memory-tracker operation for confusion adjustment: weaker
-   strength reduction, due projection from the unchanged anchor, and an
-   explicit no-later-than-existing-due invariant.
-4. Select B only when `matches.size() == 1`, prefer its active spelling tracker,
-   apply the adjustment, and persist the answer relationship within the
-   existing transaction.
-5. Cover the strength floor and a B tracker that is already due so the
-   adjustment cannot postpone it. Retain the existing unreadable-note boundary.
-
-### Verification
-
-- `CURSOR_DEV=true nix develop -c pnpm backend:test_only`
-- Targeted Cypress spec for accidental-match scheduling.
-
-**Stop-safe value:** The most direct two-note confusion case is represented
-without fabricating a recall of B.
+**Learning for Phase 4:** `findActiveNoteLevelSpellingTracker` is the
+prefer-spelling seam; extend it for understanding fallback rather than
+branching beside it.
 
 ## Phase 4 — Fall back to the understanding tracker
 

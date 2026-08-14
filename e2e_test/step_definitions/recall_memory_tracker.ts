@@ -30,6 +30,21 @@ Then(
   }
 )
 
+Then('I record the current memory tracker schedule', () => {
+  assumeMemoryTrackerPage().captureSchedule()
+})
+
+Then(
+  'the spelling memory tracker for {string} should be brought forward without recall credit',
+  (noteTitle: string) => {
+    start
+      .jumpToNotePage(noteTitle)
+      .openAssimilationSettings()
+      .openNoteLevelMemoryTracker('spelling')
+      .expectBroughtForwardWithoutRecallCredit()
+  }
+)
+
 When('I choose to remove the last memory tracker from recalls', () => {
   start
     .assumeAnsweredQuestionPage()
