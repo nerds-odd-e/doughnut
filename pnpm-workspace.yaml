@@ -28,7 +28,7 @@ overrides:
   diff: '>=8.0.3'
   dompurify: '>=3.4.0'
   ejs: '>=3.1.10'
-  esbuild: '>=0.28.1'
+  esbuild: 0.28.2
   express: '>=5.2.0'
   express-rate-limit: '>=8.2.2'
   fast-uri: '>=4.1.2'

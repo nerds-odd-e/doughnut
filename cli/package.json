@@ -42,10 +42,10 @@
     "@types/node": "26.2.0",
     "@types/react": "^19.2.18",
     "doughnut-test-fixtures": "workspace:*",
-    "esbuild": ">=0.28.1",
+    "esbuild": "0.28.2",
     "ink": "^7.1.1",
     "ink-testing-library": "^4.0.0",
-    "tsx": "4.23.8",
+    "tsx": "4.23.12",
     "typescript": "6.0.3",
     "vitest": "4.1.10"
   }

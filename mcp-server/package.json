@@ -23,7 +23,7 @@
     "@modelcontextprotocol/sdk": "^1.30.0",
     "@types/node": "26.2.0",
     "doughnut-test-fixtures": "workspace:*",
-    "esbuild": ">=0.28.1",
+    "esbuild": "0.28.2",
     "typescript": "6.0.3",
     "vitest": "4.1.10",
     "zod": "^4.4.3"
