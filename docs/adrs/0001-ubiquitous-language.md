@@ -92,7 +92,7 @@ guides gradual alignment (tests, UI, OpenAPI, packages).
 | **Book layout** | Structure of an attached book |
 | **OKF** | [Open Knowledge Format](https://cloud.google.com/blog/products/data-analytics/how-the-open-knowledge-format-can-improve-data-sharing): portable directory of markdown concept files with YAML frontmatter |
 | **Notebook health** | In-app lint, findings, and fixes for a notebook |
-| **Skip Memory Tracking** | Notebook setting that opts the notebook out of assimilation (and blocks Bazaar subscribe). |
+| **Skip Memory Tracking** | Notebook setting that opts the notebook out of assimilation sequence (and blocks Bazaar subscribe). |
 
 #### Learning and recall
 
