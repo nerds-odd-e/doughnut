@@ -2,19 +2,19 @@
 gsd_state_version: 1.0
 milestone: null
 milestone_name: null
-current_phase: 5
-current_phase_name: Leave ambiguous matched trackers unchanged
+current_phase: 6
+current_phase_name: Preserve declared-overlap neutrality
 status: executing
 stopped_at: null
-last_updated: "2026-08-14T17:26:00Z"
+last_updated: "2026-08-14T17:43:00Z"
 last_activity: 2026-08-14
-last_activity_desc: 003 Phase 4 done — unique match falls back to understanding tracker
+last_activity_desc: 003 Phase 5 done — ambiguous matches adjust no trackers
 progress:
   total_phases: 6
-  completed_phases: 4
+  completed_phases: 5
   total_plans: 1
   completed_plans: 0
-  percent: 67
+  percent: 83
 ---
 
 # Project State
@@ -27,7 +27,7 @@ See: `.planning/PROJECT.md`
 
 ## Current Position
 
-Executing `.planning/quick/003-accidental-match-confusion-adjustment/` Phase 5: ambiguous matches adjust none of the matched trackers. Phase 4 shipped: unique match falls back to B's understanding tracker when spelling is absent.
+Executing `.planning/quick/003-accidental-match-confusion-adjustment/` Phase 6: declared overlap leaves both trackers unchanged. Phase 5 shipped: ambiguous matches list all notes and adjust none.
 
 **Ops leftover:** gated dummy-skip conversions. Enable on the deploy that first applies each version, then revert to `1=0`:
 - `dummy_note_sequence_skip_convert` (`V300000254`)
@@ -42,4 +42,4 @@ JDBC harnesses remain temporary until those production applications.
 
 - Enable dummy-skip conversion placeholders on the deploys that first apply V300000254 / V300000255
 - Continue ADR 0003: resolve open issues in `.planning/research/FSRS-COMPATIBILITY-GAP.md`
-- Continue execute-plan `.planning/quick/003-accidental-match-confusion-adjustment/` (Phase 5 next)
+- Continue execute-plan `.planning/quick/003-accidental-match-confusion-adjustment/` (Phase 6 next)

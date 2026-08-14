@@ -103,11 +103,37 @@ const assumeMemoryTrackerPage = () => {
         .and('contain.text', `Focused property: ${propertyKey}`)
       return assumeMemoryTrackerPage()
     },
-    captureSchedule() {
+    captureSchedule(key?: string) {
       expectMemoryTrackerPage()
-      recordLabeledValueAs('Last Recall Time:', 'recordedLastRecallTime')
-      recordLabeledValueAs('Next Recall Time:', 'recordedNextRecallTime')
-      recordLabeledValueAs('Recall Count:', 'recordedRecallCount')
+      const suffix = key === undefined ? '' : `-${key}`
+      recordLabeledValueAs(
+        'Last Recall Time:',
+        `recordedLastRecallTime${suffix}`
+      )
+      recordLabeledValueAs(
+        'Next Recall Time:',
+        `recordedNextRecallTime${suffix}`
+      )
+      recordLabeledValueAs('Recall Count:', `recordedRecallCount${suffix}`)
+      return assumeMemoryTrackerPage()
+    },
+    expectScheduleUnchanged(key: string) {
+      expectMemoryTrackerPage()
+      expectLabeledValueUnchanged(
+        'Last Recall Time:',
+        `recordedLastRecallTime-${key}`,
+        (recorded) => `Last Recall Time should stay ${recorded}`
+      )
+      expectLabeledValueUnchanged(
+        'Next Recall Time:',
+        `recordedNextRecallTime-${key}`,
+        (recorded) => `Next Recall Time should stay ${recorded}`
+      )
+      expectLabeledValueUnchanged(
+        'Recall Count:',
+        `recordedRecallCount-${key}`,
+        (recorded) => `Recall Count should stay ${recorded}`
+      )
       return assumeMemoryTrackerPage()
     },
     expectBroughtForwardWithoutRecallCredit() {

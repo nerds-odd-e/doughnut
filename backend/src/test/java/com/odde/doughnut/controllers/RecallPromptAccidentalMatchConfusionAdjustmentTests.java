@@ -182,6 +182,26 @@ class RecallPromptAccidentalMatchConfusionAdjustmentTests extends RecallPromptCo
         hasSize(0));
   }
 
+  @Test
+  void shouldLeaveAmbiguousMatchedTrackersUnchanged() throws UnexpectedNoAccessRightException {
+    String sharedTitle = "Shared Accidental Title";
+    MemoryTracker firstTracker = ownedSpellingTracker(ownedNoteTitled(sharedTitle));
+    MemoryTracker secondTracker = ownedSpellingTracker(ownedNoteTitled(sharedTitle));
+    float firstStrengthBefore = firstTracker.getForgettingCurveIndex();
+    float secondStrengthBefore = secondTracker.getForgettingCurveIndex();
+    Timestamp firstDueBefore = firstTracker.getNextRecallAt();
+    Timestamp secondDueBefore = secondTracker.getNextRecallAt();
+    answerDTO = spellingAnswer(sharedTitle);
+
+    controller.answerSpelling(recallPrompt, answerDTO);
+
+    assertThat(recallPrompt.getAnswer().getConfusionAdjustedMemoryTracker(), nullValue());
+    assertThat(firstTracker.getForgettingCurveIndex(), equalTo(firstStrengthBefore));
+    assertThat(secondTracker.getForgettingCurveIndex(), equalTo(secondStrengthBefore));
+    assertThat(firstTracker.getNextRecallAt(), equalTo(firstDueBefore));
+    assertThat(secondTracker.getNextRecallAt(), equalTo(secondDueBefore));
+  }
+
   private Note ownedNoteTitled(String title) {
     return makeMe.aNote().notebookOwnedBy(currentUser.getUser()).title(title).please();
   }

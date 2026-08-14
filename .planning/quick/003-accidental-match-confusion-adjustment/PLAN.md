@@ -1,6 +1,6 @@
 # Accidental-match confusion adjustment
 
-**Status:** in progress (Phase 5 next)  
+**Status:** in progress (Phase 6 next)  
 **Type mix:** Behavior and Structure  
 **Context:** [CONTEXT.md](CONTEXT.md)
 
@@ -24,7 +24,7 @@ tracker and still permits retry.
 | 2 | Structure | done | An answer can durably identify one confusion-adjusted tracker |
 | 3 | Behavior | done | A unique matched spelling tracker receives the weaker adjustment without recall credit |
 | 4 | Behavior | done | A unique matched understanding tracker is used when no active spelling tracker exists |
-| 5 | Behavior | planned | Ambiguous matches adjust none of the matched trackers |
+| 5 | Behavior | done | Ambiguous matches adjust none of the matched trackers |
 | 6 | Behavior | planned | Declared overlap leaves both trackers unchanged |
 
 ## Phase 1 — Full failure for the prompted spelling tracker
@@ -36,10 +36,6 @@ tracker and still permits retry.
   `markAsRecalled` / `recallFailed` for A (index 180, `recallCount + 1`,
   grade-time `lastRecalledAt`, 12-hour relearning). Removed unused
   `MemoryTracker.markAsAccidentalMatch` and `ForgettingCurve.partialFail`.
-
-**Learning for Phase 3:** Do not resurrect `markAsAccidentalMatch`. The weaker
-confusion adjustment must be a new tracker operation that does **not**
-advance `lastRecalledAt` or `recallCount`.
 
 ## Phase 2 — Durable causal link to one adjusted tracker
 
@@ -73,31 +69,11 @@ advance `lastRecalledAt` or `recallCount`.
 ## Phase 5 — Leave ambiguous matched trackers unchanged
 
 - **Type:** Behavior
-- **Status:** planned
-- **Precondition:** The accidental spelling answer matches two or more
-  accessible notes with eligible trackers.
-- **Trigger:** Submit the answer for A.
-- **Postcondition:** A receives full failure and the resolve UI may list all
-  matches, but no matched tracker receives a confusion adjustment and the
-  answer has no adjusted-tracker relationship.
-
-### Test-first work
-
-1. Replace the controller test that treats the lowest note ID as the selected
-   match with assertions that all matches remain visible but neither eligible
-   tracker changes.
-2. Add an E2E scenario with two visible matches and verify the learner can see
-   both without either schedule changing.
-3. Keep ordering only as presentation behavior; do not let ordering select a
-   scheduling target.
-
-### Verification
-
-- `CURSOR_DEV=true nix develop -c pnpm backend:test_only`
-- Targeted Cypress spec for accidental-match scheduling/reveal.
-
-**Stop-safe value:** Doughnut never penalizes an arbitrary note merely because
-its database ID sorts first.
+- **Status:** done
+- **Shipped:** Two or more accessible matches stay listed for the reveal;
+  neither eligible tracker is adjusted and the answer has no confusion
+  link. ID ordering is presentation-only (`matches.size() == 1` remains
+  the uniqueness gate).
 
 ## Phase 6 — Preserve declared-overlap neutrality
 

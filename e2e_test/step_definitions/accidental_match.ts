@@ -14,6 +14,25 @@ Then(
   }
 )
 
+Then(
+  'I should see an accidental match reveal for spelling answer {string} with reviewed note {string} and matched notes {string} and {string}',
+  (
+    answer: string,
+    reviewedNoteTitle: string,
+    firstMatchedNoteTitle: string,
+    secondMatchedNoteTitle: string
+  ) => {
+    start
+      .assumeAnsweredQuestionPage()
+      .expectAccidentalMatchReveal(
+        answer,
+        reviewedNoteTitle,
+        firstMatchedNoteTitle,
+        secondMatchedNoteTitle
+      )
+  }
+)
+
 When(
   'I add the matched note {string} as a wiki property from the accidental match result',
   (matchedNoteTitle: string) => {

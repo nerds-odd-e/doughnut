@@ -60,6 +60,29 @@ When(
   }
 )
 
+When(
+  'I visit the spelling memory tracker for {string}',
+  (noteTitle: string) => {
+    openNoteLevelTracker(noteTitle, 'spelling')
+  }
+)
+
+Then(
+  'I record the current memory tracker schedule for {string}',
+  (noteTitle: string) => {
+    assumeMemoryTrackerPage().captureSchedule(noteTitle)
+  }
+)
+
+Then(
+  'the spelling memory tracker for {string} should keep its recorded schedule',
+  (noteTitle: string) => {
+    openNoteLevelTracker(noteTitle, 'spelling').expectScheduleUnchanged(
+      noteTitle
+    )
+  }
+)
+
 Then(
   'the spelling memory tracker for {string} should be brought forward without recall credit',
   (noteTitle: string) => {

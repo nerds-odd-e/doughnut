@@ -2,6 +2,7 @@ import { waitUntilAppIsNotBusy } from '../pageBase'
 import { form } from '../forms'
 import {
   expectAccidentalMatchAlert,
+  expectAccidentalMatchRevealForNotes,
   expectNoMatchedNotesOrAccidentalMatch,
   expectOverlapTryAgainAlert,
   openResolveAndClickMatchedNoteCta,
@@ -47,40 +48,13 @@ const assumeAnsweredQuestionPage = () => {
     expectAccidentalMatchReveal(
       answer: string,
       reviewedNoteTitle: string,
-      matchedNoteTitle: string
+      ...matchedNoteTitles: string[]
     ) {
-      expectAccidentalMatchAlert(answer)
-      cy.findByText(`Your answer \`${answer}\` is incorrect.`).should(
-        'not.exist'
+      expectAccidentalMatchRevealForNotes(
+        answer,
+        reviewedNoteTitle,
+        matchedNoteTitles
       )
-      cy.findByTestId('resolve-accidental-match')
-        .scrollIntoView()
-        .should('be.visible')
-        .and('contain.text', 'Resolve accidental match')
-      cy.findByText('Note under question').should('be.visible')
-      cy.get('[data-test="note-title"]')
-        .filter(`:contains("${reviewedNoteTitle}")`)
-        .should('have.length.at.least', 1)
-      cy.findByTestId('matched-notes-section').should('not.exist')
-
-      cy.findByTestId('resolve-accidental-match').click()
-      waitUntilAppIsNotBusy()
-      cy.findByTestId('accidental-match-resolve-dialog')
-        .should('be.visible')
-        .and('contain.text', matchedNoteTitle)
-        .and('contain.text', 'English practice')
-        .and('contain.text', 'largely overlaps with the current note')
-        .within(() => {
-          cy.contains('a', matchedNoteTitle).should('be.visible')
-          cy.findByTestId('resolve-overlap-explanation').should('be.visible')
-        })
-      cy.get('.close-button').filter(':visible').first().click()
-      cy.findByTestId('accidental-match-resolve-dialog').should('not.exist')
-
-      expectAccidentalMatchAlert(answer)
-      cy.get('[data-test="note-title"]')
-        .filter(`:contains("${reviewedNoteTitle}")`)
-        .should('have.length.at.least', 1)
       return self
     },
     openLinkToMatchedNote(matchedNoteTitle: string) {

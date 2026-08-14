@@ -45,21 +45,6 @@ class RecallPromptAccidentalMatchGradingTests extends RecallPromptControllerTest
   }
 
   @Test
-  void shouldPreferLowestNoteIdWhenMultipleReadableNotesShareTitle()
-      throws UnexpectedNoAccessRightException {
-    Note thirdNote =
-        makeMe.aNote().notebookOwnedBy(currentUser.getUser()).title(secondNote.getTitle()).please();
-
-    AnsweredQuestion answerResult = controller.answerSpelling(recallPrompt, answerDTO);
-
-    assertThat(
-        answerResult.getMatchedNotes().stream().map(NoteTopology::getId).toList(),
-        contains(secondNote.getId(), thirdNote.getId()));
-    assertThat(
-        answerResult.getAnswer().getMatchedNoteId(), equalTo(secondNote.getId().longValue()));
-  }
-
-  @Test
   void shouldIncludeTitleAndAliasMatchesInMatchedNotesOrderedById()
       throws UnexpectedNoAccessRightException {
     String shared = "TitlePreferredMatch";
