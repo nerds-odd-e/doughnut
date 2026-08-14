@@ -36,11 +36,14 @@ export function assimilationPropertyRow(propertyKey: string) {
   )!
 }
 
-export async function clickPropertyAssimilate(propertyKey: string) {
-  const assimilate = assimilationPropertyRow(propertyKey).querySelector(
-    assimilateButtonSelector
+export function propertyRowControl(propertyKey: string, selector: string) {
+  return assimilationPropertyRow(propertyKey).querySelector(
+    selector
   ) as HTMLInputElement
-  assimilate.click()
+}
+
+export async function clickPropertyAssimilate(propertyKey: string) {
+  propertyRowControl(propertyKey, assimilateButtonSelector).click()
   await flushPromises()
 }
 
@@ -48,10 +51,7 @@ async function clickPropertyRowControlAndConfirm(
   propertyKey: string,
   selector: string
 ) {
-  const control = assimilationPropertyRow(propertyKey).querySelector(
-    selector
-  ) as HTMLInputElement
-  control.click()
+  propertyRowControl(propertyKey, selector).click()
   usePopups().popups.done(true)
   await flushPromises()
 }

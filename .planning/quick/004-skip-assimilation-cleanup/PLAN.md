@@ -7,15 +7,6 @@ Cleanup pass over the shipped assimilation-sequence skip plan (commits `1a9f5748
 
 ## Findings remaining
 
-### 2. Hardcoded selectors in `assimilationSettingsTestSupport.ts` (shotgun surgery)
-
-`assimilationSettingsTestSupport.ts` imports `assimilateButtonSelector`, `skipButtonSelector`, `removeFromRecallButtonSelector` from `assimilationPanelTestSupport` but uses hardcoded strings for two others:
-
-- `propertyReviveButton`: `'[data-test="revive"]'` — should use `reviveButtonSelector`
-- `propertyReturnToSequenceButton`: `'[data-test="return-to-sequence"]'` — should use `returnToSequenceButtonSelector`
-
-Both selectors are already exported from `assimilationPanelControlTestSupport.ts` (and re-exported through `assimilationPanelTestSupport.ts`).
-
 ### 3. `MemoryTrackerInformation.vue` shows old `spelling` boolean (stale display)
 
 Shows "Spelling: Yes/No" from the legacy boolean. Should show tracker `type` (`UNDERSTANDING` / `SPELLING` / `COMMISSIONED`).
@@ -25,7 +16,7 @@ Shows "Spelling: Yes/No" from the legacy boolean. Should show tracker `type` (`U
 | # | Type | One outcome | Status |
 |---|---|---|---|
 | 1 | Structure | Shared JDBC conversion test harness | done |
-| 2 | Structure | Use exported selector constants in settings test support | planned |
+| 2 | Structure | Use exported selector constants in settings test support | done |
 | 3 | Structure | Show tracker type instead of legacy spelling boolean | planned |
 
 ---
@@ -46,15 +37,13 @@ Shows "Spelling: Yes/No" from the legacy boolean. Should show tracker `type` (`U
 ## Phase 2 — Use exported selector constants in settings test support
 
 - **Type:** Structure
-- **Status:** planned
+- **Status:** done
 
-**Change:** In `assimilationSettingsTestSupport.ts`, replace the hardcoded `'[data-test="revive"]'` and `'[data-test="return-to-sequence"]'` with the imported `reviveButtonSelector` and `returnToSequenceButtonSelector` (already exported from `assimilationPanelControlTestSupport.ts`).
+Settings helpers use `reviveButtonSelector` and `returnToSequenceButtonSelector`. Shared `propertyRowControl` lives in `assimilationPropertyTestSupport.ts`.
 
-**Constraint:** No behavior change. Test selectors stay the same.
+**Learning:** Five identical `querySelector` lookups collapsed onto one helper; settings named-button wrappers stay for the spec API.
 
-**Tests:** `CURSOR_DEV=true nix develop -c pnpm frontend:test tests/components/recall/AssimilationSettings.spec.ts`
-
-**Done when:** No hardcoded `data-test` selector string in `assimilationSettingsTestSupport.ts` that has an exported constant.
+**Tests:** `AssimilationSettings.spec.ts` (6) and `AssimilationPanel.property.spec.ts` (4) green.
 
 ---
 

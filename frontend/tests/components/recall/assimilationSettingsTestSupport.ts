@@ -7,10 +7,13 @@ import {
   clickPropertyAssimilate,
   expandAssimilationPropertiesSection,
   noteWithAssimilationProperties,
+  propertyRowControl,
 } from "./assimilationPropertyTestSupport"
 import {
   assimilateButtonSelector,
   removeFromRecallButtonSelector,
+  returnToSequenceButtonSelector,
+  reviveButtonSelector,
   skipButtonSelector,
 } from "./assimilationPanelTestSupport"
 import { afterEach, beforeEach } from "vitest"
@@ -44,33 +47,23 @@ export async function mountAssimilationSettingsReady() {
 }
 
 export function propertyAssimilateButton(propertyKey: string) {
-  return assimilationPropertyRow(propertyKey).querySelector(
-    assimilateButtonSelector
-  ) as HTMLInputElement
+  return propertyRowControl(propertyKey, assimilateButtonSelector)
 }
 
 export function propertySkipButton(propertyKey: string) {
-  return assimilationPropertyRow(propertyKey).querySelector(
-    skipButtonSelector
-  ) as HTMLInputElement
+  return propertyRowControl(propertyKey, skipButtonSelector)
 }
 
 export function propertyReviveButton(propertyKey: string) {
-  return assimilationPropertyRow(propertyKey).querySelector(
-    '[data-test="revive"]'
-  ) as HTMLInputElement
+  return propertyRowControl(propertyKey, reviveButtonSelector)
 }
 
 export function propertyReturnToSequenceButton(propertyKey: string) {
-  return assimilationPropertyRow(propertyKey).querySelector(
-    '[data-test="return-to-sequence"]'
-  ) as HTMLInputElement
+  return propertyRowControl(propertyKey, returnToSequenceButtonSelector)
 }
 
 export function propertyRemoveFromRecallButton(propertyKey: string) {
-  return assimilationPropertyRow(propertyKey).querySelector(
-    removeFromRecallButtonSelector
-  ) as HTMLInputElement
+  return propertyRowControl(propertyKey, removeFromRecallButtonSelector)
 }
 
 export async function clickPropertySkip(propertyKey: string) {

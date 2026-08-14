@@ -2,19 +2,19 @@
 gsd_state_version: 1.0
 milestone: null
 milestone_name: null
-current_phase: "1"
-current_phase_name: Shared JDBC conversion test harness
+current_phase: "2"
+current_phase_name: Use exported selector constants in settings test support
 status: executing
 stopped_at: null
-last_updated: "2026-08-14T07:50:00Z"
+last_updated: "2026-08-14T08:00:00Z"
 last_activity: 2026-08-14
-last_activity_desc: 004-skip-assimilation-cleanup Phase 1 done; next is selector constants
+last_activity_desc: 004-skip-assimilation-cleanup Phase 2 done; next is tracker type display
 progress:
   total_phases: 3
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 1
   completed_plans: 0
-  percent: 33
+  percent: 67
 ---
 
 # Project State
@@ -27,7 +27,7 @@ See: `.planning/PROJECT.md`
 
 ## Current Position
 
-Executing `.planning/quick/004-skip-assimilation-cleanup/` (skip-assimilation cleanup). Phase 1 done: shared `DummySequenceSkipConversionTestBase`. Next: Phase 2 selector constants.
+Executing `.planning/quick/004-skip-assimilation-cleanup/` (skip-assimilation cleanup). Phases 1–2 done. Next: Phase 3 tracker type display.
 
 **Ops leftover:** gated dummy-skip conversions. Enable on the deploy that first applies each version, then revert to `1=0`:
 - `dummy_note_sequence_skip_convert` (`V300000254`)
@@ -40,7 +40,7 @@ JDBC harnesses remain temporary until those production applications.
 
 ## Operator Next Steps
 
-- Continue `.planning/quick/004-skip-assimilation-cleanup/` Phase 2 (selector constants)
+- Continue `.planning/quick/004-skip-assimilation-cleanup/` Phase 3 (tracker type display)
 - Enable dummy-skip conversion placeholders on the deploys that first apply V300000254 / V300000255
 - Continue ADR 0003: resolve open issues in `.planning/research/FSRS-COMPATIBILITY-GAP.md`
 - Or queued quick plan `.planning/quick/003-accidental-match-confusion-adjustment/` if that workstream is next
