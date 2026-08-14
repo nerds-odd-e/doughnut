@@ -8,7 +8,10 @@ import {
   expandAssimilationPropertiesSection,
   noteWithAssimilationProperties,
 } from "./assimilationPropertyTestSupport"
-import { assimilateButtonSelector } from "./assimilationPanelTestSupport"
+import {
+  assimilateButtonSelector,
+  skipButtonSelector,
+} from "./assimilationPanelTestSupport"
 import { afterEach, beforeEach } from "vitest"
 
 export let wrapper: VueWrapper
@@ -47,7 +50,7 @@ export function propertyAssimilateButton(propertyKey: string) {
 
 export function propertySkipRecallButton(propertyKey: string) {
   return assimilationPropertyRow(propertyKey).querySelector(
-    'input[name="skip"]'
+    skipButtonSelector
   ) as HTMLInputElement
 }
 

@@ -64,12 +64,12 @@
                     isSkippedForRecall(noteRecallInfo, row.key)
                   "
                   @assimilate="
-                    (skip) =>
-                      emit('assimilate', {
-                        skipMemoryTracking: skip,
-                        propertyKey: row.key,
-                      })
+                    emit('assimilate', {
+                      skipMemoryTracking: false,
+                      propertyKey: row.key,
+                    })
                   "
+                  @skip="emit('skip', { propertyKey: row.key })"
                   @revive="emit('revive', { propertyKey: row.key })"
                 />
               </span>
@@ -98,9 +98,8 @@
           :skipped-for-recall="isSkippedForRecall(noteRecallInfo)"
           :show-commissioned-option="showCommissionedOption"
           :show-spelling-option="showSpellingOption"
-          @assimilate="
-            (skip) => emit('assimilate', { skipMemoryTracking: skip })
-          "
+          @assimilate="emit('assimilate', { skipMemoryTracking: false })"
+          @skip="emit('skip', {})"
           @assimilate-as-commissioned="
             emit('assimilate', {
               skipMemoryTracking: false,
@@ -156,6 +155,7 @@ const emit = defineEmits<{
   (e: "levelChanged", value: unknown): void
   (e: "noteRecallInfoLoaded", value: NoteRecallInfo): void
   (e: "assimilate", request: AssimilateEvent): void
+  (e: "skip", request: { propertyKey?: string }): void
   (e: "revive", request: { propertyKey?: string }): void
   (e: "refinementContentUpdated"): void
 }>()

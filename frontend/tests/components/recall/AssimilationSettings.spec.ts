@@ -59,13 +59,11 @@ describe("AssimilationSettings", () => {
     expect(propertyAssimilateButton("url").disabled).toBe(false)
   })
 
-  it("emits assimilate with skipMemoryTracking and propertyKey when skip recall is clicked", async () => {
+  it("emits skip with propertyKey when Skip is clicked", async () => {
     await mountAssimilationSettingsReady()
 
     await clickPropertySkipRecall("topic")
-    expect(wrapper.emitted("assimilate")).toEqual([
-      [{ skipMemoryTracking: true, propertyKey: "topic" }],
-    ])
+    expect(wrapper.emitted("skip")).toEqual([[{ propertyKey: "topic" }]])
   })
 
   describe("skipped property tracker", () => {

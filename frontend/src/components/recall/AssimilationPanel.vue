@@ -8,6 +8,7 @@
     @level-changed="emit('reloadNeeded')"
     @note-recall-info-loaded="onNoteRecallInfoLoaded"
     @assimilate="processAssimilate"
+    @skip="processSkip"
     @revive="processRevive"
     @refinement-content-updated="emit('reloadNeeded')"
   />
@@ -35,10 +36,14 @@ import AssimilationSettings from "./AssimilationSettings.vue"
 import SpellingVerificationPopup from "./SpellingVerificationPopup.vue"
 import { computed, ref } from "vue"
 import {
-  skipRecallConfirmMessage,
+  PROPERTY_SKIP_RECALL_CONFIRM,
   useAssimilateUnit,
   type AssimilateEvent,
 } from "@/composables/useAssimilateUnit"
+import {
+  SEQUENCE_SKIP_CONFIRM,
+  useAssimilationSequenceSkip,
+} from "@/composables/useAssimilationSequenceSkip"
 import { hasUnderstandingNoteLevelTracker } from "./noteLevelMemoryTrackers"
 import {
   trackersToRevive,
@@ -56,6 +61,7 @@ const emit = defineEmits<{
 
 const { popups } = usePopups()
 const { assimilateUnit } = useAssimilateUnit()
+const { skipFromAssimilationSequence } = useAssimilationSequenceSkip()
 const { reviveMemoryTrackers } = useReviveMemoryTracker()
 const { openForNote } = useAssimilationView()
 
@@ -80,7 +86,6 @@ const assimilateDisabled = computed(() =>
 )
 
 const processAssimilate = async ({
-  skipMemoryTracking,
   propertyKey,
   assimilateAsCommissioned,
   assimilateAsSpelling,
@@ -101,16 +106,38 @@ const processAssimilate = async ({
     return
   }
 
-  if (skipMemoryTracking) {
-    const confirmed = await popups.confirm(
-      skipRecallConfirmMessage(propertyKey)
-    )
+  await doAssimilate({ skipMemoryTracking: false, propertyKey })
+}
+
+const processSkip = async ({ propertyKey }: { propertyKey?: string } = {}) => {
+  if (propertyKey) {
+    const confirmed = await popups.confirm(PROPERTY_SKIP_RECALL_CONFIRM)
     if (!confirmed) {
       return
     }
+    await doAssimilate({ skipMemoryTracking: true, propertyKey })
+    return
   }
 
-  await doAssimilate({ skipMemoryTracking, propertyKey })
+  await processSequenceSkip()
+}
+
+const processSequenceSkip = async () => {
+  const confirmed = await popups.confirm(SEQUENCE_SKIP_CONFIRM)
+  if (!confirmed) {
+    return
+  }
+
+  const result = await skipFromAssimilationSequence(note.id)
+  if (!result.success) {
+    return
+  }
+
+  await settingsRef.value?.reloadNoteInfo()
+
+  if (!result.navigated) {
+    emit("reloadNeeded")
+  }
 }
 
 const processRevive = async ({ propertyKey }: { propertyKey?: string }) => {

@@ -3,7 +3,7 @@ import {
   assimilationPropertyRow,
   assimilateButtonSelector,
   reviveButtonSelector,
-  skipRecallButtonSelector,
+  skipButtonSelector,
 } from './shared'
 
 const clickPropertyRowButton = (
@@ -52,7 +52,7 @@ export function assimilationPropertyFlow() {
       return this
     },
     skipRecallProperty(propertyKey: string) {
-      clickPropertyRowButton(propertyKey, skipRecallButtonSelector)
+      clickPropertyRowButton(propertyKey, skipButtonSelector)
       cy.findByRole('button', { name: 'OK' }).click()
       waitUntilAppIsNotBusy()
       return this
@@ -66,14 +66,14 @@ export function assimilationPropertyFlow() {
       assimilationPropertyRow(propertyKey).within(() => {
         cy.get(reviveButtonSelector).should('exist')
         cy.root().then(($root) => {
-          expect($root.find(skipRecallButtonSelector).length).to.equal(0)
+          expect($root.find(skipButtonSelector).length).to.equal(0)
         })
       })
       return this
     },
     expectSkipRecallForProperty(propertyKey: string) {
       assimilationPropertyRow(propertyKey).within(() => {
-        cy.get(skipRecallButtonSelector).should('exist')
+        cy.get(skipButtonSelector).should('exist')
         cy.root().then(($root) => {
           expect($root.find(reviveButtonSelector).length).to.equal(0)
         })

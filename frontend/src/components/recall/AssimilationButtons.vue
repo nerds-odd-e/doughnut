@@ -11,7 +11,7 @@
       ]"
       data-test="assimilate"
       :disabled="disabled || assimilateDisabled"
-      @click="$emit('assimilate', false)"
+      @click="$emit('assimilate')"
     />
     <AutoCollapseDropdown
       v-if="showAssimilateOptions"
@@ -75,10 +75,11 @@
     v-else-if="showSkip"
     type="submit"
     name="skip"
-    value="Skip recall"
+    value="Skip"
     :class="['daisy-btn daisy-btn-secondary', sizeClass]"
+    data-test="skip"
     :disabled="disabled"
-    @click="$emit('assimilate', true)"
+    @click="$emit('skip')"
   />
 </template>
 
@@ -130,6 +131,7 @@ export default defineComponent({
   },
   emits: [
     "assimilate",
+    "skip",
     "revive",
     "assimilateAsCommissioned",
     "rememberSpelling",

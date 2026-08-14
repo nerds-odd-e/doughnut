@@ -39,8 +39,8 @@ When('I remember spelling', () => {
   start.assumeAssimilationPage().rememberSpelling()
 })
 
-When('I skip recall on the assimilation panel', () => {
-  start.assumeAssimilationPage().skipRecallOnPanel()
+When('I skip on the assimilation panel', () => {
+  start.assumeAssimilationPage().skipOnPanel()
 })
 
 When('I expand assimilation properties', () => {
@@ -53,10 +53,6 @@ When('I skip recall on property {string}', (propertyKey: string) => {
 
 When('I revive recall for property {string}', (propertyKey: string) => {
   start.assumeAssimilationPage().reviveRecallProperty(propertyKey)
-})
-
-When('I revive recall on the assimilation panel', () => {
-  start.assumeAssimilationPage().reviveRecallOnPanel()
 })
 
 Then(
@@ -77,10 +73,6 @@ Then(
   }
 )
 
-Then('I should see Revive on the assimilation panel', () => {
-  start.assumeAssimilationPage().expectReviveOnPanel()
-})
-
-Then('I should see Skip recall on the assimilation panel', () => {
-  start.assumeAssimilationPage().expectSkipRecallOnPanel()
+Then('I should see Skip on the assimilation panel', () => {
+  start.assumeAssimilationPage().expectSkipOnPanel()
 })

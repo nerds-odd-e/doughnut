@@ -1,6 +1,6 @@
 # Assimilation-sequence skip
 
-**Status:** in progress (Phase 4 next)  
+**Status:** in progress (Phase 5 next)  
 **Type mix:** Structure then Behavior
 
 Each phase is one commit: **Behavior** (one observable) or **Structure** (only what the **immediate next** behavior needs). Size for ~5 minutes wall-clock including targeted tests.
@@ -90,7 +90,7 @@ Permanent artifacts stay capability-named (no phase numbers in product files).
 | 1 | Structure | ADR 0001 glossary (done) |
 | 2 | Structure | Table `assimilation_sequence_skip` (done) |
 | 3 | Structure | POST skip + `/next` excludes skip rows (done) |
-| 4 | Behavior | Skip on the panel leaves the sequence with no dummy tracker |
+| 4 | Behavior | Skip on the panel leaves the sequence with no dummy tracker (done) |
 | 5 | Behavior | Assimilate (understanding) a skipped note |
 | 6 | Behavior | Remember spelling a skipped note |
 | 7 | Behavior | Assimilate as commissioned a skipped note |
@@ -142,22 +142,9 @@ Permanent artifacts stay capability-named (no phase numbers in product files).
 ## Phase 4 — Skip on the panel leaves the sequence without a dummy tracker
 
 - **Type:** Behavior  
-- **Status:** planned
+- **Status:** done
 
-**Pre-condition:** Note pending in the sequence.  
-**Trigger:** Learner presses **Skip** on the assimilation panel.  
-**Post-condition:** Next unit is shown; skipped note is not next; no understanding tracker; note-level skip row exists; daily cap unchanged. Button label **Skip** (not “Skip recall”).
-
-Interim: jumping back to the skipped note may still show **Skip** (idempotent). **Revive** must not appear (no dummy tracker). Tag or rewrite the old “Revive restores skip” E2E `@wip` / replace so CI stays green — Return to sequence is Phase 9.
-
-**Tests:** Extend `e2e_test/features/assimilation/assimilation_walkthrough.feature` skip-and-continue. Frontend Skip emits the new resource. Controller already covered in Phase 3.
-
-**Commands:**
-
-- `CURSOR_DEV=true nix develop -c pnpm frontend:test tests/components/recall/AssimilationSettings.spec.ts tests/components/recall/AssimilationPanel.spec.ts tests/components/recall/AssimilationPanel.revive.spec.ts`
-- `CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/assimilation/assimilation_walkthrough.feature`
-
-**Done when:** New note skips never create understanding trackers. Property Skip may still use the old assimilate flag.
+**Done:** Note-level Skip POSTs `/api/assimilation-sequence-skips`, advances next, no dummy tracker, daily cap unchanged. Button **Skip**. Confirm: leave the assimilation sequence. Property skip still uses `skipMemoryTracking`. Old Revive-after-skip E2E rewritten to assert no dummy tracker. Walkthrough E2E green.
 
 ---
 

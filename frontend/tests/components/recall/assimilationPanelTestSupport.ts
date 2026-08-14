@@ -1,6 +1,7 @@
 import {
   AiController,
   AssimilationController,
+  AssimilationSequenceSkipController,
   NoteController,
 } from "@generated/doughnut-backend-api/sdk.gen"
 import AssimilationPanel from "@/components/recall/AssimilationPanel.vue"
@@ -24,6 +25,7 @@ export const { note } = memoryTracker
 
 export let renderer: RenderingHelper<typeof AssimilationPanel>
 export let assimilateSpy: ReturnType<typeof mockSdkService>
+export let skipSequenceSpy: ReturnType<typeof mockSdkService>
 
 export const mockedRequestDueRecallsRefresh = vi.fn()
 export const mockedTotalAssimilatedCount = ref(0)
@@ -51,6 +53,11 @@ export function setupAssimilationPanelTests() {
     assimilationCount.setTotalUnassimilatedCount(0)
 
     assimilateSpy = mockSdkService(AssimilationController, "assimilate", [])
+    skipSequenceSpy = mockSdkService(
+      AssimilationSequenceSkipController,
+      "create",
+      { id: 1 }
+    )
     mockSdkService(NoteController, "getNoteInfo", {})
     mockSdkService(AiController, "generateRefinementSuggestions", {
       items: refinementLayoutItems([]),
@@ -146,6 +153,24 @@ export async function clickAssimilate(
   wrapper: Awaited<ReturnType<typeof mountAssimilationPanel>>
 ) {
   assimilateButtonEl(wrapper)!.click()
+  await flushPromises()
+}
+
+export const skipButtonSelector = '[data-test="skip"]' as const
+
+export function skipButtonEl(
+  wrapper: Awaited<ReturnType<typeof mountAssimilationPanel>>
+) {
+  return wrapper.element.querySelector(
+    skipButtonSelector
+  ) as HTMLInputElement | null
+}
+
+export async function clickSkipAndConfirm(
+  wrapper: Awaited<ReturnType<typeof mountAssimilationPanel>>
+) {
+  skipButtonEl(wrapper)!.click()
+  usePopups().popups.done(true)
   await flushPromises()
 }
 

@@ -2,7 +2,7 @@ import { waitUntilAppIsNotBusy } from '../../pageBase'
 
 export const assimilateButtonSelector = '[data-test="assimilate"]'
 export const reviveButtonSelector = '[data-test="revive"]'
-export const skipRecallButtonSelector = '[value="Skip recall"]'
+export const skipButtonSelector = '[data-test="skip"]'
 export const assimilateOptionsCaretSelector =
   '[data-test="assimilate-options-caret"]'
 export const assimilateAsCommissionedSelector =
@@ -32,7 +32,7 @@ export const assimilateAsCommissionedButton = noteLevelControl(
 )
 export const rememberSpellingButton = noteLevelControl(rememberSpellingSelector)
 export const reviveButton = noteLevelControl(reviveButtonSelector)
-export const skipRecallOnPanel = noteLevelControl(skipRecallButtonSelector)
+export const skipButton = noteLevelControl(skipButtonSelector)
 
 export function noteLevelReviveElements(doc: Document | ParentNode): Element[] {
   return [...doc.querySelectorAll(reviveButtonSelector)].filter(

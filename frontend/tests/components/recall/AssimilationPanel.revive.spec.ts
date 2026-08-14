@@ -12,6 +12,7 @@ import {
   mountAssimilationPanel,
   mockedRequestDueRecallsRefresh,
   setupAssimilationPanelTests,
+  skipButtonSelector,
 } from "./assimilationPanelTestSupport"
 
 vi.mock("@/composables/useRecallData")
@@ -67,7 +68,7 @@ describe("AssimilationPanel revive", () => {
     wrapper.unmount()
   })
 
-  it("shows Skip recall when note-level trackers are active", async () => {
+  it("shows Skip when note-level trackers are active", async () => {
     mockSdkService(NoteController, "getNoteInfo", {
       memoryTrackers: [makeMe.aMemoryTracker.id(1).spelling(false).please()],
     })
@@ -75,7 +76,7 @@ describe("AssimilationPanel revive", () => {
     await flushPromises()
 
     expect(wrapper.find(reviveButtonSelector).exists()).toBe(false)
-    expect(wrapper.find('[value="Skip recall"]').exists()).toBe(true)
+    expect(wrapper.find(skipButtonSelector).exists()).toBe(true)
     wrapper.unmount()
   })
 })

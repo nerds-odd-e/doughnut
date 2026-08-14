@@ -20,6 +20,8 @@ import {
   assimilateButtonSelector,
   note,
   setupAssimilationPanelTests,
+  skipButtonSelector,
+  skipSequenceSpy,
 } from "./assimilationPanelTestSupport"
 
 vi.mock("@/composables/useRecallData")
@@ -95,24 +97,39 @@ describe("AssimilationPanel loading modal", () => {
     }
   }
 
+  const delaySuccessfulSkip = () => {
+    let resolveSkip: () => void = () => undefined
+    skipSequenceSpy.mockImplementation(async () => {
+      await new Promise<void>((resolve) => {
+        resolveSkip = resolve
+      })
+      return wrapSdkResponse({ id: 1 })
+    })
+    return {
+      resolve: () => resolveSkip(),
+    }
+  }
+
   const loadingModal = () => document.querySelector(".loading-modal-mask")
 
   const expectGlobalModalThroughNextUnit = async (
-    startAssimilation: (
+    startAction: (
       wrapper: ReturnType<typeof mountPanelWithGlobalLoadingModal>
-    ) => Promise<void>
+    ) => Promise<void>,
+    delayMutation: () => { resolve: () => void },
+    mutationMessage: string
   ) => {
-    const assimilation = delaySuccessfulAssimilation()
+    const mutation = delayMutation()
     const nextAssimilation = delayNextAssimilation()
     const wrapper = mountPanelWithGlobalLoadingModal()
     await flushPromises()
 
-    await startAssimilation(wrapper)
+    await startAction(wrapper)
 
     expect(loadingModal()).toBeTruthy()
-    expect(document.body.textContent).toContain("Assimilating...")
+    expect(document.body.textContent).toContain(mutationMessage)
 
-    assimilation.resolve()
+    mutation.resolve()
     await flushPromises()
 
     expect(loadingModal()).toBeTruthy()
@@ -124,17 +141,25 @@ describe("AssimilationPanel loading modal", () => {
   }
 
   it("keeps the global modal open from assimilate through loading the next unit", async () => {
-    await expectGlobalModalThroughNextUnit(async (wrapper) => {
-      await wrapper.find(assimilateButtonSelector).trigger("click")
-    })
+    await expectGlobalModalThroughNextUnit(
+      async (wrapper) => {
+        await wrapper.find(assimilateButtonSelector).trigger("click")
+      },
+      delaySuccessfulAssimilation,
+      "Assimilating..."
+    )
   })
 
-  it("keeps the global modal open from skip-recall through loading the next unit", async () => {
-    await expectGlobalModalThroughNextUnit(async (wrapper) => {
-      await wrapper.find('input[name="skip"]').trigger("click")
-      usePopups().popups.done(true)
-      await flushPromises()
-    })
+  it("keeps the global modal open from skip through loading the next unit", async () => {
+    await expectGlobalModalThroughNextUnit(
+      async (wrapper) => {
+        await wrapper.find(skipButtonSelector).trigger("click")
+        usePopups().popups.done(true)
+        await flushPromises()
+      },
+      delaySuccessfulSkip,
+      "Skipping..."
+    )
   })
 
   it("hides global modal when assimilate API returns an error", async () => {

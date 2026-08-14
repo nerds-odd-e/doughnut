@@ -11,8 +11,7 @@ import {
   noteLevelReviveElements,
   openRefineNoteModalIfNeeded,
   rememberSpellingButton,
-  reviveButton,
-  skipRecallOnPanel,
+  skipButton,
   waitForAssimilationNoteTitle,
 } from './shared'
 
@@ -85,23 +84,14 @@ export const assumeAssimilationPage = () => ({
       .and('contain', `tutor feedback score ${score} from a learning session`)
     return this
   },
-  skipRecallOnPanel() {
-    cy.findByText('Skip recall').click()
+  skipOnPanel() {
+    skipButton().click()
     cy.findByRole('button', { name: 'OK' }).click()
     waitUntilAppIsNotBusy()
     return this
   },
-  reviveRecallOnPanel() {
-    reviveButton().click()
-    waitUntilAppIsNotBusy()
-    return this
-  },
-  expectReviveOnPanel() {
-    reviveButton().should('exist')
-    return this
-  },
-  expectSkipRecallOnPanel() {
-    skipRecallOnPanel().should('exist')
+  expectSkipOnPanel() {
+    skipButton().should('exist')
     cy.document().then((doc) => {
       expect(noteLevelReviveElements(doc)).to.have.length(0)
     })
@@ -160,7 +150,7 @@ export const assumeAssimilationPage = () => ({
         expect(assimilationType).equal('a known assimilation page type')
     }
     if (skip === 'yes') {
-      this.skipRecallOnPanel()
+      this.skipOnPanel()
     } else {
       this.clickAssimilate()
       waitUntilAppIsNotBusy()

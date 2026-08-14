@@ -12,11 +12,13 @@ import {
   assimilateSpy,
   assimilatedCountOfTheDay,
   clickAssimilate,
+  clickSkipAndConfirm,
   mockedRequestDueRecallsRefresh,
   mockedTotalAssimilatedCount,
   mountAssimilationPanelReady,
   note,
   setupAssimilationPanelTests,
+  skipSequenceSpy,
 } from "./assimilationPanelTestSupport"
 
 vi.mock("@/composables/useRecallData")
@@ -48,6 +50,21 @@ describe("AssimilationPanel", () => {
     expect(mockedTotalAssimilatedCount.value).toBe(2)
     expect(assimilatedCountOfTheDay.value).toBe(2)
     expect(mockedRequestDueRecallsRefresh).toHaveBeenCalled()
+  })
+
+  it("skips the sequence without creating a tracker or incrementing daily count", async () => {
+    const wrapper = await mountAssimilationPanelReady()
+
+    await clickSkipAndConfirm(wrapper)
+
+    expect(skipSequenceSpy).toHaveBeenCalledWith({
+      body: { noteId: note.id },
+    })
+    expect(assimilateSpy).not.toHaveBeenCalled()
+    expect(mockedGoToNextAssimilation).toHaveBeenCalled()
+    expect(mockedTotalAssimilatedCount.value).toBe(0)
+    expect(assimilatedCountOfTheDay.value).toBe(0)
+    expect(mockedRequestDueRecallsRefresh).not.toHaveBeenCalled()
   })
 
   describe("assimilate when note has memory trackers", () => {

@@ -37,7 +37,7 @@ Feature: Assimilation walkthrough
     And the note "Note 2" was assimilated on day 1
     When I start assimilation from the menu
     Then I should be assimilating the note "Note 3"
-    When I skip recall on the assimilation panel
+    When I skip on the assimilation panel
     Then I should be assimilating the note "Note 4"
     When I assimilate on the assimilation panel
     Then I should be assimilating the note "Note 5"
@@ -51,14 +51,14 @@ Feature: Assimilation walkthrough
     And I open assimilation settings
     Then assimilate should be disabled
 
-  Scenario: Revive restores skip on a skipped note
+  Scenario: Skip does not create a dummy understanding tracker
     Given It's day 1
     And the note "Note 1" was assimilated on day 1
     And the note "Note 2" was assimilated on day 1
     When I start assimilation from the menu
-    And I skip recall on the assimilation panel
-    And I jump to the note page of "Note 3"
+    Then I should be assimilating the note "Note 3"
+    When I skip on the assimilation panel
+    Then I should be assimilating the note "Note 4"
+    When I jump to the note page of "Note 3"
     And I open assimilation settings
-    Then I should see Revive on the assimilation panel
-    When I revive recall on the assimilation panel
-    Then I should see Skip recall on the assimilation panel
+    Then I should see Skip on the assimilation panel
