@@ -20,8 +20,6 @@ guides gradual alignment (tests, UI, OpenAPI, packages).
 
 | Term | Meaning |
 |------|---------|
-| **Skip Memory Tracking** | Notebook setting that opts the whole notebook out of assimilation and recall (blocks Bazaar subscribe) |
-| **Remember spelling** | Learner action at assimilation that verifies the note title and creates a spelling memory tracker |
 | **Quiz / question** | A recall prompt (spelling, AI-generated, predefined, contested, …) |
 | **Question contest** | Challenging or replacing an AI-generated recall question |
 | **Accidental match** | Recall result that matches an unintended note |
@@ -94,6 +92,7 @@ guides gradual alignment (tests, UI, OpenAPI, packages).
 | **Book layout** | Structure of an attached book |
 | **OKF** | [Open Knowledge Format](https://cloud.google.com/blog/products/data-analytics/how-the-open-knowledge-format-can-improve-data-sharing): portable directory of markdown concept files with YAML frontmatter |
 | **Notebook health** | In-app lint, findings, and fixes for a notebook |
+| **Skip Memory Tracking** | Notebook setting that opts the notebook out of assimilation (and blocks Bazaar subscribe). |
 
 #### Learning and recall
 
@@ -109,8 +108,7 @@ guides gradual alignment (tests, UI, OpenAPI, packages).
 | **Remember spelling** | Learner action at assimilation: verify the note title (or alias), then create a spelling memory tracker | |
 | **Recall** | Spaced retrieval of assimilated material: the learner must produce the knowledge. Doughnut names this **recall**, not **review**. | |
 | **Recall question** | A single recall prompt (kinds: spelling, AI-generated, predefined, …) | |
-| **Memory tracking** | Whether a notebook participates in assimilation and recall (notebook setting only). Tracker-level opt-out is **Remove from recall**, not skip recall. | |
-| **Skip Memory Tracking** | Notebook setting: notebook does not participate in assimilation or recall (blocks Bazaar subscribe) | full phrase |
+| **Memory tracking** | Creating and maintaining memory trackers for notes. Notebook **Skip Memory Tracking** opts out of assimilation. Tracker-level opt-out is **Remove from recall**. | |
 | **Remove from recall** | Stop an existing memory tracker from appearing in recall; the unit does not re-enter the sequence | **Remove** / **Remove from recall** |
 | **Revive** | Re-enable recall for a tracker that was removed from recall | **Revive** |
 | **Property memory tracker** | Recall tracking keyed by a property or relationship label | |
@@ -157,11 +155,6 @@ guides gradual alignment (tests, UI, OpenAPI, packages).
    - **Return to sequence** puts a skipped unit back in the walkthrough;
      **Revive** re-enables recall for a tracker that was **removed from
      recall**. They are different actions.
-   - **Skip Memory Tracking** is the notebook-only setting. Do not skip memory
-     tracking on a note. Tracker-level opt-out is **Remove from recall**.
-   - Use **Remember spelling** for the learner action that creates a
-     **spelling memory tracker**. Spelling is not a note option, not a
-     notebook-level default, and not a mode of assimilation.
    - Prefer **recall question** over bare **quiz** when naming the prompt type.
    - Prefer **spaced-repetition schedule** over **space setting** in new copy.
    - Prefer **semantic search** over **semantical search**.
@@ -202,8 +195,6 @@ guides gradual alignment (tests, UI, OpenAPI, packages).
 - Spelling is spoken as a learner-created **spelling memory tracker**, not as a
   note option or a mode of assimilation.
 - Sequence skip, **Remove from recall**, **Revive**, and notebook **Skip
-  Memory Tracking** stay distinct in speech; **Return to sequence** is not
-  **Revive**.
 - Commissioned learning names are fixed before the capability is built, so its
   entities, API, UI copy, and tests start on the glossary instead of renaming
   later.
