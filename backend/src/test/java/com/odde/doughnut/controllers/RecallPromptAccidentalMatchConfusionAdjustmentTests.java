@@ -17,6 +17,8 @@ import com.odde.doughnut.services.MemoryTrackerService;
 import java.sql.Timestamp;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 
 class RecallPromptAccidentalMatchConfusionAdjustmentTests extends RecallPromptControllerTestBase {
@@ -120,23 +122,16 @@ class RecallPromptAccidentalMatchConfusionAdjustmentTests extends RecallPromptCo
         understandingTracker.getForgettingCurveIndex(), equalTo(understandingStrengthBefore));
   }
 
-  @Test
-  void shouldFallBackToUnderstandingWhenSpellingIsRemovedFromRecall()
+  @ParameterizedTest
+  @CsvSource({"removedFromTracking", "deletedAt"})
+  void shouldFallBackToUnderstandingWhenSpellingTrackerBecomesInactive(String inactivationMethod)
       throws UnexpectedNoAccessRightException {
     MemoryTracker understandingTracker = ownedTracker(matchedSpellingTracker.getNote());
-    matchedSpellingTracker.setRemovedFromTracking(true);
-    makeMe.entityPersister.save(matchedSpellingTracker);
-
-    controller.answerSpelling(recallPrompt, answerDTO);
-
-    assertLinkedConfusionAdjustedTracker(understandingTracker);
-  }
-
-  @Test
-  void shouldFallBackToUnderstandingWhenSpellingIsDeleted()
-      throws UnexpectedNoAccessRightException {
-    MemoryTracker understandingTracker = ownedTracker(matchedSpellingTracker.getNote());
-    matchedSpellingTracker.setDeletedAt(testabilitySettings.getCurrentUTCTimestamp());
+    if ("removedFromTracking".equals(inactivationMethod)) {
+      matchedSpellingTracker.setRemovedFromTracking(true);
+    } else {
+      matchedSpellingTracker.setDeletedAt(testabilitySettings.getCurrentUTCTimestamp());
+    }
     makeMe.entityPersister.save(matchedSpellingTracker);
 
     controller.answerSpelling(recallPrompt, answerDTO);
