@@ -19,6 +19,29 @@ import { afterEach, beforeEach, vi } from "vitest"
 import { mockedGoToNextAssimilation } from "./assimilationPanelMocks"
 import { refinementLayoutItems } from "./noteRefinementTestSupport"
 
+export {
+  assimilateAsCommissionedButtonEl,
+  assimilateButtonEl,
+  assimilateButtonSelector,
+  assimilateOptionsCaretEl,
+  assimilateOptionsCaretSelector,
+  clickAssimilate,
+  clickAssimilateAsCommissioned,
+  clickRememberSpelling,
+  clickRemoveFromRecallAndConfirm,
+  clickReturnToSequence,
+  clickSkipAndConfirm,
+  openAssimilateOptions,
+  rememberSpellingButtonEl,
+  removeFromRecallButtonEl,
+  removeFromRecallButtonSelector,
+  returnToSequenceButtonEl,
+  returnToSequenceButtonSelector,
+  reviveButtonSelector,
+  skipButtonEl,
+  skipButtonSelector,
+} from "./assimilationPanelControlTestSupport"
+
 export const noteRealm = makeMe.aNoteRealm.please()
 export const memoryTracker = makeMe.aMemoryTracker.ofNote(noteRealm).please()
 export const { note } = memoryTracker
@@ -93,8 +116,6 @@ export function setupAssimilationPanelTests() {
   })
 }
 
-export const assimilateButtonSelector = '[data-test="assimilate"]' as const
-
 export function opaqueContentBlockerEl() {
   return document.body.querySelector(
     '[data-test="opaque-content-blocker"]'
@@ -111,14 +132,6 @@ export function verifySpellingButtonEl() {
   return document.body.querySelector(
     '[data-test="verify-spelling"]'
   ) as HTMLElement | null
-}
-
-export function assimilateButtonEl(
-  wrapper: Awaited<ReturnType<typeof mountAssimilationPanel>>
-) {
-  return wrapper.element.querySelector(
-    assimilateButtonSelector
-  ) as HTMLButtonElement | null
 }
 
 export function mountAssimilationPanel(overrides?: { note?: typeof note }) {
@@ -146,94 +159,5 @@ export async function closeSpellingVerificationPopup() {
 
 export async function clickVerifySpelling() {
   verifySpellingButtonEl()!.click()
-  await flushPromises()
-}
-
-export async function clickAssimilate(
-  wrapper: Awaited<ReturnType<typeof mountAssimilationPanel>>
-) {
-  assimilateButtonEl(wrapper)!.click()
-  await flushPromises()
-}
-
-export const skipButtonSelector = '[data-test="skip"]' as const
-export const returnToSequenceButtonSelector =
-  '[data-test="return-to-sequence"]' as const
-export const reviveButtonSelector = '[data-test="revive"]' as const
-
-export function skipButtonEl(
-  wrapper: Awaited<ReturnType<typeof mountAssimilationPanel>>
-) {
-  return wrapper.element.querySelector(
-    skipButtonSelector
-  ) as HTMLInputElement | null
-}
-
-export async function clickSkipAndConfirm(
-  wrapper: Awaited<ReturnType<typeof mountAssimilationPanel>>
-) {
-  skipButtonEl(wrapper)!.click()
-  usePopups().popups.done(true)
-  await flushPromises()
-}
-
-export function returnToSequenceButtonEl(
-  wrapper: Awaited<ReturnType<typeof mountAssimilationPanel>>
-) {
-  return wrapper.element.querySelector(
-    returnToSequenceButtonSelector
-  ) as HTMLInputElement | null
-}
-
-export async function clickReturnToSequence(
-  wrapper: Awaited<ReturnType<typeof mountAssimilationPanel>>
-) {
-  returnToSequenceButtonEl(wrapper)!.click()
-  await flushPromises()
-}
-
-export const assimilateOptionsCaretSelector =
-  '[data-test="assimilate-options-caret"]' as const
-
-export function assimilateOptionsCaretEl(
-  wrapper: Awaited<ReturnType<typeof mountAssimilationPanel>>
-) {
-  return wrapper.element.querySelector(
-    assimilateOptionsCaretSelector
-  ) as HTMLElement | null
-}
-
-export function assimilateAsCommissionedButtonEl() {
-  return document.body.querySelector(
-    '[data-test="assimilate-as-commissioned"]'
-  ) as HTMLButtonElement | null
-}
-
-export function rememberSpellingButtonEl() {
-  return document.body.querySelector(
-    '[data-test="remember-spelling"]'
-  ) as HTMLButtonElement | null
-}
-
-export async function openAssimilateOptions(
-  wrapper: Awaited<ReturnType<typeof mountAssimilationPanel>>
-) {
-  assimilateOptionsCaretEl(wrapper)!.click()
-  await flushPromises()
-}
-
-export async function clickAssimilateAsCommissioned(
-  wrapper: Awaited<ReturnType<typeof mountAssimilationPanel>>
-) {
-  await openAssimilateOptions(wrapper)
-  assimilateAsCommissionedButtonEl()!.click()
-  await flushPromises()
-}
-
-export async function clickRememberSpelling(
-  wrapper: Awaited<ReturnType<typeof mountAssimilationPanel>>
-) {
-  await openAssimilateOptions(wrapper)
-  rememberSpellingButtonEl()!.click()
   await flushPromises()
 }

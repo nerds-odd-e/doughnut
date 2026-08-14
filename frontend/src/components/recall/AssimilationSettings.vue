@@ -99,6 +99,7 @@
           :skipped-from-assimilation-sequence="
             noteRecallInfo?.skippedFromAssimilationSequence === true
           "
+          :show-remove-from-recall="showRemoveFromRecall"
           :show-commissioned-option="showCommissionedOption"
           :show-spelling-option="showSpellingOption"
           @assimilate="emit('assimilate', { skipMemoryTracking: false })"
@@ -117,6 +118,7 @@
           "
           @revive="emit('revive', {})"
           @return-to-sequence="emit('returnToSequence')"
+          @remove-from-recall="emit('removeFromRecall')"
         />
       </div>
     </div>
@@ -145,7 +147,10 @@ import {
 import { compactDisplayForPropertyValue } from "@/utils/noteProperties"
 import { usePendingAssimilationProperty } from "@/composables/usePendingAssimilationProperty"
 import { computed, ref, toRef } from "vue"
-import { hasNoteLevelTrackerOfType } from "./noteLevelMemoryTrackers"
+import {
+  hasNoteLevelTrackerOfType,
+  activeUnderstandingNoteLevelTrackers,
+} from "./noteLevelMemoryTrackers"
 
 const { note, noteInfoLoaded, assimilateDisabled, assimilatingPropertyKey } =
   defineProps<{
@@ -162,6 +167,7 @@ const emit = defineEmits<{
   (e: "skip", request: { propertyKey?: string }): void
   (e: "revive", request: { propertyKey?: string }): void
   (e: "returnToSequence"): void
+  (e: "removeFromRecall"): void
   (e: "refinementContentUpdated"): void
 }>()
 
@@ -205,6 +211,12 @@ const showSpellingOption = computed(
     hasNoteContent.value &&
     !isLinkNote.value &&
     !hasNoteLevelTrackerOfType(noteRecallInfo.value?.memoryTrackers, "SPELLING")
+)
+
+const showRemoveFromRecall = computed(
+  () =>
+    activeUnderstandingNoteLevelTrackers(noteRecallInfo.value?.memoryTrackers)
+      .length > 0
 )
 
 const reloadNoteInfo = async () => {

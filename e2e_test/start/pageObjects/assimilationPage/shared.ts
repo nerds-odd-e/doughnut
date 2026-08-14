@@ -4,6 +4,7 @@ export const assimilateButtonSelector = '[data-test="assimilate"]'
 export const reviveButtonSelector = '[data-test="revive"]'
 export const skipButtonSelector = '[data-test="skip"]'
 export const returnToSequenceButtonSelector = '[data-test="return-to-sequence"]'
+export const removeFromRecallButtonSelector = '[data-test="remove-from-recall"]'
 export const assimilateOptionsCaretSelector =
   '[data-test="assimilate-options-caret"]'
 export const assimilateAsCommissionedSelector =
@@ -37,6 +38,9 @@ export const skipButton = noteLevelControl(skipButtonSelector)
 export const returnToSequenceButton = noteLevelControl(
   returnToSequenceButtonSelector
 )
+export const removeFromRecallButton = noteLevelControl(
+  removeFromRecallButtonSelector
+)
 
 function noteLevelControlElements(
   doc: Document | ParentNode,
@@ -47,18 +51,43 @@ function noteLevelControlElements(
   )
 }
 
-export function noteLevelReviveElements(doc: Document | ParentNode): Element[] {
+function noteLevelReviveElements(doc: Document | ParentNode): Element[] {
   return noteLevelControlElements(doc, reviveButtonSelector)
 }
 
-export function noteLevelSkipElements(doc: Document | ParentNode): Element[] {
+function noteLevelSkipElements(doc: Document | ParentNode): Element[] {
   return noteLevelControlElements(doc, skipButtonSelector)
 }
 
-export function noteLevelReturnToSequenceElements(
+function noteLevelReturnToSequenceElements(
   doc: Document | ParentNode
 ): Element[] {
   return noteLevelControlElements(doc, returnToSequenceButtonSelector)
+}
+
+function noteLevelRemoveFromRecallElements(
+  doc: Document | ParentNode
+): Element[] {
+  return noteLevelControlElements(doc, removeFromRecallButtonSelector)
+}
+
+const noteLevelSecondaryActionElements = {
+  revive: noteLevelReviveElements,
+  skip: noteLevelSkipElements,
+  returnToSequence: noteLevelReturnToSequenceElements,
+  removeFromRecall: noteLevelRemoveFromRecallElements,
+} as const
+
+export function expectOtherNoteLevelSecondaryActionsAbsent(
+  doc: Document | ParentNode,
+  present: keyof typeof noteLevelSecondaryActionElements
+) {
+  for (const [name, elements] of Object.entries(
+    noteLevelSecondaryActionElements
+  )) {
+    if (name === present) continue
+    expect(elements(doc)).to.have.length(0)
+  }
 }
 
 export function openRefineNoteModalIfNeeded() {

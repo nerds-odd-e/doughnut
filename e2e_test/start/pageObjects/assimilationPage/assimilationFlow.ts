@@ -8,13 +8,13 @@ import {
   assimilateOptionsCaret,
   assimilateButton,
   mainNoteHeadingTitleSelector,
-  noteLevelReviveElements,
+  expectOtherNoteLevelSecondaryActionsAbsent,
   openRefineNoteModalIfNeeded,
   rememberSpellingButton,
+  reviveButton,
   skipButton,
   returnToSequenceButton,
-  noteLevelReturnToSequenceElements,
-  noteLevelSkipElements,
+  removeFromRecallButton,
   waitForAssimilationNoteTitle,
 } from './shared'
 
@@ -101,16 +101,34 @@ export const assumeAssimilationPage = () => ({
   expectSkipOnPanel() {
     skipButton().should('exist')
     cy.document().then((doc) => {
-      expect(noteLevelReviveElements(doc)).to.have.length(0)
-      expect(noteLevelReturnToSequenceElements(doc)).to.have.length(0)
+      expectOtherNoteLevelSecondaryActionsAbsent(doc, 'skip')
     })
     return this
   },
   expectReturnToSequenceOnPanel() {
     returnToSequenceButton().should('exist')
     cy.document().then((doc) => {
-      expect(noteLevelReviveElements(doc)).to.have.length(0)
-      expect(noteLevelSkipElements(doc)).to.have.length(0)
+      expectOtherNoteLevelSecondaryActionsAbsent(doc, 'returnToSequence')
+    })
+    return this
+  },
+  removeFromRecallOnPanel() {
+    removeFromRecallButton().click()
+    cy.findByRole('button', { name: 'OK' }).click()
+    waitUntilAppIsNotBusy()
+    return this
+  },
+  expectRemoveFromRecallOnPanel() {
+    removeFromRecallButton().should('exist')
+    cy.document().then((doc) => {
+      expectOtherNoteLevelSecondaryActionsAbsent(doc, 'removeFromRecall')
+    })
+    return this
+  },
+  expectReviveOnPanel() {
+    reviveButton().should('exist')
+    cy.document().then((doc) => {
+      expectOtherNoteLevelSecondaryActionsAbsent(doc, 'revive')
     })
     return this
   },

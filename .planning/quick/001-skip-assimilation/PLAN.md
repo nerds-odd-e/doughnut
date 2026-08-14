@@ -1,6 +1,6 @@
 # Assimilation-sequence skip
 
-**Status:** in progress (Phase 10 next)  
+**Status:** in progress (Phase 11 next)  
 **Type mix:** Structure then Behavior
 
 Each phase is one commit: **Behavior** (one observable) or **Structure** (only what the **immediate next** behavior needs). Size for ~5 minutes wall-clock including targeted tests.
@@ -96,7 +96,7 @@ Permanent artifacts stay capability-named (no phase numbers in product files).
 | 7 | Behavior | Assimilate as commissioned a skipped note (done) |
 | 8 | Behavior | Migrate note-level dummy skips (`recall_count = 0`) (done) |
 | 9 | Behavior | Return to sequence (note) (done) |
-| 10 | Behavior | Remove from recall on assimilation settings (note) |
+| 10 | Behavior | Remove from recall on assimilation settings (note) (done) |
 | 11 | Behavior | Skip a property in the sequence |
 | 12 | Behavior | Assimilate a skipped property |
 | 13 | Behavior | Return to sequence (property) |
@@ -204,15 +204,11 @@ Permanent artifacts stay capability-named (no phase numbers in product files).
 ## Phase 10 — Remove from recall on assimilation settings (note)
 
 - **Type:** Behavior  
-- **Status:** planned
+- **Status:** done
 
-**Pre-condition:** Active understanding tracker.  
-**Trigger:** **Remove from recall** on assimilation settings.  
-**Post-condition:** Tracker removed from tracking; not in recall; not back in the sequence; **Revive** shown (tracker revive). **Skip** hidden.
+**Done:** Assimilated notes show **Remove from recall** (existing `removeFromRepeating`), not Skip. After remove: Revive shown; unit stays out of the sequence. Tracker-page Remove unchanged; shared confirm copy.
 
-**Tests:** E2E on assimilation settings in `assimilation_walkthrough.feature` (or adjacent assimilation feature). Existing tracker-page Remove stays. Uses existing `removeFromRepeating`.
-
-**Done when:** Assimilated notes show Remove from recall, not Skip.
+**Learning:** Property rows still show Skip until Phase 11.
 
 ---
 

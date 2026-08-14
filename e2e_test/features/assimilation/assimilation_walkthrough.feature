@@ -51,6 +51,17 @@ Feature: Assimilation walkthrough
     And I open assimilation settings
     Then assimilate should be disabled
 
+  Scenario: Remove from recall on assimilation settings
+    Given the note "Note 1" was assimilated on day 1
+    When I jump to the note page of "Note 1"
+    And I open assimilation settings
+    Then I should see Remove from recall on the assimilation panel
+    When I remove from recall on the assimilation panel
+    Then I should see Revive on the assimilation panel
+    When I start assimilation from the menu
+    Then I should be assimilating the note "Note 2"
+    And On day 3 I should have "0/2/4" note for assimilation and "0/0/0" for recall
+
   Scenario: Skip does not create a dummy understanding tracker
     Given It's day 1
     And the note "Note 1" was assimilated on day 1

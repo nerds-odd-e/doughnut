@@ -13,49 +13,10 @@
     </div>
   </div>
   <div>
-    <div v-if="memoryTracker" class="daisy-card shadow-sm mb-6">
-      <div class="daisy-card-body">
-        <h2 class="daisy-card-title text-lg mb-4">Memory Tracker Information</h2>
-        <div class="grid grid-cols-2 gap-4 text-sm">
-          <div>
-            <span class="font-semibold">Assimilated Time:</span>
-            <span class="ml-2">
-              {{ memoryTracker.assimilatedAt ? new Date(memoryTracker.assimilatedAt).toLocaleString() : 'N/A' }}
-            </span>
-          </div>
-          <div>
-            <span class="font-semibold">Last Recall Time:</span>
-            <span class="ml-2">
-              {{ memoryTracker.lastRecalledAt ? new Date(memoryTracker.lastRecalledAt).toLocaleString() : 'N/A' }}
-            </span>
-          </div>
-          <div>
-            <span class="font-semibold">Next Recall Time:</span>
-            <span class="ml-2">
-              {{ new Date(memoryTracker.nextRecallAt).toLocaleString() }}
-            </span>
-          </div>
-          <div>
-            <span class="font-semibold">Forgetting Curve Index:</span>
-            <span class="ml-2">
-              {{ memoryTracker.forgettingCurveIndex ?? 'N/A' }}
-            </span>
-          </div>
-          <div>
-            <span class="font-semibold">Recall Count:</span>
-            <span class="ml-2">
-              {{ memoryTracker.recallCount ?? 'N/A' }}
-            </span>
-          </div>
-          <div>
-            <span class="font-semibold">Spelling:</span>
-            <span class="ml-2">
-              {{ memoryTracker.spelling ? 'Yes' : 'No' }}
-            </span>
-          </div>
-        </div>
-      </div>
-    </div>
+    <MemoryTrackerInformation
+      v-if="memoryTracker"
+      :memory-tracker="memoryTracker"
+    />
     <div class="mb-4 flex justify-end gap-2">
       <button
         v-if="hasUnansweredPrompts"
@@ -170,9 +131,11 @@ import NoteUnderQuestion from "@/components/recall/NoteUnderQuestion.vue"
 import { recalledNoteUnderQuestionProps } from "@/components/recall/recalledNoteUnderQuestionProps"
 import QuestionDisplay from "@/components/recall/QuestionDisplay.vue"
 import ConversationButton from "@/components/recall/ConversationButton.vue"
+import MemoryTrackerInformation from "@/components/recall/MemoryTrackerInformation.vue"
 import { MemoryTrackerController } from "@generated/doughnut-backend-api/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import usePopups from "@/components/commons/Popups/usePopups"
+import { REMOVE_FROM_RECALL_CONFIRM } from "@/composables/useRemoveFromRecall"
 import { EyeOff } from "@lucide/vue"
 
 const props = defineProps({
@@ -240,9 +203,7 @@ const deleteUnansweredPrompts = async () => {
 }
 
 const removeFromRecall = async () => {
-  if (
-    !(await popups.confirm(`Confirm to hide this from recalls in the future?`))
-  ) {
+  if (!(await popups.confirm(REMOVE_FROM_RECALL_CONFIRM))) {
     return
   }
   const { data: memoryTracker, error } = await apiCallWithLoading(() =>

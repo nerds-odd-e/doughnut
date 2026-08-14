@@ -1,5 +1,6 @@
 import {
   AssimilationSequenceSkipController,
+  MemoryTrackerController,
   NoteController,
 } from "@generated/doughnut-backend-api/sdk.gen"
 import { describe, expect, it, vi } from "vitest"
@@ -15,12 +16,14 @@ import {
   assimilateSpy,
   assimilatedCountOfTheDay,
   clickAssimilate,
+  clickRemoveFromRecallAndConfirm,
   clickReturnToSequence,
   clickSkipAndConfirm,
   mockedRequestDueRecallsRefresh,
   mockedTotalAssimilatedCount,
   mountAssimilationPanelReady,
   note,
+  removeFromRecallButtonEl,
   returnToSequenceButtonEl,
   reviveButtonSelector,
   setupAssimilationPanelTests,
@@ -112,6 +115,44 @@ describe("AssimilationPanel", () => {
     expect(mockedGoToNextAssimilation).not.toHaveBeenCalled()
     expect(skipButtonEl(wrapper)).not.toBeNull()
     expect(returnToSequenceButtonEl(wrapper)).toBeNull()
+  })
+
+  it("removes the understanding tracker from recall and shows Revive", async () => {
+    let removedFromTracking = false
+    mockSdkServiceWithImplementation(NoteController, "getNoteInfo", () =>
+      makeMe.aNoteRecallInfo
+        .memoryTrackers([
+          makeMe.aMemoryTracker
+            .id(7)
+            .spelling(false)
+            .removedFromTracking(removedFromTracking)
+            .please(),
+        ])
+        .please()
+    )
+    const removeSpy = mockSdkService(
+      MemoryTrackerController,
+      "removeFromRepeating",
+      makeMe.aMemoryTracker.id(7).removedFromTracking(true).please()
+    )
+    removeSpy.mockImplementation(async () => {
+      removedFromTracking = true
+      return wrapSdkResponse(
+        makeMe.aMemoryTracker.id(7).removedFromTracking(true).please()
+      )
+    })
+    const wrapper = await mountAssimilationPanelReady()
+
+    await clickRemoveFromRecallAndConfirm(wrapper)
+
+    expect(removeSpy).toHaveBeenCalledWith({
+      path: { memoryTracker: 7 },
+    })
+    expect(skipSequenceSpy).not.toHaveBeenCalled()
+    expect(mockedGoToNextAssimilation).not.toHaveBeenCalled()
+    expect(wrapper.find(reviveButtonSelector).exists()).toBe(true)
+    expect(skipButtonEl(wrapper)).toBeNull()
+    expect(removeFromRecallButtonEl(wrapper)).toBeNull()
   })
 
   describe("assimilate when note has memory trackers", () => {

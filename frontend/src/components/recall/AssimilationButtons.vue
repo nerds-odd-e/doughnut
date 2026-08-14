@@ -72,6 +72,16 @@
     @click="$emit('returnToSequence')"
   />
   <input
+    v-else-if="showRemoveFromRecall"
+    type="submit"
+    name="remove-from-recall"
+    value="Remove from recall"
+    :class="['daisy-btn daisy-btn-secondary', sizeClass]"
+    data-test="remove-from-recall"
+    :disabled="disabled"
+    @click="$emit('removeFromRecall')"
+  />
+  <input
     v-else-if="showSkip && skippedForRecall"
     type="submit"
     name="revive"
@@ -134,6 +144,10 @@ export default defineComponent({
       type: Boolean,
       default: false,
     },
+    showRemoveFromRecall: {
+      type: Boolean,
+      default: false,
+    },
     showCommissionedOption: {
       type: Boolean,
       default: false,
@@ -148,6 +162,7 @@ export default defineComponent({
     "skip",
     "revive",
     "returnToSequence",
+    "removeFromRecall",
     "assimilateAsCommissioned",
     "rememberSpelling",
   ],

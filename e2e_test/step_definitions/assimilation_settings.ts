@@ -84,3 +84,15 @@ Then('I should see Skip on the assimilation panel', () => {
 Then('I should see Return to sequence on the assimilation panel', () => {
   start.assumeAssimilationPage().expectReturnToSequenceOnPanel()
 })
+
+When('I remove from recall on the assimilation panel', () => {
+  start.assumeAssimilationPage().removeFromRecallOnPanel()
+})
+
+Then('I should see Remove from recall on the assimilation panel', () => {
+  start.assumeAssimilationPage().expectRemoveFromRecallOnPanel()
+})
+
+Then('I should see Revive on the assimilation panel', () => {
+  start.assumeAssimilationPage().expectReviveOnPanel()
+})

@@ -11,6 +11,7 @@
     @skip="processSkip"
     @revive="processRevive"
     @return-to-sequence="processReturnToSequence"
+    @remove-from-recall="processRemoveFromRecall"
     @refinement-content-updated="emit('reloadNeeded')"
   />
   <Teleport to="body">
@@ -45,11 +46,18 @@ import {
   SEQUENCE_SKIP_CONFIRM,
   useAssimilationSequenceSkip,
 } from "@/composables/useAssimilationSequenceSkip"
-import { hasUnderstandingNoteLevelTracker } from "./noteLevelMemoryTrackers"
+import {
+  hasUnderstandingNoteLevelTracker,
+  activeUnderstandingNoteLevelTrackers,
+} from "./noteLevelMemoryTrackers"
 import {
   trackersToRevive,
   useReviveMemoryTracker,
 } from "@/composables/useReviveMemoryTracker"
+import {
+  REMOVE_FROM_RECALL_CONFIRM,
+  useRemoveFromRecall,
+} from "@/composables/useRemoveFromRecall"
 import { useAssimilationView } from "@/composables/useAssimilationView"
 
 const { note } = defineProps<{
@@ -65,6 +73,7 @@ const { assimilateUnit } = useAssimilateUnit()
 const { skipFromAssimilationSequence, returnToAssimilationSequence } =
   useAssimilationSequenceSkip()
 const { reviveMemoryTrackers } = useReviveMemoryTracker()
+const { removeMemoryTrackersFromRecall } = useRemoveFromRecall()
 const { openForNote } = useAssimilationView()
 
 const settingsRef = ref<InstanceType<typeof AssimilationSettings> | null>(null)
@@ -156,6 +165,25 @@ const processRevive = async ({ propertyKey }: { propertyKey?: string }) => {
 
 const processReturnToSequence = async () => {
   const success = await returnToAssimilationSequence(note.id)
+  if (success) {
+    await settingsRef.value?.reloadNoteInfo()
+  }
+}
+
+const processRemoveFromRecall = async () => {
+  const trackers = activeUnderstandingNoteLevelTrackers(
+    noteRecallInfo.value?.memoryTrackers
+  )
+  if (trackers.length === 0) {
+    return
+  }
+
+  const confirmed = await popups.confirm(REMOVE_FROM_RECALL_CONFIRM)
+  if (!confirmed) {
+    return
+  }
+
+  const success = await removeMemoryTrackersFromRecall(trackers)
   if (success) {
     await settingsRef.value?.reloadNoteInfo()
   }
