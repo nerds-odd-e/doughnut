@@ -2,6 +2,8 @@ import { waitUntilAppIsNotBusy } from '../../pageBase'
 import {
   assimilationPropertyRow,
   assimilateButtonSelector,
+  returnToSequenceButtonSelector,
+  reviveButtonSelector,
   skipButtonSelector,
 } from './shared'
 
@@ -59,7 +61,22 @@ export function assimilationPropertyFlow() {
     expectSkipForProperty(propertyKey: string) {
       assimilationPropertyRow(propertyKey).within(() => {
         cy.get(skipButtonSelector).should('exist')
+        cy.get(returnToSequenceButtonSelector).should('not.exist')
+        cy.get(reviveButtonSelector).should('not.exist')
       })
+      return this
+    },
+    expectReturnToSequenceForProperty(propertyKey: string) {
+      assimilationPropertyRow(propertyKey).within(() => {
+        cy.get(returnToSequenceButtonSelector).should('exist')
+        cy.get(skipButtonSelector).should('not.exist')
+        cy.get(reviveButtonSelector).should('not.exist')
+      })
+      return this
+    },
+    returnPropertyToSequenceOnPanel(propertyKey: string) {
+      clickPropertyRowButton(propertyKey, returnToSequenceButtonSelector)
+      waitUntilAppIsNotBusy()
       return this
     },
     expectPropertyAssimilateDisabled(propertyKey: string) {

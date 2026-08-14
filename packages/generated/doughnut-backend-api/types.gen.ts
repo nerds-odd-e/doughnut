@@ -988,7 +988,7 @@ export type CurrentUserInfo = {
 export type NoteRecallInfo = {
     memoryTrackers?: Array<MemoryTracker>;
     recallSetting?: NoteRecallSetting;
-    skippedFromAssimilationSequence?: boolean;
+    skippedPropertyKeys?: Array<string>;
 };
 
 export type FocusContextFocusNote = {
@@ -1242,7 +1242,7 @@ export type ConversationSubjectWritable = {
 export type NoteRecallInfoWritable = {
     memoryTrackers?: Array<MemoryTrackerWritable>;
     recallSetting?: NoteRecallSetting;
-    skippedFromAssimilationSequence?: boolean;
+    skippedPropertyKeys?: Array<string>;
 };
 
 export type PutNotebookBookBlockReadingRecordData = {

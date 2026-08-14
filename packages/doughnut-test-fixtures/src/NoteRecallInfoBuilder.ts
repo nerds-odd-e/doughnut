@@ -12,6 +12,7 @@ class NoteRecallInfoBuilder extends Builder<NoteRecallInfo> {
     super()
     this.data = {
       memoryTrackers: [],
+      skippedPropertyKeys: [],
     }
   }
 
@@ -25,8 +26,8 @@ class NoteRecallInfoBuilder extends Builder<NoteRecallInfo> {
     return this
   }
 
-  skippedFromAssimilationSequence(value: boolean): NoteRecallInfoBuilder {
-    this.data.skippedFromAssimilationSequence = value
+  skippedPropertyKeys(value: string[]): NoteRecallInfoBuilder {
+    this.data.skippedPropertyKeys = value
     return this
   }
 

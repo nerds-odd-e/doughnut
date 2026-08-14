@@ -147,8 +147,12 @@ const processRevive = async ({ propertyKey }: { propertyKey?: string }) => {
   }
 }
 
-const processReturnToSequence = async () => {
-  const success = await returnToAssimilationSequence(note.id)
+const processReturnToSequence = async ({
+  propertyKey,
+}: {
+  propertyKey?: string
+} = {}) => {
+  const success = await returnToAssimilationSequence(note.id, propertyKey)
   if (success) {
     await settingsRef.value?.reloadNoteInfo()
   }

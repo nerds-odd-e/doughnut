@@ -58,7 +58,34 @@ Feature: Property memory tracker
     And I expand assimilation properties
     Then the property memory tracker for "topic" should be absent
     And assimilate for property "topic" should be enabled
-    And I should see Skip for property "topic"
+    And I should see Return to sequence for property "topic"
+
+  @disableOpenAiService
+  Scenario: Return to sequence restores a skipped property to the sequence
+    Given I am re-logged in as "another_old_learner"
+    And I have a notebook "Property return"
+    And I have a note "Minerals" under notebook "Property return" with content:
+      """
+      ---
+      topic: calcium
+      ---
+
+      Body.
+      """
+    And It's day 1, 8 hour
+    And I assimilated one note "Minerals" at the current time
+    When I start assimilation from the menu
+    Then I should see pending assimilation property "topic"
+    When I skip property "topic" on the assimilation panel
+    Then I should see the no more notes to assimilate toast
+    When I visit note "Minerals"
+    And I open assimilation settings
+    And I expand assimilation properties
+    Then I should see Return to sequence for property "topic"
+    When I return property "topic" to the sequence
+    Then I should see Skip for property "topic"
+    When I start assimilation from the menu
+    Then I should see pending assimilation property "topic"
 
   @disableOpenAiService
   Scenario: Assimilating a skipped property creates a property understanding tracker

@@ -5072,8 +5072,10 @@ components:
             $ref: "#/components/schemas/MemoryTracker"
         recallSetting:
           $ref: "#/components/schemas/NoteRecallSetting"
-        skippedFromAssimilationSequence:
-          type: boolean
+        skippedPropertyKeys:
+          type: array
+          items:
+            type: string
     FocusContextFocusNote:
       type: object
       properties:

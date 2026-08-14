@@ -48,7 +48,7 @@ export function propertyAssimilateButton(propertyKey: string) {
   ) as HTMLInputElement
 }
 
-export function propertySkipRecallButton(propertyKey: string) {
+export function propertySkipButton(propertyKey: string) {
   return assimilationPropertyRow(propertyKey).querySelector(
     skipButtonSelector
   ) as HTMLInputElement
@@ -60,13 +60,24 @@ export function propertyReviveButton(propertyKey: string) {
   ) as HTMLInputElement
 }
 
-export async function clickPropertySkipRecall(propertyKey: string) {
-  propertySkipRecallButton(propertyKey).click()
+export function propertyReturnToSequenceButton(propertyKey: string) {
+  return assimilationPropertyRow(propertyKey).querySelector(
+    '[data-test="return-to-sequence"]'
+  ) as HTMLInputElement
+}
+
+export async function clickPropertySkip(propertyKey: string) {
+  propertySkipButton(propertyKey).click()
   await flushPromises()
 }
 
 export async function clickPropertyRevive(propertyKey: string) {
   propertyReviveButton(propertyKey).click()
+  await flushPromises()
+}
+
+export async function clickPropertyReturnToSequence(propertyKey: string) {
+  propertyReturnToSequenceButton(propertyKey).click()
   await flushPromises()
 }
 

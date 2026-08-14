@@ -96,8 +96,10 @@ class NoteController {
     }
     noteRecallInfo.setMemoryTrackers(memoryTrackers);
     noteRecallInfo.setRecallSetting(note.getRecallSetting());
-    noteRecallInfo.setSkippedFromAssimilationSequence(
-        skipRepository.findByUserAndNoteAndPropertyKey(user, note, "").isPresent());
+    noteRecallInfo.setSkippedPropertyKeys(
+        skipRepository.findByUserAndNote(user, note).stream()
+            .map(AssimilationSequenceSkip::getPropertyKey)
+            .toList());
     return noteRecallInfo;
   }
 

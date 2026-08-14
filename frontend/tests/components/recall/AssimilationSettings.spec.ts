@@ -5,12 +5,14 @@ import {
   assimilationPropertyRow,
   clickPropertyAssimilate,
   clickPropertyRevive,
-  clickPropertySkipRecall,
+  clickPropertyReturnToSequence,
+  clickPropertySkip,
   getNoteInfoSpy,
   mountAssimilationSettingsReady,
   propertyAssimilateButton,
+  propertyReturnToSequenceButton,
   propertyReviveButton,
-  propertySkipRecallButton,
+  propertySkipButton,
   setupAssimilationSettingsTests,
   wrapper,
 } from "./assimilationSettingsTestSupport"
@@ -62,8 +64,28 @@ describe("AssimilationSettings", () => {
   it("emits skip with propertyKey when Skip is clicked", async () => {
     await mountAssimilationSettingsReady()
 
-    await clickPropertySkipRecall("topic")
+    await clickPropertySkip("topic")
     expect(wrapper.emitted("skip")).toEqual([[{ propertyKey: "topic" }]])
+  })
+
+  it("shows Return to sequence on a sequence-skipped property", async () => {
+    getNoteInfoSpy.mockResolvedValue(
+      wrapSdkResponse(
+        makeMe.aNoteRecallInfo.skippedPropertyKeys(["topic"]).please()
+      )
+    )
+    await mountAssimilationSettingsReady()
+
+    expect(propertyReturnToSequenceButton("topic")).not.toBeNull()
+    expect(propertySkipButton("topic")).toBeNull()
+    expect(propertyReviveButton("topic")).toBeNull()
+    expect(propertySkipButton("url")).not.toBeNull()
+    expect(propertyReturnToSequenceButton("url")).toBeNull()
+
+    await clickPropertyReturnToSequence("topic")
+    expect(wrapper.emitted("returnToSequence")).toEqual([
+      [{ propertyKey: "topic" }],
+    ])
   })
 
   describe("skipped property tracker", () => {
@@ -87,8 +109,8 @@ describe("AssimilationSettings", () => {
       await mountAssimilationSettingsReady()
 
       expect(propertyReviveButton("topic")).not.toBeNull()
-      expect(propertySkipRecallButton("topic")).toBeNull()
-      expect(propertySkipRecallButton("url")).not.toBeNull()
+      expect(propertySkipButton("topic")).toBeNull()
+      expect(propertySkipButton("url")).not.toBeNull()
       expect(propertyReviveButton("url")).toBeNull()
 
       await clickPropertyRevive("topic")

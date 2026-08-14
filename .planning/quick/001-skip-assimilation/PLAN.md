@@ -1,6 +1,6 @@
 # Assimilation-sequence skip
 
-**Status:** in progress (Phase 13 next)  
+**Status:** in progress (Phase 14 next)  
 **Type mix:** Structure then Behavior
 
 Each phase is one commit: **Behavior** (one observable) or **Structure** (only what the **immediate next** behavior needs). Size for ~5 minutes wall-clock including targeted tests.
@@ -99,7 +99,7 @@ Permanent artifacts stay capability-named (no phase numbers in product files).
 | 10 | Behavior | Remove from recall on assimilation settings (note) (done) |
 | 11 | Behavior | Skip a property in the sequence (done) |
 | 12 | Behavior | Assimilate a skipped property (done) |
-| 13 | Behavior | Return to sequence (property) |
+| 13 | Behavior | Return to sequence (property) (done) |
 | 14 | Behavior | Remove from recall on assimilation settings (property) |
 | 15 | Behavior | Migrate property-level dummy skips (`recall_count = 0`) |
 | 16 | Structure | Drop `skipMemoryTracking` on assimilate + testability wording |
@@ -237,15 +237,11 @@ Permanent artifacts stay capability-named (no phase numbers in product files).
 ## Phase 13 — Return to sequence (property)
 
 - **Type:** Behavior  
-- **Status:** planned
+- **Status:** done
 
-**Pre-condition:** Property skip row, no live property understanding tracker.  
-**Trigger:** **Return to sequence** on that property row.  
-**Post-condition:** Skip row gone; property pending in the sequence again.
+**Done:** Property row shows **Return to sequence** (DELETE with `propertyKey`). Skip hidden while skipped; property pending again after return. Skip facts unified as `NoteRecallInfo.skippedPropertyKeys` (`""` = note-level).
 
-**Tests:** Same property feature.
-
-**Done when:** Property Return to sequence is not Revive.
+**Learning:** Dropped the parallel `skippedFromAssimilationSequence` boolean. Note-level walkthrough E2E still green.
 
 ---
 

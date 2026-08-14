@@ -1,8 +1,15 @@
-import { NoteController } from "@generated/doughnut-backend-api/sdk.gen"
+import {
+  AssimilationSequenceSkipController,
+  NoteController,
+} from "@generated/doughnut-backend-api/sdk.gen"
 import { flushPromises } from "@vue/test-utils"
 import { describe, expect, it, vi, beforeEach } from "vitest"
 import makeMe from "doughnut-test-fixtures/makeMe"
-import { mockSdkService, wrapSdkResponse } from "@tests/helpers"
+import {
+  mockSdkService,
+  mockSdkServiceWithImplementation,
+  wrapSdkResponse,
+} from "@tests/helpers"
 import { mockedGoToNextAssimilation } from "./assimilationPanelMocks"
 import {
   clickPropertyAssimilate,
@@ -18,6 +25,11 @@ import {
   setupAssimilationPanelTests,
   skipSequenceSpy,
 } from "./assimilationPanelTestSupport"
+import {
+  clickPropertyReturnToSequence,
+  propertyReturnToSequenceButton,
+  propertySkipButton,
+} from "./assimilationSettingsTestSupport"
 
 vi.mock("@/composables/useRecallData")
 vi.mock("@/composables/useGoToNextAssimilation", () => ({
@@ -77,6 +89,38 @@ describe("AssimilationPanel property assimilation", () => {
       },
     })
     expect(assimilateSpy).not.toHaveBeenCalled()
+    wrapper.unmount()
+  })
+
+  it("returns a skipped property to the sequence without creating a tracker or reviving", async () => {
+    let skippedKeys = ["topic"]
+    mockSdkServiceWithImplementation(NoteController, "getNoteInfo", () =>
+      makeMe.aNoteRecallInfo.skippedPropertyKeys(skippedKeys).please()
+    )
+    const deleteSkipSpy = mockSdkService(
+      AssimilationSequenceSkipController,
+      "deleteAssimilationSequenceSkip",
+      undefined as never
+    )
+    deleteSkipSpy.mockImplementation(async () => {
+      skippedKeys = []
+      return wrapSdkResponse(undefined)
+    })
+    const wrapper = mountPanelWithProperties()
+    await flushPromises()
+    await expandAssimilationPropertiesSection()
+
+    await clickPropertyReturnToSequence("topic")
+
+    expect(deleteSkipSpy).toHaveBeenCalledWith({
+      body: {
+        noteId: noteWithAssimilationProperties.id,
+        propertyKey: "topic",
+      },
+    })
+    expect(assimilateSpy).not.toHaveBeenCalled()
+    expect(propertySkipButton("topic")).not.toBeNull()
+    expect(propertyReturnToSequenceButton("topic")).toBeNull()
     wrapper.unmount()
   })
 })

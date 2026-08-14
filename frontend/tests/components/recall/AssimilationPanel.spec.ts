@@ -81,7 +81,7 @@ describe("AssimilationPanel", () => {
     mockSdkService(
       NoteController,
       "getNoteInfo",
-      makeMe.aNoteRecallInfo.skippedFromAssimilationSequence(true).please()
+      makeMe.aNoteRecallInfo.skippedPropertyKeys([""]).please()
     )
     const wrapper = await mountAssimilationPanelReady()
 
@@ -91,9 +91,9 @@ describe("AssimilationPanel", () => {
   })
 
   it("returns the note to the sequence without creating a tracker or reviving", async () => {
-    let skipped = true
+    let skippedKeys = [""]
     mockSdkServiceWithImplementation(NoteController, "getNoteInfo", () =>
-      makeMe.aNoteRecallInfo.skippedFromAssimilationSequence(skipped).please()
+      makeMe.aNoteRecallInfo.skippedPropertyKeys(skippedKeys).please()
     )
     const deleteSkipSpy = mockSdkService(
       AssimilationSequenceSkipController,
@@ -101,7 +101,7 @@ describe("AssimilationPanel", () => {
       undefined as never
     )
     deleteSkipSpy.mockImplementation(async () => {
-      skipped = false
+      skippedKeys = []
       return wrapSdkResponse(undefined)
     })
     const wrapper = await mountAssimilationPanelReady()

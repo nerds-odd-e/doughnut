@@ -9,5 +9,5 @@ import lombok.Setter;
 public class NoteRecallInfo {
   @Getter @Setter private List<MemoryTracker> memoryTrackers;
   @Getter @Setter public NoteRecallSetting recallSetting;
-  @Getter @Setter private boolean skippedFromAssimilationSequence;
+  @Getter @Setter private List<String> skippedPropertyKeys;
 }

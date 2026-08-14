@@ -63,6 +63,9 @@
                   :skipped-for-recall="
                     isSkippedForRecall(noteRecallInfo, row.key)
                   "
+                  :skipped-from-assimilation-sequence="
+                    isSkippedFromAssimilationSequence(noteRecallInfo, row.key)
+                  "
                   @assimilate="
                     emit('assimilate', {
                       skipMemoryTracking: false,
@@ -71,6 +74,9 @@
                   "
                   @skip="emit('skip', { propertyKey: row.key })"
                   @revive="emit('revive', { propertyKey: row.key })"
+                  @return-to-sequence="
+                    emit('returnToSequence', { propertyKey: row.key })
+                  "
                 />
               </span>
             </li>
@@ -97,7 +103,7 @@
           :assimilate-disabled="assimilateDisabled"
           :skipped-for-recall="isSkippedForRecall(noteRecallInfo)"
           :skipped-from-assimilation-sequence="
-            noteRecallInfo?.skippedFromAssimilationSequence === true
+            isSkippedFromAssimilationSequence(noteRecallInfo)
           "
           :show-remove-from-recall="showRemoveFromRecall"
           :show-commissioned-option="showCommissionedOption"
@@ -117,7 +123,7 @@
             })
           "
           @revive="emit('revive', {})"
-          @return-to-sequence="emit('returnToSequence')"
+          @return-to-sequence="emit('returnToSequence', {})"
           @remove-from-recall="emit('removeFromRecall')"
         />
       </div>
@@ -138,6 +144,7 @@ import AssimilationButtons from "./AssimilationButtons.vue"
 import AssimilationProgressSummary from "./AssimilationProgressSummary.vue"
 import RefineNoteModal from "./RefineNoteModal.vue"
 import type { AssimilateEvent } from "@/composables/useAssimilateUnit"
+import { isSkippedFromAssimilationSequence } from "@/composables/useAssimilationSequenceSkip"
 import { isSkippedForRecall } from "@/composables/useReviveMemoryTracker"
 import { relationTypeLabelFromNoteContent } from "@/models/relationTypeOptions"
 import {
@@ -166,7 +173,7 @@ const emit = defineEmits<{
   (e: "assimilate", request: AssimilateEvent): void
   (e: "skip", request: { propertyKey?: string }): void
   (e: "revive", request: { propertyKey?: string }): void
-  (e: "returnToSequence"): void
+  (e: "returnToSequence", request: { propertyKey?: string }): void
   (e: "removeFromRecall"): void
   (e: "refinementContentUpdated"): void
 }>()

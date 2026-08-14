@@ -55,6 +55,17 @@ class NoteControllerNoteInfoTests extends ControllerTestBase {
 
     NoteRecallInfo noteRecallInfo = controller.getNoteInfo(note);
 
-    assertThat(noteRecallInfo.isSkippedFromAssimilationSequence(), is(true));
+    assertThat(noteRecallInfo.getSkippedPropertyKeys(), contains(""));
+  }
+
+  @Test
+  void shouldIncludeSkippedPropertyKeysWhenPropertySkipRowExists()
+      throws UnexpectedNoAccessRightException {
+    Note note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
+    makeMe.anAssimilationSequenceSkipFor(note).propertyKey("topic").please();
+
+    NoteRecallInfo noteRecallInfo = controller.getNoteInfo(note);
+
+    assertThat(noteRecallInfo.getSkippedPropertyKeys(), contains("topic"));
   }
 }

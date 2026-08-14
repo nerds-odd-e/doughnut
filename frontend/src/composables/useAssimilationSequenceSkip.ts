@@ -1,9 +1,24 @@
+import type { NoteRecallInfo } from "@generated/doughnut-backend-api"
 import { AssimilationSequenceSkipController } from "@generated/doughnut-backend-api/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import { useGoToNextAssimilation } from "@/composables/useGoToNextAssimilation"
 
 export const SEQUENCE_SKIP_CONFIRM =
   "Leave this note out of the assimilation sequence?"
+
+export function isSkippedFromAssimilationSequence(
+  noteRecallInfo: NoteRecallInfo | null | undefined,
+  propertyKey?: string
+): boolean {
+  return (
+    noteRecallInfo?.skippedPropertyKeys?.includes(propertyKey ?? "") === true
+  )
+}
+
+const skipRequestBody = (noteId: number, propertyKey?: string) => ({
+  noteId,
+  ...(propertyKey ? { propertyKey } : {}),
+})
 
 export function useAssimilationSequenceSkip() {
   const { goToNextAssimilation } = useGoToNextAssimilation()
@@ -15,10 +30,7 @@ export function useAssimilationSequenceSkip() {
     const { error } = await apiCallWithLoading(
       () =>
         AssimilationSequenceSkipController.create({
-          body: {
-            noteId,
-            ...(propertyKey ? { propertyKey } : {}),
-          },
+          body: skipRequestBody(noteId, propertyKey),
         }),
       { blockUi: true, message: "Skipping..." }
     )
@@ -32,12 +44,13 @@ export function useAssimilationSequenceSkip() {
   }
 
   const returnToAssimilationSequence = async (
-    noteId: number
+    noteId: number,
+    propertyKey?: string
   ): Promise<boolean> => {
     const { error } = await apiCallWithLoading(
       () =>
         AssimilationSequenceSkipController.deleteAssimilationSequenceSkip({
-          body: { noteId },
+          body: skipRequestBody(noteId, propertyKey),
         }),
       { blockUi: true, message: "Returning to sequence..." }
     )

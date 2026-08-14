@@ -83,6 +83,19 @@ Then('I should see Skip for property {string}', (propertyKey: string) => {
   start.assumeAssimilationPage().expectSkipForProperty(propertyKey)
 })
 
+Then(
+  'I should see Return to sequence for property {string}',
+  (propertyKey: string) => {
+    start
+      .assumeAssimilationPage()
+      .expectReturnToSequenceForProperty(propertyKey)
+  }
+)
+
+When('I return property {string} to the sequence', (propertyKey: string) => {
+  start.assumeAssimilationPage().returnPropertyToSequenceOnPanel(propertyKey)
+})
+
 Then('I should see Skip on the assimilation panel', () => {
   start.assumeAssimilationPage().expectSkipOnPanel()
 })
