@@ -36,6 +36,16 @@ describe("MemoryTrackerPageView display", () => {
     expect(wrapper.text()).not.toContain("Focused property:")
   })
 
+  it("shows memory tracker type", async () => {
+    const wrapper = await mountMemoryTrackerPageViewReady({
+      recallPrompts: [],
+      memoryTracker: makeMe.aMemoryTracker.spelling().please(),
+    })
+
+    expect(wrapper.text()).toContain("Type:")
+    expect(wrapper.text()).toContain("SPELLING")
+  })
+
   it.each([
     { thinkingTimeMs: 5234, expected: "Thinking time: 5.2s" },
     { thinkingTimeMs: 500, expected: "Thinking time: 500ms" },

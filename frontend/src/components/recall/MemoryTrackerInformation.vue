@@ -42,9 +42,9 @@
           </span>
         </div>
         <div>
-          <span class="font-semibold">Spelling:</span>
+          <span class="font-semibold">Type:</span>
           <span class="ml-2">
-            {{ memoryTracker.spelling ? "Yes" : "No" }}
+            {{ memoryTracker.type }}
           </span>
         </div>
       </div>

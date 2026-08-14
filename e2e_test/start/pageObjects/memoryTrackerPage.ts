@@ -64,11 +64,11 @@ const assumeMemoryTrackerPage = () => {
         })
       return assumeMemoryTrackerPage()
     },
-    expectSpellingEnabled() {
+    expectTrackerType(type: string) {
       expectMemoryTrackerPage()
-      cy.contains('span.font-semibold', 'Spelling:')
+      cy.contains('span.font-semibold', 'Type:')
         .parent()
-        .should('contain', 'Yes')
+        .should('contain', type)
       return assumeMemoryTrackerPage()
     },
     expectNoteTitle(noteTitle: string) {

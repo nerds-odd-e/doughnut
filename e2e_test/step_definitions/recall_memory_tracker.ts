@@ -24,7 +24,9 @@ Then(
       .goToLastAnsweredQuestion()
       .expectSpellingAnswerToBeCorrect()
       .viewMemoryTracker()
-    assumeMemoryTrackerPage().expectRecallCount(count).expectSpellingEnabled()
+    assumeMemoryTrackerPage()
+      .expectRecallCount(count)
+      .expectTrackerType('SPELLING')
   }
 )
 
