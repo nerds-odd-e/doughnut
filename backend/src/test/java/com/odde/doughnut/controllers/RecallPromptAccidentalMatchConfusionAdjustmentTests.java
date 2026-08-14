@@ -2,6 +2,8 @@ package com.odde.doughnut.controllers;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import com.odde.doughnut.controllers.dto.AnswerSpellingDTO;
@@ -9,6 +11,7 @@ import com.odde.doughnut.entities.ForgettingCurve;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.RecallPrompt;
+import com.odde.doughnut.entities.repositories.MemoryTrackerRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.MemoryTrackerService;
 import java.sql.Timestamp;
@@ -19,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 class RecallPromptAccidentalMatchConfusionAdjustmentTests extends RecallPromptControllerTestBase {
 
   @Autowired MemoryTrackerService memoryTrackerService;
+  @Autowired MemoryTrackerRepository memoryTrackerRepository;
 
   MemoryTracker promptedTracker;
   MemoryTracker matchedSpellingTracker;
@@ -29,8 +33,7 @@ class RecallPromptAccidentalMatchConfusionAdjustmentTests extends RecallPromptCo
   void setup() {
     promptedTracker = ownedSpellingTracker(ownedNote());
     recallPrompt = spellingPrompt(promptedTracker);
-    Note matchedNote =
-        makeMe.aNote().notebookOwnedBy(currentUser.getUser()).title("Another Note Title").please();
+    Note matchedNote = ownedNoteTitled("Another Note Title");
     matchedSpellingTracker = ownedSpellingTracker(matchedNote);
     answerDTO = spellingAnswer(matchedNote.getTitle());
   }
@@ -60,9 +63,7 @@ class RecallPromptAccidentalMatchConfusionAdjustmentTests extends RecallPromptCo
     assertThat(
         memoryTrackerService.countWrongAnswersInPeriod(matchedSpellingTracker, now, 14),
         equalTo(wrongCountBefore));
-    assertThat(
-        recallPrompt.getAnswer().getConfusionAdjustedMemoryTracker().getId(),
-        equalTo(matchedSpellingTracker.getId()));
+    assertLinkedConfusionAdjustedTracker(matchedSpellingTracker);
   }
 
   @Test
@@ -88,5 +89,117 @@ class RecallPromptAccidentalMatchConfusionAdjustmentTests extends RecallPromptCo
     controller.answerSpelling(recallPrompt, answerDTO);
 
     assertFalse(matchedSpellingTracker.getNextRecallAt().after(alreadyDue));
+  }
+
+  @Test
+  void shouldWeakenUniqueMatchedUnderstandingTrackerWhenSpellingIsAbsent()
+      throws UnexpectedNoAccessRightException {
+    Note understandingNote = ownedNoteTitled("Understanding Match Title");
+    MemoryTracker understandingTracker = ownedTracker(understandingNote);
+    answerDTO = spellingAnswer(understandingNote.getTitle());
+    float strengthBefore = understandingTracker.getForgettingCurveIndex();
+
+    controller.answerSpelling(recallPrompt, answerDTO);
+
+    assertThat(
+        understandingTracker.getForgettingCurveIndex(),
+        equalTo(strengthBefore - ForgettingCurve.DEFAULT_FORGETTING_CURVE_INDEX_INCREMENT));
+    assertLinkedConfusionAdjustedTracker(understandingTracker);
+  }
+
+  @Test
+  void shouldPreferActiveSpellingWhenUnderstandingAlsoExists()
+      throws UnexpectedNoAccessRightException {
+    MemoryTracker understandingTracker = ownedTracker(matchedSpellingTracker.getNote());
+    float understandingStrengthBefore = understandingTracker.getForgettingCurveIndex();
+
+    controller.answerSpelling(recallPrompt, answerDTO);
+
+    assertLinkedConfusionAdjustedTracker(matchedSpellingTracker);
+    assertThat(
+        understandingTracker.getForgettingCurveIndex(), equalTo(understandingStrengthBefore));
+  }
+
+  @Test
+  void shouldFallBackToUnderstandingWhenSpellingIsRemovedFromRecall()
+      throws UnexpectedNoAccessRightException {
+    MemoryTracker understandingTracker = ownedTracker(matchedSpellingTracker.getNote());
+    matchedSpellingTracker.setRemovedFromTracking(true);
+    makeMe.entityPersister.save(matchedSpellingTracker);
+
+    controller.answerSpelling(recallPrompt, answerDTO);
+
+    assertLinkedConfusionAdjustedTracker(understandingTracker);
+  }
+
+  @Test
+  void shouldFallBackToUnderstandingWhenSpellingIsDeleted()
+      throws UnexpectedNoAccessRightException {
+    MemoryTracker understandingTracker = ownedTracker(matchedSpellingTracker.getNote());
+    matchedSpellingTracker.setDeletedAt(testabilitySettings.getCurrentUTCTimestamp());
+    makeMe.entityPersister.save(matchedSpellingTracker);
+
+    controller.answerSpelling(recallPrompt, answerDTO);
+
+    assertLinkedConfusionAdjustedTracker(understandingTracker);
+  }
+
+  @Test
+  void shouldNotSelectPropertyTracker() throws UnexpectedNoAccessRightException {
+    Note note = ownedNoteTitled("Property Match Title");
+    MemoryTracker propertyTracker =
+        makeMe
+            .aMemoryTrackerFor(note)
+            .forgettingCurveAndNextRecallAt(200.0f)
+            .propertyKey("topic")
+            .please();
+    assertIneligibleTrackerIsUnchangedAndUnlinked(note, propertyTracker);
+  }
+
+  @Test
+  void shouldNotSelectCommissionedTracker() throws UnexpectedNoAccessRightException {
+    Note note = ownedNoteTitled("Commissioned Match Title");
+    MemoryTracker commissionedTracker =
+        makeMe
+            .aMemoryTrackerFor(note)
+            .forgettingCurveAndNextRecallAt(200.0f)
+            .commissioned()
+            .please();
+    assertIneligibleTrackerIsUnchangedAndUnlinked(note, commissionedTracker);
+  }
+
+  @Test
+  void shouldNotCreateOrLinkTrackerWhenMatchedNoteHasNoneEligible()
+      throws UnexpectedNoAccessRightException {
+    Note note = ownedNoteTitled("Bare Match Title");
+    answerDTO = spellingAnswer(note.getTitle());
+
+    controller.answerSpelling(recallPrompt, answerDTO);
+
+    assertThat(recallPrompt.getAnswer().getConfusionAdjustedMemoryTracker(), nullValue());
+    assertThat(
+        memoryTrackerRepository.findByUserAndNote(currentUser.getUser().getId(), note.getId()),
+        hasSize(0));
+  }
+
+  private Note ownedNoteTitled(String title) {
+    return makeMe.aNote().notebookOwnedBy(currentUser.getUser()).title(title).please();
+  }
+
+  private void assertLinkedConfusionAdjustedTracker(MemoryTracker tracker) {
+    assertThat(
+        recallPrompt.getAnswer().getConfusionAdjustedMemoryTracker().getId(),
+        equalTo(tracker.getId()));
+  }
+
+  private void assertIneligibleTrackerIsUnchangedAndUnlinked(Note note, MemoryTracker tracker)
+      throws UnexpectedNoAccessRightException {
+    float strengthBefore = tracker.getForgettingCurveIndex();
+    answerDTO = spellingAnswer(note.getTitle());
+
+    controller.answerSpelling(recallPrompt, answerDTO);
+
+    assertThat(recallPrompt.getAnswer().getConfusionAdjustedMemoryTracker(), nullValue());
+    assertThat(tracker.getForgettingCurveIndex(), equalTo(strengthBefore));
   }
 }

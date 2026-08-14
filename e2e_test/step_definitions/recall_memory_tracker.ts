@@ -6,6 +6,16 @@ import { Then, When } from '@badeball/cypress-cucumber-preprocessor'
 import start from '../start'
 import { assumeMemoryTrackerPage } from '../start/pageObjects/memoryTrackerPage'
 
+function openNoteLevelTracker(
+  noteTitle: string,
+  kind: 'understanding' | 'spelling'
+) {
+  return start
+    .jumpToNotePage(noteTitle)
+    .openAssimilationSettings()
+    .openNoteLevelMemoryTracker(kind === 'spelling' ? 'spelling' : 'normal')
+}
+
 Then(
   'I should see the incorrect grade time as Last Recall Time for my last answer',
   () => {
@@ -30,18 +40,43 @@ Then(
   }
 )
 
+Then(
+  'I should see the understanding memory tracker with recall count {int}',
+  (count: number) => {
+    assumeMemoryTrackerPage()
+      .expectRecallCount(count)
+      .expectTrackerType('UNDERSTANDING')
+  }
+)
+
 Then('I record the current memory tracker schedule', () => {
   assumeMemoryTrackerPage().captureSchedule()
 })
 
+When(
+  'I visit the understanding memory tracker for {string}',
+  (noteTitle: string) => {
+    openNoteLevelTracker(noteTitle, 'understanding')
+  }
+)
+
 Then(
   'the spelling memory tracker for {string} should be brought forward without recall credit',
   (noteTitle: string) => {
-    start
-      .jumpToNotePage(noteTitle)
-      .openAssimilationSettings()
-      .openNoteLevelMemoryTracker('spelling')
-      .expectBroughtForwardWithoutRecallCredit()
+    openNoteLevelTracker(
+      noteTitle,
+      'spelling'
+    ).expectBroughtForwardWithoutRecallCredit()
+  }
+)
+
+Then(
+  'the understanding memory tracker for {string} should be brought forward without recall credit',
+  (noteTitle: string) => {
+    openNoteLevelTracker(
+      noteTitle,
+      'understanding'
+    ).expectBroughtForwardWithoutRecallCredit()
   }
 )
 

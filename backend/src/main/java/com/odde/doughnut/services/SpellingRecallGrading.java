@@ -108,7 +108,7 @@ final class SpellingRecallGrading {
         gradedAnswer.setOutcome(AnswerOutcome.ACCIDENTAL_MATCH);
         if (matches.size() == 1) {
           memoryTrackerService
-              .findActiveNoteLevelSpellingTracker(user, matches.getFirst())
+              .findConfusionAdjustmentTracker(user, matches.getFirst())
               .ifPresent(
                   target -> {
                     memoryTrackerService.applyConfusionAdjustment(target);

@@ -1,6 +1,6 @@
 # Accidental-match confusion adjustment
 
-**Status:** in progress (Phase 4 next)  
+**Status:** in progress (Phase 5 next)  
 **Type mix:** Behavior and Structure  
 **Context:** [CONTEXT.md](CONTEXT.md)
 
@@ -23,7 +23,7 @@ tracker and still permits retry.
 | 1 | Behavior | done | Accidental match fully fails the prompted spelling tracker |
 | 2 | Structure | done | An answer can durably identify one confusion-adjusted tracker |
 | 3 | Behavior | done | A unique matched spelling tracker receives the weaker adjustment without recall credit |
-| 4 | Behavior | planned | A unique matched understanding tracker is used when no active spelling tracker exists |
+| 4 | Behavior | done | A unique matched understanding tracker is used when no active spelling tracker exists |
 | 5 | Behavior | planned | Ambiguous matches adjust none of the matched trackers |
 | 6 | Behavior | planned | Declared overlap leaves both trackers unchanged |
 
@@ -61,40 +61,14 @@ advance `lastRecalledAt` or `recallCount`.
   Anchor, `recallCount`, and failed-recall count stay put. Answer links
   `confusionAdjustedMemoryTracker`. Selection only when `matches.size() == 1`.
 
-**Learning for Phase 4:** `findActiveNoteLevelSpellingTracker` is the
-prefer-spelling seam; extend it for understanding fallback rather than
-branching beside it.
-
 ## Phase 4 — Fall back to the understanding tracker
 
 - **Type:** Behavior
-- **Status:** planned
-- **Precondition:** The accidental answer uniquely matches accessible B; B has
-  no active spelling tracker and has an active note-level understanding tracker.
-- **Trigger:** Submit the spelling answer for A.
-- **Postcondition:** Apply the same secondary confusion adjustment to B's
-  understanding tracker. A still receives full failure.
-
-### Test-first work
-
-1. Add the controller-boundary fallback case and confirm it fails while only
-   spelling trackers are eligible.
-2. Add the corresponding E2E scenario using an understanding-assimilated B and
-   observe its earlier due projection with unchanged recall count/anchor.
-3. Generalize target selection only enough to prefer active spelling, then
-   active note-level understanding.
-4. Cover eligibility deltas at the same boundary: active spelling wins when
-   both exist; removed/deleted spelling falls back to active understanding;
-   property and commissioned trackers are never selected; no eligible tracker
-   means no tracker is created or linked.
-
-### Verification
-
-- `CURSOR_DEV=true nix develop -c pnpm backend:test_only`
-- Targeted Cypress spec for accidental-match scheduling.
-
-**Stop-safe value:** Learners who track B's understanding but not its spelling
-still receive the weaker confusion signal on the best existing tracker.
+- **Status:** done
+- **Shipped:** `findConfusionAdjustmentTracker` prefers active note-level
+  spelling, then active note-level understanding. Same `adjustForConfusion`.
+  Property, commissioned, removed, and deleted trackers are never selected;
+  no tracker is created when none is eligible.
 
 ## Phase 5 — Leave ambiguous matched trackers unchanged
 

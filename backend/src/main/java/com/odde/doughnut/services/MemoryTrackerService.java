@@ -92,12 +92,16 @@ public class MemoryTrackerService {
     return false;
   }
 
-  public Optional<MemoryTracker> findActiveNoteLevelSpellingTracker(User user, Note note) {
-    return userService.getMemoryTrackersFor(user, note).stream()
-        .filter(MemoryTracker::isActive)
-        .filter(MemoryTracker::isNoteLevelTracker)
+  public Optional<MemoryTracker> findConfusionAdjustmentTracker(User user, Note note) {
+    List<MemoryTracker> activeNoteLevel =
+        userService.getMemoryTrackersFor(user, note).stream()
+            .filter(MemoryTracker::isActive)
+            .filter(MemoryTracker::isNoteLevelTracker)
+            .toList();
+    return activeNoteLevel.stream()
         .filter(MemoryTracker::isSpelling)
-        .findFirst();
+        .findFirst()
+        .or(() -> activeNoteLevel.stream().filter(MemoryTracker::isUnderstanding).findFirst());
   }
 
   public void applyConfusionAdjustment(MemoryTracker tracker) {
