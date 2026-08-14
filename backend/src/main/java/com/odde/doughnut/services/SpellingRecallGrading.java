@@ -99,20 +99,19 @@ final class SpellingRecallGrading {
       return new MemoryTrackerService.SpellingAnswerResult(recallPrompt, List.of());
     }
 
+    List<Note> matches = List.of();
     if (!correct && spellingAnswer != null && !spellingAnswer.isBlank()) {
-      List<Note> matches = wikiLinkResolver.findAllAccidentalMatches(spellingAnswer, note, user);
+      matches = wikiLinkResolver.findAllAccidentalMatches(spellingAnswer, note, user);
       if (!matches.isEmpty()) {
         Answer gradedAnswer = recallPrompt.getAnswer();
         gradedAnswer.setMatchedNoteId(matches.getFirst().getId().longValue());
         gradedAnswer.setOutcome(AnswerOutcome.ACCIDENTAL_MATCH);
-        markAsAccidentalMatch(currentUTCTimestamp, memoryTracker);
-        return new MemoryTrackerService.SpellingAnswerResult(recallPrompt, matches);
       }
     }
 
     memoryTrackerService.markAsRecalled(
         currentUTCTimestamp, correct, memoryTracker, answerSpellingDTO.getThinkingTimeMs());
-    return new MemoryTrackerService.SpellingAnswerResult(recallPrompt, List.of());
+    return new MemoryTrackerService.SpellingAnswerResult(recallPrompt, matches);
   }
 
   private boolean isNonDistinguishingOverlap(Note reviewedNote, String spellingAnswer, User user) {
@@ -136,11 +135,5 @@ final class SpellingRecallGrading {
       }
     }
     return false;
-  }
-
-  private void markAsAccidentalMatch(Timestamp currentUTCTimestamp, MemoryTracker memoryTracker) {
-    memoryTracker.markAsAccidentalMatch(currentUTCTimestamp);
-    entityPersister.save(memoryTracker);
-    memoryTrackerService.isThresholdExceeded(memoryTracker, currentUTCTimestamp);
   }
 }

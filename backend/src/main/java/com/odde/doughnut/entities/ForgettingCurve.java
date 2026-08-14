@@ -68,8 +68,4 @@ public class ForgettingCurve {
   public float failed() {
     return add(-DEFAULT_FORGETTING_CURVE_INDEX_INCREMENT * 2);
   }
-
-  public float partialFail() {
-    return add(-DEFAULT_FORGETTING_CURVE_INDEX_INCREMENT);
-  }
 }

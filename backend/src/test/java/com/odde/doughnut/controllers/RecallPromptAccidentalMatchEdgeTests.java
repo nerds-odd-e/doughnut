@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import com.odde.doughnut.controllers.dto.AnswerSpellingDTO;
 import com.odde.doughnut.controllers.dto.AnsweredQuestion;
 import com.odde.doughnut.controllers.dto.NoteTopology;
+import com.odde.doughnut.entities.AnswerOutcome;
 import com.odde.doughnut.entities.ForgettingCurve;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
@@ -62,17 +63,19 @@ class RecallPromptAccidentalMatchEdgeTests extends RecallPromptControllerTestBas
   }
 
   @Test
-  void shouldAdvanceRecallAnchorWithPartialFailureSchedule()
+  void shouldApplyOrdinaryIncorrectFailureScheduleOnAccidentalMatch()
       throws UnexpectedNoAccessRightException {
     testabilitySettings.timeTravelTo(memoryTracker.getNextRecallAt());
     var gradeTime = testabilitySettings.getCurrentUTCTimestamp();
+    Integer oldRecallCount = memoryTracker.getRecallCount();
     controller.answerSpelling(recallPrompt, answerDTO);
 
-    assertThat(memoryTracker.getForgettingCurveIndex(), equalTo(190.0f));
+    assertThat(memoryTracker.getForgettingCurveIndex(), equalTo(180.0f));
+    assertThat(memoryTracker.getRecallCount(), equalTo(oldRecallCount + 1));
     assertThat(memoryTracker.getLastRecalledAt(), equalTo(gradeTime));
     assertThat(
         memoryTracker.getNextRecallAt(),
-        not(equalTo(TimestampOperations.addHoursToTimestamp(gradeTime, 12))));
+        equalTo(TimestampOperations.addHoursToTimestamp(gradeTime, 12)));
   }
 
   @Test
@@ -141,7 +144,9 @@ class RecallPromptAccidentalMatchEdgeTests extends RecallPromptControllerTestBas
     }
     assertThat(memoryTrackerService.isThresholdExceeded(memoryTracker, now), is(false));
 
-    controller.answerSpelling(spellingPrompt(memoryTracker), answerDTO);
+    AnsweredQuestion lastAnswer =
+        controller.answerSpelling(spellingPrompt(memoryTracker), answerDTO);
+    assertThat(lastAnswer.getAnswer().getOutcome(), is(AnswerOutcome.ACCIDENTAL_MATCH));
     assertThat(memoryTrackerService.isThresholdExceeded(memoryTracker, now), is(true));
   }
 }

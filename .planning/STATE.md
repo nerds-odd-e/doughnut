@@ -2,19 +2,19 @@
 gsd_state_version: 1.0
 milestone: null
 milestone_name: null
-current_phase: null
-current_phase_name: null
-status: idle
+current_phase: 2
+current_phase_name: Durable causal link to one adjusted tracker
+status: executing
 stopped_at: null
-last_updated: "2026-08-14T08:15:00Z"
+last_updated: "2026-08-14T16:27:00Z"
 last_activity: 2026-08-14
-last_activity_desc: 004-skip-assimilation-cleanup finished; spent planning files removed
+last_activity_desc: 003 Phase 1 done — accidental match fully fails prompted spelling tracker
 progress:
-  total_phases: 0
-  completed_phases: 0
-  total_plans: 0
+  total_phases: 6
+  completed_phases: 1
+  total_plans: 1
   completed_plans: 0
-  percent: 0
+  percent: 17
 ---
 
 # Project State
@@ -27,7 +27,7 @@ See: `.planning/PROJECT.md`
 
 ## Current Position
 
-No active execute-plan. Skip-assimilation cleanup shipped: shared JDBC conversion harness, shared assimilation selector helpers, tracker page shows type instead of the legacy spelling boolean.
+Executing `.planning/quick/003-accidental-match-confusion-adjustment/` Phase 2: nullable `quiz_answer` FK to the confusion-adjusted tracker. Phase 1 shipped: accidental match fully fails prompted tracker A.
 
 **Ops leftover:** gated dummy-skip conversions. Enable on the deploy that first applies each version, then revert to `1=0`:
 - `dummy_note_sequence_skip_convert` (`V300000254`)
@@ -42,4 +42,4 @@ JDBC harnesses remain temporary until those production applications.
 
 - Enable dummy-skip conversion placeholders on the deploys that first apply V300000254 / V300000255
 - Continue ADR 0003: resolve open issues in `.planning/research/FSRS-COMPATIBILITY-GAP.md`
-- Or queued quick plan `.planning/quick/003-accidental-match-confusion-adjustment/` if that workstream is next
+- Continue execute-plan `.planning/quick/003-accidental-match-confusion-adjustment/` (Phase 2 next)

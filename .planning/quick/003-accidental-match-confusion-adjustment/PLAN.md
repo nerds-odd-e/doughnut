@@ -1,6 +1,6 @@
 # Accidental-match confusion adjustment
 
-**Status:** planned; do not execute without a separate instruction  
+**Status:** in progress (Phase 2 next)  
 **Type mix:** Behavior and Structure  
 **Context:** [CONTEXT.md](CONTEXT.md)
 
@@ -20,7 +20,7 @@ tracker and still permits retry.
 
 | # | Type | Status | One outcome |
 |---|---|---|---|
-| 1 | Behavior | planned | Accidental match fully fails the prompted spelling tracker |
+| 1 | Behavior | done | Accidental match fully fails the prompted spelling tracker |
 | 2 | Structure | planned | An answer can durably identify one confusion-adjusted tracker |
 | 3 | Behavior | planned | A unique matched spelling tracker receives the weaker adjustment without recall credit |
 | 4 | Behavior | planned | A unique matched understanding tracker is used when no active spelling tracker exists |
@@ -30,37 +30,16 @@ tracker and still permits retry.
 ## Phase 1 — Full failure for the prompted spelling tracker
 
 - **Type:** Behavior
-- **Status:** planned
-- **Precondition:** A spelling tracker for A is under recall; the submitted
-  answer fails A and matches at least one accessible note; the answer is not a
-  declared overlap.
-- **Trigger:** Submit the spelling answer.
-- **Postcondition:** The answer remains `ACCIDENTAL_MATCH`, while A receives the
-  ordinary incorrect memory-state transition: full strength reduction,
-  `recallCount + 1`, `lastRecalledAt` at grade time, and the ordinary relearning
-  projection. The existing reveal remains available.
+- **Status:** done
+- **Shipped:** Accidental match still sets `ACCIDENTAL_MATCH` and returns
+  matched notes for the reveal, then falls through to ordinary
+  `markAsRecalled` / `recallFailed` for A (index 180, `recallCount + 1`,
+  grade-time `lastRecalledAt`, 12-hour relearning). Removed unused
+  `MemoryTracker.markAsAccidentalMatch` and `ForgettingCurve.partialFail`.
 
-### Test-first work
-
-1. Change the controller-boundary scheduling assertion in
-   `RecallPromptAccidentalMatchEdgeTests` from partial failure to ordinary
-   incorrect failure; confirm the focused backend suite fails for the old
-   schedule.
-2. Extend the accidental-match E2E behavior to inspect A's Memory Tracker page
-   and observe the incorrect-recall interval after submitting the accidental
-   answer.
-3. Route the accidental branch through the ordinary failed-recall transition;
-   remove the prompted-tracker partial-failure path if it becomes unused.
-4. Keep or tighten the existing threshold test: A counts as a failed recall,
-   while the answer outcome remains distinct for the UI.
-
-### Verification
-
-- `CURSOR_DEV=true nix develop -c pnpm backend:test_only`
-- Targeted Cypress spec for accidental-match scheduling/reveal.
-
-**Stop-safe value:** Even without later phases, the tracker actually prompted
-is graded consistently with the failed recall.
+**Learning for Phase 3:** Do not resurrect `markAsAccidentalMatch`. The weaker
+confusion adjustment must be a new tracker operation that does **not**
+advance `lastRecalledAt` or `recallCount`.
 
 ## Phase 2 — Durable causal link to one adjusted tracker
 
@@ -220,7 +199,6 @@ from both the primary failure and the new secondary adjustment.
 
 ## Cross-phase constraints
 
-- Preserve unrelated worktree edits; another quick plan is currently active.
 - Do not hand-edit generated OpenAPI/TypeScript artifacts. The planned internal
   relationship should be JSON-hidden; if the wire shape changes unexpectedly,
   use the `generate-api-client` skill and regenerate.

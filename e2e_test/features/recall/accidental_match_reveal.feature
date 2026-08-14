@@ -22,6 +22,13 @@ Feature: Accidental match reveal
     When I type my answer "sedation"
     Then I should see an accidental match reveal for spelling answer "sedation" with reviewed note "sedition" and matched note "sedation"
 
+  Scenario: Accidental match schedules prompted tracker with incorrect-recall interval
+    When I visit recall for a due quiz question on day 2
+    Then I should be asked spelling question "means incite violence" from notebook "English practice"
+    When I type my answer "sedation"
+    Then I should see an accidental match reveal for spelling answer "sedation" with reviewed note "sedition" and matched note "sedation"
+    And I should see the incorrect grade time as Last Recall Time for my last answer
+
   Scenario: Offer adds the matched note as a wiki property without leaving the result
     When I visit recall for a due quiz question on day 2
     Then I should be asked spelling question "means incite violence" from notebook "English practice"
