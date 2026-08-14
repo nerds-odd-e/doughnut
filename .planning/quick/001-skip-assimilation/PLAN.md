@@ -1,6 +1,6 @@
 # Assimilation-sequence skip
 
-**Status:** in progress (Phase 5 next)  
+**Status:** in progress (Phase 6 next)  
 **Type mix:** Structure then Behavior
 
 Each phase is one commit: **Behavior** (one observable) or **Structure** (only what the **immediate next** behavior needs). Size for ~5 minutes wall-clock including targeted tests.
@@ -91,7 +91,7 @@ Permanent artifacts stay capability-named (no phase numbers in product files).
 | 2 | Structure | Table `assimilation_sequence_skip` (done) |
 | 3 | Structure | POST skip + `/next` excludes skip rows (done) |
 | 4 | Behavior | Skip on the panel leaves the sequence with no dummy tracker (done) |
-| 5 | Behavior | Assimilate (understanding) a skipped note |
+| 5 | Behavior | Assimilate (understanding) a skipped note (done) |
 | 6 | Behavior | Remember spelling a skipped note |
 | 7 | Behavior | Assimilate as commissioned a skipped note |
 | 8 | Behavior | Migrate note-level dummy skips (`recall_count = 0`) |
@@ -151,17 +151,9 @@ Permanent artifacts stay capability-named (no phase numbers in product files).
 ## Phase 5 — Assimilate a skipped note (understanding)
 
 - **Type:** Behavior  
-- **Status:** planned
+- **Status:** done
 
-**Pre-condition:** Note has a sequence-skip row and no understanding tracker.  
-**Trigger:** Learner **Assimilate**s that note from assimilation settings.  
-**Post-condition:** Understanding tracker exists; skip row gone; note not in the sequence; daily cap counts this assimilate.
-
-**Tests:** E2E in `assimilation_walkthrough.feature` (open skipped note, assimilate). Controller: assimilate deletes matching skip row.
-
-**Command:** `CURSOR_DEV=true nix develop -c pnpm backend:test_only` and the walkthrough spec above.
-
-**Done when:** Ordinary assimilate from a skipped note works and restores the XOR invariant.
+**Done:** Understanding assimilate deletes the matching sequence-skip row (same grain as the tracker). Spelling/commissioned do not. E2E: skip then assimilate from the note; daily cap counts; XOR restored.
 
 ---
 

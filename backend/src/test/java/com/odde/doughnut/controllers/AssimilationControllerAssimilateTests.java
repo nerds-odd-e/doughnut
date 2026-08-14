@@ -6,9 +6,11 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import com.odde.doughnut.controllers.dto.AssimilationRequestDTO;
 import com.odde.doughnut.entities.*;
+import com.odde.doughnut.entities.repositories.AssimilationSequenceSkipRepository;
 import com.odde.doughnut.entities.repositories.MemoryTrackerRepository;
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -17,6 +19,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 class AssimilationControllerAssimilateTests extends ControllerTestBase {
   @Autowired private MemoryTrackerRepository memoryTrackerRepository;
+  @Autowired private AssimilationSequenceSkipRepository skipRepository;
   @Autowired AssimilationController controller;
 
   @BeforeEach
@@ -42,6 +45,18 @@ class AssimilationControllerAssimilateTests extends ControllerTestBase {
 
       assertThat(result, hasSize(1));
       assertThat(result.get(0).getType(), equalTo(MemoryTrackerType.UNDERSTANDING));
+    }
+
+    @Test
+    void assimilatingSkippedNoteDeletesMatchingSkipRow() {
+      Note note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
+      makeMe.anAssimilationSequenceSkipFor(note).please();
+
+      controller.assimilate(AssimilationControllerTestSupport.assimilateRequest(note));
+
+      assertThat(
+          skipRepository.findByUserAndNoteAndPropertyKey(currentUser.getUser(), note, ""),
+          is(Optional.empty()));
     }
 
     @Test

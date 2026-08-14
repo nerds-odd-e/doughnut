@@ -5,6 +5,7 @@ import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.MemoryTrackerType;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
+import com.odde.doughnut.entities.repositories.AssimilationSequenceSkipRepository;
 import com.odde.doughnut.factoryServices.EntityPersister;
 import java.sql.Timestamp;
 import java.util.List;
@@ -14,14 +15,17 @@ final class MemoryTrackerAssimilation {
   private final EntityPersister entityPersister;
   private final UserService userService;
   private final MemoryTrackerService memoryTrackerService;
+  private final AssimilationSequenceSkipRepository skipRepository;
 
   MemoryTrackerAssimilation(
       EntityPersister entityPersister,
       UserService userService,
-      MemoryTrackerService memoryTrackerService) {
+      MemoryTrackerService memoryTrackerService,
+      AssimilationSequenceSkipRepository skipRepository) {
     this.entityPersister = entityPersister;
     this.userService = userService;
     this.memoryTrackerService = memoryTrackerService;
+    this.skipRepository = skipRepository;
   }
 
   List<MemoryTracker> assimilate(
@@ -128,6 +132,16 @@ final class MemoryTrackerAssimilation {
     memoryTracker.setAssimilatedAt(currentTime);
     memoryTracker.setLastRecalledAt(currentTime);
     memoryTrackerService.updateForgettingCurve(memoryTracker, 0.0f);
+    if (type == MemoryTrackerType.UNDERSTANDING) {
+      deleteMatchingSequenceSkip(currentUser, memoryTracker);
+    }
     return memoryTracker;
+  }
+
+  private void deleteMatchingSequenceSkip(User currentUser, MemoryTracker memoryTracker) {
+    skipRepository
+        .findByUserAndNoteAndPropertyKey(
+            currentUser, memoryTracker.getNote(), memoryTracker.getPropertyKey())
+        .ifPresent(entityPersister::remove);
   }
 }

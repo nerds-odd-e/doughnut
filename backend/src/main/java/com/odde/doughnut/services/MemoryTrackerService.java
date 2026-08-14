@@ -7,6 +7,7 @@ import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.RecallPrompt;
 import com.odde.doughnut.entities.User;
+import com.odde.doughnut.entities.repositories.AssimilationSequenceSkipRepository;
 import com.odde.doughnut.entities.repositories.ConversationRepository;
 import com.odde.doughnut.entities.repositories.MemoryTrackerRepository;
 import com.odde.doughnut.entities.repositories.RecallPromptRepository;
@@ -36,13 +37,15 @@ public class MemoryTrackerService {
       MemoryTrackerRepository memoryTrackerRepository,
       RecallPromptRepository recallPromptRepository,
       ConversationRepository conversationRepository,
-      WikiLinkResolver wikiLinkResolver) {
+      WikiLinkResolver wikiLinkResolver,
+      AssimilationSequenceSkipRepository skipRepository) {
     this.entityPersister = entityPersister;
     this.userService = userService;
     this.memoryTrackerRepository = memoryTrackerRepository;
     this.recallPromptRepository = recallPromptRepository;
     this.conversationRepository = conversationRepository;
-    this.assimilation = new MemoryTrackerAssimilation(entityPersister, userService, this);
+    this.assimilation =
+        new MemoryTrackerAssimilation(entityPersister, userService, this, skipRepository);
     this.spellingRecallGrading =
         new SpellingRecallGrading(entityPersister, recallPromptRepository, wikiLinkResolver, this);
   }

@@ -62,3 +62,19 @@ Feature: Assimilation walkthrough
     When I jump to the note page of "Note 3"
     And I open assimilation settings
     Then I should see Skip on the assimilation panel
+
+  Scenario: Assimilating a skipped note creates understanding and leaves the sequence
+    Given It's day 1
+    When I start assimilation from the menu
+    Then I should be assimilating the note "Note 1"
+    When I skip on the assimilation panel
+    Then I should be assimilating the note "Note 2"
+    When I jump to the note page of "Note 1"
+    And I open assimilation settings
+    Then assimilate should be enabled
+    When I assimilate on the assimilation panel
+    Then I should be assimilating the note "Note 2"
+    And I should see assimilation progress "1/2/5"
+    When I jump to the note page of "Note 1"
+    And I open assimilation settings
+    Then assimilate should be disabled

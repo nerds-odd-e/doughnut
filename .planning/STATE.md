@@ -2,19 +2,19 @@
 gsd_state_version: 1.0
 milestone: null
 milestone_name: null
-current_phase: 5
-current_phase_name: Assimilate a skipped note
+current_phase: 6
+current_phase_name: Remember spelling a skipped note
 status: in_progress
-stopped_at: null
-last_updated: "2026-08-14T04:45:00Z"
+stopped_at: "Paused after Phase 5 wrap-up; resume execute-plan at Phase 6"
+last_updated: "2026-08-14T05:05:00Z"
 last_activity: 2026-08-14
-last_activity_desc: Phase 4 done — Skip panel writes sequence skip; next is assimilate skipped note
+last_activity_desc: Phases 1–5 done; next is remember spelling on a skipped note
 progress:
   total_phases: 17
-  completed_phases: 4
+  completed_phases: 5
   total_plans: 1
   completed_plans: 0
-  percent: 24
+  percent: 29
 ---
 
 # Project State
@@ -27,7 +27,7 @@ See: `.planning/PROJECT.md`
 
 ## Current Position
 
-Ad-hoc plan in progress: [`.planning/quick/001-skip-assimilation/PLAN.md`](quick/001-skip-assimilation/PLAN.md). **Phases 1–4 done.** Next: Phase 5 (Assimilate a sequence-skipped note; clear skip row).
+Ad-hoc plan in progress: [`.planning/quick/001-skip-assimilation/PLAN.md`](quick/001-skip-assimilation/PLAN.md). **Phases 1–5 done.** Next: Phase 6 (Remember spelling a sequence-skipped note; skip row remains).
 
 **Recently shipped:** note toolbar keeps on-state Audio/Assimilation on the bar; other actions overflow from the right into More options. Production hard-delete incident response (2026-08-12) — [MILESTONES.md](MILESTONES.md).
 
@@ -35,5 +35,5 @@ Ad-hoc plan in progress: [`.planning/quick/001-skip-assimilation/PLAN.md`](quick
 
 ## Operator Next Steps
 
-- Continue execute-plan: Phase 5 of `.planning/quick/001-skip-assimilation/PLAN.md`
+- Continue execute-plan: Phase 6 of `.planning/quick/001-skip-assimilation/PLAN.md`
 - Or continue ADR 0003: resolve open issues in `.planning/research/FSRS-COMPATIBILITY-GAP.md`
