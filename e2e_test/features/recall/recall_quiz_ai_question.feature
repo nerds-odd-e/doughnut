@@ -46,7 +46,7 @@ Feature: AI recall quiz
       | SibOne      | sibling one body                                       | peers  |
       | SibTwo      | sibling two body                                       | peers  |
       | FocusFolder | Focus only content                                     | peers  |
-    And the notes "SibOne, SibTwo" are skip-recalled
+    And the notes "SibOne, SibTwo" are skipped from the assimilation sequence
     And OpenAI generates these MCQs when focus context matches depth-two wiki path, folder siblings, and wiki-linked Bahamas note:
       | Question Stem              | Correct Choice | Incorrect Choice 1 | Incorrect Choice 2 |
       | How high is K2 in meters?  | 8611           | 3776               | 8849               |

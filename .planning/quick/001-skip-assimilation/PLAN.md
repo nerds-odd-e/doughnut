@@ -1,6 +1,6 @@
 # Assimilation-sequence skip
 
-**Status:** in progress (Phase 16 next)  
+**Status:** in progress (Phase 17 next)  
 **Type mix:** Structure then Behavior
 
 Each phase is one commit: **Behavior** (one observable) or **Structure** (only what the **immediate next** behavior needs). Size for ~5 minutes wall-clock including targeted tests.
@@ -102,7 +102,7 @@ Permanent artifacts stay capability-named (no phase numbers in product files).
 | 13 | Behavior | Return to sequence (property) (done) |
 | 14 | Behavior | Remove from recall on assimilation settings (property) (done) |
 | 15 | Behavior | Migrate property-level dummy skips (`recall_count = 0`) (done) |
-| 16 | Structure | Drop `skipMemoryTracking` on assimilate + testability wording |
+| 16 | Structure | Drop `skipMemoryTracking` on assimilate + testability wording (done) |
 | 17 | Structure | Notebook Skip Memory Tracking E2E language |
 
 ---
@@ -270,14 +270,11 @@ Permanent artifacts stay capability-named (no phase numbers in product files).
 ## Phase 16 — Drop assimilate `skipMemoryTracking` and testability “skip-recalled”
 
 - **Type:** Structure  
-- **Status:** planned  
-- **Enables:** nothing further (cleanup after Phase 11 removed the last dummy-skip writer)
+- **Status:** done
 
-**Change:** Remove `skipMemoryTracking` from `AssimilationRequestDTO` and callers. Testability `the notes "X" are skip-recalled` / `assimilateNoteSkippingRecall` insert sequence-skip rows (wording → sequence skip). generateTypeScript. Existing tests still pass (same observables).
+**Done:** Removed `skipMemoryTracking` from `AssimilationRequestDTO` and callers. New assimilate trackers are never created removed-from-tracking. Testability `the notes "X" are skipped from the assimilation sequence` POSTs skip rows. generateTypeScript. Notebook `skipMemoryTrackingEntirely` unchanged.
 
-**Tests:** `CURSOR_DEV=true nix develop -c pnpm backend:test_only` plus a recall spec that uses that testability step (e.g. `e2e_test/features/recall/recall_quiz_spelling_question.feature`).
-
-**Done when:** Assimilate cannot create a dummy skipped tracker. No production translation flag.
+**Learning:** Dummy-skip via assimilate flag is gone. Phase 17 still has notebook E2E “skip recall” wording.
 
 ---
 

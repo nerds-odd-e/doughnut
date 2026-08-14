@@ -69,7 +69,6 @@
                   :show-remove-from-recall="showRemoveFromRecall(row.key)"
                   @assimilate="
                     emit('assimilate', {
-                      skipMemoryTracking: false,
                       propertyKey: row.key,
                     })
                   "
@@ -112,17 +111,15 @@
           :show-remove-from-recall="showRemoveFromRecall()"
           :show-commissioned-option="showCommissionedOption"
           :show-spelling-option="showSpellingOption"
-          @assimilate="emit('assimilate', { skipMemoryTracking: false })"
+          @assimilate="emit('assimilate', {})"
           @skip="emit('skip', {})"
           @assimilate-as-commissioned="
             emit('assimilate', {
-              skipMemoryTracking: false,
               assimilateAsCommissioned: true,
             })
           "
           @remember-spelling="
             emit('assimilate', {
-              skipMemoryTracking: false,
               assimilateAsSpelling: true,
             })
           "

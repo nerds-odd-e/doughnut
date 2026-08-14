@@ -93,28 +93,13 @@ const assimilateDisabled = computed(() =>
   hasUnderstandingNoteLevelTracker(noteRecallInfo.value?.memoryTrackers)
 )
 
-const processAssimilate = async ({
-  propertyKey,
-  assimilateAsCommissioned,
-  assimilateAsSpelling,
-}: AssimilateEvent) => {
-  if (assimilateAsCommissioned) {
-    await doAssimilate({
-      skipMemoryTracking: false,
-      assimilateAsCommissioned,
-    })
+const processAssimilate = async (event: AssimilateEvent) => {
+  if (event.assimilateAsSpelling) {
+    pendingAssimilateAfterSpelling.value = event
     return
   }
 
-  if (assimilateAsSpelling) {
-    pendingAssimilateAfterSpelling.value = {
-      skipMemoryTracking: false,
-      assimilateAsSpelling: true,
-    }
-    return
-  }
-
-  await doAssimilate({ skipMemoryTracking: false, propertyKey })
+  await doAssimilate(event)
 }
 
 const processSkip = async ({ propertyKey }: { propertyKey?: string } = {}) => {
@@ -183,7 +168,6 @@ const processRemoveFromRecall = async ({
 }
 
 const doAssimilate = async ({
-  skipMemoryTracking,
   propertyKey,
   assimilateAsCommissioned,
   assimilateAsSpelling,
@@ -192,7 +176,6 @@ const doAssimilate = async ({
   try {
     const result = await assimilateUnit({
       noteId: note.id,
-      skipMemoryTracking,
       propertyKey,
       assimilateAsCommissioned,
       assimilateAsSpelling,

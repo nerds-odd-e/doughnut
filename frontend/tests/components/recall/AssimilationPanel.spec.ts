@@ -43,11 +43,7 @@ setupAssimilationPanelTests()
 describe("AssimilationPanel", () => {
   it("advances via next assimilation and increments counts when assimilating", async () => {
     assimilateSpy.mockResolvedValue(
-      wrapSdkResponse([
-        makeMe.aMemoryTracker.id(1).please(),
-        makeMe.aMemoryTracker.id(2).removedFromTracking(true).please(),
-        makeMe.aMemoryTracker.id(3).please(),
-      ])
+      wrapSdkResponse([makeMe.aMemoryTracker.id(1).please()])
     )
     const wrapper = await mountAssimilationPanelReady()
 
@@ -57,8 +53,8 @@ describe("AssimilationPanel", () => {
       body: { noteId: note.id },
     })
     expect(mockedGoToNextAssimilation).toHaveBeenCalled()
-    expect(mockedTotalAssimilatedCount.value).toBe(2)
-    expect(assimilatedCountOfTheDay.value).toBe(2)
+    expect(mockedTotalAssimilatedCount.value).toBe(1)
+    expect(assimilatedCountOfTheDay.value).toBe(1)
     expect(mockedRequestDueRecallsRefresh).toHaveBeenCalled()
   })
 

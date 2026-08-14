@@ -8,7 +8,7 @@ Feature: Assimilate with remembering spelling
     And I have a notebook "English practice" with notes:
       | Title   |
       | English |
-    And the notes "English" are skip-recalled
+    And the notes "English" are skipped from the assimilation sequence
 
   Scenario Outline: Remember spelling verifies the title
     Given I have a notebook "English practice" with notes:

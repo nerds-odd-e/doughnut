@@ -10,7 +10,7 @@ Feature: Spelling recall quiz
       | sedition   | Sedition means incite violence             |
       | LinkTarget | A note linked from spelling content        |
       | Wikistudy  | Wikistudy uses [[LinkTarget]] for practice |
-    And the notes "English" are skip-recalled
+    And the notes "English" are skipped from the assimilation sequence
     And It's day 1
 
   Scenario: Spelling quiz accepts a correct answer

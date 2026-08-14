@@ -7,7 +7,6 @@ import { useRecallData } from "@/composables/useRecallData"
 
 export type AssimilateUnitRequest = {
   noteId: number
-  skipMemoryTracking: boolean
   propertyKey?: string
   assimilateAsCommissioned?: boolean
   assimilateAsSpelling?: boolean
@@ -15,10 +14,7 @@ export type AssimilateUnitRequest = {
 
 export type AssimilateEvent = Pick<
   AssimilateUnitRequest,
-  | "skipMemoryTracking"
-  | "propertyKey"
-  | "assimilateAsCommissioned"
-  | "assimilateAsSpelling"
+  "propertyKey" | "assimilateAsCommissioned" | "assimilateAsSpelling"
 >
 
 export type AssimilateUnitResult = {
@@ -43,7 +39,6 @@ export function useAssimilateUnit() {
             ...(request.propertyKey
               ? { propertyKey: request.propertyKey }
               : {}),
-            ...(request.skipMemoryTracking ? { skipMemoryTracking: true } : {}),
             ...(request.assimilateAsCommissioned
               ? { assimilateAsCommissioned: true }
               : {}),
@@ -67,9 +62,7 @@ export function useAssimilateUnit() {
       return { success: true, navigated: false, memoryTrackers }
     }
 
-    const newTrackerCount = memoryTrackers.filter(
-      (tracker) => !tracker.removedFromTracking
-    ).length
+    const newTrackerCount = memoryTrackers.length
     if (totalAssimilatedCount.value !== undefined) {
       totalAssimilatedCount.value += newTrackerCount
     }

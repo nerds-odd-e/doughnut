@@ -13,7 +13,7 @@ Feature: Browse answers and notes while recalling
       | sedition | Sedition means incite violence |
       | sedation | Put to sleep is sedation       |
       | medical  |                                |
-    And the notes "English" are skip-recalled
+    And the notes "English" are skipped from the assimilation sequence
     And It's day 1
 
   Scenario: View last answered question when the quiz answer was correct

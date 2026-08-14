@@ -12,7 +12,7 @@ Feature: Accidental match reveal
       | English  |                                |
       | sedition | Sedition means incite violence |
       | sedation | Put to sleep is sedation       |
-    And the notes "English" are skip-recalled
+    And the notes "English" are skipped from the assimilation sequence
     And It's day 1
     And the note "sedition" was assimilated as spelling on day 1
 

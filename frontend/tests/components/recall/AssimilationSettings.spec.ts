@@ -42,9 +42,7 @@ describe("AssimilationSettings", () => {
     }
 
     await clickPropertyAssimilate("topic")
-    expect(wrapper.emitted("assimilate")).toEqual([
-      [{ skipMemoryTracking: false, propertyKey: "topic" }],
-    ])
+    expect(wrapper.emitted("assimilate")).toEqual([[{ propertyKey: "topic" }]])
   })
 
   it("disables Assimilate per property when a property memory tracker exists", async () => {

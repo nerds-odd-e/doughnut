@@ -4507,8 +4507,6 @@ components:
         noteId:
           type: integer
           format: int32
-        skipMemoryTracking:
-          type: boolean
         propertyKey:
           type: string
         assimilateAsCommissioned:

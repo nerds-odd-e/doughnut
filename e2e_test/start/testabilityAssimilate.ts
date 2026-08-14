@@ -1,7 +1,10 @@
 /// <reference types="Cypress" />
 // @ts-check
 import type { AssimilationRequestDto } from '@generated/doughnut-backend-api'
-import { AssimilationController } from '@generated/doughnut-backend-api/sdk.gen'
+import {
+  AssimilationController,
+  AssimilationSequenceSkipController,
+} from '@generated/doughnut-backend-api/sdk.gen'
 
 type InjectedNoteIds = {
   getInjectedNoteIdByTitle(noteTitle: string): Cypress.Chainable<number>
@@ -24,27 +27,28 @@ function assimilateInjectedNote(
 
 export const assimilateTestabilityMethods = {
   assimilateNote(this: InjectedNoteIds, noteTitle: string) {
-    return assimilateInjectedNote.call(this, noteTitle, {
-      skipMemoryTracking: false,
-    })
+    return assimilateInjectedNote.call(this, noteTitle, {})
   },
 
-  assimilateNoteSkippingRecall(this: InjectedNoteIds, noteTitle: string) {
-    return assimilateInjectedNote.call(this, noteTitle, {
-      skipMemoryTracking: true,
-    })
+  skipNoteFromAssimilationSequence(this: InjectedNoteIds, noteTitle: string) {
+    return this.getInjectedNoteIdByTitle(noteTitle).then((noteId) =>
+      cy.wrap(
+        AssimilationSequenceSkipController.create({
+          body: { noteId },
+        }),
+        { log: false }
+      )
+    )
   },
 
   assimilateNoteAsCommissioned(this: InjectedNoteIds, noteTitle: string) {
     return assimilateInjectedNote.call(this, noteTitle, {
-      skipMemoryTracking: false,
       assimilateAsCommissioned: true,
     })
   },
 
   assimilateNoteAsSpelling(this: InjectedNoteIds, noteTitle: string) {
     return assimilateInjectedNote.call(this, noteTitle, {
-      skipMemoryTracking: false,
       assimilateAsSpelling: true,
     })
   },

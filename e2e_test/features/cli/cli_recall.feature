@@ -16,7 +16,7 @@ Feature: CLI recall
         | English  |                                |
         | sedition | Sedition means incite violence |
         | sedation | **Put** to sleep is _sedation_ |
-      And the notes "English" are skip-recalled
+      And the notes "English" are skipped from the assimilation sequence
 
     @disableOpenAiService
     Scenario: Recall status shows count when notes are due
@@ -93,7 +93,7 @@ Feature: CLI recall
         | Title    | Content                        |
         | English  |                                |
         | sedition | Sedition means incite violence |
-      And the notes "English" are skip-recalled
+      And the notes "English" are skipped from the assimilation sequence
 
     @disableOpenAiService
     Scenario: Spelling recall accepts a correct answer then just review

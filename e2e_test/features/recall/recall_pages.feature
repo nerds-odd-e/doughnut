@@ -9,7 +9,7 @@ Feature: Assimilation and Recall Pages
       | Sedition | Incite violence |             |
       | Sedation | Put to sleep    |             |
       | Sedative | Sleep medicine  | a_slide.jpg |
-    And the notes "English" are skip-recalled
+    And the notes "English" are skipped from the assimilation sequence
     And there is "similar to" relationship between note "Sedition" and "Sedation" in notebook "English practice"
 
   Scenario: Different assimilation pages for different notes

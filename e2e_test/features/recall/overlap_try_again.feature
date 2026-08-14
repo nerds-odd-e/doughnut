@@ -12,7 +12,7 @@ Feature: Overlap try again
       | Overlap |                          |
       | colour  | Colour means a hue       |
       | Partner | Partner note body        |
-    And the notes "Overlap, Partner" are skip-recalled
+    And the notes "Overlap, Partner" are skipped from the assimilation sequence
     And note "colour" has content:
       """
       ---

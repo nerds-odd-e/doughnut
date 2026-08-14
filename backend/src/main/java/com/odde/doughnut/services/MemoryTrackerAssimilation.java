@@ -32,8 +32,6 @@ final class MemoryTrackerAssimilation {
       AssimilationRequestDTO request, User currentUser, Timestamp currentTime) {
     Note note = entityPersister.find(Note.class, request.noteId);
     List<MemoryTracker> existingTrackers = userService.getMemoryTrackersFor(currentUser, note);
-    boolean skipMemoryTracking =
-        request.skipMemoryTracking != null ? request.skipMemoryTracking : false;
 
     if (Boolean.TRUE.equals(request.assimilateAsCommissioned)) {
       return assimilateAsNoteLevelType(
@@ -42,22 +40,15 @@ final class MemoryTrackerAssimilation {
           note,
           currentUser,
           currentTime,
-          skipMemoryTracking,
           MemoryTrackerType.COMMISSIONED);
     }
 
     if (Boolean.TRUE.equals(request.assimilateAsSpelling)) {
       return assimilateAsNoteLevelType(
-          request,
-          existingTrackers,
-          note,
-          currentUser,
-          currentTime,
-          skipMemoryTracking,
-          MemoryTrackerType.SPELLING);
+          request, existingTrackers, note, currentUser, currentTime, MemoryTrackerType.SPELLING);
     }
 
-    if (request.propertyKey != null && !request.propertyKey.isEmpty()) {
+    if (isPropertyLevelRequest(request)) {
       boolean propertyTrackerExists =
           existingTrackers.stream().anyMatch(mt -> request.propertyKey.equals(mt.getPropertyKey()));
       if (propertyTrackerExists) {
@@ -68,18 +59,11 @@ final class MemoryTrackerAssimilation {
               MemoryTracker.buildMemoryTrackerForProperty(note, request.propertyKey),
               currentUser,
               currentTime,
-              skipMemoryTracking,
               MemoryTrackerType.UNDERSTANDING));
     }
 
     return assimilateAsNoteLevelType(
-        request,
-        existingTrackers,
-        note,
-        currentUser,
-        currentTime,
-        skipMemoryTracking,
-        MemoryTrackerType.UNDERSTANDING);
+        request, existingTrackers, note, currentUser, currentTime, MemoryTrackerType.UNDERSTANDING);
   }
 
   private List<MemoryTracker> assimilateAsNoteLevelType(
@@ -88,16 +72,20 @@ final class MemoryTrackerAssimilation {
       Note note,
       User currentUser,
       Timestamp currentTime,
-      boolean skipMemoryTracking,
       MemoryTrackerType type) {
-    if (request.propertyKey != null && !request.propertyKey.isEmpty()) {
+    if (isPropertyLevelRequest(request)) {
       return List.of();
     }
     if (hasNoteLevelType(existingTrackers, type)) {
       return List.of();
     }
     return List.of(
-        createNoteLevelTracker(note, currentUser, currentTime, skipMemoryTracking, type));
+        initializeNewTracker(
+            MemoryTracker.buildMemoryTrackerForNote(note), currentUser, currentTime, type));
+  }
+
+  private static boolean isPropertyLevelRequest(AssimilationRequestDTO request) {
+    return request.propertyKey != null && !request.propertyKey.isEmpty();
   }
 
   private static boolean hasNoteLevelType(List<MemoryTracker> trackers, MemoryTrackerType type) {
@@ -106,27 +94,11 @@ final class MemoryTrackerAssimilation {
         .anyMatch(mt -> mt.getType() == type);
   }
 
-  private MemoryTracker createNoteLevelTracker(
-      Note note,
-      User currentUser,
-      Timestamp currentTime,
-      boolean skipMemoryTracking,
-      MemoryTrackerType type) {
-    return initializeNewTracker(
-        MemoryTracker.buildMemoryTrackerForNote(note),
-        currentUser,
-        currentTime,
-        skipMemoryTracking,
-        type);
-  }
-
   private MemoryTracker initializeNewTracker(
       MemoryTracker memoryTracker,
       User currentUser,
       Timestamp currentTime,
-      boolean skipMemoryTracking,
       MemoryTrackerType type) {
-    memoryTracker.setRemovedFromTracking(skipMemoryTracking);
     memoryTracker.setType(type);
     memoryTracker.setUser(currentUser);
     memoryTracker.setAssimilatedAt(currentTime);

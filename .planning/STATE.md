@@ -2,19 +2,19 @@
 gsd_state_version: 1.0
 milestone: null
 milestone_name: null
-current_phase: 16
-current_phase_name: Drop assimilate skipMemoryTracking
+current_phase: 17
+current_phase_name: Notebook Skip Memory Tracking language
 status: in_progress
-stopped_at: "Paused after Phase 15 wrap-up; resume execute-plan at Phase 16"
-last_updated: "2026-08-14T08:30:00Z"
+stopped_at: "Paused after Phase 16 wrap-up; resume execute-plan at Phase 17"
+last_updated: "2026-08-14T08:55:00Z"
 last_activity: 2026-08-14
-last_activity_desc: Phases 1–15 done; next is drop skipMemoryTracking on assimilate
+last_activity_desc: Phases 1–16 done; next is notebook Skip Memory Tracking E2E language
 progress:
   total_phases: 17
-  completed_phases: 15
+  completed_phases: 16
   total_plans: 1
   completed_plans: 0
-  percent: 88
+  percent: 94
 ---
 
 # Project State
@@ -27,7 +27,7 @@ See: `.planning/PROJECT.md`
 
 ## Current Position
 
-Ad-hoc plan in progress: [`.planning/quick/001-skip-assimilation/PLAN.md`](quick/001-skip-assimilation/PLAN.md). **Phases 1–15 done.** Next: Phase 16 (drop `skipMemoryTracking` on assimilate; testability wording → sequence skip).
+Ad-hoc plan in progress: [`.planning/quick/001-skip-assimilation/PLAN.md`](quick/001-skip-assimilation/PLAN.md). **Phases 1–16 done.** Next: Phase 17 (E2E/steps call the notebook setting Skip Memory Tracking, not skip recall).
 
 **Ops leftover:** gated dummy-skip conversions. Enable on the deploy that first applies each version, then revert to `1=0`:
 - `dummy_note_sequence_skip_convert` (`V300000254`)
@@ -40,6 +40,6 @@ JDBC harnesses are temporary until those production applications.
 
 ## Operator Next Steps
 
-- Continue execute-plan: Phase 16 of `.planning/quick/001-skip-assimilation/PLAN.md`
+- Continue execute-plan: Phase 17 of `.planning/quick/001-skip-assimilation/PLAN.md`
 - Enable dummy-skip conversion placeholders on the deploys that first apply V300000254 / V300000255
 - Or continue ADR 0003: resolve open issues in `.planning/research/FSRS-COMPATIBILITY-GAP.md`

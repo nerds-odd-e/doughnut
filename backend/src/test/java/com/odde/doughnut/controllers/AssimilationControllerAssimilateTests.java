@@ -208,13 +208,15 @@ class AssimilationControllerAssimilateTests extends ControllerTestBase {
     }
 
     @Test
-    void shouldCreatePropertyTrackerRemovedFromTrackingWhenSkipMemoryTracking() {
+    void assimilateDoesNotCreateTrackerRemovedFromRecall() {
       Note note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
-      AssimilationRequestDTO request =
-          AssimilationControllerTestSupport.assimilatePropertyRequest(note, "a part of");
-      request.skipMemoryTracking = true;
 
-      assertThat(controller.assimilate(request).get(0).getRemovedFromTracking(), equalTo(true));
+      assertThat(
+          controller
+              .assimilate(AssimilationControllerTestSupport.assimilateRequest(note))
+              .get(0)
+              .getRemovedFromTracking(),
+          equalTo(false));
     }
 
     @Test

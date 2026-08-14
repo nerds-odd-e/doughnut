@@ -11,7 +11,7 @@ Feature: Bazaar subscription
       | Triangle   |
       | Big Square |
     And I am logged in as "another_old_learner"
-    And the notes "Shape" are skip-recalled
+    And the notes "Shape" are skipped from the assimilation sequence
     And my session is logged out
     And notebook "Shape" is shared to the Bazaar
 
