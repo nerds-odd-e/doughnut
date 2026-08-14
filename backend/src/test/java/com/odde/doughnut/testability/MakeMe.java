@@ -97,6 +97,14 @@ public class MakeMe extends MakeMeWithoutDB {
     return memoryTrackerBuilder;
   }
 
+  public AssimilationSequenceSkipBuilder anAssimilationSequenceSkipFor(Note note) {
+    AssimilationSequenceSkip skip = new AssimilationSequenceSkip();
+    skip.setNote(note);
+    AssimilationSequenceSkipBuilder builder = new AssimilationSequenceSkipBuilder(skip, this);
+    builder.by(note.getNotebook().getOwnership().getUser());
+    return builder;
+  }
+
   public MemoryTrackerBuilder aMemoryTrackerBy(User user) {
     Note note = aNote().please();
     return aMemoryTrackerFor(note).by(user);

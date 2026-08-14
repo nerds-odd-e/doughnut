@@ -698,6 +698,18 @@ export type AssimilationRequestDto = {
     assimilateAsSpelling?: boolean;
 };
 
+export type AssimilationSequenceSkipRequestDto = {
+    noteId?: number;
+    propertyKey?: string;
+};
+
+export type AssimilationSequenceSkip = {
+    id: number;
+    propertyKey?: string;
+    skippedAt?: string;
+    noteId?: number;
+};
+
 export type SuggestedTitleDto = {
     title?: string;
 };
@@ -2553,6 +2565,22 @@ export type AssimilateResponses = {
 };
 
 export type AssimilateResponse = AssimilateResponses[keyof AssimilateResponses];
+
+export type CreateData = {
+    body: AssimilationSequenceSkipRequestDto;
+    path?: never;
+    query?: never;
+    url: '/api/assimilation-sequence-skips';
+};
+
+export type CreateResponses = {
+    /**
+     * OK
+     */
+    200: AssimilationSequenceSkip;
+};
+
+export type CreateResponse = CreateResponses[keyof CreateResponses];
 
 export type SuggestTitleData = {
     body?: never;

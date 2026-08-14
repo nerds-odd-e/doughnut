@@ -1,5 +1,6 @@
 package com.odde.doughnut.entities.repositories;
 
+import com.odde.doughnut.entities.AssimilationSequenceSkip;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.utils.SearchTitleNormalizer;
@@ -145,7 +146,12 @@ public interface NoteRepository extends CrudRepository<Note, Integer>, NoteStruc
               + "WHERE n.id IN :ids")
   List<Note> hydrateNonDeletedNotesWithNotebookAndFolderByIds(@Param("ids") List<Integer> ids);
 
-  String recallWhereClause = " WHERE " + "   rp IS NULL " + "   AND n.deletedAt IS NULL ";
+  String recallWhereClause =
+      " WHERE "
+          + "   rp IS NULL "
+          + "   AND n.deletedAt IS NULL "
+          + "   AND "
+          + AssimilationSequenceSkip.JPA_NOT_EXISTS_NOTE_LEVEL_SKIP;
 
   String joinMemoryTracker =
       " LEFT JOIN n.memoryTrackers rp ON rp.user.id = :userId"

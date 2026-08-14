@@ -116,6 +116,36 @@ class AssimilationControllerTests extends ControllerTestBase {
     }
 
     @Test
+    void omitsNoteWithSequenceSkip() {
+      Note skipped =
+          AssimilationControllerTestSupport.ownedNote(makeMe, currentUser.getUser(), "skipped");
+      Note remaining =
+          AssimilationControllerTestSupport.ownedNote(makeMe, currentUser.getUser(), "remaining");
+      makeMe.anAssimilationSequenceSkipFor(skipped).please();
+
+      AssimilationNextDTO result = controller.next("Asia/Shanghai");
+      assertThat(result.getNextUnit().getNoteId(), equalTo(remaining.getId()));
+    }
+
+    @Test
+    void omitsPropertyWithSequenceSkip() {
+      Timestamp day1 = makeMe.aTimestamp().of(1, 8).fromShanghai().please();
+      testabilitySettings.timeTravelTo(day1);
+      Note note =
+          makeMe
+              .aNote()
+              .notebookOwnedBy(currentUser.getUser())
+              .content("---\nexample of: \"[[Word]]\"\n---\n\nbody")
+              .please();
+      notePropertyIndexService.refreshForNote(note);
+      makeMe.aMemoryTrackerFor(note).assimilatedAt(day1).please();
+      makeMe.anAssimilationSequenceSkipFor(note).propertyKey("example of").please();
+
+      AssimilationNextDTO result = controller.next("Asia/Shanghai");
+      assertThat(result.getNextUnit(), nullValue());
+    }
+
+    @Test
     void returns_next_property_key_for_untracked_example_of() {
       Timestamp day1 = makeMe.aTimestamp().of(1, 8).fromShanghai().please();
       testabilitySettings.timeTravelTo(day1);

@@ -199,6 +199,10 @@ Use this for endpoint lookup; open `sdk.gen.ts` or `types.gen.ts` only for exact
 - `assimilate`: POST `/api/assimilation` -> `AssimilateResponse` (request: `AssimilateData`; body: AssimilationRequestDto; response body: Array<MemoryTracker>)
 - `next`: GET `/api/assimilation/next` -> `NextResponse` (request: `NextData`; query: timezone; response body: AssimilationNextDto)
 
+## Assimilation Sequence Skip Controller
+
+- `create`: POST `/api/assimilation-sequence-skips` -> `CreateResponse` (request: `CreateData`; body: AssimilationSequenceSkipRequestDto; response body: AssimilationSequenceSkip)
+
 ## Ai Controller
 
 - `suggestTitle`: POST `/api/ai/suggest-title/{note}` -> `SuggestTitleResponse` (request: `SuggestTitleData`; path: note; response body: SuggestedTitleDto)

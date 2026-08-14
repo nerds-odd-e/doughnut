@@ -1,5 +1,6 @@
 package com.odde.doughnut.entities.repositories;
 
+import com.odde.doughnut.entities.AssimilationSequenceSkip;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.NotePropertyIndex;
 import java.util.List;
@@ -32,7 +33,11 @@ public interface NotePropertyIndexRepository extends JpaRepository<NotePropertyI
           + " AND tmtBlock IS NULL"
           + ") ";
 
-  String unassimilatedWhereClause = " WHERE mt IS NULL" + " AND n.deletedAt IS NULL ";
+  String unassimilatedWhereClause =
+      " WHERE mt IS NULL"
+          + " AND n.deletedAt IS NULL "
+          + " AND "
+          + AssimilationSequenceSkip.JPA_NOT_EXISTS_PROPERTY_SKIP;
 
   String unassimilatedDedupeByExactKey =
       " AND i.itemIndex = (SELECT MIN(i2.itemIndex) FROM NotePropertyIndex i2"

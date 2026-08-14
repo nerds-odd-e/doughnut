@@ -1,6 +1,6 @@
 # Assimilation-sequence skip
 
-**Status:** in progress (Phase 3 next)  
+**Status:** in progress (Phase 4 next)  
 **Type mix:** Structure then Behavior
 
 Each phase is one commit: **Behavior** (one observable) or **Structure** (only what the **immediate next** behavior needs). Size for ~5 minutes wall-clock including targeted tests.
@@ -89,7 +89,7 @@ Permanent artifacts stay capability-named (no phase numbers in product files).
 |---|---|---|
 | 1 | Structure | ADR 0001 glossary (done) |
 | 2 | Structure | Table `assimilation_sequence_skip` (done) |
-| 3 | Structure | POST skip + `/next` excludes skip rows |
+| 3 | Structure | POST skip + `/next` excludes skip rows (done) |
 | 4 | Behavior | Skip on the panel leaves the sequence with no dummy tracker |
 | 5 | Behavior | Assimilate (understanding) a skipped note |
 | 6 | Behavior | Remember spelling a skipped note |
@@ -130,16 +130,12 @@ Permanent artifacts stay capability-named (no phase numbers in product files).
 ## Phase 3 — Sequence-skip write and `/next` exclusion (no UI)
 
 - **Type:** Structure  
-- **Status:** planned  
+- **Status:** done  
 - **Enables:** Phase 4
 
-**Change:** `AssimilationSequenceSkip` POST (noteId, optional propertyKey). `/next` excludes units with a skip row at that grain. Existing Skip button still uses `assimilate(skipMemoryTracking=true)` (dummy tracker). No user-visible change.
+**Done:** `POST /api/assimilation-sequence-skips` (idempotent). `/next` excludes skip rows in SQL for notes and properties. `V300000253` aligned table collation to `utf8mb4_0900_ai_ci` (do not edit V300000252). Skip button still uses dummy-tracker assimilate.
 
-**Tests:** Controller tests only — insert skip row, `/next` omits that note; duplicate skip is idempotent (unique key). Do not change E2E.
-
-**Commands:** `CURSOR_DEV=true nix develop -c pnpm backend:test_only` then generateTypeScript.
-
-**Done when:** New endpoint + `/next` filter exist; Skip in the UI still behaves as today.
+**Learning:** New tables must use `utf8mb4_0900_ai_ci` or JPQL joins on string keys fail.
 
 ---
 

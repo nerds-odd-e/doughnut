@@ -1563,6 +1563,24 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/MemoryTracker"
+  /api/assimilation-sequence-skips:
+    post:
+      tags:
+      - assimilation-sequence-skip-controller
+      operationId: create
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AssimilationSequenceSkipRequestDTO"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/AssimilationSequenceSkip"
   /api/ai/suggest-title/{note}:
     post:
       tags:
@@ -4484,6 +4502,30 @@ components:
           type: boolean
         assimilateAsSpelling:
           type: boolean
+    AssimilationSequenceSkipRequestDTO:
+      type: object
+      properties:
+        noteId:
+          type: integer
+          format: int32
+        propertyKey:
+          type: string
+    AssimilationSequenceSkip:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        propertyKey:
+          type: string
+        skippedAt:
+          type: string
+          format: date-time
+        noteId:
+          type: integer
+          format: int32
+      required:
+      - id
     SuggestedTitleDTO:
       type: object
       properties:
