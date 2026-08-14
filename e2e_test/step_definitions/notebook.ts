@@ -52,9 +52,12 @@ Then(
   }
 )
 
-When('I change notebook {string} to skip recall', (noteTopology: string) => {
-  start.navigateToNotebookPage(noteTopology).skipMemoryTracking()
-})
+When(
+  'I change notebook {string} to skip memory tracking',
+  (noteTopology: string) => {
+    start.navigateToNotebookPage(noteTopology).skipMemoryTracking()
+  }
+)
 
 Then('I unsubscribe from notebook {string}', (noteTopology: string) => {
   start.navigateToNotebooksPage().notebookCard(noteTopology).unsubscribe()

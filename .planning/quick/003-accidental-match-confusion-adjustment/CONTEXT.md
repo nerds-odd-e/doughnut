@@ -99,6 +99,4 @@ regenerate the database ERD.
 
 ## Worktree coordination
 
-Quick plan `001-skip-assimilation` remains the active execution workstream. This
-plan is queued independently. Preserve unrelated user changes, especially the
-current assimilation controller and E2E edits, when this plan is executed.
+Quick plan `001-skip-assimilation` is finished. This plan is queued independently.
