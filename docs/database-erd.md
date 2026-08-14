@@ -21,6 +21,7 @@ erDiagram
     memory_tracker ||--o{ recall_prompt : "memory_tracker_id ON DELETE CASCADE"
     memory_tracker ||--o{ session_item : "memory_tracker_id ON DELETE CASCADE"
     "note" ||--o{ admin_data_migration_progress : "last_processed_note_id ON DELETE SET NULL"
+    "note" ||--o{ assimilation_sequence_skip : "note_id ON DELETE CASCADE"
     "note" ||--o{ conversation : "note_id ON DELETE NO ACTION"
     "note" ||--o{ image : "note_id ON DELETE SET NULL"
     "note" ||--o{ memory_tracker : "note_id ON DELETE CASCADE"
@@ -46,6 +47,7 @@ erDiagram
     question_generation_batch ||--o{ question_generation_batch_request : "batch_id ON DELETE CASCADE"
     quiz_answer ||--o{ recall_prompt : "quiz_answer_id ON DELETE NO ACTION"
     recall_prompt ||--o{ conversation : "recall_prompt_id ON DELETE SET NULL"
+    "user" ||--o{ assimilation_sequence_skip : "user_id ON DELETE CASCADE"
     "user" ||--o{ book_block_reading_record : "user_id ON DELETE CASCADE"
     "user" ||--o{ book_user_last_read_position : "user_id ON DELETE CASCADE"
     "user" ||--o{ circle_user : "user_id ON DELETE CASCADE"
@@ -64,6 +66,11 @@ erDiagram
         int id PK
         string step_name UK
         int last_processed_note_id FK
+    }
+    assimilation_sequence_skip {
+        int id PK
+        int user_id FK
+        int note_id FK
     }
     attachment_blob {
         int id PK

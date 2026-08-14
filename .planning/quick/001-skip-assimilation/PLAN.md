@@ -1,6 +1,6 @@
 # Assimilation-sequence skip
 
-**Status:** in progress (Phase 2 next)  
+**Status:** in progress (Phase 3 next)  
 **Type mix:** Structure then Behavior
 
 Each phase is one commit: **Behavior** (one observable) or **Structure** (only what the **immediate next** behavior needs). Size for ~5 minutes wall-clock including targeted tests.
@@ -88,7 +88,7 @@ Permanent artifacts stay capability-named (no phase numbers in product files).
 | # | Type | One outcome |
 |---|---|---|
 | 1 | Structure | ADR 0001 glossary (done) |
-| 2 | Structure | Table `assimilation_sequence_skip` |
+| 2 | Structure | Table `assimilation_sequence_skip` (done) |
 | 3 | Structure | POST skip + `/next` excludes skip rows |
 | 4 | Behavior | Skip on the panel leaves the sequence with no dummy tracker |
 | 5 | Behavior | Assimilate (understanding) a skipped note |
@@ -120,14 +120,10 @@ Permanent artifacts stay capability-named (no phase numbers in product files).
 ## Phase 2 — `assimilation_sequence_skip` table
 
 - **Type:** Structure  
-- **Status:** planned  
+- **Status:** done  
 - **Enables:** Phase 3
 
-**Change:** Flyway create table as specified (no backfill). JPA entity + repository. `property_key` included now (same grain as memory trackers). Existing tests pass. Regenerate ERD.
-
-**Test:** `CURSOR_DEV=true nix develop -c pnpm backend:test_only`
-
-**Done when:** Empty table in schema; no product behavior change.
+**Done:** Flyway `V300000252` empty table (unique user/note/property_key, CASCADE FKs). Entity + repository. ERD regenerated. No product behavior change.
 
 ---
 
