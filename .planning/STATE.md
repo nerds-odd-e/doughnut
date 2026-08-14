@@ -2,19 +2,19 @@
 gsd_state_version: 1.0
 milestone: null
 milestone_name: null
-current_phase: null
-current_phase_name: null
-status: idle
+current_phase: "2"
+current_phase_name: Walkthrough does not offer a flagged notebook
+status: executing
 stopped_at: null
-last_updated: "2026-08-14T18:35:00Z"
-last_activity: 2026-08-14
-last_activity_desc: 005-accidental-match-cleanup finished; spent planning files removed
+last_updated: "2026-08-15T07:55:00Z"
+last_activity: 2026-08-15
+last_activity_desc: Phase 1 done — flagged notebooks omitted from assimilation sequence
 progress:
-  total_phases: 0
-  completed_phases: 0
-  total_plans: 0
+  total_phases: 5
+  completed_phases: 1
+  total_plans: 1
   completed_plans: 0
-  percent: 0
+  percent: 20
 ---
 
 # Project State
@@ -27,18 +27,19 @@ See: `.planning/PROJECT.md`
 
 ## Current Position
 
-No active execute-plan. Accidental-match confusion adjustment shipped and cleaned up: prompted spelling tracker fully fails; a unique matched note's active spelling (else understanding) tracker gets a weaker adjustment without recall credit; ambiguous matches and declared overlap change no matched tracker. Test suite consolidated, renamed, and split for cohesion.
+Ad-hoc plan in progress: [`.planning/quick/001-skip-memory-tracking/PLAN.md`](quick/001-skip-memory-tracking/PLAN.md). Phase 1 done: notebooks with **Skip Memory Tracking** are absent from `GET /api/assimilation/next` and unassimilated counts (owned notes, property units, subscribed notebooks). Next: Phase 2 E2E walkthrough.
 
 **Ops leftover:** gated dummy-skip conversions. Enable on the deploy that first applies each version, then revert to `1=0`:
 - `dummy_note_sequence_skip_convert` (`V300000254`)
 - `dummy_property_sequence_skip_convert` (`V300000255`)
 JDBC harnesses remain temporary until those production applications.
 
-**Recently shipped:** accidental-match confusion adjustment + cleanup (full fail of A; unique B spelling/understanding weakened without recall credit; ambiguous and overlap unchanged; test suite tidied). Assimilation-sequence skip (table, Skip / Return to sequence / Remove from recall, dummy-tracker conversion gated). Note toolbar keeps on-state Audio/Assimilation on the bar; other actions overflow from the right into More options. Production hard-delete incident response (2026-08-12) — [MILESTONES.md](MILESTONES.md).
+**Recently shipped:** accidental-match confusion adjustment + cleanup. Assimilation-sequence skip. Note toolbar overflow. Production hard-delete incident response (2026-08-12) — [MILESTONES.md](MILESTONES.md).
 
-**In discussion:** finalize Proposed ADR 0003 using [FSRS-COMPATIBILITY-GAP.md](research/FSRS-COMPATIBILITY-GAP.md). **Recall** (not FSRS **review**) is locked in ADR 0001 and ADR 0003 Decision. FSRS overdue reward is not implemented. `RecallLog` is deferred.
+**In discussion:** finalize Proposed ADR 0003 using [FSRS-COMPATIBILITY-GAP.md](research/FSRS-COMPATIBILITY-GAP.md). **Recall** (not FSRS **review**) is locked in ADR 0001 and ADR 0003 Decision.
 
 ## Operator Next Steps
 
+- Continue execute-plan on remaining phases 2–5 of `.planning/quick/001-skip-memory-tracking/PLAN.md`
 - Enable dummy-skip conversion placeholders on the deploys that first apply V300000254 / V300000255
 - Continue ADR 0003: resolve open issues in `.planning/research/FSRS-COMPATIBILITY-GAP.md`

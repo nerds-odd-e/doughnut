@@ -3,6 +3,7 @@ package com.odde.doughnut.entities.repositories;
 import com.odde.doughnut.entities.AssimilationSequenceSkip;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.NotePropertyIndex;
+import com.odde.doughnut.entities.NotebookSettings;
 import java.util.List;
 import java.util.stream.Stream;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -37,7 +38,9 @@ public interface NotePropertyIndexRepository extends JpaRepository<NotePropertyI
       " WHERE mt IS NULL"
           + " AND n.deletedAt IS NULL "
           + " AND "
-          + AssimilationSequenceSkip.JPA_NOT_EXISTS_PROPERTY_SKIP;
+          + AssimilationSequenceSkip.JPA_NOT_EXISTS_PROPERTY_SKIP
+          + " AND "
+          + NotebookSettings.JPA_NOTEBOOK_NOT_SKIP_MEMORY_TRACKING;
 
   String unassimilatedDedupeByExactKey =
       " AND i.itemIndex = (SELECT MIN(i2.itemIndex) FROM NotePropertyIndex i2"

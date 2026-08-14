@@ -73,4 +73,9 @@ public class NotebookBuilder extends EntityBuilder<Notebook> {
     entity.setReadmeContent(content);
     return this;
   }
+
+  public NotebookBuilder skipMemoryTrackingEntirely(boolean skip) {
+    entity.getNotebookSettings().setSkipMemoryTrackingEntirely(skip);
+    return this;
+  }
 }

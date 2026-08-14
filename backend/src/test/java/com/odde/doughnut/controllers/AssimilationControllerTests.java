@@ -146,6 +146,64 @@ class AssimilationControllerTests extends ControllerTestBase {
     }
 
     @Test
+    void omitsOwnedNotesFromNotebookWithSkipMemoryTracking() {
+      Notebook flagged =
+          makeMe
+              .aNotebook()
+              .creatorAndOwner(currentUser.getUser())
+              .skipMemoryTrackingEntirely(true)
+              .please();
+      makeMe.aNote("flagged").notebook(flagged).please();
+      Note remaining =
+          AssimilationControllerTestSupport.ownedNote(makeMe, currentUser.getUser(), "remaining");
+
+      AssimilationNextDTO result = controller.next("Asia/Shanghai");
+      assertThat(result.getNextUnit().getNoteId(), equalTo(remaining.getId()));
+      assertThat(result.getCounts().getDueCount(), equalTo(1));
+      assertThat(result.getCounts().getTotalUnassimilatedCount(), equalTo(1));
+    }
+
+    @Test
+    void omitsPropertyUnitFromNotebookWithSkipMemoryTracking() {
+      Timestamp day1 = makeMe.aTimestamp().of(1, 8).fromShanghai().please();
+      testabilitySettings.timeTravelTo(day1);
+      Notebook flagged =
+          makeMe
+              .aNotebook()
+              .creatorAndOwner(currentUser.getUser())
+              .skipMemoryTrackingEntirely(true)
+              .please();
+      Note note =
+          makeMe
+              .aNote()
+              .notebook(flagged)
+              .content("---\nexample of: \"[[Word]]\"\n---\n\nbody")
+              .please();
+      notePropertyIndexService.refreshForNote(note);
+      makeMe.aMemoryTrackerFor(note).assimilatedAt(day1).please();
+
+      AssimilationNextDTO result = controller.next("Asia/Shanghai");
+      assertThat(result.getNextUnit(), nullValue());
+    }
+
+    @Test
+    void omitsUnitsFromSubscribedNotebookWithSkipMemoryTracking() {
+      User user = currentUser.getUser();
+      Notebook subscribedNotebook =
+          makeMe
+              .aNotebook()
+              .creatorAndOwner(makeMe.aUser().please())
+              .skipMemoryTrackingEntirely(true)
+              .please();
+      makeMe.aNote("sub").notebook(subscribedNotebook).please();
+      makeMe.aSubscription().forNotebook(subscribedNotebook).forUser(user).please();
+      makeMe.refresh(user);
+
+      AssimilationNextDTO result = controller.next("Asia/Shanghai");
+      assertThat(result.getNextUnit(), nullValue());
+    }
+
+    @Test
     void returns_next_property_key_for_untracked_example_of() {
       Timestamp day1 = makeMe.aTimestamp().of(1, 8).fromShanghai().please();
       testabilitySettings.timeTravelTo(day1);

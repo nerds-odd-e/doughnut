@@ -3,6 +3,7 @@ package com.odde.doughnut.entities.repositories;
 import com.odde.doughnut.entities.AssimilationSequenceSkip;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.NotebookSettings;
 import com.odde.doughnut.utils.SearchTitleNormalizer;
 import java.util.List;
 import java.util.stream.Stream;
@@ -146,12 +147,14 @@ public interface NoteRepository extends CrudRepository<Note, Integer>, NoteStruc
               + "WHERE n.id IN :ids")
   List<Note> hydrateNonDeletedNotesWithNotebookAndFolderByIds(@Param("ids") List<Integer> ids);
 
-  String recallWhereClause =
+  String unassimilatedWhereClause =
       " WHERE "
           + "   rp IS NULL "
           + "   AND n.deletedAt IS NULL "
           + "   AND "
-          + AssimilationSequenceSkip.JPA_NOT_EXISTS_NOTE_LEVEL_SKIP;
+          + AssimilationSequenceSkip.JPA_NOT_EXISTS_NOTE_LEVEL_SKIP
+          + " AND "
+          + NotebookSettings.JPA_NOTEBOOK_NOT_SKIP_MEMORY_TRACKING;
 
   String joinMemoryTracker =
       " LEFT JOIN n.memoryTrackers rp ON rp.user.id = :userId"
@@ -161,7 +164,7 @@ public interface NoteRepository extends CrudRepository<Note, Integer>, NoteStruc
           + " AND "
           + MemoryTracker.JPA_WHERE_UNDERSTANDING_TRACKER;
 
-  String recallOrderByDate = " ORDER BY n.recallSetting.level, n.createdAt, n.id";
+  String unassimilatedOrderBy = " ORDER BY n.recallSetting.level, n.createdAt, n.id";
 
   String selectFromNoteWithOwnership =
       " JOIN n.notebook nb " + " ON nb.ownership.id = :ownershipId ";
@@ -171,8 +174,8 @@ public interface NoteRepository extends CrudRepository<Note, Integer>, NoteStruc
           selectFromNote
               + selectFromNoteWithOwnership
               + joinMemoryTracker
-              + recallWhereClause
-              + recallOrderByDate)
+              + unassimilatedWhereClause
+              + unassimilatedOrderBy)
   Stream<Note> findByOwnershipWhereThereIsNoMemoryTracker(Integer userId, Integer ownershipId);
 
   @Query(
@@ -180,21 +183,25 @@ public interface NoteRepository extends CrudRepository<Note, Integer>, NoteStruc
           "SELECT count(1) as count from Note n "
               + selectFromNoteWithOwnership
               + joinMemoryTracker
-              + recallWhereClause)
+              + unassimilatedWhereClause)
   int countByOwnershipWhereThereIsNoMemoryTracker(Integer userId, Integer ownershipId);
 
   String fromNotebook = "   AND n.notebook.id = :notebookId ";
 
   @Query(
       value =
-          selectFromNote + joinMemoryTracker + recallWhereClause + fromNotebook + recallOrderByDate)
+          selectFromNote
+              + joinMemoryTracker
+              + unassimilatedWhereClause
+              + fromNotebook
+              + unassimilatedOrderBy)
   Stream<Note> findByAncestorWhereThereIsNoMemoryTracker(Integer userId, Integer notebookId);
 
   @Query(
       value =
           "SELECT count(1) as count from Note n "
               + joinMemoryTracker
-              + recallWhereClause
+              + unassimilatedWhereClause
               + fromNotebook)
   int countByAncestorWhereThereIsNoMemoryTracker(Integer userId, Integer notebookId);
 
