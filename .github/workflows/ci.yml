@@ -213,7 +213,7 @@ jobs:
             cli/dist
             mcp-server/dist
           key: ${{ runner.os }}-e2e-dist-${{ hashFiles('pnpm-lock.yaml', 'package.json', 'frontend/package.json', 'frontend/vite.config.ts', 'frontend/tsconfig.json', 'frontend/index.html', 'frontend/src/**', 'frontend/public/**', 'cli/package.json', 'cli/src/**', 'cli/tsconfig.json', 'mcp-server/package.json', 'mcp-server/src/**', 'packages/generated/doughnut-backend-api/**', 'packages/doughnut-api/**') }}
-      - uses: cypress-io/github-action@v7.4.1
+      - uses: cypress-io/github-action@v7.4.2
         with:
           browser: chrome
           config-file: e2e_test/config/ci.ts
