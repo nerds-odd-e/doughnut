@@ -20,10 +20,11 @@ class RecallPromptOverlapTryAgainTests extends RecallPromptControllerTestBase {
   @Autowired MemoryTrackerService memoryTrackerService;
 
   MemoryTracker memoryTracker;
+  Note partnerNote;
 
   @BeforeEach
   void setup() {
-    Note partnerNote =
+    partnerNote =
         makeMe.aNote().notebookOwnedBy(currentUser.getUser()).title("Shared Title").please();
     Note reviewedNote =
         makeMe
@@ -68,6 +69,26 @@ class RecallPromptOverlapTryAgainTests extends RecallPromptControllerTestBase {
     assertThat(memoryTracker.getForgettingCurveIndex(), equalTo(forgettingCurveBefore));
     assertThat(memoryTracker.getNextRecallAt(), equalTo(nextRecallAtBefore));
     assertThat(memoryTracker.getLastRecalledAt(), equalTo(lastRecalledAtBefore));
+  }
+
+  @Test
+  void shouldLeaveOverlapPartnerTrackerUnchangedAndUnlinked()
+      throws UnexpectedNoAccessRightException {
+    MemoryTracker partnerTracker = ownedSpellingTracker(partnerNote);
+    float partnerStrengthBefore = partnerTracker.getForgettingCurveIndex();
+    Timestamp partnerDueBefore = partnerTracker.getNextRecallAt();
+    Timestamp now = testabilitySettings.getCurrentUTCTimestamp();
+    int partnerWrongCountBefore =
+        memoryTrackerService.countWrongAnswersInPeriod(partnerTracker, now, 14);
+
+    AnsweredQuestion result = answerSpelling(memoryTracker, "Shared Title");
+
+    assertThat(result.getAnswer().getConfusionAdjustedMemoryTracker(), nullValue());
+    assertThat(partnerTracker.getForgettingCurveIndex(), equalTo(partnerStrengthBefore));
+    assertThat(partnerTracker.getNextRecallAt(), equalTo(partnerDueBefore));
+    assertThat(
+        memoryTrackerService.countWrongAnswersInPeriod(partnerTracker, now, 14),
+        equalTo(partnerWrongCountBefore));
   }
 
   @Test

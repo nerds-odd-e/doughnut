@@ -35,11 +35,15 @@ Feature: Overlap try again
     And the note "colour" was assimilated as spelling on day 1
 
   Scenario: Shared non-distinguishing answer shows overlap try-again without credit
+    Given the note "Partner" was assimilated as spelling on day 2
+    And I visit the spelling memory tracker for "Partner"
+    And I record the current memory tracker schedule for "Partner"
     When I visit recall for a due quiz question on day 2
     Then I should be asked spelling question "means a hue" from notebook "Overlap practice"
     When I type my answer "colour"
     Then I should see an overlap try-again alert for spelling
     And I should not see matched notes or accidental match on the overlap result
+    And the spelling memory tracker for "Partner" should keep its recorded schedule
 
   Scenario: Try again then distinguishing plain alias credits as correct
     When I visit recall for a due quiz question on day 2
