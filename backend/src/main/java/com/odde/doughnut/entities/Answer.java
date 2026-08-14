@@ -36,6 +36,12 @@ public class Answer extends EntityIdentifiedByIdOnly {
 
   @Transient @Getter @Setter private Long matchedNoteId;
 
+  @ManyToOne
+  @JoinColumn(name = "confusion_adjusted_memory_tracker_id", referencedColumnName = "id")
+  @JsonIgnore
+  @Setter
+  private MemoryTracker confusionAdjustedMemoryTracker;
+
   @Column(name = "outcome")
   @Enumerated(EnumType.STRING)
   @Setter

@@ -2,19 +2,19 @@
 gsd_state_version: 1.0
 milestone: null
 milestone_name: null
-current_phase: 2
-current_phase_name: Durable causal link to one adjusted tracker
+current_phase: 3
+current_phase_name: Weaken a unique matched spelling tracker
 status: executing
 stopped_at: null
-last_updated: "2026-08-14T16:27:00Z"
+last_updated: "2026-08-14T16:39:00Z"
 last_activity: 2026-08-14
-last_activity_desc: 003 Phase 1 done — accidental match fully fails prompted spelling tracker
+last_activity_desc: 003 Phase 2 done — quiz_answer FK to confusion-adjusted tracker
 progress:
   total_phases: 6
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 1
   completed_plans: 0
-  percent: 17
+  percent: 33
 ---
 
 # Project State
@@ -27,7 +27,7 @@ See: `.planning/PROJECT.md`
 
 ## Current Position
 
-Executing `.planning/quick/003-accidental-match-confusion-adjustment/` Phase 2: nullable `quiz_answer` FK to the confusion-adjusted tracker. Phase 1 shipped: accidental match fully fails prompted tracker A.
+Executing `.planning/quick/003-accidental-match-confusion-adjustment/` Phase 3: weaken a unique matched spelling tracker without recall credit. Phase 2 shipped: nullable `quiz_answer.confusion_adjusted_memory_tracker_id`.
 
 **Ops leftover:** gated dummy-skip conversions. Enable on the deploy that first applies each version, then revert to `1=0`:
 - `dummy_note_sequence_skip_convert` (`V300000254`)
@@ -42,4 +42,4 @@ JDBC harnesses remain temporary until those production applications.
 
 - Enable dummy-skip conversion placeholders on the deploys that first apply V300000254 / V300000255
 - Continue ADR 0003: resolve open issues in `.planning/research/FSRS-COMPATIBILITY-GAP.md`
-- Continue execute-plan `.planning/quick/003-accidental-match-confusion-adjustment/` (Phase 2 next)
+- Continue execute-plan `.planning/quick/003-accidental-match-confusion-adjustment/` (Phase 3 next)

@@ -16,6 +16,7 @@ public class RecallPromptBuilder extends EntityBuilder<RecallPrompt> {
   private final PredefinedQuestionBuilder predefinedQuestionBuilder;
   private AnswerDTO answerDTO = null;
   private MemoryTracker memoryTracker = null;
+  private MemoryTracker confusionAdjustedMemoryTracker = null;
   private String spellingAnswerText = null;
   private Timestamp answerTimestamp = null;
 
@@ -49,6 +50,9 @@ public class RecallPromptBuilder extends EntityBuilder<RecallPrompt> {
         answer.setCreatedAt(answerTimestamp);
       }
       entity.setAnswer(answer);
+    }
+    if (confusionAdjustedMemoryTracker != null && entity.getAnswer() != null) {
+      entity.getAnswer().setConfusionAdjustedMemoryTracker(confusionAdjustedMemoryTracker);
     }
     if (entity.getMemoryTracker() == null && memoryTracker == null) {
       throw new IllegalStateException("call forMemoryTracker() before please()");
@@ -98,6 +102,11 @@ public class RecallPromptBuilder extends EntityBuilder<RecallPrompt> {
 
   public RecallPromptBuilder answerSpelling(String spellingAnswer) {
     this.spellingAnswerText = spellingAnswer;
+    return this;
+  }
+
+  public RecallPromptBuilder confusionAdjusted(MemoryTracker tracker) {
+    this.confusionAdjustedMemoryTracker = tracker;
     return this;
   }
 

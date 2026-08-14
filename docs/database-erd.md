@@ -18,6 +18,7 @@ erDiagram
     image ||--o{ "note" : "image_id ON DELETE CASCADE"
     learning_session ||--o{ session_item : "learning_session_id ON DELETE CASCADE"
     memory_tracker ||--o{ question_generation_batch_request : "memory_tracker_id ON DELETE CASCADE"
+    memory_tracker ||--o{ quiz_answer : "confusion_adjusted_memory_tracker_id ON DELETE SET NULL"
     memory_tracker ||--o{ recall_prompt : "memory_tracker_id ON DELETE CASCADE"
     memory_tracker ||--o{ session_item : "memory_tracker_id ON DELETE CASCADE"
     "note" ||--o{ admin_data_migration_progress : "last_processed_note_id ON DELETE SET NULL"
@@ -211,6 +212,7 @@ erDiagram
     }
     quiz_answer {
         int id PK
+        int confusion_adjusted_memory_tracker_id FK
     }
     recall_prompt {
         int id PK

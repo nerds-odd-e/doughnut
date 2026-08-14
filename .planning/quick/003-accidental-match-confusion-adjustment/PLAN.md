@@ -1,6 +1,6 @@
 # Accidental-match confusion adjustment
 
-**Status:** in progress (Phase 2 next)  
+**Status:** in progress (Phase 3 next)  
 **Type mix:** Behavior and Structure  
 **Context:** [CONTEXT.md](CONTEXT.md)
 
@@ -21,7 +21,7 @@ tracker and still permits retry.
 | # | Type | Status | One outcome |
 |---|---|---|---|
 | 1 | Behavior | done | Accidental match fully fails the prompted spelling tracker |
-| 2 | Structure | planned | An answer can durably identify one confusion-adjusted tracker |
+| 2 | Structure | done | An answer can durably identify one confusion-adjusted tracker |
 | 3 | Behavior | planned | A unique matched spelling tracker receives the weaker adjustment without recall credit |
 | 4 | Behavior | planned | A unique matched understanding tracker is used when no active spelling tracker exists |
 | 5 | Behavior | planned | Ambiguous matches adjust none of the matched trackers |
@@ -44,32 +44,12 @@ advance `lastRecalledAt` or `recallCount`.
 ## Phase 2 — Durable causal link to one adjusted tracker
 
 - **Type:** Structure
-- **Status:** planned
-- **Enables:** Phase 3 only.
-- **Structure change:** `quiz_answer` can optionally reference the one memory
-  tracker that received a secondary confusion adjustment; the relationship is
-  internal and nullable.
-
-### Work
-
-1. Use the next available Flyway version to add an indexed nullable
-   `confusion_adjusted_memory_tracker_id` relationship. Select a delete rule
-   that preserves existing tracker-deletion behavior rather than introducing a
-   restricting FK.
-2. Map the relationship on `Answer` without expanding the learner-facing JSON
-   or generated API surface. Do not repurpose transient `matchedNoteId`, which
-   serves the immediate accidental-match response.
-3. Add one persistence-focused backend test proving the optional relationship
-   survives flush/reload and remains absent for ordinary answers.
-4. Regenerate `docs/database-erd.md` with the `database-erd` skill.
-
-### Verification
-
-- `CURSOR_DEV=true nix develop -c pnpm backend:verify`
-- `CURSOR_DEV=true nix develop -c pnpm export:database-erd`
-
-**Stop-safe value:** The nullable schema and mapping change no grading behavior
-and are solely the immediate foundation for Phase 3.
+- **Status:** done
+- **Shipped:** `V300000256` adds indexed nullable
+  `quiz_answer.confusion_adjusted_memory_tracker_id` → `memory_tracker`
+  `ON DELETE SET NULL`. Mapped on `Answer` as `@JsonIgnore`;
+  `matchedNoteId` stays transient. Persistence test covers flush/reload vs
+  ordinary answers. ERD regenerated. No OpenAPI change.
 
 ## Phase 3 — Weaken a unique matched spelling tracker
 
