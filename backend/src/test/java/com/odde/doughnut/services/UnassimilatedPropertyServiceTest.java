@@ -93,6 +93,15 @@ class UnassimilatedPropertyServiceTest {
   }
 
   @Test
+  void does_not_count_when_property_has_sequence_skip() {
+    User user = makeMe.aUser().please();
+    Note note = noteWithContent(user, "---\ntopic: physics\n---\n\nbody");
+    makeMe.anAssimilationSequenceSkipFor(note).propertyKey("topic").please();
+
+    assertThat(unassimilatedPropertyService.countUnassimilatedPropertiesForUser(user), equalTo(0));
+  }
+
+  @Test
   void does_not_count_reserved_keys_not_in_index() {
     User user = makeMe.aUser().please();
     noteWithContent(user, "---\nimage: /x\nurl: https://example.com\n---\n\nbody");

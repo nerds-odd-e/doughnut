@@ -9,12 +9,16 @@ export function useAssimilationSequenceSkip() {
   const { goToNextAssimilation } = useGoToNextAssimilation()
 
   const skipFromAssimilationSequence = async (
-    noteId: number
+    noteId: number,
+    propertyKey?: string
   ): Promise<{ success: boolean; navigated: boolean }> => {
     const { error } = await apiCallWithLoading(
       () =>
         AssimilationSequenceSkipController.create({
-          body: { noteId },
+          body: {
+            noteId,
+            ...(propertyKey ? { propertyKey } : {}),
+          },
         }),
       { blockUi: true, message: "Skipping..." }
     )

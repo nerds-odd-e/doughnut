@@ -1,7 +1,11 @@
 import type { Note } from "@generated/doughnut-backend-api"
-import { assimilateButtonSelector } from "./assimilationPanelTestSupport"
+import {
+  assimilateButtonSelector,
+  skipButtonSelector,
+} from "./assimilationPanelTestSupport"
 import { flushPromises } from "@vue/test-utils"
 import makeMe from "doughnut-test-fixtures/makeMe"
+import usePopups from "@/components/commons/Popups/usePopups"
 import { expect } from "vitest"
 
 export const noteWithAssimilationProperties: Note = makeMe.aNoteRealm
@@ -36,5 +40,14 @@ export async function clickPropertyAssimilate(propertyKey: string) {
     assimilateButtonSelector
   ) as HTMLInputElement
   assimilate.click()
+  await flushPromises()
+}
+
+export async function clickPropertySkipAndConfirm(propertyKey: string) {
+  const skip = assimilationPropertyRow(propertyKey).querySelector(
+    skipButtonSelector
+  ) as HTMLInputElement
+  skip.click()
+  usePopups().popups.done(true)
   await flushPromises()
 }

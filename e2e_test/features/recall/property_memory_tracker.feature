@@ -36,7 +36,7 @@ Feature: Property memory tracker
     And I should see pending assimilation property "example of"
 
   @disableOpenAiService
-  Scenario: Skipping recall on property clears unassimilated queue
+  Scenario: Skip a property does not create a dummy understanding tracker
     Given I am re-logged in as "another_old_learner"
     And I have a notebook "Property skip"
     And I have a note "Minerals" under notebook "Property skip" with content:
@@ -51,32 +51,14 @@ Feature: Property memory tracker
     And I assimilated one note "Minerals" at the current time
     When I start assimilation from the menu
     Then I should see pending assimilation property "topic"
-    When I skip recall on property "topic"
-    Then I should not see pending assimilation property "topic"
-    And assimilate for property "topic" should be disabled
-
-  @disableOpenAiService
-  Scenario: Revive skipped property recall from assimilation settings
-    Given I am re-logged in as "another_old_learner"
-    And I have a notebook "Property revive"
-    And I have a note "Minerals" under notebook "Property revive" with content:
-      """
-      ---
-      topic: calcium
-      ---
-
-      Body.
-      """
-    And It's day 1, 8 hour
-    And I assimilated one note "Minerals" at the current time
-    When I start assimilation from the menu
-    And I skip recall on property "topic"
-    And I visit note "Minerals"
+    When I skip property "topic" on the assimilation panel
+    Then I should see the no more notes to assimilate toast
+    When I visit note "Minerals"
     And I open assimilation settings
     And I expand assimilation properties
-    Then I should see Revive for property "topic"
-    When I revive recall for property "topic"
-    Then I should see Skip recall for property "topic"
+    Then the property memory tracker for "topic" should be absent
+    And assimilate for property "topic" should be enabled
+    And I should see Skip for property "topic"
 
   @disableOpenAiService
   Scenario: Note-level assimilation stays available after property-only assimilation

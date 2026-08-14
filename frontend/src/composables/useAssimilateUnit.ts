@@ -27,9 +27,6 @@ export type AssimilateUnitResult = {
   memoryTrackers?: MemoryTracker[]
 }
 
-export const PROPERTY_SKIP_RECALL_CONFIRM =
-  "Confirm to hide this property from recalls in the future?"
-
 export function useAssimilateUnit() {
   const { totalAssimilatedCount, requestDueRecallsRefresh } = useRecallData()
   const { incrementAssimilatedCount } = useAssimilationCount()

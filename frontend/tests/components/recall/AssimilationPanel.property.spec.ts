@@ -6,6 +6,7 @@ import { mockSdkService, wrapSdkResponse } from "@tests/helpers"
 import { mockedGoToNextAssimilation } from "./assimilationPanelMocks"
 import {
   clickPropertyAssimilate,
+  clickPropertySkipAndConfirm,
   expandAssimilationPropertiesSection,
   noteWithAssimilationProperties,
 } from "./assimilationPropertyTestSupport"
@@ -15,6 +16,7 @@ import {
   mockedRequestDueRecallsRefresh,
   renderer,
   setupAssimilationPanelTests,
+  skipSequenceSpy,
 } from "./assimilationPanelTestSupport"
 
 vi.mock("@/composables/useRecallData")
@@ -59,6 +61,22 @@ describe("AssimilationPanel property assimilation", () => {
     expect(assimilatedCountOfTheDay.value).toBe(1)
     expect(mockedRequestDueRecallsRefresh).toHaveBeenCalled()
     expect(getNoteInfoSpy.mock.calls.length).toBeGreaterThanOrEqual(2)
+    wrapper.unmount()
+  })
+
+  it("skips a property from the sequence without creating a tracker", async () => {
+    const wrapper = mountPanelWithProperties()
+    await flushPromises()
+    await expandAssimilationPropertiesSection()
+    await clickPropertySkipAndConfirm("topic")
+
+    expect(skipSequenceSpy).toHaveBeenCalledWith({
+      body: {
+        noteId: noteWithAssimilationProperties.id,
+        propertyKey: "topic",
+      },
+    })
+    expect(assimilateSpy).not.toHaveBeenCalled()
     wrapper.unmount()
   })
 })

@@ -2,7 +2,6 @@ import { waitUntilAppIsNotBusy } from '../../pageBase'
 import {
   assimilationPropertyRow,
   assimilateButtonSelector,
-  reviveButtonSelector,
   skipButtonSelector,
 } from './shared'
 
@@ -51,38 +50,27 @@ export function assimilationPropertyFlow() {
       waitUntilAppIsNotBusy()
       return this
     },
-    skipRecallProperty(propertyKey: string) {
+    skipPropertyOnPanel(propertyKey: string) {
       clickPropertyRowButton(propertyKey, skipButtonSelector)
       cy.findByRole('button', { name: 'OK' }).click()
       waitUntilAppIsNotBusy()
       return this
     },
-    reviveRecallProperty(propertyKey: string) {
-      clickPropertyRowButton(propertyKey, reviveButtonSelector)
-      waitUntilAppIsNotBusy()
-      return this
-    },
-    expectReviveForProperty(propertyKey: string) {
-      assimilationPropertyRow(propertyKey).within(() => {
-        cy.get(reviveButtonSelector).should('exist')
-        cy.root().then(($root) => {
-          expect($root.find(skipButtonSelector).length).to.equal(0)
-        })
-      })
-      return this
-    },
-    expectSkipRecallForProperty(propertyKey: string) {
+    expectSkipForProperty(propertyKey: string) {
       assimilationPropertyRow(propertyKey).within(() => {
         cy.get(skipButtonSelector).should('exist')
-        cy.root().then(($root) => {
-          expect($root.find(reviveButtonSelector).length).to.equal(0)
-        })
       })
       return this
     },
     expectPropertyAssimilateDisabled(propertyKey: string) {
       assimilationPropertyRow(propertyKey).within(() => {
         cy.get(assimilateButtonSelector).should('be.disabled')
+      })
+      return this
+    },
+    expectPropertyAssimilateEnabled(propertyKey: string) {
+      assimilationPropertyRow(propertyKey).within(() => {
+        cy.get(assimilateButtonSelector).should('not.be.disabled')
       })
       return this
     },

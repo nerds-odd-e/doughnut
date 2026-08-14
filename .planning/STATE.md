@@ -2,19 +2,19 @@
 gsd_state_version: 1.0
 milestone: null
 milestone_name: null
-current_phase: 11
-current_phase_name: Skip a property in the sequence
+current_phase: 12
+current_phase_name: Assimilate a skipped property
 status: in_progress
-stopped_at: "Paused after Phase 10 wrap-up; resume execute-plan at Phase 11"
-last_updated: "2026-08-14T06:15:00Z"
+stopped_at: "Paused after Phase 11 wrap-up; resume execute-plan at Phase 12"
+last_updated: "2026-08-14T06:45:00Z"
 last_activity: 2026-08-14
-last_activity_desc: Phases 1–10 done; next is skip a property in the assimilation sequence
+last_activity_desc: Phases 1–11 done; next is assimilate a skipped property
 progress:
   total_phases: 17
-  completed_phases: 10
+  completed_phases: 11
   total_plans: 1
   completed_plans: 0
-  percent: 59
+  percent: 65
 ---
 
 # Project State
@@ -27,7 +27,7 @@ See: `.planning/PROJECT.md`
 
 ## Current Position
 
-Ad-hoc plan in progress: [`.planning/quick/001-skip-assimilation/PLAN.md`](quick/001-skip-assimilation/PLAN.md). **Phases 1–10 done.** Next: Phase 11 (Skip a property in the sequence without a dummy tracker).
+Ad-hoc plan in progress: [`.planning/quick/001-skip-assimilation/PLAN.md`](quick/001-skip-assimilation/PLAN.md). **Phases 1–11 done.** Next: Phase 12 (Assimilate a skipped property; skip row cleared; XOR at property grain).
 
 **Ops leftover:** production dummy-skip conversion is gated. Enable `spring.flyway.placeholders.dummy_note_sequence_skip_convert=1=1` on a deliberate deploy, then revert to `1=0`. JDBC harness `NoteLevelDummySequenceSkipConversionTest` is temporary until that application.
 
@@ -37,6 +37,6 @@ Ad-hoc plan in progress: [`.planning/quick/001-skip-assimilation/PLAN.md`](quick
 
 ## Operator Next Steps
 
-- Continue execute-plan: Phase 11 of `.planning/quick/001-skip-assimilation/PLAN.md`
+- Continue execute-plan: Phase 12 of `.planning/quick/001-skip-assimilation/PLAN.md`
 - Enable production dummy-skip conversion (`dummy_note_sequence_skip_convert=1=1`) on a deliberate deploy when ready
 - Or continue ADR 0003: resolve open issues in `.planning/research/FSRS-COMPATIBILITY-GAP.md`

@@ -1,6 +1,6 @@
 # Assimilation-sequence skip
 
-**Status:** in progress (Phase 11 next)  
+**Status:** in progress (Phase 12 next)  
 **Type mix:** Structure then Behavior
 
 Each phase is one commit: **Behavior** (one observable) or **Structure** (only what the **immediate next** behavior needs). Size for ~5 minutes wall-clock including targeted tests.
@@ -97,7 +97,7 @@ Permanent artifacts stay capability-named (no phase numbers in product files).
 | 8 | Behavior | Migrate note-level dummy skips (`recall_count = 0`) (done) |
 | 9 | Behavior | Return to sequence (note) (done) |
 | 10 | Behavior | Remove from recall on assimilation settings (note) (done) |
-| 11 | Behavior | Skip a property in the sequence |
+| 11 | Behavior | Skip a property in the sequence (done) |
 | 12 | Behavior | Assimilate a skipped property |
 | 13 | Behavior | Return to sequence (property) |
 | 14 | Behavior | Remove from recall on assimilation settings (property) |
@@ -215,19 +215,11 @@ Permanent artifacts stay capability-named (no phase numbers in product files).
 ## Phase 11 — Skip a property in the sequence
 
 - **Type:** Behavior  
-- **Status:** planned
+- **Status:** done
 
-**Pre-condition:** Property unit pending (note already has note-level understanding).  
-**Trigger:** **Skip** on that property row.  
-**Post-condition:** Property not offered as next; skip row with `property_key`; no dummy property tracker.
+**Done:** Property Skip POSTs `/api/assimilation-sequence-skips` with `propertyKey`; no dummy tracker. Unassimilated-property queries already excluded skip rows (Phase 3); service test locks that. E2E in `property_memory_tracker.feature`.
 
-Unassimilated-property queries exclude skip rows in this same commit (otherwise the property reappears).
-
-**Tests:** Extend `e2e_test/features/recall/property_memory_tracker.feature` and `UnassimilatedPropertyServiceTest`.
-
-**Command:** `CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/recall/property_memory_tracker.feature`
-
-**Done when:** New property skips never create dummy understanding trackers.
+**Learning:** Confirm copy still says “this note” for property Skip (shared `SEQUENCE_SKIP_CONFIRM`). Unassimilated-property exclusion was already in `/next` SQL.
 
 ---
 

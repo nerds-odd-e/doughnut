@@ -38,7 +38,6 @@ import AssimilationSettings from "./AssimilationSettings.vue"
 import SpellingVerificationPopup from "./SpellingVerificationPopup.vue"
 import { computed, ref } from "vue"
 import {
-  PROPERTY_SKIP_RECALL_CONFIRM,
   useAssimilateUnit,
   type AssimilateEvent,
 } from "@/composables/useAssimilateUnit"
@@ -58,7 +57,6 @@ import {
   REMOVE_FROM_RECALL_CONFIRM,
   useRemoveFromRecall,
 } from "@/composables/useRemoveFromRecall"
-import { useAssimilationView } from "@/composables/useAssimilationView"
 
 const { note } = defineProps<{
   note: Note
@@ -74,7 +72,6 @@ const { skipFromAssimilationSequence, returnToAssimilationSequence } =
   useAssimilationSequenceSkip()
 const { reviveMemoryTrackers } = useReviveMemoryTracker()
 const { removeMemoryTrackersFromRecall } = useRemoveFromRecall()
-const { openForNote } = useAssimilationView()
 
 const settingsRef = ref<InstanceType<typeof AssimilationSettings> | null>(null)
 
@@ -121,25 +118,12 @@ const processAssimilate = async ({
 }
 
 const processSkip = async ({ propertyKey }: { propertyKey?: string } = {}) => {
-  if (propertyKey) {
-    const confirmed = await popups.confirm(PROPERTY_SKIP_RECALL_CONFIRM)
-    if (!confirmed) {
-      return
-    }
-    await doAssimilate({ skipMemoryTracking: true, propertyKey })
-    return
-  }
-
-  await processSequenceSkip()
-}
-
-const processSequenceSkip = async () => {
   const confirmed = await popups.confirm(SEQUENCE_SKIP_CONFIRM)
   if (!confirmed) {
     return
   }
 
-  const result = await skipFromAssimilationSequence(note.id)
+  const result = await skipFromAssimilationSequence(note.id, propertyKey)
   if (!result.success) {
     return
   }
@@ -212,11 +196,7 @@ const doAssimilate = async ({
     await settingsRef.value?.reloadNoteInfo()
 
     if (!result.navigated) {
-      if (propertyKey && skipMemoryTracking) {
-        openForNote(note.id, null)
-      } else {
-        emit("reloadNeeded")
-      }
+      emit("reloadNeeded")
     }
   } finally {
     assimilatingPropertyKey.value = null
