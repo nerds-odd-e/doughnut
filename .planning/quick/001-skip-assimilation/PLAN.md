@@ -1,6 +1,6 @@
 # Assimilation-sequence skip
 
-**Status:** in progress (Phase 15 next)  
+**Status:** in progress (Phase 16 next)  
 **Type mix:** Structure then Behavior
 
 Each phase is one commit: **Behavior** (one observable) or **Structure** (only what the **immediate next** behavior needs). Size for ~5 minutes wall-clock including targeted tests.
@@ -101,7 +101,7 @@ Permanent artifacts stay capability-named (no phase numbers in product files).
 | 12 | Behavior | Assimilate a skipped property (done) |
 | 13 | Behavior | Return to sequence (property) (done) |
 | 14 | Behavior | Remove from recall on assimilation settings (property) (done) |
-| 15 | Behavior | Migrate property-level dummy skips (`recall_count = 0`) |
+| 15 | Behavior | Migrate property-level dummy skips (`recall_count = 0`) (done) |
 | 16 | Structure | Drop `skipMemoryTracking` on assimilate + testability wording |
 | 17 | Structure | Notebook Skip Memory Tracking E2E language |
 
@@ -259,11 +259,11 @@ Permanent artifacts stay capability-named (no phase numbers in product files).
 ## Phase 15 — Convert property-level dummy skipped trackers (`recall_count = 0`)
 
 - **Type:** Behavior  
-- **Status:** planned
+- **Status:** done
 
-Same conversion as Phase 8, `property_key <> ''`. Leave `recall_count > 0` as removed from recall.
+**Done:** Gated Flyway `V300000255` converts live property-level `UNDERSTANDING` dummies (`property_key <> ''`, `recall_count = 0`) into skip rows and soft-deletes those trackers. Placeholder `dummy_property_sequence_skip_convert` defaults to `1=0`. JDBC harness `PropertyLevelDummySequenceSkipConversionTest`.
 
-**Done when:** Those production dummy property skips are sequence-skip rows.
+**Learning:** Same gate-window as Phase 8 — enable the placeholder on the deploy that first applies this version. JDBC harness is temporary until production application.
 
 ---
 
