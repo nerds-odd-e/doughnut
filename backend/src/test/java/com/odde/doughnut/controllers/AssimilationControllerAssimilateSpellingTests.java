@@ -7,19 +7,37 @@ import com.odde.doughnut.controllers.dto.AssimilationRequestDTO;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.MemoryTrackerType;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.repositories.AssimilationSequenceSkipRepository;
 import com.odde.doughnut.entities.repositories.MemoryTrackerRepository;
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 class AssimilationControllerAssimilateSpellingTests extends ControllerTestBase {
   @Autowired private MemoryTrackerRepository memoryTrackerRepository;
+  @Autowired private AssimilationSequenceSkipRepository skipRepository;
   @Autowired AssimilationController controller;
 
   @BeforeEach
   void setup() {
     currentUser.setUser(makeMe.aUser().please());
+  }
+
+  @Test
+  void assimilatingAsSpellingOnSkippedNoteLeavesSkipRowAndStaysOutOfNext() {
+    Note note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
+    makeMe.anAssimilationSequenceSkipFor(note).please();
+
+    List<MemoryTracker> result =
+        controller.assimilate(AssimilationControllerTestSupport.assimilateSpellingRequest(note));
+
+    assertThat(result.get(0).getType(), equalTo(MemoryTrackerType.SPELLING));
+    assertThat(
+        skipRepository.findByUserAndNoteAndPropertyKey(currentUser.getUser(), note, ""),
+        is(not(Optional.empty())));
+    assertThat(controller.next("Asia/Shanghai").getNextUnit(), nullValue());
   }
 
   @Test

@@ -1,6 +1,6 @@
 # Assimilation-sequence skip
 
-**Status:** in progress (Phase 6 next)  
+**Status:** in progress (Phase 7 next)  
 **Type mix:** Structure then Behavior
 
 Each phase is one commit: **Behavior** (one observable) or **Structure** (only what the **immediate next** behavior needs). Size for ~5 minutes wall-clock including targeted tests.
@@ -92,7 +92,7 @@ Permanent artifacts stay capability-named (no phase numbers in product files).
 | 3 | Structure | POST skip + `/next` excludes skip rows (done) |
 | 4 | Behavior | Skip on the panel leaves the sequence with no dummy tracker (done) |
 | 5 | Behavior | Assimilate (understanding) a skipped note (done) |
-| 6 | Behavior | Remember spelling a skipped note |
+| 6 | Behavior | Remember spelling a skipped note (done) |
 | 7 | Behavior | Assimilate as commissioned a skipped note |
 | 8 | Behavior | Migrate note-level dummy skips (`recall_count = 0`) |
 | 9 | Behavior | Return to sequence (note) |
@@ -160,15 +160,11 @@ Permanent artifacts stay capability-named (no phase numbers in product files).
 ## Phase 6 — Remember spelling a skipped note
 
 - **Type:** Behavior  
-- **Status:** planned
+- **Status:** done
 
-**Pre-condition:** Sequence-skipped note, no spelling tracker.  
-**Trigger:** **Remember spelling**.  
-**Post-condition:** Spelling tracker exists; skip row **remains**; note still not next.
+**Done:** Controller test at the assimilate boundary: spelling tracker created, skip row remains, note not next. Production already left skip for non-UNDERSTANDING; no production change.
 
-**Tests:** One E2E or controller test at the assimilate boundary (extend existing spelling assimilation specs, not a phase-named file).
-
-**Done when:** Spelling on a skipped note does not clear sequence skip.
+**Learning:** Understanding-only skip deletion from Phase 5 already covers spelling; this phase is the spelling delta test.
 
 ---
 
