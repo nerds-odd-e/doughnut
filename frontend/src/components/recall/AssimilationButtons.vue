@@ -62,7 +62,17 @@
     </AutoCollapseDropdown>
   </div>
   <input
-    v-if="showSkip && skippedForRecall"
+    v-if="skippedFromAssimilationSequence"
+    type="submit"
+    name="return-to-sequence"
+    value="Return to sequence"
+    :class="['daisy-btn daisy-btn-secondary', sizeClass]"
+    data-test="return-to-sequence"
+    :disabled="disabled"
+    @click="$emit('returnToSequence')"
+  />
+  <input
+    v-else-if="showSkip && skippedForRecall"
     type="submit"
     name="revive"
     value="Revive"
@@ -120,6 +130,10 @@ export default defineComponent({
       type: Boolean,
       default: false,
     },
+    skippedFromAssimilationSequence: {
+      type: Boolean,
+      default: false,
+    },
     showCommissionedOption: {
       type: Boolean,
       default: false,
@@ -133,6 +147,7 @@ export default defineComponent({
     "assimilate",
     "skip",
     "revive",
+    "returnToSequence",
     "assimilateAsCommissioned",
     "rememberSpelling",
   ],

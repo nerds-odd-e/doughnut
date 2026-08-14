@@ -1,6 +1,6 @@
 # Assimilation-sequence skip
 
-**Status:** in progress (Phase 9 next)  
+**Status:** in progress (Phase 10 next)  
 **Type mix:** Structure then Behavior
 
 Each phase is one commit: **Behavior** (one observable) or **Structure** (only what the **immediate next** behavior needs). Size for ~5 minutes wall-clock including targeted tests.
@@ -95,7 +95,7 @@ Permanent artifacts stay capability-named (no phase numbers in product files).
 | 6 | Behavior | Remember spelling a skipped note (done) |
 | 7 | Behavior | Assimilate as commissioned a skipped note (done) |
 | 8 | Behavior | Migrate note-level dummy skips (`recall_count = 0`) (done) |
-| 9 | Behavior | Return to sequence (note) |
+| 9 | Behavior | Return to sequence (note) (done) |
 | 10 | Behavior | Remove from recall on assimilation settings (note) |
 | 11 | Behavior | Skip a property in the sequence |
 | 12 | Behavior | Assimilate a skipped property |
@@ -193,17 +193,11 @@ Permanent artifacts stay capability-named (no phase numbers in product files).
 ## Phase 9 — Return to sequence (note)
 
 - **Type:** Behavior  
-- **Status:** planned
+- **Status:** done
 
-**Pre-condition:** Note has a skip row and no live understanding tracker.  
-**Trigger:** **Return to sequence** on assimilation settings.  
-**Post-condition:** Skip row gone; note is next-eligible again; no new tracker; **Skip** visible; this is not Revive.
+**Done:** DELETE `/api/assimilation-sequence-skips` (same grain as POST). `NoteRecallInfo.skippedFromAssimilationSequence` drives **Return to sequence** on assimilation settings; Skip hidden while sequence-skipped. E2E: return restores next-eligibility; Revive stays a different control.
 
-`NoteRecallInfo` may grow a sequence-skip fact in this same commit (needed to show the button). Do not add that DTO in an earlier unused Structure phase.
-
-**Tests:** E2E in `assimilation_walkthrough.feature`. Controller: DELETE skip row only.
-
-**Done when:** Return to sequence and Revive are different controls and different storage.
+**Learning:** OpenAPI operationId is `deleteAssimilationSequenceSkip` so it does not collide with memory-tracker delete.
 
 ---
 

@@ -61,7 +61,23 @@ Feature: Assimilation walkthrough
     Then I should be assimilating the note "Note 4"
     When I jump to the note page of "Note 3"
     And I open assimilation settings
+    Then I should see Return to sequence on the assimilation panel
+
+  Scenario: Return to sequence restores next-eligibility
+    Given It's day 1
+    And the note "Note 1" was assimilated on day 1
+    And the note "Note 2" was assimilated on day 1
+    When I start assimilation from the menu
+    Then I should be assimilating the note "Note 3"
+    When I skip on the assimilation panel
+    Then I should be assimilating the note "Note 4"
+    When I jump to the note page of "Note 3"
+    And I open assimilation settings
+    When I return to sequence on the assimilation panel
     Then I should see Skip on the assimilation panel
+    And assimilate should be enabled
+    When I start assimilation from the menu
+    Then I should be assimilating the note "Note 3"
 
   Scenario: Assimilating a skipped note creates understanding and leaves the sequence
     Given It's day 1

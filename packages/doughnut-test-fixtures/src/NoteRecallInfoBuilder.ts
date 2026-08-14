@@ -25,6 +25,11 @@ class NoteRecallInfoBuilder extends Builder<NoteRecallInfo> {
     return this
   }
 
+  skippedFromAssimilationSequence(value: boolean): NoteRecallInfoBuilder {
+    this.data.skippedFromAssimilationSequence = value
+    return this
+  }
+
   do(): NoteRecallInfo {
     return this.data
   }

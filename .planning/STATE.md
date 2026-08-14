@@ -2,19 +2,19 @@
 gsd_state_version: 1.0
 milestone: null
 milestone_name: null
-current_phase: 9
-current_phase_name: Return to sequence (note)
+current_phase: 10
+current_phase_name: Remove from recall on assimilation settings (note)
 status: in_progress
-stopped_at: "Paused after Phase 8 wrap-up; resume execute-plan at Phase 9"
-last_updated: "2026-08-14T05:10:00Z"
+stopped_at: "Paused after Phase 9 wrap-up; resume execute-plan at Phase 10"
+last_updated: "2026-08-14T05:45:00Z"
 last_activity: 2026-08-14
-last_activity_desc: Phases 1–8 done; next is Return to sequence on assimilation settings
+last_activity_desc: Phases 1–9 done; next is Remove from recall on assimilation settings
 progress:
   total_phases: 17
-  completed_phases: 8
+  completed_phases: 9
   total_plans: 1
   completed_plans: 0
-  percent: 47
+  percent: 53
 ---
 
 # Project State
@@ -27,7 +27,7 @@ See: `.planning/PROJECT.md`
 
 ## Current Position
 
-Ad-hoc plan in progress: [`.planning/quick/001-skip-assimilation/PLAN.md`](quick/001-skip-assimilation/PLAN.md). **Phases 1–8 done.** Next: Phase 9 (Return to sequence on a note-level sequence skip).
+Ad-hoc plan in progress: [`.planning/quick/001-skip-assimilation/PLAN.md`](quick/001-skip-assimilation/PLAN.md). **Phases 1–9 done.** Next: Phase 10 (Remove from recall on assimilation settings for an assimilated note).
 
 **Ops leftover:** production dummy-skip conversion is gated. Enable `spring.flyway.placeholders.dummy_note_sequence_skip_convert=1=1` on a deliberate deploy, then revert to `1=0`. JDBC harness `NoteLevelDummySequenceSkipConversionTest` is temporary until that application.
 
@@ -37,6 +37,6 @@ Ad-hoc plan in progress: [`.planning/quick/001-skip-assimilation/PLAN.md`](quick
 
 ## Operator Next Steps
 
-- Continue execute-plan: Phase 9 of `.planning/quick/001-skip-assimilation/PLAN.md`
+- Continue execute-plan: Phase 10 of `.planning/quick/001-skip-assimilation/PLAN.md`
 - Enable production dummy-skip conversion (`dummy_note_sequence_skip_convert=1=1`) on a deliberate deploy when ready
 - Or continue ADR 0003: resolve open issues in `.planning/research/FSRS-COMPATIBILITY-GAP.md`

@@ -119,6 +119,7 @@ Every whole-UI blocker and long-running note-refinement AI request must be class
 | Remove refinement content | `AI is removing content...` | `NoteRefinement.vue` | `runWithBlockingApiLoading` | Mutation; nested post-remove layout reload is nonblocking (see below) |
 | Assimilate unit | `Assimilating...` | `useAssimilateUnit.ts` | `{ blockUi: true }` | Mutation |
 | Skip from assimilation sequence | `Skipping...` | `useAssimilationSequenceSkip.ts` | `{ blockUi: true }` | Mutation |
+| Return to sequence | `Returning to sequence...` | `useAssimilationSequenceSkip.ts` | `{ blockUi: true }` | Mutation |
 | Load next assimilation note | `Loading next note...` | `useGoToNextAssimilation.ts` | `{ blockUi: true }` | View transition |
 | Book layout mutations | `Updating book layout…` | `useBookLayoutMutations.ts` | `{ blockUi: true }` (2 sites) | Mutation |
 | Book layout AI suggest | `Analyzing book layout…` | `useBookLayoutAiReorganize.ts` | `{ blockUi: true }` | Long-running AI read; leave noncancelable until post-cancel UX is defined |

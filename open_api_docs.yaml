@@ -1581,6 +1581,19 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/AssimilationSequenceSkip"
+    delete:
+      tags:
+      - assimilation-sequence-skip-controller
+      operationId: deleteAssimilationSequenceSkip
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AssimilationSequenceSkipRequestDTO"
+        required: true
+      responses:
+        "200":
+          description: OK
   /api/ai/suggest-title/{note}:
     post:
       tags:
@@ -5059,6 +5072,8 @@ components:
             $ref: "#/components/schemas/MemoryTracker"
         recallSetting:
           $ref: "#/components/schemas/NoteRecallSetting"
+        skippedFromAssimilationSequence:
+          type: boolean
     FocusContextFocusNote:
       type: object
       properties:

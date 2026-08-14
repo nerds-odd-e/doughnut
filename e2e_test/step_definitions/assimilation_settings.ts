@@ -43,6 +43,10 @@ When('I skip on the assimilation panel', () => {
   start.assumeAssimilationPage().skipOnPanel()
 })
 
+When('I return to sequence on the assimilation panel', () => {
+  start.assumeAssimilationPage().returnToSequenceOnPanel()
+})
+
 When('I expand assimilation properties', () => {
   start.assumeAssimilationPage().expandAssimilationPropertiesSection()
 })
@@ -75,4 +79,8 @@ Then(
 
 Then('I should see Skip on the assimilation panel', () => {
   start.assumeAssimilationPage().expectSkipOnPanel()
+})
+
+Then('I should see Return to sequence on the assimilation panel', () => {
+  start.assumeAssimilationPage().expectReturnToSequenceOnPanel()
 })

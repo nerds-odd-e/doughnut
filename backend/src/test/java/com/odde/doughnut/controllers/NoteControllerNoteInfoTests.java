@@ -47,4 +47,14 @@ class NoteControllerNoteInfoTests extends ControllerTestBase {
     assertThat(
         noteRecallInfo.getMemoryTrackers(), hasItem(hasProperty("removedFromTracking", is(true))));
   }
+
+  @Test
+  void shouldIncludeSequenceSkipFactWhenSkipRowExists() throws UnexpectedNoAccessRightException {
+    Note note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
+    makeMe.anAssimilationSequenceSkipFor(note).please();
+
+    NoteRecallInfo noteRecallInfo = controller.getNoteInfo(note);
+
+    assertThat(noteRecallInfo.isSkippedFromAssimilationSequence(), is(true));
+  }
 }

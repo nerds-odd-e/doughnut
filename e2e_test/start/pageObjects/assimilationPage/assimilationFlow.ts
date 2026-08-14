@@ -12,6 +12,9 @@ import {
   openRefineNoteModalIfNeeded,
   rememberSpellingButton,
   skipButton,
+  returnToSequenceButton,
+  noteLevelReturnToSequenceElements,
+  noteLevelSkipElements,
   waitForAssimilationNoteTitle,
 } from './shared'
 
@@ -90,10 +93,24 @@ export const assumeAssimilationPage = () => ({
     waitUntilAppIsNotBusy()
     return this
   },
+  returnToSequenceOnPanel() {
+    returnToSequenceButton().click()
+    waitUntilAppIsNotBusy()
+    return this
+  },
   expectSkipOnPanel() {
     skipButton().should('exist')
     cy.document().then((doc) => {
       expect(noteLevelReviveElements(doc)).to.have.length(0)
+      expect(noteLevelReturnToSequenceElements(doc)).to.have.length(0)
+    })
+    return this
+  },
+  expectReturnToSequenceOnPanel() {
+    returnToSequenceButton().should('exist')
+    cy.document().then((doc) => {
+      expect(noteLevelReviveElements(doc)).to.have.length(0)
+      expect(noteLevelSkipElements(doc)).to.have.length(0)
     })
     return this
   },

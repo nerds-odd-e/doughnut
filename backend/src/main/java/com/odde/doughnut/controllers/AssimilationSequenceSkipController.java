@@ -9,7 +9,9 @@ import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.EntityPersister;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.testability.TestabilitySettings;
+import java.util.Optional;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -38,21 +40,41 @@ class AssimilationSequenceSkipController {
   @Transactional
   public AssimilationSequenceSkip create(@RequestBody AssimilationSequenceSkipRequestDTO request)
       throws UnexpectedNoAccessRightException {
+    SkipGrain grain = authorizedSkipGrain(request);
+    return findSkip(grain).orElseGet(() -> persistSkip(grain));
+  }
+
+  @DeleteMapping(path = "")
+  @Transactional
+  public void deleteAssimilationSequenceSkip(
+      @RequestBody AssimilationSequenceSkipRequestDTO request)
+      throws UnexpectedNoAccessRightException {
+    findSkip(authorizedSkipGrain(request)).ifPresent(entityPersister::remove);
+  }
+
+  private record SkipGrain(User user, Note note, String propertyKey) {}
+
+  private SkipGrain authorizedSkipGrain(AssimilationSequenceSkipRequestDTO request)
+      throws UnexpectedNoAccessRightException {
     authorizationService.assertLoggedIn();
     Note note = entityPersister.find(Note.class, request.noteId);
     authorizationService.assertReadAuthorization(note);
-    User user = authorizationService.getCurrentUser();
-    String propertyKey = request.propertyKey == null ? "" : request.propertyKey;
-    return skipRepository
-        .findByUserAndNoteAndPropertyKey(user, note, propertyKey)
-        .orElseGet(() -> persistSkip(user, note, propertyKey));
+    return new SkipGrain(
+        authorizationService.getCurrentUser(),
+        note,
+        request.propertyKey == null ? "" : request.propertyKey);
   }
 
-  private AssimilationSequenceSkip persistSkip(User user, Note note, String propertyKey) {
+  private Optional<AssimilationSequenceSkip> findSkip(SkipGrain grain) {
+    return skipRepository.findByUserAndNoteAndPropertyKey(
+        grain.user(), grain.note(), grain.propertyKey());
+  }
+
+  private AssimilationSequenceSkip persistSkip(SkipGrain grain) {
     AssimilationSequenceSkip skip = new AssimilationSequenceSkip();
-    skip.setUser(user);
-    skip.setNote(note);
-    skip.setPropertyKey(propertyKey);
+    skip.setUser(grain.user());
+    skip.setNote(grain.note());
+    skip.setPropertyKey(grain.propertyKey());
     skip.setSkippedAt(testabilitySettings.getCurrentUTCTimestamp());
     return entityPersister.save(skip);
   }

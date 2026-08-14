@@ -27,5 +27,18 @@ export function useAssimilationSequenceSkip() {
     return { success: true, navigated }
   }
 
-  return { skipFromAssimilationSequence }
+  const returnToAssimilationSequence = async (
+    noteId: number
+  ): Promise<boolean> => {
+    const { error } = await apiCallWithLoading(
+      () =>
+        AssimilationSequenceSkipController.deleteAssimilationSequenceSkip({
+          body: { noteId },
+        }),
+      { blockUi: true, message: "Returning to sequence..." }
+    )
+    return !error
+  }
+
+  return { skipFromAssimilationSequence, returnToAssimilationSequence }
 }

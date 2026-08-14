@@ -96,6 +96,9 @@
           :disabled="!noteInfoLoaded"
           :assimilate-disabled="assimilateDisabled"
           :skipped-for-recall="isSkippedForRecall(noteRecallInfo)"
+          :skipped-from-assimilation-sequence="
+            noteRecallInfo?.skippedFromAssimilationSequence === true
+          "
           :show-commissioned-option="showCommissionedOption"
           :show-spelling-option="showSpellingOption"
           @assimilate="emit('assimilate', { skipMemoryTracking: false })"
@@ -113,6 +116,7 @@
             })
           "
           @revive="emit('revive', {})"
+          @return-to-sequence="emit('returnToSequence')"
         />
       </div>
     </div>
@@ -157,6 +161,7 @@ const emit = defineEmits<{
   (e: "assimilate", request: AssimilateEvent): void
   (e: "skip", request: { propertyKey?: string }): void
   (e: "revive", request: { propertyKey?: string }): void
+  (e: "returnToSequence"): void
   (e: "refinementContentUpdated"): void
 }>()
 

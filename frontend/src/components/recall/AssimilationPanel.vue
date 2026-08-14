@@ -10,6 +10,7 @@
     @assimilate="processAssimilate"
     @skip="processSkip"
     @revive="processRevive"
+    @return-to-sequence="processReturnToSequence"
     @refinement-content-updated="emit('reloadNeeded')"
   />
   <Teleport to="body">
@@ -61,7 +62,8 @@ const emit = defineEmits<{
 
 const { popups } = usePopups()
 const { assimilateUnit } = useAssimilateUnit()
-const { skipFromAssimilationSequence } = useAssimilationSequenceSkip()
+const { skipFromAssimilationSequence, returnToAssimilationSequence } =
+  useAssimilationSequenceSkip()
 const { reviveMemoryTrackers } = useReviveMemoryTracker()
 const { openForNote } = useAssimilationView()
 
@@ -147,6 +149,13 @@ const processRevive = async ({ propertyKey }: { propertyKey?: string }) => {
   }
 
   const success = await reviveMemoryTrackers(trackers)
+  if (success) {
+    await settingsRef.value?.reloadNoteInfo()
+  }
+}
+
+const processReturnToSequence = async () => {
+  const success = await returnToAssimilationSequence(note.id)
   if (success) {
     await settingsRef.value?.reloadNoteInfo()
   }

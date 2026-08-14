@@ -202,6 +202,7 @@ Use this for endpoint lookup; open `sdk.gen.ts` or `types.gen.ts` only for exact
 ## Assimilation Sequence Skip Controller
 
 - `create`: POST `/api/assimilation-sequence-skips` -> `CreateResponse` (request: `CreateData`; body: AssimilationSequenceSkipRequestDto; response body: AssimilationSequenceSkip)
+- `deleteAssimilationSequenceSkip`: DELETE `/api/assimilation-sequence-skips` -> `DeleteAssimilationSequenceSkipResponse` (request: `DeleteAssimilationSequenceSkipData`; body: AssimilationSequenceSkipRequestDto; response body: void)
 
 ## Ai Controller
 

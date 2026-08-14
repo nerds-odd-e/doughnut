@@ -7,8 +7,11 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import com.odde.doughnut.controllers.dto.AssimilationSequenceSkipRequestDTO;
 import com.odde.doughnut.entities.AssimilationSequenceSkip;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.repositories.AssimilationSequenceSkipRepository;
+import com.odde.doughnut.entities.repositories.MemoryTrackerRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import java.sql.Timestamp;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +19,8 @@ import org.springframework.web.server.ResponseStatusException;
 
 class AssimilationSequenceSkipControllerTest extends ControllerTestBase {
   @Autowired AssimilationSequenceSkipController controller;
+  @Autowired AssimilationSequenceSkipRepository skipRepository;
+  @Autowired MemoryTrackerRepository memoryTrackerRepository;
 
   @BeforeEach
   void setup() {
@@ -57,5 +62,30 @@ class AssimilationSequenceSkipControllerTest extends ControllerTestBase {
     AssimilationSequenceSkip second = controller.create(request);
 
     assertThat(second.getId(), equalTo(first.getId()));
+  }
+
+  @Test
+  void deleteNotLoggedIn() {
+    currentUser.setUser(null);
+    assertThrows(
+        ResponseStatusException.class,
+        () -> controller.deleteAssimilationSequenceSkip(new AssimilationSequenceSkipRequestDTO()));
+  }
+
+  @Test
+  void deletesSkipRowWithoutCreatingATracker() throws UnexpectedNoAccessRightException {
+    Note note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
+    makeMe.anAssimilationSequenceSkipFor(note).please();
+    AssimilationSequenceSkipRequestDTO request = new AssimilationSequenceSkipRequestDTO();
+    request.noteId = note.getId();
+
+    controller.deleteAssimilationSequenceSkip(request);
+
+    assertThat(
+        skipRepository.findByUserAndNoteAndPropertyKey(currentUser.getUser(), note, ""),
+        is(Optional.empty()));
+    assertThat(
+        memoryTrackerRepository.findByUserAndNote(currentUser.getUser().getId(), note.getId()),
+        empty());
   }
 }

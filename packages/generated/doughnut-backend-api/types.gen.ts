@@ -988,6 +988,7 @@ export type CurrentUserInfo = {
 export type NoteRecallInfo = {
     memoryTrackers?: Array<MemoryTracker>;
     recallSetting?: NoteRecallSetting;
+    skippedFromAssimilationSequence?: boolean;
 };
 
 export type FocusContextFocusNote = {
@@ -1241,6 +1242,7 @@ export type ConversationSubjectWritable = {
 export type NoteRecallInfoWritable = {
     memoryTrackers?: Array<MemoryTrackerWritable>;
     recallSetting?: NoteRecallSetting;
+    skippedFromAssimilationSequence?: boolean;
 };
 
 export type PutNotebookBookBlockReadingRecordData = {
@@ -2565,6 +2567,20 @@ export type AssimilateResponses = {
 };
 
 export type AssimilateResponse = AssimilateResponses[keyof AssimilateResponses];
+
+export type DeleteAssimilationSequenceSkipData = {
+    body: AssimilationSequenceSkipRequestDto;
+    path?: never;
+    query?: never;
+    url: '/api/assimilation-sequence-skips';
+};
+
+export type DeleteAssimilationSequenceSkipResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
 
 export type CreateData = {
     body: AssimilationSequenceSkipRequestDto;

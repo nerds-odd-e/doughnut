@@ -157,6 +157,9 @@ export async function clickAssimilate(
 }
 
 export const skipButtonSelector = '[data-test="skip"]' as const
+export const returnToSequenceButtonSelector =
+  '[data-test="return-to-sequence"]' as const
+export const reviveButtonSelector = '[data-test="revive"]' as const
 
 export function skipButtonEl(
   wrapper: Awaited<ReturnType<typeof mountAssimilationPanel>>
@@ -171,6 +174,21 @@ export async function clickSkipAndConfirm(
 ) {
   skipButtonEl(wrapper)!.click()
   usePopups().popups.done(true)
+  await flushPromises()
+}
+
+export function returnToSequenceButtonEl(
+  wrapper: Awaited<ReturnType<typeof mountAssimilationPanel>>
+) {
+  return wrapper.element.querySelector(
+    returnToSequenceButtonSelector
+  ) as HTMLInputElement | null
+}
+
+export async function clickReturnToSequence(
+  wrapper: Awaited<ReturnType<typeof mountAssimilationPanel>>
+) {
+  returnToSequenceButtonEl(wrapper)!.click()
   await flushPromises()
 }
 

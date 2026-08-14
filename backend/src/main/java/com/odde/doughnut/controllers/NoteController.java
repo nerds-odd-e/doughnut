@@ -2,6 +2,7 @@ package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.dto.*;
 import com.odde.doughnut.entities.*;
+import com.odde.doughnut.entities.repositories.AssimilationSequenceSkipRepository;
 import com.odde.doughnut.entities.repositories.SessionItemRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.EntityPersister;
@@ -37,6 +38,7 @@ class NoteController {
   private final FocusContextMarkdownRenderer focusContextMarkdownRenderer;
   private final NoteRealmService noteRealmService;
   private final SessionItemRepository sessionItemRepository;
+  private final AssimilationSequenceSkipRepository skipRepository;
 
   public NoteController(
       EntityPersister entityPersister,
@@ -46,7 +48,8 @@ class NoteController {
       FocusContextRetrievalService focusContextRetrievalService,
       FocusContextMarkdownRenderer focusContextMarkdownRenderer,
       NoteRealmService noteRealmService,
-      SessionItemRepository sessionItemRepository) {
+      SessionItemRepository sessionItemRepository,
+      AssimilationSequenceSkipRepository skipRepository) {
     this.entityPersister = entityPersister;
     this.noteService = noteService;
     this.authorizationService = authorizationService;
@@ -55,6 +58,7 @@ class NoteController {
     this.focusContextMarkdownRenderer = focusContextMarkdownRenderer;
     this.noteRealmService = noteRealmService;
     this.sessionItemRepository = sessionItemRepository;
+    this.skipRepository = skipRepository;
   }
 
   @GetMapping("/{note}")
@@ -80,9 +84,9 @@ class NoteController {
   public NoteRecallInfo getNoteInfo(@PathVariable("note") @Schema(type = "integer") Note note)
       throws UnexpectedNoAccessRightException {
     authorizationService.assertReadAuthorization(note);
+    User user = authorizationService.getCurrentUser();
     NoteRecallInfo noteRecallInfo = new NoteRecallInfo();
-    List<MemoryTracker> memoryTrackers =
-        userService.getMemoryTrackersFor(authorizationService.getCurrentUser(), note);
+    List<MemoryTracker> memoryTrackers = userService.getMemoryTrackersFor(user, note);
     for (MemoryTracker tracker : memoryTrackers) {
       if (tracker.isCommissioned()) {
         sessionItemRepository
@@ -92,6 +96,8 @@ class NoteController {
     }
     noteRecallInfo.setMemoryTrackers(memoryTrackers);
     noteRecallInfo.setRecallSetting(note.getRecallSetting());
+    noteRecallInfo.setSkippedFromAssimilationSequence(
+        skipRepository.findByUserAndNoteAndPropertyKey(user, note, "").isPresent());
     return noteRecallInfo;
   }
 

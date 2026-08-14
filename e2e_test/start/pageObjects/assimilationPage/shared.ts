@@ -3,6 +3,7 @@ import { waitUntilAppIsNotBusy } from '../../pageBase'
 export const assimilateButtonSelector = '[data-test="assimilate"]'
 export const reviveButtonSelector = '[data-test="revive"]'
 export const skipButtonSelector = '[data-test="skip"]'
+export const returnToSequenceButtonSelector = '[data-test="return-to-sequence"]'
 export const assimilateOptionsCaretSelector =
   '[data-test="assimilate-options-caret"]'
 export const assimilateAsCommissionedSelector =
@@ -33,11 +34,31 @@ export const assimilateAsCommissionedButton = noteLevelControl(
 export const rememberSpellingButton = noteLevelControl(rememberSpellingSelector)
 export const reviveButton = noteLevelControl(reviveButtonSelector)
 export const skipButton = noteLevelControl(skipButtonSelector)
+export const returnToSequenceButton = noteLevelControl(
+  returnToSequenceButtonSelector
+)
+
+function noteLevelControlElements(
+  doc: Document | ParentNode,
+  selector: string
+): Element[] {
+  return [...doc.querySelectorAll(selector)].filter(
+    isNoteLevelAssimilationControl
+  )
+}
 
 export function noteLevelReviveElements(doc: Document | ParentNode): Element[] {
-  return [...doc.querySelectorAll(reviveButtonSelector)].filter(
-    (el) => !el.closest('[data-test="assimilation-property-row"]')
-  )
+  return noteLevelControlElements(doc, reviveButtonSelector)
+}
+
+export function noteLevelSkipElements(doc: Document | ParentNode): Element[] {
+  return noteLevelControlElements(doc, skipButtonSelector)
+}
+
+export function noteLevelReturnToSequenceElements(
+  doc: Document | ParentNode
+): Element[] {
+  return noteLevelControlElements(doc, returnToSequenceButtonSelector)
 }
 
 export function openRefineNoteModalIfNeeded() {

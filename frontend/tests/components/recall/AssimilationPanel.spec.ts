@@ -1,4 +1,7 @@
-import { NoteController } from "@generated/doughnut-backend-api/sdk.gen"
+import {
+  AssimilationSequenceSkipController,
+  NoteController,
+} from "@generated/doughnut-backend-api/sdk.gen"
 import { describe, expect, it, vi } from "vitest"
 import makeMe from "doughnut-test-fixtures/makeMe"
 import {
@@ -12,12 +15,16 @@ import {
   assimilateSpy,
   assimilatedCountOfTheDay,
   clickAssimilate,
+  clickReturnToSequence,
   clickSkipAndConfirm,
   mockedRequestDueRecallsRefresh,
   mockedTotalAssimilatedCount,
   mountAssimilationPanelReady,
   note,
+  returnToSequenceButtonEl,
+  reviveButtonSelector,
   setupAssimilationPanelTests,
+  skipButtonEl,
   skipSequenceSpy,
 } from "./assimilationPanelTestSupport"
 
@@ -65,6 +72,46 @@ describe("AssimilationPanel", () => {
     expect(mockedTotalAssimilatedCount.value).toBe(0)
     expect(assimilatedCountOfTheDay.value).toBe(0)
     expect(mockedRequestDueRecallsRefresh).not.toHaveBeenCalled()
+  })
+
+  it("shows Return to sequence instead of Skip or Revive when the note is sequence-skipped", async () => {
+    mockSdkService(
+      NoteController,
+      "getNoteInfo",
+      makeMe.aNoteRecallInfo.skippedFromAssimilationSequence(true).please()
+    )
+    const wrapper = await mountAssimilationPanelReady()
+
+    expect(returnToSequenceButtonEl(wrapper)).not.toBeNull()
+    expect(skipButtonEl(wrapper)).toBeNull()
+    expect(wrapper.find(reviveButtonSelector).exists()).toBe(false)
+  })
+
+  it("returns the note to the sequence without creating a tracker or reviving", async () => {
+    let skipped = true
+    mockSdkServiceWithImplementation(NoteController, "getNoteInfo", () =>
+      makeMe.aNoteRecallInfo.skippedFromAssimilationSequence(skipped).please()
+    )
+    const deleteSkipSpy = mockSdkService(
+      AssimilationSequenceSkipController,
+      "deleteAssimilationSequenceSkip",
+      undefined as never
+    )
+    deleteSkipSpy.mockImplementation(async () => {
+      skipped = false
+      return wrapSdkResponse(undefined)
+    })
+    const wrapper = await mountAssimilationPanelReady()
+
+    await clickReturnToSequence(wrapper)
+
+    expect(deleteSkipSpy).toHaveBeenCalledWith({
+      body: { noteId: note.id },
+    })
+    expect(assimilateSpy).not.toHaveBeenCalled()
+    expect(mockedGoToNextAssimilation).not.toHaveBeenCalled()
+    expect(skipButtonEl(wrapper)).not.toBeNull()
+    expect(returnToSequenceButtonEl(wrapper)).toBeNull()
   })
 
   describe("assimilate when note has memory trackers", () => {

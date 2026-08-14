@@ -11,6 +11,7 @@ import {
   assimilateSpy,
   mountAssimilationPanel,
   mockedRequestDueRecallsRefresh,
+  reviveButtonSelector,
   setupAssimilationPanelTests,
   skipButtonSelector,
 } from "./assimilationPanelTestSupport"
@@ -23,8 +24,6 @@ vi.mock("@/composables/useGoToNextAssimilation", () => ({
 }))
 
 setupAssimilationPanelTests()
-
-const reviveButtonSelector = '[data-test="revive"]'
 
 describe("AssimilationPanel revive", () => {
   it("calls reEnable for all skipped note-level trackers and reloads note info", async () => {
