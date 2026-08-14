@@ -95,6 +95,22 @@ class AssimilationControllerAssimilateTests extends ControllerTestBase {
     }
 
     @Test
+    void assimilatingAsCommissionedOnSkippedNoteLeavesSkipRowAndStaysOutOfNext() {
+      Note note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
+      makeMe.anAssimilationSequenceSkipFor(note).please();
+
+      List<MemoryTracker> result =
+          controller.assimilate(
+              AssimilationControllerTestSupport.assimilateCommissionedRequest(note));
+
+      assertThat(result.get(0).getType(), equalTo(MemoryTrackerType.COMMISSIONED));
+      assertThat(
+          skipRepository.findByUserAndNoteAndPropertyKey(currentUser.getUser(), note, ""),
+          is(not(Optional.empty())));
+      assertThat(controller.next("Asia/Shanghai").getNextUnit(), nullValue());
+    }
+
+    @Test
     void
         assimilatingAsCommissionedWhenUnderstandingExistsCreatesCommissionedAndLeavesUnderstanding() {
       Note note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();

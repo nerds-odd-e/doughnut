@@ -1,6 +1,6 @@
 # Assimilation-sequence skip
 
-**Status:** in progress (Phase 7 next)  
+**Status:** in progress (Phase 8 next)  
 **Type mix:** Structure then Behavior
 
 Each phase is one commit: **Behavior** (one observable) or **Structure** (only what the **immediate next** behavior needs). Size for ~5 minutes wall-clock including targeted tests.
@@ -93,7 +93,7 @@ Permanent artifacts stay capability-named (no phase numbers in product files).
 | 4 | Behavior | Skip on the panel leaves the sequence with no dummy tracker (done) |
 | 5 | Behavior | Assimilate (understanding) a skipped note (done) |
 | 6 | Behavior | Remember spelling a skipped note (done) |
-| 7 | Behavior | Assimilate as commissioned a skipped note |
+| 7 | Behavior | Assimilate as commissioned a skipped note (done) |
 | 8 | Behavior | Migrate note-level dummy skips (`recall_count = 0`) |
 | 9 | Behavior | Return to sequence (note) |
 | 10 | Behavior | Remove from recall on assimilation settings (note) |
@@ -171,15 +171,11 @@ Permanent artifacts stay capability-named (no phase numbers in product files).
 ## Phase 7 — Assimilate as commissioned a skipped note
 
 - **Type:** Behavior  
-- **Status:** planned
+- **Status:** done
 
-**Pre-condition:** Sequence-skipped note, no commissioned tracker.  
-**Trigger:** **Assimilate as commissioned**.  
-**Post-condition:** Commissioned tracker exists; skip row **remains**; note still not next.
+**Done:** Controller test at the assimilate boundary: commissioned tracker created, skip row remains, note not next. Production already left skip for non-UNDERSTANDING; no production change.
 
-**Tests:** Same grain as Phase 6, commissioned specs.
-
-**Done when:** Commissioned on a skipped note does not clear sequence skip.
+**Learning:** Same as Phase 6 — understanding-only skip deletion already covers commissioned.
 
 ---
 
