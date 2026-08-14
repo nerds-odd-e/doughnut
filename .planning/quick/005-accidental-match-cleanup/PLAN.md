@@ -1,6 +1,6 @@
 # Accidental-match confusion adjustment — cleanup
 
-**Status:** in progress (Phase 2 next)
+**Status:** in progress (Phase 3 next)
 **Type mix:** Structure
 **Context:** Follow-up to the shipped accidental-match confusion adjustment plan (6 phases, all on `main` as of `f602dc1a43`).
 
@@ -21,8 +21,8 @@ Tighten the test suite and E2E naming left by the accidental-match confusion adj
 | # | Type | Status | One outcome |
 |---|---|---|---|
 | 1 | Structure | done | Consolidate the two "understanding fallback when spelling inactive" tests |
-| 2 | Structure | in-progress | Rename the prompted-tracker floor test to reflect `recallFailed` |
-| 3 | Structure | planned | Split the confusion-adjustment test class along cohesive seams |
+| 2 | Structure | done | Rename the prompted-tracker floor test to reflect `recallFailed` |
+| 3 | Structure | in-progress | Split the confusion-adjustment test class along cohesive seams |
 | 4 | Structure | planned | Align E2E understanding-tracker naming |
 
 ## Phase 1 — Consolidate understanding-fallback inactive-spelling tests
@@ -45,8 +45,8 @@ Tighten the test suite and E2E naming left by the accidental-match confusion adj
 ## Phase 2 — Rename the prompted-tracker floor test
 
 - **Type:** Structure
-- **Status:** in-progress
-- **Structure change:** Rename
+- **Status:** done
+- **Structure change:** Renamed to
   `RecallPromptAccidentalMatchEdgeTests.shouldNotDropForgettingCurveIndexBelowFloorOnAccidentalMatch`
   to clarify it tests `MemoryTracker.recallFailed`'s floor through the accidental-match
   boundary, not an accidental-match-specific behavior. Suggested name:
@@ -62,7 +62,7 @@ Tighten the test suite and E2E naming left by the accidental-match confusion adj
 ## Phase 3 — Split the confusion-adjustment test class
 
 - **Type:** Structure
-- **Status:** planned
+- **Status:** in-progress
 - **Structure change:** `RecallPromptAccidentalMatchConfusionAdjustmentTests` is 225 lines.
   Split along cohesive seams into nested `@Nested` classes (or separate files if
   natural) — e.g. `UniqueMatch`, `Eligibility`, `Ambiguous`. Keep the same

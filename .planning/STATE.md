@@ -2,19 +2,19 @@
 gsd_state_version: 1.0
 milestone: null
 milestone_name: null
-current_phase: 2
-current_phase_name: Rename the prompted-tracker floor test
+current_phase: 3
+current_phase_name: Split the confusion-adjustment test class
 status: executing
 stopped_at: null
-last_updated: "2026-08-14T18:27:00Z"
+last_updated: "2026-08-14T18:30:00Z"
 last_activity: 2026-08-14
-last_activity_desc: 005 Phase 1 done — consolidated understanding-fallback tests
+last_activity_desc: 005 Phase 2 done — renamed prompted-tracker floor test
 progress:
   total_phases: 4
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 1
   completed_plans: 0
-  percent: 25
+  percent: 50
 ---
 
 # Project State

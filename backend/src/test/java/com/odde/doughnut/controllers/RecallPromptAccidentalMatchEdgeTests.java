@@ -120,7 +120,7 @@ class RecallPromptAccidentalMatchEdgeTests extends RecallPromptControllerTestBas
   }
 
   @Test
-  void shouldNotDropForgettingCurveIndexBelowFloorOnAccidentalMatch()
+  void shouldNotDropPromptedTrackerBelowStrengthFloorOnAccidentalMatch()
       throws UnexpectedNoAccessRightException {
     memoryTracker.setForgettingCurveIndex(ForgettingCurve.DEFAULT_FORGETTING_CURVE_INDEX);
     memoryTracker.setNextRecallAt(memoryTracker.calculateNextRecallAt());
