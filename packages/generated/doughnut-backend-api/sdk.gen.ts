@@ -325,7 +325,7 @@ export class TestabilityRestController {
     
     public static injectMcq<ThrowOnError extends boolean = false>(options: Options<InjectMcqData, ThrowOnError>): RequestResult<InjectMcqResponses, unknown, ThrowOnError> {
         return (options.client ?? client).post<InjectMcqResponses, unknown, ThrowOnError>({
-            url: '/api/testability/inject-predefined-questions',
+            url: '/api/testability/inject-mcqs',
             ...options,
             headers: {
                 'Content-Type': 'application/json',
@@ -464,42 +464,6 @@ export class RecallPromptController {
                 ...options.headers
             }
         });
-    }
-}
-
-export class McqController {
-    public static refineQuestion<ThrowOnError extends boolean = false>(options: Options<RefineQuestionData, ThrowOnError>): RequestResult<RefineQuestionResponses, unknown, ThrowOnError> {
-        return (options.client ?? client).post<RefineQuestionResponses, unknown, ThrowOnError>({
-            url: '/api/predefined-questions/{note}/refine-question',
-            ...options,
-            headers: {
-                'Content-Type': 'application/json',
-                ...options.headers
-            }
-        });
-    }
-    
-    public static getAllQuestionByNote<ThrowOnError extends boolean = false>(options: Options<GetAllQuestionByNoteData, ThrowOnError>): RequestResult<GetAllQuestionByNoteResponses, unknown, ThrowOnError> {
-        return (options.client ?? client).get<GetAllQuestionByNoteResponses, unknown, ThrowOnError>({ url: '/api/predefined-questions/{note}/note-questions', ...options });
-    }
-    
-    public static addQuestionManually<ThrowOnError extends boolean = false>(options: Options<AddQuestionManuallyData, ThrowOnError>): RequestResult<AddQuestionManuallyResponses, unknown, ThrowOnError> {
-        return (options.client ?? client).post<AddQuestionManuallyResponses, unknown, ThrowOnError>({
-            url: '/api/predefined-questions/{note}/note-questions',
-            ...options,
-            headers: {
-                'Content-Type': 'application/json',
-                ...options.headers
-            }
-        });
-    }
-    
-    public static generateQuestionWithoutSave<ThrowOnError extends boolean = false>(options: Options<GenerateQuestionWithoutSaveData, ThrowOnError>): RequestResult<GenerateQuestionWithoutSaveResponses, unknown, ThrowOnError> {
-        return (options.client ?? client).post<GenerateQuestionWithoutSaveResponses, unknown, ThrowOnError>({ url: '/api/predefined-questions/generate-question-without-save', ...options });
-    }
-    
-    public static exportQuestionGeneration<ThrowOnError extends boolean = false>(options: Options<ExportQuestionGenerationData, ThrowOnError>): RequestResult<ExportQuestionGenerationResponses, unknown, ThrowOnError> {
-        return (options.client ?? client).get<ExportQuestionGenerationResponses, unknown, ThrowOnError>({ url: '/api/predefined-questions/{note}/export-question-generation', ...options });
     }
 }
 
@@ -895,6 +859,42 @@ export class MemoryTrackerController {
     
     public static deleteUnansweredRecallPrompts<ThrowOnError extends boolean = false>(options: Options<DeleteUnansweredRecallPromptsData, ThrowOnError>): RequestResult<DeleteUnansweredRecallPromptsResponses, unknown, ThrowOnError> {
         return (options.client ?? client).delete<DeleteUnansweredRecallPromptsResponses, unknown, ThrowOnError>({ url: '/api/memory-trackers/{memoryTracker}/recall-prompts/unanswered', ...options });
+    }
+}
+
+export class McqController {
+    public static refineQuestion<ThrowOnError extends boolean = false>(options: Options<RefineQuestionData, ThrowOnError>): RequestResult<RefineQuestionResponses, unknown, ThrowOnError> {
+        return (options.client ?? client).post<RefineQuestionResponses, unknown, ThrowOnError>({
+            url: '/api/mcqs/{note}/refine-question',
+            ...options,
+            headers: {
+                'Content-Type': 'application/json',
+                ...options.headers
+            }
+        });
+    }
+    
+    public static getAllQuestionByNote<ThrowOnError extends boolean = false>(options: Options<GetAllQuestionByNoteData, ThrowOnError>): RequestResult<GetAllQuestionByNoteResponses, unknown, ThrowOnError> {
+        return (options.client ?? client).get<GetAllQuestionByNoteResponses, unknown, ThrowOnError>({ url: '/api/mcqs/{note}/note-questions', ...options });
+    }
+    
+    public static addQuestionManually<ThrowOnError extends boolean = false>(options: Options<AddQuestionManuallyData, ThrowOnError>): RequestResult<AddQuestionManuallyResponses, unknown, ThrowOnError> {
+        return (options.client ?? client).post<AddQuestionManuallyResponses, unknown, ThrowOnError>({
+            url: '/api/mcqs/{note}/note-questions',
+            ...options,
+            headers: {
+                'Content-Type': 'application/json',
+                ...options.headers
+            }
+        });
+    }
+    
+    public static generateQuestionWithoutSave<ThrowOnError extends boolean = false>(options: Options<GenerateQuestionWithoutSaveData, ThrowOnError>): RequestResult<GenerateQuestionWithoutSaveResponses, unknown, ThrowOnError> {
+        return (options.client ?? client).post<GenerateQuestionWithoutSaveResponses, unknown, ThrowOnError>({ url: '/api/mcqs/generate-question-without-save', ...options });
+    }
+    
+    public static exportQuestionGeneration<ThrowOnError extends boolean = false>(options: Options<ExportQuestionGenerationData, ThrowOnError>): RequestResult<ExportQuestionGenerationResponses, unknown, ThrowOnError> {
+        return (options.client ?? client).get<ExportQuestionGenerationResponses, unknown, ThrowOnError>({ url: '/api/mcqs/{note}/export-question-generation', ...options });
     }
 }
 

@@ -18,7 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/predefined-questions")
+@RequestMapping("/api/mcqs")
 class McqController {
   private final McqService mcqService;
 

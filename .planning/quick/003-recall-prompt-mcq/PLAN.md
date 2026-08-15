@@ -103,13 +103,13 @@ Table still `predefined_question`. Builders `anMcq`. Tests `McqControllerTests`.
 
 ### 9. Note MCQ routes are /mcqs
 
-- **Status:** planned
+- **Status:** done
 - **Type:** Behavior
-- **Pre:** Type is already `Mcq`.
-- **Trigger:** List / add / generate / refine on a note.
-- **Post:** HTTP is `/api/mcqs/...`. No `/api/predefined-questions`.
 
-**Tests:** controller tests for those routes; note MCQ E2E; regen client.
+Shipped: HTTP `/api/mcqs/...` (list/add/generate/refine/export). No
+`/api/predefined-questions`. Testability inject is `POST /api/testability/inject-mcqs`.
+Contest stays on `/recall-prompts/{id}/contest`. Nested leftover segments
+(`note-questions`, `refine-question`, …) unchanged.
 
 ### 10. Table is mcq
 
@@ -180,3 +180,4 @@ Table still `predefined_question`. Builders `anMcq`. Tests `McqControllerTests`.
 - Slice 6: answered/history property is `mcq`; Java type still `PredefinedQuestion`.
 - Slice 7: leftover `injectPredefinedQuestionsToNotebook` / feature filenames wait for type `Mcq`.
 - Slice 8: feature filename `mcq_management.feature` and inject helper `injectMcqsToNotebook` renamed with the type. Testability HTTP still `inject-predefined-questions` (product `/api/mcqs` is slice 9). Unused `McqNotPossibleException` deleted. Note MCQ E2E not re-run this slice (SUT LB 503 / stale backend on 9081).
+- Slice 9: nested leftover segments (`note-questions`, `refine-question`, `generate-question-without-save`, `export-question-generation`) stayed. Testability moved to `inject-mcqs`. Note MCQ E2E green.

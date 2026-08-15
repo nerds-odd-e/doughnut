@@ -310,7 +310,7 @@ paths:
             '*/*':
               schema:
                 type: string
-  /api/testability/inject-predefined-questions:
+  /api/testability/inject-mcqs:
     post:
       tags:
       - testability-rest-controller
@@ -632,91 +632,6 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/AnsweredQuestion"
-  /api/predefined-questions/{note}/refine-question:
-    post:
-      tags:
-      - mcq-controller
-      operationId: refineQuestion
-      parameters:
-      - name: note
-        in: path
-        required: true
-        schema:
-          type: integer
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/Mcq"
-        required: true
-      responses:
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/Mcq"
-  /api/predefined-questions/{note}/note-questions:
-    get:
-      tags:
-      - mcq-controller
-      operationId: getAllQuestionByNote
-      parameters:
-      - name: note
-        in: path
-        required: true
-        schema:
-          type: integer
-      responses:
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/Mcq"
-    post:
-      tags:
-      - mcq-controller
-      operationId: addQuestionManually
-      parameters:
-      - name: note
-        in: path
-        required: true
-        schema:
-          type: integer
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/Mcq"
-        required: true
-      responses:
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/Mcq"
-  /api/predefined-questions/generate-question-without-save:
-    post:
-      tags:
-      - mcq-controller
-      operationId: generateQuestionWithoutSave
-      parameters:
-      - name: note
-        in: query
-        required: true
-        schema:
-          type: integer
-      responses:
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/Mcq"
   /api/notes/{note}/verify-spelling:
     post:
       tags:
@@ -1294,6 +1209,91 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/MemoryTracker"
+  /api/mcqs/{note}/refine-question:
+    post:
+      tags:
+      - mcq-controller
+      operationId: refineQuestion
+      parameters:
+      - name: note
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Mcq"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Mcq"
+  /api/mcqs/{note}/note-questions:
+    get:
+      tags:
+      - mcq-controller
+      operationId: getAllQuestionByNote
+      parameters:
+      - name: note
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Mcq"
+    post:
+      tags:
+      - mcq-controller
+      operationId: addQuestionManually
+      parameters:
+      - name: note
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Mcq"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Mcq"
+  /api/mcqs/generate-question-without-save:
+    post:
+      tags:
+      - mcq-controller
+      operationId: generateQuestionWithoutSave
+      parameters:
+      - name: note
+        in: query
+        required: true
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Mcq"
   /api/learning-sessions/record:
     post:
       tags:
@@ -2422,25 +2422,6 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/AnsweredQuestion"
-  /api/predefined-questions/{note}/export-question-generation:
-    get:
-      tags:
-      - mcq-controller
-      operationId: exportQuestionGeneration
-      parameters:
-      - name: note
-        in: path
-        required: true
-        schema:
-          type: integer
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: object
-                additionalProperties: {}
   /api/notes/{note}:
     get:
       tags:
@@ -2815,6 +2796,25 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/MemoryTracker"
+  /api/mcqs/{note}/export-question-generation:
+    get:
+      tags:
+      - mcq-controller
+      operationId: exportQuestionGeneration
+      parameters:
+      - name: note
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
   /api/learning-sessions/request:
     get:
       tags:

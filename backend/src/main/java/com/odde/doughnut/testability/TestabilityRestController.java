@@ -100,7 +100,7 @@ class TestabilityRestController {
     return injectNotesWorker.inject(notesTestData, user);
   }
 
-  @PostMapping("/inject-predefined-questions")
+  @PostMapping("/inject-mcqs")
   @Transactional
   public List<Mcq> injectMcq(@RequestBody McqsTestData mcqsTestData) {
     List<Mcq> mcqs = mcqsTestData.buildMcqs(this.noteRepository);

@@ -46,7 +46,7 @@ Use this for endpoint lookup; open `sdk.gen.ts` or `types.gen.ts` only for exact
 - `setOpenAiToken`: POST `/api/testability/open_ai_token` -> `SetOpenAiTokenResponse` (request: `SetOpenAiTokenData`; body: Record<string, string>; response body: void)
 - `injectNotes`: POST `/api/testability/inject_notes` -> `InjectNotesResponse` (request: `InjectNotesData`; body: NotesTestData; response body: Record<string, number>)
 - `injectCircle`: POST `/api/testability/inject_circle` -> `InjectCircleResponse` (request: `InjectCircleData`; body: Record<string, string>; response body: string)
-- `injectMcq`: POST `/api/testability/inject-predefined-questions` -> `InjectMcqResponse` (request: `InjectMcqData`; body: McqsTestData; response body: Array<Mcq>)
+- `injectMcq`: POST `/api/testability/inject-mcqs` -> `InjectMcqResponse` (request: `InjectMcqData`; body: McqsTestData; response body: Array<Mcq>)
 - `getFeatureToggle`: GET `/api/testability/feature_toggle` -> `GetFeatureToggleResponse` (request: none; response body: boolean)
 - `enableFeatureToggle`: POST `/api/testability/feature_toggle` -> `EnableFeatureToggleResponse` (request: `EnableFeatureToggleData`; body: Record<string, string>; response body: Array<unknown>)
 - `resetDBAndTestabilitySettings`: POST `/api/testability/clean_db_and_reset_testability_settings` -> `ResetDbAndTestabilitySettingsResponse` (request: none; response body: string)
@@ -76,14 +76,6 @@ Use this for endpoint lookup; open `sdk.gen.ts` or `types.gen.ts` only for exact
 - `contest`: POST `/api/recall-prompts/{recallPrompt}/contest` -> `ContestResponse` (request: `ContestData`; path: recallPrompt; response body: QuestionContestResult)
 - `answer`: POST `/api/recall-prompts/{recallPrompt}/answer` -> `AnswerResponse` (request: `AnswerData`; path: recallPrompt; body: AnswerDto; response body: AnsweredQuestion)
 - `answerSpelling`: POST `/api/recall-prompts/{recallPrompt}/answer-spelling` -> `AnswerSpellingResponse` (request: `AnswerSpellingData`; path: recallPrompt; body: AnswerSpellingDto; response body: AnsweredQuestion)
-
-## Mcq Controller
-
-- `refineQuestion`: POST `/api/predefined-questions/{note}/refine-question` -> `RefineQuestionResponse` (request: `RefineQuestionData`; path: note; body: Mcq; response body: Mcq)
-- `getAllQuestionByNote`: GET `/api/predefined-questions/{note}/note-questions` -> `GetAllQuestionByNoteResponse` (request: `GetAllQuestionByNoteData`; path: note; response body: Array<Mcq>)
-- `addQuestionManually`: POST `/api/predefined-questions/{note}/note-questions` -> `AddQuestionManuallyResponse` (request: `AddQuestionManuallyData`; path: note; body: Mcq; response body: Mcq)
-- `generateQuestionWithoutSave`: POST `/api/predefined-questions/generate-question-without-save` -> `GenerateQuestionWithoutSaveResponse` (request: `GenerateQuestionWithoutSaveData`; query: note; response body: Mcq)
-- `exportQuestionGeneration`: GET `/api/predefined-questions/{note}/export-question-generation` -> `ExportQuestionGenerationResponse` (request: `ExportQuestionGenerationData`; path: note; response body: Record<string, unknown>)
 
 ## Note Controller
 
@@ -151,6 +143,14 @@ Use this for endpoint lookup; open `sdk.gen.ts` or `types.gen.ts` only for exact
 - `getRecentlyRecalled`: GET `/api/memory-trackers/recently-recalled` -> `GetRecentlyRecalledResponse` (request: none; response body: Array<MemoryTracker>)
 - `getRecentMemoryTrackers`: GET `/api/memory-trackers/recent` -> `GetRecentMemoryTrackersResponse` (request: none; response body: Array<MemoryTracker>)
 - `deleteUnansweredRecallPrompts`: DELETE `/api/memory-trackers/{memoryTracker}/recall-prompts/unanswered` -> `DeleteUnansweredRecallPromptsResponse` (request: `DeleteUnansweredRecallPromptsData`; path: memoryTracker; response body: void)
+
+## Mcq Controller
+
+- `refineQuestion`: POST `/api/mcqs/{note}/refine-question` -> `RefineQuestionResponse` (request: `RefineQuestionData`; path: note; body: Mcq; response body: Mcq)
+- `getAllQuestionByNote`: GET `/api/mcqs/{note}/note-questions` -> `GetAllQuestionByNoteResponse` (request: `GetAllQuestionByNoteData`; path: note; response body: Array<Mcq>)
+- `addQuestionManually`: POST `/api/mcqs/{note}/note-questions` -> `AddQuestionManuallyResponse` (request: `AddQuestionManuallyData`; path: note; body: Mcq; response body: Mcq)
+- `generateQuestionWithoutSave`: POST `/api/mcqs/generate-question-without-save` -> `GenerateQuestionWithoutSaveResponse` (request: `GenerateQuestionWithoutSaveData`; query: note; response body: Mcq)
+- `exportQuestionGeneration`: GET `/api/mcqs/{note}/export-question-generation` -> `ExportQuestionGenerationResponse` (request: `ExportQuestionGenerationData`; path: note; response body: Record<string, unknown>)
 
 ## Learning Session Controller
 

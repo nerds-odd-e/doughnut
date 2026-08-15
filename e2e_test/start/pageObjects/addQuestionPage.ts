@@ -23,7 +23,7 @@ export const addQuestionPage = () => {
       return this
     },
     addQuestion(row: Record<string, string>) {
-      cy.intercept('POST', '**/api/predefined-questions/**/note-questions').as(
+      cy.intercept('POST', '**/api/mcqs/**/note-questions').as(
         'addQuestionManually'
       )
       this.fillQuestion(row)
