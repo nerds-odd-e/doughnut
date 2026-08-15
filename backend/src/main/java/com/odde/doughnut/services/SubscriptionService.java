@@ -16,12 +16,12 @@ public class SubscriptionService {
   }
 
   public int getUnassimilatedNoteCount(Subscription subscription) {
-    return noteRepository.countByAncestorWhereThereIsNoMemoryTracker(
+    return noteRepository.countUnassimilatedByAncestor(
         subscription.getUser().getId(), subscription.getNotebook().getId());
   }
 
   public Stream<Note> getUnassimilatedNotes(Subscription subscription) {
-    return noteRepository.findByAncestorWhereThereIsNoMemoryTracker(
+    return noteRepository.findUnassimilatedByAncestor(
         subscription.getUser().getId(), subscription.getNotebook().getId());
   }
 

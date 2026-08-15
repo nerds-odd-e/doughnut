@@ -49,13 +49,11 @@ public class UserService {
   }
 
   public int getUnassimilatedNoteCount(User user) {
-    return noteRepository.countByOwnershipWhereThereIsNoMemoryTracker(
-        user.getId(), user.getOwnership().getId());
+    return noteRepository.countUnassimilatedByOwnership(user.getId(), user.getOwnership().getId());
   }
 
   public Stream<Note> getUnassimilatedNotes(User user) {
-    return noteRepository.findByOwnershipWhereThereIsNoMemoryTracker(
-        user.getId(), user.getOwnership().getId());
+    return noteRepository.findUnassimilatedByOwnership(user.getId(), user.getOwnership().getId());
   }
 
   public List<MemoryTracker> getRecentMemoryTrackers(User user, Timestamp since) {

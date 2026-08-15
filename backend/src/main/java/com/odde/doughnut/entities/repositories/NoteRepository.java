@@ -176,7 +176,7 @@ public interface NoteRepository extends CrudRepository<Note, Integer>, NoteStruc
               + joinMemoryTracker
               + unassimilatedWhereClause
               + unassimilatedOrderBy)
-  Stream<Note> findByOwnershipWhereThereIsNoMemoryTracker(Integer userId, Integer ownershipId);
+  Stream<Note> findUnassimilatedByOwnership(Integer userId, Integer ownershipId);
 
   @Query(
       value =
@@ -184,7 +184,7 @@ public interface NoteRepository extends CrudRepository<Note, Integer>, NoteStruc
               + selectFromNoteWithOwnership
               + joinMemoryTracker
               + unassimilatedWhereClause)
-  int countByOwnershipWhereThereIsNoMemoryTracker(Integer userId, Integer ownershipId);
+  int countUnassimilatedByOwnership(Integer userId, Integer ownershipId);
 
   String fromNotebook = "   AND n.notebook.id = :notebookId ";
 
@@ -195,7 +195,7 @@ public interface NoteRepository extends CrudRepository<Note, Integer>, NoteStruc
               + unassimilatedWhereClause
               + fromNotebook
               + unassimilatedOrderBy)
-  Stream<Note> findByAncestorWhereThereIsNoMemoryTracker(Integer userId, Integer notebookId);
+  Stream<Note> findUnassimilatedByAncestor(Integer userId, Integer notebookId);
 
   @Query(
       value =
@@ -203,7 +203,7 @@ public interface NoteRepository extends CrudRepository<Note, Integer>, NoteStruc
               + joinMemoryTracker
               + unassimilatedWhereClause
               + fromNotebook)
-  int countByAncestorWhereThereIsNoMemoryTracker(Integer userId, Integer notebookId);
+  int countUnassimilatedByAncestor(Integer userId, Integer notebookId);
 
   @Query(value = "SELECT count(1) as count from Note n " + " WHERE n.id in :noteIds" + fromNotebook)
   int countByAncestorAndInTheList(Integer notebookId, @Param("noteIds") List<Integer> noteIds);
