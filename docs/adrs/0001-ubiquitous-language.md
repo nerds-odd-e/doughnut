@@ -34,7 +34,6 @@ does not require renaming the whole codebase at once.
 |---------|-------------------|
 | Following a shared notebook | subscribe, subscription |
 | Binding to Wikidata | Wikidata association, Wiki association, associate Wikidata ID |
-| User recall interval list | space setting, spaced repetition |
 | Meaning-based find | semantical search, semantic search |
 
 #### Missing or weakly named
@@ -103,7 +102,8 @@ does not require renaming the whole codebase at once.
 | **Remove from recall** | Stop an existing memory tracker from appearing in recall; the unit does not re-enter the sequence | **Remove** / **Remove from recall** |
 | **Revive** | Re-enable recall for a tracker that was removed from recall | **Revive** |
 | **Property memory tracker** | Recall tracking keyed by a property or relationship label | |
-| **Spaced-repetition schedule** | User interval list for recall | |
+| **Stability** | Persisted current interval of a memory tracker, in whole hours. After a grade, next recall time is last recalled time plus Stability. A newly assimilated tracker may have Stability 0 (due now). | **Stability** |
+| **Retrievability** | Computed from elapsed whole hours and Stability; not stored. | |
 | **Daily assimilation target** | Max new understanding memory trackers to create per day (profile or subscription). Spelling and commissioned trackers do not consume this count. | |
 
 #### Conversation and focus
@@ -151,7 +151,8 @@ does not require renaming the whole codebase at once.
      subscribe. It does not opt out of **recall**. Do not skip memory
      tracking on a note. Tracker-level opt-out is **Remove from recall**.
    - Wire/AI shapes of an MCQ are not glossary nouns.
-   - Prefer **spaced-repetition schedule** over **space setting** in new copy.
+   - Use **Stability** for a memory tracker’s interval, not a user interval
+     list or **space setting**. Do not persist **Retrievability**.
    - Prefer **semantic search** over **semantical search**.
    - Use **notebook description** for the one-line plain-text catalog blurb;
      use **readme** for the markdown notebook/folder body — never treat them as the
@@ -187,7 +188,8 @@ does not require renaming the whole codebase at once.
   distinct from FSRS/Anki vocabulary. **Just review** names a recall method,
   not a different activity.
 - Humans and agents share an explicit dictionary instead of inferring synonyms.
-- Some existing strings (`space setting`) become known debt until renamed.
+- The memory tracker’s interval is **Stability**, not a learner-edited day
+  list; **Retrievability** stays a computed value.
 - Circles, notebook groups, and folders stay clearly separated in speech.
 - Spelling is spoken as a learner-created **spelling memory tracker**, not as a
   note option or a mode of assimilation.
@@ -210,8 +212,7 @@ does not require renaming the whole codebase at once.
 
 - Glossary will need edits as the product grows.
 - Temporary dual vocabulary until renames land.
-- Some metaphors (“space setting”) may feel colder when replaced with sharper
-  terms.
+- **Stability** (hours) is more technical than informal **space setting**.
 
 ## Prerequisites / Assumptions
 
@@ -224,4 +225,5 @@ does not require renaming the whole codebase at once.
 - Links: playbook [README.md](./README.md); ADR-0000
   [use-adrs-accepted.md](./0000-use-adrs-accepted.md); ADR 0003
   [spaced-repetition scheduling policy](./0003-spaced-repetition-scheduling-policy.md)
-  (FSRS **review** = Doughnut **recall**); [Open Knowledge Format](https://cloud.google.com/blog/products/data-analytics/how-the-open-knowledge-format-can-improve-data-sharing)
+  (FSRS **review** = Doughnut **recall**; **Stability** / **Retrievability**);
+  [Open Knowledge Format](https://cloud.google.com/blog/products/data-analytics/how-the-open-knowledge-format-can-improve-data-sharing)

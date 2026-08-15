@@ -18,7 +18,7 @@
 | # | Type | Status | Capability |
 |---|------|--------|------------|
 | 1 | Structure | done | ADR 0003 states Stability hours |
-| 2 | Structure | planned | Glossary names Stability |
+| 2 | Structure | done | Glossary names Stability |
 | 3 | Behavior | planned | Memory tracker field is `stability` |
 | 4 | Behavior | planned | No spaced-repetition day list in Settings or User API |
 | 5 | Behavior | planned | Stability is whole hours; day-list column dropped |
@@ -42,11 +42,11 @@ Proposed ADR 0003 is present-tense domain: persisted **Stability** (whole hours)
 ### 2. Glossary names Stability
 
 **Type:** Structure  
-**Status:** planned
+**Status:** done
 
-ADR 0001: add **Stability** and **Retrievability**. The memory tracker’s interval is Stability (hours). Remove **spaced-repetition schedule** as “user interval list”.
+ADR 0001 glossary: **Stability** (hours) and **Retrievability** (computed). Removed **spaced-repetition schedule** as user interval list.
 
-**Stop-safe:** code unchanged. Enables slices 3–4 copy.
+**Learning:** keep glossary meanings in domain language (no code identifiers). Slice 3 owns the field rename.
 
 ---
 
