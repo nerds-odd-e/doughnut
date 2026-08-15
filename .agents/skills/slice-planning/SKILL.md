@@ -66,8 +66,8 @@ For the hard trigger:
 2. Summarize learnings (discoveries, blockers, partial progress).
 3. `git stash -m "WIP: <brief description>"` (or revert uncommitted WIP).
 4. Decompose remaining work (steps below).
-5. Write `.planning/quick/NNN-slug/PLAN.md` (next free `NNN`); update
-   `.planning/STATE.md` if present. Promote to `phases/` when roadmap-bound.
+5. Write `.planning/quick/NNN-slug/PLAN.md` (next free `NNN`). Promote to
+   `phases/` when roadmap-bound.
 6. Report and wait (or execute the first smaller slice if already authorized).
 </step>
 
@@ -194,7 +194,6 @@ If GSD `/gsd-plan-phase` / discuss produced a plan violating Behavior/Structure 
 - Every slice is Behavior or Structure, stop-safe, one observable behavior
 - Plan written to `.planning/quick/` or `.planning/phases/` (not `ongoing/`)
 - Scenario-first ordering; capability-named permanent artifacts
-- STATE.md updated when it exists
 - Final output includes `## SLICE PLAN WRITTEN`
 </success_criteria>
 
