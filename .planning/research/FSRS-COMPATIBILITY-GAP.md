@@ -1,175 +1,354 @@
-# Doughnut ↔ open FSRS compatibility decisions
+# Doughnut ↔ open FSRS gap (toward ADR 0003)
 
-**Status:** Open for discussion; feeds Proposed
-[ADR 0003](../../docs/adrs/0003-spaced-repetition-scheduling-policy.md)
-**Updated:** 2026-08-13
-**Goal:** Track only unresolved choices required to finalize ADR 0003.
+**Status:** Analysis ready; open issues for discussion  
+**Updated:** 2026-08-15  
+**Feeds:** Proposed
+[ADR 0003](../../docs/adrs/0003-spaced-repetition-scheduling-policy.md)  
+**Does not:** approve the ADR (humans own announce → discuss → approve)
 
-## Current baseline
+This is the single tracking doc for (1) the gap between **current Doughnut code** and **open FSRS-6**, and (2) the unresolved choices needed to finalize ADR 0003. ADR 0003 should state the **product shape we want**, expected to be **mostly compatible with open FSRS**. Formulas and rollout stay out of the ADR until a choice is user-visible. **A1 locked:** Doughnut owns the implementation; no FSRS library.
 
-Doughnut uses a single memory-strength index plus a user-configured interval
-table. It does not calculate FSRS Difficulty, Stability, or Retrievability.
+There is no `.planning/research/SUMMARY.md` in the tree. Earlier notes lived only in this file (decision list, 2026-08-13). This revision adds the code-vs-FSRS analysis those notes assumed.
 
-The scheduler already has the FSRS-compatible transition foundation:
+---
 
-- memory updates consume the recall outcome and elapsed whole hours;
-- due time is projection metadata, not a memory-state input;
-- correct, incorrect, accidental-match, and Tutor outcomes advance the recall
-  anchor; overlap and missing Tutor feedback do not;
-- overdue success is never penalized relative to on-time success;
-- ordinary incorrect recall uses a separate 12-hour retry projection;
-- `nextRecallAt` remains materialized because history is incomplete.
+## 1. What “mostly compatible” should mean
 
-Doughnut does not yet grant the FSRS overdue reward: a successful recall after
-longer elapsed time receives the on-time increment, not a bounded additional
-Stability increase.
+Open FSRS is a **DSR scheduler**: persisted **Difficulty (D)** and **Stability (S)**, computed **Retrievability (R)** from elapsed time, four **grades**, and a **requested retention** that turns S into the next interval. Current Doughnut is a **single strength index** plus a **user interval table**.
 
-## Compatibility map
+For ADR 0003, “mostly compatible” is a product claim, not a library claim.
+**A1 is locked:** Doughnut owns an open-FSRS-compatible implementation (D, S,
+computed R, grade + elapsed time). No `ts-fsrs` / `fsrs-rs` / other FSRS library.
 
-| Open FSRS | Doughnut today | Open question |
-|-----------|----------------|---------------|
-| Difficulty (D) | None | Whether ADR 0003 names D as a target concept |
-| Stability (S) | Strength index + interval table | Whether S replaces the index later |
-| Retrievability (R) | Not calculated | Whether a future engine uses R |
-| Again / Hard / Good / Easy | Incorrect, correct, accidental, overlap, Tutor 0–5 | How product outcomes map to FSRS grades |
-| Requested retention | User interval table | Whether retention-driven intervals replace the table later |
-| Learning/relearning states | Fixed 12-hour ordinary-recall retry | Whether retry steps become configurable |
-| Recall log / optimizer | Partial Answer and Tutor history | Deferred until history is complete enough to consume |
+| Compatible | Not required to call the shape “FSRS-compatible” |
+|------------|--------------------------------------------------|
+| Transition inputs are grade + elapsed time + current memory state — never queue lateness | Shipping `ts-fsrs` / `fsrs-rs` (rejected: own implementation) |
+| Successful overdue recall is at least as strong as on-time; extra reward, if any, is bounded via low R / long elapsed time | Four Anki-style buttons in the Doughnut UI |
+| Failure shortens the next interval without a permanent trap | Dropping Doughnut-only outcomes (overlap, accidental match, Tutor 0–5) |
+| Due time is derived from memory state (may still be materialized) | Complete replayable history on day one |
+| Each memory tracker is one FSRS “card” | Calendar-day time unit (whole hours already locked) |
 
-## Open decisions
+---
 
-### O1. Meaning of “FSRS-compatible”
+## 2. Doughnut today (code, 2026-08-15)
 
-- Semantic compatibility only; formulas remain Doughnut-specific.
-- Name Difficulty/Stability/Retrievability as the target vocabulary while the
-  implementation remains transitional.
-- Commit to an eventual open-FSRS engine.
+**Memory state (one tracker = one schedule):**
 
-**Recommendation to discuss:** target vocabulary and semantics without forcing
-an engine migration.
+| Field | Role |
+|-------|------|
+| `forgettingCurveIndex` | Strength. Default `100`. Floor `100`. |
+| User `space_intervals` | Day table (default Fibonacci, often starting at `0`). Index interpolates adjacent entries, then × 24 hours. |
+| `lastRecalledAt` | Anchor for elapsed time and for `nextRecallAt = lastRecalledAt + intervalHours`. |
+| `nextRecallAt` | Materialized due-work projection. |
+| `recallCount` | Incremented on state-changing grades. |
+| `assimilatedAt` | First intake. Assimilation sets `lastRecalledAt = now` with **no grade**. |
 
-### O2. Persisted memory state
+There is **no** Difficulty, Stability, Retrievability, lapse count, requested retention, FSRS weights, or card state (`New` / `Learning` / `Review` / `Relearning`).
 
-- Keep an opaque strength index and interval table.
-- Later replace the index with Stability and Difficulty.
-- Require Difficulty in the first FSRS-shaped implementation.
+**Success** (`ForgettingCurve.succeeded`):
 
-**Already decided:** do not add unused fields. Introduce Stability, Difficulty,
-or lapses only with behavior that consumes them.
+- Base increment `+10`.
+- If `elapsedHours < currentIntervalHours` (and interval > 0): scale the increment by `elapsed / interval` (early recall grows less).
+- If overdue: **same increment as on-time** — no FSRS-style extra reward for low retrievability.
+- Optional thinking-time tweak: `±sqrt(|t − 25s|)`, clamped 0–60s, **within** correct only.
 
-### O3. Outcome-to-grade mapping
+**Failure:** index `−20`, then **forced `nextRecallAt = now + 12h`**, not the interval implied by the reduced index. `lastRecalledAt` **does** advance (ADR 0003 Context still says it does not — stale).
 
-- Collapse Doughnut outcomes onto Again/Hard/Good/Easy.
-- Keep Doughnut outcomes first-class and publish a compatibility map.
+**Other grades:**
+
+| Outcome | Memory effect | Anchor / due |
+|---------|---------------|--------------|
+| Overlap | None | Unchanged (retry in session) |
+| Accidental match (primary) | Ordinary failure | Advances; 12h retry |
+| Confusion adjustment (secondary) | `−10` index | Due may move earlier, never later; no `lastRecalledAt` / `recallCount` |
+| Tutor 5 / 4 / 3 | Success-like `+12` / `+10` / `+8` | Normal interval path; no 12h retry |
+| Tutor 2 / 1 / 0 | Reduce accumulated strength 20% / 50% / reset to 100 | Next recall strictly after now |
+| Just review | Boolean `mark-as-recalled`; thinking time `null` | Same as MCQ correct/incorrect |
+
+**History:** `answer` (correct, thinking time, spelling outcome, created_at) plus Tutor scores. Not an FSRS review log: no pre/post D/S, no rating 1–4, no scheduled vs elapsed days, no algorithm version.
+
+**Queue (not memory input):** due work uses half-day windows (`alignByHalfADay`). That is selection/display, not a transition input.
+
+---
+
+## 3. Open FSRS today (FSRS-6 / ts-fsrs)
+
+Canonical write-up: [The Algorithm](https://github.com/open-spaced-repetition/awesome-fsrs/wiki/The-Algorithm). Runnable shape: [ts-fsrs](https://open-spaced-repetition.github.io/ts-fsrs/).
+
+| Symbol | Meaning |
+|--------|---------|
+| **D** | Difficulty ∈ [1, 10]. Harder items gain less stability. |
+| **S** | Stability: elapsed time (days) at which **R = 90%**. |
+| **R(t, S)** | Retrievability. FSRS-6: power curve with trainable decay `w20`. |
+| **G** | Grade: 1 Again, 2 Hard, 3 Good, 4 Easy. |
+| **I(r, S)** | Next interval from **requested retention** `r` (default 0.9), not a day table. |
+
+Qualitative rules Doughnut already wants (and FSRS implements):
+
+1. Successful review: `SInc ≥ 1` (Hard/Good/Easy never shrink S).
+2. Lower R (including overdue) → **larger but converging** S increase — spacing effect, not linear lateness.
+3. Failure: post-lapse **S′_f(D, S, R)** then optional **relearning steps**; not “due immediately forever.”
+4. Same-day / short-term: separate `S′(S, G)` when `enable_short_term` (FSRS-6).
+5. Card states: New → Learning → Review; Again can enter Relearning.
+6. Review log is enough to **replay** and **fit** the 21 weights.
+
+FSRS **Hard (G=2) is still success**. That is the sharpest mapping clash with Doughnut Tutor score 2 (no growth, strength reduced).
+
+---
+
+## 4. Gap map
+
+| Open FSRS | Doughnut today | Kind of gap |
+|-----------|----------------|-------------|
+| Persist D and S; compute R(t, S) | One index + day table | **Model** — largest |
+| Interval from requested retention | User-edited day list | **Product knob** |
+| G ∈ {1,2,3,4} | Incorrect / correct + overlap / accidental match + Tutor 0–5 + thinking time | **Grades** |
+| Overdue success: bounded extra S via low R | Overdue = on-time increment | **Policy** (min already locked; reward not) |
+| Early success: smaller SInc via high R | Linear `elapsed/interval` on the increment | **Formula** (same direction) |
+| Post-lapse S then relearning steps | −20 index + fixed 12h | **Relearning** |
+| Same-day short-term scheduler | Whole hours; elapsed 0 on a positive interval → **zero growth** | **Short-term** |
+| New card has no S/D until first rating | Assimilate stamps `lastRecalledAt` and often due-now (table[0]=0) | **First state** |
+| Review log + optimizer | Partial answers / Tutor scores | **History** (already deferred) |
+| `request_retention`, `maximum_interval`, fuzz, learning/relearning steps | Interval table only | **Config** |
+| One card | One memory tracker (understanding / spelling / property / commissioned) | **Aligned** if 1 tracker = 1 card |
+| Activity named **review** | **Recall** (ADR 0001 / 0003) | **Vocabulary** — locked; not a scheduler gap |
+
+**Already aligned (do not reopen):**
+
+- Memory transition uses outcome + elapsed time, not `nextRecallAt` deviation.
+- Overdue success is never worse than on-time.
+- State-changing recalls advance `lastRecalledAt`.
+- Due time is a projection (materialized because history cannot rebuild it).
+- Whole elapsed hours (not calendar days, not sub-hour fractions).
+- Accidental-match / overlap transitions (ADR 0003 Decision).
+- After a graded answer, `nextRecallAt > recalledAt`.
+- Effort cannot invert a correct outcome.
+- Commissioned trackers do not use the 12h ordinary-recall retry.
+- Frequent-failure warning does not change the schedule; secondary confusion is not a failed recall of the matched tracker.
+
+---
+
+## 5. Discussion areas
+
+Discuss in this order. Each area lists options, a recommendation, and whether ADR 0003 must lock it. Resolve or **explicitly defer** before moving Working draft → Decision.
+
+### A. Target commitment — what the ADR promises
+
+**A1. Meaning of “FSRS-compatible” — resolved 2026-08-15**
+
+Locked in ADR 0003 Decision **Open FSRS-compatible target shape, own
+implementation**: D and S as persisted memory state, R computed from elapsed
+time and S, transition = grade + elapsed time + that state. Doughnut implements
+it; no FSRS library. Today’s index and table may remain until a later Decision
+consumes D/S.
+
+B–E stay open; they are how that shape becomes real.
+
+---
+
+### B. Memory-state and interval source — the shape
+
+**B1. Persist D / S when a behavior consumes them** (was O2)
+
+A1 already names D, S, and computed R as the target vocabulary. Remaining:
+
+- Keep an opaque strength index until a later Decision.
+- Persist D and S only when a behavior consumes them (already: no unused columns).
+- Require persisted D and S in the first FSRS-shaped implementation.
+
+**Recommendation:** do not add unused columns. The first slice that needs D or S persists them.
+
+**B2. Interval source** (was O6) — user-visible
+
+- Keep the day table indefinitely.
+- Keep the table until an FSRS-shaped engine exists.
+- **Prefer requested retention as the target knob**; table becomes a migration/compat input.
+
+FSRS interval is `I(r, S)`. Doughnut’s table is a discrete ease ladder. You cannot be fully FSRS-compatible while the table remains the source of truth.
+
+**Recommendation to discuss:** ADR states retention-target intervals as the **target**; the table remains allowed until that engine exists. Do not silently delete the Settings control in this ADR.
+
+**B3. Overdue success reward** (was O5)
+
+Locked minimum: overdue correct ≥ on-time correct.
+
+- Keep the minimum only (today’s code).
+- **Add a converging, bounded reward** driven by elapsed time / low R (FSRS `e^{w10(1−R)}−1` direction).
+- Linear lateness bonus (rejected by FSRS; SM-2-like).
+
+**Recommendation:** if the target is FSRS-compatible, the ADR should require the bounded R-based reward as **target behavior**, even if the first ship still only meets the minimum.
+
+**B4. Lapses** (was O15)
+
+Do not add an unused counter. Before adding: which outcomes increment it; first consumer (schedule vs warning vs fitting). FSRS-6 scheduling does not need L; FSRS-1 did.
+
+**Recommendation:** defer; frequent-failure already uses a 14-day wrong-answer window.
+
+---
+
+### C. Grades and Doughnut-only outcomes
+
+**C1. Outcome-to-grade map** (was O3) — user-visible
+
+- Collapse everything onto Again / Hard / Good / Easy (and change the UI).
+- **Keep Doughnut outcomes first-class; publish a compatibility map** into FSRS G when an FSRS-shaped engine exists.
 - Replace Tutor 0–5 at the product surface.
 
-**Recommendation to discuss:** retain product-specific outcomes. Overlap is no
-recall event; accidental match is a Doughnut extension; Tutor scores remain
-ordered grades.
+**Recommendation:** keep product outcomes. Overlap is **not** a recall event. Accidental match is a Doughnut extension (primary = Again; secondary ≠ a recall). MCQ / just review stay binary at the prompt (Again vs Good) unless we add explicit Hard/Easy later.
 
-### O4. Thinking time
+**C2. Tutor 0–5 vs FSRS Hard-is-success**
 
-- Keep bounded continuous adjustment within correct recall.
-- Map thinking-time bands to Hard/Good/Easy.
-- Remove thinking-time adjustment once explicit grades exist.
+| Tutor score | ADR 0003 today | FSRS-like reading |
+|-------------|----------------|-------------------|
+| 5 | Success, +20% | Easy (G=4) |
+| 4 | Success, standard | Good (G=3) |
+| 3 | Success, −20% | Hard (G=2) **or** weak Good |
+| 2 | **No growth; −20% accumulated** | Clash: FSRS Hard still increases S |
+| 1 | −50% accumulated | Again |
+| 0 | Reset to initial | Again (severe) |
 
-**Recommendation to discuss:** keep it bounded within correct recall so effort
-cannot invert the outcome; Tutor scores remain the grade.
+**Open:** is Tutor 2 **failure-like** (keep current policy) or **Hard-like success** (FSRS)? This is the main commissioned-learning incompatibility.
 
-### O5. Overdue success reward
+**C3. Thinking time** (was O4)
 
-- Keep the current minimum: overdue success is no worse than on-time.
-- Add a converging, bounded FSRS-like reward for longer elapsed time.
-- Add a linear lateness bonus.
+- Keep bounded continuous adjustment within correct recall (today).
+- Map time bands onto Hard / Good / Easy.
+- Remove once explicit grades exist.
 
-**Recommendation to discuss:** if a reward is added, base it on elapsed time
-and Stability/Retrievability, never queue deviation.
+**Recommendation:** keep bounded-within-correct so effort cannot invert the outcome. Do not treat slow correct as Again.
 
-### O6. Interval source
+**C4. Just review**
 
-- Keep the user interval table indefinitely.
-- Keep it until a later FSRS migration.
-- Prefer retention-target intervals in the ADR now.
+Today: boolean, no thinking time. Compatible as Again vs Good. Open: whether just review should offer Hard/Easy (Anki-like) later. **Recommendation:** out of ADR 0003 unless we want three+ self-eval buttons now.
 
-### O7. Incorrect-recall retry
+---
 
-- Keep the fixed 12-hour ordinary-recall retry.
-- Make relearning steps configurable, retaining 12 hours as the default.
-- Use post-lapse Stability without a forced short retry.
+### D. Failure, relearning, short-term
 
-Commissioned learning remains cadence-driven and does not inherit the 12-hour
-ordinary-recall rule.
+**D1. Incorrect-recall retry** (was O7)
 
-### O8. Accidental match in frequent-failure reporting — resolved
+- Keep fixed 12h ordinary-recall retry.
+- Configurable relearning steps, default 12h.
+- FSRS post-lapse S without a forced short retry (interval may already be days).
 
-The prompted spelling tracker receives the ordinary incorrect-recall transition,
-so its accidental-match answer counts as a failed recall. A secondary confusion
-adjustment is not a recall of the matched tracker and does not contribute to that
-tracker's failure count. See the locked accidental-match transition in ADR 0003.
+Commissioned learning stays cadence-driven (already stated).
 
-### O9. Manual and administrative schedule paths
+**Recommendation:** ADR may keep “ordinary incorrect recall is due again on a short, explicit retry” as the product rule, with 12h as the current default — not as a sacred constant. Post-lapse S is the **target** memory update; the retry is scheduling metadata.
+
+**D2. Short-term / same-hour recalls** (was O11)
+
+Whole-hour precision is locked. Open:
+
+- One duration-based transition until D/S exist (today: elapsed 0 + positive interval → no growth).
+- Later adopt FSRS-6 short-term `S′(S,G)` and learning/relearning states.
+- If special handling is added, bound it by elapsed duration/state, **not** the learner’s calendar date.
+
+**Recommendation:** ADR notes same-hour as “no additional success increment until a short-term rule exists”; do not invent a calendar same-day exception.
+
+**D3. Assimilation vs FSRS New** (new)
+
+FSRS: New card has no S/D until the **first rating**. Doughnut: assimilate writes `lastRecalledAt = now` and often `nextRecallAt = now` (table[0]=0) **without** a grade.
+
+**Open:** is assimilation “create a New card, due now,” or “a synthetic Good at t=0”? Target-compatible reading: **New / due immediately, first real grade initializes D and S**.
+
+**Recommendation:** state that in ADR 0003. Current code is operationally close (due now) but pretends a recall already happened.
+
+---
+
+### E. Operational contract (lock lightly or defer)
+
+**E1. Manual / admin paths** (was O9)
+
+`mark-as-recalled` is a real grade. `remove` / `revive` are not grades. `updateForgettingCurve(..., 0)` is assimilate init, not a learner grade.
 
 - Apply recall-transition rules whenever a grade is recorded.
-- Document manual paths as explicit policy escape hatches.
+- Document non-grade paths as escape hatches.
 - Remove or gate administrative bypasses.
 
-Pure schedule edits should not fabricate a recall or a due-deviation penalty.
+**Recommendation:** first option + name remove/revive as non-grades.
 
-### O10. ADR commitment sentence
+**E2. Strictly-future fallback** (was O13)
 
-- “This ADR does not require FSRS.”
-- “The target shape is open-FSRS-compatible; shipping open FSRS is optional.”
-- “Doughnut will migrate to open FSRS.”
+Invariant locked. Fallback when computed interval is non-positive:
 
-### O11. Short-term recalls
+- First positive configured spacing (today, commissioned path).
+- 24h only when no positive spacing exists (today’s last resort).
 
-Whole-hour elapsed precision is decided. Open choices:
+**Recommendation:** adopt the current commissioned fallback as the general rule.
 
-- keep one duration-based transition until Stability/Difficulty exist;
-- later adopt an explicit short-term transition and learning/relearning states;
-- if special handling is added, bound it by elapsed duration/state rather than
-  user-local calendar date.
+**E3. Fuzz, maximum interval** (new, was implicit in O6)
 
-### O12. Monitoring
+FSRS defaults: fuzz on, `maximum_interval` 36500 days. User-visible if we expose them.
 
-Choose durable scheduler observables such as interval distribution, success
-rate, and immediately-due-after-grade incidence. The completed anchor repair
-did not replay history or reinterpret due dates.
+**Recommendation:** defer to implementation; ADR may allow a maximum interval and small fuzz without requiring them.
 
-### O13. Strictly-future fallback
+**E4. Parameter ownership** (was O14)
 
-The invariant `nextRecallAt > recalledAt` is decided for every state-changing
-recall. Confirm the fallback when configured spacing is non-positive:
+A1 rejected an FSRS library. Remaining: global vs per-user weights; whether to fit from history; minimum history for fitting. Not crate/version policy.
 
-- first positive configured spacing;
-- 24 hours only when no positive spacing exists.
+**Recommendation:** **explicitly defer** fitting and per-user weights in ADR 0003.
 
-### O14. Engine and parameter ownership
+**E5. Monitoring** (was O12)
 
-- library versus maintained implementation;
-- pinned FSRS algorithm/version and upgrade policy;
-- global versus per-user retention and fitted parameters;
-- minimum history and fallback parameters for fitting.
+Interval distribution, success rate, immediately-due-after-grade incidence. Not an ADR Decision unless we want a contractual SLO.
 
-### O15. Lapses
+**Recommendation:** keep in Consequences / rollout notes.
 
-Do not add an unused counter. Before adding lapses, decide:
+**E6. RecallLog** (already in Working draft)
 
-- which outcomes increment it;
-- whether the first consumer is scheduling, learner-visible reporting, or
-  parameter fitting.
+Counterpart to the FSRS review log. Not required to finalize the policy. Keep deferred.
 
-## ADR 0003 finalization checklist
+---
 
-- Decide O1–O15 or explicitly defer each item.
-- Fold decided product constraints into ADR 0003.
-- Keep implementation freedom where no user-visible contract is needed.
-- Preserve Doughnut vocabulary: a learning **recall**, not an FSRS “review.”
-- Humans own accepting, rejecting, or superseding the ADR.
+## 6. ADR 0003 finalization checklist
+
+When discussion closes:
+
+1. Move resolved items from Working draft into **Decision**; delete or shrink Working draft.
+2. Rewrite **Context** against current code (remove `delayInHours`; incorrect recall **does** advance `lastRecalledAt`).
+3. ~~State the FSRS-compatible **target shape** (A1) without requiring an engine.~~ Done: own implementation, no FSRS library.
+4. Keep Doughnut vocabulary: **recall**, not FSRS **review**.
+5. Keep Doughnut-only outcomes first-class with a published map (C1), including the Tutor-2 decision (C2).
+6. Implementation freedom where no user-visible contract is needed (formulas, columns, optimizer).
+7. Humans accept / reject / supersede the ADR (`docs/adrs/README.md`).
+
+Hygiene while this doc is the tracker: do not duplicate open issues in the ADR; link here from Related (already).
+
+---
+
+## 7. Issue index
+
+| ID | Topic | ADR must lock? | Suggested |
+|----|-------|----------------|-----------|
+| A1 | FSRS-compatible = own D/S/R implementation, no library | **Resolved** | Locked 2026-08-15 |
+| B1 | When to persist D/S | Light lock | No unused columns; persist with first consumer |
+| B2 | Interval table vs requested retention | Yes | Retention as target; table until then |
+| B3 | Overdue R-based reward | Yes (target vs minimum) | Target = bounded FSRS-like reward |
+| B4 | Lapses | Defer | Defer |
+| C1 | Keep Doughnut outcomes | Yes | Keep + compatibility map |
+| C2 | Tutor 2 vs FSRS Hard | Yes | Discuss — current policy ≠ FSRS |
+| C3 | Thinking time | Yes | Bounded within correct |
+| C4 | Just-review Hard/Easy | No / defer | Binary Again vs Good |
+| D1 | 12h retry vs post-lapse S | Yes | Short retry as schedule; S as target update |
+| D2 | Short-term / same-hour | Light lock | No growth at elapsed 0 until short-term rule |
+| D3 | Assimilation = New card | Yes | New / due now; first grade initializes D/S |
+| E1 | Manual paths | Light lock | Grades vs remove/revive |
+| E2 | Non-positive interval fallback | Light lock | First positive spacing, else 24h |
+| E3 | Fuzz / max interval | Defer | Allowed, not required |
+| E4 | Fitting / per-user weights | Defer | Defer (library already rejected in A1) |
+| E5 | Monitoring | Consequences | Observables, not Decision |
+| E6 | RecallLog | Already deferred | Keep deferred |
+
+Resolved earlier: accidental-match counts as failure for the prompted tracker only (old O8).
+
+---
 
 ## References
 
-- [ADR 0003](../../docs/adrs/0003-spaced-repetition-scheduling-policy.md)
-- [ADR 0001](../../docs/adrs/0001-ubiquitous-language.md)
-- [ADR 0005](../../docs/adrs/0005-commissioned-learning-session-protocol.md)
-- [FSRS algorithm wiki](https://github.com/open-spaced-repetition/awesome-fsrs/wiki/The-Algorithm)
+- [ADR 0003](../../docs/adrs/0003-spaced-repetition-scheduling-policy.md) (Proposed)
+- [ADR 0001](../../docs/adrs/0001-ubiquitous-language.md) — **recall** vs FSRS **review**
+- [ADR 0005](../../docs/adrs/0005-commissioned-learning-session-protocol.md) — Tutor score meaning
+- Seed: [SEED-004](../seeds/SEED-004-close-spaced-repetition-scheduling-policy-gap.md)
+- Code: `ForgettingCurve`, `MemoryTracker`, `SpacedRepetitionAlgorithm`, `CommissionedLearningSessionFeedbackPolicy`
+- [FSRS-6 algorithm](https://github.com/open-spaced-repetition/awesome-fsrs/wiki/The-Algorithm)
+- [ts-fsrs](https://open-spaced-repetition.github.io/ts-fsrs/)

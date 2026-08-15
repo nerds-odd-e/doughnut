@@ -51,6 +51,24 @@ Do not use **review** for the spaced activity. **Just review** is a recall
 method (self-evaluate after seeing the note), not FSRS review. When citing
 FSRS, pair once (**review (FSRS) = recall**) then use Doughnut terms.
 
+### Open FSRS-compatible target shape, own implementation
+
+The target memory-state shape is **open-FSRS-compatible**: Difficulty and
+Stability as persisted memory state, Retrievability computed from elapsed
+time and Stability, and a recall transition that consumes the graded
+outcome, elapsed time, and that state — never queue lateness.
+
+Doughnut **implements that shape itself**. Do not take a dependency on
+`ts-fsrs`, `fsrs-rs`, or any other FSRS library. Compatibility is with the
+open FSRS model (inputs, state, qualitative update rules), not with a
+particular crate or version.
+
+This Decision does not by itself change today’s strength index, interval
+table, or due times. Later Decisions say when the implementation consumes
+Difficulty/Stability and which product knobs (retention, grades, overdue
+reward) follow. Until then, a smaller compatible algorithm on the existing
+model remains allowed.
+
 ### Whole-hour elapsed-time precision
 
 Use **whole elapsed hours** as the recall-transition time input. Measure the
@@ -259,19 +277,21 @@ assert the resulting schedule movement, not the internal measure.
    a zero persisted interval is not allowed.
 2. User-configured spacing remains an input, subject to these safety
    properties.
-3. Internal strength representations, interval tables, increments, interval
-   rounding, and any future stability/retrievability model are implementation
-   details. Elapsed-time input precision is fixed by the Decision above. Policy
-   tests must assert observable schedule behavior, not internal indexes.
-4. This ADR does not require FSRS. A smaller compatible algorithm may ship
-   first; the internal model may change later without changing these rules.
-5. Persisting a due-time projection remains allowed and currently required. Its
+3. Until a later Decision consumes Difficulty/Stability, the current
+   strength index and interval table remain allowed. Formulas, increments,
+   rounding, and column layout are implementation details. Elapsed-time
+   input precision is fixed by the Decision above. Policy tests must
+   assert observable schedule behavior, not internal indexes.
+4. Persisting a due-time projection remains allowed and currently required. Its
    storage does not make due-time compliance a memory-state input.
 
 ## Consequences
 
 - Doughnut says **recall**, not FSRS **review**, for the spaced activity
   (see **Decision**).
+- The destination scheduler is open-FSRS-compatible and Doughnut-owned;
+  it is not an FSRS library. Today’s index and table may remain until a
+  later Decision consumes Difficulty/Stability.
 - Busy users are judged on demonstrated recall, not schedule compliance.
 - Correct overdue recalls must not create a positive-feedback workload loop.
 - A spelling memory tracker is extra title practice the learner opts into; it
@@ -330,17 +350,23 @@ assert the resulting schedule movement, not the internal measure.
 Rejected: conflates queue compliance with memory and causes the correct-answer
 trap.
 
-### Adopt FSRS immediately
+### Adopt an open-FSRS library (`ts-fsrs`, `fsrs-rs`, …)
 
-Deferred: credible future implementation, but brings a new state model,
-parameters, retention targets, fitting, and migration that are unnecessary to
-establish the product policy.
+Rejected: the target shape is open-FSRS-compatible; Doughnut owns the
+implementation. A library would freeze crate/version policy this ADR
+does not need.
+
+### Name the FSRS-compatible shape without requiring a library
+
+Accepted (Decision above). Semantics-only (“this ADR does not require
+FSRS”) left the destination model unnamed.
 
 ### Apply the policy to the existing Doughnut model first
 
-Recommended initial path: use observed retention time, keep successful timing
-adjustments non-negative, bound effort, ensure a positive post-answer interval.
-Exact mechanics stay outside this ADR.
+Interim path until a later Decision consumes Difficulty/Stability: use
+observed retention time, keep successful timing adjustments non-negative,
+bound effort, ensure a positive post-answer interval. Exact mechanics stay
+outside this ADR.
 
 ### Recompute due time from answer history on demand
 
@@ -350,7 +376,7 @@ boundary or sufficient current memory state is persisted.
 
 ## Related
 
-- Working discussion (gap + open issues toward finalizing this ADR): [`.planning/research/FSRS-COMPATIBILITY-GAP.md`](../../.planning/research/FSRS-COMPATIBILITY-GAP.md)
+- Working discussion (code-vs-FSRS analysis + open issues): [`.planning/research/FSRS-COMPATIBILITY-GAP.md`](../../.planning/research/FSRS-COMPATIBILITY-GAP.md) — do not duplicate open issues here; move resolved items into **Decision**
 - ADR 0001 [ubiquitous language](./0001-ubiquitous-language.md) — **recall** (not FSRS **review**); **recall prompt** / **MCQ** / **just review**; commissioned learning terms; spelling memory tracker
 - ADR 0005 [commissioned learning session protocol](./0005-commissioned-learning-session-protocol.md) — what a score means to the Tutor
 - Anki answer semantics: <https://docs.ankiweb.net/studying.html#answer-buttons>
