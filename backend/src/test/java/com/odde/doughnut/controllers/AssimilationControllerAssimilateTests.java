@@ -48,6 +48,21 @@ class AssimilationControllerAssimilateTests extends ControllerTestBase {
     }
 
     @Test
+    void assimilateOnSkipMemoryTrackingNotebookCreatesUnderstandingTracker() {
+      Note note =
+          makeMe
+              .aNote()
+              .notebookOwnedBy(currentUser.getUser())
+              .skipMemoryTrackingEntirely(true)
+              .please();
+
+      List<MemoryTracker> result =
+          controller.assimilate(AssimilationControllerTestSupport.assimilateRequest(note));
+
+      assertThat(result.get(0).getType(), equalTo(MemoryTrackerType.UNDERSTANDING));
+    }
+
+    @Test
     void assimilatingSkippedNoteDeletesMatchingSkipRow() {
       Note note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
       makeMe.anAssimilationSequenceSkipFor(note).please();
@@ -70,101 +85,6 @@ class AssimilationControllerAssimilateTests extends ControllerTestBase {
       assertThat(
           skipRepository.findByUserAndNoteAndPropertyKey(currentUser.getUser(), note, "a part of"),
           is(Optional.empty()));
-    }
-
-    @Test
-    void assimilatingCommissionedOnlyNoteCreatesUnderstandingAndLeavesCommissioned() {
-      Note note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
-      makeMe.aMemoryTrackerFor(note).commissioned().please();
-
-      List<MemoryTracker> result =
-          controller.assimilate(AssimilationControllerTestSupport.assimilateRequest(note));
-
-      assertThat(result, hasSize(1));
-      assertThat(result.get(0).getType(), equalTo(MemoryTrackerType.UNDERSTANDING));
-      assertThat(
-          memoryTrackerRepository
-              .findByUserAndNote(currentUser.getUser().getId(), note.getId())
-              .stream()
-              .map(MemoryTracker::getType)
-              .toList(),
-          containsInAnyOrder(MemoryTrackerType.UNDERSTANDING, MemoryTrackerType.COMMISSIONED));
-    }
-
-    @Test
-    void assimilatingAsCommissionedCreatesOnlyCommissionedTracker() {
-      Note note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
-
-      List<MemoryTracker> result =
-          controller.assimilate(
-              AssimilationControllerTestSupport.assimilateCommissionedRequest(note));
-
-      assertThat(result, hasSize(1));
-      assertThat(result.get(0).getType(), equalTo(MemoryTrackerType.COMMISSIONED));
-      assertThat(result.get(0).isNoteLevelTracker(), equalTo(true));
-      assertThat(
-          memoryTrackerRepository.findByUserAndNote(currentUser.getUser().getId(), note.getId()),
-          hasSize(1));
-    }
-
-    @Test
-    void assimilatingAsCommissionedOnSkippedNoteLeavesSkipRowAndStaysOutOfNext() {
-      Note note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
-      makeMe.anAssimilationSequenceSkipFor(note).please();
-
-      List<MemoryTracker> result =
-          controller.assimilate(
-              AssimilationControllerTestSupport.assimilateCommissionedRequest(note));
-
-      assertThat(result.get(0).getType(), equalTo(MemoryTrackerType.COMMISSIONED));
-      assertThat(
-          skipRepository.findByUserAndNoteAndPropertyKey(currentUser.getUser(), note, ""),
-          is(not(Optional.empty())));
-      assertThat(controller.next("Asia/Shanghai").getNextUnit(), nullValue());
-    }
-
-    @Test
-    void
-        assimilatingAsCommissionedWhenUnderstandingExistsCreatesCommissionedAndLeavesUnderstanding() {
-      Note note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
-      makeMe.aMemoryTrackerFor(note).please();
-
-      controller.assimilate(AssimilationControllerTestSupport.assimilateCommissionedRequest(note));
-
-      assertThat(
-          memoryTrackerRepository
-              .findByUserAndNote(currentUser.getUser().getId(), note.getId())
-              .stream()
-              .map(MemoryTracker::getType)
-              .toList(),
-          containsInAnyOrder(MemoryTrackerType.UNDERSTANDING, MemoryTrackerType.COMMISSIONED));
-    }
-
-    @Test
-    void assimilatingAsCommissionedWithPropertyKeyReturnsEmpty() {
-      Note note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
-      AssimilationRequestDTO request =
-          AssimilationControllerTestSupport.assimilateCommissionedRequest(note);
-      request.propertyKey = "a part of";
-
-      assertThat(controller.assimilate(request), empty());
-      assertThat(
-          memoryTrackerRepository.findByUserAndNote(currentUser.getUser().getId(), note.getId()),
-          empty());
-    }
-
-    @Test
-    void assimilatingAsCommissionedWhenCommissionedExistsReturnsEmpty() {
-      Note note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
-      makeMe.aMemoryTrackerFor(note).commissioned().please();
-
-      assertThat(
-          controller.assimilate(
-              AssimilationControllerTestSupport.assimilateCommissionedRequest(note)),
-          empty());
-      assertThat(
-          memoryTrackerRepository.findByUserAndNote(currentUser.getUser().getId(), note.getId()),
-          hasSize(1));
     }
 
     @Test

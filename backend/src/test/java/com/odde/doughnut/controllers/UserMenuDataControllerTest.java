@@ -2,6 +2,7 @@ package com.odde.doughnut.controllers;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -54,6 +55,21 @@ class UserMenuDataControllerTest extends ControllerTestBase {
 
     Timestamp expectedEndAt = TimestampOperations.addHoursToTimestamp(currentTime, 4);
     assertEquals(expectedEndAt, menuData.getRecallStatus().getCurrentRecallWindowEndAt());
+  }
+
+  @Test
+  void skipMemoryTrackingNoteTrackerAppearsInRecallDue() {
+    Timestamp currentTime = makeMe.aTimestamp().of(0, 0).please();
+    testabilitySettings.timeTravelTo(currentTime);
+    Note note =
+        makeMe
+            .aNote()
+            .notebookOwnedBy(currentUser.getUser())
+            .skipMemoryTrackingEntirely(true)
+            .please();
+    makeMe.aMemoryTrackerFor(note).please();
+
+    assertThat(controller.getMenuData("Asia/Shanghai").getRecallStatus().getToRepeat(), hasSize(1));
   }
 
   @Test

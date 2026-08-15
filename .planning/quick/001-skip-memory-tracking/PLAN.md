@@ -1,6 +1,6 @@
 # Skip Memory Tracking — make the glossary true
 
-**Status:** in progress (Phases 1–2 done)  
+**Status:** in progress (Phases 1–3 done)  
 
 **Source:** Proposed [ADR 0001](../../../docs/adrs/0001-ubiquitous-language.md) — **Skip Memory Tracking** is a notebook setting that opts the notebook out of the **assimilation sequence** and blocks Bazaar subscribe. It does **not** opt the notebook out of recall. Assimilating on a note still creates a memory tracker.
 
@@ -40,19 +40,9 @@ Circle subscribe uses the same endpoint: reject whenever the flag is set.
 ## Phase 3: Assimilate-on-note still joins recall
 
 **Type:** Behavior  
-**Status:** planned
+**Status:** done
 
-**Pre-condition:** Note in a **Skip Memory Tracking** notebook has no understanding memory tracker.
-
-**Trigger:** Assimilate from the note (not via `/next`).
-
-**Post-condition:** An understanding memory tracker exists; it can appear in recall. The unit does not re-enter the assimilation sequence.
-
-**Tests:** regression at controller boundary — `AssimilationController.assimilate` on a flagged-notebook note succeeds; a follow-up `/next` does not offer that note; recall/menu due includes the new tracker (extend `AssimilationControllerAssimilateTests` and the existing recall/menu count boundary, e.g. `UserMenuDataControllerTest`). No new E2E unless the unit tests cannot express recall-due.
-
-**Implementation:** none expected if Phase 1 only filtered sequence queries. If assimilate or recall was over-blocked, revert that.
-
-**Verify:** `CURSOR_DEV=true nix develop -c pnpm backend:test_only`
+**Landed:** Tests only — Phase 1 did not over-block assimilate or recall. `assimilate` on a flagged-notebook note still creates an understanding tracker; menu recall due includes such a tracker. `NoteBuilder.skipMemoryTrackingEntirely` delegates to `NotebookBuilder`. Follow-up `/next` omit is already covered by Phase 1.
 
 ---
 

@@ -74,6 +74,15 @@ public class NoteBuilder extends EntityBuilder<Note> {
     return attachToNewNotebookOwnedBy(user);
   }
 
+  public NoteBuilder skipMemoryTrackingEntirely(boolean skip) {
+    if (entity.getNotebook() == null) {
+      throw new AssertionError(
+          "Set notebook (e.g. notebookOwnedBy) before skipMemoryTrackingEntirely.");
+    }
+    makeMe.theNotebook(entity.getNotebook()).skipMemoryTrackingEntirely(skip);
+    return this;
+  }
+
   public NoteBuilder underSameNotebookAs(Note note) {
     notebook(note.getNotebook());
     note.getNotebook().addNoteInMemoryToSupportUnitTestOnly(entity);
