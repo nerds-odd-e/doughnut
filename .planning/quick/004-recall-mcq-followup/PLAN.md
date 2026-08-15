@@ -33,14 +33,15 @@ commit.
 
 ### 2. Drop annotation-only Mcq path tests
 
-- **Status:** planned
+- **Status:** done
 - **Type:** Structure
 - **Enables:** 3. Nested MCQ routes have no question segment
 
-Delete `McqControllerTests.HttpPaths` and `TestabilityInjectMcqsPathTest`.
-They pin annotations, not HTTP, and would freeze leftover `*-question*`
-segments. Existing controller behavior tests, OpenAPI, and E2E intercepts
-remain the route contract. No production change.
+Deleted `McqControllerTests.HttpPaths` and `TestabilityInjectMcqsPathTest`.
+No production change.
+
+**Learnings:** Behavior tests in `McqControllerTests` remain. Route contract
+is OpenAPI + E2E intercept.
 
 ### 3. Nested MCQ routes have no question segment
 

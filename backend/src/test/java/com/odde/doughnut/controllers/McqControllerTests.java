@@ -15,9 +15,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 
 class McqControllerTests extends ControllerTestBase {
 
@@ -34,47 +31,6 @@ class McqControllerTests extends ControllerTestBase {
 
   Note ownedNote(String title) {
     return makeMe.aNote().notebookOwnedBy(currentUser.getUser()).title(title).please();
-  }
-
-  @Nested
-  class HttpPaths {
-    @Test
-    void noteMcqRoutesAreUnderMcqs() throws Exception {
-      assertThat(classPath(), equalTo("/api/mcqs"));
-      assertThat(
-          classPath() + getPath("getAllQuestionByNote", Note.class),
-          equalTo("/api/mcqs/{note}/note-questions"));
-      assertThat(
-          classPath() + postPath("addQuestionManually", Note.class, Mcq.class),
-          equalTo("/api/mcqs/{note}/note-questions"));
-      assertThat(
-          classPath() + postPath("generateQuestionWithoutSave", Note.class),
-          equalTo("/api/mcqs/generate-question-without-save"));
-      assertThat(
-          classPath() + getPath("exportQuestionGeneration", Note.class),
-          equalTo("/api/mcqs/{note}/export-question-generation"));
-      assertThat(
-          classPath() + postPath("refineQuestion", Note.class, Mcq.class),
-          equalTo("/api/mcqs/{note}/refine-question"));
-    }
-
-    private String classPath() {
-      return McqController.class.getAnnotation(RequestMapping.class).value()[0];
-    }
-
-    private String getPath(String method, Class<?>... params) throws Exception {
-      return McqController.class
-          .getDeclaredMethod(method, params)
-          .getAnnotation(GetMapping.class)
-          .value()[0];
-    }
-
-    private String postPath(String method, Class<?>... params) throws Exception {
-      return McqController.class
-          .getDeclaredMethod(method, params)
-          .getAnnotation(PostMapping.class)
-          .value()[0];
-    }
   }
 
   @Nested

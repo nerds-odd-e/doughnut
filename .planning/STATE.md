@@ -6,9 +6,9 @@ current_phase: null
 current_phase_name: null
 status: executing
 stopped_at: null
-last_updated: "2026-08-15T08:55:00Z"
+last_updated: "2026-08-15T09:05:00Z"
 last_activity: 2026-08-15
-last_activity_desc: 004-recall-mcq-followup slice 1 done (unanswered history omits MCQ solution)
+last_activity_desc: 004-recall-mcq-followup slice 2 done (annotation-only Mcq path tests dropped)
 progress:
   total_phases: 0
   completed_phases: 0
@@ -27,7 +27,7 @@ See: `.planning/PROJECT.md`
 
 ## Current Position
 
-[`.planning/quick/004-recall-mcq-followup/PLAN.md`](quick/004-recall-mcq-followup/PLAN.md) in progress — slice 1 done (unanswered history omits MCQ solution). Next: drop annotation-only Mcq path tests, then nested `/api/mcqs` routes with no `question` segment.
+[`.planning/quick/004-recall-mcq-followup/PLAN.md`](quick/004-recall-mcq-followup/PLAN.md) in progress — slices 1–2 done. Next: nested `/api/mcqs` routes with no `question` segment.
 
 **Ops leftover:** gated dummy-skip conversions. Enable on the deploy that first applies each version, then revert to `1=0`:
 - `dummy_note_sequence_skip_convert` (`V300000254`)
@@ -40,7 +40,7 @@ JDBC harnesses remain temporary until those production applications.
 
 ## Operator Next Steps
 
-- Continue [`.planning/quick/004-recall-mcq-followup/PLAN.md`](quick/004-recall-mcq-followup/PLAN.md) — next: drop annotation-only Mcq path tests
+- Continue [`.planning/quick/004-recall-mcq-followup/PLAN.md`](quick/004-recall-mcq-followup/PLAN.md) — next: nested `/api/mcqs` routes with no `question` segment
 - Confirm production applied Flyway `V300000257` (table `mcq`) and `V300000258` (table `answer`)
 - Enable dummy-skip conversion placeholders on the deploys that first apply V300000254 / V300000255
 - Continue ADR 0003: resolve open issues in `.planning/research/FSRS-COMPATIBILITY-GAP.md`
