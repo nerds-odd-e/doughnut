@@ -46,10 +46,20 @@ state, qualitative update rules), not with a particular crate or version.
   Settings day list.
 - **Retrievability** is computed from elapsed whole hours and Stability, not stored.
 - A recall transition consumes the graded outcome, elapsed time, and that state — never queue lateness.
-- Difficulty, requested retention (turning Stability into an interval from a
+- Requested retention (turning Stability into an interval from a
   retention target), lapses, and a RecallLog remain later gaps. Close one
   remaining gap at a time as **one observable schedule behavior**. Persist a
   field when that behavior uses it.
+
+### Difficulty on correct recall
+
+Difficulty is persisted memory state in `[1, 10]`. It is not part of the learner UI in this Decision. Harder items gain less Stability on a successful recall. A correct recall also updates Difficulty with the open-FSRS Good-equivalent rule.
+
+A newly assimilated tracker is **New**: Stability 0, Difficulty unset, due now. Assimilation is not a grade. The first real correct recall initializes Difficulty to **5** and Stability to **24** hours (short first interval; 12 hours is a later tweak). Existing trackers that already have positive Stability or a recall count are migrated to Difficulty **5**.
+
+Ordinary correct recall with Stability > 0 updates Stability (and Difficulty) with open-FSRS-6 Good-equivalent rules (own implementation). It must not walk a spacing-index ladder. Locked overdue extra growth still holds. Requested retention remains implicit: `nextRecallAt = lastRecalledAt + stability`.
+
+Incorrect recall, confusion adjustment, and commissioned scores stay on their current rules.
 
 ### Overdue correct recall: bounded extra growth
 

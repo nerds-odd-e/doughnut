@@ -2,6 +2,7 @@ package com.odde.doughnut.controllers;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.doughnut.entities.MemoryTracker;
@@ -56,6 +57,29 @@ class MemoryTrackerShowControllerTest extends MemoryTrackerControllerTestBase {
       tracker = makeMe.aMemoryTrackerBy(makeMe.aUser().please()).please();
       assertThrows(
           UnexpectedNoAccessRightException.class, () -> controller.showMemoryTracker(tracker));
+    }
+  }
+
+  @Nested
+  class DifficultyPersistence {
+    @Test
+    void persistsAssignedDifficulty() {
+      MemoryTracker stored = makeMe.aMemoryTrackerFor(ownedNote()).difficulty(7f).please();
+
+      assertThat(reloaded(stored).getDifficulty(), equalTo(7f));
+    }
+
+    @Test
+    void leavesDifficultyUnsetForAssimilateOnlyTracker() {
+      MemoryTracker stored = makeMe.aMemoryTrackerFor(ownedNote()).please();
+
+      assertThat(reloaded(stored).getDifficulty(), nullValue());
+    }
+
+    private MemoryTracker reloaded(MemoryTracker stored) {
+      Integer id = stored.getId();
+      makeMe.entityPersister.flushAndClear();
+      return makeMe.entityPersister.find(MemoryTracker.class, id);
     }
   }
 }

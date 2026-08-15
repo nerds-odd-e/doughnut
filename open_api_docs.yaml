@@ -3475,12 +3475,12 @@ components:
           type: string
         validationRationale:
           type: string
+        questionStem:
+          type: string
         responseChoices:
           type: array
           items:
             type: string
-        questionStem:
-          type: string
       required:
       - id
       - questionStem

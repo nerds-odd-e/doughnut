@@ -45,6 +45,11 @@ public class MemoryTrackerBuilder extends EntityBuilder<MemoryTracker> {
     return this;
   }
 
+  public MemoryTrackerBuilder difficulty(float difficulty) {
+    entity.setDifficulty(difficulty);
+    return this;
+  }
+
   public MemoryTrackerBuilder removedFromTracking() {
     entity.setRemovedFromTracking(true);
     return this;

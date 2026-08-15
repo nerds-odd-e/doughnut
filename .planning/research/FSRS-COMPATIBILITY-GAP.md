@@ -18,9 +18,9 @@ match. Introduce or replace structure **only** when that behavior needs it.
 No unused Difficulty, lapse, requested-retention, or RecallLog fields
 for later slices.
 
-First implementation after this ADR lock (**B3**) is **in code**: overdue correct lengthens Stability more than on-time. B1/B2/B4 and C–E stay open.
+First implementation after this ADR lock (**B3**) is **in code**: overdue correct lengthens Stability more than on-time. **B1** persist D exists (schema); D consumption and **D3** first-grade init are later slices of this plan. B2/B4 and C–E stay open.
 
-Current Doughnut persists **Stability** in whole hours (the current interval) and computes Retrievability in the success path as elapsed vs Stability. There is still **no** Difficulty, lapse count, requested retention, FSRS weights, or card state (`New` / `Learning` / `Review` / `Relearning`). Remaining gaps close by **vertical slice** (ADR 0003 Decision).
+Current Doughnut persists **Stability** in whole hours (the current interval) and **Difficulty** (nullable; hidden). Retrievability is computed in the success path as elapsed vs Stability. There is still **no** lapse count, requested retention, FSRS weights, or card state (`New` / `Learning` / `Review` / `Relearning`). Remaining gaps close by **vertical slice** (ADR 0003 Decision).
 
 ## 1. What “mostly compatible” should mean
 
@@ -47,12 +47,13 @@ computed R, grade + elapsed time). No `ts-fsrs` / `fsrs-rs` / other FSRS library
 | Field | Role |
 |-------|------|
 | `stability` | Current interval in **whole hours**. Assimilate may be `0` (due now). After a grade, `nextRecallAt = lastRecalledAt + stability`. |
+| `difficulty` | Persisted memory state in `[1, 10]`. Hidden (`@JsonIgnore`). NULL on New / assimilate-only rows. Graded rows (`stability > 0` OR `recall_count > 0`) backfilled to **5**. |
 | `lastRecalledAt` | Anchor for elapsed time. |
 | `nextRecallAt` | Materialized due-work projection. |
 | `recallCount` | Incremented on state-changing grades. |
 | `assimilatedAt` | First intake. Assimilation sets `lastRecalledAt = now` with **no grade**. |
 
-There is **no** Difficulty, lapse count, requested retention, FSRS weights, or card state (`New` / `Learning` / `Review` / `Relearning`). Retrievability is not stored.
+Difficulty is persisted (nullable; not on the learner UI). There is still **no** lapse count, requested retention, FSRS weights, or card state (`New` / `Learning` / `Review` / `Relearning`). Retrievability is not stored.
 
 **Success** (`ForgettingCurve.succeeded`):
 
@@ -109,14 +110,14 @@ FSRS **Hard (G=2) is still success**. That is the sharpest mapping clash with Do
 
 | Open FSRS | Doughnut today | Kind of gap |
 |-----------|----------------|-------------|
-| Persist D and S; compute R(t, S) | Persist S (hours); R not stored; no D | **Model** |
+| Persist D and S; compute R(t, S) | Persist S (hours) and D (nullable, hidden); R not stored | **Model** (D column exists; not yet consumed) |
 | Interval from requested retention | Built-in hours ladder (no learner day list) | **Product knob** |
 | G ∈ {1,2,3,4} | Incorrect / correct + overlap / accidental match + Tutor 0–5 + thinking time | **Grades** |
 | Overdue success: bounded extra S via low R | Overdue correct lengthens S more than on-time; extra converges | **Aligned** (B3) |
 | Early success: smaller SInc via high R | Linear `elapsed/interval` on the increment | **Formula** (same direction) |
 | Post-lapse S then relearning steps | −20 index + fixed 12h | **Relearning** |
 | Same-day short-term scheduler | Whole hours; elapsed 0 on a positive interval → **zero growth** | **Short-term** |
-| New card has no S/D until first rating | Assimilate stamps `lastRecalledAt` and often due-now (table[0]=0) | **First state** |
+| New card has no S/D until first rating | Assimilate is New: S=0, D unset, due now (not a grade); first-grade init later | **First state** (D3 locked in ADR) |
 | Review log + optimizer | Partial answers / Tutor scores | **History** (already deferred) |
 | `request_retention`, `maximum_interval`, fuzz, learning/relearning steps | Interval table only | **Config** |
 | One card | One memory tracker (understanding / spelling / property / commissioned) | **Aligned** if 1 tracker = 1 card |
@@ -168,19 +169,11 @@ due times. Implementing the locked targets later will.
 **Vertical slicing** is locked in ADR 0003 for all remaining FSRS gaps (not
 only B). First behavior: **B3**.
 
-**B1. Persist D / S when a behavior consumes them** (was O2)
+**B1. Persist D / S when a behavior consumes them** (was O2) — **schema in progress 2026-08-15**
 
-A1 already names D, S, and computed R as the target vocabulary. Remaining:
+`memory_tracker.difficulty` now exists (nullable float, hidden). Graded rows backfilled to **5**; assimilate-only / New rows leave D unset. Stability was already persisted. Consumption of D on correct recall (SInc, D-update, first-grade init) is later slices of this plan — this persist does not change due times.
 
-- Keep an opaque strength index until a later Decision.
-- Persist D and S only when a behavior consumes them (already: no unused columns).
-- Require persisted D and S in the first FSRS-shaped implementation.
-
-**Recommendation:** do not add unused columns. The first slice that needs D or S persists them.
-
-Closing B1 in the ADR: no schema, no behavior. Later first consumer: **internal**
-columns (and possibly still no learner-visible due-time change if R is computed
-only for tests/logs).
+**B1 persist D exists.** First consumer of D is not this schema slice.
 
 **B2. Interval source** (was O6) — user-visible
 
@@ -192,7 +185,6 @@ FSRS interval is `I(r, S)`. Doughnut’s table is a discrete ease ladder. You ca
 
 **Recommendation to discuss:** ADR states retention-target intervals as the **target**; the table remains allowed until Doughnut’s FSRS-shaped implementation consumes D/S. Do not silently delete the Settings control in this ADR.
 
-Closing B2 in the ADR: Settings still show the day list; no due-time change.
 Implementing the target: **behavior** — next interval comes from retention `r`
 and S, not from walking the Fibonacci/user table. The Settings control would
 change or become a compat/migration input.
@@ -210,7 +202,7 @@ Do not add an unused counter. Before adding: which outcomes increment it; first 
 Closing B4 by deferring: no change. An unused lapse column later would be
 internal only; using lapses to change due times would be behavior.
 
-**B3 in running code:** overdue correct lengthens Stability more than on-time. B1/B2/B4 remain open. Difficulty and requested retention are still later gaps.
+**B3 in running code:** overdue correct lengthens Stability more than on-time. **B1** persist D exists (not yet consumed). B2/B4 remain open. Requested retention is still a later gap.
 
 ---
 
@@ -273,13 +265,11 @@ Whole-hour precision is locked. Open:
 
 **Recommendation:** ADR notes same-hour as “no additional success increment until a short-term rule exists”; do not invent a calendar same-day exception.
 
-**D3. Assimilation vs FSRS New** (new)
+**D3. Assimilation vs FSRS New** (new) — **locked in ADR 0003 Decision 2026-08-15**
 
-FSRS: New card has no S/D until the **first rating**. Doughnut: assimilate writes `lastRecalledAt = now` and often `nextRecallAt = now` (table[0]=0) **without** a grade.
+Locked: assimilation is **New** — Stability 0, Difficulty unset, due now. Assimilation is not a grade. The first real correct recall initializes Difficulty to **5** and Stability to **24** hours.
 
-**Open:** is assimilation “create a New card, due now,” or “a synthetic Good at t=0”? Target-compatible reading: **New / due immediately, first real grade initializes D and S**.
-
-**Recommendation:** state that in ADR 0003. Current code is operationally close (due now) but pretends a recall already happened.
+**D3 New-card semantics locked.** First-grade init of D is still a later slice of this plan (this persist slice only stores the column).
 
 ---
 
@@ -349,7 +339,7 @@ Hygiene while this doc is the tracker: do not duplicate open issues in the ADR; 
 | ID | Topic | ADR must lock? | Suggested |
 |----|-------|----------------|-----------|
 | A1 | FSRS-compatible = own D/S/R implementation, no library | **Resolved** | Locked 2026-08-15 |
-| B1 | When to persist D/S | Light lock | No unused columns (vertical-slice Decision); persist with first consumer |
+| B1 | When to persist D/S | **Schema in progress** | Persist D exists (nullable; graded backfill 5); consumption later in this plan |
 | B2 | Interval table vs requested retention | Yes | Open |
 | B3 | Overdue bounded extra growth | **Resolved** | Locked and implemented 2026-08-15 |
 | B4 | Lapses | Defer | Defer |
@@ -359,7 +349,7 @@ Hygiene while this doc is the tracker: do not duplicate open issues in the ADR; 
 | C4 | Just-review Hard/Easy | No / defer | Binary Again vs Good |
 | D1 | 12h retry vs post-lapse S | Yes | Short retry as schedule; S as target update |
 | D2 | Short-term / same-hour | Light lock | No growth at elapsed 0 until short-term rule |
-| D3 | Assimilation = New card | Yes | New / due now; first grade initializes D/S |
+| D3 | Assimilation = New card | **Locked** | New / due now / D unset; first grade initializes D=5, S=24h (init still later) |
 | E1 | Manual paths | Light lock | Grades vs remove/revive |
 | E2 | Non-positive interval fallback | Light lock | First positive spacing, else 24h |
 | E3 | Fuzz / max interval | Defer | Allowed, not required |

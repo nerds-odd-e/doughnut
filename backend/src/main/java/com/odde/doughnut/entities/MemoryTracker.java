@@ -78,6 +78,12 @@ public class MemoryTracker extends EntityIdentifiedByIdOnly {
   @Setter
   private Float stability = ForgettingCurve.ASSIMILATE_STABILITY_HOURS;
 
+  @Column(name = "difficulty")
+  @JsonIgnore
+  @Getter
+  @Setter
+  private Float difficulty;
+
   @Column(name = "removed_from_tracking")
   @Getter
   @Setter

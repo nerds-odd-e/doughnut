@@ -149,8 +149,8 @@ export type Mcq = {
     contextSeed?: number;
     testedFocus?: string;
     validationRationale?: string;
-    responseChoices: Array<string>;
     questionStem: string;
+    responseChoices: Array<string>;
 };
 
 export type SubscriptionDto = {
