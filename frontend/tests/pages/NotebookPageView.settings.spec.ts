@@ -44,6 +44,17 @@ describe("NotebookPageView settings", () => {
     )
   })
 
+  it("explains Skip Memory Tracking as assimilation-sequence opt-out, not recall", async () => {
+    const wrapper = mountNotebookPageView(aNotebook())
+
+    await wrapper.get('[data-testid="notebook-tab-settings"]').trigger("click")
+    await flushPromises()
+
+    expect(wrapper.text()).toContain(
+      "When enabled, notes in this notebook are left out of the assimilation sequence, and others cannot subscribe from the Bazaar. Existing memory trackers still appear in recall."
+    )
+  })
+
   it("auto-saves when skip memory tracking is toggled", async () => {
     const nb = aNotebook({
       notebookSettings: { skipMemoryTrackingEntirely: false },

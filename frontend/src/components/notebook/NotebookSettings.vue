@@ -37,7 +37,7 @@
           @update:model-value="onSkipMemoryTrackingChange"
         />
         <p class="text-xs text-base-content/60 leading-snug mt-1">
-          When enabled, notes in this notebook will not be included in memory tracking and recall sessions.
+          When enabled, notes in this notebook are left out of the assimilation sequence, and others cannot subscribe from the Bazaar. Existing memory trackers still appear in recall.
         </p>
       </div>
     </section>

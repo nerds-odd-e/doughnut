@@ -12,7 +12,7 @@ describe("Bazaar subscribe", () => {
   const notebook = makeMe.aNotebook.title("Shape").please()
 
   describe("BazaarNotebookButtons", () => {
-    it("shows Subscribe CTA when memory tracking is enabled", () => {
+    it("shows Subscribe CTA when Skip Memory Tracking is off", () => {
       const wrapper = helper
         .component(BazaarNotebookButtons)
         .withProps({ notebook, loggedIn: true })
@@ -22,7 +22,7 @@ describe("Bazaar subscribe", () => {
       wrapper.unmount()
     })
 
-    it("omits Subscribe CTA when notebook skips memory tracking entirely", () => {
+    it("omits Subscribe CTA when notebook has Skip Memory Tracking", () => {
       const skipped = makeMe.aNotebook.skipMemoryTrackingEntirely(true).please()
       const wrapper = helper
         .component(BazaarNotebookButtons)
