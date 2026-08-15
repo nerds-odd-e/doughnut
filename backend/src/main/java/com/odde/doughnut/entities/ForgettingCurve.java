@@ -21,7 +21,7 @@ public class ForgettingCurve {
   }
 
   float succeeded(long elapsedInHours, Integer thinkingTimeMs) {
-    if (stabilityHours <= ASSIMILATE_STABILITY_HOURS) {
+    if (isNewlyAssimilated()) {
       return FIRST_SUCCESS_STABILITY_HOURS;
     }
     float fsrsHours =
@@ -29,8 +29,15 @@ public class ForgettingCurve {
     return adjustForThinkingTime(fsrsHours, thinkingTimeMs);
   }
 
-  float difficultyAfterGoodRecall() {
+  float difficultyAfterSuccessfulRecall() {
+    if (isNewlyAssimilated()) {
+      return DEFAULT_DIFFICULTY;
+    }
     return FsrsGoodRecall.difficultyAfterGoodRecall(difficulty);
+  }
+
+  boolean isNewlyAssimilated() {
+    return stabilityHours <= ASSIMILATE_STABILITY_HOURS;
   }
 
   private float adjustForThinkingTime(float fsrsHours, Integer thinkingTimeMs) {

@@ -1,6 +1,7 @@
 package com.odde.doughnut.algorithms;
 
 import static com.odde.doughnut.entities.ForgettingCurve.DEFAULT_DIFFICULTY;
+import static com.odde.doughnut.entities.ForgettingCurve.FIRST_SUCCESS_STABILITY_HOURS;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThan;
@@ -37,6 +38,16 @@ class SpacedRepetitionRecallSchedulingTest {
   private Timestamp onTimeGradeTime(MemoryTracker tracker) {
     return TimestampOperations.addHoursToTimestamp(
         tracker.getLastRecalledAt(), Math.round(tracker.getStability()));
+  }
+
+  @Test
+  void firstCorrectRecallInitializesDifficulty() {
+    MemoryTracker memoryTracker = makeMe.aMemoryTrackerFor(note).by(user).inMemoryPlease();
+
+    memoryTracker.recalledSuccessfully(memoryTracker.getNextRecallAt(), null);
+
+    assertThat(memoryTracker.getDifficulty(), equalTo(DEFAULT_DIFFICULTY));
+    assertThat(memoryTracker.getStability(), equalTo(FIRST_SUCCESS_STABILITY_HOURS));
   }
 
   @Test

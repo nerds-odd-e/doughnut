@@ -1,6 +1,6 @@
 # Plan: Difficulty on correct recall
 
-**Status:** in progress (slice 4 done; next is 5)  
+**Status:** in progress (slice 5 done; next is 6)  
 **Goal:** Persist Difficulty; ordinary correct recall follows FSRS-6 Good (SInc + D-update); New-card first correct inits D. First S = **24h** this plan (12h parked).
 
 **Context:** [CONTEXT.md](./CONTEXT.md)
@@ -54,13 +54,9 @@ Good Î”D=0 then mean reversion toward Easy-init; clamp `[1, 10]`. Fixture D=8 â†
 ### 5. First correct recall initializes Difficulty
 
 Type: Behavior  
-Status: planned
+Status: done
 
-**Pre-condition:** Newly assimilated tracker (S = 0, D unset, due now).  
-**Trigger:** First ordinary correct recall.  
-**Post-condition:** D = 5, S = 24h, `nextRecallAt` = that instant + 24h, `lastRecalledAt` advances. Assimilate still writes no grade and leaves D unset.
-
-**Done when:** first-success fixtures go through this init. 12h first interval is **not** this slice (parked).
+First ordinary correct on a New tracker sets D=5, S=24h. Assimilate still leaves D unset. 12h first interval remains parked.
 
 ---
 

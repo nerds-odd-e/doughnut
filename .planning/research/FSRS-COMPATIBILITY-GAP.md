@@ -18,7 +18,7 @@ match. Introduce or replace structure **only** when that behavior needs it.
 No unused Difficulty, lapse, requested-retention, or RecallLog fields
 for later slices.
 
-Ordinary **correct** recall with S > 0 uses FSRS-6 Good SInc and next-D (own implementation, frozen default `w` in `FsrsGoodRecall`). Remaining in plan 004: first-grade init, E2E day lists. B2 requested-retention knob, B4, and C–E stay open.
+Ordinary **correct** recall with S > 0 uses FSRS-6 Good SInc and next-D (own implementation, frozen default `w` in `FsrsGoodRecall`). First correct on New inits D=5, S=24h. Remaining in plan 004: E2E day lists. B2 requested-retention knob, B4, and C–E stay open.
 
 Current Doughnut persists **Stability** in whole hours and **Difficulty** (nullable; hidden). Retrievability is computed in the success path (FSRS-6 power curve). There is still **no** lapse count, requested-retention knob, or card state (`New` / `Learning` / `Review` / `Relearning`). Remaining gaps close by **vertical slice** (ADR 0003 Decision).
 
@@ -110,7 +110,7 @@ FSRS **Hard (G=2) is still success**. That is the sharpest mapping clash with Do
 
 | Open FSRS | Doughnut today | Kind of gap |
 |-----------|----------------|-------------|
-| Persist D and S; compute R(t, S) | Persist S (hours) and D (nullable, hidden); R computed on success | **Model** (SInc + Good next-D; first-grade init later) |
+| Persist D and S; compute R(t, S) | Persist S (hours) and D (nullable, hidden); R computed on success | **Model** (SInc + Good next-D + first-grade init D=5/S=24h) |
 | Interval from requested retention | Ordinary correct uses SInc; `nextRecallAt = last + S` (`r = 0.9` implicit). Fail/confusion/commissioned still ladder | **Product knob** (B2 r-knob open) |
 | G ∈ {1,2,3,4} | Incorrect / correct + overlap / accidental match + Tutor 0–5 + thinking time | **Grades** |
 | Overdue success: bounded extra S via low R | Overdue correct lengthens S more than on-time; extra converges | **Aligned** (B3) |
@@ -171,7 +171,7 @@ only B). First behavior: **B3**.
 
 **B1. Persist D / S when a behavior consumes them** (was O2) — **in code 2026-08-15**
 
-`memory_tracker.difficulty` exists (nullable float, hidden). Graded rows backfilled to **5**; assimilate-only / New rows leave D unset. Ordinary correct with S > 0 consumes D for FSRS-6 Good SInc and persists next-D (Good: ΔD=0, mean reversion toward Easy-init). First-grade init remains a later slice of this plan.
+`memory_tracker.difficulty` exists (nullable float, hidden). Graded rows backfilled to **5**; assimilate-only / New rows leave D unset. Ordinary correct with S > 0 consumes D for FSRS-6 Good SInc and persists next-D. First correct on New initializes D=5, S=24h.
 
 **B1 persist D exists and is consumed for SInc.**
 
@@ -269,7 +269,7 @@ Whole-hour precision is locked. Open:
 
 Locked: assimilation is **New** — Stability 0, Difficulty unset, due now. Assimilation is not a grade. The first real correct recall initializes Difficulty to **5** and Stability to **24** hours.
 
-**D3 New-card semantics locked.** First-grade init of D is still a later slice of this plan (this persist slice only stores the column).
+**D3 New-card semantics locked and in code.** First correct initializes D=5, S=24h (12h parked).
 
 ---
 
@@ -349,7 +349,7 @@ Hygiene while this doc is the tracker: do not duplicate open issues in the ADR; 
 | C4 | Just-review Hard/Easy | No / defer | Binary Again vs Good |
 | D1 | 12h retry vs post-lapse S | Yes | Short retry as schedule; S as target update |
 | D2 | Short-term / same-hour | Light lock | No growth at elapsed 0 until short-term rule |
-| D3 | Assimilation = New card | **Locked** | New / due now / D unset; first grade initializes D=5, S=24h (init still later) |
+| D3 | Assimilation = New card | **In code** | New / due now / D unset; first grade initializes D=5, S=24h |
 | E1 | Manual paths | Light lock | Grades vs remove/revive |
 | E2 | Non-positive interval fallback | Light lock | First positive spacing, else 24h |
 | E3 | Fuzz / max interval | Defer | Allowed, not required |
