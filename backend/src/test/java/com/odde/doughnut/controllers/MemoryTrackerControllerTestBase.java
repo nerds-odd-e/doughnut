@@ -31,11 +31,7 @@ abstract class MemoryTrackerControllerTestBase extends ControllerTestBase {
   }
 
   RecallPrompt promptFor(MemoryTracker tracker, Note note) {
-    return makeMe
-        .aRecallPrompt()
-        .withPredefinedQuestionForNote(note)
-        .forMemoryTracker(tracker)
-        .please();
+    return makeMe.aRecallPrompt().withMcqForNote(note).forMemoryTracker(tracker).please();
   }
 
   void assertConversationHasNoRecallPrompt(Conversation conversation) {
@@ -52,7 +48,7 @@ abstract class MemoryTrackerControllerTestBase extends ControllerTestBase {
     for (int i = 0; i < count; i++) {
       makeMe
           .aRecallPrompt()
-          .withPredefinedQuestionForNote(note)
+          .withMcqForNote(note)
           .forMemoryTracker(tracker)
           .answerChoiceIndex(1)
           .answerTimestamp(day)

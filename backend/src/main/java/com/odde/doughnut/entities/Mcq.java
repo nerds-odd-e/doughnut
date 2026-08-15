@@ -16,7 +16,7 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Table(name = "predefined_question")
-public class PredefinedQuestion extends EntityIdentifiedByIdOnly {
+public class Mcq extends EntityIdentifiedByIdOnly {
   @ManyToOne(cascade = CascadeType.DETACH)
   @JoinColumn(name = "note_id", referencedColumnName = "id")
   @JsonIgnore
@@ -62,24 +62,23 @@ public class PredefinedQuestion extends EntityIdentifiedByIdOnly {
     return Objects.equals(answer.getChoiceIndex(), getCorrectAnswerIndex());
   }
 
-  public static PredefinedQuestion fromMCQWithAnswer(MCQWithAnswer MCQWithAnswer, Note note) {
+  public static Mcq fromMCQWithAnswer(MCQWithAnswer MCQWithAnswer, Note note) {
     return fromMCQWithAnswer(MCQWithAnswer, note, null);
   }
 
-  public static PredefinedQuestion fromMCQWithAnswer(
-      MCQWithAnswer MCQWithAnswer, Note note, Long contextSeed) {
-    PredefinedQuestion predefinedQuestion = new PredefinedQuestion();
-    predefinedQuestion.setNote(note);
-    predefinedQuestion.setMultipleChoicesQuestion(MCQWithAnswer.getQuestion());
-    predefinedQuestion.setCorrectAnswerIndex(MCQWithAnswer.getSolutionChoiceIndex());
-    predefinedQuestion.setContextSeed(contextSeed);
-    predefinedQuestion.setTestedFocus(MCQWithAnswer.getTestedFocus());
-    predefinedQuestion.setValidationRationale(MCQWithAnswer.getValidationRationale());
-    return predefinedQuestion;
+  public static Mcq fromMCQWithAnswer(MCQWithAnswer MCQWithAnswer, Note note, Long contextSeed) {
+    Mcq mcq = new Mcq();
+    mcq.setNote(note);
+    mcq.setMultipleChoicesQuestion(MCQWithAnswer.getQuestion());
+    mcq.setCorrectAnswerIndex(MCQWithAnswer.getSolutionChoiceIndex());
+    mcq.setContextSeed(contextSeed);
+    mcq.setTestedFocus(MCQWithAnswer.getTestedFocus());
+    mcq.setValidationRationale(MCQWithAnswer.getValidationRationale());
+    return mcq;
   }
 
   @Override
   public String toString() {
-    return "PredefinedQuestion{" + "id=" + id + '}';
+    return "Mcq{" + "id=" + id + '}';
   }
 }

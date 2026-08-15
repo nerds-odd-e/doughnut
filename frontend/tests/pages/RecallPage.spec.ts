@@ -38,7 +38,7 @@ describe("repeat page loading", () => {
     const previousQuestionResult: AnsweredQuestion = makeMe.anAnsweredQuestion
       .withId(1)
       .withNote(note)
-      .withMcq(makeMe.aPredefinedQuestion.please())
+      .withMcq(makeMe.anMcq.please())
       .withAnswer({ id: 1, correct: true, choiceIndex: 0 })
       .withMemoryTrackerId(1)
       .please()

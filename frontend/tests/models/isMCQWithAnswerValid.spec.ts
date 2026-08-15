@@ -1,10 +1,10 @@
-import type { PredefinedQuestion } from "@generated/doughnut-backend-api"
+import type { Mcq } from "@generated/doughnut-backend-api"
 import isMCQWithAnswerValid from "@/models/isMCQWithAnswerValid"
 import makeMe from "doughnut-test-fixtures/makeMe"
 
 describe("isMCQWithAnswerValid", () => {
   it("should return true when the MCQWithAnswer is valid", () => {
-    const validMCQWithAnswer: PredefinedQuestion = makeMe.aPredefinedQuestion
+    const validMCQWithAnswer: Mcq = makeMe.anMcq
       .withQuestionStem("Valid question")
       .withChoices(["Valid choice 1", "Valid choice 2"])
       .please()
@@ -13,7 +13,7 @@ describe("isMCQWithAnswerValid", () => {
   })
 
   it("should return false when the MCQWithAnswer is invalid", () => {
-    const invalidMCQWithAnswer: PredefinedQuestion = makeMe.aPredefinedQuestion
+    const invalidMCQWithAnswer: Mcq = makeMe.anMcq
       .withQuestionStem("")
       .correctAnswerIndex(-1)
       .withChoices(["", ""])
@@ -22,7 +22,7 @@ describe("isMCQWithAnswerValid", () => {
     expect(isMCQWithAnswerValid(invalidMCQWithAnswer)).toBe(false)
   })
   it("should return false when the second choice is empty", () => {
-    const mcqWithAnswer: PredefinedQuestion = makeMe.aPredefinedQuestion
+    const mcqWithAnswer: Mcq = makeMe.anMcq
       .withQuestionStem("Valid question")
       .withChoices(["Valid choice 1", "", "Valid choice 3"])
       .please()

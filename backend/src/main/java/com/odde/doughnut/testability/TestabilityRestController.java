@@ -10,8 +10,8 @@ import com.odde.doughnut.services.BazaarService;
 import com.odde.doughnut.services.CircleService;
 import com.odde.doughnut.services.GithubService;
 import com.odde.doughnut.services.UserService;
+import com.odde.doughnut.testability.model.McqsTestData;
 import com.odde.doughnut.testability.model.NotesTestData;
-import com.odde.doughnut.testability.model.PredefinedQuestionsTestData;
 import com.odde.doughnut.utils.TimestampOperations;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.EntityManager;
@@ -102,12 +102,10 @@ class TestabilityRestController {
 
   @PostMapping("/inject-predefined-questions")
   @Transactional
-  public List<PredefinedQuestion> injectPredefinedQuestion(
-      @RequestBody PredefinedQuestionsTestData predefinedQuestionsTestData) {
-    List<PredefinedQuestion> predefinedQuestions =
-        predefinedQuestionsTestData.buildPredefinedQuestions(this.noteRepository);
-    predefinedQuestions.forEach(question -> entityPersister.save(question));
-    return predefinedQuestions;
+  public List<Mcq> injectMcq(@RequestBody McqsTestData mcqsTestData) {
+    List<Mcq> mcqs = mcqsTestData.buildMcqs(this.noteRepository);
+    mcqs.forEach(question -> entityPersister.save(question));
+    return mcqs;
   }
 
   @PostMapping("/share_to_bazaar")

@@ -6,12 +6,12 @@ import type {
 import Builder from './Builder'
 import generateId from './generateId'
 import NotebookBuilder from './NotebookBuilder'
-import PredefinedQuestionBuilder from './PredefinedQuestionBuilder'
+import McqBuilder from './McqBuilder'
 
 class RecallPromptBuilder extends Builder<RecallPrompt> {
   private idToUse?: number
   private notebookToUse?: Notebook
-  private predefinedQuestionBuilder = new PredefinedQuestionBuilder()
+  private mcqBuilder = new McqBuilder()
   private spellingStemToUse?: string
 
   withId(id: number) {
@@ -20,12 +20,12 @@ class RecallPromptBuilder extends Builder<RecallPrompt> {
   }
 
   withQuestionStem(stem: string) {
-    this.predefinedQuestionBuilder.withQuestionStem(stem)
+    this.mcqBuilder.withQuestionStem(stem)
     return this
   }
 
   withChoices(choices: string[]) {
-    this.predefinedQuestionBuilder.withChoices(choices)
+    this.mcqBuilder.withChoices(choices)
     return this
   }
 
@@ -52,11 +52,11 @@ class RecallPromptBuilder extends Builder<RecallPrompt> {
         spellingQuestion,
       }
     }
-    const predefinedQuestion = this.predefinedQuestionBuilder.do()
+    const mcq = this.mcqBuilder.do()
     return {
       id: this.idToUse ?? generateId(),
       notebook,
-      multipleChoicesQuestion: predefinedQuestion.multipleChoicesQuestion,
+      multipleChoicesQuestion: mcq.multipleChoicesQuestion,
     }
   }
 }

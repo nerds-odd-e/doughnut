@@ -1,13 +1,13 @@
 package com.odde.doughnut.testability.builders;
 
+import com.odde.doughnut.entities.Mcq;
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.PredefinedQuestion;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.testability.EntityBuilder;
 import com.odde.doughnut.testability.MakeMe;
 
-public class PredefinedQuestionBuilder extends EntityBuilder<PredefinedQuestion> {
-  public PredefinedQuestionBuilder(MakeMe makeMe) {
+public class McqBuilder extends EntityBuilder<Mcq> {
+  public McqBuilder(MakeMe makeMe) {
     super(makeMe, null);
   }
 
@@ -18,23 +18,23 @@ public class PredefinedQuestionBuilder extends EntityBuilder<PredefinedQuestion>
     }
   }
 
-  public PredefinedQuestionBuilder ofAIGeneratedQuestion(MCQWithAnswer mcqWithAnswer, Note note) {
-    this.entity = PredefinedQuestion.fromMCQWithAnswer(mcqWithAnswer, note);
+  public McqBuilder ofAIGeneratedQuestion(MCQWithAnswer mcqWithAnswer, Note note) {
+    this.entity = Mcq.fromMCQWithAnswer(mcqWithAnswer, note);
     return this;
   }
 
-  public PredefinedQuestionBuilder ofAIGeneratedQuestionForNote(Note note) {
+  public McqBuilder ofAIGeneratedQuestionForNote(Note note) {
     MCQWithAnswer mcqWithAnswer = new MCQWithAnswerBuilder().please();
-    this.entity = PredefinedQuestion.fromMCQWithAnswer(mcqWithAnswer, note);
+    this.entity = Mcq.fromMCQWithAnswer(mcqWithAnswer, note);
     return this;
   }
 
-  public PredefinedQuestionBuilder contested() {
+  public McqBuilder contested() {
     this.entity.setContested(true);
     return this;
   }
 
-  public PredefinedQuestionBuilder contextSeed(Long seed) {
+  public McqBuilder contextSeed(Long seed) {
     this.entity.setContextSeed(seed);
     return this;
   }

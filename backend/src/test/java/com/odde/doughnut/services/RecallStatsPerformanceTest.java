@@ -20,9 +20,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Regression guard: recall-stats aggregation must not regress to an N+1. With ~200 answered recalls
- * the endpoint used to issue one query per recall prompt (eager answer/predefined-question loading
- * on a native SELECT rp.*) and time out in production. The projection fix must keep the
- * prepared-statement count bounded regardless of history size.
+ * the endpoint used to issue one query per recall prompt (eager answer/mcq loading on a native
+ * SELECT rp.*) and time out in production. The projection fix must keep the prepared-statement
+ * count bounded regardless of history size.
  */
 class RecallStatsPerformanceTest extends ControllerTestBase {
   @Autowired RecallStatsService recallStatsService;
@@ -48,7 +48,7 @@ class RecallStatsPerformanceTest extends ControllerTestBase {
       // days 35..234, hour 10 — all inside the 1y (and 5y) window.
       makeMe
           .aRecallPrompt()
-          .withPredefinedQuestionForNote(note)
+          .withMcqForNote(note)
           .forMemoryTracker(mt)
           .answerChoiceIndex(0)
           .answerTimestamp(makeMe.aTimestamp().of(35 + i, 10).please())

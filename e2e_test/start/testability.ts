@@ -3,7 +3,7 @@
 import type { Randomization } from '@generated/doughnut-backend-api'
 import type ServiceMocker from '../support/ServiceMocker'
 import type { NoteTestData } from '@generated/doughnut-backend-api'
-import type { PredefinedQuestionsTestData } from '@generated/doughnut-backend-api'
+import type { McqsTestData } from '@generated/doughnut-backend-api'
 import type { TimeTravel } from '@generated/doughnut-backend-api'
 import type { TimeTravelRelativeToNow } from '@generated/doughnut-backend-api'
 import type {
@@ -334,20 +334,18 @@ const testability = () => {
       ]
       return this.injectNotes(notes, creatorId, notebook)
     },
-    injectPredefinedQuestionsToNotebook(
-      predefinedQuestionsTestData: PredefinedQuestionsTestData
-    ) {
+    injectMcqsToNotebook(mcqsTestData: McqsTestData) {
       return cy
         .wrap(
-          TestabilityRestController.injectPredefinedQuestion({
-            body: predefinedQuestionsTestData,
+          TestabilityRestController.injectMcq({
+            body: mcqsTestData,
           }),
           { log: false }
         )
         .then((response) => {
           const data = unwrapData<Record<string, unknown>>(response)
           expect(Object.keys(data).length).to.equal(
-            predefinedQuestionsTestData.predefinedQuestionTestData?.length
+            mcqsTestData.mcqTestData?.length
           )
         })
     },
@@ -355,9 +353,7 @@ const testability = () => {
       notebook: string,
       numberOfNotes: number
     ) {
-      const predefinedQuestion: Record<string, string>[] = new Array(
-        numberOfNotes
-      )
+      const mcq: Record<string, string>[] = new Array(numberOfNotes)
         .fill(0)
         .map((_, index) => ({
           'Note Title': `Note about ${index}`,
@@ -365,9 +361,9 @@ const testability = () => {
           Answer: 'Yes',
           'One Wrong Choice': 'No',
         }))
-      return this.injectPredefinedQuestionsToNotebook({
+      return this.injectMcqsToNotebook({
         notebookName: notebook,
-        predefinedQuestionTestData: predefinedQuestion,
+        mcqTestData: mcq,
       })
     },
     injectNumbersNotebookWithQuestions(

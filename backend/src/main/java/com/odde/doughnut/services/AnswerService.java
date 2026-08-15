@@ -15,9 +15,7 @@ public class AnswerService {
   }
 
   public Answer createAnswerForQuestion(RecallPrompt recallPrompt, AnswerDTO answerDTO) {
-    Answer answer =
-        Answer.buildAnswer(
-            answerDTO, recallPrompt.getPredefinedQuestion(), recallPrompt.getAnswer());
+    Answer answer = Answer.buildAnswer(answerDTO, recallPrompt.getMcq(), recallPrompt.getAnswer());
     recallPrompt.setAnswer(answer);
     entityPersister.save(recallPrompt);
     return answer;

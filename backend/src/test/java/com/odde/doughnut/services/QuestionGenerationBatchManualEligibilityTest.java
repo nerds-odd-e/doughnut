@@ -110,7 +110,7 @@ class QuestionGenerationBatchManualEligibilityTest {
   private void createAnsweredRecall(Timestamp answerTime) {
     makeMe
         .aRecallPrompt()
-        .withPredefinedQuestionForNote(note)
+        .withMcqForNote(note)
         .forMemoryTracker(memoryTracker)
         .answerChoiceIndex(0)
         .answerTimestamp(answerTime)

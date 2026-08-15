@@ -53,7 +53,7 @@ class RecallPromptRepositoryRecentRecallUsersTest {
     Timestamp oneHourBeforeEnd = new Timestamp(windowEnd.getTime() - TimeUnit.HOURS.toMillis(1));
     makeMe
         .aRecallPrompt()
-        .withPredefinedQuestionForNote(note)
+        .withMcqForNote(note)
         .forMemoryTracker(memoryTracker)
         .answerChoiceIndex(0)
         .answerTimestamp(oneHourBeforeEnd)
@@ -70,7 +70,7 @@ class RecallPromptRepositoryRecentRecallUsersTest {
     Timestamp beforeWindow = new Timestamp(windowStart.getTime() - TimeUnit.MINUTES.toMillis(1));
     makeMe
         .aRecallPrompt()
-        .withPredefinedQuestionForNote(note)
+        .withMcqForNote(note)
         .forMemoryTracker(memoryTracker)
         .answerChoiceIndex(0)
         .answerTimestamp(beforeWindow)
@@ -86,7 +86,7 @@ class RecallPromptRepositoryRecentRecallUsersTest {
   void includesRecallAnsweredAtWindowStart() {
     makeMe
         .aRecallPrompt()
-        .withPredefinedQuestionForNote(note)
+        .withMcqForNote(note)
         .forMemoryTracker(memoryTracker)
         .answerChoiceIndex(0)
         .answerTimestamp(windowStart)
@@ -102,7 +102,7 @@ class RecallPromptRepositoryRecentRecallUsersTest {
   void excludesRecallAnsweredAtWindowEnd() {
     makeMe
         .aRecallPrompt()
-        .withPredefinedQuestionForNote(note)
+        .withMcqForNote(note)
         .forMemoryTracker(memoryTracker)
         .answerChoiceIndex(0)
         .answerTimestamp(windowEnd)
@@ -119,14 +119,14 @@ class RecallPromptRepositoryRecentRecallUsersTest {
     Timestamp oneHourBeforeEnd = new Timestamp(windowEnd.getTime() - TimeUnit.HOURS.toMillis(1));
     makeMe
         .aRecallPrompt()
-        .withPredefinedQuestionForNote(note)
+        .withMcqForNote(note)
         .forMemoryTracker(memoryTracker)
         .answerChoiceIndex(0)
         .answerTimestamp(oneHourBeforeEnd)
         .please();
     makeMe
         .aRecallPrompt()
-        .withPredefinedQuestionForNote(note)
+        .withMcqForNote(note)
         .forMemoryTracker(memoryTracker)
         .answerChoiceIndex(0)
         .answerTimestamp(new Timestamp(windowEnd.getTime() - TimeUnit.HOURS.toMillis(2)))
@@ -147,14 +147,14 @@ class RecallPromptRepositoryRecentRecallUsersTest {
 
     makeMe
         .aRecallPrompt()
-        .withPredefinedQuestionForNote(note)
+        .withMcqForNote(note)
         .forMemoryTracker(memoryTracker)
         .answerChoiceIndex(0)
         .answerTimestamp(oneHourBeforeEnd)
         .please();
     makeMe
         .aRecallPrompt()
-        .withPredefinedQuestionForNote(otherNote)
+        .withMcqForNote(otherNote)
         .forMemoryTracker(otherTracker)
         .answerChoiceIndex(0)
         .answerTimestamp(oneHourBeforeEnd)

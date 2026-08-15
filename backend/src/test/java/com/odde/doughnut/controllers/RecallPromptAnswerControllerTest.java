@@ -153,7 +153,7 @@ class RecallPromptAnswerControllerTest extends RecallPromptControllerTestBase {
         makeMe
             .aRecallPrompt()
             .forMemoryTracker(othersTracker)
-            .withPredefinedQuestionForNote(othersTracker.getNote())
+            .withMcqForNote(othersTracker.getNote())
             .please();
     assertThrows(
         UnexpectedNoAccessRightException.class, () -> controller.answer(othersPrompt, answerDTO));

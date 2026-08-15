@@ -126,8 +126,8 @@ public class MakeMe extends MakeMeWithoutDB {
     return new SubscriptionBuilder(this, new Subscription());
   }
 
-  public PredefinedQuestionBuilder aPredefinedQuestion() {
-    return new PredefinedQuestionBuilder(this);
+  public McqBuilder anMcq() {
+    return new McqBuilder(this);
   }
 
   public RecallPromptBuilder aRecallPrompt() {

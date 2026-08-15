@@ -16,7 +16,7 @@
     <TextInput
       rows="2"
       field="correctChoiceIndex"
-      v-model="predefinedQuestion.correctAnswerIndex"
+      v-model="mcq.correctAnswerIndex"
     /><br />
     <button
       @click="addChoice"
@@ -63,8 +63,8 @@
 <script setup lang="ts">
 import type { PropType } from "vue"
 import { computed, ref } from "vue"
-import type { Note, PredefinedQuestion } from "@generated/doughnut-backend-api"
-import { PredefinedQuestionController } from "@generated/doughnut-backend-api/sdk.gen"
+import type { Note, Mcq } from "@generated/doughnut-backend-api"
+import { McqController } from "@generated/doughnut-backend-api/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import isMCQWithAnswerValid from "@/models/isMCQWithAnswerValid"
 import TextArea from "../form/TextArea.vue"
@@ -77,25 +77,23 @@ const props = defineProps({
   },
 })
 
-const predefinedQuestion = ref<PredefinedQuestion>({
+const mcq = ref<Mcq>({
   correctAnswerIndex: 0,
   multipleChoicesQuestion: {
     questionStem: "",
     responseChoices: ["", ""],
   },
-} as PredefinedQuestion)
+} as Mcq)
 
 const minimumNumberOfChoices = 2
 const maximumNumberOfChoices = 10
 
 const emit = defineEmits(["close-dialog"])
 
-const isValidQuestion = computed(() =>
-  isMCQWithAnswerValid(predefinedQuestion.value)
-)
+const isValidQuestion = computed(() => isMCQWithAnswerValid(mcq.value))
 
 const multipleChoicesQuestion = computed(
-  () => predefinedQuestion.value.multipleChoicesQuestion
+  () => mcq.value.multipleChoicesQuestion
 )
 
 const dirty = computed(() => {
@@ -133,11 +131,10 @@ const removeChoice = () => {
 }
 
 const submitQuestion = async () => {
-  const recallPrompt = predefinedQuestion.value
   const { data: response, error } = await apiCallWithLoading(() =>
-    PredefinedQuestionController.addQuestionManually({
+    McqController.addQuestionManually({
       path: { note: props.note.id },
-      body: recallPrompt,
+      body: mcq.value,
     })
   )
   if (!error && response) {
@@ -146,26 +143,25 @@ const submitQuestion = async () => {
 }
 
 const refineQuestion = async () => {
-  const recallPrompt = predefinedQuestion.value
   const { data: refined, error } = await apiCallWithLoading(() =>
-    PredefinedQuestionController.refineQuestion({
+    McqController.refineQuestion({
       path: { note: props.note.id },
-      body: recallPrompt,
+      body: mcq.value,
     })
   )
   if (!error && refined) {
-    predefinedQuestion.value = refined
+    mcq.value = refined
   }
 }
 
 const generateQuestionByAI = async () => {
   const { data: generated, error } = await apiCallWithLoading(() =>
-    PredefinedQuestionController.generateQuestionWithoutSave({
+    McqController.generateQuestionWithoutSave({
       query: { note: props.note.id },
     })
   )
   if (!error && generated) {
-    predefinedQuestion.value = generated
+    mcq.value = generated
   }
 }
 </script>

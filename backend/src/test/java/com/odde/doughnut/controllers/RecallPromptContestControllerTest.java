@@ -63,7 +63,7 @@ class RecallPromptContestControllerTest extends RecallPromptControllerTestBase {
 
     QuestionContestResult contest = controller.contest(recallPrompt);
     assertTrue(contest.rejected);
-    assertThat(recallPrompt.getPredefinedQuestion().isContested(), equalTo(false));
+    assertThat(recallPrompt.getMcq().isContested(), equalTo(false));
   }
 
   @Test
@@ -76,7 +76,7 @@ class RecallPromptContestControllerTest extends RecallPromptControllerTestBase {
 
     QuestionContestResult contestResult = controller.contest(recallPrompt);
     assertFalse(contestResult.rejected);
-    assertThat(recallPrompt.getPredefinedQuestion().isContested(), equalTo(true));
+    assertThat(recallPrompt.getMcq().isContested(), equalTo(true));
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     ArgumentCaptor<StructuredResponseCreateParams<QuestionEvaluation>> paramsCaptor =

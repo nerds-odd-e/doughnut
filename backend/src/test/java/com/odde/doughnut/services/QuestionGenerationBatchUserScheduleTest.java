@@ -99,11 +99,7 @@ class QuestionGenerationBatchUserScheduleTest {
   void returnsNoCandidateTrackersReasonWhenEligibleButNoBatchCandidates() {
     Timestamp now = Timestamp.valueOf(LocalDateTime.of(2024, 6, 15, 9, 0));
     givenAnsweredRecallAt(Timestamp.valueOf(LocalDateTime.of(2024, 6, 15, 8, 30)));
-    makeMe
-        .aRecallPrompt()
-        .withPredefinedQuestionForNote(note)
-        .forMemoryTracker(dueTracker)
-        .please();
+    makeMe.aRecallPrompt().withMcqForNote(note).forMemoryTracker(dueTracker).please();
 
     QuestionGenerationBatchUserScheduleDTO schedule =
         planningService.getNextBatchQuestionSchedule(user, now);
@@ -117,7 +113,7 @@ class QuestionGenerationBatchUserScheduleTest {
   private void givenAnsweredRecallAt(Timestamp answeredAt) {
     makeMe
         .aRecallPrompt()
-        .withPredefinedQuestionForNote(note)
+        .withMcqForNote(note)
         .forMemoryTracker(dueTracker)
         .answerChoiceIndex(0)
         .answerTimestamp(answeredAt)

@@ -24,7 +24,7 @@ class MemoryTrackerRecallPromptsControllerTest extends MemoryTrackerControllerTe
   private RecallPrompt answeredPromptFor(MemoryTracker tracker, Note note) {
     return makeMe
         .aRecallPrompt()
-        .withPredefinedQuestionForNote(note)
+        .withMcqForNote(note)
         .forMemoryTracker(tracker)
         .answerChoiceIndex(0)
         .please();
@@ -142,7 +142,7 @@ class MemoryTrackerRecallPromptsControllerTest extends MemoryTrackerControllerTe
       RecallPrompt contested =
           makeMe
               .aRecallPrompt()
-              .withPredefinedQuestionForNote(note)
+              .withMcqForNote(note)
               .forMemoryTracker(tracker)
               .contested()
               .please();

@@ -1,4 +1,4 @@
-import { PredefinedQuestionController } from "@generated/doughnut-backend-api/sdk.gen"
+import { McqController } from "@generated/doughnut-backend-api/sdk.gen"
 import { describe, it, vi, expect, beforeEach, afterEach } from "vitest"
 import { nextTick } from "vue"
 import helper, {
@@ -51,7 +51,7 @@ describe("QuestionExportDialog", () => {
       resolveExport = resolve
     })
     mockSdkServiceWithImplementation(
-      PredefinedQuestionController,
+      McqController,
       "exportQuestionGeneration",
       () => exportPromise
     )
@@ -90,7 +90,7 @@ describe("QuestionExportDialog", () => {
       title: "Test Note",
     } as never
     const spy = mockSdkService(
-      PredefinedQuestionController,
+      McqController,
       "exportQuestionGeneration",
       exportData
     )
@@ -115,14 +115,10 @@ describe("QuestionExportDialog", () => {
 
   it("displays error message when API call fails", async () => {
     const note = makeMe.aNote.please()
-    const spy = mockSdkService(
-      PredefinedQuestionController,
-      "exportQuestionGeneration",
-      {
-        request: { model: "gpt-4", messages: [] },
-        title: "Test Note",
-      } as never
-    )
+    const spy = mockSdkService(McqController, "exportQuestionGeneration", {
+      request: { model: "gpt-4", messages: [] },
+      title: "Test Note",
+    } as never)
     spy.mockResolvedValue(wrapSdkError("API Error"))
 
     wrapper = helper

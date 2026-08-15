@@ -109,7 +109,7 @@ class QuestionGenerationBatchCandidateMemoryTrackersTest {
   void includesTrackerWithAnsweredPrompt() {
     makeMe
         .aRecallPrompt()
-        .withPredefinedQuestionForNote(note)
+        .withMcqForNote(note)
         .forMemoryTracker(dueTracker)
         .answerChoiceIndex(0)
         .answerTimestamp(currentTime)
@@ -120,23 +120,14 @@ class QuestionGenerationBatchCandidateMemoryTrackersTest {
 
   @Test
   void includesTrackerWithUnansweredContestedPrompt() {
-    makeMe
-        .aRecallPrompt()
-        .withPredefinedQuestionForNote(note)
-        .forMemoryTracker(dueTracker)
-        .contested()
-        .please();
+    makeMe.aRecallPrompt().withMcqForNote(note).forMemoryTracker(dueTracker).contested().please();
 
     assertThat(candidateIds(), contains(dueTracker.getId()));
   }
 
   @Test
   void excludesTrackerWithUnansweredNonContestedPrompt() {
-    makeMe
-        .aRecallPrompt()
-        .withPredefinedQuestionForNote(note)
-        .forMemoryTracker(dueTracker)
-        .please();
+    makeMe.aRecallPrompt().withMcqForNote(note).forMemoryTracker(dueTracker).please();
 
     assertThat(candidates(), empty());
   }

@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class RecallQuestionService {
-  private final PredefinedQuestionService predefinedQuestionService;
+  private final McqService mcqService;
   private final RecallPromptRepository recallPromptRepository;
   private final EntityPersister entityPersister;
   private final AiQuestionGenerator aiQuestionGenerator;
@@ -27,13 +27,13 @@ public class RecallQuestionService {
       EntityPersister entityPersister,
       AnswerService answerService,
       MemoryTrackerService memoryTrackerService,
-      PredefinedQuestionService predefinedQuestionService,
+      McqService mcqService,
       AiQuestionGenerator aiQuestionGenerator) {
     this.recallPromptRepository = recallPromptRepository;
     this.entityPersister = entityPersister;
     this.answerService = answerService;
     this.memoryTrackerService = memoryTrackerService;
-    this.predefinedQuestionService = predefinedQuestionService;
+    this.mcqService = mcqService;
     this.aiQuestionGenerator = aiQuestionGenerator;
   }
 
@@ -58,12 +58,11 @@ public class RecallQuestionService {
 
   private RecallPrompt generateNewRecallPrompt(MemoryTracker memoryTracker) {
     Note note = memoryTracker.getNote();
-    PredefinedQuestion question =
-        predefinedQuestionService.generateAFeasibleQuestion(note, memoryTracker.getPropertyKey());
-    if (question == null) {
+    Mcq mcq = mcqService.generateAFeasibleQuestion(note, memoryTracker.getPropertyKey());
+    if (mcq == null) {
       return null;
     }
-    return createARecallPromptFromQuestion(question, memoryTracker);
+    return createARecallPromptFromMcq(mcq, memoryTracker);
   }
 
   public RecallPrompt regenerateAQuestion(
@@ -80,23 +79,21 @@ public class RecallQuestionService {
     if (MCQWithAnswer == null) {
       return null;
     }
-    PredefinedQuestion question =
-        PredefinedQuestion.fromMCQWithAnswer(MCQWithAnswer, note, contextSeedBoxed);
-    entityPersister.save(question);
-    return createARecallPromptFromQuestion(question, memoryTracker);
+    Mcq mcq = Mcq.fromMCQWithAnswer(MCQWithAnswer, note, contextSeedBoxed);
+    entityPersister.save(mcq);
+    return createARecallPromptFromMcq(mcq, memoryTracker);
   }
 
-  private RecallPrompt createARecallPromptFromQuestion(
-      PredefinedQuestion question, MemoryTracker memoryTracker) {
+  private RecallPrompt createARecallPromptFromMcq(Mcq mcq, MemoryTracker memoryTracker) {
     RecallPrompt recallPrompt = new RecallPrompt();
-    recallPrompt.setPredefinedQuestion(question);
+    recallPrompt.setMcq(mcq);
     recallPrompt.setMemoryTracker(memoryTracker);
     recallPrompt.setQuestionType(QuestionType.MCQ);
     return entityPersister.save(recallPrompt);
   }
 
   public QuestionContestResult contest(RecallPrompt recallPrompt) {
-    return predefinedQuestionService.contest(recallPrompt.getPredefinedQuestion());
+    return mcqService.contest(recallPrompt.getMcq());
   }
 
   public RecallPrompt answer(

@@ -35,16 +35,12 @@ class QuestionGenerationBatchSubmitDueUsersTest
           Timestamp recallTime = Timestamp.valueOf(LocalDateTime.of(2024, 8, 3, 15, 45));
           makeMe
               .aRecallPrompt()
-              .withPredefinedQuestionForNote(note)
+              .withMcqForNote(note)
               .forMemoryTracker(tracker)
               .answerChoiceIndex(0)
               .answerTimestamp(recallTime)
               .please();
-          makeMe
-              .aRecallPrompt()
-              .withPredefinedQuestionForNote(note)
-              .forMemoryTracker(tracker)
-              .please();
+          makeMe.aRecallPrompt().withMcqForNote(note).forMemoryTracker(tracker).please();
         });
 
     doReturn(List.of(dueUser[0]))

@@ -1,8 +1,8 @@
 package com.odde.doughnut.services;
 
+import com.odde.doughnut.entities.Mcq;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.PredefinedQuestion;
 import com.odde.doughnut.entities.QuestionGenerationBatchRequest;
 import com.odde.doughnut.entities.QuestionGenerationBatchRequestStatus;
 import com.odde.doughnut.entities.QuestionType;
@@ -62,12 +62,11 @@ public class QuestionGenerationBatchRowImportService {
     MemoryTracker memoryTracker = request.getMemoryTracker();
     Note note = memoryTracker.getNote();
     MCQWithAnswer postProcessedQuestion = generatedQuestionPostProcessor.postProcess(mcqWithAnswer);
-    PredefinedQuestion predefinedQuestion =
-        PredefinedQuestion.fromMCQWithAnswer(postProcessedQuestion, note, request.getContextSeed());
-    entityPersister.save(predefinedQuestion);
+    Mcq mcq = Mcq.fromMCQWithAnswer(postProcessedQuestion, note, request.getContextSeed());
+    entityPersister.save(mcq);
 
     RecallPrompt recallPrompt = new RecallPrompt();
-    recallPrompt.setPredefinedQuestion(predefinedQuestion);
+    recallPrompt.setMcq(mcq);
     recallPrompt.setMemoryTracker(memoryTracker);
     recallPrompt.setQuestionType(QuestionType.MCQ);
     entityPersister.save(recallPrompt);

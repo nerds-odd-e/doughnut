@@ -2,9 +2,9 @@ package com.odde.doughnut.testability.builders;
 
 import com.odde.doughnut.controllers.dto.AnswerDTO;
 import com.odde.doughnut.entities.Answer;
+import com.odde.doughnut.entities.Mcq;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.PredefinedQuestion;
 import com.odde.doughnut.entities.QuestionType;
 import com.odde.doughnut.entities.RecallPrompt;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
@@ -13,7 +13,7 @@ import com.odde.doughnut.testability.MakeMe;
 import java.sql.Timestamp;
 
 public class RecallPromptBuilder extends EntityBuilder<RecallPrompt> {
-  private final PredefinedQuestionBuilder predefinedQuestionBuilder;
+  private final McqBuilder mcqBuilder;
   private AnswerDTO answerDTO = null;
   private MemoryTracker memoryTracker = null;
   private MemoryTracker confusionAdjustedMemoryTracker = null;
@@ -22,7 +22,7 @@ public class RecallPromptBuilder extends EntityBuilder<RecallPrompt> {
 
   public RecallPromptBuilder(MakeMe makeMe, RecallPrompt recallPrompt) {
     super(makeMe, recallPrompt);
-    predefinedQuestionBuilder = new PredefinedQuestionBuilder(makeMe);
+    mcqBuilder = new McqBuilder(makeMe);
   }
 
   @Override
@@ -30,14 +30,13 @@ public class RecallPromptBuilder extends EntityBuilder<RecallPrompt> {
     if (entity == null) {
       entity = new RecallPrompt();
       if (entity.getQuestionType() != QuestionType.SPELLING) {
-        PredefinedQuestion predefinedQuestion = predefinedQuestionBuilder.please(needPersist);
-        entity.setPredefinedQuestion(predefinedQuestion);
+        Mcq mcq = mcqBuilder.please(needPersist);
+        entity.setMcq(mcq);
         entity.setQuestionType(QuestionType.MCQ);
       }
     }
     if (answerDTO != null && entity.getQuestionType() != QuestionType.SPELLING) {
-      Answer answer =
-          Answer.buildAnswer(answerDTO, entity.getPredefinedQuestion(), entity.getAnswer());
+      Answer answer = Answer.buildAnswer(answerDTO, entity.getMcq(), entity.getAnswer());
       if (answerTimestamp != null) {
         answer.setCreatedAt(answerTimestamp);
       }
@@ -65,13 +64,13 @@ public class RecallPromptBuilder extends EntityBuilder<RecallPrompt> {
     return this;
   }
 
-  public RecallPromptBuilder withPredefinedQuestionForNote(Note note) {
-    this.predefinedQuestionBuilder.ofAIGeneratedQuestionForNote(note);
+  public RecallPromptBuilder withMcqForNote(Note note) {
+    this.mcqBuilder.ofAIGeneratedQuestionForNote(note);
     return this;
   }
 
   public RecallPromptBuilder ofAIGeneratedQuestion(MCQWithAnswer mcqWithAnswer, Note note) {
-    this.predefinedQuestionBuilder.ofAIGeneratedQuestion(mcqWithAnswer, note);
+    this.mcqBuilder.ofAIGeneratedQuestion(mcqWithAnswer, note);
     return this;
   }
 
@@ -91,12 +90,12 @@ public class RecallPromptBuilder extends EntityBuilder<RecallPrompt> {
       entity = new RecallPrompt();
     }
     entity.setQuestionType(QuestionType.SPELLING);
-    entity.setPredefinedQuestion(null);
+    entity.setMcq(null);
     return this;
   }
 
   public RecallPromptBuilder contested() {
-    this.predefinedQuestionBuilder.contested();
+    this.mcqBuilder.contested();
     return this;
   }
 

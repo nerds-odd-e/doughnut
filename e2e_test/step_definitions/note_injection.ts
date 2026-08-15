@@ -198,9 +198,9 @@ Given(
         .testability()
         .injectNotes([{ Title: noteTitle }], username, notebookName)
         .then(() =>
-          start.testability().injectPredefinedQuestionsToNotebook({
+          start.testability().injectMcqsToNotebook({
             notebookName,
-            predefinedQuestionTestData: data.hashes(),
+            mcqTestData: data.hashes(),
           })
         )
     )

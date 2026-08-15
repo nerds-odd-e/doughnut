@@ -29,11 +29,7 @@ class RecallPromptRegenerateControllerTest extends RecallPromptControllerTestBas
     Note note = ownedNote();
     MemoryTracker memoryTracker = makeMe.aMemoryTrackerFor(note).please();
     recallPrompt =
-        makeMe
-            .aRecallPrompt()
-            .forMemoryTracker(memoryTracker)
-            .withPredefinedQuestionForNote(note)
-            .please();
+        makeMe.aRecallPrompt().forMemoryTracker(memoryTracker).withMcqForNote(note).please();
   }
 
   private QuestionContestResult contestAdvice(String advice) {
@@ -57,7 +53,7 @@ class RecallPromptRegenerateControllerTest extends RecallPromptControllerTestBas
         makeMe
             .aRecallPrompt()
             .forMemoryTracker(othersTracker)
-            .withPredefinedQuestionForNote(othersTracker.getNote())
+            .withMcqForNote(othersTracker.getNote())
             .please();
     assertThrows(
         UnexpectedNoAccessRightException.class,

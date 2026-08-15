@@ -1,8 +1,8 @@
 package com.odde.doughnut.testability.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.odde.doughnut.entities.Mcq;
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.PredefinedQuestion;
 import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.services.ai.MultipleChoicesQuestion;
 import java.util.List;
@@ -11,12 +11,12 @@ import lombok.Data;
 import lombok.Setter;
 
 @Data
-public class PredefinedQuestionsTestData {
+public class McqsTestData {
   private String notebookName;
-  private List<PredefinedQuestionTestData> predefinedQuestionTestData;
+  private List<McqTestData> mcqTestData;
 
   @Setter
-  static class PredefinedQuestionTestData {
+  static class McqTestData {
     @JsonProperty("Note Title")
     private String noteTitle;
 
@@ -29,20 +29,20 @@ public class PredefinedQuestionsTestData {
     @JsonProperty("One Wrong Choice")
     private String oneWrongChoice;
 
-    public PredefinedQuestion buildPredefinedQuestion(Note note) {
-      MultipleChoicesQuestion mcq = new MultipleChoicesQuestion();
-      mcq.setQuestionStem(question);
-      mcq.setResponseChoices(List.of(answer, oneWrongChoice));
-      PredefinedQuestion predefinedQuestion = new PredefinedQuestion();
-      predefinedQuestion.setNote(note);
-      predefinedQuestion.setCorrectAnswerIndex(0);
-      predefinedQuestion.setMultipleChoicesQuestion(mcq);
-      return predefinedQuestion;
+    public Mcq buildMcq(Note note) {
+      MultipleChoicesQuestion multipleChoicesQuestion = new MultipleChoicesQuestion();
+      multipleChoicesQuestion.setQuestionStem(question);
+      multipleChoicesQuestion.setResponseChoices(List.of(answer, oneWrongChoice));
+      Mcq mcq = new Mcq();
+      mcq.setNote(note);
+      mcq.setCorrectAnswerIndex(0);
+      mcq.setMultipleChoicesQuestion(multipleChoicesQuestion);
+      return mcq;
     }
   }
 
-  public List<PredefinedQuestion> buildPredefinedQuestions(NoteRepository noteRepository) {
-    return predefinedQuestionTestData.stream()
+  public List<Mcq> buildMcqs(NoteRepository noteRepository) {
+    return mcqTestData.stream()
         .map(
             row -> {
               Note note = noteRepository.findFirstInNotebookByName(notebookName, row.noteTitle);
@@ -54,7 +54,7 @@ public class PredefinedQuestionsTestData {
                         + notebookName
                         + "`");
               }
-              return row.buildPredefinedQuestion(note);
+              return row.buildMcq(note);
             })
         .collect(Collectors.toList());
   }

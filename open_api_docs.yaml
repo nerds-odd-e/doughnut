@@ -314,12 +314,12 @@ paths:
     post:
       tags:
       - testability-rest-controller
-      operationId: injectPredefinedQuestion
+      operationId: injectMcq
       requestBody:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/PredefinedQuestionsTestData"
+              $ref: "#/components/schemas/McqsTestData"
         required: true
       responses:
         "200":
@@ -329,7 +329,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/PredefinedQuestion"
+                  $ref: "#/components/schemas/Mcq"
   /api/testability/feature_toggle:
     get:
       tags:
@@ -635,7 +635,7 @@ paths:
   /api/predefined-questions/{note}/refine-question:
     post:
       tags:
-      - predefined-question-controller
+      - mcq-controller
       operationId: refineQuestion
       parameters:
       - name: note
@@ -647,7 +647,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/PredefinedQuestion"
+              $ref: "#/components/schemas/Mcq"
         required: true
       responses:
         "200":
@@ -655,11 +655,11 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/PredefinedQuestion"
+                $ref: "#/components/schemas/Mcq"
   /api/predefined-questions/{note}/note-questions:
     get:
       tags:
-      - predefined-question-controller
+      - mcq-controller
       operationId: getAllQuestionByNote
       parameters:
       - name: note
@@ -675,10 +675,10 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/PredefinedQuestion"
+                  $ref: "#/components/schemas/Mcq"
     post:
       tags:
-      - predefined-question-controller
+      - mcq-controller
       operationId: addQuestionManually
       parameters:
       - name: note
@@ -690,7 +690,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/PredefinedQuestion"
+              $ref: "#/components/schemas/Mcq"
         required: true
       responses:
         "200":
@@ -698,11 +698,11 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/PredefinedQuestion"
+                $ref: "#/components/schemas/Mcq"
   /api/predefined-questions/generate-question-without-save:
     post:
       tags:
-      - predefined-question-controller
+      - mcq-controller
       operationId: generateQuestionWithoutSave
       parameters:
       - name: note
@@ -716,7 +716,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/PredefinedQuestion"
+                $ref: "#/components/schemas/Mcq"
   /api/notes/{note}/verify-spelling:
     post:
       tags:
@@ -2425,7 +2425,7 @@ paths:
   /api/predefined-questions/{note}/export-question-generation:
     get:
       tags:
-      - predefined-question-controller
+      - mcq-controller
       operationId: exportQuestionGeneration
       parameters:
       - name: note
@@ -3441,7 +3441,7 @@ components:
           type: string
       required:
       - notebookName
-    PredefinedQuestionTestData:
+    McqTestData:
       type: object
       properties:
         Note Title:
@@ -3452,28 +3452,16 @@ components:
           type: string
         One Wrong Choice:
           type: string
-    PredefinedQuestionsTestData:
+    McqsTestData:
       type: object
       properties:
         notebookName:
           type: string
-        predefinedQuestionTestData:
+        mcqTestData:
           type: array
           items:
-            $ref: "#/components/schemas/PredefinedQuestionTestData"
-    MultipleChoicesQuestion:
-      type: object
-      properties:
-        questionStem:
-          type: string
-        responseChoices:
-          type: array
-          items:
-            type: string
-      required:
-      - questionStem
-      - responseChoices
-    PredefinedQuestion:
+            $ref: "#/components/schemas/McqTestData"
+    Mcq:
       type: object
       properties:
         id:
@@ -3494,6 +3482,18 @@ components:
       required:
       - id
       - multipleChoicesQuestion
+    MultipleChoicesQuestion:
+      type: object
+      properties:
+        questionStem:
+          type: string
+        responseChoices:
+          type: array
+          items:
+            type: string
+      required:
+      - questionStem
+      - responseChoices
     SubscriptionDTO:
       type: object
       properties:
@@ -3779,7 +3779,7 @@ components:
         answer:
           $ref: "#/components/schemas/Answer"
         mcq:
-          $ref: "#/components/schemas/PredefinedQuestion"
+          $ref: "#/components/schemas/Mcq"
         matchedNotes:
           type: array
           items:
@@ -5315,7 +5315,7 @@ components:
         answer:
           $ref: "#/components/schemas/Answer"
         mcq:
-          $ref: "#/components/schemas/PredefinedQuestion"
+          $ref: "#/components/schemas/Mcq"
         multipleChoicesQuestion:
           $ref: "#/components/schemas/MultipleChoicesQuestion"
       required:

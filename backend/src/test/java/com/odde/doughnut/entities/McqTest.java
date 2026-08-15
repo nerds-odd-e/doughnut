@@ -5,8 +5,8 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 
-import com.odde.doughnut.entities.repositories.PredefinedQuestionRepository;
-import com.odde.doughnut.services.PredefinedQuestionService;
+import com.odde.doughnut.entities.repositories.McqRepository;
+import com.odde.doughnut.services.McqService;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.services.ai.QuestionEvaluation;
 import com.odde.doughnut.testability.MakeMe;
@@ -24,13 +24,13 @@ import org.springframework.transaction.annotation.Transactional;
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
-class PredefinedQuestionTest {
+class McqTest {
   @MockitoBean(name = "officialOpenAiClient")
   OpenAIClient officialClient;
 
   @Autowired MakeMe makeMe;
-  @Autowired PredefinedQuestionService predefinedQuestionService;
-  @Autowired PredefinedQuestionRepository predefinedQuestionRepository;
+  @Autowired McqService mcqService;
+  @Autowired McqRepository mcqRepository;
 
   OpenAiStructuredResponseMock openAiStructuredResponseMock;
 
@@ -76,7 +76,7 @@ class PredefinedQuestionTest {
     void returnsOriginalQuestionWhenEvaluationAcceptsIt() {
       stubAcceptedGeneration(mcqWithAnswer);
 
-      PredefinedQuestion result = predefinedQuestionService.generateAFeasibleQuestion(note);
+      Mcq result = mcqService.generateAFeasibleQuestion(note);
 
       assertThat(
           result.getMultipleChoicesQuestion().getQuestionStem(),
@@ -84,10 +84,10 @@ class PredefinedQuestionTest {
     }
 
     @Test
-    void storesContextSeedOnPredefinedQuestion() {
+    void storesContextSeedOnMcq() {
       stubAcceptedGeneration(mcqWithAnswer);
 
-      PredefinedQuestion result = predefinedQuestionService.generateAFeasibleQuestion(note);
+      Mcq result = mcqService.generateAFeasibleQuestion(note);
 
       assertThat(result.getContextSeed(), notNullValue());
     }
@@ -97,7 +97,7 @@ class PredefinedQuestionTest {
       openAiStructuredResponseMock.stubStructuredResponse(mcqWithAnswer);
       openAiStructuredResponseMock.stubStructuredResponse(null);
 
-      PredefinedQuestion result = predefinedQuestionService.generateAFeasibleQuestion(note);
+      Mcq result = mcqService.generateAFeasibleQuestion(note);
 
       assertThat(
           result.getMultipleChoicesQuestion().getQuestionStem(),
@@ -114,16 +114,16 @@ class PredefinedQuestionTest {
           evaluation(false, new int[] {}, "not feasible"));
       openAiStructuredResponseMock.enqueueStructuredResponse(accepting(regeneratedQuestion));
 
-      PredefinedQuestion result = predefinedQuestionService.generateAFeasibleQuestion(note);
+      Mcq result = mcqService.generateAFeasibleQuestion(note);
 
       assertThat(
           result.getMultipleChoicesQuestion().getQuestionStem(), equalTo("regenerated stem"));
       assertThat(result.isContested(), is(false));
 
-      PredefinedQuestion contestedOriginal = null;
-      for (PredefinedQuestion question : predefinedQuestionRepository.findAll()) {
-        if (question.getNote().getId().equals(note.getId()) && question.isContested()) {
-          contestedOriginal = question;
+      Mcq contestedOriginal = null;
+      for (Mcq mcq : mcqRepository.findAll()) {
+        if (mcq.getNote().getId().equals(note.getId()) && mcq.isContested()) {
+          contestedOriginal = mcq;
           break;
         }
       }

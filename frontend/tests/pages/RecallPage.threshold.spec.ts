@@ -69,7 +69,7 @@ describe("RecallPage frequent failure warning", () => {
   it("should NOT call getThresholdExceeded when answer is correct", async () => {
     const correctAnswerResult: AnsweredQuestion = makeMe.anAnsweredQuestion
       .withNote(makeMe.aNote.please())
-      .withMcq(makeMe.aPredefinedQuestion.please())
+      .withMcq(makeMe.anMcq.please())
       .withAnswer({ id: 1, correct: true, choiceIndex: 0 })
       .withMemoryTrackerId(memoryTrackerId)
       .please()
@@ -84,7 +84,7 @@ describe("RecallPage frequent failure warning", () => {
   it("should call getThresholdExceeded when answer is wrong", async () => {
     const wrongAnswerResult: AnsweredQuestion = makeMe.anAnsweredQuestion
       .withNote(makeMe.aNote.please())
-      .withMcq(makeMe.aPredefinedQuestion.please())
+      .withMcq(makeMe.anMcq.please())
       .withAnswer({ id: 1, correct: false, choiceIndex: 1 })
       .withMemoryTrackerId(memoryTrackerId)
       .please()
@@ -110,7 +110,7 @@ describe("RecallPage frequent failure warning", () => {
     )
     const wrongAnswerResult: AnsweredQuestion = makeMe.anAnsweredQuestion
       .withNote(makeMe.aNote.please())
-      .withMcq(makeMe.aPredefinedQuestion.please())
+      .withMcq(makeMe.anMcq.please())
       .withAnswer({ id: 1, correct: false, choiceIndex: 1 })
       .withMemoryTrackerId(memoryTrackerId)
       .please()
@@ -134,7 +134,7 @@ describe("RecallPage frequent failure warning", () => {
     )
     const wrongAnswerResult: AnsweredQuestion = makeMe.anAnsweredQuestion
       .withNote(makeMe.aNote.please())
-      .withMcq(makeMe.aPredefinedQuestion.please())
+      .withMcq(makeMe.anMcq.please())
       .withAnswer({ id: 1, correct: false, choiceIndex: 1 })
       .withMemoryTrackerId(memoryTrackerId)
       .withPropertyKey("topic")

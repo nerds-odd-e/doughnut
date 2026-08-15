@@ -1,4 +1,4 @@
-import { PredefinedQuestionController } from "@generated/doughnut-backend-api/sdk.gen"
+import { McqController } from "@generated/doughnut-backend-api/sdk.gen"
 import Questions from "@/components/notes/Questions.vue"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
 import makeMe from "doughnut-test-fixtures/makeMe"
@@ -12,7 +12,7 @@ export const exportQuestionGenerationButtonTitle =
 export const questionsNote = makeMe.aNote.please()
 
 export const questionsFixture = [
-  makeMe.aPredefinedQuestion
+  makeMe.anMcq
     .withQuestionStem("What is 2+2?")
     .withChoices(["3", "4", "5", "6"])
     .correctAnswerIndex(1)
@@ -37,11 +37,7 @@ export let wrapper: VueWrapper
 export function setupQuestionsTests() {
   beforeEach(() => {
     vi.clearAllMocks()
-    mockSdkService(
-      PredefinedQuestionController,
-      "getAllQuestionByNote",
-      questionsFixture
-    )
+    mockSdkService(McqController, "getAllQuestionByNote", questionsFixture)
   })
 
   afterEach(() => {

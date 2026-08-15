@@ -77,7 +77,7 @@ class QuestionGenerationBatchRowImportServiceAtomicTest {
                   .findAllByMemoryTracker_IdOrderByIdDesc(fixture.memoryTrackerId())
                   .size(),
               is(0));
-          assertThat(countPredefinedQuestionsForNote(fixture.noteId()), is(0L));
+          assertThat(countMcqsForNote(fixture.noteId()), is(0L));
         });
 
     FAIL_ON_RECALL_PROMPT_SAVE.set(false);
@@ -91,7 +91,7 @@ class QuestionGenerationBatchRowImportServiceAtomicTest {
                   .findAllByMemoryTracker_IdOrderByIdDesc(fixture.memoryTrackerId())
                   .size(),
               is(1));
-          assertThat(countPredefinedQuestionsForNote(fixture.noteId()), is(1L));
+          assertThat(countMcqsForNote(fixture.noteId()), is(1L));
         });
   }
 
@@ -148,10 +148,9 @@ class QuestionGenerationBatchRowImportServiceAtomicTest {
         });
   }
 
-  private long countPredefinedQuestionsForNote(int noteId) {
+  private long countMcqsForNote(int noteId) {
     return entityManager
-        .createQuery(
-            "SELECT COUNT(pq) FROM PredefinedQuestion pq WHERE pq.note.id = :noteId", Long.class)
+        .createQuery("SELECT COUNT(pq) FROM Mcq pq WHERE pq.note.id = :noteId", Long.class)
         .setParameter("noteId", noteId)
         .getSingleResult();
   }

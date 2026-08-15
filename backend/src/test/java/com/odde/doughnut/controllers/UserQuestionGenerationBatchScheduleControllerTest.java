@@ -32,7 +32,7 @@ class UserQuestionGenerationBatchScheduleControllerTest extends ControllerTestBa
             .please();
     makeMe
         .aRecallPrompt()
-        .withPredefinedQuestionForNote(note)
+        .withMcqForNote(note)
         .forMemoryTracker(memoryTracker)
         .answerChoiceIndex(0)
         .answerTimestamp(Timestamp.valueOf(LocalDateTime.of(2024, 6, 15, 8, 30)))

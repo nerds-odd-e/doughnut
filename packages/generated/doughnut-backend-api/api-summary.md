@@ -46,7 +46,7 @@ Use this for endpoint lookup; open `sdk.gen.ts` or `types.gen.ts` only for exact
 - `setOpenAiToken`: POST `/api/testability/open_ai_token` -> `SetOpenAiTokenResponse` (request: `SetOpenAiTokenData`; body: Record<string, string>; response body: void)
 - `injectNotes`: POST `/api/testability/inject_notes` -> `InjectNotesResponse` (request: `InjectNotesData`; body: NotesTestData; response body: Record<string, number>)
 - `injectCircle`: POST `/api/testability/inject_circle` -> `InjectCircleResponse` (request: `InjectCircleData`; body: Record<string, string>; response body: string)
-- `injectPredefinedQuestion`: POST `/api/testability/inject-predefined-questions` -> `InjectPredefinedQuestionResponse` (request: `InjectPredefinedQuestionData`; body: PredefinedQuestionsTestData; response body: Array<PredefinedQuestion>)
+- `injectMcq`: POST `/api/testability/inject-predefined-questions` -> `InjectMcqResponse` (request: `InjectMcqData`; body: McqsTestData; response body: Array<Mcq>)
 - `getFeatureToggle`: GET `/api/testability/feature_toggle` -> `GetFeatureToggleResponse` (request: none; response body: boolean)
 - `enableFeatureToggle`: POST `/api/testability/feature_toggle` -> `EnableFeatureToggleResponse` (request: `EnableFeatureToggleData`; body: Record<string, string>; response body: Array<unknown>)
 - `resetDBAndTestabilitySettings`: POST `/api/testability/clean_db_and_reset_testability_settings` -> `ResetDbAndTestabilitySettingsResponse` (request: none; response body: string)
@@ -77,12 +77,12 @@ Use this for endpoint lookup; open `sdk.gen.ts` or `types.gen.ts` only for exact
 - `answer`: POST `/api/recall-prompts/{recallPrompt}/answer` -> `AnswerResponse` (request: `AnswerData`; path: recallPrompt; body: AnswerDto; response body: AnsweredQuestion)
 - `answerSpelling`: POST `/api/recall-prompts/{recallPrompt}/answer-spelling` -> `AnswerSpellingResponse` (request: `AnswerSpellingData`; path: recallPrompt; body: AnswerSpellingDto; response body: AnsweredQuestion)
 
-## Predefined Question Controller
+## Mcq Controller
 
-- `refineQuestion`: POST `/api/predefined-questions/{note}/refine-question` -> `RefineQuestionResponse` (request: `RefineQuestionData`; path: note; body: PredefinedQuestion; response body: PredefinedQuestion)
-- `getAllQuestionByNote`: GET `/api/predefined-questions/{note}/note-questions` -> `GetAllQuestionByNoteResponse` (request: `GetAllQuestionByNoteData`; path: note; response body: Array<PredefinedQuestion>)
-- `addQuestionManually`: POST `/api/predefined-questions/{note}/note-questions` -> `AddQuestionManuallyResponse` (request: `AddQuestionManuallyData`; path: note; body: PredefinedQuestion; response body: PredefinedQuestion)
-- `generateQuestionWithoutSave`: POST `/api/predefined-questions/generate-question-without-save` -> `GenerateQuestionWithoutSaveResponse` (request: `GenerateQuestionWithoutSaveData`; query: note; response body: PredefinedQuestion)
+- `refineQuestion`: POST `/api/predefined-questions/{note}/refine-question` -> `RefineQuestionResponse` (request: `RefineQuestionData`; path: note; body: Mcq; response body: Mcq)
+- `getAllQuestionByNote`: GET `/api/predefined-questions/{note}/note-questions` -> `GetAllQuestionByNoteResponse` (request: `GetAllQuestionByNoteData`; path: note; response body: Array<Mcq>)
+- `addQuestionManually`: POST `/api/predefined-questions/{note}/note-questions` -> `AddQuestionManuallyResponse` (request: `AddQuestionManuallyData`; path: note; body: Mcq; response body: Mcq)
+- `generateQuestionWithoutSave`: POST `/api/predefined-questions/generate-question-without-save` -> `GenerateQuestionWithoutSaveResponse` (request: `GenerateQuestionWithoutSaveData`; query: note; response body: Mcq)
 - `exportQuestionGeneration`: GET `/api/predefined-questions/{note}/export-question-generation` -> `ExportQuestionGenerationResponse` (request: `ExportQuestionGenerationData`; path: note; response body: Record<string, unknown>)
 
 ## Note Controller

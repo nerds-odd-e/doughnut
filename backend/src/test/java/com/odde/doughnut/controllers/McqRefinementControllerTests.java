@@ -9,8 +9,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.verify;
 
 import com.odde.doughnut.controllers.dto.Randomization;
+import com.odde.doughnut.entities.Mcq;
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.PredefinedQuestion;
 import com.odde.doughnut.exceptions.OpenAiNotAvailableException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.testability.OpenAiStructuredResponseMock;
@@ -25,22 +25,22 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
-class PredefinedQuestionRefinementControllerTests extends ControllerTestBase {
+class McqRefinementControllerTests extends ControllerTestBase {
 
   @MockitoBean(name = "officialOpenAiClient")
   OpenAIClient officialClient;
 
-  @Autowired PredefinedQuestionController controller;
+  @Autowired McqController controller;
   OpenAiStructuredResponseMock openAiStructuredResponseMock;
   Note note;
-  PredefinedQuestion predefinedQuestion;
+  Mcq mcq;
 
   @BeforeEach
   void setup() {
     openAiStructuredResponseMock = new OpenAiStructuredResponseMock(officialClient);
     currentUser.setUser(makeMe.aUser().please());
     note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
-    predefinedQuestion = makeMe.aPredefinedQuestion().please();
+    mcq = makeMe.anMcq().please();
   }
 
   @AfterEach
@@ -60,7 +60,7 @@ class PredefinedQuestionRefinementControllerTests extends ControllerTestBase {
             .choicesMayBeShuffled(true)
             .please());
 
-    PredefinedQuestion result = controller.refineQuestion(note, predefinedQuestion);
+    Mcq result = controller.refineQuestion(note, mcq);
 
     assertThat(
         result.getMcqWithAnswer().getQuestion().getResponseChoices(),
@@ -78,13 +78,13 @@ class PredefinedQuestionRefinementControllerTests extends ControllerTestBase {
             .choicesMayBeShuffled(true)
             .please());
 
-    assertThat(controller.refineQuestion(note, predefinedQuestion), nullValue());
+    assertThat(controller.refineQuestion(note, mcq), nullValue());
   }
 
   @Test
   void refineQuestionFailedWithGpt35WillNotTryAgain() {
     openAiStructuredResponseMock.stubStructuredResponseMalformed("{invalid json}");
-    assertThrows(RuntimeException.class, () -> controller.refineQuestion(note, predefinedQuestion));
+    assertThrows(RuntimeException.class, () -> controller.refineQuestion(note, mcq));
     verify(openAiStructuredResponseMock.responseService(), Mockito.times(1))
         .create(ArgumentMatchers.any(StructuredResponseCreateParams.class));
   }
@@ -92,8 +92,6 @@ class PredefinedQuestionRefinementControllerTests extends ControllerTestBase {
   @Test
   void shouldThrowWhenOpenAiNotAvailable() {
     testabilitySettings.setOpenAiTokenOverride("");
-    assertThrows(
-        OpenAiNotAvailableException.class,
-        () -> controller.refineQuestion(note, predefinedQuestion));
+    assertThrows(OpenAiNotAvailableException.class, () -> controller.refineQuestion(note, mcq));
   }
 }

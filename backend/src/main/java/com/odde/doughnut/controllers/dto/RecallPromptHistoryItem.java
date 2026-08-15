@@ -1,7 +1,7 @@
 package com.odde.doughnut.controllers.dto;
 
 import com.odde.doughnut.entities.Answer;
-import com.odde.doughnut.entities.PredefinedQuestion;
+import com.odde.doughnut.entities.Mcq;
 import com.odde.doughnut.entities.QuestionType;
 import com.odde.doughnut.entities.RecallPrompt;
 import com.odde.doughnut.services.ai.MultipleChoicesQuestion;
@@ -28,7 +28,7 @@ public class RecallPromptHistoryItem {
 
   private Answer answer;
 
-  private PredefinedQuestion mcq;
+  private Mcq mcq;
 
   private MultipleChoicesQuestion multipleChoicesQuestion;
 
@@ -40,7 +40,7 @@ public class RecallPromptHistoryItem {
     item.setIsContested(recallPrompt.getIsContested());
     item.setAnswerTime(recallPrompt.getAnswerTime());
     item.setAnswer(recallPrompt.getAnswer());
-    item.setMcq(recallPrompt.getPredefinedQuestion());
+    item.setMcq(recallPrompt.getMcq());
     item.setMultipleChoicesQuestion(recallPrompt.getMultipleChoicesQuestion());
     return item;
   }

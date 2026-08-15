@@ -1,4 +1,4 @@
-import { PredefinedQuestionController } from "@generated/doughnut-backend-api/sdk.gen"
+import { McqController } from "@generated/doughnut-backend-api/sdk.gen"
 import { describe, it, expect } from "vitest"
 import { mockSdkService } from "@tests/helpers"
 import {
@@ -21,7 +21,7 @@ describe("Questions", () => {
 
   it("shows export dialog when export button is clicked", async () => {
     const exportQuestionGenerationSpy = mockSdkService(
-      PredefinedQuestionController,
+      McqController,
       "exportQuestionGeneration",
       sampleQuestionExportData
     )

@@ -4,8 +4,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import com.odde.doughnut.entities.Mcq;
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.PredefinedQuestion;
 import com.odde.doughnut.exceptions.OpenAiNotAvailableException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import java.util.ArrayList;
@@ -16,9 +16,9 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-class PredefinedQuestionControllerTests extends ControllerTestBase {
+class McqControllerTests extends ControllerTestBase {
 
-  @Autowired PredefinedQuestionController controller;
+  @Autowired McqController controller;
 
   @BeforeEach
   void setup() {
@@ -34,7 +34,7 @@ class PredefinedQuestionControllerTests extends ControllerTestBase {
   }
 
   @Nested
-  class GetListOfPredefinedQuestionForNotebook {
+  class GetListOfMcqForNotebook {
     @Test
     void authorization() {
       Note note = makeMe.aNote().please();
@@ -43,25 +43,23 @@ class PredefinedQuestionControllerTests extends ControllerTestBase {
     }
 
     @Test
-    void getQuestionsOfANoteWhenThereIsNotQuestion() throws UnexpectedNoAccessRightException {
+    void getMcqsWhenThereAreNone() throws UnexpectedNoAccessRightException {
       assertThat(controller.getAllQuestionByNote(ownedNote()), hasSize(0));
     }
 
     @Test
-    void getQuestionsOfANoteWhenThereIsOneQuestion() throws UnexpectedNoAccessRightException {
+    void getMcqsWhenThereIsOne() throws UnexpectedNoAccessRightException {
       Note note = ownedNote();
-      PredefinedQuestion question =
-          makeMe.aPredefinedQuestion().ofAIGeneratedQuestionForNote(note).please();
+      Mcq mcq = makeMe.anMcq().ofAIGeneratedQuestionForNote(note).please();
       makeMe.refresh(note);
 
-      assertThat(controller.getAllQuestionByNote(note), contains(question));
+      assertThat(controller.getAllQuestionByNote(note), contains(mcq));
     }
 
     @Test
-    void getAllQuestionsOfANoteWhenThereIsMoreThanOneQuestion()
-        throws UnexpectedNoAccessRightException {
-      Note note = makeMe.theNote(ownedNote()).hasAPredefinedQuestion().please();
-      makeMe.aPredefinedQuestion().ofAIGeneratedQuestionForNote(note).please();
+    void getMcqsWhenThereAreSeveral() throws UnexpectedNoAccessRightException {
+      Note note = makeMe.theNote(ownedNote()).hasAnMcq().please();
+      makeMe.anMcq().ofAIGeneratedQuestionForNote(note).please();
       makeMe.refresh(note);
 
       assertThat(controller.getAllQuestionByNote(note), hasSize(2));
@@ -73,7 +71,7 @@ class PredefinedQuestionControllerTests extends ControllerTestBase {
     @Test
     void authorization() {
       Note note = makeMe.aNote().please();
-      PredefinedQuestion mcqWithAnswer = makeMe.aPredefinedQuestion().please();
+      Mcq mcqWithAnswer = makeMe.anMcq().please();
       assertThrows(
           UnexpectedNoAccessRightException.class,
           () -> controller.addQuestionManually(note, mcqWithAnswer));
@@ -82,9 +80,9 @@ class PredefinedQuestionControllerTests extends ControllerTestBase {
     @Test
     void persistent() throws UnexpectedNoAccessRightException {
       Note note = ownedNote();
-      controller.addQuestionManually(note, makeMe.aPredefinedQuestion().please());
+      controller.addQuestionManually(note, makeMe.anMcq().please());
       makeMe.refresh(note);
-      assertThat(note.getPredefinedQuestions(), hasSize(1));
+      assertThat(note.getMcqs(), hasSize(1));
     }
   }
 

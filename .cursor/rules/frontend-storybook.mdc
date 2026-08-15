@@ -28,7 +28,7 @@ import makeMe from "doughnut-test-fixtures/makeMe"
 The `makeMe` object provides access to test data builders:
 
 - `makeMe.anAnsweredQuestion` creates recall prompts with answers.
-- `makeMe.aPredefinedQuestion` creates predefined question data.
+- `makeMe.anMcq` creates MCQ data.
 - `makeMe.aNote` creates note data.
 - `makeMe.aNoteRealm` creates note realm data.
 - Many other API-shaped builders are available.

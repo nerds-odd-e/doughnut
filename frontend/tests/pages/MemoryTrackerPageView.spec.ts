@@ -124,7 +124,7 @@ describe("MemoryTrackerPageView display", () => {
       recallPrompts: [
         makeMe.aRecallPromptHistoryItem
           .withMcq(
-            makeMe.aPredefinedQuestion
+            makeMe.anMcq
               .withQuestionStem("What is the capital of France?")
               .withChoices(["Paris", "London"])
               .testedFocus("capital city")
@@ -146,7 +146,7 @@ describe("MemoryTrackerPageView display", () => {
         makeMe.aRecallPromptHistoryItem
           .withAnswerTime(answerTime)
           .withAnswer({ id: 1, correct: true, choiceIndex: 0 })
-          .withMcq(makeMe.aPredefinedQuestion.please())
+          .withMcq(makeMe.anMcq.please())
           .please(),
       ],
     })

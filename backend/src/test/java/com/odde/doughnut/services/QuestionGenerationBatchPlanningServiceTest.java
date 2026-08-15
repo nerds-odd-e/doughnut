@@ -63,7 +63,7 @@ class QuestionGenerationBatchPlanningServiceTest {
       Timestamp oneHourAgo = new Timestamp(currentTime.getTime() - TimeUnit.HOURS.toMillis(1));
       makeMe
           .aRecallPrompt()
-          .withPredefinedQuestionForNote(note)
+          .withMcqForNote(note)
           .forMemoryTracker(memoryTracker)
           .answerChoiceIndex(0)
           .answerTimestamp(oneHourAgo)
@@ -79,7 +79,7 @@ class QuestionGenerationBatchPlanningServiceTest {
       Timestamp eightDaysAgo = new Timestamp(currentTime.getTime() - TimeUnit.DAYS.toMillis(8));
       makeMe
           .aRecallPrompt()
-          .withPredefinedQuestionForNote(note)
+          .withMcqForNote(note)
           .forMemoryTracker(memoryTracker)
           .answerChoiceIndex(0)
           .answerTimestamp(eightDaysAgo)

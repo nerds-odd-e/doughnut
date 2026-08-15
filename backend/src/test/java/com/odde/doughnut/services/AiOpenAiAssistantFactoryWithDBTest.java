@@ -4,8 +4,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
 import com.odde.doughnut.controllers.dto.QuestionContestResult;
+import com.odde.doughnut.entities.Mcq;
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.PredefinedQuestion;
 import com.odde.doughnut.services.ai.AiQuestionGenerator;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.services.ai.QuestionEvaluation;
@@ -41,7 +41,7 @@ class AiOpenAiAssistantFactoryWithDBTest {
 
   @Nested
   class ContestQuestion {
-    PredefinedQuestion predefinedQuestion;
+    Mcq mcq;
     QuestionEvaluation questionEvaluation = new QuestionEvaluation();
 
     @BeforeEach
@@ -58,8 +58,7 @@ class AiOpenAiAssistantFactoryWithDBTest {
               .correctChoiceIndex(0)
               .please();
       Note note = makeMe.aNote().please();
-      predefinedQuestion =
-          makeMe.aPredefinedQuestion().ofAIGeneratedQuestion(aiGeneratedQuestion, note).please();
+      mcq = makeMe.anMcq().ofAIGeneratedQuestion(aiGeneratedQuestion, note).please();
     }
 
     @Test
@@ -79,9 +78,9 @@ class AiOpenAiAssistantFactoryWithDBTest {
     }
 
     private QuestionContestResult contest() {
-      MCQWithAnswer mcqWithAnswer = predefinedQuestion.getMcqWithAnswer();
+      MCQWithAnswer mcqWithAnswer = mcq.getMcqWithAnswer();
       return aiQuestionGenerator
-          .getQuestionContestResult(predefinedQuestion.getNote(), mcqWithAnswer)
+          .getQuestionContestResult(mcq.getNote(), mcqWithAnswer)
           .getQuestionContestResult(mcqWithAnswer);
     }
   }

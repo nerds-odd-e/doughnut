@@ -58,8 +58,8 @@ public class Conversation extends EntityIdentifiedByIdOnly {
     }
 
     RecallPrompt recallPrompt = subject.getRecallPrompt();
-    if (recallPrompt != null && recallPrompt.getPredefinedQuestion() != null) {
-      return recallPrompt.getPredefinedQuestion().getNote();
+    if (recallPrompt != null && recallPrompt.getMcq() != null) {
+      return recallPrompt.getMcq().getNote();
     }
 
     return null;

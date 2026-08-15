@@ -80,14 +80,10 @@ class QuestionGenerationBatchLocalPlanningTest {
 
   @Test
   void createsNoBatchWhenUserHasNoCandidateTrackers() {
+    makeMe.aRecallPrompt().withMcqForNote(note).forMemoryTracker(dueTracker).please();
     makeMe
         .aRecallPrompt()
-        .withPredefinedQuestionForNote(note)
-        .forMemoryTracker(dueTracker)
-        .please();
-    makeMe
-        .aRecallPrompt()
-        .withPredefinedQuestionForNote(secondDueTracker.getNote())
+        .withMcqForNote(secondDueTracker.getNote())
         .forMemoryTracker(secondDueTracker)
         .please();
 

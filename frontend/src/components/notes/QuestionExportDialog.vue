@@ -8,7 +8,7 @@
 
 <script setup lang="ts">
 import AiRequestExportDialog from "@/components/commons/AiRequestExportDialog.vue"
-import { PredefinedQuestionController } from "@generated/doughnut-backend-api/sdk.gen"
+import { McqController } from "@generated/doughnut-backend-api/sdk.gen"
 import {} from "@/managedApi/clientSetup"
 
 const props = defineProps<{
@@ -21,7 +21,7 @@ defineEmits<{
 
 async function fetchQuestionExport() {
   const { data: response, error } =
-    await PredefinedQuestionController.exportQuestionGeneration({
+    await McqController.exportQuestionGeneration({
       path: { note: props.noteId },
     })
   if (!error && response) {

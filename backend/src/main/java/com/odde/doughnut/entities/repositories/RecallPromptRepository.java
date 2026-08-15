@@ -51,7 +51,7 @@ public interface RecallPromptRepository extends CrudRepository<RecallPrompt, Int
       @Param("endTime") Timestamp endTime);
 
   // Projection (no entity hydration) so the stats endpoint does not N+1 on RecallPrompt's eager
-  // answer/predefinedQuestion/memoryTracker associations. Returns only the 4 fields the aggregator
+  // answer/mcq/memoryTracker associations. Returns only the 4 fields the aggregator
   // needs.
   @Query(
       "SELECT new com.odde.doughnut.services.RecallAnswerRow("

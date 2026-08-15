@@ -91,7 +91,7 @@ public class Note extends EntityIdentifiedByIdOnly {
   @OneToMany(mappedBy = "note")
   @Getter
   @JsonIgnore
-  private List<PredefinedQuestion> predefinedQuestions = new ArrayList<>();
+  private List<Mcq> mcqs = new ArrayList<>();
 
   @Embedded @JsonIgnore @Getter private NoteRecallSetting recallSetting = new NoteRecallSetting();
 

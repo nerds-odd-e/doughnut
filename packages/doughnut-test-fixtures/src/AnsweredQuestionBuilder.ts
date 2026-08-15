@@ -3,7 +3,7 @@ import type {
   Answer,
   Note,
   NoteTopology,
-  PredefinedQuestion,
+  Mcq,
   RecallPromptHistoryItem,
 } from '@generated/doughnut-backend-api'
 import Builder from './Builder'
@@ -17,7 +17,7 @@ class AnsweredQuestionBuilder extends Builder<AnsweredQuestion> {
   private memoryTrackerIdToUse = generateId()
   private idToUse?: number
   private questionType: 'MCQ' | 'SPELLING' = 'MCQ'
-  private mcqToUse?: PredefinedQuestion
+  private mcqToUse?: Mcq
   private answerToUse?: Answer
   private notebookIdToUse = generateId()
   private matchedNotesToUse?: NoteTopology[]
@@ -52,7 +52,7 @@ class AnsweredQuestionBuilder extends Builder<AnsweredQuestion> {
     return this
   }
 
-  withMcq(mcq: PredefinedQuestion): this {
+  withMcq(mcq: Mcq): this {
     this.mcqToUse = mcq
     return this
   }
@@ -130,7 +130,7 @@ class AnsweredQuestionBuilder extends Builder<AnsweredQuestion> {
       } as Answer)
     const mcq =
       this.questionType === 'MCQ'
-        ? (this.mcqToUse ?? makeMe.aPredefinedQuestion.please())
+        ? (this.mcqToUse ?? makeMe.anMcq.please())
         : undefined
     return {
       id: this.idToUse ?? generateId(),

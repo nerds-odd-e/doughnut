@@ -49,8 +49,8 @@ class RecallPromptController {
     RecallPrompt regenerated =
         recallQuestionService.regenerateAQuestion(
             contestResult,
-            recallPrompt.getPredefinedQuestion().getNote(),
-            recallPrompt.getPredefinedQuestion().getMcqWithAnswer(),
+            recallPrompt.getMcq().getNote(),
+            recallPrompt.getMcq().getMcqWithAnswer(),
             recallPrompt);
     return com.odde.doughnut.controllers.dto.RecallPrompt.from(regenerated);
   }

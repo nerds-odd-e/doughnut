@@ -32,7 +32,7 @@ public class RecallPrompt extends EntityIdentifiedByIdOnly {
 
   @ManyToOne
   @JoinColumn(name = "predefined_question_id", referencedColumnName = "id")
-  private PredefinedQuestion predefinedQuestion;
+  private Mcq mcq;
 
   @OneToOne(cascade = CascadeType.ALL)
   @JoinColumn(name = "quiz_answer_id", referencedColumnName = "id")
@@ -61,12 +61,12 @@ public class RecallPrompt extends EntityIdentifiedByIdOnly {
   }
 
   public String getQuestionDetails() {
-    if (getPredefinedQuestion() == null) {
+    if (getMcq() == null) {
       return "{}";
     }
     ObjectMapper mapper = new ObjectMapperConfig().objectMapper();
     ObjectNode questionDetails = mapper.createObjectNode();
-    MCQWithAnswer mcqWithAnswer = getPredefinedQuestion().getMcqWithAnswer();
+    MCQWithAnswer mcqWithAnswer = getMcq().getMcqWithAnswer();
     questionDetails.set(
         "originalQuestionDefinition", mapper.convertValue(mcqWithAnswer, ObjectNode.class));
     if (getAnswer() != null) {
@@ -85,8 +85,8 @@ public class RecallPrompt extends EntityIdentifiedByIdOnly {
   }
 
   public Note getNote() {
-    if (getPredefinedQuestion() != null) {
-      return getPredefinedQuestion().getNote();
+    if (getMcq() != null) {
+      return getMcq().getNote();
     }
     if (getMemoryTracker() != null) {
       return getMemoryTracker().getNote();
@@ -99,17 +99,17 @@ public class RecallPrompt extends EntityIdentifiedByIdOnly {
   }
 
   public Boolean getIsContested() {
-    if (getPredefinedQuestion() == null) {
+    if (getMcq() == null) {
       return null;
     }
-    return getPredefinedQuestion().isContested();
+    return getMcq().isContested();
   }
 
   public MultipleChoicesQuestion getMultipleChoicesQuestion() {
-    if (getPredefinedQuestion() == null) {
+    if (getMcq() == null) {
       return null;
     }
-    return getPredefinedQuestion().getMultipleChoicesQuestion();
+    return getMcq().getMultipleChoicesQuestion();
   }
 
   public SpellingQuestion getSpellingQuestion() {

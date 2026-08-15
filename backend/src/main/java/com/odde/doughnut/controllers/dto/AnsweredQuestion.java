@@ -1,8 +1,8 @@
 package com.odde.doughnut.controllers.dto;
 
 import com.odde.doughnut.entities.Answer;
+import com.odde.doughnut.entities.Mcq;
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.PredefinedQuestion;
 import com.odde.doughnut.entities.QuestionType;
 import com.odde.doughnut.entities.RecallPrompt;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -29,7 +29,7 @@ public class AnsweredQuestion {
   @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
   private Answer answer;
 
-  private PredefinedQuestion mcq;
+  private Mcq mcq;
 
   private List<NoteTopology> matchedNotes;
 
@@ -43,7 +43,7 @@ public class AnsweredQuestion {
         RecalledNote.from(recallPrompt.getNote(), recallPrompt.getPropertyKey()));
     answeredQuestion.setAnswer(recallPrompt.getAnswer());
     if (recallPrompt.getQuestionType() == QuestionType.MCQ) {
-      answeredQuestion.setMcq(recallPrompt.getPredefinedQuestion());
+      answeredQuestion.setMcq(recallPrompt.getMcq());
     }
     return answeredQuestion;
   }

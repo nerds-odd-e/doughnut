@@ -8,9 +8,9 @@ import static org.hamcrest.Matchers.is;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.doughnut.controllers.dto.Randomization;
+import com.odde.doughnut.entities.Mcq;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.PredefinedQuestion;
 import com.odde.doughnut.entities.QuestionGenerationBatch;
 import com.odde.doughnut.entities.QuestionGenerationBatchRequest;
 import com.odde.doughnut.entities.QuestionGenerationBatchRequestStatus;
@@ -101,7 +101,7 @@ class QuestionGenerationBatchRowImportServiceTest {
   @Nested
   class ImportOutputReadyRow {
     @Test
-    void createsPostProcessedPredefinedQuestionAndRecallPromptFromBatchOutput() {
+    void createsPostProcessedMcqAndRecallPromptFromBatchOutput() {
       testabilitySettings.setRandomization(new Randomization(last, 0));
 
       assertThat(rowImportService.importRow(outputReadyRequest), is(true));
@@ -118,12 +118,12 @@ class QuestionGenerationBatchRowImportServiceTest {
       assertThat(recallPrompt.getQuestionType(), is(QuestionType.MCQ));
       assertThat(recallPrompt.getMemoryTracker().getId(), is(memoryTracker.getId()));
 
-      PredefinedQuestion predefinedQuestion = recallPrompt.getPredefinedQuestion();
-      assertThat(predefinedQuestion.getNote().getId(), is(memoryTracker.getNote().getId()));
-      assertThat(predefinedQuestion.getContextSeed(), is(outputReadyRequest.getContextSeed()));
-      assertThat(predefinedQuestion.isContested(), is(false));
+      Mcq mcq = recallPrompt.getMcq();
+      assertThat(mcq.getNote().getId(), is(memoryTracker.getNote().getId()));
+      assertThat(mcq.getContextSeed(), is(outputReadyRequest.getContextSeed()));
+      assertThat(mcq.isContested(), is(false));
 
-      MCQWithAnswer importedMcq = predefinedQuestion.getMcqWithAnswer();
+      MCQWithAnswer importedMcq = mcq.getMcqWithAnswer();
       assertThat(
           importedMcq.getQuestion().getQuestionStem(),
           is(mcqWithAnswer.getQuestion().getQuestionStem()));

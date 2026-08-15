@@ -45,7 +45,7 @@ class QuestionGenerationBatchRetryEligibilityTest {
     recallTime = Timestamp.valueOf(LocalDateTime.of(2024, 6, 15, 9, 30));
     makeMe
         .aRecallPrompt()
-        .withPredefinedQuestionForNote(note)
+        .withMcqForNote(note)
         .forMemoryTracker(memoryTracker)
         .answerChoiceIndex(0)
         .answerTimestamp(recallTime)

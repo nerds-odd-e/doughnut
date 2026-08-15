@@ -152,7 +152,7 @@ class RecallsControllerTests extends RecallsControllerTestBase {
       MemoryTracker memoryTracker = makeMe.aMemoryTrackerFor(note).please();
       makeMe
           .aRecallPrompt()
-          .withPredefinedQuestionForNote(note)
+          .withMcqForNote(note)
           .forMemoryTracker(memoryTracker)
           .answerChoiceIndex(0)
           .answerTimestamp(currentTime)
@@ -173,7 +173,7 @@ class RecallsControllerTests extends RecallsControllerTestBase {
       MemoryTracker memoryTracker = makeMe.aMemoryTrackerFor(note).please();
       makeMe
           .aRecallPrompt()
-          .withPredefinedQuestionForNote(note)
+          .withMcqForNote(note)
           .forMemoryTracker(memoryTracker)
           .answerChoiceIndex(0)
           .answerTimestamp(previousWindowTime)

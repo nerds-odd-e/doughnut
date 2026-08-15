@@ -32,7 +32,7 @@ const createAnsweredQuestionWithQuestion = (opts: {
   return makeMe.anAnsweredQuestion
     .withNote(note)
     .withMcq(
-      makeMe.aPredefinedQuestion
+      makeMe.anMcq
         .withQuestionStem(opts.stem)
         .withChoices(opts.choices)
         .correctAnswerIndex(opts.correctIndex)

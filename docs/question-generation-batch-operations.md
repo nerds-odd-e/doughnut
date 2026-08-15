@@ -44,7 +44,7 @@ Batch-level terminal states are `COMPLETED`, `FAILED`, and `EXPIRED`. A complete
 | `PENDING` | Awaiting OpenAI output lines. |
 | `OUTPUT_READY` | Success payload stored; ready for import. |
 | `FAILED` | OpenAI or import error; see `error_detail` and raw payloads. |
-| `IMPORTED` | `PredefinedQuestion` and `RecallPrompt` created for this tracker. |
+| `IMPORTED` | `Mcq` and `RecallPrompt` created for this tracker. |
 
 ## Retry Behavior
 

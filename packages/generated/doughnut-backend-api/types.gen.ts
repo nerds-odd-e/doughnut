@@ -132,30 +132,30 @@ export type NotesTestData = {
     notebookName: string;
 };
 
-export type PredefinedQuestionTestData = {
+export type McqTestData = {
     'Note Title'?: string;
     Question?: string;
     Answer?: string;
     'One Wrong Choice'?: string;
 };
 
-export type PredefinedQuestionsTestData = {
+export type McqsTestData = {
     notebookName?: string;
-    predefinedQuestionTestData?: Array<PredefinedQuestionTestData>;
+    mcqTestData?: Array<McqTestData>;
 };
 
-export type MultipleChoicesQuestion = {
-    questionStem: string;
-    responseChoices: Array<string>;
-};
-
-export type PredefinedQuestion = {
+export type Mcq = {
     id: number;
     multipleChoicesQuestion: MultipleChoicesQuestion;
     correctAnswerIndex?: number;
     contextSeed?: number;
     testedFocus?: string;
     validationRationale?: string;
+};
+
+export type MultipleChoicesQuestion = {
+    questionStem: string;
+    responseChoices: Array<string>;
 };
 
 export type SubscriptionDto = {
@@ -295,7 +295,7 @@ export type AnsweredQuestion = {
     memoryTrackerId: number;
     recalledNote: RecalledNote;
     answer: Answer;
-    mcq?: PredefinedQuestion;
+    mcq?: Mcq;
     matchedNotes?: Array<NoteTopology>;
 };
 
@@ -1092,7 +1092,7 @@ export type RecallPromptHistoryItem = {
     isContested?: boolean;
     answerTime?: string;
     answer?: Answer;
-    mcq?: PredefinedQuestion;
+    mcq?: Mcq;
     multipleChoicesQuestion?: MultipleChoicesQuestion;
 };
 
@@ -1514,21 +1514,21 @@ export type InjectCircleResponses = {
 
 export type InjectCircleResponse = InjectCircleResponses[keyof InjectCircleResponses];
 
-export type InjectPredefinedQuestionData = {
-    body: PredefinedQuestionsTestData;
+export type InjectMcqData = {
+    body: McqsTestData;
     path?: never;
     query?: never;
     url: '/api/testability/inject-predefined-questions';
 };
 
-export type InjectPredefinedQuestionResponses = {
+export type InjectMcqResponses = {
     /**
      * OK
      */
-    200: Array<PredefinedQuestion>;
+    200: Array<Mcq>;
 };
 
-export type InjectPredefinedQuestionResponse = InjectPredefinedQuestionResponses[keyof InjectPredefinedQuestionResponses];
+export type InjectMcqResponse = InjectMcqResponses[keyof InjectMcqResponses];
 
 export type GetFeatureToggleData = {
     body?: never;
@@ -1795,7 +1795,7 @@ export type AnswerSpellingResponses = {
 export type AnswerSpellingResponse = AnswerSpellingResponses[keyof AnswerSpellingResponses];
 
 export type RefineQuestionData = {
-    body: PredefinedQuestion;
+    body: Mcq;
     path: {
         note: number;
     };
@@ -1807,7 +1807,7 @@ export type RefineQuestionResponses = {
     /**
      * OK
      */
-    200: PredefinedQuestion;
+    200: Mcq;
 };
 
 export type RefineQuestionResponse = RefineQuestionResponses[keyof RefineQuestionResponses];
@@ -1825,13 +1825,13 @@ export type GetAllQuestionByNoteResponses = {
     /**
      * OK
      */
-    200: Array<PredefinedQuestion>;
+    200: Array<Mcq>;
 };
 
 export type GetAllQuestionByNoteResponse = GetAllQuestionByNoteResponses[keyof GetAllQuestionByNoteResponses];
 
 export type AddQuestionManuallyData = {
-    body: PredefinedQuestion;
+    body: Mcq;
     path: {
         note: number;
     };
@@ -1843,7 +1843,7 @@ export type AddQuestionManuallyResponses = {
     /**
      * OK
      */
-    200: PredefinedQuestion;
+    200: Mcq;
 };
 
 export type AddQuestionManuallyResponse = AddQuestionManuallyResponses[keyof AddQuestionManuallyResponses];
@@ -1861,7 +1861,7 @@ export type GenerateQuestionWithoutSaveResponses = {
     /**
      * OK
      */
-    200: PredefinedQuestion;
+    200: Mcq;
 };
 
 export type GenerateQuestionWithoutSaveResponse = GenerateQuestionWithoutSaveResponses[keyof GenerateQuestionWithoutSaveResponses];

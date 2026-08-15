@@ -62,7 +62,7 @@ class UserRecallStatsControllerTest extends ControllerTestBase {
                 .toInstant());
     makeMe
         .aRecallPrompt()
-        .withPredefinedQuestionForNote(note)
+        .withMcqForNote(note)
         .forMemoryTracker(mt)
         .answerChoiceIndex(0)
         .answerTimestamp(todayAnswer)
@@ -82,7 +82,7 @@ class UserRecallStatsControllerTest extends ControllerTestBase {
     Timestamp myAnswer = makeMe.aTimestamp().of(9, 10).please();
     makeMe
         .aRecallPrompt()
-        .withPredefinedQuestionForNote(myNote)
+        .withMcqForNote(myNote)
         .forMemoryTracker(myMt)
         .answerChoiceIndex(0)
         .answerTimestamp(myAnswer)
@@ -94,7 +94,7 @@ class UserRecallStatsControllerTest extends ControllerTestBase {
     Timestamp otherAnswer = makeMe.aTimestamp().of(9, 10).please();
     makeMe
         .aRecallPrompt()
-        .withPredefinedQuestionForNote(otherNote)
+        .withMcqForNote(otherNote)
         .forMemoryTracker(otherMt)
         .answerChoiceIndex(0)
         .answerTimestamp(otherAnswer)

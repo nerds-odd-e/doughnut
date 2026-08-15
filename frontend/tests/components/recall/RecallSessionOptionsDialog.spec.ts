@@ -51,7 +51,7 @@ describe("RecallSessionOptionsDialog", () => {
 
   it("displays average thinking time when there are MCQ questions with thinking time", async () => {
     const note = makeMe.aNote.please()
-    const mcq = makeMe.aPredefinedQuestion.please()
+    const mcq = makeMe.anMcq.please()
     const questionResult1: AnsweredQuestion = makeMe.anAnsweredQuestion
       .withId(1)
       .withNote(note)
@@ -113,7 +113,7 @@ describe("RecallSessionOptionsDialog", () => {
     const questionResult: AnsweredQuestion = makeMe.anAnsweredQuestion
       .withId(1)
       .withNote(note)
-      .withMcq(makeMe.aPredefinedQuestion.please())
+      .withMcq(makeMe.anMcq.please())
       .withAnswer({ id: 1, correct: true, choiceIndex: 0 })
       .withMemoryTrackerId(1)
       .please()
@@ -134,7 +134,7 @@ describe("RecallSessionOptionsDialog", () => {
     const questionResult: AnsweredQuestion = makeMe.anAnsweredQuestion
       .withId(1)
       .withNote(note)
-      .withMcq(makeMe.aPredefinedQuestion.please())
+      .withMcq(makeMe.anMcq.please())
       .withAnswer({
         id: 1,
         correct: true,
@@ -160,7 +160,7 @@ describe("RecallSessionOptionsDialog", () => {
     const questionResult: AnsweredQuestion = makeMe.anAnsweredQuestion
       .withId(1)
       .withNote(note)
-      .withMcq(makeMe.aPredefinedQuestion.please())
+      .withMcq(makeMe.anMcq.please())
       .withAnswer({
         id: 1,
         correct: true,
@@ -186,7 +186,7 @@ describe("RecallSessionOptionsDialog", () => {
     const questionResult: AnsweredQuestion = makeMe.anAnsweredQuestion
       .withId(1)
       .withNote(note)
-      .withMcq(makeMe.aPredefinedQuestion.please())
+      .withMcq(makeMe.anMcq.please())
       .withAnswer({
         id: 1,
         correct: true,

@@ -32,7 +32,7 @@ import NotebookCatalogBuilder from './NotebookCatalogBuilder'
 import NotebookCatalogGroupItemBuilder from './NotebookCatalogGroupItemBuilder'
 import NotebookCatalogNotebookItemBuilder from './NotebookCatalogNotebookItemBuilder'
 import NotebookCatalogSubscribedNotebookItemBuilder from './NotebookCatalogSubscribedNotebookItemBuilder'
-import PredefinedQuestionBuilder from './PredefinedQuestionBuilder'
+import McqBuilder from './McqBuilder'
 import RecallPromptBuilder from './RecallPromptBuilder'
 import RecallPromptHistoryItemBuilder from './RecallPromptHistoryItemBuilder'
 import NoteSearchResultBuilder from './NoteSearchResultBuilder'
@@ -79,8 +79,8 @@ class MakeMe {
     return new RecallPromptHistoryItemBuilder()
   }
 
-  static get aPredefinedQuestion(): PredefinedQuestionBuilder {
-    return new PredefinedQuestionBuilder()
+  static get anMcq(): McqBuilder {
+    return new McqBuilder()
   }
 
   static get aCircleNote(): CircleNoteBuilder {

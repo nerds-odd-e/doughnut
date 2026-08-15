@@ -140,7 +140,7 @@ describe("AnsweredQuestionComponent", () => {
     })
 
     it("passes MCQ context when opening Refine note", async () => {
-      const mcq = makeMe.aPredefinedQuestion
+      const mcq = makeMe.anMcq
         .withQuestionStem("What is the capital of France?")
         .withChoices(["Paris", "London", "Berlin"])
         .correctAnswerIndex(0)

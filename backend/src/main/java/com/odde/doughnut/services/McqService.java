@@ -13,13 +13,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Service
-public class PredefinedQuestionService {
+public class McqService {
   private final EntityPersister entityPersister;
   private final AiQuestionGenerator aiQuestionGenerator;
   private final int regenerationTimes;
 
   @Autowired
-  public PredefinedQuestionService(
+  public McqService(
       EntityPersister entityPersister,
       AiQuestionGenerator aiQuestionGenerator,
       @Value("${question.regeneration.times:0}") int regenerationTimes) {
@@ -28,46 +28,45 @@ public class PredefinedQuestionService {
     this.regenerationTimes = regenerationTimes;
   }
 
-  public PredefinedQuestion addQuestion(Note note, PredefinedQuestion predefinedQuestion) {
-    predefinedQuestion.setNote(note);
+  public Mcq addQuestion(Note note, Mcq mcq) {
+    mcq.setNote(note);
 
     Notebook parentNotebook = note.getNotebook();
     parentNotebook.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
     entityPersister.save(parentNotebook);
-    entityPersister.save(predefinedQuestion);
-    return predefinedQuestion;
+    entityPersister.save(mcq);
+    return mcq;
   }
 
-  public PredefinedQuestion refineAIQuestion(Note note, PredefinedQuestion predefinedQuestion) {
+  public Mcq refineAIQuestion(Note note, Mcq mcq) {
     MCQWithAnswer aiGeneratedRefineQuestion =
-        aiQuestionGenerator.getAiGeneratedRefineQuestion(
-            note, predefinedQuestion.getMcqWithAnswer());
+        aiQuestionGenerator.getAiGeneratedRefineQuestion(note, mcq.getMcqWithAnswer());
     if (aiGeneratedRefineQuestion == null) {
       return null;
     }
-    return PredefinedQuestion.fromMCQWithAnswer(aiGeneratedRefineQuestion, note);
+    return Mcq.fromMCQWithAnswer(aiGeneratedRefineQuestion, note);
   }
 
-  public QuestionContestResult contest(PredefinedQuestion predefinedQuestion) {
-    MCQWithAnswer mcqWithAnswer = predefinedQuestion.getMcqWithAnswer();
+  public QuestionContestResult contest(Mcq mcq) {
+    MCQWithAnswer mcqWithAnswer = mcq.getMcqWithAnswer();
     QuestionEvaluation questionContestResult =
-        aiQuestionGenerator.getQuestionContestResult(predefinedQuestion.getNote(), mcqWithAnswer);
+        aiQuestionGenerator.getQuestionContestResult(mcq.getNote(), mcqWithAnswer);
     if (questionContestResult == null) {
       return null;
     }
     QuestionContestResult result = questionContestResult.getQuestionContestResult(mcqWithAnswer);
     if (!result.rejected) {
-      predefinedQuestion.setContested(true);
-      entityPersister.merge(predefinedQuestion);
+      mcq.setContested(true);
+      entityPersister.merge(mcq);
     }
     return result;
   }
 
-  public PredefinedQuestion generateAFeasibleQuestion(Note note) {
+  public Mcq generateAFeasibleQuestion(Note note) {
     return generateAFeasibleQuestion(note, null);
   }
 
-  public PredefinedQuestion generateAFeasibleQuestion(Note note, String propertyKey) {
+  public Mcq generateAFeasibleQuestion(Note note, String propertyKey) {
     Long contextSeedBoxed = Long.valueOf(ThreadLocalRandom.current().nextLong());
     MCQWithAnswer mcqWithAnswer =
         aiQuestionGenerator.getAiGeneratedQuestion(note, null, contextSeedBoxed, propertyKey);
@@ -75,8 +74,7 @@ public class PredefinedQuestionService {
       return null;
     }
 
-    PredefinedQuestion result =
-        PredefinedQuestion.fromMCQWithAnswer(mcqWithAnswer, note, contextSeedBoxed);
+    Mcq result = Mcq.fromMCQWithAnswer(mcqWithAnswer, note, contextSeedBoxed);
     entityPersister.save(result);
 
     // Auto-evaluate and regenerate up to regenerationTimes
@@ -92,8 +90,7 @@ public class PredefinedQuestionService {
           aiQuestionGenerator.regenerateQuestion(
               contestResult, note, mcqWithAnswer, regSeedBoxed, propertyKey);
       if (regeneratedQuestion != null) {
-        PredefinedQuestion regenerated =
-            PredefinedQuestion.fromMCQWithAnswer(regeneratedQuestion, note, regSeedBoxed);
+        Mcq regenerated = Mcq.fromMCQWithAnswer(regeneratedQuestion, note, regSeedBoxed);
         result = entityPersister.save(regenerated);
         mcqWithAnswer = regeneratedQuestion;
       } else {

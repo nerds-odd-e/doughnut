@@ -70,8 +70,8 @@
 <script setup lang="ts">
 import type { PropType } from "vue"
 import { onMounted, ref } from "vue"
-import type { Note, PredefinedQuestion } from "@generated/doughnut-backend-api"
-import { PredefinedQuestionController } from "@generated/doughnut-backend-api/sdk.gen"
+import type { Note, Mcq } from "@generated/doughnut-backend-api"
+import { McqController } from "@generated/doughnut-backend-api/sdk.gen"
 import NoteAddQuestion from "./NoteAddQuestion.vue"
 import QuestionExportDialog from "./QuestionExportDialog.vue"
 import PopButton from "../commons/Popups/PopButton.vue"
@@ -83,19 +83,19 @@ const props = defineProps({
     required: true,
   },
 })
-const questions = ref<PredefinedQuestion[]>([])
+const questions = ref<Mcq[]>([])
 const showExportDialog = ref(false)
 
 const fetchQuestions = async () => {
   const { data: allQuestions, error } =
-    await PredefinedQuestionController.getAllQuestionByNote({
+    await McqController.getAllQuestionByNote({
       path: { note: props.note.id },
     })
   if (!error && allQuestions) {
     questions.value = allQuestions
   }
 }
-const questionAdded = (newQuestion: PredefinedQuestion) => {
+const questionAdded = (newQuestion: Mcq) => {
   if (newQuestion == null) {
     return
   }

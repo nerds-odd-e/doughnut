@@ -47,14 +47,13 @@ public class Answer extends EntityIdentifiedByIdOnly {
   @Setter
   private AnswerOutcome outcome;
 
-  public static Answer buildAnswer(
-      AnswerDTO answerDTO, PredefinedQuestion predefinedQuestion, Answer existingAnswer) {
+  public static Answer buildAnswer(AnswerDTO answerDTO, Mcq mcq, Answer existingAnswer) {
     if (existingAnswer != null) {
       throw new QuestionAnswerException("The question is already answered");
     }
     Answer answer = new Answer();
     answer.choiceIndex = answerDTO.getChoiceIndex();
-    answer.setCorrect(predefinedQuestion.checkAnswer(answerDTO));
+    answer.setCorrect(mcq.checkAnswer(answerDTO));
     answer.setThinkingTimeMs(answerDTO.getThinkingTimeMs());
     return answer;
   }

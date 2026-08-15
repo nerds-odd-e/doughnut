@@ -3,8 +3,8 @@ package com.odde.doughnut.controllers;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.AuthorizationService;
+import com.odde.doughnut.services.McqService;
 import com.odde.doughnut.services.NoteQuestionGenerationService;
-import com.odde.doughnut.services.PredefinedQuestionService;
 import com.odde.doughnut.services.ai.AiQuestionGenerator;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.services.openAiApis.StructuredResponseCreateParamsSerializer;
@@ -19,8 +19,8 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/predefined-questions")
-class PredefinedQuestionController {
-  private final PredefinedQuestionService predefinedQuestionService;
+class McqController {
+  private final McqService mcqService;
 
   private final AiQuestionGenerator aiQuestionGenerator;
   private final AuthorizationService authorizationService;
@@ -28,13 +28,13 @@ class PredefinedQuestionController {
   private final StructuredResponseCreateParamsSerializer paramsSerializer;
 
   @Autowired
-  public PredefinedQuestionController(
-      PredefinedQuestionService predefinedQuestionService,
+  public McqController(
+      McqService mcqService,
       AuthorizationService authorizationService,
       AiQuestionGenerator aiQuestionGenerator,
       NoteQuestionGenerationService noteQuestionGenerationService,
       StructuredResponseCreateParamsSerializer paramsSerializer) {
-    this.predefinedQuestionService = predefinedQuestionService;
+    this.mcqService = mcqService;
     this.authorizationService = authorizationService;
     this.aiQuestionGenerator = aiQuestionGenerator;
     this.noteQuestionGenerationService = noteQuestionGenerationService;
@@ -42,42 +42,39 @@ class PredefinedQuestionController {
   }
 
   @PostMapping("/generate-question-without-save")
-  public PredefinedQuestion generateQuestionWithoutSave(
+  public Mcq generateQuestionWithoutSave(
       @RequestParam(value = "note") @Schema(type = "integer") Note note) {
     authorizationService.assertLoggedIn();
     MCQWithAnswer MCQWithAnswer = aiQuestionGenerator.getAiGeneratedQuestion(note, null);
     if (MCQWithAnswer == null) {
       return null;
     }
-    return PredefinedQuestion.fromMCQWithAnswer(MCQWithAnswer, note);
+    return Mcq.fromMCQWithAnswer(MCQWithAnswer, note);
   }
 
   @GetMapping("/{note}/note-questions")
-  public List<PredefinedQuestion> getAllQuestionByNote(
-      @PathVariable("note") @Schema(type = "integer") Note note)
+  public List<Mcq> getAllQuestionByNote(@PathVariable("note") @Schema(type = "integer") Note note)
       throws UnexpectedNoAccessRightException {
     authorizationService.assertAuthorization(note);
-    return note.getPredefinedQuestions().stream().toList();
+    return note.getMcqs().stream().toList();
   }
 
   @PostMapping("/{note}/note-questions")
   @Transactional
-  public PredefinedQuestion addQuestionManually(
-      @PathVariable("note") @Schema(type = "integer") Note note,
-      @Valid @RequestBody PredefinedQuestion predefinedQuestion)
+  public Mcq addQuestionManually(
+      @PathVariable("note") @Schema(type = "integer") Note note, @Valid @RequestBody Mcq mcq)
       throws UnexpectedNoAccessRightException {
     authorizationService.assertAuthorization(note);
-    return predefinedQuestionService.addQuestion(note, predefinedQuestion);
+    return mcqService.addQuestion(note, mcq);
   }
 
   @PostMapping("/{note}/refine-question")
   @Transactional
-  public PredefinedQuestion refineQuestion(
-      @PathVariable("note") @Schema(type = "integer") Note note,
-      @RequestBody PredefinedQuestion predefinedQuestion)
+  public Mcq refineQuestion(
+      @PathVariable("note") @Schema(type = "integer") Note note, @RequestBody Mcq mcq)
       throws UnexpectedNoAccessRightException {
     authorizationService.assertAuthorization(note);
-    return predefinedQuestionService.refineAIQuestion(note, predefinedQuestion);
+    return mcqService.refineAIQuestion(note, mcq);
   }
 
   @GetMapping(value = "/{note}/export-question-generation", produces = "application/json")

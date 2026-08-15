@@ -95,18 +95,11 @@ filenames and `injectPredefinedQuestionsToNotebook` left for type rename.
 
 ### 8. Type is Mcq
 
-- **Status:** planned
+- **Status:** done
 - **Type:** Behavior
-- **Pre:** Slice 6–7 done.
-- **Trigger:** Client reads or writes note MCQs / answered `mcq`.
-- **Post:** Java/OpenAPI type is **`Mcq`**, not `PredefinedQuestion`. HTTP
-  paths still `/api/predefined-questions/...`. `@Table` may still be
-  `predefined_question`.
 
-Regen client; rename builders (`aPredefinedQuestion` → `anMcq` or equivalent).
-
-**Tests:** `PredefinedQuestionControllerTests` (rename with the type);
-note MCQ E2E; regen compile.
+Shipped: Java/OpenAPI type is **`Mcq`**. HTTP still `/api/predefined-questions`.
+Table still `predefined_question`. Builders `anMcq`. Tests `McqControllerTests`.
 
 ### 9. Note MCQ routes are /mcqs
 
@@ -186,3 +179,4 @@ note MCQ E2E; regen compile.
 - Slice 5: CLI `RecallQuestionAnswerOutcome` still deferred; JSON `predefinedQuestion` is slice 6.
 - Slice 6: answered/history property is `mcq`; Java type still `PredefinedQuestion`.
 - Slice 7: leftover `injectPredefinedQuestionsToNotebook` / feature filenames wait for type `Mcq`.
+- Slice 8: feature filename `mcq_management.feature` and inject helper `injectMcqsToNotebook` renamed with the type. Testability HTTP still `inject-predefined-questions` (product `/api/mcqs` is slice 9). Unused `McqNotPossibleException` deleted. Note MCQ E2E not re-run this slice (SUT LB 503 / stale backend on 9081).

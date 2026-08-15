@@ -37,7 +37,7 @@ type Story = StoryObj<typeof meta>
 // Question without answer
 export const Unanswered: Story = {
   args: {
-    multipleChoicesQuestion: makeMe.aPredefinedQuestion
+    multipleChoicesQuestion: makeMe.anMcq
       .withQuestionStem("What is the capital of France?")
       .withChoices(["Paris", "London", "Berlin", "Madrid"])
       .correctAnswerIndex(0)
@@ -50,7 +50,7 @@ export const Unanswered: Story = {
 // Question with correct answer selected
 export const WithCorrectAnswer: Story = {
   args: {
-    multipleChoicesQuestion: makeMe.aPredefinedQuestion
+    multipleChoicesQuestion: makeMe.anMcq
       .withQuestionStem(
         "Which programming language is used for web development?"
       )
@@ -70,7 +70,7 @@ export const WithCorrectAnswer: Story = {
 // Question with incorrect answer selected
 export const WithIncorrectAnswer: Story = {
   args: {
-    multipleChoicesQuestion: makeMe.aPredefinedQuestion
+    multipleChoicesQuestion: makeMe.anMcq
       .withQuestionStem("What is 2 + 2?")
       .withChoices(["3", "4", "5", "6"])
       .correctAnswerIndex(1)
@@ -88,7 +88,7 @@ export const WithIncorrectAnswer: Story = {
 // Question disabled (no interaction)
 export const Disabled: Story = {
   args: {
-    multipleChoicesQuestion: makeMe.aPredefinedQuestion
+    multipleChoicesQuestion: makeMe.anMcq
       .withQuestionStem("Which data structure follows LIFO?")
       .withChoices(["Queue", "Stack", "Array", "Linked List"])
       .correctAnswerIndex(1)
@@ -101,7 +101,7 @@ export const Disabled: Story = {
 // Long question with many choices
 export const LongQuestion: Story = {
   args: {
-    multipleChoicesQuestion: makeMe.aPredefinedQuestion
+    multipleChoicesQuestion: makeMe.anMcq
       .withQuestionStem(
         "Which of the following are JavaScript frameworks? Select all that apply."
       )
@@ -125,7 +125,7 @@ export const LongQuestion: Story = {
 // Question with long choice text
 export const LongChoiceText: Story = {
   args: {
-    multipleChoicesQuestion: makeMe.aPredefinedQuestion
+    multipleChoicesQuestion: makeMe.anMcq
       .withQuestionStem(
         "Which of the following best describes the purpose of a RESTful API?"
       )

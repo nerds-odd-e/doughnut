@@ -51,11 +51,7 @@ class ConversationStartControllerTest extends ConversationMessageControllerTestB
       Note note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
       MemoryTracker memoryTracker = makeMe.aMemoryTrackerFor(note).please();
       recallPrompt =
-          makeMe
-              .aRecallPrompt()
-              .forMemoryTracker(memoryTracker)
-              .withPredefinedQuestionForNote(note)
-              .please();
+          makeMe.aRecallPrompt().forMemoryTracker(memoryTracker).withMcqForNote(note).please();
     }
 
     @Test

@@ -1,9 +1,9 @@
-import type { PredefinedQuestion } from "@generated/doughnut-backend-api"
+import type { Mcq } from "@generated/doughnut-backend-api"
 
-function isMCQWithAnswerValid(predefinedQuestion: PredefinedQuestion): boolean {
+function isMCQWithAnswerValid(mcq: Mcq): boolean {
   const { questionStem: stem, responseChoices: choices } =
-    predefinedQuestion.multipleChoicesQuestion
-  const { correctAnswerIndex } = predefinedQuestion
+    mcq.multipleChoicesQuestion
+  const { correctAnswerIndex } = mcq
 
   const isStemNotEmpty = !!stem?.trim()
   const allChoicesFilled = choices.every((option) => option.trim())

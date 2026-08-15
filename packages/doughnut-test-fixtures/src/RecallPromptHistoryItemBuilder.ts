@@ -1,16 +1,16 @@
 import type {
-  PredefinedQuestion,
+  Mcq,
   Answer,
   RecallPromptHistoryItem,
 } from '@generated/doughnut-backend-api'
 import Builder from './Builder'
 import generateId from './generateId'
-import PredefinedQuestionBuilder from './PredefinedQuestionBuilder'
+import McqBuilder from './McqBuilder'
 
 class RecallPromptHistoryItemBuilder extends Builder<RecallPromptHistoryItem> {
-  predefinedQuestionBuilder = new PredefinedQuestionBuilder()
+  mcqBuilder = new McqBuilder()
   private idToUse?: number
-  private mcqToUse?: PredefinedQuestion
+  private mcqToUse?: Mcq
   private answerToUse?: Answer
   private answerTimeToUse?: string
   private questionGeneratedTimeToUse?: string
@@ -24,16 +24,16 @@ class RecallPromptHistoryItemBuilder extends Builder<RecallPromptHistoryItem> {
   }
 
   withQuestionStem(stem: string) {
-    this.predefinedQuestionBuilder.withQuestionStem(stem)
+    this.mcqBuilder.withQuestionStem(stem)
     return this
   }
 
   withChoices(choices: string[]) {
-    this.predefinedQuestionBuilder.withChoices(choices)
+    this.mcqBuilder.withChoices(choices)
     return this
   }
 
-  withMcq(mcq: PredefinedQuestion) {
+  withMcq(mcq: Mcq) {
     this.mcqToUse = mcq
     return this
   }
@@ -88,7 +88,7 @@ class RecallPromptHistoryItemBuilder extends Builder<RecallPromptHistoryItem> {
         isContested: this.isContestedToUse,
       }
     }
-    const mcq = this.mcqToUse ?? this.predefinedQuestionBuilder.do()
+    const mcq = this.mcqToUse ?? this.mcqBuilder.do()
     return {
       id: this.idToUse ?? generateId(),
       questionType: (this.questionTypeToUse ?? 'MCQ') as 'MCQ' | 'SPELLING',
