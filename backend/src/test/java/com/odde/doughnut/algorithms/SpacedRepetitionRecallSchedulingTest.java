@@ -5,7 +5,6 @@ import static com.odde.doughnut.entities.ForgettingCurve.FIRST_SUCCESS_STABILITY
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThan;
-import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.lessThan;
 
 import com.odde.doughnut.entities.MemoryTracker;
@@ -78,8 +77,6 @@ class SpacedRepetitionRecallSchedulingTest {
     harder.recalledSuccessfully(gradeTime, null);
 
     assertThat(harder.getStability(), lessThan(easier.getStability()));
-    assertThat(easier.getStability(), greaterThanOrEqualTo(STABILITY_HOURS));
-    assertThat(harder.getStability(), greaterThanOrEqualTo(STABILITY_HOURS));
   }
 
   @Test

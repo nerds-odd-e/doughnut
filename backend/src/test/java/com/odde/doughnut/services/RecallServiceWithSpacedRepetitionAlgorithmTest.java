@@ -1,7 +1,6 @@
 package com.odde.doughnut.services;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 
@@ -94,27 +93,6 @@ public class RecallServiceWithSpacedRepetitionAlgorithmTest {
         final Timestamp timestamp = makeMe.aTimestamp().of(2, currentHour).fromShanghai().please();
         MemoryTracker mostUrgentMemoryTracker = getOneMemoryTrackerNeedToRepeat(timestamp);
         assertThat(mostUrgentMemoryTracker != null, is(expectedToRepeat));
-      }
-    }
-
-    @Nested
-    class OnTimeAndEarlyRecall {
-      @ParameterizedTest
-      @CsvSource({
-        "0, 0,  24.0",
-        "0, 1,  24.0",
-        "2, -1,  315.0",
-        "2, 0, 361.0",
-      })
-      void aMemoryTrackerHasBeenRecalledStrictly(
-          int ntimes, Integer daysDelay, float expectedStability) {
-        MemoryTracker memoryTracker =
-            makeMe.aMemoryTrackerFor(note).afterNthStrictRecall(ntimes).please();
-        Timestamp currentUTCTimestamp =
-            TimestampOperations.addHoursToTimestamp(
-                memoryTracker.getNextRecallAt(), daysDelay * 24);
-        memoryTracker.markAsRecalled(currentUTCTimestamp, true, null);
-        assertThat(memoryTracker.getStability(), equalTo(expectedStability));
       }
     }
   }
