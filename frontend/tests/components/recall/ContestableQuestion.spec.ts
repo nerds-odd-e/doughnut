@@ -44,7 +44,7 @@ describe("ContestableQuestion.vue", () => {
     vi.advanceTimersByTime(advanceMs)
   }
 
-  const mountComponent = (recallPrompt = makeMe.aRecallQuestion.please()) =>
+  const mountComponent = (recallPrompt = makeMe.aRecallPrompt.please()) =>
     helper
       .component(ContestableQuestion)
       .withRouter()
@@ -79,12 +79,12 @@ describe("ContestableQuestion.vue", () => {
   })
 
   it("resets thinking time when question is contested", async () => {
-    const initialQuestion = makeMe.aRecallQuestion
+    const initialQuestion = makeMe.aRecallPrompt
       .withQuestionStem("First question")
       .withChoices(["A", "B", "C"])
       .please()
 
-    const regeneratedQuestion = makeMe.aRecallQuestion
+    const regeneratedQuestion = makeMe.aRecallPrompt
       .withQuestionStem("Second question")
       .withChoices(["X", "Y", "Z"])
       .please()

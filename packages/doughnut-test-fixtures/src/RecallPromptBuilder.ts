@@ -1,21 +1,17 @@
 import type {
-  PredefinedQuestion,
-  Answer,
-  RecallPromptHistoryItem,
+  Notebook,
+  RecallPrompt,
+  SpellingQuestion,
 } from '@generated/doughnut-backend-api'
 import Builder from './Builder'
 import generateId from './generateId'
+import NotebookBuilder from './NotebookBuilder'
 import PredefinedQuestionBuilder from './PredefinedQuestionBuilder'
 
-class RecallPromptBuilder extends Builder<RecallPromptHistoryItem> {
-  predefinedQuestionBuilder = new PredefinedQuestionBuilder()
+class RecallPromptBuilder extends Builder<RecallPrompt> {
   private idToUse?: number
-  private predefinedQuestionToUse?: PredefinedQuestion
-  private answerToUse?: Answer
-  private answerTimeToUse?: string
-  private questionGeneratedTimeToUse?: string
-  private isContestedToUse?: boolean
-  private questionTypeToUse?: string
+  private notebookToUse?: Notebook
+  private predefinedQuestionBuilder = new PredefinedQuestionBuilder()
   private spellingStemToUse?: string
 
   withId(id: number) {
@@ -33,72 +29,34 @@ class RecallPromptBuilder extends Builder<RecallPromptHistoryItem> {
     return this
   }
 
-  withPredefinedQuestion(predefinedQuestion: PredefinedQuestion) {
-    this.predefinedQuestionToUse = predefinedQuestion
+  withNotebook(notebook: Notebook) {
+    this.notebookToUse = notebook
     return this
   }
 
-  withAnswer(answer: Answer) {
-    this.answerToUse = answer
+  withSpellingStem(stem: string) {
+    this.spellingStemToUse = stem
     return this
   }
 
-  withAnswerTime(answerTime: string) {
-    this.answerTimeToUse = answerTime
-    return this
-  }
-
-  withQuestionGeneratedTime(questionGeneratedTime: string) {
-    this.questionGeneratedTimeToUse = questionGeneratedTime
-    return this
-  }
-
-  withIsContested(isContested: boolean) {
-    this.isContestedToUse = isContested
-    return this
-  }
-
-  withQuestionType(questionType: string) {
-    this.questionTypeToUse = questionType
-    return this
-  }
-
-  withSpellingStem(_stem: string) {
-    this.spellingStemToUse = _stem
-    this.questionTypeToUse = 'SPELLING'
-    return this
-  }
-
-  spelling() {
-    this.questionTypeToUse = 'SPELLING'
-    return this
-  }
-
-  do(): RecallPromptHistoryItem {
-    if (
-      this.spellingStemToUse !== undefined ||
-      this.questionTypeToUse === 'SPELLING'
-    ) {
+  do(): RecallPrompt {
+    const notebook = this.notebookToUse ?? new NotebookBuilder().do()
+    if (this.spellingStemToUse !== undefined) {
+      const spellingQuestion: SpellingQuestion = {
+        stem: this.spellingStemToUse,
+        notebook,
+      }
       return {
         id: this.idToUse ?? generateId(),
-        questionType: 'SPELLING',
-        questionGeneratedTime: this.questionGeneratedTimeToUse ?? '',
-        answer: this.answerToUse,
-        answerTime: this.answerTimeToUse,
-        isContested: this.isContestedToUse,
+        notebook,
+        spellingQuestion,
       }
     }
-    const predefinedQuestion =
-      this.predefinedQuestionToUse ?? this.predefinedQuestionBuilder.do()
+    const predefinedQuestion = this.predefinedQuestionBuilder.do()
     return {
       id: this.idToUse ?? generateId(),
-      questionType: (this.questionTypeToUse ?? 'MCQ') as 'MCQ' | 'SPELLING',
+      notebook,
       multipleChoicesQuestion: predefinedQuestion.multipleChoicesQuestion,
-      predefinedQuestion: predefinedQuestion,
-      answer: this.answerToUse,
-      answerTime: this.answerTimeToUse,
-      questionGeneratedTime: this.questionGeneratedTimeToUse ?? '',
-      isContested: this.isContestedToUse,
     }
   }
 }

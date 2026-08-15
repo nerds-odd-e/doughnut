@@ -8,7 +8,6 @@ import static org.mockito.Mockito.verify;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.doughnut.controllers.dto.QuestionContestResult;
-import com.odde.doughnut.controllers.dto.RecallQuestion;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.RecallPrompt;
@@ -72,9 +71,10 @@ class RecallPromptRegenerateControllerTest extends RecallPromptControllerTestBas
         makeMe.aMCQWithAnswer().stem("What is the first color in the rainbow?").please();
     openAiStructuredResponseMock.stubStructuredResponse(jsonQuestion);
 
-    RecallQuestion regeneratedQuestion = controller.regenerate(recallPrompt, contestAdvice("test"));
+    com.odde.doughnut.controllers.dto.RecallPrompt regeneratedPrompt =
+        controller.regenerate(recallPrompt, contestAdvice("test"));
 
-    Assertions.assertThat(regeneratedQuestion.getMultipleChoicesQuestion().getQuestionStem())
+    Assertions.assertThat(regeneratedPrompt.getMultipleChoicesQuestion().getQuestionStem())
         .contains("What is the first color in the rainbow?");
 
     @SuppressWarnings({"unchecked", "rawtypes"})

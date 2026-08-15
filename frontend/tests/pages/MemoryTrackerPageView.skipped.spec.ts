@@ -21,7 +21,9 @@ describe("MemoryTrackerPageView skipped tracker", () => {
   it("shows skipped banner, revive button, and hides remove-from-recall", async () => {
     const wrapper = await mountMemoryTrackerPageViewReady({
       recallPrompts: [
-        makeMe.aRecallPrompt.withQuestionStem("Test question").please(),
+        makeMe.aRecallPromptHistoryItem
+          .withQuestionStem("Test question")
+          .please(),
       ],
       memoryTracker: skippedMemoryTracker(),
     })
@@ -34,7 +36,7 @@ describe("MemoryTrackerPageView skipped tracker", () => {
   it("still shows recall prompts when skipped", async () => {
     const wrapper = await mountMemoryTrackerPageViewReady({
       recallPrompts: [
-        makeMe.aRecallPrompt
+        makeMe.aRecallPromptHistoryItem
           .withQuestionStem("Test question")
           .withChoices(["A", "B", "C"])
           .please(),
@@ -55,7 +57,9 @@ describe("MemoryTrackerPageView skipped tracker", () => {
 
     const wrapper = await mountMemoryTrackerPageViewReady({
       recallPrompts: [
-        makeMe.aRecallPrompt.withQuestionStem("Test question").please(),
+        makeMe.aRecallPromptHistoryItem
+          .withQuestionStem("Test question")
+          .please(),
       ],
       memoryTracker,
     })

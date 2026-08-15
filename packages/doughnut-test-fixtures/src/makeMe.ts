@@ -34,7 +34,7 @@ import NotebookCatalogNotebookItemBuilder from './NotebookCatalogNotebookItemBui
 import NotebookCatalogSubscribedNotebookItemBuilder from './NotebookCatalogSubscribedNotebookItemBuilder'
 import PredefinedQuestionBuilder from './PredefinedQuestionBuilder'
 import RecallPromptBuilder from './RecallPromptBuilder'
-import RecallQuestionBuilder from './RecallQuestionBuilder'
+import RecallPromptHistoryItemBuilder from './RecallPromptHistoryItemBuilder'
 import NoteSearchResultBuilder from './NoteSearchResultBuilder'
 import UserBuilder from './UserBuilder'
 import UserForListingBuilder from './UserForListingBuilder'
@@ -75,8 +75,8 @@ class MakeMe {
     return new RecallPromptBuilder()
   }
 
-  static get aRecallQuestion(): RecallQuestionBuilder {
-    return new RecallQuestionBuilder()
+  static get aRecallPromptHistoryItem(): RecallPromptHistoryItemBuilder {
+    return new RecallPromptHistoryItemBuilder()
   }
 
   static get aPredefinedQuestion(): PredefinedQuestionBuilder {

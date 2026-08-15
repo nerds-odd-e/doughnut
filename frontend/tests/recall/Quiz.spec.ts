@@ -99,7 +99,7 @@ describe("repeat page", () => {
   describe("contestable dummy input", () => {
     it("clears when advancing to the next question", async () => {
       const recallPrompt = getRecallPrompt()
-      const secondRecallPrompt = makeMe.aRecallQuestion
+      const secondRecallPrompt = makeMe.aRecallPrompt
         .withQuestionStem("Second question")
         .please()
       askAQuestionSpy

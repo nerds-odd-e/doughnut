@@ -21,10 +21,12 @@ export const skippedBannerText =
 export const defaultMemoryTracker = () => makeMe.aMemoryTracker.please()
 
 export const unansweredRecallPrompt = () =>
-  makeMe.aRecallPrompt.withQuestionStem("Unanswered question").please()
+  makeMe.aRecallPromptHistoryItem
+    .withQuestionStem("Unanswered question")
+    .please()
 
 export const answeredRecallPrompt = () =>
-  makeMe.aRecallPrompt
+  makeMe.aRecallPromptHistoryItem
     .withQuestionStem("Answered question")
     .withAnswer({
       id: 1,
@@ -35,7 +37,7 @@ export const answeredRecallPrompt = () =>
     .please()
 
 export const contestedRecallPrompt = () =>
-  makeMe.aRecallPrompt
+  makeMe.aRecallPromptHistoryItem
     .withQuestionStem("Contested question")
     .withIsContested(true)
     .please()
@@ -116,7 +118,7 @@ export async function resolveConfirmPopup(confirmed: boolean) {
 }
 
 export function recallPromptWithThinkingTime(thinkingTimeMs: number) {
-  return makeMe.aRecallPrompt
+  return makeMe.aRecallPromptHistoryItem
     .withQuestionStem("Test question")
     .withChoices(["A", "B", "C"])
     .withAnswer({

@@ -72,7 +72,7 @@ Use this for endpoint lookup; open `sdk.gen.ts` or `types.gen.ts` only for exact
 
 ## Recall Prompt Controller
 
-- `regenerate`: POST `/api/recall-prompts/{recallPrompt}/regenerate` -> `RegenerateResponse` (request: `RegenerateData`; path: recallPrompt; body: QuestionContestResult; response body: RecallQuestion)
+- `regenerate`: POST `/api/recall-prompts/{recallPrompt}/regenerate` -> `RegenerateResponse` (request: `RegenerateData`; path: recallPrompt; body: QuestionContestResult; response body: RecallPrompt)
 - `contest`: POST `/api/recall-prompts/{recallPrompt}/contest` -> `ContestResponse` (request: `ContestData`; path: recallPrompt; response body: QuestionContestResult)
 - `answerQuiz`: POST `/api/recall-prompts/{recallPrompt}/answer` -> `AnswerQuizResponse` (request: `AnswerQuizData`; path: recallPrompt; body: AnswerDto; response body: AnsweredQuestion)
 - `answerSpelling`: POST `/api/recall-prompts/{recallPrompt}/answer-spelling` -> `AnswerSpellingResponse` (request: `AnswerSpellingData`; path: recallPrompt; body: AnswerSpellingDto; response body: AnsweredQuestion)
@@ -147,7 +147,7 @@ Use this for endpoint lookup; open `sdk.gen.ts` or `types.gen.ts` only for exact
 - `delete`: DELETE `/api/memory-trackers/{memoryTracker}` -> `DeleteResponse` (request: `DeleteData`; path: memoryTracker; response body: void)
 - `getThresholdExceeded`: GET `/api/memory-trackers/{memoryTracker}/threshold-exceeded` -> `GetThresholdExceededResponse` (request: `GetThresholdExceededData`; path: memoryTracker; response body: ThresholdExceededResult)
 - `getRecallPrompts`: GET `/api/memory-trackers/{memoryTracker}/recall-prompts` -> `GetRecallPromptsResponse` (request: `GetRecallPromptsData`; path: memoryTracker; response body: Array<RecallPromptHistoryItem>)
-- `askAQuestion`: GET `/api/memory-trackers/{memoryTracker}/question` -> `AskAQuestionResponse` (request: `AskAQuestionData`; path: memoryTracker; response body: RecallQuestion)
+- `askAQuestion`: GET `/api/memory-trackers/{memoryTracker}/question` -> `AskAQuestionResponse` (request: `AskAQuestionData`; path: memoryTracker; response body: RecallPrompt)
 - `getRecentlyRecalled`: GET `/api/memory-trackers/recently-recalled` -> `GetRecentlyRecalledResponse` (request: none; response body: Array<MemoryTracker>)
 - `getRecentMemoryTrackers`: GET `/api/memory-trackers/recent` -> `GetRecentMemoryTrackersResponse` (request: none; response body: Array<MemoryTracker>)
 - `deleteUnansweredRecallPrompts`: DELETE `/api/memory-trackers/{memoryTracker}/recall-prompts/unanswered` -> `DeleteUnansweredRecallPromptsResponse` (request: `DeleteUnansweredRecallPromptsData`; path: memoryTracker; response body: void)

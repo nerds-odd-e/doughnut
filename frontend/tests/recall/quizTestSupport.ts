@@ -14,7 +14,7 @@ import helper, {
 import type {
   AnsweredQuestion,
   MemoryTrackerLite,
-  RecallQuestion,
+  RecallPrompt,
 } from "@generated/doughnut-backend-api"
 import { afterEach, beforeEach, vi } from "vitest"
 import { spellingAnswerInputSelector } from "@tests/components/recall/spellingQuestionDisplayTestSupport"
@@ -31,7 +31,7 @@ export const justReviewButtonText = "Yes, I remember"
 export let askAQuestionSpy: ReturnType<typeof mockSdkService>
 export let wrapper: VueWrapper
 
-let recallPrompt: RecallQuestion
+let recallPrompt: RecallPrompt
 
 export function getRecallPrompt() {
   return recallPrompt
@@ -41,7 +41,7 @@ export function setupQuizTests() {
   beforeEach(() => {
     vi.resetAllMocks()
     vi.useFakeTimers()
-    recallPrompt = makeMe.aRecallQuestion.please()
+    recallPrompt = makeMe.aRecallPrompt.please()
     mockSdkService(NoteController, "showNote", makeMe.aNoteRealm.please())
     mockSdkService(
       MemoryTrackerController,
@@ -130,7 +130,7 @@ export async function submitSpellingAnswerFromQuiz(
 }
 
 export function mockSpellingRecallServices(stem = "Spell the word 'cat'") {
-  const spellingRecallPrompt = makeMe.aRecallQuestion
+  const spellingRecallPrompt = makeMe.aRecallPrompt
     .withSpellingStem(stem)
     .please()
   askAQuestionSpy.mockResolvedValue(wrapSdkResponse(spellingRecallPrompt))

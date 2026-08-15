@@ -30,7 +30,7 @@ const createRecallPromptWithAnswer = (opts: {
     .correctAnswerIndex(opts.correctIndex)
     .please()
 
-  return makeMe.aRecallPrompt
+  return makeMe.aRecallPromptHistoryItem
     .withPredefinedQuestion(predefinedQuestion)
     .withAnswer({
       id: 1,
@@ -98,7 +98,7 @@ export const NoteWithManyAncestors: Story = {
 
     return {
       recallPrompts: [
-        makeMe.aRecallPrompt
+        makeMe.aRecallPromptHistoryItem
           .withPredefinedQuestion(predefinedQuestion)
           .withAnswer({
             id: 1,

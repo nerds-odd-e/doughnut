@@ -58,7 +58,7 @@ import type {
   AnswerSpellingDto,
   MemoryTrackerLite,
   AnsweredQuestion,
-  RecallQuestion,
+  RecallPrompt,
 } from "@generated/doughnut-backend-api"
 import {
   MemoryTrackerController,
@@ -89,7 +89,7 @@ const emit = defineEmits<{
 
 // Composable for question fetching logic
 const useQuestionFetching = (props: QuizProps) => {
-  const recallPromptCache = ref<Record<number, RecallQuestion | undefined>>({})
+  const recallPromptCache = ref<Record<number, RecallPrompt | undefined>>({})
   const fetching = ref(false)
   const fetchingMemoryTrackerIds = ref<Set<number>>(new Set())
 

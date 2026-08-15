@@ -4,7 +4,7 @@ import {
   RecallPromptController,
   RecallsController,
 } from 'doughnut-api'
-import type { AnsweredQuestion, NoteRealm, RecallQuestion } from 'doughnut-api'
+import type { AnsweredQuestion, NoteRealm, RecallPrompt } from 'doughnut-api'
 import makeMe from 'doughnut-test-fixtures/makeMe'
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 import { InteractiveCliApp } from '../src/InteractiveCliApp.js'
@@ -54,9 +54,9 @@ export type RecallSpellingInteractiveApi = {
   recallingSpy: ReturnType<typeof vi.spyOn>
   askAQuestionSpy: ReturnType<typeof vi.spyOn>
   answerSpellingSpy: ReturnType<typeof vi.spyOn>
-  pendingSpellingPrompt: () => RecallQuestion
+  pendingSpellingPrompt: () => RecallPrompt
   spellingAnsweredPrompt: (
-    pending: RecallQuestion,
+    pending: RecallPrompt,
     answer: { correct: boolean; spellingAnswer: string }
   ) => AnsweredQuestion
   mockRecallingFirstThenEmpty: () => void
@@ -76,8 +76,8 @@ export function describeRecallSpellingInteractive(
     let answerSpellingSpy: ReturnType<typeof vi.spyOn>
     let spellingFixtureNoteRealm: NoteRealm
 
-    function pendingSpellingPrompt(): RecallQuestion {
-      return makeMe.aRecallQuestion
+    function pendingSpellingPrompt(): RecallPrompt {
+      return makeMe.aRecallPrompt
         .withId(SPELL_PROMPT_ID)
         .withSpellingStem('Spell the title')
         .please()
@@ -91,7 +91,7 @@ export function describeRecallSpellingInteractive(
     }
 
     function spellingAnsweredPrompt(
-      pending: RecallQuestion,
+      pending: RecallPrompt,
       answer: { correct: boolean; spellingAnswer: string }
     ): AnsweredQuestion {
       return makeMe.anAnsweredQuestion

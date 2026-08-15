@@ -17,7 +17,7 @@ describeRecallMcqInteractive((api) => {
     const manyChoicesCount = 15
     api.getRecallPromptsSpy.mockResolvedValue({
       data: [
-        makeMe.aRecallPrompt
+        makeMe.aRecallPromptHistoryItem
           .withId(RECALL_PROMPT_ID)
           .withQuestionStem('Pick one')
           .withChoices(

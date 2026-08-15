@@ -28,7 +28,7 @@ import type { PropType } from "vue"
 import type {
   AnsweredQuestion,
   AnswerDto,
-  RecallQuestion,
+  RecallPrompt,
 } from "@generated/doughnut-backend-api"
 import { RecallPromptController } from "@generated/doughnut-backend-api/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
@@ -44,7 +44,7 @@ const error = ref("")
 
 const props = defineProps({
   recallPrompt: {
-    type: Object as PropType<RecallQuestion>,
+    type: Object as PropType<RecallPrompt>,
     required: true,
   },
   nextIsSpelling: {

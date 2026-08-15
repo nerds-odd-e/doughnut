@@ -5,7 +5,6 @@ import com.odde.doughnut.controllers.dto.AnswerDTO;
 import com.odde.doughnut.controllers.dto.AnswerSpellingDTO;
 import com.odde.doughnut.controllers.dto.AnsweredQuestion;
 import com.odde.doughnut.controllers.dto.QuestionContestResult;
-import com.odde.doughnut.controllers.dto.RecallQuestion;
 import com.odde.doughnut.entities.RecallPrompt;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.AuthorizationService;
@@ -42,7 +41,7 @@ class RecallPromptController {
 
   @PostMapping("/{recallPrompt}/regenerate")
   @Transactional
-  public RecallQuestion regenerate(
+  public com.odde.doughnut.controllers.dto.RecallPrompt regenerate(
       @PathVariable("recallPrompt") @Schema(type = "integer") RecallPrompt recallPrompt,
       @RequestBody QuestionContestResult contestResult)
       throws JsonProcessingException, UnexpectedNoAccessRightException {
@@ -53,7 +52,7 @@ class RecallPromptController {
             recallPrompt.getPredefinedQuestion().getNote(),
             recallPrompt.getPredefinedQuestion().getMcqWithAnswer(),
             recallPrompt);
-    return RecallQuestion.from(regenerated);
+    return com.odde.doughnut.controllers.dto.RecallPrompt.from(regenerated);
   }
 
   @PostMapping("/{recallPrompt}/contest")

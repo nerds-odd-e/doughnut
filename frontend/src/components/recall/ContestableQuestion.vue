@@ -39,7 +39,7 @@
 <script setup lang="ts">
 import type {
   AnsweredQuestion,
-  RecallQuestion,
+  RecallPrompt,
 } from "@generated/doughnut-backend-api"
 import { RecallPromptController } from "@generated/doughnut-backend-api/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
@@ -50,7 +50,7 @@ import RecallPromptComponent from "./RecallPromptComponent.vue"
 import QuestionDisplay from "./QuestionDisplay.vue"
 const props = defineProps({
   recallPrompt: {
-    type: Object as PropType<RecallQuestion>,
+    type: Object as PropType<RecallPrompt>,
     required: true,
   },
   nextIsSpelling: {
@@ -68,7 +68,7 @@ const currentQuestionLegitMessage = ref<string | undefined>(undefined)
 const currentQuestion = ref(props.recallPrompt)
 const prevQuestions = ref<
   {
-    quizeQuestion: RecallQuestion
+    quizeQuestion: RecallPrompt
     badQuestionReason: string | undefined
   }[]
 >([])

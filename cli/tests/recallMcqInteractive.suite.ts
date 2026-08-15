@@ -8,7 +8,7 @@ import type {
   AnsweredQuestion,
   NoteRealm,
   RecallPromptHistoryItem,
-  RecallQuestion,
+  RecallPrompt,
 } from 'doughnut-api'
 import makeMe from 'doughnut-test-fixtures/makeMe'
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
@@ -62,7 +62,7 @@ export type RecallMcqInteractiveApi = {
     id?: number,
     stem?: string,
     choices?: string[]
-  ) => RecallQuestion
+  ) => RecallPrompt
   mcqAnsweredPrompt: (
     pending: RecallPromptHistoryItem,
     answer: { id: number; correct: boolean; choiceIndex: number },
@@ -89,7 +89,7 @@ export function describeRecallMcqInteractive(
     let mcqFixtureNoteRealm: NoteRealm
 
     function pendingMcqPrompt(): RecallPromptHistoryItem {
-      return makeMe.aRecallPrompt
+      return makeMe.aRecallPromptHistoryItem
         .withId(RECALL_PROMPT_ID)
         .withQuestionStem('Choose **Alpha**?')
         .withChoices(['First', '**Beta**', 'Third'])
@@ -100,8 +100,8 @@ export function describeRecallMcqInteractive(
       id = RECALL_PROMPT_ID,
       stem = 'Choose **Alpha**?',
       choices: string[] = ['First', '**Beta**', 'Third']
-    ): RecallQuestion {
-      return makeMe.aRecallQuestion
+    ): RecallPrompt {
+      return makeMe.aRecallPrompt
         .withId(id)
         .withQuestionStem(stem)
         .withChoices(choices)

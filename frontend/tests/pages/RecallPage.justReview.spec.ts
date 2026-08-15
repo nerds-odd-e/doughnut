@@ -38,7 +38,7 @@ describe('RecallPage "just review" quiz', () => {
     askAQuestionSpy = mockSdkService(
       MemoryTrackerController,
       "askAQuestion",
-      makeMe.aRecallQuestion.please()
+      makeMe.aRecallPrompt.please()
     )
     askAQuestionSpy.mockResolvedValueOnce(wrapSdkError("API Error"))
     vi.mocked(useRecallData).mockReturnValue(
@@ -70,7 +70,7 @@ describe('RecallPage "just review" quiz', () => {
       makeMe.aMemoryTracker.please()
     )
     askAQuestionSpy.mockResolvedValueOnce(
-      wrapSdkResponse(makeMe.aRecallQuestion.please())
+      wrapSdkResponse(makeMe.aRecallPrompt.please())
     )
     vi.runOnlyPendingTimers()
     await flushPromises()

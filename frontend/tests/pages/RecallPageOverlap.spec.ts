@@ -38,7 +38,7 @@ describe("overlap try-again stay and retry", () => {
     askAQuestionSpy = mockSdkService(
       MemoryTrackerController,
       "askAQuestion",
-      makeMe.aRecallQuestion.withSpellingStem("Spell").please()
+      makeMe.aRecallPrompt.withSpellingStem("Spell").please()
     )
     getThresholdExceededSpy = mockSdkService(
       MemoryTrackerController,

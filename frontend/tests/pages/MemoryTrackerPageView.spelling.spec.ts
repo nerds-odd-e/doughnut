@@ -14,7 +14,7 @@ describe("MemoryTrackerPageView spelling prompts", () => {
   it("shows spelling details-not-needed message when unanswered", async () => {
     const wrapper = await mountMemoryTrackerPageViewReady({
       recallPrompts: [
-        makeMe.aRecallPrompt.withQuestionType("SPELLING").please(),
+        makeMe.aRecallPromptHistoryItem.withQuestionType("SPELLING").please(),
       ],
     })
 
@@ -24,7 +24,7 @@ describe("MemoryTrackerPageView spelling prompts", () => {
   it("displays spelling answer and Correct result when answered correctly", async () => {
     const wrapper = await mountMemoryTrackerPageViewReady({
       recallPrompts: [
-        makeMe.aRecallPrompt
+        makeMe.aRecallPromptHistoryItem
           .withQuestionType("SPELLING")
           .withAnswer({
             id: 1,
@@ -45,7 +45,7 @@ describe("MemoryTrackerPageView spelling prompts", () => {
   it("displays Incorrect result when spelling answer is wrong", async () => {
     const wrapper = await mountMemoryTrackerPageViewReady({
       recallPrompts: [
-        makeMe.aRecallPrompt
+        makeMe.aRecallPromptHistoryItem
           .withQuestionType("SPELLING")
           .withAnswer({
             id: 1,
@@ -65,7 +65,7 @@ describe("MemoryTrackerPageView spelling prompts", () => {
   it("does not show multiple-choice question UI for spelling prompts", async () => {
     const wrapper = await mountMemoryTrackerPageViewReady({
       recallPrompts: [
-        makeMe.aRecallPrompt.withQuestionType("SPELLING").please(),
+        makeMe.aRecallPromptHistoryItem.withQuestionType("SPELLING").please(),
       ],
     })
 

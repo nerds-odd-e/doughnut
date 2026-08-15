@@ -64,7 +64,7 @@ describe("MemoryTrackerPageView display", () => {
   it("does not display thinking time for unanswered questions", async () => {
     const wrapper = await mountMemoryTrackerPageViewReady({
       recallPrompts: [
-        makeMe.aRecallPrompt
+        makeMe.aRecallPromptHistoryItem
           .withQuestionStem("Test question")
           .withChoices(["A", "B", "C"])
           .please(),
@@ -85,8 +85,8 @@ describe("MemoryTrackerPageView display", () => {
   it("shows note under question only once", async () => {
     const wrapper = await mountMemoryTrackerPageViewReady({
       recallPrompts: [
-        makeMe.aRecallPrompt.please(),
-        makeMe.aRecallPrompt.please(),
+        makeMe.aRecallPromptHistoryItem.please(),
+        makeMe.aRecallPromptHistoryItem.please(),
       ],
     })
 
@@ -97,7 +97,7 @@ describe("MemoryTrackerPageView display", () => {
     const questionGeneratedTime = new Date("2024-01-01T10:00:00Z").toISOString()
     const wrapper = await mountMemoryTrackerPageViewReady({
       recallPrompts: [
-        makeMe.aRecallPrompt
+        makeMe.aRecallPromptHistoryItem
           .withQuestionGeneratedTime(questionGeneratedTime)
           .please(),
       ],
@@ -111,7 +111,9 @@ describe("MemoryTrackerPageView display", () => {
 
   it("shows contested badge for contested questions", async () => {
     const wrapper = await mountMemoryTrackerPageViewReady({
-      recallPrompts: [makeMe.aRecallPrompt.withIsContested(true).please()],
+      recallPrompts: [
+        makeMe.aRecallPromptHistoryItem.withIsContested(true).please(),
+      ],
     })
 
     expect(wrapper.text()).toContain("Contested")
@@ -121,7 +123,7 @@ describe("MemoryTrackerPageView display", () => {
     const answerTime = new Date("2024-01-01T12:00:00Z").toISOString()
     const wrapper = await mountMemoryTrackerPageViewReady({
       recallPrompts: [
-        makeMe.aRecallPrompt
+        makeMe.aRecallPromptHistoryItem
           .withAnswerTime(answerTime)
           .withAnswer({ id: 1, correct: true, choiceIndex: 0 })
           .withPredefinedQuestion(makeMe.aPredefinedQuestion.please())
@@ -135,7 +137,7 @@ describe("MemoryTrackerPageView display", () => {
 
   it("shows unanswered status for unanswered questions", async () => {
     const wrapper = await mountMemoryTrackerPageViewReady({
-      recallPrompts: [makeMe.aRecallPrompt.please()],
+      recallPrompts: [makeMe.aRecallPromptHistoryItem.please()],
     })
 
     expect(wrapper.text()).toContain("Unanswered")

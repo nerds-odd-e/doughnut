@@ -32,7 +32,9 @@ describe("MemoryTrackerPage", () => {
     const { getRecallPromptsSpy, showMemoryTrackerSpy } =
       mockMemoryTrackerPageApis({
         recallPrompts: [
-          makeMe.aRecallPrompt.withQuestionStem("Loaded question").please(),
+          makeMe.aRecallPromptHistoryItem
+            .withQuestionStem("Loaded question")
+            .please(),
         ],
       })
     const wrapper = mountMemoryTrackerPage()
@@ -90,7 +92,7 @@ describe("MemoryTrackerPage", () => {
       .please()
 
     mockMemoryTrackerPageApis({
-      recallPrompts: [makeMe.aRecallPrompt.please()],
+      recallPrompts: [makeMe.aRecallPromptHistoryItem.please()],
       memoryTracker: skippedTracker,
     })
     mockShowMemoryTrackerSequence(skippedTracker, activeTracker)

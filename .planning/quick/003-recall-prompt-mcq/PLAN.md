@@ -42,18 +42,13 @@ and page-object helpers still say quiz/question (later leftover).
 
 ### 2. Ask type is RecallPrompt
 
-- **Status:** planned
+- **Status:** done
 - **Type:** Behavior
-- **Pre:** A due memory tracker.
-- **Trigger:** Client asks for the next ask payload (`GET .../question` still).
-- **Post:** OpenAPI/SDK type is **`RecallPrompt`**, not `RecallQuestion`. JSON
-  shape and path are unchanged (stem+choices or spelling stem; no solution).
 
-Delete `RecallQuestion` / `.from`. Regen client; fix compile. Leave
-`askAQuestion` and `/question`.
-
-**Tests:** `MemoryTrackerAskQuestionControllerTest`; frontend/CLI compile
-against the new type.
+Shipped: unanswered-ask OpenAPI/SDK type is **`RecallPrompt`** (DTO
+`controllers.dto.RecallPrompt`; entity unchanged). JSON shape and
+`GET .../question` / `askAQuestion` unchanged. `makeMe.aRecallPrompt` builds
+the ask payload; history is `makeMe.aRecallPromptHistoryItem`.
 
 ### 3. Ask path is recall-prompt
 
@@ -203,3 +198,4 @@ note MCQ E2E; regen compile.
 ## Learnings
 
 - Slice 1: leftover `quiz` in feature filenames and `visitRecallPageAndWaitForQuestion` stay until a later wording slice; not this step.
+- Slice 2: `makeMe.aRecallPrompt` is the unanswered-ask DTO; history items are `makeMe.aRecallPromptHistoryItem`. `RecallQuestionService` and CLI `RecallQuestionAnswerOutcome` wait for later slices.

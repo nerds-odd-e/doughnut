@@ -52,7 +52,7 @@ describe("RecallPage frequent failure warning", () => {
     mockSdkService(
       MemoryTrackerController,
       "askAQuestion",
-      makeMe.aRecallQuestion.please()
+      makeMe.aRecallPrompt.please()
     )
     getThresholdExceededSpy = mockSdkService(
       MemoryTrackerController,

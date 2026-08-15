@@ -262,7 +262,7 @@ export type QuestionContestResult = {
     rejected?: boolean;
 };
 
-export type RecallQuestion = {
+export type RecallPrompt = {
     id: number;
     notebook: Notebook;
     multipleChoicesQuestion?: MultipleChoicesQuestion;
@@ -1735,7 +1735,7 @@ export type RegenerateResponses = {
     /**
      * OK
      */
-    200: RecallQuestion;
+    200: RecallPrompt;
 };
 
 export type RegenerateResponse = RegenerateResponses[keyof RegenerateResponses];
@@ -3644,7 +3644,7 @@ export type AskAQuestionResponses = {
     /**
      * OK
      */
-    200: RecallQuestion;
+    200: RecallPrompt;
 };
 
 export type AskAQuestionResponse = AskAQuestionResponses[keyof AskAQuestionResponses];

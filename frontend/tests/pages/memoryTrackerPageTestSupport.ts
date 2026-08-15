@@ -16,7 +16,7 @@ export function mockMemoryTrackerPageApis(options?: {
   memoryTracker?: MemoryTracker
 }) {
   const recallPrompts = options?.recallPrompts ?? [
-    makeMe.aRecallPrompt.please(),
+    makeMe.aRecallPromptHistoryItem.please(),
   ]
   const memoryTracker = options?.memoryTracker ?? makeMe.aMemoryTracker.please()
   const getRecallPromptsSpy = mockSdkService(

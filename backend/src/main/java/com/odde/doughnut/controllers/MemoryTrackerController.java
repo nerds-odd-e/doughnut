@@ -1,7 +1,6 @@
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.dto.RecallPromptHistoryItem;
-import com.odde.doughnut.controllers.dto.RecallQuestion;
 import com.odde.doughnut.controllers.dto.ThresholdExceededResult;
 import com.odde.doughnut.controllers.dto.UpdateMemoryTrackerPropertyKeyDTO;
 import com.odde.doughnut.entities.MemoryTracker;
@@ -44,7 +43,7 @@ class MemoryTrackerController {
 
   @GetMapping("/{memoryTracker}/question")
   @Transactional
-  public RecallQuestion askAQuestion(
+  public com.odde.doughnut.controllers.dto.RecallPrompt askAQuestion(
       @PathVariable("memoryTracker") @Schema(type = "integer") MemoryTracker memoryTracker)
       throws UnexpectedNoAccessRightException {
     authorizationService.assertLoggedIn();
@@ -55,7 +54,7 @@ class MemoryTrackerController {
     } else {
       recallPrompt = recallQuestionService.generateAQuestion(memoryTracker);
     }
-    return RecallQuestion.from(recallPrompt);
+    return com.odde.doughnut.controllers.dto.RecallPrompt.from(recallPrompt);
   }
 
   @GetMapping("/{memoryTracker}/threshold-exceeded")

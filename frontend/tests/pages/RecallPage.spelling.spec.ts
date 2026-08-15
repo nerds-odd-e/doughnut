@@ -45,7 +45,7 @@ describe("RecallPage spelling quiz", () => {
     mockSdkService(
       MemoryTrackerController,
       "askAQuestion",
-      makeMe.aRecallQuestion.please()
+      makeMe.aRecallPrompt.please()
     )
     vi.mocked(useRecallData).mockReturnValue(
       createUseRecallDataMock({

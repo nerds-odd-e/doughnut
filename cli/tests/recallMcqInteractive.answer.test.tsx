@@ -81,7 +81,7 @@ describeRecallMcqInteractive((api) => {
     const SECOND_PROMPT_ID = 99
     const secondStem = 'SECOND_MCQ_LOADING_NEXT_UNIQUE'
     const pending = pendingMcqPrompt()
-    const secondPrompt = makeMe.aRecallPrompt
+    const secondPrompt = makeMe.aRecallPromptHistoryItem
       .withId(SECOND_PROMPT_ID)
       .withQuestionStem(secondStem)
       .withChoices(['X', 'Y', 'Z'])
@@ -168,7 +168,7 @@ describeRecallMcqInteractive((api) => {
     const SECOND_PROMPT_ID = 99
     const secondStem = 'SECOND_MCQ_STEM_UNIQUE'
     const pending = pendingMcqPrompt()
-    const secondPrompt = makeMe.aRecallPrompt
+    const secondPrompt = makeMe.aRecallPromptHistoryItem
       .withId(SECOND_PROMPT_ID)
       .withQuestionStem(secondStem)
       .withChoices(['X', 'Y', 'Z'])

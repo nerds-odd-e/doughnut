@@ -16,7 +16,7 @@ import {
   MemoryTrackerController,
   RecallPromptController,
   type AnsweredQuestion,
-  type RecallQuestion,
+  type RecallPrompt,
 } from 'doughnut-api'
 import { BorderedSingleLinePromptInputInk } from '../../commonUIComponents/borderedSingleLinePromptInputInk.js'
 import { renderMarkdownToTerminal } from '../../markdown.js'
@@ -47,7 +47,7 @@ async function fetchSpellingRecallPrompt(
   memoryTrackerId: number,
   signal?: AbortSignal
 ): Promise<{ readonly recallPromptId: number; readonly stemMarkdown: string }> {
-  const prompt = await runDefaultBackendJson<RecallQuestion>(() =>
+  const prompt = await runDefaultBackendJson<RecallPrompt>(() =>
     MemoryTrackerController.askAQuestion({
       path: { memoryTracker: memoryTrackerId },
       ...doughnutSdkOptions(signal),

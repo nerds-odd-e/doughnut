@@ -4,7 +4,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import com.odde.doughnut.controllers.dto.RecallQuestion;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.RecallPrompt;
@@ -41,9 +40,10 @@ class MemoryTrackerAskQuestionControllerTest extends MemoryTrackerControllerTest
   @Test
   void shouldReturnSpellingRecallPromptForSpellingMemoryTracker()
       throws UnexpectedNoAccessRightException {
-    RecallQuestion recallQuestion = controller.askAQuestion(spellingTracker());
-    assertThat(recallQuestion.getSpellingQuestion(), notNullValue());
-    assertThat(recallQuestion.getMultipleChoicesQuestion(), nullValue());
+    com.odde.doughnut.controllers.dto.RecallPrompt recallPrompt =
+        controller.askAQuestion(spellingTracker());
+    assertThat(recallPrompt.getSpellingQuestion(), notNullValue());
+    assertThat(recallPrompt.getMultipleChoicesQuestion(), nullValue());
   }
 
   @Test

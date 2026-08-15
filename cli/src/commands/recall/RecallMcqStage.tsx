@@ -14,7 +14,7 @@ import {
   RecallPromptController,
   type QuestionContestResult,
   type AnsweredQuestion,
-  type RecallQuestion,
+  type RecallPrompt,
 } from 'doughnut-api'
 import {
   choiceIndexFromSelectListSubmitLine,
@@ -43,7 +43,7 @@ import {
 } from './recallBusyInputCopy.js'
 import { numberedMcqMarkdownLinesForTerminal } from './numberedMcqMarkdownLines.js'
 import {
-  recallMcqPayloadFromRecallQuestion,
+  recallMcqPayloadFromRecallPrompt,
   type RecallCard,
   type RecallMcqCardPayload,
 } from './nextRecallCardLoad.js'
@@ -138,17 +138,14 @@ export async function contestAndRegenerateMcq(
     const message = contestResult.advice?.trim() || CONTEST_REJECTED_FALLBACK
     return { outcome: 'rejected', message }
   }
-  const regenerated = await runDefaultBackendJson<RecallQuestion>(() =>
+  const regenerated = await runDefaultBackendJson<RecallPrompt>(() =>
     RecallPromptController.regenerate({
       path: { recallPrompt: currentRecallPromptId },
       body: contestResult,
       ...doughnutSdkOptions(signal),
     })
   )
-  const mapped = recallMcqPayloadFromRecallQuestion(
-    memoryTrackerId,
-    regenerated
-  )
+  const mapped = recallMcqPayloadFromRecallPrompt(memoryTrackerId, regenerated)
   if (mapped === null) {
     throw new Error('Regenerated recall prompt is not a pending MCQ.')
   }

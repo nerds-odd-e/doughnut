@@ -88,7 +88,7 @@ describeRecallSpellingInteractive((api) => {
   test('after first spelling answer, shows loading spelling until second question loads', async () => {
     const secondStem = 'Second spell stem loading next unique'
     const pending1 = pendingSpellingPrompt()
-    const pending2 = makeMe.aRecallQuestion
+    const pending2 = makeMe.aRecallPrompt
       .withId(SPELL_PROMPT_ID_2)
       .withSpellingStem(secondStem)
       .please()

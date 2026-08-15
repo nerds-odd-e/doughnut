@@ -5,7 +5,7 @@ import {
   type MemoryTracker,
   type MemoryTrackerLite,
   type RecallPromptHistoryItem,
-  type RecallQuestion,
+  type RecallPrompt,
 } from 'doughnut-api'
 import {
   doughnutSdkOptions,
@@ -93,7 +93,7 @@ function firstPendingMcq(
 function recallMcqPayload(
   memoryTrackerId: number,
   recallPromptId: number,
-  multipleChoicesQuestion: RecallQuestion['multipleChoicesQuestion'],
+  multipleChoicesQuestion: RecallPrompt['multipleChoicesQuestion'],
   notebookName: string
 ): RecallMcqCardPayload | null {
   const choices = multipleChoicesQuestion?.responseChoices
@@ -107,9 +107,9 @@ function recallMcqPayload(
   }
 }
 
-export function recallMcqPayloadFromRecallQuestion(
+export function recallMcqPayloadFromRecallPrompt(
   memoryTrackerId: number,
-  prompt: RecallQuestion
+  prompt: RecallPrompt
 ): RecallMcqCardPayload | null {
   return recallMcqPayload(
     memoryTrackerId,
@@ -146,17 +146,14 @@ async function tryLoadMcqPayload(
   const mcqPrompt = firstPendingMcq(existingPrompts)
   if (mcqPrompt === undefined) {
     try {
-      const asked = await runDefaultBackendJson<RecallQuestion>(() =>
+      const asked = await runDefaultBackendJson<RecallPrompt>(() =>
         MemoryTrackerController.askAQuestion({
           path: { memoryTracker: memoryTrackerId },
           ...doughnutSdkOptions(signal),
         })
       )
       if (asked.multipleChoicesQuestion != null) {
-        const mapped = recallMcqPayloadFromRecallQuestion(
-          memoryTrackerId,
-          asked
-        )
+        const mapped = recallMcqPayloadFromRecallPrompt(memoryTrackerId, asked)
         if (mapped !== null) {
           return mapped
         }
@@ -203,7 +200,7 @@ export async function loadRecallCardForMemoryTrackerId(
 ): Promise<RecallCard> {
   if (spelling) {
     try {
-      const prompt = await runDefaultBackendJson<RecallQuestion>(() =>
+      const prompt = await runDefaultBackendJson<RecallPrompt>(() =>
         MemoryTrackerController.askAQuestion({
           path: { memoryTracker: memoryTrackerId },
           ...doughnutSdkOptions(signal),

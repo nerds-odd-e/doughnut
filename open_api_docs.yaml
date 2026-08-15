@@ -565,7 +565,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/RecallQuestion"
+                $ref: "#/components/schemas/RecallPrompt"
   /api/recall-prompts/{recallPrompt}/contest:
     post:
       tags:
@@ -2786,7 +2786,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/RecallQuestion"
+                $ref: "#/components/schemas/RecallPrompt"
   /api/memory-trackers/recently-recalled:
     get:
       tags:
@@ -3702,7 +3702,7 @@ components:
           type: string
         rejected:
           type: boolean
-    RecallQuestion:
+    RecallPrompt:
       type: object
       properties:
         id:

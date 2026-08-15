@@ -75,8 +75,12 @@ describe("MemoryTrackerPageView delete unanswered", () => {
     {
       label: "multiple prompts",
       recallPrompts: [
-        makeMe.aRecallPrompt.withQuestionStem("Unanswered question 1").please(),
-        makeMe.aRecallPrompt.withQuestionStem("Unanswered question 2").please(),
+        makeMe.aRecallPromptHistoryItem
+          .withQuestionStem("Unanswered question 1")
+          .please(),
+        makeMe.aRecallPromptHistoryItem
+          .withQuestionStem("Unanswered question 2")
+          .please(),
       ],
       expectedMessage:
         "Are you sure you want to delete 2 unanswered recall prompts?",
