@@ -25,8 +25,8 @@ final class QuestionGenerationBatchRowImportAtomicTestSupport {
         .executeUpdate();
     entityManager
         .createNativeQuery(
-            "DELETE pq FROM predefined_question pq "
-                + "INNER JOIN note n ON pq.note_id = n.id "
+            "DELETE mcq FROM mcq "
+                + "INNER JOIN note n ON mcq.note_id = n.id "
                 + "INNER JOIN notebook nb ON n.notebook_id = nb.id "
                 + "INNER JOIN ownership o ON nb.ownership_id = o.id "
                 + "INNER JOIN user u ON o.user_id = u.id "

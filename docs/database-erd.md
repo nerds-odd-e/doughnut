@@ -17,6 +17,7 @@ erDiagram
     folder ||--o{ "note" : "folder_id ON DELETE SET NULL"
     image ||--o{ "note" : "image_id ON DELETE CASCADE"
     learning_session ||--o{ session_item : "learning_session_id ON DELETE CASCADE"
+    mcq ||--o{ recall_prompt : "mcq_id ON DELETE NO ACTION"
     memory_tracker ||--o{ question_generation_batch_request : "memory_tracker_id ON DELETE CASCADE"
     memory_tracker ||--o{ quiz_answer : "confusion_adjusted_memory_tracker_id ON DELETE SET NULL"
     memory_tracker ||--o{ recall_prompt : "memory_tracker_id ON DELETE CASCADE"
@@ -25,6 +26,7 @@ erDiagram
     "note" ||--o{ assimilation_sequence_skip : "note_id ON DELETE CASCADE"
     "note" ||--o{ conversation : "note_id ON DELETE NO ACTION"
     "note" ||--o{ image : "note_id ON DELETE SET NULL"
+    "note" ||--o{ mcq : "note_id ON DELETE CASCADE"
     "note" ||--o{ memory_tracker : "note_id ON DELETE CASCADE"
     "note" ||--o{ note_alias_index : "note_id ON DELETE CASCADE"
     "note" ||--o{ note_creator : "note_id ON DELETE CASCADE"
@@ -32,7 +34,6 @@ erDiagram
     "note" ||--o{ note_property_index : "target_note_id ON DELETE SET NULL"
     "note" ||--o{ note_wiki_title_cache : "note_id ON DELETE CASCADE"
     "note" ||--o{ note_wiki_title_cache : "target_note_id ON DELETE CASCADE"
-    "note" ||--o{ predefined_question : "note_id ON DELETE CASCADE"
     notebook ||--o{ bazaar_notebook : "notebook_id ON DELETE NO ACTION"
     notebook ||--o{ book : "notebook_id ON DELETE CASCADE"
     notebook ||--o{ folder : "notebook_id ON DELETE CASCADE"
@@ -44,7 +45,6 @@ erDiagram
     ownership ||--o{ conversation : "subject_ownership_id ON DELETE NO ACTION"
     ownership ||--o{ notebook : "ownership_id ON DELETE CASCADE"
     ownership ||--o{ notebook_group : "ownership_id ON DELETE CASCADE"
-    predefined_question ||--o{ recall_prompt : "predefined_question_id ON DELETE NO ACTION"
     question_generation_batch ||--o{ question_generation_batch_request : "batch_id ON DELETE CASCADE"
     quiz_answer ||--o{ recall_prompt : "quiz_answer_id ON DELETE NO ACTION"
     recall_prompt ||--o{ conversation : "recall_prompt_id ON DELETE SET NULL"
@@ -146,6 +146,10 @@ erDiagram
         int user_id FK
         int notebook_id FK
     }
+    mcq {
+        int id PK
+        int note_id FK
+    }
     memory_tracker {
         int id PK
         int user_id FK
@@ -193,10 +197,6 @@ erDiagram
         int user_id UK FK
         int circle_id UK FK
     }
-    predefined_question {
-        int id PK
-        int note_id FK
-    }
     question_generation_batch {
         int id PK
         int user_id FK
@@ -217,7 +217,7 @@ erDiagram
     recall_prompt {
         int id PK
         int memory_tracker_id FK
-        int predefined_question_id FK
+        int mcq_id FK
         int quiz_answer_id FK
     }
     session_item {

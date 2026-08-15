@@ -15,7 +15,7 @@ import lombok.EqualsAndHashCode;
 @Entity
 @Data
 @EqualsAndHashCode(callSuper = false)
-@Table(name = "predefined_question")
+@Table(name = "mcq")
 public class Mcq extends EntityIdentifiedByIdOnly {
   @ManyToOne(cascade = CascadeType.DETACH)
   @JoinColumn(name = "note_id", referencedColumnName = "id")

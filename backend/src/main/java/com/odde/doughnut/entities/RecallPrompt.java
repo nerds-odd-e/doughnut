@@ -31,7 +31,7 @@ public class RecallPrompt extends EntityIdentifiedByIdOnly {
   private MemoryTracker memoryTracker;
 
   @ManyToOne
-  @JoinColumn(name = "predefined_question_id", referencedColumnName = "id")
+  @JoinColumn(name = "mcq_id", referencedColumnName = "id")
   private Mcq mcq;
 
   @OneToOne(cascade = CascadeType.ALL)

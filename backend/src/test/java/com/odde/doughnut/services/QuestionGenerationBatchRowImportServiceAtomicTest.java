@@ -150,7 +150,7 @@ class QuestionGenerationBatchRowImportServiceAtomicTest {
 
   private long countMcqsForNote(int noteId) {
     return entityManager
-        .createQuery("SELECT COUNT(pq) FROM Mcq pq WHERE pq.note.id = :noteId", Long.class)
+        .createQuery("SELECT COUNT(mcq) FROM Mcq mcq WHERE mcq.note.id = :noteId", Long.class)
         .setParameter("noteId", noteId)
         .getSingleResult();
   }

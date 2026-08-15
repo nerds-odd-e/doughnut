@@ -6,9 +6,9 @@ current_phase: null
 current_phase_name: null
 status: executing
 stopped_at: null
-last_updated: "2026-08-15T04:20:00Z"
+last_updated: "2026-08-15T04:45:00Z"
 last_activity: 2026-08-15
-last_activity_desc: 003-recall-prompt-mcq slice 9 done; next is slice 10 (Table is mcq)
+last_activity_desc: 003-recall-prompt-mcq slice 10 done; next is slice 11 (Table is answer)
 progress:
   total_phases: 0
   completed_phases: 0
@@ -27,7 +27,7 @@ See: `.planning/PROJECT.md`
 
 ## Current Position
 
-Executing [`.planning/quick/003-recall-prompt-mcq/PLAN.md`](quick/003-recall-prompt-mcq/PLAN.md) — slices 1–9 done; next slice 10 (Table is mcq). Align Quiz/question leftovers to ADR 0001 (**recall prompt** HAS_A **MCQ**; minimum DTO).
+Executing [`.planning/quick/003-recall-prompt-mcq/PLAN.md`](quick/003-recall-prompt-mcq/PLAN.md) — slices 1–10 done; next slice 11 (Table is answer). Align Quiz/question leftovers to ADR 0001 (**recall prompt** HAS_A **MCQ**; minimum DTO).
 
 **Ops leftover:** gated dummy-skip conversions. Enable on the deploy that first applies each version, then revert to `1=0`:
 - `dummy_note_sequence_skip_convert` (`V300000254`)
@@ -40,6 +40,6 @@ JDBC harnesses remain temporary until those production applications.
 
 ## Operator Next Steps
 
-- Continue [`.planning/quick/003-recall-prompt-mcq/PLAN.md`](quick/003-recall-prompt-mcq/PLAN.md) — next: slice 10 Table is mcq
+- Continue [`.planning/quick/003-recall-prompt-mcq/PLAN.md`](quick/003-recall-prompt-mcq/PLAN.md) — next: slice 11 Table is answer
 - Enable dummy-skip conversion placeholders on the deploys that first apply V300000254 / V300000255
 - Continue ADR 0003: resolve open issues in `.planning/research/FSRS-COMPATIBILITY-GAP.md`

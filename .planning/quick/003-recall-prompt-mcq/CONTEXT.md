@@ -1,6 +1,6 @@
 # Recall prompt / MCQ alignment — context
 
-**Status:** executing (slices 1–9 done)  
+**Status:** executing (slices 1–10 done)  
 **Glossary:** Proposed [ADR 0001](../../../docs/adrs/0001-ubiquitous-language.md), [ADR 0003](../../../docs/adrs/0003-spaced-repetition-scheduling-policy.md)
 
 ## Requirement
@@ -10,8 +10,8 @@ match persistence intent:
 
 - **Recall prompt** — one ask during recall for a memory tracker (`recall_prompt`).
   Kinds: **spelling** (no MCQ) or **MCQ** (the prompt **HAS_A** an MCQ).
-- **MCQ** — persisted multiple-choice content on a note (today’s
-  `predefined_question`). **Contested** / **contest** belong to the MCQ.
+- **MCQ** — persisted multiple-choice content on a note (`mcq`).
+  **Contested** / **contest** belong to the MCQ.
   Origin (AI vs manual) is not a prompt kind.
 
 **Just review** is a method of **recall** (self-evaluate after seeing the note),
@@ -38,7 +38,7 @@ URL (contest is triggered while viewing a prompt; the flag lives on the MCQ).
 | Glossary | Persistence | Code / API | Tests / UI leftovers |
 |----------|-------------|------------|----------------------|
 | Recall prompt | `recall_prompt` | Entity `RecallPrompt`; DTO **`RecallPrompt`**; `GET .../recall-prompt` `getRecallPrompt`; `RecallQuestionService`; `Quiz.vue` (file name out of scope) | E2E due recall prompt |
-| MCQ | `predefined_question` | Type **`Mcq`**; `/api/mcqs`; answered JSON **`mcq`** | nested path leftovers `*-question*` |
+| MCQ | `mcq` | Type **`Mcq`**; `/api/mcqs`; answered JSON **`mcq`** | nested path leftovers `*-question*` |
 | Answer | `quiz_answer` | Entity `Answer`; SDK **`answer`** | |
 | MCQ stem+choices | JSON in `raw_json_question` | `MultipleChoicesQuestion` | |
 | AI generate/refine | (same rows) | `MCQWithAnswer` | |
