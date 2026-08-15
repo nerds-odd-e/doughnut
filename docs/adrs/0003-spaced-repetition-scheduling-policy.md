@@ -65,9 +65,39 @@ particular crate or version.
 
 This Decision does not by itself change today’s strength index, interval
 table, or due times. Later Decisions say when the implementation consumes
-Difficulty/Stability and which product knobs (retention, grades, overdue
-reward) follow. Until then, a smaller compatible algorithm on the existing
-model remains allowed.
+Difficulty/Stability and which remaining product knobs (retention, grades)
+follow. Until then, a smaller compatible algorithm on the existing model
+remains allowed.
+
+### Remaining FSRS gaps close by vertical slice
+
+Until the scheduler matches the locked open-FSRS-compatible shape, close
+one remaining gap at a time as **one observable schedule behavior**. Change
+structure only when that behavior needs it, including replacing the
+strength index or interval table already in use. Do not add Difficulty,
+Stability, lapses, requested retention, or a RecallLog solely for later
+slices.
+
+### Overdue correct recall: bounded extra growth
+
+A correct recall after more elapsed whole hours than the tracker's current
+interval must result in a next interval **strictly longer** than the same
+correct recall at that current interval (same thinking-time input). The
+extra growth is driven by observed elapsed time relative to the current
+interval (the stand-in for low Retrievability until Stability is
+persisted). It is not driven by how late the tracker was relative to
+`nextRecallAt`.
+
+The extra is **bounded**: further delay must not increase the next interval
+without limit. A linear lateness bonus is not allowed.
+
+This Decision does not add Difficulty, Stability, or requested retention.
+The current strength index and interval table remain the structure in use.
+Exact increment math is an implementation detail; policy tests assert the
+observable schedule movement.
+
+Commissioned Tutor scores stay score-driven (Working draft). They do not
+inherit this elapsed-time extra until a later Decision says they do.
 
 ### Whole-hour elapsed-time precision
 
@@ -183,9 +213,8 @@ special spelling results into boolean correct/incorrect.
    answer instant.
 2. Do not reduce learned memory strength solely because the answer was early or
    overdue.
-3. A correct overdue recall is successful retention over a longer observed
-   interval. Its memory-strength result must be no worse than the same correct
-   recall at the planned time. Any lateness bonus may be bounded.
+3. Overdue correct extra growth is locked in Decision (**Overdue correct
+   recall: bounded extra growth**). The floor remains: no worse than on-time.
 4. A correct early recall may grow less than an on-time recall because it
    demonstrates retention over a shorter interval, but must not reset learning
    or make the tracker immediately due.
@@ -292,7 +321,11 @@ assert the resulting schedule movement, not the internal measure.
 - The destination scheduler is open-FSRS-compatible and Doughnut-owned;
   it is not an FSRS library. Today’s index and table may remain until a
   later Decision consumes Difficulty/Stability.
+- Remaining FSRS gaps close one observable behavior at a time; no unused
+  Difficulty, Stability, lapse, retention, or RecallLog structure.
 - Busy users are judged on demonstrated recall, not schedule compliance.
+- A correct overdue recall schedules further out than the same on-time
+  recall, with a bound so backlog cannot explode the next interval.
 - Correct overdue recalls must not create a positive-feedback workload loop.
 - A spelling memory tracker is extra title practice the learner opts into; it
   does not consume assimilation due or the daily assimilation target.
@@ -360,6 +393,17 @@ does not need.
 
 Accepted (Decision above). Semantics-only (“this ADR does not require
 FSRS”) left the destination model unnamed.
+
+### Overdue correct equals on-time increment only
+
+Rejected as the destination: FSRS rewards successful retention over a
+longer observed interval with bounded extra growth. The no-penalty floor
+remains; the extra is now required.
+
+### Linear lateness bonus (SM-2-style)
+
+Rejected: extra growth must converge, and must follow elapsed time vs the
+current interval, not queue deviation from `nextRecallAt`.
 
 ### Apply the policy to the existing Doughnut model first
 

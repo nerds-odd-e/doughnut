@@ -36,10 +36,10 @@ JDBC harnesses remain temporary until those production applications.
 
 **Recently shipped:** Unanswered recall-prompt history omits the MCQ solution; nested `/api/mcqs` routes are `/{note}`, `/refine`, `/generate`, `/export` (no `question` segment). Recall prompt / MCQ noun alignment (OpenAPI `Mcq`, `/api/mcqs`, tables `mcq`/`answer`). Skip Memory Tracking leftover cohesion (unused skip-flag tests dropped; unassimilated sequence queries renamed). Skip Memory Tracking sequence opt-out + subscribe API + Settings/ADR copy. Accidental-match confusion adjustment + cleanup. Assimilation-sequence skip. Note toolbar overflow. Production hard-delete incident response (2026-08-12) — [MILESTONES.md](MILESTONES.md).
 
-**In discussion:** finalize Proposed ADR 0003. **A1 locked:** open-FSRS-compatible target shape, Doughnut-owned implementation (no FSRS library). Remaining: B–E in [FSRS-COMPATIBILITY-GAP.md](research/FSRS-COMPATIBILITY-GAP.md). Seed: [SEED-004](seeds/SEED-004-close-spaced-repetition-scheduling-policy-gap.md). **Recall** (not FSRS **review**) is locked in ADR 0001 and ADR 0003 Decision.
+**In discussion:** finalize Proposed ADR 0003. **A1 locked** (own FSRS-compatible implementation). **B3 locked** (overdue correct: bounded extra growth). Remaining gaps close by vertical slice. Tracker: [FSRS-COMPATIBILITY-GAP.md](research/FSRS-COMPATIBILITY-GAP.md). Seed: [SEED-004](seeds/SEED-004-close-spaced-repetition-scheduling-policy-gap.md).
 
 ## Operator Next Steps
 
 - Confirm production applied Flyway `V300000257` (table `mcq`) and `V300000258` (table `answer`)
 - Enable dummy-skip conversion placeholders on the deploys that first apply V300000254 / V300000255
-- Continue ADR 0003: discuss remaining areas B–E in `.planning/research/FSRS-COMPATIBILITY-GAP.md` (A1 locked), then fold locked choices into the ADR Decision
+- Continue ADR 0003: inspect B3 Decision, then implement overdue extra on current index (`ForgettingCurve.succeeded`). Remaining discussion: B2, C–E in `.planning/research/FSRS-COMPATIBILITY-GAP.md`

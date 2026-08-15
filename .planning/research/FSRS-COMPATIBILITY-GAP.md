@@ -6,7 +6,20 @@
 [ADR 0003](../../docs/adrs/0003-spaced-repetition-scheduling-policy.md)  
 **Does not:** approve the ADR (humans own announce → discuss → approve)
 
-This is the single tracking doc for (1) the gap between **current Doughnut code** and **open FSRS-6**, and (2) the unresolved choices needed to finalize ADR 0003. ADR 0003 should state the **product shape we want**, expected to be **mostly compatible with open FSRS**. Formulas and rollout stay out of the ADR until a choice is user-visible. **A1 locked:** Doughnut owns the implementation; no FSRS library.
+This is the single tracking doc for (1) the gap between **current Doughnut code** and **open FSRS-6**, and (2) the unresolved choices needed to finalize ADR 0003. ADR 0003 should state the **product shape we want**, expected to be **mostly compatible with open FSRS**. Formulas and rollout stay out of the ADR until a choice is user-visible.
+
+**Locked:** A1 (own FSRS-compatible implementation, no library); B3 (overdue correct: bounded extra growth); remaining gaps close by **vertical slice** (ADR 0003 Decision).
+
+## Vertical slicing (until the FSRS gap is closed)
+
+Preference for all remaining work in this seed: pick **one** high-priority
+observable schedule behavior, lock it in ADR 0003, then change Doughnut to
+match. Introduce or replace structure **only** when that behavior needs it.
+No Difficulty, Stability, lapse, requested-retention, or RecallLog fields
+for later slices.
+
+First implementation slice after this ADR lock: B3 on the current index +
+interval (`ForgettingCurve.succeeded`). B1/B2/B4 and C–E stay open.
 
 There is no `.planning/research/SUMMARY.md` in the tree. Earlier notes lived only in this file (decision list, 2026-08-13). This revision adds the code-vs-FSRS analysis those notes assumed.
 
@@ -23,7 +36,7 @@ computed R, grade + elapsed time). No `ts-fsrs` / `fsrs-rs` / other FSRS library
 | Compatible | Not required to call the shape “FSRS-compatible” |
 |------------|--------------------------------------------------|
 | Transition inputs are grade + elapsed time + current memory state — never queue lateness | Shipping `ts-fsrs` / `fsrs-rs` (rejected: own implementation) |
-| Successful overdue recall is at least as strong as on-time; extra reward, if any, is bounded via low R / long elapsed time | Four Anki-style buttons in the Doughnut UI |
+| Successful overdue recall is at least as strong as on-time; extra reward is bounded via elapsed time vs current interval (low-R stand-in) | Four Anki-style buttons in the Doughnut UI |
 | Failure shortens the next interval without a permanent trap | Dropping Doughnut-only outcomes (overlap, accidental match, Tutor 0–5) |
 | Due time is derived from memory state (may still be materialized) | Complete replayable history on day one |
 | Each memory tracker is one FSRS “card” | Calendar-day time unit (whole hours already locked) |
@@ -103,7 +116,7 @@ FSRS **Hard (G=2) is still success**. That is the sharpest mapping clash with Do
 | Persist D and S; compute R(t, S) | One index + day table | **Model** — largest |
 | Interval from requested retention | User-edited day list | **Product knob** |
 | G ∈ {1,2,3,4} | Incorrect / correct + overlap / accidental match + Tutor 0–5 + thinking time | **Grades** |
-| Overdue success: bounded extra S via low R | Overdue = on-time increment | **Policy** (min already locked; reward not) |
+| Overdue success: bounded extra S via low R | Overdue = on-time increment in **code**; ADR B3 now requires bounded extra | **Policy locked; code next** |
 | Early success: smaller SInc via high R | Linear `elapsed/interval` on the increment | **Formula** (same direction) |
 | Post-lapse S then relearning steps | −20 index + fixed 12h | **Relearning** |
 | Same-day short-term scheduler | Whole hours; elapsed 0 on a positive interval → **zero growth** | **Short-term** |
@@ -142,11 +155,22 @@ time and S, transition = grade + elapsed time + that state. Doughnut implements
 it; no FSRS library. Today’s index and table may remain until a later Decision
 consumes D/S.
 
-B–E stay open; they are how that shape becomes real.
+**A1 locked.** Remaining open items in B–E close by vertical slice; **B3** is locked in Decision (code still old).
 
 ---
 
 ### B. Memory-state and interval source — the shape
+
+A1 named **what** the destination is (D, S, computed R, own implementation).
+**B** names **how that state turns into the next due time**: what is stored,
+which knob sets the interval, whether overdue success gains extra Stability,
+and whether a lapse counter exists.
+
+Closing B in the ADR is still a Decision edit. It does not by itself change
+due times. Implementing the locked targets later will.
+
+**Vertical slicing** is locked in ADR 0003 for all remaining FSRS gaps (not
+only B). First behavior: **B3**.
 
 **B1. Persist D / S when a behavior consumes them** (was O2)
 
@@ -158,6 +182,10 @@ A1 already names D, S, and computed R as the target vocabulary. Remaining:
 
 **Recommendation:** do not add unused columns. The first slice that needs D or S persists them.
 
+Closing B1 in the ADR: no schema, no behavior. Later first consumer: **internal**
+columns (and possibly still no learner-visible due-time change if R is computed
+only for tests/logs).
+
 **B2. Interval source** (was O6) — user-visible
 
 - Keep the day table indefinitely.
@@ -166,23 +194,36 @@ A1 already names D, S, and computed R as the target vocabulary. Remaining:
 
 FSRS interval is `I(r, S)`. Doughnut’s table is a discrete ease ladder. You cannot be fully FSRS-compatible while the table remains the source of truth.
 
-**Recommendation to discuss:** ADR states retention-target intervals as the **target**; the table remains allowed until that engine exists. Do not silently delete the Settings control in this ADR.
+**Recommendation to discuss:** ADR states retention-target intervals as the **target**; the table remains allowed until Doughnut’s FSRS-shaped implementation consumes D/S. Do not silently delete the Settings control in this ADR.
 
-**B3. Overdue success reward** (was O5)
+Closing B2 in the ADR: Settings still show the day list; no due-time change.
+Implementing the target: **behavior** — next interval comes from retention `r`
+and S, not from walking the Fibonacci/user table. The Settings control would
+change or become a compat/migration input.
 
-Locked minimum: overdue correct ≥ on-time correct.
+**B3. Overdue success reward — resolved 2026-08-15** (was O5)
 
-- Keep the minimum only (today’s code).
-- **Add a converging, bounded reward** driven by elapsed time / low R (FSRS `e^{w10(1−R)}−1` direction).
-- Linear lateness bonus (rejected by FSRS; SM-2-like).
+Locked in ADR 0003 Decision **Overdue correct recall: bounded extra growth**:
+next interval after overdue correct must be strictly longer than on-time
+correct (same thinking time); extra from elapsed vs current interval, not
+`nextRecallAt`; bounded, not linear. No new D/S/retention structure.
+Commissioned scores do not inherit this extra yet.
 
-**Recommendation:** if the target is FSRS-compatible, the ADR should require the bounded R-based reward as **target behavior**, even if the first ship still only meets the minimum.
+**Code still matches the old minimum** (overdue = on-time increment). Next
+vertical slice: implement that Decision in `ForgettingCurve.succeeded`.
 
 **B4. Lapses** (was O15)
 
 Do not add an unused counter. Before adding: which outcomes increment it; first consumer (schedule vs warning vs fitting). FSRS-6 scheduling does not need L; FSRS-1 did.
 
 **Recommendation:** defer; frequent-failure already uses a 14-day wrong-answer window.
+
+Closing B4 by deferring: no change. An unused lapse column later would be
+internal only; using lapses to change due times would be behavior.
+
+**End state after locking B3 (ADR only):** learners still get overdue = on-time
+in running code. ADR requires the bounded extra on ordinary correct recall.
+B1/B2/B4 remain open. Index + table stay in use for the implementation slice.
 
 ---
 
@@ -321,9 +362,9 @@ Hygiene while this doc is the tracker: do not duplicate open issues in the ADR; 
 | ID | Topic | ADR must lock? | Suggested |
 |----|-------|----------------|-----------|
 | A1 | FSRS-compatible = own D/S/R implementation, no library | **Resolved** | Locked 2026-08-15 |
-| B1 | When to persist D/S | Light lock | No unused columns; persist with first consumer |
-| B2 | Interval table vs requested retention | Yes | Retention as target; table until then |
-| B3 | Overdue R-based reward | Yes (target vs minimum) | Target = bounded FSRS-like reward |
+| B1 | When to persist D/S | Light lock | No unused columns (vertical-slice Decision); persist with first consumer |
+| B2 | Interval table vs requested retention | Yes | Open |
+| B3 | Overdue bounded extra growth | **Resolved** | Locked 2026-08-15; code still old |
 | B4 | Lapses | Defer | Defer |
 | C1 | Keep Doughnut outcomes | Yes | Keep + compatibility map |
 | C2 | Tutor 2 vs FSRS Hard | Yes | Discuss — current policy ≠ FSRS |

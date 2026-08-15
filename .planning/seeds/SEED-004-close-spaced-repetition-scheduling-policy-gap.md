@@ -13,7 +13,7 @@ scope: large
 
 Doughnut already schedules recall with elapsed time and outcome, but the **memory model** is still a single strength index plus a user day table. Open FSRS (FSRS-6) is the DSR scheduler we expect to stay **mostly compatible** with: Difficulty, Stability, computed Retrievability, grades, requested retention.
 
-Until Proposed [ADR 0003](../../docs/adrs/0003-spaced-repetition-scheduling-policy.md) states that target shape, implementation work will either freeze today’s index or invent a private model. The ADR should hold the product contract. **A1 locked:** Doughnut owns an FSRS-compatible implementation (no FSRS library); remaining knobs are B–E.
+Until Proposed [ADR 0003](../../docs/adrs/0003-spaced-repetition-scheduling-policy.md) states that target shape, implementation work will either freeze today’s index or invent a private model. The ADR should hold the product contract. **A1 locked:** Doughnut owns an FSRS-compatible implementation (no FSRS library). **B3 locked:** overdue correct gets bounded extra growth. Remaining gaps close by **vertical slice** (one observable behavior; structure only when that behavior needs it).
 
 ## When to Surface
 
@@ -25,8 +25,8 @@ Also surface when changing success/failure interval math, commissioned score →
 
 **Large** — policy first, then stop-safe behavior slices:
 
-1. Finalize ADR 0003 from the gap + open issues in `.planning/research/FSRS-COMPATIBILITY-GAP.md` (human advice process).
-2. Later implementation toward that shape (not implied by planting this seed): D/S (or a compatible engine), overdue R-based reward, retention-target intervals, relearning, optional RecallLog.
+1. Finalize ADR 0003 from the gap + open issues in `.planning/research/FSRS-COMPATIBILITY-GAP.md` (human advice process). Remaining gaps: one observable behavior at a time; no unused D/S/lapse/retention/RecallLog structure.
+2. Next implementation: B3 overdue extra on `ForgettingCurve.succeeded` (current index + interval). Then later: D/S when a behavior needs them, retention-target intervals, relearning, optional RecallLog.
 
 ## Breadcrumbs
 
