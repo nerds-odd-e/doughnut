@@ -4,6 +4,7 @@ import static com.odde.doughnut.entities.ForgettingCurve.DEFAULT_DIFFICULTY;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.lessThan;
 
 import com.odde.doughnut.entities.MemoryTracker;
@@ -21,24 +22,44 @@ class SpacedRepetitionRecallSchedulingTest {
   private final Note note = makeMe.aNote().inMemoryPlease();
 
   private MemoryTracker aGradedTrackerAtThreeDayStability() {
+    return aGradedTrackerAtThreeDayStability(DEFAULT_DIFFICULTY);
+  }
+
+  private MemoryTracker aGradedTrackerAtThreeDayStability(float difficulty) {
     return makeMe
         .aMemoryTrackerFor(note)
         .by(user)
         .stabilityAndNextRecallAt(STABILITY_HOURS)
-        .difficulty(DEFAULT_DIFFICULTY)
+        .difficulty(difficulty)
         .inMemoryPlease();
+  }
+
+  private Timestamp onTimeGradeTime(MemoryTracker tracker) {
+    return TimestampOperations.addHoursToTimestamp(
+        tracker.getLastRecalledAt(), Math.round(tracker.getStability()));
   }
 
   @Test
   void onTimeCorrectRecallUsesFsrsGoodStabilityIncrement() {
     MemoryTracker memoryTracker = aGradedTrackerAtThreeDayStability();
-    Timestamp gradeTime =
-        TimestampOperations.addHoursToTimestamp(
-            memoryTracker.getLastRecalledAt(), Math.round(memoryTracker.getStability()));
 
-    memoryTracker.recalledSuccessfully(gradeTime, null);
+    memoryTracker.recalledSuccessfully(onTimeGradeTime(memoryTracker), null);
 
     assertThat(memoryTracker.getStability(), equalTo(266.0f));
+  }
+
+  @Test
+  void harderDifficultyGrowsStabilityLessOnCorrectRecall() {
+    MemoryTracker easier = aGradedTrackerAtThreeDayStability(3f);
+    MemoryTracker harder = aGradedTrackerAtThreeDayStability(8f);
+    Timestamp gradeTime = onTimeGradeTime(easier);
+
+    easier.recalledSuccessfully(gradeTime, null);
+    harder.recalledSuccessfully(gradeTime, null);
+
+    assertThat(harder.getStability(), lessThan(easier.getStability()));
+    assertThat(easier.getStability(), greaterThanOrEqualTo(STABILITY_HOURS));
+    assertThat(harder.getStability(), greaterThanOrEqualTo(STABILITY_HOURS));
   }
 
   @Test
@@ -103,9 +124,7 @@ class SpacedRepetitionRecallSchedulingTest {
   @Test
   void nextRecallAtIsLastRecalledAtPlusStabilityHours() {
     MemoryTracker memoryTracker = aGradedTrackerAtThreeDayStability();
-    Timestamp gradeTime =
-        TimestampOperations.addHoursToTimestamp(
-            memoryTracker.getLastRecalledAt(), Math.round(memoryTracker.getStability()));
+    Timestamp gradeTime = onTimeGradeTime(memoryTracker);
 
     memoryTracker.recalledSuccessfully(gradeTime, null);
 
@@ -117,11 +136,10 @@ class SpacedRepetitionRecallSchedulingTest {
   void overdueCorrectRecallLengthensStabilityMoreThanOnTime() {
     MemoryTracker onTime = aGradedTrackerAtThreeDayStability();
     MemoryTracker overdue = aGradedTrackerAtThreeDayStability();
-    int stabilityHours = Math.round(onTime.getStability());
-    onTime.recalledSuccessfully(
-        TimestampOperations.addHoursToTimestamp(onTime.getLastRecalledAt(), stabilityHours), null);
+    onTime.recalledSuccessfully(onTimeGradeTime(onTime), null);
     overdue.recalledSuccessfully(
-        TimestampOperations.addHoursToTimestamp(overdue.getLastRecalledAt(), stabilityHours * 2),
+        TimestampOperations.addHoursToTimestamp(
+            overdue.getLastRecalledAt(), Math.round(overdue.getStability()) * 2),
         null);
 
     long onTimeInterval =

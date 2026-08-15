@@ -1,6 +1,6 @@
 # Plan: Difficulty on correct recall
 
-**Status:** in progress (slice 2 done; next is 3)  
+**Status:** in progress (slice 3 done; next is 4)  
 **Goal:** Persist Difficulty; ordinary correct recall follows FSRS-6 Good (SInc + D-update); New-card first correct inits D. First S = **24h** this plan (12h parked).
 
 **Context:** [CONTEXT.md](./CONTEXT.md)
@@ -36,15 +36,9 @@ Ordinary correct with S > 0 uses FSRS-6 Good SInc (`FsrsStabilityIncrement` next
 ### 3. Harder Difficulty grows Stability less
 
 Type: Behavior  
-Status: planned
+Status: done
 
-**Pre-condition:** Two trackers, same S, same elapsed whole hours, same thinking time; D differs (e.g. 3 vs 8).  
-**Trigger:** Same ordinary correct recall.  
-**Post-condition:** Higher D → strictly smaller next S. Both SInc ≥ 1.
-
-Delta-only test on `recalledSuccessfully`. No UI.
-
-**Done when:** that delta is locked; slice 2 canonical case is not re-asserted.
+Delta-only test: D=8 vs D=3, same S=72h on-time correct → strictly smaller next S; both SInc ≥ 1. Production SInc already had `(11 - D)`; no production change.
 
 ---
 
