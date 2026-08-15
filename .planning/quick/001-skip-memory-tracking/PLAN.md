@@ -1,6 +1,6 @@
 # Skip Memory Tracking — make the glossary true
 
-**Status:** in progress (Phases 1–3 done)  
+**Status:** in progress (Phases 1–4 done)  
 
 **Source:** Proposed [ADR 0001](../../../docs/adrs/0001-ubiquitous-language.md) — **Skip Memory Tracking** is a notebook setting that opts the notebook out of the **assimilation sequence** and blocks Bazaar subscribe. It does **not** opt the notebook out of recall. Assimilating on a note still creates a memory tracker.
 
@@ -49,19 +49,9 @@ Circle subscribe uses the same endpoint: reject whenever the flag is set.
 ## Phase 4: Subscribe API rejects Skip Memory Tracking
 
 **Type:** Behavior  
-**Status:** planned
+**Status:** done
 
-**Pre-condition:** Bazaar notebook has **Skip Memory Tracking** enabled. UI already omits the Subscribe CTA (`BazaarNotebookButtons.vue`; E2E `bazaar_subscription.feature`).
-
-**Trigger:** `POST /api/subscriptions/notebooks/{notebook}/subscribe`.
-
-**Post-condition:** No subscription row is created. Response is a client error (prefer **400**, not 403: the notebook is still readable). Existing subscribe-without-flag behavior unchanged.
-
-**Tests:** extend `SubscriptionControllerTest` (canonical reject). Do not duplicate the Bazaar CTA E2E.
-
-**Implementation:** check the flag in `SubscriptionController.createSubscription` after read authorization.
-
-**Verify:** `CURSOR_DEV=true nix develop -c pnpm backend:test_only`
+**Landed:** `createSubscription` returns 400 and creates no row when Skip Memory Tracking is set (after read auth). Circle subscribe shares that endpoint. UI CTA omit unchanged.
 
 ---
 

@@ -2,19 +2,19 @@
 gsd_state_version: 1.0
 milestone: null
 milestone_name: null
-current_phase: "4"
-current_phase_name: Subscribe API rejects Skip Memory Tracking
+current_phase: "5"
+current_phase_name: Copy and glossary match the decided concept
 status: executing
 stopped_at: null
-last_updated: "2026-08-15T08:35:00Z"
+last_updated: "2026-08-15T08:50:00Z"
 last_activity: 2026-08-15
-last_activity_desc: Phase 3 done — assimilate-on-note still joins recall
+last_activity_desc: Phase 4 done — subscribe API rejects Skip Memory Tracking
 progress:
   total_phases: 5
-  completed_phases: 3
+  completed_phases: 4
   total_plans: 1
   completed_plans: 0
-  percent: 60
+  percent: 80
 ---
 
 # Project State
@@ -27,7 +27,7 @@ See: `.planning/PROJECT.md`
 
 ## Current Position
 
-Ad-hoc plan in progress: [`.planning/quick/001-skip-memory-tracking/PLAN.md`](quick/001-skip-memory-tracking/PLAN.md). Phases 1–3 done: flagged notebooks are out of the assimilation sequence; assimilate-on-note still creates a recall tracker. Next: Phase 4 subscribe API reject.
+Ad-hoc plan in progress: [`.planning/quick/001-skip-memory-tracking/PLAN.md`](quick/001-skip-memory-tracking/PLAN.md). Phases 1–4 done: flagged notebooks are out of the assimilation sequence; assimilate-on-note still joins recall; subscribe API returns 400. Next: Phase 5 Settings/ADR copy.
 
 **Ops leftover:** gated dummy-skip conversions. Enable on the deploy that first applies each version, then revert to `1=0`:
 - `dummy_note_sequence_skip_convert` (`V300000254`)
@@ -40,6 +40,6 @@ JDBC harnesses remain temporary until those production applications.
 
 ## Operator Next Steps
 
-- Continue execute-plan on remaining phases 4–5 of `.planning/quick/001-skip-memory-tracking/PLAN.md`
+- Continue execute-plan on remaining phase 5 of `.planning/quick/001-skip-memory-tracking/PLAN.md`
 - Enable dummy-skip conversion placeholders on the deploys that first apply V300000254 / V300000255
 - Continue ADR 0003: resolve open issues in `.planning/research/FSRS-COMPATIBILITY-GAP.md`

@@ -45,6 +45,10 @@ class SubscriptionController {
       @Valid @RequestBody SubscriptionDTO subscriptionDTO)
       throws UnexpectedNoAccessRightException {
     authorizationService.assertReadAuthorization(notebook);
+    if (notebook.getNotebookSettings().getSkipMemoryTrackingEntirely()) {
+      throw new ResponseStatusException(
+          HttpStatus.BAD_REQUEST, "Cannot subscribe to a notebook with Skip Memory Tracking");
+    }
     Subscription subscription = new Subscription();
     subscription.setNotebook(notebook);
     subscription.setFromDTO(subscriptionDTO);

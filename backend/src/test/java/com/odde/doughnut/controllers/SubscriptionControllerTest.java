@@ -71,6 +71,18 @@ class SubscriptionControllerTest extends ControllerTestBase {
         () -> controller.createSubscription(anotherNote.getNotebook(), new SubscriptionDTO()));
   }
 
+  @Test
+  void rejectsSubscribeWhenSkipMemoryTracking() {
+    makeMe.theNotebook(notebook).skipMemoryTrackingEntirely(true).please();
+    long before = subscriptionRepository.count();
+    ResponseStatusException ex =
+        assertThrows(
+            ResponseStatusException.class,
+            () -> controller.createSubscription(notebook, new SubscriptionDTO()));
+    assertThat(ex.getStatusCode(), equalTo(HttpStatus.BAD_REQUEST));
+    assertThat(subscriptionRepository.count(), equalTo(before));
+  }
+
   @Nested
   class Unsubscribe {
     @Test
