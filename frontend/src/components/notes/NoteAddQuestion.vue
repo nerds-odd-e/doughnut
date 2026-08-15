@@ -3,13 +3,13 @@
     <TextArea
       :rows="2"
       field="stem"
-      v-model="multipleChoicesQuestion.questionStem"
+      v-model="mcq.questionStem"
     /><br />
-    <div v-for="(_, index) in multipleChoicesQuestion.responseChoices" :key="index">
+    <div v-for="(_, index) in mcq.responseChoices" :key="index">
       <TextArea
         :field="'choice ' + index"
         :rows="1"
-        v-model="multipleChoicesQuestion.responseChoices[index]"
+        v-model="mcq.responseChoices[index]"
       />
       <br />
     </div>
@@ -20,18 +20,14 @@
     /><br />
     <button
       @click="addChoice"
-      :disabled="
-        multipleChoicesQuestion.responseChoices.length >= maximumNumberOfChoices
-      "
+      :disabled="mcq.responseChoices.length >= maximumNumberOfChoices"
       class="daisy-btn daisy-btn-sm daisy-btn-outline mr-2"
     >
       +
     </button>
     <button
       @click="removeChoice"
-      :disabled="
-        multipleChoicesQuestion.responseChoices.length <= minimumNumberOfChoices
-      "
+      :disabled="mcq.responseChoices.length <= minimumNumberOfChoices"
       class="daisy-btn daisy-btn-sm daisy-btn-outline mr-2"
     >
       -
@@ -79,10 +75,8 @@ const props = defineProps({
 
 const mcq = ref<Mcq>({
   correctAnswerIndex: 0,
-  multipleChoicesQuestion: {
-    questionStem: "",
-    responseChoices: ["", ""],
-  },
+  questionStem: "",
+  responseChoices: ["", ""],
 } as Mcq)
 
 const minimumNumberOfChoices = 2
@@ -92,41 +86,24 @@ const emit = defineEmits(["close-dialog"])
 
 const isValidQuestion = computed(() => isMCQWithAnswerValid(mcq.value))
 
-const multipleChoicesQuestion = computed(
-  () => mcq.value.multipleChoicesQuestion
-)
-
 const dirty = computed(() => {
-  for (
-    let i = 0;
-    i < multipleChoicesQuestion.value.responseChoices.length;
-    i += 1
-  ) {
-    if (multipleChoicesQuestion.value.responseChoices[i]) {
+  for (let i = 0; i < mcq.value.responseChoices.length; i += 1) {
+    if (mcq.value.responseChoices[i]) {
       return true
     }
   }
-  return (
-    multipleChoicesQuestion.value.questionStem !== undefined &&
-    multipleChoicesQuestion.value.questionStem.trim().length > 0
-  )
+  return mcq.value.questionStem.trim().length > 0
 })
 
 const addChoice = () => {
-  if (
-    multipleChoicesQuestion.value.responseChoices.length <
-    maximumNumberOfChoices
-  ) {
-    multipleChoicesQuestion.value.responseChoices.push("")
+  if (mcq.value.responseChoices.length < maximumNumberOfChoices) {
+    mcq.value.responseChoices.push("")
   }
 }
 
 const removeChoice = () => {
-  if (
-    multipleChoicesQuestion.value.responseChoices.length >
-    minimumNumberOfChoices
-  ) {
-    multipleChoicesQuestion.value.responseChoices.pop()
+  if (mcq.value.responseChoices.length > minimumNumberOfChoices) {
+    mcq.value.responseChoices.pop()
   }
 }
 

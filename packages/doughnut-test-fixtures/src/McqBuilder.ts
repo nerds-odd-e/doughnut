@@ -6,10 +6,8 @@ class McqBuilder extends Builder<Mcq> {
   mcq: Mcq = {
     id: generateId(),
     correctAnswerIndex: 0,
-    multipleChoicesQuestion: {
-      questionStem: 'answer',
-      responseChoices: [],
-    },
+    questionStem: 'answer',
+    responseChoices: [],
   }
 
   correctAnswerIndex(n: number) {
@@ -18,12 +16,12 @@ class McqBuilder extends Builder<Mcq> {
   }
 
   withQuestionStem(stem: string) {
-    this.mcq.multipleChoicesQuestion.questionStem = stem
+    this.mcq.questionStem = stem
     return this
   }
 
   withChoices(choices: string[]) {
-    this.mcq.multipleChoicesQuestion.responseChoices = [...choices]
+    this.mcq.responseChoices = [...choices]
     return this
   }
 

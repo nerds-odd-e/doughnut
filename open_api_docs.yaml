@@ -3467,8 +3467,6 @@ components:
         id:
           type: integer
           format: int32
-        multipleChoicesQuestion:
-          $ref: "#/components/schemas/MultipleChoicesQuestion"
         correctAnswerIndex:
           type: integer
           format: int32
@@ -3479,19 +3477,14 @@ components:
           type: string
         validationRationale:
           type: string
-      required:
-      - id
-      - multipleChoicesQuestion
-    MultipleChoicesQuestion:
-      type: object
-      properties:
-        questionStem:
-          type: string
         responseChoices:
           type: array
           items:
             type: string
+        questionStem:
+          type: string
       required:
+      - id
       - questionStem
       - responseChoices
     SubscriptionDTO:
@@ -3710,8 +3703,8 @@ components:
           format: int32
         notebook:
           $ref: "#/components/schemas/Notebook"
-        multipleChoicesQuestion:
-          $ref: "#/components/schemas/MultipleChoicesQuestion"
+        mcq:
+          $ref: "#/components/schemas/Mcq"
         spellingQuestion:
           $ref: "#/components/schemas/SpellingQuestion"
       required:
@@ -5316,8 +5309,6 @@ components:
           $ref: "#/components/schemas/Answer"
         mcq:
           $ref: "#/components/schemas/Mcq"
-        multipleChoicesQuestion:
-          $ref: "#/components/schemas/MultipleChoicesQuestion"
       required:
       - id
       - questionGeneratedTime

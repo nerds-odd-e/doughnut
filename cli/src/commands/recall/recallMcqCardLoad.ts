@@ -25,15 +25,15 @@ function firstPendingMcq(
 function recallMcqPayload(
   memoryTrackerId: number,
   recallPromptId: number,
-  multipleChoicesQuestion: RecallPrompt['multipleChoicesQuestion'],
+  mcq: RecallPrompt['mcq'],
   notebookName: string
 ): RecallMcqCardPayload | null {
-  const choices = multipleChoicesQuestion?.responseChoices
+  const choices = mcq?.responseChoices
   if (choices === undefined || choices.length === 0) return null
   return {
     memoryTrackerId,
     recallPromptId,
-    stem: multipleChoicesQuestion?.questionStem?.trim() ?? '',
+    stem: mcq?.questionStem?.trim() ?? '',
     choices,
     notebookName: notebookName.trim(),
   }
@@ -46,7 +46,7 @@ export function recallMcqPayloadFromRecallPrompt(
   return recallMcqPayload(
     memoryTrackerId,
     prompt.id,
-    prompt.multipleChoicesQuestion,
+    prompt.mcq,
     prompt.notebook.name
   )
 }
@@ -57,12 +57,7 @@ function recallMcqPayloadFromRecallPromptHistoryItem(
   notebookName: string
 ): RecallMcqCardPayload | null {
   if (prompt.questionType !== 'MCQ' || prompt.answer != null) return null
-  return recallMcqPayload(
-    memoryTrackerId,
-    prompt.id,
-    prompt.multipleChoicesQuestion,
-    notebookName
-  )
+  return recallMcqPayload(memoryTrackerId, prompt.id, prompt.mcq, notebookName)
 }
 
 /**
@@ -84,7 +79,7 @@ export async function tryLoadMcqPayload(
           ...doughnutSdkOptions(signal),
         })
       )
-      if (prompt.multipleChoicesQuestion != null) {
+      if (prompt.mcq != null) {
         const mapped = recallMcqPayloadFromRecallPrompt(memoryTrackerId, prompt)
         if (mapped !== null) {
           return mapped

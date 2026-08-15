@@ -78,9 +78,7 @@ class McqTest {
 
       Mcq result = mcqService.generateAFeasibleQuestion(note);
 
-      assertThat(
-          result.getMultipleChoicesQuestion().getQuestionStem(),
-          equalTo(mcqWithAnswer.getQuestion().getQuestionStem()));
+      assertThat(result.getQuestionStem(), equalTo(mcqWithAnswer.getQuestion().getQuestionStem()));
     }
 
     @Test
@@ -99,9 +97,7 @@ class McqTest {
 
       Mcq result = mcqService.generateAFeasibleQuestion(note);
 
-      assertThat(
-          result.getMultipleChoicesQuestion().getQuestionStem(),
-          equalTo(mcqWithAnswer.getQuestion().getQuestionStem()));
+      assertThat(result.getQuestionStem(), equalTo(mcqWithAnswer.getQuestion().getQuestionStem()));
     }
 
     @Test
@@ -116,8 +112,7 @@ class McqTest {
 
       Mcq result = mcqService.generateAFeasibleQuestion(note);
 
-      assertThat(
-          result.getMultipleChoicesQuestion().getQuestionStem(), equalTo("regenerated stem"));
+      assertThat(result.getQuestionStem(), equalTo("regenerated stem"));
       assertThat(result.isContested(), is(false));
 
       Mcq contestedOriginal = null;
@@ -129,7 +124,7 @@ class McqTest {
       }
       assertThat(contestedOriginal, notNullValue());
       assertThat(
-          contestedOriginal.getMultipleChoicesQuestion().getQuestionStem(),
+          contestedOriginal.getQuestionStem(),
           equalTo(mcqWithAnswer.getQuestion().getQuestionStem()));
     }
   }

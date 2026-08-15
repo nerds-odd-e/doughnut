@@ -4,7 +4,6 @@ import com.odde.doughnut.entities.Answer;
 import com.odde.doughnut.entities.Mcq;
 import com.odde.doughnut.entities.QuestionType;
 import com.odde.doughnut.entities.RecallPrompt;
-import com.odde.doughnut.services.ai.MultipleChoicesQuestion;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.sql.Timestamp;
 import lombok.Data;
@@ -30,8 +29,6 @@ public class RecallPromptHistoryItem {
 
   private Mcq mcq;
 
-  private MultipleChoicesQuestion multipleChoicesQuestion;
-
   public static RecallPromptHistoryItem from(RecallPrompt recallPrompt) {
     RecallPromptHistoryItem item = new RecallPromptHistoryItem();
     item.setId(recallPrompt.getId());
@@ -41,7 +38,6 @@ public class RecallPromptHistoryItem {
     item.setAnswerTime(recallPrompt.getAnswerTime());
     item.setAnswer(recallPrompt.getAnswer());
     item.setMcq(recallPrompt.getMcq());
-    item.setMultipleChoicesQuestion(recallPrompt.getMultipleChoicesQuestion());
     return item;
   }
 }

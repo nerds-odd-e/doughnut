@@ -146,16 +146,12 @@ export type McqsTestData = {
 
 export type Mcq = {
     id: number;
-    multipleChoicesQuestion: MultipleChoicesQuestion;
     correctAnswerIndex?: number;
     contextSeed?: number;
     testedFocus?: string;
     validationRationale?: string;
-};
-
-export type MultipleChoicesQuestion = {
-    questionStem: string;
     responseChoices: Array<string>;
+    questionStem: string;
 };
 
 export type SubscriptionDto = {
@@ -265,7 +261,7 @@ export type QuestionContestResult = {
 export type RecallPrompt = {
     id: number;
     notebook: Notebook;
-    multipleChoicesQuestion?: MultipleChoicesQuestion;
+    mcq?: Mcq;
     spellingQuestion?: SpellingQuestion;
 };
 
@@ -1093,7 +1089,6 @@ export type RecallPromptHistoryItem = {
     answerTime?: string;
     answer?: Answer;
     mcq?: Mcq;
-    multipleChoicesQuestion?: MultipleChoicesQuestion;
 };
 
 export type LearningSessionRequestResponse = {

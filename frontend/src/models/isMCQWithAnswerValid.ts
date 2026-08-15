@@ -1,9 +1,11 @@
 import type { Mcq } from "@generated/doughnut-backend-api"
 
 function isMCQWithAnswerValid(mcq: Mcq): boolean {
-  const { questionStem: stem, responseChoices: choices } =
-    mcq.multipleChoicesQuestion
-  const { correctAnswerIndex } = mcq
+  const {
+    questionStem: stem,
+    responseChoices: choices,
+    correctAnswerIndex,
+  } = mcq
 
   const isStemNotEmpty = !!stem?.trim()
   const allChoicesFilled = choices.every((option) => option.trim())

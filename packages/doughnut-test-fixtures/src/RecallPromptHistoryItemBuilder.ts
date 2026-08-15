@@ -92,7 +92,6 @@ class RecallPromptHistoryItemBuilder extends Builder<RecallPromptHistoryItem> {
     return {
       id: this.idToUse ?? generateId(),
       questionType: (this.questionTypeToUse ?? 'MCQ') as 'MCQ' | 'SPELLING',
-      multipleChoicesQuestion: mcq.multipleChoicesQuestion,
       mcq,
       answer: this.answerToUse,
       answerTime: this.answerTimeToUse,

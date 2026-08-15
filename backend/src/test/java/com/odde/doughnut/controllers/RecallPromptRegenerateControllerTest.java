@@ -70,7 +70,7 @@ class RecallPromptRegenerateControllerTest extends RecallPromptControllerTestBas
     com.odde.doughnut.controllers.dto.RecallPrompt regeneratedPrompt =
         controller.regenerate(recallPrompt, contestAdvice("test"));
 
-    Assertions.assertThat(regeneratedPrompt.getMultipleChoicesQuestion().getQuestionStem())
+    Assertions.assertThat(regeneratedPrompt.getMcq().getQuestionStem())
         .contains("What is the first color in the rainbow?");
 
     @SuppressWarnings({"unchecked", "rawtypes"})

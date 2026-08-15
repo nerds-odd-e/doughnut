@@ -1,13 +1,16 @@
 package com.odde.doughnut.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.odde.doughnut.controllers.dto.AnswerDTO;
 import com.odde.doughnut.entities.converters.MCQToJsonConverter;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.services.ai.MultipleChoicesQuestion;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import java.sql.Timestamp;
+import java.util.List;
 import java.util.Objects;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -22,6 +25,7 @@ public class Mcq extends EntityIdentifiedByIdOnly {
   @JsonIgnore
   private Note note;
 
+  @JsonIgnore
   @Column(name = "raw_json_question")
   @Convert(converter = MCQToJsonConverter.class)
   @NotNull
@@ -46,6 +50,51 @@ public class Mcq extends EntityIdentifiedByIdOnly {
 
   @Column(name = "validation_rationale", columnDefinition = "TEXT")
   private String validationRationale;
+
+  @JsonIgnore
+  @Schema(hidden = true)
+  public MultipleChoicesQuestion getMultipleChoicesQuestion() {
+    return multipleChoicesQuestion;
+  }
+
+  @JsonIgnore
+  public void setMultipleChoicesQuestion(MultipleChoicesQuestion multipleChoicesQuestion) {
+    this.multipleChoicesQuestion = multipleChoicesQuestion;
+  }
+
+  @JsonProperty(required = true)
+  @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
+  public String getQuestionStem() {
+    return multipleChoicesQuestion == null ? null : multipleChoicesQuestion.getQuestionStem();
+  }
+
+  public void setQuestionStem(String questionStem) {
+    stemAndChoices().setQuestionStem(questionStem);
+  }
+
+  @JsonProperty(required = true)
+  @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
+  public List<String> getResponseChoices() {
+    return multipleChoicesQuestion == null ? null : multipleChoicesQuestion.getResponseChoices();
+  }
+
+  public void setResponseChoices(List<String> responseChoices) {
+    stemAndChoices().setResponseChoices(responseChoices);
+  }
+
+  public Mcq withoutSolution() {
+    Mcq copy = new Mcq();
+    copy.id = this.id;
+    if (multipleChoicesQuestion == null) {
+      return copy;
+    }
+    copy.setQuestionStem(getQuestionStem());
+    List<String> choices = getResponseChoices();
+    if (choices != null) {
+      copy.setResponseChoices(List.copyOf(choices));
+    }
+    return copy;
+  }
 
   @JsonIgnore
   public MCQWithAnswer getMcqWithAnswer() {
@@ -80,5 +129,12 @@ public class Mcq extends EntityIdentifiedByIdOnly {
   @Override
   public String toString() {
     return "Mcq{" + "id=" + id + '}';
+  }
+
+  private MultipleChoicesQuestion stemAndChoices() {
+    if (multipleChoicesQuestion == null) {
+      multipleChoicesQuestion = new MultipleChoicesQuestion();
+    }
+    return multipleChoicesQuestion;
   }
 }

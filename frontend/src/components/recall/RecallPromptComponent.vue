@@ -1,9 +1,10 @@
 <template>
   <div class="relative">
     <QuestionDisplay
-      v-if="recallPrompt.multipleChoicesQuestion"
+      v-if="recallPrompt.mcq"
       v-bind="{
-        multipleChoicesQuestion: recallPrompt.multipleChoicesQuestion,
+        questionStem: recallPrompt.mcq.questionStem,
+        responseChoices: recallPrompt.mcq.responseChoices,
       }"
       @answer="submitAnswer($event)"
       :key="recallPrompt.id"

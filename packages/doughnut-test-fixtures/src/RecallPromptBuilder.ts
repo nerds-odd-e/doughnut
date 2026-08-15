@@ -56,7 +56,11 @@ class RecallPromptBuilder extends Builder<RecallPrompt> {
     return {
       id: this.idToUse ?? generateId(),
       notebook,
-      multipleChoicesQuestion: mcq.multipleChoicesQuestion,
+      mcq: {
+        id: mcq.id,
+        questionStem: mcq.questionStem,
+        responseChoices: mcq.responseChoices,
+      },
     }
   }
 }

@@ -1,10 +1,10 @@
 <template>
   <div class="quiz-instruction relative max-w-6xl mx-auto" data-test="question-section">
     <InactiveRecallMask :show="isActiveQuestion && isPaused" />
-    <QuestionStem :stem="multipleChoicesQuestion.questionStem" />
+    <QuestionStem :stem="questionStem" />
     <QuestionChoices
-      v-if="multipleChoicesQuestion.responseChoices"
-      :choices="multipleChoicesQuestion.responseChoices"
+      v-if="responseChoices"
+      :choices="responseChoices"
       :correct-choice-index="correctChoiceIndex"
       :answer-choice-index="answer?.choiceIndex"
       :disabled="disabled"
@@ -37,19 +37,19 @@
 <script setup lang="ts">
 import { computed } from "vue"
 import type { PropType } from "vue"
-import type {
-  Answer,
-  AnswerDto,
-  MultipleChoicesQuestion,
-} from "@generated/doughnut-backend-api"
+import type { Answer, AnswerDto } from "@generated/doughnut-backend-api"
 import InactiveRecallMask from "./InactiveRecallMask.vue"
 import QuestionChoices from "./QuestionChoices.vue"
 import QuestionStem from "./QuestionStem.vue"
 import { useQuestionThinkingTime } from "@/composables/useQuestionThinkingTime"
 
 const props = defineProps({
-  multipleChoicesQuestion: {
-    type: Object as PropType<MultipleChoicesQuestion>,
+  questionStem: {
+    type: String,
+    required: true,
+  },
+  responseChoices: {
+    type: Array as PropType<string[]>,
     required: true,
   },
   correctChoiceIndex: Number,

@@ -21,7 +21,8 @@
   <QuestionDisplay
     v-if="answeredQuestion.mcq"
     v-bind="{
-      multipleChoicesQuestion: answeredQuestion.mcq.multipleChoicesQuestion,
+      questionStem: answeredQuestion.mcq.questionStem,
+      responseChoices: answeredQuestion.mcq.responseChoices,
       correctChoiceIndex: answeredQuestion.mcq.correctAnswerIndex,
       answer: answeredQuestion.answer,
       testedFocus: answeredQuestion.mcq.testedFocus,
@@ -83,10 +84,10 @@ const hasNoteContent = computed(() => !!(note.value?.content ?? "").trim())
 const questionContext = computed<NoteRefinementQuestionContextDto | undefined>(
   () => {
     const mcq = props.answeredQuestion.mcq
-    if (!mcq?.multipleChoicesQuestion) return undefined
+    if (!mcq) return undefined
     return {
-      stem: mcq.multipleChoicesQuestion.questionStem,
-      choices: mcq.multipleChoicesQuestion.responseChoices,
+      stem: mcq.questionStem,
+      choices: mcq.responseChoices,
       correctAnswerIndex: mcq.correctAnswerIndex,
       testedFocus: mcq.testedFocus,
     }

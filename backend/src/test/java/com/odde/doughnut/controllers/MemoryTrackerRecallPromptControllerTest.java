@@ -4,6 +4,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.RecallPrompt;
@@ -13,10 +15,13 @@ import com.odde.doughnut.testability.OpenAiStructuredResponseMock;
 import com.openai.client.OpenAIClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.web.server.ResponseStatusException;
 
 class MemoryTrackerRecallPromptControllerTest extends MemoryTrackerControllerTestBase {
+  @Autowired ObjectMapper objectMapper;
+
   @MockitoBean(name = "officialOpenAiClient")
   OpenAIClient officialClient;
 
@@ -43,7 +48,7 @@ class MemoryTrackerRecallPromptControllerTest extends MemoryTrackerControllerTes
     com.odde.doughnut.controllers.dto.RecallPrompt recallPrompt =
         controller.getRecallPrompt(spellingTracker());
     assertThat(recallPrompt.getSpellingQuestion(), notNullValue());
-    assertThat(recallPrompt.getMultipleChoicesQuestion(), nullValue());
+    assertThat(recallPrompt.getMcq(), nullValue());
   }
 
   @Test
@@ -70,8 +75,30 @@ class MemoryTrackerRecallPromptControllerTest extends MemoryTrackerControllerTes
   void shouldGenerateMcqWhenNoUnansweredPromptExists() throws UnexpectedNoAccessRightException {
     openAiStructuredResponseMock.stubStructuredResponse(makeMe.aMCQWithAnswer().please());
 
-    assertThat(
-        controller.getRecallPrompt(ownedTracker()).getMultipleChoicesQuestion(), notNullValue());
+    assertThat(controller.getRecallPrompt(ownedTracker()).getMcq(), notNullValue());
+  }
+
+  @Test
+  void unansweredMcqPromptCarriesSolutionOmittedMcq() throws Exception {
+    MemoryTracker tracker = ownedTracker();
+    RecallPrompt existing = makeMe.aRecallPrompt().forMemoryTracker(tracker).please();
+    Integer persistedAnswerIndex = existing.getMcq().getCorrectAnswerIndex();
+    assertThat(persistedAnswerIndex, notNullValue());
+
+    com.odde.doughnut.controllers.dto.RecallPrompt recallPrompt =
+        controller.getRecallPrompt(tracker);
+    assertThat(existing.getMcq().getCorrectAnswerIndex(), equalTo(persistedAnswerIndex));
+
+    JsonNode json = objectMapper.readTree(objectMapper.writeValueAsString(recallPrompt));
+    assertThat(json.has("mcq"), is(true));
+    assertThat(json.has("multipleChoicesQuestion"), is(false));
+    JsonNode mcqJson = json.get("mcq");
+    assertThat(mcqJson.has("questionStem"), is(true));
+    assertThat(mcqJson.has("responseChoices"), is(true));
+    assertThat(mcqJson.has("multipleChoicesQuestion"), is(false));
+    assertThat(mcqJson.has("correctAnswerIndex"), is(false));
+    assertThat(mcqJson.has("testedFocus"), is(false));
+    assertThat(mcqJson.has("validationRationale"), is(false));
   }
 
   @Test

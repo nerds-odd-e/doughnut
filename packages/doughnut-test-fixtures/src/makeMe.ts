@@ -9,7 +9,6 @@ import {
 } from './bookReadingTopMathsLike'
 import { pdfLocatorPageIndexOnly, pdfLocatorWithBbox } from './pdfLocatorFull'
 import AnsweredQuestionBuilder from './AnsweredQuestionBuilder'
-import MultipleChoicesQuestionBuilder from './BareQuestionBuilder'
 import BazaarNotebooksBuilder from './BazaarNotebooksBuilder'
 import CircleBuilder from './CircleBuilder'
 import CircleNoteBuilder from './CircleNoteBuilder'
@@ -165,10 +164,6 @@ class MakeMe {
 
   static get anAnsweredQuestion(): AnsweredQuestionBuilder {
     return new AnsweredQuestionBuilder()
-  }
-
-  static get aMultipleChoicesQuestion(): MultipleChoicesQuestionBuilder {
-    return new MultipleChoicesQuestionBuilder()
   }
 
   static get aNoteSearchResult(): NoteSearchResultBuilder {

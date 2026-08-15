@@ -27,6 +27,9 @@ translation types. One slice = one small commit. Stop-safe.
    are Behavior in this plan, not Structure-for-the-next-pixel-change.
 10. Do not rename `Quiz.vue` or the note **Questions** menu in this plan
     (leftover identifiers; no user-facing behavior tied to the file name).
+11. Stem+choices live on **`Mcq`**. The unanswered `RecallPrompt` carries a
+    solution-omitted `Mcq` (no `MultipleChoicesQuestion` type). Do not leak
+    `correctAnswerIndex` / solution rationale on that projection.
 
 ## Slices
 
@@ -131,14 +134,12 @@ regenerated.
 
 ### 12. Unanswered prompt has no MultipleChoicesQuestion type
 
-- **Status:** planned
+- **Status:** done
 - **Type:** Behavior
-- **Pre:** Learner is shown an unanswered MCQ prompt.
-- **Trigger:** Client fetches the recall prompt.
-- **Post:** OpenAPI has no **`MultipleChoicesQuestion`**. Stem+choices live
-  on the prompt or on `Mcq` without a second type name. UI pixels unchanged.
 
-**Tests:** MCQ recall E2E; regen client; OpenAPI/types have no that name.
+Shipped: OpenAPI has no `MultipleChoicesQuestion`. `Mcq` JSON has flattened
+`questionStem` / `responseChoices`. Unanswered `RecallPrompt` property is
+`mcq` via `Mcq.withoutSolution()`.
 
 ### 13. AI generate uses Mcq
 
@@ -165,9 +166,8 @@ regenerated.
 - Confirm no external API consumers that need dual JSON field names.
 - Slices 10–11 need a deploy that applies the new Flyway version.
 - Do not add compatibility DTOs that reintroduce translation.
-- **Stopped before slice 12:** choose whether stem+choices live on the
-  unanswered `RecallPrompt` or on `Mcq` (no `MultipleChoicesQuestion` type).
-  This also shapes slice 13 (`MCQWithAnswer` → fields on `Mcq`).
+- Slice 12 placement: **B** — stem+choices on `Mcq`; unanswered prompt
+  carries a solution-omitted `Mcq`.
 
 ## Learnings
 
@@ -181,3 +181,4 @@ regenerated.
 - Slice 9: nested leftover segments (`note-questions`, `refine-question`, `generate-question-without-save`, `export-question-generation`) stayed. Testability moved to `inject-mcqs`. Note MCQ E2E green.
 - Slice 10: native SQL lived in `RecallPromptRepository`, `MemoryTrackerRepository`, and `QuestionGenerationBatchRowImportAtomicTestSupport` only. `quiz_answer` still slice 11.
 - Slice 11: native SQL only in `RecallPromptRepository` and `MemoryTrackerRepository`. Confusion-adjusted FK renamed with the table; `ON DELETE SET NULL` kept.
+- Slice 12: unanswered projection is `Mcq.withoutSolution()` (do not mutate the persisted entity). Internal Java `MultipleChoicesQuestion` stays for converter + `MCQWithAnswer` until slice 13. No Flyway. SUT LB 503; controller JSON + frontend cover the unanswered shape.

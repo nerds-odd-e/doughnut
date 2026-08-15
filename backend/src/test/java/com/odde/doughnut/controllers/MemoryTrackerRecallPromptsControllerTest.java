@@ -77,6 +77,7 @@ class MemoryTrackerRecallPromptsControllerTest extends MemoryTrackerControllerTe
               objectMapper.writeValueAsString(controller.getRecallPrompts(tracker)));
       assertThat(json.get(0).has("mcq"), is(true));
       assertThat(json.get(0).has("predefinedQuestion"), is(false));
+      assertThat(json.get(0).has("multipleChoicesQuestion"), is(false));
     }
 
     @Test

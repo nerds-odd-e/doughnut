@@ -6,7 +6,7 @@
     <div class="daisy-card-body">
       <h3 class="daisy-card-title">Previous Question Contested ...</h3>
       <p>{{ q.badQuestionReason }}</p>
-      <QuestionDisplay v-if="q.quizeQuestion.multipleChoicesQuestion" :multiple-choices-question="q.quizeQuestion.multipleChoicesQuestion" :disabled="true" :key="q.quizeQuestion.id"/>
+      <QuestionDisplay v-if="q.quizeQuestion.mcq" :question-stem="q.quizeQuestion.mcq.questionStem" :response-choices="q.quizeQuestion.mcq.responseChoices" :disabled="true" :key="q.quizeQuestion.id"/>
     </div>
   </div>
   <p v-if="currentQuestionLegitMessage" class="text-warning mb-4">

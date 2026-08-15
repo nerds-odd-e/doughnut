@@ -34,17 +34,14 @@
       <tbody>
         <tr
           v-for="question in questions"
-          :key="question.multipleChoicesQuestion.questionStem"
+          :key="question.questionStem"
         >
           <td>
-            {{ question.multipleChoicesQuestion.questionStem }}
+            {{ question.questionStem }}
           </td>
-          <template
-            v-if="question.multipleChoicesQuestion.responseChoices"
-          >
+          <template v-if="question.responseChoices">
             <td
-              v-for="(choice, index) in question
-                .multipleChoicesQuestion.responseChoices"
+              v-for="(choice, index) in question.responseChoices"
               :class="{
                 'correct-choice': index === question.correctAnswerIndex,
               }"

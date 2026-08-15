@@ -1,8 +1,8 @@
 package com.odde.doughnut.controllers.dto;
 
+import com.odde.doughnut.entities.Mcq;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.QuestionType;
-import com.odde.doughnut.services.ai.MultipleChoicesQuestion;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -16,7 +16,7 @@ public class RecallPrompt {
   @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
   private Notebook notebook;
 
-  private MultipleChoicesQuestion multipleChoicesQuestion;
+  private Mcq mcq;
 
   private SpellingQuestion spellingQuestion;
 
@@ -25,7 +25,8 @@ public class RecallPrompt {
     prompt.setId(recallPrompt.getId());
     prompt.setNotebook(recallPrompt.getNotebook());
     if (recallPrompt.getQuestionType() == QuestionType.MCQ) {
-      prompt.setMultipleChoicesQuestion(recallPrompt.getMultipleChoicesQuestion());
+      Mcq persisted = recallPrompt.getMcq();
+      prompt.setMcq(persisted == null ? null : persisted.withoutSolution());
     } else {
       prompt.setSpellingQuestion(recallPrompt.getSpellingQuestion());
     }

@@ -1,6 +1,6 @@
 # Recall prompt / MCQ alignment — context
 
-**Status:** executing (slices 1–11 done; stopped before 12 — stem+choices placement)  
+**Status:** executing (slices 1–12 done)  
 **Glossary:** Proposed [ADR 0001](../../../docs/adrs/0001-ubiquitous-language.md), [ADR 0003](../../../docs/adrs/0003-spaced-repetition-scheduling-policy.md)
 
 ## Requirement
@@ -38,10 +38,9 @@ URL (contest is triggered while viewing a prompt; the flag lives on the MCQ).
 | Glossary | Persistence | Code / API | Tests / UI leftovers |
 |----------|-------------|------------|----------------------|
 | Recall prompt | `recall_prompt` | Entity `RecallPrompt`; DTO **`RecallPrompt`**; `GET .../recall-prompt` `getRecallPrompt`; `RecallQuestionService`; `Quiz.vue` (file name out of scope) | E2E due recall prompt |
-| MCQ | `mcq` | Type **`Mcq`**; `/api/mcqs`; answered JSON **`mcq`** | nested path leftovers `*-question*` |
+| MCQ | `mcq` | Type **`Mcq`** (`questionStem`/`responseChoices`); `/api/mcqs`; unanswered/answered JSON **`mcq`** | nested path leftovers `*-question*` |
 | Answer | `answer` | Entity `Answer`; SDK **`answer`** | |
-| MCQ stem+choices | JSON in `raw_json_question` | `MultipleChoicesQuestion` | |
-| AI generate/refine | (same rows) | `MCQWithAnswer` | |
+| AI generate/refine | (same rows) | `MCQWithAnswer` (internal) | |
 
 Plan slices (see PLAN.md): 1 tests → 2 type RecallPrompt → 3 path → 4 CLI help → 5 answer op → 6 field `mcq` → 7 tests MCQ → 8 type Mcq → 9 `/mcqs` → 10 table `mcq` → 11 table `answer` → 12 drop `MultipleChoicesQuestion` → 13 AI uses Mcq.
 

@@ -96,7 +96,8 @@
           <QuestionDisplay
             v-else-if="prompt.mcq && prompt.answer"
             v-bind="{
-              multipleChoicesQuestion: prompt.mcq.multipleChoicesQuestion,
+              questionStem: prompt.mcq.questionStem,
+              responseChoices: prompt.mcq.responseChoices,
               correctChoiceIndex: prompt.mcq.correctAnswerIndex,
               answer: prompt.answer,
               disabled: true,
@@ -105,9 +106,10 @@
             }"
           />
           <QuestionDisplay
-            v-else-if="prompt.multipleChoicesQuestion"
+            v-else-if="prompt.mcq"
             v-bind="{
-              multipleChoicesQuestion: prompt.multipleChoicesQuestion,
+              questionStem: prompt.mcq.questionStem,
+              responseChoices: prompt.mcq.responseChoices,
               disabled: true,
             }"
           />

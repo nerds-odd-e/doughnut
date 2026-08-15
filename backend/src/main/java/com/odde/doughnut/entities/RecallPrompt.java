@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.odde.doughnut.configs.ObjectMapperConfig;
 import com.odde.doughnut.controllers.dto.SpellingQuestion;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
-import com.odde.doughnut.services.ai.MultipleChoicesQuestion;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import java.sql.Timestamp;
@@ -103,13 +102,6 @@ public class RecallPrompt extends EntityIdentifiedByIdOnly {
       return null;
     }
     return getMcq().isContested();
-  }
-
-  public MultipleChoicesQuestion getMultipleChoicesQuestion() {
-    if (getMcq() == null) {
-      return null;
-    }
-    return getMcq().getMultipleChoicesQuestion();
   }
 
   public SpellingQuestion getSpellingQuestion() {
