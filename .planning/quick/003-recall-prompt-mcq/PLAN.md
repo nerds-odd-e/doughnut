@@ -86,15 +86,12 @@ Type remains `PredefinedQuestion`. Builders use `withMcq`.
 
 ### 7. Tests say MCQ on the note
 
-- **Status:** planned
+- **Status:** done
 - **Type:** Structure
 - **Enables:** 8. Type is Mcq
 
-E2E/testability wording: “predefined questions in the notebook” → MCQs;
-contest feature says contest an **MCQ**. No product change.
-
-**Verify:** `predefined_questions_management.feature` and
-`question_contest.feature` still pass.
+Shipped: Gherkin/testability says MCQs / contest an **MCQ**. Feature
+filenames and `injectPredefinedQuestionsToNotebook` left for type rename.
 
 ### 8. Type is Mcq
 
@@ -188,3 +185,4 @@ note MCQ E2E; regen compile.
 - Slice 3: SDK operation is `getRecallPrompt` (history list remains `getRecallPrompts`). Fetch extracted to `useRecallPromptFetching` / `recallMcqCardLoad`.
 - Slice 5: CLI `RecallQuestionAnswerOutcome` still deferred; JSON `predefinedQuestion` is slice 6.
 - Slice 6: answered/history property is `mcq`; Java type still `PredefinedQuestion`.
+- Slice 7: leftover `injectPredefinedQuestionsToNotebook` / feature filenames wait for type `Mcq`.

@@ -134,7 +134,7 @@ Given('OpenAI evaluates the question as not legitimate', () => {
   })
 })
 
-When('I contest the question', () => {
+When('I contest the MCQ', () => {
   start.assumeQuestionPage().contestQuestion()
 })
 

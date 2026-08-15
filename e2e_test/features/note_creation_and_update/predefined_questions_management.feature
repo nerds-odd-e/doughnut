@@ -1,12 +1,12 @@
-Feature: Predefined question management
-  As a trainer, I want to manage predefined quiz questions for notes,
+Feature: MCQ management
+  As a trainer, I want to manage MCQs for notes,
   so that learners can practice with consistent multiple-choice questions.
 
   Background:
     Given I am logged in as an existing user
 
   @skipOptimizationDueToKnownNecessarySlowness
-  Scenario: Add a predefined question to a note
+  Scenario: Add an MCQ to a note
     Given I have a notebook "Cow jokes" with a note "The cow joke"
     When I add the following question for the note "The cow joke":
       | Stem                                 | Choice 0    | Choice 1 | Choice 2 | Correct Choice Index |
@@ -17,7 +17,7 @@ Feature: Predefined question management
 
   @usingMockedOpenAiService
   Scenario: Generate a question with AI
-    Given I have a notebook "Cow jokes" with note "The cow joke" and predefined questions in the notebook:
+    Given I have a notebook "Cow jokes" with note "The cow joke" and MCQs in the notebook:
       | Note Title   | Question             | Answer | One Wrong Choice |
       | The cow joke | What does a cow say? | moo    | woo              |
     And OpenAI generates this question:
@@ -30,7 +30,7 @@ Feature: Predefined question management
 
   @usingMockedOpenAiService
   Scenario: Refine a question with AI
-    Given I have a notebook "Cow jokes" with note "The cow joke" and predefined questions in the notebook:
+    Given I have a notebook "Cow jokes" with note "The cow joke" and MCQs in the notebook:
       | Note Title   | Question             | Answer | One Wrong Choice |
       | The cow joke | What does a cow say? | moo    | woo              |
     And OpenAI now refines the question to become:

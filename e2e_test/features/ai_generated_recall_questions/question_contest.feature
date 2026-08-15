@@ -1,6 +1,6 @@
 @usingMockedOpenAiService
-Feature: Contest AI-generated recall questions
-  As a learner, I want to contest an AI-generated recall question so I can get a better question for my note.
+Feature: Contest AI-generated MCQs
+  As a learner, I want to contest an MCQ so I can get a better MCQ for my note.
 
   Background:
     Given I am logged in as an existing user
@@ -12,7 +12,7 @@ Feature: Contest AI-generated recall questions
       | Question Stem   | Correct Choice | Incorrect Choice 1 | Incorrect Choice 2 |
       | Second question | Rescue Diver   | Divemaster         | Open Water Diver   |
 
-  Scenario Outline: Internally contested questions are replaced before recall
+  Scenario Outline: Internally contested MCQs are replaced before recall
     Given OpenAI evaluates the question as <Legitimate Question>
     And the note "Scuba Diving" was assimilated on day 1
     When I am recalling my note on day 2
@@ -23,9 +23,9 @@ Feature: Contest AI-generated recall questions
       | legitimate          | First question   |
       | not legitimate      | Second question  |
 
-  Scenario: Learner contests a question and gets a replacement
+  Scenario: Learner contests an MCQ and gets a replacement
     Given OpenAI evaluates the question as not legitimate
     And the note "Scuba Diving" was assimilated on day 1
     And I am recalling my note on day 2
-    When I contest the question
+    When I contest the MCQ
     Then I should be asked "Second question"
