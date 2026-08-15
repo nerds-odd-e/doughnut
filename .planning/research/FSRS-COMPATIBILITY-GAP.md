@@ -18,7 +18,7 @@ match. Introduce or replace structure **only** when that behavior needs it.
 No unused Difficulty, lapse, requested-retention, or RecallLog fields
 for later slices.
 
-Ordinary **correct** recall with S > 0 uses FSRS-6 Good SInc (own implementation, frozen default `w`). **B1** D is consumed for that increment. Remaining in plan 004: harder D → less growth, D-update, first-grade init, E2E day lists. B2 requested-retention knob, B4, and C–E stay open.
+Ordinary **correct** recall with S > 0 uses FSRS-6 Good SInc and next-D (own implementation, frozen default `w` in `FsrsGoodRecall`). Remaining in plan 004: first-grade init, E2E day lists. B2 requested-retention knob, B4, and C–E stay open.
 
 Current Doughnut persists **Stability** in whole hours and **Difficulty** (nullable; hidden). Retrievability is computed in the success path (FSRS-6 power curve). There is still **no** lapse count, requested-retention knob, or card state (`New` / `Learning` / `Review` / `Relearning`). Remaining gaps close by **vertical slice** (ADR 0003 Decision).
 
@@ -53,7 +53,7 @@ computed R, grade + elapsed time). No `ts-fsrs` / `fsrs-rs` / other FSRS library
 | `recallCount` | Incremented on state-changing grades. |
 | `assimilatedAt` | First intake. Assimilation sets `lastRecalledAt = now` with **no grade**. |
 
-Difficulty is persisted (nullable; not on the learner UI) and consumed on ordinary correct recall. Frozen default FSRS-6 weights live in `FsrsStabilityIncrement`. There is still **no** lapse count, requested-retention knob, or card state (`New` / `Learning` / `Review` / `Relearning`). Retrievability is not stored.
+Difficulty is persisted (nullable; not on the learner UI) and consumed on ordinary correct recall. Frozen default FSRS-6 weights live in `FsrsGoodRecall`. There is still **no** lapse count, requested-retention knob, or card state (`New` / `Learning` / `Review` / `Relearning`). Retrievability is not stored.
 
 **Success** (`ForgettingCurve.succeeded`):
 
@@ -110,7 +110,7 @@ FSRS **Hard (G=2) is still success**. That is the sharpest mapping clash with Do
 
 | Open FSRS | Doughnut today | Kind of gap |
 |-----------|----------------|-------------|
-| Persist D and S; compute R(t, S) | Persist S (hours) and D (nullable, hidden); R computed on success | **Model** (D consumed for SInc; D-update later) |
+| Persist D and S; compute R(t, S) | Persist S (hours) and D (nullable, hidden); R computed on success | **Model** (SInc + Good next-D; first-grade init later) |
 | Interval from requested retention | Ordinary correct uses SInc; `nextRecallAt = last + S` (`r = 0.9` implicit). Fail/confusion/commissioned still ladder | **Product knob** (B2 r-knob open) |
 | G ∈ {1,2,3,4} | Incorrect / correct + overlap / accidental match + Tutor 0–5 + thinking time | **Grades** |
 | Overdue success: bounded extra S via low R | Overdue correct lengthens S more than on-time; extra converges | **Aligned** (B3) |
@@ -171,7 +171,7 @@ only B). First behavior: **B3**.
 
 **B1. Persist D / S when a behavior consumes them** (was O2) — **in code 2026-08-15**
 
-`memory_tracker.difficulty` exists (nullable float, hidden). Graded rows backfilled to **5**; assimilate-only / New rows leave D unset. Ordinary correct with S > 0 consumes D for FSRS-6 Good SInc. D-update and first-grade init remain later slices of this plan.
+`memory_tracker.difficulty` exists (nullable float, hidden). Graded rows backfilled to **5**; assimilate-only / New rows leave D unset. Ordinary correct with S > 0 consumes D for FSRS-6 Good SInc and persists next-D (Good: ΔD=0, mean reversion toward Easy-init). First-grade init remains a later slice of this plan.
 
 **B1 persist D exists and is consumed for SInc.**
 

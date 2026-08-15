@@ -1,14 +1,14 @@
 package com.odde.doughnut.entities;
 
-/** FSRS-6 Good stability increment. Days in; whole hours out. Frozen default weights. */
-final class FsrsStabilityIncrement {
+/** FSRS-6 Good next Stability and Difficulty. Days in; whole hours out. Frozen default weights. */
+final class FsrsGoodRecall {
   private static final double[] W = {
     0.212, 1.2931, 2.3065, 8.2956, 6.4133, 0.8334, 3.0194, 0.001, 1.8722, 0.1666, 0.796, 1.4835,
     0.0614, 0.2629, 1.6483, 0.6014, 1.8729, 0.5425, 0.0912, 0.0658, 0.1542
   };
   private static final double HOURS_PER_DAY = 24.0;
 
-  private FsrsStabilityIncrement() {}
+  private FsrsGoodRecall() {}
 
   static float hoursAfterGoodRecall(float stabilityHours, float difficulty, long elapsedInHours) {
     double stabilityDays = stabilityHours / HOURS_PER_DAY;
@@ -22,6 +22,13 @@ final class FsrsStabilityIncrement {
                 * (Math.exp((1.0 - retrievability) * W[10]) - 1.0);
     double nextDays = stabilityDays * Math.max(1.0, stabilityIncrease);
     return (float) Math.round(nextDays * HOURS_PER_DAY);
+  }
+
+  static float difficultyAfterGoodRecall(float difficulty) {
+    final int good = 3;
+    double deltaD = -W[6] * (good - 3);
+    double next = W[7] * W[4] + (1.0 - W[7]) * (difficulty + deltaD);
+    return (float) Math.max(1.0, Math.min(10.0, next));
   }
 
   private static double retrievability(double elapsedDays, double stabilityDays) {

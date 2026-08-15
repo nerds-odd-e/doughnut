@@ -49,6 +49,15 @@ class SpacedRepetitionRecallSchedulingTest {
   }
 
   @Test
+  void onTimeCorrectRecallUpdatesDifficultyTowardEasyInit() {
+    MemoryTracker memoryTracker = aGradedTrackerAtThreeDayStability(8f);
+
+    memoryTracker.recalledSuccessfully(onTimeGradeTime(memoryTracker), null);
+
+    assertThat(memoryTracker.getDifficulty(), equalTo(7.998413f));
+  }
+
+  @Test
   void harderDifficultyGrowsStabilityLessOnCorrectRecall() {
     MemoryTracker easier = aGradedTrackerAtThreeDayStability(3f);
     MemoryTracker harder = aGradedTrackerAtThreeDayStability(8f);

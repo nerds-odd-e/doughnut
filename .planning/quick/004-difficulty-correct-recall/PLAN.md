@@ -1,6 +1,6 @@
 # Plan: Difficulty on correct recall
 
-**Status:** in progress (slice 3 done; next is 4)  
+**Status:** in progress (slice 4 done; next is 5)  
 **Goal:** Persist Difficulty; ordinary correct recall follows FSRS-6 Good (SInc + D-update); New-card first correct inits D. First S = **24h** this plan (12h parked).
 
 **Context:** [CONTEXT.md](./CONTEXT.md)
@@ -27,7 +27,7 @@ Shipped: nullable `memory_tracker.difficulty` (`V300000261`); graded backfill 5;
 Type: Behavior  
 Status: done
 
-Ordinary correct with S > 0 uses FSRS-6 Good SInc (`FsrsStabilityIncrement` next to `ForgettingCurve`); S=0 still 24h. Fail/confusion/commissioned stay on the ladder.
+Ordinary correct with S > 0 uses FSRS-6 Good SInc (`FsrsGoodRecall` next to `ForgettingCurve`); S=0 still 24h. Fail/confusion/commissioned stay on the ladder.
 
 **Learning:** D=5, S=72h on-time → **266h** vs old Fibonacci 120h (**2.22×**, not 10×) — weights left frozen. Two `spaced_repetition.feature` schedule scenarios `@wip` (2/5) for slice 6.
 
@@ -45,15 +45,9 @@ Delta-only test: D=8 vs D=3, same S=72h on-time correct → strictly smaller nex
 ### 4. Correct recall updates Difficulty
 
 Type: Behavior  
-Status: planned
+Status: done
 
-**Pre-condition:** Graded tracker with a known D.  
-**Trigger:** Ordinary correct recall (Good).  
-**Post-condition:** Persisted D follows FSRS-5/6 (ΔD then mean reversion, clamped `[1, 10]`). For Good, ΔD = 0; D only nudges toward Easy-init.
-
-Delta-only: D after the grade is the FSRS next-D, not left sticky.
-
-**Done when:** that update is locked; SInc from slice 2 still holds.
+Good ΔD=0 then mean reversion toward Easy-init; clamp `[1, 10]`. Fixture D=8 → 7.998413. SInc still from pre-grade D (72h on-time at D=5 → 266h). Helper renamed `FsrsGoodRecall`.
 
 ---
 
