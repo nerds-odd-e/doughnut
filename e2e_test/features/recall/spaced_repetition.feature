@@ -15,23 +15,23 @@ Feature: Spaced-repetition
     Then On day 1 I should have "1/1/3" note for assimilation and "0/1/1" for recall
     And On day 2 I should have "1/2/3" note for assimilation and "0/1/1" for recall
 
-  @wip @mockBrowserTime
+  @mockBrowserTime
   Scenario: Strictly follow the schedule
     When On day 1 I recall "                    " and assimilate new "Note 1, end "
     And On day 2 I recall "Note 1, end         " and assimilate new "Note 2, end "
     And On day 3 I recall "Note 2, Note 1, end " and assimilate new "Note 3, end "
     And On day 4 I recall "Note 3, Note 2, end " and assimilate new "end         "
-    And On day 5 I recall "Note 1, Note 3, end " and assimilate new "end         "
-    And On day 6 I recall "Note 2, end         " and assimilate new "end         "
-    And On day 7 I recall "Note 3, end         " and assimilate new "end         "
-    And On day 8 I recall "Note 1, end         " and assimilate new "end         "
+    And On day 5 I recall "Note 3, end         " and assimilate new "end         "
+    And On day 6 I recall "end                 " and assimilate new "end         "
+    And On day 7 I recall "Note 1, end         " and assimilate new "end         "
+    And On day 8 I recall "Note 2, end         " and assimilate new "end         "
 
-  @wip @mockBrowserTime
+  @mockBrowserTime
   Scenario: Strictly follow the schedule but want to recall more
     When On day 1 I recall "                    " and assimilate new "Note 1, end "
     And On day 2 I recall "Note 1, end         " and assimilate new "Note 2, end "
     And On day 3 I recall "Note 2, Note 1, end " and assimilate new "Note 3, end "
     And On day 4 I recall "Note 3, Note 2, end " and assimilate new "end         "
     And I ask to do more recall
-    And I repeat more old "Note 1         "
-    Then I should have "0/0/3" note for assimilation and "6/8/3" for recall
+    And I repeat more old "Note 3         "
+    Then I should have "0/0/3" note for assimilation and "6/7/3" for recall

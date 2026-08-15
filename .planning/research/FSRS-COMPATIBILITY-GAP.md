@@ -18,13 +18,13 @@ match. Introduce or replace structure **only** when that behavior needs it.
 No unused Difficulty, lapse, requested-retention, or RecallLog fields
 for later slices.
 
-Ordinary **correct** recall with S > 0 uses FSRS-6 Good SInc and next-D (own implementation, frozen default `w` in `FsrsGoodRecall`). First correct on New inits D=5, S=24h. Remaining in plan 004: E2E day lists. B2 requested-retention knob, B4, and C–E stay open.
+Ordinary **correct** recall with S > 0 uses FSRS-6 Good SInc and next-D (own implementation, frozen default `w` in `FsrsGoodRecall`). First correct on New inits D=5, S=24h. E2E day-at-08:00 assimilate/recall lists follow that success path. Fail / confusion / commissioned still use `DEFAULT_SPACES` (leftover; keep until those behaviors move). B2 requested-retention knob, B4, and C–E stay open.
 
 Current Doughnut persists **Stability** in whole hours and **Difficulty** (nullable; hidden). Retrievability is computed in the success path (FSRS-6 power curve). There is still **no** lapse count, requested-retention knob, or card state (`New` / `Learning` / `Review` / `Relearning`). Remaining gaps close by **vertical slice** (ADR 0003 Decision).
 
 ## 1. What “mostly compatible” should mean
 
-Open FSRS is a **DSR scheduler**: persisted **Difficulty (D)** and **Stability (S)**, computed **Retrievability (R)** from elapsed time, four **grades**, and a **requested retention** that turns S into the next interval. Current Doughnut persists **Stability** (hours) and uses a built-in spacing ladder; it does not persist Difficulty or take a retention target.
+Open FSRS is a **DSR scheduler**: persisted **Difficulty (D)** and **Stability (S)**, computed **Retrievability (R)** from elapsed time, four **grades**, and a **requested retention** that turns S into the next interval. Current Doughnut persists **Stability** (hours) and **Difficulty** (nullable, hidden). Ordinary correct uses FSRS-6 Good SInc (`r = 0.9` implicit). No requested-retention knob (B2).
 
 For ADR 0003, “mostly compatible” is a product claim, not a library claim.
 **A1 is locked:** Doughnut owns an open-FSRS-compatible implementation (D, S,
@@ -119,7 +119,7 @@ FSRS **Hard (G=2) is still success**. That is the sharpest mapping clash with Do
 | Same-day short-term scheduler | Whole hours; elapsed 0 on a positive interval → **zero growth** | **Short-term** |
 | New card has no S/D until first rating | Assimilate is New: S=0, D unset, due now (not a grade); first-grade init later | **First state** (D3 locked in ADR) |
 | Review log + optimizer | Partial answers / Tutor scores | **History** (already deferred) |
-| `request_retention`, `maximum_interval`, fuzz, learning/relearning steps | Interval table only | **Config** |
+| `request_retention`, `maximum_interval`, fuzz, learning/relearning steps | Success path: SInc, no r-knob / max-interval / fuzz | **Config** |
 | One card | One memory tracker (understanding / spelling / property / commissioned) | **Aligned** if 1 tracker = 1 card |
 | Activity named **review** | **Recall** (ADR 0001 / 0003) | **Vocabulary** — locked; not a scheduler gap |
 
@@ -149,10 +149,10 @@ Discuss in this order. Each area lists options, a recommendation, and whether AD
 Locked in ADR 0003 Decision **Open FSRS-compatible target shape, own
 implementation**: D and S as persisted memory state, R computed from elapsed
 time and S, transition = grade + elapsed time + that state. Doughnut implements
-it; no FSRS library. Today’s index and table may remain until a later Decision
-consumes D/S.
+it; no FSRS library. Ordinary correct already consumes D/S via Good SInc. Fail /
+confusion / commissioned still use `DEFAULT_SPACES` until those behaviors move.
 
-**A1 locked.** Remaining open items in B–E close by vertical slice; **B3** is locked in Decision (code still old).
+**A1 locked.** Remaining open items in B–E close by vertical slice; **B3** is locked in Decision and in code.
 
 ---
 
@@ -177,17 +177,16 @@ only B). First behavior: **B3**.
 
 **B2. Interval source** (was O6) — user-visible
 
-- Keep the day table indefinitely.
-- Keep the table until an FSRS-shaped engine exists.
-- **Prefer requested retention as the target knob**; table becomes a migration/compat input.
+Success path already uses FSRS-6 Good SInc with implicit `r = 0.9`. Remaining knob: requested retention `r ≠ 0.9`. Fail / confusion / commissioned still walk `DEFAULT_SPACES` (leftover; not this B2 question).
 
-FSRS interval is `I(r, S)`. Doughnut’s table is a discrete ease ladder. You cannot be fully FSRS-compatible while the table remains the source of truth.
+- Keep implicit `r = 0.9` (no Settings knob).
+- **Prefer requested retention as the target knob.**
 
-**Recommendation to discuss:** ADR states retention-target intervals as the **target**; the table remains allowed until Doughnut’s FSRS-shaped implementation consumes D/S. Do not silently delete the Settings control in this ADR.
+FSRS interval is `I(r, S)`. Doughnut success path is already SInc, not a day table. Full compatibility still needs an `r` knob (and leftover paths off the ladder).
 
-Implementing the target: **behavior** — next interval comes from retention `r`
-and S, not from walking the Fibonacci/user table. The Settings control would
-change or become a compat/migration input.
+**Recommendation to discuss:** ADR states retention-target intervals as the **target**. Do not silently add a Settings control in this ADR.
+
+Implementing the remaining target: **behavior** — next interval from retention `r` and S when `r ≠ 0.9`. Deleting `DEFAULT_SPACES` waits on fail/confusion/commissioned slices, not B2.
 
 **B3. Overdue success reward — resolved 2026-08-15** (was O5); **in code 2026-08-15**
 
@@ -340,7 +339,7 @@ Hygiene while this doc is the tracker: do not duplicate open issues in the ADR; 
 |----|-------|----------------|-----------|
 | A1 | FSRS-compatible = own D/S/R implementation, no library | **Resolved** | Locked 2026-08-15 |
 | B1 | When to persist D/S | **In code** | Persist D exists; ordinary correct consumes D for SInc |
-| B2 | Interval table vs requested retention | Yes | Open |
+| B2 | Requested-retention knob (`r ≠ 0.9`) | Yes | Open |
 | B3 | Overdue bounded extra growth | **Resolved** | Locked and implemented 2026-08-15 |
 | B4 | Lapses | Defer | Defer |
 | C1 | Keep Doughnut outcomes | Yes | Keep + compatibility map |
