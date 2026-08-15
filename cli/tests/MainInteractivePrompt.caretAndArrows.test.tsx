@@ -29,7 +29,7 @@ describe('MainInteractivePrompt caret and slash arrows', () => {
     await waitForLastFrameRaw((raw) =>
       rawLineIncludesBoldMarker(
         raw,
-        'Recall the next due note (just review when no quiz is pe'
+        'Recall the next due note (just review when no recall prompt is pending)'
       )
     )
   })
@@ -48,7 +48,7 @@ describe('MainInteractivePrompt caret and slash arrows', () => {
     await waitForLastFrameRaw((raw) =>
       rawLineIncludesBoldMarker(
         raw,
-        'Recall the next due note (just review when no quiz is pe'
+        'Recall the next due note (just review when no recall prompt is pending)'
       )
     )
 

@@ -1,6 +1,6 @@
 # Recall prompt / MCQ alignment — context
 
-**Status:** executing (slices 1–3 done)  
+**Status:** executing (slices 1–4 done)  
 **Glossary:** Proposed [ADR 0001](../../../docs/adrs/0001-ubiquitous-language.md), [ADR 0003](../../../docs/adrs/0003-spaced-repetition-scheduling-policy.md)
 
 ## Requirement

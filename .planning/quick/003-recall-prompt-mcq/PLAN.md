@@ -61,13 +61,11 @@ No `askAQuestion` / `GET .../question`. Ask controller test is
 
 ### 4. CLI recall help is not quiz
 
-- **Status:** planned
+- **Status:** done
 - **Type:** Behavior
-- **Pre:** `/recall` help is shown.
-- **Trigger:** User reads CLI command docs / help.
-- **Post:** Copy does not say **quiz**; it matches just review / recall prompt.
 
-**Tests:** existing CLI help or `/recall` doc assertion.
+Shipped: `/recall` help is `Recall the next due note (just review when no
+recall prompt is pending)`.
 
 ### 5. Answer operation is answer
 
