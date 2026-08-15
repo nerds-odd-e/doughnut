@@ -74,8 +74,8 @@ Prefer GSD phase dirs and filenames. Local flat `.planning/<name>.md` is legacy-
 
 ### Plan history (resume vs cleanup)
 
-- **While a plan is in progress:** keep enough history under `.planning/` (STATE, CONTEXT, PLAN status, brief learnings, SUMMARY for completed steps) so work can **stop and resume across sessions and environments**.
-- **As soon as the plan is fully executed** and outcomes live in code and permanent docs: **actively clean up** spent planning history (prune done-slice detail, delete disposable notes, drop obsolete SUMMARY/discussion noise). Keep only what still helps a future reader of the *product*, or a short pointer in ROADMAP/STATE if the milestone continues.
+- **While a plan is in progress:** keep enough history in the PLAN file (slice status, brief learnings, remaining slices) plus CONTEXT/SUMMARY so work can **stop and resume across sessions and environments**.
+- **As soon as the plan is fully executed** and outcomes live in code and permanent docs: **actively clean up** spent planning history (prune done-slice detail, delete disposable notes, drop obsolete SUMMARY/discussion noise). Keep only what still helps a future reader of the *product*, or a short pointer in ROADMAP if the milestone continues.
 - Do **not** leave completed plans as a permanent diary under `.planning/`.
 
 ---

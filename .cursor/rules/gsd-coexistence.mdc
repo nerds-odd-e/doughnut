@@ -49,7 +49,7 @@ These are **hard** in this repo even when GSD workflows omit them:
 | New or ongoing **milestone / roadmap** | GSD: `/gsd-onboard` or `/gsd-new-milestone`, then discuss → plan → execute |
 | Small ad-hoc slice | Local `slice-planning` → `.planning/quick/NNN-slug/` (or a new `phases/` entry), then `execute-plan` |
 | **Test optimization / domain tools** (API client, ERD, …) | Local skills; plans still under `.planning/phases/` or `quick/` |
-| Resuming after a break | Read `.planning/STATE.md` and the active GSD phase / plan; continue with GSD progress/resume **or** `execute-plan` on remaining PLAN tasks |
+| Resuming after a break | GSD progress/resume uses `STATE.md` as the project index. `execute-plan` resumes from the PLAN file (next undone slice). |
 
 ## Anti-patterns
 

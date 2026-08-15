@@ -50,9 +50,12 @@ run post-change-refactor themselves (nested agents routinely skip spawning a
 second Task). The coordinator spawns a **fresh** refactor agent and must see
 `## REFACTOR COMPLETE` (or handle `## REFACTOR JIDOKA STOP`) before committing.
 
+**Resume:** The PLAN file is the source of truth for remaining slices (status,
+learnings, adjusted later slices).
+
 **Parallelism:** Run multiple independent plans/slices in parallel (GSD waves or
 Task agents) when `files_modified` / touch sets do not overlap and they do not
-contend on the same PLAN/STATE writes. Otherwise run sequentially. Each parallel
+contend on the same PLAN file. Otherwise run sequentially. Each parallel
 unit still gets its own coordinator-owned refactor → commit before the next
 dependent unit starts.
 </context>
@@ -127,7 +130,7 @@ decision** the developer needs. Then wait.
       `CURSOR_DEV=true nix develop -c pnpm format:all`. Fix issues.
    d. If backend controller/DTO signatures changed and client not yet regenerated,
       run generate-api-client.
-   e. Update PLAN (and STATE/SUMMARY if present): mark slice done; brief
+   e. Update PLAN (and SUMMARY if present): mark slice done; brief
       learnings; prune obsolete detail; adjust future slices if warranted.
    f. Post-slice Jidoka — if learnings need developer judgment: commit and push
       work so far, then STOP.
@@ -171,7 +174,7 @@ The implementer prompt **must** include:
    `gsd-coexistence.mdc`, and other applicable rules. **Naming:**
    permanent artifacts by **capability/domain**, never GSD phase number.
 4. **Hard stop before wrap-up:** Do **not** commit. Do **not** push. Do **not**
-   update PLAN/STATE to `done`. Do **not** run post-change-refactor (and do not
+   update PLAN to `done`. Do **not** run post-change-refactor (and do not
    "apply the refactor skill yourself"). Leave the working tree uncommitted
    with relevant tests green for the coordinator (non-`@wip` failures that CI
    would run are not acceptable).
@@ -182,7 +185,7 @@ The implementer prompt **must** include:
    Jidoka stop, or reverted and split. Do not claim slice "done" in git terms.
 
 **Do NOT pass entire plan history** — only the current slice. Resume context
-lives in STATE / PLAN files on disk.
+lives in the PLAN file on disk.
 </step>
 
 <step name="wrap_up">
@@ -203,7 +206,7 @@ non-`@wip` CI-safe, uncommitted):
    `CURSOR_DEV=true nix develop -c pnpm format:all`. Fix any issues.
 4. **Regenerate API client** — if backend controller or DTO signatures changed,
    run **generate-api-client** before committing.
-5. **Reflect & re-plan** — update PLAN (and STATE/SUMMARY if present):
+5. **Reflect & re-plan** — update PLAN (and SUMMARY if present):
    - Brief learnings that change remaining work.
    - Mark slice **done**; prune obsolete detail from that slice.
    - Adjust future slices when warranted.
@@ -245,7 +248,7 @@ When this happens:
 - Each slice implemented by a fresh sub-agent (coordinator does not accumulate implementation context)
 - Coordinator owns wrap-up: fresh post-change-refactor Task → `## REFACTOR COMPLETE` → lint/format → plan update → commit → push
 - Pre- and post-slice Jidoka checks applied
-- Parallel waves only when touch sets and PLAN/STATE writes do not conflict
+- Parallel waves only when touch sets and PLAN writes do not conflict
 - Spent planning history cleaned when entire plan is done
 - Final output includes `## PLAN EXECUTION COMPLETE` when all slices finish
 </success_criteria>
@@ -254,7 +257,7 @@ When this happens:
 When the loop ends (all slices done or a stop condition):
 
 1. **Summary** — which slices were completed this run.
-2. **Current state** — PLAN/STATE pointers for resume (if stopped).
+2. **Current state** — PLAN.md path and next undone slice for resume (if stopped).
 3. **Next action** — developer decision needed, or confirm cleanup done.
 
 ```
