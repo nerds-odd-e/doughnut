@@ -70,7 +70,7 @@ class RecallPromptAccidentalMatchEdgeTests extends RecallPromptControllerTestBas
     Integer oldRecallCount = memoryTracker.getRecallCount();
     controller.answerSpelling(recallPrompt, answerDTO);
 
-    assertThat(memoryTracker.getStability(), equalTo(180.0f));
+    assertThat(memoryTracker.getStability(), equalTo(new ForgettingCurve(200f).failed()));
     assertThat(memoryTracker.getRecallCount(), equalTo(oldRecallCount + 1));
     assertThat(memoryTracker.getLastRecalledAt(), equalTo(gradeTime));
     assertThat(
@@ -122,15 +122,14 @@ class RecallPromptAccidentalMatchEdgeTests extends RecallPromptControllerTestBas
   @Test
   void shouldNotDropPromptedTrackerBelowStabilityFloorOnAccidentalMatch()
       throws UnexpectedNoAccessRightException {
-    memoryTracker.setStability(ForgettingCurve.DEFAULT_FORGETTING_CURVE_INDEX);
+    memoryTracker.setStability(ForgettingCurve.ASSIMILATE_STABILITY_HOURS);
     memoryTracker.setNextRecallAt(memoryTracker.calculateNextRecallAt());
     makeMe.entityPersister.save(memoryTracker);
     testabilitySettings.timeTravelTo(memoryTracker.getNextRecallAt());
 
     controller.answerSpelling(recallPrompt, answerDTO);
 
-    assertThat(
-        memoryTracker.getStability(), equalTo(ForgettingCurve.DEFAULT_FORGETTING_CURVE_INDEX));
+    assertThat(memoryTracker.getStability(), equalTo(ForgettingCurve.ASSIMILATE_STABILITY_HOURS));
   }
 
   @Test

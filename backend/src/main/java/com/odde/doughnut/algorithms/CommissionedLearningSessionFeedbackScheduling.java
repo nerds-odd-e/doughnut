@@ -21,17 +21,7 @@ public final class CommissionedLearningSessionFeedbackScheduling {
     if (scheduled.after(now)) {
       return scheduled;
     }
-    return TimestampOperations.addHoursToTimestamp(now, firstPositiveSpacingHours(tracker));
-  }
-
-  private static int firstPositiveSpacingHours(MemoryTracker tracker) {
-    SpacedRepetitionAlgorithm algorithm = tracker.getUser().getSpacedRepetitionAlgorithm();
-    for (int spacingIndex = 0; spacingIndex < 30; spacingIndex++) {
-      int hours = algorithm.getRepeatInHours(spacingIndex);
-      if (hours > 0) {
-        return hours;
-      }
-    }
-    return 24;
+    return TimestampOperations.addHoursToTimestamp(
+        now, SpacedRepetitionAlgorithm.hoursFromSpacingIndex(1));
   }
 }

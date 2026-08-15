@@ -1,7 +1,6 @@
 package com.odde.doughnut.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.odde.doughnut.algorithms.SpacedRepetitionAlgorithm;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import java.util.ArrayList;
@@ -39,12 +38,6 @@ public class User extends EntityIdentifiedByIdOnly {
   @Setter
   private Integer dailyAssimilationCount = 15;
 
-  @Column(name = "space_intervals")
-  @JsonIgnore
-  @Getter
-  @Setter
-  private String spaceIntervals = "0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55";
-
   @Column(name = "health_remove_empty_folders_default")
   @Getter
   @Setter
@@ -81,11 +74,6 @@ public class User extends EntityIdentifiedByIdOnly {
 
   public boolean inCircle(Circle circle) {
     return circle.getMembers().contains(this);
-  }
-
-  @JsonIgnore
-  public SpacedRepetitionAlgorithm getSpacedRepetitionAlgorithm() {
-    return new SpacedRepetitionAlgorithm(getSpaceIntervals());
   }
 
   private static final List<String> allowUserIdentifiers =

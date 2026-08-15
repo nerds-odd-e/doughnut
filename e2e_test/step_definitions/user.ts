@@ -101,10 +101,6 @@ Then('my daily new notes to assimilate is set to {int}', (number: string) => {
     .updateCurrentUserSettingsWith({ daily_assimilation_count: number })
 })
 
-Then('my space setting is {string}', (number: string) => {
-  start.testability().updateCurrentUserSettingsWith({ space_intervals: number })
-})
-
 Then("I haven't login", () => {
   start.logout()
 })

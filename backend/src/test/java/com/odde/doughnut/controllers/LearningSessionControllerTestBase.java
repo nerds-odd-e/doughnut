@@ -36,7 +36,7 @@ abstract class LearningSessionControllerTestBase extends ControllerTestBase {
 
   @BeforeEach
   void setupLearningSessionTests() {
-    currentUser.setUser(makeMe.aUser().withSpaceIntervals("1, 2, 4, 8").please());
+    currentUser.setUser(makeMe.aUser().please());
   }
 
   protected RecordLearningSessionRequest recordRequest(Notebook notebook, String reportMarkdown) {

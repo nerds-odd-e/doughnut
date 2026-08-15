@@ -8,7 +8,7 @@ status: executing
 stopped_at: null
 last_updated: "2026-08-15T10:20:00Z"
 last_activity: 2026-08-15
-last_activity_desc: 005-overdue-correct-stability slice 4 done (no day list in Settings or User API)
+last_activity_desc: 005-overdue-correct-stability slice 5 done (Stability is whole hours; day-list column dropped)
 progress:
   total_phases: 0
   completed_phases: 0
@@ -27,7 +27,7 @@ See: `.planning/PROJECT.md`
 
 ## Current Position
 
-Executing [`.planning/quick/005-overdue-correct-stability/PLAN.md`](quick/005-overdue-correct-stability/PLAN.md). Slices 1–4 done. Next: slice 5 Stability as whole hours and drop day-list column.
+Executing [`.planning/quick/005-overdue-correct-stability/PLAN.md`](quick/005-overdue-correct-stability/PLAN.md). Slices 1–5 done. Next: slice 6 overdue correct lengthens Stability more than on-time.
 
 **Ops leftover:** gated dummy-skip conversions. Enable on the deploy that first applies each version, then revert to `1=0`:
 - `dummy_note_sequence_skip_convert` (`V300000254`)
@@ -36,10 +36,10 @@ JDBC harnesses remain temporary until those production applications.
 
 **Recently shipped:** Unanswered recall-prompt history omits the MCQ solution; nested `/api/mcqs` routes are `/{note}`, `/refine`, `/generate`, `/export` (no `question` segment). Recall prompt / MCQ noun alignment (OpenAPI `Mcq`, `/api/mcqs`, tables `mcq`/`answer`). Skip Memory Tracking leftover cohesion (unused skip-flag tests dropped; unassimilated sequence queries renamed). Skip Memory Tracking sequence opt-out + subscribe API + Settings/ADR copy. Accidental-match confusion adjustment + cleanup. Assimilation-sequence skip. Note toolbar overflow. Production hard-delete incident response (2026-08-12) — [MILESTONES.md](MILESTONES.md).
 
-**In progress:** [`.planning/quick/005-overdue-correct-stability/PLAN.md`](quick/005-overdue-correct-stability/PLAN.md) — slices 1–4 done. Next: slice 5 hours + drop `space_intervals`. Tracker: [FSRS-COMPATIBILITY-GAP.md](research/FSRS-COMPATIBILITY-GAP.md).
+**In progress:** [`.planning/quick/005-overdue-correct-stability/PLAN.md`](quick/005-overdue-correct-stability/PLAN.md) — slices 1–5 done. Next: slice 6 overdue extra. Tracker: [FSRS-COMPATIBILITY-GAP.md](research/FSRS-COMPATIBILITY-GAP.md).
 
 ## Operator Next Steps
 
 - Confirm production applied Flyway `V300000257` (table `mcq`) and `V300000258` (table `answer`)
 - Enable dummy-skip conversion placeholders on the deploys that first apply V300000254 / V300000255
-- Continue [`.planning/quick/005-overdue-correct-stability/PLAN.md`](quick/005-overdue-correct-stability/PLAN.md) from slice 5 (Stability is whole hours; drop day-list column)
+- Continue [`.planning/quick/005-overdue-correct-stability/PLAN.md`](quick/005-overdue-correct-stability/PLAN.md) from slice 6 (overdue correct lengthens Stability more than on-time)

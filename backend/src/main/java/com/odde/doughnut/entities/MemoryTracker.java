@@ -76,7 +76,7 @@ public class MemoryTracker extends EntityIdentifiedByIdOnly {
   @Column(name = "stability")
   @Getter
   @Setter
-  private Float stability = ForgettingCurve.DEFAULT_FORGETTING_CURVE_INDEX;
+  private Float stability = ForgettingCurve.ASSIMILATE_STABILITY_HOURS;
 
   @Column(name = "removed_from_tracking")
   @Getter
@@ -163,12 +163,11 @@ public class MemoryTracker extends EntityIdentifiedByIdOnly {
   private MemoryTracker() {}
 
   public Timestamp calculateNextRecallAt() {
-    return TimestampOperations.addHoursToTimestamp(
-        getLastRecalledAt(), forgettingCurve().getRepeatInHours());
+    return TimestampOperations.addHoursToTimestamp(getLastRecalledAt(), Math.round(getStability()));
   }
 
   private ForgettingCurve forgettingCurve() {
-    return new ForgettingCurve(getUser().getSpacedRepetitionAlgorithm(), getStability());
+    return new ForgettingCurve(getStability());
   }
 
   public void recallFailed(Timestamp currentUTCTimestamp) {

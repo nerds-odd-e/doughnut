@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test;
 
 class SpacedRepetitionRecallSchedulingTest {
   private final MakeMe makeMe = MakeMe.makeMeWithoutFactoryService();
-  private final User user = makeMe.aUser().withSpaceIntervals("3, 6, 9, 12, 15").inMemoryPlease();
+  private final User user = makeMe.aUser().inMemoryPlease();
   private final Note note = makeMe.aNote().inMemoryPlease();
 
   private MemoryTracker aMemoryTrackerAfterThreeStrictRecalls() {
@@ -74,6 +74,19 @@ class SpacedRepetitionRecallSchedulingTest {
 
     long intervalAfterCorrectRecall =
         TimestampOperations.getDiffInHours(memoryTracker.getNextRecallAt(), correctGradeTime);
-    assertThat(intervalAfterCorrectRecall, equalTo(96L));
+    assertThat(intervalAfterCorrectRecall, equalTo(48L));
+  }
+
+  @Test
+  void nextRecallAtIsLastRecalledAtPlusStabilityHours() {
+    MemoryTracker memoryTracker = aMemoryTrackerAfterThreeStrictRecalls();
+    Timestamp gradeTime =
+        TimestampOperations.addHoursToTimestamp(
+            memoryTracker.getLastRecalledAt(), Math.round(memoryTracker.getStability()));
+
+    memoryTracker.recalledSuccessfully(gradeTime, null);
+
+    long interval = TimestampOperations.getDiffInHours(memoryTracker.getNextRecallAt(), gradeTime);
+    assertThat(interval, equalTo((long) Math.round(memoryTracker.getStability())));
   }
 }

@@ -6,19 +6,25 @@ public final class CommissionedLearningSessionFeedbackPolicy {
 
   private CommissionedLearningSessionFeedbackPolicy() {}
 
-  public static float applyScore(float currentIndex, int score) {
-    float initial = ForgettingCurve.DEFAULT_FORGETTING_CURVE_INDEX;
-    float accumulated = Math.max(0, currentIndex - initial);
-    float standardIncrement = ForgettingCurve.DEFAULT_FORGETTING_CURVE_INDEX_INCREMENT;
+  public static float applyScore(float currentHours, int score) {
+    float initial = ForgettingCurve.ASSIMILATE_STABILITY_HOURS;
+    float accumulated = Math.max(0, currentHours - initial);
+    float standardIncrement = standardIncrementHours(currentHours);
 
-    return switch (score) {
-      case 5 -> currentIndex + standardIncrement * 1.2f;
-      case 4 -> currentIndex + standardIncrement;
-      case 3 -> currentIndex + standardIncrement * 0.8f;
-      case 2 -> initial + accumulated * 0.8f;
-      case 1 -> initial + accumulated * 0.5f;
-      case 0 -> initial;
-      default -> currentIndex;
-    };
+    float next =
+        switch (score) {
+          case 5 -> currentHours + standardIncrement * 1.2f;
+          case 4 -> currentHours + standardIncrement;
+          case 3 -> currentHours + standardIncrement * 0.8f;
+          case 2 -> initial + accumulated * 0.8f;
+          case 1 -> initial + accumulated * 0.5f;
+          case 0 -> initial;
+          default -> currentHours;
+        };
+    return Math.max(initial, Math.round(next));
+  }
+
+  private static float standardIncrementHours(float currentHours) {
+    return SpacedRepetitionAlgorithm.hoursAfterSpacingDelta(currentHours, 1, true) - currentHours;
   }
 }

@@ -21,7 +21,7 @@
 | 2 | Structure | done | Glossary names Stability |
 | 3 | Behavior | done | Memory tracker field is `stability` |
 | 4 | Behavior | done | No spaced-repetition day list in Settings or User API |
-| 5 | Behavior | planned | Stability is whole hours; day-list column dropped |
+| 5 | Behavior | done | Stability is whole hours; day-list column dropped |
 | 6 | Behavior | planned | Overdue correct lengthens Stability more than on-time |
 
 Stop after any slice: product still schedules. After 4, learners cannot edit a day list; stored tables still apply until 5. After 5, spacing is hours only.
@@ -75,19 +75,11 @@ Settings and User API have no day-list field. `User.spaceIntervals` remains `@Js
 ### 5. Stability is whole hours; day-list column dropped
 
 **Type:** Behavior  
-**Status:** planned
+**Status:** done
 
-**Pre-condition:** Field is already `stability` (index scale). `space_intervals` still on `user` for conversion.
+`stability` is whole hours. Flyway `V300000260` converts via legacy index + day list then drops `space_intervals`. Runtime growth uses a built-in hours ladder (`hoursAfterSpacingDelta`). Assimilate = 0. Fail still 12h retry. Overdue still equals on-time. E2E spaced-repetition green without `@wip`.
 
-**Trigger:** Migrate, then any grade or assimilate.
-
-**Post-condition:** `stability` is whole hours (the current interval). `nextRecallAt = lastRecalledAt + stability` after a grade. No `space_intervals` column, no testability day list, no `SpacedRepetitionAlgorithm` table lookup. `ForgettingCurve` (or its replacement) updates hours. Assimilate still due now (`stability = 0`). Incorrect still 12h retry. Early correct still grows less than on-time. Overdue correct still **equals** on-time. Thinking time and commissioned scores adjust **hours** with the same qualitative rules.
-
-**Change:** Java Flyway: `stability = repeatInHours(oldValue, user.space_intervals)` then drop `space_intervals`. Algorithm in hours. Backend scheduling tests assert hours. Frontend shows the new numbers (field name already `stability`).
-
-No SDK field rename in this slice. No Settings UI work (slice 4).
-
-**Tests:** `SpacedRepetitionRecallSchedulingTest`, early-recall tests, commissioned score tests, confusion/overlap — next interval hours, not index.
+**Learning:** load-more recall counts changed with the default ladder (`6/8/3`). Slice 6 adds overdue extra on `elapsedHours > stability`.
 
 ---
 

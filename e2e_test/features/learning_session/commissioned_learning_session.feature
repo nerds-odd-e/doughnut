@@ -5,7 +5,6 @@ Feature: Commissioned learning session
 
   Background:
     Given I am logged in as an existing user
-    And my space setting is "1, 2, 4, 8"
     And I have a notebook "Spanish conversation" with notes:
       | Title   | Content   |
       | Hola    | Hello     |
@@ -67,4 +66,4 @@ Feature: Commissioned learning session
     When It's day 3, 9 hour
     Then I should see 1 potential learning session for notebook "Spanish conversation"
     When I open the learning session request for notebook "Spanish conversation"
-    Then the learning session request should list session items for only notes "Gracias"
+    Then the learning session request should list session items for notes "Gracias, Hola"

@@ -28,16 +28,11 @@ public class UserBuilder extends EntityBuilder<User> {
     entity.setName(userName);
   }
 
-  public UserBuilder withSpaceIntervals(String spaceIntervals) {
-    entity.setSpaceIntervals(spaceIntervals);
+  public UserBuilder dailyAssimilationCount(int i) {
+    entity.setDailyAssimilationCount(i);
     return this;
   }
 
   @Override
   public void beforeCreate(boolean needPersist) {}
-
-  public UserBuilder dailyAssimilationCount(int i) {
-    entity.setDailyAssimilationCount(i);
-    return this;
-  }
 }

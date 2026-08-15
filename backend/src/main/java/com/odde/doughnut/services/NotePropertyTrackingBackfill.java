@@ -77,7 +77,7 @@ public final class NotePropertyTrackingBackfill {
         PreparedStatement trackerExistsStmt = connection.prepareStatement(TRACKER_EXISTS_QUERY);
         PreparedStatement insertTrackerStmt = connection.prepareStatement(INSERT_SKIPPED_TRACKER)) {
 
-      insertTrackerStmt.setFloat(7, ForgettingCurve.DEFAULT_FORGETTING_CURVE_INDEX);
+      insertTrackerStmt.setFloat(7, ForgettingCurve.ASSIMILATE_STABILITY_HOURS);
 
       try (ResultSet notes = notesStmt.executeQuery()) {
         while (notes.next()) {

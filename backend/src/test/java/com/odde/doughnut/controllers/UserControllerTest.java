@@ -2,11 +2,8 @@ package com.odde.doughnut.controllers;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.controllers.dto.UserDTO;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
@@ -17,7 +14,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 class UserControllerTest extends ControllerTestBase {
   @Autowired UserController controller;
-  @Autowired ObjectMapper objectMapper;
 
   @BeforeEach
   void setup() {
@@ -38,23 +34,6 @@ class UserControllerTest extends ControllerTestBase {
     User response = controller.updateUser(currentUser.getUser(), dto);
     assertThat(response.getName(), equalTo(dto.getName()));
     assertThat(response.getDailyAssimilationCount(), equalTo(dto.getDailyAssimilationCount()));
-  }
-
-  @Test
-  void updateUserDoesNotChangeStoredSpaceIntervals() throws UnexpectedNoAccessRightException {
-    User user = currentUser.getUser();
-    user.setSpaceIntervals("9, 9, 9");
-    UserDTO dto = new UserDTO();
-    dto.setName(user.getName());
-    dto.setDailyAssimilationCount(user.getDailyAssimilationCount());
-    assertThat(controller.updateUser(user, dto).getSpaceIntervals(), equalTo("9, 9, 9"));
-  }
-
-  @Test
-  void userProfileJsonOmitsSpaceIntervals() throws Exception {
-    JsonNode json =
-        objectMapper.readTree(objectMapper.writeValueAsString(controller.getUserProfile()));
-    assertThat(json.has("spaceIntervals"), is(false));
   }
 
   @Test

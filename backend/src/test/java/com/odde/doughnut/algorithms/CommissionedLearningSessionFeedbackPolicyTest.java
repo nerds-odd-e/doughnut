@@ -1,7 +1,6 @@
 package com.odde.doughnut.algorithms;
 
-import static com.odde.doughnut.entities.ForgettingCurve.DEFAULT_FORGETTING_CURVE_INDEX;
-import static com.odde.doughnut.entities.ForgettingCurve.DEFAULT_FORGETTING_CURVE_INDEX_INCREMENT;
+import static com.odde.doughnut.entities.ForgettingCurve.ASSIMILATE_STABILITY_HOURS;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
@@ -13,28 +12,27 @@ class CommissionedLearningSessionFeedbackPolicyTest {
 
   @ParameterizedTest
   @CsvSource({
-    "5, 112", "4, 110", "3, 108", "2, 100", "1, 100", "0, 100",
+    "5, 29", "4, 24", "3, 19", "2, 0", "1, 0", "0, 0",
   })
   void applyScoreFromInitialLevel(int score, float expected) {
     assertThat(
-        CommissionedLearningSessionFeedbackPolicy.applyScore(DEFAULT_FORGETTING_CURVE_INDEX, score),
+        CommissionedLearningSessionFeedbackPolicy.applyScore(ASSIMILATE_STABILITY_HOURS, score),
         is(expected));
   }
 
   @ParameterizedTest
   @CsvSource({
-    "5, 132", "4, 130", "3, 128", "2, 116", "1, 110", "0, 100",
+    "5, 77", "4, 72", "3, 67", "2, 38", "1, 24", "0, 0",
   })
   void applyScoreFromElevatedLevel(int score, float expected) {
-    float elevatedIndex =
-        DEFAULT_FORGETTING_CURVE_INDEX + DEFAULT_FORGETTING_CURVE_INDEX_INCREMENT * 2f;
+    float elevatedHours = 48f;
     assertThat(
-        CommissionedLearningSessionFeedbackPolicy.applyScore(elevatedIndex, score), is(expected));
+        CommissionedLearningSessionFeedbackPolicy.applyScore(elevatedHours, score), is(expected));
   }
 
   @Test
-  void applyScoreLeavesIndexUnchangedForInvalidScore() {
-    float unchanged = CommissionedLearningSessionFeedbackPolicy.applyScore(120f, 9);
-    assertThat(unchanged, is(120f));
+  void applyScoreLeavesHoursUnchangedForInvalidScore() {
+    float unchanged = CommissionedLearningSessionFeedbackPolicy.applyScore(48f, 9);
+    assertThat(unchanged, is(48f));
   }
 }

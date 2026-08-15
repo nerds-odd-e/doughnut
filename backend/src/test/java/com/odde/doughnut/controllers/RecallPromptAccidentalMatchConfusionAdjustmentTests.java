@@ -59,7 +59,7 @@ class RecallPromptAccidentalMatchConfusionAdjustmentTests extends RecallPromptCo
 
       assertThat(
           matchedSpellingTracker.getStability(),
-          equalTo(stabilityBefore - ForgettingCurve.DEFAULT_FORGETTING_CURVE_INDEX_INCREMENT));
+          equalTo(new ForgettingCurve(stabilityBefore).confusionAdjusted()));
       assertThat(matchedSpellingTracker.getLastRecalledAt(), equalTo(lastRecalledBefore));
       assertThat(matchedSpellingTracker.getRecallCount(), equalTo(recallCountBefore));
       assertThat(
@@ -75,7 +75,7 @@ class RecallPromptAccidentalMatchConfusionAdjustmentTests extends RecallPromptCo
     @Test
     void shouldNotDropMatchedSpellingTrackerBelowStabilityFloor()
         throws UnexpectedNoAccessRightException {
-      matchedSpellingTracker.setStability(ForgettingCurve.DEFAULT_FORGETTING_CURVE_INDEX);
+      matchedSpellingTracker.setStability(ForgettingCurve.ASSIMILATE_STABILITY_HOURS);
       matchedSpellingTracker.setNextRecallAt(matchedSpellingTracker.calculateNextRecallAt());
       makeMe.entityPersister.save(matchedSpellingTracker);
 
@@ -83,7 +83,7 @@ class RecallPromptAccidentalMatchConfusionAdjustmentTests extends RecallPromptCo
 
       assertThat(
           matchedSpellingTracker.getStability(),
-          equalTo(ForgettingCurve.DEFAULT_FORGETTING_CURVE_INDEX));
+          equalTo(ForgettingCurve.ASSIMILATE_STABILITY_HOURS));
     }
 
     @Test
@@ -110,7 +110,7 @@ class RecallPromptAccidentalMatchConfusionAdjustmentTests extends RecallPromptCo
 
       assertThat(
           understandingTracker.getStability(),
-          equalTo(stabilityBefore - ForgettingCurve.DEFAULT_FORGETTING_CURVE_INDEX_INCREMENT));
+          equalTo(new ForgettingCurve(stabilityBefore).confusionAdjusted()));
       assertLinkedConfusionAdjustedTracker(understandingTracker);
     }
 

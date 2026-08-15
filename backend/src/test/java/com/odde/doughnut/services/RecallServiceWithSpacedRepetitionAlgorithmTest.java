@@ -33,7 +33,7 @@ public class RecallServiceWithSpacedRepetitionAlgorithmTest {
 
   @BeforeEach
   void setup() {
-    user = makeMe.aUser().withSpaceIntervals("1, 2, 4, 8").please();
+    user = makeMe.aUser().please();
     anotherUser = makeMe.aUser().please();
   }
 
@@ -64,7 +64,7 @@ public class RecallServiceWithSpacedRepetitionAlgorithmTest {
       "2,  10, true",
       "3,   0, false",
       "3,   1, false",
-      "3,   3, false",
+      "3,   3, true",
       "3,   4, true",
     })
     void whenThereIsOneRecalledNotesForUser(
@@ -100,10 +100,10 @@ public class RecallServiceWithSpacedRepetitionAlgorithmTest {
     class OnTimeAndEarlyRecall {
       @ParameterizedTest
       @CsvSource({
-        "0, 0,  100.0",
-        "0, 1,  110.0",
-        "2, -1,  115.0",
-        "2, 0, 120.0",
+        "0, 0,  24.0",
+        "0, 1,  24.0",
+        "2, -1,  60.0",
+        "2, 0, 72.0",
       })
       void aMemoryTrackerHasBeenRecalledStrictly(
           int ntimes, Integer daysDelay, float expectedStability) {

@@ -43,11 +43,6 @@ public class UserService {
     entityPersister.merge(user);
   }
 
-  public void setSpaceIntervals(User user, String spaceIntervals) {
-    user.setSpaceIntervals(spaceIntervals);
-    entityPersister.merge(user);
-  }
-
   public int getUnassimilatedNoteCount(User user) {
     return noteRepository.countUnassimilatedByOwnership(user.getId(), user.getOwnership().getId());
   }

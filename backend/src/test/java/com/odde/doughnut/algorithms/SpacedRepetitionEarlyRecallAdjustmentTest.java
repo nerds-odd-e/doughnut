@@ -1,7 +1,5 @@
 package com.odde.doughnut.algorithms;
 
-import static com.odde.doughnut.entities.ForgettingCurve.DEFAULT_FORGETTING_CURVE_INDEX;
-import static com.odde.doughnut.entities.ForgettingCurve.DEFAULT_FORGETTING_CURVE_INDEX_INCREMENT;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThan;
@@ -17,40 +15,42 @@ import com.odde.doughnut.utils.TimestampOperations;
 import org.junit.jupiter.api.Test;
 
 public class SpacedRepetitionEarlyRecallAdjustmentTest {
-  final float currentForgettingCurveIndex =
-      DEFAULT_FORGETTING_CURVE_INDEX + DEFAULT_FORGETTING_CURVE_INDEX_INCREMENT * 2;
-  final float baselineForgettingCurveIndex =
-      DEFAULT_FORGETTING_CURVE_INDEX + DEFAULT_FORGETTING_CURVE_INDEX_INCREMENT * 3;
-
   @Test
-  void repeatAfterCurrentInterval() {
-    float index = getNextForgettingCurveIndexWithElapsedHours(9 * 24);
-    assertThat(index, equalTo(baselineForgettingCurveIndex));
+  void onTimeCorrectGrowsToNextLadderHours() {
+    float hours = nextStabilityHours(72);
+    assertThat(hours, equalTo(120.0f));
   }
 
   @Test
-  void repeatEarly_immediatelyWhichIsImpossible() {
-    float index = getNextForgettingCurveIndexWithElapsedHours(0);
-    assertThat(index, equalTo(currentForgettingCurveIndex));
+  void overdueCorrectEqualsOnTime() {
+    float onTime = nextStabilityHours(72);
+    float overdue = nextStabilityHours(72 + 48);
+    assertThat(overdue, equalTo(onTime));
   }
 
   @Test
-  void repeatEarly_inOneHour() {
-    float index = getNextForgettingCurveIndexWithElapsedHours(1);
-    assertThat(index, greaterThanOrEqualTo(currentForgettingCurveIndex));
-    assertThat(index, lessThan(baselineForgettingCurveIndex));
+  void immediateEarlyCorrectDoesNotGrow() {
+    float hours = nextStabilityHours(0);
+    assertThat(hours, equalTo(72.0f));
   }
 
   @Test
-  void repeatEarly_OneHourEarlier() {
-    float index = getNextForgettingCurveIndexWithElapsedHours(9 * 24 - 1);
-    assertThat(index, greaterThan(currentForgettingCurveIndex));
-    assertThat(index, lessThanOrEqualTo(baselineForgettingCurveIndex));
+  void earlyCorrectGrowsLessThanOnTime() {
+    float hours = nextStabilityHours(1);
+    assertThat(hours, greaterThanOrEqualTo(72.0f));
+    assertThat(hours, lessThan(120.0f));
   }
 
-  private float getNextForgettingCurveIndexWithElapsedHours(int elapsedInHours) {
+  @Test
+  void almostOnTimeEarlyCorrectGrowsLessThanOrEqualToOnTime() {
+    float hours = nextStabilityHours(71);
+    assertThat(hours, greaterThan(72.0f));
+    assertThat(hours, lessThanOrEqualTo(120.0f));
+  }
+
+  private float nextStabilityHours(int elapsedInHours) {
     MakeMe makeMe = MakeMe.makeMeWithoutFactoryService();
-    User user = makeMe.aUser().withSpaceIntervals("3, 6, 9, 12, 15").inMemoryPlease();
+    User user = makeMe.aUser().inMemoryPlease();
     Note note = makeMe.aNote().inMemoryPlease();
     MemoryTracker memoryTracker =
         makeMe.aMemoryTrackerFor(note).by(user).afterNthStrictRecall(3).inMemoryPlease();

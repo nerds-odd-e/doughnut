@@ -135,9 +135,6 @@ class TestabilityRestController {
       userService.setDailyAssimilationCount(
           user, Integer.valueOf(userInfo.get("daily_assimilation_count")));
     }
-    if (userInfo.containsKey("space_intervals")) {
-      userService.setSpaceIntervals(user, userInfo.get("space_intervals"));
-    }
     return "OK";
   }
 
