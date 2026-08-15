@@ -67,7 +67,24 @@ class MemoryTrackerRecallPromptsControllerTest extends MemoryTrackerControllerTe
     }
 
     @Test
-    void shouldExposeAnsweredMcqUnderMcqField() throws Exception {
+    void shouldOmitMcqSolutionFromUnansweredHistory() throws Exception {
+      Note note = ownedNote();
+      MemoryTracker tracker = ownedTracker(note);
+      promptFor(tracker, note);
+
+      JsonNode json =
+          objectMapper.readTree(
+              objectMapper.writeValueAsString(controller.getRecallPrompts(tracker)));
+      JsonNode mcqJson = json.get(0).get("mcq");
+      assertThat(mcqJson.has("questionStem"), is(true));
+      assertThat(mcqJson.has("responseChoices"), is(true));
+      assertThat(mcqJson.has("correctAnswerIndex"), is(false));
+      assertThat(mcqJson.has("testedFocus"), is(false));
+      assertThat(mcqJson.has("validationRationale"), is(false));
+    }
+
+    @Test
+    void shouldIncludeMcqSolutionOnAnsweredHistory() throws Exception {
       Note note = ownedNote();
       MemoryTracker tracker = ownedTracker(note);
       answeredPromptFor(tracker, note);
@@ -75,9 +92,7 @@ class MemoryTrackerRecallPromptsControllerTest extends MemoryTrackerControllerTe
       JsonNode json =
           objectMapper.readTree(
               objectMapper.writeValueAsString(controller.getRecallPrompts(tracker)));
-      assertThat(json.get(0).has("mcq"), is(true));
-      assertThat(json.get(0).has("predefinedQuestion"), is(false));
-      assertThat(json.get(0).has("multipleChoicesQuestion"), is(false));
+      assertThat(json.get(0).get("mcq").has("correctAnswerIndex"), is(true));
     }
 
     @Test

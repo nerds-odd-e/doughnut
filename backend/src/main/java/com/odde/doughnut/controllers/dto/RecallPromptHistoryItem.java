@@ -37,7 +37,8 @@ public class RecallPromptHistoryItem {
     item.setIsContested(recallPrompt.getIsContested());
     item.setAnswerTime(recallPrompt.getAnswerTime());
     item.setAnswer(recallPrompt.getAnswer());
-    item.setMcq(recallPrompt.getMcq());
+    Mcq mcq = recallPrompt.getMcq();
+    item.setMcq(recallPrompt.getAnswer() == null && mcq != null ? mcq.withoutSolution() : mcq);
     return item;
   }
 }
