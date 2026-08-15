@@ -1,34 +1,21 @@
 # 0001 — Ubiquitous language for Doughnut domain concepts
 
 **Status:** Proposed  
-**Date:** 2026-07-31  
+**Date:** 2026-08-15  
 **Decision makers:** Terry
 **Consulted:** (people / teams asked for advice)
 
 ## Context
 
-Doughnut’s product vocabulary should not be **inconsistent**: the same idea appears under
-several names, and some names mean more than one thing. Humans, UI copy, APIs,
-and coding agents then invent synonyms or collide terms.
+Doughnut’s product vocabulary should not be **inconsistent**: the same idea
+appears under several names, and some names mean more than one thing. Humans,
+UI copy, APIs, and coding agents then invent synonyms or collide terms.
 
-This ADR proposes a **canonical ubiquitous language**, plus renames where
-today’s wording is missing, ambiguous, or redundant. Accepting it does **not**
-require renaming the whole codebase at once; it constrains *new* naming and
-guides gradual alignment (tests, UI, OpenAPI, packages).
+This ADR is the **canonical ubiquitous language**. Accepting it constrains
+*new* naming and guides gradual alignment (tests, UI, OpenAPI, schema). It
+does not require renaming the whole codebase at once.
 
-### Current vocabulary
-
-| Term | Meaning |
-|------|---------|
-| **Quiz / question** | A recall prompt (spelling, AI-generated, predefined, contested, …) |
-| **Question contest** | Challenging or replacing an AI-generated recall question |
-| **Accidental match** | Recall result that matches an unintended note |
-| **Property** | Attribute on a note; may result from reducing a relationship note to the source |
-| **Reading record** | Progress through a book |
-| **Space setting** | User’s spaced-repetition interval list (e.g. `1, 2, 4, 8`) |
-| **Access token** | Credential for API / CLI access to Doughnut |
-
-### Problems
+### Remaining collisions (still to tighten in this glossary)
 
 #### Ambiguous (one word, several meanings)
 
@@ -36,7 +23,6 @@ guides gradual alignment (tests, UI, OpenAPI, packages).
 |------|------------------|
 | **Learning** | Overall learner metaphor; commissioned **Learning Session** family — not a synonym for subscription |
 | **Layout** | Refinement layout for a note vs book layout for an attached book |
-| **Quiz / question** | Spelling, AI-generated, predefined, and contested prompts without a shared parent name |
 | **Property** | Reduced relationship field; wiki property from accidental match; property memory tracker key |
 | **Chat / conversation / message** | Human note threads and AI chat share the same nouns without a clear split |
 | **My notes / my notebooks** | Notebook catalog; note search scope; subscribed notebook appearing among the user’s notebooks |
@@ -55,7 +41,6 @@ guides gradual alignment (tests, UI, OpenAPI, packages).
 
 | Gap | Why it matters |
 |-----|----------------|
-| No umbrella for **recall question** kinds | Spelling / AI / predefined / contested lack a shared type name |
 | **Focus context** | Used in AI flows but not established as a first-class domain noun |
 | **OKF** (Open Knowledge Format) | Named in CLI lint but not introduced as a first-class glossary noun |
 | **Owned vs subscribed notebook** | Distinction exists in behavior but not as glossary entries |
@@ -90,6 +75,7 @@ guides gradual alignment (tests, UI, OpenAPI, packages).
 | **Refinement layout** | Layout for decomposing and improving a note while refining |
 | **Book** | Attached reading artifact (EPUB, PDF, …), distinct from a notebook |
 | **Book layout** | Structure of an attached book |
+| **Reading record** | Progress through a book |
 | **OKF** | [Open Knowledge Format](https://cloud.google.com/blog/products/data-analytics/how-the-open-knowledge-format-can-improve-data-sharing): portable directory of markdown concept files with YAML frontmatter |
 | **Notebook health** | In-app lint, findings, and fixes for a notebook |
 | **Skip Memory Tracking** | Notebook setting that opts the notebook out of the assimilation sequence and blocks Bazaar subscribe. It does not opt the notebook out of recall. |
@@ -106,8 +92,13 @@ guides gradual alignment (tests, UI, OpenAPI, packages).
 | **Understanding memory tracker** | Note-level tracker created by ordinary Assimilate. A spelling or commissioned tracker does not satisfy ordinary sequence due. | |
 | **Spelling memory tracker** | Note-level tracker for recalling the note title by spelling. The learner creates it. | |
 | **Remember spelling** | Learner action at assimilation: verify the note title (or alias), then create a spelling memory tracker | |
-| **Recall** | Spaced retrieval of assimilated material: the learner must produce the knowledge. Doughnut names this **recall**, not **review**. | |
-| **Recall question** | A single recall prompt (kinds: spelling, AI-generated, predefined, …) | |
+| **Recall** | Spaced retrieval of assimilated material. Doughnut names the activity **recall**, not FSRS/Anki **review**. Methods: **recall prompt** or **just review**. | |
+| **Recall prompt** | One ask during recall for a memory tracker. Kinds: **spelling** (no MCQ) or **MCQ** (the prompt HAS_A an MCQ). An MCQ is not a type of recall prompt. | |
+| **MCQ** | Multiple-choice content on a note (stem, choices, solution). A recall prompt may have an MCQ; an MCQ is not a type of recall prompt. **Contested** is a property of an MCQ. Origin (AI-generated vs manually added) is how the content was produced, not a prompt kind. | |
+| **Contested** | Property of an MCQ: marked not feasible. Not a kind of recall prompt. | |
+| **Contest** | Challenge an MCQ shown in a recall prompt; the MCQ may be marked contested and replaced. | |
+| **Just review** | Recall by reviewing the note and self-evaluating. A method of recall, not the absence of a prompt. | **Just review** |
+| **Accidental match** | Recall result that matches an unintended note | |
 | **Memory tracking** | Creating and maintaining memory trackers for notes. Tracker-level opt-out is **Remove from recall**. | |
 | **Remove from recall** | Stop an existing memory tracker from appearing in recall; the unit does not re-enter the sequence | **Remove** / **Remove from recall** |
 | **Revive** | Re-enable recall for a tracker that was removed from recall | **Revive** |
@@ -159,7 +150,7 @@ guides gradual alignment (tests, UI, OpenAPI, packages).
      notebook out of the **assimilation sequence** and blocks Bazaar
      subscribe. It does not opt out of **recall**. Do not skip memory
      tracking on a note. Tracker-level opt-out is **Remove from recall**.
-   - Prefer **recall question** over bare **quiz** when naming the prompt type.
+   - Wire/AI shapes of an MCQ are not glossary nouns.
    - Prefer **spaced-repetition schedule** over **space setting** in new copy.
    - Prefer **semantic search** over **semantical search**.
    - Use **notebook description** for the one-line plain-text catalog blurb;
@@ -175,16 +166,17 @@ guides gradual alignment (tests, UI, OpenAPI, packages).
 5. **Alignment policy** — On Accept:
 
    - **New** features, tests, OpenAPI names, and packages follow this glossary.
-   - This glossary slice (**assimilation sequence**, sequence skip, **Return
-     to sequence**, **Remove from recall**, **Revive**, **Skip Memory
-     Tracking**) is the source for new naming in that work. **Existing** names
-     may remain until a deliberate rename slice; do not mass-rename in
-     drive-by PRs.
+   - **Existing** names may remain until a deliberate rename slice; do not
+     mass-rename in drive-by PRs.
+   - End state for this slice: the same nouns in UI, API, and schema, with
+     **minimum DTO** (a recall prompt HAS_A an MCQ when it is MCQ; do not
+     introduce a translation type that wraps one as the other). Reach that
+     in phases.
    - Agents treat this ADR as binding for naming choices; conflicts with older
      strings are expected until cleaned up.
 
-6. **Out of scope** — Exact UI microcopy, i18n, and full mechanical rename
-   plans. Those become normal product work citing this ADR.
+6. **Out of scope** — Exact UI microcopy, i18n, and the mechanical rename
+   slices. Those become normal product work citing this ADR.
 
 ## Consequences
 
@@ -192,7 +184,8 @@ guides gradual alignment (tests, UI, OpenAPI, packages).
   **learning**, **layout**).
 - Product language names spaced retrieval **recall**, not **review**, so the
   glossary matches the philosophy (recall is better than review) and stays
-  distinct from FSRS/Anki vocabulary.
+  distinct from FSRS/Anki vocabulary. **Just review** names a recall method,
+  not a different activity.
 - Humans and agents share an explicit dictionary instead of inferring synonyms.
 - Some existing strings (`space setting`) become known debt until renamed.
 - Circles, notebook groups, and folders stay clearly separated in speech.

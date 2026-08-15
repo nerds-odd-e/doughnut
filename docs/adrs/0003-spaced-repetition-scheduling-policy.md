@@ -24,7 +24,7 @@ can span across the failure. Overdue answers are not rewarded the way open FSRS
 rewards low retrievability (longer elapsed → larger bounded stability increase).
 
 The planned recall time is a queue target. Missing it can reflect availability,
-queue size, question readiness, or system behavior — not that the learner forgot.
+queue size, MCQ readiness, or system behavior — not that the learner forgot.
 A memory-state transition uses the recall outcome and the actual elapsed time
 since the previous state-changing recall.
 
@@ -47,8 +47,9 @@ section as they are locked.
 
 Keep **recall**. FSRS **review** is the same activity; Doughnut names it recall
 because **recall is better than review**. Glossary: [ADR 0001](./0001-ubiquitous-language.md).
-Do not use **review** as a Doughnut domain noun. When citing FSRS, pair once
-(**review (FSRS) = recall**) then use Doughnut terms.
+Do not use **review** for the spaced activity. **Just review** is a recall
+method (self-evaluate after seeing the note), not FSRS review. When citing
+FSRS, pair once (**review (FSRS) = recall**) then use Doughnut terms.
 
 ### Whole-hour elapsed-time precision
 
@@ -200,7 +201,7 @@ tracker.
 ### Commissioned learning session feedback
 
 A commissioned memory tracker is graded from the Feedback a Tutor returns for its
-Session Item, not from a recall question Doughnut asked. Feedback carries a score
+Session Item, not from a recall prompt Doughnut asked. Feedback carries a score
 from 0 to 5. ADR 0001 defines the vocabulary and ADR 0005 defines what the score
 means to the Tutor; this section defines what it does to the schedule.
 
@@ -281,7 +282,8 @@ assert the resulting schedule movement, not the internal measure.
 - Declared overlap remains a first-class no-credit, no-penalty outcome with a
   same-session retry.
 - Tutor Feedback becomes a grading source alongside Doughnut's own recall
-  questions, and is the first place this policy quantifies an adjustment.
+  prompts (and just review), and is the first place this policy quantifies an
+  adjustment.
 - Implementations must distinguish observed retention time from deviation
   relative to a queue target.
 - Recall transitions use whole elapsed hours; sub-hour recall timing does not
@@ -349,7 +351,7 @@ boundary or sufficient current memory state is persisted.
 ## Related
 
 - Working discussion (gap + open issues toward finalizing this ADR): [`.planning/research/FSRS-COMPATIBILITY-GAP.md`](../../.planning/research/FSRS-COMPATIBILITY-GAP.md)
-- ADR 0001 [ubiquitous language](./0001-ubiquitous-language.md) — **recall** (not FSRS **review**); commissioned learning terms; spelling memory tracker
+- ADR 0001 [ubiquitous language](./0001-ubiquitous-language.md) — **recall** (not FSRS **review**); **recall prompt** / **MCQ** / **just review**; commissioned learning terms; spelling memory tracker
 - ADR 0005 [commissioned learning session protocol](./0005-commissioned-learning-session-protocol.md) — what a score means to the Tutor
 - Anki answer semantics: <https://docs.ankiweb.net/studying.html#answer-buttons>
 - FSRS algorithm and overdue-recall behavior: <https://github.com/open-spaced-repetition/awesome-fsrs/wiki/The-Algorithm>
