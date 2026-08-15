@@ -20,14 +20,14 @@ class MemoryTrackerUpdatePropertyKeyControllerTest extends MemoryTrackerControll
     MemoryTracker tracker =
         makeMe.aMemoryTrackerFor(note).propertyKey("topic").afterNthStrictRecall(2).please();
     Integer recallCount = tracker.getRecallCount();
-    Float forgettingCurve = tracker.getForgettingCurveIndex();
+    Float stability = tracker.getStability();
     Timestamp nextRecallAt = tracker.getNextRecallAt();
 
     MemoryTracker result = controller.updatePropertyKey(tracker, renameTo("subject"));
 
     assertThat(result.getPropertyKey(), equalTo("subject"));
     assertThat(result.getRecallCount(), equalTo(recallCount));
-    assertThat(result.getForgettingCurveIndex(), equalTo(forgettingCurve));
+    assertThat(result.getStability(), equalTo(stability));
     assertThat(result.getNextRecallAt(), equalTo(nextRecallAt));
   }
 

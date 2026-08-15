@@ -47,7 +47,7 @@ class RecallPromptAccidentalMatchConfusionAdjustmentTests extends RecallPromptCo
     @Test
     void shouldWeakenUniqueMatchedSpellingTrackerWithoutRecallCredit()
         throws UnexpectedNoAccessRightException {
-      float strengthBefore = matchedSpellingTracker.getForgettingCurveIndex();
+      float stabilityBefore = matchedSpellingTracker.getStability();
       Timestamp dueBefore = matchedSpellingTracker.getNextRecallAt();
       Timestamp lastRecalledBefore = matchedSpellingTracker.getLastRecalledAt();
       Integer recallCountBefore = matchedSpellingTracker.getRecallCount();
@@ -58,8 +58,8 @@ class RecallPromptAccidentalMatchConfusionAdjustmentTests extends RecallPromptCo
       controller.answerSpelling(recallPrompt, answerDTO);
 
       assertThat(
-          matchedSpellingTracker.getForgettingCurveIndex(),
-          equalTo(strengthBefore - ForgettingCurve.DEFAULT_FORGETTING_CURVE_INDEX_INCREMENT));
+          matchedSpellingTracker.getStability(),
+          equalTo(stabilityBefore - ForgettingCurve.DEFAULT_FORGETTING_CURVE_INDEX_INCREMENT));
       assertThat(matchedSpellingTracker.getLastRecalledAt(), equalTo(lastRecalledBefore));
       assertThat(matchedSpellingTracker.getRecallCount(), equalTo(recallCountBefore));
       assertThat(
@@ -73,17 +73,16 @@ class RecallPromptAccidentalMatchConfusionAdjustmentTests extends RecallPromptCo
     }
 
     @Test
-    void shouldNotDropMatchedSpellingTrackerBelowStrengthFloor()
+    void shouldNotDropMatchedSpellingTrackerBelowStabilityFloor()
         throws UnexpectedNoAccessRightException {
-      matchedSpellingTracker.setForgettingCurveIndex(
-          ForgettingCurve.DEFAULT_FORGETTING_CURVE_INDEX);
+      matchedSpellingTracker.setStability(ForgettingCurve.DEFAULT_FORGETTING_CURVE_INDEX);
       matchedSpellingTracker.setNextRecallAt(matchedSpellingTracker.calculateNextRecallAt());
       makeMe.entityPersister.save(matchedSpellingTracker);
 
       controller.answerSpelling(recallPrompt, answerDTO);
 
       assertThat(
-          matchedSpellingTracker.getForgettingCurveIndex(),
+          matchedSpellingTracker.getStability(),
           equalTo(ForgettingCurve.DEFAULT_FORGETTING_CURVE_INDEX));
     }
 
@@ -105,13 +104,13 @@ class RecallPromptAccidentalMatchConfusionAdjustmentTests extends RecallPromptCo
       Note understandingNote = ownedNoteTitled("Understanding Match Title");
       MemoryTracker understandingTracker = ownedTracker(understandingNote);
       answerDTO = spellingAnswer(understandingNote.getTitle());
-      float strengthBefore = understandingTracker.getForgettingCurveIndex();
+      float stabilityBefore = understandingTracker.getStability();
 
       controller.answerSpelling(recallPrompt, answerDTO);
 
       assertThat(
-          understandingTracker.getForgettingCurveIndex(),
-          equalTo(strengthBefore - ForgettingCurve.DEFAULT_FORGETTING_CURVE_INDEX_INCREMENT));
+          understandingTracker.getStability(),
+          equalTo(stabilityBefore - ForgettingCurve.DEFAULT_FORGETTING_CURVE_INDEX_INCREMENT));
       assertLinkedConfusionAdjustedTracker(understandingTracker);
     }
 
@@ -119,13 +118,12 @@ class RecallPromptAccidentalMatchConfusionAdjustmentTests extends RecallPromptCo
     void shouldPreferActiveSpellingWhenUnderstandingAlsoExists()
         throws UnexpectedNoAccessRightException {
       MemoryTracker understandingTracker = ownedTracker(matchedSpellingTracker.getNote());
-      float understandingStrengthBefore = understandingTracker.getForgettingCurveIndex();
+      float understandingStabilityBefore = understandingTracker.getStability();
 
       controller.answerSpelling(recallPrompt, answerDTO);
 
       assertLinkedConfusionAdjustedTracker(matchedSpellingTracker);
-      assertThat(
-          understandingTracker.getForgettingCurveIndex(), equalTo(understandingStrengthBefore));
+      assertThat(understandingTracker.getStability(), equalTo(understandingStabilityBefore));
     }
 
     @ParameterizedTest
@@ -155,7 +153,7 @@ class RecallPromptAccidentalMatchConfusionAdjustmentTests extends RecallPromptCo
       MemoryTracker propertyTracker =
           makeMe
               .aMemoryTrackerFor(note)
-              .forgettingCurveAndNextRecallAt(200.0f)
+              .stabilityAndNextRecallAt(200.0f)
               .propertyKey("topic")
               .please();
       assertIneligibleTrackerIsUnchangedAndUnlinked(note, propertyTracker);
@@ -165,11 +163,7 @@ class RecallPromptAccidentalMatchConfusionAdjustmentTests extends RecallPromptCo
     void shouldNotSelectCommissionedTracker() throws UnexpectedNoAccessRightException {
       Note note = ownedNoteTitled("Commissioned Match Title");
       MemoryTracker commissionedTracker =
-          makeMe
-              .aMemoryTrackerFor(note)
-              .forgettingCurveAndNextRecallAt(200.0f)
-              .commissioned()
-              .please();
+          makeMe.aMemoryTrackerFor(note).stabilityAndNextRecallAt(200.0f).commissioned().please();
       assertIneligibleTrackerIsUnchangedAndUnlinked(note, commissionedTracker);
     }
 
@@ -196,8 +190,8 @@ class RecallPromptAccidentalMatchConfusionAdjustmentTests extends RecallPromptCo
       String sharedTitle = "Shared Accidental Title";
       MemoryTracker firstTracker = ownedSpellingTracker(ownedNoteTitled(sharedTitle));
       MemoryTracker secondTracker = ownedSpellingTracker(ownedNoteTitled(sharedTitle));
-      float firstStrengthBefore = firstTracker.getForgettingCurveIndex();
-      float secondStrengthBefore = secondTracker.getForgettingCurveIndex();
+      float firstStabilityBefore = firstTracker.getStability();
+      float secondStabilityBefore = secondTracker.getStability();
       Timestamp firstDueBefore = firstTracker.getNextRecallAt();
       Timestamp secondDueBefore = secondTracker.getNextRecallAt();
       answerDTO = spellingAnswer(sharedTitle);
@@ -205,8 +199,8 @@ class RecallPromptAccidentalMatchConfusionAdjustmentTests extends RecallPromptCo
       controller.answerSpelling(recallPrompt, answerDTO);
 
       assertThat(recallPrompt.getAnswer().getConfusionAdjustedMemoryTracker(), nullValue());
-      assertThat(firstTracker.getForgettingCurveIndex(), equalTo(firstStrengthBefore));
-      assertThat(secondTracker.getForgettingCurveIndex(), equalTo(secondStrengthBefore));
+      assertThat(firstTracker.getStability(), equalTo(firstStabilityBefore));
+      assertThat(secondTracker.getStability(), equalTo(secondStabilityBefore));
       assertThat(firstTracker.getNextRecallAt(), equalTo(firstDueBefore));
       assertThat(secondTracker.getNextRecallAt(), equalTo(secondDueBefore));
     }
@@ -224,12 +218,12 @@ class RecallPromptAccidentalMatchConfusionAdjustmentTests extends RecallPromptCo
 
   private void assertIneligibleTrackerIsUnchangedAndUnlinked(Note note, MemoryTracker tracker)
       throws UnexpectedNoAccessRightException {
-    float strengthBefore = tracker.getForgettingCurveIndex();
+    float stabilityBefore = tracker.getStability();
     answerDTO = spellingAnswer(note.getTitle());
 
     controller.answerSpelling(recallPrompt, answerDTO);
 
     assertThat(recallPrompt.getAnswer().getConfusionAdjustedMemoryTracker(), nullValue());
-    assertThat(tracker.getForgettingCurveIndex(), equalTo(strengthBefore));
+    assertThat(tracker.getStability(), equalTo(stabilityBefore));
   }
 }

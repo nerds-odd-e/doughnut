@@ -602,7 +602,7 @@ export type MemoryTracker = {
     nextRecallAt: string;
     assimilatedAt?: string;
     recallCount?: number;
-    forgettingCurveIndex?: number;
+    stability?: number;
     removedFromTracking?: boolean;
     type?: 'UNDERSTANDING' | 'SPELLING' | 'COMMISSIONED';
     propertyKey?: string;
@@ -1210,7 +1210,7 @@ export type MemoryTrackerWritable = {
     nextRecallAt: string;
     assimilatedAt?: string;
     recallCount?: number;
-    forgettingCurveIndex?: number;
+    stability?: number;
     removedFromTracking?: boolean;
     type?: 'UNDERSTANDING' | 'SPELLING' | 'COMMISSIONED';
     propertyKey?: string;

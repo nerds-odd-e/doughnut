@@ -4314,7 +4314,7 @@ components:
         recallCount:
           type: integer
           format: int32
-        forgettingCurveIndex:
+        stability:
           type: number
           format: float
         removedFromTracking:

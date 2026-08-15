@@ -103,7 +103,7 @@ final class MemoryTrackerAssimilation {
     memoryTracker.setUser(currentUser);
     memoryTracker.setAssimilatedAt(currentTime);
     memoryTracker.setLastRecalledAt(currentTime);
-    memoryTrackerService.updateForgettingCurve(memoryTracker, 0.0f);
+    memoryTrackerService.updateStability(memoryTracker, 0.0f);
     if (type == MemoryTrackerType.UNDERSTANDING) {
       deleteMatchingSequenceSkip(currentUser, memoryTracker);
     }

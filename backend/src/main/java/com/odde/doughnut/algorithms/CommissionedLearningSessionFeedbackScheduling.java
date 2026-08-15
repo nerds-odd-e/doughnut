@@ -11,9 +11,8 @@ public final class CommissionedLearningSessionFeedbackScheduling {
   public static void recordFeedback(MemoryTracker tracker, Timestamp now, int score) {
     tracker.setRecallCount(tracker.getRecallCount() + 1);
     tracker.setLastRecalledAt(now);
-    tracker.setForgettingCurveIndex(
-        CommissionedLearningSessionFeedbackPolicy.applyScore(
-            tracker.getForgettingCurveIndex(), score));
+    tracker.setStability(
+        CommissionedLearningSessionFeedbackPolicy.applyScore(tracker.getStability(), score));
     tracker.setNextRecallAt(ensureNextRecallStrictlyAfterNow(tracker, now));
   }
 

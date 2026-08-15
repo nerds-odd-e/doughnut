@@ -85,7 +85,7 @@ class LearningSessionRecordTests extends LearningSessionControllerTestBase {
         List.of(
             holaTracker.getLastRecalledAt(),
             holaTracker.getRecallCount(),
-            holaTracker.getForgettingCurveIndex(),
+            holaTracker.getStability(),
             holaTracker.getNextRecallAt());
     long sessionsBefore = learningSessionRepository.count();
 
@@ -108,7 +108,7 @@ class LearningSessionRecordTests extends LearningSessionControllerTestBase {
         List.of(
             holaTracker.getLastRecalledAt(),
             holaTracker.getRecallCount(),
-            holaTracker.getForgettingCurveIndex(),
+            holaTracker.getStability(),
             holaTracker.getNextRecallAt()),
         equalTo(trackerStateBefore));
   }

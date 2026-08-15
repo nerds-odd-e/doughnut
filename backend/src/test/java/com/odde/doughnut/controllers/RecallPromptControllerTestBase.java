@@ -40,15 +40,11 @@ abstract class RecallPromptControllerTestBase extends ControllerTestBase {
   }
 
   MemoryTracker ownedTracker(Note note) {
-    return makeMe.aMemoryTrackerFor(note).forgettingCurveAndNextRecallAt(200.0f).please();
+    return makeMe.aMemoryTrackerFor(note).stabilityAndNextRecallAt(200.0f).please();
   }
 
   MemoryTracker ownedSpellingTracker(Note note) {
-    return makeMe
-        .aMemoryTrackerFor(note)
-        .forgettingCurveAndNextRecallAt(200.0f)
-        .spelling()
-        .please();
+    return makeMe.aMemoryTrackerFor(note).stabilityAndNextRecallAt(200.0f).spelling().please();
   }
 
   MemoryTracker ownedSpellingTracker() {

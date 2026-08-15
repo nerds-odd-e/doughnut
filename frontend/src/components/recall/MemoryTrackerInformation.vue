@@ -30,9 +30,9 @@
           </span>
         </div>
         <div>
-          <span class="font-semibold">Forgetting Curve Index:</span>
+          <span class="font-semibold">Stability:</span>
           <span class="ml-2">
-            {{ memoryTracker.forgettingCurveIndex ?? "N/A" }}
+            {{ memoryTracker.stability ?? "N/A" }}
           </span>
         </div>
         <div>

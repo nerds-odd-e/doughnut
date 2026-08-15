@@ -52,18 +52,18 @@ class RecallPromptAnswerControllerTest extends RecallPromptControllerTestBase {
         makeMe
             .aMemoryTrackerFor(note)
             .propertyKey("topic")
-            .forgettingCurveAndNextRecallAt(200.0f)
+            .stabilityAndNextRecallAt(200.0f)
             .please();
     testabilitySettings.timeTravelTo(propertyTracker.getNextRecallAt());
 
     Integer noteLevelRecallCountBefore = noteLevelTracker.getRecallCount();
-    Float noteLevelIndexBefore = noteLevelTracker.getForgettingCurveIndex();
+    Float noteLevelStabilityBefore = noteLevelTracker.getStability();
     Integer propertyRecallCountBefore = propertyTracker.getRecallCount();
 
     controller.answer(mcqPrompt(propertyTracker, note), answerDTO);
 
     assertThat(noteLevelTracker.getRecallCount(), equalTo(noteLevelRecallCountBefore));
-    assertThat(noteLevelTracker.getForgettingCurveIndex(), equalTo(noteLevelIndexBefore));
+    assertThat(noteLevelTracker.getStability(), equalTo(noteLevelStabilityBefore));
     assertThat(propertyTracker.getRecallCount(), greaterThan(propertyRecallCountBefore));
   }
 
@@ -83,60 +83,61 @@ class RecallPromptAnswerControllerTest extends RecallPromptControllerTestBase {
   }
 
   @Test
-  void shouldNoteIncreaseIndexIfRepeatImmediately() throws UnexpectedNoAccessRightException {
+  void shouldNotIncreaseStabilityIfRepeatImmediately() throws UnexpectedNoAccessRightException {
     testabilitySettings.timeTravelTo(memoryTracker.getLastRecalledAt());
-    Float oldForgettingCurveIndex = memoryTracker.getForgettingCurveIndex();
+    Float oldStability = memoryTracker.getStability();
     controller.answer(recallPrompt, answerDTO);
-    assertThat(memoryTracker.getForgettingCurveIndex(), equalTo(oldForgettingCurveIndex));
+    assertThat(memoryTracker.getStability(), equalTo(oldStability));
   }
 
   @Test
-  void shouldIncreaseTheIndex() throws UnexpectedNoAccessRightException {
+  void shouldIncreaseStability() throws UnexpectedNoAccessRightException {
     testabilitySettings.timeTravelTo(memoryTracker.getNextRecallAt());
-    Float oldForgettingCurveIndex = memoryTracker.getForgettingCurveIndex();
+    Float oldStability = memoryTracker.getStability();
     controller.answer(recallPrompt, answerDTO);
-    assertThat(memoryTracker.getForgettingCurveIndex(), greaterThan(oldForgettingCurveIndex));
+    assertThat(memoryTracker.getStability(), greaterThan(oldStability));
     assertThat(
         memoryTracker.getLastRecalledAt(), equalTo(testabilitySettings.getCurrentUTCTimestamp()));
   }
 
   @Test
-  void fastAnswer_shouldIncreaseIndexMoreThanSlowAnswer() throws UnexpectedNoAccessRightException {
+  void fastAnswer_shouldIncreaseStabilityMoreThanSlowAnswer()
+      throws UnexpectedNoAccessRightException {
     testabilitySettings.timeTravelTo(memoryTracker.getNextRecallAt());
-    Float baseIndex = memoryTracker.getForgettingCurveIndex();
+    Float baseStability = memoryTracker.getStability();
     Timestamp baseLastRecalledAt = memoryTracker.getLastRecalledAt();
 
     answerDTO.setThinkingTimeMs(10000);
     controller.answer(recallPrompt, answerDTO);
-    Float indexWithFastAnswer = memoryTracker.getForgettingCurveIndex();
+    Float stabilityWithFastAnswer = memoryTracker.getStability();
 
-    memoryTracker.setForgettingCurveIndex(baseIndex);
+    memoryTracker.setStability(baseStability);
     memoryTracker.setLastRecalledAt(baseLastRecalledAt);
     memoryTracker.setNextRecallAt(memoryTracker.calculateNextRecallAt());
     answerDTO.setThinkingTimeMs(40000);
     controller.answer(mcqPrompt(memoryTracker, memoryTracker.getNote()), answerDTO);
 
-    assertThat(indexWithFastAnswer, greaterThan(memoryTracker.getForgettingCurveIndex()));
+    assertThat(stabilityWithFastAnswer, greaterThan(memoryTracker.getStability()));
   }
 
   @Test
   void answerWithBaseThinkingTime_shouldHaveNoThinkingTimeAdjustment()
       throws UnexpectedNoAccessRightException {
     testabilitySettings.timeTravelTo(memoryTracker.getNextRecallAt());
-    Float baseIndex = memoryTracker.getForgettingCurveIndex();
+    Float baseStability = memoryTracker.getStability();
     Timestamp baseLastRecalledAt = memoryTracker.getLastRecalledAt();
 
     answerDTO.setThinkingTimeMs(ForgettingCurve.BASE_THINKING_TIME_MS);
     controller.answer(recallPrompt, answerDTO);
-    Float indexWithBaseThinkingTime = memoryTracker.getForgettingCurveIndex();
+    Float stabilityWithBaseThinkingTime = memoryTracker.getStability();
 
-    memoryTracker.setForgettingCurveIndex(baseIndex);
+    memoryTracker.setStability(baseStability);
     memoryTracker.setLastRecalledAt(baseLastRecalledAt);
     memoryTracker.setNextRecallAt(memoryTracker.calculateNextRecallAt());
     answerDTO.setThinkingTimeMs(null);
     controller.answer(mcqPrompt(memoryTracker, memoryTracker.getNote()), answerDTO);
 
-    assertThat(indexWithBaseThinkingTime, equalTo(memoryTracker.getForgettingCurveIndex()));
+    assertThat(stabilityWithBaseThinkingTime, equalTo(memoryTracker.getStability()));
   }
 
   @Test
@@ -176,12 +177,12 @@ class RecallPromptAnswerControllerTest extends RecallPromptControllerTestBase {
     }
 
     @Test
-    void shouldMoveLastRecalledAtToGradeTimeAndReduceStrength()
+    void shouldMoveLastRecalledAtToGradeTimeAndReduceStability()
         throws UnexpectedNoAccessRightException {
       testabilitySettings.timeTravelTo(memoryTracker.getNextRecallAt());
-      Float oldForgettingCurveIndex = memoryTracker.getForgettingCurveIndex();
+      Float oldStability = memoryTracker.getStability();
       controller.answer(recallPrompt, answerDTO);
-      assertThat(memoryTracker.getForgettingCurveIndex(), lessThan(oldForgettingCurveIndex));
+      assertThat(memoryTracker.getStability(), lessThan(oldStability));
       assertThat(
           memoryTracker.getLastRecalledAt(), equalTo(testabilitySettings.getCurrentUTCTimestamp()));
     }

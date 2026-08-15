@@ -12,7 +12,7 @@
       <tr>
         <th>Type</th>
         <th>Recall Count</th>
-        <th>Forgetting Curve Index</th>
+        <th>Stability</th>
         <th>Next Recall</th>
       </tr>
     </thead>

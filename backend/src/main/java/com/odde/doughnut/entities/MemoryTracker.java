@@ -73,10 +73,10 @@ public class MemoryTracker extends EntityIdentifiedByIdOnly {
   @Setter
   private Integer recallCount = 0;
 
-  @Column(name = "forgetting_curve_index")
+  @Column(name = "stability")
   @Getter
   @Setter
-  private Float forgettingCurveIndex = ForgettingCurve.DEFAULT_FORGETTING_CURVE_INDEX;
+  private Float stability = ForgettingCurve.DEFAULT_FORGETTING_CURVE_INDEX;
 
   @Column(name = "removed_from_tracking")
   @Getter
@@ -168,11 +168,11 @@ public class MemoryTracker extends EntityIdentifiedByIdOnly {
   }
 
   private ForgettingCurve forgettingCurve() {
-    return new ForgettingCurve(getUser().getSpacedRepetitionAlgorithm(), getForgettingCurveIndex());
+    return new ForgettingCurve(getUser().getSpacedRepetitionAlgorithm(), getStability());
   }
 
   public void recallFailed(Timestamp currentUTCTimestamp) {
-    setForgettingCurveIndex(forgettingCurve().failed());
+    setStability(forgettingCurve().failed());
     setLastRecalledAt(currentUTCTimestamp);
     setNextRecallAt(TimestampOperations.addHoursToTimestamp(currentUTCTimestamp, 12));
   }
@@ -181,7 +181,7 @@ public class MemoryTracker extends EntityIdentifiedByIdOnly {
     long elapsedInHours =
         TimestampOperations.getDiffInHours(currentUTCTimestamp, getLastRecalledAt());
 
-    setForgettingCurveIndex(forgettingCurve().succeeded(elapsedInHours, thinkingTimeMs));
+    setStability(forgettingCurve().succeeded(elapsedInHours, thinkingTimeMs));
 
     setLastRecalledAt(currentUTCTimestamp);
     setNextRecallAt(calculateNextRecallAt());
@@ -199,7 +199,7 @@ public class MemoryTracker extends EntityIdentifiedByIdOnly {
 
   public void adjustForConfusion() {
     Timestamp existingDue = getNextRecallAt();
-    setForgettingCurveIndex(forgettingCurve().confusionAdjusted());
+    setStability(forgettingCurve().confusionAdjusted());
     Timestamp projected = calculateNextRecallAt();
     setNextRecallAt(projected.after(existingDue) ? existingDue : projected);
   }

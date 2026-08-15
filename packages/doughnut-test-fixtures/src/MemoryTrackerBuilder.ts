@@ -22,7 +22,7 @@ class MemoryTrackerBuilder extends Builder<MemoryTracker> {
       nextRecallAt: '',
       assimilatedAt: '',
       recallCount: 0,
-      forgettingCurveIndex: 0,
+      stability: 0,
       removedFromTracking: false,
       note: new NoteBuilder().do(),
     }
@@ -53,8 +53,8 @@ class MemoryTrackerBuilder extends Builder<MemoryTracker> {
     return this
   }
 
-  forgettingCurveIndex(forgettingCurveIndex: number): MemoryTrackerBuilder {
-    this.data.forgettingCurveIndex = forgettingCurveIndex
+  stability(stability: number): MemoryTrackerBuilder {
+    this.data.stability = stability
     return this
   }
 

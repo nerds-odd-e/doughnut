@@ -108,6 +108,7 @@ describe("NoteInfoComponent", () => {
       .mount({ attachTo: document.body })
 
     expect(wrapper.find("table").exists()).toBe(true)
+    expect(wrapper.text()).toContain("Stability")
     const h6Elements = wrapper.findAll("h6")
     expect(h6Elements.some((h6) => h6.text().includes("Memory Trackers"))).toBe(
       true

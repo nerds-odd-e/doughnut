@@ -57,7 +57,7 @@ class RecallPromptOverlapTryAgainTests extends RecallPromptControllerTestBase {
   void shouldGradeAsOverlapWhenAnswerMatchesReviewedAndResolvedOverlapTarget()
       throws UnexpectedNoAccessRightException {
     Integer recallCountBefore = memoryTracker.getRecallCount();
-    Float forgettingCurveBefore = memoryTracker.getForgettingCurveIndex();
+    Float stabilityBefore = memoryTracker.getStability();
     Timestamp nextRecallAtBefore = memoryTracker.getNextRecallAt();
     Timestamp lastRecalledAtBefore = memoryTracker.getLastRecalledAt();
 
@@ -66,7 +66,7 @@ class RecallPromptOverlapTryAgainTests extends RecallPromptControllerTestBase {
     assertThat(result.getAnswer().getOutcome(), is(AnswerOutcome.OVERLAP));
     assertFalse(result.getAnswer().getCorrect());
     assertThat(memoryTracker.getRecallCount(), equalTo(recallCountBefore));
-    assertThat(memoryTracker.getForgettingCurveIndex(), equalTo(forgettingCurveBefore));
+    assertThat(memoryTracker.getStability(), equalTo(stabilityBefore));
     assertThat(memoryTracker.getNextRecallAt(), equalTo(nextRecallAtBefore));
     assertThat(memoryTracker.getLastRecalledAt(), equalTo(lastRecalledAtBefore));
   }
@@ -75,7 +75,7 @@ class RecallPromptOverlapTryAgainTests extends RecallPromptControllerTestBase {
   void shouldLeaveOverlapPartnerTrackerUnchangedAndUnlinked()
       throws UnexpectedNoAccessRightException {
     MemoryTracker partnerTracker = ownedSpellingTracker(partnerNote);
-    float partnerStrengthBefore = partnerTracker.getForgettingCurveIndex();
+    float partnerStabilityBefore = partnerTracker.getStability();
     Timestamp partnerDueBefore = partnerTracker.getNextRecallAt();
     Timestamp now = testabilitySettings.getCurrentUTCTimestamp();
     int partnerWrongCountBefore =
@@ -84,7 +84,7 @@ class RecallPromptOverlapTryAgainTests extends RecallPromptControllerTestBase {
     AnsweredQuestion result = answerSpelling(memoryTracker, "Shared Title");
 
     assertThat(result.getAnswer().getConfusionAdjustedMemoryTracker(), nullValue());
-    assertThat(partnerTracker.getForgettingCurveIndex(), equalTo(partnerStrengthBefore));
+    assertThat(partnerTracker.getStability(), equalTo(partnerStabilityBefore));
     assertThat(partnerTracker.getNextRecallAt(), equalTo(partnerDueBefore));
     assertThat(
         memoryTrackerService.countWrongAnswersInPeriod(partnerTracker, now, 14),

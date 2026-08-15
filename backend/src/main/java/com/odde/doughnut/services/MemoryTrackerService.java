@@ -64,8 +64,8 @@ public class MemoryTrackerService {
     return assimilation.assimilate(request, currentUser, currentTime);
   }
 
-  public void updateForgettingCurve(MemoryTracker memoryTracker, float adjustment) {
-    memoryTracker.setForgettingCurveIndex(memoryTracker.getForgettingCurveIndex() + adjustment);
+  public void updateStability(MemoryTracker memoryTracker, float adjustment) {
+    memoryTracker.setStability(memoryTracker.getStability() + adjustment);
     memoryTracker.setNextRecallAt(memoryTracker.calculateNextRecallAt());
     entityPersister.save(memoryTracker);
   }

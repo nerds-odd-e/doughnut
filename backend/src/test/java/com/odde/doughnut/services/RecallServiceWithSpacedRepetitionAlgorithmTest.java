@@ -106,14 +106,14 @@ public class RecallServiceWithSpacedRepetitionAlgorithmTest {
         "2, 0, 120.0",
       })
       void aMemoryTrackerHasBeenRecalledStrictly(
-          int ntimes, Integer daysDelay, float expectedForgettingCurveIndex) {
+          int ntimes, Integer daysDelay, float expectedStability) {
         MemoryTracker memoryTracker =
             makeMe.aMemoryTrackerFor(note).afterNthStrictRecall(ntimes).please();
         Timestamp currentUTCTimestamp =
             TimestampOperations.addHoursToTimestamp(
                 memoryTracker.getNextRecallAt(), daysDelay * 24);
         memoryTracker.markAsRecalled(currentUTCTimestamp, true, null);
-        assertThat(memoryTracker.getForgettingCurveIndex(), equalTo(expectedForgettingCurveIndex));
+        assertThat(memoryTracker.getStability(), equalTo(expectedStability));
       }
     }
   }

@@ -1,6 +1,6 @@
 # Overdue correct recall — Stability hours
 
-**Status:** in progress (slices 1–2 done)  
+**Status:** in progress (slices 1–3 done)  
 **ADR:** Proposed [0003](../../../docs/adrs/0003-spaced-repetition-scheduling-policy.md) B3  
 **Seed:** [SEED-004](../../seeds/SEED-004-close-spaced-repetition-scheduling-policy-gap.md)
 

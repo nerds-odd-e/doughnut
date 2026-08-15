@@ -57,6 +57,6 @@ public class SpacedRepetitionEarlyRecallAdjustmentTest {
     memoryTracker.recalledSuccessfully(
         TimestampOperations.addHoursToTimestamp(memoryTracker.getLastRecalledAt(), elapsedInHours),
         null);
-    return memoryTracker.getForgettingCurveIndex();
+    return memoryTracker.getStability();
   }
 }

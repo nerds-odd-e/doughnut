@@ -8,7 +8,7 @@
           <th>Assimilated</th>
           <th>Next Recall</th>
           <th>Recall Count</th>
-          <th>Curve Index</th>
+          <th>Stability</th>
           <th>Spelling</th>
           <th>Status</th>
         </tr>
@@ -24,7 +24,7 @@
           <td>{{ new Date(point.assimilatedAt!).toLocaleString() }}</td>
           <td>{{ new Date(point.nextRecallAt!).toLocaleString() }}</td>
           <td>{{ point.recallCount }}</td>
-          <td>{{ point.forgettingCurveIndex }}</td>
+          <td>{{ point.stability }}</td>
           <td>{{ point.spelling ? 'Yes' : 'No' }}</td>
           <td>{{ point.removedFromTracking ? 'Removed' : 'Active' }}</td>
         </tr>

@@ -72,11 +72,11 @@ class NoteControllerDeleteReduceToSourceTests extends ControllerTestBase {
         makeMe
             .aMemoryTrackerFor(relation)
             .afterNthStrictRecall(3)
-            .forgettingCurveAndNextRecallAt(5.5f)
+            .stabilityAndNextRecallAt(5.5f)
             .please();
     int trackerId = relationTracker.getId();
     int recallCountBefore = relationTracker.getRecallCount();
-    float forgettingCurveBefore = relationTracker.getForgettingCurveIndex();
+    float stabilityBefore = relationTracker.getStability();
     Timestamp nextRecallBefore = relationTracker.getNextRecallAt();
 
     controller.deleteNote(relation, reduceToSourcePropertyDeleteRequest("a part of"));
@@ -87,7 +87,7 @@ class NoteControllerDeleteReduceToSourceTests extends ControllerTestBase {
     assertThat(reloaded.getPropertyKey(), equalTo("a part of"));
     assertThat(reloaded.getType(), equalTo(MemoryTrackerType.UNDERSTANDING));
     assertThat(reloaded.getRecallCount(), equalTo(recallCountBefore));
-    assertThat(reloaded.getForgettingCurveIndex(), equalTo(forgettingCurveBefore));
+    assertThat(reloaded.getStability(), equalTo(stabilityBefore));
     assertThat(reloaded.getNextRecallAt(), equalTo(nextRecallBefore));
     assertThat(
         memoryTrackerRepository.findByUserAndNote(currentUser.getUser().getId(), relation.getId()),

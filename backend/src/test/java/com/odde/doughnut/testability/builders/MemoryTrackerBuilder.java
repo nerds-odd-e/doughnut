@@ -39,8 +39,8 @@ public class MemoryTrackerBuilder extends EntityBuilder<MemoryTracker> {
   @Override
   protected void beforeCreate(boolean needPersist) {}
 
-  public MemoryTrackerBuilder forgettingCurveAndNextRecallAt(float value) {
-    entity.setForgettingCurveIndex(value);
+  public MemoryTrackerBuilder stabilityAndNextRecallAt(float value) {
+    entity.setStability(value);
     entity.setNextRecallAt(entity.calculateNextRecallAt());
     return this;
   }

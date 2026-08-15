@@ -70,7 +70,7 @@ class RecallPromptAccidentalMatchEdgeTests extends RecallPromptControllerTestBas
     Integer oldRecallCount = memoryTracker.getRecallCount();
     controller.answerSpelling(recallPrompt, answerDTO);
 
-    assertThat(memoryTracker.getForgettingCurveIndex(), equalTo(180.0f));
+    assertThat(memoryTracker.getStability(), equalTo(180.0f));
     assertThat(memoryTracker.getRecallCount(), equalTo(oldRecallCount + 1));
     assertThat(memoryTracker.getLastRecalledAt(), equalTo(gradeTime));
     assertThat(
@@ -120,9 +120,9 @@ class RecallPromptAccidentalMatchEdgeTests extends RecallPromptControllerTestBas
   }
 
   @Test
-  void shouldNotDropPromptedTrackerBelowStrengthFloorOnAccidentalMatch()
+  void shouldNotDropPromptedTrackerBelowStabilityFloorOnAccidentalMatch()
       throws UnexpectedNoAccessRightException {
-    memoryTracker.setForgettingCurveIndex(ForgettingCurve.DEFAULT_FORGETTING_CURVE_INDEX);
+    memoryTracker.setStability(ForgettingCurve.DEFAULT_FORGETTING_CURVE_INDEX);
     memoryTracker.setNextRecallAt(memoryTracker.calculateNextRecallAt());
     makeMe.entityPersister.save(memoryTracker);
     testabilitySettings.timeTravelTo(memoryTracker.getNextRecallAt());
@@ -130,8 +130,7 @@ class RecallPromptAccidentalMatchEdgeTests extends RecallPromptControllerTestBas
     controller.answerSpelling(recallPrompt, answerDTO);
 
     assertThat(
-        memoryTracker.getForgettingCurveIndex(),
-        equalTo(ForgettingCurve.DEFAULT_FORGETTING_CURVE_INDEX));
+        memoryTracker.getStability(), equalTo(ForgettingCurve.DEFAULT_FORGETTING_CURVE_INDEX));
   }
 
   @Test

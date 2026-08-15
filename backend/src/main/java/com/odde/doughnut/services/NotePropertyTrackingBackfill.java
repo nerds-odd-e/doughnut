@@ -62,7 +62,7 @@ public final class NotePropertyTrackingBackfill {
         assimilated_at,
         last_recalled_at,
         next_recall_at,
-        forgetting_curve_index,
+        stability,
         recall_count
       ) VALUES (?, ?, 'UNDERSTANDING', ?, 1, ?, ?, ?, ?, 0)
       """;

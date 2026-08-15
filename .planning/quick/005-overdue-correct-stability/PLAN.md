@@ -19,7 +19,7 @@
 |---|------|--------|------------|
 | 1 | Structure | done | ADR 0003 states Stability hours |
 | 2 | Structure | done | Glossary names Stability |
-| 3 | Behavior | planned | Memory tracker field is `stability` |
+| 3 | Behavior | done | Memory tracker field is `stability` |
 | 4 | Behavior | planned | No spaced-repetition day list in Settings or User API |
 | 5 | Behavior | planned | Stability is whole hours; day-list column dropped |
 | 6 | Behavior | planned | Overdue correct lengthens Stability more than on-time |
@@ -53,19 +53,11 @@ ADR 0001 glossary: **Stability** (hours) and **Retrievability** (computed). Remo
 ### 3. Memory tracker field is `stability`
 
 **Type:** Behavior  
-**Status:** planned
+**Status:** done
 
-**Pre-condition:** API/UI/DB use `forgettingCurveIndex` / `forgetting_curve_index` with the same numbers as today.
+Field/column/JSON/UI is **`stability` / Stability**. Numbers still the old index scale. Migration `V300000259`. `ForgettingCurve` algorithm class unchanged. No E2E for the old label.
 
-**Trigger:** Load a memory tracker (note info, tracker page, recently recalled, OpenAPI).
-
-**Post-condition:** The field is **`stability`**. Label **Stability**. Numbers **unchanged** (still the old index scale). Scheduler still uses the day table. Due times unchanged.
-
-**Change:** rename column, entity, generated SDK (`pnpm generateTypeScript`), fixtures, frontend, tests. No `@JsonProperty` alias to the old name.
-
-**Tests:** existing tracker tests keep the same numeric expectations under `stability`; E2E label `Forgetting Curve Index:` → `Stability:`.
-
-This is the JSON/SDK/frontend rename commit. Enables slice 5 to convert **values** without renaming.
+**Learning:** unused duplicate `ReviewPointBuilder.ts` deleted. Slice 5 still converts values and may replace `ForgettingCurve`.
 
 ---
 
