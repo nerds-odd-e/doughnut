@@ -1,6 +1,7 @@
 # Skip Memory Tracking — leftover cohesion
 
-**Status:** planned  
+**Status:** in-progress  
+
 **Source:** Inspection of the shipped Skip Memory Tracking work (`7e19361038`…`89a3a32202`). No user-facing bugs. Remaining work is Structure only: redundant tests, a now-dead fixture helper, and repository method names that still say “no memory tracker” after the sequence filter grew.
 
 **Inspected and not in this plan**
@@ -20,21 +21,11 @@
 ## Phase 1: Drop skip-flag tests that do not exercise a production branch
 
 **Type:** Structure  
-**Status:** planned
+**Status:** done
 
-**Structure change:** Remove two controller tests whose extra precondition (notebook **Skip Memory Tracking**) is never read by the endpoint under test, then delete `NoteBuilder.skipMemoryTrackingEntirely` which exists only for those tests.
+**Done:** Removed `AssimilationControllerAssimilateTests.assimilateOnSkipMemoryTrackingNotebookCreatesUnderstandingTracker`, `UserMenuDataControllerTest.skipMemoryTrackingNoteTrackerAppearsInRecallDue`, and `NoteBuilder.skipMemoryTrackingEntirely`. Kept `NotebookBuilder.skipMemoryTrackingEntirely` and remaining `/next` / subscribe / E2E / Settings coverage.
 
-**Immediate next:** Phase 2 can rename unassimilated repository methods without dragging a misleading “skip-flag still works on assimilate/recall” test surface.
-
-**Delete**
-
-- `AssimilationControllerAssimilateTests.assimilateOnSkipMemoryTrackingNotebookCreatesUnderstandingTracker` — same `assimilate` outcome as `ordinaryAssimilateCreatesOnlyUnderstandingTracker`; assimilate does not branch on the flag
-- `UserMenuDataControllerTest.skipMemoryTrackingNoteTrackerAppearsInRecallDue` — menu due uses the same recall query as `RecallsControllerTests`; that query does not filter the flag
-- `NoteBuilder.skipMemoryTrackingEntirely` — callers are only the two tests above. Keep `NotebookBuilder.skipMemoryTrackingEntirely` (used by `/next` and subscribe tests)
-
-**Do not delete:** `/next` omit tests, walkthrough E2E, subscribe 400 test, Settings help-text test.
-
-**Verify:** `CURSOR_DEV=true nix develop -c backend/gradlew -p backend test -Dspring.profiles.active=test --tests "com.odde.doughnut.controllers.AssimilationControllerAssimilateTests" --tests "com.odde.doughnut.controllers.UserMenuDataControllerTest"`
+**Learning:** No leftover NoteBuilder callers; file sizes stayed under 250. Phase 2 rename is still the remaining work.
 
 ---
 

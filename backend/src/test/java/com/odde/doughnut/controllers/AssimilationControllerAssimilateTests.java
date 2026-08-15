@@ -48,21 +48,6 @@ class AssimilationControllerAssimilateTests extends ControllerTestBase {
     }
 
     @Test
-    void assimilateOnSkipMemoryTrackingNotebookCreatesUnderstandingTracker() {
-      Note note =
-          makeMe
-              .aNote()
-              .notebookOwnedBy(currentUser.getUser())
-              .skipMemoryTrackingEntirely(true)
-              .please();
-
-      List<MemoryTracker> result =
-          controller.assimilate(AssimilationControllerTestSupport.assimilateRequest(note));
-
-      assertThat(result.get(0).getType(), equalTo(MemoryTrackerType.UNDERSTANDING));
-    }
-
-    @Test
     void assimilatingSkippedNoteDeletesMatchingSkipRow() {
       Note note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
       makeMe.anAssimilationSequenceSkipFor(note).please();
