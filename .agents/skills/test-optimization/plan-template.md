@@ -2,7 +2,7 @@
 
 Status: in-progress
 
-**Execution:** run via **execute-plan** (commit + push per phase).
+**Execution:** run via **execute-plan** (commit + push per slice).
 
 ## Profiling baseline (YYYY-MM-DD)
 
@@ -36,7 +36,8 @@ tag Scenario or Feature `@skipOptimizationDueToKnownNecessarySlowness`.
 
 ---
 
-### Phase 1: <name>
+### <name>
+Type: Structure
 Status: planned
 
 **Tests:**
@@ -52,7 +53,8 @@ Status: planned
 
 ---
 
-### Phase N: Re-profile and close
+### Re-profile and close
+Type: Structure
 Status: planned
 
 | Metric | Before | After |

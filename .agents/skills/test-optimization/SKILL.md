@@ -1,7 +1,7 @@
 ---
 name: test-optimization
 description: >-
-  Profile a test suite, optimize the slowest top 10% in phased groups, and
+  Profile a test suite, optimize the slowest top 10% in grouped slices, and
   close with a re-profile. Works for unit tests (JUnit/Vitest/…; "small test" style)
   in any sub-project (backend, frontend, cli, mcp-server) or Cypress E2E. Use when
   the developer asks to optimize, speed up, or profile slow tests, top 10% slowest,
@@ -10,13 +10,13 @@ description: >-
 ---
 
 <objective>
-Profile a test suite, optimize the slowest top 10% in phased groups, and close
+Profile a test suite, optimize the slowest top 10% in grouped slices, and close
 with a re-profile — faster, deterministic tests, not more tests.
 
 Purpose: Systematic test-performance workflow for any sub-project (backend,
 frontend, cli, mcp-server, E2E).
 
-Output: Optimized tests with per-phase commits + summary ending with
+Output: Optimized tests with per-slice commits + summary ending with
 `## TEST OPTIMIZATION COMPLETE`.
 </objective>
 
@@ -48,8 +48,8 @@ When `--resolve` is given, skip every other step and go straight to
 
 **Execution model:** After writing the plan, **always** use **execute-plan**
 (`.agents/skills/execute-plan/SKILL.md`). Coordinator delegates each group to a
-fresh sub-agent; each phase runs post-change-refactor, then commits and pushes.
-Do not accumulate context across phases in one agent.
+fresh sub-agent; each slice runs post-change-refactor, then commits and pushes.
+Do not accumulate context across slices in one agent.
 
 **E2E skip tag:** `@skipOptimizationDueToKnownNecessarySlowness` on a Scenario
 or Feature marks known-necessary slowness. Profile runs exclude it via
@@ -96,13 +96,13 @@ For **each** Candidate:
 | Option | When | Action |
 |--------|------|--------|
 | **1. Tag** | Slowness is inherent to the behavior under test and no cheaper test matches its coverage + user-value clarity. | Add `@skipOptimizationDueToKnownNecessarySlowness` to that Scenario / Scenario Outline / Feature (tag the specific slow scenario, not the whole feature unless all of it is slow). |
-| **2. Plan** | A unit test (or mocked scenario) can give the same coverage + behavioral protection + user-value clarity, so the slow test should be replaced/removed. | Add it to a phased plan via the **phased-planning** skill (`.planning/quick/NNN-slug/`) to remove the test and replace with the cheaper test(s). |
+| **2. Plan** | A unit test (or mocked scenario) can give the same coverage + behavioral protection + user-value clarity, so the slow test should be replaced/removed. | Add it to a plan via the **slice-planning** skill (`.planning/quick/NNN-slug/`) to remove the test and replace with the cheaper test(s). |
 | **3. Ask** | No obviously logical decision (e.g. a genuine product / network / value trade-off). | Use `AskQuestion` to let the developer decide; then apply their choice. |
 
 **Constraints:**
 
 - **Zero or one plan total** across the whole resolve pass — batch replacements
-  into a single phased plan if more than one Candidate needs option 2.
+  into a single plan if more than one Candidate needs option 2.
 - Tagging is a **developer decision (Jidoka)** normally proposed, not auto-applied;
   in `--resolve` mode the developer has invoked resolve explicitly, so you **may
   apply option-1 tags directly** when the decision is obviously logical, and fall
@@ -171,8 +171,8 @@ Compute group counts for two strategies only:
 <step name="write_plan">
 Copy [plan-template.md](plan-template.md) to
 `.planning/quick/NNN-<scope>-test-optimization/PLAN.md` (or `phases/NN-slug/` PLAN).
-Fill baseline, skip-tag note, top-10% table, grouping choice, one phase per
-group, and a final re-profile phase.
+Fill baseline, skip-tag note, top-10% table, grouping choice, one slice per
+group, and a final re-profile slice.
 
 Read sub-project rules when editing tests: `e2e-authoring.mdc`, `frontend-testing.mdc`,
 `backend-testing.mdc`, `cli.mdc`, etc.
@@ -181,13 +181,13 @@ Read sub-project rules when editing tests: `e2e-authoring.mdc`, `frontend-testin
 <step name="execute_via_execute_plan">
 Hand plan to **execute-plan**. Do not optimize groups in the coordinator agent.
 
-Each group phase (sub-agent):
+Each group slice (sub-agent):
 
 1. Optimize only tests in that group (see `optimize_tactics`).
 2. Verify with focused commands (see `verify`).
 3. Run **post-change-refactor** (no commit from refactor sub-agent).
 4. Lint/format per execute-plan wrap-up.
-5. Mark phase **done** in plan.
+5. Mark slice **done** in plan.
 6. **Commit** (`perf(<scope>): …`) and **push**.
 
 **Hard-to-improve → Candidates / skip tag:** If no meaningful speedup after serious
@@ -196,7 +196,7 @@ attempt, or would need product/design trade-off:
 1. Do **not** force a weak change.
 2. Append under **Candidates** in `ongoing/test-optimization-blacklist.md`: file,
    test/scenario, duration, why hard, date (`YYYY-MM-DD`).
-3. Mark phase done (or Jidoka-stop if value decision required).
+3. Mark slice done (or Jidoka-stop if value decision required).
 
 **Promoting** a Candidate to permanent skip is a developer decision (Jidoka) —
 propose tagging the Scenario or Feature with
@@ -253,13 +253,13 @@ CURSOR_DEV=true nix develop -c pnpm cli:test
 CURSOR_DEV=true nix develop -c backend/gradlew -p backend test -Dspring.profiles.active=test --tests "com.odde.doughnut....ClassName"
 ```
 
-E2E groups: **3+ consecutive green runs** on touched specs before closing a phase.
+E2E groups: **3+ consecutive green runs** on touched specs before closing a slice.
 
 **Pre-commit scope:** ensure unrelated WIP is not staged (hooks may `git add -u`).
 </step>
 
 <step name="reprofile_and_close">
-After all group phases (via execute-plan):
+After all group slices (via execute-plan):
 
 - Re-run same profile command as baseline (same `--env tags=…` for E2E).
 - Record: test count, suite wall, top-10 table, top-10% **total CPU** (Vitest) or
@@ -314,7 +314,7 @@ one-off inline Node script is enough.
 
 **Resolve mode (`--resolve`):**
 - Every Candidate resolved by exactly one of tag / plan / ask
-- At most one phased plan created for all replacements
+- At most one plan created for all replacements
 - Resolved Candidates deleted from the blacklist (no "Resolved" archive kept)
 - No profiling or optimization performed
 - Final output includes `## CANDIDATES RESOLVED`
@@ -346,5 +346,5 @@ blacklist Candidates list was pruned.
 - Do not commit profile JSON.
 - In optimize mode, do not add `@skipOptimizationDueToKnownNecessarySlowness` without developer Jidoka (in `--resolve` mode you may tag directly per the `resolve_candidates` step).
 - Do not add `@focus` / `@only` in committed code.
-- Do not run full E2E suite for per-phase verify unless shared helpers require it.
+- Do not run full E2E suite for per-slice verify unless shared helpers require it.
 </out_of_scope>

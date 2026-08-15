@@ -13,7 +13,7 @@ Repo conventions live in `.cursor/rules/`. Cursor injects `alwaysApply: true` ru
 For local MySQL or Redis failures, inspect `mysql/mysql.log` or `redis/redis.log`; the Nix shell setup is defined by `process-compose.yaml` and `scripts/shell_setup.sh`.
 
 Planning lives under `.planning/` (GSD + local). Canonical coexistence:
-`.cursor/rules/gsd-coexistence.mdc`. Phase quality: `.cursor/rules/planning.mdc`.
+`.cursor/rules/gsd-coexistence.mdc`. Slice quality: `.cursor/rules/planning.mdc`.
 Legacy holdouts may remain under `ongoing/` (e.g. test-optimization blacklist) — do not put new plans there.
 
 ## Principles
@@ -22,17 +22,17 @@ Portable digest (details live in the cited always-applied rules — keep `AGENTS
 
 1. High cohesion — one concept, one place (`general.mdc`)
 2. Keep it simple — minimum code; no defensive programming (`general.mdc`)
-3. Capability naming — no phase numbers in product artifacts (`general.mdc`, `planning.mdc`)
+3. Capability naming — no GSD phase numbers in product artifacts (`general.mdc`, `planning.mdc`)
 4. Test observables via high-level entry points (`unit-testing.mdc`)
 5. Never silently swallow failures — prevent → propagate → enrich → deliberate catch (`error-handling.mdc`)
 
-## Planning and phased delivery
+## Planning and slice delivery
 
 - **Layout (GSD-aligned):** `.planning/phases/NN-slug/`, `.planning/quick/NNN-slug/`, plus GSD `PROJECT` / `ROADMAP` / `STATE` / `codebase/`. See `planning.mdc` and `gsd-coexistence.mdc`.
-- **Hard plan grammar:** Behavior vs Structure, stop-safe, one observable behavior per phase (`planning.mdc`) — applies to GSD PLANs too.
+- **Hard plan grammar:** Behavior vs Structure, stop-safe, one observable behavior per slice (`planning.mdc`) — applies to GSD PLANs too.
 - **Time budget (self-enforced):** ~5 min fuzzy goal per problem slice (incl. tests); >5 min → scrutinize finer decompose; >10 min → hard finer-decompose + revert/retry unless good reason (`planning.mdc`).
 - **History:** keep resume-useful planning artifacts while a plan is in progress; **clean up** spent history when the plan is fully executed into code/permanent docs.
 - **Execution wrap-up (required):** Jidoka → post-change-refactor → update plan → commit → push (**execute-plan**; also `/gsd-execute-phase`). Skills emit completion markers for handoff.
-- **GSD** for milestones (`/gsd-onboard`, `/gsd-plan-phase`, `/gsd-execute-phase`, …); **phased-planning** + **execute-plan** for ad-hoc slices under `.planning/quick/`.
+- **GSD** for milestones (`/gsd-onboard`, `/gsd-plan-phase`, `/gsd-execute-phase`, …); **slice-planning** + **execute-plan** for ad-hoc slices under `.planning/quick/`.
 - **Test optimization:** `test-optimization` skill — plans under `.planning/phases/` or `quick/`, run via execute-plan.
 - **Non-compatible local overlays** (must keep): documented in `.cursor/rules/gsd-coexistence.mdc`.

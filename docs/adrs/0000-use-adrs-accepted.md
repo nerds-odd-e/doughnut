@@ -40,7 +40,7 @@ done. They are the wrong place for long-lived architectural constraints.
 - Humans keep authority; agents keep continuity.
 - Rejected and Superseded ADRs remain for archaeology; only Accepted ones are
   current recommendations.
-- Planning (GSD / phased-planning) stays for delivery; ADRs stay for durable
+- Planning (GSD / slice-planning) stays for delivery; ADRs stay for durable
   decisions.
 
 ## Related

@@ -67,9 +67,9 @@ Assume `pnpm sut` is already running. If unsure, check `CURSOR_DEV=true nix deve
 | Mode | Artifacts | Orchestrator |
 |------|-----------|--------------|
 | Formal milestone | `.planning/phases/NN-slug/*-PLAN.md`, STATE, ROADMAP | `/gsd-plan-phase` → `/gsd-execute-phase` → `/gsd-ship` (+ local wrap-up) |
-| Ad-hoc | `.planning/quick/NNN-slug/PLAN.md` | **phased-planning** + **execute-plan** |
+| Ad-hoc | `.planning/quick/NNN-slug/PLAN.md` | **slice-planning** + **execute-plan** |
 | Legacy | `ongoing/*.md` | **execute-plan** only; do not migrate |
 
-**Hard phase quality (both modes):** Behavior vs Structure, stop-safe, one observable behavior — `planning.mdc`.
+**Hard slice quality (both modes):** Behavior vs Structure, stop-safe, one observable behavior — `planning.mdc`.
 Do not write new flat `.planning/<name>.md` when `phases/` or `quick/` fits.
-**Per-phase wrap-up:** Jidoka → post-change-refactor → update plan → commit → push (**execute-plan**). Skills emit completion markers (e.g. `## REFACTOR COMPLETE`) for handoff.
+**Per-slice wrap-up:** Jidoka → post-change-refactor → update plan → commit → push (**execute-plan**). Skills emit completion markers (e.g. `## REFACTOR COMPLETE`) for handoff.

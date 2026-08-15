@@ -12,7 +12,7 @@ Identify codebase friction from your current session and either fix it directly
 or propose structural improvements — then continue the original task.
 
 Purpose: discoverability and code quality, not task planning (use
-**phased-planning** when the task itself is too large).
+**slice-planning** when the task itself is too large).
 
 Output: Short friction report ending with `## RETROSPECTIVE COMPLETE`, then
 resume the original work.
@@ -25,7 +25,7 @@ resume the original work.
 - The developer asks for a retrospective on friction or discoverability.
 
 **This is about codebase quality**, not task planning. If the task itself is too
-big, use **phased-planning**.
+big, use **slice-planning**.
 
 Take 1–2 minutes — do not derail the session.
 </context>
@@ -114,7 +114,7 @@ Then resume the original task.
 </output>
 
 <out_of_scope>
-- Do not replan the task (use phased-planning for that).
+- Do not replan the task (use slice-planning for that).
 - Do not spend more than 1–2 minutes on the retrospective.
 - Do not add documentation that merely repeats clear code.
 </out_of_scope>

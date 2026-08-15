@@ -67,8 +67,8 @@ Accepted ADRs under `docs/adrs/`. Planning history for completed milestones is n
 
 ## Constraints
 
-- **Stack:** Prefer high-level tests; Behavior/Structure phased delivery; Nix tooling via `CURSOR_DEV=true nix develop -c …`
-- **Stop-safe:** After each phase the tree must remain healthier (or no worse) than before
+- **Stack:** Prefer high-level tests; Behavior/Structure slice delivery; Nix tooling via `CURSOR_DEV=true nix develop -c …`
+- **Stop-safe:** After each slice the tree must remain healthier (or no worse) than before
 - **ADRs:** Follow Accepted ADRs; humans own approval (`docs/adrs/`)
 
 ## Key Decisions

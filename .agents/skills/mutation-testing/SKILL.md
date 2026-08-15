@@ -2,7 +2,7 @@
 name: mutation-testing
 description: >-
   Run and interpret Stryker mutation testing results. Use ONLY when the
-  developer explicitly asks for mutation testing or when a plan phase
+  developer explicitly asks for mutation testing or when a slice
   includes it. Do NOT use proactively.
 ---
 
@@ -19,7 +19,7 @@ Output: Mutation run results + interpretation + summary ending with
 
 <context>
 **Use only when:** the developer explicitly asks for mutation testing, or a
-plan phase includes it. **Do not use proactively.**
+slice includes it. **Do not use proactively.**
 
 **Current scope:** `cli/` only. Later: reuse in `frontend/`, `mcp-server/`.
 

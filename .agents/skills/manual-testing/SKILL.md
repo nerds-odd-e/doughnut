@@ -2,7 +2,7 @@
 name: manual-testing
 description: >-
   Browser-based manual testing of the doughnut web app. Use ONLY when the
-  developer explicitly asks to test manually or when a plan phase includes
+  developer explicitly asks to test manually or when a slice includes
   manual testing. Do NOT use proactively.
 ---
 
@@ -18,7 +18,7 @@ Output: Verified behavior report + summary ending with
 
 <context>
 **Use only when:** the developer explicitly asks for manual testing, or a plan
-phase includes it. **Do not use proactively.**
+slice includes it. **Do not use proactively.**
 
 **Prerequisites:** Assume `pnpm sut` is already running (backend, frontend,
 Mountebank — all auto-reload on code changes). If not running, suggest the user

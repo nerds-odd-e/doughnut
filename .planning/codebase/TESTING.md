@@ -220,8 +220,8 @@ const note = makeMe.aNoteRealm
 - Frontend Vitest: coverage **disabled** in `frontend/vitest.config.ts` (`coverage.enabled: false`).
 - MCP: optional Vitest v8 coverage config present in `mcp-server/vitest.config.ts` — not a gate for normal development.
 - Backend: no Jacoco gate required for routine PR work; confidence comes from Spring + DB controller tests.
-- CLI: Stryker mutation testing available (`pnpm test:mutation` under `cli/` via `mutation-testing` skill) — use only when explicitly requested or a plan phase includes it.
-- Philosophy: observable behavior and E2E for happy paths; unit tests (in the "small test" style) for pure algorithms, edges, and non–happy-path (`unit-testing.mdc`). Production happy-path code should be justified by E2E or equivalent, not unit tests alone (phased-planning skill).
+- CLI: Stryker mutation testing available (`pnpm test:mutation` under `cli/` via `mutation-testing` skill) — use only when explicitly requested or a slice includes it.
+- Philosophy: observable behavior and E2E for happy paths; unit tests (in the "small test" style) for pure algorithms, edges, and non–happy-path (`unit-testing.mdc`). Production happy-path code should be justified by E2E or equivalent, not unit tests alone (slice-planning skill).
 
 **View Coverage:**
 ```bash
