@@ -82,7 +82,7 @@ export function describeRecallMcqInteractive(
     let recallingSpy: ReturnType<typeof vi.spyOn>
     let showMemoryTrackerSpy: ReturnType<typeof vi.spyOn>
     let getRecallPromptsSpy: ReturnType<typeof vi.spyOn>
-    let askAQuestionSpy: ReturnType<typeof vi.spyOn>
+    let getRecallPromptSpy: ReturnType<typeof vi.spyOn>
     let answerQuizSpy: ReturnType<typeof vi.spyOn>
     let contestSpy: ReturnType<typeof vi.spyOn> | undefined
     let regenerateSpy: ReturnType<typeof vi.spyOn> | undefined
@@ -161,8 +161,8 @@ export function describeRecallMcqInteractive(
           ReturnType<typeof MemoryTrackerController.getRecallPrompts>
         >)
 
-      askAQuestionSpy = vi
-        .spyOn(MemoryTrackerController, 'askAQuestion')
+      getRecallPromptSpy = vi
+        .spyOn(MemoryTrackerController, 'getRecallPrompt')
         .mockRejectedValue(new Error('stub: MCQ from getRecallPrompts'))
 
       answerQuizSpy = vi.spyOn(RecallPromptController, 'answerQuiz')
@@ -176,7 +176,7 @@ export function describeRecallMcqInteractive(
       recallingSpy.mockRestore()
       showMemoryTrackerSpy.mockRestore()
       getRecallPromptsSpy.mockRestore()
-      askAQuestionSpy.mockRestore()
+      getRecallPromptSpy.mockRestore()
       answerQuizSpy.mockRestore()
       if (savedConfigDir === undefined) {
         delete process.env.DOUGHNUT_CONFIG_DIR

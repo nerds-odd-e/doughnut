@@ -2,7 +2,7 @@ import makeMe from "doughnut-test-fixtures/makeMe"
 import { flushPromises } from "@vue/test-utils"
 import { describe, it, expect } from "vitest"
 import {
-  askAQuestionSpy,
+  getRecallPromptSpy,
   contentLoaderVisible,
   contestableDummyInput,
   contestableQuestionVisible,
@@ -39,7 +39,7 @@ describe("repeat page", () => {
       async ({ memoryTrackerIds, eagerFetchCount, expectedTrackerIds }) => {
         await mountQuizReady(memoryTrackerIds, eagerFetchCount)
         for (const [index, memoryTrackerId] of expectedTrackerIds.entries()) {
-          expect(askAQuestionSpy).toHaveBeenNthCalledWith(
+          expect(getRecallPromptSpy).toHaveBeenNthCalledWith(
             index + 1,
             expect.objectContaining({
               path: { memoryTracker: memoryTrackerId },
@@ -51,9 +51,9 @@ describe("repeat page", () => {
 
     it("does not fetch question 2 again after prefetched", async () => {
       const quizWrapper = await mountQuizReady([1, 2, 3, 4], 2)
-      expect(askAQuestionSpy).toBeCalledTimes(2)
+      expect(getRecallPromptSpy).toBeCalledTimes(2)
       await quizWrapper.setProps({ currentIndex: 1 })
-      expect(askAQuestionSpy).toHaveBeenCalledWith(
+      expect(getRecallPromptSpy).toHaveBeenCalledWith(
         expect.objectContaining({
           path: { memoryTracker: 3 },
         })
@@ -102,7 +102,7 @@ describe("repeat page", () => {
       const secondRecallPrompt = makeMe.aRecallPrompt
         .withQuestionStem("Second question")
         .please()
-      askAQuestionSpy
+      getRecallPromptSpy
         .mockResolvedValueOnce(wrapSdkResponse(recallPrompt))
         .mockResolvedValueOnce(wrapSdkResponse(secondRecallPrompt))
 
@@ -122,7 +122,7 @@ describe("repeat page", () => {
       const recallPrompt = getRecallPrompt()
       let tracker1Calls = 0
       const { gate, resolve } = createDeferredGate()
-      askAQuestionSpy.mockImplementation(async (options) => {
+      getRecallPromptSpy.mockImplementation(async (options) => {
         const memoryTracker = (options as { path: { memoryTracker: number } })
           .path.memoryTracker
         if (memoryTracker === 1) {

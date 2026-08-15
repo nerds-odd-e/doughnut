@@ -112,7 +112,7 @@ export function mockRecallPageDefaults() {
   )
   mockSdkService(
     MemoryTrackerController,
-    "askAQuestion",
+    "getRecallPrompt",
     makeMe.aRecallPrompt.withSpellingStem("Spell").please()
   )
   vi.mocked(useRecallData).mockReturnValue(createUseRecallDataMock())

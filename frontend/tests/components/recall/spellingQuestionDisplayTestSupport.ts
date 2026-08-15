@@ -11,7 +11,7 @@ export const spellingAnswerInputSelector =
 export function mockSpellingQuestionServices() {
   mockSdkService(
     MemoryTrackerController,
-    "askAQuestion",
+    "getRecallPrompt",
     makeMe.aRecallPrompt.withSpellingStem("Spell the word").please()
   )
   mockSdkService(

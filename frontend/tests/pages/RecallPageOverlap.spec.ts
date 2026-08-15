@@ -27,7 +27,7 @@ describe("overlap try-again stay and retry", () => {
   const memoryTrackerId = 123
   const ctx = useRecallPageSpecContext({ fakeTimers: true })
   let getThresholdExceededSpy: ReturnType<typeof mockSdkService>
-  let askAQuestionSpy: ReturnType<typeof mockSdkService>
+  let getRecallPromptSpy: ReturnType<typeof mockSdkService>
 
   beforeEach(() => {
     mockSdkService(
@@ -35,9 +35,9 @@ describe("overlap try-again stay and retry", () => {
       "showMemoryTracker",
       makeMe.aMemoryTracker.please()
     )
-    askAQuestionSpy = mockSdkService(
+    getRecallPromptSpy = mockSdkService(
       MemoryTrackerController,
-      "askAQuestion",
+      "getRecallPrompt",
       makeMe.aRecallPrompt.withSpellingStem("Spell").please()
     )
     getThresholdExceededSpy = mockSdkService(
@@ -71,7 +71,7 @@ describe("overlap try-again stay and retry", () => {
     expect(vm.currentIndex).toBe(0)
     expect(getThresholdExceededSpy).not.toHaveBeenCalled()
 
-    const askCallsBeforeRetry = askAQuestionSpy.mock.calls.length
+    const getRecallPromptCallsBeforeRetry = getRecallPromptSpy.mock.calls.length
     await wrapper.find('[data-testid="overlap-try-again"]').trigger("click")
     await flushPromises()
 
@@ -82,8 +82,8 @@ describe("overlap try-again stay and retry", () => {
     expect(
       wrapper.findComponent({ name: "Quiz" }).props("spellingRetryNonce")
     ).toBe(1)
-    expect(askAQuestionSpy.mock.calls.length).toBeGreaterThan(
-      askCallsBeforeRetry
+    expect(getRecallPromptSpy.mock.calls.length).toBeGreaterThan(
+      getRecallPromptCallsBeforeRetry
     )
   })
 })

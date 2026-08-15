@@ -1,6 +1,6 @@
 # Recall prompt / MCQ alignment — context
 
-**Status:** executing (slices 1–2 done)  
+**Status:** executing (slices 1–3 done)  
 **Glossary:** Proposed [ADR 0001](../../../docs/adrs/0001-ubiquitous-language.md), [ADR 0003](../../../docs/adrs/0003-spaced-repetition-scheduling-policy.md)
 
 ## Requirement
@@ -37,7 +37,7 @@ URL (contest is triggered while viewing a prompt; the flag lives on the MCQ).
 
 | Glossary | Persistence | Code / API | Tests / UI leftovers |
 |----------|-------------|------------|----------------------|
-| Recall prompt | `recall_prompt` | Entity `RecallPrompt`; DTO **`RecallPrompt`**; `GET .../question` `askAQuestion`; `RecallQuestionService`; `Quiz.vue` (file name out of scope) | E2E due recall prompt; `answerQuiz` |
+| Recall prompt | `recall_prompt` | Entity `RecallPrompt`; DTO **`RecallPrompt`**; `GET .../recall-prompt` `getRecallPrompt`; `RecallQuestionService`; `Quiz.vue` (file name out of scope) | E2E due recall prompt; `answerQuiz` |
 | MCQ | `predefined_question` | `PredefinedQuestion`; `/api/predefined-questions`; JSON `predefinedQuestion` | E2E “predefined questions” |
 | Answer | `quiz_answer` | Entity `Answer`; `answerQuiz` | `submitQuizAnswer` |
 | MCQ stem+choices | JSON in `raw_json_question` | `MultipleChoicesQuestion` | |

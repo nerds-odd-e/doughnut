@@ -108,7 +108,7 @@ export function describeRecallJustReviewInteractive(
     let recallingSpy: ReturnType<typeof vi.spyOn>
     let showMemoryTrackerSpy: ReturnType<typeof vi.spyOn>
     let getRecallPromptsSpy: ReturnType<typeof vi.spyOn>
-    let askAQuestionSpy: ReturnType<typeof vi.spyOn>
+    let getRecallPromptSpy: ReturnType<typeof vi.spyOn>
     let markAsRecalledSpy: ReturnType<typeof vi.spyOn>
 
     const spies = () => ({
@@ -150,8 +150,8 @@ export function describeRecallJustReviewInteractive(
           ReturnType<typeof MemoryTrackerController.getRecallPrompts>
         >)
 
-      askAQuestionSpy = vi
-        .spyOn(MemoryTrackerController, 'askAQuestion')
+      getRecallPromptSpy = vi
+        .spyOn(MemoryTrackerController, 'getRecallPrompt')
         .mockRejectedValue(new Error('stub: no quiz in just-review tests'))
 
       markAsRecalledSpy = vi
@@ -165,7 +165,7 @@ export function describeRecallJustReviewInteractive(
       recallingSpy.mockRestore()
       showMemoryTrackerSpy.mockRestore()
       getRecallPromptsSpy.mockRestore()
-      askAQuestionSpy.mockRestore()
+      getRecallPromptSpy.mockRestore()
       markAsRecalledSpy.mockRestore()
       if (savedConfigDir === undefined) {
         delete process.env.DOUGHNUT_CONFIG_DIR

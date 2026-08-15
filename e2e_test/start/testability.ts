@@ -584,7 +584,7 @@ const testability = () => {
           expect(trackerId, 'expected one due memory tracker for recall').to
             .exist
           return cy.wrap(
-            MemoryTrackerController.askAQuestion({
+            MemoryTrackerController.getRecallPrompt({
               path: { memoryTracker: trackerId! },
             }),
             { log: false }

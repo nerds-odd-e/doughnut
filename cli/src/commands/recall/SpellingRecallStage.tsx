@@ -1,123 +1,35 @@
 import {
   useCallback,
   useContext,
-  useEffect,
   useLayoutEffect,
   useMemo,
   useRef,
   useState,
   type MutableRefObject,
-  type ReactElement,
 } from 'react'
 import type { Key } from 'ink'
 import { Box, Text, useInput, useStdout } from 'ink'
 import { Spinner } from '@inkjs/ui'
-import {
-  MemoryTrackerController,
-  RecallPromptController,
-  type AnsweredQuestion,
-  type RecallPrompt,
-} from 'doughnut-api'
 import { BorderedSingleLinePromptInputInk } from '../../commonUIComponents/borderedSingleLinePromptInputInk.js'
 import { renderMarkdownToTerminal } from '../../markdown.js'
 import {
   inkTerminalColumns,
   resolvedTerminalWidth,
 } from '../../terminalColumns.js'
-import {
-  doughnutSdkOptions,
-  runDefaultBackendJson,
-} from '../../backendApi/doughnutBackendClient.js'
 import { SetStageKeyHandlerContext } from '../../commonUIComponents/stageKeyForwardContext.js'
 import { userVisibleSlashCommandError } from '../../userVisibleSlashCommandError.js'
 import { LeaveRecallConfirmPrompt } from './LeaveRecallConfirmPrompt.js'
 import { RECALL_BUSY_SUBMIT_ANSWER_LABEL } from './recallBusyInputCopy.js'
 import { normalizeSpellingLineForSubmit } from './spellingAnswerLine.js'
 import type { SpellingRecallSessionPayload } from './nextRecallCardLoad.js'
-import { breadcrumbTrailFromRecalledNote } from './recallNoteContext.js'
 import type { RecallQuestionAnswerOutcome } from './recallQuestionAnswerOutcome.js'
 import {
-  RecallAnsweredBlockShell,
-  recallAnsweredBreadcrumbText,
-  recallAnsweredMarkdownToDisplayLines,
-  recallAnsweredQuizOutcomeInk,
-} from './recallAnsweredInkShared.js'
-
-async function fetchSpellingRecallPrompt(
-  memoryTrackerId: number,
-  signal?: AbortSignal
-): Promise<{ readonly recallPromptId: number; readonly stemMarkdown: string }> {
-  const prompt = await runDefaultBackendJson<RecallPrompt>(() =>
-    MemoryTrackerController.askAQuestion({
-      path: { memoryTracker: memoryTrackerId },
-      ...doughnutSdkOptions(signal),
-    })
-  )
-  if (prompt.spellingQuestion == null) {
-    throw new Error('Expected a spelling recall prompt from the server.')
-  }
-  const recallPromptId = prompt.id
-  return {
-    recallPromptId,
-    stemMarkdown: prompt.spellingQuestion?.stem ?? '',
-  }
-}
-
-async function submitSpellingAnswer(
-  recallPromptId: number,
-  spellingAnswer: string,
-  signal?: AbortSignal
-): Promise<AnsweredQuestion> {
-  return runDefaultBackendJson<AnsweredQuestion>(() =>
-    RecallPromptController.answerSpelling({
-      path: { recallPrompt: recallPromptId },
-      body: { spellingAnswer },
-      ...doughnutSdkOptions(signal),
-    })
-  )
-}
-
-function recallAnsweredSpellingInk(args: {
-  readonly answeredPrompt: AnsweredQuestion
-  readonly contentMarkdownFallback: string
-  readonly spellingAnswerDisplay: string
-  readonly notebookName?: string
-}): ReactElement {
-  const width = resolvedTerminalWidth()
-  const crumb = recallAnsweredBreadcrumbText(
-    breadcrumbTrailFromRecalledNote(
-      args.answeredPrompt.recalledNote,
-      args.notebookName
-    )
-  )
-  const contentMarkdown = args.contentMarkdownFallback
-  const detailLines = recallAnsweredMarkdownToDisplayLines(
-    contentMarkdown,
-    width
-  )
-  const ans = args.spellingAnswerDisplay
-  const correct = args.answeredPrompt.answer.correct === true
-  return (
-    <RecallAnsweredBlockShell>
-      <Text>{crumb}</Text>
-      {detailLines.map((line, i) => (
-        <Text key={i}>{line.length > 0 ? line : ' '}</Text>
-      ))}
-      <Text>{`Your answer: ${ans}`}</Text>
-      {recallAnsweredQuizOutcomeInk(correct)}
-    </RecallAnsweredBlockShell>
-  )
-}
+  recallAnsweredSpellingInk,
+  submitSpellingAnswer,
+  useSpellingRecallPromptLoad,
+} from './spellingRecallStageSupport.js'
 
 const SPELL_INPUT_PLACEHOLDER = 'Type answer, Enter to submit'
-
-type LoadState =
-  | { readonly status: 'loading' }
-  | {
-      readonly status: 'ready'
-      readonly recallPromptId: number
-      readonly stemMarkdown: string
-    }
 
 export function SpellingRecallStage({
   payload,
@@ -134,7 +46,7 @@ export function SpellingRecallStage({
   readonly onRecallFatalError: (message: string) => void
   readonly onConfirmLeaveRecall: () => void
 }) {
-  const [loadState, setLoadState] = useState<LoadState>({ status: 'loading' })
+  const loadState = useSpellingRecallPromptLoad(payload, onRecallFatalError)
   const setStageKeyHandler = useContext(SetStageKeyHandlerContext)
   const { stdout } = useStdout()
   const promptCols = inkTerminalColumns(stdout.columns)
@@ -146,49 +58,6 @@ export function SpellingRecallStage({
   )
 
   const width = resolvedTerminalWidth()
-
-  useEffect(() => {
-    if (
-      payload.recallPromptId !== undefined &&
-      payload.stemMarkdown !== undefined
-    ) {
-      setLoadState({
-        status: 'ready',
-        recallPromptId: payload.recallPromptId,
-        stemMarkdown: payload.stemMarkdown,
-      })
-      return
-    }
-    let cancelled = false
-    const ac = new AbortController()
-    ;(async () => {
-      try {
-        const fetched = await fetchSpellingRecallPrompt(
-          payload.memoryTrackerId,
-          ac.signal
-        )
-        if (cancelled) return
-        setLoadState({
-          status: 'ready',
-          recallPromptId: fetched.recallPromptId,
-          stemMarkdown: fetched.stemMarkdown,
-        })
-      } catch (err: unknown) {
-        if (cancelled || ac.signal.aborted) return
-        onRecallFatalError(userVisibleSlashCommandError(err))
-      }
-    })().catch(() => undefined)
-    return () => {
-      cancelled = true
-      ac.abort()
-    }
-  }, [
-    onRecallFatalError,
-    payload.memoryTrackerId,
-    payload.recallPromptId,
-    payload.stemMarkdown,
-  ])
-
   const stemRendered = useMemo(() => {
     if (loadState.status !== 'ready') return ''
     return renderMarkdownToTerminal(loadState.stemMarkdown, width)

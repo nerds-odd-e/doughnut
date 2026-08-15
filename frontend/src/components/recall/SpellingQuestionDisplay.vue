@@ -67,7 +67,7 @@ const stem = computed(() => recallPrompt.value?.spellingQuestion?.stem || "")
 const fetchSpellingQuestion = async () => {
   loading.value = true
   const { data: prompt, error: promptError } =
-    await MemoryTrackerController.askAQuestion({
+    await MemoryTrackerController.getRecallPrompt({
       path: { memoryTracker: props.memoryTrackerId },
     })
   if (!promptError && prompt) {

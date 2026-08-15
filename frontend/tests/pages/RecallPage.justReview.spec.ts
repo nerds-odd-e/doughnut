@@ -27,7 +27,7 @@ describe('RecallPage "just review" quiz', () => {
   const firstMemoryTrackerId = 123
   const secondMemoryTrackerId = 456
   const ctx = useRecallPageSpecContext({ fakeTimers: true })
-  let askAQuestionSpy: ReturnType<typeof mockSdkService>
+  let getRecallPromptSpy: ReturnType<typeof mockSdkService>
 
   beforeEach(() => {
     mockSdkService(
@@ -35,12 +35,12 @@ describe('RecallPage "just review" quiz', () => {
       "showMemoryTracker",
       makeMe.aMemoryTracker.please()
     )
-    askAQuestionSpy = mockSdkService(
+    getRecallPromptSpy = mockSdkService(
       MemoryTrackerController,
-      "askAQuestion",
+      "getRecallPrompt",
       makeMe.aRecallPrompt.please()
     )
-    askAQuestionSpy.mockResolvedValueOnce(wrapSdkError("API Error"))
+    getRecallPromptSpy.mockResolvedValueOnce(wrapSdkError("API Error"))
     vi.mocked(useRecallData).mockReturnValue(
       createUseRecallDataMock({
         toRepeat: [
@@ -55,7 +55,7 @@ describe('RecallPage "just review" quiz', () => {
   it("shows initial progress and asks the first tracker", async () => {
     const wrapper = await ctx.mountPage()
     expect(wrapper.findComponent({ name: "GlobalBar" }).text()).toContain("0/3")
-    expect(askAQuestionSpy).toHaveBeenCalledWith(
+    expect(getRecallPromptSpy).toHaveBeenCalledWith(
       expect.objectContaining({
         path: { memoryTracker: firstMemoryTrackerId },
       })
@@ -69,7 +69,7 @@ describe('RecallPage "just review" quiz', () => {
       "markAsRecalled",
       makeMe.aMemoryTracker.please()
     )
-    askAQuestionSpy.mockResolvedValueOnce(
+    getRecallPromptSpy.mockResolvedValueOnce(
       wrapSdkResponse(makeMe.aRecallPrompt.please())
     )
     vi.runOnlyPendingTimers()
@@ -81,7 +81,7 @@ describe('RecallPage "just review" quiz', () => {
     })
     await flushPromises()
     expect(wrapper.findComponent({ name: "GlobalBar" }).text()).toContain("1/3")
-    expect(askAQuestionSpy).toHaveBeenCalledWith(
+    expect(getRecallPromptSpy).toHaveBeenCalledWith(
       expect.objectContaining({
         path: { memoryTracker: secondMemoryTrackerId },
       })

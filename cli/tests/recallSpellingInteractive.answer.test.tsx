@@ -105,21 +105,23 @@ describeRecallSpellingInteractive((api) => {
 
     const { promise: ask2Promise, resolve: resolveAsk2 } =
       deferred<
-        Awaited<ReturnType<typeof MemoryTrackerController.askAQuestion>>
+        Awaited<ReturnType<typeof MemoryTrackerController.getRecallPrompt>>
       >()
 
     let askN = 0
-    api.askAQuestionSpy.mockImplementation(() => {
+    api.getRecallPromptSpy.mockImplementation(() => {
       askN += 1
       if (askN === 1) {
         return Promise.resolve({
           data: pending1,
-        } as Awaited<ReturnType<typeof MemoryTrackerController.askAQuestion>>)
+        } as Awaited<
+          ReturnType<typeof MemoryTrackerController.getRecallPrompt>
+        >)
       }
       if (askN === 2) {
         return ask2Promise
       }
-      throw new Error(`unexpected askAQuestion call ${String(askN)}`)
+      throw new Error(`unexpected getRecallPrompt call ${String(askN)}`)
     })
 
     api.answerSpellingSpy.mockResolvedValue({
@@ -142,7 +144,7 @@ describeRecallSpellingInteractive((api) => {
 
     resolveAsk2({
       data: pending2,
-    } as Awaited<ReturnType<typeof MemoryTrackerController.askAQuestion>>)
+    } as Awaited<ReturnType<typeof MemoryTrackerController.getRecallPrompt>>)
 
     await ink.waitForLastFrameToInclude(secondStem)
   })

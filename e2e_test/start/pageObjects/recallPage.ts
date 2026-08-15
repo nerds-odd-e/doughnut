@@ -15,13 +15,14 @@ function recallProgressFromTriple(triple: string) {
 
 function loadRecallPage(options?: { waitForQuestion?: boolean }) {
   if (options?.waitForQuestion) {
-    cy.intercept('GET', '**/api/memory-trackers/**/question**').as(
-      'recallQuestion'
-    )
+    cy.intercept(
+      'GET',
+      /\/api\/memory-trackers\/[^/]+\/recall-prompt(?:\?.*)?$/
+    ).as('recallPrompt')
   }
   cy.visit('/recall')
   if (options?.waitForQuestion) {
-    cy.wait('@recallQuestion', { timeout: 15000 })
+    cy.wait('@recallPrompt', { timeout: 15000 })
   }
   waitUntilAppIsNotBusy()
 }

@@ -16,7 +16,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.web.server.ResponseStatusException;
 
-class MemoryTrackerAskQuestionControllerTest extends MemoryTrackerControllerTestBase {
+class MemoryTrackerRecallPromptControllerTest extends MemoryTrackerControllerTestBase {
   @MockitoBean(name = "officialOpenAiClient")
   OpenAIClient officialClient;
 
@@ -41,7 +41,7 @@ class MemoryTrackerAskQuestionControllerTest extends MemoryTrackerControllerTest
   void shouldReturnSpellingRecallPromptForSpellingMemoryTracker()
       throws UnexpectedNoAccessRightException {
     com.odde.doughnut.controllers.dto.RecallPrompt recallPrompt =
-        controller.askAQuestion(spellingTracker());
+        controller.getRecallPrompt(spellingTracker());
     assertThat(recallPrompt.getSpellingQuestion(), notNullValue());
     assertThat(recallPrompt.getMultipleChoicesQuestion(), nullValue());
   }
@@ -53,7 +53,7 @@ class MemoryTrackerAskQuestionControllerTest extends MemoryTrackerControllerTest
     RecallPrompt existingPrompt =
         makeMe.aRecallPrompt().forMemoryTracker(memoryTracker).spelling().please();
 
-    assertThat(controller.askAQuestion(memoryTracker).getId(), equalTo(existingPrompt.getId()));
+    assertThat(controller.getRecallPrompt(memoryTracker).getId(), equalTo(existingPrompt.getId()));
   }
 
   @Test
@@ -63,7 +63,7 @@ class MemoryTrackerAskQuestionControllerTest extends MemoryTrackerControllerTest
     RecallPrompt mostRecent = makeMe.aRecallPrompt().forMemoryTracker(tracker).please();
     makeMe.entityPersister.flush();
 
-    assertThat(controller.askAQuestion(tracker).getId(), equalTo(mostRecent.getId()));
+    assertThat(controller.getRecallPrompt(tracker).getId(), equalTo(mostRecent.getId()));
   }
 
   @Test
@@ -71,27 +71,28 @@ class MemoryTrackerAskQuestionControllerTest extends MemoryTrackerControllerTest
     openAiStructuredResponseMock.stubStructuredResponse(makeMe.aMCQWithAnswer().please());
 
     assertThat(
-        controller.askAQuestion(ownedTracker()).getMultipleChoicesQuestion(), notNullValue());
+        controller.getRecallPrompt(ownedTracker()).getMultipleChoicesQuestion(), notNullValue());
   }
 
   @Test
-  void shouldNotBeAbleToAskQuestionForOthersMemoryTracker() {
+  void shouldNotBeAbleToGetRecallPromptForOthersMemoryTracker() {
     MemoryTracker memoryTracker = makeMe.aMemoryTrackerBy(makeMe.aUser().please()).please();
     assertThrows(
-        UnexpectedNoAccessRightException.class, () -> controller.askAQuestion(memoryTracker));
+        UnexpectedNoAccessRightException.class, () -> controller.getRecallPrompt(memoryTracker));
   }
 
   @Test
   void shouldRequireUserToBeLoggedIn() {
     currentUser.setUser(null);
     MemoryTracker memoryTracker = makeMe.aMemoryTrackerBy(makeMe.aUser().please()).please();
-    assertThrows(ResponseStatusException.class, () -> controller.askAQuestion(memoryTracker));
+    assertThrows(ResponseStatusException.class, () -> controller.getRecallPrompt(memoryTracker));
   }
 
   @Test
   void shouldThrowWhenOpenAiNotAvailableAndGeneratingQuestion() {
     MemoryTracker memoryTracker = ownedTracker();
     testabilitySettings.setOpenAiTokenOverride("");
-    assertThrows(OpenAiNotAvailableException.class, () -> controller.askAQuestion(memoryTracker));
+    assertThrows(
+        OpenAiNotAvailableException.class, () -> controller.getRecallPrompt(memoryTracker));
   }
 }

@@ -28,7 +28,7 @@ export const contestableDummyInputSelector =
 export const recallPromptSelector = ".recall-prompt"
 export const justReviewButtonText = "Yes, I remember"
 
-export let askAQuestionSpy: ReturnType<typeof mockSdkService>
+export let getRecallPromptSpy: ReturnType<typeof mockSdkService>
 export let wrapper: VueWrapper
 
 let recallPrompt: RecallPrompt
@@ -48,9 +48,9 @@ export function setupQuizTests() {
       "showMemoryTracker",
       makeMe.aMemoryTracker.please()
     )
-    askAQuestionSpy = mockSdkService(
+    getRecallPromptSpy = mockSdkService(
       MemoryTrackerController,
-      "askAQuestion",
+      "getRecallPrompt",
       recallPrompt
     )
   })
@@ -133,7 +133,7 @@ export function mockSpellingRecallServices(stem = "Spell the word 'cat'") {
   const spellingRecallPrompt = makeMe.aRecallPrompt
     .withSpellingStem(stem)
     .please()
-  askAQuestionSpy.mockResolvedValue(wrapSdkResponse(spellingRecallPrompt))
+  getRecallPromptSpy.mockResolvedValue(wrapSdkResponse(spellingRecallPrompt))
   mockSdkService(
     MemoryTrackerController,
     "showMemoryTracker",

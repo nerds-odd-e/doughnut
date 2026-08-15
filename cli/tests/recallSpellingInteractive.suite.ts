@@ -52,7 +52,7 @@ export type RecallSpellingInteractiveApi = {
   waitSpellingCorrect: typeof waitSpellingCorrect
   waitReturnsToSpellingWithBuffer: typeof waitReturnsToSpellingWithBuffer
   recallingSpy: ReturnType<typeof vi.spyOn>
-  askAQuestionSpy: ReturnType<typeof vi.spyOn>
+  getRecallPromptSpy: ReturnType<typeof vi.spyOn>
   answerSpellingSpy: ReturnType<typeof vi.spyOn>
   pendingSpellingPrompt: () => RecallPrompt
   spellingAnsweredPrompt: (
@@ -72,7 +72,7 @@ export function describeRecallSpellingInteractive(
     let recallingSpy: ReturnType<typeof vi.spyOn>
     let showMemoryTrackerSpy: ReturnType<typeof vi.spyOn>
     let getRecallPromptsSpy: ReturnType<typeof vi.spyOn>
-    let askAQuestionSpy: ReturnType<typeof vi.spyOn>
+    let getRecallPromptSpy: ReturnType<typeof vi.spyOn>
     let answerSpellingSpy: ReturnType<typeof vi.spyOn>
     let spellingFixtureNoteRealm: NoteRealm
 
@@ -152,10 +152,10 @@ export function describeRecallSpellingInteractive(
           new Error('unexpected getRecallPrompts in spelling path')
         )
 
-      askAQuestionSpy = vi.spyOn(MemoryTrackerController, 'askAQuestion')
-      askAQuestionSpy.mockResolvedValue({
+      getRecallPromptSpy = vi.spyOn(MemoryTrackerController, 'getRecallPrompt')
+      getRecallPromptSpy.mockResolvedValue({
         data: pendingSpellingPrompt(),
-      } as Awaited<ReturnType<typeof MemoryTrackerController.askAQuestion>>)
+      } as Awaited<ReturnType<typeof MemoryTrackerController.getRecallPrompt>>)
 
       answerSpellingSpy = vi.spyOn(RecallPromptController, 'answerSpelling')
     })
@@ -164,7 +164,7 @@ export function describeRecallSpellingInteractive(
       recallingSpy.mockRestore()
       showMemoryTrackerSpy.mockRestore()
       getRecallPromptsSpy.mockRestore()
-      askAQuestionSpy.mockRestore()
+      getRecallPromptSpy.mockRestore()
       answerSpellingSpy.mockRestore()
       if (savedConfigDir === undefined) {
         delete process.env.DOUGHNUT_CONFIG_DIR
@@ -199,8 +199,8 @@ export function describeRecallSpellingInteractive(
       get recallingSpy() {
         return recallingSpy
       },
-      get askAQuestionSpy() {
-        return askAQuestionSpy
+      get getRecallPromptSpy() {
+        return getRecallPromptSpy
       },
       get answerSpellingSpy() {
         return answerSpellingSpy

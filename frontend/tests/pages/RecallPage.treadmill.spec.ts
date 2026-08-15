@@ -28,7 +28,7 @@ describe("RecallPage treadmill mode", () => {
   const spellingId = 456
   const anotherNormalId = 789
   const ctx = useRecallPageSpecContext({ fakeTimers: true })
-  let askAQuestionSpy: ReturnType<typeof mockSdkService>
+  let getRecallPromptSpy: ReturnType<typeof mockSdkService>
 
   const defaultTrackers = () => [
     createMemoryTrackerLite(normalId, false),
@@ -42,9 +42,9 @@ describe("RecallPage treadmill mode", () => {
       "showMemoryTracker",
       makeMe.aMemoryTracker.please()
     )
-    askAQuestionSpy = mockSdkService(
+    getRecallPromptSpy = mockSdkService(
       MemoryTrackerController,
-      "askAQuestion",
+      "getRecallPrompt",
       makeMe.aRecallPrompt.please()
     )
     vi.mocked(useRecallData).mockReturnValue(
@@ -67,7 +67,7 @@ describe("RecallPage treadmill mode", () => {
     await toggleTreadmillMode(wrapper, true)
     expect(globalBar.text()).toContain("0/2")
     expect(globalBar.classes()).toContain("treadmill-mode")
-    expect(askAQuestionSpy).toHaveBeenCalledWith(
+    expect(getRecallPromptSpy).toHaveBeenCalledWith(
       expect.objectContaining({
         path: { memoryTracker: normalId },
       })

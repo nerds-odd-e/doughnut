@@ -3,7 +3,7 @@
     class="content h-full"
     :class="{ 'quiz--contestable': showContestableDummyInput }"
   >
-    <ContentLoader v-if="!currentQuestionFetched || isCurrentMemoryTrackerFetching" />
+    <ContentLoader v-if="!currentRecallPromptFetched || isCurrentMemoryTrackerFetching" />
     <template v-else>
       <div class="pt-5 h-full">
       <SpellingQuestionDisplay
@@ -58,17 +58,14 @@ import type {
   AnswerSpellingDto,
   MemoryTrackerLite,
   AnsweredQuestion,
-  RecallPrompt,
 } from "@generated/doughnut-backend-api"
-import {
-  MemoryTrackerController,
-  RecallPromptController,
-} from "@generated/doughnut-backend-api/sdk.gen"
+import { RecallPromptController } from "@generated/doughnut-backend-api/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import ContestableQuestion from "./ContestableQuestion.vue"
 import JustReview from "./JustReview.vue"
 import SpellingQuestionDisplay from "./SpellingQuestionDisplay.vue"
 import NotebookLink from "../notes/NotebookLink.vue"
+import { useRecallPromptFetching } from "./useRecallPromptFetching"
 
 // Interface definitions for better type safety
 interface QuizProps {
@@ -87,67 +84,8 @@ const emit = defineEmits<{
   (e: "just-reviewed", result: undefined): void
 }>()
 
-// Composable for question fetching logic
-const useQuestionFetching = (props: QuizProps) => {
-  const recallPromptCache = ref<Record<number, RecallPrompt | undefined>>({})
-  const fetching = ref(false)
-  const fetchingMemoryTrackerIds = ref<Set<number>>(new Set())
-
-  const fetchNextQuestion = async () => {
-    for (
-      let index = props.currentIndex;
-      index < props.currentIndex + props.eagerFetchCount;
-      index++
-    ) {
-      const memoryTracker = memoryTrackerAt(index)
-      if (memoryTracker === undefined) break
-
-      const memoryTrackerId = memoryTracker.memoryTrackerId
-
-      // All memory trackers (including spelling) can use askAQuestion
-
-      const cachedValue = recallPromptCache.value[memoryTrackerId]
-      if (cachedValue !== undefined) continue
-
-      fetchingMemoryTrackerIds.value.add(memoryTrackerId)
-      try {
-        const { data: question, error } = await apiCallWithLoading(() =>
-          MemoryTrackerController.askAQuestion({
-            path: { memoryTracker: memoryTrackerId },
-          })
-        )
-        if (!error) {
-          recallPromptCache.value[memoryTrackerId] = question!
-        } else {
-          recallPromptCache.value[memoryTrackerId] = undefined
-        }
-      } finally {
-        fetchingMemoryTrackerIds.value.delete(memoryTrackerId)
-      }
-    }
-  }
-
-  const fetchQuestion = async () => {
-    if (!fetching.value) {
-      fetching.value = true
-      try {
-        await fetchNextQuestion()
-      } finally {
-        fetching.value = false
-      }
-    }
-  }
-
-  return {
-    recallPromptCache,
-    fetchQuestion,
-    fetchingMemoryTrackerIds,
-  }
-}
-
-// Use the composable
-const { recallPromptCache, fetchQuestion, fetchingMemoryTrackerIds } =
-  useQuestionFetching(props)
+const { recallPromptCache, fetchRecallPrompts, fetchingMemoryTrackerIds } =
+  useRecallPromptFetching(props)
 
 // Computed properties with better naming
 const currentMemoryTracker = computed(() => memoryTrackerAt(props.currentIndex))
@@ -161,7 +99,7 @@ const isCurrentMemoryTrackerFetching = computed(() => {
     fetchingMemoryTrackerIds.value.has(memoryTrackerId)
   )
 })
-const currentQuestionFetched = computed(() => {
+const currentRecallPromptFetched = computed(() => {
   const memoryTrackerId = currentMemoryTrackerId.value
   return (
     memoryTrackerId !== undefined && memoryTrackerId in recallPromptCache.value
@@ -175,7 +113,7 @@ const currentRecallPrompt = computed(() => {
 })
 const showContestableDummyInput = computed(
   () =>
-    currentQuestionFetched.value &&
+    currentRecallPromptFetched.value &&
     !isCurrentMemoryTrackerFetching.value &&
     !currentMemoryTracker.value?.spelling &&
     currentRecallPrompt.value !== undefined
@@ -215,13 +153,13 @@ watch(
   () => currentMemoryTrackerId.value,
   () => {
     contestableDummyInput.value = ""
-    fetchQuestion()
+    fetchRecallPrompts()
   }
 )
 
 // Lifecycle hooks
 onMounted(() => {
-  fetchQuestion()
+  fetchRecallPrompts()
 })
 </script>
 

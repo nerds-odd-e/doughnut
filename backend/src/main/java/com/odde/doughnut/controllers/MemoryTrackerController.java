@@ -41,9 +41,9 @@ class MemoryTrackerController {
     this.recallQuestionService = recallQuestionService;
   }
 
-  @GetMapping("/{memoryTracker}/question")
+  @GetMapping("/{memoryTracker}/recall-prompt")
   @Transactional
-  public com.odde.doughnut.controllers.dto.RecallPrompt askAQuestion(
+  public com.odde.doughnut.controllers.dto.RecallPrompt getRecallPrompt(
       @PathVariable("memoryTracker") @Schema(type = "integer") MemoryTracker memoryTracker)
       throws UnexpectedNoAccessRightException {
     authorizationService.assertLoggedIn();

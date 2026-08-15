@@ -33,7 +33,7 @@ describe("RecallPage diligent mode", () => {
     )
     mockSdkService(
       MemoryTrackerController,
-      "askAQuestion",
+      "getRecallPrompt",
       makeMe.aRecallPrompt.please()
     )
   })

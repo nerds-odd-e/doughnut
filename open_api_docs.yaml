@@ -2769,11 +2769,11 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/RecallPromptHistoryItem"
-  /api/memory-trackers/{memoryTracker}/question:
+  /api/memory-trackers/{memoryTracker}/recall-prompt:
     get:
       tags:
       - memory-tracker-controller
-      operationId: askAQuestion
+      operationId: getRecallPrompt
       parameters:
       - name: memoryTracker
         in: path

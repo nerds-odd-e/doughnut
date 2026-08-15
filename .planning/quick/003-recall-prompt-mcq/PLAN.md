@@ -52,15 +52,12 @@ the ask payload; history is `makeMe.aRecallPromptHistoryItem`.
 
 ### 3. Ask path is recall-prompt
 
-- **Status:** planned
+- **Status:** done
 - **Type:** Behavior
-- **Pre:** Slice 2 done.
-- **Trigger:** Learner starts recall (web or CLI).
-- **Post:** `GET /api/memory-trackers/{id}/recall-prompt`. No `.../question`
-  and no `askAQuestion`.
 
-**Tests:** same ask tests + one MCQ recall E2E + one spelling recall E2E;
-CLI interactive ask mocks.
+Shipped: `GET /api/memory-trackers/{id}/recall-prompt`, SDK `getRecallPrompt`.
+No `askAQuestion` / `GET .../question`. Ask controller test is
+`MemoryTrackerRecallPromptControllerTest`.
 
 ### 4. CLI recall help is not quiz
 
@@ -199,3 +196,4 @@ note MCQ E2E; regen compile.
 
 - Slice 1: leftover `quiz` in feature filenames and `visitRecallPageAndWaitForQuestion` stay until a later wording slice; not this step.
 - Slice 2: `makeMe.aRecallPrompt` is the unanswered-ask DTO; history items are `makeMe.aRecallPromptHistoryItem`. `RecallQuestionService` and CLI `RecallQuestionAnswerOutcome` wait for later slices.
+- Slice 3: SDK operation is `getRecallPrompt` (history list remains `getRecallPrompts`). Fetch extracted to `useRecallPromptFetching` / `recallMcqCardLoad`.

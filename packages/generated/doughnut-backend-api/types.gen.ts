@@ -3631,23 +3631,23 @@ export type GetRecallPromptsResponses = {
 
 export type GetRecallPromptsResponse = GetRecallPromptsResponses[keyof GetRecallPromptsResponses];
 
-export type AskAQuestionData = {
+export type GetRecallPromptData = {
     body?: never;
     path: {
         memoryTracker: number;
     };
     query?: never;
-    url: '/api/memory-trackers/{memoryTracker}/question';
+    url: '/api/memory-trackers/{memoryTracker}/recall-prompt';
 };
 
-export type AskAQuestionResponses = {
+export type GetRecallPromptResponses = {
     /**
      * OK
      */
     200: RecallPrompt;
 };
 
-export type AskAQuestionResponse = AskAQuestionResponses[keyof AskAQuestionResponses];
+export type GetRecallPromptResponse = GetRecallPromptResponses[keyof GetRecallPromptResponses];
 
 export type GetRecentlyRecalledData = {
     body?: never;
