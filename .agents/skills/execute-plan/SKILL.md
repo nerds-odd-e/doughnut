@@ -126,8 +126,9 @@ decision** the developer needs. Then wait.
       On `## REFACTOR JIDOKA STOP`, relay to the developer and STOP (leave
       working tree as the refactor agent left it).
       On missing marker → re-dispatch refactor once; if still missing, STOP.
-   c. Lint & format: `CURSOR_DEV=true nix develop -c pnpm lint:all` and
-      `CURSOR_DEV=true nix develop -c pnpm format:all`. Fix issues.
+   c. Format: `CURSOR_DEV=true nix develop -c pnpm format:all`
+      (includes lint + auto-fix; do **not** also run `pnpm lint:all` —
+      that is CI check-only). Fix remaining issues.
    d. If backend controller/DTO signatures changed and client not yet regenerated,
       run generate-api-client.
    e. Update PLAN (and SUMMARY if present): mark slice done; brief
@@ -202,8 +203,10 @@ non-`@wip` CI-safe, uncommitted):
    - Return must end with `## REFACTOR COMPLETE` or `## REFACTOR JIDOKA STOP`
 2. **Gate** — Proceed only on `## REFACTOR COMPLETE`. On Jidoka stop or missing
    marker, follow the coordinator_loop rules above (do not commit).
-3. **Lint & format** — `CURSOR_DEV=true nix develop -c pnpm lint:all` and
-   `CURSOR_DEV=true nix develop -c pnpm format:all`. Fix any issues.
+3. **Format** — `CURSOR_DEV=true nix develop -c pnpm format:all`. That
+   command already lints and auto-fixes (Biome `check --write`, Spotless
+   apply, `vue-tsc`). Do **not** also run `pnpm lint:all` (CI check-only).
+   Fix any remaining issues.
 4. **Regenerate API client** — if backend controller or DTO signatures changed,
    run **generate-api-client** before committing.
 5. **Reflect & re-plan** — update PLAN (and SUMMARY if present):
@@ -246,7 +249,7 @@ When this happens:
 
 <success_criteria>
 - Each slice implemented by a fresh sub-agent (coordinator does not accumulate implementation context)
-- Coordinator owns wrap-up: fresh post-change-refactor Task → `## REFACTOR COMPLETE` → lint/format → plan update → commit → push
+- Coordinator owns wrap-up: fresh post-change-refactor Task → `## REFACTOR COMPLETE` → format (`pnpm format:all` only) → plan update → commit → push
 - Pre- and post-slice Jidoka checks applied
 - Parallel waves only when touch sets and PLAN writes do not conflict
 - Spent planning history cleaned when entire plan is done

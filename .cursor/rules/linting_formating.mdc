@@ -54,8 +54,8 @@ This runs:
 
 ## Format vs Lint
 
-- **Use `CURSOR_DEV=true nix develop -c pnpm format:all`** during development - it fixes formatting and catches most issues
-- **Use `CURSOR_DEV=true nix develop -c pnpm lint:all`** for CI/CD validation - it checks without fixing
+- **Use `CURSOR_DEV=true nix develop -c pnpm format:all`** during development and at slice wrap-up — it lints and auto-fixes (Biome `check --write`, Spotless apply, `vue-tsc`). Do not also run `lint:all`.
+- **Use `CURSOR_DEV=true nix develop -c pnpm lint:all`** for CI/CD validation only — it checks without fixing (plus a few script unit tests that format does not run).
 
 ## OpenAPI Linting
 
