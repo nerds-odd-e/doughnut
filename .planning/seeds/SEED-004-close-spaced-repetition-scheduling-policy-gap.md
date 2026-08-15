@@ -26,7 +26,7 @@ Also surface when changing success/failure interval math, commissioned score →
 **Large** — policy first, then stop-safe behavior slices:
 
 1. Finalize ADR 0003 from the gap + open issues in `.planning/research/FSRS-COMPATIBILITY-GAP.md` (human advice process). Remaining gaps: one observable behavior at a time; no unused D/S/lapse/retention/RecallLog structure.
-2. Next implementation: B3 overdue extra on `ForgettingCurve.succeeded` (current index + interval). Then later: D/S when a behavior needs them, retention-target intervals, relearning, optional RecallLog.
+2. **B3 is in code** (overdue extra on `ForgettingCurve.succeeded`; Stability in hours). Later: Difficulty when a behavior needs it, retention-target intervals, relearning, optional RecallLog.
 
 ## Breadcrumbs
 

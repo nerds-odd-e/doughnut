@@ -2,6 +2,7 @@ package com.odde.doughnut.algorithms;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.greaterThan;
 
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
@@ -88,5 +89,50 @@ class SpacedRepetitionRecallSchedulingTest {
 
     long interval = TimestampOperations.getDiffInHours(memoryTracker.getNextRecallAt(), gradeTime);
     assertThat(interval, equalTo((long) Math.round(memoryTracker.getStability())));
+  }
+
+  @Test
+  void overdueCorrectRecallLengthensStabilityMoreThanOnTime() {
+    MemoryTracker onTime = aMemoryTrackerAfterThreeStrictRecalls();
+    MemoryTracker overdue = aMemoryTrackerAfterThreeStrictRecalls();
+    int stabilityHours = Math.round(onTime.getStability());
+    onTime.recalledSuccessfully(
+        TimestampOperations.addHoursToTimestamp(onTime.getLastRecalledAt(), stabilityHours), null);
+    overdue.recalledSuccessfully(
+        TimestampOperations.addHoursToTimestamp(overdue.getLastRecalledAt(), stabilityHours * 2),
+        null);
+
+    long onTimeInterval =
+        TimestampOperations.getDiffInHours(onTime.getNextRecallAt(), onTime.getLastRecalledAt());
+    long overdueInterval =
+        TimestampOperations.getDiffInHours(overdue.getNextRecallAt(), overdue.getLastRecalledAt());
+    assertThat(overdueInterval, greaterThan(onTimeInterval));
+    assertThat(overdue.getStability(), greaterThan(onTime.getStability()));
+  }
+
+  @Test
+  void overdueCorrectRecallExtraGrowthConverges() {
+    MemoryTracker elapsedTenTimesStability = aMemoryTrackerAfterThreeStrictRecalls();
+    MemoryTracker elapsedHundredTimesStability = aMemoryTrackerAfterThreeStrictRecalls();
+    int stabilityHours = Math.round(elapsedTenTimesStability.getStability());
+    elapsedTenTimesStability.recalledSuccessfully(
+        TimestampOperations.addHoursToTimestamp(
+            elapsedTenTimesStability.getLastRecalledAt(), stabilityHours * 10),
+        null);
+    elapsedHundredTimesStability.recalledSuccessfully(
+        TimestampOperations.addHoursToTimestamp(
+            elapsedHundredTimesStability.getLastRecalledAt(), stabilityHours * 100),
+        null);
+
+    assertThat(
+        TimestampOperations.getDiffInHours(
+            elapsedTenTimesStability.getNextRecallAt(),
+            elapsedTenTimesStability.getLastRecalledAt()),
+        equalTo(184L));
+    assertThat(
+        TimestampOperations.getDiffInHours(
+            elapsedHundredTimesStability.getNextRecallAt(),
+            elapsedHundredTimesStability.getLastRecalledAt()),
+        equalTo(191L));
   }
 }

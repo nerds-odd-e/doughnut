@@ -15,19 +15,16 @@ This is the single tracking doc for (1) the gap between **current Doughnut code*
 Preference for all remaining work in this seed: pick **one** high-priority
 observable schedule behavior, lock it in ADR 0003, then change Doughnut to
 match. Introduce or replace structure **only** when that behavior needs it.
-No Difficulty, Stability, lapse, requested-retention, or RecallLog fields
+No unused Difficulty, lapse, requested-retention, or RecallLog fields
 for later slices.
 
-First implementation slice after this ADR lock: B3 on the current index +
-interval (`ForgettingCurve.succeeded`). B1/B2/B4 and C–E stay open.
+First implementation after this ADR lock (**B3**) is **in code**: overdue correct lengthens Stability more than on-time. B1/B2/B4 and C–E stay open.
 
-There is no `.planning/research/SUMMARY.md` in the tree. Earlier notes lived only in this file (decision list, 2026-08-13). This revision adds the code-vs-FSRS analysis those notes assumed.
-
----
+Current Doughnut persists **Stability** in whole hours (the current interval) and computes Retrievability in the success path as elapsed vs Stability. There is still **no** Difficulty, lapse count, requested retention, FSRS weights, or card state (`New` / `Learning` / `Review` / `Relearning`). Remaining gaps close by **vertical slice** (ADR 0003 Decision).
 
 ## 1. What “mostly compatible” should mean
 
-Open FSRS is a **DSR scheduler**: persisted **Difficulty (D)** and **Stability (S)**, computed **Retrievability (R)** from elapsed time, four **grades**, and a **requested retention** that turns S into the next interval. Current Doughnut is a **single strength index** plus a **user interval table**.
+Open FSRS is a **DSR scheduler**: persisted **Difficulty (D)** and **Stability (S)**, computed **Retrievability (R)** from elapsed time, four **grades**, and a **requested retention** that turns S into the next interval. Current Doughnut persists **Stability** (hours) and uses a built-in spacing ladder; it does not persist Difficulty or take a retention target.
 
 For ADR 0003, “mostly compatible” is a product claim, not a library claim.
 **A1 is locked:** Doughnut owns an open-FSRS-compatible implementation (D, S,
@@ -49,23 +46,22 @@ computed R, grade + elapsed time). No `ts-fsrs` / `fsrs-rs` / other FSRS library
 
 | Field | Role |
 |-------|------|
-| `forgettingCurveIndex` | Strength. Default `100`. Floor `100`. |
-| User `space_intervals` | Day table (default Fibonacci, often starting at `0`). Index interpolates adjacent entries, then × 24 hours. |
-| `lastRecalledAt` | Anchor for elapsed time and for `nextRecallAt = lastRecalledAt + intervalHours`. |
+| `stability` | Current interval in **whole hours**. Assimilate may be `0` (due now). After a grade, `nextRecallAt = lastRecalledAt + stability`. |
+| `lastRecalledAt` | Anchor for elapsed time. |
 | `nextRecallAt` | Materialized due-work projection. |
 | `recallCount` | Incremented on state-changing grades. |
 | `assimilatedAt` | First intake. Assimilation sets `lastRecalledAt = now` with **no grade**. |
 
-There is **no** Difficulty, Stability, Retrievability, lapse count, requested retention, FSRS weights, or card state (`New` / `Learning` / `Review` / `Relearning`).
+There is **no** Difficulty, lapse count, requested retention, FSRS weights, or card state (`New` / `Learning` / `Review` / `Relearning`). Retrievability is not stored.
 
 **Success** (`ForgettingCurve.succeeded`):
 
-- Base increment `+10`.
-- If `elapsedHours < currentIntervalHours` (and interval > 0): scale the increment by `elapsed / interval` (early recall grows less).
-- If overdue: **same increment as on-time** — no FSRS-style extra reward for low retrievability.
-- Optional thinking-time tweak: `±sqrt(|t − 25s|)`, clamped 0–60s, **within** correct only.
+- On-time: one spacing-ladder step.
+- If `elapsedHours < stability`: smaller step (early recall grows less).
+- If overdue: **strictly longer** next Stability than on-time; extra approaches one extra step as elapsed/Stability grows (not linear).
+- Optional thinking-time tweak: `±sqrt(|t − 25s|)` scaled to the ladder, clamped 0–60s, **within** correct only.
 
-**Failure:** index `−20`, then **forced `nextRecallAt = now + 12h`**, not the interval implied by the reduced index. `lastRecalledAt` **does** advance (ADR 0003 Context still says it does not — stale).
+**Failure:** step down the ladder, then **forced `nextRecallAt = now + 12h`**, not the interval implied by the reduced Stability. `lastRecalledAt` **does** advance.
 
 **Other grades:**
 
@@ -113,10 +109,10 @@ FSRS **Hard (G=2) is still success**. That is the sharpest mapping clash with Do
 
 | Open FSRS | Doughnut today | Kind of gap |
 |-----------|----------------|-------------|
-| Persist D and S; compute R(t, S) | One index + day table | **Model** — largest |
-| Interval from requested retention | User-edited day list | **Product knob** |
+| Persist D and S; compute R(t, S) | Persist S (hours); R not stored; no D | **Model** |
+| Interval from requested retention | Built-in hours ladder (no learner day list) | **Product knob** |
 | G ∈ {1,2,3,4} | Incorrect / correct + overlap / accidental match + Tutor 0–5 + thinking time | **Grades** |
-| Overdue success: bounded extra S via low R | Overdue = on-time increment in **code**; ADR B3 now requires bounded extra | **Policy locked; code next** |
+| Overdue success: bounded extra S via low R | Overdue correct lengthens S more than on-time; extra converges | **Aligned** (B3) |
 | Early success: smaller SInc via high R | Linear `elapsed/interval` on the increment | **Formula** (same direction) |
 | Post-lapse S then relearning steps | −20 index + fixed 12h | **Relearning** |
 | Same-day short-term scheduler | Whole hours; elapsed 0 on a positive interval → **zero growth** | **Short-term** |
@@ -201,16 +197,9 @@ Implementing the target: **behavior** — next interval comes from retention `r`
 and S, not from walking the Fibonacci/user table. The Settings control would
 change or become a compat/migration input.
 
-**B3. Overdue success reward — resolved 2026-08-15** (was O5)
+**B3. Overdue success reward — resolved 2026-08-15** (was O5); **in code 2026-08-15**
 
-Locked in ADR 0003 Decision **Overdue correct recall: bounded extra growth**:
-next interval after overdue correct must be strictly longer than on-time
-correct (same thinking time); extra from elapsed vs current interval, not
-`nextRecallAt`; bounded, not linear. No new D/S/retention structure.
-Commissioned scores do not inherit this extra yet.
-
-**Code still matches the old minimum** (overdue = on-time increment). Next
-vertical slice: implement that Decision in `ForgettingCurve.succeeded`.
+Locked in ADR 0003 Decision **Overdue correct recall: bounded extra growth**, and implemented on `ForgettingCurve.succeeded`: next interval after overdue correct is strictly longer than on-time (same thinking time); extra from elapsed vs Stability, not `nextRecallAt`; bounded, not linear. Commissioned scores do not inherit this extra yet.
 
 **B4. Lapses** (was O15)
 
@@ -221,9 +210,7 @@ Do not add an unused counter. Before adding: which outcomes increment it; first 
 Closing B4 by deferring: no change. An unused lapse column later would be
 internal only; using lapses to change due times would be behavior.
 
-**End state after locking B3 (ADR only):** learners still get overdue = on-time
-in running code. ADR requires the bounded extra on ordinary correct recall.
-B1/B2/B4 remain open. Index + table stay in use for the implementation slice.
+**B3 in running code:** overdue correct lengthens Stability more than on-time. B1/B2/B4 remain open. Difficulty and requested retention are still later gaps.
 
 ---
 
@@ -364,7 +351,7 @@ Hygiene while this doc is the tracker: do not duplicate open issues in the ADR; 
 | A1 | FSRS-compatible = own D/S/R implementation, no library | **Resolved** | Locked 2026-08-15 |
 | B1 | When to persist D/S | Light lock | No unused columns (vertical-slice Decision); persist with first consumer |
 | B2 | Interval table vs requested retention | Yes | Open |
-| B3 | Overdue bounded extra growth | **Resolved** | Locked 2026-08-15; code still old |
+| B3 | Overdue bounded extra growth | **Resolved** | Locked and implemented 2026-08-15 |
 | B4 | Lapses | Defer | Defer |
 | C1 | Keep Doughnut outcomes | Yes | Keep + compatibility map |
 | C2 | Tutor 2 vs FSRS Hard | Yes | Discuss — current policy ≠ FSRS |

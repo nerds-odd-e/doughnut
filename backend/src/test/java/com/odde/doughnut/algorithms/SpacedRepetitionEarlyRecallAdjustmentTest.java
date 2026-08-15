@@ -22,13 +22,6 @@ public class SpacedRepetitionEarlyRecallAdjustmentTest {
   }
 
   @Test
-  void overdueCorrectEqualsOnTime() {
-    float onTime = nextStabilityHours(72);
-    float overdue = nextStabilityHours(72 + 48);
-    assertThat(overdue, equalTo(onTime));
-  }
-
-  @Test
   void immediateEarlyCorrectDoesNotGrow() {
     float hours = nextStabilityHours(0);
     assertThat(hours, equalTo(72.0f));

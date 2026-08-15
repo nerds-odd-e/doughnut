@@ -14,8 +14,13 @@ public class ForgettingCurve {
 
   float succeeded(long elapsedInHours, Integer thinkingTimeMs) {
     float successIncrement = 1.0f;
-    if (stabilityHours > 0 && elapsedInHours < stabilityHours) {
-      successIncrement += (elapsedInHours - stabilityHours) / stabilityHours;
+    if (stabilityHours > 0) {
+      float elapsedVsStability = (elapsedInHours - stabilityHours) / stabilityHours;
+      if (elapsedVsStability < 0) {
+        successIncrement += elapsedVsStability;
+      } else if (elapsedVsStability > 0) {
+        successIncrement += 1.0f - 1.0f / (1.0f + elapsedVsStability);
+      }
     }
     float thinkingTimeAdjustment = calculateThinkingTimeAdjustment(thinkingTimeMs);
     return (float)
