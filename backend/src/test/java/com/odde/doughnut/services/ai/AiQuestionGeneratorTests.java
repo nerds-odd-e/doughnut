@@ -53,25 +53,24 @@ class AiQuestionGeneratorTests {
 
   @Test
   void shouldGenerateQuestion() {
-    MCQWithAnswer jsonQuestion =
-        makeMe.aMCQWithAnswer().stem("What is the first color in the rainbow?").please();
+    GeneratedMcq jsonQuestion =
+        makeMe.aGeneratedMcq().stem("What is the first color in the rainbow?").please();
     openAiStructuredResponseMock.stubStructuredResponse(jsonQuestion);
 
-    MCQWithAnswer result =
+    GeneratedMcq result =
         aiQuestionGenerator.getAiGeneratedQuestion(noteReadyForQuestionGeneration(), null);
 
-    assertThat(
-        result.getQuestion().getQuestionStem(), equalTo("What is the first color in the rainbow?"));
+    assertThat(result.getQuestionStem(), equalTo("What is the first color in the rainbow?"));
   }
 
   @Test
   void shouldRejectQuestionWithInvalidChoiceIndex() {
-    MCQWithAnswer invalidQuestion =
+    GeneratedMcq invalidQuestion =
         makeMe
-            .aMCQWithAnswer()
+            .aGeneratedMcq()
             .stem("What is 2+2?")
             .choices("4", "3", "5")
-            .correctChoiceIndex(3)
+            .correctAnswerIndex(3)
             .please();
     openAiStructuredResponseMock.stubStructuredResponse(invalidQuestion);
 

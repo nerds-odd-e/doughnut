@@ -20,7 +20,7 @@ import com.odde.doughnut.entities.RecallPrompt;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.QuestionGenerationBatchRequestRepository;
 import com.odde.doughnut.entities.repositories.RecallPromptRepository;
-import com.odde.doughnut.services.ai.MCQWithAnswer;
+import com.odde.doughnut.services.ai.GeneratedMcq;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
 import java.sql.Timestamp;
@@ -50,7 +50,7 @@ class QuestionGenerationBatchRowImportServiceTest {
   Timestamp currentTime;
   MemoryTracker memoryTracker;
   QuestionGenerationBatchRequest outputReadyRequest;
-  MCQWithAnswer mcqWithAnswer;
+  GeneratedMcq generatedMcq;
 
   @BeforeEach
   void setup() throws JsonProcessingException {
@@ -73,12 +73,12 @@ class QuestionGenerationBatchRowImportServiceTest {
             .please();
     makeMe.entityPersister.flush();
 
-    mcqWithAnswer =
+    generatedMcq =
         makeMe
-            .aMCQWithAnswer()
+            .aGeneratedMcq()
             .stem("What color is the sky on a clear day?")
             .choices("Blue", "Green", "Red")
-            .correctChoiceIndex(0)
+            .correctAnswerIndex(0)
             .please();
 
     outputReadyRequest =
@@ -89,7 +89,7 @@ class QuestionGenerationBatchRowImportServiceTest {
             .status(QuestionGenerationBatchRequestStatus.OUTPUT_READY)
             .please();
     outputReadyRequest.setRawSuccessPayload(
-        batchSuccessLine(outputReadyRequest.getCustomId(), mcqWithAnswer));
+        batchSuccessLine(outputReadyRequest.getCustomId(), generatedMcq));
     batchRequestRepository.saveAndFlush(outputReadyRequest);
   }
 
@@ -123,13 +123,9 @@ class QuestionGenerationBatchRowImportServiceTest {
       assertThat(mcq.getContextSeed(), is(outputReadyRequest.getContextSeed()));
       assertThat(mcq.isContested(), is(false));
 
-      MCQWithAnswer importedMcq = mcq.getMcqWithAnswer();
-      assertThat(
-          importedMcq.getQuestion().getQuestionStem(),
-          is(mcqWithAnswer.getQuestion().getQuestionStem()));
-      assertThat(
-          importedMcq.getQuestion().getResponseChoices(), is(List.of("Red", "Green", "Blue")));
-      assertThat(importedMcq.getSolutionChoiceIndex(), is(2));
+      assertThat(mcq.getQuestionStem(), is(generatedMcq.getQuestionStem()));
+      assertThat(mcq.getResponseChoices(), is(List.of("Red", "Green", "Blue")));
+      assertThat(mcq.getCorrectAnswerIndex(), is(2));
     }
 
     @Test

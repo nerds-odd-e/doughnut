@@ -4,7 +4,7 @@ import com.odde.doughnut.controllers.dto.QuestionContestResult;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.factoryServices.EntityPersister;
 import com.odde.doughnut.services.ai.AiQuestionGenerator;
-import com.odde.doughnut.services.ai.MCQWithAnswer;
+import com.odde.doughnut.services.ai.GeneratedMcq;
 import com.odde.doughnut.services.ai.QuestionEvaluation;
 import java.sql.Timestamp;
 import java.util.concurrent.ThreadLocalRandom;
@@ -39,22 +39,21 @@ public class McqService {
   }
 
   public Mcq refineAIQuestion(Note note, Mcq mcq) {
-    MCQWithAnswer aiGeneratedRefineQuestion =
-        aiQuestionGenerator.getAiGeneratedRefineQuestion(note, mcq.getMcqWithAnswer());
+    GeneratedMcq aiGeneratedRefineQuestion =
+        aiQuestionGenerator.getAiGeneratedRefineQuestion(note, mcq);
     if (aiGeneratedRefineQuestion == null) {
       return null;
     }
-    return Mcq.fromMCQWithAnswer(aiGeneratedRefineQuestion, note);
+    return aiGeneratedRefineQuestion.toMcq(note);
   }
 
   public QuestionContestResult contest(Mcq mcq) {
-    MCQWithAnswer mcqWithAnswer = mcq.getMcqWithAnswer();
     QuestionEvaluation questionContestResult =
-        aiQuestionGenerator.getQuestionContestResult(mcq.getNote(), mcqWithAnswer);
+        aiQuestionGenerator.getQuestionContestResult(mcq.getNote(), mcq);
     if (questionContestResult == null) {
       return null;
     }
-    QuestionContestResult result = questionContestResult.getQuestionContestResult(mcqWithAnswer);
+    QuestionContestResult result = questionContestResult.getQuestionContestResult(mcq);
     if (!result.rejected) {
       mcq.setContested(true);
       entityPersister.merge(mcq);
@@ -68,16 +67,15 @@ public class McqService {
 
   public Mcq generateAFeasibleQuestion(Note note, String propertyKey) {
     Long contextSeedBoxed = Long.valueOf(ThreadLocalRandom.current().nextLong());
-    MCQWithAnswer mcqWithAnswer =
+    GeneratedMcq generatedMcq =
         aiQuestionGenerator.getAiGeneratedQuestion(note, null, contextSeedBoxed, propertyKey);
-    if (mcqWithAnswer == null) {
+    if (generatedMcq == null) {
       return null;
     }
 
-    Mcq result = Mcq.fromMCQWithAnswer(mcqWithAnswer, note, contextSeedBoxed);
+    Mcq result = generatedMcq.toMcq(note, contextSeedBoxed);
     entityPersister.save(result);
 
-    // Auto-evaluate and regenerate up to regenerationTimes
     for (int i = 0; i < regenerationTimes; i++) {
       QuestionContestResult contestResult = contest(result);
 
@@ -86,13 +84,12 @@ public class McqService {
       }
 
       Long regSeedBoxed = Long.valueOf(ThreadLocalRandom.current().nextLong());
-      MCQWithAnswer regeneratedQuestion =
+      GeneratedMcq regeneratedQuestion =
           aiQuestionGenerator.regenerateQuestion(
-              contestResult, note, mcqWithAnswer, regSeedBoxed, propertyKey);
+              contestResult, note, result, regSeedBoxed, propertyKey);
       if (regeneratedQuestion != null) {
-        Mcq regenerated = Mcq.fromMCQWithAnswer(regeneratedQuestion, note, regSeedBoxed);
+        Mcq regenerated = regeneratedQuestion.toMcq(note, regSeedBoxed);
         result = entityPersister.save(regenerated);
-        mcqWithAnswer = regeneratedQuestion;
       } else {
         return result;
       }

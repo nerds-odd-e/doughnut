@@ -1,10 +1,10 @@
 package com.odde.doughnut.services;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.odde.doughnut.entities.Mcq;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
-import com.odde.doughnut.services.ai.MCQWithAnswer;
-import com.odde.doughnut.services.ai.MCQWithAnswerForRefinement;
+import com.odde.doughnut.services.ai.GeneratedMcq;
 import com.odde.doughnut.services.ai.QuestionEvaluation;
 import com.odde.doughnut.services.ai.builder.OpenAIResponseRequestBuilder;
 import com.odde.doughnut.services.ai.tools.AiToolFactory;
@@ -28,42 +28,42 @@ public class NoteQuestionGenerationService {
     this.requestBuilder = requestBuilder;
   }
 
-  public MCQWithAnswer generateQuestion(Note note, String additionalMessage)
+  public GeneratedMcq generateQuestion(Note note, String additionalMessage)
       throws JsonProcessingException {
     return generateQuestion(note, additionalMessage, null, null);
   }
 
-  public MCQWithAnswer generateQuestion(Note note, String additionalMessage, Long contextSeed)
+  public GeneratedMcq generateQuestion(Note note, String additionalMessage, Long contextSeed)
       throws JsonProcessingException {
     return generateQuestion(note, additionalMessage, contextSeed, null);
   }
 
-  public MCQWithAnswer generateQuestion(
+  public GeneratedMcq generateQuestion(
       Note note, String additionalMessage, Long contextSeed, String propertyKey)
       throws JsonProcessingException {
     return generateQuestionWithResponses(note, additionalMessage, contextSeed, propertyKey);
   }
 
-  public StructuredResponseCreateParams<MCQWithAnswer> buildQuestionGenerationRequest(
+  public StructuredResponseCreateParams<GeneratedMcq> buildQuestionGenerationRequest(
       Note note, String additionalMessage) {
     return buildQuestionGenerationRequest(note, additionalMessage, null);
   }
 
-  public StructuredResponseCreateParams<MCQWithAnswer> buildQuestionGenerationRequest(
+  public StructuredResponseCreateParams<GeneratedMcq> buildQuestionGenerationRequest(
       Note note, String additionalMessage, String propertyKey) {
     return requestBuilder.buildQuestionGenerationResponseRequest(
         note, additionalMessage, null, propertyKey);
   }
 
-  public StructuredResponseCreateParams<MCQWithAnswer> buildQuestionGenerationRequest(
+  public StructuredResponseCreateParams<GeneratedMcq> buildQuestionGenerationRequest(
       Note note, String additionalMessage, Long contextSeed, String propertyKey, User viewer) {
     return requestBuilder.buildQuestionGenerationResponseRequest(
         note, additionalMessage, contextSeed, propertyKey, viewer);
   }
 
-  private MCQWithAnswer generateQuestionWithResponses(
+  private GeneratedMcq generateQuestionWithResponses(
       Note note, String additionalMessage, Long contextSeed, String propertyKey) {
-    StructuredResponseCreateParams<MCQWithAnswer> responseRequest =
+    StructuredResponseCreateParams<GeneratedMcq> responseRequest =
         requestBuilder.buildQuestionGenerationResponseRequest(
             note, additionalMessage, contextSeed, propertyKey);
 
@@ -73,11 +73,11 @@ public class NoteQuestionGenerationService {
         .orElse(null);
   }
 
-  public Optional<MCQWithAnswer> refineQuestion(Note note, MCQWithAnswer question) {
+  public Optional<GeneratedMcq> refineQuestion(Note note, Mcq question) {
     InstructionAndSchema tool = AiToolFactory.questionRefineAiTool(question);
-    OpenAIResponseRequestBuilder<MCQWithAnswerForRefinement> responseRequestBuilder =
+    OpenAIResponseRequestBuilder<GeneratedMcq> responseRequestBuilder =
         requestBuilder.openAiResponseRequestForQuestionGeneration(
-            MCQWithAnswerForRefinement.class, note, null, null);
+            GeneratedMcq.class, note, null, null);
     responseRequestBuilder.addInstruction(tool.getMessageBody());
 
     return openAiApiHandler
@@ -85,20 +85,19 @@ public class NoteQuestionGenerationService {
         .flatMap(this::validQuestion);
   }
 
-  private Optional<MCQWithAnswer> validQuestion(MCQWithAnswer question) {
+  private Optional<GeneratedMcq> validQuestion(GeneratedMcq question) {
     if (question == null || !question.isValid()) {
       return Optional.empty();
     }
     return Optional.of(question);
   }
 
-  public Optional<QuestionEvaluation> evaluateQuestion(Note note, MCQWithAnswer question)
+  public Optional<QuestionEvaluation> evaluateQuestion(Note note, Mcq question)
       throws JsonProcessingException {
     return evaluateQuestionWithResponses(note, question);
   }
 
-  private Optional<QuestionEvaluation> evaluateQuestionWithResponses(
-      Note note, MCQWithAnswer question) {
+  private Optional<QuestionEvaluation> evaluateQuestionWithResponses(Note note, Mcq question) {
     InstructionAndSchema tool = AiToolFactory.questionEvaluationAiTool(question);
     var responseRequestBuilder =
         requestBuilder.openAiResponseRequestForQuestionEvaluation(

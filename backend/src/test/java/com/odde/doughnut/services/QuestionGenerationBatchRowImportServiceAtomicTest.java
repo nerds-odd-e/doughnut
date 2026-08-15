@@ -17,7 +17,7 @@ import com.odde.doughnut.entities.QuestionGenerationBatchStatus;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.QuestionGenerationBatchRequestRepository;
 import com.odde.doughnut.entities.repositories.RecallPromptRepository;
-import com.odde.doughnut.services.ai.MCQWithAnswer;
+import com.odde.doughnut.services.ai.GeneratedMcq;
 import com.odde.doughnut.testability.MakeMe;
 import jakarta.persistence.EntityManager;
 import java.sql.Timestamp;
@@ -122,12 +122,12 @@ class QuestionGenerationBatchRowImportServiceAtomicTest {
                     .please();
             makeMe.entityPersister.flush();
 
-            MCQWithAnswer committedMcq =
+            GeneratedMcq committedMcq =
                 makeMe
-                    .aMCQWithAnswer()
+                    .aGeneratedMcq()
                     .stem("What color is the sky on a clear day?")
                     .choices("Blue", "Green", "Red")
-                    .correctChoiceIndex(0)
+                    .correctAnswerIndex(0)
                     .please();
 
             QuestionGenerationBatchRequest request =

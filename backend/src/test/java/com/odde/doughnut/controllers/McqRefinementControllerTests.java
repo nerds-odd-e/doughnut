@@ -54,27 +54,25 @@ class McqRefinementControllerTests extends ControllerTestBase {
     testabilitySettings.setRandomization(new Randomization(last, 0));
     openAiStructuredResponseMock.stubStructuredResponse(
         makeMe
-            .aMCQWithAnswer()
+            .aGeneratedMcq()
             .choices("Blue", "Green", "Red")
-            .correctChoiceIndex(0)
+            .correctAnswerIndex(0)
             .choicesMayBeShuffled(true)
             .please());
 
     Mcq result = controller.refineQuestion(note, mcq);
 
-    assertThat(
-        result.getMcqWithAnswer().getQuestion().getResponseChoices(),
-        equalTo(List.of("Red", "Green", "Blue")));
-    assertThat(result.getMcqWithAnswer().getSolutionChoiceIndex(), equalTo(2));
+    assertThat(result.getResponseChoices(), equalTo(List.of("Red", "Green", "Blue")));
+    assertThat(result.getCorrectAnswerIndex(), equalTo(2));
   }
 
   @Test
   void invalidRefinedQuestionIsRejected() throws UnexpectedNoAccessRightException {
     openAiStructuredResponseMock.stubStructuredResponse(
         makeMe
-            .aMCQWithAnswer()
+            .aGeneratedMcq()
             .choices("Blue", "Green", "Red")
-            .correctChoiceIndex(3)
+            .correctAnswerIndex(3)
             .choicesMayBeShuffled(true)
             .please());
 

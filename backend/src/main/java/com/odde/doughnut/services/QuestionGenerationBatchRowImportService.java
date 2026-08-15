@@ -9,8 +9,8 @@ import com.odde.doughnut.entities.QuestionType;
 import com.odde.doughnut.entities.RecallPrompt;
 import com.odde.doughnut.entities.repositories.QuestionGenerationBatchRequestRepository;
 import com.odde.doughnut.factoryServices.EntityPersister;
+import com.odde.doughnut.services.ai.GeneratedMcq;
 import com.odde.doughnut.services.ai.GeneratedQuestionPostProcessor;
-import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -45,13 +45,13 @@ public class QuestionGenerationBatchRowImportService {
       return false;
     }
 
-    MCQWithAnswer mcqWithAnswer =
+    GeneratedMcq generatedMcq =
         openAiApiHandler
             .parseStructuredOutputFromBatchSuccessLine(
-                request.getRawSuccessPayload(), MCQWithAnswer.class)
-            .filter(MCQWithAnswer::isValid)
+                request.getRawSuccessPayload(), GeneratedMcq.class)
+            .filter(GeneratedMcq::isValid)
             .orElse(null);
-    if (mcqWithAnswer == null) {
+    if (generatedMcq == null) {
       request.setStatus(QuestionGenerationBatchRequestStatus.FAILED);
       request.setErrorDetail("invalid batch success payload");
       batchRequestRepository.save(request);
@@ -61,8 +61,8 @@ public class QuestionGenerationBatchRowImportService {
 
     MemoryTracker memoryTracker = request.getMemoryTracker();
     Note note = memoryTracker.getNote();
-    MCQWithAnswer postProcessedQuestion = generatedQuestionPostProcessor.postProcess(mcqWithAnswer);
-    Mcq mcq = Mcq.fromMCQWithAnswer(postProcessedQuestion, note, request.getContextSeed());
+    GeneratedMcq postProcessedQuestion = generatedQuestionPostProcessor.postProcess(generatedMcq);
+    Mcq mcq = postProcessedQuestion.toMcq(note, request.getContextSeed());
     entityPersister.save(mcq);
 
     RecallPrompt recallPrompt = new RecallPrompt();

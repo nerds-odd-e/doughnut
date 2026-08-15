@@ -6,7 +6,7 @@ import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.McqService;
 import com.odde.doughnut.services.NoteQuestionGenerationService;
 import com.odde.doughnut.services.ai.AiQuestionGenerator;
-import com.odde.doughnut.services.ai.MCQWithAnswer;
+import com.odde.doughnut.services.ai.GeneratedMcq;
 import com.odde.doughnut.services.openAiApis.StructuredResponseCreateParamsSerializer;
 import com.openai.models.responses.StructuredResponseCreateParams;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -45,11 +45,11 @@ class McqController {
   public Mcq generateQuestionWithoutSave(
       @RequestParam(value = "note") @Schema(type = "integer") Note note) {
     authorizationService.assertLoggedIn();
-    MCQWithAnswer MCQWithAnswer = aiQuestionGenerator.getAiGeneratedQuestion(note, null);
-    if (MCQWithAnswer == null) {
+    GeneratedMcq generatedMcq = aiQuestionGenerator.getAiGeneratedQuestion(note, null);
+    if (generatedMcq == null) {
       return null;
     }
-    return Mcq.fromMCQWithAnswer(MCQWithAnswer, note);
+    return generatedMcq.toMcq(note);
   }
 
   @GetMapping("/{note}/note-questions")
@@ -82,7 +82,7 @@ class McqController {
       @PathVariable("note") @Schema(type = "integer") Note note)
       throws UnexpectedNoAccessRightException {
     authorizationService.assertAuthorization(note);
-    StructuredResponseCreateParams<MCQWithAnswer> params =
+    StructuredResponseCreateParams<GeneratedMcq> params =
         noteQuestionGenerationService.buildQuestionGenerationRequest(note, null);
     return paramsSerializer.toBodyMap(params);
   }

@@ -13,7 +13,7 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.RecallPrompt;
 import com.odde.doughnut.exceptions.OpenAiNotAvailableException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.doughnut.services.ai.MCQWithAnswer;
+import com.odde.doughnut.services.ai.GeneratedMcq;
 import com.openai.models.responses.StructuredResponseCreateParams;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -63,8 +63,8 @@ class RecallPromptRegenerateControllerTest extends RecallPromptControllerTestBas
   @Test
   void shouldPassOldQuestionAndContestResultToOpenAiApi()
       throws JsonProcessingException, UnexpectedNoAccessRightException {
-    MCQWithAnswer jsonQuestion =
-        makeMe.aMCQWithAnswer().stem("What is the first color in the rainbow?").please();
+    GeneratedMcq jsonQuestion =
+        makeMe.aGeneratedMcq().stem("What is the first color in the rainbow?").please();
     openAiStructuredResponseMock.stubStructuredResponse(jsonQuestion);
 
     com.odde.doughnut.controllers.dto.RecallPrompt regeneratedPrompt =
@@ -74,7 +74,7 @@ class RecallPromptRegenerateControllerTest extends RecallPromptControllerTestBas
         .contains("What is the first color in the rainbow?");
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    ArgumentCaptor<StructuredResponseCreateParams<MCQWithAnswer>> paramsCaptor =
+    ArgumentCaptor<StructuredResponseCreateParams<GeneratedMcq>> paramsCaptor =
         ArgumentCaptor.forClass((Class) StructuredResponseCreateParams.class);
     verify(openAiStructuredResponseMock.responseService(), atLeastOnce())
         .create(paramsCaptor.capture());

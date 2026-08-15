@@ -5,33 +5,35 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 
 import com.odde.doughnut.controllers.dto.QuestionContestResult;
+import com.odde.doughnut.entities.Mcq;
 import com.odde.doughnut.testability.MakeMeWithoutDB;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class QuestionEvaluationTest {
   private QuestionEvaluation questionEvaluation;
-  private MCQWithAnswer mcqWithAnswer;
+  private Mcq mcq;
   private MakeMeWithoutDB makeMe;
 
   @BeforeEach
   void setup() {
     makeMe = new MakeMeWithoutDB();
     questionEvaluation = new QuestionEvaluation();
-    mcqWithAnswer =
+    mcq =
         makeMe
-            .aMCQWithAnswer()
+            .aGeneratedMcq()
             .stem("What is the capital of France?")
             .choices("Paris", "London", "Berlin")
-            .correctChoiceIndex(0)
-            .please();
+            .correctAnswerIndex(0)
+            .please()
+            .toMcq(null);
   }
 
   @Test
   void shouldShowExplanationAndUnclearAnswerWhenNoCorrectChoices() {
     questionEvaluation.feasibleQuestion = true;
     questionEvaluation.improvementAdvices = "what a horrible question!";
-    QuestionContestResult result = questionEvaluation.getQuestionContestResult(mcqWithAnswer);
+    QuestionContestResult result = questionEvaluation.getQuestionContestResult(mcq);
     assertThat(result.advice, containsString("what a horrible question!"));
     assertThat(result.advice, containsString("Unclear answer detected"));
     assertThat(
@@ -45,7 +47,7 @@ class QuestionEvaluationTest {
   void shouldShowMultipleCorrectChoicesMessage() {
     questionEvaluation.feasibleQuestion = true;
     questionEvaluation.correctChoices = new int[] {1, 2};
-    QuestionContestResult result = questionEvaluation.getQuestionContestResult(mcqWithAnswer);
+    QuestionContestResult result = questionEvaluation.getQuestionContestResult(mcq);
     assertThat(
         result.advice,
         containsString("1 (\"London\"), 2 (\"Berlin\") are correct to the question"));
@@ -55,7 +57,7 @@ class QuestionEvaluationTest {
   void shouldShowLegitimateQuestionMessageWhenAnswerMatches() {
     questionEvaluation.feasibleQuestion = true;
     questionEvaluation.correctChoices = new int[] {0};
-    QuestionContestResult result = questionEvaluation.getQuestionContestResult(mcqWithAnswer);
+    QuestionContestResult result = questionEvaluation.getQuestionContestResult(mcq);
     assertThat(result.advice, equalTo("This seems to be a legitimate question. Please answer it."));
   }
 
@@ -63,7 +65,7 @@ class QuestionEvaluationTest {
   void shouldHandleOutOfBoundsIndicesInCorrectChoices() {
     questionEvaluation.feasibleQuestion = true;
     questionEvaluation.correctChoices = new int[] {3};
-    QuestionContestResult result = questionEvaluation.getQuestionContestResult(mcqWithAnswer);
+    QuestionContestResult result = questionEvaluation.getQuestionContestResult(mcq);
     assertThat(result.advice, containsString("3 (invalid index)"));
   }
 
@@ -71,13 +73,14 @@ class QuestionEvaluationTest {
   void shouldHandleNullChoices() {
     questionEvaluation.feasibleQuestion = true;
     questionEvaluation.correctChoices = new int[] {1};
-    MCQWithAnswer mcqWithNullChoices =
+    Mcq mcqWithNullChoices =
         makeMe
-            .aMCQWithAnswer()
+            .aGeneratedMcq()
             .stem("What is the capital of France?")
-            .correctChoiceIndex(0)
-            .please();
-    mcqWithNullChoices.getQuestion().setResponseChoices(null);
+            .correctAnswerIndex(0)
+            .please()
+            .toMcq(null);
+    mcqWithNullChoices.setResponseChoices(null);
 
     QuestionContestResult result = questionEvaluation.getQuestionContestResult(mcqWithNullChoices);
     assertThat(result.advice, equalTo("The question has no choices defined."));

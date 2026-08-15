@@ -3,7 +3,7 @@ package com.odde.doughnut.services;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.NoteRepository;
-import com.odde.doughnut.services.ai.MCQWithAnswer;
+import com.odde.doughnut.services.ai.GeneratedMcq;
 import com.odde.doughnut.services.ai.OpenAiModelCapabilities;
 import com.odde.doughnut.services.ai.builder.OpenAIResponseRequestBuilder;
 import com.odde.doughnut.services.ai.tools.AiToolFactory;
@@ -50,31 +50,31 @@ public class QuestionGenerationRequestBuilder {
     this.authorizationService = authorizationService;
   }
 
-  public StructuredResponseCreateParams<MCQWithAnswer> buildQuestionGenerationResponseRequest(
+  public StructuredResponseCreateParams<GeneratedMcq> buildQuestionGenerationResponseRequest(
       Note note, String additionalMessage, Long contextSeed) {
     return buildQuestionGenerationResponseRequest(note, additionalMessage, contextSeed, null);
   }
 
-  public StructuredResponseCreateParams<MCQWithAnswer> buildQuestionGenerationResponseRequest(
+  public StructuredResponseCreateParams<GeneratedMcq> buildQuestionGenerationResponseRequest(
       Note note, String additionalMessage, Long contextSeed, String propertyKey) {
     return buildQuestionGenerationResponseRequest(
         note, additionalMessage, contextSeed, propertyKey, authorizationService.getCurrentUser());
   }
 
-  public StructuredResponseCreateParams<MCQWithAnswer> buildQuestionGenerationResponseRequest(
+  public StructuredResponseCreateParams<GeneratedMcq> buildQuestionGenerationResponseRequest(
       Note note, String additionalMessage, Long contextSeed, String propertyKey, User viewer) {
     return buildQuestionGenerationResponseRequestInternal(
         note, additionalMessage, contextSeed, propertyKey, viewer, false);
   }
 
-  public StructuredResponseCreateParams<MCQWithAnswer>
+  public StructuredResponseCreateParams<GeneratedMcq>
       buildQuestionGenerationResponseRequestForBatch(
           Note note, String additionalMessage, Long contextSeed, String propertyKey, User viewer) {
     return buildQuestionGenerationResponseRequestInternal(
         note, additionalMessage, contextSeed, propertyKey, viewer, true);
   }
 
-  private StructuredResponseCreateParams<MCQWithAnswer>
+  private StructuredResponseCreateParams<GeneratedMcq>
       buildQuestionGenerationResponseRequestInternal(
           Note note,
           String additionalMessage,
@@ -87,11 +87,10 @@ public class QuestionGenerationRequestBuilder {
         OpenAiModelCapabilities.questionGenerationReasoningEffort(modelName, batch);
 
     InstructionAndSchema tool =
-        AiToolFactory.mcqWithAnswerAiTool(
-            hydrateFocusNoteForQuestionGeneration(note).isBodyContentBlank());
-    OpenAIResponseRequestBuilder<MCQWithAnswer> responseRequestBuilder =
+        AiToolFactory.mcqAiTool(hydrateFocusNoteForQuestionGeneration(note).isBodyContentBlank());
+    OpenAIResponseRequestBuilder<GeneratedMcq> responseRequestBuilder =
         openAiResponseRequestForQuestionGeneration(
-            MCQWithAnswer.class, note, additionalMessage, contextSeed, propertyKey, viewer);
+            GeneratedMcq.class, note, additionalMessage, contextSeed, propertyKey, viewer);
     responseRequestBuilder.addInstruction(tool.getMessageBody());
     responseRequestBuilder.reasoningEffort(reasoningEffort);
     responseRequestBuilder.maxOutputTokens(

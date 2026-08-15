@@ -13,7 +13,7 @@ import com.odde.doughnut.entities.QuestionGenerationBatchRequest;
 import com.odde.doughnut.entities.QuestionGenerationBatchStatus;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.QuestionGenerationBatchRequestRepository;
-import com.odde.doughnut.services.ai.MCQWithAnswer;
+import com.odde.doughnut.services.ai.GeneratedMcq;
 import com.odde.doughnut.services.openAiApis.StructuredResponseCreateParamsSerializer;
 import com.odde.doughnut.testability.MakeMe;
 import com.openai.models.responses.StructuredResponseCreateParams;
@@ -78,7 +78,7 @@ class QuestionGenerationBatchJsonlRendererTest {
     if (propertyKey != null && propertyKey.isBlank()) {
       propertyKey = null;
     }
-    StructuredResponseCreateParams<MCQWithAnswer> params =
+    StructuredResponseCreateParams<GeneratedMcq> params =
         requestBuilder.buildQuestionGenerationResponseRequestForBatch(
             tracker.getNote(), null, request.getContextSeed(), propertyKey, batch.getUser());
     return paramsSerializer.toBodyMap(params);

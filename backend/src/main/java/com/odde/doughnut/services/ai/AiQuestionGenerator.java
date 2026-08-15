@@ -2,6 +2,7 @@ package com.odde.doughnut.services.ai;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.doughnut.controllers.dto.QuestionContestResult;
+import com.odde.doughnut.entities.Mcq;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.services.NoteQuestionGenerationService;
 import com.odde.doughnut.services.ai.tools.AiToolFactory;
@@ -21,19 +22,19 @@ public class AiQuestionGenerator {
     this.generatedQuestionPostProcessor = generatedQuestionPostProcessor;
   }
 
-  public MCQWithAnswer getAiGeneratedQuestion(Note note, String additionalMessage) {
+  public GeneratedMcq getAiGeneratedQuestion(Note note, String additionalMessage) {
     return getAiGeneratedQuestion(note, additionalMessage, null, null);
   }
 
-  public MCQWithAnswer getAiGeneratedQuestion(
+  public GeneratedMcq getAiGeneratedQuestion(
       Note note, String additionalMessage, Long contextSeed) {
     return getAiGeneratedQuestion(note, additionalMessage, contextSeed, null);
   }
 
-  public MCQWithAnswer getAiGeneratedQuestion(
+  public GeneratedMcq getAiGeneratedQuestion(
       Note note, String additionalMessage, Long contextSeed, String propertyKey) {
     try {
-      MCQWithAnswer original =
+      GeneratedMcq original =
           noteQuestionGenerationService.generateQuestion(
               note, additionalMessage, contextSeed, propertyKey);
       return generatedQuestionPostProcessor.postProcess(original);
@@ -42,37 +43,33 @@ public class AiQuestionGenerator {
     }
   }
 
-  public MCQWithAnswer getAiGeneratedRefineQuestion(Note note, MCQWithAnswer mcqWithAnswer) {
+  public GeneratedMcq getAiGeneratedRefineQuestion(Note note, Mcq mcq) {
     return noteQuestionGenerationService
-        .refineQuestion(note, mcqWithAnswer)
+        .refineQuestion(note, mcq)
         .map(generatedQuestionPostProcessor::postProcess)
         .orElse(null);
   }
 
-  public QuestionEvaluation getQuestionContestResult(Note note, MCQWithAnswer mcqWithAnswer) {
+  public QuestionEvaluation getQuestionContestResult(Note note, Mcq mcq) {
     try {
-      return noteQuestionGenerationService.evaluateQuestion(note, mcqWithAnswer).orElse(null);
+      return noteQuestionGenerationService.evaluateQuestion(note, mcq).orElse(null);
     } catch (JsonProcessingException e) {
       throw new RuntimeException(e);
     }
   }
 
-  public MCQWithAnswer regenerateQuestion(
-      QuestionContestResult contestResult,
-      Note note,
-      MCQWithAnswer mcqWithAnswer,
-      Long contextSeed) {
-    return regenerateQuestion(contestResult, note, mcqWithAnswer, contextSeed, null);
+  public GeneratedMcq regenerateQuestion(
+      QuestionContestResult contestResult, Note note, Mcq mcq, Long contextSeed) {
+    return regenerateQuestion(contestResult, note, mcq, contextSeed, null);
   }
 
-  public MCQWithAnswer regenerateQuestion(
+  public GeneratedMcq regenerateQuestion(
       QuestionContestResult contestResult,
       Note note,
-      MCQWithAnswer mcqWithAnswer,
+      Mcq mcq,
       Long contextSeed,
       String propertyKey) {
-    String additionalMessage =
-        AiToolFactory.buildRegenerateQuestionMessage(contestResult, mcqWithAnswer);
+    String additionalMessage = AiToolFactory.buildRegenerateQuestionMessage(contestResult, mcq);
     return getAiGeneratedQuestion(note, additionalMessage, contextSeed, propertyKey);
   }
 }

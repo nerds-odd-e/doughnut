@@ -17,7 +17,7 @@ import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.QuestionGenerationBatchRepository;
 import com.odde.doughnut.entities.repositories.QuestionGenerationBatchRequestRepository;
 import com.odde.doughnut.entities.repositories.RecallPromptRepository;
-import com.odde.doughnut.services.ai.MCQWithAnswer;
+import com.odde.doughnut.services.ai.GeneratedMcq;
 import com.odde.doughnut.testability.MakeMe;
 import java.sql.Timestamp;
 import java.util.List;
@@ -48,7 +48,7 @@ class QuestionGenerationBatchImportServiceTest {
   QuestionGenerationBatchRequest failedRequest;
   QuestionGenerationBatchRequest malformedRequest;
   QuestionGenerationBatchRequest alreadyImportedRequest;
-  MCQWithAnswer mcqWithAnswer;
+  GeneratedMcq generatedMcq;
 
   @BeforeEach
   void setup() throws JsonProcessingException {
@@ -65,18 +65,18 @@ class QuestionGenerationBatchImportServiceTest {
             .please();
     makeMe.entityPersister.flush();
 
-    mcqWithAnswer =
+    generatedMcq =
         makeMe
-            .aMCQWithAnswer()
+            .aGeneratedMcq()
             .stem("What color is the sky on a clear day?")
             .choices("Blue", "Green", "Red")
-            .correctChoiceIndex(0)
+            .correctAnswerIndex(0)
             .please();
 
     importableRequest =
         createRequest("importable", QuestionGenerationBatchRequestStatus.OUTPUT_READY);
     importableRequest.setRawSuccessPayload(
-        batchSuccessLine(importableRequest.getCustomId(), mcqWithAnswer));
+        batchSuccessLine(importableRequest.getCustomId(), generatedMcq));
 
     failedRequest = createRequest("failed", QuestionGenerationBatchRequestStatus.FAILED);
     failedRequest.setErrorDetail("model unavailable");

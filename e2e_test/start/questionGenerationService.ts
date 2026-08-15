@@ -2,34 +2,30 @@ import type { TextMessageToMatch } from './mock_services/MessageToMatch'
 import mock_services from './mock_services'
 
 /** Shape of JSON returned by OpenAI tool calls for MCQ (not all fields are in OpenAPI). */
-type McqWithAnswer = {
-  question: {
-    questionStem: string
-    responseChoices: string[]
-  }
-  solutionChoiceIndex: number
+type GeneratedMcq = {
+  questionStem: string
+  responseChoices: string[]
+  correctAnswerIndex: number
   choicesMayBeShuffled: boolean
   testedFocus?: string
   validationRationale?: string
 }
 
-const createMcqWithAnswer = (
+const createGeneratedMcq = (
   stem: string,
   correctChoice: string,
   incorrectChoice1: string,
   incorrectChoice2: string
-): McqWithAnswer => ({
-  solutionChoiceIndex: 0,
+): GeneratedMcq => ({
+  correctAnswerIndex: 0,
   choicesMayBeShuffled: false,
-  question: {
-    questionStem: stem,
-    responseChoices: [correctChoice, incorrectChoice1, incorrectChoice2],
-  },
+  questionStem: stem,
+  responseChoices: [correctChoice, incorrectChoice1, incorrectChoice2],
 })
 
 const mcqReplyJson = (record: Record<string, string>) =>
   JSON.stringify(
-    createMcqWithAnswer(
+    createGeneratedMcq(
       record['Question Stem']!,
       record['Correct Choice']!,
       record['Incorrect Choice 1']!,

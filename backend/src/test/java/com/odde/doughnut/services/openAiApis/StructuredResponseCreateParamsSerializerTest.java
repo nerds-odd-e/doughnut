@@ -12,7 +12,7 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.services.QuestionGenerationRequestBuilder;
-import com.odde.doughnut.services.ai.MCQWithAnswer;
+import com.odde.doughnut.services.ai.GeneratedMcq;
 import com.odde.doughnut.testability.MakeMe;
 import com.openai.models.responses.StructuredResponseCreateParams;
 import java.lang.reflect.Method;
@@ -59,7 +59,7 @@ class StructuredResponseCreateParamsSerializerTest {
         .setKeyValue(currentTime, "gpt-batch-question-generation");
   }
 
-  private StructuredResponseCreateParams<MCQWithAnswer> sampleParams() {
+  private StructuredResponseCreateParams<GeneratedMcq> sampleParams() {
     Note note =
         makeMe.aNote().notebookOwnedBy(user).title("Tokyo is the capital of Japan").please();
     return requestBuilder.buildQuestionGenerationResponseRequest(note, null, null, null);
@@ -97,7 +97,7 @@ class StructuredResponseCreateParamsSerializerTest {
   class ToBodyMap {
     @Test
     void rendersResponsesApiBodyShapeWithoutSyntheticValidField() throws Exception {
-      StructuredResponseCreateParams<MCQWithAnswer> params = sampleParams();
+      StructuredResponseCreateParams<GeneratedMcq> params = sampleParams();
 
       Map<String, Object> body = paramsSerializer.toBodyMap(params);
 
@@ -116,7 +116,7 @@ class StructuredResponseCreateParamsSerializerTest {
       assertThat(format.containsKey("schema"), is(true));
 
       assertThat(
-          "body should not contain synthetic 'valid' fields from MCQWithAnswer.isValid()",
+          "body should not contain synthetic 'valid' fields from GeneratedMcq.isValid()",
           findValidFieldPaths(body),
           empty());
     }
@@ -140,7 +140,7 @@ class StructuredResponseCreateParamsSerializerTest {
   class RemoveSyntheticValidFromStructuredOutputSchema {
     @Test
     void removesValidOnlyWithinStructuredOutputSchema() throws Exception {
-      StructuredResponseCreateParams<MCQWithAnswer> params = sampleParams();
+      StructuredResponseCreateParams<GeneratedMcq> params = sampleParams();
       Method bodyMethod =
           params
               .rawParams()

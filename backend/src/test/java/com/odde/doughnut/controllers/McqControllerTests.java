@@ -115,10 +115,9 @@ class McqControllerTests extends ControllerTestBase {
     @Test
     void authorization() {
       Note note = makeMe.aNote().please();
-      Mcq mcqWithAnswer = makeMe.anMcq().please();
+      Mcq mcq = makeMe.anMcq().please();
       assertThrows(
-          UnexpectedNoAccessRightException.class,
-          () -> controller.addQuestionManually(note, mcqWithAnswer));
+          UnexpectedNoAccessRightException.class, () -> controller.addQuestionManually(note, mcq));
     }
 
     @Test
@@ -163,6 +162,9 @@ class McqControllerTests extends ControllerTestBase {
       assertThat(
           request.get("input").toString(), containsString("There are 42 prefectures in Japan"));
       assertThat(findValidFields(request), empty());
+      assertThat(request.toString(), containsString("correctAnswerIndex"));
+      assertThat(request.toString(), not(containsString("solutionChoiceIndex")));
+      assertThat(request.toString(), not(containsString("MCQWithAnswer")));
     }
 
     private List<String> findValidFields(Object obj) {

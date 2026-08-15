@@ -19,7 +19,7 @@ import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.QuestionGenerationBatchRepository;
 import com.odde.doughnut.entities.repositories.QuestionGenerationBatchRequestRepository;
 import com.odde.doughnut.entities.repositories.RecallPromptRepository;
-import com.odde.doughnut.services.ai.MCQWithAnswer;
+import com.odde.doughnut.services.ai.GeneratedMcq;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.odde.doughnut.testability.MakeMe;
 import java.sql.Timestamp;
@@ -81,12 +81,12 @@ class QuestionGenerationBatchMaintenanceServiceTest {
             .please();
     makeMe.entityPersister.flush();
 
-    MCQWithAnswer mcqWithAnswer =
+    GeneratedMcq generatedMcq =
         makeMe
-            .aMCQWithAnswer()
+            .aGeneratedMcq()
             .stem("What color is the sky on a clear day?")
             .choices("Blue", "Green", "Red")
-            .correctChoiceIndex(0)
+            .correctAnswerIndex(0)
             .please();
 
     when(openAiApiHandler.retrieveBatch("batch-openai-1")).thenReturn(completedOpenAiBatch());
@@ -94,7 +94,7 @@ class QuestionGenerationBatchMaintenanceServiceTest {
         .thenReturn(successLine(request.getCustomId()));
     when(openAiApiHandler.downloadFileContent("file-error")).thenReturn("");
     when(openAiApiHandler.parseStructuredOutputFromBatchSuccessLine(anyString(), any(Class.class)))
-        .thenReturn(Optional.of(mcqWithAnswer));
+        .thenReturn(Optional.of(generatedMcq));
   }
 
   @Test

@@ -1,184 +1,28 @@
 # Plan: Recall prompt / MCQ — minimum translation
 
-**Goal:** Same nouns as ADR 0001 (**recall prompt** HAS_A **MCQ**) in tests, API,
-code, and schema, with no `RecallQuestion` / `PredefinedQuestion` / `quiz`
-translation types. One slice = one small commit. Stop-safe.
+**Status:** done (2026-08-15)
 
-**Prerequisite (done):** ADR 0001 / 0003 glossary.
+**Goal (shipped):** Same nouns as ADR 0001 — **recall prompt** HAS_A **MCQ** —
+in tests, API, code, and schema. No `RecallQuestion` / `PredefinedQuestion` /
+`MultipleChoicesQuestion` / `MCQWithAnswer` product types.
 
-**Cite:** [CONTEXT.md](./CONTEXT.md)
+## Shipped shape
 
-## Decisions
+- Unanswered ask: DTO/SDK **`RecallPrompt`** at `GET /api/memory-trackers/{id}/recall-prompt`
+- Answer: SDK **`answer`** at `POST /api/recall-prompts/{id}/answer`
+- Note MCQs: type **`Mcq`** (`questionStem` / `responseChoices`), HTTP `/api/mcqs`
+- Unanswered prompt carries a solution-omitted **`mcq`** (`Mcq.withoutSolution()`)
+- Tables: `mcq` (`V300000257`), `answer` (`V300000258`); FKs `recall_prompt.mcq_id`, `recall_prompt.answer_id`
+- AI generate/refine/contest-regenerate: Mcq field names; **`GeneratedMcq`** is AI-only parse/shuffle (`choicesMayBeShuffled` not persisted)
 
-1. Two nouns only. An MCQ is not a subtype of a recall prompt.
-2. Minimum DTO ≠ zero DTO. The unanswered prompt must not leak the solution;
-   that projection must not be named **RecallQuestion**.
-3. Contest stays on the recall-prompt URL; `contested` stays on the MCQ.
-4. Do not feed note-authored MCQs into recall in this plan.
-5. After OpenAPI/controller changes, regenerate the client
-   (`pnpm generateTypeScript`); never hand-edit generated files. Type/path
-   slices that regen the SDK may exceed ~5 min; that regen is the stated
-   reason to continue (do not bundle a second outcome into the same commit).
-6. New Flyway versions only; never edit committed migrations.
-7. Capability-named tests only. Slice numbers stay in this file.
-8. One slice, one commit. If a slice overruns ~10 min for any reason other
-   than SDK regen or a single Flyway apply, stop, revert, split.
-9. Schema table names are operator-observable (ERD + migrated catalog). They
-   are Behavior in this plan, not Structure-for-the-next-pixel-change.
-10. Do not rename `Quiz.vue` or the note **Questions** menu in this plan
-    (leftover identifiers; no user-facing behavior tied to the file name).
-11. Stem+choices live on **`Mcq`**. The unanswered `RecallPrompt` carries a
-    solution-omitted `Mcq` (no `MultipleChoicesQuestion` type). Do not leak
-    `correctAnswerIndex` / solution rationale on that projection.
+## Leftovers (out of this plan)
 
-## Slices
-
-### 1. Tests say recall prompt
-
-- **Status:** done
-- **Type:** Structure
-- **Enables:** 2. Ask type is RecallPrompt
-
-Shipped: `When I visit recall for a due recall prompt on day {int}` (step +
-call sites). Contest / note-question wording untouched. Feature filenames
-and page-object helpers still say quiz/question (later leftover).
-
-### 2. Ask type is RecallPrompt
-
-- **Status:** done
-- **Type:** Behavior
-
-Shipped: unanswered-ask OpenAPI/SDK type is **`RecallPrompt`** (DTO
-`controllers.dto.RecallPrompt`; entity unchanged). JSON shape and
-`GET .../question` / `askAQuestion` unchanged. `makeMe.aRecallPrompt` builds
-the ask payload; history is `makeMe.aRecallPromptHistoryItem`.
-
-### 3. Ask path is recall-prompt
-
-- **Status:** done
-- **Type:** Behavior
-
-Shipped: `GET /api/memory-trackers/{id}/recall-prompt`, SDK `getRecallPrompt`.
-No `askAQuestion` / `GET .../question`. Ask controller test is
-`MemoryTrackerRecallPromptControllerTest`.
-
-### 4. CLI recall help is not quiz
-
-- **Status:** done
-- **Type:** Behavior
-
-Shipped: `/recall` help is `Recall the next due note (just review when no
-recall prompt is pending)`.
-
-### 5. Answer operation is answer
-
-- **Status:** done
-- **Type:** Behavior
-
-Shipped: SDK operation **`answer`** (not `answerQuiz`); path still
-`POST /api/recall-prompts/{id}/answer`. Frontend `submitAnswer`; test
-`RecallPromptAnswerControllerTest`; service method `answer`.
-
-### 6. Answered field is mcq
-
-- **Status:** done
-- **Type:** Behavior
-
-Shipped: answered result and history JSON/OpenAPI property is **`mcq`**.
-Type remains `PredefinedQuestion`. Builders use `withMcq`.
-
-### 7. Tests say MCQ on the note
-
-- **Status:** done
-- **Type:** Structure
-- **Enables:** 8. Type is Mcq
-
-Shipped: Gherkin/testability says MCQs / contest an **MCQ**. Feature
-filenames and `injectPredefinedQuestionsToNotebook` left for type rename.
-
-### 8. Type is Mcq
-
-- **Status:** done
-- **Type:** Behavior
-
-Shipped: Java/OpenAPI type is **`Mcq`**. HTTP still `/api/predefined-questions`.
-Table still `predefined_question`. Builders `anMcq`. Tests `McqControllerTests`.
-
-### 9. Note MCQ routes are /mcqs
-
-- **Status:** done
-- **Type:** Behavior
-
-Shipped: HTTP `/api/mcqs/...` (list/add/generate/refine/export). No
-`/api/predefined-questions`. Testability inject is `POST /api/testability/inject-mcqs`.
-Contest stays on `/recall-prompts/{id}/contest`. Nested leftover segments
-(`note-questions`, `refine-question`, …) unchanged.
-
-### 10. Table is mcq
-
-- **Status:** done
-- **Type:** Behavior
-
-Shipped: Flyway `V300000257__rename_predefined_question_to_mcq.sql` — table
-`mcq`, FK `recall_prompt.mcq_id` (`fk_recall_prompt_mcq`), note FK
-`fk_mcq_note`. ERD regenerated.
-
-### 11. Table is answer
-
-- **Status:** done
-- **Type:** Behavior
-
-Shipped: Flyway `V300000258__rename_quiz_answer_to_answer.sql` — table
-`answer`, FK `recall_prompt.answer_id` (`fk_recall_prompt_answer`). ERD
-regenerated.
-
-### 12. Unanswered prompt has no MultipleChoicesQuestion type
-
-- **Status:** done
-- **Type:** Behavior
-
-Shipped: OpenAPI has no `MultipleChoicesQuestion`. `Mcq` JSON has flattened
-`questionStem` / `responseChoices`. Unanswered `RecallPrompt` property is
-`mcq` via `Mcq.withoutSolution()`.
-
-### 13. AI generate uses Mcq
-
-- **Status:** planned
-- **Type:** Behavior
-- **Pre:** Trainer or recall generation asks the model for an MCQ.
-- **Trigger:** Generate / refine / contest-regenerate.
-- **Post:** API/Java have no **`MCQWithAnswer`** (or refine subclass) as a
-  product type. `choicesMayBeShuffled` is a field on `Mcq` or AI-only — not
-  a glossary noun.
-
-**Tests:** generate/refine/contest/regenerate controller tests;
-`isMCQWithAnswerValid` follows the type.
-
-## Out of scope
-
+- `Quiz.vue`, note **Questions** menu, nested HTTP segments (`note-questions`, `refine-question`, …)
+- `RecallQuestionService`, CLI `RecallQuestionAnswerOutcome`
+- Internal `MultipleChoicesQuestion` (DB `raw_json_question` converter only)
 - Using the note’s MCQ list as the recall source
-- Inferring `QuestionType` from `mcq_id` and dropping the enum
-- Renaming **just review**, `Quiz.vue`, or the note **Questions** menu
-- Dual JSON aliases for old field names
+- Inferring `QuestionType` from `mcq_id`
 
-## Jidoka
+## Ops
 
-- Confirm no external API consumers that need dual JSON field names.
-- Slices 10–11 need a deploy that applies the new Flyway version.
-- Do not add compatibility DTOs that reintroduce translation.
-- Slice 12 placement: **B** — stem+choices on `Mcq`; unanswered prompt
-  carries a solution-omitted `Mcq`.
-
-## Learnings
-
-- Slice 1: leftover `quiz` in feature filenames and `visitRecallPageAndWaitForQuestion` stay until a later wording slice; not this step.
-- Slice 2: `makeMe.aRecallPrompt` is the unanswered-ask DTO; history items are `makeMe.aRecallPromptHistoryItem`. `RecallQuestionService` and CLI `RecallQuestionAnswerOutcome` wait for later slices.
-- Slice 3: SDK operation is `getRecallPrompt` (history list remains `getRecallPrompts`). Fetch extracted to `useRecallPromptFetching` / `recallMcqCardLoad`.
-- Slice 5: CLI `RecallQuestionAnswerOutcome` still deferred; JSON `predefinedQuestion` is slice 6.
-- Slice 6: answered/history property is `mcq`; Java type still `PredefinedQuestion`.
-- Slice 7: leftover `injectPredefinedQuestionsToNotebook` / feature filenames wait for type `Mcq`.
-- Slice 8: feature filename `mcq_management.feature` and inject helper `injectMcqsToNotebook` renamed with the type. Testability HTTP still `inject-predefined-questions` (product `/api/mcqs` is slice 9). Unused `McqNotPossibleException` deleted. Note MCQ E2E not re-run this slice (SUT LB 503 / stale backend on 9081).
-- Slice 9: nested leftover segments (`note-questions`, `refine-question`, `generate-question-without-save`, `export-question-generation`) stayed. Testability moved to `inject-mcqs`. Note MCQ E2E green.
-- Slice 10: native SQL lived in `RecallPromptRepository`, `MemoryTrackerRepository`, and `QuestionGenerationBatchRowImportAtomicTestSupport` only. `quiz_answer` still slice 11.
-- Slice 11: native SQL only in `RecallPromptRepository` and `MemoryTrackerRepository`. Confusion-adjusted FK renamed with the table; `ON DELETE SET NULL` kept.
-- Slice 12: unanswered projection is `Mcq.withoutSolution()` (do not mutate the persisted entity). Internal Java `MultipleChoicesQuestion` stays for converter + `MCQWithAnswer` until slice 13. No Flyway. SUT LB 503; controller JSON + frontend cover the unanswered shape.
+Deploy must apply Flyway **V300000257** and **V300000258**.

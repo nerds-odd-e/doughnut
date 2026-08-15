@@ -13,7 +13,7 @@ public class GeneratedQuestionPostProcessor {
     this.testabilitySettings = testabilitySettings;
   }
 
-  public MCQWithAnswer postProcess(MCQWithAnswer original) {
+  public GeneratedMcq postProcess(GeneratedMcq original) {
     if (original == null) {
       return original;
     }
@@ -24,19 +24,14 @@ public class GeneratedQuestionPostProcessor {
       return original;
     }
 
-    List<IndexedChoice> indexedChoices =
-        indexedChoices(original.getQuestion().getResponseChoices());
+    List<IndexedChoice> indexedChoices = indexedChoices(original.getResponseChoices());
     List<IndexedChoice> shuffledChoices =
         testabilitySettings.getRandomizer().shuffle(indexedChoices);
-    int newCorrectIndex = newCorrectIndex(shuffledChoices, original.getSolutionChoiceIndex());
+    int newCorrectIndex = newCorrectIndex(shuffledChoices, original.getCorrectAnswerIndex());
 
-    MultipleChoicesQuestion shuffledQuestion =
-        new MultipleChoicesQuestion(
-            original.getQuestion().getQuestionStem(),
-            shuffledChoices.stream().map(IndexedChoice::choice).toList());
-
-    return new MCQWithAnswer(
-        shuffledQuestion,
+    return new GeneratedMcq(
+        original.getQuestionStem(),
+        shuffledChoices.stream().map(IndexedChoice::choice).toList(),
         newCorrectIndex,
         true,
         original.getTestedFocus(),

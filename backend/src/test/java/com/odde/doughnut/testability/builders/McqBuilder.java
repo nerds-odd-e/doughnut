@@ -2,7 +2,7 @@ package com.odde.doughnut.testability.builders;
 
 import com.odde.doughnut.entities.Mcq;
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.services.ai.MCQWithAnswer;
+import com.odde.doughnut.services.ai.GeneratedMcq;
 import com.odde.doughnut.testability.EntityBuilder;
 import com.odde.doughnut.testability.MakeMe;
 
@@ -18,14 +18,13 @@ public class McqBuilder extends EntityBuilder<Mcq> {
     }
   }
 
-  public McqBuilder ofAIGeneratedQuestion(MCQWithAnswer mcqWithAnswer, Note note) {
-    this.entity = Mcq.fromMCQWithAnswer(mcqWithAnswer, note);
+  public McqBuilder ofAIGeneratedQuestion(GeneratedMcq generatedMcq, Note note) {
+    this.entity = generatedMcq.toMcq(note);
     return this;
   }
 
   public McqBuilder ofAIGeneratedQuestionForNote(Note note) {
-    MCQWithAnswer mcqWithAnswer = new MCQWithAnswerBuilder().please();
-    this.entity = Mcq.fromMCQWithAnswer(mcqWithAnswer, note);
+    this.entity = new GeneratedMcqBuilder().please().toMcq(note);
     return this;
   }
 

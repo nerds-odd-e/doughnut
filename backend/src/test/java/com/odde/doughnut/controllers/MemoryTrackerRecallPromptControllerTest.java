@@ -73,7 +73,7 @@ class MemoryTrackerRecallPromptControllerTest extends MemoryTrackerControllerTes
 
   @Test
   void shouldGenerateMcqWhenNoUnansweredPromptExists() throws UnexpectedNoAccessRightException {
-    openAiStructuredResponseMock.stubStructuredResponse(makeMe.aMCQWithAnswer().please());
+    openAiStructuredResponseMock.stubStructuredResponse(makeMe.aGeneratedMcq().please());
 
     assertThat(controller.getRecallPrompt(ownedTracker()).getMcq(), notNullValue());
   }

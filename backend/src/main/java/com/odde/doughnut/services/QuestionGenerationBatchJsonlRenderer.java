@@ -6,7 +6,7 @@ import com.odde.doughnut.entities.QuestionGenerationBatch;
 import com.odde.doughnut.entities.QuestionGenerationBatchRequest;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.QuestionGenerationBatchRequestRepository;
-import com.odde.doughnut.services.ai.MCQWithAnswer;
+import com.odde.doughnut.services.ai.GeneratedMcq;
 import com.odde.doughnut.services.openAiApis.StructuredResponseCreateParamsSerializer;
 import com.openai.models.responses.StructuredResponseCreateParams;
 import java.util.Comparator;
@@ -57,7 +57,7 @@ public class QuestionGenerationBatchJsonlRenderer {
 
   private String renderLine(User viewer, QuestionGenerationBatchRequest request) {
     MemoryTracker tracker = request.getMemoryTracker();
-    StructuredResponseCreateParams<MCQWithAnswer> params =
+    StructuredResponseCreateParams<GeneratedMcq> params =
         requestBuilder.buildQuestionGenerationResponseRequestForBatch(
             tracker.getNote(),
             null,

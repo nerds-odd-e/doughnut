@@ -7,7 +7,7 @@ import static org.hamcrest.Matchers.notNullValue;
 
 import com.odde.doughnut.entities.repositories.McqRepository;
 import com.odde.doughnut.services.McqService;
-import com.odde.doughnut.services.ai.MCQWithAnswer;
+import com.odde.doughnut.services.ai.GeneratedMcq;
 import com.odde.doughnut.services.ai.QuestionEvaluation;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.OpenAiStructuredResponseMock;
@@ -39,8 +39,8 @@ class McqTest {
     openAiStructuredResponseMock = new OpenAiStructuredResponseMock(officialClient);
   }
 
-  private MCQWithAnswer anUnshuffledMcq() {
-    return makeMe.aMCQWithAnswer().choicesMayBeShuffled(false).please();
+  private GeneratedMcq anUnshuffledGeneratedMcq() {
+    return makeMe.aGeneratedMcq().choicesMayBeShuffled(false).please();
   }
 
   private static QuestionEvaluation evaluation(
@@ -52,11 +52,11 @@ class McqTest {
     return evaluation;
   }
 
-  private static QuestionEvaluation accepting(MCQWithAnswer mcq) {
-    return evaluation(true, new int[] {mcq.getSolutionChoiceIndex()}, "");
+  private static QuestionEvaluation accepting(GeneratedMcq mcq) {
+    return evaluation(true, new int[] {mcq.getCorrectAnswerIndex()}, "");
   }
 
-  private void stubAcceptedGeneration(MCQWithAnswer mcq) {
+  private void stubAcceptedGeneration(GeneratedMcq mcq) {
     openAiStructuredResponseMock.stubStructuredResponse(mcq);
     openAiStructuredResponseMock.stubStructuredResponse(accepting(mcq));
   }
@@ -64,26 +64,26 @@ class McqTest {
   @Nested
   class AutoEvaluateAndRegenerate {
     Note note;
-    MCQWithAnswer mcqWithAnswer;
+    GeneratedMcq generatedMcq;
 
     @BeforeEach
     void setup() {
       note = makeMe.aNote().please();
-      mcqWithAnswer = anUnshuffledMcq();
+      generatedMcq = anUnshuffledGeneratedMcq();
     }
 
     @Test
     void returnsOriginalQuestionWhenEvaluationAcceptsIt() {
-      stubAcceptedGeneration(mcqWithAnswer);
+      stubAcceptedGeneration(generatedMcq);
 
       Mcq result = mcqService.generateAFeasibleQuestion(note);
 
-      assertThat(result.getQuestionStem(), equalTo(mcqWithAnswer.getQuestion().getQuestionStem()));
+      assertThat(result.getQuestionStem(), equalTo(generatedMcq.getQuestionStem()));
     }
 
     @Test
     void storesContextSeedOnMcq() {
-      stubAcceptedGeneration(mcqWithAnswer);
+      stubAcceptedGeneration(generatedMcq);
 
       Mcq result = mcqService.generateAFeasibleQuestion(note);
 
@@ -92,19 +92,19 @@ class McqTest {
 
     @Test
     void shouldReturnOriginalQuestionWhenEvaluationApiFails() {
-      openAiStructuredResponseMock.stubStructuredResponse(mcqWithAnswer);
+      openAiStructuredResponseMock.stubStructuredResponse(generatedMcq);
       openAiStructuredResponseMock.stubStructuredResponse(null);
 
       Mcq result = mcqService.generateAFeasibleQuestion(note);
 
-      assertThat(result.getQuestionStem(), equalTo(mcqWithAnswer.getQuestion().getQuestionStem()));
+      assertThat(result.getQuestionStem(), equalTo(generatedMcq.getQuestionStem()));
     }
 
     @Test
     void shouldRegenerateQuestionWhenEvaluationShowsNotFeasible() {
-      MCQWithAnswer regeneratedQuestion =
-          makeMe.aMCQWithAnswer().stem("regenerated stem").choicesMayBeShuffled(false).please();
-      openAiStructuredResponseMock.enqueueStructuredResponse(mcqWithAnswer);
+      GeneratedMcq regeneratedQuestion =
+          makeMe.aGeneratedMcq().stem("regenerated stem").choicesMayBeShuffled(false).please();
+      openAiStructuredResponseMock.enqueueStructuredResponse(generatedMcq);
       openAiStructuredResponseMock.enqueueStructuredResponse(regeneratedQuestion);
       openAiStructuredResponseMock.enqueueStructuredResponse(
           evaluation(false, new int[] {}, "not feasible"));
@@ -123,9 +123,7 @@ class McqTest {
         }
       }
       assertThat(contestedOriginal, notNullValue());
-      assertThat(
-          contestedOriginal.getQuestionStem(),
-          equalTo(mcqWithAnswer.getQuestion().getQuestionStem()));
+      assertThat(contestedOriginal.getQuestionStem(), equalTo(generatedMcq.getQuestionStem()));
     }
   }
 }

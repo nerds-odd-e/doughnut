@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.RecallPrompt;
-import com.odde.doughnut.services.ai.MCQWithAnswer;
+import com.odde.doughnut.services.ai.GeneratedMcq;
 import com.odde.doughnut.testability.MakeMe;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -26,18 +26,18 @@ class AIGeneratedQuizFactoryTest {
   @Autowired MakeMe makeMe;
   Note note;
   MemoryTracker memoryTracker;
-  MCQWithAnswer mcqWithAnswer;
+  GeneratedMcq generatedMcq;
 
   @BeforeEach
   void setup() {
     note = makeMe.aNote("saying").content("Rome is not built in a day").please();
     memoryTracker = makeMe.aMemoryTrackerFor(note).please();
-    mcqWithAnswer =
+    generatedMcq =
         makeMe
-            .aMCQWithAnswer()
+            .aGeneratedMcq()
             .stem("How long did it take to build Rome?")
             .choices("1/2 day", "1 day", "more than 1 day")
-            .correctChoiceIndex(2)
+            .correctAnswerIndex(2)
             .please();
   }
 
@@ -61,7 +61,7 @@ class AIGeneratedQuizFactoryTest {
     @Test
     void correct() {
       RecallPrompt recallPrompt =
-          questionBuilder().answerChoiceIndex(mcqWithAnswer.getSolutionChoiceIndex()).please(false);
+          questionBuilder().answerChoiceIndex(generatedMcq.getCorrectAnswerIndex()).please(false);
       assertTrue(recallPrompt.getAnswer().getCorrect());
     }
   }
@@ -70,7 +70,7 @@ class AIGeneratedQuizFactoryTest {
     return makeMe
         .aRecallPrompt()
         .forMemoryTracker(memoryTracker)
-        .ofAIGeneratedQuestion(mcqWithAnswer, note);
+        .ofAIGeneratedQuestion(generatedMcq, note);
   }
 
   private RecallPrompt buildQuestion() {

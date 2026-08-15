@@ -4,6 +4,9 @@ import com.fasterxml.jackson.annotation.JsonClassDescription;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
+import com.odde.doughnut.entities.Mcq;
+import com.odde.doughnut.entities.Note;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -14,14 +17,20 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor
-public class MCQWithAnswer {
+public class GeneratedMcq {
 
+  @JsonPropertyDescription(
+      "The question stem — the full, self-contained text of the prompt. Markdown allowed. Must not reference external context.")
   @JsonProperty(required = true)
-  private MultipleChoicesQuestion question = new MultipleChoicesQuestion();
+  private String questionStem;
+
+  @JsonPropertyDescription("List of choices. Markdown allowed.")
+  @JsonProperty(required = true)
+  private List<String> responseChoices;
 
   @JsonPropertyDescription("Index of the correct choice. 0-based.")
   @JsonProperty(required = true)
-  private int solutionChoiceIndex;
+  private int correctAnswerIndex;
 
   @JsonPropertyDescription(
       "Whether choices can be safely reordered before display. False if any choice depends on position or refers to another choice.")
@@ -38,11 +47,24 @@ public class MCQWithAnswer {
 
   @JsonIgnore
   public boolean isValid() {
-    if (question == null) return false;
-    if (question.getQuestionStem() == null || question.getQuestionStem().isBlank()) return false;
-    if (question.getResponseChoices() == null) return false;
-    int choicesCount = question.getResponseChoices().size();
-    if (choicesCount == 0) return false;
-    return solutionChoiceIndex >= 0 && solutionChoiceIndex < choicesCount;
+    if (questionStem == null || questionStem.isBlank()) return false;
+    if (responseChoices == null || responseChoices.isEmpty()) return false;
+    return correctAnswerIndex >= 0 && correctAnswerIndex < responseChoices.size();
+  }
+
+  public Mcq toMcq(Note note) {
+    return toMcq(note, null);
+  }
+
+  public Mcq toMcq(Note note, Long contextSeed) {
+    Mcq mcq = new Mcq();
+    mcq.setNote(note);
+    mcq.setQuestionStem(questionStem);
+    mcq.setResponseChoices(responseChoices);
+    mcq.setCorrectAnswerIndex(correctAnswerIndex);
+    mcq.setContextSeed(contextSeed);
+    mcq.setTestedFocus(testedFocus);
+    mcq.setValidationRationale(validationRationale);
+    return mcq;
   }
 }

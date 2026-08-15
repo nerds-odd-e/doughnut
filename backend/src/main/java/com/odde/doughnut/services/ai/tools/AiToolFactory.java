@@ -5,6 +5,7 @@ import com.odde.doughnut.configs.ObjectMapperConfig;
 import com.odde.doughnut.controllers.dto.BookLayoutReorganizationSuggestion;
 import com.odde.doughnut.controllers.dto.NoteRefinementQuestionContextDTO;
 import com.odde.doughnut.controllers.dto.QuestionContestResult;
+import com.odde.doughnut.entities.Mcq;
 import com.odde.doughnut.services.ai.*;
 import com.odde.doughnut.services.focusContext.FocusContextConstants;
 import java.util.List;
@@ -12,10 +13,10 @@ import java.util.List;
 public class AiToolFactory {
 
   public static Class<?> askSingleAnswerMultipleChoiceQuestion() {
-    return MCQWithAnswer.class;
+    return GeneratedMcq.class;
   }
 
-  public static InstructionAndSchema mcqWithAnswerAiTool(boolean focusNoteContentEmpty) {
+  public static InstructionAndSchema mcqAiTool(boolean focusNoteContentEmpty) {
     return new InstructionAndSchema(
         getBaseInstruction(focusNoteContentEmpty), askSingleAnswerMultipleChoiceQuestion());
   }
@@ -79,9 +80,7 @@ public class AiToolFactory {
             verifyGroundingRule);
   }
 
-  public static InstructionAndSchema questionEvaluationAiTool(MCQWithAnswer question) {
-    MultipleChoicesQuestion mcq = question.getQuestion();
-
+  public static InstructionAndSchema questionEvaluationAiTool(Mcq question) {
     String messageBody =
         """
         You are an AI assistant evaluating a memory recall question for a user’s personal knowledge management (PKM) system. The user has hidden Markdown context around a focus note (wiki-linked notes and inbound references, possibly beyond one link away) along with a multiple-choice question meant to test recollection of that focus note. The user does not know which note is the focus note when answering.
@@ -102,14 +101,16 @@ public class AiToolFactory {
         %s
 
         """
-            .formatted(new ObjectMapperConfig().objectMapper().valueToTree(mcq).toString());
+            .formatted(
+                new ObjectMapperConfig()
+                    .objectMapper()
+                    .valueToTree(question.withoutSolution())
+                    .toString());
 
     return new InstructionAndSchema(messageBody, QuestionEvaluation.class);
   }
 
-  public static InstructionAndSchema questionRefineAiTool(MCQWithAnswer question) {
-    MultipleChoicesQuestion mcq = question.getQuestion();
-
+  public static InstructionAndSchema questionRefineAiTool(Mcq question) {
     String messageBody =
 """
 Please assume the role of a Memory Assistant, which involves helping me recall and reinforce information from my notes. As a Memory Assistant, focus on creating exercises that stimulate memory and comprehension. Please adhere to the following guidelines:
@@ -124,9 +125,13 @@ Please assume the role of a Memory Assistant, which involves helping me recall a
 %s
 
 """
-            .formatted(new ObjectMapperConfig().objectMapper().valueToTree(mcq).toString());
+            .formatted(
+                new ObjectMapperConfig()
+                    .objectMapper()
+                    .valueToTree(question.withoutSolution())
+                    .toString());
 
-    return new InstructionAndSchema(messageBody, MCQWithAnswerForRefinement.class);
+    return new InstructionAndSchema(messageBody, GeneratedMcq.class);
   }
 
   public static InstructionAndSchema transcriptionToTextAiTool(String transcriptionFromAudio) {
@@ -219,14 +224,14 @@ Please assume the role of a Memory Assistant, which involves helping me recall a
   }
 
   public static String buildRegenerateQuestionMessage(
-      QuestionContestResult contestResult, MCQWithAnswer mcqWithAnswer) {
-    String mcq = null;
+      QuestionContestResult contestResult, Mcq mcq) {
+    String mcqJson;
     try {
-      mcq =
+      mcqJson =
           new ObjectMapperConfig()
               .objectMapper()
               .writerWithDefaultPrettyPrinter()
-              .writeValueAsString(mcqWithAnswer);
+              .writeValueAsString(mcq);
     } catch (JsonProcessingException e) {
       throw new RuntimeException(e);
     }
@@ -240,6 +245,6 @@ Please assume the role of a Memory Assistant, which involves helping me recall a
                 %s
 
                 Please regenerate or refine the question based on the above advice."""
-        .formatted(mcq, contestResult.advice);
+        .formatted(mcqJson, contestResult.advice);
   }
 }

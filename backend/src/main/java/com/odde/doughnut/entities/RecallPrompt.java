@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.odde.doughnut.configs.ObjectMapperConfig;
 import com.odde.doughnut.controllers.dto.SpellingQuestion;
-import com.odde.doughnut.services.ai.MCQWithAnswer;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import java.sql.Timestamp;
@@ -65,9 +64,8 @@ public class RecallPrompt extends EntityIdentifiedByIdOnly {
     }
     ObjectMapper mapper = new ObjectMapperConfig().objectMapper();
     ObjectNode questionDetails = mapper.createObjectNode();
-    MCQWithAnswer mcqWithAnswer = getMcq().getMcqWithAnswer();
     questionDetails.set(
-        "originalQuestionDefinition", mapper.convertValue(mcqWithAnswer, ObjectNode.class));
+        "originalQuestionDefinition", mapper.convertValue(getMcq(), ObjectNode.class));
     if (getAnswer() != null) {
       Answer answer = getAnswer();
       questionDetails.put("userAnswer", answer.getChoiceIndex());

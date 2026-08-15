@@ -62,7 +62,7 @@ import { computed, ref } from "vue"
 import type { Note, Mcq } from "@generated/doughnut-backend-api"
 import { McqController } from "@generated/doughnut-backend-api/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
-import isMCQWithAnswerValid from "@/models/isMCQWithAnswerValid"
+import isMcqValid from "@/models/isMcqValid"
 import TextArea from "../form/TextArea.vue"
 import TextInput from "../form/TextInput.vue"
 
@@ -84,7 +84,7 @@ const maximumNumberOfChoices = 10
 
 const emit = defineEmits(["close-dialog"])
 
-const isValidQuestion = computed(() => isMCQWithAnswerValid(mcq.value))
+const isValidQuestion = computed(() => isMcqValid(mcq.value))
 
 const dirty = computed(() => {
   for (let i = 0; i < mcq.value.responseChoices.length; i += 1) {

@@ -1,6 +1,6 @@
 import type { Mcq } from "@generated/doughnut-backend-api"
 
-function isMCQWithAnswerValid(mcq: Mcq): boolean {
+function isMcqValid(mcq: Mcq): boolean {
   const {
     questionStem: stem,
     responseChoices: choices,
@@ -17,4 +17,4 @@ function isMCQWithAnswerValid(mcq: Mcq): boolean {
   return isStemNotEmpty && allChoicesFilled && isValidChoiceIndex
 }
 
-export default isMCQWithAnswerValid
+export default isMcqValid

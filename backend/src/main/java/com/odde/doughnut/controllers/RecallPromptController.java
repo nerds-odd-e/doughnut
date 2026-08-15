@@ -48,10 +48,7 @@ class RecallPromptController {
     assertCanMutateRecallPrompt(recallPrompt);
     RecallPrompt regenerated =
         recallQuestionService.regenerateAQuestion(
-            contestResult,
-            recallPrompt.getMcq().getNote(),
-            recallPrompt.getMcq().getMcqWithAnswer(),
-            recallPrompt);
+            contestResult, recallPrompt.getMcq().getNote(), recallPrompt.getMcq(), recallPrompt);
     return com.odde.doughnut.controllers.dto.RecallPrompt.from(regenerated);
   }
 

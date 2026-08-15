@@ -12,7 +12,7 @@ import com.odde.doughnut.entities.QuestionGenerationBatchRequest;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.QuestionGenerationBatchRepository;
 import com.odde.doughnut.entities.repositories.QuestionGenerationBatchRequestRepository;
-import com.odde.doughnut.services.ai.MCQWithAnswer;
+import com.odde.doughnut.services.ai.GeneratedMcq;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.odde.doughnut.testability.MakeMe;
 import com.openai.models.batches.Batch;
@@ -107,15 +107,15 @@ class QuestionGenerationBatchMetricsTest {
     when(openAiApiHandler.downloadFileContent("file-error")).thenReturn("");
     outputCollectionService.collectOutputForCompletedBatches(currentTime);
 
-    MCQWithAnswer mcqWithAnswer =
+    GeneratedMcq generatedMcq =
         makeMe
-            .aMCQWithAnswer()
+            .aGeneratedMcq()
             .stem("What color is the sky on a clear day?")
             .choices("Blue", "Green", "Red")
-            .correctChoiceIndex(0)
+            .correctAnswerIndex(0)
             .please();
     when(openAiApiHandler.parseStructuredOutputFromBatchSuccessLine(anyString(), any(Class.class)))
-        .thenReturn(Optional.of(mcqWithAnswer));
+        .thenReturn(Optional.of(generatedMcq));
     batchImportService.importCompletedBatches(currentTime);
 
     assertThat(counter("question_generation_batch.submitted") - submittedBaseline, is(1.0));

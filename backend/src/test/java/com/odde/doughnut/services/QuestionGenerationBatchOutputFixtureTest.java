@@ -4,7 +4,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsStringIgnoringCase;
 import static org.hamcrest.Matchers.is;
 
-import com.odde.doughnut.services.ai.MCQWithAnswer;
+import com.odde.doughnut.services.ai.GeneratedMcq;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -27,13 +27,13 @@ class QuestionGenerationBatchOutputFixtureTest {
         new ClassPathResource("openai-batch-fixtures/live_batch_success_line.json")
             .getContentAsString(StandardCharsets.UTF_8);
 
-    MCQWithAnswer mcq =
+    GeneratedMcq mcq =
         openAiApiHandler
-            .parseStructuredOutputFromBatchSuccessLine(line, MCQWithAnswer.class)
+            .parseStructuredOutputFromBatchSuccessLine(line, GeneratedMcq.class)
             .orElseThrow();
 
     assertThat(mcq.isValid(), is(true));
-    assertThat(mcq.getQuestion().getQuestionStem(), containsStringIgnoringCase("sunlight"));
-    assertThat(mcq.getSolutionChoiceIndex(), is(0));
+    assertThat(mcq.getQuestionStem(), containsStringIgnoringCase("sunlight"));
+    assertThat(mcq.getCorrectAnswerIndex(), is(0));
   }
 }

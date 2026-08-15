@@ -3,7 +3,7 @@ package com.odde.doughnut.services;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.configs.ObjectMapperConfig;
-import com.odde.doughnut.services.ai.MCQWithAnswer;
+import com.odde.doughnut.services.ai.GeneratedMcq;
 
 final class QuestionGenerationBatchImportPayloadSupport {
 
@@ -11,9 +11,9 @@ final class QuestionGenerationBatchImportPayloadSupport {
 
   private QuestionGenerationBatchImportPayloadSupport() {}
 
-  static String batchSuccessLine(String customId, MCQWithAnswer mcqWithAnswer)
+  static String batchSuccessLine(String customId, GeneratedMcq generatedMcq)
       throws JsonProcessingException {
-    String structuredOutput = OBJECT_MAPPER.writeValueAsString(mcqWithAnswer);
+    String structuredOutput = OBJECT_MAPPER.writeValueAsString(generatedMcq);
     String responseBody =
         """
         {

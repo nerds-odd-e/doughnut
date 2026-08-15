@@ -16,17 +16,16 @@ class GeneratedQuestionPostProcessorTest {
   void preservesChoiceOrderWhenChoicesMayNotBeShuffled() {
     GeneratedQuestionPostProcessor postProcessor =
         new GeneratedQuestionPostProcessor(new TestabilitySettings());
-    MCQWithAnswer originalQuestion =
-        new MCQWithAnswer(
-            new MultipleChoicesQuestion(
-                "Which ordered choice is correct?",
-                List.of("first choice", "second choice", "third choice")),
+    GeneratedMcq originalQuestion =
+        new GeneratedMcq(
+            "Which ordered choice is correct?",
+            List.of("first choice", "second choice", "third choice"),
             1,
             false,
             "focus",
             "rationale");
 
-    MCQWithAnswer result = postProcessor.postProcess(originalQuestion);
+    GeneratedMcq result = postProcessor.postProcess(originalQuestion);
 
     assertThat(result, equalTo(originalQuestion));
   }
@@ -41,22 +40,21 @@ class GeneratedQuestionPostProcessorTest {
                 return new ReorderingRandomizer(0, 2, 1, 3);
               }
             });
-    MCQWithAnswer originalQuestion =
-        new MCQWithAnswer(
-            new MultipleChoicesQuestion(
-                "Which duplicate answer is the intended solution?",
-                List.of("same answer", "different answer", "same answer", "last answer")),
+    GeneratedMcq originalQuestion =
+        new GeneratedMcq(
+            "Which duplicate answer is the intended solution?",
+            List.of("same answer", "different answer", "same answer", "last answer"),
             2,
             true,
             "focus",
             "rationale");
 
-    MCQWithAnswer result = postProcessor.postProcess(originalQuestion);
+    GeneratedMcq result = postProcessor.postProcess(originalQuestion);
 
     assertThat(
-        result.getQuestion().getResponseChoices(),
+        result.getResponseChoices(),
         equalTo(List.of("same answer", "same answer", "different answer", "last answer")));
-    assertThat(result.getSolutionChoiceIndex(), equalTo(1));
+    assertThat(result.getCorrectAnswerIndex(), equalTo(1));
   }
 
   private static class ReorderingRandomizer implements Randomizer {

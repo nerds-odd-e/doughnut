@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.odde.doughnut.controllers.dto.AnswerDTO;
 import com.odde.doughnut.entities.converters.MCQToJsonConverter;
-import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.services.ai.MultipleChoicesQuestion;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
@@ -97,33 +96,8 @@ public class Mcq extends EntityIdentifiedByIdOnly {
   }
 
   @JsonIgnore
-  public MCQWithAnswer getMcqWithAnswer() {
-    MCQWithAnswer mcqWithAnswer = new MCQWithAnswer();
-    mcqWithAnswer.setQuestion(getMultipleChoicesQuestion());
-    mcqWithAnswer.setSolutionChoiceIndex(correctAnswerIndex == null ? -1 : correctAnswerIndex);
-    mcqWithAnswer.setTestedFocus(testedFocus);
-    mcqWithAnswer.setValidationRationale(validationRationale);
-    return mcqWithAnswer;
-  }
-
-  @JsonIgnore
   public boolean checkAnswer(AnswerDTO answer) {
     return Objects.equals(answer.getChoiceIndex(), getCorrectAnswerIndex());
-  }
-
-  public static Mcq fromMCQWithAnswer(MCQWithAnswer MCQWithAnswer, Note note) {
-    return fromMCQWithAnswer(MCQWithAnswer, note, null);
-  }
-
-  public static Mcq fromMCQWithAnswer(MCQWithAnswer MCQWithAnswer, Note note, Long contextSeed) {
-    Mcq mcq = new Mcq();
-    mcq.setNote(note);
-    mcq.setMultipleChoicesQuestion(MCQWithAnswer.getQuestion());
-    mcq.setCorrectAnswerIndex(MCQWithAnswer.getSolutionChoiceIndex());
-    mcq.setContextSeed(contextSeed);
-    mcq.setTestedFocus(MCQWithAnswer.getTestedFocus());
-    mcq.setValidationRationale(MCQWithAnswer.getValidationRationale());
-    return mcq;
   }
 
   @Override

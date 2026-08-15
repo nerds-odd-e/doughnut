@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.odde.doughnut.controllers.dto.QuestionContestResult;
+import com.odde.doughnut.entities.Mcq;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
@@ -30,8 +31,8 @@ public class QuestionEvaluation {
         && correctChoices[0] == correctChoiceIndex;
   }
 
-  public QuestionContestResult getQuestionContestResult(MCQWithAnswer mcqWithAnswer) {
-    int correctChoiceIndex = mcqWithAnswer.getSolutionChoiceIndex();
+  public QuestionContestResult getQuestionContestResult(Mcq mcq) {
+    int correctChoiceIndex = mcq.getCorrectAnswerIndex() == null ? -1 : mcq.getCorrectAnswerIndex();
     if (feasibleQuestion && indisputableAnswer(correctChoiceIndex)) {
       QuestionContestResult result = new QuestionContestResult();
       result.advice = "This seems to be a legitimate question. Please answer it.";
@@ -41,7 +42,7 @@ public class QuestionEvaluation {
     QuestionContestResult result = new QuestionContestResult();
     result.advice = "";
     if (!indisputableAnswer(correctChoiceIndex)) {
-      var choices = mcqWithAnswer.getQuestion().getResponseChoices();
+      var choices = mcq.getResponseChoices();
       if (choices == null) {
         result.advice = "The question has no choices defined.";
         return result;

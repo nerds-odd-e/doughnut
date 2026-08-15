@@ -35,7 +35,7 @@ public class MakeMeWithoutDB {
     return new WikidataClaimJsonBuilder(wikidataId);
   }
 
-  public MCQWithAnswerBuilder aMCQWithAnswer() {
-    return new MCQWithAnswerBuilder();
+  public GeneratedMcqBuilder aGeneratedMcq() {
+    return new GeneratedMcqBuilder();
   }
 }

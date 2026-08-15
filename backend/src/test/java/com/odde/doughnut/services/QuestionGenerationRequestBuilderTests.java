@@ -7,7 +7,7 @@ import static org.hamcrest.Matchers.not;
 import com.odde.doughnut.controllers.currentUser.CurrentUser;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
-import com.odde.doughnut.services.ai.MCQWithAnswer;
+import com.odde.doughnut.services.ai.GeneratedMcq;
 import com.odde.doughnut.services.focusContext.FocusContextConstants;
 import com.odde.doughnut.services.focusContext.FocusContextMarkdownAugmenter;
 import com.odde.doughnut.testability.MakeMe;
@@ -43,11 +43,11 @@ class QuestionGenerationRequestBuilderTests {
     currentUser.setUser(user);
   }
 
-  private String instructionText(StructuredResponseCreateParams<MCQWithAnswer> request) {
+  private String instructionText(StructuredResponseCreateParams<GeneratedMcq> request) {
     return request.rawParams().instructions().orElse("");
   }
 
-  private String inputText(StructuredResponseCreateParams<MCQWithAnswer> request) {
+  private String inputText(StructuredResponseCreateParams<GeneratedMcq> request) {
     return request.rawParams().input().flatMap(input -> input.text()).orElse("");
   }
 
@@ -67,7 +67,7 @@ class QuestionGenerationRequestBuilderTests {
   void shouldIncludePropertyFocusInFocusContextKeyValueAndLinkTargets() {
     Note focus = propertyFocusNote();
 
-    StructuredResponseCreateParams<MCQWithAnswer> request =
+    StructuredResponseCreateParams<GeneratedMcq> request =
         noteQuestionGenerationService.buildQuestionGenerationRequest(focus, null, "a part of");
 
     assertThat(
@@ -98,7 +98,7 @@ class QuestionGenerationRequestBuilderTests {
     Note focus = makeMe.aNote().notebook(target.getNotebook()).content(markdown).please();
     wikiTitleCacheService.refreshForNote(focus, viewer);
 
-    StructuredResponseCreateParams<MCQWithAnswer> request =
+    StructuredResponseCreateParams<GeneratedMcq> request =
         questionGenerationRequestBuilder.buildQuestionGenerationResponseRequest(
             focus, null, null, "a part of", viewer);
 
