@@ -126,7 +126,7 @@ public interface MemoryTrackerRepository extends CrudRepository<MemoryTracker, I
               + "    SELECT 1 FROM recall_prompt rp "
               + "    LEFT JOIN mcq ON rp.mcq_id = mcq.id "
               + "    WHERE rp.memory_tracker_id = mt.id "
-              + "      AND rp.quiz_answer_id IS NULL "
+              + "      AND rp.answer_id IS NULL "
               + "      AND (mcq.id IS NULL OR mcq.is_contested = false)"
               + "  ) "
               + "  AND NOT EXISTS ("

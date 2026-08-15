@@ -11,7 +11,7 @@ import lombok.Setter;
 
 @Getter
 @Entity
-@Table(name = "quiz_answer")
+@Table(name = "answer")
 public class Answer extends EntityIdentifiedByIdOnly {
   @Column(name = "choice_index")
   Integer choiceIndex;

@@ -1,6 +1,6 @@
 # Recall prompt / MCQ alignment — context
 
-**Status:** executing (slices 1–10 done)  
+**Status:** executing (slices 1–11 done; stopped before 12 — stem+choices placement)  
 **Glossary:** Proposed [ADR 0001](../../../docs/adrs/0001-ubiquitous-language.md), [ADR 0003](../../../docs/adrs/0003-spaced-repetition-scheduling-policy.md)
 
 ## Requirement
@@ -39,7 +39,7 @@ URL (contest is triggered while viewing a prompt; the flag lives on the MCQ).
 |----------|-------------|------------|----------------------|
 | Recall prompt | `recall_prompt` | Entity `RecallPrompt`; DTO **`RecallPrompt`**; `GET .../recall-prompt` `getRecallPrompt`; `RecallQuestionService`; `Quiz.vue` (file name out of scope) | E2E due recall prompt |
 | MCQ | `mcq` | Type **`Mcq`**; `/api/mcqs`; answered JSON **`mcq`** | nested path leftovers `*-question*` |
-| Answer | `quiz_answer` | Entity `Answer`; SDK **`answer`** | |
+| Answer | `answer` | Entity `Answer`; SDK **`answer`** | |
 | MCQ stem+choices | JSON in `raw_json_question` | `MultipleChoicesQuestion` | |
 | AI generate/refine | (same rows) | `MCQWithAnswer` | |
 

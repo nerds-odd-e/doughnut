@@ -122,14 +122,12 @@ Shipped: Flyway `V300000257__rename_predefined_question_to_mcq.sql` — table
 
 ### 11. Table is answer
 
-- **Status:** planned
+- **Status:** done
 - **Type:** Behavior
-- **Pre:** Slice 10 done (or at least app on current schema).
-- **Trigger:** Flyway migrate.
-- **Post:** Table `answer`, FK `recall_prompt.answer_id`; ERD matches;
-  answering still works. Entity was already `Answer`.
 
-**Tests:** backend answer / recall-prompt tests; ERD export.
+Shipped: Flyway `V300000258__rename_quiz_answer_to_answer.sql` — table
+`answer`, FK `recall_prompt.answer_id` (`fk_recall_prompt_answer`). ERD
+regenerated.
 
 ### 12. Unanswered prompt has no MultipleChoicesQuestion type
 
@@ -167,6 +165,9 @@ Shipped: Flyway `V300000257__rename_predefined_question_to_mcq.sql` — table
 - Confirm no external API consumers that need dual JSON field names.
 - Slices 10–11 need a deploy that applies the new Flyway version.
 - Do not add compatibility DTOs that reintroduce translation.
+- **Stopped before slice 12:** choose whether stem+choices live on the
+  unanswered `RecallPrompt` or on `Mcq` (no `MultipleChoicesQuestion` type).
+  This also shapes slice 13 (`MCQWithAnswer` → fields on `Mcq`).
 
 ## Learnings
 
@@ -179,3 +180,4 @@ Shipped: Flyway `V300000257__rename_predefined_question_to_mcq.sql` — table
 - Slice 8: feature filename `mcq_management.feature` and inject helper `injectMcqsToNotebook` renamed with the type. Testability HTTP still `inject-predefined-questions` (product `/api/mcqs` is slice 9). Unused `McqNotPossibleException` deleted. Note MCQ E2E not re-run this slice (SUT LB 503 / stale backend on 9081).
 - Slice 9: nested leftover segments (`note-questions`, `refine-question`, `generate-question-without-save`, `export-question-generation`) stayed. Testability moved to `inject-mcqs`. Note MCQ E2E green.
 - Slice 10: native SQL lived in `RecallPromptRepository`, `MemoryTrackerRepository`, and `QuestionGenerationBatchRowImportAtomicTestSupport` only. `quiz_answer` still slice 11.
+- Slice 11: native SQL only in `RecallPromptRepository` and `MemoryTrackerRepository`. Confusion-adjusted FK renamed with the table; `ON DELETE SET NULL` kept.

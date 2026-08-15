@@ -14,7 +14,7 @@ public interface RecallPromptRepository extends CrudRepository<RecallPrompt, Int
       " FROM recall_prompt rp "
           + "LEFT JOIN mcq ON rp.mcq_id = mcq.id "
           + "WHERE rp.memory_tracker_id = :memoryTrackerId "
-          + "AND rp.quiz_answer_id IS NULL "
+          + "AND rp.answer_id IS NULL "
           + "AND (mcq.id IS NULL OR mcq.is_contested = false)";
 
   @Query(
@@ -32,12 +32,12 @@ public interface RecallPromptRepository extends CrudRepository<RecallPrompt, Int
   @Query(
       value =
           "SELECT rp.* FROM recall_prompt rp "
-              + "JOIN quiz_answer qa ON rp.quiz_answer_id = qa.id "
+              + "JOIN answer a ON rp.answer_id = a.id "
               + "JOIN memory_tracker mt ON rp.memory_tracker_id = mt.id "
               + "WHERE mt.user_id = :userId "
-              + "AND qa.created_at >= :startTime "
-              + "AND qa.created_at < :endTime "
-              + "ORDER BY qa.created_at ASC",
+              + "AND a.created_at >= :startTime "
+              + "AND a.created_at < :endTime "
+              + "ORDER BY a.created_at ASC",
       nativeQuery = true)
   List<RecallPrompt> findAnsweredRecallPromptsInTimeRange(
       @Param("userId") Integer userId,
@@ -49,10 +49,10 @@ public interface RecallPromptRepository extends CrudRepository<RecallPrompt, Int
   // needs.
   @Query(
       "SELECT new com.odde.doughnut.services.RecallAnswerRow("
-          + "qa.createdAt, qa.correct, qa.thinkingTimeMs, rp.createdAt) "
-          + "FROM RecallPrompt rp JOIN rp.answer qa JOIN rp.memoryTracker mt "
-          + "WHERE mt.user.id = :userId AND qa.createdAt >= :startTime AND qa.createdAt < :endTime "
-          + "ORDER BY qa.createdAt ASC")
+          + "a.createdAt, a.correct, a.thinkingTimeMs, rp.createdAt) "
+          + "FROM RecallPrompt rp JOIN rp.answer a JOIN rp.memoryTracker mt "
+          + "WHERE mt.user.id = :userId AND a.createdAt >= :startTime AND a.createdAt < :endTime "
+          + "ORDER BY a.createdAt ASC")
   List<com.odde.doughnut.services.RecallAnswerRow> findAnsweredRecallAnswerRows(
       @Param("userId") Integer userId,
       @Param("startTime") Timestamp startTime,
@@ -61,10 +61,10 @@ public interface RecallPromptRepository extends CrudRepository<RecallPrompt, Int
   @Query(
       value =
           "SELECT DISTINCT mt.user_id FROM recall_prompt rp "
-              + "JOIN quiz_answer qa ON rp.quiz_answer_id = qa.id "
+              + "JOIN answer a ON rp.answer_id = a.id "
               + "JOIN memory_tracker mt ON rp.memory_tracker_id = mt.id "
-              + "WHERE qa.created_at >= :startTime "
-              + "AND qa.created_at < :endTime",
+              + "WHERE a.created_at >= :startTime "
+              + "AND a.created_at < :endTime",
       nativeQuery = true)
   List<Integer> findUserIdsWithAnsweredRecallsInTimeRange(
       @Param("startTime") Timestamp startTime, @Param("endTime") Timestamp endTime);
@@ -72,11 +72,11 @@ public interface RecallPromptRepository extends CrudRepository<RecallPrompt, Int
   @Query(
       value =
           "SELECT COUNT(*) FROM recall_prompt rp "
-              + "JOIN quiz_answer qa ON rp.quiz_answer_id = qa.id "
+              + "JOIN answer a ON rp.answer_id = a.id "
               + "WHERE rp.memory_tracker_id = :memoryTrackerId "
-              + "AND qa.correct = false "
-              + "AND (qa.outcome IS NULL OR qa.outcome <> 'OVERLAP') "
-              + "AND qa.created_at >= :since",
+              + "AND a.correct = false "
+              + "AND (a.outcome IS NULL OR a.outcome <> 'OVERLAP') "
+              + "AND a.created_at >= :since",
       nativeQuery = true)
   int countWrongAnswersSinceForMemoryTracker(
       @Param("memoryTrackerId") Integer memoryTrackerId, @Param("since") Timestamp since);

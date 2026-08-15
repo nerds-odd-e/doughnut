@@ -35,7 +35,7 @@ public class RecallPrompt extends EntityIdentifiedByIdOnly {
   private Mcq mcq;
 
   @OneToOne(cascade = CascadeType.ALL)
-  @JoinColumn(name = "quiz_answer_id", referencedColumnName = "id")
+  @JoinColumn(name = "answer_id", referencedColumnName = "id")
   @Getter
   @Setter
   private Answer answer;

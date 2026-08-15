@@ -4,6 +4,7 @@ Entity-relationship view of the application database: foreign keys as relationsh
 
 ```mermaid
 erDiagram
+    answer ||--o{ recall_prompt : "answer_id ON DELETE NO ACTION"
     attachment_blob ||--o{ image : "attachment_blob_id ON DELETE CASCADE"
     book ||--o{ book_block : "book_id ON DELETE CASCADE"
     book ||--o{ book_user_last_read_position : "book_id ON DELETE CASCADE"
@@ -18,8 +19,8 @@ erDiagram
     image ||--o{ "note" : "image_id ON DELETE CASCADE"
     learning_session ||--o{ session_item : "learning_session_id ON DELETE CASCADE"
     mcq ||--o{ recall_prompt : "mcq_id ON DELETE NO ACTION"
+    memory_tracker ||--o{ answer : "confusion_adjusted_memory_tracker_id ON DELETE SET NULL"
     memory_tracker ||--o{ question_generation_batch_request : "memory_tracker_id ON DELETE CASCADE"
-    memory_tracker ||--o{ quiz_answer : "confusion_adjusted_memory_tracker_id ON DELETE SET NULL"
     memory_tracker ||--o{ recall_prompt : "memory_tracker_id ON DELETE CASCADE"
     memory_tracker ||--o{ session_item : "memory_tracker_id ON DELETE CASCADE"
     "note" ||--o{ admin_data_migration_progress : "last_processed_note_id ON DELETE SET NULL"
@@ -46,7 +47,6 @@ erDiagram
     ownership ||--o{ notebook : "ownership_id ON DELETE CASCADE"
     ownership ||--o{ notebook_group : "ownership_id ON DELETE CASCADE"
     question_generation_batch ||--o{ question_generation_batch_request : "batch_id ON DELETE CASCADE"
-    quiz_answer ||--o{ recall_prompt : "quiz_answer_id ON DELETE NO ACTION"
     recall_prompt ||--o{ conversation : "recall_prompt_id ON DELETE SET NULL"
     "user" ||--o{ assimilation_sequence_skip : "user_id ON DELETE CASCADE"
     "user" ||--o{ book_block_reading_record : "user_id ON DELETE CASCADE"
@@ -67,6 +67,10 @@ erDiagram
         int id PK
         string step_name UK
         int last_processed_note_id FK
+    }
+    answer {
+        int id PK
+        int confusion_adjusted_memory_tracker_id FK
     }
     assimilation_sequence_skip {
         int id PK
@@ -210,15 +214,11 @@ erDiagram
         int memory_tracker_id FK
         string custom_id UK
     }
-    quiz_answer {
-        int id PK
-        int confusion_adjusted_memory_tracker_id FK
-    }
     recall_prompt {
         int id PK
         int memory_tracker_id FK
         int mcq_id FK
-        int quiz_answer_id FK
+        int answer_id FK
     }
     session_item {
         int id PK
