@@ -13,7 +13,6 @@ class UserBuilder extends Builder<User> {
       externalIdentifier: `user ${generateId()}`,
       ownership: { id: 0 },
       dailyAssimilationCount: 5,
-      spaceIntervals: '',
       healthRemoveEmptyFoldersDefault: false,
       admin: false,
     }
@@ -31,11 +30,6 @@ class UserBuilder extends Builder<User> {
 
   dailyAssimilationCount(value: number) {
     this.data.dailyAssimilationCount = value
-    return this
-  }
-
-  spaceIntervals(value: string) {
-    this.data.spaceIntervals = value
     return this
   }
 

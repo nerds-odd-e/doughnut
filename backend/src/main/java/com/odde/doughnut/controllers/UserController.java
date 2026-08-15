@@ -94,7 +94,6 @@ class UserController {
       throws UnexpectedNoAccessRightException {
     authorizationService.assertAuthorization(user);
     user.setName(updates.getName());
-    user.setSpaceIntervals(updates.getSpaceIntervals());
     user.setDailyAssimilationCount(updates.getDailyAssimilationCount());
     user.setHealthRemoveEmptyFoldersDefault(
         Objects.requireNonNullElse(updates.getHealthRemoveEmptyFoldersDefault(), false));

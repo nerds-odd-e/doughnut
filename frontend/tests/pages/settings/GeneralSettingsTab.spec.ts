@@ -57,6 +57,21 @@ describe("GeneralSettingsTab", () => {
     )
   })
 
+  it("does not show a spaced-repetition day list", async () => {
+    const user = makeMe.aUser.please()
+    mockSdkService(UserController, "getUserProfile", user)
+    mockSdkService(UserController, "getQuestionGenerationBatchSchedule", {})
+
+    wrapper = helper
+      .component(GeneralSettingsTab)
+      .withRouter()
+      .withCurrentUserRef(currentUser)
+      .mount()
+    await flushPromises()
+
+    expect(wrapper.find("#user-spaceIntervals").exists()).toBe(false)
+  })
+
   it("updates the injected currentUser ref after saving profile changes", async () => {
     const user = makeMe.aUser.please()
     const updatedUser = { ...user, name: "New name" }

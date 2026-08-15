@@ -151,7 +151,6 @@ async function saveAsDefaults() {
       body: {
         name: user.name,
         dailyAssimilationCount: user.dailyAssimilationCount,
-        spaceIntervals: user.spaceIntervals,
         healthRemoveEmptyFoldersDefault: removeEmptyFolders.value,
       },
     })

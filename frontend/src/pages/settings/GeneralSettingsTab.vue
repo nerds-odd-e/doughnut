@@ -14,12 +14,6 @@
         v-model="formData.dailyAssimilationCount"
         :error-message="errors.dailyAssimilationCount"
       />
-      <TextInput
-        scope-name="user"
-        field="spaceIntervals"
-        v-model="formData.spaceIntervals"
-        :error-message="errors.spaceIntervals"
-      />
       <section class="my-4">
         <h3 class="mb-2 text-base font-semibold">Batch questions</h3>
         <div class="text-sm" data-testid="batch-question-schedule">

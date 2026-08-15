@@ -20,7 +20,7 @@
 | 1 | Structure | done | ADR 0003 states Stability hours |
 | 2 | Structure | done | Glossary names Stability |
 | 3 | Behavior | done | Memory tracker field is `stability` |
-| 4 | Behavior | planned | No spaced-repetition day list in Settings or User API |
+| 4 | Behavior | done | No spaced-repetition day list in Settings or User API |
 | 5 | Behavior | planned | Stability is whole hours; day-list column dropped |
 | 6 | Behavior | planned | Overdue correct lengthens Stability more than on-time |
 
@@ -64,19 +64,11 @@ Field/column/JSON/UI is **`stability` / Stability**. Numbers still the old index
 ### 4. No spaced-repetition day list in Settings or User API
 
 **Type:** Behavior  
-**Status:** planned
+**Status:** done
 
-**Pre-condition:** General Settings and User JSON still expose `spaceIntervals`.
+Settings and User API have no day-list field. `User.spaceIntervals` remains `@JsonIgnore` on the entity for slice 5 conversion. Testability `space_intervals` still present.
 
-**Trigger:** Open Settings / read current user.
-
-**Post-condition:** No day-list field in Settings or User API. Learners cannot customize a table.
-
-**Change:** remove Settings control, `UserDTO.spaceIntervals`, OpenAPI user field, related validation/UI tests. `User.spaceIntervals` stays on the entity for the scheduler (and slice 5 migration). `@JsonIgnore` is the temporary API hide — special case until slice 5 drops the column.
-
-**Stop-safe:** recall still uses each user’s stored table. Testability `space_intervals` may remain until slice 5.
-
-**Tests:** Settings / UserDTO tests; regen SDK if the user type changes.
+**Learning:** health “Save as defaults” only echoed the DTO field; omit it. Drop `@JsonIgnore` with the column in slice 5 — do not leave it in production.
 
 ---
 

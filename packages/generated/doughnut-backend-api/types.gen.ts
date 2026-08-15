@@ -82,7 +82,6 @@ export type User = {
     externalIdentifier: string;
     ownership?: Ownership;
     dailyAssimilationCount?: number;
-    spaceIntervals?: string;
     healthRemoveEmptyFoldersDefault?: boolean;
     admin?: boolean;
 };
@@ -787,7 +786,6 @@ export type QuestionGenerationBatchAdminStatusDto = {
 export type UserDto = {
     name: string;
     dailyAssimilationCount?: number;
-    spaceIntervals?: string;
     healthRemoveEmptyFoldersDefault?: boolean;
 };
 

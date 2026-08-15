@@ -202,11 +202,10 @@ describe("NotebookHealthPanel", () => {
     expect(lintSpy).not.toHaveBeenCalled()
   })
 
-  it("saves full UserDTO-shaped defaults without calling lint and updates currentUser", async () => {
+  it("saves health defaults without a day list and updates currentUser", async () => {
     const user = makeMe.aUser
       .name("Health Owner")
       .dailyAssimilationCount(12)
-      .spaceIntervals("0, 1, 2")
       .healthRemoveEmptyFoldersDefault(false)
       .please()
     const updatedUser = {
@@ -232,7 +231,6 @@ describe("NotebookHealthPanel", () => {
         body: {
           name: "Health Owner",
           dailyAssimilationCount: 12,
-          spaceIntervals: "0, 1, 2",
           healthRemoveEmptyFoldersDefault: true,
         },
       })
