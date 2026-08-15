@@ -4,11 +4,11 @@ milestone: null
 milestone_name: null
 current_phase: null
 current_phase_name: null
-status: idle
+status: planning
 stopped_at: null
-last_updated: "2026-08-15T09:10:00Z"
+last_updated: "2026-08-15T09:03:00Z"
 last_activity: 2026-08-15
-last_activity_desc: Completed skip-memory-tracking leftover cohesion; cleaned spent plan
+last_activity_desc: Slice plan written for recall prompt / MCQ minimum-translation alignment; not executing yet
 progress:
   total_phases: 0
   completed_phases: 0
@@ -27,7 +27,7 @@ See: `.planning/PROJECT.md`
 
 ## Current Position
 
-No active ad-hoc plan. Skip Memory Tracking leftover cohesion is shipped (dropped unused skip-flag tests; renamed unassimilated sequence queries).
+Ad-hoc plan ready, not executing: [`.planning/quick/003-recall-prompt-mcq/PLAN.md`](quick/003-recall-prompt-mcq/PLAN.md) — align Quiz/question leftovers to ADR 0001 (**recall prompt** HAS_A **MCQ**; minimum DTO). Skip Memory Tracking leftover cohesion is shipped.
 
 **Ops leftover:** gated dummy-skip conversions. Enable on the deploy that first applies each version, then revert to `1=0`:
 - `dummy_note_sequence_skip_convert` (`V300000254`)
@@ -40,5 +40,6 @@ JDBC harnesses remain temporary until those production applications.
 
 ## Operator Next Steps
 
+- Execute [`.planning/quick/003-recall-prompt-mcq/PLAN.md`](quick/003-recall-prompt-mcq/PLAN.md) when ready (not started)
 - Enable dummy-skip conversion placeholders on the deploys that first apply V300000254 / V300000255
 - Continue ADR 0003: resolve open issues in `.planning/research/FSRS-COMPATIBILITY-GAP.md`

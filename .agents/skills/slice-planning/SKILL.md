@@ -179,9 +179,10 @@ Include:
 - Discoveries that affect remaining work
 
 **Naming rule:** Feature files, test files, classes, directories reflect **domain
-capability** (e.g. `video_playback.feature`, `SegmentExportController`), not GSD phase
-number. GSD phase numbers belong only under `.planning/`. Name headings by
-capability, not `Phase N`.
+capability** (e.g. `video_playback.feature`, `SegmentExportController`), not GSD
+phase or slice number. Those numbers belong only under `.planning/`. In
+`PLAN.md`, number slices for progress (`### 1. Capability heading`) and keep
+the capability name.
 
 If GSD `/gsd-plan-phase` / discuss produced a plan violating Behavior/Structure —
 **rewrite or split** until every plan unit is one slice.

@@ -70,7 +70,7 @@ Active work lives under `.planning/`:
 
 Prefer GSD phase dirs and filenames. Local flat `.planning/<name>.md` is legacy-compatible for execute-plan but **new** plans should use `.planning/phases/NN-slug/` or `.planning/quick/NNN-slug/`.
 
-**Product code, tests, and permanent docs** stay capability-named — never encode GSD phase numbers there. GSD phase numbers belong only under `.planning/`.
+**Product code, tests, and permanent docs** stay capability-named — never encode GSD phase or slice numbers there. Those numbers belong only under `.planning/`. In `PLAN.md`, number slices (`### 1. Capability heading`); do not heading them `Phase N` (phase ≠ slice).
 
 ### Plan history (resume vs cleanup)
 
@@ -82,7 +82,7 @@ Prefer GSD phase dirs and filenames. Local flat `.planning/<name>.md` is legacy-
 
 ## Testing And Completion
 
-- Name tests and permanent artifacts by capability, not GSD phase number.
+- Name tests and permanent artifacts by capability, not GSD phase or slice number.
 - Prefer unit tests through high-level entry points in the "small test" style (`unit-testing.mdc`); use direct unit tests only for pure helpers / edge paths that are themselves a domain-stable contract.
 - Run targeted E2E for touched behavior, not the full suite unless explicitly required.
 - Do not leave failing tests that CI would run (non-`@wip`) at a slice boundary; remove `@wip` once scenarios pass.
