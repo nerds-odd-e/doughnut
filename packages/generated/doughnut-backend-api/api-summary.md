@@ -74,7 +74,7 @@ Use this for endpoint lookup; open `sdk.gen.ts` or `types.gen.ts` only for exact
 
 - `regenerate`: POST `/api/recall-prompts/{recallPrompt}/regenerate` -> `RegenerateResponse` (request: `RegenerateData`; path: recallPrompt; body: QuestionContestResult; response body: RecallPrompt)
 - `contest`: POST `/api/recall-prompts/{recallPrompt}/contest` -> `ContestResponse` (request: `ContestData`; path: recallPrompt; response body: QuestionContestResult)
-- `answerQuiz`: POST `/api/recall-prompts/{recallPrompt}/answer` -> `AnswerQuizResponse` (request: `AnswerQuizData`; path: recallPrompt; body: AnswerDto; response body: AnsweredQuestion)
+- `answer`: POST `/api/recall-prompts/{recallPrompt}/answer` -> `AnswerResponse` (request: `AnswerData`; path: recallPrompt; body: AnswerDto; response body: AnsweredQuestion)
 - `answerSpelling`: POST `/api/recall-prompts/{recallPrompt}/answer-spelling` -> `AnswerSpellingResponse` (request: `AnswerSpellingData`; path: recallPrompt; body: AnswerSpellingDto; response body: AnsweredQuestion)
 
 ## Predefined Question Controller

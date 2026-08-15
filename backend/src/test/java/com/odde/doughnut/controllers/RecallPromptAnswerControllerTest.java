@@ -18,7 +18,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.web.server.ResponseStatusException;
 
-class RecallPromptAnswerQuizControllerTest extends RecallPromptControllerTestBase {
+class RecallPromptAnswerControllerTest extends RecallPromptControllerTestBase {
   MemoryTracker memoryTracker;
   RecallPrompt recallPrompt;
   AnswerDTO answerDTO;
@@ -34,7 +34,7 @@ class RecallPromptAnswerQuizControllerTest extends RecallPromptControllerTestBas
   @Test
   void shouldValidateTheAnswerAndUpdateMemoryTracker() throws UnexpectedNoAccessRightException {
     Integer oldRecallCount = memoryTracker.getRecallCount();
-    AnsweredQuestion answerResult = controller.answerQuiz(recallPrompt, answerDTO);
+    AnsweredQuestion answerResult = controller.answer(recallPrompt, answerDTO);
     assertThat(answerResult.getAnswer().getCorrect(), is(true));
     assertThat(memoryTracker.getRecallCount(), greaterThan(oldRecallCount));
   }
@@ -56,7 +56,7 @@ class RecallPromptAnswerQuizControllerTest extends RecallPromptControllerTestBas
     Float noteLevelIndexBefore = noteLevelTracker.getForgettingCurveIndex();
     Integer propertyRecallCountBefore = propertyTracker.getRecallCount();
 
-    controller.answerQuiz(mcqPrompt(propertyTracker, note), answerDTO);
+    controller.answer(mcqPrompt(propertyTracker, note), answerDTO);
 
     assertThat(noteLevelTracker.getRecallCount(), equalTo(noteLevelRecallCountBefore));
     assertThat(noteLevelTracker.getForgettingCurveIndex(), equalTo(noteLevelIndexBefore));
@@ -67,15 +67,14 @@ class RecallPromptAnswerQuizControllerTest extends RecallPromptControllerTestBas
   void shouldSaveThinkingTimeMs() throws UnexpectedNoAccessRightException {
     answerDTO.setThinkingTimeMs(5000);
     assertThat(
-        controller.answerQuiz(recallPrompt, answerDTO).getAnswer().getThinkingTimeMs(),
-        equalTo(5000));
+        controller.answer(recallPrompt, answerDTO).getAnswer().getThinkingTimeMs(), equalTo(5000));
   }
 
   @Test
   void shouldNoteIncreaseIndexIfRepeatImmediately() throws UnexpectedNoAccessRightException {
     testabilitySettings.timeTravelTo(memoryTracker.getLastRecalledAt());
     Float oldForgettingCurveIndex = memoryTracker.getForgettingCurveIndex();
-    controller.answerQuiz(recallPrompt, answerDTO);
+    controller.answer(recallPrompt, answerDTO);
     assertThat(memoryTracker.getForgettingCurveIndex(), equalTo(oldForgettingCurveIndex));
   }
 
@@ -83,7 +82,7 @@ class RecallPromptAnswerQuizControllerTest extends RecallPromptControllerTestBas
   void shouldIncreaseTheIndex() throws UnexpectedNoAccessRightException {
     testabilitySettings.timeTravelTo(memoryTracker.getNextRecallAt());
     Float oldForgettingCurveIndex = memoryTracker.getForgettingCurveIndex();
-    controller.answerQuiz(recallPrompt, answerDTO);
+    controller.answer(recallPrompt, answerDTO);
     assertThat(memoryTracker.getForgettingCurveIndex(), greaterThan(oldForgettingCurveIndex));
     assertThat(
         memoryTracker.getLastRecalledAt(), equalTo(testabilitySettings.getCurrentUTCTimestamp()));
@@ -96,14 +95,14 @@ class RecallPromptAnswerQuizControllerTest extends RecallPromptControllerTestBas
     Timestamp baseLastRecalledAt = memoryTracker.getLastRecalledAt();
 
     answerDTO.setThinkingTimeMs(10000);
-    controller.answerQuiz(recallPrompt, answerDTO);
+    controller.answer(recallPrompt, answerDTO);
     Float indexWithFastAnswer = memoryTracker.getForgettingCurveIndex();
 
     memoryTracker.setForgettingCurveIndex(baseIndex);
     memoryTracker.setLastRecalledAt(baseLastRecalledAt);
     memoryTracker.setNextRecallAt(memoryTracker.calculateNextRecallAt());
     answerDTO.setThinkingTimeMs(40000);
-    controller.answerQuiz(mcqPrompt(memoryTracker, memoryTracker.getNote()), answerDTO);
+    controller.answer(mcqPrompt(memoryTracker, memoryTracker.getNote()), answerDTO);
 
     assertThat(indexWithFastAnswer, greaterThan(memoryTracker.getForgettingCurveIndex()));
   }
@@ -116,14 +115,14 @@ class RecallPromptAnswerQuizControllerTest extends RecallPromptControllerTestBas
     Timestamp baseLastRecalledAt = memoryTracker.getLastRecalledAt();
 
     answerDTO.setThinkingTimeMs(ForgettingCurve.BASE_THINKING_TIME_MS);
-    controller.answerQuiz(recallPrompt, answerDTO);
+    controller.answer(recallPrompt, answerDTO);
     Float indexWithBaseThinkingTime = memoryTracker.getForgettingCurveIndex();
 
     memoryTracker.setForgettingCurveIndex(baseIndex);
     memoryTracker.setLastRecalledAt(baseLastRecalledAt);
     memoryTracker.setNextRecallAt(memoryTracker.calculateNextRecallAt());
     answerDTO.setThinkingTimeMs(null);
-    controller.answerQuiz(mcqPrompt(memoryTracker, memoryTracker.getNote()), answerDTO);
+    controller.answer(mcqPrompt(memoryTracker, memoryTracker.getNote()), answerDTO);
 
     assertThat(indexWithBaseThinkingTime, equalTo(memoryTracker.getForgettingCurveIndex()));
   }
@@ -132,11 +131,11 @@ class RecallPromptAnswerQuizControllerTest extends RecallPromptControllerTestBas
   void shouldNotBeAbleToSeeNoteIDontHaveAccessTo() {
     currentUser.setUser(null);
     assertThrows(
-        ResponseStatusException.class, () -> controller.answerQuiz(recallPrompt, choiceAnswer(0)));
+        ResponseStatusException.class, () -> controller.answer(recallPrompt, choiceAnswer(0)));
   }
 
   @Test
-  void shouldNotBeAbleToAnswerQuizForOthersMemoryTracker() {
+  void shouldNotBeAbleToAnswerForOthersMemoryTracker() {
     MemoryTracker othersTracker = memoryTrackerOwnedByAnotherUser();
     RecallPrompt othersPrompt =
         makeMe
@@ -145,8 +144,7 @@ class RecallPromptAnswerQuizControllerTest extends RecallPromptControllerTestBas
             .withPredefinedQuestionForNote(othersTracker.getNote())
             .please();
     assertThrows(
-        UnexpectedNoAccessRightException.class,
-        () -> controller.answerQuiz(othersPrompt, answerDTO));
+        UnexpectedNoAccessRightException.class, () -> controller.answer(othersPrompt, answerDTO));
   }
 
   @Nested
@@ -160,7 +158,7 @@ class RecallPromptAnswerQuizControllerTest extends RecallPromptControllerTestBas
     void shouldValidateTheWrongAnswer() throws UnexpectedNoAccessRightException {
       testabilitySettings.timeTravelTo(memoryTracker.getNextRecallAt());
       Integer oldRecallCount = memoryTracker.getRecallCount();
-      AnsweredQuestion answerResult = controller.answerQuiz(recallPrompt, answerDTO);
+      AnsweredQuestion answerResult = controller.answer(recallPrompt, answerDTO);
       assertThat(answerResult.getAnswer().getCorrect(), is(false));
       assertThat(memoryTracker.getRecallCount(), greaterThan(oldRecallCount));
     }
@@ -170,7 +168,7 @@ class RecallPromptAnswerQuizControllerTest extends RecallPromptControllerTestBas
         throws UnexpectedNoAccessRightException {
       testabilitySettings.timeTravelTo(memoryTracker.getNextRecallAt());
       Float oldForgettingCurveIndex = memoryTracker.getForgettingCurveIndex();
-      controller.answerQuiz(recallPrompt, answerDTO);
+      controller.answer(recallPrompt, answerDTO);
       assertThat(memoryTracker.getForgettingCurveIndex(), lessThan(oldForgettingCurveIndex));
       assertThat(
           memoryTracker.getLastRecalledAt(), equalTo(testabilitySettings.getCurrentUTCTimestamp()));
@@ -179,7 +177,7 @@ class RecallPromptAnswerQuizControllerTest extends RecallPromptControllerTestBas
     @Test
     void shouldRepeatInTwelveHours() throws UnexpectedNoAccessRightException {
       testabilitySettings.timeTravelTo(memoryTracker.getNextRecallAt());
-      controller.answerQuiz(recallPrompt, answerDTO);
+      controller.answer(recallPrompt, answerDTO);
       assertThat(
           memoryTracker.getNextRecallAt(),
           equalTo(

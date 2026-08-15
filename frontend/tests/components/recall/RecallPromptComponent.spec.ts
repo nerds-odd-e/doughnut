@@ -23,7 +23,7 @@ describe("RecallPromptComponent", () => {
     vi.useFakeTimers()
     mockSdkService(
       RecallPromptController,
-      "answerQuiz",
+      "answer",
       makeMe.anAnsweredQuestion.please()
     )
   })
@@ -69,13 +69,13 @@ describe("RecallPromptComponent", () => {
         expect(softKeyboardPrimerElement()).toBeTruthy()
 
         let resolveAnswer: (value: ReturnType<typeof wrapSdkResponse>) => void
-        const answerQuizSpy = mockSdkService(
+        const answerSpy = mockSdkService(
           RecallPromptController,
-          "answerQuiz",
+          "answer",
           makeMe.anAnsweredQuestion.please()
         )
         if (expectPrimerFocused) {
-          answerQuizSpy.mockImplementation(
+          answerSpy.mockImplementation(
             () =>
               new Promise((resolve) => {
                 resolveAnswer = resolve
@@ -104,12 +104,12 @@ describe("RecallPromptComponent", () => {
   describe("answer submission", () => {
     it("shows loading state while submitting answer", async () => {
       // Setup API to delay response
-      const answerQuizSpy = mockSdkService(
+      const answerSpy = mockSdkService(
         RecallPromptController,
-        "answerQuiz",
+        "answer",
         makeMe.anAnsweredQuestion.please()
       )
-      answerQuizSpy.mockImplementation(
+      answerSpy.mockImplementation(
         () =>
           new Promise(
             (resolve) =>
@@ -148,12 +148,12 @@ describe("RecallPromptComponent", () => {
 
     it("allows retrying on API error", async () => {
       // Setup API to fail first time
-      const answerQuizSpy = mockSdkService(
+      const answerSpy = mockSdkService(
         RecallPromptController,
-        "answerQuiz",
+        "answer",
         makeMe.anAnsweredQuestion.answerCorrect(true).please()
       )
-      answerQuizSpy
+      answerSpy
         .mockResolvedValueOnce(wrapSdkError("API Error"))
         .mockResolvedValueOnce(
           wrapSdkResponse(
@@ -189,7 +189,7 @@ describe("RecallPromptComponent", () => {
       const answerResult = makeMe.anAnsweredQuestion
         .answerCorrect(true)
         .please()
-      mockSdkService(RecallPromptController, "answerQuiz", answerResult)
+      mockSdkService(RecallPromptController, "answer", answerResult)
 
       const wrapper = mountComponent()
 

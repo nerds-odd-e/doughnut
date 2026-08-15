@@ -100,9 +100,9 @@ describe("ContestableQuestion.vue", () => {
       regeneratedQuestion
     )
 
-    const answerQuizSpy = mockSdkService(
+    const answerSpy = mockSdkService(
       RecallPromptController,
-      "answerQuiz",
+      "answer",
       makeMe.anAnsweredQuestion.answerCorrect(true).please()
     )
 
@@ -130,8 +130,8 @@ describe("ContestableQuestion.vue", () => {
     await questionDisplay.find("li.choice button").trigger("click")
     await flushPromises()
 
-    expect(answerQuizSpy).toHaveBeenCalled()
-    const thinkingTime = getAnswerThinkingTime(answerQuizSpy)
+    expect(answerSpy).toHaveBeenCalled()
+    const thinkingTime = getAnswerThinkingTime(answerSpy)
     expect(thinkingTime).toBeDefined()
     expect(thinkingTime).toBeGreaterThanOrEqual(3000)
     expect(thinkingTime).toBeLessThan(4000)

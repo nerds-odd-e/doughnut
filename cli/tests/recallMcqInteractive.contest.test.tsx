@@ -37,7 +37,7 @@ describeRecallMcqInteractive((api) => {
     await ink.waitForLastFrameToInclude(rejectAdvice)
     expect(ink.lastStrippedFrame()).toContain('Choose')
     expect(regenerateSpy).not.toHaveBeenCalled()
-    expect(api.answerQuizSpy).not.toHaveBeenCalled()
+    expect(api.answerSpy).not.toHaveBeenCalled()
   })
 
   test('contest API error settles with user-visible message and leaves recall', async () => {
@@ -53,6 +53,6 @@ describeRecallMcqInteractive((api) => {
     await waitMcqVisible(ink)
     ink.stdin.write('/contest\r')
     await ink.waitForLastFrameToInclude('Doughnut service is not available')
-    expect(api.answerQuizSpy).not.toHaveBeenCalled()
+    expect(api.answerSpy).not.toHaveBeenCalled()
   })
 })

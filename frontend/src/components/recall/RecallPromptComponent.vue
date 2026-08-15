@@ -5,7 +5,7 @@
       v-bind="{
         multipleChoicesQuestion: recallPrompt.multipleChoicesQuestion,
       }"
-      @answer="submitQuizAnswer($event)"
+      @answer="submitAnswer($event)"
       :key="recallPrompt.id"
       :disabled="isLoading || isAnswered"
     />
@@ -64,7 +64,7 @@ const handleError = async () => {
   )
 }
 
-const submitQuizAnswer = async (answerData: AnswerDto) => {
+const submitAnswer = async (answerData: AnswerDto) => {
   if (answerData.choiceIndex === undefined) return
   if (props.nextIsSpelling) primeSoftKeyboard()
 
@@ -73,7 +73,7 @@ const submitQuizAnswer = async (answerData: AnswerDto) => {
   error.value = ""
 
   const { data: answerResult, error: apiError } = await apiCallWithLoading(() =>
-    RecallPromptController.answerQuiz({
+    RecallPromptController.answer({
       path: { recallPrompt: props.recallPrompt.id },
       body: answerData,
     })

@@ -66,13 +66,13 @@ class RecallPromptController {
 
   @PostMapping("/{recallPrompt}/answer")
   @Transactional
-  public AnsweredQuestion answerQuiz(
+  public AnsweredQuestion answer(
       @PathVariable("recallPrompt") @Schema(type = "integer") RecallPrompt recallPrompt,
       @Valid @RequestBody AnswerDTO answerDTO)
       throws UnexpectedNoAccessRightException {
     assertCanMutateRecallPrompt(recallPrompt);
     RecallPrompt answered =
-        recallQuestionService.answerQuestion(
+        recallQuestionService.answer(
             recallPrompt, answerDTO, testabilitySettings.getCurrentUTCTimestamp());
     return AnsweredQuestion.from(answered);
   }

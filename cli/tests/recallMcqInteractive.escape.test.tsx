@@ -19,7 +19,7 @@ describeRecallMcqInteractive((api) => {
     RecallPromptController,
   } = api
 
-  test('after Esc, y settles with Recall session stopped and never calls answerQuiz', async () => {
+  test('after Esc, y settles with Recall session stopped and never calls answer', async () => {
     const ink = await renderInkWhenCommandLineReady(<InteractiveCliApp />)
 
     startRecall(ink.stdin)
@@ -28,10 +28,10 @@ describeRecallMcqInteractive((api) => {
     await ink.waitForLastFrameToInclude(leaveRecallWithYnRe)
     ink.stdin.write('y\r')
     await ink.waitForLastFrameToInclude('Recall session stopped.')
-    expect(api.answerQuizSpy).not.toHaveBeenCalled()
+    expect(api.answerSpy).not.toHaveBeenCalled()
   })
 
-  test('after Esc, n returns to MCQ without answerQuiz; buffer preserved', async () => {
+  test('after Esc, n returns to MCQ without answer; buffer preserved', async () => {
     const ink = await renderInkWhenCommandLineReady(<InteractiveCliApp />)
 
     startRecall(ink.stdin)
@@ -47,19 +47,19 @@ describeRecallMcqInteractive((api) => {
         p.includes('Choose') &&
         !p.includes('Leave recall?')
     )
-    expect(api.answerQuizSpy).not.toHaveBeenCalled()
+    expect(api.answerSpy).not.toHaveBeenCalled()
   })
 
   test('after Esc then n, MCQ list highlight preserved (Enter submits second choice)', async () => {
     mockSingleMcqDue()
     const pending = pendingMcqPrompt()
-    api.answerQuizSpy.mockResolvedValue({
+    api.answerSpy.mockResolvedValue({
       data: mcqAnsweredPrompt(pending, {
         id: 100,
         correct: false,
         choiceIndex: 1,
       }),
-    } as Awaited<ReturnType<typeof RecallPromptController.answerQuiz>>)
+    } as Awaited<ReturnType<typeof RecallPromptController.answer>>)
 
     const ink = await renderInkWhenCommandLineReady(<InteractiveCliApp />)
 
@@ -73,7 +73,7 @@ describeRecallMcqInteractive((api) => {
     await waitReturnsToMcq(ink)
     ink.stdin.write('\r')
     await waitMcqIncorrectOnLastFrame(ink)
-    expect(api.answerQuizSpy).toHaveBeenCalledWith(
+    expect(api.answerSpy).toHaveBeenCalledWith(
       expect.objectContaining({
         path: { recallPrompt: RECALL_PROMPT_ID },
         body: { choiceIndex: 1 },
@@ -92,6 +92,6 @@ describeRecallMcqInteractive((api) => {
     await ink.waitForLastFrameToInclude(/Leave recall\?/)
     ink.stdin.write('n\r')
     await waitReturnsToMcq(ink)
-    expect(api.answerQuizSpy).not.toHaveBeenCalled()
+    expect(api.answerSpy).not.toHaveBeenCalled()
   })
 })

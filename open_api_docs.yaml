@@ -588,7 +588,7 @@ paths:
     post:
       tags:
       - recall-prompt-controller
-      operationId: answerQuiz
+      operationId: answer
       parameters:
       - name: recallPrompt
         in: path

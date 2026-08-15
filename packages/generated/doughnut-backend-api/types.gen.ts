@@ -1758,7 +1758,7 @@ export type ContestResponses = {
 
 export type ContestResponse = ContestResponses[keyof ContestResponses];
 
-export type AnswerQuizData = {
+export type AnswerData = {
     body: AnswerDto;
     path: {
         recallPrompt: number;
@@ -1767,14 +1767,14 @@ export type AnswerQuizData = {
     url: '/api/recall-prompts/{recallPrompt}/answer';
 };
 
-export type AnswerQuizResponses = {
+export type AnswerResponses = {
     /**
      * OK
      */
     200: AnsweredQuestion;
 };
 
-export type AnswerQuizResponse = AnswerQuizResponses[keyof AnswerQuizResponses];
+export type AnswerResponse = AnswerResponses[keyof AnswerResponses];
 
 export type AnswerSpellingData = {
     body: AnswerSpellingDto;

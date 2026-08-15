@@ -69,17 +69,12 @@ recall prompt is pending)`.
 
 ### 5. Answer operation is answer
 
-- **Status:** planned
+- **Status:** done
 - **Type:** Behavior
-- **Pre:** An unanswered recall prompt is on screen.
-- **Trigger:** Learner submits an MCQ choice or spelling.
-- **Post:** SDK operation is **`answer`**, not `answerQuiz`. Path stays
-  `POST /api/recall-prompts/{id}/answer`.
 
-Rename `submitQuizAnswer` with the SDK. Regen client.
-
-**Tests:** `RecallPromptAnswerQuizControllerTest` (rename with the operation);
-`RecallPromptComponent` spec; existing answer E2E.
+Shipped: SDK operation **`answer`** (not `answerQuiz`); path still
+`POST /api/recall-prompts/{id}/answer`. Frontend `submitAnswer`; test
+`RecallPromptAnswerControllerTest`; service method `answer`.
 
 ### 6. Answered field is mcq
 
@@ -195,3 +190,4 @@ note MCQ E2E; regen compile.
 - Slice 1: leftover `quiz` in feature filenames and `visitRecallPageAndWaitForQuestion` stay until a later wording slice; not this step.
 - Slice 2: `makeMe.aRecallPrompt` is the unanswered-ask DTO; history items are `makeMe.aRecallPromptHistoryItem`. `RecallQuestionService` and CLI `RecallQuestionAnswerOutcome` wait for later slices.
 - Slice 3: SDK operation is `getRecallPrompt` (history list remains `getRecallPrompts`). Fetch extracted to `useRecallPromptFetching` / `recallMcqCardLoad`.
+- Slice 5: CLI `RecallQuestionAnswerOutcome` still deferred; JSON `predefinedQuestion` is slice 6.

@@ -27,13 +27,13 @@ describeRecallMcqInteractive((api) => {
   test('wrong MCQ choice shows Incorrect and sends 0-based choiceIndex to API', async () => {
     mockSingleMcqDue()
     const pending = pendingMcqPrompt()
-    api.answerQuizSpy.mockResolvedValue({
+    api.answerSpy.mockResolvedValue({
       data: mcqAnsweredPrompt(pending, {
         id: 100,
         correct: false,
         choiceIndex: 1,
       }),
-    } as Awaited<ReturnType<typeof RecallPromptController.answerQuiz>>)
+    } as Awaited<ReturnType<typeof RecallPromptController.answer>>)
 
     const ink = await renderInkWhenCommandLineReady(<InteractiveCliApp />)
 
@@ -44,7 +44,7 @@ describeRecallMcqInteractive((api) => {
     await waitMcqLoadMore(ink)
 
     expect(ink.lastStrippedFrame()).toContain('Beta')
-    expect(api.answerQuizSpy).toHaveBeenCalledWith(
+    expect(api.answerSpy).toHaveBeenCalledWith(
       expect.objectContaining({
         path: { recallPrompt: RECALL_PROMPT_ID },
         body: { choiceIndex: 1 },
@@ -52,12 +52,12 @@ describeRecallMcqInteractive((api) => {
     )
   })
 
-  test('shows busy label in bordered input while answerQuiz is pending', async () => {
+  test('shows busy label in bordered input while answer is pending', async () => {
     mockSingleMcqDue()
     const pending = pendingMcqPrompt()
     const { promise: answerPromise, resolve: resolveAnswer } =
-      deferred<Awaited<ReturnType<typeof RecallPromptController.answerQuiz>>>()
-    api.answerQuizSpy.mockImplementation(() => answerPromise)
+      deferred<Awaited<ReturnType<typeof RecallPromptController.answer>>>()
+    api.answerSpy.mockImplementation(() => answerPromise)
 
     const ink = await renderInkWhenCommandLineReady(<InteractiveCliApp />)
 
@@ -72,7 +72,7 @@ describeRecallMcqInteractive((api) => {
         correct: false,
         choiceIndex: 1,
       }),
-    } as Awaited<ReturnType<typeof RecallPromptController.answerQuiz>>)
+    } as Awaited<ReturnType<typeof RecallPromptController.answer>>)
 
     await waitMcqLoadMore(ink)
   })
@@ -117,13 +117,13 @@ describeRecallMcqInteractive((api) => {
       throw new Error(`unexpected memoryTracker ${String(id)}`)
     })
 
-    api.answerQuizSpy.mockResolvedValue({
+    api.answerSpy.mockResolvedValue({
       data: mcqAnsweredPrompt(pending, {
         id: 100,
         correct: false,
         choiceIndex: 1,
       }),
-    } as Awaited<ReturnType<typeof RecallPromptController.answerQuiz>>)
+    } as Awaited<ReturnType<typeof RecallPromptController.answer>>)
 
     const ink = await renderInkWhenCommandLineReady(<InteractiveCliApp />)
 
@@ -140,16 +140,16 @@ describeRecallMcqInteractive((api) => {
     await ink.waitForLastFrameToInclude(secondStem)
   })
 
-  test('out-of-range MCQ number does not call answerQuiz; valid answer still works', async () => {
+  test('out-of-range MCQ number does not call answer; valid answer still works', async () => {
     mockSingleMcqDue()
     const pending = pendingMcqPrompt()
-    api.answerQuizSpy.mockResolvedValue({
+    api.answerSpy.mockResolvedValue({
       data: mcqAnsweredPrompt(pending, {
         id: 100,
         correct: false,
         choiceIndex: 1,
       }),
-    } as Awaited<ReturnType<typeof RecallPromptController.answerQuiz>>)
+    } as Awaited<ReturnType<typeof RecallPromptController.answer>>)
 
     const ink = await renderInkWhenCommandLineReady(<InteractiveCliApp />)
 
@@ -157,11 +157,11 @@ describeRecallMcqInteractive((api) => {
     await waitMcqVisible(ink)
     ink.stdin.write('9\r')
     await ink.waitForLastFrameToInclude('→ 9')
-    expect(api.answerQuizSpy).not.toHaveBeenCalled()
+    expect(api.answerSpy).not.toHaveBeenCalled()
 
     ink.stdin.write('\x7f2\r')
     await waitMcqIncorrectOnLastFrame(ink)
-    expect(api.answerQuizSpy).toHaveBeenCalledTimes(1)
+    expect(api.answerSpy).toHaveBeenCalledTimes(1)
   })
 
   test('wrong MCQ then next due tracker shows second question without ending recall', async () => {
@@ -206,7 +206,7 @@ describeRecallMcqInteractive((api) => {
     })
 
     let answerN = 0
-    api.answerQuizSpy.mockImplementation(() => {
+    api.answerSpy.mockImplementation(() => {
       answerN += 1
       if (answerN === 1) {
         return Promise.resolve({
@@ -215,14 +215,14 @@ describeRecallMcqInteractive((api) => {
             correct: false,
             choiceIndex: 1,
           }),
-        } as Awaited<ReturnType<typeof RecallPromptController.answerQuiz>>)
+        } as Awaited<ReturnType<typeof RecallPromptController.answer>>)
       }
       return Promise.resolve({
         data: makeMe.anAnsweredQuestion
           .fromMcqHistoryItem(secondPrompt, note2.note, 2)
           .withAnswer({ id: 101, correct: true, choiceIndex: 0 })
           .please(),
-      } as Awaited<ReturnType<typeof RecallPromptController.answerQuiz>>)
+      } as Awaited<ReturnType<typeof RecallPromptController.answer>>)
     })
 
     const ink = await renderInkWhenCommandLineReady(<InteractiveCliApp />)
@@ -233,12 +233,12 @@ describeRecallMcqInteractive((api) => {
     await ink.waitForLastFrameToInclude(
       new RegExp(`(?=.*Incorrect)(?=.*${reLiteral(secondStem)})`, 's')
     )
-    expect(api.answerQuizSpy).toHaveBeenCalledTimes(1)
+    expect(api.answerSpy).toHaveBeenCalledTimes(1)
 
     ink.stdin.write('1\r')
     await ink.waitForLastFrameToInclude('Correct!')
     expect(ink.lastStrippedFrame()).toContain(secondStem)
-    expect(api.answerQuizSpy).toHaveBeenCalledTimes(2)
+    expect(api.answerSpy).toHaveBeenCalledTimes(2)
     expect(api.recallingSpy).toHaveBeenCalledTimes(1)
   })
 })

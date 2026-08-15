@@ -99,7 +99,7 @@ public class RecallQuestionService {
     return predefinedQuestionService.contest(recallPrompt.getPredefinedQuestion());
   }
 
-  public RecallPrompt answerQuestion(
+  public RecallPrompt answer(
       RecallPrompt recallPrompt, AnswerDTO answerDTO, Timestamp currentUTCTimestamp) {
     Answer answer = answerService.createAnswerForQuestion(recallPrompt, answerDTO);
     memoryTrackerService.updateMemoryTrackerAfterAnsweringQuestion(

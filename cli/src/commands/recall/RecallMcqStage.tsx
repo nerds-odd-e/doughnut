@@ -6,30 +6,14 @@ import {
   useRef,
   useState,
   type MutableRefObject,
-  type ReactElement,
 } from 'react'
-import type { Key } from 'ink'
 import { Box, Text, useInput, useStdout } from 'ink'
-import {
-  RecallPromptController,
-  type QuestionContestResult,
-  type AnsweredQuestion,
-  type RecallPrompt,
-} from 'doughnut-api'
-import {
-  choiceIndexFromSelectListSubmitLine,
-  handleSelectListInkKey,
-} from '../../interactions/selectListInteraction.js'
 import { BorderedSingleLinePromptInputInk } from '../../commonUIComponents/borderedSingleLinePromptInputInk.js'
 import { GuidanceListInk } from '../../commonUIComponents/guidanceListWindowInk.js'
 import {
   inkTerminalColumns,
   resolvedTerminalWidth,
 } from '../../terminalColumns.js'
-import {
-  doughnutSdkOptions,
-  runDefaultBackendJson,
-} from '../../backendApi/doughnutBackendClient.js'
 import { SetStageKeyHandlerContext } from '../../commonUIComponents/stageKeyForwardContext.js'
 import {
   TimedToastInk,
@@ -42,136 +26,23 @@ import {
   RECALL_BUSY_SUBMIT_ANSWER_LABEL,
 } from './recallBusyInputCopy.js'
 import { numberedMcqMarkdownLinesForTerminal } from './numberedMcqMarkdownLines.js'
-import {
-  recallMcqPayloadFromRecallPrompt,
-  type RecallCard,
-  type RecallMcqCardPayload,
-} from './nextRecallCardLoad.js'
-import { breadcrumbTrailFromRecalledNote } from './recallNoteContext.js'
+import type { RecallCard, RecallMcqCardPayload } from './nextRecallCardLoad.js'
+import { recallAnsweredMarkdownToDisplayLines } from './recallAnsweredInkShared.js'
 import type { RecallQuestionAnswerOutcome } from './recallQuestionAnswerOutcome.js'
-import {
-  RecallAnsweredBlockShell,
-  recallAnsweredBreadcrumbText,
-  recallAnsweredMarkdownToDisplayLines,
-  recallAnsweredQuizOutcomeInk,
-} from './recallAnsweredInkShared.js'
 import {
   recallAnsweredPlainInk,
   recallAnsweredScrollbackItem,
 } from './recallAnsweredScrollback.js'
 import { useSessionScrollbackAppend } from '../../sessionScrollback/sessionScrollbackAppendContext.js'
-
-const CONTEST_REJECTED_FALLBACK =
-  'Contest was not accepted. Please answer the question.'
-
-function recallAnsweredMcqInk(args: {
-  readonly answeredPrompt: AnsweredQuestion
-  readonly stem: string
-  readonly choices: readonly string[]
-  readonly selectedChoiceIndex: number
-  readonly notebookName: string
-}): ReactElement {
-  const width = resolvedTerminalWidth()
-  const crumb = recallAnsweredBreadcrumbText(
-    breadcrumbTrailFromRecalledNote(
-      args.answeredPrompt.recalledNote,
-      args.notebookName
-    )
-  )
-  const correct = args.answeredPrompt.answer.correct === true
-  const fromPredefined =
-    args.answeredPrompt.predefinedQuestion?.correctAnswerIndex
-  const correctChoiceIndex =
-    fromPredefined !== undefined && fromPredefined !== null
-      ? fromPredefined
-      : correct && args.answeredPrompt.answer.choiceIndex !== undefined
-        ? args.answeredPrompt.answer.choiceIndex
-        : undefined
-
-  const stemLines = recallAnsweredMarkdownToDisplayLines(args.stem, width)
-  const listLines = numberedMcqMarkdownLinesForTerminal(args.choices, width)
-  const sel = args.selectedChoiceIndex
-
-  const choiceLineColor = (itemIndex: number): undefined | 'green' | 'red' => {
-    if (correctChoiceIndex !== undefined && itemIndex === correctChoiceIndex) {
-      return 'green'
-    }
-    if (!correct && itemIndex === sel) {
-      return 'red'
-    }
-    return
-  }
-
-  return (
-    <RecallAnsweredBlockShell>
-      <Text>{crumb}</Text>
-      {stemLines.map((line, i) => (
-        <Text key={`st-${i}`}>{line.length > 0 ? line : ' '}</Text>
-      ))}
-      {listLines.map((line, i) => (
-        <Text key={`ch-${i}`} color={choiceLineColor(line.itemIndex)}>
-          {line.text}
-        </Text>
-      ))}
-      {recallAnsweredQuizOutcomeInk(correct)}
-    </RecallAnsweredBlockShell>
-  )
-}
-
-type ContestMcqOutcome =
-  | { outcome: 'replaced'; payload: RecallMcqCardPayload }
-  | { outcome: 'rejected'; message: string }
-
-/** Contest then regenerate, or rejected outcome with a user-visible message. */
-export async function contestAndRegenerateMcq(
-  memoryTrackerId: number,
-  currentRecallPromptId: number,
-  signal?: AbortSignal
-): Promise<ContestMcqOutcome> {
-  const contestResult = await runDefaultBackendJson<QuestionContestResult>(() =>
-    RecallPromptController.contest({
-      path: { recallPrompt: currentRecallPromptId },
-      ...doughnutSdkOptions(signal),
-    })
-  )
-  if (contestResult.rejected === true) {
-    const message = contestResult.advice?.trim() || CONTEST_REJECTED_FALLBACK
-    return { outcome: 'rejected', message }
-  }
-  const regenerated = await runDefaultBackendJson<RecallPrompt>(() =>
-    RecallPromptController.regenerate({
-      path: { recallPrompt: currentRecallPromptId },
-      body: contestResult,
-      ...doughnutSdkOptions(signal),
-    })
-  )
-  const mapped = recallMcqPayloadFromRecallPrompt(memoryTrackerId, regenerated)
-  if (mapped === null) {
-    throw new Error('Regenerated recall prompt is not a pending MCQ.')
-  }
-  return { outcome: 'replaced', payload: mapped }
-}
-
-export async function submitMcqAnswer(
-  recallPromptId: number,
-  choiceIndex: number,
-  signal?: AbortSignal
-): Promise<AnsweredQuestion> {
-  return runDefaultBackendJson<AnsweredQuestion>(() =>
-    RecallPromptController.answerQuiz({
-      path: { recallPrompt: recallPromptId },
-      body: { choiceIndex },
-      ...doughnutSdkOptions(signal),
-    })
-  )
-}
+import { createRecallMcqInputHandler } from './recallMcqStageKeys.js'
+import {
+  contestAndRegenerateMcq,
+  recallAnsweredMcqInk,
+  submitMcqAnswer,
+} from './recallMcqStageSupport.js'
 
 const MCQ_HINT =
   '↑↓ Enter or number to select; Esc asks to leave recall (y/n confirm)'
-
-function mcqInvalidChoiceHintMessage(choiceCount: number): string {
-  return `Not a valid choice. Enter 1–${choiceCount}, use ↑↓, or /contest.`
-}
 
 export function RecallMcqStage({
   payload,
@@ -228,22 +99,9 @@ export function RecallMcqStage({
           bufferRef.current = ''
           setBuffer('')
           setHighlightIndex(0)
-          await onRecallQuestionAnswered({
-            successful: false,
-            answeredRows: [
-              recallAnsweredMcqInk({
-                answeredPrompt: updated,
-                stem: payload.stem,
-                choices: payload.choices,
-                selectedChoiceIndex: choiceIdx,
-                notebookName: payload.notebookName,
-              }),
-            ],
-          })
-          return
         }
         await onRecallQuestionAnswered({
-          successful: true,
+          successful: correct,
           answeredRows: [
             recallAnsweredMcqInk({
               answeredPrompt: updated,
@@ -261,14 +119,7 @@ export function RecallMcqStage({
         setCommandLineBusyLabel(undefined)
       }
     },
-    [
-      inputBlockedRef,
-      onRecallFatalError,
-      onRecallQuestionAnswered,
-      payload.choices,
-      payload.recallPromptId,
-      payload.stem,
-    ]
+    [inputBlockedRef, onRecallFatalError, onRecallQuestionAnswered, payload]
   )
 
   const runContest = useCallback(async () => {
@@ -306,73 +157,22 @@ export function RecallMcqStage({
     payload.recallPromptId,
   ])
 
-  const processKeyEvent = useCallback(
-    (input: string, key: Key) => {
-      if (inputBlockedRef.current) return
-
-      const clearDraft = () => {
-        clearToast()
-        bufferRef.current = ''
-        setBuffer('')
-      }
-
-      handleSelectListInkKey(
-        input,
-        key,
-        bufferRef.current,
-        highlightIndex,
-        choices.length,
-        {
-          kind: 'slash-and-number-or-highlight',
-          choiceCount: choices.length,
-        },
-        'signal-escape',
-        {
-          onSetHighlightIndex: (index) => {
-            clearToast()
-            setHighlightIndex(index)
-          },
-          onSubmitHighlightIndex: (index) => {
-            clearDraft()
-            runSubmit(index).catch(() => undefined)
-          },
-          onSubmitWithLine: (line) => {
-            if (line.trim() === '/contest') {
-              clearDraft()
-              runContest().catch(() => undefined)
-              return
-            }
-            const idx = choiceIndexFromSelectListSubmitLine(
-              line,
-              choices.length
-            )
-            if (idx === null) return
-            clearDraft()
-            runSubmit(idx).catch(() => undefined)
-          },
-          onInvalidSelectListSubmitLine: () => {
-            showToast(mcqInvalidChoiceHintMessage(choices.length))
-          },
-          onEscapeSignaled: () => {
-            setShowLeaveConfirm(true)
-          },
-          onEditBackspace: () => {
-            clearToast()
-            const cur = bufferRef.current
-            if (cur.length === 0) return
-            const next = cur.slice(0, -1)
-            bufferRef.current = next
-            setBuffer(next)
-          },
-          onEditChar: (char) => {
-            clearToast()
-            const next = bufferRef.current + char
-            bufferRef.current = next
-            setBuffer(next)
-          },
-        }
-      )
-    },
+  const handleInput = useCallback(
+    createRecallMcqInputHandler({
+      inputBlockedRef,
+      choiceCount: choices.length,
+      highlightIndex,
+      bufferRef,
+      setBuffer,
+      setHighlightIndex,
+      clearToast,
+      showToast,
+      runSubmit,
+      runContest,
+      onEscape: () => {
+        setShowLeaveConfirm(true)
+      },
+    }),
     [
       choices.length,
       clearToast,
@@ -382,28 +182,6 @@ export function RecallMcqStage({
       runSubmit,
       showToast,
     ]
-  )
-
-  const handleInput = useCallback(
-    (input: string, key: Key) => {
-      if (inputBlockedRef.current) return
-
-      if (input.includes('\r') || input.includes('\n')) {
-        const returnKey = { return: true } as Key
-        const emptyKey = {} as Key
-        for (const ch of input) {
-          if (ch === '\r' || ch === '\n') {
-            processKeyEvent('\r', returnKey)
-          } else if (!(key.ctrl || key.meta)) {
-            processKeyEvent(ch, emptyKey)
-          }
-        }
-        return
-      }
-
-      processKeyEvent(input, key)
-    },
-    [inputBlockedRef, processKeyEvent]
   )
 
   useLayoutEffect(() => {

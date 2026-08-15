@@ -56,7 +56,7 @@ export type RecallMcqInteractiveApi = {
   waitReturnsToMcq: typeof waitReturnsToMcq
   recallingSpy: ReturnType<typeof vi.spyOn>
   getRecallPromptsSpy: ReturnType<typeof vi.spyOn>
-  answerQuizSpy: ReturnType<typeof vi.spyOn>
+  answerSpy: ReturnType<typeof vi.spyOn>
   pendingMcqPrompt: () => RecallPromptHistoryItem
   pendingMcqQuestion: (
     id?: number,
@@ -83,7 +83,7 @@ export function describeRecallMcqInteractive(
     let showMemoryTrackerSpy: ReturnType<typeof vi.spyOn>
     let getRecallPromptsSpy: ReturnType<typeof vi.spyOn>
     let getRecallPromptSpy: ReturnType<typeof vi.spyOn>
-    let answerQuizSpy: ReturnType<typeof vi.spyOn>
+    let answerSpy: ReturnType<typeof vi.spyOn>
     let contestSpy: ReturnType<typeof vi.spyOn> | undefined
     let regenerateSpy: ReturnType<typeof vi.spyOn> | undefined
     let mcqFixtureNoteRealm: NoteRealm
@@ -165,7 +165,7 @@ export function describeRecallMcqInteractive(
         .spyOn(MemoryTrackerController, 'getRecallPrompt')
         .mockRejectedValue(new Error('stub: MCQ from getRecallPrompts'))
 
-      answerQuizSpy = vi.spyOn(RecallPromptController, 'answerQuiz')
+      answerSpy = vi.spyOn(RecallPromptController, 'answer')
     })
 
     afterEach(() => {
@@ -177,7 +177,7 @@ export function describeRecallMcqInteractive(
       showMemoryTrackerSpy.mockRestore()
       getRecallPromptsSpy.mockRestore()
       getRecallPromptSpy.mockRestore()
-      answerQuizSpy.mockRestore()
+      answerSpy.mockRestore()
       if (savedConfigDir === undefined) {
         delete process.env.DOUGHNUT_CONFIG_DIR
       } else {
@@ -214,8 +214,8 @@ export function describeRecallMcqInteractive(
       get getRecallPromptsSpy() {
         return getRecallPromptsSpy
       },
-      get answerQuizSpy() {
-        return answerQuizSpy
+      get answerSpy() {
+        return answerSpy
       },
       pendingMcqPrompt,
       pendingMcqQuestion,

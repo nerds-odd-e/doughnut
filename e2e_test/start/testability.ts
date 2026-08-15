@@ -605,7 +605,7 @@ const testability = () => {
           `expected choice "${wrongChoiceText}" in ${JSON.stringify(choices)}`
         ).to.be.at.least(0)
         return cy.wrap(
-          RecallPromptController.answerQuiz({
+          RecallPromptController.answer({
             path: { recallPrompt: recallPrompt!.id },
             body: { choiceIndex, thinkingTimeMs: 1000 },
           }),
