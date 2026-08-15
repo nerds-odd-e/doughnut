@@ -150,7 +150,7 @@ Feature: Property memory tracker
       | Question Stem                      | Correct Choice | Incorrect Choice 1 | Incorrect Choice 2 |
       | What does the topic property mean? | micronutrients | vitamins           | minerals           |
     And OpenAI evaluates the question as legitimate
-    When I visit recall for a due quiz question on day 2
+    When I visit recall for a due recall prompt on day 2
     Then I should be asked "What does the topic property mean?"
     When I choose answer "micronutrients"
     And I visit note "Vitamins"
@@ -164,7 +164,7 @@ Feature: Property memory tracker
       | Question Stem                      | Correct Choice | Incorrect Choice 1 | Incorrect Choice 2 |
       | What does the topic property mean? | micronutrients | vitamins           | minerals           |
     And OpenAI evaluates the question as legitimate
-    When I visit recall for a due quiz question on day 2
+    When I visit recall for a due recall prompt on day 2
     Then I should be asked "What does the topic property mean?"
     And OpenAI Responses POST bodies include property focus for "topic" with value "micronutrients"
 

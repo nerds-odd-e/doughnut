@@ -14,7 +14,7 @@ Feature: AI recall quiz
       | Question Stem                    | Correct Choice     | Incorrect Choice 1 | Incorrect Choice 2 |
       | What is the meaning of sedition? | to incite violence | to sleep           | Open Water Diver   |
     And the note "sedition" was assimilated on day 1
-    When I visit recall for a due quiz question on day 2
+    When I visit recall for a due recall prompt on day 2
     Then I should be asked "What is the meaning of sedition?"
     When I choose answer "to sleep"
     Then I should see that my MCQ answer "to sleep" is incorrect
@@ -29,7 +29,7 @@ Feature: AI recall quiz
       | Question Stem                    | Correct Choice     | Incorrect Choice 1 | Incorrect Choice 2 |
       | What is the meaning of sedition? | to incite violence | to sleep           | Open Water Diver   |
     And the note "sedition" was assimilated on day 1
-    When I visit recall for a due quiz question on day 2
+    When I visit recall for a due recall prompt on day 2
     Then I should be asked "What is the meaning of sedition?"
     When I choose answer "to incite violence"
     Then I should see that my answer is correct as the last question
@@ -55,5 +55,5 @@ Feature: AI recall quiz
     And the note "WikiRecall" was assimilated on day 1
     And the note "DepthRecall" was assimilated on day 1
     And the note "FocusFolder" was assimilated on day 1
-    When I visit recall for a due quiz question on day 2
+    When I visit recall for a due recall prompt on day 2
     Then OpenAI Responses POST bodies include wiki-linked, depth-two wiki path, and folder-sibling focus context prompts

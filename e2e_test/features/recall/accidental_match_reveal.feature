@@ -17,20 +17,20 @@ Feature: Accidental match reveal
     And the note "sedition" was assimilated as spelling on day 1
 
   Scenario: Accidental match reveals reviewed and matched notes
-    When I visit recall for a due quiz question on day 2
+    When I visit recall for a due recall prompt on day 2
     Then I should be asked spelling question "means incite violence" from notebook "English practice"
     When I type my answer "sedation"
     Then I should see an accidental match reveal for spelling answer "sedation" with reviewed note "sedition" and matched note "sedation"
 
   Scenario: Accidental match schedules prompted tracker with incorrect-recall interval
-    When I visit recall for a due quiz question on day 2
+    When I visit recall for a due recall prompt on day 2
     Then I should be asked spelling question "means incite violence" from notebook "English practice"
     When I type my answer "sedation"
     Then I should see an accidental match reveal for spelling answer "sedation" with reviewed note "sedition" and matched note "sedation"
     And I should see the incorrect grade time as Last Recall Time for my last answer
 
   Scenario: Offer adds the matched note as a wiki property without leaving the result
-    When I visit recall for a due quiz question on day 2
+    When I visit recall for a due recall prompt on day 2
     Then I should be asked spelling question "means incite violence" from notebook "English practice"
     When I type my answer "sedation"
     Then I should see an accidental match reveal for spelling answer "sedation" with reviewed note "sedition" and matched note "sedation"
@@ -38,7 +38,7 @@ Feature: Accidental match reveal
     Then I should still be on the accidental match result for spelling answer "sedation" with matched note "sedation"
 
   Scenario: Offer adds the matched note as a relationship without leaving the result
-    When I visit recall for a due quiz question on day 2
+    When I visit recall for a due recall prompt on day 2
     Then I should be asked spelling question "means incite violence" from notebook "English practice"
     When I type my answer "sedation"
     Then I should see an accidental match reveal for spelling answer "sedation" with reviewed note "sedition" and matched note "sedation"
@@ -46,7 +46,7 @@ Feature: Accidental match reveal
     Then I should still be on the accidental match result for spelling answer "sedation" with matched note "sedation"
 
   Scenario: Add as overlapped note stays on accidental match without try-again
-    When I visit recall for a due quiz question on day 2
+    When I visit recall for a due recall prompt on day 2
     Then I should be asked spelling question "means incite violence" from notebook "English practice"
     When I type my answer "sedation"
     Then I should see an accidental match reveal for spelling answer "sedation" with reviewed note "sedition" and matched note "sedation"
@@ -55,7 +55,7 @@ Feature: Accidental match reveal
     And I should not see overlap try-again on the accidental match result
 
   Scenario: Reopen resolve after navigating matched title and returning
-    When I visit recall for a due quiz question on day 2
+    When I visit recall for a due recall prompt on day 2
     Then I should be asked spelling question "means incite violence" from notebook "English practice"
     When I type my answer "sedation"
     Then I should see an accidental match reveal for spelling answer "sedation" with reviewed note "sedition" and matched note "sedation"

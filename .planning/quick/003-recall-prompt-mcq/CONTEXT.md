@@ -1,6 +1,6 @@
 # Recall prompt / MCQ alignment — context
 
-**Status:** planned (do not execute until the developer says so)  
+**Status:** executing (slice 1 done)  
 **Glossary:** Proposed [ADR 0001](../../../docs/adrs/0001-ubiquitous-language.md), [ADR 0003](../../../docs/adrs/0003-spaced-repetition-scheduling-policy.md)
 
 ## Requirement
@@ -37,11 +37,13 @@ URL (contest is triggered while viewing a prompt; the flag lives on the MCQ).
 
 | Glossary | Persistence | Code / API | Tests / UI leftovers |
 |----------|-------------|------------|----------------------|
-| Recall prompt | `recall_prompt` | Entity `RecallPrompt`; DTO **`RecallQuestion`** (`id` is the prompt); `GET .../question` `askAQuestion`; `RecallQuestionService`; `Quiz.vue` | E2E “due **quiz question**”; `answerQuiz` |
-| MCQ | `predefined_question` | `PredefinedQuestion`; `/api/predefined-questions`; JSON `predefinedQuestion` | E2E “predefined questions”; note **Questions** UI |
+| Recall prompt | `recall_prompt` | Entity `RecallPrompt`; DTO **`RecallQuestion`**; `GET .../question` `askAQuestion`; `RecallQuestionService`; `Quiz.vue` (file name out of scope) | E2E due recall prompt (slice 1); `answerQuiz` |
+| MCQ | `predefined_question` | `PredefinedQuestion`; `/api/predefined-questions`; JSON `predefinedQuestion` | E2E “predefined questions” |
 | Answer | `quiz_answer` | Entity `Answer`; `answerQuiz` | `submitQuizAnswer` |
-| MCQ stem+choices | JSON in `raw_json_question` | `MultipleChoicesQuestion` (OpenAPI type) | |
+| MCQ stem+choices | JSON in `raw_json_question` | `MultipleChoicesQuestion` | |
 | AI generate/refine | (same rows) | `MCQWithAnswer` | |
+
+Plan slices (see PLAN.md): 1 tests → 2 type RecallPrompt → 3 path → 4 CLI help → 5 answer op → 6 field `mcq` → 7 tests MCQ → 8 type Mcq → 9 `/mcqs` → 10 table `mcq` → 11 table `answer` → 12 drop `MultipleChoicesQuestion` → 13 AI uses Mcq.
 
 Contest HTTP is already on `/recall-prompts/{id}/contest` and mutates the MCQ.
 That is HAS_A, not a translation to delete.

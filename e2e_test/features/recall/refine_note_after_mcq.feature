@@ -21,7 +21,7 @@ Feature: Refine note after answered MCQ
     And the note "sedition" was assimilated on day 1
 
   Scenario: Question-led points are preselected when refining after MCQ
-    When I visit recall for a due quiz question on day 2
+    When I visit recall for a due recall prompt on day 2
     Then I should be asked "What is the meaning of sedition?"
     When I choose answer "to sleep"
     And I open Refine note from the answered question

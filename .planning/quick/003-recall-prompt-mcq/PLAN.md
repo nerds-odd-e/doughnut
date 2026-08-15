@@ -1,11 +1,10 @@
 # Plan: Recall prompt / MCQ — minimum translation
 
-**Goal:** Learners, APIs, code, and schema use **recall prompt** and **MCQ** as
-in ADR 0001, with no `RecallQuestion` / `PredefinedQuestion` / `quiz` translation
-types. Stop-safe; one Behavior or Structure per slice.
+**Goal:** Same nouns as ADR 0001 (**recall prompt** HAS_A **MCQ**) in tests, API,
+code, and schema, with no `RecallQuestion` / `PredefinedQuestion` / `quiz`
+translation types. One slice = one small commit. Stop-safe.
 
-**Prerequisite (done):** ADR 0001 / 0003 glossary (recall prompt HAS_A MCQ; just
-review is a recall method).
+**Prerequisite (done):** ADR 0001 / 0003 glossary.
 
 **Cite:** [CONTEXT.md](./CONTEXT.md)
 
@@ -17,136 +16,190 @@ review is a recall method).
 3. Contest stays on the recall-prompt URL; `contested` stays on the MCQ.
 4. Do not feed note-authored MCQs into recall in this plan.
 5. After OpenAPI/controller changes, regenerate the client
-   (`pnpm generateTypeScript`); never hand-edit generated files.
+   (`pnpm generateTypeScript`); never hand-edit generated files. Type/path
+   slices that regen the SDK may exceed ~5 min; that regen is the stated
+   reason to continue (do not bundle a second outcome into the same commit).
 6. New Flyway versions only; never edit committed migrations.
-7. Capability-named tests only (existing recall / note-question features).
-8. If a slice overruns ~10 min, stop, revert that attempt, split that slice.
+7. Capability-named tests only. Slice numbers stay in this file.
+8. One slice, one commit. If a slice overruns ~10 min for any reason other
+   than SDK regen or a single Flyway apply, stop, revert, split.
+9. Schema table names are operator-observable (ERD + migrated catalog). They
+   are Behavior in this plan, not Structure-for-the-next-pixel-change.
+10. Do not rename `Quiz.vue` or the note **Questions** menu in this plan
+    (leftover identifiers; no user-facing behavior tied to the file name).
 
 ## Slices
 
 ### 1. Tests say recall prompt
 
-- **Status:** planned
+- **Status:** done
 - **Type:** Structure
-- **Enables:** Ask yields a recall prompt
+- **Enables:** 2. Ask type is RecallPrompt
 
-Rename Gherkin/steps/feature titles that say **quiz question** to **recall
-prompt** (e.g. `When I visit recall for a due quiz question on day {int}`).
-Rename contest feature language to contest an **MCQ**. No product change;
-existing scenarios still pass.
+Shipped: `When I visit recall for a due recall prompt on day {int}` (step +
+call sites). Contest / note-question wording untouched. Feature filenames
+and page-object helpers still say quiz/question (later leftover).
 
-**Verify:** targeted `cypress run --spec` for touched recall features.
-
-### 2. Ask yields a recall prompt
+### 2. Ask type is RecallPrompt
 
 - **Status:** planned
 - **Type:** Behavior
-- **Pre:** A due memory tracker (spelling or understanding).
+- **Pre:** A due memory tracker.
+- **Trigger:** Client asks for the next ask payload (`GET .../question` still).
+- **Post:** OpenAPI/SDK type is **`RecallPrompt`**, not `RecallQuestion`. JSON
+  shape and path are unchanged (stem+choices or spelling stem; no solution).
+
+Delete `RecallQuestion` / `.from`. Regen client; fix compile. Leave
+`askAQuestion` and `/question`.
+
+**Tests:** `MemoryTrackerAskQuestionControllerTest`; frontend/CLI compile
+against the new type.
+
+### 3. Ask path is recall-prompt
+
+- **Status:** planned
+- **Type:** Behavior
+- **Pre:** Slice 2 done.
 - **Trigger:** Learner starts recall (web or CLI).
-- **Post:** The client loads a **recall prompt** from
-  `GET /api/memory-trackers/{id}/recall-prompt`. There is no `RecallQuestion`
-  type and no `.../question` / `askAQuestion` path.
+- **Post:** `GET /api/memory-trackers/{id}/recall-prompt`. No `.../question`
+  and no `askAQuestion`.
 
-Drop `RecallQuestion` / `RecallQuestion.from`. Return a learner view of
-`RecallPrompt` (stem+choices or spelling stem; no solution). Rename `Quiz.vue`
-to a recall-session name in this slice so the session is not a “quiz.” CLI
-help that says “no quiz” follows the glossary (just review / no prompt).
+**Tests:** same ask tests + one MCQ recall E2E + one spelling recall E2E;
+CLI interactive ask mocks.
 
-**Tests:** existing recall E2E (MCQ + spelling); frontend `Quiz`/`RecallPage`
-specs; CLI interactive recall; controller tests. Then `generateTypeScript`.
+### 4. CLI recall help is not quiz
 
-### 3. Answer a recall prompt
+- **Status:** planned
+- **Type:** Behavior
+- **Pre:** `/recall` help is shown.
+- **Trigger:** User reads CLI command docs / help.
+- **Post:** Copy does not say **quiz**; it matches just review / recall prompt.
+
+**Tests:** existing CLI help or `/recall` doc assertion.
+
+### 5. Answer operation is answer
 
 - **Status:** planned
 - **Type:** Behavior
 - **Pre:** An unanswered recall prompt is on screen.
 - **Trigger:** Learner submits an MCQ choice or spelling.
-- **Post:** Submit uses `POST /api/recall-prompts/{id}/answer` as **answer**,
-  not `answerQuiz`. Frontend has no `submitQuizAnswer` name.
+- **Post:** SDK operation is **`answer`**, not `answerQuiz`. Path stays
+  `POST /api/recall-prompts/{id}/answer`.
 
-Path is already `/answer`; this slice is the operation and client names.
+Rename `submitQuizAnswer` with the SDK. Regen client.
 
-**Tests:** existing answer E2E + `RecallPromptComponent` / controller answer tests.
+**Tests:** `RecallPromptAnswerQuizControllerTest` (rename with the operation);
+`RecallPromptComponent` spec; existing answer E2E.
 
-### 4. Answered MCQ is named MCQ
+### 6. Answered field is mcq
 
 - **Status:** planned
 - **Type:** Behavior
 - **Pre:** Learner has answered an MCQ recall prompt.
-- **Trigger:** Result / history is shown.
-- **Post:** Wire field is `mcq`, not `predefinedQuestion` (`AnsweredQuestion`,
-  history items). Type may still be `PredefinedQuestion` until the next slice.
+- **Trigger:** Result or history is shown.
+- **Post:** JSON field is **`mcq`**, not `predefinedQuestion`. Java/OpenAPI
+  type may still be `PredefinedQuestion`.
 
-**Tests:** memory-tracker prompt history unit tests; answered-question component
-tests; regenerate client.
+**Tests:** answered-question component spec; memory-tracker history tests;
+regen client.
 
-### 5. Trainer manages MCQs on a note
+### 7. Tests say MCQ on the note
+
+- **Status:** planned
+- **Type:** Structure
+- **Enables:** 8. Type is Mcq
+
+E2E/testability wording: “predefined questions in the notebook” → MCQs;
+contest feature says contest an **MCQ**. No product change.
+
+**Verify:** `predefined_questions_management.feature` and
+`question_contest.feature` still pass.
+
+### 8. Type is Mcq
 
 - **Status:** planned
 - **Type:** Behavior
-- **Pre:** Note owner opens note MCQ management.
-- **Trigger:** List / add / AI-generate / refine.
-- **Post:** API is `/api/mcqs/...`; Java/OpenAPI type is **Mcq** (not
-  `PredefinedQuestion`). Table name may still be `predefined_question`.
-  Button microcopy may still say “question” (ADR out of scope).
+- **Pre:** Slice 6–7 done.
+- **Trigger:** Client reads or writes note MCQs / answered `mcq`.
+- **Post:** Java/OpenAPI type is **`Mcq`**, not `PredefinedQuestion`. HTTP
+  paths still `/api/predefined-questions/...`. `@Table` may still be
+  `predefined_question`.
 
-**Tests:** `predefined_questions_management.feature` scenarios (keep
-capability-named file; update wording inside); controller tests; regenerate
-client.
+Regen client; rename builders (`aPredefinedQuestion` → `anMcq` or equivalent).
 
-### 6. Schema table is mcq
+**Tests:** `PredefinedQuestionControllerTests` (rename with the type);
+note MCQ E2E; regen compile.
 
-- **Status:** planned
-- **Type:** Structure
-- **Enables:** Schema table matches Answer (and any later MCQ work)
-
-Flyway rename `predefined_question` → `mcq`; `recall_prompt.predefined_question_id`
-→ `mcq_id`. Entity `@Table` matches. No API JSON change.
-
-**Verify:** backend tests that persist MCQs / recall prompts.
-
-### 7. Schema table matches Answer
+### 9. Note MCQ routes are /mcqs
 
 - **Status:** planned
-- **Type:** Structure
-- **Enables:** Learner MCQ view is not a named type
+- **Type:** Behavior
+- **Pre:** Type is already `Mcq`.
+- **Trigger:** List / add / generate / refine on a note.
+- **Post:** HTTP is `/api/mcqs/...`. No `/api/predefined-questions`.
 
-Flyway rename `quiz_answer` → `answer`; `recall_prompt.quiz_answer_id` →
-`answer_id`. Entity is already `Answer`.
+**Tests:** controller tests for those routes; note MCQ E2E; regen client.
 
-**Verify:** backend answer / recall-prompt tests.
-
-### 8. Learner MCQ view is not a named OpenAPI type
-
-- **Status:** planned
-- **Type:** Structure
-- **Enables:** AI generates an Mcq
-
-Remove `MultipleChoicesQuestion` from OpenAPI. Unanswered prompt exposes
-stem+choices as fields on the prompt or on `Mcq` without a second type name.
-`generateTypeScript`; existing MCQ recall E2E still pass (same pixels).
-
-### 9. AI generates an Mcq
+### 10. Table is mcq
 
 - **Status:** planned
-- **Type:** Structure
+- **Type:** Behavior
+- **Pre:** API type is `Mcq`.
+- **Trigger:** Flyway migrate.
+- **Post:** Table `mcq`, FK `recall_prompt.mcq_id`; ERD matches; create/load
+  MCQ and recall still work. No JSON change.
 
-`MCQWithAnswer` (and refine subclass) become `Mcq` or a factory onto `Mcq`.
-`choicesMayBeShuffled` is either stored on `Mcq` or kept as an AI-only field —
-do not invent a glossary noun for it.
+**Tests:** backend tests that persist MCQs / recall prompts;
+`pnpm export:database-erd`.
 
-**Verify:** question-generation / contest / regenerate controller tests.
+### 11. Table is answer
+
+- **Status:** planned
+- **Type:** Behavior
+- **Pre:** Slice 10 done (or at least app on current schema).
+- **Trigger:** Flyway migrate.
+- **Post:** Table `answer`, FK `recall_prompt.answer_id`; ERD matches;
+  answering still works. Entity was already `Answer`.
+
+**Tests:** backend answer / recall-prompt tests; ERD export.
+
+### 12. Unanswered prompt has no MultipleChoicesQuestion type
+
+- **Status:** planned
+- **Type:** Behavior
+- **Pre:** Learner is shown an unanswered MCQ prompt.
+- **Trigger:** Client fetches the recall prompt.
+- **Post:** OpenAPI has no **`MultipleChoicesQuestion`**. Stem+choices live
+  on the prompt or on `Mcq` without a second type name. UI pixels unchanged.
+
+**Tests:** MCQ recall E2E; regen client; OpenAPI/types have no that name.
+
+### 13. AI generate uses Mcq
+
+- **Status:** planned
+- **Type:** Behavior
+- **Pre:** Trainer or recall generation asks the model for an MCQ.
+- **Trigger:** Generate / refine / contest-regenerate.
+- **Post:** API/Java have no **`MCQWithAnswer`** (or refine subclass) as a
+  product type. `choicesMayBeShuffled` is a field on `Mcq` or AI-only — not
+  a glossary noun.
+
+**Tests:** generate/refine/contest/regenerate controller tests;
+`isMCQWithAnswerValid` follows the type.
 
 ## Out of scope
 
 - Using the note’s MCQ list as the recall source
-- Inferring `QuestionType` from `mcq_id` and dropping the enum (no next
-  behavior in this plan)
-- Renaming **just review**
-- Mass UI microcopy (“Questions” menu)
+- Inferring `QuestionType` from `mcq_id` and dropping the enum
+- Renaming **just review**, `Quiz.vue`, or the note **Questions** menu
+- Dual JSON aliases for old field names
 
 ## Jidoka
 
 - Confirm no external API consumers that need dual JSON field names.
-- Table renames need a real Flyway version and a deploy that applies it.
+- Slices 10–11 need a deploy that applies the new Flyway version.
 - Do not add compatibility DTOs that reintroduce translation.
+
+## Learnings
+
+- Slice 1: leftover `quiz` in feature filenames and `visitRecallPageAndWaitForQuestion` stay until a later wording slice; not this step.

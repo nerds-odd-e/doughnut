@@ -17,12 +17,12 @@ Feature: Accidental match scheduling
 
   Scenario: Unique matched spelling tracker is brought forward without recall credit
     Given the note "sedation" was assimilated as spelling on day 1
-    When I visit recall for a due quiz question on day 1
+    When I visit recall for a due recall prompt on day 1
     And I type my answer "sedation"
     Then I should see that my last spelling answer was correct with recall count 1
     And I record the current memory tracker schedule
     And the note "sedition" was assimilated as spelling on day 1
-    When I visit recall for a due quiz question on day 1
+    When I visit recall for a due recall prompt on day 1
     Then I should be asked spelling question "means incite violence" from notebook "English practice"
     When I type my answer "sedation"
     Then I should see an accidental match reveal for spelling answer "sedation" with reviewed note "sedition" and matched note "sedation"
@@ -43,17 +43,17 @@ Feature: Accidental match scheduling
       lull means put to sleep
       """
     And the note "sedation" was assimilated as spelling on day 1
-    When I visit recall for a due quiz question on day 1
+    When I visit recall for a due recall prompt on day 1
     And I type my answer "sedation"
     And I visit the spelling memory tracker for "sedation"
     And I record the current memory tracker schedule for "sedation"
     And the note "lull" was assimilated as spelling on day 1
-    When I visit recall for a due quiz question on day 1
+    When I visit recall for a due recall prompt on day 1
     And I type my answer "lull"
     And I visit the spelling memory tracker for "lull"
     And I record the current memory tracker schedule for "lull"
     And the note "sedition" was assimilated as spelling on day 1
-    When I visit recall for a due quiz question on day 1
+    When I visit recall for a due recall prompt on day 1
     Then I should be asked spelling question "means incite violence" from notebook "English practice"
     When I type my answer "sedation"
     Then I should see an accidental match reveal for spelling answer "sedation" with reviewed note "sedition" and matched notes "sedation" and "lull"
@@ -68,7 +68,7 @@ Feature: Accidental match scheduling
     Then I should see the understanding memory tracker with recall count 1
     And I record the current memory tracker schedule
     And the note "sedition" was assimilated as spelling on day 2
-    When I visit recall for a due quiz question on day 2
+    When I visit recall for a due recall prompt on day 2
     Then I should be asked spelling question "means incite violence" from notebook "English practice"
     When I type my answer "sedation"
     Then I should see an accidental match reveal for spelling answer "sedation" with reviewed note "sedition" and matched note "sedation"

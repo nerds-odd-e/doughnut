@@ -92,7 +92,7 @@ When('I am recalling my note on day {int}', (day: number) => {
   start.recall().visitRecallPage()
 })
 
-When('I visit recall for a due quiz question on day {int}', (day: number) => {
+When('I visit recall for a due recall prompt on day {int}', (day: number) => {
   start.testability().backendTimeTravelTo(day, 8)
   start.recall().visitRecallPageAndWaitForQuestion()
 })
