@@ -60,12 +60,13 @@ public class RecallServiceWithSpacedRepetitionAlgorithmTest {
       "1,  10, true",
       "2,   0, false",
       "2,   1, false",
-      "2,   2, true",
+      "2,   4, false",
+      "2,   5, true",
       "2,  10, true",
       "3,   0, false",
       "3,   1, false",
-      "3,   3, true",
-      "3,   4, true",
+      "3,  14, false",
+      "3,  15, true",
     })
     void whenThereIsOneRecalledNotesForUser(
         Integer recallDone, Integer recallDay, Boolean expectedToRepeat) {
@@ -102,8 +103,8 @@ public class RecallServiceWithSpacedRepetitionAlgorithmTest {
       @CsvSource({
         "0, 0,  24.0",
         "0, 1,  24.0",
-        "2, -1,  60.0",
-        "2, 0, 72.0",
+        "2, -1,  315.0",
+        "2, 0, 361.0",
       })
       void aMemoryTrackerHasBeenRecalledStrictly(
           int ntimes, Integer daysDelay, float expectedStability) {

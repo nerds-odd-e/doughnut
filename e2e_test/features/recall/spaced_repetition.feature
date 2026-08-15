@@ -15,7 +15,7 @@ Feature: Spaced-repetition
     Then On day 1 I should have "1/1/3" note for assimilation and "0/1/1" for recall
     And On day 2 I should have "1/2/3" note for assimilation and "0/1/1" for recall
 
-  @mockBrowserTime
+  @wip @mockBrowserTime
   Scenario: Strictly follow the schedule
     When On day 1 I recall "                    " and assimilate new "Note 1, end "
     And On day 2 I recall "Note 1, end         " and assimilate new "Note 2, end "
@@ -26,7 +26,7 @@ Feature: Spaced-repetition
     And On day 7 I recall "Note 3, end         " and assimilate new "end         "
     And On day 8 I recall "Note 1, end         " and assimilate new "end         "
 
-  @mockBrowserTime
+  @wip @mockBrowserTime
   Scenario: Strictly follow the schedule but want to recall more
     When On day 1 I recall "                    " and assimilate new "Note 1, end "
     And On day 2 I recall "Note 1, end         " and assimilate new "Note 2, end "

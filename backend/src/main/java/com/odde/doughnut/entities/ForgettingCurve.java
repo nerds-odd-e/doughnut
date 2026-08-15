@@ -4,28 +4,37 @@ import com.odde.doughnut.algorithms.SpacedRepetitionAlgorithm;
 
 public class ForgettingCurve {
   public static final float ASSIMILATE_STABILITY_HOURS = 0.0f;
+  public static final float FIRST_SUCCESS_STABILITY_HOURS = 24.0f;
+  public static final float DEFAULT_DIFFICULTY = 5.0f;
   public static final Integer BASE_THINKING_TIME_MS = 25000; // 25 seconds
   public static final Integer MAX_THINKING_TIME_MS = 60000; // 60 seconds
   private final float stabilityHours;
+  private final float difficulty;
 
   public ForgettingCurve(float stabilityHours) {
+    this(stabilityHours, null);
+  }
+
+  public ForgettingCurve(float stabilityHours, Float difficulty) {
     this.stabilityHours = Math.max(ASSIMILATE_STABILITY_HOURS, stabilityHours);
+    this.difficulty = difficulty == null ? DEFAULT_DIFFICULTY : difficulty;
   }
 
   float succeeded(long elapsedInHours, Integer thinkingTimeMs) {
-    float successIncrement = 1.0f;
-    if (stabilityHours > 0) {
-      float elapsedVsStability = (elapsedInHours - stabilityHours) / stabilityHours;
-      if (elapsedVsStability < 0) {
-        successIncrement += elapsedVsStability;
-      } else if (elapsedVsStability > 0) {
-        successIncrement += 1.0f - 1.0f / (1.0f + elapsedVsStability);
-      }
+    if (stabilityHours <= ASSIMILATE_STABILITY_HOURS) {
+      return FIRST_SUCCESS_STABILITY_HOURS;
     }
-    float thinkingTimeAdjustment = calculateThinkingTimeAdjustment(thinkingTimeMs);
-    return (float)
-        SpacedRepetitionAlgorithm.hoursAfterSpacingDelta(
-            stabilityHours, successIncrement + thinkingTimeAdjustment, true);
+    float fsrsHours =
+        FsrsStabilityIncrement.hoursAfterGoodRecall(stabilityHours, difficulty, elapsedInHours);
+    return adjustForThinkingTime(fsrsHours, thinkingTimeMs);
+  }
+
+  private float adjustForThinkingTime(float fsrsHours, Integer thinkingTimeMs) {
+    float increment = fsrsHours - stabilityHours;
+    float adjustment = calculateThinkingTimeAdjustment(thinkingTimeMs);
+    float tweakBase = increment > 0 ? increment : stabilityHours;
+    float tweaked = fsrsHours + tweakBase * adjustment;
+    return Math.max(stabilityHours, Math.round(tweaked));
   }
 
   private float calculateThinkingTimeAdjustment(Integer thinkingTimeMs) {

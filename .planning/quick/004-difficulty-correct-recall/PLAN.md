@@ -1,6 +1,6 @@
 # Plan: Difficulty on correct recall
 
-**Status:** in progress (slice 1 done; next is 2)  
+**Status:** in progress (slice 2 done; next is 3)  
 **Goal:** Persist Difficulty; ordinary correct recall follows FSRS-6 Good (SInc + D-update); New-card first correct inits D. First S = **24h** this plan (12h parked).
 
 **Context:** [CONTEXT.md](./CONTEXT.md)
@@ -25,21 +25,11 @@ Shipped: nullable `memory_tracker.difficulty` (`V300000261`); graded backfill 5;
 ### 2. On-time correct recall uses FSRS SInc
 
 Type: Behavior  
-Status: planned
+Status: done
 
-**Pre-condition:** Tracker with S > 0, D = 5 (backfill or default).  
-**Trigger:** Ordinary on-time correct recall.  
-**Post-condition:** Next S is FSRS-6 Good SInc (days internally, hours persisted), not `hoursAfterSpacingDelta`. `nextRecallAt = lastRecalledAt + stability`. SInc ≥ 1. Drop the success-path ladder and linear elapsed/S increment.
+Ordinary correct with S > 0 uses FSRS-6 Good SInc (`FsrsStabilityIncrement` next to `ForgettingCurve`); S=0 still 24h. Fail/confusion/commissioned stay on the ladder.
 
-Put SInc next to `ForgettingCurve` (pass D). Do not add it to `SpacedRepetitionAlgorithm`. Commissioned standard increment stays ladder-based.
-
-Same `succeeded()` path: rewrite Fibonacci-pinned **unit** assertions in this slice so CI stays green (on-time, early, overdue/B3 qualitative, thinking-time qualitative, `RecallServiceWithSpacedRepetitionAlgorithmTest` 60/72). If `spaced_repetition.feature` schedule scenarios go red, tag those scenarios `@wip` here (cap 5); do not rewrite day lists yet (slice 6).
-
-S = 0 still yields **24h** (current first rung).
-
-If on-time growth at D = 5, S ≈ 3d is a 10× jump vs Fibonacci, **Jidoka** (do not retune weights ad hoc).
-
-**Done when:** success path does not walk the ladder; backend unit tests green; fail/confusion/commissioned still ladder; E2E schedule scenarios either still pass or are `@wip`.
+**Learning:** D=5, S=72h on-time → **266h** vs old Fibonacci 120h (**2.22×**, not 10×) — weights left frozen. Two `spaced_repetition.feature` schedule scenarios `@wip` (2/5) for slice 6.
 
 ---
 

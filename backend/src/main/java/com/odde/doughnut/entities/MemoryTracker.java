@@ -173,7 +173,7 @@ public class MemoryTracker extends EntityIdentifiedByIdOnly {
   }
 
   private ForgettingCurve forgettingCurve() {
-    return new ForgettingCurve(getStability());
+    return new ForgettingCurve(getStability(), getDifficulty());
   }
 
   public void recallFailed(Timestamp currentUTCTimestamp) {

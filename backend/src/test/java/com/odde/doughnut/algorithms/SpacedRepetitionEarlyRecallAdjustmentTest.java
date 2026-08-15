@@ -1,5 +1,6 @@
 package com.odde.doughnut.algorithms;
 
+import static com.odde.doughnut.entities.ForgettingCurve.DEFAULT_DIFFICULTY;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThan;
@@ -15,38 +16,41 @@ import com.odde.doughnut.utils.TimestampOperations;
 import org.junit.jupiter.api.Test;
 
 public class SpacedRepetitionEarlyRecallAdjustmentTest {
-  @Test
-  void onTimeCorrectGrowsToNextLadderHours() {
-    float hours = nextStabilityHours(72);
-    assertThat(hours, equalTo(120.0f));
-  }
+  private static final float STABILITY_HOURS = 72f;
+  private final MakeMe makeMe = MakeMe.makeMeWithoutFactoryService();
+  private final User user = makeMe.aUser().inMemoryPlease();
+  private final Note note = makeMe.aNote().inMemoryPlease();
 
   @Test
   void immediateEarlyCorrectDoesNotGrow() {
     float hours = nextStabilityHours(0);
-    assertThat(hours, equalTo(72.0f));
+    assertThat(hours, equalTo(STABILITY_HOURS));
   }
 
   @Test
   void earlyCorrectGrowsLessThanOnTime() {
-    float hours = nextStabilityHours(1);
-    assertThat(hours, greaterThanOrEqualTo(72.0f));
-    assertThat(hours, lessThan(120.0f));
+    float early = nextStabilityHours(1);
+    float onTime = nextStabilityHours(Math.round(STABILITY_HOURS));
+    assertThat(early, greaterThanOrEqualTo(STABILITY_HOURS));
+    assertThat(early, lessThan(onTime));
   }
 
   @Test
   void almostOnTimeEarlyCorrectGrowsLessThanOrEqualToOnTime() {
-    float hours = nextStabilityHours(71);
-    assertThat(hours, greaterThan(72.0f));
-    assertThat(hours, lessThanOrEqualTo(120.0f));
+    float almostOnTime = nextStabilityHours(Math.round(STABILITY_HOURS) - 1);
+    float onTime = nextStabilityHours(Math.round(STABILITY_HOURS));
+    assertThat(almostOnTime, greaterThan(STABILITY_HOURS));
+    assertThat(almostOnTime, lessThanOrEqualTo(onTime));
   }
 
   private float nextStabilityHours(int elapsedInHours) {
-    MakeMe makeMe = MakeMe.makeMeWithoutFactoryService();
-    User user = makeMe.aUser().inMemoryPlease();
-    Note note = makeMe.aNote().inMemoryPlease();
     MemoryTracker memoryTracker =
-        makeMe.aMemoryTrackerFor(note).by(user).afterNthStrictRecall(3).inMemoryPlease();
+        makeMe
+            .aMemoryTrackerFor(note)
+            .by(user)
+            .stabilityAndNextRecallAt(STABILITY_HOURS)
+            .difficulty(DEFAULT_DIFFICULTY)
+            .inMemoryPlease();
     memoryTracker.recalledSuccessfully(
         TimestampOperations.addHoursToTimestamp(memoryTracker.getLastRecalledAt(), elapsedInHours),
         null);

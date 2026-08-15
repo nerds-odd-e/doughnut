@@ -18,9 +18,9 @@ match. Introduce or replace structure **only** when that behavior needs it.
 No unused Difficulty, lapse, requested-retention, or RecallLog fields
 for later slices.
 
-First implementation after this ADR lock (**B3**) is **in code**: overdue correct lengthens Stability more than on-time. **B1** persist D exists (schema); D consumption and **D3** first-grade init are later slices of this plan. B2/B4 and C–E stay open.
+Ordinary **correct** recall with S > 0 uses FSRS-6 Good SInc (own implementation, frozen default `w`). **B1** D is consumed for that increment. Remaining in plan 004: harder D → less growth, D-update, first-grade init, E2E day lists. B2 requested-retention knob, B4, and C–E stay open.
 
-Current Doughnut persists **Stability** in whole hours (the current interval) and **Difficulty** (nullable; hidden). Retrievability is computed in the success path as elapsed vs Stability. There is still **no** lapse count, requested retention, FSRS weights, or card state (`New` / `Learning` / `Review` / `Relearning`). Remaining gaps close by **vertical slice** (ADR 0003 Decision).
+Current Doughnut persists **Stability** in whole hours and **Difficulty** (nullable; hidden). Retrievability is computed in the success path (FSRS-6 power curve). There is still **no** lapse count, requested-retention knob, or card state (`New` / `Learning` / `Review` / `Relearning`). Remaining gaps close by **vertical slice** (ADR 0003 Decision).
 
 ## 1. What “mostly compatible” should mean
 
@@ -53,14 +53,14 @@ computed R, grade + elapsed time). No `ts-fsrs` / `fsrs-rs` / other FSRS library
 | `recallCount` | Incremented on state-changing grades. |
 | `assimilatedAt` | First intake. Assimilation sets `lastRecalledAt = now` with **no grade**. |
 
-Difficulty is persisted (nullable; not on the learner UI). There is still **no** lapse count, requested retention, FSRS weights, or card state (`New` / `Learning` / `Review` / `Relearning`). Retrievability is not stored.
+Difficulty is persisted (nullable; not on the learner UI) and consumed on ordinary correct recall. Frozen default FSRS-6 weights live in `FsrsStabilityIncrement`. There is still **no** lapse count, requested-retention knob, or card state (`New` / `Learning` / `Review` / `Relearning`). Retrievability is not stored.
 
 **Success** (`ForgettingCurve.succeeded`):
 
-- On-time: one spacing-ladder step.
-- If `elapsedHours < stability`: smaller step (early recall grows less).
-- If overdue: **strictly longer** next Stability than on-time; extra approaches one extra step as elapsed/Stability grows (not linear).
-- Optional thinking-time tweak: `±sqrt(|t − 25s|)` scaled to the ladder, clamped 0–60s, **within** correct only.
+- S > 0: FSRS-6 Good SInc (math in days, persist whole hours). SInc ≥ 1. Null D treated as 5.
+- S = 0: first success still **24h**.
+- Early (high R) grows less; overdue (low R) grows more and extra converges (B3).
+- Optional thinking-time tweak on the FSRS result: `±sqrt(|t − 25s|)` clamped 0–60s, **within** correct only.
 
 **Failure:** step down the ladder, then **forced `nextRecallAt = now + 12h`**, not the interval implied by the reduced Stability. `lastRecalledAt` **does** advance.
 
@@ -110,11 +110,11 @@ FSRS **Hard (G=2) is still success**. That is the sharpest mapping clash with Do
 
 | Open FSRS | Doughnut today | Kind of gap |
 |-----------|----------------|-------------|
-| Persist D and S; compute R(t, S) | Persist S (hours) and D (nullable, hidden); R not stored | **Model** (D column exists; not yet consumed) |
-| Interval from requested retention | Built-in hours ladder (no learner day list) | **Product knob** |
+| Persist D and S; compute R(t, S) | Persist S (hours) and D (nullable, hidden); R computed on success | **Model** (D consumed for SInc; D-update later) |
+| Interval from requested retention | Ordinary correct uses SInc; `nextRecallAt = last + S` (`r = 0.9` implicit). Fail/confusion/commissioned still ladder | **Product knob** (B2 r-knob open) |
 | G ∈ {1,2,3,4} | Incorrect / correct + overlap / accidental match + Tutor 0–5 + thinking time | **Grades** |
 | Overdue success: bounded extra S via low R | Overdue correct lengthens S more than on-time; extra converges | **Aligned** (B3) |
-| Early success: smaller SInc via high R | Linear `elapsed/interval` on the increment | **Formula** (same direction) |
+| Early success: smaller SInc via high R | FSRS-6 R in SInc (same direction) | **Aligned** |
 | Post-lapse S then relearning steps | −20 index + fixed 12h | **Relearning** |
 | Same-day short-term scheduler | Whole hours; elapsed 0 on a positive interval → **zero growth** | **Short-term** |
 | New card has no S/D until first rating | Assimilate is New: S=0, D unset, due now (not a grade); first-grade init later | **First state** (D3 locked in ADR) |
@@ -169,11 +169,11 @@ due times. Implementing the locked targets later will.
 **Vertical slicing** is locked in ADR 0003 for all remaining FSRS gaps (not
 only B). First behavior: **B3**.
 
-**B1. Persist D / S when a behavior consumes them** (was O2) — **schema in progress 2026-08-15**
+**B1. Persist D / S when a behavior consumes them** (was O2) — **in code 2026-08-15**
 
-`memory_tracker.difficulty` now exists (nullable float, hidden). Graded rows backfilled to **5**; assimilate-only / New rows leave D unset. Stability was already persisted. Consumption of D on correct recall (SInc, D-update, first-grade init) is later slices of this plan — this persist does not change due times.
+`memory_tracker.difficulty` exists (nullable float, hidden). Graded rows backfilled to **5**; assimilate-only / New rows leave D unset. Ordinary correct with S > 0 consumes D for FSRS-6 Good SInc. D-update and first-grade init remain later slices of this plan.
 
-**B1 persist D exists.** First consumer of D is not this schema slice.
+**B1 persist D exists and is consumed for SInc.**
 
 **B2. Interval source** (was O6) — user-visible
 
@@ -202,7 +202,7 @@ Do not add an unused counter. Before adding: which outcomes increment it; first 
 Closing B4 by deferring: no change. An unused lapse column later would be
 internal only; using lapses to change due times would be behavior.
 
-**B3 in running code:** overdue correct lengthens Stability more than on-time. **B1** persist D exists (not yet consumed). B2/B4 remain open. Requested retention is still a later gap.
+**B3 in running code:** overdue correct lengthens Stability more than on-time (now via FSRS SInc). **B1** D is consumed for SInc. B2 requested-retention knob and B4 remain open.
 
 ---
 
@@ -339,7 +339,7 @@ Hygiene while this doc is the tracker: do not duplicate open issues in the ADR; 
 | ID | Topic | ADR must lock? | Suggested |
 |----|-------|----------------|-----------|
 | A1 | FSRS-compatible = own D/S/R implementation, no library | **Resolved** | Locked 2026-08-15 |
-| B1 | When to persist D/S | **Schema in progress** | Persist D exists (nullable; graded backfill 5); consumption later in this plan |
+| B1 | When to persist D/S | **In code** | Persist D exists; ordinary correct consumes D for SInc |
 | B2 | Interval table vs requested retention | Yes | Open |
 | B3 | Overdue bounded extra growth | **Resolved** | Locked and implemented 2026-08-15 |
 | B4 | Lapses | Defer | Defer |
