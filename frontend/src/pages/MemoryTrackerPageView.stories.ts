@@ -24,14 +24,14 @@ const createRecallPromptWithAnswer = (opts: {
   answerIndex: number
   isCorrect: boolean
 }) => {
-  const predefinedQuestion = makeMe.aPredefinedQuestion
+  const mcq = makeMe.aPredefinedQuestion
     .withQuestionStem(opts.stem)
     .withChoices(opts.choices)
     .correctAnswerIndex(opts.correctIndex)
     .please()
 
   return makeMe.aRecallPromptHistoryItem
-    .withPredefinedQuestion(predefinedQuestion)
+    .withMcq(mcq)
     .withAnswer({
       id: 1,
       correct: opts.isCorrect,
@@ -85,7 +85,7 @@ export const NoteWithManyAncestors: Story = {
       )
       .please()
 
-    const predefinedQuestion = makeMe.aPredefinedQuestion
+    const mcq = makeMe.aPredefinedQuestion
       .withQuestionStem("What is TypeScript?")
       .withChoices([
         "A programming language",
@@ -99,7 +99,7 @@ export const NoteWithManyAncestors: Story = {
     return {
       recallPrompts: [
         makeMe.aRecallPromptHistoryItem
-          .withPredefinedQuestion(predefinedQuestion)
+          .withMcq(mcq)
           .withAnswer({
             id: 1,
             correct: true,

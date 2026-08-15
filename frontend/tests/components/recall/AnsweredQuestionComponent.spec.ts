@@ -140,7 +140,7 @@ describe("AnsweredQuestionComponent", () => {
     })
 
     it("passes MCQ context when opening Refine note", async () => {
-      const predefinedQuestion = makeMe.aPredefinedQuestion
+      const mcq = makeMe.aPredefinedQuestion
         .withQuestionStem("What is the capital of France?")
         .withChoices(["Paris", "London", "Berlin"])
         .correctAnswerIndex(0)
@@ -161,7 +161,7 @@ describe("AnsweredQuestionComponent", () => {
         .please()
       const answeredQuestion = makeMe.anAnsweredQuestion
         .withNote(noteRealm.note)
-        .withPredefinedQuestion(predefinedQuestion)
+        .withMcq(mcq)
         .please()
       const chain = helper
         .component(AnsweredQuestionComponent)

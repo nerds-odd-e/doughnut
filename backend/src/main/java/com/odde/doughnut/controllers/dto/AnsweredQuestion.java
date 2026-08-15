@@ -29,7 +29,7 @@ public class AnsweredQuestion {
   @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
   private Answer answer;
 
-  private PredefinedQuestion predefinedQuestion;
+  private PredefinedQuestion mcq;
 
   private List<NoteTopology> matchedNotes;
 
@@ -43,7 +43,7 @@ public class AnsweredQuestion {
         RecalledNote.from(recallPrompt.getNote(), recallPrompt.getPropertyKey()));
     answeredQuestion.setAnswer(recallPrompt.getAnswer());
     if (recallPrompt.getQuestionType() == QuestionType.MCQ) {
-      answeredQuestion.setPredefinedQuestion(recallPrompt.getPredefinedQuestion());
+      answeredQuestion.setMcq(recallPrompt.getPredefinedQuestion());
     }
     return answeredQuestion;
   }

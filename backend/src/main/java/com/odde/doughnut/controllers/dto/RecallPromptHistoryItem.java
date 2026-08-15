@@ -28,7 +28,7 @@ public class RecallPromptHistoryItem {
 
   private Answer answer;
 
-  private PredefinedQuestion predefinedQuestion;
+  private PredefinedQuestion mcq;
 
   private MultipleChoicesQuestion multipleChoicesQuestion;
 
@@ -40,7 +40,7 @@ public class RecallPromptHistoryItem {
     item.setIsContested(recallPrompt.getIsContested());
     item.setAnswerTime(recallPrompt.getAnswerTime());
     item.setAnswer(recallPrompt.getAnswer());
-    item.setPredefinedQuestion(recallPrompt.getPredefinedQuestion());
+    item.setMcq(recallPrompt.getPredefinedQuestion());
     item.setMultipleChoicesQuestion(recallPrompt.getMultipleChoicesQuestion());
     return item;
   }

@@ -594,10 +594,7 @@ const testability = () => {
 
     submitWrongMcqRecallAnswer(wrongChoiceText: string) {
       return this.dueRecallPrompt().then((recallPrompt) => {
-        const choices =
-          recallPrompt?.multipleChoicesQuestion?.responseChoices ??
-          recallPrompt?.predefinedQuestion?.multipleChoicesQuestion
-            ?.responseChoices
+        const choices = recallPrompt?.multipleChoicesQuestion?.responseChoices
         expect(choices, 'expected MCQ response choices').to.exist
         const choiceIndex = choices!.indexOf(wrongChoiceText)
         expect(

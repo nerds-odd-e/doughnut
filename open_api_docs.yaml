@@ -3778,7 +3778,7 @@ components:
           $ref: "#/components/schemas/RecalledNote"
         answer:
           $ref: "#/components/schemas/Answer"
-        predefinedQuestion:
+        mcq:
           $ref: "#/components/schemas/PredefinedQuestion"
         matchedNotes:
           type: array
@@ -5314,7 +5314,7 @@ components:
           format: date-time
         answer:
           $ref: "#/components/schemas/Answer"
-        predefinedQuestion:
+        mcq:
           $ref: "#/components/schemas/PredefinedQuestion"
         multipleChoicesQuestion:
           $ref: "#/components/schemas/MultipleChoicesQuestion"

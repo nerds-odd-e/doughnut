@@ -19,13 +19,13 @@
     </div>
   </div>
   <QuestionDisplay
-    v-if="answeredQuestion.predefinedQuestion"
+    v-if="answeredQuestion.mcq"
     v-bind="{
-      multipleChoicesQuestion: answeredQuestion.predefinedQuestion.multipleChoicesQuestion,
-      correctChoiceIndex: answeredQuestion.predefinedQuestion.correctAnswerIndex,
+      multipleChoicesQuestion: answeredQuestion.mcq.multipleChoicesQuestion,
+      correctChoiceIndex: answeredQuestion.mcq.correctAnswerIndex,
       answer: answeredQuestion.answer,
-      testedFocus: answeredQuestion.predefinedQuestion.testedFocus,
-      validationRationale: answeredQuestion.predefinedQuestion.validationRationale,
+      testedFocus: answeredQuestion.mcq.testedFocus,
+      validationRationale: answeredQuestion.mcq.validationRationale,
     }"
   />
   <ConversationButton
@@ -82,13 +82,13 @@ const hasNoteContent = computed(() => !!(note.value?.content ?? "").trim())
 
 const questionContext = computed<NoteRefinementQuestionContextDto | undefined>(
   () => {
-    const predefined = props.answeredQuestion.predefinedQuestion
-    if (!predefined?.multipleChoicesQuestion) return undefined
+    const mcq = props.answeredQuestion.mcq
+    if (!mcq?.multipleChoicesQuestion) return undefined
     return {
-      stem: predefined.multipleChoicesQuestion.questionStem,
-      choices: predefined.multipleChoicesQuestion.responseChoices,
-      correctAnswerIndex: predefined.correctAnswerIndex,
-      testedFocus: predefined.testedFocus,
+      stem: mcq.multipleChoicesQuestion.questionStem,
+      choices: mcq.multipleChoicesQuestion.responseChoices,
+      correctAnswerIndex: mcq.correctAnswerIndex,
+      testedFocus: mcq.testedFocus,
     }
   }
 )

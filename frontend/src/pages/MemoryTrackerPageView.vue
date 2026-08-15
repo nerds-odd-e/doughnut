@@ -94,14 +94,14 @@
             </div>
           </div>
           <QuestionDisplay
-            v-else-if="prompt.predefinedQuestion && prompt.answer"
+            v-else-if="prompt.mcq && prompt.answer"
             v-bind="{
-              multipleChoicesQuestion: prompt.predefinedQuestion.multipleChoicesQuestion,
-              correctChoiceIndex: prompt.predefinedQuestion.correctAnswerIndex,
+              multipleChoicesQuestion: prompt.mcq.multipleChoicesQuestion,
+              correctChoiceIndex: prompt.mcq.correctAnswerIndex,
               answer: prompt.answer,
               disabled: true,
-              testedFocus: prompt.predefinedQuestion.testedFocus,
-              validationRationale: prompt.predefinedQuestion.validationRationale,
+              testedFocus: prompt.mcq.testedFocus,
+              validationRationale: prompt.mcq.validationRationale,
             }"
           />
           <QuestionDisplay

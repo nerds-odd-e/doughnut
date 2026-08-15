@@ -42,11 +42,10 @@ export function recallAnsweredMcqInk(args: {
     )
   )
   const correct = args.answeredPrompt.answer.correct === true
-  const fromPredefined =
-    args.answeredPrompt.predefinedQuestion?.correctAnswerIndex
+  const fromMcq = args.answeredPrompt.mcq?.correctAnswerIndex
   const correctChoiceIndex =
-    fromPredefined !== undefined && fromPredefined !== null
-      ? fromPredefined
+    fromMcq !== undefined && fromMcq !== null
+      ? fromMcq
       : correct && args.answeredPrompt.answer.choiceIndex !== undefined
         ? args.answeredPrompt.answer.choiceIndex
         : undefined

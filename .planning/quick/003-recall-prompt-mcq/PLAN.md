@@ -78,15 +78,11 @@ Shipped: SDK operation **`answer`** (not `answerQuiz`); path still
 
 ### 6. Answered field is mcq
 
-- **Status:** planned
+- **Status:** done
 - **Type:** Behavior
-- **Pre:** Learner has answered an MCQ recall prompt.
-- **Trigger:** Result or history is shown.
-- **Post:** JSON field is **`mcq`**, not `predefinedQuestion`. Java/OpenAPI
-  type may still be `PredefinedQuestion`.
 
-**Tests:** answered-question component spec; memory-tracker history tests;
-regen client.
+Shipped: answered result and history JSON/OpenAPI property is **`mcq`**.
+Type remains `PredefinedQuestion`. Builders use `withMcq`.
 
 ### 7. Tests say MCQ on the note
 
@@ -191,3 +187,4 @@ note MCQ E2E; regen compile.
 - Slice 2: `makeMe.aRecallPrompt` is the unanswered-ask DTO; history items are `makeMe.aRecallPromptHistoryItem`. `RecallQuestionService` and CLI `RecallQuestionAnswerOutcome` wait for later slices.
 - Slice 3: SDK operation is `getRecallPrompt` (history list remains `getRecallPrompts`). Fetch extracted to `useRecallPromptFetching` / `recallMcqCardLoad`.
 - Slice 5: CLI `RecallQuestionAnswerOutcome` still deferred; JSON `predefinedQuestion` is slice 6.
+- Slice 6: answered/history property is `mcq`; Java type still `PredefinedQuestion`.

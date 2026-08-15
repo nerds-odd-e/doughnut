@@ -295,7 +295,7 @@ export type AnsweredQuestion = {
     memoryTrackerId: number;
     recalledNote: RecalledNote;
     answer: Answer;
-    predefinedQuestion?: PredefinedQuestion;
+    mcq?: PredefinedQuestion;
     matchedNotes?: Array<NoteTopology>;
 };
 
@@ -1092,7 +1092,7 @@ export type RecallPromptHistoryItem = {
     isContested?: boolean;
     answerTime?: string;
     answer?: Answer;
-    predefinedQuestion?: PredefinedQuestion;
+    mcq?: PredefinedQuestion;
     multipleChoicesQuestion?: MultipleChoicesQuestion;
 };
 

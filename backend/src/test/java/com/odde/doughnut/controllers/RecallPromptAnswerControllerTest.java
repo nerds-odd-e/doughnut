@@ -4,6 +4,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.controllers.dto.AnswerDTO;
 import com.odde.doughnut.controllers.dto.AnsweredQuestion;
 import com.odde.doughnut.entities.ForgettingCurve;
@@ -16,9 +18,11 @@ import java.sql.Timestamp;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.server.ResponseStatusException;
 
 class RecallPromptAnswerControllerTest extends RecallPromptControllerTestBase {
+  @Autowired ObjectMapper objectMapper;
   MemoryTracker memoryTracker;
   RecallPrompt recallPrompt;
   AnswerDTO answerDTO;
@@ -61,6 +65,14 @@ class RecallPromptAnswerControllerTest extends RecallPromptControllerTestBase {
     assertThat(noteLevelTracker.getRecallCount(), equalTo(noteLevelRecallCountBefore));
     assertThat(noteLevelTracker.getForgettingCurveIndex(), equalTo(noteLevelIndexBefore));
     assertThat(propertyTracker.getRecallCount(), greaterThan(propertyRecallCountBefore));
+  }
+
+  @Test
+  void shouldExposeAnsweredMcqUnderMcqField() throws Exception {
+    AnsweredQuestion answerResult = controller.answer(recallPrompt, answerDTO);
+    JsonNode json = objectMapper.readTree(objectMapper.writeValueAsString(answerResult));
+    assertThat(json.has("mcq"), is(true));
+    assertThat(json.has("predefinedQuestion"), is(false));
   }
 
   @Test

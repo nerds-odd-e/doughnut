@@ -31,7 +31,7 @@ const createAnsweredQuestionWithQuestion = (opts: {
   const note = makeMe.aNote.title(opts.noteTitle).please()
   return makeMe.anAnsweredQuestion
     .withNote(note)
-    .withPredefinedQuestion(
+    .withMcq(
       makeMe.aPredefinedQuestion
         .withQuestionStem(opts.stem)
         .withChoices(opts.choices)

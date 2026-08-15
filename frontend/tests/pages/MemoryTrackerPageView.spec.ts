@@ -119,6 +119,26 @@ describe("MemoryTrackerPageView display", () => {
     expect(wrapper.text()).toContain("Contested")
   })
 
+  it("shows tested focus from the answered MCQ", async () => {
+    const wrapper = await mountMemoryTrackerPageViewReady({
+      recallPrompts: [
+        makeMe.aRecallPromptHistoryItem
+          .withMcq(
+            makeMe.aPredefinedQuestion
+              .withQuestionStem("What is the capital of France?")
+              .withChoices(["Paris", "London"])
+              .testedFocus("capital city")
+              .please()
+          )
+          .withAnswer({ id: 1, correct: true, choiceIndex: 0 })
+          .withAnswerTime(new Date().toISOString())
+          .please(),
+      ],
+    })
+
+    expect(wrapper.text()).toContain("capital city")
+  })
+
   it("shows answer time for answered questions", async () => {
     const answerTime = new Date("2024-01-01T12:00:00Z").toISOString()
     const wrapper = await mountMemoryTrackerPageViewReady({
@@ -126,7 +146,7 @@ describe("MemoryTrackerPageView display", () => {
         makeMe.aRecallPromptHistoryItem
           .withAnswerTime(answerTime)
           .withAnswer({ id: 1, correct: true, choiceIndex: 0 })
-          .withPredefinedQuestion(makeMe.aPredefinedQuestion.please())
+          .withMcq(makeMe.aPredefinedQuestion.please())
           .please(),
       ],
     })

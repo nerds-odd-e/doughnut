@@ -4,6 +4,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.controllers.dto.RecallPromptHistoryItem;
 import com.odde.doughnut.entities.Conversation;
 import com.odde.doughnut.entities.MemoryTracker;
@@ -13,9 +15,11 @@ import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import java.util.List;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.server.ResponseStatusException;
 
 class MemoryTrackerRecallPromptsControllerTest extends MemoryTrackerControllerTestBase {
+  @Autowired ObjectMapper objectMapper;
 
   private RecallPrompt answeredPromptFor(MemoryTracker tracker, Note note) {
     return makeMe
@@ -60,6 +64,19 @@ class MemoryTrackerRecallPromptsControllerTest extends MemoryTrackerControllerTe
               .map(RecallPromptHistoryItem::getId)
               .toList(),
           containsInAnyOrder(answered.getId(), unanswered.getId()));
+    }
+
+    @Test
+    void shouldExposeAnsweredMcqUnderMcqField() throws Exception {
+      Note note = ownedNote();
+      MemoryTracker tracker = ownedTracker(note);
+      answeredPromptFor(tracker, note);
+
+      JsonNode json =
+          objectMapper.readTree(
+              objectMapper.writeValueAsString(controller.getRecallPrompts(tracker)));
+      assertThat(json.get(0).has("mcq"), is(true));
+      assertThat(json.get(0).has("predefinedQuestion"), is(false));
     }
 
     @Test

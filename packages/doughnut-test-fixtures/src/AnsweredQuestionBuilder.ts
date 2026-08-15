@@ -17,7 +17,7 @@ class AnsweredQuestionBuilder extends Builder<AnsweredQuestion> {
   private memoryTrackerIdToUse = generateId()
   private idToUse?: number
   private questionType: 'MCQ' | 'SPELLING' = 'MCQ'
-  private predefinedQuestionToUse?: PredefinedQuestion
+  private mcqToUse?: PredefinedQuestion
   private answerToUse?: Answer
   private notebookIdToUse = generateId()
   private matchedNotesToUse?: NoteTopology[]
@@ -52,8 +52,8 @@ class AnsweredQuestionBuilder extends Builder<AnsweredQuestion> {
     return this
   }
 
-  withPredefinedQuestion(predefinedQuestion: PredefinedQuestion): this {
-    this.predefinedQuestionToUse = predefinedQuestion
+  withMcq(mcq: PredefinedQuestion): this {
+    this.mcqToUse = mcq
     return this
   }
 
@@ -107,7 +107,7 @@ class AnsweredQuestionBuilder extends Builder<AnsweredQuestion> {
   ): this {
     this.idToUse = pending.id
     this.noteToUse = note
-    this.predefinedQuestionToUse = pending.predefinedQuestion
+    this.mcqToUse = pending.mcq
     this.memoryTrackerIdToUse = memoryTrackerId
     return this
   }
@@ -128,9 +128,9 @@ class AnsweredQuestionBuilder extends Builder<AnsweredQuestion> {
           choiceIndex: this.choiceIndexToUse,
         }),
       } as Answer)
-    const predefinedQuestion =
+    const mcq =
       this.questionType === 'MCQ'
-        ? (this.predefinedQuestionToUse ?? makeMe.aPredefinedQuestion.please())
+        ? (this.mcqToUse ?? makeMe.aPredefinedQuestion.please())
         : undefined
     return {
       id: this.idToUse ?? generateId(),
@@ -143,7 +143,7 @@ class AnsweredQuestionBuilder extends Builder<AnsweredQuestion> {
         propertyKey: this.propertyKeyToUse,
       },
       answer,
-      predefinedQuestion,
+      mcq,
       ...(this.matchedNotesToUse !== undefined && {
         matchedNotes: this.matchedNotesToUse,
       }),
