@@ -34,17 +34,16 @@ class McqControllerTests extends ControllerTestBase {
   }
 
   @Nested
-  class GetListOfMcqForNotebook {
+  class ListMcqs {
     @Test
     void authorization() {
       Note note = makeMe.aNote().please();
-      assertThrows(
-          UnexpectedNoAccessRightException.class, () -> controller.getAllQuestionByNote(note));
+      assertThrows(UnexpectedNoAccessRightException.class, () -> controller.list(note));
     }
 
     @Test
     void getMcqsWhenThereAreNone() throws UnexpectedNoAccessRightException {
-      assertThat(controller.getAllQuestionByNote(ownedNote()), hasSize(0));
+      assertThat(controller.list(ownedNote()), hasSize(0));
     }
 
     @Test
@@ -53,7 +52,7 @@ class McqControllerTests extends ControllerTestBase {
       Mcq mcq = makeMe.anMcq().ofAIGeneratedQuestionForNote(note).please();
       makeMe.refresh(note);
 
-      assertThat(controller.getAllQuestionByNote(note), contains(mcq));
+      assertThat(controller.list(note), contains(mcq));
     }
 
     @Test
@@ -62,48 +61,44 @@ class McqControllerTests extends ControllerTestBase {
       makeMe.anMcq().ofAIGeneratedQuestionForNote(note).please();
       makeMe.refresh(note);
 
-      assertThat(controller.getAllQuestionByNote(note), hasSize(2));
+      assertThat(controller.list(note), hasSize(2));
     }
   }
 
   @Nested
-  class addQuestionToNote {
+  class AddMcq {
     @Test
     void authorization() {
       Note note = makeMe.aNote().please();
       Mcq mcq = makeMe.anMcq().please();
-      assertThrows(
-          UnexpectedNoAccessRightException.class, () -> controller.addQuestionManually(note, mcq));
+      assertThrows(UnexpectedNoAccessRightException.class, () -> controller.add(note, mcq));
     }
 
     @Test
     void persistent() throws UnexpectedNoAccessRightException {
       Note note = ownedNote();
-      controller.addQuestionManually(note, makeMe.anMcq().please());
+      controller.add(note, makeMe.anMcq().please());
       makeMe.refresh(note);
       assertThat(note.getMcqs(), hasSize(1));
     }
   }
 
   @Nested
-  class GenerateQuestionWithoutSave {
+  class GenerateMcq {
     @Test
     void shouldThrowWhenOpenAiNotAvailable() {
       Note note = ownedNote();
       testabilitySettings.setOpenAiTokenOverride("");
-      assertThrows(
-          OpenAiNotAvailableException.class, () -> controller.generateQuestionWithoutSave(note));
+      assertThrows(OpenAiNotAvailableException.class, () -> controller.generate(note));
     }
   }
 
   @Nested
-  class ExportQuestionGeneration {
+  class ExportMcq {
     @Test
     void shouldNotBeAbleToExportQuestionGenerationForNoteIAmNotAuthorized() {
       Note otherNote = makeMe.aNote().please();
-      assertThrows(
-          UnexpectedNoAccessRightException.class,
-          () -> controller.exportQuestionGeneration(otherNote));
+      assertThrows(UnexpectedNoAccessRightException.class, () -> controller.export(otherNote));
     }
 
     @Test
@@ -111,7 +106,7 @@ class McqControllerTests extends ControllerTestBase {
         throws UnexpectedNoAccessRightException {
       Note note = ownedNote("There are 42 prefectures in Japan");
 
-      Map<String, Object> request = controller.exportQuestionGeneration(note);
+      Map<String, Object> request = controller.export(note);
 
       assertThat(request.keySet(), hasItems("model", "instructions", "input", "text"));
       assertThat(request.get("max_output_tokens"), is(1000));

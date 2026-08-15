@@ -23,14 +23,12 @@ export const addQuestionPage = () => {
       return this
     },
     addQuestion(row: Record<string, string>) {
-      cy.intercept('POST', '**/api/mcqs/**/note-questions').as(
-        'addQuestionManually'
-      )
+      cy.intercept('POST', /\/api\/mcqs\/\d+$/).as('add')
       this.fillQuestion(row)
       cy.findByRole('button', { name: 'Submit' }).click()
       waitUntilAppIsNotBusy()
-      cy.wait('@addQuestionManually').then(({ response }) => {
-        expect(response?.statusCode, 'add question manually').to.equal(200)
+      cy.wait('@add').then(({ response }) => {
+        expect(response?.statusCode, 'add').to.equal(200)
       })
       cy.get('.question-table').should('contain.text', row.Stem!)
       return this

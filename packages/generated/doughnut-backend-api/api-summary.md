@@ -146,11 +146,11 @@ Use this for endpoint lookup; open `sdk.gen.ts` or `types.gen.ts` only for exact
 
 ## Mcq Controller
 
-- `refineQuestion`: POST `/api/mcqs/{note}/refine-question` -> `RefineQuestionResponse` (request: `RefineQuestionData`; path: note; body: Mcq; response body: Mcq)
-- `getAllQuestionByNote`: GET `/api/mcqs/{note}/note-questions` -> `GetAllQuestionByNoteResponse` (request: `GetAllQuestionByNoteData`; path: note; response body: Array<Mcq>)
-- `addQuestionManually`: POST `/api/mcqs/{note}/note-questions` -> `AddQuestionManuallyResponse` (request: `AddQuestionManuallyData`; path: note; body: Mcq; response body: Mcq)
-- `generateQuestionWithoutSave`: POST `/api/mcqs/generate-question-without-save` -> `GenerateQuestionWithoutSaveResponse` (request: `GenerateQuestionWithoutSaveData`; query: note; response body: Mcq)
-- `exportQuestionGeneration`: GET `/api/mcqs/{note}/export-question-generation` -> `ExportQuestionGenerationResponse` (request: `ExportQuestionGenerationData`; path: note; response body: Record<string, unknown>)
+- `list`: GET `/api/mcqs/{note}` -> `ListResponse` (request: `ListData`; path: note; response body: Array<Mcq>)
+- `add`: POST `/api/mcqs/{note}` -> `AddResponse` (request: `AddData`; path: note; body: Mcq; response body: Mcq)
+- `refine`: POST `/api/mcqs/{note}/refine` -> `RefineResponse` (request: `RefineData`; path: note; body: Mcq; response body: Mcq)
+- `generate`: POST `/api/mcqs/generate` -> `GenerateResponse` (request: `GenerateData`; query: note; response body: Mcq)
+- `export`: GET `/api/mcqs/{note}/export` -> `ExportResponse` (request: `ExportData`; path: note; response body: Record<string, unknown>)
 
 ## Learning Session Controller
 

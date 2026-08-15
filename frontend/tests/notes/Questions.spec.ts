@@ -20,9 +20,9 @@ describe("Questions", () => {
   })
 
   it("shows export dialog when export button is clicked", async () => {
-    const exportQuestionGenerationSpy = mockSdkService(
+    const exportSpy = mockSdkService(
       McqController,
-      "exportQuestionGeneration",
+      "export",
       sampleQuestionExportData
     )
 
@@ -30,7 +30,7 @@ describe("Questions", () => {
     await clickExportQuestionGeneration()
 
     expect(exportTextarea()).toBeTruthy()
-    expect(exportQuestionGenerationSpy).toHaveBeenCalledWith({
+    expect(exportSpy).toHaveBeenCalledWith({
       path: { note: questionsNote.id },
     })
   })

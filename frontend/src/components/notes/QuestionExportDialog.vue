@@ -20,10 +20,9 @@ defineEmits<{
 }>()
 
 async function fetchQuestionExport() {
-  const { data: response, error } =
-    await McqController.exportQuestionGeneration({
-      path: { note: props.noteId },
-    })
+  const { data: response, error } = await McqController.export({
+    path: { note: props.noteId },
+  })
   if (!error && response) {
     return response
   }

@@ -60,7 +60,7 @@ class McqRefinementControllerTests extends ControllerTestBase {
             .choicesMayBeShuffled(true)
             .please());
 
-    Mcq result = controller.refineQuestion(note, mcq);
+    Mcq result = controller.refine(note, mcq);
 
     assertThat(result.getResponseChoices(), equalTo(List.of("Red", "Green", "Blue")));
     assertThat(result.getCorrectAnswerIndex(), equalTo(2));
@@ -76,13 +76,13 @@ class McqRefinementControllerTests extends ControllerTestBase {
             .choicesMayBeShuffled(true)
             .please());
 
-    assertThat(controller.refineQuestion(note, mcq), nullValue());
+    assertThat(controller.refine(note, mcq), nullValue());
   }
 
   @Test
   void refineQuestionFailedWithGpt35WillNotTryAgain() {
     openAiStructuredResponseMock.stubStructuredResponseMalformed("{invalid json}");
-    assertThrows(RuntimeException.class, () -> controller.refineQuestion(note, mcq));
+    assertThrows(RuntimeException.class, () -> controller.refine(note, mcq));
     verify(openAiStructuredResponseMock.responseService(), Mockito.times(1))
         .create(ArgumentMatchers.any(StructuredResponseCreateParams.class));
   }
@@ -90,6 +90,6 @@ class McqRefinementControllerTests extends ControllerTestBase {
   @Test
   void shouldThrowWhenOpenAiNotAvailable() {
     testabilitySettings.setOpenAiTokenOverride("");
-    assertThrows(OpenAiNotAvailableException.class, () -> controller.refineQuestion(note, mcq));
+    assertThrows(OpenAiNotAvailableException.class, () -> controller.refine(note, mcq));
   }
 }

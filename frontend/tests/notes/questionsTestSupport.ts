@@ -37,7 +37,7 @@ export let wrapper: VueWrapper
 export function setupQuestionsTests() {
   beforeEach(() => {
     vi.clearAllMocks()
-    mockSdkService(McqController, "getAllQuestionByNote", questionsFixture)
+    mockSdkService(McqController, "list", questionsFixture)
   })
 
   afterEach(() => {

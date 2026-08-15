@@ -2250,77 +2250,77 @@ export type ReEnableResponses = {
 
 export type ReEnableResponse = ReEnableResponses[keyof ReEnableResponses];
 
-export type RefineQuestionData = {
-    body: Mcq;
-    path: {
-        note: number;
-    };
-    query?: never;
-    url: '/api/mcqs/{note}/refine-question';
-};
-
-export type RefineQuestionResponses = {
-    /**
-     * OK
-     */
-    200: Mcq;
-};
-
-export type RefineQuestionResponse = RefineQuestionResponses[keyof RefineQuestionResponses];
-
-export type GetAllQuestionByNoteData = {
+export type ListData = {
     body?: never;
     path: {
         note: number;
     };
     query?: never;
-    url: '/api/mcqs/{note}/note-questions';
+    url: '/api/mcqs/{note}';
 };
 
-export type GetAllQuestionByNoteResponses = {
+export type ListResponses = {
     /**
      * OK
      */
     200: Array<Mcq>;
 };
 
-export type GetAllQuestionByNoteResponse = GetAllQuestionByNoteResponses[keyof GetAllQuestionByNoteResponses];
+export type ListResponse = ListResponses[keyof ListResponses];
 
-export type AddQuestionManuallyData = {
+export type AddData = {
     body: Mcq;
     path: {
         note: number;
     };
     query?: never;
-    url: '/api/mcqs/{note}/note-questions';
+    url: '/api/mcqs/{note}';
 };
 
-export type AddQuestionManuallyResponses = {
+export type AddResponses = {
     /**
      * OK
      */
     200: Mcq;
 };
 
-export type AddQuestionManuallyResponse = AddQuestionManuallyResponses[keyof AddQuestionManuallyResponses];
+export type AddResponse = AddResponses[keyof AddResponses];
 
-export type GenerateQuestionWithoutSaveData = {
+export type RefineData = {
+    body: Mcq;
+    path: {
+        note: number;
+    };
+    query?: never;
+    url: '/api/mcqs/{note}/refine';
+};
+
+export type RefineResponses = {
+    /**
+     * OK
+     */
+    200: Mcq;
+};
+
+export type RefineResponse = RefineResponses[keyof RefineResponses];
+
+export type GenerateData = {
     body?: never;
     path?: never;
     query: {
         note: number;
     };
-    url: '/api/mcqs/generate-question-without-save';
+    url: '/api/mcqs/generate';
 };
 
-export type GenerateQuestionWithoutSaveResponses = {
+export type GenerateResponses = {
     /**
      * OK
      */
     200: Mcq;
 };
 
-export type GenerateQuestionWithoutSaveResponse = GenerateQuestionWithoutSaveResponses[keyof GenerateQuestionWithoutSaveResponses];
+export type GenerateResponse = GenerateResponses[keyof GenerateResponses];
 
 export type RecordData = {
     body: RecordLearningSessionRequest;
@@ -3656,16 +3656,16 @@ export type GetRecentMemoryTrackersResponses = {
 
 export type GetRecentMemoryTrackersResponse = GetRecentMemoryTrackersResponses[keyof GetRecentMemoryTrackersResponses];
 
-export type ExportQuestionGenerationData = {
+export type ExportData = {
     body?: never;
     path: {
         note: number;
     };
     query?: never;
-    url: '/api/mcqs/{note}/export-question-generation';
+    url: '/api/mcqs/{note}/export';
 };
 
-export type ExportQuestionGenerationResponses = {
+export type ExportResponses = {
     /**
      * OK
      */
@@ -3674,7 +3674,7 @@ export type ExportQuestionGenerationResponses = {
     };
 };
 
-export type ExportQuestionGenerationResponse = ExportQuestionGenerationResponses[keyof ExportQuestionGenerationResponses];
+export type ExportResponse = ExportResponses[keyof ExportResponses];
 
 export type RequestData = {
     body?: never;

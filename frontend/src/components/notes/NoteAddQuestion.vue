@@ -109,7 +109,7 @@ const removeChoice = () => {
 
 const submitQuestion = async () => {
   const { data: response, error } = await apiCallWithLoading(() =>
-    McqController.addQuestionManually({
+    McqController.add({
       path: { note: props.note.id },
       body: mcq.value,
     })
@@ -121,7 +121,7 @@ const submitQuestion = async () => {
 
 const refineQuestion = async () => {
   const { data: refined, error } = await apiCallWithLoading(() =>
-    McqController.refineQuestion({
+    McqController.refine({
       path: { note: props.note.id },
       body: mcq.value,
     })
@@ -133,7 +133,7 @@ const refineQuestion = async () => {
 
 const generateQuestionByAI = async () => {
   const { data: generated, error } = await apiCallWithLoading(() =>
-    McqController.generateQuestionWithoutSave({
+    McqController.generate({
       query: { note: props.note.id },
     })
   )

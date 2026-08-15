@@ -52,7 +52,7 @@ describe("QuestionExportDialog", () => {
     })
     mockSdkServiceWithImplementation(
       McqController,
-      "exportQuestionGeneration",
+      "export",
       () => exportPromise
     )
 
@@ -89,11 +89,7 @@ describe("QuestionExportDialog", () => {
       },
       title: "Test Note",
     } as never
-    const spy = mockSdkService(
-      McqController,
-      "exportQuestionGeneration",
-      exportData
-    )
+    const spy = mockSdkService(McqController, "export", exportData)
 
     wrapper = helper
       .component(QuestionExportDialog)
@@ -115,7 +111,7 @@ describe("QuestionExportDialog", () => {
 
   it("displays error message when API call fails", async () => {
     const note = makeMe.aNote.please()
-    const spy = mockSdkService(McqController, "exportQuestionGeneration", {
+    const spy = mockSdkService(McqController, "export", {
       request: { model: "gpt-4", messages: [] },
       title: "Test Note",
     } as never)

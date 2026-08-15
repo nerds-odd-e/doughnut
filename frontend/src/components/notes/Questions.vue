@@ -84,10 +84,9 @@ const questions = ref<Mcq[]>([])
 const showExportDialog = ref(false)
 
 const fetchQuestions = async () => {
-  const { data: allQuestions, error } =
-    await McqController.getAllQuestionByNote({
-      path: { note: props.note.id },
-    })
+  const { data: allQuestions, error } = await McqController.list({
+    path: { note: props.note.id },
+  })
   if (!error && allQuestions) {
     questions.value = allQuestions
   }
