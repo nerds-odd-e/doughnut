@@ -105,3 +105,11 @@ Feature: Assimilation walkthrough
     When I jump to the note page of "Note 1"
     And I open assimilation settings
     Then assimilate should be disabled
+
+  Scenario: Walkthrough does not offer notes from a Skip Memory Tracking notebook
+    Given It's day 1
+    And I have a notebook "Private archive" with a note "Archive memo"
+    And I change notebook "Private archive" to skip memory tracking
+    When I start assimilation from the menu
+    Then I should be assimilating the note "Note 1"
+    And I should see assimilation progress "0/2/5"

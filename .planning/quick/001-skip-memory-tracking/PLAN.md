@@ -1,6 +1,6 @@
 # Skip Memory Tracking — make the glossary true
 
-**Status:** in progress (Phase 1 done)  
+**Status:** in progress (Phases 1–2 done)  
 
 **Source:** Proposed [ADR 0001](../../../docs/adrs/0001-ubiquitous-language.md) — **Skip Memory Tracking** is a notebook setting that opts the notebook out of the **assimilation sequence** and blocks Bazaar subscribe. It does **not** opt the notebook out of recall. Assimilating on a note still creates a memory tracker.
 
@@ -31,19 +31,9 @@ Circle subscribe uses the same endpoint: reject whenever the flag is set.
 ## Phase 2: Walkthrough does not offer a flagged notebook
 
 **Type:** Behavior  
-**Status:** planned
+**Status:** done
 
-**Pre-condition:** Logged-in learner has the usual walkthrough notes plus another notebook with **Skip Memory Tracking** and at least one unassimilated note.
-
-**Trigger:** Start assimilation from the menu.
-
-**Post-condition:** Walkthrough offers a note from a non-flagged notebook; progress totals do not include the flagged notebook’s units.
-
-**Tests:** extend `e2e_test/features/assimilation/assimilation_walkthrough.feature` (capability-named scenario, not a phase number). Reuse `I change notebook {string} to skip memory tracking`. Tag `@wip` until green.
-
-**Implementation:** should already follow from Phase 1; this phase only adds the E2E. If it fails, fix the sequence filter — do not special-case the UI.
-
-**Verify:** `CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/assimilation/assimilation_walkthrough.feature`
+**Landed:** E2E `Walkthrough does not offer notes from a Skip Memory Tracking notebook` in `assimilation_walkthrough.feature`. Menu walkthrough still offers Note 1 with progress `0/2/5` when a flagged notebook has an unassimilated note. No product-code change; Phase 1 filter was sufficient.
 
 ---
 

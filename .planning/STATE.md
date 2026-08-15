@@ -2,19 +2,19 @@
 gsd_state_version: 1.0
 milestone: null
 milestone_name: null
-current_phase: "2"
-current_phase_name: Walkthrough does not offer a flagged notebook
+current_phase: "3"
+current_phase_name: Assimilate-on-note still joins recall
 status: executing
 stopped_at: null
-last_updated: "2026-08-15T07:55:00Z"
+last_updated: "2026-08-15T08:15:00Z"
 last_activity: 2026-08-15
-last_activity_desc: Phase 1 done — flagged notebooks omitted from assimilation sequence
+last_activity_desc: Phase 2 done — walkthrough E2E omits Skip Memory Tracking notes
 progress:
   total_phases: 5
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 1
   completed_plans: 0
-  percent: 20
+  percent: 40
 ---
 
 # Project State
@@ -27,7 +27,7 @@ See: `.planning/PROJECT.md`
 
 ## Current Position
 
-Ad-hoc plan in progress: [`.planning/quick/001-skip-memory-tracking/PLAN.md`](quick/001-skip-memory-tracking/PLAN.md). Phase 1 done: notebooks with **Skip Memory Tracking** are absent from `GET /api/assimilation/next` and unassimilated counts (owned notes, property units, subscribed notebooks). Next: Phase 2 E2E walkthrough.
+Ad-hoc plan in progress: [`.planning/quick/001-skip-memory-tracking/PLAN.md`](quick/001-skip-memory-tracking/PLAN.md). Phases 1–2 done: flagged notebooks are absent from the assimilation sequence (API + walkthrough E2E). Next: Phase 3 regression that assimilate-on-note still creates a recall tracker.
 
 **Ops leftover:** gated dummy-skip conversions. Enable on the deploy that first applies each version, then revert to `1=0`:
 - `dummy_note_sequence_skip_convert` (`V300000254`)
@@ -40,6 +40,6 @@ JDBC harnesses remain temporary until those production applications.
 
 ## Operator Next Steps
 
-- Continue execute-plan on remaining phases 2–5 of `.planning/quick/001-skip-memory-tracking/PLAN.md`
+- Continue execute-plan on remaining phases 3–5 of `.planning/quick/001-skip-memory-tracking/PLAN.md`
 - Enable dummy-skip conversion placeholders on the deploys that first apply V300000254 / V300000255
 - Continue ADR 0003: resolve open issues in `.planning/research/FSRS-COMPATIBILITY-GAP.md`
