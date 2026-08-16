@@ -35,13 +35,11 @@ Learned: 235 → 196 lines. Score 0 added to first-score D-unset/S=0. Score 1 Ag
 
 ### 3. One E2E outline for on-time second-score Stability
 Type: Structure  
-Status: planned
+Status: done
 
 Enables slice 4: production cohesion without three Gherkin copies of the same path.
 
-- Replace the three on-time second Tutor score scenarios (4→102, 5→169, 3→71) with one **Scenario Outline**.
-- Same path and assertion focus; only score and Stability vary (`e2e-authoring.mdc`).
-- Leave first-score 4 Difficulty / first-score 5 Stability as separate scenarios (different unique claims).
+Learned: one Outline with Examples 4→102, 5→169, 3→71; first-score 4 Difficulty and first-score 5 Stability left separate. Cypress commissioned_learning_session.feature 10 passing. Remaining slices unchanged.
 
 ---
 
