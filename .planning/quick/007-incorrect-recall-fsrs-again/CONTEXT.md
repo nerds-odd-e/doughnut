@@ -18,15 +18,18 @@ Do not mix with in-progress [quick/006](../006-difficulty-card-and-test-cleanup/
 
 ## Doughnut today
 
-`MemoryTracker.recallFailed` sets Stability via `hoursAfterSpacingDelta(S, −2)` (Fibonacci `DEFAULT_SPACES`) and `nextRecallAt = now + 12h`. It does not use elapsed time or update Difficulty. Accidental-match **primary** is this path. Existing E2E 12h checks (`recall_quiz_ai_question`, `accidental_match_reveal`) are mostly **first-grade fail on New** — they do not cover S > 0 Again.
+`MemoryTracker.recallFailed` sets Stability via `hoursAfterSpacingDelta(S, −2)` (Fibonacci `DEFAULT_SPACES`) and `nextRecallAt = now + 12h`. It does not use elapsed time or update Difficulty. Accidental-match **primary** is this path (`S = 200` in that fixture). Existing E2E 12h checks (`recall_quiz_ai_question`, `accidental_match_reveal`) are mostly **first-grade fail on New** — they do not cover S > 0 Again.
 
 ## Discoveries
 
-- FSRS Again from D=5 typically **clamps Difficulty to 10** (weak mean reversion). Expect that on the Memory Tracker page once slice 3 persists D.
-- Post-lapse S from first success (S=24h, D=5, on-time) is on the order of **hours, not 0**. Today that fail stores S=0. That delta is the slice 1 E2E signal.
+- FSRS Again from D=5 typically **clamps Difficulty to 10** (weak mean reversion). That is the Memory Tracker signal once Difficulty is persisted.
+- Post-lapse S from first success (S=24h, D=5, on-time) is on the order of **hours, not 0**. Today that fail stores S=0.
 - Accidental-match “confusion is strictly weaker” may not hold numerically vs post-lapse S at low S until a later confusion slice. Leave confusion on −1 ladder.
 - `hoursAfterSpacingDelta` must remain for confusion (−1) and commissioned (+1) until those slices.
+- Do **not** extract shared FSRS helpers before the first Again behavior. Add Again next to the existing FSRS helper (or a sibling). Dedupe `W` / R only in post-change-refactor after a second consumer exists.
 
 ## Tests
 
-Drive `SpacedRepetitionRecallSchedulingTest` (MemoryTracker `markAsRecalled(..., false, ...)`), same grain as Good. Controller accidental-match edge: keep 12h / recallCount / lastRecalledAt; do not pin leftover `ForgettingCurve.failed()`. E2E: `spaced_repetition.feature` (no OpenAI) — success then fail, then Memory Tracker. Existing New+fail 12h E2E must still pass.
+- **Unit:** `SpacedRepetitionRecallSchedulingTest` via `markAsRecalled(..., false, ...)` — same grain as Good. One new assertion focus per slice.
+- **Accidental-match edge:** keep 12h / recallCount / lastRecalledAt; stop pinning `ForgettingCurve.failed()` once canonical S is pinned.
+- **E2E:** `spaced_repetition.feature` (`@mockBrowserTime`, no OpenAI). Success then fail, then Memory Tracker. Existing New+fail 12h E2E must stay green. Tag new scenarios `@wip` until that slice’s post-condition passes.
