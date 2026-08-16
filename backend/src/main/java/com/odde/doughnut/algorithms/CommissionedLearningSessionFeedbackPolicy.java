@@ -13,7 +13,6 @@ public final class CommissionedLearningSessionFeedbackPolicy {
     float next =
         switch (score) {
           case 2 -> initial + accumulated * 0.8f;
-          case 0 -> initial;
           default -> currentHours;
         };
     return Math.max(initial, Math.round(next));

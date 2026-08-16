@@ -30,15 +30,9 @@ On-time second score 1 (after 4): S **8**, Again next-D **10**, due = last + new
 
 ### 3. Tutor score 0 matches score 1
 Type: Behavior  
-Status: planned
+Status: done
 
-**Pre:** Same as slice 2.  
-**Trigger:** Record Tutor score **0**.  
-**Post:** Same S, D, and due as score 1 on that state. Not a reset to S=0.
-
-- ADR: score **0** is the same schedule as **1**; rubric text still differs.
-- One controller test: score 0 equals score 1 (S, D, due). Existing `scoreZeroSchedulesStrictlyAfterRecordedAt` stays the New/strictly-future pin only if it still unique.
-- Remove leftover reset-to-initial for score 0.
+On-time second score 0 equals score 1 (S, D, due) on one notebook (Hola=1 vs Gracias=0 after both scored 4). New 0 still strictly-future. Leftover `applyScore` is score **2** only.
 
 ---
 

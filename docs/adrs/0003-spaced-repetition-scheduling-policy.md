@@ -93,6 +93,14 @@ A **New** commissioned tracker (Stability 0, Difficulty unset) that receives sco
 
 With Stability greater than 0, score 1 updates Stability and Difficulty with open-FSRS-6 Again-equivalent rules (own implementation): post-lapse Stability from Difficulty, Stability, and Retrievability (elapsed whole hours vs Stability), plus Again next-D. Unset Difficulty on Stability > 0 is treated as **5**. Queue lateness vs `nextRecallAt` is not an input. It must not walk a spacing-index ladder.
 
+### Tutor Feedback score 0 (same schedule as score 1)
+
+Tutor Feedback score **0** uses the **same schedule** as score **1**: open-FSRS-6 **Again** memory and due from Stability (see **Tutor Feedback score 1 (Again memory, due from Stability)**). Rubric and product text still differ ([ADR 0005](./0005-commissioned-learning-session-protocol.md)); scheduling does not.
+
+A **New** commissioned tracker (Stability 0, Difficulty unset) that receives score 0 stays Stability 0 and Difficulty unset. Due is strictly after the recorded time, matching New score 1 (24-hour fallback when Stability 0 would otherwise leave due at the grade instant).
+
+With Stability greater than 0, score 0 does not reset Stability to the assimilate initial level. It applies the same memory-state update and due as score 1 on that state.
+
 ### Incorrect recall (Again)
 
 Ordinary incorrect recall (MCQ, just review, spelling fail) is FSRS **Again**. Doughnut does not offer Hard or Easy buttons; product outcomes stay.
@@ -219,6 +227,9 @@ Decision **Tutor Feedback score 3 (Hard)**.
 Locked score **1** (Again memory update, New stays S=0 and Difficulty unset,
 due from Stability not +12h) lives in Decision **Tutor Feedback score 1
 (Again memory, due from Stability)**.
+Locked score **0** (same schedule as score 1; rubric/product text still
+differs per ADR 0005) lives in Decision **Tutor Feedback score 0 (same
+schedule as score 1)**.
 Remaining:
 
 1. A recorded score drives a memory-state transition of the same standing as a
@@ -230,7 +241,6 @@ Remaining:
 | Score | Learner demonstrated | Stability result |
 |-------|----------------------|------------------|
 | 2 | Needed a reminder at first, then showed signs of mastery | No growth; accumulated Stability reduced by 20% |
-| 0 | Could not reach the learning point even with help | Accumulated Stability reset to the initial level |
 
 3. Reductions apply to accumulated Stability, so a tracker already at the initial
    level cannot fall below it.

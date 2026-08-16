@@ -5,29 +5,20 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
 
 class CommissionedLearningSessionFeedbackPolicyTest {
 
-  @ParameterizedTest
-  @CsvSource({
-    "2, 0", "0, 0",
-  })
-  void applyScoreFromInitialLevel(int score, float expected) {
+  @Test
+  void applyScoreFromInitialLevel() {
     assertThat(
-        CommissionedLearningSessionFeedbackPolicy.applyScore(ASSIMILATE_STABILITY_HOURS, score),
-        is(expected));
+        CommissionedLearningSessionFeedbackPolicy.applyScore(ASSIMILATE_STABILITY_HOURS, 2),
+        is(ASSIMILATE_STABILITY_HOURS));
   }
 
-  @ParameterizedTest
-  @CsvSource({
-    "2, 38", "0, 0",
-  })
-  void applyScoreFromElevatedLevel(int score, float expected) {
+  @Test
+  void applyScoreFromElevatedLevel() {
     float elevatedHours = 48f;
-    assertThat(
-        CommissionedLearningSessionFeedbackPolicy.applyScore(elevatedHours, score), is(expected));
+    assertThat(CommissionedLearningSessionFeedbackPolicy.applyScore(elevatedHours, 2), is(38f));
   }
 
   @Test
