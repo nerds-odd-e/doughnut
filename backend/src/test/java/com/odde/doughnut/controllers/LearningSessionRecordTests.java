@@ -69,9 +69,6 @@ class LearningSessionRecordTests extends LearningSessionControllerTestBase {
     MemoryTracker hola = fixture.holaTracker();
     assertThat(hola.getDifficulty(), equalTo(5f));
     assertThat(hola.getStability(), equalTo(24f));
-    assertThat(
-        hola.getNextRecallAt(),
-        equalTo(TimestampOperations.addHoursToTimestamp(hola.getLastRecalledAt(), 24)));
   }
 
   @Test

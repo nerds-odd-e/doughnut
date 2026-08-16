@@ -77,14 +77,14 @@ Feature: Commissioned learning session
     When I visit the commissioned memory tracker for "Hola"
     Then I should see Difficulty 5
 
-  Scenario: First tutor score 5 on a new tracker sets Difficulty to 5
+  Scenario: First tutor score 5 on a new tracker sets Stability to 24
     Given the notes "Hola, Gracias" are assimilated as commissioned on day 1
     And I have recorded a learning session for notebook "Spanish conversation" on day 2 with scores:
       | Note    | Score |
       | Hola    | 5     |
       | Gracias | 1     |
     When I visit the commissioned memory tracker for "Hola"
-    Then I should see Difficulty 5
+    Then I should see Stability 24
 
   Scenario: On-time second tutor score 4 grows Stability to 102
     Given the notes "Hola, Gracias" are assimilated as commissioned on day 1

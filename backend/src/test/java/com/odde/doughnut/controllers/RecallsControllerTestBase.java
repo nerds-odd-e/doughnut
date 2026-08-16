@@ -1,6 +1,5 @@
 package com.odde.doughnut.controllers;
 
-import com.odde.doughnut.controllers.dto.RecordLearningSessionRequest;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
@@ -11,24 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 abstract class RecallsControllerTestBase extends ControllerTestBase {
 
-  protected static final String HOLA_GRACIAS_REPORT =
-      """
-      # Learning Session Report
-
-      Hola: 5
-      Gracias: 1
-      """;
-
-  protected static final String HOLA4_GRACIAS1_REPORT =
-      """
-      # Learning Session Report
-
-      Hola: 4
-      Gracias: 1
-      """;
-
   @Autowired RecallsController controller;
-  @Autowired LearningSessionController learningSessionController;
 
   @BeforeEach
   void setupRecallsTests() {
@@ -45,13 +27,6 @@ abstract class RecallsControllerTestBase extends ControllerTestBase {
 
   protected MemoryTracker dueTracker(Timestamp nextRecallAt) {
     return makeMe.aMemoryTrackerBy(currentUser.getUser()).nextRecallAt(nextRecallAt).please();
-  }
-
-  protected RecordLearningSessionRequest recordRequest(Notebook notebook, String reportMarkdown) {
-    RecordLearningSessionRequest request = new RecordLearningSessionRequest();
-    request.notebookId = notebook.getId();
-    request.reportMarkdown = reportMarkdown;
-    return request;
   }
 
   protected Notebook spanishConversationNotebook() {
