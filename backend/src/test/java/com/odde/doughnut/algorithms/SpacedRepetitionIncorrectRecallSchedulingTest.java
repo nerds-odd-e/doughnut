@@ -4,7 +4,6 @@ import static com.odde.doughnut.entities.ForgettingCurve.ASSIMILATE_STABILITY_HO
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThan;
-import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.lessThan;
 import static org.hamcrest.Matchers.nullValue;
 
@@ -54,12 +53,12 @@ class SpacedRepetitionIncorrectRecallSchedulingTest
   }
 
   @Test
-  void incorrectRecallFromOneHourStabilityPersistsAtLeastOneHour() {
+  void incorrectRecallFromOneHourStabilityPersistsOneHour() {
     MemoryTracker memoryTracker = aGradedTrackerAtStability(1f);
 
     memoryTracker.markAsRecalled(onTimeGradeTime(memoryTracker), false, null);
 
-    assertThat(memoryTracker.getStability(), greaterThanOrEqualTo(1f));
+    assertThat(memoryTracker.getStability(), equalTo(1f));
   }
 
   @Test

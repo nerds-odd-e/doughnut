@@ -1,6 +1,6 @@
 # Plan: Tighten Again fail pins
 
-**Status:** in progress (slices 1–2 done)  
+**Status:** in progress (slices 1–3 done)  
 **Index:** not in `.planning/STATE.md` — ad-hoc only; do not write it into project state.  
 **Goal:** Make the 007 Again path’s unique claims unprovable from a no-op or a missing floor. Align Proposed ADR 0003 general Stability bullets with the locked Again Decision. No Accept.
 
@@ -39,16 +39,13 @@ Delta only: `nullValue()` on Difficulty in `newTrackerIncorrectRecallKeepsZeroSt
 ### 3. Incorrect from 1-hour Stability persists 1 hour
 
 Type: Behavior  
-Status: planned
+Status: done
 
 **Pre-condition:** Graded tracker, Stability = 1 hour, D=5.  
 **Trigger:** Ordinary incorrect recall (on-time).  
 **Post-condition:** Persisted Stability is **1** (the floored FSRS result for this fixture).
 
-- Change `incorrectRecallFromOneHourStabilityPersistsAtLeastOneHour` from `≥ 1` to `equalTo(1f)`.
-- No production change expected. Do not change the floor in `FsrsAgainRecall`.
-
-**Done when:** the 1h pin is `1f`; `pnpm backend:test_only` green.
+Pinned `incorrectRecallFromOneHourStabilityPersistsOneHour` to `equalTo(1f)`. Floor in `FsrsAgainRecall` unchanged. `pnpm backend:test_only` green.
 
 ---
 
