@@ -83,6 +83,17 @@ const assumeMemoryTrackerPage = () => {
       })
       return assumeMemoryTrackerPage()
     },
+    expectRemainingStability() {
+      expectMemoryTrackerPage()
+      labeledValue('Stability:').then((text) => {
+        const stability = Number(text)
+        expect(
+          stability,
+          `Expected remaining Stability greater than 0, got "${text}"`
+        ).to.be.greaterThan(0)
+      })
+      return assumeMemoryTrackerPage()
+    },
     expectTrackerType(type: string) {
       expectMemoryTrackerPage()
       labeledValue('Type:').then((text) => {

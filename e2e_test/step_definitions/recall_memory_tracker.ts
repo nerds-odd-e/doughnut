@@ -29,6 +29,14 @@ Then(
   }
 )
 
+Then('I should see remaining Stability after the incorrect recall', () => {
+  assumeMemoryTrackerPage().expectRemainingStability()
+})
+
+Then('I should see 12 hours between last and next recall', () => {
+  assumeMemoryTrackerPage().expectLastRecallTimeTwelveHoursBeforeNextRecall()
+})
+
 Then(
   'I should see that my last spelling answer was correct with recall count {int}',
   (count: number) => {

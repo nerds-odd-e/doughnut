@@ -1,6 +1,6 @@
 # Plan: Ordinary incorrect recall uses FSRS-6 Again
 
-**Status:** in progress (slice 1 done)  
+**Status:** in progress (slices 1–2 done)  
 **Goal:** S > 0 incorrect recall persists FSRS-6 post-lapse Stability (D, S, R) and Again Difficulty; due time stays +12h. Lock D1 in ADR 0003 Decision. No Accept.
 
 **Context:** [CONTEXT.md](./CONTEXT.md)
@@ -9,7 +9,7 @@ Sequential. Each slice is one Behavior, stop-safe, ~one commit. Do not Accept AD
 
 Canonical post-conditions (12h due, lastRecalledAt / recallCount) are asserted **once** in slice 1. Later slices assert only their delta.
 
-**Learnings (slice 1):** On-time pin is **17h** (S=72, D=5). Frozen `W`/R live in package-private `Fsrs`; grade formulas stay `FsrsGoodRecall` / `FsrsAgainRecall`. Accidental-match no longer pins ladder S. Slice 2 E2E is first-success S=24 then fail — assert Stability **not 0**, not 17h.
+**Learnings:** On-time pin is **17h** (S=72, D=5). Frozen `W`/R live in package-private `Fsrs`. Slice 2 E2E is first-success S=24 then fail — Stability **not 0**, not 17h. Just-review has no answered-question page: open the understanding Memory Tracker from the note. Slice 7 should extend that same scenario/path.
 
 ---
 
@@ -25,17 +25,9 @@ On-time incorrect at S=72h/D=5 persists **17h** (FSRS-6 post-lapse), not −2 la
 ### 2. Memory Tracker shows post-lapse Stability after incorrect
 
 Type: Behavior  
-Status: planned
+Status: done
 
-**Pre-condition:** Learner assimilated, then just-review **Yes** (first success, S = 24h).  
-**Trigger:** Next due just-review **No, I need more recall**.  
-**Post-condition:** Memory Tracker Stability is not 0; Last-to-Next is 12 hours.
-
-- `spaced_repetition.feature` (`@mockBrowserTime`, no OpenAI). `@wip` until green, then remove `@wip`.
-- Page object: read Stability; reuse 12h Last/Next. Do not assert Difficulty yet.
-- Existing New+fail 12h scenarios stay green (no product change expected).
-
-**Done when:** that E2E scenario green without `@wip`.
+Assimilate → just-review Yes (day 1) → due No (day 2) → understanding Memory Tracker: remaining Stability > 0 and 12h Last-to-Next. Scenario in `spaced_repetition.feature` (`@mockBrowserTime`). No production change.
 
 ---
 

@@ -44,6 +44,13 @@ const recallPage = () => {
       cy.tick(11 * 1000).then(() => {
         cy.findByRole('button', { name: 'Yes, I remember' }).click({})
       })
+      waitUntilAppIsNotBusy()
+    },
+    noINeedMoreRecall() {
+      cy.findByRole('button', { name: 'No, I need more recall' })
+        .should('be.visible')
+        .click()
+      waitUntilAppIsNotBusy()
     },
     typeSpellingAnswer(answer: string) {
       waitUntilAppIsNotBusy()
