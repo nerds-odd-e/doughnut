@@ -62,13 +62,9 @@ Commissioned fallback uses `FIRST_SUCCESS_STABILITY_HOURS`. ADR E2 locked. Same 
 
 ### 7. Drop live leftover ladder
 Type: Structure  
-Status: planned
+Status: done
 
-Enables slice 8: no live scheduling on `DEFAULT_SPACES`.
-
-- Remove `hoursAfterSpacingDelta` and leftover policy if still present. Keep `DEFAULT_SPACES` / `hoursFromLegacyIndex` / `StabilityIndexToHoursBackfill` for `V300000260` replay.
-- `SpacedRepetitionAlgorithmTest` keeps legacy conversion; drop live ladder-step tests.
-- Thinking-time `LEGACY_INDEX_STEP` stays unless unused.
+Live `hoursAfterSpacingDelta` / `spacingIndexFromHours` / public `hoursFromSpacingIndex` removed. `hoursFromLegacyIndex` + `DEFAULT_SPACES` remain for `V300000260`. Same schedule.
 
 ---
 
