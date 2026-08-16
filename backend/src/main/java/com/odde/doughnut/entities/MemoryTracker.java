@@ -129,10 +129,7 @@ public class MemoryTracker extends EntityIdentifiedByIdOnly {
     return getType() == MemoryTrackerType.UNDERSTANDING;
   }
 
-  /**
-   * JPQL fragment for joined alias {@code rp}; must stay aligned with {@link
-   * #isNoteLevelTracker()}.
-   */
+  /** JPQL fragment for {@code rp}; must stay aligned with {@link #isNoteLevelTracker()}. */
   public static final String JPA_WHERE_NOTE_LEVEL_TRACKER =
       "(rp.propertyKey IS NULL OR rp.propertyKey = '')";
 
@@ -212,6 +209,10 @@ public class MemoryTracker extends EntityIdentifiedByIdOnly {
 
   public void recalledAgain(Timestamp currentUTCTimestamp) {
     MemoryTrackerAgainRecall.apply(this, currentUTCTimestamp);
+  }
+
+  public void shrinkStability(Timestamp currentUTCTimestamp) {
+    MemoryTrackerShrinkStability.apply(this, currentUTCTimestamp);
   }
 
   public void markAsRecalled(

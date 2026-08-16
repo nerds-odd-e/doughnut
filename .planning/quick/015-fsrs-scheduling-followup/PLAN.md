@@ -45,13 +45,11 @@ Learned: one Outline with Examples 4→102, 5→169, 3→71; first-score 4 Diffi
 
 ### 4. Score 2 shrink lives on MemoryTracker
 Type: Structure  
-Status: planned
+Status: done
 
 Enables slice 5: every commissioned grade mutates memory on `MemoryTracker`, so Easy/Hard/Good apply can collapse without a leftover scheduling special case.
 
-- Move 80% accumulated shrink (D unchanged, lastRecalledAt, due from new S) onto `MemoryTracker` next to `recalledHard` / `recalledAgain`.
-- `recordFeedback` only routes `case 2`.
-- Same S=19 / D unchanged / New D unset. `MemoryTracker` must stay ≤ 250 lines (extract if needed, like Again).
+Learned: `case 2` routes to `MemoryTracker.shrinkStability` → `MemoryTrackerShrinkStability` (Again-style extract; due via `scheduleNextRecallFromStability`). Existing tests still pin S=19 / D unchanged / New D unset. `MemoryTracker` is 250 lines with a compacted JPQL javadoc — **restore that javadoc when slice 5 frees lines**.
 
 ---
 
@@ -66,6 +64,7 @@ No further Behavior in this plan (cohesion of shipped Hard). Existing tests stil
 - Thinking time stays on **Good / correct** only.
 - Do not change 102 / 169 / 71 / next-D floats.
 - Inline `MemoryTrackerAgainRecall` only if line budget allows after the collapse; otherwise leave it.
+- Restore the original `JPA_WHERE_NOTE_LEVEL_TRACKER` javadoc if the collapse frees lines.
 
 ---
 

@@ -15,17 +15,10 @@ public final class CommissionedLearningSessionFeedbackScheduling {
       case 5 -> tracker.recalledEasily(now);
       case 4 -> tracker.recalledSuccessfully(now, null);
       case 3 -> tracker.recalledHard(now);
-      case 2 -> shrinkStability(tracker, now);
+      case 2 -> tracker.shrinkStability(now);
       case 1, 0 -> tracker.recalledAgain(now);
     }
     tracker.setNextRecallAt(ensureNextRecallStrictlyAfterNow(tracker, now));
-  }
-
-  private static void shrinkStability(MemoryTracker tracker, Timestamp now) {
-    float initial = ForgettingCurve.ASSIMILATE_STABILITY_HOURS;
-    float accumulated = Math.max(0, tracker.getStability() - initial);
-    tracker.setLastRecalledAt(now);
-    tracker.setStability(Math.max(initial, Math.round(initial + accumulated * 0.8f)));
   }
 
   private static Timestamp ensureNextRecallStrictlyAfterNow(MemoryTracker tracker, Timestamp now) {
