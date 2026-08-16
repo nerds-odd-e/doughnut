@@ -36,6 +36,12 @@
           </span>
         </div>
         <div>
+          <span class="font-semibold">Difficulty:</span>
+          <span class="ml-2">
+            {{ memoryTracker.difficulty ?? "N/A" }}
+          </span>
+        </div>
+        <div>
           <span class="font-semibold">Recall Count:</span>
           <span class="ml-2">
             {{ memoryTracker.recallCount ?? "N/A" }}

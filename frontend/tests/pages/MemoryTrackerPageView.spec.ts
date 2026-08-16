@@ -46,6 +46,23 @@ describe("MemoryTrackerPageView display", () => {
     expect(wrapper.text()).toContain("SPELLING")
   })
 
+  it("shows difficulty", async () => {
+    const wrapper = await mountMemoryTrackerPageViewReady({
+      recallPrompts: [],
+      memoryTracker: makeMe.aMemoryTracker.difficulty(7).please(),
+    })
+
+    expect(wrapper.text()).toMatch(/Difficulty:\s*7/)
+  })
+
+  it("shows N/A when difficulty is unset", async () => {
+    const wrapper = await mountMemoryTrackerPageViewReady({
+      recallPrompts: [],
+    })
+
+    expect(wrapper.text()).toMatch(/Difficulty:\s*N\/A/)
+  })
+
   it.each([
     { thinkingTimeMs: 5234, expected: "Thinking time: 5.2s" },
     { thinkingTimeMs: 500, expected: "Thinking time: 500ms" },

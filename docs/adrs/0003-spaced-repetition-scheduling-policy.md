@@ -53,7 +53,7 @@ state, qualitative update rules), not with a particular crate or version.
 
 ### Difficulty on correct recall
 
-Difficulty is persisted memory state in `[1, 10]`. It is not part of the learner UI in this Decision. Harder items gain less Stability on a successful recall. A correct recall also updates Difficulty with the open-FSRS Good-equivalent rule.
+Difficulty is persisted memory state in `[1, 10]`. It is shown on the Memory Tracker page (Information card), next to Stability, as the number returned by the API or **N/A** when unset (New / assimilate-only). Harder items gain less Stability on a successful recall. A correct recall also updates Difficulty with the open-FSRS Good-equivalent rule.
 
 A newly assimilated tracker is **New**: Stability 0, Difficulty unset, due now. Assimilation is not a grade. The first real correct recall initializes Difficulty to **5** and Stability to **24** hours (short first interval; 12 hours is a later tweak). Existing trackers that already have positive Stability or a recall count are migrated to Difficulty **5**.
 
