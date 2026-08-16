@@ -1,6 +1,6 @@
 # Plan: Tighten Again fail pins
 
-**Status:** in progress (slice 1 done)  
+**Status:** in progress (slices 1–2 done)  
 **Index:** not in `.planning/STATE.md` — ad-hoc only; do not write it into project state.  
 **Goal:** Make the 007 Again path’s unique claims unprovable from a no-op or a missing floor. Align Proposed ADR 0003 general Stability bullets with the locked Again Decision. No Accept.
 
@@ -26,16 +26,13 @@ Pinned Then to rendered `"8"` via `expectStability`. Deleted `expectRemainingSta
 ### 2. New incorrect recall leaves Difficulty unset
 
 Type: Behavior  
-Status: planned
+Status: done
 
 **Pre-condition:** New tracker (S=0, D unset).  
 **Trigger:** Ordinary incorrect recall.  
 **Post-condition:** Difficulty is still unset. S=0 and 12h already asserted — do not re-assert.
 
-- Delta only on `newTrackerIncorrectRecallKeepsZeroStabilityAndTwelveHourDue`.
-- Production already skips `setDifficulty` when S=0. No production change expected.
-
-**Done when:** `nullValue()` on Difficulty is green.
+Delta only: `nullValue()` on Difficulty in `newTrackerIncorrectRecallKeepsZeroStabilityAndTwelveHourDue`. No production change. `pnpm backend:test_only` green.
 
 ---
 

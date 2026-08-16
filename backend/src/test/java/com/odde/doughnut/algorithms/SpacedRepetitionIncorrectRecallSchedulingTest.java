@@ -6,6 +6,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.lessThan;
+import static org.hamcrest.Matchers.nullValue;
 
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.utils.TimestampOperations;
@@ -72,6 +73,7 @@ class SpacedRepetitionIncorrectRecallSchedulingTest
     assertThat(
         memoryTracker.getNextRecallAt(),
         equalTo(TimestampOperations.addHoursToTimestamp(gradeTime, 12)));
+    assertThat(memoryTracker.getDifficulty(), nullValue());
   }
 
   @Test
