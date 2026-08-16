@@ -6,9 +6,9 @@ current_phase: null
 current_phase_name: null
 status: ready
 stopped_at: null
-last_updated: "2026-08-16T09:08:00Z"
+last_updated: "2026-08-16T10:30:00Z"
 last_activity: 2026-08-16
-last_activity_desc: "quick/005 done: Difficulty on Memory Tracker page; no active plan"
+last_activity_desc: "quick/007 done: FSRS-6 Again on ordinary incorrect; no active plan"
 progress:
   total_phases: 0
   completed_phases: 0
@@ -27,16 +27,16 @@ See: `.planning/PROJECT.md`
 
 ## Current Position
 
-Difficulty is shown on the Memory Tracker Information card (API number, or **N/A** when unset). Correct recall persists Difficulty on graded trackers that still had it unset. Proposed ADR 0003 stays Proposed.
+Difficulty is shown on the Memory Tracker Information card (API number, or **N/A** when unset). Ordinary correct persists FSRS-6 Good next-D; ordinary incorrect persists Again next-D (due stays +12h). Proposed ADR 0003 stays Proposed.
 
 **Ops leftover:** gated dummy-skip conversions. Enable on the deploy that first applies each version, then revert to `1=0`:
 - `dummy_note_sequence_skip_convert` (`V300000254`)
 - `dummy_property_sequence_skip_convert` (`V300000255`)
 JDBC harnesses remain temporary until those production applications.
 
-**Recently shipped:** Difficulty on the Memory Tracker page (Information card; N/A when unset). FSRS-6 Good next Stability and Difficulty on ordinary correct recall (first Stability 24h; E2E day lists follow FSRS). Stability as whole hours; overdue correct lengthens Stability more than on-time. Unanswered recall-prompt history omits the MCQ solution; nested `/api/mcqs` routes are `/{note}`, `/refine`, `/generate`, `/export` (no `question` segment). Recall prompt / MCQ noun alignment (OpenAPI `Mcq`, `/api/mcqs`, tables `mcq`/`answer`). Skip Memory Tracking leftover cohesion (unused skip-flag tests dropped; unassimilated sequence queries renamed). Skip Memory Tracking sequence opt-out + subscribe API + Settings/ADR copy. Accidental-match confusion adjustment + cleanup. Assimilation-sequence skip. Note toolbar overflow. Production hard-delete incident response (2026-08-12) — [MILESTONES.md](MILESTONES.md).
+**Recently shipped:** Difficulty on the Memory Tracker page (Information card; N/A when unset). FSRS-6 Good next Stability and Difficulty on ordinary correct recall (first Stability 24h; E2E day lists follow FSRS). Ordinary incorrect uses FSRS-6 post-lapse Stability and Again Difficulty (due stays +12h). Stability as whole hours; overdue correct lengthens Stability more than on-time. Unanswered recall-prompt history omits the MCQ solution; nested `/api/mcqs` routes are `/{note}`, `/refine`, `/generate`, `/export` (no `question` segment). Recall prompt / MCQ noun alignment (OpenAPI `Mcq`, `/api/mcqs`, tables `mcq`/`answer`). Skip Memory Tracking leftover cohesion (unused skip-flag tests dropped; unassimilated sequence queries renamed). Skip Memory Tracking sequence opt-out + subscribe API + Settings/ADR copy. Accidental-match confusion adjustment + cleanup. Assimilation-sequence skip. Note toolbar overflow. Production hard-delete incident response (2026-08-12) — [MILESTONES.md](MILESTONES.md).
 
-**Remaining FSRS gap:** requested retention (B2), relearning, optional RecallLog, leftover ladder on fail/confusion/commissioned. Tracker: [FSRS-COMPATIBILITY-GAP.md](research/FSRS-COMPATIBILITY-GAP.md). Seed: [SEED-004](seeds/SEED-004-close-spaced-repetition-scheduling-policy-gap.md).
+**Remaining FSRS gap:** requested retention (B2), relearning steps, optional RecallLog, leftover ladder on confusion/commissioned. Tracker: [FSRS-COMPATIBILITY-GAP.md](research/FSRS-COMPATIBILITY-GAP.md). Seed: [SEED-004](seeds/SEED-004-close-spaced-repetition-scheduling-policy-gap.md).
 
 ## Operator Next Steps
 

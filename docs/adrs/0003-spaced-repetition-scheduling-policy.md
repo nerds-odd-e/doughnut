@@ -153,12 +153,11 @@ special spelling results into boolean correct/incorrect.
 
 #### Incorrect recall
 
-1. Incorrect recall may reduce Stability and shorten the next interval.
-2. The penalty is based on the failed outcome, not on earliness or lateness.
-3. Failure must not permanently trap the tracker; later correct recalls must be
+Locked Again memory update, next-D, New-fail, and 12-hour retry live in
+Decision **Incorrect recall (Again)**. Remaining:
+
+1. Failure must not permanently trap the tracker; later correct recalls must be
    able to restore expanding intervals.
-4. Same-session retry and the persisted next-recall time are separate. The
-   post-grade schedule must be explicit.
 
 ### Frequent-failure warning
 

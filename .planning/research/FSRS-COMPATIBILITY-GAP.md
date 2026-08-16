@@ -1,7 +1,7 @@
 # Doughnut ↔ open FSRS gap (toward ADR 0003)
 
 **Status:** Analysis ready; open issues for discussion  
-**Updated:** 2026-08-15  
+**Updated:** 2026-08-16
 **Feeds:** Proposed
 [ADR 0003](../../docs/adrs/0003-spaced-repetition-scheduling-policy.md)  
 **Does not:** approve the ADR (humans own announce → discuss → approve)
@@ -18,13 +18,13 @@ match. Introduce or replace structure **only** when that behavior needs it.
 No unused Difficulty, lapse, requested-retention, or RecallLog fields
 for later slices.
 
-Ordinary **correct** recall with S > 0 uses FSRS-6 Good SInc and next-D (own implementation, frozen default `w` in `FsrsGoodRecall`). First correct on New inits D=5, S=24h. E2E day-at-08:00 assimilate/recall lists follow that success path. Fail / confusion / commissioned still use `DEFAULT_SPACES` (leftover; keep until those behaviors move). B2 requested-retention knob, B4, and C–E stay open.
+Ordinary **correct** recall with S > 0 uses FSRS-6 Good SInc and next-D (own implementation, frozen default `w` in `FsrsGoodRecall`). First correct on New inits D=5, S=24h. E2E day-at-08:00 assimilate/recall lists follow that success path. Ordinary **incorrect** (S > 0) uses FSRS-6 post-lapse S and Again next-D (`FsrsAgainRecall`); due stays +12h. Confusion / commissioned still use `DEFAULT_SPACES` (leftover; keep until those behaviors move). B2 requested-retention knob, B4, relearning steps, and C–E stay open.
 
-Current Doughnut persists **Stability** in whole hours and **Difficulty** (nullable; hidden). Retrievability is computed in the success path (FSRS-6 power curve). There is still **no** lapse count, requested-retention knob, or card state (`New` / `Learning` / `Review` / `Relearning`). Remaining gaps close by **vertical slice** (ADR 0003 Decision).
+Current Doughnut persists **Stability** in whole hours and **Difficulty** (nullable; shown on the Memory Tracker). Retrievability is computed on ordinary correct and ordinary incorrect (FSRS-6 power curve). There is still **no** lapse count, requested-retention knob, or card state (`New` / `Learning` / `Review` / `Relearning`). Remaining gaps close by **vertical slice** (ADR 0003 Decision).
 
 ## 1. What “mostly compatible” should mean
 
-Open FSRS is a **DSR scheduler**: persisted **Difficulty (D)** and **Stability (S)**, computed **Retrievability (R)** from elapsed time, four **grades**, and a **requested retention** that turns S into the next interval. Current Doughnut persists **Stability** (hours) and **Difficulty** (nullable, hidden). Ordinary correct uses FSRS-6 Good SInc (`r = 0.9` implicit). No requested-retention knob (B2).
+Open FSRS is a **DSR scheduler**: persisted **Difficulty (D)** and **Stability (S)**, computed **Retrievability (R)** from elapsed time, four **grades**, and a **requested retention** that turns S into the next interval. Current Doughnut persists **Stability** (hours) and **Difficulty** (nullable, shown on the Memory Tracker). Ordinary correct uses FSRS-6 Good SInc (`r = 0.9` implicit). Ordinary incorrect uses FSRS-6 post-lapse S and Again next-D. No requested-retention knob (B2).
 
 For ADR 0003, “mostly compatible” is a product claim, not a library claim.
 **A1 is locked:** Doughnut owns an open-FSRS-compatible implementation (D, S,
@@ -40,20 +40,20 @@ computed R, grade + elapsed time). No `ts-fsrs` / `fsrs-rs` / other FSRS library
 
 ---
 
-## 2. Doughnut today (code, 2026-08-15)
+## 2. Doughnut today (code, 2026-08-16)
 
 **Memory state (one tracker = one schedule):**
 
 | Field | Role |
 |-------|------|
 | `stability` | Current interval in **whole hours**. Assimilate may be `0` (due now). After a grade, `nextRecallAt = lastRecalledAt + stability`. |
-| `difficulty` | Persisted memory state in `[1, 10]`. Hidden (`@JsonIgnore`). NULL on New / assimilate-only rows. Graded rows (`stability > 0` OR `recall_count > 0`) backfilled to **5**. |
+| `difficulty` | Persisted memory state in `[1, 10]`. Shown on the Memory Tracker. NULL on New / assimilate-only rows. Graded rows (`stability > 0` OR `recall_count > 0`) backfilled to **5**. |
 | `lastRecalledAt` | Anchor for elapsed time. |
 | `nextRecallAt` | Materialized due-work projection. |
 | `recallCount` | Incremented on state-changing grades. |
 | `assimilatedAt` | First intake. Assimilation sets `lastRecalledAt = now` with **no grade**. |
 
-Difficulty is persisted (nullable; not on the learner UI) and consumed on ordinary correct recall. Frozen default FSRS-6 weights live in `FsrsGoodRecall`. There is still **no** lapse count, requested-retention knob, or card state (`New` / `Learning` / `Review` / `Relearning`). Retrievability is not stored.
+Difficulty is persisted (nullable; shown on the Memory Tracker) and consumed on ordinary correct and ordinary incorrect recall. Frozen default FSRS-6 weights live in `Fsrs`. There is still **no** lapse count, requested-retention knob, or card state (`New` / `Learning` / `Review` / `Relearning`). Retrievability is not stored.
 
 **Success** (`ForgettingCurve.succeeded`):
 
@@ -62,7 +62,11 @@ Difficulty is persisted (nullable; not on the learner UI) and consumed on ordina
 - Early (high R) grows less; overdue (low R) grows more and extra converges (B3).
 - Optional thinking-time tweak on the FSRS result: `±sqrt(|t − 25s|)` clamped 0–60s, **within** correct only.
 
-**Failure:** step down the ladder, then **forced `nextRecallAt = now + 12h`**, not the interval implied by the reduced Stability. `lastRecalledAt` **does** advance.
+**Failure** (`ForgettingCurve.failed`):
+
+- S > 0: FSRS-6 post-lapse S (math in days, persist whole hours, floor 1h) and Again next-D. Null D treated as 5.
+- S = 0: stays 0, D unset.
+- Forced `nextRecallAt = now + 12h` (schedule metadata, not the new Stability). `lastRecalledAt` **does** advance.
 
 **Other grades:**
 
@@ -110,12 +114,12 @@ FSRS **Hard (G=2) is still success**. That is the sharpest mapping clash with Do
 
 | Open FSRS | Doughnut today | Kind of gap |
 |-----------|----------------|-------------|
-| Persist D and S; compute R(t, S) | Persist S (hours) and D (nullable, hidden); R computed on success | **Model** (SInc + Good next-D + first-grade init D=5/S=24h) |
-| Interval from requested retention | Ordinary correct uses SInc; `nextRecallAt = last + S` (`r = 0.9` implicit). Fail/confusion/commissioned still ladder | **Product knob** (B2 r-knob open) |
+| Persist D and S; compute R(t, S) | Persist S (hours) and D (nullable, shown); R computed on ordinary correct and ordinary incorrect | **Model** (SInc + Good next-D + post-lapse S + Again next-D + first-grade init D=5/S=24h) |
+| Interval from requested retention | Ordinary correct uses SInc; ordinary incorrect uses post-lapse S; success `nextRecallAt = last + S` (`r = 0.9` implicit). Fail due stays +12h. Confusion/commissioned still ladder | **Product knob** (B2 r-knob open) |
 | G ∈ {1,2,3,4} | Incorrect / correct + overlap / accidental match + Tutor 0–5 + thinking time | **Grades** |
 | Overdue success: bounded extra S via low R | Overdue correct lengthens S more than on-time; extra converges | **Aligned** (B3) |
 | Early success: smaller SInc via high R | FSRS-6 R in SInc (same direction) | **Aligned** |
-| Post-lapse S then relearning steps | −20 index + fixed 12h | **Relearning** |
+| Post-lapse S then relearning steps | Post-lapse S + Again D in code; due +12h (schedule metadata). Relearning steps not implemented | **Relearning** |
 | Same-day short-term scheduler | Whole hours; elapsed 0 on a positive interval → **zero growth** | **Short-term** |
 | New card has no S/D until first rating | Assimilate is New: S=0, D unset, due now (not a grade); first-grade init later | **First state** (D3 locked in ADR) |
 | Review log + optimizer | Partial answers / Tutor scores | **History** (already deferred) |
@@ -149,8 +153,9 @@ Discuss in this order. Each area lists options, a recommendation, and whether AD
 Locked in ADR 0003 Decision **Open FSRS-compatible target shape, own
 implementation**: D and S as persisted memory state, R computed from elapsed
 time and S, transition = grade + elapsed time + that state. Doughnut implements
-it; no FSRS library. Ordinary correct already consumes D/S via Good SInc. Fail /
-confusion / commissioned still use `DEFAULT_SPACES` until those behaviors move.
+it; no FSRS library. Ordinary correct already consumes D/S via Good SInc.
+Ordinary incorrect consumes D/S via post-lapse S and Again next-D. Confusion /
+commissioned still use `DEFAULT_SPACES` until those behaviors move.
 
 **A1 locked.** Remaining open items in B–E close by vertical slice; **B3** is locked in Decision and in code.
 
@@ -171,22 +176,22 @@ only B). First behavior: **B3**.
 
 **B1. Persist D / S when a behavior consumes them** (was O2) — **in code 2026-08-15**
 
-`memory_tracker.difficulty` exists (nullable float, hidden). Graded rows backfilled to **5**; assimilate-only / New rows leave D unset. Ordinary correct with S > 0 consumes D for FSRS-6 Good SInc and persists next-D. First correct on New initializes D=5, S=24h.
+`memory_tracker.difficulty` exists (nullable float, shown on the Memory Tracker). Graded rows backfilled to **5**; assimilate-only / New rows leave D unset. Ordinary correct with S > 0 consumes D for FSRS-6 Good SInc and persists next-D. Ordinary incorrect with S > 0 consumes D for post-lapse S and Again next-D. First correct on New initializes D=5, S=24h.
 
-**B1 persist D exists and is consumed for SInc.**
+**B1 persist D exists and is consumed for SInc and Again.**
 
 **B2. Interval source** (was O6) — user-visible
 
-Success path already uses FSRS-6 Good SInc with implicit `r = 0.9`. Remaining knob: requested retention `r ≠ 0.9`. Fail / confusion / commissioned still walk `DEFAULT_SPACES` (leftover; not this B2 question).
+Success path already uses FSRS-6 Good SInc with implicit `r = 0.9`. Remaining knob: requested retention `r ≠ 0.9`. Ordinary fail is off the leftover ladder. Confusion / commissioned still walk `DEFAULT_SPACES` (leftover; not this B2 question).
 
 - Keep implicit `r = 0.9` (no Settings knob).
 - **Prefer requested retention as the target knob.**
 
-FSRS interval is `I(r, S)`. Doughnut success path is already SInc, not a day table. Full compatibility still needs an `r` knob (and leftover paths off the ladder).
+FSRS interval is `I(r, S)`. Doughnut success path is already SInc, not a day table. Full compatibility still needs an `r` knob (and leftover confusion/commissioned paths off the ladder).
 
 **Recommendation to discuss:** ADR states retention-target intervals as the **target**. Do not silently add a Settings control in this ADR.
 
-Implementing the remaining target: **behavior** — next interval from retention `r` and S when `r ≠ 0.9`. Deleting `DEFAULT_SPACES` waits on fail/confusion/commissioned slices, not B2.
+Implementing the remaining target: **behavior** — next interval from retention `r` and S when `r ≠ 0.9`. Deleting `DEFAULT_SPACES` waits on confusion/commissioned slices, not B2.
 
 **B3. Overdue success reward — resolved 2026-08-15** (was O5); **in code 2026-08-15**
 
@@ -201,7 +206,7 @@ Do not add an unused counter. Before adding: which outcomes increment it; first 
 Closing B4 by deferring: no change. An unused lapse column later would be
 internal only; using lapses to change due times would be behavior.
 
-**B3 in running code:** overdue correct lengthens Stability more than on-time (now via FSRS SInc). **B1** D is consumed for SInc. B2 requested-retention knob and B4 remain open.
+**B3 in running code:** overdue correct lengthens Stability more than on-time (now via FSRS SInc). **B1** D is consumed for SInc and Again. B2 requested-retention knob and B4 remain open.
 
 ---
 
@@ -244,15 +249,13 @@ Today: boolean, no thinking time. Compatible as Again vs Good. Open: whether jus
 
 ### D. Failure, relearning, short-term
 
-**D1. Incorrect-recall retry** (was O7)
+**D1. Incorrect-recall retry** (was O7) — **in code 2026-08-16**
 
-- Keep fixed 12h ordinary-recall retry.
-- Configurable relearning steps, default 12h.
-- FSRS post-lapse S without a forced short retry (interval may already be days).
+Locked in ADR 0003 Decision **Incorrect recall (Again)**: the 12-hour ordinary-recall retry is schedule metadata (current default, not a sacred constant). The memory update is FSRS-6 post-lapse Stability plus Again next-D. Implemented on ordinary incorrect (MCQ / just review / spelling fail) via `FsrsAgainRecall`. New (S=0) fail stays S=0, D unset, due in 12h.
 
-Commissioned learning stays cadence-driven (already stated).
+Configurable relearning steps remain open. Commissioned learning stays cadence-driven.
 
-**Recommendation:** ADR may keep “ordinary incorrect recall is due again on a short, explicit retry” as the product rule, with 12h as the current default — not as a sacred constant. Post-lapse S is the **target** memory update; the retry is scheduling metadata.
+**D1 locked and in code.** Leftover ladder is confusion + commissioned only.
 
 **D2. Short-term / same-hour recalls** (was O11)
 
@@ -338,7 +341,7 @@ Hygiene while this doc is the tracker: do not duplicate open issues in the ADR; 
 | ID | Topic | ADR must lock? | Suggested |
 |----|-------|----------------|-----------|
 | A1 | FSRS-compatible = own D/S/R implementation, no library | **Resolved** | Locked 2026-08-15 |
-| B1 | When to persist D/S | **In code** | Persist D exists; ordinary correct consumes D for SInc |
+| B1 | When to persist D/S | **In code** | Persist D exists; ordinary correct and incorrect consume D |
 | B2 | Requested-retention knob (`r ≠ 0.9`) | Yes | Open |
 | B3 | Overdue bounded extra growth | **Resolved** | Locked and implemented 2026-08-15 |
 | B4 | Lapses | Defer | Defer |
@@ -346,7 +349,7 @@ Hygiene while this doc is the tracker: do not duplicate open issues in the ADR; 
 | C2 | Tutor 2 vs FSRS Hard | Yes | Discuss — current policy ≠ FSRS |
 | C3 | Thinking time | Yes | Bounded within correct |
 | C4 | Just-review Hard/Easy | No / defer | Binary Again vs Good |
-| D1 | 12h retry vs post-lapse S | Yes | Short retry as schedule; S as target update |
+| D1 | 12h retry vs post-lapse S | **In code** | 12h retry as schedule; post-lapse S + Again D as memory update |
 | D2 | Short-term / same-hour | Light lock | No growth at elapsed 0 until short-term rule |
 | D3 | Assimilation = New card | **In code** | New / due now / D unset; first grade initializes D=5, S=24h |
 | E1 | Manual paths | Light lock | Grades vs remove/revive |

@@ -33,6 +33,13 @@ Then('I should see remaining Stability after the incorrect recall', () => {
   assumeMemoryTrackerPage().expectRemainingStability()
 })
 
+Then(
+  'I should see Difficulty {int} after the incorrect recall',
+  (difficulty: number) => {
+    assumeMemoryTrackerPage().expectDifficulty(difficulty)
+  }
+)
+
 Then('I should see 12 hours between last and next recall', () => {
   assumeMemoryTrackerPage().expectLastRecallTimeTwelveHoursBeforeNextRecall()
 })

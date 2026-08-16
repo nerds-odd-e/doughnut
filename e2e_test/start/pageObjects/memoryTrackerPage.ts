@@ -94,6 +94,13 @@ const assumeMemoryTrackerPage = () => {
       })
       return assumeMemoryTrackerPage()
     },
+    expectDifficulty(difficulty: number) {
+      expectMemoryTrackerPage()
+      labeledValue('Difficulty:').then((text) => {
+        expect(text).to.equal(String(difficulty))
+      })
+      return assumeMemoryTrackerPage()
+    },
     expectTrackerType(type: string) {
       expectMemoryTrackerPage()
       labeledValue('Type:').then((text) => {
