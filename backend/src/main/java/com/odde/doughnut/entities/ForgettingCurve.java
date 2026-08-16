@@ -30,10 +30,16 @@ public class ForgettingCurve {
   }
 
   float stabilityAfterEasyRecall(long elapsedInHours) {
+    if (isNewlyAssimilated()) {
+      return FIRST_SUCCESS_STABILITY_HOURS;
+    }
     return FsrsEasyRecall.hoursAfterEasyRecall(stabilityHours, difficulty, elapsedInHours);
   }
 
   float difficultyAfterEasyRecall() {
+    if (isNewlyAssimilated()) {
+      return DEFAULT_DIFFICULTY;
+    }
     return FsrsEasyRecall.difficultyAfterEasyRecall(difficulty);
   }
 
