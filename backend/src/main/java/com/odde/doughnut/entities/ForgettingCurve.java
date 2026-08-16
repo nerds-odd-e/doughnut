@@ -66,8 +66,11 @@ public class ForgettingCurve {
     return (float) adjustmentValue;
   }
 
-  public float failed() {
-    return (float) SpacedRepetitionAlgorithm.hoursAfterSpacingDelta(stabilityHours, -2, false);
+  public float failed(long elapsedInHours) {
+    if (isNewlyAssimilated()) {
+      return ASSIMILATE_STABILITY_HOURS;
+    }
+    return FsrsAgainRecall.hoursAfterAgainRecall(stabilityHours, difficulty, elapsedInHours);
   }
 
   public float confusionAdjusted() {

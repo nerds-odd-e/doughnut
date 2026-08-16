@@ -59,7 +59,13 @@ A newly assimilated tracker is **New**: Stability 0, Difficulty unset, due now. 
 
 Ordinary correct recall with Stability > 0 updates Stability (and Difficulty) with open-FSRS-6 Good-equivalent rules (own implementation). It must not walk a spacing-index ladder. Locked overdue extra growth still holds. Requested retention remains implicit: `nextRecallAt = lastRecalledAt + stability`.
 
-Incorrect recall, confusion adjustment, and commissioned scores stay on their current rules.
+### Incorrect recall (Again)
+
+Ordinary incorrect recall (MCQ, just review, spelling fail) is FSRS **Again**. Doughnut does not offer Hard or Easy buttons; product outcomes stay.
+
+When Stability is greater than 0, the memory update for Stability is the open-FSRS-6 post-lapse formula from Difficulty, Stability, and Retrievability (elapsed whole hours vs Stability). Queue lateness vs `nextRecallAt` is not an input. The due-work projection after an ordinary incorrect recall stays **grade time + 12 hours**: that 12-hour retry is schedule metadata (the current default, not a sacred constant), not the new Stability.
+
+A **New** tracker (Stability 0) that fails stays Stability 0 and due in 12 hours. Confusion adjustment and commissioned scores stay on their current rules.
 
 ### Overdue correct recall: bounded extra growth
 

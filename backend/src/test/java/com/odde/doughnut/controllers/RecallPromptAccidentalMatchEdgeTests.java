@@ -70,7 +70,6 @@ class RecallPromptAccidentalMatchEdgeTests extends RecallPromptControllerTestBas
     Integer oldRecallCount = memoryTracker.getRecallCount();
     controller.answerSpelling(recallPrompt, answerDTO);
 
-    assertThat(memoryTracker.getStability(), equalTo(new ForgettingCurve(200f).failed()));
     assertThat(memoryTracker.getRecallCount(), equalTo(oldRecallCount + 1));
     assertThat(memoryTracker.getLastRecalledAt(), equalTo(gradeTime));
     assertThat(

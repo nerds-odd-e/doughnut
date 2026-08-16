@@ -1,6 +1,6 @@
 # Plan: Ordinary incorrect recall uses FSRS-6 Again
 
-**Status:** planned  
+**Status:** in progress (slice 1 done)  
 **Goal:** S > 0 incorrect recall persists FSRS-6 post-lapse Stability (D, S, R) and Again Difficulty; due time stays +12h. Lock D1 in ADR 0003 Decision. No Accept.
 
 **Context:** [CONTEXT.md](./CONTEXT.md)
@@ -9,22 +9,16 @@ Sequential. Each slice is one Behavior, stop-safe, ~one commit. Do not Accept AD
 
 Canonical post-conditions (12h due, lastRecalledAt / recallCount) are asserted **once** in slice 1. Later slices assert only their delta.
 
+**Learnings (slice 1):** On-time pin is **17h** (S=72, D=5). Frozen `W`/R live in package-private `Fsrs`; grade formulas stay `FsrsGoodRecall` / `FsrsAgainRecall`. Accidental-match no longer pins ladder S. Slice 2 E2E is first-success S=24 then fail — assert Stability **not 0**, not 17h.
+
 ---
 
 ### 1. On-time incorrect (S > 0) persists post-lapse Stability
 
 Type: Behavior  
-Status: planned
+Status: done
 
-**Pre-condition:** Graded tracker, Stability > 0, Difficulty 5 (or unset, treated as 5).  
-**Trigger:** Ordinary incorrect recall at elapsed whole hours = current Stability.  
-**Post-condition:** Persisted Stability is FSRS-6 post-lapse S (not −2 ladder steps). `nextRecallAt` is still grade time + 12 hours. New (S = 0) fail is unchanged (S = 0 + 12h).
-
-- Lock ADR 0003 Decision **Incorrect recall (Again)** for this outcome only: Doughnut incorrect = FSRS Again; post-lapse S from D, S, R; 12h is due-time metadata; New+fail unchanged; confusion/commissioned stay. Floor-1h and Again next-D wait for later slices. Do not Accept.
-- One on-time Stability pin in `SpacedRepetitionRecallSchedulingTest` (Good SInc style) plus a New-fail guard. Accidental-match edge: keep 12h / count / lastRecalledAt; drop `new ForgettingCurve(200f).failed()`.
-- `recallFailed` passes elapsed whole hours. S ≤ 0 keeps today’s 0. Do not persist next Difficulty. Do not add E2E yet.
-
-**Done when:** on-time unit pin green; New-fail guard green; targeted backend tests green.
+On-time incorrect at S=72h/D=5 persists **17h** (FSRS-6 post-lapse), not −2 ladder. `nextRecallAt` stays +12h. New fail stays S=0 + 12h. ADR 0003 Decision **Incorrect recall (Again)** locked; Status still Proposed. Floor and next-D not locked.
 
 ---
 

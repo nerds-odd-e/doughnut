@@ -176,7 +176,9 @@ public class MemoryTracker extends EntityIdentifiedByIdOnly {
   }
 
   public void recallFailed(Timestamp currentUTCTimestamp) {
-    setStability(forgettingCurve().failed());
+    long elapsedInHours =
+        TimestampOperations.getDiffInHours(currentUTCTimestamp, getLastRecalledAt());
+    setStability(forgettingCurve().failed(elapsedInHours));
     setLastRecalledAt(currentUTCTimestamp);
     setNextRecallAt(TimestampOperations.addHoursToTimestamp(currentUTCTimestamp, 12));
   }
