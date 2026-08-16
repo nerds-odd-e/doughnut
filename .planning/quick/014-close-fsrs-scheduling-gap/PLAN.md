@@ -38,15 +38,9 @@ On-time second score 0 equals score 1 (S, D, due) on one notebook (Hola=1 vs Gra
 
 ### 4. Tutor score 2 shrinks Stability (not Hard)
 Type: Behavior  
-Status: planned
+Status: done
 
-**Pre:** Commissioned tracker with S > 0.  
-**Trigger:** Record Tutor score **2**.  
-**Post:** Next S = rounded 80% of current S (accumulated above assimilate 0). D unchanged. Due from new S.
-
-- ADR: named Doughnut exception. Not FSRS Hard. No elapsed/R. No overdue extra.
-- Last leftover `applyScore` case. Delete `CommissionedLearningSessionFeedbackPolicy` when it has no callers.
-- Controller: after score 4 (S=24), score 2 → S=19, D unchanged. New score 2 stays S=0, D unset.
+After score 4: score 2 → S **19**, D unchanged, due from new S. New 2 leaves D unset / S=0. Leftover `CommissionedLearningSessionFeedbackPolicy` deleted. `hoursAfterSpacingDelta` kept for confusion.
 
 ---
 

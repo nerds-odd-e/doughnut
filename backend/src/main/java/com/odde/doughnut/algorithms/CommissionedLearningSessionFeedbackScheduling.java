@@ -1,5 +1,6 @@
 package com.odde.doughnut.algorithms;
 
+import com.odde.doughnut.entities.ForgettingCurve;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.utils.TimestampOperations;
 import java.sql.Timestamp;
@@ -10,20 +11,21 @@ public final class CommissionedLearningSessionFeedbackScheduling {
 
   public static void recordFeedback(MemoryTracker tracker, Timestamp now, int score) {
     tracker.setRecallCount(tracker.getRecallCount() + 1);
-    if (score == 4) {
-      tracker.recalledSuccessfully(now, null);
-    } else if (score == 5) {
-      tracker.recalledEasily(now);
-    } else if (score == 3) {
-      tracker.recalledHard(now);
-    } else if (score == 1 || score == 0) {
-      tracker.recalledAgain(now);
-    } else {
-      tracker.setLastRecalledAt(now);
-      tracker.setStability(
-          CommissionedLearningSessionFeedbackPolicy.applyScore(tracker.getStability(), score));
+    switch (score) {
+      case 5 -> tracker.recalledEasily(now);
+      case 4 -> tracker.recalledSuccessfully(now, null);
+      case 3 -> tracker.recalledHard(now);
+      case 2 -> shrinkStability(tracker, now);
+      case 1, 0 -> tracker.recalledAgain(now);
     }
     tracker.setNextRecallAt(ensureNextRecallStrictlyAfterNow(tracker, now));
+  }
+
+  private static void shrinkStability(MemoryTracker tracker, Timestamp now) {
+    float initial = ForgettingCurve.ASSIMILATE_STABILITY_HOURS;
+    float accumulated = Math.max(0, tracker.getStability() - initial);
+    tracker.setLastRecalledAt(now);
+    tracker.setStability(Math.max(initial, Math.round(initial + accumulated * 0.8f)));
   }
 
   private static Timestamp ensureNextRecallStrictlyAfterNow(MemoryTracker tracker, Timestamp now) {
