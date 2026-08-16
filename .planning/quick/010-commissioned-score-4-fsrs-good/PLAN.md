@@ -1,6 +1,6 @@
 # Plan: Commissioned Tutor score 4 is FSRS-6 Good
 
-**Status:** in progress (slices 1–5 done)  
+**Status:** in progress (slices 1–6 done)  
 **Index:** ad-hoc under `.planning/quick/` — on last-slice wrap-up, update `.planning/STATE.md` remaining FSRS gap (score 4 done; leftover 5/3/2/1/0 + confusion). Do not Accept ADR 0003.
 
 **Goal:** Tutor Feedback score 4 uses the same Good-equivalent memory update as ordinary correct (SInc + next-D, including New init and overdue extra). Migrate leftover null Difficulty on already-graded trackers. Cleanup spent score-4 ladder pins.
@@ -59,15 +59,9 @@ Status: done
 ### 6. Graded trackers with null Difficulty backfill to 5
 
 Type: Behavior  
-Status: planned
+Status: done
 
-**Pre-condition:** `memory_tracker` row with `difficulty` NULL and (`stability > 0` OR `recall_count > 0`).  
-**Trigger:** Apply Flyway `V300000262`.  
-**Post-condition:** Those rows have Difficulty **5**. New / assimilate-only rows stay NULL.
-
-**Commit bound:** `V300000262` SQL only (plus a focused test if the repo already tests Flyway backfills that way). Do not rewrite Stability. Do not change score-4 runtime.
-
-**Done when:** graded null-D rows are 5; New rows remain unset.
+**Learnings:** `V300000262__backfill_memory_tracker_difficulty_for_graded_rows.sql` updates NULL D where S>0 OR recall_count>0; `difficulty IS NULL` preserves already-written next-D. New rows stay unset. Slice 7 cleans leftover score-4 ladder docs.
 
 ---
 
