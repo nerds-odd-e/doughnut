@@ -59,17 +59,12 @@ class LearningSessionRecordTests extends LearningSessionControllerTestBase {
 
   @Test
   void onTimeSecondScoreFourPersistsStability102() throws UnexpectedNoAccessRightException {
-    Timestamp firstRecord = makeMe.aTimestamp().of(1, 9).please();
-    testabilitySettings.timeTravelTo(firstRecord);
+    assertThat(afterOnTimeSecondScoreFour().holaTracker().getStability(), equalTo(102f));
+  }
 
-    SpanishNotebookFixture fixture = spanishNotebookFixture(firstRecord);
-    controller.record(recordRequest(fixture.notebook(), HOLA4_GRACIAS1_REPORT), "Asia/Shanghai");
-
-    Timestamp secondRecord = TimestampOperations.addHoursToTimestamp(firstRecord, 24);
-    testabilitySettings.timeTravelTo(secondRecord);
-    controller.record(recordRequest(fixture.notebook(), HOLA4_GRACIAS1_REPORT), "Asia/Shanghai");
-
-    assertThat(fixture.holaTracker().getStability(), equalTo(102f));
+  @Test
+  void onTimeSecondScoreFourPersistsGoodNextDifficulty() throws UnexpectedNoAccessRightException {
+    assertThat(afterOnTimeSecondScoreFour().holaTracker().getDifficulty(), equalTo(5.0014133f));
   }
 
   @Test
@@ -164,5 +159,20 @@ class LearningSessionRecordTests extends LearningSessionControllerTestBase {
     assertThat(
         response.getRejectedEntries().getFirst().getReason(),
         containsString("No commissioned memory tracker"));
+  }
+
+  private SpanishNotebookFixture afterOnTimeSecondScoreFour()
+      throws UnexpectedNoAccessRightException {
+    Timestamp firstRecord = makeMe.aTimestamp().of(1, 9).please();
+    testabilitySettings.timeTravelTo(firstRecord);
+
+    SpanishNotebookFixture fixture = spanishNotebookFixture(firstRecord);
+    controller.record(recordRequest(fixture.notebook(), HOLA4_GRACIAS1_REPORT), "Asia/Shanghai");
+
+    Timestamp secondRecord = TimestampOperations.addHoursToTimestamp(firstRecord, 24);
+    testabilitySettings.timeTravelTo(secondRecord);
+    controller.record(recordRequest(fixture.notebook(), HOLA4_GRACIAS1_REPORT), "Asia/Shanghai");
+
+    return fixture;
   }
 }

@@ -13,8 +13,8 @@ public final class CommissionedLearningSessionFeedbackScheduling {
     long elapsedInHours = TimestampOperations.getDiffInHours(now, tracker.getLastRecalledAt());
     tracker.setRecallCount(tracker.getRecallCount() + 1);
     tracker.setLastRecalledAt(now);
-    if (score == 4 && isNewlyAssimilated(tracker)) {
-      tracker.setDifficulty(ForgettingCurve.DEFAULT_DIFFICULTY);
+    if (score == 4) {
+      tracker.setDifficulty(tracker.difficultyAfterSuccessfulRecall());
     }
     tracker.setStability(nextStabilityHours(tracker, score, elapsedInHours));
     tracker.setNextRecallAt(ensureNextRecallStrictlyAfterNow(tracker, now));

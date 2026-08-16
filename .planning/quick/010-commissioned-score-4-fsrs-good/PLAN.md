@@ -1,6 +1,6 @@
 # Plan: Commissioned Tutor score 4 is FSRS-6 Good
 
-**Status:** in progress (slices 1–3 done)  
+**Status:** in progress (slices 1–4 done)  
 **Index:** ad-hoc under `.planning/quick/` — on last-slice wrap-up, update `.planning/STATE.md` remaining FSRS gap (score 4 done; leftover 5/3/2/1/0 + confusion). Do not Accept ADR 0003.
 
 **Goal:** Tutor Feedback score 4 uses the same Good-equivalent memory update as ordinary correct (SInc + next-D, including New init and overdue extra). Migrate leftover null Difficulty on already-graded trackers. Cleanup spent score-4 ladder pins.
@@ -41,17 +41,9 @@ Status: done
 ### 4. Subsequent score 4 persists Good next-D
 
 Type: Behavior  
-Status: planned
+Status: done
 
-**Pre-condition:** Commissioned tracker with S>0, D=5 (or unset treated as 5).  
-**Trigger:** Record Tutor Feedback score **4**.  
-**Post-condition:** Difficulty is **5.001413f** (Good next-D from 5). Do not re-assert Stability 102.
-
-**Commit bound:** HTTP/unit pin of next-D only. No E2E (float; New D=5 already showed Difficulty on the page). Do not change Stability math.
-
-- Production: on score 4 with S>0, also `setDifficulty(difficultyAfterSuccessfulRecall())`. Still do not call `recalledSuccessfully` unless that is now the smaller change (SInc already shipped).
-
-**Done when:** subsequent score 4 persists `5.001413f`; 102 not re-asserted as the unique claim.
+**Learnings:** Score 4 always `setDifficulty(difficultyAfterSuccessfulRecall())` before `setStability` (New still D=5 via ForgettingCurve). HTTP pin is `5.0014133f` (Java float of documented 5.001413f). Shared `afterOnTimeSecondScoreFour()` helper. Slice 5 should already follow from elapsed-based SInc.
 
 ---
 
