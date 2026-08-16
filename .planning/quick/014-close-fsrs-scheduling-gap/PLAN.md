@@ -22,15 +22,9 @@ On-time Hard S **71** (< Good 102), Hard next-D **8.0177937**, overdue S **97**.
 
 ### 2. Tutor score 1 is Again memory, due from Stability
 Type: Behavior  
-Status: planned
+Status: done
 
-**Pre:** Commissioned tracker with S > 0 (after score 4).  
-**Trigger:** Record Tutor score **1**.  
-**Post:** Post-lapse S + Again next-D. `nextRecallAt = lastRecalledAt + stability` (not +12h).
-
-- ADR: score **1** = FSRS Again **memory**, commissioned **due from S**.
-- Reuse `FsrsAgainRecall`. New score 1 stays S=0, D unset; due strictly after now via 24h fallback (existing `firstScoreOneLeavesDifficultyUnset`).
-- Controller unique claim: on-time second score 1 pins Again hours, Again next-D, and due = last + new S. Do not re-assert ordinary-recall +12h.
+On-time second score 1 (after 4): S **8**, Again next-D **10**, due = last + new S. New 1 still D unset / S=0. Ordinary incorrect reuses Again memory then **+12h**. Leftover `applyScore` is 2 and 0.
 
 ---
 

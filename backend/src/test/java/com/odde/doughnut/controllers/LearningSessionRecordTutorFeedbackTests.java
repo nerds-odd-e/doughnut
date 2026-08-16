@@ -97,7 +97,28 @@ class LearningSessionRecordTutorFeedbackTests extends LearningSessionControllerT
   }
 
   @Test
-  void firstScoreOneLeavesDifficultyUnset() throws UnexpectedNoAccessRightException {
+  void onTimeSecondScoreOnePersistsAgainStability() throws UnexpectedNoAccessRightException {
+    assertThat(afterOnTimeSecondScoreOne().holaTracker().getStability(), equalTo(8f));
+  }
+
+  @Test
+  void onTimeSecondScoreOnePersistsAgainNextDifficulty() throws UnexpectedNoAccessRightException {
+    assertThat(afterOnTimeSecondScoreOne().holaTracker().getDifficulty(), equalTo(10f));
+  }
+
+  @Test
+  void onTimeSecondScoreOneSchedulesDueFromStability() throws UnexpectedNoAccessRightException {
+    MemoryTracker hola = afterOnTimeSecondScoreOne().holaTracker();
+    assertThat(
+        hola.getNextRecallAt(),
+        equalTo(
+            TimestampOperations.addHoursToTimestamp(
+                hola.getLastRecalledAt(), Math.round(hola.getStability()))));
+  }
+
+  @Test
+  void firstScoreOneLeavesDifficultyUnsetAndStabilityZero()
+      throws UnexpectedNoAccessRightException {
     Timestamp dayTwo = makeMe.aTimestamp().of(1, 9).please();
     testabilitySettings.timeTravelTo(dayTwo);
 
@@ -105,6 +126,7 @@ class LearningSessionRecordTutorFeedbackTests extends LearningSessionControllerT
     controller.record(recordRequest(fixture.notebook(), HOLA_GRACIAS_REPORT), "Asia/Shanghai");
 
     assertThat(fixture.graciasTracker().getDifficulty(), nullValue());
+    assertThat(fixture.graciasTracker().getStability(), equalTo(0f));
   }
 
   @Test
@@ -135,6 +157,11 @@ class LearningSessionRecordTutorFeedbackTests extends LearningSessionControllerT
   private SpanishNotebookFixture afterOnTimeSecondScoreThree()
       throws UnexpectedNoAccessRightException {
     return afterOnTimeSecondScore(learningSessionReport("Hola", 3));
+  }
+
+  private SpanishNotebookFixture afterOnTimeSecondScoreOne()
+      throws UnexpectedNoAccessRightException {
+    return afterOnTimeSecondScore(learningSessionReport("Hola", 1));
   }
 
   private SpanishNotebookFixture afterOnTimeSecondScore(String secondReport)
