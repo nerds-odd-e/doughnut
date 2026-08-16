@@ -31,15 +31,9 @@ New score 5 (`S <= assimilate hours`) uses `recalledSuccessfully`: D=5, S=24h, d
 
 ### 3. On-time subsequent score 5 grows Stability more than score 4
 Type: Behavior  
-Status: planned
+Status: done
 
-**Pre:** Commissioned tracker after first score 4 (S=24, D=5).  
-**Trigger:** On-time second session (elapsed 24h) records score 5.  
-**Post:** Stability **169** (frozen `w`; strictly greater than score 4’s 102). Due from new S. D may still be unchanged this slice. Effort stays neutral (no thinking-time tweak).
-
-Controller test + E2E pin Stability 169 (mirror “On-time second tutor score 4 grows Stability to 102”).
-
-Impl: FSRS-6 Easy SInc — Good increment term × `w16`, persist whole hours. Do not send subsequent score 5 through `recalledSuccessfully` (that is Good). Sibling to `FsrsGoodRecall` is enough; do not generalize a grade framework.
+On-time second score 5 (after first score 4, elapsed=S) persists Stability **169** via `FsrsEasyRecall` (Good increment × `w16`). Wired through `MemoryTracker.recalledEasily`, not `recalledSuccessfully`. D unchanged until slice 4. `applyScore` case 5 still present.
 
 ---
 

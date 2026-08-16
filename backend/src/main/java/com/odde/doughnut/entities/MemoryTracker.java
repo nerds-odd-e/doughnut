@@ -175,28 +175,35 @@ public class MemoryTracker extends EntityIdentifiedByIdOnly {
     return new ForgettingCurve(getStability(), getDifficulty());
   }
 
+  private long elapsedHoursUntil(Timestamp currentUTCTimestamp) {
+    return TimestampOperations.getDiffInHours(currentUTCTimestamp, getLastRecalledAt());
+  }
+
+  private void scheduleNextRecallFromStability(Timestamp currentUTCTimestamp) {
+    setLastRecalledAt(currentUTCTimestamp);
+    setNextRecallAt(calculateNextRecallAt());
+  }
+
   public void recallFailed(Timestamp currentUTCTimestamp) {
-    long elapsedInHours =
-        TimestampOperations.getDiffInHours(currentUTCTimestamp, getLastRecalledAt());
     ForgettingCurve curve = forgettingCurve();
     if (getStability() > ForgettingCurve.ASSIMILATE_STABILITY_HOURS) {
       setDifficulty(curve.difficultyAfterFailedRecall());
     }
-    setStability(curve.failed(elapsedInHours));
+    setStability(curve.failed(elapsedHoursUntil(currentUTCTimestamp)));
     setLastRecalledAt(currentUTCTimestamp);
     setNextRecallAt(TimestampOperations.addHoursToTimestamp(currentUTCTimestamp, 12));
   }
 
   public void recalledSuccessfully(Timestamp currentUTCTimestamp, Integer thinkingTimeMs) {
-    long elapsedInHours =
-        TimestampOperations.getDiffInHours(currentUTCTimestamp, getLastRecalledAt());
-
     ForgettingCurve curve = forgettingCurve();
     setDifficulty(curve.difficultyAfterSuccessfulRecall());
-    setStability(curve.succeeded(elapsedInHours, thinkingTimeMs));
+    setStability(curve.succeeded(elapsedHoursUntil(currentUTCTimestamp), thinkingTimeMs));
+    scheduleNextRecallFromStability(currentUTCTimestamp);
+  }
 
-    setLastRecalledAt(currentUTCTimestamp);
-    setNextRecallAt(calculateNextRecallAt());
+  public void recalledEasily(Timestamp currentUTCTimestamp) {
+    setStability(forgettingCurve().afterEasyRecall(elapsedHoursUntil(currentUTCTimestamp)));
+    scheduleNextRecallFromStability(currentUTCTimestamp);
   }
 
   public void markAsRecalled(

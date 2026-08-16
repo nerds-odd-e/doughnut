@@ -18,6 +18,30 @@ final class Fsrs {
     return Math.pow(1.0 + factor * elapsedDays / stabilityDays, decay);
   }
 
+  static double retrievabilityFromHours(float stabilityHours, long elapsedInHours) {
+    return retrievability(elapsedInHours / HOURS_PER_DAY, stabilityHours / HOURS_PER_DAY);
+  }
+
+  static double goodIncrementTerm(double stabilityDays, double difficulty, double retrievability) {
+    return Math.exp(W[8])
+        * (11.0 - difficulty)
+        * Math.pow(stabilityDays, -W[9])
+        * (Math.exp((1.0 - retrievability) * W[10]) - 1.0);
+  }
+
+  static double goodIncrementTermFromHours(
+      float stabilityHours, float difficulty, long elapsedInHours) {
+    return goodIncrementTerm(
+        stabilityHours / HOURS_PER_DAY,
+        difficulty,
+        retrievabilityFromHours(stabilityHours, elapsedInHours));
+  }
+
+  static float hoursAfterStabilityIncrease(float stabilityHours, double incrementTerm) {
+    double nextDays = (stabilityHours / HOURS_PER_DAY) * Math.max(1.0, 1.0 + incrementTerm);
+    return (float) Math.round(nextDays * HOURS_PER_DAY);
+  }
+
   static float nextDifficulty(float difficulty, int grade) {
     double deltaD = -W[6] * (grade - GOOD);
     double next = W[7] * W[4] + (1.0 - W[7]) * (difficulty + deltaD);

@@ -80,6 +80,11 @@ class LearningSessionRecordTests extends LearningSessionControllerTestBase {
   }
 
   @Test
+  void onTimeSecondScoreFivePersistsStability169() throws UnexpectedNoAccessRightException {
+    assertThat(afterOnTimeSecondScoreFive().holaTracker().getStability(), equalTo(169f));
+  }
+
+  @Test
   void onTimeSecondScoreFourPersistsGoodNextDifficulty() throws UnexpectedNoAccessRightException {
     assertThat(afterOnTimeSecondScoreFour().holaTracker().getDifficulty(), equalTo(5.0014133f));
   }
@@ -196,6 +201,16 @@ class LearningSessionRecordTests extends LearningSessionControllerTestBase {
 
   private SpanishNotebookFixture afterOnTimeSecondScoreFour()
       throws UnexpectedNoAccessRightException {
+    return afterOnTimeSecondScore(HOLA4_GRACIAS1_REPORT);
+  }
+
+  private SpanishNotebookFixture afterOnTimeSecondScoreFive()
+      throws UnexpectedNoAccessRightException {
+    return afterOnTimeSecondScore(HOLA_GRACIAS_REPORT);
+  }
+
+  private SpanishNotebookFixture afterOnTimeSecondScore(String secondReport)
+      throws UnexpectedNoAccessRightException {
     Timestamp firstRecord = makeMe.aTimestamp().of(1, 9).please();
     testabilitySettings.timeTravelTo(firstRecord);
 
@@ -204,7 +219,7 @@ class LearningSessionRecordTests extends LearningSessionControllerTestBase {
 
     Timestamp secondRecord = TimestampOperations.addHoursToTimestamp(firstRecord, 24);
     testabilitySettings.timeTravelTo(secondRecord);
-    controller.record(recordRequest(fixture.notebook(), HOLA4_GRACIAS1_REPORT), "Asia/Shanghai");
+    controller.record(recordRequest(fixture.notebook(), secondReport), "Asia/Shanghai");
 
     return fixture;
   }

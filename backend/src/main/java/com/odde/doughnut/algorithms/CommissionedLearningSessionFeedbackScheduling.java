@@ -13,6 +13,8 @@ public final class CommissionedLearningSessionFeedbackScheduling {
     tracker.setRecallCount(tracker.getRecallCount() + 1);
     if (score == 4 || isScoreFiveOnNewlyAssimilated(tracker, score)) {
       tracker.recalledSuccessfully(now, null);
+    } else if (score == 5) {
+      tracker.recalledEasily(now);
     } else {
       tracker.setLastRecalledAt(now);
       tracker.setStability(

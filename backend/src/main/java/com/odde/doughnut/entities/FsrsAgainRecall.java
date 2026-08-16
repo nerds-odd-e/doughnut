@@ -16,8 +16,7 @@ final class FsrsAgainRecall {
 
   static float hoursAfterAgainRecall(float stabilityHours, float difficulty, long elapsedInHours) {
     double stabilityDays = stabilityHours / HOURS_PER_DAY;
-    double elapsedDays = elapsedInHours / HOURS_PER_DAY;
-    double retrievability = Fsrs.retrievability(elapsedDays, stabilityDays);
+    double retrievability = Fsrs.retrievabilityFromHours(stabilityHours, elapsedInHours);
     double nextDays =
         W[11]
             * Math.pow(difficulty, -W[12])
