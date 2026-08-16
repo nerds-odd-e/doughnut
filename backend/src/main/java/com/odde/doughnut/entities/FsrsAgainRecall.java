@@ -3,9 +3,16 @@ package com.odde.doughnut.entities;
 import static com.odde.doughnut.entities.Fsrs.HOURS_PER_DAY;
 import static com.odde.doughnut.entities.Fsrs.W;
 
-/** FSRS-6 Again post-lapse Stability. Days in; whole hours out. Frozen default weights. */
+/**
+ * FSRS-6 Again post-lapse Stability and next Difficulty. Days in; whole hours out. Frozen default
+ * weights.
+ */
 final class FsrsAgainRecall {
   private FsrsAgainRecall() {}
+
+  static float difficultyAfterAgainRecall(float difficulty) {
+    return Fsrs.nextDifficulty(difficulty, Fsrs.AGAIN);
+  }
 
   static float hoursAfterAgainRecall(float stabilityHours, float difficulty, long elapsedInHours) {
     double stabilityDays = stabilityHours / HOURS_PER_DAY;

@@ -22,9 +22,6 @@ final class FsrsGoodRecall {
   }
 
   static float difficultyAfterGoodRecall(float difficulty) {
-    final int good = 3;
-    double deltaD = -W[6] * (good - 3);
-    double next = W[7] * W[4] + (1.0 - W[7]) * (difficulty + deltaD);
-    return (float) Math.max(1.0, Math.min(10.0, next));
+    return Fsrs.nextDifficulty(difficulty, Fsrs.GOOD);
   }
 }

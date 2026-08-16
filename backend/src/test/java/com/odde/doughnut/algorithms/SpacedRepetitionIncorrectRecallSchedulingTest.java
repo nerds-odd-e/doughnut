@@ -73,4 +73,30 @@ class SpacedRepetitionIncorrectRecallSchedulingTest
         memoryTracker.getNextRecallAt(),
         equalTo(TimestampOperations.addHoursToTimestamp(gradeTime, 12)));
   }
+
+  @Test
+  void onTimeIncorrectRecallUpdatesDifficultyWithFsrsAgainNextD() {
+    MemoryTracker memoryTracker = aGradedTrackerAtThreeDayStability();
+
+    memoryTracker.markAsRecalled(onTimeGradeTime(memoryTracker), false, null);
+
+    assertThat(memoryTracker.getDifficulty(), equalTo(10f));
+  }
+
+  @Test
+  void incorrectRecallFillsUnsetDifficultyOnGradedTracker() {
+    MemoryTracker unsetDifficulty =
+        makeMe
+            .aMemoryTrackerFor(note)
+            .by(user)
+            .stabilityAndNextRecallAt(STABILITY_HOURS)
+            .inMemoryPlease();
+    MemoryTracker difficultyFive = aGradedTrackerAtThreeDayStability();
+    Timestamp gradeTime = onTimeGradeTime(unsetDifficulty);
+
+    unsetDifficulty.markAsRecalled(gradeTime, false, null);
+    difficultyFive.markAsRecalled(gradeTime, false, null);
+
+    assertThat(unsetDifficulty.getDifficulty(), equalTo(difficultyFive.getDifficulty()));
+  }
 }

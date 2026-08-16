@@ -1,6 +1,6 @@
 # Plan: Ordinary incorrect recall uses FSRS-6 Again
 
-**Status:** in progress (slices 1–5 done)  
+**Status:** in progress (slices 1–6 done)  
 **Goal:** S > 0 incorrect recall persists FSRS-6 post-lapse Stability (D, S, R) and Again Difficulty; due time stays +12h. Lock D1 in ADR 0003 Decision. No Accept.
 
 **Context:** [CONTEXT.md](./CONTEXT.md)
@@ -9,7 +9,7 @@ Sequential. Each slice is one Behavior, stop-safe, ~one commit. Do not Accept AD
 
 Canonical post-conditions (12h due, lastRecalledAt / recallCount) are asserted **once** in slice 1. Later slices assert only their delta.
 
-**Learnings:** On-time pin is **17h** (S=72, D=5). Frozen `W`/R live in package-private `Fsrs`. Slice 2 E2E: first-success S=24 then fail — Stability **not 0**; open understanding Memory Tracker from the note (just-review has no answered-question page). Incorrect-recall unit tests live in `SpacedRepetitionIncorrectRecallSchedulingTest` (split from the old combined class at 250 lines).
+**Learnings:** On-time S pin **17h** (S=72, D=5). Again D pin **5 → 10**. Frozen `W`/R/next-D live in `Fsrs`. Slice 2/7 E2E: first-success S=24 then fail; open understanding Memory Tracker from the note (just-review has no answered-question page). Incorrect unit tests: `SpacedRepetitionIncorrectRecallSchedulingTest`.
 
 ---
 
@@ -61,16 +61,9 @@ Graded S=1h fail persists Stability ≥ 1 (`FsrsAgainRecall` floors at 1h). New 
 ### 6. Incorrect recall persists Again Difficulty
 
 Type: Behavior  
-Status: planned
+Status: done
 
-**Pre-condition:** Graded tracker, Stability > 0.  
-**Trigger:** Ordinary incorrect recall.  
-**Post-condition:** Persisted Difficulty is FSRS-6 Again next-D (harder; from 5 → 10 with frozen `w`). Unset D matches a D=5 sibling (assert D only).
-
-- Canonical D pin plus unset sibling in `SpacedRepetitionIncorrectRecallSchedulingTest`. Lock Again next-D in ADR 0003 Decision. Do not Accept.
-- No E2E in this slice.
-
-**Done when:** both D unit tests green.
+Graded S>0 fail persists Again next-D: **5 → 10**. Unset D matches a D=5 sibling. New fail leaves D unset. ADR 0003 Again next-D locked; Status still Proposed.
 
 ---
 
