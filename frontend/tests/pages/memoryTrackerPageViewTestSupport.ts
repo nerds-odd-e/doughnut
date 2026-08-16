@@ -56,11 +56,14 @@ export function mockMemoryTrackerPageViewDefaults() {
   )
 }
 
-export function mountMemoryTrackerPageView({
-  recallPrompts,
-  memoryTracker = defaultMemoryTracker(),
-  memoryTrackerId = defaultMemoryTrackerId,
-}: MountMemoryTrackerPageViewProps) {
+export function mountMemoryTrackerPageView(
+  {
+    recallPrompts,
+    memoryTracker = defaultMemoryTracker(),
+    memoryTrackerId = defaultMemoryTrackerId,
+  }: MountMemoryTrackerPageViewProps,
+  options?: { attachToBody?: boolean }
+) {
   return helper
     .component(MemoryTrackerPageView)
     .withProps({
@@ -68,13 +71,14 @@ export function mountMemoryTrackerPageView({
       memoryTracker,
       memoryTrackerId,
     })
-    .mount()
+    .mount(options?.attachToBody ? { attachTo: document.body } : undefined)
 }
 
 export async function mountMemoryTrackerPageViewReady(
-  props: MountMemoryTrackerPageViewProps
+  props: MountMemoryTrackerPageViewProps,
+  options?: { attachToBody?: boolean }
 ) {
-  const wrapper = mountMemoryTrackerPageView(props)
+  const wrapper = mountMemoryTrackerPageView(props, options)
   await flushPromises()
   return wrapper
 }

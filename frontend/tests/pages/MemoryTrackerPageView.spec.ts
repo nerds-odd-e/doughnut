@@ -63,6 +63,21 @@ describe("MemoryTrackerPageView display", () => {
     expect(wrapper.text()).toMatch(/Difficulty:\s*N\/A/)
   })
 
+  it("places Stability and Difficulty on the same row", async () => {
+    const wrapper = await mountMemoryTrackerPageViewReady(
+      { recallPrompts: [] },
+      { attachToBody: true }
+    )
+
+    const labels = wrapper.findAll("span.font-semibold")
+    const texts = labels.map((label) => label.text())
+    const stabilityIndex = texts.indexOf("Stability:")
+    expect(texts[stabilityIndex + 1]).toBe("Difficulty:")
+    expect(labels[stabilityIndex]!.element.getBoundingClientRect().top).toBe(
+      labels[stabilityIndex + 1]!.element.getBoundingClientRect().top
+    )
+  })
+
   it.each([
     { thinkingTimeMs: 5234, expected: "Thinking time: 5.2s" },
     { thinkingTimeMs: 500, expected: "Thinking time: 500ms" },
