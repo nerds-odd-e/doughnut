@@ -9,20 +9,14 @@ public final class CommissionedLearningSessionFeedbackPolicy {
   public static float applyScore(float currentHours, int score) {
     float initial = ForgettingCurve.ASSIMILATE_STABILITY_HOURS;
     float accumulated = Math.max(0, currentHours - initial);
-    float standardIncrement = standardIncrementHours(currentHours);
 
     float next =
         switch (score) {
-          case 3 -> currentHours + standardIncrement * 0.8f;
           case 2 -> initial + accumulated * 0.8f;
           case 1 -> initial + accumulated * 0.5f;
           case 0 -> initial;
           default -> currentHours;
         };
     return Math.max(initial, Math.round(next));
-  }
-
-  private static float standardIncrementHours(float currentHours) {
-    return SpacedRepetitionAlgorithm.hoursAfterSpacingDelta(currentHours, 1, true) - currentHours;
   }
 }

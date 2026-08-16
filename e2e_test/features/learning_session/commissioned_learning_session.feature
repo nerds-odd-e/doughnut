@@ -125,3 +125,23 @@ Feature: Commissioned learning session
       """
     And I visit the commissioned memory tracker for "Hola"
     Then I should see Stability 169
+
+  Scenario: On-time second tutor score 3 grows Stability to 71
+    Given the notes "Hola, Gracias" are assimilated as commissioned on day 1
+    And I have recorded a learning session for notebook "Spanish conversation" on day 2 with scores:
+      | Note    | Score |
+      | Hola    | 4     |
+      | Gracias | 1     |
+    And It's day 3, 9 hour
+    When I open the learning session request for notebook "Spanish conversation"
+    And I record the learning session report:
+      """
+      # Learning Session Report
+
+      <session_item_scores>
+      Hola: 3
+      Gracias: 1
+      </session_item_scores>
+      """
+    And I visit the commissioned memory tracker for "Hola"
+    Then I should see Stability 71

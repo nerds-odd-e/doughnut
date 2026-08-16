@@ -8,6 +8,7 @@ final class Fsrs {
   };
   static final double HOURS_PER_DAY = 24.0;
   static final int AGAIN = 1;
+  static final int HARD = 2;
   static final int GOOD = 3;
   static final int EASY = 4;
 

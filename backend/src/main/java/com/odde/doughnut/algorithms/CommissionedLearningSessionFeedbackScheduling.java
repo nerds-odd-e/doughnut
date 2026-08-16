@@ -14,6 +14,8 @@ public final class CommissionedLearningSessionFeedbackScheduling {
       tracker.recalledSuccessfully(now, null);
     } else if (score == 5) {
       tracker.recalledEasily(now);
+    } else if (score == 3) {
+      tracker.recalledHard(now);
     } else {
       tracker.setLastRecalledAt(now);
       tracker.setStability(

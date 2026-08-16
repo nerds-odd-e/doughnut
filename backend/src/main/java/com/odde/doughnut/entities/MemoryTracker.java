@@ -208,6 +208,13 @@ public class MemoryTracker extends EntityIdentifiedByIdOnly {
     scheduleNextRecallFromStability(currentUTCTimestamp);
   }
 
+  public void recalledHard(Timestamp currentUTCTimestamp) {
+    ForgettingCurve curve = forgettingCurve();
+    setDifficulty(curve.difficultyAfterHardRecall());
+    setStability(curve.stabilityAfterHardRecall(elapsedHoursUntil(currentUTCTimestamp)));
+    scheduleNextRecallFromStability(currentUTCTimestamp);
+  }
+
   public void markAsRecalled(
       Timestamp currentUTCTimestamp, boolean successful, Integer thinkingTimeMs) {
     setRecallCount(getRecallCount() + 1);

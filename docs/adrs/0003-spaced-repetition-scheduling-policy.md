@@ -77,6 +77,14 @@ A **New** commissioned tracker (Stability 0, Difficulty unset) that receives sco
 
 With Stability greater than 0, score 5 updates Stability and Difficulty with open-FSRS-6 Easy-equivalent rules (own implementation): an Easy increment that is at least as large as Good's and includes an extra Easy factor, plus Easy next-D. Next Stability is strictly longer than the same state under score 4. It must not walk a spacing-index ladder. Locked overdue extra growth applies. Queue lateness vs `nextRecallAt` is not an input.
 
+### Tutor Feedback score 3 (Hard)
+
+Tutor Feedback score **3** is open-FSRS-6 **Hard**-equivalent (own implementation), not a percentage below the Good or ladder increment. Effort is neutral. After score 3, `nextRecallAt = lastRecalledAt + stability`. Do not apply the incorrect-recall 12-hour retry.
+
+A **New** commissioned tracker (Stability 0, Difficulty unset) that receives score 3 initializes Difficulty to **5** and Stability to **24** hours, matching the first real correct recall and scores 4 and 5. Do not use FSRS Hard first-rating initial Stability and Difficulty.
+
+With Stability greater than 0, score 3 updates Stability and Difficulty with open-FSRS-6 Hard-equivalent rules (own implementation): a Hard increment that is the Good increment times an extra Hard factor, plus Hard next-D. Next Stability is at least the current Stability and strictly shorter than the same state under score 4. It must not walk a spacing-index ladder. Locked overdue extra growth applies. Queue lateness vs `nextRecallAt` is not an input.
+
 ### Incorrect recall (Again)
 
 Ordinary incorrect recall (MCQ, just review, spelling fail) is FSRS **Again**. Doughnut does not offer Hard or Easy buttons; product outcomes stay.
@@ -95,7 +103,7 @@ thinking-time input). Extra growth is driven by elapsed time vs Stability
 further delay must not increase the next interval without limit. A linear
 lateness bonus is not allowed. Exact increment math is an implementation
 detail; policy tests assert the observable next interval in hours.
-Tutor Feedback scores **4** and **5** inherit this extra. Other commissioned Tutor
+Tutor Feedback scores **3**, **4**, and **5** inherit this extra. Other commissioned Tutor
 scores stay score-driven (Working draft) and do not inherit this extra
 until a later Decision says they do.
 
@@ -197,6 +205,9 @@ due from Stability) lives in Decision **Tutor Feedback score 4 (Good)**.
 Locked score **5** (Easy-equivalent memory update, New init matching first
 correct and score 4, overdue extra, due from Stability) lives in Decision
 **Tutor Feedback score 5 (Easy)**.
+Locked score **3** (Hard-equivalent memory update, New init matching first
+correct and scores 4 and 5, overdue extra, due from Stability) lives in
+Decision **Tutor Feedback score 3 (Hard)**.
 Remaining:
 
 1. A recorded score drives a memory-state transition of the same standing as a
@@ -207,27 +218,23 @@ Remaining:
 
 | Score | Learner demonstrated | Stability result |
 |-------|----------------------|------------------|
-| 3 | Mastery, but not fluent | Successful recall, growth 20% below the standard increment |
 | 2 | Needed a reminder at first, then showed signs of mastery | No growth; accumulated Stability reduced by 20% |
 | 1 | Needed several reminders | No growth; accumulated Stability reduced by 50% |
 | 0 | Could not reach the learning point even with help | Accumulated Stability reset to the initial level |
 
-3. Demonstrated mastery always moves forward. Score 3 grows Stability,
-   so a learner who masters a learning point without ever becoming fluent still
-   earns lengthening intervals rather than decaying toward permanent due work.
-4. Reductions apply to accumulated Stability, so a tracker already at the initial
+3. Reductions apply to accumulated Stability, so a tracker already at the initial
    level cannot fall below it.
-5. Resetting Stability must never leave a tracker due at the instant its score
+4. Resetting Stability must never leave a tracker due at the instant its score
    was recorded.
-6. Otherwise schedule the next recall from the updated Stability. Do not apply
+5. Otherwise schedule the next recall from the updated Stability. Do not apply
    the incorrect-recall relearning override: a commissioned tracker is due only
    when the learner commissions another Learning Session, so a short forced
    retry window would express nothing.
-7. A Tutor session carries no trustworthy effort measurement, so effort is
+6. A Tutor session carries no trustworthy effort measurement, so effort is
    neutral.
-8. A late session does not weaken the result. The score determines the
+7. A late session does not weaken the result. The score determines the
    memory-state adjustment; the recorded time advances `lastRecalledAt`.
-9. A Session Item that never receives Feedback supplies no graded recall result:
+8. A Session Item that never receives Feedback supplies no graded recall result:
    its tracker stays unchanged and the item is abandoned with its session.
 
 ### Recall effort
