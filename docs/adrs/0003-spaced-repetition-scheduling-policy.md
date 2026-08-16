@@ -177,6 +177,13 @@ another accessible note, and the same answer is accepted by the declared note.
 Neither tracker receives recall credit, an incorrect transition, or a confusion
 adjustment; schedule fields stay unchanged. Retry in session with a more specific answer.
 
+### Strictly-future fallback (non-positive interval)
+
+After a grade, the tracker must be due strictly after the recorded time. When
+the computed interval is non-positive (due would be at or before the grade
+instant), schedule **24 hours** after the recorded time — the same first-success
+Stability. Do not use the spacing-index ladder as this fallback.
+
 ## Working draft
 
 ### Spelling memory tracker
@@ -245,6 +252,9 @@ schedule as score 1)**.
 Locked score **2** (Doughnut Stability shrink, not Hard; 80% of accumulated
 S; D unchanged) lives in Decision **Tutor Feedback score 2 (Doughnut
 Stability shrink)**.
+Locked strictly-future fallback (non-positive interval → 24h, same as
+first-success Stability) lives in Decision **Strictly-future fallback
+(non-positive interval)**.
 Remaining:
 
 1. A recorded score drives a memory-state transition of the same standing as a

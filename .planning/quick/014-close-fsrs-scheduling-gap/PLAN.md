@@ -54,13 +54,9 @@ On-time unique match: secondary S **115** (midpoint of 200 and Again 30). Not a 
 
 ### 6. Strictly-future fallback is 24 hours
 Type: Structure  
-Status: planned
+Status: done
 
-Enables slice 7: live code must not use `hoursFromSpacingIndex(1)`.
-
-- Replace commissioned fallback with `FIRST_SUCCESS_STABILITY_HOURS` (24). Same observable as today.
-- ADR E2: non-positive interval → 24h.
-- Existing tests still pass; no new schedule numbers.
+Commissioned fallback uses `FIRST_SUCCESS_STABILITY_HOURS`. ADR E2 locked. Same schedule.
 
 ---
 

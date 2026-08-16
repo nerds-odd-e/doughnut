@@ -34,6 +34,6 @@ public final class CommissionedLearningSessionFeedbackScheduling {
       return scheduled;
     }
     return TimestampOperations.addHoursToTimestamp(
-        now, SpacedRepetitionAlgorithm.hoursFromSpacingIndex(1));
+        now, Math.round(ForgettingCurve.FIRST_SUCCESS_STABILITY_HOURS));
   }
 }
