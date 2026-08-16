@@ -1,6 +1,7 @@
 package com.odde.doughnut.entities;
 
 import com.odde.doughnut.algorithms.SpacedRepetitionAlgorithm;
+import java.util.function.Supplier;
 
 public class ForgettingCurve {
   public static final float ASSIMILATE_STABILITY_HOURS = 0.0f;
@@ -20,48 +21,39 @@ public class ForgettingCurve {
     this.difficulty = difficulty == null ? DEFAULT_DIFFICULTY : difficulty;
   }
 
+  record NextMemory(float difficulty, float stability) {}
+
+  NextMemory afterGoodRecall(long elapsedInHours, Integer thinkingTimeMs) {
+    return afterGoodHardOrEasyRecall(
+        () -> FsrsGoodRecall.difficultyAfterGoodRecall(difficulty),
+        () ->
+            adjustForThinkingTime(
+                FsrsGoodRecall.hoursAfterGoodRecall(stabilityHours, difficulty, elapsedInHours),
+                thinkingTimeMs));
+  }
+
+  NextMemory afterEasyRecall(long elapsedInHours) {
+    return afterGoodHardOrEasyRecall(
+        () -> FsrsEasyRecall.difficultyAfterEasyRecall(difficulty),
+        () -> FsrsEasyRecall.hoursAfterEasyRecall(stabilityHours, difficulty, elapsedInHours));
+  }
+
+  NextMemory afterHardRecall(long elapsedInHours) {
+    return afterGoodHardOrEasyRecall(
+        () -> FsrsHardRecall.difficultyAfterHardRecall(difficulty),
+        () -> FsrsHardRecall.hoursAfterHardRecall(stabilityHours, difficulty, elapsedInHours));
+  }
+
   float succeeded(long elapsedInHours, Integer thinkingTimeMs) {
-    if (isNewlyAssimilated()) {
-      return FIRST_SUCCESS_STABILITY_HOURS;
-    }
-    float fsrsHours =
-        FsrsGoodRecall.hoursAfterGoodRecall(stabilityHours, difficulty, elapsedInHours);
-    return adjustForThinkingTime(fsrsHours, thinkingTimeMs);
+    return afterGoodRecall(elapsedInHours, thinkingTimeMs).stability();
   }
 
-  float stabilityAfterEasyRecall(long elapsedInHours) {
+  private NextMemory afterGoodHardOrEasyRecall(
+      Supplier<Float> nextDifficulty, Supplier<Float> nextStability) {
     if (isNewlyAssimilated()) {
-      return FIRST_SUCCESS_STABILITY_HOURS;
+      return new NextMemory(DEFAULT_DIFFICULTY, FIRST_SUCCESS_STABILITY_HOURS);
     }
-    return FsrsEasyRecall.hoursAfterEasyRecall(stabilityHours, difficulty, elapsedInHours);
-  }
-
-  float difficultyAfterEasyRecall() {
-    if (isNewlyAssimilated()) {
-      return DEFAULT_DIFFICULTY;
-    }
-    return FsrsEasyRecall.difficultyAfterEasyRecall(difficulty);
-  }
-
-  float stabilityAfterHardRecall(long elapsedInHours) {
-    if (isNewlyAssimilated()) {
-      return FIRST_SUCCESS_STABILITY_HOURS;
-    }
-    return FsrsHardRecall.hoursAfterHardRecall(stabilityHours, difficulty, elapsedInHours);
-  }
-
-  float difficultyAfterHardRecall() {
-    if (isNewlyAssimilated()) {
-      return DEFAULT_DIFFICULTY;
-    }
-    return FsrsHardRecall.difficultyAfterHardRecall(difficulty);
-  }
-
-  float difficultyAfterSuccessfulRecall() {
-    if (isNewlyAssimilated()) {
-      return DEFAULT_DIFFICULTY;
-    }
-    return FsrsGoodRecall.difficultyAfterGoodRecall(difficulty);
+    return new NextMemory(nextDifficulty.get(), nextStability.get());
   }
 
   float difficultyAfterFailedRecall() {

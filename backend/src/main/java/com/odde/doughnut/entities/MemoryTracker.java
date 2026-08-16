@@ -129,7 +129,10 @@ public class MemoryTracker extends EntityIdentifiedByIdOnly {
     return getType() == MemoryTrackerType.UNDERSTANDING;
   }
 
-  /** JPQL fragment for {@code rp}; must stay aligned with {@link #isNoteLevelTracker()}. */
+  /**
+   * JPQL fragment for joined alias {@code rp}; must stay aligned with {@link
+   * #isNoteLevelTracker()}.
+   */
   public static final String JPA_WHERE_NOTE_LEVEL_TRACKER =
       "(rp.propertyKey IS NULL OR rp.propertyKey = '')";
 
@@ -186,25 +189,22 @@ public class MemoryTracker extends EntityIdentifiedByIdOnly {
     setNextRecallAt(TimestampOperations.addHoursToTimestamp(currentUTCTimestamp, 12));
   }
 
-  public void recalledSuccessfully(Timestamp currentUTCTimestamp, Integer thinkingTimeMs) {
-    ForgettingCurve curve = forgettingCurve();
-    setDifficulty(curve.difficultyAfterSuccessfulRecall());
-    setStability(curve.succeeded(elapsedHoursUntil(currentUTCTimestamp), thinkingTimeMs));
-    scheduleNextRecallFromStability(currentUTCTimestamp);
+  public void recalledSuccessfully(Timestamp now, Integer thinkingTimeMs) {
+    applyRecall(now, forgettingCurve().afterGoodRecall(elapsedHoursUntil(now), thinkingTimeMs));
   }
 
-  public void recalledEasily(Timestamp currentUTCTimestamp) {
-    ForgettingCurve curve = forgettingCurve();
-    setDifficulty(curve.difficultyAfterEasyRecall());
-    setStability(curve.stabilityAfterEasyRecall(elapsedHoursUntil(currentUTCTimestamp)));
-    scheduleNextRecallFromStability(currentUTCTimestamp);
+  public void recalledEasily(Timestamp now) {
+    applyRecall(now, forgettingCurve().afterEasyRecall(elapsedHoursUntil(now)));
   }
 
-  public void recalledHard(Timestamp currentUTCTimestamp) {
-    ForgettingCurve curve = forgettingCurve();
-    setDifficulty(curve.difficultyAfterHardRecall());
-    setStability(curve.stabilityAfterHardRecall(elapsedHoursUntil(currentUTCTimestamp)));
-    scheduleNextRecallFromStability(currentUTCTimestamp);
+  public void recalledHard(Timestamp now) {
+    applyRecall(now, forgettingCurve().afterHardRecall(elapsedHoursUntil(now)));
+  }
+
+  private void applyRecall(Timestamp now, ForgettingCurve.NextMemory next) {
+    setDifficulty(next.difficulty());
+    setStability(next.stability());
+    scheduleNextRecallFromStability(now);
   }
 
   public void recalledAgain(Timestamp currentUTCTimestamp) {
