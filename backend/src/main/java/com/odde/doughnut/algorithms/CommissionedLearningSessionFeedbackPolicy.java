@@ -14,7 +14,6 @@ public final class CommissionedLearningSessionFeedbackPolicy {
     float next =
         switch (score) {
           case 5 -> currentHours + standardIncrement * 1.2f;
-          case 4 -> currentHours + standardIncrement;
           case 3 -> currentHours + standardIncrement * 0.8f;
           case 2 -> initial + accumulated * 0.8f;
           case 1 -> initial + accumulated * 0.5f;

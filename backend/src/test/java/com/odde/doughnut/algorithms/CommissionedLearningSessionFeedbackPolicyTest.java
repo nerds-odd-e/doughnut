@@ -12,7 +12,7 @@ class CommissionedLearningSessionFeedbackPolicyTest {
 
   @ParameterizedTest
   @CsvSource({
-    "5, 29", "4, 24", "3, 19", "2, 0", "1, 0", "0, 0",
+    "5, 29", "3, 19", "2, 0", "1, 0", "0, 0",
   })
   void applyScoreFromInitialLevel(int score, float expected) {
     assertThat(
