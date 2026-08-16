@@ -104,8 +104,8 @@ public class MemoryTrackerService {
         .or(() -> activeNoteLevel.stream().filter(MemoryTracker::isUnderstanding).findFirst());
   }
 
-  public void applyConfusionAdjustment(MemoryTracker tracker) {
-    tracker.adjustForConfusion();
+  public void applyConfusionAdjustment(MemoryTracker tracker, Timestamp currentUTCTimestamp) {
+    tracker.adjustForConfusion(currentUTCTimestamp);
     entityPersister.save(tracker);
   }
 

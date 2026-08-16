@@ -115,7 +115,7 @@ Ordinary incorrect recall (MCQ, just review, spelling fail) is FSRS **Again**. D
 
 When Stability is greater than 0, the memory update for Stability is the open-FSRS-6 post-lapse formula from Difficulty, Stability, and Retrievability (elapsed whole hours vs Stability). Ordinary incorrect also updates Difficulty with the open-FSRS-6 Again next-D (harder; clamped to `[1, 10]`). Unset Difficulty on Stability > 0 is treated as **5**. Queue lateness vs `nextRecallAt` is not an input. The due-work projection after an ordinary incorrect recall stays **grade time + 12 hours**: that 12-hour retry is schedule metadata (the current default, not a sacred constant), not the new Stability.
 
-A **New** tracker (Stability 0) that fails stays Stability 0, Difficulty unset, and due in 12 hours. Confusion adjustment stays on its current rules.
+A **New** tracker (Stability 0) that fails stays Stability 0, Difficulty unset, and due in 12 hours. Confusion adjustment is not a grade and is not FSRS Again (see **Accidental-match and overlap transitions**).
 
 ### Overdue correct recall: bounded extra growth
 
@@ -154,11 +154,16 @@ a declared overlap, the answer has the following consequences:
    for it. Prefer its spelling tracker; otherwise use its note-level
    understanding tracker. Never select a property or commissioned tracker, a
    removed or deleted tracker, or create a tracker implicitly.
-3. The confusion adjustment is strictly weaker than ordinary incorrect recall.
-   It reduces the selected tracker's Stability and recomputes its due-work
-   projection from its existing recall anchor. It must not advance
-   `lastRecalledAt`, increment `recallCount`, count as a failed recall, or move
-   an already scheduled recall later.
+3. The confusion adjustment is not a grade and not FSRS Again. It must stay
+   strictly weaker than ordinary incorrect recall. When Stability is greater
+   than 0, next Stability is the whole-hour midpoint of current Stability and
+   FSRS-6 Again Stability for the same Difficulty (unset Difficulty treated as
+   **5**), elapsed whole hours vs `lastRecalledAt`, and current Stability.
+   Floor 1 hour. Next Stability must be less than current Stability and
+   greater than Again Stability when rounding still distinguishes them.
+   Difficulty, `lastRecalledAt`, and `recallCount` are unchanged. Due never
+   later (`min(existing due, lastRecalledAt + new Stability)`). Stability 0
+   stays 0. It must not count as a failed recall.
 4. The primary incorrect transition and any secondary confusion adjustment are
    one atomic grading operation. The secondary adjustment must remain durably
    attributable to the accidental-match answer that caused it.

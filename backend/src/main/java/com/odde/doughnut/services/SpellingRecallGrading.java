@@ -111,7 +111,7 @@ final class SpellingRecallGrading {
               .findConfusionAdjustmentTracker(user, matches.getFirst())
               .ifPresent(
                   target -> {
-                    memoryTrackerService.applyConfusionAdjustment(target);
+                    memoryTrackerService.applyConfusionAdjustment(target, currentUTCTimestamp);
                     gradedAnswer.setConfusionAdjustedMemoryTracker(target);
                   });
         }

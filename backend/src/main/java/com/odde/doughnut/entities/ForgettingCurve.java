@@ -105,7 +105,11 @@ public class ForgettingCurve {
     return FsrsAgainRecall.hoursAfterAgainRecall(stabilityHours, difficulty, elapsedInHours);
   }
 
-  public float confusionAdjusted() {
-    return (float) SpacedRepetitionAlgorithm.hoursAfterSpacingDelta(stabilityHours, -1, false);
+  float confusionAdjusted(long elapsedInHours) {
+    float againHours = failed(elapsedInHours);
+    if (isNewlyAssimilated()) {
+      return againHours;
+    }
+    return Math.max(1f, Math.round((stabilityHours + againHours) / 2.0f));
   }
 }

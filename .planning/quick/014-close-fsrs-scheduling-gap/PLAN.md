@@ -46,15 +46,9 @@ After score 4: score 2 → S **19**, D unchanged, due from new S. New 2 leaves D
 
 ### 5. Confusion shrinks Stability without the ladder
 Type: Behavior  
-Status: planned
+Status: done
 
-**Pre:** Accidental match with one eligible secondary tracker, S > 0.  
-**Trigger:** Grade the spelling answer.  
-**Post:** Secondary S is the Again-midpoint (CONTEXT). D / `lastRecalledAt` / `recallCount` unchanged. Due not later. Strictly weaker than Again on the same state.
-
-- ADR: confusion formula in Decision (replace “current rules”).
-- **Jidoka** if midpoint is rejected.
-- Update `RecallPromptAccidentalMatchConfusionAdjustmentTests` to the new S; keep non-grade and due-not-later pins. Stop calling `hoursAfterSpacingDelta`.
+On-time unique match: secondary S **115** (midpoint of 200 and Again 30). Not a grade. `confusionAdjusted` reuses `failed()`; due-not-later unchanged. `hoursAfterSpacingDelta` unused by confusion.
 
 ---
 

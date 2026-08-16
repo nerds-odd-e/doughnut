@@ -224,9 +224,9 @@ public class MemoryTracker extends EntityIdentifiedByIdOnly {
     }
   }
 
-  public void adjustForConfusion() {
+  public void adjustForConfusion(Timestamp currentUTCTimestamp) {
     Timestamp existingDue = getNextRecallAt();
-    setStability(forgettingCurve().confusionAdjusted());
+    setStability(forgettingCurve().confusionAdjusted(elapsedHoursUntil(currentUTCTimestamp)));
     Timestamp projected = calculateNextRecallAt();
     setNextRecallAt(projected.after(existingDue) ? existingDue : projected);
   }
