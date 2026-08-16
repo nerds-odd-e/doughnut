@@ -38,7 +38,7 @@ Feature: Spaced-repetition
     And I visit the understanding memory tracker for "Note 1"
     Then I should see Stability 8
     And I should see 12 hours between last and next recall
-    And I should see Difficulty 10 after the incorrect recall
+    And I should see Difficulty 10
 
   @mockBrowserTime
   Scenario: Strictly follow the schedule but want to recall more

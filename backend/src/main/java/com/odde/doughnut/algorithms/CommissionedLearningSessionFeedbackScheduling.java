@@ -13,15 +13,22 @@ public final class CommissionedLearningSessionFeedbackScheduling {
     long elapsedInHours = TimestampOperations.getDiffInHours(now, tracker.getLastRecalledAt());
     tracker.setRecallCount(tracker.getRecallCount() + 1);
     tracker.setLastRecalledAt(now);
+    if (score == 4 && isNewlyAssimilated(tracker)) {
+      tracker.setDifficulty(ForgettingCurve.DEFAULT_DIFFICULTY);
+    }
     tracker.setStability(nextStabilityHours(tracker, score, elapsedInHours));
     tracker.setNextRecallAt(ensureNextRecallStrictlyAfterNow(tracker, now));
   }
 
   private static float nextStabilityHours(MemoryTracker tracker, int score, long elapsedInHours) {
-    if (score == 4 && tracker.getStability() > ForgettingCurve.ASSIMILATE_STABILITY_HOURS) {
+    if (score == 4 && !isNewlyAssimilated(tracker)) {
       return tracker.stabilityHoursAfterSuccessfulRecall(elapsedInHours);
     }
     return CommissionedLearningSessionFeedbackPolicy.applyScore(tracker.getStability(), score);
+  }
+
+  private static boolean isNewlyAssimilated(MemoryTracker tracker) {
+    return tracker.getStability() <= ForgettingCurve.ASSIMILATE_STABILITY_HOURS;
   }
 
   private static Timestamp ensureNextRecallStrictlyAfterNow(MemoryTracker tracker, Timestamp now) {

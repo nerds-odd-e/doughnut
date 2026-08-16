@@ -1,6 +1,6 @@
 # Plan: Commissioned Tutor score 4 is FSRS-6 Good
 
-**Status:** in progress (slices 1–2 done)  
+**Status:** in progress (slices 1–3 done)  
 **Index:** ad-hoc under `.planning/quick/` — on last-slice wrap-up, update `.planning/STATE.md` remaining FSRS gap (score 4 done; leftover 5/3/2/1/0 + confusion). Do not Accept ADR 0003.
 
 **Goal:** Tutor Feedback score 4 uses the same Good-equivalent memory update as ordinary correct (SInc + next-D, including New init and overdue extra). Migrate leftover null Difficulty on already-graded trackers. Cleanup spent score-4 ladder pins.
@@ -32,17 +32,9 @@ Status: done
 ### 3. First score 4 on New persists Difficulty 5
 
 Type: Behavior  
-Status: planned
+Status: done
 
-**Pre-condition:** New commissioned tracker (S=0, D unset).  
-**Trigger:** Record Tutor Feedback score **4**.  
-**Post-condition:** Difficulty is **5**. Stability 24 already holds — do not re-assert.
-
-**Commit bound:** New score 4 writes D=5; HTTP `nullValue()` → `5f`; E2E `expectDifficulty(5)` after the **first** Hola: 4. Do not write subsequent next-D. Do not change Stability math.
-
-- Production likely: `setDifficulty(DEFAULT_DIFFICULTY)` when score 4 and S=0. Leave S on `applyScore` (already 24).
-
-**Done when:** New score 4 leaves D=5; E2E/unit green.
+**Learnings:** New score 4 sets `DEFAULT_DIFFICULTY` when still assimilate (S=0) before `setStability`. Subsequent next-D not written. HTTP `nullValue()` → `5f`; E2E first Hola: 4 shows Difficulty 5. Slice 4 still needs Good next-D for S>0.
 
 ---
 
