@@ -47,13 +47,9 @@ On-time second score 5 persists Difficulty **1.9850327** (`Fsrs.nextDifficulty(d
 
 ### 5. Overdue subsequent score 5 grows Stability more than on-time
 Type: Behavior  
-Status: planned
+Status: done
 
-**Pre:** Two commissioned trackers after the same first score 4.  
-**Trigger:** One gets score 5 at elapsed=S; the other at elapsed=2S.  
-**Post:** Overdue next S is strictly greater than on-time (pin **253** vs **169** with frozen `w` if the same first state as the score-4 overdue test). Extra from elapsed vs Stability, not `nextRecallAt`.
-
-Controller test next to `overdueSecondScoreFourGrowsStabilityMoreThanOnTime`. No E2E unless that spec is already open.
+Overdue elapsed=2S after first score 4 persists Stability **253** (Easy SInc already used elapsed vs Stability). Controller test only; no production change.
 
 ---
 

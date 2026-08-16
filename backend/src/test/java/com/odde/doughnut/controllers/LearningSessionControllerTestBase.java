@@ -38,20 +38,6 @@ abstract class LearningSessionControllerTestBase extends ControllerTestBase {
       Gracias: 4
       """;
 
-  protected static final String HOLA4_REPORT =
-      """
-      # Learning Session Report
-
-      Hola: 4
-      """;
-
-  protected static final String GRACIAS4_REPORT =
-      """
-      # Learning Session Report
-
-      Gracias: 4
-      """;
-
   @Autowired LearningSessionController controller;
   @Autowired LearningSessionRepository learningSessionRepository;
   @Autowired SessionItemRepository sessionItemRepository;
@@ -59,6 +45,10 @@ abstract class LearningSessionControllerTestBase extends ControllerTestBase {
   @BeforeEach
   void setupLearningSessionTests() {
     currentUser.setUser(makeMe.aUser().please());
+  }
+
+  protected static String learningSessionReport(String title, int score) {
+    return "# Learning Session Report\n\n%s: %d\n".formatted(title, score);
   }
 
   protected RecordLearningSessionRequest recordRequest(Notebook notebook, String reportMarkdown) {
