@@ -36,7 +36,7 @@ public class ForgettingCurve {
     return FsrsGoodRecall.difficultyAfterGoodRecall(difficulty);
   }
 
-  boolean isNewlyAssimilated() {
+  private boolean isNewlyAssimilated() {
     return stabilityHours <= ASSIMILATE_STABILITY_HOURS;
   }
 

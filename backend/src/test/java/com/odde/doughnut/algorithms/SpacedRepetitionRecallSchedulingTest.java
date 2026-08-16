@@ -50,6 +50,23 @@ class SpacedRepetitionRecallSchedulingTest {
   }
 
   @Test
+  void correctRecallFillsUnsetDifficultyOnGradedTracker() {
+    MemoryTracker unsetDifficulty =
+        makeMe
+            .aMemoryTrackerFor(note)
+            .by(user)
+            .stabilityAndNextRecallAt(STABILITY_HOURS)
+            .inMemoryPlease();
+    MemoryTracker difficultyFive = aGradedTrackerAtThreeDayStability();
+    Timestamp gradeTime = onTimeGradeTime(unsetDifficulty);
+
+    unsetDifficulty.recalledSuccessfully(gradeTime, null);
+    difficultyFive.recalledSuccessfully(gradeTime, null);
+
+    assertThat(unsetDifficulty.getDifficulty(), equalTo(difficultyFive.getDifficulty()));
+  }
+
+  @Test
   void onTimeCorrectRecallUsesFsrsGoodStabilityIncrement() {
     MemoryTracker memoryTracker = aGradedTrackerAtThreeDayStability();
 

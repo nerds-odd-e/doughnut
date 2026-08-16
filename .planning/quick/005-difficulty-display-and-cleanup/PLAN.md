@@ -1,6 +1,6 @@
 # Plan: Difficulty on the Memory Tracker page (004 follow-up)
 
-**Status:** in progress (slice 1 done; next is slice 2)  
+**Status:** in progress (slices 1–2 done; next is slice 3)  
 **Goal:** Drop redundant exact next-Stability hour pins; persist Difficulty when a graded tracker still has it unset; show Difficulty on the Memory Tracker page.
 
 **Context:** [CONTEXT.md](./CONTEXT.md)
@@ -16,24 +16,14 @@ Status: done
 
 Deleted `OnTimeAndEarlyRecall` (24/315/361 pins); kept the due-day grid. `harderDifficultyGrowsStabilityLessOnCorrectRecall` now only asserts higher D → smaller next Stability.
 
-**Learning:** `RobotsTests.openApiDocsMatchCommittedYaml` is already red on HEAD/main CI (`Mcq` property order). Slice 1 wrapped up as-is per developer (local commit, no push). Slice 3 still owns the `@JsonPropertyOrder` pin. Do not treat full `backend:test_only` green as a slice-2 gate.
-
----
-
 ---
 
 ### 2. Correct recall fills unset Difficulty on a graded tracker
 
 Type: Behavior  
-Status: planned
+Status: done
 
-**Pre-condition:** Tracker with Stability > 0 and Difficulty unset.  
-**Trigger:** Ordinary correct recall.  
-**Post-condition:** Difficulty is persisted as the FSRS Good next-D from 5 (not left null). Next Stability for that recall still uses Difficulty 5.
-
-Delta-only on `recalledSuccessfully`. Do not re-assert 266h.
-
-**Done when:** that persist is locked; New (Stability 0) init from 004 still holds.
+`recalledSuccessfully` always persists `difficultyAfterSuccessfulRecall()`. Graded + unset Difficulty now gets FSRS Good next-D from 5 (same as a tracker that already had D=5). New (Stability 0) still inits Difficulty 5. `ForgettingCurve.isNewlyAssimilated()` is private.
 
 ---
 
@@ -42,10 +32,10 @@ Delta-only on `recalledSuccessfully`. Do not re-assert 266h.
 Type: Structure  
 Status: planned
 
-**Unlocks slice 4.** No page change yet.
+**Unlocks slice 4.** No page change yet. `@JsonPropertyOrder` on `Mcq` is already on main (`a4ba72d868`) — do not re-pin unless regen still fails.
 
 - Remove `@JsonIgnore` on `MemoryTracker.difficulty`.
-- `CURSOR_DEV=true nix develop -c pnpm generateTypeScript`. If `RobotsTests.openApiDocsMatchCommittedYaml` fails on `Mcq` property order, pin `@JsonPropertyOrder` on `Mcq` to declaration order and regen — do not hand-edit YAML.
+- `CURSOR_DEV=true nix develop -c pnpm generateTypeScript`. Do not hand-edit YAML.
 - TS `makeMe.aMemoryTracker.difficulty(...)`.
 - Controller/show: graded Difficulty round-trips on the shown entity (delta). Assimilate-only still null.
 
