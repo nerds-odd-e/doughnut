@@ -1,6 +1,6 @@
 # Plan: Commissioned Tutor score 4 is FSRS-6 Good
 
-**Status:** in progress (slices 1–4 done)  
+**Status:** in progress (slices 1–5 done)  
 **Index:** ad-hoc under `.planning/quick/` — on last-slice wrap-up, update `.planning/STATE.md` remaining FSRS gap (score 4 done; leftover 5/3/2/1/0 + confusion). Do not Accept ADR 0003.
 
 **Goal:** Tutor Feedback score 4 uses the same Good-equivalent memory update as ordinary correct (SInc + next-D, including New init and overdue extra). Migrate leftover null Difficulty on already-graded trackers. Cleanup spent score-4 ladder pins.
@@ -50,17 +50,9 @@ Status: done
 ### 5. Overdue score 4 grows more than on-time
 
 Type: Behavior  
-Status: planned
+Status: done
 
-**Pre-condition:** Same commissioned tracker at S=24h, D=5; one grade at elapsed=24h, sibling at elapsed=48h (no thinking time).  
-**Trigger:** Record Tutor Feedback score **4**.  
-**Post-condition:** Overdue Stability is **strictly greater** than on-time (146 vs 102). Queue lateness vs `nextRecallAt` is not an input.
-
-**Commit bound:** one unit/HTTP comparison test. No E2E. No formula fork.
-
-- Production should already follow from slice 2’s elapsed-based SInc. If elapsed is ignored, this slice fails for the right reason — fix SInc to use elapsed, do not add a commissioned-only overdue bonus.
-
-**Done when:** overdue > on-time pin is green.
+**Learnings:** Production already used elapsed-based Good SInc — no formula change. HTTP comparison: Gracias at +48h (146) > Hola at +24h (102). Slice 6 is Flyway null-D backfill only.
 
 ---
 

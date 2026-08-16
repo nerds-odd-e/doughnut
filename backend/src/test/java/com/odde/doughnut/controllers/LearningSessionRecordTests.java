@@ -68,6 +68,26 @@ class LearningSessionRecordTests extends LearningSessionControllerTestBase {
   }
 
   @Test
+  void overdueSecondScoreFourGrowsStabilityMoreThanOnTime()
+      throws UnexpectedNoAccessRightException {
+    Timestamp firstRecord = makeMe.aTimestamp().of(1, 9).please();
+    testabilitySettings.timeTravelTo(firstRecord);
+
+    SpanishNotebookFixture fixture = spanishNotebookFixture(firstRecord);
+    controller.record(recordRequest(fixture.notebook(), HOLA4_GRACIAS4_REPORT), "Asia/Shanghai");
+
+    testabilitySettings.timeTravelTo(TimestampOperations.addHoursToTimestamp(firstRecord, 24));
+    controller.record(recordRequest(fixture.notebook(), HOLA4_REPORT), "Asia/Shanghai");
+
+    testabilitySettings.timeTravelTo(TimestampOperations.addHoursToTimestamp(firstRecord, 48));
+    controller.record(recordRequest(fixture.notebook(), GRACIAS4_REPORT), "Asia/Shanghai");
+
+    assertThat(
+        fixture.graciasTracker().getStability(), greaterThan(fixture.holaTracker().getStability()));
+    assertThat(fixture.graciasTracker().getStability(), equalTo(146f));
+  }
+
+  @Test
   void highScoreSchedulesLaterThanLowScoreFromSameStartingState()
       throws UnexpectedNoAccessRightException {
     Timestamp dayTwo = makeMe.aTimestamp().of(1, 9).please();
