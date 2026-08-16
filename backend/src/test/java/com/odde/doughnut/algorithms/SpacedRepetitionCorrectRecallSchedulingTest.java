@@ -1,6 +1,5 @@
 package com.odde.doughnut.algorithms;
 
-import static com.odde.doughnut.entities.ForgettingCurve.ASSIMILATE_STABILITY_HOURS;
 import static com.odde.doughnut.entities.ForgettingCurve.DEFAULT_DIFFICULTY;
 import static com.odde.doughnut.entities.ForgettingCurve.FIRST_SUCCESS_STABILITY_HOURS;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -9,37 +8,11 @@ import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.lessThan;
 
 import com.odde.doughnut.entities.MemoryTracker;
-import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.User;
-import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.utils.TimestampOperations;
 import java.sql.Timestamp;
 import org.junit.jupiter.api.Test;
 
-class SpacedRepetitionRecallSchedulingTest {
-  private static final float STABILITY_HOURS = 72f;
-  private final MakeMe makeMe = MakeMe.makeMeWithoutFactoryService();
-  private final User user = makeMe.aUser().inMemoryPlease();
-  private final Note note = makeMe.aNote().inMemoryPlease();
-
-  private MemoryTracker aGradedTrackerAtThreeDayStability() {
-    return aGradedTrackerAtThreeDayStability(DEFAULT_DIFFICULTY);
-  }
-
-  private MemoryTracker aGradedTrackerAtThreeDayStability(float difficulty) {
-    return makeMe
-        .aMemoryTrackerFor(note)
-        .by(user)
-        .stabilityAndNextRecallAt(STABILITY_HOURS)
-        .difficulty(difficulty)
-        .inMemoryPlease();
-  }
-
-  private Timestamp onTimeGradeTime(MemoryTracker tracker) {
-    return TimestampOperations.addHoursToTimestamp(
-        tracker.getLastRecalledAt(), Math.round(tracker.getStability()));
-  }
-
+class SpacedRepetitionCorrectRecallSchedulingTest extends SpacedRepetitionRecallSchedulingTestBase {
   @Test
   void firstCorrectRecallInitializesDifficulty() {
     MemoryTracker memoryTracker = makeMe.aMemoryTrackerFor(note).by(user).inMemoryPlease();
@@ -210,34 +183,5 @@ class SpacedRepetitionRecallSchedulingTest {
             elapsedHundredTimesStability.getLastRecalledAt());
     assertThat(hundredTimesInterval, greaterThan(tenTimesInterval));
     assertThat(hundredTimesInterval - tenTimesInterval, lessThan(tenTimesInterval));
-  }
-
-  @Test
-  void onTimeIncorrectRecallUsesFsrsAgainPostLapseStability() {
-    MemoryTracker memoryTracker = aGradedTrackerAtThreeDayStability();
-    Integer oldRecallCount = memoryTracker.getRecallCount();
-    Timestamp gradeTime = onTimeGradeTime(memoryTracker);
-
-    memoryTracker.markAsRecalled(gradeTime, false, null);
-
-    assertThat(memoryTracker.getStability(), equalTo(17.0f));
-    assertThat(
-        memoryTracker.getNextRecallAt(),
-        equalTo(TimestampOperations.addHoursToTimestamp(gradeTime, 12)));
-    assertThat(memoryTracker.getLastRecalledAt(), equalTo(gradeTime));
-    assertThat(memoryTracker.getRecallCount(), equalTo(oldRecallCount + 1));
-  }
-
-  @Test
-  void newTrackerIncorrectRecallKeepsZeroStabilityAndTwelveHourDue() {
-    MemoryTracker memoryTracker = makeMe.aMemoryTrackerFor(note).by(user).inMemoryPlease();
-    Timestamp gradeTime = memoryTracker.getNextRecallAt();
-
-    memoryTracker.markAsRecalled(gradeTime, false, null);
-
-    assertThat(memoryTracker.getStability(), equalTo(ASSIMILATE_STABILITY_HOURS));
-    assertThat(
-        memoryTracker.getNextRecallAt(),
-        equalTo(TimestampOperations.addHoursToTimestamp(gradeTime, 12)));
   }
 }

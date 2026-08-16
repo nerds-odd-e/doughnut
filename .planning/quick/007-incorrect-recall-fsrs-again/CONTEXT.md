@@ -30,6 +30,6 @@ Do not mix with in-progress [quick/006](../006-difficulty-card-and-test-cleanup/
 
 ## Tests
 
-- **Unit:** `SpacedRepetitionRecallSchedulingTest` via `markAsRecalled(..., false, ...)` — same grain as Good. One new assertion focus per slice.
+- **Unit:** `SpacedRepetitionIncorrectRecallSchedulingTest` via `markAsRecalled(..., false, ...)`. One new assertion focus per slice. Correct-recall pins live in `SpacedRepetitionCorrectRecallSchedulingTest`.
 - **Accidental-match edge:** keep 12h / recallCount / lastRecalledAt; stop pinning `ForgettingCurve.failed()` once canonical S is pinned.
 - **E2E:** `spaced_repetition.feature` (`@mockBrowserTime`, no OpenAI). Success then fail, then Memory Tracker. Existing New+fail 12h E2E must stay green. Tag new scenarios `@wip` until that slice’s post-condition passes.

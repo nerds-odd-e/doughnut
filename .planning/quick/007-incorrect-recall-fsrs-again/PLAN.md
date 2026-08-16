@@ -1,6 +1,6 @@
 # Plan: Ordinary incorrect recall uses FSRS-6 Again
 
-**Status:** in progress (slices 1–2 done)  
+**Status:** in progress (slices 1–3 done)  
 **Goal:** S > 0 incorrect recall persists FSRS-6 post-lapse Stability (D, S, R) and Again Difficulty; due time stays +12h. Lock D1 in ADR 0003 Decision. No Accept.
 
 **Context:** [CONTEXT.md](./CONTEXT.md)
@@ -9,7 +9,7 @@ Sequential. Each slice is one Behavior, stop-safe, ~one commit. Do not Accept AD
 
 Canonical post-conditions (12h due, lastRecalledAt / recallCount) are asserted **once** in slice 1. Later slices assert only their delta.
 
-**Learnings:** On-time pin is **17h** (S=72, D=5). Frozen `W`/R live in package-private `Fsrs`. Slice 2 E2E is first-success S=24 then fail — Stability **not 0**, not 17h. Just-review has no answered-question page: open the understanding Memory Tracker from the note. Slice 7 should extend that same scenario/path.
+**Learnings:** On-time pin is **17h** (S=72, D=5). Frozen `W`/R live in package-private `Fsrs`. Slice 2 E2E: first-success S=24 then fail — Stability **not 0**; open understanding Memory Tracker from the note (just-review has no answered-question page). Incorrect-recall unit tests live in `SpacedRepetitionIncorrectRecallSchedulingTest` (split from the old combined class at 250 lines).
 
 ---
 
@@ -34,15 +34,9 @@ Assimilate → just-review Yes (day 1) → due No (day 2) → understanding Memo
 ### 3. Harder Difficulty leaves less remaining Stability on incorrect
 
 Type: Behavior  
-Status: planned
+Status: done
 
-**Pre-condition:** Two graded siblings, same S, on-time elapsed; Difficulties 3 and 8.  
-**Trigger:** Ordinary incorrect recall.  
-**Post-condition:** The harder tracker’s remaining Stability is **strictly less**. Due time still +12h (do not re-assert).
-
-- Delta only in `SpacedRepetitionRecallSchedulingTest`. No E2E.
-
-**Done when:** harder < easier remaining-S unit test green.
+D=3 vs D=8 siblings, same S, on-time incorrect: harder remaining Stability is strictly less. Production unchanged (post-lapse already uses D). Test in `SpacedRepetitionIncorrectRecallSchedulingTest`.
 
 ---
 
@@ -55,7 +49,7 @@ Status: planned
 **Trigger:** One incorrect at elapsed = S; the other at elapsed = 2S.  
 **Post-condition:** Overdue remaining Stability is **strictly greater**. Extra from elapsed vs Stability (low R), not `nextRecallAt`.
 
-- Delta only (mirror `overdueCorrectRecallLengthensStabilityMoreThanOnTime`). No E2E.
+- Delta only in `SpacedRepetitionIncorrectRecallSchedulingTest` (mirror `overdueCorrectRecallLengthensStabilityMoreThanOnTime`). No E2E.
 
 **Done when:** overdue > on-time unit test green.
 
@@ -70,7 +64,7 @@ Status: planned
 **Trigger:** Ordinary incorrect recall.  
 **Post-condition:** Persisted Stability is **≥ 1**. Still due in 12h (do not re-assert).
 
-- One unit test. This is the floor; slice 1’s 72h/24h pin need not hit it.
+- One unit test in `SpacedRepetitionIncorrectRecallSchedulingTest`. This is the floor; slice 1’s 72h pin need not hit it.
 
 **Done when:** 1-hour-S fail unit test green.
 
@@ -85,7 +79,7 @@ Status: planned
 **Trigger:** Ordinary incorrect recall.  
 **Post-condition:** Persisted Difficulty is FSRS-6 Again next-D (harder; from 5 → 10 with frozen `w`). Unset D matches a D=5 sibling (assert D only).
 
-- Canonical D pin plus unset sibling in `SpacedRepetitionRecallSchedulingTest`. Lock Again next-D in ADR 0003 Decision. Do not Accept.
+- Canonical D pin plus unset sibling in `SpacedRepetitionIncorrectRecallSchedulingTest`. Lock Again next-D in ADR 0003 Decision. Do not Accept.
 - No E2E in this slice.
 
 **Done when:** both D unit tests green.
