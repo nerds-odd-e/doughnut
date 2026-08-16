@@ -18,13 +18,13 @@ match. Introduce or replace structure **only** when that behavior needs it.
 No unused Difficulty, lapse, requested-retention, or RecallLog fields
 for later slices.
 
-Ordinary **correct** recall with S > 0 uses FSRS-6 Good SInc and next-D (own implementation, frozen default `w` in `FsrsGoodRecall`). First correct on New inits D=5, S=24h. E2E day-at-08:00 assimilate/recall lists follow that success path. Ordinary **incorrect** (S > 0) uses FSRS-6 post-lapse S and Again next-D (`FsrsAgainRecall`); due stays +12h. Commissioned Tutor score **4** is the same Good path (SInc, next-D, New D=5/S=24, overdue extra). Leftover ladder is Tutor **5/3/2/1/0** plus confusion (`DEFAULT_SPACES`; keep until those behaviors move). B2 requested-retention knob, B4, relearning steps, and C–E stay open.
+Ordinary **correct** recall with S > 0 uses FSRS-6 Good SInc and next-D (own implementation, frozen default `w` in `FsrsGoodRecall`). First correct on New inits D=5, S=24h. E2E day-at-08:00 assimilate/recall lists follow that success path. Ordinary **incorrect** (S > 0) uses FSRS-6 post-lapse S and Again next-D (`FsrsAgainRecall`); due stays +12h. Commissioned Tutor score **4** is the same Good path (SInc, next-D, New D=5/S=24, overdue extra). Score **5** is FSRS-6 Easy (`recalledEasily`; New init like first correct). Leftover ladder is Tutor **3/2/1/0** plus confusion (`DEFAULT_SPACES`; keep until those behaviors move). Next work is remaining leftover scores first, not B2 by default. B2 requested-retention knob, B4, relearning steps, and C–E stay open.
 
-Current Doughnut persists **Stability** in whole hours and **Difficulty** (nullable; shown on the Memory Tracker). Retrievability is computed on ordinary correct, ordinary incorrect, and Tutor score 4 (FSRS-6 power curve). There is still **no** lapse count, requested-retention knob, or card state (`New` / `Learning` / `Review` / `Relearning`). Remaining gaps close by **vertical slice** (ADR 0003 Decision).
+Current Doughnut persists **Stability** in whole hours and **Difficulty** (nullable; shown on the Memory Tracker). Retrievability is computed on ordinary correct, ordinary incorrect, and Tutor scores 4 and 5 (FSRS-6 power curve). There is still **no** lapse count, requested-retention knob, or card state (`New` / `Learning` / `Review` / `Relearning`). Remaining gaps close by **vertical slice** (ADR 0003 Decision).
 
 ## 1. What “mostly compatible” should mean
 
-Open FSRS is a **DSR scheduler**: persisted **Difficulty (D)** and **Stability (S)**, computed **Retrievability (R)** from elapsed time, four **grades**, and a **requested retention** that turns S into the next interval. Current Doughnut persists **Stability** (hours) and **Difficulty** (nullable, shown on the Memory Tracker). Ordinary correct uses FSRS-6 Good SInc (`r = 0.9` implicit). Tutor score 4 uses that same Good path. Ordinary incorrect uses FSRS-6 post-lapse S and Again next-D. No requested-retention knob (B2).
+Open FSRS is a **DSR scheduler**: persisted **Difficulty (D)** and **Stability (S)**, computed **Retrievability (R)** from elapsed time, four **grades**, and a **requested retention** that turns S into the next interval. Current Doughnut persists **Stability** (hours) and **Difficulty** (nullable, shown on the Memory Tracker). Ordinary correct uses FSRS-6 Good SInc (`r = 0.9` implicit). Tutor score 4 uses that same Good path. Score 5 uses FSRS-6 Easy. Ordinary incorrect uses FSRS-6 post-lapse S and Again next-D. No requested-retention knob (B2).
 
 For ADR 0003, “mostly compatible” is a product claim, not a library claim.
 **A1 is locked:** Doughnut owns an open-FSRS-compatible implementation (D, S,
@@ -53,7 +53,7 @@ computed R, grade + elapsed time). No `ts-fsrs` / `fsrs-rs` / other FSRS library
 | `recallCount` | Incremented on state-changing grades. |
 | `assimilatedAt` | First intake. Assimilation sets `lastRecalledAt = now` with **no grade**. |
 
-Difficulty is persisted (nullable; shown on the Memory Tracker) and consumed on ordinary correct, ordinary incorrect, and Tutor score 4. Frozen default FSRS-6 weights live in `Fsrs`. There is still **no** lapse count, requested-retention knob, or card state (`New` / `Learning` / `Review` / `Relearning`). Retrievability is not stored.
+Difficulty is persisted (nullable; shown on the Memory Tracker) and consumed on ordinary correct, ordinary incorrect, and Tutor scores 4 and 5. Frozen default FSRS-6 weights live in `Fsrs`. There is still **no** lapse count, requested-retention knob, or card state (`New` / `Learning` / `Review` / `Relearning`). Retrievability is not stored.
 
 **Success** (`ForgettingCurve.succeeded`):
 
@@ -75,8 +75,9 @@ Difficulty is persisted (nullable; shown on the Memory Tracker) and consumed on 
 | Overlap | None | Unchanged (retry in session) |
 | Accidental match (primary) | Ordinary failure | Advances; 12h retry |
 | Confusion adjustment (secondary) | `−10` index | Due may move earlier, never later; no `lastRecalledAt` / `recallCount` |
+| Tutor 5 | FSRS-6 Easy (SInc × w16, Easy next-D; New D=5/S=24; overdue extra) | Normal interval path; no 12h retry |
 | Tutor 4 | FSRS-6 Good (SInc, next-D; New D=5/S=24; overdue extra) | Normal interval path; no 12h retry |
-| Tutor 5 / 3 | Success-like `+12` / `+8` (ladder) | Normal interval path; no 12h retry |
+| Tutor 3 | Success-like `+8` (ladder) | Normal interval path; no 12h retry |
 | Tutor 2 / 1 / 0 | Reduce accumulated strength 20% / 50% / reset to 100 | Next recall strictly after now |
 | Just review | Boolean `mark-as-recalled`; thinking time `null` | Same as MCQ correct/incorrect |
 
@@ -115,8 +116,8 @@ FSRS **Hard (G=2) is still success**. That is the sharpest mapping clash with Do
 
 | Open FSRS | Doughnut today | Kind of gap |
 |-----------|----------------|-------------|
-| Persist D and S; compute R(t, S) | Persist S (hours) and D (nullable, shown); R computed on ordinary correct, ordinary incorrect, and Tutor score 4 | **Model** (SInc + Good next-D + post-lapse S + Again next-D + first-grade init D=5/S=24h) |
-| Interval from requested retention | Ordinary correct uses SInc; ordinary incorrect uses post-lapse S; success `nextRecallAt = last + S` (`r = 0.9` implicit). Fail due stays +12h. Confusion / Tutor 5/3/2/1/0 still ladder | **Product knob** (B2 r-knob open) |
+| Persist D and S; compute R(t, S) | Persist S (hours) and D (nullable, shown); R computed on ordinary correct, ordinary incorrect, and Tutor scores 4 and 5 | **Model** (SInc + Good next-D + post-lapse S + Again next-D + first-grade init D=5/S=24h) |
+| Interval from requested retention | Ordinary correct uses SInc; ordinary incorrect uses post-lapse S; success `nextRecallAt = last + S` (`r = 0.9` implicit). Fail due stays +12h. Confusion / Tutor 3/2/1/0 still ladder | **Product knob** (B2 r-knob open) |
 | G ∈ {1,2,3,4} | Incorrect / correct + overlap / accidental match + Tutor 0–5 + thinking time | **Grades** |
 | Overdue success: bounded extra S via low R | Overdue correct lengthens S more than on-time; extra converges | **Aligned** (B3) |
 | Early success: smaller SInc via high R | FSRS-6 R in SInc (same direction) | **Aligned** |
@@ -156,7 +157,7 @@ implementation**: D and S as persisted memory state, R computed from elapsed
 time and S, transition = grade + elapsed time + that state. Doughnut implements
 it; no FSRS library. Ordinary correct already consumes D/S via Good SInc.
 Ordinary incorrect consumes D/S via post-lapse S and Again next-D. Tutor score
-4 is that same Good path. Confusion / Tutor 5/3/2/1/0 still use
+4 is that same Good path. Score 5 is FSRS-6 Easy. Confusion / Tutor 3/2/1/0 still use
 `DEFAULT_SPACES` until those behaviors move.
 
 **A1 locked.** Remaining open items in B–E close by vertical slice; **B3** is locked in Decision and in code.
@@ -178,26 +179,26 @@ only B). First behavior: **B3**.
 
 **B1. Persist D / S when a behavior consumes them** (was O2) — **in code 2026-08-15**
 
-`memory_tracker.difficulty` exists (nullable float, shown on the Memory Tracker). Graded rows backfilled to **5**; assimilate-only / New rows leave D unset. Ordinary correct with S > 0 consumes D for FSRS-6 Good SInc and persists next-D. Tutor score 4 does the same. Ordinary incorrect with S > 0 consumes D for post-lapse S and Again next-D. First correct on New (including Tutor score 4) initializes D=5, S=24h.
+`memory_tracker.difficulty` exists (nullable float, shown on the Memory Tracker). Graded rows backfilled to **5**; assimilate-only / New rows leave D unset. Ordinary correct with S > 0 consumes D for FSRS-6 Good SInc and persists next-D. Tutor score 4 does the same. Score 5 consumes D for Easy SInc and Easy next-D. Ordinary incorrect with S > 0 consumes D for post-lapse S and Again next-D. First correct on New (including Tutor scores 4 and 5) initializes D=5, S=24h.
 
 **B1 persist D exists and is consumed for SInc and Again.**
 
 **B2. Interval source** (was O6) — user-visible
 
-Success path already uses FSRS-6 Good SInc with implicit `r = 0.9`. Remaining knob: requested retention `r ≠ 0.9`. Ordinary fail is off the leftover ladder. Confusion / Tutor 5/3/2/1/0 still walk `DEFAULT_SPACES` (leftover; not this B2 question).
+Success path already uses FSRS-6 Good SInc with implicit `r = 0.9`. Remaining knob: requested retention `r ≠ 0.9`. Ordinary fail is off the leftover ladder. Confusion / Tutor 3/2/1/0 still walk `DEFAULT_SPACES` (leftover; not this B2 question). Next work is remaining leftover scores first, not B2 by default.
 
 - Keep implicit `r = 0.9` (no Settings knob).
 - **Prefer requested retention as the target knob.**
 
-FSRS interval is `I(r, S)`. Doughnut success path is already SInc, not a day table. Full compatibility still needs an `r` knob (and leftover confusion / Tutor 5/3/2/1/0 paths off the ladder).
+FSRS interval is `I(r, S)`. Doughnut success path is already SInc, not a day table. Full compatibility still needs an `r` knob (and leftover confusion / Tutor 3/2/1/0 paths off the ladder).
 
 **Recommendation to discuss:** ADR states retention-target intervals as the **target**. Do not silently add a Settings control in this ADR.
 
-Implementing the remaining target: **behavior** — next interval from retention `r` and S when `r ≠ 0.9`. Deleting `DEFAULT_SPACES` waits on confusion / Tutor 5/3/2/1/0 slices, not B2.
+Implementing the remaining target: **behavior** — next interval from retention `r` and S when `r ≠ 0.9`. Deleting `DEFAULT_SPACES` waits on confusion / Tutor 3/2/1/0 slices, not B2.
 
 **B3. Overdue success reward — resolved 2026-08-15** (was O5); **in code 2026-08-15**
 
-Locked in ADR 0003 Decision **Overdue correct recall: bounded extra growth**, and implemented on `ForgettingCurve.succeeded`: next interval after overdue correct is strictly longer than on-time (same thinking time); extra from elapsed vs Stability, not `nextRecallAt`; bounded, not linear. Tutor score 4 inherits this extra (same as ordinary correct). Remaining Tutor scores (5/3/2/1/0) do not.
+Locked in ADR 0003 Decision **Overdue correct recall: bounded extra growth**, and implemented on `ForgettingCurve.succeeded`: next interval after overdue correct is strictly longer than on-time (same thinking time); extra from elapsed vs Stability, not `nextRecallAt`; bounded, not linear. Tutor scores 4 and 5 inherit this extra (same as ordinary correct). Remaining Tutor scores (3/2/1/0) do not.
 
 **B4. Lapses** (was O15)
 
@@ -208,7 +209,7 @@ Do not add an unused counter. Before adding: which outcomes increment it; first 
 Closing B4 by deferring: no change. An unused lapse column later would be
 internal only; using lapses to change due times would be behavior.
 
-**B3 in running code:** overdue correct lengthens Stability more than on-time (now via FSRS SInc), including Tutor score 4. **B1** D is consumed for SInc and Again. B2 requested-retention knob and B4 remain open.
+**B3 in running code:** overdue correct lengthens Stability more than on-time (now via FSRS SInc), including Tutor scores 4 and 5. **B1** D is consumed for SInc and Again. B2 requested-retention knob and B4 remain open.
 
 ---
 
@@ -226,7 +227,7 @@ internal only; using lapses to change due times would be behavior.
 
 | Tutor score | ADR 0003 today | FSRS-like reading |
 |-------------|----------------|-------------------|
-| 5 | Success, +20% | Easy (G=4) |
+| 5 | Easy (in code) | Easy (G=4) |
 | 4 | Good (same as ordinary correct) | Good (G=3) |
 | 3 | Success, −20% | Hard (G=2) **or** weak Good |
 | 2 | **No growth; −20% accumulated** | Clash: FSRS Hard still increases S |
@@ -257,7 +258,7 @@ Locked in ADR 0003 Decision **Incorrect recall (Again)**: the 12-hour ordinary-r
 
 Configurable relearning steps remain open. Commissioned learning stays cadence-driven.
 
-**D1 locked and in code.** Leftover ladder is confusion + Tutor 5/3/2/1/0.
+**D1 locked and in code.** Leftover ladder is confusion + Tutor 3/2/1/0.
 
 **D2. Short-term / same-hour recalls** (was O11)
 
@@ -343,7 +344,7 @@ Hygiene while this doc is the tracker: do not duplicate open issues in the ADR; 
 | ID | Topic | ADR must lock? | Suggested |
 |----|-------|----------------|-----------|
 | A1 | FSRS-compatible = own D/S/R implementation, no library | **Resolved** | Locked 2026-08-15 |
-| B1 | When to persist D/S | **In code** | Persist D exists; ordinary correct, ordinary incorrect, and Tutor score 4 consume D |
+| B1 | When to persist D/S | **In code** | Persist D exists; ordinary correct, ordinary incorrect, and Tutor scores 4 and 5 consume D |
 | B2 | Requested-retention knob (`r ≠ 0.9`) | Yes | Open |
 | B3 | Overdue bounded extra growth | **Resolved** | Locked and implemented 2026-08-15 |
 | B4 | Lapses | Defer | Defer |
