@@ -23,8 +23,9 @@ Feature: Spaced-repetition
     And On day 4 I recall "Note 3, Note 2, end " and assimilate new "end         "
     And On day 5 I recall "Note 3, end         " and assimilate new "end         "
     And On day 6 I recall "end                 " and assimilate new "end         "
-    And On day 7 I recall "Note 1, end         " and assimilate new "end         "
-    And On day 8 I recall "Note 2, end         " and assimilate new "end         "
+    And On day 7 I recall "end                 " and assimilate new "end         "
+    And On day 8 I recall "Note 1, end         " and assimilate new "end         "
+    And On day 9 I recall "Note 2, end         " and assimilate new "end         "
 
   @mockBrowserTime
   Scenario: Strictly follow the schedule but want to recall more
@@ -34,4 +35,4 @@ Feature: Spaced-repetition
     And On day 4 I recall "Note 3, Note 2, end " and assimilate new "end         "
     And I ask to do more recall
     And I repeat more old "Note 3         "
-    Then I should have "0/0/3" note for assimilation and "6/7/3" for recall
+    Then I should have "0/0/3" note for assimilation and "6/6/3" for recall

@@ -4,8 +4,6 @@ import type { Randomization } from '@generated/doughnut-backend-api'
 import type ServiceMocker from '../support/ServiceMocker'
 import type { NoteTestData } from '@generated/doughnut-backend-api'
 import type { McqsTestData } from '@generated/doughnut-backend-api'
-import type { TimeTravel } from '@generated/doughnut-backend-api'
-import type { TimeTravelRelativeToNow } from '@generated/doughnut-backend-api'
 import type {
   AttachBookRequestFull,
   Folder,
@@ -27,10 +25,7 @@ import {
 } from '@generated/doughnut-backend-api/sdk.gen'
 import { circleIdAlias } from './pageObjects/circlePage'
 import { assimilateTestabilityMethods } from './testabilityAssimilate'
-
-const hourOfDay = (days: number, hours: number) => {
-  return new Date(1976, 5, 1 + days, hours)
-}
+import { timeTravelTestabilityMethods } from './testabilityTimeTravel'
 
 /** Per-attempt budget for DB truncate + seed; CI under load often exceeds 6s. */
 const CLEAN_DB_REQUEST_TIMEOUT_MS = 30_000
@@ -565,6 +560,7 @@ const testability = () => {
     },
 
     ...assimilateTestabilityMethods,
+    ...timeTravelTestabilityMethods,
 
     dueRecallPrompt() {
       const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
@@ -640,46 +636,6 @@ const testability = () => {
             )
           })
         })
-    },
-
-    timeTravelTo(day: number, hour: number) {
-      this.backendTimeTravelTo(day, hour)
-      cy.window().then((window) => {
-        cy.tick(hourOfDay(day, hour).getTime() - new window.Date().getTime())
-      })
-    },
-
-    backendTimeTravelToDate(date: Date) {
-      const requestBody: TimeTravel = { travel_to: JSON.stringify(date) }
-
-      return cy.wrap(
-        TestabilityRestController.timeTravel({ body: requestBody }),
-        { log: false }
-      )
-    },
-
-    backendTimeTravelTo(day: number, hour: number) {
-      const requestBody: TimeTravel = {
-        travel_to: JSON.stringify(hourOfDay(day, hour)),
-      }
-
-      return cy.wrap(
-        TestabilityRestController.timeTravel({ body: requestBody }),
-        { log: false }
-      )
-    },
-
-    backendTimeTravelRelativeToNow(hours: number) {
-      const requestBody: TimeTravelRelativeToNow = {
-        hours,
-      }
-
-      return cy.wrap(
-        TestabilityRestController.timeTravelRelativeToNow({
-          body: requestBody,
-        }),
-        { log: false }
-      )
     },
 
     randomizerSettings(strategy: 'first' | 'last' | 'seed', seed: number) {
@@ -777,20 +733,6 @@ const testability = () => {
         }),
         { log: false }
       )
-    },
-    mockBrowserTime() {
-      //
-      // when using `cy.clock()` to set the time,
-      // for Vue component with v-if for a ref/react object that is changed during mount by async call
-      // the event, eg. click, will not work.
-      //
-      cy.clock(hourOfDay(0, 0), [
-        'setTimeout',
-        'setInterval',
-        'clearInterval',
-        'clearTimeout',
-        'Date',
-      ])
     },
     mockService(serviceMocker: ServiceMocker) {
       this.setServiceUrl(serviceMocker.serviceName, serviceMocker.serviceUrl)
