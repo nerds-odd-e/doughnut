@@ -40,10 +40,12 @@ any other FSRS library. Compatibility is with the open FSRS model (inputs,
 state, qualitative update rules), not with a particular crate or version.
 
 - **Stability** is persisted memory state: the current interval in **whole
-  hours**. After a grade, `nextRecallAt = lastRecalledAt + stability`. A
-  newly assimilated tracker may have Stability 0 (due now). After any graded
-  answer, persisted Stability 0 is not allowed. Spacing is Stability, not a
-  Settings day list.
+  hours**. After a **correct** recall, `nextRecallAt = lastRecalledAt +
+  stability`. After **ordinary incorrect**, due is grade time + 12 hours
+  (schedule metadata). A newly assimilated tracker may have Stability 0
+  (due now). After any graded answer, persisted Stability 0 is not allowed,
+  except New fail (S=0 + 12h, already in Again Decision). Spacing is
+  Stability, not a Settings day list.
 - **Retrievability** is computed from elapsed whole hours and Stability, not stored.
 - A recall transition consumes the graded outcome, elapsed time, and that state — never queue lateness.
 - Requested retention (turning Stability into an interval from a
