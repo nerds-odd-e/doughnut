@@ -66,13 +66,22 @@ Feature: Commissioned learning session
     When It's day 3, 9 hour
     Then I should see 1 potential learning session for notebook "Spanish conversation"
     When I open the learning session request for notebook "Spanish conversation"
-    Then the learning session request should list session items for only notes "Gracias"
+    Then the learning session request should list session items for notes "Hola, Gracias"
 
   Scenario: First tutor score 4 on a new tracker sets Difficulty to 5
     Given the notes "Hola, Gracias" are assimilated as commissioned on day 1
     And I have recorded a learning session for notebook "Spanish conversation" on day 2 with scores:
       | Note    | Score |
       | Hola    | 4     |
+      | Gracias | 1     |
+    When I visit the commissioned memory tracker for "Hola"
+    Then I should see Difficulty 5
+
+  Scenario: First tutor score 5 on a new tracker sets Difficulty to 5
+    Given the notes "Hola, Gracias" are assimilated as commissioned on day 1
+    And I have recorded a learning session for notebook "Spanish conversation" on day 2 with scores:
+      | Note    | Score |
+      | Hola    | 5     |
       | Gracias | 1     |
     When I visit the commissioned memory tracker for "Hola"
     Then I should see Difficulty 5

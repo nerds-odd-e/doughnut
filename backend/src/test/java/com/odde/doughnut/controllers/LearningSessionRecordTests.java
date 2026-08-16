@@ -58,6 +58,23 @@ class LearningSessionRecordTests extends LearningSessionControllerTestBase {
   }
 
   @Test
+  void firstScoreFiveOnNewPersistsDifficultyFiveAndStability24()
+      throws UnexpectedNoAccessRightException {
+    Timestamp dayTwo = makeMe.aTimestamp().of(1, 9).please();
+    testabilitySettings.timeTravelTo(dayTwo);
+
+    SpanishNotebookFixture fixture = spanishNotebookFixture(dayTwo);
+    controller.record(recordRequest(fixture.notebook(), HOLA_GRACIAS_REPORT), "Asia/Shanghai");
+
+    MemoryTracker hola = fixture.holaTracker();
+    assertThat(hola.getDifficulty(), equalTo(5f));
+    assertThat(hola.getStability(), equalTo(24f));
+    assertThat(
+        hola.getNextRecallAt(),
+        equalTo(TimestampOperations.addHoursToTimestamp(hola.getLastRecalledAt(), 24)));
+  }
+
+  @Test
   void onTimeSecondScoreFourPersistsStability102() throws UnexpectedNoAccessRightException {
     assertThat(afterOnTimeSecondScoreFour().holaTracker().getStability(), equalTo(102f));
   }
@@ -88,18 +105,14 @@ class LearningSessionRecordTests extends LearningSessionControllerTestBase {
   }
 
   @Test
-  void highScoreSchedulesLaterThanLowScoreFromSameStartingState()
-      throws UnexpectedNoAccessRightException {
+  void firstScoreOneLeavesDifficultyUnset() throws UnexpectedNoAccessRightException {
     Timestamp dayTwo = makeMe.aTimestamp().of(1, 9).please();
     testabilitySettings.timeTravelTo(dayTwo);
 
-    Notebook notebook = spanishNotebook(dayTwo);
-    controller.record(recordRequest(notebook, HOLA_GRACIAS_REPORT), "Asia/Shanghai");
+    SpanishNotebookFixture fixture = spanishNotebookFixture(dayTwo);
+    controller.record(recordRequest(fixture.notebook(), HOLA_GRACIAS_REPORT), "Asia/Shanghai");
 
-    MemoryTracker holaTracker = trackerForNote(notebook, "Hola");
-    MemoryTracker graciasTracker = trackerForNote(notebook, "Gracias");
-
-    assertThat(holaTracker.getNextRecallAt(), greaterThan(graciasTracker.getNextRecallAt()));
+    assertThat(fixture.graciasTracker().getDifficulty(), nullValue());
   }
 
   @Test

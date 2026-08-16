@@ -15,23 +15,17 @@ Status: done
 
 Locked in Proposed ADR 0003: **Tutor Feedback score 5 (Easy)** next to score 4. New D=5/S=24h; S>0 Easy increment + Easy next-D; overdue extra inherited by 4 and 5. Working draft leftover is 3/2/1/0. ADR not accepted.
 
-Learning: no surprises; app still +20% ladder until slice 2.
+Learning: no surprises; New score 5 now matches first correct (slice 2).
 
 ---
 
 ### 2. First score 5 on New initializes Difficulty 5 and Stability 24h
 Type: Behavior  
-Status: planned
+Status: done
 
-**Pre:** New commissioned tracker (S=0, D unset).  
-**Trigger:** Record Tutor score 5.  
-**Post:** D=5, S=24, `nextRecallAt = lastRecalledAt + 24h`. Not 29h ladder. D is no longer unset.
+New score 5 (`S <= assimilate hours`) uses `recalledSuccessfully`: D=5, S=24h, due +24h. Subsequent score 5 still `applyScore` until slice 3.
 
-Controller test next to `firstScoreFourOnNewPersistsDifficultyFive`. E2E next to “First tutor score 4 … Difficulty 5”.
-
-**Discovery to handle in this slice:** today first score 5 is 29h, so `highScoreSchedulesLaterThanLowScoreFromSameStartingState` (5 vs 1) and the E2E that expects Hola:5 still not due on day 3 9:00 rely on 29h vs score 1’s 24h strictly-future fallback. After this slice those due times can match. Retarget those tests to D/S (or another still-true claim). Do not keep 29h to protect them.
-
-Smallest impl: New score 5 uses the same successful-recall init as score 4 (`recalledSuccessfully`). Subsequent score 5 must still use `applyScore` until slice 3.
+29h retargets: score 1 leaves D unset; day-3 due list is both Hola and Gracias. Exclusive “only notes” E2E helper removed.
 
 ---
 

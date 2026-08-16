@@ -93,23 +93,6 @@ export const recallLearningSessionMethods = () => ({
     })
     return this
   },
-  expectLearningSessionRequestListsOnlyNotes(noteTitles: string) {
-    const expected = commonSenseSplit(noteTitles, ',')
-    expected.forEach((title) => {
-      this.learningSessionRequestText().should('contain', `### ${title}`)
-    })
-    this.learningSessionRequestText().then((text) => {
-      const sessionItemsSection =
-        text.match(/<session_items>([\s\S]*?)<\/session_items>/)?.[1] ?? ''
-      const itemHeaders = sessionItemsSection.match(/^### .+$/gm) ?? []
-      expect(itemHeaders).to.have.length(expected.length)
-      for (const header of itemHeaders) {
-        const title = header.replace('### ', '')
-        expect(expected).to.include(title)
-      }
-    })
-    return this
-  },
   expectLearningSessionRequestIncludesLearningStatus(noteTitle: string) {
     this.learningSessionRequestText().should((text) => {
       expect(text).to.contain(`### ${noteTitle}`)

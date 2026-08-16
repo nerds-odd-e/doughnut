@@ -88,16 +88,6 @@ Then(
 )
 
 Then(
-  'the learning session request should list session items for only notes {string}',
-  (noteTitles: string) => {
-    start
-      .recall()
-      .assumeRecallPage()
-      .expectLearningSessionRequestListsOnlyNotes(noteTitles)
-  }
-)
-
-Then(
   'the learning session request should include the learning status of {string}',
   (noteTitle: string) => {
     start

@@ -1,7 +1,7 @@
 package com.odde.doughnut.controllers;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -10,7 +10,6 @@ import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.doughnut.utils.TimestampOperations;
 import java.sql.Timestamp;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -41,7 +40,7 @@ class RecallsCommissionedLearningSessionTests extends RecallsControllerTestBase 
     }
 
     @Test
-    void dayThreeDueCommissionedOnlyGraciasAfterRecordedScores()
+    void dayThreeDueCommissionedHolaAndGraciasAfterRecordedScores()
         throws UnexpectedNoAccessRightException {
       currentUser.setUser(makeMe.aUser().please());
       Timestamp dayOne = makeMe.aTimestamp().of(0, 8).please();
@@ -61,19 +60,12 @@ class RecallsCommissionedLearningSessionTests extends RecallsControllerTestBase 
       learningSessionController.record(
           recordRequest(notebook, HOLA_GRACIAS_REPORT), "Asia/Shanghai");
 
-      assertThat(
-          holaTracker.getNextRecallAt(),
-          equalTo(TimestampOperations.addHoursToTimestamp(dayTwo, 29)));
-      assertThat(
-          graciasTracker.getNextRecallAt(),
-          equalTo(TimestampOperations.addHoursToTimestamp(dayTwo, 24)));
-
       testabilitySettings.timeTravelTo(dayThree);
       DueMemoryTrackers due = controller.recalling("UTC", 0);
 
-      assertThat(due.getDueCommissioned(), hasSize(1));
-      assertEquals(graciasTracker.getId(), due.getDueCommissioned().get(0).getMemoryTrackerId());
-      assertTrue(holaTracker.getNextRecallAt().after(dayThree));
+      assertThat(
+          due.getDueCommissioned().stream().map(item -> item.getMemoryTrackerId()).toList(),
+          containsInAnyOrder(holaTracker.getId(), graciasTracker.getId()));
     }
   }
 }
