@@ -39,13 +39,9 @@ On-time second score 5 (after first score 4, elapsed=S) persists Stability **169
 
 ### 4. Subsequent score 5 persists Easy next Difficulty
 Type: Behavior  
-Status: planned
+Status: done
 
-**Pre:** Same as slice 3 (S=24, D=5, on-time score 5).  
-**Trigger:** Record that score 5.  
-**Post:** Difficulty is Easy next-D (`Fsrs.nextDifficulty(d, 4)`), about **1.985**, not Good’s 5.0014133 and not left unchanged.
-
-Controller test only (score 4 did the same). Unset D on S>0 still counts as 5.
+On-time second score 5 persists Difficulty **1.9850327** (`Fsrs.nextDifficulty(d, EASY)`). Unset D still defaults to 5 in `ForgettingCurve`. Controller test only.
 
 ---
 

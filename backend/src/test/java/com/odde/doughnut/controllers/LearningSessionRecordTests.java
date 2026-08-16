@@ -90,6 +90,11 @@ class LearningSessionRecordTests extends LearningSessionControllerTestBase {
   }
 
   @Test
+  void onTimeSecondScoreFivePersistsEasyNextDifficulty() throws UnexpectedNoAccessRightException {
+    assertThat(afterOnTimeSecondScoreFive().holaTracker().getDifficulty(), equalTo(1.9850327f));
+  }
+
+  @Test
   void overdueSecondScoreFourGrowsStabilityMoreThanOnTime()
       throws UnexpectedNoAccessRightException {
     Timestamp firstRecord = makeMe.aTimestamp().of(1, 9).please();

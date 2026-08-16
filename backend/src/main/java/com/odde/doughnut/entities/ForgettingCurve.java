@@ -29,8 +29,12 @@ public class ForgettingCurve {
     return adjustForThinkingTime(fsrsHours, thinkingTimeMs);
   }
 
-  float afterEasyRecall(long elapsedInHours) {
+  float stabilityAfterEasyRecall(long elapsedInHours) {
     return FsrsEasyRecall.hoursAfterEasyRecall(stabilityHours, difficulty, elapsedInHours);
+  }
+
+  float difficultyAfterEasyRecall() {
+    return FsrsEasyRecall.difficultyAfterEasyRecall(difficulty);
   }
 
   float difficultyAfterSuccessfulRecall() {
