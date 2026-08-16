@@ -18,6 +18,12 @@ const recordLabeledValueAs = (label: string, alias: string) => {
   })
 }
 
+const expectLabeledValue = (label: string, expected: string) => {
+  labeledValue(label).then((text) => {
+    expect(text).to.equal(expected)
+  })
+}
+
 const expectLabeledValueUnchanged = (
   label: string,
   alias: string,
@@ -62,9 +68,7 @@ const assumeMemoryTrackerPage = () => {
     },
     expectRecallCount(count: number) {
       expectMemoryTrackerPage()
-      labeledValue('Recall Count:').then((text) => {
-        expect(text).to.equal(String(count))
-      })
+      expectLabeledValue('Recall Count:', String(count))
       return assumeMemoryTrackerPage()
     },
     expectLastRecallTimeTwelveHoursBeforeNextRecall() {
@@ -83,29 +87,19 @@ const assumeMemoryTrackerPage = () => {
       })
       return assumeMemoryTrackerPage()
     },
-    expectRemainingStability() {
+    expectStability(stability: number) {
       expectMemoryTrackerPage()
-      labeledValue('Stability:').then((text) => {
-        const stability = Number(text)
-        expect(
-          stability,
-          `Expected remaining Stability greater than 0, got "${text}"`
-        ).to.be.greaterThan(0)
-      })
+      expectLabeledValue('Stability:', String(stability))
       return assumeMemoryTrackerPage()
     },
     expectDifficulty(difficulty: number) {
       expectMemoryTrackerPage()
-      labeledValue('Difficulty:').then((text) => {
-        expect(text).to.equal(String(difficulty))
-      })
+      expectLabeledValue('Difficulty:', String(difficulty))
       return assumeMemoryTrackerPage()
     },
     expectTrackerType(type: string) {
       expectMemoryTrackerPage()
-      labeledValue('Type:').then((text) => {
-        expect(text).to.equal(type)
-      })
+      expectLabeledValue('Type:', type)
       return assumeMemoryTrackerPage()
     },
     expectNoteTitle(noteTitle: string) {

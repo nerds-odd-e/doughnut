@@ -29,9 +29,12 @@ Then(
   }
 )
 
-Then('I should see remaining Stability after the incorrect recall', () => {
-  assumeMemoryTrackerPage().expectRemainingStability()
-})
+Then(
+  'I should see Stability {int} after the incorrect recall',
+  (stability: number) => {
+    assumeMemoryTrackerPage().expectStability(stability)
+  }
+)
 
 Then(
   'I should see Difficulty {int} after the incorrect recall',
