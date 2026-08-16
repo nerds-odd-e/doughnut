@@ -45,34 +45,36 @@ class LearningSessionRecordTutorFeedbackTests extends LearningSessionControllerT
     assertThat(hola.getStability(), equalTo(24f));
   }
 
-  @Test
-  void onTimeSecondScoreFourPersistsStability102() throws UnexpectedNoAccessRightException {
-    assertThat(afterOnTimeSecondScoreFour().holaTracker().getStability(), equalTo(102f));
-  }
-
-  @Test
-  void onTimeSecondScoreFivePersistsStability169() throws UnexpectedNoAccessRightException {
-    assertThat(afterOnTimeSecondScoreFive().holaTracker().getStability(), equalTo(169f));
-  }
-
-  @Test
-  void onTimeSecondScoreThreePersistsStability71() throws UnexpectedNoAccessRightException {
-    assertThat(afterOnTimeSecondScoreThree().holaTracker().getStability(), equalTo(71f));
+  @ParameterizedTest
+  @CsvSource({"4, 102", "5, 169", "3, 71"})
+  void onTimeSecondScorePersistsStability(int score, float expectedStability)
+      throws UnexpectedNoAccessRightException {
+    assertThat(
+        afterOnTimeSecondScore(score).holaTracker().getStability(), equalTo(expectedStability));
   }
 
   @Test
   void onTimeSecondScoreFourPersistsGoodNextDifficulty() throws UnexpectedNoAccessRightException {
-    assertThat(afterOnTimeSecondScoreFour().holaTracker().getDifficulty(), equalTo(5.0014133f));
+    assertThat(afterOnTimeSecondScore(4).holaTracker().getDifficulty(), equalTo(5.0014133f));
   }
 
   @Test
   void onTimeSecondScoreFivePersistsEasyNextDifficulty() throws UnexpectedNoAccessRightException {
-    assertThat(afterOnTimeSecondScoreFive().holaTracker().getDifficulty(), equalTo(1.9850327f));
+    assertThat(afterOnTimeSecondScore(5).holaTracker().getDifficulty(), equalTo(1.9850327f));
   }
 
   @Test
   void onTimeSecondScoreThreePersistsHardNextDifficulty() throws UnexpectedNoAccessRightException {
-    assertThat(afterOnTimeSecondScoreThree().holaTracker().getDifficulty(), equalTo(8.0177937f));
+    assertThat(afterOnTimeSecondScore(3).holaTracker().getDifficulty(), equalTo(8.0177937f));
+  }
+
+  @ParameterizedTest
+  @CsvSource({"4, 146", "5, 253", "3, 97"})
+  void overdueSecondScorePersistsStability(int score, float expectedStability)
+      throws UnexpectedNoAccessRightException {
+    assertThat(
+        afterStaggeredSecondScore(score).graciasTracker().getStability(),
+        equalTo(expectedStability));
   }
 
   @Test
@@ -81,34 +83,13 @@ class LearningSessionRecordTutorFeedbackTests extends LearningSessionControllerT
     SpanishNotebookFixture fixture = afterStaggeredSecondScore(4);
     assertThat(
         fixture.graciasTracker().getStability(), greaterThan(fixture.holaTracker().getStability()));
-    assertThat(fixture.graciasTracker().getStability(), equalTo(146f));
   }
 
   @Test
-  void overdueSecondScoreFiveGrowsStabilityMoreThanOnTime()
-      throws UnexpectedNoAccessRightException {
-    assertThat(afterStaggeredSecondScore(5).graciasTracker().getStability(), equalTo(253f));
-  }
-
-  @Test
-  void overdueSecondScoreThreeGrowsStabilityMoreThanOnTime()
-      throws UnexpectedNoAccessRightException {
-    assertThat(afterStaggeredSecondScore(3).graciasTracker().getStability(), equalTo(97f));
-  }
-
-  @Test
-  void onTimeSecondScoreOnePersistsAgainStability() throws UnexpectedNoAccessRightException {
-    assertThat(afterOnTimeSecondScoreOne().holaTracker().getStability(), equalTo(8f));
-  }
-
-  @Test
-  void onTimeSecondScoreOnePersistsAgainNextDifficulty() throws UnexpectedNoAccessRightException {
-    assertThat(afterOnTimeSecondScoreOne().holaTracker().getDifficulty(), equalTo(10f));
-  }
-
-  @Test
-  void onTimeSecondScoreOneSchedulesDueFromStability() throws UnexpectedNoAccessRightException {
-    MemoryTracker hola = afterOnTimeSecondScoreOne().holaTracker();
+  void onTimeSecondScoreOnePersistsAgainSchedule() throws UnexpectedNoAccessRightException {
+    MemoryTracker hola = afterOnTimeSecondScore(1).holaTracker();
+    assertThat(hola.getStability(), equalTo(8f));
+    assertThat(hola.getDifficulty(), equalTo(10f));
     assertThat(
         hola.getNextRecallAt(),
         equalTo(
@@ -138,13 +119,13 @@ class LearningSessionRecordTutorFeedbackTests extends LearningSessionControllerT
   @Test
   void onTimeSecondScoreTwoShrinksStabilityAndLeavesDifficultyUnchanged()
       throws UnexpectedNoAccessRightException {
-    MemoryTracker hola = afterOnTimeSecondScore(learningSessionReport("Hola", 2)).holaTracker();
+    MemoryTracker hola = afterOnTimeSecondScore(2).holaTracker();
     assertThat(hola.getStability(), equalTo(19f));
     assertThat(hola.getDifficulty(), equalTo(5f));
   }
 
   @ParameterizedTest
-  @CsvSource({"1", "2"})
+  @CsvSource({"0", "1", "2"})
   void firstScoreLeavesDifficultyUnsetAndStabilityZero(int score)
       throws UnexpectedNoAccessRightException {
     Timestamp dayTwo = makeMe.aTimestamp().of(1, 9).please();
@@ -173,29 +154,9 @@ class LearningSessionRecordTutorFeedbackTests extends LearningSessionControllerT
     assertTrue(holaTracker.getNextRecallAt().after(response.getRecordedAt()));
   }
 
-  private SpanishNotebookFixture afterOnTimeSecondScoreFour()
+  private SpanishNotebookFixture afterOnTimeSecondScore(int score)
       throws UnexpectedNoAccessRightException {
-    return afterOnTimeSecondScore(HOLA4_GRACIAS1_REPORT);
-  }
-
-  private SpanishNotebookFixture afterOnTimeSecondScoreFive()
-      throws UnexpectedNoAccessRightException {
-    return afterOnTimeSecondScore(HOLA_GRACIAS_REPORT);
-  }
-
-  private SpanishNotebookFixture afterOnTimeSecondScoreThree()
-      throws UnexpectedNoAccessRightException {
-    return afterOnTimeSecondScore(learningSessionReport("Hola", 3));
-  }
-
-  private SpanishNotebookFixture afterOnTimeSecondScoreOne()
-      throws UnexpectedNoAccessRightException {
-    return afterOnTimeSecondScore(learningSessionReport("Hola", 1));
-  }
-
-  private SpanishNotebookFixture afterOnTimeSecondScore(String secondReport)
-      throws UnexpectedNoAccessRightException {
-    return afterOnTimeSecondScore(HOLA4_GRACIAS1_REPORT, secondReport);
+    return afterOnTimeSecondScore(HOLA4_GRACIAS1_REPORT, learningSessionReport("Hola", score));
   }
 
   private SpanishNotebookFixture afterOnTimeSecondScore(String firstReport, String secondReport)

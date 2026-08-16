@@ -25,16 +25,11 @@ Learned: production already shrinks S on this path; only the unique `lessThan` c
 
 ### 2. Tutor Feedback tests pin each unique claim once
 Type: Structure  
-Status: planned
+Status: done
 
-Enables slice 3: E2E outline stays the only duplicated 4/5/3 Stability pin across boundaries; unit S pins become one parameterized test.
+Enables slice 3: E2E outline stays the only duplicated 4/5/3 Stability pin across boundaries; unit S pins are one parameterized test.
 
-- Include New score **0** in `firstScoreLeavesDifficultyUnsetAndStabilityZero` (`0,1,2`).
-- Keep **one** strictly-future due test for S=0 (24h fallback). Do not also pin D/S there.
-- Collapse on-time score **1** (S=8, D=10, due = last + S) into **one** test.
-- Parameterize on-time second S (4→102, 5→169, 3→71) and overdue second S (4→146, 5→253, 3→97). Keep separate next-D tests (unique floats).
-- Existing tests still pass; no new schedule numbers.
-- Stay under 250 lines in `LearningSessionRecordTutorFeedbackTests`.
+Learned: 235 → 196 lines. Score 0 added to first-score D-unset/S=0. Score 1 Again is one test (S=8, D=10, due = last + S). On-time/overdue S parameterized; next-D and overdue greaterThan kept unique. Unused String trampoline dropped. Remaining slices unchanged.
 
 ---
 
