@@ -66,4 +66,24 @@ Feature: Commissioned learning session
     When It's day 3, 9 hour
     Then I should see 1 potential learning session for notebook "Spanish conversation"
     When I open the learning session request for notebook "Spanish conversation"
-    Then the learning session request should list session items for notes "Gracias, Hola"
+    Then the learning session request should list session items for only notes "Gracias"
+
+  Scenario: On-time second tutor score 4 grows Stability to 102
+    Given the notes "Hola, Gracias" are assimilated as commissioned on day 1
+    And I have recorded a learning session for notebook "Spanish conversation" on day 2 with scores:
+      | Note    | Score |
+      | Hola    | 4     |
+      | Gracias | 1     |
+    And It's day 3, 9 hour
+    When I open the learning session request for notebook "Spanish conversation"
+    And I record the learning session report:
+      """
+      # Learning Session Report
+
+      <session_item_scores>
+      Hola: 4
+      Gracias: 1
+      </session_item_scores>
+      """
+    And I visit the commissioned memory tracker for "Hola"
+    Then I should see Stability 102

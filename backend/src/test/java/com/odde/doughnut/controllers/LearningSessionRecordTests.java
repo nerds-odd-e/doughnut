@@ -10,6 +10,7 @@ import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.SessionItem;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
+import com.odde.doughnut.utils.TimestampOperations;
 import java.sql.Timestamp;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -41,6 +42,21 @@ class LearningSessionRecordTests extends LearningSessionControllerTestBase {
       assertThat(item.getMemoryTracker().getRecallCount(), equalTo(1));
       assertThat(item.getMemoryTracker().getLastRecalledAt(), equalTo(dayTwo));
     }
+  }
+
+  @Test
+  void onTimeSecondScoreFourPersistsStability102() throws UnexpectedNoAccessRightException {
+    Timestamp firstRecord = makeMe.aTimestamp().of(1, 9).please();
+    testabilitySettings.timeTravelTo(firstRecord);
+
+    SpanishNotebookFixture fixture = spanishNotebookFixture(firstRecord);
+    controller.record(recordRequest(fixture.notebook(), HOLA4_GRACIAS1_REPORT), "Asia/Shanghai");
+
+    Timestamp secondRecord = TimestampOperations.addHoursToTimestamp(firstRecord, 24);
+    testabilitySettings.timeTravelTo(secondRecord);
+    controller.record(recordRequest(fixture.notebook(), HOLA4_GRACIAS1_REPORT), "Asia/Shanghai");
+
+    assertThat(fixture.holaTracker().getStability(), equalTo(102f));
   }
 
   @Test

@@ -36,7 +36,7 @@ Feature: Spaced-repetition
     And I am recalling my note on day 2
     And I choose no I need more recall
     And I visit the understanding memory tracker for "Note 1"
-    Then I should see Stability 8 after the incorrect recall
+    Then I should see Stability 8
     And I should see 12 hours between last and next recall
     And I should see Difficulty 10 after the incorrect recall
 

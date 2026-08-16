@@ -133,6 +133,20 @@ export function propertyMemoryTrackerRowLabel(propertyKey: string) {
   return `property: ${propertyKey}`
 }
 
+// Assimilation table labels from NoteInfoMemoryTracker.vue trackerTypeLabel:
+// understanding → 'normal', commissioned → 'Commissioned'.
+export type NoteLevelTrackerKind = 'understanding' | 'spelling' | 'commissioned'
+
+const noteLevelTrackerRowLabels: Record<NoteLevelTrackerKind, string> = {
+  understanding: 'normal',
+  spelling: 'spelling',
+  commissioned: 'Commissioned',
+}
+
+export function noteLevelTrackerRowLabel(kind: NoteLevelTrackerKind): string {
+  return noteLevelTrackerRowLabels[kind]
+}
+
 export function waitForAssimilationNoteTitle(expectedTitle?: string) {
   waitUntilAppIsNotBusy()
   cy.get('#main-note-content', { timeout: 15000 }).should('be.visible')

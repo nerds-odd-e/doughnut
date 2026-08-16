@@ -16,6 +16,7 @@ import {
   returnToSequenceButton,
   removeFromRecallButton,
   waitForAssimilationNoteTitle,
+  noteLevelTrackerRowLabel,
 } from './shared'
 
 const openAssimilateOption = (
@@ -74,11 +75,16 @@ export const assumeAssimilationPage = () => ({
     return this
   },
   expectOrdinaryAndCommissionedMemoryTrackers() {
-    this.expectMemoryTrackerInfo([{ type: 'normal' }, { type: 'Commissioned' }])
+    this.expectMemoryTrackerInfo([
+      { type: noteLevelTrackerRowLabel('understanding') },
+      { type: noteLevelTrackerRowLabel('commissioned') },
+    ])
     return this
   },
   expectSpellingMemoryTracker() {
-    this.expectMemoryTrackerInfo([{ type: 'spelling' }])
+    this.expectMemoryTrackerInfo([
+      { type: noteLevelTrackerRowLabel('spelling') },
+    ])
     return this
   },
   expectTutorFeedbackScore(score: number) {

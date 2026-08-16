@@ -1,6 +1,6 @@
 # Plan: Commissioned Tutor score 4 is FSRS-6 Good
 
-**Status:** in progress (slice 1 done)  
+**Status:** in progress (slices 1–2 done)  
 **Index:** ad-hoc under `.planning/quick/` — on last-slice wrap-up, update `.planning/STATE.md` remaining FSRS gap (score 4 done; leftover 5/3/2/1/0 + confusion). Do not Accept ADR 0003.
 
 **Goal:** Tutor Feedback score 4 uses the same Good-equivalent memory update as ordinary correct (SInc + next-D, including New init and overdue extra). Migrate leftover null Difficulty on already-graded trackers. Cleanup spent score-4 ladder pins.
@@ -23,19 +23,9 @@ Status: done
 ### 2. On-time second score 4 persists Stability 102
 
 Type: Behavior  
-Status: planned
+Status: done
 
-**Pre-condition:** Commissioned tracker already at S=24h after a prior score 4. On-time: elapsed whole hours = 24. D unset or 5 (treat unset as 5).  
-**Trigger:** Record Tutor Feedback score **4**.  
-**Post-condition:** Persisted Stability is **102** (FSRS-6 Good SInc). Not 48 (ladder +1).
-
-**Commit bound:** SInc for score 4 when S>0; one HTTP assertion of 102; one E2E scenario that opens the Commissioned Memory Tracker and `expectStability(102)`. Do not write Difficulty. Do not assert Difficulty, overdue, or New-card D. Do not edit `applyScore` tables, gap docs, or ADR.
-
-- HTTP: `LearningSessionRecordTests` — second `record` of score 4 (or fixture S=24h, elapsed=24). Gracias score 1 stays ladder if the report includes it.
-- E2E: `commissioned_learning_session.feature` (`@mockBrowserTime`, `@disableOpenAiService`). Extend `openNoteLevelMemoryTracker` to the **Commissioned** row; reuse `expectStability`.
-- Production: for score 4 and S>0, set Stability from Good hours (`ForgettingCurve.succeeded(elapsed, null)` or `FsrsGoodRecall` via an entities collaborator). Compute elapsed **before** advancing `lastRecalledAt`. Other scores still `applyScore`. Do **not** call `recalledSuccessfully` (it writes D).
-
-**Done when:** HTTP pin is 102; E2E shows 102; Difficulty unchanged vs before this slice; `pnpm backend:test_only` and `pnpm cypress run --spec e2e_test/features/learning_session/commissioned_learning_session.feature` green.
+**Learnings:** Elapsed is computed before advancing `lastRecalledAt`. Score 4 with S>0 uses `MemoryTracker.stabilityHoursAfterSuccessfulRecall` (Good SInc, no Difficulty write). HTTP pin 102; E2E opens the commissioned tracker and sees Stability 102. Existing day-3 request after Hola: 5 / Gracias: 1 lists only Gracias (score 5 → 29h) — E2E aligned with HTTP `dayThreeDueCommissionedOnlyGraciasAfterRecordedScores`. Slice 3 still needs New score 4 to write D=5.
 
 ---
 

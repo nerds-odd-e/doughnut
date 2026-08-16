@@ -5,18 +5,13 @@
 import { Then, When } from '@badeball/cypress-cucumber-preprocessor'
 import start from '../start'
 import { assumeMemoryTrackerPage } from '../start/pageObjects/memoryTrackerPage'
+import type { NoteLevelTrackerKind } from '../start/pageObjects/assimilationPage/shared'
 
-// The assimilation page labels understanding tracker rows as 'normal'
-// (NoteInfoMemoryTracker.vue trackerTypeLabel), so the 'understanding' kind
-// maps to the 'normal' row label when opening the note-level tracker.
-function openNoteLevelTracker(
-  noteTitle: string,
-  kind: 'understanding' | 'spelling'
-) {
+function openNoteLevelTracker(noteTitle: string, kind: NoteLevelTrackerKind) {
   return start
     .jumpToNotePage(noteTitle)
     .openAssimilationSettings()
-    .openNoteLevelMemoryTracker(kind === 'spelling' ? 'spelling' : 'normal')
+    .openNoteLevelMemoryTracker(kind)
 }
 
 Then(
@@ -29,12 +24,9 @@ Then(
   }
 )
 
-Then(
-  'I should see Stability {int} after the incorrect recall',
-  (stability: number) => {
-    assumeMemoryTrackerPage().expectStability(stability)
-  }
-)
+Then('I should see Stability {int}', (stability: number) => {
+  assumeMemoryTrackerPage().expectStability(stability)
+})
 
 Then(
   'I should see Difficulty {int} after the incorrect recall',
@@ -85,6 +77,13 @@ When(
   'I visit the spelling memory tracker for {string}',
   (noteTitle: string) => {
     openNoteLevelTracker(noteTitle, 'spelling')
+  }
+)
+
+When(
+  'I visit the commissioned memory tracker for {string}',
+  (noteTitle: string) => {
+    openNoteLevelTracker(noteTitle, 'commissioned')
   }
 )
 

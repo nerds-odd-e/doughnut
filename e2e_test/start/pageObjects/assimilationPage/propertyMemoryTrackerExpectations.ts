@@ -1,6 +1,10 @@
 import { waitUntilAppIsNotBusy } from '../../pageBase'
 import { assumeMemoryTrackerPage } from '../memoryTrackerPage'
-import { propertyMemoryTrackerRowLabel } from './shared'
+import {
+  noteLevelTrackerRowLabel,
+  propertyMemoryTrackerRowLabel,
+  type NoteLevelTrackerKind,
+} from './shared'
 
 function openTrackerRow(rowText: string) {
   cy.contains('tr', rowText).click()
@@ -41,11 +45,11 @@ export function assimilationPropertyMemoryTrackerExpectations() {
       }
       return this
     },
-    removeMemoryTrackerFromRecall(type: 'normal' | 'spelling') {
-      return this.openNoteLevelMemoryTracker(type).removeFromRecall()
+    removeMemoryTrackerFromRecall(kind: 'understanding' | 'spelling') {
+      return this.openNoteLevelMemoryTracker(kind).removeFromRecall()
     },
-    openNoteLevelMemoryTracker(type: 'normal' | 'spelling') {
-      return openTrackerRow(type)
+    openNoteLevelMemoryTracker(kind: NoteLevelTrackerKind) {
+      return openTrackerRow(noteLevelTrackerRowLabel(kind))
     },
   }
 }
