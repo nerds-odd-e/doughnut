@@ -23,7 +23,7 @@ missing the due time an input to the memory-state transition.
 
 ## Decision
 
-Finalized choices live here. Move items from **Working draft** into this section as they are locked.
+Locked policy for Proposed ADR 0003. Humans still own accept.
 
 ### Recall, not FSRS "review"
 
@@ -45,13 +45,13 @@ state, qualitative update rules), not with a particular crate or version.
   (schedule metadata). A newly assimilated tracker may have Stability 0
   (due now). After any graded answer, persisted Stability 0 is not allowed,
   except New fail (S=0 + 12h, already in Again Decision). Spacing is
-  Stability, not a Settings day list.
+  Stability, not a Settings day list. Live scheduling must not walk a
+  spacing-index ladder.
 - **Retrievability** is computed from elapsed whole hours and Stability, not stored.
 - A recall transition consumes the graded outcome, elapsed time, and that state — never queue lateness.
-- Requested retention (turning Stability into an interval from a
-  retention target), lapses, and a RecallLog remain later gaps. Close one
-  remaining gap at a time as **one observable schedule behavior**. Persist a
-  field when that behavior uses it.
+- Requested retention stays implicit: after success, `nextRecallAt =
+  lastRecalledAt + stability` because `r = 0.9`. Settings `r ≠ 0.9`, lapses,
+  and a RecallLog are **deferred** (see **Deferred**).
 
 ### Difficulty on correct recall
 
@@ -59,63 +59,52 @@ Difficulty is persisted memory state in `[1, 10]`. It is shown on the Memory Tra
 
 A newly assimilated tracker is **New**: Stability 0, Difficulty unset, due now. Assimilation is not a grade. The first real correct recall initializes Difficulty to **5** and Stability to **24** hours (short first interval; 12 hours is a later tweak). Existing trackers that already have positive Stability or a recall count are migrated to Difficulty **5**.
 
-Ordinary correct recall with Stability > 0 updates Stability (and Difficulty) with open-FSRS-6 Good-equivalent rules (own implementation). It must not walk a spacing-index ladder. Locked overdue extra growth still holds. Requested retention remains implicit: `nextRecallAt = lastRecalledAt + stability`.
+Ordinary correct recall with Stability > 0 updates Stability (and Difficulty) with open-FSRS-6 Good-equivalent rules (own implementation). Locked overdue extra growth still holds.
 
-### Tutor Feedback score 4 (Good)
+### Outcome-to-grade compatibility map
 
-Tutor Feedback score **4** is open-FSRS-6 **Good**-equivalent: the same memory-state update as ordinary correct recall. Effort is neutral. After score 4, `nextRecallAt = lastRecalledAt + stability`. Do not apply the incorrect-recall 12-hour retry.
+Keep Doughnut product outcomes first-class. Do not replace the Tutor 0–5 rubric with Anki Again / Hard / Good / Easy buttons. When memory updates follow an FSRS-shaped engine, map as follows:
 
-A **New** commissioned tracker (Stability 0, Difficulty unset) that receives score 4 initializes Difficulty to **5** and Stability to **24** hours, matching the first real correct recall.
+| Product | Schedule |
+|---------|----------|
+| Ordinary correct / Tutor **4** | FSRS-6 Good |
+| Tutor **5** | FSRS-6 Easy |
+| Tutor **3** | FSRS-6 Hard |
+| Tutor **2** | Doughnut exception (80% accumulated S, D unchanged) |
+| Ordinary incorrect | FSRS-6 Again memory; due **+12h** |
+| Tutor **1** and **0** | Again memory; due from S (0 same as 1; rubric still differs) |
+| Confusion | Not a grade; Again-midpoint S; due not later |
+| Overlap | No memory change |
 
-With Stability greater than 0, score 4 updates Stability and Difficulty with open-FSRS-6 Good-equivalent rules (own implementation). It must not walk a spacing-index ladder. Locked overdue extra growth applies. Queue lateness vs `nextRecallAt` is not an input.
+Shared commissioned rules and score-specific memory updates follow. Accidental-match detail is in **Accidental-match and overlap transitions**.
 
-### Tutor Feedback score 5 (Easy)
+### Commissioned learning session feedback
 
-Tutor Feedback score **5** is open-FSRS-6 **Easy**-equivalent (own implementation), not a percentage above the Good or ladder increment. Effort is neutral. After score 5, `nextRecallAt = lastRecalledAt + stability`. Do not apply the incorrect-recall 12-hour retry.
+A commissioned memory tracker is graded from Tutor Feedback (score 0–5), not from a recall prompt Doughnut asked. [ADR 0001](./0001-ubiquitous-language.md) defines the vocabulary and [ADR 0005](./0005-commissioned-learning-session-protocol.md) defines what the score means to the Tutor. Shared schedule rules:
 
-A **New** commissioned tracker (Stability 0, Difficulty unset) that receives score 5 initializes Difficulty to **5** and Stability to **24** hours, matching the first real correct recall and score 4. Do not use FSRS Easy first-rating initial Stability and Difficulty.
+- A recorded score is a grade: it counts the recall, sets `lastRecalledAt`, and reschedules the tracker.
+- A Session Item that never receives Feedback supplies no graded recall result: its tracker stays unchanged and the item is abandoned with its session.
+- Effort is neutral. A Tutor session carries no trustworthy effort measurement.
+- A late session does not weaken the result. The score determines the memory-state adjustment; the recorded time advances `lastRecalledAt`.
+- Never apply the ordinary incorrect-recall 12-hour retry. After a score, due is from the updated Stability. A commissioned tracker is due only when the learner commissions another Learning Session.
+- **New** (Stability 0, Difficulty unset): scores **3**, **4**, and **5** initialize Difficulty to **5** and Stability to **24** hours, matching the first real correct recall — not FSRS first-rating initials. Scores **0**, **1**, and **2** stay Stability 0 and Difficulty unset; due is strictly after the recorded time (24-hour fallback).
 
-With Stability greater than 0, score 5 updates Stability and Difficulty with open-FSRS-6 Easy-equivalent rules (own implementation): an Easy increment that is at least as large as Good's and includes an extra Easy factor, plus Easy next-D. Next Stability is strictly longer than the same state under score 4. It must not walk a spacing-index ladder. Locked overdue extra growth applies. Queue lateness vs `nextRecallAt` is not an input.
+Memory updates with Stability > 0:
 
-### Tutor Feedback score 3 (Hard)
-
-Tutor Feedback score **3** is open-FSRS-6 **Hard**-equivalent (own implementation), not a percentage below the Good or ladder increment. Effort is neutral. After score 3, `nextRecallAt = lastRecalledAt + stability`. Do not apply the incorrect-recall 12-hour retry.
-
-A **New** commissioned tracker (Stability 0, Difficulty unset) that receives score 3 initializes Difficulty to **5** and Stability to **24** hours, matching the first real correct recall and scores 4 and 5. Do not use FSRS Hard first-rating initial Stability and Difficulty.
-
-With Stability greater than 0, score 3 updates Stability and Difficulty with open-FSRS-6 Hard-equivalent rules (own implementation): a Hard increment that is the Good increment times an extra Hard factor, plus Hard next-D. Next Stability is at least the current Stability and strictly shorter than the same state under score 4. It must not walk a spacing-index ladder. Locked overdue extra growth applies. Queue lateness vs `nextRecallAt` is not an input.
-
-### Tutor Feedback score 2 (Doughnut Stability shrink)
-
-Tutor Feedback score **2** is a named Doughnut exception, not open-FSRS-6 **Hard**. Effort is neutral. After score 2, `nextRecallAt = lastRecalledAt + stability`. Do not apply the incorrect-recall 12-hour retry.
-
-A **New** commissioned tracker (Stability 0, Difficulty unset) that receives score 2 stays Stability 0 and Difficulty unset. Due is strictly after the recorded time (24-hour fallback when Stability 0 would otherwise leave due at the grade instant).
-
-With Stability greater than 0, score 2 does not grow Stability. Next Stability is the rounded 80% of current Stability (accumulated hours above the assimilate initial of 0). Difficulty is unchanged. Ignore elapsed time and Retrievability. Do not apply overdue extra growth. Queue lateness vs `nextRecallAt` is not an input. It must not walk a spacing-index ladder.
-
-### Tutor Feedback score 1 (Again memory, due from Stability)
-
-Tutor Feedback score **1** is open-FSRS-6 **Again** memory (own implementation): the same memory-state update as ordinary incorrect recall (post-lapse Stability and Again next-D). Effort is neutral. After score 1, `nextRecallAt = lastRecalledAt + stability`. Do not apply the ordinary incorrect-recall 12-hour retry: a commissioned tracker is due only when the learner commissions another Learning Session.
-
-A **New** commissioned tracker (Stability 0, Difficulty unset) that receives score 1 stays Stability 0 and Difficulty unset. Due is strictly after the recorded time (24-hour fallback when Stability 0 would otherwise leave due at the grade instant).
-
-With Stability greater than 0, score 1 updates Stability and Difficulty with open-FSRS-6 Again-equivalent rules (own implementation): post-lapse Stability from Difficulty, Stability, and Retrievability (elapsed whole hours vs Stability), plus Again next-D. Unset Difficulty on Stability > 0 is treated as **5**. Queue lateness vs `nextRecallAt` is not an input. It must not walk a spacing-index ladder.
-
-### Tutor Feedback score 0 (same schedule as score 1)
-
-Tutor Feedback score **0** uses the **same schedule** as score **1**: open-FSRS-6 **Again** memory and due from Stability (see **Tutor Feedback score 1 (Again memory, due from Stability)**). Rubric and product text still differ ([ADR 0005](./0005-commissioned-learning-session-protocol.md)); scheduling does not.
-
-A **New** commissioned tracker (Stability 0, Difficulty unset) that receives score 0 stays Stability 0 and Difficulty unset. Due is strictly after the recorded time, matching New score 1 (24-hour fallback when Stability 0 would otherwise leave due at the grade instant).
-
-With Stability greater than 0, score 0 does not reset Stability to the assimilate initial level. It applies the same memory-state update and due as score 1 on that state.
+- **4:** open-FSRS-6 **Good**-equivalent (same as ordinary correct), including overdue extra.
+- **5:** open-FSRS-6 **Easy**-equivalent, not a percentage above Good. Easy increment at least as large as Good's plus an extra Easy factor, plus Easy next-D. Next Stability is strictly longer than the same state under score 4. Overdue extra applies.
+- **3:** open-FSRS-6 **Hard**-equivalent, not a percentage below Good. Hard increment is the Good increment times an extra Hard factor, plus Hard next-D. Next Stability is at least the current Stability and strictly shorter than the same state under score 4. Overdue extra applies.
+- **2:** Doughnut exception, not Hard. Next Stability is the rounded 80% of current Stability (accumulated hours above assimilate 0); Difficulty unchanged. Ignore elapsed time and Retrievability. No overdue extra.
+- **1:** open-FSRS-6 **Again** memory (same as ordinary incorrect: post-lapse Stability and Again next-D). Due from Stability, not the 12-hour retry.
+- **0:** same schedule as score **1**. Rubric still differs ([ADR 0005](./0005-commissioned-learning-session-protocol.md)). Does not reset Stability to the assimilate initial level.
 
 ### Incorrect recall (Again)
 
 Ordinary incorrect recall (MCQ, just review, spelling fail) is FSRS **Again**. Doughnut does not offer Hard or Easy buttons; product outcomes stay.
 
-When Stability is greater than 0, the memory update for Stability is the open-FSRS-6 post-lapse formula from Difficulty, Stability, and Retrievability (elapsed whole hours vs Stability). Ordinary incorrect also updates Difficulty with the open-FSRS-6 Again next-D (harder; clamped to `[1, 10]`). Unset Difficulty on Stability > 0 is treated as **5**. Queue lateness vs `nextRecallAt` is not an input. The due-work projection after an ordinary incorrect recall stays **grade time + 12 hours**: that 12-hour retry is schedule metadata (the current default, not a sacred constant), not the new Stability.
+When Stability is greater than 0, the memory update for Stability is the open-FSRS-6 post-lapse formula from Difficulty, Stability, and Retrievability (elapsed whole hours vs Stability). Ordinary incorrect also updates Difficulty with the open-FSRS-6 Again next-D (harder; clamped to `[1, 10]`). Unset Difficulty on Stability > 0 is treated as **5**. Queue lateness vs `nextRecallAt` is not an input. The due-work projection after an ordinary incorrect recall stays **grade time + 12 hours**: that 12-hour retry is schedule metadata (the current default, not a sacred constant), not the new Stability. There is **no relearning step list**.
 
-A **New** tracker (Stability 0) that fails stays Stability 0, Difficulty unset, and due in 12 hours. Confusion adjustment is not a grade and is not FSRS Again (see **Accidental-match and overlap transitions**).
+A **New** tracker (Stability 0) that fails stays Stability 0, Difficulty unset, and due in 12 hours. Confusion adjustment is not a grade and is not FSRS Again (see **Accidental-match and overlap transitions**). Failure must not permanently trap the tracker; later correct recalls must be able to restore expanding intervals.
 
 ### Overdue correct recall: bounded extra growth
 
@@ -135,9 +124,17 @@ not. Scores **0** and **1** use Again memory, not this extra.
 Use **whole elapsed hours** as the recall-transition time input: duration
 between the current recall time and `lastRecalledAt`, discarding any sub-hour
 remainder, independent of time zone or calendar day. Morning/afternoon recall
-windows make day precision too coarse. This Decision does not add a separate
-same-day transition; a future short-term or Difficulty behavior may add one
-without changing this decision.
+windows make day precision too coarse. When elapsed whole hours are **0** on a
+tracker with positive Stability, there is no extra success increment. There is
+no calendar same-day rule. This Decision does not add a separate same-day
+transition; a future short-term behavior may add one without changing this
+decision.
+
+### Thinking time
+
+A trustworthy effort measurement (thinking time) may adjust within a
+**correct** outcome only, within bounds. It must not invert the outcome.
+Missing or untrustworthy effort is neutral.
 
 ### Accidental-match and overlap transitions
 
@@ -184,7 +181,10 @@ the computed interval is non-positive (due would be at or before the grade
 instant), schedule **24 hours** after the recorded time — the same first-success
 Stability. Do not use the spacing-index ladder as this fallback.
 
-## Working draft
+### Manual and admin paths
+
+`mark-as-recalled` is a grade and follows recall-transition rules. `remove` and
+`revive` are not grades.
 
 ### Spelling memory tracker
 
@@ -193,34 +193,6 @@ It does not consume assimilation due or the daily assimilation target (same as
 a commissioned tracker). Grading follows the locked accidental-match and overlap
 transitions.
 
-### Graded outcomes
-
-Correct, incorrect, accidental match, and overlap are distinct graded outcomes
-where the product defines them. Scheduling must follow the outcome — not collapse
-special spelling results into boolean correct/incorrect.
-
-#### Correct recall
-
-1. Schedule the tracker strictly in the future; it must not remain due at the
-   answer instant.
-2. Do not reduce Stability solely because the answer was early or overdue.
-   Overdue extra growth is locked in Decision; the floor remains: no worse than
-   on-time.
-3. A correct early recall may grow less than an on-time recall because it
-   demonstrates retention over a shorter interval, but must not reset learning
-   or make the tracker immediately due.
-4. A sequence of correct recalls separated by meaningful time must show forward
-   progress toward longer intervals. Backlog alone must not trap a tracker in
-   an immediate or daily-recall loop.
-
-#### Incorrect recall
-
-Locked Again memory update, next-D, New-fail, and 12-hour retry live in
-Decision **Incorrect recall (Again)**. Remaining:
-
-1. Failure must not permanently trap the tracker; later correct recalls must be
-   able to restore expanding intervals.
-
 ### Frequent-failure warning
 
 When a tracker has ≥ 5 incorrect recalls in the last 14 days, Doughnut warns
@@ -228,56 +200,18 @@ the learner (`wrongCount`, `threshold`, `periodDays`) and does not change the
 schedule or remove the tracker. **Overlap** does not count. Property trackers
 name the property. No confirm action.
 
-### Commissioned learning session feedback
+### Deferred
 
-A commissioned memory tracker is graded from Tutor Feedback (score 0–5), not
-from a recall prompt Doughnut asked. ADR 0001 defines the vocabulary and ADR
-0005 defines what the score means to the Tutor; this section defines the
-schedule.
+- **B2:** Settings requested-retention knob `r ≠ 0.9`
+- **B4:** Lapses (no unused counter)
+- **C4:** Just-review Hard / Easy buttons
+- **E3:** Fuzz / maximum interval
+- **E4:** Fitting / per-user weights
+- **E6:** RecallLog
 
-Locked score **4** (Good-equivalent memory update, New init, overdue extra,
-due from Stability) lives in Decision **Tutor Feedback score 4 (Good)**.
-Locked score **5** (Easy-equivalent memory update, New init matching first
-correct and score 4, overdue extra, due from Stability) lives in Decision
-**Tutor Feedback score 5 (Easy)**.
-Locked score **3** (Hard-equivalent memory update, New init matching first
-correct and scores 4 and 5, overdue extra, due from Stability) lives in
-Decision **Tutor Feedback score 3 (Hard)**.
-Locked score **1** (Again memory update, New stays S=0 and Difficulty unset,
-due from Stability not +12h) lives in Decision **Tutor Feedback score 1
-(Again memory, due from Stability)**.
-Locked score **0** (same schedule as score 1; rubric/product text still
-differs per ADR 0005) lives in Decision **Tutor Feedback score 0 (same
-schedule as score 1)**.
-Locked score **2** (Doughnut Stability shrink, not Hard; 80% of accumulated
-S; D unchanged) lives in Decision **Tutor Feedback score 2 (Doughnut
-Stability shrink)**.
-Locked strictly-future fallback (non-positive interval → 24h, same as
-first-success Stability) lives in Decision **Strictly-future fallback
-(non-positive interval)**.
-Remaining:
+## Working draft
 
-1. A recorded score drives a memory-state transition of the same standing as a
-   graded recall answer: recording it counts the recall, sets the last-recalled
-   time, and reschedules the tracker.
-2. Resetting Stability must never leave a tracker due at the instant its score
-   was recorded.
-3. Otherwise schedule the next recall from the updated Stability. Do not apply
-   the incorrect-recall relearning override: a commissioned tracker is due only
-   when the learner commissions another Learning Session, so a short forced
-   retry window would express nothing.
-4. A Tutor session carries no trustworthy effort measurement, so effort is
-   neutral.
-5. A late session does not weaken the result. The score determines the
-   memory-state adjustment; the recorded time advances `lastRecalledAt`.
-6. A Session Item that never receives Feedback supplies no graded recall result:
-   its tracker stays unchanged and the item is abandoned with its session.
-
-### Recall effort
-
-A trustworthy effort measurement (e.g. thinking time) may adjust within a
-correct or incorrect outcome, within bounds. It must not invert the outcome.
-Missing or untrustworthy effort data is neutral.
+Empty pending accept.
 
 ## Consequences
 
@@ -324,7 +258,7 @@ Missing or untrustworthy effort data is neutral.
 
 ## Related
 
-- Working discussion (code-vs-FSRS analysis + open issues): [`.planning/research/FSRS-COMPATIBILITY-GAP.md`](../../.planning/research/FSRS-COMPATIBILITY-GAP.md) — do not duplicate open issues here; move resolved items into **Decision**
+- Tracker (pointer + deferred IDs, not a second policy map): [`.planning/research/FSRS-COMPATIBILITY-GAP.md`](../../.planning/research/FSRS-COMPATIBILITY-GAP.md)
 - ADR 0001 [ubiquitous language](./0001-ubiquitous-language.md) — **recall** (not FSRS **review**); **recall prompt** / **MCQ** / **just review**; commissioned learning terms; spelling memory tracker
 - ADR 0005 [commissioned learning session protocol](./0005-commissioned-learning-session-protocol.md) — what a score means to the Tutor
 - Anki answer semantics: <https://docs.ankiweb.net/studying.html#answer-buttons>

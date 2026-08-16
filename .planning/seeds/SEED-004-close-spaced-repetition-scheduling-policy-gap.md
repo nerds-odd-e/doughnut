@@ -3,7 +3,7 @@ id: SEED-004
 status: sprouting
 planted: 2026-08-15
 planted_during: ADR 0003 finalization (gap analysis)
-trigger_when: when closing Doughnut’s spaced-repetition scheduling gap vs open FSRS, or when accepting Proposed ADR 0003
+trigger_when: when exposing a requested-retention knob, adding a relearning step list or RecallLog, or when accepting Proposed ADR 0003
 scope: large
 ---
 
@@ -11,33 +11,30 @@ scope: large
 
 ## Why This Matters
 
-Doughnut already schedules recall with elapsed time and outcome. Ordinary **correct** recall uses FSRS-6 Good SInc and Difficulty (own implementation; first success D=5, S=24h). Ordinary **incorrect** uses FSRS-6 post-lapse Stability and Again next-D; due stays +12h. Commissioned Tutor score **4** is that same Good path. Score **5** is FSRS-6 Easy in code. Remaining commissioned leftover is confusion + Tutor **3/2/1/0** (`DEFAULT_SPACES`). Open FSRS (FSRS-6) remains the DSR target: Difficulty, Stability, computed Retrievability, grades, requested retention.
-
-Until Proposed [ADR 0003](../../docs/adrs/0003-spaced-repetition-scheduling-policy.md) states that target shape, remaining work will either freeze today’s success-path SInc or invent a private model. The ADR should hold the product contract. **A1 locked:** Doughnut owns an FSRS-compatible implementation (no FSRS library). **B3 locked:** overdue correct gets bounded extra growth. Remaining gaps close by **vertical slice** (one observable behavior; structure only when that behavior needs it).
+Doughnut already schedules recall with elapsed time and outcome. The product contract is Proposed [ADR 0003](../../docs/adrs/0003-spaced-repetition-scheduling-policy.md) Decision. Remaining work is deferred knobs plus **accepting** that ADR.
 
 ## When to Surface
 
-**Trigger:** finalizing or accepting ADR 0003; moving confusion / remaining commissioned leftover scores (3/2/1/0) off the leftover ladder; exposing a requested-retention knob; adding a replayable recall log for fitting.
+**Trigger:** accepting ADR 0003; exposing a requested-retention knob (B2); adding a relearning step list; adding a replayable recall log for fitting (E6).
 
 Also surface when changing success/failure interval math, commissioned score → schedule mapping, or due-work rebuild from history.
 
 ## Scope Estimate
 
-**Large** — policy first, then stop-safe behavior slices:
+**Large** — remaining trigger is policy accept plus deferred product knobs:
 
-1. Finalize ADR 0003 from the gap + open issues in `.planning/research/FSRS-COMPATIBILITY-GAP.md` (human advice process). Remaining gaps: one observable behavior at a time; no unused lapse/retention/RecallLog structure.
-2. **Success path, ordinary incorrect Again, commissioned Tutor score 4 (Good), and score 5 (Easy) are in code** (details in the gap doc). Remaining: leftover ladder on confusion + Tutor 3/2/1/0 first, then B2 `r ≠ 0.9`, relearning steps, RecallLog / fitting.
+1. Humans accept Proposed [ADR 0003](../../docs/adrs/0003-spaced-repetition-scheduling-policy.md) (`docs/adrs/README.md`).
+2. Deferred IDs: ADR 0003 Decision **Deferred**. Tracker: [FSRS-COMPATIBILITY-GAP.md](../research/FSRS-COMPATIBILITY-GAP.md).
 
 ## Breadcrumbs
 
-- `.planning/research/FSRS-COMPATIBILITY-GAP.md` — analysis + open issues (tracker)
-- `docs/adrs/0003-spaced-repetition-scheduling-policy.md` — Proposed policy (Decision + Working draft)
+- `.planning/research/FSRS-COMPATIBILITY-GAP.md` — pointer + deferred ID list
+- `docs/adrs/0003-spaced-repetition-scheduling-policy.md` — Proposed policy (Decision; Working draft empty pending accept)
 - `docs/adrs/0001-ubiquitous-language.md` — **recall** (not FSRS **review**)
 - `docs/adrs/0005-commissioned-learning-session-protocol.md` — Tutor 0–5 meaning
 - `backend/src/main/java/com/odde/doughnut/entities/ForgettingCurve.java`
 - `backend/src/main/java/com/odde/doughnut/entities/MemoryTracker.java`
 - `backend/src/main/java/com/odde/doughnut/algorithms/SpacedRepetitionAlgorithm.java`
-- `backend/src/main/java/com/odde/doughnut/algorithms/CommissionedLearningSessionFeedbackPolicy.java`
 - https://github.com/open-spaced-repetition/awesome-fsrs/wiki/The-Algorithm
 
 ## Notes
