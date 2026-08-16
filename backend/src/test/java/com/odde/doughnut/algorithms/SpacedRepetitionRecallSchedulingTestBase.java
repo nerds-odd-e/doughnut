@@ -16,14 +16,22 @@ abstract class SpacedRepetitionRecallSchedulingTestBase {
   final Note note = makeMe.aNote().inMemoryPlease();
 
   MemoryTracker aGradedTrackerAtThreeDayStability() {
-    return aGradedTrackerAtThreeDayStability(DEFAULT_DIFFICULTY);
+    return aGradedTrackerAtStability(STABILITY_HOURS);
   }
 
   MemoryTracker aGradedTrackerAtThreeDayStability(float difficulty) {
+    return aGradedTrackerAtStability(STABILITY_HOURS, difficulty);
+  }
+
+  MemoryTracker aGradedTrackerAtStability(float stabilityHours) {
+    return aGradedTrackerAtStability(stabilityHours, DEFAULT_DIFFICULTY);
+  }
+
+  MemoryTracker aGradedTrackerAtStability(float stabilityHours, float difficulty) {
     return makeMe
         .aMemoryTrackerFor(note)
         .by(user)
-        .stabilityAndNextRecallAt(STABILITY_HOURS)
+        .stabilityAndNextRecallAt(stabilityHours)
         .difficulty(difficulty)
         .inMemoryPlease();
   }

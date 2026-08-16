@@ -1,6 +1,6 @@
 # Plan: Ordinary incorrect recall uses FSRS-6 Again
 
-**Status:** in progress (slices 1–4 done)  
+**Status:** in progress (slices 1–5 done)  
 **Goal:** S > 0 incorrect recall persists FSRS-6 post-lapse Stability (D, S, R) and Again Difficulty; due time stays +12h. Lock D1 in ADR 0003 Decision. No Accept.
 
 **Context:** [CONTEXT.md](./CONTEXT.md)
@@ -52,15 +52,9 @@ Elapsed = 2S leaves strictly more remaining Stability than elapsed = S (same D).
 ### 5. Incorrect from 1-hour Stability persists at least 1 hour
 
 Type: Behavior  
-Status: planned
+Status: done
 
-**Pre-condition:** Graded tracker, Stability = 1 hour.  
-**Trigger:** Ordinary incorrect recall.  
-**Post-condition:** Persisted Stability is **≥ 1**. Still due in 12h (do not re-assert).
-
-- One unit test in `SpacedRepetitionIncorrectRecallSchedulingTest`. This is the floor; slice 1’s 72h pin need not hit it.
-
-**Done when:** 1-hour-S fail unit test green.
+Graded S=1h fail persists Stability ≥ 1 (`FsrsAgainRecall` floors at 1h). New fail stays 0.
 
 ---
 
