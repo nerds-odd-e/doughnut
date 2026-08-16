@@ -3,6 +3,7 @@ package com.odde.doughnut.algorithms;
 import static com.odde.doughnut.entities.ForgettingCurve.ASSIMILATE_STABILITY_HOURS;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.lessThan;
 
 import com.odde.doughnut.entities.MemoryTracker;
@@ -26,6 +27,16 @@ class SpacedRepetitionIncorrectRecallSchedulingTest
         equalTo(TimestampOperations.addHoursToTimestamp(gradeTime, 12)));
     assertThat(memoryTracker.getLastRecalledAt(), equalTo(gradeTime));
     assertThat(memoryTracker.getRecallCount(), equalTo(oldRecallCount + 1));
+  }
+
+  @Test
+  void overdueIncorrectRecallLeavesMoreRemainingStabilityThanOnTime() {
+    MemoryTracker onTime = aGradedTrackerAtThreeDayStability();
+    MemoryTracker overdue = aGradedTrackerAtThreeDayStability();
+    onTime.markAsRecalled(onTimeGradeTime(onTime), false, null);
+    overdue.markAsRecalled(overdueGradeTime(overdue), false, null);
+
+    assertThat(overdue.getStability(), greaterThan(onTime.getStability()));
   }
 
   @Test

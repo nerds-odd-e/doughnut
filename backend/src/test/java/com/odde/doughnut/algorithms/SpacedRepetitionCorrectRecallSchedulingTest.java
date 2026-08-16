@@ -146,10 +146,7 @@ class SpacedRepetitionCorrectRecallSchedulingTest extends SpacedRepetitionRecall
     MemoryTracker onTime = aGradedTrackerAtThreeDayStability();
     MemoryTracker overdue = aGradedTrackerAtThreeDayStability();
     onTime.recalledSuccessfully(onTimeGradeTime(onTime), null);
-    overdue.recalledSuccessfully(
-        TimestampOperations.addHoursToTimestamp(
-            overdue.getLastRecalledAt(), Math.round(overdue.getStability()) * 2),
-        null);
+    overdue.recalledSuccessfully(overdueGradeTime(overdue), null);
 
     long onTimeInterval =
         TimestampOperations.getDiffInHours(onTime.getNextRecallAt(), onTime.getLastRecalledAt());

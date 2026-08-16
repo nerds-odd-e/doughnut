@@ -32,4 +32,9 @@ abstract class SpacedRepetitionRecallSchedulingTestBase {
     return TimestampOperations.addHoursToTimestamp(
         tracker.getLastRecalledAt(), Math.round(tracker.getStability()));
   }
+
+  Timestamp overdueGradeTime(MemoryTracker tracker) {
+    return TimestampOperations.addHoursToTimestamp(
+        tracker.getLastRecalledAt(), Math.round(tracker.getStability()) * 2);
+  }
 }

@@ -1,6 +1,6 @@
 # Plan: Ordinary incorrect recall uses FSRS-6 Again
 
-**Status:** in progress (slices 1–3 done)  
+**Status:** in progress (slices 1–4 done)  
 **Goal:** S > 0 incorrect recall persists FSRS-6 post-lapse Stability (D, S, R) and Again Difficulty; due time stays +12h. Lock D1 in ADR 0003 Decision. No Accept.
 
 **Context:** [CONTEXT.md](./CONTEXT.md)
@@ -43,15 +43,9 @@ D=3 vs D=8 siblings, same S, on-time incorrect: harder remaining Stability is st
 ### 4. Overdue incorrect leaves more remaining Stability than on-time
 
 Type: Behavior  
-Status: planned
+Status: done
 
-**Pre-condition:** Two graded siblings, same S and D.  
-**Trigger:** One incorrect at elapsed = S; the other at elapsed = 2S.  
-**Post-condition:** Overdue remaining Stability is **strictly greater**. Extra from elapsed vs Stability (low R), not `nextRecallAt`.
-
-- Delta only in `SpacedRepetitionIncorrectRecallSchedulingTest` (mirror `overdueCorrectRecallLengthensStabilityMoreThanOnTime`). No E2E.
-
-**Done when:** overdue > on-time unit test green.
+Elapsed = 2S leaves strictly more remaining Stability than elapsed = S (same D). Production unchanged (R already in post-lapse). Shared `overdueGradeTime` helper.
 
 ---
 
