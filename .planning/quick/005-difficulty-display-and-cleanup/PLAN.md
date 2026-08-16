@@ -1,6 +1,6 @@
 # Plan: Difficulty on the Memory Tracker page (004 follow-up)
 
-**Status:** in progress (slices 1–2 done; next is slice 3)  
+**Status:** in progress (slices 1–3 done; next is slice 4)  
 **Goal:** Drop redundant exact next-Stability hour pins; persist Difficulty when a graded tracker still has it unset; show Difficulty on the Memory Tracker page.
 
 **Context:** [CONTEXT.md](./CONTEXT.md)
@@ -30,16 +30,9 @@ Status: done
 ### 3. MemoryTracker JSON includes Difficulty
 
 Type: Structure  
-Status: planned
+Status: done
 
-**Unlocks slice 4.** No page change yet. `@JsonPropertyOrder` on `Mcq` is already on main (`a4ba72d868`) — do not re-pin unless regen still fails.
-
-- Remove `@JsonIgnore` on `MemoryTracker.difficulty`.
-- `CURSOR_DEV=true nix develop -c pnpm generateTypeScript`. Do not hand-edit YAML.
-- TS `makeMe.aMemoryTracker.difficulty(...)`.
-- Controller/show: graded Difficulty round-trips on the shown entity (delta). Assimilate-only still null.
-
-**Done when:** generated `MemoryTracker` type has `difficulty?: number`; show payload can carry Difficulty; due `MemoryTrackerLite` unchanged.
+Removed `@JsonIgnore` on `MemoryTracker.difficulty`. Generated type has `difficulty?: number`. Show JSON: graded Difficulty round-trips; assimilate-only omits the field. TS `makeMe.aMemoryTracker.difficulty(...)`. `MemoryTrackerLite` unchanged. Mcq order did not need a re-pin.
 
 ---
 

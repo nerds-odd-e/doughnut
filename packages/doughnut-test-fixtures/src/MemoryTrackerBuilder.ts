@@ -58,6 +58,11 @@ class MemoryTrackerBuilder extends Builder<MemoryTracker> {
     return this
   }
 
+  difficulty(difficulty: number): MemoryTrackerBuilder {
+    this.data.difficulty = difficulty
+    return this
+  }
+
   removedFromTracking(removedFromTracking: boolean): MemoryTrackerBuilder {
     this.data.removedFromTracking = removedFromTracking
     return this

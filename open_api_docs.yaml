@@ -4315,6 +4315,9 @@ components:
         stability:
           type: number
           format: float
+        difficulty:
+          type: number
+          format: float
         removedFromTracking:
           type: boolean
         type:

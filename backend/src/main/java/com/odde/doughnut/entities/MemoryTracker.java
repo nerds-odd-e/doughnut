@@ -79,7 +79,6 @@ public class MemoryTracker extends EntityIdentifiedByIdOnly {
   private Float stability = ForgettingCurve.ASSIMILATE_STABILITY_HOURS;
 
   @Column(name = "difficulty")
-  @JsonIgnore
   @Getter
   @Setter
   private Float difficulty;

@@ -602,6 +602,7 @@ export type MemoryTracker = {
     assimilatedAt?: string;
     recallCount?: number;
     stability?: number;
+    difficulty?: number;
     removedFromTracking?: boolean;
     type?: 'UNDERSTANDING' | 'SPELLING' | 'COMMISSIONED';
     propertyKey?: string;
@@ -1209,6 +1210,7 @@ export type MemoryTrackerWritable = {
     assimilatedAt?: string;
     recallCount?: number;
     stability?: number;
+    difficulty?: number;
     removedFromTracking?: boolean;
     type?: 'UNDERSTANDING' | 'SPELLING' | 'COMMISSIONED';
     propertyKey?: string;
