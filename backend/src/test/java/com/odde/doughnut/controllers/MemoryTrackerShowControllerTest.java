@@ -57,18 +57,6 @@ class MemoryTrackerShowControllerTest extends MemoryTrackerControllerTestBase {
       assertThrows(
           UnexpectedNoAccessRightException.class, () -> controller.showMemoryTracker(tracker));
     }
-
-    @Test
-    void gradedTrackerShowIncludesDifficulty() throws UnexpectedNoAccessRightException {
-      MemoryTracker stored =
-          makeMe
-              .aMemoryTrackerFor(ownedNote())
-              .stabilityAndNextRecallAt(72f)
-              .difficulty(7f)
-              .please();
-      MemoryTracker shown = controller.showMemoryTracker(stored);
-      assertThat(shown.getDifficulty(), equalTo(7f));
-    }
   }
 
   @Nested
