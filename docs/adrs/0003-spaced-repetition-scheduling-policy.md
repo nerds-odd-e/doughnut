@@ -61,6 +61,14 @@ A newly assimilated tracker is **New**: Stability 0, Difficulty unset, due now. 
 
 Ordinary correct recall with Stability > 0 updates Stability (and Difficulty) with open-FSRS-6 Good-equivalent rules (own implementation). It must not walk a spacing-index ladder. Locked overdue extra growth still holds. Requested retention remains implicit: `nextRecallAt = lastRecalledAt + stability`.
 
+### Tutor Feedback score 4 (Good)
+
+Tutor Feedback score **4** is open-FSRS-6 **Good**-equivalent: the same memory-state update as ordinary correct recall. Effort is neutral. After score 4, `nextRecallAt = lastRecalledAt + stability`. Do not apply the incorrect-recall 12-hour retry.
+
+A **New** commissioned tracker (Stability 0, Difficulty unset) that receives score 4 initializes Difficulty to **5** and Stability to **24** hours, matching the first real correct recall.
+
+With Stability greater than 0, score 4 updates Stability and Difficulty with open-FSRS-6 Good-equivalent rules (own implementation). It must not walk a spacing-index ladder. Locked overdue extra growth applies. Queue lateness vs `nextRecallAt` is not an input.
+
 ### Incorrect recall (Again)
 
 Ordinary incorrect recall (MCQ, just review, spelling fail) is FSRS **Again**. Doughnut does not offer Hard or Easy buttons; product outcomes stay.
@@ -79,8 +87,9 @@ thinking-time input). Extra growth is driven by elapsed time vs Stability
 further delay must not increase the next interval without limit. A linear
 lateness bonus is not allowed. Exact increment math is an implementation
 detail; policy tests assert the observable next interval in hours.
-Commissioned Tutor scores stay score-driven (Working draft) and do not
-inherit this extra until a later Decision says they do.
+Tutor Feedback score **4** inherits this extra. Other commissioned Tutor
+scores stay score-driven (Working draft) and do not inherit this extra
+until a later Decision says they do.
 
 ### Whole-hour elapsed-time precision
 
@@ -175,22 +184,25 @@ from a recall prompt Doughnut asked. ADR 0001 defines the vocabulary and ADR
 0005 defines what the score means to the Tutor; this section defines the
 schedule.
 
+Locked score **4** (Good-equivalent memory update, New init, overdue extra,
+due from Stability) lives in Decision **Tutor Feedback score 4 (Good)**.
+Remaining:
+
 1. A recorded score drives a memory-state transition of the same standing as a
    graded recall answer: recording it counts the recall, sets the last-recalled
    time, and reschedules the tracker.
-2. Scores move Stability as follows, where **accumulated Stability** means
-   hours above the initial level of a newly assimilated tracker:
+2. Remaining scores move Stability as follows, where **accumulated Stability**
+   means hours above the initial level of a newly assimilated tracker:
 
 | Score | Learner demonstrated | Stability result |
 |-------|----------------------|------------------|
 | 5 | Mastery with full fluency | Successful recall, growth 20% above the standard increment |
-| 4 | Mastery with fluency | Successful recall, standard growth |
 | 3 | Mastery, but not fluent | Successful recall, growth 20% below the standard increment |
 | 2 | Needed a reminder at first, then showed signs of mastery | No growth; accumulated Stability reduced by 20% |
 | 1 | Needed several reminders | No growth; accumulated Stability reduced by 50% |
 | 0 | Could not reach the learning point even with help | Accumulated Stability reset to the initial level |
 
-3. Demonstrated mastery always moves forward. Scores 3 through 5 grow Stability,
+3. Demonstrated mastery always moves forward. Scores 3 and 5 grow Stability,
    so a learner who masters a learning point without ever becoming fluent still
    earns lengthening intervals rather than decaying toward permanent due work.
 4. Reductions apply to accumulated Stability, so a tracker already at the initial

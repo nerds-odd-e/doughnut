@@ -1,6 +1,6 @@
 # Plan: Commissioned Tutor score 4 is FSRS-6 Good
 
-**Status:** planned (not started)  
+**Status:** in progress (slice 1 done)  
 **Index:** ad-hoc under `.planning/quick/` — on last-slice wrap-up, update `.planning/STATE.md` remaining FSRS gap (score 4 done; leftover 5/3/2/1/0 + confusion). Do not Accept ADR 0003.
 
 **Goal:** Tutor Feedback score 4 uses the same Good-equivalent memory update as ordinary correct (SInc + next-D, including New init and overdue extra). Migrate leftover null Difficulty on already-graded trackers. Cleanup spent score-4 ladder pins.
@@ -14,17 +14,9 @@ Sequential. Each slice is one Behavior or Structure, stop-safe, **one commit**. 
 ### 1. ADR: Tutor 4 is FSRS Good
 
 Type: Structure  
-Status: planned
+Status: done
 
-Structure change: Proposed ADR 0003 Decision states Tutor score **4** = open-FSRS-6 Good-equivalent. Immediate next: slice 2 implements Stability SInc for that mapping.
-
-**Commit bound:** `docs/adrs/0003-spaced-repetition-scheduling-policy.md` only.
-
-- Move Working-draft score **4** (“standard growth”) into Decision. Leave 5 / 3 / 2 / 1 / 0 on the Working-draft table.
-- Score 4 inherits overdue bounded extra (lift the B3 commissioned exception **for 4 only**). Effort neutral. Due is `lastRecalledAt + stability`. New score 4 still inits D=5, S=24h.
-- Status stays **Proposed**. Do not Accept. Do not qualify Again general-Stability bullets (that is `quick/009` slice 4). Do not rewrite unrelated Working draft.
-
-**Done when:** Decision names score 4 as Good; Working draft no longer claims ladder “standard growth” for 4; Status still Proposed.
+**Learnings:** Decision heading `Tutor Feedback score 4 (Good)`; overdue extra lifted for 4 only; Working-draft table dropped the score-4 row. Status still Proposed. Slice 2 can implement Good SInc without further ADR wording.
 
 ---
 
