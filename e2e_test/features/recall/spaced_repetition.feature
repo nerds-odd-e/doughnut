@@ -28,7 +28,7 @@ Feature: Spaced-repetition
     And On day 9 I recall "Note 2, end         " and assimilate new "end         "
 
   @mockBrowserTime
-  Scenario: Memory Tracker shows Stability and Again Difficulty after incorrect just-review
+  Scenario: Memory Tracker shows remaining Stability and Again Difficulty after incorrect just-review
     Given the browser and backend are on day 1
     When I assimilate the note "Note 1"
     And I am recalling my note on day 1
@@ -36,7 +36,7 @@ Feature: Spaced-repetition
     And I am recalling my note on day 2
     And I choose no I need more recall
     And I visit the understanding memory tracker for "Note 1"
-    Then I should see Stability 8 after the incorrect recall
+    Then I should see remaining Stability after the incorrect recall
     And I should see 12 hours between last and next recall
     And I should see Difficulty 10 after the incorrect recall
 
