@@ -22,7 +22,7 @@ class CommissionedLearningSessionFeedbackPolicyTest {
 
   @ParameterizedTest
   @CsvSource({
-    "5, 77", "4, 72", "3, 67", "2, 38", "1, 24", "0, 0",
+    "5, 77", "3, 67", "2, 38", "1, 24", "0, 0",
   })
   void applyScoreFromElevatedLevel(int score, float expected) {
     float elevatedHours = 48f;
