@@ -64,6 +64,7 @@ class SpacedRepetitionRecallSchedulingTest {
     difficultyFive.recalledSuccessfully(gradeTime, null);
 
     assertThat(unsetDifficulty.getDifficulty(), equalTo(difficultyFive.getDifficulty()));
+    assertThat(unsetDifficulty.getStability(), equalTo(difficultyFive.getStability()));
   }
 
   @Test

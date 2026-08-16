@@ -49,7 +49,7 @@ describe("MemoryTrackerPageView display", () => {
   it("shows difficulty", async () => {
     const wrapper = await mountMemoryTrackerPageViewReady({
       recallPrompts: [],
-      memoryTracker: makeMe.aMemoryTracker.difficulty(7).please(),
+      memoryTracker: makeMe.aMemoryTracker.stability(72).difficulty(7).please(),
     })
 
     expect(wrapper.text()).toMatch(/Difficulty:\s*7/)

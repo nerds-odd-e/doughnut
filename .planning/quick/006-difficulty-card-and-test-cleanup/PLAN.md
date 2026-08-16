@@ -1,6 +1,6 @@
 # Plan: Difficulty tests and Information-card row
 
-**Status:** planned (not started)  
+**Status:** in progress (slice 1 done)  
 **Index:** not in `.planning/STATE.md` — this plan is ad-hoc only; do not write it into project state.  
 **Goal:** Drop the redundant show-JSON omit test; use graded fixtures; lock next Stability on graded-unset persist; put Stability and Difficulty on the same card row.
 
@@ -13,16 +13,13 @@ Sequential. Test cleanup first (requested focus). Do not Accept ADR 0003.
 ### 1. Difficulty tests match graded vs unset, without Jackson omit-null
 
 Type: Structure  
-Status: planned
+Status: done
 
 **Unlocks slice 2** (page tests already describe Difficulty; layout can move the pair without fighting New+D=7 fixtures).
 
-- Delete `assimilateOnlyTrackerShowLeavesDifficultyNull`. Keep `leavesDifficultyUnsetForAssimilateOnlyTracker` and page N/A.
-- `gradedTrackerShowIncludesDifficulty`: Stability > 0 and Difficulty 7 (not New+D=7).
-- Page `shows difficulty`: graded-shaped tracker (Stability set, Difficulty 7). Keep unset → N/A as the sibling.
-- `correctRecallFillsUnsetDifficultyOnGradedTracker`: also assert next Stability equals the D=5 sibling. Do not re-assert 266h.
+Graded show/page fixtures are Stability > 0 + Difficulty 7. Jackson omit-null show test removed; DB unset + page N/A remain. Persist also locks next Stability to the D=5 sibling.
 
-**Done when:** `pnpm backend:test_only` and `pnpm frontend:test tests/pages/MemoryTrackerPageView.spec.ts` green; no show test named graded on a Stability-0 tracker.
+**Learnings:** After dropping the omit-null sibling, graded show asserts `shown.getDifficulty()` on the controller return (no ObjectMapper roundtrip). `persistsAssignedDifficulty` still uses New+D=7 — that is assigned-Difficulty persistence, not the graded-show precondition. Slice 2 can move the card pair without New+D=7 fixtures.
 
 ---
 

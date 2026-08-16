@@ -2,23 +2,17 @@ package com.odde.doughnut.controllers;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.MemoryTrackerType;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 
 class MemoryTrackerShowControllerTest extends MemoryTrackerControllerTestBase {
-  @Autowired ObjectMapper objectMapper;
-
   @Nested
   class WhenThereIsAMemoryTracker {
     MemoryTracker tracker;
@@ -65,20 +59,15 @@ class MemoryTrackerShowControllerTest extends MemoryTrackerControllerTestBase {
     }
 
     @Test
-    void gradedTrackerShowIncludesDifficulty() throws Exception {
-      MemoryTracker stored = makeMe.aMemoryTrackerFor(ownedNote()).difficulty(7f).please();
-      JsonNode json =
-          objectMapper.readTree(
-              objectMapper.writeValueAsString(controller.showMemoryTracker(stored)));
-      assertThat(json.path("difficulty").floatValue(), equalTo(7f));
-    }
-
-    @Test
-    void assimilateOnlyTrackerShowLeavesDifficultyNull() throws Exception {
-      JsonNode json =
-          objectMapper.readTree(
-              objectMapper.writeValueAsString(controller.showMemoryTracker(tracker)));
-      assertThat(json.has("difficulty"), is(false));
+    void gradedTrackerShowIncludesDifficulty() throws UnexpectedNoAccessRightException {
+      MemoryTracker stored =
+          makeMe
+              .aMemoryTrackerFor(ownedNote())
+              .stabilityAndNextRecallAt(72f)
+              .difficulty(7f)
+              .please();
+      MemoryTracker shown = controller.showMemoryTracker(stored);
+      assertThat(shown.getDifficulty(), equalTo(7f));
     }
   }
 
