@@ -3,6 +3,7 @@ package com.odde.doughnut.controllers;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.lessThan;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
@@ -102,10 +103,12 @@ class RecallPromptAccidentalMatchConfusionAdjustmentTests extends RecallPromptCo
         throws UnexpectedNoAccessRightException {
       Note understandingNote = ownedNoteTitled("Understanding Match Title");
       MemoryTracker understandingTracker = ownedTracker(understandingNote);
+      float stabilityBefore = understandingTracker.getStability();
       answerDTO = spellingAnswer(understandingNote.getTitle());
 
       controller.answerSpelling(recallPrompt, answerDTO);
 
+      assertThat(understandingTracker.getStability(), lessThan(stabilityBefore));
       assertLinkedConfusionAdjustedTracker(understandingTracker);
     }
 

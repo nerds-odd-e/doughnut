@@ -42,4 +42,4 @@ JDBC harnesses remain temporary until those production applications.
 
 - Confirm production applied Flyway `V300000257` (table `mcq`), `V300000258` (table `answer`), `V300000259` (rename `stability`), `V300000260` (hours conversion + drop `space_intervals`), `V300000261` (difficulty column + graded backfill), and `V300000262` (leftover graded-row difficulty backfill)
 - Enable dummy-skip conversion placeholders on the deploys that first apply V300000254 / V300000255
-- Next FSRS: humans accept Proposed ADR 0003, or pick a deferred knob (B2 / relearning steps / RecallLog).
+- Next FSRS: optional follow-up [015](quick/015-fsrs-scheduling-followup/PLAN.md) (confusion understanding test hole + test/cohesion leftovers). Then humans accept Proposed ADR 0003, or pick a deferred knob (B2 / relearning steps / RecallLog).
