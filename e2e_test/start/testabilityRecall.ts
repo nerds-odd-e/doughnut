@@ -34,6 +34,33 @@ type SpellingScheduleSnapshot = {
 const spellingScheduleAlias = (noteTitle: string) =>
   `recordedSpellingSchedule-${noteTitle}`
 
+function expectSpellingScheduleAgainstRecorded(
+  testability: RecallTestability,
+  noteTitle: string,
+  assertNextRecallAt: (
+    tracker: MemoryTracker,
+    recorded: SpellingScheduleSnapshot
+  ) => void
+) {
+  return testability
+    .memoryTrackerForNote(noteTitle, 'SPELLING')
+    .then((tracker) => {
+      cy.get<SpellingScheduleSnapshot>(
+        `@${spellingScheduleAlias(noteTitle)}`
+      ).then((recorded) => {
+        expect(
+          tracker.lastRecalledAt ?? '',
+          `Last Recall Time for "${noteTitle}" should stay ${recorded.lastRecalledAt}`
+        ).to.equal(recorded.lastRecalledAt)
+        expect(
+          String(tracker.recallCount ?? 0),
+          `Recall Count for "${noteTitle}" should stay ${recorded.recallCount}`
+        ).to.equal(recorded.recallCount)
+        assertNextRecallAt(tracker, recorded)
+      })
+    })
+}
+
 export const recallTestabilityMethods = {
   memoryTrackerForNote(
     this: InjectedNoteIds,
@@ -109,23 +136,49 @@ export const recallTestabilityMethods = {
     this: RecallTestability,
     noteTitle: string
   ) {
-    return this.memoryTrackerForNote(noteTitle, 'SPELLING').then((tracker) => {
-      cy.get<SpellingScheduleSnapshot>(
-        `@${spellingScheduleAlias(noteTitle)}`
-      ).then((recorded) => {
-        expect(
-          tracker.lastRecalledAt ?? '',
-          `Last Recall Time for "${noteTitle}" should stay ${recorded.lastRecalledAt}`
-        ).to.equal(recorded.lastRecalledAt)
+    return expectSpellingScheduleAgainstRecorded(
+      this,
+      noteTitle,
+      (tracker, recorded) => {
         expect(
           tracker.nextRecallAt,
           `Next Recall Time for "${noteTitle}" should stay ${recorded.nextRecallAt}`
         ).to.equal(recorded.nextRecallAt)
+      }
+    )
+  },
+
+  expectSpellingTrackerBroughtForwardWithoutRecallCredit(
+    this: RecallTestability,
+    noteTitle: string
+  ) {
+    return expectSpellingScheduleAgainstRecorded(
+      this,
+      noteTitle,
+      (tracker, recorded) => {
+        const next = new Date(tracker.nextRecallAt).getTime()
+        const before = new Date(recorded.nextRecallAt).getTime()
         expect(
-          String(tracker.recallCount ?? 0),
-          `Recall Count for "${noteTitle}" should stay ${recorded.recallCount}`
-        ).to.equal(recorded.recallCount)
-      })
-    })
+          next,
+          `Next Recall Time (${tracker.nextRecallAt}) for "${noteTitle}" should be earlier than recorded ${recorded.nextRecallAt}`
+        ).to.be.lessThan(before)
+      }
+    )
+  },
+
+  markUnderstandingTrackerRecalledSuccessfully(
+    this: RecallTestability,
+    noteTitle: string
+  ) {
+    return this.memoryTrackerForNote(noteTitle, 'UNDERSTANDING').then(
+      (tracker) =>
+        cy.wrap(
+          MemoryTrackerController.markAsRecalled({
+            path: { memoryTracker: tracker.id },
+            query: { successful: true },
+          }),
+          { log: false }
+        )
+    )
   },
 }

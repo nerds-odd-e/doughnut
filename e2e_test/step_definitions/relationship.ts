@@ -54,17 +54,6 @@ When(
   }
 )
 
-When(
-  'I move note {string} under folder {string}',
-  (fromNoteTopic: string, folderTitle: string) => {
-    start
-      .jumpToNotePage(fromNoteTopic)
-      .openWikiLinkOrRelationship()
-      .findTarget(folderTitle)
-      .moveUnder(folderTitle)
-  }
-)
-
 Given(
   'there is {string} relationship between note {string} and {string} in notebook {string}',
   (

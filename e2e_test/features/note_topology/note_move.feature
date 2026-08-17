@@ -3,7 +3,7 @@ Feature: Note move
   so I can reorganize related notes.
 
   Background:
-    Given I am logged in as an existing user
+    Given I have a session as "old_learner"
     And I have a notebook "Sedition law" with a note "Sedition"
     And I have a notebook "Sedation care" with notes:
       | Title    | Folder   |
@@ -11,13 +11,14 @@ Feature: Note move
 
   @mockBrowserTime
   Scenario: Move a note under a folder and undo
-    When I move note "Sedition" under folder "Sedation"
+    When I route to the note "Sedition"
+    And I move the current note under folder "Sedation" in notebook "Sedation care"
     Then I should see sidebar folder "Sedation" containing these notes:
       | note-title |
       | Sedation   |
       | Sedition   |
     When I undo "move note"
-    And I jump to the notebook "Sedation care"
+    And I route to the note "Sedation"
     Then I should see sidebar folder "Sedation" containing these notes:
       | note-title |
       | Sedation   |

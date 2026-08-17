@@ -122,20 +122,16 @@ export const assumeNoteTargetSearchDialog = () => {
         ).to.deep.equal(targets)
       })
     },
-    moveUnder(folderTitle: string, notebookName?: string) {
-      let cards = cy.get('[role=listitem]').filter((_, el) => {
-        const t = el.querySelector('.folder-hit-title')
-        if (!t?.textContent?.includes(folderTitle)) return false
-        if (notebookName && !el.textContent?.includes(notebookName))
-          return false
-        return true
-      })
-      if (notebookName) {
-        cards = cards.should('have.length', 1)
-      } else {
-        cards = cards.should('have.length.at.least', 1).first()
-      }
-      cards.findByRole('button', { name: 'Move Under' }).click()
+    moveUnder(folderTitle: string, notebookName: string) {
+      cy.get('[role=listitem]')
+        .filter((_, el) => {
+          const t = el.querySelector('.folder-hit-title')
+          if (!t?.textContent?.includes(folderTitle)) return false
+          return el.textContent?.includes(notebookName) ?? false
+        })
+        .should('have.length', 1)
+        .findByRole('button', { name: 'Move Under' })
+        .click()
       cy.findByRole('button', { name: 'OK' }).click()
       waitUntilAppIsNotBusy()
     },

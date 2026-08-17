@@ -122,12 +122,18 @@ Then(
 )
 
 Then(
-  'the spelling memory tracker for {string} should be brought forward without recall credit',
+  'the spelling schedule of {string} should be brought forward without recall credit',
   (noteTitle: string) => {
-    openNoteLevelTracker(
-      noteTitle,
-      'spelling'
-    ).expectBroughtForwardWithoutRecallCredit()
+    start
+      .testability()
+      .expectSpellingTrackerBroughtForwardWithoutRecallCredit(noteTitle)
+  }
+)
+
+Given(
+  'I marked the understanding tracker for {string} as recalled successfully',
+  (noteTitle: string) => {
+    start.testability().markUnderstandingTrackerRecalledSuccessfully(noteTitle)
   }
 )
 

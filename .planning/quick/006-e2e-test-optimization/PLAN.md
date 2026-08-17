@@ -85,7 +85,9 @@ CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/folder_
 
 ### 2. Unique spelling match, note move undo, incorrect just-review
 Type: Structure
-Status: planned
+Status: done
+
+**Learnings:** Unique-match injects first credited spelling recall (~5.0s → ~2.9s). Note-move skips catalog and routes by note id (~5.0s → ~2.3s). Incorrect just-review injects assimilate + first Good (~4.9s → ~2.7s). Unused notebook-less `moveUnder` step removed.
 
 **Tests:**
 - `e2e_test/features/recall/accidental_match_scheduling.feature` — "Unique matched spelling tracker is brought forward without recall credit" (~4968ms)
