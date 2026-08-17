@@ -1,13 +1,10 @@
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.dto.RecordLearningSessionRequest;
-import com.odde.doughnut.entities.LearningSession;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
-import com.odde.doughnut.entities.SessionItem;
-import com.odde.doughnut.entities.repositories.LearningSessionRepository;
-import com.odde.doughnut.entities.repositories.SessionItemRepository;
+import com.odde.doughnut.entities.repositories.RecallLogRepository;
 import java.sql.Timestamp;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,8 +36,7 @@ abstract class LearningSessionControllerTestBase extends ControllerTestBase {
       """;
 
   @Autowired LearningSessionController controller;
-  @Autowired LearningSessionRepository learningSessionRepository;
-  @Autowired SessionItemRepository sessionItemRepository;
+  @Autowired RecallLogRepository recallLogRepository;
 
   @BeforeEach
   void setupLearningSessionTests() {
@@ -79,20 +75,5 @@ abstract class LearningSessionControllerTestBase extends ControllerTestBase {
 
   protected Notebook spanishNotebook(Timestamp dueAt) {
     return spanishNotebookFixture(dueAt).notebook();
-  }
-
-  protected MemoryTracker trackerForNote(Notebook notebook, String title) {
-    LearningSession session =
-        learningSessionRepository
-            .findByUser_IdAndNotebook_Id(currentUser.getUser().getId(), notebook.getId())
-            .getFirst();
-    return sessionItemFor(session.getId(), title).getMemoryTracker();
-  }
-
-  protected SessionItem sessionItemFor(int sessionId, String title) {
-    return sessionItemRepository.findByLearningSession_Id(sessionId).stream()
-        .filter(item -> item.getNoteTitle().equals(title))
-        .findFirst()
-        .orElseThrow();
   }
 }

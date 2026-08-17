@@ -18,12 +18,10 @@ erDiagram
     folder ||--o{ folder : "parent_folder_id ON DELETE CASCADE"
     folder ||--o{ "note" : "folder_id ON DELETE SET NULL"
     image ||--o{ "note" : "image_id ON DELETE CASCADE"
-    learning_session ||--o{ session_item : "learning_session_id ON DELETE CASCADE"
     mcq ||--o{ recall_prompt : "mcq_id ON DELETE NO ACTION"
     memory_tracker ||--o{ question_generation_batch_request : "memory_tracker_id ON DELETE CASCADE"
     memory_tracker ||--o{ recall_log : "memory_tracker_id ON DELETE CASCADE"
     memory_tracker ||--o{ recall_prompt : "memory_tracker_id ON DELETE CASCADE"
-    memory_tracker ||--o{ session_item : "memory_tracker_id ON DELETE CASCADE"
     "note" ||--o{ admin_data_migration_progress : "last_processed_note_id ON DELETE SET NULL"
     "note" ||--o{ assimilation_sequence_skip : "note_id ON DELETE CASCADE"
     "note" ||--o{ conversation : "note_id ON DELETE NO ACTION"
@@ -39,7 +37,6 @@ erDiagram
     notebook ||--o{ bazaar_notebook : "notebook_id ON DELETE NO ACTION"
     notebook ||--o{ book : "notebook_id ON DELETE CASCADE"
     notebook ||--o{ folder : "notebook_id ON DELETE CASCADE"
-    notebook ||--o{ learning_session : "notebook_id ON DELETE CASCADE"
     notebook ||--o{ "note" : "notebook_id ON DELETE NO ACTION"
     notebook ||--o{ subscription : "notebook_id ON DELETE NO ACTION"
     notebook_group ||--o{ notebook : "notebook_group_id ON DELETE SET NULL"
@@ -56,7 +53,6 @@ erDiagram
     "user" ||--o{ conversation : "conversation_initiator_id ON DELETE NO ACTION"
     "user" ||--o{ conversation_message : "sender ON DELETE CASCADE"
     "user" ||--o{ image : "user_id ON DELETE CASCADE"
-    "user" ||--o{ learning_session : "user_id ON DELETE CASCADE"
     "user" ||--o{ memory_tracker : "user_id ON DELETE CASCADE"
     "user" ||--o{ note_creator : "user_id ON DELETE CASCADE"
     "user" ||--o{ notebook : "creator_id ON DELETE CASCADE"
@@ -145,11 +141,6 @@ erDiagram
         int attachment_blob_id FK
         int note_id FK
     }
-    learning_session {
-        int id PK
-        int user_id FK
-        int notebook_id FK
-    }
     mcq {
         int id PK
         int note_id FK
@@ -224,11 +215,6 @@ erDiagram
         int memory_tracker_id FK
         int mcq_id FK
         int answer_id FK
-    }
-    session_item {
-        int id PK
-        int learning_session_id FK
-        int memory_tracker_id FK
     }
     shedlock {
         string name PK

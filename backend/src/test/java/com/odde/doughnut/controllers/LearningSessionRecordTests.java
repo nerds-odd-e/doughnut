@@ -4,10 +4,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
 import com.odde.doughnut.controllers.dto.RecordLearningSessionResponse;
-import com.odde.doughnut.entities.LearningSession;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Notebook;
-import com.odde.doughnut.entities.SessionItem;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import java.sql.Timestamp;
 import java.util.List;
@@ -16,39 +14,35 @@ import org.junit.jupiter.api.Test;
 class LearningSessionRecordTests extends LearningSessionControllerTestBase {
 
   @Test
-  void recordsSpanishNotebookSessionWithMatchedScores() throws UnexpectedNoAccessRightException {
+  void recordsMatchedScoresAsRecallLogsAndSchedulesTrackers()
+      throws UnexpectedNoAccessRightException {
     Timestamp dayTwo = makeMe.aTimestamp().of(1, 9).please();
     testabilitySettings.timeTravelTo(dayTwo);
 
-    Notebook notebook = spanishNotebook(dayTwo);
+    SpanishNotebookFixture fixture = spanishNotebookFixture(dayTwo);
 
     RecordLearningSessionResponse response =
-        controller.record(recordRequest(notebook, HOLA_GRACIAS_REPORT), "Asia/Shanghai");
+        controller.record(recordRequest(fixture.notebook(), HOLA_GRACIAS_REPORT), "Asia/Shanghai");
 
     assertThat(response.getRecordedAt(), equalTo(dayTwo));
     assertThat(response.getRecordedItems(), hasSize(2));
     assertThat(response.getRejectedEntries(), empty());
 
-    LearningSession session =
-        learningSessionRepository
-            .findByUser_IdAndNotebook_Id(currentUser.getUser().getId(), notebook.getId())
-            .getFirst();
-    assertThat(session.getRecordedAt(), equalTo(dayTwo));
-
-    for (SessionItem item : sessionItemRepository.findByLearningSession_Id(session.getId())) {
-      assertThat(item.getFeedbackRecordedAt(), equalTo(dayTwo));
-      assertThat(item.getMemoryTracker().getRecallCount(), equalTo(1));
-      assertThat(item.getMemoryTracker().getLastRecalledAt(), equalTo(dayTwo));
+    for (MemoryTracker tracker : List.of(fixture.holaTracker(), fixture.graciasTracker())) {
+      assertThat(
+          recallLogRepository.findAllByMemoryTracker_IdOrderByRecordedAtDescIdDesc(tracker.getId()),
+          hasSize(1));
+      assertThat(tracker.getRecallCount(), equalTo(1));
+      assertThat(tracker.getLastRecalledAt(), equalTo(dayTwo));
     }
   }
 
   @Test
-  void allLinesRejectedCreatesNoSession() throws UnexpectedNoAccessRightException {
+  void allLinesRejectedWritesNoRecallLogs() throws UnexpectedNoAccessRightException {
     Timestamp dayTwo = makeMe.aTimestamp().of(1, 9).please();
     testabilitySettings.timeTravelTo(dayTwo);
 
     SpanishNotebookFixture fixture = spanishNotebookFixture(dayTwo);
-    Notebook notebook = fixture.notebook();
     MemoryTracker holaTracker = fixture.holaTracker();
     var trackerStateBefore =
         List.of(
@@ -56,12 +50,12 @@ class LearningSessionRecordTests extends LearningSessionControllerTestBase {
             holaTracker.getRecallCount(),
             holaTracker.getStability(),
             holaTracker.getNextRecallAt());
-    long sessionsBefore = learningSessionRepository.count();
+    long logsBefore = recallLogRepository.count();
 
     RecordLearningSessionResponse response =
         controller.record(
             recordRequest(
-                notebook,
+                fixture.notebook(),
                 """
                 # Learning Session Report
 
@@ -72,7 +66,7 @@ class LearningSessionRecordTests extends LearningSessionControllerTestBase {
 
     assertThat(response.getRecordedItems(), empty());
     assertThat(response.getRejectedEntries(), hasSize(2));
-    assertThat(learningSessionRepository.count(), equalTo(sessionsBefore));
+    assertThat(recallLogRepository.count(), equalTo(logsBefore));
     assertThat(
         List.of(
             holaTracker.getLastRecalledAt(),

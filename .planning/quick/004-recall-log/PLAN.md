@@ -1,6 +1,6 @@
 # Plan: RecallLog
 
-**Status:** in progress (slice 12 next)
+**Status:** in progress (slice 13 next)
 
 **Goal:** Memory-state transitions are a RecallLog. Prompt submissions stay `answer`. Tutor Feedback is a log row, not a session bag.
 
@@ -10,8 +10,8 @@
 - Write logs at the **grade caller** (just review, prompt grading, `recordFeedback`, confusion), not only inside `recalledAgain` — Tutor **0** and **1** both call `recalledAgain` but must log `AGAIN_ZERO` vs `AGAIN`.
 - Hooking `markAsRecalled` will also log prompt Yes/No before `answer_id` is set. That is allowed interim; the next prompt slice sets `answer_id`. Overlap must still write **no** log (it does not call `markAsRecalled`).
 - `GET /api/memory-trackers/{id}/recall-logs` is the Memory Tracker surface. After a DTO change, `pnpm generateTypeScript`.
-- Next Flyway: `V300000267`. `recall_log.memory_tracker_id` ON DELETE CASCADE. Include logs in hard-delete fixtures (`unit-testing.mdc`).
-- Jidoka before dropping `learning_session`: [ADR 0005](../../../docs/adrs/0005-commissioned-learning-session-protocol.md) still describes paste-into-session and amend-in-place; code already does not. Slice 12 drafts that ADR to match “session = Request/Report activity, not a table.”
+- Next Flyway: `V300000268`. `recall_log.memory_tracker_id` ON DELETE CASCADE. Include logs in hard-delete fixtures (`unit-testing.mdc`).
+- Proposed [ADR 0005](../../../docs/adrs/0005-commissioned-learning-session-protocol.md): Learning Session is the Request/Report activity, not a table (human owns accept).
 
 ## Slices
 
@@ -59,11 +59,9 @@ Grade caller maps 4/5/3/2/1/0 → GOOD/EASY/HARD/SHRINK/AGAIN/AGAIN_ZERO and per
 
 Tutoring status counts `answer_id` null tutor outcomes **on the commissioned tracker** (sibling understanding just-review does not count). Frequent-failure counts `AGAIN`/`AGAIN_ZERO` in 14 days. No source column. `session_item` still written.
 
-### 12. Drop learning_session and session_item — Structure — planned
+### 12. Drop learning_session and session_item — Structure — done
 
-**Jidoka:** Draft ADR 0005 so Learning Session is the Request/Report activity, not a persisted aggregate (no paste-into-session, no amend-in-place). Human owns that Decision edit.
-
-Remove tables, entities, and E2E “creates a session” assertions. Latest tutor score on the Memory Tracker comes from the latest tutor log. Existing tests still pass aside from those replaced assertions. `note_title` snapshot is not kept.
+`V300000267` dropped the tables. ADR 0005 drafted (stays Proposed): session = Request/Report activity. Latest tutor score is the latest tutor log. `note_title` snapshot not kept.
 
 ### 13. Drop redundant answer.correct and recall_count — Structure — planned
 

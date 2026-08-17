@@ -48,7 +48,7 @@ When('I record the learning session report:', (reportMarkdown: string) => {
 })
 
 Then(
-  'the learning session for notebook {string} should be marked as recorded',
+  'the recorded Feedback for notebook {string} should be shown',
   (_notebookTitle: string) => {
     start.recall().assumeRecallPage().expectLearningSessionReportRecorded()
   }
@@ -114,16 +114,6 @@ Then(
       .recall()
       .assumeRecallPage()
       .expectLearningSessionRequestIncludesRubric()
-  }
-)
-
-Then(
-  'no learning session should exist for notebook {string}',
-  (notebookTitle: string) => {
-    start
-      .recall()
-      .assumeRecallPage()
-      .expectNoLearningSessionForNotebook(notebookTitle)
   }
 )
 

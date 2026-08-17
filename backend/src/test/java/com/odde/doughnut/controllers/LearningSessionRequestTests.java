@@ -18,13 +18,13 @@ import org.springframework.web.server.ResponseStatusException;
 class LearningSessionRequestTests extends LearningSessionControllerTestBase {
 
   @Test
-  void returnsRequestMarkdownFromDueTrackersWithoutCreatingSession()
+  void returnsRequestMarkdownFromDueTrackersWithoutWritingRecallLogs()
       throws UnexpectedNoAccessRightException {
     Timestamp dayTwo = makeMe.aTimestamp().of(1, 9).please();
     testabilitySettings.timeTravelTo(dayTwo);
 
     Notebook notebook = spanishNotebook(dayTwo);
-    long sessionsBefore = learningSessionRepository.count();
+    long logsBefore = recallLogRepository.count();
 
     LearningSessionRequestResponse response = controller.request(notebook.getId(), "Asia/Shanghai");
 
@@ -84,7 +84,7 @@ class LearningSessionRequestTests extends LearningSessionControllerTestBase {
         containsString("- 2 — needed a reminder at first, then showed signs of mastering it"));
     assertThat(markdown, containsString("- 1 — needed several reminders"));
     assertThat(markdown, containsString("- 0 — could not reach the session item even with help"));
-    assertThat(learningSessionRepository.count(), equalTo(sessionsBefore));
+    assertThat(recallLogRepository.count(), equalTo(logsBefore));
   }
 
   @Test

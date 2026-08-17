@@ -6,10 +6,13 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.doughnut.controllers.dto.NoteRecallInfo;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.ProductOutcome;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.httpQuery.HttpClientAdapter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
@@ -67,5 +70,40 @@ class NoteControllerNoteInfoTests extends ControllerTestBase {
     NoteRecallInfo noteRecallInfo = controller.getNoteInfo(note);
 
     assertThat(noteRecallInfo.getSkippedPropertyKeys(), contains("topic"));
+  }
+
+  @ParameterizedTest
+  @CsvSource({"EASY, 5", "GOOD, 4", "HARD, 3", "SHRINK, 2", "AGAIN, 1", "AGAIN_ZERO, 0"})
+  void commissionedTrackerShowsMappedScoreFromLatestTutorLog(ProductOutcome outcome, int score)
+      throws UnexpectedNoAccessRightException {
+    Note note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
+    makeMe
+        .aRecallLogFor(makeMe.aMemoryTrackerFor(note).commissioned().please())
+        .productOutcome(outcome)
+        .please();
+
+    assertThat(
+        controller.getNoteInfo(note).getMemoryTrackers().getFirst().getLatestTutorFeedbackScore(),
+        equalTo(score));
+  }
+
+  @Test
+  void latestTutorLogWinsForTutorFeedbackScore() throws UnexpectedNoAccessRightException {
+    Note note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
+    var tracker = makeMe.aMemoryTrackerFor(note).commissioned().please();
+    makeMe
+        .aRecallLogFor(tracker)
+        .productOutcome(ProductOutcome.EASY)
+        .recordedAt(makeMe.aTimestamp().of(1, 8).please())
+        .please();
+    makeMe
+        .aRecallLogFor(tracker)
+        .productOutcome(ProductOutcome.GOOD)
+        .recordedAt(makeMe.aTimestamp().of(2, 8).please())
+        .please();
+
+    assertThat(
+        controller.getNoteInfo(note).getMemoryTrackers().getFirst().getLatestTutorFeedbackScore(),
+        equalTo(4));
   }
 }

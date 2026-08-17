@@ -5,9 +5,7 @@ import com.odde.doughnut.controllers.dto.LearningSessionRequestResponse;
 import com.odde.doughnut.controllers.dto.RecordLearningSessionResponse;
 import com.odde.doughnut.controllers.dto.RecordedLearningSessionItem;
 import com.odde.doughnut.entities.*;
-import com.odde.doughnut.entities.repositories.LearningSessionRepository;
 import com.odde.doughnut.entities.repositories.NoteRepository;
-import com.odde.doughnut.entities.repositories.SessionItemRepository;
 import com.odde.doughnut.services.LearningSessionReportParser.ParseResult;
 import com.odde.doughnut.services.LearningSessionReportParser.ParsedReportEntry;
 import java.sql.Timestamp;
@@ -26,8 +24,6 @@ import org.springframework.web.server.ResponseStatusException;
 public class LearningSessionService {
 
   private final UserService userService;
-  private final LearningSessionRepository learningSessionRepository;
-  private final SessionItemRepository sessionItemRepository;
   private final NoteRepository noteRepository;
   private final LearningSessionRequestMarkdownBuilder learningSessionRequestMarkdownBuilder;
   private final LearningSessionReportParser learningSessionReportParser;
@@ -36,15 +32,11 @@ public class LearningSessionService {
   @Autowired
   public LearningSessionService(
       UserService userService,
-      LearningSessionRepository learningSessionRepository,
-      SessionItemRepository sessionItemRepository,
       NoteRepository noteRepository,
       LearningSessionRequestMarkdownBuilder learningSessionRequestMarkdownBuilder,
       LearningSessionReportParser learningSessionReportParser,
       MemoryTrackerService memoryTrackerService) {
     this.userService = userService;
-    this.learningSessionRepository = learningSessionRepository;
-    this.sessionItemRepository = sessionItemRepository;
     this.noteRepository = noteRepository;
     this.learningSessionRequestMarkdownBuilder = learningSessionRequestMarkdownBuilder;
     this.learningSessionReportParser = learningSessionReportParser;
@@ -100,21 +92,13 @@ public class LearningSessionService {
       return response;
     }
 
-    LearningSession session = new LearningSession();
-    session.setUser(user);
-    session.setNotebook(notebook);
-    session.setRecordedAt(now);
-    learningSessionRepository.save(session);
-
     for (MatchedReportEntry matched : matchedEntries) {
       int score = matched.entry().score();
       ProductOutcome productOutcome =
           CommissionedLearningSessionFeedbackScheduling.productOutcomeForScore(score);
-      SessionItem item = createSessionItem(session, matched.tracker(), score, now);
       memoryTrackerService.persistRecallLog(matched.tracker(), now, productOutcome, null);
       CommissionedLearningSessionFeedbackScheduling.recordFeedback(
           matched.tracker(), now, productOutcome);
-      sessionItemRepository.save(item);
 
       RecordedLearningSessionItem recorded = new RecordedLearningSessionItem();
       recorded.setNoteTitle(matched.entry().noteTitle());
@@ -150,17 +134,6 @@ public class LearningSessionService {
           HttpStatus.BAD_REQUEST, "No due commissioned memory trackers for this notebook.");
     }
     return dueTrackers;
-  }
-
-  private SessionItem createSessionItem(
-      LearningSession session, MemoryTracker tracker, int score, Timestamp now) {
-    SessionItem item = new SessionItem();
-    item.setLearningSession(session);
-    item.setMemoryTracker(tracker);
-    item.setNoteTitle(tracker.getNote().getTitle());
-    item.setFeedbackScore(score);
-    item.setFeedbackRecordedAt(now);
-    return item;
   }
 
   private record MatchedReportEntry(ParsedReportEntry entry, MemoryTracker tracker) {}

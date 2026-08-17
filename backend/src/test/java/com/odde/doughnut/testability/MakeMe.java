@@ -158,14 +158,6 @@ public class MakeMe extends MakeMeWithoutDB {
     return new QuestionGenerationBatchRequestBuilder(this);
   }
 
-  public LearningSessionBuilder aLearningSession() {
-    return new LearningSessionBuilder(this);
-  }
-
-  public SessionItemBuilder aSessionItem() {
-    return new SessionItemBuilder(this);
-  }
-
   public RecallLogBuilder aRecallLogFor(MemoryTracker memoryTracker) {
     return new RecallLogBuilder(this).memoryTracker(memoryTracker);
   }

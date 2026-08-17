@@ -1,9 +1,10 @@
 package com.odde.doughnut.controllers;
 
+import com.odde.doughnut.algorithms.CommissionedLearningSessionFeedbackScheduling;
 import com.odde.doughnut.controllers.dto.*;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.repositories.AssimilationSequenceSkipRepository;
-import com.odde.doughnut.entities.repositories.SessionItemRepository;
+import com.odde.doughnut.entities.repositories.RecallLogRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.EntityPersister;
 import com.odde.doughnut.services.AuthorizationService;
@@ -37,7 +38,7 @@ class NoteController {
   private final FocusContextRetrievalService focusContextRetrievalService;
   private final FocusContextMarkdownRenderer focusContextMarkdownRenderer;
   private final NoteRealmService noteRealmService;
-  private final SessionItemRepository sessionItemRepository;
+  private final RecallLogRepository recallLogRepository;
   private final AssimilationSequenceSkipRepository skipRepository;
 
   public NoteController(
@@ -48,7 +49,7 @@ class NoteController {
       FocusContextRetrievalService focusContextRetrievalService,
       FocusContextMarkdownRenderer focusContextMarkdownRenderer,
       NoteRealmService noteRealmService,
-      SessionItemRepository sessionItemRepository,
+      RecallLogRepository recallLogRepository,
       AssimilationSequenceSkipRepository skipRepository) {
     this.entityPersister = entityPersister;
     this.noteService = noteService;
@@ -57,7 +58,7 @@ class NoteController {
     this.focusContextRetrievalService = focusContextRetrievalService;
     this.focusContextMarkdownRenderer = focusContextMarkdownRenderer;
     this.noteRealmService = noteRealmService;
-    this.sessionItemRepository = sessionItemRepository;
+    this.recallLogRepository = recallLogRepository;
     this.skipRepository = skipRepository;
   }
 
@@ -89,8 +90,9 @@ class NoteController {
     List<MemoryTracker> memoryTrackers = userService.getMemoryTrackersFor(user, note);
     for (MemoryTracker tracker : memoryTrackers) {
       if (tracker.isCommissioned()) {
-        sessionItemRepository
-            .findLatestFeedbackScoreByMemoryTrackerId(tracker.getId())
+        recallLogRepository
+            .findLatestTutorProductOutcomeByMemoryTrackerId(tracker.getId())
+            .map(CommissionedLearningSessionFeedbackScheduling::scoreForProductOutcome)
             .ifPresent(tracker::setLatestTutorFeedbackScore);
       }
     }

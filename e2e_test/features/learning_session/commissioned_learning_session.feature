@@ -24,7 +24,7 @@ Feature: Commissioned learning session
     Then I should see that I have 0 notes to recall
     And I should see 1 potential learning session for notebook "Spanish conversation"
 
-  Scenario: Opening a potential learning session shows the request without creating a session
+  Scenario: Opening a potential learning session shows the request without persisting a session
     Given the notes "Hola, Gracias" are assimilated as commissioned on day 1
     And It's day 2, 9 hour
     When I open the learning session request for notebook "Spanish conversation"
@@ -32,7 +32,7 @@ Feature: Commissioned learning session
     And the learning session request should include the tutoring status of "Hola"
     And the learning session request should include focus context with note body "Hello"
     And the learning session request should instruct the tutor to report one score per session item
-    And no learning session should exist for notebook "Spanish conversation"
+    And I should see 1 potential learning session for notebook "Spanish conversation"
 
   Scenario: Notes from different notebooks are commissioned as separate learning sessions
     Given I have a notebook "Kanji" with notes:
@@ -45,7 +45,7 @@ Feature: Commissioned learning session
     And I should see 1 potential learning session for notebook "Spanish conversation"
     And I should see 1 potential learning session for notebook "Kanji"
 
-  Scenario: Recording the tutor's report creates a session and schedules each tracker
+  Scenario: Recording the tutor's report writes Feedback and schedules each tracker
     Given the notes "Hola, Gracias" are assimilated as commissioned on day 1
     And It's day 2, 9 hour
     When I open the learning session request for notebook "Spanish conversation"
@@ -58,7 +58,7 @@ Feature: Commissioned learning session
       Gracias: 1
       </session_item_scores>
       """
-    Then the learning session for notebook "Spanish conversation" should be marked as recorded
+    Then the recorded Feedback for notebook "Spanish conversation" should be shown
     And the commissioned memory tracker for "Hola" should have recall count 1
     And the commissioned memory tracker for "Gracias" should have recall count 1
     And I should see tutor feedback score 5 from a learning session for the memory tracker of note "Hola"

@@ -6,7 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.odde.doughnut.controllers.dto.RecordLearningSessionResponse;
 import com.odde.doughnut.entities.MemoryTracker;
-import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.utils.TimestampOperations;
 import java.sql.Timestamp;
@@ -144,14 +143,13 @@ class LearningSessionRecordTutorFeedbackTests extends LearningSessionControllerT
     Timestamp dayTwo = makeMe.aTimestamp().of(1, 9).please();
     testabilitySettings.timeTravelTo(dayTwo);
 
-    Notebook notebook = spanishNotebook(dayTwo);
+    SpanishNotebookFixture fixture = spanishNotebookFixture(dayTwo);
 
     RecordLearningSessionResponse response =
         controller.record(
-            recordRequest(notebook, learningSessionReport("Hola", 0)), "Asia/Shanghai");
+            recordRequest(fixture.notebook(), learningSessionReport("Hola", 0)), "Asia/Shanghai");
 
-    MemoryTracker holaTracker = trackerForNote(notebook, "Hola");
-    assertTrue(holaTracker.getNextRecallAt().after(response.getRecordedAt()));
+    assertTrue(fixture.holaTracker().getNextRecallAt().after(response.getRecordedAt()));
   }
 
   private SpanishNotebookFixture afterOnTimeSecondScore(int score)

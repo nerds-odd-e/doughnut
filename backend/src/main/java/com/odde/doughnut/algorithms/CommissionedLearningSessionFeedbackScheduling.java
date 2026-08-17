@@ -20,6 +20,19 @@ public final class CommissionedLearningSessionFeedbackScheduling {
     };
   }
 
+  public static int scoreForProductOutcome(ProductOutcome productOutcome) {
+    return switch (productOutcome) {
+      case EASY -> 5;
+      case GOOD -> 4;
+      case HARD -> 3;
+      case SHRINK -> 2;
+      case AGAIN -> 1;
+      case AGAIN_ZERO -> 0;
+      case CONFUSION ->
+          throw new IllegalArgumentException("CONFUSION is not a tutor feedback outcome");
+    };
+  }
+
   public static void recordFeedback(
       MemoryTracker tracker, Timestamp now, ProductOutcome productOutcome) {
     tracker.setRecallCount(tracker.getRecallCount() + 1);
