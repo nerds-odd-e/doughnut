@@ -61,20 +61,9 @@ class RecallPromptAnswerSpellingControllerTest extends RecallPromptControllerTes
   }
 
   @Test
-  void shouldValidateTheAnswerAndUpdateMemoryTracker() throws UnexpectedNoAccessRightException {
-    Integer oldRecallCount = memoryTracker.getRecallCount();
+  void shouldValidateTheAnswer() throws UnexpectedNoAccessRightException {
     AnsweredQuestion answerResult = controller.answerSpelling(recallPrompt, answerDTO);
     assertTrue(answerResult.getAnswer().getCorrect());
-    assertThat(memoryTracker.getRecallCount(), greaterThan(oldRecallCount));
-  }
-
-  @Test
-  void correctAnswerLeavesARecallLogLinkedToTheAnswer() throws UnexpectedNoAccessRightException {
-    AnsweredQuestion answerResult = controller.answerSpelling(recallPrompt, answerDTO);
-
-    assertThat(
-        memoryTrackerController.getRecallLogs(memoryTracker).get(0).getAnswerId(),
-        equalTo(answerResult.getAnswer().getId()));
   }
 
   @Test

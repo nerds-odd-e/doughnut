@@ -52,7 +52,6 @@ class RecallPromptOverlapTryAgainTests extends RecallPromptControllerTestBase {
   @Test
   void shouldGradeAsOverlapWhenAnswerMatchesReviewedAndResolvedOverlapTarget()
       throws UnexpectedNoAccessRightException {
-    Integer recallCountBefore = memoryTracker.getRecallCount();
     Float stabilityBefore = memoryTracker.getStability();
     Timestamp nextRecallAtBefore = memoryTracker.getNextRecallAt();
     Timestamp lastRecalledAtBefore = memoryTracker.getLastRecalledAt();
@@ -60,7 +59,6 @@ class RecallPromptOverlapTryAgainTests extends RecallPromptControllerTestBase {
     AnsweredQuestion result = answerSpelling(memoryTracker, "Shared Title");
 
     assertThat(result.getAnswer().getOutcome(), is(AnswerOutcome.OVERLAP));
-    assertThat(memoryTracker.getRecallCount(), equalTo(recallCountBefore));
     assertThat(memoryTracker.getStability(), equalTo(stabilityBefore));
     assertThat(memoryTracker.getNextRecallAt(), equalTo(nextRecallAtBefore));
     assertThat(memoryTracker.getLastRecalledAt(), equalTo(lastRecalledAtBefore));

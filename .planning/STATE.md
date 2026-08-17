@@ -6,9 +6,9 @@ current_phase: null
 current_phase_name: null
 status: ready
 stopped_at: null
-last_updated: "2026-08-17T11:00:00Z"
+last_updated: "2026-08-17T11:20:00Z"
 last_activity: 2026-08-17
-last_activity_desc: "020 slice 1 done (prompt history Correct after reload); remaining 020 slices 2–3; FSRS gap B4/E3/E4 plus accept ADR 0003"
+last_activity_desc: "020 slices 1–2 done (history Correct after reload; canonical RecallLog pins); remaining slice 3 stats adapter; FSRS gap B4/E3/E4 plus accept ADR 0003"
 progress:
   total_phases: 0
   completed_phases: 0
@@ -43,4 +43,4 @@ JDBC harnesses remain temporary until those production applications.
 - Confirm production applied Flyway `V300000257` (table `mcq`), `V300000258` (table `answer`), `V300000259` (rename `stability`), `V300000260` (hours conversion + drop `space_intervals`), `V300000261` (difficulty column + graded backfill), `V300000262` (leftover graded-row difficulty backfill), `V300000263` (`recall_log`), `V300000264` (drop confusion FK), `V300000265`–`V300000266` (RecallLog backfills), `V300000267` (drop `session_item` / `learning_session`), and `V300000268` (drop `answer.correct` / `recall_count`)
 - Enable dummy-skip conversion placeholders on the deploys that first apply V300000254 / V300000255
 - Next FSRS: humans accept Proposed ADR 0003, or pick a remaining deferred knob ([FSRS-COMPATIBILITY-GAP.md](research/FSRS-COMPATIBILITY-GAP.md)).
-- Continue `.planning/quick/020-recall-log-leftover-cohesion/PLAN.md` (slice 2: one canonical pin per RecallLog writer; slice 3: stats tests drive RecallAnswerRow).
+- Continue `.planning/quick/020-recall-log-leftover-cohesion/PLAN.md` (slice 3: stats tests drive RecallAnswerRow).

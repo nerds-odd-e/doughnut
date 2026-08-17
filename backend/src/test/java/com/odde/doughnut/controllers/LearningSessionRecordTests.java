@@ -32,7 +32,6 @@ class LearningSessionRecordTests extends LearningSessionControllerTestBase {
       assertThat(
           recallLogRepository.findAllByMemoryTracker_IdOrderByRecordedAtDescIdDesc(tracker.getId()),
           hasSize(1));
-      assertThat(tracker.getRecallCount(), equalTo(1));
       assertThat(tracker.getLastRecalledAt(), equalTo(dayTwo));
     }
   }

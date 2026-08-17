@@ -27,27 +27,10 @@ Tighten leftovers from `.planning/quick/004-recall-log/` (see `CONTEXT.md`). Do 
 ### 2. One canonical pin per RecallLog writer
 
 - **Type:** Structure
-- **Status:** planned
-- **What:** Remove overlapping tests/assertions. No production change.
-- **Verify:** Same focused controller/frontend tests still pass; no new behavior.
-
-**Delete**
-
-- `markAsRecalledIncrementsRecallCount` — implied by the just-review GOOD log pin.
-- `unansweredPromptDoesNotWriteARecallLog` — no trigger.
-- Spelling `correctAnswerLeavesARecallLogLinkedToTheAnswer` — same writer as MCQ GOOD + `answer_id`.
-- Frontend assertion that `[data-testid="recall-log-answer-id"]` is absent — that testid is not in production; E2E already says “no answer id”.
-
-**Slim (delta only)**
-
-- MCQ/spelling `shouldValidateTheAnswerAndUpdateMemoryTracker`: drop `recallCount`; keep `correct: true`.
-- MCQ `shouldValidateTheWrongAnswer`: drop `recallCount`; keep `correct: false`.
-- `scoreFourLeavesAGoodRecallLogWithoutAnswer`: keep one GOOD log and null `answer_id`; drop elapsed / `recorded_at` / `memoryTrackerId` (canonical on just-review Yes).
-- Accidental-match log test: keep `AGAIN` (delta vs overlap writes no log); drop `answer_id` (canonical on incorrect MCQ).
-- Overlap schedule test: drop `recallCount` unchanged (the no-log test is that claim).
-- `LearningSessionRecordTests.recordsMatchedScoresAsRecallLogsAndSchedulesTrackers`: drop `recallCount == 1` when log size is already 1; keep `lastRecalledAt`.
-
-**Keep** (unique claims): just-review GOOD shape; just-review AGAIN as second log; MCQ GOOD+`answer_id`; MCQ AGAIN+`answer_id`; overlap writes no log; confusion CONFUSION on matched tracker; tutor score mapping parameterized test; unmatched title writes no log; property-tracker credit vs note-level (recallCount is the which-tracker signal); E2E just-review logs; frontend GOOD elapsed-hours render and two-log AGAIN.
+- **Status:** done
+- **What:** Removed overlapping tests/assertions. No production change.
+- **Learnings:** Deleted `markAsRecalledIncrementsRecallCount`, `unansweredPromptDoesNotWriteARecallLog`, spelling `correctAnswerLeavesARecallLogLinkedToTheAnswer`, and the unused frontend `recall-log-answer-id` absence pin. Slimmed MCQ/spelling validate tests, tutor score-4 log, accidental-match log, overlap schedule, and `LearningSessionRecordTests` to delta-only. Renamed validate tests to `shouldValidateTheAnswer` after dropping tracker-update assertions.
+- **Keep** (unique claims still live): just-review GOOD shape; just-review AGAIN as second log; MCQ GOOD+`answer_id`; MCQ AGAIN+`answer_id`; overlap writes no log; confusion CONFUSION on matched tracker; tutor score mapping parameterized test; unmatched title writes no log; property-tracker credit vs note-level; E2E just-review logs; frontend GOOD elapsed-hours render and two-log AGAIN.
 
 ---
 

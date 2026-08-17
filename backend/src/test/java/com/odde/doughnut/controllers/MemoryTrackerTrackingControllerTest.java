@@ -42,14 +42,6 @@ class MemoryTrackerTrackingControllerTest extends MemoryTrackerControllerTestBas
   }
 
   @Test
-  void markAsRecalledIncrementsRecallCount() {
-    MemoryTracker tracker = ownedTracker();
-    Integer oldRecallCount = tracker.getRecallCount();
-    controller.markAsRecalled(tracker, true);
-    assertThat(tracker.getRecallCount(), equalTo(oldRecallCount + 1));
-  }
-
-  @Test
   void successfulMarkAsRecalledLeavesOneGoodRecallLog() throws UnexpectedNoAccessRightException {
     Timestamp assimilatedAt = makeMe.aTimestamp().of(1, 8).please();
     MemoryTracker tracker =

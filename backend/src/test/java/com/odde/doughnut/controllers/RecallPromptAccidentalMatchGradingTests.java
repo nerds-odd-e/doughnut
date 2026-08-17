@@ -11,10 +11,8 @@ import com.odde.doughnut.entities.AnswerOutcome;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.ProductOutcome;
-import com.odde.doughnut.entities.RecallLog;
 import com.odde.doughnut.entities.RecallPrompt;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
-import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -51,13 +49,12 @@ class RecallPromptAccidentalMatchGradingTests extends RecallPromptControllerTest
   }
 
   @Test
-  void accidentalMatchLeavesAnAgainRecallLogLinkedToTheAnswer()
-      throws UnexpectedNoAccessRightException {
-    AnsweredQuestion answerResult = controller.answerSpelling(recallPrompt, answerDTO);
+  void accidentalMatchLeavesAnAgainRecallLog() throws UnexpectedNoAccessRightException {
+    controller.answerSpelling(recallPrompt, answerDTO);
 
-    List<RecallLog> logs = memoryTrackerController.getRecallLogs(memoryTracker);
-    assertThat(logs.get(0).getProductOutcome(), is(ProductOutcome.AGAIN));
-    assertThat(logs.get(0).getAnswerId(), equalTo(answerResult.getAnswer().getId()));
+    assertThat(
+        memoryTrackerController.getRecallLogs(memoryTracker).get(0).getProductOutcome(),
+        is(ProductOutcome.AGAIN));
   }
 
   @Test

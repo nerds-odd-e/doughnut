@@ -38,16 +38,9 @@ class RecallPromptAnswerControllerTest extends RecallPromptControllerTestBase {
   }
 
   @Test
-  void shouldValidateTheAnswerAndUpdateMemoryTracker() throws UnexpectedNoAccessRightException {
-    Integer oldRecallCount = memoryTracker.getRecallCount();
+  void shouldValidateTheAnswer() throws UnexpectedNoAccessRightException {
     AnsweredQuestion answerResult = controller.answer(recallPrompt, answerDTO);
     assertThat(answerResult.getAnswer().getCorrect(), is(true));
-    assertThat(memoryTracker.getRecallCount(), greaterThan(oldRecallCount));
-  }
-
-  @Test
-  void unansweredPromptDoesNotWriteARecallLog() throws UnexpectedNoAccessRightException {
-    assertThat(memoryTrackerController.getRecallLogs(memoryTracker), empty());
   }
 
   @Test
@@ -191,10 +184,8 @@ class RecallPromptAnswerControllerTest extends RecallPromptControllerTestBase {
     @Test
     void shouldValidateTheWrongAnswer() throws UnexpectedNoAccessRightException {
       testabilitySettings.timeTravelTo(memoryTracker.getNextRecallAt());
-      Integer oldRecallCount = memoryTracker.getRecallCount();
       AnsweredQuestion answerResult = controller.answer(recallPrompt, answerDTO);
       assertThat(answerResult.getAnswer().getCorrect(), is(false));
-      assertThat(memoryTracker.getRecallCount(), greaterThan(oldRecallCount));
     }
 
     @Test
