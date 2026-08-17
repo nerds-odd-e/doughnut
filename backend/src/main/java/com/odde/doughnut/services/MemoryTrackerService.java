@@ -25,8 +25,8 @@ import org.springframework.web.server.ResponseStatusException;
 
 @Service
 public class MemoryTrackerService {
-  private static final int WRONG_ANSWER_THRESHOLD = 5;
-  private static final int WRONG_ANSWER_PERIOD_DAYS = 14;
+  private static final int FREQUENT_FAILURE_THRESHOLD = 5;
+  private static final int FREQUENT_FAILURE_PERIOD_DAYS = 14;
 
   private final EntityPersister entityPersister;
   private final UserService userService;
@@ -217,23 +217,18 @@ public class MemoryTrackerService {
         recallPrompt, answerSpellingDTO, user, currentUTCTimestamp);
   }
 
-  public int countWrongAnswersInPeriod(
-      MemoryTracker memoryTracker, Timestamp currentTime, int periodDays) {
-    Timestamp since =
-        new Timestamp(currentTime.getTime() - (long) periodDays * 24 * 60 * 60 * 1000);
-    return recallPromptRepository.countWrongAnswersSinceForMemoryTracker(
-        memoryTracker.getId(), since);
-  }
-
   public ThresholdExceededResult getThresholdExceededResult(
       MemoryTracker memoryTracker, Timestamp currentTime) {
+    Timestamp since =
+        new Timestamp(
+            currentTime.getTime() - (long) FREQUENT_FAILURE_PERIOD_DAYS * 24 * 60 * 60 * 1000);
     int wrongCount =
-        countWrongAnswersInPeriod(memoryTracker, currentTime, WRONG_ANSWER_PERIOD_DAYS);
+        recallLogRepository.countAgainOutcomesSinceForMemoryTracker(memoryTracker.getId(), since);
     return new ThresholdExceededResult(
-        wrongCount >= WRONG_ANSWER_THRESHOLD,
+        wrongCount >= FREQUENT_FAILURE_THRESHOLD,
         wrongCount,
-        WRONG_ANSWER_THRESHOLD,
-        WRONG_ANSWER_PERIOD_DAYS);
+        FREQUENT_FAILURE_THRESHOLD,
+        FREQUENT_FAILURE_PERIOD_DAYS);
   }
 
   public boolean isThresholdExceeded(MemoryTracker memoryTracker, Timestamp currentTime) {

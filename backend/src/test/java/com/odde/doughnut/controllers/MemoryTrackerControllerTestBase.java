@@ -7,6 +7,7 @@ import com.odde.doughnut.controllers.dto.UpdateMemoryTrackerPropertyKeyDTO;
 import com.odde.doughnut.entities.Conversation;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.ProductOutcome;
 import com.odde.doughnut.entities.RecallPrompt;
 import com.odde.doughnut.services.NoteService;
 import java.sql.Timestamp;
@@ -44,15 +45,9 @@ abstract class MemoryTrackerControllerTestBase extends ControllerTestBase {
     return ownedTracker(ownedNote());
   }
 
-  void addWrongAnswers(MemoryTracker tracker, Note note, int count, Timestamp day) {
+  void addRecallLogs(MemoryTracker tracker, ProductOutcome outcome, int count, Timestamp day) {
     for (int i = 0; i < count; i++) {
-      makeMe
-          .aRecallPrompt()
-          .withMcqForNote(note)
-          .forMemoryTracker(tracker)
-          .answerChoiceIndex(1)
-          .answerTimestamp(day)
-          .please();
+      makeMe.aRecallLogFor(tracker).productOutcome(outcome).recordedAt(day).please();
     }
   }
 

@@ -17,7 +17,6 @@ import com.odde.doughnut.entities.RecallLog;
 import com.odde.doughnut.entities.RecallPrompt;
 import com.odde.doughnut.entities.repositories.MemoryTrackerRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.doughnut.services.MemoryTrackerService;
 import java.sql.Timestamp;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -29,7 +28,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 class RecallPromptAccidentalMatchConfusionAdjustmentTests extends RecallPromptControllerTestBase {
 
-  @Autowired MemoryTrackerService memoryTrackerService;
   @Autowired MemoryTrackerRepository memoryTrackerRepository;
 
   MemoryTracker promptedTracker;
@@ -68,9 +66,8 @@ class RecallPromptAccidentalMatchConfusionAdjustmentTests extends RecallPromptCo
       Timestamp dueBefore = matchedSpellingTracker.getNextRecallAt();
       Timestamp lastRecalledBefore = matchedSpellingTracker.getLastRecalledAt();
       Integer recallCountBefore = matchedSpellingTracker.getRecallCount();
-      Timestamp now = testabilitySettings.getCurrentUTCTimestamp();
       int wrongCountBefore =
-          memoryTrackerService.countWrongAnswersInPeriod(matchedSpellingTracker, now, 14);
+          memoryTrackerController.getThresholdExceeded(matchedSpellingTracker).wrongCount();
 
       controller.answerSpelling(recallPrompt, answerDTO);
 
@@ -83,7 +80,7 @@ class RecallPromptAccidentalMatchConfusionAdjustmentTests extends RecallPromptCo
           equalTo(matchedSpellingTracker.calculateNextRecallAt()));
       assertFalse(matchedSpellingTracker.getNextRecallAt().after(dueBefore));
       assertThat(
-          memoryTrackerService.countWrongAnswersInPeriod(matchedSpellingTracker, now, 14),
+          memoryTrackerController.getThresholdExceeded(matchedSpellingTracker).wrongCount(),
           equalTo(wrongCountBefore));
     }
 

@@ -69,17 +69,5 @@ public interface RecallPromptRepository extends CrudRepository<RecallPrompt, Int
   List<Integer> findUserIdsWithAnsweredRecallsInTimeRange(
       @Param("startTime") Timestamp startTime, @Param("endTime") Timestamp endTime);
 
-  @Query(
-      value =
-          "SELECT COUNT(*) FROM recall_prompt rp "
-              + "JOIN answer a ON rp.answer_id = a.id "
-              + "WHERE rp.memory_tracker_id = :memoryTrackerId "
-              + "AND a.correct = false "
-              + "AND (a.outcome IS NULL OR a.outcome <> 'OVERLAP') "
-              + "AND a.created_at >= :since",
-      nativeQuery = true)
-  int countWrongAnswersSinceForMemoryTracker(
-      @Param("memoryTrackerId") Integer memoryTrackerId, @Param("since") Timestamp since);
-
   void deleteByMemoryTracker_Id(Integer memoryTrackerId);
 }

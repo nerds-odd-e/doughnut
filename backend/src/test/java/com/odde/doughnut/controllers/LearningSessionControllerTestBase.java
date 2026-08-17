@@ -58,17 +58,6 @@ abstract class LearningSessionControllerTestBase extends ControllerTestBase {
     return request;
   }
 
-  protected void addRecordedFeedback(
-      LearningSession session, MemoryTracker tracker, int score, Timestamp at) {
-    makeMe
-        .aSessionItem()
-        .learningSession(session)
-        .memoryTracker(tracker)
-        .feedbackScore(score)
-        .feedbackRecordedAt(at)
-        .please();
-  }
-
   protected record SpanishNotebookFixture(
       Notebook notebook, MemoryTracker holaTracker, MemoryTracker graciasTracker) {}
 

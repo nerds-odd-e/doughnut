@@ -1,6 +1,6 @@
 # Plan: RecallLog
 
-**Status:** in progress (slice 11 next)
+**Status:** in progress (slice 12 next)
 
 **Goal:** Memory-state transitions are a RecallLog. Prompt submissions stay `answer`. Tutor Feedback is a log row, not a session bag.
 
@@ -55,11 +55,9 @@ Grade caller maps 4/5/3/2/1/0 → GOOD/EASY/HARD/SHRINK/AGAIN/AGAIN_ZERO and per
 
 `V300000266` INSERT…SELECT from scored `session_item` (same 0–5 map as live). No `answer_id`. `elapsed_hours` null. Idempotent against live tutor logs.
 
-### 11. Tutoring status and frequent-failure read the log — Behavior — planned
+### 11. Tutoring status and frequent-failure read the log — Behavior — done
 
-**Pre:** Logs from slices 8–10 (and live grades).  
-**Trigger:** Open a Learning Session Request, or hit the frequent-failure threshold.  
-**Post:** “N previous sessions, last on …” counts tutor logs (`GOOD`/`EASY`/`HARD`/`SHRINK`/`AGAIN`/`AGAIN_ZERO`) for that tracker. Frequent-failure counts `AGAIN`/`AGAIN_ZERO` in 14 days from the log (just-review No and Tutor 0/1 count; overlap and `CONFUSION` do not).
+Tutoring status counts `answer_id` null tutor outcomes **on the commissioned tracker** (sibling understanding just-review does not count). Frequent-failure counts `AGAIN`/`AGAIN_ZERO` in 14 days. No source column. `session_item` still written.
 
 ### 12. Drop learning_session and session_item — Structure — planned
 

@@ -86,7 +86,7 @@ class MemoryTrackerTrackingControllerTest extends MemoryTrackerControllerTestBas
     Note note = ownedNote();
     MemoryTracker tracker = ownedTracker(note);
     Timestamp day1 = makeMe.aTimestamp().of(1, 8).fromShanghai().please();
-    addWrongAnswers(tracker, note, 5, day1);
+    addRecallLogs(tracker, ProductOutcome.AGAIN, 5, day1);
     testabilitySettings.timeTravelTo(day1);
 
     controller.markAsRecalled(tracker, false);

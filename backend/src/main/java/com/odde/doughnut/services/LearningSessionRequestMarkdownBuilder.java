@@ -5,8 +5,8 @@ import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.User;
-import com.odde.doughnut.entities.repositories.RecordedFeedbackSummary;
-import com.odde.doughnut.entities.repositories.SessionItemRepository;
+import com.odde.doughnut.entities.repositories.RecallLogRepository;
+import com.odde.doughnut.entities.repositories.TutorLogSummary;
 import com.odde.doughnut.services.focusContext.FocusContextMarkdownRenderer;
 import com.odde.doughnut.services.focusContext.FocusContextResult;
 import com.odde.doughnut.services.focusContext.FocusContextRetrievalService;
@@ -23,16 +23,16 @@ public class LearningSessionRequestMarkdownBuilder {
 
   private static final DateTimeFormatter ISO_DATE = DateTimeFormatter.ISO_LOCAL_DATE;
 
-  private final SessionItemRepository sessionItemRepository;
+  private final RecallLogRepository recallLogRepository;
   private final FocusContextRetrievalService focusContextRetrievalService;
   private final FocusContextMarkdownRenderer focusContextMarkdownRenderer;
 
   @Autowired
   public LearningSessionRequestMarkdownBuilder(
-      SessionItemRepository sessionItemRepository,
+      RecallLogRepository recallLogRepository,
       FocusContextRetrievalService focusContextRetrievalService,
       FocusContextMarkdownRenderer focusContextMarkdownRenderer) {
-    this.sessionItemRepository = sessionItemRepository;
+    this.recallLogRepository = recallLogRepository;
     this.focusContextRetrievalService = focusContextRetrievalService;
     this.focusContextMarkdownRenderer = focusContextMarkdownRenderer;
   }
@@ -133,15 +133,15 @@ public class LearningSessionRequestMarkdownBuilder {
   }
 
   private String tutoringStatusLine(Integer memoryTrackerId, ZoneId zoneId) {
-    RecordedFeedbackSummary summary =
-        sessionItemRepository.summarizeRecordedFeedbackByMemoryTrackerId(memoryTrackerId);
-    if (summary.sessionCount() == 0) {
+    TutorLogSummary summary =
+        recallLogRepository.summarizeTutorLogsByMemoryTrackerId(memoryTrackerId);
+    if (summary.logCount() == 0) {
       return "not yet tutored";
     }
 
     String lastDate =
         summary.lastRecordedAt().toInstant().atZone(zoneId).toLocalDate().format(ISO_DATE);
-    String sessionWord = summary.sessionCount() == 1 ? "session" : "sessions";
-    return summary.sessionCount() + " previous " + sessionWord + ", last on " + lastDate;
+    String sessionWord = summary.logCount() == 1 ? "session" : "sessions";
+    return summary.logCount() + " previous " + sessionWord + ", last on " + lastDate;
   }
 }

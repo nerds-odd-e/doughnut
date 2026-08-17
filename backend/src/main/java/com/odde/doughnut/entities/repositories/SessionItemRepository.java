@@ -12,16 +12,6 @@ public interface SessionItemRepository extends JpaRepository<SessionItem, Intege
 
   @Query(
       """
-      SELECT new com.odde.doughnut.entities.repositories.RecordedFeedbackSummary(
-        COUNT(si), MAX(si.feedbackRecordedAt))
-      FROM SessionItem si
-      WHERE si.memoryTracker.id = :memoryTrackerId
-      """)
-  RecordedFeedbackSummary summarizeRecordedFeedbackByMemoryTrackerId(
-      @Param("memoryTrackerId") Integer memoryTrackerId);
-
-  @Query(
-      """
       SELECT si.feedbackScore
       FROM SessionItem si
       WHERE si.memoryTracker.id = :memoryTrackerId

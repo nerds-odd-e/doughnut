@@ -5,8 +5,9 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.doughnut.controllers.dto.LearningSessionRequestResponse;
-import com.odde.doughnut.entities.LearningSession;
+import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Notebook;
+import com.odde.doughnut.entities.ProductOutcome;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.LearningSessionReportParser;
 import com.odde.doughnut.services.focusContext.FocusContextConstants;
@@ -117,15 +118,11 @@ class LearningSessionRequestTests extends LearningSessionControllerTestBase {
     testabilitySettings.timeTravelTo(dayTwo);
 
     SpanishNotebookFixture fixture = spanishNotebookFixture(dayTwo);
-
-    LearningSession recordedSession =
-        makeMe
-            .aLearningSession()
-            .forNotebook(fixture.notebook())
-            .by(currentUser.getUser())
-            .recordedAt(priorSessionAt)
-            .please();
-    addRecordedFeedback(recordedSession, fixture.holaTracker(), 4, priorSessionAt);
+    makeMe
+        .aRecallLogFor(fixture.holaTracker())
+        .productOutcome(ProductOutcome.GOOD)
+        .recordedAt(priorSessionAt)
+        .please();
 
     LearningSessionRequestResponse response =
         controller.request(fixture.notebook().getId(), "Asia/Shanghai");
@@ -135,6 +132,29 @@ class LearningSessionRequestTests extends LearningSessionControllerTestBase {
     assertThat(markdown, containsString("1 previous session, last on 1989-01-06"));
     assertThat(markdown, containsString("### Gracias"));
     assertThat(markdown, containsString("- Tutoring status: not yet tutored"));
+  }
+
+  @Test
+  void justReviewLogsOnSiblingUnderstandingTrackerDoNotChangeTutoringStatus()
+      throws UnexpectedNoAccessRightException {
+    Timestamp priorSessionAt = makeMe.aTimestamp().of(5, 10).fromShanghai().please();
+    Timestamp dayTwo = makeMe.aTimestamp().of(1, 9).fromShanghai().please();
+    testabilitySettings.timeTravelTo(dayTwo);
+
+    SpanishNotebookFixture fixture = spanishNotebookFixture(dayTwo);
+    MemoryTracker understandingTracker =
+        makeMe.aMemoryTrackerFor(fixture.holaTracker().getNote()).please();
+    makeMe
+        .aRecallLogFor(understandingTracker)
+        .productOutcome(ProductOutcome.GOOD)
+        .recordedAt(priorSessionAt)
+        .please();
+
+    LearningSessionRequestResponse response =
+        controller.request(fixture.notebook().getId(), "Asia/Shanghai");
+
+    assertThat(response.getRequestMarkdown(), not(containsString("previous session")));
+    assertThat(response.getRequestMarkdown(), containsString("- Tutoring status: not yet tutored"));
   }
 
   @Test

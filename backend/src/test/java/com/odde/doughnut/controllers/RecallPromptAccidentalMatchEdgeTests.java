@@ -134,7 +134,7 @@ class RecallPromptAccidentalMatchEdgeTests extends RecallPromptControllerTestBas
   }
 
   @Test
-  void shouldStillCountAccidentalMatchTowardWrongAnswerThreshold()
+  void shouldStillCountAccidentalMatchTowardFrequentFailureThreshold()
       throws UnexpectedNoAccessRightException {
     var now = testabilitySettings.getCurrentUTCTimestamp();
 

@@ -9,15 +9,11 @@ import com.odde.doughnut.entities.AnswerOutcome;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.doughnut.services.MemoryTrackerService;
 import java.sql.Timestamp;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 
 class RecallPromptOverlapTryAgainTests extends RecallPromptControllerTestBase {
-
-  @Autowired MemoryTrackerService memoryTrackerService;
 
   MemoryTracker memoryTracker;
   Note partnerNote;
@@ -84,9 +80,8 @@ class RecallPromptOverlapTryAgainTests extends RecallPromptControllerTestBase {
     MemoryTracker partnerTracker = ownedSpellingTracker(partnerNote);
     float partnerStabilityBefore = partnerTracker.getStability();
     Timestamp partnerDueBefore = partnerTracker.getNextRecallAt();
-    Timestamp now = testabilitySettings.getCurrentUTCTimestamp();
     int partnerWrongCountBefore =
-        memoryTrackerService.countWrongAnswersInPeriod(partnerTracker, now, 14);
+        memoryTrackerController.getThresholdExceeded(partnerTracker).wrongCount();
 
     answerSpelling(memoryTracker, "Shared Title");
 
@@ -94,7 +89,7 @@ class RecallPromptOverlapTryAgainTests extends RecallPromptControllerTestBase {
     assertThat(partnerTracker.getStability(), equalTo(partnerStabilityBefore));
     assertThat(partnerTracker.getNextRecallAt(), equalTo(partnerDueBefore));
     assertThat(
-        memoryTrackerService.countWrongAnswersInPeriod(partnerTracker, now, 14),
+        memoryTrackerController.getThresholdExceeded(partnerTracker).wrongCount(),
         equalTo(partnerWrongCountBefore));
   }
 
@@ -128,13 +123,13 @@ class RecallPromptOverlapTryAgainTests extends RecallPromptControllerTestBase {
   }
 
   @Test
-  void shouldNotCountOverlapTowardWrongAnswerThreshold() throws UnexpectedNoAccessRightException {
-    Timestamp now = testabilitySettings.getCurrentUTCTimestamp();
-
+  void shouldNotCountOverlapTowardFrequentFailureThreshold()
+      throws UnexpectedNoAccessRightException {
     for (int i = 0; i < 5; i++) {
       answerSpelling(memoryTracker, "Shared Title");
     }
-    assertThat(memoryTrackerService.isThresholdExceeded(memoryTracker, now), is(false));
+    assertThat(
+        memoryTrackerController.getThresholdExceeded(memoryTracker).thresholdExceeded(), is(false));
   }
 
   @Test

@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.ProductOutcome;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import java.sql.Timestamp;
 import org.junit.jupiter.api.Test;
@@ -17,28 +18,28 @@ class MemoryTrackerThresholdControllerTest extends MemoryTrackerControllerTestBa
 
   @ParameterizedTest
   @CsvSource({"4, false", "5, true", "6, true"})
-  void reportsThresholdFromWrongAnswerCount(int wrongAnswers, boolean exceeded)
+  void reportsThresholdFromAgainLogCount(int againLogs, boolean exceeded)
       throws UnexpectedNoAccessRightException {
     Note note = ownedNote();
     MemoryTracker tracker = ownedTracker(note);
     Timestamp day1 = makeMe.aTimestamp().of(1, 8).fromShanghai().please();
-    addWrongAnswers(tracker, note, wrongAnswers, day1);
+    addRecallLogs(tracker, ProductOutcome.AGAIN, againLogs, day1);
 
     testabilitySettings.timeTravelTo(day1);
     var result = controller.getThresholdExceeded(tracker);
     assertThat(result.thresholdExceeded(), equalTo(exceeded));
-    assertThat(result.wrongCount(), equalTo(wrongAnswers));
+    assertThat(result.wrongCount(), equalTo(againLogs));
     assertThat(result.threshold(), equalTo(5));
     assertThat(result.periodDays(), equalTo(14));
   }
 
   @Test
-  void scopesWrongAnswersPerMemoryTrackerNotPerNote() throws UnexpectedNoAccessRightException {
+  void scopesAgainLogsPerMemoryTrackerNotPerNote() throws UnexpectedNoAccessRightException {
     Note note = ownedNote();
     MemoryTracker noteLevelTracker = ownedTracker(note);
     MemoryTracker propertyTracker = makeMe.aMemoryTrackerFor(note).propertyKey("topic").please();
     Timestamp day1 = makeMe.aTimestamp().of(1, 8).fromShanghai().please();
-    addWrongAnswers(propertyTracker, note, 5, day1);
+    addRecallLogs(propertyTracker, ProductOutcome.AGAIN, 5, day1);
 
     testabilitySettings.timeTravelTo(day1);
     var noteLevelResult = controller.getThresholdExceeded(noteLevelTracker);
@@ -47,6 +48,40 @@ class MemoryTrackerThresholdControllerTest extends MemoryTrackerControllerTestBa
     var propertyResult = controller.getThresholdExceeded(propertyTracker);
     assertThat(propertyResult.thresholdExceeded(), equalTo(true));
     assertThat(propertyResult.wrongCount(), equalTo(5));
+  }
+
+  @Test
+  void tutorAgainZeroCountsTowardThreshold() throws UnexpectedNoAccessRightException {
+    MemoryTracker tracker = ownedTracker();
+    Timestamp day1 = makeMe.aTimestamp().of(1, 8).fromShanghai().please();
+    addRecallLogs(tracker, ProductOutcome.AGAIN_ZERO, 5, day1);
+
+    testabilitySettings.timeTravelTo(day1);
+    var result = controller.getThresholdExceeded(tracker);
+    assertThat(result.wrongCount(), equalTo(5));
+  }
+
+  @Test
+  void confusionDoesNotCountTowardThreshold() throws UnexpectedNoAccessRightException {
+    MemoryTracker tracker = ownedTracker();
+    Timestamp day1 = makeMe.aTimestamp().of(1, 8).fromShanghai().please();
+    addRecallLogs(tracker, ProductOutcome.CONFUSION, 5, day1);
+
+    testabilitySettings.timeTravelTo(day1);
+    var result = controller.getThresholdExceeded(tracker);
+    assertThat(result.wrongCount(), equalTo(0));
+  }
+
+  @Test
+  void againLogsOlderThanFourteenDaysDoNotCount() throws UnexpectedNoAccessRightException {
+    MemoryTracker tracker = ownedTracker();
+    Timestamp now = makeMe.aTimestamp().of(15, 8).fromShanghai().please();
+    Timestamp beforeWindow = makeMe.aTimestamp().of(0, 8).fromShanghai().please();
+    addRecallLogs(tracker, ProductOutcome.AGAIN, 1, beforeWindow);
+
+    testabilitySettings.timeTravelTo(now);
+    var result = controller.getThresholdExceeded(tracker);
+    assertThat(result.wrongCount(), equalTo(0));
   }
 
   @Test
