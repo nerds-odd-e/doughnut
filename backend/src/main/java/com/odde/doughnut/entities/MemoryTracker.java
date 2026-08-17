@@ -11,12 +11,17 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 import jakarta.validation.constraints.NotNull;
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 @Entity
 @Table(name = "memory_tracker")
@@ -68,10 +73,25 @@ public class MemoryTracker extends EntityIdentifiedByIdOnly {
   @Setter
   private Timestamp assimilatedAt;
 
-  @Column(name = "recall_count")
-  @Getter
-  @Setter
-  private Integer recallCount = 0;
+  @OneToMany(mappedBy = "memoryTracker")
+  @Fetch(FetchMode.SUBSELECT)
+  @JsonIgnore
+  private List<RecallLog> recallLogs = new ArrayList<>();
+
+  @JsonProperty
+  public Integer getRecallCount() {
+    int count = 0;
+    for (RecallLog log : recallLogs) {
+      if (log.getProductOutcome() != ProductOutcome.CONFUSION) {
+        count++;
+      }
+    }
+    return count;
+  }
+
+  public void addRecallLog(RecallLog recallLog) {
+    recallLogs.add(recallLog);
+  }
 
   @Column(name = "stability")
   @Getter
@@ -196,7 +216,6 @@ public class MemoryTracker extends EntityIdentifiedByIdOnly {
 
   public void markAsRecalled(
       Timestamp currentUTCTimestamp, boolean successful, Integer thinkingTimeMs) {
-    setRecallCount(getRecallCount() + 1);
     if (successful) {
       recalledSuccessfully(currentUTCTimestamp, thinkingTimeMs);
     } else {

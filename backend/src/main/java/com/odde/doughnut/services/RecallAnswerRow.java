@@ -1,5 +1,8 @@
 package com.odde.doughnut.services;
 
+import com.odde.doughnut.entities.Answer;
+import com.odde.doughnut.entities.AnswerOutcome;
+import com.odde.doughnut.entities.ProductOutcome;
 import java.sql.Timestamp;
 
 /**
@@ -9,6 +12,12 @@ import java.sql.Timestamp;
  */
 public record RecallAnswerRow(
     Timestamp answerCreatedAt,
-    Boolean correct,
+    AnswerOutcome answerOutcome,
+    ProductOutcome productOutcome,
     Integer thinkingTimeMs,
-    Timestamp promptCreatedAt) {}
+    Timestamp promptCreatedAt) {
+
+  boolean correct() {
+    return Boolean.TRUE.equals(Answer.correctFrom(answerOutcome, productOutcome));
+  }
+}

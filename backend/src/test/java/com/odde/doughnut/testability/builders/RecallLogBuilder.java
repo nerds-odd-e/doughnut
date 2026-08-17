@@ -1,5 +1,6 @@
 package com.odde.doughnut.testability.builders;
 
+import com.odde.doughnut.entities.Answer;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.ProductOutcome;
 import com.odde.doughnut.entities.RecallLog;
@@ -30,6 +31,11 @@ public class RecallLogBuilder extends EntityBuilder<RecallLog> {
 
   public RecallLogBuilder productOutcome(ProductOutcome productOutcome) {
     entity.setProductOutcome(productOutcome);
+    return this;
+  }
+
+  public RecallLogBuilder answer(Answer answer) {
+    entity.setAnswer(answer);
     return this;
   }
 

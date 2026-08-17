@@ -3770,7 +3770,6 @@ components:
           - ACCIDENTAL_MATCH
           - OVERLAP
       required:
-      - correct
       - id
     AnsweredQuestion:
       type: object
@@ -4335,9 +4334,6 @@ components:
         assimilatedAt:
           type: string
           format: date-time
-        recallCount:
-          type: integer
-          format: int32
         stability:
           type: number
           format: float
@@ -4354,6 +4350,9 @@ components:
           - COMMISSIONED
         propertyKey:
           type: string
+        recallCount:
+          type: integer
+          format: int32
         recalledNote:
           $ref: "#/components/schemas/RecalledNote"
         latestTutorFeedbackScore:

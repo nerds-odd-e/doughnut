@@ -2,6 +2,8 @@ package com.odde.doughnut.services;
 
 import com.odde.doughnut.controllers.dto.RecallStatsDTO;
 import com.odde.doughnut.entities.Answer;
+import com.odde.doughnut.entities.ProductOutcome;
+import com.odde.doughnut.entities.RecallLog;
 import com.odde.doughnut.entities.RecallPrompt;
 import java.sql.Timestamp;
 import java.time.ZoneId;
@@ -22,9 +24,12 @@ final class RecallStatsTestFixtures {
     RecallPrompt rp = new RecallPrompt();
     rp.setCreatedAt(promptAt != null ? promptAt : answerAt);
     Answer answer = new Answer();
-    answer.setCorrect(correct);
     answer.setThinkingTimeMs(thinkingTimeMs);
     answer.setCreatedAt(answerAt);
+    RecallLog log = new RecallLog();
+    log.setProductOutcome(
+        Boolean.TRUE.equals(correct) ? ProductOutcome.GOOD : ProductOutcome.AGAIN);
+    answer.addRecallLog(log);
     rp.setAnswer(answer);
     return rp;
   }

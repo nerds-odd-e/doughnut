@@ -8,6 +8,8 @@ import com.odde.doughnut.controllers.dto.RecallStatsDTO.DayRetention;
 import com.odde.doughnut.controllers.dto.RecallStatsDTO.HeadlineStats;
 import com.odde.doughnut.controllers.dto.RecallStatsDTO.HourRetention;
 import com.odde.doughnut.entities.Answer;
+import com.odde.doughnut.entities.ProductOutcome;
+import com.odde.doughnut.entities.RecallLog;
 import com.odde.doughnut.entities.RecallPrompt;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.RecallPromptRepository;
@@ -82,7 +84,7 @@ public class RecallStatsService {
       int wd = zdt.getDayOfWeek().getValue() - 1;
       int hour = zdt.getHour();
 
-      boolean correct = Boolean.TRUE.equals(r.correct());
+      boolean correct = r.correct();
       weekdayHourCounts[wd][hour]++;
       hourAnswered[hour]++;
       if (correct) {
@@ -140,11 +142,25 @@ public class RecallStatsService {
       rows.add(
           new RecallAnswerRow(
               answer == null ? null : answer.getCreatedAt(),
-              answer == null ? null : answer.getCorrect(),
+              answer == null ? null : answer.getOutcome(),
+              productOutcomeFromLogs(answer),
               answer == null ? null : answer.getThinkingTimeMs(),
               rp.getCreatedAt()));
     }
     return rows;
+  }
+
+  private static ProductOutcome productOutcomeFromLogs(Answer answer) {
+    if (answer == null) {
+      return null;
+    }
+    for (RecallLog log : answer.getRecallLogs()) {
+      ProductOutcome productOutcome = log.getProductOutcome();
+      if (productOutcome != ProductOutcome.CONFUSION) {
+        return productOutcome;
+      }
+    }
+    return null;
   }
 
   private static Timestamp minusDays(Timestamp ts, int days) {

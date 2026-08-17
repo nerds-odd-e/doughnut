@@ -35,7 +35,6 @@ public final class CommissionedLearningSessionFeedbackScheduling {
 
   public static void recordFeedback(
       MemoryTracker tracker, Timestamp now, ProductOutcome productOutcome) {
-    tracker.setRecallCount(tracker.getRecallCount() + 1);
     switch (productOutcome) {
       case EASY -> tracker.recalledEasily(now);
       case GOOD -> tracker.recalledSuccessfully(now, null);

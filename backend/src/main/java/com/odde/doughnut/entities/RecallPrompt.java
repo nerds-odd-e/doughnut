@@ -69,7 +69,10 @@ public class RecallPrompt extends EntityIdentifiedByIdOnly {
     if (getAnswer() != null) {
       Answer answer = getAnswer();
       questionDetails.put("userAnswer", answer.getChoiceIndex());
-      questionDetails.put("userAnswerWasMarkedAs", answer.getCorrect() ? "correct" : "incorrect");
+      Boolean markedCorrect = answer.getCorrect();
+      if (markedCorrect != null) {
+        questionDetails.put("userAnswerWasMarkedAs", markedCorrect ? "correct" : "incorrect");
+      }
     }
     return questionDetails.toPrettyString();
   }

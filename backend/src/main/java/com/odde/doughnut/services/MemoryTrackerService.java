@@ -117,6 +117,10 @@ public class MemoryTrackerService {
     recallLog.setProductOutcome(productOutcome);
     recallLog.setAnswer(answer);
     entityPersister.save(recallLog);
+    memoryTracker.addRecallLog(recallLog);
+    if (answer != null) {
+      answer.addRecallLog(recallLog);
+    }
   }
 
   public Optional<MemoryTracker> findConfusionAdjustmentTracker(User user, Note note) {

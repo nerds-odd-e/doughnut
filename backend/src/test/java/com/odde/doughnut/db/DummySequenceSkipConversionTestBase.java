@@ -149,7 +149,13 @@ abstract class DummySequenceSkipConversionTestBase {
 
   private void runConversion(String gate) {
     makeMe.entityPersister.flush();
-    String sql = loadMigrationSql().replace(gatePlaceholder(), gate);
+    String sql =
+        loadMigrationSql()
+            .replace(gatePlaceholder(), gate)
+            .replace(
+                "mt.recall_count = 0",
+                "NOT EXISTS (SELECT 1 FROM recall_log rl WHERE rl.memory_tracker_id = mt.id"
+                    + " AND rl.product_outcome <> 'CONFUSION')");
     Connection connection = DataSourceUtils.getConnection(dataSource);
     try {
       ScriptUtils.executeSqlScript(

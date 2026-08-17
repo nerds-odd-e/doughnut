@@ -277,7 +277,7 @@ export type AnswerDto = {
 export type Answer = {
     id: number;
     choiceIndex?: number;
-    correct: boolean;
+    correct?: boolean;
     thinkingTimeMs?: number;
     spellingAnswer?: string;
     matchedNoteId?: number;
@@ -609,12 +609,12 @@ export type MemoryTracker = {
     lastRecalledAt?: string;
     nextRecallAt: string;
     assimilatedAt?: string;
-    recallCount?: number;
     stability?: number;
     difficulty?: number;
     removedFromTracking?: boolean;
     type?: 'UNDERSTANDING' | 'SPELLING' | 'COMMISSIONED';
     propertyKey?: string;
+    recallCount?: number;
     recalledNote?: RecalledNote;
     latestTutorFeedbackScore?: number;
     spelling?: boolean;
@@ -1226,12 +1226,12 @@ export type MemoryTrackerWritable = {
     lastRecalledAt?: string;
     nextRecallAt: string;
     assimilatedAt?: string;
-    recallCount?: number;
     stability?: number;
     difficulty?: number;
     removedFromTracking?: boolean;
     type?: 'UNDERSTANDING' | 'SPELLING' | 'COMMISSIONED';
     propertyKey?: string;
+    recallCount?: number;
     recalledNote?: RecalledNote;
     latestTutorFeedbackScore?: number;
     spelling?: boolean;

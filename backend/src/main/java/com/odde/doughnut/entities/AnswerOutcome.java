@@ -1,6 +1,6 @@
 package com.odde.doughnut.entities;
 
-/** Special spelling-grade outcomes beyond the boolean {@code Answer.correct} flag. */
+/** Special spelling-grade outcomes beyond a boolean recall result. */
 public enum AnswerOutcome {
   ACCIDENTAL_MATCH,
   OVERLAP

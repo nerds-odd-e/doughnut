@@ -6,6 +6,7 @@ import com.odde.doughnut.testability.MakeMe;
 import java.sql.Timestamp;
 
 public class MemoryTrackerBuilder extends EntityBuilder<MemoryTracker> {
+  private int recallLogsToCreate = 0;
 
   public MemoryTrackerBuilder(MemoryTracker memoryTracker, MakeMe makeMe) {
     super(makeMe, memoryTracker);
@@ -32,12 +33,21 @@ public class MemoryTrackerBuilder extends EntityBuilder<MemoryTracker> {
   }
 
   public MemoryTrackerBuilder recallCount(int recallCount) {
-    entity.setRecallCount(recallCount);
+    this.recallLogsToCreate = recallCount;
     return this;
   }
 
   @Override
   protected void beforeCreate(boolean needPersist) {}
+
+  @Override
+  protected void afterCreate(boolean needPersist) {
+    for (int i = 0; i < recallLogsToCreate; i++) {
+      RecallLog log =
+          makeMe.aRecallLogFor(entity).productOutcome(ProductOutcome.GOOD).please(needPersist);
+      entity.addRecallLog(log);
+    }
+  }
 
   public MemoryTrackerBuilder stabilityAndNextRecallAt(float value) {
     entity.setStability(value);

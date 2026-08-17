@@ -60,7 +60,6 @@ class RecallPromptOverlapTryAgainTests extends RecallPromptControllerTestBase {
     AnsweredQuestion result = answerSpelling(memoryTracker, "Shared Title");
 
     assertThat(result.getAnswer().getOutcome(), is(AnswerOutcome.OVERLAP));
-    assertFalse(result.getAnswer().getCorrect());
     assertThat(memoryTracker.getRecallCount(), equalTo(recallCountBefore));
     assertThat(memoryTracker.getStability(), equalTo(stabilityBefore));
     assertThat(memoryTracker.getNextRecallAt(), equalTo(nextRecallAtBefore));

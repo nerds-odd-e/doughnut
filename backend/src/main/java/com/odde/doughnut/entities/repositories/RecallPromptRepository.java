@@ -45,12 +45,13 @@ public interface RecallPromptRepository extends CrudRepository<RecallPrompt, Int
       @Param("endTime") Timestamp endTime);
 
   // Projection (no entity hydration) so the stats endpoint does not N+1 on RecallPrompt's eager
-  // answer/mcq/memoryTracker associations. Returns only the 4 fields the aggregator
-  // needs.
+  // answer/mcq/memoryTracker associations. Correctness is derived from answer outcome / linked log.
   @Query(
       "SELECT new com.odde.doughnut.services.RecallAnswerRow("
-          + "a.createdAt, a.correct, a.thinkingTimeMs, rp.createdAt) "
+          + "a.createdAt, a.outcome, rl.productOutcome, a.thinkingTimeMs, rp.createdAt) "
           + "FROM RecallPrompt rp JOIN rp.answer a JOIN rp.memoryTracker mt "
+          + "LEFT JOIN RecallLog rl ON rl.answer = a AND rl.memoryTracker = mt "
+          + "AND rl.productOutcome <> com.odde.doughnut.entities.ProductOutcome.CONFUSION "
           + "WHERE mt.user.id = :userId AND a.createdAt >= :startTime AND a.createdAt < :endTime "
           + "ORDER BY a.createdAt ASC")
   List<com.odde.doughnut.services.RecallAnswerRow> findAnsweredRecallAnswerRows(

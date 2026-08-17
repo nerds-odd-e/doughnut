@@ -77,7 +77,10 @@
                 <span class="font-semibold">Your answer:</span>
                 <span>{{ prompt.answer.spellingAnswer }}</span>
               </div>
-              <div class="flex items-center gap-2">
+              <div
+                v-if="prompt.answer.correct != null"
+                class="flex items-center gap-2"
+              >
                 <span class="font-semibold">Result:</span>
                 <span
                   :class="{

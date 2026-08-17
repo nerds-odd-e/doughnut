@@ -1,6 +1,6 @@
 # Plan: RecallLog
 
-**Status:** in progress (slice 13 next)
+**Status:** in progress (slice 14 next)
 
 **Goal:** Memory-state transitions are a RecallLog. Prompt submissions stay `answer`. Tutor Feedback is a log row, not a session bag.
 
@@ -10,7 +10,7 @@
 - Write logs at the **grade caller** (just review, prompt grading, `recordFeedback`, confusion), not only inside `recalledAgain` — Tutor **0** and **1** both call `recalledAgain` but must log `AGAIN_ZERO` vs `AGAIN`.
 - Hooking `markAsRecalled` will also log prompt Yes/No before `answer_id` is set. That is allowed interim; the next prompt slice sets `answer_id`. Overlap must still write **no** log (it does not call `markAsRecalled`).
 - `GET /api/memory-trackers/{id}/recall-logs` is the Memory Tracker surface. After a DTO change, `pnpm generateTypeScript`.
-- Next Flyway: `V300000268`. `recall_log.memory_tracker_id` ON DELETE CASCADE. Include logs in hard-delete fixtures (`unit-testing.mdc`).
+- Next Flyway: `V300000269`. `recall_log.memory_tracker_id` ON DELETE CASCADE. Include logs in hard-delete fixtures (`unit-testing.mdc`).
 - Proposed [ADR 0005](../../../docs/adrs/0005-commissioned-learning-session-protocol.md): Learning Session is the Request/Report activity, not a table (human owns accept).
 
 ## Slices
@@ -63,9 +63,9 @@ Tutoring status counts `answer_id` null tutor outcomes **on the commissioned tra
 
 `V300000267` dropped the tables. ADR 0005 drafted (stays Proposed): session = Request/Report activity. Latest tutor score is the latest tutor log. `note_title` snapshot not kept.
 
-### 13. Drop redundant answer.correct and recall_count — Structure — planned
+### 13. Drop redundant answer.correct and recall_count — Structure — done
 
-Prompt history “Correct/Incorrect” follows the linked log (or `OVERLAP`). `recall_count` is not stored; if the API still exposes a count, it is `count` of non-`CONFUSION` logs. Existing tests pass with the new source.
+Dropped stored columns (`V300000268`). History Correct/Incorrect follows linked log or OVERLAP. API `recallCount` is the count of non-`CONFUSION` logs.
 
 ### 14. Point the gap tracker at remaining knobs only — Structure — planned
 
