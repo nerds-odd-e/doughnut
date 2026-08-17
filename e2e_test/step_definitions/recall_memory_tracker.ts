@@ -18,7 +18,7 @@ Then('I should see Stability {int}', (stability: number) => {
   assumeMemoryTrackerPage().expectStability(stability)
 })
 
-Then('I should see Difficulty {int}', (difficulty: number) => {
+Then('I should see Difficulty {float}', (difficulty: number) => {
   assumeMemoryTrackerPage().expectDifficulty(difficulty)
 })
 

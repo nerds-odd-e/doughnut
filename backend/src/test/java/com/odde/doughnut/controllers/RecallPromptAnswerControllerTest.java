@@ -124,6 +124,7 @@ class RecallPromptAnswerControllerTest extends RecallPromptControllerTestBase {
       throws UnexpectedNoAccessRightException {
     testabilitySettings.timeTravelTo(memoryTracker.getNextRecallAt());
     Float baseStability = memoryTracker.getStability();
+    Float baseDifficulty = memoryTracker.getDifficulty();
     Timestamp baseLastRecalledAt = memoryTracker.getLastRecalledAt();
 
     answerDTO.setThinkingTimeMs(ForgettingCurve.BASE_THINKING_TIME_MS);
@@ -131,6 +132,7 @@ class RecallPromptAnswerControllerTest extends RecallPromptControllerTestBase {
     Float stabilityWithBaseThinkingTime = memoryTracker.getStability();
 
     memoryTracker.setStability(baseStability);
+    memoryTracker.setDifficulty(baseDifficulty);
     memoryTracker.setLastRecalledAt(baseLastRecalledAt);
     memoryTracker.setNextRecallAt(memoryTracker.calculateNextRecallAt());
     answerDTO.setThinkingTimeMs(null);

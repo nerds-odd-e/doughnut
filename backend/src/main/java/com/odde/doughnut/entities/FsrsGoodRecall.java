@@ -1,6 +1,6 @@
 package com.odde.doughnut.entities;
 
-/** FSRS-6 Good next Stability and Difficulty. Days in; whole hours out. Frozen default weights. */
+/** FSRS-6 Good next Stability. Days in; whole hours out. Frozen default weights. */
 final class FsrsGoodRecall {
   private FsrsGoodRecall() {}
 
@@ -8,9 +8,5 @@ final class FsrsGoodRecall {
     return Fsrs.hoursAfterStabilityIncrease(
         stabilityHours,
         Fsrs.goodIncrementTermFromHours(stabilityHours, difficulty, elapsedInHours));
-  }
-
-  static float difficultyAfterGoodRecall(float difficulty) {
-    return Fsrs.nextDifficulty(difficulty, Fsrs.GOOD);
   }
 }

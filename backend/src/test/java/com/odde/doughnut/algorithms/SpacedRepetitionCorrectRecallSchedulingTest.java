@@ -51,12 +51,12 @@ class SpacedRepetitionCorrectRecallSchedulingTest extends SpacedRepetitionRecall
   }
 
   @Test
-  void onTimeCorrectRecallUpdatesDifficultyTowardEasyInit() {
+  void onTimeCorrectRecallUpdatesDifficultyWithFsrsGoodNextD() {
     MemoryTracker memoryTracker = aGradedTrackerAtThreeDayStability(8f);
 
     memoryTracker.recalledSuccessfully(onTimeGradeTime(memoryTracker), null);
 
-    assertThat(memoryTracker.getDifficulty(), equalTo(7.998413f));
+    assertThat(memoryTracker.getDifficulty(), equalTo(7.9872284f));
   }
 
   @Test

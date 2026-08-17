@@ -55,7 +55,9 @@ final class Fsrs {
 
   static float nextDifficulty(float difficulty, int grade) {
     double deltaD = -W[6] * (grade - GOOD);
-    double next = W[7] * W[4] + (1.0 - W[7]) * (difficulty + deltaD);
+    double dPrime = difficulty + deltaD * (10.0 - difficulty) / 9.0;
+    double d0Easy = W[4] - Math.exp(W[5] * (EASY - 1)) + 1.0;
+    double next = W[7] * d0Easy + (1.0 - W[7]) * dPrime;
     return (float) Math.max(1.0, Math.min(10.0, next));
   }
 }

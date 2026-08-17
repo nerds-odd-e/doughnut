@@ -1,6 +1,6 @@
 # Doughnut ↔ open FSRS gap (toward ADR 0003)
 
-**Status:** Remaining work is **deferred** knobs plus **accept ADR 0003** (human).
+**Status:** Remaining work is **deferred** knobs plus **accept ADR 0003** (human). Next Difficulty after a mapped grade is locked in ADR 0003 Decision; this tracker is not a second policy map.
 
 **Updated:** 2026-08-17
 
@@ -16,7 +16,7 @@ Doughnut persists **Stability** in whole hours and **Difficulty** (nullable; sho
 
 Live scheduling does not walk a spacing-index ladder. `DEFAULT_SPACES` / `hoursFromLegacyIndex` remain only so committed `V300000260` can replay on fresh DBs.
 
-Tutor map, confusion, ordinary correct/incorrect, and locked IDs: ADR 0003 Decision.
+Tutor map, confusion, ordinary correct/incorrect, next Difficulty, and locked IDs: ADR 0003 Decision.
 
 ## Deferred (see ADR 0003 Decision)
 

@@ -74,7 +74,7 @@ class SpacedRepetitionIncorrectRecallSchedulingTest
 
     memoryTracker.markAsRecalled(onTimeGradeTime(memoryTracker), false, null);
 
-    assertThat(memoryTracker.getDifficulty(), equalTo(10f));
+    assertThat(memoryTracker.getDifficulty(), equalTo(8.341763f));
   }
 
   @Test

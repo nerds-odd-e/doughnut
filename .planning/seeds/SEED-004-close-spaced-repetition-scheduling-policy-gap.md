@@ -11,7 +11,7 @@ scope: large
 
 ## Why This Matters
 
-Doughnut already schedules recall with elapsed time and outcome. Requested retention (**B2**) is locked global `r = 0.9` (`Fsrs.REQUESTED_RETENTION`), not a knob. The product contract is Proposed [ADR 0003](../../docs/adrs/0003-spaced-repetition-scheduling-policy.md) Decision. Remaining work is **accepting** that ADR plus deferred knobs B4 / C4 / E3 / E4 / E6.
+Doughnut already schedules recall with elapsed time and outcome. Requested retention (**B2**) is locked global `r = 0.9` (`Fsrs.REQUESTED_RETENTION`), not a knob. The product contract is Proposed [ADR 0003](../../docs/adrs/0003-spaced-repetition-scheduling-policy.md) Decision (including published FSRS-6 next Difficulty). Remaining work is **accepting** that ADR plus deferred knobs B4 / C4 / E3 / E4 / E6.
 
 ## When to Surface
 

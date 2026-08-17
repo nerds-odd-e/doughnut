@@ -55,17 +55,17 @@ class LearningSessionRecordTutorFeedbackTests extends LearningSessionControllerT
 
   @Test
   void onTimeSecondScoreFourPersistsGoodNextDifficulty() throws UnexpectedNoAccessRightException {
-    assertThat(afterOnTimeSecondScore(4).holaTracker().getDifficulty(), equalTo(5.0014133f));
+    assertThat(afterOnTimeSecondScore(4).holaTracker().getDifficulty(), equalTo(4.990228f));
   }
 
   @Test
   void onTimeSecondScoreFivePersistsEasyNextDifficulty() throws UnexpectedNoAccessRightException {
-    assertThat(afterOnTimeSecondScore(5).holaTracker().getDifficulty(), equalTo(1.9850327f));
+    assertThat(afterOnTimeSecondScore(5).holaTracker().getDifficulty(), equalTo(3.3144615f));
   }
 
   @Test
   void onTimeSecondScoreThreePersistsHardNextDifficulty() throws UnexpectedNoAccessRightException {
-    assertThat(afterOnTimeSecondScore(3).holaTracker().getDifficulty(), equalTo(8.0177937f));
+    assertThat(afterOnTimeSecondScore(3).holaTracker().getDifficulty(), equalTo(6.6659956f));
   }
 
   @ParameterizedTest
@@ -89,7 +89,7 @@ class LearningSessionRecordTutorFeedbackTests extends LearningSessionControllerT
   void onTimeSecondScoreOnePersistsAgainSchedule() throws UnexpectedNoAccessRightException {
     MemoryTracker hola = afterOnTimeSecondScore(1).holaTracker();
     assertThat(hola.getStability(), equalTo(8f));
-    assertThat(hola.getDifficulty(), equalTo(10f));
+    assertThat(hola.getDifficulty(), equalTo(8.341763f));
     assertThat(
         hola.getNextRecallAt(),
         equalTo(
