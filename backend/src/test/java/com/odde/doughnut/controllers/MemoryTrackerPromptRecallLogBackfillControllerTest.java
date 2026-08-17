@@ -13,21 +13,16 @@ import com.odde.doughnut.entities.ProductOutcome;
 import com.odde.doughnut.entities.RecallLog;
 import com.odde.doughnut.entities.RecallPrompt;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
-import java.sql.Connection;
 import java.sql.Timestamp;
 import java.util.List;
-import javax.sql.DataSource;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.jdbc.datasource.DataSourceUtils;
-import org.springframework.jdbc.datasource.init.ScriptUtils;
 
-class MemoryTrackerRecallLogBackfillControllerTest extends MemoryTrackerControllerTestBase {
-  private static final String MIGRATION_SQL =
-      "db/migration/V300000265__backfill_prompt_answers_into_recall_log.sql";
-
-  @Autowired DataSource dataSource;
+class MemoryTrackerPromptRecallLogBackfillControllerTest
+    extends RecallLogBackfillControllerTestBase {
+  @Override
+  protected String migrationSql() {
+    return "db/migration/V300000265__backfill_prompt_answers_into_recall_log.sql";
+  }
 
   @Test
   void backfilledCorrectAnswerLeavesAGoodRecallLogLinkedToTheAnswer()
@@ -108,15 +103,5 @@ class MemoryTrackerRecallLogBackfillControllerTest extends MemoryTrackerControll
     applyBackfill();
 
     assertThat(controller.getRecallLogs(tracker), hasSize(1));
-  }
-
-  private void applyBackfill() {
-    makeMe.entityPersister.flush();
-    Connection connection = DataSourceUtils.getConnection(dataSource);
-    try {
-      ScriptUtils.executeSqlScript(connection, new ClassPathResource(MIGRATION_SQL));
-    } finally {
-      DataSourceUtils.releaseConnection(connection, dataSource);
-    }
   }
 }
