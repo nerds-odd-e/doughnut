@@ -25,7 +25,7 @@ public class SubscriptionService {
         subscription.getUser().getId(), subscription.getNotebook().getId());
   }
 
-  public int needToLearnCountToday(Subscription subscription, List<Integer> noteIds) {
+  public int remainingDailyAssimilationTarget(Subscription subscription, List<Integer> noteIds) {
     int count =
         noteRepository.countByAncestorAndInTheList(subscription.getNotebook().getId(), noteIds);
     return Math.max(0, subscription.getDailyTargetOfNewNotes() - count);

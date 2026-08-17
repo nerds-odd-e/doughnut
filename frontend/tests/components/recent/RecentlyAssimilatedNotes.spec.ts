@@ -1,11 +1,11 @@
 import { MemoryTrackerController } from "@generated/doughnut-backend-api/sdk.gen"
-import RecentlyLearnedNotes from "@/components/recent/RecentlyLearnedNotes.vue"
+import RecentlyAssimilatedNotes from "@/components/recent/RecentlyAssimilatedNotes.vue"
 import { flushPromises } from "@vue/test-utils"
 import helper, { mockSdkService } from "@tests/helpers"
 import makeMe from "doughnut-test-fixtures/makeMe"
-import { describe, it, expect, beforeEach } from "vitest"
+import { describe, it, expect } from "vitest"
 
-describe("RecentlyLearnedNotes", () => {
+describe("RecentlyAssimilatedNotes", () => {
   const mockMemoryTrackers = [
     makeMe.aMemoryTracker
       .assimilatedAt("2024-01-01T00:00:00Z")
@@ -17,32 +17,24 @@ describe("RecentlyLearnedNotes", () => {
       .please(),
   ]
 
-  beforeEach(() => {
-    mockSdkService(
-      MemoryTrackerController,
-      "getRecentMemoryTrackers",
-      mockMemoryTrackers
-    )
-  })
-
   it("fetches and displays recent memory trackers", async () => {
     const getRecentMemoryTrackersSpy = mockSdkService(
       MemoryTrackerController,
       "getRecentMemoryTrackers",
       mockMemoryTrackers
     )
-    const wrapper = helper.component(RecentlyLearnedNotes).withRouter().mount()
+    const wrapper = helper
+      .component(RecentlyAssimilatedNotes)
+      .withRouter()
+      .mount()
 
     await flushPromises()
 
-    // Verify API was called
     expect(getRecentMemoryTrackersSpy).toBeCalled()
 
-    // Verify memory trackers are displayed
     const rows = wrapper.findAll("tbody tr")
     expect(rows).toHaveLength(2)
 
-    // Verify removed memory tracker has correct styling
     const removedRow = rows[1]
     expect(removedRow?.classes()).toContain("removed")
   })

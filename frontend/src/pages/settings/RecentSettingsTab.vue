@@ -1,11 +1,11 @@
 <template>
   <div class="daisy-tabs daisy-tabs-box bg-base-200 p-2 flex justify-center mb-4">
     <a
-      :class="`daisy-tab daisy-tab-lg ${activePage === 'recentlyLearned' ? 'daisy-tab-active' : ''}`"
+      :class="`daisy-tab daisy-tab-lg ${activePage === 'recentlyAssimilated' ? 'daisy-tab-active' : ''}`"
       role="button"
       href="#"
-      @click.prevent="setActivePage('recentlyLearned')"
-    >Recently Learned</a>
+      @click.prevent="setActivePage('recentlyAssimilated')"
+    >Recently Assimilated</a>
     <a
       :class="`daisy-tab daisy-tab-lg ${activePage === 'recentlyRecalled' ? 'daisy-tab-active' : ''}`"
       role="button"
@@ -14,17 +14,17 @@
     >Recently Recalled</a>
   </div>
 
-  <RecentlyLearnedNotes v-if="activePage === 'recentlyLearned'" />
+  <RecentlyAssimilatedNotes v-if="activePage === 'recentlyAssimilated'" />
   <RecentlyRecalledNotes v-if="activePage === 'recentlyRecalled'" />
 </template>
 
 <script setup lang="ts">
 import { computed } from "vue"
 import { useRoute, useRouter } from "vue-router"
-import RecentlyLearnedNotes from "@/components/recent/RecentlyLearnedNotes.vue"
+import RecentlyAssimilatedNotes from "@/components/recent/RecentlyAssimilatedNotes.vue"
 import RecentlyRecalledNotes from "@/components/recent/RecentlyRecalledNotes.vue"
 
-type TabType = "recentlyLearned" | "recentlyRecalled"
+type TabType = "recentlyAssimilated" | "recentlyRecalled"
 
 const route = useRoute()
 const router = useRouter()
@@ -32,10 +32,10 @@ const router = useRouter()
 const activePage = computed({
   get(): TabType {
     const tab = route.query.tab as string | undefined
-    if (tab === "recentlyLearned" || tab === "recentlyRecalled") {
+    if (tab === "recentlyAssimilated" || tab === "recentlyRecalled") {
       return tab
     }
-    return "recentlyLearned"
+    return "recentlyAssimilated"
   },
   set(value: TabType) {
     router.push({

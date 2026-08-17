@@ -32,7 +32,7 @@ public class RetrievalConfig {
     return new RetrievalConfig(1, null, null);
   }
 
-  /** Focus note only — no related-note expansion (e.g. commissioned learning session items). */
+  /** Focus note only — no related-note expansion (e.g. commissioned Learning Session items). */
   public static RetrievalConfig focusNoteOnly() {
     return new RetrievalConfig(0, null, null);
   }

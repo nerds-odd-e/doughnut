@@ -31,10 +31,12 @@ describe("RecentSettingsTab", () => {
     return { wrapper, pushSpy }
   }
 
-  it("shows Recently Learned tab by default when no query parameter", async () => {
+  it("shows Recently Assimilated tab by default when no query parameter", async () => {
     const { wrapper } = await mountWithTabQuery()
-    expect(wrapper.find(".daisy-tab-active").text()).toBe("Recently Learned")
-    expect(wrapper.find(".recently-learned-notes").exists()).toBe(true)
+    expect(wrapper.find(".daisy-tab-active").text()).toBe(
+      "Recently Assimilated"
+    )
+    expect(wrapper.find(".recently-assimilated-notes").exists()).toBe(true)
   })
 
   it("shows Recently Recalled tab when query parameter is recentlyRecalled", async () => {
@@ -43,9 +45,11 @@ describe("RecentSettingsTab", () => {
     expect(wrapper.find(".recently-recalled-notes").exists()).toBe(true)
   })
 
-  it("defaults to Recently Learned tab when query parameter is invalid", async () => {
+  it("defaults to Recently Assimilated tab when query parameter is invalid", async () => {
     const { wrapper } = await mountWithTabQuery("invalidTab")
-    expect(wrapper.find(".daisy-tab-active").text()).toBe("Recently Learned")
+    expect(wrapper.find(".daisy-tab-active").text()).toBe(
+      "Recently Assimilated"
+    )
   })
 
   it("updates route when Recently Recalled tab is clicked", async () => {

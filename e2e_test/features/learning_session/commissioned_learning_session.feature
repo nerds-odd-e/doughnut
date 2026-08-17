@@ -29,7 +29,7 @@ Feature: Commissioned learning session
     And It's day 2, 9 hour
     When I open the learning session request for notebook "Spanish conversation"
     Then the learning session request should list session items for notes "Hola, Gracias"
-    And the learning session request should include the learning status of "Hola"
+    And the learning session request should include the tutoring status of "Hola"
     And the learning session request should include focus context with note body "Hello"
     And the learning session request should instruct the tutor to report one score per session item
     And no learning session should exist for notebook "Spanish conversation"

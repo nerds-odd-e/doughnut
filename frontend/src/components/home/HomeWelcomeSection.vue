@@ -2,9 +2,9 @@
   <div class="upper-half" ref="upperHalf">
     <h1 class="welcome-text">Welcome {{ userName }}!</h1>
 
-    <div class="learning-process">
+    <div class="welcome-process">
       <div class="flow-container">
-        <div class="learning-flow-group">
+        <div class="welcome-flow-group">
           <svg class="flow-background" preserveAspectRatio="none">
             <rect width="100%" height="100%" fill="none" />
             <g class="arrows" fill="none" stroke="rgba(0,0,0,0.6)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
@@ -15,7 +15,7 @@
             </g>
           </svg>
 
-          <div class="learning-steps">
+          <div class="welcome-steps">
             <div v-for="(item, index) in navItems"
                  :key="item.name"
                  class="step-container"
@@ -45,7 +45,7 @@
 <script setup lang="ts">
 import NavigationItem from "@/components/navigation/NavigationItem.vue"
 import { useGoToNextAssimilation } from "@/composables/useGoToNextAssimilation"
-import { useLearningFlowPath } from "@/composables/useLearningFlowPath"
+import { useHomeWelcomePath } from "@/composables/useHomeWelcomePath"
 import type { Component } from "vue"
 import { ref } from "vue"
 
@@ -66,7 +66,7 @@ defineProps<{
 }>()
 
 const upperHalf = ref<HTMLElement>()
-const { isScrolling } = useLearningFlowPath(upperHalf)
+const { isScrolling } = useHomeWelcomePath(upperHalf)
 
 const cardTitles = [
   "Taking notes is only the beginning",
@@ -75,9 +75,9 @@ const cardTitles = [
 ]
 
 const cardDescriptions = [
-  "Capture what you saw, what you heard, what you read, your thoughts and ideas, with the help of AI tools. Your notebooks learn as you learn.",
+  "Capture what you saw, what you heard, what you read, your thoughts and ideas, with the help of AI tools. Your notebooks grow as you capture.",
   "Start to understand your notes, and tracking your memories about them. Decide what to keep and what to let go.",
-  "Using AI generated questions to help you recall the notes to keep your memories alive. Improve the notes stucture continously as we learn.",
+  "Using AI generated questions to help you recall the notes to keep your memories alive. Improve the notes structure continuously as you recall.",
 ]
 </script>
 
@@ -100,7 +100,7 @@ const cardDescriptions = [
   font-weight: 600;
 }
 
-.learning-process {
+.welcome-process {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -126,7 +126,7 @@ const cardDescriptions = [
   transform: translateX(-100px);
 }
 
-.learning-steps {
+.welcome-steps {
   display: flex;
   justify-content: space-between;
   position: relative;
@@ -176,7 +176,7 @@ const cardDescriptions = [
   }
 }
 
-.learning-flow-group {
+.welcome-flow-group {
   position: relative;
   width: 100%;
   padding: 2rem 0;
@@ -227,7 +227,7 @@ const cardDescriptions = [
 }
 
 @media (max-width: 768px) {
-  .learning-steps {
+  .welcome-steps {
     flex-direction: column;
     align-items: center;
     gap: 3rem;

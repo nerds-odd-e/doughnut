@@ -7,9 +7,9 @@
 
 ## Context
 
-Doughnut’s product vocabulary should not be **inconsistent**: the same idea
-appears under several names, and some names mean more than one thing. Humans,
-UI copy, APIs, and coding agents then invent synonyms or collide terms.
+Doughnut’s product vocabulary should be **consistent**: each idea has one name,
+and each name means one thing. Humans, UI copy, APIs, and coding agents then
+share those terms.
 
 This ADR is the **canonical ubiquitous language**. Accepting it constrains
 *new* naming and guides gradual alignment (tests, UI, OpenAPI, schema). It
@@ -21,7 +21,6 @@ does not require renaming the whole codebase at once.
 
 | Term | Colliding senses |
 |------|------------------|
-| **Learning** | Overall learner metaphor; commissioned **Learning Session** family — not a synonym for subscription |
 | **Layout** | Refinement layout for a note vs book layout for an attached book |
 | **Property** | Reduced relationship field; wiki property from accidental match; property memory tracker key |
 | **Chat / conversation / message** | Human note threads and AI chat share the same nouns without a clear split |
@@ -79,7 +78,7 @@ does not require renaming the whole codebase at once.
 | **Notebook health** | In-app lint, findings, and fixes for a notebook |
 | **Skip Memory Tracking** | Notebook setting that opts the notebook out of the assimilation sequence and blocks Bazaar subscribe. It does not opt the notebook out of recall. |
 
-#### Learning and recall
+#### Assimilation and recall
 
 | Term | Meaning | Short UI |
 |------|---------|----------|
@@ -116,13 +115,13 @@ does not require renaming the whole codebase at once.
 | **Message center** | UI for conversations and unread state |
 | **Focus context** | Bounded note neighborhood for AI use |
 
-3. **Commissioned learning terms** — Vocabulary for learning that a Tutor
-   conducts outside Doughnut, on commission from Doughnut:
+3. **Commissioned Learning Session terms** — Vocabulary for Learning Sessions
+   that a Tutor conducts outside Doughnut, on commission from Doughnut:
 
 | Term | Meaning |
 |------|---------|
-| **Learning Orchestrator** | The Doughnut component that directs and coordinates learning sessions |
-| **Commissioned memory tracker** | Memory tracker maintained through commissioned learning sessions rather than ordinary recall |
+| **Learning Orchestrator** | The Doughnut component that directs and coordinates Learning Sessions |
+| **Commissioned memory tracker** | Memory tracker maintained through commissioned Learning Sessions rather than ordinary recall |
 | **Tutor** | Party that conducts a Learning Session from the request and produces a report; may be a person or an AI assistant, and is outside Doughnut |
 | **Learning Session** | One commissioned unit of tutoring, covering the due commissioned memory trackers of a single notebook |
 | **Potential learning session** | Due commissioned memory trackers that could be commissioned but have no Learning Session yet |
@@ -138,9 +137,10 @@ does not require renaming the whole codebase at once.
    - Always qualify **layout** as **refinement** or **book**.
    - Use **wiki link**, **relationship**, or **Wikidata association** — never
      bare **link** or **wiki** when the kind matters.
-   - Use **subscription** / **subscribe** for following a shared notebook;
-     reserve **learning** for the overall learner metaphor, not as a synonym of
-     subscription.
+   - Use **subscription** / **subscribe** for following a shared notebook.
+     Do not use bare **learning**. Use **Learning Session** (and its family)
+     for commissioned tutoring; use **assimilation**, **recall**, or
+     **subscription** for Doughnut’s own activities.
    - **Skip from the assimilation sequence** is not the assimilate action; it
      does not block assimilating that unit from the note. Do not use **skip
      assimilation**, **Unskip**, or **skip recall** for this mark.
@@ -184,7 +184,8 @@ does not require renaming the whole codebase at once.
 ## Consequences
 
 - Product language converges on fewer overloaded words (**link**,
-  **learning**, **layout**).
+  **layout**). Bare **learning** is not a glossary noun; commissioned tutoring
+  uses the **Learning Session** family.
 - Product language names spaced retrieval **recall**, not **review**, so the
   glossary matches the philosophy (recall is better than review) and stays
   distinct from FSRS/Anki vocabulary. **Just review** names a recall method,
@@ -199,7 +200,7 @@ does not require renaming the whole codebase at once.
 - Sequence skip, **Remove from recall**, **Revive**, and notebook **Skip
   Memory Tracking** stay distinct in speech; **Return to sequence** is not
   **Revive**.
-- Commissioned learning names are fixed before the capability is built, so its
+- Commissioned Learning Session names are fixed before the capability is built, so its
   entities, API, UI copy, and tests start on the glossary instead of renaming
   later.
 - Retired product concepts (**workspace** as CLI sync tree, **push / pull**

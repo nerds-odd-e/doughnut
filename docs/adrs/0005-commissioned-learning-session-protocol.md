@@ -7,7 +7,8 @@
 
 ## Context
 
-Doughnut is adding commissioned learning (ADR 0001, commissioned learning terms):
+Doughnut is adding commissioned Learning Sessions (ADR 0001, commissioned
+Learning Session terms):
 the Learning Orchestrator commissions a Tutor to conduct a Learning Session
 covering the due commissioned memory trackers of one notebook, then records the
 Tutor's Learning Session Report.
@@ -53,7 +54,7 @@ that a later machine transport can carry the same concepts unchanged.
 ### Learning Session Request
 
 Doughnut states the notebook, how to report (with the rubric inline), and one
-section per Session Item keyed by note title, carrying the learner's learning
+section per Session Item keyed by note title, carrying the learner's tutoring
 status and a focus-note-only Focus Context block with the note body.
 
 ```markdown
@@ -74,7 +75,7 @@ Wait for the learner's instruction before starting the learning session.
 
 <session_items>
 ### Hola
-- Learning status: 1 previous session, last on 2026-08-06
+- Tutoring status: 1 previous session, last on 2026-08-06
 <focus_context>
 Purpose: Context around the focus note for AI use.
 Max depth: 0
@@ -91,7 +92,7 @@ Hello
 </focus_context>
 
 ### Gracias
-- Learning status: not yet tutored
+- Tutoring status: not yet tutored
 <focus_context>
 Purpose: Context around the focus note for AI use.
 Max depth: 0
@@ -112,12 +113,12 @@ Thank you
 Teach the session items above, then return a Learning Session Report giving one
 score from 0 to 5 per item:
 
-- 5 — mastered the learning point with full fluency
-- 4 — mastered the learning point with fluency
-- 3 — mastered the learning point, but not fluent
+- 5 — mastered the session item with full fluency
+- 4 — mastered the session item with fluency
+- 3 — mastered the session item, but not fluent
 - 2 — needed a reminder at first, then showed signs of mastering it
 - 1 — needed several reminders
-- 0 — could not reach the learning point even with help
+- 0 — could not reach the session item even with help
 
 Example of how to provide feedback:
 
@@ -129,7 +130,7 @@ Gracias: 1
 </session_item_scores>
 
 Only score session items that were actually taught in this session. Do not list
-items that were not learnt in the session.
+items that were not taught in the session.
 </how_to_report>
 ```
 
@@ -214,7 +215,7 @@ and ignores it rather than rejecting the Report.
 - Learners can copy and paste between Doughnut and their Tutor's channel.
 - People and LLMs can follow a short rubric well enough for a 0–5 score to mean
   something.
-- The learning status the Request exposes is enough for a Tutor to pitch the
+- The tutoring status the Request exposes is enough for a Tutor to pitch the
   session appropriately.
 
 ## Related

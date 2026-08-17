@@ -1,7 +1,7 @@
 @usingMockedOpenAiService
 Feature: Bazaar subscription
   As a learner, I want to subscribe to notes in the Bazaar so that I can
-  learn it's content.
+  assimilate and recall its content.
 
   Background:
     Given there are some notes for existing user "another_old_learner" in notebook "Shape"

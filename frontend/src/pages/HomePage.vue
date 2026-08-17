@@ -1,7 +1,7 @@
 <template>
   <GlobalBar />
   <div class="home-container">
-    <LearningFlowSection
+    <HomeWelcomeSection
       :user-name="user?.name || 'To Doughnut'"
       :nav-items="upperNavItems"
     />
@@ -35,7 +35,7 @@ doughnut</code></pre>
 </template>
 
 <script setup lang="ts">
-import LearningFlowSection from "@/components/home/LearningFlowSection.vue"
+import HomeWelcomeSection from "@/components/home/HomeWelcomeSection.vue"
 import NavigationItem from "@/components/navigation/NavigationItem.vue"
 import GlobalBar from "@/components/toolbars/GlobalBar.vue"
 import { useNavigationItems } from "@/composables/useNavigationItems"

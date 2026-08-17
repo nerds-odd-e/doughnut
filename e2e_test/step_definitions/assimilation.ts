@@ -17,19 +17,6 @@ Then('I should see {int} due for assimilation', (numberOfNotes: number) => {
 })
 
 Then(
-  'I added and learned one note {string} on day {int}',
-  (noteTopology: string, day: number) => {
-    cy.get<string>('@currentLoginUser').then((username) => {
-      start
-        .testability()
-        .injectNotes([{ Title: noteTopology }], username, noteTopology)
-    })
-    start.testability().backendTimeTravelTo(day, 8)
-    start.testability().assimilateNote(noteTopology)
-  }
-)
-
-Then(
   'I assimilated one note {string} at the current time',
   (noteTitle: string) => {
     start.testability().assimilateNote(noteTitle)

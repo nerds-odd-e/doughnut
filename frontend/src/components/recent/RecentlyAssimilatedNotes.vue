@@ -1,5 +1,5 @@
 <template>
-  <div class="recently-learned-notes">
+  <div class="recently-assimilated-notes">
     <ContentLoader v-if="!memoryTrackers" />
     <table v-else class="daisy-table daisy-table-zebra w-full">
       <thead>

@@ -88,12 +88,12 @@ Then(
 )
 
 Then(
-  'the learning session request should include the learning status of {string}',
+  'the learning session request should include the tutoring status of {string}',
   (noteTitle: string) => {
     start
       .recall()
       .assumeRecallPage()
-      .expectLearningSessionRequestIncludesLearningStatus(noteTitle)
+      .expectLearningSessionRequestIncludesTutoringStatus(noteTitle)
   }
 )
 

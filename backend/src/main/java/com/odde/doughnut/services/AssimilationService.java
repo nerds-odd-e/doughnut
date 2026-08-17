@@ -56,7 +56,8 @@ public class AssimilationService {
           .forEach(
               sub -> {
                 int budget =
-                    subscriptionService.needToLearnCountToday(sub, todaysAssimilatedNoteIds);
+                    subscriptionService.remainingDailyAssimilationTarget(
+                        sub, todaysAssimilatedNoteIds);
                 if (budget > 0) {
                   heads.add(headOfSubscription(sub));
                 }

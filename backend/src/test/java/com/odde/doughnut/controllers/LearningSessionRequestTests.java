@@ -46,7 +46,7 @@ class LearningSessionRequestTests extends LearningSessionControllerTestBase {
     assertThat(markdown, containsString("### Hola"));
     assertThat(markdown, containsString("### Gracias"));
     assertThat(markdown, not(containsString("Expected learning content:")));
-    assertThat(markdown, containsString("- Learning status: not yet tutored"));
+    assertThat(markdown, containsString("- Tutoring status: not yet tutored"));
     assertThat(markdown, containsString("Hello"));
     assertThat(markdown, containsString("Thank you"));
     assertThat(markdown, containsString(FocusContextConstants.FOCUS_CONTEXT_OPEN_MARKER));
@@ -73,16 +73,16 @@ class LearningSessionRequestTests extends LearningSessionControllerTestBase {
         markdown,
         containsString(
             "Only score session items that were actually taught in this session. Do not list"));
-    assertThat(markdown, containsString("items that were not learnt in the session."));
+    assertThat(markdown, containsString("items that were not taught in the session."));
     assertThat(markdown, containsString("</how_to_report>"));
-    assertThat(markdown, containsString("- 5 — mastered the learning point with full fluency"));
-    assertThat(markdown, containsString("- 4 — mastered the learning point with fluency"));
-    assertThat(markdown, containsString("- 3 — mastered the learning point, but not fluent"));
+    assertThat(markdown, containsString("- 5 — mastered the session item with full fluency"));
+    assertThat(markdown, containsString("- 4 — mastered the session item with fluency"));
+    assertThat(markdown, containsString("- 3 — mastered the session item, but not fluent"));
     assertThat(
         markdown,
         containsString("- 2 — needed a reminder at first, then showed signs of mastering it"));
     assertThat(markdown, containsString("- 1 — needed several reminders"));
-    assertThat(markdown, containsString("- 0 — could not reach the learning point even with help"));
+    assertThat(markdown, containsString("- 0 — could not reach the session item even with help"));
     assertThat(learningSessionRepository.count(), equalTo(sessionsBefore));
   }
 
@@ -134,7 +134,7 @@ class LearningSessionRequestTests extends LearningSessionControllerTestBase {
     assertThat(markdown, containsString("### Hola"));
     assertThat(markdown, containsString("1 previous session, last on 1989-01-06"));
     assertThat(markdown, containsString("### Gracias"));
-    assertThat(markdown, containsString("- Learning status: not yet tutored"));
+    assertThat(markdown, containsString("- Tutoring status: not yet tutored"));
   }
 
   @Test

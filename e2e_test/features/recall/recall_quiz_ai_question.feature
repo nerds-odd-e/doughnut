@@ -1,5 +1,5 @@
 Feature: AI recall quiz
-  As a learner, I want AI-generated quizzes in recall to help and gamify my learning.
+  As a learner, I want AI-generated quizzes in recall to help and gamify recall.
 
   Background:
     Given I am logged in as an existing user

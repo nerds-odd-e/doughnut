@@ -93,10 +93,10 @@ export const recallLearningSessionMethods = () => ({
     })
     return this
   },
-  expectLearningSessionRequestIncludesLearningStatus(noteTitle: string) {
+  expectLearningSessionRequestIncludesTutoringStatus(noteTitle: string) {
     this.learningSessionRequestText().should((text) => {
       expect(text).to.contain(`### ${noteTitle}`)
-      expect(text).to.match(/not yet tutored|Learning status:/)
+      expect(text).to.match(/not yet tutored|Tutoring status:/)
     })
     return this
   },

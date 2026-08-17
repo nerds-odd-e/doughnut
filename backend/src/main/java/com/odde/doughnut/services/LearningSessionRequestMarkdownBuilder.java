@@ -87,12 +87,12 @@ public class LearningSessionRequestMarkdownBuilder {
     sb.append("<how_to_report>\n");
     sb.append("Teach the session items above, then return a Learning Session Report giving one\n");
     sb.append("score from 0 to 5 per item:\n\n");
-    sb.append("- 5 — mastered the learning point with full fluency\n");
-    sb.append("- 4 — mastered the learning point with fluency\n");
-    sb.append("- 3 — mastered the learning point, but not fluent\n");
+    sb.append("- 5 — mastered the session item with full fluency\n");
+    sb.append("- 4 — mastered the session item with fluency\n");
+    sb.append("- 3 — mastered the session item, but not fluent\n");
     sb.append("- 2 — needed a reminder at first, then showed signs of mastering it\n");
     sb.append("- 1 — needed several reminders\n");
-    sb.append("- 0 — could not reach the learning point even with help\n\n");
+    sb.append("- 0 — could not reach the session item even with help\n\n");
     sb.append("Example of how to provide feedback:\n\n");
     sb.append("# Learning Session Report\n\n");
     sb.append(LearningSessionReportParser.SESSION_ITEM_SCORES_OPEN_TAG).append("\n");
@@ -100,7 +100,7 @@ public class LearningSessionRequestMarkdownBuilder {
     sb.append("\n").append(LearningSessionReportParser.SESSION_ITEM_SCORES_CLOSE_TAG);
     sb.append(
         "\n\nOnly score session items that were actually taught in this session. Do not list\n");
-    sb.append("items that were not learnt in the session.\n");
+    sb.append("items that were not taught in the session.\n");
     sb.append("</how_to_report>\n");
   }
 
@@ -119,8 +119,8 @@ public class LearningSessionRequestMarkdownBuilder {
     Note note = tracker.getNote();
 
     sb.append("### ").append(note.getTitle()).append("\n");
-    sb.append("- Learning status: ")
-        .append(learningStatusLine(tracker.getId(), zoneId))
+    sb.append("- Tutoring status: ")
+        .append(tutoringStatusLine(tracker.getId(), zoneId))
         .append("\n");
     appendFocusContext(sb, note, viewer);
   }
@@ -132,7 +132,7 @@ public class LearningSessionRequestMarkdownBuilder {
     sb.append(focusContextMarkdownRenderer.render(focusContextResult, config));
   }
 
-  private String learningStatusLine(Integer memoryTrackerId, ZoneId zoneId) {
+  private String tutoringStatusLine(Integer memoryTrackerId, ZoneId zoneId) {
     RecordedFeedbackSummary summary =
         sessionItemRepository.summarizeRecordedFeedbackByMemoryTrackerId(memoryTrackerId);
     if (summary.sessionCount() == 0) {

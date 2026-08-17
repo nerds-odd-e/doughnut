@@ -2,7 +2,7 @@ import { onMounted, onUnmounted, ref, type Ref } from "vue"
 
 type Point = { x: number; y: number }
 
-function updateLearningFlowPath() {
+function updateHomeWelcomePath() {
   const svg = document.querySelector(".flow-background") as SVGElement | null
   const iconWrappers = document.querySelectorAll(
     ".nav-item-wrapper"
@@ -86,7 +86,7 @@ function updateLearningFlowPath() {
   })
 }
 
-export function useLearningFlowPath(upperHalf: Ref<HTMLElement | undefined>) {
+export function useHomeWelcomePath(upperHalf: Ref<HTMLElement | undefined>) {
   const isScrolling = ref(false)
 
   const handleScroll = () => {
@@ -99,13 +99,13 @@ export function useLearningFlowPath(upperHalf: Ref<HTMLElement | undefined>) {
 
   onMounted(() => {
     window.addEventListener("scroll", handleScroll)
-    window.addEventListener("resize", updateLearningFlowPath)
-    setTimeout(updateLearningFlowPath, 100)
+    window.addEventListener("resize", updateHomeWelcomePath)
+    setTimeout(updateHomeWelcomePath, 100)
   })
 
   onUnmounted(() => {
     window.removeEventListener("scroll", handleScroll)
-    window.removeEventListener("resize", updateLearningFlowPath)
+    window.removeEventListener("resize", updateHomeWelcomePath)
   })
 
   return { isScrolling }
