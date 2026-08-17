@@ -20,8 +20,9 @@ Live scheduling does not walk a spacing-index ladder. `DEFAULT_SPACES` / `hoursF
 
 **B2** is closed: requested retention is locked global `r = 0.9` (`Fsrs.REQUESTED_RETENTION`), not a knob.
 
+**C4** is closed: just review stays two buttons (Yes = Tutor **4** / Good, No = Tutor **1** / Again). Hard / Easy stay commissioned-only.
+
 - **B4** lapses
-- **C4** just-review Hard / Easy
 - **E3** fuzz / max interval
 - **E4** fitting / per-user weights
 - **E6** RecallLog

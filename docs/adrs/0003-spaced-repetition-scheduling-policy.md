@@ -79,16 +79,20 @@ Keep Doughnut product outcomes first-class. Do not replace the Tutor 0–5 rubri
 
 | Product | Schedule |
 |---------|----------|
-| Ordinary correct / Tutor **4** | FSRS-6 Good |
+| Just review Yes / ordinary correct / Tutor **4** | FSRS-6 Good |
 | Tutor **5** | FSRS-6 Easy |
 | Tutor **3** | FSRS-6 Hard |
 | Tutor **2** | Doughnut exception (80% accumulated S, D unchanged) |
-| Ordinary incorrect | FSRS-6 Again memory; due from `I` (non-positive `I` → 24h) |
+| Just review No / ordinary incorrect | FSRS-6 Again memory; due from `I` (non-positive `I` → 24h) |
 | Tutor **1** and **0** | Again memory; due from S (0 same as 1; rubric still differs) |
 | Confusion | Not a grade; Again-midpoint S; due not later |
 | Overlap | No memory change |
 
 Shared commissioned rules and score-specific memory updates follow. Accidental-match detail is in **Accidental-match and overlap transitions**.
+
+### Just review
+
+Just review stays **two buttons**. **Yes, I remember** is ordinary correct (Tutor **4**, FSRS-6 Good). **No, I need more recall** is ordinary incorrect (Tutor **1**, FSRS-6 Again). Do not add Hard or Easy. Tutor **3** and **5** stay commissioned-only.
 
 ### Commissioned Learning Session feedback
 
@@ -112,7 +116,7 @@ Memory updates with Stability > 0:
 
 ### Incorrect recall (Again)
 
-Ordinary incorrect recall (MCQ, just review, spelling fail) is FSRS **Again**. Doughnut does not offer Hard or Easy buttons; product outcomes stay.
+Ordinary incorrect recall (MCQ, just review No, spelling fail) is FSRS **Again**.
 
 When Stability is greater than 0, the memory update for Stability is the open-FSRS-6 post-lapse formula from Difficulty, Stability, and Retrievability (elapsed whole hours vs Stability). Ordinary incorrect also updates Difficulty with Again next-D (see **Difficulty after a mapped grade**). Unset Difficulty on Stability > 0 is treated as **5**. Queue lateness vs `nextRecallAt` is not an input. After ordinary incorrect, due is `lastRecalledAt + I(0.9, S)` of the post-lapse Stability; non-positive `I` → 24h. There is **no relearning step list**.
 
@@ -203,8 +207,9 @@ Stability. Do not use the spacing-index ladder as this fallback.
 
 ### Manual and admin paths
 
-`mark-as-recalled` is a grade and follows recall-transition rules. `remove` and
-`revive` are not grades.
+`mark-as-recalled` is just review's grade path: successful is just review Yes
+(Good); unsuccessful is just review No (Again). `remove` and `revive` are not
+grades.
 
 ### Spelling memory tracker
 
@@ -223,7 +228,6 @@ name the property. No confirm action.
 ### Deferred
 
 - **B4:** Lapses (no unused counter)
-- **C4:** Just-review Hard / Easy buttons
 - **E3:** Fuzz / maximum interval
 - **E4:** Fitting / per-user weights
 - **E6:** RecallLog
@@ -274,6 +278,8 @@ Empty pending accept.
   global constant 0.9, not a Settings knob.
 - **Recompute due time from answer history on demand** — deferred: history is
   incomplete; due-work needs a queryable projection.
+- **Just review Hard / Easy buttons** — rejected: just review is rare; keep two
+  buttons mapped to Tutor **4** and **1**.
 
 ## Related
 

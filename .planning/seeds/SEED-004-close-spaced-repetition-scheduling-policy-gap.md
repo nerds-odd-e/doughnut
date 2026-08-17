@@ -24,7 +24,7 @@ Also surface when changing success/failure interval math, commissioned score →
 **Large** — remaining trigger is policy accept plus deferred product knobs:
 
 1. Humans accept Proposed [ADR 0003](../../docs/adrs/0003-spaced-repetition-scheduling-policy.md) (`docs/adrs/README.md`).
-2. Deferred IDs: **B4** / **C4** / **E3** / **E4** / **E6**. Tracker: [FSRS-COMPATIBILITY-GAP.md](../research/FSRS-COMPATIBILITY-GAP.md).
+2. Deferred IDs: **B4** / **E3** / **E4** / **E6**. Tracker: [FSRS-COMPATIBILITY-GAP.md](../research/FSRS-COMPATIBILITY-GAP.md).
 
 ## Breadcrumbs
 
