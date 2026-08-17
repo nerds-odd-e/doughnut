@@ -17,12 +17,6 @@ does not require renaming the whole codebase at once.
 
 ### Remaining collisions (still to tighten in this glossary)
 
-#### Ambiguous (one word, several meanings)
-
-| Term | Colliding senses |
-|------|------------------|
-| **Description / Readme** | Catalog blurb (`notebook description`) vs notebook/folder markdown body (`readme`) — both “about the notebook” but different fields |
-
 #### Redundant (several names, one concept)
 
 | Concept | Overlapping names |
@@ -54,9 +48,9 @@ does not require renaming the whole codebase at once.
 |------|---------|
 | **Note** | Atomic knowledge document (title, content, markdown / rich content, frontmatter; may be nested under another note) |
 | **Notebook** | Top-level collection of notes a user owns or subscribes to |
-| **Notebook description** | One-line short plain-text blurb of a notebook (catalog/settings; not markdown, not the Readme) |
+| **Notebook short description** | One-line short plain-text description of a notebook. Shown in the **notebook catalog**. Not markdown; not the Readme. |
 | **Folder** | Hierarchical path segment inside a notebook |
-| **Readme** | Markdown body on a notebook or folder (landing content; separate from notebook description) |
+| **Readme** | Markdown body on a notebook or folder (landing content). Also bears YAML frontmatter for that notebook or folder. Distinct from **notebook short description**. Qualified: **notebook readme**, **folder readme**. |
 | **Notebook catalog** | List of a user’s notebooks (and notebook groups). The catalog heading is **Notebooks**. |
 | **Owned notebook** | A notebook the user created or owns; appears in the **notebook catalog** |
 | **Subscribed notebook** | A shared notebook the user follows via a **subscription**; appears in the **notebook catalog** |
@@ -160,9 +154,11 @@ does not require renaming the whole codebase at once.
      list or **space setting**. Do not persist **Retrievability**. **Requested
      retention** is a global constant 0.9, not a learner setting.
    - Prefer **semantic search** over **semantical search**.
-   - Use **notebook description** for the one-line plain-text catalog blurb;
-     use **readme** for the markdown notebook/folder body — never treat them as the
-     same concept.
+   - Use **notebook short description** for the one-line plain-text catalog blurb
+     shown in the notebook catalog. Use **readme** (or **notebook readme** /
+     **folder readme**) for the markdown body of a notebook or folder, including
+     that container’s YAML frontmatter. Never treat them as the same concept.
+     Do not call the catalog blurb a readme, or the readme a description.
    - The catalog heading is **Notebooks**, not “My notebooks”. **Owned
      notebooks** and **subscribed notebooks** both appear in the **notebook
      catalog**. Search across that catalog is **All notebooks**. Do not use
