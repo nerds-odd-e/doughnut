@@ -1,7 +1,7 @@
 package com.odde.doughnut.entities.repositories;
 
 import com.odde.doughnut.entities.AssimilationSequenceSkip;
-import com.odde.doughnut.entities.MemoryTracker;
+import com.odde.doughnut.entities.MemoryTrackerQueryFragments;
 import com.odde.doughnut.entities.NotePropertyIndex;
 import com.odde.doughnut.entities.NotebookSettings;
 import java.util.List;
@@ -26,9 +26,9 @@ public interface NotePropertyIndexRepository extends JpaRepository<NotePropertyI
           + " LEFT JOIN tBlock.memoryTrackers tmtBlock ON tmtBlock.user.id = :userId"
           + " AND tmtBlock.deletedAt IS NULL"
           + " AND "
-          + MemoryTracker.JPA_WHERE_NOTE_LEVEL_TARGET_TRACKER
+          + MemoryTrackerQueryFragments.JPA_WHERE_NOTE_LEVEL_TARGET_TRACKER
           + " AND "
-          + MemoryTracker.JPA_WHERE_UNDERSTANDING_TARGET_TRACKER
+          + MemoryTrackerQueryFragments.JPA_WHERE_UNDERSTANDING_TARGET_TRACKER
           + " WHERE iBlock.note = n AND iBlock.propertyKey = i.propertyKey"
           + " AND tBlock.deletedAt IS NULL"
           + " AND tmtBlock IS NULL"

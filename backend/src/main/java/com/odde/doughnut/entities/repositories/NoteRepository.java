@@ -1,7 +1,7 @@
 package com.odde.doughnut.entities.repositories;
 
 import com.odde.doughnut.entities.AssimilationSequenceSkip;
-import com.odde.doughnut.entities.MemoryTracker;
+import com.odde.doughnut.entities.MemoryTrackerQueryFragments;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.NotebookSettings;
 import com.odde.doughnut.utils.SearchTitleNormalizer;
@@ -160,9 +160,9 @@ public interface NoteRepository extends CrudRepository<Note, Integer>, NoteStruc
       " LEFT JOIN n.memoryTrackers rp ON rp.user.id = :userId"
           + " AND rp.deletedAt IS NULL"
           + " AND "
-          + MemoryTracker.JPA_WHERE_NOTE_LEVEL_TRACKER
+          + MemoryTrackerQueryFragments.JPA_WHERE_NOTE_LEVEL_TRACKER
           + " AND "
-          + MemoryTracker.JPA_WHERE_UNDERSTANDING_TRACKER;
+          + MemoryTrackerQueryFragments.JPA_WHERE_UNDERSTANDING_TRACKER;
 
   String unassimilatedOrderBy = " ORDER BY n.recallSetting.level, n.createdAt, n.id";
 

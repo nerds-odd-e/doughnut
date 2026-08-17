@@ -129,30 +129,6 @@ public class MemoryTracker extends EntityIdentifiedByIdOnly {
     return getType() == MemoryTrackerType.UNDERSTANDING;
   }
 
-  /**
-   * JPQL fragment for joined alias {@code rp}; must stay aligned with {@link
-   * #isNoteLevelTracker()}.
-   */
-  public static final String JPA_WHERE_NOTE_LEVEL_TRACKER =
-      "(rp.propertyKey IS NULL OR rp.propertyKey = '')";
-
-  /**
-   * JPQL fragment for joined alias {@code tmtBlock}; must stay aligned with {@link
-   * #isNoteLevelTracker()}.
-   */
-  public static final String JPA_WHERE_NOTE_LEVEL_TARGET_TRACKER =
-      "(tmtBlock.propertyKey IS NULL OR tmtBlock.propertyKey = '')";
-
-  /** JPQL fragment for joined alias {@code rp}: ordinary assimilation is UNDERSTANDING only. */
-  public static final String JPA_WHERE_UNDERSTANDING_TRACKER =
-      "rp.type = com.odde.doughnut.entities.MemoryTrackerType.UNDERSTANDING";
-
-  /**
-   * JPQL fragment for joined alias {@code tmtBlock}: ordinary assimilation is UNDERSTANDING only.
-   */
-  public static final String JPA_WHERE_UNDERSTANDING_TARGET_TRACKER =
-      "tmtBlock.type = com.odde.doughnut.entities.MemoryTrackerType.UNDERSTANDING";
-
   @Column(name = "deleted_at")
   @JsonIgnore
   @Getter
@@ -181,7 +157,15 @@ public class MemoryTracker extends EntityIdentifiedByIdOnly {
   }
 
   void scheduleNextRecallFromStability(Timestamp currentUTCTimestamp) {
-    MemoryTrackerNextRecallScheduling.apply(this, currentUTCTimestamp);
+    setLastRecalledAt(currentUTCTimestamp);
+    Timestamp scheduled = calculateNextRecallAt();
+    if (!scheduled.after(currentUTCTimestamp)) {
+      scheduled =
+          TimestampOperations.addHoursToTimestamp(
+              currentUTCTimestamp,
+              Fsrs.intervalHours(ForgettingCurve.FIRST_SUCCESS_STABILITY_HOURS));
+    }
+    setNextRecallAt(scheduled);
   }
 
   public void recalledSuccessfully(Timestamp now, Integer thinkingTimeMs) {
@@ -221,7 +205,10 @@ public class MemoryTracker extends EntityIdentifiedByIdOnly {
   }
 
   public void adjustForConfusion(Timestamp currentUTCTimestamp) {
-    MemoryTrackerConfusionAdjustment.apply(this, currentUTCTimestamp);
+    Timestamp existingDue = getNextRecallAt();
+    setStability(forgettingCurve().confusionAdjusted(elapsedHoursUntil(currentUTCTimestamp)));
+    Timestamp projected = calculateNextRecallAt();
+    setNextRecallAt(projected.after(existingDue) ? existingDue : projected);
   }
 
   @JsonIgnore
