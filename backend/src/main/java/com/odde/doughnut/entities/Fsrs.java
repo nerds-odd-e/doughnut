@@ -53,6 +53,14 @@ final class Fsrs {
     return (float) Math.round(nextDays * HOURS_PER_DAY);
   }
 
+  /** Published FSRS-6 short-term next Stability. Clamp SInc ≥ 1 so S does not shrink. */
+  static float hoursAfterShortTermRecall(float stabilityHours, int grade) {
+    double stabilityDays = stabilityHours / HOURS_PER_DAY;
+    double sInc = Math.exp(W[17] * (grade - GOOD + W[18])) * Math.pow(stabilityDays, -W[19]);
+    double nextDays = stabilityDays * Math.max(1.0, sInc);
+    return (float) Math.round(nextDays * HOURS_PER_DAY);
+  }
+
   static float nextDifficulty(float difficulty, int grade) {
     double deltaD = -W[6] * (grade - GOOD);
     double dPrime = difficulty + deltaD * (10.0 - difficulty) / 9.0;

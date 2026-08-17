@@ -57,15 +57,15 @@ class ForgettingCurveThinkingTimeTest {
   }
 
   @Test
-  void thinkingTimeAdjustmentCombinedWithElapsedTimeDiscount() {
+  void thinkingTimeAdjustmentCombinedWithSameHourRecall() {
     ForgettingCurve curve = createForgettingCurve();
     float hoursAfterCurrentIntervalWithBase =
         succeededAfterCurrentInterval(curve, BASE_THINKING_TIME_MS);
     float hoursWithNoElapsedTimeAtBase = curve.succeeded(0, BASE_THINKING_TIME_MS);
-    float hoursWithNoElapsedTimeAt10Seconds = curve.succeeded(0, 10000);
+    float hoursWithNoElapsedTimeAtFastThinking = curve.succeeded(0, 0);
 
     assertThat(hoursAfterCurrentIntervalWithBase, greaterThan(hoursWithNoElapsedTimeAtBase));
-    assertThat(hoursWithNoElapsedTimeAt10Seconds, greaterThan(hoursWithNoElapsedTimeAtBase));
+    assertThat(hoursWithNoElapsedTimeAtFastThinking, greaterThan(hoursWithNoElapsedTimeAtBase));
   }
 
   @Test
