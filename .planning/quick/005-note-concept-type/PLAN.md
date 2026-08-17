@@ -1,6 +1,6 @@
 # Plan: Note concept type
 
-**Status:** in progress (V300000270 prod backfill — gate `1=1` this deploy)
+**Status:** in progress (slice 10 next — production backfill applied)
 
 **Goal:** Ordinary notes persist `type: Note`. Relationship notes persist `type: Relationship`. Existing `note.content` is backfilled. ADRs describe that stored shape.
 
@@ -12,7 +12,7 @@
 - Leave `makeMe` content defaults alone. Typeless fixtures stay valid for later save/backfill tests.
 - Structure slices sit immediately before the behavior they unlock (ADR 0004 before `type: Note`; ADR 0001 / Relationship spelling before compose).
 - Flyway: **V300000269** applied on production as a 13ms no-op (`1=0`). **V300000270** is the same helper; do not rewrite 269.
-- Backfill is **gated** (`1=0` in non-prod; `1=1` in `application-prod.yml` for the deploy that first applies 270). Revert prod to `1=0` after that apply. Helper tests are permanent. Gate tests are temporary (slice 10).
+- Backfill is **gated** (`1=0` default). Production applied 270 with `1=1`; prod placeholder is reverted to `1=0`. Helper tests are permanent. Gate tests are temporary (slice 10).
 
 ## Slices
 
@@ -78,11 +78,9 @@ Temporary tests: `NoteConceptTypeBackfillTest` (default no-op; enabled updates n
 
 **Learnings:** Gate is a `1=0`/`1=1` flag, not concatenated SQL. Production applied 269 at 2026-08-17 11:54:30 UTC in 13ms with `1=0`; 26,633 notes, 0 with `type: Note`. Flyway will not re-run 269.
 
-### 9b. Apply the note type backfill on production — Behavior — in progress
+### 9b. Apply the note type backfill on production — Behavior — done
 
-Pre-condition: 269 is recorded; ordinary notes still lack `type: Note`.
-Trigger: deploy `V300000270__backfill_note_concept_type` with prod placeholder `1=1`.
-Post-condition: existing `note.content` has stored type (`type: Note` or canonical `type: Relationship`); Flyway 270 success; then revert prod to `1=0`.
+`V300000270` applied 2026-08-17 13:57:05 UTC in 25111ms with prod `1=1`. 26,633 notes; 16,961 `type: Note`; 9,671 Relationship; 0 missing `type`. GitHub deploy health probe failed (3 min) while Flyway was still running; the instance came up healthy afterward. Revert prod placeholder to `1=0`.
 
 ### 10. Close C1/D2 on the tracker; drop the migration harness after production — Structure — planned
 
