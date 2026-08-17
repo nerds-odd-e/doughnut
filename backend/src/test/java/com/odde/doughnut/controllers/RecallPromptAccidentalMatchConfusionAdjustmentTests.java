@@ -3,6 +3,7 @@ package com.odde.doughnut.controllers;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.lessThan;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -11,11 +12,14 @@ import com.odde.doughnut.controllers.dto.AnswerSpellingDTO;
 import com.odde.doughnut.entities.ForgettingCurve;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.ProductOutcome;
+import com.odde.doughnut.entities.RecallLog;
 import com.odde.doughnut.entities.RecallPrompt;
 import com.odde.doughnut.entities.repositories.MemoryTrackerRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.MemoryTrackerService;
 import java.sql.Timestamp;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -46,6 +50,18 @@ class RecallPromptAccidentalMatchConfusionAdjustmentTests extends RecallPromptCo
   class UniqueMatch {
 
     @Test
+    void accidentalMatchLeavesAConfusionRecallLogOnTheMatchedTrackerLinkedToTheSameAnswer()
+        throws UnexpectedNoAccessRightException {
+      controller.answerSpelling(recallPrompt, answerDTO);
+
+      Integer promptedAnswerId =
+          memoryTrackerController.getRecallLogs(promptedTracker).get(0).getAnswerId();
+      List<RecallLog> matchedLogs = memoryTrackerController.getRecallLogs(matchedSpellingTracker);
+      assertThat(matchedLogs.get(0).getProductOutcome(), is(ProductOutcome.CONFUSION));
+      assertThat(matchedLogs.get(0).getAnswerId(), equalTo(promptedAnswerId));
+    }
+
+    @Test
     void shouldWeakenUniqueMatchedSpellingTrackerWithoutRecallCredit()
         throws UnexpectedNoAccessRightException {
       testabilitySettings.timeTravelTo(matchedSpellingTracker.getNextRecallAt());
@@ -69,7 +85,6 @@ class RecallPromptAccidentalMatchConfusionAdjustmentTests extends RecallPromptCo
       assertThat(
           memoryTrackerService.countWrongAnswersInPeriod(matchedSpellingTracker, now, 14),
           equalTo(wrongCountBefore));
-      assertLinkedConfusionAdjustedTracker(matchedSpellingTracker);
     }
 
     @Test
@@ -109,7 +124,7 @@ class RecallPromptAccidentalMatchConfusionAdjustmentTests extends RecallPromptCo
       controller.answerSpelling(recallPrompt, answerDTO);
 
       assertThat(understandingTracker.getStability(), lessThan(stabilityBefore));
-      assertLinkedConfusionAdjustedTracker(understandingTracker);
+      assertConfusionLogged(understandingTracker);
     }
 
     @Test
@@ -120,8 +135,9 @@ class RecallPromptAccidentalMatchConfusionAdjustmentTests extends RecallPromptCo
 
       controller.answerSpelling(recallPrompt, answerDTO);
 
-      assertLinkedConfusionAdjustedTracker(matchedSpellingTracker);
+      assertConfusionLogged(matchedSpellingTracker);
       assertThat(understandingTracker.getStability(), equalTo(understandingStabilityBefore));
+      assertNoConfusionLog(understandingTracker);
     }
 
     @ParameterizedTest
@@ -138,7 +154,7 @@ class RecallPromptAccidentalMatchConfusionAdjustmentTests extends RecallPromptCo
 
       controller.answerSpelling(recallPrompt, answerDTO);
 
-      assertLinkedConfusionAdjustedTracker(understandingTracker);
+      assertConfusionLogged(understandingTracker);
     }
   }
 
@@ -154,7 +170,7 @@ class RecallPromptAccidentalMatchConfusionAdjustmentTests extends RecallPromptCo
               .stabilityAndNextRecallAt(200.0f)
               .propertyKey("topic")
               .please();
-      assertIneligibleTrackerIsUnchangedAndUnlinked(note, propertyTracker);
+      assertIneligibleTrackerIsUnchanged(note, propertyTracker);
     }
 
     @Test
@@ -162,7 +178,7 @@ class RecallPromptAccidentalMatchConfusionAdjustmentTests extends RecallPromptCo
       Note note = ownedNoteTitled("Commissioned Match Title");
       MemoryTracker commissionedTracker =
           makeMe.aMemoryTrackerFor(note).stabilityAndNextRecallAt(200.0f).commissioned().please();
-      assertIneligibleTrackerIsUnchangedAndUnlinked(note, commissionedTracker);
+      assertIneligibleTrackerIsUnchanged(note, commissionedTracker);
     }
 
     @Test
@@ -173,7 +189,6 @@ class RecallPromptAccidentalMatchConfusionAdjustmentTests extends RecallPromptCo
 
       controller.answerSpelling(recallPrompt, answerDTO);
 
-      assertThat(recallPrompt.getAnswer().getConfusionAdjustedMemoryTracker(), nullValue());
       assertThat(
           memoryTrackerRepository.findByUserAndNote(currentUser.getUser().getId(), note.getId()),
           hasSize(0));
@@ -196,7 +211,8 @@ class RecallPromptAccidentalMatchConfusionAdjustmentTests extends RecallPromptCo
 
       controller.answerSpelling(recallPrompt, answerDTO);
 
-      assertThat(recallPrompt.getAnswer().getConfusionAdjustedMemoryTracker(), nullValue());
+      assertNoConfusionLog(firstTracker);
+      assertNoConfusionLog(secondTracker);
       assertThat(firstTracker.getStability(), equalTo(firstStabilityBefore));
       assertThat(secondTracker.getStability(), equalTo(secondStabilityBefore));
       assertThat(firstTracker.getNextRecallAt(), equalTo(firstDueBefore));
@@ -208,20 +224,25 @@ class RecallPromptAccidentalMatchConfusionAdjustmentTests extends RecallPromptCo
     return makeMe.aNote().notebookOwnedBy(currentUser.getUser()).title(title).please();
   }
 
-  private void assertLinkedConfusionAdjustedTracker(MemoryTracker tracker) {
+  private void assertConfusionLogged(MemoryTracker tracker)
+      throws UnexpectedNoAccessRightException {
     assertThat(
-        recallPrompt.getAnswer().getConfusionAdjustedMemoryTracker().getId(),
-        equalTo(tracker.getId()));
+        memoryTrackerController.getRecallLogs(tracker).get(0).getProductOutcome(),
+        is(ProductOutcome.CONFUSION));
   }
 
-  private void assertIneligibleTrackerIsUnchangedAndUnlinked(Note note, MemoryTracker tracker)
+  private void assertNoConfusionLog(MemoryTracker tracker) throws UnexpectedNoAccessRightException {
+    assertThat(memoryTrackerController.getRecallLogs(tracker), hasSize(0));
+  }
+
+  private void assertIneligibleTrackerIsUnchanged(Note note, MemoryTracker tracker)
       throws UnexpectedNoAccessRightException {
     float stabilityBefore = tracker.getStability();
     answerDTO = spellingAnswer(note.getTitle());
 
     controller.answerSpelling(recallPrompt, answerDTO);
 
-    assertThat(recallPrompt.getAnswer().getConfusionAdjustedMemoryTracker(), nullValue());
+    assertNoConfusionLog(tracker);
     assertThat(tracker.getStability(), equalTo(stabilityBefore));
   }
 }

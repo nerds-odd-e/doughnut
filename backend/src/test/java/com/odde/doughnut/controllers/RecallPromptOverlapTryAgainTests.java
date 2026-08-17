@@ -80,8 +80,7 @@ class RecallPromptOverlapTryAgainTests extends RecallPromptControllerTestBase {
   }
 
   @Test
-  void shouldLeaveOverlapPartnerTrackerUnchangedAndUnlinked()
-      throws UnexpectedNoAccessRightException {
+  void shouldLeaveOverlapPartnerTrackerUnchanged() throws UnexpectedNoAccessRightException {
     MemoryTracker partnerTracker = ownedSpellingTracker(partnerNote);
     float partnerStabilityBefore = partnerTracker.getStability();
     Timestamp partnerDueBefore = partnerTracker.getNextRecallAt();
@@ -89,9 +88,9 @@ class RecallPromptOverlapTryAgainTests extends RecallPromptControllerTestBase {
     int partnerWrongCountBefore =
         memoryTrackerService.countWrongAnswersInPeriod(partnerTracker, now, 14);
 
-    AnsweredQuestion result = answerSpelling(memoryTracker, "Shared Title");
+    answerSpelling(memoryTracker, "Shared Title");
 
-    assertThat(result.getAnswer().getConfusionAdjustedMemoryTracker(), nullValue());
+    assertThat(memoryTrackerController.getRecallLogs(partnerTracker), empty());
     assertThat(partnerTracker.getStability(), equalTo(partnerStabilityBefore));
     assertThat(partnerTracker.getNextRecallAt(), equalTo(partnerDueBefore));
     assertThat(

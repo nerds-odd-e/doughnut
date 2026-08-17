@@ -91,7 +91,11 @@ public class MemoryTrackerService {
       MemoryTracker memoryTracker,
       Integer thinkingTimeMs,
       Answer answer) {
-    persistRecallLog(memoryTracker, currentUTCTimestamp, correct, answer);
+    persistRecallLog(
+        memoryTracker,
+        currentUTCTimestamp,
+        correct ? ProductOutcome.GOOD : ProductOutcome.AGAIN,
+        answer);
     memoryTracker.markAsRecalled(currentUTCTimestamp, correct, thinkingTimeMs);
     entityPersister.save(memoryTracker);
 
@@ -101,13 +105,16 @@ public class MemoryTrackerService {
     return false;
   }
 
-  private void persistRecallLog(
-      MemoryTracker memoryTracker, Timestamp recordedAt, boolean successful, Answer answer) {
+  void persistRecallLog(
+      MemoryTracker memoryTracker,
+      Timestamp recordedAt,
+      ProductOutcome productOutcome,
+      Answer answer) {
     RecallLog recallLog = new RecallLog();
     recallLog.setMemoryTracker(memoryTracker);
     recallLog.setRecordedAt(recordedAt);
     recallLog.setElapsedHours((int) memoryTracker.elapsedHoursUntil(recordedAt));
-    recallLog.setProductOutcome(successful ? ProductOutcome.GOOD : ProductOutcome.AGAIN);
+    recallLog.setProductOutcome(productOutcome);
     recallLog.setAnswer(answer);
     entityPersister.save(recallLog);
   }
