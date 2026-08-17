@@ -1,6 +1,6 @@
 # Plan: RecallLog
 
-**Status:** in progress (slice 9 next)
+**Status:** in progress (slice 10 next)
 
 **Goal:** Memory-state transitions are a RecallLog. Prompt submissions stay `answer`. Tutor Feedback is a log row, not a session bag.
 
@@ -10,7 +10,7 @@
 - Write logs at the **grade caller** (just review, prompt grading, `recordFeedback`, confusion), not only inside `recalledAgain` — Tutor **0** and **1** both call `recalledAgain` but must log `AGAIN_ZERO` vs `AGAIN`.
 - Hooking `markAsRecalled` will also log prompt Yes/No before `answer_id` is set. That is allowed interim; the next prompt slice sets `answer_id`. Overlap must still write **no** log (it does not call `markAsRecalled`).
 - `GET /api/memory-trackers/{id}/recall-logs` is the Memory Tracker surface. After a DTO change, `pnpm generateTypeScript`.
-- Next Flyway: `V300000265`. `recall_log.memory_tracker_id` ON DELETE CASCADE. Include logs in hard-delete fixtures (`unit-testing.mdc`).
+- Next Flyway: `V300000266`. `recall_log.memory_tracker_id` ON DELETE CASCADE. Include logs in hard-delete fixtures (`unit-testing.mdc`).
 - Jidoka before dropping `learning_session`: [ADR 0005](../../../docs/adrs/0005-commissioned-learning-session-protocol.md) still describes paste-into-session and amend-in-place; code already does not. Slice 12 drafts that ADR to match “session = Request/Report activity, not a table.”
 
 ## Slices
@@ -47,11 +47,9 @@ Matched tracker gets `CONFUSION` with the same `answer_id`. Stability adjustment
 
 Grade caller maps 4/5/3/2/1/0 → GOOD/EASY/HARD/SHRINK/AGAIN/AGAIN_ZERO and persists before `recalledAgain` (0 vs 1). No `answer_id`. `session_item` still written. E2E: one GOOD log after tutor 4.
 
-### 9. Backfill prompt answers into RecallLog — Behavior — planned
+### 9. Backfill prompt answers into RecallLog — Behavior — done
 
-**Pre:** Existing `answer` rows from before slice 4.  
-**Trigger:** Flyway backfill.  
-**Post:** Each ordinary prompt grade has a log (`GOOD`/`AGAIN`, `answer_id` set, `elapsed_hours` null if unknown). Overlap answers still have no log. Memory Tracker shows those logs.
+`V300000265` INSERT…SELECT: ordinary answers → GOOD/AGAIN with `answer_id`, `elapsed_hours` null. OVERLAP skipped. Idempotent on existing `recall_log.answer_id`.
 
 ### 10. Backfill Tutor scores into RecallLog — Behavior — planned
 

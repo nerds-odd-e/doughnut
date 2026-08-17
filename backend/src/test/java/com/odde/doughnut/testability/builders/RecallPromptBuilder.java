@@ -2,6 +2,7 @@ package com.odde.doughnut.testability.builders;
 
 import com.odde.doughnut.controllers.dto.AnswerDTO;
 import com.odde.doughnut.entities.Answer;
+import com.odde.doughnut.entities.AnswerOutcome;
 import com.odde.doughnut.entities.Mcq;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
@@ -18,6 +19,7 @@ public class RecallPromptBuilder extends EntityBuilder<RecallPrompt> {
   private MemoryTracker memoryTracker = null;
   private String spellingAnswerText = null;
   private Timestamp answerTimestamp = null;
+  private AnswerOutcome answerOutcome = null;
 
   public RecallPromptBuilder(MakeMe makeMe, RecallPrompt recallPrompt) {
     super(makeMe, recallPrompt);
@@ -48,6 +50,10 @@ public class RecallPromptBuilder extends EntityBuilder<RecallPrompt> {
         answer.setCreatedAt(answerTimestamp);
       }
       entity.setAnswer(answer);
+    }
+    if (entity.getAnswer() != null && answerOutcome != null) {
+      entity.getAnswer().setOutcome(answerOutcome);
+      entity.getAnswer().setCorrect(false);
     }
     if (entity.getMemoryTracker() == null && memoryTracker == null) {
       throw new IllegalStateException("call forMemoryTracker() before please()");
@@ -102,6 +108,23 @@ public class RecallPromptBuilder extends EntityBuilder<RecallPrompt> {
 
   public RecallPromptBuilder answerTimestamp(Timestamp timestamp) {
     this.answerTimestamp = timestamp;
+    return this;
+  }
+
+  public RecallPromptBuilder overlap() {
+    return spellingAnswerWithOutcome(AnswerOutcome.OVERLAP);
+  }
+
+  public RecallPromptBuilder accidentalMatch() {
+    return spellingAnswerWithOutcome(AnswerOutcome.ACCIDENTAL_MATCH);
+  }
+
+  private RecallPromptBuilder spellingAnswerWithOutcome(AnswerOutcome outcome) {
+    spelling();
+    if (spellingAnswerText == null) {
+      spellingAnswerText = "x";
+    }
+    this.answerOutcome = outcome;
     return this;
   }
 }
