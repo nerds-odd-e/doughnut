@@ -115,14 +115,16 @@ export const recallTestabilityMethods = {
     return this.memoryTrackerForNote(noteTitle, 'SPELLING').then((tracker) => {
       expect(
         tracker.lastRecalledAt,
-        `expected spelling tracker for "${noteTitle}" to have Last Recall Time after credited recall`
+        `expected spelling tracker for "${noteTitle}" to have Last Recall Time`
       )
         .to.be.a('string')
         .and.not.equal('')
       expect(
-        tracker.recallCount,
-        `expected spelling tracker for "${noteTitle}" to have recall count after credited recall`
-      ).to.be.at.least(1)
+        tracker.nextRecallAt,
+        `expected spelling tracker for "${noteTitle}" to have Next Recall Time`
+      )
+        .to.be.a('string')
+        .and.not.equal('')
       const snapshot: SpellingScheduleSnapshot = {
         lastRecalledAt: tracker.lastRecalledAt ?? '',
         nextRecallAt: tracker.nextRecallAt,

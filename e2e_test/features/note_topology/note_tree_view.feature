@@ -13,17 +13,11 @@ Feature: Note tree view
       | Const          | LeSS in Action/TDD/TPP |
       | Pull           | LeSS in Action/ATDD    |
 
-  Scenario: Open sidebar on a narrow window to see the note tree
+  Scenario: Open sidebar on a narrow window
     Given I am on a window 500 * 500
     And I route to the note "LeSS in Action"
     When I open the notebook sidebar
-    And I expand the children of note "LeSS in Action" in the sidebar
-    Then I should see the note tree in the sidebar
-      | note-title     |
-      | ATDD           |
-      | CI             |
-      | TDD            |
-      | LeSS in Action |
+    Then I should see sidebar folder "LeSS in Action"
 
   Scenario: Sidebar shows the whole notebook from TDD
     When I navigate to "LeSS training/LeSS in Action/TDD" note

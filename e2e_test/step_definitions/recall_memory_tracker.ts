@@ -75,32 +75,9 @@ When(
 )
 
 When(
-  'I visit the spelling memory tracker for {string}',
-  (noteTitle: string) => {
-    openNoteLevelTracker(noteTitle, 'spelling')
-  }
-)
-
-When(
   'I visit the commissioned memory tracker for {string}',
   (noteTitle: string) => {
     openNoteLevelTracker(noteTitle, 'commissioned')
-  }
-)
-
-Then(
-  'I record the current memory tracker schedule for {string}',
-  (noteTitle: string) => {
-    assumeMemoryTrackerPage().captureSchedule(noteTitle)
-  }
-)
-
-Then(
-  'the spelling memory tracker for {string} should keep its recorded schedule',
-  (noteTitle: string) => {
-    openNoteLevelTracker(noteTitle, 'spelling').expectScheduleUnchanged(
-      noteTitle
-    )
   }
 )
 
@@ -113,6 +90,10 @@ Given(
       .then(() => start.testability().captureSpellingTrackerSchedule(noteTitle))
   }
 )
+
+Given('I recorded the spelling schedule of {string}', (noteTitle: string) => {
+  start.testability().captureSpellingTrackerSchedule(noteTitle)
+})
 
 Then(
   'the spelling schedule of {string} should be unchanged',

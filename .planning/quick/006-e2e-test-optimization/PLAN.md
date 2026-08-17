@@ -139,7 +139,9 @@ CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/bazaar/
 
 ### 4. Narrow sidebar, undo title, overlap try-again
 Type: Structure
-Status: planned
+Status: done
+
+**Learnings:** Narrow sidebar keeps 500×500 open-sidebar (~4.0s → ~2.6s). Title undo no longer repeats content-edit+undo (~4.0s → ~2.1s). Overlap captures Partner schedule via API (~4.0s → ~2.6s). Unused spelling-tracker UI schedule steps removed.
 
 **Tests:**
 - `e2e_test/features/note_topology/note_tree_view.feature` — "Open sidebar on a narrow window to see the note tree" (~3984ms)

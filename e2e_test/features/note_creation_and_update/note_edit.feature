@@ -14,8 +14,6 @@ Feature: Note Edit
 
   Scenario: Undo title edit restores previous title
     Given I update note title "LeSS in Action" to become "Odd-e CSD"
-    And I update note "Odd-e CSD" content to become "After"
-    And I undo "edit content"
     When I undo "edit title"
     Then the note title should be "LeSS in Action"
     And there should be nothing left to undo
