@@ -102,7 +102,8 @@ does not require renaming the whole codebase at once.
 | **Remove from recall** | Stop an existing memory tracker from appearing in recall; the unit does not re-enter the sequence | **Remove** / **Remove from recall** |
 | **Revive** | Re-enable recall for a tracker that was removed from recall | **Revive** |
 | **Property memory tracker** | Recall tracking keyed by a property or relationship label | |
-| **Stability** | Persisted current interval of a memory tracker, in whole hours. After a grade, next recall time is last recalled time plus Stability. A newly assimilated tracker may have Stability 0 (due now). | **Stability** |
+| **Stability** | Persisted current interval of a memory tracker, in whole hours. After a grade, next recall time is last recalled time plus `I(r, S)` with **requested retention** `r` locked at 0.9 (so due hours equal Stability hours). A newly assimilated tracker may have Stability 0 (due now). | **Stability** |
+| **Requested retention** | Target retrievability at the next due. Locked globally at **0.9** — not a Settings knob, not in the UI, not persisted. At this `r`, open FSRS `I(0.9, S) = S` in whole hours. | |
 | **Retrievability** | Computed from elapsed whole hours and Stability; not stored. | |
 | **Daily assimilation target** | Max new understanding memory trackers to create per day (profile or subscription). Spelling and commissioned trackers do not consume this count. | |
 
@@ -152,7 +153,8 @@ does not require renaming the whole codebase at once.
      tracking on a note. Tracker-level opt-out is **Remove from recall**.
    - Wire/AI shapes of an MCQ are not glossary nouns.
    - Use **Stability** for a memory tracker’s interval, not a user interval
-     list or **space setting**. Do not persist **Retrievability**.
+     list or **space setting**. Do not persist **Retrievability**. **Requested
+     retention** is a global constant 0.9, not a learner setting.
    - Prefer **semantic search** over **semantical search**.
    - Use **notebook description** for the one-line plain-text catalog blurb;
      use **readme** for the markdown notebook/folder body — never treat them as the
@@ -189,7 +191,8 @@ does not require renaming the whole codebase at once.
   not a different activity.
 - Humans and agents share an explicit dictionary instead of inferring synonyms.
 - The memory tracker’s interval is **Stability**, not a learner-edited day
-  list; **Retrievability** stays a computed value.
+  list; **Retrievability** stays a computed value; **requested retention**
+  is a global constant 0.9, not a Settings knob.
 - Circles, notebook groups, and folders stay clearly separated in speech.
 - Spelling is spoken as a learner-created **spelling memory tracker**, not as a
   note option or a mode of assimilation.

@@ -40,18 +40,19 @@ any other FSRS library. Compatibility is with the open FSRS model (inputs,
 state, qualitative update rules), not with a particular crate or version.
 
 - **Stability** is persisted memory state: the current interval in **whole
-  hours**. After a **correct** recall, `nextRecallAt = lastRecalledAt +
-  stability`. After **ordinary incorrect**, due is grade time + 12 hours
-  (schedule metadata). A newly assimilated tracker may have Stability 0
-  (due now). After any graded answer, persisted Stability 0 is not allowed,
-  except New fail (S=0 + 12h, already in Again Decision). Spacing is
-  Stability, not a Settings day list. Live scheduling must not walk a
-  spacing-index ladder.
+  hours**. Dues that already come from Stability are `nextRecallAt =
+  lastRecalledAt + I(r, S)` with requested retention `r` locked at **0.9**
+  (`I(0.9, S) = S` in whole hours). After **ordinary incorrect**, due is grade
+  time + 12 hours (schedule metadata). A newly assimilated tracker may have
+  Stability 0 (due now). After any graded answer, persisted Stability 0 is
+  not allowed, except New fail (S=0 + 12h, already in Again Decision).
+  Spacing is Stability, not a Settings day list. Live scheduling must not
+  walk a spacing-index ladder.
 - **Retrievability** is computed from elapsed whole hours and Stability, not stored.
 - A recall transition consumes the graded outcome, elapsed time, and that state — never queue lateness.
-- Requested retention stays implicit: after success, `nextRecallAt =
-  lastRecalledAt + stability` because `r = 0.9`. Settings `r ≠ 0.9`, lapses,
-  and a RecallLog are **deferred** (see **Deferred**).
+- **Requested retention** `r` is a **global constant 0.9** — not a Settings
+  knob, not in the UI, not persisted. Lapses and a RecallLog are **deferred**
+  (see **Deferred**).
 
 ### Difficulty on correct recall
 
@@ -202,7 +203,6 @@ name the property. No confirm action.
 
 ### Deferred
 
-- **B2:** Settings requested-retention knob `r ≠ 0.9`
 - **B4:** Lapses (no unused counter)
 - **C4:** Just-review Hard / Easy buttons
 - **E3:** Fuzz / maximum interval
@@ -227,8 +227,8 @@ Empty pending accept.
 - While history is incomplete, the due-time projection stays operationally
   authoritative. A rebuildable projection needs additional scheduler state or
   complete versioned history.
-- Allows a data-fitted scheduler later without a library lock-in. The policy
-  does not choose tuning constants or a target retention rate.
+- Allows a data-fitted scheduler later without a library lock-in. Requested
+  retention is locked at 0.9; other tuning constants remain deferred.
 
 ## Prerequisites / Assumptions
 
@@ -251,8 +251,8 @@ Empty pending accept.
 - **Linear lateness bonus (SM-2-style)** — rejected: extra must converge and
   follow elapsed time vs Stability, not `nextRecallAt`.
 - **Settings day list as the interval source** — rejected as the destination;
-  spacing is persisted Stability in whole hours. Requested retention remains a
-  later gap.
+  spacing is persisted Stability in whole hours. Requested retention is a
+  global constant 0.9, not a Settings knob.
 - **Recompute due time from answer history on demand** — deferred: history is
   incomplete; due-work needs a queryable projection.
 

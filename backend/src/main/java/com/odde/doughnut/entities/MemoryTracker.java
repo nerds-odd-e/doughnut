@@ -168,7 +168,8 @@ public class MemoryTracker extends EntityIdentifiedByIdOnly {
   private MemoryTracker() {}
 
   public Timestamp calculateNextRecallAt() {
-    return TimestampOperations.addHoursToTimestamp(getLastRecalledAt(), Math.round(getStability()));
+    return TimestampOperations.addHoursToTimestamp(
+        getLastRecalledAt(), Fsrs.intervalHours(getStability()));
   }
 
   ForgettingCurve forgettingCurve() {
@@ -226,10 +227,7 @@ public class MemoryTracker extends EntityIdentifiedByIdOnly {
   }
 
   public void adjustForConfusion(Timestamp currentUTCTimestamp) {
-    Timestamp existingDue = getNextRecallAt();
-    setStability(forgettingCurve().confusionAdjusted(elapsedHoursUntil(currentUTCTimestamp)));
-    Timestamp projected = calculateNextRecallAt();
-    setNextRecallAt(projected.after(existingDue) ? existingDue : projected);
+    MemoryTrackerConfusionAdjustment.apply(this, currentUTCTimestamp);
   }
 
   @JsonIgnore
