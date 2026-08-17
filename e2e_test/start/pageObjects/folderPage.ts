@@ -1,4 +1,5 @@
 import { waitUntilAppIsNotBusy } from '../pageBase'
+import { assumeFolderOrganizeForm } from './folderOrganizeForm'
 
 const folderPage = () => ({
   renameHeading(name: string) {
@@ -32,6 +33,11 @@ const folderPage = () => ({
     cy.get('[data-testid="folder-tab-settings"]').click()
     cy.get('[data-testid="folder-settings"]').should('be.visible')
     return this
+  },
+
+  openOrganizeForm() {
+    this.openSettingsTab()
+    return assumeFolderOrganizeForm()
   },
 
   typeFolderReadmeDraftAndSave(text: string) {

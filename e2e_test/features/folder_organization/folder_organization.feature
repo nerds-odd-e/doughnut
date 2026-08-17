@@ -122,8 +122,7 @@ Feature: Folder organization
       | Title      | Folder                   |
       | Root note  | FolderXMerge Dest/Shared |
       | Place note | FolderXMerge Dest        |
-    When I view note "Inner note"
-    And I activate folder "Shared" under the open folder "FolderXMerge Root" in the sidebar
-    And I move folder "Shared" under "FolderXMerge Root" to notebook "FolderXMerge New NB" folder "FolderXMerge Dest" and confirm merge
+    When I open the folder page for "Shared" in notebook "FolderXMerge Old NB"
+    And I move the current folder to notebook "FolderXMerge New NB" folder "FolderXMerge Dest" and confirm merge
     Then I should see note "Root note" under open folder "Shared"
     And I should see note "Inner note" under open folder "Shared"

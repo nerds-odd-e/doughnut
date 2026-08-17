@@ -17,6 +17,9 @@ export const loginActions = {
   },
 
   establishSessionAs(username: string) {
+    if (username === 'none') {
+      return this.logout()
+    }
     cy.wrap(username).as('currentLoginUser')
     cy.wrap(username).as('injectNotesExternalIdentifier')
     return cy.wrap(
@@ -29,11 +32,10 @@ export const loginActions = {
   },
 
   loginAs(username: string) {
-    if (username === 'none') {
-      return this.logout()
-    }
-
     return this.establishSessionAs(username).then(() => {
+      if (username === 'none') {
+        return
+      }
       cy.visit('/notebooks')
     })
   },

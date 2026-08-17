@@ -25,7 +25,9 @@ import {
 } from '@generated/doughnut-backend-api/sdk.gen'
 import { circleIdAlias } from './pageObjects/circlePage'
 import { assimilateTestabilityMethods } from './testabilityAssimilate'
+import { recallTestabilityMethods } from './testabilityRecall'
 import { timeTravelTestabilityMethods } from './testabilityTimeTravel'
+import { unwrapData } from './unwrapApi'
 
 /** Per-attempt budget for DB truncate + seed; CI under load often exceeds 6s. */
 const CLEAN_DB_REQUEST_TIMEOUT_MS = 30_000
@@ -68,13 +70,6 @@ function noteIdFromUrl(url: string): number {
     `could not parse note id from URL (expected /n<id>, /n/<id>, or legacy /d/n/<id>): ${url}`
   ).to.not.be.null
   return Number(match![1])
-}
-
-const unwrapData = <T>(result: T | { data: T } | undefined): T => {
-  if (result && typeof result === 'object' && 'data' in result) {
-    return (result as { data: T }).data
-  }
-  return result as T
 }
 
 /** Same kebab-case rule as relation type options / app compose. */
@@ -560,6 +555,7 @@ const testability = () => {
     },
 
     ...assimilateTestabilityMethods,
+    ...recallTestabilityMethods,
     ...timeTravelTestabilityMethods,
 
     dueRecallPrompt() {

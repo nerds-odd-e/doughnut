@@ -29,12 +29,7 @@ Feature: Accidental match scheduling
     And the spelling memory tracker for "sedation" should be brought forward without recall credit
 
   Scenario: Ambiguous matches leave both tracked notes unchanged
-    Given I have a notebook "Sleep words" with notes:
-      | Title | Content                 |
-      | Sleep |                         |
-      | lull  | lull means put to sleep |
-    And the notes "Sleep" are skipped from the assimilation sequence
-    And note "lull" has content:
+    Given I have a note "lull" under notebook "English practice" with content:
       """
       ---
       aliases:
@@ -43,22 +38,16 @@ Feature: Accidental match scheduling
       lull means put to sleep
       """
     And the note "sedation" was assimilated as spelling on day 1
-    When I visit recall for a due recall prompt on day 1
-    And I type my answer "sedation"
-    And I visit the spelling memory tracker for "sedation"
-    And I record the current memory tracker schedule for "sedation"
+    And I credited a spelling recall of "sedation" and recorded its schedule
     And the note "lull" was assimilated as spelling on day 1
-    When I visit recall for a due recall prompt on day 1
-    And I type my answer "lull"
-    And I visit the spelling memory tracker for "lull"
-    And I record the current memory tracker schedule for "lull"
+    And I credited a spelling recall of "lull" and recorded its schedule
     And the note "sedition" was assimilated as spelling on day 1
     When I visit recall for a due recall prompt on day 1
     Then I should be asked spelling question "means incite violence" from notebook "English practice"
     When I type my answer "sedation"
     Then I should see an accidental match reveal for spelling answer "sedation" with reviewed note "sedition" and matched notes "sedation" and "lull"
-    And the spelling memory tracker for "sedation" should keep its recorded schedule
-    And the spelling memory tracker for "lull" should keep its recorded schedule
+    And the spelling schedule of "sedation" should be unchanged
+    And the spelling schedule of "lull" should be unchanged
 
   Scenario: Unique matched understanding tracker is brought forward when spelling is absent
     Given the note "sedation" was assimilated on day 1

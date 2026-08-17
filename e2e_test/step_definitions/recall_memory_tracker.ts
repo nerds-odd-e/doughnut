@@ -2,7 +2,7 @@
 /// <reference types="../support" />
 // @ts-check
 
-import { Then, When } from '@badeball/cypress-cucumber-preprocessor'
+import { Given, Then, When } from '@badeball/cypress-cucumber-preprocessor'
 import start from '../start'
 import { assumeMemoryTrackerPage } from '../start/pageObjects/memoryTrackerPage'
 import type { NoteLevelTrackerKind } from '../start/pageObjects/assimilationPage/shared'
@@ -101,6 +101,23 @@ Then(
     openNoteLevelTracker(noteTitle, 'spelling').expectScheduleUnchanged(
       noteTitle
     )
+  }
+)
+
+Given(
+  'I credited a spelling recall of {string} and recorded its schedule',
+  (noteTitle: string) => {
+    start
+      .testability()
+      .creditSpellingRecallForNote(noteTitle)
+      .then(() => start.testability().captureSpellingTrackerSchedule(noteTitle))
+  }
+)
+
+Then(
+  'the spelling schedule of {string} should be unchanged',
+  (noteTitle: string) => {
+    start.testability().expectSpellingTrackerScheduleUnchanged(noteTitle)
   }
 )
 

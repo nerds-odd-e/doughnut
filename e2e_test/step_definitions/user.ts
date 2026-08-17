@@ -12,6 +12,10 @@ Given('I am logged in as {string}', (externalIdentifier: string) => {
   return start.loginAs(externalIdentifier)
 })
 
+Given('I have a session as {string}', (externalIdentifier: string) => {
+  return start.establishSessionAs(externalIdentifier)
+})
+
 Given('I am re-logged in as {string}', (externalIdentifier: string) => {
   return start.reloginAs(externalIdentifier).then(() => {
     cy.get<string>('@currentLoginUser').should('eq', externalIdentifier)

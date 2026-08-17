@@ -1,6 +1,5 @@
 import { waitUntilAppIsNotBusy } from '../pageBase'
 import folderPage from './folderPage'
-import { assumeFolderOrganizeForm } from './folderOrganizeForm'
 
 const sidebarActionTimeoutMs = 20000
 
@@ -24,8 +23,7 @@ function openFolderPageLink(treeitem: Cypress.Chainable<JQuery<HTMLElement>>) {
     .find('[data-testid="sidebar-folder-open-page-link"]')
     .click()
   waitUntilAppIsNotBusy()
-  folderPage().openSettingsTab()
-  return assumeFolderOrganizeForm()
+  return folderPage().openOrganizeForm()
 }
 
 export function openFolderPageForOrganize(folderLabel: string) {

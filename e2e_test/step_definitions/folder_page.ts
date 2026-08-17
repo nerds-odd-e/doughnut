@@ -120,16 +120,10 @@ When(
 )
 
 When(
-  'I move folder {string} under {string} to notebook {string} folder {string} and confirm merge',
-  (
-    childLabel: string,
-    parentLabel: string,
-    notebookName: string,
-    destFolder: string
-  ) => {
-    start
-      .noteSidebar()
-      .openFolderPageForOrganizeUnderParent(parentLabel, childLabel)
+  'I move the current folder to notebook {string} folder {string} and confirm merge',
+  (notebookName: string, destFolder: string) => {
+    folderPage()
+      .openOrganizeForm()
       .selectDestinationNotebook(notebookName)
       .openFolderSearch()
       .searchFolderDestination(destFolder)
