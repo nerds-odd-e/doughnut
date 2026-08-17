@@ -1,6 +1,6 @@
 # Same-hour FSRS-6 short-term next Stability
 
-**Status:** in progress (slices 1–2 done)  
+**Status:** in progress (slices 1–3 done)  
 **Policy:** Proposed [ADR 0003](../../../docs/adrs/0003-spaced-repetition-scheduling-policy.md) (do not Accept)
 
 Locked for this plan (human, 2026-08-17):

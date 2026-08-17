@@ -36,6 +36,10 @@ abstract class SpacedRepetitionRecallSchedulingTestBase {
         .inMemoryPlease();
   }
 
+  Timestamp sameHourGradeTime(MemoryTracker tracker) {
+    return Timestamp.from(tracker.getLastRecalledAt().toInstant().plusSeconds(30 * 60));
+  }
+
   Timestamp onTimeGradeTime(MemoryTracker tracker) {
     return TimestampOperations.addHoursToTimestamp(
         tracker.getLastRecalledAt(), Math.round(tracker.getStability()));

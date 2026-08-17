@@ -44,12 +44,28 @@ class SpacedRepetitionCorrectRecallSchedulingTest extends SpacedRepetitionRecall
   @Test
   void sameHourCorrectRecallGrowsFirstIntervalStabilityToTwentyFive() {
     MemoryTracker memoryTracker = aGradedTrackerAtStability(FIRST_SUCCESS_STABILITY_HOURS);
-    Timestamp gradeTime =
-        Timestamp.from(memoryTracker.getLastRecalledAt().toInstant().plusSeconds(30 * 60));
 
-    memoryTracker.recalledSuccessfully(gradeTime, null);
+    memoryTracker.recalledSuccessfully(sameHourGradeTime(memoryTracker), null);
 
     assertThat(memoryTracker.getStability(), equalTo(25.0f));
+  }
+
+  @Test
+  void sameHourEasyRecallGrowsFirstIntervalStabilityToFortyThree() {
+    MemoryTracker memoryTracker = aGradedTrackerAtStability(FIRST_SUCCESS_STABILITY_HOURS);
+
+    memoryTracker.recalledEasily(sameHourGradeTime(memoryTracker));
+
+    assertThat(memoryTracker.getStability(), equalTo(43.0f));
+  }
+
+  @Test
+  void sameHourHardRecallDoesNotShrinkFirstIntervalStability() {
+    MemoryTracker memoryTracker = aGradedTrackerAtStability(FIRST_SUCCESS_STABILITY_HOURS);
+
+    memoryTracker.recalledHard(sameHourGradeTime(memoryTracker));
+
+    assertThat(memoryTracker.getStability(), equalTo(24.0f));
   }
 
   @Test

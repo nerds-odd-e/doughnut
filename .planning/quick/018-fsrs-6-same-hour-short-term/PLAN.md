@@ -1,6 +1,6 @@
 # Plan: Same-hour success uses FSRS-6 short-term Stability
 
-**Status:** in progress (slices 1–2 done)  
+**Status:** in progress (slices 1–3 done)  
 **Index:** ad-hoc under `.planning/quick/` — on last-slice wrap-up, update `.planning/STATE.md` remaining FSRS gap (D2 short-term done). Do not Accept ADR 0003.
 
 **Goal:** At elapsed whole hours 0 and S > 0, a success grade updates Stability with published FSRS-6 short-term `S'(S, G)` (clamp SInc ≥ 1). Again stays post-lapse. No migration.
@@ -36,18 +36,9 @@ Ordinary correct at elapsed 0 and S=24 → Stability **25** (unit + E2E). 72h el
 ### 3. Same-hour Easy grows Stability more than Good
 
 Type: Behavior  
-Status: planned
+Status: done
 
-**Pre-condition:** Tracker with Stability **24**, Difficulty **5**, elapsed whole hours **0**.  
-**Trigger:** Easy recall (Tutor score **5** / `recalledEasily`).  
-**Post-condition:** Persisted Stability is **43**. Strictly greater than the same state under Good (25).
-
-**Commit bound:** Easy path; extract a shared short-term helper if Good and Easy would duplicate. One unit or HTTP pin of 43 (do not re-assert Good 25). Also pin Hard same-hour at S=24 stays **24** (clamp on the shared helper) so Hard matches the ADR without a fourth slice. Do not change Again. No E2E (float path already shown for Good; Tutor 5 on-time E2E already exists).
-
-- HTTP: `LearningSessionRecordTutorFeedbackTests` — second score **5** in the same hour, or `MemoryTracker.recalledEasily` at elapsed 0. Canonical Easy claim is 43; Hard claim is “does not shrink.”
-- Production: `afterEasyRecall` / `afterHardRecall` at elapsed 0 call existing `Fsrs.hoursAfterShortTermRecall` with `G = EASY` / `HARD`. New (S = 0) still inits 24, not this formula.
-
-**Done when:** same-hour Easy is 43; Hard at 24 stays 24; Again at elapsed 0 still post-lapse.
+Same-hour Easy at S=24 → **43**; Hard stays **24**. Shared formula remains `Fsrs.hoursAfterShortTermRecall`; per-grade elapsed-0 routing stayed in Easy/Hard modules. Again unchanged.
 
 ---
 
