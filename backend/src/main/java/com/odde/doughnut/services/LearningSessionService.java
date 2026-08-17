@@ -31,6 +31,7 @@ public class LearningSessionService {
   private final NoteRepository noteRepository;
   private final LearningSessionRequestMarkdownBuilder learningSessionRequestMarkdownBuilder;
   private final LearningSessionReportParser learningSessionReportParser;
+  private final MemoryTrackerService memoryTrackerService;
 
   @Autowired
   public LearningSessionService(
@@ -39,13 +40,15 @@ public class LearningSessionService {
       SessionItemRepository sessionItemRepository,
       NoteRepository noteRepository,
       LearningSessionRequestMarkdownBuilder learningSessionRequestMarkdownBuilder,
-      LearningSessionReportParser learningSessionReportParser) {
+      LearningSessionReportParser learningSessionReportParser,
+      MemoryTrackerService memoryTrackerService) {
     this.userService = userService;
     this.learningSessionRepository = learningSessionRepository;
     this.sessionItemRepository = sessionItemRepository;
     this.noteRepository = noteRepository;
     this.learningSessionRequestMarkdownBuilder = learningSessionRequestMarkdownBuilder;
     this.learningSessionReportParser = learningSessionReportParser;
+    this.memoryTrackerService = memoryTrackerService;
   }
 
   @Transactional(readOnly = true)
@@ -104,15 +107,18 @@ public class LearningSessionService {
     learningSessionRepository.save(session);
 
     for (MatchedReportEntry matched : matchedEntries) {
-      SessionItem item =
-          createSessionItem(session, matched.tracker(), matched.entry().score(), now);
+      int score = matched.entry().score();
+      ProductOutcome productOutcome =
+          CommissionedLearningSessionFeedbackScheduling.productOutcomeForScore(score);
+      SessionItem item = createSessionItem(session, matched.tracker(), score, now);
+      memoryTrackerService.persistRecallLog(matched.tracker(), now, productOutcome, null);
       CommissionedLearningSessionFeedbackScheduling.recordFeedback(
-          matched.tracker(), now, matched.entry().score());
+          matched.tracker(), now, productOutcome);
       sessionItemRepository.save(item);
 
       RecordedLearningSessionItem recorded = new RecordedLearningSessionItem();
       recorded.setNoteTitle(matched.entry().noteTitle());
-      recorded.setScore(matched.entry().score());
+      recorded.setScore(score);
       recorded.setMemoryTrackerId(matched.tracker().getId());
       response.getRecordedItems().add(recorded);
     }

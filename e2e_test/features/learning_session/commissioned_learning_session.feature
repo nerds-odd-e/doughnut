@@ -77,6 +77,15 @@ Feature: Commissioned learning session
     When I visit the commissioned memory tracker for "Hola"
     Then I should see Difficulty 5
 
+  Scenario: Recording tutor score 4 leaves a GOOD RecallLog
+    Given the notes "Hola, Gracias" are assimilated as commissioned on day 1
+    And I have recorded a learning session for notebook "Spanish conversation" on day 2 with scores:
+      | Note    | Score |
+      | Hola    | 4     |
+      | Gracias | 1     |
+    When I visit the commissioned memory tracker for "Hola"
+    Then I should see a GOOD RecallLog with elapsed hours and no answer id
+
   Scenario: First tutor score 5 on a new tracker sets Stability to 24
     Given the notes "Hola, Gracias" are assimilated as commissioned on day 1
     And I have recorded a learning session for notebook "Spanish conversation" on day 2 with scores:

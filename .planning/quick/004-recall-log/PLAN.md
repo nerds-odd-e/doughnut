@@ -1,6 +1,6 @@
 # Plan: RecallLog
 
-**Status:** in progress (slice 8 next)
+**Status:** in progress (slice 9 next)
 
 **Goal:** Memory-state transitions are a RecallLog. Prompt submissions stay `answer`. Tutor Feedback is a log row, not a session bag.
 
@@ -43,13 +43,9 @@ Spelling accidental match already wrote `AGAIN` + `answer_id` (slice 4 path). Co
 
 Matched tracker gets `CONFUSION` with the same `answer_id`. Stability adjustment unchanged. Dropped `answer.confusion_adjusted_memory_tracker_id` (`V300000264`). Tutoring status still reads `session_item` until slice 11.
 
-### 8. Tutor Feedback writes a RecallLog per score — Behavior — planned
+### 8. Tutor Feedback writes a RecallLog per score — Behavior — done
 
-**Pre:** Due commissioned trackers; learner records a Report.  
-**Trigger:** Record scores.  
-**Post:** Each matched score is a RecallLog on that tracker (`GOOD`/`EASY`/`HARD`/`SHRINK`/`AGAIN`/`AGAIN_ZERO` for 4/5/3/2/1/0), no `answer_id`. Request still creates no session. Keep `session_item` until slice 12 (interim).
-
-E2E: extend `commissioned_learning_session.feature` (one scenario asserts a log; other scores as controller deltas). Tutoring status may still count `session_item` until slice 11.
+Grade caller maps 4/5/3/2/1/0 → GOOD/EASY/HARD/SHRINK/AGAIN/AGAIN_ZERO and persists before `recalledAgain` (0 vs 1). No `answer_id`. `session_item` still written. E2E: one GOOD log after tutor 4.
 
 ### 9. Backfill prompt answers into RecallLog — Behavior — planned
 

@@ -1,6 +1,6 @@
 # RecallLog (E6) — close the FSRS history gap
 
-**Status:** in progress (slice 7 done; slice 8 next)  
+**Status:** in progress (slice 8 done; slice 9 next)  
 **Seed:** [SEED-004](../../seeds/SEED-004-close-spaced-repetition-scheduling-policy-gap.md)  
 **Policy:** Proposed [ADR 0003](../../../docs/adrs/0003-spaced-repetition-scheduling-policy.md) (lock E6 in Decision in slice 1)
 
