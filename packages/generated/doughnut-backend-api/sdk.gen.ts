@@ -1110,7 +1110,7 @@ export class AiController {
     }
     
     /**
-     * Remove selected layout points from note content (response only)
+     * Remove selected refinement layout items from note content (response only)
      *
      * Returns AI-regenerated note content in the response. Does not persist the note; the client must save the returned text (for example via the note update API).
      */
@@ -1139,7 +1139,7 @@ export class AiController {
     /**
      * Preview note extraction (no persistence)
      *
-     * Runs AI extraction for the selected layout points and returns the suggested new note title, new note content, and updated original note content without persisting any changes.
+     * Runs AI extraction for the selected refinement layout items and returns the suggested new note title, new note content, and updated original note content without persisting any changes.
      */
     public static extractNotePreview<ThrowOnError extends boolean = false>(options: Options<ExtractNotePreviewData, ThrowOnError>): RequestResult<ExtractNotePreviewResponses, unknown, ThrowOnError> {
         return (options.client ?? client).post<ExtractNotePreviewResponses, unknown, ThrowOnError>({

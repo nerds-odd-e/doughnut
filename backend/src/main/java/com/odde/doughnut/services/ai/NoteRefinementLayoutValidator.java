@@ -16,7 +16,7 @@ public class NoteRefinementLayoutValidator {
   public static NoteRefinementLayout validOrEmpty(NoteRefinementLayout layout) {
     Optional<String> reason = firstInvalidReason(layout);
     if (reason.isPresent()) {
-      logger.warn("Rejecting invalid note refinement layout: {}", reason.get());
+      logger.warn("Rejecting invalid refinement layout: {}", reason.get());
       return NoteRefinementLayout.empty();
     }
     return layout;
@@ -28,10 +28,10 @@ public class NoteRefinementLayoutValidator {
 
   private static Optional<String> firstInvalidReason(NoteRefinementLayout layout) {
     if (layout == null) {
-      return Optional.of("layout is null");
+      return Optional.of("refinement layout is null");
     }
     if (layout.items == null) {
-      return Optional.of("layout items is null");
+      return Optional.of("refinement layout items is null");
     }
     Set<String> ids = new HashSet<>();
     for (NoteRefinementLayoutItem item : layout.items) {
@@ -68,7 +68,7 @@ public class NoteRefinementLayoutValidator {
       return Optional.of("item children is null");
     }
     if (depth > 2) {
-      return Optional.of("layout exceeds maximum depth");
+      return Optional.of("refinement layout exceeds maximum depth");
     }
     for (NoteRefinementLayoutItem child : children) {
       Optional<String> childReason = invalidReasonForItem(child, depth + 1, ids);

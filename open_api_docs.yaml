@@ -1616,7 +1616,8 @@ paths:
     post:
       tags:
       - ai-controller
-      summary: Remove selected layout points from note content (response only)
+      summary: Remove selected refinement layout items from note content (response
+        only)
       description: Returns AI-regenerated note content in the response. Does not persist
         the note; the client must save the returned text (for example via the note
         update API).
@@ -1668,9 +1669,9 @@ paths:
       tags:
       - ai-controller
       summary: Preview note extraction (no persistence)
-      description: "Runs AI extraction for the selected layout points and returns\
-        \ the suggested new note title, new note content, and updated original note\
-        \ content without persisting any changes."
+      description: "Runs AI extraction for the selected refinement layout items and\
+        \ returns the suggested new note title, new note content, and updated original\
+        \ note content without persisting any changes."
       operationId: extractNotePreview
       parameters:
       - name: note

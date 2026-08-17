@@ -92,9 +92,9 @@ class AiControllerExtractNotePreviewTest extends ControllerTestBase {
       String instructions = params.rawParams().instructions().orElse("");
       assertThat(params.rawParams().maxOutputTokens()).isEqualTo(Optional.of(3000L));
       assertThat(instructions)
-          .contains("Full note layout:")
+          .contains("Full refinement layout:")
           .contains("\"id\" : \"p1-1\"")
-          .contains("Selected layout item ids to extract together")
+          .contains("Selected refinement layout item ids to extract together")
           .contains("[p1-1, p2]")
           .contains("- p1-1: \"key suggestion to extract\"")
           .contains("- p2: \"Other point\"")

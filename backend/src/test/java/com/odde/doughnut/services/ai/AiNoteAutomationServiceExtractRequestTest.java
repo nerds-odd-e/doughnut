@@ -86,9 +86,9 @@ class AiNoteAutomationServiceExtractRequestTest {
     assertThat(format).containsKey("schema");
 
     String instructions = body.get("instructions").toString();
-    assertThat(instructions).contains("Full note layout:");
+    assertThat(instructions).contains("Full refinement layout:");
     assertThat(instructions).contains("\"id\" : \"p1-1\"");
-    assertThat(instructions).contains("Selected layout item ids to extract together");
+    assertThat(instructions).contains("Selected refinement layout item ids to extract together");
     assertThat(instructions).contains("[p1-1, p2]");
     assertThat(instructions).contains("- p1-1: \"key suggestion to extract\"");
     assertThat(instructions).contains("- p2: \"Other point\"");

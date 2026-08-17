@@ -96,7 +96,7 @@ public class AiController {
   }
 
   @Operation(
-      summary = "Remove selected layout points from note content (response only)",
+      summary = "Remove selected refinement layout items from note content (response only)",
       description =
           "Returns AI-regenerated note content in the response. Does not persist the note; the client must save the returned text (for example via the note update API).")
   @PostMapping("/remove-refinement-suggestion/{note}")
@@ -123,7 +123,7 @@ public class AiController {
   @Operation(
       summary = "Preview note extraction (no persistence)",
       description =
-          "Runs AI extraction for the selected layout points and returns the suggested new note title, new note content, and updated original note content without persisting any changes.")
+          "Runs AI extraction for the selected refinement layout items and returns the suggested new note title, new note content, and updated original note content without persisting any changes.")
   @PostMapping("/extract-note-preview/{note}")
   @Transactional
   public NoteExtractionResult extractNotePreview(
@@ -215,7 +215,7 @@ public class AiController {
   private static NoteRefinementLayout validateLayoutSelectionRequest(
       NoteRefinementLayout layout, List<String> selectedItemIds) {
     if (!NoteRefinementLayoutValidator.isValid(layout)) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "layout is invalid");
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "refinement layout is invalid");
     }
     if (selectedItemIds == null || selectedItemIds.isEmpty()) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "selectedItemIds cannot be empty");
@@ -223,7 +223,7 @@ public class AiController {
     if (NoteRefinementLayoutValidator.selectedItems(layout, selectedItemIds).size()
         != selectedItemIds.size()) {
       throw new ResponseStatusException(
-          HttpStatus.BAD_REQUEST, "selectedItemIds must reference layout items");
+          HttpStatus.BAD_REQUEST, "selectedItemIds must reference refinement layout items");
     }
     return layout;
   }

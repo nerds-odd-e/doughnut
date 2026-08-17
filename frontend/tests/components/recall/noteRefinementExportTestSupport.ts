@@ -8,7 +8,7 @@ export const exportBreakdownRequestButtonTitle =
 
 export const sampleExtractExportData = {
   model: "gpt-4",
-  instructions: "Extract selected layout points",
+  instructions: "Extract selected refinement layout items",
   input: "Note content",
   text: {
     format: {

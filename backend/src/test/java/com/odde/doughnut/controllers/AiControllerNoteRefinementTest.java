@@ -92,14 +92,15 @@ class AiControllerNoteRefinementTest extends ControllerTestBase {
       StructuredResponseCreateParams<NoteRefinementLayout> params = paramsCaptor.getValue();
       String instructions = params.rawParams().instructions().orElse("");
       assertThat(instructions)
-          .contains("Return one current-content layout for the note content")
+          .contains("Return one current-content refinement layout for the note content")
           .contains("not alternative breakdown suggestions")
           .contains("Do not create grandchildren")
           .contains("simple standalone wiki-link-only lines")
           .contains("Focus Note content only")
-          .contains("only source for layout items")
+          .contains("only source for refinement layout items")
           .contains("Retrieved Notes are secondary context only")
-          .contains("do not add layout items for content that appears only in Retrieved Notes")
+          .contains(
+              "do not add refinement layout items for content that appears only in Retrieved Notes")
           .contains("Set ledToQuestion to false for every item")
           .doesNotContain("Set ledToQuestion=true");
       assertThat(params.rawParams().text().flatMap(ResponseTextConfig::format)).isPresent();

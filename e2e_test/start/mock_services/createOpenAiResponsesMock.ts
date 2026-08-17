@@ -2,7 +2,7 @@ import type ServiceMocker from '../../support/ServiceMocker'
 import type { MessageToMatch } from './MessageToMatch'
 
 export const REFINEMENT_LAYOUT_INSTRUCTION_PATTERN =
-  '.*Return one current-content layout for the note content.*'
+  '.*Return one current-content refinement layout for the note content.*'
 
 export const refinementLayoutBodyToMatch = {
   instructions: REFINEMENT_LAYOUT_INSTRUCTION_PATTERN,

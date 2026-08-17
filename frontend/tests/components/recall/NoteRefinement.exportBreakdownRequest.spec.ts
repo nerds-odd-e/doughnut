@@ -16,7 +16,8 @@ setupNoteRefinementTests()
 
 const sampleExportData = {
   model: "gpt-4",
-  instructions: "Return one current-content layout for the note content",
+  instructions:
+    "Return one current-content refinement layout for the note content",
   input: "Note content",
   text: {
     format: {
@@ -69,7 +70,7 @@ describe("NoteRefinement export breakdown request", () => {
     expect(textarea.value).toContain('"model"')
     expect(textarea.value).toContain('"instructions"')
     expect(textarea.value).toContain(
-      "Return one current-content layout for the note content"
+      "Return one current-content refinement layout for the note content"
     )
   })
 

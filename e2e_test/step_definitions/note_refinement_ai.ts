@@ -13,10 +13,10 @@ import { mock_services } from '../start'
 import { REFINEMENT_LAYOUT_INSTRUCTION_PATTERN } from '../start/mock_services/createOpenAiResponsesMock'
 
 const EXTRACT_NOTE_INSTRUCTION_PATTERN =
-  '.*extract selected layout points from a note to create one new note.*'
+  '.*extract selected refinement layout items from a note to create one new note.*'
 
-const REMOVE_LAYOUT_POINTS_INSTRUCTION_PATTERN =
-  '.*remove selected layout points from the note content.*'
+const REMOVE_REFINEMENT_LAYOUT_ITEMS_INSTRUCTION_PATTERN =
+  '.*remove selected refinement layout items from the note content.*'
 
 let refinementLayoutInitialOutput: string | null = null
 
@@ -151,7 +151,7 @@ Given(
         .responses()
         .requestMessageMatches({
           role: 'developer',
-          content: REMOVE_LAYOUT_POINTS_INSTRUCTION_PATTERN,
+          content: REMOVE_REFINEMENT_LAYOUT_ITEMS_INSTRUCTION_PATTERN,
         })
         .stubOutputText(reply)
     })

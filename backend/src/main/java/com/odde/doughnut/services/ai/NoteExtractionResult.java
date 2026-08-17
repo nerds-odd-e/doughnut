@@ -8,8 +8,8 @@ import lombok.Data;
 
 @JsonClassDescription(
     """
-    Extract one or more selected layout points from the note into one new note.
-    The selected points will be expanded into a complete note with title and content.
+    Extract one or more selected refinement layout items from the note into one new note.
+    The selected refinement layout items will be expanded into a complete note with title and content.
     The original note's content will be updated with the extracted content removed.
     """)
 @Data

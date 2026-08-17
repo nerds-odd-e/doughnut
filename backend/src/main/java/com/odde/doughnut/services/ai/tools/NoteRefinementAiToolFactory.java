@@ -24,16 +24,16 @@ final class NoteRefinementAiToolFactory {
             : questionLedLayoutGuidance(questionContext);
     return new InstructionAndSchema(
         """
-        Return one current-content layout for the note content, not alternative breakdown suggestions.
+        Return one current-content refinement layout for the note content, not alternative breakdown suggestions.
 
         Context:
         - The user message includes hidden "%s" with a "%s" section and optional "%s" sections.
-        - Build the layout from the Focus Note content only. The Focus Note is the only source for layout items.
-        - Retrieved Notes are secondary context only: use them to clarify scope or ambiguous Focus Note content, but do not add layout items for content that appears only in Retrieved Notes. If a Retrieved Note clarifies a Focus Note section, reflect that in the Focus Note item text.
+        - Build the refinement layout from the Focus Note content only. The Focus Note is the only source for refinement layout items.
+        - Retrieved Notes are secondary context only: use them to clarify scope or ambiguous Focus Note content, but do not add refinement layout items for content that appears only in Retrieved Notes. If a Retrieved Note clarifies a Focus Note section, reflect that in the Focus Note item text.
 
-        The layout must have at most two levels: top-level items and optional child items. Do not create grandchildren.
-        Each item text should describe the Focus Note content represented by that point.
-        Give every item a stable id that is unique within the layout.
+        The refinement layout must have at most two levels: top-level items and optional child items. Do not create grandchildren.
+        Each item text should describe the Focus Note content represented by that refinement layout item.
+        Give every item a stable id that is unique within the refinement layout.
         Set alreadyExtracted to true only for simple standalone wiki-link-only lines that point to content already extracted into another note, for example [[Target note]] or [[Target note|Label]]. These items should be marked Already extracted in the UI but remain selectable.
         %s
         """
@@ -77,8 +77,8 @@ final class NoteRefinementAiToolFactory {
     }
     return """
         %s
-        When building the layout:
-        - Separate content points that led to or are tested by this question as distinct layout items at the appropriate hierarchy level (top-level or child).
+        When building the refinement layout:
+        - Separate content points that led to or are tested by this question as distinct refinement layout items at the appropriate hierarchy level (top-level or child).
         - Set ledToQuestion=true on those items that capture the knowledge the question was testing or that led to this question.
         - Set ledToQuestion=false on all other items.
         """
@@ -95,22 +95,22 @@ final class NoteRefinementAiToolFactory {
     String selectedItemsBlock = formatSelectedItemsForPrompt(layout, selectedItemIds);
     String instruction =
         """
-        You need to remove selected layout points from the note content. Carefully identify and completely remove all content related to each selected point. After removal, rewrite the remaining content into coherent, well-structured markdown while preserving all other information.
+        You need to remove selected refinement layout items from the note content. Carefully identify and completely remove all content related to each selected refinement layout item. After removal, rewrite the remaining content into coherent, well-structured markdown while preserving all other information.
 
-        Full note layout:
+        Full refinement layout:
         %s
 
-        Selected layout item ids to remove: %s
+        Selected refinement layout item ids to remove: %s
 
-        Selected item texts:
+        Selected refinement layout item texts:
         %s
 
         Important guidelines:
-        1. Identify content that matches or relates to each selected layout point listed above
-        2. Completely remove all sentences, paragraphs, or sections that contain or relate to these selected points
-        3. Selected points may be non-contiguous; keep unrelated content unchanged
+        1. Identify content that matches or relates to each selected refinement layout item listed above
+        2. Completely remove all sentences, paragraphs, or sections that contain or relate to these selected refinement layout items
+        3. Selected refinement layout items may be non-contiguous; keep unrelated content unchanged
         4. Ensure the remaining content flows naturally and maintains coherence
-        5. Items marked alreadyExtracted in the layout are still valid user selections; remove their represented content as requested
+        5. Items marked alreadyExtracted in the refinement layout are still valid user selections; remove their represented content as requested
         6. Output only the new content in markdown format
         """
             .formatted(layoutJson, selectedItemIds, selectedItemsBlock);
@@ -123,19 +123,19 @@ final class NoteRefinementAiToolFactory {
     String selectedItemsBlock = formatSelectedItemsForPrompt(layout, selectedItemIds);
     String instruction =
         """
-        You are helping extract selected layout points from a note to create one new note.
+        You are helping extract selected refinement layout items from a note to create one new note.
 
-        Full note layout:
+        Full refinement layout:
         %s
 
-        Selected layout item ids to extract together into one new note: %s
+        Selected refinement layout item ids to extract together into one new note: %s
 
-        Selected item texts:
+        Selected refinement layout item texts:
         %s
 
         Tasks:
-        1. Generate a concise, meaningful title for the new note based on the selected points
-        2. Identify the related content in the current note for these selected points (they may be non-contiguous)
+        1. Generate a concise, meaningful title for the new note based on the selected refinement layout items
+        2. Identify the related content in the current note for these selected refinement layout items (they may be non-contiguous)
         3. Move that content to the new note's content
         4. Remove the extracted content from the current note
 
@@ -144,7 +144,7 @@ final class NoteRefinementAiToolFactory {
         - Do not add new information that was not in the original content
         - Keep all unrelated parts of the current note unchanged
         - Ensure the remaining content in current note still reads naturally after removing non-contiguous selections
-        - Items marked alreadyExtracted in the layout are still valid user selections; extract their represented content as requested
+        - Items marked alreadyExtracted in the refinement layout are still valid user selections; extract their represented content as requested
         - You receive focus-note context plus related notes. Prefer replacing the removed content in the original note with a natural contextual wiki link to the new note.
         - Do not add YAML frontmatter or metadata properties, such as parent:, merely to backlink the new note to the original note.
         - Include YAML frontmatter in the new note only when it is part of the extracted content itself or clearly semantically necessary.

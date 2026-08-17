@@ -73,7 +73,9 @@ describe("NoteRefinement export extract request", () => {
     expect(textarea).toBeTruthy()
     expect(textarea!.value).toContain('"model"')
     expect(textarea!.value).toContain('"instructions"')
-    expect(textarea!.value).toContain("Extract selected layout points")
+    expect(textarea!.value).toContain(
+      "Extract selected refinement layout items"
+    )
   })
 
   it("does not show export button on the extraction preview screen", async () => {

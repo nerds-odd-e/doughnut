@@ -17,13 +17,13 @@ public class NoteRefinementLayoutItem {
   @NotBlank
   @JsonProperty(required = true)
   @JsonPropertyDescription(
-      "Stable unique id for this layout item. Must be unique across the entire layout.")
+      "Stable unique id for this refinement layout item. Must be unique across the entire refinement layout.")
   public String id;
 
   @NotBlank
   @JsonProperty(required = true)
   @JsonPropertyDescription(
-      "The Focus Note content represented by this layout item. Do not represent content that appears only in Retrieved Notes.")
+      "The Focus Note content represented by this refinement layout item. Do not represent content that appears only in Retrieved Notes.")
   public String text;
 
   @JsonProperty(required = true)
@@ -40,6 +40,6 @@ public class NoteRefinementLayoutItem {
   @NotNull
   @JsonProperty(required = true)
   @JsonPropertyDescription(
-      "Child layout items. Only top-level items may have children; child items must have an empty children array. Grandchildren are prohibited.")
+      "Child refinement layout items. Only top-level items may have children; child items must have an empty children array. Grandchildren are prohibited.")
   public List<NoteRefinementLayoutItem> children = List.of();
 }
