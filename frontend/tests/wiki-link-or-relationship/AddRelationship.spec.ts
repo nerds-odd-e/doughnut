@@ -216,7 +216,7 @@ describe("AddRelationshipFinalize", () => {
       path: { notebook: sourceRealm.notebookRealm.notebook.id },
       body: expect.objectContaining({
         newTitle: expectedTitle,
-        content: expect.stringContaining("relation:"),
+        content: expect.stringContaining("type: Relationship"),
       }),
     })
     expect(routerReplace).toHaveBeenCalledWith(

@@ -60,7 +60,7 @@ Feature: Add relationship
     When I open the relationship from "Sedition" to "Sedation"
     Then I should be on the relationship note page from "Sedition" with relation "similar to" to "Sedation"
     When I open the note content markdown editor
-    Then the note content markdown source should contain "type: relationship"
+    Then the note content markdown source should contain "type: Relationship"
     And the note content markdown source should contain "relation: similar-to"
     And the note content markdown source should contain 'source: "[[Sedition]]"'
     And the note content markdown source should contain 'target: "[[Sedation care: Sedation]]"'

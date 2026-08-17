@@ -1,6 +1,6 @@
 # Plan: Note concept type
 
-**Status:** in progress (slice 7 next)
+**Status:** in progress (slice 8 next)
 
 **Goal:** Ordinary notes persist `type: Note`. Relationship notes persist `type: Relationship`. Existing `note.content` is backfilled. ADRs describe that stored shape.
 
@@ -58,13 +58,11 @@ Glossary **Relationship note** is `type: Relationship`. ADR 0004 Decision uses t
 
 **Learnings:** 0001 file already said Approved; only the index was stale. Do not rename to `*-accepted.md` in this plan.
 
-### 7. Adding a relationship writes type: Relationship — Behavior — planned
+### 7. Adding a relationship writes type: Relationship — Behavior — done
 
-**Pre:** Two notes; add a relationship.  
-**Trigger:** Create the relationship note.  
-**Post:** Composed markdown has `type: Relationship`. Reads still match case-insensitively.
+`formatRelationshipNoteMarkdown` (`relationshipNoteCompose.ts`) writes `type: Relationship`. E2E `add_relationship.feature` and AddRelationship create-payload test assert that spelling. Save/backfill/reads unchanged (lowercase still matches).
 
-E2E: `add_relationship.feature`. Frontend compose + fixtures that assert composed markdown. Do not normalize on save. Do not backfill.
+**Learnings:** One compose constant `NOTE_TYPE`. Slice 8 canonicalizes on save; do not change compose again.
 
 ### 8. Saving a Doughnut type canonicalizes its spelling — Behavior — planned
 

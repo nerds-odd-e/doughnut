@@ -1,7 +1,7 @@
 import { relationKebabFromLabel } from "@/models/relationTypeOptions"
 import type { RelationTypeLabel } from "@/models/relationTypeOptions"
 
-const NOTE_TYPE = "relationship"
+const NOTE_TYPE = "Relationship"
 const UNTITLED = "Untitled"
 const DEFAULT_RELATION_LABEL = "related to"
 /** Matches backend `Note.MAX_TITLE_LENGTH`. */
