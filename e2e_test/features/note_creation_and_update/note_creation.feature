@@ -23,10 +23,7 @@ Feature: Nested Note creation
       | team         |
       | tech         |
       | Re-quirement |
-
-  Scenario: Creating a title-only note stores type Note
-    When I create a note with title "Re-quirement" under the folder "LeSS in Action" in the notebook "LeSS training"
-    And I open the note content markdown editor
+    When I open the note content markdown editor on note "Re-quirement"
     Then the note content markdown source should contain "type: Note"
 
   Scenario: Create a note with empty title is rejected
@@ -53,8 +50,5 @@ Feature: Nested Note creation
   Scenario: Create note under current note as parent
     When I create a note titled "Child topic" from note "Course intro" with relationship "Under current"
     Then I should see rich note property "parent" with value "[[Course intro]]"
-
-  Scenario: Creating a note under current stores type Note
-    When I create a note titled "Child topic" from note "Course intro" with relationship "Under current"
-    And I open the note content markdown editor
+    When I open the note content markdown editor
     Then the note content markdown source should contain "type: Note"

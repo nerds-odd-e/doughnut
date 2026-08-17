@@ -1,6 +1,6 @@
 # Plan: Note stored type leftover
 
-**Status:** in progress (slices 1–2 done)
+**Status:** in progress (slices 1–3 done)
 
 **Goal:** Every product write of `note.content` keeps a leading stored type. Tests pin that once per boundary, not twice.
 
@@ -25,13 +25,11 @@ Wikidata location prepend lands in the body after a closed `type: Note` fence. A
 
 **Learning:** the original-note write was the remaining persist hole; renaming `persistCreatedNoteContent` → `persistNoteContent` matches both callers.
 
-### 3. Drop persist tests that only re-pin the helper YAML — Structure — planned
+### 3. Drop persist tests that only re-pin the helper YAML — Structure — done
 
-Enables a smaller leftover surface for slice 4. Existing tests still pass; no product change.
+Deleted controller siblings that only re-pinned helper YAML (empty wrap, insert-type-first, canonicalize `relationship`). Kept `shouldBeAbleToSaveNoteWhenValid` and already-typed frontmatter. Folded `type: Note` into the two existing create scenarios in `note_creation.feature` after their original post-conditions. Left `note_edit.feature` and `add_relationship.feature` alone.
 
-Delete controller tests that duplicate `NoteConceptTypeTest`: empty wrap, insert-type-first on save, canonicalize `relationship` on save. Keep `shouldBeAbleToSaveNoteWhenValid` (save wiring) and already-typed frontmatter round-trip.
-
-Fold E2E `type: Note` into the existing create scenarios in `note_creation.feature`; delete the two dedicated sibling scenarios that only re-create to assert type. Keep `note_edit.feature` save-without-frontmatter and `add_relationship.feature`.
+**Learning:** folder-create navigates away from the note page, so the type check must reopen the editor on the created note rather than sitting between tree and folder assertions.
 
 ### 4. Relationship test composers write type: Relationship — Structure — planned
 

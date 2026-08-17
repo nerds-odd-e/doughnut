@@ -31,13 +31,6 @@ class TextContentControllerUpdateNoteContentTests extends TextContentControllerT
   }
 
   @Test
-  void wrapsEmptyContentWithOrdinaryNoteType() throws UnexpectedNoAccessRightException {
-    assertThat(
-        controller.updateNoteContent(note, contentDto("")).getNote().getContent(),
-        equalTo(ORDINARY_NOTE_FENCE));
-  }
-
-  @Test
   void preservesLeadingYamlFrontmatterInContent() throws UnexpectedNoAccessRightException {
     String contentWithFrontmatter =
         """
@@ -57,44 +50,6 @@ class TextContentControllerUpdateNoteContentTests extends TextContentControllerT
             .getNote()
             .getContent(),
         equalTo(contentWithFrontmatter));
-  }
-
-  @Test
-  void insertsOrdinaryNoteTypeFirstWhenSavingAliasesFenceWithoutType()
-      throws UnexpectedNoAccessRightException {
-    String content =
-        """
-        ---
-        aliases:
-          - color
-          - hue
-        ---
-
-        body
-        """;
-    assertThat(
-        controller.updateNoteContent(note, contentDto(content)).getNote().getContent(),
-        equalTo(
-            """
-            ---
-            type: Note
-            aliases:
-              - color
-              - hue
-            ---
-
-            body
-            """));
-  }
-
-  @Test
-  void canonicalizesLowercaseRelationshipTypeWhenSaving() throws UnexpectedNoAccessRightException {
-    assertThat(
-        controller
-            .updateNoteContent(note, contentDto("---\ntype: relationship\n---\n"))
-            .getNote()
-            .getContent(),
-        equalTo("---\ntype: Relationship\n---\n"));
   }
 
   @Test
