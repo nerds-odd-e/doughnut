@@ -4,7 +4,7 @@ import type { createRichMarkdownEditorTestHarness } from "./richMarkdownEditorTe
 type Harness = ReturnType<typeof createRichMarkdownEditorTestHarness>
 
 const RELATION_NOTE = (relation: string) =>
-  `---\nrelation: ${relation}\ntype: relationship\n---\n\nBody`
+  `---\nrelation: ${relation}\ntype: Relationship\n---\n\nBody`
 
 export function editorRoot(h: Harness): HTMLElement {
   return h.getWrapper().element as HTMLElement

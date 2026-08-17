@@ -3,7 +3,7 @@ import { relationTypeLabelFromNoteContent } from "@/models/relationTypeOptions"
 
 describe("relationTypeLabelFromNoteContent", () => {
   it("returns label for valid relation kebab in frontmatter", () => {
-    const md = "---\nrelation: similar-to\ntype: relationship\n---\nbody\n"
+    const md = "---\nrelation: similar-to\ntype: Relationship\n---\nbody\n"
     expect(relationTypeLabelFromNoteContent(md)).toBe("similar to")
   })
 
@@ -13,7 +13,7 @@ describe("relationTypeLabelFromNoteContent", () => {
   })
 
   it("returns undefined when relation key is absent", () => {
-    const md = "---\ntype: relationship\n---\n"
+    const md = "---\ntype: Relationship\n---\n"
     expect(relationTypeLabelFromNoteContent(md)).toBeUndefined()
   })
 

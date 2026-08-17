@@ -5,7 +5,7 @@ import com.odde.doughnut.entities.Notebook;
 
 /** Builds relationship-note frontmatter markdown for test fixtures. */
 public final class RelationshipNoteMarkdown {
-  private static final String RELATIONSHIP_NOTE_TYPE = "relationship";
+  private static final String RELATIONSHIP_NOTE_TYPE = "Relationship";
   private static final String UNTITLED = "Untitled";
   private static final String DEFAULT_RELATION_LABEL = "related to";
 

@@ -5,7 +5,7 @@ export function relationshipNoteContent(
   targetLink: string
 ): string {
   return `---
-type: relationship
+type: Relationship
 relation: ${relationKebab}
 source: "${sourceLink.replace(/"/g, '\\"')}"
 target: "${targetLink.replace(/"/g, '\\"')}"

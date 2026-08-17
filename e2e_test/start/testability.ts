@@ -127,7 +127,7 @@ function relationshipNoteMarkdown(
     s.replace(/\\/g, '\\\\').replace(/"/g, '\\"')
   const suffix = bodySuffix?.trim() ? `\n${bodySuffix.trim()}\n` : ''
   return `---
-type: relationship
+type: Relationship
 relation: ${relationKebab}
 source: "${yamlEscape(sourceLink)}"
 target: "${yamlEscape(targetLink)}"

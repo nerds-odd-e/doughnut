@@ -43,7 +43,7 @@ describe("qualifyRelationNoteForReduceOnDelete", () => {
   it("returns undefined when relation label cannot be derived", () => {
     const realm = makeMe.aNoteRealm
       .content(`---
-type: relationship
+type: Relationship
 source: "[[Moon]]"
 target: "[[Earth]]"
 ---

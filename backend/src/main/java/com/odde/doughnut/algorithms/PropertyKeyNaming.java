@@ -90,7 +90,7 @@ public final class PropertyKeyNaming {
   }
 
   /**
-   * Frontmatter keys that define relationship note structure ({@code type: relationship},
+   * Frontmatter keys that define relationship note structure ({@code type: Relationship},
    * endpoints).
    */
   public static boolean isRelationshipNoteStructuralPropertyKey(String key) {
