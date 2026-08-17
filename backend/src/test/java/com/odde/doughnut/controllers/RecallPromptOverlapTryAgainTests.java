@@ -72,6 +72,14 @@ class RecallPromptOverlapTryAgainTests extends RecallPromptControllerTestBase {
   }
 
   @Test
+  void overlapAnswerDoesNotWriteARecallLog() throws UnexpectedNoAccessRightException {
+    AnsweredQuestion result = answerSpelling(memoryTracker, "Shared Title");
+
+    assertThat(result.getAnswer().getOutcome(), is(AnswerOutcome.OVERLAP));
+    assertThat(memoryTrackerController.getRecallLogs(memoryTracker), empty());
+  }
+
+  @Test
   void shouldLeaveOverlapPartnerTrackerUnchangedAndUnlinked()
       throws UnexpectedNoAccessRightException {
     MemoryTracker partnerTracker = ownedSpellingTracker(partnerNote);

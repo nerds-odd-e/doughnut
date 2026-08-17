@@ -1,6 +1,6 @@
 # Plan: RecallLog
 
-**Status:** in progress (slice 5 next)
+**Status:** in progress (slice 6 next)
 
 **Goal:** Memory-state transitions are a RecallLog. Prompt submissions stay `answer`. Tutor Feedback is a log row, not a session bag.
 
@@ -31,11 +31,9 @@ Unsuccessful `markAsRecalled` already wrote `AGAIN`. Tests assert the second log
 
 Prompt grade callers pass the persisted `Answer` into `markAsRecalled`. MCQ pins GOOD/`AGAIN` + `answer_id`; spelling correct asserts the link. Just-review still null. Accidental-match may already get `answer_id` (slice 6). Overlap still does not call `markAsRecalled`.
 
-### 5. Overlap does not write a RecallLog — Behavior — planned
+### 5. Overlap does not write a RecallLog — Behavior — done
 
-**Pre:** Spelling overlap with a declared overlap note.  
-**Trigger:** Submit the overlapping answer.  
-**Post:** Answer exists with outcome `OVERLAP`. Prompted tracker has no new RecallLog. Schedule fields unchanged (existing overlap tests stay the canonical schedule assertion).
+Overlap still does not call `markAsRecalled`. Controller test pins `OVERLAP` + no log. Schedule stays in the canonical overlap test.
 
 ### 6. Accidental-match primary logs AGAIN on the answer — Behavior — planned
 
