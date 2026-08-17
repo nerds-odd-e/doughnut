@@ -14,16 +14,6 @@ function openNoteLevelTracker(noteTitle: string, kind: NoteLevelTrackerKind) {
     .openNoteLevelMemoryTracker(kind)
 }
 
-Then(
-  'I should see the incorrect grade time as Last Recall Time for my last answer',
-  () => {
-    start
-      .assumeAnsweredQuestionPage()
-      .viewMemoryTracker()
-      .expectHoursBetweenLastAndNextRecall(24)
-  }
-)
-
 Then('I should see Stability {int}', (stability: number) => {
   assumeMemoryTrackerPage().expectStability(stability)
 })

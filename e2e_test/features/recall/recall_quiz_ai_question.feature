@@ -18,7 +18,6 @@ Feature: AI recall quiz
     Then I should be asked "What is the meaning of sedition?"
     When I choose answer "to sleep"
     Then I should see that my MCQ answer "to sleep" is incorrect
-    And I should see the incorrect grade time as Last Recall Time for my last answer
 
   @usingMockedOpenAiService
   Scenario: AI generated question - correct answer

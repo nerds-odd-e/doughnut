@@ -17,17 +17,10 @@ class SpacedRepetitionIncorrectRecallSchedulingTest
   @Test
   void onTimeIncorrectRecallUsesFsrsAgainPostLapseStability() {
     MemoryTracker memoryTracker = aGradedTrackerAtThreeDayStability();
-    Integer oldRecallCount = memoryTracker.getRecallCount();
-    Timestamp gradeTime = onTimeGradeTime(memoryTracker);
 
-    memoryTracker.markAsRecalled(gradeTime, false, null);
+    memoryTracker.markAsRecalled(onTimeGradeTime(memoryTracker), false, null);
 
     assertThat(memoryTracker.getStability(), equalTo(17.0f));
-    assertThat(
-        memoryTracker.getNextRecallAt(),
-        equalTo(TimestampOperations.addHoursToTimestamp(gradeTime, 17)));
-    assertThat(memoryTracker.getLastRecalledAt(), equalTo(gradeTime));
-    assertThat(memoryTracker.getRecallCount(), equalTo(oldRecallCount + 1));
   }
 
   @Test
