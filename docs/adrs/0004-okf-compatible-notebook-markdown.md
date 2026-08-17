@@ -27,8 +27,11 @@ profile. Codec round-trips must be lossless for these rules.
 
 - One notebook ↔ one OKF bundle (directory of `.md` files).
 - Public concept ID = path without `.md` (OKF).
-- Ordinary notes use `type: Note` and valid YAML frontmatter. Preserve
-  author-owned and unknown frontmatter on round-trip.
+- Stored note markdown carries `type` and valid YAML frontmatter.
+  Ordinary notes use `type: Note`. Relationship notes are concepts in
+  the bundle (`type: relationship`). OKF unknown types are allowed.
+  Preserve author-owned and unknown frontmatter keys on persist and
+  round-trip.
 - Reserved basenames: `index.md` (directory listing / folder readme) and
   `log.md`. Concept files must not use those names.
 - Folder readmes map to that directory’s `index.md`. Empty folders exist in
