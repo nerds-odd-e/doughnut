@@ -37,7 +37,7 @@ export function useNoteRefinementLayout(
   const storageAccessor = useStorageAccessor()
 
   const layoutSelectionBody = () => ({
-    layout: { items: refinementLayoutItems.value },
+    refinementLayout: { items: refinementLayoutItems.value },
     selectedItemIds: selectedItemIds.value,
   })
 

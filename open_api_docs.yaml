@@ -4241,7 +4241,7 @@ components:
           - pdf
           - epub
           minLength: 1
-        layout:
+        bookLayout:
           $ref: "#/components/schemas/AttachBookLayoutRequest_Full"
           description: Nested book layout. Omit when sending contentList instead.
             Exactly one of this (non-empty roots) or contentList is required for PDF.
@@ -4577,7 +4577,7 @@ components:
     NoteRefinementLayoutSelectionRequestDTO:
       type: object
       properties:
-        layout:
+        refinementLayout:
           $ref: "#/components/schemas/NoteRefinementLayout"
         selectedItemIds:
           type: array

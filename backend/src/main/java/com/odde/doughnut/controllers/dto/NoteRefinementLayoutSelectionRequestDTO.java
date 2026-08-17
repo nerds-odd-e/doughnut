@@ -8,6 +8,6 @@ import lombok.Setter;
 @Setter
 @Getter
 public class NoteRefinementLayoutSelectionRequestDTO {
-  public NoteRefinementLayout layout;
+  public NoteRefinementLayout refinementLayout;
   public List<String> selectedItemIds;
 }

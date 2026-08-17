@@ -48,7 +48,7 @@ final class AiControllerExtractNoteTestSupport {
       NoteRefinementLayout layout, List<String> selectedItemIds) {
     NoteRefinementLayoutSelectionRequestDTO requestDTO =
         new NoteRefinementLayoutSelectionRequestDTO();
-    requestDTO.setLayout(layout);
+    requestDTO.setRefinementLayout(layout);
     requestDTO.setSelectedItemIds(selectedItemIds);
     return requestDTO;
   }

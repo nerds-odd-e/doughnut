@@ -78,14 +78,14 @@ export function refinementLayoutSelectionApiCall(
   const call: {
     path: { note: number }
     body: {
-      layout: { items: NoteRefinementLayoutItem[] }
+      refinementLayout: { items: NoteRefinementLayoutItem[] }
       selectedItemIds: string[]
     }
     signal?: AbortSignal
   } = {
     path: { note: noteId },
     body: {
-      layout: { items },
+      refinementLayout: { items },
       selectedItemIds,
     },
   }

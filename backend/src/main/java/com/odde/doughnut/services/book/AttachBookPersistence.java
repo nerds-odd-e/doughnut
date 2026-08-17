@@ -60,7 +60,7 @@ final class AttachBookPersistence {
 
     var book = newBook(ctx, BOOK_FORMAT_PDF);
 
-    List<AttachBookLayoutNodeRequest> roots = ctx.request().getLayout().getRoots();
+    List<AttachBookLayoutNodeRequest> roots = ctx.request().getBookLayout().getRoots();
     IdentityHashMap<AttachBookLayoutNodeRequest, BookBlock> nodeToBlock = new IdentityHashMap<>();
     int[] seq = {0};
     for (AttachBookLayoutNodeRequest root : roots) {

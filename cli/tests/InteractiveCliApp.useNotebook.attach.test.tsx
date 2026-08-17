@@ -49,7 +49,7 @@ describe('InteractiveCliApp /use notebook /attach', () => {
       ok: true,
       outline: 'o',
       source: 's',
-      layout: {
+      bookLayout: {
         roots: [
           {
             title: 'Part One',

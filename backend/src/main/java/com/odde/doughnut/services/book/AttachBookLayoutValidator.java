@@ -36,7 +36,7 @@ final class AttachBookLayoutValidator {
       if (built.getRoots().isEmpty()) {
         throw bindingError("contentList produced no book layout blocks");
       }
-      request.setLayout(built);
+      request.setBookLayout(built);
       layoutRoots = built.getRoots();
     }
 
@@ -84,7 +84,7 @@ final class AttachBookLayoutValidator {
   }
 
   private static List<AttachBookLayoutNodeRequest> layoutRootsOrNull(AttachBookRequest request) {
-    AttachBookLayoutRequest layout = request.getLayout();
+    AttachBookLayoutRequest layout = request.getBookLayout();
     return layout != null && layout.getRoots() != null ? layout.getRoots() : null;
   }
 

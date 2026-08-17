@@ -110,7 +110,7 @@ public class AiController {
 
     assertNoteContentNotEmpty(note);
     NoteRefinementLayout layout =
-        validateLayoutSelectionRequest(request.getLayout(), request.getSelectedItemIds());
+        validateLayoutSelectionRequest(request.getRefinementLayout(), request.getSelectedItemIds());
 
     String newContent =
         notebookAssistantForNoteServiceFactory
@@ -179,7 +179,7 @@ public class AiController {
     authorizationService.assertAuthorization(note);
     assertNoteContentNotEmpty(note);
     NoteRefinementLayout layout =
-        validateLayoutSelectionRequest(request.getLayout(), request.getSelectedItemIds());
+        validateLayoutSelectionRequest(request.getRefinementLayout(), request.getSelectedItemIds());
     StructuredResponseCreateParams<NoteExtractionResult> params =
         notebookAssistantForNoteServiceFactory
             .createNoteAutomationService(note)
@@ -193,7 +193,7 @@ public class AiController {
     authorizationService.assertAuthorization(note);
     assertNoteContentNotEmpty(note);
     NoteRefinementLayout layout =
-        validateLayoutSelectionRequest(request.getLayout(), request.getSelectedItemIds());
+        validateLayoutSelectionRequest(request.getRefinementLayout(), request.getSelectedItemIds());
     NoteExtractionResult aiResult =
         notebookAssistantForNoteServiceFactory
             .createNoteAutomationService(note)

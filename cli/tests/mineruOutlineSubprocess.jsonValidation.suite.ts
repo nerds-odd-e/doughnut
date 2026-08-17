@@ -11,7 +11,7 @@ export function describeMineruOutlineSubprocessJsonValidation(): void {
   describe('runMineruOutlineSubprocess JSON validation', () => {
     useMineruOutlineSubprocessFixture()
 
-    test('fails when stdout JSON includes both layout and contentList', async () => {
+    test('fails when stdout JSON includes both bookLayout and contentList', async () => {
       fakeChild((child) => {
         setImmediate(() => {
           child.stdout!.end(
@@ -19,7 +19,7 @@ export function describeMineruOutlineSubprocessJsonValidation(): void {
               ok: true,
               outline: 'x',
               source: 'y',
-              layout: {
+              bookLayout: {
                 roots: [{ title: 'A' }],
               },
               contentList: [
@@ -39,12 +39,12 @@ export function describeMineruOutlineSubprocessJsonValidation(): void {
 
       expect(result).toEqual({
         ok: false,
-        error: 'cannot send both layout and contentList in outline JSON',
+        error: 'cannot send both bookLayout and contentList in outline JSON',
         exitCode: 0,
       })
     })
 
-    test('fails when layout.roots is empty', async () => {
+    test('fails when bookLayout.roots is empty', async () => {
       fakeChild((child) => {
         setImmediate(() => {
           child.stdout!.end(
@@ -52,7 +52,7 @@ export function describeMineruOutlineSubprocessJsonValidation(): void {
               ok: true,
               outline: 'x',
               source: 'y',
-              layout: { roots: [] },
+              bookLayout: { roots: [] },
             })
           )
           child.stderr!.end('')
@@ -67,7 +67,7 @@ export function describeMineruOutlineSubprocessJsonValidation(): void {
 
       expect(result).toEqual({
         ok: false,
-        error: 'layout.roots must be a non-empty array',
+        error: 'bookLayout.roots must be a non-empty array',
         exitCode: 0,
       })
     })

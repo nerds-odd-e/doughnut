@@ -30,7 +30,7 @@ public class AttachBookRequest {
       description =
           "Nested book layout. Omit when sending contentList instead. Exactly one of this"
               + " (non-empty roots) or contentList is required for PDF.")
-  private AttachBookLayoutRequest layout;
+  private AttachBookLayoutRequest bookLayout;
 
   @Schema(
       requiredMode = Schema.RequiredMode.NOT_REQUIRED,

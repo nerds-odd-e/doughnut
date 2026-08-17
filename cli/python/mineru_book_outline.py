@@ -10,7 +10,7 @@ EPUB: MinerU does not accept EPUB. For `.epub` we walk the OPF spine and collect
 MinerU writes `{stem}_content_list.json` (not `document_content_list.json`).
 
 With `--json-result`, stdout is one JSON object with `outline`, optional `note`, and either
-`contentList` (MinerU `content_list` array for PDFs parsed from content_list) or `layout` with
+`contentList` (MinerU `content_list` array for PDFs parsed from content_list) or `bookLayout` with
 nested `roots` / `children` (EPUB or PDF middle.json fallback) for `POST …/attach-book`. Logs stay
 on stderr.
 
@@ -156,7 +156,7 @@ def find_middle_json(output_dir: Path, stem: str) -> Path | None:
 
 
 def layout_roots_from_heading_records(records: list[dict[str, Any]]) -> list[dict[str, Any]]:
-    """Build nested layout nodes (attach-book ``layout.roots``) from headings in reading order.
+    """Build nested layout nodes (attach-book ``bookLayout.roots``) from headings in reading order.
 
     The heading record is stored as contentBlocks[0] (the structural title block whose raw
     data becomes contentLocators[0] on the server after attach). Layout nodes do not carry a
@@ -380,12 +380,12 @@ def run_pdf(
                 "contentList": raw_cl,
             }
         else:
-            layout_payload = {"roots": layout_roots_from_heading_records(records)}
+            book_layout_payload = {"roots": layout_roots_from_heading_records(records)}
             payload = {
                 "ok": True,
                 "outline": "\n".join(outline),
                 "source": source,
-                "layout": layout_payload,
+                "bookLayout": book_layout_payload,
             }
         _print_json_result(payload)
     else:
@@ -449,14 +449,14 @@ def main() -> int:
                 print(f"{epub_note}.", file=sys.stderr)
             return 0
         outline = [f"[L{r['level']} s{r['spine_index']}] {r['title']}" for r in epub_records]
-        layout_payload = {"roots": layout_roots_from_heading_records(epub_records)}
+        book_layout_payload = {"roots": layout_roots_from_heading_records(epub_records)}
         if json_mode:
             _print_json_result(
                 {
                     "ok": True,
                     "outline": "\n".join(outline),
                     "source": epub_note,
-                    "layout": layout_payload,
+                    "bookLayout": book_layout_payload,
                 }
             )
         else:

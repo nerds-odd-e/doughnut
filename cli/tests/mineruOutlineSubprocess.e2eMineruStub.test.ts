@@ -47,7 +47,7 @@ describe('mineru_book_outline.py with E2E shadow mineru (PYTHONPATH)', () => {
     expect(result.ok).toBe(true)
     if (!result.ok) return
     expect(result.outline).toContain('[L2 p0] Code Refactoring')
-    expect(result.layout).toBeUndefined()
+    expect(result.bookLayout).toBeUndefined()
     const cl = result.contentList
     expect(Array.isArray(cl)).toBe(true)
     expect((cl?.length ?? 0) > 2).toBe(true)

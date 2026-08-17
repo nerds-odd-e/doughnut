@@ -70,11 +70,12 @@ async function runPdfAttach(
   }
   const hasContentList =
     minerResult.contentList !== undefined && minerResult.contentList.length > 0
-  const hasLayout =
-    minerResult.layout !== undefined && minerResult.layout.roots.length > 0
-  if (!(hasContentList || hasLayout)) {
+  const hasBookLayout =
+    minerResult.bookLayout !== undefined &&
+    minerResult.bookLayout.roots.length > 0
+  if (!(hasContentList || hasBookLayout)) {
     throw new Error(
-      'Outline script did not return contentList or layout.roots; attach requires MinerU outline JSON from the Python script.'
+      'Outline script did not return contentList or bookLayout.roots; attach requires MinerU outline JSON from the Python script.'
     )
   }
 
@@ -83,7 +84,7 @@ async function runPdfAttach(
     notebook.id,
     hasContentList
       ? { bookName, format: 'pdf', contentList: minerResult.contentList }
-      : { bookName, format: 'pdf', layout: minerResult.layout },
+      : { bookName, format: 'pdf', bookLayout: minerResult.bookLayout },
     absPath
   )
   return { assistantMessage: attachedBookAssistantMessage(book) }

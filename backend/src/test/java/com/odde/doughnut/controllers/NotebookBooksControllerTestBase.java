@@ -201,7 +201,7 @@ abstract class NotebookBooksControllerTestBase extends ControllerTestBase {
     AttachBookRequest r = new AttachBookRequest();
     r.setBookName("Linear Algebra");
     r.setFormat(BookReadingWireConstants.BOOK_FORMAT_PDF);
-    r.setLayout(layout);
+    r.setBookLayout(layout);
     return r;
   }
 

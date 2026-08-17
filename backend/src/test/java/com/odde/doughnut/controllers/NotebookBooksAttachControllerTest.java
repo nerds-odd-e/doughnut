@@ -168,7 +168,7 @@ class NotebookBooksAttachControllerTest extends NotebookBooksControllerTestBase 
     void rejectsEmptyRoots() {
       Notebook nb = myNotebook();
       AttachBookRequest req = attachRequest();
-      req.getLayout().setRoots(new ArrayList<>());
+      req.getBookLayout().setRoots(new ArrayList<>());
       assertThrows(
           ApiException.class, () -> controller.attachBook(nb, req, pdfFile(STUB_PDF_BYTES)));
     }

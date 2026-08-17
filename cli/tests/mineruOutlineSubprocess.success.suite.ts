@@ -122,8 +122,8 @@ export function describeMineruOutlineSubprocessSuccess(): void {
       if (result.ok) expect(result.contentList).toEqual(contentList)
     })
 
-    test('returns layout when subprocess JSON includes valid layout', async () => {
-      const layout = {
+    test('returns bookLayout when subprocess JSON includes valid bookLayout', async () => {
+      const bookLayout = {
         roots: [
           {
             title: 'Root A',
@@ -139,7 +139,7 @@ export function describeMineruOutlineSubprocessSuccess(): void {
               ok: true,
               outline: 'x',
               source: 'stub',
-              layout,
+              bookLayout,
             })
           )
           child.stderr!.end('')
@@ -153,7 +153,7 @@ export function describeMineruOutlineSubprocessSuccess(): void {
       })
 
       expect(result.ok).toBe(true)
-      if (result.ok) expect(result.layout).toEqual(layout)
+      if (result.ok) expect(result.bookLayout).toEqual(bookLayout)
     })
   })
 }

@@ -578,7 +578,7 @@ export type AttachBookRequestFull = {
     /**
      * Nested book layout. Omit when sending contentList instead. Exactly one of this (non-empty roots) or contentList is required for PDF.
      */
-    layout?: AttachBookLayoutRequestFull;
+    bookLayout?: AttachBookLayoutRequestFull;
     /**
      * MinerU content_list array; server builds the book layout. Mutually exclusive with non-empty book layout roots.
      */
@@ -731,7 +731,7 @@ export type NoteRefinementLayoutItem = {
 };
 
 export type NoteRefinementLayoutSelectionRequestDto = {
-    layout?: NoteRefinementLayout;
+    refinementLayout?: NoteRefinementLayout;
     selectedItemIds?: Array<string>;
 };
 
