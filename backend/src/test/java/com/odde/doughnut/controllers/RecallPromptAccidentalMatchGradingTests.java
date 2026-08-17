@@ -8,22 +8,28 @@ import com.odde.doughnut.controllers.dto.AnswerSpellingDTO;
 import com.odde.doughnut.controllers.dto.AnsweredQuestion;
 import com.odde.doughnut.controllers.dto.NoteTopology;
 import com.odde.doughnut.entities.AnswerOutcome;
+import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.ProductOutcome;
+import com.odde.doughnut.entities.RecallLog;
 import com.odde.doughnut.entities.RecallPrompt;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class RecallPromptAccidentalMatchGradingTests extends RecallPromptControllerTestBase {
 
   Note secondNote;
+  MemoryTracker memoryTracker;
   RecallPrompt recallPrompt;
   AnswerSpellingDTO answerDTO;
 
   @BeforeEach
   void setup() {
     Note answerNote = ownedNote();
-    recallPrompt = spellingPrompt(ownedSpellingTracker(answerNote));
+    memoryTracker = ownedSpellingTracker(answerNote);
+    recallPrompt = spellingPrompt(memoryTracker);
     secondNote =
         makeMe.aNote().notebookOwnedBy(currentUser.getUser()).title("Another Note Title").please();
     answerDTO = spellingAnswer(secondNote.getTitle());
@@ -42,6 +48,16 @@ class RecallPromptAccidentalMatchGradingTests extends RecallPromptControllerTest
     assertThat(answerResult.getMatchedNotes().getFirst().getId(), equalTo(secondNote.getId()));
     assertThat(
         answerResult.getMatchedNotes().getFirst().getTitle(), equalTo(secondNote.getTitle()));
+  }
+
+  @Test
+  void accidentalMatchLeavesAnAgainRecallLogLinkedToTheAnswer()
+      throws UnexpectedNoAccessRightException {
+    AnsweredQuestion answerResult = controller.answerSpelling(recallPrompt, answerDTO);
+
+    List<RecallLog> logs = memoryTrackerController.getRecallLogs(memoryTracker);
+    assertThat(logs.get(0).getProductOutcome(), is(ProductOutcome.AGAIN));
+    assertThat(logs.get(0).getAnswerId(), equalTo(answerResult.getAnswer().getId()));
   }
 
   @Test

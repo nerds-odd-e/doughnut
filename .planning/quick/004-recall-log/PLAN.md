@@ -1,6 +1,6 @@
 # Plan: RecallLog
 
-**Status:** in progress (slice 6 next)
+**Status:** in progress (slice 7 next)
 
 **Goal:** Memory-state transitions are a RecallLog. Prompt submissions stay `answer`. Tutor Feedback is a log row, not a session bag.
 
@@ -35,11 +35,9 @@ Prompt grade callers pass the persisted `Answer` into `markAsRecalled`. MCQ pins
 
 Overlap still does not call `markAsRecalled`. Controller test pins `OVERLAP` + no log. Schedule stays in the canonical overlap test.
 
-### 6. Accidental-match primary logs AGAIN on the answer — Behavior — planned
+### 6. Accidental-match primary logs AGAIN on the answer — Behavior — done
 
-**Pre:** Spelling accidental match (no overlap).  
-**Trigger:** Submit the match.  
-**Post:** Prompted tracker has an `AGAIN` log whose `answer_id` is the accidental-match answer.
+Spelling accidental match already wrote `AGAIN` + `answer_id` (slice 4 path). Controller test pins that delta.
 
 ### 7. Confusion logs CONFUSION on the matched tracker — Behavior — planned
 
