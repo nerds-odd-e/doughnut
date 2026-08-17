@@ -32,6 +32,7 @@ public final class NoteConceptTypeBackfill {
 
     try (PreparedStatement update =
         connection.prepareStatement("UPDATE note SET content = ? WHERE id = ?")) {
+      boolean pending = false;
       for (Row row : rows) {
         String updated = NoteConceptType.ensureStoredType(row.content());
         if (Objects.equals(updated, row.content())) {
@@ -39,7 +40,11 @@ public final class NoteConceptTypeBackfill {
         }
         update.setString(1, updated);
         update.setInt(2, row.id());
-        update.executeUpdate();
+        update.addBatch();
+        pending = true;
+      }
+      if (pending) {
+        update.executeBatch();
       }
     }
   }

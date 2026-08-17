@@ -1,6 +1,6 @@
 # Plan: Note concept type
 
-**Status:** in progress (slice 10 next — waiting on production backfill)
+**Status:** in progress (V300000270 prod backfill — gate `1=1` this deploy)
 
 **Goal:** Ordinary notes persist `type: Note`. Relationship notes persist `type: Relationship`. Existing `note.content` is backfilled. ADRs describe that stored shape.
 
@@ -11,8 +11,8 @@
 - Title-only create initializes `content` via `NoteConceptType.ensureStoredType` in `NoteConstructionService.createNote` (null → leading `type: Note` fence).
 - Leave `makeMe` content defaults alone. Typeless fixtures stay valid for later save/backfill tests.
 - Structure slices sit immediately before the behavior they unlock (ADR 0004 before `type: Note`; ADR 0001 / Relationship spelling before compose).
-- Next Flyway: **V300000269** (`note_concept_type_backfill`). `V300000267`–`V300000268` are taken (004-recall-log).
-- Backfill is **gated** (`1=0` default; `1=1` only on the production deploy). Helper tests are permanent. Gate tests are temporary (slice 10).
+- Flyway: **V300000269** applied on production as a 13ms no-op (`1=0`). **V300000270** is the same helper; do not rewrite 269.
+- Backfill is **gated** (`1=0` in non-prod; `1=1` in `application-prod.yml` for the deploy that first applies 270). Revert prod to `1=0` after that apply. Helper tests are permanent. Gate tests are temporary (slice 10).
 
 ## Slices
 
@@ -76,11 +76,17 @@ Gated Java Flyway `V300000269__backfill_note_concept_type` calls `NoteConceptTyp
 
 Temporary tests: `NoteConceptTypeBackfillTest` (default no-op; enabled updates note, leaves readmes). YAML matrix stays on the helper. STATE records the leftover.
 
-**Learnings:** Gate is a `1=0`/`1=1` flag, not concatenated SQL. Slice 10 waits on human confirmation of production apply + override back to `1=0`.
+**Learnings:** Gate is a `1=0`/`1=1` flag, not concatenated SQL. Production applied 269 at 2026-08-17 11:54:30 UTC in 13ms with `1=0`; 26,633 notes, 0 with `type: Note`. Flyway will not re-run 269.
+
+### 9b. Apply the note type backfill on production — Behavior — in progress
+
+Pre-condition: 269 is recorded; ordinary notes still lack `type: Note`.
+Trigger: deploy `V300000270__backfill_note_concept_type` with prod placeholder `1=1`.
+Post-condition: existing `note.content` has stored type (`type: Note` or canonical `type: Relationship`); Flyway 270 success; then revert prod to `1=0`.
 
 ### 10. Close C1/D2 on the tracker; drop the migration harness after production — Structure — planned
 
-**Jidoka:** Human confirms production applied the backfill and the override is back to `1=0`.
+**Jidoka:** Human confirms production applied **V300000270** (not merely 269) and the override is back to `1=0`.
 
 Mark C1/D2 closed in [OKF-COMPATIBILITY-GAP.md](../../research/OKF-COMPATIBILITY-GAP.md) and SEED-003. Delete the migration-only gate tests. Do not rewrite the Flyway file. When this plan is fully executed, remove spent planning history from this directory.
 
