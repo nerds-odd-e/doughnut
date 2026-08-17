@@ -2,7 +2,7 @@
   <button
     class="daisy-btn daisy-btn-sm daisy-btn-ghost gap-2"
     role="button"
-    title="Wiki Association"
+    title="Wikidata association"
     @click="onClickWikidata"
   >
     <Link2 class="w-6 h-6" />

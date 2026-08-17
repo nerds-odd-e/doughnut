@@ -17,14 +17,6 @@ does not require renaming the whole codebase at once.
 
 ### Remaining collisions (still to tighten in this glossary)
 
-#### Redundant (several names, one concept)
-
-| Concept | Overlapping names |
-|---------|-------------------|
-| Following a shared notebook | subscribe, subscription |
-| Binding to Wikidata | Wikidata association, Wiki association, associate Wikidata ID |
-| Meaning-based find | semantical search, semantic search |
-
 #### Missing or weakly named
 
 | Gap | Why it matters |
@@ -61,7 +53,7 @@ does not require renaming the whole codebase at once.
 | **Property** | YAML frontmatter key–value on a note (scalar or one-level list). Distinct from a **relationship note**. A value may contain **wiki links**. Relation-like keys (`example of`, `a part of`) are still properties. |
 | **Relationship** | Typed association between notes (e.g. “similar to”, “a part of”) |
 | **Relationship note** | A note that represents a relationship (`type: relationship` in frontmatter), with source, target, and relation |
-| **Wikidata association** | Binding a note to a Wikidata entity (also called Wiki association) |
+| **Wikidata association** | Binding a note to a Wikidata entity. The action is **Associate Wikidata**. Distinct from **Wikidata ID** (the Q-id). |
 | **Refinement layout** | Layout for decomposing and improving a note while refining |
 | **Book** | Attached reading artifact (EPUB, PDF, …), distinct from a notebook |
 | **Book layout** | Structure of an attached book |
@@ -69,12 +61,13 @@ does not require renaming the whole codebase at once.
 | **OKF** | [Open Knowledge Format](https://cloud.google.com/blog/products/data-analytics/how-the-open-knowledge-format-can-improve-data-sharing): portable directory of markdown concept files with YAML frontmatter |
 | **Notebook health** | In-app lint, findings, and fixes for a notebook |
 | **Skip Memory Tracking** | Notebook setting that opts the notebook out of the assimilation sequence and blocks Bazaar subscribe. It does not opt the notebook out of recall. |
+| **Semantic search** | Meaning-based find of notes via embeddings. Distinct from keyword search. |
 
 #### Assimilation and recall
 
 | Term | Meaning | Short UI |
 |------|---------|----------|
-| **Subscription** | Following a shared notebook (from the Bazaar or a Circle) with a daily assimilation quota | |
+| **Subscription** | Following a shared notebook (from the Bazaar or a Circle) with a daily assimilation quota. The action is **subscribe**. | |
 | **Assimilation** | First-pass intake of a note into the learner’s memory schedule | |
 | **Assimilation sequence** | Ordered units offered as next-to-assimilate (menu walkthrough, `/next`). Distinct from assimilating on a note. A unit is in the sequence iff it has not been skipped from the sequence and has no live understanding memory tracker. | |
 | **Skip from the assimilation sequence** | Mark a unit so it is not offered as next. Does not block assimilating that unit from the note (any tracker type). | **Skip** |
@@ -130,7 +123,9 @@ does not require renaming the whole codebase at once.
      **health** as needed — do not call the in-app notebook page a “workspace”.
    - Always qualify **layout** as **refinement** or **book**.
    - Use **wiki link**, **relationship**, or **Wikidata association** — never
-     bare **link** or **wiki** when the kind matters.
+     bare **link** or **wiki** when the kind matters. For Wikidata: the
+     action is **Associate Wikidata**; never **Wiki association**.
+     **Wikidata ID** names the Q-id, not the association.
    - Use **property** for a YAML frontmatter key–value on a note. Never invent
      **wiki property** — say add a **wiki link** as a **property**. Reducing a
      **relationship note** writes a **property** on the source; do not call
