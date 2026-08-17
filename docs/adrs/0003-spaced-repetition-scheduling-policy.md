@@ -136,11 +136,19 @@ not. Scores **0** and **1** use Again memory, not this extra.
 Use **whole elapsed hours** as the recall-transition time input: duration
 between the current recall time and `lastRecalledAt`, discarding any sub-hour
 remainder, independent of time zone or calendar day. Morning/afternoon recall
-windows make day precision too coarse. When elapsed whole hours are **0** on a
-tracker with positive Stability, there is no extra success increment. There is
-no calendar same-day rule. This Decision does not add a separate same-day
-transition; a future short-term behavior may add one without changing this
-decision.
+windows make day precision too coarse. There is no calendar same-day rule.
+When elapsed whole hours are **0** and Stability is greater than 0, success
+grades (ordinary correct / Tutor **4** Good, Tutor **3** Hard, Tutor **5** Easy)
+update Stability with published open FSRS-6 short-term next Stability (own
+implementation, frozen `Fsrs.W`): convert persisted whole hours to days,
+`S' = S · e^{w17 · (G − 3 + w18)} · S^{-w19}`, then persist whole hours.
+Clamp **SInc ≥ 1** so next Stability does not shrink. With frozen weights
+and rounding: Good 24→**25**; Easy 24→**43**; Hard 24 stays **24** (clamp);
+Good at 72 hours stays **72** (clamp). Again at elapsed 0 stays post-lapse.
+Tutor **2** and confusion are unchanged. New (Stability 0) stays first-success
+init Difficulty **5**, Stability **24** hours. The short-term success rule is
+not a Settings knob. Elapsed whole hours **≥ 1** still use long-term next
+Stability.
 
 ### Thinking time
 
