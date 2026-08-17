@@ -59,8 +59,10 @@ export function useDebouncedTextAutosave(
     pendingSaveValues.add(newValue)
     try {
       await options.persist(newValue)
-      savedVersion.value = nextVersion
-      lastSavedValue.value = newValue
+      if (hasUnsavedChanges()) {
+        savedVersion.value = nextVersion
+        lastSavedValue.value = newValue
+      }
     } catch (errs: unknown) {
       options.onError?.(errs)
     } finally {

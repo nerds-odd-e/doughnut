@@ -1,10 +1,16 @@
 import { vi, describe, it, expect, beforeEach, afterEach } from "vitest"
+import { flushPromises, type VueWrapper } from "@vue/test-utils"
+import type { ComponentPublicInstance } from "vue"
+import makeMe from "doughnut-test-fixtures/makeMe"
+import { mockSdkServiceWithImplementation } from "@tests/helpers"
+import { TextContentController } from "@generated/doughnut-backend-api/sdk.gen"
 import { advanceNoteContentSaveDebounce } from "@tests/helpers/noteContentDebounceTestSupport"
 import {
   mountMarkdownTextarea,
   setTextareaValue,
   setupPopupsMock,
   setupUpdateNoteContentMock,
+  textareaEl,
 } from "./noteEditableContentTestSupport"
 
 vi.mock("@/components/commons/Popups/usePopups")
@@ -80,6 +86,35 @@ describe("NoteEditableContent debounced save", () => {
       path: { note: noteId },
       body: { content: "Hello world" },
     })
+
+    wrapper.unmount()
+  })
+
+  it("clears dirty when save returns wrapped ordinary-note content", async () => {
+    const noteId = 1
+    const wrapped = "---\ntype: Note\n---\nAfter save"
+    let wrapper: VueWrapper<ComponentPublicInstance>
+
+    mockSdkServiceWithImplementation(
+      TextContentController,
+      "updateNoteContent",
+      async () => {
+        await wrapper.setProps({ noteId, noteContent: wrapped })
+        return makeMe.aNoteRealm.id(noteId).content(wrapped).please()
+      }
+    )
+
+    wrapper = await mountMarkdownTextarea({
+      noteId,
+      noteContent: "Before",
+    })
+
+    await setTextareaValue(wrapper, "After save")
+    await wrapper.find("textarea").trigger("blur")
+    await flushPromises()
+
+    expect(wrapper.find(".dirty").exists()).toBe(false)
+    expect(textareaEl(wrapper).value).toBe(wrapped)
 
     wrapper.unmount()
   })

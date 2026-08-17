@@ -44,6 +44,15 @@ Feature: Note Edit
       | list item          | Specification by Example |
       | indented list item | Living documentation     |
 
+  Scenario: Saving a note with no frontmatter stores type Note
+    When I update note "LeSS in Action" content using markdown to become:
+      """
+      After save
+      """
+    And I open the note content markdown editor
+    Then the note content markdown source should contain "type: Note"
+    And the note content markdown source should contain "After save"
+
   Scenario: Edit a note's content with a markdown table
     When I update note "LeSS in Action" content using markdown to become:
       """

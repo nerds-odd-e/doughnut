@@ -1,5 +1,6 @@
 package com.odde.doughnut.controllers;
 
+import com.odde.doughnut.algorithms.NoteConceptType;
 import com.odde.doughnut.controllers.dto.ApiError;
 import com.odde.doughnut.controllers.dto.NoteRealm;
 import com.odde.doughnut.controllers.dto.NoteUpdateContentDTO;
@@ -106,7 +107,8 @@ class TextContentController {
       @Valid @RequestBody NoteUpdateContentDTO contentDTO)
       throws UnexpectedNoAccessRightException {
     String prepared = AuthoredNoteContent.prepareContentForSave(contentDTO.getContent());
-    return updateNote(note, n -> n.setContent(prepared), true, true);
+    return updateNote(
+        note, n -> n.setContent(NoteConceptType.ensureOrdinaryNoteType(prepared)), true, true);
   }
 
   private NoteRealm updateNote(

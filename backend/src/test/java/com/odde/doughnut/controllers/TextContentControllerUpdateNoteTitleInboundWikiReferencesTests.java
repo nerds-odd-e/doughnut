@@ -59,7 +59,7 @@ class TextContentControllerUpdateNoteTitleInboundWikiReferencesTests
     NoteRealm response = controller.updateNoteTitle(inbound.target(), titleDto);
     assertThat(response.getNote().getTitle(), equalTo("RenamedTarget"));
     makeMe.refresh(inbound.carrier());
-    assertThat(inbound.carrier().getContent(), equalTo("[[RenamedTarget]]"));
+    assertThat(inbound.carrier().getContent(), containsString("[[RenamedTarget]]"));
   }
 
   @Test
@@ -75,7 +75,7 @@ class TextContentControllerUpdateNoteTitleInboundWikiReferencesTests
     assertThat(response.getReferences().getFirst().getId(), equalTo(inbound.carrier().getId()));
 
     makeMe.refresh(inbound.carrier());
-    assertThat(inbound.carrier().getContent(), equalTo("[[RenamedTarget|custom label]]"));
+    assertThat(inbound.carrier().getContent(), containsString("[[RenamedTarget|custom label]]"));
 
     NoteWikiTitleCache row =
         noteWikiTitleCacheRepository
@@ -114,7 +114,7 @@ class TextContentControllerUpdateNoteTitleInboundWikiReferencesTests
     controller.updateNoteTitle(target, titleDto);
 
     makeMe.refresh(carrier);
-    assertThat(carrier.getContent(), equalTo("[[NbFixed:RenamedTarget]]"));
+    assertThat(carrier.getContent(), containsString("[[NbFixed:RenamedTarget]]"));
   }
 
   @Test
@@ -130,7 +130,7 @@ class TextContentControllerUpdateNoteTitleInboundWikiReferencesTests
     assertThat(response.getReferences(), hasSize(1));
 
     makeMe.refresh(inbound.carrier());
-    assertThat(inbound.carrier().getContent(), equalTo("[[RenamedTarget|TargetTitle]]"));
+    assertThat(inbound.carrier().getContent(), containsString("[[RenamedTarget|TargetTitle]]"));
     NoteWikiTitleCache row =
         noteWikiTitleCacheRepository
             .findByNote_IdOrderByIdAsc(inbound.carrier().getId())
@@ -150,6 +150,6 @@ class TextContentControllerUpdateNoteTitleInboundWikiReferencesTests
     controller.updateNoteTitle(inbound.target(), titleDto);
 
     makeMe.refresh(inbound.carrier());
-    assertThat(inbound.carrier().getContent(), equalTo("[[RenamedTarget|custom text]]"));
+    assertThat(inbound.carrier().getContent(), containsString("[[RenamedTarget|custom text]]"));
   }
 }

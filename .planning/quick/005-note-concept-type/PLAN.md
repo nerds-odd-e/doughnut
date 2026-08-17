@@ -1,6 +1,6 @@
 # Plan: Note concept type
 
-**Status:** in progress (slice 3 next)
+**Status:** in progress (slice 4 next)
 
 **Goal:** Ordinary notes persist `type: Note`. Relationship notes persist `type: Relationship`. Existing `note.content` is backfilled. ADRs describe that stored shape.
 
@@ -11,7 +11,7 @@
 - Title-only create initializes `content` via `NoteConceptType.ensureOrdinaryNoteType` in `NoteConstructionService.createNote` (null → leading `type: Note` fence).
 - Leave `makeMe` content defaults alone. Typeless fixtures stay valid for later save/backfill tests.
 - Structure slices sit immediately before the behavior they unlock (ADR 0004 before `type: Note`; ADR 0001 / Relationship spelling before compose).
-- Next Flyway: **next unused** `V300000xxx` at execute time. `V300000267` is taken (004-recall-log drop of `session_item` / `learning_session`).
+- Next Flyway: **next unused** `V300000xxx` at execute time. `V300000267`–`V300000268` are taken (004-recall-log).
 - Backfill is **gated** (`1=0` default; `1=1` only on the production deploy). Helper tests are permanent. Gate tests are temporary (slice 10).
 
 ## Slices
@@ -30,13 +30,13 @@ E2E: `note_creation.feature` (open markdown source). Unit: wrap null/empty, uncl
 
 **Learnings:** Reuse `NoteLeadingFrontmatter.splitVerbatim` for closed-fence detection. Under-current create already has a `parent` fence, so it stays without `type` until slice 5.
 
-### 3. Saving a note with no frontmatter stores type: Note — Behavior — planned
+### 3. Saving a note with no frontmatter stores type: Note — Behavior — done
 
-**Pre:** Existing note whose content is empty or body-only (no leading fence).  
-**Trigger:** Save content.  
-**Post:** Same wrap as slice 2; body preserved. Notes that already have a fence are unchanged.
+`updateNoteContent` wraps with `NoteConceptType.ensureOrdinaryNoteType` after `prepareContentForSave`. Empty/body-only content gets a leading `type: Note` fence; closed fences unchanged. Readme save still has no wrap.
 
-E2E: `note_edit.feature` (or the existing markdown-save scenario). Reuse the wrap; call it from `updateNoteContent` only. Do not implement insert-into-fence.
+E2E: `note_edit.feature`. Controller: body-only, empty, fenced delta. Autosave keeps last-saved when the store already echoed wrapped content (otherwise the editor stays dirty).
+
+**Learnings:** Persist mutates the body, so autosave must not stamp last-saved to the *sent* unwrapped text after the store has the wrap. Use `mockSdkServiceWithImplementation` for that frontend echo, not a cast `mockImplementation`.
 
 ### 4. Creating a note with a body and no frontmatter stores type: Note — Behavior — planned
 

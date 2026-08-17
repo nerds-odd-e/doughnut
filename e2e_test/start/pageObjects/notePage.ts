@@ -129,7 +129,7 @@ export const assumeNotePage = (
         'i'
       )
       findNoteContentRegion().within(() => {
-        cy.get('.ql-editor, [contenteditable]').should(($el) => {
+        cy.get('.ql-editor').should(($el) => {
           const html = $el.html()
           expect(
             html,

@@ -18,6 +18,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 class TextContentControllerUpdateNoteContentTests extends TextContentControllerTestBase {
+  private static final String ORDINARY_NOTE_FENCE = "---\ntype: Note\n---\n";
+
   @Autowired NoteWikiTitleCacheRepository noteWikiTitleCacheRepository;
   @Autowired ImageRepository imageRepository;
 
@@ -25,7 +27,14 @@ class TextContentControllerUpdateNoteContentTests extends TextContentControllerT
   void shouldBeAbleToSaveNoteWhenValid() throws UnexpectedNoAccessRightException {
     NoteRealm response = controller.updateNoteContent(note, contentDto("new content"));
     assertThat(response.getId(), equalTo(note.getId()));
-    assertThat(response.getNote().getContent(), equalTo("new content"));
+    assertThat(response.getNote().getContent(), equalTo(ORDINARY_NOTE_FENCE + "new content"));
+  }
+
+  @Test
+  void wrapsEmptyContentWithOrdinaryNoteType() throws UnexpectedNoAccessRightException {
+    assertThat(
+        controller.updateNoteContent(note, contentDto("")).getNote().getContent(),
+        equalTo(ORDINARY_NOTE_FENCE));
   }
 
   @Test
