@@ -69,6 +69,15 @@ class SpacedRepetitionCorrectRecallSchedulingTest extends SpacedRepetitionRecall
   }
 
   @Test
+  void sameHourCorrectRecallDoesNotShrinkThreeDayStability() {
+    MemoryTracker memoryTracker = aGradedTrackerAtThreeDayStability();
+
+    memoryTracker.recalledSuccessfully(sameHourGradeTime(memoryTracker), null);
+
+    assertThat(memoryTracker.getStability(), equalTo(72.0f));
+  }
+
+  @Test
   void onTimeCorrectRecallUsesFsrsGoodStabilityIncrement() {
     MemoryTracker memoryTracker = aGradedTrackerAtThreeDayStability();
 

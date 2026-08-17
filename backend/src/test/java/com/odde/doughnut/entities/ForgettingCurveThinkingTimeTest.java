@@ -62,10 +62,8 @@ class ForgettingCurveThinkingTimeTest {
     float hoursAfterCurrentIntervalWithBase =
         succeededAfterCurrentInterval(curve, BASE_THINKING_TIME_MS);
     float hoursWithNoElapsedTimeAtBase = curve.succeeded(0, BASE_THINKING_TIME_MS);
-    float hoursWithNoElapsedTimeAtFastThinking = curve.succeeded(0, 0);
 
     assertThat(hoursAfterCurrentIntervalWithBase, greaterThan(hoursWithNoElapsedTimeAtBase));
-    assertThat(hoursWithNoElapsedTimeAtFastThinking, greaterThan(hoursWithNoElapsedTimeAtBase));
   }
 
   @Test
