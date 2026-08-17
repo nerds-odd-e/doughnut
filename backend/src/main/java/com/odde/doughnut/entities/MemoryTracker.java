@@ -184,10 +184,6 @@ public class MemoryTracker extends EntityIdentifiedByIdOnly {
     MemoryTrackerNextRecallScheduling.apply(this, currentUTCTimestamp);
   }
 
-  public void recallFailed(Timestamp currentUTCTimestamp) {
-    recalledAgain(currentUTCTimestamp);
-  }
-
   public void recalledSuccessfully(Timestamp now, Integer thinkingTimeMs) {
     applyRecall(now, forgettingCurve().afterGoodRecall(elapsedHoursUntil(now), thinkingTimeMs));
   }
@@ -220,7 +216,7 @@ public class MemoryTracker extends EntityIdentifiedByIdOnly {
     if (successful) {
       recalledSuccessfully(currentUTCTimestamp, thinkingTimeMs);
     } else {
-      recallFailed(currentUTCTimestamp);
+      recalledAgain(currentUTCTimestamp);
     }
   }
 

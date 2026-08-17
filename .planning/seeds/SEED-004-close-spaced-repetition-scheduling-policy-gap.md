@@ -3,7 +3,7 @@ id: SEED-004
 status: sprouting
 planted: 2026-08-15
 planted_during: ADR 0003 finalization (gap analysis)
-trigger_when: when exposing a requested-retention knob, adding a relearning step list or RecallLog, or when accepting Proposed ADR 0003
+trigger_when: when accepting Proposed ADR 0003, or when adding a relearning step list or RecallLog
 scope: large
 ---
 
@@ -11,20 +11,20 @@ scope: large
 
 ## Why This Matters
 
-Doughnut already schedules recall with elapsed time and outcome. The product contract is Proposed [ADR 0003](../../docs/adrs/0003-spaced-repetition-scheduling-policy.md) Decision. Remaining work is deferred knobs plus **accepting** that ADR.
+Doughnut already schedules recall with elapsed time and outcome. Requested retention (**B2**) is locked global `r = 0.9` (`Fsrs.REQUESTED_RETENTION`), not a knob. The product contract is Proposed [ADR 0003](../../docs/adrs/0003-spaced-repetition-scheduling-policy.md) Decision. Remaining work is **accepting** that ADR plus deferred knobs B4 / C4 / E3 / E4 / E6.
 
 ## When to Surface
 
-**Trigger:** accepting ADR 0003; exposing a requested-retention knob (B2); adding a relearning step list; adding a replayable recall log for fitting (E6).
+**Trigger:** accepting ADR 0003; adding a relearning step list; adding a replayable recall log for fitting (E6).
 
 Also surface when changing success/failure interval math, commissioned score → schedule mapping, or due-work rebuild from history.
 
 ## Scope Estimate
 
-**Large** — remaining trigger is policy accept plus deferred product knobs:
+**Large** — remaining trigger is policy accept plus deferred product knobs (B2 is locked `r = 0.9`, not a knob):
 
 1. Humans accept Proposed [ADR 0003](../../docs/adrs/0003-spaced-repetition-scheduling-policy.md) (`docs/adrs/README.md`).
-2. Deferred IDs: ADR 0003 Decision **Deferred**. Tracker: [FSRS-COMPATIBILITY-GAP.md](../research/FSRS-COMPATIBILITY-GAP.md).
+2. Deferred IDs: **B4** / **C4** / **E3** / **E4** / **E6**. Tracker: [FSRS-COMPATIBILITY-GAP.md](../research/FSRS-COMPATIBILITY-GAP.md).
 
 ## Breadcrumbs
 
