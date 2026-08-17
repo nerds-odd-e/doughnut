@@ -1,6 +1,6 @@
 # Plan: Note concept type
 
-**Status:** in progress (slice 6 next)
+**Status:** in progress (slice 7 next)
 
 **Goal:** Ordinary notes persist `type: Note`. Relationship notes persist `type: Relationship`. Existing `note.content` is backfilled. ADRs describe that stored shape.
 
@@ -52,9 +52,11 @@ E2E: under-current in `note_creation.feature`. Helper: insert/verbatim/blank/unc
 
 **Learnings:** Read `type` with `Frontmatter.parse`; edit the verbatim block (drop blank `type:` line, prepend). `VerbatimSplit.yamlRaw` is the inner YAML. Do not canonicalize spelling until slice 8.
 
-### 6. Lock type: Relationship in ADR 0001 and ADR 0004 — Structure — planned
+### 6. Lock type: Relationship in ADR 0001 and ADR 0004 — Structure — done
 
-Glossary **Relationship note** becomes `type: Relationship`. ADR 0004 uses that spelling. Fix the ADR index row for 0001 if it still says Proposed. Enables slice 7. Code still writes `relationship` until slice 7.
+Glossary **Relationship note** is `type: Relationship`. ADR 0004 Decision uses that spelling. Index 0001 is **Approved** (matches the ADR file). 0004 stays Proposed. Code still writes `relationship` until slice 7.
+
+**Learnings:** 0001 file already said Approved; only the index was stale. Do not rename to `*-accepted.md` in this plan.
 
 ### 7. Adding a relationship writes type: Relationship — Behavior — planned
 

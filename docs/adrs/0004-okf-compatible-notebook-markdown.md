@@ -29,7 +29,7 @@ profile. Codec round-trips must be lossless for these rules.
 - Public concept ID = path without `.md` (OKF).
 - Stored note markdown carries `type` and valid YAML frontmatter.
   Ordinary notes use `type: Note`. Relationship notes are concepts in
-  the bundle (`type: relationship`). OKF unknown types are allowed.
+  the bundle (`type: Relationship`). OKF unknown types are allowed.
   Preserve author-owned and unknown frontmatter keys on persist and
   round-trip.
 - Reserved basenames: `index.md` (directory listing / folder readme) and
