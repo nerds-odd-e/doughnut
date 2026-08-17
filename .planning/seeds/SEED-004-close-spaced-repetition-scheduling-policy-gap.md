@@ -3,7 +3,7 @@ id: SEED-004
 status: sprouting
 planted: 2026-08-15
 planted_during: ADR 0003 finalization (gap analysis)
-trigger_when: when accepting Proposed ADR 0003, or when adding a relearning step list or RecallLog
+trigger_when: when accepting Proposed ADR 0003, or when adding a relearning step list
 scope: large
 ---
 
@@ -15,7 +15,7 @@ Doughnut already schedules recall with elapsed time and outcome. The product con
 
 ## When to Surface
 
-**Trigger:** accepting ADR 0003; adding a relearning step list; adding a replayable recall log for fitting (E6).
+**Trigger:** accepting ADR 0003; adding a relearning step list.
 
 Also surface when changing success/failure interval math, commissioned score → schedule mapping, or due-work rebuild from history.
 
@@ -24,7 +24,7 @@ Also surface when changing success/failure interval math, commissioned score →
 **Large** — remaining trigger is policy accept plus deferred product knobs:
 
 1. Humans accept Proposed [ADR 0003](../../docs/adrs/0003-spaced-repetition-scheduling-policy.md) (`docs/adrs/README.md`).
-2. Deferred IDs: **B4** / **E3** / **E4** / **E6**. Tracker: [FSRS-COMPATIBILITY-GAP.md](../research/FSRS-COMPATIBILITY-GAP.md).
+2. Deferred IDs: **B4** / **E3** / **E4**. Tracker: [FSRS-COMPATIBILITY-GAP.md](../research/FSRS-COMPATIBILITY-GAP.md).
 
 ## Breadcrumbs
 

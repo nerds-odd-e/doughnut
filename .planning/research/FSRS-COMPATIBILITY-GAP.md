@@ -12,7 +12,7 @@ Product policy lives in ADR 0003 Decision. This tracker is a pointer plus the de
 
 ## Current code vs FSRS-6
 
-Doughnut persists **Stability** in whole hours and **Difficulty** (nullable; shown on the Memory Tracker). Retrievability is computed (FSRS-6 power curve), not stored. Frozen default FSRS-6 weights live in `Fsrs`. Requested retention is locked global `r = 0.9` (`Fsrs.REQUESTED_RETENTION`); it is not a product knob. There is **no** lapse count, card state (`New` / `Learning` / `Review` / `Relearning`), fuzz, max interval, or RecallLog.
+Doughnut persists **Stability** in whole hours and **Difficulty** (nullable; shown on the Memory Tracker). Retrievability is computed (FSRS-6 power curve), not stored. Frozen default FSRS-6 weights live in `Fsrs`. Requested retention is locked global `r = 0.9` (`Fsrs.REQUESTED_RETENTION`); it is not a product knob. There is **no** lapse count, card state (`New` / `Learning` / `Review` / `Relearning`), fuzz, or max interval.
 
 Live scheduling does not walk a spacing-index ladder. `DEFAULT_SPACES` / `hoursFromLegacyIndex` remain only so committed `V300000260` can replay on fresh DBs.
 
@@ -25,7 +25,6 @@ Live scheduling does not walk a spacing-index ladder. `DEFAULT_SPACES` / `hoursF
 - **B4** lapses
 - **E3** fuzz / max interval
 - **E4** fitting / per-user weights
-- **E6** RecallLog
 
 Humans still own accept / reject / supersede of ADR 0003 (`docs/adrs/README.md`).
 
