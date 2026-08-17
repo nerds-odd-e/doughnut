@@ -21,7 +21,6 @@ does not require renaming the whole codebase at once.
 
 | Term | Colliding senses |
 |------|------------------|
-| **Layout** | Refinement layout for a note vs book layout for an attached book |
 | **Property** | Reduced relationship field; wiki property from accidental match; property memory tracker key |
 | **Chat / conversation / message** | Human note threads and AI chat share the same nouns without a clear split |
 | **My notes / my notebooks** | Notebook catalog; note search scope; subscribed notebook appearing among the user’s notebooks |
@@ -183,9 +182,10 @@ does not require renaming the whole codebase at once.
 
 ## Consequences
 
-- Product language converges on fewer overloaded words (**link**,
-  **layout**). Bare **learning** is not a glossary noun; commissioned tutoring
-  uses the **Learning Session** family.
+- Product language converges on fewer overloaded words (**link**). Bare
+  **learning** is not a glossary noun; commissioned tutoring uses the
+  **Learning Session** family. **Refinement layout** and **book layout** stay
+  distinct; never use bare **layout** for either.
 - Product language names spaced retrieval **recall**, not **review**, so the
   glossary matches the philosophy (recall is better than review) and stays
   distinct from FSRS/Anki vocabulary. **Just review** names a recall method,
