@@ -46,7 +46,7 @@ Feature: EPUB book
       And I leave the EPUB reading view and return to it
       Then I should see the text "Cell One" in the EPUB reader
 
-    Scenario: Current block updates on scroll while explicit layout selection is unchanged
+    Scenario: Current block updates on scroll while explicit book layout selection is unchanged
       When I choose the book block "Chapter Alpha"
       Then the book block "Chapter Alpha" should be the current selection in the book reader
       And the book block "Chapter Alpha" should be the current block in the book reader

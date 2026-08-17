@@ -12,7 +12,7 @@
         id="book-layout-reorganize-preview-title"
         class="text-lg font-semibold"
       >
-        Reorganize layout (preview)
+        Reorganize book layout (preview)
       </h2>
       <div
         class="max-h-[min(24rem,50vh)] overflow-y-auto py-2"

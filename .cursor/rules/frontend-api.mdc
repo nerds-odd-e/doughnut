@@ -123,7 +123,7 @@ Every whole-UI blocker and long-running note-refinement AI request must be class
 | Load next assimilation note | `Loading next note...` | `useGoToNextAssimilation.ts` | `{ blockUi: true }` | View transition |
 | Book layout mutations | `Updating book layout…` | `useBookLayoutMutations.ts` | `{ blockUi: true }` (2 sites) | Mutation |
 | Book layout AI suggest | `Analyzing book layout…` | `useBookLayoutAiReorganize.ts` | `{ blockUi: true }` | Long-running AI read; leave noncancelable until post-cancel UX is defined |
-| Book layout apply suggestion | `Applying layout changes…` | `useBookLayoutAiReorganize.ts` | `{ blockUi: true }` | Mutation |
+| Book layout apply suggestion | `Applying book layout changes…` | `useBookLayoutAiReorganize.ts` | `{ blockUi: true }` | Mutation |
 | Note delete / reduce | `Deleting note...` / `Reducing to source property...` | `useNoteDeleteFlow.ts` | `runWithBlockingApiLoading` | Mutation |
 | Relationship finalize | `Creating relationship note...` | `AddRelationshipFinalize.vue` | `runWithBlockingApiLoading` | Mutation |
 | Attach book upload | `Uploading book…` | `NotebookAttachedBookSection.vue` | `runWithBlockingApiLoading` | Mutation |

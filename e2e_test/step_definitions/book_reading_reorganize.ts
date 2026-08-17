@@ -13,7 +13,7 @@ import testability from '../start/testability'
 import { unwrapData, validatePreorderDepths } from './book_reading_helpers'
 
 Given(
-  'OpenAI returns a layout suggestion that indents block {string} for notebook {string}',
+  'OpenAI returns a book layout suggestion that indents block {string} for notebook {string}',
   // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
   (blockTitle: string, notebookName: string) => {
     return testability()

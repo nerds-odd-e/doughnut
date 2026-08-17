@@ -33,7 +33,7 @@ When(
 )
 
 When(
-  'I attach a fake blank pdf book with layout of {string} to the notebook {string}',
+  'I attach a fake blank pdf book with book layout of {string} to the notebook {string}',
   // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
   (fixtureStem: string, notebookName: string) => {
     return cy

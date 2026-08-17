@@ -129,7 +129,7 @@ describe("BookReadingContent AI reorganize suggest", () => {
       '[data-testid="book-layout-reorganize-preview-dialog"]'
     )
     expect(dialog.classes()).toContain("daisy-modal-open")
-    expect(wrapper.text()).toContain("Reorganize layout (preview)")
+    expect(wrapper.text()).toContain("Reorganize book layout (preview)")
 
     await wrapper
       .find('[data-testid="book-layout-reorganize-preview-cancel"]')
@@ -221,7 +221,7 @@ describe("BookReadingContent AI reorganize suggest", () => {
     await flushPromises()
 
     expect(loadingModal()).toBeTruthy()
-    expect(document.body.textContent).toContain("Applying layout changes…")
+    expect(document.body.textContent).toContain("Applying book layout changes…")
 
     pending.resolve(
       wrapSdkResponse({

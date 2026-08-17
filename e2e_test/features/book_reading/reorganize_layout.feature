@@ -7,7 +7,7 @@ Feature: Reorganize book layout
 
     Background:
       Given I have a notebook "Refactoring read" with a note "Code Refactoring Book"
-      And I attach a fake blank pdf book with layout of "refactoring" to the notebook "Code Refactoring Book"
+      And I attach a fake blank pdf book with book layout of "refactoring" to the notebook "Code Refactoring Book"
       And I open the book attached to notebook "Refactoring read"
 
     Scenario Outline: Indent a book block with Tab
@@ -36,7 +36,7 @@ Feature: Reorganize book layout
 
     Background:
       Given I have a notebook "Refactoring read" with a note "Code Refactoring Book"
-      And I attach a fake blank pdf book with layout of "refactoring" to the notebook "Code Refactoring Book"
+      And I attach a fake blank pdf book with book layout of "refactoring" to the notebook "Code Refactoring Book"
       And I open the book attached to notebook "Refactoring read"
 
     @mockBrowserTime
@@ -66,7 +66,7 @@ Feature: Reorganize book layout
 
     Background:
       Given I have a notebook "Subtree read" with a note "Subtree Book"
-      And I attach a fake blank pdf book with layout of "subtree_indent" to the notebook "Subtree Book"
+      And I attach a fake blank pdf book with book layout of "subtree_indent" to the notebook "Subtree Book"
       And I open the book attached to notebook "Subtree read"
 
     Scenario: Indent a block and its children together
@@ -79,7 +79,7 @@ Feature: Reorganize book layout
       And the book block "A.2 Second section" should be at depth 2 in the book layout
       And the book block "Chapter B" should be at depth 0 in the book layout
 
-    Scenario: Cancel a leaf block removes it from the layout
+    Scenario: Cancel a leaf block removes it from the book layout
       When I choose the book block "Chapter B"
       Then the book block "Chapter B" should be focused in the book layout
       When I cancel the focused book block with Backspace

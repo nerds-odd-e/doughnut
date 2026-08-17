@@ -8,7 +8,7 @@ import { NotebookBooksController } from "@generated/doughnut-backend-api/sdk.gen
 import { computed, ref, toValue, type MaybeRefOrGetter } from "vue"
 
 const BOOK_LAYOUT_SUGGEST_LOADING_MESSAGE = "Analyzing book layout…"
-const BOOK_LAYOUT_APPLY_LOADING_MESSAGE = "Applying layout changes…"
+const BOOK_LAYOUT_APPLY_LOADING_MESSAGE = "Applying book layout changes…"
 
 export function useBookLayoutAiReorganize(
   notebookId: MaybeRefOrGetter<number>,

@@ -3,7 +3,7 @@ Feature: Book browsing
   Background:
     Given I am logged in as an existing user
     And I have a notebook "Refactoring read" with a note "Code Refactoring Book"
-    And I attach a fake blank pdf book with layout of "refactoring" to the notebook "Code Refactoring Book"
+    And I attach a fake blank pdf book with book layout of "refactoring" to the notebook "Code Refactoring Book"
     And I open the book attached to notebook "Refactoring read"
 
   Scenario: See book layout and beginning of PDF in the browser

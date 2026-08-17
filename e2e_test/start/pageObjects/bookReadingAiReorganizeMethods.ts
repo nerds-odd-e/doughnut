@@ -21,7 +21,7 @@ export const bookReadingAiReorganizeMethods = () => ({
     expectDaisyDialogBoxVisible(dialog)
     cy.get('#book-layout-reorganize-preview-title').should(
       'contain',
-      'Reorganize layout (preview)'
+      'Reorganize book layout (preview)'
     )
     return this
   },
