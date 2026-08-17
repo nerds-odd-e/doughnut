@@ -12,7 +12,7 @@
   },
   "engines": {
     "node": ">=26.7",
-    "pnpm": ">=11.21.0"
+    "pnpm": ">=11.22.0"
   },
   "scripts": {
     "preinstall": "npx only-allow pnpm",
