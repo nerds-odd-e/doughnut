@@ -79,7 +79,7 @@ describe("adding new note", () => {
     await flushPromises()
     expect(sdkSpies.mockedCreateNoteAtRoot).toHaveBeenCalledWith({
       path: { notebook: noteNewFormRealm.notebookRealm.notebook.id },
-      body: expect.objectContaining({ newTitle: "2026-05-09" }),
+      body: expect.objectContaining({ newTitle: "2026-05-09 " }),
     })
     wrapper.unmount()
   })
@@ -184,7 +184,7 @@ describe("adding new note", () => {
     wrapper.unmount()
   })
 
-  it("does not select all text when initialTitle comes from a template", async () => {
+  it("places the caret after a trailing space when initialTitle comes from a template", async () => {
     vi.useRealTimers()
     const wrapper = mountNoteNewForm(
       {
@@ -196,10 +196,28 @@ describe("adding new note", () => {
 
     await settleScheduledAutofocus()
 
-    expect(document.activeElement?.classList.contains("seamless-editor")).toBe(
-      true
-    )
-    expect(window.getSelection()?.toString()).not.toBe("2026-05-09")
+    const editor = document.activeElement as HTMLElement
+    expect(editor.classList.contains("seamless-editor")).toBe(true)
+    expect(editor.textContent).toBe("2026-05-09 ")
+    const range = window.getSelection()?.getRangeAt(0)
+    expect(range?.collapsed).toBe(true)
+    const afterCaret = range!.cloneRange()
+    afterCaret.selectNodeContents(editor)
+    afterCaret.setStart(range!.endContainer, range!.endOffset)
+    expect(afterCaret.toString()).toBe("")
+    wrapper.unmount()
+  })
+
+  it("does not add a second space when the template already ends with a space", async () => {
+    const wrapper = mountNoteNewForm({
+      ...notebookRootProps,
+      initialTitle: "2026-05-09 ",
+    })
+
+    expect(
+      (wrapper.find('[data-test="note-title"]').element as HTMLElement)
+        .textContent
+    ).toBe("2026-05-09 ")
     wrapper.unmount()
   })
 })

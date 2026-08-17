@@ -77,18 +77,13 @@ import {
 } from "@/utils/wikidataTitleActions"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import usePopups from "@/components/commons/Popups/usePopups"
-import { createNoteFromForm } from "./noteNewFormSubmit"
 import {
-  applyParentRelationshipToCreateContent,
-  type NoteCreationParentRelationship as ParentRelationship,
-} from "@/utils/noteCreationParentRelationship"
-
-function contentWithWikidataFrontmatter(
-  wikidataId: string
-): string | undefined {
-  const t = wikidataId.trim()
-  return t ? `---\nwikidata_id: ${t}\n---\n` : undefined
-}
+  contentForNewNote,
+  contentWithWikidataFrontmatter,
+  createNoteFromForm,
+} from "./noteNewFormSubmit"
+import { initialNewNoteTitle } from "./noteNewFormTitle"
+import type { NoteCreationParentRelationship as ParentRelationship } from "@/utils/noteCreationParentRelationship"
 
 const router = useRouter()
 const storageAccessor = useStorageAccessor()
@@ -143,7 +138,7 @@ const emit = defineEmits<{
   closeDialog: []
 }>()
 
-const newTitle = ref(props.initialTitle ?? "Untitled")
+const newTitle = ref(initialNewNoteTitle(props.initialTitle))
 const wikidataIdSelection = ref("")
 const noteContentMarkdown = ref<string | undefined>(undefined)
 const noteFormErrors = ref<{
@@ -161,18 +156,6 @@ const effectiveSearchKey = computed(() =>
   hasTitleBeenEdited.value ? newTitle.value : ""
 )
 
-function contentForSubmit(): string | undefined {
-  const baseContent =
-    noteContentMarkdown.value !== undefined
-      ? noteContentMarkdown.value
-      : contentWithWikidataFrontmatter(wikidataIdSelection.value)
-  return applyParentRelationshipToCreateContent(
-    baseContent,
-    parentRelationship.value,
-    contextNote.value
-  )
-}
-
 const processForm = async () => {
   if (processing.value) return
   processing.value = true
@@ -186,7 +169,12 @@ const processForm = async () => {
     return
   }
 
-  const content = contentForSubmit()
+  const content = contentForNewNote({
+    noteContentMarkdown: noteContentMarkdown.value,
+    wikidataId: wikidataIdSelection.value,
+    parentRelationship: parentRelationship.value,
+    contextNote: contextNote.value,
+  })
   const body: NoteCreationDto = {
     newTitle: newTitle.value,
     ...(content !== undefined ? { content } : {}),

@@ -61,6 +61,31 @@ function selectAllText(element: HTMLElement) {
   sel?.addRange(range)
 }
 
+function collapseCaretToEnd(element: HTMLElement) {
+  if (
+    element instanceof HTMLInputElement ||
+    element instanceof HTMLTextAreaElement
+  ) {
+    const len = element.value.length
+    element.setSelectionRange(len, len)
+    return
+  }
+  if (!element.isContentEditable) return
+  const textNode = element.firstChild
+  const range = document.createRange()
+  if (textNode?.nodeType === Node.TEXT_NODE) {
+    const len = (textNode as Text).length
+    range.setStart(textNode, len)
+    range.setEnd(textNode, len)
+  } else {
+    range.selectNodeContents(element)
+    range.collapse(false)
+  }
+  const sel = window.getSelection()
+  sel?.removeAllRanges()
+  sel?.addRange(range)
+}
+
 export function focusTargetWithin(
   element: Element | null,
   options: FocusTargetOptions = {}
@@ -75,6 +100,8 @@ export function focusTargetWithin(
   focusable.focus()
   if (options.selectAll) {
     selectAllText(focusable)
+  } else {
+    collapseCaretToEnd(focusable)
   }
   return true
 }

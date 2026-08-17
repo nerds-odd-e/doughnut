@@ -4,6 +4,10 @@ import type {
   NoteRealm,
 } from "@generated/doughnut-backend-api"
 import { parseSoftDeletedTitleConflict } from "@/managedApi/softDeletedTitleConflict"
+import {
+  applyParentRelationshipToCreateContent,
+  type NoteCreationParentRelationship,
+} from "@/utils/noteCreationParentRelationship"
 
 type NoteCreateApi = {
   createRootNoteAtNotebook: (
@@ -20,6 +24,30 @@ type NoteCreateApi = {
 
 type ConfirmPopups = {
   confirm: (message: string) => Promise<boolean>
+}
+
+export function contentWithWikidataFrontmatter(
+  wikidataId: string
+): string | undefined {
+  const t = wikidataId.trim()
+  return t ? `---\nwikidata_id: ${t}\n---\n` : undefined
+}
+
+export function contentForNewNote(input: {
+  noteContentMarkdown: string | undefined
+  wikidataId: string
+  parentRelationship: NoteCreationParentRelationship
+  contextNote: { title: string; content?: string } | undefined
+}): string | undefined {
+  const baseContent =
+    input.noteContentMarkdown !== undefined
+      ? input.noteContentMarkdown
+      : contentWithWikidataFrontmatter(input.wikidataId)
+  return applyParentRelationshipToCreateContent(
+    baseContent,
+    input.parentRelationship,
+    input.contextNote
+  )
 }
 
 export function parseCreateNoteFailure(e: unknown): {
