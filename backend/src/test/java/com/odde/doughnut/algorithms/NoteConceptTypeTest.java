@@ -5,6 +5,7 @@ import static org.hamcrest.Matchers.equalTo;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 
@@ -15,14 +16,13 @@ class NoteConceptTypeTest {
   @ParameterizedTest
   @NullAndEmptySource
   void wrapsNullOrEmptyWithOrdinaryNoteType(String content) {
-    assertThat(NoteConceptType.ensureOrdinaryNoteType(content), equalTo(ORDINARY_NOTE_FENCE));
+    assertThat(NoteConceptType.ensureStoredType(content), equalTo(ORDINARY_NOTE_FENCE));
   }
 
   @Test
   void wrapsUnclosedFenceAsNoFence() {
     String unclosed = "---\naliases:\n  - x\nbody";
-    assertThat(
-        NoteConceptType.ensureOrdinaryNoteType(unclosed), equalTo(ORDINARY_NOTE_FENCE + unclosed));
+    assertThat(NoteConceptType.ensureStoredType(unclosed), equalTo(ORDINARY_NOTE_FENCE + unclosed));
   }
 
   @Test
@@ -38,7 +38,7 @@ class NoteConceptTypeTest {
         body line
         """;
     assertThat(
-        NoteConceptType.ensureOrdinaryNoteType(content),
+        NoteConceptType.ensureStoredType(content),
         equalTo(
             """
             ---
@@ -57,14 +57,39 @@ class NoteConceptTypeTest {
   void treatsBlankTypeAsMissingAndInsertsFirst(String typeLine) {
     String content = "---\nparent: \"[[x]]\"\n" + typeLine + "\naliases:\n  - y\n---\n";
     assertThat(
-        NoteConceptType.ensureOrdinaryNoteType(content),
+        NoteConceptType.ensureStoredType(content),
         equalTo("---\ntype: Note\nparent: \"[[x]]\"\naliases:\n  - y\n---\n"));
   }
 
   @ParameterizedTest
-  @ValueSource(strings = {"relationship", "note", "Note", "Attested Computation"})
-  void leavesExistingNonEmptyTypeUnchanged(String type) {
+  @CsvSource(
+      textBlock =
+          """
+          note,                 Note
+          NOTE,                 Note
+          Note,                 Note
+          '"note"',             Note
+          '"NOTE"',             Note
+          '"Note"',             Note
+          '''note''',           Note
+          relationship,         Relationship
+          RELATIONSHIP,         Relationship
+          Relationship,         Relationship
+          '"relationship"',     Relationship
+          '"RELATIONSHIP"',     Relationship
+          '''relationship''',   Relationship
+          """)
+  void canonicalizesStoredTypeSpellingInPlace(String givenType, String canonicalType) {
+    String content = "---\ntype: " + givenType + "\nparent: x\n---\nbody";
+    assertThat(
+        NoteConceptType.ensureStoredType(content),
+        equalTo("---\ntype: " + canonicalType + "\nparent: x\n---\nbody"));
+  }
+
+  @ParameterizedTest
+  @ValueSource(strings = {"Attested Computation", "\"Attested Computation\""})
+  void leavesUnknownNonEmptyTypeUnchanged(String type) {
     String content = "---\ntype: " + type + "\nparent: x\n---\nbody";
-    assertThat(NoteConceptType.ensureOrdinaryNoteType(content), equalTo(content));
+    assertThat(NoteConceptType.ensureStoredType(content), equalTo(content));
   }
 }

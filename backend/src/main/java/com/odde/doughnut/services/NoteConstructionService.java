@@ -64,7 +64,7 @@ public class NoteConstructionService {
     Timestamp ts = testabilitySettings.getCurrentUTCTimestamp();
     note.initializeNewNote(notebook, ts, title);
     note.setFolder(folderOrNull);
-    note.setContent(NoteConceptType.ensureOrdinaryNoteType(null));
+    note.setContent(NoteConceptType.ensureStoredType(null));
     User user = authorizationService.getCurrentUser();
     entityPersister.save(note);
     entityPersister.save(NoteCreator.forNoteAndUser(note, user));
@@ -74,7 +74,7 @@ public class NoteConstructionService {
   private void persistCreatedNoteContent(Note note, String content) {
     Timestamp ts = testabilitySettings.getCurrentUTCTimestamp();
     note.setContent(
-        NoteConceptType.ensureOrdinaryNoteType(AuthoredNoteContent.prepareContentForSave(content)));
+        NoteConceptType.ensureStoredType(AuthoredNoteContent.prepareContentForSave(content)));
     note.setUpdatedAt(ts);
     entityPersister.save(note);
   }

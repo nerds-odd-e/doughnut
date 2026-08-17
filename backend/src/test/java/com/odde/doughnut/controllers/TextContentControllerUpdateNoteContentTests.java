@@ -88,11 +88,13 @@ class TextContentControllerUpdateNoteContentTests extends TextContentControllerT
   }
 
   @Test
-  void leavesExistingNonEmptyTypeUnchangedWhenSaving() throws UnexpectedNoAccessRightException {
-    String content = "---\ntype: relationship\n---\n";
+  void canonicalizesLowercaseRelationshipTypeWhenSaving() throws UnexpectedNoAccessRightException {
     assertThat(
-        controller.updateNoteContent(note, contentDto(content)).getNote().getContent(),
-        equalTo(content));
+        controller
+            .updateNoteContent(note, contentDto("---\ntype: relationship\n---\n"))
+            .getNote()
+            .getContent(),
+        equalTo("---\ntype: Relationship\n---\n"));
   }
 
   @Test

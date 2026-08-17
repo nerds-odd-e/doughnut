@@ -108,7 +108,7 @@ class TextContentController {
       throws UnexpectedNoAccessRightException {
     String prepared = AuthoredNoteContent.prepareContentForSave(contentDTO.getContent());
     return updateNote(
-        note, n -> n.setContent(NoteConceptType.ensureOrdinaryNoteType(prepared)), true, true);
+        note, n -> n.setContent(NoteConceptType.ensureStoredType(prepared)), true, true);
   }
 
   private NoteRealm updateNote(

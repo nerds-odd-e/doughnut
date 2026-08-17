@@ -15,7 +15,13 @@ public final class NoteLeadingFrontmatter {
    * #split}; handing the block back to the author means this, because a round trip through {@link
    * Frontmatter} settles comments, key order, and quoting for them.
    */
-  public record VerbatimSplit(String frontmatterBlock, String yamlRaw, String body) {}
+  public record VerbatimSplit(String frontmatterBlock, String yamlRaw, String body) {
+    String rebuild(String newYamlRaw) {
+      String yaml =
+          newYamlRaw.isEmpty() || newYamlRaw.endsWith("\n") ? newYamlRaw : newYamlRaw + "\n";
+      return "---\n" + yaml + "---\n" + body;
+    }
+  }
 
   public static Optional<Split> split(String content) {
     return splitVerbatim(content).map(s -> new Split(Frontmatter.parse(s.yamlRaw()), s.body()));

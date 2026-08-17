@@ -1,6 +1,6 @@
 # Plan: Note concept type
 
-**Status:** in progress (slice 8 next)
+**Status:** in progress (slice 9 next)
 
 **Goal:** Ordinary notes persist `type: Note`. Relationship notes persist `type: Relationship`. Existing `note.content` is backfilled. ADRs describe that stored shape.
 
@@ -8,7 +8,7 @@
 
 - One persist scenario per slice. Extend the same surgical helper; do **not** finish every YAML branch in the first persist slice.
 - Call the helper only on **note** persist (`NoteConstructionService`, `TextContentController.updateNoteContent`). Never from `AuthoredNoteContent.prepareContentForSave` (readme uses that too).
-- Title-only create initializes `content` via `NoteConceptType.ensureOrdinaryNoteType` in `NoteConstructionService.createNote` (null → leading `type: Note` fence).
+- Title-only create initializes `content` via `NoteConceptType.ensureStoredType` in `NoteConstructionService.createNote` (null → leading `type: Note` fence).
 - Leave `makeMe` content defaults alone. Typeless fixtures stay valid for later save/backfill tests.
 - Structure slices sit immediately before the behavior they unlock (ADR 0004 before `type: Note`; ADR 0001 / Relationship spelling before compose).
 - Next Flyway: **next unused** `V300000xxx` at execute time. `V300000267`–`V300000268` are taken (004-recall-log).
@@ -64,13 +64,11 @@ Glossary **Relationship note** is `type: Relationship`. ADR 0004 Decision uses t
 
 **Learnings:** One compose constant `NOTE_TYPE`. Slice 8 canonicalizes on save; do not change compose again.
 
-### 8. Saving a Doughnut type canonicalizes its spelling — Behavior — planned
+### 8. Saving a Doughnut type canonicalizes its spelling — Behavior — done
 
-**Pre:** Note whose `type` is `relationship` / `RELATIONSHIP` / `note` / `NOTE` (quoted or not), or some other non-empty type.  
-**Trigger:** Save.  
-**Post:** Doughnut types become `Relationship` / `Note` in place. Any other non-empty type is unchanged.
+`NoteConceptType.ensureStoredType` rewrites the verbatim `type` value in place: `note`/`relationship` (any case, quoted or not) → `Note`/`Relationship`. Other non-empty types unchanged. Save and create-with-content share the helper. Compose not re-asserted.
 
-Controller/unit on the helper. New relationship notes (slice 7) are not re-asserted. No backfill.
+**Learnings:** Renamed from `ensureOrdinaryNoteType` because it also canonicalizes Relationship. Fence rebuild is `VerbatimSplit.rebuild`. Slice 9 should call `ensureStoredType`.
 
 ### 9. Existing notes are backfilled — Behavior — planned
 
