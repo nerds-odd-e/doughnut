@@ -25,6 +25,7 @@ import {
 } from '@generated/doughnut-backend-api/sdk.gen'
 import { circleIdAlias } from './pageObjects/circlePage'
 import { assimilateTestabilityMethods } from './testabilityAssimilate'
+import { bazaarTestabilityMethods } from './testabilityBazaar'
 import { recallTestabilityMethods } from './testabilityRecall'
 import { timeTravelTestabilityMethods } from './testabilityTimeTravel'
 import { unwrapData } from './unwrapApi'
@@ -555,6 +556,7 @@ const testability = () => {
     },
 
     ...assimilateTestabilityMethods,
+    ...bazaarTestabilityMethods,
     ...recallTestabilityMethods,
     ...timeTravelTestabilityMethods,
 
@@ -648,17 +650,6 @@ const testability = () => {
         TestabilityRestController.triggerException().catch(() => {
           // Expected: the exception triggers a 500 error which is caught and logged
           return Promise.resolve()
-        }),
-        { log: false }
-      )
-    },
-
-    shareToBazaar(notebookName: string) {
-      const requestBody = { notebookName }
-
-      return cy.wrap(
-        TestabilityRestController.shareToBazaar({
-          body: requestBody,
         }),
         { log: false }
       )

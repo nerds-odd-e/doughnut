@@ -87,12 +87,6 @@ export const assumeAssimilationPage = () => ({
     ])
     return this
   },
-  expectTutorFeedbackScore(score: number) {
-    cy.get(`[data-test="tutor-feedback-score-${score}"]`)
-      .should('be.visible')
-      .and('contain', `tutor feedback score ${score} from a learning session`)
-    return this
-  },
   skipOnPanel() {
     skipButton().click()
     cy.findByRole('button', { name: 'OK' }).click()

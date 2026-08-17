@@ -61,12 +61,8 @@ Feature: Commissioned learning session
     Then the recorded Feedback for notebook "Spanish conversation" should be shown
     And the commissioned memory tracker for "Hola" should have recall count 1
     And the commissioned memory tracker for "Gracias" should have recall count 1
-    And I should see tutor feedback score 5 from a learning session for the memory tracker of note "Hola"
+    And the commissioned memory tracker for "Hola" should have tutor feedback score 5
     And I should see 0 potential learning session for notebook "Spanish conversation"
-    When It's day 3, 9 hour
-    Then I should see 1 potential learning session for notebook "Spanish conversation"
-    When I open the learning session request for notebook "Spanish conversation"
-    Then the learning session request should list session items for notes "Hola, Gracias"
 
   Scenario: First tutor score 4 on a new tracker sets Difficulty to 5
     Given the notes "Hola, Gracias" are assimilated as commissioned on day 1

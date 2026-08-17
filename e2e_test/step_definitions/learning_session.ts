@@ -4,10 +4,7 @@
 
 import { Given, Then, When } from '@badeball/cypress-cucumber-preprocessor'
 import type { DataTable } from '@cucumber/cucumber'
-import {
-  LearningSessionController,
-  NoteController,
-} from '@generated/doughnut-backend-api/sdk.gen'
+import { LearningSessionController } from '@generated/doughnut-backend-api/sdk.gen'
 import start from '../start'
 
 const SESSION_ITEM_SCORES_OPEN_TAG = '<session_item_scores>'
@@ -54,26 +51,31 @@ Then(
   }
 )
 
+function commissionedMemoryTracker(noteTitle: string) {
+  return start.testability().memoryTrackerForNote(noteTitle, 'COMMISSIONED')
+}
+
 Then(
   'the commissioned memory tracker for {string} should have recall count {int}',
   (noteTitle: string, recallCount: number) => {
-    start
-      .testability()
-      .getInjectedNoteIdByTitle(noteTitle)
-      .then((noteId) =>
-        cy.wrap(NoteController.getNoteInfo({ path: { note: noteId } }), {
-          log: false,
-        })
-      )
-      .then((noteInfo) => {
-        const commissioned = noteInfo?.memoryTrackers?.find(
-          (tracker) => tracker.type === 'COMMISSIONED'
-        )
-        expect(
-          commissioned?.recallCount,
-          `commissioned recall count for ${noteTitle}`
-        ).to.eq(recallCount)
-      })
+    commissionedMemoryTracker(noteTitle).then((tracker) => {
+      expect(
+        tracker.recallCount,
+        `commissioned recall count for ${noteTitle}`
+      ).to.eq(recallCount)
+    })
+  }
+)
+
+Then(
+  'the commissioned memory tracker for {string} should have tutor feedback score {int}',
+  (noteTitle: string, score: number) => {
+    commissionedMemoryTracker(noteTitle).then((tracker) => {
+      expect(
+        tracker.latestTutorFeedbackScore,
+        `tutor feedback score for ${noteTitle}`
+      ).to.eq(score)
+    })
   }
 )
 
@@ -114,13 +116,5 @@ Then(
       .recall()
       .assumeRecallPage()
       .expectLearningSessionRequestIncludesRubric()
-  }
-)
-
-Then(
-  'I should see tutor feedback score {int} from a learning session for the memory tracker of note {string}',
-  (score: number, noteTitle: string) => {
-    start.jumpToNotePage(noteTitle).moreOptions().openAssimilationSettings()
-    start.assumeAssimilationPage().expectTutorFeedbackScore(score)
   }
 )

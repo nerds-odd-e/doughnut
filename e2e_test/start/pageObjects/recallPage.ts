@@ -162,8 +162,7 @@ export const recall = () => {
       return this
     },
     expectPotentialLearningSession(count: number, notebookTitle: string) {
-      this.navigateToRecallPage()
-      recallLearningSessionMethods().expectPotentialLearningSession(
+      this.visitRecallPage().expectPotentialLearningSession(
         count,
         notebookTitle
       )

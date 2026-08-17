@@ -3,7 +3,7 @@
 /// <reference types="../support" />
 // @ts-check
 
-import { Then, When } from '@badeball/cypress-cucumber-preprocessor'
+import { Given, Then, When } from '@badeball/cypress-cucumber-preprocessor'
 import start from '../start'
 
 When('I visit the Bazaar', () => {
@@ -30,6 +30,15 @@ When(
   'I subscribe to notebook {string} in the bazaar, with daily assimilation target of {int} notes per day',
   (notebookName: string, count: string) => {
     start.navigateToBazaar().subscribe(notebookName, count)
+  }
+)
+
+Given(
+  'I have subscribed to notebook {string} in the bazaar with daily assimilation target of {int}',
+  (notebookName: string, dailyTargetOfNewNotes: number) => {
+    start
+      .testability()
+      .subscribeToBazaarNotebook(notebookName, dailyTargetOfNewNotes)
   }
 )
 

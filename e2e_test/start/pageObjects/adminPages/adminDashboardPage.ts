@@ -29,34 +29,42 @@ function modelManagement() {
   }
 }
 
+function failureReportList() {
+  cy.get('h2').contains('Failure Reports')
+  return {
+    shouldContain(content: string) {
+      cy.get('body').should(($body) => {
+        const actual = $body.text()
+        expect(
+          actual,
+          `Expected failure report to contain "${content}", but found: ${actual.slice(0, 500)}`
+        ).to.contain(content)
+      })
+      return this
+    },
+    clearSelected(index = 0) {
+      cy.get('.daisy-card').eq(index).find('input[type="checkbox"]').check()
+      cy.get('button').contains('Delete Selected').click()
+      clickDaisyDialogButton('dialog.daisy-modal', 'Delete')
+      waitUntilAppIsNotBusy()
+      return this
+    },
+    shouldBeEmpty() {
+      cy.findByText('All Clear!').should('exist')
+      return this
+    },
+  }
+}
+
 export function assumeAdminDashboardPage() {
   return {
     goToFailureReportList() {
       this.goToTabInAdminDashboard('Failure Reports')
-      cy.get('h2').contains('Failure Reports')
-      return {
-        shouldContain(content: string) {
-          cy.get('body').should(($body) => {
-            const actual = $body.text()
-            expect(
-              actual,
-              `Expected failure report to contain "${content}", but found: ${actual.slice(0, 500)}`
-            ).to.contain(content)
-          })
-          return this
-        },
-        clearSelected(index = 0) {
-          cy.get('.daisy-card').eq(index).find('input[type="checkbox"]').check()
-          cy.get('button').contains('Delete Selected').click()
-          clickDaisyDialogButton('dialog.daisy-modal', 'Delete')
-          waitUntilAppIsNotBusy()
-          return this
-        },
-        shouldBeEmpty() {
-          cy.findByText('All Clear!').should('exist')
-          return this
-        },
-      }
+      return failureReportList()
+    },
+
+    assumeFailureReportList() {
+      return failureReportList()
     },
 
     openFailureReports() {

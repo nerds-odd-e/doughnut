@@ -23,19 +23,39 @@ Then(
   }
 )
 
+function assimilateTitlesOnDay(
+  noteTitles: string,
+  day: number,
+  assimilateTitle: (title: string) => void
+) {
+  start.testability().backendTimeTravelTo(day, 8)
+  commonSenseSplit(noteTitles, ', ').forEach(assimilateTitle)
+}
+
 Given(
   'the note {string} was assimilated on day {int}',
   (noteTitle: string, day: number) => {
-    start.testability().backendTimeTravelTo(day, 8)
-    start.testability().assimilateNote(noteTitle)
+    assimilateTitlesOnDay(noteTitle, day, (title) =>
+      start.testability().assimilateNote(title)
+    )
+  }
+)
+
+Given(
+  'the notes {string} are assimilated on day {int}',
+  (noteTitles: string, day: number) => {
+    assimilateTitlesOnDay(noteTitles, day, (title) =>
+      start.testability().assimilateNote(title)
+    )
   }
 )
 
 Given(
   'the note {string} was assimilated as spelling on day {int}',
   (noteTitle: string, day: number) => {
-    start.testability().backendTimeTravelTo(day, 8)
-    start.testability().assimilateNoteAsSpelling(noteTitle)
+    assimilateTitlesOnDay(noteTitle, day, (title) =>
+      start.testability().assimilateNoteAsSpelling(title)
+    )
   }
 )
 
@@ -51,20 +71,18 @@ Given(
 Given(
   'the notes {string} are assimilated as commissioned on day {int}',
   (noteTitles: string, day: number) => {
-    start.testability().backendTimeTravelTo(day, 8)
-    commonSenseSplit(noteTitles, ', ').forEach((title) => {
+    assimilateTitlesOnDay(noteTitles, day, (title) =>
       start.testability().assimilateNoteAsCommissioned(title)
-    })
+    )
   }
 )
 
 Given(
   'the notes {string} in notebook {string} are assimilated as commissioned on day {int}',
   (noteTitles: string, _notebookTitle: string, day: number) => {
-    start.testability().backendTimeTravelTo(day, 8)
-    commonSenseSplit(noteTitles, ', ').forEach((title) => {
+    assimilateTitlesOnDay(noteTitles, day, (title) =>
       start.testability().assimilateNoteAsCommissioned(title)
-    })
+    )
   }
 )
 

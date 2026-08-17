@@ -112,7 +112,9 @@ CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/recall/
 
 ### 3. Bazaar assimilate, tutor report, clear failure report
 Type: Structure
-Status: planned
+Status: done
+
+**Learnings:** Bazaar assimilate subscribes via API (~4.8s → ~1.1s). Tutor report keeps UI write; schedule/score via API (~4.1s → ~2.3s). Failure-report clear uses admin session + direct tab URL (~4.1s → ~1.1s). Bazaar share/subscribe helpers live in `testabilityBazaar.ts`.
 
 **Tests:**
 - `e2e_test/features/bazaar/bazaar_subscription.feature` — "Assimilate notes from a Bazaar subscription" (~4767ms)

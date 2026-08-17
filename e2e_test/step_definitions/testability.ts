@@ -21,15 +21,20 @@ Then(
 )
 
 Given('an admin is viewing the failure report', () => {
-  start.loginAsAdminAndGoToAdminDashboard().goToFailureReportList()
+  return start.establishSessionAs('admin').then(() => {
+    start
+      .assumeAdminDashboardPage()
+      .openFailureReports()
+      .assumeFailureReportList()
+  })
 })
 
 When('I clear the selected failure report item', () => {
-  start.assumeAdminDashboardPage().goToFailureReportList().clearSelected()
+  start.assumeAdminDashboardPage().assumeFailureReportList().clearSelected()
 })
 
 Then('the failure report should be empty', () => {
-  start.assumeAdminDashboardPage().goToFailureReportList().shouldBeEmpty()
+  start.assumeAdminDashboardPage().assumeFailureReportList().shouldBeEmpty()
 })
 
 When('I visit the home page', () => {

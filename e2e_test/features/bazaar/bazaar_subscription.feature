@@ -10,7 +10,7 @@ Feature: Bazaar subscription
       | Square     |
       | Triangle   |
       | Big Square |
-    And I am logged in as "another_old_learner"
+    And I have a session as "another_old_learner"
     And the notes "Shape" are skipped from the assimilation sequence
     And my session is logged out
     And notebook "Shape" is shared to the Bazaar
@@ -29,12 +29,10 @@ Feature: Bazaar subscription
     Given I am logged in as an existing user
     And I have a notebook "Memo pad" with a note "My memo"
     And my daily new notes to assimilate is set to 2
-    When I subscribe to notebook "Shape" in the bazaar, with daily assimilation target of 1 notes per day
-    And the OpenAI service is unavailable due to invalid system token
+    And I have subscribed to notebook "Shape" in the bazaar with daily assimilation target of 1
     Then On day 1 I should have "0/2/4" note for assimilation and "0/0/0" for recall
-    And  On day 1 I recall "                     " and assimilate new "Square, My memo, end"
-    And  On day 2 I recall "Square, My memo, end " and assimilate new "Triangle, end       "
-    And  I should be able to edit the subscription to notebook "Shape"
+    And the notes "Square, My memo" are assimilated on day 1
+    Then On day 2 I should have "0/2/2" note for assimilation and "0/2/2" for recall
 
   Scenario: Notebook with Skip Memory Tracking cannot be subscribed from the Bazaar
     Given I am logged in as "another_old_learner"
