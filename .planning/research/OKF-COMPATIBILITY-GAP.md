@@ -2,7 +2,7 @@
 
 **Status:** Live spec is **OKF v0.2**. Catalog ZIP export is **not** an OKF-conformant bundle. Remaining work is a lossless codec + accept/lint that match Proposed ADR 0004, plus **accept ADR 0004** (human). This tracker is not a second profile.
 
-**Updated:** 2026-08-17
+**Updated:** 2026-08-18
 
 **Feeds:** Proposed [ADR 0004](../../docs/adrs/0004-okf-compatible-notebook-markdown.md)
 
@@ -25,15 +25,16 @@ Portable output today is **one-way catalog ZIP** (`GET /api/notebooks/{notebook}
 - No `log.md`. Root `index.md` has no `okf_version`.
 - Note titles `readme` / `readme.md` are reserved. Titles `index` and `log` are allowed, so a note can occupy reserved OKF basenames and collide with a folder `index.md`.
 
-In the product (not the ZIP), titles live in a column (max 150). Inter-note links are title/alias wiki links. Relationship notes use `type: relationship` plus `relation` / `source` / `target`. `tags` / `aliases` / `cssclasses` are Obsidian-style passthrough; `aliases` must be a plain YAML list. Images are MySQL blobs addressed by numeric id.
+In the product (not the ZIP), titles live in a column (max 150). Inter-note links are title/alias wiki links. Stored notes carry `type: Note` or `type: Relationship` (relationship notes also have `relation` / `source` / `target`). `tags` / `aliases` / `cssclasses` are Obsidian-style passthrough; `aliases` must be a plain YAML list. Images are MySQL blobs addressed by numeric id.
 
 ## Blocking for an OKF-conformant tree (§11)
 
 A bundle is conformant only if every non-reserved `.md` has parseable YAML with a non-empty `type`, and every present `index.md` / `log.md` follows §8 / §9.
 
+**C1** is closed: persist (`NoteConceptType.ensureStoredType`) and production backfill (`V300000270`) store `type: Note` / `type: Relationship` on `note.content`. Export copies the leading YAML block, so concept files carry that `type`.
+
 | ID | Gap | Code today |
 |----|-----|------------|
-| **C1** | Required concept frontmatter + `type` | Ordinary notes usually have **no** frontmatter. Export does not add `type: Note` (ADR 0004). Relationship notes already have `type: relationship` (unknown types are OK for OKF consumers). |
 | **C2** | Reserved `index.md` body is a directory listing (§8) when the file is present | Doughnut writes **folder/notebook readme** into `index.md`. That is not §8 progressive-disclosure listing. Root file has no `okf_version`. See **D1**. |
 | **C3** | Concept files MUST NOT use reserved basenames `index.md` / `log.md` | Titles `index` / `log` are allowed. A note titled `index` in a folder that also has a readme would write a second `index.md`. |
 
@@ -73,10 +74,11 @@ Do not treat **O2**–**O4** as codec blockers.
 
 These are Decision tensions, not missing lines of export code.
 
+**D2** is closed: ADR 0004 Decision names relationship notes as concepts (`type: Relationship`); ordinary notes use `type: Note`. Persist, compose, and backfill match that spelling.
+
 | ID | Tension |
 |----|---------|
 | **D1** | ADR 0004 maps folder/notebook **readme** → `index.md`. OKF §8 / §11: when `index.md` exists it is a **directory listing** (root may add `okf_version` only). Using readme as the reserved file makes **C2** unfixable without changing the profile or generating a listing (and putting readme elsewhere). |
-| **D2** | Ordinary notes: `type: Note`. Relationship notes: `type: relationship` plus Doughnut keys. OKF allows unknown types; ADR 0004 does not say whether relationship files are concepts in the bundle. |
 | **D3** | Filename-as-title matches OKF “derive title from filename” and Obsidian inline titles. OKF still *recommends* a `title` field; ADR 0004 uses `title` only when the path cannot round-trip. |
 
 Humans still own accept / reject / supersede of ADR 0004 (`docs/adrs/README.md`). **D1** should be resolved in that process; do not silently ship a listing generator that drops readmes, or a readme-in-`index.md` tree labeled OKF-conformant.
