@@ -51,8 +51,8 @@ state, qualitative update rules), not with a particular crate or version.
 - **Retrievability** is computed from elapsed whole hours and Stability, not stored.
 - A recall transition consumes the graded outcome, elapsed time, and that state — never queue lateness.
 - **Requested retention** `r` is a **global constant 0.9** — not a Settings
-  knob, not in the UI, not persisted. Lapses and a RecallLog are **deferred**
-  (see **Deferred**).
+  knob, not in the UI, not persisted. Lapses are **deferred** (see **Deferred**).
+  Memory-state transitions are a **RecallLog** (see **RecallLog**).
 
 ### Difficulty on correct recall
 
@@ -225,12 +225,31 @@ the learner (`wrongCount`, `threshold`, `periodDays`) and does not change the
 schedule or remove the tracker. **Overlap** does not count. Property trackers
 name the property. No confirm action.
 
+### RecallLog
+
+Each memory-state transition is a **RecallLog**
+([ADR 0001](./0001-ubiquitous-language.md)). Tutor Feedback is a log row, not a
+session bag.
+
+A `recall_log` has `memory_tracker_id`, `recorded_at`, `elapsed_hours`
+(nullable on backfill), `product_outcome`, and optional `answer_id`.
+
+A row has `answer_id` xor none: prompt grade and confusion set `answer_id`;
+just review and Tutor Feedback set none. Do not store `recall_prompt_id`
+(redundant with `answer` → `recall_prompt`).
+
+Do not store FSRS G, Retrievability, `I`, or pre/post Stability/Difficulty.
+Current Stability and Difficulty stay on `memory_tracker`. `next_recall_at`
+stays the due-work index.
+
+`product_outcome`: `GOOD` | `EASY` | `HARD` | `SHRINK` | `AGAIN` | `AGAIN_ZERO`
+| `CONFUSION`.
+
 ### Deferred
 
 - **B4:** Lapses (no unused counter)
 - **E3:** Fuzz / maximum interval
 - **E4:** Fitting / per-user weights
-- **E6:** RecallLog
 
 ## Working draft
 
@@ -284,7 +303,7 @@ Empty pending accept.
 ## Related
 
 - Tracker (pointer + deferred IDs, not a second policy map): [`.planning/research/FSRS-COMPATIBILITY-GAP.md`](../../.planning/research/FSRS-COMPATIBILITY-GAP.md)
-- ADR 0001 [ubiquitous language](./0001-ubiquitous-language.md) — **recall** (not FSRS **review**); **recall prompt** / **MCQ** / **just review**; commissioned Learning Session terms; spelling memory tracker
+- ADR 0001 [ubiquitous language](./0001-ubiquitous-language.md) — **recall** (not FSRS **review**); **recall prompt** / **MCQ** / **just review**; **RecallLog**; commissioned Learning Session terms; spelling memory tracker
 - ADR 0005 [commissioned learning session protocol](./0005-commissioned-learning-session-protocol.md) — what a score means to the Tutor
 - Anki answer semantics: <https://docs.ankiweb.net/studying.html#answer-buttons>
 - FSRS overdue-recall: <https://github.com/open-spaced-repetition/awesome-fsrs/wiki/The-Algorithm>

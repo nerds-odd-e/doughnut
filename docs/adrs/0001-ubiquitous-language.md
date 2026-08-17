@@ -96,6 +96,7 @@ does not require renaming the whole codebase at once.
 | **Stability** | Persisted current interval of a memory tracker, in whole hours. After a grade, next recall time is last recalled time plus `I(r, S)` with **requested retention** `r` locked at 0.9 (so due hours equal Stability hours). A newly assimilated tracker may have Stability 0 (due now). | **Stability** |
 | **Requested retention** | Target retrievability at the next due. Locked globally at **0.9** — not a Settings knob, not in the UI, not persisted. At this `r`, open FSRS `I(0.9, S) = S` in whole hours. | |
 | **Retrievability** | Computed from elapsed whole hours and Stability; not stored. | |
+| **RecallLog** | One persisted memory-state transition for a memory tracker. Doughnut’s name for the FSRS-shaped review history (review (FSRS) = recall). Prompt grades and confusion link an **answer**; just review and Tutor Feedback do not. Shape: [ADR 0003](./0003-spaced-repetition-scheduling-policy.md). | |
 | **Daily assimilation target** | Max new understanding memory trackers to create per day (profile or subscription). Spelling and commissioned trackers do not consume this count. | |
 
 #### Conversation and focus
@@ -153,6 +154,8 @@ does not require renaming the whole codebase at once.
    - Use **Stability** for a memory tracker’s interval, not a user interval
      list or **space setting**. Do not persist **Retrievability**. **Requested
      retention** is a global constant 0.9, not a learner setting.
+   - Use **RecallLog** for a memory-state transition. Prompt submissions stay
+     **answer**. Do not name the log after FSRS **review**.
    - Prefer **semantic search** over **semantical search**.
    - Use **notebook short description** for the one-line plain-text catalog blurb
      shown in the notebook catalog. Use **readme** (or **notebook readme** /
@@ -245,5 +248,6 @@ does not require renaming the whole codebase at once.
 - Links: playbook [README.md](./README.md); ADR-0000
   [use-adrs-accepted.md](./0000-use-adrs-accepted.md); ADR 0003
   [spaced-repetition scheduling policy](./0003-spaced-repetition-scheduling-policy.md)
-  (FSRS **review** = Doughnut **recall**; **Stability** / **Retrievability**);
+  (FSRS **review** = Doughnut **recall**; **Stability** / **Retrievability** /
+  **RecallLog**);
   [Open Knowledge Format](https://cloud.google.com/blog/products/data-analytics/how-the-open-knowledge-format-can-improve-data-sharing)
