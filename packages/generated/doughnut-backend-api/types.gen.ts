@@ -1099,6 +1099,15 @@ export type RecallPromptHistoryItem = {
     mcq?: Mcq;
 };
 
+export type RecallLog = {
+    id: number;
+    recordedAt: string;
+    elapsedHours?: number;
+    productOutcome: 'GOOD' | 'EASY' | 'HARD' | 'SHRINK' | 'AGAIN' | 'AGAIN_ZERO' | 'CONFUSION';
+    memoryTrackerId: number;
+    answerId?: number;
+};
+
 export type LearningSessionRequestResponse = {
     requestMarkdown: string;
 };
@@ -3632,6 +3641,24 @@ export type GetRecallPromptResponses = {
 };
 
 export type GetRecallPromptResponse = GetRecallPromptResponses[keyof GetRecallPromptResponses];
+
+export type GetRecallLogsData = {
+    body?: never;
+    path: {
+        memoryTracker: number;
+    };
+    query?: never;
+    url: '/api/memory-trackers/{memoryTracker}/recall-logs';
+};
+
+export type GetRecallLogsResponses = {
+    /**
+     * OK
+     */
+    200: Array<RecallLog>;
+};
+
+export type GetRecallLogsResponse = GetRecallLogsResponses[keyof GetRecallLogsResponses];
 
 export type GetRecentlyRecalledData = {
     body?: never;

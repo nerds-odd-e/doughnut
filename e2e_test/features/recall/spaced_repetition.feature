@@ -28,6 +28,15 @@ Feature: Spaced-repetition
     And On day 9 I recall "Note 2, end         " and assimilate new "end         "
 
   @mockBrowserTime
+  Scenario: Memory Tracker shows a GOOD RecallLog after just-review Yes
+    Given the browser and backend are on day 1
+    When I assimilate the note "Note 1"
+    And I am recalling my note on day 1
+    And I choose yes I remember
+    And I visit the understanding memory tracker for "Note 1"
+    Then I should see a GOOD RecallLog with elapsed hours and no answer id
+
+  @mockBrowserTime
   Scenario: Memory Tracker shows Stability and Again Difficulty after incorrect just-review
     Given the browser and backend are on day 1
     When I assimilate the note "Note 1"

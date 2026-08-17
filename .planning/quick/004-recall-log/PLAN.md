@@ -1,6 +1,6 @@
 # Plan: RecallLog
 
-**Status:** in progress (slice 2 next)
+**Status:** in progress (slice 3 next)
 
 **Goal:** Memory-state transitions are a RecallLog. Prompt submissions stay `answer`. Tutor Feedback is a log row, not a session bag.
 
@@ -10,7 +10,7 @@
 - Write logs at the **grade caller** (just review, prompt grading, `recordFeedback`, confusion), not only inside `recalledAgain` — Tutor **0** and **1** both call `recalledAgain` but must log `AGAIN_ZERO` vs `AGAIN`.
 - Hooking `markAsRecalled` will also log prompt Yes/No before `answer_id` is set. That is allowed interim; the next prompt slice sets `answer_id`. Overlap must still write **no** log (it does not call `markAsRecalled`).
 - `GET /api/memory-trackers/{id}/recall-logs` is the Memory Tracker surface. After a DTO change, `pnpm generateTypeScript`.
-- Next Flyway: `V300000263`. `recall_log.memory_tracker_id` ON DELETE CASCADE. Include logs in hard-delete fixtures (`unit-testing.mdc`).
+- Next Flyway: `V300000264`. `recall_log.memory_tracker_id` ON DELETE CASCADE. Include logs in hard-delete fixtures (`unit-testing.mdc`).
 - Jidoka before dropping `learning_session`: [ADR 0005](../../../docs/adrs/0005-commissioned-learning-session-protocol.md) still describes paste-into-session and amend-in-place; code already does not. Slice 12 drafts that ADR to match “session = Request/Report activity, not a table.”
 
 ## Slices
@@ -19,13 +19,9 @@
 
 E6 is in Proposed ADR 0003 Decision (shape + `product_outcome` + `answer_id` xor none). **RecallLog** is in ADR 0001 glossary. Status stays Proposed (human). GAP/SEED still list E6 until slice 14.
 
-### 2. Just-review Yes leaves a GOOD RecallLog — Behavior — planned
+### 2. Just-review Yes leaves a GOOD RecallLog — Behavior — done
 
-**Pre:** Assimilated understanding tracker.  
-**Trigger:** Just review **Yes, I remember**.  
-**Post:** Memory Tracker shows one RecallLog: `GOOD`, `recorded_at`, `elapsed_hours`, no `answer_id`. Stability/Difficulty display unchanged.
-
-Includes table + entity + writer on successful `mark-as-recalled` + GET + page section. E2E in `spaced_repetition.feature`. Controller test pins the log shape once.
+Table `recall_log` (`V300000263`), GET `/api/memory-trackers/{id}/recall-logs`, Memory Tracker section. Successful `markAsRecalled` writes `GOOD`. Unsuccessful already writes `AGAIN` (same writer; slice 3 asserts it). Controller test pins the GOOD shape once.
 
 ### 3. Just-review No leaves an AGAIN RecallLog — Behavior — planned
 

@@ -53,6 +53,7 @@ export const WithAnsweredQuestion: Story = {
         isCorrect: true,
       }),
     ],
+    recallLogs: [],
     memoryTracker: makeMe.aMemoryTracker.please(),
     memoryTrackerId: 1,
   },
@@ -70,6 +71,7 @@ export const WithIncorrectAnswer: Story = {
         isCorrect: false,
       }),
     ],
+    recallLogs: [],
     memoryTracker: makeMe.aMemoryTracker.please(),
     memoryTrackerId: 1,
   },
@@ -108,6 +110,7 @@ export const NoteWithManyAncestors: Story = {
           .withAnswerTime(new Date().toISOString())
           .please(),
       ],
+      recallLogs: [],
       memoryTracker: makeMe.aMemoryTracker.ofLink(note).please(),
       memoryTrackerId: 1,
     }
@@ -118,6 +121,7 @@ export const NoteWithManyAncestors: Story = {
 export const NoQuestionFound: Story = {
   args: {
     recallPrompts: [],
+    recallLogs: [],
     memoryTracker: makeMe.aMemoryTracker.please(),
     memoryTrackerId: 1,
   },

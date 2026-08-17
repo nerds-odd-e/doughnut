@@ -29,7 +29,7 @@ vi.mock("vue-router", async (importOriginal) => {
 
 describe("MemoryTrackerPage", () => {
   it("fetches memory tracker data on mount", async () => {
-    const { getRecallPromptsSpy, showMemoryTrackerSpy } =
+    const { getRecallPromptsSpy, getRecallLogsSpy, showMemoryTrackerSpy } =
       mockMemoryTrackerPageApis({
         recallPrompts: [
           makeMe.aRecallPromptHistoryItem
@@ -41,6 +41,9 @@ describe("MemoryTrackerPage", () => {
     await flushPromises()
 
     expect(getRecallPromptsSpy).toHaveBeenCalledWith({
+      path: { memoryTracker: memoryTrackerId },
+    })
+    expect(getRecallLogsSpy).toHaveBeenCalledWith({
       path: { memoryTracker: memoryTrackerId },
     })
     expect(showMemoryTrackerSpy).toHaveBeenCalledWith({
@@ -77,6 +80,9 @@ describe("MemoryTrackerPage", () => {
       wrapSdkError("Error")
     )
     vi.spyOn(MemoryTrackerController, "showMemoryTracker").mockResolvedValue(
+      wrapSdkError("Error")
+    )
+    vi.spyOn(MemoryTrackerController, "getRecallLogs").mockResolvedValue(
       wrapSdkError("Error")
     )
     const wrapper = mountMemoryTrackerPage()

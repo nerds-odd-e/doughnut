@@ -14,6 +14,13 @@ function openNoteLevelTracker(noteTitle: string, kind: NoteLevelTrackerKind) {
     .openNoteLevelMemoryTracker(kind)
 }
 
+Then(
+  'I should see a GOOD RecallLog with elapsed hours and no answer id',
+  () => {
+    assumeMemoryTrackerPage().expectGoodRecallLogWithoutAnswer()
+  }
+)
+
 Then('I should see Stability {int}', (stability: number) => {
   assumeMemoryTrackerPage().expectStability(stability)
 })

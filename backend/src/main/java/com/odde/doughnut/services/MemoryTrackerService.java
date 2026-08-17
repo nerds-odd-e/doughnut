@@ -5,11 +5,14 @@ import com.odde.doughnut.controllers.dto.AssimilationRequestDTO;
 import com.odde.doughnut.controllers.dto.ThresholdExceededResult;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.ProductOutcome;
+import com.odde.doughnut.entities.RecallLog;
 import com.odde.doughnut.entities.RecallPrompt;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.AssimilationSequenceSkipRepository;
 import com.odde.doughnut.entities.repositories.ConversationRepository;
 import com.odde.doughnut.entities.repositories.MemoryTrackerRepository;
+import com.odde.doughnut.entities.repositories.RecallLogRepository;
 import com.odde.doughnut.entities.repositories.RecallPromptRepository;
 import com.odde.doughnut.factoryServices.EntityPersister;
 import java.sql.Timestamp;
@@ -28,6 +31,7 @@ public class MemoryTrackerService {
   private final UserService userService;
   private final MemoryTrackerRepository memoryTrackerRepository;
   private final RecallPromptRepository recallPromptRepository;
+  private final RecallLogRepository recallLogRepository;
   private final ConversationRepository conversationRepository;
   private final MemoryTrackerAssimilation assimilation;
   private final SpellingRecallGrading spellingRecallGrading;
@@ -37,6 +41,7 @@ public class MemoryTrackerService {
       UserService userService,
       MemoryTrackerRepository memoryTrackerRepository,
       RecallPromptRepository recallPromptRepository,
+      RecallLogRepository recallLogRepository,
       ConversationRepository conversationRepository,
       WikiLinkResolver wikiLinkResolver,
       AssimilationSequenceSkipRepository skipRepository) {
@@ -44,6 +49,7 @@ public class MemoryTrackerService {
     this.userService = userService;
     this.memoryTrackerRepository = memoryTrackerRepository;
     this.recallPromptRepository = recallPromptRepository;
+    this.recallLogRepository = recallLogRepository;
     this.conversationRepository = conversationRepository;
     this.assimilation =
         new MemoryTrackerAssimilation(entityPersister, userService, this, skipRepository);
@@ -83,6 +89,7 @@ public class MemoryTrackerService {
       Boolean correct,
       MemoryTracker memoryTracker,
       Integer thinkingTimeMs) {
+    persistRecallLog(memoryTracker, currentUTCTimestamp, correct);
     memoryTracker.markAsRecalled(currentUTCTimestamp, correct, thinkingTimeMs);
     entityPersister.save(memoryTracker);
 
@@ -90,6 +97,16 @@ public class MemoryTrackerService {
       return isThresholdExceeded(memoryTracker, currentUTCTimestamp);
     }
     return false;
+  }
+
+  private void persistRecallLog(
+      MemoryTracker memoryTracker, Timestamp recordedAt, boolean successful) {
+    RecallLog recallLog = new RecallLog();
+    recallLog.setMemoryTracker(memoryTracker);
+    recallLog.setRecordedAt(recordedAt);
+    recallLog.setElapsedHours((int) memoryTracker.elapsedHoursUntil(recordedAt));
+    recallLog.setProductOutcome(successful ? ProductOutcome.GOOD : ProductOutcome.AGAIN);
+    entityPersister.save(recallLog);
   }
 
   public Optional<MemoryTracker> findConfusionAdjustmentTracker(User user, Note note) {
@@ -153,6 +170,11 @@ public class MemoryTrackerService {
 
   public List<RecallPrompt> getAllRecallPrompts(MemoryTracker memoryTracker) {
     return recallPromptRepository.findAllByMemoryTracker_IdOrderByIdDesc(memoryTracker.getId());
+  }
+
+  public List<RecallLog> getRecallLogs(MemoryTracker memoryTracker) {
+    return recallLogRepository.findAllByMemoryTracker_IdOrderByRecordedAtDescIdDesc(
+        memoryTracker.getId());
   }
 
   public void deleteUnansweredRecallPrompts(MemoryTracker memoryTracker) {

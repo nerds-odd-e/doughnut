@@ -174,6 +174,21 @@ const assumeMemoryTrackerPage = () => {
       })
       return assumeMemoryTrackerPage()
     },
+    expectGoodRecallLogWithoutAnswer() {
+      expectMemoryTrackerPage()
+      cy.get('[data-testid="recall-log"]').should('have.length', 1)
+      cy.get('[data-testid="recall-log-product-outcome"]').should(
+        'have.text',
+        'GOOD'
+      )
+      cy.get('[data-testid="recall-log"]').should('contain.text', 'Recorded:')
+      cy.get('[data-testid="recall-log"]').should(
+        'contain.text',
+        'Elapsed hours:'
+      )
+      cy.get('[data-testid="recall-log-answer-id"]').should('not.exist')
+      return assumeMemoryTrackerPage()
+    },
   }
 }
 

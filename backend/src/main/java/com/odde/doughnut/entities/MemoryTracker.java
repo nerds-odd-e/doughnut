@@ -152,7 +152,7 @@ public class MemoryTracker extends EntityIdentifiedByIdOnly {
     return new ForgettingCurve(getStability(), getDifficulty());
   }
 
-  long elapsedHoursUntil(Timestamp currentUTCTimestamp) {
+  public long elapsedHoursUntil(Timestamp currentUTCTimestamp) {
     return TimestampOperations.getDiffInHours(currentUTCTimestamp, getLastRecalledAt());
   }
 

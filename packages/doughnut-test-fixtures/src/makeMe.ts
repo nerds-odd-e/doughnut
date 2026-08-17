@@ -34,6 +34,7 @@ import NotebookCatalogSubscribedNotebookItemBuilder from './NotebookCatalogSubsc
 import McqBuilder from './McqBuilder'
 import RecallPromptBuilder from './RecallPromptBuilder'
 import RecallPromptHistoryItemBuilder from './RecallPromptHistoryItemBuilder'
+import RecallLogBuilder from './RecallLogBuilder'
 import NoteSearchResultBuilder from './NoteSearchResultBuilder'
 import UserBuilder from './UserBuilder'
 import UserForListingBuilder from './UserForListingBuilder'
@@ -76,6 +77,10 @@ class MakeMe {
 
   static get aRecallPromptHistoryItem(): RecallPromptHistoryItemBuilder {
     return new RecallPromptHistoryItemBuilder()
+  }
+
+  static get aRecallLog(): RecallLogBuilder {
+    return new RecallLogBuilder()
   }
 
   static get anMcq(): McqBuilder {

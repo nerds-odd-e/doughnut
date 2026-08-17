@@ -6,9 +6,12 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.ProductOutcome;
+import com.odde.doughnut.entities.RecallLog;
 import com.odde.doughnut.entities.repositories.MemoryTrackerRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import java.sql.Timestamp;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -44,6 +47,26 @@ class MemoryTrackerTrackingControllerTest extends MemoryTrackerControllerTestBas
     Integer oldRecallCount = tracker.getRecallCount();
     controller.markAsRecalled(tracker, true);
     assertThat(tracker.getRecallCount(), equalTo(oldRecallCount + 1));
+  }
+
+  @Test
+  void successfulMarkAsRecalledLeavesOneGoodRecallLog() throws UnexpectedNoAccessRightException {
+    Timestamp assimilatedAt = makeMe.aTimestamp().of(1, 8).please();
+    MemoryTracker tracker =
+        makeMe.aMemoryTrackerFor(ownedNote()).assimilatedAt(assimilatedAt).please();
+    Timestamp recalledAt = makeMe.aTimestamp().of(2, 8).please();
+    testabilitySettings.timeTravelTo(recalledAt);
+
+    controller.markAsRecalled(tracker, true);
+
+    List<RecallLog> logs = controller.getRecallLogs(tracker);
+    assertThat(logs, hasSize(1));
+    RecallLog log = logs.get(0);
+    assertThat(log.getProductOutcome(), is(ProductOutcome.GOOD));
+    assertThat(log.getRecordedAt(), equalTo(recalledAt));
+    assertThat(log.getElapsedHours(), equalTo(24));
+    assertThat(log.getAnswerId(), nullValue());
+    assertThat(log.getMemoryTrackerId(), equalTo(tracker.getId()));
   }
 
   @Test

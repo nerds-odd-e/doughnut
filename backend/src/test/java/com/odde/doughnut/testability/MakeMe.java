@@ -165,4 +165,8 @@ public class MakeMe extends MakeMeWithoutDB {
   public SessionItemBuilder aSessionItem() {
     return new SessionItemBuilder(this);
   }
+
+  public RecallLogBuilder aRecallLogFor(MemoryTracker memoryTracker) {
+    return new RecallLogBuilder(this).memoryTracker(memoryTracker);
+  }
 }

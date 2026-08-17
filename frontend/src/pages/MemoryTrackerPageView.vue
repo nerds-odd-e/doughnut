@@ -17,6 +17,7 @@
       v-if="memoryTracker"
       :memory-tracker="memoryTracker"
     />
+    <RecallLogs :recall-logs="recallLogs" />
     <div class="mb-4 flex justify-end gap-2">
       <button
         v-if="hasUnansweredPrompts"
@@ -128,12 +129,14 @@ import { computed, type PropType } from "vue"
 import type {
   RecallPromptHistoryItem,
   MemoryTracker,
+  RecallLog,
 } from "@generated/doughnut-backend-api"
 import NoteUnderQuestion from "@/components/recall/NoteUnderQuestion.vue"
 import { recalledNoteUnderQuestionProps } from "@/components/recall/recalledNoteUnderQuestionProps"
 import QuestionDisplay from "@/components/recall/QuestionDisplay.vue"
 import ConversationButton from "@/components/recall/ConversationButton.vue"
 import MemoryTrackerInformation from "@/components/recall/MemoryTrackerInformation.vue"
+import RecallLogs from "@/components/recall/RecallLogs.vue"
 import { MemoryTrackerController } from "@generated/doughnut-backend-api/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import usePopups from "@/components/commons/Popups/usePopups"
@@ -143,6 +146,10 @@ import { EyeOff } from "@lucide/vue"
 const props = defineProps({
   recallPrompts: {
     type: Array as PropType<RecallPromptHistoryItem[]>,
+    required: true,
+  },
+  recallLogs: {
+    type: Array as PropType<RecallLog[]>,
     required: true,
   },
   memoryTracker: {

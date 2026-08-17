@@ -194,4 +194,23 @@ describe("MemoryTrackerPageView display", () => {
 
     expect(wrapper.text()).toContain("Unanswered")
   })
+
+  it("shows a GOOD recall log with recorded time, elapsed hours, and no answer id", async () => {
+    const recordedAt = new Date("2024-01-01T12:00:00Z").toISOString()
+    const wrapper = await mountMemoryTrackerPageViewReady({
+      recallPrompts: [],
+      recallLogs: [
+        makeMe.aRecallLog.recordedAt(recordedAt).elapsedHours(24).please(),
+      ],
+    })
+
+    const log = wrapper.find('[data-testid="recall-log"]')
+    expect(log.exists()).toBe(true)
+    expect(log.text()).toContain("GOOD")
+    expect(log.text()).toContain(new Date(recordedAt).toLocaleString())
+    expect(log.text()).toMatch(/Elapsed hours:\s*24/)
+    expect(log.find('[data-testid="recall-log-answer-id"]').exists()).toBe(
+      false
+    )
+  })
 })

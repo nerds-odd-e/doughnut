@@ -37,6 +37,7 @@ class MemoryTrackerDeleteControllerTest extends MemoryTrackerControllerTestBase 
     RecallPrompt recallPrompt = promptFor(tracker, note);
     Conversation conversation =
         makeMe.aConversation().forARecallPrompt(recallPrompt).from(currentUser.getUser()).please();
+    makeMe.aRecallLogFor(tracker).please();
 
     Integer trackerId = tracker.getId();
     Integer conversationId = conversation.getId();

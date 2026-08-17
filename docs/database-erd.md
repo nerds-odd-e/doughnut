@@ -4,6 +4,7 @@ Entity-relationship view of the application database: foreign keys as relationsh
 
 ```mermaid
 erDiagram
+    answer ||--o{ recall_log : "answer_id ON DELETE SET NULL"
     answer ||--o{ recall_prompt : "answer_id ON DELETE NO ACTION"
     attachment_blob ||--o{ image : "attachment_blob_id ON DELETE CASCADE"
     book ||--o{ book_block : "book_id ON DELETE CASCADE"
@@ -21,6 +22,7 @@ erDiagram
     mcq ||--o{ recall_prompt : "mcq_id ON DELETE NO ACTION"
     memory_tracker ||--o{ answer : "confusion_adjusted_memory_tracker_id ON DELETE SET NULL"
     memory_tracker ||--o{ question_generation_batch_request : "memory_tracker_id ON DELETE CASCADE"
+    memory_tracker ||--o{ recall_log : "memory_tracker_id ON DELETE CASCADE"
     memory_tracker ||--o{ recall_prompt : "memory_tracker_id ON DELETE CASCADE"
     memory_tracker ||--o{ session_item : "memory_tracker_id ON DELETE CASCADE"
     "note" ||--o{ admin_data_migration_progress : "last_processed_note_id ON DELETE SET NULL"
@@ -213,6 +215,11 @@ erDiagram
         int batch_id FK
         int memory_tracker_id FK
         string custom_id UK
+    }
+    recall_log {
+        int id PK
+        int memory_tracker_id FK
+        int answer_id FK
     }
     recall_prompt {
         int id PK
