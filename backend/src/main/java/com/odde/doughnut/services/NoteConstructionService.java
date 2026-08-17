@@ -71,7 +71,7 @@ public class NoteConstructionService {
     return note;
   }
 
-  private void persistCreatedNoteContent(Note note, String content) {
+  private void persistNoteContent(Note note, String content) {
     Timestamp ts = testabilitySettings.getCurrentUTCTimestamp();
     note.setContent(
         NoteConceptType.ensureStoredType(AuthoredNoteContent.prepareContentForSave(content)));
@@ -108,7 +108,7 @@ public class NoteConstructionService {
     }
     Note note = createNote(notebook, folder, noteCreation.getNewTitle());
     if (noteCreation.getContent() != null) {
-      persistCreatedNoteContent(note, noteCreation.getContent());
+      persistNoteContent(note, noteCreation.getContent());
     }
     note = attachWikidataAndRefresh(note, wikidataIdWithApi);
     noteService.deleteOrphanImagesForPersistedContent(note);
@@ -130,7 +130,6 @@ public class NoteConstructionService {
   public NoteRealm createNoteFromExtractedSuggestion(
       Note originalNote, NoteExtractionResult aiResult) {
     User user = authorizationService.getCurrentUser();
-    Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
 
     String newNoteContent =
         NoteContentTitleHeading.withoutRepeatedTitleHeading(
@@ -138,12 +137,8 @@ public class NoteConstructionService {
 
     Note newNote =
         createNote(originalNote.getNotebook(), originalNote.getFolder(), aiResult.newNoteTitle);
-    persistCreatedNoteContent(newNote, newNoteContent);
-
-    originalNote.setUpdatedAt(currentUTCTimestamp);
-    originalNote.setContent(
-        AuthoredNoteContent.prepareContentForSave(aiResult.updatedOriginalNoteContent));
-    entityPersister.save(originalNote);
+    persistNoteContent(newNote, newNoteContent);
+    persistNoteContent(originalNote, aiResult.updatedOriginalNoteContent);
 
     noteService.deleteOrphanImagesForPersistedContent(newNote);
     noteService.deleteOrphanImagesForPersistedContent(originalNote);

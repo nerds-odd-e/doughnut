@@ -107,7 +107,8 @@ class AiControllerCreateExtractedNoteTest extends ControllerTestBase {
           .isEqualTo("---\ntype: Note\n---\nExpanded content for the new note.");
       assertThat(persistedNote.getFolder()).isNull();
       makeMe.entityPersister.refresh(sourceNote);
-      assertThat(sourceNote.getContent()).isEqualTo("Updated parent with summary.");
+      assertThat(sourceNote.getContent())
+          .isEqualTo("---\ntype: Note\n---\nUpdated parent with summary.");
     }
 
     @Test

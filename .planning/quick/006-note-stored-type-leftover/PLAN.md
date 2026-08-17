@@ -1,6 +1,6 @@
 # Plan: Note stored type leftover
 
-**Status:** in progress (slice 1 done)
+**Status:** in progress (slices 1–2 done)
 
 **Goal:** Every product write of `note.content` keeps a leading stored type. Tests pin that once per boundary, not twice.
 
@@ -19,13 +19,11 @@ Wikidata location prepend lands in the body after a closed `type: Note` fence. A
 
 **Learning:** fence-aware prepend belongs on `NoteLeadingFrontmatter.prependToBody`, not inline in `Note.prependContent`.
 
-### 2. Extracting a note keeps type on the original — Behavior — planned
+### 2. Extracting a note keeps type on the original — Behavior — done
 
-Pre-condition: source note has stored type (or body-only AI remainder).  
-Trigger: `createExtractedNote`.  
-Post-condition: original note content is `prepareContentForSave` then `ensureStoredType` (same as the new note). Body-only remainder becomes `---\ntype: Note\n---\n` plus that body.
+`createNoteFromExtractedSuggestion` persists original and new-note content through `persistNoteContent` (`prepareContentForSave` then `ensureStoredType`). Body-only remainder is stored as `---\ntype: Note\n---\n` plus that body.
 
-Controller: `AiControllerCreateExtractedNoteTest` (`shouldCreateExtractedNoteFromSourceNote` currently expects untyped remainder).
+**Learning:** the original-note write was the remaining persist hole; renaming `persistCreatedNoteContent` → `persistNoteContent` matches both callers.
 
 ### 3. Drop persist tests that only re-pin the helper YAML — Structure — planned
 
