@@ -71,7 +71,7 @@ const assumeMemoryTrackerPage = () => {
       expectLabeledValue('Recall Count:', String(count))
       return assumeMemoryTrackerPage()
     },
-    expectLastRecallTimeTwelveHoursBeforeNextRecall() {
+    expectHoursBetweenLastAndNextRecall(hours: number) {
       expectMemoryTrackerPage()
       labeledValue('Last Recall Time:').then((lastRecallTime) => {
         labeledValue('Next Recall Time:').then((nextRecallTime) => {
@@ -81,8 +81,8 @@ const assumeMemoryTrackerPage = () => {
             3_600_000
           expect(
             intervalInHours,
-            `Expected Last Recall Time (${lastRecallTime}) to be the incorrect grade time, 12 hours before Next Recall Time (${nextRecallTime})`
-          ).to.equal(12)
+            `Expected ${hours} hours between Last Recall Time (${lastRecallTime}) and Next Recall Time (${nextRecallTime})`
+          ).to.equal(hours)
         })
       })
       return assumeMemoryTrackerPage()

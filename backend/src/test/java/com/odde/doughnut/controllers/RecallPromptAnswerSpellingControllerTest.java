@@ -224,16 +224,5 @@ class RecallPromptAnswerSpellingControllerTest extends RecallPromptControllerTes
       assertThat(
           memoryTracker.getLastRecalledAt(), equalTo(testabilitySettings.getCurrentUTCTimestamp()));
     }
-
-    @Test
-    void shouldRepeatInTwelveHours() throws UnexpectedNoAccessRightException {
-      testabilitySettings.timeTravelTo(memoryTracker.getNextRecallAt());
-      controller.answerSpelling(recallPrompt, answerDTO);
-      assertThat(
-          memoryTracker.getNextRecallAt(),
-          equalTo(
-              TimestampOperations.addHoursToTimestamp(
-                  testabilitySettings.getCurrentUTCTimestamp(), 12)));
-    }
   }
 }

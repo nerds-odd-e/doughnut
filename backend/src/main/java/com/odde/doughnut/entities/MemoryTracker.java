@@ -187,7 +187,9 @@ public class MemoryTracker extends EntityIdentifiedByIdOnly {
 
   public void recallFailed(Timestamp currentUTCTimestamp) {
     recalledAgain(currentUTCTimestamp);
-    setNextRecallAt(TimestampOperations.addHoursToTimestamp(currentUTCTimestamp, 12));
+    if (forgettingCurve().isNewlyAssimilated()) {
+      setNextRecallAt(TimestampOperations.addHoursToTimestamp(currentUTCTimestamp, 12));
+    }
   }
 
   public void recalledSuccessfully(Timestamp now, Integer thinkingTimeMs) {

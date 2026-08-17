@@ -74,7 +74,9 @@ class RecallPromptAccidentalMatchEdgeTests extends RecallPromptControllerTestBas
     assertThat(memoryTracker.getLastRecalledAt(), equalTo(gradeTime));
     assertThat(
         memoryTracker.getNextRecallAt(),
-        equalTo(TimestampOperations.addHoursToTimestamp(gradeTime, 12)));
+        equalTo(
+            TimestampOperations.addHoursToTimestamp(
+                gradeTime, Math.round(memoryTracker.getStability()))));
   }
 
   @Test

@@ -20,7 +20,7 @@ Then(
     start
       .assumeAnsweredQuestionPage()
       .viewMemoryTracker()
-      .expectLastRecallTimeTwelveHoursBeforeNextRecall()
+      .expectHoursBetweenLastAndNextRecall(12)
   }
 )
 
@@ -32,9 +32,12 @@ Then('I should see Difficulty {int}', (difficulty: number) => {
   assumeMemoryTrackerPage().expectDifficulty(difficulty)
 })
 
-Then('I should see 12 hours between last and next recall', () => {
-  assumeMemoryTrackerPage().expectLastRecallTimeTwelveHoursBeforeNextRecall()
-})
+Then(
+  'I should see {int} hours between last and next recall',
+  (hours: number) => {
+    assumeMemoryTrackerPage().expectHoursBetweenLastAndNextRecall(hours)
+  }
+)
 
 Then(
   'I should see that my last spelling answer was correct with recall count {int}',

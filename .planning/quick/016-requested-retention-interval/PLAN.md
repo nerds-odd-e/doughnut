@@ -23,17 +23,15 @@ Learning: wrapping `calculateNextRecallAt` pushed `MemoryTracker` over 250 lines
 
 ### 2. Incorrect recall with Stability > 0 is due from I
 Type: Behavior  
-Status: planned
+Status: done
 
 **Pre:** Graded tracker, Stability > 0, due for recall.  
 **Trigger:** Ordinary incorrect (just-review, MCQ, or spelling).  
-**Post:** `nextRecallAt = lastRecalledAt + I(0.9,` post-lapse `S)` — the Memory Tracker wait equals the new Stability hours, not 12.
+**Post:** `nextRecallAt = lastRecalledAt + I(0.9,` post-lapse `S)` — wait equals new Stability hours, not 12.
 
-- E2E: `spaced_repetition.feature` just-review fail already pins Stability **8** and Difficulty **10**. Change the unique due claim from 12 hours to **8**. Generalize the step/page-object from “twelve hours” to `{int} hours between last and next recall`.
-- Canonical unit due pin: `onTimeIncorrectRecallUsesFsrsAgainPostLapseStability` (S=17 → due last+17, not +12).
-- Drop `shouldRepeatInTwelveHours` on MCQ and spelling answer controllers (canonical due lives on the algorithm test). Accidental-match ordinary-incorrect due: last+round(S), not +12 — unique claim is still “match uses ordinary fail due,” not the S=17 number.
-- Production: after `recalledAgain`, do **not** override due when S > 0. **Interim:** New fail (S=0) still +12h so strictly-future stays satisfied until slice 3. Do not invent other fail intervals.
-- ADR 0003: ordinary incorrect with S > 0 is Again memory **and** due from `I`. Keep New fail +12h as interim in the Decision until slice 3.
+Just-review E2E unique due claim is 8 hours (`{int} hours between last and next recall`). Canonical unit pin S=17 → last+17. MCQ/spelling `shouldRepeatInTwelveHours` dropped. New fail still +12h via `recallFailed` when `isNewlyAssimilated()`. ADR 0003 still Proposed (S>0 due from `I`; New fail +12h interim).
+
+Learning: New-tracker check for the +12h override shares `ForgettingCurve.isNewlyAssimilated()` with Again recall.
 
 ---
 

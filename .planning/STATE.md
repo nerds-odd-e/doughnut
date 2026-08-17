@@ -6,9 +6,9 @@ current_phase: null
 current_phase_name: null
 status: ready
 stopped_at: null
-last_updated: "2026-08-17T08:10:00Z"
+last_updated: "2026-08-17T08:40:00Z"
 last_activity: 2026-08-17
-last_activity_desc: "016 slice 1: r=0.9 named; due hours I(0.9,S)=S; ordinary-incorrect +12h still in place; ADR 0003 still Proposed"
+last_activity_desc: "016 slice 2: ordinary incorrect S>0 due from I (not +12h); New fail still +12h; ADR 0003 still Proposed"
 progress:
   total_phases: 0
   completed_phases: 0

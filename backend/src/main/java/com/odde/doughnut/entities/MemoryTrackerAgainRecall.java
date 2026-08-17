@@ -7,7 +7,7 @@ final class MemoryTrackerAgainRecall {
 
   static void apply(MemoryTracker tracker, Timestamp currentUTCTimestamp) {
     ForgettingCurve curve = tracker.forgettingCurve();
-    if (tracker.getStability() > ForgettingCurve.ASSIMILATE_STABILITY_HOURS) {
+    if (!curve.isNewlyAssimilated()) {
       tracker.setDifficulty(curve.difficultyAfterFailedRecall());
     }
     tracker.setStability(curve.failed(tracker.elapsedHoursUntil(currentUTCTimestamp)));

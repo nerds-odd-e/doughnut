@@ -25,7 +25,7 @@ class SpacedRepetitionIncorrectRecallSchedulingTest
     assertThat(memoryTracker.getStability(), equalTo(17.0f));
     assertThat(
         memoryTracker.getNextRecallAt(),
-        equalTo(TimestampOperations.addHoursToTimestamp(gradeTime, 12)));
+        equalTo(TimestampOperations.addHoursToTimestamp(gradeTime, 17)));
     assertThat(memoryTracker.getLastRecalledAt(), equalTo(gradeTime));
     assertThat(memoryTracker.getRecallCount(), equalTo(oldRecallCount + 1));
   }

@@ -13,7 +13,6 @@ import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.RecallPrompt;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.doughnut.utils.TimestampOperations;
 import java.sql.Timestamp;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -185,17 +184,6 @@ class RecallPromptAnswerControllerTest extends RecallPromptControllerTestBase {
       assertThat(memoryTracker.getStability(), lessThan(oldStability));
       assertThat(
           memoryTracker.getLastRecalledAt(), equalTo(testabilitySettings.getCurrentUTCTimestamp()));
-    }
-
-    @Test
-    void shouldRepeatInTwelveHours() throws UnexpectedNoAccessRightException {
-      testabilitySettings.timeTravelTo(memoryTracker.getNextRecallAt());
-      controller.answer(recallPrompt, answerDTO);
-      assertThat(
-          memoryTracker.getNextRecallAt(),
-          equalTo(
-              TimestampOperations.addHoursToTimestamp(
-                  testabilitySettings.getCurrentUTCTimestamp(), 12)));
     }
   }
 }
