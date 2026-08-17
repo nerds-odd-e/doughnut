@@ -109,7 +109,7 @@ public class ConversationService {
             });
   }
 
-  public List<ConversationMessage> getUnreadConversations(User user) {
+  public List<ConversationMessage> getUnreadMessages(User user) {
     return conversationRepository.findUnreadMessagesByUser(user);
   }
 

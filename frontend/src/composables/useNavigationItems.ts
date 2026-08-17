@@ -11,7 +11,7 @@ import {
   Store,
   Users,
 } from "@lucide/vue"
-import { messageCenterConversations } from "@/store/messageStore"
+import { messageCenter } from "@/store/messageCenter"
 
 export function useNavigationItems() {
   const route = useRoute()
@@ -109,7 +109,7 @@ export function useNavigationItems() {
       name: "messageCenter",
       label: "Messages",
       icon: MessageCircle,
-      badge: messageCenterConversations.unreadConversations.length,
+      badge: messageCenter.unreadMessages.length,
       badgeClass: "unread-count",
       isActive: ["messageCenter"].includes(route.name as string),
     },

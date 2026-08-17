@@ -57,12 +57,12 @@ export class ConversationAboutNotePage {
 
   expectMessages(messages: Record<'role' | 'message', string>[]) {
     messages.forEach(({ role, message }) => {
-      const selector = role === 'user' ? 'pre' : '.ai-chat *'
+      const selector = role === 'user' ? 'pre' : '.ai-assistant *'
       cy.findByText(message, { selector }).should(($el) => {
         const actual = $el.text().trim()
         expect(
           actual,
-          `Expected ${role} chat message "${message}", but found "${actual}"`
+          `Expected ${role} message "${message}", but found "${actual}"`
         ).to.equal(message)
       })
     })

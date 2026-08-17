@@ -39,7 +39,7 @@ const meta = {
           currentRecallWindowEndAt: "",
           totalAssimilatedCount: 0,
         },
-        unreadConversations: [],
+        unreadMessages: [],
       }
       UserController.getMenuData = (async <
         ThrowOnError extends boolean = false,
@@ -99,7 +99,7 @@ export const WithDueCount: Story = {
           currentRecallWindowEndAt: "",
           totalAssimilatedCount: 0,
         },
-        unreadConversations: [],
+        unreadMessages: [],
       }
       UserController.getMenuData = (async <
         ThrowOnError extends boolean = false,
@@ -143,7 +143,7 @@ export const WithRecallCount: Story = {
           currentRecallWindowEndAt: "",
           totalAssimilatedCount: 0,
         },
-        unreadConversations: [],
+        unreadMessages: [],
       }
       UserController.getMenuData = (async <
         ThrowOnError extends boolean = false,
@@ -174,9 +174,9 @@ export const WithUnreadMessages: Story = {
   },
   decorators: [
     (story) => {
-      // Override the default mock to return unread conversations
+      // Override the default mock to return unread messages
       const originalGetMenuData = UserController.getMenuData
-      const mockConversations: ConversationMessage[] = [
+      const mockMessages: ConversationMessage[] = [
         { id: 1, message: "Test message 1" },
         { id: 2, message: "Test message 2" },
         { id: 3, message: "Test message 3" },
@@ -192,7 +192,7 @@ export const WithUnreadMessages: Story = {
           currentRecallWindowEndAt: "",
           totalAssimilatedCount: 0,
         },
-        unreadConversations: mockConversations,
+        unreadMessages: mockMessages,
       }
       UserController.getMenuData = (async <
         ThrowOnError extends boolean = false,

@@ -10,5 +10,5 @@ import lombok.Data;
 public class MenuDataDTO {
   private AssimilationCountDTO assimilationCount;
   private DueMemoryTrackers recallStatus;
-  private List<ConversationMessage> unreadConversations;
+  private List<ConversationMessage> unreadMessages;
 }

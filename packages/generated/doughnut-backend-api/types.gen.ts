@@ -980,7 +980,7 @@ export type MemoryTrackerLite = {
 export type MenuDataDto = {
     assimilationCount?: AssimilationCountDto;
     recallStatus?: DueMemoryTrackers;
-    unreadConversations?: Array<ConversationMessage>;
+    unreadMessages?: Array<ConversationMessage>;
 };
 
 export type CurrentUserInfo = {

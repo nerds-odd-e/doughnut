@@ -38,7 +38,7 @@
             isCurrentUser(conversationMessage.sender?.id || 0)
               ? 'bg-primary text-primary-content'
               : 'bg-base-200',
-            conversationMessage.sender?.id === undefined ? 'ai-chat' : '',
+            conversationMessage.sender?.id === undefined ? 'ai-assistant' : '',
           ]"
         >
           <pre v-if="isCurrentUser(conversationMessage.sender?.id || 0)" class="user-message">{{ formatMessage(conversationMessage.message) }}</pre>

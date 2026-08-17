@@ -1,5 +1,5 @@
 <template>
-  <div class="daisy-card py-2 px-3 bg-base-200 ai-chat">
+  <div class="daisy-card py-2 px-3 bg-base-200 ai-assistant">
     <div>
       <slot name="title" />
     </div>
@@ -47,7 +47,7 @@ defineEmits<{
 </script>
 
 <style scoped>
-.ai-chat {
+.ai-assistant {
   background-color: #f8f9fa;
   border-left: 3px solid #0d6efd;
 }

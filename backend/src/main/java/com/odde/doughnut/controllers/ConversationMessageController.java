@@ -61,7 +61,7 @@ public class ConversationMessageController {
       throws UnexpectedNoAccessRightException {
     authorizationService.assertAuthorization(conversation);
     conversationService.markConversationAsRead(conversation, authorizationService.getCurrentUser());
-    return conversationService.getUnreadConversations(authorizationService.getCurrentUser());
+    return conversationService.getUnreadMessages(authorizationService.getCurrentUser());
   }
 
   @PostMapping("/{conversationId}/send")

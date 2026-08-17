@@ -79,7 +79,7 @@ class UserMenuDataControllerTest extends ControllerTestBase {
     makeMe.aConversationMessage(conversation).sender(currentUser.getUser()).please();
     makeMe.aConversationMessage(conversation).sender(makeMe.aUser().please()).please();
 
-    assertEquals(1, controller.getMenuData("Asia/Shanghai").getUnreadConversations().size());
+    assertEquals(1, controller.getMenuData("Asia/Shanghai").getUnreadMessages().size());
   }
 
   @Test
@@ -90,7 +90,7 @@ class UserMenuDataControllerTest extends ControllerTestBase {
     makeMe.aConversationMessage(conversation).sender(sender).please();
     makeMe.aConversationMessage(conversation).sender(sender).please();
 
-    assertEquals(3, controller.getMenuData("Asia/Shanghai").getUnreadConversations().size());
+    assertEquals(3, controller.getMenuData("Asia/Shanghai").getUnreadMessages().size());
   }
 
   @Test
@@ -98,7 +98,7 @@ class UserMenuDataControllerTest extends ControllerTestBase {
     Conversation conversation = makeMe.aConversation().from(currentUser.getUser()).please();
     makeMe.aConversationMessage(conversation).sender(currentUser.getUser()).please();
 
-    assertEquals(0, controller.getMenuData("Asia/Shanghai").getUnreadConversations().size());
+    assertEquals(0, controller.getMenuData("Asia/Shanghai").getUnreadMessages().size());
   }
 
   @Test
@@ -110,6 +110,6 @@ class UserMenuDataControllerTest extends ControllerTestBase {
         .readByReceiver()
         .please();
 
-    assertEquals(0, controller.getMenuData("Asia/Shanghai").getUnreadConversations().size());
+    assertEquals(0, controller.getMenuData("Asia/Shanghai").getUnreadMessages().size());
   }
 }

@@ -32,7 +32,7 @@ const mountComponent = (conversation, user) =>
 
 const submitMessage = async (wrapper, message: string) => {
   await wrapper.find("textarea").setValue(message)
-  await wrapper.find("form.chat-input-form").trigger("submit")
+  await wrapper.find("form.message-input-form").trigger("submit")
   await flushPromises()
 }
 
@@ -111,7 +111,7 @@ describe("ConversationInner", () => {
       simulateAiResponse()
       await flushPromises()
 
-      expect(wrapper.find(".ai-chat h2").text()).toEqual("I'm ChatGPT")
+      expect(wrapper.find(".ai-assistant h2").text()).toEqual("I'm ChatGPT")
     })
   })
 
@@ -133,7 +133,7 @@ describe("ConversationInner", () => {
       ] satisfies ConversationMessage[]
       await wrapper.vm.$nextTick()
 
-      const aiMessage = wrapper.find(".ai-chat")
+      const aiMessage = wrapper.find(".ai-assistant")
       expect(aiMessage.find("h2").exists()).toBe(true)
       expect(aiMessage.find("strong").exists()).toBe(true)
     })

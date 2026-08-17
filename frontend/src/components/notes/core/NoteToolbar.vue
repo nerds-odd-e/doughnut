@@ -37,7 +37,7 @@
         v-if="!conversationButton && !conversationOverflowed"
         class="daisy-btn daisy-btn-ghost daisy-btn-sm"
         role="button"
-        aria-label="Star a conversation about this note"
+        :aria-label="noteMoreOptionsTitles.conversation"
         @click="() => router.push({
           ...noteShowLocation(note.noteTopology.id),
           query: { conversation: 'true' },

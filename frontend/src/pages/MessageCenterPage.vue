@@ -67,7 +67,7 @@ import type {
   ConversationListItem,
   User,
 } from "@generated/doughnut-backend-api"
-import { messageCenterConversations } from "@/store/messageStore"
+import { messageCenter } from "@/store/messageCenter"
 import { useRouter } from "vue-router"
 
 const props = defineProps({
@@ -117,12 +117,12 @@ const fetchData = async () => {
 }
 
 const handleConversationFetched = async (conversationId: number) => {
-  const { data: unreadConversations, error } =
+  const { data: unreadMessages, error } =
     await ConversationMessageController.markConversationAsRead({
       path: { conversationId },
     })
   if (!error) {
-    messageCenterConversations.unreadConversations = unreadConversations!
+    messageCenter.unreadMessages = unreadMessages!
   }
 }
 
@@ -193,24 +193,6 @@ const handleConversationChanged = (conversationId: number) => {
   .conversation {
     flex: 0 0 75%;
   }
-}
-
-.conversations {
-  margin-bottom: 100px;
-}
-
-.ai-chat {
-  color: red;
-}
-
-.chat-controls {
-  position: fixed;
-  width: 75%;
-  bottom: 0;
-  right: 0;
-  background-color: white;
-  box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
-  padding: 10px;
 }
 
 .info-heading {

@@ -54,7 +54,7 @@ describe("NoteConversation", () => {
     mockSdkService(ConversationMessageController, "getConversationMessages", [])
   })
 
-  it("starts a conversation and shows the chat when none exist", async () => {
+  it("starts a conversation and shows the message input when none exist", async () => {
     mockSdkService(
       ConversationMessageController,
       "getConversationsAboutNote",
@@ -70,7 +70,7 @@ describe("NoteConversation", () => {
       path: { note: note.id },
       body: "Hello",
     })
-    expect(wrapper.find("form.chat-input-form").exists()).toBe(true)
+    expect(wrapper.find("form.message-input-form").exists()).toBe(true)
   })
 
   it("shows the first conversation when conversations already exist", async () => {
@@ -79,7 +79,7 @@ describe("NoteConversation", () => {
     ])
     const wrapper = await mount()
 
-    expect(wrapper.find("form.chat-input-form").exists()).toBe(true)
+    expect(wrapper.find("form.message-input-form").exists()).toBe(true)
     expect(wrapper.find("select.conversation-select").exists()).toBe(false)
   })
 
@@ -138,7 +138,7 @@ describe("NoteConversation", () => {
       path: { note: note.id },
       body: "New conversation message",
     })
-    expect(wrapper.find("form.chat-input-form").exists()).toBe(true)
+    expect(wrapper.find("form.message-input-form").exists()).toBe(true)
   })
 
   it("starts AI reply when starting a conversation with AI invite", async () => {
@@ -155,7 +155,7 @@ describe("NoteConversation", () => {
     const wrapper = await mount()
 
     await wrapper.find("textarea").setValue("Hello AI")
-    await wrapper.find("form.chat-input-form").trigger("submit")
+    await wrapper.find("form.message-input-form").trigger("submit")
     await flushPromises()
 
     expect(startConversationSpy).toHaveBeenCalledWith({
@@ -182,7 +182,7 @@ describe("NoteConversation", () => {
     const wrapper = await mount()
 
     await wrapper.find("textarea").setValue("Hello AI")
-    await wrapper.find("form.chat-input-form").trigger("submit")
+    await wrapper.find("form.message-input-form").trigger("submit")
     await flushPromises()
 
     expect(replySpy).toHaveBeenCalledWith({

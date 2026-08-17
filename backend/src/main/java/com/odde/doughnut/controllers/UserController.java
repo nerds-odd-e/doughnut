@@ -197,9 +197,9 @@ class UserController {
         assimilationServiceFactory.create(user, currentUTCTimestamp, timeZone);
     var assimilationCount = assimilationService.getCounts();
     var recallStatus = recallService.getDueMemoryTrackers(user, currentUTCTimestamp, timeZone, 0);
-    var unreadConversations = conversationService.getUnreadConversations(user);
+    var unreadMessages = conversationService.getUnreadMessages(user);
 
-    return new MenuDataDTO(assimilationCount, recallStatus, unreadConversations);
+    return new MenuDataDTO(assimilationCount, recallStatus, unreadMessages);
   }
 
   @GetMapping("/recall-stats")

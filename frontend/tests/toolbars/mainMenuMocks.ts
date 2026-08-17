@@ -19,7 +19,7 @@ export const defaultMenuData = {
     currentRecallWindowEndAt: "",
     totalAssimilatedCount: 0,
   },
-  unreadConversations: [],
+  unreadMessages: [],
 }
 
 export const createMenuData = (

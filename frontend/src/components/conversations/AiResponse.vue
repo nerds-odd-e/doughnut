@@ -4,7 +4,7 @@
       <Bot class="w-6 h-6" />
     </div>
     <div
-      class="daisy-card py-2 px-3 bg-base-200 ai-chat"
+      class="daisy-card py-2 px-3 bg-base-200 ai-assistant"
       :class="RICH_CONTENT_PROSE"
       v-html="markdowntToHtml(currentAiReply)"
     />

@@ -5047,7 +5047,7 @@ components:
           $ref: "#/components/schemas/AssimilationCountDTO"
         recallStatus:
           $ref: "#/components/schemas/DueMemoryTrackers"
-        unreadConversations:
+        unreadMessages:
           type: array
           items:
             $ref: "#/components/schemas/ConversationMessage"

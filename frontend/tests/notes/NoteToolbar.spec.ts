@@ -45,7 +45,7 @@ describe("NoteToolbar", () => {
 
     wrapper = await mountNoteToolbar(noteRealm, { router })
     await wrapper
-      .find('[title="Star a conversation about this note"]')
+      .find('[title="Start a conversation about this note"]')
       .trigger("click")
     await flushPromises()
 

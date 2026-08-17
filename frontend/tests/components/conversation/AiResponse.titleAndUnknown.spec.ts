@@ -95,7 +95,7 @@ describe("AiResponse unknown tool call", () => {
   it("displays unknown tool call with raw JSON", () => {
     const unknownRequest = ctx.wrapper.find(".unknown-request")
     expect(unknownRequest.text()).toContain(JSON.stringify(testJson))
-    expect(ctx.wrapper.find(".ai-chat").text()).toContain("unknown_tool")
+    expect(ctx.wrapper.find(".ai-assistant").text()).toContain("unknown_tool")
   })
 
   it("has no accept button for unknown tool calls", () => {

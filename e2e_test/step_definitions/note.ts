@@ -79,10 +79,6 @@ Then('I should see a notification of a bad request', () => {
   start.assumeConversationAboutNotePage().expectErrorMessage('Bad Request')
 })
 
-When('I start to chat about the note {string}', (noteTopology: string) => {
-  start.jumpToNotePage(noteTopology).startAConversationAboutNote()
-})
-
 When('I expand the children of note {string}', (noteTopology: string) => {
   start.assumeNotePage(noteTopology).expandChildren()
 })

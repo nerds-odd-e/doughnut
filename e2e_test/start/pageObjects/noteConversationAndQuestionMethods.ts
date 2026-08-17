@@ -48,7 +48,7 @@ export const noteConversationAndQuestionMethods = () => ({
     })
   },
   startAConversationAboutNote() {
-    toolbarButton('Star a conversation about this note').click()
+    toolbarButton('Start a conversation about this note').click()
     waitUntilAppIsNotBusy()
     return assumeConversationAboutNotePage()
   },

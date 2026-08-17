@@ -98,7 +98,7 @@ When(
 )
 
 When(
-  'I ask AI about the note {string} with the message {string}',
+  'I start a conversation about the note {string} inviting AI with the message {string}',
   (note: string, conversation: string) => {
     start.jumpToNotePage(note).sendMessageToAI(conversation)
   }
@@ -110,7 +110,7 @@ When('I send the message {string} to AI', (question: string) => {
     .replyToConversationAndInviteAiToReply(question)
 })
 
-Then('I should see the following chat messages:', (data: DataTable) => {
+Then('I should see the following messages:', (data: DataTable) => {
   start.assumeConversationAboutNotePage().expectMessages(data.hashes())
 })
 

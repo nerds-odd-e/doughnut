@@ -1,6 +1,6 @@
 # Focus context retrieval
 
-Doughnut gathers **bounded context around one focus note** for AI features (question generation, chat about a note, note automation, exports) and for the JSON `GET /api/notes/{note}/graph` surface.
+Doughnut gathers **bounded context around one focus note** for AI features (question generation, conversation about a note, note automation, exports) and for the JSON `GET /api/notes/{note}/graph` surface.
 
 ## Model
 

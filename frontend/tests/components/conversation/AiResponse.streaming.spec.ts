@@ -34,7 +34,7 @@ describe("AiResponse streaming", () => {
       simulateAiResponse()
       await flushPromises()
 
-      expect(ctx.wrapper.find(".ai-chat h2").text()).toEqual("I'm ChatGPT")
+      expect(ctx.wrapper.find(".ai-assistant h2").text()).toEqual("I'm ChatGPT")
     })
 
     it("shows status messages during AI reply lifecycle", async () => {

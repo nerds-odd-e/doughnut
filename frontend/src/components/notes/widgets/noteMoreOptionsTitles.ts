@@ -9,7 +9,7 @@ export const noteToolbarEditTitle = (asMarkdown?: boolean) =>
 export const noteMoreOptionsTitles = {
   new: "New note (n)",
   wiki: "Wiki link or relationship (Ctrl+Shift+F / Cmd+Shift+F)",
-  conversation: "Star a conversation about this note",
+  conversation: "Start a conversation about this note",
   export: "Export... (e)",
   questions: "Questions for the note",
   audio: "Audio tools",

@@ -26,7 +26,7 @@ import { useAssimilationCount } from "@/composables/useAssimilationCount"
 import timezoneParam from "@/managedApi/window/timezoneParam"
 import { useRecallData } from "@/composables/useRecallData"
 import { useNavigationItems } from "@/composables/useNavigationItems"
-import { messageCenterConversations } from "@/store/messageStore"
+import { messageCenter } from "@/store/messageCenter"
 import { useBreakpoint } from "@/composables/useBreakpoint"
 import { useRoute } from "vue-router"
 import VerticalMenu from "@/components/toolbars/VerticalMenu.vue"
@@ -63,9 +63,8 @@ const fetchMenuData = async () => {
       )
       setTotalAssimilatedCount(menuData.recallStatus.totalAssimilatedCount)
     }
-    if (menuData.unreadConversations !== undefined) {
-      messageCenterConversations.unreadConversations =
-        menuData.unreadConversations
+    if (menuData.unreadMessages !== undefined) {
+      messageCenter.unreadMessages = menuData.unreadMessages
     }
   }
 }
