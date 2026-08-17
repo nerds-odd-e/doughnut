@@ -24,6 +24,11 @@ Feature: Nested Note creation
       | tech         |
       | Re-quirement |
 
+  Scenario: Creating a title-only note stores type Note
+    When I create a note with title "Re-quirement" under the folder "LeSS in Action" in the notebook "LeSS training"
+    And I open the note content markdown editor
+    Then the note content markdown source should contain "type: Note"
+
   Scenario: Create a note with empty title is rejected
     When I create a note with title "" under the folder "LeSS in Action" in the notebook "LeSS training"
     Then I should see that the note creation is not successful

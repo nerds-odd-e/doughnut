@@ -1,6 +1,6 @@
 # Note concept `type` (OKF C1 / D2)
 
-**Status:** in progress (slice 1 done; slice 2 next)  
+**Status:** in progress (slice 2 done; slice 3 next)  
 **Seed:** [SEED-003](../../seeds/SEED-003-close-okf-v0-2-compatibility-gaps.md)  
 **Profile:** Proposed [ADR 0004](../../../docs/adrs/0004-okf-compatible-notebook-markdown.md)  
 **Glossary:** [ADR 0001](../../../docs/adrs/0001-ubiquitous-language.md)

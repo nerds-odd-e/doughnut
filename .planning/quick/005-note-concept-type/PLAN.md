@@ -1,6 +1,6 @@
 # Plan: Note concept type
 
-**Status:** in progress (slice 2 next)
+**Status:** in progress (slice 3 next)
 
 **Goal:** Ordinary notes persist `type: Note`. Relationship notes persist `type: Relationship`. Existing `note.content` is backfilled. ADRs describe that stored shape.
 
@@ -8,7 +8,7 @@
 
 - One persist scenario per slice. Extend the same surgical helper; do **not** finish every YAML branch in the first persist slice.
 - Call the helper only on **note** persist (`NoteConstructionService`, `TextContentController.updateNoteContent`). Never from `AuthoredNoteContent.prepareContentForSave` (readme uses that too).
-- Title-only create leaves `content` null today — slice 2 initializes it.
+- Title-only create initializes `content` via `NoteConceptType.ensureOrdinaryNoteType` in `NoteConstructionService.createNote` (null → leading `type: Note` fence).
 - Leave `makeMe` content defaults alone. Typeless fixtures stay valid for later save/backfill tests.
 - Structure slices sit immediately before the behavior they unlock (ADR 0004 before `type: Note`; ADR 0001 / Relationship spelling before compose).
 - Next Flyway: **next unused** `V300000xxx` at execute time. `V300000267` is taken (004-recall-log drop of `session_item` / `learning_session`).
@@ -22,13 +22,13 @@ Decision / Bundle and concepts now: stored note markdown carries `type` and vali
 
 **Learnings:** The existing Decision already mentioned `type: Note` for the portable tree. The lock was stored markdown + relationship-as-concept. Split those claims so valid YAML is not ordinary-note-only. `type: relationship` spelling unchanged until slice 6.
 
-### 2. Creating a title-only note stores type: Note — Behavior — planned
+### 2. Creating a title-only note stores type: Note — Behavior — done
 
-**Pre:** Notebook; create with a title and no content.  
-**Trigger:** Create the note.  
-**Post:** `note.content` is a leading fence with `type: Note` (no extra body). Readme save still has no `type`.
+Title-only create persists `---\ntype: Note\n---\n`. Helper `NoteConceptType.ensureOrdinaryNoteType` wraps null/empty/unclosed `---` and leaves a closed leading fence unchanged. Wired only from `NoteConstructionService.createNote` with `null` (create-with-content still overwrites until slice 4). Save/readme untouched.
 
-E2E: `note_creation.feature` (open markdown source). Smallest wrap for null/empty only. Do not wire save. Do not insert into existing fences. Unclosed `---` counts as no fence (unit on the wrap).
+E2E: `note_creation.feature` (open markdown source). Unit: wrap null/empty, unclosed fence, closed fence unchanged.
+
+**Learnings:** Reuse `NoteLeadingFrontmatter.splitVerbatim` for closed-fence detection. Under-current create already has a `parent` fence, so it stays without `type` until slice 5.
 
 ### 3. Saving a note with no frontmatter stores type: Note — Behavior — planned
 

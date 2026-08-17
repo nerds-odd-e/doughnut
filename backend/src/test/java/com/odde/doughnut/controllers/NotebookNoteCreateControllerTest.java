@@ -47,6 +47,14 @@ class NotebookNoteCreateControllerTest extends NotebookControllerTestBase {
   }
 
   @Test
+  void titleOnlyCreateStoresOrdinaryNoteTypeFence() throws Exception {
+    NoteRealm result = controller.createNoteAtNotebookRoot(ownedNotebook(), noteCreate("Root One"));
+
+    Note created = noteRepository.findById(result.getId()).orElseThrow();
+    assertThat(created.getContent(), equalTo("---\ntype: Note\n---\n"));
+  }
+
+  @Test
   void persistsInitialMarkdownContentWhenProvided() throws Exception {
     NoteCreationDTO noteCreation = noteCreate("Root With Body");
     noteCreation.setContent("# Hello\n\n[[Link]]");

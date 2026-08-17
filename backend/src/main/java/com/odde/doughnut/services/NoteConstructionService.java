@@ -1,5 +1,6 @@
 package com.odde.doughnut.services;
 
+import com.odde.doughnut.algorithms.NoteConceptType;
 import com.odde.doughnut.algorithms.NoteContentTitleHeading;
 import com.odde.doughnut.controllers.dto.ApiError;
 import com.odde.doughnut.controllers.dto.NoteCreationDTO;
@@ -63,6 +64,7 @@ public class NoteConstructionService {
     Timestamp ts = testabilitySettings.getCurrentUTCTimestamp();
     note.initializeNewNote(notebook, ts, title);
     note.setFolder(folderOrNull);
+    note.setContent(NoteConceptType.ensureOrdinaryNoteType(null));
     User user = authorizationService.getCurrentUser();
     entityPersister.save(note);
     entityPersister.save(NoteCreator.forNoteAndUser(note, user));
