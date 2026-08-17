@@ -15,16 +15,6 @@ This ADR is the **canonical ubiquitous language**. Accepting it constrains
 *new* naming and guides gradual alignment (tests, UI, OpenAPI, schema). It
 does not require renaming the whole codebase at once.
 
-### Remaining collisions (still to tighten in this glossary)
-
-#### Missing or weakly named
-
-| Gap | Why it matters |
-|-----|----------------|
-| **Focus context** | Used in AI flows but not established as a first-class domain noun |
-| **OKF** (Open Knowledge Format) | Named in CLI lint but not introduced as a first-class glossary noun |
-| **Notebook health** vs export/lint tooling | Same findings idea at two layers without a shared term family |
-
 ## Decision
 
 1. **Maintain a glossary** — Keep the dictionary in this ADR (Accepted form) as
@@ -34,7 +24,7 @@ does not require renaming the whole codebase at once.
 2. **Canonical terms** — Prefer these meanings in new UI copy, APIs, tests, and
    code identifiers.
 
-#### Notebook / note structure and OKF
+#### Notebook / note structure
 
 | Term | Meaning |
 |------|---------|
@@ -58,8 +48,8 @@ does not require renaming the whole codebase at once.
 | **Book** | Attached reading artifact (EPUB, PDF, …), distinct from a notebook |
 | **Book layout** | Structure of an attached book |
 | **Reading record** | Progress through a book |
-| **OKF** | [Open Knowledge Format](https://cloud.google.com/blog/products/data-analytics/how-the-open-knowledge-format-can-improve-data-sharing): portable directory of markdown concept files with YAML frontmatter |
-| **Notebook health** | In-app lint, findings, and fixes for a notebook |
+| **Notebook health** | Current findings state of a notebook (empty folders, readme-only folders, dead wiki links). Shown on the notebook **Health** tab. Distinct from **lint** (the check action). |
+| **Lint** | Action that checks **notebook health** and returns findings. Does not mutate the notebook. Short UI: **Run lint**. |
 | **Skip Memory Tracking** | Notebook setting that opts the notebook out of the assimilation sequence and blocks Bazaar subscribe. It does not opt the notebook out of recall. |
 | **Semantic search** | Meaning-based find of notes via embeddings. Distinct from keyword search. |
 
@@ -92,7 +82,14 @@ does not require renaming the whole codebase at once.
 | **RecallLog** | One persisted memory-state transition for a memory tracker. Doughnut’s name for the FSRS-shaped review history (review (FSRS) = recall). Prompt grades and confusion link an **answer**; just review and Tutor Feedback do not. Shape: [ADR 0003](./0003-spaced-repetition-scheduling-policy.md). | |
 | **Daily assimilation target** | Max new understanding memory trackers to create per day (profile or subscription). Spelling and commissioned trackers do not consume this count. | |
 
-#### Conversation and focus
+#### Focus context
+
+| Term | Meaning |
+|------|---------|
+| **Focus context** | Bounded neighborhood around a **focus note** (depth 0) plus related notes reached by wiki links, inbound references, and sampled folder peers, within a token budget. Used for conversation, recall-prompt generation, note automation, Learning Session Request, and export. |
+| **Focus note** | The center note of a **focus context** (depth 0). |
+
+#### Conversation
 
 | Term | Meaning | Short UI |
 |------|---------|----------|
@@ -100,7 +97,6 @@ does not require renaming the whole codebase at once.
 | **Message** | One utterance in a conversation | |
 | **Message center** | Inbox UI for conversations and unread state | **Messages** |
 | **AI Assistant** | Conversation participant that sends messages with no human sender | **AI Assistant** |
-| **Focus context** | Bounded note neighborhood for AI use | |
 
 3. **Commissioned Learning Session terms** — Vocabulary for Learning Sessions
    that a Tutor conducts outside Doughnut, on commission from Doughnut:
@@ -174,6 +170,16 @@ does not require renaming the whole codebase at once.
      wire names and vendor **ChatGPT** are not glossary nouns. A
      commissioned **Learning Session** and CLI interactive scrollback are
      not conversations.
+   - The product name is **focus context**. Wire paths `/graph` and
+     `/ai-context-markdown`, MCP `get_note_graph`, and JSON `getGraph` are
+     the JSON and markdown surfaces, not competing glossary nouns.
+   - Use **notebook health** for the findings state and the Health tab; use
+     **lint** for the check action. Do not call the tab lint. **Fix**
+     applies selected repairs from current notebook health findings, then
+     typically lints again; it is not a kind of lint. There is no CLI lint
+     product yet. Developer `pnpm lint` is not a product noun.
+   - Do not use **OKF** in UI, APIs, tests, or domain identifiers; that name
+     lives in ADRs 0002 and 0004. Portable Markdown follows ADR 0004.
 
 5. **Alignment policy** — On Accept:
 
@@ -217,6 +223,11 @@ does not require renaming the whole codebase at once.
   later.
 - **Conversation** / **message** / **message center** name one product
   (note or recall-prompt threads). **Chat** is not a product noun.
+- **Focus context** names the bounded neighborhood around a **focus note**.
+  Wire `/graph` and MCP `get_note_graph` are surfaces, not product nouns.
+- **Notebook health** is the findings state; **lint** is the check action.
+- **OKF** is not a product glossary noun; the portable Markdown profile is
+  ADR 0004.
 - Retired product concepts (**workspace** as CLI sync tree, **push / pull**
   sync, **sync baseline** / `.doughnut-sync`) must not reappear in product
   code or glossary; portable content follows ADR 0002.
@@ -244,5 +255,6 @@ does not require renaming the whole codebase at once.
   [use-adrs-accepted.md](./0000-use-adrs-accepted.md); ADR 0003
   [spaced-repetition scheduling policy](./0003-spaced-repetition-scheduling-policy.md)
   (FSRS **review** = Doughnut **recall**; **Stability** / **Retrievability** /
-  **RecallLog**);
-  [Open Knowledge Format](https://cloud.google.com/blog/products/data-analytics/how-the-open-knowledge-format-can-improve-data-sharing)
+  **RecallLog**); ADR 0004
+  [OKF-compatible notebook Markdown](./0004-okf-compatible-notebook-markdown.md)
+  (portable Markdown profile)

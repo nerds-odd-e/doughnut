@@ -3,8 +3,8 @@
     <div class="daisy-card-body">
       <h3 class="daisy-card-title">Export Note Data</h3>
       <p class="text-sm text-base-content/70 mb-2">
-        Focus-context markdown. The token budget limits approximate size of the focus note body plus
-        all included related note bodies combined (same value for graph JSON below).
+        Focus context markdown. The token budget limits approximate size of the focus note body plus
+        all included related note bodies combined (same value for focus context JSON below).
       </p>
       <div class="flex items-center gap-2 mb-2">
         <label for="context-token-limit" class="daisy-label-text">Token budget:</label>
@@ -48,7 +48,7 @@
           @click="toggleGraphExpanded($event)"
         >
           <svg :class="['transition-transform', 'duration-200', expandedGraph ? 'rotate-90' : '']" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-          Export Note Graph (JSON)
+          Export focus context (JSON)
         </summary>
         <div v-if="expandedGraph" class="mt-4">
           <p class="text-xs text-base-content/60 mb-2">
@@ -61,7 +61,7 @@
               @click="refreshGraph"
               :disabled="loadingGraph"
               data-testid="refresh-graph-btn"
-              aria-label="Refresh Graph"
+              aria-label="Refresh focus context JSON"
             >
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="2" d="M4 4v5h.582M20 20v-5h-.581M19.418 9A7.994 7.994 0 0 0 12 4a8 8 0 1 0 7.418 5"/></svg>
             </button>
@@ -69,7 +69,7 @@
           </div>
           <JsonExportSection
             :json-data="jsonGraph"
-            :filename="`note-${note.id}-graph`"
+            :filename="`note-${note.id}-focus-context`"
             :loading="loadingGraph"
             textarea-test-id="graph-json-textarea"
             copy-button-test-id="copy-json-btn-graph"

@@ -84,6 +84,12 @@ describe("NoteExportForm", () => {
     expect(blobArg.type).toContain("markdown")
   })
 
+  it("labels JSON export as focus context", async () => {
+    mountForm()
+    await flushPromises()
+    expect(graphSummary()?.textContent).toContain("Export focus context (JSON)")
+  })
+
   it("fetches graph JSON once, downloads, and keeps cache when toggling", async () => {
     const note = mountForm()
     await flushPromises()
