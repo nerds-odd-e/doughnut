@@ -200,6 +200,8 @@ class RecallPromptAnswerControllerTest extends RecallPromptControllerTestBase {
     @Test
     void incorrectAnswerLeavesAnAgainRecallLogLinkedToTheAnswer()
         throws UnexpectedNoAccessRightException {
+      makeMe.entityPersister.flushAndClear();
+
       AnsweredQuestion answerResult = controller.answer(recallPrompt, answerDTO);
 
       List<RecallLog> logs = memoryTrackerController.getRecallLogs(memoryTracker);
