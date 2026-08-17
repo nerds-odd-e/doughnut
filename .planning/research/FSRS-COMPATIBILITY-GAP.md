@@ -1,6 +1,6 @@
 # Doughnut ↔ open FSRS gap (toward ADR 0003)
 
-**Status:** Remaining work is **deferred** knobs plus **accept ADR 0003** (human). Next Difficulty after a mapped grade is locked in ADR 0003 Decision; this tracker is not a second policy map.
+**Status:** Remaining work is **deferred** knobs plus **accept ADR 0003** (human). Shipped FSRS-6 locks, including same-hour success short-term next Stability (elapsed 0, S > 0), live in ADR 0003 Decision and code; this tracker is not a second policy map.
 
 **Updated:** 2026-08-17
 
@@ -15,8 +15,6 @@ Product policy lives in ADR 0003 Decision. This tracker is a pointer plus the de
 Doughnut persists **Stability** in whole hours and **Difficulty** (nullable; shown on the Memory Tracker). Retrievability is computed (FSRS-6 power curve), not stored. Frozen default FSRS-6 weights live in `Fsrs`. Requested retention is locked global `r = 0.9` (`Fsrs.REQUESTED_RETENTION`); it is not a product knob. There is **no** lapse count, card state (`New` / `Learning` / `Review` / `Relearning`), fuzz, max interval, or RecallLog.
 
 Live scheduling does not walk a spacing-index ladder. `DEFAULT_SPACES` / `hoursFromLegacyIndex` remain only so committed `V300000260` can replay on fresh DBs.
-
-Tutor map, confusion, ordinary correct/incorrect, next Difficulty, and locked IDs: ADR 0003 Decision.
 
 ## Deferred (see ADR 0003 Decision)
 
