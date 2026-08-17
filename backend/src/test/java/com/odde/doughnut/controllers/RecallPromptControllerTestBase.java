@@ -19,6 +19,7 @@ abstract class RecallPromptControllerTestBase extends ControllerTestBase {
   OpenAIClient officialClient;
 
   @Autowired RecallPromptController controller;
+  @Autowired MemoryTrackerController memoryTrackerController;
 
   OpenAiStructuredResponseMock openAiStructuredResponseMock;
 

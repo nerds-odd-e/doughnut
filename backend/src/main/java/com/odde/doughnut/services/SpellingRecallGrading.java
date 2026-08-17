@@ -61,10 +61,7 @@ final class SpellingRecallGrading {
     answer.setThinkingTimeMs(answerSpellingDTO.getThinkingTimeMs());
     recallPrompt.setAnswer(answer);
     memoryTrackerService.markAsRecalled(
-        currentUTCTimestamp,
-        answer.getCorrect(),
-        memoryTracker,
-        answerSpellingDTO.getThinkingTimeMs());
+        currentUTCTimestamp, answer.getCorrect(), memoryTracker, answer.getThinkingTimeMs(), null);
     return recallPrompt;
   }
 
@@ -118,8 +115,13 @@ final class SpellingRecallGrading {
       }
     }
 
+    Answer persistedAnswer = recallPrompt.getAnswer();
     memoryTrackerService.markAsRecalled(
-        currentUTCTimestamp, correct, memoryTracker, answerSpellingDTO.getThinkingTimeMs());
+        currentUTCTimestamp,
+        correct,
+        memoryTracker,
+        persistedAnswer.getThinkingTimeMs(),
+        persistedAnswer);
     return new MemoryTrackerService.SpellingAnswerResult(recallPrompt, matches);
   }
 

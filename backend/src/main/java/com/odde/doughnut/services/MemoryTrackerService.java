@@ -3,6 +3,7 @@ package com.odde.doughnut.services;
 import com.odde.doughnut.controllers.dto.AnswerSpellingDTO;
 import com.odde.doughnut.controllers.dto.AssimilationRequestDTO;
 import com.odde.doughnut.controllers.dto.ThresholdExceededResult;
+import com.odde.doughnut.entities.Answer;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.ProductOutcome;
@@ -79,17 +80,18 @@ public class MemoryTrackerService {
   public boolean updateMemoryTrackerAfterAnsweringQuestion(
       Timestamp currentUTCTimestamp, Boolean correct, RecallPrompt recallPrompt) {
     MemoryTracker memoryTracker = recallPrompt.requireMemoryTracker();
-    Integer thinkingTimeMs =
-        recallPrompt.getAnswer() != null ? recallPrompt.getAnswer().getThinkingTimeMs() : null;
-    return markAsRecalled(currentUTCTimestamp, correct, memoryTracker, thinkingTimeMs);
+    Answer answer = recallPrompt.getAnswer();
+    return markAsRecalled(
+        currentUTCTimestamp, correct, memoryTracker, answer.getThinkingTimeMs(), answer);
   }
 
   public boolean markAsRecalled(
       Timestamp currentUTCTimestamp,
       Boolean correct,
       MemoryTracker memoryTracker,
-      Integer thinkingTimeMs) {
-    persistRecallLog(memoryTracker, currentUTCTimestamp, correct);
+      Integer thinkingTimeMs,
+      Answer answer) {
+    persistRecallLog(memoryTracker, currentUTCTimestamp, correct, answer);
     memoryTracker.markAsRecalled(currentUTCTimestamp, correct, thinkingTimeMs);
     entityPersister.save(memoryTracker);
 
@@ -100,12 +102,13 @@ public class MemoryTrackerService {
   }
 
   private void persistRecallLog(
-      MemoryTracker memoryTracker, Timestamp recordedAt, boolean successful) {
+      MemoryTracker memoryTracker, Timestamp recordedAt, boolean successful, Answer answer) {
     RecallLog recallLog = new RecallLog();
     recallLog.setMemoryTracker(memoryTracker);
     recallLog.setRecordedAt(recordedAt);
     recallLog.setElapsedHours((int) memoryTracker.elapsedHoursUntil(recordedAt));
     recallLog.setProductOutcome(successful ? ProductOutcome.GOOD : ProductOutcome.AGAIN);
+    recallLog.setAnswer(answer);
     entityPersister.save(recallLog);
   }
 

@@ -69,6 +69,15 @@ class RecallPromptAnswerSpellingControllerTest extends RecallPromptControllerTes
   }
 
   @Test
+  void correctAnswerLeavesARecallLogLinkedToTheAnswer() throws UnexpectedNoAccessRightException {
+    AnsweredQuestion answerResult = controller.answerSpelling(recallPrompt, answerDTO);
+
+    assertThat(
+        memoryTrackerController.getRecallLogs(memoryTracker).get(0).getAnswerId(),
+        equalTo(answerResult.getAnswer().getId()));
+  }
+
+  @Test
   void shouldPersistThinkingTimeAndSpellingOnAnswerEntity()
       throws UnexpectedNoAccessRightException {
     answerDTO.setThinkingTimeMs(5000);

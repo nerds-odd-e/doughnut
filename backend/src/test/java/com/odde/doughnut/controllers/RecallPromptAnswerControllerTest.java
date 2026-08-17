@@ -11,9 +11,12 @@ import com.odde.doughnut.controllers.dto.AnsweredQuestion;
 import com.odde.doughnut.entities.ForgettingCurve;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.ProductOutcome;
+import com.odde.doughnut.entities.RecallLog;
 import com.odde.doughnut.entities.RecallPrompt;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import java.sql.Timestamp;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -40,6 +43,23 @@ class RecallPromptAnswerControllerTest extends RecallPromptControllerTestBase {
     AnsweredQuestion answerResult = controller.answer(recallPrompt, answerDTO);
     assertThat(answerResult.getAnswer().getCorrect(), is(true));
     assertThat(memoryTracker.getRecallCount(), greaterThan(oldRecallCount));
+  }
+
+  @Test
+  void unansweredPromptDoesNotWriteARecallLog() throws UnexpectedNoAccessRightException {
+    assertThat(memoryTrackerController.getRecallLogs(memoryTracker), empty());
+  }
+
+  @Test
+  void correctAnswerLeavesAGoodRecallLogLinkedToTheAnswer()
+      throws UnexpectedNoAccessRightException {
+    AnsweredQuestion answerResult = controller.answer(recallPrompt, answerDTO);
+
+    List<RecallLog> logs = memoryTrackerController.getRecallLogs(memoryTracker);
+    assertThat(logs, hasSize(1));
+    RecallLog log = logs.get(0);
+    assertThat(log.getProductOutcome(), is(ProductOutcome.GOOD));
+    assertThat(log.getAnswerId(), equalTo(answerResult.getAnswer().getId()));
   }
 
   @Test
@@ -175,6 +195,16 @@ class RecallPromptAnswerControllerTest extends RecallPromptControllerTestBase {
       AnsweredQuestion answerResult = controller.answer(recallPrompt, answerDTO);
       assertThat(answerResult.getAnswer().getCorrect(), is(false));
       assertThat(memoryTracker.getRecallCount(), greaterThan(oldRecallCount));
+    }
+
+    @Test
+    void incorrectAnswerLeavesAnAgainRecallLogLinkedToTheAnswer()
+        throws UnexpectedNoAccessRightException {
+      AnsweredQuestion answerResult = controller.answer(recallPrompt, answerDTO);
+
+      List<RecallLog> logs = memoryTrackerController.getRecallLogs(memoryTracker);
+      assertThat(logs.get(0).getProductOutcome(), is(ProductOutcome.AGAIN));
+      assertThat(logs.get(0).getAnswerId(), equalTo(answerResult.getAnswer().getId()));
     }
 
     @Test

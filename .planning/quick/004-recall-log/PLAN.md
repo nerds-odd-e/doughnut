@@ -1,6 +1,6 @@
 # Plan: RecallLog
 
-**Status:** in progress (slice 4 next)
+**Status:** in progress (slice 5 next)
 
 **Goal:** Memory-state transitions are a RecallLog. Prompt submissions stay `answer`. Tutor Feedback is a log row, not a session bag.
 
@@ -27,11 +27,9 @@ Table `recall_log` (`V300000263`), GET `/api/memory-trackers/{id}/recall-logs`, 
 
 Unsuccessful `markAsRecalled` already wrote `AGAIN`. Tests assert the second log only (controller, page, E2E). Do not re-assert the GOOD shape.
 
-### 4. Prompt grade links the log to the answer — Behavior — planned
+### 4. Prompt grade links the log to the answer — Behavior — done
 
-**Pre:** Recall prompt (MCQ or spelling) answered correctly or incorrectly.  
-**Trigger:** Submit the answer.  
-**Post:** The new RecallLog is `GOOD` or `AGAIN` and `answer_id` is that prompt’s answer. Unanswered prompts still have no log.
+Prompt grade callers pass the persisted `Answer` into `markAsRecalled`. MCQ pins GOOD/`AGAIN` + `answer_id`; spelling correct asserts the link. Just-review still null. Accidental-match may already get `answer_id` (slice 6). Overlap still does not call `markAsRecalled`.
 
 ### 5. Overlap does not write a RecallLog — Behavior — planned
 
