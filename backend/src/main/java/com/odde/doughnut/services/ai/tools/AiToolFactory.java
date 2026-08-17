@@ -47,6 +47,7 @@ public class AiToolFactory {
     Rules:
     %s
     - Retrieved Notes may clarify context or provide distractors, but must not be necessary to know the correct answer.
+    - Do not focus the question on wiki-linked parts of the Focus Note; those notes have their own memory trackers. Use them only as supporting context or distractors.
     - Do not use external knowledge as the basis for the correct answer.
     - If the Focus Note is weak, generic, uncertain, truncated, or mostly empty, test only the most concrete stable point available and note the limitation in validationRationale.
     - The stem must be self-contained.
@@ -91,6 +92,7 @@ public class AiToolFactory {
             3.	Logical Consistency: Ensure that the question logically follows from the focus note and its supporting context without assuming misleading or incorrect relationships.
             4.	Relevance to the Focus Note: The question should not just be related to indirectly linked notes; it should be closely tied to the focus note itself and not merely any related concepts.
             5.	Avoiding Simplicity or Obviousness: The question should not be too trivial or easily guessable without requiring meaningful recall of the focus note.
+            6.	Wiki-linked notes: The question must not test wiki-linked notes (they have their own memory trackers); those notes may only support or distract.
 
         Output Requirements:
             •	If the question fails any of the above criteria, set the field "feasibleQuestion": false in the response.
