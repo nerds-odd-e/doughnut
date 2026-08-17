@@ -5,11 +5,10 @@ final class FsrsGoodRecall {
   private FsrsGoodRecall() {}
 
   static float hoursAfterGoodRecall(float stabilityHours, float difficulty, long elapsedInHours) {
-    if (elapsedInHours == 0) {
-      return Fsrs.hoursAfterShortTermRecall(stabilityHours, Fsrs.GOOD);
-    }
-    return Fsrs.hoursAfterStabilityIncrease(
+    return Fsrs.hoursAfterShortTermOrStabilityIncrease(
         stabilityHours,
+        Fsrs.GOOD,
+        elapsedInHours,
         Fsrs.goodIncrementTermFromHours(stabilityHours, difficulty, elapsedInHours));
   }
 }
