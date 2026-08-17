@@ -1,10 +1,7 @@
 package com.odde.doughnut.services;
 
 import com.odde.doughnut.controllers.dto.RecallStatsDTO;
-import com.odde.doughnut.entities.Answer;
 import com.odde.doughnut.entities.ProductOutcome;
-import com.odde.doughnut.entities.RecallLog;
-import com.odde.doughnut.entities.RecallPrompt;
 import java.sql.Timestamp;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -19,19 +16,14 @@ final class RecallStatsTestFixtures {
 
   private RecallStatsTestFixtures() {}
 
-  static RecallPrompt answered(
-      Timestamp answerAt, Integer thinkingTimeMs, Boolean correct, Timestamp promptAt) {
-    RecallPrompt rp = new RecallPrompt();
-    rp.setCreatedAt(promptAt != null ? promptAt : answerAt);
-    Answer answer = new Answer();
-    answer.setThinkingTimeMs(thinkingTimeMs);
-    answer.setCreatedAt(answerAt);
-    RecallLog log = new RecallLog();
-    log.setProductOutcome(
-        Boolean.TRUE.equals(correct) ? ProductOutcome.GOOD : ProductOutcome.AGAIN);
-    answer.addRecallLog(log);
-    rp.setAnswer(answer);
-    return rp;
+  static RecallAnswerRow answered(
+      Timestamp answerAt, Integer thinkingTimeMs, boolean correct, Timestamp promptAt) {
+    return new RecallAnswerRow(
+        answerAt,
+        null,
+        correct ? ProductOutcome.GOOD : ProductOutcome.AGAIN,
+        thinkingTimeMs,
+        promptAt != null ? promptAt : answerAt);
   }
 
   static Timestamp utc(int day, int hour) {
@@ -39,12 +31,12 @@ final class RecallStatsTestFixtures {
         ZonedDateTime.of(1989, 1, 1, hour, 0, 0, 0, ZoneId.of("UTC")).plusDays(day).toInstant());
   }
 
-  static RecallStatsDTO aggregate(List<RecallPrompt> recent, Timestamp now) {
-    return RecallStatsService.aggregate(recent, recent, ZoneId.of("UTC"), now);
+  static RecallStatsDTO aggregate(List<RecallAnswerRow> recent, Timestamp now) {
+    return RecallStatsService.aggregateRows(recent, recent, ZoneId.of("UTC"), now);
   }
 
-  static RecallStatsDTO aggregateZone(List<RecallPrompt> recent, ZoneId zoneId, Timestamp now) {
-    return RecallStatsService.aggregate(recent, recent, zoneId, now);
+  static RecallStatsDTO aggregateZone(List<RecallAnswerRow> recent, ZoneId zoneId, Timestamp now) {
+    return RecallStatsService.aggregateRows(recent, recent, zoneId, now);
   }
 
   static RecallStatsDTO.DayAvgResponseTime dayAvg(RecallStatsDTO dto, String date) {

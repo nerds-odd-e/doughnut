@@ -7,10 +7,6 @@ import com.odde.doughnut.controllers.dto.RecallStatsDTO.DayCount;
 import com.odde.doughnut.controllers.dto.RecallStatsDTO.DayRetention;
 import com.odde.doughnut.controllers.dto.RecallStatsDTO.HeadlineStats;
 import com.odde.doughnut.controllers.dto.RecallStatsDTO.HourRetention;
-import com.odde.doughnut.entities.Answer;
-import com.odde.doughnut.entities.ProductOutcome;
-import com.odde.doughnut.entities.RecallLog;
-import com.odde.doughnut.entities.RecallPrompt;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.RecallPromptRepository;
 import com.odde.doughnut.utils.TimestampOperations;
@@ -51,12 +47,6 @@ public class RecallStatsService {
       }
     }
     return aggregateRows(recent, allTime, zoneId, now);
-  }
-
-  /** Adapter preserved for unit tests that build {@link RecallPrompt} rows directly. */
-  static RecallStatsDTO aggregate(
-      List<RecallPrompt> recent, List<RecallPrompt> allTime, ZoneId zoneId, Timestamp now) {
-    return aggregateRows(rowsFrom(recent), rowsFrom(allTime), zoneId, now);
   }
 
   static RecallStatsDTO aggregateRows(
@@ -133,34 +123,6 @@ public class RecallStatsService {
         weekdayHourCorrect,
         hourlyRetention,
         totals);
-  }
-
-  private static List<RecallAnswerRow> rowsFrom(List<RecallPrompt> prompts) {
-    List<RecallAnswerRow> rows = new ArrayList<>(prompts.size());
-    for (RecallPrompt rp : prompts) {
-      Answer answer = rp.getAnswer();
-      rows.add(
-          new RecallAnswerRow(
-              answer == null ? null : answer.getCreatedAt(),
-              answer == null ? null : answer.getOutcome(),
-              productOutcomeFromLogs(answer),
-              answer == null ? null : answer.getThinkingTimeMs(),
-              rp.getCreatedAt()));
-    }
-    return rows;
-  }
-
-  private static ProductOutcome productOutcomeFromLogs(Answer answer) {
-    if (answer == null) {
-      return null;
-    }
-    for (RecallLog log : answer.getRecallLogs()) {
-      ProductOutcome productOutcome = log.getProductOutcome();
-      if (productOutcome != ProductOutcome.CONFUSION) {
-        return productOutcome;
-      }
-    }
-    return null;
   }
 
   private static Timestamp minusDays(Timestamp ts, int days) {

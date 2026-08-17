@@ -5,7 +5,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
 import com.odde.doughnut.controllers.dto.RecallStatsDTO;
-import com.odde.doughnut.entities.RecallPrompt;
 import java.sql.Timestamp;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -20,7 +19,7 @@ class RecallStatsServiceTest {
     @Test
     void usesThinkingTimeMsWhenNonNull() {
       Timestamp now = utc(11, 12); // today = 1989-01-11
-      List<RecallPrompt> rows =
+      List<RecallAnswerRow> rows =
           List.of(
               answered(utc(9, 10), 5000, true, null),
               answered(utc(9, 11), 6000, true, null),
@@ -32,7 +31,7 @@ class RecallStatsServiceTest {
     @Test
     void dropsSub1000msMisclicks() {
       Timestamp now = utc(11, 12);
-      List<RecallPrompt> rows =
+      List<RecallAnswerRow> rows =
           List.of(
               answered(utc(9, 10), 500, true, null), // dropped (<1000)
               answered(utc(9, 11), 5000, true, null),
@@ -46,7 +45,7 @@ class RecallStatsServiceTest {
     @Test
     void capsThinkingTimeMsAbove120000() {
       Timestamp now = utc(11, 12);
-      List<RecallPrompt> rows =
+      List<RecallAnswerRow> rows =
           List.of(
               answered(utc(9, 10), 200000, true, null), // capped to 120000
               answered(utc(9, 11), 5000, true, null),
@@ -60,7 +59,7 @@ class RecallStatsServiceTest {
       Timestamp now = utc(11, 12);
       // 3 answers on 1989-01-10, thinkingTimeMs null, diffs 10000/11000/12000 (uncapped)
       Timestamp p = utc(9, 8); // 1989-01-10 08:00 UTC
-      List<RecallPrompt> rows =
+      List<RecallAnswerRow> rows =
           List.of(
               answered(new Timestamp(p.getTime() + 10_000), null, true, p),
               answered(new Timestamp(p.getTime() + 11_000), null, true, p),
@@ -73,7 +72,7 @@ class RecallStatsServiceTest {
     void capsDiffFallbackAbove300000() {
       Timestamp now = utc(11, 12);
       Timestamp p = utc(9, 8);
-      List<RecallPrompt> rows =
+      List<RecallAnswerRow> rows =
           List.of(
               answered(new Timestamp(p.getTime() + 400_000), null, true, p), // capped to 300000
               answered(new Timestamp(p.getTime() + 400_000), null, true, p),
@@ -85,7 +84,7 @@ class RecallStatsServiceTest {
     @Test
     void returnsNullAvgWhenFewerThan3ValidSamples() {
       Timestamp now = utc(11, 12);
-      List<RecallPrompt> rows =
+      List<RecallAnswerRow> rows =
           List.of(answered(utc(9, 10), 5000, true, null), answered(utc(9, 11), 6000, true, null));
       RecallStatsDTO dto = aggregate(rows, now);
       assertThat(dayAvg(dto, "1989-01-10").getAvgMs(), nullValue());
@@ -100,7 +99,7 @@ class RecallStatsServiceTest {
       Timestamp now = utc(11, 12);
       // 1989-01-10: 2 correct / 2 answered -> insufficient (<3) -> null
       // 1989-01-09: 3 correct / 4 answered -> 75%
-      List<RecallPrompt> rows =
+      List<RecallAnswerRow> rows =
           new ArrayList<>(
               List.of(
                   answered(utc(9, 10), 5000, true, null),
@@ -120,7 +119,7 @@ class RecallStatsServiceTest {
     @Test
     void overallRetentionPct365OverTheWindow() {
       Timestamp now = utc(11, 12);
-      List<RecallPrompt> rows =
+      List<RecallAnswerRow> rows =
           List.of(
               answered(utc(9, 10), 5000, true, null),
               answered(utc(9, 11), 5000, true, null),
@@ -135,7 +134,7 @@ class RecallStatsServiceTest {
       Timestamp now = utc(11, 12);
       // hour 10: 5/5 correct -> 100% (best)
       // hour 11: 1/5 correct -> 20% (worst)
-      List<RecallPrompt> rows =
+      List<RecallAnswerRow> rows =
           new ArrayList<>(
               List.of(
                   answered(utc(9, 10), 5000, true, null),
@@ -159,7 +158,7 @@ class RecallStatsServiceTest {
     void weekdayHourCorrectAndCountsFromSameRows() {
       Timestamp now = utc(11, 12);
       // 1989-01-09 is a Monday (DayOfWeek=1 -> idx 0), hour 10
-      List<RecallPrompt> rows =
+      List<RecallAnswerRow> rows =
           List.of(
               answered(utc(8, 10), 5000, true, null),
               answered(utc(8, 10), 5000, false, null),
@@ -179,7 +178,7 @@ class RecallStatsServiceTest {
       //   under Shanghai zone -> 1989-01-10 01:00 -> local day 1989-01-10
       Timestamp instant = utc(8, 17);
       Timestamp now = utc(20, 12);
-      List<RecallPrompt> rows =
+      List<RecallAnswerRow> rows =
           List.of(answered(instant, 5000, true, null), answered(instant, 5000, true, null));
       RecallStatsDTO asShanghai = aggregateZone(rows, ZoneId.of("Asia/Shanghai"), now);
       RecallStatsDTO asUtc = aggregateZone(rows, ZoneId.of("UTC"), now);
@@ -196,7 +195,7 @@ class RecallStatsServiceTest {
       // reviews on day 10, 9, 8 (consecutive ending today) -> current 3.
       // also day 5, 4 (run of 2). longest = 3.
       Timestamp now = utc(11, 12);
-      List<RecallPrompt> rows =
+      List<RecallAnswerRow> rows =
           List.of(
               answered(utc(11, 8), 5000, true, null),
               answered(utc(10, 8), 5000, true, null),
@@ -211,7 +210,7 @@ class RecallStatsServiceTest {
     @Test
     void currentStreakZeroWhenNoReviewToday() {
       Timestamp now = utc(11, 12);
-      List<RecallPrompt> rows =
+      List<RecallAnswerRow> rows =
           List.of(answered(utc(9, 8), 5000, true, null), answered(utc(8, 8), 5000, true, null));
       RecallStatsDTO dto = aggregate(rows, now);
       assertThat(dto.getTotals().getCurrentStreak(), equalTo(0));
