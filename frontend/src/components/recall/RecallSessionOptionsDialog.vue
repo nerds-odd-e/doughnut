@@ -6,11 +6,11 @@
     <template #body>
       <div class="flex flex-col gap-4">
         <div class="flex flex-col gap-2">
-          <p class="my-2 text-neutral">Daily Progress: {{ finished }} / {{ finished + toRepeatCount }}</p>
-          <p class="my-2 text-neutral">Total assimilated: {{ finished }} / {{ totalAssimilatedCount }}</p>
+          <p class="my-2 text-base-content">Daily Progress: {{ finished }} / {{ finished + toRepeatCount }}</p>
+          <p class="my-2 text-base-content">Total assimilated: {{ finished }} / {{ totalAssimilatedCount }}</p>
           <p
             v-if="averageThinkingTime !== null"
-            class="my-2 text-neutral"
+            class="my-2 text-base-content"
           >
             Average thinking time: {{ formatThinkingTime(averageThinkingTime) }}
           </p>
