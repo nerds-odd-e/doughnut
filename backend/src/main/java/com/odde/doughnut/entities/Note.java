@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.odde.doughnut.algorithms.ClozedString;
 import com.odde.doughnut.algorithms.FrontmatterAliases;
 import com.odde.doughnut.algorithms.NoteContentMarkdown;
+import com.odde.doughnut.algorithms.NoteLeadingFrontmatter;
 import com.odde.doughnut.algorithms.NoteTitle;
 import com.odde.doughnut.configs.ObjectMapperConfig;
 import com.odde.doughnut.controllers.dto.NoteTopology;
@@ -134,9 +135,7 @@ public class Note extends EntityIdentifiedByIdOnly {
   }
 
   public void prependContent(String addition) {
-    String prev = getContent() != null ? getContent() : "";
-    String merged = prev.isEmpty() ? addition : addition + "\n\n" + prev;
-    setContent(merged);
+    setContent(NoteLeadingFrontmatter.prependToBody(getContent(), addition));
   }
 
   @JsonIgnore

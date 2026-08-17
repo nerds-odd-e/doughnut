@@ -101,6 +101,7 @@ class NotebookRootNoteCreationWithWikidataTests extends NotebookControllerTestBa
         mockApiResponseWithLocationInfo(
             "{\"latitude\":1.3,\"longitude\":103.8}", "globecoordinate");
         NoteRealm note = controller.createNoteAtNotebookRoot(notebook, noteCreation);
+        assertThat(note.getNote().getContent(), startsWith("---\ntype: Note\n"));
         assertThat(note.getNote().getContent(), containsString("Location: " + lnglat));
       }
 

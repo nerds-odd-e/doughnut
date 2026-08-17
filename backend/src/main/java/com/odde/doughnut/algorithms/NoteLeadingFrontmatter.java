@@ -27,6 +27,19 @@ public final class NoteLeadingFrontmatter {
     return splitVerbatim(content).map(s -> new Split(Frontmatter.parse(s.yamlRaw()), s.body()));
   }
 
+  /**
+   * Prepends {@code addition} to the markdown body. A closed leading fence stays in place; unfenced
+   * content is {@code addition} then previous, separated by a blank line.
+   */
+  public static String prependToBody(String content, String addition) {
+    String prev = content == null ? "" : content;
+    Optional<VerbatimSplit> verbatim = splitVerbatim(prev);
+    String prefix = verbatim.map(s -> s.frontmatterBlock() + "\n").orElse("");
+    String rest = verbatim.map(VerbatimSplit::body).orElse(prev);
+    String merged = rest.isEmpty() ? addition : addition + "\n\n" + rest;
+    return prefix + merged;
+  }
+
   public static Optional<VerbatimSplit> splitVerbatim(String content) {
     if (content == null || content.isEmpty()) {
       return Optional.empty();
