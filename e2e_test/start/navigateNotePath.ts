@@ -22,7 +22,7 @@ function navigateAlongSidebarToNote(titles: string[]) {
   return assumeNotePage(leafNoteTitle)
 }
 
-/** Requires the notebook catalog UI (My notebooks or Bazaar) to already be visible. */
+/** Requires the notebook catalog UI (Notebooks or Bazaar) to already be visible. */
 export function navigateAlongNotebookCatalogPath(segments: string[]) {
   if (segments.length === 0) {
     return

@@ -45,7 +45,7 @@ Then(
 )
 
 Then(
-  'I should see {string} as targets only when searching in all my notebooks {string}',
+  'I should see {string} as targets only when searching in all notebooks {string}',
   (noteTopicsAsString: string, searchKey: string) => {
     start
       .assumeNoteTargetSearchDialog()
@@ -66,7 +66,7 @@ Then(
 )
 
 Then(
-  'I should see note cannot be found when searching in all my notebooks {string}',
+  'I should see note cannot be found when searching in all notebooks {string}',
   (searchKey: string) => {
     start
       .assumeNoteTargetSearchDialog()
@@ -75,7 +75,7 @@ Then(
   }
 )
 
-When('I search for {string} in all my notebooks', (searchKey: string) => {
+When('I search for {string} in all notebooks', (searchKey: string) => {
   start.assumeNoteTargetSearchDialog().findTarget(searchKey)
 })
 

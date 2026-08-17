@@ -27,17 +27,15 @@ function expectExactRelationshipTargetsWithRetry(targets: string[]) {
   tryMatch(0)
 }
 
-function ensureAllMyNotebooksAndSubscriptionsScopeOn() {
-  cy.findByRole('button', { name: 'All My Notebooks And Subscriptions' }).then(
-    ($btn) => {
-      if ($btn.is(':disabled')) {
-        return
-      }
-      if (!$btn.hasClass('text-primary')) {
-        cy.wrap($btn).click()
-      }
+function ensureAllNotebooksScopeOn() {
+  cy.findByRole('button', { name: 'All notebooks' }).then(($btn) => {
+    if ($btn.is(':disabled')) {
+      return
     }
-  )
+    if (!$btn.hasClass('text-primary')) {
+      cy.wrap($btn).click()
+    }
+  })
 }
 
 function ensureSemanticSearchOn() {
@@ -48,9 +46,9 @@ function ensureSemanticSearchOn() {
   })
 }
 
-function searchNote(searchKey: string, options: string[]) {
-  if (options?.includes('All My Notebooks And Subscriptions')) {
-    ensureAllMyNotebooksAndSubscriptionsScopeOn()
+function searchNote(searchKey: string, allNotebooks: boolean) {
+  if (allNotebooks) {
+    ensureAllNotebooksScopeOn()
   }
   cy.findByPlaceholderText('Search')
     .clear()
@@ -78,11 +76,11 @@ export const assumeNoteTargetSearchDialog = () => {
       return this
     },
     findTarget(target: string) {
-      searchNote(target, ['All My Notebooks And Subscriptions'])
+      searchNote(target, true)
       return this
     },
     findTargetWithinNotebook(target: string) {
-      searchNote(target, [])
+      searchNote(target, false)
       return this
     },
     expectNoRelationshipTargetNotes() {

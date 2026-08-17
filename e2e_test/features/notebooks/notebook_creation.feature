@@ -5,13 +5,13 @@ Feature: Notebook creation
 
   Scenario: Create notebook with description
     When I create a notebook with title "Sedation Wiki" and description "Quick reference for sedation protocols"
-    Then I should see my notebooks:
+    Then I should see notebooks:
       | Title          | Description                                |
       | Sedation Wiki  | Quick reference for sedation protocols     |
 
   Scenario: Create notebook readme from notebook page when notebook has no readme
     Given I have a notebook "Empty NB E2E Readme"
-    And I open the notebook "Empty NB E2E Readme" from my notebooks catalog
+    And I open the notebook "Empty NB E2E Readme" from the notebook catalog
     When I save notebook readme "E2E readme body"
     And I reload the notebook page
     Then the notebook readme body includes "E2E readme body"

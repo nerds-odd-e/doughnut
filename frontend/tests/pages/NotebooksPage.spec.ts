@@ -15,11 +15,18 @@ describe("Notebooks Page", () => {
     clearNotebooksPageStorage()
   })
 
+  it("shows the Notebooks heading", async () => {
+    mockMyNotebooks({ notebooks: [] })
+    const wrapper = await mountNotebooksPage()
+    expect(wrapper.get("h1").text()).toBe("Notebooks")
+  })
+
   it("fetch API to be called ONCE", async () => {
     const notebook = makeMe.aNotebook.please()
     const myNotebooksSpy = mockMyNotebooks({
       notebooks: [{ notebook }],
     })
+    myNotebooksSpy.mockClear()
     helper.component(NotebooksPage).withRouter().render()
     expect(myNotebooksSpy).toBeCalledTimes(1)
   })

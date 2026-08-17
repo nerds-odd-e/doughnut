@@ -12,13 +12,13 @@ Feature: Add relationship
   @mockBrowserTime
   Scenario: Searching for relationship targets when none exist yet
     When I open wiki link or relationship for note "Sedition"
-    Then I should see "Sedation, Sedative" as targets only when searching in all my notebooks " se "
-    And I should see note cannot be found when searching in all my notebooks "Sedition"
+    Then I should see "Sedation, Sedative" as targets only when searching in all notebooks " se "
+    And I should see note cannot be found when searching in all notebooks "Sedition"
 
   @mockBrowserTime
   Scenario Outline: Searching for relationship targets with partial input
     When I open wiki link or relationship for note "Sedition"
-    Then I should see "<targets>" as targets only when searching in all my notebooks "<search key>"
+    Then I should see "<targets>" as targets only when searching in all notebooks "<search key>"
     Examples:
       | search key | targets            |
       | Sed        | Sedation, Sedative |
@@ -36,15 +36,15 @@ Feature: Add relationship
     Given I have a notebook "Recent scratch" with a note "Recent Note" and content "Recently added"
     When I open wiki link or relationship for note "Sedition"
     Then I should see "Recent Note" in the recently updated notes section
-    When I search for "Sed" in all my notebooks
-    Then I should see "Sedation, Sedative" as targets only when searching in all my notebooks "Sed"
+    When I search for "Sed" in all notebooks
+    Then I should see "Sedation, Sedative" as targets only when searching in all notebooks "Sed"
     And I should not see the recently updated notes section
 
   @mockBrowserTime
   Scenario: Switching to recently updated notes while search key is non-empty
     Given I have a notebook "Recent scratch" with a note "Recent Note" and content "Recently added"
     When I open wiki link or relationship for note "Sedition"
-    And I search for "Sed" in all my notebooks
+    And I search for "Sed" in all notebooks
     Then I should see relationship targets "Sedation, Sedative"
     And I should not see the recently updated notes section
     When I switch to recently updated notes

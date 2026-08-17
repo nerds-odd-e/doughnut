@@ -39,7 +39,7 @@ import { navigateToMyCircles } from './pageObjects/myCirclesPage'
 import {
   navigateToNotebookPage,
   navigateToNotebooksPage,
-} from './pageObjects/myNotebooksPage'
+} from './pageObjects/notebooksPage'
 import { notebookCard } from './pageObjects/notebookCard'
 import { assumeNotePage } from './pageObjects/notePage'
 import { noteSidebar } from './pageObjects/noteSidebar'

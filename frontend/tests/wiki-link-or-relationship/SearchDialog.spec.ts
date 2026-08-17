@@ -106,7 +106,7 @@ describe("SearchForm", () => {
     await flushPromises()
     screen.getByPlaceholderText("Search")
     expect(titleEl("Semantic search")).toBeInTheDocument()
-    expect(titleEl("All My Notebooks And Subscriptions")).toBeDisabled()
+    expect(titleEl("All notebooks")).toBeDisabled()
   })
 
   describe("keyboard navigation", () => {
@@ -156,10 +156,8 @@ describe("SearchForm", () => {
     helper.component(SearchForm).withCleanStorage().withProps({ note }).render()
     await flushPromises()
     titleEl("All My Circles").click()
-    expect(titleEl("All My Notebooks And Subscriptions")).toHaveClass(
-      "text-primary"
-    )
-    titleEl("All My Notebooks And Subscriptions").click()
+    expect(titleEl("All notebooks")).toHaveClass("text-primary")
+    titleEl("All notebooks").click()
     expect(titleEl("All My Circles")).not.toHaveClass("text-primary")
   })
 })

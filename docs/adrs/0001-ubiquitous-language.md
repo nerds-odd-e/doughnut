@@ -21,7 +21,6 @@ does not require renaming the whole codebase at once.
 
 | Term | Colliding senses |
 |------|------------------|
-| **My notes / my notebooks** | Notebook catalog; note search scope; subscribed notebook appearing among the user’s notebooks |
 | **Description / Readme** | Catalog blurb (`notebook description`) vs notebook/folder markdown body (`readme`) — both “about the notebook” but different fields |
 
 #### Redundant (several names, one concept)
@@ -38,7 +37,6 @@ does not require renaming the whole codebase at once.
 |-----|----------------|
 | **Focus context** | Used in AI flows but not established as a first-class domain noun |
 | **OKF** (Open Knowledge Format) | Named in CLI lint but not introduced as a first-class glossary noun |
-| **Owned vs subscribed notebook** | Distinction exists in behavior but not as glossary entries |
 | **Notebook health** vs export/lint tooling | Same findings idea at two layers without a shared term family |
 
 ## Decision
@@ -59,7 +57,9 @@ does not require renaming the whole codebase at once.
 | **Notebook description** | One-line short plain-text blurb of a notebook (catalog/settings; not markdown, not the Readme) |
 | **Folder** | Hierarchical path segment inside a notebook |
 | **Readme** | Markdown body on a notebook or folder (landing content; separate from notebook description) |
-| **Notebook catalog** | List of a user’s notebooks (and notebook groups) |
+| **Notebook catalog** | List of a user’s notebooks (and notebook groups). The catalog heading is **Notebooks**. |
+| **Owned notebook** | A notebook the user created or owns; appears in the **notebook catalog** |
+| **Subscribed notebook** | A shared notebook the user follows via a **subscription**; appears in the **notebook catalog** |
 | **Notebook group** | Named catalog grouping of notebooks (not a Circle) |
 | **Circle** | Multi-user shared space with members and notebooks |
 | **Bazaar** | Marketplace where notebooks are shared for others to browse and subscribe |
@@ -163,6 +163,11 @@ does not require renaming the whole codebase at once.
    - Use **notebook description** for the one-line plain-text catalog blurb;
      use **readme** for the markdown notebook/folder body — never treat them as the
      same concept.
+   - The catalog heading is **Notebooks**, not “My notebooks”. **Owned
+     notebooks** and **subscribed notebooks** both appear in the **notebook
+     catalog**. Search across that catalog is **All notebooks**. Do not use
+     “my notes” as a place name. First-person “my note” / “my notebook” in
+     E2E is fine when contrasting with someone else’s.
    - Use **Tutor** for whoever conducts a Learning Session — not *teacher*,
      *coach*, or *instructor*.
    - Use **Learning Session** for the commissioned unit; reserve **recall** for

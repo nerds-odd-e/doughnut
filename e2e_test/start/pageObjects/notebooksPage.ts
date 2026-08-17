@@ -20,8 +20,8 @@ import {
 const addNewNotebookButton = () =>
   cy.findByRole('button', { name: 'Add New Notebook' })
 
-export const myNotebooksPage = () => {
-  cy.contains('h1', 'My notebooks', { timeout: 15000 }).should('be.visible')
+export const notebooksPage = () => {
+  cy.contains('h1', 'Notebooks', { timeout: 15000 }).should('be.visible')
 
   return {
     ...notebookList(),
@@ -123,7 +123,7 @@ export const myNotebooksPage = () => {
       waitUntilAppIsNotBusy()
       router().push('/notebooks', 'notebooks', {})
       waitUntilAppIsNotBusy()
-      return myNotebooksPage()
+      return notebooksPage()
     },
     expectNotebookAtTopLevelOfCatalog(notebookName: string) {
       cy.get('.notebook-catalog-section--list > [data-cy="notebook-card"]')
@@ -137,7 +137,7 @@ export const myNotebooksPage = () => {
 export const navigateToNotebooksPage = () => {
   router().push('/notebooks', 'notebooks', {})
   waitUntilAppIsNotBusy()
-  return myNotebooksPage()
+  return notebooksPage()
 }
 
 export const navigateToNotebookPage = (notebookName: string) =>

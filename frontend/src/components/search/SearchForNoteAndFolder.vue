@@ -53,8 +53,8 @@
       </TextInput>
       <button
         type="button"
-        title="All My Notebooks And Subscriptions"
-        aria-label="All My Notebooks And Subscriptions"
+        title="All notebooks"
+        aria-label="All notebooks"
         :disabled="!noteId"
         :class="[
           'daisy-btn daisy-btn-ghost daisy-btn-sm daisy-btn-square',

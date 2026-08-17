@@ -22,7 +22,7 @@
         :to="{ name: 'notebooks' }"
         class="daisy-btn daisy-btn-link daisy-btn-sm mt-3 inline-block"
       >
-        Back to My notebooks
+        Back to Notebooks
       </router-link>
     </div>
   </main>
@@ -34,7 +34,7 @@ import type {
   NotebookCatalogGroupItem,
   User,
 } from "@generated/doughnut-backend-api"
-import { useMyNotebooksCatalog } from "@/composables/useMyNotebooksCatalog"
+import { useNotebookCatalog } from "@/composables/useNotebookCatalog"
 import ContentLoader from "@/components/commons/ContentLoader.vue"
 import NotebookGroupPageView from "./NotebookGroupPageView.vue"
 
@@ -44,7 +44,7 @@ const props = defineProps<{
 
 const user = inject<Ref<User | undefined>>("currentUser")
 const { catalogItems, subscriptions, fetchData, handleNotebookUpdated } =
-  useMyNotebooksCatalog()
+  useNotebookCatalog()
 
 const resolvedGroup = computed((): NotebookCatalogGroupItem | undefined => {
   const items = catalogItems.value

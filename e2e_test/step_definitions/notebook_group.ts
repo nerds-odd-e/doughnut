@@ -4,7 +4,7 @@
 
 import { Then, When } from '@badeball/cypress-cucumber-preprocessor'
 import start from '../start'
-import { myNotebooksPage } from '../start/pageObjects/myNotebooksPage'
+import { notebooksPage } from '../start/pageObjects/notebooksPage'
 import notebookGroupPage from '../start/pageObjects/notebookGroupPage'
 
 When(
@@ -25,14 +25,10 @@ When(
   }
 )
 
-When('I go to my notebooks page', () => {
-  start.navigateToNotebooksPage()
-})
-
 When(
   'I open notebook group {string} from the catalog header',
   (groupName: string) => {
-    myNotebooksPage().openNotebookGroupFromHeader(groupName)
+    notebooksPage().openNotebookGroupFromHeader(groupName)
   }
 )
 
@@ -48,10 +44,7 @@ When(
 Then(
   'I should see notebook group {string} with a hint including {string}',
   (groupName: string, hintSubstring: string) => {
-    myNotebooksPage().expectNotebookGroupWithMemberHint(
-      groupName,
-      hintSubstring
-    )
+    notebooksPage().expectNotebookGroupWithMemberHint(groupName, hintSubstring)
   }
 )
 
@@ -72,6 +65,6 @@ When(
 Then(
   'notebook {string} should appear at the top level of the notebook catalog',
   (notebookName: string) => {
-    myNotebooksPage().expectNotebookAtTopLevelOfCatalog(notebookName)
+    notebooksPage().expectNotebookAtTopLevelOfCatalog(notebookName)
   }
 )

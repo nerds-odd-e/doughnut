@@ -3,7 +3,7 @@
     <h1
       class="m-0 self-center text-2xl font-bold tracking-tight text-base-content"
     >
-      My notebooks
+      Notebooks
     </h1>
     <template #right>
       <div class="flex items-center gap-2">
@@ -162,7 +162,7 @@ import {
 } from "@/composables/useNoteSidebarPeerSort"
 import NotebookNewButton from "@/components/notebook/NotebookNewButton.vue"
 import NotebookCatalogSection from "@/components/notebook/NotebookCatalogSection.vue"
-import { narrowGroupNotebooksForCatalogFilter } from "@/components/notebook/narrowGroupNotebooksForCatalogFilter"
+import { filterNotebookCatalogItems } from "@/components/notebook/filterNotebookCatalogItems"
 import GlobalBar from "@/components/toolbars/GlobalBar.vue"
 import AutoCollapseDropdown from "@/components/commons/AutoCollapseDropdown.vue"
 import SidebarPeerSortDropdownMenu from "@/components/notes/SidebarPeerSortDropdownMenu.vue"
@@ -213,36 +213,12 @@ function selectCatalogPeerSort(
 const filterText = ref("")
 const filterInputRef = ref<HTMLInputElement | null>(null)
 
-const filteredOnlyCatalogItems = computed(() => {
-  const q = filterText.value.trim().toLowerCase()
-  if (!q) {
-    return props.catalogItems
-  }
-  const rows = props.catalogItems.filter((item) => {
-    if (item.type === "notebook" || item.type === "subscribedNotebook") {
-      return (item.notebook.name ?? "").toLowerCase().includes(q)
-    }
-    if (item.name.toLowerCase().includes(q)) {
-      return true
-    }
-    return item.notebooks.some((nb) =>
-      (nb.notebook.name ?? "").toLowerCase().includes(q)
-    )
-  })
-  return rows.map((item) => {
-    if (item.type !== "notebookGroup") {
-      return item
-    }
-    return {
-      ...item,
-      notebooks: narrowGroupNotebooksForCatalogFilter(item, q),
-    }
-  })
-})
-
 const filteredCatalogItems = computed(() =>
   sortNotebookCatalogByPeerSpec(
-    filteredOnlyCatalogItems.value,
+    filterNotebookCatalogItems(
+      props.catalogItems,
+      filterText.value.trim().toLowerCase()
+    ),
     sortPeerSpec.value
   )
 )

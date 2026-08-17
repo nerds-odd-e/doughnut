@@ -21,7 +21,7 @@ Feature: Notebook health
   Scenario: Run lint with removing empty folders enabled does not delete folders
     Given I have a notebook "Health no-mutate suite" with a note "Anchor"
     And the notebook "Health no-mutate suite" has an empty folder "Keep Empty"
-    When I open the notebook "Health no-mutate suite" from my notebooks catalog
+    When I open the notebook "Health no-mutate suite" from the notebook catalog
     And I open the notebook Health tab
     And I enable removing empty folders on the notebook health panel
     And I run notebook health lint
@@ -31,7 +31,7 @@ Feature: Notebook health
     Given I have a notebook "Health purge suite" with a note "Anchor"
     And the notebook "Health purge suite" has an empty folder "Empty Shell"
     And the notebook "Health purge suite" has a readme-only folder "Readme Only Shell" with readme "Only a readme here"
-    When I open the notebook "Health purge suite" from my notebooks catalog
+    When I open the notebook "Health purge suite" from the notebook catalog
     And I open the notebook Health tab
     And I enable removing empty folders on the notebook health panel
     And I run notebook health lint
@@ -46,10 +46,10 @@ Feature: Notebook health
   Scenario: Save removing empty folders default applies on another notebook
     Given I have a notebook "Defaults A" with a note "A1"
     And I have a notebook "Defaults B" with a note "B1"
-    When I open the notebook "Defaults A" from my notebooks catalog
+    When I open the notebook "Defaults A" from the notebook catalog
     And I open the notebook Health tab
     And I enable removing empty folders on the notebook health panel
     And I save notebook health options as defaults
-    And I open the notebook "Defaults B" from my notebooks catalog
+    And I open the notebook "Defaults B" from the notebook catalog
     And I open the notebook Health tab
     Then removing empty folders on the notebook health panel is enabled

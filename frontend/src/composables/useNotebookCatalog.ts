@@ -9,7 +9,7 @@ import {
   type NotebookCatalogEntry,
 } from "@/components/notebook/patchNotebookInCatalogItems"
 
-export function useMyNotebooksCatalog() {
+export function useNotebookCatalog() {
   const subscriptions = ref<SubscriptionForNotebooksListing[] | undefined>(
     undefined
   )

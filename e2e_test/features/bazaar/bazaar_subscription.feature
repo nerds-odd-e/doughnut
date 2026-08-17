@@ -20,7 +20,7 @@ Feature: Bazaar subscription
     Given I am logged in as an existing user
     When I subscribe to notebook "Shape" in the bazaar, with daily assimilation target of 1 notes per day
     Then I should see I've subscribed to "Shape"
-    And I should see readonly notebook "Shape" in my notes
+    And I should see readonly notebook "Shape" in the notebook catalog
     When I unsubscribe from notebook "Shape"
     Then I should see I've not subscribed to "Shape"
 

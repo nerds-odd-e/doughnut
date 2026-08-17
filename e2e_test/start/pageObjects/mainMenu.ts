@@ -1,6 +1,6 @@
 import { waitUntilAppIsNotBusy } from '../pageBase'
 import { form } from '../forms'
-import { navigateToNotebooksPage } from './myNotebooksPage'
+import { navigateToNotebooksPage } from './notebooksPage'
 import { assumeAdminDashboardPage } from './adminPages/adminDashboardPage'
 import { messageCenterIndicator } from './messageCenterIndicator'
 import { manageAccessTokensPage } from './manageAccessTokensPage'

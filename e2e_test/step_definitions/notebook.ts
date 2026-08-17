@@ -32,7 +32,7 @@ Given('I choose to share my notebook {string}', (noteTopology: string) => {
 })
 
 Then(
-  'I should see readonly notebook {string} in my notes',
+  'I should see readonly notebook {string} in the notebook catalog',
   (noteTopology: string) => {
     start
       .navigateToNotebooksPage()
@@ -79,7 +79,7 @@ When(
 )
 
 When(
-  'I open the notebook {string} from my notebooks catalog',
+  'I open the notebook {string} from the notebook catalog',
   (notebookName: string) => {
     start.navigateToNotebookPage(notebookName)
   }
@@ -211,11 +211,7 @@ When('I jump to the notebook {string}', (notebookName: string) => {
   start.jumpToNotebookPage(notebookName)
 })
 
-When('I visit all my notebooks', () => {
-  start.navigateToNotebooksPage()
-})
-
-Then('I should see my notebooks:', (data: DataTable) => {
+Then('I should see notebooks:', (data: DataTable) => {
   start.navigateToNotebooksPage().expectNotebookCards(data.hashes())
 })
 

@@ -13,13 +13,13 @@
 <script setup lang="ts">
 import { inject, onMounted, type Ref } from "vue"
 import type { User } from "@generated/doughnut-backend-api"
-import { useMyNotebooksCatalog } from "@/composables/useMyNotebooksCatalog"
+import { useNotebookCatalog } from "@/composables/useNotebookCatalog"
 import NotebooksPageView from "./NotebooksPageView.vue"
 import ContentLoader from "@/components/commons/ContentLoader.vue"
 
 const user = inject<Ref<User | undefined>>("currentUser")
 const { catalogItems, subscriptions, fetchData, handleNotebookUpdated } =
-  useMyNotebooksCatalog()
+  useNotebookCatalog()
 
 onMounted(() => {
   fetchData()
