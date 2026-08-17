@@ -5,7 +5,7 @@
     data-test-id="refinement-layout"
   >
     <div v-if="!showExtractionPreview" class="text-base">
-      <div class="font-semibold mb-3 text-accent-content">Note layout:</div>
+      <div class="font-semibold mb-3 text-accent-content">Refinement layout:</div>
       <ul class="space-y-2">
         <li
           v-for="item in refinementLayoutItems"
@@ -95,7 +95,7 @@
     class="mb-4 rounded-lg bg-accent p-4"
     data-test-id="refinement-layout-empty"
   >
-    <div class="font-semibold mb-3 text-accent-content">Note layout:</div>
+    <div class="font-semibold mb-3 text-accent-content">Refinement layout:</div>
     <button
       data-test-id="retry-refinement-layout"
       class="daisy-btn daisy-btn-ghost daisy-btn-sm"

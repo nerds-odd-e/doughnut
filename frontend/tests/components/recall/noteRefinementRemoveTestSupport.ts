@@ -61,7 +61,7 @@ export function expectRemoveConfirmPopup() {
   const popups = usePopups().popups.peek()
   expect(popups).toHaveLength(1)
   expect(popups[0]!.type).toBe("confirm")
-  expect(popups[0]!.message).toContain("remove")
+  expect(popups[0]!.message).toContain("selected refinement layout item(s)")
 }
 
 export async function clickRemoveRefinementLayout(

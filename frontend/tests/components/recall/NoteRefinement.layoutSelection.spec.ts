@@ -41,7 +41,7 @@ describe("NoteRefinement layout selection", () => {
     expect(layoutCheckbox(wrapper, "p1-2").checked).toBe(false)
   })
 
-  it("marks already extracted layout points clearly without disabling selection", async () => {
+  it("marks already extracted refinement layout items clearly without disabling selection", async () => {
     const wrapper = await mountNoteRefinementWithLayoutReady(
       sampleNestedLayout()
     )
@@ -108,7 +108,7 @@ describe("NoteRefinement layout selection", () => {
     )
   })
 
-  it("removes non-contiguous selected layout points", async () => {
+  it("removes non-contiguous selected refinement layout items", async () => {
     const layout = sampleNestedLayout()
     const removeLayoutSpy = mockSdkService(
       AiController,

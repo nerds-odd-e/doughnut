@@ -45,7 +45,7 @@ describe("NoteRefinement extract note preview", () => {
     ).toHaveLength(1)
   })
 
-  it("shows an editable preview after extracting selected layout points", async () => {
+  it("shows an editable preview after extracting selected refinement layout items", async () => {
     const preview = sampleExtractionPreview({
       newNoteTitle: "Point 2 title",
       newNoteContent: "Point 2 content",
@@ -74,7 +74,7 @@ describe("NoteRefinement extract note preview", () => {
     expect(wrapper.findAll("li")).toHaveLength(0)
   })
 
-  it("extracts multiple selected layout points into one preview", async () => {
+  it("extracts multiple selected refinement layout items into one preview", async () => {
     const extractNotePreviewSpy = mockSdkService(
       AiController,
       "extractNotePreview",

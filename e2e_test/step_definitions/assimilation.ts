@@ -153,7 +153,7 @@ Then('I should see the refinement layout:', (data: DataTable) => {
   start.assumeAssimilationPage().expectRefinementLayout(data.hashes())
 })
 
-Then('no refinement layout points should be selected', () => {
+Then('no refinement layout items should be selected', () => {
   start.assumeAssimilationPage().expectNoRefinementLayoutSelection()
 })
 

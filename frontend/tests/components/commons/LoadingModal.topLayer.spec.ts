@@ -24,7 +24,7 @@ describe("LoadingModal top layer", () => {
       unmount: () => void
     }
     const { unmount: unmountLoading } = render(LoadingModal, {
-      props: { show: true, message: "AI is generating layout..." },
+      props: { show: true, message: "AI is generating refinement layout..." },
     })
     try {
       await page.viewport(1280, 720)

@@ -48,7 +48,7 @@ const { data, error } = await apiCallWithLoading(
 
 For safe **read-only** blockers where the user may abandon the wait, pass the literal opt-in `{ blockUi: true, cancelable: true, message?: string }`. That overload returns `CancelableApiResult<T>` (`{ status: "completed"; result }` | `{ status: "cancelled" }`). Narrow on `status` before using `result`; do not treat cancel as an API error.
 
-Allowed product opt-ins today (note refinement only): **layout generation** (`AI is generating layout...`) and **extraction-preview generation** (`extractNotePreview` / `AI is generating preview...`). Both use this same overload and status narrowing.
+Allowed product opt-ins today (note refinement only): **layout generation** (`AI is generating refinement layout...`) and **extraction-preview generation** (`extractNotePreview` / `AI is generating preview...`). Both use this same overload and status narrowing.
 
 ```typescript
 const outcome = await apiCallWithLoading(
@@ -60,7 +60,7 @@ const outcome = await apiCallWithLoading(
   {
     blockUi: true,
     cancelable: true,
-    message: "AI is generating layout...",
+    message: "AI is generating refinement layout...",
   }
 )
 
@@ -108,7 +108,7 @@ Every whole-UI blocker and long-running note-refinement AI request must be class
 
 | Operation | Message | Call site | Notes |
 | --- | --- | --- | --- |
-| Layout generation | `AI is generating layout...` | `NoteRefinement.vue` | Shared cancelable overload |
+| Layout generation | `AI is generating refinement layout...` | `NoteRefinement.vue` | Shared cancelable overload |
 | Extraction-preview generation | `AI is generating preview...` | `NoteRefinement.vue` | Shared cancelable overload |
 
 **Intentionally noncancelable** (whole-UI blocker without Cancel — do **not** opt into `cancelable: true` until a safe post-cancel outcome is defined for that site):

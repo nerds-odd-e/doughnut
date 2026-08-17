@@ -68,7 +68,9 @@ describe("NoteRefinement layout generation cancel", () => {
 
     expect(generateSpy.mock.calls.length).toBeGreaterThan(callsAfterMount)
     expect(loadingModalMask()).toBeTruthy()
-    expect(document.body.textContent).toContain("AI is generating layout...")
+    expect(document.body.textContent).toContain(
+      "AI is generating refinement layout..."
+    )
   })
 
   it("cancels a pending retry without applying late layout items", async () => {
@@ -82,7 +84,9 @@ describe("NoteRefinement layout generation cancel", () => {
     await clickRetryRefinementLayout(wrapper)
     await nextTick()
     expect(loadingModalMask()).toBeTruthy()
-    expect(document.body.textContent).toContain("AI is generating layout...")
+    expect(document.body.textContent).toContain(
+      "AI is generating refinement layout..."
+    )
 
     clickLoadingModalCancel()
     await flushPromises()

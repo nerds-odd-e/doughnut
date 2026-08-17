@@ -6,31 +6,31 @@ import { Then, When } from '@badeball/cypress-cucumber-preprocessor'
 import start from '../start'
 
 When(
-  'I extract refinement layout points {string} and {string} to a new note',
-  (firstPoint: string, secondPoint: string) => {
+  'I extract refinement layout items {string} and {string} to a new note',
+  (firstItem: string, secondItem: string) => {
     start
       .assumeAssimilationPage()
-      .extractLayoutPointsToNewNote(firstPoint, secondPoint)
+      .extractLayoutItemsToNewNote(firstItem, secondItem)
   }
 )
 
 When(
-  'I open extraction preview for refinement layout points {string} and {string}',
-  (firstPoint: string, secondPoint: string) => {
+  'I open extraction preview for refinement layout items {string} and {string}',
+  (firstItem: string, secondItem: string) => {
     start
       .assumeAssimilationPage()
-      .openExtractionPreviewForLayoutPoints(firstPoint, secondPoint)
+      .openExtractionPreviewForLayoutItems(firstItem, secondItem)
   }
 )
 
 When(
-  'I open extraction preview on note {string} for refinement layout points {string} and {string}',
-  (noteTitle: string, firstPoint: string, secondPoint: string) => {
+  'I open extraction preview on note {string} for refinement layout items {string} and {string}',
+  (noteTitle: string, firstItem: string, secondItem: string) => {
     start
       .jumpToNotePage(noteTitle)
       .moreOptions()
       .openAssimilationSettings()
-      .openExtractionPreviewForLayoutPoints(firstPoint, secondPoint)
+      .openExtractionPreviewForLayoutItems(firstItem, secondItem)
   }
 )
 

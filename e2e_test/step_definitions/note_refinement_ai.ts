@@ -141,7 +141,7 @@ Given('OpenAI reloads refinement layout after removal:', (data: DataTable) => {
 })
 
 Given(
-  'OpenAI returns the following content when requested to remove layout points:',
+  'OpenAI returns the following content when requested to remove refinement layout items:',
   (data: DataTable) => {
     const content = data.raw().flat()[0]
     const reply = JSON.stringify({ content })
@@ -159,9 +159,9 @@ Given(
 )
 
 Given(
-  'OpenAI will extract layout points {string} to a new note with title {string} and content {string} and updated parent content {string}',
+  'OpenAI will extract refinement layout items {string} to a new note with title {string} and content {string} and updated parent content {string}',
   (
-    _layoutPoints: string,
+    _layoutItems: string,
     newNoteTitle: string,
     newNoteContent: string,
     updatedOriginalNoteContent: string
@@ -177,9 +177,9 @@ Given(
 )
 
 Given(
-  'OpenAI will extract layout points {string} with retry producing title {string} and content {string} and updated parent content {string}',
+  'OpenAI will extract refinement layout items {string} with retry producing title {string} and content {string} and updated parent content {string}',
   (
-    _layoutPoints: string,
+    _layoutItems: string,
     retryNoteTitle: string,
     retryNoteContent: string,
     retryUpdatedParentContent: string
@@ -202,11 +202,11 @@ Given(
 )
 
 When(
-  'I export the extract request for refinement layout points {string} and {string}',
-  (firstPoint: string, secondPoint: string) => {
+  'I export the extract request for refinement layout items {string} and {string}',
+  (firstItem: string, secondItem: string) => {
     start
       .assumeAssimilationPage()
-      .exportExtractRequestForLayoutPoints(firstPoint, secondPoint)
+      .exportExtractRequestForLayoutItems(firstItem, secondItem)
   }
 )
 
@@ -223,19 +223,19 @@ When('I open Refine note from the answered question', () => {
 })
 
 Then(
-  'refinement layout points {string} should be selected',
-  (layoutPointText: string) => {
+  'refinement layout items {string} should be selected',
+  (layoutItemText: string) => {
     start
       .assumeAnsweredQuestionPage()
-      .expectRefinementLayoutPointsSelected(layoutPointText)
+      .expectRefinementLayoutItemsSelected(layoutItemText)
   }
 )
 
 Then(
-  'refinement layout points {string} and {string} should not be selected',
-  (firstPoint: string, secondPoint: string) => {
+  'refinement layout items {string} and {string} should not be selected',
+  (firstItem: string, secondItem: string) => {
     start
       .assumeAnsweredQuestionPage()
-      .expectRefinementLayoutPointsNotSelected(firstPoint, secondPoint)
+      .expectRefinementLayoutItemsNotSelected(firstItem, secondItem)
   }
 )

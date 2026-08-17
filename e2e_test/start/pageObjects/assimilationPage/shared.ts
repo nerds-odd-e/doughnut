@@ -85,12 +85,12 @@ export function openRefineNoteModalIfNeeded() {
 export const refinementLayoutPanel = () =>
   cy
     .get('[data-test="refine-note-modal"]')
-    .contains('Note layout:')
+    .contains('Refinement layout:')
     .closest('.bg-accent')
 
-export function layoutCheckboxForPoint(layoutPointText: string) {
+export function layoutCheckboxForItem(layoutItemText: string) {
   return refinementLayoutPanel()
-    .contains('[data-layout-level] > label', layoutPointText)
+    .contains('[data-layout-level] > label', layoutItemText)
     .find('input[type="checkbox"]')
     .first()
 }

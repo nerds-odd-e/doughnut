@@ -24,7 +24,7 @@ describe("NoteRefinement remove layout loading modal", () => {
     return wrapper
   }
 
-  it("shows LoadingModal while removing layout points and hides on success or failure", async () => {
+  it("shows LoadingModal while removing refinement layout items and hides on success or failure", async () => {
     const successGate = createDeferredGate()
     mockSdkServiceWithImplementation(
       AiController,
@@ -78,7 +78,7 @@ describe("NoteRefinement remove layout loading modal", () => {
     expect(document.body.textContent).toContain("AI is removing content...")
     expect(screen.queryByText("Cancel")).toBeNull()
     expect(document.body.textContent).not.toContain(
-      "AI is generating layout..."
+      "AI is generating refinement layout..."
     )
 
     layoutGate.resolve()

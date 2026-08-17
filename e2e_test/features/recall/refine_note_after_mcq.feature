@@ -1,7 +1,7 @@
 @usingMockedOpenAiService
 Feature: Refine note after answered MCQ
   As a learner, after answering an MCQ on a contentful note,
-  I want to open Refine note and see question-led layout points already selected,
+  I want to open Refine note and see question-led refinement layout items already selected,
   so I can extract or remove the content that led to the question.
 
   Background:
@@ -20,10 +20,10 @@ Feature: Refine note after answered MCQ
     And OpenAI evaluates the question as legitimate
     And the note "sedition" was assimilated on day 1
 
-  Scenario: Question-led points are preselected when refining after MCQ
+  Scenario: Question-led refinement layout items are preselected when refining after MCQ
     When I visit recall for a due recall prompt on day 2
     Then I should be asked "What is the meaning of sedition?"
     When I choose answer "to sleep"
     And I open Refine note from the answered question
-    Then refinement layout points "Sedition means incite violence" should be selected
-    And refinement layout points "Extra point A" and "Extra point B" should not be selected
+    Then refinement layout items "Sedition means incite violence" should be selected
+    And refinement layout items "Extra point A" and "Extra point B" should not be selected

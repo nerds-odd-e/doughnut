@@ -1,6 +1,6 @@
 import { waitUntilAppIsNotBusy } from '../../pageBase'
 import {
-  layoutCheckboxForPoint,
+  layoutCheckboxForItem,
   refinementLayoutPanel,
   removeRefinementLayoutButton,
   waitForExtractNote,
@@ -62,20 +62,20 @@ export function assimilationRefinementLayoutExpectations() {
       removeRefinementLayoutButton().should('be.disabled')
       return this
     },
-    extractLayoutPointsToNewNote(...layoutPointTexts: string[]) {
-      this.openExtractionPreviewForLayoutPoints(...layoutPointTexts)
+    extractLayoutItemsToNewNote(...layoutItemTexts: string[]) {
+      this.openExtractionPreviewForLayoutItems(...layoutItemTexts)
       this.createNoteFromExtractionPreview()
       return this
     },
-    selectRefinementLayoutPoints(...layoutPointTexts: string[]) {
+    selectRefinementLayoutItems(...layoutItemTexts: string[]) {
       showRefinementLayout.call(this)
-      layoutPointTexts.forEach((layoutPointText) => {
-        layoutCheckboxForPoint(layoutPointText).check()
+      layoutItemTexts.forEach((layoutItemText) => {
+        layoutCheckboxForItem(layoutItemText).check()
       })
       return this
     },
-    openExtractionPreviewForLayoutPoints(...layoutPointTexts: string[]) {
-      this.selectRefinementLayoutPoints(...layoutPointTexts)
+    openExtractionPreviewForLayoutItems(...layoutItemTexts: string[]) {
+      this.selectRefinementLayoutItems(...layoutItemTexts)
       refinementLayoutPanel().within(() => {
         cy.findByRole('button', { name: 'Extract' }).click()
       })
@@ -83,8 +83,8 @@ export function assimilationRefinementLayoutExpectations() {
       extractionPreviewPanel().should('be.visible')
       return this
     },
-    exportExtractRequestForLayoutPoints(...layoutPointTexts: string[]) {
-      this.selectRefinementLayoutPoints(...layoutPointTexts)
+    exportExtractRequestForLayoutItems(...layoutItemTexts: string[]) {
+      this.selectRefinementLayoutItems(...layoutItemTexts)
       refinementLayoutPanel()
         .find('[data-test-id="export-extract-request"]')
         .click()

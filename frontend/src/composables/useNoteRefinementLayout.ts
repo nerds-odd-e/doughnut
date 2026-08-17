@@ -82,7 +82,7 @@ export function useNoteRefinementLayout(
 
     const outcome = await apiCallWithLoading(requestLayout, {
       blockUi: true,
-      message: "AI is generating layout...",
+      message: "AI is generating refinement layout...",
       cancelable: true,
     })
 
@@ -102,7 +102,7 @@ export function useNoteRefinementLayout(
     }
 
     const confirmed = await popups.confirm(
-      `Are you sure you want to remove ${selectedItemIds.value.length} selected layout point(s)? The AI will remove related content from the note.`
+      `Are you sure you want to remove ${selectedItemIds.value.length} selected refinement layout item(s)? The AI will remove related content from the note.`
     )
 
     if (!confirmed) {

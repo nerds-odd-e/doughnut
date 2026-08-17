@@ -1,5 +1,5 @@
 import {
-  layoutCheckboxForPoint,
+  layoutCheckboxForItem,
   openRefineNoteModalIfNeeded,
   refinementLayoutPanel,
 } from './assimilationPage/shared'
@@ -11,17 +11,17 @@ export function answeredQuestionRefineMethods<T extends object>(self: T) {
       refinementLayoutPanel().scrollIntoView().should('be.visible')
       return self
     },
-    expectRefinementLayoutPointsSelected(...layoutPointTexts: string[]) {
+    expectRefinementLayoutItemsSelected(...layoutItemTexts: string[]) {
       this.openRefineNoteModal()
-      layoutPointTexts.forEach((layoutPointText) => {
-        layoutCheckboxForPoint(layoutPointText).should('be.checked')
+      layoutItemTexts.forEach((layoutItemText) => {
+        layoutCheckboxForItem(layoutItemText).should('be.checked')
       })
       return self
     },
-    expectRefinementLayoutPointsNotSelected(...layoutPointTexts: string[]) {
+    expectRefinementLayoutItemsNotSelected(...layoutItemTexts: string[]) {
       this.openRefineNoteModal()
-      layoutPointTexts.forEach((layoutPointText) => {
-        layoutCheckboxForPoint(layoutPointText).should('not.be.checked')
+      layoutItemTexts.forEach((layoutItemText) => {
+        layoutCheckboxForItem(layoutItemText).should('not.be.checked')
       })
       return self
     },

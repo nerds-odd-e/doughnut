@@ -31,9 +31,9 @@ import {
 
 setupNoteRefinementTests()
 
-describe("NoteRefinement remove layout points", () => {
+describe("NoteRefinement remove refinement layout items", () => {
   describe("selection and confirmation", () => {
-    it("shows checkboxes for each layout point", async () => {
+    it("shows checkboxes for each refinement layout item", async () => {
       const wrapper = await mountNoteRefinementReady([
         "Point 1",
         "Point 2",
@@ -48,7 +48,7 @@ describe("NoteRefinement remove layout points", () => {
       { testId: "remove-refinement-layout" as const, action: "remove" },
       { testId: "extract-refinement-layout" as const, action: "extract" },
     ])(
-      "disables $action button when no layout points are selected",
+      "disables $action button when no refinement layout items are selected",
       async ({ testId }) => {
         const wrapper = await mountNoteRefinementReady(["Point 1", "Point 2"])
         expect(refinementActionButton(wrapper, testId).disabled).toBe(true)
@@ -59,7 +59,7 @@ describe("NoteRefinement remove layout points", () => {
       { testId: "remove-refinement-layout" as const, action: "remove" },
       { testId: "extract-refinement-layout" as const, action: "extract" },
     ])(
-      "enables $action button when a layout point is selected",
+      "enables $action button when a refinement layout item is selected",
       async ({ testId }) => {
         const wrapper = await mountNoteRefinementReady(["Point 1", "Point 2"])
         await selectFirstLayoutItem(wrapper)
