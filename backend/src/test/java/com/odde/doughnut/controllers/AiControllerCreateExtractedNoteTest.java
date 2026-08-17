@@ -83,7 +83,8 @@ class AiControllerCreateExtractedNoteTest extends ControllerTestBase {
                   "Updated parent with summary."));
 
       Note persistedNote = noteRepository.findById(response.getNote().getId()).orElseThrow();
-      assertThat(persistedNote.getContent()).isEqualTo("Body that should remain.");
+      assertThat(persistedNote.getContent())
+          .isEqualTo("---\ntype: Note\n---\nBody that should remain.");
     }
 
     @Test
@@ -102,7 +103,8 @@ class AiControllerCreateExtractedNoteTest extends ControllerTestBase {
       Note persistedNote = noteRepository.findById(response.getNote().getId()).orElseThrow();
       assertThat(noteRepository.count()).isEqualTo(noteCountBefore + 1);
       assertThat(persistedNote.getTitle()).isEqualTo("Extracted Note");
-      assertThat(persistedNote.getContent()).isEqualTo("Expanded content for the new note.");
+      assertThat(persistedNote.getContent())
+          .isEqualTo("---\ntype: Note\n---\nExpanded content for the new note.");
       assertThat(persistedNote.getFolder()).isNull();
       makeMe.entityPersister.refresh(sourceNote);
       assertThat(sourceNote.getContent()).isEqualTo("Updated parent with summary.");

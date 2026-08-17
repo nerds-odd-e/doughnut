@@ -61,7 +61,7 @@ class NotebookNoteCreateControllerTest extends NotebookControllerTestBase {
     NoteRealm result = controller.createNoteAtNotebookRoot(ownedNotebook(), noteCreation);
 
     Note created = noteRepository.findById(result.getId()).orElseThrow();
-    assertThat(created.getContent(), equalTo("# Hello\n\n[[Link]]"));
+    assertThat(created.getContent(), equalTo("---\ntype: Note\n---\n# Hello\n\n[[Link]]"));
   }
 
   @Test

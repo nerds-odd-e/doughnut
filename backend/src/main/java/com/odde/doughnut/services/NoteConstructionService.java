@@ -71,6 +71,14 @@ public class NoteConstructionService {
     return note;
   }
 
+  private void persistCreatedNoteContent(Note note, String content) {
+    Timestamp ts = testabilitySettings.getCurrentUTCTimestamp();
+    note.setContent(
+        NoteConceptType.ensureOrdinaryNoteType(AuthoredNoteContent.prepareContentForSave(content)));
+    note.setUpdatedAt(ts);
+    entityPersister.save(note);
+  }
+
   private Note attachWikidataAndRefresh(Note note, WikidataIdWithApi wikidataIdWithApi)
       throws IOException, InterruptedException {
     if (wikidataIdWithApi != null) {
@@ -100,11 +108,7 @@ public class NoteConstructionService {
     }
     Note note = createNote(notebook, folder, noteCreation.getNewTitle());
     if (noteCreation.getContent() != null) {
-      String prepared = AuthoredNoteContent.prepareContentForSave(noteCreation.getContent());
-      Timestamp ts = testabilitySettings.getCurrentUTCTimestamp();
-      note.setContent(prepared);
-      note.setUpdatedAt(ts);
-      entityPersister.save(note);
+      persistCreatedNoteContent(note, noteCreation.getContent());
     }
     note = attachWikidataAndRefresh(note, wikidataIdWithApi);
     noteService.deleteOrphanImagesForPersistedContent(note);
@@ -134,15 +138,11 @@ public class NoteConstructionService {
 
     Note newNote =
         createNote(originalNote.getNotebook(), originalNote.getFolder(), aiResult.newNoteTitle);
-    String preparedNew = AuthoredNoteContent.prepareContentForSave(newNoteContent);
-    String preparedOriginal =
-        AuthoredNoteContent.prepareContentForSave(aiResult.updatedOriginalNoteContent);
-    newNote.setContent(preparedNew);
-    newNote.setUpdatedAt(currentUTCTimestamp);
-    entityPersister.save(newNote);
+    persistCreatedNoteContent(newNote, newNoteContent);
 
     originalNote.setUpdatedAt(currentUTCTimestamp);
-    originalNote.setContent(preparedOriginal);
+    originalNote.setContent(
+        AuthoredNoteContent.prepareContentForSave(aiResult.updatedOriginalNoteContent));
     entityPersister.save(originalNote);
 
     noteService.deleteOrphanImagesForPersistedContent(newNote);

@@ -1,6 +1,6 @@
 # Plan: Note concept type
 
-**Status:** in progress (slice 4 next)
+**Status:** in progress (slice 5 next)
 
 **Goal:** Ordinary notes persist `type: Note`. Relationship notes persist `type: Relationship`. Existing `note.content` is backfilled. ADRs describe that stored shape.
 
@@ -38,13 +38,11 @@ E2E: `note_edit.feature`. Controller: body-only, empty, fenced delta. Autosave k
 
 **Learnings:** Persist mutates the body, so autosave must not stamp last-saved to the *sent* unwrapped text after the store has the wrap. Use `mockSdkServiceWithImplementation` for that frontend echo, not a cast `mockImplementation`.
 
-### 4. Creating a note with a body and no frontmatter stores type: Note — Behavior — planned
+### 4. Creating a note with a body and no frontmatter stores type: Note — Behavior — done
 
-**Pre:** Create DTO / extract / similar supplies a body and no leading fence.  
-**Trigger:** Create the note with that content.  
-**Post:** Wrapped `type: Note` plus the body. Title-only create (slice 2) is not re-asserted.
+Create-with-content (DTO and extract new-note) goes through `persistCreatedNoteContent`: `prepareContentForSave` then `ensureOrdinaryNoteType`. Body-only markdown stores `---\ntype: Note\n---\n` plus the body. Original-note extract updates still prepare without wrapping.
 
-Wire wrap on `NoteConstructionService` create-with-content only. Do not insert into existing fences.
+**Learnings:** Title-only still uses wrap(null) on first save; create-with-content overwrites via the helper. Slice 5 insert-into-fence should extend `ensureOrdinaryNoteType` so both save and `persistCreatedNoteContent` pick it up.
 
 ### 5. Persisting frontmatter without type inserts type: Note first — Behavior — planned
 
