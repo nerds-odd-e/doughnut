@@ -55,7 +55,7 @@ import {
   diffFrontmatterPropertyKeyChanges,
   parseNoteContentMarkdown,
 } from "@/utils/noteContentFrontmatter"
-import type { DeadWikiLinkPayload } from "@/utils/wikiPropertyValueField"
+import type { DeadWikiLinkPayload } from "@/utils/wikiLinkMarkup"
 
 const emit = defineEmits<{
   deadWikiLinkClick: [payload: DeadWikiLinkPayload]
@@ -93,8 +93,11 @@ const textareaRef = ref<InstanceType<typeof TextArea> | null>(null)
 const richEditorRef = ref<InstanceType<typeof RichMarkdownEditor> | null>(null)
 const { htmlToMarkdown, processContentAfterPaste } =
   usePasteWithLinkImageOptions()
-const { registerInserter, registerWikiPropertyInserter, unregisterInserter } =
-  useContentCursorInserter()
+const {
+  registerInserter,
+  registerInsertWikiLinkAsPropertyInserter,
+  unregisterInserter,
+} = useContentCursorInserter()
 
 /** Byte offset in `markdown` of the `""` YAML key for the empty property name line, or null. */
 function caretOffsetForEmptyPropertyYamlKey(markdown: string): number | null {
@@ -152,7 +155,7 @@ onMounted(() => {
     }
   })
 
-  registerWikiPropertyInserter({
+  registerInsertWikiLinkAsPropertyInserter({
     canInsert: () => parseNoteContentMarkdown(props.noteContent ?? "").ok,
     insert: (text: string) => {
       const composed = appendWikiLinkPropertyRow(props.noteContent ?? "", text)
@@ -172,7 +175,7 @@ onMounted(() => {
         })
       } else {
         queueMicrotask(() => {
-          richEditorRef.value?.addWikiLinkProperty(text)
+          richEditorRef.value?.addWikiLinkAsProperty(text)
         })
       }
     },

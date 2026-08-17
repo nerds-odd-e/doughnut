@@ -10,7 +10,7 @@ import {
   DEAD_WIKI_LINK_CLASS,
   DOUGHNUT_WIKI_LINK_CLASS,
 } from "@/utils/wikiLinkDomMarkers"
-import { wikiAnchorToMarkdownToken } from "@/utils/wikiPropertyValueField"
+import { wikiAnchorToMarkdownToken } from "@/utils/wikiLinkMarkup"
 
 export const turndownService = new TurndownService({
   br: "<br>",

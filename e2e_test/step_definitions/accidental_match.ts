@@ -34,7 +34,7 @@ Then(
 )
 
 When(
-  'I add the matched note {string} as a wiki property from the accidental match result',
+  'I add the matched note {string} as a wiki link in a new property from the accidental match result',
   (matchedNoteTitle: string) => {
     start
       .assumeAnsweredQuestionPage()

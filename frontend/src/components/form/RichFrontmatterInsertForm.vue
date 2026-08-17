@@ -86,7 +86,7 @@
               isUrlPropertyKey(draftKey) ? 'min-w-0 flex-1' : ''
             "
           >
-            <WikiPropertyValueField
+            <PropertyValueField
               :model-value="draftValue"
               :wiki-titles="wikiTitles"
               aria-label="Property value"
@@ -112,7 +112,7 @@ import { ref } from "vue"
 import RichFrontmatterImagePropertyValue from "@/components/form/RichFrontmatterImagePropertyValue.vue"
 import RichFrontmatterPropertyExternalLink from "@/components/form/RichFrontmatterPropertyExternalLink.vue"
 import RichFrontmatterPropertyKeyPresets from "@/components/form/RichFrontmatterPropertyKeyPresets.vue"
-import WikiPropertyValueField from "@/components/form/WikiPropertyValueField.vue"
+import PropertyValueField from "@/components/form/PropertyValueField.vue"
 import type { WikiTitle } from "@generated/doughnut-backend-api"
 import {
   isImagePropertyKey,
@@ -121,7 +121,7 @@ import {
   type PropertyRow,
 } from "@/utils/noteContentFrontmatter"
 import { scheduleFocusTargetWithin } from "@/utils/focusTarget"
-import type { DeadWikiLinkPayload } from "@/utils/wikiPropertyValueField"
+import type { DeadWikiLinkPayload } from "@/utils/wikiLinkMarkup"
 
 defineProps<{
   insertOpen: boolean

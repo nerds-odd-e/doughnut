@@ -179,7 +179,7 @@ export function useRichFrontmatterPropertyEditing(options: {
     options.onPropertiesChanged(filterForEmit([...options.propertyRows.value]))
   }
 
-  async function addWikiLinkProperty(wikiLinkText: string) {
+  async function addWikiLinkAsProperty(wikiLinkText: string) {
     const trimmedLink = wikiLinkText.trim()
     const newRows = [
       ...options.propertyRows.value,
@@ -231,7 +231,7 @@ export function useRichFrontmatterPropertyEditing(options: {
     removeRow,
     commitRow,
     onRelationTypeSelected,
-    addWikiLinkProperty,
+    addWikiLinkAsProperty,
     getPropertyRows,
     headingVisible,
     showSection,

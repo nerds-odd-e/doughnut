@@ -29,7 +29,7 @@ example of 2: "[[B]]"
       .getWrapper()
       .find('[data-testid="rich-note-property-value"]')
     await keyInput.setValue("example of")
-    await h.setWikiPropertyValueField(valInput, "[[C]]")
+    await h.setPropertyValueField(valInput, "[[C]]")
     await valInput.trigger("blur")
 
     const last = h.lastEmittedMarkdown()
@@ -65,7 +65,7 @@ example of:
       .getWrapper()
       .find('[data-testid="rich-note-property-value"]')
     await keyInput.setValue("example of")
-    await h.setWikiPropertyValueField(valInput, "[[C]]")
+    await h.setPropertyValueField(valInput, "[[C]]")
     await valInput.trigger("blur")
 
     const parsed = parseNoteContentMarkdown(h.lastEmittedMarkdown())
@@ -94,7 +94,7 @@ example of 3: three
       .getWrapper()
       .find('[data-testid="rich-note-property-value"]')
     await keyInput.setValue("example of")
-    await h.setWikiPropertyValueField(valInput, "four")
+    await h.setPropertyValueField(valInput, "four")
     await valInput.trigger("blur")
 
     const parsed = parseNoteContentMarkdown(h.lastEmittedMarkdown())

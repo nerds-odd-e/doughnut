@@ -165,7 +165,7 @@ import {
   scalarStringFromPropertyValue,
   type PropertyValue,
 } from "@/utils/noteProperties"
-import type { DeadWikiLinkPayload } from "@/utils/wikiPropertyValueField"
+import type { DeadWikiLinkPayload } from "@/utils/wikiLinkMarkup"
 import {
   isKnownRelationKebab,
   relationTypeFromKebab,

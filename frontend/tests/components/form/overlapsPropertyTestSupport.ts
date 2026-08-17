@@ -42,7 +42,7 @@ export async function addNewOverlapsProperty(h: Harness, wikiLink: string) {
   const keyInput = w.find('[data-testid="rich-note-property-key"]')
   const valInput = w.find('[data-testid="rich-note-property-value"]')
   await keyInput.setValue("overlaps")
-  await h.setWikiPropertyValueField(valInput, wikiLink)
+  await h.setPropertyValueField(valInput, wikiLink)
   await valInput.trigger("blur")
   await flushPromises()
 }

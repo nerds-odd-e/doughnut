@@ -154,7 +154,7 @@ Workshop body.`
     )
     await keyInput.setValue("domain")
     await keyInput.trigger("blur")
-    await h.setWikiPropertyValueField(valInput, "wiki")
+    await h.setPropertyValueField(valInput, "wiki")
     await valInput.trigger("blur")
 
     const last = h.lastEmittedMarkdown()

@@ -158,6 +158,7 @@ declare module 'vue' {
     PopButton: typeof import('./src/components/commons/Popups/PopButton.vue')['default']
     Popups: typeof import('./src/components/commons/Popups/Popups.vue')['default']
     ProgressBar: typeof import('./src/components/commons/ProgressBar.vue')['default']
+    PropertyValueField: typeof import('./src/components/form/PropertyValueField.vue')['default']
     QuestionChoices: typeof import('./src/components/recall/QuestionChoices.vue')['default']
     QuestionDisplay: typeof import('./src/components/recall/QuestionDisplay.vue')['default']
     QuestionExportDialog: typeof import('./src/components/notes/QuestionExportDialog.vue')['default']
@@ -274,7 +275,6 @@ declare module 'vue' {
     WikidataSearchByLabel: typeof import('./src/components/notes/WikidataSearchByLabel.vue')['default']
     WikiLinkOrRelationshipChoice: typeof import('./src/components/wiki-link-or-relationship/WikiLinkOrRelationshipChoice.vue')['default']
     WikiLinkToken: typeof import('./src/components/notes/WikiLinkToken.vue')['default']
-    WikiPropertyValueField: typeof import('./src/components/form/WikiPropertyValueField.vue')['default']
   }
 }
 
@@ -426,6 +426,7 @@ declare global {
   const PopButton: typeof import('./src/components/commons/Popups/PopButton.vue')['default']
   const Popups: typeof import('./src/components/commons/Popups/Popups.vue')['default']
   const ProgressBar: typeof import('./src/components/commons/ProgressBar.vue')['default']
+  const PropertyValueField: typeof import('./src/components/form/PropertyValueField.vue')['default']
   const QuestionChoices: typeof import('./src/components/recall/QuestionChoices.vue')['default']
   const QuestionDisplay: typeof import('./src/components/recall/QuestionDisplay.vue')['default']
   const QuestionExportDialog: typeof import('./src/components/notes/QuestionExportDialog.vue')['default']
@@ -542,5 +543,4 @@ declare global {
   const WikidataSearchByLabel: typeof import('./src/components/notes/WikidataSearchByLabel.vue')['default']
   const WikiLinkOrRelationshipChoice: typeof import('./src/components/wiki-link-or-relationship/WikiLinkOrRelationshipChoice.vue')['default']
   const WikiLinkToken: typeof import('./src/components/notes/WikiLinkToken.vue')['default']
-  const WikiPropertyValueField: typeof import('./src/components/form/WikiPropertyValueField.vue')['default']
 }

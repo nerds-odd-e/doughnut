@@ -108,7 +108,7 @@ import { noteImageScalarsFromMarkdown } from "@/utils/noteContentFrontmatter"
 import NoteToolbar from "./core/NoteToolbar.vue"
 import NoteRecentUpdateIndicator from "./NoteRecentUpdateIndicator.vue"
 import NoteDeadWikiLinkCreateModal from "./NoteDeadWikiLinkCreateModal.vue"
-import type { DeadWikiLinkPayload } from "@/utils/wikiPropertyValueField"
+import type { DeadWikiLinkPayload } from "@/utils/wikiLinkMarkup"
 import { provideNoteShortcutScope } from "@/composables/noteShortcutScope"
 import { isReservedReadmeNoteTitle } from "@/utils/reservedReadmeTitles"
 

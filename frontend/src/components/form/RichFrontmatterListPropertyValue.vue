@@ -53,7 +53,7 @@ import {
   compactDisplayForPropertyValue,
   type PropertyValue,
 } from "@/utils/noteProperties"
-import type { DeadWikiLinkPayload } from "@/utils/wikiPropertyValueField"
+import type { DeadWikiLinkPayload } from "@/utils/wikiLinkMarkup"
 
 const props = defineProps<{
   value: Extract<PropertyValue, { kind: "list" }>

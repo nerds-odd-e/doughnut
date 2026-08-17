@@ -21,8 +21,6 @@ does not require renaming the whole codebase at once.
 
 | Term | Colliding senses |
 |------|------------------|
-| **Property** | Reduced relationship field; wiki property from accidental match; property memory tracker key |
-| **Chat / conversation / message** | Human note threads and AI chat share the same nouns without a clear split |
 | **My notes / my notebooks** | Notebook catalog; note search scope; subscribed notebook appearing among the user’s notebooks |
 | **Description / Readme** | Catalog blurb (`notebook description`) vs notebook/folder markdown body (`readme`) — both “about the notebook” but different fields |
 
@@ -66,6 +64,7 @@ does not require renaming the whole codebase at once.
 | **Circle** | Multi-user shared space with members and notebooks |
 | **Bazaar** | Marketplace where notebooks are shared for others to browse and subscribe |
 | **Wiki link** | In-content `[[…]]` reference to a note (optionally `Notebook:Title`) |
+| **Property** | YAML frontmatter key–value on a note (scalar or one-level list). Distinct from a **relationship note**. A value may contain **wiki links**. Relation-like keys (`example of`, `a part of`) are still properties. |
 | **Relationship** | Typed association between notes (e.g. “similar to”, “a part of”) |
 | **Relationship note** | A note that represents a relationship (`type: relationship` in frontmatter), with source, target, and relation |
 | **Wikidata association** | Binding a note to a Wikidata entity (also called Wiki association) |
@@ -91,15 +90,15 @@ does not require renaming the whole codebase at once.
 | **Remember spelling** | Learner action at assimilation: verify the note title (or alias), then create a spelling memory tracker | |
 | **Recall** | Spaced retrieval of assimilated material. Doughnut names the activity **recall**, not FSRS/Anki **review**. Methods: **recall prompt** or **just review**. | |
 | **Recall prompt** | One ask during recall for a memory tracker. Kinds: **spelling** (no MCQ) or **MCQ** (the prompt HAS_A an MCQ). An MCQ is not a type of recall prompt. | |
-| **MCQ** | Multiple-choice content on a note (stem, choices, solution). A recall prompt may have an MCQ; an MCQ is not a type of recall prompt. **Contested** is a property of an MCQ. Origin (AI-generated vs manually added) is how the content was produced, not a prompt kind. | |
-| **Contested** | Property of an MCQ: marked not feasible. Not a kind of recall prompt. | |
+| **MCQ** | Multiple-choice content on a note (stem, choices, solution). A recall prompt may have an MCQ; an MCQ is not a type of recall prompt. **Contested** marks an MCQ as not feasible. Origin (AI-generated vs manually added) is how the content was produced, not a prompt kind. | |
+| **Contested** | Marks an MCQ as not feasible. Not a kind of recall prompt. | |
 | **Contest** | Challenge an MCQ shown in a recall prompt; the MCQ may be marked contested and replaced. | |
 | **Just review** | Recall by reviewing the note and self-evaluating. A method of recall, not the absence of a prompt. | **Just review** |
 | **Accidental match** | Recall result that matches an unintended note | |
 | **Memory tracking** | Creating and maintaining memory trackers for notes. Tracker-level opt-out is **Remove from recall**. | |
 | **Remove from recall** | Stop an existing memory tracker from appearing in recall; the unit does not re-enter the sequence | **Remove** / **Remove from recall** |
 | **Revive** | Re-enable recall for a tracker that was removed from recall | **Revive** |
-| **Property memory tracker** | Recall tracking keyed by a property or relationship label | |
+| **Property memory tracker** | Understanding memory tracker keyed by a **property** name (the frontmatter key). Not a separate tracker type; not keyed by a relationship note. | |
 | **Stability** | Persisted current interval of a memory tracker, in whole hours. After a grade, next recall time is last recalled time plus `I(r, S)` with **requested retention** `r` locked at 0.9 (so due hours equal Stability hours). A newly assimilated tracker may have Stability 0 (due now). | **Stability** |
 | **Requested retention** | Target retrievability at the next due. Locked globally at **0.9** — not a Settings knob, not in the UI, not persisted. At this `r`, open FSRS `I(0.9, S) = S` in whole hours. | |
 | **Retrievability** | Computed from elapsed whole hours and Stability; not stored. | |
@@ -107,12 +106,13 @@ does not require renaming the whole codebase at once.
 
 #### Conversation and focus
 
-| Term | Meaning |
-|------|---------|
-| **Conversation** | Thread of messages about a note (human or AI participant) |
-| **Message** | One utterance in a conversation |
-| **Message center** | UI for conversations and unread state |
-| **Focus context** | Bounded note neighborhood for AI use |
+| Term | Meaning | Short UI |
+|------|---------|----------|
+| **Conversation** | Thread of messages about a **note** or **recall prompt**. Participants may be humans and/or the **AI Assistant**. Not a separate AI-chat product. | |
+| **Message** | One utterance in a conversation | |
+| **Message center** | Inbox UI for conversations and unread state | **Messages** |
+| **AI Assistant** | Conversation participant that sends messages with no human sender | **AI Assistant** |
+| **Focus context** | Bounded note neighborhood for AI use | |
 
 3. **Commissioned Learning Session terms** — Vocabulary for Learning Sessions
    that a Tutor conducts outside Doughnut, on commission from Doughnut:
@@ -136,6 +136,11 @@ does not require renaming the whole codebase at once.
    - Always qualify **layout** as **refinement** or **book**.
    - Use **wiki link**, **relationship**, or **Wikidata association** — never
      bare **link** or **wiki** when the kind matters.
+   - Use **property** for a YAML frontmatter key–value on a note. Never invent
+     **wiki property** — say add a **wiki link** as a **property**. Reducing a
+     **relationship note** writes a **property** on the source; do not call
+     that field a reduced relationship. Do not use **property** for Jackson /
+     OpenAPI / CSS / JavaBean in domain speech.
    - Use **subscription** / **subscribe** for following a shared notebook.
      Do not use bare **learning**. Use **Learning Session** (and its family)
      for commissioned tutoring; use **assimilation**, **recall**, or
@@ -164,6 +169,12 @@ does not require renaming the whole codebase at once.
      the ordinary spaced activity Doughnut conducts itself.
    - Say a Learning Session is **commissioned** (by the Learning Orchestrator)
      and later **recorded** (from a Learning Session Report).
+   - Use **conversation** and **message** for note/recall-prompt threads.
+     Do not use **chat**, **AI chat**, or a Chat entity. The **AI Assistant**
+     is a participant in a conversation, not a different product. OpenAI
+     wire names and vendor **ChatGPT** are not glossary nouns. A
+     commissioned **Learning Session** and CLI interactive scrollback are
+     not conversations.
 
 5. **Alignment policy** — On Accept:
 
@@ -185,7 +196,9 @@ does not require renaming the whole codebase at once.
 - Product language converges on fewer overloaded words (**link**). Bare
   **learning** is not a glossary noun; commissioned tutoring uses the
   **Learning Session** family. **Refinement layout** and **book layout** stay
-  distinct; never use bare **layout** for either.
+  distinct; never use bare **layout** for either. **Property** is the YAML
+  frontmatter key–value on a note — not a wiki-property kind and not a
+  reduced-relationship kind.
 - Product language names spaced retrieval **recall**, not **review**, so the
   glossary matches the philosophy (recall is better than review) and stays
   distinct from FSRS/Anki vocabulary. **Just review** names a recall method,
@@ -203,6 +216,8 @@ does not require renaming the whole codebase at once.
 - Commissioned Learning Session names are fixed before the capability is built, so its
   entities, API, UI copy, and tests start on the glossary instead of renaming
   later.
+- **Conversation** / **message** / **message center** name one product
+  (note or recall-prompt threads). **Chat** is not a product noun.
 - Retired product concepts (**workspace** as CLI sync tree, **push / pull**
   sync, **sync baseline** / `.doughnut-sync`) must not reappear in product
   code or glossary; portable content follows ADR 0002.

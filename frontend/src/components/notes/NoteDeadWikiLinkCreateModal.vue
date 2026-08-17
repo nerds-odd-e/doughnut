@@ -47,7 +47,7 @@ import Modal from "@/components/commons/Modal.vue"
 import { realmLeafFolder } from "./useNoteSidebarTree"
 import NoteNewForm from "./NoteNewForm.vue"
 import SearchForm from "@/components/wiki-link-or-relationship/SearchForm.vue"
-import type { DeadWikiLinkPayload } from "@/utils/wikiPropertyValueField"
+import type { DeadWikiLinkPayload } from "@/utils/wikiLinkMarkup"
 import { primeSoftKeyboard } from "@/utils/focusTarget"
 
 const pointAtExistingNoteLabel = "Point at an existing note"

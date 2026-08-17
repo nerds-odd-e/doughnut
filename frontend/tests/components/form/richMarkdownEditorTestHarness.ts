@@ -5,7 +5,7 @@ import { flushPromises, type VueWrapper } from "@vue/test-utils"
 export function createRichMarkdownEditorTestHarness() {
   let wrapper: VueWrapper
 
-  async function setWikiPropertyValueField(
+  async function setPropertyValueField(
     field: ReturnType<VueWrapper["find"]>,
     text: string
   ) {
@@ -132,7 +132,7 @@ export function createRichMarkdownEditorTestHarness() {
     /** Same instance as the last `mountEditor` return value. */
     getWrapper: () => wrapper,
     cleanup,
-    setWikiPropertyValueField,
+    setPropertyValueField,
     lastEmittedMarkdown,
     lastEmittedPasteComplete,
     quillEditorEl,

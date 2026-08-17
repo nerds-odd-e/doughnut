@@ -3,7 +3,7 @@
     v-if="selectedSearchResult && sourceNote && !targetSearchResult"
     :target-note-topology="selectedSearchResult.noteTopology"
     :bare-wiki-link-available="false"
-    :wiki-property-option-available="wikiPropertyOptionAvailable"
+    :insert-wiki-link-as-property-available="insertWikiLinkAsPropertyAvailable"
     @choose-insert-wiki-link-as-property="onInsertWikiLinkAsProperty"
     @choose-add-relationship="chooseAddRelationship"
     @go-back="$emit('closeDialog')"
@@ -62,7 +62,7 @@ const selectedSearchResult = computed<NoteSearchResult | undefined>(() => {
 
 const targetSearchResult = ref<NoteSearchResult | undefined>(undefined)
 
-const wikiPropertyOptionAvailable = computed(
+const insertWikiLinkAsPropertyAvailable = computed(
   () => parseNoteContentMarkdown(sourceNote.value?.content ?? "").ok
 )
 

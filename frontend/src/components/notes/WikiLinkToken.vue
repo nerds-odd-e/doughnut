@@ -34,7 +34,7 @@ import {
 import {
   wikiTitleNoteIdLookup,
   type DeadWikiLinkPayload,
-} from "@/utils/wikiPropertyValueField"
+} from "@/utils/wikiLinkMarkup"
 
 const props = defineProps({
   token: { type: String, required: true },

@@ -6,11 +6,11 @@ import {
 } from "@/utils/wikiLinkDomMarkers"
 import {
   escapeHtmlAttributeValue,
-  escapeHtmlForWikiPropertyValue,
-  isValidPropertyWikiInner,
+  escapeHtmlForWikiLinkDisplay,
+  isValidWikiLinkInner,
   splitWikiLinkInner,
   wikiTitleParts,
-} from "@/utils/wikiPropertyValueField"
+} from "@/utils/wikiLinkMarkup"
 
 /** Visible inner text of a dead-wiki-link anchor (bracket UI or plain). */
 function deadWikiLinkBracketDisplayMatches(
@@ -62,8 +62,8 @@ function upgradeDeadWikiAnchors(html: string, wikiTitles: WikiTitle[]): string {
 }
 
 function deadWikiAnchorHtmlFromInner(innerRaw: string): string {
-  if (!isValidPropertyWikiInner(innerRaw)) {
-    return escapeHtmlForWikiPropertyValue(`[[${innerRaw}]]`)
+  if (!isValidWikiLinkInner(innerRaw)) {
+    return escapeHtmlForWikiLinkDisplay(`[[${innerRaw}]]`)
   }
   const { target, display } = splitWikiLinkInner(innerRaw)
   const attrTarget = escapeHtmlAttributeValue(target)
@@ -71,7 +71,7 @@ function deadWikiAnchorHtmlFromInner(innerRaw: string): string {
     display !== target
       ? ` data-wiki-display="${escapeHtmlAttributeValue(display)}"`
       : ""
-  return `<a href="#" class="${DEAD_WIKI_LINK_CLASS}" data-wiki-title="${attrTarget}"${displayAttr}>${escapeHtmlForWikiPropertyValue(display)}</a>`
+  return `<a href="#" class="${DEAD_WIKI_LINK_CLASS}" data-wiki-title="${attrTarget}"${displayAttr}>${escapeHtmlForWikiLinkDisplay(display)}</a>`
 }
 
 export function replaceWikiLinksInHtml(
@@ -88,7 +88,7 @@ export function replaceWikiLinksInHtml(
         : ""
     result = result.replaceAll(
       `[[${inner}]]`,
-      `<a href="${noteShowHref(w.noteId)}" class="${DOUGHNUT_WIKI_LINK_CLASS}" data-wiki-title="${attrTarget}"${displayAttr}>${escapeHtmlForWikiPropertyValue(display)}</a>`
+      `<a href="${noteShowHref(w.noteId)}" class="${DOUGHNUT_WIKI_LINK_CLASS}" data-wiki-title="${attrTarget}"${displayAttr}>${escapeHtmlForWikiLinkDisplay(display)}</a>`
     )
   })
   result = upgradeDeadWikiAnchors(result, wikiTitles)

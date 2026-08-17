@@ -7,7 +7,7 @@ import {
 import {
   splitWikiLinkInner,
   wikiTitleNoteIdLookup,
-} from "@/utils/wikiPropertyValueField"
+} from "@/utils/wikiLinkMarkup"
 
 const RELATIONSHIP_NOTE_TYPE = "relationship"
 

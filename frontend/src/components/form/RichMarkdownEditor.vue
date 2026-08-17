@@ -53,7 +53,7 @@ import {
   parseNoteContentMarkdown,
   type PropertyRow,
 } from "@/utils/noteContentFrontmatter"
-import type { DeadWikiLinkPayload } from "@/utils/wikiPropertyValueField"
+import type { DeadWikiLinkPayload } from "@/utils/wikiLinkMarkup"
 
 const quillRef = ref<InstanceType<typeof QuillEditor> | null>(null)
 
@@ -192,9 +192,9 @@ function insertTextAtCursor(text: string) {
   }
 }
 
-function addWikiLinkProperty(text: string) {
-  frontmatterPropertiesRef.value?.addWikiLinkProperty(text)
+function addWikiLinkAsProperty(text: string) {
+  frontmatterPropertiesRef.value?.addWikiLinkAsProperty(text)
 }
 
-defineExpose({ insertMarkdownAtEnd, insertTextAtCursor, addWikiLinkProperty })
+defineExpose({ insertMarkdownAtEnd, insertTextAtCursor, addWikiLinkAsProperty })
 </script>

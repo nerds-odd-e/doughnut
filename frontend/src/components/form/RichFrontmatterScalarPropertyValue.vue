@@ -18,7 +18,7 @@
       :class="valueFieldWrapperClass"
       @pointerdown="onValuePointerDown"
     >
-      <WikiPropertyValueField
+      <PropertyValueField
         :model-value="scalarValue"
         :wiki-titles="wikiTitles"
         :aria-label="valueAriaLabel"
@@ -61,7 +61,7 @@ import { computed, ref } from "vue"
 import RichFrontmatterListPropertyValue from "@/components/form/RichFrontmatterListPropertyValue.vue"
 import RichFrontmatterPropertyExternalLink from "@/components/form/RichFrontmatterPropertyExternalLink.vue"
 import RichFrontmatterPropertyValueDialog from "@/components/form/RichFrontmatterPropertyValueDialog.vue"
-import WikiPropertyValueField from "@/components/form/WikiPropertyValueField.vue"
+import PropertyValueField from "@/components/form/PropertyValueField.vue"
 import type { WikiTitle } from "@generated/doughnut-backend-api"
 import {
   isScalarOnlyStructuralPropertyKey,
@@ -74,7 +74,7 @@ import {
   scalarStringFromPropertyValue,
   type PropertyValue,
 } from "@/utils/noteProperties"
-import type { DeadWikiLinkPayload } from "@/utils/wikiPropertyValueField"
+import type { DeadWikiLinkPayload } from "@/utils/wikiLinkMarkup"
 import { primeSoftKeyboard } from "@/utils/focusTarget"
 
 const props = defineProps<{

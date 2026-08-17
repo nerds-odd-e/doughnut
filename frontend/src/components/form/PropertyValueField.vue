@@ -2,7 +2,7 @@
   <div
     ref="root"
     tabindex="0"
-    class="wiki-property-value-field rich-content-wiki-links daisy-input daisy-input-sm w-full min-h-0 py-1 px-3 leading-normal"
+    class="property-value-field rich-content-wiki-links daisy-input daisy-input-sm w-full min-h-0 py-1 px-3 leading-normal"
     :class="{ 'daisy-input-disabled': readonly }"
     :contenteditable="!readonly"
     role="textbox"
@@ -23,9 +23,11 @@ import type { WikiTitle } from "@generated/doughnut-backend-api"
 import {
   handleRichContentAnchorClick,
   type DeadWikiLinkPayload,
+} from "@/utils/wikiLinkMarkup"
+import {
   propertyValuePlainToDisplayHtml,
-  serializeWikiPropertyValueFieldRoot,
-} from "@/utils/wikiPropertyValueField"
+  serializePropertyValueFieldRoot,
+} from "@/utils/propertyValueField"
 
 const props = defineProps({
   modelValue: { type: String, required: true },
@@ -85,7 +87,7 @@ onMounted(() => {
 
 function onInput() {
   if (props.readonly || !root.value) return
-  const plain = serializeWikiPropertyValueFieldRoot(root.value)
+  const plain = serializePropertyValueFieldRoot(root.value)
   lastEmittedPlain.value = plain
   emit("update:modelValue", plain)
 }
@@ -141,7 +143,7 @@ defineExpose({
 </script>
 
 <style scoped>
-.wiki-property-value-field {
+.property-value-field {
   outline: none;
   white-space: nowrap;
   overflow-x: auto;
@@ -149,7 +151,7 @@ defineExpose({
   line-height: 1.375rem;
 }
 
-.wiki-property-value-field :deep(.wiki-bracket) {
+.property-value-field :deep(.wiki-bracket) {
   text-decoration: none;
 }
 </style>

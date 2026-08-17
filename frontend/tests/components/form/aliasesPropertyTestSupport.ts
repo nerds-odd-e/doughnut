@@ -42,7 +42,7 @@ export async function addNewAliasesProperty(h: Harness, alias: string) {
   const keyInput = w.find('[data-testid="rich-note-property-key"]')
   const valInput = w.find('[data-testid="rich-note-property-value"]')
   await keyInput.setValue("aliases")
-  await h.setWikiPropertyValueField(valInput, alias)
+  await h.setPropertyValueField(valInput, alias)
   await valInput.trigger("blur")
   await flushPromises()
 }

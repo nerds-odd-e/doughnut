@@ -3,25 +3,29 @@ import { ref } from "vue"
 /** Module-level singleton: holds the inserter registered by the currently mounted NoteEditableContent. */
 const _inserter = ref<((text: string) => void) | undefined>(undefined)
 
-export type WikiPropertyInserter = {
+export type InsertWikiLinkAsPropertyInserter = {
   canInsert: () => boolean
   insert: (text: string) => void
 }
 
-const _wikiPropertyInserter = ref<WikiPropertyInserter | undefined>(undefined)
+const _insertWikiLinkAsPropertyInserter = ref<
+  InsertWikiLinkAsPropertyInserter | undefined
+>(undefined)
 
 export function useContentCursorInserter() {
   function registerInserter(fn: (text: string) => void) {
     _inserter.value = fn
   }
 
-  function registerWikiPropertyInserter(reg: WikiPropertyInserter) {
-    _wikiPropertyInserter.value = reg
+  function registerInsertWikiLinkAsPropertyInserter(
+    reg: InsertWikiLinkAsPropertyInserter
+  ) {
+    _insertWikiLinkAsPropertyInserter.value = reg
   }
 
   function unregisterInserter() {
     _inserter.value = undefined
-    _wikiPropertyInserter.value = undefined
+    _insertWikiLinkAsPropertyInserter.value = undefined
   }
 
   function insert(text: string) {
@@ -31,16 +35,16 @@ export function useContentCursorInserter() {
   }
 
   function canInsertWikiLinkAsProperty(): boolean {
-    return _wikiPropertyInserter.value?.canInsert() ?? false
+    return _insertWikiLinkAsPropertyInserter.value?.canInsert() ?? false
   }
 
   function insertWikiLinkAsProperty(text: string) {
-    _wikiPropertyInserter.value?.insert(text)
+    _insertWikiLinkAsPropertyInserter.value?.insert(text)
   }
 
   return {
     registerInserter,
-    registerWikiPropertyInserter,
+    registerInsertWikiLinkAsPropertyInserter,
     unregisterInserter,
     insert,
     canInsertWikiLinkAsProperty,

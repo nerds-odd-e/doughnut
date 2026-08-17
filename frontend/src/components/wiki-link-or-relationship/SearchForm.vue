@@ -15,7 +15,7 @@
   <WikiLinkOrRelationshipChoice
     v-if="selectedSearchResult && !targetSearchResult && note"
     :target-note-topology="selectedSearchResult.noteTopology"
-    :wiki-property-option-available="wikiPropertyOptionAvailable"
+    :insert-wiki-link-as-property-available="insertWikiLinkAsPropertyAvailable"
     :dead-wiki-link-display-text="deadWikiLinkPayload?.displayText"
     @choose-insert-wiki-link="onInsertWikiLink"
     @choose-insert-wiki-link-as-property="onInsertWikiLinkAsProperty"
@@ -44,7 +44,7 @@ import { useContentCursorInserter } from "@/composables/useContentCursorInserter
 import {
   type DeadWikiLinkPayload,
   markdownWikiTokenFromDeadWikiLinkPayload,
-} from "@/utils/wikiPropertyValueField"
+} from "@/utils/wikiLinkMarkup"
 import {
   moveBlockedBySoftDeletedTitleMessage,
   parseSoftDeletedTitleConflict,
@@ -55,7 +55,7 @@ const storageAccessor = useStorageAccessor()
 const { insert, canInsertWikiLinkAsProperty, insertWikiLinkAsProperty } =
   useContentCursorInserter()
 
-const wikiPropertyOptionAvailable = computed(() =>
+const insertWikiLinkAsPropertyAvailable = computed(() =>
   canInsertWikiLinkAsProperty()
 )
 

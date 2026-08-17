@@ -1,7 +1,7 @@
 import {
-  isValidPropertyWikiInner,
+  isValidWikiLinkInner,
   splitWikiLinkInner,
-} from "@/utils/wikiPropertyValueField"
+} from "@/utils/wikiLinkMarkup"
 
 const WELL_FORMED_WIKI_SEGMENT = /\[\[([^\[\]\r\n]*)\]\]/g
 
@@ -17,7 +17,7 @@ function replaceWellFormedWikiLinksWithDisplayPlain(markdown: string): string {
     WELL_FORMED_WIKI_SEGMENT,
     (fullMatch: string, inner: string | undefined) => {
       const raw = inner ?? ""
-      if (!isValidPropertyWikiInner(raw)) {
+      if (!isValidWikiLinkInner(raw)) {
         return fullMatch
       }
       return splitWikiLinkInner(raw).display

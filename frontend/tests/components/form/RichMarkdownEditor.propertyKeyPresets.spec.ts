@@ -24,7 +24,7 @@ describe("RichMarkdownEditor property key presets", () => {
       .getWrapper()
       .find('[data-testid="rich-note-property-value"]')
     await keyInput.setValue("status")
-    await h.setWikiPropertyValueField(valInput, "draft")
+    await h.setPropertyValueField(valInput, "draft")
     await valInput.trigger("blur")
 
     const last = h.lastEmittedMarkdown()

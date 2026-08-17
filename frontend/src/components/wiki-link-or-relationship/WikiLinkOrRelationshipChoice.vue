@@ -15,7 +15,7 @@
         {{ primaryLabel }}
       </button>
       <button
-        v-if="wikiPropertyOptionAvailable && !deadWikiLinkDisplayText"
+        v-if="insertWikiLinkAsPropertyAvailable && !deadWikiLinkDisplayText"
         class="daisy-btn daisy-btn-accent"
         @click="$emit('chooseInsertWikiLinkAsProperty')"
       >
@@ -44,7 +44,7 @@ import { Reply } from "@lucide/vue"
 const props = withDefaults(
   defineProps<{
     targetNoteTopology: NoteTopology
-    wikiPropertyOptionAvailable?: boolean
+    insertWikiLinkAsPropertyAvailable?: boolean
     deadWikiLinkDisplayText?: string
     bareWikiLinkAvailable?: boolean
     relationshipOptionAvailable?: boolean

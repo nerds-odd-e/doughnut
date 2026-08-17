@@ -1,5 +1,5 @@
 import makeMe from "doughnut-test-fixtures/makeMe"
-import { wikiTitleFromInnerAndNoteId } from "@/utils/wikiPropertyValueField"
+import { wikiTitleFromInnerAndNoteId } from "@/utils/wikiLinkMarkup"
 import { type VueWrapper, flushPromises } from "@vue/test-utils"
 import { afterEach, describe, expect, it, vi } from "vitest"
 import type { ComponentPublicInstance } from "vue"

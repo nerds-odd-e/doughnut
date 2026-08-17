@@ -15,7 +15,7 @@ import {
 import {
   handleRichContentAnchorClick,
   type DeadWikiLinkPayload,
-} from "@/utils/wikiPropertyValueField"
+} from "@/utils/wikiLinkMarkup"
 import { DEAD_WIKI_LINK_CLASS } from "@/utils/wikiLinkDomMarkers"
 
 registerDoughnutQuillBlots()

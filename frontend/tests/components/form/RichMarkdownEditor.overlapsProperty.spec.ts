@@ -5,7 +5,7 @@ import {
   parseNoteContentMarkdown,
 } from "@/utils/noteContentFrontmatter"
 import { noteShowLocation } from "@/routes/noteShowLocation"
-import { wikiTitleFromInnerAndNoteId } from "@/utils/wikiPropertyValueField"
+import { wikiTitleFromInnerAndNoteId } from "@/utils/wikiLinkMarkup"
 import {
   addNewOverlapsProperty,
   mountOverlapsValuePopup,

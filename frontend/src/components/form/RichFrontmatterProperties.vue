@@ -118,7 +118,7 @@ import {
   type PropertyRow,
 } from "@/utils/noteContentFrontmatter"
 import { richFrontmatterPropertyRowsFromMarkdown } from "@/utils/richFrontmatterPropertyRowsFromMarkdown"
-import type { DeadWikiLinkPayload } from "@/utils/wikiPropertyValueField"
+import type { DeadWikiLinkPayload } from "@/utils/wikiLinkMarkup"
 
 const props = defineProps<{
   contentMarkdown: string
@@ -177,7 +177,7 @@ const {
   removeRow,
   commitRow,
   onRelationTypeSelected,
-  addWikiLinkProperty,
+  addWikiLinkAsProperty,
   getPropertyRows,
   headingVisible,
   showSection,
@@ -245,5 +245,5 @@ watch(
   { immediate: true }
 )
 
-defineExpose({ getPropertyRows, addWikiLinkProperty })
+defineExpose({ getPropertyRows, addWikiLinkAsProperty })
 </script>

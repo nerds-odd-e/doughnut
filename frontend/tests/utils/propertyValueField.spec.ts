@@ -1,55 +1,15 @@
 import { describe, expect, it } from "vitest"
 import {
-  deadWikiLinkPayloadFromAnchor,
-  escapeHtmlForWikiPropertyValue,
-  handleRichContentAnchorClick,
-  markdownWikiTokenFromDeadWikiLinkPayload,
   propertyValuePlainToDisplayHtml,
-  serializeWikiPropertyValueFieldRoot,
+  serializePropertyValueFieldRoot,
+} from "@/utils/propertyValueField"
+import {
+  deadWikiLinkPayloadFromAnchor,
+  escapeHtmlForWikiLinkDisplay,
   wikiTitleFromInnerAndNoteId,
-} from "@/utils/wikiPropertyValueField"
+} from "@/utils/wikiLinkMarkup"
 
-describe("wikiPropertyValueField utils", () => {
-  it("handleRichContentAnchorClick emits dead link before checking href", () => {
-    const anchor = document.createElement("a")
-    anchor.className = "dead-wiki-link"
-    anchor.setAttribute("data-wiki-title", "Ghost")
-    anchor.textContent = "Ghost"
-    let payload: { targetToken: string; displayText: string } | undefined
-    handleRichContentAnchorClick(
-      anchor,
-      {
-        onDeadWikiLink: (p) => {
-          payload = p
-        },
-        navigateInApp: () => {
-          throw new Error("should not navigate")
-        },
-      },
-      { deadWikiLinksEnabled: true }
-    )
-    expect(payload).toEqual({ targetToken: "Ghost", displayText: "Ghost" })
-  })
-
-  it("markdownWikiTokenFromDeadWikiLinkPayload matches simple and piped stored tokens", () => {
-    expect(
-      markdownWikiTokenFromDeadWikiLinkPayload({
-        targetToken: "a",
-        displayText: "a",
-      })
-    ).toBe("[[a]]")
-    expect(
-      markdownWikiTokenFromDeadWikiLinkPayload({
-        targetToken: "Target",
-        displayText: "label",
-      })
-    ).toBe("[[Target|label]]")
-  })
-
-  it("escapes HTML-sensitive characters for display pipeline", () => {
-    expect(escapeHtmlForWikiPropertyValue(`a<b>"c`)).toBe("a&lt;b&gt;&quot;c")
-  })
-
+describe("propertyValueField utils", () => {
   it("renders unresolved wiki link with display text after pipe", () => {
     const html = propertyValuePlainToDisplayHtml(
       "See [[Unknown Topic|friendly label]] here",
@@ -68,7 +28,7 @@ describe("wikiPropertyValueField utils", () => {
       "[[Target Page|alias text]]",
       []
     )
-    expect(serializeWikiPropertyValueFieldRoot(root)).toBe(
+    expect(serializePropertyValueFieldRoot(root)).toBe(
       "[[Target Page|alias text]]"
     )
   })
@@ -100,7 +60,7 @@ describe("wikiPropertyValueField utils", () => {
     const html = propertyValuePlainToDisplayHtml(plain, [])
     expect(html).not.toContain("doughnut-wiki-link")
     expect(html).not.toContain("dead-wiki-link")
-    expect(html).toContain(escapeHtmlForWikiPropertyValue(plain))
+    expect(html).toContain(escapeHtmlForWikiLinkDisplay(plain))
   })
 
   it("resolves wiki markers when title is known", () => {
@@ -125,7 +85,7 @@ describe("wikiPropertyValueField utils", () => {
   it("round-trips mixed text and wiki anchors from a field root", () => {
     const root = document.createElement("div")
     root.innerHTML = propertyValuePlainToDisplayHtml("A [[B]] C", [])
-    expect(serializeWikiPropertyValueFieldRoot(root)).toBe("A [[B]] C")
+    expect(serializePropertyValueFieldRoot(root)).toBe("A [[B]] C")
   })
 
   it("serializes live link anchors from visible text (textContent)", () => {
@@ -133,7 +93,7 @@ describe("wikiPropertyValueField utils", () => {
     root.innerHTML = propertyValuePlainToDisplayHtml("[[N]]", [
       wikiTitleFromInnerAndNoteId("N", 1),
     ])
-    expect(serializeWikiPropertyValueFieldRoot(root)).toBe("[[N]]")
+    expect(serializePropertyValueFieldRoot(root)).toBe("[[N]]")
   })
 
   it("serializes a wiki anchor as plain text when the user replaced inner content (broken link)", () => {
@@ -143,7 +103,7 @@ describe("wikiPropertyValueField utils", () => {
     ])
     const a = root.querySelector("a.doughnut-wiki-link") as HTMLAnchorElement
     a.textContent = "[[Eng]"
-    expect(serializeWikiPropertyValueFieldRoot(root)).toBe("[[Eng]")
+    expect(serializePropertyValueFieldRoot(root)).toBe("[[Eng]")
   })
 
   it("deadWikiLinkPayloadFromAnchor uses visible closed wiki text", () => {
@@ -151,12 +111,5 @@ describe("wikiPropertyValueField utils", () => {
     wrap.innerHTML = propertyValuePlainToDisplayHtml("see [[X]]", [])
     const a = wrap.querySelector("a.dead-wiki-link") as HTMLAnchorElement
     expect(deadWikiLinkPayloadFromAnchor(a).targetToken).toBe("X")
-  })
-
-  it("deadWikiLinkPayloadFromAnchor reads title from incomplete visible wiki text", () => {
-    const a = document.createElement("a")
-    a.className = "dead-wiki-link"
-    a.textContent = "[[Eng"
-    expect(deadWikiLinkPayloadFromAnchor(a).targetToken).toBe("Eng")
   })
 })

@@ -5,7 +5,7 @@ import {
   insertedTexts,
   openWikiLinkOrRelationshipChoice,
   setupInsertWikiLinkTests,
-  wikiPropertyInserted,
+  insertedWikiLinkAsProperty,
 } from "@tests/wiki-link-or-relationship/insertWikiLinkTestSupport"
 import { describe, expect, it } from "vitest"
 
@@ -46,19 +46,19 @@ describe("InsertWikiLink", () => {
     expect(screen.getByText("Complete relationship")).toBeInTheDocument()
   })
 
-  it("calls the wiki-property inserter when Add wiki link as a new property is clicked", async () => {
+  it("calls the insert-wiki-link-as-property inserter when Add wiki link as a new property is clicked", async () => {
     const note = MakeMe.aNote.please()
     const targetResult = MakeMe.aNoteSearchResult.title("PropTarget").please()
     await openWikiLinkOrRelationshipChoice(note, {
       searchKey: "Prop",
       targetResult,
-      wikiPropertyCanInsert: true,
+      canInsertWikiLinkAsProperty: true,
     })
 
     fireEvent.click(screen.getByText("Add wiki link as a new property"))
     await flushPromises()
 
-    expect(wikiPropertyInserted).toContain("[[PropTarget]]")
+    expect(insertedWikiLinkAsProperty).toContain("[[PropTarget]]")
     expect(insertedTexts).toHaveLength(0)
   })
 })

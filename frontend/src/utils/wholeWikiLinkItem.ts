@@ -2,7 +2,7 @@
  * Whole-item wiki-link token — mirrors WikiLinkMarkdown.INNER_LINK_PATTERN.matches()
  * plus non-empty target after optional display pipe.
  */
-import { splitWikiLinkInner } from "@/utils/wikiPropertyValueField"
+import { splitWikiLinkInner } from "@/utils/wikiLinkMarkup"
 
 const WHOLE_WIKI_LINK = /^\[\[([^\]]+)]]$/
 

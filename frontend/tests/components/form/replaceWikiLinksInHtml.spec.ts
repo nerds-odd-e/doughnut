@@ -1,5 +1,5 @@
 import { replaceWikiLinksInHtml } from "@/components/form/replaceWikiLinksInHtml"
-import { wikiTitleFromInnerAndNoteId } from "@/utils/wikiPropertyValueField"
+import { wikiTitleFromInnerAndNoteId } from "@/utils/wikiLinkMarkup"
 import { describe, it, expect } from "vitest"
 
 describe("replaceWikiLinksInHtml", () => {

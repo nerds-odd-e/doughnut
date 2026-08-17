@@ -22,12 +22,12 @@ Feature: Accidental match reveal
     When I type my answer "sedation"
     Then I should see an accidental match reveal for spelling answer "sedation" with reviewed note "sedition" and matched note "sedation"
 
-  Scenario: Offer adds the matched note as a wiki property without leaving the result
+  Scenario: Offer adds the matched note as a wiki link in a new property without leaving the result
     When I visit recall for a due recall prompt on day 2
     Then I should be asked spelling question "means incite violence" from notebook "English practice"
     When I type my answer "sedation"
     Then I should see an accidental match reveal for spelling answer "sedation" with reviewed note "sedition" and matched note "sedation"
-    When I add the matched note "sedation" as a wiki property from the accidental match result
+    When I add the matched note "sedation" as a wiki link in a new property from the accidental match result
     Then I should still be on the accidental match result for spelling answer "sedation" with matched note "sedation"
 
   Scenario: Offer adds the matched note as a relationship without leaving the result

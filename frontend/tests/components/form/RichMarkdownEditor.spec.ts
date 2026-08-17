@@ -1,4 +1,4 @@
-import { wikiTitleFromInnerAndNoteId } from "@/utils/wikiPropertyValueField"
+import { wikiTitleFromInnerAndNoteId } from "@/utils/wikiLinkMarkup"
 import { nextTick } from "vue"
 import { createRichMarkdownEditorTestHarness } from "./richMarkdownEditorTestHarness"
 

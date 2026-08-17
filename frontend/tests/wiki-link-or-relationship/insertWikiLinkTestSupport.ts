@@ -12,16 +12,19 @@ import {
 import { afterEach, beforeEach, vi } from "vitest"
 
 export const insertedTexts: string[] = []
-export const wikiPropertyInserted: string[] = []
+export const insertedWikiLinkAsProperty: string[] = []
 
-export function setupInserters(wikiPropertyCanInsert = false) {
-  const { registerInserter, registerWikiPropertyInserter, unregisterInserter } =
-    useContentCursorInserter()
+export function setupInserters(canInsertWikiLinkAsProperty = false) {
+  const {
+    registerInserter,
+    registerInsertWikiLinkAsPropertyInserter,
+    unregisterInserter,
+  } = useContentCursorInserter()
   unregisterInserter()
   registerInserter((text) => insertedTexts.push(text))
-  registerWikiPropertyInserter({
-    canInsert: () => wikiPropertyCanInsert,
-    insert: (text) => wikiPropertyInserted.push(text),
+  registerInsertWikiLinkAsPropertyInserter({
+    canInsert: () => canInsertWikiLinkAsProperty,
+    insert: (text) => insertedWikiLinkAsProperty.push(text),
   })
 }
 
@@ -37,10 +40,10 @@ export async function openWikiLinkOrRelationshipChoice(
     searchKey: string
     targetResult: NoteSearchResult
     withRouter?: boolean
-    wikiPropertyCanInsert?: boolean
+    canInsertWikiLinkAsProperty?: boolean
   }
 ) {
-  if (options.wikiPropertyCanInsert) {
+  if (options.canInsertWikiLinkAsProperty) {
     setupInserters(true)
   }
   mockRelationshipSearch(options.targetResult)
@@ -58,7 +61,7 @@ export function setupInsertWikiLinkTests() {
     vi.useFakeTimers()
     vi.clearAllMocks()
     insertedTexts.length = 0
-    wikiPropertyInserted.length = 0
+    insertedWikiLinkAsProperty.length = 0
     setupSearchFormSdkMocks()
     setupInserters()
   })

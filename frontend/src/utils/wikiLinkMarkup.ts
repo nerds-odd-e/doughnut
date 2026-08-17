@@ -1,9 +1,5 @@
 import type { WikiTitle } from "@generated/doughnut-backend-api"
-import { noteShowHref } from "@/routes/noteShowLocation"
-import {
-  DEAD_WIKI_LINK_CLASS,
-  DOUGHNUT_WIKI_LINK_CLASS,
-} from "@/utils/wikiLinkDomMarkers"
+import { DEAD_WIKI_LINK_CLASS } from "@/utils/wikiLinkDomMarkers"
 
 /** Builds API-shaped {@link WikiTitle} for tests and local fixtures from markdown inner + note id. */
 export function wikiTitleFromInnerAndNoteId(
@@ -23,7 +19,7 @@ export function wikiTitleParts(w: WikiTitle): {
   return { target: w.targetToken, display: w.displayText, inner: w.linkText }
 }
 
-export function escapeHtmlForWikiPropertyValue(s: string): string {
+export function escapeHtmlForWikiLinkDisplay(s: string): string {
   return s
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
@@ -37,11 +33,11 @@ export function escapeHtmlAttributeValue(s: string): string {
 
 /** `[[` / `]]` shown literally; title text escaped (same visible shape as plain wiki syntax). */
 export function wikiLinkBracketedInnerHtml(plainTitleInner: string): string {
-  return `<span class="wiki-bracket">[[</span>${escapeHtmlForWikiPropertyValue(plainTitleInner)}<span class="wiki-bracket">]]</span>`
+  return `<span class="wiki-bracket">[[</span>${escapeHtmlForWikiLinkDisplay(plainTitleInner)}<span class="wiki-bracket">]]</span>`
 }
 
 /** Valid wiki segment: non-empty after trim, no brackets or newlines inside (regex already constrains). */
-export function isValidPropertyWikiInner(rawBetweenBrackets: string): boolean {
+export function isValidWikiLinkInner(rawBetweenBrackets: string): boolean {
   return rawBetweenBrackets.trim().length > 0
 }
 
@@ -73,51 +69,6 @@ export function wikiTitleNoteIdLookup(
     map.set(w.linkText.trim(), w.noteId)
   }
   return map
-}
-
-/**
- * Renders a YAML property scalar with clickable wiki links. Only well-formed `[[title]]` segments
- * (non-empty title, no `[`/`]`/newlines inside) become links; everything else stays plain text.
- */
-export function propertyValuePlainToDisplayHtml(
-  plain: string,
-  wikiTitles: WikiTitle[]
-): string {
-  const map = wikiTitleNoteIdLookup(wikiTitles)
-
-  const re = /\[\[([^\[\]\r\n]*)\]\]/g
-  let out = ""
-  let lastIndex = 0
-  let m: RegExpExecArray | null
-  while ((m = re.exec(plain)) !== null) {
-    const fullMatch = m[0]
-    const titleRaw = m[1] ?? ""
-    const start = m.index
-
-    out += escapeHtmlForWikiPropertyValue(plain.slice(lastIndex, start))
-    lastIndex = start + fullMatch.length
-
-    if (!isValidPropertyWikiInner(titleRaw)) {
-      out += escapeHtmlForWikiPropertyValue(fullMatch)
-      continue
-    }
-
-    const { target, display } = splitWikiLinkInner(titleRaw)
-    const noteId = map.get(titleRaw.trim()) ?? map.get(target.trim())
-    const innerHtml = wikiLinkBracketedInnerHtml(display)
-    const attrTarget = escapeHtmlAttributeValue(target)
-    const displayAttr =
-      display !== target
-        ? ` data-wiki-display="${escapeHtmlAttributeValue(display)}"`
-        : ""
-    if (noteId !== undefined) {
-      out += `<a href="${noteShowHref(noteId)}" class="${DOUGHNUT_WIKI_LINK_CLASS}" data-wiki-title="${attrTarget}"${displayAttr}>${innerHtml}</a>`
-    } else {
-      out += `<a href="#" class="${DEAD_WIKI_LINK_CLASS}" data-wiki-title="${attrTarget}"${displayAttr}>${innerHtml}</a>`
-    }
-  }
-  out += escapeHtmlForWikiPropertyValue(plain.slice(lastIndex))
-  return out
 }
 
 /** Dead wiki link click payload containing the target token and visible display text. */
@@ -222,28 +173,4 @@ export function wikiAnchorToMarkdownToken(anchor: HTMLAnchorElement): string {
     return `[[${target}]]`
   }
   return `[[${target}|${raw}]]`
-}
-
-/** Serializes the editor root (top-level nodes) back to a plain scalar. Wiki anchors use visible text only (so in-place edits are saved). */
-export function serializeWikiPropertyValueFieldRoot(el: HTMLElement): string {
-  let out = ""
-  for (const node of el.childNodes) {
-    if (node.nodeType === Node.TEXT_NODE) {
-      out += node.textContent ?? ""
-    } else if (node instanceof HTMLBRElement) {
-      continue
-    } else if (node instanceof HTMLAnchorElement) {
-      if (
-        node.classList.contains(DOUGHNUT_WIKI_LINK_CLASS) ||
-        node.classList.contains(DEAD_WIKI_LINK_CLASS)
-      ) {
-        out += wikiAnchorToMarkdownToken(node)
-        continue
-      }
-      out += node.textContent ?? ""
-    } else if (node instanceof HTMLElement) {
-      out += node.textContent ?? ""
-    }
-  }
-  return out.replace(/\r?\n/g, "")
 }
