@@ -1,6 +1,6 @@
 # Plan: Note concept type
 
-**Status:** in progress (slice 9 next)
+**Status:** in progress (slice 10 next — waiting on production backfill)
 
 **Goal:** Ordinary notes persist `type: Note`. Relationship notes persist `type: Relationship`. Existing `note.content` is backfilled. ADRs describe that stored shape.
 
@@ -11,7 +11,7 @@
 - Title-only create initializes `content` via `NoteConceptType.ensureStoredType` in `NoteConstructionService.createNote` (null → leading `type: Note` fence).
 - Leave `makeMe` content defaults alone. Typeless fixtures stay valid for later save/backfill tests.
 - Structure slices sit immediately before the behavior they unlock (ADR 0004 before `type: Note`; ADR 0001 / Relationship spelling before compose).
-- Next Flyway: **next unused** `V300000xxx` at execute time. `V300000267`–`V300000268` are taken (004-recall-log).
+- Next Flyway: **V300000269** (`note_concept_type_backfill`). `V300000267`–`V300000268` are taken (004-recall-log).
 - Backfill is **gated** (`1=0` default; `1=1` only on the production deploy). Helper tests are permanent. Gate tests are temporary (slice 10).
 
 ## Slices
@@ -70,13 +70,13 @@ Glossary **Relationship note** is `type: Relationship`. ADR 0004 Decision uses t
 
 **Learnings:** Renamed from `ensureOrdinaryNoteType` because it also canonicalizes Relationship. Fence rebuild is `VerbatimSplit.rebuild`. Slice 9 should call `ensureStoredType`.
 
-### 9. Existing notes are backfilled — Behavior — planned
+### 9. Existing notes are backfilled — Behavior — done
 
-**Pre:** `note.content` rows from before slices 2–8 (empty, body-only, fence without type, `type: relationship`, unknown type).  
-**Trigger:** Flyway Java migration with gate enabled.  
-**Post:** Same rules as the helper. Default gate `1=0` changes nothing. Readme columns untouched.
+Gated Java Flyway `V300000269__backfill_note_concept_type` calls `NoteConceptTypeBackfill` → `ensureStoredType` on `note.content` only. Placeholder `note_concept_type_backfill` is `1=0` in all profiles (no-op). Enable `1=1` only on the production deploy that first applies it, then revert to `1=0`. Readme columns never selected.
 
-Temporary tests: default no-op; enabled selects `note.content` only. Do not duplicate the YAML matrix. **Jidoka:** Flyway version vs 004-recall-log; record enable/revert in STATE.
+Temporary tests: `NoteConceptTypeBackfillTest` (default no-op; enabled updates note, leaves readmes). YAML matrix stays on the helper. STATE records the leftover.
+
+**Learnings:** Gate is a `1=0`/`1=1` flag, not concatenated SQL. Slice 10 waits on human confirmation of production apply + override back to `1=0`.
 
 ### 10. Close C1/D2 on the tracker; drop the migration harness after production — Structure — planned
 
