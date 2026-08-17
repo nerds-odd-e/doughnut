@@ -166,7 +166,9 @@ CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/note_to
 
 ### 5. Same-hour Good Stability
 Type: Structure
-Status: planned
+Status: done
+
+**Learnings:** Injects assimilate + first success; UI only for the extra same-hour Good → Stability 25 (~3.9s → ~2.2s).
 
 **Tests:**
 - `e2e_test/features/recall/spaced_repetition.feature` — "Same-hour Good after first success grows Stability to 25" (~3946ms)
