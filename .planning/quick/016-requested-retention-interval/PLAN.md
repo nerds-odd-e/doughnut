@@ -37,16 +37,13 @@ Learning: New-tracker check for the +12h override shares `ForgettingCurve.isNewl
 
 ### 3. New incorrect recall uses the 24-hour fallback
 Type: Behavior  
-Status: planned
+Status: done
 
 **Pre:** New tracker (Stability 0, Difficulty unset).  
 **Trigger:** Ordinary incorrect.  
-**Post:** Stability 0, Difficulty unset, due **24 hours** after the grade (`I` non-positive → existing strictly-future fallback). Not +12h.
+**Post:** Stability 0, Difficulty unset, due **24 hours** after the grade. Not +12h.
 
-- Change `newTrackerIncorrectRecallKeepsZeroStabilityAndTwelveHourDue` to 24h; keep D unset / S=0 as the canonical New-fail shape (due is the unique delta).
-- Remove the S=0 +12h branch. Put strictly-future **24h** on `scheduleNextRecallFromStability` so ordinary fail and commissioned scores share it. `CommissionedLearningSessionFeedbackScheduling.ensureNextRecallStrictlyAfterNow` should not stay a second copy.
-- ADR 0003: delete every ordinary-incorrect **+12h** / “schedule metadata” sentence. After **any** grade, due is `last + I(0.9, S)`; non-positive `I` → 24h. New fail matches commissioned New 0/1/2 fallback. Confusion projection `last + I`, never later.
-- No new E2E (New fail 24h vs 12h is the unit-test edge of the same rule slice 2 already showed on the Memory Tracker).
+Canonical New-fail test pins 24h. S=0 +12h branch gone. Strictly-future 24h lives on `scheduleNextRecallFromStability` (extracted to `MemoryTrackerNextRecallScheduling` after MemoryTracker exceeded 250 lines). Commissioned `ensureNextRecallStrictlyAfterNow` deleted. Thin `recallFailed` only calls Again. ADR 0003 still Proposed; ordinary-incorrect +12h sentences removed. Existing E2E due pin 12→24 (no new scenario).
 
 ---
 

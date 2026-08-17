@@ -181,15 +181,11 @@ public class MemoryTracker extends EntityIdentifiedByIdOnly {
   }
 
   void scheduleNextRecallFromStability(Timestamp currentUTCTimestamp) {
-    setLastRecalledAt(currentUTCTimestamp);
-    setNextRecallAt(calculateNextRecallAt());
+    MemoryTrackerNextRecallScheduling.apply(this, currentUTCTimestamp);
   }
 
   public void recallFailed(Timestamp currentUTCTimestamp) {
     recalledAgain(currentUTCTimestamp);
-    if (forgettingCurve().isNewlyAssimilated()) {
-      setNextRecallAt(TimestampOperations.addHoursToTimestamp(currentUTCTimestamp, 12));
-    }
   }
 
   public void recalledSuccessfully(Timestamp now, Integer thinkingTimeMs) {

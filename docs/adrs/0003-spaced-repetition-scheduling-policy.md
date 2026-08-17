@@ -40,13 +40,14 @@ any other FSRS library. Compatibility is with the open FSRS model (inputs,
 state, qualitative update rules), not with a particular crate or version.
 
 - **Stability** is persisted memory state: the current interval in **whole
-  hours**. After a grade, `nextRecallAt = lastRecalledAt + I(r, S)` with
-  requested retention `r` locked at **0.9** (`I(0.9, S) = S` in whole hours),
-  including **ordinary incorrect** when Stability is greater than 0. A newly
-  assimilated tracker may have Stability 0 (due now). After any graded answer,
-  persisted Stability 0 is not allowed, except New fail (S=0 + 12h interim,
-  already in Again Decision). Spacing is Stability, not a Settings day list.
-  Live scheduling must not walk a spacing-index ladder.
+  hours**. After any grade, `nextRecallAt = lastRecalledAt + I(r, S)` with
+  requested retention `r` locked at **0.9** (`I(0.9, S) = S` in whole hours).
+  When `I` is non-positive, due is 24 hours after the grade (strictly-future
+  fallback). A newly assimilated tracker may have Stability 0 (due now).
+  After a grade, persisted Stability 0 is only New fail (Difficulty unset;
+  due from that 24-hour fallback, matching commissioned New 0/1/2). Spacing
+  is Stability, not a Settings day list. Live scheduling must not walk a
+  spacing-index ladder.
 - **Retrievability** is computed from elapsed whole hours and Stability, not stored.
 - A recall transition consumes the graded outcome, elapsed time, and that state — never queue lateness.
 - **Requested retention** `r` is a **global constant 0.9** — not a Settings
@@ -71,7 +72,7 @@ Keep Doughnut product outcomes first-class. Do not replace the Tutor 0–5 rubri
 | Tutor **5** | FSRS-6 Easy |
 | Tutor **3** | FSRS-6 Hard |
 | Tutor **2** | Doughnut exception (80% accumulated S, D unchanged) |
-| Ordinary incorrect | FSRS-6 Again memory; due from `I` when S > 0 (New fail +12h interim) |
+| Ordinary incorrect | FSRS-6 Again memory; due from `I` (non-positive `I` → 24h) |
 | Tutor **1** and **0** | Again memory; due from S (0 same as 1; rubric still differs) |
 | Confusion | Not a grade; Again-midpoint S; due not later |
 | Overlap | No memory change |
@@ -86,7 +87,7 @@ A commissioned memory tracker is graded from Tutor Feedback (score 0–5), not f
 - A Session Item that never receives Feedback supplies no graded recall result: its tracker stays unchanged and the item is abandoned with its session.
 - Effort is neutral. A Tutor session carries no trustworthy effort measurement.
 - A late session does not weaken the result. The score determines the memory-state adjustment; the recorded time advances `lastRecalledAt`.
-- Never apply the ordinary incorrect-recall 12-hour retry. After a score, due is from the updated Stability. A commissioned tracker is due only when the learner commissions another Learning Session.
+- After a score, due is `lastRecalledAt + I(0.9, S)`; non-positive `I` → 24h. A commissioned tracker is due only when the learner commissions another Learning Session.
 - **New** (Stability 0, Difficulty unset): scores **3**, **4**, and **5** initialize Difficulty to **5** and Stability to **24** hours, matching the first real correct recall — not FSRS first-rating initials. Scores **0**, **1**, and **2** stay Stability 0 and Difficulty unset; due is strictly after the recorded time (24-hour fallback).
 
 Memory updates with Stability > 0:
@@ -95,16 +96,16 @@ Memory updates with Stability > 0:
 - **5:** open-FSRS-6 **Easy**-equivalent, not a percentage above Good. Easy increment at least as large as Good's plus an extra Easy factor, plus Easy next-D. Next Stability is strictly longer than the same state under score 4. Overdue extra applies.
 - **3:** open-FSRS-6 **Hard**-equivalent, not a percentage below Good. Hard increment is the Good increment times an extra Hard factor, plus Hard next-D. Next Stability is at least the current Stability and strictly shorter than the same state under score 4. Overdue extra applies.
 - **2:** Doughnut exception, not Hard. Next Stability is the rounded 80% of current Stability (accumulated hours above assimilate 0); Difficulty unchanged. Ignore elapsed time and Retrievability. No overdue extra.
-- **1:** open-FSRS-6 **Again** memory (same as ordinary incorrect: post-lapse Stability and Again next-D). Due from Stability, not the 12-hour retry.
+- **1:** open-FSRS-6 **Again** memory (same as ordinary incorrect: post-lapse Stability and Again next-D). Due from `I`.
 - **0:** same schedule as score **1**. Rubric still differs ([ADR 0005](./0005-commissioned-learning-session-protocol.md)). Does not reset Stability to the assimilate initial level.
 
 ### Incorrect recall (Again)
 
 Ordinary incorrect recall (MCQ, just review, spelling fail) is FSRS **Again**. Doughnut does not offer Hard or Easy buttons; product outcomes stay.
 
-When Stability is greater than 0, the memory update for Stability is the open-FSRS-6 post-lapse formula from Difficulty, Stability, and Retrievability (elapsed whole hours vs Stability). Ordinary incorrect also updates Difficulty with the open-FSRS-6 Again next-D (harder; clamped to `[1, 10]`). Unset Difficulty on Stability > 0 is treated as **5**. Queue lateness vs `nextRecallAt` is not an input. After ordinary incorrect with Stability greater than 0, due is `lastRecalledAt + I(0.9, S)` of the post-lapse Stability. There is **no relearning step list**.
+When Stability is greater than 0, the memory update for Stability is the open-FSRS-6 post-lapse formula from Difficulty, Stability, and Retrievability (elapsed whole hours vs Stability). Ordinary incorrect also updates Difficulty with the open-FSRS-6 Again next-D (harder; clamped to `[1, 10]`). Unset Difficulty on Stability > 0 is treated as **5**. Queue lateness vs `nextRecallAt` is not an input. After ordinary incorrect, due is `lastRecalledAt + I(0.9, S)` of the post-lapse Stability; non-positive `I` → 24h. There is **no relearning step list**.
 
-A **New** tracker (Stability 0) that fails stays Stability 0, Difficulty unset, and due in 12 hours (interim until the strictly-future fallback owns this path). Confusion adjustment is not a grade and is not FSRS Again (see **Accidental-match and overlap transitions**). Failure must not permanently trap the tracker; later correct recalls must be able to restore expanding intervals.
+A **New** tracker (Stability 0) that fails stays Stability 0, Difficulty unset; due is the 24-hour strictly-future fallback, matching commissioned New 0/1/2. Confusion adjustment is not a grade and is not FSRS Again (see **Accidental-match and overlap transitions**). Failure must not permanently trap the tracker; later correct recalls must be able to restore expanding intervals.
 
 ### Overdue correct recall: bounded extra growth
 
@@ -159,7 +160,7 @@ a declared overlap, the answer has the following consequences:
    Floor 1 hour. Next Stability must be less than current Stability and
    greater than Again Stability when rounding still distinguishes them.
    Difficulty, `lastRecalledAt`, and `recallCount` are unchanged. Due never
-   later (`min(existing due, lastRecalledAt + new Stability)`). Stability 0
+   later (`min(existing due, lastRecalledAt + I(0.9, S))`). Stability 0
    stays 0. It must not count as a failed recall.
 4. The primary incorrect transition and any secondary confusion adjustment are
    one atomic grading operation. The secondary adjustment must remain durably

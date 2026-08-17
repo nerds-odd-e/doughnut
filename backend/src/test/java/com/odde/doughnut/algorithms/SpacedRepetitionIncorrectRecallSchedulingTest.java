@@ -62,7 +62,7 @@ class SpacedRepetitionIncorrectRecallSchedulingTest
   }
 
   @Test
-  void newTrackerIncorrectRecallKeepsZeroStabilityAndTwelveHourDue() {
+  void newTrackerIncorrectRecallKeepsZeroStabilityAndTwentyFourHourDue() {
     MemoryTracker memoryTracker = makeMe.aMemoryTrackerFor(note).by(user).inMemoryPlease();
     Timestamp gradeTime = memoryTracker.getNextRecallAt();
 
@@ -71,7 +71,7 @@ class SpacedRepetitionIncorrectRecallSchedulingTest
     assertThat(memoryTracker.getStability(), equalTo(ASSIMILATE_STABILITY_HOURS));
     assertThat(
         memoryTracker.getNextRecallAt(),
-        equalTo(TimestampOperations.addHoursToTimestamp(gradeTime, 12)));
+        equalTo(TimestampOperations.addHoursToTimestamp(gradeTime, 24)));
     assertThat(memoryTracker.getDifficulty(), nullValue());
   }
 

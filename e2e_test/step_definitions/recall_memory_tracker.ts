@@ -20,7 +20,7 @@ Then(
     start
       .assumeAnsweredQuestionPage()
       .viewMemoryTracker()
-      .expectHoursBetweenLastAndNextRecall(12)
+      .expectHoursBetweenLastAndNextRecall(24)
   }
 )
 

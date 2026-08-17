@@ -1,8 +1,6 @@
 package com.odde.doughnut.algorithms;
 
-import com.odde.doughnut.entities.ForgettingCurve;
 import com.odde.doughnut.entities.MemoryTracker;
-import com.odde.doughnut.utils.TimestampOperations;
 import java.sql.Timestamp;
 
 public final class CommissionedLearningSessionFeedbackScheduling {
@@ -18,15 +16,5 @@ public final class CommissionedLearningSessionFeedbackScheduling {
       case 2 -> tracker.shrinkStability(now);
       case 1, 0 -> tracker.recalledAgain(now);
     }
-    tracker.setNextRecallAt(ensureNextRecallStrictlyAfterNow(tracker, now));
-  }
-
-  private static Timestamp ensureNextRecallStrictlyAfterNow(MemoryTracker tracker, Timestamp now) {
-    Timestamp scheduled = tracker.calculateNextRecallAt();
-    if (scheduled.after(now)) {
-      return scheduled;
-    }
-    return TimestampOperations.addHoursToTimestamp(
-        now, Math.round(ForgettingCurve.FIRST_SUCCESS_STABILITY_HOURS));
   }
 }
