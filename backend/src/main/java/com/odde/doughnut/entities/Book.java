@@ -17,6 +17,10 @@ import lombok.Setter;
 @JsonPropertyOrder({"id", "bookName", "format", "createdAt", "updatedAt", "blocks", "notebookId"})
 public class Book extends EntityIdentifiedByIdOnly {
 
+  public static final String BLOCKS_PREORDER_DESCRIPTION =
+      "Book blocks in depth-first preorder (parent before descendants, then siblings). "
+          + "Order matches ascending book layout sequence in persistence.";
+
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "notebook_id", nullable = false)
   @JsonIgnore
@@ -67,11 +71,7 @@ public class Book extends EntityIdentifiedByIdOnly {
 
   @JsonProperty("blocks")
   @JsonView(BookViews.Full.class)
-  @Schema(
-      requiredMode = Schema.RequiredMode.REQUIRED,
-      description =
-          "Book blocks in depth-first preorder (parent before descendants, then siblings). "
-              + "Order matches ascending layout_sequence in persistence.")
+  @Schema(requiredMode = Schema.RequiredMode.REQUIRED, description = BLOCKS_PREORDER_DESCRIPTION)
   public List<BookBlock> getBlocks() {
     return blocks;
   }

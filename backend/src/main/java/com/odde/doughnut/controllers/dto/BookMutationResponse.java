@@ -1,6 +1,7 @@
 package com.odde.doughnut.controllers.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.odde.doughnut.entities.Book;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.sql.Timestamp;
 import java.util.List;
@@ -24,9 +25,7 @@ public class BookMutationResponse {
 
   @Schema(
       requiredMode = Schema.RequiredMode.REQUIRED,
-      description =
-          "Book blocks in depth-first preorder (parent before descendants, then siblings). "
-              + "Order matches ascending layout_sequence in persistence.")
+      description = Book.BLOCKS_PREORDER_DESCRIPTION)
   private final List<BookBlockMutationResponse> blocks;
 
   @Schema(requiredMode = Schema.RequiredMode.REQUIRED, type = "string")

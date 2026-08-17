@@ -41,7 +41,7 @@ export type BookMutationResponseFull = {
     createdAt?: string;
     updatedAt?: string;
     /**
-     * Book blocks in depth-first preorder (parent before descendants, then siblings). Order matches ascending layout_sequence in persistence.
+     * Book blocks in depth-first preorder (parent before descendants, then siblings). Order matches ascending book layout sequence in persistence.
      */
     blocks: Array<BookBlockMutationResponseFull>;
     notebookId: string;
@@ -545,7 +545,7 @@ export type BookFull = {
     createdAt?: string;
     updatedAt?: string;
     /**
-     * Book blocks in depth-first preorder (parent before descendants, then siblings). Order matches ascending layout_sequence in persistence.
+     * Book blocks in depth-first preorder (parent before descendants, then siblings). Order matches ascending book layout sequence in persistence.
      */
     blocks: Array<BookBlockFull>;
     notebookId: string;
@@ -560,6 +560,9 @@ export type AttachBookLayoutNodeRequestFull = {
 };
 
 export type AttachBookLayoutRequestFull = {
+    /**
+     * Root nodes of the nested book layout.
+     */
     roots: Array<AttachBookLayoutNodeRequestFull>;
 };
 
@@ -572,7 +575,13 @@ export type AttachBookRequestFull = {
      * Book file format
      */
     format: 'pdf' | 'epub';
+    /**
+     * Nested book layout. Omit when sending contentList instead. Exactly one of this (non-empty roots) or contentList is required for PDF.
+     */
     layout?: AttachBookLayoutRequestFull;
+    /**
+     * MinerU content_list array; server builds the book layout. Mutually exclusive with non-empty book layout roots.
+     */
     contentList?: Array<unknown>;
 };
 

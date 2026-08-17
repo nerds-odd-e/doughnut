@@ -13,6 +13,8 @@ public class AttachBookLayoutRequest {
 
   @NotEmpty
   @Valid
-  @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
+  @Schema(
+      requiredMode = Schema.RequiredMode.REQUIRED,
+      description = "Root nodes of the nested book layout.")
   private List<AttachBookLayoutNodeRequest> roots;
 }

@@ -149,7 +149,8 @@ class NotebookBooksAttachControllerTest extends NotebookBooksControllerTestBase 
       ApiException ex =
           assertThrows(
               ApiException.class, () -> controller.attachBook(nb, req, epubFile(STUB_PDF_BYTES)));
-      assertThat(ex.getMessage(), equalTo("EPUB attach must not include layout or contentList"));
+      assertThat(
+          ex.getMessage(), equalTo("EPUB attach must not include book layout or contentList"));
     }
 
     @Test

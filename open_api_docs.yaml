@@ -3256,7 +3256,7 @@ components:
         blocks:
           type: array
           description: "Book blocks in depth-first preorder (parent before descendants,\
-            \ then siblings). Order matches ascending layout_sequence in persistence."
+            \ then siblings). Order matches ascending book layout sequence in persistence."
           items:
             $ref: "#/components/schemas/BookBlockMutationResponse_Full"
         notebookId:
@@ -4186,7 +4186,7 @@ components:
         blocks:
           type: array
           description: "Book blocks in depth-first preorder (parent before descendants,\
-            \ then siblings). Order matches ascending layout_sequence in persistence."
+            \ then siblings). Order matches ascending book layout sequence in persistence."
           items:
             $ref: "#/components/schemas/BookBlock_Full"
         notebookId:
@@ -4220,6 +4220,7 @@ components:
       properties:
         roots:
           type: array
+          description: Root nodes of the nested book layout.
           items:
             $ref: "#/components/schemas/AttachBookLayoutNodeRequest_Full"
           minItems: 1
@@ -4242,8 +4243,12 @@ components:
           minLength: 1
         layout:
           $ref: "#/components/schemas/AttachBookLayoutRequest_Full"
+          description: Nested book layout. Omit when sending contentList instead.
+            Exactly one of this (non-empty roots) or contentList is required for PDF.
         contentList:
           type: array
+          description: MinerU content_list array; server builds the book layout. Mutually
+            exclusive with non-empty book layout roots.
           items: {}
       required:
       - bookName

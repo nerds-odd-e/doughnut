@@ -24,19 +24,18 @@ public class AttachBookRequest {
       description = "Book file format")
   private String format;
 
-  /**
-   * Nested book layout. Omit when sending {@link #contentList} instead. Exactly one of this
-   * (non-empty roots) or {@code contentList} (non-empty) is required; enforced in {@link
-   * com.odde.doughnut.services.book.BookService}.
-   */
   @Valid
-  @Schema(requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Schema(
+      requiredMode = Schema.RequiredMode.NOT_REQUIRED,
+      description =
+          "Nested book layout. Omit when sending contentList instead. Exactly one of this"
+              + " (non-empty roots) or contentList is required for PDF.")
   private AttachBookLayoutRequest layout;
 
-  /**
-   * MinerU {@code content_list} array; server builds {@link #layout}. Mutually exclusive with
-   * non-empty {@link AttachBookLayoutRequest#getRoots()}.
-   */
-  @Schema(requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Schema(
+      requiredMode = Schema.RequiredMode.NOT_REQUIRED,
+      description =
+          "MinerU content_list array; server builds the book layout. Mutually exclusive with"
+              + " non-empty book layout roots.")
   private List<Object> contentList;
 }
