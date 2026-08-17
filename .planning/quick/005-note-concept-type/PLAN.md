@@ -1,6 +1,6 @@
 # Plan: Note concept type
 
-**Status:** in progress (slice 5 next)
+**Status:** in progress (slice 6 next)
 
 **Goal:** Ordinary notes persist `type: Note`. Relationship notes persist `type: Relationship`. Existing `note.content` is backfilled. ADRs describe that stored shape.
 
@@ -44,13 +44,13 @@ Create-with-content (DTO and extract new-note) goes through `persistCreatedNoteC
 
 **Learnings:** Title-only still uses wrap(null) on first save; create-with-content overwrites via the helper. Slice 5 insert-into-fence should extend `ensureOrdinaryNoteType` so both save and `persistCreatedNoteContent` pick it up.
 
-### 5. Persisting frontmatter without type inserts type: Note first — Behavior — planned
+### 5. Persisting frontmatter without type inserts type: Note first — Behavior — done
 
-**Pre:** Leading fence with other keys (`parent`, `aliases`, …) and no `type` (including “under current” create).  
-**Trigger:** Create or save that content.  
-**Post:** `type: Note` is the first key; the rest of the fence and body are verbatim. A note that already has a non-empty `type` is unchanged (delta test only). Blank `type` counts as missing.
+`ensureOrdinaryNoteType` inserts `type: Note` as the first key when the leading fence is missing or blank `type`; remainder of fence + body stay verbatim. Non-empty `type` is unchanged. Create and save pick this up through the existing helper.
 
-E2E: `note_creation.feature` “under current” — assert `type: Note` without re-checking `parent`. Controller save with aliases is the save delta. Surgical insert only; no Relationship rename.
+E2E: under-current in `note_creation.feature`. Helper: insert/verbatim/blank/unchanged. Controller: aliases save + already-typed delta.
+
+**Learnings:** Read `type` with `Frontmatter.parse`; edit the verbatim block (drop blank `type:` line, prepend). `VerbatimSplit.yamlRaw` is the inner YAML. Do not canonicalize spelling until slice 8.
 
 ### 6. Lock type: Relationship in ADR 0001 and ADR 0004 — Structure — planned
 

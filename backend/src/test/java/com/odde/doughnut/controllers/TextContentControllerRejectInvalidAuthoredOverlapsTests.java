@@ -76,6 +76,7 @@ class TextContentControllerRejectInvalidAuthoredOverlapsTests
     String content =
         """
         ---
+        type: Note
         overlaps:
           - "[[Other Note]]"
           - "[[Shared Notebook:Hue|display]]"

@@ -42,6 +42,7 @@ class TextContentControllerUpdateNoteContentTests extends TextContentControllerT
     String contentWithFrontmatter =
         """
         ---
+        type: Note
         key_one: alpha
         key_two: beta
         ---
@@ -56,6 +57,42 @@ class TextContentControllerUpdateNoteContentTests extends TextContentControllerT
             .getNote()
             .getContent(),
         equalTo(contentWithFrontmatter));
+  }
+
+  @Test
+  void insertsOrdinaryNoteTypeFirstWhenSavingAliasesFenceWithoutType()
+      throws UnexpectedNoAccessRightException {
+    String content =
+        """
+        ---
+        aliases:
+          - color
+          - hue
+        ---
+
+        body
+        """;
+    assertThat(
+        controller.updateNoteContent(note, contentDto(content)).getNote().getContent(),
+        equalTo(
+            """
+            ---
+            type: Note
+            aliases:
+              - color
+              - hue
+            ---
+
+            body
+            """));
+  }
+
+  @Test
+  void leavesExistingNonEmptyTypeUnchangedWhenSaving() throws UnexpectedNoAccessRightException {
+    String content = "---\ntype: relationship\n---\n";
+    assertThat(
+        controller.updateNoteContent(note, contentDto(content)).getNote().getContent(),
+        equalTo(content));
   }
 
   @Test

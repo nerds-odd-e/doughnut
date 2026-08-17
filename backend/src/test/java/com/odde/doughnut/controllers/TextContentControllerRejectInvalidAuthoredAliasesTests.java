@@ -1,6 +1,7 @@
 package com.odde.doughnut.controllers;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -84,7 +85,7 @@ class TextContentControllerRejectInvalidAuthoredAliasesTests extends TextContent
         """;
     assertThat(
         controller.updateNoteContent(note, contentDto(content)).getNote().getContent(),
-        equalTo(content));
+        containsString("aliases:\n  - color\n  - hue"));
   }
 
   @Test
