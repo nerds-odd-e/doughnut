@@ -36,6 +36,8 @@ const expectLabeledValueUnchanged = (
   })
 }
 
+const recallLogs = () => cy.get('[data-testid="recall-log"]')
+
 const assumeMemoryTrackerPage = () => {
   return {
     removeFromRecall() {
@@ -176,17 +178,23 @@ const assumeMemoryTrackerPage = () => {
     },
     expectGoodRecallLogWithoutAnswer() {
       expectMemoryTrackerPage()
-      cy.get('[data-testid="recall-log"]').should('have.length', 1)
+      recallLogs().should('have.length', 1)
       cy.get('[data-testid="recall-log-product-outcome"]').should(
         'have.text',
         'GOOD'
       )
-      cy.get('[data-testid="recall-log"]').should('contain.text', 'Recorded:')
-      cy.get('[data-testid="recall-log"]').should(
-        'contain.text',
-        'Elapsed hours:'
-      )
+      recallLogs().should('contain.text', 'Recorded:')
+      recallLogs().should('contain.text', 'Elapsed hours:')
       cy.get('[data-testid="recall-log-answer-id"]').should('not.exist')
+      return assumeMemoryTrackerPage()
+    },
+    expectAgainRecallLog() {
+      expectMemoryTrackerPage()
+      recallLogs().should('have.length', 2)
+      recallLogs().contains(
+        '[data-testid="recall-log-product-outcome"]',
+        'AGAIN'
+      )
       return assumeMemoryTrackerPage()
     },
   }

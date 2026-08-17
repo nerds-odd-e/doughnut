@@ -1,6 +1,6 @@
 # Plan: RecallLog
 
-**Status:** in progress (slice 3 next)
+**Status:** in progress (slice 4 next)
 
 **Goal:** Memory-state transitions are a RecallLog. Prompt submissions stay `answer`. Tutor Feedback is a log row, not a session bag.
 
@@ -23,11 +23,9 @@ E6 is in Proposed ADR 0003 Decision (shape + `product_outcome` + `answer_id` xor
 
 Table `recall_log` (`V300000263`), GET `/api/memory-trackers/{id}/recall-logs`, Memory Tracker section. Successful `markAsRecalled` writes `GOOD`. Unsuccessful already writes `AGAIN` (same writer; slice 3 asserts it). Controller test pins the GOOD shape once.
 
-### 3. Just-review No leaves an AGAIN RecallLog — Behavior — planned
+### 3. Just-review No leaves an AGAIN RecallLog — Behavior — done
 
-**Pre:** Tracker already has a GOOD log (slice 2).  
-**Trigger:** Just review **No, I need more recall**.  
-**Post:** Memory Tracker shows a second log `AGAIN`. Do not re-assert the GOOD row shape.
+Unsuccessful `markAsRecalled` already wrote `AGAIN`. Tests assert the second log only (controller, page, E2E). Do not re-assert the GOOD shape.
 
 ### 4. Prompt grade links the log to the answer — Behavior — planned
 

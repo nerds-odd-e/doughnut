@@ -21,6 +21,10 @@ Then(
   }
 )
 
+Then('I should see an AGAIN RecallLog', () => {
+  assumeMemoryTrackerPage().expectAgainRecallLog()
+})
+
 Then('I should see Stability {int}', (stability: number) => {
   assumeMemoryTrackerPage().expectStability(stability)
 })

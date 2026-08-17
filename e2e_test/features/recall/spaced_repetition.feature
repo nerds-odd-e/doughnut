@@ -48,6 +48,7 @@ Feature: Spaced-repetition
     Then I should see Stability 8
     And I should see 8 hours between last and next recall
     And I should see Difficulty 8.34176
+    And I should see an AGAIN RecallLog
 
   @mockBrowserTime
   Scenario: Same-hour Good after first success grows Stability to 25

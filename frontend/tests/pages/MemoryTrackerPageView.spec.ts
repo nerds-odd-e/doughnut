@@ -213,4 +213,20 @@ describe("MemoryTrackerPageView display", () => {
       false
     )
   })
+
+  it("shows an AGAIN recall log as a second log", async () => {
+    const wrapper = await mountMemoryTrackerPageViewReady({
+      recallPrompts: [],
+      recallLogs: [
+        makeMe.aRecallLog.please(),
+        makeMe.aRecallLog.productOutcome("AGAIN").please(),
+      ],
+    })
+
+    const outcomes = wrapper.findAll(
+      '[data-testid="recall-log-product-outcome"]'
+    )
+    expect(outcomes).toHaveLength(2)
+    expect(outcomes.map((el) => el.text())).toContain("AGAIN")
+  })
 })

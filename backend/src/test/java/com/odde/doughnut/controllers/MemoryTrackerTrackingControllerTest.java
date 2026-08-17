@@ -70,6 +70,18 @@ class MemoryTrackerTrackingControllerTest extends MemoryTrackerControllerTestBas
   }
 
   @Test
+  void unsuccessfulMarkAsRecalledLeavesAnAgainRecallLog() throws UnexpectedNoAccessRightException {
+    MemoryTracker tracker = ownedTracker();
+    makeMe.aRecallLogFor(tracker).please();
+
+    controller.markAsRecalled(tracker, false);
+
+    List<RecallLog> logs = controller.getRecallLogs(tracker);
+    assertThat(logs, hasSize(2));
+    assertThat(logs.get(0).getProductOutcome(), is(ProductOutcome.AGAIN));
+  }
+
+  @Test
   void markAsRecalledDoesNotDeleteTrackerWhenWrongAnswerThresholdExceeded() {
     Note note = ownedNote();
     MemoryTracker tracker = ownedTracker(note);
