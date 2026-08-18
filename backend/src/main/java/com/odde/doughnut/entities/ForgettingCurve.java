@@ -25,8 +25,7 @@ public class ForgettingCurve {
 
   NextMemory afterGoodRecall(long elapsedInHours, Integer thinkingTimeMs) {
     if (isNewlyAssimilated()) {
-      return new NextMemory(
-          Fsrs.initialDifficulty(Fsrs.GOOD), Fsrs.initialStabilityHours(Fsrs.GOOD));
+      return firstRating(Fsrs.GOOD);
     }
     return afterGoodHardOrEasyRecall(
         () -> Fsrs.nextDifficulty(difficulty, Fsrs.GOOD),
@@ -37,6 +36,9 @@ public class ForgettingCurve {
   }
 
   NextMemory afterEasyRecall(long elapsedInHours) {
+    if (isNewlyAssimilated()) {
+      return firstRating(Fsrs.EASY);
+    }
     return afterGoodHardOrEasyRecall(
         () -> Fsrs.nextDifficulty(difficulty, Fsrs.EASY),
         () -> FsrsEasyRecall.hoursAfterEasyRecall(stabilityHours, difficulty, elapsedInHours));
@@ -50,6 +52,10 @@ public class ForgettingCurve {
 
   float succeeded(long elapsedInHours, Integer thinkingTimeMs) {
     return afterGoodRecall(elapsedInHours, thinkingTimeMs).stability();
+  }
+
+  private NextMemory firstRating(int grade) {
+    return new NextMemory(Fsrs.initialDifficulty(grade), Fsrs.initialStabilityHours(grade));
   }
 
   private NextMemory afterGoodHardOrEasyRecall(

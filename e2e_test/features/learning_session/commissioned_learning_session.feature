@@ -82,14 +82,16 @@ Feature: Commissioned learning session
     When I visit the commissioned memory tracker for "Hola"
     Then I should see a GOOD RecallLog with elapsed hours and no answer id
 
-  Scenario: First tutor score 5 on a new tracker sets Stability to 24
+  Scenario: First tutor score 5 on a new tracker sets Stability to 199
     Given the notes "Hola, Gracias" are assimilated as commissioned on day 1
     And I have recorded a learning session for notebook "Spanish conversation" on day 2 with scores:
       | Note    | Score |
       | Hola    | 5     |
       | Gracias | 1     |
     When I visit the commissioned memory tracker for "Hola"
-    Then I should see Stability 24
+    Then I should see Stability 199
+    And I should see Difficulty 1
+    And I should see 199 hours between last and next recall
 
   Scenario Outline: On-time second tutor score grows Stability
     Given the notes "Hola, Gracias" are assimilated as commissioned on day 1

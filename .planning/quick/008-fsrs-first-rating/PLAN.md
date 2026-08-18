@@ -29,7 +29,7 @@ E3 fuzz / max interval, E4 fitting, New Again init, card states, `DEFAULT_SPACES
 - **Type:** Structure
 - **Status:** done
 
-Lock lives in Proposed ADR 0003 **First rating on New**. Gap tracker points here as in-progress (not a second policy map). First Good is now S0/D0 in code; Hard/Easy New still D=5/S=24 until slices 3–4.
+Lock lives in Proposed ADR 0003 **First rating on New**. Gap tracker points here as in-progress (not a second policy map). First Good and Easy are S0/D0 in code; Hard New still D=5/S=24 until slice 4.
 
 **Learning:** ADR cross-refs (commissioned New 3/4/5, elapsed-0, thinking time, mapped-grade D) now point at that section; product behavior is unchanged.
 
@@ -38,22 +38,18 @@ Lock lives in Proposed ADR 0003 **First rating on New**. Gap tracker points here
 - **Type:** Behavior
 - **Status:** done
 
-Ordinary correct / just review Yes / Tutor **4** on New: Stability **55**, Difficulty **`2.118104f`** (`D0(3)`), due +55h. Hard/Easy New still D=5 / S=24. New fail unchanged.
+Ordinary correct / just review Yes / Tutor **4** on New: Stability **55**, Difficulty **`2.118104f`** (`D0(3)`), due +55h.
 
 **Learning:** Init is `Fsrs.initialDifficulty` / `initialStabilityHours` from `ForgettingCurve.afterGoodRecall`. Same-hour short-term E2E seeds a graded S=24 tracker (`/api/testability/seed_graded_memory_tracker`). On-time second score waits +55h.
 
 ### 3. First Easy on New uses S0(Easy) / D0(Easy)
 
 - **Type:** Behavior
-- **Status:** planned
+- **Status:** done
 
-**Pre:** New commissioned tracker.  
-**Trigger:** Tutor **5**.  
-**Post:** Stability **199**, Difficulty **1**, due +199h.
+Tutor **5** on New: Stability **199**, Difficulty **1**, due +199h. New Hard still D=5 / S=24. Good path unchanged.
 
-Extend `LearningSessionRecordTutorFeedbackTests` first score **5** and E2E `commissioned_learning_session.feature` “First tutor score 5 … Stability 24”.
-
-**Done when:** New Easy is FSRS-6; New Hard still 24/5; Good path unchanged.
+**Learning:** New Good/Easy share `ForgettingCurve.firstRating(grade)`. Hard still uses leftover 24/5 until slice 4.
 
 ### 4. First Hard on New uses S0(Hard) / D0(Hard)
 

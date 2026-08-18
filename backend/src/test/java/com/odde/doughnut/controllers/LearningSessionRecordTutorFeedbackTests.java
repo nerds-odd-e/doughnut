@@ -16,6 +16,8 @@ import org.junit.jupiter.params.provider.CsvSource;
 class LearningSessionRecordTutorFeedbackTests extends LearningSessionControllerTestBase {
   static final float FIRST_GOOD_DIFFICULTY = 2.118104f;
   static final float FIRST_GOOD_STABILITY_HOURS = 55f;
+  static final float FIRST_EASY_DIFFICULTY = 1f;
+  static final float FIRST_EASY_STABILITY_HOURS = 199f;
 
   @Test
   void firstScoreFourOnNewPersistsD0Good() throws UnexpectedNoAccessRightException {
@@ -37,18 +39,17 @@ class LearningSessionRecordTutorFeedbackTests extends LearningSessionControllerT
                 hola.getLastRecalledAt(), Math.round(FIRST_GOOD_STABILITY_HOURS))));
   }
 
-  @ParameterizedTest
-  @CsvSource({"5", "3"})
-  void firstScoreOnNewPersistsDifficultyFiveAndStability24(int score)
+  @Test
+  void firstScoreFiveOnNewPersistsD0Easy() throws UnexpectedNoAccessRightException {
+    MemoryTracker hola = holaAfterFirstScore(5);
+    assertThat(hola.getDifficulty(), equalTo(FIRST_EASY_DIFFICULTY));
+    assertThat(hola.getStability(), equalTo(FIRST_EASY_STABILITY_HOURS));
+  }
+
+  @Test
+  void firstScoreThreeOnNewPersistsDifficultyFiveAndStability24()
       throws UnexpectedNoAccessRightException {
-    Timestamp dayTwo = makeMe.aTimestamp().of(1, 9).please();
-    testabilitySettings.timeTravelTo(dayTwo);
-
-    SpanishNotebookFixture fixture = spanishNotebookFixture(dayTwo);
-    controller.record(
-        recordRequest(fixture.notebook(), learningSessionReport("Hola", score)), "Asia/Shanghai");
-
-    MemoryTracker hola = fixture.holaTracker();
+    MemoryTracker hola = holaAfterFirstScore(3);
     assertThat(hola.getDifficulty(), equalTo(5f));
     assertThat(hola.getStability(), equalTo(24f));
   }
@@ -136,15 +137,9 @@ class LearningSessionRecordTutorFeedbackTests extends LearningSessionControllerT
   @CsvSource({"0", "1", "2"})
   void firstScoreLeavesDifficultyUnsetAndStabilityZero(int score)
       throws UnexpectedNoAccessRightException {
-    Timestamp dayTwo = makeMe.aTimestamp().of(1, 9).please();
-    testabilitySettings.timeTravelTo(dayTwo);
-
-    SpanishNotebookFixture fixture = spanishNotebookFixture(dayTwo);
-    controller.record(
-        recordRequest(fixture.notebook(), learningSessionReport("Hola", score)), "Asia/Shanghai");
-
-    assertThat(fixture.holaTracker().getDifficulty(), nullValue());
-    assertThat(fixture.holaTracker().getStability(), equalTo(0f));
+    MemoryTracker hola = holaAfterFirstScore(score);
+    assertThat(hola.getDifficulty(), nullValue());
+    assertThat(hola.getStability(), equalTo(0f));
   }
 
   @Test
@@ -159,6 +154,15 @@ class LearningSessionRecordTutorFeedbackTests extends LearningSessionControllerT
             recordRequest(fixture.notebook(), learningSessionReport("Hola", 0)), "Asia/Shanghai");
 
     assertTrue(fixture.holaTracker().getNextRecallAt().after(response.getRecordedAt()));
+  }
+
+  private MemoryTracker holaAfterFirstScore(int score) throws UnexpectedNoAccessRightException {
+    Timestamp dayTwo = makeMe.aTimestamp().of(1, 9).please();
+    testabilitySettings.timeTravelTo(dayTwo);
+    SpanishNotebookFixture fixture = spanishNotebookFixture(dayTwo);
+    controller.record(
+        recordRequest(fixture.notebook(), learningSessionReport("Hola", score)), "Asia/Shanghai");
+    return fixture.holaTracker();
   }
 
   private SpanishNotebookFixture afterOnTimeSecondScore(int score)
