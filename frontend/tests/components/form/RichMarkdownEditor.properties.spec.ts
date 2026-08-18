@@ -16,6 +16,7 @@ import {
   mountDuplicateKeysEditor,
   propertyWikiLinkMarkdown,
 } from "./propertiesTestSupport"
+import { relationshipNoteContent } from "@tests/notes/relationshipNoteTestContent"
 import { createRichMarkdownEditorTestHarness } from "./richMarkdownEditorTestHarness"
 
 const twoPropertyMarkdown = `---
@@ -137,6 +138,28 @@ Hello`
       expect(wrapper.emitted("deadWikiLinkClick")?.[0]).toEqual([expected])
     }
   )
+
+  it("shows path Markdown in a relationship source as a live wiki-style link", async () => {
+    const wrapper = await h.mountEditor(
+      relationshipNoteContent("a-part-of", "[Moon](/Moon.md)", "[[Earth]]"),
+      {
+        wikiTitles: [
+          {
+            linkText: "[Moon](/Moon.md)",
+            targetToken: "/Moon.md",
+            displayText: "Moon",
+            noteId: 42,
+          },
+        ],
+      }
+    )
+    const live = wrapper
+      .find(propertyRowSelector("source"))
+      .element.querySelector("a.doughnut-wiki-link") as HTMLAnchorElement
+    expect(live.getAttribute("href")).toBe("/Moon.md")
+    expect(live.textContent).toBe("Moon")
+    expect(live.querySelector(".wiki-bracket")).toBeNull()
+  })
 
   it("editing an existing property row emits renamed keys and updated values", async () => {
     const markdown = `---

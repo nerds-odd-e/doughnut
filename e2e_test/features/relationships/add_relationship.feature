@@ -66,3 +66,27 @@ Feature: Add relationship
     And the note content markdown source should contain 'target: "[[Sedation care: Sedation]]"'
     When I undo "create note"
     Then I should see "Sedition" has no relationship to "Sedation"
+
+  @wip
+  Scenario: A path Markdown relationship source opens like a wiki link and keeps its spelling
+    Given I have a notebook "Path source space" with notes:
+      | Title | Content    |
+      | Moon  | Lunar body |
+      | Earth | Planet     |
+    And I have a note "Moon a part of Earth" under notebook "Path source space" with content:
+      """
+      ---
+      type: Relationship
+      relation: a-part-of
+      source: "[Moon](/Moon.md)"
+      target: "[[Earth]]"
+      ---
+
+      """
+    When I route to the note "Moon a part of Earth"
+    Then following the wiki link "Moon" should open the note titled "Moon"
+    And the note content on the current page should be "Lunar body"
+    When I route to the note "Moon a part of Earth"
+    And I view the note content as markdown
+    Then the note content markdown source should contain "[Moon](/Moon.md)"
+    And the note content markdown source should not contain "[[Moon]]"

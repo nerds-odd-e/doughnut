@@ -13,6 +13,7 @@ import {
   isPathMarkdownWikiTitle,
   isValidWikiLinkInner,
   splitWikiLinkInner,
+  wikiLinkAnchorHtml,
   wikiTitleParts,
 } from "@/utils/wikiLinkMarkup"
 
@@ -64,24 +65,6 @@ function upgradeDeadWikiAnchors(html: string, wikiTitles: WikiTitle[]): string {
     }
   }
   return wrap.innerHTML
-}
-
-function wikiLinkAnchorHtml(attrs: {
-  href: string
-  className: string
-  target: string
-  display: string
-  noteId?: number
-}): string {
-  const attrHref = escapeHtmlAttributeValue(attrs.href)
-  const attrTarget = escapeHtmlAttributeValue(attrs.target)
-  const displayAttr =
-    attrs.display !== attrs.target
-      ? ` data-wiki-display="${escapeHtmlAttributeValue(attrs.display)}"`
-      : ""
-  const noteIdAttr =
-    attrs.noteId === undefined ? "" : ` data-note-id="${attrs.noteId}"`
-  return `<a href="${attrHref}" class="${attrs.className}" data-wiki-title="${attrTarget}"${displayAttr}${noteIdAttr}>${escapeHtmlForWikiLinkDisplay(attrs.display)}</a>`
 }
 
 function deadWikiAnchorHtmlFromInner(innerRaw: string): string {

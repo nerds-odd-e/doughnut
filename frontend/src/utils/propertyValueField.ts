@@ -6,6 +6,7 @@ import {
 } from "@/utils/wikiLinkDomMarkers"
 import {
   authoredLinkOccurrences,
+  splitAuthoredToken,
   splitWikiLinkInner,
 } from "@/utils/authoredLinkMarkup"
 import {
@@ -13,13 +14,15 @@ import {
   escapeHtmlForWikiLinkDisplay,
   isValidWikiLinkInner,
   wikiAnchorToMarkdownToken,
+  wikiLinkAnchorHtml,
   wikiLinkBracketedInnerHtml,
   wikiTitleNoteIdLookup,
 } from "@/utils/wikiLinkMarkup"
 
 /**
- * Renders a YAML property scalar with clickable wiki links. Well-formed wiki `[[title]]`
- * occurrences become links; path Markdown and everything else stay escaped plain text.
+ * Renders a YAML property scalar with clickable wiki and path-Markdown links.
+ * Well-formed wiki `[[title]]` uses bracket UI; path Markdown uses the same
+ * live/dead wiki-link classes as body path links (plain display, path href).
  */
 export function propertyValuePlainToDisplayHtml(
   plain: string,
@@ -34,6 +37,21 @@ export function propertyValuePlainToDisplayHtml(
     out += escapeHtmlForWikiLinkDisplay(plain.slice(lastIndex, occ.start))
     lastIndex = occ.end
     const fullMatch = plain.slice(occ.start, occ.end)
+    if (occ.kind === "pathMarkdown") {
+      const { target, display } = splitAuthoredToken(occ.token)
+      const noteId = map.get(occ.token.trim()) ?? map.get(target.trim())
+      out += wikiLinkAnchorHtml({
+        href: target,
+        className:
+          noteId === undefined
+            ? DEAD_WIKI_LINK_CLASS
+            : DOUGHNUT_WIKI_LINK_CLASS,
+        target,
+        display,
+        noteId,
+      })
+      continue
+    }
     if (occ.kind !== "wiki" || !isValidWikiLinkInner(occ.token)) {
       out += escapeHtmlForWikiLinkDisplay(fullMatch)
       continue

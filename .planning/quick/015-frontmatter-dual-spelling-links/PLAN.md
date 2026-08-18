@@ -13,7 +13,7 @@ Inspection after locking Proposed [ADR 0004](../../../docs/adrs/0004-okf-compati
 - A bare YAML path (`source: /folder/File.md`) is not a link.
 - Frontend markdown/YAML consumers go through `authoredLinkMarkup` (TS mirror of `WikiLinkMarkdown`; extracted from `wikiLinkMarkup`). Do not add a third occurrence regex. `wikiLinkMarkup` stays click/DOM helpers.
 - Backend overlaps whole-item check uses `WikiLinkMarkdown` (extend `isWellFormedWholeLinkToken`; do not add a second parser).
-- `replaceWikiLinksInHtml` stays the HTML body path. Do not merge HTML and markdown token walks here.
+- `replaceWikiLinksInHtml` stays the HTML body path. Do not merge HTML and markdown token walks here. Shared live/dead path-anchor HTML is `wikiLinkAnchorHtml` in `wikiLinkMarkup`.
 - ADR 0004 stays Proposed. Do not accept it here.
 
 ## Out of this plan
@@ -26,8 +26,7 @@ Inspection after locking Proposed [ADR 0004](../../../docs/adrs/0004-okf-compati
 ## Discoveries
 
 - Backend resolve, cache, rename rewrite, and reduce-on-delete already scan frontmatter via `NoteContentMarkdown.authoredTokensInOccurrenceOrder` (wiki + path Markdown). Stored wiki `source: "[[Sedition]]"` is already the default form.
-- Wiki-only leftovers are product parsers, not missing data:
-  - `propertyValuePlainToDisplayHtml` walks `authoredLinkOccurrences` but still only linkifies wiki; path Markdown stays escaped until slice 2.
+- Wiki-only leftovers remaining:
   - `qualifyRelationNoteForReduceOnDelete` uses a private wiki regex; backend would already resolve a path-Markdown source.
   - `parseWholeWikiLinkItem` / `WikiLinkToken` / overlaps validation / `WikiLinkMarkdown.isWellFormedWholeLinkToken` require a whole `[[…]]` item.
   - `hasNewWikiLinkTexts` only sees `[[…]]`, so a new path-Markdown link does not flush the editor.
@@ -39,18 +38,18 @@ Inspection after locking Proposed [ADR 0004](../../../docs/adrs/0004-okf-compati
 - **Type:** Structure
 - **Status:** done
 
-`authoredLinkOccurrences` / `splitAuthoredToken` live in `frontend/src/utils/authoredLinkMarkup.ts` (file-size split from `wikiLinkMarkup`). Wiki `token` is the inner; path `token` is the full `[display](/href)`; `start`/`end` span the original substring. `propertyValuePlainToDisplayHtml` walks those occurrences; wiki still live/dead HTML; path still escaped text.
+`authoredLinkOccurrences` / `splitAuthoredToken` live in `frontend/src/utils/authoredLinkMarkup.ts` (file-size split from `wikiLinkMarkup`). Wiki `token` is the inner; path `token` is the full `[display](/href)`; `start`/`end` span the original substring. `propertyValuePlainToDisplayHtml` walks those occurrences; wiki still live/dead HTML. Path scalars are live/dead as of slice 2.
 
 **Learning:** later frontend slices import from `authoredLinkMarkup`, not a new regex. Product commit landed early as `a66ef8721a` (mixed with unrelated `.planning/quick/016-dual-spelling-leftovers/`); wrap-up is the extract + this plan update.
 
 ### 2. Path Markdown in a frontmatter scalar is a live or dead link
 
 - **Type:** Behavior
-- **Status:** planned
+- **Status:** done
 
-**Pre:** a relationship note’s YAML has `source: "[Moon](/Moon.md)"` (and a wiki `target`), stored spelling unchanged. **Trigger:** open the note (rich property row). **Post:** the source value shows the same live wiki-link UI as a body path-Markdown link to Moon (dead UI if unresolved); markdown source still contains `[Moon](/Moon.md)`, not `[[Moon]]`.
+YAML `source: "[Moon](/Moon.md)"` renders as a live or dead path wiki-link (path href, plain label, `data-note-id` when resolved; no `wiki-bracket` spans; no conversion to `[[Moon]]`). Driven through `propertyValuePlainToDisplayHtml` and mounted `RichMarkdownEditor` source row. Live/dead path-anchor HTML is `wikiLinkAnchorHtml`.
 
-Drive `propertyValuePlainToDisplayHtml` / mounted `PropertyValueField` with path-Markdown scalars; linkify `kind === "pathMarkdown"` occurrences (scanner already returns them). E2E on `e2e_test/features/relationships/add_relationship.feature` (edit YAML or seed content; do not change Doughnut-authored create, which stays wiki). `serializePropertyValueFieldRoot` already round-trips path Markdown via `wikiAnchorToMarkdownToken`.
+**E2E leftover:** `add_relationship.feature` scenario is `@wip` — SUT backend was down (`127.0.0.1:9081` ECONNREFUSED) so Cypress was not verified. After backend is healthy, run that spec, drop `@wip` if it passes, then continue slice 3.
 
 ### 3. Reducing a relationship whose source is path Markdown
 

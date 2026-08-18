@@ -9,6 +9,13 @@ import {
   wikiTitleFromInnerAndNoteId,
 } from "@/utils/wikiLinkMarkup"
 
+const moonPathWikiTitle = {
+  linkText: "[Moon](/Moon.md)",
+  targetToken: "/Moon.md",
+  displayText: "Moon",
+  noteId: 42,
+}
+
 describe("propertyValueField utils", () => {
   it("renders unresolved wiki link with display text after pipe", () => {
     const html = propertyValuePlainToDisplayHtml(
@@ -55,11 +62,37 @@ describe("propertyValueField utils", () => {
     expect(html).toContain("[[ ]]")
   })
 
-  it("leaves path Markdown in a scalar as escaped text", () => {
+  it("renders resolved path Markdown in a scalar as a live wiki-style link", () => {
+    const html = propertyValuePlainToDisplayHtml("[Moon](/Moon.md)", [
+      moonPathWikiTitle,
+    ])
+    expect(html).toBe(
+      '<a href="/Moon.md" class="doughnut-wiki-link" data-wiki-title="/Moon.md" data-wiki-display="Moon" data-note-id="42">Moon</a>'
+    )
+  })
+
+  it("renders unresolved path Markdown in a scalar as a dead wiki-style link", () => {
     const html = propertyValuePlainToDisplayHtml("[Moon](/Moon.md)", [])
+    expect(html).toContain('class="dead-wiki-link"')
+    expect(html).toContain('href="/Moon.md"')
+    expect(html).not.toContain("doughnut-wiki-link")
+    expect(html).not.toContain("wiki-bracket")
+    expect(html).not.toContain("/n")
+  })
+
+  it("round-trips path Markdown from a field root without converting to wiki", () => {
+    const root = document.createElement("div")
+    root.innerHTML = propertyValuePlainToDisplayHtml("[Moon](/Moon.md)", [
+      moonPathWikiTitle,
+    ])
+    expect(root.querySelector("a.doughnut-wiki-link")).not.toBeNull()
+    expect(serializePropertyValueFieldRoot(root)).toBe("[Moon](/Moon.md)")
+  })
+
+  it("does not treat a bare YAML path as a link", () => {
+    const html = propertyValuePlainToDisplayHtml("/folder/File.md", [])
     expect(html).not.toContain("doughnut-wiki-link")
     expect(html).not.toContain("dead-wiki-link")
-    expect(html).toBe(escapeHtmlForWikiLinkDisplay("[Moon](/Moon.md)"))
   })
 
   it("does not treat malformed nested brackets as a wiki link", () => {
