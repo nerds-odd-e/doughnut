@@ -183,7 +183,7 @@ public class MemoryTracker extends EntityIdentifiedByIdOnly {
       scheduled =
           TimestampOperations.addHoursToTimestamp(
               currentUTCTimestamp,
-              Fsrs.intervalHours(ForgettingCurve.FIRST_SUCCESS_STABILITY_HOURS));
+              Fsrs.intervalHours(ForgettingCurve.STRICTLY_FUTURE_FALLBACK_HOURS));
     }
     setNextRecallAt(scheduled);
   }

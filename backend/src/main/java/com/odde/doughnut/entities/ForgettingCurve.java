@@ -5,7 +5,7 @@ import java.util.function.Supplier;
 
 public class ForgettingCurve {
   public static final float ASSIMILATE_STABILITY_HOURS = 0.0f;
-  public static final float FIRST_SUCCESS_STABILITY_HOURS = 24.0f;
+  public static final float STRICTLY_FUTURE_FALLBACK_HOURS = 24.0f;
   public static final float DEFAULT_DIFFICULTY = 5.0f;
   public static final Integer BASE_THINKING_TIME_MS = 25000; // 25 seconds
   public static final Integer MAX_THINKING_TIME_MS = 60000; // 60 seconds
@@ -24,11 +24,8 @@ public class ForgettingCurve {
   record NextMemory(float difficulty, float stability) {}
 
   NextMemory afterGoodRecall(long elapsedInHours, Integer thinkingTimeMs) {
-    if (isNewlyAssimilated()) {
-      return firstRating(Fsrs.GOOD);
-    }
     return afterGoodHardOrEasyRecall(
-        () -> Fsrs.nextDifficulty(difficulty, Fsrs.GOOD),
+        Fsrs.GOOD,
         () ->
             adjustForThinkingTime(
                 FsrsGoodRecall.hoursAfterGoodRecall(stabilityHours, difficulty, elapsedInHours),
@@ -36,17 +33,14 @@ public class ForgettingCurve {
   }
 
   NextMemory afterEasyRecall(long elapsedInHours) {
-    if (isNewlyAssimilated()) {
-      return firstRating(Fsrs.EASY);
-    }
     return afterGoodHardOrEasyRecall(
-        () -> Fsrs.nextDifficulty(difficulty, Fsrs.EASY),
+        Fsrs.EASY,
         () -> FsrsEasyRecall.hoursAfterEasyRecall(stabilityHours, difficulty, elapsedInHours));
   }
 
   NextMemory afterHardRecall(long elapsedInHours) {
     return afterGoodHardOrEasyRecall(
-        () -> Fsrs.nextDifficulty(difficulty, Fsrs.HARD),
+        Fsrs.HARD,
         () -> FsrsHardRecall.hoursAfterHardRecall(stabilityHours, difficulty, elapsedInHours));
   }
 
@@ -58,12 +52,11 @@ public class ForgettingCurve {
     return new NextMemory(Fsrs.initialDifficulty(grade), Fsrs.initialStabilityHours(grade));
   }
 
-  private NextMemory afterGoodHardOrEasyRecall(
-      Supplier<Float> nextDifficulty, Supplier<Float> nextStability) {
+  private NextMemory afterGoodHardOrEasyRecall(int grade, Supplier<Float> nextStability) {
     if (isNewlyAssimilated()) {
-      return new NextMemory(DEFAULT_DIFFICULTY, FIRST_SUCCESS_STABILITY_HOURS);
+      return firstRating(grade);
     }
-    return new NextMemory(nextDifficulty.get(), nextStability.get());
+    return new NextMemory(Fsrs.nextDifficulty(difficulty, grade), nextStability.get());
   }
 
   float difficultyAfterFailedRecall() {

@@ -11,7 +11,7 @@ scope: large
 
 ## Why This Matters
 
-Doughnut already schedules recall with elapsed time and outcome. The product contract is Proposed [ADR 0003](../../docs/adrs/0003-spaced-repetition-scheduling-policy.md) Decision. Remaining work is **accepting** that ADR plus the deferred knobs below.
+Doughnut already schedules recall with elapsed time and outcome. The product contract is Proposed [ADR 0003](../../docs/adrs/0003-spaced-repetition-scheduling-policy.md) Decision. First-rating initials on New success are **closed** (`S0`/`D0` for Good / Hard / Easy). Remaining work is **accepting** that ADR plus the deferred knobs below.
 
 ## When to Surface
 

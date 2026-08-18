@@ -93,6 +93,17 @@ Feature: Commissioned learning session
     And I should see Difficulty 1
     And I should see 199 hours between last and next recall
 
+  Scenario: First tutor score 3 on a new tracker sets Stability to 31
+    Given the notes "Hola, Gracias" are assimilated as commissioned on day 1
+    And I have recorded a learning session for notebook "Spanish conversation" on day 2 with scores:
+      | Note    | Score |
+      | Hola    | 3     |
+      | Gracias | 1     |
+    When I visit the commissioned memory tracker for "Hola"
+    Then I should see Stability 31
+    And I should see Difficulty 5.11217
+    And I should see 31 hours between last and next recall
+
   Scenario Outline: On-time second tutor score grows Stability
     Given the notes "Hola, Gracias" are assimilated as commissioned on day 1
     And I have recorded a learning session for notebook "Spanish conversation" on day 2 with scores:

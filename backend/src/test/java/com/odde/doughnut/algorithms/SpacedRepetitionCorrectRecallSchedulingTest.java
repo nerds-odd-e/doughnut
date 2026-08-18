@@ -1,6 +1,5 @@
 package com.odde.doughnut.algorithms;
 
-import static com.odde.doughnut.entities.ForgettingCurve.FIRST_SUCCESS_STABILITY_HOURS;
 import static com.odde.doughnut.entities.ForgettingCurve.MAX_THINKING_TIME_MS;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -70,7 +69,7 @@ class SpacedRepetitionCorrectRecallSchedulingTest extends SpacedRepetitionRecall
 
   @Test
   void sameHourCorrectRecallGrowsFirstIntervalStabilityToTwentyFive() {
-    MemoryTracker memoryTracker = aGradedTrackerAtStability(FIRST_SUCCESS_STABILITY_HOURS);
+    MemoryTracker memoryTracker = aGradedTrackerAtStability(24f);
 
     memoryTracker.recalledSuccessfully(sameHourGradeTime(memoryTracker), null);
 
@@ -79,7 +78,7 @@ class SpacedRepetitionCorrectRecallSchedulingTest extends SpacedRepetitionRecall
 
   @Test
   void sameHourEasyRecallGrowsFirstIntervalStabilityToFortyThree() {
-    MemoryTracker memoryTracker = aGradedTrackerAtStability(FIRST_SUCCESS_STABILITY_HOURS);
+    MemoryTracker memoryTracker = aGradedTrackerAtStability(24f);
 
     memoryTracker.recalledEasily(sameHourGradeTime(memoryTracker));
 
@@ -88,7 +87,7 @@ class SpacedRepetitionCorrectRecallSchedulingTest extends SpacedRepetitionRecall
 
   @Test
   void sameHourHardRecallDoesNotShrinkFirstIntervalStability() {
-    MemoryTracker memoryTracker = aGradedTrackerAtStability(FIRST_SUCCESS_STABILITY_HOURS);
+    MemoryTracker memoryTracker = aGradedTrackerAtStability(24f);
 
     memoryTracker.recalledHard(sameHourGradeTime(memoryTracker));
 

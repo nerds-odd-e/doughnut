@@ -1,6 +1,6 @@
 # Doughnut ↔ open FSRS gap (toward ADR 0003)
 
-**Status:** First-rating initials (`S0`/`D0` on New success) are **in progress** in [`.planning/quick/008-fsrs-first-rating/PLAN.md`](../quick/008-fsrs-first-rating/PLAN.md). This tracker is not a second policy map. Remaining work after that is **deferred** knobs plus **accept ADR 0003** (human). Other shipped FSRS-6 locks, including same-hour success short-term next Stability (elapsed 0, S > 0), live in ADR 0003 Decision and code.
+**Status:** First-rating initials (`S0`/`D0` on New success) are **closed**. Remaining work is **deferred** knobs (**E3** / **E4**) plus **accept ADR 0003** (human). Other shipped FSRS-6 locks, including same-hour success short-term next Stability (elapsed 0, S > 0), live in ADR 0003 Decision and code.
 
 **Updated:** 2026-08-18
 
@@ -24,6 +24,8 @@ Live scheduling does not walk a spacing-index ladder. `DEFAULT_SPACES` / `hoursF
 
 **B4** is closed: no lapse count. Memory state is Difficulty, Stability, computed Retrievability. Again history is RecallLog. Frequent-failure warning is the product signal. FSRS-6 After-Again Stability does not consume a count.
 
+First-rating on New is closed: first mapped success (Good / Hard / Easy) uses published FSRS-6 `S0(G)` / `D0(G)` (ADR 0003 **First rating on New**). New Again / Tutor **0/1/2** stay New. `w[0]` is unused until a later New Again init.
+
 - **E3** fuzz / max interval
 - **E4** fitting / per-user weights
 
@@ -31,7 +33,6 @@ Humans still own accept / reject / supersede of ADR 0003 (`docs/adrs/README.md`)
 
 ## References
 
-- In progress: [`.planning/quick/008-fsrs-first-rating/PLAN.md`](../quick/008-fsrs-first-rating/PLAN.md) — first-rating initials
 - [ADR 0003](../../docs/adrs/0003-spaced-repetition-scheduling-policy.md) (Proposed)
 - [ADR 0001](../../docs/adrs/0001-ubiquitous-language.md) — **recall** vs FSRS **review**
 - [ADR 0005](../../docs/adrs/0005-commissioned-learning-session-protocol.md) — Tutor score meaning

@@ -1,6 +1,6 @@
 # Plan: FSRS-6 first-rating initials
 
-**Status:** in progress
+**Status:** complete
 
 **Goal:** First mapped **success** on a New tracker uses published FSRS-6 `S0(G)` / `D0(G)` (own implementation, frozen `Fsrs.W`). Destination: Proposed [ADR 0003](../../../docs/adrs/0003-spaced-repetition-scheduling-policy.md) Decision.
 
@@ -29,7 +29,7 @@ E3 fuzz / max interval, E4 fitting, New Again init, card states, `DEFAULT_SPACES
 - **Type:** Structure
 - **Status:** done
 
-Lock lives in Proposed ADR 0003 **First rating on New**. Gap tracker points here as in-progress (not a second policy map). First Good and Easy are S0/D0 in code; Hard New still D=5/S=24 until slice 4.
+Lock lives in Proposed ADR 0003 **First rating on New**. Gap tracker is not a second policy map. First Good / Hard / Easy are S0/D0 in code.
 
 **Learning:** ADR cross-refs (commissioned New 3/4/5, elapsed-0, thinking time, mapped-grade D) now point at that section; product behavior is unchanged.
 
@@ -47,26 +47,16 @@ Ordinary correct / just review Yes / Tutor **4** on New: Stability **55**, Diffi
 - **Type:** Behavior
 - **Status:** done
 
-Tutor **5** on New: Stability **199**, Difficulty **1**, due +199h. New Hard still D=5 / S=24. Good path unchanged.
-
-**Learning:** New Good/Easy share `ForgettingCurve.firstRating(grade)`. Hard still uses leftover 24/5 until slice 4.
+Tutor **5** on New: Stability **199**, Difficulty **1**, due +199h.
 
 ### 4. First Hard on New uses S0(Hard) / D0(Hard)
 
 - **Type:** Behavior
-- **Status:** planned
+- **Status:** done
 
-**Pre:** New commissioned tracker.  
-**Trigger:** Tutor **3**.  
-**Post:** Stability **31**, Difficulty `D0(2)` (API number), due +31h.
+Tutor **3** on New: Stability **31**, Difficulty **`5.1121707f`** (`D0(2)`), due +31h. Leftover New-success D=5/S=24 is gone. 24h due fallback is `STRICTLY_FUTURE_FALLBACK_HOURS`. `w[0]` unused.
 
-Extend the first-score **3** unit pin. Add one commissioned E2E scenario for first score 3 (feature already owns first 4/5).
-
-Then remove the leftover New-success D=5/S=24 branch. Keep `FIRST_SUCCESS_STABILITY_HOURS` only if it is still the 24h strictly-future fallback — rename so it is not “first success.” `DEFAULT_DIFFICULTY` stays as null-D fallback on S>0.
-
-Update the gap tracker / SEED-004 / STATE: first-rating closed; remaining FSRS knobs still E3/E4 plus human accept of ADR 0003.
-
-**Done when:** all three first-success initials are FSRS-6; no D=5/S=24 success init; fallback is not named as first success; no new dead weights path (`w[0]` still unused — New Again is later).
+**Learning:** New Good/Hard/Easy share `ForgettingCurve.firstRating(grade)`. Gap tracker / SEED-004 / STATE mark first-rating closed; remaining FSRS is E3/E4 plus human accept of ADR 0003.
 
 ## Tests (capability-owned)
 

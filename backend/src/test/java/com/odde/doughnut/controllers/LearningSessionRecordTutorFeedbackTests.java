@@ -18,6 +18,8 @@ class LearningSessionRecordTutorFeedbackTests extends LearningSessionControllerT
   static final float FIRST_GOOD_STABILITY_HOURS = 55f;
   static final float FIRST_EASY_DIFFICULTY = 1f;
   static final float FIRST_EASY_STABILITY_HOURS = 199f;
+  static final float FIRST_HARD_DIFFICULTY = 5.1121707f;
+  static final float FIRST_HARD_STABILITY_HOURS = 31f;
 
   @Test
   void firstScoreFourOnNewPersistsD0Good() throws UnexpectedNoAccessRightException {
@@ -47,11 +49,10 @@ class LearningSessionRecordTutorFeedbackTests extends LearningSessionControllerT
   }
 
   @Test
-  void firstScoreThreeOnNewPersistsDifficultyFiveAndStability24()
-      throws UnexpectedNoAccessRightException {
+  void firstScoreThreeOnNewPersistsD0Hard() throws UnexpectedNoAccessRightException {
     MemoryTracker hola = holaAfterFirstScore(3);
-    assertThat(hola.getDifficulty(), equalTo(5f));
-    assertThat(hola.getStability(), equalTo(24f));
+    assertThat(hola.getDifficulty(), equalTo(FIRST_HARD_DIFFICULTY));
+    assertThat(hola.getStability(), equalTo(FIRST_HARD_STABILITY_HOURS));
   }
 
   @ParameterizedTest
