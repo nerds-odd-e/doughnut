@@ -2,12 +2,13 @@
 
 **Status:** planned
 **Scope:** everything surfaced by the FSRS-compatibility-gap analysis of recall
-stats (chat 2026-08-18): one correctness bug, one policy/naming adoption
-(2 slices), one dead-code cleanup. Forward-looking stats (forecast,
+stats (chat 2026-08-18), refined into small-commit-size slices: one
+correctness bug (1), one Requested-retention adoption arc (2 docs → 3 code),
+two independent dead-wire cleanups (4, 5). Forward-looking stats (forecast,
 stability/difficulty distribution) are explicitly **out of scope** per
 developer direction.
 
-## Context (why these four slices)
+## Context (why these five slices)
 
 Full analysis is in the chat transcript, not duplicated here. Short version:
 
@@ -26,10 +27,13 @@ Full analysis is in the chat transcript, not duplicated here. Short version:
   ADR 0003's Decision currently says requested retention is "not in the UI,"
   which the heatmap-anchor change below will make untrue; that line needs
   amending before (or as part of) making the change.
-- Dead DTO weight: `DayRetention.correctCount` / `.answeredCount` /
-  `.sampleSize` and `HourRetention.correctCount` / `.answeredCount` are
-  computed and shipped but never read by any frontend file (confirmed via
-  grep across `frontend/src`) — pure payload bloat.
+- Dead DTO weight, two independent findings: `DayRetention.correctCount` /
+  `.answeredCount` / `.sampleSize` are computed and shipped but never read
+  by any frontend file (confirmed via grep across `frontend/src`); and the
+  entire `hourlyRetention` list (all of `HourRetention`) is dead on the
+  wire — the frontend only ever reads the server-computed
+  `bestHourRetentionPct` / `worstHourRetentionPct` derived from it, never
+  the raw per-hour list.
 - Design decision: **do not** add a new API field for the requested-retention
   constant. It is explicitly "a global constant... frozen weights" (ADR
   0003) with no other runtime knob anywhere (Retrievability itself is
@@ -109,38 +113,82 @@ Full analysis is in the chat transcript, not duplicated here. Short version:
     keep passing unchanged — confirm, don't assume.
 - **Status:** planned
 
-### 4. Cleanup: drop unread retention-count fields from the stats DTO (Structure)
+### 4. Cleanup: drop unread retention-count fields from `DayRetention` (Structure)
 
 - Removes `DayRetention.correctCount`, `DayRetention.answeredCount`,
-  `DayRetention.sampleSize`, `HourRetention.correctCount`,
-  `HourRetention.answeredCount` — confirmed zero references anywhere under
-  `frontend/src` (`.correctCount` / `.answeredCount` / `.sampleSize` on
-  these two types). `DayAvgResponseTime.sampleSize` is a **different**
-  concept (valid response-time sample count) and stays.
+  `DayRetention.sampleSize` (three fields, one record) — confirmed zero
+  references anywhere under `frontend/src`. `DayAvgResponseTime.sampleSize`
+  is a **different** concept (valid response-time sample count) and stays
+  untouched.
 - **Files:**
   - `backend/src/main/java/com/odde/doughnut/controllers/dto/RecallStatsDTO.java` —
-    trim the two record shapes.
+    trim the `DayRetention` record to `(date, retentionPct)`.
   - `backend/src/main/java/com/odde/doughnut/services/RecallStatsAggregator.java` —
-    update `buildRetentionTrend` / `buildHourlyRetention` constructor calls.
+    update the `buildRetentionTrend` constructor call.
   - `backend/src/test/java/com/odde/doughnut/services/RecallStatsServiceTest.java` —
-    drop the now-nonexistent-field assertions in
-    `perDayRetentionIsCorrectOverAnsweredWithGuard`
-    (`getAnsweredCount()`/`getCorrectCount()`); keep the `retentionPct`
-    assertions, which are the only externally-observable part.
+    drop the three now-nonexistent-field assertions in
+    `perDayRetentionIsCorrectOverAnsweredWithGuard` (lines ~113/115/116:
+    `getAnsweredCount()` × 2, `getCorrectCount()` × 1); keep the
+    `retentionPct` assertions, the only externally-observable part.
   - Regenerate the frontend OpenAPI client (`generate-api-client` skill) so
-    `DayRetention`/`HourRetention` TS types narrow accordingly; confirm no
-    frontend file breaks (none should, per the grep above).
-- **No external behavior change** — verified by existing backend tests
-  (once trimmed of the removed getters) and the frontend build/tests passing
-  with the narrowed generated types.
+    the `DayRetention` TS type narrows accordingly; confirm no frontend file
+    breaks (none should, per the grep above).
+- **No external behavior change** — verified by the trimmed backend test
+  and the frontend build/tests passing against the narrowed generated type.
+- **Status:** planned
+
+### 5. Cleanup: stop exposing `hourlyRetention` on the wire — it's server-internal (Structure)
+
+- Bigger finding than a field trim: the **entire** `RecallStatsDTO.hourlyRetention`
+  list is dead on the wire. Grepped `frontend/src` for `HourRetention` /
+  `hourlyRetention` — the only hit is `RecallStatsTiles.vue` reading
+  `totals.bestHourRetentionPct` / `worstHourRetentionPct`, which are
+  computed server-side by `RecallStatsAggregator.buildTotals` *from*
+  `hourlyRetention` — the raw per-hour list itself is never read once it
+  reaches the browser. It's currently public API surface purely to satisfy
+  an internal computation step.
+- Also, `HourRetention.correctCount` is unused even **internally**:
+  `buildTotals`'s best/worst-hour loop only reads `getAnsweredCount()` (the
+  `BEST_WORST_MIN_ANSWERED` guard) and `getRetentionPct()`, never
+  `getCorrectCount()`.
+- **Fix:** remove `hourlyRetention` from `RecallStatsDTO`'s public shape;
+  relocate `HourRetention` from `controllers.dto.RecallStatsDTO` into
+  `services` (package-private, alongside `RecallStatsAggregator`) as a
+  purely internal computation type, and drop its dead `correctCount` field
+  (keep `hour`, `retentionPct`, `answeredCount` — the guard needs the last
+  one).
+- **Files:**
+  - `backend/src/main/java/com/odde/doughnut/controllers/dto/RecallStatsDTO.java` —
+    remove the `hourlyRetention` field and the nested `HourRetention` class.
+  - `backend/src/main/java/com/odde/doughnut/services/RecallStatsAggregator.java` —
+    define `HourRetention` as a package-private record here (3 fields, no
+    `correctCount`); `buildHourlyRetention` stays, used only as an internal
+    input to `buildTotals`.
+  - `backend/src/main/java/com/odde/doughnut/services/RecallStatsService.java` —
+    drop `hourlyRetention` from the `new RecallStatsDTO(...)` call (7 args,
+    not 8); the local `hourlyRetention` variable stays, just isn't returned.
+  - `frontend/tests/pages/settings/RecallStatsSettingsTab.spec.ts` — drop
+    the `hourlyRetention: buildHourlyRetention()` key (and the now-unused
+    `buildHourlyRetention` mock helper) from the DTO test fixture.
+  - Regenerate the frontend OpenAPI client so the generated
+    `RecallStatsDTO` TS type drops `hourlyRetention`/`HourRetention`.
+- **No external behavior change** — `bestHourRetentionPct`/`worstHourRetentionPct`
+  on `totals` are computed identically; verified by existing backend tests
+  (`bestAndWorstHourByRetentionWithMin5Guard`, unchanged) and the frontend
+  build/tests against the narrowed type.
 - **Status:** planned
 
 ## Ordering rationale
 
 1 (correctness bug) → 2+3 (Requested-retention adoption arc; 2 unlocks 3) →
-4 (zero-value hygiene, safe to drop last if work stops early). Each slice is
-independently stop-safe: stopping after any one still leaves a strictly
-better, fully-tested state than before it.
+4, 5 (zero-value hygiene, independent of each other and of 1–3; safe to drop
+either or both last if work stops early). Slices 4 and 5 are retroactive
+dead-code removal (already-proven-unused fields), not speculative structure
+prep — they don't need a following behavior slice to justify them, per the
+"clean up dead code" phase-discipline rule rather than the
+prep-for-next-behavior rule. Each slice is independently stop-safe: stopping
+after any one still leaves a strictly better, fully-tested state than
+before it.
 
 ## Out of scope (explicit)
 
