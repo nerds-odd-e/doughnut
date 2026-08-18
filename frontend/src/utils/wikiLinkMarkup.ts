@@ -1,5 +1,8 @@
 import type { WikiTitle } from "@generated/doughnut-backend-api"
-import { noteShowHref } from "@/routes/noteShowLocation"
+import {
+  hrefLooksLikeConceptNotePath,
+  noteShowHref,
+} from "@/routes/noteShowLocation"
 import {
   DEAD_WIKI_LINK_CLASS,
   DOUGHNUT_WIKI_LINK_CLASS,
@@ -148,8 +151,33 @@ export function deadWikiLinkPayloadFromAnchor(
   return { targetToken, displayText: targetToken }
 }
 
+function pathHrefFromWikiAnchor(anchor: HTMLAnchorElement): string | null {
+  const fromAttr = anchor.getAttribute("data-wiki-title")
+  if (
+    fromAttr !== null &&
+    fromAttr !== "" &&
+    hrefLooksLikeConceptNotePath(fromAttr)
+  ) {
+    return fromAttr
+  }
+  const href = anchor.getAttribute("href")
+  if (href && hrefLooksLikeConceptNotePath(href)) {
+    return href
+  }
+  return null
+}
+
 /** Markdown token for a wiki anchor (dead or live) from DOM; prefers `data-wiki-title` / bracketed display. */
 export function wikiAnchorToMarkdownToken(anchor: HTMLAnchorElement): string {
+  const pathHref = pathHrefFromWikiAnchor(anchor)
+  if (pathHref !== null) {
+    const display =
+      anchor.getAttribute("data-wiki-display") ||
+      anchor.textContent?.trim() ||
+      ""
+    return `[${display}](${pathHref})`
+  }
+
   const raw = anchor.textContent?.trim() ?? ""
   const target = anchor.getAttribute("data-wiki-title")
   if (target === null || target === "") {

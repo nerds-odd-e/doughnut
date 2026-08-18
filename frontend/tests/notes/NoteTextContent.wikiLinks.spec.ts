@@ -60,6 +60,22 @@ describe("NoteTextContent wiki link display", () => {
     expect(live.getAttribute("data-wiki-title")).toBe("Target Title")
   })
 
+  it("shows unresolved path markdown as a dead wiki link", async () => {
+    wrapper = mountNoteTextContent(
+      makeMe.aNote.content("See [label](/Folder/Missing.md).").please(),
+      { readonly: true }
+    )
+    await flushPromises()
+    await vi.waitUntil(() =>
+      document.querySelector(".ql-editor a.dead-wiki-link")
+    )
+    const dead = document.querySelector(
+      ".ql-editor a.dead-wiki-link"
+    ) as HTMLAnchorElement
+    expect(dead.textContent).toContain("label")
+    expect(dead.getAttribute("data-wiki-title")).toBe("/Folder/Missing.md")
+  })
+
   it("shows a path markdown link as a live wiki-style link to the note", async () => {
     const targetNote = makeMe.aNote.title("Title").please()
     wrapper = mountNoteTextContent(

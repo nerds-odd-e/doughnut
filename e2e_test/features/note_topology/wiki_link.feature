@@ -28,32 +28,6 @@ Feature: Wiki links in notes
     And the wiki link "WikiPath Pantry/WikiPath Shared" should open the note titled "WikiPath Shared"
     And the note content on the current page should be "pantry namesake"
 
-  Scenario Outline: A path Markdown link opens like a wiki link and keeps its spelling
-    Given I have a notebook "WikiPathMdNB" with notes:
-      | Title             | Content         | Folder           |
-      | WikiPathMdTitle   | folder namesake | WikiPathMdFolder |
-      | WikiPathMdRoot    | root namesake   |                  |
-      | WikiPathMdCarrier | origin          | WikiPathMdFolder |
-    When I update note "WikiPathMdCarrier" content using markdown to become:
-      """
-      See <markdown>.
-      """
-    Then I should see the note content rendered as:
-      | Kind           | Text      |
-      | live wiki link | <display> |
-    When I view the note content as markdown
-    Then the note content markdown source should contain "<markdown>"
-    And the note content markdown source should not contain "[[<display>]]"
-    When I view the note content as rich content
-    Then following the wiki link "<display>" should open the note titled "<target_title>"
-    And the note content on the current page should be "<target_content>"
-
-    Examples:
-      | markdown                                      | display | target_title    | target_content  |
-      | [label](/WikiPathMdFolder/WikiPathMdTitle.md) | label   | WikiPathMdTitle | folder namesake |
-      | [label](/WikiPathMdFolder/WikiPathMdTitle)    | label   | WikiPathMdTitle | folder namesake |
-      | [label](/WikiPathMdRoot.md)                   | label   | WikiPathMdRoot  | root namesake   |
-
   Scenario: A nested folder-path wiki link opens the nested note
     Given I have a notebook "WikiPath Nested NB" with notes:
       | Title                   | Content         | Folder                                       |
@@ -213,25 +187,6 @@ Feature: Wiki links in notes
     Then the note content markdown source should contain "[[WikiPath Rename Recipes/WikiPath Rename New]]"
     When I view the note content as rich content
     Then the wiki link "WikiPath Rename Recipes/WikiPath Rename New" should open the note titled "WikiPath Rename New"
-
-  Scenario: Renaming a referenced note rewrites path Markdown hrefs and keeps Markdown
-    Given I have a notebook "WikiPathMdRenameNB" with notes:
-      | Title                   | Folder                |
-      | WikiPathMdRenameOld     | WikiPathMdRenameFolder |
-      | WikiPathMdRenameCarrier | WikiPathMdRenameRoot   |
-    When I update note "WikiPathMdRenameCarrier" content using markdown to become:
-      """
-      See [label](/WikiPathMdRenameFolder/WikiPathMdRenameOld.md) and [also](/WikiPathMdRenameFolder/WikiPathMdRenameOld).
-      """
-    And I route to the note "WikiPathMdRenameOld"
-    And I set the note title to "WikiPathMdRenameNew" updating visible reference text
-    And I route to the note "WikiPathMdRenameCarrier"
-    And I view the note content as markdown
-    Then the note content markdown source should contain "[label](/WikiPathMdRenameFolder/WikiPathMdRenameNew.md)"
-    And the note content markdown source should contain "[also](/WikiPathMdRenameFolder/WikiPathMdRenameNew)"
-    And the note content markdown source should not contain "[["
-    When I view the note content as rich content
-    Then following the wiki link "label" should open the note titled "WikiPathMdRenameNew"
 
   @mockBrowserTime
   Scenario: Insert a qualified wiki link to a note in another notebook

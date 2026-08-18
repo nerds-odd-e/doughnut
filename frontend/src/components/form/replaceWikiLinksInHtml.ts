@@ -1,5 +1,8 @@
 import type { WikiTitle } from "@generated/doughnut-backend-api"
-import { noteShowHref } from "@/routes/noteShowLocation"
+import {
+  hrefLooksLikeConceptNotePath,
+  noteShowHref,
+} from "@/routes/noteShowLocation"
 import {
   DEAD_WIKI_LINK_CLASS,
   DOUGHNUT_WIKI_LINK_CLASS,
@@ -38,6 +41,7 @@ function upgradeDeadWikiAnchors(html: string, wikiTitles: WikiTitle[]): string {
   if (!wrap) return html
 
   for (const w of wikiTitles) {
+    if (isPathMarkdownWikiTitle(w)) continue
     const { target, display } = wikiTitleParts(w)
     const href = noteShowHref(w.noteId)
     for (const a of [...wrap.querySelectorAll(`a.${DEAD_WIKI_LINK_CLASS}`)]) {
@@ -62,17 +66,35 @@ function upgradeDeadWikiAnchors(html: string, wikiTitles: WikiTitle[]): string {
   return wrap.innerHTML
 }
 
+function wikiLinkAnchorHtml(attrs: {
+  href: string
+  className: string
+  target: string
+  display: string
+  noteId?: number
+}): string {
+  const attrHref = escapeHtmlAttributeValue(attrs.href)
+  const attrTarget = escapeHtmlAttributeValue(attrs.target)
+  const displayAttr =
+    attrs.display !== attrs.target
+      ? ` data-wiki-display="${escapeHtmlAttributeValue(attrs.display)}"`
+      : ""
+  const noteIdAttr =
+    attrs.noteId === undefined ? "" : ` data-note-id="${attrs.noteId}"`
+  return `<a href="${attrHref}" class="${attrs.className}" data-wiki-title="${attrTarget}"${displayAttr}${noteIdAttr}>${escapeHtmlForWikiLinkDisplay(attrs.display)}</a>`
+}
+
 function deadWikiAnchorHtmlFromInner(innerRaw: string): string {
   if (!isValidWikiLinkInner(innerRaw)) {
     return escapeHtmlForWikiLinkDisplay(`[[${innerRaw}]]`)
   }
   const { target, display } = splitWikiLinkInner(innerRaw)
-  const attrTarget = escapeHtmlAttributeValue(target)
-  const displayAttr =
-    display !== target
-      ? ` data-wiki-display="${escapeHtmlAttributeValue(display)}"`
-      : ""
-  return `<a href="#" class="${DEAD_WIKI_LINK_CLASS}" data-wiki-title="${attrTarget}"${displayAttr}>${escapeHtmlForWikiLinkDisplay(display)}</a>`
+  return wikiLinkAnchorHtml({
+    href: "#",
+    className: DEAD_WIKI_LINK_CLASS,
+    target,
+    display,
+  })
 }
 
 function upgradePathMarkdownAnchors(
@@ -84,14 +106,45 @@ function upgradePathMarkdownAnchors(
     if (!isPathMarkdownWikiTitle(w)) continue
     const { target, display } = wikiTitleParts(w)
     const attrTarget = escapeHtmlAttributeValue(target)
-    const displayAttr =
-      display !== target
-        ? ` data-wiki-display="${escapeHtmlAttributeValue(display)}"`
-        : ""
-    const live = `<a href="${attrTarget}" class="${DOUGHNUT_WIKI_LINK_CLASS}" data-wiki-title="${attrTarget}"${displayAttr} data-note-id="${w.noteId}">${escapeHtmlForWikiLinkDisplay(display)}</a>`
+    const live = wikiLinkAnchorHtml({
+      href: target,
+      className: DOUGHNUT_WIKI_LINK_CLASS,
+      target,
+      display,
+      noteId: w.noteId,
+    })
     result = result.replaceAll(`<a href="${attrTarget}">${display}</a>`, live)
+    result = result.replaceAll(
+      wikiLinkAnchorHtml({
+        href: target,
+        className: DEAD_WIKI_LINK_CLASS,
+        target,
+        display,
+      }),
+      live
+    )
   }
   return result
+}
+
+/** Leftover `[[…]]` and leftover concept-path hrefs get the same dead wiki-link UI. */
+function markUnresolvedAsDeadWikiLinks(html: string): string {
+  const withDeadWikiTokens = html.replace(
+    /\[\[([^\[\]\r\n]*)\]\]/g,
+    (_fullMatch, inner: string) => deadWikiAnchorHtmlFromInner(inner)
+  )
+  return withDeadWikiTokens.replace(
+    /<a href="(\/[^"]+)">([^<]*)<\/a>/g,
+    (full, href: string, display: string) => {
+      if (!hrefLooksLikeConceptNotePath(href)) return full
+      return wikiLinkAnchorHtml({
+        href,
+        className: DEAD_WIKI_LINK_CLASS,
+        target: href,
+        display,
+      })
+    }
+  )
 }
 
 export function replaceWikiLinksInHtml(
@@ -102,21 +155,17 @@ export function replaceWikiLinksInHtml(
   wikiTitles.forEach((w) => {
     if (isPathMarkdownWikiTitle(w)) return
     const { target, display, inner } = wikiTitleParts(w)
-    const attrTarget = escapeHtmlAttributeValue(target)
-    const displayAttr =
-      display !== target
-        ? ` data-wiki-display="${escapeHtmlAttributeValue(display)}"`
-        : ""
     result = result.replaceAll(
       `[[${inner}]]`,
-      `<a href="${noteShowHref(w.noteId)}" class="${DOUGHNUT_WIKI_LINK_CLASS}" data-wiki-title="${attrTarget}"${displayAttr}>${escapeHtmlForWikiLinkDisplay(display)}</a>`
+      wikiLinkAnchorHtml({
+        href: noteShowHref(w.noteId),
+        className: DOUGHNUT_WIKI_LINK_CLASS,
+        target,
+        display,
+      })
     )
   })
   result = upgradePathMarkdownAnchors(result, wikiTitles)
   result = upgradeDeadWikiAnchors(result, wikiTitles)
-  result = result.replace(
-    /\[\[([^\[\]\r\n]*)\]\]/g,
-    (_fullMatch, inner: string) => deadWikiAnchorHtmlFromInner(inner)
-  )
-  return result
+  return markUnresolvedAsDeadWikiLinks(result)
 }

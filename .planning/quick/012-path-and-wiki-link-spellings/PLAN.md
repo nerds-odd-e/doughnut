@@ -95,16 +95,16 @@ Inbound `[label](/Folder/Old.md)` last segment becomes `New`; stays Markdown; pr
 ### 7. Unresolved path Markdown shows as a dead wiki link
 
 - **Type:** Behavior
-- **Status:** planned
+- **Status:** done
 
-**Pre:** no note at that folder/title. **Trigger:** save `[label](/Folder/Missing.md)`. **Post:** dead wiki-link treatment (same as unresolved `[[…]]`); markdown source unchanged. Point-at-existing / create-note may follow existing dead-wiki flows **without** converting the stored span to wiki unless that flow already replaces the authored token in place.
+Unresolved `[label](/Folder/Missing.md)` uses the same dead wiki-link UI; stored Markdown unchanged. Create / point-at-existing still search wiki tokens only (no Markdown→wiki conversion). Path Markdown E2E lives in `path_markdown_link.feature`.
 
 ### 8. Folder rename updates path prefixes in both spellings
 
 - **Type:** Behavior
 - **Status:** planned
 
-**Pre:** a note contains both `[[OldFolder/Title]]` and `[label](/OldFolder/Title.md)` to the same target. **Trigger:** rename folder `OldFolder` → `NewFolder`. **Post:** both spans still open the note; wiki stays wiki; Markdown stays Markdown; path prefix is `NewFolder`. One rewrite over parsed path segments.
+**Pre:** a note contains both `[[OldFolder/Title]]` and `[label](/OldFolder/Title.md)` to the same target. **Trigger:** rename folder `OldFolder` → `NewFolder`. **Post:** both spans still open the note; wiki stays wiki; Markdown stays Markdown; path prefix is `NewFolder`. One rewrite over parsed path segments (`PathShapedTarget` + `pathMarkdownOccurrences`). E2E: `wiki_link.feature` and/or `path_markdown_link.feature`.
 
 ### 9. Close P4 dual-spelling in the tracker
 
@@ -121,4 +121,5 @@ Inbound `[label](/Folder/Old.md)` last segment becomes `New`; stays Markdown; pr
 - Slice 4: nested `[[Parent/Child/Title]]` already resolved; this slice only locked it with tests.
 - Slice 5: extract is `authoredTokensInOccurrenceOrder`. Cache `link_text` is the full Markdown token. Display uses `WikiTitle.targetToken` (leading `/` ⇒ path href). Turndown: `/n…` → wiki; concept path href → Markdown.
 - Slice 6: `WikiLinkMarkdown.tryParsePathMarkdownToken` / `pathMarkdownOccurrences` is the only Markdown scan. `PathShapedTarget.withNoteTitle` keeps `/` and `.md`. Slice 8 should rewrite folder segments on that same parse, not a second scanner.
+- Slice 7: leftover wiki tokens and leftover path hrefs share one dead-link pass. Create / point-at-existing still wiki-token-only (out of this plan). Path Markdown scenarios: `e2e_test/features/note_topology/path_markdown_link.feature`.
 - ZIP collision `Recipe (2).md` is not `[[Recipe (2)]]`. Out of this plan.

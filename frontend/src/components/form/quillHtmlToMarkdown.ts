@@ -1,9 +1,6 @@
 import TurndownService from "turndown"
 import { gfm } from "turndown-plugin-gfm"
-import {
-  hrefLooksLikeConceptNotePath,
-  pathnameLooksLikeInternalNoteShow,
-} from "@/routes/noteShowLocation"
+import { pathnameLooksLikeInternalNoteShow } from "@/routes/noteShowLocation"
 import {
   mergeConsecutiveHeaders,
   normalizeTableCells,
@@ -171,27 +168,14 @@ turndownService.addRule("italicWithEscapedEntities", {
   },
 })
 
-turndownService.addRule("doughnutWikiNoteLink", {
+turndownService.addRule("doughnutWikiLink", {
   filter(node) {
     if (node.nodeName !== "A") return false
-    return (node as HTMLElement).classList.contains(DOUGHNUT_WIKI_LINK_CLASS)
-  },
-  replacement(_content, node) {
-    const el = node as HTMLAnchorElement
-    const href = el.getAttribute("href") ?? ""
-    if (hrefLooksLikeConceptNotePath(href)) {
-      const display =
-        el.getAttribute("data-wiki-display") || el.textContent?.trim() || ""
-      return `[${display}](${href})`
-    }
-    return wikiAnchorToMarkdownToken(el)
-  },
-})
-
-turndownService.addRule("doughnutDeadWikiLink", {
-  filter(node) {
-    if (node.nodeName !== "A") return false
-    return (node as HTMLElement).classList.contains(DEAD_WIKI_LINK_CLASS)
+    const el = node as HTMLElement
+    return (
+      el.classList.contains(DOUGHNUT_WIKI_LINK_CLASS) ||
+      el.classList.contains(DEAD_WIKI_LINK_CLASS)
+    )
   },
   replacement(_content, node) {
     return wikiAnchorToMarkdownToken(node as HTMLAnchorElement)

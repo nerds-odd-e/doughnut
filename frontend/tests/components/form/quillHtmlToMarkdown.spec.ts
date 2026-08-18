@@ -57,6 +57,7 @@ describe("quillHtmlToMarkdown", () => {
     ${"doughnut-wiki-link with piped wiki attrs"}        | ${'<p><a href="/n1" class="doughnut-wiki-link" data-wiki-title="A" data-wiki-display="B">B</a></p>'}                                                         | ${"[[A|B]]"}
     ${"path markdown doughnut-wiki-link keeps markdown"} | ${'<p><a href="/Folder/Title.md" class="doughnut-wiki-link" data-wiki-title="/Folder/Title.md" data-wiki-display="label" data-note-id="42">label</a></p>'}   | ${"[label](/Folder/Title.md)"}
     ${"path markdown without .md keeps href"}            | ${'<p><a href="/Folder/Title" class="doughnut-wiki-link" data-wiki-title="/Folder/Title" data-wiki-display="label">label</a></p>'}                           | ${"[label](/Folder/Title)"}
+    ${"path markdown dead-wiki-link keeps markdown"}     | ${'<p><a href="/Folder/Missing.md" class="dead-wiki-link" data-wiki-title="/Folder/Missing.md" data-wiki-display="label">label</a></p>'}                     | ${"[label](/Folder/Missing.md)"}
   `("wiki links: $label", ({ html, expected }) => {
     expect(htmlToMarkdown(html)).toBe(expected)
   })
@@ -71,13 +72,14 @@ describe("quillHtmlToMarkdown", () => {
   ]
 
   it.each`
-    label                               | raw                                               | resolves                  | expected
-    ${"two wikilinks in one paragraph"} | ${"<p>[[LeSS in Action]] .... [[Odd-e CSD]]</p>"} | ${linkifiedTwoNotes}      | ${"[[LeSS in Action]] .... [[Odd-e CSD]]"}
-    ${"extra [ before resolved"}        | ${"<p>[[[WikiLink]]</p>"}                         | ${linkifiedWikiLink99}    | ${String.raw`\[[[WikiLink]]`}
-    ${"extra ] after resolved"}         | ${"<p>[[WikiLink]]]</p>"}                         | ${linkifiedWikiLink99}    | ${"[[WikiLink]]\\]"}
-    ${"extra [ before and ] after"}     | ${"<p>[[[WikiLink]]]</p>"}                        | ${linkifiedWikiLink99}    | ${String.raw`\[[[WikiLink]]\]`}
-    ${"piped resolved round-trip"}      | ${"<p>[[MyTarget|shown text]]</p>"}               | ${linkifiedPipedResolved} | ${"[[MyTarget|shown text]]"}
-    ${"piped unresolved stays piped"}   | ${"<p>[[Unknown Topic|friendly label]]</p>"}      | ${[]}                     | ${"[[Unknown Topic|friendly label]]"}
+    label                               | raw                                                | resolves                  | expected
+    ${"two wikilinks in one paragraph"} | ${"<p>[[LeSS in Action]] .... [[Odd-e CSD]]</p>"}  | ${linkifiedTwoNotes}      | ${"[[LeSS in Action]] .... [[Odd-e CSD]]"}
+    ${"extra [ before resolved"}        | ${"<p>[[[WikiLink]]</p>"}                          | ${linkifiedWikiLink99}    | ${String.raw`\[[[WikiLink]]`}
+    ${"extra ] after resolved"}         | ${"<p>[[WikiLink]]]</p>"}                          | ${linkifiedWikiLink99}    | ${"[[WikiLink]]\\]"}
+    ${"extra [ before and ] after"}     | ${"<p>[[[WikiLink]]]</p>"}                         | ${linkifiedWikiLink99}    | ${String.raw`\[[[WikiLink]]\]`}
+    ${"piped resolved round-trip"}      | ${"<p>[[MyTarget|shown text]]</p>"}                | ${linkifiedPipedResolved} | ${"[[MyTarget|shown text]]"}
+    ${"piped unresolved stays piped"}   | ${"<p>[[Unknown Topic|friendly label]]</p>"}       | ${[]}                     | ${"[[Unknown Topic|friendly label]]"}
+    ${"unresolved path markdown stays"} | ${'<p><a href="/Folder/Missing.md">label</a></p>'} | ${[]}                     | ${"[label](/Folder/Missing.md)"}
   `("linkified wiki links: $label", ({ raw, resolves, expected }) => {
     const html = replaceWikiLinksInHtml(raw, [...resolves])
     expect(htmlToMarkdown(html)).toBe(expected)
