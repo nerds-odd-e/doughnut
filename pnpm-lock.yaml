@@ -6,7 +6,7 @@ settings:
 
 overrides:
   '@anev/ts-mountebank>superagent': '>=10.3.0'
-  '@hono/node-server': 2.1.0
+  '@hono/node-server': 2.1.1
   '@isaacs/brace-expansion': '>=5.0.5'
   '@tootallnate/once': '>=3.0.1'
   '@xmldom/xmldom': '>=0.9.10'
@@ -86,8 +86,8 @@ importers:
         specifier: 0.99.0
         version: 0.99.0(typescript@6.0.3)
       '@hono/node-server':
-        specifier: 2.1.0
-        version: 2.1.0(hono@4.13.1)
+        specifier: 2.1.1
+        version: 2.1.1(hono@4.13.2)
       '@mbtest/mountebank':
         specifier: 2.9.4
         version: 2.9.4(supports-color@8.1.1)
@@ -122,8 +122,8 @@ importers:
         specifier: ^15.1.0
         version: 15.1.0
       hono:
-        specifier: 4.13.1
-        version: 4.13.1
+        specifier: 4.13.2
+        version: 4.13.2
       npm-run-all2:
         specifier: ^9.0.3
         version: 9.0.3
@@ -190,10 +190,10 @@ importers:
     devDependencies:
       '@stryker-mutator/core':
         specifier: ^9.6.1
-        version: 9.6.1(@types/node@26.2.0)(supports-color@8.1.1)
+        version: 9.6.1(@types/node@26.2.0)(supports-color@11.0.0)
       '@stryker-mutator/vitest-runner':
         specifier: ^9.6.1
-        version: 9.6.1(@stryker-mutator/core@9.6.1(@types/node@26.2.0)(supports-color@8.1.1))(vitest@4.1.10)
+        version: 9.6.1(@stryker-mutator/core@9.6.1(@types/node@26.2.0)(supports-color@11.0.0))(vitest@4.1.10)
       '@types/node':
         specifier: 26.2.0
         version: 26.2.0
@@ -220,7 +220,7 @@ importers:
         version: 6.0.3
       vitest:
         specifier: 4.1.10
-        version: 4.1.10(@opentelemetry/api@1.9.1)(@types/node@26.2.0)(@vitest/browser-playwright@4.1.10)(@vitest/ui@4.1.10)(jsdom@26.1.0(canvas@3.2.3)(supports-color@8.1.1))(vite@8.2.1(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(sass@1.102.0)(terser@5.50.0)(tsx@4.23.12)(yaml@2.9.0))
+        version: 4.1.10(@opentelemetry/api@1.9.1)(@types/node@26.2.0)(@vitest/browser-playwright@4.1.10)(@vitest/ui@4.1.10)(jsdom@26.1.0(canvas@3.2.3)(supports-color@11.0.0))(vite@8.2.1(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(sass@1.102.0)(terser@5.50.0)(tsx@4.23.12)(yaml@2.9.0))
 
   frontend:
     dependencies:
@@ -1085,8 +1085,8 @@ packages:
   '@hey-api/types@0.1.4':
     resolution: {integrity: sha512-thWfawrDIP7wSI9ioT13I5soaaqB5vAPIiZmgD8PbeEVKNrkonc0N/Sjj97ezl7oQgusZmaNphGdMKipPO6IBg==}
 
-  '@hono/node-server@2.1.0':
-    resolution: {integrity: sha512-XovyyCCnBzW+zKu+z/zq8hwNs4KOR5rEMAOxo2f40Q5xoOI37IMm6MIg2COOUtUApo0i6850MTBKH2u4QLGIqg==}
+  '@hono/node-server@2.1.1':
+    resolution: {integrity: sha512-ELuehkj5VCBdgEw9zs+ivkKwyzzUCSQuE96YmiPvn1ECBoZCczbFXJLeEGMTYjphP6gydh4pHMqEYPVMYUVgQg==}
     engines: {node: '>=20'}
     peerDependencies:
       hono: ^4
@@ -3805,8 +3805,8 @@ packages:
     resolution: {integrity: sha512-F/1DnUGPopORZi0ni+CvrCgHQ5FyEAHRLSApuYWMmrbSwoN2Mn/7k+Gl38gJnR7yyDZk6WLXwiGod1JOWNDKGw==}
     hasBin: true
 
-  hono@4.13.1:
-    resolution: {integrity: sha512-kdJoFVv2xmayw6cY09H7AbMJMt8Jn5jdlEdXsP7AGBdF2DIptVlKlOLKXP41yPip4/a3yQPv9gVcJYI8YY04dw==}
+  hono@4.13.2:
+    resolution: {integrity: sha512-JydRilDRkYBQMt9qR9U92mXxmbGqsqSn/IKOrh4e7/gEbn+0zSr8igTu0obwJoNGN4sez28DIql7FBHWydoJpA==}
     engines: {node: '>=16.9.0'}
 
   hookable@5.5.3:
@@ -6704,31 +6704,11 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@babel/helper-create-class-features-plugin@7.29.7(@babel/core@7.29.7(supports-color@8.1.1))(supports-color@8.1.1)':
-    dependencies:
-      '@babel/core': 7.29.7(supports-color@8.1.1)
-      '@babel/helper-annotate-as-pure': 7.29.7
-      '@babel/helper-member-expression-to-functions': 7.29.7(supports-color@8.1.1)
-      '@babel/helper-optimise-call-expression': 7.29.7
-      '@babel/helper-replace-supers': 7.29.7(@babel/core@7.29.7(supports-color@8.1.1))(supports-color@8.1.1)
-      '@babel/helper-skip-transparent-expression-wrappers': 7.29.7(supports-color@8.1.1)
-      '@babel/traverse': 7.29.7(supports-color@8.1.1)
-      semver: 6.3.1
-    transitivePeerDependencies:
-      - supports-color
-
   '@babel/helper-globals@7.29.7': {}
 
   '@babel/helper-member-expression-to-functions@7.29.7(supports-color@11.0.0)':
     dependencies:
       '@babel/traverse': 7.29.7(supports-color@11.0.0)
-      '@babel/types': 7.29.8
-    transitivePeerDependencies:
-      - supports-color
-
-  '@babel/helper-member-expression-to-functions@7.29.7(supports-color@8.1.1)':
-    dependencies:
-      '@babel/traverse': 7.29.7(supports-color@8.1.1)
       '@babel/types': 7.29.8
     transitivePeerDependencies:
       - supports-color
@@ -6780,25 +6760,9 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@babel/helper-replace-supers@7.29.7(@babel/core@7.29.7(supports-color@8.1.1))(supports-color@8.1.1)':
-    dependencies:
-      '@babel/core': 7.29.7(supports-color@8.1.1)
-      '@babel/helper-member-expression-to-functions': 7.29.7(supports-color@8.1.1)
-      '@babel/helper-optimise-call-expression': 7.29.7
-      '@babel/traverse': 7.29.7(supports-color@8.1.1)
-    transitivePeerDependencies:
-      - supports-color
-
   '@babel/helper-skip-transparent-expression-wrappers@7.29.7(supports-color@11.0.0)':
     dependencies:
       '@babel/traverse': 7.29.7(supports-color@11.0.0)
-      '@babel/types': 7.29.8
-    transitivePeerDependencies:
-      - supports-color
-
-  '@babel/helper-skip-transparent-expression-wrappers@7.29.7(supports-color@8.1.1)':
-    dependencies:
-      '@babel/traverse': 7.29.7(supports-color@8.1.1)
       '@babel/types': 7.29.8
     transitivePeerDependencies:
       - supports-color
@@ -6839,23 +6803,9 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@babel/plugin-proposal-decorators@7.29.7(@babel/core@7.29.7(supports-color@8.1.1))(supports-color@8.1.1)':
-    dependencies:
-      '@babel/core': 7.29.7(supports-color@8.1.1)
-      '@babel/helper-create-class-features-plugin': 7.29.7(@babel/core@7.29.7(supports-color@8.1.1))(supports-color@8.1.1)
-      '@babel/helper-plugin-utils': 7.29.7
-      '@babel/plugin-syntax-decorators': 7.29.7(@babel/core@7.29.7(supports-color@8.1.1))
-    transitivePeerDependencies:
-      - supports-color
-
   '@babel/plugin-syntax-decorators@7.29.7(@babel/core@7.29.7(supports-color@11.0.0))':
     dependencies:
       '@babel/core': 7.29.7(supports-color@11.0.0)
-      '@babel/helper-plugin-utils': 7.29.7
-
-  '@babel/plugin-syntax-decorators@7.29.7(@babel/core@7.29.7(supports-color@8.1.1))':
-    dependencies:
-      '@babel/core': 7.29.7(supports-color@8.1.1)
       '@babel/helper-plugin-utils': 7.29.7
 
   '@babel/plugin-syntax-import-attributes@7.29.7(@babel/core@7.29.7(supports-color@11.0.0))':
@@ -6883,31 +6833,26 @@ snapshots:
       '@babel/core': 7.29.7(supports-color@11.0.0)
       '@babel/helper-plugin-utils': 7.29.7
 
-  '@babel/plugin-syntax-typescript@7.29.7(@babel/core@7.29.7(supports-color@8.1.1))':
+  '@babel/plugin-transform-destructuring@7.29.7(@babel/core@7.29.7(supports-color@11.0.0))(supports-color@11.0.0)':
     dependencies:
-      '@babel/core': 7.29.7(supports-color@8.1.1)
+      '@babel/core': 7.29.7(supports-color@11.0.0)
       '@babel/helper-plugin-utils': 7.29.7
-
-  '@babel/plugin-transform-destructuring@7.29.7(@babel/core@7.29.7(supports-color@8.1.1))(supports-color@8.1.1)':
-    dependencies:
-      '@babel/core': 7.29.7(supports-color@8.1.1)
-      '@babel/helper-plugin-utils': 7.29.7
-      '@babel/traverse': 7.29.7(supports-color@8.1.1)
+      '@babel/traverse': 7.29.7(supports-color@11.0.0)
     transitivePeerDependencies:
       - supports-color
 
-  '@babel/plugin-transform-explicit-resource-management@7.29.7(@babel/core@7.29.7(supports-color@8.1.1))(supports-color@8.1.1)':
+  '@babel/plugin-transform-explicit-resource-management@7.29.7(@babel/core@7.29.7(supports-color@11.0.0))(supports-color@11.0.0)':
     dependencies:
-      '@babel/core': 7.29.7(supports-color@8.1.1)
+      '@babel/core': 7.29.7(supports-color@11.0.0)
       '@babel/helper-plugin-utils': 7.29.7
-      '@babel/plugin-transform-destructuring': 7.29.7(@babel/core@7.29.7(supports-color@8.1.1))(supports-color@8.1.1)
+      '@babel/plugin-transform-destructuring': 7.29.7(@babel/core@7.29.7(supports-color@11.0.0))(supports-color@11.0.0)
     transitivePeerDependencies:
       - supports-color
 
-  '@babel/plugin-transform-modules-commonjs@7.29.7(@babel/core@7.29.7(supports-color@8.1.1))(supports-color@8.1.1)':
+  '@babel/plugin-transform-modules-commonjs@7.29.7(@babel/core@7.29.7(supports-color@11.0.0))(supports-color@11.0.0)':
     dependencies:
-      '@babel/core': 7.29.7(supports-color@8.1.1)
-      '@babel/helper-module-transforms': 7.29.7(@babel/core@7.29.7(supports-color@8.1.1))(supports-color@8.1.1)
+      '@babel/core': 7.29.7(supports-color@11.0.0)
+      '@babel/helper-module-transforms': 7.29.7(@babel/core@7.29.7(supports-color@11.0.0))(supports-color@11.0.0)
       '@babel/helper-plugin-utils': 7.29.7
     transitivePeerDependencies:
       - supports-color
@@ -6923,25 +6868,14 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@babel/plugin-transform-typescript@7.29.7(@babel/core@7.29.7(supports-color@8.1.1))(supports-color@8.1.1)':
+  '@babel/preset-typescript@7.28.5(@babel/core@7.29.7(supports-color@11.0.0))(supports-color@11.0.0)':
     dependencies:
-      '@babel/core': 7.29.7(supports-color@8.1.1)
-      '@babel/helper-annotate-as-pure': 7.29.7
-      '@babel/helper-create-class-features-plugin': 7.29.7(@babel/core@7.29.7(supports-color@8.1.1))(supports-color@8.1.1)
-      '@babel/helper-plugin-utils': 7.29.7
-      '@babel/helper-skip-transparent-expression-wrappers': 7.29.7(supports-color@8.1.1)
-      '@babel/plugin-syntax-typescript': 7.29.7(@babel/core@7.29.7(supports-color@8.1.1))
-    transitivePeerDependencies:
-      - supports-color
-
-  '@babel/preset-typescript@7.28.5(@babel/core@7.29.7(supports-color@8.1.1))(supports-color@8.1.1)':
-    dependencies:
-      '@babel/core': 7.29.7(supports-color@8.1.1)
+      '@babel/core': 7.29.7(supports-color@11.0.0)
       '@babel/helper-plugin-utils': 7.29.7
       '@babel/helper-validator-option': 7.29.7
-      '@babel/plugin-syntax-jsx': 7.29.7(@babel/core@7.29.7(supports-color@8.1.1))
-      '@babel/plugin-transform-modules-commonjs': 7.29.7(@babel/core@7.29.7(supports-color@8.1.1))(supports-color@8.1.1)
-      '@babel/plugin-transform-typescript': 7.29.7(@babel/core@7.29.7(supports-color@8.1.1))(supports-color@8.1.1)
+      '@babel/plugin-syntax-jsx': 7.29.7(@babel/core@7.29.7(supports-color@11.0.0))
+      '@babel/plugin-transform-modules-commonjs': 7.29.7(@babel/core@7.29.7(supports-color@11.0.0))(supports-color@11.0.0)
+      '@babel/plugin-transform-typescript': 7.29.7(@babel/core@7.29.7(supports-color@11.0.0))(supports-color@11.0.0)
     transitivePeerDependencies:
       - supports-color
 
@@ -7441,9 +7375,9 @@ snapshots:
 
   '@hey-api/types@0.1.4': {}
 
-  '@hono/node-server@2.1.0(hono@4.13.1)':
+  '@hono/node-server@2.1.1(hono@4.13.2)':
     dependencies:
-      hono: 4.13.1
+      hono: 4.13.2
 
   '@inkjs/ui@2.0.0(ink@7.1.1(@types/react@19.2.18)(react@19.2.8))(react@19.2.8)':
     dependencies:
@@ -7686,7 +7620,7 @@ snapshots:
 
   '@modelcontextprotocol/sdk@1.30.0(supports-color@11.0.0)(zod@4.4.3)':
     dependencies:
-      '@hono/node-server': 2.1.0(hono@4.13.1)
+      '@hono/node-server': 2.1.1(hono@4.13.2)
       ajv: 8.20.0
       ajv-formats: 3.0.1(ajv@8.20.0)
       content-type: 1.0.5
@@ -7696,7 +7630,7 @@ snapshots:
       eventsource-parser: 3.1.0
       express: 5.2.1(supports-color@11.0.0)
       express-rate-limit: 8.6.0(express@5.2.1(supports-color@8.1.1))(supports-color@11.0.0)
-      hono: 4.13.1
+      hono: 4.13.2
       jose: 6.2.3
       json-schema-typed: 8.0.2
       pkce-challenge: 5.0.1
@@ -7708,7 +7642,7 @@ snapshots:
 
   '@modelcontextprotocol/sdk@1.30.0(supports-color@8.1.1)(zod@4.4.3)':
     dependencies:
-      '@hono/node-server': 2.1.0(hono@4.13.1)
+      '@hono/node-server': 2.1.1(hono@4.13.2)
       ajv: 8.20.0
       ajv-formats: 3.0.1(ajv@8.20.0)
       content-type: 1.0.5
@@ -7718,7 +7652,7 @@ snapshots:
       eventsource-parser: 3.1.0
       express: 5.2.1(supports-color@8.1.1)
       express-rate-limit: 8.6.0(express@5.2.1(supports-color@8.1.1))(supports-color@8.1.1)
-      hono: 4.13.1
+      hono: 4.13.2
       jose: 6.2.3
       json-schema-typed: 8.0.2
       pkce-challenge: 5.0.1
@@ -8150,11 +8084,11 @@ snapshots:
       tslib: 2.8.1
       typed-inject: 5.0.0
 
-  '@stryker-mutator/core@9.6.1(@types/node@26.2.0)(supports-color@8.1.1)':
+  '@stryker-mutator/core@9.6.1(@types/node@26.2.0)(supports-color@11.0.0)':
     dependencies:
       '@inquirer/prompts': 8.5.2(@types/node@26.2.0)
       '@stryker-mutator/api': 9.6.1
-      '@stryker-mutator/instrumenter': 9.6.1(supports-color@8.1.1)
+      '@stryker-mutator/instrumenter': 9.6.1(supports-color@11.0.0)
       '@stryker-mutator/util': 9.6.1
       ajv: 8.20.0
       chalk: 5.6.2
@@ -8182,14 +8116,14 @@ snapshots:
       - '@types/node'
       - supports-color
 
-  '@stryker-mutator/instrumenter@9.6.1(supports-color@8.1.1)':
+  '@stryker-mutator/instrumenter@9.6.1(supports-color@11.0.0)':
     dependencies:
-      '@babel/core': 7.29.7(supports-color@8.1.1)
+      '@babel/core': 7.29.7(supports-color@11.0.0)
       '@babel/generator': 7.29.7
       '@babel/parser': 7.29.7
-      '@babel/plugin-proposal-decorators': 7.29.7(@babel/core@7.29.7(supports-color@8.1.1))(supports-color@8.1.1)
-      '@babel/plugin-transform-explicit-resource-management': 7.29.7(@babel/core@7.29.7(supports-color@8.1.1))(supports-color@8.1.1)
-      '@babel/preset-typescript': 7.28.5(@babel/core@7.29.7(supports-color@8.1.1))(supports-color@8.1.1)
+      '@babel/plugin-proposal-decorators': 7.29.7(@babel/core@7.29.7(supports-color@11.0.0))(supports-color@11.0.0)
+      '@babel/plugin-transform-explicit-resource-management': 7.29.7(@babel/core@7.29.7(supports-color@11.0.0))(supports-color@11.0.0)
+      '@babel/preset-typescript': 7.28.5(@babel/core@7.29.7(supports-color@11.0.0))(supports-color@11.0.0)
       '@stryker-mutator/api': 9.6.1
       '@stryker-mutator/util': 9.6.1
       angular-html-parser: 10.4.0
@@ -8201,14 +8135,14 @@ snapshots:
 
   '@stryker-mutator/util@9.6.1': {}
 
-  '@stryker-mutator/vitest-runner@9.6.1(@stryker-mutator/core@9.6.1(@types/node@26.2.0)(supports-color@8.1.1))(vitest@4.1.10)':
+  '@stryker-mutator/vitest-runner@9.6.1(@stryker-mutator/core@9.6.1(@types/node@26.2.0)(supports-color@11.0.0))(vitest@4.1.10)':
     dependencies:
       '@stryker-mutator/api': 9.6.1
-      '@stryker-mutator/core': 9.6.1(@types/node@26.2.0)(supports-color@8.1.1)
+      '@stryker-mutator/core': 9.6.1(@types/node@26.2.0)(supports-color@11.0.0)
       '@stryker-mutator/util': 9.6.1
       semver: 7.8.5
       tslib: 2.8.1
-      vitest: 4.1.10(@opentelemetry/api@1.9.1)(@types/node@26.2.0)(@vitest/browser-playwright@4.1.10)(@vitest/ui@4.1.10)(jsdom@26.1.0(canvas@3.2.3)(supports-color@8.1.1))(vite@8.2.1(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(sass@1.102.0)(terser@5.50.0)(tsx@4.23.12)(yaml@2.9.0))
+      vitest: 4.1.10(@opentelemetry/api@1.9.1)(@types/node@26.2.0)(@vitest/browser-playwright@4.1.10)(@vitest/ui@4.1.10)(jsdom@26.1.0(canvas@3.2.3)(supports-color@11.0.0))(vite@8.2.1(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(sass@1.102.0)(terser@5.50.0)(tsx@4.23.12)(yaml@2.9.0))
 
   '@szmarczak/http-timer@4.0.6':
     dependencies:
@@ -10337,7 +10271,7 @@ snapshots:
 
   he@1.2.0: {}
 
-  hono@4.13.1: {}
+  hono@4.13.2: {}
 
   hookable@5.5.3: {}
 
@@ -12888,37 +12822,6 @@ snapshots:
       '@vitest/browser-playwright': 4.1.10(playwright@1.62.1)(vite@8.2.1(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(sass@1.102.0)(terser@5.50.0)(tsx@4.23.12)(yaml@2.9.0))(vitest@4.1.10)
       '@vitest/ui': 4.1.10(vitest@4.1.10)
       jsdom: 26.1.0(canvas@3.2.3)(supports-color@11.0.0)
-    transitivePeerDependencies:
-      - msw
-
-  vitest@4.1.10(@opentelemetry/api@1.9.1)(@types/node@26.2.0)(@vitest/browser-playwright@4.1.10)(@vitest/ui@4.1.10)(jsdom@26.1.0(canvas@3.2.3)(supports-color@8.1.1))(vite@8.2.1(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(sass@1.102.0)(terser@5.50.0)(tsx@4.23.12)(yaml@2.9.0)):
-    dependencies:
-      '@vitest/expect': 4.1.10
-      '@vitest/mocker': 4.1.10(vite@8.2.1(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(sass@1.102.0)(terser@5.50.0)(tsx@4.23.12)(yaml@2.9.0))
-      '@vitest/pretty-format': 4.1.10
-      '@vitest/runner': 4.1.10
-      '@vitest/snapshot': 4.1.10
-      '@vitest/spy': 4.1.10
-      '@vitest/utils': 4.1.10
-      es-module-lexer: 2.3.1
-      expect-type: 1.4.0
-      magic-string: 0.30.21
-      obug: 2.1.4
-      pathe: 2.0.3
-      picomatch: 4.0.5
-      std-env: 4.2.0
-      tinybench: 2.9.0
-      tinyexec: 1.2.4
-      tinyglobby: 0.2.17
-      tinyrainbow: 3.1.0
-      vite: 8.2.1(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(sass@1.102.0)(terser@5.50.0)(tsx@4.23.12)(yaml@2.9.0)
-      why-is-node-running: 2.3.0
-    optionalDependencies:
-      '@opentelemetry/api': 1.9.1
-      '@types/node': 26.2.0
-      '@vitest/browser-playwright': 4.1.10(playwright@1.62.1)(vite@8.2.1(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(sass@1.102.0)(terser@5.50.0)(tsx@4.23.12)(yaml@2.9.0))(vitest@4.1.10)
-      '@vitest/ui': 4.1.10(vitest@4.1.10)
-      jsdom: 26.1.0(canvas@3.2.3)(supports-color@8.1.1)
     transitivePeerDependencies:
       - msw
 
