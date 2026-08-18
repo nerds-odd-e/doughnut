@@ -64,6 +64,7 @@ state, qualitative update rules), not with a particular crate or version.
   (`nextRecallAt = lastRecalledAt + I(0.9, S)`). Do not keep an unbounded S
   beside a capped due. Same strictly-future fallback when `I` is
   non-positive. Existing over-cap rows **will** be clamped (S and due).
+  There is **no interval fuzz** (see **Fuzz**).
 
 ### Lapses
 
@@ -74,6 +75,17 @@ forget counter. Open FSRS-6 After-Again Stability (the published
 not a count. Again outcomes stay on **RecallLog**. The **frequent-failure
 warning** is the product signal for repeated incorrect recall; it does not
 change the schedule.
+
+### Fuzz
+
+There is **no interval fuzz**. After a grade, due is `lastRecalledAt +
+I(0.9, S)` in whole hours (strictly-future fallback when `I` is
+non-positive). Do not jitter Stability or due. Open FSRS may randomize the
+scheduled interval to spread same-calendar-day clumps; Doughnut already
+spreads dues because they are anchored to the actual recall instant in
+whole hours. Thinking time may still adjust Stability on ordinary Good;
+that is an effort overlay, not random `I`. Session order among already-due
+items is not a memory-state concern. Fuzz is not a Settings knob.
 
 ### Difficulty on correct recall
 
@@ -287,7 +299,6 @@ stays the due-work index.
 
 ### Deferred
 
-- **E3:** Fuzz
 - **E4:** Fitting / per-user weights
 
 ## Working draft
@@ -310,8 +321,8 @@ Empty pending accept.
   complete versioned history.
 - Allows a data-fitted scheduler later without a library lock-in. Requested
   retention is locked at 0.9. Maximum interval is locked at 36500 days
-  (876000 whole hours). A lapse count is not memory state. Fuzz and
-  per-user fitting remain deferred.
+  (876000 whole hours). A lapse count is not memory state. There is no
+  interval fuzz. Per-user fitting remains deferred.
 
 ## Prerequisites / Assumptions
 
@@ -344,6 +355,10 @@ Empty pending accept.
 - **Persist a lapse count** — rejected: FSRS-6 After-Again Stability does not
   consume it; RecallLog already holds Again history; the frequent-failure
   warning is the product signal. Do not add an unused counter.
+- **FSRS interval fuzz** — rejected: due follows Stability; hour-precision
+  recall instants already spread same-calendar-day clumps; thinking time is
+  an effort overlay on Good, not random `I`. Open FSRS treats fuzz as
+  optional (`enable_fuzz` defaults off in ts-fsrs).
 
 ## Related
 
