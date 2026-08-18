@@ -3,7 +3,7 @@ id: SEED-004
 status: sprouting
 planted: 2026-08-15
 planted_during: ADR 0003 finalization (gap analysis)
-trigger_when: when accepting Proposed ADR 0003, or when changing fuzz / max interval / fitting
+trigger_when: when accepting Proposed ADR 0003, or when changing fuzz / fitting
 scope: large
 ---
 
@@ -11,11 +11,11 @@ scope: large
 
 ## Why This Matters
 
-Doughnut already schedules recall with elapsed time and outcome. The product contract is Proposed [ADR 0003](../../docs/adrs/0003-spaced-repetition-scheduling-policy.md) Decision. First-rating (all four G, Tutor **2** on New as Hard) is **closed**; `w[0]` is used for Again `S0`. Remaining work is **accepting** that ADR plus the deferred knobs below (**E3** / **E4**).
+Doughnut already schedules recall with elapsed time and outcome. The product contract is Proposed [ADR 0003](../../docs/adrs/0003-spaced-repetition-scheduling-policy.md) Decision. First-rating (all four G, Tutor **2** on New as Hard) is **closed**; `w[0]` is used for Again `S0`. Maximum interval is **closed** (36500 days / 876000 hours). Remaining work is **accepting** that ADR plus deferred **E3** fuzz and **E4** fitting.
 
 ## When to Surface
 
-**Trigger:** accepting ADR 0003; changing fuzz / max interval / fitting.
+**Trigger:** accepting ADR 0003; changing fuzz / fitting.
 
 Also surface when changing success/failure interval math, commissioned score → schedule mapping, or due-work rebuild from history.
 
@@ -24,7 +24,7 @@ Also surface when changing success/failure interval math, commissioned score →
 **Large** — remaining trigger is policy accept plus deferred product knobs:
 
 1. Humans accept Proposed [ADR 0003](../../docs/adrs/0003-spaced-repetition-scheduling-policy.md) (`docs/adrs/README.md`).
-2. Deferred IDs: **E3** / **E4**. Tracker: [FSRS-COMPATIBILITY-GAP.md](../research/FSRS-COMPATIBILITY-GAP.md).
+2. Deferred IDs: **E3** fuzz / **E4** fitting. Tracker: [FSRS-COMPATIBILITY-GAP.md](../research/FSRS-COMPATIBILITY-GAP.md).
 
 ## Breadcrumbs
 

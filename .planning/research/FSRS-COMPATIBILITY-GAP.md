@@ -1,6 +1,6 @@
 # Doughnut ↔ open FSRS gap (toward ADR 0003)
 
-**Status:** First-rating (all four G, Tutor **2** on New as Hard) is **closed** in product; `w[0]` is used. **New** = ungraded is locked in ADR 0001. Still-New graded-row backfill is gated Flyway: Again `V300000271` (`still_new_again_first_rating_backfill`), Hard/SHRINK `V300000272` (`still_new_hard_first_rating_backfill`), both default `1=0`. Remaining knobs: **E3** / **E4**, plus **accept ADR 0003** (human). Other shipped FSRS-6 locks, including same-hour success short-term next Stability (elapsed 0, S > 0), live in ADR 0003 Decision and code.
+**Status:** First-rating (all four G, Tutor **2** on New as Hard) is **closed** in product; `w[0]` is used. **New** = ungraded is locked in ADR 0001. Maximum interval is **closed** (global 36500 days / 876000 hours). Still-New graded-row backfill is gated Flyway: Again `V300000271` (`still_new_again_first_rating_backfill`), Hard/SHRINK `V300000272` (`still_new_hard_first_rating_backfill`), both default `1=0`. Remaining knobs: **E3** fuzz / **E4** fitting, plus **accept ADR 0003** (human). Other shipped FSRS-6 locks, including same-hour success short-term next Stability (elapsed 0, S > 0), live in ADR 0003 Decision and code.
 
 **Updated:** 2026-08-18
 
@@ -12,7 +12,7 @@ Product policy lives in ADR 0003 Decision. This tracker is a pointer plus the de
 
 ## Current code vs FSRS-6
 
-Doughnut persists **Stability** in whole hours and **Difficulty** (nullable; shown on the Memory Tracker). Retrievability is computed (FSRS-6 power curve), not stored. Frozen default FSRS-6 weights live in `Fsrs`. Requested retention is locked global `r = 0.9` (`Fsrs.REQUESTED_RETENTION`); it is not a product knob. There is **no** lapse count (locked: not memory state). There is no card state (`New` / `Learning` / `Review` / `Relearning`), fuzz, or max interval.
+Doughnut persists **Stability** in whole hours and **Difficulty** (nullable; shown on the Memory Tracker). Retrievability is computed (FSRS-6 power curve), not stored. Frozen default FSRS-6 weights live in `Fsrs`. Requested retention is locked global `r = 0.9` (`Fsrs.REQUESTED_RETENTION`); it is not a product knob. There is **no** lapse count (locked: not memory state). Maximum interval is locked global **36500 days** / **876000 hours** (`Fsrs.MAXIMUM_INTERVAL_HOURS`); clamp after next-S, due from that S. There is no card state (`New` / `Learning` / `Review` / `Relearning`) or fuzz.
 
 Live scheduling does not walk a spacing-index ladder. `DEFAULT_SPACES` / `hoursFromLegacyIndex` remain only so committed `V300000260` can replay on fresh DBs.
 
@@ -26,7 +26,9 @@ Live scheduling does not walk a spacing-index ladder. `DEFAULT_SPACES` / `hoursF
 
 First-rating on New is closed in product: all four G use published FSRS-6 `S0(G)` / `D0(G)` (ADR 0003 **First rating on New**), including Tutor **2** as Hard (`S0(2)` / `D0(2)`). Shrink 80% remains the exception only when `S > 0`. `w[0]` is used for Again `S0`.
 
-- **E3** fuzz / max interval
+Maximum interval is closed. Existing over-cap rows were clamped (`V300000274`).
+
+- **E3** fuzz
 - **E4** fitting / per-user weights
 
 Humans still own accept / reject / supersede of ADR 0003 (`docs/adrs/README.md`).
