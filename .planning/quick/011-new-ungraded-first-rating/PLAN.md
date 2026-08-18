@@ -66,22 +66,14 @@ Example rows **0** and **1** on `commissioned_learning_session.feature` “First
 - **Type:** Structure
 - **Status:** done
 
-Proposed ADR 0003: New Tutor **2** uses Hard `S0(2)` / `D0(2)` (due **31h**), same first bucket as Tutor **3**. Shrink 80% only when `S > 0`. No Flyway / no backfill. ADR 0001 unchanged. Product still stay-New until slice 6.
+Proposed ADR 0003: New Tutor **2** uses Hard `S0(2)` / `D0(2)` (due **31h**), same first bucket as Tutor **3**. Shrink 80% only when `S > 0`. No Flyway / no backfill. ADR 0001 unchanged.
 
 ### 6. First Tutor 2 on New uses S0(Hard) / D0(Hard)
 
 - **Type:** Behavior
-- **Status:** planned
+- **Status:** done
 
-**Pre:** New commissioned tracker.  
-**Trigger:** Tutor **2**.  
-**Post:** Stability **31**, Difficulty `D0(2)`, due +31h (same first bucket as score **3**).
-
-Score **2** when `S > 0` still shrinks 80% and leaves Difficulty unchanged (`onTimeSecondScoreTwoShrinksStabilityAndLeavesDifficultyUnchanged`).
-
-Extend `LearningSessionRecordTutorFeedbackTests` first score **2**. Add Example row **2** to the commissioned first-score outline. `--spec` `commissioned_learning_session.feature` only.
-
-**Done when:** no memory-state grade leaves a tracker New; shrink when `S > 0` unchanged.
+Tutor **2** on New is Hard first-rating (Stability **31**, `D0(2)`, due +31h); `S > 0` still shrinks 80%. `MemoryTrackerShrinkStability` branches on `isNewlyAssimilated()`. Outline row **2** added. Cypress `commissioned_learning_session.feature`: 15 passing.
 
 ### 7. Lock New = ungraded and Again-row backfill in the ADRs
 

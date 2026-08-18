@@ -1,6 +1,6 @@
 # Doughnut ↔ open FSRS gap (toward ADR 0003)
 
-**Status:** First-rating initials for New **success** (`S0`/`D0` for Good / Hard / Easy) and first Again / Tutor **0/1** (`S0(1)` / `D0(1)`) are **closed** in product. Proposed ADR 0003 now locks Tutor **2** on New as Hard first-rating (`S0(2)` / `D0(2)`); product code still stay-New until [`.planning/quick/011-new-ungraded-first-rating/PLAN.md`](../quick/011-new-ungraded-first-rating/PLAN.md) slice 6. After that: **deferred** knobs (**E3** / **E4**) plus **accept ADR 0003** (human). Other shipped FSRS-6 locks, including same-hour success short-term next Stability (elapsed 0, S > 0), live in ADR 0003 Decision and code.
+**Status:** First-rating initials on New (all four G, including Tutor **2** as Hard) are **closed** in product. Remaining work in [`.planning/quick/011-new-ungraded-first-rating/PLAN.md`](../quick/011-new-ungraded-first-rating/PLAN.md) is New = ungraded glossary plus backfill of still-New graded rows. After that: **deferred** knobs (**E3** / **E4**) plus **accept ADR 0003** (human). Other shipped FSRS-6 locks, including same-hour success short-term next Stability (elapsed 0, S > 0), live in ADR 0003 Decision and code.
 
 **Updated:** 2026-08-18
 
@@ -24,7 +24,7 @@ Live scheduling does not walk a spacing-index ladder. `DEFAULT_SPACES` / `hoursF
 
 **B4** is closed: no lapse count. Memory state is Difficulty, Stability, computed Retrievability. Again history is RecallLog. Frequent-failure warning is the product signal. FSRS-6 After-Again Stability does not consume a count.
 
-First-rating on New **success** (Good / Hard / Easy) is closed: published FSRS-6 `S0(G)` / `D0(G)` (ADR 0003 **First rating on New**). First Again / Tutor **0/1** on New uses `S0(1)` / `D0(1)` (Stability **5**, due **5h**). Tutor **2** on New still stay-New in product until [that plan](../quick/011-new-ungraded-first-rating/PLAN.md) slice 6. `w[0]` is used for Again `S0`.
+First-rating on New is closed in product: all four G use published FSRS-6 `S0(G)` / `D0(G)` (ADR 0003 **First rating on New**), including Tutor **2** as Hard (`S0(2)` / `D0(2)`). Shrink 80% remains the exception only when `S > 0`. Remaining work in [that plan](../quick/011-new-ungraded-first-rating/PLAN.md) is New = ungraded plus backfill of still-New graded rows. `w[0]` is used for Again `S0`.
 
 - **E3** fuzz / max interval
 - **E4** fitting / per-user weights

@@ -50,9 +50,10 @@ class LearningSessionRecordTutorFeedbackTests extends LearningSessionControllerT
     assertThat(hola.getStability(), equalTo(FIRST_EASY_STABILITY_HOURS));
   }
 
-  @Test
-  void firstScoreThreeOnNewPersistsD0Hard() throws UnexpectedNoAccessRightException {
-    MemoryTracker hola = holaAfterFirstScore(3);
+  @ParameterizedTest
+  @CsvSource({"3", "2"})
+  void firstScoreTwoOrThreeOnNewPersistsD0Hard(int score) throws UnexpectedNoAccessRightException {
+    MemoryTracker hola = holaAfterFirstScore(score);
     assertThat(hola.getDifficulty(), equalTo(FIRST_HARD_DIFFICULTY));
     assertThat(hola.getStability(), equalTo(FIRST_HARD_STABILITY_HOURS));
   }
@@ -147,14 +148,6 @@ class LearningSessionRecordTutorFeedbackTests extends LearningSessionControllerT
         equalTo(
             TimestampOperations.addHoursToTimestamp(
                 hola.getLastRecalledAt(), Math.round(FIRST_AGAIN_STABILITY_HOURS))));
-  }
-
-  @Test
-  void firstScoreTwoOnNewLeavesDifficultyUnsetAndStabilityZero()
-      throws UnexpectedNoAccessRightException {
-    MemoryTracker hola = holaAfterFirstScore(2);
-    assertThat(hola.getDifficulty(), nullValue());
-    assertThat(hola.getStability(), equalTo(0f));
   }
 
   @Test
