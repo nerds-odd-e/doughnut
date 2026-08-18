@@ -49,14 +49,16 @@ Feature: Spaced-repetition
     And I should see an AGAIN RecallLog
 
   @mockBrowserTime
-  Scenario: Same-hour Good after first success grows Stability to 25
-    Given the note "Note 1" was assimilated on day 1
-    And the understanding tracker for "Note 1" is graded at stability 24
-    When I ask to do more recall
+  Scenario: Same-hour Good after first Good stays Stability 55
+    Given the browser and backend are on day 1
+    When I assimilate the note "Note 1"
+    And I am recalling my note on day 1
+    And I choose yes I remember
+    And I ask to do more recall
     And I choose yes I remember
     And I visit the understanding memory tracker for "Note 1"
-    Then I should see Stability 25
-    And I should see 25 hours between last and next recall
+    Then I should see Stability 55
+    And I should see 55 hours between last and next recall
 
   @mockBrowserTime
   Scenario: Strictly follow the schedule but want to recall more
