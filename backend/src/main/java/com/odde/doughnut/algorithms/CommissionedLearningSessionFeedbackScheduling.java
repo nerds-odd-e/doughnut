@@ -38,7 +38,7 @@ public final class CommissionedLearningSessionFeedbackScheduling {
       MemoryTracker tracker, Timestamp now, ProductOutcome productOutcome) {
     switch (productOutcome) {
       case EASY -> tracker.recalledEasily(now);
-      case GOOD -> tracker.recalledSuccessfully(now, null);
+      case GOOD -> tracker.recalledSuccessfully(now);
       case HARD -> tracker.recalledHard(now);
       case SHRINK -> {
         if (new ForgettingCurve(tracker.getStability()).isNew()) {

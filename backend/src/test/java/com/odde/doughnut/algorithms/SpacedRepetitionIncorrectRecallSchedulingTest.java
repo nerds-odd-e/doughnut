@@ -19,7 +19,7 @@ class SpacedRepetitionIncorrectRecallSchedulingTest
   void onTimeIncorrectRecallUsesFsrsAgainPostLapseStability() {
     MemoryTracker memoryTracker = aGradedTrackerAtThreeDayStability();
 
-    memoryTracker.markAsRecalled(onTimeGradeTime(memoryTracker), false, null);
+    memoryTracker.markAsRecalled(onTimeGradeTime(memoryTracker), false);
 
     assertThat(memoryTracker.getStability(), equalTo(17.0f));
   }
@@ -28,8 +28,8 @@ class SpacedRepetitionIncorrectRecallSchedulingTest
   void overdueIncorrectRecallLeavesMoreRemainingStabilityThanOnTime() {
     MemoryTracker onTime = aGradedTrackerAtThreeDayStability();
     MemoryTracker overdue = aGradedTrackerAtThreeDayStability();
-    onTime.markAsRecalled(onTimeGradeTime(onTime), false, null);
-    overdue.markAsRecalled(overdueGradeTime(overdue), false, null);
+    onTime.markAsRecalled(onTimeGradeTime(onTime), false);
+    overdue.markAsRecalled(overdueGradeTime(overdue), false);
 
     assertThat(overdue.getStability(), greaterThan(onTime.getStability()));
   }
@@ -40,8 +40,8 @@ class SpacedRepetitionIncorrectRecallSchedulingTest
     MemoryTracker harder = aGradedTrackerAtThreeDayStability(8f);
     Timestamp gradeTime = onTimeGradeTime(easier);
 
-    easier.markAsRecalled(gradeTime, false, null);
-    harder.markAsRecalled(gradeTime, false, null);
+    easier.markAsRecalled(gradeTime, false);
+    harder.markAsRecalled(gradeTime, false);
 
     assertThat(harder.getStability(), lessThan(easier.getStability()));
   }
@@ -50,7 +50,7 @@ class SpacedRepetitionIncorrectRecallSchedulingTest
   void incorrectRecallFromOneHourStabilityPersistsOneHour() {
     MemoryTracker memoryTracker = aGradedTrackerAtStability(1f);
 
-    memoryTracker.markAsRecalled(onTimeGradeTime(memoryTracker), false, null);
+    memoryTracker.markAsRecalled(onTimeGradeTime(memoryTracker), false);
 
     assertThat(memoryTracker.getStability(), equalTo(1f));
   }
@@ -60,7 +60,7 @@ class SpacedRepetitionIncorrectRecallSchedulingTest
     MemoryTracker memoryTracker = makeMe.aMemoryTrackerFor(note).by(user).inMemoryPlease();
     Timestamp gradeTime = memoryTracker.getNextRecallAt();
 
-    memoryTracker.markAsRecalled(gradeTime, false, null);
+    memoryTracker.markAsRecalled(gradeTime, false);
 
     assertThat(memoryTracker.getDifficulty(), equalTo(FIRST_AGAIN_DIFFICULTY));
     assertThat(memoryTracker.getStability(), equalTo(FIRST_AGAIN_STABILITY_HOURS));
@@ -74,10 +74,10 @@ class SpacedRepetitionIncorrectRecallSchedulingTest
   @Test
   void onTimeIncorrectRecallAfterFirstGoodUsesFsrsAgainFromS0AndD0Good() {
     MemoryTracker memoryTracker = makeMe.aMemoryTrackerFor(note).by(user).inMemoryPlease();
-    memoryTracker.recalledSuccessfully(memoryTracker.getNextRecallAt(), null);
+    memoryTracker.recalledSuccessfully(memoryTracker.getNextRecallAt());
     Timestamp gradeTime = onTimeGradeTime(memoryTracker);
 
-    memoryTracker.markAsRecalled(gradeTime, false, null);
+    memoryTracker.markAsRecalled(gradeTime, false);
 
     assertThat(memoryTracker.getStability(), equalTo(15.0f));
     assertThat(memoryTracker.getDifficulty(), equalTo(7.3945026f));
@@ -90,7 +90,7 @@ class SpacedRepetitionIncorrectRecallSchedulingTest
   void onTimeIncorrectRecallUpdatesDifficultyWithFsrsAgainNextD() {
     MemoryTracker memoryTracker = aGradedTrackerAtThreeDayStability();
 
-    memoryTracker.markAsRecalled(onTimeGradeTime(memoryTracker), false, null);
+    memoryTracker.markAsRecalled(onTimeGradeTime(memoryTracker), false);
 
     assertThat(memoryTracker.getDifficulty(), equalTo(8.341763f));
   }
@@ -106,8 +106,8 @@ class SpacedRepetitionIncorrectRecallSchedulingTest
     MemoryTracker difficultyFive = aGradedTrackerAtThreeDayStability();
     Timestamp gradeTime = onTimeGradeTime(unsetDifficulty);
 
-    unsetDifficulty.markAsRecalled(gradeTime, false, null);
-    difficultyFive.markAsRecalled(gradeTime, false, null);
+    unsetDifficulty.markAsRecalled(gradeTime, false);
+    difficultyFive.markAsRecalled(gradeTime, false);
 
     assertThat(unsetDifficulty.getDifficulty(), equalTo(difficultyFive.getDifficulty()));
   }

@@ -1,6 +1,5 @@
 package com.odde.doughnut.algorithms;
 
-import static com.odde.doughnut.entities.ForgettingCurve.MAX_THINKING_TIME_MS;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThan;
@@ -22,7 +21,7 @@ class SpacedRepetitionCorrectRecallSchedulingTest extends SpacedRepetitionRecall
     MemoryTracker memoryTracker = makeMe.aMemoryTrackerFor(note).by(user).inMemoryPlease();
     Timestamp gradeTime = memoryTracker.getNextRecallAt();
 
-    memoryTracker.recalledSuccessfully(gradeTime, null);
+    memoryTracker.recalledSuccessfully(gradeTime);
 
     assertThat(memoryTracker.getDifficulty(), equalTo(FIRST_GOOD_DIFFICULTY));
     assertThat(memoryTracker.getStability(), equalTo(FIRST_GOOD_STABILITY_HOURS));
@@ -36,16 +35,16 @@ class SpacedRepetitionCorrectRecallSchedulingTest extends SpacedRepetitionRecall
   @Test
   void correctRecallAfterNewAgainUsesLongTermGoodStability() {
     MemoryTracker memoryTracker = makeMe.aMemoryTrackerFor(note).by(user).inMemoryPlease();
-    memoryTracker.markAsRecalled(memoryTracker.getNextRecallAt(), false, null);
+    memoryTracker.markAsRecalled(memoryTracker.getNextRecallAt(), false);
 
-    memoryTracker.recalledSuccessfully(onTimeGradeTime(memoryTracker), null);
+    memoryTracker.recalledSuccessfully(onTimeGradeTime(memoryTracker));
 
     assertThat(memoryTracker.getStability(), equalTo(21.0f));
   }
 
   @ParameterizedTest
-  @CsvSource({"true, 0", "false, 500"})
-  void firstCorrectRecallIgnoresReviewTiming(boolean maxThinkingTime, int extraElapsedHours) {
+  @CsvSource({"0", "500"})
+  void firstCorrectRecallIgnoresReviewTiming(int extraElapsedHours) {
     MemoryTracker memoryTracker = makeMe.aMemoryTrackerFor(note).by(user).inMemoryPlease();
     Timestamp gradeTime =
         extraElapsedHours == 0
@@ -53,7 +52,7 @@ class SpacedRepetitionCorrectRecallSchedulingTest extends SpacedRepetitionRecall
             : TimestampOperations.addHoursToTimestamp(
                 memoryTracker.getLastRecalledAt(), extraElapsedHours);
 
-    memoryTracker.recalledSuccessfully(gradeTime, maxThinkingTime ? MAX_THINKING_TIME_MS : null);
+    memoryTracker.recalledSuccessfully(gradeTime);
 
     assertThat(memoryTracker.getDifficulty(), equalTo(FIRST_GOOD_DIFFICULTY));
     assertThat(memoryTracker.getStability(), equalTo(FIRST_GOOD_STABILITY_HOURS));
@@ -70,8 +69,8 @@ class SpacedRepetitionCorrectRecallSchedulingTest extends SpacedRepetitionRecall
     MemoryTracker difficultyFive = aGradedTrackerAtThreeDayStability();
     Timestamp gradeTime = onTimeGradeTime(unsetDifficulty);
 
-    unsetDifficulty.recalledSuccessfully(gradeTime, null);
-    difficultyFive.recalledSuccessfully(gradeTime, null);
+    unsetDifficulty.recalledSuccessfully(gradeTime);
+    difficultyFive.recalledSuccessfully(gradeTime);
 
     assertThat(unsetDifficulty.getDifficulty(), equalTo(difficultyFive.getDifficulty()));
     assertThat(unsetDifficulty.getStability(), equalTo(difficultyFive.getStability()));
@@ -81,33 +80,16 @@ class SpacedRepetitionCorrectRecallSchedulingTest extends SpacedRepetitionRecall
   void onTimeCorrectRecallUsesFsrsGoodStabilityIncrement() {
     MemoryTracker memoryTracker = aGradedTrackerAtThreeDayStability();
 
-    memoryTracker.recalledSuccessfully(onTimeGradeTime(memoryTracker), null);
+    memoryTracker.recalledSuccessfully(onTimeGradeTime(memoryTracker));
 
     assertThat(memoryTracker.getStability(), equalTo(266.0f));
-  }
-
-  @Test
-  void ordinaryGoodNextStabilityAndDueIgnoreThinkingTime() {
-    MemoryTracker missing = aGradedTrackerAtThreeDayStability();
-    MemoryTracker zeroMs = aGradedTrackerAtThreeDayStability();
-    MemoryTracker sixtySeconds = aGradedTrackerAtThreeDayStability();
-    Timestamp gradeTime = onTimeGradeTime(missing);
-
-    missing.recalledSuccessfully(gradeTime, null);
-    zeroMs.recalledSuccessfully(gradeTime, 0);
-    sixtySeconds.recalledSuccessfully(gradeTime, 60_000);
-
-    assertThat(zeroMs.getStability(), equalTo(missing.getStability()));
-    assertThat(sixtySeconds.getStability(), equalTo(missing.getStability()));
-    assertThat(zeroMs.getNextRecallAt(), equalTo(missing.getNextRecallAt()));
-    assertThat(sixtySeconds.getNextRecallAt(), equalTo(missing.getNextRecallAt()));
   }
 
   @Test
   void onTimeCorrectRecallUpdatesDifficultyWithFsrsGoodNextD() {
     MemoryTracker memoryTracker = aGradedTrackerAtThreeDayStability(8f);
 
-    memoryTracker.recalledSuccessfully(onTimeGradeTime(memoryTracker), null);
+    memoryTracker.recalledSuccessfully(onTimeGradeTime(memoryTracker));
 
     assertThat(memoryTracker.getDifficulty(), equalTo(7.9872284f));
   }
@@ -118,8 +100,8 @@ class SpacedRepetitionCorrectRecallSchedulingTest extends SpacedRepetitionRecall
     MemoryTracker harder = aGradedTrackerAtThreeDayStability(8f);
     Timestamp gradeTime = onTimeGradeTime(easier);
 
-    easier.recalledSuccessfully(gradeTime, null);
-    harder.recalledSuccessfully(gradeTime, null);
+    easier.recalledSuccessfully(gradeTime);
+    harder.recalledSuccessfully(gradeTime);
 
     assertThat(harder.getStability(), lessThan(easier.getStability()));
   }
@@ -133,8 +115,8 @@ class SpacedRepetitionCorrectRecallSchedulingTest extends SpacedRepetitionRecall
     earlierProjection.setNextRecallAt(TimestampOperations.addHoursToTimestamp(gradeTime, -24));
     laterProjection.setNextRecallAt(TimestampOperations.addHoursToTimestamp(gradeTime, 48));
 
-    earlierProjection.recalledSuccessfully(gradeTime, null);
-    laterProjection.recalledSuccessfully(gradeTime, null);
+    earlierProjection.recalledSuccessfully(gradeTime);
+    laterProjection.recalledSuccessfully(gradeTime);
 
     long earlierInterval =
         TimestampOperations.getDiffInHours(earlierProjection.getNextRecallAt(), gradeTime);
@@ -152,8 +134,8 @@ class SpacedRepetitionCorrectRecallSchedulingTest extends SpacedRepetitionRecall
     Timestamp gradeTimeWithSubHourRemainder =
         Timestamp.from(wholeHourGradeTime.toInstant().plusSeconds(30 * 60));
 
-    wholeHourRecall.recalledSuccessfully(wholeHourGradeTime, null);
-    recallWithSubHourRemainder.recalledSuccessfully(gradeTimeWithSubHourRemainder, null);
+    wholeHourRecall.recalledSuccessfully(wholeHourGradeTime);
+    recallWithSubHourRemainder.recalledSuccessfully(gradeTimeWithSubHourRemainder);
 
     long wholeHourInterval =
         TimestampOperations.getDiffInHours(wholeHourRecall.getNextRecallAt(), wholeHourGradeTime);
@@ -172,13 +154,11 @@ class SpacedRepetitionCorrectRecallSchedulingTest extends SpacedRepetitionRecall
     MemoryTracker laterCorrect = aGradedTrackerAtThreeDayStability();
     Timestamp failureTime =
         TimestampOperations.addHoursToTimestamp(earlierCorrect.getLastRecalledAt(), 300);
-    earlierCorrect.markAsRecalled(failureTime, false, null);
-    laterCorrect.markAsRecalled(failureTime, false, null);
+    earlierCorrect.markAsRecalled(failureTime, false);
+    laterCorrect.markAsRecalled(failureTime, false);
 
-    earlierCorrect.markAsRecalled(
-        TimestampOperations.addHoursToTimestamp(failureTime, 12), true, null);
-    laterCorrect.markAsRecalled(
-        TimestampOperations.addHoursToTimestamp(failureTime, 24), true, null);
+    earlierCorrect.markAsRecalled(TimestampOperations.addHoursToTimestamp(failureTime, 12), true);
+    laterCorrect.markAsRecalled(TimestampOperations.addHoursToTimestamp(failureTime, 24), true);
 
     assertThat(laterCorrect.getStability(), greaterThan(earlierCorrect.getStability()));
   }
@@ -188,7 +168,7 @@ class SpacedRepetitionCorrectRecallSchedulingTest extends SpacedRepetitionRecall
     MemoryTracker memoryTracker = aGradedTrackerAtThreeDayStability();
     Timestamp gradeTime = onTimeGradeTime(memoryTracker);
 
-    memoryTracker.recalledSuccessfully(gradeTime, null);
+    memoryTracker.recalledSuccessfully(gradeTime);
 
     long interval = TimestampOperations.getDiffInHours(memoryTracker.getNextRecallAt(), gradeTime);
     assertThat(interval, equalTo((long) Math.round(memoryTracker.getStability())));
@@ -198,8 +178,8 @@ class SpacedRepetitionCorrectRecallSchedulingTest extends SpacedRepetitionRecall
   void overdueCorrectRecallLengthensStabilityMoreThanOnTime() {
     MemoryTracker onTime = aGradedTrackerAtThreeDayStability();
     MemoryTracker overdue = aGradedTrackerAtThreeDayStability();
-    onTime.recalledSuccessfully(onTimeGradeTime(onTime), null);
-    overdue.recalledSuccessfully(overdueGradeTime(overdue), null);
+    onTime.recalledSuccessfully(onTimeGradeTime(onTime));
+    overdue.recalledSuccessfully(overdueGradeTime(overdue));
 
     long onTimeInterval =
         TimestampOperations.getDiffInHours(onTime.getNextRecallAt(), onTime.getLastRecalledAt());
@@ -216,12 +196,10 @@ class SpacedRepetitionCorrectRecallSchedulingTest extends SpacedRepetitionRecall
     int stabilityHours = Math.round(elapsedTenTimesStability.getStability());
     elapsedTenTimesStability.recalledSuccessfully(
         TimestampOperations.addHoursToTimestamp(
-            elapsedTenTimesStability.getLastRecalledAt(), stabilityHours * 10),
-        null);
+            elapsedTenTimesStability.getLastRecalledAt(), stabilityHours * 10));
     elapsedHundredTimesStability.recalledSuccessfully(
         TimestampOperations.addHoursToTimestamp(
-            elapsedHundredTimesStability.getLastRecalledAt(), stabilityHours * 100),
-        null);
+            elapsedHundredTimesStability.getLastRecalledAt(), stabilityHours * 100));
 
     long tenTimesInterval =
         TimestampOperations.getDiffInHours(

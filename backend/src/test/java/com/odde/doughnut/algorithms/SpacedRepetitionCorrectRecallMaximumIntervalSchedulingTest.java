@@ -18,7 +18,7 @@ class SpacedRepetitionCorrectRecallMaximumIntervalSchedulingTest
     MemoryTracker memoryTracker = aGradedTrackerAtStability(LEGACY_LADDER_MAX_STABILITY_HOURS);
     Timestamp gradeTime = onTimeGradeTime(memoryTracker);
 
-    memoryTracker.recalledSuccessfully(gradeTime, null);
+    memoryTracker.recalledSuccessfully(gradeTime);
 
     assertThat(memoryTracker.getStability(), equalTo(MAXIMUM_INTERVAL_HOURS));
     assertThat(
@@ -26,14 +26,5 @@ class SpacedRepetitionCorrectRecallMaximumIntervalSchedulingTest
         equalTo(
             TimestampOperations.addHoursToTimestamp(
                 gradeTime, Math.round(MAXIMUM_INTERVAL_HOURS))));
-  }
-
-  @Test
-  void thinkingTimeOnOverCapCorrectRecallDoesNotPierceTheCap() {
-    MemoryTracker memoryTracker = aGradedTrackerAtStability(LEGACY_LADDER_MAX_STABILITY_HOURS);
-
-    memoryTracker.recalledSuccessfully(onTimeGradeTime(memoryTracker), 0);
-
-    assertThat(memoryTracker.getStability(), equalTo(MAXIMUM_INTERVAL_HOURS));
   }
 }

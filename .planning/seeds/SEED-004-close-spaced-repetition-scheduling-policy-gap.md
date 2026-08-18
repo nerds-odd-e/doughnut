@@ -11,7 +11,7 @@ scope: large
 
 ## Why This Matters
 
-Doughnut already schedules recall with elapsed time and outcome. The product contract is Proposed [ADR 0003](../../docs/adrs/0003-spaced-repetition-scheduling-policy.md) Decision. First-rating (all four G, Tutor **2** on New as Hard) is **closed**; `w[0]` is used for Again `S0`. Maximum interval is **closed** (36500 days / 876000 hours). Interval fuzz is **closed** (not used). Remaining work is **accepting** that ADR plus deferred **E4** fitting.
+Doughnut already schedules recall with elapsed time and outcome. The product contract is Proposed [ADR 0003](../../docs/adrs/0003-spaced-repetition-scheduling-policy.md) Decision. First-rating (all four G, Tutor **2** on New as Hard) is **closed**; `w[0]` is used for Again `S0`. Maximum interval is **closed** (36500 days / 876000 hours). Interval fuzz is **closed** (not used). Thinking-time overlay is **closed** (RT is not a DSR input). Remaining work is **accepting** that ADR plus deferred **E4** fitting.
 
 ## When to Surface
 

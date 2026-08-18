@@ -30,8 +30,7 @@ class SpacedRepetitionEarlyRecallAdjustmentTest extends SpacedRepetitionRecallSc
   private float nextStabilityHours(int elapsedInHours) {
     MemoryTracker memoryTracker = aGradedTrackerAtThreeDayStability();
     memoryTracker.recalledSuccessfully(
-        TimestampOperations.addHoursToTimestamp(memoryTracker.getLastRecalledAt(), elapsedInHours),
-        null);
+        TimestampOperations.addHoursToTimestamp(memoryTracker.getLastRecalledAt(), elapsedInHours));
     return memoryTracker.getStability();
   }
 }

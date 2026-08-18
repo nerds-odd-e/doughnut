@@ -81,22 +81,17 @@ public class MemoryTrackerService {
       Timestamp currentUTCTimestamp, Boolean correct, RecallPrompt recallPrompt) {
     MemoryTracker memoryTracker = recallPrompt.requireMemoryTracker();
     Answer answer = recallPrompt.getAnswer();
-    return markAsRecalled(
-        currentUTCTimestamp, correct, memoryTracker, answer.getThinkingTimeMs(), answer);
+    return markAsRecalled(currentUTCTimestamp, correct, memoryTracker, answer);
   }
 
   public boolean markAsRecalled(
-      Timestamp currentUTCTimestamp,
-      Boolean correct,
-      MemoryTracker memoryTracker,
-      Integer thinkingTimeMs,
-      Answer answer) {
+      Timestamp currentUTCTimestamp, Boolean correct, MemoryTracker memoryTracker, Answer answer) {
     persistRecallLog(
         memoryTracker,
         currentUTCTimestamp,
         correct ? ProductOutcome.GOOD : ProductOutcome.AGAIN,
         answer);
-    memoryTracker.markAsRecalled(currentUTCTimestamp, correct, thinkingTimeMs);
+    memoryTracker.markAsRecalled(currentUTCTimestamp, correct);
     entityPersister.save(memoryTracker);
 
     if (!correct) {

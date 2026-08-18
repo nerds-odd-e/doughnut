@@ -188,8 +188,8 @@ public class MemoryTracker extends EntityIdentifiedByIdOnly {
     setNextRecallAt(scheduled);
   }
 
-  public void recalledSuccessfully(Timestamp now, Integer thinkingTimeMs) {
-    applyRecall(now, forgettingCurve().afterGoodRecall(elapsedHoursUntil(now), thinkingTimeMs));
+  public void recalledSuccessfully(Timestamp now) {
+    applyRecall(now, forgettingCurve().afterGoodRecall(elapsedHoursUntil(now)));
   }
 
   public void recalledEasily(Timestamp now) {
@@ -214,10 +214,9 @@ public class MemoryTracker extends EntityIdentifiedByIdOnly {
     MemoryTrackerShrinkStability.apply(this, currentUTCTimestamp);
   }
 
-  public void markAsRecalled(
-      Timestamp currentUTCTimestamp, boolean successful, Integer thinkingTimeMs) {
+  public void markAsRecalled(Timestamp currentUTCTimestamp, boolean successful) {
     if (successful) {
-      recalledSuccessfully(currentUTCTimestamp, thinkingTimeMs);
+      recalledSuccessfully(currentUTCTimestamp);
     } else {
       recalledAgain(currentUTCTimestamp);
     }

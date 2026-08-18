@@ -6,8 +6,6 @@ public class ForgettingCurve {
   public static final float ASSIMILATE_STABILITY_HOURS = 0.0f;
   public static final float STRICTLY_FUTURE_FALLBACK_HOURS = 24.0f;
   public static final float DEFAULT_DIFFICULTY = 5.0f;
-  public static final Integer BASE_THINKING_TIME_MS = 25000; // 25 seconds
-  public static final Integer MAX_THINKING_TIME_MS = 60000; // 60 seconds
   private final float stabilityHours;
   private final float difficulty;
 
@@ -22,7 +20,7 @@ public class ForgettingCurve {
 
   record NextMemory(float difficulty, float stability) {}
 
-  NextMemory afterGoodRecall(long elapsedInHours, Integer thinkingTimeMs) {
+  NextMemory afterGoodRecall(long elapsedInHours) {
     return afterRecall(
         Fsrs.GOOD,
         () -> FsrsGoodRecall.hoursAfterGoodRecall(stabilityHours, difficulty, elapsedInHours));

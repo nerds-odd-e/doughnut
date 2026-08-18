@@ -8,14 +8,12 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.controllers.dto.AnswerDTO;
 import com.odde.doughnut.controllers.dto.AnsweredQuestion;
-import com.odde.doughnut.entities.ForgettingCurve;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.ProductOutcome;
 import com.odde.doughnut.entities.RecallLog;
 import com.odde.doughnut.entities.RecallPrompt;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
-import java.sql.Timestamp;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -95,6 +93,30 @@ class RecallPromptAnswerControllerTest extends RecallPromptControllerTestBase {
   }
 
   @Test
+  void ordinaryGoodNextStabilityAndDueIgnoreThinkingTime() throws UnexpectedNoAccessRightException {
+    Note zeroNote = ownedNote();
+    MemoryTracker zeroMs = ownedTracker(zeroNote);
+    Note sixtyNote = ownedNote();
+    MemoryTracker sixtySeconds = ownedTracker(sixtyNote);
+    testabilitySettings.timeTravelTo(memoryTracker.getNextRecallAt());
+
+    controller.answer(recallPrompt, answerDTO);
+
+    AnswerDTO zero = choiceAnswer(0);
+    zero.setThinkingTimeMs(0);
+    controller.answer(mcqPrompt(zeroMs, zeroNote), zero);
+
+    AnswerDTO sixty = choiceAnswer(0);
+    sixty.setThinkingTimeMs(60_000);
+    controller.answer(mcqPrompt(sixtySeconds, sixtyNote), sixty);
+
+    assertThat(zeroMs.getStability(), equalTo(memoryTracker.getStability()));
+    assertThat(sixtySeconds.getStability(), equalTo(memoryTracker.getStability()));
+    assertThat(zeroMs.getNextRecallAt(), equalTo(memoryTracker.getNextRecallAt()));
+    assertThat(sixtySeconds.getNextRecallAt(), equalTo(memoryTracker.getNextRecallAt()));
+  }
+
+  @Test
   void shouldNotIncreaseStabilityIfRepeatImmediately() throws UnexpectedNoAccessRightException {
     testabilitySettings.timeTravelTo(memoryTracker.getLastRecalledAt());
     Float oldStability = memoryTracker.getStability();
@@ -110,28 +132,6 @@ class RecallPromptAnswerControllerTest extends RecallPromptControllerTestBase {
     assertThat(memoryTracker.getStability(), greaterThan(oldStability));
     assertThat(
         memoryTracker.getLastRecalledAt(), equalTo(testabilitySettings.getCurrentUTCTimestamp()));
-  }
-
-  @Test
-  void answerWithBaseThinkingTime_shouldHaveNoThinkingTimeAdjustment()
-      throws UnexpectedNoAccessRightException {
-    testabilitySettings.timeTravelTo(memoryTracker.getNextRecallAt());
-    Float baseStability = memoryTracker.getStability();
-    Float baseDifficulty = memoryTracker.getDifficulty();
-    Timestamp baseLastRecalledAt = memoryTracker.getLastRecalledAt();
-
-    answerDTO.setThinkingTimeMs(ForgettingCurve.BASE_THINKING_TIME_MS);
-    controller.answer(recallPrompt, answerDTO);
-    Float stabilityWithBaseThinkingTime = memoryTracker.getStability();
-
-    memoryTracker.setStability(baseStability);
-    memoryTracker.setDifficulty(baseDifficulty);
-    memoryTracker.setLastRecalledAt(baseLastRecalledAt);
-    memoryTracker.setNextRecallAt(memoryTracker.calculateNextRecallAt());
-    answerDTO.setThinkingTimeMs(null);
-    controller.answer(mcqPrompt(memoryTracker, memoryTracker.getNote()), answerDTO);
-
-    assertThat(stabilityWithBaseThinkingTime, equalTo(memoryTracker.getStability()));
   }
 
   @Test

@@ -16,7 +16,7 @@ public final class SpacedRepetitionAlgorithm {
   /** Historical index scale used only to convert existing rows. */
   private static final float LEGACY_INDEX_OFFSET = 100.0f;
 
-  public static final float LEGACY_INDEX_STEP = 10.0f;
+  private static final float LEGACY_INDEX_STEP = 10.0f;
 
   private SpacedRepetitionAlgorithm() {}
 

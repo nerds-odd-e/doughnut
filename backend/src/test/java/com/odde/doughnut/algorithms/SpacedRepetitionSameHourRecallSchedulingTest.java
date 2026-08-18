@@ -12,7 +12,7 @@ class SpacedRepetitionSameHourRecallSchedulingTest
   void sameHourCorrectRecallGrowsFirstIntervalStabilityToTwentyFive() {
     MemoryTracker memoryTracker = aGradedTrackerAtStability(24f);
 
-    memoryTracker.recalledSuccessfully(sameHourGradeTime(memoryTracker), null);
+    memoryTracker.recalledSuccessfully(sameHourGradeTime(memoryTracker));
 
     assertThat(memoryTracker.getStability(), equalTo(25.0f));
   }
@@ -39,7 +39,7 @@ class SpacedRepetitionSameHourRecallSchedulingTest
   void sameHourCorrectRecallDoesNotShrinkThreeDayStability() {
     MemoryTracker memoryTracker = aGradedTrackerAtThreeDayStability();
 
-    memoryTracker.recalledSuccessfully(sameHourGradeTime(memoryTracker), null);
+    memoryTracker.recalledSuccessfully(sameHourGradeTime(memoryTracker));
 
     assertThat(memoryTracker.getStability(), equalTo(72.0f));
   }

@@ -27,7 +27,7 @@ public class MemoryTrackerBuilder extends EntityBuilder<MemoryTracker> {
 
   public MemoryTrackerBuilder afterNthStrictRecall(Integer recallDone) {
     for (int i = 0; i < recallDone; i++) {
-      entity.recalledSuccessfully(entity.getNextRecallAt(), null);
+      entity.recalledSuccessfully(entity.getNextRecallAt());
     }
     return this;
   }

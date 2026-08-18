@@ -7,7 +7,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import com.odde.doughnut.controllers.dto.AnswerSpellingDTO;
 import com.odde.doughnut.controllers.dto.AnsweredQuestion;
 import com.odde.doughnut.entities.Answer;
-import com.odde.doughnut.entities.ForgettingCurve;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.RecallPrompt;
@@ -106,12 +105,9 @@ class RecallPromptAnswerSpellingControllerTest extends RecallPromptControllerTes
   void lateCorrectAnswerDoesNotShortenTheNextInterval() throws UnexpectedNoAccessRightException {
     Note lateNote = ownedNote();
     MemoryTracker lateTracker = ownedSpellingTracker(lateNote);
-    Integer thinkingTimeMs = ForgettingCurve.BASE_THINKING_TIME_MS;
 
     testabilitySettings.timeTravelTo(memoryTracker.getNextRecallAt());
-    AnswerSpellingDTO onTimeAnswer = spellingAnswer(answerNote.getTitle());
-    onTimeAnswer.setThinkingTimeMs(thinkingTimeMs);
-    controller.answerSpelling(recallPrompt, onTimeAnswer);
+    controller.answerSpelling(recallPrompt, spellingAnswer(answerNote.getTitle()));
     long onTimeIntervalMs =
         memoryTracker.getNextRecallAt().getTime()
             - testabilitySettings.getCurrentUTCTimestamp().getTime();
@@ -119,37 +115,12 @@ class RecallPromptAnswerSpellingControllerTest extends RecallPromptControllerTes
     Timestamp lateAnswerAt =
         TimestampOperations.addHoursToTimestamp(lateTracker.getNextRecallAt(), 100 * 24);
     testabilitySettings.timeTravelTo(lateAnswerAt);
-    AnswerSpellingDTO lateAnswer = spellingAnswer(lateNote.getTitle());
-    lateAnswer.setThinkingTimeMs(thinkingTimeMs);
-    controller.answerSpelling(spellingPrompt(lateTracker), lateAnswer);
+    controller.answerSpelling(spellingPrompt(lateTracker), spellingAnswer(lateNote.getTitle()));
     long lateIntervalMs =
         lateTracker.getNextRecallAt().getTime()
             - testabilitySettings.getCurrentUTCTimestamp().getTime();
 
     assertThat(lateIntervalMs, greaterThanOrEqualTo(onTimeIntervalMs));
-  }
-
-  @Test
-  void answerWithBaseThinkingTime_shouldHaveNoThinkingTimeAdjustment()
-      throws UnexpectedNoAccessRightException {
-    testabilitySettings.timeTravelTo(memoryTracker.getNextRecallAt());
-    Float baseStability = memoryTracker.getStability();
-    Float baseDifficulty = memoryTracker.getDifficulty();
-    Timestamp baseLastRecalledAt = memoryTracker.getLastRecalledAt();
-
-    answerDTO.setThinkingTimeMs(ForgettingCurve.BASE_THINKING_TIME_MS);
-    controller.answerSpelling(recallPrompt, answerDTO);
-    Float stabilityWithBaseThinkingTime = memoryTracker.getStability();
-
-    memoryTracker.setStability(baseStability);
-    memoryTracker.setDifficulty(baseDifficulty);
-    memoryTracker.setLastRecalledAt(baseLastRecalledAt);
-    memoryTracker.setNextRecallAt(memoryTracker.calculateNextRecallAt());
-    AnswerSpellingDTO noThinkingTime = spellingAnswer(answerNote.getTitle());
-    noThinkingTime.setThinkingTimeMs(null);
-    controller.answerSpelling(spellingPrompt(memoryTracker), noThinkingTime);
-
-    assertThat(stabilityWithBaseThinkingTime, equalTo(memoryTracker.getStability()));
   }
 
   @Test
