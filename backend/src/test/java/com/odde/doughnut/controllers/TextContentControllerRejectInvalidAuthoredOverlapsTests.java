@@ -59,6 +59,14 @@ class TextContentControllerRejectInvalidAuthoredOverlapsTests
         ---
 
         body
+        """,
+        """
+        ---
+        overlaps:
+          - /Folder/Title.md
+        ---
+
+        body
         """
       })
   void rejects_invalid_overlaps_list_items(String content) {
@@ -80,6 +88,23 @@ class TextContentControllerRejectInvalidAuthoredOverlapsTests
         overlaps:
           - "[[Other Note]]"
           - "[[Shared Notebook:Hue|display]]"
+        ---
+
+        body
+        """;
+    assertThat(
+        controller.updateNoteContent(note, contentDto(content)).getNote().getContent(),
+        equalTo(content));
+  }
+
+  @Test
+  void accepts_valid_overlaps_path_markdown_list_item() throws UnexpectedNoAccessRightException {
+    String content =
+        """
+        ---
+        type: Note
+        overlaps:
+          - "[Title](/Folder/Title.md)"
         ---
 
         body

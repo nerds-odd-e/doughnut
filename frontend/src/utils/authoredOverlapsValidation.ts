@@ -1,5 +1,5 @@
 import type { PropertyValue } from "@/utils/noteProperties"
-import { isWellFormedWholeWikiLinkItem } from "@/utils/wholeWikiLinkItem"
+import { isWellFormedWholeWikiLinkItem } from "@/utils/authoredLinkMarkup"
 
 export const AUTHORED_OVERLAPS_MESSAGE =
   "overlaps must be a one-level YAML list of well-formed wiki-link items."

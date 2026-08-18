@@ -26,7 +26,10 @@
 import { computed, type PropType } from "vue"
 import type { WikiTitle } from "@generated/doughnut-backend-api"
 import { noteShowLocation } from "@/routes/noteShowLocation"
-import { parseWholeWikiLinkItem } from "@/utils/wholeWikiLinkItem"
+import {
+  noteIdForAuthoredToken,
+  parseWholeWikiLinkItem,
+} from "@/utils/authoredLinkMarkup"
 import {
   DEAD_WIKI_LINK_CLASS,
   DOUGHNUT_WIKI_LINK_CLASS,
@@ -52,7 +55,7 @@ const resolved = computed(() => {
   const parsed = parseWholeWikiLinkItem(props.token.trim())
   if (!parsed) return undefined
   const map = wikiTitleNoteIdLookup(props.wikiTitles)
-  const noteId = map.get(parsed.inner.trim()) ?? map.get(parsed.target.trim())
+  const noteId = noteIdForAuthoredToken(parsed.inner, map)
   const linkAttrs: Record<string, string> = {
     "data-wiki-title": parsed.target,
   }

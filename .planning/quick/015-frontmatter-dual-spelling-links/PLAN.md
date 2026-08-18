@@ -27,7 +27,6 @@ Inspection after locking Proposed [ADR 0004](../../../docs/adrs/0004-okf-compati
 
 - Backend resolve, cache, rename rewrite, and reduce-on-delete already scan frontmatter via `NoteContentMarkdown.authoredTokensInOccurrenceOrder` (wiki + path Markdown). Stored wiki `source: "[[Sedition]]"` is already the default form.
 - Wiki-only leftovers remaining:
-  - `parseWholeWikiLinkItem` / `WikiLinkToken` / overlaps validation / `WikiLinkMarkdown.isWellFormedWholeLinkToken` require a whole `[[…]]` item.
   - `hasNewWikiLinkTexts` only sees `[[…]]`, so a new path-Markdown link does not flush the editor.
 
 ## Slices
@@ -60,11 +59,11 @@ Deleting a relationship whose YAML `source` is a resolvable path-Markdown token 
 ### 4. An overlaps list item written as path Markdown is the same wiki link
 
 - **Type:** Behavior
-- **Status:** planned
+- **Status:** done
 
-**Pre:** `overlaps` contains `[Title](/Folder/Title.md)` as a whole list item. **Trigger:** view the property / accidental-match overlap check. **Post:** the item is a live or dead wiki-equivalent link; it counts as an authored overlap (same as `[[Folder/Title]]`).
+A whole overlaps list item `[Title](/Folder/Title.md)` is a live or dead wiki-equivalent link and counts as an authored overlap (no conversion). `parseWholeWikiLinkItem` / `isWellFormedWholeWikiLinkItem` live in `authoredLinkMarkup`; backend `WikiLinkMarkdown.isWellFormedWholeLinkToken` accepts the same whole path token. `WikiLinkToken` resolves via `noteIdForAuthoredToken`. Deleted leftover `wholeWikiLinkItem.ts`.
 
-`parseWholeWikiLinkItem` / `isWellFormedWholeLinkToken` accept a whole path-Markdown token. `WikiLinkToken` and overlaps validation/index use that. Reuse `authoredLinkMarkup` / `noteIdForAuthoredToken`. No conversion of stored items.
+**Learning:** whole-item parse is part of the frontend token API (`authoredLinkMarkup`), not a second module. Slice 5 still needs `hasNewWikiLinkTexts` to walk `authoredLinkOccurrences`.
 
 ### 5. A newly typed path-Markdown link flushes like a wiki link
 

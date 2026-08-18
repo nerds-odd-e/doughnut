@@ -25,6 +25,20 @@ class WikiLinkMarkdownTest {
   }
 
   @Test
+  void isWellFormedWholeLinkToken_acceptsPathMarkdown() {
+    assertThat(
+        WikiLinkMarkdown.isWellFormedWholeLinkToken("[Title](/Folder/Title.md)"), equalTo(true));
+  }
+
+  @Test
+  void isWellFormedWholeLinkToken_rejectsBarePathAndMixedJunk() {
+    assertThat(WikiLinkMarkdown.isWellFormedWholeLinkToken("/Folder/Title.md"), equalTo(false));
+    assertThat(
+        WikiLinkMarkdown.isWellFormedWholeLinkToken("[Title](/Folder/Title.md) extra"),
+        equalTo(false));
+  }
+
+  @Test
   void splitAuthoredToken_readsPathMarkdownHrefAsTarget() {
     WikiLinkMarkdown.WikiInnerSplit s =
         WikiLinkMarkdown.splitAuthoredToken("[label](/Folder/Title.md)");

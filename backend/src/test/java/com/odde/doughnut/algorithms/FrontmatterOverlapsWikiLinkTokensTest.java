@@ -53,6 +53,20 @@ class FrontmatterOverlapsWikiLinkTokensTest {
   }
 
   @Test
+  void overlapWikiLinkTokens_returnsPathMarkdownWholeItemUnconverted() {
+    Frontmatter fm =
+        Frontmatter.parse(
+            """
+            overlaps:
+              - "[Title](/Folder/Title.md)"
+            """);
+
+    assertThat(
+        FrontmatterOverlaps.overlapWikiLinkTokensFromFrontmatter(fm),
+        equalTo(List.of("[Title](/Folder/Title.md)")));
+  }
+
+  @Test
   void overlapWikiLinkTokensFromNoteContent_reads_overlaps_only() {
     String content =
         """

@@ -76,10 +76,13 @@ public final class WikiLinkMarkdown {
   }
 
   /**
-   * True when {@code trimmed} is exactly one well-formed {@code [[target]]} or {@code
-   * [[target|display]]} token with a non-empty target.
+   * True when {@code trimmed} is exactly one well-formed {@code [[target]]}, {@code
+   * [[target|display]]}, or path Markdown {@code [display](/href)} token with a non-empty target.
    */
   public static boolean isWellFormedWholeLinkToken(String trimmed) {
+    if (tryParsePathMarkdownToken(trimmed).isPresent()) {
+      return true;
+    }
     Matcher matcher = INNER_LINK_PATTERN.matcher(trimmed);
     if (!matcher.matches()) {
       return false;

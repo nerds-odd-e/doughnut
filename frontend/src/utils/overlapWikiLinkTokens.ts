@@ -7,7 +7,7 @@ import {
   isListPropertyValue,
   type NoteProperties,
 } from "@/utils/noteProperties"
-import { isWellFormedWholeWikiLinkItem } from "@/utils/wholeWikiLinkItem"
+import { isWellFormedWholeWikiLinkItem } from "@/utils/authoredLinkMarkup"
 
 function overlapWikiLinkTokensFromProperties(
   properties: NoteProperties

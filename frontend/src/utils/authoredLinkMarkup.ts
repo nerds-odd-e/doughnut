@@ -56,6 +56,29 @@ export function splitAuthoredToken(authored: string): {
   return splitWikiLinkInner(authored)
 }
 
+/**
+ * Whole-item wiki link — `[[…]]` or path Markdown `[display](/href)`.
+ * Mirrors WikiLinkMarkdown.isWellFormedWholeLinkToken.
+ */
+export function parseWholeWikiLinkItem(
+  trimmed: string
+): { inner: string; target: string; display: string } | undefined {
+  if (tryParsePathMarkdownToken(trimmed)) {
+    return { inner: trimmed, ...splitAuthoredToken(trimmed) }
+  }
+  const match = INNER_LINK_PATTERN.exec(trimmed)
+  if (!match || match[0] !== trimmed) return
+  const inner = match[1]!.trim()
+  if (inner === "") return
+  const { target, display } = splitAuthoredToken(inner)
+  if (target.trim() === "") return
+  return { inner, target, display }
+}
+
+export function isWellFormedWholeWikiLinkItem(trimmed: string): boolean {
+  return parseWholeWikiLinkItem(trimmed) !== undefined
+}
+
 /** Builds API-shaped {@link WikiTitle} for tests and local fixtures from an authored token + note id. */
 export function wikiTitleFromAuthoredToken(
   authored: string,
