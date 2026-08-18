@@ -69,6 +69,7 @@ export function mountMemoryTrackerPageView(
 ) {
   return helper
     .component(MemoryTrackerPageView)
+    .withRouter()
     .withProps({
       recallPrompts,
       recallLogs,
