@@ -34,17 +34,9 @@ Removed leftover first-Again pins. `firstScoreZeroOrOneOnNewPersistsD0Again` is 
 ### 2. Hard backfill does not select Again-only New
 
 - **Type:** Behavior
-- **Status:** planned
+- **Status:** done
 
-**Pre:** still-New tracker (`S = 0`, D unset) with only an `AGAIN` RecallLog.  
-**Trigger:** `StillNewFirstRatingBackfill.runHard(..., "1=1")`.  
-**Post:** tracker still New (`S = 0`, D unset, due unchanged).
-
-Missing negative: `runAgain` already pins SHRINK-only stays New; `runHard` does not pin Again-only stays New. If `runHard` ever selected all still-New rows, slice 8’s unmigrated Again corpus would be first-rated Hard.
-
-One delta in `StillNewFirstRatingBackfillTest` (no new class). `runHard_leavesAgainAlreadyMigratedTrackersUnchanged` stays the `S > 0` case.
-
-**Done when:** that pin passes; SHRINK-positive and Again-already-migrated pins unchanged.
+`runHard_leavesAgainOnlyTrackersNew` pins Again-only New stays New. Production `runHard` already selects SHRINK only — missing pin, not a selection bug.
 
 ### 3. Tutor 2 on New first-rates at the outcome map, not inside shrink
 

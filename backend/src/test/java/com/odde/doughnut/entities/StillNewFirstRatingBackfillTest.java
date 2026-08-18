@@ -107,6 +107,16 @@ class StillNewFirstRatingBackfillTest {
   }
 
   @Test
+  void runHard_leavesAgainOnlyTrackersNew() throws Exception {
+    MemoryTracker againOnly =
+        stillNewWith(ProductOutcome.AGAIN, makeMe.aTimestamp().of(1, 0).please());
+
+    runHard("1=1");
+
+    assertStillNew(againOnly.getId(), againOnly.getLastRecalledAt());
+  }
+
+  @Test
   void runHard_leavesAgainAlreadyMigratedTrackersUnchanged() throws Exception {
     MemoryTracker tracker =
         stillNewWith(ProductOutcome.AGAIN, makeMe.aTimestamp().of(1, 0).please());
