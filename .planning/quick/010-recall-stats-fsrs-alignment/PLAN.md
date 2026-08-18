@@ -1,6 +1,6 @@
 # Recall-stats FSRS alignment — cleanup + Requested-retention adoption
 
-**Status:** in progress (slices 1–2 done)
+**Status:** in progress (slices 1–3 done)
 **Scope:** everything surfaced by the FSRS-compatibility-gap analysis of recall
 stats (chat 2026-08-18), refined into small-commit-size slices: one
 correctness bug (1), one Requested-retention adoption arc (2 docs → 3 code),
@@ -80,20 +80,12 @@ Full analysis is in the chat transcript, not duplicated here. Short version:
 - **Trigger:** the user opens the recall-stats "Retention %" heatmap.
 - **Post-condition:** cell color is anchored at the product's actual
   Requested Retention (90%), not an arbitrary UI-chosen 85% — a cell at 87%
-  now renders red-leaning (below target) instead of green-leaning.
-- **Files:**
-  - `frontend/src/components/recallStats/WeekdayHourHeatmap.vue` — rename
-    `RETENTION_TARGET_PCT` value `85` → `90`; update the adjacent comment to
-    reference `Fsrs.REQUESTED_RETENTION` / ADR 0003 as the source of truth
-    instead of "real-world retention clusters in the 85-92% band."
-  - `frontend/tests/components/recallStats/recallStatsTheme.spec.ts` —
-    update the retention-heatmap test's description ("anchored at 85%") and
-    inline comments ("above/below 85% target") to 90%. Existing 100/90/80/60
-    sample data still exercises both sides of a 90% anchor (90% lands as the
-    lightest green level, not "mild green above the target" — reword
-    accordingly); assertions (distinct shades, hue direction) are expected to
-    keep passing unchanged — confirm, don't assume.
-- **Status:** planned
+  now renders red-leaning (below requested retention) instead of green-leaning.
+- **Status:** done
+- **Learning:** constant is `REQUESTED_RETENTION_PCT` (not "target"). 87% is
+  red-leaning. With hinge 90 and span 15, 100% maps to `rs-hm-r3` (green
+  `r4` is unreachable); red `bad4` still reachable. Dual 90 vs backend 0.9
+  literals kept per plan (no API field).
 
 ### 4. Cleanup: drop unread retention-count fields from `DayRetention` (Structure)
 

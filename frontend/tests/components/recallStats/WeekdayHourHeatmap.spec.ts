@@ -49,7 +49,7 @@ describe("WeekdayHourHeatmap", () => {
         c.attributes("data-hour") === "10"
     )
     expect(high).toBeDefined()
-    expect(high!.classes()).toContain("rs-hm-r4")
+    expect(high!.classes()).toContain("rs-hm-r3")
 
     const insufficient = cells.find(
       (c) =>

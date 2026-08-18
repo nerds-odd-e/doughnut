@@ -65,7 +65,9 @@ const cellSize = 16
 const leftGutter = 28
 const topGutter = 16
 const bottomGutter = 16
-const RETENTION_TARGET_PCT = 85
+// Requested retention as percent (Fsrs.REQUESTED_RETENTION, ADR 0003)
+const REQUESTED_RETENTION_PCT = 90
+// Band around the hinge; a 0–100 linear scale collapses typical days into one bucket
 const RETENTION_GRANULARITY_SPAN = 15
 
 const cells: { wd: number; hr: number }[] = []
@@ -112,16 +114,13 @@ const cellClass = (wd: number, hr: number) => {
   const answered = countAt(wd, hr)
   if (answered < 3) return "rs-hm-insufficient"
   const pct = retentionPct(wd, hr)
-  // Anchored at the RETENTION_TARGET_PCT threshold rather than a plain 0-100%
-  // scale: real-world retention clusters tightly in the 85-92% band, so a
-  // linear 0-100 scale renders nearly every day as the same top-bucket color.
-  if (pct >= RETENTION_TARGET_PCT) {
+  if (pct >= REQUESTED_RETENTION_PCT) {
     const level = Math.min(
       4,
       Math.max(
         1,
         Math.ceil(
-          ((pct - RETENTION_TARGET_PCT) / RETENTION_GRANULARITY_SPAN) * 4
+          ((pct - REQUESTED_RETENTION_PCT) / RETENTION_GRANULARITY_SPAN) * 4
         )
       )
     )
@@ -131,7 +130,9 @@ const cellClass = (wd: number, hr: number) => {
     4,
     Math.max(
       1,
-      Math.ceil(((RETENTION_TARGET_PCT - pct) / RETENTION_GRANULARITY_SPAN) * 4)
+      Math.ceil(
+        ((REQUESTED_RETENTION_PCT - pct) / RETENTION_GRANULARITY_SPAN) * 4
+      )
     )
   )
   return `rs-hm-bad${level}`

@@ -100,17 +100,19 @@ describe("recall stats charts use theme tokens (dark-mode safe)", () => {
     expect(fillOf(filled.element)).not.toBe(OLD_DARK_GREEN)
   })
 
-  it("retention heatmap uses a red/green scale anchored at 85%, with granularity within each side", () => {
+  it("retention heatmap uses a red/green scale anchored at requested retention (90%), with granularity within each side", () => {
     const answered = emptyGrid()
     const correct = emptyGrid()
     setCell(answered, 0, 0, 10)
     setCell(correct, 0, 0, 10) // 100% -> deep green
     setCell(answered, 1, 0, 10)
-    setCell(correct, 1, 0, 9) // 90% -> mild green (above 85% target)
+    setCell(correct, 1, 0, 9) // 90% -> lightest green (at requested retention)
     setCell(answered, 2, 0, 10)
-    setCell(correct, 2, 0, 8) // 80% -> mild red (below 85% target)
+    setCell(correct, 2, 0, 8) // 80% -> red-leaning (below requested retention)
     setCell(answered, 3, 0, 10)
     setCell(correct, 3, 0, 6) // 60% -> deep red
+    setCell(answered, 4, 0, 100)
+    setCell(correct, 4, 0, 87) // 87% -> red-leaning (below requested retention)
     const wrapper = helper
       .component(WeekdayHourHeatmap)
       .withProps({ mode: "retention", counts: answered, correct })
@@ -120,21 +122,23 @@ describe("recall stats charts use theme tokens (dark-mode safe)", () => {
     const byWeekday = (wd: number) =>
       cells.find((c) => c.attributes("data-weekday") === String(wd))!
     const deepGreen = byWeekday(0)
-    const mildGreen = byWeekday(1)
+    const lightestGreen = byWeekday(1)
     const mildRed = byWeekday(2)
     const deepRed = byWeekday(3)
+    const belowRequestedRetention = byWeekday(4)
 
     setTheme("light")
 
-    // granularity: cells on the same side of 85% still render distinct colors
-    expect(fillOf(deepGreen.element)).not.toBe(fillOf(mildGreen.element))
+    // granularity: cells on the same side of 90% still render distinct colors
+    expect(fillOf(deepGreen.element)).not.toBe(fillOf(lightestGreen.element))
     expect(fillOf(mildRed.element)).not.toBe(fillOf(deepRed.element))
 
-    // hue direction: >= 85% is greenish, < 85% is reddish
+    // hue direction: >= 90% is greenish, < 90% is reddish
     expect(hueOf(fillOf(deepGreen.element))).toBeGreaterThan(90)
-    expect(hueOf(fillOf(mildGreen.element))).toBeGreaterThan(90)
+    expect(hueOf(fillOf(lightestGreen.element))).toBeGreaterThan(90)
     expect(hueOf(fillOf(mildRed.element))).toBeLessThan(60)
     expect(hueOf(fillOf(deepRed.element))).toBeLessThan(60)
+    expect(hueOf(fillOf(belowRequestedRetention.element))).toBeLessThan(60)
   })
 
   it("AM/PM label and bars adapt to dark theme (readable)", () => {
