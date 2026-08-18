@@ -81,10 +81,24 @@ profile. Codec round-trips must be lossless for these rules.
 
 ### Links and attachments
 
-- Prefer standard Markdown path links compatible with OKF and Obsidian.
-- Wiki-style `[[…]]` may appear in author content; export/lint may rewrite or
-  report them per product rules, but the accepted canonical form for
-  inter-note links is path-based Markdown.
+- Doughnut-authored inter-note links stay wiki `[[target]]` /
+  `[[target|display]]`. Product insert stays wiki. Unqualified `[[Title]]` is
+  unchanged (lowest note id when titles collide across folders).
+  `Notebook:Title` is unchanged.
+- Path Markdown `[display](/folder/File.md)` is the same link as
+  `[[folder/File|display]]`. Leading `/` on Markdown hrefs is bundle-relative
+  (notebook root). Wiki path form has no leading `/`.
+- `.md` on a **path-shaped** target is optional and ignored (`/folder/File` =
+  `/folder/File.md`; `[[folder/File.md]]` = `[[folder/File]]`). Do not strip
+  `.md` from unqualified wiki titles (`[[File.md]]` can still mean a title).
+- Identity is **folder path + title**, not ZIP collision basenames
+  (`Recipe (2).md`).
+- No active conversion of stored `[[…]]` ↔ `[…](…)`, including save/paste
+  round-trip of path Markdown. ZIP export copies stored spelling. Wiki in
+  Doughnut ZIPs is a profile exception to OKF path-link preference, not a
+  rewrite job.
+- Both spellings share one resolved-link cache `(note, target_note,
+  link_text)`. No style column. No second cache.
 - Git-managed images/binaries are out of scope here (ADR 0002 Level 2). Until
   then, stored `image:` is authored frontmatter (today a host-relative
   attachment path). Export copies it. That is not a codec wrap.
@@ -107,9 +121,13 @@ profile. Codec round-trips must be lossless for these rules.
   renames is ADR 0002 lineage.
 - `title:` on the portable tree is codec wrap when the filename cannot
   round-trip; stored notes keep the title column.
+- Inter-note links are dual-spelling: Doughnut writes wiki; path Markdown
+  stays as authored. ZIP does not rewrite wiki to path Markdown.
 - Obsidian and OKF consumers can open a Doughnut notebook tree. Public
   identity in the files is the path, except a user-insisted concept
   `index.md` / `log.md`, which OKF tools may treat as a listing/log or reject.
+  Tools that do not resolve wiki links will not follow Doughnut-authored
+  `[[…]]` until they support both spellings.
 
 ## Pros
 
@@ -122,12 +140,15 @@ profile. Codec round-trips must be lossless for these rules.
   the portable tree; the title column stays the stored source of truth
   (same persist-vs-wrap split as Readme `type`).
 - Strict accept rules reject some free-form trees until fixed.
+- Wiki in Doughnut-authored trees is a profile exception to OKF path-link
+  preference.
 
 ## Related
 
 - Supersedes: (none)
 - Superseded by: (none)
 - Links:
+  - [ADR 0001 — Ubiquitous language](./0001-ubiquitous-language.md) (**Wiki link**)
   - [ADR 0002 — Git-native notebooks](./0002-git-native-notebooks-backed-by-mysql.md)
   - [Open Knowledge Format v0.2](https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/SPEC.md)
   - [Obsidian inline titles](https://obsidian.md/help/settings)
