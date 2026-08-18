@@ -1,6 +1,9 @@
 import TurndownService from "turndown"
 import { gfm } from "turndown-plugin-gfm"
-import { pathnameLooksLikeInternalNoteShow } from "@/routes/noteShowLocation"
+import {
+  hrefLooksLikeConceptNotePath,
+  pathnameLooksLikeInternalNoteShow,
+} from "@/routes/noteShowLocation"
 import {
   mergeConsecutiveHeaders,
   normalizeTableCells,
@@ -174,7 +177,14 @@ turndownService.addRule("doughnutWikiNoteLink", {
     return (node as HTMLElement).classList.contains(DOUGHNUT_WIKI_LINK_CLASS)
   },
   replacement(_content, node) {
-    return wikiAnchorToMarkdownToken(node as HTMLAnchorElement)
+    const el = node as HTMLAnchorElement
+    const href = el.getAttribute("href") ?? ""
+    if (hrefLooksLikeConceptNotePath(href)) {
+      const display =
+        el.getAttribute("data-wiki-display") || el.textContent?.trim() || ""
+      return `[${display}](${href})`
+    }
+    return wikiAnchorToMarkdownToken(el)
   },
 })
 

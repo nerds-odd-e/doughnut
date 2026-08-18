@@ -6,6 +6,7 @@ import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
 
 import com.odde.doughnut.controllers.dto.WikiTitle;
+import com.odde.doughnut.entities.Folder;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.NoteWikiTitleCache;
 import com.odde.doughnut.entities.User;
@@ -55,6 +56,24 @@ class WikiTitleCacheViewerQueriesTest {
     assertThat(titles, hasSize(2));
     assertThat(titles.get(0).getDisplayText(), equalTo("first label"));
     assertThat(titles.get(1).getDisplayText(), equalTo("second label"));
+  }
+
+  @Test
+  void path_markdown_wiki_title_keeps_authored_token_and_href_target() {
+    User user = makeMe.aUser().please();
+    Folder folder = makeMe.aFolder().notebookOwnedBy(user).name("Folder").please();
+    Note target = makeMe.aNote().title("Title").folder(folder).please();
+    Note carrier =
+        makeMe.aNote().notebook(folder.getNotebook()).content("[label](/Folder/Title.md)").please();
+
+    wikiTitleCacheService.refreshForNote(carrier, user);
+
+    List<WikiTitle> titles = wikiTitleCacheService.wikiTitlesForViewer(carrier, user);
+    assertThat(titles, hasSize(1));
+    assertThat(titles.get(0).getLinkText(), equalTo("[label](/Folder/Title.md)"));
+    assertThat(titles.get(0).getTargetToken(), equalTo("/Folder/Title.md"));
+    assertThat(titles.get(0).getDisplayText(), equalTo("label"));
+    assertThat(titles.get(0).getNoteId(), equalTo(target.getId()));
   }
 
   @Test

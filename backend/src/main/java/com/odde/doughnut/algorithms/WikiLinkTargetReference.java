@@ -12,7 +12,7 @@ public record WikiLinkTargetReference(String notebookName, String noteTitle) {
    * Notebook:Title}; unqualified links use {@code focusNotebookName} as the notebook.
    */
   public static Optional<WikiLinkTargetReference> forToken(String token, String focusNotebookName) {
-    String resolutionKey = WikiLinkMarkdown.splitInner(token).target();
+    String resolutionKey = WikiLinkMarkdown.splitAuthoredToken(token).target();
     if (resolutionKey == null || resolutionKey.isBlank()) {
       return Optional.empty();
     }
@@ -48,12 +48,17 @@ public record WikiLinkTargetReference(String notebookName, String noteTitle) {
   }
 
   /**
-   * Folder names then title for a path-shaped target ({@code Folder/Title}). Optional trailing
-   * {@code .md} on the last segment is ignored. Unqualified titles are not path-shaped.
+   * Folder names then title for a path-shaped target ({@code Folder/Title}, or Markdown {@code
+   * /Title} at notebook root). Optional trailing {@code .md} on the last segment is ignored.
+   * Unqualified titles without a leading {@code /} are not path-shaped.
    */
   public record PathShapedTarget(List<String> folderNames, String title) {
     public static Optional<PathShapedTarget> tryParse(String noteTitle) {
-      if (noteTitle == null || noteTitle.contains(":") || !noteTitle.contains("/")) {
+      if (noteTitle == null || noteTitle.contains(":")) {
+        return Optional.empty();
+      }
+      boolean leadingSlash = noteTitle.startsWith("/");
+      if (!leadingSlash && !noteTitle.contains("/")) {
         return Optional.empty();
       }
       List<String> segments = new ArrayList<>();
@@ -63,7 +68,10 @@ public record WikiLinkTargetReference(String notebookName, String noteTitle) {
           segments.add(segment);
         }
       }
-      if (segments.size() < 2) {
+      if (segments.isEmpty()) {
+        return Optional.empty();
+      }
+      if (segments.size() < 2 && !leadingSlash) {
         return Optional.empty();
       }
       String last = segments.getLast();
@@ -71,8 +79,9 @@ public record WikiLinkTargetReference(String notebookName, String noteTitle) {
       if (title.isEmpty()) {
         return Optional.empty();
       }
-      return Optional.of(
-          new PathShapedTarget(List.copyOf(segments.subList(0, segments.size() - 1)), title));
+      List<String> folderNames =
+          segments.size() == 1 ? List.of() : List.copyOf(segments.subList(0, segments.size() - 1));
+      return Optional.of(new PathShapedTarget(folderNames, title));
     }
 
     String withNoteTitle(String newTitle) {

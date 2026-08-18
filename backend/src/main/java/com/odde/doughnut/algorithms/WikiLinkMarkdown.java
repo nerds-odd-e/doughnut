@@ -1,25 +1,53 @@
 package com.odde.doughnut.algorithms;
 
-import com.odde.doughnut.validators.DisplayNamePathSeparators;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
-import java.util.function.UnaryOperator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Double-bracket {@code [[wikilink]]} inner titles in markdown text (occurrence order, no dedupe).
+ * Inter-note link tokens in markdown: wiki {@code [[inner]]} titles and path Markdown {@code
+ * [display](/folder/File.md)} (occurrence order, no dedupe).
  */
 public final class WikiLinkMarkdown {
 
   public static final Pattern INNER_LINK_PATTERN = Pattern.compile("\\[\\[([^\\]]+)]]");
 
   /**
-   * Target and display segments of {@code [[inner]]} (first {@code |} separates; mirrors frontend).
+   * Notebook-relative Markdown path link {@code [display](/folder/File.md)} (leading {@code /},
+   * optional {@code .md}).
+   */
+  private static final Pattern PATH_MARKDOWN_LINK_PATTERN =
+      Pattern.compile("\\[([^\\[\\]]*)\\]\\((/[^)\\s]+)\\)");
+
+  /**
+   * Target and display segments of an authored inter-note token (first {@code |} separates wiki
+   * inners; Markdown path links use display text and href).
    */
   public record WikiInnerSplit(String target, String display) {}
 
   private WikiLinkMarkdown() {}
+
+  /**
+   * Target and display of an authored inter-note token: Markdown path link {@code [display](/href)}
+   * or wiki inner ({@link #splitInner}).
+   */
+  public static WikiInnerSplit splitAuthoredToken(String authored) {
+    if (authored == null || authored.isEmpty()) {
+      return new WikiInnerSplit("", "");
+    }
+    Matcher markdown = PATH_MARKDOWN_LINK_PATTERN.matcher(authored.trim());
+    if (markdown.matches() && isConceptPathHref(markdown.group(2))) {
+      String display = markdown.group(1);
+      String href = markdown.group(2);
+      if (display.trim().isEmpty()) {
+        display = href;
+      }
+      return new WikiInnerSplit(href, display);
+    }
+    return splitInner(authored);
+  }
 
   /**
    * Splits wiki link inner text on the first {@code |}. Empty right-hand side is treated as no pipe
@@ -57,163 +85,49 @@ public final class WikiLinkMarkdown {
     return !splitInner(inner).target().trim().isEmpty();
   }
 
-  public static List<String> innerTitlesInOccurrenceOrder(String markdown) {
+  public static List<String> authoredTokensInOccurrenceOrder(String markdown) {
     if (markdown == null || markdown.isEmpty()) {
       return List.of();
     }
-    List<String> titles = new ArrayList<>();
-    Matcher matcher = INNER_LINK_PATTERN.matcher(markdown);
-    while (matcher.find()) {
-      String t = matcher.group(1).trim();
+    record Hit(int start, String token) {}
+    List<Hit> hits = new ArrayList<>();
+    Matcher wiki = INNER_LINK_PATTERN.matcher(markdown);
+    while (wiki.find()) {
+      String t = wiki.group(1).trim();
       if (!t.isEmpty()) {
-        titles.add(t);
+        hits.add(new Hit(wiki.start(), t));
       }
     }
-    return titles;
-  }
-
-  public static String newInnerForUpdateVisibleText(String storedLinkInner, String newNoteTitle) {
-    return newInnerWithHandling(storedLinkInner, newNoteTitle, false);
-  }
-
-  public static String newInnerForKeepVisibleText(String storedLinkInner, String newNoteTitle) {
-    return newInnerWithHandling(storedLinkInner, newNoteTitle, true);
-  }
-
-  /**
-   * Rewrites the notebook prefix of a wiki link while preserving the note title and visible display
-   * text. Used when a note is moved to a different notebook.
-   *
-   * <ul>
-   *   <li>{@code [[X]]} → {@code [[NewNb:X|X]]}
-   *   <li>{@code [[OldNb:X]]} → {@code [[NewNb:X|OldNb:X]]}
-   *   <li>{@code [[OldNb:X|custom]]} → {@code [[NewNb:X|custom]]}
-   * </ul>
-   */
-  public static String newInnerForKeepNotebookMove(String storedLinkInner, String newNotebookName) {
-    if (newNotebookName == null) {
-      throw new IllegalArgumentException("newNotebookName");
-    }
-    if (storedLinkInner == null || storedLinkInner.isEmpty()) {
-      return storedLinkInner;
-    }
-    return keepVisibleInner(
-        storedLinkInner,
-        rawTargetToken ->
-            WikiLinkTargetReference.replaceNotebookName(rawTargetToken, newNotebookName));
-  }
-
-  /**
-   * Qualifies an unqualified outgoing wiki-link inner with the source notebook while preserving the
-   * text currently visible to readers. Already-qualified inners are left untouched.
-   */
-  public static String newInnerForQualifyUnqualifiedOutgoingLink(
-      String storedLinkInner, String sourceNotebookName) {
-    if (sourceNotebookName == null) {
-      throw new IllegalArgumentException("sourceNotebookName");
-    }
-    if (storedLinkInner == null || storedLinkInner.isEmpty()) {
-      return storedLinkInner;
-    }
-    int pipeIdx = storedLinkInner.indexOf('|');
-    String rawTargetPart = pipeIdx == -1 ? storedLinkInner : storedLinkInner.substring(0, pipeIdx);
-    String targetToken = rawTargetPart.trim();
-    if (targetToken.isEmpty() || WikiLinkTargetReference.isQualifiedToken(targetToken)) {
-      return storedLinkInner;
-    }
-    return keepVisibleInner(
-        storedLinkInner, rawTargetToken -> sourceNotebookName + ":" + rawTargetToken);
-  }
-
-  private static String newInnerWithHandling(
-      String storedLinkInner, String newNoteTitle, boolean keepVisibleText) {
-    if (newNoteTitle == null) {
-      throw new IllegalArgumentException("newNoteTitle");
-    }
-    if (storedLinkInner == null || storedLinkInner.isEmpty()) {
-      return newNoteTitle;
-    }
-    int pipeIdx = storedLinkInner.indexOf('|');
-    String rawTargetPart = pipeIdx == -1 ? storedLinkInner : storedLinkInner.substring(0, pipeIdx);
-    String newTargetToken =
-        WikiLinkTargetReference.replaceNoteTitle(rawTargetPart.trim(), newNoteTitle.trim());
-    if (pipeIdx == -1) {
-      return keepVisibleText ? newTargetToken + "|" + storedLinkInner.trim() : newTargetToken;
-    }
-    String rawDisplay = storedLinkInner.substring(pipeIdx + 1);
-    if (rawDisplay.trim().isEmpty()) {
-      return keepVisibleText ? newTargetToken + "|" + rawTargetPart.trim() : newTargetToken;
-    }
-    return newTargetToken + "|" + rawDisplay;
-  }
-
-  /**
-   * Shared keep-visible-text branching: replaces the target token using the given transform and
-   * always preserves whatever text readers currently see.
-   */
-  private static String keepVisibleInner(
-      String storedLinkInner, UnaryOperator<String> targetTokenTransform) {
-    int pipeIdx = storedLinkInner.indexOf('|');
-    String rawTargetPart = pipeIdx == -1 ? storedLinkInner : storedLinkInner.substring(0, pipeIdx);
-    String newTargetToken = targetTokenTransform.apply(rawTargetPart.trim());
-    if (pipeIdx == -1) {
-      return newTargetToken + "|" + storedLinkInner.trim();
-    }
-    String rawDisplay = storedLinkInner.substring(pipeIdx + 1);
-    if (rawDisplay.trim().isEmpty()) {
-      return newTargetToken + "|" + rawTargetPart.trim();
-    }
-    return newTargetToken + "|" + rawDisplay;
-  }
-
-  public static String sanitizePathSeparatorsInWikiLinks(String markdown) {
-    if (markdown == null || markdown.isEmpty()) {
-      return markdown;
-    }
-    Matcher matcher = INNER_LINK_PATTERN.matcher(markdown);
-    StringBuilder out = new StringBuilder();
-    int last = 0;
-    while (matcher.find()) {
-      out.append(markdown, last, matcher.start());
-      String rawInner = matcher.group(1);
-      int pipeIdx = rawInner.indexOf('|');
-      String rawTarget = pipeIdx == -1 ? rawInner : rawInner.substring(0, pipeIdx);
-      String sanitizedTarget =
-          DisplayNamePathSeparators.toFullwidthPathSeparatorsInWikiLinkTarget(rawTarget.trim());
-      if (pipeIdx == -1) {
-        out.append("[[").append(sanitizedTarget).append("]]");
-      } else {
-        out.append("[[")
-            .append(sanitizedTarget)
-            .append("|")
-            .append(rawInner.substring(pipeIdx + 1))
-            .append("]]");
+    Matcher pathMarkdown = PATH_MARKDOWN_LINK_PATTERN.matcher(markdown);
+    while (pathMarkdown.find()) {
+      if (pathMarkdown.start() > 0 && markdown.charAt(pathMarkdown.start() - 1) == '!') {
+        continue;
       }
-      last = matcher.end();
+      String href = pathMarkdown.group(2);
+      if (!isConceptPathHref(href)) {
+        continue;
+      }
+      hits.add(new Hit(pathMarkdown.start(), pathMarkdown.group(0)));
     }
-    out.append(markdown.substring(last));
-    return out.toString();
+    hits.sort(Comparator.comparingInt(Hit::start));
+    return hits.stream().map(Hit::token).toList();
   }
 
-  public static String replaceWikiLinksMatchingTrimmedInner(
-      String markdown, String oldInnerTrimmed, String newInner) {
-    if (markdown == null || markdown.isEmpty()) {
-      return markdown;
+  private static boolean isConceptPathHref(String href) {
+    if (href == null || !href.startsWith("/") || href.startsWith("//")) {
+      return false;
     }
-    Matcher matcher = INNER_LINK_PATTERN.matcher(markdown);
-    StringBuilder out = new StringBuilder();
-    int last = 0;
-    while (matcher.find()) {
-      out.append(markdown, last, matcher.start());
-      String innerTrimmed = matcher.group(1).trim();
-      if (innerTrimmed.equals(oldInnerTrimmed)) {
-        out.append("[[").append(newInner).append("]]");
-      } else {
-        out.append(matcher.group(0));
-      }
-      last = matcher.end();
+    String path = href;
+    int query = path.indexOf('?');
+    if (query >= 0) {
+      path = path.substring(0, query);
     }
-    out.append(markdown.substring(last));
-    return out.toString();
+    int hash = path.indexOf('#');
+    if (hash >= 0) {
+      path = path.substring(0, hash);
+    }
+    return !path.matches("/d/n/\\d+(/.*)?")
+        && !path.matches("/n/\\d+(/.*)?")
+        && !path.matches("/n\\d+");
   }
 }

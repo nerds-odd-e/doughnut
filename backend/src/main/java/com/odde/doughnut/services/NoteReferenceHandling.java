@@ -152,7 +152,7 @@ final class NoteReferenceHandling {
 
   private Optional<Note> resolveRelationshipSourceNote(
       Note relationNote, String sourceScalar, User viewer) {
-    List<String> linkTokens = WikiLinkMarkdown.innerTitlesInOccurrenceOrder(sourceScalar);
+    List<String> linkTokens = WikiLinkMarkdown.authoredTokensInOccurrenceOrder(sourceScalar);
     if (linkTokens.isEmpty()) {
       return Optional.empty();
     }

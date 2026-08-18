@@ -75,6 +75,42 @@ class WikiTitleCacheTitleResolutionTest {
   }
 
   @ParameterizedTest
+  @ValueSource(strings = {"[label](/Pantry/Dup.md)", "[label](/Pantry/Dup)"})
+  void path_markdown_link_resolves_to_the_note_in_that_folder(String content) {
+    User user = makeMe.aUser().please();
+    Folder recipes = makeMe.aFolder().notebookOwnedBy(user).name("Recipes").please();
+    Notebook notebook = recipes.getNotebook();
+    Folder pantry = makeMe.aFolder().notebook(notebook).name("Pantry").please();
+    makeMe.aNote().title("Dup").folder(recipes).please();
+    Note pantryDup = makeMe.aNote().title("Dup").folder(pantry).please();
+    Note carrier = makeMe.aNote().notebook(notebook).content(content).please();
+
+    wikiTitleCacheService.refreshForNote(carrier, user);
+
+    List<NoteWikiTitleCache> rows = cacheRows(carrier);
+    assertThat(rows, hasSize(1));
+    assertThat(rows.get(0).getLinkText(), equalTo(content));
+    assertThat(rows.get(0).getTargetNote().getId(), equalTo(pantryDup.getId()));
+  }
+
+  @Test
+  void root_path_markdown_link_resolves_to_the_notebook_root_note() {
+    User user = makeMe.aUser().please();
+    Folder folder = makeMe.aFolder().notebookOwnedBy(user).name("Pantry").please();
+    makeMe.aNote().title("Title").folder(folder).please();
+    Note root = makeMe.aNote().title("Title").notebook(folder.getNotebook()).please();
+    Note carrier =
+        makeMe.aNote().notebook(folder.getNotebook()).content("[label](/Title.md)").please();
+
+    wikiTitleCacheService.refreshForNote(carrier, user);
+
+    List<NoteWikiTitleCache> rows = cacheRows(carrier);
+    assertThat(rows, hasSize(1));
+    assertThat(rows.get(0).getLinkText(), equalTo("[label](/Title.md)"));
+    assertThat(rows.get(0).getTargetNote().getId(), equalTo(root.getId()));
+  }
+
+  @ParameterizedTest
   @ValueSource(strings = {"[[Pantry/Dup]]", "[[Pantry/Dup.md]]", "[[Pantry/Dup|label]]"})
   void folder_path_link_resolves_to_the_note_in_that_folder(String content) {
     User user = makeMe.aUser().please();

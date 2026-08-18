@@ -59,4 +59,32 @@ describe("NoteTextContent wiki link display", () => {
     expect(live.getAttribute("href")).toBe(`/n${targetNote.id}`)
     expect(live.getAttribute("data-wiki-title")).toBe("Target Title")
   })
+
+  it("shows a path markdown link as a live wiki-style link to the note", async () => {
+    const targetNote = makeMe.aNote.title("Title").please()
+    wrapper = mountNoteTextContent(
+      makeMe.aNote.content("See [label](/Folder/Title.md).").please(),
+      {
+        readonly: true,
+        wikiTitles: [
+          {
+            linkText: "[label](/Folder/Title.md)",
+            targetToken: "/Folder/Title.md",
+            displayText: "label",
+            noteId: targetNote.id!,
+          },
+        ],
+      }
+    )
+    await flushPromises()
+    await vi.waitUntil(() =>
+      document.querySelector(".ql-editor a.doughnut-wiki-link")
+    )
+    const live = document.querySelector(
+      ".ql-editor a.doughnut-wiki-link"
+    ) as HTMLAnchorElement
+    expect(live.textContent).toContain("label")
+    expect(live.getAttribute("href")).toBe("/Folder/Title.md")
+    expect(live.getAttribute("data-note-id")).toBe(String(targetNote.id))
+  })
 })

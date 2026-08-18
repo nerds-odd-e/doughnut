@@ -40,6 +40,21 @@ describe("replaceWikiLinksInHtml", () => {
     )
   })
 
+  it("upgrades path markdown anchors to live wiki-style links without rewriting href", () => {
+    expect(
+      replaceWikiLinksInHtml('<p><a href="/Folder/Title.md">label</a></p>', [
+        {
+          linkText: "[label](/Folder/Title.md)",
+          targetToken: "/Folder/Title.md",
+          displayText: "label",
+          noteId: 42,
+        },
+      ])
+    ).toBe(
+      '<p><a href="/Folder/Title.md" class="doughnut-wiki-link" data-wiki-title="/Folder/Title.md" data-wiki-display="label" data-note-id="42">label</a></p>'
+    )
+  })
+
   it("preserves Quill hr markup without rewriting through DOMParser", () => {
     const quillHr = "<p><hr></p>"
     expect(replaceWikiLinksInHtml(quillHr, [])).toBe(quillHr)

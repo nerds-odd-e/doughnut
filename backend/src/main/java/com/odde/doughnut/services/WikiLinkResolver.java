@@ -103,7 +103,7 @@ public class WikiLinkResolver {
     if (content == null || content.isBlank()) {
       return List.of();
     }
-    List<String> linkTitlesOrdered = NoteContentMarkdown.wikiLinkInnersInOccurrenceOrder(content);
+    List<String> linkTitlesOrdered = NoteContentMarkdown.authoredTokensInOccurrenceOrder(content);
     if (linkTitlesOrdered.isEmpty()) {
       return List.of();
     }
@@ -126,7 +126,7 @@ public class WikiLinkResolver {
     if (content == null || content.isBlank()) {
       return List.of();
     }
-    List<String> linkTitlesOrdered = NoteContentMarkdown.wikiLinkInnersInOccurrenceOrder(content);
+    List<String> linkTitlesOrdered = NoteContentMarkdown.authoredTokensInOccurrenceOrder(content);
     if (linkTitlesOrdered.isEmpty()) {
       return List.of();
     }

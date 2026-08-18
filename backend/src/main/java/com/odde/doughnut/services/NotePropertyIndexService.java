@@ -100,7 +100,7 @@ public class NotePropertyIndexService {
     if (value == null || value.isBlank()) {
       return Optional.empty();
     }
-    List<String> linkTokens = WikiLinkMarkdown.innerTitlesInOccurrenceOrder(value);
+    List<String> linkTokens = WikiLinkMarkdown.authoredTokensInOccurrenceOrder(value);
     if (linkTokens.isEmpty()) {
       return Optional.empty();
     }

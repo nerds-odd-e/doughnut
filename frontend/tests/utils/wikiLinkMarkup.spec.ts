@@ -28,6 +28,28 @@ describe("wikiLinkMarkup utils", () => {
     expect(payload).toEqual({ targetToken: "Ghost", displayText: "Ghost" })
   })
 
+  it("handleRichContentAnchorClick navigates path markdown wiki links via data-note-id", () => {
+    const anchor = document.createElement("a")
+    anchor.className = "doughnut-wiki-link"
+    anchor.setAttribute("href", "/Folder/Title.md")
+    anchor.setAttribute("data-note-id", "42")
+    anchor.textContent = "label"
+    let navigated: string | undefined
+    handleRichContentAnchorClick(
+      anchor,
+      {
+        onDeadWikiLink: () => {
+          throw new Error("should not treat as dead")
+        },
+        navigateInApp: (href) => {
+          navigated = href
+        },
+      },
+      { deadWikiLinksEnabled: true }
+    )
+    expect(navigated).toBe("/n42")
+  })
+
   it("markdownWikiTokenFromDeadWikiLinkPayload matches simple and piped stored tokens", () => {
     expect(
       markdownWikiTokenFromDeadWikiLinkPayload({

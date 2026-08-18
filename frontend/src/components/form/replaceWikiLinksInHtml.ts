@@ -7,6 +7,7 @@ import {
 import {
   escapeHtmlAttributeValue,
   escapeHtmlForWikiLinkDisplay,
+  isPathMarkdownWikiTitle,
   isValidWikiLinkInner,
   splitWikiLinkInner,
   wikiTitleParts,
@@ -74,12 +75,32 @@ function deadWikiAnchorHtmlFromInner(innerRaw: string): string {
   return `<a href="#" class="${DEAD_WIKI_LINK_CLASS}" data-wiki-title="${attrTarget}"${displayAttr}>${escapeHtmlForWikiLinkDisplay(display)}</a>`
 }
 
+function upgradePathMarkdownAnchors(
+  html: string,
+  wikiTitles: WikiTitle[]
+): string {
+  let result = html
+  for (const w of wikiTitles) {
+    if (!isPathMarkdownWikiTitle(w)) continue
+    const { target, display } = wikiTitleParts(w)
+    const attrTarget = escapeHtmlAttributeValue(target)
+    const displayAttr =
+      display !== target
+        ? ` data-wiki-display="${escapeHtmlAttributeValue(display)}"`
+        : ""
+    const live = `<a href="${attrTarget}" class="${DOUGHNUT_WIKI_LINK_CLASS}" data-wiki-title="${attrTarget}"${displayAttr} data-note-id="${w.noteId}">${escapeHtmlForWikiLinkDisplay(display)}</a>`
+    result = result.replaceAll(`<a href="${attrTarget}">${display}</a>`, live)
+  }
+  return result
+}
+
 export function replaceWikiLinksInHtml(
   html: string,
   wikiTitles: WikiTitle[]
 ): string {
   let result = html
   wikiTitles.forEach((w) => {
+    if (isPathMarkdownWikiTitle(w)) return
     const { target, display, inner } = wikiTitleParts(w)
     const attrTarget = escapeHtmlAttributeValue(target)
     const displayAttr =
@@ -91,6 +112,7 @@ export function replaceWikiLinksInHtml(
       `<a href="${noteShowHref(w.noteId)}" class="${DOUGHNUT_WIKI_LINK_CLASS}" data-wiki-title="${attrTarget}"${displayAttr}>${escapeHtmlForWikiLinkDisplay(display)}</a>`
     )
   })
+  result = upgradePathMarkdownAnchors(result, wikiTitles)
   result = upgradeDeadWikiAnchors(result, wikiTitles)
   result = result.replace(
     /\[\[([^\[\]\r\n]*)\]\]/g,

@@ -67,7 +67,7 @@ public final class NotePropertyIndexTargetNoteBackfill {
     if (propertyValue.isEmpty()) {
       return Optional.empty();
     }
-    List<String> linkTokens = WikiLinkMarkdown.innerTitlesInOccurrenceOrder(propertyValue.get());
+    List<String> linkTokens = WikiLinkMarkdown.authoredTokensInOccurrenceOrder(propertyValue.get());
     if (linkTokens.isEmpty()) {
       return Optional.empty();
     }

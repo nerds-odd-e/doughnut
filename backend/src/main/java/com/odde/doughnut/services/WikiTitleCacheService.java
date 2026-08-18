@@ -51,7 +51,8 @@ public class WikiTitleCacheService {
         noteWikiTitleCacheRepository.findByNote_IdOrderByIdAsc(focusNote.getId())) {
       Note resolved = authorizedOutgoingTargetNote(focusNote, row, viewer);
       if (resolved != null) {
-        WikiLinkMarkdown.WikiInnerSplit parts = WikiLinkMarkdown.splitInner(row.getLinkText());
+        WikiLinkMarkdown.WikiInnerSplit parts =
+            WikiLinkMarkdown.splitAuthoredToken(row.getLinkText());
         out.add(
             new WikiTitle(row.getLinkText(), parts.target(), parts.display(), resolved.getId()));
       }

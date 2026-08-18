@@ -1,12 +1,11 @@
 package com.odde.doughnut.services;
 
 import com.odde.doughnut.algorithms.NoteContentMarkdown;
-import com.odde.doughnut.algorithms.WikiLinkMarkdown;
+import com.odde.doughnut.algorithms.WikiLinkMarkdownRewrite;
 import com.odde.doughnut.algorithms.WikiLinkTargetReference;
 import com.odde.doughnut.controllers.dto.TitleRenameReferenceHandling;
 import com.odde.doughnut.entities.DisplayName;
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.NoteWikiTitleCache;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.NoteWikiTitleCacheRepository;
@@ -16,14 +15,11 @@ import jakarta.persistence.PersistenceContext;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Consumer;
 import java.util.function.UnaryOperator;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -58,8 +54,8 @@ public class WikiLinkRewriteService {
       TitleRenameReferenceHandling handling) {
     UnaryOperator<String> fn =
         handling == TitleRenameReferenceHandling.KEEP_VISIBLE_TEXT
-            ? lt -> WikiLinkMarkdown.newInnerForKeepVisibleText(lt, newTitle)
-            : lt -> WikiLinkMarkdown.newInnerForUpdateVisibleText(lt, newTitle);
+            ? lt -> WikiLinkMarkdownRewrite.newInnerForKeepVisibleText(lt, newTitle)
+            : lt -> WikiLinkMarkdownRewrite.newInnerForUpdateVisibleText(lt, newTitle);
     targetNote.setTitle(new DisplayName(newTitle));
     targetNote.setUpdatedAt(updatedAt);
     entityPersister.save(targetNote);
@@ -106,7 +102,7 @@ public class WikiLinkRewriteService {
       User viewer,
       Set<Integer> excludedReferrerIds) {
     UnaryOperator<String> fn =
-        lt -> WikiLinkMarkdown.newInnerForKeepNotebookMove(lt, newNotebookName);
+        lt -> WikiLinkMarkdownRewrite.newInnerForKeepNotebookMove(lt, newNotebookName);
     rewriteInboundWikiLinks(targetNote, updatedAt, viewer, fn, excludedReferrerIds);
   }
 
@@ -117,7 +113,8 @@ public class WikiLinkRewriteService {
   @Transactional
   public void rewriteInboundWikiLinksForFolderNotebookMove(
       Set<Integer> movedNoteIds, String newNotebookName, Timestamp updatedAt, User viewer) {
-    forEachNonDeletedNoteInMoveSet(
+    WikiLinkRewriteSupport.forEachNonDeletedNoteInMoveSet(
+        entityManager,
         movedNoteIds,
         note ->
             rewriteInboundWikiLinksForNotebookMove(
@@ -132,7 +129,8 @@ public class WikiLinkRewriteService {
   @Transactional
   public void rewriteOutgoingWikiLinksForFolderNotebookMove(
       Set<Integer> movedNoteIds, String sourceNotebookName, Timestamp updatedAt, User viewer) {
-    forEachNonDeletedNoteInMoveSet(
+    WikiLinkRewriteSupport.forEachNonDeletedNoteInMoveSet(
+        entityManager,
         movedNoteIds,
         note ->
             rewriteOutgoingWikiLinksForNotebookMove(
@@ -163,17 +161,19 @@ public class WikiLinkRewriteService {
     }
     String content = originalContent;
     LinkedHashSet<String> linkTexts =
-        new LinkedHashSet<>(NoteContentMarkdown.wikiLinkInnersInOccurrenceOrder(content));
+        new LinkedHashSet<>(NoteContentMarkdown.authoredTokensInOccurrenceOrder(content));
     for (String linkText : linkTexts) {
       String newInner =
-          WikiLinkMarkdown.newInnerForQualifyUnqualifiedOutgoingLink(linkText, sourceNotebookName);
+          WikiLinkMarkdownRewrite.newInnerForQualifyUnqualifiedOutgoingLink(
+              linkText, sourceNotebookName);
       if (newInner.equals(linkText)) {
         continue;
       }
       if (coMovedTargetResolvesFrom(movedNote, linkText, coMovedTargetNoteIds)) {
         continue;
       }
-      content = WikiLinkMarkdown.replaceWikiLinksMatchingTrimmedInner(content, linkText, newInner);
+      content =
+          WikiLinkMarkdownRewrite.replaceWikiLinksMatchingTrimmedInner(content, linkText, newInner);
     }
     if (content.equals(originalContent)) {
       return;
@@ -182,20 +182,6 @@ public class WikiLinkRewriteService {
     movedNote.setUpdatedAt(updatedAt);
     entityPersister.save(movedNote);
     wikiTitleCacheService.refreshForNote(movedNote, viewer);
-  }
-
-  private void forEachNonDeletedNoteInMoveSet(Set<Integer> movedNoteIds, Consumer<Note> action) {
-    if (movedNoteIds.isEmpty()) {
-      return;
-    }
-    List<Integer> noteIds = new ArrayList<>(movedNoteIds);
-    Collections.sort(noteIds);
-    for (Integer noteId : noteIds) {
-      Note note = entityManager.find(Note.class, noteId);
-      if (note != null && note.getDeletedAt() == null) {
-        action.accept(note);
-      }
-    }
   }
 
   private boolean coMovedTargetResolvesFrom(
@@ -239,36 +225,15 @@ public class WikiLinkRewriteService {
       User viewer,
       UnaryOperator<String> newInnerFromLinkText,
       Set<Integer> excludedReferrerIds) {
-    Integer targetId = targetNote.getId();
-    List<NoteWikiTitleCache> rows =
-        noteWikiTitleCacheRepository.findRowsReferringToNonDeletedNotesForTarget(targetId);
-
-    Map<Integer, LinkedHashSet<String>> linkTextsByReferrer = new LinkedHashMap<>();
-    for (NoteWikiTitleCache row : rows) {
-      linkTextsByReferrer
-          .computeIfAbsent(row.getNote().getId(), _ -> new LinkedHashSet<>())
-          .add(row.getLinkText());
-    }
-    List<Integer> referrerIds = new ArrayList<>(linkTextsByReferrer.keySet());
-    Collections.sort(referrerIds);
-    for (Integer referrerId : referrerIds) {
-      if (excludedReferrerIds.contains(referrerId)) {
-        continue;
-      }
-      Note referrer = entityManager.find(Note.class, referrerId);
-      if (referrer == null || referrer.getDeletedAt() != null) {
-        continue;
-      }
-      String content = referrer.getContent() != null ? referrer.getContent() : "";
-      for (String linkText : linkTextsByReferrer.get(referrerId)) {
-        String newInner = newInnerFromLinkText.apply(linkText);
-        content =
-            WikiLinkMarkdown.replaceWikiLinksMatchingTrimmedInner(content, linkText, newInner);
-      }
-      referrer.setContent(content);
-      referrer.setUpdatedAt(updatedAt);
-      entityPersister.save(referrer);
-      wikiTitleCacheService.refreshForNote(referrer, viewer);
-    }
+    WikiLinkRewriteSupport.applyInboundReferrerRewrite(
+        entityManager,
+        noteWikiTitleCacheRepository,
+        entityPersister,
+        wikiTitleCacheService,
+        targetNote,
+        updatedAt,
+        viewer,
+        newInnerFromLinkText,
+        excludedReferrerIds);
   }
 }

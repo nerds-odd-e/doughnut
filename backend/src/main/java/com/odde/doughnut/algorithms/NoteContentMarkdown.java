@@ -140,11 +140,11 @@ public final class NoteContentMarkdown {
   }
 
   /**
-   * Wiki link inner titles in document order: parsed frontmatter scalar and list-item strings
-   * first, then the body. Raw YAML escapes (e.g. {@code \"} inside double-quoted scalars) must not
-   * leak into link tokens.
+   * Authored inter-note tokens in document order: wiki inners and path Markdown links from parsed
+   * frontmatter scalar and list-item strings first, then the body. Raw YAML escapes (e.g. {@code
+   * \"} inside double-quoted scalars) must not leak into link tokens.
    */
-  public static List<String> wikiLinkInnersInOccurrenceOrder(String content) {
+  public static List<String> authoredTokensInOccurrenceOrder(String content) {
     if (content == null || content.isEmpty()) {
       return List.of();
     }
@@ -153,12 +153,12 @@ public final class NoteContentMarkdown {
             lf -> {
               List<String> titles = new ArrayList<>();
               for (String value : lf.frontmatter().supportedValueStringsInInsertionOrder()) {
-                titles.addAll(WikiLinkMarkdown.innerTitlesInOccurrenceOrder(value));
+                titles.addAll(WikiLinkMarkdown.authoredTokensInOccurrenceOrder(value));
               }
-              titles.addAll(WikiLinkMarkdown.innerTitlesInOccurrenceOrder(lf.body()));
+              titles.addAll(WikiLinkMarkdown.authoredTokensInOccurrenceOrder(lf.body()));
               return List.copyOf(titles);
             })
-        .orElseGet(() -> WikiLinkMarkdown.innerTitlesInOccurrenceOrder(content));
+        .orElseGet(() -> WikiLinkMarkdown.authoredTokensInOccurrenceOrder(content));
   }
 
   /**

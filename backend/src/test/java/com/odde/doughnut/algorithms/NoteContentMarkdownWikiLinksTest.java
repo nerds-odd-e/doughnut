@@ -19,16 +19,16 @@ class NoteContentMarkdownWikiLinksTest {
       """;
 
   @Test
-  void wikiLinkInnersInOccurrenceOrder_readsWikiLinkFromParsedFrontmatterScalar() {
+  void authoredTokensInOccurrenceOrder_readsWikiLinkFromParsedFrontmatterScalar() {
     String title = "In volitional (\"let's\" or \"I shall\") statements";
     String content = Frontmatter.empty().set("example of", "[[" + title + "]]").fenced("");
 
     assertThat(
-        NoteContentMarkdown.wikiLinkInnersInOccurrenceOrder(content), equalTo(List.of(title)));
+        NoteContentMarkdown.authoredTokensInOccurrenceOrder(content), equalTo(List.of(title)));
   }
 
   @Test
-  void wikiLinkInnersInOccurrenceOrder_readsWikiLinksFromListItemsInYamlOrder() {
+  void authoredTokensInOccurrenceOrder_readsWikiLinksFromListItemsInYamlOrder() {
     String content =
         Frontmatter.parse(
                 """
@@ -40,12 +40,12 @@ class NoteContentMarkdownWikiLinksTest {
             .fenced("");
 
     assertThat(
-        NoteContentMarkdown.wikiLinkInnersInOccurrenceOrder(content),
+        NoteContentMarkdown.authoredTokensInOccurrenceOrder(content),
         equalTo(List.of("First", "Second")));
   }
 
   @Test
-  void wikiLinkInnersInOccurrenceOrder_scansScalarsThenListItemsInPropertyOrder() {
+  void authoredTokensInOccurrenceOrder_scansScalarsThenListItemsInPropertyOrder() {
     String content =
         Frontmatter.parse(
                 """
@@ -57,16 +57,16 @@ class NoteContentMarkdownWikiLinksTest {
             .fenced("Body [[Body]]");
 
     assertThat(
-        NoteContentMarkdown.wikiLinkInnersInOccurrenceOrder(content),
+        NoteContentMarkdown.authoredTokensInOccurrenceOrder(content),
         equalTo(List.of("Scalar", "One", "Two", "Body")));
   }
 
   @Test
-  void wikiLinkInnersInOccurrenceOrder_skipsUnsupportedNestedValues() {
+  void authoredTokensInOccurrenceOrder_skipsUnsupportedNestedValues() {
     String content = Frontmatter.parse(NESTED_AND_LISTED_FRONTMATTER).fenced("");
 
     assertThat(
-        NoteContentMarkdown.wikiLinkInnersInOccurrenceOrder(content), equalTo(List.of("Listed")));
+        NoteContentMarkdown.authoredTokensInOccurrenceOrder(content), equalTo(List.of("Listed")));
   }
 
   @Test

@@ -61,6 +61,16 @@ Then(
   }
 )
 
+Then(
+  'following the wiki link {string} should open the note titled {string}',
+  (wikiLinkText: string, noteTitle: string) => {
+    start
+      .assumeNotePage()
+      .wikiLinkInNoteContent(wikiLinkText)
+      .followAndAssumeNote(noteTitle)
+  }
+)
+
 When(
   'I create a new note by following the dead wiki link {string}',
   (wikiLinkTitle: string) => {

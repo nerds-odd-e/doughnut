@@ -81,20 +81,16 @@ Walker already handled nested `PathShapedTarget.folderNames`. Locked with unit t
 ### 5. Path Markdown link opens like a wiki link; `.md` optional; spelling kept
 
 - **Type:** Behavior
-- **Status:** planned
+- **Status:** done
 
-**Pre:** target note in `Folder` titled `Title`. **Trigger:** save `[label](/Folder/Title.md)` or `[label](/Folder/Title)` (one scenario outline). **Post:** rich view is a live wiki-style link to that note; markdown source still contains the authored Markdown (with or without `.md` as written). Cache row uses that authored token; resolver sees the same target token as `[[Folder/Title|label]]`.
-
-Extract Markdown path links in the **same** occurrence list as wiki inners (one extract → one `resolveWikiLinksForCache`). Turndown must not convert these hrefs to `[[…]]`.
-
-Root `[label](/Title.md)` (note at notebook root) is the same behavior with an empty folder path — include as an Examples row if cheap; otherwise the next slice. Prefer Examples in this slice.
+`[label](/Folder/Title.md)` (`.md` optional; root `/Title.md` included) extracts with wiki via `authoredTokensInOccurrenceOrder`, caches the authored Markdown token, rich-displays as a live wiki-style link, Turndown keeps Markdown. `PathShapedTarget` allows empty folder when href has leading `/`.
 
 ### 6. Renaming a note rewrites path-Markdown hrefs and keeps Markdown
 
 - **Type:** Behavior
 - **Status:** planned
 
-**Pre:** body has `[label](/Folder/Old.md)` (and a sibling without `.md` if still authored). **Trigger:** rename `Old` → `New`. **Post:** href path last segment is `New`; link remains Markdown (not rewritten to `[[…]]`); still opens the note. Reuse slice 3 rewrite; only the write-back spelling differs.
+**Pre:** body has `[label](/Folder/Old.md)` (and a sibling without `.md` if still authored). **Trigger:** rename `Old` → `New`. **Post:** href path last segment is `New`; link remains Markdown (not rewritten to `[[…]]`); still opens the note. Reuse `WikiLinkTargetReference.replaceNoteTitle` / `PathShapedTarget.withNoteTitle`; write back the Markdown spelling via the same rewrite service (wiki write-back is `WikiLinkMarkdownRewrite`).
 
 ### 7. Unresolved path Markdown shows as a dead wiki link
 
@@ -123,6 +119,5 @@ Root `[label](/Title.md)` (note at notebook root) is the same behavior with an e
 - Slice 2: `PathShapedTarget` already holds `folderNames` (list) + title. Sanitizer asks that parser. `/` in wiki **titles** stays forbidden (fullwidth on persist). Unqualified `[[Title]]` still lowest id.
 - Slice 3: title rewrite lives on `WikiLinkTargetReference.replaceNoteTitle` (path-shaped via `PathShapedTarget.withNoteTitle`). Slice 6 should reuse that write-back; only Markdown spelling differs.
 - Slice 4: nested `[[Parent/Child/Title]]` already resolved; this slice only locked it with tests.
-- Cache is style-blind at rest; extract/display/rewrite are wiki-inner-specific. Path Markdown is not extracted (`NoteContentMarkdown.wikiLinkInnersInOccurrenceOrder`).
-- `quillHtmlToMarkdown` turns doughnut-wiki-link and `/n…` hrefs into `[[label]]`. Path `.md` hrefs must not take that path, or “no conversion” fails on save.
+- Slice 5: extract is `authoredTokensInOccurrenceOrder` (wiki inners + path Markdown). Cache `link_text` is the full Markdown token. Display uses `WikiTitle.targetToken` (leading `/` ⇒ path href), not a second client parse. Turndown: `/n…` → wiki; concept path href → same Markdown. Wiki write-back extracted to `WikiLinkMarkdownRewrite`; inbound rewrite walk to `WikiLinkRewriteSupport`.
 - ZIP collision `Recipe (2).md` is not `[[Recipe (2)]]`. Out of this plan.

@@ -1,5 +1,9 @@
 import type { WikiTitle } from "@generated/doughnut-backend-api"
-import { DEAD_WIKI_LINK_CLASS } from "@/utils/wikiLinkDomMarkers"
+import { noteShowHref } from "@/routes/noteShowLocation"
+import {
+  DEAD_WIKI_LINK_CLASS,
+  DOUGHNUT_WIKI_LINK_CLASS,
+} from "@/utils/wikiLinkDomMarkers"
 
 /** Builds API-shaped {@link WikiTitle} for tests and local fixtures from markdown inner + note id. */
 export function wikiTitleFromInnerAndNoteId(
@@ -17,6 +21,11 @@ export function wikiTitleParts(w: WikiTitle): {
   inner: string
 } {
   return { target: w.targetToken, display: w.displayText, inner: w.linkText }
+}
+
+/** Path Markdown spelling: {@link WikiTitle.targetToken} is the bundle-relative href. */
+export function isPathMarkdownWikiTitle(w: WikiTitle): boolean {
+  return w.targetToken.startsWith("/")
 }
 
 export function escapeHtmlForWikiLinkDisplay(s: string): string {
@@ -97,6 +106,11 @@ export function handleRichContentAnchorClick(
     anchor.classList.contains(DEAD_WIKI_LINK_CLASS)
   ) {
     handlers.onDeadWikiLink(deadWikiLinkPayloadFromAnchor(anchor))
+    return
+  }
+  const noteId = anchor.getAttribute("data-note-id")
+  if (anchor.classList.contains(DOUGHNUT_WIKI_LINK_CLASS) && noteId) {
+    handlers.navigateInApp(noteShowHref(Number(noteId)))
     return
   }
   const href = anchor.getAttribute("href")

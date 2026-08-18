@@ -34,7 +34,7 @@ public final class NotePropertyIndexPlanner {
         List<PlannedRow> linkRows = new ArrayList<>();
         for (int i = 0; i < listItems.items().size(); i++) {
           String item = listItems.items().get(i);
-          if (!WikiLinkMarkdown.innerTitlesInOccurrenceOrder(item).isEmpty()) {
+          if (!WikiLinkMarkdown.authoredTokensInOccurrenceOrder(item).isEmpty()) {
             linkRows.add(new PlannedRow(key, i, item, true));
           }
         }

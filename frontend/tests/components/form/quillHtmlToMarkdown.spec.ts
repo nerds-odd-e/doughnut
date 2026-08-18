@@ -46,15 +46,17 @@ describe("quillHtmlToMarkdown", () => {
   })
 
   it.each`
-    label                                          | html                                                                                                                                                         | expected
-    ${"preserves complete double brackets"}        | ${"<p>[[WikiLink]]</p>"}                                                                                                                                     | ${"[[WikiLink]]"}
-    ${"converts doughnut-wiki-link anchors"}       | ${'<p><a href="/n701" class="doughnut-wiki-link">MyNote</a></p>'}                                                                                            | ${"[[MyNote]]"}
-    ${"note show href without doughnut-wiki-link"} | ${'<p><a href="/n701">MyNote</a></p>'}                                                                                                                       | ${"[[MyNote]]"}
-    ${"absolute URL to note show"}                 | ${'<p><a href="https://app.test/n42">T</a></p>'}                                                                                                             | ${"[[T]]"}
-    ${"note href without doughnut-wiki-link"}      | ${'<p><a href="/n123">looks internal</a></p>'}                                                                                                               | ${"[[looks internal]]"}
-    ${"converts dead wiki anchors"}                | ${'<p><a href="#" class="dead-wiki-link" data-wiki-title="Unknown"><span class="wiki-bracket">[[</span>Unknown<span class="wiki-bracket">]]</span></a></p>'} | ${"[[Unknown]]"}
-    ${"converts plain dead wiki anchors"}          | ${'<p><a href="#" class="dead-wiki-link" data-wiki-title="Unknown">Unknown</a></p>'}                                                                         | ${"[[Unknown]]"}
-    ${"doughnut-wiki-link with piped wiki attrs"}  | ${'<p><a href="/n1" class="doughnut-wiki-link" data-wiki-title="A" data-wiki-display="B">B</a></p>'}                                                         | ${"[[A|B]]"}
+    label                                                | html                                                                                                                                                         | expected
+    ${"preserves complete double brackets"}              | ${"<p>[[WikiLink]]</p>"}                                                                                                                                     | ${"[[WikiLink]]"}
+    ${"converts doughnut-wiki-link anchors"}             | ${'<p><a href="/n701" class="doughnut-wiki-link">MyNote</a></p>'}                                                                                            | ${"[[MyNote]]"}
+    ${"note show href without doughnut-wiki-link"}       | ${'<p><a href="/n701">MyNote</a></p>'}                                                                                                                       | ${"[[MyNote]]"}
+    ${"absolute URL to note show"}                       | ${'<p><a href="https://app.test/n42">T</a></p>'}                                                                                                             | ${"[[T]]"}
+    ${"note href without doughnut-wiki-link"}            | ${'<p><a href="/n123">looks internal</a></p>'}                                                                                                               | ${"[[looks internal]]"}
+    ${"converts dead wiki anchors"}                      | ${'<p><a href="#" class="dead-wiki-link" data-wiki-title="Unknown"><span class="wiki-bracket">[[</span>Unknown<span class="wiki-bracket">]]</span></a></p>'} | ${"[[Unknown]]"}
+    ${"converts plain dead wiki anchors"}                | ${'<p><a href="#" class="dead-wiki-link" data-wiki-title="Unknown">Unknown</a></p>'}                                                                         | ${"[[Unknown]]"}
+    ${"doughnut-wiki-link with piped wiki attrs"}        | ${'<p><a href="/n1" class="doughnut-wiki-link" data-wiki-title="A" data-wiki-display="B">B</a></p>'}                                                         | ${"[[A|B]]"}
+    ${"path markdown doughnut-wiki-link keeps markdown"} | ${'<p><a href="/Folder/Title.md" class="doughnut-wiki-link" data-wiki-title="/Folder/Title.md" data-wiki-display="label" data-note-id="42">label</a></p>'}   | ${"[label](/Folder/Title.md)"}
+    ${"path markdown without .md keeps href"}            | ${'<p><a href="/Folder/Title" class="doughnut-wiki-link" data-wiki-title="/Folder/Title" data-wiki-display="label">label</a></p>'}                           | ${"[label](/Folder/Title)"}
   `("wiki links: $label", ({ html, expected }) => {
     expect(htmlToMarkdown(html)).toBe(expected)
   })
