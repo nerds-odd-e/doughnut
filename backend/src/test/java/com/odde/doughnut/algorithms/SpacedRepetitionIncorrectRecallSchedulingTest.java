@@ -69,6 +69,21 @@ class SpacedRepetitionIncorrectRecallSchedulingTest
   }
 
   @Test
+  void onTimeIncorrectRecallAfterFirstGoodUsesFsrsAgainFromS0AndD0Good() {
+    MemoryTracker memoryTracker = makeMe.aMemoryTrackerFor(note).by(user).inMemoryPlease();
+    memoryTracker.recalledSuccessfully(memoryTracker.getNextRecallAt(), null);
+    Timestamp gradeTime = onTimeGradeTime(memoryTracker);
+
+    memoryTracker.markAsRecalled(gradeTime, false, null);
+
+    assertThat(memoryTracker.getStability(), equalTo(15.0f));
+    assertThat(memoryTracker.getDifficulty(), equalTo(7.3945026f));
+    assertThat(
+        memoryTracker.getNextRecallAt(),
+        equalTo(TimestampOperations.addHoursToTimestamp(gradeTime, 15)));
+  }
+
+  @Test
   void onTimeIncorrectRecallUpdatesDifficultyWithFsrsAgainNextD() {
     MemoryTracker memoryTracker = aGradedTrackerAtThreeDayStability();
 

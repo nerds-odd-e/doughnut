@@ -97,6 +97,10 @@ When('I visit recall for a due recall prompt on day {int}', (day: number) => {
   start.recall().visitRecallPageAndWaitForQuestion()
 })
 
+When('I visit recall', () => {
+  start.recall().visitRecallPage()
+})
+
 When(
   'I make {int} wrong answers over {int} days since day {int}, answering {string} to {string}',
   (

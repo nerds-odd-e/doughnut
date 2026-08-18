@@ -38,15 +38,9 @@ E2E in `spaced_repetition.feature` now assimilates → just-review Yes → more 
 ### 2. Incorrect just-review after first Good uses Again from S0(Good)
 
 - **Type:** Behavior
-- **Status:** planned
+- **Status:** done
 
-**Pre:** New understanding tracker; just-review Yes (first Good).  
-**Trigger:** just-review No when that Good interval is due (~55h later, not “day 2 after seeded S=24”).  
-**Post:** Stability and Difficulty are FSRS-6 Again from S=55 / D=`2.118104f` (API number / page text). AGAIN RecallLog. No synthetic GOOD log from seeding.
-
-Extend `SpacedRepetitionIncorrectRecallSchedulingTest` with one pin for this Again (same class, not a new surface). Drive E2E expected display from that float. Do not keep the S=24 / D=5 / Stability 8 / Difficulty 8.34176 story on this path (8.34176 is already the graded D=5 Again unit pin).
-
-**Done when:** E2E and the unit pin match Again-from-first-Good; `seed_graded_memory_tracker` has no remaining feature callers.
+Unit pin `onTimeIncorrectRecallAfterFirstGoodUsesFsrsAgainFromS0AndD0Good`: Stability **15**, Difficulty **7.3945026f**, due **15h**. E2E: first Good then `It's day 3, 15 hour` + `I visit recall` (must not reset to hour 8) → No; display Difficulty **7.3945**. Seed has no remaining feature callers. Graded D=5 Again pin 8.341763f kept.
 
 ### 3. Drop graded-tracker seed and dead mark-successfully helper
 
