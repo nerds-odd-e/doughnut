@@ -62,7 +62,8 @@ public final class NotebookZipBuilder {
         NotebookExportFilenames.uniqueFileNames(
             notesHere.stream().map(n -> Map.entry(n.id(), n.title())).toList(), ".md");
     for (ExportNoteRow note : notesHere) {
-      writeEntry(zos, pathPrefix + noteFileNames.get(note.id()), ExportNoteMarkdown.assemble(note));
+      String fileName = noteFileNames.get(note.id());
+      writeEntry(zos, pathPrefix + fileName, ExportNoteMarkdown.assemble(note, fileName));
     }
 
     Map<Integer, String> folderDirNames =

@@ -10,6 +10,17 @@ function loadZipEntries(notebookName: string) {
     .then(() => cy.task<Record<string, string>>('readZipEntries', filePath))
 }
 
+function entryContent(notebookName: string, entryPath: string) {
+  return loadZipEntries(notebookName).then((entries) => {
+    const actual = entries[entryPath]
+    expect(
+      actual,
+      `Expected zip for "${notebookName}" to contain "${entryPath}", but found [${Object.keys(entries).join(', ')}]`
+    ).to.not.equal(undefined)
+    return actual
+  })
+}
+
 /** Assertions against a catalog-exported notebook ZIP download. */
 export const downloadedNotebookZip = (notebookName: string) => ({
   expectDownloaded() {
@@ -39,15 +50,37 @@ export const downloadedNotebookZip = (notebookName: string) => ({
     return this
   },
   expectEntryIncludes(entryPath: string, fragment: string) {
-    loadZipEntries(notebookName).then((entries) => {
-      const actual = entries[entryPath]
-      expect(
-        actual,
-        `Expected zip for "${notebookName}" to contain "${entryPath}", but found [${Object.keys(entries).join(', ')}]`
-      ).to.not.equal(undefined)
+    entryContent(notebookName, entryPath).then((actual) => {
       expect(
         actual,
         `Expected "${entryPath}" in zip for "${notebookName}" to include "${fragment}", but found "${actual}"`
+      ).to.include(fragment)
+    })
+    return this
+  },
+  expectEntryDoesNotInclude(entryPath: string, fragment: string) {
+    entryContent(notebookName, entryPath).then((actual) => {
+      expect(
+        actual,
+        `Expected "${entryPath}" in zip for "${notebookName}" not to include "${fragment}", but found "${actual}"`
+      ).to.not.include(fragment)
+    })
+    return this
+  },
+  expectCollisionEntryIncludes(title: string, fragment: string) {
+    loadZipEntries(notebookName).then((entries) => {
+      const collisionPaths = Object.keys(entries).filter(
+        (path) => path.startsWith(`${title} (`) && path.endsWith(').md')
+      )
+      expect(
+        collisionPaths,
+        `Expected a collision zip entry for title "${title}" in "${notebookName}", but found [${Object.keys(entries).join(', ')}]`
+      ).to.have.length.greaterThan(0)
+      const collisionPath = collisionPaths[0]
+      const actual = entries[collisionPath]
+      expect(
+        actual,
+        `Expected collision entry "${collisionPath}" for "${notebookName}" to include "${fragment}", but found "${actual}"`
       ).to.include(fragment)
     })
     return this

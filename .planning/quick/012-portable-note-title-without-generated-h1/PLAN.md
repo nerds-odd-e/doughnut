@@ -2,7 +2,7 @@
 
 **Goal:** Catalog ZIP notes keep the display title without a generated `# title` H1.
 
-**Status:** planned (ADR Decision for this gap locked 2026-08-18; codec not started)
+**Status:** in progress (slice 1 done; slice 2 next)
 
 Decision lives in Proposed [ADR 0004](../../../docs/adrs/0004-okf-compatible-notebook-markdown.md) (Titles, filenames, body). Tracker: [OKF-COMPATIBILITY-GAP.md](../../research/OKF-COMPATIBILITY-GAP.md) **P1** / **P2**.
 
@@ -18,16 +18,11 @@ Do not reopen persist-vs-wrap, **D3**, or **P3** in this plan.
 
 ## Slices
 
-### 1. Non-round-trip export filename gets title frontmatter — Behavior — planned
+### 1. Non-round-trip export filename gets title frontmatter — Behavior — done
 
-**Pre:** A notebook has a note whose export filename is not the exact title (duplicate title in the same directory, invalid filename characters, or blank → `Untitled`).  
-**Trigger:** Catalog ZIP export.  
-**Post:** That note’s `.md` has `title:` set to the Doughnut title. A sibling whose filename **is** the exact title does not get a wrap `title:` key. Stored `note.content` is unchanged. Generated `# title` H1 still present (interim).
+Codec wrap via `NoteLeadingFrontmatter.ensureTitleKey` (same seam as Readme `type`). Generated H1 still present.
 
-Tests:
-
-- E2E `e2e_test/features/notebooks/notebook_export.feature` — two notes with the same title; the collision zip entry includes `title:`; the unsuffixed sibling does not get wrap `title:`.
-- Unit at the ZIP boundary (`NotebookZipBuilderTest` / `NotebookExportServiceTest`) — sanitize and `Untitled` (create UI rewrites some invalid chars, so those stay unit). Preserve author `title` if already present.
+**Learning:** E2E cannot persist two notes with the identical title (`uk_note_notebook_folder_title`). Scenario uses `Recipe` + `Recipe*` so sanitize collides; ZIP unit tests still cover identical-title collision.
 
 ### 2. Export does not inject a title H1 — Behavior — planned
 

@@ -38,3 +38,23 @@ Then(
     downloadedNotebookZip(notebookName).expectEntryIncludes(entryPath, fragment)
   }
 )
+
+Then(
+  'the downloaded zip entry {string} of notebook {string} does not include {string}',
+  (entryPath: string, notebookName: string, fragment: string) => {
+    downloadedNotebookZip(notebookName).expectEntryDoesNotInclude(
+      entryPath,
+      fragment
+    )
+  }
+)
+
+Then(
+  'the collision zip entry for title {string} of notebook {string} includes {string}',
+  (title: string, notebookName: string, fragment: string) => {
+    downloadedNotebookZip(notebookName).expectCollisionEntryIncludes(
+      title,
+      fragment
+    )
+  }
+)

@@ -1,7 +1,9 @@
 package com.odde.doughnut.services.notebookExport;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.not;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -111,5 +113,47 @@ class NotebookZipBuilderTest {
 
     assertThat(entries.containsKey("Dup.md"), equalTo(true));
     assertThat(entries.containsKey("Dup (2).md"), equalTo(true));
+  }
+
+  @Test
+  void wrapsTitleOnCollisionFileAndLeavesExactFilenameSiblingUnwrapped() throws IOException {
+    ExportNoteRow first = new ExportNoteRow(1, null, "Dup", "first");
+    ExportNoteRow second = new ExportNoteRow(2, null, "Dup", "second");
+
+    Map<String, String> entries = readZipEntries(buildZip(null, List.of(), List.of(first, second)));
+
+    assertThat(entries.get("Dup.md"), not(containsString("title:")));
+    assertThat(entries.get("Dup (2).md"), containsString("title: Dup"));
+  }
+
+  @Test
+  void wrapsTitleWhenSanitizedFilenameDiffersFromExactTitle() throws IOException {
+    ExportNoteRow note = new ExportNoteRow(1, null, "Q&A: What/Why?", "body");
+
+    Map<String, String> entries = readZipEntries(buildZip(null, List.of(), List.of(note)));
+
+    assertThat(entries.get("Q&A What Why.md"), containsString("title:"));
+    assertThat(entries.get("Q&A What Why.md"), containsString("Q&A: What/Why?"));
+  }
+
+  @Test
+  void wrapsTitleWhenBlankAfterSanitizeUsesUntitledFilename() throws IOException {
+    ExportNoteRow note = new ExportNoteRow(1, null, "///:::", "body");
+
+    Map<String, String> entries = readZipEntries(buildZip(null, List.of(), List.of(note)));
+
+    assertThat(entries.get("Untitled.md"), containsString("title:"));
+    assertThat(entries.get("Untitled.md"), containsString("///:::"));
+  }
+
+  @Test
+  void leavesAuthorTitleUnchangedWhenFilenameDoesNotRoundTrip() throws IOException {
+    ExportNoteRow note =
+        new ExportNoteRow(1, null, "Q&A: x", "---\ntitle: Keep Me\n---\n\nActual body");
+
+    Map<String, String> entries = readZipEntries(buildZip(null, List.of(), List.of(note)));
+
+    assertThat(
+        entries.get("Q&A x.md"), equalTo("---\ntitle: Keep Me\n---\n\n# Q&A: x\n\nActual body"));
   }
 }
