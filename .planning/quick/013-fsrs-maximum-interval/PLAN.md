@@ -13,7 +13,8 @@ Humans already chose the locks below. This plan only sequences them. Do not acce
 - Cap value: **36500 days**, compared and persisted as **876000 whole hours** (open FSRS `S_MAX`).
 - Cap **persisted Stability**. Due follows (`nextRecallAt = lastRecalledAt + I(0.9, S)`). Do not keep an unbounded S beside a capped due.
 - Clamp **after** next-S is computed (FSRS update, thinking-time overlay on Good, Tutor **2** shrink, confusion midpoint), on every write of next Stability.
-- Existing over-cap rows: clamp S and set `next_recall_at = last_recalled_at + I(S)`. Under-cap rows unchanged. Difficulty and RecallLog unchanged. If `last_recalled_at` is null, cap S only.
+- Existing over-cap rows: clamp S and set `next_recall_at = last_recalled_at + I(S)`. Under-cap rows unchanged. Difficulty and RecallLog unchanged. `last_recalled_at` is `NOT NULL` — there is no null-last case.
+- `last_recalled_at` and `next_recall_at` are **DATETIME** (UTC wall-clock; JDBC session TZ stays UTC) so `last + 876000 hours` can persist. Do not convert other `TIMESTAMP` columns here ([SEED-006](../../seeds/SEED-006-remove-mysql-timestamp-2038.md)).
 - Ordinary **ungated** one-shot Flyway (not a `1=0` placeholder). Idempotent `LEAST`.
 - Global constant, not a Settings knob, not shown as its own UI. Memory Tracker still shows Stability (migrated rows may drop).
 - Fuzz stays **deferred**. Fitting / per-user weights (**E4**) stay deferred.
@@ -22,7 +23,7 @@ Humans already chose the locks below. This plan only sequences them. Do not acce
 
 ## Out of this plan
 
-Fuzz, E4 fitting, accepting ADR 0003, dropping the legacy spacing-index converter, thinking-time formula / `LEGACY_INDEX_STEP`, a shorter Doughnut-specific cap, Settings or copy for “max interval.”
+Fuzz, E4 fitting, accepting ADR 0003, dropping the legacy spacing-index converter, thinking-time formula / `LEGACY_INDEX_STEP`, a shorter Doughnut-specific cap, Settings or copy for “max interval.” Remaining MySQL `TIMESTAMP` columns / 2038 ([SEED-006](../../seeds/SEED-006-remove-mysql-timestamp-2038.md)).
 
 ## Testing
 
@@ -44,20 +45,29 @@ Decision fragment in Proposed ADR 0003 (next to requested retention): global **3
 
 Over-cap ordinary correct (and thinking-time sibling) persist Stability **876000**; due = last + 876000. One write seam: `MemoryTrackerNextStability.write` over `Fsrs.cappedStabilityHours` / `MAXIMUM_INTERVAL_HOURS` (applyRecall, shrink, confusion). Fixture `setStability` is not clamped (precondition can still be over-cap).
 
-### 3. Existing over-cap rows are clamped without a grade
+### 3. Persist recall due past the TIMESTAMP range
+
+- **Type:** Structure
+- **Status:** planned
+
+Alter `memory_tracker.last_recalled_at` and `next_recall_at` from `TIMESTAMP` to `DATETIME` (keep `NOT NULL`). Session TZ stays UTC so existing values are preserved. Flyway `V300000273` (next free after `V300000272`). Do not convert `assimilated_at` or other `TIMESTAMP` columns.
+
+Unlocks slice 4: a persisted over-cap clamp can write `next_recall_at = last_recalled_at + 876000 hours`. Pin with a persisted flush of that due (not in-memory). Regenerate `docs/database-erd.md`.
+
+### 4. Existing over-cap rows are clamped without a grade
 
 - **Type:** Behavior
 - **Status:** planned
 
 **Pre:** persisted `memory_tracker.stability > 876000` with `last_recalled_at` set (and a sibling under-cap row).
 
-**Trigger:** ungated Flyway `V300000273` (next free after `V300000272`) running a Java backfill (same shape as hours conversion / still-New backfills: logic in an entity/service type, thin `db.migration` wrapper). Reuse `Fsrs.MAXIMUM_INTERVAL_HOURS` / `cappedStabilityHours` — do not duplicate the cap.
+**Trigger:** ungated Flyway `V300000274` running a Java backfill (same shape as hours conversion / still-New backfills: logic in an entity/service type, thin `db.migration` wrapper). Reuse `Fsrs.MAXIMUM_INTERVAL_HOURS` / `cappedStabilityHours` — do not duplicate the cap.
 
-**Post:** over-cap row has Stability **876000** and `next_recall_at = last_recalled_at + 876000 hours`; under-cap row untouched; Difficulty unchanged. Null `last_recalled_at`: cap S only.
+**Post:** over-cap row has Stability **876000** and `next_recall_at = last_recalled_at + 876000 hours`; under-cap row untouched; Difficulty unchanged.
 
 Test drives the backfill class (not HTTP). Do not gate with `1=0`.
 
-### 4. Close maximum-interval in the FSRS tracker
+### 5. Close maximum-interval in the FSRS tracker
 
 - **Type:** Structure
 - **Status:** planned
@@ -67,4 +77,5 @@ Test drives the backfill class (not HTTP). Do not gate with `1=0`.
 ## Discoveries
 
 - Slice 1: restating the 24h fallback next to the cap duplicated the existing strictly-future bullet; the Decision now points at that fallback instead.
-- Slice 2: clamp lives in `Fsrs.cappedStabilityHours`; grade writes go through `MemoryTrackerNextStability`. `setStability` stays uncapped so tests can seed over-cap rows.
+- Slice 2: clamp lives in `Fsrs.cappedStabilityHours`; grade writes go through `MemoryTrackerNextStability`. `setStability` stays uncapped so tests can seed over-cap rows. Those tests are in-memory; MySQL `TIMESTAMP` cannot store `last + 876000 hours`.
+- Jidoka: humans accepted DATETIME for `last_recalled_at` / `next_recall_at` only; remaining TIMESTAMP columns are [SEED-006](../../seeds/SEED-006-remove-mysql-timestamp-2038.md). Dropped the null-last clamp case (`NOT NULL`).
