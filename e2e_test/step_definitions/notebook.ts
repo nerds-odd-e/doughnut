@@ -85,22 +85,6 @@ When(
   }
 )
 
-When('I export notebook {string} from the catalog', (notebookName: string) => {
-  start.navigateToNotebooksPage().notebookCard(notebookName).exportNotebook()
-})
-
-Then(
-  'a zip file for notebook {string} should be downloaded',
-  (notebookName: string) => {
-    const downloadsFolder = Cypress.config('downloadsFolder')
-    const filePath = `${downloadsFolder}/${notebookName}.zip`
-    cy.task('fileShouldExistSoon', filePath).should('equal', filePath)
-    cy.readFile(filePath, 'binary').then((content: string) => {
-      expect(content.startsWith('PK')).to.equal(true)
-    })
-  }
-)
-
 When('I save notebook readme {string}', (body: string) => {
   notebookPage().saveNotebookReadme(body)
 })

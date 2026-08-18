@@ -1,6 +1,6 @@
 # Plan: Readme as README.md
 
-**Status:** in progress (slice 2 next)
+**Status:** in progress (slice 3 next)
 
 **Goal:** ZIP maps notebook/folder readme to `README.md` with `type: Readme`. Notes titled `index` / `log` warn, not block. ADR 0004 Decision matches that shape.
 
@@ -19,13 +19,11 @@ Proposed ADR 0004 Decision + Validation, and ADR 0001 **Readme** glossary row, n
 
 **Learning:** Validation still required missing `index.md`; amended so missing listing is conformant and concept `index.md` / `log.md` warn only.
 
-### 2. ZIP writes readme as README.md with type: Readme — Behavior — planned
+### 2. ZIP writes readme as README.md with type: Readme — Behavior — done
 
-**Pre:** Notebook and/or folder with a non-blank readme; another folder with a blank readme.  
-**Trigger:** Export catalog ZIP.  
-**Post:** Non-blank readme is `README.md` in that directory; leading `type: Readme`; no `index.md` from readme. Blank readme omits the file. Author YAML on the readme is preserved.
+Catalog ZIP writes non-blank notebook/folder readme as that directory’s `README.md` with leading `type: Readme`; blank omits the file; no `index.md` from readme.
 
-E2E: `notebook_export.feature` (unzip the download; assert `README.md` / no `index.md`). Unit: `NotebookZipBuilderTest` (root + nested; missing type inserted; existing fence preserved).
+**Learning:** Export wrap lives in `ExportReadmeMarkdown` (not persist). Type-key insert/canonicalize is `NoteLeadingFrontmatter.ensureTypeKey`, shared with `NoteConceptType`. E2E unzip is `notebook_export.feature` + `notebookExportZip` page object.
 
 ### 3. Creating or renaming a note to index or log warns and still saves — Behavior — planned
 

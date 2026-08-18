@@ -7,3 +7,19 @@ Feature: Notebook export
   Scenario: Export notebook downloads a zip
     When I export notebook "E2E Export Notebook" from the catalog
     Then a zip file for notebook "E2E Export Notebook" should be downloaded
+
+  Scenario: Exported zip writes non-blank readme as README.md
+    And the notebook "E2E Export Notebook" has readme content "Notebook landing"
+    And the notebook "E2E Export Notebook" has a readme-only folder "Has Readme" with readme "Folder landing"
+    And I have a note "Blank folder note" under notebook "E2E Export Notebook" in folder "Blank Readme" with content:
+      """
+      in blank folder
+      """
+    When I export notebook "E2E Export Notebook" from the catalog
+    Then the downloaded zip for notebook "E2E Export Notebook" contains "README.md"
+    And the downloaded zip entry "README.md" of notebook "E2E Export Notebook" includes "type: Readme"
+    And the downloaded zip entry "README.md" of notebook "E2E Export Notebook" includes "Notebook landing"
+    And the downloaded zip for notebook "E2E Export Notebook" contains "Has Readme/README.md"
+    And the downloaded zip for notebook "E2E Export Notebook" does not contain "index.md"
+    And the downloaded zip for notebook "E2E Export Notebook" does not contain "Has Readme/index.md"
+    And the downloaded zip for notebook "E2E Export Notebook" does not contain "Blank Readme/README.md"

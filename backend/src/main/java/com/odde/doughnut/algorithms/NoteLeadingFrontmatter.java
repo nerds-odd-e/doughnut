@@ -1,9 +1,13 @@
 package com.odde.doughnut.algorithms;
 
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 /** Leading {@code ---} fenced block at the start of note markdown: split and rebuild. */
 public final class NoteLeadingFrontmatter {
+
+  private static final Pattern TOP_LEVEL_TYPE_LINE =
+      Pattern.compile("(?im)^(type\\s*:)([ \\t]*)(?:\"[^\"]*\"|'[^']*'|\\S+)?[ \\t]*$(\\n)?");
 
   private NoteLeadingFrontmatter() {}
 
@@ -21,6 +25,27 @@ public final class NoteLeadingFrontmatter {
           newYamlRaw.isEmpty() || newYamlRaw.endsWith("\n") ? newYamlRaw : newYamlRaw + "\n";
       return "---\n" + yaml + "---\n" + body;
     }
+  }
+
+  /**
+   * Ensures a top-level {@code type} key without re-dumping the rest of the fence. Missing or blank
+   * type becomes {@code typeWhenAbsent} as the first key. A present type matching a canonical
+   * spelling (case-insensitive) is rewritten in place; any other non-empty type is left unchanged.
+   */
+  public static String ensureTypeKey(
+      String content, String typeWhenAbsent, String... canonicalSpellings) {
+    Optional<VerbatimSplit> verbatim = splitVerbatim(content);
+    if (verbatim.isEmpty()) {
+      String body = content == null ? "" : content;
+      return "---\ntype: " + typeWhenAbsent + "\n---\n" + body;
+    }
+    VerbatimSplit split = verbatim.get();
+    Optional<String> type =
+        Frontmatter.parse(split.yamlRaw()).getString("type").filter(s -> !s.isBlank());
+    if (type.isEmpty()) {
+      return insertTypeFirst(split, typeWhenAbsent);
+    }
+    return canonicalizeTypeSpelling(content, split, type.get(), canonicalSpellings);
   }
 
   public static Optional<Split> split(String content) {
@@ -56,6 +81,34 @@ public final class NoteLeadingFrontmatter {
         String body = joinLines(lines, i + 1, lines.length);
         String frontmatterBlock = joinLines(lines, 0, i + 1);
         return Optional.of(new VerbatimSplit(frontmatterBlock, yamlRaw, body));
+      }
+    }
+    return Optional.empty();
+  }
+
+  private static String insertTypeFirst(VerbatimSplit split, String typeWhenAbsent) {
+    String remainder = TOP_LEVEL_TYPE_LINE.matcher(split.yamlRaw()).replaceFirst("");
+    return split.rebuild("type: " + typeWhenAbsent + "\n" + remainder);
+  }
+
+  private static String canonicalizeTypeSpelling(
+      String content, VerbatimSplit split, String type, String[] canonicalSpellings) {
+    Optional<String> canonical = canonicalSpelling(type.trim(), canonicalSpellings);
+    if (canonical.isEmpty()) {
+      return content;
+    }
+    String newYaml =
+        TOP_LEVEL_TYPE_LINE.matcher(split.yamlRaw()).replaceFirst("$1$2" + canonical.get() + "$3");
+    if (newYaml.equals(split.yamlRaw())) {
+      return content;
+    }
+    return split.rebuild(newYaml);
+  }
+
+  private static Optional<String> canonicalSpelling(String type, String[] canonicalSpellings) {
+    for (String spelling : canonicalSpellings) {
+      if (spelling.equalsIgnoreCase(type)) {
+        return Optional.of(spelling);
       }
     }
     return Optional.empty();

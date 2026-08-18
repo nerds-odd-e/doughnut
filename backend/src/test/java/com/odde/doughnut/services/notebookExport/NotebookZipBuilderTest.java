@@ -15,6 +15,8 @@ import org.junit.jupiter.api.Test;
 
 class NotebookZipBuilderTest {
 
+  private static final String README_FENCE = "---\ntype: Readme\n---\n";
+
   private Map<String, String> readZipEntries(byte[] zipBytes) throws IOException {
     Map<String, String> entries = new LinkedHashMap<>();
     try (ZipInputStream zis = new ZipInputStream(new ByteArrayInputStream(zipBytes))) {
@@ -32,7 +34,7 @@ class NotebookZipBuilderTest {
   }
 
   @Test
-  void writesNotebookIndexAndRootNotesAsMarkdownFilesWithATitleHeading() throws IOException {
+  void writesNotebookReadmeAsReadmeMarkdownWithTypeWhenMissing() throws IOException {
     byte[] zipBytes =
         buildZip(
             "# Notebook readme",
@@ -41,12 +43,13 @@ class NotebookZipBuilderTest {
 
     Map<String, String> entries = readZipEntries(zipBytes);
 
-    assertThat(entries.get("index.md"), equalTo("# Notebook readme"));
+    assertThat(entries.get("README.md"), equalTo(README_FENCE + "# Notebook readme"));
+    assertThat(entries.containsKey("index.md"), equalTo(false));
     assertThat(entries.get("First note.md"), equalTo("# First note\n\nFirst body"));
   }
 
   @Test
-  void writesNestedFoldersWithTheirOwnIndexAndNotes() throws IOException {
+  void writesNestedFolderReadmeAsReadmeMarkdownAndOmitsBlank() throws IOException {
     ExportFolderRow parent = new ExportFolderRow(10, null, "Parent Folder", "Parent readme");
     ExportFolderRow child = new ExportFolderRow(11, 10, "Child Folder", null);
     ExportNoteRow noteInChild = new ExportNoteRow(2, 11, "Nested note", "Nested body");
@@ -55,11 +58,41 @@ class NotebookZipBuilderTest {
 
     Map<String, String> entries = readZipEntries(zipBytes);
 
-    assertThat(entries.get("Parent Folder/index.md"), equalTo("Parent readme"));
-    assertThat(entries.containsKey("Child Folder/index.md"), equalTo(false));
+    assertThat(entries.get("Parent Folder/README.md"), equalTo(README_FENCE + "Parent readme"));
+    assertThat(entries.containsKey("Parent Folder/Child Folder/README.md"), equalTo(false));
     assertThat(
         entries.get("Parent Folder/Child Folder/Nested note.md"),
         equalTo("# Nested note\n\nNested body"));
+  }
+
+  @Test
+  void insertsReadmeTypeAsFirstKeyKeepingAuthorFence() throws IOException {
+    String contentWithFrontmatter = "---\nwikidata_id: Q123\n---\n\nActual body text";
+
+    Map<String, String> entries =
+        readZipEntries(buildZip(contentWithFrontmatter, List.of(), List.of()));
+
+    assertThat(
+        entries.get("README.md"),
+        equalTo("---\ntype: Readme\nwikidata_id: Q123\n---\n\nActual body text"));
+  }
+
+  @Test
+  void canonicalizesReadmeTypeSpellingInPlace() throws IOException {
+    String content = "---\ntype: readme\nwikidata_id: Q1\n---\nbody";
+
+    Map<String, String> entries = readZipEntries(buildZip(content, List.of(), List.of()));
+
+    assertThat(entries.get("README.md"), equalTo("---\ntype: Readme\nwikidata_id: Q1\n---\nbody"));
+  }
+
+  @Test
+  void leavesOtherNonEmptyTypeUnchanged() throws IOException {
+    String content = "---\ntype: Note\nwikidata_id: Q1\n---\nbody";
+
+    Map<String, String> entries = readZipEntries(buildZip(content, List.of(), List.of()));
+
+    assertThat(entries.get("README.md"), equalTo(content));
   }
 
   @Test

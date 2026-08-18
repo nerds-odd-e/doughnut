@@ -10,6 +10,7 @@ import { attachCypressSpecScreenshotSink } from './cypressSpecScreenshotSink'
 import { createCliE2ePluginTasks } from './cliE2ePluginTasks'
 import { CLI_E2E_PNPM_SPAWN_ENV, runShellCommandSync } from './cliE2eRepo'
 import { E2E_APP_BASE_URL } from './constants'
+import { readZipEntries } from './readZipEntries'
 
 const commonConfig = {
   chromeWebSecurity: false,
@@ -106,6 +107,7 @@ const commonConfig = {
           })
         },
 
+        readZipEntries,
         fileShouldExistSoon(filePath, retryCount = 50): Promise<string> {
           const checker = (count: number): Promise<string> => {
             return new Promise((resolve) => {
