@@ -172,6 +172,13 @@ Then(
   }
 )
 
+Then(
+  'the notebook health OKF-incompatible titles finding includes {string}',
+  (label: string) => {
+    notebookPage().expectFindingGroupIncludes('okf_incompatible_titles', label)
+  }
+)
+
 When('I rename the notebook to {string}', (newName: string) => {
   notebookPage().rename(newName)
 })

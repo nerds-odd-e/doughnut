@@ -47,11 +47,7 @@ public class EmptyFolderHealthRule implements HealthRule {
     Set<Integer> occupiedFolderIds =
         new HashSet<>(noteRepository.findLiveNoteFolderIdsByNotebookId(notebook.getId()));
 
-    HealthFindingGroup group = new HealthFindingGroup();
-    group.setRuleId(id());
-    group.setTitle(title());
-    group.setSeverity(severity());
-    group.setAutoFixable(autoFixable());
+    HealthFindingGroup group = findingGroup();
     group.setItems(
         FolderSubtreeLiveNotes.noteEmptyFolderItems(
             folders, occupiedFolderIds, FolderSubtreeLiveNotes::isBlankReadme));

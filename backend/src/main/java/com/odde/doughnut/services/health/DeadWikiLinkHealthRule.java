@@ -53,22 +53,15 @@ public class DeadWikiLinkHealthRule implements HealthRule {
       children.add(childGroupForNote(note, deadTokens));
     }
 
-    HealthFindingGroup group = new HealthFindingGroup();
-    group.setRuleId(id());
-    group.setTitle(title());
-    group.setSeverity(severity());
-    group.setAutoFixable(autoFixable());
+    HealthFindingGroup group = findingGroup();
     group.setItems(List.of());
     group.setChildren(children);
     return group;
   }
 
   private HealthFindingGroup childGroupForNote(Note note, List<String> deadTokens) {
-    HealthFindingGroup child = new HealthFindingGroup();
-    child.setRuleId(id());
+    HealthFindingGroup child = findingGroup();
     child.setTitle(note.getTitle());
-    child.setSeverity(severity());
-    child.setAutoFixable(autoFixable());
     List<HealthFindingItem> items = new ArrayList<>();
     for (String token : deadTokens) {
       HealthFindingItem item = new HealthFindingItem();

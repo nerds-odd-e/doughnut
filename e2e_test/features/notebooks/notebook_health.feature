@@ -18,6 +18,13 @@ Feature: Notebook health
     And the notebook health readme-only folders finding includes "Readme Only Shell"
     And the notebook health dead wiki links finding includes note "Carrier" and token "Missing"
 
+  Scenario: Run lint lists notes whose titles occupy OKF reserved basenames
+    Given I have a notebook "Health OKF titles" with a note "index"
+    When I jump to the notebook "Health OKF titles"
+    And I open the notebook Health tab
+    When I run notebook health lint
+    Then the notebook health OKF-incompatible titles finding includes "index"
+
   Scenario: Run lint with removing empty folders enabled does not delete folders
     Given I have a notebook "Health no-mutate suite" with a note "Anchor"
     And the notebook "Health no-mutate suite" has an empty folder "Keep Empty"

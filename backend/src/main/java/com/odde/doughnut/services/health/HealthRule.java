@@ -14,4 +14,13 @@ public interface HealthRule {
   boolean autoFixable();
 
   HealthFindingGroup evaluate(Notebook notebook, HealthRunContext context);
+
+  default HealthFindingGroup findingGroup() {
+    HealthFindingGroup group = new HealthFindingGroup();
+    group.setRuleId(id());
+    group.setTitle(title());
+    group.setSeverity(severity());
+    group.setAutoFixable(autoFixable());
+    return group;
+  }
 }

@@ -1,6 +1,6 @@
 # Readme as `README.md` (OKF D1 / C2)
 
-**Status:** in progress (slice 4 next)  
+**Status:** in progress (slice 5 next)  
 **Seed:** [SEED-003](../../seeds/SEED-003-close-okf-v0-2-compatibility-gaps.md)  
 **Profile:** Proposed [ADR 0004](../../../docs/adrs/0004-okf-compatible-notebook-markdown.md)  
 **Glossary:** [ADR 0001](../../../docs/adrs/0001-ubiquitous-language.md)  

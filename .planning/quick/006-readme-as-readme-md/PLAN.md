@@ -1,6 +1,6 @@
 # Plan: Readme as README.md
 
-**Status:** in progress (slice 4 next)
+**Status:** in progress (slice 5 next)
 
 **Goal:** ZIP maps notebook/folder readme to `README.md` with `type: Readme`. Notes titled `index` / `log` warn, not block. ADR 0004 Decision matches that shape.
 
@@ -31,13 +31,11 @@ PathNameEditor shows a non-blocking OKF-incompatible title warning for `index` /
 
 **Learning:** Warning is value-based on the current title (still visible after save), unlike event-sourced wiki-link warnings. Do not share the title list with backend health (slice 4 is a different subsystem).
 
-### 4. Notebook health lists notes whose titles occupy OKF reserved basenames — Behavior — planned
+### 4. Notebook health lists notes whose titles occupy OKF reserved basenames — Behavior — done
 
-**Pre:** Notebook with a note titled `index` (or `log` / `*.md` variants).  
-**Trigger:** Run lint.  
-**Post:** A warning-severity finding names those notes. No auto-fix. Empty-folder / dead-wiki groups unchanged.
+Lint emits warning-severity, non-auto-fixable `okf_incompatible_titles` naming live notes titled `index` / `index.md` / `log` / `log.md`. Empty-folder and dead-wiki groups unchanged.
 
-E2E: `notebook_health.feature`. Rule: new `HealthRule` (warning, not auto-fixable).
+**Learning:** `OkfIncompatibleTitleHealthRule` is a `@Service` `HealthRule` (auto-picked by `HealthRuleRunner`). Finding-group metadata is `HealthRule.findingGroup()`. Title set stays local to backend; do not share with PathNameEditor.
 
 ### 5. Close D1/C2 on the tracker — Structure — planned
 
