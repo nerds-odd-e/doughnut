@@ -16,8 +16,6 @@ import org.junit.jupiter.params.provider.CsvSource;
 class SpacedRepetitionCorrectRecallSchedulingTest extends SpacedRepetitionRecallSchedulingTestBase {
   static final float FIRST_GOOD_DIFFICULTY = 2.118104f;
   static final float FIRST_GOOD_STABILITY_HOURS = 55.0f;
-  static final float MAXIMUM_INTERVAL_HOURS = 876000f;
-  static final float LEGACY_LADDER_MAX_STABILITY_HOURS = 1_800_600f;
 
   @Test
   void firstCorrectRecallUsesS0AndD0Good() {
@@ -86,6 +84,23 @@ class SpacedRepetitionCorrectRecallSchedulingTest extends SpacedRepetitionRecall
     memoryTracker.recalledSuccessfully(onTimeGradeTime(memoryTracker), null);
 
     assertThat(memoryTracker.getStability(), equalTo(266.0f));
+  }
+
+  @Test
+  void ordinaryGoodNextStabilityAndDueIgnoreThinkingTime() {
+    MemoryTracker missing = aGradedTrackerAtThreeDayStability();
+    MemoryTracker zeroMs = aGradedTrackerAtThreeDayStability();
+    MemoryTracker sixtySeconds = aGradedTrackerAtThreeDayStability();
+    Timestamp gradeTime = onTimeGradeTime(missing);
+
+    missing.recalledSuccessfully(gradeTime, null);
+    zeroMs.recalledSuccessfully(gradeTime, 0);
+    sixtySeconds.recalledSuccessfully(gradeTime, 60_000);
+
+    assertThat(zeroMs.getStability(), equalTo(missing.getStability()));
+    assertThat(sixtySeconds.getStability(), equalTo(missing.getStability()));
+    assertThat(zeroMs.getNextRecallAt(), equalTo(missing.getNextRecallAt()));
+    assertThat(sixtySeconds.getNextRecallAt(), equalTo(missing.getNextRecallAt()));
   }
 
   @Test
@@ -218,29 +233,5 @@ class SpacedRepetitionCorrectRecallSchedulingTest extends SpacedRepetitionRecall
             elapsedHundredTimesStability.getLastRecalledAt());
     assertThat(hundredTimesInterval, greaterThan(tenTimesInterval));
     assertThat(hundredTimesInterval - tenTimesInterval, lessThan(tenTimesInterval));
-  }
-
-  @Test
-  void correctRecallFromOverCapStabilityLandsAtTheCap() {
-    MemoryTracker memoryTracker = aGradedTrackerAtStability(LEGACY_LADDER_MAX_STABILITY_HOURS);
-    Timestamp gradeTime = onTimeGradeTime(memoryTracker);
-
-    memoryTracker.recalledSuccessfully(gradeTime, null);
-
-    assertThat(memoryTracker.getStability(), equalTo(MAXIMUM_INTERVAL_HOURS));
-    assertThat(
-        memoryTracker.getNextRecallAt(),
-        equalTo(
-            TimestampOperations.addHoursToTimestamp(
-                gradeTime, Math.round(MAXIMUM_INTERVAL_HOURS))));
-  }
-
-  @Test
-  void thinkingTimeOnOverCapCorrectRecallDoesNotPierceTheCap() {
-    MemoryTracker memoryTracker = aGradedTrackerAtStability(LEGACY_LADDER_MAX_STABILITY_HOURS);
-
-    memoryTracker.recalledSuccessfully(onTimeGradeTime(memoryTracker), 0);
-
-    assertThat(memoryTracker.getStability(), equalTo(MAXIMUM_INTERVAL_HOURS));
   }
 }

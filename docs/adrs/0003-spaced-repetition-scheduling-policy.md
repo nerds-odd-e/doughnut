@@ -58,8 +58,8 @@ state, qualitative update rules), not with a particular crate or version.
   `S_MAX`), compared and persisted as **876000 whole hours** — not a Settings
   knob, not persisted as its own field, and not otherwise configurable. It is
   not shown as its own UI; Memory Tracker still shows Stability (migrated
-  rows may drop). After next Stability is computed (FSRS update, thinking-time
-  overlay on Good, Tutor **2** shrink, confusion midpoint), on every write of
+  rows may drop). After next Stability is computed (FSRS update, Tutor **2**
+  shrink, confusion midpoint), on every write of
   next Stability: `S = min(S, 876000)`. Due follows from that S
   (`nextRecallAt = lastRecalledAt + I(0.9, S)`). Do not keep an unbounded S
   beside a capped due. Same strictly-future fallback when `I` is
@@ -83,9 +83,8 @@ I(0.9, S)` in whole hours (strictly-future fallback when `I` is
 non-positive). Do not jitter Stability or due. Open FSRS may randomize the
 scheduled interval to spread same-calendar-day clumps; Doughnut already
 spreads dues because they are anchored to the actual recall instant in
-whole hours. Thinking time may still adjust Stability on ordinary Good;
-that is an effort overlay, not random `I`. Session order among already-due
-items is not a memory-state concern. Fuzz is not a Settings knob.
+whole hours. Session order among already-due items is not a memory-state
+concern. Fuzz is not a Settings knob.
 
 ### Difficulty on correct recall
 
@@ -102,7 +101,7 @@ First mapped **success** on a New tracker (ordinary correct / just review Yes / 
 - Stability `S0(G) = w[G−1]` days, persisted as whole hours. With frozen weights: Good **55**, Hard **31**, Easy **199**.
 - Difficulty is `D0(G)` clamped to `[1, 10]`, persisted as the Java float from that formula (API number, no extra rounding). Persisted first Easy Difficulty is **1**.
 - `D0(Easy)` stays **unclamped** as the later mean-reversion target (see **Difficulty after a mapped grade**).
-- Elapsed time and thinking time do **not** change first-rating. Overdue extra does not apply.
+- Elapsed time does **not** change first-rating. Overdue extra does not apply.
 - Due is `lastRecalledAt` plus those hours.
 
 First Again / Tutor **0/1** on New uses the same first-rating path with `G=1`: Stability `S0(1)` (**5** hours), Difficulty `D0(1)` (Java float), due `lastRecalledAt + I` (**5h**).
@@ -177,8 +176,8 @@ A **New** tracker (Stability 0) that fails uses first-rating Again: Stability `S
 
 A correct recall after more elapsed whole hours than the tracker's
 **Stability** must result in a next Stability **strictly longer** than the
-same correct recall at elapsed hours equal to that Stability (same
-thinking-time input). Extra growth is driven by elapsed time vs Stability
+same correct recall at elapsed hours equal to that Stability. Extra growth
+is driven by elapsed time vs Stability
 (low Retrievability), not by lateness vs `nextRecallAt`. It is **bounded**:
 further delay must not increase the next interval without limit. A linear
 lateness bonus is not allowed. Exact increment math is an implementation
@@ -207,10 +206,12 @@ next Stability.
 
 ### Thinking time
 
-A trustworthy effort measurement (thinking time) may adjust within a
-**correct** outcome only, within bounds. It must not invert the outcome.
-Missing or untrustworthy effort is neutral. Thinking time does not change
-first-rating on New (see **First rating on New**).
+Thinking time is **not** a memory-state input. Memory-state transitions use
+grade G, elapsed whole hours, and D/S/R only. Record thinking time on the
+answer when the prompt measured it. Show it in recall statistics and Memory
+Tracker prompt history. It must not change Stability, Difficulty, or due.
+Do not rewrite existing Stability that was computed under a previous overlay.
+Do not replace the overlay with interval fuzz or any other due shuffle.
 
 ### Accidental-match and overlap transitions
 
@@ -329,7 +330,8 @@ Empty pending accept.
 - Graded outcomes are trustworthy enough to be the primary scheduling signal.
 - Answer time and the current tracker snapshot are available when grading;
   complete historical events are not assumed reconstructable.
-- Thinking time is an optional secondary input, not a correctness substitute.
+- Thinking time may be recorded on answers for display; it is not a
+  memory-state input.
 - Work preserves the existing due-time projection rather than an unsafe
   historical rebuild.
 
@@ -356,9 +358,12 @@ Empty pending accept.
   consume it; RecallLog already holds Again history; the frequent-failure
   warning is the product signal. Do not add an unused counter.
 - **FSRS interval fuzz** — rejected: due follows Stability; hour-precision
-  recall instants already spread same-calendar-day clumps; thinking time is
-  an effort overlay on Good, not random `I`. Open FSRS treats fuzz as
-  optional (`enable_fuzz` defaults off in ts-fsrs).
+  recall instants already spread same-calendar-day clumps. Open FSRS treats
+  fuzz as optional (`enable_fuzz` defaults off in ts-fsrs).
+- **RT as Stability input** — rejected: thinking time is not a DSR input
+  (G, elapsed t, D/S/R only). Record it on the answer and show it in stats /
+  prompt history. Do not change S, D, or due. Do not rewrite existing S. Do
+  not replace the overlay with fuzz or another shuffle.
 
 ## Related
 

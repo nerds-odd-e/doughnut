@@ -1,6 +1,5 @@
 package com.odde.doughnut.entities;
 
-import com.odde.doughnut.algorithms.SpacedRepetitionAlgorithm;
 import java.util.function.Supplier;
 
 public class ForgettingCurve {
@@ -26,10 +25,7 @@ public class ForgettingCurve {
   NextMemory afterGoodRecall(long elapsedInHours, Integer thinkingTimeMs) {
     return afterRecall(
         Fsrs.GOOD,
-        () ->
-            adjustForThinkingTime(
-                FsrsGoodRecall.hoursAfterGoodRecall(stabilityHours, difficulty, elapsedInHours),
-                thinkingTimeMs));
+        () -> FsrsGoodRecall.hoursAfterGoodRecall(stabilityHours, difficulty, elapsedInHours));
   }
 
   NextMemory afterEasyRecall(long elapsedInHours) {
@@ -50,10 +46,6 @@ public class ForgettingCurve {
         () -> FsrsAgainRecall.hoursAfterAgainRecall(stabilityHours, difficulty, elapsedInHours));
   }
 
-  float succeeded(long elapsedInHours, Integer thinkingTimeMs) {
-    return afterGoodRecall(elapsedInHours, thinkingTimeMs).stability();
-  }
-
   private NextMemory firstRating(int grade) {
     return new NextMemory(Fsrs.initialDifficulty(grade), Fsrs.initialStabilityHours(grade));
   }
@@ -67,32 +59,6 @@ public class ForgettingCurve {
 
   public boolean isNew() {
     return stabilityHours <= ASSIMILATE_STABILITY_HOURS;
-  }
-
-  private float adjustForThinkingTime(float fsrsHours, Integer thinkingTimeMs) {
-    float increment = fsrsHours - stabilityHours;
-    float adjustment = calculateThinkingTimeAdjustment(thinkingTimeMs);
-    float tweakBase = increment > 0 ? increment : stabilityHours;
-    float tweaked = fsrsHours + tweakBase * adjustment;
-    return Math.max(stabilityHours, Math.round(tweaked));
-  }
-
-  private float calculateThinkingTimeAdjustment(Integer thinkingTimeMs) {
-    if (thinkingTimeMs == null) {
-      return 0.0f;
-    }
-    int clampedMs = Math.max(0, Math.min(MAX_THINKING_TIME_MS, thinkingTimeMs));
-    double thinkingTimeSeconds = clampedMs / 1000.0;
-    double baseThinkingTimeSeconds = BASE_THINKING_TIME_MS / 1000.0;
-
-    double diff = Math.abs(thinkingTimeSeconds - baseThinkingTimeSeconds);
-    double adjustmentValue = Math.sqrt(diff) / SpacedRepetitionAlgorithm.LEGACY_INDEX_STEP;
-
-    if (thinkingTimeSeconds > baseThinkingTimeSeconds) {
-      adjustmentValue = -adjustmentValue;
-    }
-
-    return (float) adjustmentValue;
   }
 
   float confusionAdjusted(long elapsedInHours) {

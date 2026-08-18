@@ -130,27 +130,6 @@ class RecallPromptAnswerSpellingControllerTest extends RecallPromptControllerTes
   }
 
   @Test
-  void fastAnswer_shouldIncreaseStabilityMoreThanSlowAnswer()
-      throws UnexpectedNoAccessRightException {
-    testabilitySettings.timeTravelTo(memoryTracker.getNextRecallAt());
-    Float baseStability = memoryTracker.getStability();
-    Timestamp baseLastRecalledAt = memoryTracker.getLastRecalledAt();
-
-    answerDTO.setThinkingTimeMs(10000);
-    controller.answerSpelling(recallPrompt, answerDTO);
-    Float stabilityWithFastAnswer = memoryTracker.getStability();
-
-    memoryTracker.setStability(baseStability);
-    memoryTracker.setLastRecalledAt(baseLastRecalledAt);
-    memoryTracker.setNextRecallAt(memoryTracker.calculateNextRecallAt());
-    AnswerSpellingDTO slowAnswer = spellingAnswer(answerNote.getTitle());
-    slowAnswer.setThinkingTimeMs(40000);
-    controller.answerSpelling(spellingPrompt(memoryTracker), slowAnswer);
-
-    assertThat(stabilityWithFastAnswer, greaterThan(memoryTracker.getStability()));
-  }
-
-  @Test
   void answerWithBaseThinkingTime_shouldHaveNoThinkingTimeAdjustment()
       throws UnexpectedNoAccessRightException {
     testabilitySettings.timeTravelTo(memoryTracker.getNextRecallAt());
