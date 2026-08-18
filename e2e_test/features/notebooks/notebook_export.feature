@@ -36,3 +36,19 @@ Feature: Notebook export
     When I export notebook "E2E Export Notebook" from the catalog
     Then the downloaded zip entry "Recipe.md" of notebook "E2E Export Notebook" does not include "title:"
     And the collision zip entry for title "Recipe" of notebook "E2E Export Notebook" includes "title: Recipe*"
+
+  Scenario: Exported note file is stored markdown without a generated title heading
+    And I have a note "Pasta" under notebook "E2E Export Notebook" with content:
+      """
+      ---
+      type: Note
+      ---
+      # Author heading
+
+      Boil water
+      """
+    When I export notebook "E2E Export Notebook" from the catalog
+    Then the downloaded zip entry "Pasta.md" of notebook "E2E Export Notebook" includes "type: Note"
+    And the downloaded zip entry "Pasta.md" of notebook "E2E Export Notebook" includes "# Author heading"
+    And the downloaded zip entry "Pasta.md" of notebook "E2E Export Notebook" includes "Boil water"
+    And the downloaded zip entry "Pasta.md" of notebook "E2E Export Notebook" does not include "# Pasta"

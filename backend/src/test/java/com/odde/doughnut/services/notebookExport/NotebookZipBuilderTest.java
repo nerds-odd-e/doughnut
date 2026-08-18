@@ -56,9 +56,7 @@ class NotebookZipBuilderTest {
 
     assertThat(entries.get("Parent Folder/README.md"), equalTo(README_FENCE + "Parent readme"));
     assertThat(entries.containsKey("Parent Folder/Child Folder/README.md"), equalTo(false));
-    assertThat(
-        entries.get("Parent Folder/Child Folder/Nested note.md"),
-        equalTo("# Nested note\n\nNested body"));
+    assertThat(entries.get("Parent Folder/Child Folder/Nested note.md"), equalTo("Nested body"));
   }
 
   @Test
@@ -100,8 +98,7 @@ class NotebookZipBuilderTest {
 
     Map<String, String> entries = readZipEntries(zipBytes);
     assertThat(
-        entries.get("My Note.md"),
-        equalTo("---\nwikidata_id: Q123\n---\n\n# My Note\n\nActual body text"));
+        entries.get("My Note.md"), equalTo("---\nwikidata_id: Q123\n---\n\nActual body text"));
   }
 
   @Test
@@ -153,7 +150,6 @@ class NotebookZipBuilderTest {
 
     Map<String, String> entries = readZipEntries(buildZip(null, List.of(), List.of(note)));
 
-    assertThat(
-        entries.get("Q&A x.md"), equalTo("---\ntitle: Keep Me\n---\n\n# Q&A: x\n\nActual body"));
+    assertThat(entries.get("Q&A x.md"), equalTo("---\ntitle: Keep Me\n---\n\nActual body"));
   }
 }

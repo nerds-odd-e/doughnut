@@ -49,7 +49,7 @@ class NotebookExportServiceTest {
     Map<String, String> entries =
         readZipEntries(notebookExportService.exportNotebookAsZip(folder.getNotebook()));
 
-    assertThat(entries.get("Recipes/Pasta.md"), equalTo("# Pasta\n\nBoil water"));
+    assertThat(entries.get("Recipes/Pasta.md"), equalTo("Boil water"));
   }
 
   @Test

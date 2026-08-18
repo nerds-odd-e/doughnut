@@ -4,8 +4,8 @@ import com.odde.doughnut.algorithms.NoteLeadingFrontmatter;
 import java.util.Objects;
 
 /**
- * Assembles an exported note Markdown file: preserved author frontmatter (if any), codec-wrap
- * {@code title:} when the filename cannot round-trip, title heading, and body.
+ * Assembles exported note Markdown: stored content, with codec-wrap {@code title:} when the
+ * filename cannot round-trip the display title.
  */
 public final class ExportNoteMarkdown {
   private static final String MD_SUFFIX = ".md";
@@ -14,14 +14,10 @@ public final class ExportNoteMarkdown {
 
   public static String assemble(ExportNoteRow note, String zipEntryFileName) {
     String rawContent = note.content() == null ? "" : note.content();
-    String heading = "# " + note.title() + "\n\n";
-    String wrapped =
-        Objects.equals(conceptFileName(zipEntryFileName), note.title())
-            ? rawContent
-            : NoteLeadingFrontmatter.ensureTitleKey(rawContent, note.title());
-    return NoteLeadingFrontmatter.splitVerbatim(wrapped)
-        .map(split -> split.frontmatterBlock() + "\n\n" + heading + split.body().stripLeading())
-        .orElseGet(() -> heading + wrapped.stripLeading());
+    if (Objects.equals(conceptFileName(zipEntryFileName), note.title())) {
+      return rawContent;
+    }
+    return NoteLeadingFrontmatter.ensureTitleKey(rawContent, note.title());
   }
 
   private static String conceptFileName(String zipEntryFileName) {
