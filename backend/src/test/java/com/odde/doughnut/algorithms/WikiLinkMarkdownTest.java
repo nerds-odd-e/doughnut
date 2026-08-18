@@ -117,6 +117,37 @@ class WikiLinkMarkdownTest {
   }
 
   @Test
+  void newInnerForFolderRename_rewritesWikiPathPrefix() {
+    assertThat(
+        WikiLinkMarkdownRewrite.newInnerForFolderRename(
+            "OldFolder/Title", "OldFolder", "NewFolder"),
+        equalTo("NewFolder/Title"));
+  }
+
+  @Test
+  void newInnerForFolderRename_rewritesOneFolderSegmentNotTitle() {
+    assertThat(
+        WikiLinkMarkdownRewrite.newInnerForFolderRename(
+            "Parent/OldFolder/OldFolder", "OldFolder", "NewFolder"),
+        equalTo("Parent/NewFolder/OldFolder"));
+  }
+
+  @Test
+  void newInnerForFolderRename_rewritesPathMarkdownPrefixAndKeepsMarkdown() {
+    assertThat(
+        WikiLinkMarkdownRewrite.newInnerForFolderRename(
+            "[label](/OldFolder/Title.md)", "OldFolder", "NewFolder"),
+        equalTo("[label](/NewFolder/Title.md)"));
+  }
+
+  @Test
+  void newInnerForFolderRename_leavesUnqualifiedTitleUnchanged() {
+    assertThat(
+        WikiLinkMarkdownRewrite.newInnerForFolderRename("Title", "OldFolder", "NewFolder"),
+        equalTo("Title"));
+  }
+
+  @Test
   void newInnerForKeepVisibleText_keepsPathMarkdownLabel() {
     assertThat(
         WikiLinkMarkdownRewrite.newInnerForKeepVisibleText("[label](/Folder/Old.md)", "New"),

@@ -102,9 +102,9 @@ Unresolved `[label](/Folder/Missing.md)` uses the same dead wiki-link UI; stored
 ### 8. Folder rename updates path prefixes in both spellings
 
 - **Type:** Behavior
-- **Status:** planned
+- **Status:** done
 
-**Pre:** a note contains both `[[OldFolder/Title]]` and `[label](/OldFolder/Title.md)` to the same target. **Trigger:** rename folder `OldFolder` → `NewFolder`. **Post:** both spans still open the note; wiki stays wiki; Markdown stays Markdown; path prefix is `NewFolder`. One rewrite over parsed path segments (`PathShapedTarget` + `pathMarkdownOccurrences`). E2E: `wiki_link.feature` and/or `path_markdown_link.feature`.
+Folder rename rewrites one matching folder-name segment via `PathShapedTarget.withRenamedFolder` / `rewriteAuthoredTarget`. Wiki stays wiki; Markdown stays Markdown. E2E in `path_markdown_link.feature`.
 
 ### 9. Close P4 dual-spelling in the tracker
 
@@ -120,6 +120,7 @@ Unresolved `[label](/Folder/Missing.md)` uses the same dead wiki-link UI; stored
 - Slice 3: title rewrite lives on `WikiLinkTargetReference.replaceNoteTitle` (path-shaped via `PathShapedTarget.withNoteTitle`).
 - Slice 4: nested `[[Parent/Child/Title]]` already resolved; this slice only locked it with tests.
 - Slice 5: extract is `authoredTokensInOccurrenceOrder`. Cache `link_text` is the full Markdown token. Display uses `WikiTitle.targetToken` (leading `/` ⇒ path href). Turndown: `/n…` → wiki; concept path href → Markdown.
-- Slice 6: `WikiLinkMarkdown.tryParsePathMarkdownToken` / `pathMarkdownOccurrences` is the only Markdown scan. `PathShapedTarget.withNoteTitle` keeps `/` and `.md`. Slice 8 should rewrite folder segments on that same parse, not a second scanner.
+- Slice 6: `WikiLinkMarkdown.tryParsePathMarkdownToken` / `pathMarkdownOccurrences` is the only Markdown scan. `PathShapedTarget.withNoteTitle` keeps `/` and `.md`.
 - Slice 7: leftover wiki tokens and leftover path hrefs share one dead-link pass. Create / point-at-existing still wiki-token-only (out of this plan). Path Markdown scenarios: `e2e_test/features/note_topology/path_markdown_link.feature`.
+- Slice 8: folder rename uses `rewriteAuthoredTarget` + `PathShapedTarget.withRenamedFolder`. Subtree walk extracted to `FolderSubtree`. `NotebookController` HTTP signature unchanged.
 - ZIP collision `Recipe (2).md` is not `[[Recipe (2)]]`. Out of this plan.

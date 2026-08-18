@@ -64,3 +64,25 @@ Feature: Path Markdown links in notes
     And the note content markdown source should not contain "[["
     When I view the note content as rich content
     Then following the wiki link "label" should open the note titled "WikiPathMdRenameNew"
+
+  Scenario: Renaming a folder updates path prefixes in both spellings
+    Given I have a notebook "WikiFolderRenameNB" with notes:
+      | Title                   | Folder                 |
+      | WikiFolderRenameTitle   | WikiFolderRenameOld    |
+      | WikiFolderRenameCarrier | WikiFolderRenameRoot   |
+    When I update note "WikiFolderRenameCarrier" content using markdown to become:
+      """
+      See [[WikiFolderRenameOld/WikiFolderRenameTitle]] and [label](/WikiFolderRenameOld/WikiFolderRenameTitle.md).
+      """
+    And I open the folder page for "WikiFolderRenameOld" in notebook "WikiFolderRenameNB"
+    And I rename the folder heading to "WikiFolderRenameNew"
+    And I reload the folder page
+    Then the folder page heading should be "WikiFolderRenameNew"
+    When I route to the note "WikiFolderRenameCarrier"
+    And I view the note content as markdown
+    Then the note content markdown source should contain "[[WikiFolderRenameNew/WikiFolderRenameTitle]]"
+    And the note content markdown source should contain "[label](/WikiFolderRenameNew/WikiFolderRenameTitle.md)"
+    When I view the note content as rich content
+    Then the wiki link "WikiFolderRenameNew/WikiFolderRenameTitle" should open the note titled "WikiFolderRenameTitle"
+    When I route to the note "WikiFolderRenameCarrier"
+    Then following the wiki link "label" should open the note titled "WikiFolderRenameTitle"

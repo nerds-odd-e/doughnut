@@ -1,8 +1,6 @@
 package com.odde.doughnut.services;
 
-import com.odde.doughnut.algorithms.NoteContentMarkdown;
 import com.odde.doughnut.algorithms.WikiLinkMarkdownRewrite;
-import com.odde.doughnut.algorithms.WikiLinkTargetReference;
 import com.odde.doughnut.controllers.dto.TitleRenameReferenceHandling;
 import com.odde.doughnut.entities.DisplayName;
 import com.odde.doughnut.entities.Note;
@@ -13,12 +11,7 @@ import com.odde.doughnut.factoryServices.EntityPersister;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.function.UnaryOperator;
 import org.springframework.stereotype.Service;
@@ -107,6 +100,25 @@ public class WikiLinkRewriteService {
   }
 
   /**
+   * Rewrites inbound path-shaped wiki and Markdown links when a folder is renamed. One matching
+   * folder-name segment in the prefix is updated; spelling is preserved.
+   */
+  @Transactional
+  public void rewriteInboundWikiLinksForFolderRename(
+      Set<Integer> noteIdsInSubtree,
+      String oldFolderName,
+      String newFolderName,
+      Timestamp updatedAt,
+      User viewer) {
+    UnaryOperator<String> fn =
+        lt -> WikiLinkMarkdownRewrite.newInnerForFolderRename(lt, oldFolderName, newFolderName);
+    WikiLinkRewriteSupport.forEachNonDeletedNoteInMoveSet(
+        entityManager,
+        noteIdsInSubtree,
+        note -> rewriteInboundWikiLinks(note, updatedAt, viewer, fn, Set.of()));
+  }
+
+  /**
    * Rewrites inbound wiki links for every note in a folder subtree that moved to another notebook.
    * Referrers inside the moved set are skipped because their relative links still resolve.
    */
@@ -155,68 +167,15 @@ public class WikiLinkRewriteService {
       Timestamp updatedAt,
       User viewer,
       Set<Integer> coMovedTargetNoteIds) {
-    String originalContent = movedNote.getContent();
-    if (originalContent == null || originalContent.isEmpty()) {
-      return;
-    }
-    String content = originalContent;
-    LinkedHashSet<String> linkTexts =
-        new LinkedHashSet<>(NoteContentMarkdown.authoredTokensInOccurrenceOrder(content));
-    for (String linkText : linkTexts) {
-      String newInner =
-          WikiLinkMarkdownRewrite.newInnerForQualifyUnqualifiedOutgoingLink(
-              linkText, sourceNotebookName);
-      if (newInner.equals(linkText)) {
-        continue;
-      }
-      if (coMovedTargetResolvesFrom(movedNote, linkText, coMovedTargetNoteIds)) {
-        continue;
-      }
-      content =
-          WikiLinkMarkdownRewrite.replaceWikiLinksMatchingTrimmedInner(content, linkText, newInner);
-    }
-    if (content.equals(originalContent)) {
-      return;
-    }
-    movedNote.setContent(content);
-    movedNote.setUpdatedAt(updatedAt);
-    entityPersister.save(movedNote);
-    wikiTitleCacheService.refreshForNote(movedNote, viewer);
-  }
-
-  private boolean coMovedTargetResolvesFrom(
-      Note movedNote, String linkText, Set<Integer> coMovedTargetNoteIds) {
-    if (coMovedTargetNoteIds.isEmpty()) {
-      return false;
-    }
-    String focusNotebookName =
-        movedNote.getNotebook() == null ? null : movedNote.getNotebook().getName();
-    Optional<WikiLinkTargetReference> reference =
-        WikiLinkTargetReference.forToken(linkText, focusNotebookName);
-    if (reference.isEmpty()) {
-      return false;
-    }
-    WikiLinkTargetReference ref = reference.get();
-    List<Integer> noteIds = new ArrayList<>(coMovedTargetNoteIds);
-    Collections.sort(noteIds);
-    // When several co-moved notes share a title, lowest note id wins (same as global resolution).
-    for (Integer noteId : noteIds) {
-      Note candidate = entityManager.find(Note.class, noteId);
-      if (candidate != null
-          && candidate.getDeletedAt() == null
-          && noteMatchesWikiLinkTarget(candidate, ref)) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  private static boolean noteMatchesWikiLinkTarget(Note note, WikiLinkTargetReference ref) {
-    if (note.getNotebook() == null) {
-      return false;
-    }
-    return note.getNotebook().getName().equalsIgnoreCase(ref.notebookName())
-        && note.getTitle().equalsIgnoreCase(ref.noteTitle());
+    WikiLinkRewriteSupport.applyOutgoingNotebookMoveRewrite(
+        entityManager,
+        entityPersister,
+        wikiTitleCacheService,
+        movedNote,
+        sourceNotebookName,
+        updatedAt,
+        viewer,
+        coMovedTargetNoteIds);
   }
 
   private void rewriteInboundWikiLinks(

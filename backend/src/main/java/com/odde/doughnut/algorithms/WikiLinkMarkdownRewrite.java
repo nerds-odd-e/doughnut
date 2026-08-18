@@ -1,6 +1,7 @@
 package com.odde.doughnut.algorithms;
 
 import com.odde.doughnut.validators.DisplayNamePathSeparators;
+import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 import java.util.regex.Matcher;
 
@@ -17,6 +18,27 @@ public final class WikiLinkMarkdownRewrite {
 
   public static String newInnerForKeepVisibleText(String storedLinkInner, String newNoteTitle) {
     return newInnerWithHandling(storedLinkInner, newNoteTitle, true);
+  }
+
+  /**
+   * Rewrites one matching folder-name segment in a path-shaped wiki inner or path Markdown href.
+   * Unqualified titles and the note-title segment are left unchanged. Spelling is preserved.
+   */
+  public static String newInnerForFolderRename(
+      String storedLinkInner, String oldFolderName, String newFolderName) {
+    if (oldFolderName == null) {
+      throw new IllegalArgumentException("oldFolderName");
+    }
+    if (newFolderName == null) {
+      throw new IllegalArgumentException("newFolderName");
+    }
+    if (storedLinkInner == null || storedLinkInner.isEmpty()) {
+      return storedLinkInner;
+    }
+    UnaryOperator<String> transform =
+        token -> WikiLinkTargetReference.replaceFolderName(token, oldFolderName, newFolderName);
+    return rewriteAuthoredTarget(
+        storedLinkInner, transform, () -> rewriteWikiInnerTarget(storedLinkInner, transform));
   }
 
   /**
@@ -72,12 +94,30 @@ public final class WikiLinkMarkdownRewrite {
     if (storedLinkInner == null || storedLinkInner.isEmpty()) {
       return newNoteTitle;
     }
+    return rewriteAuthoredTarget(
+        storedLinkInner,
+        token -> WikiLinkTargetReference.replaceNoteTitle(token, newNoteTitle.trim()),
+        () -> rewriteWikiInnerNoteTitle(storedLinkInner, newNoteTitle, keepVisibleText));
+  }
+
+  private static String rewriteAuthoredTarget(
+      String storedLinkInner,
+      UnaryOperator<String> targetTransform,
+      Supplier<String> wikiFallback) {
     return WikiLinkMarkdown.tryParsePathMarkdownToken(storedLinkInner)
-        .map(
-            token ->
-                token.withHref(
-                    WikiLinkTargetReference.replaceNoteTitle(token.href(), newNoteTitle.trim())))
-        .orElseGet(() -> rewriteWikiInnerNoteTitle(storedLinkInner, newNoteTitle, keepVisibleText));
+        .map(token -> token.withHref(targetTransform.apply(token.href())))
+        .orElseGet(wikiFallback);
+  }
+
+  private static String rewriteWikiInnerTarget(
+      String storedLinkInner, UnaryOperator<String> targetTransform) {
+    int pipeIdx = storedLinkInner.indexOf('|');
+    String rawTargetPart = pipeIdx == -1 ? storedLinkInner : storedLinkInner.substring(0, pipeIdx);
+    String newTargetToken = targetTransform.apply(rawTargetPart.trim());
+    if (pipeIdx == -1) {
+      return newTargetToken;
+    }
+    return newTargetToken + "|" + storedLinkInner.substring(pipeIdx + 1);
   }
 
   private static String rewriteWikiInnerNoteTitle(

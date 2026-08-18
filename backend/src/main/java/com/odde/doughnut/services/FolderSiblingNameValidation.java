@@ -69,6 +69,25 @@ public class FolderSiblingNameValidation {
   }
 
   /**
+   * When a same-name sibling exists, returns it if {@code merge} is true; otherwise rejects with
+   * {@link #DUPLICATE_SIBLING_NAME_HERE}. Empty when the destination is free.
+   */
+  public Optional<Folder> mergeTargetOrRejectConflict(
+      Integer notebookId, Integer destParentId, Folder folder, boolean merge) {
+    Optional<Folder> existingSibling =
+        findConflictingSibling(
+            notebookId, destParentId, new DisplayName(folder.getName()), folder.getId());
+    if (existingSibling.isEmpty()) {
+      return Optional.empty();
+    }
+    if (merge) {
+      return existingSibling;
+    }
+    throwFolderNameConflict(DUPLICATE_SIBLING_NAME_HERE);
+    return Optional.empty();
+  }
+
+  /**
    * Ensures no other folder under {@code parentFolderId} in {@code notebookId} has {@code name},
    * ignoring folders whose ids are in {@code excludedFolderIds}.
    */

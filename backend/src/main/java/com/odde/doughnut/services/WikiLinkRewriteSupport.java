@@ -1,6 +1,8 @@
 package com.odde.doughnut.services;
 
+import com.odde.doughnut.algorithms.NoteContentMarkdown;
 import com.odde.doughnut.algorithms.WikiLinkMarkdownRewrite;
+import com.odde.doughnut.algorithms.WikiLinkTargetReference;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.NoteWikiTitleCache;
 import com.odde.doughnut.entities.User;
@@ -14,6 +16,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.UnaryOperator;
@@ -80,5 +83,81 @@ final class WikiLinkRewriteSupport {
       entityPersister.save(referrer);
       wikiTitleCacheService.refreshForNote(referrer, viewer);
     }
+  }
+
+  static void applyOutgoingNotebookMoveRewrite(
+      EntityManager entityManager,
+      EntityPersister entityPersister,
+      WikiTitleCacheService wikiTitleCacheService,
+      Note movedNote,
+      String sourceNotebookName,
+      Timestamp updatedAt,
+      User viewer,
+      Set<Integer> coMovedTargetNoteIds) {
+    String originalContent = movedNote.getContent();
+    if (originalContent == null || originalContent.isEmpty()) {
+      return;
+    }
+    String content = originalContent;
+    LinkedHashSet<String> linkTexts =
+        new LinkedHashSet<>(NoteContentMarkdown.authoredTokensInOccurrenceOrder(content));
+    for (String linkText : linkTexts) {
+      String newInner =
+          WikiLinkMarkdownRewrite.newInnerForQualifyUnqualifiedOutgoingLink(
+              linkText, sourceNotebookName);
+      if (newInner.equals(linkText)) {
+        continue;
+      }
+      if (coMovedTargetResolvesFrom(entityManager, movedNote, linkText, coMovedTargetNoteIds)) {
+        continue;
+      }
+      content =
+          WikiLinkMarkdownRewrite.replaceWikiLinksMatchingTrimmedInner(content, linkText, newInner);
+    }
+    if (content.equals(originalContent)) {
+      return;
+    }
+    movedNote.setContent(content);
+    movedNote.setUpdatedAt(updatedAt);
+    entityPersister.save(movedNote);
+    wikiTitleCacheService.refreshForNote(movedNote, viewer);
+  }
+
+  private static boolean coMovedTargetResolvesFrom(
+      EntityManager entityManager,
+      Note movedNote,
+      String linkText,
+      Set<Integer> coMovedTargetNoteIds) {
+    if (coMovedTargetNoteIds.isEmpty()) {
+      return false;
+    }
+    String focusNotebookName =
+        movedNote.getNotebook() == null ? null : movedNote.getNotebook().getName();
+    Optional<WikiLinkTargetReference> reference =
+        WikiLinkTargetReference.forToken(linkText, focusNotebookName);
+    if (reference.isEmpty()) {
+      return false;
+    }
+    WikiLinkTargetReference ref = reference.get();
+    List<Integer> noteIds = new ArrayList<>(coMovedTargetNoteIds);
+    Collections.sort(noteIds);
+    // When several co-moved notes share a title, lowest note id wins (same as global resolution).
+    for (Integer noteId : noteIds) {
+      Note candidate = entityManager.find(Note.class, noteId);
+      if (candidate != null
+          && candidate.getDeletedAt() == null
+          && noteMatchesWikiLinkTarget(candidate, ref)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private static boolean noteMatchesWikiLinkTarget(Note note, WikiLinkTargetReference ref) {
+    if (note.getNotebook() == null) {
+      return false;
+    }
+    return note.getNotebook().getName().equalsIgnoreCase(ref.notebookName())
+        && note.getTitle().equalsIgnoreCase(ref.noteTitle());
   }
 }

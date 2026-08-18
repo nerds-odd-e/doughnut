@@ -41,6 +41,12 @@ public record WikiLinkTargetReference(String notebookName, String noteTitle) {
         .orElse(newTitle);
   }
 
+  static String replaceFolderName(String targetToken, String oldFolderName, String newFolderName) {
+    return PathShapedTarget.tryParse(targetToken)
+        .map(path -> path.withRenamedFolder(oldFolderName, newFolderName))
+        .orElse(targetToken);
+  }
+
   static String replaceNotebookName(String targetToken, String newNotebookName) {
     Qualified qualified = Qualified.tryParse(targetToken);
     String noteTitle = qualified == null ? targetToken : qualified.noteTitle();
@@ -88,14 +94,29 @@ public record WikiLinkTargetReference(String notebookName, String noteTitle) {
     }
 
     String withNoteTitle(String newTitle) {
+      return formatPath(folderNames, newTitle);
+    }
+
+    String withRenamedFolder(String oldFolderName, String newFolderName) {
+      List<String> updated = new ArrayList<>(folderNames);
+      for (int i = 0; i < updated.size(); i++) {
+        if (updated.get(i).equalsIgnoreCase(oldFolderName)) {
+          updated.set(i, newFolderName);
+          break;
+        }
+      }
+      return formatPath(updated, title);
+    }
+
+    private String formatPath(List<String> folders, String noteTitle) {
       StringBuilder out = new StringBuilder();
       if (leadingSlash) {
         out.append('/');
       }
-      if (!folderNames.isEmpty()) {
-        out.append(String.join("/", folderNames)).append('/');
+      if (!folders.isEmpty()) {
+        out.append(String.join("/", folders)).append('/');
       }
-      out.append(newTitle);
+      out.append(noteTitle);
       if (markdownSuffix) {
         out.append(".md");
       }

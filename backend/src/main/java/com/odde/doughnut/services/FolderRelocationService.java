@@ -12,10 +12,6 @@ import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.factoryServices.EntityPersister;
 import com.odde.doughnut.testability.TestabilitySettings;
 import java.sql.Timestamp;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Deque;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -33,6 +29,7 @@ public class FolderRelocationService {
   private final TestabilitySettings testabilitySettings;
   private final NoteTitlePlacementRules noteTitlePlacementRules;
   private final WikiLinkRewriteService wikiLinkRewriteService;
+  private final FolderSubtree subtree;
 
   public FolderRelocationService(
       FolderRepository folderRepository,
@@ -49,6 +46,9 @@ public class FolderRelocationService {
     this.testabilitySettings = testabilitySettings;
     this.noteTitlePlacementRules = noteTitlePlacementRules;
     this.wikiLinkRewriteService = wikiLinkRewriteService;
+    this.subtree =
+        new FolderSubtree(
+            folderRepository, noteRepository, entityPersister, noteTitlePlacementRules);
   }
 
   public Folder moveFolder(
@@ -77,9 +77,10 @@ public class FolderRelocationService {
     Integer destParentId = newParent == null ? null : newParent.getId();
     Timestamp now = testabilitySettings.getCurrentUTCTimestamp();
     Optional<Folder> mergeTarget =
-        siblingConflictMergeTarget(notebook.getId(), destParentId, folder, request);
+        folderSiblingNameValidation.mergeTargetOrRejectConflict(
+            notebook.getId(), destParentId, folder, request != null && request.isMerge());
     if (mergeTarget.isPresent()) {
-      mergeFolderInto(folder, mergeTarget.get(), now);
+      subtree.mergeInto(folder, mergeTarget.get(), now);
       return mergeTarget.get();
     }
 
@@ -95,8 +96,8 @@ public class FolderRelocationService {
       Folder folder, FolderMoveRequest request, Notebook destinationNotebook, User viewer) {
     Notebook sourceNotebook = folder.getNotebook();
     Timestamp now = testabilitySettings.getCurrentUTCTimestamp();
-    List<Folder> subtreeFolders = collectSubtreeFolders(folder);
-    Set<Integer> movedNoteIds = collectSubtreeNoteIds(subtreeFolders);
+    List<Folder> subtreeFolders = subtree.collectFolders(folder);
+    Set<Integer> movedNoteIds = subtree.collectNoteIds(subtreeFolders);
 
     Folder newParent = resolveNewParentFolder(request);
     if (newParent != null) {
@@ -106,16 +107,20 @@ public class FolderRelocationService {
 
     Integer destParentId = newParent == null ? null : newParent.getId();
     Optional<Folder> mergeTarget =
-        siblingConflictMergeTarget(destinationNotebook.getId(), destParentId, folder, request);
+        folderSiblingNameValidation.mergeTargetOrRejectConflict(
+            destinationNotebook.getId(),
+            destParentId,
+            folder,
+            request != null && request.isMerge());
     if (mergeTarget.isPresent()) {
-      mergeFolderInto(folder, mergeTarget.get(), now);
+      subtree.mergeInto(folder, mergeTarget.get(), now);
       rewriteWikiLinksForFolderMove(movedNoteIds, sourceNotebook, destinationNotebook, now, viewer);
       return mergeTarget.get();
     }
 
-    requireNoSoftDeletedTitlesInSubtree(destinationNotebook, subtreeFolders);
+    subtree.requireNoSoftDeletedTitles(destinationNotebook, subtreeFolders);
 
-    reassignFolderSubtreeToNotebook(subtreeFolders, destinationNotebook, now);
+    subtree.reassignToNotebook(subtreeFolders, destinationNotebook, now);
     folder.setParentFolder(newParent);
     folder.setUpdatedAt(now);
     entityPersister.flush();
@@ -123,26 +128,6 @@ public class FolderRelocationService {
     entityPersister.flush();
     rewriteWikiLinksForFolderMove(movedNoteIds, sourceNotebook, destinationNotebook, now, viewer);
     return folder;
-  }
-
-  /**
-   * When a same-name sibling exists and merge is requested, returns that sibling; otherwise throws
-   * on conflict or returns empty when the destination is free.
-   */
-  private Optional<Folder> siblingConflictMergeTarget(
-      Integer notebookId, Integer destParentId, Folder folder, FolderMoveRequest request) {
-    Optional<Folder> existingSibling =
-        folderSiblingNameValidation.findConflictingSibling(
-            notebookId, destParentId, new DisplayName(folder.getName()), folder.getId());
-    if (existingSibling.isEmpty()) {
-      return Optional.empty();
-    }
-    if (request != null && request.isMerge()) {
-      return existingSibling;
-    }
-    FolderSiblingNameValidation.throwFolderNameConflict(
-        FolderSiblingNameValidation.DUPLICATE_SIBLING_NAME_HERE);
-    return Optional.empty();
   }
 
   private void rewriteWikiLinksForFolderMove(
@@ -155,16 +140,6 @@ public class FolderRelocationService {
         movedNoteIds, destinationNotebook.getName(), now, viewer);
     wikiLinkRewriteService.rewriteOutgoingWikiLinksForFolderNotebookMove(
         movedNoteIds, sourceNotebook.getName(), now, viewer);
-  }
-
-  private Set<Integer> collectSubtreeNoteIds(List<Folder> subtreeFolders) {
-    Set<Integer> noteIds = new LinkedHashSet<>();
-    for (Folder subtreeFolder : subtreeFolders) {
-      for (Note note : noteRepository.findNotesInFolderOrderByIdAsc(subtreeFolder.getId())) {
-        noteIds.add(note.getId());
-      }
-    }
-    return noteIds;
   }
 
   private Folder resolveNewParentFolder(FolderMoveRequest request) {
@@ -184,93 +159,14 @@ public class FolderRelocationService {
     }
   }
 
-  private void requireNoSoftDeletedTitlesInSubtree(
-      Notebook destinationNotebook, List<Folder> subtreeFolders) {
-    for (Folder subtreeFolder : subtreeFolders) {
-      for (Note note : noteRepository.findNotesInFolderOrderByIdAsc(subtreeFolder.getId())) {
-        noteTitlePlacementRules.requireNoSoftDeletedTitleAt(
-            destinationNotebook, subtreeFolder, note.getTitle());
-      }
-    }
-  }
-
-  private List<Folder> collectSubtreeFolders(Folder root) {
-    List<Folder> result = new ArrayList<>();
-    Deque<Folder> stack = new ArrayDeque<>();
-    stack.push(root);
-    while (!stack.isEmpty()) {
-      Folder current = stack.pop();
-      result.add(current);
-      for (Folder child :
-          folderRepository.findChildFoldersByParentFolderIdOrderByIdAsc(current.getId())) {
-        stack.push(child);
-      }
-    }
-    return result;
-  }
-
-  private void reassignFolderSubtreeToNotebook(
-      List<Folder> subtreeFolders, Notebook destinationNotebook, Timestamp now) {
-    for (Folder subtreeFolder : subtreeFolders) {
-      subtreeFolder.setNotebook(destinationNotebook);
-      subtreeFolder.setUpdatedAt(now);
-      entityPersister.merge(subtreeFolder);
-      for (Note note : noteRepository.findNotesInFolderOrderByIdAsc(subtreeFolder.getId())) {
-        note.assignNotebook(destinationNotebook);
-        entityPersister.merge(note);
-      }
-    }
-  }
-
-  private void mergeFolderInto(Folder source, Folder target, Timestamp now) {
-    Notebook destinationNotebook = target.getNotebook();
-    boolean crossNotebook = !source.getNotebook().getId().equals(destinationNotebook.getId());
-
-    List<Folder> srcSubfolders =
-        folderRepository.findChildFoldersByParentFolderIdOrderByIdAsc(source.getId());
-    for (Folder srcChild : srcSubfolders) {
-      Optional<Folder> tgtChild =
-          folderRepository
-              .findCandidateChildContainers(
-                  destinationNotebook.getId(), target.getId(), new DisplayName(srcChild.getName()))
-              .stream()
-              .findFirst();
-      if (tgtChild.isPresent()) {
-        mergeFolderInto(srcChild, tgtChild.get(), now);
-      } else {
-        srcChild.setParentFolder(target);
-        srcChild.setUpdatedAt(now);
-        if (crossNotebook) {
-          reassignFolderSubtreeToNotebook(
-              collectSubtreeFolders(srcChild), destinationNotebook, now);
-        }
-        entityPersister.merge(srcChild);
-      }
-    }
-
-    List<Note> srcNotes = noteRepository.findNotesInFolderOrderByIdAsc(source.getId());
-    for (Note note : srcNotes) {
-      noteTitlePlacementRules.requireNoSoftDeletedTitleAt(
-          destinationNotebook, target, note.getTitle());
-      note.setFolder(target);
-      if (crossNotebook) {
-        note.assignNotebook(destinationNotebook);
-      }
-      entityPersister.merge(note);
-    }
-
-    target.setUpdatedAt(now);
-    entityPersister.merge(target);
-    entityPersister.flush();
-    entityPersister.remove(source);
-  }
-
-  public Folder renameFolder(Notebook notebook, Folder folder, FolderRenameRequest request) {
+  public Folder renameFolder(
+      Notebook notebook, Folder folder, FolderRenameRequest request, User viewer) {
     if (!folder.getNotebook().getId().equals(notebook.getId())) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Folder not in notebook.");
     }
     DisplayName displayName = new DisplayName(request.getName());
-    if (displayName.value().equals(folder.getName())) {
+    String oldName = folder.getName();
+    if (displayName.value().equals(oldName)) {
       return folder;
     }
     Integer parentFolderId =
@@ -278,10 +174,17 @@ public class FolderRelocationService {
     folderSiblingNameValidation.requireNoConflictingSibling(
         notebook.getId(), parentFolderId, displayName, folder.getId());
     folder.setName(displayName);
-    folder.setUpdatedAt(testabilitySettings.getCurrentUTCTimestamp());
+    Timestamp now = testabilitySettings.getCurrentUTCTimestamp();
+    folder.setUpdatedAt(now);
     entityPersister.flush();
     entityPersister.merge(folder);
     entityPersister.flush();
+    wikiLinkRewriteService.rewriteInboundWikiLinksForFolderRename(
+        subtree.collectNoteIds(subtree.collectFolders(folder)),
+        oldName,
+        displayName.value(),
+        now,
+        viewer);
     return folder;
   }
 
@@ -305,7 +208,7 @@ public class FolderRelocationService {
         continue;
       }
       if (merge) {
-        mergeFolderInto(child, existingSibling.get(), now);
+        subtree.mergeInto(child, existingSibling.get(), now);
       } else {
         FolderSiblingNameValidation.throwFolderNameConflict(
             FolderSiblingNameValidation.dissolveSiblingClashAtDestination(child.getName()));
