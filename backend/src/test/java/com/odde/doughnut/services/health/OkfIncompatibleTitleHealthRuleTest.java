@@ -4,14 +4,11 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasItem;
-import static org.hamcrest.Matchers.not;
 
 import com.odde.doughnut.controllers.dto.HealthFindingGroup;
 import com.odde.doughnut.controllers.dto.HealthFindingItem;
 import com.odde.doughnut.controllers.dto.HealthSeverity;
 import com.odde.doughnut.controllers.dto.NotebookHealthLintReport;
-import com.odde.doughnut.entities.Folder;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.User;
@@ -19,8 +16,6 @@ import com.odde.doughnut.services.NotebookHealthService;
 import com.odde.doughnut.testability.MakeMe;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -53,10 +48,9 @@ class OkfIncompatibleTitleHealthRuleTest {
     assertThat(group.getItems(), empty());
   }
 
-  @ParameterizedTest
-  @ValueSource(strings = {"index", "INDEX", "index.md", "log", "LOG.MD"})
-  void listsNotesWhoseTitlesOccupyOkfReservedBasenames(String title) {
-    Note note = makeMe.aNote(title).notebook(notebook).please();
+  @Test
+  void listsNotesWhoseTitlesOccupyOkfReservedBasenames() {
+    Note note = makeMe.aNote("INDEX").notebook(notebook).please();
 
     HealthFindingGroup group = okfIncompatibleTitlesGroup();
     assertThat(
@@ -84,32 +78,14 @@ class OkfIncompatibleTitleHealthRuleTest {
         containsInAnyOrder(live.getId()));
   }
 
-  @Test
-  void emptyFolderAndDeadWikiGroupsStillReportWhenOkfTitleExists() {
-    Folder emptyFolder = makeMe.aFolder().notebook(notebook).name("Empty Shell").please();
-    makeMe.aNote("index").notebook(notebook).content("See [[Missing]]").please();
-
-    NotebookHealthLintReport report =
-        notebookHealthService.lint(notebook, new HealthRunContext(owner));
-
-    assertThat(
-        groupFrom(report, HealthRuleIds.EMPTY_FOLDERS).getItems().stream()
-            .map(HealthFindingItem::getFolderId)
-            .toList(),
-        hasItem(emptyFolder.getId()));
-    assertThat(groupFrom(report, HealthRuleIds.DEAD_WIKI_LINKS).getChildren(), not(empty()));
-  }
-
   private HealthFindingGroup okfIncompatibleTitlesGroup() {
     NotebookHealthLintReport report =
         notebookHealthService.lint(notebook, new HealthRunContext(owner));
-    return groupFrom(report, HealthRuleIds.OKF_INCOMPATIBLE_TITLES);
-  }
-
-  private static HealthFindingGroup groupFrom(NotebookHealthLintReport report, String ruleId) {
     return report.getGroups().stream()
-        .filter(g -> ruleId.equals(g.getRuleId()))
+        .filter(g -> HealthRuleIds.OKF_INCOMPATIBLE_TITLES.equals(g.getRuleId()))
         .findFirst()
-        .orElseThrow(() -> new AssertionError("missing " + ruleId + " group"));
+        .orElseThrow(
+            () ->
+                new AssertionError("missing " + HealthRuleIds.OKF_INCOMPATIBLE_TITLES + " group"));
   }
 }

@@ -22,7 +22,7 @@ Portable output today is **one-way catalog ZIP** (`GET /api/notebooks/{notebook}
 - Every note file gets a generated `# {title}` H1. Author YAML, if any, is copied verbatim (no injected identity or `okf_version`).
 - Wiki links (`[[…]]`) and attachment paths (`/attachments/images/{id}/…`) are left unchanged.
 - No listing `index.md`, no `log.md`, no root `okf_version` (missing listing is conformant).
-- Note titles `readme` / `readme.md` are hard-reserved. Titles `index` / `index.md` / `log` / `log.md` are allowed; PathNameEditor and notebook health warn (non-blocking). Filename-as-title: a note titled `index` writes `index.md`. Locked in ADR 0004; not remaining work.
+- Note titles `readme` / `readme.md` are hard-reserved. Note titles `index` / `index.md` / `log` / `log.md` are allowed; note create/edit and notebook health warn (non-blocking). Folder and notebook names do not warn. Filename-as-title: a note titled `index` writes `index.md`. Locked in ADR 0004; not remaining work.
 
 In the product (not the ZIP), titles live in a column (max 150). Inter-note links are title/alias wiki links. Relationship notes also have `relation` / `source` / `target`. `tags` / `aliases` / `cssclasses` are Obsidian-style passthrough; `aliases` must be a plain YAML list. Images are MySQL blobs addressed by numeric id.
 

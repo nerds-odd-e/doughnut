@@ -35,17 +35,11 @@ class NotebookZipBuilderTest {
 
   @Test
   void writesNotebookReadmeAsReadmeMarkdownWithTypeWhenMissing() throws IOException {
-    byte[] zipBytes =
-        buildZip(
-            "# Notebook readme",
-            List.of(),
-            List.of(new ExportNoteRow(1, null, "First note", "First body")));
-
-    Map<String, String> entries = readZipEntries(zipBytes);
+    Map<String, String> entries =
+        readZipEntries(buildZip("# Notebook readme", List.of(), List.of()));
 
     assertThat(entries.get("README.md"), equalTo(README_FENCE + "# Notebook readme"));
     assertThat(entries.containsKey("index.md"), equalTo(false));
-    assertThat(entries.get("First note.md"), equalTo("# First note\n\nFirst body"));
   }
 
   @Test

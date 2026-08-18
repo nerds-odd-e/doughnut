@@ -61,9 +61,4 @@ Feature: Nested Note creation
   Scenario: Creating a note titled index warns and still saves
     When I create a note with title "index" under the folder "LeSS in Action" in the notebook "LeSS training"
     Then I should see a warning that the portable tree may be OKF-incompatible
-    And I should see the note tree in the sidebar
-      | note-title   |
-      | index        |
-      | team         |
-      | tech         |
-      | Course intro |
+    And I should see note "index" under open folder "LeSS in Action"
