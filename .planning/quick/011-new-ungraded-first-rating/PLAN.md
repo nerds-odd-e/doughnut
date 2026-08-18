@@ -85,15 +85,9 @@ ADR 0001 **New**: ungraded (`S = 0`, Difficulty unset / **N/A**). ADR 0003 (Prop
 ### 8. Backfill still-New Again rows
 
 - **Type:** Behavior
-- **Status:** planned
+- **Status:** done
 
-**Pre:** `S = 0`, Difficulty unset, RecallLog has `AGAIN` or `AGAIN_ZERO`.  
-**Trigger:** Flyway apply (next version after `V300000270`).  
-**Post:** `S0(1)` / `D0(1)`, due `last_recalled_at + 5h`. Never-graded, `S > 0`, and `SHRINK`-only New rows unchanged.
-
-Backfill service uses the same `S0`/`D0` as live first-rating (no magic hours in SQL). Java migration delegates to it. One service test: Again log selected; assimilate-only and `S > 0` negatives. `makeMe` fixtures for every selected table/outcome this path needs (RecallLog + tracker).
-
-**Done when:** that test passes; no `SHRINK` backfill in this migration.
+`V300000271` + `StillNewAgainFirstRatingBackfill`: still-New + `AGAIN`/`AGAIN_ZERO` → live `S0(1)`/`D0(1)`, due `last_recalled_at + 5h`. Gate `still_new_again_first_rating_backfill` default `1=0`. SHRINK-only New not selected.
 
 ### 9. Lock SHRINK-on-New backfill in ADR 0003
 
