@@ -36,28 +36,16 @@ E3 fuzz / max interval, E4 fitting, card-state enum, learning steps, `DEFAULT_SP
 
 Proposed ADR 0003 Decision now locks First Again / Tutor **0/1** on New to `S0(1)` / `D0(1)` (Stability **5**, due **5h**). Tutor **2** still stay-New. No Flyway / no backfill. ADR 0001 **New** unchanged. Gap tracker points here.
 
-**Learning:** 24h is named as the non-positive-`I` fallback, not a New-fail interval. Product code still stay-New until slice 2.
+**Learning:** 24h is named as the non-positive-`I` fallback, not a New-fail interval.
 
 ### 2. First Again on New uses S0(Again) / D0(Again)
 
 - **Type:** Behavior
-- **Status:** planned
+- **Status:** done
 
-**Pre:** tracker is New (`S = 0`, D unset).  
-**Trigger:** ordinary incorrect / just review No.  
-**Post:** Stability **5**, Difficulty `D0(1)`, due `lastRecalledAt + 5h`.
+Ordinary incorrect / just review No / Tutor **0/1** on New go through `afterRecall` first-rating (`S0(1)` **5**, `D0(1)` **6.4133**, due +5h). `recalledAgain` shares `applyRecall`. Tutor **2** still stay-New. Confusion on New still `S = 0`. E2E: `Memory Tracker shows first Again after just-review No on New`.
 
-Tutor **0/1** share `recalledAgain` — retarget their unit pin in this commit so CI stays green (`firstScoreLeavesDifficultyUnsetAndStabilityZero`: **0/1** first-rate; **2** still stay-New). Do not add commissioned E2E rows here (slice 4). Do not pin the following Good (slice 3).
-
-Extend existing pins only:
-
-- `SpacedRepetitionIncorrectRecallSchedulingTest.newTrackerIncorrectRecallKeepsZeroStabilityAndTwentyFourHourDue`
-- Split the commissioned first-score **0/1/2** parameterized test as above
-- E2E `spaced_repetition.feature`: one scenario — just review No on New (Stability 5, Difficulty, 5h gap). `@wip` until green; `--spec` this feature only
-
-Confusion on New still `S = 0`. Tutor **2** on New still stay-New.
-
-**Done when:** that E2E and the two unit pins pass; no other feature files in this commit.
+**Learning:** Prompted accidental-match is Again (reviewed tracker), not matched-note confusion. `MemoryTrackerAgainRecall` is gone. Slice 3 is unblocked: after Again, `S = 5` so the next Good is long-term.
 
 ### 3. Success after New Again is long-term Good
 

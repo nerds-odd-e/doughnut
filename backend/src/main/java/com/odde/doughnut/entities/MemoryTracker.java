@@ -206,8 +206,8 @@ public class MemoryTracker extends EntityIdentifiedByIdOnly {
     scheduleNextRecallFromStability(now);
   }
 
-  public void recalledAgain(Timestamp currentUTCTimestamp) {
-    MemoryTrackerAgainRecall.apply(this, currentUTCTimestamp);
+  public void recalledAgain(Timestamp now) {
+    applyRecall(now, forgettingCurve().afterAgainRecall(elapsedHoursUntil(now)));
   }
 
   public void shrinkStability(Timestamp currentUTCTimestamp) {

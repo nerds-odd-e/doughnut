@@ -24,7 +24,7 @@ public class ForgettingCurve {
   record NextMemory(float difficulty, float stability) {}
 
   NextMemory afterGoodRecall(long elapsedInHours, Integer thinkingTimeMs) {
-    return afterGoodHardOrEasyRecall(
+    return afterRecall(
         Fsrs.GOOD,
         () ->
             adjustForThinkingTime(
@@ -33,15 +33,21 @@ public class ForgettingCurve {
   }
 
   NextMemory afterEasyRecall(long elapsedInHours) {
-    return afterGoodHardOrEasyRecall(
+    return afterRecall(
         Fsrs.EASY,
         () -> FsrsEasyRecall.hoursAfterEasyRecall(stabilityHours, difficulty, elapsedInHours));
   }
 
   NextMemory afterHardRecall(long elapsedInHours) {
-    return afterGoodHardOrEasyRecall(
+    return afterRecall(
         Fsrs.HARD,
         () -> FsrsHardRecall.hoursAfterHardRecall(stabilityHours, difficulty, elapsedInHours));
+  }
+
+  NextMemory afterAgainRecall(long elapsedInHours) {
+    return afterRecall(
+        Fsrs.AGAIN,
+        () -> FsrsAgainRecall.hoursAfterAgainRecall(stabilityHours, difficulty, elapsedInHours));
   }
 
   float succeeded(long elapsedInHours, Integer thinkingTimeMs) {
@@ -52,15 +58,11 @@ public class ForgettingCurve {
     return new NextMemory(Fsrs.initialDifficulty(grade), Fsrs.initialStabilityHours(grade));
   }
 
-  private NextMemory afterGoodHardOrEasyRecall(int grade, Supplier<Float> nextStability) {
+  private NextMemory afterRecall(int grade, Supplier<Float> nextStability) {
     if (isNewlyAssimilated()) {
       return firstRating(grade);
     }
     return new NextMemory(Fsrs.nextDifficulty(difficulty, grade), nextStability.get());
-  }
-
-  float difficultyAfterFailedRecall() {
-    return Fsrs.nextDifficulty(difficulty, Fsrs.AGAIN);
   }
 
   boolean isNewlyAssimilated() {
@@ -93,18 +95,11 @@ public class ForgettingCurve {
     return (float) adjustmentValue;
   }
 
-  public float failed(long elapsedInHours) {
+  float confusionAdjusted(long elapsedInHours) {
     if (isNewlyAssimilated()) {
       return ASSIMILATE_STABILITY_HOURS;
     }
-    return FsrsAgainRecall.hoursAfterAgainRecall(stabilityHours, difficulty, elapsedInHours);
-  }
-
-  float confusionAdjusted(long elapsedInHours) {
-    float againHours = failed(elapsedInHours);
-    if (isNewlyAssimilated()) {
-      return againHours;
-    }
+    float againHours = afterAgainRecall(elapsedInHours).stability();
     return Math.max(1f, Math.round((stabilityHours + againHours) / 2.0f));
   }
 }

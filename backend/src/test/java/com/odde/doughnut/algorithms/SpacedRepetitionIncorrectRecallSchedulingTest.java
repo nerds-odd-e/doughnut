@@ -1,11 +1,9 @@
 package com.odde.doughnut.algorithms;
 
-import static com.odde.doughnut.entities.ForgettingCurve.ASSIMILATE_STABILITY_HOURS;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.lessThan;
-import static org.hamcrest.Matchers.nullValue;
 
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.utils.TimestampOperations;
@@ -14,6 +12,9 @@ import org.junit.jupiter.api.Test;
 
 class SpacedRepetitionIncorrectRecallSchedulingTest
     extends SpacedRepetitionRecallSchedulingTestBase {
+  static final float FIRST_AGAIN_DIFFICULTY = 6.4133f;
+  static final float FIRST_AGAIN_STABILITY_HOURS = 5f;
+
   @Test
   void onTimeIncorrectRecallUsesFsrsAgainPostLapseStability() {
     MemoryTracker memoryTracker = aGradedTrackerAtThreeDayStability();
@@ -55,17 +56,19 @@ class SpacedRepetitionIncorrectRecallSchedulingTest
   }
 
   @Test
-  void newTrackerIncorrectRecallKeepsZeroStabilityAndTwentyFourHourDue() {
+  void newTrackerIncorrectRecallUsesS0AndD0Again() {
     MemoryTracker memoryTracker = makeMe.aMemoryTrackerFor(note).by(user).inMemoryPlease();
     Timestamp gradeTime = memoryTracker.getNextRecallAt();
 
     memoryTracker.markAsRecalled(gradeTime, false, null);
 
-    assertThat(memoryTracker.getStability(), equalTo(ASSIMILATE_STABILITY_HOURS));
+    assertThat(memoryTracker.getDifficulty(), equalTo(FIRST_AGAIN_DIFFICULTY));
+    assertThat(memoryTracker.getStability(), equalTo(FIRST_AGAIN_STABILITY_HOURS));
     assertThat(
         memoryTracker.getNextRecallAt(),
-        equalTo(TimestampOperations.addHoursToTimestamp(gradeTime, 24)));
-    assertThat(memoryTracker.getDifficulty(), nullValue());
+        equalTo(
+            TimestampOperations.addHoursToTimestamp(
+                gradeTime, Math.round(FIRST_AGAIN_STABILITY_HOURS))));
   }
 
   @Test
