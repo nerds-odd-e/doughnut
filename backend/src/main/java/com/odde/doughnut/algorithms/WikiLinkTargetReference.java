@@ -27,6 +27,26 @@ public record WikiLinkTargetReference(String notebookName, String noteTitle) {
     return Optional.of(new WikiLinkTargetReference(focusNotebookName, resolutionKey));
   }
 
+  static boolean isQualifiedToken(String targetToken) {
+    return Qualified.tryParse(targetToken) != null;
+  }
+
+  static String replaceNoteTitle(String targetToken, String newTitle) {
+    Qualified qualified = Qualified.tryParse(targetToken);
+    if (qualified != null) {
+      return qualified.notebookName() + ":" + newTitle;
+    }
+    return PathShapedTarget.tryParse(targetToken)
+        .map(path -> path.withNoteTitle(newTitle))
+        .orElse(newTitle);
+  }
+
+  static String replaceNotebookName(String targetToken, String newNotebookName) {
+    Qualified qualified = Qualified.tryParse(targetToken);
+    String noteTitle = qualified == null ? targetToken : qualified.noteTitle();
+    return newNotebookName + ":" + noteTitle;
+  }
+
   /**
    * Folder names then title for a path-shaped target ({@code Folder/Title}). Optional trailing
    * {@code .md} on the last segment is ignored. Unqualified titles are not path-shaped.
@@ -53,6 +73,10 @@ public record WikiLinkTargetReference(String notebookName, String noteTitle) {
       }
       return Optional.of(
           new PathShapedTarget(List.copyOf(segments.subList(0, segments.size() - 1)), title));
+    }
+
+    String withNoteTitle(String newTitle) {
+      return String.join("/", folderNames) + "/" + newTitle;
     }
 
     private static String stripOptionalMarkdownSuffix(String lastSegment) {

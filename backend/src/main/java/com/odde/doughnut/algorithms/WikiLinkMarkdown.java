@@ -19,8 +19,6 @@ public final class WikiLinkMarkdown {
    */
   public record WikiInnerSplit(String target, String display) {}
 
-  private record QualifiedTargetToken(String notebookName, String noteTitle) {}
-
   private WikiLinkMarkdown() {}
 
   /**
@@ -101,7 +99,8 @@ public final class WikiLinkMarkdown {
     }
     return keepVisibleInner(
         storedLinkInner,
-        rawTargetToken -> requalifyTargetTokenWithNotebook(rawTargetToken, newNotebookName));
+        rawTargetToken ->
+            WikiLinkTargetReference.replaceNotebookName(rawTargetToken, newNotebookName));
   }
 
   /**
@@ -119,7 +118,7 @@ public final class WikiLinkMarkdown {
     int pipeIdx = storedLinkInner.indexOf('|');
     String rawTargetPart = pipeIdx == -1 ? storedLinkInner : storedLinkInner.substring(0, pipeIdx);
     String targetToken = rawTargetPart.trim();
-    if (targetToken.isEmpty() || isQualifiedTargetToken(targetToken)) {
+    if (targetToken.isEmpty() || WikiLinkTargetReference.isQualifiedToken(targetToken)) {
       return storedLinkInner;
     }
     return keepVisibleInner(
@@ -137,7 +136,7 @@ public final class WikiLinkMarkdown {
     int pipeIdx = storedLinkInner.indexOf('|');
     String rawTargetPart = pipeIdx == -1 ? storedLinkInner : storedLinkInner.substring(0, pipeIdx);
     String newTargetToken =
-        replaceUnqualifiedOrQualifiedNoteTitle(rawTargetPart.trim(), newNoteTitle.trim());
+        WikiLinkTargetReference.replaceNoteTitle(rawTargetPart.trim(), newNoteTitle.trim());
     if (pipeIdx == -1) {
       return keepVisibleText ? newTargetToken + "|" + storedLinkInner.trim() : newTargetToken;
     }
@@ -165,14 +164,6 @@ public final class WikiLinkMarkdown {
       return newTargetToken + "|" + rawTargetPart.trim();
     }
     return newTargetToken + "|" + rawDisplay;
-  }
-
-  /** Replaces or adds the notebook prefix on a target token, keeping the note title intact. */
-  private static String requalifyTargetTokenWithNotebook(
-      String targetToken, String newNotebookName) {
-    QualifiedTargetToken qualified = parseQualifiedTargetToken(targetToken);
-    String noteTitle = qualified == null ? targetToken : qualified.noteTitle();
-    return newNotebookName + ":" + noteTitle;
   }
 
   public static String sanitizePathSeparatorsInWikiLinks(String markdown) {
@@ -224,31 +215,5 @@ public final class WikiLinkMarkdown {
     }
     out.append(markdown.substring(last));
     return out.toString();
-  }
-
-  private static String replaceUnqualifiedOrQualifiedNoteTitle(
-      String targetToken, String newTitle) {
-    QualifiedTargetToken qualified = parseQualifiedTargetToken(targetToken);
-    if (qualified != null) {
-      return qualified.notebookName() + ":" + newTitle;
-    }
-    return newTitle;
-  }
-
-  private static boolean isQualifiedTargetToken(String targetToken) {
-    return parseQualifiedTargetToken(targetToken) != null;
-  }
-
-  private static QualifiedTargetToken parseQualifiedTargetToken(String targetToken) {
-    int colon = targetToken.indexOf(':');
-    if (colon <= 0 || colon >= targetToken.length() - 1) {
-      return null;
-    }
-    String notebookName = targetToken.substring(0, colon).trim();
-    String noteTitle = targetToken.substring(colon + 1).trim();
-    if (notebookName.isEmpty() || noteTitle.isEmpty()) {
-      return null;
-    }
-    return new QualifiedTargetToken(notebookName, noteTitle);
   }
 }

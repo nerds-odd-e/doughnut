@@ -67,9 +67,9 @@ Locked in Proposed [ADR 0004](../../../docs/adrs/0004-okf-compatible-notebook-ma
 ### 3. Renaming a note keeps folder-path wiki prefix
 
 - **Type:** Behavior
-- **Status:** planned
+- **Status:** done
 
-**Pre:** a note contains `[[Folder/Old]]` (or piped display) pointing at `Old` in `Folder`. **Trigger:** rename `Old` → `New` (keep or update visible text, existing product choice). **Post:** stored spelling stays wiki with prefix `Folder/`; link still opens the renamed note. Must not collapse to `[[New]]`.
+Rename rewrites via `WikiLinkTargetReference.replaceNoteTitle` / `PathShapedTarget.withNoteTitle`. `[[Folder/Old]]` stays wiki with prefix `Folder/`; does not collapse to `[[New]]`. E2E in `wiki_link.feature`.
 
 ### 4. Nested folder-path wiki link opens the nested note
 
@@ -121,6 +121,7 @@ Root `[label](/Title.md)` (note at notebook root) is the same behavior with an e
 
 - Slice 1: glossary **Wiki link** row names both spellings and points at ADR 0004 rather than restating `.md` / leading-`/` mechanics. Gap tracker/seed no longer treat ZIP wiki rewrite as remaining P4 work; product dual-spelling still open until slice 9.
 - Slice 2: `PathShapedTarget` already holds `folderNames` (list) + title; slice 4 should confirm nested walk + E2E, not a second walker. Sanitizer asks that parser (`contains("/") && !contains(":")` heuristic removed). `/` in wiki **titles** stays forbidden (fullwidth on persist). Unqualified `[[Title]]` still lowest id.
+- Slice 3: title rewrite lives on `WikiLinkTargetReference.replaceNoteTitle` (path-shaped via `PathShapedTarget.withNoteTitle`). Slice 6 should reuse that write-back; only Markdown spelling differs.
 - Cache is style-blind at rest; extract/display/rewrite are wiki-inner-specific. Path Markdown is not extracted (`NoteContentMarkdown.wikiLinkInnersInOccurrenceOrder`).
 - `quillHtmlToMarkdown` turns doughnut-wiki-link and `/n…` hrefs into `[[label]]`. Path `.md` hrefs must not take that path, or “no conversion” fails on save.
 - ZIP collision `Recipe (2).md` is not `[[Recipe (2)]]`. Out of this plan.

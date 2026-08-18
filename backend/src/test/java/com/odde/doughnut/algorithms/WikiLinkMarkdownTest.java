@@ -42,6 +42,12 @@ class WikiLinkMarkdownTest {
   }
 
   @Test
+  void newInnerForUpdateVisibleText_keepsFolderPathPrefix() {
+    assertThat(
+        WikiLinkMarkdown.newInnerForUpdateVisibleText("Folder/Old", "New"), equalTo("Folder/New"));
+  }
+
+  @Test
   void newInnerForKeepVisibleText_plainLinkAddsDisplay() {
     assertThat(
         WikiLinkMarkdown.newInnerForKeepVisibleText("OldTitle", "NewTitle"),
@@ -60,6 +66,13 @@ class WikiLinkMarkdownTest {
     assertThat(
         WikiLinkMarkdown.newInnerForKeepVisibleText("MyNb:OldTitle", "NewTitle"),
         equalTo("MyNb:NewTitle|MyNb:OldTitle"));
+  }
+
+  @Test
+  void newInnerForKeepVisibleText_keepsFolderPathPrefix() {
+    assertThat(
+        WikiLinkMarkdown.newInnerForKeepVisibleText("Folder/Old", "New"),
+        equalTo("Folder/New|Folder/Old"));
   }
 
   @Test

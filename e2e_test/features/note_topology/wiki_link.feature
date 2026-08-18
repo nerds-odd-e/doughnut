@@ -153,6 +153,23 @@ Feature: Wiki links in notes
       | wiki link | WikiLinks E2E CI Renamed |
     And the wiki link "WikiLinks E2E CI Renamed" should open the note titled "WikiLinks E2E CI Renamed"
 
+  Scenario: Renaming a referenced note keeps folder-path wiki prefix
+    Given I have a notebook "WikiPath Rename NB" with notes:
+      | Title                   | Folder                  |
+      | WikiPath Rename Old     | WikiPath Rename Recipes |
+      | WikiPath Rename Carrier | WikiPath Rename Root    |
+    When I update note "WikiPath Rename Carrier" content using markdown to become:
+      """
+      See [[WikiPath Rename Recipes/WikiPath Rename Old]].
+      """
+    And I route to the note "WikiPath Rename Old"
+    And I set the note title to "WikiPath Rename New" updating visible reference text
+    And I route to the note "WikiPath Rename Carrier"
+    And I view the note content as markdown
+    Then the note content markdown source should contain "[[WikiPath Rename Recipes/WikiPath Rename New]]"
+    When I view the note content as rich content
+    Then the wiki link "WikiPath Rename Recipes/WikiPath Rename New" should open the note titled "WikiPath Rename New"
+
   @mockBrowserTime
   Scenario: Insert a qualified wiki link to a note in another notebook
     Given I have a notebook "WikiCross Tgt NB" with notes:
