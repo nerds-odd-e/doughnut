@@ -87,7 +87,7 @@ First Again / Tutor **0/1** on New uses the same first-rating path with `G=1`: S
 
 Tutor **2** on New uses the same first-rating path with `G=2`: Stability `S0(2)` (**31** hours), Difficulty `D0(2)` (Java float), due `lastRecalledAt + I` (**31h**) — same first bucket as Tutor **3**. Shrink 80% remains the exception only when `S > 0`.
 
-Going-forward New has no memory-state grade: every mapped grade uses first-rating (all four G, including Tutor **2** Hard) and the tracker is no longer New. Still-New rows with `AGAIN` / `AGAIN_ZERO` RecallLogs **will** be backfilled to `S0(1)` / `D0(1)`, due from `I`. First-success rows with `S > 0` stay unrestored.
+Going-forward New has no memory-state grade: every mapped grade uses first-rating (all four G, including Tutor **2** Hard) and the tracker is no longer New. Still-New rows with `AGAIN` / `AGAIN_ZERO` RecallLogs **will** be backfilled to `S0(1)` / `D0(1)`, due from `I`. Still-New rows with `SHRINK` RecallLogs **will** be backfilled to Hard first-rating (`S0(2)` / `D0(2)`, due +31h). First-success rows with `S > 0` stay unrestored.
 
 The 24-hour strictly-future fallback is for non-positive `I`, not a New first-rating interval.
 

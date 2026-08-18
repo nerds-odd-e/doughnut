@@ -92,11 +92,9 @@ ADR 0001 **New**: ungraded (`S = 0`, Difficulty unset / **N/A**). ADR 0003 (Prop
 ### 9. Lock SHRINK-on-New backfill in ADR 0003
 
 - **Type:** Structure
-- **Status:** planned
+- **Status:** done
 
-Enables slice 10 only. Still-New rows with `SHRINK` RecallLogs **will** be backfilled to Hard first-rating (`S0(2)` / `D0(2)`, due +31h).
-
-**Done when:** Decision matches slice 10; tests unchanged.
+Proposed ADR 0003: still-New `SHRINK` RecallLogs **will** be backfilled to Hard first-rating (`S0(2)` / `D0(2)`, due +31h). Product tests unchanged.
 
 ### 10. Backfill still-New SHRINK rows
 

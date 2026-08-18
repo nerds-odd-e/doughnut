@@ -1,6 +1,6 @@
 # Doughnut ↔ open FSRS gap (toward ADR 0003)
 
-**Status:** First-rating initials on New (all four G, including Tutor **2** as Hard) are **closed** in product. **New** = ungraded is locked in ADR 0001. Still-New Again-row backfill is `V300000271` (gated `still_new_again_first_rating_backfill`, default `1=0`). Remaining work in [`.planning/quick/011-new-ungraded-first-rating/PLAN.md`](../quick/011-new-ungraded-first-rating/PLAN.md) is SHRINK-on-New backfill. After that: **deferred** knobs (**E3** / **E4**) plus **accept ADR 0003** (human). Other shipped FSRS-6 locks, including same-hour success short-term next Stability (elapsed 0, S > 0), live in ADR 0003 Decision and code.
+**Status:** First-rating initials on New (all four G, including Tutor **2** as Hard) are **closed** in product. **New** = ungraded is locked in ADR 0001. Still-New Again-row backfill is `V300000271` (gated `still_new_again_first_rating_backfill`, default `1=0`). SHRINK-on-New backfill is locked in ADR 0003 Decision; not shipped yet ([plan](../quick/011-new-ungraded-first-rating/PLAN.md) slice 10). After that: **deferred** knobs (**E3** / **E4**) plus **accept ADR 0003** (human). Other shipped FSRS-6 locks, including same-hour success short-term next Stability (elapsed 0, S > 0), live in ADR 0003 Decision and code.
 
 **Updated:** 2026-08-18
 
