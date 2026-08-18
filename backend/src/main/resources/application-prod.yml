@@ -48,6 +48,7 @@ spring:
       dummy_property_sequence_skip_convert: "1=0"
       note_concept_type_backfill: "1=0"
       still_new_again_first_rating_backfill: "1=0"
+      still_new_hard_first_rating_backfill: "1=0"
   jpa:
     generate-ddl: false
     show-sql: false

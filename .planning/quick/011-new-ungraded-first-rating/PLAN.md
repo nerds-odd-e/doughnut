@@ -99,15 +99,9 @@ Proposed ADR 0003: still-New `SHRINK` RecallLogs **will** be backfilled to Hard 
 ### 10. Backfill still-New SHRINK rows
 
 - **Type:** Behavior
-- **Status:** planned
+- **Status:** done
 
-**Pre:** `S = 0`, Difficulty unset, RecallLog has `SHRINK` (no Again-only requirement).  
-**Trigger:** Flyway apply (version after slice 8).  
-**Post:** `S0(2)` / `D0(2)`, due +31h. Slice 8 rows and `S > 0` unchanged.
-
-Extend the same backfill service + test (positive `SHRINK`; negative Again-already-migrated). New migration file; do not edit slice 8’s committed migration.
-
-**Done when:** graded-New rows in fixtures match New = ungraded; `S > 0` corpus untouched.
+`V300000272` + `StillNewFirstRatingBackfill.runHard`: still-New + `SHRINK` → live `S0(2)`/`D0(2)`, due +31h. Gate `still_new_hard_first_rating_backfill` default `1=0`. `V300000271` unchanged (facade `StillNewAgainFirstRatingBackfill.run` → `runAgain`).
 
 ### 11. Drop stay-New leftover
 
