@@ -1,6 +1,6 @@
 # Doughnut ↔ OKF v0.2 gap (toward ADR 0004)
 
-**Status:** Live spec is **OKF v0.2**. Remaining codec work is **P4** (dual-spelling, tracked here — do not close by converting), **P9**, plus **accept ADR 0004** (human). ZIP copies stored link spelling; wiki in Doughnut ZIPs is a profile exception, not remaining rewrite work. This tracker is not a second profile. Status stays Proposed.
+**Status:** Live spec is **OKF v0.2**. **P4** is closed (dual-spelling + no conversion). Remaining codec work is **P9**, YAML path-valued `source`/`target`, and collision basenames, plus **accept ADR 0004** (human). This tracker is not a second profile. Status stays Proposed.
 
 **Updated:** 2026-08-18
 
@@ -24,14 +24,17 @@ Portable output today is **one-way catalog ZIP** (`GET /api/notebooks/{notebook}
 - No listing `index.md`, no `log.md`, no root `okf_version` (missing listing is conformant).
 - Note titles `readme` / `readme.md` are hard-reserved. Note titles `index` / `index.md` / `log` / `log.md` are allowed; note create/edit and notebook health warn (non-blocking). Folder and notebook names do not warn. Filename-as-title: a note titled `index` writes `index.md`. Locked in ADR 0004; not remaining work.
 
-In the product (not the ZIP), titles live in a column (max 150). Doughnut-authored inter-note links are wiki; path Markdown is not yet treated as the same link (**P4**). Relationship notes also have `relation` / `source` / `target`. `tags` / `aliases` / `cssclasses` are Obsidian-style passthrough; `aliases` must be a plain YAML list. `image:` is authored frontmatter; binaries in the tree are ADR 0002 Level 2.
+In the product (not the ZIP), titles live in a column (max 150). Doughnut-authored inter-note links stay wiki; path Markdown `[display](/folder/File.md)` is the same link as `[[folder/File|display]]`. Relationship notes also have `relation` / `source` / `target`. Identity is folder path + title, not ZIP collision basenames (`Recipe (2).md`). `tags` / `aliases` / `cssclasses` are Obsidian-style passthrough; `aliases` must be a plain YAML list. `image:` is authored frontmatter; binaries in the tree are ADR 0002 Level 2.
 
 ## ADR 0004 profile vs codec
 
+**P4** is closed: dual-spelling + no conversion against Proposed [ADR 0004](../../docs/adrs/0004-okf-compatible-notebook-markdown.md) Decision. Wiki and path Markdown are the same link (resolve, live/dead display, title rename rewrite, folder-rename prefix rewrite). ZIP copies stored spelling (wiki in Doughnut ZIPs is a profile exception, not remaining rewrite work). Create-note / point-at-existing still search wiki tokens only — optional product polish, not remaining codec work.
+
 | ID | ADR 0004 rule | Code today |
 |----|---------------|------------|
-| **P4** | Dual-spelling: Doughnut canonical is wiki; path Markdown is accepted and equivalent; no conversion. ZIP copies stored spelling. Lock: Proposed [ADR 0004](../../docs/adrs/0004-okf-compatible-notebook-markdown.md) Decision. | Product does not yet resolve, display, or rewrite path Markdown as the same link as wiki. Delivery: [path-and-wiki-link-spellings](../quick/012-path-and-wiki-link-spellings/PLAN.md). Do not close P4 by converting `[[…]]` ↔ `[…](…)`. |
 | **P9** | Accept / CLI lint reject trees that break OKF or this profile | No import, no lint command, no Git accept. ZIP is download-only (`notebook_export.feature`). Concept `index.md` / `log.md` warn only (see ADR 0004). |
+
+Remaining besides **P9**: YAML path-valued `source`/`target` on relationship notes; collision basenames (identity is folder path + title, not `Recipe (2).md`).
 
 Lossless round-trip (ADR 0004 Decision) is not implemented: there is no inverse of the ZIP codec.
 
