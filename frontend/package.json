@@ -52,7 +52,7 @@
     "@vue/compiler-core": "3.5.41",
     "@vue/server-renderer": "3.5.41",
     "@vue/test-utils": "2.4.11",
-    "daisyui": "5.7.16",
+    "daisyui": "5.7.17",
     "doughnut-test-fixtures": "workspace:*",
     "es-toolkit": "^1.50.0",
     "esbuild": "0.28.2",
@@ -78,7 +78,7 @@
     "vitest-fetch-mock": "^0.4.5",
     "vue": "3.5.41",
     "vue-router": "5.2.0",
-    "vue-tsc": "3.3.9"
+    "vue-tsc": "3.3.10"
   },
   "overrides": {
     "quill": "npm:@dotwee/quill@2.0.9"
