@@ -55,15 +55,9 @@ Over-cap ordinary correct (and thinking-time sibling) persist Stability **876000
 ### 4. Existing over-cap rows are clamped without a grade
 
 - **Type:** Behavior
-- **Status:** planned
+- **Status:** done
 
-**Pre:** persisted `memory_tracker.stability > 876000` with `last_recalled_at` set (and a sibling under-cap row).
-
-**Trigger:** ungated Flyway `V300000274` running a Java backfill (same shape as hours conversion / still-New backfills: logic in an entity/service type, thin `db.migration` wrapper). Reuse `Fsrs.MAXIMUM_INTERVAL_HOURS` / `cappedStabilityHours` — do not duplicate the cap.
-
-**Post:** over-cap row has Stability **876000** and `next_recall_at = last_recalled_at + 876000 hours`; under-cap row untouched; Difficulty unchanged.
-
-Test drives the backfill class (not HTTP). Do not gate with `1=0`.
+Ungated `V300000274` / `OverCapStabilityBackfill`: over-cap rows get Stability **876000** and `next_recall_at = last_recalled_at + I(S_MAX)`; under-cap untouched; Difficulty unchanged. Cap from `Fsrs.MAXIMUM_INTERVAL_HOURS`; SQL `LEAST`.
 
 ### 5. Close maximum-interval in the FSRS tracker
 
@@ -78,3 +72,4 @@ Test drives the backfill class (not HTTP). Do not gate with `1=0`.
 - Slice 2: clamp lives in `Fsrs.cappedStabilityHours`; grade writes go through `MemoryTrackerNextStability`. `setStability` stays uncapped so tests can seed over-cap rows. Those tests are in-memory; MySQL `TIMESTAMP` cannot store `last + 876000 hours`.
 - Jidoka: humans accepted DATETIME for `last_recalled_at` / `next_recall_at` only; remaining TIMESTAMP columns are [SEED-006](../../seeds/SEED-006-remove-mysql-timestamp-2038.md). Dropped the null-last clamp case (`NOT NULL`).
 - Slice 3: ERD exporter does not list these columns (not PK/UK/FK); no `docs/database-erd.md` delta.
+- Slice 4: backfill due hours use `Fsrs.intervalHours(MAXIMUM_INTERVAL_HOURS)` (cap is already S_MAX).
