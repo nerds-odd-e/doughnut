@@ -11,7 +11,7 @@ scope: large
 
 ## Why This Matters
 
-Doughnut already schedules recall with elapsed time and outcome. The product contract is Proposed [ADR 0003](../../docs/adrs/0003-spaced-repetition-scheduling-policy.md) Decision. First-rating initials on New success are **closed** (`S0`/`D0` for Good / Hard / Easy). Remaining work is **accepting** that ADR plus the deferred knobs below.
+Doughnut already schedules recall with elapsed time and outcome. The product contract is Proposed [ADR 0003](../../docs/adrs/0003-spaced-repetition-scheduling-policy.md) Decision. First-rating (all four G, Tutor **2** on New as Hard) is **closed**; `w[0]` is used for Again `S0`. Remaining work is **accepting** that ADR plus the deferred knobs below (**E3** / **E4**).
 
 ## When to Surface
 
@@ -30,7 +30,7 @@ Also surface when changing success/failure interval math, commissioned score →
 
 - `.planning/research/FSRS-COMPATIBILITY-GAP.md` — pointer + deferred ID list
 - `docs/adrs/0003-spaced-repetition-scheduling-policy.md` — Proposed policy (Decision; Working draft empty pending accept)
-- `docs/adrs/0001-ubiquitous-language.md` — **recall** (not FSRS **review**)
+- `docs/adrs/0001-ubiquitous-language.md` — **recall** (not FSRS **review**); **New** = ungraded
 - `docs/adrs/0005-commissioned-learning-session-protocol.md` — Tutor 0–5 meaning
 - `backend/src/main/java/com/odde/doughnut/entities/ForgettingCurve.java`
 - `backend/src/main/java/com/odde/doughnut/entities/MemoryTracker.java`
