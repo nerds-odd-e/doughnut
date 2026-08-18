@@ -3,6 +3,8 @@ package com.odde.doughnut.services.notebookExport;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
+import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 class NotebookExportFilenamesTest {
@@ -23,16 +25,23 @@ class NotebookExportFilenamesTest {
 
   @Test
   void uniqueFileNamesKeepsCleanNameForFirstOccurrenceAndSuffixesLaterDuplicates() {
-    java.util.Map<Integer, String> result =
+    Map<Integer, String> result =
         NotebookExportFilenames.uniqueFileNames(
-            java.util.List.of(
-                java.util.Map.entry(1, "Recipe"),
-                java.util.Map.entry(2, "Recipe"),
-                java.util.Map.entry(3, "Other")),
+            List.of(Map.entry(10, "Recipe"), Map.entry(99, "Recipe"), Map.entry(3, "Other")),
             ".md");
 
-    assertThat(result.get(1), equalTo("Recipe.md"));
-    assertThat(result.get(2), equalTo("Recipe (2).md"));
+    assertThat(result.get(10), equalTo("Recipe.md"));
+    assertThat(result.get(99), equalTo("Recipe (2).md"));
     assertThat(result.get(3), equalTo("Other.md"));
+  }
+
+  @Test
+  void uniqueFileNamesSkipsHumanSuffixAlreadyTakenByAnotherBasename() {
+    Map<Integer, String> result =
+        NotebookExportFilenames.uniqueFileNames(
+            List.of(Map.entry(10, "Recipe"), Map.entry(20, "Recipe (2)"), Map.entry(99, "Recipe*")),
+            ".md");
+
+    assertThat(result.get(99), equalTo("Recipe (3).md"));
   }
 }

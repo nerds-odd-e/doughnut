@@ -67,22 +67,4 @@ export const downloadedNotebookZip = (notebookName: string) => ({
     })
     return this
   },
-  expectCollisionEntryIncludes(title: string, fragment: string) {
-    loadZipEntries(notebookName).then((entries) => {
-      const collisionPaths = Object.keys(entries).filter(
-        (path) => path.startsWith(`${title} (`) && path.endsWith(').md')
-      )
-      expect(
-        collisionPaths,
-        `Expected a collision zip entry for title "${title}" in "${notebookName}", but found [${Object.keys(entries).join(', ')}]`
-      ).to.have.length.greaterThan(0)
-      const collisionPath = collisionPaths[0]
-      const actual = entries[collisionPath]
-      expect(
-        actual,
-        `Expected collision entry "${collisionPath}" for "${notebookName}" to include "${fragment}", but found "${actual}"`
-      ).to.include(fragment)
-    })
-    return this
-  },
 })

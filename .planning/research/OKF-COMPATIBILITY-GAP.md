@@ -1,6 +1,6 @@
 # Doughnut ↔ OKF v0.2 gap (toward ADR 0004)
 
-**Status:** Live spec is **OKF v0.2**. Catalog ZIP export does not yet match Proposed ADR 0004 (wiki links, id-suffixed collisions). Remaining codec work is **P3**–**P5**, **P8**–**P9**, plus **accept ADR 0004** (human). This tracker is not a second profile. Status stays Proposed.
+**Status:** Live spec is **OKF v0.2**. Catalog ZIP export does not yet match Proposed ADR 0004 (wiki links; attachment paths still carry ids). Remaining codec work is **P4**, **P8**–**P9**, plus **accept ADR 0004** (human). **P5** remains only as attachment-path ids. This tracker is not a second profile. Status stays Proposed.
 
 **Updated:** 2026-08-18
 
@@ -18,7 +18,7 @@ Portable output today is **one-way catalog ZIP** (`GET /api/notebooks/{notebook}
 
 - One notebook → a directory of `.md` files; folders are subdirectories. Non-blank notebook/folder readme → that directory’s `README.md` with export-only `type: Readme`. Blank omits the file. Empty folders with no readme and no notes are omitted (ZIP/Git-like).
 - Stored notes carry `type: Note` or `type: Relationship` on `note.content` (`NoteConceptType.ensureStoredType`, production backfill `V300000270`). Export copies the leading YAML block.
-- Concept filename = sanitized note title + `.md`. Collision suffix is `" (" + noteId + ")"` (database key), not a human sequence. Sanitize replaces `\/:*?"<>|` and control chars with spaces; blank → `Untitled`. When that basename is not the exact title and leading YAML has no `title` key, export wraps `title: {display title}` (`NoteLeadingFrontmatter.ensureTitleKey`). Author `title` is left unchanged. Stored notes keep the title column.
+- Concept filename = sanitized note title + `.md`. Collision suffix is a human sequence in export order (`Recipe.md`, `Recipe (2).md`, …), never a database key. Sanitize replaces `\/:*?"<>|` and control chars with spaces; blank → `Untitled`. When that basename is not the exact title and leading YAML has no `title` key, export wraps `title: {display title}` (`NoteLeadingFrontmatter.ensureTitleKey`). Author `title` is left unchanged. Stored notes keep the title column.
 - Export does not inject `# {title}`. Author YAML and author headings in the body are copied as stored (no injected identity or `okf_version`).
 - Wiki links (`[[…]]`) and attachment paths (`/attachments/images/{id}/…`) are left unchanged.
 - No listing `index.md`, no `log.md`, no root `okf_version` (missing listing is conformant).
@@ -30,9 +30,8 @@ In the product (not the ZIP), titles live in a column (max 150). Inter-note link
 
 | ID | ADR 0004 rule | Code today |
 |----|---------------|------------|
-| **P3** | Collision suffixes are human (`Recipe (2).md`), never DB keys | Suffix is the note id. Tests that use id `2` look sequential by coincidence. |
 | **P4** | Canonical inter-note links are path-based Markdown (`/path.md` or relative) | Export does not rewrite `[[wiki]]`. In-app canonical form remains wiki links. |
-| **P5** | No Doughnut note id / UUID / sync manifest in the tree | Collision filenames leak the note id (**P3**). Frontmatter is otherwise identity-free. |
+| **P5** | No Doughnut note id / UUID / sync manifest in the tree | Filenames are identity-free. Attachment paths still carry ids (**P8**). Frontmatter is otherwise identity-free. |
 | **P8** | Attachments: portable absolute URLs until Git binaries (ADR 0002 Level 2) | Paths stay `/attachments/images/{id}/…` (host-relative, id in the path). |
 | **P9** | Accept / CLI lint reject trees that break OKF or this profile | No import, no lint command, no Git accept. ZIP is download-only (`notebook_export.feature`). Concept `index.md` / `log.md` warn only (see ADR 0004). |
 

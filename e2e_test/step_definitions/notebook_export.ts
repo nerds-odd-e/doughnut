@@ -48,13 +48,3 @@ Then(
     )
   }
 )
-
-Then(
-  'the collision zip entry for title {string} of notebook {string} includes {string}',
-  (title: string, notebookName: string, fragment: string) => {
-    downloadedNotebookZip(notebookName).expectCollisionEntryIncludes(
-      title,
-      fragment
-    )
-  }
-)

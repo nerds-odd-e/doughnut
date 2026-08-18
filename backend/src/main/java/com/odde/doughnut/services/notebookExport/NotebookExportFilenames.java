@@ -24,8 +24,10 @@ public final class NotebookExportFilenames {
     for (Map.Entry<Integer, String> entry : idsAndRawNames) {
       String base = sanitize(entry.getValue());
       String candidate = base + extension;
-      if (used.contains(candidate)) {
-        candidate = base + " (" + entry.getKey() + ")" + extension;
+      int n = 2;
+      while (used.contains(candidate)) {
+        candidate = base + " (" + n + ")" + extension;
+        n++;
       }
       used.add(candidate);
       result.put(entry.getKey(), candidate);

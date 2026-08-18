@@ -61,7 +61,11 @@ profile. Codec round-trips must be lossless for these rules.
 - When the exact Doughnut title cannot round-trip through that filesystem-safe
   name (sanitize, Untitled fallback, collision suffix), set `title` in
   frontmatter as the display title. Collision suffixes belong to the path,
-  not the title (e.g. `Recipe.md`, `Recipe (2).md`).
+  not the title. They are a human sequence in export order within that
+  directory: first keeps the unsuffixed basename; later collisions use
+  `(2)`, `(3)`, … skipping any basename already used (including a sibling
+  whose title is already `Recipe (2)`). Never a Doughnut note or folder id
+  (e.g. `Recipe.md`, `Recipe (2).md`).
 - Codec wrap (export / portable tree): when the concept filename (basename
   without `.md`) differs from the exact title and the leading YAML omits
   `title`, insert `title: {display title}`. Leave an author-owned `title` key

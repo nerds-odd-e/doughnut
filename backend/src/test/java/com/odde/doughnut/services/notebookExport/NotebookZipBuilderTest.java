@@ -102,20 +102,9 @@ class NotebookZipBuilderTest {
   }
 
   @Test
-  void usesCollisionSafeFilenamesForDuplicateTitles() throws IOException {
-    ExportNoteRow first = new ExportNoteRow(1, null, "Dup", "first");
-    ExportNoteRow second = new ExportNoteRow(2, null, "Dup", "second");
-
-    Map<String, String> entries = readZipEntries(buildZip(null, List.of(), List.of(first, second)));
-
-    assertThat(entries.containsKey("Dup.md"), equalTo(true));
-    assertThat(entries.containsKey("Dup (2).md"), equalTo(true));
-  }
-
-  @Test
   void wrapsTitleOnCollisionFileAndLeavesExactFilenameSiblingUnwrapped() throws IOException {
-    ExportNoteRow first = new ExportNoteRow(1, null, "Dup", "first");
-    ExportNoteRow second = new ExportNoteRow(2, null, "Dup", "second");
+    ExportNoteRow first = new ExportNoteRow(10, null, "Dup", "first");
+    ExportNoteRow second = new ExportNoteRow(99, null, "Dup", "second");
 
     Map<String, String> entries = readZipEntries(buildZip(null, List.of(), List.of(first, second)));
 
