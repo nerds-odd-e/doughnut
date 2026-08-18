@@ -1,8 +1,10 @@
 package com.odde.doughnut.controllers;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.equalTo;
 
+import com.odde.doughnut.controllers.dto.WikiTitle;
 import com.odde.doughnut.entities.Folder;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
@@ -56,5 +58,27 @@ class NotebookFolderMoveWikiLinkRewriteControllerTest
 
     makeMe.refresh(insideNote);
     assertThat(insideNote.getContent(), equalTo("[[NbA:Outside|Outside]] and [[Peer]]."));
+  }
+
+  @Test
+  void crossNotebookFolderMove_keepsPathShapedLinksToCoMovedNotes()
+      throws UnexpectedNoAccessRightException {
+    User owner = currentUser.getUser();
+    Notebook oldNb = ownedNotebook("OldNb");
+    Notebook newNb = ownedNotebook("NewNb");
+    Folder folderF = ownedFolder(oldNb, "F");
+    Note noteA = makeMe.aNote("A").folder(folderF).please();
+    Note noteB = makeMe.aNote("B").folder(folderF).content("[[F/A]] and [label](/F/A.md)").please();
+    wikiTitleCacheServiceBean.refreshForNote(noteB, owner);
+
+    controller.moveFolder(oldNb, folderF, folderMoveTo(newNb, null));
+
+    makeMe.refresh(noteB);
+    assertThat(noteB.getContent(), equalTo("[[F/A]] and [label](/F/A.md)"));
+    assertThat(
+        wikiTitleCacheServiceBean.wikiTitlesForViewer(noteB, owner).stream()
+            .map(WikiTitle::getNoteId)
+            .toList(),
+        containsInAnyOrder(noteA.getId(), noteA.getId()));
   }
 }

@@ -27,8 +27,7 @@ ADR 0004 stays Proposed. Do not accept it here.
 ## Discoveries
 
 - Dead path-Markdown retarget (slice 1): fixed — original token is path Markdown when the target is a path.
-- `WikiLinkRewriteSupport.noteMatchesWikiLinkTarget` compares `note.getTitle()` to `ref.noteTitle()`. For `[[Folder/A]]` / `[x](/Folder/A.md)` that string is the path, not the title. Co-moved notes in a folder moved across notebooks get incorrectly qualified to the old notebook (path Markdown currently no-ops only because the corrupt `newInner` fails path-parse and wiki replace misses).
-- `WikiLinkResolver.noteCandidates` still uses `contains("/")` instead of `PathShapedTarget.tryParse` (same dual heuristic the sanitizer already dropped).
+- Cross-notebook co-move (slice 2): fixed — path-shaped match is `PathShapedTarget.matchesTitleAndFolderTrail`; qualify-outgoing skips path Markdown.
 - Overlap: `WikiLinkMarkdownTest` rewrite cases vs `TextContentControllerUpdateNoteTitleInboundWikiReferencesTests` / `NotebookFolderRenameWikiLinkRewriteControllerTest`. Frontend: `replaceWikiLinksInHtml` live/dead path Markdown vs `NoteTextContent.wikiLinks` vs `path_markdown_link.feature`.
 
 ## Slices
@@ -47,11 +46,13 @@ Learning: SearchForm loads the chosen note realm only for path retarget (folder 
 ### 2. Moving a folder across notebooks keeps path-shaped links to co-moved notes
 
 - **Type:** Behavior
-- **Status:** planned
+- **Status:** done
 
 **Pre:** folder `F` contains notes `A` and `B`; `B`’s body has both `[[F/A]]` and `[label](/F/A.md)`. **Trigger:** move folder `F` to another notebook. **Post:** both spans still open `A`; wiki stays wiki with prefix `F/`; Markdown stays Markdown with href `/F/A.md`; neither is qualified as `OldNb:…` or `OldNb:[label](/…)`.
 
-Controller boundary: existing cross-notebook folder/note move tests (`RelationControllerTests` / folder-move controller). Co-moved match must use `PathShapedTarget` + folder trail (same as resolve). Path-Markdown tokens are skipped by qualify-outgoing / keep-notebook-move. Drop the `contains("/")` gate in `noteCandidates` in this slice if it is on the same matching path.
+Shipped: `NotebookFolderMoveWikiLinkRewriteControllerTest`; `PathShapedTarget.matchesTitleAndFolderTrail` shared by resolve and rewrite; `noteCandidates` uses `PathShapedTarget.tryParse`; qualify-outgoing / keep-notebook-move leave path-Markdown authored.
+
+Learning: matching is the same rule as resolve (title + folder trail names). The known gap remains — inbound path Markdown following a target note into another notebook.
 
 ### 3. Dual-spelling tests pin the stable boundary once
 

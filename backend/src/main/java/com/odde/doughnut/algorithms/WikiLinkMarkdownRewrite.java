@@ -58,10 +58,13 @@ public final class WikiLinkMarkdownRewrite {
     if (storedLinkInner == null || storedLinkInner.isEmpty()) {
       return storedLinkInner;
     }
-    return keepVisibleInner(
+    return rewriteWikiInnerLeavingPathMarkdown(
         storedLinkInner,
-        rawTargetToken ->
-            WikiLinkTargetReference.replaceNotebookName(rawTargetToken, newNotebookName));
+        () ->
+            keepVisibleInner(
+                storedLinkInner,
+                rawTargetToken ->
+                    WikiLinkTargetReference.replaceNotebookName(rawTargetToken, newNotebookName)));
   }
 
   /**
@@ -76,6 +79,12 @@ public final class WikiLinkMarkdownRewrite {
     if (storedLinkInner == null || storedLinkInner.isEmpty()) {
       return storedLinkInner;
     }
+    return rewriteWikiInnerLeavingPathMarkdown(
+        storedLinkInner, () -> qualifyUnqualifiedWikiInner(storedLinkInner, sourceNotebookName));
+  }
+
+  private static String qualifyUnqualifiedWikiInner(
+      String storedLinkInner, String sourceNotebookName) {
     int pipeIdx = storedLinkInner.indexOf('|');
     String rawTargetPart = pipeIdx == -1 ? storedLinkInner : storedLinkInner.substring(0, pipeIdx);
     String targetToken = rawTargetPart.trim();
@@ -107,6 +116,13 @@ public final class WikiLinkMarkdownRewrite {
     return WikiLinkMarkdown.tryParsePathMarkdownToken(storedLinkInner)
         .map(token -> token.withHref(targetTransform.apply(token.href())))
         .orElseGet(wikiFallback);
+  }
+
+  private static String rewriteWikiInnerLeavingPathMarkdown(
+      String storedLinkInner, Supplier<String> wikiRewrite) {
+    return WikiLinkMarkdown.tryParsePathMarkdownToken(storedLinkInner)
+        .map(_ -> storedLinkInner)
+        .orElseGet(wikiRewrite);
   }
 
   private static String rewriteWikiInnerTarget(

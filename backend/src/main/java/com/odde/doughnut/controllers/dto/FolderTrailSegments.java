@@ -5,7 +5,6 @@ import com.odde.doughnut.entities.Note;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /** Folder path from notebook root to the note's containing folder (outermost first). */
 public final class FolderTrailSegments {
@@ -13,9 +12,7 @@ public final class FolderTrailSegments {
 
   /** Outer-most folder first, separated by {@code " / "} (empty when the note has no folder). */
   public static String crumbPathJoinedBySlashSpace(Note note) {
-    return fromRootToContainingFolder(note).stream()
-        .map(Folder::getName)
-        .collect(Collectors.joining(" / "));
+    return String.join(" / ", namesFromRootToContainingFolder(note));
   }
 
   public static List<Folder> fromRootToContainingFolder(Note note) {
@@ -24,6 +21,11 @@ public final class FolderTrailSegments {
       return List.of();
     }
     return fromRootToFolder(folder);
+  }
+
+  /** Outer-most folder name first (empty when the note has no folder). */
+  public static List<String> namesFromRootToContainingFolder(Note note) {
+    return fromRootToContainingFolder(note).stream().map(Folder::getName).toList();
   }
 
   /** Outermost folder first, from notebook root through {@code folder} (inclusive). */

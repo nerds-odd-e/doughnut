@@ -108,6 +108,21 @@ public record WikiLinkTargetReference(String notebookName, String noteTitle) {
       return formatPath(updated, title);
     }
 
+    public boolean matchesTitleAndFolderTrail(String noteTitle, List<String> folderTrailNames) {
+      if (!noteTitle.equalsIgnoreCase(title)) {
+        return false;
+      }
+      if (folderTrailNames.size() != folderNames.size()) {
+        return false;
+      }
+      for (int i = 0; i < folderNames.size(); i++) {
+        if (!folderNames.get(i).equalsIgnoreCase(folderTrailNames.get(i))) {
+          return false;
+        }
+      }
+      return true;
+    }
+
     private String formatPath(List<String> folders, String noteTitle) {
       StringBuilder out = new StringBuilder();
       if (leadingSlash) {

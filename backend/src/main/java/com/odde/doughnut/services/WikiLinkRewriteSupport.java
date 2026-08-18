@@ -3,6 +3,7 @@ package com.odde.doughnut.services;
 import com.odde.doughnut.algorithms.NoteContentMarkdown;
 import com.odde.doughnut.algorithms.WikiLinkMarkdownRewrite;
 import com.odde.doughnut.algorithms.WikiLinkTargetReference;
+import com.odde.doughnut.controllers.dto.FolderTrailSegments;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.NoteWikiTitleCache;
 import com.odde.doughnut.entities.User;
@@ -157,7 +158,14 @@ final class WikiLinkRewriteSupport {
     if (note.getNotebook() == null) {
       return false;
     }
-    return note.getNotebook().getName().equalsIgnoreCase(ref.notebookName())
-        && note.getTitle().equalsIgnoreCase(ref.noteTitle());
+    if (!note.getNotebook().getName().equalsIgnoreCase(ref.notebookName())) {
+      return false;
+    }
+    return WikiLinkTargetReference.PathShapedTarget.tryParse(ref.noteTitle())
+        .map(
+            path ->
+                path.matchesTitleAndFolderTrail(
+                    note.getTitle(), FolderTrailSegments.namesFromRootToContainingFolder(note)))
+        .orElseGet(() -> note.getTitle().equalsIgnoreCase(ref.noteTitle()));
   }
 }
