@@ -44,11 +44,9 @@ state, qualitative update rules), not with a particular crate or version.
   requested retention `r` locked at **0.9** (`I(0.9, S) = S` in whole hours).
   When `I` is non-positive, due is 24 hours after the grade (strictly-future
   fallback). A newly assimilated tracker may have Stability 0 (due now).
-  After a grade, persisted Stability 0 is only Tutor **2** on New (Difficulty
-  unset; due from that 24-hour fallback). First Again / Tutor **0/1** on New
-  uses first-rating (see **First rating on New**); due then comes from `I`, not
-  from the 24-hour fallback. Spacing is Stability, not a Settings day list. Live
-  scheduling must not walk a spacing-index ladder.
+  First mapped grades on New use first-rating (see **First rating on New**);
+  due then comes from `I`, not from the 24-hour fallback. Spacing is Stability,
+  not a Settings day list. Live scheduling must not walk a spacing-index ladder.
 - **Retrievability** is computed from elapsed whole hours and Stability, not stored.
 - A recall transition consumes the graded outcome, elapsed time, and that state — never queue lateness.
 - **Requested retention** `r` is a **global constant 0.9** — not a Settings
@@ -71,7 +69,7 @@ change the schedule.
 
 Difficulty is persisted memory state in `[1, 10]`. It is shown on the Memory Tracker page (Information card), next to Stability, as the number returned by the API or **N/A** when unset (New / assimilate-only). Harder items gain less Stability on a successful recall. A correct recall also updates Difficulty with Good next-D (see **Difficulty after a mapped grade**).
 
-A newly assimilated tracker is **New**: Stability 0, Difficulty unset, due now. Assimilation is not a grade. The first mapped success or Again initializes Stability and Difficulty with FSRS-6 first-rating (see **First rating on New**). Difficulty **5** remains only as the fallback when Stability > 0 and Difficulty is null.
+A newly assimilated tracker is **New**: Stability 0, Difficulty unset, due now. Assimilation is not a grade. The first mapped grade initializes Stability and Difficulty with FSRS-6 first-rating (see **First rating on New**). Difficulty **5** remains only as the fallback when Stability > 0 and Difficulty is null.
 
 Ordinary correct recall with Stability > 0 updates Stability with open-FSRS-6 Good-equivalent rules (own implementation) and Difficulty with Good next-D. Locked overdue extra growth still holds.
 
@@ -87,9 +85,9 @@ First mapped **success** on a New tracker (ordinary correct / just review Yes / 
 
 First Again / Tutor **0/1** on New uses the same first-rating path with `G=1`: Stability `S0(1)` (**5** hours), Difficulty `D0(1)` (Java float), due `lastRecalledAt + I` (**5h**).
 
-Tutor **2** on New stays New (Stability 0, Difficulty unset; due +24h from the strictly-future fallback). Already-graded rows are not backfilled. No Flyway.
+Tutor **2** on New uses the same first-rating path with `G=2`: Stability `S0(2)` (**31** hours), Difficulty `D0(2)` (Java float), due `lastRecalledAt + I` (**31h**) — same first bucket as Tutor **3**. Already-graded rows are not backfilled. No Flyway. Shrink 80% remains the exception only when `S > 0`.
 
-The 24-hour strictly-future fallback is for non-positive `I`, not the New-Again interval.
+The 24-hour strictly-future fallback is for non-positive `I`, not a New first-rating interval.
 
 ### Difficulty after a mapped grade
 
@@ -100,7 +98,7 @@ When Stability > 0, a mapped grade updates Difficulty with published open FSRS-6
 - `D'' = w7 · D0(Easy) + (1 − w7) · D'`, then clamp to `[1, 10]`
 - `D0(G) = w4 − e^{w5·(G−1)} + 1`; **`D0(Easy)` is unclamped** `D0(4)` (negative with default weights)
 
-`G`: Again=1, Hard=2, Good=3, Easy=4 (`Fsrs.AGAIN` / `HARD` / `GOOD` / `EASY`). Existing persisted Difficulty is **not** backfilled. New first-rating uses clamped `D0(G)` (see **First rating on New**). Tutor **2** and confusion do not change Difficulty. Display is the API number (no extra rounding).
+`G`: Again=1, Hard=2, Good=3, Easy=4 (`Fsrs.AGAIN` / `HARD` / `GOOD` / `EASY`). Existing persisted Difficulty is **not** backfilled. New first-rating uses clamped `D0(G)` (see **First rating on New**). Tutor **2** on New uses `D0(2)`; when `S > 0`, Tutor **2** does not change Difficulty. Confusion does not change Difficulty. Display is the API number (no extra rounding).
 
 ### Outcome-to-grade compatibility map
 
@@ -111,7 +109,7 @@ Keep Doughnut product outcomes first-class. Do not replace the Tutor 0–5 rubri
 | Just review Yes / ordinary correct / Tutor **4** | FSRS-6 Good |
 | Tutor **5** | FSRS-6 Easy |
 | Tutor **3** | FSRS-6 Hard |
-| Tutor **2** | Doughnut exception (80% accumulated S, D unchanged) |
+| Tutor **2** | On New: FSRS-6 Hard first-rating (`S0(2)` / `D0(2)`); when `S > 0`: Doughnut exception (80% accumulated S, D unchanged) |
 | Just review No / ordinary incorrect | FSRS-6 Again memory; due from `I` (non-positive `I` → 24h) |
 | Tutor **1** and **0** | Again memory; due from S (0 same as 1; rubric still differs) |
 | Confusion | Not a grade; Again-midpoint S; due not later |
@@ -132,7 +130,7 @@ A commissioned memory tracker is graded from Tutor Feedback (score 0–5), not f
 - Effort is neutral. A Tutor session carries no trustworthy effort measurement.
 - A late session does not weaken the result. The score determines the memory-state adjustment; the recorded time advances `lastRecalledAt`.
 - After a score, due is `lastRecalledAt + I(0.9, S)`; non-positive `I` → 24h. A commissioned tracker is due only when the learner commissions another Learning Session.
-- **New** (Stability 0, Difficulty unset): scores **3**, **4**, and **5** use FSRS-6 first-rating (see **First rating on New**). Scores **0** and **1** use first-rating Again (`S0(1)` / `D0(1)`, due from `I`, **5h**). Score **2** stays Stability 0 and Difficulty unset; due is strictly after the recorded time (24-hour fallback).
+- **New** (Stability 0, Difficulty unset): scores **3**, **4**, and **5** use FSRS-6 first-rating (see **First rating on New**). Scores **0** and **1** use first-rating Again (`S0(1)` / `D0(1)`, due from `I`, **5h**). Score **2** uses Hard first-rating (`S0(2)` / `D0(2)`, due from `I`, **31h**).
 
 Memory updates with Stability > 0:
 
@@ -233,8 +231,7 @@ adjustment; schedule fields stay unchanged. Retry in session with a more specifi
 After a grade, the tracker must be due strictly after the recorded time. When
 the computed interval is non-positive (due would be at or before the grade
 instant), schedule **24 hours** after the recorded time. This fallback is not
-first-rating Stability (success or Again). Do not use the spacing-index ladder
-as this fallback.
+first-rating Stability. Do not use the spacing-index ladder as this fallback.
 
 ### Manual and admin paths
 

@@ -64,11 +64,9 @@ Example rows **0** and **1** on `commissioned_learning_session.feature` “First
 ### 5. Lock Tutor 2 on New as Hard first-rating in ADR 0003
 
 - **Type:** Structure
-- **Status:** planned
+- **Status:** done
 
-Enables slice 6 only. Commissioned New **2** uses Hard `S0(2)` / `D0(2)` (due +31h). Shrink 80% remains the exception **only when `S > 0`**. Do not lock backfill. Do not amend ADR 0001 yet.
-
-**Done when:** Decision matches slice 6; tests unchanged.
+Proposed ADR 0003: New Tutor **2** uses Hard `S0(2)` / `D0(2)` (due **31h**), same first bucket as Tutor **3**. Shrink 80% only when `S > 0`. No Flyway / no backfill. ADR 0001 unchanged. Product still stay-New until slice 6.
 
 ### 6. First Tutor 2 on New uses S0(Hard) / D0(Hard)
 
