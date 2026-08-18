@@ -86,13 +86,34 @@ export function wikiTitleNoteIdLookup(
 /** Dead wiki link click payload containing the target token and visible display text. */
 export type DeadWikiLinkPayload = { targetToken: string; displayText: string }
 
-/** Markdown `[[...]]` token for the clicked dead wiki link (matches stored content for replace). */
+function pathMarkdownToken(displayText: string, href: string): string {
+  return `[${displayText}](${href})`
+}
+
+/** Stored token for the clicked dead wiki link (wiki `[[…]]` or path `[label](href)`), for replace. */
 export function markdownWikiTokenFromDeadWikiLinkPayload(
   p: DeadWikiLinkPayload
 ): string {
   const { targetToken, displayText } = p
+  if (hrefLooksLikeConceptNotePath(targetToken)) {
+    return pathMarkdownToken(displayText, targetToken)
+  }
   if (targetToken === displayText) return `[[${targetToken}]]`
   return `[[${targetToken}|${displayText}]]`
+}
+
+/** Path-Markdown token pointing at a note, keeping the authored `.md` / no-`.md` suffix. */
+export function pathMarkdownTokenForNote(args: {
+  displayText: string
+  folderNames: readonly string[]
+  title: string
+  authoredHref: string
+}): string {
+  const folders = args.folderNames.filter((name) => name.length > 0)
+  const path =
+    folders.length > 0 ? `${folders.join("/")}/${args.title}` : args.title
+  const suffix = args.authoredHref.toLowerCase().endsWith(".md") ? ".md" : ""
+  return pathMarkdownToken(args.displayText, `/${path}${suffix}`)
 }
 
 /** Handles click on a rich-content anchor: dead wiki links, external URLs, in-app routes. */
@@ -175,7 +196,7 @@ export function wikiAnchorToMarkdownToken(anchor: HTMLAnchorElement): string {
       anchor.getAttribute("data-wiki-display") ||
       anchor.textContent?.trim() ||
       ""
-    return `[${display}](${pathHref})`
+    return pathMarkdownToken(display, pathHref)
   }
 
   const raw = anchor.textContent?.trim() ?? ""

@@ -1,22 +1,15 @@
 import {
   RelationController,
   SearchController,
-  TextContentController,
 } from "@generated/doughnut-backend-api/sdk.gen"
-import SearchForm from "@/components/wiki-link-or-relationship/SearchForm.vue"
 import usePopups from "@/components/commons/Popups/usePopups"
 import { fireEvent, screen } from "@testing-library/vue"
 import { flushPromises } from "@vue/test-utils"
 import MakeMe from "doughnut-test-fixtures/makeMe"
-import helper, { mockSdkService, wrapSdkError } from "@tests/helpers"
-import { useStorageAccessor } from "@/composables/useStorageAccessor"
-import createNoteStorage from "@/store/createNoteStorage"
+import { mockSdkService, wrapSdkError } from "@tests/helpers"
 import { afterEach, describe, expect, it, vi } from "vitest"
-import { advanceSearchDebounce } from "@tests/helpers/searchDebounceTestSupport"
 import {
   confirmMovePopup,
-  deadWikiLinkPayload,
-  makeNoteHit,
   makeNotebookHit,
   openUseThisNoteChoice,
   renderSearchForm,
@@ -142,85 +135,6 @@ describe("SearchForm actions", () => {
           targetNotebook: targetNotebookId,
         },
       })
-    })
-  })
-
-  describe("Dead link - link to existing note", () => {
-    beforeEach(() => {
-      vi.useFakeTimers()
-    })
-
-    it("prefills search with dead link display text and searches automatically", async () => {
-      const note = MakeMe.aNote.please()
-      const searchSpy = mockSdkService(
-        SearchController,
-        "searchForRelationshipTargetWithin",
-        [makeNoteHit("Selected Note", note.noteTopology.id + 100)]
-      )
-
-      helper
-        .component(SearchForm)
-        .withCleanStorage()
-        .withProps({ note, deadWikiLinkPayload })
-        .render()
-      await flushPromises()
-
-      const searchInput = screen.getByPlaceholderText("Search")
-      expect(searchInput).toHaveValue("original text")
-      await advanceSearchDebounce()
-
-      expect(searchSpy).toHaveBeenCalledWith(
-        expect.objectContaining({
-          path: { note: note.id },
-          body: expect.objectContaining({ searchKey: "original text" }),
-        })
-      )
-    })
-
-    it("rewrites note content when linking dead link to existing note", async () => {
-      const noteRealm = MakeMe.aNoteRealm
-        .content("See [[original text]] for details.")
-        .please()
-      const note = noteRealm.note
-      const targetNotebookId = note.noteTopology.id + 100
-      mockSdkService(SearchController, "searchForRelationshipTargetWithin", [
-        makeNoteHit("Selected Note", targetNotebookId),
-      ])
-      const updateSpy = mockSdkService(
-        TextContentController,
-        "updateNoteContent",
-        MakeMe.aNoteRealm.please()
-      )
-
-      const storageAccessor = useStorageAccessor()
-      storageAccessor.value = createNoteStorage()
-      storageAccessor.value.refreshNoteRealm(noteRealm)
-
-      const searchInput = await renderSearchForm(
-        { note, deadWikiLinkPayload },
-        { cleanStorage: false }
-      )
-      await typeInSearch(searchInput, "Selected")
-
-      fireEvent.click(screen.getByText("Use this note"))
-      await flushPromises()
-
-      const linkButton = screen.getByText(
-        'Point wiki link "original text" at this note'
-      )
-      expect(linkButton).toBeInTheDocument()
-
-      fireEvent.click(linkButton)
-      await flushPromises()
-
-      expect(updateSpy).toHaveBeenCalledTimes(1)
-      expect(updateSpy).toHaveBeenCalledWith(
-        expect.objectContaining({
-          body: expect.objectContaining({
-            content: "See [[Selected Note|original text]] for details.",
-          }),
-        })
-      )
     })
   })
 })

@@ -41,9 +41,11 @@ import usePopups from "../commons/Popups/usePopups"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import { buildWikiLinkText } from "@/utils/buildWikiLinkText"
 import { useContentCursorInserter } from "@/composables/useContentCursorInserter"
+import { hrefLooksLikeConceptNotePath } from "@/routes/noteShowLocation"
 import {
   type DeadWikiLinkPayload,
   markdownWikiTokenFromDeadWikiLinkPayload,
+  pathMarkdownTokenForNote,
 } from "@/utils/wikiLinkMarkup"
 import {
   moveBlockedBySoftDeletedTitleMessage,
@@ -99,14 +101,30 @@ async function onInsertWikiLinkAsProperty() {
   await closeDialogThen(() => insertWikiLinkAsProperty(linkText))
 }
 
+async function folderNamesForNote(noteId: number): Promise<string[]> {
+  const realm = await storageAccessor.value.storedApi().loadNoteRealm(noteId)
+  return (realm.ancestorFolders ?? []).map((folder) => folder.name)
+}
+
 async function onDeadWikiLinkToNote() {
   if (!selectedSearchResult.value || !note || !deadWikiLinkPayload) return
-  const newLinkText = buildWikiLinkText(selectedSearchResult.value, {
-    notebookId: notebookId.value,
-    displayText: deadWikiLinkPayload.displayText,
-  })
   const originalToken =
     markdownWikiTokenFromDeadWikiLinkPayload(deadWikiLinkPayload)
+  const newLinkText = hrefLooksLikeConceptNotePath(
+    deadWikiLinkPayload.targetToken
+  )
+    ? pathMarkdownTokenForNote({
+        displayText: deadWikiLinkPayload.displayText,
+        folderNames: await folderNamesForNote(
+          selectedSearchResult.value.noteTopology.id
+        ),
+        title: selectedSearchResult.value.noteTopology.title,
+        authoredHref: deadWikiLinkPayload.targetToken,
+      })
+    : buildWikiLinkText(selectedSearchResult.value, {
+        notebookId: notebookId.value,
+        displayText: deadWikiLinkPayload.displayText,
+      })
   const currentContent =
     storageAccessor.value.refOfNoteRealm(note.id).value?.note.content ?? ""
   const newContent = currentContent.replace(originalToken, newLinkText)
