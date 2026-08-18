@@ -43,7 +43,7 @@ state, qualitative update rules), not with a particular crate or version.
   hours**. After any grade, `nextRecallAt = lastRecalledAt + I(r, S)` with
   requested retention `r` locked at **0.9** (`I(0.9, S) = S` in whole hours).
   When `I` is non-positive, due is 24 hours after the grade (strictly-future
-  fallback). A newly assimilated tracker may have Stability 0 (due now).
+  fallback). A **New** tracker has Stability 0 (due now).
   First mapped grades on New use first-rating (see **First rating on New**);
   due then comes from `I`, not from the 24-hour fallback. Spacing is Stability,
   not a Settings day list. Live scheduling must not walk a spacing-index ladder.
@@ -69,7 +69,7 @@ change the schedule.
 
 Difficulty is persisted memory state in `[1, 10]`. It is shown on the Memory Tracker page (Information card), next to Stability, as the number returned by the API or **N/A** when unset (New / assimilate-only). Harder items gain less Stability on a successful recall. A correct recall also updates Difficulty with Good next-D (see **Difficulty after a mapped grade**).
 
-A newly assimilated tracker is **New**: Stability 0, Difficulty unset, due now. Assimilation is not a grade. The first mapped grade initializes Stability and Difficulty with FSRS-6 first-rating (see **First rating on New**). Difficulty **5** remains only as the fallback when Stability > 0 and Difficulty is null.
+A **New** tracker ([ADR 0001](./0001-ubiquitous-language.md)) has Stability 0, Difficulty unset / **N/A**, due now. The first mapped grade initializes Stability and Difficulty with FSRS-6 first-rating (see **First rating on New**). Difficulty **5** remains only as the fallback when Stability > 0 and Difficulty is null.
 
 Ordinary correct recall with Stability > 0 updates Stability with open-FSRS-6 Good-equivalent rules (own implementation) and Difficulty with Good next-D. Locked overdue extra growth still holds.
 
@@ -85,7 +85,9 @@ First mapped **success** on a New tracker (ordinary correct / just review Yes / 
 
 First Again / Tutor **0/1** on New uses the same first-rating path with `G=1`: Stability `S0(1)` (**5** hours), Difficulty `D0(1)` (Java float), due `lastRecalledAt + I` (**5h**).
 
-Tutor **2** on New uses the same first-rating path with `G=2`: Stability `S0(2)` (**31** hours), Difficulty `D0(2)` (Java float), due `lastRecalledAt + I` (**31h**) — same first bucket as Tutor **3**. Already-graded rows are not backfilled. No Flyway. Shrink 80% remains the exception only when `S > 0`.
+Tutor **2** on New uses the same first-rating path with `G=2`: Stability `S0(2)` (**31** hours), Difficulty `D0(2)` (Java float), due `lastRecalledAt + I` (**31h**) — same first bucket as Tutor **3**. Shrink 80% remains the exception only when `S > 0`.
+
+Going-forward New has no memory-state grade: every mapped grade uses first-rating (all four G, including Tutor **2** Hard) and the tracker is no longer New. Still-New rows with `AGAIN` / `AGAIN_ZERO` RecallLogs **will** be backfilled to `S0(1)` / `D0(1)`, due from `I`. First-success rows with `S > 0` stay unrestored.
 
 The 24-hour strictly-future fallback is for non-positive `I`, not a New first-rating interval.
 
@@ -98,7 +100,7 @@ When Stability > 0, a mapped grade updates Difficulty with published open FSRS-6
 - `D'' = w7 · D0(Easy) + (1 − w7) · D'`, then clamp to `[1, 10]`
 - `D0(G) = w4 − e^{w5·(G−1)} + 1`; **`D0(Easy)` is unclamped** `D0(4)` (negative with default weights)
 
-`G`: Again=1, Hard=2, Good=3, Easy=4 (`Fsrs.AGAIN` / `HARD` / `GOOD` / `EASY`). Existing persisted Difficulty is **not** backfilled. New first-rating uses clamped `D0(G)` (see **First rating on New**). Tutor **2** on New uses `D0(2)`; when `S > 0`, Tutor **2** does not change Difficulty. Confusion does not change Difficulty. Display is the API number (no extra rounding).
+`G`: Again=1, Hard=2, Good=3, Easy=4 (`Fsrs.AGAIN` / `HARD` / `GOOD` / `EASY`). Existing persisted Difficulty on already-graded `S > 0` rows is **not** backfilled. New first-rating uses clamped `D0(G)` (see **First rating on New**). Tutor **2** on New uses `D0(2)`; when `S > 0`, Tutor **2** does not change Difficulty. Confusion does not change Difficulty. Display is the API number (no extra rounding).
 
 ### Outcome-to-grade compatibility map
 
@@ -334,7 +336,7 @@ Empty pending accept.
 ## Related
 
 - Tracker (pointer + deferred IDs, not a second policy map): [`.planning/research/FSRS-COMPATIBILITY-GAP.md`](../../.planning/research/FSRS-COMPATIBILITY-GAP.md)
-- ADR 0001 [ubiquitous language](./0001-ubiquitous-language.md) — **recall** (not FSRS **review**); **recall prompt** / **MCQ** / **just review**; **RecallLog**; commissioned Learning Session terms; spelling memory tracker
+- ADR 0001 [ubiquitous language](./0001-ubiquitous-language.md) — **recall** (not FSRS **review**); **recall prompt** / **MCQ** / **just review**; **New**; **RecallLog**; commissioned Learning Session terms; spelling memory tracker
 - ADR 0005 [commissioned learning session protocol](./0005-commissioned-learning-session-protocol.md) — what a score means to the Tutor
 - Anki answer semantics: <https://docs.ankiweb.net/studying.html#answer-buttons>
 - FSRS overdue-recall: <https://github.com/open-spaced-repetition/awesome-fsrs/wiki/The-Algorithm>

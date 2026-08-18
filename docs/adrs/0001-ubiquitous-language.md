@@ -85,7 +85,8 @@ terms here; do not supersede this ADR with a new one.
 | **Remove from recall**                  | Stop an existing memory tracker from appearing in recall; the unit does not re-enter the sequence                                                                                                                                                                                                 | **Remove** / **Remove from recall** |
 | **Revive**                              | Re-enable recall for a tracker that was removed from recall                                                                                                                                                                                                                                       | **Revive**                          |
 | **Property memory tracker**             | Understanding memory tracker keyed by a **property** name (the frontmatter key).                                                                                                                                                                                                                  |                                     |
-| **Stability**                           | Persisted current interval of a memory tracker, in whole hours. After a grade, next recall time is last recalled time plus `I(r, S)` with **requested retention** `r` locked at 0.9 (so due hours equal Stability hours). A newly assimilated tracker may have Stability 0 (due now).             | **Stability**                       |
+| **Stability**                           | Persisted current interval of a memory tracker, in whole hours. After a grade, next recall time is last recalled time plus `I(r, S)` with **requested retention** `r` locked at 0.9 (so due hours equal Stability hours). A **New** tracker has Stability 0 (due now).                             | **Stability**                       |
+| **New**                                 | Memory tracker that is ungraded (`S = 0`, Difficulty unset / **N/A**; Difficulty: [ADR 0003](./0003-spaced-repetition-scheduling-policy.md)). Assimilation is not a grade; confusion is not a grade. Not “never succeeded.” After any mapped grade the tracker is no longer New.                   |                                     |
 | **Requested retention**                 | Target retrievability at the next due. Locked globally at **0.9**. At this `r`, open FSRS `I(0.9, S) = S` in whole hours. May be shown read-only in recall statistics (e.g. the heatmap color anchor).                                                                                              |                                     |
 | **Retrievability**                      | Computed from elapsed whole hours and Stability; not stored.                                                                                                                                                                                                                                      |                                     |
 | **RecallLog**                           | One persisted memory-state transition for a memory tracker. Doughnut’s name for the FSRS-shaped review history (review (FSRS) = recall). Prompt grades and confusion link an **answer**; just review and Tutor Feedback do not. Shape: [ADR 0003](./0003-spaced-repetition-scheduling-policy.md). |                                     |
@@ -149,8 +150,8 @@ introduce a translation type that wraps one as the other.
 - Links: playbook [README.md](./README.md); ADR-0000
 [use-adrs-accepted.md](./0000-use-adrs-accepted.md); ADR 0003
 [spaced-repetition scheduling policy](./0003-spaced-repetition-scheduling-policy.md)
-(FSRS **review** = Doughnut **recall**; **Stability** / **Retrievability** /
-**RecallLog**); ADR 0004
+(FSRS **review** = Doughnut **recall**; **Stability** / **New** /
+**Retrievability** / **RecallLog**); ADR 0004
 [OKF-compatible notebook Markdown](./0004-okf-compatible-notebook-markdown.md)
 (portable Markdown profile)
 

@@ -78,11 +78,9 @@ Tutor **2** on New is Hard first-rating (Stability **31**, `D0(2)`, due +31h); `
 ### 7. Lock New = ungraded and Again-row backfill in the ADRs
 
 - **Type:** Structure
-- **Status:** planned
+- **Status:** done
 
-Enables slice 8 only. Amend ADR 0001 in place: **New** (memory tracker) is ungraded (`S = 0`, Difficulty unset / **N/A**). In ADR 0003: going-forward New has no memory-state grade; still-New rows with `AGAIN` / `AGAIN_ZERO` RecallLogs **will** be backfilled (`S0(1)` / `D0(1)`, due from `I`). Do not mention `SHRINK` backfill yet. First-success rows with `S > 0` stay unrestored.
-
-**Done when:** glossary matches live code from slice 6; product tests unchanged.
+ADR 0001 **New**: ungraded (`S = 0`, Difficulty unset / **N/A**). ADR 0003 (Proposed): going-forward New has no memory-state grade; still-New `AGAIN` / `AGAIN_ZERO` rows **will** be backfilled to `S0(1)` / `D0(1)`, due from `I`. No SHRINK backfill mention. First-success `S > 0` unrestored.
 
 ### 8. Backfill still-New Again rows
 
