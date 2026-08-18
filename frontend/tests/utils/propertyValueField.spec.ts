@@ -55,6 +55,13 @@ describe("propertyValueField utils", () => {
     expect(html).toContain("[[ ]]")
   })
 
+  it("leaves path Markdown in a scalar as escaped text", () => {
+    const html = propertyValuePlainToDisplayHtml("[Moon](/Moon.md)", [])
+    expect(html).not.toContain("doughnut-wiki-link")
+    expect(html).not.toContain("dead-wiki-link")
+    expect(html).toBe(escapeHtmlForWikiLinkDisplay("[Moon](/Moon.md)"))
+  })
+
   it("does not treat malformed nested brackets as a wiki link", () => {
     const plain = "x[[a[b]]y"
     const html = propertyValuePlainToDisplayHtml(plain, [])

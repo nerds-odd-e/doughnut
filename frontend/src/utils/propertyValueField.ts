@@ -5,6 +5,7 @@ import {
   DOUGHNUT_WIKI_LINK_CLASS,
 } from "@/utils/wikiLinkDomMarkers"
 import {
+  authoredLinkOccurrences,
   escapeHtmlAttributeValue,
   escapeHtmlForWikiLinkDisplay,
   isValidWikiLinkInner,
@@ -15,8 +16,8 @@ import {
 } from "@/utils/wikiLinkMarkup"
 
 /**
- * Renders a YAML property scalar with clickable wiki links. Only well-formed `[[title]]` segments
- * (non-empty title, no `[`/`]`/newlines inside) become links; everything else stays plain text.
+ * Renders a YAML property scalar with clickable wiki links. Well-formed wiki `[[title]]`
+ * occurrences become links; path Markdown and everything else stay escaped plain text.
  */
 export function propertyValuePlainToDisplayHtml(
   plain: string,
@@ -24,25 +25,20 @@ export function propertyValuePlainToDisplayHtml(
 ): string {
   const map = wikiTitleNoteIdLookup(wikiTitles)
 
-  const re = /\[\[([^\[\]\r\n]*)\]\]/g
   let out = ""
   let lastIndex = 0
-  let m: RegExpExecArray | null
-  while ((m = re.exec(plain)) !== null) {
-    const fullMatch = m[0]
-    const titleRaw = m[1] ?? ""
-    const start = m.index
-
-    out += escapeHtmlForWikiLinkDisplay(plain.slice(lastIndex, start))
-    lastIndex = start + fullMatch.length
-
-    if (!isValidWikiLinkInner(titleRaw)) {
+  for (const occ of authoredLinkOccurrences(plain)) {
+    if (occ.start < lastIndex) continue
+    out += escapeHtmlForWikiLinkDisplay(plain.slice(lastIndex, occ.start))
+    lastIndex = occ.end
+    const fullMatch = plain.slice(occ.start, occ.end)
+    if (occ.kind !== "wiki" || !isValidWikiLinkInner(occ.token)) {
       out += escapeHtmlForWikiLinkDisplay(fullMatch)
       continue
     }
 
-    const { target, display } = splitWikiLinkInner(titleRaw)
-    const noteId = map.get(titleRaw.trim()) ?? map.get(target.trim())
+    const { target, display } = splitWikiLinkInner(occ.token)
+    const noteId = map.get(occ.token.trim()) ?? map.get(target.trim())
     const innerHtml = wikiLinkBracketedInnerHtml(display)
     const attrTarget = escapeHtmlAttributeValue(target)
     const displayAttr =
