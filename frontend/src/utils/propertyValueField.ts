@@ -6,6 +6,7 @@ import {
 } from "@/utils/wikiLinkDomMarkers"
 import {
   authoredLinkOccurrences,
+  noteIdForAuthoredToken,
   splitAuthoredToken,
   splitWikiLinkInner,
 } from "@/utils/authoredLinkMarkup"
@@ -39,7 +40,7 @@ export function propertyValuePlainToDisplayHtml(
     const fullMatch = plain.slice(occ.start, occ.end)
     if (occ.kind === "pathMarkdown") {
       const { target, display } = splitAuthoredToken(occ.token)
-      const noteId = map.get(occ.token.trim()) ?? map.get(target.trim())
+      const noteId = noteIdForAuthoredToken(occ.token, map)
       out += wikiLinkAnchorHtml({
         href: target,
         className:
@@ -58,7 +59,7 @@ export function propertyValuePlainToDisplayHtml(
     }
 
     const { target, display } = splitWikiLinkInner(occ.token)
-    const noteId = map.get(occ.token.trim()) ?? map.get(target.trim())
+    const noteId = noteIdForAuthoredToken(occ.token, map)
     const innerHtml = wikiLinkBracketedInnerHtml(display)
     const attrTarget = escapeHtmlAttributeValue(target)
     const displayAttr =

@@ -27,7 +27,6 @@ Inspection after locking Proposed [ADR 0004](../../../docs/adrs/0004-okf-compati
 
 - Backend resolve, cache, rename rewrite, and reduce-on-delete already scan frontmatter via `NoteContentMarkdown.authoredTokensInOccurrenceOrder` (wiki + path Markdown). Stored wiki `source: "[[Sedition]]"` is already the default form.
 - Wiki-only leftovers remaining:
-  - `qualifyRelationNoteForReduceOnDelete` uses a private wiki regex; backend would already resolve a path-Markdown source.
   - `parseWholeWikiLinkItem` / `WikiLinkToken` / overlaps validation / `WikiLinkMarkdown.isWellFormedWholeLinkToken` require a whole `[[…]]` item.
   - `hasNewWikiLinkTexts` only sees `[[…]]`, so a new path-Markdown link does not flush the editor.
 
@@ -47,18 +46,16 @@ Inspection after locking Proposed [ADR 0004](../../../docs/adrs/0004-okf-compati
 - **Type:** Behavior
 - **Status:** done
 
-YAML `source: "[Moon](/Moon.md)"` renders as a live or dead path wiki-link (path href, plain label, `data-note-id` when resolved; no `wiki-bracket` spans; no conversion to `[[Moon]]`). Driven through `propertyValuePlainToDisplayHtml` and mounted `RichMarkdownEditor` source row. Live/dead path-anchor HTML is `wikiLinkAnchorHtml`.
-
-**E2E leftover:** `add_relationship.feature` scenario is `@wip` — SUT backend was down (`127.0.0.1:9081` ECONNREFUSED) so Cypress was not verified. After backend is healthy, run that spec, drop `@wip` if it passes, then continue slice 3.
+YAML `source: "[Moon](/Moon.md)"` renders as a live or dead path wiki-link (path href, plain label, `data-note-id` when resolved; no `wiki-bracket` spans; no conversion to `[[Moon]]`). Driven through `propertyValuePlainToDisplayHtml` and mounted `RichMarkdownEditor` source row. Live/dead path-anchor HTML is `wikiLinkAnchorHtml`. Slice-2 leftover E2E (`add_relationship.feature` path-Markdown source) passed; `@wip` dropped.
 
 ### 3. Reducing a relationship whose source is path Markdown
 
 - **Type:** Behavior
-- **Status:** planned
+- **Status:** done
 
-**Pre:** relationship YAML `source` is a resolvable path-Markdown token (same as slice 2). **Trigger:** delete the relationship note. **Post:** “Reduce to a property of the source” is offered; confirming writes the target onto the source note as today.
+Deleting a relationship whose YAML `source` is a resolvable path-Markdown token offers “Reduce to a property of the source” and writes the target onto the source note. `qualifyRelationNoteForReduceOnDelete` uses the first `authoredLinkOccurrences` token. Wrap-up moved `wikiTitleFromAuthoredToken` / `noteIdForAuthoredToken` into `authoredLinkMarkup`.
 
-`qualifyRelationNoteForReduceOnDelete` uses the first authored token from slice 1 (delete the private `[[…]]` regex). Extend `relationNoteReduceOnDelete.spec.ts`; reuse existing delete E2E reduce flow with path-Markdown source content.
+**Learning:** later slices resolve authored tokens through `noteIdForAuthoredToken`, not a private lookup. E2E: `relationship_edit_and_remove.feature`.
 
 ### 4. An overlaps list item written as path Markdown is the same wiki link
 
@@ -67,7 +64,7 @@ YAML `source: "[Moon](/Moon.md)"` renders as a live or dead path wiki-link (path
 
 **Pre:** `overlaps` contains `[Title](/Folder/Title.md)` as a whole list item. **Trigger:** view the property / accidental-match overlap check. **Post:** the item is a live or dead wiki-equivalent link; it counts as an authored overlap (same as `[[Folder/Title]]`).
 
-`parseWholeWikiLinkItem` / `isWellFormedWholeLinkToken` accept a whole path-Markdown token. `WikiLinkToken` and overlaps validation/index use that. No conversion of stored items.
+`parseWholeWikiLinkItem` / `isWellFormedWholeLinkToken` accept a whole path-Markdown token. `WikiLinkToken` and overlaps validation/index use that. Reuse `authoredLinkMarkup` / `noteIdForAuthoredToken`. No conversion of stored items.
 
 ### 5. A newly typed path-Markdown link flushes like a wiki link
 

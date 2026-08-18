@@ -1,3 +1,4 @@
+import type { WikiTitle } from "@generated/doughnut-backend-api"
 import { hrefLooksLikeConceptNotePath } from "@/routes/noteShowLocation"
 
 /** Splits inner wiki text on the first `|`; empty right-hand side is treated as no pipe. */
@@ -53,6 +54,29 @@ export function splitAuthoredToken(authored: string): {
     }
   }
   return splitWikiLinkInner(authored)
+}
+
+/** Builds API-shaped {@link WikiTitle} for tests and local fixtures from an authored token + note id. */
+export function wikiTitleFromAuthoredToken(
+  authored: string,
+  noteId: number
+): WikiTitle {
+  const { target, display } = splitAuthoredToken(authored)
+  return {
+    linkText: authored,
+    targetToken: target,
+    displayText: display,
+    noteId,
+  }
+}
+
+/** Note id for an authored token: full token key, else split target. */
+export function noteIdForAuthoredToken(
+  token: string,
+  noteIdByLinkKey: Map<string, number>
+): number | undefined {
+  const { target } = splitAuthoredToken(token)
+  return noteIdByLinkKey.get(token.trim()) ?? noteIdByLinkKey.get(target.trim())
 }
 
 /** Wiki and path-Markdown link occurrences in document order (no dedupe). */

@@ -1,35 +1,20 @@
-import type { NoteRealm, WikiTitle } from "@generated/doughnut-backend-api"
+import type { NoteRealm } from "@generated/doughnut-backend-api"
 import { relationTypeLabelFromNoteContent } from "@/models/relationTypeOptions"
+import {
+  authoredLinkOccurrences,
+  noteIdForAuthoredToken,
+} from "@/utils/authoredLinkMarkup"
 import {
   frontmatterScalar,
   parseNoteContentMarkdown,
 } from "@/utils/noteContentFrontmatter"
-import {
-  splitWikiLinkInner,
-  wikiTitleNoteIdLookup,
-} from "@/utils/wikiLinkMarkup"
+import { wikiTitleNoteIdLookup } from "@/utils/wikiLinkMarkup"
 
 const RELATIONSHIP_NOTE_TYPE = "relationship"
 
 export type RelationNoteReduceOnDeleteQualification = {
   sourcePropertyKey: string
   sourceNoteId: number
-}
-
-function firstWikiLinkInnerInScalar(scalar: string): string | undefined {
-  const m = /\[\[([^\[\]\r\n]*)\]\]/.exec(scalar)
-  if (!m) return
-  const inner = m[1]?.trim()
-  return inner === "" ? undefined : inner
-}
-
-function noteIdForWikiLinkInner(
-  inner: string,
-  wikiTitles: WikiTitle[]
-): number | undefined {
-  const map = wikiTitleNoteIdLookup(wikiTitles)
-  const { target } = splitWikiLinkInner(inner)
-  return map.get(inner) ?? map.get(target.trim())
 }
 
 /** Whether delete may offer reducing this relation note to a source property. */
@@ -50,11 +35,13 @@ export function qualifyRelationNoteForReduceOnDelete(
   const targetScalar = frontmatterScalar(parsed.properties, "target")
   if (!sourceScalar || !targetScalar) return
 
-  const sourceInner = firstWikiLinkInnerInScalar(sourceScalar)
-  if (!sourceInner) return
+  const sourceToken = authoredLinkOccurrences(sourceScalar)[0]?.token
+  if (!sourceToken) return
 
-  const wikiTitles = noteRealm.wikiTitles ?? []
-  const sourceNoteId = noteIdForWikiLinkInner(sourceInner, wikiTitles)
+  const sourceNoteId = noteIdForAuthoredToken(
+    sourceToken,
+    wikiTitleNoteIdLookup(noteRealm.wikiTitles ?? [])
+  )
   if (sourceNoteId === undefined) return
 
   return { sourcePropertyKey, sourceNoteId }

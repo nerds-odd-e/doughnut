@@ -5,7 +5,7 @@ import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import GlobalApiLoadingModal from "@tests/helpers/GlobalApiLoadingModal"
 import { teardownGlobalClientForTesting } from "@/managedApi/clientSetup"
 import usePopups from "@/components/commons/Popups/usePopups"
-import { wikiTitleFromInnerAndNoteId } from "@/utils/wikiLinkMarkup"
+import { wikiTitleFromAuthoredToken } from "@/utils/wikiLinkMarkup"
 import makeMe from "doughnut-test-fixtures/makeMe"
 import helper, { mockSdkService } from "@tests/helpers"
 import RenderingHelper from "@tests/helpers/RenderingHelper"
@@ -128,8 +128,8 @@ export function qualifyingRelationRealmForDelete(options?: {
   const relationBuilder = makeMe.aNoteRealm
     .content(relationshipNoteContent("a-part-of", "[[Moon]]", "[[Earth]]"))
     .wikiTitles([
-      wikiTitleFromInnerAndNoteId("Moon", moonId),
-      wikiTitleFromInnerAndNoteId("Earth", earthId),
+      wikiTitleFromAuthoredToken("Moon", moonId),
+      wikiTitleFromAuthoredToken("Earth", earthId),
     ])
   const relationRealm =
     options?.relationId === undefined

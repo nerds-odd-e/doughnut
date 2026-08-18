@@ -17,6 +17,7 @@ import {
   propertyWikiLinkMarkdown,
 } from "./propertiesTestSupport"
 import { relationshipNoteContent } from "@tests/notes/relationshipNoteTestContent"
+import { wikiTitleFromAuthoredToken } from "@/utils/wikiLinkMarkup"
 import { createRichMarkdownEditorTestHarness } from "./richMarkdownEditorTestHarness"
 
 const twoPropertyMarkdown = `---
@@ -143,14 +144,7 @@ Hello`
     const wrapper = await h.mountEditor(
       relationshipNoteContent("a-part-of", "[Moon](/Moon.md)", "[[Earth]]"),
       {
-        wikiTitles: [
-          {
-            linkText: "[Moon](/Moon.md)",
-            targetToken: "/Moon.md",
-            displayText: "Moon",
-            noteId: 42,
-          },
-        ],
+        wikiTitles: [wikiTitleFromAuthoredToken("[Moon](/Moon.md)", 42)],
       }
     )
     const live = wrapper

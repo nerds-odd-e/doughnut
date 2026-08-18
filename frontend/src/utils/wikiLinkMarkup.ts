@@ -3,22 +3,15 @@ import {
   hrefLooksLikeConceptNotePath,
   noteShowHref,
 } from "@/routes/noteShowLocation"
-import { splitWikiLinkInner } from "@/utils/authoredLinkMarkup"
 import {
   DEAD_WIKI_LINK_CLASS,
   DOUGHNUT_WIKI_LINK_CLASS,
 } from "@/utils/wikiLinkDomMarkers"
 
-export { splitWikiLinkInner }
-
-/** Builds API-shaped {@link WikiTitle} for tests and local fixtures from markdown inner + note id. */
-export function wikiTitleFromInnerAndNoteId(
-  inner: string,
-  noteId: number
-): WikiTitle {
-  const { target, display } = splitWikiLinkInner(inner)
-  return { linkText: inner, targetToken: target, displayText: display, noteId }
-}
+export {
+  splitWikiLinkInner,
+  wikiTitleFromAuthoredToken,
+} from "@/utils/authoredLinkMarkup"
 
 /** Normalized target, display label, and full inner for a wiki title from the note realm. */
 export function wikiTitleParts(w: WikiTitle): {

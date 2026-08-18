@@ -1,12 +1,12 @@
 import { replaceWikiLinksInHtml } from "@/components/form/replaceWikiLinksInHtml"
-import { wikiTitleFromInnerAndNoteId } from "@/utils/wikiLinkMarkup"
+import { wikiTitleFromAuthoredToken } from "@/utils/wikiLinkMarkup"
 import { describe, it, expect } from "vitest"
 
 describe("replaceWikiLinksInHtml", () => {
   it("replaces known wikilink text with a note href", () => {
     expect(
       replaceWikiLinksInHtml("<p>[[MyNote]]</p>", [
-        wikiTitleFromInnerAndNoteId("MyNote", 42),
+        wikiTitleFromAuthoredToken("MyNote", 42),
       ])
     ).toBe(
       '<p><a href="/n42" class="doughnut-wiki-link" data-wiki-title="MyNote">MyNote</a></p>'
@@ -16,7 +16,7 @@ describe("replaceWikiLinksInHtml", () => {
   it("replaces piped wikilink with display text as anchor body", () => {
     expect(
       replaceWikiLinksInHtml("<p>[[Target|label]]</p>", [
-        wikiTitleFromInnerAndNoteId("Target|label", 7),
+        wikiTitleFromAuthoredToken("Target|label", 7),
       ])
     ).toBe(
       '<p><a href="/n7" class="doughnut-wiki-link" data-wiki-title="Target" data-wiki-display="label">label</a></p>'
@@ -26,7 +26,7 @@ describe("replaceWikiLinksInHtml", () => {
   it("replaces every occurrence when the same wikilink appears multiple times", () => {
     const html = "<p>[[MyNote]] then [[MyNote]]</p>"
     const out = replaceWikiLinksInHtml(html, [
-      wikiTitleFromInnerAndNoteId("MyNote", 42),
+      wikiTitleFromAuthoredToken("MyNote", 42),
     ])
     expect(out).not.toContain("dead-wiki-link")
     expect(out).toBe(
@@ -44,14 +44,7 @@ describe("replaceWikiLinksInHtml", () => {
     expect(
       replaceWikiLinksInHtml(
         '<p><a href="/Folder/Title.md" class="dead-wiki-link" data-wiki-title="/Folder/Title.md" data-wiki-display="label">label</a></p>',
-        [
-          {
-            linkText: "[label](/Folder/Title.md)",
-            targetToken: "/Folder/Title.md",
-            displayText: "label",
-            noteId: 42,
-          },
-        ]
+        [wikiTitleFromAuthoredToken("[label](/Folder/Title.md)", 42)]
       )
     ).toBe(
       '<p><a href="/Folder/Title.md" class="doughnut-wiki-link" data-wiki-title="/Folder/Title.md" data-wiki-display="label" data-note-id="42">label</a></p>'
@@ -74,7 +67,7 @@ describe("replaceWikiLinksInHtml", () => {
     expect(
       replaceWikiLinksInHtml(
         '<p><a href="#" class="dead-wiki-link">MyNote</a></p>',
-        [wikiTitleFromInnerAndNoteId("MyNote", 42)]
+        [wikiTitleFromAuthoredToken("MyNote", 42)]
       )
     ).toBe(
       '<p><a href="/n42" class="doughnut-wiki-link" data-wiki-title="MyNote">MyNote</a></p>'

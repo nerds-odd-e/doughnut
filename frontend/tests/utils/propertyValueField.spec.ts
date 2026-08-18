@@ -6,15 +6,8 @@ import {
 import {
   deadWikiLinkPayloadFromAnchor,
   escapeHtmlForWikiLinkDisplay,
-  wikiTitleFromInnerAndNoteId,
+  wikiTitleFromAuthoredToken,
 } from "@/utils/wikiLinkMarkup"
-
-const moonPathWikiTitle = {
-  linkText: "[Moon](/Moon.md)",
-  targetToken: "/Moon.md",
-  displayText: "Moon",
-  noteId: 42,
-}
 
 describe("propertyValueField utils", () => {
   it("renders unresolved wiki link with display text after pipe", () => {
@@ -64,7 +57,7 @@ describe("propertyValueField utils", () => {
 
   it("renders resolved path Markdown in a scalar as a live wiki-style link", () => {
     const html = propertyValuePlainToDisplayHtml("[Moon](/Moon.md)", [
-      moonPathWikiTitle,
+      wikiTitleFromAuthoredToken("[Moon](/Moon.md)", 42),
     ])
     expect(html).toBe(
       '<a href="/Moon.md" class="doughnut-wiki-link" data-wiki-title="/Moon.md" data-wiki-display="Moon" data-note-id="42">Moon</a>'
@@ -83,7 +76,7 @@ describe("propertyValueField utils", () => {
   it("round-trips path Markdown from a field root without converting to wiki", () => {
     const root = document.createElement("div")
     root.innerHTML = propertyValuePlainToDisplayHtml("[Moon](/Moon.md)", [
-      moonPathWikiTitle,
+      wikiTitleFromAuthoredToken("[Moon](/Moon.md)", 42),
     ])
     expect(root.querySelector("a.doughnut-wiki-link")).not.toBeNull()
     expect(serializePropertyValueFieldRoot(root)).toBe("[Moon](/Moon.md)")
@@ -105,7 +98,7 @@ describe("propertyValueField utils", () => {
 
   it("resolves wiki markers when title is known", () => {
     const html = propertyValuePlainToDisplayHtml("[[My Note]]", [
-      wikiTitleFromInnerAndNoteId("My Note", 42),
+      wikiTitleFromAuthoredToken("My Note", 42),
     ])
     expect(html).toContain("doughnut-wiki-link")
     expect(html).toContain("/n42")
@@ -114,7 +107,7 @@ describe("propertyValueField utils", () => {
 
   it("resolves piped wiki marker using target and shows display as visible link", () => {
     const html = propertyValuePlainToDisplayHtml("[[Target Page|friendly]]", [
-      wikiTitleFromInnerAndNoteId("Target Page|friendly", 99),
+      wikiTitleFromAuthoredToken("Target Page|friendly", 99),
     ])
     expect(html).toContain("doughnut-wiki-link")
     expect(html).toContain("/n99")
@@ -131,7 +124,7 @@ describe("propertyValueField utils", () => {
   it("serializes live link anchors from visible text (textContent)", () => {
     const root = document.createElement("div")
     root.innerHTML = propertyValuePlainToDisplayHtml("[[N]]", [
-      wikiTitleFromInnerAndNoteId("N", 1),
+      wikiTitleFromAuthoredToken("N", 1),
     ])
     expect(serializePropertyValueFieldRoot(root)).toBe("[[N]]")
   })
@@ -139,7 +132,7 @@ describe("propertyValueField utils", () => {
   it("serializes a wiki anchor as plain text when the user replaced inner content (broken link)", () => {
     const root = document.createElement("div")
     root.innerHTML = propertyValuePlainToDisplayHtml("[[English]]", [
-      wikiTitleFromInnerAndNoteId("English", 1),
+      wikiTitleFromAuthoredToken("English", 1),
     ])
     const a = root.querySelector("a.doughnut-wiki-link") as HTMLAnchorElement
     a.textContent = "[[Eng]"

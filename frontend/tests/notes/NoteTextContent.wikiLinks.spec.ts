@@ -1,5 +1,5 @@
 import makeMe from "doughnut-test-fixtures/makeMe"
-import { wikiTitleFromInnerAndNoteId } from "@/utils/wikiLinkMarkup"
+import { wikiTitleFromAuthoredToken } from "@/utils/wikiLinkMarkup"
 import { type VueWrapper, flushPromises } from "@vue/test-utils"
 import { afterEach, describe, expect, it, vi } from "vitest"
 import type { ComponentPublicInstance } from "vue"
@@ -40,7 +40,7 @@ describe("NoteTextContent wiki link display", () => {
       {
         readonly: true,
         wikiTitles: [
-          wikiTitleFromInnerAndNoteId(
+          wikiTitleFromAuthoredToken(
             "Target Title|friendly label",
             targetNote.id!
           ),
@@ -83,12 +83,10 @@ describe("NoteTextContent wiki link display", () => {
       {
         readonly: true,
         wikiTitles: [
-          {
-            linkText: "[label](/Folder/Title.md)",
-            targetToken: "/Folder/Title.md",
-            displayText: "label",
-            noteId: targetNote.id!,
-          },
+          wikiTitleFromAuthoredToken(
+            "[label](/Folder/Title.md)",
+            targetNote.id!
+          ),
         ],
       }
     )

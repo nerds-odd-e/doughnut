@@ -67,7 +67,6 @@ Feature: Add relationship
     When I undo "create note"
     Then I should see "Sedition" has no relationship to "Sedation"
 
-  @wip
   Scenario: A path Markdown relationship source opens like a wiki link and keeps its spelling
     Given I have a notebook "Path source space" with notes:
       | Title | Content    |

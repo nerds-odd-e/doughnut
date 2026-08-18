@@ -5,7 +5,7 @@ import {
   parseNoteContentMarkdown,
 } from "@/utils/noteContentFrontmatter"
 import { noteShowLocation } from "@/routes/noteShowLocation"
-import { wikiTitleFromInnerAndNoteId } from "@/utils/wikiLinkMarkup"
+import { wikiTitleFromAuthoredToken } from "@/utils/wikiLinkMarkup"
 import {
   addNewOverlapsProperty,
   mountOverlapsValuePopup,
@@ -86,7 +86,7 @@ describe("RichMarkdownEditor overlaps property", () => {
 
   it("renders overlaps list items as in-app wiki links", async () => {
     const wrapper = await h.mountEditor(OVERLAPS_LIST_MARKDOWN, {
-      wikiTitles: [wikiTitleFromInnerAndNoteId("Other Note", 42)],
+      wikiTitles: [wikiTitleFromAuthoredToken("Other Note", 42)],
     })
     await flushPromises()
 
