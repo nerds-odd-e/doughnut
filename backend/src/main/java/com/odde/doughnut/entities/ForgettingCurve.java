@@ -24,6 +24,10 @@ public class ForgettingCurve {
   record NextMemory(float difficulty, float stability) {}
 
   NextMemory afterGoodRecall(long elapsedInHours, Integer thinkingTimeMs) {
+    if (isNewlyAssimilated()) {
+      return new NextMemory(
+          Fsrs.initialDifficulty(Fsrs.GOOD), Fsrs.initialStabilityHours(Fsrs.GOOD));
+    }
     return afterGoodHardOrEasyRecall(
         () -> Fsrs.nextDifficulty(difficulty, Fsrs.GOOD),
         () ->

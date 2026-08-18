@@ -54,18 +54,19 @@ public class RecallServiceWithSpacedRepetitionAlgorithmTest {
     @ParameterizedTest
     @CsvSource({
       "1,   0, false",
-      "1,   1, true",
-      "1,   2, true",
+      "1,   1, false",
+      "1,   2, false",
+      "1,   3, true",
       "1,  10, true",
       "2,   0, false",
       "2,   1, false",
-      "2,   4, false",
-      "2,   5, true",
-      "2,  10, true",
+      "2,  11, false",
+      "2,  12, true",
+      "2,  20, true",
       "3,   0, false",
       "3,   1, false",
-      "3,  14, false",
-      "3,  15, true",
+      "3,  49, false",
+      "3,  50, true",
     })
     void whenThereIsOneRecalledNotesForUser(
         Integer recallDone, Integer recallDay, Boolean expectedToRepeat) {

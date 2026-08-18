@@ -73,8 +73,22 @@ final class Fsrs {
   static float nextDifficulty(float difficulty, int grade) {
     double deltaD = -W[6] * (grade - GOOD);
     double dPrime = difficulty + deltaD * (10.0 - difficulty) / 9.0;
-    double d0Easy = W[4] - Math.exp(W[5] * (EASY - 1)) + 1.0;
-    double next = W[7] * d0Easy + (1.0 - W[7]) * dPrime;
-    return (float) Math.max(1.0, Math.min(10.0, next));
+    return clampDifficulty(W[7] * d0(EASY) + (1.0 - W[7]) * dPrime);
+  }
+
+  static float initialDifficulty(int grade) {
+    return clampDifficulty(d0(grade));
+  }
+
+  static float initialStabilityHours(int grade) {
+    return (float) Math.round(W[grade - 1] * HOURS_PER_DAY);
+  }
+
+  private static double d0(int grade) {
+    return W[4] - Math.exp(W[5] * (grade - 1)) + 1.0;
+  }
+
+  private static float clampDifficulty(double difficulty) {
+    return (float) Math.max(1.0, Math.min(10.0, difficulty));
   }
 }

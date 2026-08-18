@@ -19,13 +19,13 @@ Feature: Spaced-repetition
   Scenario: Strictly follow the schedule
     When On day 1 I recall "                    " and assimilate new "Note 1, end "
     And On day 2 I recall "Note 1, end         " and assimilate new "Note 2, end "
-    And On day 3 I recall "Note 2, Note 1, end " and assimilate new "Note 3, end "
-    And On day 4 I recall "Note 3, Note 2, end " and assimilate new "end         "
-    And On day 5 I recall "Note 3, end         " and assimilate new "end         "
-    And On day 6 I recall "end                 " and assimilate new "end         "
-    And On day 7 I recall "end                 " and assimilate new "end         "
-    And On day 8 I recall "Note 1, end         " and assimilate new "end         "
-    And On day 9 I recall "Note 2, end         " and assimilate new "end         "
+    And On day 3 I recall "Note 2, end         " and assimilate new "Note 3, end "
+    And On day 4 I recall "Note 3, end         " and assimilate new "end         "
+    And On day 5 I recall "Note 1, end         " and assimilate new "end         "
+    And On day 6 I recall "Note 2, end         " and assimilate new "end         "
+    And On day 7 I recall "Note 3, end         " and assimilate new "end         "
+    And On day 8 I recall "end                 " and assimilate new "end         "
+    And On day 9 I recall "end                 " and assimilate new "end         "
 
   @mockBrowserTime
   Scenario: Memory Tracker shows a GOOD RecallLog after just-review Yes
@@ -39,7 +39,7 @@ Feature: Spaced-repetition
   @mockBrowserTime
   Scenario: Memory Tracker shows Stability and Again Difficulty after incorrect just-review
     Given the note "Note 1" was assimilated on day 1
-    And I marked the understanding tracker for "Note 1" as recalled successfully
+    And the understanding tracker for "Note 1" is graded at stability 24
     When I visit recall for a due recall prompt on day 2
     And I choose no I need more recall
     And I visit the understanding memory tracker for "Note 1"
@@ -51,7 +51,7 @@ Feature: Spaced-repetition
   @mockBrowserTime
   Scenario: Same-hour Good after first success grows Stability to 25
     Given the note "Note 1" was assimilated on day 1
-    And I marked the understanding tracker for "Note 1" as recalled successfully
+    And the understanding tracker for "Note 1" is graded at stability 24
     When I ask to do more recall
     And I choose yes I remember
     And I visit the understanding memory tracker for "Note 1"
@@ -62,8 +62,8 @@ Feature: Spaced-repetition
   Scenario: Strictly follow the schedule but want to recall more
     When On day 1 I recall "                    " and assimilate new "Note 1, end "
     And On day 2 I recall "Note 1, end         " and assimilate new "Note 2, end "
-    And On day 3 I recall "Note 2, Note 1, end " and assimilate new "Note 3, end "
-    And On day 4 I recall "Note 3, Note 2, end " and assimilate new "end         "
+    And On day 3 I recall "Note 2, end         " and assimilate new "Note 3, end "
+    And On day 4 I recall "Note 3, end         " and assimilate new "end         "
     And I ask to do more recall
-    And I repeat more old "Note 3         "
+    And I repeat more old "Note 1, Note 2, Note 3"
     Then I should have "0/0/3" note for assimilation and "6/6/3" for recall

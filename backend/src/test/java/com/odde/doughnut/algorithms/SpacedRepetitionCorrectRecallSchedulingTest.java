@@ -1,7 +1,7 @@
 package com.odde.doughnut.algorithms;
 
-import static com.odde.doughnut.entities.ForgettingCurve.DEFAULT_DIFFICULTY;
 import static com.odde.doughnut.entities.ForgettingCurve.FIRST_SUCCESS_STABILITY_HOURS;
+import static com.odde.doughnut.entities.ForgettingCurve.MAX_THINKING_TIME_MS;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThan;
@@ -11,16 +11,43 @@ import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.utils.TimestampOperations;
 import java.sql.Timestamp;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 class SpacedRepetitionCorrectRecallSchedulingTest extends SpacedRepetitionRecallSchedulingTestBase {
+  static final float FIRST_GOOD_DIFFICULTY = 2.118104f;
+  static final float FIRST_GOOD_STABILITY_HOURS = 55.0f;
+
   @Test
-  void firstCorrectRecallInitializesDifficulty() {
+  void firstCorrectRecallUsesS0AndD0Good() {
     MemoryTracker memoryTracker = makeMe.aMemoryTrackerFor(note).by(user).inMemoryPlease();
+    Timestamp gradeTime = memoryTracker.getNextRecallAt();
 
-    memoryTracker.recalledSuccessfully(memoryTracker.getNextRecallAt(), null);
+    memoryTracker.recalledSuccessfully(gradeTime, null);
 
-    assertThat(memoryTracker.getDifficulty(), equalTo(DEFAULT_DIFFICULTY));
-    assertThat(memoryTracker.getStability(), equalTo(FIRST_SUCCESS_STABILITY_HOURS));
+    assertThat(memoryTracker.getDifficulty(), equalTo(FIRST_GOOD_DIFFICULTY));
+    assertThat(memoryTracker.getStability(), equalTo(FIRST_GOOD_STABILITY_HOURS));
+    assertThat(
+        memoryTracker.getNextRecallAt(),
+        equalTo(
+            TimestampOperations.addHoursToTimestamp(
+                gradeTime, Math.round(FIRST_GOOD_STABILITY_HOURS))));
+  }
+
+  @ParameterizedTest
+  @CsvSource({"true, 0", "false, 500"})
+  void firstCorrectRecallIgnoresReviewTiming(boolean maxThinkingTime, int extraElapsedHours) {
+    MemoryTracker memoryTracker = makeMe.aMemoryTrackerFor(note).by(user).inMemoryPlease();
+    Timestamp gradeTime =
+        extraElapsedHours == 0
+            ? memoryTracker.getNextRecallAt()
+            : TimestampOperations.addHoursToTimestamp(
+                memoryTracker.getLastRecalledAt(), extraElapsedHours);
+
+    memoryTracker.recalledSuccessfully(gradeTime, maxThinkingTime ? MAX_THINKING_TIME_MS : null);
+
+    assertThat(memoryTracker.getDifficulty(), equalTo(FIRST_GOOD_DIFFICULTY));
+    assertThat(memoryTracker.getStability(), equalTo(FIRST_GOOD_STABILITY_HOURS));
   }
 
   @Test

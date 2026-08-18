@@ -118,6 +118,13 @@ Given(
   }
 )
 
+Given(
+  'the understanding tracker for {string} is graded at stability {int}',
+  (noteTitle: string, stability: number) => {
+    start.testability().seedGradedUnderstandingTracker(noteTitle, stability, 5)
+  }
+)
+
 Then(
   'the understanding memory tracker for {string} should be brought forward without recall credit',
   (noteTitle: string) => {

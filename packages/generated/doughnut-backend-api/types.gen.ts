@@ -1443,6 +1443,24 @@ export type ShareToBazaarResponses = {
 
 export type ShareToBazaarResponse = ShareToBazaarResponses[keyof ShareToBazaarResponses];
 
+export type SeedGradedMemoryTrackerData = {
+    body: {
+        [key: string]: unknown;
+    };
+    path?: never;
+    query?: never;
+    url: '/api/testability/seed_graded_memory_tracker';
+};
+
+export type SeedGradedMemoryTrackerResponses = {
+    /**
+     * OK
+     */
+    200: string;
+};
+
+export type SeedGradedMemoryTrackerResponse = SeedGradedMemoryTrackerResponses[keyof SeedGradedMemoryTrackerResponses];
+
 export type ReplaceServiceUrlData = {
     body: {
         [key: string]: string;

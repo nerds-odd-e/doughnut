@@ -219,6 +219,25 @@ paths:
             '*/*':
               schema:
                 type: string
+  /api/testability/seed_graded_memory_tracker:
+    post:
+      tags:
+      - testability-rest-controller
+      operationId: seedGradedMemoryTracker
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: {}
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: string
   /api/testability/replace_service_url:
     post:
       tags:

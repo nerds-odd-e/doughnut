@@ -64,14 +64,14 @@ Feature: Commissioned learning session
     And the commissioned memory tracker for "Hola" should have tutor feedback score 5
     And I should see 0 potential learning session for notebook "Spanish conversation"
 
-  Scenario: First tutor score 4 on a new tracker sets Difficulty to 5
+  Scenario: First tutor score 4 on a new tracker sets Difficulty to D0 Good
     Given the notes "Hola, Gracias" are assimilated as commissioned on day 1
     And I have recorded a learning session for notebook "Spanish conversation" on day 2 with scores:
       | Note    | Score |
       | Hola    | 4     |
       | Gracias | 1     |
     When I visit the commissioned memory tracker for "Hola"
-    Then I should see Difficulty 5
+    Then I should see Difficulty 2.1181
 
   Scenario: Recording tutor score 4 leaves a GOOD RecallLog
     Given the notes "Hola, Gracias" are assimilated as commissioned on day 1
@@ -97,7 +97,7 @@ Feature: Commissioned learning session
       | Note    | Score |
       | Hola    | 4     |
       | Gracias | 1     |
-    And It's day 3, 9 hour
+    And It's day 4, 16 hour
     When I open the learning session request for notebook "Spanish conversation"
     And I record the learning session report:
       """
@@ -113,6 +113,6 @@ Feature: Commissioned learning session
 
     Examples:
       | score | Stability |
-      | 4     | 102       |
-      | 5     | 169       |
-      | 3     | 71        |
+      | 4     | 284       |
+      | 5     | 484       |
+      | 3     | 193       |

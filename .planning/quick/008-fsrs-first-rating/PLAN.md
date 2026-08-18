@@ -29,35 +29,18 @@ E3 fuzz / max interval, E4 fitting, New Again init, card states, `DEFAULT_SPACES
 - **Type:** Structure
 - **Status:** done
 
-Lock lives in Proposed ADR 0003 **First rating on New**. Gap tracker points here as in-progress (not a second policy map). Code still initializes New success as D=5/S=24 until slice 2.
+Lock lives in Proposed ADR 0003 **First rating on New**. Gap tracker points here as in-progress (not a second policy map). First Good is now S0/D0 in code; Hard/Easy New still D=5/S=24 until slices 3–4.
 
 **Learning:** ADR cross-refs (commissioned New 3/4/5, elapsed-0, thinking time, mapped-grade D) now point at that section; product behavior is unchanged.
 
 ### 2. First Good on New uses S0(Good) / D0(Good)
 
 - **Type:** Behavior
-- **Status:** planned
+- **Status:** done
 
-**Pre:** tracker is New (S=0, D unset).  
-**Trigger:** ordinary correct / just review Yes / Tutor **4**.  
-**Post:** Stability **55**, Difficulty `D0(3)` (API number), due `lastRecalledAt + 55h`.
+Ordinary correct / just review Yes / Tutor **4** on New: Stability **55**, Difficulty **`2.118104f`** (`D0(3)`), due +55h. Hard/Easy New still D=5 / S=24. New fail unchanged.
 
-Interim: New Tutor **3** / **5** still D=5, S=24.
-
-Extend existing pins; do not add a parallel test class:
-
-- `SpacedRepetitionCorrectRecallSchedulingTest.firstCorrectRecallInitializesDifficulty`
-- `LearningSessionRecordTutorFeedbackTests` first score **4**
-- E2E `commissioned_learning_session.feature` first tutor score 4 Difficulty
-- E2E `spaced_repetition.feature` day lists that assume first Good = 24h
-
-Retiming that assumed first Good = 24h belongs **here** (on-time second score +24h → +55h; `afterNthStrictRecall` due days; shrink 80% of 24 → 80% of 55). Same-hour short-term E2E that used “marked as recalled successfully” as a 24h setup should **seed a graded S=24 tracker** instead of going through New init.
-
-First Good with thinking time or long elapsed still yields S0(Good) — fold into the same unit test class as deltas, not a new surface.
-
-**Done when:** Good New init matches FSRS-6; Hard/Easy New still 24/5; New fail unchanged; targeted backend tests and the two `--spec`s above pass.
-
-Slice 2 may run long because of schedule E2E retiming. That is expected; do not bundle Easy/Hard to “save a slice.”
+**Learning:** Init is `Fsrs.initialDifficulty` / `initialStabilityHours` from `ForgettingCurve.afterGoodRecall`. Same-hour short-term E2E seeds a graded S=24 tracker (`/api/testability/seed_graded_memory_tracker`). On-time second score waits +55h.
 
 ### 3. First Easy on New uses S0(Easy) / D0(Easy)
 
