@@ -54,6 +54,16 @@ state, qualitative update rules), not with a particular crate or version.
   read-only in recall statistics (e.g. the heatmap color anchor). There is
   **no lapse count** (see **Lapses**). Memory-state transitions are a
   **RecallLog** (see **RecallLog**).
+- **Maximum interval** is a **global constant 36500 days** (open FSRS
+  `S_MAX`), compared and persisted as **876000 whole hours** — not a Settings
+  knob, not persisted as its own field, and not otherwise configurable. It is
+  not shown as its own UI; Memory Tracker still shows Stability (migrated
+  rows may drop). After next Stability is computed (FSRS update, thinking-time
+  overlay on Good, Tutor **2** shrink, confusion midpoint), on every write of
+  next Stability: `S = min(S, 876000)`. Due follows from that S
+  (`nextRecallAt = lastRecalledAt + I(0.9, S)`). Do not keep an unbounded S
+  beside a capped due. Same strictly-future fallback when `I` is
+  non-positive. Existing over-cap rows **will** be clamped (S and due).
 
 ### Lapses
 
@@ -277,7 +287,7 @@ stays the due-work index.
 
 ### Deferred
 
-- **E3:** Fuzz / maximum interval
+- **E3:** Fuzz
 - **E4:** Fitting / per-user weights
 
 ## Working draft
@@ -299,8 +309,9 @@ Empty pending accept.
   authoritative. A rebuildable projection needs additional scheduler state or
   complete versioned history.
 - Allows a data-fitted scheduler later without a library lock-in. Requested
-  retention is locked at 0.9. A lapse count is not memory state. Other tuning
-  constants remain deferred.
+  retention is locked at 0.9. Maximum interval is locked at 36500 days
+  (876000 whole hours). A lapse count is not memory state. Fuzz and
+  per-user fitting remain deferred.
 
 ## Prerequisites / Assumptions
 
@@ -324,7 +335,8 @@ Empty pending accept.
   follow elapsed time vs Stability, not `nextRecallAt`.
 - **Settings day list as the interval source** — rejected as the destination;
   spacing is persisted Stability in whole hours. Requested retention is a
-  global constant 0.9, not a Settings knob.
+  global constant 0.9, not a Settings knob. Maximum interval is a global
+  constant (36500 days / 876000 whole hours), not a Settings knob.
 - **Recompute due time from answer history on demand** — deferred: history is
   incomplete; due-work needs a queryable projection.
 - **Just review Hard / Easy buttons** — rejected: just review is rare; keep two
