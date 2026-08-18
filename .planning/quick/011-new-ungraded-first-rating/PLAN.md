@@ -57,15 +57,9 @@ Pin `correctRecallAfterNewAgainUsesLongTermGoodStability`: New → Again → on-
 ### 4. Memory Tracker shows first tutor 0/1 as Again first-rating
 
 - **Type:** Behavior
-- **Status:** planned
+- **Status:** done
 
-**Pre:** New commissioned tracker.  
-**Trigger:** record Tutor **0** or **1**.  
-**Post:** Memory Tracker shows Stability **5**, `D0(1)`, 5h between last and next recall.
-
-Behavior already follows from slice 2. This slice only adds the missing user-visible coverage: two Example rows on `commissioned_learning_session.feature` “First tutor score on a new tracker…”. `--spec` that feature only.
-
-**Done when:** those examples pass; score **2** outline row not added yet.
+Example rows **0** and **1** on `commissioned_learning_session.feature` “First tutor score on a new tracker…”: Stability **5**, Difficulty **6.4133**, **5h**. Score **2** not added. Cypress that feature: 14 passing.
 
 ### 5. Lock Tutor 2 on New as Hard first-rating in ADR 0003
 

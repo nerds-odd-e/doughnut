@@ -80,6 +80,8 @@ Feature: Commissioned learning session
       | 4     | 55        | 2.1181     | 55    |
       | 5     | 199       | 1          | 199   |
       | 3     | 31        | 5.11217    | 31    |
+      | 0     | 5         | 6.4133     | 5     |
+      | 1     | 5         | 6.4133     | 5     |
 
   Scenario: Recording tutor score 4 leaves a GOOD RecallLog
     Given the notes "Hola, Gracias" are assimilated as commissioned on day 1
