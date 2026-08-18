@@ -43,6 +43,11 @@ Feature: Nested Note creation
     When I create a folder named "Top Shelf" while viewing note "Course intro"
     Then I should see sidebar folder "Top Shelf"
 
+  Scenario: Creating a folder named index does not warn
+    When I create a folder named "index" while viewing note "Course intro"
+    Then I should not see a warning that the portable tree may be OKF-incompatible
+    And I should see sidebar folder "index"
+
   Scenario: Create a nested folder under an existing folder
     When I create a folder named "Deep" while viewing note "team"
     Then I should see sidebar folder "Deep" under open folder "LeSS in Action"

@@ -29,6 +29,20 @@ const folderPage = () => ({
     return this
   },
 
+  expectNoOkfIncompatibleTitleWarning() {
+    waitUntilAppIsNotBusy()
+    cy.get('[data-testid="folder-page-summary"] .path-name-editor').should(
+      ($el) => {
+        const actual = $el.text().trim()
+        expect(
+          actual,
+          `Expected no OKF-incompatible warning on the folder name, but found: "${actual}"`
+        ).not.to.match(/OKF-incompatible/i)
+      }
+    )
+    return this
+  },
+
   openSettingsTab() {
     cy.get('[data-testid="folder-tab-settings"]').click()
     cy.get('[data-testid="folder-settings"]').should('be.visible')

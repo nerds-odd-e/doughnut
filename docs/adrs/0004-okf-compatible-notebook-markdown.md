@@ -39,14 +39,17 @@ profile. Codec round-trips must be lossless for these rules.
   canonicalize `readme` → `Readme`; leave any other non-empty `type`.
   Preserve author YAML. Do not persist `type: Readme` on stored readme
   columns. Do not backfill. ZIP has no stored artifacts to migrate.
-- `readme` / `readme.md` stay hard-reserved note titles.
-- `index.md` is only the OKF directory listing. Doughnut does not emit it
-  until listing generation exists; missing is conformant. Root
+- `readme` / `readme.md` stay the only hard-reserved note titles.
+- `index.md` is only the OKF directory listing. Doughnut does not emit a
+  listing until listing generation exists; missing is conformant. Root
   `okf_version` appears only when that listing file exists.
 - Concept titles that would become `index.md` or `log.md` (`index`,
   `index.md`, `log`, `log.md`, case-insensitive) are allowed. The product
-  warns on create/rename (PathNameEditor, same non-blocking channel as
-  wiki-link-char warnings) and does not reject.
+  warns on create/rename (PathNameEditor, notebook health) and does not
+  reject. Filename-as-title still applies: an insisted title is exported
+  as that basename. Do not remap to a non-reserved filename. That tree is
+  not OKF §3.1 / §11 conformant; that is a profile exception, not a
+  defect to close.
 - Empty folders exist in the tree only via tracked content (typically
   `README.md` when a readme is present); Git has no empty dirs.
 
@@ -77,8 +80,9 @@ profile. Codec round-trips must be lossless for these rules.
 - Accept (push / durable write) and CLI lint reject trees that break OKF
   requirements or this profile (missing/invalid `type`, reserved-name misuse
   of `readme` / `readme.md`, unsafe paths, etc.).
-- Missing `index.md` is conformant until Doughnut generates listings.
-  Concept files named `index.md` / `log.md` warn; they do not fail accept.
+- Missing listing `index.md` is conformant until Doughnut generates
+  listings. Concept files named `index.md` / `log.md` warn; they do not
+  fail accept or lint.
 - Recommendations (e.g. OKF `tags` shape) may warn without blocking.
 
 ## Consequences
@@ -87,7 +91,8 @@ profile. Codec round-trips must be lossless for these rules.
 - Title changes are usually filename changes; identity preservation across
   renames is ADR 0002 lineage, not Markdown metadata.
 - Obsidian and OKF consumers can open a Doughnut notebook tree without Doughnut
-  IDs in the files.
+  IDs in the files, except a user-insisted concept `index.md` / `log.md`,
+  which OKF tools may treat as a listing/log or reject.
 
 ## Pros
 

@@ -11,6 +11,7 @@
         :error-message="errors.title"
         :readonly="readonly"
         hide-label
+        warn-on-okf-incompatible-title
         @update:model-value="update(noteId, $event)"
         @blur="blur"
       >

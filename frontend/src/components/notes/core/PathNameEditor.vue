@@ -116,6 +116,7 @@ const props = withDefaults(
     editorRole?: string
     /** `data-test` on the inner editor (E2E note flows use `note-title`). */
     editorDataTest?: string
+    warnOnOkfIncompatibleTitle?: boolean
   }>(),
   {
     readonly: false,
@@ -125,6 +126,7 @@ const props = withDefaults(
     initialSelectAll: false,
     editorRole: "title",
     editorDataTest: "note-title",
+    warnOnOkfIncompatibleTitle: false,
   }
 )
 
@@ -141,7 +143,7 @@ const displayWarning = computed(() => {
   const parts = [
     replacementWarning.value,
     linkWarning.value,
-    isOkfIncompatibleTitle(props.modelValue)
+    props.warnOnOkfIncompatibleTitle && isOkfIncompatibleTitle(props.modelValue)
       ? OKF_INCOMPATIBLE_TITLE_WARNING
       : "",
   ].filter(Boolean)

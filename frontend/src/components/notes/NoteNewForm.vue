@@ -25,6 +25,7 @@
               :error-message="noteFormErrors.newTitle"
               autofocus
               :initial-select-all="initialTitle === undefined"
+              warn-on-okf-incompatible-title
               @update:model-value="onTitleChange"
             >
               <template #append>

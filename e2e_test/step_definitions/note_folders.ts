@@ -9,6 +9,7 @@ import {
 } from '@badeball/cypress-cucumber-preprocessor'
 import type NotePath from '../support/NotePath'
 import start from '../start'
+import folderPage from '../start/pageObjects/folderPage'
 
 Then(
   'I should see folder {notepath} containing these notes:',
@@ -45,6 +46,13 @@ When(
 Then('I should see sidebar folder {string}', (folderLabel: string) => {
   start.noteSidebar().expectSidebarFolderVisible(folderLabel)
 })
+
+Then(
+  'I should not see a warning that the portable tree may be OKF-incompatible',
+  () => {
+    folderPage().expectNoOkfIncompatibleTitleWarning()
+  }
+)
 
 Then('I should not see sidebar folder {string}', (folderLabel: string) => {
   start.noteSidebar().expectSidebarFolderAbsent(folderLabel)
