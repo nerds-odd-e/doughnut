@@ -60,11 +60,9 @@ Locked in Proposed [ADR 0004](../../../docs/adrs/0004-okf-compatible-notebook-ma
 ### 2. Folder-path wiki link opens the note in that folder
 
 - **Type:** Behavior
-- **Status:** planned
+- **Status:** done
 
-**Pre:** two notes share a title in different folders of the same notebook. **Trigger:** save body `[[Folder/Title]]` (display optional). **Post:** rendered wiki link opens the note in `Folder`, not the other namesake. Unqualified `[[Title]]` still lowest id.
-
-E2E: extend `e2e_test/features/note_topology/wiki_link.feature`. Resolver grows path-shaped targets; do not add a second resolver. Do not fullwidth-slash path-shaped wiki targets (AI sanitizer included).
+`[[Folder/Title]]` resolves via one `WikiLinkResolver` + `PathShapedTarget`. Unqualified `[[Title]]` still lowest id. Sanitizer keeps `/` in path-shaped wiki targets. E2E in `wiki_link.feature`.
 
 ### 3. Renaming a note keeps folder-path wiki prefix
 
@@ -78,7 +76,7 @@ E2E: extend `e2e_test/features/note_topology/wiki_link.feature`. Resolver grows 
 - **Type:** Behavior
 - **Status:** planned
 
-**Pre:** note titled `Title` lives in `Parent/Child`. **Trigger:** save `[[Parent/Child/Title]]`. **Post:** wiki link opens that note. Same path walker as slice 2 (generalize the segments; do not fork).
+**Pre:** note titled `Title` lives in `Parent/Child`. **Trigger:** save `[[Parent/Child/Title]]`. **Post:** wiki link opens that note. Reuse slice 2 `PathShapedTarget.folderNames`; do not fork a walker.
 
 ### 5. Path Markdown link opens like a wiki link; `.md` optional; spelling kept
 
@@ -122,7 +120,7 @@ Root `[label](/Title.md)` (note at notebook root) is the same behavior with an e
 ## Discoveries
 
 - Slice 1: glossary **Wiki link** row names both spellings and points at ADR 0004 rather than restating `.md` / leading-`/` mechanics. Gap tracker/seed no longer treat ZIP wiki rewrite as remaining P4 work; product dual-spelling still open until slice 9.
-- Wiki qualification today is only `Notebook:Title`. `/` in wiki **titles** is forbidden (fullwidth on persist). `/` in wiki **targets** is not a folder path; `[[folder/File]]` does not resolve. Same title in two folders: lowest note id (`WikiTitleCacheTitleResolutionTest`).
+- Slice 2: `PathShapedTarget` already holds `folderNames` (list) + title; slice 4 should confirm nested walk + E2E, not a second walker. Sanitizer asks that parser (`contains("/") && !contains(":")` heuristic removed). `/` in wiki **titles** stays forbidden (fullwidth on persist). Unqualified `[[Title]]` still lowest id.
 - Cache is style-blind at rest; extract/display/rewrite are wiki-inner-specific. Path Markdown is not extracted (`NoteContentMarkdown.wikiLinkInnersInOccurrenceOrder`).
 - `quillHtmlToMarkdown` turns doughnut-wiki-link and `/n…` hrefs into `[[label]]`. Path `.md` hrefs must not take that path, or “no conversion” fails on save.
 - ZIP collision `Recipe (2).md` is not `[[Recipe (2)]]`. Out of this plan.

@@ -143,6 +143,24 @@ class AiControllerExtractNotePreviewTest extends ControllerTestBase {
     }
 
     @Test
+    void shouldKeepSlashInPathShapedWikiTargetsInExtractionPreview()
+        throws UnexpectedNoAccessRightException, JsonProcessingException {
+      Note testNote = extractableNote();
+      stubExtraction(
+          "Extracted Note",
+          "See [[Pantry/Dup]] and [[Pantry/Dup.md|label]].",
+          "Back to [[Pantry/Dup]].");
+
+      NoteExtractionResult response =
+          controller.extractNotePreview(
+              testNote, selectSingleLayoutItem("p1", "key suggestion to extract"));
+
+      assertThat(response.getNewNoteContent())
+          .isEqualTo("See [[Pantry/Dup]] and [[Pantry/Dup.md|label]].");
+      assertThat(response.getUpdatedOriginalNoteContent()).isEqualTo("Back to [[Pantry/Dup]].");
+    }
+
+    @Test
     void shouldTrimSurroundingWhitespaceFromExtractionPreviewTitle()
         throws UnexpectedNoAccessRightException, JsonProcessingException {
       Note testNote = extractableNote();

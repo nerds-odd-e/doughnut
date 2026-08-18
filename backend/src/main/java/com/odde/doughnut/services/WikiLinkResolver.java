@@ -3,6 +3,8 @@ package com.odde.doughnut.services;
 import com.odde.doughnut.algorithms.FrontmatterAliases;
 import com.odde.doughnut.algorithms.NoteContentMarkdown;
 import com.odde.doughnut.algorithms.WikiLinkTargetReference;
+import com.odde.doughnut.controllers.dto.FolderTrailSegments;
+import com.odde.doughnut.entities.Folder;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.NoteAliasIndex;
 import com.odde.doughnut.entities.Notebook;
@@ -173,12 +175,46 @@ public class WikiLinkResolver {
   }
 
   private List<Note> noteCandidates(String notebookName, String noteTitle) {
+    if (noteTitle.contains("/")) {
+      return WikiLinkTargetReference.PathShapedTarget.tryParse(noteTitle)
+          .map(path -> pathShapedNoteCandidates(notebookName, path))
+          .orElse(List.of());
+    }
     List<Note> byTitle =
         noteRepository.findByNotebookNameAndNoteTitleOrderByIdAsc(notebookName, noteTitle);
     if (!byTitle.isEmpty()) {
       return byTitle;
     }
     return aliasTargetCandidates(notebookName, noteTitle);
+  }
+
+  private List<Note> pathShapedNoteCandidates(
+      String notebookName, WikiLinkTargetReference.PathShapedTarget path) {
+    List<Note> byTitle =
+        noteRepository.findByNotebookNameAndNoteTitleOrderByIdAsc(notebookName, path.title());
+    if (byTitle.isEmpty()) {
+      return List.of();
+    }
+    List<Note> inFolder = new ArrayList<>();
+    for (Note candidate : byTitle) {
+      if (matchesFolderPath(candidate, path.folderNames())) {
+        inFolder.add(candidate);
+      }
+    }
+    return inFolder;
+  }
+
+  private static boolean matchesFolderPath(Note note, List<String> folderNames) {
+    List<Folder> trail = FolderTrailSegments.fromRootToContainingFolder(note);
+    if (trail.size() != folderNames.size()) {
+      return false;
+    }
+    for (int i = 0; i < folderNames.size(); i++) {
+      if (!trail.get(i).getName().equalsIgnoreCase(folderNames.get(i))) {
+        return false;
+      }
+    }
+    return true;
   }
 
   private List<Note> aliasTargetCandidates(String notebookName, String linkToken) {

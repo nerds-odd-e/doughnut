@@ -1,5 +1,6 @@
 package com.odde.doughnut.validators;
 
+import com.odde.doughnut.algorithms.WikiLinkTargetReference;
 import java.util.regex.Pattern;
 
 public final class DisplayNamePathSeparators {
@@ -37,8 +38,9 @@ public final class DisplayNamePathSeparators {
   }
 
   /**
-   * Sanitizes wiki link target tokens: for {@code Notebook:Note/Title}, only the note-title portion
-   * after the first {@code :} is converted; the notebook prefix colon stays halfwidth.
+   * Sanitizes wiki link target tokens. Path-shaped targets ({@code Folder/Title}) keep {@code /}.
+   * For {@code Notebook:Title}, only the note-title portion after the first {@code :} is converted;
+   * the notebook prefix colon stays halfwidth.
    */
   public static String toFullwidthPathSeparatorsInWikiLinkTarget(String targetToken) {
     if (targetToken == null) {
@@ -51,6 +53,9 @@ public final class DisplayNamePathSeparators {
         String noteTitle = targetToken.substring(colon + 1);
         return notebookName + ":" + toFullwidthPathSeparators(noteTitle);
       }
+    }
+    if (WikiLinkTargetReference.PathShapedTarget.tryParse(targetToken).isPresent()) {
+      return targetToken.replace('\\', '＼');
     }
     return toFullwidthPathSeparators(targetToken);
   }

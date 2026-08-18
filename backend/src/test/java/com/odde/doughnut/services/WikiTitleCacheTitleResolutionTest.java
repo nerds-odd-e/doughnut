@@ -15,6 +15,8 @@ import com.odde.doughnut.entities.repositories.NoteWikiTitleCacheRepository;
 import com.odde.doughnut.testability.MakeMe;
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -70,6 +72,37 @@ class WikiTitleCacheTitleResolutionTest {
     List<NoteWikiTitleCache> rows = cacheRows(carrier);
     assertThat(rows, hasSize(1));
     assertThat(rows.get(0).getTargetNote().getId(), equalTo(firstCreated.getId()));
+  }
+
+  @ParameterizedTest
+  @ValueSource(strings = {"[[Pantry/Dup]]", "[[Pantry/Dup.md]]", "[[Pantry/Dup|label]]"})
+  void folder_path_link_resolves_to_the_note_in_that_folder(String content) {
+    User user = makeMe.aUser().please();
+    Folder recipes = makeMe.aFolder().notebookOwnedBy(user).name("Recipes").please();
+    Notebook notebook = recipes.getNotebook();
+    Folder pantry = makeMe.aFolder().notebook(notebook).name("Pantry").please();
+    makeMe.aNote().title("Dup").folder(recipes).please();
+    Note pantryDup = makeMe.aNote().title("Dup").folder(pantry).please();
+    Note carrier = makeMe.aNote().notebook(notebook).content(content).please();
+
+    wikiTitleCacheService.refreshForNote(carrier, user);
+
+    List<NoteWikiTitleCache> rows = cacheRows(carrier);
+    assertThat(rows, hasSize(1));
+    assertThat(rows.get(0).getTargetNote().getId(), equalTo(pantryDup.getId()));
+  }
+
+  @Test
+  void unqualified_link_does_not_strip_md_suffix_from_title() {
+    User user = makeMe.aUser().please();
+    Folder folderA = makeMe.aFolder().notebookOwnedBy(user).name("A").please();
+    Notebook notebook = folderA.getNotebook();
+    makeMe.aNote().title("Dup").folder(folderA).please();
+    Note carrier = makeMe.aNote().notebook(notebook).content("[[Dup.md]]").please();
+
+    wikiTitleCacheService.refreshForNote(carrier, user);
+
+    assertThat(cacheRows(carrier), empty());
   }
 
   @Test

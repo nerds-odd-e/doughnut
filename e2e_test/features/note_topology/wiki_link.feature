@@ -10,6 +10,24 @@ Feature: Wiki links in notes
       | WikiLinks E2E Tech | WikiLinks E2E Root |
       | WikiLinks E2E CI   | WikiLinks E2E Root |
 
+  Scenario: A folder-path wiki link opens the note in that folder
+    Given I have a notebook "WikiPath Folder NB" with notes:
+      | Title            | Content          | Folder           |
+      | WikiPath Shared  | recipes namesake | WikiPath Recipes |
+      | WikiPath Carrier | origin           | WikiPath Root    |
+    And I have a notebook "WikiPath Folder NB" with notes:
+      | Title           | Content         | Folder          |
+      | WikiPath Shared | pantry namesake | WikiPath Pantry |
+    When I update note "WikiPath Carrier" content using markdown to become:
+      """
+      See [[WikiPath Pantry/WikiPath Shared]].
+      """
+    Then I should see the note content rendered as:
+      | Kind           | Text                                 |
+      | live wiki link | WikiPath Pantry/WikiPath Shared      |
+    And the wiki link "WikiPath Pantry/WikiPath Shared" should open the note titled "WikiPath Shared"
+    And the note content on the current page should be "pantry namesake"
+
   Scenario: A wiki link points to the note with the same title
     When I update note "WikiLinks E2E Tech" content using markdown to become:
       """
