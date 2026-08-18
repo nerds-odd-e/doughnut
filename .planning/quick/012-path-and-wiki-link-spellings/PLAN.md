@@ -74,9 +74,9 @@ Rename rewrites via `WikiLinkTargetReference.replaceNoteTitle` / `PathShapedTarg
 ### 4. Nested folder-path wiki link opens the nested note
 
 - **Type:** Behavior
-- **Status:** planned
+- **Status:** done
 
-**Pre:** note titled `Title` lives in `Parent/Child`. **Trigger:** save `[[Parent/Child/Title]]`. **Post:** wiki link opens that note. Reuse slice 2 `PathShapedTarget.folderNames`; do not fork a walker.
+Walker already handled nested `PathShapedTarget.folderNames`. Locked with unit test + E2E in `wiki_link.feature`. No production change.
 
 ### 5. Path Markdown link opens like a wiki link; `.md` optional; spelling kept
 
@@ -120,8 +120,9 @@ Root `[label](/Title.md)` (note at notebook root) is the same behavior with an e
 ## Discoveries
 
 - Slice 1: glossary **Wiki link** row names both spellings and points at ADR 0004 rather than restating `.md` / leading-`/` mechanics. Gap tracker/seed no longer treat ZIP wiki rewrite as remaining P4 work; product dual-spelling still open until slice 9.
-- Slice 2: `PathShapedTarget` already holds `folderNames` (list) + title; slice 4 should confirm nested walk + E2E, not a second walker. Sanitizer asks that parser (`contains("/") && !contains(":")` heuristic removed). `/` in wiki **titles** stays forbidden (fullwidth on persist). Unqualified `[[Title]]` still lowest id.
+- Slice 2: `PathShapedTarget` already holds `folderNames` (list) + title. Sanitizer asks that parser. `/` in wiki **titles** stays forbidden (fullwidth on persist). Unqualified `[[Title]]` still lowest id.
 - Slice 3: title rewrite lives on `WikiLinkTargetReference.replaceNoteTitle` (path-shaped via `PathShapedTarget.withNoteTitle`). Slice 6 should reuse that write-back; only Markdown spelling differs.
+- Slice 4: nested `[[Parent/Child/Title]]` already resolved; this slice only locked it with tests.
 - Cache is style-blind at rest; extract/display/rewrite are wiki-inner-specific. Path Markdown is not extracted (`NoteContentMarkdown.wikiLinkInnersInOccurrenceOrder`).
 - `quillHtmlToMarkdown` turns doughnut-wiki-link and `/n…` hrefs into `[[label]]`. Path `.md` hrefs must not take that path, or “no conversion” fails on save.
 - ZIP collision `Recipe (2).md` is not `[[Recipe (2)]]`. Out of this plan.

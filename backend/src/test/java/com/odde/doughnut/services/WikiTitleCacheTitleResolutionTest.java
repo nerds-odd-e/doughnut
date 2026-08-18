@@ -93,6 +93,23 @@ class WikiTitleCacheTitleResolutionTest {
   }
 
   @Test
+  void nested_folder_path_link_resolves_to_the_nested_note() {
+    User user = makeMe.aUser().please();
+    Folder parent = makeMe.aFolder().notebookOwnedBy(user).name("Parent").please();
+    Notebook notebook = parent.getNotebook();
+    Folder child = makeMe.aFolder().parentFolder(parent).name("Child").please();
+    makeMe.aNote().title("Title").folder(parent).please();
+    Note nested = makeMe.aNote().title("Title").folder(child).please();
+    Note carrier = makeMe.aNote().notebook(notebook).content("[[Parent/Child/Title]]").please();
+
+    wikiTitleCacheService.refreshForNote(carrier, user);
+
+    List<NoteWikiTitleCache> rows = cacheRows(carrier);
+    assertThat(rows, hasSize(1));
+    assertThat(rows.get(0).getTargetNote().getId(), equalTo(nested.getId()));
+  }
+
+  @Test
   void unqualified_link_does_not_strip_md_suffix_from_title() {
     User user = makeMe.aUser().please();
     Folder folderA = makeMe.aFolder().notebookOwnedBy(user).name("A").please();

@@ -28,6 +28,24 @@ Feature: Wiki links in notes
     And the wiki link "WikiPath Pantry/WikiPath Shared" should open the note titled "WikiPath Shared"
     And the note content on the current page should be "pantry namesake"
 
+  Scenario: A nested folder-path wiki link opens the nested note
+    Given I have a notebook "WikiPath Nested NB" with notes:
+      | Title                   | Content         | Folder                                       |
+      | WikiPath Nested Shared  | nested namesake | WikiPath Nested Parent/WikiPath Nested Child |
+      | WikiPath Nested Carrier | origin          | WikiPath Nested Root                         |
+    And I have a notebook "WikiPath Nested NB" with notes:
+      | Title                  | Content          | Folder                 |
+      | WikiPath Nested Shared | shallow namesake | WikiPath Nested Parent |
+    When I update note "WikiPath Nested Carrier" content using markdown to become:
+      """
+      See [[WikiPath Nested Parent/WikiPath Nested Child/WikiPath Nested Shared]].
+      """
+    Then I should see the note content rendered as:
+      | Kind           | Text                                                            |
+      | live wiki link | WikiPath Nested Parent/WikiPath Nested Child/WikiPath Nested Shared |
+    And the wiki link "WikiPath Nested Parent/WikiPath Nested Child/WikiPath Nested Shared" should open the note titled "WikiPath Nested Shared"
+    And the note content on the current page should be "nested namesake"
+
   Scenario: A wiki link points to the note with the same title
     When I update note "WikiLinks E2E Tech" content using markdown to become:
       """
