@@ -51,8 +51,18 @@ state, qualitative update rules), not with a particular crate or version.
 - **Retrievability** is computed from elapsed whole hours and Stability, not stored.
 - A recall transition consumes the graded outcome, elapsed time, and that state — never queue lateness.
 - **Requested retention** `r` is a **global constant 0.9** — not a Settings
-  knob, not in the UI, not persisted. Lapses are **deferred** (see **Deferred**).
-  Memory-state transitions are a **RecallLog** (see **RecallLog**).
+  knob, not in the UI, not persisted. There is **no lapse count** (see
+  **Lapses**). Memory-state transitions are a **RecallLog** (see **RecallLog**).
+
+### Lapses
+
+There is **no lapse count**. Memory state is Difficulty, Stability, and
+computed Retrievability. Do not persist, display, or glossary a lifetime
+forget counter. Open FSRS-6 After-Again Stability (the published
+**post-lapse** formula) consumes Difficulty, Stability, and Retrievability —
+not a count. Again outcomes stay on **RecallLog**. The **frequent-failure
+warning** is the product signal for repeated incorrect recall; it does not
+change the schedule.
 
 ### Difficulty on correct recall
 
@@ -167,9 +177,9 @@ but names another accessible note by title or plain alias. Unless the notes have
 a declared overlap, the answer has the following consequences:
 
 1. The spelling tracker under recall receives the ordinary incorrect-recall
-   transition, including its full negative memory-state adjustment and
-   relearning projection. It advances `lastRecalledAt` and `recallCount` and
-   counts as a failed recall for that tracker.
+   transition, including its full negative memory-state adjustment and due.
+   It advances `lastRecalledAt` and `recallCount` and counts as a failed
+   recall for that tracker.
 2. A secondary **confusion adjustment** applies only when the answer matches
    exactly one accessible note and that learner has an eligible active tracker
    for it. Prefer its spelling tracker; otherwise use its note-level
@@ -247,7 +257,6 @@ stays the due-work index.
 
 ### Deferred
 
-- **B4:** Lapses (no unused counter)
 - **E3:** Fuzz / maximum interval
 - **E4:** Fitting / per-user weights
 
@@ -270,7 +279,8 @@ Empty pending accept.
   authoritative. A rebuildable projection needs additional scheduler state or
   complete versioned history.
 - Allows a data-fitted scheduler later without a library lock-in. Requested
-  retention is locked at 0.9; other tuning constants remain deferred.
+  retention is locked at 0.9. A lapse count is not memory state. Other tuning
+  constants remain deferred.
 
 ## Prerequisites / Assumptions
 
@@ -299,6 +309,9 @@ Empty pending accept.
   incomplete; due-work needs a queryable projection.
 - **Just review Hard / Easy buttons** — rejected: just review is rare; keep two
   buttons mapped to Tutor **4** and **1**.
+- **Persist a lapse count** — rejected: FSRS-6 After-Again Stability does not
+  consume it; RecallLog already holds Again history; the frequent-failure
+  warning is the product signal. Do not add an unused counter.
 
 ## Related
 
