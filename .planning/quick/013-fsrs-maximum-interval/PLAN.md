@@ -48,11 +48,9 @@ Over-cap ordinary correct (and thinking-time sibling) persist Stability **876000
 ### 3. Persist recall due past the TIMESTAMP range
 
 - **Type:** Structure
-- **Status:** planned
+- **Status:** done
 
-Alter `memory_tracker.last_recalled_at` and `next_recall_at` from `TIMESTAMP` to `DATETIME` (keep `NOT NULL`). Session TZ stays UTC so existing values are preserved. Flyway `V300000273` (next free after `V300000272`). Do not convert `assimilated_at` or other `TIMESTAMP` columns.
-
-Unlocks slice 4: a persisted over-cap clamp can write `next_recall_at = last_recalled_at + 876000 hours`. Pin with a persisted flush of that due (not in-memory). Regenerate `docs/database-erd.md`.
+`V300000273` converts `last_recalled_at` / `next_recall_at` to `DATETIME NOT NULL`. Persisted flush of `last + 876000 hours` succeeds (`MemoryTrackerRecallDuePersistenceTest`). Java `Timestamp` mapping unchanged. `assimilated_at` still `TIMESTAMP`. ERD exporter lists only PK/UK/FK columns, so `docs/database-erd.md` did not change.
 
 ### 4. Existing over-cap rows are clamped without a grade
 
@@ -79,3 +77,4 @@ Test drives the backfill class (not HTTP). Do not gate with `1=0`.
 - Slice 1: restating the 24h fallback next to the cap duplicated the existing strictly-future bullet; the Decision now points at that fallback instead.
 - Slice 2: clamp lives in `Fsrs.cappedStabilityHours`; grade writes go through `MemoryTrackerNextStability`. `setStability` stays uncapped so tests can seed over-cap rows. Those tests are in-memory; MySQL `TIMESTAMP` cannot store `last + 876000 hours`.
 - Jidoka: humans accepted DATETIME for `last_recalled_at` / `next_recall_at` only; remaining TIMESTAMP columns are [SEED-006](../../seeds/SEED-006-remove-mysql-timestamp-2038.md). Dropped the null-last clamp case (`NOT NULL`).
+- Slice 3: ERD exporter does not list these columns (not PK/UK/FK); no `docs/database-erd.md` delta.
