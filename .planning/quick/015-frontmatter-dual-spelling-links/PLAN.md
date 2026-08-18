@@ -1,6 +1,6 @@
 # Plan: Frontmatter dual-spelling wiki links
 
-**Status:** in progress
+**Status:** complete
 
 **Goal:** YAML frontmatter inter-note links use the same dual-spelling as the body (wiki default, path Markdown accepted, no conversion). One token API so the next wiki-link change does not add another regex. Do not convert stored wiki to paths. Do not treat a bare YAML path as a link.
 
@@ -68,11 +68,9 @@ A whole overlaps list item `[Title](/Folder/Title.md)` is a live or dead wiki-eq
 ### 5. A newly typed path-Markdown link flushes like a wiki link
 
 - **Type:** Behavior
-- **Status:** planned
+- **Status:** done
 
-**Pre:** the note content editor is open. **Trigger:** the next content introduces `[label](/Folder/Title.md)` (not only `[[Title]]`). **Post:** the editor flushes immediately, same as a new wiki token.
-
-`hasNewWikiLinkTexts` uses `authoredLinkOccurrences` from `authoredLinkMarkup`. Extend `noteContentWikiLinks.spec.ts`. Existing wiki flush cases still pass.
+`hasNewWikiLinkTexts` walks `authoredLinkOccurrences` (wiki inner and full `[display](/href)`). A newly typed path-Markdown token flushes immediately, same as a new wiki token. Wiki-only `extractWikiLinkTexts` removed. Bare `/Moon.md` does not flush.
 
 ## Coordination
 
