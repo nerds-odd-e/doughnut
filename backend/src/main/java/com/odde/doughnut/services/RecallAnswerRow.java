@@ -20,4 +20,8 @@ public record RecallAnswerRow(
   boolean correct() {
     return Boolean.TRUE.equals(Answer.correctFrom(answerOutcome, productOutcome));
   }
+
+  boolean countsAsReview() {
+    return answerOutcome != AnswerOutcome.OVERLAP;
+  }
 }

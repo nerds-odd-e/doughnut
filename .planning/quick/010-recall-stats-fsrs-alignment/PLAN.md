@@ -1,6 +1,6 @@
 # Recall-stats FSRS alignment — cleanup + Requested-retention adoption
 
-**Status:** planned
+**Status:** in progress (slice 1 done)
 **Scope:** everything surfaced by the FSRS-compatibility-gap analysis of recall
 stats (chat 2026-08-18), refined into small-commit-size slices: one
 correctness bug (1), one Requested-retention adoption arc (2 docs → 3 code),
@@ -55,23 +55,12 @@ Full analysis is in the chat transcript, not duplicated here. Short version:
 - **Post-condition:** that answer is excluded entirely from
   `totalReviewsAllTime` / `totalReviews365` / `retentionPct365` / calendar /
   weekday-hour heatmap / streaks — it was never a graded recall.
-- **Files:**
-  - `backend/src/main/java/com/odde/doughnut/services/RecallAnswerRow.java` —
-    add `boolean countsAsReview() { return answerOutcome != AnswerOutcome.OVERLAP; }`
-  - `backend/src/main/java/com/odde/doughnut/services/RecallStatsService.java` —
-    in `aggregateRows`, filter both `recent` and `allTime` through
-    `countsAsReview()` before any aggregation.
-  - `backend/src/test/java/com/odde/doughnut/services/RecallStatsTestFixtures.java` —
-    add an `overlapAnswered(Timestamp answerAt)` builder (outcome `OVERLAP`,
-    `productOutcome null`, matching production reality).
-  - `backend/src/test/java/com/odde/doughnut/services/RecallStatsServiceTest.java` —
-    new nested test class asserting an overlap row contributes to none of
-    `totalReviewsAllTime`, `retentionPct365`, or the calendar count for its
-    day.
-- **TDD:** write the new test first against current code (it should fail —
-  today overlap counts as a correct review), confirm it fails for the right
-  reason, then implement the filter.
-- **Status:** planned
+- **Status:** done
+- **Learning:** filter is `RecallAnswerRow.countsAsReview()` applied once in
+  `aggregateRows` (`recentReviews` / `allTimeReviews`). Overlap test lives in
+  `RecallStatsOverlapIsNotAReviewTest` so `RecallStatsServiceTest` stays under
+  250 lines. `Answer.correctFrom` still treats overlap as correct — that is
+  unchanged and out of scope.
 
 ### 2. Structure (docs): Requested retention may be shown read-only in stats
 

@@ -1,6 +1,7 @@
 package com.odde.doughnut.services;
 
 import com.odde.doughnut.controllers.dto.RecallStatsDTO;
+import com.odde.doughnut.entities.AnswerOutcome;
 import com.odde.doughnut.entities.ProductOutcome;
 import java.sql.Timestamp;
 import java.time.ZoneId;
@@ -8,7 +9,7 @@ import java.time.ZonedDateTime;
 import java.util.List;
 
 /**
- * Shared builders/lookups for {@link RecallStatsServiceTest} so the test class stays under the
+ * Shared builders/lookups for recall-stats aggregation tests so each test class stays under the
  * 250-line limit.
  */
 final class RecallStatsTestFixtures {
@@ -24,6 +25,10 @@ final class RecallStatsTestFixtures {
         correct ? ProductOutcome.GOOD : ProductOutcome.AGAIN,
         thinkingTimeMs,
         promptAt != null ? promptAt : answerAt);
+  }
+
+  static RecallAnswerRow overlapAnswered(Timestamp answerAt) {
+    return new RecallAnswerRow(answerAt, AnswerOutcome.OVERLAP, null, null, answerAt);
   }
 
   static Timestamp utc(int day, int hour) {

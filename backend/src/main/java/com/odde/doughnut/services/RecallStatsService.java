@@ -51,6 +51,10 @@ public class RecallStatsService {
 
   static RecallStatsDTO aggregateRows(
       List<RecallAnswerRow> recent, List<RecallAnswerRow> allTime, ZoneId zoneId, Timestamp now) {
+    List<RecallAnswerRow> recentReviews =
+        recent.stream().filter(RecallAnswerRow::countsAsReview).toList();
+    List<RecallAnswerRow> allTimeReviews =
+        allTime.stream().filter(RecallAnswerRow::countsAsReview).toList();
     LocalDate today = now.toInstant().atZone(zoneId).toLocalDate();
 
     Map<LocalDate, List<Long>> perDayTimes = new HashMap<>();
@@ -65,7 +69,7 @@ public class RecallStatsService {
     }
     int totalCorrect365 = 0;
 
-    for (RecallAnswerRow r : recent) {
+    for (RecallAnswerRow r : recentReviews) {
       if (r.answerCreatedAt() == null) {
         continue;
       }
@@ -100,13 +104,13 @@ public class RecallStatsService {
     List<HourRetention> hourlyRetention =
         RecallStatsAggregator.buildHourlyRetention(hourCorrect, hourAnswered);
 
-    int totalReviews365 = recent.size();
+    int totalReviews365 = recentReviews.size();
     Double retentionPct365 = RecallStatsAggregator.pct(totalCorrect365, totalReviews365);
     int reviewsToday = perDayRetention.getOrDefault(today, new int[] {0, 0})[1];
 
     HeadlineStats totals =
         RecallStatsAggregator.buildTotals(
-            allTime,
+            allTimeReviews,
             zoneId,
             today,
             totalReviews365,
