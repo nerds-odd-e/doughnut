@@ -11,20 +11,20 @@ scope: large
 
 ## Why This Matters
 
-Portable notebooks should be OKF v0.2 trees plus the Doughnut profile in Proposed [ADR 0004](../../docs/adrs/0004-okf-compatible-notebook-markdown.md). Catalog ZIP export is not yet that profile (wiki links; attachment paths still carry ids). Closing the gap is what makes ZIP / a future Git working tree openable by OKF and Obsidian-style tools without Doughnut IDs in the files.
+Portable notebooks should be OKF v0.2 trees plus the Doughnut profile in Proposed [ADR 0004](../../docs/adrs/0004-okf-compatible-notebook-markdown.md). Catalog ZIP export is not yet that profile (wiki links). Closing the gap is what makes ZIP / a future Git working tree openable by OKF and Obsidian-style tools without Doughnut IDs in the files.
 
 ## When to Surface
 
 **Trigger:** accepting ADR 0004; changing notebook ZIP export; adding Markdown import, CLI lint, or Git accept (ADR 0002 Level 1).
 
-Also surface when rewriting wiki links to path Markdown. Do not reopen `index` / `log` note titles as a hard reserve. Do not reopen persist-vs-wrap for `title:`. Do not reopen human collision suffixes (`Recipe (2).md`).
+Also surface when rewriting wiki links to path Markdown. Do not reopen `index` / `log` note titles as a hard reserve. Do not reopen persist-vs-wrap for `title:`. Do not reopen human collision suffixes (`Recipe (2).md`). Do not reopen stored `image:` as a codec wrap (binaries are ADR 0002 Level 2).
 
 ## Scope Estimate
 
 **Large** — remaining work is profile accept plus a lossless codec (and later accept/lint):
 
 1. Humans accept Proposed [ADR 0004](../../docs/adrs/0004-okf-compatible-notebook-markdown.md). See `docs/adrs/README.md`.
-2. Remaining codec IDs: **P4**, **P8**–**P9** (**P5** only as attachment-path ids). Tracker: [OKF-COMPATIBILITY-GAP.md](../research/OKF-COMPATIBILITY-GAP.md).
+2. Remaining codec IDs: **P4**, **P9**. Tracker: [OKF-COMPATIBILITY-GAP.md](../research/OKF-COMPATIBILITY-GAP.md).
 
 ## Breadcrumbs
 

@@ -86,7 +86,8 @@ profile. Codec round-trips must be lossless for these rules.
   report them per product rules, but the accepted canonical form for
   inter-note links is path-based Markdown.
 - Git-managed images/binaries are out of scope here (ADR 0002 Level 2). Until
-  then, attachments may use portable absolute URLs outside the bundle.
+  then, stored `image:` is authored frontmatter (today a host-relative
+  attachment path). Export copies it. That is not a codec wrap.
 
 ### Validation
 
