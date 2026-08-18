@@ -4928,21 +4928,6 @@ components:
         worstHourRetentionPct:
           type: number
           format: double
-    HourRetention:
-      type: object
-      properties:
-        hour:
-          type: integer
-          format: int32
-        retentionPct:
-          type: number
-          format: double
-        correctCount:
-          type: integer
-          format: int32
-        answeredCount:
-          type: integer
-          format: int32
     RecallStatsDTO:
       type: object
       properties:
@@ -4974,10 +4959,6 @@ components:
             items:
               type: integer
               format: int32
-        hourlyRetention:
-          type: array
-          items:
-            $ref: "#/components/schemas/HourRetention"
         totals:
           $ref: "#/components/schemas/HeadlineStats"
     QuestionGenerationBatchUserScheduleDTO:

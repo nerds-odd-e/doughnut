@@ -7,7 +7,6 @@ import type {
   DayCount,
   DayAvgResponseTime,
   DayRetention,
-  HourRetention,
 } from "@generated/doughnut-backend-api"
 import { flushPromises } from "@vue/test-utils"
 import { describe, it, expect, beforeEach, vi } from "vitest"
@@ -51,19 +50,6 @@ function emptyGrid(): number[][] {
   return Array.from({ length: 7 }, () => Array.from({ length: 24 }, () => 0))
 }
 
-function buildHourlyRetention(): HourRetention[] {
-  const hours: HourRetention[] = []
-  for (let h = 0; h < 24; h++) {
-    hours.push({
-      hour: h,
-      retentionPct: h === 10 ? 100 : 50,
-      correctCount: 5,
-      answeredCount: 6,
-    })
-  }
-  return hours
-}
-
 const fixture: RecallStatsDto = {
   calendar: buildCalendar(),
   trend: buildTrend(),
@@ -80,7 +66,6 @@ const fixture: RecallStatsDto = {
   },
   weekdayHourCounts: emptyGrid(),
   weekdayHourCorrect: emptyGrid(),
-  hourlyRetention: buildHourlyRetention(),
   totals: {
     totalReviewsAllTime: 200,
     totalReviews365: 100,

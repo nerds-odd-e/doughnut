@@ -13,7 +13,6 @@ public class RecallStatsDTO {
   private AmPmResponseTime amPm;
   private int[][] weekdayHourCounts;
   private int[][] weekdayHourCorrect;
-  private List<HourRetention> hourlyRetention;
   private HeadlineStats totals;
 
   @Data
@@ -49,15 +48,6 @@ public class RecallStatsDTO {
     private Integer eveningSamples;
     private Long nightMs;
     private Integer nightSamples;
-  }
-
-  @Data
-  @AllArgsConstructor
-  public static class HourRetention {
-    private Integer hour;
-    private Double retentionPct;
-    private Integer correctCount;
-    private Integer answeredCount;
   }
 
   @Data

@@ -6,7 +6,6 @@ import com.odde.doughnut.controllers.dto.RecallStatsDTO.DayAvgResponseTime;
 import com.odde.doughnut.controllers.dto.RecallStatsDTO.DayCount;
 import com.odde.doughnut.controllers.dto.RecallStatsDTO.DayRetention;
 import com.odde.doughnut.controllers.dto.RecallStatsDTO.HeadlineStats;
-import com.odde.doughnut.controllers.dto.RecallStatsDTO.HourRetention;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.RecallPromptRepository;
 import com.odde.doughnut.utils.TimestampOperations;
@@ -101,8 +100,6 @@ public class RecallStatsService {
     List<DayRetention> retentionTrend =
         RecallStatsAggregator.buildRetentionTrend(today, perDayRetention);
     AmPmResponseTime amPm = RecallStatsAggregator.buildAmPm(amPmValues);
-    List<HourRetention> hourlyRetention =
-        RecallStatsAggregator.buildHourlyRetention(hourCorrect, hourAnswered);
 
     int totalReviews365 = recentReviews.size();
     Double retentionPct365 = RecallStatsAggregator.pct(totalCorrect365, totalReviews365);
@@ -116,17 +113,11 @@ public class RecallStatsService {
             totalReviews365,
             reviewsToday,
             retentionPct365,
-            hourlyRetention);
+            hourCorrect,
+            hourAnswered);
 
     return new RecallStatsDTO(
-        calendar,
-        trend,
-        retentionTrend,
-        amPm,
-        weekdayHourCounts,
-        weekdayHourCorrect,
-        hourlyRetention,
-        totals);
+        calendar, trend, retentionTrend, amPm, weekdayHourCounts, weekdayHourCorrect, totals);
   }
 
   private static Timestamp minusDays(Timestamp ts, int days) {

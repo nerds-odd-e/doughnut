@@ -1,6 +1,6 @@
 # Recall-stats FSRS alignment — cleanup + Requested-retention adoption
 
-**Status:** in progress (slices 1–4 done)
+**Status:** in progress (slices 1–5 done; cleanup next)
 **Scope:** everything surfaced by the FSRS-compatibility-gap analysis of recall
 stats (chat 2026-08-18), refined into small-commit-size slices: one
 correctness bug (1), one Requested-retention adoption arc (2 docs → 3 code),
@@ -100,44 +100,12 @@ Full analysis is in the chat transcript, not duplicated here. Short version:
 
 ### 5. Cleanup: stop exposing `hourlyRetention` on the wire — it's server-internal (Structure)
 
-- Bigger finding than a field trim: the **entire** `RecallStatsDTO.hourlyRetention`
-  list is dead on the wire. Grepped `frontend/src` for `HourRetention` /
-  `hourlyRetention` — the only hit is `RecallStatsTiles.vue` reading
-  `totals.bestHourRetentionPct` / `worstHourRetentionPct`, which are
-  computed server-side by `RecallStatsAggregator.buildTotals` *from*
-  `hourlyRetention` — the raw per-hour list itself is never read once it
-  reaches the browser. It's currently public API surface purely to satisfy
-  an internal computation step.
-- Also, `HourRetention.correctCount` is unused even **internally**:
-  `buildTotals`'s best/worst-hour loop only reads `getAnsweredCount()` (the
-  `BEST_WORST_MIN_ANSWERED` guard) and `getRetentionPct()`, never
-  `getCorrectCount()`.
-- **Fix:** remove `hourlyRetention` from `RecallStatsDTO`'s public shape;
-  relocate `HourRetention` from `controllers.dto.RecallStatsDTO` into
-  `services` (package-private, alongside `RecallStatsAggregator`) as a
-  purely internal computation type, and drop its dead `correctCount` field
-  (keep `hour`, `retentionPct`, `answeredCount` — the guard needs the last
-  one).
-- **Files:**
-  - `backend/src/main/java/com/odde/doughnut/controllers/dto/RecallStatsDTO.java` —
-    remove the `hourlyRetention` field and the nested `HourRetention` class.
-  - `backend/src/main/java/com/odde/doughnut/services/RecallStatsAggregator.java` —
-    define `HourRetention` as a package-private record here (3 fields, no
-    `correctCount`); `buildHourlyRetention` stays, used only as an internal
-    input to `buildTotals`.
-  - `backend/src/main/java/com/odde/doughnut/services/RecallStatsService.java` —
-    drop `hourlyRetention` from the `new RecallStatsDTO(...)` call (7 args,
-    not 8); the local `hourlyRetention` variable stays, just isn't returned.
-  - `frontend/tests/pages/settings/RecallStatsSettingsTab.spec.ts` — drop
-    the `hourlyRetention: buildHourlyRetention()` key (and the now-unused
-    `buildHourlyRetention` mock helper) from the DTO test fixture.
-  - Regenerate the frontend OpenAPI client so the generated
-    `RecallStatsDTO` TS type drops `hourlyRetention`/`HourRetention`.
-- **No external behavior change** — `bestHourRetentionPct`/`worstHourRetentionPct`
-  on `totals` are computed identically; verified by existing backend tests
-  (`bestAndWorstHourByRetentionWithMin5Guard`, unchanged) and the frontend
-  build/tests against the narrowed type.
-- **Status:** planned
+- Removed `hourlyRetention` / `HourRetention` from the public DTO. Best/worst
+  hour stay on `totals`, computed from `hourCorrect` / `hourAnswered` arrays.
+  No external behavior change.
+- **Status:** done
+- **Learning:** an internal `HourRetention` record was a leftover 24-slot wire
+  shape duplicating those arrays; it was deleted rather than relocated.
 
 ## Ordering rationale
 

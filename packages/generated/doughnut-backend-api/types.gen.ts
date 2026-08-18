@@ -925,13 +925,6 @@ export type HeadlineStats = {
     worstHourRetentionPct?: number;
 };
 
-export type HourRetention = {
-    hour?: number;
-    retentionPct?: number;
-    correctCount?: number;
-    answeredCount?: number;
-};
-
 export type RecallStatsDto = {
     calendar?: Array<DayCount>;
     trend?: Array<DayAvgResponseTime>;
@@ -939,7 +932,6 @@ export type RecallStatsDto = {
     amPm?: AmPmResponseTime;
     weekdayHourCounts?: Array<Array<number>>;
     weekdayHourCorrect?: Array<Array<number>>;
-    hourlyRetention?: Array<HourRetention>;
     totals?: HeadlineStats;
 };
 

@@ -6,7 +6,6 @@ import com.odde.doughnut.controllers.dto.RecallStatsDTO.DayAvgResponseTime;
 import com.odde.doughnut.controllers.dto.RecallStatsDTO.DayCount;
 import com.odde.doughnut.controllers.dto.RecallStatsDTO.DayRetention;
 import com.odde.doughnut.controllers.dto.RecallStatsDTO.HeadlineStats;
-import com.odde.doughnut.controllers.dto.RecallStatsDTO.HourRetention;
 import com.odde.doughnut.utils.TimestampOperations;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -39,7 +38,8 @@ final class RecallStatsAggregator {
       int totalReviews365,
       int reviewsToday,
       Double retentionPct365,
-      List<HourRetention> hourlyRetention) {
+      int[] hourCorrect,
+      int[] hourAnswered) {
     long totalTimeSpentMs = 0;
     TreeSet<LocalDate> dates = new TreeSet<>();
     for (RecallAnswerRow r : allTime) {
@@ -58,21 +58,19 @@ final class RecallStatsAggregator {
     Double bestPct = null;
     Integer worstHour = null;
     Double worstPct = null;
-    for (HourRetention hr : hourlyRetention) {
-      if (hr.getAnsweredCount() == null || hr.getAnsweredCount() < BEST_WORST_MIN_ANSWERED) {
+    for (int h = 0; h < 24; h++) {
+      int answered = hourAnswered[h];
+      if (answered < BEST_WORST_MIN_ANSWERED) {
         continue;
       }
-      Double pct = hr.getRetentionPct();
-      if (pct == null) {
-        continue;
-      }
+      Double pct = pct(hourCorrect[h], answered);
       if (bestPct == null || pct > bestPct) {
         bestPct = pct;
-        bestHour = hr.getHour();
+        bestHour = h;
       }
       if (worstPct == null || pct < worstPct) {
         worstPct = pct;
-        worstHour = hr.getHour();
+        worstHour = h;
       }
     }
     return new HeadlineStats(
@@ -139,17 +137,6 @@ final class RecallStatsAggregator {
         values[2].size(),
         trimmedMean(values[3]),
         values[3].size());
-  }
-
-  static List<HourRetention> buildHourlyRetention(int[] correct, int[] answered) {
-    List<HourRetention> list = new ArrayList<>();
-    for (int h = 0; h < 24; h++) {
-      int c = correct[h];
-      int a = answered[h];
-      Double pct = a >= MIN_SAMPLES ? pct(c, a) : null;
-      list.add(new HourRetention(h, pct, c, a));
-    }
-    return list;
   }
 
   static int currentStreak(TreeSet<LocalDate> dates, LocalDate today) {
