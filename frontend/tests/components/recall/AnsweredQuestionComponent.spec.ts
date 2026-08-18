@@ -7,17 +7,7 @@ import helper, { mockSdkService, mockShowNote } from "@tests/helpers"
 import { teardownGlobalClientForTesting } from "@/managedApi/clientSetup"
 import makeMe from "doughnut-test-fixtures/makeMe"
 import { refinementLayoutItems } from "./noteRefinementTestSupport"
-import { afterEach, beforeEach, describe, it, expect, vi } from "vitest"
-
-vi.mock("vue-router", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("vue-router")>()
-  return {
-    ...actual,
-    useRouter: () => ({
-      push: vi.fn(),
-    }),
-  }
-})
+import { afterEach, beforeEach, describe, it, expect } from "vitest"
 
 describe("AnsweredQuestionComponent", () => {
   let wrapper: VueWrapper | undefined
@@ -40,6 +30,7 @@ describe("AnsweredQuestionComponent", () => {
 
       wrapper = helper
         .component(AnsweredQuestionComponent)
+        .withRouter()
         .withProps({ answeredQuestion, conversationButton: false })
         .mount()
 
@@ -60,6 +51,7 @@ describe("AnsweredQuestionComponent", () => {
 
       wrapper = helper
         .component(AnsweredQuestionComponent)
+        .withRouter()
         .withProps({
           answeredQuestion: answeredQuestion1,
           conversationButton: false,
@@ -95,6 +87,7 @@ describe("AnsweredQuestionComponent", () => {
         .please()
       const chain = helper
         .component(AnsweredQuestionComponent)
+        .withRouter()
         .withCleanStorage()
       useStorageAccessor().value.refreshNoteRealm(noteRealm)
       return chain
@@ -165,6 +158,7 @@ describe("AnsweredQuestionComponent", () => {
         .please()
       const chain = helper
         .component(AnsweredQuestionComponent)
+        .withRouter()
         .withCleanStorage()
       useStorageAccessor().value.refreshNoteRealm(noteRealm)
       wrapper = chain

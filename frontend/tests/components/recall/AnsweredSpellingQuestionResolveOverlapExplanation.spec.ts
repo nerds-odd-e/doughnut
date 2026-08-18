@@ -23,9 +23,7 @@ describe("AnsweredSpellingQuestion resolve overlap explanation", () => {
 
   it("explains overlap meaning when resolve dialog list is shown", async () => {
     const { answeredQuestion } = accidentalMatchWithTwoMatchedNotes()
-    wrapper = mountAnsweredSpellingQuestion(answeredQuestion, {
-      withRouter: true,
-    })
+    wrapper = mountAnsweredSpellingQuestion(answeredQuestion)
     await flushPromises()
     await openResolveAccidentalMatch(wrapper)
 

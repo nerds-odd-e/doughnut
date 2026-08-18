@@ -59,7 +59,6 @@ describe("AnsweredSpellingQuestion accidental match", () => {
         notebookNames: ["Notebook Alpha", "Notebook Beta"],
       })
     wrapper = mountAnsweredSpellingQuestion(answeredQuestion, {
-      withRouter: true,
       seedRealms: [matchedA, matchedB],
     })
     await flushPromises()
@@ -107,9 +106,7 @@ describe("AnsweredSpellingQuestion accidental match", () => {
 
   it("dismisses resolve dialog via close button and stays on accidental-match result", async () => {
     const { answeredQuestion } = accidentalMatchWithTwoMatchedNotes()
-    wrapper = mountAnsweredSpellingQuestion(answeredQuestion, {
-      withRouter: true,
-    })
+    wrapper = mountAnsweredSpellingQuestion(answeredQuestion)
     await flushPromises()
     await openResolveAccidentalMatch(wrapper)
 
@@ -140,7 +137,6 @@ describe("AnsweredSpellingQuestion accidental match", () => {
     wrapper = mountAnsweredSpellingQuestion(answeredQuestion, {
       currentUser: makeMe.aUser.please(),
       seedRealms: [reviewedRealm, matchedA, matchedB],
-      withRouter: true,
     })
     await flushPromises()
     await openResolveAccidentalMatch(wrapper)
@@ -201,7 +197,6 @@ describe("AnsweredSpellingQuestion accidental match", () => {
     wrapper = mountAnsweredSpellingQuestion(answeredQuestion, {
       currentUser: makeMe.aUser.please(),
       seedRealms: [reviewedRealm, matchedA, matchedB],
-      withRouter: true,
     })
     await flushPromises()
     await openResolveAccidentalMatch(wrapper)
@@ -229,7 +224,6 @@ describe("AnsweredSpellingQuestion accidental match", () => {
 
     wrapper = mountAnsweredSpellingQuestion(answeredQuestion, {
       currentUser: makeMe.aUser.please(),
-      withRouter: true,
     })
     await flushPromises()
     await openResolveAccidentalMatch(wrapper)

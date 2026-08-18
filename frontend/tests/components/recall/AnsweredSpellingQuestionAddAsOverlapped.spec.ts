@@ -37,7 +37,6 @@ describe("AnsweredSpellingQuestion add as overlapped note", () => {
     wrapper = mountAnsweredSpellingQuestion(answeredQuestion, {
       currentUser: makeMe.aUser.please(),
       seedRealms: [reviewedRealm, matchedA, matchedB],
-      withRouter: true,
     })
     await flushPromises()
     await openResolveAccidentalMatch(wrapper)
@@ -89,7 +88,6 @@ describe("AnsweredSpellingQuestion add as overlapped note", () => {
     wrapper = mountAnsweredSpellingQuestion(answeredQuestion, {
       currentUser: makeMe.aUser.please(),
       seedRealms: [reviewedWithOverlap, matchedA, matchedB],
-      withRouter: true,
     })
     await flushPromises()
     await openResolveAccidentalMatch(wrapper)
@@ -122,7 +120,6 @@ describe("AnsweredSpellingQuestion add as overlapped note", () => {
     wrapper = mountAnsweredSpellingQuestion(answeredQuestion, {
       currentUser: makeMe.aUser.please(),
       seedRealms: [reviewedWithAlias, matchedA, matchedB],
-      withRouter: true,
     })
     await flushPromises()
     await openResolveAccidentalMatch(wrapper)

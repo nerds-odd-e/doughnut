@@ -9,17 +9,6 @@ import { buildWikiLinkText } from "@/utils/buildWikiLinkText"
 import helper from "@tests/helpers"
 import makeMe from "doughnut-test-fixtures/makeMe"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
-import { vi } from "vitest"
-
-vi.mock("vue-router", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("vue-router")>()
-  return {
-    ...actual,
-    useRouter: () => ({
-      push: vi.fn(),
-    }),
-  }
-})
 
 const noteShowStub = {
   name: "NoteShow",
@@ -33,16 +22,13 @@ export function mountAnsweredSpellingQuestion(
   options: {
     currentUser?: User
     seedRealms?: NoteRealm[]
-    withRouter?: boolean
   } = {}
 ) {
   let chain = helper
     .component(AnsweredSpellingQuestion)
     .withCleanStorage()
     .withProps({ answeredQuestion })
-  if (options.withRouter) {
-    chain = chain.withRouter()
-  }
+    .withRouter()
   if (options.currentUser) {
     chain = chain.withCurrentUser(options.currentUser)
   }
