@@ -41,15 +41,11 @@ Removed leftover first-Again pins. `firstScoreZeroOrOneOnNewPersistsD0Again` is 
 ### 3. Tutor 2 on New first-rates at the outcome map, not inside shrink
 
 - **Type:** Structure
-- **Status:** planned
+- **Status:** done
 
-Enables slice 4 (New check only remains on the forgetting curve).
+`recordFeedback` routes `SHRINK` + New (`S = 0`) to `recalledHard`; `S > 0` to shrink. Shrink helper is 80% only. RecallLog `SHRINK` vs `HARD` unchanged.
 
-`MemoryTracker.shrinkStability` / `MemoryTrackerShrinkStability` currently first-rates Hard when `isNewlyAssimilated()`. The method name is shrink; Hard first-rating is Tutor **2** on New. Put that branch on `CommissionedLearningSessionFeedbackScheduling.recordFeedback` (`SHRINK` + New → `recalledHard`; `S > 0` → `shrinkStability`). Shrink helper only does 80% and does not call `recalledHard`.
-
-No product change: `firstScoreTwoOrThreeOnNewPersistsD0Hard` and `onTimeSecondScoreTwoShrinksStabilityAndLeavesDifficultyUnchanged` still pass. Do not change RecallLog `SHRINK` vs `HARD`.
-
-**Done when:** shrink helper has no New/Hard branch; commissioned first **2** and graded shrink tests still pass.
+**Learning for slice 4:** outcome map currently uses `getStability() > 0`, not `isNewlyAssimilated()`. Rename the predicate and use it there too so New is one check.
 
 ### 4. Call New what the glossary calls New
 

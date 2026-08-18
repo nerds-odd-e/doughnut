@@ -39,7 +39,13 @@ public final class CommissionedLearningSessionFeedbackScheduling {
       case EASY -> tracker.recalledEasily(now);
       case GOOD -> tracker.recalledSuccessfully(now, null);
       case HARD -> tracker.recalledHard(now);
-      case SHRINK -> tracker.shrinkStability(now);
+      case SHRINK -> {
+        if (tracker.getStability() > 0) {
+          tracker.shrinkStability(now);
+        } else {
+          tracker.recalledHard(now);
+        }
+      }
       case AGAIN, AGAIN_ZERO -> tracker.recalledAgain(now);
       case CONFUSION ->
           throw new IllegalArgumentException("CONFUSION is not a tutor feedback outcome");
