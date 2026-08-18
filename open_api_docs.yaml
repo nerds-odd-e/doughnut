@@ -4892,15 +4892,6 @@ components:
         retentionPct:
           type: number
           format: double
-        correctCount:
-          type: integer
-          format: int32
-        answeredCount:
-          type: integer
-          format: int32
-        sampleSize:
-          type: integer
-          format: int32
     HeadlineStats:
       type: object
       properties:

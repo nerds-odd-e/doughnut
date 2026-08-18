@@ -1,6 +1,6 @@
 # Recall-stats FSRS alignment — cleanup + Requested-retention adoption
 
-**Status:** in progress (slices 1–3 done)
+**Status:** in progress (slices 1–4 done)
 **Scope:** everything surfaced by the FSRS-compatibility-gap analysis of recall
 stats (chat 2026-08-18), refined into small-commit-size slices: one
 correctness bug (1), one Requested-retention adoption arc (2 docs → 3 code),
@@ -90,26 +90,13 @@ Full analysis is in the chat transcript, not duplicated here. Short version:
 ### 4. Cleanup: drop unread retention-count fields from `DayRetention` (Structure)
 
 - Removes `DayRetention.correctCount`, `DayRetention.answeredCount`,
-  `DayRetention.sampleSize` (three fields, one record) — confirmed zero
-  references anywhere under `frontend/src`. `DayAvgResponseTime.sampleSize`
-  is a **different** concept (valid response-time sample count) and stays
-  untouched.
-- **Files:**
-  - `backend/src/main/java/com/odde/doughnut/controllers/dto/RecallStatsDTO.java` —
-    trim the `DayRetention` record to `(date, retentionPct)`.
-  - `backend/src/main/java/com/odde/doughnut/services/RecallStatsAggregator.java` —
-    update the `buildRetentionTrend` constructor call.
-  - `backend/src/test/java/com/odde/doughnut/services/RecallStatsServiceTest.java` —
-    drop the three now-nonexistent-field assertions in
-    `perDayRetentionIsCorrectOverAnsweredWithGuard` (lines ~113/115/116:
-    `getAnsweredCount()` × 2, `getCorrectCount()` × 1); keep the
-    `retentionPct` assertions, the only externally-observable part.
-  - Regenerate the frontend OpenAPI client (`generate-api-client` skill) so
-    the `DayRetention` TS type narrows accordingly; confirm no frontend file
-    breaks (none should, per the grep above).
-- **No external behavior change** — verified by the trimmed backend test
-  and the frontend build/tests passing against the narrowed generated type.
-- **Status:** planned
+  `DayRetention.sampleSize` — zero `frontend/src` readers.
+  `DayAvgResponseTime.sampleSize` stays. No external behavior change.
+- **Status:** done
+- **Learning:** frontend test fixtures also needed the extra fields dropped
+  (`RetentionTrendChart.spec.ts`, `RecallStatsSettingsTab.spec.ts`).
+  `RecallStatsAggregator` is 246 lines — slice 5 relocating `HourRetention`
+  into that file will likely need a split to stay under 250.
 
 ### 5. Cleanup: stop exposing `hourlyRetention` on the wire — it's server-internal (Structure)
 

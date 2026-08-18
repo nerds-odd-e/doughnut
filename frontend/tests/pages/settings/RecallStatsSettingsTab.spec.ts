@@ -42,9 +42,6 @@ function buildRetentionTrend(): DayRetention[] {
     days.push({
       date: `1989-02-${String((i % 28) + 1).padStart(2, "0")}`,
       retentionPct: sufficient ? 75 : undefined,
-      correctCount: sufficient ? 3 : 1,
-      answeredCount: sufficient ? 4 : 1,
-      sampleSize: sufficient ? 4 : 1,
     })
   }
   return days

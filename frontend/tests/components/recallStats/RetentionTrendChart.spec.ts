@@ -15,19 +15,13 @@ describe("RetentionTrendChart", () => {
         retentionTrend.push({
           date: `1989-02-${String(i + 1).padStart(2, "0")}`,
           retentionPct: 60 + (i % 30),
-          correctCount: 3,
-          answeredCount: 4,
-          sampleSize: 4,
         })
       } else {
         insufficient++
-        // Insufficient: retentionPct null (NOT 0 or 100), answeredCount < 3
+        // Insufficient: retentionPct null (NOT 0 or 100)
         retentionTrend.push({
           date: `1989-02-${String(i + 1).padStart(2, "0")}`,
           retentionPct: undefined,
-          correctCount: 1,
-          answeredCount: 1,
-          sampleSize: 1,
         })
       }
     }
@@ -62,9 +56,6 @@ describe("RetentionTrendChart", () => {
       retentionTrend.push({
         date: `1989-02-${String(i + 1).padStart(2, "0")}`,
         retentionPct: 60 + (i % 30),
-        correctCount: 3,
-        answeredCount: 4,
-        sampleSize: 4,
       })
     }
     const wrapper = helper

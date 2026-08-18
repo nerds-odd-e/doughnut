@@ -124,7 +124,7 @@ final class RecallStatsAggregator {
       int correct = ret[0];
       int answered = ret[1];
       Double pct = answered >= MIN_SAMPLES ? pct(correct, answered) : null;
-      trend.add(new DayRetention(date.format(ISO_DATE), pct, correct, answered, answered));
+      trend.add(new DayRetention(date.format(ISO_DATE), pct));
     }
     return trend;
   }

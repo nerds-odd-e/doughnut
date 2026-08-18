@@ -36,9 +36,6 @@ public class RecallStatsDTO {
   public static class DayRetention {
     private String date;
     private Double retentionPct;
-    private Integer correctCount;
-    private Integer answeredCount;
-    private Integer sampleSize;
   }
 
   @Data

@@ -909,9 +909,6 @@ export type DayCount = {
 export type DayRetention = {
     date?: string;
     retentionPct?: number;
-    correctCount?: number;
-    answeredCount?: number;
-    sampleSize?: number;
 };
 
 export type HeadlineStats = {

@@ -110,10 +110,7 @@ class RecallStatsServiceTest {
                   answered(utc(8, 13), 5000, false, null)));
       RecallStatsDTO dto = aggregate(rows, now);
       assertThat(dayRet(dto, "1989-01-10").getRetentionPct(), nullValue());
-      assertThat(dayRet(dto, "1989-01-10").getAnsweredCount(), equalTo(2));
       assertThat(dayRet(dto, "1989-01-09").getRetentionPct(), closeTo(75.0, 0.01));
-      assertThat(dayRet(dto, "1989-01-09").getCorrectCount(), equalTo(3));
-      assertThat(dayRet(dto, "1989-01-09").getAnsweredCount(), equalTo(4));
     }
 
     @Test
