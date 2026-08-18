@@ -6,10 +6,12 @@ import {
 } from "@/utils/wikiLinkDomMarkers"
 import {
   authoredLinkOccurrences,
+  splitWikiLinkInner,
+} from "@/utils/authoredLinkMarkup"
+import {
   escapeHtmlAttributeValue,
   escapeHtmlForWikiLinkDisplay,
   isValidWikiLinkInner,
-  splitWikiLinkInner,
   wikiAnchorToMarkdownToken,
   wikiLinkBracketedInnerHtml,
   wikiTitleNoteIdLookup,

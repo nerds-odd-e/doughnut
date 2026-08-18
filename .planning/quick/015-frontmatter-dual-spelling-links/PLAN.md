@@ -1,6 +1,6 @@
 # Plan: Frontmatter dual-spelling wiki links
 
-**Status:** planned
+**Status:** in progress
 
 **Goal:** YAML frontmatter inter-note links use the same dual-spelling as the body (wiki default, path Markdown accepted, no conversion). One token API so the next wiki-link change does not add another regex. Do not convert stored wiki to paths. Do not treat a bare YAML path as a link.
 
@@ -11,7 +11,7 @@ Inspection after locking Proposed [ADR 0004](../../../docs/adrs/0004-okf-compati
 - Wiki is Doughnut-authored (`formatRelationshipNoteMarkdown`, overlap insert, product insert).
 - Path Markdown `[display](/folder/File.md)` in a YAML scalar or list item is the same link. No `[[…]]` ↔ `[…](…)` conversion. No backfill.
 - A bare YAML path (`source: /folder/File.md`) is not a link.
-- Frontend markdown/YAML consumers go through `wikiLinkMarkup` (TS mirror of `WikiLinkMarkdown`). Do not add a third occurrence regex.
+- Frontend markdown/YAML consumers go through `authoredLinkMarkup` (TS mirror of `WikiLinkMarkdown`; extracted from `wikiLinkMarkup`). Do not add a third occurrence regex. `wikiLinkMarkup` stays click/DOM helpers.
 - Backend overlaps whole-item check uses `WikiLinkMarkdown` (extend `isWellFormedWholeLinkToken`; do not add a second parser).
 - `replaceWikiLinksInHtml` stays the HTML body path. Do not merge HTML and markdown token walks here.
 - ADR 0004 stays Proposed. Do not accept it here.
@@ -27,7 +27,7 @@ Inspection after locking Proposed [ADR 0004](../../../docs/adrs/0004-okf-compati
 
 - Backend resolve, cache, rename rewrite, and reduce-on-delete already scan frontmatter via `NoteContentMarkdown.authoredTokensInOccurrenceOrder` (wiki + path Markdown). Stored wiki `source: "[[Sedition]]"` is already the default form.
 - Wiki-only leftovers are product parsers, not missing data:
-  - `propertyValuePlainToDisplayHtml` only linkifies `[[…]]` (relationship `source` / `target` scalars).
+  - `propertyValuePlainToDisplayHtml` walks `authoredLinkOccurrences` but still only linkifies wiki; path Markdown stays escaped until slice 2.
   - `qualifyRelationNoteForReduceOnDelete` uses a private wiki regex; backend would already resolve a path-Markdown source.
   - `parseWholeWikiLinkItem` / `WikiLinkToken` / overlaps validation / `WikiLinkMarkdown.isWellFormedWholeLinkToken` require a whole `[[…]]` item.
   - `hasNewWikiLinkTexts` only sees `[[…]]`, so a new path-Markdown link does not flush the editor.
@@ -37,9 +37,11 @@ Inspection after locking Proposed [ADR 0004](../../../docs/adrs/0004-okf-compati
 ### 1. Authored-link occurrences live in wikiLinkMarkup
 
 - **Type:** Structure
-- **Status:** planned
+- **Status:** done
 
-Add `authoredLinkOccurrences` (wiki + path Markdown, document order) on `wikiLinkMarkup`, mirroring `WikiLinkMarkdown.authoredTokensInOccurrenceOrder` / `splitAuthoredToken`. Switch `propertyValuePlainToDisplayHtml` wiki matching to those wiki occurrences. Path occurrences exist but are still rendered as escaped text this slice. Existing `propertyValueField.spec.ts` wiki cases pass. No user-facing change.
+`authoredLinkOccurrences` / `splitAuthoredToken` live in `frontend/src/utils/authoredLinkMarkup.ts` (file-size split from `wikiLinkMarkup`). Wiki `token` is the inner; path `token` is the full `[display](/href)`; `start`/`end` span the original substring. `propertyValuePlainToDisplayHtml` walks those occurrences; wiki still live/dead HTML; path still escaped text.
+
+**Learning:** later frontend slices import from `authoredLinkMarkup`, not a new regex. Product commit landed early as `a66ef8721a` (mixed with unrelated `.planning/quick/016-dual-spelling-leftovers/`); wrap-up is the extract + this plan update.
 
 ### 2. Path Markdown in a frontmatter scalar is a live or dead link
 
@@ -48,7 +50,7 @@ Add `authoredLinkOccurrences` (wiki + path Markdown, document order) on `wikiLin
 
 **Pre:** a relationship note’s YAML has `source: "[Moon](/Moon.md)"` (and a wiki `target`), stored spelling unchanged. **Trigger:** open the note (rich property row). **Post:** the source value shows the same live wiki-link UI as a body path-Markdown link to Moon (dead UI if unresolved); markdown source still contains `[Moon](/Moon.md)`, not `[[Moon]]`.
 
-Drive `propertyValuePlainToDisplayHtml` / mounted `PropertyValueField` with path-Markdown scalars; E2E on `e2e_test/features/relationships/add_relationship.feature` (edit YAML or seed content; do not change Doughnut-authored create, which stays wiki). `serializePropertyValueFieldRoot` already round-trips path Markdown via `wikiAnchorToMarkdownToken`.
+Drive `propertyValuePlainToDisplayHtml` / mounted `PropertyValueField` with path-Markdown scalars; linkify `kind === "pathMarkdown"` occurrences (scanner already returns them). E2E on `e2e_test/features/relationships/add_relationship.feature` (edit YAML or seed content; do not change Doughnut-authored create, which stays wiki). `serializePropertyValueFieldRoot` already round-trips path Markdown via `wikiAnchorToMarkdownToken`.
 
 ### 3. Reducing a relationship whose source is path Markdown
 
@@ -75,7 +77,7 @@ Drive `propertyValuePlainToDisplayHtml` / mounted `PropertyValueField` with path
 
 **Pre:** the note content editor is open. **Trigger:** the next content introduces `[label](/Folder/Title.md)` (not only `[[Title]]`). **Post:** the editor flushes immediately, same as a new wiki token.
 
-`hasNewWikiLinkTexts` uses authored occurrences from slice 1. Extend `noteContentWikiLinks.spec.ts`. Existing wiki flush cases still pass.
+`hasNewWikiLinkTexts` uses `authoredLinkOccurrences` from `authoredLinkMarkup`. Extend `noteContentWikiLinks.spec.ts`. Existing wiki flush cases still pass.
 
 ## Coordination
 
