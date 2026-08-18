@@ -8,7 +8,7 @@ status: ready
 stopped_at: null
 last_updated: "2026-08-18T01:13:00Z"
 last_activity: 2026-08-18
-last_activity_desc: "FSRS-6 first-rating closed: New Hard/Good/Easy use S0/D0"
+last_activity_desc: "Dropped spent first-rating plan; New success uses FSRS-6 S0/D0"
 progress:
   total_phases: 0
   completed_phases: 0
