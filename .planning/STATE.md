@@ -6,9 +6,9 @@ current_phase: null
 current_phase_name: null
 status: ready
 stopped_at: null
-last_updated: "2026-08-18T00:05:00Z"
+last_updated: "2026-08-18T00:11:00Z"
 last_activity: 2026-08-18
-last_activity_desc: "B4 closed: no lapse count in ADR 0003 memory state; remaining FSRS gap is E3/E4 plus accept ADR 0003"
+last_activity_desc: "Dropped spent quick plans 003 and 004; leftover MCQ/recall-prompt nouns parked as SEED-005"
 progress:
   total_phases: 0
   completed_phases: 0

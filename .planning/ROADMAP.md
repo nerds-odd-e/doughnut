@@ -13,7 +13,7 @@ No active milestone. Start the next one with `/gsd-new-milestone`.
 
 ## Backlog
 
-Parked elsewhere: SEED-001, SEED-002, SEED-003, ADR 0002 Level 1.
+Parked elsewhere: SEED-001, SEED-002, SEED-003, SEED-005, ADR 0002 Level 1.
 
 ---
-*Last updated: 2026-08-10 — v1.3 shipped; post-v1.3 CLS refactor done; no active milestone*
+*Last updated: 2026-08-18 — spent quick plans 003/004 dropped; leftover MCQ nouns parked as SEED-005*
