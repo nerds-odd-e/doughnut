@@ -2,14 +2,14 @@
 
 **Status:** planned
 
-**Goal:** After 014 (dead path-Markdown retarget, co-move matching, first pass of overlapping tests), fix the leftover user-visible retarget bug and finish pinning dual-spelling at one stable boundary. Do not reopen conversion, P9, or frontmatter (015).
+**Goal:** After 014 (dead path-Markdown retarget, co-move matching, first pass of overlapping tests), fix the leftover user-visible retarget bug and finish pinning dual-spelling at one stable boundary. Do not reopen conversion, P9, or frontmatter dual-spelling.
 
 Inspection of commits `97c91ba7e3`, `d3f1271066`, `94ffdf077d`. Do not execute until asked.
 
 ## Locked for this plan
 
 - No conversion of stored `[[…]]` ↔ `[…](…)`.
-- Do not unify Java `isConceptPathHref` with TS `hrefLooksLikeConceptNotePath` (cross-subsystem; 015 also locked this out).
+- Do not unify Java `isConceptPathHref` with TS `hrefLooksLikeConceptNotePath` (cross-subsystem).
 - Frontend path-Markdown detection for a `WikiTitle` uses the existing concept-path helper, not a second `startsWith("/")` rule.
 - Redundant tests: keep one stable boundary (controller, mounted `SearchForm` / `NoteTextContent`, or E2E). Delete algorithm/HTML tests that only re-assert that outcome.
 - ADR 0004 stays Proposed. Do not accept it here.
@@ -22,7 +22,7 @@ Inspection of commits `97c91ba7e3`, `d3f1271066`, `94ffdf077d`. Do not execute u
 - `NoteTextContent.wikiLinks` live/dead path display vs E2E open+persist (E2E unique: follow the link and round-trip markdown).
 - Editor Turndown rows and “dead path Markdown upgrades to live” in `replaceWikiLinksInHtml` / `quillHtmlToMarkdown` (014 kept these).
 - Pre-existing wiki retarget overlap (`wiki_link.feature` vs SearchForm wiki case).
-- 015 frontmatter dual-spelling.
+- Frontmatter dual-spelling (wiki default, path Markdown accepted, no conversion).
 
 ## Discoveries
 

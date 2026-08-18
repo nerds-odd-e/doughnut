@@ -36,7 +36,7 @@ In the product (not the ZIP), titles live in a column (max 150). Doughnut-author
 
 Remaining besides **P9**: collision basenames (identity is folder path + title, not `Recipe (2).md`).
 
-Frontmatter `source` / `target` / `overlaps` are **wiki links**, not OKF §6.2 path-valued fields. Wiki default; path Markdown accepted; no conversion; no backfill. Product holes (wiki-only property display, reduce-on-delete, overlaps whole-item, editor flush) are [015](../quick/015-frontmatter-dual-spelling-links/PLAN.md), not remaining codec conversion.
+Frontmatter `source` / `target` / `overlaps` are **wiki links**, not OKF §6.2 path-valued fields. Wiki default; path Markdown accepted; no conversion; no backfill. Product dual-spelling for YAML scalars, reduce-on-delete, whole overlaps items, and editor flush is closed — not remaining codec conversion.
 
 Lossless round-trip (ADR 0004 Decision) is not implemented: there is no inverse of the ZIP codec.
 

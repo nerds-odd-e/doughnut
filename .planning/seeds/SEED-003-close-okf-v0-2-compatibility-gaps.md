@@ -24,7 +24,7 @@ Also surface when changing inter-note link spelling (wiki vs path Markdown). Do 
 **Large** — remaining work is profile accept plus a lossless codec (and later accept/lint):
 
 1. Humans accept Proposed [ADR 0004](../../docs/adrs/0004-okf-compatible-notebook-markdown.md). See `docs/adrs/README.md`.
-2. Remaining codec work: **P9**, collision basenames (identity is folder path + title, not `Recipe (2).md`). Tracker: [OKF-COMPATIBILITY-GAP.md](../research/OKF-COMPATIBILITY-GAP.md). Frontmatter dual-spelling holes: [015](../quick/015-frontmatter-dual-spelling-links/PLAN.md).
+2. Remaining codec work: **P9**, collision basenames (identity is folder path + title, not `Recipe (2).md`). Tracker: [OKF-COMPATIBILITY-GAP.md](../research/OKF-COMPATIBILITY-GAP.md). Frontmatter dual-spelling product holes are closed (wiki default, path Markdown accepted, no conversion).
 
 ## Breadcrumbs
 
