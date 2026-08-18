@@ -85,6 +85,13 @@ profile. Codec round-trips must be lossless for these rules.
   `[[target|display]]`. Product insert stays wiki. Unqualified `[[Title]]` is
   unchanged (lowest note id when titles collide across folders).
   `Notebook:Title` is unchanged.
+- These rules apply to the **body and to YAML frontmatter values** (scalars
+  and one-level list items), including relationship `source` / `target` and
+  `overlaps` items. Doughnut-authored frontmatter stays wiki. Path Markdown
+  in those values is the same link. No conversion. A bare YAML path
+  (`source: /folder/File.md`) is not a link. OKF §6.2 path-valued fields
+  (`resource`, `sources[].resource`, …) are a different key family;
+  Doughnut relationship endpoints are not those fields.
 - Path Markdown `[display](/folder/File.md)` is the same link as
   `[[folder/File|display]]`. Leading `/` on Markdown hrefs is bundle-relative
   (notebook root). Wiki path form has no leading `/`.
@@ -121,8 +128,10 @@ profile. Codec round-trips must be lossless for these rules.
   renames is ADR 0002 lineage.
 - `title:` on the portable tree is codec wrap when the filename cannot
   round-trip; stored notes keep the title column.
-- Inter-note links are dual-spelling: Doughnut writes wiki; path Markdown
-  stays as authored. ZIP does not rewrite wiki to path Markdown.
+- Inter-note links are dual-spelling in body and frontmatter: Doughnut
+  writes wiki; path Markdown stays as authored. ZIP does not rewrite wiki
+  to path Markdown. Wiki in Doughnut-authored YAML is the same profile
+  exception as wiki in the body.
 - Obsidian and OKF consumers can open a Doughnut notebook tree. Public
   identity in the files is the path, except a user-insisted concept
   `index.md` / `log.md`, which OKF tools may treat as a listing/log or reject.
