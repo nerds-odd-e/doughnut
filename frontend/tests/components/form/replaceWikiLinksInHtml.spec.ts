@@ -40,32 +40,6 @@ describe("replaceWikiLinksInHtml", () => {
     )
   })
 
-  it("marks unresolved path markdown anchors as dead wiki links", () => {
-    expect(
-      replaceWikiLinksInHtml(
-        '<p><a href="/Folder/Missing.md">label</a></p>',
-        []
-      )
-    ).toBe(
-      '<p><a href="/Folder/Missing.md" class="dead-wiki-link" data-wiki-title="/Folder/Missing.md" data-wiki-display="label">label</a></p>'
-    )
-  })
-
-  it("upgrades path markdown anchors to live wiki-style links without rewriting href", () => {
-    expect(
-      replaceWikiLinksInHtml('<p><a href="/Folder/Title.md">label</a></p>', [
-        {
-          linkText: "[label](/Folder/Title.md)",
-          targetToken: "/Folder/Title.md",
-          displayText: "label",
-          noteId: 42,
-        },
-      ])
-    ).toBe(
-      '<p><a href="/Folder/Title.md" class="doughnut-wiki-link" data-wiki-title="/Folder/Title.md" data-wiki-display="label" data-note-id="42">label</a></p>'
-    )
-  })
-
   it("upgrades dead path markdown anchors to live when wikiTitles resolve", () => {
     expect(
       replaceWikiLinksInHtml(

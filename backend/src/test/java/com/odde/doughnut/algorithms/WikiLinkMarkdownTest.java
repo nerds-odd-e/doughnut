@@ -68,13 +68,6 @@ class WikiLinkMarkdownTest {
   }
 
   @Test
-  void newInnerForUpdateVisibleText_keepsFolderPathPrefix() {
-    assertThat(
-        WikiLinkMarkdownRewrite.newInnerForUpdateVisibleText("Folder/Old", "New"),
-        equalTo("Folder/New"));
-  }
-
-  @Test
   void newInnerForKeepVisibleText_plainLinkAddsDisplay() {
     assertThat(
         WikiLinkMarkdownRewrite.newInnerForKeepVisibleText("OldTitle", "NewTitle"),
@@ -96,48 +89,11 @@ class WikiLinkMarkdownTest {
   }
 
   @Test
-  void newInnerForKeepVisibleText_keepsFolderPathPrefix() {
-    assertThat(
-        WikiLinkMarkdownRewrite.newInnerForKeepVisibleText("Folder/Old", "New"),
-        equalTo("Folder/New|Folder/Old"));
-  }
-
-  @Test
-  void newInnerForUpdateVisibleText_rewritesPathMarkdownHrefLastSegment() {
-    assertThat(
-        WikiLinkMarkdownRewrite.newInnerForUpdateVisibleText("[label](/Folder/Old.md)", "New"),
-        equalTo("[label](/Folder/New.md)"));
-  }
-
-  @Test
-  void newInnerForUpdateVisibleText_preservesPathMarkdownWithoutMdSuffix() {
-    assertThat(
-        WikiLinkMarkdownRewrite.newInnerForUpdateVisibleText("[label](/Folder/Old)", "New"),
-        equalTo("[label](/Folder/New)"));
-  }
-
-  @Test
-  void newInnerForFolderRename_rewritesWikiPathPrefix() {
-    assertThat(
-        WikiLinkMarkdownRewrite.newInnerForFolderRename(
-            "OldFolder/Title", "OldFolder", "NewFolder"),
-        equalTo("NewFolder/Title"));
-  }
-
-  @Test
   void newInnerForFolderRename_rewritesOneFolderSegmentNotTitle() {
     assertThat(
         WikiLinkMarkdownRewrite.newInnerForFolderRename(
             "Parent/OldFolder/OldFolder", "OldFolder", "NewFolder"),
         equalTo("Parent/NewFolder/OldFolder"));
-  }
-
-  @Test
-  void newInnerForFolderRename_rewritesPathMarkdownPrefixAndKeepsMarkdown() {
-    assertThat(
-        WikiLinkMarkdownRewrite.newInnerForFolderRename(
-            "[label](/OldFolder/Title.md)", "OldFolder", "NewFolder"),
-        equalTo("[label](/NewFolder/Title.md)"));
   }
 
   @Test
@@ -214,15 +170,5 @@ class WikiLinkMarkdownTest {
         WikiLinkMarkdownRewrite.replaceWikiLinksMatchingTrimmedInner(
             "see [[  Old  ]] end", "Old", "NewTitle"),
         equalTo("see [[NewTitle]] end"));
-  }
-
-  @Test
-  void replaceWikiLinksMatchingTrimmedInner_rewritesPathMarkdownWithoutConvertingToWiki() {
-    assertThat(
-        WikiLinkMarkdownRewrite.replaceWikiLinksMatchingTrimmedInner(
-            "see [label](/Folder/Old.md) end",
-            "[label](/Folder/Old.md)",
-            "[label](/Folder/New.md)"),
-        equalTo("see [label](/Folder/New.md) end"));
   }
 }

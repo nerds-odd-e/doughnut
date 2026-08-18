@@ -13,7 +13,7 @@ Inspection after locking Proposed [ADR 0004](../../../docs/adrs/0004-okf-compati
 - A bare YAML path (`source: /folder/File.md`) is not a link.
 - Frontend markdown/YAML consumers go through `wikiLinkMarkup` (TS mirror of `WikiLinkMarkdown`). Do not add a third occurrence regex.
 - Backend overlaps whole-item check uses `WikiLinkMarkdown` (extend `isWellFormedWholeLinkToken`; do not add a second parser).
-- `replaceWikiLinksInHtml` stays the HTML body path ([014](../014-dual-spelling-link-followup/PLAN.md)). Do not merge HTML and markdown token walks here.
+- `replaceWikiLinksInHtml` stays the HTML body path. Do not merge HTML and markdown token walks here.
 - ADR 0004 stays Proposed. Do not accept it here.
 
 ## Out of this plan
@@ -79,4 +79,4 @@ Drive `propertyValuePlainToDisplayHtml` / mounted `PropertyValueField` with path
 
 ## Coordination
 
-If [014](../014-dual-spelling-link-followup/PLAN.md) is in progress, do not edit `wikiLinkMarkup.ts` in parallel. 014 owns HTML body retarget; this plan owns markdown/YAML token consumers.
+Body path-Markdown retarget and co-move matching are on main. This plan owns markdown/YAML token consumers.
