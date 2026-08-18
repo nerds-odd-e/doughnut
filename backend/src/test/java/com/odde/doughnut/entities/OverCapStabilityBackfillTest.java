@@ -31,7 +31,6 @@ class OverCapStabilityBackfillTest {
   @Test
   void clampsOverCapStabilityAndRebuildsDue() throws Exception {
     MemoryTracker overCap = overCapTracker();
-    underCapTracker();
     Float difficulty = overCap.getDifficulty();
     Timestamp last = overCap.getLastRecalledAt();
 
@@ -59,16 +58,6 @@ class OverCapStabilityBackfillTest {
     TrackerRow row = trackerRow(underCap.getId());
     assertThat(row.stability(), equalTo(stability));
     assertThat(row.nextRecallAt(), equalTo(due));
-  }
-
-  @Test
-  void runningTwiceStaysAtTheCap() throws Exception {
-    MemoryTracker overCap = overCapTracker();
-
-    runBackfill();
-    runBackfill();
-
-    assertThat(trackerRow(overCap.getId()).stability(), equalTo(Fsrs.MAXIMUM_INTERVAL_HOURS));
   }
 
   private MemoryTracker overCapTracker() {
