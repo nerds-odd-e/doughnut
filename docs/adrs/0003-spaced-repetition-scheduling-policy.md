@@ -68,9 +68,23 @@ change the schedule.
 
 Difficulty is persisted memory state in `[1, 10]`. It is shown on the Memory Tracker page (Information card), next to Stability, as the number returned by the API or **N/A** when unset (New / assimilate-only). Harder items gain less Stability on a successful recall. A correct recall also updates Difficulty with Good next-D (see **Difficulty after a mapped grade**).
 
-A newly assimilated tracker is **New**: Stability 0, Difficulty unset, due now. Assimilation is not a grade. The first real correct recall initializes Difficulty to **5** and Stability to **24** hours (short first interval; 12 hours is a later tweak). Existing trackers that already have positive Stability or a recall count are migrated to Difficulty **5**.
+A newly assimilated tracker is **New**: Stability 0, Difficulty unset, due now. Assimilation is not a grade. The first mapped success initializes Stability and Difficulty with FSRS-6 first-rating (see **First rating on New**). Difficulty **5** remains only as the fallback when Stability > 0 and Difficulty is null.
 
 Ordinary correct recall with Stability > 0 updates Stability with open-FSRS-6 Good-equivalent rules (own implementation) and Difficulty with Good next-D. Locked overdue extra growth still holds.
+
+### First rating on New
+
+First mapped **success** on a New tracker (ordinary correct / just review Yes / Tutor **4** Good, Tutor **3** Hard, Tutor **5** Easy) uses published FSRS-6 first-rating (own implementation, frozen `Fsrs.W`):
+
+- Stability `S0(G) = w[G−1]` days, persisted as whole hours. With frozen weights: Good **55**, Hard **31**, Easy **199**.
+- Difficulty is `D0(G)` clamped to `[1, 10]`, persisted as the Java float from that formula (API number, no extra rounding). Persisted first Easy Difficulty is **1**.
+- `D0(Easy)` stays **unclamped** as the later mean-reversion target (see **Difficulty after a mapped grade**).
+- Elapsed time and thinking time do **not** change first-rating. Overdue extra does not apply.
+- Due is `lastRecalledAt` plus those hours.
+
+New Again / Tutor **0/1/2** stay New (Stability 0, Difficulty unset; due +24h from the strictly-future fallback). Already-graded rows are not backfilled. No Flyway.
+
+The 24-hour strictly-future fallback is named separately from first-success Stability.
 
 ### Difficulty after a mapped grade
 
@@ -81,7 +95,7 @@ When Stability > 0, a mapped grade updates Difficulty with published open FSRS-6
 - `D'' = w7 · D0(Easy) + (1 − w7) · D'`, then clamp to `[1, 10]`
 - `D0(G) = w4 − e^{w5·(G−1)} + 1`; **`D0(Easy)` is unclamped** `D0(4)` (negative with default weights)
 
-`G`: Again=1, Hard=2, Good=3, Easy=4 (`Fsrs.AGAIN` / `HARD` / `GOOD` / `EASY`). Existing persisted Difficulty is **not** backfilled. New init stays Difficulty **5** (not `D0(G)`). Tutor **2** and confusion do not change Difficulty. Display is the API number (no extra rounding).
+`G`: Again=1, Hard=2, Good=3, Easy=4 (`Fsrs.AGAIN` / `HARD` / `GOOD` / `EASY`). Existing persisted Difficulty is **not** backfilled. New first-rating uses clamped `D0(G)` (see **First rating on New**). Tutor **2** and confusion do not change Difficulty. Display is the API number (no extra rounding).
 
 ### Outcome-to-grade compatibility map
 
@@ -113,7 +127,7 @@ A commissioned memory tracker is graded from Tutor Feedback (score 0–5), not f
 - Effort is neutral. A Tutor session carries no trustworthy effort measurement.
 - A late session does not weaken the result. The score determines the memory-state adjustment; the recorded time advances `lastRecalledAt`.
 - After a score, due is `lastRecalledAt + I(0.9, S)`; non-positive `I` → 24h. A commissioned tracker is due only when the learner commissions another Learning Session.
-- **New** (Stability 0, Difficulty unset): scores **3**, **4**, and **5** initialize Difficulty to **5** and Stability to **24** hours, matching the first real correct recall — not FSRS first-rating initials. Scores **0**, **1**, and **2** stay Stability 0 and Difficulty unset; due is strictly after the recorded time (24-hour fallback).
+- **New** (Stability 0, Difficulty unset): scores **3**, **4**, and **5** use FSRS-6 first-rating (see **First rating on New**). Scores **0**, **1**, and **2** stay Stability 0 and Difficulty unset; due is strictly after the recorded time (24-hour fallback).
 
 Memory updates with Stability > 0:
 
@@ -159,16 +173,17 @@ implementation, frozen `Fsrs.W`): convert persisted whole hours to days,
 Clamp **SInc ≥ 1** so next Stability does not shrink. With frozen weights
 and rounding: Good 24→**25**; Easy 24→**43**; Hard 24 stays **24** (clamp);
 Good at 72 hours stays **72** (clamp). Again at elapsed 0 stays post-lapse.
-Tutor **2** and confusion are unchanged. New (Stability 0) stays first-success
-init Difficulty **5**, Stability **24** hours. The short-term success rule is
-not a Settings knob. Elapsed whole hours **≥ 1** still use long-term next
-Stability.
+Tutor **2** and confusion are unchanged. New (Stability 0) first-rating is
+unchanged by elapsed time (see **First rating on New**). The short-term success
+rule is not a Settings knob. Elapsed whole hours **≥ 1** still use long-term
+next Stability.
 
 ### Thinking time
 
 A trustworthy effort measurement (thinking time) may adjust within a
 **correct** outcome only, within bounds. It must not invert the outcome.
-Missing or untrustworthy effort is neutral.
+Missing or untrustworthy effort is neutral. Thinking time does not change
+first-rating on New (see **First rating on New**).
 
 ### Accidental-match and overlap transitions
 
@@ -212,8 +227,8 @@ adjustment; schedule fields stay unchanged. Retry in session with a more specifi
 
 After a grade, the tracker must be due strictly after the recorded time. When
 the computed interval is non-positive (due would be at or before the grade
-instant), schedule **24 hours** after the recorded time — the same first-success
-Stability. Do not use the spacing-index ladder as this fallback.
+instant), schedule **24 hours** after the recorded time. This fallback is not
+first-success Stability. Do not use the spacing-index ladder as this fallback.
 
 ### Manual and admin paths
 

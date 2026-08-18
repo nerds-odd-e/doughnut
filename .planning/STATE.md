@@ -6,9 +6,9 @@ current_phase: null
 current_phase_name: null
 status: ready
 stopped_at: null
-last_updated: "2026-08-18T00:11:00Z"
+last_updated: "2026-08-18T00:30:00Z"
 last_activity: 2026-08-18
-last_activity_desc: "Dropped spent quick plans 003 and 004; leftover MCQ/recall-prompt nouns parked as SEED-005"
+last_activity_desc: "FSRS-6 first-rating initials in progress (quick 008 slice 1: ADR lock)"
 progress:
   total_phases: 0
   completed_phases: 0
@@ -35,10 +35,10 @@ Difficulty is shown on the Memory Tracker Information card (API number, or **N/A
 
 **Recently shipped:** No lapse count in Proposed ADR 0003 memory state (B4 closed; Again history is RecallLog; frequent-failure warning unchanged). Stored note markdown carries `type: Note` / `type: Relationship` (persist + production backfill `V300000270`; OKF **C1**/**D2** closed; Wikidata prepend and extract remainder keep the leading fence; leftover persist-test overlap dropped). RecallLog leftover cohesion (reloaded prompt-history Correct/Incorrect pinned; one canonical pin per RecallLog writer; stats tests on `RecallAnswerRow`). Same-hour FSRS-6 short-term success next Stability (elapsed 0, S > 0; Good 24→25, Easy 24→43, Hard 24 stays 24; Again stays post-lapse). Published FSRS-6 next Difficulty after a mapped grade (linear damping + mean reversion toward unclamped D0(Easy); existing D not backfilled). Difficulty on the Memory Tracker page (Information card; N/A when unset). FSRS-6 Good next Stability and Difficulty on ordinary correct recall (first Stability 24h; E2E day lists follow FSRS). Ordinary incorrect uses FSRS-6 post-lapse Stability and Again Difficulty (due from `I(0.9, S)`; New fail 24h). Stability as whole hours; overdue correct lengthens Stability more than on-time. Unanswered recall-prompt history omits the MCQ solution; nested `/api/mcqs` routes are `/{note}`, `/refine`, `/generate`, `/export` (no `question` segment). Recall prompt / MCQ noun alignment (OpenAPI `Mcq`, `/api/mcqs`, tables `mcq`/`answer`). Skip Memory Tracking leftover cohesion (unused skip-flag tests dropped; unassimilated sequence queries renamed). Skip Memory Tracking sequence opt-out + subscribe API + Settings/ADR copy. Accidental-match confusion adjustment + cleanup. Assimilation-sequence skip. Note toolbar overflow. Production hard-delete incident response (2026-08-12) — [MILESTONES.md](MILESTONES.md). Requested-retention leftover cohesion (redundant fail-due pins dropped; grade due and confusion projection live on `MemoryTracker`).
 
-**Remaining FSRS gap:** Deferred knobs (**E3** / **E4**) plus **accept ADR 0003** (human). Lapses are not memory state. Just review is locked two buttons (Tutor **4** / **1**). Tracker: [FSRS-COMPATIBILITY-GAP.md](research/FSRS-COMPATIBILITY-GAP.md). Seed: [SEED-004](seeds/SEED-004-close-spaced-repetition-scheduling-policy-gap.md).
+**Remaining FSRS gap:** First-rating initials (`S0`/`D0` on New success) in progress — [`.planning/quick/008-fsrs-first-rating/PLAN.md`](quick/008-fsrs-first-rating/PLAN.md). Then deferred knobs (**E3** / **E4**) plus **accept ADR 0003** (human). Lapses are not memory state. Just review is locked two buttons (Tutor **4** / **1**). Tracker: [FSRS-COMPATIBILITY-GAP.md](research/FSRS-COMPATIBILITY-GAP.md). Seed: [SEED-004](seeds/SEED-004-close-spaced-repetition-scheduling-policy-gap.md).
 
 ## Operator Next Steps
 
 - Confirm production applied Flyway `V300000257` (table `mcq`), `V300000258` (table `answer`), `V300000259` (rename `stability`), `V300000260` (hours conversion + drop `space_intervals`), `V300000261` (difficulty column + graded backfill), `V300000262` (leftover graded-row difficulty backfill), `V300000263` (`recall_log`), `V300000264` (drop confusion FK), `V300000265`–`V300000266` (RecallLog backfills), `V300000267` (drop `session_item` / `learning_session`), and `V300000268` (drop `answer.correct` / `recall_count`)
 - Enable dummy-skip conversion placeholders on the deploys that first apply V300000254 / V300000255
-- Next FSRS: humans accept Proposed ADR 0003, or pick a remaining deferred knob ([FSRS-COMPATIBILITY-GAP.md](research/FSRS-COMPATIBILITY-GAP.md)).
+- Next FSRS: finish first-rating initials ([`.planning/quick/008-fsrs-first-rating/PLAN.md`](quick/008-fsrs-first-rating/PLAN.md)); then humans accept Proposed ADR 0003, or pick a remaining deferred knob ([FSRS-COMPATIBILITY-GAP.md](research/FSRS-COMPATIBILITY-GAP.md)).

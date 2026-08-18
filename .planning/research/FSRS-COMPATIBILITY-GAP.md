@@ -1,6 +1,6 @@
 # Doughnut ↔ open FSRS gap (toward ADR 0003)
 
-**Status:** Remaining work is **deferred** knobs plus **accept ADR 0003** (human). Shipped FSRS-6 locks, including same-hour success short-term next Stability (elapsed 0, S > 0), live in ADR 0003 Decision and code; this tracker is not a second policy map.
+**Status:** First-rating initials (`S0`/`D0` on New success) are **in progress** in [`.planning/quick/008-fsrs-first-rating/PLAN.md`](../quick/008-fsrs-first-rating/PLAN.md). This tracker is not a second policy map. Remaining work after that is **deferred** knobs plus **accept ADR 0003** (human). Other shipped FSRS-6 locks, including same-hour success short-term next Stability (elapsed 0, S > 0), live in ADR 0003 Decision and code.
 
 **Updated:** 2026-08-18
 
@@ -31,6 +31,7 @@ Humans still own accept / reject / supersede of ADR 0003 (`docs/adrs/README.md`)
 
 ## References
 
+- In progress: [`.planning/quick/008-fsrs-first-rating/PLAN.md`](../quick/008-fsrs-first-rating/PLAN.md) — first-rating initials
 - [ADR 0003](../../docs/adrs/0003-spaced-repetition-scheduling-policy.md) (Proposed)
 - [ADR 0001](../../docs/adrs/0001-ubiquitous-language.md) — **recall** vs FSRS **review**
 - [ADR 0005](../../docs/adrs/0005-commissioned-learning-session-protocol.md) — Tutor score meaning
