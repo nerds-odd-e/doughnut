@@ -49,10 +49,12 @@ public record WikiLinkTargetReference(String notebookName, String noteTitle) {
 
   /**
    * Folder names then title for a path-shaped target ({@code Folder/Title}, or Markdown {@code
-   * /Title} at notebook root). Optional trailing {@code .md} on the last segment is ignored.
-   * Unqualified titles without a leading {@code /} are not path-shaped.
+   * /Title} at notebook root). Resolution ignores optional trailing {@code .md}; {@link
+   * #withNoteTitle} keeps leading {@code /} and that suffix. Unqualified titles without a leading
+   * {@code /} are not path-shaped.
    */
-  public record PathShapedTarget(List<String> folderNames, String title) {
+  public record PathShapedTarget(
+      List<String> folderNames, String title, boolean leadingSlash, boolean markdownSuffix) {
     public static Optional<PathShapedTarget> tryParse(String noteTitle) {
       if (noteTitle == null || noteTitle.contains(":")) {
         return Optional.empty();
@@ -75,25 +77,34 @@ public record WikiLinkTargetReference(String notebookName, String noteTitle) {
         return Optional.empty();
       }
       String last = segments.getLast();
-      String title = stripOptionalMarkdownSuffix(last);
+      boolean markdownSuffix = hasOptionalMarkdownSuffix(last);
+      String title = markdownSuffix ? last.substring(0, last.length() - 3) : last;
       if (title.isEmpty()) {
         return Optional.empty();
       }
       List<String> folderNames =
           segments.size() == 1 ? List.of() : List.copyOf(segments.subList(0, segments.size() - 1));
-      return Optional.of(new PathShapedTarget(folderNames, title));
+      return Optional.of(new PathShapedTarget(folderNames, title, leadingSlash, markdownSuffix));
     }
 
     String withNoteTitle(String newTitle) {
-      return String.join("/", folderNames) + "/" + newTitle;
+      StringBuilder out = new StringBuilder();
+      if (leadingSlash) {
+        out.append('/');
+      }
+      if (!folderNames.isEmpty()) {
+        out.append(String.join("/", folderNames)).append('/');
+      }
+      out.append(newTitle);
+      if (markdownSuffix) {
+        out.append(".md");
+      }
+      return out.toString();
     }
 
-    private static String stripOptionalMarkdownSuffix(String lastSegment) {
-      if (lastSegment.length() > 3
-          && lastSegment.regionMatches(true, lastSegment.length() - 3, ".md", 0, 3)) {
-        return lastSegment.substring(0, lastSegment.length() - 3);
-      }
-      return lastSegment;
+    private static boolean hasOptionalMarkdownSuffix(String lastSegment) {
+      return lastSegment.length() > 3
+          && lastSegment.regionMatches(true, lastSegment.length() - 3, ".md", 0, 3);
     }
   }
 

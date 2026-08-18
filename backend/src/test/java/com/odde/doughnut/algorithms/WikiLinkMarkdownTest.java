@@ -103,6 +103,27 @@ class WikiLinkMarkdownTest {
   }
 
   @Test
+  void newInnerForUpdateVisibleText_rewritesPathMarkdownHrefLastSegment() {
+    assertThat(
+        WikiLinkMarkdownRewrite.newInnerForUpdateVisibleText("[label](/Folder/Old.md)", "New"),
+        equalTo("[label](/Folder/New.md)"));
+  }
+
+  @Test
+  void newInnerForUpdateVisibleText_preservesPathMarkdownWithoutMdSuffix() {
+    assertThat(
+        WikiLinkMarkdownRewrite.newInnerForUpdateVisibleText("[label](/Folder/Old)", "New"),
+        equalTo("[label](/Folder/New)"));
+  }
+
+  @Test
+  void newInnerForKeepVisibleText_keepsPathMarkdownLabel() {
+    assertThat(
+        WikiLinkMarkdownRewrite.newInnerForKeepVisibleText("[label](/Folder/Old.md)", "New"),
+        equalTo("[label](/Folder/New.md)"));
+  }
+
+  @Test
   void newInnerForKeepVisibleText_emptyPipeUsesTargetAsDisplay() {
     assertThat(
         WikiLinkMarkdownRewrite.newInnerForKeepVisibleText("Alpha|", "Beta"),
@@ -162,5 +183,15 @@ class WikiLinkMarkdownTest {
         WikiLinkMarkdownRewrite.replaceWikiLinksMatchingTrimmedInner(
             "see [[  Old  ]] end", "Old", "NewTitle"),
         equalTo("see [[NewTitle]] end"));
+  }
+
+  @Test
+  void replaceWikiLinksMatchingTrimmedInner_rewritesPathMarkdownWithoutConvertingToWiki() {
+    assertThat(
+        WikiLinkMarkdownRewrite.replaceWikiLinksMatchingTrimmedInner(
+            "see [label](/Folder/Old.md) end",
+            "[label](/Folder/Old.md)",
+            "[label](/Folder/New.md)"),
+        equalTo("see [label](/Folder/New.md) end"));
   }
 }

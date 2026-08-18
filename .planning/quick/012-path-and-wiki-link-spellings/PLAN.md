@@ -88,9 +88,9 @@ Walker already handled nested `PathShapedTarget.folderNames`. Locked with unit t
 ### 6. Renaming a note rewrites path-Markdown hrefs and keeps Markdown
 
 - **Type:** Behavior
-- **Status:** planned
+- **Status:** done
 
-**Pre:** body has `[label](/Folder/Old.md)` (and a sibling without `.md` if still authored). **Trigger:** rename `Old` → `New`. **Post:** href path last segment is `New`; link remains Markdown (not rewritten to `[[…]]`); still opens the note. Reuse `WikiLinkTargetReference.replaceNoteTitle` / `PathShapedTarget.withNoteTitle`; write back the Markdown spelling via the same rewrite service (wiki write-back is `WikiLinkMarkdownRewrite`).
+Inbound `[label](/Folder/Old.md)` last segment becomes `New`; stays Markdown; preserves `/` and optional `.md`. Same walk as wiki; `PathMarkdownToken` parse is shared; `WikiLinkMarkdownRewrite` writes the Markdown token.
 
 ### 7. Unresolved path Markdown shows as a dead wiki link
 
@@ -117,7 +117,8 @@ Walker already handled nested `PathShapedTarget.folderNames`. Locked with unit t
 
 - Slice 1: glossary **Wiki link** row names both spellings and points at ADR 0004 rather than restating `.md` / leading-`/` mechanics. Gap tracker/seed no longer treat ZIP wiki rewrite as remaining P4 work; product dual-spelling still open until slice 9.
 - Slice 2: `PathShapedTarget` already holds `folderNames` (list) + title. Sanitizer asks that parser. `/` in wiki **titles** stays forbidden (fullwidth on persist). Unqualified `[[Title]]` still lowest id.
-- Slice 3: title rewrite lives on `WikiLinkTargetReference.replaceNoteTitle` (path-shaped via `PathShapedTarget.withNoteTitle`). Slice 6 should reuse that write-back; only Markdown spelling differs.
+- Slice 3: title rewrite lives on `WikiLinkTargetReference.replaceNoteTitle` (path-shaped via `PathShapedTarget.withNoteTitle`).
 - Slice 4: nested `[[Parent/Child/Title]]` already resolved; this slice only locked it with tests.
-- Slice 5: extract is `authoredTokensInOccurrenceOrder` (wiki inners + path Markdown). Cache `link_text` is the full Markdown token. Display uses `WikiTitle.targetToken` (leading `/` ⇒ path href), not a second client parse. Turndown: `/n…` → wiki; concept path href → same Markdown. Wiki write-back extracted to `WikiLinkMarkdownRewrite`; inbound rewrite walk to `WikiLinkRewriteSupport`.
+- Slice 5: extract is `authoredTokensInOccurrenceOrder`. Cache `link_text` is the full Markdown token. Display uses `WikiTitle.targetToken` (leading `/` ⇒ path href). Turndown: `/n…` → wiki; concept path href → Markdown.
+- Slice 6: `WikiLinkMarkdown.tryParsePathMarkdownToken` / `pathMarkdownOccurrences` is the only Markdown scan. `PathShapedTarget.withNoteTitle` keeps `/` and `.md`. Slice 8 should rewrite folder segments on that same parse, not a second scanner.
 - ZIP collision `Recipe (2).md` is not `[[Recipe (2)]]`. Out of this plan.

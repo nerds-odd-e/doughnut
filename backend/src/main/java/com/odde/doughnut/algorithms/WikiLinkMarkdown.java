@@ -3,6 +3,7 @@ package com.odde.doughnut.algorithms;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -27,6 +28,14 @@ public final class WikiLinkMarkdown {
    */
   public record WikiInnerSplit(String target, String display) {}
 
+  record PathMarkdownToken(String display, String href) {
+    String withHref(String newHref) {
+      return "[" + display + "](" + newHref + ")";
+    }
+  }
+
+  record PathMarkdownOccurrence(int start, int end, String token) {}
+
   private WikiLinkMarkdown() {}
 
   /**
@@ -37,14 +46,11 @@ public final class WikiLinkMarkdown {
     if (authored == null || authored.isEmpty()) {
       return new WikiInnerSplit("", "");
     }
-    Matcher markdown = PATH_MARKDOWN_LINK_PATTERN.matcher(authored.trim());
-    if (markdown.matches() && isConceptPathHref(markdown.group(2))) {
-      String display = markdown.group(1);
-      String href = markdown.group(2);
-      if (display.trim().isEmpty()) {
-        display = href;
-      }
-      return new WikiInnerSplit(href, display);
+    Optional<PathMarkdownToken> path = tryParsePathMarkdownToken(authored);
+    if (path.isPresent()) {
+      PathMarkdownToken token = path.get();
+      String display = token.display().trim().isEmpty() ? token.href() : token.display();
+      return new WikiInnerSplit(token.href(), display);
     }
     return splitInner(authored);
   }
@@ -98,19 +104,42 @@ public final class WikiLinkMarkdown {
         hits.add(new Hit(wiki.start(), t));
       }
     }
+    for (PathMarkdownOccurrence occurrence : pathMarkdownOccurrences(markdown)) {
+      hits.add(new Hit(occurrence.start(), occurrence.token()));
+    }
+    hits.sort(Comparator.comparingInt(Hit::start));
+    return hits.stream().map(Hit::token).toList();
+  }
+
+  static Optional<PathMarkdownToken> tryParsePathMarkdownToken(String authored) {
+    if (authored == null || authored.isEmpty()) {
+      return Optional.empty();
+    }
+    Matcher markdown = PATH_MARKDOWN_LINK_PATTERN.matcher(authored.trim());
+    if (!markdown.matches() || !isConceptPathHref(markdown.group(2))) {
+      return Optional.empty();
+    }
+    return Optional.of(new PathMarkdownToken(markdown.group(1), markdown.group(2)));
+  }
+
+  static List<PathMarkdownOccurrence> pathMarkdownOccurrences(String markdown) {
+    if (markdown == null || markdown.isEmpty()) {
+      return List.of();
+    }
+    List<PathMarkdownOccurrence> occurrences = new ArrayList<>();
     Matcher pathMarkdown = PATH_MARKDOWN_LINK_PATTERN.matcher(markdown);
     while (pathMarkdown.find()) {
       if (pathMarkdown.start() > 0 && markdown.charAt(pathMarkdown.start() - 1) == '!') {
         continue;
       }
-      String href = pathMarkdown.group(2);
-      if (!isConceptPathHref(href)) {
+      if (!isConceptPathHref(pathMarkdown.group(2))) {
         continue;
       }
-      hits.add(new Hit(pathMarkdown.start(), pathMarkdown.group(0)));
+      occurrences.add(
+          new PathMarkdownOccurrence(
+              pathMarkdown.start(), pathMarkdown.end(), pathMarkdown.group(0)));
     }
-    hits.sort(Comparator.comparingInt(Hit::start));
-    return hits.stream().map(Hit::token).toList();
+    return occurrences;
   }
 
   private static boolean isConceptPathHref(String href) {

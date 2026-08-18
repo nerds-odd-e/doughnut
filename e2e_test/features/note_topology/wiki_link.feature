@@ -214,6 +214,25 @@ Feature: Wiki links in notes
     When I view the note content as rich content
     Then the wiki link "WikiPath Rename Recipes/WikiPath Rename New" should open the note titled "WikiPath Rename New"
 
+  Scenario: Renaming a referenced note rewrites path Markdown hrefs and keeps Markdown
+    Given I have a notebook "WikiPathMdRenameNB" with notes:
+      | Title                   | Folder                |
+      | WikiPathMdRenameOld     | WikiPathMdRenameFolder |
+      | WikiPathMdRenameCarrier | WikiPathMdRenameRoot   |
+    When I update note "WikiPathMdRenameCarrier" content using markdown to become:
+      """
+      See [label](/WikiPathMdRenameFolder/WikiPathMdRenameOld.md) and [also](/WikiPathMdRenameFolder/WikiPathMdRenameOld).
+      """
+    And I route to the note "WikiPathMdRenameOld"
+    And I set the note title to "WikiPathMdRenameNew" updating visible reference text
+    And I route to the note "WikiPathMdRenameCarrier"
+    And I view the note content as markdown
+    Then the note content markdown source should contain "[label](/WikiPathMdRenameFolder/WikiPathMdRenameNew.md)"
+    And the note content markdown source should contain "[also](/WikiPathMdRenameFolder/WikiPathMdRenameNew)"
+    And the note content markdown source should not contain "[["
+    When I view the note content as rich content
+    Then following the wiki link "label" should open the note titled "WikiPathMdRenameNew"
+
   @mockBrowserTime
   Scenario: Insert a qualified wiki link to a note in another notebook
     Given I have a notebook "WikiCross Tgt NB" with notes:

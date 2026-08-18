@@ -4,7 +4,9 @@ import com.odde.doughnut.validators.DisplayNamePathSeparators;
 import java.util.function.UnaryOperator;
 import java.util.regex.Matcher;
 
-/** Rewrites stored wiki-link inner text and matching {@code [[…]]} spans in markdown. */
+/**
+ * Rewrites stored inter-note tokens (wiki inner or path Markdown) and matching spans in markdown.
+ */
 public final class WikiLinkMarkdownRewrite {
 
   private WikiLinkMarkdownRewrite() {}
@@ -70,6 +72,16 @@ public final class WikiLinkMarkdownRewrite {
     if (storedLinkInner == null || storedLinkInner.isEmpty()) {
       return newNoteTitle;
     }
+    return WikiLinkMarkdown.tryParsePathMarkdownToken(storedLinkInner)
+        .map(
+            token ->
+                token.withHref(
+                    WikiLinkTargetReference.replaceNoteTitle(token.href(), newNoteTitle.trim())))
+        .orElseGet(() -> rewriteWikiInnerNoteTitle(storedLinkInner, newNoteTitle, keepVisibleText));
+  }
+
+  private static String rewriteWikiInnerNoteTitle(
+      String storedLinkInner, String newNoteTitle, boolean keepVisibleText) {
     int pipeIdx = storedLinkInner.indexOf('|');
     String rawTargetPart = pipeIdx == -1 ? storedLinkInner : storedLinkInner.substring(0, pipeIdx);
     String newTargetToken =
@@ -137,6 +149,10 @@ public final class WikiLinkMarkdownRewrite {
     if (markdown == null || markdown.isEmpty()) {
       return markdown;
     }
+    if (WikiLinkMarkdown.tryParsePathMarkdownToken(oldInnerTrimmed).isPresent()
+        && WikiLinkMarkdown.tryParsePathMarkdownToken(newInner).isPresent()) {
+      return replacePathMarkdownMatching(markdown, oldInnerTrimmed, newInner);
+    }
     Matcher matcher = WikiLinkMarkdown.INNER_LINK_PATTERN.matcher(markdown);
     StringBuilder out = new StringBuilder();
     int last = 0;
@@ -149,6 +165,20 @@ public final class WikiLinkMarkdownRewrite {
         out.append(matcher.group(0));
       }
       last = matcher.end();
+    }
+    out.append(markdown.substring(last));
+    return out.toString();
+  }
+
+  private static String replacePathMarkdownMatching(
+      String markdown, String oldTokenTrimmed, String newToken) {
+    StringBuilder out = new StringBuilder();
+    int last = 0;
+    for (WikiLinkMarkdown.PathMarkdownOccurrence occurrence :
+        WikiLinkMarkdown.pathMarkdownOccurrences(markdown)) {
+      out.append(markdown, last, occurrence.start());
+      out.append(occurrence.token().equals(oldTokenTrimmed) ? newToken : occurrence.token());
+      last = occurrence.end();
     }
     out.append(markdown.substring(last));
     return out.toString();
