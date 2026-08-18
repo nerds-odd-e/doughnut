@@ -50,15 +50,9 @@ Ordinary incorrect / just review No / Tutor **0/1** on New go through `afterReca
 ### 3. Success after New Again is long-term Good
 
 - **Type:** Behavior
-- **Status:** planned
+- **Status:** done
 
-**Pre:** tracker was New, then Again (now `S = 5`, `D0(1)`).  
-**Trigger:** ordinary correct / just review Yes.  
-**Post:** Stability is **not** `S0(Good)=55`; it is the long-term Good update from that state.
-
-One delta in `SpacedRepetitionCorrectRecallSchedulingTest` (or the incorrect class): New Again then Good ≠ 55. No new test class. No E2E unless the unit pin is ambiguous — then one `@wip` scenario in `spaced_repetition.feature` only.
-
-**Done when:** that pin passes; first Again from slice 2 unchanged.
+Pin `correctRecallAfterNewAgainUsesLongTermGoodStability`: New → Again → on-time Good is Stability **21**, not `S0(Good)=55`. Production already took the long-term path. Same-hour Good/Easy/Hard pins moved to `SpacedRepetitionSameHourRecallSchedulingTest` so the correct-recall class stays under 250 lines.
 
 ### 4. Memory Tracker shows first tutor 0/1 as Again first-rating
 
