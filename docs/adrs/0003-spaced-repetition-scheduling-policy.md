@@ -44,10 +44,11 @@ state, qualitative update rules), not with a particular crate or version.
   requested retention `r` locked at **0.9** (`I(0.9, S) = S` in whole hours).
   When `I` is non-positive, due is 24 hours after the grade (strictly-future
   fallback). A newly assimilated tracker may have Stability 0 (due now).
-  After a grade, persisted Stability 0 is only New fail (Difficulty unset;
-  due from that 24-hour fallback, matching commissioned New 0/1/2). Spacing
-  is Stability, not a Settings day list. Live scheduling must not walk a
-  spacing-index ladder.
+  After a grade, persisted Stability 0 is only Tutor **2** on New (Difficulty
+  unset; due from that 24-hour fallback). First Again / Tutor **0/1** on New
+  uses first-rating (see **First rating on New**); due then comes from `I`, not
+  from the 24-hour fallback. Spacing is Stability, not a Settings day list. Live
+  scheduling must not walk a spacing-index ladder.
 - **Retrievability** is computed from elapsed whole hours and Stability, not stored.
 - A recall transition consumes the graded outcome, elapsed time, and that state — never queue lateness.
 - **Requested retention** `r` is a **global constant 0.9** — not a Settings
@@ -70,7 +71,7 @@ change the schedule.
 
 Difficulty is persisted memory state in `[1, 10]`. It is shown on the Memory Tracker page (Information card), next to Stability, as the number returned by the API or **N/A** when unset (New / assimilate-only). Harder items gain less Stability on a successful recall. A correct recall also updates Difficulty with Good next-D (see **Difficulty after a mapped grade**).
 
-A newly assimilated tracker is **New**: Stability 0, Difficulty unset, due now. Assimilation is not a grade. The first mapped success initializes Stability and Difficulty with FSRS-6 first-rating (see **First rating on New**). Difficulty **5** remains only as the fallback when Stability > 0 and Difficulty is null.
+A newly assimilated tracker is **New**: Stability 0, Difficulty unset, due now. Assimilation is not a grade. The first mapped success or Again initializes Stability and Difficulty with FSRS-6 first-rating (see **First rating on New**). Difficulty **5** remains only as the fallback when Stability > 0 and Difficulty is null.
 
 Ordinary correct recall with Stability > 0 updates Stability with open-FSRS-6 Good-equivalent rules (own implementation) and Difficulty with Good next-D. Locked overdue extra growth still holds.
 
@@ -84,9 +85,11 @@ First mapped **success** on a New tracker (ordinary correct / just review Yes / 
 - Elapsed time and thinking time do **not** change first-rating. Overdue extra does not apply.
 - Due is `lastRecalledAt` plus those hours.
 
-New Again / Tutor **0/1/2** stay New (Stability 0, Difficulty unset; due +24h from the strictly-future fallback). Already-graded rows are not backfilled. No Flyway.
+First Again / Tutor **0/1** on New uses the same first-rating path with `G=1`: Stability `S0(1)` (**5** hours), Difficulty `D0(1)` (Java float), due `lastRecalledAt + I` (**5h**).
 
-The 24-hour strictly-future fallback is named separately from first-success Stability.
+Tutor **2** on New stays New (Stability 0, Difficulty unset; due +24h from the strictly-future fallback). Already-graded rows are not backfilled. No Flyway.
+
+The 24-hour strictly-future fallback is for non-positive `I`, not the New-Again interval.
 
 ### Difficulty after a mapped grade
 
@@ -129,7 +132,7 @@ A commissioned memory tracker is graded from Tutor Feedback (score 0–5), not f
 - Effort is neutral. A Tutor session carries no trustworthy effort measurement.
 - A late session does not weaken the result. The score determines the memory-state adjustment; the recorded time advances `lastRecalledAt`.
 - After a score, due is `lastRecalledAt + I(0.9, S)`; non-positive `I` → 24h. A commissioned tracker is due only when the learner commissions another Learning Session.
-- **New** (Stability 0, Difficulty unset): scores **3**, **4**, and **5** use FSRS-6 first-rating (see **First rating on New**). Scores **0**, **1**, and **2** stay Stability 0 and Difficulty unset; due is strictly after the recorded time (24-hour fallback).
+- **New** (Stability 0, Difficulty unset): scores **3**, **4**, and **5** use FSRS-6 first-rating (see **First rating on New**). Scores **0** and **1** use first-rating Again (`S0(1)` / `D0(1)`, due from `I`, **5h**). Score **2** stays Stability 0 and Difficulty unset; due is strictly after the recorded time (24-hour fallback).
 
 Memory updates with Stability > 0:
 
@@ -146,7 +149,7 @@ Ordinary incorrect recall (MCQ, just review No, spelling fail) is FSRS **Again**
 
 When Stability is greater than 0, the memory update for Stability is the open-FSRS-6 post-lapse formula from Difficulty, Stability, and Retrievability (elapsed whole hours vs Stability). Ordinary incorrect also updates Difficulty with Again next-D (see **Difficulty after a mapped grade**). Unset Difficulty on Stability > 0 is treated as **5**. Queue lateness vs `nextRecallAt` is not an input. After ordinary incorrect, due is `lastRecalledAt + I(0.9, S)` of the post-lapse Stability; non-positive `I` → 24h. There is **no relearning step list**.
 
-A **New** tracker (Stability 0) that fails stays Stability 0, Difficulty unset; due is the 24-hour strictly-future fallback, matching commissioned New 0/1/2. Confusion adjustment is not a grade and is not FSRS Again (see **Accidental-match and overlap transitions**). Failure must not permanently trap the tracker; later correct recalls must be able to restore expanding intervals.
+A **New** tracker (Stability 0) that fails uses first-rating Again: Stability `S0(1)` (**5**), Difficulty `D0(1)` (Java float), due `lastRecalledAt + I` (**5h**); see **First rating on New**. Confusion adjustment is not a grade and is not FSRS Again (see **Accidental-match and overlap transitions**). Failure must not permanently trap the tracker; later correct recalls must be able to restore expanding intervals.
 
 ### Overdue correct recall: bounded extra growth
 
@@ -230,7 +233,8 @@ adjustment; schedule fields stay unchanged. Retry in session with a more specifi
 After a grade, the tracker must be due strictly after the recorded time. When
 the computed interval is non-positive (due would be at or before the grade
 instant), schedule **24 hours** after the recorded time. This fallback is not
-first-success Stability. Do not use the spacing-index ladder as this fallback.
+first-rating Stability (success or Again). Do not use the spacing-index ladder
+as this fallback.
 
 ### Manual and admin paths
 

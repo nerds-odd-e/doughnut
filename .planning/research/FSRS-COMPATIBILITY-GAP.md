@@ -1,6 +1,6 @@
 # Doughnut ↔ open FSRS gap (toward ADR 0003)
 
-**Status:** First-rating initials (`S0`/`D0` on New success) are **closed**. Remaining work is **deferred** knobs (**E3** / **E4**) plus **accept ADR 0003** (human). Other shipped FSRS-6 locks, including same-hour success short-term next Stability (elapsed 0, S > 0), live in ADR 0003 Decision and code.
+**Status:** First-rating initials for New **success** (`S0`/`D0` for Good / Hard / Easy) are **closed**. Remaining first-rating work is tracked in [`.planning/quick/011-new-ungraded-first-rating/PLAN.md`](../quick/011-new-ungraded-first-rating/PLAN.md) (Again / Tutor **0/1** first-rating in progress; Tutor **2** on New still stay-New). After that: **deferred** knobs (**E3** / **E4**) plus **accept ADR 0003** (human). Other shipped FSRS-6 locks, including same-hour success short-term next Stability (elapsed 0, S > 0), live in ADR 0003 Decision and code.
 
 **Updated:** 2026-08-18
 
@@ -24,7 +24,7 @@ Live scheduling does not walk a spacing-index ladder. `DEFAULT_SPACES` / `hoursF
 
 **B4** is closed: no lapse count. Memory state is Difficulty, Stability, computed Retrievability. Again history is RecallLog. Frequent-failure warning is the product signal. FSRS-6 After-Again Stability does not consume a count.
 
-First-rating on New is closed: first mapped success (Good / Hard / Easy) uses published FSRS-6 `S0(G)` / `D0(G)` (ADR 0003 **First rating on New**). New Again / Tutor **0/1/2** stay New. `w[0]` is unused until a later New Again init.
+First-rating on New **success** (Good / Hard / Easy) is closed: published FSRS-6 `S0(G)` / `D0(G)` (ADR 0003 **First rating on New**). First Again / Tutor **0/1** on New is locked there as `S0(1)` / `D0(1)` (Stability **5**, due **5h**); product code still stay-New until [that plan](../quick/011-new-ungraded-first-rating/PLAN.md) lands it. Tutor **2** on New still stay-New. `w[0]` is the Again `S0` weight now locked in the ADR; live scheduling does not use it yet.
 
 - **E3** fuzz / max interval
 - **E4** fitting / per-user weights
