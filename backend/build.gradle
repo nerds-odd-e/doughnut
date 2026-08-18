@@ -16,7 +16,7 @@ plugins {
   id 'java'
   id 'org.springframework.boot' version '4.1.0'
   // Spotless for the code style
-  id "com.diffplug.spotless" version "8.9.0"
+  id "com.diffplug.spotless" version "8.10.0"
   id "io.github.ben-manes.versions" version "0.59.0"
 }
 
