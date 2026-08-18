@@ -79,6 +79,11 @@ Feature: Note Edit
       | Critical thinking |
       | LeSS in Action    |
 
+  Scenario: Renaming a note to index warns and still saves
+    When I update note title "LeSS in Action" to become "index"
+    Then I should see a warning that the portable tree may be OKF-incompatible
+    And the note title should be "index"
+
   Scenario: Soft line break in note content
     When I insert a soft line break in note "LeSS in Action" between "Hello" and "World"
     Then the note content should include "Hello"

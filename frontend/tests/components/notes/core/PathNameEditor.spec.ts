@@ -49,6 +49,32 @@ describe("PathNameEditor.vue", () => {
     )
   })
 
+  it("warns that the portable tree may be OKF-incompatible when the title is index", () => {
+    const wrapper = mount(PathNameEditor, {
+      props: { modelValue: "index" },
+    })
+    expect(wrapper.find(".text-warning").text()).toBe(
+      "This title may make the portable notebook tree OKF-incompatible"
+    )
+  })
+
+  it.each(["INDEX", "index.md", "log", "LOG.MD", " log "])(
+    "warns that the title %s is OKF-incompatible",
+    (title) => {
+      const wrapper = mount(PathNameEditor, {
+        props: { modelValue: title },
+      })
+      expect(wrapper.find(".text-warning").text()).toContain("OKF-incompatible")
+    }
+  )
+
+  it("does not show the OKF-incompatible warning for a readme title", () => {
+    const wrapper = mount(PathNameEditor, {
+      props: { modelValue: "readme" },
+    })
+    expect(wrapper.find(".text-warning").exists()).toBe(false)
+  })
+
   it("shows errorMessage instead of warnings when errorMessage is set", async () => {
     const wrapper = mount(PathNameEditor, {
       props: {

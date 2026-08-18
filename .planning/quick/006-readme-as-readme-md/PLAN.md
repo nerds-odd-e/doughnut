@@ -1,6 +1,6 @@
 # Plan: Readme as README.md
 
-**Status:** in progress (slice 3 next)
+**Status:** in progress (slice 4 next)
 
 **Goal:** ZIP maps notebook/folder readme to `README.md` with `type: Readme`. Notes titled `index` / `log` warn, not block. ADR 0004 Decision matches that shape.
 
@@ -25,13 +25,11 @@ Catalog ZIP writes non-blank notebook/folder readme as that directory’s `READM
 
 **Learning:** Export wrap lives in `ExportReadmeMarkdown` (not persist). Type-key insert/canonicalize is `NoteLeadingFrontmatter.ensureTypeKey`, shared with `NoteConceptType`. E2E unzip is `notebook_export.feature` + `notebookExportZip` page object.
 
-### 3. Creating or renaming a note to index or log warns and still saves — Behavior — planned
+### 3. Creating or renaming a note to index or log warns and still saves — Behavior — done
 
-**Pre:** Note create or title edit.  
-**Trigger:** Title `index`, `index.md`, `log`, or `log.md` (any case).  
-**Post:** Non-blocking warning that the portable tree may be OKF-incompatible. Save succeeds. `readme` / `readme.md` still reject.
+PathNameEditor shows a non-blocking OKF-incompatible title warning for `index` / `index.md` / `log` / `log.md` (any case); save still succeeds. `readme` / `readme.md` still reject.
 
-E2E: `note_creation.feature` (create `index` — warning + note exists) and `note_edit.feature` (rename — warning + title kept). Frontend: PathNameEditor warning predicate.
+**Learning:** Warning is value-based on the current title (still visible after save), unlike event-sourced wiki-link warnings. Do not share the title list with backend health (slice 4 is a different subsystem).
 
 ### 4. Notebook health lists notes whose titles occupy OKF reserved basenames — Behavior — planned
 

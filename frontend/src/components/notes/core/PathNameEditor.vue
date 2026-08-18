@@ -63,6 +63,15 @@ const LINK_BREAK_CHARS = "#^[]|"
 const LINK_NAME_WARNING =
   "Wiki links will not work with names containing any of `#^[]|`"
 
+const OKF_INCOMPATIBLE_TITLES = new Set(["index", "index.md", "log", "log.md"])
+
+const OKF_INCOMPATIBLE_TITLE_WARNING =
+  "This title may make the portable notebook tree OKF-incompatible"
+
+function isOkfIncompatibleTitle(title: string): boolean {
+  return OKF_INCOMPATIBLE_TITLES.has(title.trim().toLowerCase())
+}
+
 function processIllegalPathChars(raw: string): {
   value: string
   replacementNote: string
@@ -129,7 +138,13 @@ const replacementWarning = ref("")
 const linkWarning = ref("")
 
 const displayWarning = computed(() => {
-  const parts = [replacementWarning.value, linkWarning.value].filter(Boolean)
+  const parts = [
+    replacementWarning.value,
+    linkWarning.value,
+    isOkfIncompatibleTitle(props.modelValue)
+      ? OKF_INCOMPATIBLE_TITLE_WARNING
+      : "",
+  ].filter(Boolean)
   return parts.join(" ")
 })
 

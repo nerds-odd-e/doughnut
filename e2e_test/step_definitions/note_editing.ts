@@ -93,6 +93,13 @@ Then('the note title should be {string}', (title: string) => {
   start.assumeNotePage().expectNoteTitleDisplayed(title)
 })
 
+Then(
+  'I should see a warning that the portable tree may be OKF-incompatible',
+  () => {
+    start.assumeNotePage().expectOkfIncompatibleTitleWarning()
+  }
+)
+
 Then('the note content should include {string}', (fragment: string) => {
   start.assumeNotePage().expectContentContaining(fragment)
 })

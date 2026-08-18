@@ -52,3 +52,13 @@ Feature: Nested Note creation
     Then I should see rich note property "parent" with value "[[Course intro]]"
     When I open the note content markdown editor
     Then the note content markdown source should contain "type: Note"
+
+  Scenario: Creating a note titled index warns and still saves
+    When I create a note with title "index" under the folder "LeSS in Action" in the notebook "LeSS training"
+    Then I should see a warning that the portable tree may be OKF-incompatible
+    And I should see the note tree in the sidebar
+      | note-title   |
+      | index        |
+      | team         |
+      | tech         |
+      | Course intro |

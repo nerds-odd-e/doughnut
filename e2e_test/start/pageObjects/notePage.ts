@@ -80,6 +80,18 @@ export const assumeNotePage = (
       findNoteTitle(title)
       return this
     },
+    expectOkfIncompatibleTitleWarning() {
+      cy.get('#main-note-content .path-name-editor .text-warning').should(
+        ($el) => {
+          const actual = $el.text().trim()
+          expect(
+            actual,
+            `Expected a warning that the portable tree may be OKF-incompatible, but found: "${actual}"`
+          ).to.match(/OKF-incompatible/i)
+        }
+      )
+      return this
+    },
     expectHeaderImage() {
       cy.get('#note-image').should(($img) => {
         expect(
