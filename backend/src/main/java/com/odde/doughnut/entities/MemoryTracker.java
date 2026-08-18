@@ -202,7 +202,7 @@ public class MemoryTracker extends EntityIdentifiedByIdOnly {
 
   private void applyRecall(Timestamp now, ForgettingCurve.NextMemory next) {
     setDifficulty(next.difficulty());
-    setStability(next.stability());
+    MemoryTrackerNextStability.write(this, next.stability());
     scheduleNextRecallFromStability(now);
   }
 
@@ -225,7 +225,8 @@ public class MemoryTracker extends EntityIdentifiedByIdOnly {
 
   public void adjustForConfusion(Timestamp currentUTCTimestamp) {
     Timestamp existingDue = getNextRecallAt();
-    setStability(forgettingCurve().confusionAdjusted(elapsedHoursUntil(currentUTCTimestamp)));
+    MemoryTrackerNextStability.write(
+        this, forgettingCurve().confusionAdjusted(elapsedHoursUntil(currentUTCTimestamp)));
     Timestamp projected = calculateNextRecallAt();
     setNextRecallAt(projected.after(existingDue) ? existingDue : projected);
   }

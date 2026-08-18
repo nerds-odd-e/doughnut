@@ -8,7 +8,8 @@ final class MemoryTrackerShrinkStability {
   static void apply(MemoryTracker tracker, Timestamp currentUTCTimestamp) {
     float initial = ForgettingCurve.ASSIMILATE_STABILITY_HOURS;
     float accumulated = Math.max(0, tracker.getStability() - initial);
-    tracker.setStability(Math.max(initial, Math.round(initial + accumulated * 0.8f)));
+    MemoryTrackerNextStability.write(
+        tracker, Math.max(initial, Math.round(initial + accumulated * 0.8f)));
     tracker.scheduleNextRecallFromStability(currentUTCTimestamp);
   }
 }

@@ -1,6 +1,9 @@
 package com.odde.doughnut.entities;
 
-/** Frozen open-FSRS-6 default weights, requested retention, Retrievability, and next Difficulty. */
+/**
+ * Frozen open-FSRS-6 default weights, requested retention, maximum interval, Retrievability, and
+ * next Difficulty.
+ */
 final class Fsrs {
   static final double[] W = {
     0.212, 1.2931, 2.3065, 8.2956, 6.4133, 0.8334, 3.0194, 0.001, 1.8722, 0.1666, 0.796, 1.4835,
@@ -10,6 +13,9 @@ final class Fsrs {
 
   /** Global requested retention; not a Settings knob. */
   static final double REQUESTED_RETENTION = 0.9;
+
+  /** Global maximum interval in whole hours; not a Settings knob. */
+  static final float MAXIMUM_INTERVAL_HOURS = 876000f;
 
   static final int AGAIN = 1;
   static final int HARD = 2;
@@ -21,6 +27,10 @@ final class Fsrs {
   /** Open FSRS identity: I(0.9, S) = S in whole hours. */
   static int intervalHours(float stabilityHours) {
     return Math.round(stabilityHours);
+  }
+
+  static float cappedStabilityHours(float stabilityHours) {
+    return Math.min(stabilityHours, MAXIMUM_INTERVAL_HOURS);
   }
 
   static double retrievability(double elapsedDays, double stabilityDays) {

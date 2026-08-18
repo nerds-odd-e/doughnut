@@ -40,15 +40,9 @@ Decision fragment in Proposed ADR 0003 (next to requested retention): global **3
 ### 2. A grade from over-cap Stability lands at the cap
 
 - **Type:** Behavior
-- **Status:** planned
+- **Status:** done
 
-**Pre:** a graded tracker with Stability **above** 876000 hours (legacy ladder scale), `lastRecalledAt` set, due = last + current S.
-
-**Trigger:** ordinary correct (`recalledSuccessfully`, neutral thinking time).
-
-**Post:** Stability **876000**; `nextRecallAt = lastRecalledAt + 876000 hours`. Difficulty follows existing Good next-D (unchanged by this slice’s unique claim — do not re-assert D).
-
-Canonical test in `SpacedRepetitionCorrectRecallSchedulingTest`. Implementation: one clamp used by every next-S write (`applyRecall`, shrink, confusion) so other grades cannot leak an over-cap S. Thinking-time on Good must not pierce the cap (one extra assertion or sibling test; same post-condition). First-rating hours stay far below the cap (no new first-rating tests).
+Over-cap ordinary correct (and thinking-time sibling) persist Stability **876000**; due = last + 876000. One write seam: `MemoryTrackerNextStability.write` over `Fsrs.cappedStabilityHours` / `MAXIMUM_INTERVAL_HOURS` (applyRecall, shrink, confusion). Fixture `setStability` is not clamped (precondition can still be over-cap).
 
 ### 3. Existing over-cap rows are clamped without a grade
 
@@ -57,7 +51,7 @@ Canonical test in `SpacedRepetitionCorrectRecallSchedulingTest`. Implementation:
 
 **Pre:** persisted `memory_tracker.stability > 876000` with `last_recalled_at` set (and a sibling under-cap row).
 
-**Trigger:** ungated Flyway `V300000273` (next free after `V300000272`) running a Java backfill (same shape as hours conversion / still-New backfills: logic in an entity/service type, thin `db.migration` wrapper).
+**Trigger:** ungated Flyway `V300000273` (next free after `V300000272`) running a Java backfill (same shape as hours conversion / still-New backfills: logic in an entity/service type, thin `db.migration` wrapper). Reuse `Fsrs.MAXIMUM_INTERVAL_HOURS` / `cappedStabilityHours` — do not duplicate the cap.
 
 **Post:** over-cap row has Stability **876000** and `next_recall_at = last_recalled_at + 876000 hours`; under-cap row untouched; Difficulty unchanged. Null `last_recalled_at`: cap S only.
 
@@ -73,3 +67,4 @@ Test drives the backfill class (not HTTP). Do not gate with `1=0`.
 ## Discoveries
 
 - Slice 1: restating the 24h fallback next to the cap duplicated the existing strictly-future bullet; the Decision now points at that fallback instead.
+- Slice 2: clamp lives in `Fsrs.cappedStabilityHours`; grade writes go through `MemoryTrackerNextStability`. `setStability` stays uncapped so tests can seed over-cap rows.
