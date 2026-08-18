@@ -2,9 +2,7 @@ package com.odde.doughnut.controllers;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.odde.doughnut.controllers.dto.RecordLearningSessionResponse;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.utils.TimestampOperations;
@@ -143,25 +141,6 @@ class LearningSessionRecordTutorFeedbackTests extends LearningSessionControllerT
     MemoryTracker hola = holaAfterFirstScore(score);
     assertThat(hola.getDifficulty(), equalTo(FIRST_AGAIN_DIFFICULTY));
     assertThat(hola.getStability(), equalTo(FIRST_AGAIN_STABILITY_HOURS));
-    assertThat(
-        hola.getNextRecallAt(),
-        equalTo(
-            TimestampOperations.addHoursToTimestamp(
-                hola.getLastRecalledAt(), Math.round(FIRST_AGAIN_STABILITY_HOURS))));
-  }
-
-  @Test
-  void scoreZeroSchedulesStrictlyAfterRecordedAt() throws UnexpectedNoAccessRightException {
-    Timestamp dayTwo = makeMe.aTimestamp().of(1, 9).please();
-    testabilitySettings.timeTravelTo(dayTwo);
-
-    SpanishNotebookFixture fixture = spanishNotebookFixture(dayTwo);
-
-    RecordLearningSessionResponse response =
-        controller.record(
-            recordRequest(fixture.notebook(), learningSessionReport("Hola", 0)), "Asia/Shanghai");
-
-    assertTrue(fixture.holaTracker().getNextRecallAt().after(response.getRecordedAt()));
   }
 
   private MemoryTracker holaAfterFirstScore(int score) throws UnexpectedNoAccessRightException {

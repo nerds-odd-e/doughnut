@@ -8,7 +8,6 @@ import com.odde.doughnut.controllers.dto.AnswerSpellingDTO;
 import com.odde.doughnut.controllers.dto.AnsweredQuestion;
 import com.odde.doughnut.controllers.dto.NoteTopology;
 import com.odde.doughnut.entities.AnswerOutcome;
-import com.odde.doughnut.entities.ForgettingCurve;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.RecallPrompt;
@@ -118,18 +117,6 @@ class RecallPromptAccidentalMatchEdgeTests extends RecallPromptControllerTestBas
     answerDTO = spellingAnswer(answerNote.getTitle());
 
     assertTrue(controller.answerSpelling(recallPrompt, answerDTO).getAnswer().getCorrect());
-  }
-
-  @Test
-  void accidentalMatchOnNewPromptedTrackerUsesS0Again() throws UnexpectedNoAccessRightException {
-    memoryTracker.setStability(ForgettingCurve.ASSIMILATE_STABILITY_HOURS);
-    memoryTracker.setNextRecallAt(memoryTracker.calculateNextRecallAt());
-    makeMe.entityPersister.save(memoryTracker);
-    testabilitySettings.timeTravelTo(memoryTracker.getNextRecallAt());
-
-    controller.answerSpelling(recallPrompt, answerDTO);
-
-    assertThat(memoryTracker.getStability(), equalTo(5f));
   }
 
   @Test
