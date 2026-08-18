@@ -24,11 +24,12 @@ Also surface when adding `title` frontmatter or rewriting wiki links to path Mar
 **Large** — remaining work is profile accept plus a lossless codec (and later accept/lint):
 
 1. Humans accept Proposed [ADR 0004](../../docs/adrs/0004-okf-compatible-notebook-markdown.md). See `docs/adrs/README.md`.
-2. Remaining codec IDs: **P1**–**P5**, **P8**–**P9**. Tracker: [OKF-COMPATIBILITY-GAP.md](../research/OKF-COMPATIBILITY-GAP.md).
+2. Remaining codec IDs: **P1**–**P5**, **P8**–**P9**. Tracker: [OKF-COMPATIBILITY-GAP.md](../research/OKF-COMPATIBILITY-GAP.md). **P1**/**P2** Decision wrap is locked; executing: [`.planning/quick/012-portable-note-title-without-generated-h1/`](../quick/012-portable-note-title-without-generated-h1/).
 
 ## Breadcrumbs
 
 - `.planning/research/OKF-COMPATIBILITY-GAP.md` — pointer + gap ID list
+- `.planning/quick/012-portable-note-title-without-generated-h1/` — close **P1**/**P2** (no generated H1; `title:` wrap when the filename cannot round-trip)
 - `docs/adrs/0004-okf-compatible-notebook-markdown.md` — Proposed Doughnut OKF profile (the OKF document; not a glossary noun in ADR 0001)
 - `docs/adrs/0002-git-native-notebooks-backed-by-mysql.md` — Git working tree; Level 1 deferred (**T1**)
 - `backend/src/main/java/com/odde/doughnut/services/notebookExport/`
