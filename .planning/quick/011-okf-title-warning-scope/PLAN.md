@@ -1,6 +1,6 @@
 # Plan: OKF title warning only on notes
 
-**Status:** planned (slice 1 next)
+**Status:** in progress (slice 2 next)
 
 **Goal:** Folder and notebook names `index` / `log` do not show the OKF-incompatible warning. Drop redundant tests left from the Readme/`README.md` work.
 
@@ -11,14 +11,11 @@
 
 ## Slices
 
-### 1. Folder or notebook named index or log does not warn — Behavior — planned
+### 1. Folder or notebook named index or log does not warn — Behavior — done
 
-**Pre:** Folder create/rename or notebook create/rename (not a note).  
-**Trigger:** Name `index`, `index.md`, `log`, or `log.md` (any case).  
-**Post:** No OKF-incompatible warning. Save succeeds. Creating or renaming a **note** to those titles still warns and still saves.
+`PathNameEditor.warnOnOkfIncompatibleTitle` defaults off; `NoteNewForm` and `NoteEditableTitle` opt in. Folder/notebook editors do not warn. E2E: create folder `index` — no warning, folder exists.
 
-E2E: extend folder create (e.g. `note_creation.feature`) — create folder `index`, no warning, folder exists. Existing note create/rename scenarios stay green.  
-Frontend: PathNameEditor default off; prop on `NoteNewForm` and `NoteEditableTitle` only.
+Landed on main in `e866f2efdb` (concurrent ADR 0004 session committed the uncommitted implementation with the ADR lock).
 
 ### 2. Drop redundant OKF/readme tests — Structure — planned
 
