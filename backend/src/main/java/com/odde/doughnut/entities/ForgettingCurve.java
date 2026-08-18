@@ -59,13 +59,13 @@ public class ForgettingCurve {
   }
 
   private NextMemory afterRecall(int grade, Supplier<Float> nextStability) {
-    if (isNewlyAssimilated()) {
+    if (isNew()) {
       return firstRating(grade);
     }
     return new NextMemory(Fsrs.nextDifficulty(difficulty, grade), nextStability.get());
   }
 
-  boolean isNewlyAssimilated() {
+  public boolean isNew() {
     return stabilityHours <= ASSIMILATE_STABILITY_HOURS;
   }
 
@@ -96,7 +96,7 @@ public class ForgettingCurve {
   }
 
   float confusionAdjusted(long elapsedInHours) {
-    if (isNewlyAssimilated()) {
+    if (isNew()) {
       return ASSIMILATE_STABILITY_HOURS;
     }
     float againHours = afterAgainRecall(elapsedInHours).stability();

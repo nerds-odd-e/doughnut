@@ -1,5 +1,6 @@
 package com.odde.doughnut.algorithms;
 
+import com.odde.doughnut.entities.ForgettingCurve;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.ProductOutcome;
 import java.sql.Timestamp;
@@ -40,10 +41,10 @@ public final class CommissionedLearningSessionFeedbackScheduling {
       case GOOD -> tracker.recalledSuccessfully(now, null);
       case HARD -> tracker.recalledHard(now);
       case SHRINK -> {
-        if (tracker.getStability() > 0) {
-          tracker.shrinkStability(now);
-        } else {
+        if (new ForgettingCurve(tracker.getStability()).isNew()) {
           tracker.recalledHard(now);
+        } else {
+          tracker.shrinkStability(now);
         }
       }
       case AGAIN, AGAIN_ZERO -> tracker.recalledAgain(now);
