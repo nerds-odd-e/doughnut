@@ -47,7 +47,6 @@ class TestabilityRestController {
   @Autowired BazaarService bazaarService;
   @Autowired UserService userService;
   @Autowired InjectNotesWorker injectNotesWorker;
-  @Autowired SeedGradedMemoryTrackerWorker seedGradedMemoryTrackerWorker;
 
   @PostMapping("/clean_db_and_reset_testability_settings")
   @Transactional
@@ -232,14 +231,5 @@ class TestabilityRestController {
   public List<Object> randomizer(@RequestBody Randomization randomization) {
     testabilitySettings.setRandomization(randomization);
     return Collections.emptyList();
-  }
-
-  @PostMapping("/seed_graded_memory_tracker")
-  @Transactional
-  public String seedGradedMemoryTracker(@RequestBody Map<String, Object> body) {
-    return seedGradedMemoryTrackerWorker.seed(
-        ((Number) body.get("memoryTrackerId")).intValue(),
-        ((Number) body.get("stability")).floatValue(),
-        ((Number) body.get("difficulty")).floatValue());
   }
 }

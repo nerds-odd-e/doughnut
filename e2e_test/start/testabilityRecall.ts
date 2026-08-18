@@ -167,41 +167,4 @@ export const recallTestabilityMethods = {
       }
     )
   },
-
-  markUnderstandingTrackerRecalledSuccessfully(
-    this: RecallTestability,
-    noteTitle: string
-  ) {
-    return this.memoryTrackerForNote(noteTitle, 'UNDERSTANDING').then(
-      (tracker) =>
-        cy.wrap(
-          MemoryTrackerController.markAsRecalled({
-            path: { memoryTracker: tracker.id },
-            query: { successful: true },
-          }),
-          { log: false }
-        )
-    )
-  },
-
-  seedGradedUnderstandingTracker(
-    this: RecallTestability,
-    noteTitle: string,
-    stability: number,
-    difficulty: number
-  ) {
-    return this.memoryTrackerForNote(noteTitle, 'UNDERSTANDING').then(
-      (tracker) =>
-        cy.request({
-          method: 'POST',
-          url: '/api/testability/seed_graded_memory_tracker',
-          body: {
-            memoryTrackerId: tracker.id,
-            stability,
-            difficulty,
-          },
-          log: false,
-        })
-    )
-  },
 }

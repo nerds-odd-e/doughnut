@@ -105,7 +105,7 @@ public class MemoryTrackerService {
     return false;
   }
 
-  public void persistRecallLog(
+  void persistRecallLog(
       MemoryTracker memoryTracker,
       Timestamp recordedAt,
       ProductOutcome productOutcome,

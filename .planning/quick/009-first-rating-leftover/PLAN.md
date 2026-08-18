@@ -45,15 +45,9 @@ Unit pin `onTimeIncorrectRecallAfterFirstGoodUsesFsrsAgainFromS0AndD0Good`: Stab
 ### 3. Drop graded-tracker seed and dead mark-successfully helper
 
 - **Type:** Structure
-- **Status:** planned
+- **Status:** done
 
-Enables nothing further — leftover from slices 1–2. Stop-safe: unused testability only.
-
-Remove `POST /api/testability/seed_graded_memory_tracker`, `SeedGradedMemoryTrackerWorker`, E2E `seedGradedUnderstandingTracker` / “graded at stability {int}” step, generated client for that operation (`pnpm generateTypeScript`). Revert `MemoryTrackerService.persistRecallLog` to package-private (it was widened only for the worker’s unused GOOD log).
-
-Delete unused `markUnderstandingTrackerRecalledSuccessfully` and the “I marked the understanding tracker … as recalled successfully” step (no feature callers after 008).
-
-**Done when:** no seed endpoint; `persistRecallLog` not public; targeted backend tests and `spaced_repetition.feature` still pass.
+Removed seed endpoint/worker, E2E seed and mark-successfully helpers/steps, regenerated OpenAPI client. `persistRecallLog` is package-private.
 
 ### 4. One commissioned first-score E2E outline
 
