@@ -1,6 +1,6 @@
 # Recall-stats FSRS alignment — cleanup + Requested-retention adoption
 
-**Status:** in progress (slice 1 done)
+**Status:** in progress (slices 1–2 done)
 **Scope:** everything surfaced by the FSRS-compatibility-gap analysis of recall
 stats (chat 2026-08-18), refined into small-commit-size slices: one
 correctness bug (1), one Requested-retention adoption arc (2 docs → 3 code),
@@ -64,21 +64,14 @@ Full analysis is in the chat transcript, not duplicated here. Short version:
 
 ### 2. Structure (docs): Requested retention may be shown read-only in stats
 
-- Amends ADR 0001 and ADR 0003 so slice 3 doesn't contradict written policy.
-  No code change; verified by re-reading the two ADRs for internal
-  consistency (grep confirms "not in the UI" appears exactly once, in ADR
-  0003 line ~54).
-- **Files:**
-  - `docs/adrs/0001-ubiquitous-language.md` — extend the existing
-    **Requested retention** glossary row to note it may be surfaced
-    read-only in recall statistics (e.g. the heatmap color anchor).
-  - `docs/adrs/0003-spaced-repetition-scheduling-policy.md` — reword "not a
-    Settings knob, not in the UI, not persisted" to distinguish
-    *configurable* (still no) from *displayed read-only* (now yes, in recall
-    stats). Do not touch the other two "not a Settings knob" mentions
-    (lines ~178, ~322) — they're about the short-term-success rule and the
-    rejected-options list, not the UI-visibility question.
-- **Status:** planned — enables slice 3.
+- Amends ADR 0001 glossary and Proposed ADR 0003 Decision so requested
+  retention may be shown read-only in recall statistics (e.g. heatmap color
+  anchor) while remaining a locked 0.9 constant — not a Settings knob, not
+  persisted. Enables slice 3.
+- **Status:** done
+- **Learning:** dual glossary/policy wording is the same pattern as
+  Stability; other two "not a Settings knob" mentions in ADR 0003 (short-term
+  success, rejected options) were left alone. ADR 0003 stays Proposed.
 
 ### 3. Heatmap retention color anchor uses Requested Retention, 90% not 85% (Behavior)
 

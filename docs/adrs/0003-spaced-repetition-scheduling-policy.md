@@ -51,8 +51,10 @@ state, qualitative update rules), not with a particular crate or version.
 - **Retrievability** is computed from elapsed whole hours and Stability, not stored.
 - A recall transition consumes the graded outcome, elapsed time, and that state — never queue lateness.
 - **Requested retention** `r` is a **global constant 0.9** — not a Settings
-  knob, not in the UI, not persisted. There is **no lapse count** (see
-  **Lapses**). Memory-state transitions are a **RecallLog** (see **RecallLog**).
+  knob, not persisted, and not otherwise configurable. It may be shown
+  read-only in recall statistics (e.g. the heatmap color anchor). There is
+  **no lapse count** (see **Lapses**). Memory-state transitions are a
+  **RecallLog** (see **RecallLog**).
 
 ### Lapses
 
