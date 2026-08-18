@@ -9,12 +9,12 @@ import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.utils.TimestampOperations;
 import java.sql.Timestamp;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
 
 class SpacedRepetitionCorrectRecallSchedulingTest extends SpacedRepetitionRecallSchedulingTestBase {
   static final float FIRST_GOOD_DIFFICULTY = 2.118104f;
   static final float FIRST_GOOD_STABILITY_HOURS = 55.0f;
+  static final float MAXIMUM_INTERVAL_HOURS = 876000f;
+  static final float LEGACY_LADDER_MAX_STABILITY_HOURS = 1_800_600f;
 
   @Test
   void firstCorrectRecallUsesS0AndD0Good() {
@@ -42,15 +42,11 @@ class SpacedRepetitionCorrectRecallSchedulingTest extends SpacedRepetitionRecall
     assertThat(memoryTracker.getStability(), equalTo(21.0f));
   }
 
-  @ParameterizedTest
-  @CsvSource({"0", "500"})
-  void firstCorrectRecallIgnoresReviewTiming(int extraElapsedHours) {
+  @Test
+  void firstCorrectRecallIgnoresElapsedHours() {
     MemoryTracker memoryTracker = makeMe.aMemoryTrackerFor(note).by(user).inMemoryPlease();
     Timestamp gradeTime =
-        extraElapsedHours == 0
-            ? memoryTracker.getNextRecallAt()
-            : TimestampOperations.addHoursToTimestamp(
-                memoryTracker.getLastRecalledAt(), extraElapsedHours);
+        TimestampOperations.addHoursToTimestamp(memoryTracker.getLastRecalledAt(), 500);
 
     memoryTracker.recalledSuccessfully(gradeTime);
 
@@ -211,5 +207,20 @@ class SpacedRepetitionCorrectRecallSchedulingTest extends SpacedRepetitionRecall
             elapsedHundredTimesStability.getLastRecalledAt());
     assertThat(hundredTimesInterval, greaterThan(tenTimesInterval));
     assertThat(hundredTimesInterval - tenTimesInterval, lessThan(tenTimesInterval));
+  }
+
+  @Test
+  void correctRecallFromOverCapStabilityLandsAtTheCap() {
+    MemoryTracker memoryTracker = aGradedTrackerAtStability(LEGACY_LADDER_MAX_STABILITY_HOURS);
+    Timestamp gradeTime = onTimeGradeTime(memoryTracker);
+
+    memoryTracker.recalledSuccessfully(gradeTime);
+
+    assertThat(memoryTracker.getStability(), equalTo(MAXIMUM_INTERVAL_HOURS));
+    assertThat(
+        memoryTracker.getNextRecallAt(),
+        equalTo(
+            TimestampOperations.addHoursToTimestamp(
+                gradeTime, Math.round(MAXIMUM_INTERVAL_HOURS))));
   }
 }

@@ -93,7 +93,7 @@ class RecallPromptAnswerControllerTest extends RecallPromptControllerTestBase {
   }
 
   @Test
-  void ordinaryGoodNextStabilityAndDueIgnoreThinkingTime() throws UnexpectedNoAccessRightException {
+  void ordinaryGoodNextMemoryStateIgnoresThinkingTime() throws UnexpectedNoAccessRightException {
     Note zeroNote = ownedNote();
     MemoryTracker zeroMs = ownedTracker(zeroNote);
     Note sixtyNote = ownedNote();
@@ -112,6 +112,8 @@ class RecallPromptAnswerControllerTest extends RecallPromptControllerTestBase {
 
     assertThat(zeroMs.getStability(), equalTo(memoryTracker.getStability()));
     assertThat(sixtySeconds.getStability(), equalTo(memoryTracker.getStability()));
+    assertThat(zeroMs.getDifficulty(), equalTo(memoryTracker.getDifficulty()));
+    assertThat(sixtySeconds.getDifficulty(), equalTo(memoryTracker.getDifficulty()));
     assertThat(zeroMs.getNextRecallAt(), equalTo(memoryTracker.getNextRecallAt()));
     assertThat(sixtySeconds.getNextRecallAt(), equalTo(memoryTracker.getNextRecallAt()));
   }
