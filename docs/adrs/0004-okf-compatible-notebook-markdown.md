@@ -32,13 +32,23 @@ profile. Codec round-trips must be lossless for these rules.
   the bundle (`type: Relationship`). OKF unknown types are allowed.
   Preserve author-owned and unknown frontmatter keys on persist and
   round-trip.
-- Reserved basenames: `index.md` (directory listing / folder readme) and
-  `log.md`. Concept files must not use those names.
-- Folder readmes map to that directory’s `index.md`. Empty folders exist in
-  the tree only via tracked content (typically `index.md`); Git has no empty
-  dirs.
-- Root `index.md` may carry `okf_version` only (OKF); other index files have
-  no concept frontmatter beyond that rule.
+- Container **Readme** is a notebook/folder column, not a note row.
+  Non-blank readme maps to that directory’s `README.md`, a bundle concept
+  with `type: Readme`. Blank readme omits the file.
+- Codec wrap (export / portable tree): insert `type: Readme` if missing;
+  canonicalize `readme` → `Readme`; leave any other non-empty `type`.
+  Preserve author YAML. Do not persist `type: Readme` on stored readme
+  columns. Do not backfill. ZIP has no stored artifacts to migrate.
+- `readme` / `readme.md` stay hard-reserved note titles.
+- `index.md` is only the OKF directory listing. Doughnut does not emit it
+  until listing generation exists; missing is conformant. Root
+  `okf_version` appears only when that listing file exists.
+- Concept titles that would become `index.md` or `log.md` (`index`,
+  `index.md`, `log`, `log.md`, case-insensitive) are allowed. The product
+  warns on create/rename (PathNameEditor, same non-blocking channel as
+  wiki-link-char warnings) and does not reject.
+- Empty folders exist in the tree only via tracked content (typically
+  `README.md` when a readme is present); Git has no empty dirs.
 
 ### Titles, filenames, body
 
@@ -65,8 +75,10 @@ profile. Codec round-trips must be lossless for these rules.
 ### Validation
 
 - Accept (push / durable write) and CLI lint reject trees that break OKF
-  requirements or this profile (missing/invalid `type`, reserved-name misuse,
-  unsafe paths, missing required indexes where Doughnut requires them, etc.).
+  requirements or this profile (missing/invalid `type`, reserved-name misuse
+  of `readme` / `readme.md`, unsafe paths, etc.).
+- Missing `index.md` is conformant until Doughnut generates listings.
+  Concept files named `index.md` / `log.md` warn; they do not fail accept.
 - Recommendations (e.g. OKF `tags` shape) may warn without blocking.
 
 ## Consequences
