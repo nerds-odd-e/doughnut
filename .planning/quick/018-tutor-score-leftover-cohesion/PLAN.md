@@ -1,6 +1,6 @@
 # Plan: Tutor score 1–4 leftover cohesion
 
-**Status:** in progress (slices 1–2 done)
+**Status:** in progress (slices 1–3 done)
 
 **Goal:** The shipped 1–4 identity (`score = G`) is pinned once per observable surface. Drop leftover duplicate tests from the old “score 4 leaves GOOD” special case and from Request-copy / parser / alias-rewrite outlines that re-assert the same post-condition.
 
@@ -29,7 +29,7 @@ Leftovers that wrap-up missed:
 
 - HTTP `scoreThreeLeavesAGoodRecallLogWithoutAnswer` folded into `matchedScoreLeavesMappedRecallLog`.
 - E2E `expectLearningSessionRequestIncludesRubric` now pins only `score from 1 to 4 per item` and `Hola: 4`; HTTP keeps the four mastery lines.
-- Parser `acceptsScoreFromOneToFour` re-asserts the same parse shape for 1, 2, 3, and 4. Reject `0/5/6` already defines the range.
+- Parser `acceptsScoreFromOneToFour` is one in-range accept (`Hola: 4`); reject `0/5/6` defines the range.
 - `AliasRecallLogGradeBackfillTest` re-asserts Stability, Difficulty, and due for both aliases. `StillNewFirstRatingBackfillTest` still names a tracker `shrink`.
 
 ## Slices
@@ -55,11 +55,9 @@ Learning: helper lives in `recallLearningSessionMethods.ts`; Cypress not re-run 
 ### 3. Parser range is one accept plus reject-outside
 
 - **Type:** Structure
-- **Status:** planned
+- **Status:** done
 
-Structure: replace parameterized accept `1/2/3/4` with **one** in-range accept. Keep reject `0`, `5`, and `6` (`Score must be 1, 2, 3, or 4.`).
-
-Unlocks: range is pinned as reject-outside, not four identical accepts.
+`acceptsScoreFromOneToFour` is one `@Test` with `Hola: 4`. Reject `0`/`5`/`6` still pins `Score must be 1, 2, 3, or 4.`
 
 ### 4. Alias rewrite pins schedule once
 
