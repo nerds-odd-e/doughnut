@@ -1,16 +1,5 @@
 import type { PropertyRow } from "@/utils/noteContentPropertyRows"
 
-/** Preset property keys offered in rich-mode property name UI. */
-export const RICH_MODE_PRESET_PROPERTY_KEYS = [
-  "aliases",
-  "overlaps",
-  "image",
-  "wikidata_id",
-  "url",
-  "example of",
-  "question_generation_instruction",
-] as const
-
 /**
  * Predefined property keys shown only when editing a container readme
  * (notebook/folder readme editors, or a note whose title is a reserved readme name).
@@ -218,27 +207,4 @@ export function findPropertyRowIndexByExactKey(
     if (rows[i]!.key.trim() === trimmed) return i
   }
   return -1
-}
-
-/** Keys offered in the rich-mode property key dropdown (insert and row key fields). */
-export function richModeKeyDropdownPresetKeys(
-  isReadmeContext: boolean
-): string[] {
-  const keys: string[] = [...RICH_MODE_PRESET_PROPERTY_KEYS]
-  if (isReadmeContext) keys.push(...README_ONLY_PRESET_PROPERTY_KEYS)
-  return keys
-}
-
-/**
- * Preset keys for the rich-mode property key dropdown, each resolved to the next
- * available name in its family (e.g. `url 2` when `url` already exists).
- */
-export function richModeKeyDropdownPresetKeysForPropertyRows(
-  isReadmeContext: boolean,
-  rows: readonly PropertyRow[],
-  options?: { excludeRowIndex?: number }
-): string[] {
-  return richModeKeyDropdownPresetKeys(isReadmeContext).map((preset) =>
-    nextAvailablePropertyKeyForPreset(preset, rows, options)
-  )
 }
