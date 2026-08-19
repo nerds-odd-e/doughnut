@@ -2,6 +2,7 @@ package com.odde.doughnut.algorithms;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.is;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -127,6 +128,15 @@ class ClozeDescriptionTest {
 
     assertThat(result, containsString("[...]"));
     assertThat(result, containsString("https://en.wikipedia.org/wiki/Enemy"));
+  }
+
+  @Test
+  void clozeShouldMaskPronunciationSpellingWhenItRepeatsInTheBody() {
+    String result =
+        new ClozedString(clozeReplacement, "a cat /kat/ also written kat")
+            .hide(new NoteTitle("cat"))
+            .maskedContentAsMarkdown();
+    assertThat(result, is("a [...] /.../ also written [...]"));
   }
 
   @Test
