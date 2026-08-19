@@ -1,6 +1,6 @@
 # Plan: Elapsed-hours backfill test cohesion
 
-**Status:** planned
+**Status:** in-progress
 
 **Goal:** Reconstruction tests pin the ADR contract on the reconstruction function without Spring or vacuous JDBC. Live persist pins stay on the tracking controller.
 
@@ -22,18 +22,18 @@
 
 ## Findings (inspect only)
 
-No reconstruction logic bug vs ADR 0003 RecallLog. After `NOT NULL`, two JDBC tests in `RecallLogElapsedHoursBackfillTest` no longer fill `NULL`s: `persistedLogDefaultsElapsedHoursToZero` only pins the Java `RecallLogBuilder` default (live **0** is already on `successfulMarkAsRecalledLeavesOneGoodRecallLog`); `leavesPersistedElapsedAndScheduleUnchanged` is a no-op `UPDATE … WHERE elapsed_hours IS NULL`. The four reconstruction cases still boot `@SpringBootTest`. Mixed non-null + `NULL`, negative diff → **0**, and tracker isolation are untested on the function (the original “non-null left alone” sibling was the JDBC no-op).
+No reconstruction logic bug vs ADR 0003 RecallLog. Live first-grade **0** stays on `successfulMarkAsRecalledLeavesOneGoodRecallLog`. Mixed non-null + `NULL`, negative diff → **0**, and tracker isolation are still untested on `reconstructedNullElapsedById` (slice 2).
 
 ## Slices
 
 ### 1. Backfill tests do not boot Spring
 
 - **Type:** Structure
-- **Status:** planned
+- **Status:** done
 
-Drop `persistedLogDefaultsElapsedHoursToZero` and `leavesPersistedElapsedAndScheduleUnchanged` (and the JDBC/`MakeMe` harness they need). Keep the four reconstruction cases as a plain unit test (no `@SpringBootTest`). Existing tests still pass; no observable product change.
+Dropped the two JDBC/`MakeMe` cases and Spring harness. Four reconstruction cases remain as a plain JUnit class (`onDay` timestamps). Production `run` unchanged.
 
-Unlocks: slice 2 can add ADR sibling pins on that cheap surface.
+Unlocks: slice 2 sibling pins on `reconstructedNullElapsedById`.
 
 ### 2. Reconstruction siblings match the ADR deltas
 
@@ -49,4 +49,4 @@ On `reconstructedNullElapsedById` only (siblings assert their delta; canonical f
 ## Discoveries
 
 - `run()` cannot insert `NULL` after `V300000282`; Flyway remains the production caller. Alias-grade backfill can still plant rewrite rows; elapsed cannot.
-- `RecallLogElapsedHoursBackfillTest` is `@SpringBootTest` because slice 2 originally drove `run()` with `makeMe` `NULL`s.
+- Reconstruction tests no longer boot Spring. Slice 2 adds mixed / negative / tracker-isolation siblings on the same `reconstructedNullElapsedById` surface.
