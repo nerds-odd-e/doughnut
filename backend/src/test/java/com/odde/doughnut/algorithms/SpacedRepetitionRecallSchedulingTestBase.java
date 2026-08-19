@@ -1,6 +1,6 @@
 package com.odde.doughnut.algorithms;
 
-import static com.odde.doughnut.entities.ForgettingCurve.DEFAULT_DIFFICULTY;
+import static com.odde.doughnut.entities.Fsrs.DEFAULT_DIFFICULTY;
 
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
@@ -48,5 +48,12 @@ abstract class SpacedRepetitionRecallSchedulingTestBase {
   Timestamp overdueGradeTime(MemoryTracker tracker) {
     return TimestampOperations.addHoursToTimestamp(
         tracker.getLastRecalledAt(), Math.round(tracker.getStability()) * 2);
+  }
+
+  float nextStabilityHours(int elapsedInHours) {
+    MemoryTracker memoryTracker = aGradedTrackerAtThreeDayStability();
+    memoryTracker.recalledSuccessfully(
+        TimestampOperations.addHoursToTimestamp(memoryTracker.getLastRecalledAt(), elapsedInHours));
+    return memoryTracker.getStability();
   }
 }

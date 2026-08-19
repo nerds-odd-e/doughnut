@@ -3,7 +3,7 @@ package com.odde.doughnut.services;
 import com.odde.doughnut.algorithms.NoteContentMarkdown;
 import com.odde.doughnut.algorithms.NotePropertyIndexPlanner;
 import com.odde.doughnut.algorithms.PropertyTrackingBackfillPlan;
-import com.odde.doughnut.entities.ForgettingCurve;
+import com.odde.doughnut.entities.Fsrs;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -76,7 +76,7 @@ public final class NotePropertyTrackingBackfill {
         PreparedStatement trackerExistsStmt = connection.prepareStatement(TRACKER_EXISTS_QUERY);
         PreparedStatement insertTrackerStmt = connection.prepareStatement(INSERT_SKIPPED_TRACKER)) {
 
-      insertTrackerStmt.setFloat(7, ForgettingCurve.ASSIMILATE_STABILITY_HOURS);
+      insertTrackerStmt.setFloat(7, Fsrs.NEW_STABILITY_HOURS);
 
       try (ResultSet notes = notesStmt.executeQuery()) {
         while (notes.next()) {

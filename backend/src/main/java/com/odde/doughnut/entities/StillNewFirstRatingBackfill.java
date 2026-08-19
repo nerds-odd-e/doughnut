@@ -12,19 +12,15 @@ public final class StillNewFirstRatingBackfill {
   private StillNewFirstRatingBackfill() {}
 
   public static void runAgain(Connection connection, String gate) throws SQLException {
-    ForgettingCurve.NextMemory firstAgain =
-        new ForgettingCurve(ForgettingCurve.ASSIMILATE_STABILITY_HOURS).afterAgainRecall(0);
-    run(connection, gate, firstAgain, "'AGAIN', 'AGAIN_ZERO'");
+    run(connection, gate, Fsrs.firstRating(Fsrs.AGAIN), "'AGAIN', 'AGAIN_ZERO'");
   }
 
   public static void runHard(Connection connection, String gate) throws SQLException {
-    ForgettingCurve.NextMemory firstHard =
-        new ForgettingCurve(ForgettingCurve.ASSIMILATE_STABILITY_HOURS).afterHardRecall(0);
-    run(connection, gate, firstHard, "'SHRINK'");
+    run(connection, gate, Fsrs.firstRating(Fsrs.HARD), "'SHRINK'");
   }
 
   private static void run(
-      Connection connection, String gate, ForgettingCurve.NextMemory first, String outcomeSqlInList)
+      Connection connection, String gate, Fsrs.NextMemory first, String outcomeSqlInList)
       throws SQLException {
     if ("1=0".equals(gate)) {
       return;

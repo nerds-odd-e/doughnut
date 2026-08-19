@@ -1,10 +1,16 @@
 package com.odde.doughnut.entities;
 
+import java.util.function.BiFunction;
+
 /**
- * Frozen open-FSRS-6 default weights, requested retention, maximum interval, Retrievability, and
- * next Difficulty.
+ * Frozen open-FSRS-6 default weights, requested retention, maximum interval, Retrievability, next
+ * Difficulty, New vs graded first-rating, and DSR constants.
  */
-final class Fsrs {
+public final class Fsrs {
+  public static final float NEW_STABILITY_HOURS = 0.0f;
+  public static final float STRICTLY_FUTURE_FALLBACK_HOURS = 24.0f;
+  public static final float DEFAULT_DIFFICULTY = 5.0f;
+
   static final double[] W = {
     0.212, 1.2931, 2.3065, 8.2956, 6.4133, 0.8334, 3.0194, 0.001, 1.8722, 0.1666, 0.796, 1.4835,
     0.0614, 0.2629, 1.6483, 0.6014, 1.8729, 0.5425, 0.0912, 0.0658, 0.1542
@@ -23,6 +29,57 @@ final class Fsrs {
   static final int EASY = 4;
 
   private Fsrs() {}
+
+  record NextMemory(float difficulty, float stability) {}
+
+  public static boolean isNew(float stabilityHours) {
+    return stabilityHours <= NEW_STABILITY_HOURS;
+  }
+
+  static NextMemory firstRating(int grade) {
+    return new NextMemory(initialDifficulty(grade), initialStabilityHours(grade));
+  }
+
+  static NextMemory afterGoodRecall(float stabilityHours, Float difficulty, long elapsedInHours) {
+    return afterRecall(
+        stabilityHours,
+        difficulty,
+        GOOD,
+        (s, d) -> FsrsGoodRecall.hoursAfterGoodRecall(s, d, elapsedInHours));
+  }
+
+  static NextMemory afterEasyRecall(float stabilityHours, Float difficulty, long elapsedInHours) {
+    return afterRecall(
+        stabilityHours,
+        difficulty,
+        EASY,
+        (s, d) -> FsrsEasyRecall.hoursAfterEasyRecall(s, d, elapsedInHours));
+  }
+
+  static NextMemory afterHardRecall(float stabilityHours, Float difficulty, long elapsedInHours) {
+    return afterRecall(
+        stabilityHours,
+        difficulty,
+        HARD,
+        (s, d) -> FsrsHardRecall.hoursAfterHardRecall(s, d, elapsedInHours));
+  }
+
+  static NextMemory afterAgainRecall(float stabilityHours, Float difficulty, long elapsedInHours) {
+    return afterRecall(
+        stabilityHours,
+        difficulty,
+        AGAIN,
+        (s, d) -> FsrsAgainRecall.hoursAfterAgainRecall(s, d, elapsedInHours));
+  }
+
+  static float confusionAdjusted(float stabilityHours, Float difficulty, long elapsedInHours) {
+    float s = clampedStability(stabilityHours);
+    if (isNew(s)) {
+      return NEW_STABILITY_HOURS;
+    }
+    float againHours = afterAgainRecall(s, difficulty, elapsedInHours).stability();
+    return Math.max(1f, Math.round((s + againHours) / 2.0f));
+  }
 
   /** Open FSRS identity: I(0.9, S) = S in whole hours. */
   static int intervalHours(float stabilityHours) {
@@ -63,10 +120,13 @@ final class Fsrs {
     return (float) Math.round(nextDays * HOURS_PER_DAY);
   }
 
-  /** Elapsed 0 → FSRS-6 short-term next Stability; otherwise long-term Stability increase. */
+  /**
+   * Elapsed hours under 24 use FSRS-6 short-term next Stability; otherwise long-term Stability
+   * increase.
+   */
   static float hoursAfterShortTermOrStabilityIncrease(
       float stabilityHours, int grade, long elapsedInHours, double incrementTerm) {
-    if (elapsedInHours == 0) {
+    if (elapsedInHours < HOURS_PER_DAY) {
       return hoursAfterShortTermRecall(stabilityHours, grade);
     }
     return hoursAfterStabilityIncrease(stabilityHours, incrementTerm);
@@ -92,6 +152,27 @@ final class Fsrs {
 
   static float initialStabilityHours(int grade) {
     return (float) Math.round(W[grade - 1] * HOURS_PER_DAY);
+  }
+
+  private static NextMemory afterRecall(
+      float stabilityHours,
+      Float difficulty,
+      int grade,
+      BiFunction<Float, Float, Float> nextStability) {
+    float s = clampedStability(stabilityHours);
+    float d = difficultyOrDefault(difficulty);
+    if (isNew(s)) {
+      return firstRating(grade);
+    }
+    return new NextMemory(nextDifficulty(d, grade), nextStability.apply(s, d));
+  }
+
+  private static float clampedStability(float stabilityHours) {
+    return Math.max(NEW_STABILITY_HOURS, stabilityHours);
+  }
+
+  private static float difficultyOrDefault(Float difficulty) {
+    return difficulty == null ? DEFAULT_DIFFICULTY : difficulty;
   }
 
   private static double d0(int grade) {

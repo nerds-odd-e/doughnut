@@ -187,18 +187,22 @@ Use **whole elapsed hours** as the recall-transition time input: duration
 between the current recall time and `lastRecalledAt`, discarding any sub-hour
 remainder, independent of time zone or calendar day. Morning/afternoon recall
 windows make day precision too coarse. There is no calendar same-day rule.
-When elapsed whole hours are **0** and Stability is greater than 0, success
+When elapsed whole hours are **< 24** and Stability is greater than 0, success
 grades (ordinary correct / Tutor **3** Good, Tutor **2** Hard, Tutor **4** Easy)
 update Stability with published open FSRS-6 short-term next Stability (own
 implementation, frozen `Fsrs.W`): convert persisted whole hours to days,
 `S' = S · e^{w17 · (G − 3 + w18)} · S^{-w19}`, then persist whole hours.
 Clamp **SInc ≥ 1** so next Stability does not shrink. With frozen weights
-and rounding: Good 24→**25**; Easy 24→**43**; Hard 24 stays **24** (clamp);
-Good at 72 hours stays **72** (clamp). Again at elapsed 0 stays post-lapse.
-Confusion is unchanged. New (Stability 0) first-rating is
-unchanged by elapsed time (see **First rating on New**). The short-term success
-rule is not a Settings knob. Elapsed whole hours **≥ 1** still use long-term
-next Stability.
+and rounding, short-term next Stability: Good **24h** → **25h**; Easy
+**24h** → **43h**; Hard **24h** stays **24h** (clamp); Good **72h** stays
+**72h** (clamp). Elapsed whole hours **≥ 24** use
+long-term next Stability. Again is post-lapse at every elapsed, including 0
+and 5. Confusion is unchanged. New (Stability 0) first-rating is unchanged
+by elapsed time (see **First rating on New**). The short-term success rule
+is not a Settings knob. Existing Stability, Difficulty, and due change
+**going forward only**: do not rewrite stored Stability; no new Flyway for
+this rule. Observable pin: New → Again (`S0(1)` = **5h**) → Good at elapsed
+5 → short-term next Stability **6h** (not long-term **21h**).
 
 ### Thinking time
 
@@ -377,6 +381,15 @@ Empty pending accept.
   assimilate** — rejected: `lastRecalledAt` is the last mapped grade only;
   New has no last recall and is due at `assimilatedAt`. After first-rating
   the tracker is a graded DSR tracker. No step list or card-state column.
+- **Short-term success only when elapsed whole hours are 0** — rejected:
+  published FSRS-6 short-term applies while elapsed hours are **< 24**.
+- **Calendar same-day short-term window** — rejected: whole-hour elapsed is
+  the time input; there is no calendar-day rule.
+- **Open FSRS `enable_short_term` off** — rejected: Doughnut uses the
+  published short-term success path for elapsed **< 24**; the switch is not
+  a Settings knob.
+- **Rebuild stored Stability from the new short-term window** — rejected:
+  existing S/D/due change going forward only; no new Flyway for this rule.
 
 ## Related
 

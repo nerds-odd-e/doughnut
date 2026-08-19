@@ -33,13 +33,13 @@ class SpacedRepetitionCorrectRecallSchedulingTest extends SpacedRepetitionRecall
   }
 
   @Test
-  void correctRecallAfterNewAgainUsesLongTermGoodStability() {
+  void correctRecallAfterNewAgainUsesShortTermGoodStability() {
     MemoryTracker memoryTracker = makeMe.aMemoryTrackerFor(note).by(user).inMemoryPlease();
     memoryTracker.markAsRecalled(memoryTracker.getNextRecallAt(), false);
 
     memoryTracker.recalledSuccessfully(onTimeGradeTime(memoryTracker));
 
-    assertThat(memoryTracker.getStability(), equalTo(21.0f));
+    assertThat(memoryTracker.getStability(), equalTo(6.0f));
   }
 
   @Test

@@ -9,7 +9,7 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import com.odde.doughnut.controllers.dto.AnswerSpellingDTO;
-import com.odde.doughnut.entities.ForgettingCurve;
+import com.odde.doughnut.entities.Fsrs;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.ProductOutcome;
@@ -87,15 +87,13 @@ class RecallPromptAccidentalMatchConfusionAdjustmentTests extends RecallPromptCo
     @Test
     void shouldNotDropMatchedSpellingTrackerBelowStabilityFloor()
         throws UnexpectedNoAccessRightException {
-      matchedSpellingTracker.setStability(ForgettingCurve.ASSIMILATE_STABILITY_HOURS);
+      matchedSpellingTracker.setStability(Fsrs.NEW_STABILITY_HOURS);
       matchedSpellingTracker.setNextRecallAt(matchedSpellingTracker.calculateNextRecallAt());
       makeMe.entityPersister.save(matchedSpellingTracker);
 
       controller.answerSpelling(recallPrompt, answerDTO);
 
-      assertThat(
-          matchedSpellingTracker.getStability(),
-          equalTo(ForgettingCurve.ASSIMILATE_STABILITY_HOURS));
+      assertThat(matchedSpellingTracker.getStability(), equalTo(Fsrs.NEW_STABILITY_HOURS));
     }
 
     @Test

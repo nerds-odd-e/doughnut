@@ -89,7 +89,7 @@
 **Domain algorithms (pure):**
 - Purpose: Stateless text/SRS helpers without Spring wiring
 - Location: `backend/src/main/java/com/odde/doughnut/algorithms/`
-- Contains: `ClozedString`, `NoteContentMarkdown`, `SpacedRepetitionAlgorithm`, wiki-link parsing, property indexing planners
+- Contains: `ClozedString`, `NoteContentMarkdown`, wiki-link parsing, property indexing planners
 - Depends on: Minimal JDK / shared types
 - Used by: Entities and services
 
