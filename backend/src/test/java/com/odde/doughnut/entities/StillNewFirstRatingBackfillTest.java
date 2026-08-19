@@ -1,21 +1,17 @@
 package com.odde.doughnut.entities;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.closeTo;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.doughnut.testability.MakeMe;
-import com.odde.doughnut.utils.TimestampOperations;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import javax.sql.DataSource;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.EnumSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -28,56 +24,9 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 class StillNewFirstRatingBackfillTest {
 
-  static final float FIRST_AGAIN_STABILITY_HOURS = 5f;
-  static final float FIRST_AGAIN_DIFFICULTY = 6.4133f;
-  static final float FIRST_HARD_STABILITY_HOURS = 31f;
-  static final float FIRST_HARD_DIFFICULTY = 5.1121707f;
-
   @Autowired MakeMe makeMe;
   @Autowired DataSource dataSource;
   @Autowired JdbcTemplate jdbcTemplate;
-
-  @ParameterizedTest
-  @EnumSource(
-      value = ProductOutcome.class,
-      names = {"AGAIN", "AGAIN_ZERO"})
-  void runAgain_appliesAgainFirstRatingToStillNewTrackersWithAgainLogs(ProductOutcome outcome)
-      throws Exception {
-    MemoryTracker tracker = stillNewWith(outcome, makeMe.aTimestamp().of(1, 0).please());
-
-    runAgain("1=1");
-
-    assertAgainFirstRating(tracker.getId());
-  }
-
-  @Test
-  void runAgain_leavesAssimilateOnlyTrackersNew() throws Exception {
-    MemoryTracker assimilateOnly = stillNew(makeMe.aTimestamp().of(1, 0).please());
-
-    runAgain("1=1");
-
-    assertStillNew(assimilateOnly.getId(), assimilateOnly.getAssimilatedAt());
-  }
-
-  @Test
-  void runAgain_leavesAlreadyGradedTrackersUnchanged() throws Exception {
-    MemoryTracker alreadyGraded = gradedWithAgainLog(makeMe.aTimestamp().of(1, 0).please());
-    Float gradedStability = alreadyGraded.getStability();
-
-    runAgain("1=1");
-
-    assertThat(stability(alreadyGraded.getId()), equalTo(gradedStability));
-  }
-
-  @Test
-  void runAgain_leavesShrinkOnlyTrackersNew() throws Exception {
-    MemoryTracker shrinkOnly =
-        stillNewWith(ProductOutcome.SHRINK, makeMe.aTimestamp().of(1, 0).please());
-
-    runAgain("1=1");
-
-    assertStillNew(shrinkOnly.getId(), shrinkOnly.getAssimilatedAt());
-  }
 
   @Test
   void runAgain_isNoOpWhenGateDisabled() throws Exception {
@@ -97,38 +46,6 @@ class StillNewFirstRatingBackfillTest {
   }
 
   @Test
-  void runHard_appliesHardFirstRatingToStillNewTrackersWithShrinkLogs() throws Exception {
-    MemoryTracker tracker =
-        stillNewWith(ProductOutcome.SHRINK, makeMe.aTimestamp().of(1, 0).please());
-
-    runHard("1=1");
-
-    assertHardFirstRating(tracker.getId());
-  }
-
-  @Test
-  void runHard_leavesAgainOnlyTrackersNew() throws Exception {
-    MemoryTracker againOnly =
-        stillNewWith(ProductOutcome.AGAIN, makeMe.aTimestamp().of(1, 0).please());
-
-    runHard("1=1");
-
-    assertStillNew(againOnly.getId(), againOnly.getAssimilatedAt());
-  }
-
-  @Test
-  void runHard_leavesAgainAlreadyMigratedTrackersUnchanged() throws Exception {
-    MemoryTracker tracker =
-        stillNewWith(ProductOutcome.AGAIN, makeMe.aTimestamp().of(1, 0).please());
-    runAgain("1=1");
-    Float afterAgain = stability(tracker.getId());
-
-    runHard("1=1");
-
-    assertThat(stability(tracker.getId()), equalTo(afterAgain));
-  }
-
-  @Test
   void runHard_isNoOpWhenGateDisabled() throws Exception {
     MemoryTracker shrink =
         stillNewWith(ProductOutcome.SHRINK, makeMe.aTimestamp().of(2, 0).please());
@@ -138,29 +55,10 @@ class StillNewFirstRatingBackfillTest {
     assertStillNew(shrink.getId(), shrink.getAssimilatedAt());
   }
 
-  private MemoryTracker stillNewWith(ProductOutcome outcome, Timestamp lastRecalled) {
-    MemoryTracker tracker = stillNew(lastRecalled);
-    makeMe.aRecallLogFor(tracker).productOutcome(outcome).please();
-    return tracker;
-  }
-
-  private MemoryTracker stillNew(Timestamp lastRecalled) {
-    return makeMe
-        .aMemoryTrackerFor(makeMe.aNote().please())
-        .assimilatedAt(lastRecalled)
-        .lastRecalledAt(lastRecalled)
-        .please();
-  }
-
-  private MemoryTracker gradedWithAgainLog(Timestamp lastRecalled) {
+  private MemoryTracker stillNewWith(ProductOutcome outcome, Timestamp assimilatedAt) {
     MemoryTracker tracker =
-        makeMe
-            .aMemoryTrackerFor(makeMe.aNote().please())
-            .assimilatedAt(lastRecalled)
-            .stabilityAndNextRecallAt(55f)
-            .difficulty(5.3f)
-            .please();
-    makeMe.aRecallLogFor(tracker).productOutcome(ProductOutcome.AGAIN).please();
+        makeMe.aMemoryTrackerFor(makeMe.aNote().please()).assimilatedAt(assimilatedAt).please();
+    makeMe.aRecallLogFor(tracker).productOutcome(outcome).please();
     return tracker;
   }
 
@@ -182,25 +80,6 @@ class StillNewFirstRatingBackfillTest {
     }
   }
 
-  private void assertAgainFirstRating(Integer id) {
-    assertFirstRating(id, FIRST_AGAIN_STABILITY_HOURS, FIRST_AGAIN_DIFFICULTY);
-  }
-
-  private void assertHardFirstRating(Integer id) {
-    assertFirstRating(id, FIRST_HARD_STABILITY_HOURS, FIRST_HARD_DIFFICULTY);
-  }
-
-  private void assertFirstRating(Integer id, float expectedStability, float expectedDifficulty) {
-    TrackerRow row = trackerRow(id);
-    assertThat(row.stability(), equalTo(expectedStability));
-    assertThat((double) row.difficulty(), closeTo(expectedDifficulty, 1e-5));
-    assertThat(
-        row.nextRecallAt(),
-        equalTo(
-            TimestampOperations.addHoursToTimestamp(
-                row.lastRecalledAt(), Math.round(expectedStability))));
-  }
-
   private void assertStillNew(Integer id, Timestamp expectedDue) {
     TrackerRow row = trackerRow(id);
     assertThat(row.stability(), equalTo(ForgettingCurve.ASSIMILATE_STABILITY_HOURS));
@@ -208,22 +87,17 @@ class StillNewFirstRatingBackfillTest {
     assertThat(row.nextRecallAt(), equalTo(expectedDue));
   }
 
-  private Float stability(Integer id) {
-    return trackerRow(id).stability();
-  }
-
   private TrackerRow trackerRow(Integer id) {
     return jdbcTemplate.queryForObject(
         """
-        SELECT stability, difficulty, next_recall_at, last_recalled_at
+        SELECT stability, difficulty, next_recall_at
         FROM memory_tracker WHERE id = ?
         """,
         (rs, rowNum) ->
             new TrackerRow(
                 rs.getObject("stability", Float.class),
                 rs.getObject("difficulty", Float.class),
-                rs.getTimestamp("next_recall_at"),
-                rs.getTimestamp("last_recalled_at")),
+                rs.getTimestamp("next_recall_at")),
         id);
   }
 
@@ -232,6 +106,5 @@ class StillNewFirstRatingBackfillTest {
     void run(Connection connection, String gate) throws SQLException;
   }
 
-  private record TrackerRow(
-      Float stability, Float difficulty, Timestamp nextRecallAt, Timestamp lastRecalledAt) {}
+  private record TrackerRow(Float stability, Float difficulty, Timestamp nextRecallAt) {}
 }
