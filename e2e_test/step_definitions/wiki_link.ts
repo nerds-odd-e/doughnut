@@ -92,6 +92,17 @@ When(
 )
 
 When(
+  'I try to create a new note by following the dead wiki link displayed as {string}',
+  (displayText: string) => {
+    start.assumeNotePage().followDeadWikiLink(displayText).chooseCreateNewNote()
+  }
+)
+
+Then('I should see a warning that a note cannot be created from a path', () => {
+  start.assumeNotePage().expectCannotCreateNoteFromPath()
+})
+
+When(
   'I point dead wiki link {string} at existing note {string}',
   (deadWikiLinkText: string, existingNoteTitle: string) => {
     start

@@ -22,11 +22,15 @@ import { createRouter, createWebHistory } from "vue-router"
 import routes from "@/routes/routes"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 
+const { alertMock } = vi.hoisted(() => ({
+  alertMock: vi.fn(),
+}))
+
 vi.mock("@/components/commons/Popups/usePopups", () => ({
   default: () => ({
     popups: {
       confirm: vi.fn().mockResolvedValue(false),
-      alert: vi.fn(),
+      alert: alertMock,
       options: vi.fn(),
       done: vi.fn(),
       register: vi.fn(),
@@ -60,6 +64,7 @@ describe("NoteDeadWikiLinkCreateModal", () => {
   let wrapper: VueWrapper | undefined
 
   beforeEach(() => {
+    alertMock.mockReset()
     const storageAccessor = useStorageAccessor()
     storageAccessor.value = createNoteStorage()
     storageAccessor.value.refreshNoteRealm(noteRealm)
@@ -132,6 +137,22 @@ describe("NoteDeadWikiLinkCreateModal", () => {
       document.querySelector('[data-test="note-title"]') as HTMLElement
     ).innerText.trim()
     expect(title).toBe("Ghost Page")
+  })
+
+  it("warns and does not show the create form when the target contains a slash", async () => {
+    mountModal({
+      targetToken: "/WikiPathMdDeadFolder/WikiPathMdDeadMissing.md",
+      displayText: "label",
+    })
+    await waitForChooser()
+
+    await tapChooserAndSettle(createNoteLabel)
+
+    expect(alertMock).toHaveBeenCalledWith(
+      "Cannot create a note from a path. You can point at an existing note instead."
+    )
+    expect(screen.queryByTestId("note-new-form")).toBeNull()
+    expect(screen.getByText(pointAtExistingNoteLabel)).toBeTruthy()
   })
 
   it("shows create-or-retarget choice when reopened after modelValue cleared without close", async () => {
