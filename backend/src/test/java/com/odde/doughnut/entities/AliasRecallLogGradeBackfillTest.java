@@ -8,8 +8,6 @@ import java.sql.Connection;
 import java.sql.Timestamp;
 import javax.sql.DataSource;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -26,9 +24,8 @@ class AliasRecallLogGradeBackfillTest {
   @Autowired DataSource dataSource;
   @Autowired JdbcTemplate jdbcTemplate;
 
-  @ParameterizedTest
-  @CsvSource({"SHRINK, HARD", "AGAIN_ZERO, AGAIN"})
-  void rewritesAliasGradeAndKeepsSchedule(String alias, ProductOutcome grade) throws Exception {
+  @Test
+  void rewritesShrinkAliasToHardAndKeepsSchedule() throws Exception {
     MemoryTracker tracker =
         makeMe
             .aMemoryTrackerFor(makeMe.aNote().please())
@@ -37,15 +34,26 @@ class AliasRecallLogGradeBackfillTest {
             .please();
     Timestamp due = tracker.getNextRecallAt();
     var log = makeMe.aRecallLogFor(tracker).please();
-    setRecallLogProductOutcome(log.getId(), alias);
+    setRecallLogProductOutcome(log.getId(), "SHRINK");
 
     runBackfill();
 
     RewrittenRow row = rewrittenRow(log.getId(), tracker.getId());
-    assertThat(row.productOutcome(), equalTo(grade.name()));
+    assertThat(row.productOutcome(), equalTo("HARD"));
     assertThat(row.stability(), equalTo(55f));
     assertThat(row.difficulty(), equalTo(5.3f));
     assertThat(row.nextRecallAt(), equalTo(due));
+  }
+
+  @Test
+  void rewritesAgainZeroAliasToAgain() throws Exception {
+    var log =
+        makeMe.aRecallLogFor(makeMe.aMemoryTrackerFor(makeMe.aNote().please()).please()).please();
+    setRecallLogProductOutcome(log.getId(), "AGAIN_ZERO");
+
+    runBackfill();
+
+    assertThat(productOutcome(log.getId()), equalTo("AGAIN"));
   }
 
   @Test

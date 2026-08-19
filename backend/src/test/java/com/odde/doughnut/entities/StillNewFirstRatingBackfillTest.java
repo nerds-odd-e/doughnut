@@ -47,16 +47,17 @@ class StillNewFirstRatingBackfillTest {
 
   @Test
   void runHard_isNoOpWhenGateDisabled() throws Exception {
-    MemoryTracker shrink =
+    MemoryTracker shrinkColumnLiteral =
         makeMe
             .aMemoryTrackerFor(makeMe.aNote().please())
             .assimilatedAt(makeMe.aTimestamp().of(2, 0).please())
             .please();
-    setRecallLogProductOutcome(makeMe.aRecallLogFor(shrink).please().getId(), "SHRINK");
+    setRecallLogProductOutcome(
+        makeMe.aRecallLogFor(shrinkColumnLiteral).please().getId(), "SHRINK");
 
     runHard("1=0");
 
-    assertStillNew(shrink.getId(), shrink.getAssimilatedAt());
+    assertStillNew(shrinkColumnLiteral.getId(), shrinkColumnLiteral.getAssimilatedAt());
   }
 
   private MemoryTracker stillNewWith(ProductOutcome outcome, Timestamp assimilatedAt) {
