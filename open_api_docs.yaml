@@ -5355,6 +5355,7 @@ components:
           type: integer
           format: int32
       required:
+      - elapsedHours
       - id
       - memoryTrackerId
       - productOutcome

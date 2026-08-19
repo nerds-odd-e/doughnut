@@ -41,9 +41,11 @@ public class RecallLog extends EntityIdentifiedByIdOnly {
   @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
   private Timestamp recordedAt;
 
-  @Column(name = "elapsed_hours")
+  @Column(name = "elapsed_hours", nullable = false)
   @Getter
   @Setter
+  @NotNull
+  @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
   private Integer elapsedHours;
 
   @Column(name = "product_outcome", nullable = false)

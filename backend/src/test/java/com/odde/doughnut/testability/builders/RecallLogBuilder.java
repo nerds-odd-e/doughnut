@@ -12,6 +12,7 @@ public class RecallLogBuilder extends EntityBuilder<RecallLog> {
 
   public RecallLogBuilder(MakeMe makeMe) {
     super(makeMe, new RecallLog());
+    entity.setElapsedHours(0);
   }
 
   public RecallLogBuilder memoryTracker(MemoryTracker memoryTracker) {
@@ -24,7 +25,7 @@ public class RecallLogBuilder extends EntityBuilder<RecallLog> {
     return this;
   }
 
-  public RecallLogBuilder elapsedHours(Integer elapsedHours) {
+  public RecallLogBuilder elapsedHours(int elapsedHours) {
     entity.setElapsedHours(elapsedHours);
     return this;
   }

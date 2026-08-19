@@ -284,14 +284,12 @@ A `recall_log` has `memory_tracker_id`, `recorded_at`, `elapsed_hours`,
 `product_outcome`, and optional `answer_id`.
 
 `elapsed_hours` is always present (whole hours; see **Whole-hour elapsed-time
-precision**). The first mapped grade on a tracker is **0**. Later mapped
-grades are whole hours since the previous mapped grade's `recorded_at` on
-that tracker (`GOOD` / `EASY` / `HARD` / `AGAIN`). `CONFUSION` uses the same
+precision**) and required. The first mapped grade on a tracker is **0**. Later
+mapped grades are whole hours since the previous mapped grade's `recorded_at`
+on that tracker (`GOOD` / `EASY` / `HARD` / `AGAIN`). `CONFUSION` uses the same
 elapsed vs the last mapped grade, else **0**, and is not an anchor. Order is
-`recorded_at`, then `id`. A negative diff is **0**. Historical `NULL`s **will**
-be filled with that rule; already persisted non-null elapsed stays. The
-column becomes `NOT NULL`. Filling elapsed does not rewrite Stability,
-Difficulty, `lastRecalledAt`, or `nextRecallAt`.
+`recorded_at`, then `id`. A negative diff is **0**. Elapsed does not rewrite
+Stability, Difficulty, `lastRecalledAt`, or `nextRecallAt`.
 
 A row has `answer_id` xor none: prompt grade and confusion set `answer_id`;
 just review and Tutor Feedback set none. Do not store `recall_prompt_id`

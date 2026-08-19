@@ -1091,7 +1091,7 @@ export type RecallPromptHistoryItem = {
 export type RecallLog = {
     id: number;
     recordedAt: string;
-    elapsedHours?: number;
+    elapsedHours: number;
     productOutcome: 'GOOD' | 'EASY' | 'HARD' | 'AGAIN' | 'CONFUSION';
     memoryTrackerId: number;
     answerId?: number;

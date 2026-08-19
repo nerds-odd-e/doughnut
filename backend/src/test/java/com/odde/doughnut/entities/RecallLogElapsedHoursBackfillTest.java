@@ -2,10 +2,14 @@ package com.odde.doughnut.entities;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasEntry;
 
+import com.odde.doughnut.entities.RecallLogElapsedHoursBackfill.LogRow;
 import com.odde.doughnut.testability.MakeMe;
 import java.sql.Connection;
 import java.sql.Timestamp;
+import java.util.List;
+import java.util.Map;
 import javax.sql.DataSource;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,82 +29,62 @@ class RecallLogElapsedHoursBackfillTest {
   @Autowired JdbcTemplate jdbcTemplate;
 
   @Test
-  void fillsFirstMappedNullElapsedAsZeroAndKeepsSchedule() throws Exception {
-    MemoryTracker tracker = trackerWithSchedule();
-    Timestamp due = tracker.getNextRecallAt();
-    Timestamp lastRecalledAt = tracker.getLastRecalledAt();
-    var log = makeMe.aRecallLogFor(tracker).please();
+  void reconstructsFirstMappedNullElapsedAsZero() {
+    Timestamp firstAt = makeMe.aTimestamp().of(1, 0).please();
 
-    runBackfill();
-
-    FilledRow row = filledRow(log.getId(), tracker.getId());
-    assertThat(row.elapsedHours(), equalTo(0));
-    assertThat(row.stability(), equalTo(55f));
-    assertThat(row.difficulty(), equalTo(5.3f));
-    assertThat(row.nextRecallAt(), equalTo(due));
-    assertThat(row.lastRecalledAt(), equalTo(lastRecalledAt));
+    assertThat(reconstructed(nullElapsed(1, firstAt, ProductOutcome.GOOD)), hasEntry(1, 0));
   }
 
   @Test
-  void fillsLaterMappedNullElapsedFromPreviousMapped() throws Exception {
-    MemoryTracker tracker = trackerWithSchedule();
+  void reconstructsLaterMappedNullElapsedFromPreviousMapped() {
     Timestamp firstAt = makeMe.aTimestamp().of(1, 0).please();
     Timestamp laterAt = makeMe.aTimestamp().of(2, 0).please();
-    makeMe.aRecallLogFor(tracker).recordedAt(firstAt).please();
-    var later =
-        makeMe
-            .aRecallLogFor(tracker)
-            .productOutcome(ProductOutcome.HARD)
-            .recordedAt(laterAt)
-            .please();
 
-    runBackfill();
-
-    assertThat(elapsedHours(later.getId()), equalTo(24));
+    assertThat(
+        reconstructed(
+            nullElapsed(1, firstAt, ProductOutcome.GOOD),
+            nullElapsed(2, laterAt, ProductOutcome.HARD)),
+        hasEntry(2, 24));
   }
 
   @Test
-  void fillsConfusionNullElapsedFromLastMappedWithoutBecomingAnchor() throws Exception {
-    MemoryTracker tracker = trackerWithSchedule();
+  void reconstructsConfusionNullElapsedFromLastMappedWithoutBecomingAnchor() {
     Timestamp mappedAt = makeMe.aTimestamp().of(1, 0).please();
     Timestamp confusionAt = makeMe.aTimestamp().of(2, 0).please();
     Timestamp laterMappedAt = makeMe.aTimestamp().of(3, 0).please();
-    makeMe.aRecallLogFor(tracker).recordedAt(mappedAt).please();
-    var confusion =
-        makeMe
-            .aRecallLogFor(tracker)
-            .productOutcome(ProductOutcome.CONFUSION)
-            .recordedAt(confusionAt)
-            .please();
-    var laterMapped =
-        makeMe
-            .aRecallLogFor(tracker)
-            .productOutcome(ProductOutcome.EASY)
-            .recordedAt(laterMappedAt)
-            .please();
 
-    runBackfill();
+    Map<Integer, Integer> updates =
+        reconstructed(
+            nullElapsed(1, mappedAt, ProductOutcome.GOOD),
+            nullElapsed(2, confusionAt, ProductOutcome.CONFUSION),
+            nullElapsed(3, laterMappedAt, ProductOutcome.EASY));
 
-    assertThat(elapsedHours(confusion.getId()), equalTo(24));
-    assertThat(elapsedHours(laterMapped.getId()), equalTo(48));
+    assertThat(updates, hasEntry(2, 24));
+    assertThat(updates, hasEntry(3, 48));
   }
 
   @Test
-  void fillsConfusionNullElapsedAsZeroWhenNoMappedGrade() throws Exception {
-    var confusion =
-        makeMe
-            .aRecallLogFor(trackerWithSchedule())
-            .productOutcome(ProductOutcome.CONFUSION)
-            .please();
+  void reconstructsConfusionNullElapsedAsZeroWhenNoMappedGrade() {
+    Timestamp confusionAt = makeMe.aTimestamp().of(1, 0).please();
 
-    runBackfill();
-
-    assertThat(elapsedHours(confusion.getId()), equalTo(0));
+    assertThat(
+        reconstructed(nullElapsed(1, confusionAt, ProductOutcome.CONFUSION)), hasEntry(1, 0));
   }
 
   @Test
-  void leavesNonNullElapsedUnchanged() throws Exception {
+  void persistedLogDefaultsElapsedHoursToZero() {
+    var log =
+        makeMe.aRecallLogFor(makeMe.aMemoryTrackerFor(makeMe.aNote().please()).please()).please();
+    makeMe.entityPersister.flush();
+
+    assertThat(elapsedHours(log.getId()), equalTo(0));
+  }
+
+  @Test
+  void leavesPersistedElapsedAndScheduleUnchanged() throws Exception {
     MemoryTracker tracker = trackerWithSchedule();
+    Timestamp due = tracker.getNextRecallAt();
+    Timestamp lastRecalledAt = tracker.getLastRecalledAt();
     Timestamp firstAt = makeMe.aTimestamp().of(1, 0).please();
     Timestamp laterAt = makeMe.aTimestamp().of(2, 0).please();
     var first = makeMe.aRecallLogFor(tracker).recordedAt(firstAt).elapsedHours(99).please();
@@ -114,8 +98,21 @@ class RecallLogElapsedHoursBackfillTest {
 
     runBackfill();
 
-    assertThat(elapsedHours(first.getId()), equalTo(99));
+    FilledRow row = filledRow(first.getId(), tracker.getId());
+    assertThat(row.elapsedHours(), equalTo(99));
     assertThat(elapsedHours(later.getId()), equalTo(7));
+    assertThat(row.stability(), equalTo(55f));
+    assertThat(row.difficulty(), equalTo(5.3f));
+    assertThat(row.nextRecallAt(), equalTo(due));
+    assertThat(row.lastRecalledAt(), equalTo(lastRecalledAt));
+  }
+
+  private static LogRow nullElapsed(int id, Timestamp recordedAt, ProductOutcome outcome) {
+    return new LogRow(id, 10, recordedAt, outcome, null);
+  }
+
+  private static Map<Integer, Integer> reconstructed(LogRow... rows) {
+    return RecallLogElapsedHoursBackfill.reconstructedNullElapsedById(List.of(rows));
   }
 
   private MemoryTracker trackerWithSchedule() {
@@ -127,7 +124,7 @@ class RecallLogElapsedHoursBackfillTest {
   }
 
   private void runBackfill() throws Exception {
-    makeMe.entityPersister.flush();
+    makeMe.entityPersister.flushAndClear();
     Connection connection = DataSourceUtils.getConnection(dataSource);
     try {
       RecallLogElapsedHoursBackfill.run(connection);
@@ -146,7 +143,7 @@ class RecallLogElapsedHoursBackfillTest {
         """,
         (rs, rowNum) ->
             new FilledRow(
-                rs.getObject("elapsed_hours", Integer.class),
+                rs.getInt("elapsed_hours"),
                 rs.getObject("stability", Float.class),
                 rs.getObject("difficulty", Float.class),
                 rs.getTimestamp("next_recall_at"),
@@ -161,7 +158,7 @@ class RecallLogElapsedHoursBackfillTest {
   }
 
   private record FilledRow(
-      Integer elapsedHours,
+      int elapsedHours,
       Float stability,
       Float difficulty,
       Timestamp nextRecallAt,

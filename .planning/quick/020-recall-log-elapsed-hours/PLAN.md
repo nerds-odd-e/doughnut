@@ -42,11 +42,9 @@ Ungated `V300000281` (`RecallLogElapsedHoursBackfill` + Flyway wrapper). NULL el
 ### 3. elapsed_hours is NOT NULL
 
 - **Type:** Structure
-- **Status:** planned
+- **Status:** done
 
-Ungated `V300000282`: `ALTER` `recall_log.elapsed_hours` `NOT NULL`. Entity / OpenAPI: elapsed required (`generateTypeScript`). Java `RecallLogBuilder` defaults elapsed **0**. Drop `RecallHistory` `v-if="elapsedHours != null"` so the label is unconditional. Existing history spec still pins `Elapsed hours: 24`. After NOT NULL, `RecallLogElapsedHoursBackfillTest` cannot insert NULL; keep the helper for production 281→282 order; adjust the NULL-insert harness.
-
-Unlocks: leftover docs match the required field.
+Ungated `V300000282`: `elapsed_hours` `NOT NULL`. Entity / OpenAPI required. `RecallLogBuilder` defaults **0**. `RecallHistory` always shows elapsed. Backfill helper kept; reconstruction pinned in-memory (no NULL inserts). ADR RecallLog Decision present tense; still Proposed.
 
 ### 4. Trackers match required elapsed
 
@@ -60,4 +58,4 @@ Unlocks: leftover docs match the required field.
 - `V300000265` / `V300000266` inserted historical logs with `elapsed_hours` NULL. Live `persistRecallLog` already sets elapsed from `elapsedHoursUntil`.
 - Prompt history hides elapsed when null; mounted spec pins 24h; E2E only checks the label exists on live grades.
 - Reconstruction contract lives only in ADR 0003 RecallLog (mapped **grade**, truncation via **Whole-hour elapsed-time precision**). FSRS/SEED only point here.
-- `V300000280` was taken by OS-invalid display names; elapsed backfill is `V300000281`. Mapped grade is `ProductOutcome.isMappedGrade()`. `RecallLogBuilder` still leaves elapsed unset (null) so the backfill test can insert NULL until slice 3.
+- `V300000280` was taken by OS-invalid display names; elapsed backfill is `V300000281`, NOT NULL is `V300000282`. Mapped grade is `ProductOutcome.isMappedGrade()`. After NOT NULL, reconstruction is tested in-memory; the builder defaults elapsed **0**.
