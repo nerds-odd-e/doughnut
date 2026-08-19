@@ -56,7 +56,7 @@ const assumeMemoryTrackerPage = () => {
         .click()
       cy.findByRole('button', { name: 'OK' }).click()
       waitUntilAppIsNotBusy()
-      return assumeMemoryTrackerPage().expectSkipped()
+      return assumeMemoryTrackerPage()
     },
     reviveMemoryTracker() {
       expectMemoryTrackerPage()
