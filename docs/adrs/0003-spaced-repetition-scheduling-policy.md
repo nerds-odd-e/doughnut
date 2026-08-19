@@ -40,13 +40,16 @@ any other FSRS library. Compatibility is with the open FSRS model (inputs,
 state, qualitative update rules), not with a particular crate or version.
 
 - **Stability** is persisted memory state: the current interval in **whole
-  hours**. After any grade, `nextRecallAt = lastRecalledAt + I(r, S)` with
+  hours**. `lastRecalledAt` is the last mapped grade only (FSRS
+  `last_review`). Assimilate time stays on `assimilatedAt`. After a grade,
+  when last recall exists, `nextRecallAt = lastRecalledAt + I(r, S)` with
   requested retention `r` locked at **0.9** (`I(0.9, S) = S` in whole hours).
   When `I` is non-positive, due is 24 hours after the grade (strictly-future
-  fallback). A **New** tracker has Stability 0 (due now).
-  First mapped grades on New use first-rating (see **First rating on New**);
-  due then comes from `I`, not from the 24-hour fallback. Spacing is Stability,
-  not a Settings day list. Live scheduling must not walk a spacing-index ladder.
+  fallback). A **New** tracker has Stability 0, `lastRecalledAt` unset, and
+  `nextRecallAt = assimilatedAt` (due now). First mapped grades on New use
+  first-rating (see **First rating on New**); due then comes from `I`, not
+  from the 24-hour fallback. Spacing is Stability, not a Settings day list.
+  Live scheduling must not walk a spacing-index ladder.
 - **Retrievability** is computed from elapsed whole hours and Stability, not stored.
 - A recall transition consumes the graded outcome, elapsed time, and that state — never queue lateness.
 - **Requested retention** `r` is a **global constant 0.9** — not a Settings
@@ -90,7 +93,7 @@ concern. Fuzz is not a Settings knob.
 
 Difficulty is persisted memory state in `[1, 10]`. It is shown on the Memory Tracker page (Information card), next to Stability, as the number returned by the API or **N/A** when unset (New / assimilate-only). Harder items gain less Stability on a successful recall. A correct recall also updates Difficulty with Good next-D (see **Difficulty after a mapped grade**).
 
-A **New** tracker ([ADR 0001](./0001-ubiquitous-language.md)) has Stability 0, Difficulty unset / **N/A**, due now. The first mapped grade initializes Stability and Difficulty with FSRS-6 first-rating (see **First rating on New**). Difficulty **5** remains only as the fallback when Stability > 0 and Difficulty is null.
+A **New** tracker ([ADR 0001](./0001-ubiquitous-language.md)) has Stability 0, Difficulty unset / **N/A**, and no last recall (due from `assimilatedAt`; see Stability). There is no FSRS card-state machine: no Learning / Review / Relearning step list or column. The first mapped grade initializes Stability and Difficulty with FSRS-6 first-rating (see **First rating on New**); after that the tracker is a graded DSR tracker. Difficulty **5** remains only as the fallback when Stability > 0 and Difficulty is null.
 
 Ordinary correct recall with Stability > 0 updates Stability with open-FSRS-6 Good-equivalent rules (own implementation) and Difficulty with Good next-D. Locked overdue extra growth still holds.
 
@@ -102,6 +105,8 @@ First mapped **success** on a New tracker (ordinary correct / just review Yes / 
 - Difficulty is `D0(G)` clamped to `[1, 10]`, persisted as the Java float from that formula (API number, no extra rounding). Persisted first Easy Difficulty is **1**.
 - `D0(Easy)` stays **unclamped** as the later mean-reversion target (see **Difficulty after a mapped grade**).
 - Elapsed time does **not** change first-rating. Overdue extra does not apply.
+  The first mapped grade writes `RecallLog.elapsed_hours` **0** (no previous
+  recall). That 0 still does not change `S0`/`D0`.
 - Due is `lastRecalledAt` plus those hours.
 
 First Again / Tutor **0/1** on New uses the same first-rating path with `G=1`: Stability `S0(1)` (**5** hours), Difficulty `D0(1)` (Java float), due `lastRecalledAt + I` (**5h**).
@@ -262,7 +267,7 @@ first-rating Stability. Do not use the spacing-index ladder as this fallback.
 
 `mark-as-recalled` is just review's grade path: successful is just review Yes
 (Good); unsuccessful is just review No (Again). `remove` and `revive` are not
-grades.
+grades and do not write `lastRecalledAt`.
 
 ### Spelling memory tracker
 
@@ -364,6 +369,10 @@ Empty pending accept.
   (G, elapsed t, D/S/R only). Record it on the answer and show it in stats /
   prompt history. Do not change S, D, or due. Do not rewrite existing S. Do
   not replace the overlay with fuzz or another shuffle.
+- **FSRS card states (Learning / Review / Relearning) or last recall at
+  assimilate** — rejected: `lastRecalledAt` is the last mapped grade only;
+  New has no last recall and is due at `assimilatedAt`. After first-rating
+  the tracker is a graded DSR tracker. No step list or card-state column.
 
 ## Related
 

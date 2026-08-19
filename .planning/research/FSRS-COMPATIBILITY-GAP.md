@@ -1,8 +1,8 @@
 # Doughnut ↔ open FSRS gap (toward ADR 0003)
 
-**Status:** Interval fuzz is **closed** (not used; due follows S). Thinking-time overlay is **closed** (RT is not a DSR input). Remaining knob: **E4** fitting, plus **accept ADR 0003** (human). Shipped FSRS-6 locks live in ADR 0003 Decision and code.
+**Status:** Interval fuzz is **closed** (not used; due follows S). Thinking-time overlay is **closed** (RT is not a DSR input). Live gap: **New last recall** ([plan](../quick/017-new-no-last-recall/PLAN.md)). Remaining deferred: **E4** fitting, plus **accept ADR 0003** (human). Shipped FSRS-6 locks live in ADR 0003 Decision and code.
 
-**Updated:** 2026-08-18
+**Updated:** 2026-08-19
 
 **Feeds:** Proposed [ADR 0003](../../docs/adrs/0003-spaced-repetition-scheduling-policy.md)
 
@@ -12,7 +12,7 @@ Product policy lives in ADR 0003 Decision. This tracker is a pointer plus the de
 
 ## Current code vs FSRS-6
 
-Doughnut persists **Stability** in whole hours and **Difficulty** (nullable; shown on the Memory Tracker). Retrievability is computed (FSRS-6 power curve), not stored. Frozen default FSRS-6 weights live in `Fsrs`. Requested retention is locked global `r = 0.9` (`Fsrs.REQUESTED_RETENTION`). There is **no lapse count**. Maximum interval is locked global **36500 days** / **876000 hours** (`Fsrs.MAXIMUM_INTERVAL_HOURS`); clamp after next-S, due from that S. There is **no interval fuzz** (due is `lastRecalledAt + I(0.9, S)`). Thinking time is recorded on answers for display and stats; it is not a memory-state input. There is no card state (`New` / `Learning` / `Review` / `Relearning`). First-rating on New uses published FSRS-6 `S0(G)` / `D0(G)` for all four G (Tutor **2** on New is Hard). Still-New graded-row backfill is gated Flyway: Again `V300000271`, Hard/SHRINK `V300000272`, both default `1=0`.
+Doughnut persists **Stability** in whole hours and **Difficulty** (nullable; shown on the Memory Tracker). Retrievability is computed (FSRS-6 power curve), not stored. Frozen default FSRS-6 weights live in `Fsrs`. Requested retention is locked global `r = 0.9` (`Fsrs.REQUESTED_RETENTION`). There is **no lapse count**. Maximum interval is locked global **36500 days** / **876000 hours** (`Fsrs.MAXIMUM_INTERVAL_HOURS`); clamp after next-S, due from that S. There is **no interval fuzz** (due is `lastRecalledAt + I(0.9, S)`). Thinking time is recorded on answers for display and stats; it is not a memory-state input. There is no FSRS card-state machine (Learning / Review / Relearning); Doughnut **New** is ungraded. Assimilate still writes `lastRecalledAt` (New due from last recall). Closing the ADR 0003 last-recall lock in code is the live gap ([plan](../quick/017-new-no-last-recall/PLAN.md)). First-rating on New uses published FSRS-6 `S0(G)` / `D0(G)` for all four G (Tutor **2** on New is Hard). Still-New graded-row backfill is gated Flyway: Again `V300000271`, Hard/SHRINK `V300000272`, both default `1=0`.
 
 Live scheduling does not walk a spacing-index ladder. `DEFAULT_SPACES` / `hoursFromLegacyIndex` remain only so committed `V300000260` can replay on fresh DBs.
 
