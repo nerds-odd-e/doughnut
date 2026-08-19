@@ -1,9 +1,8 @@
-import type { Note } from "@generated/doughnut-backend-api"
 import makeMe from "doughnut-test-fixtures/makeMe"
 import { type VueWrapper, flushPromises } from "@vue/test-utils"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import type { ComponentPublicInstance } from "vue"
-import { TEXT_AUTOSAVE_DEBOUNCE_MS } from "@/composables/useDebouncedTextAutosave"
+import { advanceNoteContentSaveDebounce } from "@tests/helpers/noteContentDebounceTestSupport"
 import {
   editTitle,
   editTitleThenBlur,
@@ -15,11 +14,6 @@ import {
 
 describe("NoteTextContent title edit save race", () => {
   let wrapper: VueWrapper<ComponentPublicInstance>
-
-  const mountWith = (note: Note) => {
-    wrapper = mountNoteTextContent(note)
-    return wrapper
-  }
 
   beforeEach(() => {
     vi.resetAllMocks()
@@ -51,10 +45,9 @@ describe("NoteTextContent title edit save race", () => {
       { path: { note: note.id }, body: { newTitle } },
     ]
 
-    mountWith(note)
+    wrapper = mountNoteTextContent(note)
     await editTitle(wrapper, "ABC")
-    await vi.advanceTimersByTimeAsync(TEXT_AUTOSAVE_DEBOUNCE_MS)
-    await flushPromises()
+    await advanceNoteContentSaveDebounce()
 
     expect(mockedUpdateTitleCall.mock.calls).toEqual([titleSave("ABC")])
 
@@ -62,16 +55,18 @@ describe("NoteTextContent title edit save race", () => {
     await flushPromises()
 
     expect(mockedUpdateTitleCall.mock.calls).toEqual([titleSave("ABC")])
+    expect(releaseSaves).toHaveLength(1)
 
-    releaseSaves[0]?.()
+    releaseSaves[0]!()
     await flushPromises()
 
     expect(mockedUpdateTitleCall.mock.calls).toEqual([
       titleSave("ABC"),
       titleSave("ABCDEF"),
     ])
+    expect(releaseSaves).toHaveLength(2)
 
-    releaseSaves[1]?.()
+    releaseSaves[1]!()
     await flushPromises()
     expect(titleEditorEl(wrapper).innerText).toBe("ABCDEF")
   })
