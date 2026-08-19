@@ -1,6 +1,6 @@
 # Plan: FSRS-6 short-term under one day
 
-**Status:** planned
+**Status:** in-progress
 
 **Goal:** Success grades with elapsed whole hours **0–23** use published FSRS-6 short-term next Stability. Elapsed **≥ 24** stays long-term. Live domain is DSR (`ForgettingCurve` gone). Ladder conversion stays only for Flyway replay of `V300000260`.
 
@@ -32,11 +32,11 @@
 ### 1. Lock the short-term window in ADR 0003
 
 - **Type:** Structure
-- **Status:** planned
+- **Status:** done
 
-Replace “elapsed **0** / **≥ 1**” in Proposed ADR 0003 Decision with elapsed **< 24** / **≥ 24**. Pin Again → Good at 5h → **6h**. Record rejected options: keep elapsed==0 only; calendar same-day; `enable_short_term` off; rebuild past S. Pointer docs (`FSRS-COMPATIBILITY-GAP.md`, SEED-004) follow the Decision; no product code.
+Proposed ADR 0003 Decision now uses elapsed **< 24** / **≥ 24**. Pin: Again → Good at 5h → **6h**. Rejected: elapsed==0 only; calendar same-day; `enable_short_term` off; rebuild past S. GAP/SEED-004 point at the Decision.
 
-Unlocks: slice 2 implements against a written contract.
+**Learning:** GAP “Current code vs FSRS-6” must not claim live code already uses **< 24**; that lands in slice 2. Clamp examples in the Decision are Stability hours (Good **24h**→**25h**), not elapsed.
 
 ### 2. On-time Good after first Again uses short-term Stability 6
 
