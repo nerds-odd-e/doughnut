@@ -86,13 +86,13 @@ public class LearningSessionRequestMarkdownBuilder {
   private void appendHowToReport(StringBuilder sb, List<MemoryTracker> trackers) {
     sb.append("<how_to_report>\n");
     sb.append("Teach the session items above, then return a Learning Session Report giving one\n");
-    sb.append("score from 0 to 5 per item:\n\n");
-    sb.append("- 5 — mastered the session item with full fluency\n");
-    sb.append("- 4 — mastered the session item with fluency\n");
-    sb.append("- 3 — mastered the session item, but not fluent\n");
-    sb.append("- 2 — needed a reminder at first, then showed signs of mastering it\n");
-    sb.append("- 1 — needed several reminders\n");
-    sb.append("- 0 — could not reach the session item even with help\n\n");
+    sb.append("score from 1 to 4 per item:\n\n");
+    sb.append("- 4 — mastered the session item with full fluency\n");
+    sb.append("- 3 — mastered the session item with fluency\n");
+    sb.append(
+        "- 2 — mastered the session item but not fluent, or needed a reminder then showed mastery\n");
+    sb.append(
+        "- 1 — needed several reminders, or could not reach the session item even with help\n\n");
     sb.append("Example of how to provide feedback:\n\n");
     sb.append("# Learning Session Report\n\n");
     sb.append(LearningSessionReportParser.SESSION_ITEM_SCORES_OPEN_TAG).append("\n");
@@ -108,7 +108,7 @@ public class LearningSessionRequestMarkdownBuilder {
     if (trackers.isEmpty()) {
       return;
     }
-    sb.append(trackers.getFirst().getNote().getTitle()).append(": 5");
+    sb.append(trackers.getFirst().getNote().getTitle()).append(": 4");
     if (trackers.size() > 1) {
       sb.append("\n").append(trackers.get(1).getNote().getTitle()).append(": 1");
     }

@@ -76,10 +76,20 @@ export const recallLearningSessionMethods = () => ({
     return this
   },
   expectLearningSessionRequestIncludesRubric() {
-    this.learningSessionRequestText().should(
-      'contain',
-      'score from 0 to 5 per item'
-    )
+    this.learningSessionRequestText().should((text) => {
+      expect(text).to.contain('score from 1 to 4 per item')
+      expect(text).to.contain(
+        '- 4 — mastered the session item with full fluency'
+      )
+      expect(text).to.contain('- 3 — mastered the session item with fluency')
+      expect(text).to.contain(
+        '- 2 — mastered the session item but not fluent, or needed a reminder then showed mastery'
+      )
+      expect(text).to.contain(
+        '- 1 — needed several reminders, or could not reach the session item even with help'
+      )
+      expect(text).to.contain('Hola: 4')
+    })
     return this
   },
   recordLearningSessionReport(reportMarkdown: string) {

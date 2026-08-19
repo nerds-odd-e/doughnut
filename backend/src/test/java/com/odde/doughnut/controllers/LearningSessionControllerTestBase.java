@@ -11,14 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 abstract class LearningSessionControllerTestBase extends ControllerTestBase {
 
-  protected static final String HOLA_GRACIAS_REPORT =
-      """
-      # Learning Session Report
-
-      Hola: 5
-      Gracias: 1
-      """;
-
   protected static final String HOLA4_GRACIAS1_REPORT =
       """
       # Learning Session Report
@@ -27,12 +19,20 @@ abstract class LearningSessionControllerTestBase extends ControllerTestBase {
       Gracias: 1
       """;
 
-  protected static final String HOLA4_GRACIAS4_REPORT =
+  protected static final String HOLA3_GRACIAS1_REPORT =
       """
       # Learning Session Report
 
-      Hola: 4
-      Gracias: 4
+      Hola: 3
+      Gracias: 1
+      """;
+
+  protected static final String HOLA3_GRACIAS3_REPORT =
+      """
+      # Learning Session Report
+
+      Hola: 3
+      Gracias: 3
       """;
 
   @Autowired LearningSessionController controller;

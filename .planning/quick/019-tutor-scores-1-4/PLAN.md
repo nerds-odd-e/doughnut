@@ -31,11 +31,7 @@
 
 ## Discoveries
 
-- Request copy and parser live in `LearningSessionRequestMarkdownBuilder` / `LearningSessionReportParser` (range **0–5** today). Example line is `Hola: 5`.
-- Recording map and reverse map: `CommissionedLearningSessionFeedbackScheduling`. Score **2** on `S > 0` calls `shrinkStability` (80% S, D unchanged). New is already Hard for **2**.
-- E2E `commissioned_learning_session.feature`: record **5**/**1**; first-score outline includes **0–5**; second-score **4/5/3**; “score **4** leaves GOOD”.
-- HTTP pins the same numbers in `LearningSessionRecordTutorFeedbackTests` / `RecallLogTests` / `NoteControllerNoteInfoTests`.
-- `latestTutorFeedbackScore` is derived, not stored.
+- Latest tutor feedback is derived (`scoreForProductOutcome`). `SHRINK` / `AGAIN_ZERO` still reverse-map to **2** / **1** so note-info stays valid until slice 3 rewrites those rows.
 - Frequent-failure count includes `AGAIN_ZERO`; after rewrite, `AGAIN` is enough.
 - `ProductOutcome.mappedGradeSqlInList()` is used by still-New / ungraded / removed backfills. After the live enum is four grades, those **historical** helpers must keep selecting `'SHRINK'` and `'AGAIN_ZERO'` in their own SQL (replay at that version).
 
@@ -51,17 +47,9 @@ Proposed ADR 0003/0005 Decision is the 1–4 identity (`score = G`). First-ratin
 ### 2. Tutor scores 1–4 are the four grades
 
 - **Type:** Behavior
-- **Status:** planned
+- **Status:** done
 
-**Pre:** commissioned trackers (New and already graded). **Trigger:** open a Learning Session Request; record a Report with scores **1–4**. **Post:** Request rubric is the four lines above (example `Hola: 4`); each score writes the matching `product_outcome` and schedule (New first-rating `S0`/`D0`; graded **2** is Hard next S/D and due from `I`); latest tutor feedback is that 1–4 score.
-
-Capability tests (extend existing, one outline where the path is the same):
-
-- E2E `commissioned_learning_session.feature`: Request instruction; record **4**/**1** (latest **4**); first-score outline **4/3/2/1** with Easy/Good/Hard/Again hours; “score **3** leaves a GOOD RecallLog”; second-score outline **4→484**, **3→284**, **2→193** (same numbers as today’s **5/4/3**).
-- HTTP `LearningSessionRequestTests` / `LearningSessionRecordTutorFeedbackTests` / `RecallLogTests` / `NoteControllerNoteInfoTests`: same map. Graded **2** pin is Hard next S/D (replace the 80% S pin).
-- Parser: valid **1–4**; **0**, **5**, and **6** rejected (“Score must be 1, 2, 3, or 4.”).
-
-Implementation: identity `productOutcomeForScore` / `scoreForProductOutcome`; `recordFeedback` **2** → `recalledHard`; delete `shrinkStability` / `MemoryTrackerShrinkStability` when unused. OpenAPI / generated client stay until slice 4 if the enum still has unused values for one deploy.
+Request, parser, recording, and latest score are `score = G`. Graded **2** is Hard (`shrinkStability` gone). Parser rejects 0/5/6. `SHRINK`/`AGAIN_ZERO` still read as latest **2**/**1** until slice 3. OpenAPI/enum stay until slice 4.
 
 ### 3. Alias RecallLogs are HARD and AGAIN
 

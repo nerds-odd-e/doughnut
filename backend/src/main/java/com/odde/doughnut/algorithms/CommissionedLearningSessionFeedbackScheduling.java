@@ -1,6 +1,5 @@
 package com.odde.doughnut.algorithms;
 
-import com.odde.doughnut.entities.ForgettingCurve;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.ProductOutcome;
 import java.sql.Timestamp;
@@ -11,24 +10,20 @@ public final class CommissionedLearningSessionFeedbackScheduling {
 
   public static ProductOutcome productOutcomeForScore(int score) {
     return switch (score) {
-      case 5 -> ProductOutcome.EASY;
-      case 4 -> ProductOutcome.GOOD;
-      case 3 -> ProductOutcome.HARD;
-      case 2 -> ProductOutcome.SHRINK;
+      case 4 -> ProductOutcome.EASY;
+      case 3 -> ProductOutcome.GOOD;
+      case 2 -> ProductOutcome.HARD;
       case 1 -> ProductOutcome.AGAIN;
-      case 0 -> ProductOutcome.AGAIN_ZERO;
-      default -> throw new IllegalArgumentException("Tutor score must be 0–5: " + score);
+      default -> throw new IllegalArgumentException("Tutor score must be 1–4: " + score);
     };
   }
 
   public static int scoreForProductOutcome(ProductOutcome productOutcome) {
     return switch (productOutcome) {
-      case EASY -> 5;
-      case GOOD -> 4;
-      case HARD -> 3;
-      case SHRINK -> 2;
-      case AGAIN -> 1;
-      case AGAIN_ZERO -> 0;
+      case EASY -> 4;
+      case GOOD -> 3;
+      case HARD, SHRINK -> 2;
+      case AGAIN, AGAIN_ZERO -> 1;
       case CONFUSION ->
           throw new IllegalArgumentException("CONFUSION is not a tutor feedback outcome");
     };
@@ -39,14 +34,7 @@ public final class CommissionedLearningSessionFeedbackScheduling {
     switch (productOutcome) {
       case EASY -> tracker.recalledEasily(now);
       case GOOD -> tracker.recalledSuccessfully(now);
-      case HARD -> tracker.recalledHard(now);
-      case SHRINK -> {
-        if (new ForgettingCurve(tracker.getStability()).isNew()) {
-          tracker.recalledHard(now);
-        } else {
-          tracker.shrinkStability(now);
-        }
-      }
+      case HARD, SHRINK -> tracker.recalledHard(now);
       case AGAIN, AGAIN_ZERO -> tracker.recalledAgain(now);
       case CONFUSION ->
           throw new IllegalArgumentException("CONFUSION is not a tutor feedback outcome");

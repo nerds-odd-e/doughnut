@@ -12,6 +12,8 @@ import com.odde.doughnut.services.LearningSessionReportParser.RejectedReportEntr
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 class LearningSessionReportParserTest {
 
@@ -42,41 +44,54 @@ class LearningSessionReportParserTest {
     assertRejected(result.rejected().get(0), "Hola: six", "Could not parse");
   }
 
-  @Test
-  void rejectsScoreOutsideZeroToFive() {
-    ParseResult result = parser.parse("Hola: 6\n", SPANISH_TITLES, Set.of());
-
-    assertThat(result.entries(), empty());
-    assertThat(result.rejected(), hasSize(1));
-    assertRejected(result.rejected().get(0), "Hola: 6", "Score must be between 0 and 5");
-  }
-
-  @Test
-  void rejectsDuplicateNotebookTitles() {
-    ParseResult result = parser.parse("Hola: 5\n", SPANISH_TITLES, Set.of("Hola"));
-
-    assertThat(result.entries(), empty());
-    assertThat(result.rejected(), hasSize(1));
-    assertRejected(result.rejected().get(0), "Hola: 5", "Ambiguous note title");
-  }
-
-  @Test
-  void toleratesTrailingProseOnValidLine() {
-    ParseResult result = parser.parse("Hola: 5 great session today\n", SPANISH_TITLES, Set.of());
+  @ParameterizedTest
+  @CsvSource({"1", "2", "3", "4"})
+  void acceptsScoreFromOneToFour(int score) {
+    ParseResult result = parser.parse("Hola: %d\n".formatted(score), SPANISH_TITLES, Set.of());
 
     assertThat(result.rejected(), empty());
     assertThat(result.entries(), hasSize(1));
     assertEquals("Hola", result.entries().get(0).noteTitle());
-    assertEquals(5, result.entries().get(0).score());
+    assertEquals(score, result.entries().get(0).score());
+  }
+
+  @ParameterizedTest
+  @CsvSource({"0", "5", "6"})
+  void rejectsScoreOutsideOneToFour(int score) {
+    String line = "Hola: %d".formatted(score);
+    ParseResult result = parser.parse(line + "\n", SPANISH_TITLES, Set.of());
+
+    assertThat(result.entries(), empty());
+    assertThat(result.rejected(), hasSize(1));
+    assertRejected(result.rejected().get(0), line, "Score must be 1, 2, 3, or 4.");
+  }
+
+  @Test
+  void rejectsDuplicateNotebookTitles() {
+    ParseResult result = parser.parse("Hola: 4\n", SPANISH_TITLES, Set.of("Hola"));
+
+    assertThat(result.entries(), empty());
+    assertThat(result.rejected(), hasSize(1));
+    assertRejected(result.rejected().get(0), "Hola: 4", "Ambiguous note title");
+  }
+
+  @Test
+  void toleratesTrailingProseOnValidLine() {
+    ParseResult result = parser.parse("Hola: 4 great session today\n", SPANISH_TITLES, Set.of());
+
+    assertThat(result.rejected(), empty());
+    assertThat(result.entries(), hasSize(1));
+    assertEquals("Hola", result.entries().get(0).noteTitle());
+    assertEquals(4, result.entries().get(0).score());
   }
 
   @Test
   void rejectsDuplicateTitleInReport() {
-    ParseResult result = parser.parse("Hola: 5\nHola: 3\n", SPANISH_TITLES, Set.of());
+    ParseResult result = parser.parse("Hola: 4\nHola: 3\n", SPANISH_TITLES, Set.of());
 
     assertThat(result.entries(), hasSize(1));
     assertEquals("Hola", result.entries().get(0).noteTitle());
-    assertEquals(5, result.entries().get(0).score());
+    assertEquals(4, result.entries().get(0).score());
     assertThat(result.rejected(), hasSize(1));
     assertRejected(result.rejected().get(0), "Hola: 3", "Duplicate note title");
   }
@@ -88,7 +103,7 @@ class LearningSessionReportParserTest {
             """
             # Learning Session Report
 
-            Hola: 5
+            Hola: 4
             Gracias: 1
             """,
             SPANISH_TITLES,
@@ -108,7 +123,7 @@ class LearningSessionReportParserTest {
             Thanks for a great session today.
 
             %s
-            Hola: 5
+            Hola: 4
             Gracias: 1
             %s
 
@@ -121,7 +136,7 @@ class LearningSessionReportParserTest {
     assertThat(result.rejected(), empty());
     assertThat(result.entries(), hasSize(2));
     assertEquals("Hola", result.entries().get(0).noteTitle());
-    assertEquals(5, result.entries().get(0).score());
+    assertEquals(4, result.entries().get(0).score());
     assertEquals("Gracias", result.entries().get(1).noteTitle());
     assertEquals(1, result.entries().get(1).score());
   }

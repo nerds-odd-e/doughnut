@@ -73,7 +73,7 @@ class NoteControllerNoteInfoTests extends ControllerTestBase {
   }
 
   @ParameterizedTest
-  @CsvSource({"EASY, 5", "GOOD, 4", "HARD, 3", "SHRINK, 2", "AGAIN, 1", "AGAIN_ZERO, 0"})
+  @CsvSource({"EASY, 4", "GOOD, 3", "HARD, 2", "SHRINK, 2", "AGAIN, 1", "AGAIN_ZERO, 1"})
   void commissionedTrackerShowsMappedScoreFromLatestTutorLog(ProductOutcome outcome, int score)
       throws UnexpectedNoAccessRightException {
     Note note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
@@ -104,6 +104,6 @@ class NoteControllerNoteInfoTests extends ControllerTestBase {
 
     assertThat(
         controller.getNoteInfo(note).getMemoryTrackers().getFirst().getLatestTutorFeedbackScore(),
-        equalTo(4));
+        equalTo(3));
   }
 }

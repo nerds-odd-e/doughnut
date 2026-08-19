@@ -49,8 +49,8 @@ public class LearningSessionReportParser {
 
       String title = matcher.group(1).trim();
       int score = Integer.parseInt(matcher.group(2));
-      if (score < 0 || score > 5) {
-        rejected.add(new RejectedReportEntry(line, "Score must be between 0 and 5."));
+      if (score < 1 || score > 4) {
+        rejected.add(new RejectedReportEntry(line, "Score must be 1, 2, 3, or 4."));
         continue;
       }
 

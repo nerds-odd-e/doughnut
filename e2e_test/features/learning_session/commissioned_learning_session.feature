@@ -54,14 +54,14 @@ Feature: Commissioned learning session
       # Learning Session Report
 
       <session_item_scores>
-      Hola: 5
+      Hola: 4
       Gracias: 1
       </session_item_scores>
       """
     Then the recorded Feedback for notebook "Spanish conversation" should be shown
     And the commissioned memory tracker for "Hola" should have recall count 1
     And the commissioned memory tracker for "Gracias" should have recall count 1
-    And the commissioned memory tracker for "Hola" should have tutor feedback score 5
+    And the commissioned memory tracker for "Hola" should have tutor feedback score 4
     And I should see 0 potential learning session for notebook "Spanish conversation"
 
   Scenario Outline: First tutor score on a new tracker sets Stability and Difficulty
@@ -77,18 +77,16 @@ Feature: Commissioned learning session
 
     Examples:
       | score | Stability | Difficulty | hours |
-      | 4     | 55        | 2.1181     | 55    |
-      | 5     | 199       | 1          | 199   |
-      | 3     | 31        | 5.11217    | 31    |
+      | 4     | 199       | 1          | 199   |
+      | 3     | 55        | 2.1181     | 55    |
       | 2     | 31        | 5.11217    | 31    |
-      | 0     | 5         | 6.4133     | 5     |
       | 1     | 5         | 6.4133     | 5     |
 
-  Scenario: Recording tutor score 4 leaves a GOOD RecallLog
+  Scenario: Recording tutor score 3 leaves a GOOD RecallLog
     Given the notes "Hola, Gracias" are assimilated as commissioned on day 1
     And I have recorded a learning session for notebook "Spanish conversation" on day 2 with scores:
       | Note    | Score |
-      | Hola    | 4     |
+      | Hola    | 3     |
       | Gracias | 1     |
     When I visit the commissioned memory tracker for "Hola"
     Then I should see a GOOD RecallLog with elapsed hours and no answer id
@@ -97,7 +95,7 @@ Feature: Commissioned learning session
     Given the notes "Hola, Gracias" are assimilated as commissioned on day 1
     And I have recorded a learning session for notebook "Spanish conversation" on day 2 with scores:
       | Note    | Score |
-      | Hola    | 4     |
+      | Hola    | 3     |
       | Gracias | 1     |
     And It's day 4, 16 hour
     When I open the learning session request for notebook "Spanish conversation"
@@ -115,6 +113,6 @@ Feature: Commissioned learning session
 
     Examples:
       | score | Stability |
-      | 4     | 284       |
-      | 5     | 484       |
-      | 3     | 193       |
+      | 4     | 484       |
+      | 3     | 284       |
+      | 2     | 193       |

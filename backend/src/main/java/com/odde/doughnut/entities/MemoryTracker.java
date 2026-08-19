@@ -209,10 +209,6 @@ public class MemoryTracker extends EntityIdentifiedByIdOnly {
     applyRecall(now, forgettingCurve().afterAgainRecall(elapsedHoursUntil(now)));
   }
 
-  public void shrinkStability(Timestamp currentUTCTimestamp) {
-    MemoryTrackerShrinkStability.apply(this, currentUTCTimestamp);
-  }
-
   public void markAsRecalled(Timestamp currentUTCTimestamp, boolean successful) {
     if (successful) {
       recalledSuccessfully(currentUTCTimestamp);

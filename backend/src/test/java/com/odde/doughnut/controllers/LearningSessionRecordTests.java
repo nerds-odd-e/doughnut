@@ -23,7 +23,8 @@ class LearningSessionRecordTests extends LearningSessionControllerTestBase {
     SpanishNotebookFixture fixture = spanishNotebookFixture(dayTwo);
 
     RecordLearningSessionResponse response =
-        controller.record(recordRequest(fixture.notebook(), HOLA_GRACIAS_REPORT), "Asia/Shanghai");
+        controller.record(
+            recordRequest(fixture.notebook(), HOLA4_GRACIAS1_REPORT), "Asia/Shanghai");
 
     assertThat(response.getRecordedAt(), equalTo(dayTwo));
     assertThat(response.getRecordedItems(), hasSize(2));
@@ -91,7 +92,7 @@ class LearningSessionRecordTests extends LearningSessionControllerTestBase {
 
     RecordLearningSessionResponse response =
         controller.record(
-            recordRequest(notebook, learningSessionReport("Hola", 5)), "Asia/Shanghai");
+            recordRequest(notebook, learningSessionReport("Hola", 4)), "Asia/Shanghai");
 
     assertThat(response.getRecordedItems(), empty());
     assertThat(response.getRejectedEntries(), hasSize(1));

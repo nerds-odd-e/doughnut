@@ -21,7 +21,7 @@ class LearningSessionRecordTutorFeedbackRecallLogTests extends LearningSessionCo
   @Autowired MemoryTrackerController memoryTrackerController;
 
   @Test
-  void scoreFourLeavesAGoodRecallLogWithoutAnswer() throws UnexpectedNoAccessRightException {
+  void scoreThreeLeavesAGoodRecallLogWithoutAnswer() throws UnexpectedNoAccessRightException {
     Timestamp recordedAt = makeMe.aTimestamp().of(2, 8).please();
     testabilitySettings.timeTravelTo(recordedAt);
 
@@ -30,7 +30,7 @@ class LearningSessionRecordTutorFeedbackRecallLogTests extends LearningSessionCo
     MemoryTracker holaTracker =
         makeMe.aMemoryTrackerFor(hola).commissioned().nextRecallAt(recordedAt).please();
 
-    controller.record(recordRequest(notebook, learningSessionReport("Hola", 4)), "Asia/Shanghai");
+    controller.record(recordRequest(notebook, learningSessionReport("Hola", 3)), "Asia/Shanghai");
 
     List<RecallLog> logs = memoryTrackerController.getRecallLogs(holaTracker);
     assertThat(logs, hasSize(1));
@@ -40,7 +40,7 @@ class LearningSessionRecordTutorFeedbackRecallLogTests extends LearningSessionCo
   }
 
   @ParameterizedTest
-  @CsvSource({"5, EASY", "3, HARD", "2, SHRINK", "1, AGAIN", "0, AGAIN_ZERO"})
+  @CsvSource({"4, EASY", "2, HARD", "1, AGAIN"})
   void matchedScoreLeavesMappedRecallLog(int score, ProductOutcome outcome)
       throws UnexpectedNoAccessRightException {
     Timestamp dayTwo = makeMe.aTimestamp().of(1, 9).please();

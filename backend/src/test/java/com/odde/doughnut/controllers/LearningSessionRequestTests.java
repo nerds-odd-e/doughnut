@@ -61,14 +61,14 @@ class LearningSessionRequestTests extends LearningSessionControllerTestBase {
         markdown,
         containsString(
             "Teach the session items above, then return a Learning Session Report giving one"));
-    assertThat(markdown, containsString("score from 0 to 5 per item"));
+    assertThat(markdown, containsString("score from 1 to 4 per item"));
     assertThat(markdown, containsString("Example of how to provide feedback:"));
     assertThat(
         markdown,
         containsString(
             "# Learning Session Report\n\n"
                 + LearningSessionReportParser.SESSION_ITEM_SCORES_OPEN_TAG
-                + "\nHola: 5\nGracias: 1\n"
+                + "\nHola: 4\nGracias: 1\n"
                 + LearningSessionReportParser.SESSION_ITEM_SCORES_CLOSE_TAG));
     assertThat(
         markdown,
@@ -76,14 +76,17 @@ class LearningSessionRequestTests extends LearningSessionControllerTestBase {
             "Only score session items that were actually taught in this session. Do not list"));
     assertThat(markdown, containsString("items that were not taught in the session."));
     assertThat(markdown, containsString("</how_to_report>"));
-    assertThat(markdown, containsString("- 5 — mastered the session item with full fluency"));
-    assertThat(markdown, containsString("- 4 — mastered the session item with fluency"));
-    assertThat(markdown, containsString("- 3 — mastered the session item, but not fluent"));
+    assertThat(markdown, containsString("- 4 — mastered the session item with full fluency"));
+    assertThat(markdown, containsString("- 3 — mastered the session item with fluency"));
     assertThat(
         markdown,
-        containsString("- 2 — needed a reminder at first, then showed signs of mastering it"));
-    assertThat(markdown, containsString("- 1 — needed several reminders"));
-    assertThat(markdown, containsString("- 0 — could not reach the session item even with help"));
+        containsString(
+            "- 2 — mastered the session item but not fluent, or needed a reminder then showed"
+                + " mastery"));
+    assertThat(
+        markdown,
+        containsString(
+            "- 1 — needed several reminders, or could not reach the session item even with help"));
     assertThat(recallLogRepository.count(), equalTo(logsBefore));
   }
 
