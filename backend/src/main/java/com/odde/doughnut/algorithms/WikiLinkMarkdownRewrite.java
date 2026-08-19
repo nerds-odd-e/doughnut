@@ -1,6 +1,7 @@
 package com.odde.doughnut.algorithms;
 
 import com.odde.doughnut.validators.DisplayNamePathSeparators;
+import java.util.LinkedHashSet;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 import java.util.regex.Matcher;
@@ -171,33 +172,31 @@ public final class WikiLinkMarkdownRewrite {
     return newTargetToken + "|" + rawDisplay;
   }
 
-  public static String replaceOsInvalidCharsInWikiLinks(String markdown) {
+  /** Converts OS-invalid characters in one wiki inner or path-Markdown token. */
+  public static String replaceOsInvalidCharsInStoredLinkInner(String storedLinkInner) {
+    if (storedLinkInner == null || storedLinkInner.isEmpty()) {
+      return storedLinkInner;
+    }
+    UnaryOperator<String> convert =
+        DisplayNamePathSeparators::replaceOsInvalidCharsInWikiLinkTarget;
+    return rewriteAuthoredTarget(
+        storedLinkInner, convert, () -> rewriteWikiInnerTarget(storedLinkInner, convert));
+  }
+
+  /** Converts OS-invalid characters in wiki and path-Markdown tokens. */
+  public static String replaceOsInvalidCharsInAuthoredTokens(String markdown) {
     if (markdown == null || markdown.isEmpty()) {
       return markdown;
     }
-    Matcher matcher = WikiLinkMarkdown.INNER_LINK_PATTERN.matcher(markdown);
-    StringBuilder out = new StringBuilder();
-    int last = 0;
-    while (matcher.find()) {
-      out.append(markdown, last, matcher.start());
-      String rawInner = matcher.group(1);
-      int pipeIdx = rawInner.indexOf('|');
-      String rawTarget = pipeIdx == -1 ? rawInner : rawInner.substring(0, pipeIdx);
-      String sanitizedTarget =
-          DisplayNamePathSeparators.replaceOsInvalidCharsInWikiLinkTarget(rawTarget.trim());
-      if (pipeIdx == -1) {
-        out.append("[[").append(sanitizedTarget).append("]]");
-      } else {
-        out.append("[[")
-            .append(sanitizedTarget)
-            .append("|")
-            .append(rawInner.substring(pipeIdx + 1))
-            .append("]]");
+    String content = markdown;
+    for (String token :
+        new LinkedHashSet<>(WikiLinkMarkdown.authoredTokensInOccurrenceOrder(markdown))) {
+      String converted = replaceOsInvalidCharsInStoredLinkInner(token);
+      if (!converted.equals(token)) {
+        content = replaceWikiLinksMatchingTrimmedInner(content, token, converted);
       }
-      last = matcher.end();
     }
-    out.append(markdown.substring(last));
-    return out.toString();
+    return content;
   }
 
   public static String replaceWikiLinksMatchingTrimmedInner(

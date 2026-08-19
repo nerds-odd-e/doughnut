@@ -10,7 +10,7 @@
 
 - **Filename = name.** Sibling uniqueness already implies unique files. Do not treat `Recipe (2).md` as identity, and do not invert collision suffixes in link resolution.
 - **Forbidden characters** (create/rename reject): `\ / : * ? " < > |` and ASCII controls (`U+0000`–`U+001F`). Slice 2 done.
-- **Historical rows:** convert those characters to fullwidth (same idea as `:` → `：`): `*` → `＊`, `?` → `？`, `"` → `＂`, `<` → `＜`, `>` → `＞`, `|` → `｜`; controls → space then trim. Fail loud on unique-key collision or empty result. Inbound wiki / path-Markdown tokens must follow (same as a user rename).
+- **Historical rows:** convert via fullwidth / controls→space+trim (`V300000280`). Fail loud on unique-key collision or empty result. Inbound wiki / path-Markdown tokens follow. Slice 3 done.
 - **Out of scope:** path qualification; P9 / import / Git accept (T1); Windows device names (`CON`, …); trailing dots; accepting ADR 0004 as a whole; converting stored `[[…]]` ↔ `[…](…)`.
 
 ## Slices
@@ -28,18 +28,13 @@ ADR 0004 Decision is filename = display name (portable path = folder path + disp
 - **Status:** done
 
 Create/rename rejects the locked set; message is `Name must not contain \ / : * ? " < > | or ASCII control characters.` Surrounding whitespace/controls still trim then blank-reject. Extract uses `replaceOsInvalidChars` (new chars → fullwidth; controls → space then trim) so it does not hit the reject. E2E: `note_creation.feature` (`Recipe*`).
+
 ### 3. Migrate existing illegal display names
 
 - **Type:** Behavior
-- **Status:** planned
+- **Status:** done
 
-**Pre-condition:** a live note/folder/notebook still has a newly forbidden character (e.g. title `Recipe*` beside sibling `Recipe`).
-
-**Trigger:** production backfill (next Flyway Java migration after `V300000278`, same three-table pattern as `DisplayNameSurroundingWhitespaceBackfill`).
-
-**Post-condition:** stored names are OS-safe and still unique in their directory; inbound links that used the old spelling resolve to the same targets. Fail loud if uniquify would collide or the name would be blank.
-
-Do not invent `(2)` titles. Fullwidth keeps `Recipe` and `Recipe*` distinct (`Recipe＊`).
+`V300000280` / `DisplayNameOsInvalidCharsBackfill`: note/folder/notebook names convert via `normalizeDisplayName`; `Recipe` + `Recipe*` stay distinct as `Recipe＊`. Fail loud on unique-key collision or blank. Inbound wiki and path-Markdown tokens (and wiki-title cache) rewrite to the converted spelling. Shared unique-key JDBC loop is `DisplayNameUniqueKeyJdbcConversion`.
 
 ### 4. Export the exact display name
 

@@ -63,8 +63,8 @@ public final class DisplayNamePathSeparators {
 
   /**
    * Sanitizes wiki link target tokens. Path-shaped targets ({@code Folder/Title}) keep {@code /}.
-   * For {@code Notebook:Title}, only the note-title portion after the first {@code :} is converted;
-   * the notebook prefix colon stays halfwidth.
+   * For {@code Notebook:Title}, the notebook prefix colon stays halfwidth; both the notebook name
+   * and the note-title portion are converted.
    */
   public static String replaceOsInvalidCharsInWikiLinkTarget(String targetToken) {
     if (targetToken == null) {
@@ -75,12 +75,11 @@ public final class DisplayNamePathSeparators {
       String notebookName = targetToken.substring(0, colon).trim();
       if (!notebookName.isEmpty() && !notebookName.contains("\\") && !notebookName.contains("/")) {
         String noteTitle = targetToken.substring(colon + 1);
-        return notebookName + ":" + replaceOsInvalidChars(noteTitle);
+        return replaceOsInvalidChars(notebookName) + ":" + replaceOsInvalidChars(noteTitle);
       }
     }
-    if (WikiLinkTargetReference.PathShapedTarget.tryParse(targetToken).isPresent()) {
-      return targetToken.replace('\\', '＼');
-    }
-    return replaceOsInvalidChars(targetToken);
+    return WikiLinkTargetReference.PathShapedTarget.tryParse(targetToken)
+        .map(path -> path.mapSegmentNames(DisplayNamePathSeparators::replaceOsInvalidChars))
+        .orElseGet(() -> replaceOsInvalidChars(targetToken));
   }
 }

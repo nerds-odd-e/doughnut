@@ -3,6 +3,7 @@ package com.odde.doughnut.algorithms;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.UnaryOperator;
 
 /** Notebook name and note title used to resolve a wiki-link token to a target note. */
 public record WikiLinkTargetReference(String notebookName, String noteTitle) {
@@ -95,6 +96,14 @@ public record WikiLinkTargetReference(String notebookName, String noteTitle) {
 
     String withNoteTitle(String newTitle) {
       return formatPath(folderNames, newTitle);
+    }
+
+    public String mapSegmentNames(UnaryOperator<String> map) {
+      List<String> mapped = new ArrayList<>(folderNames.size());
+      for (String folderName : folderNames) {
+        mapped.add(map.apply(folderName));
+      }
+      return formatPath(mapped, map.apply(title));
     }
 
     String withRenamedFolder(String oldFolderName, String newFolderName) {
