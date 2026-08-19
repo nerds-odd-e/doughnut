@@ -32,12 +32,9 @@
 ### 2. Rebuild a first mapped Good from RecallLog
 
 - **Type:** Behavior
-- **Status:** planned
-- **Pre:** Active tracker whose only mapped grade is GOOD at elapsed **0**, but snapshot S/D/due are leftover (not first-rating Good). A New tracker with no mapped grade exists.
-- **Trigger:** Ungated backfill (`V300000283`, capability-named runner e.g. `RecallLogDsrBackfill`).
-- **Post:** Graded tracker is first-rating Good (**55h**, **D0(3)**, last = log `recorded_at`, due = last + 55h, even if past). New is unchanged.
-- **Tests:** `RecallLogDsrBackfillTest` (makeMe + `run(connection)`), one canonical first-Good pin and the New skip as the delta. Flyway class only calls the runner.
-- **Note:** Smallest implementation may already loop all mapped grades via `Fsrs.*` + stored elapsed; do not special-case Good if the loop is shorter.
+- **Status:** done
+- **Done:** Ungated `V300000283` / `RecallLogDsrBackfill` rebuilds leftover first mapped Good to first-rating Good (**55h**, **D0(3)**, last = log `recorded_at`, due = last + 55h). New with no mapped grade is skipped.
+- **Learning:** Runner already folds all mapped grades via `Fsrs.after*Recall` (confusion as non-grade). Slice 3 only needs the Again pin on that loop; do not special-case Good.
 
 ### 3. Rebuild through a later mapped grade
 
