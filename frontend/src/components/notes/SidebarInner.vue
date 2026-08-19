@@ -44,11 +44,11 @@ import {
   type SidebarStructuralRow,
 } from "./sidebarStructuralSort"
 import { computed, ref, watch } from "vue"
-import { useNoteSidebarPeerSort } from "@/composables/useNoteSidebarPeerSort"
+import { usePeerSort } from "@/composables/usePeerSort"
 import { getCachedListing, setCachedListing } from "./sidebarFolderListingCache"
 import { requestNotebookFolderListing } from "@/utils/notebookFolderListingRequest"
 
-const { sortPeerSpec } = useNoteSidebarPeerSort()
+const { peerSortSpec } = usePeerSort()
 
 function folderNumericId(folder: Folder): number | undefined {
   return folder.id
@@ -88,7 +88,7 @@ const currentLevel = computed(() => props.level ?? 1)
 const rawRows = ref<SidebarStructuralRow[]>([])
 
 const displayRows = computed(() =>
-  sortSidebarStructuralRows(rawRows.value, sortPeerSpec.value)
+  sortSidebarStructuralRows(rawRows.value, peerSortSpec.value)
 )
 
 function applyListing(listing: FolderListing) {
