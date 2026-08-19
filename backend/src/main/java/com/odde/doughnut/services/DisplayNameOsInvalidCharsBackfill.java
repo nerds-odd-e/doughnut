@@ -14,8 +14,9 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * One-shot JDBC backfill: convert OS-invalid characters in note/folder/notebook display names and
- * rewrite inbound wiki / path-Markdown tokens to the converted spellings.
+ * One-shot JDBC backfill: convert OS-invalid characters in note/folder/notebook display names,
+ * rewrite inbound wiki / path-Markdown tokens, and rewrite wiki-title cache {@code link_text} to
+ * the converted spellings.
  */
 public final class DisplayNameOsInvalidCharsBackfill {
 

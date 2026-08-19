@@ -11,8 +11,11 @@ import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.testability.MakeMe;
 import java.sql.Connection;
+import java.util.List;
 import java.util.Optional;
 import javax.sql.DataSource;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -81,6 +84,38 @@ class DisplayNameOsInvalidCharsBackfillTest {
     assertThat(resolved.get().getId(), is(recipeStar.getId()));
   }
 
+  @Nested
+  class wikiTitleCacheLinkText {
+    Note recipeStar;
+    Note carrier;
+
+    @BeforeEach
+    void seedCarrierAndStarWithRawIllegalTitle() {
+      recipeStar = makeMe.aNote().title("Star").please();
+      carrier = makeMe.aNote().title("Carrier").please();
+      jdbcTemplate.update("UPDATE note SET title = ? WHERE id = ?", "Recipe*", recipeStar.getId());
+    }
+
+    @Test
+    void run_convertsWikiTitleCacheLinkTextToConvertedSpelling() throws Exception {
+      insertWikiTitleCache(carrier.getId(), recipeStar.getId(), "Recipe*");
+
+      runBackfill();
+
+      assertThat(rawWikiTitleCacheLinkTexts(carrier.getId()), is(List.of("Recipe＊")));
+    }
+
+    @Test
+    void run_deletesWikiTitleCacheRowWhenConvertWouldDuplicateOnSameNote() throws Exception {
+      insertWikiTitleCache(carrier.getId(), recipeStar.getId(), "Recipe＊");
+      insertWikiTitleCache(carrier.getId(), recipeStar.getId(), "Recipe*");
+
+      runBackfill();
+
+      assertThat(rawWikiTitleCacheLinkTexts(carrier.getId()), is(List.of("Recipe＊")));
+    }
+  }
+
   @Test
   void run_failsLoudWhenConvertWouldCollideWithSiblingNoteTitle() throws Exception {
     Notebook notebook = makeMe.aNotebook().please();
@@ -138,5 +173,20 @@ class DisplayNameOsInvalidCharsBackfillTest {
 
   private String rawNotebookName(Integer id) {
     return jdbcTemplate.queryForObject("SELECT name FROM notebook WHERE id = ?", String.class, id);
+  }
+
+  private void insertWikiTitleCache(Integer noteId, Integer targetNoteId, String linkText) {
+    jdbcTemplate.update(
+        "INSERT INTO note_wiki_title_cache (note_id, target_note_id, link_text) VALUES (?, ?, ?)",
+        noteId,
+        targetNoteId,
+        linkText);
+  }
+
+  private List<String> rawWikiTitleCacheLinkTexts(Integer noteId) {
+    return jdbcTemplate.queryForList(
+        "SELECT link_text FROM note_wiki_title_cache WHERE note_id = ? ORDER BY id",
+        String.class,
+        noteId);
   }
 }
