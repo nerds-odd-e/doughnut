@@ -153,8 +153,8 @@ class SpacedRepetitionCorrectRecallSchedulingTest extends SpacedRepetitionRecall
     earlierCorrect.markAsRecalled(failureTime, false);
     laterCorrect.markAsRecalled(failureTime, false);
 
-    earlierCorrect.markAsRecalled(TimestampOperations.addHoursToTimestamp(failureTime, 12), true);
-    laterCorrect.markAsRecalled(TimestampOperations.addHoursToTimestamp(failureTime, 24), true);
+    earlierCorrect.markAsRecalled(TimestampOperations.addHoursToTimestamp(failureTime, 24), true);
+    laterCorrect.markAsRecalled(TimestampOperations.addHoursToTimestamp(failureTime, 48), true);
 
     assertThat(laterCorrect.getStability(), greaterThan(earlierCorrect.getStability()));
   }
