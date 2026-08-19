@@ -19,7 +19,6 @@
 - Replay memory state from RecallLog; backfill historical S.
 - Per-user / fitted weights (E4).
 - Showing Retrievability on the Memory Tracker.
-- `.planning/quick/021-elapsed-hours-backfill-test-cohesion/` (orthogonal).
 
 ## Discoveries
 
