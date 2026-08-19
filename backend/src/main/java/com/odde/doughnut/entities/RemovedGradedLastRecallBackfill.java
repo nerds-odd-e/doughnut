@@ -17,7 +17,7 @@ public final class RemovedGradedLastRecallBackfill {
               SELECT memory_tracker_id, MAX(recorded_at) AS last_mapped_at
               FROM recall_log
               WHERE product_outcome IN (
-                %s
+                %s, 'SHRINK', 'AGAIN_ZERO'
               )
               GROUP BY memory_tracker_id
             ) mapped ON mapped.memory_tracker_id = memory_tracker.id

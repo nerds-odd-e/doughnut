@@ -21,7 +21,7 @@ public final class UngradedNewLastRecallBackfill {
                 SELECT 1 FROM recall_log
                 WHERE recall_log.memory_tracker_id = memory_tracker.id
                   AND recall_log.product_outcome IN (
-                    %s
+                    %s, 'SHRINK', 'AGAIN_ZERO'
                   )
               )
             """

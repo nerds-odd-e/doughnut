@@ -32,7 +32,7 @@ public final class StillNewMappedFirstRatingBackfill {
                 JOIN recall_log rl
                   ON rl.memory_tracker_id = mt.id
                  AND rl.product_outcome IN (
-                   %s
+                   %s, 'SHRINK', 'AGAIN_ZERO'
                  )
                 WHERE mt.stability = 0
                   AND mt.difficulty IS NULL

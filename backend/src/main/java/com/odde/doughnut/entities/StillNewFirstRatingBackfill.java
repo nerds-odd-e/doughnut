@@ -6,7 +6,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.util.Collections;
 
 public final class StillNewFirstRatingBackfill {
 
@@ -15,20 +14,17 @@ public final class StillNewFirstRatingBackfill {
   public static void runAgain(Connection connection, String gate) throws SQLException {
     ForgettingCurve.NextMemory firstAgain =
         new ForgettingCurve(ForgettingCurve.ASSIMILATE_STABILITY_HOURS).afterAgainRecall(0);
-    run(connection, gate, firstAgain, ProductOutcome.AGAIN, ProductOutcome.AGAIN_ZERO);
+    run(connection, gate, firstAgain, "'AGAIN', 'AGAIN_ZERO'");
   }
 
   public static void runHard(Connection connection, String gate) throws SQLException {
     ForgettingCurve.NextMemory firstHard =
         new ForgettingCurve(ForgettingCurve.ASSIMILATE_STABILITY_HOURS).afterHardRecall(0);
-    run(connection, gate, firstHard, ProductOutcome.SHRINK);
+    run(connection, gate, firstHard, "'SHRINK'");
   }
 
   private static void run(
-      Connection connection,
-      String gate,
-      ForgettingCurve.NextMemory first,
-      ProductOutcome... outcomes)
+      Connection connection, String gate, ForgettingCurve.NextMemory first, String outcomeSqlInList)
       throws SQLException {
     if ("1=0".equals(gate)) {
       return;
@@ -41,7 +37,6 @@ public final class StillNewFirstRatingBackfill {
     float stability = first.stability();
     float difficulty = first.difficulty();
     int intervalHours = Fsrs.intervalHours(stability);
-    String inList = String.join(", ", Collections.nCopies(outcomes.length, "?"));
 
     try (PreparedStatement select =
             connection.prepareStatement(
@@ -56,7 +51,7 @@ public final class StillNewFirstRatingBackfill {
                       AND rl.product_outcome IN (%s)
                   )
                 """
-                    .formatted(inList));
+                    .formatted(outcomeSqlInList));
         PreparedStatement update =
             connection.prepareStatement(
                 """
@@ -64,9 +59,6 @@ public final class StillNewFirstRatingBackfill {
                 SET stability = ?, difficulty = ?, next_recall_at = ?
                 WHERE id = ?
                 """)) {
-      for (int i = 0; i < outcomes.length; i++) {
-        select.setString(i + 1, outcomes[i].name());
-      }
       try (ResultSet rows = select.executeQuery()) {
         boolean pending = false;
         while (rows.next()) {

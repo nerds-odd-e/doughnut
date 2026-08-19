@@ -55,11 +55,10 @@ class StillNewMappedFirstRatingBackfillTest {
 
   @Test
   void appliesHardFirstRatingToShrinkOnly() throws Exception {
-    MemoryTracker tracker =
-        stillNewWith(
-            ProductOutcome.SHRINK,
-            makeMe.aTimestamp().of(1, 0).please(),
-            makeMe.aTimestamp().of(2, 0).please());
+    Timestamp gradeTime = makeMe.aTimestamp().of(2, 0).please();
+    MemoryTracker tracker = stillNew(makeMe.aTimestamp().of(1, 0).please());
+    setRecallLogProductOutcome(
+        makeMe.aRecallLogFor(tracker).recordedAt(gradeTime).please().getId(), "SHRINK");
 
     runBackfill();
 
@@ -75,11 +74,8 @@ class StillNewMappedFirstRatingBackfillTest {
     Timestamp shrinkAt = makeMe.aTimestamp().of(3, 0).please();
     MemoryTracker tracker = stillNew(assimilateBump);
     makeMe.aRecallLogFor(tracker).productOutcome(ProductOutcome.AGAIN).recordedAt(againAt).please();
-    makeMe
-        .aRecallLogFor(tracker)
-        .productOutcome(ProductOutcome.SHRINK)
-        .recordedAt(shrinkAt)
-        .please();
+    setRecallLogProductOutcome(
+        makeMe.aRecallLogFor(tracker).recordedAt(shrinkAt).please().getId(), "SHRINK");
 
     runBackfill();
 
@@ -135,6 +131,12 @@ class StillNewMappedFirstRatingBackfillTest {
     MemoryTracker tracker = stillNew(assimilateBump);
     makeMe.aRecallLogFor(tracker).productOutcome(outcome).recordedAt(gradeTime).please();
     return tracker;
+  }
+
+  private void setRecallLogProductOutcome(Integer logId, String productOutcome) {
+    makeMe.entityPersister.flushAndClear();
+    jdbcTemplate.update(
+        "UPDATE recall_log SET product_outcome = ? WHERE id = ?", productOutcome, logId);
   }
 
   private MemoryTracker stillNew(Timestamp assimilateBump) {

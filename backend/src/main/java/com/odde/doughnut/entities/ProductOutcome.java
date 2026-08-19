@@ -7,13 +7,11 @@ public enum ProductOutcome {
   GOOD,
   EASY,
   HARD,
-  SHRINK,
   AGAIN,
-  AGAIN_ZERO,
   CONFUSION;
 
   static String mappedGradeSqlInList() {
-    return Stream.of(GOOD, EASY, HARD, SHRINK, AGAIN, AGAIN_ZERO)
+    return Stream.of(GOOD, EASY, HARD, AGAIN)
         .map(outcome -> "'" + outcome.name() + "'")
         .collect(Collectors.joining(", "));
   }

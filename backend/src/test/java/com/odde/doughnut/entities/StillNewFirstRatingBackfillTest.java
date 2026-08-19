@@ -48,7 +48,11 @@ class StillNewFirstRatingBackfillTest {
   @Test
   void runHard_isNoOpWhenGateDisabled() throws Exception {
     MemoryTracker shrink =
-        stillNewWith(ProductOutcome.SHRINK, makeMe.aTimestamp().of(2, 0).please());
+        makeMe
+            .aMemoryTrackerFor(makeMe.aNote().please())
+            .assimilatedAt(makeMe.aTimestamp().of(2, 0).please())
+            .please();
+    setRecallLogProductOutcome(makeMe.aRecallLogFor(shrink).please().getId(), "SHRINK");
 
     runHard("1=0");
 
@@ -60,6 +64,12 @@ class StillNewFirstRatingBackfillTest {
         makeMe.aMemoryTrackerFor(makeMe.aNote().please()).assimilatedAt(assimilatedAt).please();
     makeMe.aRecallLogFor(tracker).productOutcome(outcome).please();
     return tracker;
+  }
+
+  private void setRecallLogProductOutcome(Integer logId, String productOutcome) {
+    makeMe.entityPersister.flushAndClear();
+    jdbcTemplate.update(
+        "UPDATE recall_log SET product_outcome = ? WHERE id = ?", productOutcome, logId);
   }
 
   private void runAgain(String gate) throws Exception {

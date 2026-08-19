@@ -5346,9 +5346,7 @@ components:
           - GOOD
           - EASY
           - HARD
-          - SHRINK
           - AGAIN
-          - AGAIN_ZERO
           - CONFUSION
         memoryTrackerId:
           type: integer

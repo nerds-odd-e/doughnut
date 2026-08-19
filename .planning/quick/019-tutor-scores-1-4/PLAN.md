@@ -31,8 +31,7 @@
 
 ## Discoveries
 
-- `scoreForProductOutcome` still reverse-maps leftover `SHRINK`/`AGAIN_ZERO` (historical fixtures until slice 4 drops the enum).
-- `ProductOutcome.mappedGradeSqlInList()` is used by still-New / ungraded / removed backfills. After the live enum is four grades, those **historical** helpers must keep selecting `'SHRINK'` and `'AGAIN_ZERO'` in their own SQL (replay at that version).
+- Historical backfills (271/272/277/278 helpers) keep `'SHRINK'` / `'AGAIN_ZERO'` in **their** SQL `IN` lists so Flyway replay still selects those column values. Live `mappedGradeSqlInList()` is the four grades.
 
 ## Slices
 
@@ -48,21 +47,21 @@ Proposed ADR 0003/0005 Decision is the 1–4 identity (`score = G`). First-ratin
 - **Type:** Behavior
 - **Status:** done
 
-Request, parser, recording, and latest score are `score = G`. Graded **2** is Hard (`shrinkStability` gone). Parser rejects 0/5/6. OpenAPI/enum stay until slice 4.
+Request, parser, recording, and latest score are `score = G`. Graded **2** is Hard (`shrinkStability` gone). Parser rejects 0/5/6.
 
 ### 3. Alias RecallLogs are HARD and AGAIN
 
 - **Type:** Behavior
 - **Status:** done
 
-Ungated `V300000279` / `AliasRecallLogGradeBackfill`: `SHRINK`→`HARD`, `AGAIN_ZERO`→`AGAIN`; S/D/due unchanged. Pins in `AliasRecallLogGradeBackfillTest`. Frequent-failure counts `AGAIN` only. Reverse-map stays until slice 4.
+Ungated `V300000279` / `AliasRecallLogGradeBackfill`: `SHRINK`→`HARD`, `AGAIN_ZERO`→`AGAIN`; S/D/due unchanged. Pins in `AliasRecallLogGradeBackfillTest`. Frequent-failure counts `AGAIN` only.
 
 ### 4. Live product_outcome is four grades plus CONFUSION
 
 - **Type:** Structure
-- **Status:** planned
+- **Status:** done
 
-`ProductOutcome` = `GOOD`, `EASY`, `HARD`, `AGAIN`, `CONFUSION`. OpenAPI + `pnpm generateTypeScript`. Historical backfill helpers keep SQL literals `'SHRINK'` / `'AGAIN_ZERO'` in **their** `IN` lists (replay). Tests that fixture those column values for 271/272/277 use the same literals. `mappedGradeSqlInList()` is the four live grades.
+Live enum is `GOOD` | `EASY` | `HARD` | `AGAIN` | `CONFUSION`. OpenAPI regenerated. Historical helpers keep `'SHRINK'` / `'AGAIN_ZERO'` literals. `mappedGradeSqlInList()` is the four live grades (`ProductOutcomeTest`).
 
 ### 5. Trackers and leftover pins match 1–4
 

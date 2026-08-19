@@ -22,8 +22,8 @@ public final class CommissionedLearningSessionFeedbackScheduling {
     return switch (productOutcome) {
       case EASY -> 4;
       case GOOD -> 3;
-      case HARD, SHRINK -> 2;
-      case AGAIN, AGAIN_ZERO -> 1;
+      case HARD -> 2;
+      case AGAIN -> 1;
       case CONFUSION ->
           throw new IllegalArgumentException("CONFUSION is not a tutor feedback outcome");
     };
@@ -34,8 +34,8 @@ public final class CommissionedLearningSessionFeedbackScheduling {
     switch (productOutcome) {
       case EASY -> tracker.recalledEasily(now);
       case GOOD -> tracker.recalledSuccessfully(now);
-      case HARD, SHRINK -> tracker.recalledHard(now);
-      case AGAIN, AGAIN_ZERO -> tracker.recalledAgain(now);
+      case HARD -> tracker.recalledHard(now);
+      case AGAIN -> tracker.recalledAgain(now);
       case CONFUSION ->
           throw new IllegalArgumentException("CONFUSION is not a tutor feedback outcome");
     }

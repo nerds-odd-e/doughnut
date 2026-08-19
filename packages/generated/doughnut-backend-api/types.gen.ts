@@ -1092,7 +1092,7 @@ export type RecallLog = {
     id: number;
     recordedAt: string;
     elapsedHours?: number;
-    productOutcome: 'GOOD' | 'EASY' | 'HARD' | 'SHRINK' | 'AGAIN' | 'AGAIN_ZERO' | 'CONFUSION';
+    productOutcome: 'GOOD' | 'EASY' | 'HARD' | 'AGAIN' | 'CONFUSION';
     memoryTrackerId: number;
     answerId?: number;
 };

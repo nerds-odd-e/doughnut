@@ -28,8 +28,7 @@ class AliasRecallLogGradeBackfillTest {
 
   @ParameterizedTest
   @CsvSource({"SHRINK, HARD", "AGAIN_ZERO, AGAIN"})
-  void rewritesAliasGradeAndKeepsSchedule(ProductOutcome alias, ProductOutcome grade)
-      throws Exception {
+  void rewritesAliasGradeAndKeepsSchedule(String alias, ProductOutcome grade) throws Exception {
     MemoryTracker tracker =
         makeMe
             .aMemoryTrackerFor(makeMe.aNote().please())
@@ -37,7 +36,8 @@ class AliasRecallLogGradeBackfillTest {
             .difficulty(5.3f)
             .please();
     Timestamp due = tracker.getNextRecallAt();
-    var log = makeMe.aRecallLogFor(tracker).productOutcome(alias).please();
+    var log = makeMe.aRecallLogFor(tracker).please();
+    setRecallLogProductOutcome(log.getId(), alias);
 
     runBackfill();
 
@@ -59,6 +59,12 @@ class AliasRecallLogGradeBackfillTest {
     runBackfill();
 
     assertThat(productOutcome(log.getId()), equalTo("GOOD"));
+  }
+
+  private void setRecallLogProductOutcome(Integer logId, String productOutcome) {
+    makeMe.entityPersister.flushAndClear();
+    jdbcTemplate.update(
+        "UPDATE recall_log SET product_outcome = ? WHERE id = ?", productOutcome, logId);
   }
 
   private void runBackfill() throws Exception {
