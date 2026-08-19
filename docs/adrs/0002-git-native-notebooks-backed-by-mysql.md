@@ -86,8 +86,7 @@ Does not change Level 1 authority. Deferred until needed:
 ## Cons
 
 - New object store, lineage model, lossless codec, and commit-shaped writes.
-- Ambiguous renames need user resolution; filename titles need `title`
-  frontmatter when paths cannot round-trip.
+- Ambiguous renames need user resolution.
 
 ## Assumptions
 

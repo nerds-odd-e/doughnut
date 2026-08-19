@@ -14,9 +14,8 @@ so local copies work with OKF tooling, Obsidian-style editing, and (with
 [ADR 0002](./0002-git-native-notebooks-backed-by-mysql.md)) Git-native sync.
 
 OKF defines structure (concept files, reserved `index.md` / `log.md`, path as
-concept ID, required `type` frontmatter). Doughnut title round-trips, collision
-filenames, wiki-link policy, and what stays out of the tree are a producer
-profile.
+concept ID, required `type` frontmatter). Doughnut filename = display name,
+wiki-link policy, and what stays out of the tree are a producer profile.
 
 ## Decision
 
@@ -53,29 +52,20 @@ profile. Codec round-trips must be lossless for these rules.
 
 ### Titles, filenames, body
 
-- Filename is the ordinary note title (Obsidian inline-title / OKF “derive
-  title from filename”). The title column (max 150) is the product source of
-  truth. Export sanitize replaces `\/:*?"<>|` and control characters with
-  spaces; a blank result becomes `Untitled`. Filename length follows the
-  title column.
-- When the exact Doughnut title cannot round-trip through that filesystem-safe
-  name (sanitize, Untitled fallback, collision suffix), set `title` in
-  frontmatter as the display title. Collision suffixes belong to the path,
-  not the title. They are a human sequence in export order within that
-  directory: first keeps the unsuffixed basename; later collisions use
-  `(2)`, `(3)`, … skipping any basename already used (including a sibling
-  whose title is already `Recipe (2)`). Never a Doughnut note or folder id
-  (e.g. `Recipe.md`, `Recipe (2).md`).
-- Codec wrap (export / portable tree): when the concept filename (basename
-  without `.md`) differs from the exact title and the leading YAML omits
-  `title`, insert `title: {display title}`. Leave an author-owned `title` key
-  unchanged. Preserve other author YAML. This wrap is export-only; stored
-  notes keep the title column.
-- Title in the portable file is the filename, or `title:` when the filename
-  cannot round-trip. Author H1s in the body are ordinary body content.
-  Ordinary save keeps author headings, including a leading heading that
-  matches the title. AI extract may drop a repeated title heading so the
-  stored body is the note content.
+- Filename is the display name: the concept basename without `.md` is the
+  ordinary note title (Obsidian inline-title / OKF “derive title from
+  filename”). The title column (max 150) is the product source of truth.
+  Filename length follows the title column. Sibling uniqueness already
+  implies unique files in a directory.
+- Portable path is folder path + display name. Collision suffixes
+  (`Recipe (2).md`) are not part of the profile.
+- Author-owned `title` in YAML is preserved unchanged. The codec does not
+  insert `title:` to compensate for a basename that is not the display
+  name. Preserve other author YAML. Stored notes keep the title column.
+- Author H1s in the body are ordinary body content. Ordinary save keeps
+  author headings, including a leading heading that matches the title.
+  AI extract may drop a repeated title heading so the stored body is the
+  note content.
 - Public identity in the tree is the path. Doughnut note ID, UUID, and sync
   manifests stay server-side (ADR 0002).
 
@@ -98,8 +88,8 @@ profile. Codec round-trips must be lossless for these rules.
 - `.md` on a **path-shaped** target is optional and ignored (`/folder/File` =
   `/folder/File.md`; `[[folder/File.md]]` = `[[folder/File]]`). Do not strip
   `.md` from unqualified wiki titles (`[[File.md]]` can still mean a title).
-- Identity is **folder path + title**, not ZIP collision basenames
-  (`Recipe (2).md`).
+- Identity is **folder path + display name**, not ZIP collision basenames
+  (`Recipe (2).md`). Those suffixes are gone from the profile, not mapped.
 - No active conversion of stored `[[…]]` ↔ `[…](…)`, including save/paste
   round-trip of path Markdown. ZIP export copies stored spelling. Wiki in
   Doughnut ZIPs is a profile exception to OKF path-link preference, not a
@@ -124,10 +114,12 @@ profile. Codec round-trips must be lossless for these rules.
 ## Consequences
 
 - Export, lint, import, and Git accept share one codec contract.
-- Title changes are usually filename changes; identity preservation across
+- Title changes are filename changes; identity preservation across
   renames is ADR 0002 lineage.
-- `title:` on the portable tree is codec wrap when the filename cannot
-  round-trip; stored notes keep the title column.
+- Filename is the display name on the portable tree. Author-owned `title:`
+  stays as authored YAML; the codec does not wrap `title:` to compensate
+  for a basename that is not the display name. Stored notes keep the title
+  column.
 - Inter-note links are dual-spelling in body and frontmatter: Doughnut
   writes wiki; path Markdown stays as authored. ZIP does not rewrite wiki
   to path Markdown. Wiki in Doughnut-authored YAML is the same profile
@@ -145,9 +137,9 @@ profile. Codec round-trips must be lossless for these rules.
 
 ## Cons
 
-- Filenames that cannot express the exact title need `title` frontmatter on
-  the portable tree; the title column stays the stored source of truth
-  (same persist-vs-wrap split as Readme `type`).
+- Unique sibling display names are the files; uniqueness is not encoded
+  with collision suffixes. The title column stays the stored source of
+  truth.
 - Strict accept rules reject some free-form trees until fixed.
 - Wiki in Doughnut-authored trees is a profile exception to OKF path-link
   preference.

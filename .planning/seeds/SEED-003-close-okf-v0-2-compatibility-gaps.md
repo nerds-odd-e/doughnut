@@ -17,14 +17,14 @@ Portable notebooks should be OKF v0.2 trees plus the Doughnut profile in Propose
 
 **Trigger:** accepting ADR 0004; changing notebook ZIP export; adding Markdown import, CLI lint, or Git accept (ADR 0002 Level 1).
 
-Also surface when changing inter-note link spelling (wiki vs path Markdown). Do not reopen **P4** by converting `[[…]]` ↔ `[…](…)`. Do not reopen frontmatter links as OKF path scalars (`source: /folder/File.md`); they are wiki links (wiki default, dual-spelling, no conversion). Do not reopen `index` / `log` note titles as a hard reserve. Do not reopen persist-vs-wrap for `title:`. Do not reopen human collision suffixes (`Recipe (2).md`) as the export uniqueness scheme; collision-basename *mapping* as identity is remaining. Do not reopen stored `image:` as a codec wrap (binaries are ADR 0002 Level 2).
+Also surface when changing inter-note link spelling (wiki vs path Markdown). Do not reopen **P4** by converting `[[…]]` ↔ `[…](…)`. Do not reopen frontmatter links as OKF path scalars (`source: /folder/File.md`); they are wiki links (wiki default, dual-spelling, no conversion). Do not reopen `index` / `log` note titles as a hard reserve. Do not reopen persist-vs-wrap for author-owned `title:` (the codec does not wrap `title:` to compensate for a basename that is not the display name). Do not reopen collision suffixes (`Recipe (2).md`) as identity. Do not reopen stored `image:` as a codec wrap (binaries are ADR 0002 Level 2).
 
 ## Scope Estimate
 
 **Large** — remaining work is profile accept plus a lossless codec (and later accept/lint):
 
 1. Humans accept Proposed [ADR 0004](../../docs/adrs/0004-okf-compatible-notebook-markdown.md). See `docs/adrs/README.md`.
-2. Remaining codec work: **P9**, collision basenames (identity is folder path + title, not `Recipe (2).md`). Tracker: [OKF-COMPATIBILITY-GAP.md](../research/OKF-COMPATIBILITY-GAP.md). Frontmatter dual-spelling product holes are closed (wiki default, path Markdown accepted, no conversion).
+2. Remaining codec work: **P9**. Collision-basename mapping is not remaining work (filename = display name; [017-os-safe-display-names](../quick/017-os-safe-display-names/PLAN.md) replaces it). Tracker: [OKF-COMPATIBILITY-GAP.md](../research/OKF-COMPATIBILITY-GAP.md). Frontmatter dual-spelling product holes are closed (wiki default, path Markdown accepted, no conversion).
 
 ## Breadcrumbs
 
