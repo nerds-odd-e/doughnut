@@ -2,6 +2,7 @@ package com.odde.doughnut.algorithms;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.greaterThan;
 
 import com.odde.doughnut.entities.MemoryTracker;
 import org.junit.jupiter.api.Test;
@@ -41,6 +42,16 @@ class SpacedRepetitionSameHourRecallSchedulingTest
 
     memoryTracker.recalledSuccessfully(sameHourGradeTime(memoryTracker));
 
-    assertThat(memoryTracker.getStability(), equalTo(72.0f));
+    assertThat(memoryTracker.getStability(), equalTo(STABILITY_HOURS));
+  }
+
+  @Test
+  void twentyThreeHourCorrectRecallDoesNotShrinkThreeDayStability() {
+    assertThat(nextStabilityHours(23), equalTo(STABILITY_HOURS));
+  }
+
+  @Test
+  void twentyFourHourCorrectRecallGrowsThreeDayStability() {
+    assertThat(nextStabilityHours(24), greaterThan(STABILITY_HOURS));
   }
 }

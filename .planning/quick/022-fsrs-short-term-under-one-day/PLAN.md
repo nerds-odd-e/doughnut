@@ -52,11 +52,11 @@ Live switch: `elapsedInHours < HOURS_PER_DAY` in `Fsrs.hoursAfterShortTermOrStab
 ### 3. Good at elapsed 23 is still short-term; 24 is long-term
 
 - **Type:** Behavior
-- **Status:** planned
+- **Status:** done
 
 **Pre:** graded tracker with Stability **72**. **Trigger:** ordinary Good. **Post:** elapsed **23** → Stability stays **72** (short-term clamp); elapsed **24** → Stability **> 72** (long-term).
 
-Unit only on the existing scheduling surface (`SpacedRepetitionSameHourRecallSchedulingTest` / sibling). No new E2E (slice 2 covers the user path). Canonical shape of S=72 clamp at elapsed 0 already exists; this slice only the 23 vs 24 delta.
+Pins sit beside the elapsed-0 S=72 clamp in `SpacedRepetitionSameHourRecallSchedulingTest`. Early-vs-on-time keeps only the magnitude delta. Shared `nextStabilityHours` lives on the scheduling test base.
 
 ### 4. Live memory updates are not a ForgettingCurve
 

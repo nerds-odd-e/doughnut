@@ -49,4 +49,11 @@ abstract class SpacedRepetitionRecallSchedulingTestBase {
     return TimestampOperations.addHoursToTimestamp(
         tracker.getLastRecalledAt(), Math.round(tracker.getStability()) * 2);
   }
+
+  float nextStabilityHours(int elapsedInHours) {
+    MemoryTracker memoryTracker = aGradedTrackerAtThreeDayStability();
+    memoryTracker.recalledSuccessfully(
+        TimestampOperations.addHoursToTimestamp(memoryTracker.getLastRecalledAt(), elapsedInHours));
+    return memoryTracker.getStability();
+  }
 }
