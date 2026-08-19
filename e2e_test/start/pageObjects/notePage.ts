@@ -1,4 +1,5 @@
 import { commonSenseSplit } from '../../support/string_util'
+import { clickPopupConfirmOk } from '../../support/daisyModalHelpers'
 import { waitUntilAppIsNotBusy } from '../pageBase'
 import testability from '../testability'
 import audioToolsPage from './audioToolsPage'
@@ -195,15 +196,33 @@ export const assumeNotePage = (
       findNoteContentRegion().find('a.dead-wiki-link').contains(wikiLinkText)
       return this
     },
-    followDeadWikiLink(wikiLinkTitle: string) {
+    expectCannotCreateNoteFromPath() {
+      cy.get('dialog')
+        .filter(':visible')
+        .contains(
+          'Cannot create a note from a path. You can point at an existing note instead.'
+        )
+        .should('be.visible')
+      clickPopupConfirmOk()
+      cy.findByTestId('note-new-form').should('not.exist')
+      cy.findByRole('button', { name: 'Point at an existing note' }).should(
+        'be.visible'
+      )
+      return this
+    },
+    followDeadWikiLink(wikiLinkText: string) {
       this.switchToRichContent()
       findNoteContentRegion()
         .find('a.dead-wiki-link')
-        .contains(wikiLinkTitle)
+        .contains(wikiLinkText)
         .click()
+      const chooseCreateNewNote = () => {
+        cy.findByRole('button', { name: /Create a new note/ }).click()
+      }
       return {
+        chooseCreateNewNote,
         createNote: () => {
-          cy.findByRole('button', { name: /Create a new note/ }).click()
+          chooseCreateNewNote()
           noteCreationForm.submit()
         },
         pointAtExistingNote: (

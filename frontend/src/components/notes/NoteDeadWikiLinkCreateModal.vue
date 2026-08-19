@@ -10,7 +10,7 @@
             class="daisy-btn daisy-btn-primary"
             @click="onCreateNewNoteClick"
           >
-            Create a new note named "{{ modelValue.displayText }}"
+            Create a new note named "{{ modelValue.targetToken }}"
           </button>
           <button
             class="daisy-btn daisy-btn-secondary"
@@ -24,7 +24,7 @@
         v-else-if="showCreateForm && modelValue !== null"
         :notebookId="notebookId"
         :initial-folder="realmLeafFolder(noteRealm)"
-        :initial-title="modelValue.displayText"
+        :initial-title="modelValue.targetToken"
         :wiki-title-cache-refresh-source-note-id="sourceNoteId"
         :ancestor-folders="noteRealm.ancestorFolders ?? []"
         @close-dialog="close"
@@ -44,6 +44,7 @@
 import { ref, watch } from "vue"
 import type { NoteRealm } from "@generated/doughnut-backend-api"
 import Modal from "@/components/commons/Modal.vue"
+import usePopups from "@/components/commons/Popups/usePopups"
 import { realmLeafFolder } from "./useNoteSidebarTree"
 import NoteNewForm from "./NoteNewForm.vue"
 import SearchForm from "@/components/wiki-link-or-relationship/SearchForm.vue"
@@ -63,6 +64,7 @@ const emit = defineEmits<{
   "update:modelValue": [value: DeadWikiLinkPayload | null]
 }>()
 
+const { popups } = usePopups()
 const pointingAtExisting = ref(false)
 const showCreateForm = ref(false)
 
@@ -76,7 +78,13 @@ watch(
   }
 )
 
-const onCreateNewNoteClick = () => {
+const onCreateNewNoteClick = async () => {
+  if (props.modelValue?.targetToken.includes("/")) {
+    await popups.alert(
+      "Cannot create a note from a path. You can point at an existing note instead."
+    )
+    return
+  }
   primeSoftKeyboard()
   showCreateForm.value = true
 }

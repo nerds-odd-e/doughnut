@@ -46,6 +46,20 @@ Feature: Path Markdown links in notes
     Then the note content markdown source should contain "[label](/WikiPathMdDeadFolder/WikiPathMdDeadMissing.md)"
     And the note content markdown source should not contain "[["
 
+  Scenario: Creating from a dead path Markdown link warns and does not create a note
+    Given I have a notebook "WikiPathMdDeadCreateNB" with notes:
+      | Title                       | Folder                     |
+      | WikiPathMdDeadCreateCarrier | WikiPathMdDeadCreateFolder |
+    When I update note "WikiPathMdDeadCreateCarrier" content using markdown to become:
+      """
+      See [label](/WikiPathMdDeadFolder/WikiPathMdDeadMissing.md).
+      """
+    Then I should see the note content rendered as:
+      | Kind           | Text  |
+      | dead wiki link | label |
+    When I try to create a new note by following the dead wiki link displayed as "label"
+    Then I should see a warning that a note cannot be created from a path
+
   @mockBrowserTime
   Scenario: Pointing a dead path Markdown link at an existing note keeps Markdown
     Given I have a notebook "WikiPathMdPointNB" with notes:

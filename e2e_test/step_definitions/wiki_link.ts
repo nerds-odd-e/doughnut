@@ -71,14 +71,36 @@ Then(
   }
 )
 
+function createNoteFromDeadWikiLink(displayText: string, newNoteTitle: string) {
+  start.assumeNotePage().followDeadWikiLink(displayText).createNote()
+  start.testability().rememberUiCreatedNote(newNoteTitle)
+  start.assumeNotePage(newNoteTitle).expectNoteTitleDisplayed(newNoteTitle)
+}
+
 When(
   'I create a new note by following the dead wiki link {string}',
   (wikiLinkTitle: string) => {
-    start.assumeNotePage().followDeadWikiLink(wikiLinkTitle).createNote()
-    start.testability().rememberUiCreatedNote(wikiLinkTitle)
-    start.assumeNotePage(wikiLinkTitle).expectNoteTitleDisplayed(wikiLinkTitle)
+    createNoteFromDeadWikiLink(wikiLinkTitle, wikiLinkTitle)
   }
 )
+
+When(
+  'I create a new note titled {string} by following the dead wiki link displayed as {string}',
+  (newNoteTitle: string, displayText: string) => {
+    createNoteFromDeadWikiLink(displayText, newNoteTitle)
+  }
+)
+
+When(
+  'I try to create a new note by following the dead wiki link displayed as {string}',
+  (displayText: string) => {
+    start.assumeNotePage().followDeadWikiLink(displayText).chooseCreateNewNote()
+  }
+)
+
+Then('I should see a warning that a note cannot be created from a path', () => {
+  start.assumeNotePage().expectCannotCreateNoteFromPath()
+})
 
 When(
   'I point dead wiki link {string} at existing note {string}',

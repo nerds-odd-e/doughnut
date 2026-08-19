@@ -120,6 +120,17 @@ Feature: Wiki links in notes
       | Kind           | Text                  |
       | live wiki link | WikiLinks E2E Missing |
 
+  Scenario: Creating from a piped dead wiki link uses the target as the new note title
+    When I update note "WikiLinks E2E CI" content using markdown to become:
+      """
+      See [[WikiLinks E2E Piped Missing|shown text]].
+      """
+    And I create a new note titled "WikiLinks E2E Piped Missing" by following the dead wiki link displayed as "shown text"
+    Then note "WikiLinks E2E CI" should show the note content rendered as:
+      | Kind           | Text        |
+      | live wiki link | shown text  |
+    And the wiki link "shown text" should open the note titled "WikiLinks E2E Piped Missing"
+
   @mockBrowserTime
   Scenario: A dead wiki link can be pointed at an existing note
     When I update note "WikiLinks E2E CI" content using markdown to become:

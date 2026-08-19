@@ -22,11 +22,15 @@ import { createRouter, createWebHistory } from "vue-router"
 import routes from "@/routes/routes"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 
+const { alertMock } = vi.hoisted(() => ({
+  alertMock: vi.fn(),
+}))
+
 vi.mock("@/components/commons/Popups/usePopups", () => ({
   default: () => ({
     popups: {
       confirm: vi.fn().mockResolvedValue(false),
-      alert: vi.fn(),
+      alert: alertMock,
       options: vi.fn(),
       done: vi.fn(),
       register: vi.fn(),
@@ -60,6 +64,7 @@ describe("NoteDeadWikiLinkCreateModal", () => {
   let wrapper: VueWrapper | undefined
 
   beforeEach(() => {
+    alertMock.mockReset()
     const storageAccessor = useStorageAccessor()
     storageAccessor.value = createNoteStorage()
     storageAccessor.value.refreshNoteRealm(noteRealm)
@@ -82,10 +87,12 @@ describe("NoteDeadWikiLinkCreateModal", () => {
     document.body.innerHTML = ""
   })
 
-  const mountModal = () => {
+  const mountModal = (
+    modelValue: typeof deadWikiLinkPayload = deadWikiLinkPayload
+  ) => {
     mountSoftKeyboardPrimer()
     wrapper = mount(NoteDeadWikiLinkCreateModal, {
-      props: commonProps,
+      props: { ...commonProps, modelValue },
       attachTo: document.body,
       global: {
         plugins: [router],
@@ -116,6 +123,35 @@ describe("NoteDeadWikiLinkCreateModal", () => {
     mountModal()
     await waitForChooser()
     expect(screen.getByText(/Dead wiki link:/)).toBeTruthy()
+    expect(screen.getByText(pointAtExistingNoteLabel)).toBeTruthy()
+  })
+
+  it("uses the wiki target as the new note name when display text differs", async () => {
+    mountModal({ targetToken: "Ghost Page", displayText: "shown text" })
+    await waitForChooser()
+    expect(screen.getByText("shown text")).toBeTruthy()
+
+    await tapChooserAndSettle('Create a new note named "Ghost Page"')
+    await waitUntilFocused('[data-test="note-title"]')
+    const title = (
+      document.querySelector('[data-test="note-title"]') as HTMLElement
+    ).innerText.trim()
+    expect(title).toBe("Ghost Page")
+  })
+
+  it("warns and does not show the create form when the target contains a slash", async () => {
+    mountModal({
+      targetToken: "/WikiPathMdDeadFolder/WikiPathMdDeadMissing.md",
+      displayText: "label",
+    })
+    await waitForChooser()
+
+    await tapChooserAndSettle(createNoteLabel)
+
+    expect(alertMock).toHaveBeenCalledWith(
+      "Cannot create a note from a path. You can point at an existing note instead."
+    )
+    expect(screen.queryByTestId("note-new-form")).toBeNull()
     expect(screen.getByText(pointAtExistingNoteLabel)).toBeTruthy()
   })
 
