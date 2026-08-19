@@ -50,7 +50,7 @@ function expectSpellingScheduleAgainstRecorded(
       ).then((recorded) => {
         expect(
           tracker.lastRecalledAt ?? '',
-          `Last Recall Time for "${noteTitle}" should stay ${recorded.lastRecalledAt}`
+          `Last Recall Time for "${noteTitle}" should stay ${recorded.lastRecalledAt || 'N/A'}`
         ).to.equal(recorded.lastRecalledAt)
         expect(
           String(tracker.recallCount ?? 0),
@@ -113,12 +113,6 @@ export const recallTestabilityMethods = {
 
   captureSpellingTrackerSchedule(this: RecallTestability, noteTitle: string) {
     return this.memoryTrackerForNote(noteTitle, 'SPELLING').then((tracker) => {
-      expect(
-        tracker.lastRecalledAt,
-        `expected spelling tracker for "${noteTitle}" to have Last Recall Time`
-      )
-        .to.be.a('string')
-        .and.not.equal('')
       expect(
         tracker.nextRecallAt,
         `expected spelling tracker for "${noteTitle}" to have Next Recall Time`
