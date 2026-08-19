@@ -38,6 +38,21 @@ Feature: Spaced-repetition
     And I should see Difficulty "N/A"
 
   @mockBrowserTime
+  Scenario: Remove from recall does not change Last Recall Time
+    Given the browser and backend are on day 1
+    When I assimilate the note "Note 1"
+    And I am recalling my note on day 1
+    And I choose yes I remember
+    And I visit the understanding memory tracker for "Note 1"
+    Then I record the current memory tracker schedule
+    When I remove the memory tracker from recall
+    Then the memory tracker should be skipped
+    And I should see the same Last Recall Time
+    When I revive the memory tracker on this page
+    Then the memory tracker should be available for recall again
+    And I should see the same Last Recall Time
+
+  @mockBrowserTime
   Scenario: Memory Tracker shows a GOOD RecallLog after just-review Yes
     Given the browser and backend are on day 1
     When I assimilate the note "Note 1"

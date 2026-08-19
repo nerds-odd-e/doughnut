@@ -1,3 +1,5 @@
+import { waitUntilAppIsNotBusy } from '../pageBase'
+
 const SKIPPED_MEMORY_TRACKER_MESSAGE =
   'This memory tracker is currently skipped and will not appear in recall sessions.'
 
@@ -53,8 +55,8 @@ const assumeMemoryTrackerPage = () => {
         .should('be.visible')
         .click()
       cy.findByRole('button', { name: 'OK' }).click()
-      cy.findByText(SKIPPED_MEMORY_TRACKER_MESSAGE)
-      return assumeMemoryTrackerPage()
+      waitUntilAppIsNotBusy()
+      return assumeMemoryTrackerPage().expectSkipped()
     },
     reviveMemoryTracker() {
       expectMemoryTrackerPage()
@@ -63,6 +65,12 @@ const assumeMemoryTrackerPage = () => {
       })
         .should('be.visible')
         .click()
+      waitUntilAppIsNotBusy()
+      return assumeMemoryTrackerPage()
+    },
+    expectSkipped() {
+      expectMemoryTrackerPage()
+      cy.findByText(SKIPPED_MEMORY_TRACKER_MESSAGE).should('be.visible')
       return assumeMemoryTrackerPage()
     },
     expectAvailableForRecall() {
@@ -107,6 +115,15 @@ const assumeMemoryTrackerPage = () => {
     expectLastRecallTime(value: string) {
       expectMemoryTrackerPage()
       expectLabeledValue('Last Recall Time:', value)
+      return assumeMemoryTrackerPage()
+    },
+    expectLastRecallTimeUnchanged() {
+      expectMemoryTrackerPage()
+      expectLabeledValueUnchanged(
+        'Last Recall Time:',
+        'recordedLastRecallTime',
+        (recorded) => `Last Recall Time should stay ${recorded}`
+      )
       return assumeMemoryTrackerPage()
     },
     expectNextRecallTimeEqualsAssimilatedTime() {

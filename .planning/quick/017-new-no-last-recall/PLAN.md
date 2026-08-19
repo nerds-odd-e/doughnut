@@ -27,7 +27,7 @@ Accepted recommendations (2026-08-19): nullable `last_recalled_at`; New due = `a
 
 - `findLast100RecalledByUser` already filters `last_recalled_at IS NOT NULL`. Memory Tracker already shows **N/A** when last recall is missing.
 - `last_recalled_at` is DATETIME NULL (`V300000275`). Assimilate leaves it unset; due = `assimilatedAt`.
-- `remove` still writes `lastRecalledAt = now` (slice 4).
+- `remove` / `revive` do not write last recall.
 - Graded builder helpers (`stabilityAndNextRecallAt`, `afterNthStrictRecall`) still set last recall when the fixture is not New.
 
 ## Slices
@@ -58,11 +58,9 @@ Assimilate leaves last recall unset; due via `calculateNextRecallAt()` (= assimi
 ### 4. Remove from recall does not change Last Recall Time
 
 - **Type:** Behavior
-- **Status:** planned
+- **Status:** done
 
-**Pre:** a graded tracker with last recall T (just-review Yes, then open Memory Tracker). **Trigger:** Remove from recall. **Post:** tracker is skipped; Last Recall Time still T.
-
-Replace `MemoryTrackerTrackingControllerTest.removeAndUpdateLastRecalledAt`. Extend `spaced_repetition.feature` (or the existing visit-tracker path) so Remove on the Memory Tracker page leaves Last Recall Time unchanged. Revive still does not write last recall.
+`removeFromRepeating` no longer writes last recall. E2E: just-review Yes, record schedule, remove → skipped + same Last Recall Time; revive still unchanged.
 
 ### 5. Existing ungraded New have no last recall
 

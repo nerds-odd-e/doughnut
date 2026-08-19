@@ -19,12 +19,37 @@ class MemoryTrackerTrackingControllerTest extends MemoryTrackerControllerTestBas
   @Autowired MemoryTrackerRepository memoryTrackerRepository;
 
   @Test
-  void removeAndUpdateLastRecalledAt() {
-    testabilitySettings.timeTravelTo(makeMe.aTimestamp().please());
-    MemoryTracker tracker = ownedTracker();
+  void removeDoesNotChangeLastRecalledAt() {
+    Timestamp lastRecall = makeMe.aTimestamp().of(1, 8).please();
+    MemoryTracker tracker =
+        makeMe
+            .aMemoryTrackerFor(ownedNote())
+            .assimilatedAt(lastRecall)
+            .stabilityAndNextRecallAt(55f)
+            .please();
+    testabilitySettings.timeTravelTo(makeMe.aTimestamp().of(2, 8).please());
+
     controller.removeFromRepeating(tracker);
+
     assertThat(tracker.getRemovedFromTracking(), is(true));
-    assertThat(tracker.getLastRecalledAt(), equalTo(testabilitySettings.getCurrentUTCTimestamp()));
+    assertThat(tracker.getLastRecalledAt(), equalTo(lastRecall));
+  }
+
+  @Test
+  void reEnableDoesNotChangeLastRecalledAt() throws UnexpectedNoAccessRightException {
+    Timestamp lastRecall = makeMe.aTimestamp().of(1, 8).please();
+    MemoryTracker tracker =
+        makeMe
+            .aMemoryTrackerFor(ownedNote())
+            .assimilatedAt(lastRecall)
+            .stabilityAndNextRecallAt(55f)
+            .removedFromTracking()
+            .please();
+    testabilitySettings.timeTravelTo(makeMe.aTimestamp().of(2, 8).please());
+
+    controller.reEnable(tracker);
+
+    assertThat(tracker.getLastRecalledAt(), equalTo(lastRecall));
   }
 
   @Test

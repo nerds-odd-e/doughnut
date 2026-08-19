@@ -83,7 +83,6 @@ class MemoryTrackerController {
   public MemoryTracker removeFromRepeating(
       @PathVariable("memoryTracker") @Schema(type = "integer") MemoryTracker memoryTracker) {
     memoryTracker.setRemovedFromTracking(true);
-    memoryTracker.setLastRecalledAt(testabilitySettings.getCurrentUTCTimestamp());
     entityPersister.save(memoryTracker);
     return memoryTracker;
   }

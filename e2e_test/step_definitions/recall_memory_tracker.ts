@@ -141,10 +141,22 @@ When('I choose to remove the last memory tracker from recalls', () => {
     .removeFromRecall()
 })
 
+When('I remove the memory tracker from recall', () => {
+  assumeMemoryTrackerPage().removeFromRecall()
+})
+
 When('I revive the memory tracker on this page', () => {
   assumeMemoryTrackerPage().reviveMemoryTracker()
 })
 
+Then('the memory tracker should be skipped', () => {
+  assumeMemoryTrackerPage().expectSkipped()
+})
+
 Then('the memory tracker should be available for recall again', () => {
   assumeMemoryTrackerPage().expectAvailableForRecall()
+})
+
+Then('I should see the same Last Recall Time', () => {
+  assumeMemoryTrackerPage().expectLastRecallTimeUnchanged()
 })
