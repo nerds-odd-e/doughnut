@@ -1,6 +1,6 @@
 # Doughnut ↔ open FSRS gap (toward ADR 0003)
 
-**Status:** Interval fuzz is **closed** (not used; due follows S). Thinking-time overlay is **closed** (RT is not a DSR input). New last recall is **closed** (`lastRecalledAt` is the last mapped grade; New has none). Proposed ADR 0003/0005 Decision locks commissioned Tutor scores as **1–4**, identical to FSRS G (`1` Again, `2` Hard, `3` Good, `4` Easy). Remaining deferred: **E4** fitting, plus **accept ADR 0003** (human). Shipped FSRS-6 locks live in ADR 0003 Decision and code.
+**Status:** Interval fuzz is **closed** (not used; due follows S). Thinking-time overlay is **closed** (RT is not a DSR input). New last recall is **closed** (`lastRecalledAt` is the last mapped grade; New has none). Proposed ADR 0003/0005 Decision locks commissioned Tutor scores as **1–4**, identical to FSRS G (`1` Again, `2` Hard, `3` Good, `4` Easy). Remaining RecallLog `elapsed_hours` work: [`.planning/quick/020-recall-log-elapsed-hours/`](../quick/020-recall-log-elapsed-hours/). Remaining deferred: **E4** fitting, plus **accept ADR 0003** (human). Shipped FSRS-6 locks live in ADR 0003 Decision and code.
 
 **Updated:** 2026-08-19
 

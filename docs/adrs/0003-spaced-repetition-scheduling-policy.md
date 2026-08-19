@@ -104,8 +104,8 @@ First mapped grade on a New tracker (ordinary correct / just review Yes / Tutor 
 - Difficulty is `D0(G)` clamped to `[1, 10]`, persisted as the Java float from that formula (API number, no extra rounding). Persisted first Easy Difficulty is **1**.
 - `D0(Easy)` stays **unclamped** as the later mean-reversion target (see **Difficulty after a mapped grade**).
 - Elapsed time does **not** change first-rating. Overdue extra does not apply.
-  The first mapped grade writes `RecallLog.elapsed_hours` **0** (no previous
-  recall). That 0 still does not change `S0`/`D0`.
+  First-mapped `elapsed_hours` is **0** (see **RecallLog**); that 0 still does
+  not change `S0`/`D0`.
 - Due is `lastRecalledAt` plus those hours.
 
 Going-forward New has no memory-state grade: every mapped grade uses first-rating (all four G) and the tracker is no longer New.
@@ -280,8 +280,18 @@ Each memory-state transition is a **RecallLog**
 ([ADR 0001](./0001-ubiquitous-language.md)). Tutor Feedback is a log row, not a
 session bag.
 
-A `recall_log` has `memory_tracker_id`, `recorded_at`, `elapsed_hours`
-(nullable on backfill), `product_outcome`, and optional `answer_id`.
+A `recall_log` has `memory_tracker_id`, `recorded_at`, `elapsed_hours`,
+`product_outcome`, and optional `answer_id`.
+
+`elapsed_hours` is always present (whole hours; see **Whole-hour elapsed-time
+precision**). The first mapped grade on a tracker is **0**. Later mapped
+grades are whole hours since the previous mapped grade's `recorded_at` on
+that tracker (`GOOD` / `EASY` / `HARD` / `AGAIN`). `CONFUSION` uses the same
+elapsed vs the last mapped grade, else **0**, and is not an anchor. Order is
+`recorded_at`, then `id`. A negative diff is **0**. Historical `NULL`s **will**
+be filled with that rule; already persisted non-null elapsed stays. The
+column becomes `NOT NULL`. Filling elapsed does not rewrite Stability,
+Difficulty, `lastRecalledAt`, or `nextRecallAt`.
 
 A row has `answer_id` xor none: prompt grade and confusion set `answer_id`;
 just review and Tutor Feedback set none. Do not store `recall_prompt_id`
@@ -289,7 +299,7 @@ just review and Tutor Feedback set none. Do not store `recall_prompt_id`
 
 Do not store FSRS G, Retrievability, `I`, or pre/post Stability/Difficulty.
 Current Stability and Difficulty stay on `memory_tracker`. `next_recall_at`
-stays the due-work index.
+stays the due-work index. Do not replay memory state from logs.
 
 `product_outcome`: `GOOD` | `EASY` | `HARD` | `AGAIN` | `CONFUSION`. Persist
 named grades. Latest tutor feedback is **1–4** via `AGAIN→1`, `HARD→2`,
