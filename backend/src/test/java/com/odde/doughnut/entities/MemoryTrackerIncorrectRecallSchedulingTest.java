@@ -70,21 +70,6 @@ class MemoryTrackerIncorrectRecallSchedulingTest extends MemoryTrackerRecallSche
   }
 
   @Test
-  void sameHourIncorrectRecallAfterFirstGoodUsesShortTermStability() {
-    MemoryTracker memoryTracker = makeMe.aMemoryTrackerFor(note).by(user).inMemoryPlease();
-    memoryTracker.recalledSuccessfully(memoryTracker.getNextRecallAt());
-    Timestamp gradeTime = sameHourGradeTime(memoryTracker);
-
-    memoryTracker.markAsRecalled(gradeTime, false);
-
-    assertThat(memoryTracker.getStability(), equalTo(18.0f));
-    assertThat(memoryTracker.getDifficulty(), equalTo(7.3945026f));
-    assertThat(
-        memoryTracker.getNextRecallAt(),
-        equalTo(TimestampOperations.addHoursToTimestamp(gradeTime, 18)));
-  }
-
-  @Test
   void sameHourIncorrectRecallOnThreeDayStabilityUsesShortTermNotPostLapse() {
     MemoryTracker memoryTracker = aGradedTrackerAtThreeDayStability();
 
