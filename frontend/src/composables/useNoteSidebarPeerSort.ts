@@ -16,13 +16,11 @@ const defaultSpec: SidebarPeerSortSpec = {
   direction: "asc",
 }
 
-function readSpecFromSession(): SidebarPeerSortSpec {
-  if (typeof sessionStorage === "undefined") return defaultSpec
+function parseStoredSpec(raw: string | null): SidebarPeerSortSpec | undefined {
+  if (raw == null || raw === "") return undefined
   try {
-    const raw = sessionStorage.getItem(NOTE_SIDEBAR_PEER_SORT_STORAGE_KEY)
-    if (raw == null || raw === "") return defaultSpec
     const v = JSON.parse(raw) as unknown
-    if (v == null || typeof v !== "object") return defaultSpec
+    if (v == null || typeof v !== "object") return undefined
     const field = (v as { field?: unknown }).field
     const direction = (v as { direction?: unknown }).direction
     if (
@@ -34,16 +32,24 @@ function readSpecFromSession(): SidebarPeerSortSpec {
   } catch {
     /* ignore invalid JSON */
   }
-  return defaultSpec
+  return undefined
 }
 
-const sortPeerSpec = ref<SidebarPeerSortSpec>(readSpecFromSession())
+function readStoredSpec(): SidebarPeerSortSpec {
+  if (typeof localStorage === "undefined") return defaultSpec
+  return (
+    parseStoredSpec(localStorage.getItem(NOTE_SIDEBAR_PEER_SORT_STORAGE_KEY)) ??
+    defaultSpec
+  )
+}
+
+const sortPeerSpec = ref<SidebarPeerSortSpec>(readStoredSpec())
 
 watch(
   sortPeerSpec,
   (spec) => {
-    if (typeof sessionStorage === "undefined") return
-    sessionStorage.setItem(
+    if (typeof localStorage === "undefined") return
+    localStorage.setItem(
       NOTE_SIDEBAR_PEER_SORT_STORAGE_KEY,
       JSON.stringify(spec)
     )
@@ -52,12 +58,12 @@ watch(
 )
 
 export function useNoteSidebarPeerSort() {
-  const fromSession = readSpecFromSession()
+  const stored = readStoredSpec()
   if (
-    sortPeerSpec.value.field !== fromSession.field ||
-    sortPeerSpec.value.direction !== fromSession.direction
+    sortPeerSpec.value.field !== stored.field ||
+    sortPeerSpec.value.direction !== stored.direction
   ) {
-    sortPeerSpec.value = fromSession
+    sortPeerSpec.value = stored
   }
 
   function setSortPeerSpec(spec: SidebarPeerSortSpec) {
