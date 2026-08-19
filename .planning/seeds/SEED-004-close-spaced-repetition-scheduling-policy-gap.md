@@ -34,5 +34,5 @@ Also surface when changing success/failure interval math, commissioned score →
 - `docs/adrs/0005-commissioned-learning-session-protocol.md` — Tutor 1–4 meaning (`score = G`)
 - `backend/src/main/java/com/odde/doughnut/entities/Fsrs.java`
 - `backend/src/main/java/com/odde/doughnut/entities/MemoryTracker.java`
-- `backend/src/main/java/com/odde/doughnut/algorithms/SpacedRepetitionAlgorithm.java`
+- `backend/src/main/java/com/odde/doughnut/services/StabilityIndexToHoursBackfill.java` (Flyway replay of `V300000260` only; not live scheduling)
 - https://github.com/open-spaced-repetition/awesome-fsrs/wiki/The-Algorithm
