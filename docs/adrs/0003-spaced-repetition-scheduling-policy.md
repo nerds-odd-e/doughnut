@@ -61,13 +61,12 @@ state, qualitative update rules), not with a particular crate or version.
   `S_MAX`), compared and persisted as **876000 whole hours** — not a Settings
   knob, not persisted as its own field, and not otherwise configurable. It is
   not shown as its own UI; Memory Tracker still shows Stability (migrated
-  rows may drop). After next Stability is computed (FSRS update, Tutor **2**
-  shrink, confusion midpoint), on every write of
-  next Stability: `S = min(S, 876000)`. Due follows from that S
-  (`nextRecallAt = lastRecalledAt + I(0.9, S)`). Do not keep an unbounded S
-  beside a capped due. Same strictly-future fallback when `I` is
-  non-positive. Existing over-cap rows **will** be clamped (S and due).
-  There is **no interval fuzz** (see **Fuzz**).
+  rows may drop). After next Stability is computed (FSRS update, confusion
+  midpoint), on every write of next Stability: `S = min(S, 876000)`. Due
+  follows from that S (`nextRecallAt = lastRecalledAt + I(0.9, S)`). Do not
+  keep an unbounded S beside a capped due. Same strictly-future fallback
+  when `I` is non-positive. Existing over-cap rows **will** be clamped (S
+  and due). There is **no interval fuzz** (see **Fuzz**).
 
 ### Lapses
 
@@ -99,9 +98,9 @@ Ordinary correct recall with Stability > 0 updates Stability with open-FSRS-6 Go
 
 ### First rating on New
 
-First mapped **success** on a New tracker (ordinary correct / just review Yes / Tutor **4** Good, Tutor **3** Hard, Tutor **5** Easy) uses published FSRS-6 first-rating (own implementation, frozen `Fsrs.W`):
+First mapped grade on a New tracker (ordinary correct / just review Yes / Tutor **3** Good, Tutor **2** Hard, Tutor **4** Easy, just review No / ordinary incorrect / Tutor **1** Again) uses published FSRS-6 first-rating (own implementation, frozen `Fsrs.W`) with `G` = the mapped grade (Tutor score **is** `G`):
 
-- Stability `S0(G) = w[G−1]` days, persisted as whole hours. With frozen weights: Good **55**, Hard **31**, Easy **199**.
+- Stability `S0(G) = w[G−1]` days, persisted as whole hours. With frozen weights: Again **5**, Hard **31**, Good **55**, Easy **199**.
 - Difficulty is `D0(G)` clamped to `[1, 10]`, persisted as the Java float from that formula (API number, no extra rounding). Persisted first Easy Difficulty is **1**.
 - `D0(Easy)` stays **unclamped** as the later mean-reversion target (see **Difficulty after a mapped grade**).
 - Elapsed time does **not** change first-rating. Overdue extra does not apply.
@@ -109,11 +108,7 @@ First mapped **success** on a New tracker (ordinary correct / just review Yes / 
   recall). That 0 still does not change `S0`/`D0`.
 - Due is `lastRecalledAt` plus those hours.
 
-First Again / Tutor **0/1** on New uses the same first-rating path with `G=1`: Stability `S0(1)` (**5** hours), Difficulty `D0(1)` (Java float), due `lastRecalledAt + I` (**5h**).
-
-Tutor **2** on New uses the same first-rating path with `G=2`: Stability `S0(2)` (**31** hours), Difficulty `D0(2)` (Java float), due `lastRecalledAt + I` (**31h**) — same first bucket as Tutor **3**. Shrink 80% remains the exception only when `S > 0`.
-
-Going-forward New has no memory-state grade: every mapped grade uses first-rating (all four G, including Tutor **2** Hard) and the tracker is no longer New. Still-New rows with `AGAIN` / `AGAIN_ZERO` RecallLogs **will** be backfilled to `S0(1)` / `D0(1)`, due from `I`. Still-New rows with `SHRINK` RecallLogs **will** be backfilled to Hard first-rating (`S0(2)` / `D0(2)`, due +31h). First-success rows with `S > 0` stay unrestored.
+Going-forward New has no memory-state grade: every mapped grade uses first-rating (all four G) and the tracker is no longer New.
 
 The 24-hour strictly-future fallback is for non-positive `I`, not a New first-rating interval.
 
@@ -126,20 +121,18 @@ When Stability > 0, a mapped grade updates Difficulty with published open FSRS-6
 - `D'' = w7 · D0(Easy) + (1 − w7) · D'`, then clamp to `[1, 10]`
 - `D0(G) = w4 − e^{w5·(G−1)} + 1`; **`D0(Easy)` is unclamped** `D0(4)` (negative with default weights)
 
-`G`: Again=1, Hard=2, Good=3, Easy=4 (`Fsrs.AGAIN` / `HARD` / `GOOD` / `EASY`). Existing persisted Difficulty on already-graded `S > 0` rows is **not** backfilled. New first-rating uses clamped `D0(G)` (see **First rating on New**). Tutor **2** on New uses `D0(2)`; when `S > 0`, Tutor **2** does not change Difficulty. Confusion does not change Difficulty. Display is the API number (no extra rounding).
+`G`: Again=1, Hard=2, Good=3, Easy=4 (`Fsrs.AGAIN` / `HARD` / `GOOD` / `EASY`). Tutor score **is** `G`. Existing persisted Difficulty on already-graded `S > 0` rows is **not** backfilled. New first-rating uses clamped `D0(G)` (see **First rating on New**). Tutor **2** is Hard: on New, `D0(2)`; when `S > 0`, Hard next-D. Confusion does not change Difficulty. Display is the API number (no extra rounding).
 
 ### Outcome-to-grade compatibility map
 
-Keep Doughnut product outcomes first-class. Do not replace the Tutor 0–5 rubric with Anki Again / Hard / Good / Easy buttons. When memory updates follow an FSRS-shaped engine, map as follows:
+Keep Doughnut product outcomes first-class. Do not replace the Tutor 1–4 rubric with Anki Again / Hard / Good / Easy buttons. The report **score is FSRS G**. When memory updates follow an FSRS-shaped engine, map as follows:
 
 | Product | Schedule |
 |---------|----------|
-| Just review Yes / ordinary correct / Tutor **4** | FSRS-6 Good |
-| Tutor **5** | FSRS-6 Easy |
-| Tutor **3** | FSRS-6 Hard |
-| Tutor **2** | On New: FSRS-6 Hard first-rating (`S0(2)` / `D0(2)`); when `S > 0`: Doughnut exception (80% accumulated S, D unchanged) |
-| Just review No / ordinary incorrect | FSRS-6 Again memory; due from `I` (non-positive `I` → 24h) |
-| Tutor **1** and **0** | Again memory; due from S (0 same as 1; rubric still differs) |
+| Just review Yes / ordinary correct / Tutor **3** | FSRS-6 Good |
+| Tutor **4** | FSRS-6 Easy |
+| Tutor **2** | FSRS-6 Hard |
+| Just review No / ordinary incorrect / Tutor **1** | FSRS-6 Again memory; due from `I` (non-positive `I` → 24h) |
 | Confusion | Not a grade; Again-midpoint S; due not later |
 | Overlap | No memory change |
 
@@ -147,27 +140,25 @@ Shared commissioned rules and score-specific memory updates follow. Accidental-m
 
 ### Just review
 
-Just review stays **two buttons**. **Yes, I remember** is ordinary correct (Tutor **4**, FSRS-6 Good). **No, I need more recall** is ordinary incorrect (Tutor **1**, FSRS-6 Again). Do not add Hard or Easy. Tutor **3** and **5** stay commissioned-only.
+Just review stays **two buttons**. **Yes, I remember** is ordinary correct (Tutor **3**, FSRS-6 Good). **No, I need more recall** is ordinary incorrect (Tutor **1**, FSRS-6 Again). Do not add Hard or Easy. Tutor **2** and **4** stay commissioned-only.
 
 ### Commissioned Learning Session feedback
 
-A commissioned memory tracker is graded from Tutor Feedback (score 0–5), not from a recall prompt Doughnut asked. [ADR 0001](./0001-ubiquitous-language.md) defines the vocabulary and [ADR 0005](./0005-commissioned-learning-session-protocol.md) defines what the score means to the Tutor. Shared schedule rules:
+A commissioned memory tracker is graded from Tutor Feedback (score 1–4), not from a recall prompt Doughnut asked. [ADR 0001](./0001-ubiquitous-language.md) defines the vocabulary and [ADR 0005](./0005-commissioned-learning-session-protocol.md) defines what the score means to the Tutor. Valid scores are **1, 2, 3, and 4**. The score **is** FSRS G: **1** Again, **2** Hard, **3** Good, **4** Easy. Shared schedule rules:
 
 - A recorded score is a grade: it counts the recall, sets `lastRecalledAt`, and reschedules the tracker.
 - A Session Item that never receives Feedback supplies no graded recall result: its tracker stays unchanged and the item is abandoned with its session.
 - Effort is neutral. A Tutor session carries no trustworthy effort measurement.
 - A late session does not weaken the result. The score determines the memory-state adjustment; the recorded time advances `lastRecalledAt`.
 - After a score, due is `lastRecalledAt + I(0.9, S)`; non-positive `I` → 24h. A commissioned tracker is due only when the learner commissions another Learning Session.
-- **New** (Stability 0, Difficulty unset): scores **3**, **4**, and **5** use FSRS-6 first-rating (see **First rating on New**). Scores **0** and **1** use first-rating Again (`S0(1)` / `D0(1)`, due from `I`, **5h**). Score **2** uses Hard first-rating (`S0(2)` / `D0(2)`, due from `I`, **31h**).
+- **New** (Stability 0, Difficulty unset): scores **1–4** use FSRS-6 first-rating with `G = score` (see **First rating on New**).
 
 Memory updates with Stability > 0:
 
-- **4:** open-FSRS-6 **Good**-equivalent (same as ordinary correct), including overdue extra and Good next-D (see **Difficulty after a mapped grade**).
-- **5:** open-FSRS-6 **Easy**-equivalent, not a percentage above Good. Easy increment at least as large as Good's plus an extra Easy factor, plus Easy next-D (see **Difficulty after a mapped grade**). Next Stability is strictly longer than the same state under score 4. Overdue extra applies.
-- **3:** open-FSRS-6 **Hard**-equivalent, not a percentage below Good. Hard increment is the Good increment times an extra Hard factor, plus Hard next-D (see **Difficulty after a mapped grade**). Next Stability is at least the current Stability and strictly shorter than the same state under score 4. Overdue extra applies.
-- **2:** Doughnut exception, not Hard. Next Stability is the rounded 80% of current Stability (accumulated hours above assimilate 0); Difficulty unchanged. Ignore elapsed time and Retrievability. No overdue extra.
+- **4:** open-FSRS-6 **Easy**-equivalent, not a percentage above Good. Easy increment at least as large as Good's plus an extra Easy factor, plus Easy next-D (see **Difficulty after a mapped grade**). Next Stability is strictly longer than the same state under score 3. Overdue extra applies.
+- **3:** open-FSRS-6 **Good**-equivalent (same as ordinary correct), including overdue extra and Good next-D (see **Difficulty after a mapped grade**).
+- **2:** open-FSRS-6 **Hard**-equivalent, not a percentage below Good. Hard increment is the Good increment times an extra Hard factor, plus Hard next-D (see **Difficulty after a mapped grade**). Next Stability is at least the current Stability and strictly shorter than the same state under score 3. Overdue extra applies.
 - **1:** open-FSRS-6 **Again** memory (same as ordinary incorrect: post-lapse Stability and Again next-D; see **Difficulty after a mapped grade**). Due from `I`.
-- **0:** same schedule as score **1**. Rubric still differs ([ADR 0005](./0005-commissioned-learning-session-protocol.md)). Does not reset Stability to the assimilate initial level.
 
 ### Incorrect recall (Again)
 
@@ -187,8 +178,8 @@ is driven by elapsed time vs Stability
 further delay must not increase the next interval without limit. A linear
 lateness bonus is not allowed. Exact increment math is an implementation
 detail; policy tests assert the observable next interval in hours.
-Tutor Feedback scores **3**, **4**, and **5** inherit this extra. Score **2** does
-not. Scores **0** and **1** use Again memory, not this extra.
+Tutor Feedback scores **2**, **3**, and **4** inherit this extra. Score **1** uses
+Again memory, not this extra.
 
 ### Whole-hour elapsed-time precision
 
@@ -197,14 +188,14 @@ between the current recall time and `lastRecalledAt`, discarding any sub-hour
 remainder, independent of time zone or calendar day. Morning/afternoon recall
 windows make day precision too coarse. There is no calendar same-day rule.
 When elapsed whole hours are **0** and Stability is greater than 0, success
-grades (ordinary correct / Tutor **4** Good, Tutor **3** Hard, Tutor **5** Easy)
+grades (ordinary correct / Tutor **3** Good, Tutor **2** Hard, Tutor **4** Easy)
 update Stability with published open FSRS-6 short-term next Stability (own
 implementation, frozen `Fsrs.W`): convert persisted whole hours to days,
 `S' = S · e^{w17 · (G − 3 + w18)} · S^{-w19}`, then persist whole hours.
 Clamp **SInc ≥ 1** so next Stability does not shrink. With frozen weights
 and rounding: Good 24→**25**; Easy 24→**43**; Hard 24 stays **24** (clamp);
 Good at 72 hours stays **72** (clamp). Again at elapsed 0 stays post-lapse.
-Tutor **2** and confusion are unchanged. New (Stability 0) first-rating is
+Confusion is unchanged. New (Stability 0) first-rating is
 unchanged by elapsed time (see **First rating on New**). The short-term success
 rule is not a Settings knob. Elapsed whole hours **≥ 1** still use long-term
 next Stability.
@@ -300,8 +291,9 @@ Do not store FSRS G, Retrievability, `I`, or pre/post Stability/Difficulty.
 Current Stability and Difficulty stay on `memory_tracker`. `next_recall_at`
 stays the due-work index.
 
-`product_outcome`: `GOOD` | `EASY` | `HARD` | `SHRINK` | `AGAIN` | `AGAIN_ZERO`
-| `CONFUSION`.
+`product_outcome`: `GOOD` | `EASY` | `HARD` | `AGAIN` | `CONFUSION`. Persist
+named grades. Latest tutor feedback is **1–4** via `AGAIN→1`, `HARD→2`,
+`GOOD→3`, `EASY→4` ([ADR 0005](./0005-commissioned-learning-session-protocol.md)).
 
 ### Deferred
 
@@ -357,8 +349,12 @@ Empty pending accept.
   constant (36500 days / 876000 whole hours), not a Settings knob.
 - **Recompute due time from answer history on demand** — deferred: history is
   incomplete; due-work needs a queryable projection.
+- **Tutor scores 1–4 identical to FSRS G** (`1` Again, `2` Hard, `3` Good,
+  `4` Easy; `score = G`) — accepted (Decision above).
+- **A 0–5 commissioned rubric with a shifted Good/Hard/Easy map** — rejected:
+  valid report scores are 1, 2, 3, and 4; Tutor **2** is Hard.
 - **Just review Hard / Easy buttons** — rejected: just review is rare; keep two
-  buttons mapped to Tutor **4** and **1**.
+  buttons mapped to Tutor **3** and **1**.
 - **Persist a lapse count** — rejected: FSRS-6 After-Again Stability does not
   consume it; RecallLog already holds Again history; the frequent-failure
   warning is the product signal. Do not add an unused counter.

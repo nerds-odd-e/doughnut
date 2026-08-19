@@ -118,21 +118,19 @@ Thank you
 
 <how_to_report>
 Teach the session items above, then return a Learning Session Report giving one
-score from 0 to 5 per item:
+score from 1 to 4 per item:
 
-- 5 — mastered the session item with full fluency
-- 4 — mastered the session item with fluency
-- 3 — mastered the session item, but not fluent
-- 2 — needed a reminder at first, then showed signs of mastering it
-- 1 — needed several reminders
-- 0 — could not reach the session item even with help
+- 4 — mastered the session item with full fluency
+- 3 — mastered the session item with fluency
+- 2 — mastered the session item but not fluent, or needed a reminder then showed mastery
+- 1 — needed several reminders, or could not reach the session item even with help
 
 Example of how to provide feedback:
 
 # Learning Session Report
 
 <session_item_scores>
-Hola: 5
+Hola: 4
 Gracias: 1
 </session_item_scores>
 
@@ -152,7 +150,7 @@ markdown headers outside the block are ignored.
 Thanks for a great session today.
 
 <session_item_scores>
-Hola: 5
+Hola: 4
 Gracias: 1
 </session_item_scores>
 ```
@@ -171,7 +169,7 @@ and ignores it rather than rejecting the Report.
    (`answer_id` null) on that commissioned tracker and scheduling it. Unmatched
    entries are rejected and reported to the learner. Recording is not
    all-or-nothing: a partly usable Report still moves the trackers it matched.
-3. A matched entry whose score is not an integer from 0 to 5 is rejected and
+3. A matched entry whose score is not an integer from 1 to 4 is rejected and
    reported the same way.
 4. A Session Item with no matching entry receives no Feedback, and its tracker is
    unchanged.
@@ -183,7 +181,7 @@ and ignores it rather than rejecting the Report.
    the state the earlier score already produced.
 7. The Memory Tracker's latest tutor feedback score is the latest tutor RecallLog
    on that commissioned tracker (`answer_id` null, excluding CONFUSION), mapped
-   4 / 5 / 3 / 2 / 1 / 0 from GOOD / EASY / HARD / SHRINK / AGAIN / AGAIN_ZERO.
+   **4 / 3 / 2 / 1** from `EASY` / `GOOD` / `HARD` / `AGAIN`.
 
 ### Out of scope
 
@@ -226,10 +224,19 @@ and ignores it rather than rejecting the Report.
 
 - Note titles are unique within a notebook in practice.
 - Learners can copy and paste between Doughnut and their Tutor's channel.
-- People and LLMs can follow a short rubric well enough for a 0–5 score to mean
+- People and LLMs can follow a short rubric well enough for a 1–4 score to mean
   something.
 - The tutoring status the Request exposes is enough for a Tutor to pitch the
   session appropriately.
+
+## Options considered
+
+- **Tutor scores 1–4 identical to FSRS G** (`1` Again, `2` Hard, `3` Good,
+  `4` Easy; `score = G`) — accepted (Decision above). The Request rubric is
+  those four lines; latest tutor feedback is **4/3/2/1** from `EASY` / `GOOD` /
+  `HARD` / `AGAIN`.
+- **A 0–5 rubric with a shifted Good/Hard/Easy map** — rejected: valid report
+  scores are 1, 2, 3, and 4; the score is G.
 
 ## Related
 
