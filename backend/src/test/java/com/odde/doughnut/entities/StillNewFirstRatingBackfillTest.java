@@ -93,7 +93,7 @@ class StillNewFirstRatingBackfillTest {
 
   private void assertStillNew(Integer id, Timestamp expectedDue) {
     TrackerRow row = trackerRow(id);
-    assertThat(row.stability(), equalTo(ForgettingCurve.ASSIMILATE_STABILITY_HOURS));
+    assertThat(row.stability(), equalTo(Fsrs.NEW_STABILITY_HOURS));
     assertThat(row.difficulty(), nullValue());
     assertThat(row.nextRecallAt(), equalTo(expectedDue));
   }

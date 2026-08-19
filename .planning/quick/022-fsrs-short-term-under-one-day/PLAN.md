@@ -61,9 +61,9 @@ Pins sit beside the elapsed-0 S=72 clamp in `SpacedRepetitionSameHourRecallSched
 ### 4. Live memory updates are not a ForgettingCurve
 
 - **Type:** Structure
-- **Status:** planned
+- **Status:** done
 
-Delete `ForgettingCurve`. `MemoryTracker` + `Fsrs` (and existing `Fsrs*Recall`) own New vs graded, first-rating, next D/S, confusion midpoint, and constants (`S = 0`, 24h fallback, D fallback **5**). Flyway Java that currently constructs `ForgettingCurve` for first-rating numbers calls `Fsrs` instead. No glossary term added — ADR 0001 already has **New**, **Stability**, **Retrievability**. Existing tests still pass; no schedule change.
+Deleted `ForgettingCurve`. `Fsrs` owns New vs graded, first-rating, next D/S, confusion midpoint, and constants (`NEW_STABILITY_HOURS` = 0, 24h fallback, D fallback **5**). Flyway first-rating backfills call `Fsrs.firstRating`. No new glossary term. No schedule change.
 
 ### 5. Legacy index conversion lives only next to V300000260
 

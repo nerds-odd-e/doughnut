@@ -122,7 +122,7 @@ class StillNewMappedFirstRatingBackfillTest {
     runBackfill();
 
     TrackerRow row = trackerRow(assimilateOnly.getId());
-    assertThat(row.stability(), equalTo(ForgettingCurve.ASSIMILATE_STABILITY_HOURS));
+    assertThat(row.stability(), equalTo(Fsrs.NEW_STABILITY_HOURS));
     assertThat(row.difficulty(), nullValue());
   }
 

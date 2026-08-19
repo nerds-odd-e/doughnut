@@ -96,7 +96,7 @@ public class MemoryTracker extends EntityIdentifiedByIdOnly {
   @Column(name = "stability")
   @Getter
   @Setter
-  private Float stability = ForgettingCurve.ASSIMILATE_STABILITY_HOURS;
+  private Float stability = Fsrs.NEW_STABILITY_HOURS;
 
   @Column(name = "difficulty")
   @Getter
@@ -171,42 +171,38 @@ public class MemoryTracker extends EntityIdentifiedByIdOnly {
     return MemoryTrackerRecallDue.elapsedHoursUntil(this, currentUTCTimestamp);
   }
 
-  ForgettingCurve forgettingCurve() {
-    return new ForgettingCurve(getStability(), getDifficulty());
-  }
-
   void scheduleNextRecallFromStability(Timestamp currentUTCTimestamp) {
     setLastRecalledAt(currentUTCTimestamp);
     Timestamp scheduled = calculateNextRecallAt();
     if (!scheduled.after(currentUTCTimestamp)) {
       scheduled =
           TimestampOperations.addHoursToTimestamp(
-              currentUTCTimestamp,
-              Fsrs.intervalHours(ForgettingCurve.STRICTLY_FUTURE_FALLBACK_HOURS));
+              currentUTCTimestamp, Fsrs.intervalHours(Fsrs.STRICTLY_FUTURE_FALLBACK_HOURS));
     }
     setNextRecallAt(scheduled);
   }
 
   public void recalledSuccessfully(Timestamp now) {
-    applyRecall(now, forgettingCurve().afterGoodRecall(elapsedHoursUntil(now)));
+    applyRecall(now, Fsrs.afterGoodRecall(getStability(), getDifficulty(), elapsedHoursUntil(now)));
   }
 
   public void recalledEasily(Timestamp now) {
-    applyRecall(now, forgettingCurve().afterEasyRecall(elapsedHoursUntil(now)));
+    applyRecall(now, Fsrs.afterEasyRecall(getStability(), getDifficulty(), elapsedHoursUntil(now)));
   }
 
   public void recalledHard(Timestamp now) {
-    applyRecall(now, forgettingCurve().afterHardRecall(elapsedHoursUntil(now)));
+    applyRecall(now, Fsrs.afterHardRecall(getStability(), getDifficulty(), elapsedHoursUntil(now)));
   }
 
-  private void applyRecall(Timestamp now, ForgettingCurve.NextMemory next) {
+  private void applyRecall(Timestamp now, Fsrs.NextMemory next) {
     setDifficulty(next.difficulty());
     MemoryTrackerNextStability.write(this, next.stability());
     scheduleNextRecallFromStability(now);
   }
 
   public void recalledAgain(Timestamp now) {
-    applyRecall(now, forgettingCurve().afterAgainRecall(elapsedHoursUntil(now)));
+    applyRecall(
+        now, Fsrs.afterAgainRecall(getStability(), getDifficulty(), elapsedHoursUntil(now)));
   }
 
   public void markAsRecalled(Timestamp currentUTCTimestamp, boolean successful) {
@@ -220,7 +216,9 @@ public class MemoryTracker extends EntityIdentifiedByIdOnly {
   public void adjustForConfusion(Timestamp currentUTCTimestamp) {
     Timestamp existingDue = getNextRecallAt();
     MemoryTrackerNextStability.write(
-        this, forgettingCurve().confusionAdjusted(elapsedHoursUntil(currentUTCTimestamp)));
+        this,
+        Fsrs.confusionAdjusted(
+            getStability(), getDifficulty(), elapsedHoursUntil(currentUTCTimestamp)));
     Timestamp projected = calculateNextRecallAt();
     setNextRecallAt(projected.after(existingDue) ? existingDue : projected);
   }

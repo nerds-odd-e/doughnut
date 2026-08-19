@@ -12,11 +12,10 @@ public final class StillNewMappedFirstRatingBackfill {
   private StillNewMappedFirstRatingBackfill() {}
 
   public static void run(Connection connection) throws SQLException {
-    ForgettingCurve newCard = new ForgettingCurve(ForgettingCurve.ASSIMILATE_STABILITY_HOURS);
-    ForgettingCurve.NextMemory firstAgain = newCard.afterAgainRecall(0);
-    ForgettingCurve.NextMemory firstHard = newCard.afterHardRecall(0);
-    ForgettingCurve.NextMemory firstGood = newCard.afterGoodRecall(0);
-    ForgettingCurve.NextMemory firstEasy = newCard.afterEasyRecall(0);
+    Fsrs.NextMemory firstAgain = Fsrs.firstRating(Fsrs.AGAIN);
+    Fsrs.NextMemory firstHard = Fsrs.firstRating(Fsrs.HARD);
+    Fsrs.NextMemory firstGood = Fsrs.firstRating(Fsrs.GOOD);
+    Fsrs.NextMemory firstEasy = Fsrs.firstRating(Fsrs.EASY);
 
     try (PreparedStatement select =
             connection.prepareStatement(
@@ -49,8 +48,8 @@ public final class StillNewMappedFirstRatingBackfill {
       try (ResultSet rows = select.executeQuery()) {
         boolean pending = false;
         while (rows.next()) {
-          ForgettingCurve.NextMemory first =
-              firstRating(rows, firstAgain, firstHard, firstGood, firstEasy);
+          Fsrs.NextMemory first =
+              firstRatingForRow(rows, firstAgain, firstHard, firstGood, firstEasy);
           Timestamp lastMappedAt = rows.getTimestamp("last_mapped_at");
           update.setFloat(1, first.stability());
           update.setFloat(2, first.difficulty());
@@ -70,12 +69,12 @@ public final class StillNewMappedFirstRatingBackfill {
     }
   }
 
-  private static ForgettingCurve.NextMemory firstRating(
+  private static Fsrs.NextMemory firstRatingForRow(
       ResultSet row,
-      ForgettingCurve.NextMemory firstAgain,
-      ForgettingCurve.NextMemory firstHard,
-      ForgettingCurve.NextMemory firstGood,
-      ForgettingCurve.NextMemory firstEasy)
+      Fsrs.NextMemory firstAgain,
+      Fsrs.NextMemory firstHard,
+      Fsrs.NextMemory firstGood,
+      Fsrs.NextMemory firstEasy)
       throws SQLException {
     if (row.getInt("has_again") != 0) {
       return firstAgain;

@@ -32,7 +32,7 @@ Also surface when changing success/failure interval math, commissioned score →
 - `docs/adrs/0003-spaced-repetition-scheduling-policy.md` — Proposed policy (Decision; Working draft empty pending accept)
 - `docs/adrs/0001-ubiquitous-language.md` — **recall** (not FSRS **review**); **New** = ungraded
 - `docs/adrs/0005-commissioned-learning-session-protocol.md` — Tutor 1–4 meaning (`score = G`)
-- `backend/src/main/java/com/odde/doughnut/entities/ForgettingCurve.java`
+- `backend/src/main/java/com/odde/doughnut/entities/Fsrs.java`
 - `backend/src/main/java/com/odde/doughnut/entities/MemoryTracker.java`
 - `backend/src/main/java/com/odde/doughnut/algorithms/SpacedRepetitionAlgorithm.java`
 - https://github.com/open-spaced-repetition/awesome-fsrs/wiki/The-Algorithm

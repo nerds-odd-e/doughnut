@@ -28,6 +28,6 @@ Humans still own accept / reject / supersede of ADR 0003 (`docs/adrs/README.md`)
 - [ADR 0001](../../docs/adrs/0001-ubiquitous-language.md) — **recall** vs FSRS **review**; **New** = ungraded
 - [ADR 0005](../../docs/adrs/0005-commissioned-learning-session-protocol.md) — Tutor 1–4 meaning (`score = G`)
 - Seed: [SEED-004](../seeds/SEED-004-close-spaced-repetition-scheduling-policy-gap.md)
-- Code: `ForgettingCurve`, `MemoryTracker`, `SpacedRepetitionAlgorithm`
+- Code: `Fsrs`, `MemoryTracker`, `SpacedRepetitionAlgorithm`
 - [FSRS-6 algorithm](https://github.com/open-spaced-repetition/awesome-fsrs/wiki/The-Algorithm)
 - [ts-fsrs](https://open-spaced-repetition.github.io/ts-fsrs/)

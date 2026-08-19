@@ -1,6 +1,6 @@
 package com.odde.doughnut.algorithms;
 
-import static com.odde.doughnut.entities.ForgettingCurve.DEFAULT_DIFFICULTY;
+import static com.odde.doughnut.entities.Fsrs.DEFAULT_DIFFICULTY;
 
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
