@@ -46,16 +46,9 @@ Learning: pointers use Doughnut **recall**, not FSRS “review”.
 ### 2. last_recalled_at can be unset
 
 - **Type:** Structure
-- **Status:** planned
+- **Status:** done
 
-No user-facing change. New Flyway after `V300000274`: `last_recalled_at` DATETIME **NULL**. Update `MemoryTrackerRecallDuePersistenceTest` (nullable, still DATETIME).
-
-Null-safe on `MemoryTracker` so existing tests still pass:
-
-- `elapsedHoursUntil`: no last recall → **0**.
-- `calculateNextRecallAt`: no last recall → `assimilatedAt` (New due). Do not NPE.
-
-Assimilate still writes last recall until the next slice. Do not migrate data here.
+Flyway `V300000275` makes `last_recalled_at` DATETIME NULL. Unset last recall: elapsed hours **0**, due = `assimilatedAt`. Assimilate still writes last recall. Due math lives in package-private `MemoryTrackerRecallDue` so `MemoryTracker` stays under 250 lines.
 
 ### 3. Assimilating leaves Last Recall Time N/A
 

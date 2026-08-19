@@ -164,16 +164,15 @@ public class MemoryTracker extends EntityIdentifiedByIdOnly {
   private MemoryTracker() {}
 
   public Timestamp calculateNextRecallAt() {
-    return TimestampOperations.addHoursToTimestamp(
-        getLastRecalledAt(), Fsrs.intervalHours(getStability()));
+    return MemoryTrackerRecallDue.calculateNextRecallAt(this);
+  }
+
+  public long elapsedHoursUntil(Timestamp currentUTCTimestamp) {
+    return MemoryTrackerRecallDue.elapsedHoursUntil(this, currentUTCTimestamp);
   }
 
   ForgettingCurve forgettingCurve() {
     return new ForgettingCurve(getStability(), getDifficulty());
-  }
-
-  public long elapsedHoursUntil(Timestamp currentUTCTimestamp) {
-    return TimestampOperations.getDiffInHours(currentUTCTimestamp, getLastRecalledAt());
   }
 
   void scheduleNextRecallFromStability(Timestamp currentUTCTimestamp) {

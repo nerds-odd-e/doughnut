@@ -9,7 +9,7 @@ import com.odde.doughnut.utils.TimestampOperations;
 import java.sql.Timestamp;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -25,8 +25,8 @@ class MemoryTrackerRecallDuePersistenceTest {
   @Autowired JdbcTemplate jdbcTemplate;
 
   @ParameterizedTest
-  @ValueSource(strings = {"last_recalled_at", "next_recall_at"})
-  void recallAtColumnIsDatetimeNotNull(String columnName) {
+  @CsvSource({"last_recalled_at, YES", "next_recall_at, NO"})
+  void recallAtColumnIsDatetime(String columnName, String nullable) {
     String[] column =
         jdbcTemplate.queryForObject(
             """
@@ -36,7 +36,23 @@ class MemoryTrackerRecallDuePersistenceTest {
             (rs, rowNum) -> new String[] {rs.getString("DATA_TYPE"), rs.getString("IS_NULLABLE")},
             columnName);
     assertThat(column[0], equalToIgnoringCase("datetime"));
-    assertThat(column[1], equalToIgnoringCase("NO"));
+    assertThat(column[1], equalToIgnoringCase(nullable));
+  }
+
+  @Test
+  void elapsedHoursUntilIsZeroWhenLastRecallIsUnset() {
+    MemoryTracker tracker = makeMe.aMemoryTrackerFor(makeMe.aNote().please(false)).please(false);
+    tracker.setLastRecalledAt(null);
+    Timestamp later = TimestampOperations.addHoursToTimestamp(tracker.getAssimilatedAt(), 24);
+    assertThat(tracker.elapsedHoursUntil(later), equalTo(0L));
+  }
+
+  @Test
+  void calculateNextRecallAtIsAssimilatedAtWhenLastRecallIsUnset() {
+    MemoryTracker tracker = makeMe.aMemoryTrackerFor(makeMe.aNote().please(false)).please(false);
+    Timestamp assimilated = tracker.getAssimilatedAt();
+    tracker.setLastRecalledAt(null);
+    assertThat(tracker.calculateNextRecallAt(), equalTo(assimilated));
   }
 
   @Test
