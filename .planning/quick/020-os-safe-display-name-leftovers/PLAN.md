@@ -14,7 +14,7 @@
 
 ## Findings (017 follow-through)
 
-**Test bug:** `NotebookZipBuilderTest.writesNoteFileAsExactDisplayName` uses title `Q&A: What/Why?`. `/` `:` `?` cannot be saved after 017; `/` in a ZIP entry name is a path separator. `NotebookExportServiceTest` / catalog frontend use notebook `Q&A: Notes` (colon illegal). The tests pass only because builders skip Bean Validation.
+**Export fixtures (slice 2 done):** ZIP/catalog tests now use savable `Q&A Notes` / `Q&A What Why` (`&` legal). E2E `Recipe` / `Recipe＊` sibling-uniqueness unchanged.
 
 **Wiki-title cache (slice 1 done):** `rewriteWikiTitleCache` already converted `link_text` and deleted same-note duplicates. Tests plant stale rows via JDBC INSERT (`Recipe*` cannot go through entities).
 
@@ -34,15 +34,9 @@ Production already rewrote cache `link_text` (`*` → `＊`) and deleted same-no
 ### 2. Export contract uses savable display names
 
 - **Type:** Behavior
-- **Status:** planned
+- **Status:** done
 
-**Pre-condition:** a notebook/note name the user can save (e.g. `Q&A Notes` — `&` is legal; no `:` `/` `?`).
-
-**Trigger:** catalog ZIP build / `exportFileName` / catalog download filename from `Content-Disposition`.
-
-**Post-condition:** entry is `{title}.md`; download is `{notebook name}.zip`. No fixture uses OS-invalid characters.
-
-Replace `Q&A: What/Why?` and `Q&A: Notes`. E2E `Recipe` / `Recipe＊` stays the sibling-uniqueness scenario.
+Replaced illegal `Q&A: What/Why?` / `Q&A: Notes` with `Q&A What Why` / `Q&A Notes`. ZIP entry remains `{title}.md`; download `{notebook name}.zip`. Dropped unused `creatorAndOwner` on the exportFileName fixture.
 
 ### 3. One OS-invalid copy; drop redundant extract `*`
 

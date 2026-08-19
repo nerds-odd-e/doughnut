@@ -52,9 +52,8 @@ class NotebookExportServiceTest {
 
   @Test
   void exportFileNameIsNotebookNameZip() {
-    Notebook notebook =
-        makeMe.aNotebook().creatorAndOwner(makeMe.aUser().please()).name("Q&A: Notes").please();
+    Notebook notebook = makeMe.aNotebook().name("Q&A Notes").please();
 
-    assertThat(notebookExportService.exportFileName(notebook), equalTo("Q&A: Notes.zip"));
+    assertThat(notebookExportService.exportFileName(notebook), equalTo("Q&A Notes.zip"));
   }
 }

@@ -101,10 +101,10 @@ class NotebookZipBuilderTest {
 
   @Test
   void writesNoteFileAsExactDisplayName() throws IOException {
-    ExportNoteRow note = new ExportNoteRow(null, "Q&A: What/Why?", "body");
+    ExportNoteRow note = new ExportNoteRow(null, "Q&A What Why", "body");
 
     Map<String, String> entries = readZipEntries(buildZip(null, List.of(), List.of(note)));
 
-    assertThat(entries.get("Q&A: What/Why?.md"), equalTo("body"));
+    assertThat(entries.get("Q&A What Why.md"), equalTo("body"));
   }
 }
