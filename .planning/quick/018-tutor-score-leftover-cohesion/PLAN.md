@@ -1,6 +1,6 @@
 # Plan: Tutor score 1–4 leftover cohesion
 
-**Status:** in progress (slice 1 done)
+**Status:** in progress (slices 1–2 done)
 
 **Goal:** The shipped 1–4 identity (`score = G`) is pinned once per observable surface. Drop leftover duplicate tests from the old “score 4 leaves GOOD” special case and from Request-copy / parser / alias-rewrite outlines that re-assert the same post-condition.
 
@@ -28,7 +28,7 @@ Inspection of the five 1–4 commits found **no production mapping bug**. Parser
 Leftovers that wrap-up missed:
 
 - HTTP `scoreThreeLeavesAGoodRecallLogWithoutAnswer` folded into `matchedScoreLeavesMappedRecallLog`.
-- E2E `expectLearningSessionRequestIncludesRubric` copies all four mastery lines already asserted in `LearningSessionRequestTests`.
+- E2E `expectLearningSessionRequestIncludesRubric` now pins only `score from 1 to 4 per item` and `Hola: 4`; HTTP keeps the four mastery lines.
 - Parser `acceptsScoreFromOneToFour` re-asserts the same parse shape for 1, 2, 3, and 4. Reject `0/5/6` already defines the range.
 - `AliasRecallLogGradeBackfillTest` re-asserts Stability, Difficulty, and due for both aliases. `StillNewFirstRatingBackfillTest` still names a tracker `shrink`.
 
@@ -46,11 +46,11 @@ Learning: step def stays — still used by `spaced_repetition.feature`.
 ### 2. E2E Request rubric is the 1–4 identity only
 
 - **Type:** Structure
-- **Status:** planned
+- **Status:** done
 
-Structure: `expectLearningSessionRequestIncludesRubric` asserts `score from 1 to 4` and example `Hola: 4`. Do not repeat the four mastery lines (HTTP Request test keeps them).
+`expectLearningSessionRequestIncludesRubric` now asserts `score from 1 to 4 per item` and `Hola: 4` only. Four mastery lines stay in `LearningSessionRequestTests`.
 
-Unlocks: one copy of Request rubric text.
+Learning: helper lives in `recallLearningSessionMethods.ts`; Cypress not re-run (assertion trim).
 
 ### 3. Parser range is one accept plus reject-outside
 
