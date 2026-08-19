@@ -40,29 +40,18 @@ Existing E2E `Memory Tracker shows Stability and Again Difficulty after incorrec
 **Type:** Structure  
 **Status:** done
 
-Proposed ADR 0003 Decision now uses one `< 24` / `S > 0` gate for all four G (Again may shrink; SInc ≥ 1 only for G ≥ 2; 1h floor). Code still post-lapse Again at every elapsed until slice 2. Status stays Proposed; Working draft empty.
+Proposed ADR 0003 Decision uses one `< 24` / `S > 0` gate for all four G. Status stays Proposed; Working draft empty.
 
 **Learning:** **Lapses** now points at **Incorrect recall (Again)** instead of equating After-Again with always post-lapse. Do not split the 400+ line ADR.
 
 ### 2. Same-hour Again after first Good uses short-term Stability 18
 
 **Type:** Behavior  
-**Status:** planned
+**Status:** done
 
-**Pre:** New tracker, just-review Yes (first Good **55h**), still on the same hour.  
-**Trigger:** just-review No (Again).  
-**Post:** Memory Tracker Stability **18**, **18** hours between last and next recall, Difficulty **7.3945**, an AGAIN RecallLog. Not post-lapse **15**.
+Same-hour just-review No after first Good is Stability **18** / **18h** due (not post-lapse **15**). Unit pins: 72h same-hour and elapsed 23 → **24**; long-term on-time 72h **17** and after first Good **15** unchanged. `FsrsAgainRecall` uses `hoursAfterShortTermRecall` when elapsed **< 24**; SInc ≥ 1 only for G ≥ Hard; 1h floor.
 
-TDD: add the scenario to `e2e_test/features/recall/spaced_repetition.feature` (same shape as `Same-hour Good after first Good stays Stability 55`: assimilate → yes → ask to do more → **no**). Tag `@wip`, run `--spec` that feature, confirm it fails on Stability **15**. Unit pin in `MemoryTrackerIncorrectRecallSchedulingTest` (same-hour after first Good → **18**; same-hour on 72h / D=5 → **24**). Then smallest production change:
-
-- `FsrsAgainRecall`: elapsed **< 24** → short-term `S'(S, Again)`; else existing post-lapse.
-- `hoursAfterShortTermRecall`: clamp SInc ≥ 1 only when `grade >= HARD`. After Again, `max(1h, …)`.
-- Existing ≥ 24 / New first-Again tests stay green (`onTimeIncorrectRecallAfterFirstGood…` **15**, `onTimeIncorrectRecallUsesFsrsAgainPostLapseStability` **17**, `newTrackerIncorrectRecallUsesS0AndD0Again` **5**, Tutor on-time score **1** **15**).
-- `incorrectRecallFromOneHourStabilityPersistsOneHour` is on-time elapsed **1** on S=**1h** (inside the window). Short-term rounds below 1h; the **1h** floor must keep it **1**.
-
-Remove `@wip` when the E2E passes. Targeted E2E may exceed the 5-minute fuzzy budget; that is a stated good reason to finish the spec (`planning.mdc`).
-
-**Done when:** the E2E and unit pins above pass; long-term After-Again pins unchanged.
+**Learning:** TDD red was same-hour post-lapse **13**, not on-time **15**. The short-term formula is not duplicated; slice 3 still has a separate `< 24` gate in `FsrsAgainRecall` plus tracker/docs.
 
 ### 3. Short-term After-Again leftover cohesion
 
@@ -71,7 +60,7 @@ Remove `@wip` when the E2E passes. Targeted E2E may exceed the 5-minute fuzzy bu
 
 No new user-visible schedule. Existing tests stay green.
 
-- One short-term entry for all four G (`hoursAfterShortTermRecall` / the `< 24` branch). Again must not keep a duplicate copy of the short-term formula.
+- One short-term entry for all four G (`hoursAfterShortTermRecall` / the `< 24` branch). Formula is already shared; collapse the extra `< 24` gate in `FsrsAgainRecall` if success and Again can share it.
 - Comments: SInc ≥ 1 is for **G ≥ 2**, not “so S does not shrink” for every grade.
 - Close the exception in `.planning/research/FSRS-COMPATIBILITY-GAP.md`, `SEED-004`, and `STATE.md`. Remaining deferred is still **E4** plus **accept ADR 0003**.
 - Prune spent “Again is post-lapse at 0 and 5” wording once the Decision and code agree.

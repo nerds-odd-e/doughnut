@@ -113,6 +113,20 @@ Feature: Spaced-repetition
     And I should see 55 hours between last and next recall
 
   @mockBrowserTime
+  Scenario: Same-hour Again after first Good uses short-term Stability 18
+    Given the browser and backend are on day 1
+    When I assimilate the note "Note 1"
+    And I am recalling my note on day 1
+    And I choose yes I remember
+    And I ask to do more recall
+    And I choose no I need more recall
+    And I visit the understanding memory tracker for "Note 1"
+    Then I should see Stability 18
+    And I should see 18 hours between last and next recall
+    And I should see Difficulty 7.3945
+    And I should see an AGAIN RecallLog
+
+  @mockBrowserTime
   Scenario: Strictly follow the schedule but want to recall more
     When On day 1 I recall "                    " and assimilate new "Note 1, end "
     And On day 2 I recall "Note 1, end         " and assimilate new "Note 2, end "
