@@ -50,11 +50,11 @@ describe("Notebook catalog export", () => {
     expect(vi.mocked(saveAs).mock.calls[0]![1]).toBe("Owned Catalog.zip")
   })
 
-  it("uses the sanitized filename the backend sends via Content-Disposition", async () => {
+  it("uses the filename the backend sends via Content-Disposition", async () => {
     const nb = makeMe.aNotebook.title("Q&A: Notes").please()
     fetchMock.mockResponseOnce("zip-file-bytes", {
       headers: {
-        "content-disposition": 'attachment; filename="Q&A Notes.zip"',
+        "content-disposition": 'attachment; filename="Q&A: Notes.zip"',
       },
     })
     await openCatalogOverflowFor(nb)
@@ -63,7 +63,7 @@ describe("Notebook catalog export", () => {
     await fireEvent.click(exportButtons[exportButtons.length - 1]!)
     await flushPromises()
 
-    expect(vi.mocked(saveAs).mock.calls.at(-1)?.[1]).toBe("Q&A Notes.zip")
+    expect(vi.mocked(saveAs).mock.calls.at(-1)?.[1]).toBe("Q&A: Notes.zip")
   })
 
   it("falls back to the notebook name when Content-Disposition is not printable ASCII", async () => {

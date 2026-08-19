@@ -1,11 +1,9 @@
 package com.odde.doughnut.services;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 
 import com.odde.doughnut.entities.Folder;
-import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.testability.MakeMe;
 import java.io.ByteArrayInputStream;
@@ -53,23 +51,10 @@ class NotebookExportServiceTest {
   }
 
   @Test
-  void exportFileNameUsesSanitizedNotebookName() {
+  void exportFileNameIsNotebookNameZip() {
     Notebook notebook =
         makeMe.aNotebook().creatorAndOwner(makeMe.aUser().please()).name("Q&A: Notes").please();
 
-    assertThat(notebookExportService.exportFileName(notebook), equalTo("Q&A Notes.zip"));
-  }
-
-  @Test
-  void wrapsTitleWhenPersistedNoteTitleSanitizesToDifferentFilename() throws IOException {
-    Note note = makeMe.aNote("Q&A: What/Why?").content("original body").please();
-    makeMe.entityPersister.flush();
-    String stored = note.getContent();
-
-    Map<String, String> entries =
-        readZipEntries(notebookExportService.exportNotebookAsZip(note.getNotebook()));
-
-    assertThat(entries.get("Q&A What Why.md"), containsString("title:"));
-    assertThat(note.getContent(), equalTo(stored));
+    assertThat(notebookExportService.exportFileName(notebook), equalTo("Q&A: Notes.zip"));
   }
 }

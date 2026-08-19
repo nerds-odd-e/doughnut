@@ -5,7 +5,6 @@ import com.odde.doughnut.entities.repositories.FolderRepository;
 import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.services.notebookExport.ExportFolderRow;
 import com.odde.doughnut.services.notebookExport.ExportNoteRow;
-import com.odde.doughnut.services.notebookExport.NotebookExportFilenames;
 import com.odde.doughnut.services.notebookExport.NotebookZipBuilder;
 import java.util.List;
 import org.springframework.stereotype.Service;
@@ -33,7 +32,6 @@ public class NotebookExportService {
             .map(
                 n ->
                     new ExportNoteRow(
-                        n.getId(),
                         n.getFolder() == null ? null : n.getFolder().getId(),
                         n.getTitle(),
                         n.getContent()))
@@ -42,6 +40,6 @@ public class NotebookExportService {
   }
 
   public String exportFileName(Notebook notebook) {
-    return NotebookExportFilenames.sanitize(notebook.getName()) + ".zip";
+    return notebook.getName() + ".zip";
   }
 }

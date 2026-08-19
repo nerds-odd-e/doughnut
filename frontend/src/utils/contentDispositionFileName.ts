@@ -2,7 +2,7 @@
  * Read the filename a `Content-Disposition` header names.
  *
  * The backend already decides what a notebook's export is called
- * (`NotebookExportService.exportFileName`, which sanitizes the notebook name),
+ * (`NotebookExportService.exportFileName`),
  * so reading it here keeps that rule in one place instead of mirroring it.
  */
 export function contentDispositionFileName(

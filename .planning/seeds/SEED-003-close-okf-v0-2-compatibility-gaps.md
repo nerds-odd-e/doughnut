@@ -24,7 +24,7 @@ Also surface when changing inter-note link spelling (wiki vs path Markdown). Do 
 **Large** — remaining work is profile accept plus a lossless codec (and later accept/lint):
 
 1. Humans accept Proposed [ADR 0004](../../docs/adrs/0004-okf-compatible-notebook-markdown.md). See `docs/adrs/README.md`.
-2. Remaining codec work: **P9**. Collision-basename mapping is not remaining work (filename = display name; [017-os-safe-display-names](../quick/017-os-safe-display-names/PLAN.md) replaces it). Tracker: [OKF-COMPATIBILITY-GAP.md](../research/OKF-COMPATIBILITY-GAP.md). Frontmatter dual-spelling product holes are closed (wiki default, path Markdown accepted, no conversion).
+2. Remaining codec work: **P9** (and **T1** for Git accept). Filename = display name is shipped on catalog ZIP (no collision suffixes, no codec `title:` wrap). Tracker: [OKF-COMPATIBILITY-GAP.md](../research/OKF-COMPATIBILITY-GAP.md). Frontmatter dual-spelling product holes are closed (wiki default, path Markdown accepted, no conversion).
 
 ## Breadcrumbs
 

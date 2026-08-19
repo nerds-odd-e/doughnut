@@ -1,11 +1,7 @@
 package com.odde.doughnut.algorithms;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Pattern;
-import org.yaml.snakeyaml.DumperOptions;
-import org.yaml.snakeyaml.Yaml;
 
 /** Leading {@code ---} fenced block at the start of note markdown: split and rebuild. */
 public final class NoteLeadingFrontmatter {
@@ -50,24 +46,6 @@ public final class NoteLeadingFrontmatter {
       return insertTypeFirst(split, typeWhenAbsent);
     }
     return canonicalizeTypeSpelling(content, split, type.get(), canonicalSpellings);
-  }
-
-  /**
-   * Appends a top-level {@code title} key without re-dumping the rest of the fence. A present title
-   * (case-insensitive) is left unchanged. Missing fence or missing title key gets {@code title:}
-   * appended, YAML-quoted as needed.
-   */
-  public static String ensureTitleKey(String content, String title) {
-    Optional<VerbatimSplit> verbatim = splitVerbatim(content);
-    if (verbatim.isPresent()
-        && Frontmatter.parse(verbatim.get().yamlRaw()).containsKeyIgnoreCase("title")) {
-      return content;
-    }
-    VerbatimSplit split =
-        verbatim.orElseGet(() -> new VerbatimSplit("", "", content == null ? "" : content));
-    String yaml = split.yamlRaw();
-    String withNewline = yaml.isEmpty() || yaml.endsWith("\n") ? yaml : yaml + "\n";
-    return split.rebuild(withNewline + titleKeyLine(title) + "\n");
   }
 
   public static Optional<Split> split(String content) {
@@ -125,16 +103,6 @@ public final class NoteLeadingFrontmatter {
       return content;
     }
     return split.rebuild(newYaml);
-  }
-
-  private static String titleKeyLine(String title) {
-    DumperOptions opts = new DumperOptions();
-    opts.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
-    opts.setExplicitStart(false);
-    opts.setExplicitEnd(false);
-    Map<String, Object> map = new LinkedHashMap<>();
-    map.put("title", title == null ? "" : title);
-    return new Yaml(opts).dump(map).strip();
   }
 
   private static Optional<String> canonicalSpelling(String type, String[] canonicalSpellings) {

@@ -1,6 +1,6 @@
 # Doughnut ↔ OKF v0.2 gap (toward ADR 0004)
 
-**Status:** Live spec is **OKF v0.2**. **P4** is closed (dual-spelling + no conversion). Frontmatter links are the same dual-spelling as the body (wiki default; not OKF path scalars). Remaining codec work is **P9**, plus **accept ADR 0004** (human). Collision-basename mapping is not remaining work; filename = display name is [017-os-safe-display-names](../quick/017-os-safe-display-names/PLAN.md). This tracker is not a second profile. Status stays Proposed.
+**Status:** Live spec is **OKF v0.2**. **P4** is closed (dual-spelling + no conversion). Frontmatter links are the same dual-spelling as the body (wiki default; not OKF path scalars). Filename = display name is shipped on catalog ZIP. Remaining codec work is **P9**, plus **accept ADR 0004** (human). This tracker is not a second profile. Status stays Proposed.
 
 **Updated:** 2026-08-19
 
@@ -14,17 +14,17 @@ Product profile lives in ADR 0004 Decision. This tracker is code vs [OKF v0.2](h
 
 Portable output today is **one-way catalog ZIP** (`GET /api/notebooks/{notebook}/export`). There is **no** Markdown import, CLI OKF lint, or Git accept path. ADR 0002 Level 1 (git-native notebooks) is deferred in [PROJECT.md](../PROJECT.md).
 
-`NotebookZipBuilder` / `ExportReadmeMarkdown` / `ExportNoteMarkdown` / `NotebookExportFilenames`:
+`NotebookZipBuilder` / `ExportReadmeMarkdown`:
 
 - One notebook → a directory of `.md` files; folders are subdirectories. Non-blank notebook/folder readme → that directory’s `README.md` with export-only `type: Readme`. Blank omits the file. Empty folders with no readme and no notes are omitted (ZIP/Git-like).
 - Stored notes carry `type: Note` or `type: Relationship` on `note.content` (`NoteConceptType.ensureStoredType`, production backfill `V300000270`). Export copies the leading YAML block.
-- ZIP code today still sanitizes, suffixes (`Recipe (2).md`), and may wrap `title:` (`NoteLeadingFrontmatter.ensureTitleKey`). ADR 0004 filename = display name (no collision suffixes; no codec `title:` wrap). Closing that ZIP gap is [017-os-safe-display-names](../quick/017-os-safe-display-names/PLAN.md), not collision-basename mapping.
+- Catalog ZIP entry path is the folder trail plus `{title}.md` (folder dirs = folder names). Download name is `{notebook name}.zip`. No collision suffixes, no Untitled fallback, no codec `title:` wrap. Author-owned `title:` is copied as stored.
 - Export does not inject `# {title}` or Doughnut note ids. Author YAML (including `image:`) and author headings are copied as stored (no injected identity or `okf_version`).
 - Wiki links (`[[…]]`) are copied as stored (no rewrite to path Markdown; that is the profile, not a remaining codec job).
 - No listing `index.md`, no `log.md`, no root `okf_version` (missing listing is conformant).
 - Note titles `readme` / `readme.md` are hard-reserved. Note titles `index` / `index.md` / `log` / `log.md` are allowed; note create/edit and notebook health warn (non-blocking). Folder and notebook names do not warn. Filename-as-title: a note titled `index` writes `index.md`. Locked in ADR 0004; not remaining work.
 
-In the product (not the ZIP), titles live in a column (max 150). Doughnut-authored inter-note links stay wiki in **body and frontmatter**; path Markdown `[display](/folder/File.md)` is the same link as `[[folder/File|display]]`. Relationship `source` / `target` are wiki links (wiki default), not OKF path scalars. Identity is folder path + display name, not ZIP collision basenames (`Recipe (2).md`) — those suffixes are gone from the profile, not mapped. `tags` / `aliases` / `cssclasses` are Obsidian-style passthrough; `aliases` must be a plain YAML list. `image:` is authored frontmatter; binaries in the tree are ADR 0002 Level 2.
+Titles live in a column (max 150). Doughnut-authored inter-note links stay wiki in **body and frontmatter**; path Markdown `[display](/folder/File.md)` is the same link as `[[folder/File|display]]`. Relationship `source` / `target` are wiki links (wiki default), not OKF path scalars. Identity is folder path + display name (the catalog ZIP uses that path). Collision suffixes (`Recipe (2).md`) are not identity. `tags` / `aliases` / `cssclasses` are Obsidian-style passthrough; `aliases` must be a plain YAML list. `image:` is authored frontmatter; binaries in the tree are ADR 0002 Level 2.
 
 ## ADR 0004 profile vs codec
 
@@ -71,5 +71,5 @@ Humans still own accept / reject / supersede of ADR 0004 (`docs/adrs/README.md`)
 - [ADR 0002](../../docs/adrs/0002-git-native-notebooks-backed-by-mysql.md) — Git-native notebooks; OKF working tree
 - [ADR 0001](../../docs/adrs/0001-ubiquitous-language.md) — portable Markdown profile pointer (OKF is not a glossary noun)
 - Seed: [SEED-003](../seeds/SEED-003-close-okf-v0-2-compatibility-gaps.md)
-- Code: `NotebookExportService`, `NotebookZipBuilder`, `ExportReadmeMarkdown`, `ExportNoteMarkdown`, `NotebookExportFilenames`, `ReservedReadmeTitles`
+- Code: `NotebookExportService`, `NotebookZipBuilder`, `ExportReadmeMarkdown`, `ReservedReadmeTitles`
 - [Open Knowledge Format v0.2](https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/SPEC.md)

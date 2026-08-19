@@ -58,19 +58,13 @@ public final class NotebookZipBuilder {
       writeEntry(zos, pathPrefix + "README.md", ExportReadmeMarkdown.assemble(readmeContentOrNull));
     }
 
-    Map<Integer, String> noteFileNames =
-        NotebookExportFilenames.uniqueFileNames(
-            notesHere.stream().map(n -> Map.entry(n.id(), n.title())).toList(), ".md");
     for (ExportNoteRow note : notesHere) {
-      String fileName = noteFileNames.get(note.id());
-      writeEntry(zos, pathPrefix + fileName, ExportNoteMarkdown.assemble(note, fileName));
+      String content = note.content() == null ? "" : note.content();
+      writeEntry(zos, pathPrefix + note.title() + ".md", content);
     }
 
-    Map<Integer, String> folderDirNames =
-        NotebookExportFilenames.uniqueFileNames(
-            childFolders.stream().map(f -> Map.entry(f.id(), f.name())).toList(), "");
     for (ExportFolderRow folder : childFolders) {
-      String subPath = pathPrefix + folderDirNames.get(folder.id()) + "/";
+      String subPath = pathPrefix + folder.name() + "/";
       writeDirectory(
           zos,
           subPath,

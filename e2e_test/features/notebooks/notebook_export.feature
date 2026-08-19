@@ -24,19 +24,24 @@ Feature: Notebook export
     And the downloaded zip for notebook "E2E Export Notebook" does not contain "Has Readme/index.md"
     And the downloaded zip for notebook "E2E Export Notebook" does not contain "Blank Readme/README.md"
 
-  Scenario: Collision filename is a human sequence and carries display title
-    And I have a note "Recipe" under notebook "E2E Export Notebook" with content:
+  Scenario: Exported zip entry is the folder trail plus the display name
+    And I have a note "Recipe" under notebook "E2E Export Notebook" in folder "Recipes" with content:
       """
       first recipe
       """
-    And I have a note "Recipe*" under notebook "E2E Export Notebook" with content:
+    And I have a note "Recipe＊" under notebook "E2E Export Notebook" in folder "Recipes" with content:
       """
+      ---
+      title: Keep Me
+      ---
       starred recipe
       """
     When I export notebook "E2E Export Notebook" from the catalog
-    Then the downloaded zip for notebook "E2E Export Notebook" contains "Recipe (2).md"
-    And the downloaded zip entry "Recipe.md" of notebook "E2E Export Notebook" does not include "title:"
-    And the downloaded zip entry "Recipe (2).md" of notebook "E2E Export Notebook" includes "title: Recipe*"
+    Then the downloaded zip for notebook "E2E Export Notebook" contains "Recipes/Recipe.md"
+    And the downloaded zip for notebook "E2E Export Notebook" contains "Recipes/Recipe＊.md"
+    And the downloaded zip for notebook "E2E Export Notebook" does not contain "Recipes/Recipe (2).md"
+    And the downloaded zip entry "Recipes/Recipe.md" of notebook "E2E Export Notebook" does not include "title:"
+    And the downloaded zip entry "Recipes/Recipe＊.md" of notebook "E2E Export Notebook" includes "title: Keep Me"
 
   Scenario: Exported note file is stored markdown without a generated title heading
     And I have a note "Pasta" under notebook "E2E Export Notebook" with content:
