@@ -7,7 +7,7 @@
 
 - Every long-lived database is already at the current Flyway tip **or has no rows**. Startup still `repair()` then `migrate()` (prod and test).
 - **Keep `V300000260`** (drops `user.space_intervals`, sets `stability` default `0`). Baseline still has the old column/default; no later SQL repeats this.
-- **Keep `V300000283` / `RecallLogDsrBackfill`** (in-tree DSR rebuild; `.planning/quick/028-rebuild-dsr-from-recall-log/`).
+- **Keep `V300000283` / `RecallLogDsrBackfill`** (in-tree DSR rebuild).
 - Do **not** edit committed SQL (including `V300000266` comments that still mention `SHRINK` / `AGAIN_ZERO`).
 - Do **not** squash the SQL chain or rewrite `V100000000__baseline.sql`.
 
@@ -50,7 +50,7 @@ Each slice is **Structure**: delete one backfill family; remaining tests pass; e
 
 - **Type:** Structure
 - **Status:** planned
-- **Done:** `V300000274`, `OverCapStabilityBackfill`, and `OverCapStabilityBackfillTest` gone. Live over-cap clamp on `Fsrs` / recall scheduling tests unchanged. ADR 0003 DSR snapshot cites `RecallLogDsrBackfill` (not the deleted classes). `.planning/quick/028-rebuild-dsr-from-recall-log/PLAN.md` locked decision matches.
+- **Done:** `V300000274`, `OverCapStabilityBackfill`, and `OverCapStabilityBackfillTest` gone. Live over-cap clamp on `Fsrs` / recall scheduling tests unchanged. ADR 0003 DSR snapshot cites `RecallLogDsrBackfill` (not the deleted classes).
 
 ### 5. Drop ungraded-New last-recall backfill
 
@@ -99,4 +99,3 @@ Each slice is **Structure**: delete one backfill family; remaining tests pass; e
 - Stop after any slice; each family gone is the value.
 - If a remaining test still imports a deleted runner, that slice is not done — fix in the same slice, do not leave a compile hole.
 - If empty-DB migrate fails after a delete, revert that slice; the usual cause is having deleted **V260** or **V282** by mistake.
-- Do not run in parallel with 028 on ADR 0003 except slice 4’s citation retarget.
