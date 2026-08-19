@@ -1,6 +1,6 @@
 # Plan: Last-recall leftover cohesion
 
-**Status:** in progress (slice 1 done)
+**Status:** in progress (slices 1–2 done)
 
 **Goal:** After New last recall shipped, drop overlapping tests and close the mapped-grade SQL footgun. No product behavior change. Do not accept ADR 0003. Do not touch Flyway 271–278 files.
 
@@ -46,9 +46,9 @@ Kept `1=0` no-op (Again and Hard) and invalid-gate fail-loud. Deleted **1=1** ap
 ### 2. Drop entity last-recall due pins covered at HTTP
 
 - **Type:** Structure
-- **Status:** planned
+- **Status:** done
 
-No user-facing change. Remove `elapsedHoursUntilIsZeroWhenLastRecallIsUnset` and `calculateNextRecallAtIsAssimilatedAtWhenLastRecallIsUnset` from `MemoryTrackerRecallDuePersistenceTest`. Keep `recallAtColumnIsDatetime` and the max-interval persist pin.
+Removed `elapsedHoursUntilIsZeroWhenLastRecallIsUnset` and `calculateNextRecallAtIsAssimilatedAtWhenLastRecallIsUnset`. Kept DATETIME/nullability and max-interval persist. Canonical New last-recall remains HTTP assimilate + first just-review elapsed **0**.
 
 ### 3. Mapped grades are an explicit list
 

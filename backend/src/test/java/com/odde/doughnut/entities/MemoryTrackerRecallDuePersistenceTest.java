@@ -40,22 +40,6 @@ class MemoryTrackerRecallDuePersistenceTest {
   }
 
   @Test
-  void elapsedHoursUntilIsZeroWhenLastRecallIsUnset() {
-    MemoryTracker tracker = makeMe.aMemoryTrackerFor(makeMe.aNote().please(false)).please(false);
-    tracker.setLastRecalledAt(null);
-    Timestamp later = TimestampOperations.addHoursToTimestamp(tracker.getAssimilatedAt(), 24);
-    assertThat(tracker.elapsedHoursUntil(later), equalTo(0L));
-  }
-
-  @Test
-  void calculateNextRecallAtIsAssimilatedAtWhenLastRecallIsUnset() {
-    MemoryTracker tracker = makeMe.aMemoryTrackerFor(makeMe.aNote().please(false)).please(false);
-    Timestamp assimilated = tracker.getAssimilatedAt();
-    tracker.setLastRecalledAt(null);
-    assertThat(tracker.calculateNextRecallAt(), equalTo(assimilated));
-  }
-
-  @Test
   void persistsNextRecallAtLastPlusMaximumIntervalHours() {
     Timestamp last = makeMe.aTimestamp().of(0, 0).please();
     Timestamp due =
