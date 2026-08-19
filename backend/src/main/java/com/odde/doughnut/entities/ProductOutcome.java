@@ -1,7 +1,7 @@
 package com.odde.doughnut.entities;
 
-import java.util.Arrays;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public enum ProductOutcome {
   GOOD,
@@ -13,8 +13,7 @@ public enum ProductOutcome {
   CONFUSION;
 
   static String mappedGradeSqlInList() {
-    return Arrays.stream(values())
-        .filter(outcome -> outcome != CONFUSION)
+    return Stream.of(GOOD, EASY, HARD, SHRINK, AGAIN, AGAIN_ZERO)
         .map(outcome -> "'" + outcome.name() + "'")
         .collect(Collectors.joining(", "));
   }

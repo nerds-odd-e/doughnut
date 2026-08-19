@@ -9,8 +9,6 @@ import java.sql.Connection;
 import java.sql.Timestamp;
 import javax.sql.DataSource;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.EnumSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -64,13 +62,10 @@ class UngradedNewLastRecallBackfillTest {
     assertThat(trackerRow(confusionOnly.getId()).lastRecalledAt(), nullValue());
   }
 
-  @ParameterizedTest
-  @EnumSource(
-      value = ProductOutcome.class,
-      names = {"GOOD", "EASY", "HARD", "SHRINK", "AGAIN", "AGAIN_ZERO"})
-  void leavesStillNewWithMappedLogsUnchanged(ProductOutcome outcome) throws Exception {
+  @Test
+  void leavesStillNewWithMappedLogsUnchanged() throws Exception {
     Timestamp lastRecalled = makeMe.aTimestamp().of(1, 0).please();
-    MemoryTracker stillNewWithMappedLog = ungradedNewWith(outcome, lastRecalled);
+    MemoryTracker stillNewWithMappedLog = ungradedNewWith(ProductOutcome.AGAIN, lastRecalled);
 
     runBackfill();
 

@@ -1,6 +1,6 @@
 # Plan: Last-recall leftover cohesion
 
-**Status:** in progress (slices 1–2 done)
+**Status:** in progress (slices 1–3 done)
 
 **Goal:** After New last recall shipped, drop overlapping tests and close the mapped-grade SQL footgun. No product behavior change. Do not accept ADR 0003. Do not touch Flyway 271–278 files.
 
@@ -53,9 +53,9 @@ Removed `elapsedHoursUntilIsZeroWhenLastRecallIsUnset` and `calculateNextRecallA
 ### 3. Mapped grades are an explicit list
 
 - **Type:** Structure
-- **Status:** planned
+- **Status:** done
 
-No user-facing change. `ProductOutcome.mappedGradeSqlInList()` lists `GOOD`, `EASY`, `HARD`, `SHRINK`, `AGAIN`, `AGAIN_ZERO` (not “not CONFUSION”). Collapse `UngradedNewLastRecallBackfillTest.leavesStillNewWithMappedLogsUnchanged` to one mapped outcome (AGAIN). Confusion-only skip stays (proves CONFUSION is excluded).
+`mappedGradeSqlInList()` lists `GOOD`, `EASY`, `HARD`, `SHRINK`, `AGAIN`, `AGAIN_ZERO`. Mapped-log skip collapsed to AGAIN; confusion-only skip remains. Live JPQL/count `<> CONFUSION` paths are a different surface (left alone).
 
 ### 4. Removing from recall does not assert skipped in the When
 
