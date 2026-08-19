@@ -58,10 +58,9 @@ const FULLWIDTH_REPLACE: Record<string, string> = {
   ":": "：",
 }
 
-const LINK_BREAK_CHARS = "#^[]|"
+const LINK_BREAK_CHARS = "#^[]"
 
-const LINK_NAME_WARNING =
-  "Wiki links will not work with names containing any of `#^[]|`"
+const LINK_NAME_WARNING = `Wiki links will not work with names containing any of \`${LINK_BREAK_CHARS}\``
 
 const OKF_INCOMPATIBLE_TITLES = new Set(["index", "index.md", "log", "log.md"])
 

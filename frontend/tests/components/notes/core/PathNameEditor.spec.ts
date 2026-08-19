@@ -37,7 +37,7 @@ describe("PathNameEditor.vue", () => {
     )
   })
 
-  it("shows the wiki link warning when the title contains # ^ [ ] or |", async () => {
+  it("shows the wiki link warning when the title contains # ^ [ ]", async () => {
     const wrapper = mount(PathNameEditor, {
       props: { modelValue: "" },
     })
@@ -45,8 +45,16 @@ describe("PathNameEditor.vue", () => {
     const warn = wrapper.find(".text-warning")
     expect(warn.exists()).toBe(true)
     expect(warn.text()).toContain(
-      "Wiki links will not work with names containing any of `#^[]|`"
+      "Wiki links will not work with names containing any of `#^[]`"
     )
+  })
+
+  it("does not show the wiki link warning when the title contains |", async () => {
+    const wrapper = mount(PathNameEditor, {
+      props: { modelValue: "" },
+    })
+    await emitEditorValue(wrapper, "a|b")
+    expect(wrapper.find(".text-warning").exists()).toBe(false)
   })
 
   it("does not warn that the portable tree may be OKF-incompatible by default when the title is index", () => {
@@ -89,7 +97,7 @@ describe("PathNameEditor.vue", () => {
         errorMessage: "Name already taken",
       },
     })
-    await emitEditorValue(wrapper, "bad|name")
+    await emitEditorValue(wrapper, "bad#name")
     expect(wrapper.find(".text-error").text()).toBe("Name already taken")
     expect(wrapper.find(".text-warning").exists()).toBe(false)
   })
@@ -108,7 +116,7 @@ describe("PathNameEditor.vue", () => {
     const wrapper = mount(PathNameEditor, {
       props: { modelValue: "" },
     })
-    await emitEditorValue(wrapper, "a|b:c")
+    await emitEditorValue(wrapper, "a#b:c")
     const warn = wrapper.find(".text-warning").text()
     expect(warn).toContain("fullwidth")
     expect(warn).toContain("Wiki links will not work")
