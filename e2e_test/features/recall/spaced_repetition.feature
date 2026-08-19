@@ -73,6 +73,19 @@ Feature: Spaced-repetition
     And I should see 5 hours between last and next recall
 
   @mockBrowserTime
+  Scenario: On-time Good after first Again uses short-term Stability 6
+    Given the browser and backend are on day 1
+    When I assimilate the note "Note 1"
+    And I am recalling my note on day 1
+    And I choose no I need more recall
+    And It's day 1, 13 hour
+    And I visit recall
+    And I choose yes I remember
+    And I visit the understanding memory tracker for "Note 1"
+    Then I should see Stability 6
+    And I should see 6 hours between last and next recall
+
+  @mockBrowserTime
   Scenario: Memory Tracker shows Stability and Again Difficulty after incorrect just-review
     Given the browser and backend are on day 1
     When I assimilate the note "Note 1"

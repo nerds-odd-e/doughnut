@@ -12,8 +12,8 @@ import org.junit.jupiter.api.Test;
 
 class SpacedRepetitionEarlyRecallAdjustmentTest extends SpacedRepetitionRecallSchedulingTestBase {
   @Test
-  void earlyCorrectGrowsLessThanOnTime() {
-    float early = nextStabilityHours(1);
+  void earlyLongTermCorrectGrowsLessThanOnTime() {
+    float early = nextStabilityHours(24);
     float onTime = nextStabilityHours(Math.round(STABILITY_HOURS));
     assertThat(early, greaterThanOrEqualTo(STABILITY_HOURS));
     assertThat(early, lessThan(onTime));

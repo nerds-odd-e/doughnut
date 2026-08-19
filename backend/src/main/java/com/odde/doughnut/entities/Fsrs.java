@@ -63,10 +63,13 @@ final class Fsrs {
     return (float) Math.round(nextDays * HOURS_PER_DAY);
   }
 
-  /** Elapsed 0 → FSRS-6 short-term next Stability; otherwise long-term Stability increase. */
+  /**
+   * Elapsed hours under 24 use FSRS-6 short-term next Stability; otherwise long-term Stability
+   * increase.
+   */
   static float hoursAfterShortTermOrStabilityIncrease(
       float stabilityHours, int grade, long elapsedInHours, double incrementTerm) {
-    if (elapsedInHours == 0) {
+    if (elapsedInHours < HOURS_PER_DAY) {
       return hoursAfterShortTermRecall(stabilityHours, grade);
     }
     return hoursAfterStabilityIncrease(stabilityHours, incrementTerm);

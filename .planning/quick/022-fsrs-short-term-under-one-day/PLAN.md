@@ -41,15 +41,13 @@ Proposed ADR 0003 Decision now uses elapsed **< 24** / **≥ 24**. Pin: Again �
 ### 2. On-time Good after first Again uses short-term Stability 6
 
 - **Type:** Behavior
-- **Status:** planned
+- **Status:** done
 
-**Pre:** New tracker, just-review No (S=**5**, D=`D0(1)`), then 5 whole hours later. **Trigger:** just-review Yes. **Post:** Stability **6**, due 6h after that grade.
+**Pre:** New tracker, just-review No (S=**5**), then 5 whole hours later. **Trigger:** just-review Yes. **Post:** Stability **6**, due 6h after that grade.
 
-- E2E: `e2e_test/features/recall/spaced_repetition.feature` (sibling of first-Again S=**5** and same-hour Good **55**). `@wip` until green.
-- Unit: change `correctRecallAfterNewAgainUsesLongTermGoodStability` to pin **6h** (same `MemoryTracker` path). Drive `elapsedInHours < 24` in `Fsrs.hoursAfterShortTermOrStabilityIncrease`.
-- Adjust `earlyCorrectGrowsLessThanOnTime` so “early long-term” uses elapsed **≥ 24**, not 1. Existing elapsed-0 pins stay.
+Live switch: `elapsedInHours < HOURS_PER_DAY` in `Fsrs.hoursAfterShortTermOrStabilityIncrease`. Unit pin renamed to `correctRecallAfterNewAgainUsesShortTermGoodStability` (6h). Early long-term fixture is `earlyLongTermCorrectGrowsLessThanOnTime` at elapsed **24**. E2E sibling in `spaced_repetition.feature` (recall starts hour 8; `It's day 1, 13 hour` is 5 elapsed).
 
-Hard/Easy inherit the same switch; do not add extra pins in this slice.
+**Learning:** GAP “Current code vs FSRS-6” now matches live `< 24` / `≥ 24`. Slice 3 still owns the 23 vs 24 clamp/growth pins.
 
 ### 3. Good at elapsed 23 is still short-term; 24 is long-term
 
