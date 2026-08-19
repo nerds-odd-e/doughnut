@@ -9,8 +9,7 @@ No production bug found. `elapsed < 24` matches Proposed ADR 0003. Confusion sti
 
 Meaningful leftover:
 
-- **Window tests split.** Same-hour / 23h After-Again on 72h live in `MemoryTrackerIncorrectRecallSchedulingTest`. Hard/Good/Easy window pins (including 23h vs 24h) already live in `MemoryTrackerSameHourRecallSchedulingTest`. `sameHourIncorrectRecallOnThreeDayStabilityUsesShortTermNotPostLapse` and `twentyThreeHourIncorrectRecallOnThreeDayStabilityUsesShortTermNotPostLapse` both assert **24**.
-- **Fencepost gap.** Good has `twentyFourHourCorrectRecallGrowsThreeDayStability`. After-Again pins 23h → **24** and on-time 72h → **17**, but not elapsed **24**. A `<= 24` slip would not fail those tests.
+- **Fencepost gap.** Good has `twentyFourHourCorrectRecallGrowsThreeDayStability`. After-Again pins elapsed **0**/**23** → **24** on `MemoryTrackerSameHourRecallSchedulingTest` (`nextStabilityHoursAfterAgain`) and on-time 72h → **17**, but not elapsed **24**. A `<= 24` slip would not fail those tests.
 
 ## Decisions
 
@@ -31,15 +30,9 @@ Deleted `sameHourIncorrectRecallAfterFirstGoodUsesShortTermStability`. E2E `Same
 ### 2. House After-Again window pins with the other short-term grades
 
 **Type:** Structure  
-**Status:** planned
+**Status:** done
 
-Enables slice 3 to add elapsed **24** next to Good’s 24h pin. No schedule change.
-
-- Move `sameHourIncorrectRecallOnThreeDayStabilityUsesShortTermNotPostLapse` and `twentyThreeHourIncorrectRecallOnThreeDayStabilityUsesShortTermNotPostLapse` into `MemoryTrackerSameHourRecallSchedulingTest`.
-- One parameterized pin: elapsed **0** and **23** on 72h / D=5 → Stability **24** (not post-lapse **17**). Reuse the base `nextStabilityHours` shape (Again helper), do not keep two methods that both assert **24**.
-- Keep 1h-floor and on-time **15** / **17** on `MemoryTrackerIncorrectRecallSchedulingTest`.
-
-**Done when:** window After-Again pins live with Hard/Good/Easy; one **24** assertion for 0h and 23h.
+One parameterized pin `againRecallOnThreeDayStabilityUsesShortTermNotPostLapse` (elapsed **0**, **23** → Stability **24**) on `MemoryTrackerSameHourRecallSchedulingTest`, via `nextStabilityHoursAfterAgain` (`recalledAgain`). 1h-floor and on-time **15** / **17** stay on IncorrectRecall.
 
 ### 3. Elapsed 24 After-Again uses post-lapse Stability 17
 
@@ -50,7 +43,7 @@ Enables slice 3 to add elapsed **24** next to Good’s 24h pin. No schedule chan
 **Trigger:** Again at elapsed **24**.  
 **Post:** Stability **17** (post-lapse), not short-term **24**.
 
-Add next to `twentyFourHourCorrectRecallGrowsThreeDayStability`. Unit only (same boundary as that Good pin; no new E2E).
+Add next to `twentyFourHourCorrectRecallGrowsThreeDayStability`, using `nextStabilityHoursAfterAgain(24)`. Unit only (same boundary as that Good pin; no new E2E). Do not fold elapsed **24** into the short-term parameterized pin (different expected S).
 
 **Done when:** elapsed **23** → **24** and elapsed **24** → **17** on the same 72h tracker.
 

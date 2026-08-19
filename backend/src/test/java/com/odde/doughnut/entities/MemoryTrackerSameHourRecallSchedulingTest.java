@@ -5,6 +5,8 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThan;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 class MemoryTrackerSameHourRecallSchedulingTest extends MemoryTrackerRecallSchedulingTestBase {
   @Test
@@ -46,6 +48,12 @@ class MemoryTrackerSameHourRecallSchedulingTest extends MemoryTrackerRecallSched
   @Test
   void twentyThreeHourCorrectRecallDoesNotShrinkThreeDayStability() {
     assertThat(nextStabilityHours(23), equalTo(STABILITY_HOURS));
+  }
+
+  @ParameterizedTest
+  @ValueSource(ints = {0, 23})
+  void againRecallOnThreeDayStabilityUsesShortTermNotPostLapse(int elapsedInHours) {
+    assertThat(nextStabilityHoursAfterAgain(elapsedInHours), equalTo(24.0f));
   }
 
   @Test

@@ -53,4 +53,11 @@ abstract class MemoryTrackerRecallSchedulingTestBase {
         TimestampOperations.addHoursToTimestamp(memoryTracker.getLastRecalledAt(), elapsedInHours));
     return memoryTracker.getStability();
   }
+
+  float nextStabilityHoursAfterAgain(int elapsedInHours) {
+    MemoryTracker memoryTracker = aGradedTrackerAtThreeDayStability();
+    memoryTracker.recalledAgain(
+        TimestampOperations.addHoursToTimestamp(memoryTracker.getLastRecalledAt(), elapsedInHours));
+    return memoryTracker.getStability();
+  }
 }
