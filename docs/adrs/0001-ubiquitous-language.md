@@ -31,10 +31,10 @@ terms here; do not supersede this ADR with a new one.
 | **Notebook group**             | Named catalog grouping of notebooks. Distinct from a **Circle**.                                                                                                                                                   |
 | **Circle**                     | Multi-user shared space with members and notebooks                                                                                                                                                                 |
 | **Bazaar**                     | Marketplace where notebooks are shared for others to browse and subscribe                                                                                                                                          |
-| **Wiki link**                  | In-content reference to a note. Doughnut-authored form is wiki `[[target]]` / `[[target|display]]` (optionally `Notebook:Title`). Path Markdown `[display](/folder/File.md)` is the same link, not a second kind. Spelling rules: [ADR 0004](./0004-okf-compatible-notebook-markdown.md). |
+| **Wiki link**                  | In-content reference to a note. Doughnut-authored form is wiki `[[target]]` / `[[target|display]]` (optionally `Notebook:Title`). Path Markdown `[display](/folder/File.md)` is the same link, not a second kind. Spelling rules: [ADR 0004](./0004-okf-compatible-notebook-markdown-accepted.md). |
 | **Property**                   | YAML frontmatter key–value on a note (scalar or one-level list). Distinct from a **relationship note**. A value may contain **wiki links**. Relation-like keys (`example of`, `a part of`) are still properties.   |
 | **Relationship**               | Typed association between notes (e.g. “similar to”, “a part of”)                                                                                                                                                   |
-| **Relationship note**          | A note that represents a relationship (`type: Relationship` in frontmatter), with source, target, and relation. Source and target are **wiki links** (same dual-spelling as the body; [ADR 0004](./0004-okf-compatible-notebook-markdown.md)). |
+| **Relationship note**          | A note that represents a relationship (`type: Relationship` in frontmatter), with source, target, and relation. Source and target are **wiki links** (same dual-spelling as the body; [ADR 0004](./0004-okf-compatible-notebook-markdown-accepted.md)). |
 | **Wikidata association**       | Binding a note to a Wikidata entity. The action is **Associate Wikidata**. Distinct from **Wikidata ID** (the Q-id).                                                                                               |
 | **Skip Memory Tracking**       | Notebook setting that opts the notebook out of the assimilation sequence and blocks Bazaar subscribe. Distinct from opting out of **recall**.                                                                      |
 
@@ -152,6 +152,6 @@ introduce a translation type that wraps one as the other.
 [spaced-repetition scheduling policy](./0003-spaced-repetition-scheduling-policy.md)
 (FSRS **review** = Doughnut **recall**; **Stability** / **New** /
 **Retrievability** / **RecallLog**); ADR 0004
-[OKF-compatible notebook Markdown](./0004-okf-compatible-notebook-markdown.md)
+[OKF-compatible notebook Markdown](./0004-okf-compatible-notebook-markdown-accepted.md)
 (portable Markdown profile)
 

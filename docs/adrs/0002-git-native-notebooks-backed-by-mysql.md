@@ -18,7 +18,7 @@ subscriptions, memory trackers, questions, and other Doughnut-specific
 behavior stay authoritative relational data.
 
 Local copies should be OKF-compatible Markdown trees (see
-[ADR 0004](./0004-okf-compatible-notebook-markdown.md)), real Git
+[ADR 0004](./0004-okf-compatible-notebook-markdown-accepted.md)), real Git
 repositories, free of Doughnut note IDs in the working tree, and syncable
 with Doughnut. Doughnut keeps stable internal identities privately so
 learning data stays attached across renames.
@@ -37,7 +37,7 @@ Authority and representation:
    commit they represent and must be rebuildable from that commit plus identity
    lineage. Do not mutate projected content outside an accepted revision.
 2. **OKF working tree, no internal IDs.** Canonical tree follows
-   [ADR 0004](./0004-okf-compatible-notebook-markdown.md). No note ID, UUID,
+   [ADR 0004](./0004-okf-compatible-notebook-markdown-accepted.md). No note ID, UUID,
    or sync manifest identity in the tree.
 3. **Private identity lineage.** Same path → same identity; unambiguous
    rename/folder-move → preserve; delete → tombstone (keep DB-only history);
@@ -101,7 +101,7 @@ Does not change Level 1 authority. Deferred until needed:
 - Superseded by: (none)
 - Links:
   - ADR-0000 [Use Architectural Decision Records](./0000-use-adrs-accepted.md)
-  - [ADR 0004 — OKF-compatible notebook Markdown](./0004-okf-compatible-notebook-markdown.md)
+  - [ADR 0004 — OKF-compatible notebook Markdown](./0004-okf-compatible-notebook-markdown-accepted.md)
   - [ADR playbook](./README.md)
   - [Open Knowledge Format v0.2](https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/SPEC.md)
   - [Git rename detection](https://git-scm.com/docs/git-status.html)
