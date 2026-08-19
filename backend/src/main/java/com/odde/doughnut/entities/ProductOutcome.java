@@ -10,8 +10,16 @@ public enum ProductOutcome {
   AGAIN,
   CONFUSION;
 
+  boolean isMappedGrade() {
+    return switch (this) {
+      case GOOD, EASY, HARD, AGAIN -> true;
+      case CONFUSION -> false;
+    };
+  }
+
   static String mappedGradeSqlInList() {
-    return Stream.of(GOOD, EASY, HARD, AGAIN)
+    return Stream.of(values())
+        .filter(ProductOutcome::isMappedGrade)
         .map(outcome -> "'" + outcome.name() + "'")
         .collect(Collectors.joining(", "));
   }
