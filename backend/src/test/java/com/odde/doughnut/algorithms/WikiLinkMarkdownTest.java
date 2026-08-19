@@ -61,41 +61,6 @@ class WikiLinkMarkdownTest {
   }
 
   @Test
-  void newInnerForUpdateVisibleText_plainLink() {
-    assertThat(
-        WikiLinkMarkdownRewrite.newInnerForUpdateVisibleText("OldTitle", "NewTitle"),
-        equalTo("NewTitle"));
-  }
-
-  @Test
-  void newInnerForUpdateVisibleText_keepsDisplaySegment() {
-    assertThat(
-        WikiLinkMarkdownRewrite.newInnerForUpdateVisibleText("OldTitle|custom label", "NewTitle"),
-        equalTo("NewTitle|custom label"));
-  }
-
-  @Test
-  void newInnerForUpdateVisibleText_keepsNotebookQualifier() {
-    assertThat(
-        WikiLinkMarkdownRewrite.newInnerForUpdateVisibleText("MyNb:OldTitle|x", "NewTitle"),
-        equalTo("MyNb:NewTitle|x"));
-  }
-
-  @Test
-  void newInnerForKeepVisibleText_plainLinkAddsDisplay() {
-    assertThat(
-        WikiLinkMarkdownRewrite.newInnerForKeepVisibleText("OldTitle", "NewTitle"),
-        equalTo("NewTitle|OldTitle"));
-  }
-
-  @Test
-  void newInnerForKeepVisibleText_preservesCustomDisplay() {
-    assertThat(
-        WikiLinkMarkdownRewrite.newInnerForKeepVisibleText("OldTitle|custom text", "NewTitle"),
-        equalTo("NewTitle|custom text"));
-  }
-
-  @Test
   void newInnerForKeepVisibleText_qualifiedPlainLink() {
     assertThat(
         WikiLinkMarkdownRewrite.newInnerForKeepVisibleText("MyNb:OldTitle", "NewTitle"),
@@ -132,14 +97,6 @@ class WikiLinkMarkdownTest {
   }
 
   @Test
-  void newInnerForQualifyUnqualifiedOutgoingLink_plainLinkAddsSourceNotebookAndDisplay() {
-    assertThat(
-        WikiLinkMarkdownRewrite.newInnerForQualifyUnqualifiedOutgoingLink(
-            "Target", "Source Notebook"),
-        equalTo("Source Notebook:Target|Target"));
-  }
-
-  @Test
   void newInnerForQualifyUnqualifiedOutgoingLink_preservesCustomDisplay() {
     assertThat(
         WikiLinkMarkdownRewrite.newInnerForQualifyUnqualifiedOutgoingLink(
@@ -153,14 +110,6 @@ class WikiLinkMarkdownTest {
         WikiLinkMarkdownRewrite.newInnerForQualifyUnqualifiedOutgoingLink(
             "Target|", "Source Notebook"),
         equalTo("Source Notebook:Target|Target"));
-  }
-
-  @Test
-  void newInnerForQualifyUnqualifiedOutgoingLink_keepsAlreadyQualifiedPlainLink() {
-    assertThat(
-        WikiLinkMarkdownRewrite.newInnerForQualifyUnqualifiedOutgoingLink(
-            "Other Notebook:Target", "Source Notebook"),
-        equalTo("Other Notebook:Target"));
   }
 
   @Test

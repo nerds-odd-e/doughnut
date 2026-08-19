@@ -1,6 +1,6 @@
 # Plan: Dual-spelling leftover bugs and test pins
 
-**Status:** in progress
+**Status:** done
 
 **Goal:** After 014 (dead path-Markdown retarget, co-move matching, first pass of overlapping tests), fix the leftover user-visible retarget bug and finish pinning dual-spelling at one stable boundary. Do not reopen conversion, P9, or frontmatter dual-spelling.
 
@@ -29,7 +29,7 @@ Inspection of commits `97c91ba7e3`, `d3f1271066`, `94ffdf077d`.
 - `SearchForm.onDeadWikiLinkToNote` used `String.replace` (first match only). Slice 1 switched to `replaceAll`; mounted SearchForm pins two identical path-Markdown tokens. Wiki tokens share that path.
 - `isPathMarkdownWikiTitle` now delegates to `hrefLooksLikeConceptNotePath` (same frontend rule as retarget; rejects `/n42` and `//…`). Java `isConceptPathHref` stays separate.
 - Path-Markdown retarget suffix matrix (`.md` / no `.md`) is pinned only on mounted SearchForm `it.each`. E2E retarget is one `.md` scenario (follow + persist).
-- 014 slice 3 deleted path-prefix / folder-rename duplicates in `WikiLinkMarkdownTest` but left wiki title and qualify `newInner*` cases that still only repeat `TextContentControllerUpdateNoteTitleInboundWikiReferencesTests` and `RelationControllerTests` outgoing qualify.
+- 014 slice 3 deleted path-prefix / folder-rename duplicates in `WikiLinkMarkdownTest`. Slice 4 dropped the remaining wiki-title and qualify `newInner*` cases that only repeated controller outcomes.
 
 ## Slices
 
@@ -59,18 +59,6 @@ Mounted SearchForm `it.each` keeps `.md` / no `.md`. `path_markdown_link.feature
 ### 4. WikiLinkMarkdown rewrite tests pin only unique algorithm edges
 
 - **Type:** Structure
-- **Status:** planned
+- **Status:** done
 
-No user-facing change. Delete `WikiLinkMarkdownTest` cases that only repeat controller title-rename / outgoing-qualify outcomes:
-
-- `newInnerForUpdateVisibleText_plainLink`
-- `newInnerForUpdateVisibleText_keepsDisplaySegment`
-- `newInnerForUpdateVisibleText_keepsNotebookQualifier`
-- `newInnerForKeepVisibleText_plainLinkAddsDisplay`
-- `newInnerForKeepVisibleText_preservesCustomDisplay`
-- `newInnerForQualifyUnqualifiedOutgoingLink_plainLinkAddsSourceNotebookAndDisplay`
-- `newInnerForQualifyUnqualifiedOutgoingLink_keepsAlreadyQualifiedPlainLink`
-
-Keep unique edges: extract/parse; nested same-name folder vs title; unqualified title unchanged on folder rename; KEEP_VISIBLE path-Markdown label; empty-pipe / blank inner; qualify custom display and already-qualified-with-display; whitespace-in-`[[ ]]` replace.
-
-Existing controller tests still pass.
+Deleted seven `WikiLinkMarkdownTest` `newInner*` cases that only repeated controller title-rename / outgoing-qualify. Unique algorithm edges remain.
