@@ -8,9 +8,15 @@ final class FsrsAgainRecall {
   private FsrsAgainRecall() {}
 
   static float hoursAfterAgainRecall(float stabilityHours, float difficulty, long elapsedInHours) {
-    if (elapsedInHours < HOURS_PER_DAY) {
-      return Fsrs.hoursAfterShortTermRecall(stabilityHours, Fsrs.AGAIN);
-    }
+    return Fsrs.hoursAfterShortTermOrLongTerm(
+        stabilityHours,
+        Fsrs.AGAIN,
+        elapsedInHours,
+        hoursAfterPostLapse(stabilityHours, difficulty, elapsedInHours));
+  }
+
+  private static float hoursAfterPostLapse(
+      float stabilityHours, float difficulty, long elapsedInHours) {
     double stabilityDays = stabilityHours / HOURS_PER_DAY;
     double retrievability = Fsrs.retrievabilityFromHours(stabilityHours, elapsedInHours);
     double nextDays =

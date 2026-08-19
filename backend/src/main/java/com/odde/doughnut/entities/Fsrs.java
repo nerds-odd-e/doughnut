@@ -121,19 +121,22 @@ public final class Fsrs {
   }
 
   /**
-   * Elapsed hours under 24 use FSRS-6 short-term next Stability; otherwise long-term Stability
-   * increase.
+   * Elapsed hours under 24 use FSRS-6 short-term next Stability for all four G; otherwise the
+   * long-term continuation (Stability increase for Hard/Good/Easy, post-lapse for Again).
    */
-  static float hoursAfterShortTermOrStabilityIncrease(
-      float stabilityHours, int grade, long elapsedInHours, double incrementTerm) {
+  static float hoursAfterShortTermOrLongTerm(
+      float stabilityHours, int grade, long elapsedInHours, float longTermHours) {
     if (elapsedInHours < HOURS_PER_DAY) {
       return hoursAfterShortTermRecall(stabilityHours, grade);
     }
-    return hoursAfterStabilityIncrease(stabilityHours, incrementTerm);
+    return longTermHours;
   }
 
-  /** Published FSRS-6 short-term next Stability. Clamp SInc ≥ 1 only for G ≥ Hard. Floor 1 hour. */
-  static float hoursAfterShortTermRecall(float stabilityHours, int grade) {
+  /**
+   * Published FSRS-6 short-term next Stability. Clamp SInc ≥ 1 only for G ≥ Hard; Again (G=1) may
+   * shrink. Floor 1 hour.
+   */
+  private static float hoursAfterShortTermRecall(float stabilityHours, int grade) {
     double stabilityDays = stabilityHours / HOURS_PER_DAY;
     double sInc = Math.exp(W[17] * (grade - GOOD + W[18])) * Math.pow(stabilityDays, -W[19]);
     if (grade >= HARD) {

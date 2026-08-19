@@ -1,6 +1,6 @@
 # Plan: FSRS-6 short-term After-Again
 
-**Status:** in progress  
+**Status:** complete  
 **Goal:** When Stability > 0 and elapsed whole hours are **< 24**, Again uses the same published FSRS-6 short-term `S'(S,G)` as Hard/Good/Easy. Elapsed **≥ 24** stays post-lapse. Existing S/D/due change going forward only.
 
 ## Decisions (accepted 2026-08-19)
@@ -51,22 +51,14 @@ Proposed ADR 0003 Decision uses one `< 24` / `S > 0` gate for all four G. Status
 
 Same-hour just-review No after first Good is Stability **18** / **18h** due (not post-lapse **15**). Unit pins: 72h same-hour and elapsed 23 → **24**; long-term on-time 72h **17** and after first Good **15** unchanged. `FsrsAgainRecall` uses `hoursAfterShortTermRecall` when elapsed **< 24**; SInc ≥ 1 only for G ≥ Hard; 1h floor.
 
-**Learning:** TDD red was same-hour post-lapse **13**, not on-time **15**. The short-term formula is not duplicated; slice 3 still has a separate `< 24` gate in `FsrsAgainRecall` plus tracker/docs.
+**Learning:** TDD red was same-hour post-lapse **13**, not on-time **15**.
 
 ### 3. Short-term After-Again leftover cohesion
 
 **Type:** Structure  
-**Status:** planned
+**Status:** done
 
-No new user-visible schedule. Existing tests stay green.
-
-- One short-term entry for all four G (`hoursAfterShortTermRecall` / the `< 24` branch). Formula is already shared; collapse the extra `< 24` gate in `FsrsAgainRecall` if success and Again can share it.
-- Comments: SInc ≥ 1 is for **G ≥ 2**, not “so S does not shrink” for every grade.
-- Close the exception in `.planning/research/FSRS-COMPATIBILITY-GAP.md`, `SEED-004`, and `STATE.md`. Remaining deferred is still **E4** plus **accept ADR 0003**.
-- Prune spent “Again is post-lapse at 0 and 5” wording once the Decision and code agree.
-- Do not squash Flyway. Do not add a backfill.
-
-**Done when:** one short-term path; trackers match the shipped rule; no leftover dual Again formula.
+One elapsed `< 24` gate: `Fsrs.hoursAfterShortTermOrLongTerm`. Hard/Good/Easy continue with Stability increase; Again continues with post-lapse. Trackers match the shipped rule. Remaining deferred is still **E4** plus **accept ADR 0003**.
 
 ## Not this plan
 

@@ -7,10 +7,12 @@ final class FsrsEasyRecall {
   private FsrsEasyRecall() {}
 
   static float hoursAfterEasyRecall(float stabilityHours, float difficulty, long elapsedInHours) {
-    return Fsrs.hoursAfterShortTermOrStabilityIncrease(
+    return Fsrs.hoursAfterShortTermOrLongTerm(
         stabilityHours,
         Fsrs.EASY,
         elapsedInHours,
-        Fsrs.goodIncrementTermFromHours(stabilityHours, difficulty, elapsedInHours) * W[16]);
+        Fsrs.hoursAfterStabilityIncrease(
+            stabilityHours,
+            Fsrs.goodIncrementTermFromHours(stabilityHours, difficulty, elapsedInHours) * W[16]));
   }
 }
