@@ -91,17 +91,18 @@ describe("CommissionLearningSessionDialog", () => {
     const recordSpy = mockSdkService(LearningSessionController, "record", {
       recordedAt: "1989-01-02T09:00:00Z",
       recordedItems: [
-        { noteTitle: "Hola", score: 5, memoryTrackerId: 11 },
+        { noteTitle: "Hola", score: 4, memoryTrackerId: 11 },
         { noteTitle: "Gracias", score: 1, memoryTrackerId: 12 },
       ],
       rejectedEntries: [],
     })
     const wrapper = await openRequestMode()
+    const reportMarkdown = "# Learning Session Report\n\nHola: 4\nGracias: 1\n"
 
     const reportTextarea = document.body.querySelector(
       '[data-test="learning-session-report"]'
     ) as HTMLTextAreaElement
-    reportTextarea.value = "# Learning Session Report\n\nHola: 5\nGracias: 1\n"
+    reportTextarea.value = reportMarkdown
     reportTextarea.dispatchEvent(new Event("input"))
 
     await clickRecordReportSubmit()
@@ -109,7 +110,7 @@ describe("CommissionLearningSessionDialog", () => {
     expect(recordSpy).toHaveBeenCalledWith({
       body: {
         notebookId: 42,
-        reportMarkdown: "# Learning Session Report\n\nHola: 5\nGracias: 1\n",
+        reportMarkdown,
       },
       query: { timezone: expect.any(String) },
     })
@@ -122,14 +123,14 @@ describe("CommissionLearningSessionDialog", () => {
       document.body.querySelector(
         '[data-test="learning-session-recorded-items"]'
       )?.textContent
-    ).toContain("Hola: 5")
+    ).toContain("Hola: 4")
     expect(wrapper.emitted("recorded")).toBeTruthy()
   })
 
   it("shows rejection warning on partial success", async () => {
     mockSdkService(LearningSessionController, "record", {
       recordedAt: "1989-01-02T09:00:00Z",
-      recordedItems: [{ noteTitle: "Hola", score: 5, memoryTrackerId: 11 }],
+      recordedItems: [{ noteTitle: "Hola", score: 4, memoryTrackerId: 11 }],
       rejectedEntries: [
         {
           line: "Unknown: 3",

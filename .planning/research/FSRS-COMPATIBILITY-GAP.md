@@ -1,6 +1,6 @@
 # Doughnut ↔ open FSRS gap (toward ADR 0003)
 
-**Status:** Interval fuzz is **closed** (not used; due follows S). Thinking-time overlay is **closed** (RT is not a DSR input). New last recall is **closed** (`lastRecalledAt` is the last mapped grade; New has none). Proposed ADR 0003/0005 Decision locks commissioned Tutor scores as **1–4**, identical to FSRS G (`1` Again, `2` Hard, `3` Good, `4` Easy); delivery: [`.planning/quick/019-tutor-scores-1-4/`](../quick/019-tutor-scores-1-4/PLAN.md). Remaining deferred: **E4** fitting, plus **accept ADR 0003** (human). Shipped FSRS-6 locks live in ADR 0003 Decision and code.
+**Status:** Interval fuzz is **closed** (not used; due follows S). Thinking-time overlay is **closed** (RT is not a DSR input). New last recall is **closed** (`lastRecalledAt` is the last mapped grade; New has none). Proposed ADR 0003/0005 Decision locks commissioned Tutor scores as **1–4**, identical to FSRS G (`1` Again, `2` Hard, `3` Good, `4` Easy). Remaining deferred: **E4** fitting, plus **accept ADR 0003** (human). Shipped FSRS-6 locks live in ADR 0003 Decision and code.
 
 **Updated:** 2026-08-19
 
@@ -27,7 +27,6 @@ Humans still own accept / reject / supersede of ADR 0003 (`docs/adrs/README.md`)
 - [ADR 0003](../../docs/adrs/0003-spaced-repetition-scheduling-policy.md) (Proposed)
 - [ADR 0001](../../docs/adrs/0001-ubiquitous-language.md) — **recall** vs FSRS **review**; **New** = ungraded
 - [ADR 0005](../../docs/adrs/0005-commissioned-learning-session-protocol.md) — Tutor 1–4 meaning (`score = G`)
-- Commissioned 1–4 identity delivery: [`.planning/quick/019-tutor-scores-1-4/`](../quick/019-tutor-scores-1-4/PLAN.md)
 - Seed: [SEED-004](../seeds/SEED-004-close-spaced-repetition-scheduling-policy-gap.md)
 - Code: `ForgettingCurve`, `MemoryTracker`, `SpacedRepetitionAlgorithm`
 - [FSRS-6 algorithm](https://github.com/open-spaced-repetition/awesome-fsrs/wiki/The-Algorithm)
