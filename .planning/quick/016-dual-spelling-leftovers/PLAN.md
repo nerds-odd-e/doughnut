@@ -28,7 +28,7 @@ Inspection of commits `97c91ba7e3`, `d3f1271066`, `94ffdf077d`.
 
 - `SearchForm.onDeadWikiLinkToNote` used `String.replace` (first match only). Slice 1 switched to `replaceAll`; mounted SearchForm pins two identical path-Markdown tokens. Wiki tokens share that path.
 - `isPathMarkdownWikiTitle` now delegates to `hrefLooksLikeConceptNotePath` (same frontend rule as retarget; rejects `/n42` and `//…`). Java `isConceptPathHref` stays separate.
-- Path-Markdown retarget suffix matrix (`.md` / no `.md`) is pinned twice: `SearchDialog.deadWikiLink.spec.ts` `it.each` and `path_markdown_link.feature` outline.
+- Path-Markdown retarget suffix matrix (`.md` / no `.md`) is pinned only on mounted SearchForm `it.each`. E2E retarget is one `.md` scenario (follow + persist).
 - 014 slice 3 deleted path-prefix / folder-rename duplicates in `WikiLinkMarkdownTest` but left wiki title and qualify `newInner*` cases that still only repeat `TextContentControllerUpdateNoteTitleInboundWikiReferencesTests` and `RelationControllerTests` outgoing qualify.
 
 ## Slices
@@ -52,9 +52,9 @@ Pinned on mounted SearchForm (`SearchDialog.deadWikiLink.spec.ts`); `onDeadWikiL
 ### 3. Path-Markdown retarget suffix is pinned once
 
 - **Type:** Structure
-- **Status:** planned
+- **Status:** done
 
-No user-facing change. Keep the mounted `SearchForm` `it.each` (`.md` / no `.md`) as the suffix matrix. Collapse `path_markdown_link.feature` retarget outline to **one** example (keep `.md`). Existing controller, mounted, and remaining E2E still pass.
+Mounted SearchForm `it.each` keeps `.md` / no `.md`. `path_markdown_link.feature` retarget is one `.md` scenario.
 
 ### 4. WikiLinkMarkdown rewrite tests pin only unique algorithm edges
 

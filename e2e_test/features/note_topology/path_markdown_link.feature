@@ -47,14 +47,14 @@ Feature: Path Markdown links in notes
     And the note content markdown source should not contain "[["
 
   @mockBrowserTime
-  Scenario Outline: Pointing a dead path Markdown link at an existing note keeps Markdown
+  Scenario: Pointing a dead path Markdown link at an existing note keeps Markdown
     Given I have a notebook "WikiPathMdPointNB" with notes:
       | Title                  | Folder                 |
       | WikiPathMdPointTitle   | WikiPathMdChosenFolder |
       | WikiPathMdPointCarrier | WikiPathMdPointRoot    |
     When I update note "WikiPathMdPointCarrier" content using markdown to become:
       """
-      See <dead_markdown>.
+      See [label](/WikiPathMdDeadFolder/WikiPathMdMissing.md).
       """
     Then I should see the note content rendered as:
       | Kind           | Text  |
@@ -64,15 +64,10 @@ Feature: Path Markdown links in notes
       | Kind           | Text  |
       | live wiki link | label |
     When I view the note content as markdown
-    Then the note content markdown source should contain "<expected_markdown>"
+    Then the note content markdown source should contain "[label](/WikiPathMdChosenFolder/WikiPathMdPointTitle.md)"
     And the note content markdown source should not contain "[["
     When I view the note content as rich content
     Then following the wiki link "label" should open the note titled "WikiPathMdPointTitle"
-
-    Examples:
-      | dead_markdown                                       | expected_markdown                                              |
-      | [label](/WikiPathMdDeadFolder/WikiPathMdMissing.md) | [label](/WikiPathMdChosenFolder/WikiPathMdPointTitle.md)       |
-      | [label](/WikiPathMdDeadFolder/WikiPathMdMissing)    | [label](/WikiPathMdChosenFolder/WikiPathMdPointTitle)          |
 
   Scenario: Renaming a referenced note rewrites path Markdown hrefs and keeps Markdown
     Given I have a notebook "WikiPathMdRenameNB" with notes:
