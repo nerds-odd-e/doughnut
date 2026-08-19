@@ -1,6 +1,6 @@
 import type { NotebookRealm } from "@generated/doughnut-backend-api"
 import type { NotebookCatalogEntry } from "@/components/notebook/patchNotebookInCatalogItems"
-import type { SidebarPeerSortSpec } from "@/composables/useNoteSidebarPeerSort"
+import type { PeerSortSpec } from "@/composables/usePeerSort"
 
 function parseTime(iso: string | undefined): number {
   if (iso == null || iso === "") return Number.NaN
@@ -61,7 +61,7 @@ function catalogUpdatedTime(item: NotebookCatalogEntry): number {
 function compareCatalogEntries(
   a: NotebookCatalogEntry,
   b: NotebookCatalogEntry,
-  spec: SidebarPeerSortSpec
+  spec: PeerSortSpec
 ): number {
   if (spec.field === "title") {
     const cmp = topLevelTitle(a).localeCompare(topLevelTitle(b), undefined, {
@@ -93,7 +93,7 @@ function compareCatalogEntries(
 function compareGroupMembers(
   a: NotebookRealm,
   b: NotebookRealm,
-  spec: SidebarPeerSortSpec
+  spec: PeerSortSpec
 ): number {
   if (spec.field === "title") {
     const ta = a.notebook.name ?? ""
@@ -124,7 +124,7 @@ function compareGroupMembers(
 
 export function sortNotebookCatalogByPeerSpec(
   items: NotebookCatalogEntry[],
-  spec: SidebarPeerSortSpec
+  spec: PeerSortSpec
 ): NotebookCatalogEntry[] {
   const sortedTop = [...items].sort((a, b) => compareCatalogEntries(a, b, spec))
   return sortedTop.map((item) => {

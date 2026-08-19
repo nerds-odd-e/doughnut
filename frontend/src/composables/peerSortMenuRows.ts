@@ -6,15 +6,15 @@ import {
   ClockArrowDown,
   ClockArrowUp,
 } from "@lucide/vue"
-import type { SidebarPeerSortSpec } from "@/composables/useNoteSidebarPeerSort"
+import type { PeerSortSpec } from "@/composables/usePeerSort"
 
-export type SidebarPeerSortMenuRow = {
-  spec: SidebarPeerSortSpec
+export type PeerSortMenuRow = {
+  spec: PeerSortSpec
   label: string
   Icon: typeof ArrowDownAZ
 }
 
-export const SIDEBAR_PEER_SORT_MENU_ROWS: SidebarPeerSortMenuRow[] = [
+export const PEER_SORT_MENU_ROWS: PeerSortMenuRow[] = [
   {
     spec: { field: "title", direction: "asc" },
     label: "Title (A–Z)",
@@ -46,3 +46,14 @@ export const SIDEBAR_PEER_SORT_MENU_ROWS: SidebarPeerSortMenuRow[] = [
     Icon: ClockArrowUp,
   },
 ]
+
+function peerSortMenuRowMatching(spec: PeerSortSpec) {
+  return PEER_SORT_MENU_ROWS.find(
+    (row) =>
+      row.spec.field === spec.field && row.spec.direction === spec.direction
+  )
+}
+
+export function peerSortTriggerIcon(spec: PeerSortSpec) {
+  return peerSortMenuRowMatching(spec)?.Icon ?? ArrowDownAZ
+}

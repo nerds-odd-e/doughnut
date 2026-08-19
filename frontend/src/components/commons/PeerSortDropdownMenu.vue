@@ -1,7 +1,7 @@
 <template>
   <DropdownMenu size="wide">
     <DropdownMenuItem
-      v-for="row in SIDEBAR_PEER_SORT_MENU_ROWS"
+      v-for="row in PEER_SORT_MENU_ROWS"
       :key="`${row.spec.field}-${row.spec.direction}`"
     >
       <DropdownMenuActionButton
@@ -24,14 +24,14 @@
 </template>
 
 <script setup lang="ts">
-import { SIDEBAR_PEER_SORT_MENU_ROWS } from "@/composables/sidebarPeerSortMenuRows"
-import type { SidebarPeerSortSpec } from "@/composables/useNoteSidebarPeerSort"
+import { PEER_SORT_MENU_ROWS } from "@/composables/peerSortMenuRows"
+import type { PeerSortSpec } from "@/composables/usePeerSort"
 import DropdownMenu from "@/components/commons/DropdownMenu.vue"
 import DropdownMenuActionButton from "@/components/commons/DropdownMenuActionButton.vue"
 import DropdownMenuItem from "@/components/commons/DropdownMenuItem.vue"
 
 defineEmits<{
-  (e: "select", spec: SidebarPeerSortSpec): void
+  (e: "select", spec: PeerSortSpec): void
 }>()
 
 defineProps<{

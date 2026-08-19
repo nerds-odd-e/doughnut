@@ -1,5 +1,5 @@
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
-import { NOTE_SIDEBAR_PEER_SORT_STORAGE_KEY } from "@/composables/useNoteSidebarPeerSort"
+import { PEER_SORT_STORAGE_KEY } from "@/composables/usePeerSort"
 import createNoteStorage from "@/store/createNoteStorage"
 import makeMe from "doughnut-test-fixtures/makeMe"
 import helper from "@tests/helpers"
@@ -108,7 +108,7 @@ describe("Sidebar peer sort", () => {
     await chooseTitleZa()
 
     wrapper.unmount()
-    sessionStorage.removeItem(NOTE_SIDEBAR_PEER_SORT_STORAGE_KEY)
+    sessionStorage.removeItem(PEER_SORT_STORAGE_KEY)
 
     wrapper = mountSidebarSignedIn(helper, activeA, nbId)
     await flushUntilTwoRootFolderLabels()

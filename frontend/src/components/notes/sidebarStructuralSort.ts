@@ -1,5 +1,5 @@
 import type { Folder, NoteTopology } from "@generated/doughnut-backend-api"
-import type { SidebarPeerSortSpec } from "@/composables/useNoteSidebarPeerSort"
+import type { PeerSortSpec } from "@/composables/usePeerSort"
 
 export type SidebarStructuralRow =
   | { kind: "note"; noteTopology: NoteTopology }
@@ -53,7 +53,7 @@ function compareDates(
 function compare(
   a: SidebarStructuralRow,
   b: SidebarStructuralRow,
-  spec: SidebarPeerSortSpec
+  spec: PeerSortSpec
 ): number {
   let cmp = 0
   if (spec.field === "title") {
@@ -75,7 +75,7 @@ function compare(
 
 export function sortSidebarStructuralRows(
   rows: SidebarStructuralRow[],
-  spec: SidebarPeerSortSpec
+  spec: PeerSortSpec
 ): SidebarStructuralRow[] {
   type FolderRow = Extract<SidebarStructuralRow, { kind: "folder" }>
   type NoteRow = Extract<SidebarStructuralRow, { kind: "note" }>

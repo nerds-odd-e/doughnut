@@ -1,4 +1,4 @@
-import { NOTE_SIDEBAR_PEER_SORT_STORAGE_KEY } from "@/composables/useNoteSidebarPeerSort"
+import { PEER_SORT_STORAGE_KEY } from "@/composables/usePeerSort"
 import { invalidateSidebarListingCache } from "@/components/notes/sidebarFolderListingCache"
 import type { ApiStatus } from "@/managedApi/ApiStatusHandler"
 import {
@@ -129,9 +129,9 @@ export function setupDefaultSidebarSdkMocks(fixtures: SidebarTreeFixtures) {
   )
 }
 
-export function resetSidebarPeerSortStorage() {
-  sessionStorage.removeItem(NOTE_SIDEBAR_PEER_SORT_STORAGE_KEY)
-  localStorage.removeItem(NOTE_SIDEBAR_PEER_SORT_STORAGE_KEY)
+export function resetPeerSortStorage() {
+  sessionStorage.removeItem(PEER_SORT_STORAGE_KEY)
+  localStorage.removeItem(PEER_SORT_STORAGE_KEY)
 }
 
 export function prepareSidebarDefaultMountContext(options: {
@@ -143,7 +143,7 @@ export function prepareSidebarDefaultMountContext(options: {
   }
 }) {
   invalidateSidebarListingCache()
-  resetSidebarPeerSortStorage()
+  resetPeerSortStorage()
   options.storageAccessor.value = createNoteStorage()
   seedDefaultTreeRealmsInStorage(options.storageAccessor, options.fixtures)
   setupDefaultSidebarSdkMocks(options.fixtures)

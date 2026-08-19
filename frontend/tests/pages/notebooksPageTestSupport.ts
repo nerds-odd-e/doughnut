@@ -6,17 +6,16 @@ import { NotebookController } from "@generated/doughnut-backend-api/sdk.gen"
 import type { NotebookCatalogEntry } from "@/components/notebook/patchNotebookInCatalogItems"
 import NotebooksPage from "@/pages/NotebooksPage.vue"
 import NotebooksPageView from "@/pages/NotebooksPageView.vue"
-import { NOTE_SIDEBAR_PEER_SORT_STORAGE_KEY } from "@/composables/useNoteSidebarPeerSort"
+import { PEER_SORT_STORAGE_KEY } from "@/composables/usePeerSort"
 import helper, { mockSdkService } from "@tests/helpers"
 import makeMe from "doughnut-test-fixtures/makeMe"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
 import type { Router } from "vue-router"
 
 export function clearNotebooksPageStorage() {
-  localStorage.removeItem("doughnut.notebooksPage.sortOrder")
   localStorage.removeItem("doughnut.notebooksPage.layout")
-  sessionStorage.removeItem(NOTE_SIDEBAR_PEER_SORT_STORAGE_KEY)
-  localStorage.removeItem(NOTE_SIDEBAR_PEER_SORT_STORAGE_KEY)
+  sessionStorage.removeItem(PEER_SORT_STORAGE_KEY)
+  localStorage.removeItem(PEER_SORT_STORAGE_KEY)
 }
 
 export function catalogHeadingTexts(wrapper: VueWrapper) {

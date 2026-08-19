@@ -47,7 +47,7 @@
               aria-hidden="true"
             />
           </summary>
-          <SidebarPeerSortDropdownMenu
+          <PeerSortDropdownMenu
             catalog-sort-buttons
             @select="(spec) => selectCatalogPeerSort(spec, closeDropdown)"
           />
@@ -146,7 +146,7 @@
 <script setup lang="ts">
 import type { PropType } from "vue"
 import { computed, onMounted, ref } from "vue"
-import { ArrowDownAZ, LayoutGrid, List, Search, X } from "@lucide/vue"
+import { LayoutGrid, List, Search, X } from "@lucide/vue"
 import type {
   Notebook,
   SubscriptionForNotebooksListing,
@@ -154,18 +154,15 @@ import type {
 } from "@generated/doughnut-backend-api"
 import type { NotebookCatalogEntry } from "@/components/notebook/patchNotebookInCatalogItems"
 import { sortNotebookCatalogByPeerSpec } from "@/components/notebook/sortNotebookCatalogByPeerSpec"
-import { SIDEBAR_PEER_SORT_MENU_ROWS } from "@/composables/sidebarPeerSortMenuRows"
+import { peerSortTriggerIcon } from "@/composables/peerSortMenuRows"
 import { useNotebooksLayout } from "@/composables/useNotebooksLayout"
-import {
-  useNoteSidebarPeerSort,
-  type SidebarPeerSortSpec,
-} from "@/composables/useNoteSidebarPeerSort"
+import { usePeerSort, type PeerSortSpec } from "@/composables/usePeerSort"
 import NotebookNewButton from "@/components/notebook/NotebookNewButton.vue"
 import NotebookCatalogSection from "@/components/notebook/NotebookCatalogSection.vue"
 import { filterNotebookCatalogItems } from "@/components/notebook/filterNotebookCatalogItems"
 import GlobalBar from "@/components/toolbars/GlobalBar.vue"
 import AutoCollapseDropdown from "@/components/commons/AutoCollapseDropdown.vue"
-import SidebarPeerSortDropdownMenu from "@/components/notes/SidebarPeerSortDropdownMenu.vue"
+import PeerSortDropdownMenu from "@/components/commons/PeerSortDropdownMenu.vue"
 
 const props = defineProps({
   catalogItems: {
@@ -192,22 +189,14 @@ const handleNotebookUpdated = (updatedNotebook: Notebook) => {
 }
 
 const { notebooksLayout } = useNotebooksLayout()
-const { sortPeerSpec, setSortPeerSpec } = useNoteSidebarPeerSort()
+const { peerSortSpec, setPeerSortSpec } = usePeerSort()
 
-const catalogPeerSortTriggerIcon = computed(() => {
-  const match = SIDEBAR_PEER_SORT_MENU_ROWS.find(
-    (row) =>
-      row.spec.field === sortPeerSpec.value.field &&
-      row.spec.direction === sortPeerSpec.value.direction
-  )
-  return match?.Icon ?? ArrowDownAZ
-})
+const catalogPeerSortTriggerIcon = computed(() =>
+  peerSortTriggerIcon(peerSortSpec.value)
+)
 
-function selectCatalogPeerSort(
-  spec: SidebarPeerSortSpec,
-  closeDropdown: () => void
-) {
-  setSortPeerSpec(spec)
+function selectCatalogPeerSort(spec: PeerSortSpec, closeDropdown: () => void) {
+  setPeerSortSpec(spec)
   closeDropdown()
 }
 const filterText = ref("")
@@ -219,7 +208,7 @@ const filteredCatalogItems = computed(() =>
       props.catalogItems,
       filterText.value.trim().toLowerCase()
     ),
-    sortPeerSpec.value
+    peerSortSpec.value
   )
 )
 

@@ -36,7 +36,7 @@
         >
           <component :is="triggerIcon" class="w-6 h-6" aria-hidden="true" />
         </summary>
-        <SidebarPeerSortDropdownMenu
+        <PeerSortDropdownMenu
           @select="(spec) => selectSort(spec, closeDropdown)"
         />
       </AutoCollapseDropdown>
@@ -50,13 +50,10 @@ import type {
   FolderRealm,
   NoteRealm,
 } from "@generated/doughnut-backend-api"
-import { SIDEBAR_PEER_SORT_MENU_ROWS } from "@/composables/sidebarPeerSortMenuRows"
-import SidebarPeerSortDropdownMenu from "./SidebarPeerSortDropdownMenu.vue"
-import {
-  useNoteSidebarPeerSort,
-  type SidebarPeerSortSpec,
-} from "@/composables/useNoteSidebarPeerSort"
-import { ArrowDownAZ, FolderPlus } from "@lucide/vue"
+import { peerSortTriggerIcon } from "@/composables/peerSortMenuRows"
+import PeerSortDropdownMenu from "@/components/commons/PeerSortDropdownMenu.vue"
+import { usePeerSort, type PeerSortSpec } from "@/composables/usePeerSort"
+import { FolderPlus } from "@lucide/vue"
 import { computed } from "vue"
 import AutoCollapseDropdown from "@/components/commons/AutoCollapseDropdown.vue"
 import FolderNewButton from "./core/FolderNewButton.vue"
@@ -79,19 +76,12 @@ const { parentFolderForCreation } = useNoteCreationToolbarContext(() => ({
   activeFolderRealm: props.activeFolderRealm,
 }))
 
-const { sortPeerSpec, setSortPeerSpec } = useNoteSidebarPeerSort()
+const { peerSortSpec, setPeerSortSpec } = usePeerSort()
 
-const triggerIcon = computed(() => {
-  const match = SIDEBAR_PEER_SORT_MENU_ROWS.find(
-    (row) =>
-      row.spec.field === sortPeerSpec.value.field &&
-      row.spec.direction === sortPeerSpec.value.direction
-  )
-  return match?.Icon ?? ArrowDownAZ
-})
+const triggerIcon = computed(() => peerSortTriggerIcon(peerSortSpec.value))
 
-function selectSort(spec: SidebarPeerSortSpec, closeDropdown: () => void) {
-  setSortPeerSpec(spec)
+function selectSort(spec: PeerSortSpec, closeDropdown: () => void) {
+  setPeerSortSpec(spec)
   closeDropdown()
 }
 </script>
