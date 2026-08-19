@@ -52,6 +52,35 @@ class RecallLogDsrBackfillTest {
   }
 
   @Test
+  void rebuildsLeftoverThroughLaterMappedAgain() throws Exception {
+    Timestamp leftoverLast = makeMe.aTimestamp().of(1, 0).please();
+    Timestamp firstGoodAt = makeMe.aTimestamp().of(2, 0).please();
+    Timestamp againAt = makeMe.aTimestamp().of(3, 0).please();
+    int againElapsedHours = 24;
+    MemoryTracker leftover = leftoverFirstMappedGood(leftoverLast, firstGoodAt);
+    makeMe
+        .aRecallLogFor(leftover)
+        .productOutcome(ProductOutcome.AGAIN)
+        .recordedAt(againAt)
+        .elapsedHours(againElapsedHours)
+        .please();
+
+    runBackfill();
+
+    Fsrs.NextMemory afterAgain =
+        Fsrs.afterAgainRecall(FIRST_GOOD_STABILITY_HOURS, FIRST_GOOD_DIFFICULTY, againElapsedHours);
+    TrackerRow row = trackerRow(leftover.getId());
+    assertThat(row.lastRecalledAt(), equalTo(againAt));
+    assertThat(row.stability(), equalTo(afterAgain.stability()));
+    assertThat((double) row.difficulty(), closeTo(afterAgain.difficulty(), 1e-5));
+    assertThat(
+        row.nextRecallAt(),
+        equalTo(
+            TimestampOperations.addHoursToTimestamp(
+                againAt, Fsrs.intervalHours(afterAgain.stability()))));
+  }
+
+  @Test
   void leavesNewWithNoMappedGradeUnchanged() throws Exception {
     leftoverFirstMappedGood(
         makeMe.aTimestamp().of(1, 0).please(), makeMe.aTimestamp().of(2, 0).please());

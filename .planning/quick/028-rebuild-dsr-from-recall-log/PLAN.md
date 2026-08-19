@@ -39,10 +39,9 @@
 ### 3. Rebuild through a later mapped grade
 
 - **Type:** Behavior
-- **Status:** planned
-- **Pre:** First Good, then AGAIN at elapsed **≥ 24**, snapshot still leftover.
-- **Trigger:** Same backfill.
-- **Post:** S/D/due match `Fsrs.afterAgainRecall` on that first-Good state (post-lapse + cap + Again next-D). `lastRecalledAt` is the Again row.
+- **Status:** done
+- **Done:** Delta pin: leftover first Good then AGAIN at elapsed 24 rebuilds via `Fsrs.afterAgainRecall` on first-Good state; `lastRecalledAt` is the Again row. No production change (fold loop already did this).
+- **Learning:** Keep later-grade pins as deltas on `leftoverFirstMappedGood`. Expected S/D come from `Fsrs.afterAgainRecall`, not D=5 table pins (`D0(3)` ≠ 5).
 
 ### 4. Replay confusion as a non-grade
 
