@@ -3,6 +3,8 @@ const formControl = (label: string) =>
 
 const inputElement = (label: string) => cy.findByLabelText(label)
 
+const fieldError = (label: string) => formControl(label).find('.text-error')
+
 const isContentEditable = ($input: JQuery<HTMLElement>) =>
   $input[0]?.isContentEditable === true
 
@@ -48,11 +50,15 @@ const formField = (label: string) => {
       return self
     },
     expectError(message: string) {
-      formControl(label).find('.text-error').findByText(message)
+      fieldError(label).findByText(message)
+      return self
+    },
+    expectHasError() {
+      fieldError(label).should('exist')
       return self
     },
     expectNoError() {
-      formControl(label).find('.text-error').should('not.exist')
+      fieldError(label).should('not.exist')
       return self
     },
     type(text: string) {

@@ -18,7 +18,7 @@
 
 **Wiki-title cache (slice 1 done):** `rewriteWikiTitleCache` already converted `link_text` and deleted same-note duplicates. Tests plant stale rows via JDBC INSERT (`Recipe*` cannot go through entities).
 
-**Redundant tests:** `AiControllerExtractNotePreviewTest.shouldConvertOsInvalidCharactersInExtractionPreview` (title `Recipe*` only) is covered by extract preview already calling `normalizeDisplayName` (`shouldSanitizePathSeparatorsInExtractionPreview`) plus `DisplayNamePathSeparatorsTrimTest.normalizeDisplayNameConvertsOsInvalidCharacters`. E2E `Then I should see that the title is rejected as OS-invalid` re-pins the full `MESSAGE` string.
+**OS-invalid copy (slice 3 done):** Extract-preview `Recipe*` test deleted; remaining preview test named convert. E2E Then uses `expectHasError()` and does not pin `MESSAGE`.
 
 **Misleading editor warning:** PathNameEditor `LINK_BREAK_CHARS` includes `|`, which is now OS-invalid. Typing `|` shows the wiki-link warning; save then rejects as OS-invalid. `|` should behave like `*` (no wiki warning; reject on save).
 
@@ -41,11 +41,9 @@ Replaced illegal `Q&A: What/Why?` / `Q&A: Notes` with `Q&A What Why` / `Q&A Note
 ### 3. One OS-invalid copy; drop redundant extract `*`
 
 - **Type:** Structure
-- **Status:** planned
+- **Status:** done
 
-Structure change: delete `shouldConvertOsInvalidCharactersInExtractionPreview`. Rename `shouldSanitizePathSeparatorsInExtractionPreview` so it says convert, not sanitize. E2E OS-invalid Then asserts rejection without repeating `MESSAGE` (unit test owns the sentence).
-
-Unlocks slice 4: `|` can reuse the same reject path without a third copy of the message.
+Deleted extract-preview `Recipe*` test; renamed remaining test to convert (also sibling suggested-title test). E2E OS-invalid Then asserts Title `expectHasError()` without repeating `MESSAGE`. `Recipe*` create-reject scenario remains for slice 4.
 
 ### 4. Pipe in a title is OS-invalid, not a wiki-link warning
 

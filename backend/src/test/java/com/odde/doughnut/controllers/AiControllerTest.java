@@ -61,7 +61,7 @@ class AiControllerTest extends ControllerTestBase {
     }
 
     @Test
-    void shouldSanitizePathSeparatorsInSuggestedTitle()
+    void shouldConvertPathSeparatorsInSuggestedTitle()
         throws UnexpectedNoAccessRightException, JsonProcessingException {
       stubSuggestedTitle("TCP/IP: Overview");
 

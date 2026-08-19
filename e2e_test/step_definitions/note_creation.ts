@@ -70,11 +70,7 @@ Then('I should see that the note creation is not successful', () => {
 })
 
 Then('I should see that the title is rejected as OS-invalid', () => {
-  start.form
-    .getField('Title')
-    .expectError(
-      'Name must not contain \\ / : * ? " < > | or ASCII control characters.'
-    )
+  start.form.getField('Title').expectHasError()
   dismissValidationToast()
 })
 

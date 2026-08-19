@@ -124,7 +124,7 @@ class AiControllerExtractNotePreviewTest extends ControllerTestBase {
     }
 
     @Test
-    void shouldSanitizePathSeparatorsInExtractionPreview()
+    void shouldConvertPathSeparatorsInExtractionPreview()
         throws UnexpectedNoAccessRightException, JsonProcessingException {
       Note testNote = extractableNote();
       stubExtraction(
@@ -140,19 +140,6 @@ class AiControllerExtractNotePreviewTest extends ControllerTestBase {
       assertThat(response.getNewNoteContent())
           .isEqualTo("See [[foo／bar： baz|link]] and [[MyNb:foo／bar|nb]].");
       assertThat(response.getUpdatedOriginalNoteContent()).isEqualTo("Back to [[foo／bar： baz]].");
-    }
-
-    @Test
-    void shouldConvertOsInvalidCharactersInExtractionPreview()
-        throws UnexpectedNoAccessRightException, JsonProcessingException {
-      Note testNote = extractableNote();
-      stubExtraction("Recipe*", "Expanded content.", "Updated parent.");
-
-      NoteExtractionResult response =
-          controller.extractNotePreview(
-              testNote, selectSingleLayoutItem("p1", "key suggestion to extract"));
-
-      assertThat(response.getNewNoteTitle()).isEqualTo("Recipe＊");
     }
 
     @Test
