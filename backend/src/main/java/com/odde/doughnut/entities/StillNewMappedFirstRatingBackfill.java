@@ -32,12 +32,13 @@ public final class StillNewMappedFirstRatingBackfill {
                 JOIN recall_log rl
                   ON rl.memory_tracker_id = mt.id
                  AND rl.product_outcome IN (
-                   'GOOD', 'EASY', 'HARD', 'SHRINK', 'AGAIN', 'AGAIN_ZERO'
+                   %s
                  )
                 WHERE mt.stability = 0
                   AND mt.difficulty IS NULL
                 GROUP BY mt.id
-                """);
+                """
+                    .formatted(ProductOutcome.mappedGradeSqlInList()));
         PreparedStatement update =
             connection.prepareStatement(
                 """

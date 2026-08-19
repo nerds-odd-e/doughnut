@@ -21,10 +21,11 @@ public final class UngradedNewLastRecallBackfill {
                 SELECT 1 FROM recall_log
                 WHERE recall_log.memory_tracker_id = memory_tracker.id
                   AND recall_log.product_outcome IN (
-                    'GOOD', 'EASY', 'HARD', 'SHRINK', 'AGAIN', 'AGAIN_ZERO'
+                    %s
                   )
               )
-            """)) {
+            """
+                .formatted(ProductOutcome.mappedGradeSqlInList()))) {
       update.executeUpdate();
     }
   }
