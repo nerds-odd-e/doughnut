@@ -201,10 +201,11 @@ and rounding, short-term next Stability: Good **24h** → **25h**; Easy
 **72h** (clamp); same-hour Again after first Good **55h** → **18h**;
 same-hour Again on **72h** / D=5 → **24h** (elapsed 0 and 23 are the same
 next S). Elapsed whole hours **≥ 24** use long-term next Stability; Again
-is then post-lapse (on-time **72h** / D=5 → **17h**; on-time after first
-Good **55h** → **15h**). Confusion is unchanged as a non-grade (inherits
-Again S). New (Stability 0) first-rating is unchanged by elapsed time
-(see **First rating on New**). The short-term rule is not a Settings knob.
+is then post-lapse (on-time **72h** / D=5 → **17h**, elapsed **24** →
+**15h**; on-time after first Good **55h** → **15h**). Confusion is
+unchanged as a non-grade (inherits Again S). New (Stability 0)
+first-rating is unchanged by elapsed time (see **First rating on New**).
+The short-term rule is not a Settings knob.
 Existing Stability, Difficulty, and due change **going forward only**: do
 not rewrite stored Stability; no new Flyway for this rule. Observable pin:
 New → Again (`S0(1)` = **5h**) → Good at elapsed 5 → short-term next

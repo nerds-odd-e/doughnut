@@ -60,4 +60,9 @@ class MemoryTrackerSameHourRecallSchedulingTest extends MemoryTrackerRecallSched
   void twentyFourHourCorrectRecallGrowsThreeDayStability() {
     assertThat(nextStabilityHours(24), greaterThan(STABILITY_HOURS));
   }
+
+  @Test
+  void twentyFourHourAgainRecallUsesPostLapseStability() {
+    assertThat(nextStabilityHoursAfterAgain(24), equalTo(15.0f));
+  }
 }
