@@ -65,13 +65,9 @@ Assimilate leaves last recall unset; due via `calculateNextRecallAt()` (= assimi
 ### 5. Existing ungraded New have no last recall
 
 - **Type:** Behavior
-- **Status:** planned
+- **Status:** done
 
-**Pre:** persisted New (`S = 0`, Difficulty null, no mapped RecallLog: not `GOOD`/`EASY`/`HARD`/`SHRINK`/`AGAIN`/`AGAIN_ZERO`). **Trigger:** apply the new ungated Flyway. **Post:** `last_recalled_at` is null; `next_recall_at` stays `assimilated_at`. Includes removed New with no mapped logs.
-
-Still-New rows **with** mapped logs stay for the next slice (do not null them). CONFUSION-only stays New (null last recall).
-
-Test the Java/SQL backfill like `StillNewFirstRatingBackfillTest` / `OverCapStabilityBackfillTest`. No E2E.
+Ungated `V300000276` nulls `last_recalled_at` for New (`S = 0`, D null, no mapped RecallLog). Due unchanged. Includes removed New and CONFUSION-only. Still-New with mapped logs left for slice 6.
 
 ### 6. Still-New mapped logs first-rate from the grade time
 
