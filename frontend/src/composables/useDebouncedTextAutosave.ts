@@ -46,21 +46,30 @@ export function useDebouncedTextAutosave(
 
   const isDirty = computed(() => hasUnsavedChanges())
 
-  const persistInner = async (newValue: string, nextVersion: number) => {
+  let persistChain: Promise<void> = Promise.resolve()
+
+  const persistOne = async (newValue: string, nextVersion: number) => {
+    if (nextVersion !== version.value) {
+      return
+    }
     if (options.beforePersist) {
       const proceed = await options.beforePersist(
         lastSavedValue.value ?? "",
         newValue
       )
-      if (!proceed) {
+      if (!proceed || nextVersion !== version.value) {
         return
       }
     }
     pendingSaveValues.add(newValue)
     try {
       await options.persist(newValue)
-      if (hasUnsavedChanges()) {
+      if (nextVersion === version.value) {
+        if (hasUnsavedChanges()) {
+          lastSavedValue.value = newValue
+        }
         savedVersion.value = nextVersion
+      } else if (nextVersion < version.value) {
         lastSavedValue.value = newValue
       }
     } catch (errs: unknown) {
@@ -70,7 +79,13 @@ export function useDebouncedTextAutosave(
     }
   }
 
-  const debouncedPersist = debounce(persistInner, TEXT_AUTOSAVE_DEBOUNCE_MS)
+  const enqueuePersist = (newValue: string, nextVersion: number) => {
+    const run = () => persistOne(newValue, nextVersion)
+    persistChain = persistChain.then(run, run)
+    return persistChain
+  }
+
+  const debouncedPersist = debounce(enqueuePersist, TEXT_AUTOSAVE_DEBOUNCE_MS)
 
   const propose = (newValue: string) => {
     const normalizedNewValue = normalize(newValue)
