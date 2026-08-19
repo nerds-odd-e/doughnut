@@ -1,4 +1,4 @@
-package com.odde.doughnut.algorithms;
+package com.odde.doughnut.entities;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
@@ -7,7 +7,7 @@ import static org.hamcrest.Matchers.lessThanOrEqualTo;
 
 import org.junit.jupiter.api.Test;
 
-class SpacedRepetitionEarlyRecallAdjustmentTest extends SpacedRepetitionRecallSchedulingTestBase {
+class MemoryTrackerEarlyRecallAdjustmentTest extends MemoryTrackerRecallSchedulingTestBase {
   @Test
   void earlyLongTermCorrectGrowsLessThanOnTime() {
     float early = nextStabilityHours(24);

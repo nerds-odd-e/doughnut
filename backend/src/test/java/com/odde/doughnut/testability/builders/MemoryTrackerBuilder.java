@@ -55,7 +55,7 @@ public class MemoryTrackerBuilder extends EntityBuilder<MemoryTracker> {
 
   public MemoryTrackerBuilder stabilityAndNextRecallAt(float value) {
     entity.setStability(value);
-    if (!Fsrs.isNew(entity.getStability()) && entity.getLastRecalledAt() == null) {
+    if (!entity.isNew() && entity.getLastRecalledAt() == null) {
       entity.setLastRecalledAt(entity.getAssimilatedAt());
     }
     entity.setNextRecallAt(entity.calculateNextRecallAt());

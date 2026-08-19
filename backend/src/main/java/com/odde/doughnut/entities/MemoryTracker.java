@@ -149,6 +149,11 @@ public class MemoryTracker extends EntityIdentifiedByIdOnly {
     return getType() == MemoryTrackerType.UNDERSTANDING;
   }
 
+  @JsonIgnore
+  public boolean isNew() {
+    return Fsrs.isNew(getStability());
+  }
+
   @Column(name = "deleted_at")
   @JsonIgnore
   @Getter

@@ -24,7 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
-public class RecallServiceWithSpacedRepetitionAlgorithmTest {
+public class RecallServiceDueWorkTest {
   @Autowired MakeMe makeMe;
   @Autowired UserService userService;
   User user;

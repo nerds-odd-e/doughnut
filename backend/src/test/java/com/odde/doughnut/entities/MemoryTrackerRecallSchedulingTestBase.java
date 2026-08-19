@@ -1,15 +1,12 @@
-package com.odde.doughnut.algorithms;
+package com.odde.doughnut.entities;
 
 import static com.odde.doughnut.entities.Fsrs.DEFAULT_DIFFICULTY;
 
-import com.odde.doughnut.entities.MemoryTracker;
-import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.User;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.utils.TimestampOperations;
 import java.sql.Timestamp;
 
-abstract class SpacedRepetitionRecallSchedulingTestBase {
+abstract class MemoryTrackerRecallSchedulingTestBase {
   static final float STABILITY_HOURS = 72f;
   final MakeMe makeMe = MakeMe.makeMeWithoutFactoryService();
   final User user = makeMe.aUser().inMemoryPlease();

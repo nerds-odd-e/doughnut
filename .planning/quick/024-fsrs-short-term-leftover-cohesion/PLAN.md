@@ -1,6 +1,6 @@
 # Plan: FSRS short-term leftover cohesion
 
-**Status:** in progress
+**Status:** done
 
 **Goal:** After [PR #1580](https://github.com/nerds-odd-e/doughnut/pull/1580) (executed `.planning/quick/022-fsrs-short-term-under-one-day/`), the live domain has no SM-2 ladder in `services`, leftover `SpacedRepetitionAlgorithm` names are gone, **New** lives on the memory tracker, and the failure→success elapsed pin no longer straddles the short-term window.
 
@@ -46,15 +46,11 @@ Inspected commits: `d6cf6e9943` … `04dcf7112e` (merged as #1580).
 ### 3. Live names are recall scheduling and New, not SpacedRepetitionAlgorithm
 
 - **Type:** Structure
-- **Status:** planned
+- **Status:** done
 
-`SpacedRepetitionAlgorithm` is gone; leftover names and a public `Fsrs.isNew(float)` still describe the old types.
+Leftover `SpacedRepetition*` recall-scheduling tests are `MemoryTracker*RecallScheduling*` under `entities/`. `RecallServiceDueWorkTest` is the due-work name. Public **New** is `MemoryTracker.isNew()` (ADR 0001); `Fsrs.isNew(float)` is package-private. Builder uses `entity.isNew()`.
 
-- Rename `RecallServiceWithSpacedRepetitionAlgorithmTest` to a due-work / recall-service name (it never imported the deleted class, so 022 skipped it).
-- Rename `SpacedRepetition*RecallScheduling*` tests to memory-tracker / FSRS recall-scheduling names and move them out of `algorithms/` (production type is `MemoryTracker` + `Fsrs`).
-- Add `MemoryTracker.isNew()` (ADR 0001 **New**). Builder and callers use that; `Fsrs.isNew` need not stay public.
-
-No schedule change. Do not add tests that only re-pin S=**6** / 23 vs 24.
+**Learning:** Remaining `algorithms/` tests are wiki/frontmatter/cloze/silent-window, not scheduling. `Fsrs.isNew` stays package-private (clamped S) rather than inlined.
 
 ## Out of this plan
 

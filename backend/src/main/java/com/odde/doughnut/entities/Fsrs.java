@@ -32,7 +32,7 @@ public final class Fsrs {
 
   record NextMemory(float difficulty, float stability) {}
 
-  public static boolean isNew(float stabilityHours) {
+  static boolean isNew(float stabilityHours) {
     return stabilityHours <= NEW_STABILITY_HOURS;
   }
 

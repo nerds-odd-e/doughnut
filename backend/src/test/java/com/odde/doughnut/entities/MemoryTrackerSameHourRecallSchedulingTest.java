@@ -1,14 +1,12 @@
-package com.odde.doughnut.algorithms;
+package com.odde.doughnut.entities;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThan;
 
-import com.odde.doughnut.entities.MemoryTracker;
 import org.junit.jupiter.api.Test;
 
-class SpacedRepetitionSameHourRecallSchedulingTest
-    extends SpacedRepetitionRecallSchedulingTestBase {
+class MemoryTrackerSameHourRecallSchedulingTest extends MemoryTrackerRecallSchedulingTestBase {
   @Test
   void sameHourCorrectRecallGrowsFirstIntervalStabilityToTwentyFive() {
     MemoryTracker memoryTracker = aGradedTrackerAtStability(24f);

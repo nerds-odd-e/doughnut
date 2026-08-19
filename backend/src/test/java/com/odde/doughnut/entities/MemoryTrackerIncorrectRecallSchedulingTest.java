@@ -1,17 +1,15 @@
-package com.odde.doughnut.algorithms;
+package com.odde.doughnut.entities;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.lessThan;
 
-import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.utils.TimestampOperations;
 import java.sql.Timestamp;
 import org.junit.jupiter.api.Test;
 
-class SpacedRepetitionIncorrectRecallSchedulingTest
-    extends SpacedRepetitionRecallSchedulingTestBase {
+class MemoryTrackerIncorrectRecallSchedulingTest extends MemoryTrackerRecallSchedulingTestBase {
   static final float FIRST_AGAIN_DIFFICULTY = 6.4133f;
   static final float FIRST_AGAIN_STABILITY_HOURS = 5f;
 
