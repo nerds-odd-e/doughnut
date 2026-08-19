@@ -129,8 +129,9 @@ export function setupDefaultSidebarSdkMocks(fixtures: SidebarTreeFixtures) {
   )
 }
 
-export function resetSidebarPeerSortSessionStorage() {
+export function resetSidebarPeerSortStorage() {
   sessionStorage.removeItem(NOTE_SIDEBAR_PEER_SORT_STORAGE_KEY)
+  localStorage.removeItem(NOTE_SIDEBAR_PEER_SORT_STORAGE_KEY)
 }
 
 export function prepareSidebarDefaultMountContext(options: {
@@ -142,7 +143,7 @@ export function prepareSidebarDefaultMountContext(options: {
   }
 }) {
   invalidateSidebarListingCache()
-  resetSidebarPeerSortSessionStorage()
+  resetSidebarPeerSortStorage()
   options.storageAccessor.value = createNoteStorage()
   seedDefaultTreeRealmsInStorage(options.storageAccessor, options.fixtures)
   setupDefaultSidebarSdkMocks(options.fixtures)

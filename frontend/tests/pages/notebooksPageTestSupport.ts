@@ -16,6 +16,7 @@ export function clearNotebooksPageStorage() {
   localStorage.removeItem("doughnut.notebooksPage.sortOrder")
   localStorage.removeItem("doughnut.notebooksPage.layout")
   sessionStorage.removeItem(NOTE_SIDEBAR_PEER_SORT_STORAGE_KEY)
+  localStorage.removeItem(NOTE_SIDEBAR_PEER_SORT_STORAGE_KEY)
 }
 
 export function catalogHeadingTexts(wrapper: VueWrapper) {

@@ -64,7 +64,7 @@
 **Caching:**
 - Redis 8.4 on `127.0.0.1:6380` (all Spring profiles in `application.yml`; CI/local via process-compose / GitHub Actions Redis service)
 - `spring-boot-starter-data-redis` and `spring-session-core` declared; no application Java code references Redis APIs directly — treat as infrastructure dependency for session/runtime stack
-- Frontend uses browser `sessionStorage` for UI prefs only (e.g. note sidebar sort)
+- Frontend uses browser `localStorage` for UI prefs (e.g. note sidebar sort, notebooks page layout)
 
 ## Authentication & Identity
 

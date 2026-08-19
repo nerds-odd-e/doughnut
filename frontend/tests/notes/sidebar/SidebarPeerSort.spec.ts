@@ -33,12 +33,23 @@ describe("Sidebar peer sort", () => {
     teardownSidebarComponentTest(wrapper)
   })
 
-  function zebraApplePeerRealms(updates?: { z?: string; a?: string }) {
-    const z = makeMe.aNoteRealm.title("zebra").under(fixtures.topNoteRealm)
-    const a = makeMe.aNoteRealm.title("apple").under(fixtures.topNoteRealm)
+  const titleZaRootOrder = [
+    "folder:mango",
+    "folder:banana",
+    "note:zebra",
+    "note:apple",
+  ]
+
+  function zebraApplePeerRealms() {
     return {
-      realmZ: (updates?.z ? z.updatedAt(updates.z) : z).please(),
-      realmA: (updates?.a ? a.updatedAt(updates.a) : a).please(),
+      realmZ: makeMe.aNoteRealm
+        .title("zebra")
+        .under(fixtures.topNoteRealm)
+        .please(),
+      realmA: makeMe.aNoteRealm
+        .title("apple")
+        .under(fixtures.topNoteRealm)
+        .please(),
     }
   }
 
@@ -47,6 +58,29 @@ describe("Sidebar peer sort", () => {
     await vi.waitUntil(
       () => wrapper.findAll(".sidebar-folder-label").length >= 2
     )
+  }
+
+  async function mountZebraAppleRootSidebar() {
+    storageAccessor.value = createNoteStorage()
+    const { realmZ, realmA } = zebraApplePeerRealms()
+    const { nbId, realmA: activeA } = setupRootPeersWithFolders({
+      storageAccessor,
+      topNoteRealm: fixtures.topNoteRealm,
+      realmZ,
+      realmA,
+    })
+    wrapper = mountSidebarSignedIn(helper, activeA, nbId)
+    await flushUntilTwoRootFolderLabels()
+    return { activeA, nbId }
+  }
+
+  async function chooseTitleZa() {
+    await wrapper.find("[data-note-sidebar-sort] summary").trigger("click")
+    await flushPromises()
+    const titleZaButton = document.querySelector('button[title="Title (Z–A)"]')
+    expect(titleZaButton).not.toBeNull()
+    await (titleZaButton as HTMLButtonElement).click()
+    await flushPromises()
   }
 
   it("shows sort control in the sidebar toolbar", async () => {
@@ -60,63 +94,25 @@ describe("Sidebar peer sort", () => {
   })
 
   it("lists folders above notes (A–Z) and reorders root peers when Title (Z–A) is chosen", async () => {
-    storageAccessor.value = createNoteStorage()
-    const { realmZ, realmA } = zebraApplePeerRealms()
-    const { nbId, realmA: activeA } = setupRootPeersWithFolders({
-      storageAccessor,
-      topNoteRealm: fixtures.topNoteRealm,
-      realmZ,
-      realmA,
-    })
+    await mountZebraAppleRootSidebar()
+
+    expect(rootRowLabels(wrapper)).toEqual([...DEFAULT_ROOT_PEER_ORDER])
+
+    await chooseTitleZa()
+
+    expect(rootRowLabels(wrapper)).toEqual(titleZaRootOrder)
+  })
+
+  it("keeps Title (Z–A) on a later visit after the tab session is gone", async () => {
+    const { activeA, nbId } = await mountZebraAppleRootSidebar()
+    await chooseTitleZa()
+
+    wrapper.unmount()
+    sessionStorage.removeItem(NOTE_SIDEBAR_PEER_SORT_STORAGE_KEY)
 
     wrapper = mountSidebarSignedIn(helper, activeA, nbId)
     await flushUntilTwoRootFolderLabels()
 
-    expect(rootRowLabels(wrapper)).toEqual([...DEFAULT_ROOT_PEER_ORDER])
-
-    await wrapper.find("[data-note-sidebar-sort] summary").trigger("click")
-    await flushPromises()
-    const titleZaButton = document.querySelector('button[title="Title (Z–A)"]')
-    expect(titleZaButton).not.toBeNull()
-    await (titleZaButton as HTMLButtonElement).click()
-    await flushPromises()
-
-    expect(rootRowLabels(wrapper)).toEqual([
-      "folder:mango",
-      "folder:banana",
-      "note:zebra",
-      "note:apple",
-    ])
-  })
-
-  it("applies sort from sessionStorage on mount without opening the menu", async () => {
-    sessionStorage.setItem(
-      NOTE_SIDEBAR_PEER_SORT_STORAGE_KEY,
-      JSON.stringify({ field: "updated", direction: "desc" })
-    )
-    storageAccessor.value = createNoteStorage()
-    const { realmZ, realmA } = zebraApplePeerRealms({
-      z: "2015-06-01T00:00:00.000Z",
-      a: "2020-01-01T00:00:00.000Z",
-    })
-    setupRootPeersWithFolders({
-      storageAccessor,
-      topNoteRealm: fixtures.topNoteRealm,
-      realmZ,
-      realmA,
-      folderExtras: {
-        banana: { updatedAt: "2018-01-01T00:00:00.000Z" },
-        mango: { updatedAt: "2005-01-01T00:00:00.000Z" },
-      },
-    })
-
-    wrapper = mountSidebarSignedIn(
-      helper,
-      realmA,
-      fixtures.topNoteRealm.notebookRealm.notebook.id
-    )
-    await flushUntilTwoRootFolderLabels()
-
-    expect(rootRowLabels(wrapper)).toEqual([...DEFAULT_ROOT_PEER_ORDER])
+    expect(rootRowLabels(wrapper)).toEqual(titleZaRootOrder)
   })
 })
