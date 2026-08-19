@@ -51,17 +51,6 @@ class MemoryTrackerThresholdControllerTest extends MemoryTrackerControllerTestBa
   }
 
   @Test
-  void tutorAgainZeroCountsTowardThreshold() throws UnexpectedNoAccessRightException {
-    MemoryTracker tracker = ownedTracker();
-    Timestamp day1 = makeMe.aTimestamp().of(1, 8).fromShanghai().please();
-    addRecallLogs(tracker, ProductOutcome.AGAIN_ZERO, 5, day1);
-
-    testabilitySettings.timeTravelTo(day1);
-    var result = controller.getThresholdExceeded(tracker);
-    assertThat(result.wrongCount(), equalTo(5));
-  }
-
-  @Test
   void confusionDoesNotCountTowardThreshold() throws UnexpectedNoAccessRightException {
     MemoryTracker tracker = ownedTracker();
     Timestamp day1 = makeMe.aTimestamp().of(1, 8).fromShanghai().please();

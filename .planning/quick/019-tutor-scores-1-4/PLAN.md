@@ -17,7 +17,7 @@
 - Persist named grades on RecallLog. Latest tutor feedback is **1–4** via `AGAIN→1`, `HARD→2`, `GOOD→3`, `EASY→4`.
 - Alias rewrite: `recall_log.product_outcome` `SHRINK` → `HARD`, `AGAIN_ZERO` → `AGAIN`. Stability and Difficulty stay.
 - `GOOD` / `EASY` / `HARD` / `AGAIN` / `CONFUSION` rows stay those grades (old digit **4** that was Good stays `GOOD`, shown as **3**).
-- Flyway wrappers `V300000271`–`V300000278` stay. Helpers they call may use SQL literals `'SHRINK'` / `'AGAIN_ZERO'` so replay still selects those column values. Next migration after `V300000278`.
+- Flyway wrappers `V300000271`–`V300000278` stay. Helpers they call may use SQL literals `'SHRINK'` / `'AGAIN_ZERO'` so replay still selects those column values. Alias rewrite is ungated `V300000279`.
 - Affirmative current state in ADR, tests, and code. No “used to be 0–5 / shrink” prose. Tests pin the 1–4 outcomes. Out-of-range rejection is current validation — pin that.
 - Independent of `.planning/quick/018-last-recall-leftover-cohesion/` (different files).
 
@@ -31,8 +31,7 @@
 
 ## Discoveries
 
-- Latest tutor feedback is derived (`scoreForProductOutcome`). `SHRINK` / `AGAIN_ZERO` still reverse-map to **2** / **1** so note-info stays valid until slice 3 rewrites those rows.
-- Frequent-failure count includes `AGAIN_ZERO`; after rewrite, `AGAIN` is enough.
+- `scoreForProductOutcome` still reverse-maps leftover `SHRINK`/`AGAIN_ZERO` (historical fixtures until slice 4 drops the enum).
 - `ProductOutcome.mappedGradeSqlInList()` is used by still-New / ungraded / removed backfills. After the live enum is four grades, those **historical** helpers must keep selecting `'SHRINK'` and `'AGAIN_ZERO'` in their own SQL (replay at that version).
 
 ## Slices
@@ -49,16 +48,14 @@ Proposed ADR 0003/0005 Decision is the 1–4 identity (`score = G`). First-ratin
 - **Type:** Behavior
 - **Status:** done
 
-Request, parser, recording, and latest score are `score = G`. Graded **2** is Hard (`shrinkStability` gone). Parser rejects 0/5/6. `SHRINK`/`AGAIN_ZERO` still read as latest **2**/**1** until slice 3. OpenAPI/enum stay until slice 4.
+Request, parser, recording, and latest score are `score = G`. Graded **2** is Hard (`shrinkStability` gone). Parser rejects 0/5/6. OpenAPI/enum stay until slice 4.
 
 ### 3. Alias RecallLogs are HARD and AGAIN
 
 - **Type:** Behavior
-- **Status:** planned
+- **Status:** done
 
-**Pre:** a commissioned tracker with a `SHRINK` or `AGAIN_ZERO` RecallLog (S/D already set). **Trigger:** apply the new Flyway rewrite. **Post:** those rows are `HARD` / `AGAIN`; Stability, Difficulty, and due unchanged; latest tutor feedback is **2** / **1**.
-
-Ungated Java (or SQL) migration after `V300000278`. Controller-level pin via `makeMe` logs + run the backfill (same style as other recall-log rewrites). Frequent-failure count uses `AGAIN` only.
+Ungated `V300000279` / `AliasRecallLogGradeBackfill`: `SHRINK`→`HARD`, `AGAIN_ZERO`→`AGAIN`; S/D/due unchanged. Pins in `AliasRecallLogGradeBackfillTest`. Frequent-failure counts `AGAIN` only. Reverse-map stays until slice 4.
 
 ### 4. Live product_outcome is four grades plus CONFUSION
 
@@ -72,6 +69,6 @@ Ungated Java (or SQL) migration after `V300000278`. Controller-level pin via `ma
 - **Type:** Structure
 - **Status:** planned
 
-`STATE.md` plus leftover 0–5 / shrink pins in tests and fixtures. Frontend `tutor-feedback-score-4` (was 5) if still on the old digit. FSRS gap / SEED-004 already point at this plan from slice 1; keep remaining deferred **E4** + accept ADR 0003.
+`STATE.md` (include `V300000279`) plus leftover 0–5 / shrink pins in tests and fixtures. Frontend `tutor-feedback-score-4` (was 5) if still on the old digit. FSRS gap / SEED-004 already point at this plan from slice 1; keep remaining deferred **E4** + accept ADR 0003.
 
 ## SLICE PLAN WRITTEN

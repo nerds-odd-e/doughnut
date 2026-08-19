@@ -42,9 +42,7 @@ public interface RecallLogRepository extends CrudRepository<RecallLog, Integer> 
       SELECT COUNT(rl)
       FROM RecallLog rl
       WHERE rl.memoryTracker.id = :memoryTrackerId
-        AND rl.productOutcome IN (
-          com.odde.doughnut.entities.ProductOutcome.AGAIN,
-          com.odde.doughnut.entities.ProductOutcome.AGAIN_ZERO)
+        AND rl.productOutcome = com.odde.doughnut.entities.ProductOutcome.AGAIN
         AND rl.recordedAt >= :since
       """)
   int countAgainOutcomesSinceForMemoryTracker(
