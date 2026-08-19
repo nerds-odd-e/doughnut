@@ -82,10 +82,12 @@ describe("NoteDeadWikiLinkCreateModal", () => {
     document.body.innerHTML = ""
   })
 
-  const mountModal = () => {
+  const mountModal = (
+    modelValue: typeof deadWikiLinkPayload = deadWikiLinkPayload
+  ) => {
     mountSoftKeyboardPrimer()
     wrapper = mount(NoteDeadWikiLinkCreateModal, {
-      props: commonProps,
+      props: { ...commonProps, modelValue },
       attachTo: document.body,
       global: {
         plugins: [router],
@@ -117,6 +119,19 @@ describe("NoteDeadWikiLinkCreateModal", () => {
     await waitForChooser()
     expect(screen.getByText(/Dead wiki link:/)).toBeTruthy()
     expect(screen.getByText(pointAtExistingNoteLabel)).toBeTruthy()
+  })
+
+  it("uses the wiki target as the new note name when display text differs", async () => {
+    mountModal({ targetToken: "Ghost Page", displayText: "shown text" })
+    await waitForChooser()
+    expect(screen.getByText("shown text")).toBeTruthy()
+
+    await tapChooserAndSettle('Create a new note named "Ghost Page"')
+    await waitUntilFocused('[data-test="note-title"]')
+    const title = (
+      document.querySelector('[data-test="note-title"]') as HTMLElement
+    ).innerText.trim()
+    expect(title).toBe("Ghost Page")
   })
 
   it("shows create-or-retarget choice when reopened after modelValue cleared without close", async () => {

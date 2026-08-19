@@ -195,11 +195,11 @@ export const assumeNotePage = (
       findNoteContentRegion().find('a.dead-wiki-link').contains(wikiLinkText)
       return this
     },
-    followDeadWikiLink(wikiLinkTitle: string) {
+    followDeadWikiLink(wikiLinkText: string) {
       this.switchToRichContent()
       findNoteContentRegion()
         .find('a.dead-wiki-link')
-        .contains(wikiLinkTitle)
+        .contains(wikiLinkText)
         .click()
       return {
         createNote: () => {

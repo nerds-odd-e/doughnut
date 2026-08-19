@@ -10,7 +10,7 @@
             class="daisy-btn daisy-btn-primary"
             @click="onCreateNewNoteClick"
           >
-            Create a new note named "{{ modelValue.displayText }}"
+            Create a new note named "{{ modelValue.targetToken }}"
           </button>
           <button
             class="daisy-btn daisy-btn-secondary"
@@ -24,7 +24,7 @@
         v-else-if="showCreateForm && modelValue !== null"
         :notebookId="notebookId"
         :initial-folder="realmLeafFolder(noteRealm)"
-        :initial-title="modelValue.displayText"
+        :initial-title="modelValue.targetToken"
         :wiki-title-cache-refresh-source-note-id="sourceNoteId"
         :ancestor-folders="noteRealm.ancestorFolders ?? []"
         @close-dialog="close"
