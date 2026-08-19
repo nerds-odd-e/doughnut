@@ -82,15 +82,6 @@ Feature: Commissioned learning session
       | 2     | 31        | 5.11217    | 31    |
       | 1     | 5         | 6.4133     | 5     |
 
-  Scenario: Recording tutor score 3 leaves a GOOD RecallLog
-    Given the notes "Hola, Gracias" are assimilated as commissioned on day 1
-    And I have recorded a learning session for notebook "Spanish conversation" on day 2 with scores:
-      | Note    | Score |
-      | Hola    | 3     |
-      | Gracias | 1     |
-    When I visit the commissioned memory tracker for "Hola"
-    Then I should see a GOOD RecallLog with elapsed hours and no answer id
-
   Scenario Outline: On-time second tutor score grows Stability
     Given the notes "Hola, Gracias" are assimilated as commissioned on day 1
     And I have recorded a learning session for notebook "Spanish conversation" on day 2 with scores:

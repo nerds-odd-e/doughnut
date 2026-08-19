@@ -3,9 +3,6 @@ package com.odde.doughnut.controllers;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
-import com.odde.doughnut.entities.MemoryTracker;
-import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.ProductOutcome;
 import com.odde.doughnut.entities.RecallLog;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
@@ -20,27 +17,8 @@ class LearningSessionRecordTutorFeedbackRecallLogTests extends LearningSessionCo
 
   @Autowired MemoryTrackerController memoryTrackerController;
 
-  @Test
-  void scoreThreeLeavesAGoodRecallLogWithoutAnswer() throws UnexpectedNoAccessRightException {
-    Timestamp recordedAt = makeMe.aTimestamp().of(2, 8).please();
-    testabilitySettings.timeTravelTo(recordedAt);
-
-    Notebook notebook = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
-    Note hola = makeMe.aNote().notebook(notebook).title("Hola").please();
-    MemoryTracker holaTracker =
-        makeMe.aMemoryTrackerFor(hola).commissioned().nextRecallAt(recordedAt).please();
-
-    controller.record(recordRequest(notebook, learningSessionReport("Hola", 3)), "Asia/Shanghai");
-
-    List<RecallLog> logs = memoryTrackerController.getRecallLogs(holaTracker);
-    assertThat(logs, hasSize(1));
-    RecallLog log = logs.get(0);
-    assertThat(log.getProductOutcome(), is(ProductOutcome.GOOD));
-    assertThat(log.getAnswerId(), nullValue());
-  }
-
   @ParameterizedTest
-  @CsvSource({"4, EASY", "2, HARD", "1, AGAIN"})
+  @CsvSource({"4, EASY", "3, GOOD", "2, HARD", "1, AGAIN"})
   void matchedScoreLeavesMappedRecallLog(int score, ProductOutcome outcome)
       throws UnexpectedNoAccessRightException {
     Timestamp dayTwo = makeMe.aTimestamp().of(1, 9).please();
@@ -51,7 +29,11 @@ class LearningSessionRecordTutorFeedbackRecallLogTests extends LearningSessionCo
         recordRequest(fixture.notebook(), learningSessionReport("Hola", score)), "Asia/Shanghai");
 
     List<RecallLog> logs = memoryTrackerController.getRecallLogs(fixture.holaTracker());
-    assertThat(logs.get(0).getProductOutcome(), is(outcome));
+    RecallLog log = logs.get(0);
+    assertThat(log.getProductOutcome(), is(outcome));
+    if (outcome == ProductOutcome.GOOD) {
+      assertThat(log.getAnswerId(), nullValue());
+    }
   }
 
   @Test
