@@ -9,7 +9,6 @@ import {
 
 export {
   README_ONLY_PRESET_PROPERTY_KEYS,
-  RICH_MODE_PRESET_PROPERTY_KEYS,
   findPropertyRowIndexByExactKey,
   isExampleOfPropertyKey,
   isImagePropertyKey,
@@ -24,10 +23,14 @@ export {
   nextAvailablePropertyKeyForPreset,
   propertyKeyBaseAndSuffix,
   propertyKeyMatchesPresetFamily,
-  richModeKeyDropdownPresetKeys,
-  richModeKeyDropdownPresetKeysForPropertyRows,
   rowFillsReadmeOnlyPresetSlot,
 } from "@/utils/noteContentPropertyKeys"
+export {
+  NOTE_ONLY_PRESET_PROPERTY_KEYS,
+  RICH_MODE_PRESET_PROPERTY_KEYS,
+  richModeKeyDropdownPresetKeys,
+  richModeKeyDropdownPresetKeysForPropertyRows,
+} from "@/utils/noteContentPropertyKeyPresets"
 
 export {
   type PropertyRow,
