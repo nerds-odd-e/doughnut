@@ -21,15 +21,6 @@ import org.springframework.web.server.ResponseStatusException;
 class MemoryTrackerRecallPromptsControllerTest extends MemoryTrackerControllerTestBase {
   @Autowired ObjectMapper objectMapper;
 
-  private RecallPrompt answeredPromptFor(MemoryTracker tracker, Note note) {
-    return makeMe
-        .aRecallPrompt()
-        .withMcqForNote(note)
-        .forMemoryTracker(tracker)
-        .answerChoiceIndex(0)
-        .please();
-  }
-
   @Nested
   class GetRecallPrompts {
     @Test

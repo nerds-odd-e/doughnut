@@ -1,5 +1,6 @@
 package com.odde.doughnut.controllers;
 
+import com.odde.doughnut.controllers.dto.RecallHistoryItem;
 import com.odde.doughnut.controllers.dto.RecallPromptHistoryItem;
 import com.odde.doughnut.controllers.dto.ThresholdExceededResult;
 import com.odde.doughnut.controllers.dto.UpdateMemoryTrackerPropertyKeyDTO;
@@ -130,6 +131,15 @@ class MemoryTrackerController {
     authorizationService.assertLoggedIn();
     authorizationService.assertReadAuthorization(memoryTracker);
     return memoryTrackerService.getRecallLogs(memoryTracker);
+  }
+
+  @GetMapping("/{memoryTracker}/recall-history")
+  public List<RecallHistoryItem> getRecallHistory(
+      @PathVariable("memoryTracker") @Schema(type = "integer") MemoryTracker memoryTracker)
+      throws UnexpectedNoAccessRightException {
+    authorizationService.assertLoggedIn();
+    authorizationService.assertReadAuthorization(memoryTracker);
+    return memoryTrackerService.getRecallHistory(memoryTracker);
   }
 
   @GetMapping("/{memoryTracker}/recall-prompts")

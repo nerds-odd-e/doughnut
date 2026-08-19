@@ -35,6 +35,15 @@ abstract class MemoryTrackerControllerTestBase extends ControllerTestBase {
     return makeMe.aRecallPrompt().withMcqForNote(note).forMemoryTracker(tracker).please();
   }
 
+  RecallPrompt answeredPromptFor(MemoryTracker tracker, Note note) {
+    return makeMe
+        .aRecallPrompt()
+        .withMcqForNote(note)
+        .forMemoryTracker(tracker)
+        .answerChoiceIndex(0)
+        .please();
+  }
+
   void assertConversationHasNoRecallPrompt(Conversation conversation) {
     assertThat(
         conversation.getSubject() == null || conversation.getSubject().getRecallPrompt() == null,

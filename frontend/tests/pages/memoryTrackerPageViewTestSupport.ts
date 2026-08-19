@@ -2,6 +2,7 @@ import type {
   MemoryTracker,
   RecallPromptHistoryItem,
   RecallLog,
+  RecallHistoryItem,
 } from "@generated/doughnut-backend-api"
 import { MemoryTrackerController } from "@generated/doughnut-backend-api/sdk.gen"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
@@ -43,9 +44,18 @@ export const contestedRecallPrompt = () =>
     .withIsContested(true)
     .please()
 
-export type MountMemoryTrackerPageViewProps = {
+export function historyFromPrompts(
   recallPrompts: RecallPromptHistoryItem[]
-  recallLogs?: RecallLog[]
+): RecallHistoryItem[] {
+  return recallPrompts.map((recallPrompt) => ({ recallPrompt }))
+}
+
+export function historyFromLogs(recallLogs: RecallLog[]): RecallHistoryItem[] {
+  return recallLogs.map((recallLog) => ({ recallLog }))
+}
+
+export type MountMemoryTrackerPageViewProps = {
+  recallHistory?: RecallHistoryItem[]
   memoryTracker?: MemoryTracker
   memoryTrackerId?: number
 }
@@ -60,8 +70,7 @@ export function mockMemoryTrackerPageViewDefaults() {
 
 export function mountMemoryTrackerPageView(
   {
-    recallPrompts,
-    recallLogs = [],
+    recallHistory = [],
     memoryTracker = defaultMemoryTracker(),
     memoryTrackerId = defaultMemoryTrackerId,
   }: MountMemoryTrackerPageViewProps,
@@ -71,8 +80,7 @@ export function mountMemoryTrackerPageView(
     .component(MemoryTrackerPageView)
     .withRouter()
     .withProps({
-      recallPrompts,
-      recallLogs,
+      recallHistory,
       memoryTracker,
       memoryTrackerId,
     })

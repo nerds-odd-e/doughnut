@@ -29,21 +29,22 @@ vi.mock("vue-router", async (importOriginal) => {
 
 describe("MemoryTrackerPage", () => {
   it("fetches memory tracker data on mount", async () => {
-    const { getRecallPromptsSpy, getRecallLogsSpy, showMemoryTrackerSpy } =
+    const { getRecallHistorySpy, showMemoryTrackerSpy } =
       mockMemoryTrackerPageApis({
-        recallPrompts: [
-          makeMe.aRecallPromptHistoryItem
-            .withQuestionStem("Loaded question")
+        recallHistory: [
+          makeMe.aRecallHistoryItem
+            .recallPrompt(
+              makeMe.aRecallPromptHistoryItem
+                .withQuestionStem("Loaded question")
+                .please()
+            )
             .please(),
         ],
       })
     const wrapper = mountMemoryTrackerPage()
     await flushPromises()
 
-    expect(getRecallPromptsSpy).toHaveBeenCalledWith({
-      path: { memoryTracker: memoryTrackerId },
-    })
-    expect(getRecallLogsSpy).toHaveBeenCalledWith({
+    expect(getRecallHistorySpy).toHaveBeenCalledWith({
       path: { memoryTracker: memoryTrackerId },
     })
     expect(showMemoryTrackerSpy).toHaveBeenCalledWith({
@@ -67,22 +68,19 @@ describe("MemoryTrackerPage", () => {
     )
   })
 
-  it("shows message when no recall prompts exist", async () => {
+  it("shows message when there is no recall history", async () => {
     const wrapper = await mountMemoryTrackerPageReady({
-      recallPrompts: [],
+      recallHistory: [],
     })
 
-    expect(wrapper.text()).toContain("No recall prompts found")
+    expect(wrapper.text()).toContain("No recall history found")
   })
 
   it("shows error message when API call fails", async () => {
-    vi.spyOn(MemoryTrackerController, "getRecallPrompts").mockResolvedValue(
+    vi.spyOn(MemoryTrackerController, "getRecallHistory").mockResolvedValue(
       wrapSdkError("Error")
     )
     vi.spyOn(MemoryTrackerController, "showMemoryTracker").mockResolvedValue(
-      wrapSdkError("Error")
-    )
-    vi.spyOn(MemoryTrackerController, "getRecallLogs").mockResolvedValue(
       wrapSdkError("Error")
     )
     const wrapper = mountMemoryTrackerPage()
@@ -98,7 +96,11 @@ describe("MemoryTrackerPage", () => {
       .please()
 
     mockMemoryTrackerPageApis({
-      recallPrompts: [makeMe.aRecallPromptHistoryItem.please()],
+      recallHistory: [
+        makeMe.aRecallHistoryItem
+          .recallPrompt(makeMe.aRecallPromptHistoryItem.please())
+          .please(),
+      ],
       memoryTracker: skippedTracker,
     })
     mockShowMemoryTrackerSequence(skippedTracker, activeTracker)

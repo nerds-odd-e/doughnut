@@ -141,6 +141,7 @@ Use this for endpoint lookup; open `sdk.gen.ts` or `types.gen.ts` only for exact
 - `getRecallPrompts`: GET `/api/memory-trackers/{memoryTracker}/recall-prompts` -> `GetRecallPromptsResponse` (request: `GetRecallPromptsData`; path: memoryTracker; response body: Array<RecallPromptHistoryItem>)
 - `getRecallPrompt`: GET `/api/memory-trackers/{memoryTracker}/recall-prompt` -> `GetRecallPromptResponse` (request: `GetRecallPromptData`; path: memoryTracker; response body: RecallPrompt)
 - `getRecallLogs`: GET `/api/memory-trackers/{memoryTracker}/recall-logs` -> `GetRecallLogsResponse` (request: `GetRecallLogsData`; path: memoryTracker; response body: Array<RecallLog>)
+- `getRecallHistory`: GET `/api/memory-trackers/{memoryTracker}/recall-history` -> `GetRecallHistoryResponse` (request: `GetRecallHistoryData`; path: memoryTracker; response body: Array<RecallHistoryItem>)
 - `getRecentlyRecalled`: GET `/api/memory-trackers/recently-recalled` -> `GetRecentlyRecalledResponse` (request: none; response body: Array<MemoryTracker>)
 - `getRecentMemoryTrackers`: GET `/api/memory-trackers/recent` -> `GetRecentMemoryTrackersResponse` (request: none; response body: Array<MemoryTracker>)
 - `deleteUnansweredRecallPrompts`: DELETE `/api/memory-trackers/{memoryTracker}/recall-prompts/unanswered` -> `DeleteUnansweredRecallPromptsResponse` (request: `DeleteUnansweredRecallPromptsData`; path: memoryTracker; response body: void)

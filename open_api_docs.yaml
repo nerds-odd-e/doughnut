@@ -2789,6 +2789,26 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/RecallLog"
+  /api/memory-trackers/{memoryTracker}/recall-history:
+    get:
+      tags:
+      - memory-tracker-controller
+      operationId: getRecallHistory
+      parameters:
+      - name: memoryTracker
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/RecallHistoryItem"
   /api/memory-trackers/recently-recalled:
     get:
       tags:
@@ -5341,6 +5361,13 @@ components:
       - memoryTrackerId
       - productOutcome
       - recordedAt
+    RecallHistoryItem:
+      type: object
+      properties:
+        recallLog:
+          $ref: "#/components/schemas/RecallLog"
+        recallPrompt:
+          $ref: "#/components/schemas/RecallPromptHistoryItem"
     LearningSessionRequestResponse:
       type: object
       properties:
