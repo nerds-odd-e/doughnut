@@ -7,7 +7,7 @@ const meta = {
   component: MemoryTrackerPageView,
   tags: ["autodocs"],
   argTypes: {
-    recallPrompts: {
+    recallHistory: {
       control: "object",
     },
   },
@@ -16,7 +16,6 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-// Helper to create a recall prompt with answer
 const createRecallPromptWithAnswer = (opts: {
   stem: string
   choices: string[]
@@ -41,43 +40,46 @@ const createRecallPromptWithAnswer = (opts: {
     .please()
 }
 
-// With an answered question
 export const WithAnsweredQuestion: Story = {
   args: {
-    recallPrompts: [
-      createRecallPromptWithAnswer({
-        stem: "What is the capital of France?",
-        choices: ["Paris", "London", "Berlin", "Madrid"],
-        correctIndex: 0,
-        answerIndex: 0,
-        isCorrect: true,
-      }),
+    recallHistory: [
+      makeMe.aRecallHistoryItem
+        .recallPrompt(
+          createRecallPromptWithAnswer({
+            stem: "What is the capital of France?",
+            choices: ["Paris", "London", "Berlin", "Madrid"],
+            correctIndex: 0,
+            answerIndex: 0,
+            isCorrect: true,
+          })
+        )
+        .please(),
     ],
-    recallLogs: [],
     memoryTracker: makeMe.aMemoryTracker.please(),
     memoryTrackerId: 1,
   },
 }
 
-// With incorrect answer
 export const WithIncorrectAnswer: Story = {
   args: {
-    recallPrompts: [
-      createRecallPromptWithAnswer({
-        stem: "What is the capital of France?",
-        choices: ["Paris", "London", "Berlin", "Madrid"],
-        correctIndex: 0,
-        answerIndex: 1,
-        isCorrect: false,
-      }),
+    recallHistory: [
+      makeMe.aRecallHistoryItem
+        .recallPrompt(
+          createRecallPromptWithAnswer({
+            stem: "What is the capital of France?",
+            choices: ["Paris", "London", "Berlin", "Madrid"],
+            correctIndex: 0,
+            answerIndex: 1,
+            isCorrect: false,
+          })
+        )
+        .please(),
     ],
-    recallLogs: [],
     memoryTracker: makeMe.aMemoryTracker.please(),
     memoryTrackerId: 1,
   },
 }
 
-// Question with note that has many ancestors
 export const NoteWithManyAncestors: Story = {
   args: (() => {
     const note = makeMe.aNote
@@ -99,29 +101,30 @@ export const NoteWithManyAncestors: Story = {
       .please()
 
     return {
-      recallPrompts: [
-        makeMe.aRecallPromptHistoryItem
-          .withMcq(mcq)
-          .withAnswer({
-            id: 1,
-            correct: true,
-            choiceIndex: 0,
-          })
-          .withAnswerTime(new Date().toISOString())
+      recallHistory: [
+        makeMe.aRecallHistoryItem
+          .recallPrompt(
+            makeMe.aRecallPromptHistoryItem
+              .withMcq(mcq)
+              .withAnswer({
+                id: 1,
+                correct: true,
+                choiceIndex: 0,
+              })
+              .withAnswerTime(new Date().toISOString())
+              .please()
+          )
           .please(),
       ],
-      recallLogs: [],
       memoryTracker: makeMe.aMemoryTracker.ofLink(note).please(),
       memoryTrackerId: 1,
     }
   })(),
 }
 
-// No recall prompts found
-export const NoQuestionFound: Story = {
+export const NoHistoryFound: Story = {
   args: {
-    recallPrompts: [],
-    recallLogs: [],
+    recallHistory: [],
     memoryTracker: makeMe.aMemoryTracker.please(),
     memoryTrackerId: 1,
   },

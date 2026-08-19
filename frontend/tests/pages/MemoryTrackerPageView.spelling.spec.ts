@@ -4,6 +4,7 @@ import {
   mockMemoryTrackerPageViewDefaults,
   mountMemoryTrackerPageViewReady,
   spellingDetailsNotNeeded,
+  historyFromPrompts,
 } from "./memoryTrackerPageViewTestSupport"
 
 describe("MemoryTrackerPageView spelling prompts", () => {
@@ -13,9 +14,9 @@ describe("MemoryTrackerPageView spelling prompts", () => {
 
   it("shows spelling details-not-needed message when unanswered", async () => {
     const wrapper = await mountMemoryTrackerPageViewReady({
-      recallPrompts: [
+      recallHistory: historyFromPrompts([
         makeMe.aRecallPromptHistoryItem.withQuestionType("SPELLING").please(),
-      ],
+      ]),
     })
 
     expect(wrapper.text()).toContain(spellingDetailsNotNeeded)
@@ -23,7 +24,7 @@ describe("MemoryTrackerPageView spelling prompts", () => {
 
   it("displays spelling answer and Correct result when answered correctly", async () => {
     const wrapper = await mountMemoryTrackerPageViewReady({
-      recallPrompts: [
+      recallHistory: historyFromPrompts([
         makeMe.aRecallPromptHistoryItem
           .withQuestionType("SPELLING")
           .withAnswer({
@@ -34,7 +35,7 @@ describe("MemoryTrackerPageView spelling prompts", () => {
           })
           .withAnswerTime(new Date().toISOString())
           .please(),
-      ],
+      ]),
     })
 
     expect(wrapper.text()).toContain("Your answer:")
@@ -44,7 +45,7 @@ describe("MemoryTrackerPageView spelling prompts", () => {
 
   it("displays Incorrect result when spelling answer is wrong", async () => {
     const wrapper = await mountMemoryTrackerPageViewReady({
-      recallPrompts: [
+      recallHistory: historyFromPrompts([
         makeMe.aRecallPromptHistoryItem
           .withQuestionType("SPELLING")
           .withAnswer({
@@ -55,7 +56,7 @@ describe("MemoryTrackerPageView spelling prompts", () => {
           })
           .withAnswerTime(new Date().toISOString())
           .please(),
-      ],
+      ]),
     })
 
     expect(wrapper.text()).toContain("asdf")
@@ -64,9 +65,9 @@ describe("MemoryTrackerPageView spelling prompts", () => {
 
   it("does not show multiple-choice question UI for spelling prompts", async () => {
     const wrapper = await mountMemoryTrackerPageViewReady({
-      recallPrompts: [
+      recallHistory: historyFromPrompts([
         makeMe.aRecallPromptHistoryItem.withQuestionType("SPELLING").please(),
-      ],
+      ]),
     })
 
     expect(wrapper.find('[data-test="question-section"]').exists()).toBe(false)

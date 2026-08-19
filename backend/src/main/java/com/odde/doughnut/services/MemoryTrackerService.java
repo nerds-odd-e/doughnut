@@ -2,6 +2,7 @@ package com.odde.doughnut.services;
 
 import com.odde.doughnut.controllers.dto.AnswerSpellingDTO;
 import com.odde.doughnut.controllers.dto.AssimilationRequestDTO;
+import com.odde.doughnut.controllers.dto.RecallHistoryItem;
 import com.odde.doughnut.controllers.dto.ThresholdExceededResult;
 import com.odde.doughnut.entities.Answer;
 import com.odde.doughnut.entities.MemoryTracker;
@@ -184,6 +185,10 @@ public class MemoryTrackerService {
   public List<RecallLog> getRecallLogs(MemoryTracker memoryTracker) {
     return recallLogRepository.findAllByMemoryTracker_IdOrderByRecordedAtDescIdDesc(
         memoryTracker.getId());
+  }
+
+  public List<RecallHistoryItem> getRecallHistory(MemoryTracker memoryTracker) {
+    return RecallHistoryItem.from(getRecallLogs(memoryTracker), getAllRecallPrompts(memoryTracker));
   }
 
   public void deleteUnansweredRecallPrompts(MemoryTracker memoryTracker) {

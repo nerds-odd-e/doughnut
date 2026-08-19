@@ -1097,6 +1097,11 @@ export type RecallLog = {
     answerId?: number;
 };
 
+export type RecallHistoryItem = {
+    recallLog?: RecallLog;
+    recallPrompt?: RecallPromptHistoryItem;
+};
+
 export type LearningSessionRequestResponse = {
     requestMarkdown: string;
 };
@@ -3648,6 +3653,24 @@ export type GetRecallLogsResponses = {
 };
 
 export type GetRecallLogsResponse = GetRecallLogsResponses[keyof GetRecallLogsResponses];
+
+export type GetRecallHistoryData = {
+    body?: never;
+    path: {
+        memoryTracker: number;
+    };
+    query?: never;
+    url: '/api/memory-trackers/{memoryTracker}/recall-history';
+};
+
+export type GetRecallHistoryResponses = {
+    /**
+     * OK
+     */
+    200: Array<RecallHistoryItem>;
+};
+
+export type GetRecallHistoryResponse = GetRecallHistoryResponses[keyof GetRecallHistoryResponses];
 
 export type GetRecentlyRecalledData = {
     body?: never;

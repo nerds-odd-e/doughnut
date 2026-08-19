@@ -8,8 +8,7 @@
     <ContentLoader v-else-if="pageData === undefined" />
     <MemoryTrackerPageView
       v-else
-      :recall-prompts="pageData.recallPrompts"
-      :recall-logs="pageData.recallLogs"
+      :recall-history="pageData.recallHistory"
       :memory-tracker="pageData.memoryTracker"
       :memory-tracker-id="memoryTrackerId"
       @refresh="fetchData"
@@ -20,9 +19,8 @@
 <script setup lang="ts">
 import { computed, ref, onMounted } from "vue"
 import type {
-  RecallPromptHistoryItem,
+  RecallHistoryItem,
   MemoryTracker,
-  RecallLog,
 } from "@generated/doughnut-backend-api"
 import { MemoryTrackerController } from "@generated/doughnut-backend-api/sdk.gen"
 import {} from "@/managedApi/clientSetup"
@@ -34,44 +32,34 @@ const props = defineProps<{
   memoryTrackerId: number
 }>()
 
-const recallPrompts = ref<RecallPromptHistoryItem[] | undefined>(undefined)
+const recallHistory = ref<RecallHistoryItem[] | undefined>(undefined)
 const memoryTracker = ref<MemoryTracker | undefined>(undefined)
-const recallLogs = ref<RecallLog[] | undefined>(undefined)
 const error = ref(false)
 const pageData = computed(() => {
-  if (
-    recallPrompts.value === undefined ||
-    memoryTracker.value === undefined ||
-    recallLogs.value === undefined
-  ) {
+  if (recallHistory.value === undefined || memoryTracker.value === undefined) {
     return undefined
   }
   return {
-    recallPrompts: recallPrompts.value,
+    recallHistory: recallHistory.value,
     memoryTracker: memoryTracker.value,
-    recallLogs: recallLogs.value,
   }
 })
 
 const fetchData = async () => {
-  const [promptsResult, trackerResult, logsResult] = await Promise.all([
-    MemoryTrackerController.getRecallPrompts({
+  const [historyResult, trackerResult] = await Promise.all([
+    MemoryTrackerController.getRecallHistory({
       path: { memoryTracker: props.memoryTrackerId },
     }),
     MemoryTrackerController.showMemoryTracker({
       path: { memoryTracker: props.memoryTrackerId },
     }),
-    MemoryTrackerController.getRecallLogs({
-      path: { memoryTracker: props.memoryTrackerId },
-    }),
   ])
 
-  if (promptsResult.error || trackerResult.error || logsResult.error) {
+  if (historyResult.error || trackerResult.error) {
     error.value = true
   } else {
-    recallPrompts.value = promptsResult.data ?? []
+    recallHistory.value = historyResult.data ?? []
     memoryTracker.value = trackerResult.data
-    recallLogs.value = logsResult.data ?? []
   }
 }
 
