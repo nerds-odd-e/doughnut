@@ -1,6 +1,6 @@
 # Rebuild Memory Tracker DSR from RecallLog
 
-**Status:** in progress  
+**Status:** complete  
 **Goal:** One-time fold of each tracker that has a mapped-grade RecallLog under locked FSRS-6, so persisted Stability, Difficulty, `lastRecalledAt`, and `nextRecallAt` match that log. ADR 0003 drops “history is incomplete / do not replay / going forward only.” E4 stays deferred.
 
 ## Locked decisions
@@ -60,8 +60,8 @@
 ### 6. Drop leftover incomplete-history story
 
 - **Type:** Structure
-- **Status:** planned
-- **Cleanup only:** SEED-004, `FSRS-COMPATIBILITY-GAP.md`, `STATE.md` — remaining deferred is **E4** plus human accept. ADR Consequences / Assumptions / Related match the Decision. No dual “do not replay” map. No product rename of `Fsrs*`.
+- **Status:** done
+- **Done:** SEED-004, `FSRS-COMPATIBILITY-GAP.md`, and `STATE.md` point at ADR 0003 **DSR snapshot**. Remaining deferred is **E4** plus human accept. Ungated `V300000283` listed as applied-needed. ADR left unchanged (already one map). No `Fsrs*` rename.
 
 ## Jidoka
 

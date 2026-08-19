@@ -11,13 +11,13 @@ scope: large
 
 ## Why This Matters
 
-Doughnut already schedules recall with elapsed time and outcome. The product contract is Proposed [ADR 0003](../../docs/adrs/0003-spaced-repetition-scheduling-policy.md) Decision. First-rating (all four G, Tutor **2** as Hard) is **closed**; `w[0]` is used for Again `S0`. Maximum interval is **closed** (36500 days / 876000 hours). Interval fuzz is **closed** (not used). Thinking-time overlay is **closed** (RT is not a DSR input). New last recall is **closed** (`lastRecalledAt` is the last mapped grade; New has none; due for New is `assimilatedAt`). Commissioned scores are **1–4** identical to FSRS G (`score = G`). RecallLog elapsed hours is **closed** (`elapsed_hours` required; ADR 0003 RecallLog). Short-term window is locked in that Decision (elapsed **< 24** all four G; **≥ 24** long-term, Again = post-lapse; New → Again **5h** → Good at 5h → **6h**). Post-lapse cap is **closed** (elapsed **≥ 24**, a fail cannot lengthen S). Remaining deferred is **accepting** ADR 0003 plus **E4** fitting.
+Doughnut already schedules recall with elapsed time and outcome. The product contract is Proposed [ADR 0003](../../docs/adrs/0003-spaced-repetition-scheduling-policy.md) Decision. First-rating (all four G, Tutor **2** as Hard) is **closed**; `w[0]` is used for Again `S0`. Maximum interval is **closed** (36500 days / 876000 hours). Interval fuzz is **closed** (not used). Thinking-time overlay is **closed** (RT is not a DSR input). New last recall is **closed** (`lastRecalledAt` is the last mapped grade; New has none; due for New is `assimilatedAt`). Commissioned scores are **1–4** identical to FSRS G (`score = G`). RecallLog elapsed hours is **closed** (`elapsed_hours` required; ADR 0003 RecallLog). Short-term window is locked in that Decision (elapsed **< 24** all four G; **≥ 24** long-term, Again = post-lapse; New → Again **5h** → Good at 5h → **6h**). Post-lapse cap is **closed** (elapsed **≥ 24**, a fail cannot lengthen S). DSR snapshot is **closed** (see ADR 0003 **DSR snapshot**). Remaining deferred is **accepting** ADR 0003 plus **E4** fitting.
 
 ## When to Surface
 
 **Trigger:** accepting ADR 0003; changing fitting.
 
-Also surface when changing success/failure interval math, commissioned score → schedule mapping, or due-work rebuild from history.
+Also surface when changing success/failure interval math or commissioned score → schedule mapping.
 
 ## Scope Estimate
 
@@ -35,5 +35,6 @@ Also surface when changing success/failure interval math, commissioned score →
 - `backend/src/main/java/com/odde/doughnut/entities/Fsrs.java`
 - `backend/src/main/java/com/odde/doughnut/entities/FsrsAgainRecall.java`
 - `backend/src/main/java/com/odde/doughnut/entities/MemoryTracker.java`
+- `backend/src/main/java/com/odde/doughnut/entities/RecallLogDsrBackfill.java` (ungated `V300000283` one-time DSR snapshot; not live scheduling)
 - `backend/src/main/java/db/migration/StabilityIndexToHoursBackfill.java` (Flyway replay of `V300000260` only; not live scheduling)
 - https://github.com/open-spaced-repetition/awesome-fsrs/wiki/The-Algorithm
