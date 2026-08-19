@@ -46,10 +46,9 @@
 ### 4. Replay confusion as a non-grade
 
 - **Type:** Behavior
-- **Status:** planned
-- **Pre:** First Good, then CONFUSION, leftover snapshot.
-- **Trigger:** Same backfill.
-- **Post:** S is the confusion midpoint; Difficulty and `lastRecalledAt` stay the Good grade; due is not later than the Good due.
+- **Status:** done
+- **Done:** Delta pin: leftover first Good then CONFUSION at elapsed 24 uses `Fsrs.confusionAdjusted` (then cap); D and `lastRecalledAt` stay the Good grade; due ≤ Good due. No production change.
+- **Learning:** Confusion pin stays a delta on `leftoverFirstMappedGood`. Expected S from `Fsrs.confusionAdjusted`, not a second formula.
 
 ### 5. Leave snapshots with no mapped-grade log
 
