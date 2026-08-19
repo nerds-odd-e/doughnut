@@ -61,6 +61,32 @@ async function pointDeadWikiLinkAndCaptureUpdate(args: {
   return updateSpy
 }
 
+async function pointPathMarkdownDeadLinkAndCaptureUpdate(args: {
+  deadHref: string
+  content: string
+}) {
+  const targetRealm = MakeMe.aNoteRealm
+    .title("Title")
+    .inFolder(10, "ChosenFolder")
+    .please()
+  return pointDeadWikiLinkAndCaptureUpdate({
+    content: args.content,
+    payload: { targetToken: args.deadHref, displayText: "label" },
+    typeIn: "Title",
+    searchHits: [
+      {
+        hitKind: "NOTE" as const,
+        noteSearchResult: MakeMe.aNoteSearchResult
+          .title("Title")
+          .id(targetRealm.id)
+          .notebookId(targetRealm.notebookRealm.notebook.id)
+          .please(),
+      },
+    ],
+    targetRealm,
+  })
+}
+
 describe("SearchForm dead wiki link actions", () => {
   setupSearchDialogTests()
 
@@ -131,25 +157,9 @@ describe("SearchForm dead wiki link actions", () => {
     ])(
       "rewrites path Markdown dead link $deadHref keeping Markdown spelling",
       async ({ deadHref, expected }) => {
-        const targetRealm = MakeMe.aNoteRealm
-          .title("Title")
-          .inFolder(10, "ChosenFolder")
-          .please()
-        const updateSpy = await pointDeadWikiLinkAndCaptureUpdate({
+        const updateSpy = await pointPathMarkdownDeadLinkAndCaptureUpdate({
+          deadHref,
           content: `See [label](${deadHref}) here.`,
-          payload: { targetToken: deadHref, displayText: "label" },
-          typeIn: "Title",
-          searchHits: [
-            {
-              hitKind: "NOTE" as const,
-              noteSearchResult: MakeMe.aNoteSearchResult
-                .title("Title")
-                .id(targetRealm.id)
-                .notebookId(targetRealm.notebookRealm.notebook.id)
-                .please(),
-            },
-          ],
-          targetRealm,
         })
 
         expect(updateSpy).toHaveBeenCalledWith(
@@ -161,5 +171,22 @@ describe("SearchForm dead wiki link actions", () => {
         )
       }
     )
+
+    it("rewrites every matching path Markdown dead link token", async () => {
+      const deadSpan = "[label](/Folder/Missing.md)"
+      const updateSpy = await pointPathMarkdownDeadLinkAndCaptureUpdate({
+        deadHref: "/Folder/Missing.md",
+        content: `${deadSpan} ${deadSpan}`,
+      })
+
+      const rewritten = "[label](/ChosenFolder/Title.md)"
+      expect(updateSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          body: expect.objectContaining({
+            content: `${rewritten} ${rewritten}`,
+          }),
+        })
+      )
+    })
   })
 })

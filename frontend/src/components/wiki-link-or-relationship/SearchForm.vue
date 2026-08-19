@@ -127,7 +127,7 @@ async function onDeadWikiLinkToNote() {
       })
   const currentContent =
     storageAccessor.value.refOfNoteRealm(note.id).value?.note.content ?? ""
-  const newContent = currentContent.replace(originalToken, newLinkText)
+  const newContent = currentContent.replaceAll(originalToken, newLinkText)
   await closeDialogThen(() =>
     storageAccessor.value
       .storedApi()
