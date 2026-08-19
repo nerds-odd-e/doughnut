@@ -20,8 +20,12 @@ public class MemoryTrackerBuilder extends EntityBuilder<MemoryTracker> {
 
   public MemoryTrackerBuilder assimilatedAt(Timestamp assimilatedTimestamp) {
     entity.setAssimilatedAt(assimilatedTimestamp);
-    entity.setLastRecalledAt(assimilatedTimestamp);
     entity.setNextRecallAt(assimilatedTimestamp);
+    return this;
+  }
+
+  public MemoryTrackerBuilder lastRecalledAt(Timestamp lastRecalledAt) {
+    entity.setLastRecalledAt(lastRecalledAt);
     return this;
   }
 
@@ -51,6 +55,9 @@ public class MemoryTrackerBuilder extends EntityBuilder<MemoryTracker> {
 
   public MemoryTrackerBuilder stabilityAndNextRecallAt(float value) {
     entity.setStability(value);
+    if (!new ForgettingCurve(value).isNew() && entity.getLastRecalledAt() == null) {
+      entity.setLastRecalledAt(entity.getAssimilatedAt());
+    }
     entity.setNextRecallAt(entity.calculateNextRecallAt());
     return this;
   }

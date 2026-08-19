@@ -56,9 +56,27 @@ class MemoryTrackerTrackingControllerTest extends MemoryTrackerControllerTestBas
     RecallLog log = logs.get(0);
     assertThat(log.getProductOutcome(), is(ProductOutcome.GOOD));
     assertThat(log.getRecordedAt(), equalTo(recalledAt));
-    assertThat(log.getElapsedHours(), equalTo(24));
+    assertThat(log.getElapsedHours(), equalTo(0));
     assertThat(log.getAnswerId(), nullValue());
     assertThat(log.getMemoryTrackerId(), equalTo(tracker.getId()));
+  }
+
+  @Test
+  void laterGradeOnGradedTrackerElapsedHoursAreSinceLastRecall()
+      throws UnexpectedNoAccessRightException {
+    Timestamp lastRecall = makeMe.aTimestamp().of(1, 8).please();
+    MemoryTracker tracker =
+        makeMe
+            .aMemoryTrackerFor(ownedNote())
+            .assimilatedAt(lastRecall)
+            .stabilityAndNextRecallAt(55f)
+            .please();
+    Timestamp recalledAt = makeMe.aTimestamp().of(2, 8).please();
+    testabilitySettings.timeTravelTo(recalledAt);
+
+    controller.markAsRecalled(tracker, true);
+
+    assertThat(controller.getRecallLogs(tracker).get(0).getElapsedHours(), equalTo(24));
   }
 
   @Test

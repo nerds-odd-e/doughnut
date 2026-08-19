@@ -28,6 +28,16 @@ Feature: Spaced-repetition
     And On day 9 I recall "end                 " and assimilate new "end         "
 
   @mockBrowserTime
+  Scenario: Memory Tracker after assimilate has no last recall
+    Given the browser and backend are on day 1
+    When I assimilate the note "Note 1"
+    And I visit the understanding memory tracker for "Note 1"
+    Then I should see Last Recall Time "N/A"
+    And I should see Next Recall Time equal to Assimilated Time
+    And I should see Stability 0
+    And I should see Difficulty "N/A"
+
+  @mockBrowserTime
   Scenario: Memory Tracker shows a GOOD RecallLog after just-review Yes
     Given the browser and backend are on day 1
     When I assimilate the note "Note 1"

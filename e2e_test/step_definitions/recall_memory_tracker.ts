@@ -33,6 +33,18 @@ Then('I should see Difficulty {float}', (difficulty: number) => {
   assumeMemoryTrackerPage().expectDifficulty(difficulty)
 })
 
+Then('I should see Last Recall Time {string}', (value: string) => {
+  assumeMemoryTrackerPage().expectLastRecallTime(value)
+})
+
+Then('I should see Difficulty {string}', (value: string) => {
+  assumeMemoryTrackerPage().expectDifficulty(value)
+})
+
+Then('I should see Next Recall Time equal to Assimilated Time', () => {
+  assumeMemoryTrackerPage().expectNextRecallTimeEqualsAssimilatedTime()
+})
+
 Then(
   'I should see {int} hours between last and next recall',
   (hours: number) => {

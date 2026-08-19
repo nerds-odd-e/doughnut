@@ -56,7 +56,7 @@ class StillNewFirstRatingBackfillTest {
 
     runAgain("1=1");
 
-    assertStillNew(assimilateOnly.getId(), assimilateOnly.getLastRecalledAt());
+    assertStillNew(assimilateOnly.getId(), assimilateOnly.getAssimilatedAt());
   }
 
   @Test
@@ -76,7 +76,7 @@ class StillNewFirstRatingBackfillTest {
 
     runAgain("1=1");
 
-    assertStillNew(shrinkOnly.getId(), shrinkOnly.getLastRecalledAt());
+    assertStillNew(shrinkOnly.getId(), shrinkOnly.getAssimilatedAt());
   }
 
   @Test
@@ -85,7 +85,7 @@ class StillNewFirstRatingBackfillTest {
 
     runAgain("1=0");
 
-    assertStillNew(again.getId(), again.getLastRecalledAt());
+    assertStillNew(again.getId(), again.getAssimilatedAt());
   }
 
   @Test
@@ -113,7 +113,7 @@ class StillNewFirstRatingBackfillTest {
 
     runHard("1=1");
 
-    assertStillNew(againOnly.getId(), againOnly.getLastRecalledAt());
+    assertStillNew(againOnly.getId(), againOnly.getAssimilatedAt());
   }
 
   @Test
@@ -135,7 +135,7 @@ class StillNewFirstRatingBackfillTest {
 
     runHard("1=0");
 
-    assertStillNew(shrink.getId(), shrink.getLastRecalledAt());
+    assertStillNew(shrink.getId(), shrink.getAssimilatedAt());
   }
 
   private MemoryTracker stillNewWith(ProductOutcome outcome, Timestamp lastRecalled) {
@@ -145,7 +145,11 @@ class StillNewFirstRatingBackfillTest {
   }
 
   private MemoryTracker stillNew(Timestamp lastRecalled) {
-    return makeMe.aMemoryTrackerFor(makeMe.aNote().please()).assimilatedAt(lastRecalled).please();
+    return makeMe
+        .aMemoryTrackerFor(makeMe.aNote().please())
+        .assimilatedAt(lastRecalled)
+        .lastRecalledAt(lastRecalled)
+        .please();
   }
 
   private MemoryTracker gradedWithAgainLog(Timestamp lastRecalled) {
@@ -197,11 +201,11 @@ class StillNewFirstRatingBackfillTest {
                 row.lastRecalledAt(), Math.round(expectedStability))));
   }
 
-  private void assertStillNew(Integer id, Timestamp lastRecalled) {
+  private void assertStillNew(Integer id, Timestamp expectedDue) {
     TrackerRow row = trackerRow(id);
     assertThat(row.stability(), equalTo(ForgettingCurve.ASSIMILATE_STABILITY_HOURS));
     assertThat(row.difficulty(), nullValue());
-    assertThat(row.nextRecallAt(), equalTo(lastRecalled));
+    assertThat(row.nextRecallAt(), equalTo(expectedDue));
   }
 
   private Float stability(Integer id) {

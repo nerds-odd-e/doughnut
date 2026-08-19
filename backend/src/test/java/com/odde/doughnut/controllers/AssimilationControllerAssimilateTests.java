@@ -87,7 +87,7 @@ class AssimilationControllerAssimilateTests extends ControllerTestBase {
     }
 
     @Test
-    void shouldSetAssimilatedAtAndLastRecalledAt() {
+    void assimilateLeavesLastRecallUnsetAndDueAtAssimilatedAt() {
       Timestamp now = makeMe.aTimestamp().of(1, 8).fromShanghai().please();
       testabilitySettings.timeTravelTo(now);
       Note note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
@@ -96,7 +96,8 @@ class AssimilationControllerAssimilateTests extends ControllerTestBase {
           controller.assimilate(AssimilationControllerTestSupport.assimilateRequest(note)).get(0);
 
       assertThat(tracker.getAssimilatedAt(), equalTo(now));
-      assertThat(tracker.getLastRecalledAt(), equalTo(now));
+      assertThat(tracker.getLastRecalledAt(), nullValue());
+      assertThat(tracker.getNextRecallAt(), equalTo(now));
     }
 
     @Test

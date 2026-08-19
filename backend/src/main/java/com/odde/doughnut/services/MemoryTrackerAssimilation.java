@@ -14,17 +14,14 @@ import java.util.List;
 final class MemoryTrackerAssimilation {
   private final EntityPersister entityPersister;
   private final UserService userService;
-  private final MemoryTrackerService memoryTrackerService;
   private final AssimilationSequenceSkipRepository skipRepository;
 
   MemoryTrackerAssimilation(
       EntityPersister entityPersister,
       UserService userService,
-      MemoryTrackerService memoryTrackerService,
       AssimilationSequenceSkipRepository skipRepository) {
     this.entityPersister = entityPersister;
     this.userService = userService;
-    this.memoryTrackerService = memoryTrackerService;
     this.skipRepository = skipRepository;
   }
 
@@ -102,8 +99,8 @@ final class MemoryTrackerAssimilation {
     memoryTracker.setType(type);
     memoryTracker.setUser(currentUser);
     memoryTracker.setAssimilatedAt(currentTime);
-    memoryTracker.setLastRecalledAt(currentTime);
-    memoryTrackerService.updateStability(memoryTracker, 0.0f);
+    memoryTracker.setNextRecallAt(memoryTracker.calculateNextRecallAt());
+    entityPersister.save(memoryTracker);
     if (type == MemoryTrackerType.UNDERSTANDING) {
       deleteMatchingSequenceSkip(currentUser, memoryTracker);
     }

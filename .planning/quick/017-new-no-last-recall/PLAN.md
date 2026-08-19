@@ -26,11 +26,9 @@ Accepted recommendations (2026-08-19): nullable `last_recalled_at`; New due = `a
 ## Discoveries
 
 - `findLast100RecalledByUser` already filters `last_recalled_at IS NOT NULL`. Memory Tracker already shows **N/A** when last recall is missing.
-- Schema is still `datetime NOT NULL` (`V300000273`). Assimilate writes `lastRecalledAt = now`. `remove` also writes `lastRecalledAt = now`.
-- `MemoryTrackerBuilder.assimilatedAt` copies assimilate time onto last recall and due. Graded helpers must keep a last recall when the fixture is not New.
-- `updateStability(..., 0)` exists only for assimilate init.
-- `successfulMarkAsRecalledLeavesOneGoodRecallLog` pins first just-review Yes at +24h elapsed from assimilate — that pin is the lie this plan removes.
-- Same-day first-grade E2E already has elapsed 0; the unique pin is a later first grade (controller test) plus Last Recall Time **N/A** after assimilate (E2E).
+- `last_recalled_at` is DATETIME NULL (`V300000275`). Assimilate leaves it unset; due = `assimilatedAt`.
+- `remove` still writes `lastRecalledAt = now` (slice 4).
+- Graded builder helpers (`stabilityAndNextRecallAt`, `afterNthStrictRecall`) still set last recall when the fixture is not New.
 
 ## Slices
 
@@ -53,14 +51,9 @@ Flyway `V300000275` makes `last_recalled_at` DATETIME NULL. Unset last recall: e
 ### 3. Assimilating leaves Last Recall Time N/A
 
 - **Type:** Behavior
-- **Status:** planned
+- **Status:** done
 
-**Pre:** a note is not yet assimilated. **Trigger:** assimilate (understanding; spelling/commissioned share `initializeNewTracker`). **Post:** Last Recall Time **N/A**; Next Recall Time equals Assimilated Time; Stability 0; Difficulty **N/A**. A later first mapped grade (just-review Yes a day after assimilate) writes last recall at the grade instant and `RecallLog.elapsed_hours` **0**; first-rating S/D unchanged.
-
-- E2E: `spaced_repetition.feature` — assimilate `Note 1`, visit the understanding memory tracker, Last Recall Time **N/A**, Next Recall Time equals Assimilated Time. Canonical first-grade log shape stays the existing same-day GOOD scenario; change `successfulMarkAsRecalledLeavesOneGoodRecallLog` elapsed **24 → 0** (unique delta). Add a sibling controller pin only if no existing test already shows S>0 elapsed is still hours since last grade.
-- HTTP: `AssimilationControllerAssimilateTests.shouldSetAssimilatedAtAndLastRecalledAt` — last recall unset; due = assimilated.
-- Stop writing last recall in `initializeNewTracker`. Set `nextRecallAt = assimilatedAt` and persist; drop `updateStability(..., 0)` if that was its only caller.
-- `MemoryTrackerBuilder.assimilatedAt` does not copy onto last recall. Graded helpers (`stabilityAndNextRecallAt`, `afterNthStrictRecall`) must still leave a last recall when the fixture is not New.
+Assimilate leaves last recall unset; due via `calculateNextRecallAt()` (= assimilated). First just-review Yes a day later: `RecallLog.elapsed_hours` **0**. E2E: Last Recall Time **N/A**, Next = Assimilated, S 0, D **N/A**. Builder `assimilatedAt` does not copy last recall; graded helpers still set it. Dropped unused `updateStability`.
 
 ### 4. Remove from recall does not change Last Recall Time
 

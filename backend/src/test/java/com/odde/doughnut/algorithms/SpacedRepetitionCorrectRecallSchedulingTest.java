@@ -46,7 +46,7 @@ class SpacedRepetitionCorrectRecallSchedulingTest extends SpacedRepetitionRecall
   void firstCorrectRecallIgnoresElapsedHours() {
     MemoryTracker memoryTracker = makeMe.aMemoryTrackerFor(note).by(user).inMemoryPlease();
     Timestamp gradeTime =
-        TimestampOperations.addHoursToTimestamp(memoryTracker.getLastRecalledAt(), 500);
+        TimestampOperations.addHoursToTimestamp(memoryTracker.getAssimilatedAt(), 500);
 
     memoryTracker.recalledSuccessfully(gradeTime);
 

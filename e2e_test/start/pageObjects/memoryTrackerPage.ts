@@ -36,6 +36,11 @@ const expectLabeledValueUnchanged = (
   })
 }
 
+const labeledPair = (firstLabel: string, secondLabel: string) =>
+  labeledValue(firstLabel).then((first) =>
+    labeledValue(secondLabel).then((second) => ({ first, second }))
+  )
+
 const recallLogs = () => cy.get('[data-testid="recall-log"]')
 
 const assumeMemoryTrackerPage = () => {
@@ -75,8 +80,8 @@ const assumeMemoryTrackerPage = () => {
     },
     expectHoursBetweenLastAndNextRecall(hours: number) {
       expectMemoryTrackerPage()
-      labeledValue('Last Recall Time:').then((lastRecallTime) => {
-        labeledValue('Next Recall Time:').then((nextRecallTime) => {
+      labeledPair('Last Recall Time:', 'Next Recall Time:').then(
+        ({ first: lastRecallTime, second: nextRecallTime }) => {
           const intervalInHours =
             (new Date(nextRecallTime).getTime() -
               new Date(lastRecallTime).getTime()) /
@@ -85,8 +90,8 @@ const assumeMemoryTrackerPage = () => {
             intervalInHours,
             `Expected ${hours} hours between Last Recall Time (${lastRecallTime}) and Next Recall Time (${nextRecallTime})`
           ).to.equal(hours)
-        })
-      })
+        }
+      )
       return assumeMemoryTrackerPage()
     },
     expectStability(stability: number) {
@@ -94,9 +99,26 @@ const assumeMemoryTrackerPage = () => {
       expectLabeledValue('Stability:', String(stability))
       return assumeMemoryTrackerPage()
     },
-    expectDifficulty(difficulty: number) {
+    expectDifficulty(difficulty: number | string) {
       expectMemoryTrackerPage()
       expectLabeledValue('Difficulty:', String(difficulty))
+      return assumeMemoryTrackerPage()
+    },
+    expectLastRecallTime(value: string) {
+      expectMemoryTrackerPage()
+      expectLabeledValue('Last Recall Time:', value)
+      return assumeMemoryTrackerPage()
+    },
+    expectNextRecallTimeEqualsAssimilatedTime() {
+      expectMemoryTrackerPage()
+      labeledPair('Assimilated Time:', 'Next Recall Time:').then(
+        ({ first: assimilatedTime, second: nextRecallTime }) => {
+          expect(
+            nextRecallTime,
+            `Next Recall Time (${nextRecallTime}) should equal Assimilated Time (${assimilatedTime})`
+          ).to.equal(assimilatedTime)
+        }
+      )
       return assumeMemoryTrackerPage()
     },
     expectTrackerType(type: string) {

@@ -53,8 +53,7 @@ public class MemoryTrackerService {
     this.recallPromptRepository = recallPromptRepository;
     this.recallLogRepository = recallLogRepository;
     this.conversationRepository = conversationRepository;
-    this.assimilation =
-        new MemoryTrackerAssimilation(entityPersister, userService, this, skipRepository);
+    this.assimilation = new MemoryTrackerAssimilation(entityPersister, userService, skipRepository);
     this.spellingRecallGrading =
         new SpellingRecallGrading(entityPersister, recallPromptRepository, wikiLinkResolver, this);
   }
@@ -70,12 +69,6 @@ public class MemoryTrackerService {
   public List<MemoryTracker> assimilate(
       AssimilationRequestDTO request, User currentUser, Timestamp currentTime) {
     return assimilation.assimilate(request, currentUser, currentTime);
-  }
-
-  public void updateStability(MemoryTracker memoryTracker, float adjustment) {
-    memoryTracker.setStability(memoryTracker.getStability() + adjustment);
-    memoryTracker.setNextRecallAt(memoryTracker.calculateNextRecallAt());
-    entityPersister.save(memoryTracker);
   }
 
   public boolean updateMemoryTrackerAfterAnsweringQuestion(

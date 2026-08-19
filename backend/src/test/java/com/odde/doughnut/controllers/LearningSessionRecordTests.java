@@ -8,6 +8,7 @@ import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import java.sql.Timestamp;
+import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
@@ -44,7 +45,7 @@ class LearningSessionRecordTests extends LearningSessionControllerTestBase {
     SpanishNotebookFixture fixture = spanishNotebookFixture(dayTwo);
     MemoryTracker holaTracker = fixture.holaTracker();
     var trackerStateBefore =
-        List.of(
+        Arrays.asList(
             holaTracker.getLastRecalledAt(),
             holaTracker.getRecallCount(),
             holaTracker.getStability(),
@@ -67,7 +68,7 @@ class LearningSessionRecordTests extends LearningSessionControllerTestBase {
     assertThat(response.getRejectedEntries(), hasSize(2));
     assertThat(recallLogRepository.count(), equalTo(logsBefore));
     assertThat(
-        List.of(
+        Arrays.asList(
             holaTracker.getLastRecalledAt(),
             holaTracker.getRecallCount(),
             holaTracker.getStability(),
