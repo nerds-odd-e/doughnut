@@ -53,10 +53,9 @@
 ### 5. Leave snapshots with no mapped-grade log
 
 - **Type:** Behavior
-- **Status:** planned
-- **Pre:** `S > 0` with no mapped-grade log (and a confusion-only leftover if cheap). A **removed** tracker with a mapped Good. A **deleted** tracker with a mapped Good.
-- **Trigger:** Same backfill.
-- **Post:** No-mapped-grade snapshot unchanged. Removed Good is rebuilt (same numbers as slice 2). Deleted Good unchanged.
+- **Status:** done
+- **Done:** Skip/include pins: leftover `S > 0` with no mapped grade (and cheap confusion-only) unchanged; removed-from-tracking mapped Good rebuilt; `deleted_at` mapped Good unchanged. Production SQL already did this.
+- **Learning:** Removed is `removed_from_tracking` (included). Deleted is `deleted_at` (skipped). Canonical stay-unchanged is the no-mapped-grade leftover; deleted/confusion-only stay deltas.
 
 ### 6. Drop leftover incomplete-history story
 

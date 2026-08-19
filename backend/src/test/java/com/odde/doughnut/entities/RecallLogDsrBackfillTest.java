@@ -7,6 +7,7 @@ import static org.hamcrest.Matchers.lessThanOrEqualTo;
 import static org.hamcrest.Matchers.nullValue;
 
 import com.odde.doughnut.testability.MakeMe;
+import com.odde.doughnut.testability.builders.MemoryTrackerBuilder;
 import com.odde.doughnut.utils.TimestampOperations;
 import java.sql.Connection;
 import java.sql.Timestamp;
@@ -124,21 +125,79 @@ class RecallLogDsrBackfillTest {
     assertThat(row.difficulty(), nullValue());
   }
 
-  private MemoryTracker leftoverFirstMappedGood(Timestamp leftoverLast, Timestamp gradeTime) {
+  @Test
+  void leavesLeftoverWithNoMappedGradeUnchanged() throws Exception {
+    Timestamp leftoverLast = makeMe.aTimestamp().of(1, 0).please();
+    MemoryTracker leftover = leftoverSnapshot(leftoverLast).please();
+
+    runBackfill();
+
+    TrackerRow row = trackerRow(leftover.getId());
+    assertThat(row.stability(), equalTo(LEFTOVER_STABILITY_HOURS));
+    assertThat(row.lastRecalledAt(), equalTo(leftoverLast));
+  }
+
+  @Test
+  void leavesConfusionOnlyLeftoverUnchanged() throws Exception {
+    Timestamp leftoverLast = makeMe.aTimestamp().of(1, 0).please();
+    MemoryTracker leftover = leftoverSnapshot(leftoverLast).please();
+    makeMe
+        .aRecallLogFor(leftover)
+        .productOutcome(ProductOutcome.CONFUSION)
+        .recordedAt(makeMe.aTimestamp().of(2, 0).please())
+        .please();
+
+    runBackfill();
+
+    assertThat(trackerRow(leftover.getId()).stability(), equalTo(LEFTOVER_STABILITY_HOURS));
+  }
+
+  @Test
+  void rebuildsRemovedTrackerWithMappedGood() throws Exception {
+    Timestamp leftoverLast = makeMe.aTimestamp().of(1, 0).please();
+    Timestamp gradeTime = makeMe.aTimestamp().of(2, 0).please();
+    MemoryTracker leftover = leftoverSnapshot(leftoverLast).removedFromTracking().please();
+    mappedGood(leftover, gradeTime);
+
+    runBackfill();
+
+    assertThat(trackerRow(leftover.getId()).stability(), equalTo(FIRST_GOOD_STABILITY_HOURS));
+  }
+
+  @Test
+  void leavesDeletedTrackerWithMappedGoodUnchanged() throws Exception {
+    Timestamp leftoverLast = makeMe.aTimestamp().of(1, 0).please();
+    Timestamp gradeTime = makeMe.aTimestamp().of(2, 0).please();
     MemoryTracker leftover =
-        makeMe
-            .aMemoryTrackerFor(makeMe.aNote().please())
-            .stabilityAndNextRecallAt(LEFTOVER_STABILITY_HOURS)
-            .difficulty(LEFTOVER_DIFFICULTY)
-            .lastRecalledAt(leftoverLast)
-            .please();
+        leftoverSnapshot(leftoverLast).deletedAt(makeMe.aTimestamp().of(3, 0).please()).please();
+    mappedGood(leftover, gradeTime);
+
+    runBackfill();
+
+    assertThat(trackerRow(leftover.getId()).stability(), equalTo(LEFTOVER_STABILITY_HOURS));
+  }
+
+  private MemoryTracker leftoverFirstMappedGood(Timestamp leftoverLast, Timestamp gradeTime) {
+    MemoryTracker leftover = leftoverSnapshot(leftoverLast).please();
+    mappedGood(leftover, gradeTime);
+    return leftover;
+  }
+
+  private MemoryTrackerBuilder leftoverSnapshot(Timestamp leftoverLast) {
+    return makeMe
+        .aMemoryTrackerFor(makeMe.aNote().please())
+        .stabilityAndNextRecallAt(LEFTOVER_STABILITY_HOURS)
+        .difficulty(LEFTOVER_DIFFICULTY)
+        .lastRecalledAt(leftoverLast);
+  }
+
+  private void mappedGood(MemoryTracker leftover, Timestamp gradeTime) {
     makeMe
         .aRecallLogFor(leftover)
         .productOutcome(ProductOutcome.GOOD)
         .recordedAt(gradeTime)
         .elapsedHours(0)
         .please();
-    return leftover;
   }
 
   private void runBackfill() throws Exception {
