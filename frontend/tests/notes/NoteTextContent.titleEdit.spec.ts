@@ -4,6 +4,7 @@ import { type VueWrapper, flushPromises } from "@vue/test-utils"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import type { ComponentPublicInstance } from "vue"
 import { RESERVED_README_TITLE_MESSAGE } from "@/utils/reservedReadmeTitles"
+import { advanceNoteContentSaveDebounce } from "@tests/helpers/noteContentDebounceTestSupport"
 import {
   editTitle,
   editTitleThenBlur,
@@ -96,8 +97,7 @@ describe("NoteTextContent title edit", () => {
     const note = makeMe.aNote.title("Dummy Title").please()
     mountWith(note)
     await editTitle(wrapper, "ABC")
-    await vi.advanceTimersByTimeAsync(1000)
-    await flushPromises()
+    await advanceNoteContentSaveDebounce()
 
     expect(mockedUpdateTitleCall).toHaveBeenCalledWith({
       path: { note: note.id },

@@ -48,8 +48,11 @@ export function useDebouncedTextAutosave(
 
   let persistChain: Promise<void> = Promise.resolve()
 
+  const isCurrentProposal = (nextVersion: number) =>
+    nextVersion === version.value
+
   const persistOne = async (newValue: string, nextVersion: number) => {
-    if (nextVersion !== version.value) {
+    if (!isCurrentProposal(nextVersion)) {
       return
     }
     if (options.beforePersist) {
@@ -57,14 +60,14 @@ export function useDebouncedTextAutosave(
         lastSavedValue.value ?? "",
         newValue
       )
-      if (!proceed || nextVersion !== version.value) {
+      if (!proceed || !isCurrentProposal(nextVersion)) {
         return
       }
     }
     pendingSaveValues.add(newValue)
     try {
       await options.persist(newValue)
-      if (nextVersion === version.value) {
+      if (isCurrentProposal(nextVersion)) {
         if (hasUnsavedChanges()) {
           lastSavedValue.value = newValue
         }
@@ -82,7 +85,6 @@ export function useDebouncedTextAutosave(
   const enqueuePersist = (newValue: string, nextVersion: number) => {
     const run = () => persistOne(newValue, nextVersion)
     persistChain = persistChain.then(run, run)
-    return persistChain
   }
 
   const debouncedPersist = debounce(enqueuePersist, TEXT_AUTOSAVE_DEBOUNCE_MS)

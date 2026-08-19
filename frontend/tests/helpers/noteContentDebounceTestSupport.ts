@@ -2,7 +2,7 @@ import { TEXT_AUTOSAVE_DEBOUNCE_MS } from "@/composables/useDebouncedTextAutosav
 import { flushPromises } from "@vue/test-utils"
 import { vi } from "vitest"
 
-/** Matches note body / readmeContent auto-save debounce (`useDebouncedTextAutosave`). */
+/** Matches `useDebouncedTextAutosave` delay. */
 export const NOTE_CONTENT_SAVE_DEBOUNCE_MS = TEXT_AUTOSAVE_DEBOUNCE_MS
 
 export async function advanceNoteContentSaveDebounce() {
