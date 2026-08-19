@@ -21,16 +21,18 @@ When(
 When(
   'I create a note with title {string} under the folder {string} in the notebook {string}',
   (title: string, folder: string, notebook: string) => {
-    start.navigateToNotebooksPage().navigateToNotebook(notebook)
-    start
-      .noteSidebar()
-      .activateFolderByLabel(folder)
-      .addingNewNoteFromToolbar()
-      .createNoteWithTitle(title)
+    submitNoteTitleUnderFolder(title, folder, notebook)
     start.assumeNotePage(title)
     if (title !== '') {
       start.testability().rememberUiCreatedNote(title)
     }
+  }
+)
+
+When(
+  'I attempt to create a note with title {string} under the folder {string} in the notebook {string}',
+  (title: string, folder: string, notebook: string) => {
+    submitNoteTitleUnderFolder(title, folder, notebook)
   }
 )
 
@@ -64,10 +66,36 @@ When('I am creating a note in the notebook {string}', (notebook: string) => {
 
 Then('I should see that the note creation is not successful', () => {
   start.form.getField('Title').expectError('must not be blank')
+  dismissValidationToast()
+})
+
+Then('I should see that the title is rejected as OS-invalid', () => {
+  start.form
+    .getField('Title')
+    .expectError(
+      'Name must not contain \\ / : * ? " < > | or ASCII control characters.'
+    )
+  dismissValidationToast()
+})
+
+function submitNoteTitleUnderFolder(
+  title: string,
+  folder: string,
+  notebook: string
+) {
+  start.navigateToNotebooksPage().navigateToNotebook(notebook)
+  start
+    .noteSidebar()
+    .activateFolderByLabel(folder)
+    .addingNewNoteFromToolbar()
+    .createNoteWithTitle(title)
+}
+
+function dismissValidationToast() {
   cy.get('body').then(($body) => {
     const close = $body.find('.Vue-Toastification__close-button').get(0)
     if (close) {
       close.click()
     }
   })
-})
+}

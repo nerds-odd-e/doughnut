@@ -3970,7 +3970,7 @@ components:
           type: string
           maxLength: 150
           minLength: 0
-          pattern: "^[^\\\\/:]*$"
+          pattern: "^[\\s\\x00-\\x1F]*[^\\\\/:*?\"<>|\\x00-\\x1F]*[\\s\\x00-\\x1F]*$"
     HealthFindingGroup:
       type: object
       properties:
@@ -4051,7 +4051,7 @@ components:
           description: Display name for the new folder
           maxLength: 512
           minLength: 0
-          pattern: "^[^\\\\/:]*$"
+          pattern: "^[\\s\\x00-\\x1F]*[^\\\\/:*?\"<>|\\x00-\\x1F]*[\\s\\x00-\\x1F]*$"
         underFolderId:
           type: integer
           format: int32
@@ -4094,7 +4094,7 @@ components:
           type: string
           maxLength: 150
           minLength: 0
-          pattern: "^[^\\\\/:]*$"
+          pattern: "^[\\s\\x00-\\x1F]*[^\\\\/:*?\"<>|\\x00-\\x1F]*[\\s\\x00-\\x1F]*$"
         referenceHandling:
           type: string
           enum:
@@ -4299,7 +4299,7 @@ components:
           type: string
           maxLength: 150
           minLength: 0
-          pattern: "^[^\\\\/:]*$"
+          pattern: "^[\\s\\x00-\\x1F]*[^\\\\/:*?\"<>|\\x00-\\x1F]*[\\s\\x00-\\x1F]*$"
         referenceHandling:
           type: string
           enum:
@@ -4736,7 +4736,7 @@ components:
           type: string
           maxLength: 150
           minLength: 0
-          pattern: "^[^\\\\/:]*$"
+          pattern: "^[\\s\\x00-\\x1F]*[^\\\\/:*?\"<>|\\x00-\\x1F]*[\\s\\x00-\\x1F]*$"
         referenceHandling:
           type: string
           enum:
@@ -4762,7 +4762,7 @@ components:
           description: New display name for the folder
           maxLength: 512
           minLength: 0
-          pattern: "^[^\\\\/:]*$"
+          pattern: "^[\\s\\x00-\\x1F]*[^\\\\/:*?\"<>|\\x00-\\x1F]*[\\s\\x00-\\x1F]*$"
       required:
       - name
     FolderRealm:

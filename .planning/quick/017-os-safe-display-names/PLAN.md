@@ -9,7 +9,7 @@
 ## Locked for this plan
 
 - **Filename = name.** Sibling uniqueness already implies unique files. Do not treat `Recipe (2).md` as identity, and do not invert collision suffixes in link resolution.
-- **Forbidden characters** (create/rename reject): `\ / : * ? " < > |` and ASCII controls (`U+0000`–`U+001F`). `\ / :` are already rejected.
+- **Forbidden characters** (create/rename reject): `\ / : * ? " < > |` and ASCII controls (`U+0000`–`U+001F`). Slice 2 done.
 - **Historical rows:** convert those characters to fullwidth (same idea as `:` → `：`): `*` → `＊`, `?` → `？`, `"` → `＂`, `<` → `＜`, `>` → `＞`, `|` → `｜`; controls → space then trim. Fail loud on unique-key collision or empty result. Inbound wiki / path-Markdown tokens must follow (same as a user rename).
 - **Out of scope:** path qualification; P9 / import / Git accept (T1); Windows device names (`CON`, …); trailing dots; accepting ADR 0004 as a whole; converting stored `[[…]]` ↔ `[…](…)`.
 
@@ -25,16 +25,9 @@ ADR 0004 Decision is filename = display name (portable path = folder path + disp
 ### 2. Reject remaining OS-invalid characters on save
 
 - **Type:** Behavior
-- **Status:** planned
+- **Status:** done
 
-**Pre-condition:** user is creating or renaming a note (shared `DisplayNamePathSeparators.REGEXP` also covers folder and notebook name DTOs).
-
-**Trigger:** title `Recipe*` (or another newly forbidden character).
-
-**Post-condition:** save is rejected; the message names the forbidden set (extend today’s “backslash, slash, or colon” copy). A legal title still saves.
-
-E2E: `note_creation.feature` (same shape as empty-title reject). Unit: extend `DisplayNamePathSeparatorsValidationTest` / `NoteUpdateTitleDTOTest`. AI extract must fullwidth-convert the new set (today only `\ / :`) so extract does not regress.
-
+Create/rename rejects the locked set; message is `Name must not contain \ / : * ? " < > | or ASCII control characters.` Surrounding whitespace/controls still trim then blank-reject. Extract uses `replaceOsInvalidChars` (new chars → fullwidth; controls → space then trim) so it does not hit the reject. E2E: `note_creation.feature` (`Recipe*`).
 ### 3. Migrate existing illegal display names
 
 - **Type:** Behavior

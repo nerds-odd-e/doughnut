@@ -30,6 +30,10 @@ Feature: Nested Note creation
     When I create a note with title "" under the folder "LeSS in Action" in the notebook "LeSS training"
     Then I should see that the note creation is not successful
 
+  Scenario: Create a note with an OS-invalid title is rejected
+    When I attempt to create a note with title "Recipe*" under the folder "LeSS in Action" in the notebook "LeSS training"
+    Then I should see that the title is rejected as OS-invalid
+
   Scenario: Undo creating a new note
     When I create a note with title "New Note" under the folder "LeSS in Action" in the notebook "LeSS training"
     And I undo "create note"

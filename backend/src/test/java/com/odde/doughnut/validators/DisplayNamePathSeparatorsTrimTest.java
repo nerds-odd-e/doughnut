@@ -41,4 +41,17 @@ class DisplayNamePathSeparatorsTrimTest {
         DisplayNamePathSeparators.normalizeDisplayName(" \u3000foo/bar: baz\u3000 "),
         equalTo("foo／bar： baz"));
   }
+
+  @Test
+  void normalizeDisplayNameConvertsOsInvalidCharacters() {
+    assertThat(
+        DisplayNamePathSeparators.normalizeDisplayName("Recipe*?\"<>|"), equalTo("Recipe＊？＂＜＞｜"));
+  }
+
+  @Test
+  void normalizeDisplayNameConvertsAsciiControlsToSpaceThenTrims() {
+    assertThat(
+        DisplayNamePathSeparators.normalizeDisplayName("\u0001Recipe\u0007*\u001F"),
+        equalTo("Recipe ＊"));
+  }
 }

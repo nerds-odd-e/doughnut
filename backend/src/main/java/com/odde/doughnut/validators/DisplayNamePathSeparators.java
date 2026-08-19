@@ -11,9 +11,11 @@ public final class DisplayNamePathSeparators {
       Pattern.compile(
           "(?U)\\A[\\s\\u200B\\u200C\\u200D\\u2060\\uFEFF]+|[\\s\\u200B\\u200C\\u200D\\u2060\\uFEFF]+\\z");
 
-  public static final String REGEXP = "^[^\\\\/:]*$";
+  public static final String REGEXP =
+      "^[\\s\\x00-\\x1F]*[^\\\\/:*?\"<>|\\x00-\\x1F]*[\\s\\x00-\\x1F]*$";
 
-  public static final String MESSAGE = "Name must not contain backslash, slash, or colon.";
+  public static final String MESSAGE =
+      "Name must not contain \\ / : * ? \" < > | or ASCII control characters.";
 
   public static String trimSurroundingWhitespace(String value) {
     if (value == null) {
@@ -23,18 +25,40 @@ public final class DisplayNamePathSeparators {
   }
 
   public static String normalizeDisplayName(String value) {
-    return trimSurroundingWhitespace(toFullwidthPathSeparators(value));
+    return trimSurroundingWhitespace(replaceOsInvalidChars(value));
   }
 
-  /** Halfwidth path separators in note titles → fullwidth (mirrors V300000174 migration). */
-  public static String toFullwidthPathSeparators(String value) {
+  /** OS-invalid filename characters in note titles → fullwidth (ASCII controls → space). */
+  public static String replaceOsInvalidChars(String value) {
     if (value == null) {
       return null;
     }
-    if (!value.contains("\\") && !value.contains("/") && !value.contains(":")) {
-      return value;
+    StringBuilder converted = new StringBuilder(value.length());
+    boolean changed = false;
+    for (int i = 0; i < value.length(); i++) {
+      char original = value.charAt(i);
+      char mapped = toFullwidthOrSpace(original);
+      converted.append(mapped);
+      if (mapped != original) {
+        changed = true;
+      }
     }
-    return value.replace('\\', '＼').replace('/', '／').replace(':', '：');
+    return changed ? converted.toString() : value;
+  }
+
+  private static char toFullwidthOrSpace(char c) {
+    return switch (c) {
+      case '\\' -> '＼';
+      case '/' -> '／';
+      case ':' -> '：';
+      case '*' -> '＊';
+      case '?' -> '？';
+      case '"' -> '＂';
+      case '<' -> '＜';
+      case '>' -> '＞';
+      case '|' -> '｜';
+      default -> c <= 0x1F ? ' ' : c;
+    };
   }
 
   /**
@@ -42,7 +66,7 @@ public final class DisplayNamePathSeparators {
    * For {@code Notebook:Title}, only the note-title portion after the first {@code :} is converted;
    * the notebook prefix colon stays halfwidth.
    */
-  public static String toFullwidthPathSeparatorsInWikiLinkTarget(String targetToken) {
+  public static String replaceOsInvalidCharsInWikiLinkTarget(String targetToken) {
     if (targetToken == null) {
       return null;
     }
@@ -51,12 +75,12 @@ public final class DisplayNamePathSeparators {
       String notebookName = targetToken.substring(0, colon).trim();
       if (!notebookName.isEmpty() && !notebookName.contains("\\") && !notebookName.contains("/")) {
         String noteTitle = targetToken.substring(colon + 1);
-        return notebookName + ":" + toFullwidthPathSeparators(noteTitle);
+        return notebookName + ":" + replaceOsInvalidChars(noteTitle);
       }
     }
     if (WikiLinkTargetReference.PathShapedTarget.tryParse(targetToken).isPresent()) {
       return targetToken.replace('\\', '＼');
     }
-    return toFullwidthPathSeparators(targetToken);
+    return replaceOsInvalidChars(targetToken);
   }
 }

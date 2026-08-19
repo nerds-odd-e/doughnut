@@ -91,10 +91,9 @@ public class AiNoteAutomationService {
     result.newNoteContent =
         NoteContentTitleHeading.withoutRepeatedTitleHeading(
             result.newNoteTitle,
-            WikiLinkMarkdownRewrite.sanitizePathSeparatorsInWikiLinks(result.newNoteContent));
+            WikiLinkMarkdownRewrite.replaceOsInvalidCharsInWikiLinks(result.newNoteContent));
     result.updatedOriginalNoteContent =
-        WikiLinkMarkdownRewrite.sanitizePathSeparatorsInWikiLinks(
-            result.updatedOriginalNoteContent);
+        WikiLinkMarkdownRewrite.replaceOsInvalidCharsInWikiLinks(result.updatedOriginalNoteContent);
     return result;
   }
 

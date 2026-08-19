@@ -143,6 +143,19 @@ class AiControllerExtractNotePreviewTest extends ControllerTestBase {
     }
 
     @Test
+    void shouldConvertOsInvalidCharactersInExtractionPreview()
+        throws UnexpectedNoAccessRightException, JsonProcessingException {
+      Note testNote = extractableNote();
+      stubExtraction("Recipe*", "Expanded content.", "Updated parent.");
+
+      NoteExtractionResult response =
+          controller.extractNotePreview(
+              testNote, selectSingleLayoutItem("p1", "key suggestion to extract"));
+
+      assertThat(response.getNewNoteTitle()).isEqualTo("Recipe＊");
+    }
+
+    @Test
     void shouldKeepSlashInPathShapedWikiTargetsInExtractionPreview()
         throws UnexpectedNoAccessRightException, JsonProcessingException {
       Note testNote = extractableNote();

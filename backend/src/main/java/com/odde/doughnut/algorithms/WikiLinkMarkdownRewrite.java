@@ -171,7 +171,7 @@ public final class WikiLinkMarkdownRewrite {
     return newTargetToken + "|" + rawDisplay;
   }
 
-  public static String sanitizePathSeparatorsInWikiLinks(String markdown) {
+  public static String replaceOsInvalidCharsInWikiLinks(String markdown) {
     if (markdown == null || markdown.isEmpty()) {
       return markdown;
     }
@@ -184,7 +184,7 @@ public final class WikiLinkMarkdownRewrite {
       int pipeIdx = rawInner.indexOf('|');
       String rawTarget = pipeIdx == -1 ? rawInner : rawInner.substring(0, pipeIdx);
       String sanitizedTarget =
-          DisplayNamePathSeparators.toFullwidthPathSeparatorsInWikiLinkTarget(rawTarget.trim());
+          DisplayNamePathSeparators.replaceOsInvalidCharsInWikiLinkTarget(rawTarget.trim());
       if (pipeIdx == -1) {
         out.append("[[").append(sanitizedTarget).append("]]");
       } else {
