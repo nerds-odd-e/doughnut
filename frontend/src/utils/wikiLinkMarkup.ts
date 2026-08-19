@@ -24,7 +24,7 @@ export function wikiTitleParts(w: WikiTitle): {
 
 /** Path Markdown spelling: {@link WikiTitle.targetToken} is the bundle-relative href. */
 export function isPathMarkdownWikiTitle(w: WikiTitle): boolean {
-  return w.targetToken.startsWith("/")
+  return hrefLooksLikeConceptNotePath(w.targetToken)
 }
 
 export function escapeHtmlForWikiLinkDisplay(s: string): string {

@@ -27,7 +27,7 @@ Inspection of commits `97c91ba7e3`, `d3f1271066`, `94ffdf077d`.
 ## Discoveries
 
 - `SearchForm.onDeadWikiLinkToNote` used `String.replace` (first match only). Slice 1 switched to `replaceAll`; mounted SearchForm pins two identical path-Markdown tokens. Wiki tokens share that path.
-- `isPathMarkdownWikiTitle` is `targetToken.startsWith("/")`. Retarget uses `hrefLooksLikeConceptNotePath` (rejects `/n42` and `//…`). Display/upgrade can classify a note-show or protocol-relative token as path Markdown while retarget does not.
+- `isPathMarkdownWikiTitle` now delegates to `hrefLooksLikeConceptNotePath` (same frontend rule as retarget; rejects `/n42` and `//…`). Java `isConceptPathHref` stays separate.
 - Path-Markdown retarget suffix matrix (`.md` / no `.md`) is pinned twice: `SearchDialog.deadWikiLink.spec.ts` `it.each` and `path_markdown_link.feature` outline.
 - 014 slice 3 deleted path-prefix / folder-rename duplicates in `WikiLinkMarkdownTest` but left wiki title and qualify `newInner*` cases that still only repeat `TextContentControllerUpdateNoteTitleInboundWikiReferencesTests` and `RelationControllerTests` outgoing qualify.
 
@@ -45,9 +45,9 @@ Pinned on mounted SearchForm (`SearchDialog.deadWikiLink.spec.ts`); `onDeadWikiL
 ### 2. Path-Markdown WikiTitle detection uses the concept-path helper
 
 - **Type:** Structure
-- **Status:** planned
+- **Status:** done
 
-No user-facing change. `isPathMarkdownWikiTitle` delegates to `hrefLooksLikeConceptNotePath` so display/upgrade and retarget share one frontend rule. Existing mounted, HTML-upgrade, and E2E tests still pass.
+`isPathMarkdownWikiTitle` delegates to `hrefLooksLikeConceptNotePath`. Display/upgrade and retarget share one frontend rule.
 
 ### 3. Path-Markdown retarget suffix is pinned once
 
