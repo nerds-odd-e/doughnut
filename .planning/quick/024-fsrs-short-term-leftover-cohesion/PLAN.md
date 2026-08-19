@@ -37,11 +37,11 @@ Inspected commits: `d6cf6e9943` … `04dcf7112e` (merged as #1580).
 ### 2. Legacy index conversion is not a live service
 
 - **Type:** Structure
-- **Status:** planned
+- **Status:** done
 
-`StabilityIndexToHoursBackfill` and `hoursFromLegacyIndex` still sit in `com.odde.doughnut.services` with a unit test that only exists so `V300000260` can replay. Slice 5 of 022 left them in the live application package.
+`StabilityIndexToHoursBackfill` and `hoursFromLegacyIndex` live in `db.migration` next to `V300000260` (package-private). Breadcrumbs in SEED-004, FSRS-COMPATIBILITY-GAP, and STATE point there. No schema change.
 
-Move the helper (and `StabilityIndexToHoursBackfillTest`) into `db.migration` next to `V300000260`. Keep `hoursFromLegacyIndex` package-private to that package. Update SEED-004 / FSRS tracker breadcrumbs that point at `services.StabilityIndexToHoursBackfill`. No schema change.
+**Learning:** Other `*Backfill` types in `entities`/`services` are different concepts; leave them. Slice 3 still owns `SpacedRepetition*` rename / `MemoryTracker.isNew()`.
 
 ### 3. Live names are recall scheduling and New, not SpacedRepetitionAlgorithm
 

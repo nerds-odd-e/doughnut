@@ -1,4 +1,4 @@
-package com.odde.doughnut.services;
+package db.migration;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;

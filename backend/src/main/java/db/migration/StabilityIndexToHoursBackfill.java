@@ -1,4 +1,4 @@
-package com.odde.doughnut.services;
+package db.migration;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -9,7 +9,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /** Convert persisted Stability from legacy index scale to whole hours, then drop day lists. */
-public final class StabilityIndexToHoursBackfill {
+final class StabilityIndexToHoursBackfill {
   private static final List<Integer> DEFAULT_SPACES =
       Arrays.asList(
           0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377, 610, 987, 1597, 2584, 4181, 6765,
@@ -20,7 +20,7 @@ public final class StabilityIndexToHoursBackfill {
 
   private StabilityIndexToHoursBackfill() {}
 
-  public static void run(Connection connection) throws SQLException {
+  static void run(Connection connection) throws SQLException {
     convertStabilityToHours(connection);
     try (Statement ddl = connection.createStatement()) {
       ddl.execute("ALTER TABLE memory_tracker MODIFY COLUMN stability float NOT NULL DEFAULT '0'");

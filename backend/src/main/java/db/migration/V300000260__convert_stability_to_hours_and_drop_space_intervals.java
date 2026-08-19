@@ -1,6 +1,5 @@
 package db.migration;
 
-import com.odde.doughnut.services.StabilityIndexToHoursBackfill;
 import org.flywaydb.core.api.migration.BaseJavaMigration;
 import org.flywaydb.core.api.migration.Context;
 
