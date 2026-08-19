@@ -72,13 +72,9 @@ Ungated `V300000276` nulls `last_recalled_at` for New (`S = 0`, D null, no mappe
 ### 6. Still-New mapped logs first-rate from the grade time
 
 - **Type:** Behavior
-- **Status:** planned
+- **Status:** done
 
-**Pre:** `S = 0`, Difficulty null, at least one mapped RecallLog. **Trigger:** apply the new ungated Flyway (do not edit 271/272). **Post:** first-rating S/D per locked outcome precedence; `lastRecalledAt` = latest mapped `recall_log.recorded_at`; due = that time + `I`. Snapshot, not a history replay. Already `S > 0` unchanged (including if 271/272 ever ran).
-
-Canonical Again-only and Shrink-only pins; Hard still skips Again-only. If both Again and Shrink logs exist, keep today’s order (Again first-rating wins because Hard skips already-migrated).
-
-After this slice, STATE must not ask operators to enable 271/272. Keep those files for Flyway replay.
+Ungated `V300000277` snapshot first-rates still-New with mapped logs: S/D from locked precedence; `lastRecalledAt` = latest mapped `recorded_at`; due = that + `I`. Mixed Again+Shrink keeps Again S/D. 271/272 stay `1=0` for Flyway replay; STATE no longer asks operators to enable them.
 
 ### 7. Removed graded last recall is the last mapped grade
 
