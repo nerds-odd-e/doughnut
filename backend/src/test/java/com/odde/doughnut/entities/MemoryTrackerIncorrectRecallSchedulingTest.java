@@ -23,6 +23,16 @@ class MemoryTrackerIncorrectRecallSchedulingTest extends MemoryTrackerRecallSche
   }
 
   @Test
+  void yearOverdueIncorrectRecallOnFiveHourStabilityStaysAtFive() {
+    MemoryTracker memoryTracker = aGradedTrackerAtStability(5f, 1f);
+
+    memoryTracker.markAsRecalled(
+        TimestampOperations.addHoursToTimestamp(memoryTracker.getLastRecalledAt(), 8760), false);
+
+    assertThat(memoryTracker.getStability(), equalTo(5f));
+  }
+
+  @Test
   void overdueIncorrectRecallLeavesMoreRemainingStabilityThanOnTime() {
     MemoryTracker onTime = aGradedTrackerAtThreeDayStability();
     MemoryTracker overdue = aGradedTrackerAtThreeDayStability();

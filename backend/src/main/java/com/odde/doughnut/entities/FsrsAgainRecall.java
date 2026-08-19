@@ -24,6 +24,6 @@ final class FsrsAgainRecall {
             * Math.pow(difficulty, -W[12])
             * (Math.pow(stabilityDays + 1.0, W[13]) - 1.0)
             * Math.exp(W[14] * (1.0 - retrievability));
-    return Math.max(1f, (float) Math.round(nextDays * HOURS_PER_DAY));
+    return Math.min(stabilityHours, Math.max(1f, (float) Math.round(nextDays * HOURS_PER_DAY)));
   }
 }
