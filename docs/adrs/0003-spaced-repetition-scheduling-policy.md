@@ -159,13 +159,13 @@ Memory updates with Stability > 0:
 - **4:** open-FSRS-6 **Easy**-equivalent, not a percentage above Good. Easy increment at least as large as Good's plus an extra Easy factor, plus Easy next-D (see **Difficulty after a mapped grade**). Next Stability is strictly longer than the same state under score 3. Overdue extra applies.
 - **3:** open-FSRS-6 **Good**-equivalent (same as ordinary correct), including overdue extra and Good next-D (see **Difficulty after a mapped grade**).
 - **2:** open-FSRS-6 **Hard**-equivalent, not a percentage below Good. Hard increment is the Good increment times an extra Hard factor, plus Hard next-D (see **Difficulty after a mapped grade**). Next Stability is at least the current Stability and strictly shorter than the same state under score 3. Overdue extra applies.
-- **1:** open-FSRS-6 **Again** memory (same as ordinary incorrect: short-term After-Again when elapsed **< 24**, post-lapse when **≥ 24**, and Again next-D; see **Incorrect recall (Again)** and **Difficulty after a mapped grade**). Due from `I`.
+- **1:** open-FSRS-6 **Again** memory (same as ordinary incorrect: short-term After-Again when elapsed **< 24**, capped post-lapse when **≥ 24**, and Again next-D; see **Incorrect recall (Again)** and **Difficulty after a mapped grade**). Due from `I`.
 
 ### Incorrect recall (Again)
 
 Ordinary incorrect recall (MCQ, just review No, spelling fail) is FSRS **Again**.
 
-When Stability is greater than 0, elapsed whole hours **< 24** use short-term After-Again: the same published `S'(S,G)` as **Whole-hour elapsed-time precision** (G=1; SInc may be < 1; floor **1 hour**). Elapsed **≥ 24** use the open-FSRS-6 post-lapse formula from Difficulty, Stability, and Retrievability (elapsed whole hours vs Stability). Ordinary incorrect also updates Difficulty with Again next-D (see **Difficulty after a mapped grade**). Unset Difficulty on Stability > 0 is treated as **5**. Queue lateness vs `nextRecallAt` is not an input. After ordinary incorrect, due is `lastRecalledAt + I(0.9, S)` of that next Stability; non-positive `I` → 24h. There is **no relearning step list**.
+When Stability is greater than 0, elapsed whole hours **< 24** use short-term After-Again: the same published `S'(S,G)` as **Whole-hour elapsed-time precision** (G=1; SInc may be < 1; floor **1 hour**). Elapsed **≥ 24** use the open-FSRS-6 post-lapse formula from Difficulty, Stability, and Retrievability (elapsed whole hours vs Stability): compute `Sf`, then `S' = min(current S, max(1, round(Sf)))` in whole hours. Floor **1 hour** applies before the cap. Ordinary incorrect also updates Difficulty with Again next-D (see **Difficulty after a mapped grade**). Unset Difficulty on Stability > 0 is treated as **5**. Queue lateness vs `nextRecallAt` is not an input. After ordinary incorrect, due is `lastRecalledAt + I(0.9, S)` of that next Stability; non-positive `I` → 24h. There is **no relearning step list**.
 
 A **New** tracker (Stability 0) that fails uses first-rating Again: Stability `S0(1)` (**5**), Difficulty `D0(1)` (Java float), due `lastRecalledAt + I` (**5h**); see **First rating on New**. Confusion adjustment is not a grade and is not FSRS Again (see **Accidental-match and overlap transitions**). Failure must not permanently trap the tracker; later correct recalls must be able to restore expanding intervals.
 
@@ -201,9 +201,10 @@ and rounding, short-term next Stability: Good **24h** → **25h**; Easy
 **72h** (clamp); same-hour Again after first Good **55h** → **18h**;
 same-hour Again on **72h** / D=5 → **24h** (elapsed 0 and 23 are the same
 next S). Elapsed whole hours **≥ 24** use long-term next Stability; Again
-is then post-lapse (on-time **72h** / D=5 → **17h**, elapsed **24** →
-**15h**; on-time after first Good **55h** → **15h**). Confusion is
-unchanged as a non-grade (inherits Again S). New (Stability 0)
+is then post-lapse (see **Incorrect recall (Again)**): on-time **72h** /
+D=5 → **17h**, elapsed **24** → **15h**; on-time after first Good **55h**
+→ **15h**; **5h** / D=**1** / elapsed **8760** stays **5h**, not **6h**.
+Confusion is unchanged as a non-grade (inherits Again S). New (Stability 0)
 first-rating is unchanged by elapsed time (see **First rating on New**).
 The short-term rule is not a Settings knob.
 Existing Stability, Difficulty, and due change **going forward only**: do
@@ -404,6 +405,10 @@ Empty pending accept.
 - **Rebuild stored Stability from the new short-term window** — rejected:
   existing S/D/due change going forward only; do not replay RecallLog; do
   not invert post-lapse to recover previous S; no new Flyway for this rule.
+- **Allow post-lapse `Sf` to exceed current S** — rejected: open FSRS-4.5+ /
+  FSRS-6 uses `S' = min(Sf, S)` so a fail cannot lengthen Stability.
+- **Cap short-term After-Again too** — rejected: open FSRS applies `min` on
+  post-lapse only; short-term After-Again is unchanged.
 
 ## Related
 
