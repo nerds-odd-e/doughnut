@@ -98,20 +98,9 @@ Status: done
 
 ### Optimize question_contest
 Type: Structure
-Status: planned
+Status: done
 
-**Tests:**
-- `e2e_test/features/ai_generated_recall_questions/question_contest.feature` — Internally contested MCQs (examples #1/#2); Learner contests an MCQ…
-
-**Goals:**
-- Parameterize outline examples; API seed contested questions; drop duplicate recall entry paths.
-
-**Verify:**
-
-```bash
-source /workspace/scripts/cloud_agent_setup.sh
-xvfb-run -a pnpm cypress run --spec e2e_test/features/ai_generated_recall_questions/question_contest.feature --config-file e2e_test/config/ci.ts
-```
+**Done:** Shared Background + API-seed `dueRecallPrompt`; visit recall without reload; evaluation stub helpers consolidated; dead steps removed. ~15s→~11s warm.
 
 ---
 

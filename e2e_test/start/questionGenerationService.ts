@@ -68,6 +68,25 @@ const restartOpenAiAndStubMcqForUserMessage = async (
   }
 }
 
+type QuestionEvaluation = {
+  feasibleQuestion: boolean
+  correctChoices: number[]
+  improvementAdvices: string
+}
+
+const acceptedQuestionEvaluation: QuestionEvaluation = {
+  feasibleQuestion: true,
+  correctChoices: [0],
+  improvementAdvices: 'Yes, this is a good question!',
+}
+
+const rejectedQuestionEvaluation: QuestionEvaluation = {
+  feasibleQuestion: false,
+  correctChoices: [0],
+  improvementAdvices:
+    'This question is not feasible and needs to be regenerated completely.',
+}
+
 /** Stubs registered most-specific-first so Mountebank matches the right prompt per recall. */
 const addFocusContextShapeMcqStubs = async (
   depthTwoRow: Record<string, string>,
@@ -98,6 +117,21 @@ const addFocusContextShapeMcqStubs = async (
     },
     wikiLinkedBahamasRow
   )
+}
+
+const evaluationDeveloperMessage = {
+  role: 'developer' as const,
+  content: 'evaluating a memory recall question',
+}
+
+const stubEvaluationOutput = (record: QuestionEvaluation) => {
+  cy.then(async () => {
+    await mock_services
+      .openAi()
+      .responses()
+      .requestMessageMatches(evaluationDeveloperMessage)
+      .stubOutputText(JSON.stringify(record))
+  })
 }
 
 export const questionGenerationService = () => ({
@@ -143,18 +177,25 @@ export const questionGenerationService = () => ({
     })
   },
 
-  stubEvaluationQuestion: (
-    record: Record<string, boolean | string | number[]>
-  ) => {
+  stubAcceptedEvaluation: () => {
+    stubEvaluationOutput(acceptedQuestionEvaluation)
+  },
+
+  stubRejectedEvaluation: () => {
+    stubEvaluationOutput(rejectedQuestionEvaluation)
+  },
+
+  /** First evaluation accepts (generation keeps MCQ); later evaluations uphold contest. */
+  stubAcceptThenUpholdContestEvaluations: () => {
     cy.then(async () => {
       await mock_services
         .openAi()
         .responses()
-        .requestMessageMatches({
-          role: 'developer',
-          content: 'evaluating a memory recall question',
-        })
-        .stubOutputText(JSON.stringify(record))
+        .requestMessageMatches(evaluationDeveloperMessage)
+        .stubOutputTextSequence(
+          JSON.stringify(acceptedQuestionEvaluation),
+          JSON.stringify(rejectedQuestionEvaluation)
+        )
     })
   },
 })

@@ -5,17 +5,15 @@ Feature: Contest AI-generated MCQs
   Background:
     Given I am logged in as an existing user
     And I have a notebook "Dive journal" with a note "Scuba Diving"
-    And OpenAI generates this as first question:
+    And OpenAI generates this question:
       | Question Stem  | Correct Choice | Incorrect Choice 1 | Incorrect Choice 2 |
       | First question | Rescue Diver   | Divemaster         | Open Water Diver   |
-    And OpenAI generates this as second question:
-      | Question Stem   | Correct Choice | Incorrect Choice 1 | Incorrect Choice 2 |
-      | Second question | Rescue Diver   | Divemaster         | Open Water Diver   |
+    And the note "Scuba Diving" was assimilated on day 1
 
   Scenario Outline: Internally contested MCQs are replaced before recall
     Given OpenAI evaluates the question as <Legitimate Question>
-    And the note "Scuba Diving" was assimilated on day 1
-    When I am recalling my note on day 2
+    And a due recall prompt is ready on day 2
+    When I visit recall
     Then I should be asked "<Current Question>"
 
     Examples:
@@ -24,8 +22,9 @@ Feature: Contest AI-generated MCQs
       | not legitimate      | Second question  |
 
   Scenario: Learner contests an MCQ and gets a replacement
-    Given OpenAI evaluates the question as not legitimate
-    And the note "Scuba Diving" was assimilated on day 1
-    And I am recalling my note on day 2
+    Given OpenAI will accept the generated question then uphold a contest
+    And a due recall prompt is ready on day 2
+    When I visit recall
+    Then I should be asked "First question"
     When I contest the MCQ
     Then I should be asked "Second question"

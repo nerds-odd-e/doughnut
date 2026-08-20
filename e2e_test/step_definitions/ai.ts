@@ -90,46 +90,29 @@ Then(
   }
 )
 
-Given(
-  'OpenAI generates this as first question:',
-  stubOpenAiMcqFromSingleRowTable
-)
-
-Given(
-  'OpenAI generates this as second question:',
-  (questionTable: DataTable) => {
-    const question = parseSingleRowQuestion(questionTable)
-    cy.task('setTestState', { key: 'secondQuestion', value: question })
-  }
-)
+const defaultReplacementMcq = {
+  'Question Stem': 'Second question',
+  'Correct Choice': 'Rescue Diver',
+  'Incorrect Choice 1': 'Divemaster',
+  'Incorrect Choice 2': 'Open Water Diver',
+}
 
 Given('OpenAI evaluates the question as legitimate', () => {
-  start.questionGenerationService().stubEvaluationQuestion({
-    feasibleQuestion: true,
-    correctChoices: [0],
-    improvementAdvices: 'Yes, this is a good question!',
-  })
+  start.questionGenerationService().stubAcceptedEvaluation()
 })
 
 Given('OpenAI evaluates the question as not legitimate', () => {
-  start.questionGenerationService().stubEvaluationQuestion({
-    feasibleQuestion: false,
-    correctChoices: [0],
-    improvementAdvices:
-      'This question is not feasible and needs to be regenerated completely.',
-  })
+  start.questionGenerationService().stubRejectedEvaluation()
+  start
+    .questionGenerationService()
+    .stubRegeneratedQuestion(defaultReplacementMcq)
+})
 
-  const defaultSecondQuestion = {
-    'Question Stem': 'Second question',
-    'Correct Choice': 'Rescue Diver',
-    'Incorrect Choice 1': 'Divemaster',
-    'Incorrect Choice 2': 'Open Water Diver',
-  }
-  cy.task('getTestState', 'secondQuestion').then((stored) => {
-    const secondQuestion =
-      (stored as Record<string, string> | undefined) ?? defaultSecondQuestion
-    start.questionGenerationService().stubRegeneratedQuestion(secondQuestion)
-  })
+Given('OpenAI will accept the generated question then uphold a contest', () => {
+  start.questionGenerationService().stubAcceptThenUpholdContestEvaluations()
+  start
+    .questionGenerationService()
+    .stubRegeneratedQuestion(defaultReplacementMcq)
 })
 
 When('I contest the MCQ', () => {

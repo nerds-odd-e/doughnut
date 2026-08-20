@@ -92,6 +92,11 @@ When('I am recalling my note on day {int}', (day: number) => {
   start.recall().visitRecallPage()
 })
 
+Given('a due recall prompt is ready on day {int}', (day: number) => {
+  start.testability().backendTimeTravelTo(day, 8)
+  start.testability().dueRecallPrompt()
+})
+
 When('I visit recall for a due recall prompt on day {int}', (day: number) => {
   start.testability().backendTimeTravelTo(day, 8)
   start.recall().visitRecallPageAndWaitForQuestions(1)
