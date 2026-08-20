@@ -1,6 +1,6 @@
 # Canonical-grade follow-up cleanup
 
-**Status:** in progress  
+**Status:** done  
 **Type:** Ad-hoc quick plan (not on roadmap)  
 **Objective:** Fix bugs and cohesion/test debt left by `.planning/quick/001-canonical-grade/` without changing FSRS math or Confusion/Overlap semantics.
 
@@ -56,13 +56,9 @@ HARD/EASY on `mark-as-recalled` return 400; OpenAPI/TS param is GOOD|AGAIN. Memb
 
 Tutor-feedback tests keep one schedule-advance smoke (no float matrix). Recall-log tests assert `answerId` null for all grades. Unused HOLA3 report constants removed from test base.
 
-### 6. CLI just-review asserts grade query — **Behavior** — planned
+### 6. CLI just-review asserts grade query — **Behavior** — done
 
-**Pre:** Interactive just-review card shown.  
-**Trigger:** Answer `y` or `n`.  
-**Post:** `markAsRecalled` called with `query.grade` GOOD or AGAIN respectively.
-
-One focused CLI unit assertion (extend existing mock spy); do not broaden session `successful` cleanup.
+Interactive just-review `y`/`n` asserts `markAsRecalled` with `query.grade` GOOD/AGAIN in `recallJustReviewInteractive.session.test.tsx`.
 
 ---
 
@@ -73,8 +69,8 @@ One focused CLI unit assertion (extend existing mock spy); do not broaden sessio
 - [x] One non-null graded apply path for quiz/just-review/session
 - [x] RecallLog JSON has a single outcome field (`productOutcome`)
 - [x] No duplicate FSRS float matrix in learning-session tutor tests; recall-log assert not GOOD-only
-- [ ] CLI just-review tests pin GOOD/AGAIN query
-- [ ] Focused tests + `generateTypeScript` (when API changes) + format/whitespace green
+- [x] CLI just-review tests pin GOOD/AGAIN query
+- [x] Focused tests + `generateTypeScript` (when API changes) + format/whitespace green
 
 ## Out of scope
 

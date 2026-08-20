@@ -181,4 +181,28 @@ describeRecallJustReviewInteractive((api) => {
     expect(markAsRecalledCount.n).toBe(2)
     expect(api.recallingSpy).toHaveBeenCalledTimes(1)
   })
+
+  test('just-review y and n call markAsRecalled with query.grade GOOD and AGAIN', async () => {
+    setupTwoDueJustReviewItemsMocks()
+
+    const { stdin, ...ink } = await renderInkWhenCommandLineReady(
+      <InteractiveCliApp />
+    )
+
+    startRecall(stdin)
+    await waitJustReviewCard(ink, 'Alpha', { ynHint: true })
+    stdin.write('y\r')
+    await waitJustReviewCard(ink, 'Beta')
+    stdin.write('n\r')
+    await waitLoadMore(ink)
+
+    expect(api.markAsRecalledSpy).toHaveBeenNthCalledWith(
+      1,
+      expect.objectContaining({ query: { grade: 'GOOD' } })
+    )
+    expect(api.markAsRecalledSpy).toHaveBeenNthCalledWith(
+      2,
+      expect.objectContaining({ query: { grade: 'AGAIN' } })
+    )
+  })
 })
