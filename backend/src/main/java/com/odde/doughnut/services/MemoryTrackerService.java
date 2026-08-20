@@ -75,17 +75,20 @@ public class MemoryTrackerService {
       Timestamp currentUTCTimestamp, Boolean correct, RecallPrompt recallPrompt) {
     MemoryTracker memoryTracker = recallPrompt.requireMemoryTracker();
     Answer answer = recallPrompt.getAnswer();
-    return markAsRecalled(currentUTCTimestamp, correct, memoryTracker, answer);
+    return markAsRecalled(
+        currentUTCTimestamp,
+        Grade.fromCorrect(Boolean.TRUE.equals(correct)),
+        memoryTracker,
+        answer);
   }
 
   public boolean markAsRecalled(
-      Timestamp currentUTCTimestamp, Boolean correct, MemoryTracker memoryTracker, Answer answer) {
-    Grade grade = correct ? Grade.GOOD : Grade.AGAIN;
+      Timestamp currentUTCTimestamp, Grade grade, MemoryTracker memoryTracker, Answer answer) {
     persistRecallLog(memoryTracker, currentUTCTimestamp, grade, answer);
     memoryTracker.applyGrade(currentUTCTimestamp, grade);
     entityPersister.save(memoryTracker);
 
-    if (!correct) {
+    if (grade == Grade.AGAIN) {
       return isThresholdExceeded(memoryTracker, currentUTCTimestamp);
     }
     return false;

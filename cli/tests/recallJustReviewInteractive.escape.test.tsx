@@ -11,13 +11,13 @@ describeRecallJustReviewInteractive((api) => {
     renderInkWhenCommandLineReady,
     pressEscapeAndWaitForCancelledLine,
     waitForFrames,
-    waitRememberCard,
+    waitJustReviewCard,
     startRecall,
     alphaNoteRealm,
     mockShowMemoryTrackerCardForRealm,
     mockMarkAsRecalledCounting,
-    reachLeaveRecallOnRemember,
-    waitReturnsToSingleRememberCard,
+    reachLeaveRecallOnJustReview,
+    waitReturnsToSingleJustReviewCard,
   } = api
 
   async function inkAtLeaveRecallConfirm() {
@@ -25,14 +25,14 @@ describeRecallJustReviewInteractive((api) => {
     mockShowMemoryTrackerCardForRealm(alphaNoteRealm())
     const rendered = await renderInkWhenCommandLineReady(<InteractiveCliApp />)
     startRecall(rendered.stdin)
-    await reachLeaveRecallOnRemember(rendered.stdin, rendered, 'Alpha')
+    await reachLeaveRecallOnJustReview(rendered.stdin, rendered, 'Alpha')
     expect(api.markAsRecalledSpy).not.toHaveBeenCalled()
     return rendered
   }
 
   test.each([
     {
-      name: 'after Esc on remember card, y settles Recall session stopped without markAsRecalled',
+      name: 'after Esc on just-review card, y settles Recall session stopped without markAsRecalled',
       run: async (
         stdin: { write: (s: string) => void },
         ink: RecallInkWaitHelpers
@@ -42,17 +42,17 @@ describeRecallJustReviewInteractive((api) => {
       },
     },
     {
-      name: 'after Esc on remember card, n returns to Yes, I remember without markAsRecalled',
+      name: 'after Esc on just-review card, n returns to Good without markAsRecalled',
       run: async (
         _stdin: { write: (s: string) => void },
         ink: RecallInkWaitHelpers
       ) => {
         _stdin.write('n\r')
-        await waitReturnsToSingleRememberCard(ink, 'Alpha')
+        await waitReturnsToSingleJustReviewCard(ink, 'Alpha')
       },
     },
     {
-      name: 'empty Enter on leave recall confirm stays on confirm; n returns to remember card',
+      name: 'empty Enter on leave recall confirm stays on confirm; n returns to just-review card',
       run: async (
         stdin: { write: (s: string) => void },
         ink: RecallInkWaitHelpers
@@ -60,7 +60,7 @@ describeRecallJustReviewInteractive((api) => {
         stdin.write('\r')
         await ink.waitForLastFrameToInclude(/Leave recall\?/)
         stdin.write('n\r')
-        await waitReturnsToSingleRememberCard(ink, 'Alpha')
+        await waitReturnsToSingleJustReviewCard(ink, 'Alpha')
       },
     },
   ])('$name', async ({ run }) => {
@@ -108,7 +108,7 @@ describeRecallJustReviewInteractive((api) => {
       await renderInkWhenCommandLineReady(<InteractiveCliApp />)
 
     startRecall(stdin)
-    await waitRememberCard(ink, 'Alpha')
+    await waitJustReviewCard(ink, 'Alpha')
 
     stdin.write('y\r')
     await waitForFrames(lastStrippedFrame, () => markEntered)

@@ -5,6 +5,7 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.doughnut.controllers.dto.NoteDeleteReferenceHandling;
+import com.odde.doughnut.entities.Grade;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
 import org.junit.jupiter.api.Nested;
@@ -65,8 +66,8 @@ class MemoryTrackerRecentControllerTest extends MemoryTrackerControllerTestBase 
     void shouldReturnRecentlyRecalledForCurrentUser() {
       MemoryTracker tracker1 = ownedTracker();
       MemoryTracker tracker2 = ownedTracker();
-      controller.markAsRecalled(tracker1, true);
-      controller.markAsRecalled(tracker2, true);
+      controller.markAsRecalled(tracker1, Grade.GOOD);
+      controller.markAsRecalled(tracker2, Grade.GOOD);
 
       assertThat(controller.getRecentlyRecalled(), containsInAnyOrder(tracker1, tracker2));
     }
@@ -84,8 +85,8 @@ class MemoryTrackerRecentControllerTest extends MemoryTrackerControllerTestBase 
       MemoryTracker activeTracker = ownedTracker(activeNote);
       MemoryTracker deletedTracker = ownedTracker(deletedNote);
 
-      controller.markAsRecalled(activeTracker, true);
-      controller.markAsRecalled(deletedTracker, true);
+      controller.markAsRecalled(activeTracker, Grade.GOOD);
+      controller.markAsRecalled(deletedTracker, Grade.GOOD);
 
       noteService.destroy(
           deletedNote, NoteDeleteReferenceHandling.LEAVE_DEAD_LINKS, currentUser.getUser());

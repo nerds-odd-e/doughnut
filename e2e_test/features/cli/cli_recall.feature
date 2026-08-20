@@ -33,7 +33,7 @@ Feature: CLI recall
       Then I should see "sedation" in the Current guidance
       And I should see "Put to sleep is sedation" in the Current guidance
       And I should see "Put" styled in the Current guidance
-      And I should see "Yes, I remember?" in the Current guidance
+      And I should see "Good?" in the Current guidance
       When I enter "y" in the interactive CLI
       Then I should see "sedation" in answered questions
       And I should see "Put to sleep" in answered questions
@@ -47,13 +47,13 @@ Feature: CLI recall
       And the note "sedation" was assimilated on day 1
       And It's day 2
       When I enter the slash command "/recall" in the interactive CLI
-      And I answer "y" in the interactive CLI to prompt "Yes, I remember?"
-      And I answer "y" in the interactive CLI to prompt "Yes, I remember?"
+      And I answer "y" in the interactive CLI to prompt "Good?"
+      And I answer "y" in the interactive CLI to prompt "Good?"
       And I answer "n" in the interactive CLI to prompt "Load more from next 3 days?"
       Then I should see "Recalled 2 notes" in past CLI assistant messages
       When I enter the slash command "/recall" in the interactive CLI
       And I answer "y" in the interactive CLI to prompt "Load more from next 3 days?"
-      And I answer "y" in the interactive CLI to prompt "Yes, I remember?"
+      And I answer "y" in the interactive CLI to prompt "Good?"
       Then I should see "Reviewed: sedition" in answered questions
 
     @usingMockedOpenAiService
@@ -107,7 +107,7 @@ Feature: CLI recall
       And I should see "Your answer: sedition" in answered questions
       And I should see "sedition" in answered questions
       And I should see "Sedition means incite violence" in answered questions
-      When I answer "y" in the interactive CLI to prompt "Yes, I remember?"
+      When I answer "y" in the interactive CLI to prompt "Good?"
       Then I should see "sedition" in answered questions
       And I should see "Sedition means incite violence" in answered questions
       And I should see "Reviewed: sedition" in answered questions

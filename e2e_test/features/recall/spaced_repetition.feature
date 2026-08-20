@@ -42,7 +42,7 @@ Feature: Spaced-repetition
     Given the browser and backend are on day 1
     When I assimilate the note "Note 1"
     And I am recalling my note on day 1
-    And I choose yes I remember
+    And I choose Good
     And I visit the understanding memory tracker for "Note 1"
     Then I record the current memory tracker schedule
     When I remove the memory tracker from recall
@@ -53,20 +53,20 @@ Feature: Spaced-repetition
     And I should see the same Last Recall Time
 
   @mockBrowserTime
-  Scenario: Memory Tracker shows a GOOD RecallLog after just-review Yes
+  Scenario: Memory Tracker shows a GOOD RecallLog after just-review Good
     Given the browser and backend are on day 1
     When I assimilate the note "Note 1"
     And I am recalling my note on day 1
-    And I choose yes I remember
+    And I choose Good
     And I visit the understanding memory tracker for "Note 1"
     Then I should see a GOOD RecallLog with elapsed hours and no answer id
 
   @mockBrowserTime
-  Scenario: Memory Tracker shows first Again after just-review No on New
+  Scenario: Memory Tracker shows first Again after just-review Again on New
     Given the browser and backend are on day 1
     When I assimilate the note "Note 1"
     And I am recalling my note on day 1
-    And I choose no I need more recall
+    And I choose Again
     And I visit the understanding memory tracker for "Note 1"
     Then I should see Stability 5
     And I should see Difficulty 6.4133
@@ -77,10 +77,10 @@ Feature: Spaced-repetition
     Given the browser and backend are on day 1
     When I assimilate the note "Note 1"
     And I am recalling my note on day 1
-    And I choose no I need more recall
+    And I choose Again
     And It's day 1, 13 hour
     And I visit recall
-    And I choose yes I remember
+    And I choose Good
     And I visit the understanding memory tracker for "Note 1"
     Then I should see Stability 6
     And I should see 6 hours between last and next recall
@@ -90,10 +90,10 @@ Feature: Spaced-repetition
     Given the browser and backend are on day 1
     When I assimilate the note "Note 1"
     And I am recalling my note on day 1
-    And I choose yes I remember
+    And I choose Good
     And It's day 3, 15 hour
     And I visit recall
-    And I choose no I need more recall
+    And I choose Again
     And I visit the understanding memory tracker for "Note 1"
     Then I should see Stability 15
     And I should see 15 hours between last and next recall
@@ -105,9 +105,9 @@ Feature: Spaced-repetition
     Given the browser and backend are on day 1
     When I assimilate the note "Note 1"
     And I am recalling my note on day 1
-    And I choose yes I remember
+    And I choose Good
     And I ask to do more recall
-    And I choose yes I remember
+    And I choose Good
     And I visit the understanding memory tracker for "Note 1"
     Then I should see Stability 55
     And I should see 55 hours between last and next recall
@@ -117,9 +117,9 @@ Feature: Spaced-repetition
     Given the browser and backend are on day 1
     When I assimilate the note "Note 1"
     And I am recalling my note on day 1
-    And I choose yes I remember
+    And I choose Good
     And I ask to do more recall
-    And I choose no I need more recall
+    And I choose Again
     And I visit the understanding memory tracker for "Note 1"
     Then I should see Stability 18
     And I should see 18 hours between last and next recall

@@ -2,16 +2,16 @@
   <div class="daisy-btn-group">
     <button
       class="daisy-btn daisy-btn-primary loading"
-      @click.once="$emit('self-evaluated-memory-state', true)"
+      @click.once="$emit('grade', 'GOOD')"
       :disabled="!ready"
     >
-      Yes, I remember
+      Good
     </button>
     <button
       class="daisy-btn daisy-btn-secondary"
-      @click.once="$emit('self-evaluated-memory-state', false)"
+      @click.once="$emit('grade', 'AGAIN')"
     >
-      No, I need more recall
+      Again
     </button>
   </div>
 </template>
@@ -21,7 +21,7 @@ import gsap from "gsap"
 import { defineComponent } from "vue"
 
 export default defineComponent({
-  emits: ["self-evaluated-memory-state"],
+  emits: ["grade"],
   data() {
     return {
       loadingWidth: "100%",

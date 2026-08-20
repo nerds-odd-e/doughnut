@@ -4,6 +4,7 @@ import com.odde.doughnut.controllers.dto.RecallHistoryItem;
 import com.odde.doughnut.controllers.dto.RecallPromptHistoryItem;
 import com.odde.doughnut.controllers.dto.ThresholdExceededResult;
 import com.odde.doughnut.controllers.dto.UpdateMemoryTrackerPropertyKeyDTO;
+import com.odde.doughnut.entities.Grade;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.RecallLog;
 import com.odde.doughnut.entities.RecallPrompt;
@@ -103,10 +104,10 @@ class MemoryTrackerController {
   @Transactional
   public MemoryTracker markAsRecalled(
       @PathVariable("memoryTracker") @Schema(type = "integer") MemoryTracker memoryTracker,
-      @RequestParam("successful") boolean successful) {
+      @RequestParam("grade") Grade grade) {
     authorizationService.assertLoggedIn();
     memoryTrackerService.markAsRecalled(
-        testabilitySettings.getCurrentUTCTimestamp(), successful, memoryTracker, null);
+        testabilitySettings.getCurrentUTCTimestamp(), grade, memoryTracker, null);
     return memoryTracker;
   }
 

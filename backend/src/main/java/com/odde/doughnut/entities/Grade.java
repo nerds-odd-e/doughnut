@@ -27,4 +27,9 @@ public enum Grade {
       default -> throw new IllegalArgumentException("Grade G must be 1–4: " + value);
     };
   }
+
+  /** Map a binary answer correctness to scheduling Grade (correct → GOOD, else AGAIN). */
+  public static Grade fromCorrect(boolean correct) {
+    return correct ? GOOD : AGAIN;
+  }
 }

@@ -14,12 +14,12 @@ describeRecallJustReviewInteractive((api) => {
     InteractiveCliApp,
     renderInkWhenCommandLineReady,
     waitForLastFrame,
-    waitRememberCard,
+    waitJustReviewCard,
     mockDeferredMarkAsRecalled,
     mockShowMemoryTrackerSecondCardDelayed,
     waitLoadMore,
     waitRecalledSummary,
-    emptyEnterAndInvalidLineStayOnRemember,
+    emptyEnterAndInvalidLineStayOnJustReview,
     startRecall,
     alphaNoteRealm,
     childNoteUnderEnglish,
@@ -36,7 +36,7 @@ describeRecallJustReviewInteractive((api) => {
     )
 
     startRecall(stdin)
-    await waitRememberCard(ink, 'Alpha', { ynHint: true })
+    await waitJustReviewCard(ink, 'Alpha', { ynHint: true })
     stdin.write('y\r')
 
     await waitBusyRecordReview(ink)
@@ -79,7 +79,7 @@ describeRecallJustReviewInteractive((api) => {
     )
 
     startRecall(stdin)
-    await waitRememberCard(ink, 'Alpha', { ynHint: true })
+    await waitJustReviewCard(ink, 'Alpha', { ynHint: true })
     stdin.write('y\r')
 
     await waitLoadingNextQuestion(ink)
@@ -91,10 +91,10 @@ describeRecallJustReviewInteractive((api) => {
         .please(),
     } as Awaited<ReturnType<typeof MemoryTrackerController.showMemoryTracker>>)
 
-    await waitRememberCard(ink, 'Beta')
+    await waitJustReviewCard(ink, 'Beta')
   })
 
-  test('empty Enter and non-y/n on remember card do not recall; two-item session completes', async () => {
+  test('empty Enter and non-y/n on just-review card do not recall; two-item session completes', async () => {
     setupTwoDueJustReviewItemsMocks()
     const markAsRecalledCount = mockMarkAsRecalledCounting()
 
@@ -103,8 +103,8 @@ describeRecallJustReviewInteractive((api) => {
     )
 
     startRecall(stdin)
-    await waitRememberCard(ink, 'Alpha', { ynHint: true })
-    await emptyEnterAndInvalidLineStayOnRemember(
+    await waitJustReviewCard(ink, 'Alpha', { ynHint: true })
+    await emptyEnterAndInvalidLineStayOnJustReview(
       stdin,
       ink,
       'Alpha',
@@ -113,7 +113,7 @@ describeRecallJustReviewInteractive((api) => {
     )
 
     stdin.write('y\r')
-    await waitRememberCard(ink, 'Beta')
+    await waitJustReviewCard(ink, 'Beta')
     expect(markAsRecalledCount.n).toBe(1)
 
     stdin.write('y\r')
@@ -131,7 +131,7 @@ describeRecallJustReviewInteractive((api) => {
       await renderInkWhenCommandLineReady(<InteractiveCliApp />)
 
     startRecall(stdin)
-    await waitForFramesToInclude(/(?=.*Yes, I remember\?)(?=.*Sedition)/s)
+    await waitForFramesToInclude(/(?=.*Good\?)(?=.*Sedition)/s)
     stdin.write('y\r')
     await waitForFramesToInclude(
       /(?=.*English › Sedition)(?=.*Sedition means incite violence)(?=.*Reviewed: Sedition)/s
@@ -148,10 +148,7 @@ describeRecallJustReviewInteractive((api) => {
     )
     startRecall(stdin)
     await ink.waitUntilLastFrame(
-      (f) =>
-        f.includes('Yes, I remember?') &&
-        f.includes('Note') &&
-        !f.includes('Alpha')
+      (f) => f.includes('Good?') && f.includes('Note') && !f.includes('Alpha')
     )
 
     stdin.write('n\r')
@@ -167,9 +164,9 @@ describeRecallJustReviewInteractive((api) => {
     )
 
     startRecall(stdin)
-    await waitRememberCard(ink, 'Alpha')
+    await waitJustReviewCard(ink, 'Alpha')
     stdin.write('y\r')
-    await waitRememberCard(ink, 'Beta')
+    await waitJustReviewCard(ink, 'Beta')
     await waitForLastFrame(lastFrame, (plain) => {
       return (
         plain.includes('Reviewed: Alpha') &&

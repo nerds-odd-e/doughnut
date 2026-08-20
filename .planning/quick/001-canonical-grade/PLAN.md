@@ -47,15 +47,11 @@ Introduced `Grade`; deleted `CommissionedLearningSessionFeedbackScheduling` and 
 
 **Learning:** Call sites should use `applyGrade` directly; Yes/No wrappers on MemoryTracker were dead after the structure cut.
 
-### 3. Just review submits Good / Again — **Behavior** — planned
+### 3. Just review submits Good / Again — **Behavior** — done
 
-**Pre:** Learner is in just review.  
-**Trigger:** Chooses Good or Again (web and CLI).  
-**Post:** API records that `Grade`; schedule matches former Yes→GOOD / No→AGAIN; UI/CLI copy and params are grade-based (no `successful`, no Yes/No domain ids).
+API query `grade` replaces `successful`; web/CLI/E2E use Good/Again. Schedule still GOOD/AGAIN. Binary→Grade via `Grade.fromCorrect`.
 
-Update `MemoryTrackerController.markAsRecalled`, frontend `JustReview` / `SelfEvaluateButtons`, E2E recall page objects/steps, CLI just-review stage + tests. Regenerate API client as needed.
-
-**Verify:** Targeted frontend unit + CLI tests + E2E just-review path (`cypress run --spec` for the recall feature that covers just review).
+**Learning:** CLI session-level `successful` for shared MCQ/spelling flow is separate from just-review wire params — leave until a dedicated CLI session cleanup if needed.
 
 ### 4. Learning Session Feedback is Grade — **Behavior** — planned
 

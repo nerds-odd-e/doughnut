@@ -32,13 +32,13 @@ import {
   setupTwoDueJustReviewItemsMocks,
 } from './recallJustReviewInteractive.mocks.js'
 import {
-  emptyEnterAndInvalidLineStayOnRemember,
+  emptyEnterAndInvalidLineStayOnJustReview,
   recallSingleAlphaToLoadMore,
-  reachLeaveRecallOnRemember,
+  reachLeaveRecallOnJustReview,
   waitLoadMore,
   waitRecalledSummary,
-  waitRememberCard,
-  waitReturnsToSingleRememberCard,
+  waitJustReviewCard,
+  waitReturnsToSingleJustReviewCard,
 } from './recallJustReviewInteractive.waits.js'
 
 export type RecallJustReviewInteractiveApi = {
@@ -62,13 +62,13 @@ export type RecallJustReviewInteractiveApi = {
   recallingSpy: ReturnType<typeof vi.spyOn>
   showMemoryTrackerSpy: ReturnType<typeof vi.spyOn>
   markAsRecalledSpy: ReturnType<typeof vi.spyOn>
-  waitRememberCard: typeof waitRememberCard
+  waitJustReviewCard: typeof waitJustReviewCard
   waitLoadMore: typeof waitLoadMore
   waitRecalledSummary: typeof waitRecalledSummary
-  waitReturnsToSingleRememberCard: typeof waitReturnsToSingleRememberCard
-  emptyEnterAndInvalidLineStayOnRemember: typeof emptyEnterAndInvalidLineStayOnRemember
+  waitReturnsToSingleJustReviewCard: typeof waitReturnsToSingleJustReviewCard
+  emptyEnterAndInvalidLineStayOnJustReview: typeof emptyEnterAndInvalidLineStayOnJustReview
   recallSingleAlphaToLoadMore: typeof recallSingleAlphaToLoadMore
-  reachLeaveRecallOnRemember: typeof reachLeaveRecallOnRemember
+  reachLeaveRecallOnJustReview: typeof reachLeaveRecallOnJustReview
   startRecall: typeof startRecall
   alphaNoteRealm: typeof alphaNoteRealm
   childNoteUnderEnglish: typeof childNoteUnderEnglish
@@ -202,13 +202,13 @@ export function describeRecallJustReviewInteractive(
       get markAsRecalledSpy() {
         return markAsRecalledSpy
       },
-      waitRememberCard,
+      waitJustReviewCard,
       waitLoadMore,
       waitRecalledSummary,
-      waitReturnsToSingleRememberCard,
-      emptyEnterAndInvalidLineStayOnRemember,
+      waitReturnsToSingleJustReviewCard,
+      emptyEnterAndInvalidLineStayOnJustReview,
       recallSingleAlphaToLoadMore,
-      reachLeaveRecallOnRemember,
+      reachLeaveRecallOnJustReview,
       startRecall,
       alphaNoteRealm,
       childNoteUnderEnglish,

@@ -147,12 +147,12 @@ When(
   }
 )
 
-When('I choose yes I remember', () => {
-  start.recall().assumeRecallPage().yesIRemember()
+When('I choose Good', () => {
+  start.recall().assumeRecallPage().chooseGood()
 })
 
-When('I choose no I need more recall', () => {
-  start.recall().assumeRecallPage().noINeedMoreRecall()
+When('I choose Again', () => {
+  start.recall().assumeRecallPage().chooseAgain()
 })
 
 Then('I skip one question', () => {

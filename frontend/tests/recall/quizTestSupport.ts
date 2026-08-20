@@ -26,7 +26,7 @@ export const contentLoaderSelector = ".daisy-loading.daisy-loading-spinner"
 export const contestableDummyInputSelector =
   '[data-testid="contestable-dummy-input"]'
 export const recallPromptSelector = ".recall-prompt"
-export const justReviewButtonText = "Yes, I remember"
+export const justReviewButtonText = "Good"
 
 export let getRecallPromptSpy: ReturnType<typeof mockSdkService>
 export let wrapper: VueWrapper

@@ -77,7 +77,7 @@ describe('RecallPage "just review" quiz', () => {
     await wrapper.find("button.daisy-btn-primary").trigger("click")
     expect(mockedMarkAsRepeatedCall).toHaveBeenCalledWith({
       path: { memoryTracker: firstMemoryTrackerId },
-      query: { successful: true },
+      query: { grade: "GOOD" },
     })
     await flushPromises()
     expect(wrapper.findComponent({ name: "GlobalBar" }).text()).toContain("1/3")

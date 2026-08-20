@@ -5,14 +5,14 @@ import {
   startRecall,
 } from './recallInteractiveShared.js'
 
-export async function waitRememberCard(
+export async function waitJustReviewCard(
   ink: RecallInkWaitHelpers,
   title: string,
   opts?: { ynHint: boolean }
 ) {
   const re = opts?.ynHint
-    ? new RegExp(`(?=.*Yes, I remember\\?)(?=.*${title})(?=.*\\(y/n\\))`, 's')
-    : new RegExp(`(?=.*Yes, I remember\\?)(?=.*${title})`, 's')
+    ? new RegExp(`(?=.*Good\\?)(?=.*${title})(?=.*\\(y/n\\))`, 's')
+    : new RegExp(`(?=.*Good\\?)(?=.*${title})`, 's')
   await ink.waitForLastFrameToInclude(re)
 }
 
@@ -29,16 +29,16 @@ export async function waitRecalledSummary(
   await ink.waitForLastFrameToInclude(summary)
 }
 
-export async function waitReturnsToSingleRememberCard(
+export async function waitReturnsToSingleJustReviewCard(
   ink: RecallInkWaitHelpers,
   noteTitle: string
 ) {
   await ink.waitUntilLastFrame((plain) => {
     return (
-      plain.includes('Yes, I remember?') &&
+      plain.includes('Good?') &&
       plain.includes(noteTitle) &&
       !plain.includes(LEAVE_RECALL_PROMPT) &&
-      (plain.match(/Yes, I remember\?/g) ?? []).length === 1
+      (plain.match(/Good\?/g) ?? []).length === 1
     )
   })
 }
@@ -54,25 +54,23 @@ async function backspaceClearsTyped(
   )
 }
 
-export async function emptyEnterAndInvalidLineStayOnRemember(
+export async function emptyEnterAndInvalidLineStayOnJustReview(
   stdin: { write(data: string): void },
   ink: RecallInkWaitHelpers,
   noteTitle: string,
   summaryNotYet: string,
   opts?: { readonly skipInitialWait?: boolean }
 ) {
-  const onRemember = (f: string) =>
-    f.includes('Yes, I remember?') &&
-    f.includes(noteTitle) &&
-    !f.includes(summaryNotYet)
+  const onJustReview = (f: string) =>
+    f.includes('Good?') && f.includes(noteTitle) && !f.includes(summaryNotYet)
 
   if (!opts?.skipInitialWait) {
-    await ink.waitUntilLastFrame(onRemember)
+    await ink.waitUntilLastFrame(onJustReview)
   }
   stdin.write('\r')
-  await ink.waitUntilLastFrame(onRemember)
+  await ink.waitUntilLastFrame(onJustReview)
   stdin.write('q\r')
-  await ink.waitUntilLastFrame(onRemember)
+  await ink.waitUntilLastFrame(onJustReview)
   await backspaceClearsTyped(stdin, ink, '→ q')
 }
 
@@ -81,17 +79,17 @@ export async function recallSingleAlphaToLoadMore(
   ink: RecallInkWaitHelpers
 ) {
   startRecall(stdin)
-  await waitRememberCard(ink, 'Alpha')
+  await waitJustReviewCard(ink, 'Alpha')
   stdin.write('y\r')
   await waitLoadMore(ink)
 }
 
-export async function reachLeaveRecallOnRemember(
+export async function reachLeaveRecallOnJustReview(
   stdin: { write(data: string): void },
   ink: RecallInkWaitHelpers,
   noteTitle: string
 ) {
-  await waitRememberCard(ink, noteTitle)
+  await waitJustReviewCard(ink, noteTitle)
   await pressEscape(stdin)
   await ink.waitForLastFrameToInclude(/Leave recall\?/)
 }

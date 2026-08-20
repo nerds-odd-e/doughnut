@@ -9,7 +9,7 @@ describeRecallJustReviewInteractive((api) => {
     InteractiveCliApp,
     renderInkWhenCommandLineReady,
     pressEscape,
-    waitRememberCard,
+    waitJustReviewCard,
     waitLoadMore,
     waitRecalledSummary,
     recallSingleAlphaToLoadMore,
@@ -113,9 +113,9 @@ describeRecallJustReviewInteractive((api) => {
     )
 
     startRecall(stdin)
-    await waitRememberCard(ink, 'Alpha')
+    await waitJustReviewCard(ink, 'Alpha')
     stdin.write('y\r')
-    await waitRememberCard(ink, 'Beta')
+    await waitJustReviewCard(ink, 'Beta')
     stdin.write('y\r')
     await waitLoadMore(ink)
     stdin.write('y\r')

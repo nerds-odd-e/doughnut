@@ -67,14 +67,14 @@ class MemoryTrackerTrackingControllerTest extends MemoryTrackerControllerTestBas
   }
 
   @Test
-  void successfulMarkAsRecalledLeavesOneGoodRecallLog() throws UnexpectedNoAccessRightException {
+  void markAsRecalledWithGoodLeavesOneGoodRecallLog() throws UnexpectedNoAccessRightException {
     Timestamp assimilatedAt = makeMe.aTimestamp().of(1, 8).please();
     MemoryTracker tracker =
         makeMe.aMemoryTrackerFor(ownedNote()).assimilatedAt(assimilatedAt).please();
     Timestamp recalledAt = makeMe.aTimestamp().of(2, 8).please();
     testabilitySettings.timeTravelTo(recalledAt);
 
-    controller.markAsRecalled(tracker, true);
+    controller.markAsRecalled(tracker, Grade.GOOD);
 
     List<RecallLog> logs = controller.getRecallLogs(tracker);
     assertThat(logs, hasSize(1));
@@ -99,17 +99,17 @@ class MemoryTrackerTrackingControllerTest extends MemoryTrackerControllerTestBas
     Timestamp recalledAt = makeMe.aTimestamp().of(2, 8).please();
     testabilitySettings.timeTravelTo(recalledAt);
 
-    controller.markAsRecalled(tracker, true);
+    controller.markAsRecalled(tracker, Grade.GOOD);
 
     assertThat(controller.getRecallLogs(tracker).get(0).getElapsedHours(), equalTo(24));
   }
 
   @Test
-  void unsuccessfulMarkAsRecalledLeavesAnAgainRecallLog() throws UnexpectedNoAccessRightException {
+  void markAsRecalledWithAgainLeavesAnAgainRecallLog() throws UnexpectedNoAccessRightException {
     MemoryTracker tracker = ownedTracker();
     makeMe.aRecallLogFor(tracker).please();
 
-    controller.markAsRecalled(tracker, false);
+    controller.markAsRecalled(tracker, Grade.AGAIN);
 
     List<RecallLog> logs = controller.getRecallLogs(tracker);
     assertThat(logs, hasSize(2));
@@ -124,7 +124,7 @@ class MemoryTrackerTrackingControllerTest extends MemoryTrackerControllerTestBas
     addRecallLogs(tracker, Grade.AGAIN, 5, day1);
     testabilitySettings.timeTravelTo(day1);
 
-    controller.markAsRecalled(tracker, false);
+    controller.markAsRecalled(tracker, Grade.AGAIN);
 
     assertThat(
         memoryTrackerRepository.findByUserAndNote(currentUser.getUser().getId(), note.getId()),

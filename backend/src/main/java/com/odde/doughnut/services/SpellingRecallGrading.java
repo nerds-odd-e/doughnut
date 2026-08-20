@@ -5,6 +5,7 @@ import com.odde.doughnut.algorithms.WikiLinkMarkdown;
 import com.odde.doughnut.controllers.dto.AnswerSpellingDTO;
 import com.odde.doughnut.entities.Answer;
 import com.odde.doughnut.entities.AnswerOutcome;
+import com.odde.doughnut.entities.Grade;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.QuestionType;
@@ -61,7 +62,10 @@ final class SpellingRecallGrading {
     answer.setThinkingTimeMs(answerSpellingDTO.getThinkingTimeMs());
     recallPrompt.setAnswer(answer);
     memoryTrackerService.markAsRecalled(
-        currentUTCTimestamp, answer.getCorrect(), memoryTracker, null);
+        currentUTCTimestamp,
+        Grade.fromCorrect(Boolean.TRUE.equals(answer.getCorrect())),
+        memoryTracker,
+        null);
     return recallPrompt;
   }
 
@@ -118,7 +122,10 @@ final class SpellingRecallGrading {
 
     Answer persistedAnswer = recallPrompt.getAnswer();
     memoryTrackerService.markAsRecalled(
-        currentUTCTimestamp, correct, memoryTracker, persistedAnswer);
+        currentUTCTimestamp,
+        Grade.fromCorrect(Boolean.TRUE.equals(correct)),
+        memoryTracker,
+        persistedAnswer);
     return new MemoryTrackerService.SpellingAnswerResult(recallPrompt, matches);
   }
 

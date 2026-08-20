@@ -10,7 +10,7 @@ describeRecallJustReviewInteractive((api) => {
     RecallsController,
     InteractiveCliApp,
     renderInkWhenCommandLineReady,
-    waitRememberCard,
+    waitJustReviewCard,
     recallSingleAlphaToLoadMore,
     mockMarkAsRecalledCounting,
   } = api
@@ -77,7 +77,7 @@ describeRecallJustReviewInteractive((api) => {
     try {
       await recallSingleAlphaToLoadMore(stdin, ink)
       stdin.write('y\r')
-      await waitRememberCard(ink, 'FIRST_AFTER_SHUFFLE')
+      await waitJustReviewCard(ink, 'FIRST_AFTER_SHUFFLE')
       expect(api.recallingSpy).toHaveBeenCalledTimes(2)
     } finally {
       randomSpy.mockRestore()

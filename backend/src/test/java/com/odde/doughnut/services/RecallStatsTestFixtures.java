@@ -22,7 +22,7 @@ final class RecallStatsTestFixtures {
     return new RecallAnswerRow(
         answerAt,
         null,
-        correct ? Grade.GOOD : Grade.AGAIN,
+        Grade.fromCorrect(correct),
         thinkingTimeMs,
         promptAt != null ? promptAt : answerAt);
   }

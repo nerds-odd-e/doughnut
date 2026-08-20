@@ -7,7 +7,7 @@
       }"
     />
     <SelfEvaluateButtons
-      @self-evaluated-memory-state="justReivew($event)"
+      @grade="justReview($event)"
       :key="memoryTrackerId"
     />
   </div>
@@ -27,14 +27,14 @@ const emit = defineEmits<{
   reviewed: []
 }>()
 
-const justReivew = async (successful: boolean) => {
+const justReview = async (grade: "GOOD" | "AGAIN") => {
   if (props.memoryTrackerId === undefined) {
     return
   }
   const { error } = await apiCallWithLoading(() =>
     MemoryTrackerController.markAsRecalled({
       path: { memoryTracker: props.memoryTrackerId! },
-      query: { successful },
+      query: { grade },
     })
   )
   if (!error) {

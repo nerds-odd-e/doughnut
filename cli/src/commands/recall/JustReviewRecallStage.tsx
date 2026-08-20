@@ -25,10 +25,10 @@ import {
 } from './recallAnsweredInkShared.js'
 
 function justReviewOutcomeLine(
-  outcome: 'remembered' | 'reduced',
+  grade: 'GOOD' | 'AGAIN',
   noteTitle: string
 ): string {
-  if (outcome === 'reduced') {
+  if (grade === 'AGAIN') {
     return 'Reduced memory index.'
   }
   return `Reviewed: ${noteTitle}`
@@ -36,7 +36,7 @@ function justReviewOutcomeLine(
 
 function recallAnsweredJustReviewInk(
   payload: RecallJustReviewPayload,
-  remembered: boolean
+  grade: 'GOOD' | 'AGAIN'
 ): ReactElement {
   const width = resolvedTerminalWidth()
   const crumb = recallAnsweredBreadcrumbText(payload.breadcrumbTitles)
@@ -44,16 +44,13 @@ function recallAnsweredJustReviewInk(
     payload.contentMarkdown,
     width
   )
-  const outcome: 'remembered' | 'reduced' = remembered
-    ? 'remembered'
-    : 'reduced'
   return (
     <RecallAnsweredBlockShell>
       <Text>{crumb}</Text>
       {contentMarkdownLines.map((line, i) => (
         <Text key={i}>{line.length > 0 ? line : ' '}</Text>
       ))}
-      <Text>{justReviewOutcomeLine(outcome, payload.noteTitle)}</Text>
+      <Text>{justReviewOutcomeLine(grade, payload.noteTitle)}</Text>
     </RecallAnsweredBlockShell>
   )
 }
@@ -81,19 +78,20 @@ export function JustReviewRecallStage({
   >(undefined)
 
   const submitJustReview = useCallback(
-    async (yesIRemember: boolean) => {
+    async (answeredGood: boolean) => {
       if (inputBlockedRef.current) return
       const ac = new AbortController()
       activeOperationAbortRef.current = ac
       inputBlockedRef.current = true
       setJustReviewBusyLabel(RECALL_BUSY_RECORD_REVIEW_LABEL)
       const p = payload
+      const grade = answeredGood ? 'GOOD' : 'AGAIN'
       try {
         try {
           await runDefaultBackendJson(() =>
             MemoryTrackerController.markAsRecalled({
               path: { memoryTracker: p.memoryTrackerId },
-              query: { successful: yesIRemember },
+              query: { grade },
               ...doughnutSdkOptions(ac.signal),
             })
           )
@@ -109,16 +107,9 @@ export function JustReviewRecallStage({
           )
           return
         }
-        if (!yesIRemember) {
-          await onRecallQuestionAnswered({
-            successful: false,
-            answeredRows: [recallAnsweredJustReviewInk(p, false)],
-          })
-          return
-        }
         await onRecallQuestionAnswered({
-          successful: true,
-          answeredRows: [recallAnsweredJustReviewInk(p, true)],
+          successful: grade === 'GOOD',
+          answeredRows: [recallAnsweredJustReviewInk(p, grade)],
         })
       } finally {
         inputBlockedRef.current = false
@@ -171,7 +162,7 @@ export function JustReviewRecallStage({
   return (
     <YesNoStagePrompt
       key={payload.memoryTrackerId}
-      prompt="Yes, I remember?"
+      prompt="Good?"
       onAnswer={submitJustReview}
       onCancel={handleQuestionEsc}
       inputBlockedRef={inputBlockedRef}

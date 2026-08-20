@@ -35,7 +35,7 @@ function loadRecallPage(options?: { waitForQuestionCount?: number }) {
 const recallPage = () => {
   return {
     ...recallLearningSessionMethods(),
-    yesIRemember() {
+    chooseGood() {
       cy.on('uncaught:exception', (err) => {
         if (
           err.message.includes('Unauthorized') ||
@@ -45,16 +45,14 @@ const recallPage = () => {
         }
         return true
       })
-      cy.findByRole('button', { name: 'Yes, I remember' })
+      cy.findByRole('button', { name: 'Good' })
       cy.tick(11 * 1000).then(() => {
-        cy.findByRole('button', { name: 'Yes, I remember' }).click({})
+        cy.findByRole('button', { name: 'Good' }).click({})
       })
       waitUntilAppIsNotBusy()
     },
-    noINeedMoreRecall() {
-      cy.findByRole('button', { name: 'No, I need more recall' })
-        .should('be.visible')
-        .click()
+    chooseAgain() {
+      cy.findByRole('button', { name: 'Again' }).should('be.visible').click()
       waitUntilAppIsNotBusy()
     },
     typeSpellingAnswer(answer: string) {
@@ -137,7 +135,7 @@ const recallPage = () => {
           ).should('be.visible')
         } else {
           cy.findByText(title, { selector: 'h2 *' })
-          this.yesIRemember()
+          this.chooseGood()
         }
       })
     },

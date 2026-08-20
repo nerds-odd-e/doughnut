@@ -1092,9 +1092,10 @@ export type RecallLog = {
     id: number;
     recordedAt: string;
     elapsedHours: number;
-    productOutcome: 'GOOD' | 'EASY' | 'HARD' | 'AGAIN' | 'CONFUSION';
+    productOutcome: 'AGAIN' | 'HARD' | 'GOOD' | 'EASY' | 'CONFUSION';
     memoryTrackerId: number;
     answerId?: number;
+    grade?: 'AGAIN' | 'HARD' | 'GOOD' | 'EASY';
 };
 
 export type RecallHistoryItem = {
@@ -3051,7 +3052,7 @@ export type MarkAsRecalledData = {
         memoryTracker: number;
     };
     query: {
-        successful: boolean;
+        grade: 'AGAIN' | 'HARD' | 'GOOD' | 'EASY';
     };
     url: '/api/memory-trackers/{memoryTracker}/mark-as-recalled';
 };
