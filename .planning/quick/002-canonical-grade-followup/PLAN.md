@@ -48,11 +48,9 @@ HARD/EASY on `mark-as-recalled` return 400; OpenAPI/TS param is GOOD|AGAIN. Memb
 
 `LearningSessionService.record` uses `MemoryTrackerService.markAsRecalled(..., grade, tracker, null)`. `markAsRecalled` requires non-null `Grade`; confusion stays on `persistRecallLog` only.
 
-### 4. RecallLog wire exposes only `productOutcome` — **Structure** — planned
+### 4. RecallLog wire exposes only `productOutcome` — **Structure** — done
 
-`@JsonIgnore` on `RecallLog.grade` persistence field (keep Java API `getGrade()` for domain code via a non-serialized accessor if needed). OpenAPI/client drop duplicate optional `grade` on RecallLog. Frontend unchanged (`productOutcome`).
-
-**Verify:** Recall-log / history related backend tests; regenerate TypeScript; whitespace check on generated files via script.
+`@JsonIgnore` on `RecallLog.grade`; OpenAPI/client drop duplicate optional `grade`. Frontend still uses `productOutcome`.
 
 ### 5. Thin tutor-feedback FSRS asserts; fix recall-log assert — **Structure** — planned
 
@@ -75,7 +73,7 @@ One focused CLI unit assertion (extend existing mock spy); do not broaden sessio
 - [x] Blank grades tag no longer shadows legacy scores
 - [x] Just-review HTTP API cannot schedule HARD/EASY
 - [x] One non-null graded apply path for quiz/just-review/session
-- [ ] RecallLog JSON has a single outcome field (`productOutcome`)
+- [x] RecallLog JSON has a single outcome field (`productOutcome`)
 - [ ] No duplicate FSRS float matrix in learning-session tutor tests; recall-log assert not GOOD-only
 - [ ] CLI just-review tests pin GOOD/AGAIN query
 - [ ] Focused tests + `generateTypeScript` (when API changes) + format/whitespace green

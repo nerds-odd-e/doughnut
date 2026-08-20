@@ -5357,13 +5357,6 @@ components:
         answerId:
           type: integer
           format: int32
-        grade:
-          type: string
-          enum:
-          - AGAIN
-          - HARD
-          - GOOD
-          - EASY
       required:
       - elapsedHours
       - id

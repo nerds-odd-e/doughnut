@@ -1095,7 +1095,6 @@ export type RecallLog = {
     productOutcome: 'AGAIN' | 'HARD' | 'GOOD' | 'EASY' | 'CONFUSION';
     memoryTrackerId: number;
     answerId?: number;
-    grade?: 'AGAIN' | 'HARD' | 'GOOD' | 'EASY';
 };
 
 export type RecallHistoryItem = {

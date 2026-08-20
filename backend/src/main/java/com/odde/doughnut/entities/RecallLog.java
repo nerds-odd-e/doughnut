@@ -53,6 +53,7 @@ public class RecallLog extends EntityIdentifiedByIdOnly {
    */
   @Column(name = "product_outcome", nullable = false)
   @Convert(converter = GradeOrConfusionConverter.class)
+  @JsonIgnore
   @Getter
   @Setter
   private Grade grade;
