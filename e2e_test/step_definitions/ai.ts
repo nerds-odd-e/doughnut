@@ -57,8 +57,12 @@ Given('An OpenAI response is unavailable', () => {
 Given('OpenAI generates this question:', stubOpenAiMcqFromSingleRowTable)
 
 Given(
-  'OpenAI now refines the question to become:',
-  stubOpenAiMcqFromSingleRowTable
+  'OpenAI will return these questions in order:',
+  (questionTable: DataTable) => {
+    start
+      .questionGenerationService()
+      .stubAskingMCQSequence(questionTable.hashes())
+  }
 )
 
 Given(

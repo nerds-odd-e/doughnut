@@ -46,26 +46,20 @@ const addJsonSchemaMcqStubForUserMessage = async (
     .stubOutputText(reply)
 }
 
-const restartOpenAiAndStubMcqForUserMessage = async (
-  userMessageMatch: TextMessageToMatch,
-  record: Record<string, string>,
-  responseKind: 'jsonSchema' | 'questionGeneration'
-) => {
-  const reply = mcqReplyJson(record)
-  const stub = mock_services
+/** Question Designer / Memory Assistant MCQ stubs (excludes contest regeneration). */
+const stubQuestionDesignerMcqOutputTexts = async (...outputTexts: string[]) => {
+  await mock_services
     .openAi()
     .responses()
-    .requestMessageMatches(userMessageMatch)
-  if (responseKind === 'questionGeneration') {
-    await stub
-      .requestDoesNotMessageMatch({
-        role: 'user',
-        content: 'Previously generated non-feasible question',
-      })
-      .stubOutputText(reply)
-  } else {
-    await stub.stubOutputText(reply)
-  }
+    .requestMessageMatches({
+      role: 'developer',
+      content: 'Question Designer|Memory Assistant',
+    })
+    .requestDoesNotMessageMatch({
+      role: 'user',
+      content: 'Previously generated non-feasible question',
+    })
+    .stubOutputTextSequence(...outputTexts)
 }
 
 type QuestionEvaluation = {
@@ -134,68 +128,75 @@ const stubEvaluationOutput = (record: QuestionEvaluation) => {
   })
 }
 
-export const questionGenerationService = () => ({
-  resetAndStubAskingMCQByResponses: (record: Record<string, string>) => {
-    cy.then(async () => {
-      await restartOpenAiAndStubMcqForUserMessage(
-        { role: 'developer', content: 'Question Designer|Memory Assistant' },
-        record,
-        'questionGeneration'
-      )
-    })
-  },
-
-  stubRegeneratedQuestion: (record: Record<string, string>) => {
-    cy.then(async () => {
-      const reply = mcqReplyJson(record)
-      await mock_services
-        .openAi()
-        .responses()
-        .requestMessageMatches({
-          role: 'user',
-          content: 'Previously generated non-feasible question',
-        })
-        .stubOutputText(reply)
-    })
-  },
-
-  /**
-   * Three predicates on the shared OpenAI imposter (depth-two wiki path, folder siblings, Bahamas wiki link).
-   * Table rows must be in this order: depth-two question, folder-sibling question, wiki-linked question.
-   */
-  stubMcqForFocusContextRetrievalCases: (rows: Record<string, string>[]) => {
-    if (rows.length !== 3) {
-      throw new Error(
-        `Expected exactly 3 MCQ rows (depth-two, folder siblings, wiki-linked), got ${rows.length}`
-      )
+export const questionGenerationService = () => {
+  const stubAskingMCQSequence = (records: Record<string, string>[]) => {
+    if (records.length < 1) {
+      throw new Error('stubAskingMCQSequence requires at least one MCQ row')
     }
-    const depthTwo = rows[0]!
-    const folderSiblings = rows[1]!
-    const wikiLinked = rows[2]!
     cy.then(async () => {
-      await addFocusContextShapeMcqStubs(depthTwo, folderSiblings, wikiLinked)
+      await stubQuestionDesignerMcqOutputTexts(...records.map(mcqReplyJson))
     })
-  },
+  }
 
-  stubAcceptedEvaluation: () => {
-    stubEvaluationOutput(acceptedQuestionEvaluation)
-  },
+  return {
+    resetAndStubAskingMCQByResponses: (record: Record<string, string>) => {
+      stubAskingMCQSequence([record])
+    },
 
-  stubRejectedEvaluation: () => {
-    stubEvaluationOutput(rejectedQuestionEvaluation)
-  },
+    stubAskingMCQSequence,
 
-  /** First evaluation accepts (generation keeps MCQ); later evaluations uphold contest. */
-  stubAcceptThenUpholdContestEvaluations: () => {
-    cy.then(async () => {
-      await mock_services
-        .openAi()
-        .responses()
-        .requestMessageMatches(evaluationDeveloperMessage)
-        .stubOutputTextSequence(
-          JSON.stringify(acceptedQuestionEvaluation),
-          JSON.stringify(rejectedQuestionEvaluation)
+    stubRegeneratedQuestion: (record: Record<string, string>) => {
+      cy.then(async () => {
+        const reply = mcqReplyJson(record)
+        await mock_services
+          .openAi()
+          .responses()
+          .requestMessageMatches({
+            role: 'user',
+            content: 'Previously generated non-feasible question',
+          })
+          .stubOutputText(reply)
+      })
+    },
+
+    /**
+     * Three predicates on the shared OpenAI imposter (depth-two wiki path, folder siblings, Bahamas wiki link).
+     * Table rows must be in this order: depth-two question, folder-sibling question, wiki-linked question.
+     */
+    stubMcqForFocusContextRetrievalCases: (rows: Record<string, string>[]) => {
+      if (rows.length !== 3) {
+        throw new Error(
+          `Expected exactly 3 MCQ rows (depth-two, folder siblings, wiki-linked), got ${rows.length}`
         )
-    })
-  },
-})
+      }
+      const depthTwo = rows[0]!
+      const folderSiblings = rows[1]!
+      const wikiLinked = rows[2]!
+      cy.then(async () => {
+        await addFocusContextShapeMcqStubs(depthTwo, folderSiblings, wikiLinked)
+      })
+    },
+
+    stubAcceptedEvaluation: () => {
+      stubEvaluationOutput(acceptedQuestionEvaluation)
+    },
+
+    stubRejectedEvaluation: () => {
+      stubEvaluationOutput(rejectedQuestionEvaluation)
+    },
+
+    /** First evaluation accepts (generation keeps MCQ); later evaluations uphold contest. */
+    stubAcceptThenUpholdContestEvaluations: () => {
+      cy.then(async () => {
+        await mock_services
+          .openAi()
+          .responses()
+          .requestMessageMatches(evaluationDeveloperMessage)
+          .stubOutputTextSequence(
+            JSON.stringify(acceptedQuestionEvaluation),
+            JSON.stringify(rejectedQuestionEvaluation)
+          )
+      })
+    },
+  }
+}
