@@ -82,7 +82,7 @@ Accepted ADRs under `docs/adrs/`. Planning history for completed milestones is n
 | Distinct `overlaps` vs plain `aliases` | Wiki-link overlap declarations are not aliases; grading reads `overlaps` | ✓ Shipped v1.2 |
 | Commissioned learning glossary (ADR 0001 §3) | Lock Tutor / Learning Session / Feedback names before build | ✓ Shipped v1.3 (ADR still Proposed) |
 | Markdown copy-paste protocol (ADR 0005) | No existing ed-tech standard fits offline Tutor exchange | ✓ Shipped v1.3 (ADR still Proposed) |
-| Feedback Grade → schedule (ADR 0003) | Grades 1–4 (= FSRS G) | ✓ Shipped v1.3 (ADR still Proposed) |
+| Feedback Grade → schedule (ADR 0003) | Grades 1–4 (= FSRS G) | ✓ Accepted 2026-08-20 |
 | Amend re-grade from pre-session snapshot | Avoid compound re-scheduling on amend | Superseded 2026-08-10 (amend removed) |
 | Memory tracker `type` enum | `COMMISSIONED` alongside `UNDERSTANDING` / `SPELLING` | ✓ Shipped v1.3 (quick 006) |
 

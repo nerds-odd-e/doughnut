@@ -243,7 +243,7 @@ tolerated and ignored.
 - Supersedes: (none)
 - Superseded by: (none)
 - Links: ADR 0001 [ubiquitous language](./0001-ubiquitous-language.md);
-  ADR 0003 [spaced-repetition scheduling policy](./0003-spaced-repetition-scheduling-policy.md);
+  ADR 0003 [spaced-repetition scheduling policy](./0003-spaced-repetition-scheduling-policy-accepted.md);
   [Ed API: Towards a Shared API for Education Microservices](https://aet.cit.tum.de/research/publications/soelch2026las.pdf);
   [Caliper Analytics 1.2](https://www.imsglobal.org/spec/caliper/v1p2);
   [QTI 3.0 overview](https://www.imsglobal.org/spec/qti/v3p0/oview);

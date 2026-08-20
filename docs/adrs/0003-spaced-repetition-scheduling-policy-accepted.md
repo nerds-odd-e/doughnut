@@ -167,9 +167,6 @@ their history, while deleted trackers are outside reconstruction.
 - [ADR 0005: Commissioned Learning Session
   protocol](./0005-commissioned-learning-session-protocol.md) — Tutor Feedback
   semantics
-- [FSRS compatibility
-  tracker](../../.planning/research/FSRS-COMPATIBILITY-GAP.md) — implementation
-  gaps and deferred work, not a second policy map
 - [`Fsrs`](../../backend/src/main/java/com/odde/doughnut/entities/Fsrs.java) —
   exact algorithm, weights, constants, and numeric rules
 - [`MemoryTracker`](../../backend/src/main/java/com/odde/doughnut/entities/MemoryTracker.java)

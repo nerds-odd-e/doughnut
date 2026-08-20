@@ -16,7 +16,7 @@ the source of truth; prefer these meanings in UI copy, APIs, tests, and
 code identifiers. This glossary is amended in place. Add or change domain
 terms here; do not supersede this ADR with a new one. Spaced-repetition domain
 concepts live in the **Spaced repetition glossary** of [ADR
-0003](./0003-spaced-repetition-scheduling-policy.md).
+0003](./0003-spaced-repetition-scheduling-policy-accepted.md).
 
 ## Notebook / note structure
 
@@ -92,7 +92,7 @@ concepts live in the **Spaced repetition glossary** of [ADR
   Circle) with a daily assimilation quota. The action is **subscribe**.
 - **Assimilation** — First-pass intake of a note into the learner’s
   memory schedule. Creates a **New** memory tracker
-  ([ADR 0003](./0003-spaced-repetition-scheduling-policy.md)).
+  ([ADR 0003](./0003-spaced-repetition-scheduling-policy-accepted.md)).
 - **Assimilation sequence** — Ordered units offered as next-to-assimilate
   (menu walkthrough, `/next`). Distinct from assimilating on a note. A
   unit is in the sequence iff it has not been skipped from the sequence
@@ -142,12 +142,12 @@ concepts live in the **Spaced repetition glossary** of [ADR
   Hard (2), Good (3), Easy (4). The numeric value **is** FSRS `G`.
   Used by recall prompts, **just review**, and Tutor **Feedback**.
   **Confusion** and **Overlap** are not grades. Scheduling detail:
-  [ADR 0003](./0003-spaced-repetition-scheduling-policy.md).
+  [ADR 0003](./0003-spaced-repetition-scheduling-policy-accepted.md).
 - **Answer** — The learner's response to a **recall prompt**. Prompt
   grades and **confusion** link a RecallLog row to this answer.
 - **Accidental match** — Spelling answer that fails the note under recall
   but names another accessible note by title or plain alias. Transitions:
-  [ADR 0003](./0003-spaced-repetition-scheduling-policy.md).
+  [ADR 0003](./0003-spaced-repetition-scheduling-policy-accepted.md).
 - **Remove from recall** — Stop an existing memory tracker from appearing
   in recall; the unit does not re-enter the assimilation sequence. Short
   UI: **Remove** / **Remove from recall**. Not a grade.
@@ -156,7 +156,7 @@ concepts live in the **Spaced repetition glossary** of [ADR
 
 **New**, **Stability**, **Difficulty**, **Retrievability**, **RecallLog**,
 **Thinking time**, **Confusion**, and **Overlap**: **Spaced repetition
-glossary** in [ADR 0003](./0003-spaced-repetition-scheduling-policy.md).
+glossary** in [ADR 0003](./0003-spaced-repetition-scheduling-policy-accepted.md).
 
 ## Focus context
 
@@ -206,7 +206,7 @@ commission from Doughnut:
 
 - Features, tests, OpenAPI names, and packages follow this glossary.
   Spaced-repetition domain concepts follow the **Spaced repetition glossary** in
-  [ADR 0003](./0003-spaced-repetition-scheduling-policy.md).
+  [ADR 0003](./0003-spaced-repetition-scheduling-policy-accepted.md).
 - Same nouns in UI, API, and schema, with **minimum DTO**. Do not
 introduce a translation type that wraps one as the other.
 - Agents treat this ADR as binding for naming choices. Spaced-repetition domain
@@ -217,7 +217,7 @@ introduce a translation type that wraps one as the other.
 
 - Spaced-repetition domain concepts are constrained by the **Spaced repetition
   glossary** in
-  [ADR 0003](./0003-spaced-repetition-scheduling-policy.md).
+  [ADR 0003](./0003-spaced-repetition-scheduling-policy-accepted.md).
 
 ## Related
 
@@ -225,7 +225,7 @@ introduce a translation type that wraps one as the other.
 - Superseded by: (none)
 - Links: playbook [README.md](./README.md); ADR-0000
 [use-adrs-accepted.md](./0000-use-adrs-accepted.md); ADR 0003
-[spaced-repetition scheduling policy](./0003-spaced-repetition-scheduling-policy.md)
+[spaced-repetition scheduling policy](./0003-spaced-repetition-scheduling-policy-accepted.md)
 (**Spaced repetition glossary**); ADR 0004
 [OKF-compatible notebook Markdown](./0004-okf-compatible-notebook-markdown-accepted.md)
 (portable Markdown profile)

@@ -13,7 +13,7 @@ No active milestone. Start the next one with `/gsd-new-milestone`.
 
 ## Backlog
 
-Parked elsewhere: SEED-001, SEED-002, SEED-005, ADR 0002 Level 1.
+Parked elsewhere: SEED-001, SEED-002, SEED-005, SEED-006, ADR 0002 Level 1.
 
 ---
-*Last updated: 2026-08-19 — spent OKF gap tracker and SEED-003 dropped*
+*Last updated: 2026-08-20 — ADR 0003 accepted; spent FSRS gap seed and tracker dropped*
