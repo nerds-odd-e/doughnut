@@ -59,13 +59,11 @@ Request/report/DTO/API/UI use grades + `<session_item_grades>` / `grade` / `late
 
 **Learning:** Keep `ParsedReportEntry.grade` as `Grade` (not int) so the service does not re-wrap.
 
-### 5. Legacy `<session_item_scores>` still grades — **Behavior** — planned
+### 5. Legacy `<session_item_scores>` still grades — **Behavior** — done
 
-**Pre:** Pasted Report still uses `<session_item_scores>`.  
-**Trigger:** Record report.  
-**Post:** Entries normalize to `Grade` immediately; scheduling identical to `<session_item_grades>`; “score” does not appear outside the parser compatibility path.
+Legacy tag normalizes to `Grade` at parse; focused parser + record tests cover grades vs scores tags. No public score API.
 
-**Verify:** Parser unit tests (legacy tag + new tag); no new public score API.
+**Learning:** Parameterize shared prose/tag parsing over both tags; keep a `legacyScoresTaggedReport` helper for record tests.
 
 ### 6. Leftover name sweep — **Structure** — planned
 

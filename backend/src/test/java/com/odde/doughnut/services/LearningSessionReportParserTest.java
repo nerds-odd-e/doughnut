@@ -2,6 +2,8 @@ package com.odde.doughnut.services;
 
 import static com.odde.doughnut.services.LearningSessionReportParser.SESSION_ITEM_GRADES_CLOSE_TAG;
 import static com.odde.doughnut.services.LearningSessionReportParser.SESSION_ITEM_GRADES_OPEN_TAG;
+import static com.odde.doughnut.services.LearningSessionReportParser.SESSION_ITEM_SCORES_CLOSE_TAG;
+import static com.odde.doughnut.services.LearningSessionReportParser.SESSION_ITEM_SCORES_OPEN_TAG;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasSize;
@@ -11,10 +13,13 @@ import com.odde.doughnut.entities.Grade;
 import com.odde.doughnut.services.LearningSessionReportParser.ParseResult;
 import com.odde.doughnut.services.LearningSessionReportParser.RejectedReportEntry;
 import java.util.Set;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.MethodSource;
 
 class LearningSessionReportParserTest {
 
@@ -113,8 +118,9 @@ class LearningSessionReportParserTest {
     assertThat(result.entries(), hasSize(2));
   }
 
-  @Test
-  void parsesGradesInsideTagIgnoringSurroundingProse() {
+  @ParameterizedTest
+  @MethodSource("sessionItemTagPairs")
+  void parsesGradesInsideTagIgnoringSurroundingProse(String openTag, String closeTag) {
     ParseResult result =
         parser.parse(
             """
@@ -129,7 +135,7 @@ class LearningSessionReportParserTest {
 
             Hola: 99
             """
-                .formatted(SESSION_ITEM_GRADES_OPEN_TAG, SESSION_ITEM_GRADES_CLOSE_TAG),
+                .formatted(openTag, closeTag),
             SPANISH_TITLES,
             Set.of());
 
@@ -175,6 +181,12 @@ class LearningSessionReportParserTest {
     assertThat(result.entries(), hasSize(1));
     assertEquals("Hola", result.entries().get(0).noteTitle());
     assertEquals(Grade.GOOD, result.entries().get(0).grade());
+  }
+
+  private static Stream<Arguments> sessionItemTagPairs() {
+    return Stream.of(
+        Arguments.of(SESSION_ITEM_GRADES_OPEN_TAG, SESSION_ITEM_GRADES_CLOSE_TAG),
+        Arguments.of(SESSION_ITEM_SCORES_OPEN_TAG, SESSION_ITEM_SCORES_CLOSE_TAG));
   }
 
   private void assertRejected(RejectedReportEntry rejected, String line, String reasonFragment) {

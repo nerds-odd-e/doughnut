@@ -100,4 +100,22 @@ class LearningSessionRecordTests extends LearningSessionControllerTestBase {
         response.getRejectedEntries().getFirst().getReason(),
         containsString("No commissioned memory tracker"));
   }
+
+  @Test
+  void legacyScoresTagReportRecordsGrades() throws UnexpectedNoAccessRightException {
+    Timestamp dayTwo = makeMe.aTimestamp().of(1, 9).please();
+    testabilitySettings.timeTravelTo(dayTwo);
+
+    SpanishNotebookFixture fixture = spanishNotebookFixture(dayTwo);
+    RecordLearningSessionResponse response =
+        controller.record(
+            recordRequest(fixture.notebook(), legacyScoresTaggedReport("Hola: 4\nGracias: 1\n")),
+            "Asia/Shanghai");
+
+    assertThat(response.getRejectedEntries(), empty());
+    assertThat(response.getRecordedItems(), hasSize(2));
+    assertThat(response.getRecordedItems().get(0).getGrade(), equalTo(4));
+    assertThat(response.getRecordedItems().get(1).getGrade(), equalTo(1));
+    assertThat(fixture.holaTracker().getLastRecalledAt(), equalTo(dayTwo));
+  }
 }

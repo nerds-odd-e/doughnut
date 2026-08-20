@@ -5,6 +5,7 @@ import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.repositories.RecallLogRepository;
+import com.odde.doughnut.services.LearningSessionReportParser;
 import java.sql.Timestamp;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +46,13 @@ abstract class LearningSessionControllerTestBase extends ControllerTestBase {
 
   protected static String learningSessionReport(String title, int grade) {
     return "# Learning Session Report\n\n%s: %d\n".formatted(title, grade);
+  }
+
+  protected static String legacyScoresTaggedReport(String lines) {
+    return LearningSessionReportParser.SESSION_ITEM_SCORES_OPEN_TAG
+        + "\n"
+        + lines
+        + LearningSessionReportParser.SESSION_ITEM_SCORES_CLOSE_TAG;
   }
 
   protected RecordLearningSessionRequest recordRequest(Notebook notebook, String reportMarkdown) {
