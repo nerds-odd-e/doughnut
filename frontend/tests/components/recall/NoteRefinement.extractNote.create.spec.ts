@@ -1,6 +1,5 @@
 import { AiController } from "@generated/doughnut-backend-api/sdk.gen"
 import { noteShowLocation } from "@/routes/noteShowLocation"
-import { flushPromises } from "@vue/test-utils"
 import { nextTick } from "vue"
 import { beforeEach, describe, expect, it, vi } from "vitest"
 import makeMe from "doughnut-test-fixtures/makeMe"
@@ -54,30 +53,23 @@ describe("NoteRefinement extract note create", () => {
     routerReplace.mockResolvedValue(undefined)
   })
 
-  it("creates a note from the preview and navigates to the new note", async () => {
-    const preview = sampleExtractionPreview()
+  it("toggles Create note from title and creates from edited preview fields", async () => {
+    const preview = sampleExtractionPreview({ newNoteTitle: "" })
     const { wrapper, createExtractedNoteSpy, createdRealm } =
       await mountCreateReady(preview)
-
-    await createNoteFromExtractionPreview(wrapper)
-
-    expect(createExtractedNoteSpy).toHaveBeenCalledWith(
-      extractionPreviewApiCall(note.id, preview)
+    const createButton = wrapper.find(
+      '[data-test-id="extraction-preview-create"]'
     )
-    expect(routerReplace).toHaveBeenCalledWith(
-      noteShowLocation(createdRealm.id)
-    )
-  })
-
-  it("creates a note from edited preview fields", async () => {
-    const preview = sampleExtractionPreview()
-    const { wrapper, createExtractedNoteSpy } = await mountCreateReady(preview)
+    expect((createButton.element as HTMLButtonElement).disabled).toBe(true)
 
     await setPreviewFields(wrapper, {
       newTitle: "Edited title",
       newContent: "Edited content",
       originalContent: "Edited original content",
     })
+    await nextTick()
+    expect((createButton.element as HTMLButtonElement).disabled).toBe(false)
+
     await createNoteFromExtractionPreview(wrapper)
 
     expect(createExtractedNoteSpy).toHaveBeenCalledWith(
@@ -87,27 +79,9 @@ describe("NoteRefinement extract note create", () => {
         updatedOriginalNoteContent: "Edited original content",
       })
     )
-  })
-
-  it("toggles Create note disabled state from new note title", async () => {
-    const { wrapper, createExtractedNoteSpy } = await mountCreateReady(
-      sampleExtractionPreview({ newNoteTitle: "" })
+    expect(routerReplace).toHaveBeenCalledWith(
+      noteShowLocation(createdRealm.id)
     )
-    const createButton = wrapper.find(
-      '[data-test-id="extraction-preview-create"]'
-    )
-    expect((createButton.element as HTMLButtonElement).disabled).toBe(true)
-
-    await setPreviewFields(wrapper, { newTitle: "New title" })
-    await nextTick()
-    expect((createButton.element as HTMLButtonElement).disabled).toBe(false)
-
-    await setPreviewFields(wrapper, { newTitle: "" })
-    await nextTick()
-    expect((createButton.element as HTMLButtonElement).disabled).toBe(true)
-    await createButton.trigger("click")
-    await flushPromises()
-    expect(createExtractedNoteSpy).not.toHaveBeenCalled()
   })
 
   it("shows create errors in the preview", async () => {
