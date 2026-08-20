@@ -86,7 +86,7 @@ public class LearningSessionReportParser {
     String gradesBlock =
         extractTaggedBlock(
             reportMarkdown, SESSION_ITEM_GRADES_OPEN_TAG, SESSION_ITEM_GRADES_CLOSE_TAG);
-    if (gradesBlock != null) {
+    if (gradesBlock != null && !gradesBlock.isBlank()) {
       return gradesBlock;
     }
     String legacyScoresBlock =
@@ -95,7 +95,7 @@ public class LearningSessionReportParser {
     if (legacyScoresBlock != null) {
       return legacyScoresBlock;
     }
-    return reportMarkdown;
+    return gradesBlock != null ? gradesBlock : reportMarkdown;
   }
 
   /** Returns tagged content, or null when the open tag is absent. */

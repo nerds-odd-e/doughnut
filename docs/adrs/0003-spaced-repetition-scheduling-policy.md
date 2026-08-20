@@ -116,12 +116,15 @@ rounding.
 **Grade** is the single scheduling evaluation concept. Its numeric value **is**
 FSRS `G`:
 
-| Grade | G |
-|-------|---|
-| Again | 1 |
-| Hard | 2 |
-| Good | 3 |
-| Easy | 4 |
+| Grade | G | Meaning and Stability effect when `S > 0` |
+|-------|---|---------------------------------------------|
+| Again | 1 | Failed recall; ordinary incorrect-recall update |
+| Hard | 2 | Difficult success; below Good, never below current `S` |
+| Good | 3 | Successful recall; ordinary correct-recall update |
+| Easy | 4 | Easy success; above Good |
+
+Hard, Good, and Easy inherit the bounded overdue extra. Every grade updates
+Difficulty by **Difficulty after a grade**.
 
 Recall prompts, **just review**, and Tutor **Feedback** all submit a Grade.
 **Confusion** and **Overlap** are not grades (see **Accidental-match and
@@ -149,19 +152,6 @@ a Doughnut recall prompt. Vocabulary:
 - A commissioned tracker is presented only when the learner commissions
   another Learning Session.
 - On New, use **First rating on New**.
-
-Memory updates with Stability > 0:
-
-- **Easy (4):** Good increment times the Easy factor; next Stability is
-  strictly longer than the same state under Good. Overdue extra applies.
-- **Good (3):** same update as ordinary correct recall; overdue extra applies.
-- **Hard (2):** Good increment times the Hard factor; next Stability is at
-  least current Stability and strictly shorter than the same state under Good.
-  Overdue extra applies.
-- **Again (1):** same update as ordinary incorrect recall; see **Incorrect
-  recall (Again)**.
-
-All four update Difficulty by **Difficulty after a grade**.
 
 ### Incorrect recall (Again)
 
@@ -306,9 +296,9 @@ Current Stability, Difficulty, `lastRecalledAt`, and `nextRecallAt` stay on
 `memory_tracker` (see **DSR snapshot**). `next_recall_at` stays the due-work
 index.
 
-`product_outcome`: `GOOD` | `EASY` | `HARD` | `AGAIN` | `CONFUSION`. Persist
-named grades (`GOOD` / `EASY` / `HARD` / `AGAIN` are **Grade**; `CONFUSION` is
-not). Latest tutor feedback is that Grade's `G` (**1–4**)
+`product_outcome`: `GOOD` | `EASY` | `HARD` | `AGAIN` | `CONFUSION`. The first
+four are Grades; `CONFUSION` is not. Latest tutor feedback is the latest
+persisted Grade
 ([ADR 0005](./0005-commissioned-learning-session-protocol.md)).
 
 ### DSR snapshot
@@ -364,8 +354,8 @@ Fold semantics:
   adopting an open-FSRS library was rejected.
 - **Rebuild DSR from RecallLog on every due-work query** — rejected: due-work
   needs a queryable snapshot; do not fold at query time.
-- **Tutor rubric** — Grades with numeric values **1–4 = G** were selected; a
-  shifted 0–5 rubric was rejected.
+- **Tutor rubric** — The canonical Grade scale was selected; a shifted 0–5
+  rubric was rejected.
 - **Just review Hard / Easy buttons** — rejected: just review is rare; keep
   **Good** and **Again** only.
 - **Persist a lapse count** — rejected: scheduling does not consume it;
