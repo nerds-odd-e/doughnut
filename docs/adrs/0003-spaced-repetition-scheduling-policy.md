@@ -50,9 +50,6 @@ relearning step list.
   forgetting and normally permits a longer scheduled interval.
 - **Difficulty** — The estimated inherent difficulty of retaining a memory.
   Higher Difficulty reduces the Stability gained from a successful recall.
-- **DSR** — The FSRS memory model described by Difficulty, Stability, and
-  Retrievability. Difficulty and Stability describe the current memory;
-  Retrievability is derived for a particular elapsed time.
 - **Retrievability** — The predicted probability of recalling a memory at a
   particular elapsed time, given its Stability. It is an input to a scheduling
   transition, not part of the persisted current memory state.
@@ -74,9 +71,6 @@ relearning step list.
 - **RecallLog** — The durable history of scheduling events for one memory
   tracker. It records Grades and confusion adjustments in enough context to
   explain and reconstruct the tracker's memory state.
-- **DSR snapshot** — The current Difficulty, Stability, and recall timing of a
-  memory tracker. It is the queryable projection of that tracker's RecallLog,
-  not a separate source of historical truth.
 - **Thinking time** — How long the learner took to answer a measured prompt.
   It may be reported to the learner but is not evidence of memory state.
 - **Confusion** — A secondary, deliberately weaker memory adjustment when a
@@ -118,9 +112,10 @@ the elapsed time since the previous Grade:
   and Retrievability, not on punishment or reward for queue compliance, and is
   bounded.
 
-Every Grade advances Last recalled at, appends to RecallLog, updates the DSR
-snapshot, and schedules the next recall strictly after the Grade. Queue
-lateness, thinking time, time zone, and time of day are not memory-state inputs.
+Every Grade appends to RecallLog and updates the memory tracker's Stability,
+Difficulty, Last recalled at, and Next recall at. The next recall is strictly
+after the Grade. Queue lateness, thinking time, time zone, and time of day are
+not memory-state inputs.
 
 All sources of a Grade have the same scheduling meaning. In particular, Tutor
 Feedback from a commissioned Learning Session is a Grade at its recorded time.
@@ -153,10 +148,11 @@ RecallLog is the durable sequence of Grades and Confusion events. A prompt
 event remains attributable to its Answer; a Grade from just review or Tutor
 Feedback need not have an Answer.
 
-The DSR snapshot is updated transactionally with each scheduling event so due
-work remains a direct query. It can be rebuilt deterministically from RecallLog
-when needed; normal due-work queries do not replay the log. Removed trackers
-retain their history, while deleted trackers are outside reconstruction.
+MemoryTracker stores the current scheduling state. Each scheduling event
+updates that state transactionally so due work remains a direct query. The
+scheduling state can be rebuilt deterministically from RecallLog when needed;
+normal due-work queries do not replay the log. Removed trackers retain their
+history, while deleted trackers are outside reconstruction.
 
 ## Consequences
 
@@ -165,8 +161,8 @@ retain their history, while deleted trackers are outside reconstruction.
 - Scheduling responds to demonstrated recall and elapsed time, not compliance
   with the due queue.
 - All Grade-producing experiences share one transition model.
-- RecallLog explains history while the DSR snapshot keeps due-work queries
-  efficient.
+- RecallLog explains history while the current MemoryTracker state keeps
+  due-work queries efficient.
 - Algorithm mechanics can evolve within this policy without synchronizing
   formulas or numeric examples in prose.
 - A change to the meaning of a concept or to a transition invariant requires an
@@ -177,7 +173,8 @@ retain their history, while deleted trackers are outside reconstruction.
 - Grades are trustworthy enough to be the primary scheduling signal.
 - A scheduling event has the current tracker state, its recorded time, and the
   elapsed time needed to apply the policy.
-- RecallLog carries enough information to reconstruct the DSR snapshot.
+- RecallLog carries enough information to reconstruct the current scheduling
+  state on MemoryTracker.
 
 ## Options considered
 
@@ -187,8 +184,8 @@ retain their history, while deleted trackers are outside reconstruction.
   transitions use elapsed time and Retrievability.
 - **Use a linear lateness bonus** — Rejected because overdue growth must remain
   bounded.
-- **Rebuild DSR for every due-work query** — Rejected in favor of a queryable
-  snapshot backed by RecallLog.
+- **Replay RecallLog for every due-work query** — Rejected in favor of current
+  scheduling fields on MemoryTracker.
 - **Separate lapse counter** — Rejected because RecallLog already represents
   lapse history and drives the frequent-failure warning.
 - **FSRS card states** — Rejected because Doughnut does not use learning or
@@ -204,10 +201,15 @@ retain their history, while deleted trackers are outside reconstruction.
 - [ADR 0005: Commissioned Learning Session
   protocol](./0005-commissioned-learning-session-protocol.md) — Tutor Feedback
   semantics
+- [FSRS compatibility
+  tracker](../../.planning/research/FSRS-COMPATIBILITY-GAP.md) — implementation
+  gaps and deferred work, not a second policy map
 - [`Fsrs`](../../backend/src/main/java/com/odde/doughnut/entities/Fsrs.java) —
   exact algorithm, weights, constants, and numeric rules
 - [`MemoryTracker`](../../backend/src/main/java/com/odde/doughnut/entities/MemoryTracker.java)
-  — Grade and Confusion transitions and DSR snapshot updates
+  — Grade and Confusion transitions and current scheduling-state updates
 - [`RecallLog`](../../backend/src/main/java/com/odde/doughnut/entities/RecallLog.java)
   — persisted event shape
 - [FSRS algorithm reference](https://github.com/open-spaced-repetition/awesome-fsrs/wiki/The-Algorithm)
+- [Anki answer-button semantics](https://docs.ankiweb.net/studying.html#answer-buttons)
+- [Reddy et al.](https://arxiv.org/abs/1602.07032)

@@ -15,7 +15,7 @@ This ADR is the **canonical ubiquitous language**. The glossary below is
 the source of truth; prefer these meanings in UI copy, APIs, tests, and
 code identifiers. This glossary is amended in place. Add or change domain
 terms here; do not supersede this ADR with a new one. Spaced-repetition
-DSR and schedule terms live in the **Spaced repetition glossary** of
+memory-state and schedule terms live in the **Spaced repetition glossary** of
 [ADR 0003](./0003-spaced-repetition-scheduling-policy.md).
 
 ## Notebook / note structure
@@ -154,8 +154,8 @@ DSR and schedule terms live in the **Spaced repetition glossary** of
 - **Revive** — Re-enable recall for a tracker that was removed from
   recall. Short UI: **Revive**. Not a grade.
 
-**New**, DSR (**Stability** / **Difficulty** / **Retrievability**),
-**RecallLog**, and schedule fields: **Spaced repetition glossary** in
+**New**, **Stability**, **Difficulty**, **Retrievability**, **RecallLog**, and
+schedule fields: **Spaced repetition glossary** in
 [ADR 0003](./0003-spaced-repetition-scheduling-policy.md).
 
 ## Focus context
@@ -205,18 +205,18 @@ commission from Doughnut:
 ## Alignment policy
 
 - Features, tests, OpenAPI names, and packages follow this glossary.
-  Spaced-repetition DSR and schedule names follow the **Spaced
+  Spaced-repetition memory-state and schedule names follow the **Spaced
   repetition glossary** in
   [ADR 0003](./0003-spaced-repetition-scheduling-policy.md).
 - Same nouns in UI, API, and schema, with **minimum DTO**. Do not
 introduce a translation type that wraps one as the other.
 - Agents treat this ADR as binding for naming choices. Spaced-repetition
-  DSR and schedule terms follow ADR 0003. Humans and agents share an
+  memory-state and schedule terms follow ADR 0003. Humans and agents share an
   explicit dictionary instead of inferring synonyms.
 
 ## Prerequisites / Assumptions
 
-- Spaced-repetition DSR and schedule terms are constrained by the
+- Spaced-repetition memory-state and schedule terms are constrained by the
   **Spaced repetition glossary** in
   [ADR 0003](./0003-spaced-repetition-scheduling-policy.md).
 

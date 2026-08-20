@@ -4,7 +4,7 @@ import java.util.function.BiFunction;
 
 /**
  * Frozen open-FSRS-6 default weights, requested retention, maximum interval, Retrievability, next
- * Difficulty, New vs graded first-rating, and DSR constants.
+ * Difficulty, New vs graded first-rating, and scheduler constants.
  */
 public final class Fsrs {
   public static final float NEW_STABILITY_HOURS = 0.0f;
