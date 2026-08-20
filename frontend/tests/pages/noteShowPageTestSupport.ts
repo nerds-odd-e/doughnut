@@ -133,22 +133,3 @@ export function closeConversationButtonEl() {
     "button.minimize-button"
   ) as HTMLButtonElement | null
 }
-
-export async function withStubbedInnerWidth<T>(
-  width: number,
-  run: () => Promise<T>
-): Promise<T> {
-  const innerWidthDesc = Object.getOwnPropertyDescriptor(window, "innerWidth")
-  Object.defineProperty(window, "innerWidth", {
-    configurable: true,
-    writable: true,
-    value: width,
-  })
-  try {
-    return await run()
-  } finally {
-    if (innerWidthDesc) {
-      Object.defineProperty(window, "innerWidth", innerWidthDesc)
-    }
-  }
-}

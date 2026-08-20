@@ -248,23 +248,9 @@ Status: done
 
 ### Optimize batch 4 (ranks 10–12)
 Type: Structure
-Status: planned
+Status: done
 
-**Tests:**
-- `tests/components/recall/NoteRefinement.removeLayout.loading.spec.ts` — "NoteRefinement remove layout loading modal shows LoadingModal while removing refinement layout items and hides on success or failure" (~31ms)
-- `tests/pages/NoteShowPageAssimilationPanel.spec.ts` — "note show page inline assimilation panel keeps assimilation settings in the shared toolbar panel when sidebar is open" (~30ms)
-
-**Note:** PDF ctrl+wheel already optimized via batch 3 merge — skip that rank.
-
-**Goals:** Speed up only the listed tests (delete/merge redundant coverage first; then setup/selectors/waits). If no meaningful speedup after a serious attempt, append Candidate(s) to `ongoing/test-optimization-blacklist.md` and mark done.
-
-**Verify:**
-
-```bash
-pnpm frontend:test tests/components/recall/NoteRefinement.removeLayout.loading.spec.ts tests/pages/NoteShowPageAssimilationPanel.spec.ts
-```
-
-(Paths are relative to `frontend/` as accepted by `pnpm frontend:test`.)
+**Done:** Single-mount removeLayout loading success+failure; deleted redundant AssimilationPanel sidebar layout test. PDF skipped (batch 3). 4 tests green ×3.
 
 ---
 
