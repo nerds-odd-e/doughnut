@@ -1,6 +1,6 @@
 # Remove spent Java Flyway backfills
 
-**Status:** planned  
+**Status:** in-progress  
 **Goal:** Delete Java migrations that are DML-only (or empty-DB-safe), their gates, and code/tests/docs that existed only to run them. Empty migrate still reaches the current schema. Product behavior unchanged.
 
 ## Assumptions
@@ -33,8 +33,9 @@ Each slice is **Structure**: delete one backfill family; remaining tests pass; e
 ### 1. Drop display-name whitespace backfill
 
 - **Type:** Structure
-- **Status:** planned
+- **Status:** done
 - **Done:** `V300000244` gone. `DisplayNameSurroundingWhitespaceBackfill` + its test gone. `DisplayNameUniqueKeyJdbcConversion` still used by V280.
+- **Learnings:** No stray product imports; conversion helper correctly deferred to slice 9.
 
 ### 2. Drop note concept-type backfill and gate
 
