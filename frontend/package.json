@@ -35,7 +35,7 @@
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.9",
-    "@lucide/vue": "^1.32.0",
+    "@lucide/vue": "^1.33.0",
     "@storybook/addon-docs": "10.5.8",
     "@storybook/vue3": "10.5.8",
     "@storybook/vue3-vite": "10.5.8",
