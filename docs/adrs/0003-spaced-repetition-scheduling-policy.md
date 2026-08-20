@@ -19,14 +19,10 @@ citing FSRS, pair once then use Doughnut terms.
 
 ### Spaced repetition glossary
 
-- **Confusion** — Secondary memory-state adjustment on the matched note's
-  tracker after an accidental match. Not a grade and not FSRS Again.
-- **Overlap** — Declared non-distinguishing spelling outcome. No memory
-  change.
 - **New** — Ungraded memory tracker (`S = 0`, Difficulty unset / **N/A**).
-  Assimilation and confusion are not grades. Not “never succeeded.” After
-  any mapped grade the tracker is no longer New. Due at `assimilatedAt`.
-  No FSRS Learning / Review / Relearning card-state machine.
+  Created by assimilation and due immediately: `nextRecallAt = assimilatedAt`.
+  The first mapped grade initializes Stability and Difficulty, after which the
+  tracker is no longer New.
 - **Stability** — Persisted current interval of a memory tracker, in
   whole hours. Short UI: **Stability**.
 - **Difficulty** — Persisted memory state in `[1, 10]`. Shown on the
@@ -49,6 +45,10 @@ citing FSRS, pair once then use Doughnut terms.
   review history). Schema: **RecallLog** below.
 - **Thinking time** — Duration the prompt measured while the learner
   answered. Recorded on the answer for display; not a memory-state input.
+- **Confusion** — Secondary memory-state adjustment on the matched note's
+  tracker after an accidental match. Not a grade and not FSRS Again.
+- **Overlap** — Declared non-distinguishing spelling outcome. No memory
+  change.
 
 ### Doughnut vs FSRS terms
 
@@ -58,8 +58,8 @@ Product outcomes → G: **Outcome-to-grade compatibility map**.
 | ----------------------- | ------------------- | ----------------------------------------------- |
 | **Recall**              | **Review**          | Because "'recall' is better than 'review'" .    |
 | **Just review**         |                     | A method of recall                              |
-| **Assimilation**        | **New** card        | Introduce, ungraded                             |
-| **New**                 | **New**             | Ungraded; no Learning / Review / Relearning     |
+| **Assimilation**        | Create **New** card | Initial intake; not FSRS Learning               |
+| **New**                 | **New**             | Ungraded until the first mapped grade           |
 | **Memory tracker**      | Card                |                                                 |
 | **Stability**           | Stability `S`       | Whole hours                                     |
 | **Difficulty**          | Difficulty `D`      |                                                 |
@@ -78,6 +78,13 @@ Product outcomes → G: **Outcome-to-grade compatibility map**.
 
 Doughnut implements the open FSRS model itself (inputs, state, qualitative
 update rules), not `ts-fsrs`, `fsrs-rs`, or another library.
+
+Doughnut does not persist or transition through the FSRS scheduler's
+**Learning**, **Review**, and **Relearning** card states, and has no learning
+or relearning step list. **Assimilation** is Doughnut's first-pass intake
+action: it creates a **New** tracker; it does not correspond to FSRS
+**Learning**. The first mapped grade initializes Stability and Difficulty;
+later mapped grades update them directly.
 
 After a grade, when last recall exists, due is `lastRecalledAt + I(0.9, S)`.
 When `I` is non-positive, due is 24 hours after the grade (strictly-future
