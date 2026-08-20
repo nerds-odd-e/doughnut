@@ -1,6 +1,7 @@
 import { NoteController } from "@generated/doughnut-backend-api/sdk.gen"
 import type { NoteRealm } from "@generated/doughnut-backend-api"
 import NoteToolbar from "@/components/notes/core/NoteToolbar.vue"
+import { noteMoreOptionsTitles } from "@/components/notes/widgets/noteMoreOptionsTitles"
 import makeMe from "doughnut-test-fixtures/makeMe"
 import helper, { mockSdkService } from "@tests/helpers"
 import { notebookSidebarClosedPlugin } from "@tests/helpers/notebookSidebarTestProvide"
@@ -17,6 +18,41 @@ export function overflowMenuItem(title: string) {
   return document.querySelector<HTMLButtonElement>(
     `[data-dropdown-portal-panel] button[title="${title}"]`
   )
+}
+
+export async function openNoteToolbarOverflowMenu(wrapper: VueWrapper) {
+  await noteToolbarAction(
+    wrapper,
+    noteMoreOptionsTitles.overflowMenu
+  ).trigger("click")
+  await flushPromises()
+}
+
+export function dispatchDocumentKey(init: KeyboardEventInit) {
+  document.dispatchEvent(
+    new KeyboardEvent("keydown", {
+      bubbles: true,
+      cancelable: true,
+      ...init,
+    })
+  )
+}
+
+/** Wiki uses `hidden` when overflowed (still in DOM). */
+export function noteToolbarWikiHidden(wrapper: VueWrapper) {
+  return noteToolbarAction(wrapper, noteMoreOptionsTitles.wiki).attributes(
+    "hidden"
+  ) !== undefined
+}
+
+/** New uses `v-show` on a `display:contents` host (still in DOM when overflowed). */
+export function noteToolbarNewDisplayed(wrapper: VueWrapper) {
+  const el = noteToolbarAction(wrapper, noteMoreOptionsTitles.new)
+    .element as HTMLElement
+  const host = el.closest(
+    '[data-testid="note-creation-new-button"]'
+  ) as HTMLElement | null
+  return host?.style.display !== "none"
 }
 
 export function resetNoteToolbarTestState() {

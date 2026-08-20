@@ -13,14 +13,17 @@ import {
   noteToolbarEditTitles,
 } from "@/components/notes/widgets/noteMoreOptionsTitles"
 import {
+  dispatchDocumentKey,
   mountOverflowToolbar,
   noteToolbarAction,
+  noteToolbarNewDisplayed,
+  noteToolbarWikiHidden,
+  openNoteToolbarOverflowMenu,
   overflowMenuItem,
   resetNoteToolbarTestState,
 } from "@tests/notes/noteToolbarTestHelpers"
 import { setupNoteNewFormSdkMocks } from "@tests/notes/noteNewFormTestSupport"
 import { setupSearchFormSdkMocks } from "@tests/wiki-link-or-relationship/searchDialogTestSupport"
-import { screen } from "@testing-library/vue"
 import { describe, it, expect, afterEach, beforeEach, vi } from "vitest"
 import { type VueWrapper, flushPromises } from "@vue/test-utils"
 
@@ -42,27 +45,54 @@ describe("NoteToolbar Conversation, Wiki, and New overflow", () => {
     resetNoteToolbarTestState()
   })
 
-  it("moves Conversation into more options before Wiki or New", async () => {
+  it("overflows Conversation before Wiki/New, and shortcuts still open them", async () => {
+    setupSearchFormSdkMocks()
+    setupNoteNewFormSdkMocks()
     wrapper = await mountOverflowToolbar()
     await layoutNoteToolbar(wrapper, conversationOverflowNavWidth())
 
     expect(noteToolbarAction(wrapper, titles.conversation).exists()).toBe(false)
-    expect(noteToolbarAction(wrapper, titles.wiki).isVisible()).toBe(true)
-    expect(noteToolbarAction(wrapper, titles.new).isVisible()).toBe(true)
+    expect(noteToolbarWikiHidden(wrapper)).toBe(false)
+    expect(noteToolbarNewDisplayed(wrapper)).toBe(true)
 
-    await noteToolbarAction(wrapper, titles.overflowMenu).trigger("click")
-    await flushPromises()
-
+    await openNoteToolbarOverflowMenu(wrapper)
     expect(overflowMenuItem(titles.conversation)).not.toBeNull()
     expect(overflowMenuItem(titles.wiki)).toBeNull()
     expect(overflowMenuItem(titles.new)).toBeNull()
+    await openNoteToolbarOverflowMenu(wrapper)
+
+    await layoutNoteToolbar(wrapper, wikiOverflowNavWidth())
+    expect(noteToolbarWikiHidden(wrapper)).toBe(true)
+    expect(document.querySelector('input[placeholder="Search"]')).toBeNull()
+
+    dispatchDocumentKey({
+      key: "f",
+      code: "KeyF",
+      ctrlKey: true,
+      shiftKey: true,
+    })
+    await flushPromises()
+    expect(document.querySelector('input[placeholder="Search"]')).not.toBeNull()
+
+    dispatchDocumentKey({ key: "Escape" })
+    await flushPromises()
+    expect(document.querySelector('input[placeholder="Search"]')).toBeNull()
+
+    await layoutNoteToolbar(wrapper, overflowOnlyNavWidth())
+    expect(noteToolbarNewDisplayed(wrapper)).toBe(false)
+    expect(document.querySelector('[data-testid="note-new-form"]')).toBeNull()
+
+    dispatchDocumentKey({ key: "n", code: "KeyN" })
+    await flushPromises()
+    expect(
+      document.querySelector('[data-testid="note-new-form"]')
+    ).not.toBeNull()
   })
 
-  it("keeps only the on-toggle and more options on an extremely narrow bar", async () => {
+  it("keeps a pinned on-toggle then only more options when nothing is pinned", async () => {
     wrapper = await mountOverflowToolbar()
     await layoutNoteToolbar(wrapper, overflowTogglesNavWidth())
-    await noteToolbarAction(wrapper, titles.overflowMenu).trigger("click")
-    await flushPromises()
+    await openNoteToolbarOverflowMenu(wrapper)
     overflowMenuItem(titles.audio)?.click()
     await flushPromises()
     await layoutNoteToolbar(wrapper, pinnedToggleOnlyNavWidth())
@@ -70,65 +100,20 @@ describe("NoteToolbar Conversation, Wiki, and New overflow", () => {
     expect(noteToolbarAction(wrapper, titles.audio).exists()).toBe(true)
     expect(noteToolbarAction(wrapper, titles.overflowMenu).exists()).toBe(true)
     expect(noteToolbarAction(wrapper, titles.conversation).exists()).toBe(false)
-    expect(noteToolbarAction(wrapper, titles.wiki).isVisible()).toBe(false)
-    expect(noteToolbarAction(wrapper, titles.new).isVisible()).toBe(false)
+    expect(noteToolbarWikiHidden(wrapper)).toBe(true)
+    expect(noteToolbarNewDisplayed(wrapper)).toBe(false)
     expect(
       noteToolbarAction(wrapper, noteToolbarEditTitles.markdown).exists()
     ).toBe(false)
-  })
 
-  it("keeps only more options when nothing is pinned and everything overflowed", async () => {
-    wrapper = await mountOverflowToolbar()
+    await noteToolbarAction(wrapper, titles.audio).trigger("click")
+    await flushPromises()
     await layoutNoteToolbar(wrapper, overflowOnlyNavWidth())
 
     expect(noteToolbarAction(wrapper, titles.overflowMenu).exists()).toBe(true)
     expect(noteToolbarAction(wrapper, titles.conversation).exists()).toBe(false)
-    expect(noteToolbarAction(wrapper, titles.wiki).isVisible()).toBe(false)
-    expect(noteToolbarAction(wrapper, titles.new).isVisible()).toBe(false)
+    expect(noteToolbarWikiHidden(wrapper)).toBe(true)
+    expect(noteToolbarNewDisplayed(wrapper)).toBe(false)
     expect(noteToolbarAction(wrapper, titles.audio).exists()).toBe(false)
-  })
-
-  it("still opens wiki search when Wiki is in more options", async () => {
-    setupSearchFormSdkMocks()
-    wrapper = await mountOverflowToolbar()
-    await layoutNoteToolbar(wrapper, wikiOverflowNavWidth())
-
-    expect(noteToolbarAction(wrapper, titles.wiki).isVisible()).toBe(false)
-    expect(screen.queryByPlaceholderText("Search")).toBeNull()
-
-    document.dispatchEvent(
-      new KeyboardEvent("keydown", {
-        key: "f",
-        code: "KeyF",
-        ctrlKey: true,
-        shiftKey: true,
-        bubbles: true,
-        cancelable: true,
-      })
-    )
-    await flushPromises()
-
-    expect(await screen.findByPlaceholderText("Search")).toBeInTheDocument()
-  })
-
-  it("still opens new note when New is in more options", async () => {
-    setupNoteNewFormSdkMocks()
-    wrapper = await mountOverflowToolbar()
-    await layoutNoteToolbar(wrapper, overflowOnlyNavWidth())
-
-    expect(noteToolbarAction(wrapper, titles.new).isVisible()).toBe(false)
-    expect(screen.queryByTestId("note-new-form")).toBeNull()
-
-    document.dispatchEvent(
-      new KeyboardEvent("keydown", {
-        key: "n",
-        code: "KeyN",
-        bubbles: true,
-        cancelable: true,
-      })
-    )
-    await flushPromises()
-
-    expect(await screen.findByTestId("note-new-form")).toBeInTheDocument()
   })
 })
