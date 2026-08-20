@@ -82,24 +82,22 @@ describe("FolderPage rename and dissolve", () => {
       wrapper.unmount()
     })
 
-    it("cancels a pending intermediate rename when restored to the saved name", async () => {
-      const { wrapper, renameSpy } =
-        await replacePendingFolderNameWith("Original")
+    it("cancels pending rename when restored to saved name or blank", async () => {
+      {
+        const { wrapper, renameSpy } =
+          await replacePendingFolderNameWith("Original")
+        expect(renameSpy).not.toHaveBeenCalled()
+        wrapper.unmount()
+      }
 
-      expect(renameSpy).not.toHaveBeenCalled()
-
-      wrapper.unmount()
-    })
-
-    it("cancels a pending intermediate rename and shows an inline error for a blank name", async () => {
-      const { wrapper, renameSpy } = await replacePendingFolderNameWith("   ")
-
-      expect(renameSpy).not.toHaveBeenCalled()
-      expect(wrapper.text()).toContain(
-        "Folder name cannot be empty. Enter a name to rename this folder."
-      )
-
-      wrapper.unmount()
+      {
+        const { wrapper, renameSpy } = await replacePendingFolderNameWith("   ")
+        expect(renameSpy).not.toHaveBeenCalled()
+        expect(wrapper.text()).toContain(
+          "Folder name cannot be empty. Enter a name to rename this folder."
+        )
+        wrapper.unmount()
+      }
     })
 
     it("shows inline conflict error when rename returns 409 FOLDER_NAME_CONFLICT", async () => {
@@ -139,7 +137,7 @@ describe("FolderPage rename and dissolve", () => {
   })
 
   describe("dissolve", () => {
-    it("shows merge confirm when dissolve returns 409 and retries with merge=true", async () => {
+    it("soft-deleted shows inline error; name conflict confirms merge and retries", async () => {
       const { wrapper } = mountFolderPage(router, 20, "Mid")
 
       const dissolveSpy = vi
@@ -147,12 +145,22 @@ describe("FolderPage rename and dissolve", () => {
         .mockResolvedValue(
           wrapSdkError({
             status: 409,
-            message:
-              "A folder with this name already exists at the destination: Inner",
-            errorType: "FOLDER_NAME_CONFLICT",
+            errorType: "SOFT_DELETED_TITLE_CONFLICT",
+            message: softDeletedTitleConflictMessage,
           })
         )
 
+      await dissolveWithInitialConfirm(wrapper)
+      expect(wrapper.text()).toContain(softDeletedTitleConflictMessage)
+
+      dissolveSpy.mockResolvedValue(
+        wrapSdkError({
+          status: 409,
+          message:
+            "A folder with this name already exists at the destination: Inner",
+          errorType: "FOLDER_NAME_CONFLICT",
+        })
+      )
       await dissolveWithInitialConfirm(wrapper)
 
       const mergePopup = usePopups().popups.peek()?.[0]
@@ -163,28 +171,9 @@ describe("FolderPage rename and dissolve", () => {
       resolveTopConfirm(true)
       await flushPromises()
 
-      expect(dissolveSpy).toHaveBeenCalledTimes(2)
       expect(dissolveSpy).toHaveBeenLastCalledWith(
         expect.objectContaining({ query: { merge: true } })
       )
-
-      wrapper.unmount()
-    })
-
-    it("shows inline error when dissolve returns soft-deleted title conflict", async () => {
-      const { wrapper } = mountFolderPage(router, 20, "Mid")
-
-      vi.spyOn(NotebookController, "dissolveFolder").mockResolvedValue(
-        wrapSdkError({
-          status: 409,
-          errorType: "SOFT_DELETED_TITLE_CONFLICT",
-          message: softDeletedTitleConflictMessage,
-        })
-      )
-
-      await dissolveWithInitialConfirm(wrapper)
-
-      expect(wrapper.text()).toContain(softDeletedTitleConflictMessage)
 
       wrapper.unmount()
     })

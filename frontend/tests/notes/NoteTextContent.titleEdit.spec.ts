@@ -34,26 +34,23 @@ describe("NoteTextContent title edit", () => {
     vi.useRealTimers()
   })
 
-  it("displays an editable title by default", async () => {
+  it("is editable by default and not editable when readonly", async () => {
     mountWith(makeMe.aNote.title("Dummy Title").please())
     await flushPromises()
     expect(titleEditorEl(wrapper).getAttribute("contenteditable")).toBe("true")
-  })
 
-  it("is not editable when readonly", async () => {
-    mountWith(makeMe.aNote.title("Dummy Title").please(), true)
+    await wrapper.setProps({ readonly: true })
     await flushPromises()
     expect(titleEditorEl(wrapper).getAttribute("contenteditable")).toBe("false")
   })
 
-  it("prompts for content when empty", async () => {
+  it("prompts for content when empty only when editable", async () => {
     mountWith(makeMe.aNote.title("Dummy Title").content("").please())
     expect(
       wrapper.get("[data-placeholder]").attributes("data-placeholder")
     ).toBe("Enter note content here...")
-  })
+    wrapper.unmount()
 
-  it("does not prompt for content when readonly", async () => {
     mountWith(makeMe.aNote.title("Dummy Title").content("").please(), true)
     expect(wrapper.find("[data-placeholder]").exists()).toBe(false)
   })
@@ -135,33 +132,27 @@ describe("NoteTextContent title edit", () => {
     expect(titleEditorEl(wrapper).innerText).toBe("different value")
   })
 
-  describe("when save fails with a binding error", () => {
-    beforeEach(async () => {
-      const note = makeMe.aNote.title("Dummy Title").please()
-      mountWith(note)
-      mockedUpdateTitleCall.mockRejectedValueOnce(
-        makeMe.anApiError
-          .ofBindingError({
-            title: "size must be between 1 and 100",
-          })
-          .please()
-      )
-      await editTitleThenBlur(wrapper)
-      await flushPromises()
-    })
+  it("displays a binding error then clears it after a successful edit", async () => {
+    const note = makeMe.aNote.title("Dummy Title").please()
+    mountWith(note)
+    mockedUpdateTitleCall.mockRejectedValueOnce(
+      makeMe.anApiError
+        .ofBindingError({
+          title: "size must be between 1 and 100",
+        })
+        .please()
+    )
+    await editTitleThenBlur(wrapper)
+    await flushPromises()
 
-    it("displays the binding error", async () => {
-      expect(wrapper.find(".path-name-editor .text-error").text()).toBe(
-        "size must be between 1 and 100"
-      )
-    })
+    expect(wrapper.find(".path-name-editor .text-error").text()).toBe(
+      "size must be between 1 and 100"
+    )
 
-    it("clears the error after a successful edit", async () => {
-      await editTitleThenBlur(wrapper)
-      await flushPromises()
-      expect(wrapper.findAll(".path-name-editor .text-error")).toHaveLength(0)
-      expect(mockedUpdateTitleCall).toBeCalledTimes(2)
-    })
+    await editTitleThenBlur(wrapper)
+    await flushPromises()
+    expect(wrapper.findAll(".path-name-editor .text-error")).toHaveLength(0)
+    expect(mockedUpdateTitleCall).toBeCalledTimes(2)
   })
 
   it("displays reserved title error in the title field", async () => {

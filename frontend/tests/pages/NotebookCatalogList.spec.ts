@@ -5,6 +5,7 @@ import makeMe from "doughnut-test-fixtures/makeMe"
 import helper from "@tests/helpers"
 import { fireEvent } from "@testing-library/vue"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
+import type { NotebookCatalogEntry } from "@/components/notebook/patchNotebookInCatalogItems"
 import {
   catalogHeadingTexts,
   clearNotebooksPageStorage,
@@ -25,29 +26,32 @@ async function pickNotebookCatalogPeerSort(
   await flushPromises()
 }
 
+function mountCatalogList(catalogItems: NotebookCatalogEntry[]) {
+  return helper
+    .component(NotebooksPageView)
+    .withProps({
+      catalogItems,
+      subscriptions: [],
+      user: makeMe.aUser.please(),
+    })
+    .withCurrentUser(makeMe.aUser.please())
+    .withRouter()
+    .mount()
+}
+
 describe("catalog list", () => {
   beforeEach(() => {
     clearNotebooksPageStorage()
   })
 
-  it("sorts catalog by title A–Z by default (list layout)", async () => {
+  it("sorts title A–Z by default, Z–A when selected, then back to A–Z", async () => {
     const catalogItems = makeMe.notebookCatalog
       .notebook("Top Loose")
       .group("Middle Group", "Inside One")
       .notebook("Bottom Loose")
       .please()
 
-    const wrapper = helper
-      .component(NotebooksPageView)
-      .withProps({
-        catalogItems,
-        subscriptions: [],
-        user: makeMe.aUser.please(),
-      })
-      .withCurrentUser(makeMe.aUser.please())
-      .withRouter()
-      .mount()
-
+    const wrapper = mountCatalogList(catalogItems)
     await flushPromises()
 
     expect(catalogHeadingTexts(wrapper)).toEqual([
@@ -56,51 +60,28 @@ describe("catalog list", () => {
       "Inside One",
       "Top Loose",
     ])
-  })
 
-  it("sorts catalog by title Z–A when selected", async () => {
-    const catalogItems = makeMe.notebookCatalog
-      .notebook("Top Loose")
-      .group("Middle Group", "Inside One")
-      .notebook("Bottom Loose")
-      .please()
-
-    const wrapper = helper
-      .component(NotebooksPageView)
-      .withProps({
-        catalogItems,
-        subscriptions: [],
-        user: makeMe.aUser.please(),
-      })
-      .withCurrentUser(makeMe.aUser.please())
-      .withRouter()
-      .mount()
-
-    await flushPromises()
     await pickNotebookCatalogPeerSort(wrapper, "title", "desc")
-
     expect(catalogHeadingTexts(wrapper)).toEqual([
       "Top Loose",
       "Middle Group",
       "Inside One",
       "Bottom Loose",
+    ])
+
+    await pickNotebookCatalogPeerSort(wrapper, "title", "asc")
+    expect(catalogHeadingTexts(wrapper)).toEqual([
+      "Bottom Loose",
+      "Middle Group",
+      "Inside One",
+      "Top Loose",
     ])
   })
 
   it("collapses the sort dropdown when clicking outside", async () => {
     const catalogItems = makeMe.notebookCatalog.notebook("Alpha").please()
 
-    const wrapper = helper
-      .component(NotebooksPageView)
-      .withProps({
-        catalogItems,
-        subscriptions: [],
-        user: makeMe.aUser.please(),
-      })
-      .withCurrentUser(makeMe.aUser.please())
-      .withRouter()
-      .mount()
-
+    const wrapper = mountCatalogList(catalogItems)
     await flushPromises()
 
     const dropdown = wrapper.get('[data-testid="notebook-catalog-sort"]')
@@ -112,52 +93,12 @@ describe("catalog list", () => {
     expect(dropdown.open).toBe(false)
   })
 
-  it("returns to title A–Z after title Z–A", async () => {
-    const catalogItems = makeMe.notebookCatalog
-      .notebook("Top Loose")
-      .group("Middle Group", "Inside One")
-      .notebook("Bottom Loose")
-      .please()
-
-    const wrapper = helper
-      .component(NotebooksPageView)
-      .withProps({
-        catalogItems,
-        subscriptions: [],
-        user: makeMe.aUser.please(),
-      })
-      .withCurrentUser(makeMe.aUser.please())
-      .withRouter()
-      .mount()
-
-    await flushPromises()
-    await pickNotebookCatalogPeerSort(wrapper, "title", "desc")
-    await pickNotebookCatalogPeerSort(wrapper, "title", "asc")
-
-    expect(catalogHeadingTexts(wrapper)).toEqual([
-      "Bottom Loose",
-      "Middle Group",
-      "Inside One",
-      "Top Loose",
-    ])
-  })
-
   it("sorts group members by title A–Z by default", async () => {
     const catalogItems = makeMe.notebookCatalog
       .group("My Group", "Zebra", "Alpha")
       .please()
 
-    const wrapper = helper
-      .component(NotebooksPageView)
-      .withProps({
-        catalogItems,
-        subscriptions: [],
-        user: makeMe.aUser.please(),
-      })
-      .withCurrentUser(makeMe.aUser.please())
-      .withRouter()
-      .mount()
-
+    const wrapper = mountCatalogList(catalogItems)
     await flushPromises()
 
     expect(catalogHeadingTexts(wrapper)).toEqual(["My Group", "Alpha", "Zebra"])
@@ -173,17 +114,7 @@ describe("catalog list", () => {
         .please(),
     ]
 
-    const wrapper = helper
-      .component(NotebooksPageView)
-      .withProps({
-        catalogItems,
-        subscriptions: [],
-        user: makeMe.aUser.please(),
-      })
-      .withCurrentUser(makeMe.aUser.please())
-      .withRouter()
-      .mount()
-
+    const wrapper = mountCatalogList(catalogItems)
     await flushPromises()
 
     expect(wrapper.text()).toContain("Showing 3 of 4 notebooks")
@@ -210,17 +141,7 @@ describe("catalog list", () => {
         .please(),
     ]
 
-    const wrapper = helper
-      .component(NotebooksPageView)
-      .withProps({
-        catalogItems,
-        subscriptions: [],
-        user: makeMe.aUser.please(),
-      })
-      .withCurrentUser(makeMe.aUser.please())
-      .withRouter()
-      .mount()
-
+    const wrapper = mountCatalogList(catalogItems)
     await flushPromises()
 
     expect(

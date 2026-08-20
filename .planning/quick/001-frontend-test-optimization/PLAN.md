@@ -336,48 +336,19 @@ Status: done
 
 ### Optimize remaining NoteToolbar and note chrome
 Type: Structure
-Status: planned
+Status: done
 
-**Tests:**
-- `tests/notes/NoteToolbar.moreOptions.spec.ts`
-- `tests/notes/NoteToolbar.assimilationPanel.spec.ts`
-- `tests/notes/NoteMoreOptionsForm.deleteNote.spec.ts`
-- `tests/notes/NoteMoreOptionsForm.deleteNote.relationship.spec.ts`
-- `tests/notes/NoteEditableContent.spec.ts`
-- `tests/notes/NoteEditableContent.paste.spec.ts`
-- `tests/notes/NoteEditableContent.relationProperty.spec.ts`
-- `tests/notes/NoteTextContent.titleEdit.spec.ts`
-- `tests/notes/NoteTextContent.titleEdit.saveRace.spec.ts`
-- `tests/components/notes/NoteTextContentUndo.spec.ts`
-- `tests/notes/NoteNewButton.spec.ts`
-- `tests/notes/NoteNewForm.spec.ts`
-- `tests/notes/NoteNewForm.parentRelationship.spec.ts`
-- `tests/notes/NoteDeadWikiLinkCreateModal.spec.ts`
-- `tests/notes/FolderSelector.spec.ts`
+**Done:** Fake rAF primers; merged toolbar/editable/delete/new-form remounts; 63 tests green.
 
-**Goals:** Merge remount-heavy toolbar/form cases; fake timers for soft-keyboard primers.
-
-**Verify:**
-```bash
-pnpm frontend:test tests/notes/NoteToolbar.moreOptions.spec.ts tests/notes/NoteToolbar.assimilationPanel.spec.ts tests/notes/NoteMoreOptionsForm.deleteNote.spec.ts tests/notes/NoteMoreOptionsForm.deleteNote.relationship.spec.ts tests/notes/NoteEditableContent.spec.ts tests/notes/NoteEditableContent.paste.spec.ts tests/notes/NoteEditableContent.relationProperty.spec.ts tests/notes/NoteTextContent.titleEdit.spec.ts tests/notes/NoteTextContent.titleEdit.saveRace.spec.ts tests/components/notes/NoteTextContentUndo.spec.ts tests/notes/NoteNewButton.spec.ts tests/notes/NoteNewForm.spec.ts tests/notes/NoteNewForm.parentRelationship.spec.ts tests/notes/NoteDeadWikiLinkCreateModal.spec.ts tests/notes/FolderSelector.spec.ts
-```
 
 ---
 
 ### Optimize Wikidata association and NoteNewForm wikidata remainder
 Type: Structure
-Status: planned
+Status: done
 
-**Tests:**
-- `tests/notes/WikidataAssociationDialog.titleActions.spec.ts`
-- `tests/notes/NoteNewForm.wikidata.spec.ts` (remaining non-merged cases)
+**Done:** Parameterized title actions; fake timers on wikidata search; 13 tests green.
 
-**Goals:** Parameterize title-action matrix; soft-keyboard primers with fake timers.
-
-**Verify:**
-```bash
-pnpm frontend:test tests/notes/WikidataAssociationDialog.titleActions.spec.ts tests/notes/NoteNewForm.wikidata.spec.ts
-```
 
 ---
 
@@ -392,74 +363,28 @@ Status: done
 
 ### Optimize sidebar specs
 Type: Structure
-Status: planned
+Status: done
 
-**Tests:**
-- `tests/notes/sidebar/SidebarFirstGeneration.spec.ts`
-- `tests/notes/sidebar/SidebarFolderItem.spec.ts`
-- `tests/notes/sidebar/SidebarPeerSort.spec.ts`
-- `tests/notes/sidebar/SidebarRouteNavigation.spec.ts`
-- `tests/notes/sidebar/SidebarAncestorLoading.spec.ts`
+**Done:** Sync IntersectionObserver stub; merged remount cases; 9 tests green.
 
-**Goals:** Share sidebar mount fixtures; drop redundant scroll/nav remounts.
-
-**Verify:**
-```bash
-pnpm frontend:test tests/notes/sidebar/SidebarFirstGeneration.spec.ts tests/notes/sidebar/SidebarFolderItem.spec.ts tests/notes/sidebar/SidebarPeerSort.spec.ts tests/notes/sidebar/SidebarRouteNavigation.spec.ts tests/notes/sidebar/SidebarAncestorLoading.spec.ts
-```
 
 ---
 
 ### Optimize remaining pages (Folder, Assimilation, Book, Recall, Catalog, Memory)
 Type: Structure
-Status: planned
+Status: done
 
-**Tests:**
-- `tests/pages/NoteShowPageAssimilationPanel.spec.ts`
-- `tests/pages/FolderPage.renameDissolve.spec.ts`
-- `tests/pages/FolderPage.moveConflict.spec.ts`
-- `tests/pages/FolderPage.moveDestination.spec.ts` (any remaining)
-- `tests/pages/BookReadingPage.snap.spec.ts`
-- `tests/pages/BookReadingPage.snap.budgets.spec.ts`
-- `tests/pages/BookReadingPage.readingPosition.spec.ts`
-- `tests/pages/RecallPage.spelling.spec.ts`
-- `tests/pages/RecallPageOverlap.spec.ts`
-- `tests/pages/NotebookCatalogList.spec.ts`
-- `tests/pages/NotebookCatalogExport.spec.ts`
-- `tests/pages/MemoryTrackerPageView.deleteUnanswered.spec.ts`
-- `tests/pages/settings/AccessTokensSettingsTab.spec.ts`
-- `tests/toolbars/MainMenu.resume.spec.ts`
+**Done:** Merged confirms/sort/export/debounce; Candidates for inherent PDF/Recall mounts; 53 tests green.
 
-**Goals:** Merge parameterized confirmation messages; lighter page mounts; fake timers where waits remain.
-
-**Verify:**
-```bash
-pnpm frontend:test tests/pages/NoteShowPageAssimilationPanel.spec.ts tests/pages/FolderPage.renameDissolve.spec.ts tests/pages/FolderPage.moveConflict.spec.ts tests/pages/BookReadingPage.snap.spec.ts tests/pages/BookReadingPage.snap.budgets.spec.ts tests/pages/BookReadingPage.readingPosition.spec.ts tests/pages/RecallPage.spelling.spec.ts tests/pages/RecallPageOverlap.spec.ts tests/pages/NotebookCatalogList.spec.ts tests/pages/NotebookCatalogExport.spec.ts tests/pages/MemoryTrackerPageView.deleteUnanswered.spec.ts tests/pages/settings/AccessTokensSettingsTab.spec.ts tests/toolbars/MainMenu.resume.spec.ts
-```
 
 ---
 
 ### Optimize remaining misc recall/commons components
 Type: Structure
-Status: planned
+Status: done
 
-**Tests:**
-- `tests/components/recall/AssimilationPanel.property.spec.ts`
-- `tests/components/recall/AssimilationPanel.loadingModal.spec.ts`
-- `tests/components/recall/AnsweredQuestionComponent.spec.ts`
-- `tests/components/recall/CommissionLearningSessionDialog.spec.ts`
-- `tests/components/commons/Modal.spec.ts`
-- `tests/components/form/SeamlessTextEditor.spec.ts`
-- `tests/components/form/TextInput.spec.ts`
-- `tests/components/recallStats/recallStatsTheme.spec.ts`
-- `tests/components/admin/FailureReportList.spec.ts`
+**Done:** Merged Assimilation loading, Modal autofocus, AnsweredQuestion, Commission paths; calendar fixture slimmed; 43 tests green.
 
-**Goals:** Merge loading-modal paths; drop redundant assertions; fake timers for caret sync.
-
-**Verify:**
-```bash
-pnpm frontend:test tests/components/recall/AssimilationPanel.property.spec.ts tests/components/recall/AssimilationPanel.loadingModal.spec.ts tests/components/recall/AnsweredQuestionComponent.spec.ts tests/components/recall/CommissionLearningSessionDialog.spec.ts tests/components/commons/Modal.spec.ts tests/components/form/SeamlessTextEditor.spec.ts tests/components/form/TextInput.spec.ts tests/components/recallStats/recallStatsTheme.spec.ts tests/components/admin/FailureReportList.spec.ts
-```
 
 ---
 

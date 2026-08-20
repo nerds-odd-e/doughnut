@@ -30,7 +30,7 @@ describe("NoteToolbar assimilation panel", () => {
     resetNoteToolbarTestState()
   })
 
-  it("shows assimilation settings in the shared panel shell when opened", async () => {
+  it("shows assimilation settings in the shared panel shell without a max-height cage", async () => {
     const noteRealm = makeMe.aNoteRealm.title("Dummy Title").please()
 
     wrapper = await mountNoteToolbar(noteRealm)
@@ -39,9 +39,13 @@ describe("NoteToolbar assimilation panel", () => {
 
     const panelShell = wrapper.find('[data-testid="note-toolbar-panel-shell"]')
     expect(panelShell.exists()).toBe(true)
+    const assimilationSettings = panelShell.find(
+      '[data-testid="assimilation-settings"]'
+    )
+    expect(assimilationSettings.exists()).toBe(true)
     expect(
-      panelShell.find('[data-testid="assimilation-settings"]').exists()
-    ).toBe(true)
+      assimilationSettings.find(".max-h-\\[min\\(40vh\\,22rem\\)\\]").exists()
+    ).toBe(false)
 
     useAssimilationView().dismiss()
     await flushPromises()
@@ -82,20 +86,5 @@ describe("NoteToolbar assimilation panel", () => {
       true
     )
     expect(wrapper.find('button[title="Record Audio"]').exists()).toBe(false)
-  })
-
-  it("does not cage assimilation settings in a half-page max-height scroll area", async () => {
-    const noteRealm = makeMe.aNoteRealm.title("Dummy Title").please()
-
-    wrapper = await mountNoteToolbar(noteRealm)
-    useAssimilationView().openForNote(noteRealm.note.id)
-    await flushPromises()
-
-    expect(
-      wrapper
-        .find('[data-testid="assimilation-settings"]')
-        .find(".max-h-\\[min\\(40vh\\,22rem\\)\\]")
-        .exists()
-    ).toBe(false)
   })
 })

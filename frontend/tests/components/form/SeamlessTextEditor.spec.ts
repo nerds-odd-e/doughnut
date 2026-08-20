@@ -41,7 +41,6 @@ describe("SeamlessTextEditor", () => {
     selection?.addRange(range)
 
     await wrapper.setProps({ modelValue: "x：y" })
-    await flushPromises()
     await nextTick()
 
     const sel = window.getSelection()

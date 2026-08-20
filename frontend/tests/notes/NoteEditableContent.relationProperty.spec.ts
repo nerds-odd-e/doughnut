@@ -13,7 +13,7 @@ describe("NoteEditableContent relation property row in rich mode", () => {
     document.body.innerHTML = ""
   })
 
-  it("shows relation type picker when noteContent includes relation frontmatter", async () => {
+  it("shows relation type picker only when noteContent includes relation frontmatter", async () => {
     const wrapper = mountNoteEditableContent(
       {
         noteId: 99,
@@ -27,27 +27,18 @@ relation: parent-of
       { attachTo: document.body }
     )
     await flushPromises()
-
     expect(relationTypeSelectInRow()).not.toBeNull()
-    wrapper.unmount()
-  })
 
-  it("omits relation type picker when noteContent has no relation property", async () => {
-    const wrapper = mountNoteEditableContent(
-      {
-        noteId: 99,
-        noteContent: `---
+    await wrapper.setProps({
+      noteContent: `---
 topic: training
 ---
 
 # Body`,
-        asMarkdown: false,
-      },
-      { attachTo: document.body }
-    )
+    })
     await flushPromises()
-
     expect(relationTypeSelectInRow()).toBeNull()
+
     wrapper.unmount()
   })
 })

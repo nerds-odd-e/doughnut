@@ -71,20 +71,31 @@ describe("NoteEditableContent", () => {
     wrapper.unmount()
   })
 
-  it("should update displayed content when navigating to a different note with no unsaved changes", async () => {
+  it("updates displayed content on navigate, including clearing when content is undefined", async () => {
     const wrapper = mountNoteEditableContent(
-      { noteId: 1, noteContent: "First note content" },
+      { noteId: 1, noteContent: "This is the first note's content" },
       { attachTo: document.body }
     )
     await flushPromises()
+    expect(textareaEl(wrapper).value).toBe("This is the first note's content")
 
     await wrapper.setProps({
       noteId: 2,
       noteContent: "Second note content",
     })
     await flushPromises()
-
     expect(textareaEl(wrapper).value).toBe("Second note content")
+
+    await wrapper.setProps({
+      noteId: 3,
+      noteContent: undefined,
+    })
+    await flushPromises()
+
+    expect(textareaEl(wrapper).value).not.toContain(
+      "This is the first note's content"
+    )
+    expect(textareaEl(wrapper).value).toBe("")
     wrapper.unmount()
   })
 
@@ -147,31 +158,6 @@ describe("NoteEditableContent", () => {
     await flushPromises()
 
     expect(textareaEl(wrapper).value).toBe("Second edit")
-    wrapper.unmount()
-  })
-
-  it("should clear content when switching from a note with content to a note without content (undefined)", async () => {
-    const wrapper = mountNoteEditableContent(
-      {
-        noteId: 1,
-        noteContent: "This is the first note's content",
-      },
-      { attachTo: document.body }
-    )
-    await flushPromises()
-
-    expect(textareaEl(wrapper).value).toBe("This is the first note's content")
-
-    await wrapper.setProps({
-      noteId: 2,
-      noteContent: undefined,
-    })
-    await flushPromises()
-
-    expect(textareaEl(wrapper).value).not.toContain(
-      "This is the first note's content"
-    )
-    expect(textareaEl(wrapper).value).toBe("")
     wrapper.unmount()
   })
 })

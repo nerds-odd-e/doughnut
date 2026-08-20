@@ -34,51 +34,49 @@ describe("Notebook catalog export", () => {
     return wrapper
   }
 
-  it("downloads a zip when export is clicked", async () => {
-    const nb = makeMe.aNotebook.title("Owned Catalog").please()
-    fetchMock.mockResponseOnce("zip-file-bytes")
-    await openCatalogOverflowFor(nb)
-
-    const exportButtons = screen.getAllByTitle(NOTEBOOK_EXPORT_BUTTON_LABEL)
-    await fireEvent.click(exportButtons[exportButtons.length - 1]!)
-    await flushPromises()
-
-    expect(fetchMock).toHaveBeenCalledWith(
-      `/api/notebooks/${nb.id}/export`,
-      expect.objectContaining({ credentials: "same-origin" })
-    )
-    expect(vi.mocked(saveAs).mock.calls[0]![1]).toBe("Owned Catalog.zip")
-  })
-
-  it("uses the filename the backend sends via Content-Disposition", async () => {
-    const nb = makeMe.aNotebook.title("Q&A Notes").please()
-    fetchMock.mockResponseOnce("zip-file-bytes", {
+  it.each([
+    {
+      label: "notebook title when no Content-Disposition",
+      title: "Owned Catalog",
+      headers: undefined as Record<string, string> | undefined,
+      expectedFilename: "Owned Catalog.zip",
+    },
+    {
+      label: "Content-Disposition filename",
+      title: "Q&A Notes",
       headers: {
         "content-disposition": 'attachment; filename="Q&A Notes.zip"',
       },
-    })
-    await openCatalogOverflowFor(nb)
-
-    const exportButtons = screen.getAllByTitle(NOTEBOOK_EXPORT_BUTTON_LABEL)
-    await fireEvent.click(exportButtons[exportButtons.length - 1]!)
-    await flushPromises()
-
-    expect(vi.mocked(saveAs).mock.calls.at(-1)?.[1]).toBe("Q&A Notes.zip")
-  })
-
-  it("falls back to the notebook name when Content-Disposition is not printable ASCII", async () => {
-    const nb = makeMe.aNotebook.title("筆記本").please()
-    fetchMock.mockResponseOnce("zip-file-bytes", {
+      expectedFilename: "Q&A Notes.zip",
+    },
+    {
+      label: "notebook title when Content-Disposition is not printable ASCII",
+      title: "筆記本",
       headers: {
         "content-disposition": 'attachment; filename="ç­.zip"',
       },
-    })
-    await openCatalogOverflowFor(nb)
+      expectedFilename: "筆記本.zip",
+    },
+  ])(
+    "downloads a zip using $label",
+    async ({ title, headers, expectedFilename }) => {
+      const nb = makeMe.aNotebook.title(title).please()
+      if (headers) {
+        fetchMock.mockResponseOnce("zip-file-bytes", { headers })
+      } else {
+        fetchMock.mockResponseOnce("zip-file-bytes")
+      }
+      await openCatalogOverflowFor(nb)
 
-    const exportButtons = screen.getAllByTitle(NOTEBOOK_EXPORT_BUTTON_LABEL)
-    await fireEvent.click(exportButtons[exportButtons.length - 1]!)
-    await flushPromises()
+      const exportButtons = screen.getAllByTitle(NOTEBOOK_EXPORT_BUTTON_LABEL)
+      await fireEvent.click(exportButtons[exportButtons.length - 1]!)
+      await flushPromises()
 
-    expect(vi.mocked(saveAs).mock.calls.at(-1)?.[1]).toBe("筆記本.zip")
-  })
+      expect(fetchMock).toHaveBeenCalledWith(
+        `/api/notebooks/${nb.id}/export`,
+        expect.objectContaining({ credentials: "same-origin" })
+      )
+      expect(vi.mocked(saveAs).mock.calls.at(-1)?.[1]).toBe(expectedFilename)
+    }
+  )
 })

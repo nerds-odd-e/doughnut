@@ -65,13 +65,11 @@ export function stubIntersectionObserver(isIntersecting: boolean): () => void {
   const original = globalThis.IntersectionObserver
   globalThis.IntersectionObserver = class {
     constructor(private readonly cb: IntersectionObserverCallback) {}
-    observe() {
-      setTimeout(() => {
-        this.cb(
-          [{ isIntersecting }] as IntersectionObserverEntry[],
-          this as unknown as IntersectionObserver
-        )
-      }, 0)
+    observe(target: Element) {
+      this.cb(
+        [{ isIntersecting, target }] as IntersectionObserverEntry[],
+        this as unknown as IntersectionObserver
+      )
     }
     disconnect() {
       /* no-op stub */

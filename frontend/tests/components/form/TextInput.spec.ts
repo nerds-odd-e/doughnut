@@ -1,10 +1,12 @@
 import { mount, flushPromises } from "@vue/test-utils"
 import TextInput from "@/components/form/TextInput.vue"
-import { vi } from "vitest"
+import { advanceAnimationFrame } from "@tests/helpers/focusTargetTestSupport"
+import { afterEach, describe, expect, it, vi } from "vitest"
 
 describe("TextInput.vue", () => {
   afterEach(() => {
     document.body.innerHTML = ""
+    vi.useRealTimers()
   })
 
   it("disables the input when given the disabled prop", async () => {
@@ -20,60 +22,42 @@ describe("TextInput.vue", () => {
     expect(wrapper.find("input").element.disabled).toBe(true)
   })
 
-  it("selects all text when initialSelectAll is true", async () => {
+  it("selects all text only when initialSelectAll is true", async () => {
+    vi.useFakeTimers({ toFake: ["requestAnimationFrame"] })
     const selectSpy = vi.spyOn(HTMLInputElement.prototype, "select")
 
-    const wrapper = mount(TextInput, {
+    const selected = mount(TextInput, {
       props: {
         modelValue: "test text",
         scopeName: "test",
-        field: "test",
+        field: "selected",
         title: "test",
         initialSelectAll: true,
       },
       attachTo: document.body,
     })
-
-    await wrapper.vm.$nextTick()
-    await vi.waitUntil(() => selectSpy.mock.calls.length > 0, { timeout: 1000 })
     await flushPromises()
+    await advanceAnimationFrame()
 
     expect(selectSpy).toHaveBeenCalled()
-    selectSpy.mockRestore()
-    wrapper.unmount()
-  })
+    const callsAfterSelectAll = selectSpy.mock.calls.length
+    selected.unmount()
 
-  it("does not select text when initialSelectAll is false", async () => {
-    const wrapper = mount(TextInput, {
+    const unselected = mount(TextInput, {
       props: {
         modelValue: "test text",
         scopeName: "test",
-        field: "test",
+        field: "unselected",
         title: "test",
         initialSelectAll: false,
       },
       attachTo: document.body,
     })
-
-    await wrapper.vm.$nextTick()
-    await new Promise((resolve) =>
-      requestAnimationFrame(() => resolve(undefined))
-    )
     await flushPromises()
+    await advanceAnimationFrame()
 
-    const inputElement = document.getElementById(
-      "test-test"
-    ) as HTMLInputElement
-    const selectSpy = vi.spyOn(inputElement, "select")
-
-    await wrapper.vm.$nextTick()
-    await new Promise((resolve) =>
-      requestAnimationFrame(() => resolve(undefined))
-    )
-    await flushPromises()
-
-    expect(selectSpy).not.toHaveBeenCalled()
+    expect(selectSpy.mock.calls.length).toBe(callsAfterSelectAll)
     selectSpy.mockRestore()
-    wrapper.unmount()
+    unselected.unmount()
   })
 })

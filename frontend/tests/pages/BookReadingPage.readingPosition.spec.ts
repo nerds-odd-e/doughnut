@@ -31,7 +31,7 @@ describe("BookReadingPage reading position", () => {
     mockBookReadingPageDefaults()
   })
 
-  it("debounces PATCH reading position on rapid viewport updates", async () => {
+  it("debounces PATCH reading position; keeps last top; skips null viewport", async () => {
     const { wrapper, patchSpy } = await mountPatchDebounceScenario()
     const pdf = wrapper.findComponent(PdfBookViewer)
     const viewport = { top: 200, mid: 500, bottom: 1000 }
@@ -61,12 +61,8 @@ describe("BookReadingPage reading position", () => {
         selectedBookBlockId: 101,
       },
     })
-  })
 
-  it("PATCH reading position uses last viewport top within debounce window", async () => {
-    const { wrapper, patchSpy } = await mountPatchDebounceScenario()
-    const pdf = wrapper.findComponent(PdfBookViewer)
-
+    patchSpy.mockClear()
     await withFakeTimers(async () => {
       pdf.vm.$emit("viewportAnchorPage", {
         anchorPageIndexZeroBased: 0,
@@ -94,12 +90,8 @@ describe("BookReadingPage reading position", () => {
         selectedBookBlockId: 101,
       },
     })
-  })
 
-  it("does not PATCH reading position when viewport is null", async () => {
-    const { wrapper, patchSpy } = await mountPatchDebounceScenario()
-    const pdf = wrapper.findComponent(PdfBookViewer)
-
+    patchSpy.mockClear()
     await withFakeTimers(async () => {
       pdf.vm.$emit("viewportAnchorPage", {
         anchorPageIndexZeroBased: 0,

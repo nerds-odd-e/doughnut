@@ -32,9 +32,6 @@ describe("Sidebar gradual ancestor population", () => {
       fixtures,
       vi,
     })
-  })
-
-  beforeEach(() => {
     storageAccessor.value = createNoteStorage()
   })
 
@@ -42,7 +39,7 @@ describe("Sidebar gradual ancestor population", () => {
     teardownSidebarComponentTest(wrapper)
   })
 
-  it("loads ancestor branches for a deep note through folder listings without showNote", async () => {
+  it("loads ancestor branches via folder listings, then shows them from cache on remount", async () => {
     const listingSpy = mockSdkServiceWithImplementation(
       NotebookController,
       "listNotebookFolderListing",
@@ -69,31 +66,19 @@ describe("Sidebar gradual ancestor population", () => {
     expect(listedParentIds).toContain(FOLDER_FIRST_GEN_CHILDREN_ID)
     expect(listedParentIds).not.toContain(fixtures.firstGenerationSibling.id)
 
-    await vi.waitUntil(() =>
+    expect(
       findSidebarItem(
         wrapper,
         fixtures.secondGeneration.note.noteTopology.title
       )?.exists()
-    )
+    ).toBe(true)
     expect(
       findSidebarItem(
         wrapper,
         fixtures.firstGenerationSibling.note.noteTopology.title
       )?.exists()
     ).toBe(true)
-  })
 
-  it("shows previously fetched ancestor rows from cache when API is blocked on remount", async () => {
-    mockSdkServiceWithImplementation(
-      NotebookController,
-      "listNotebookFolderListing",
-      (options) =>
-        folderListingForQueryParent(options, fixtures.defaultTreeFolderListings)
-    )
-
-    // First mount: populate the listing cache
-    wrapper = mountSidebar(helper, fixtures.secondGeneration)
-    await flushPromises()
     teardownSidebarComponentTest(wrapper)
     wrapper = undefined as unknown as typeof wrapper
 
@@ -103,18 +88,15 @@ describe("Sidebar gradual ancestor population", () => {
       () => neverResolving()
     )
 
-    // Second mount: flush reactivity but NOT the blocked API responses
     wrapper = mountSidebar(helper, fixtures.secondGeneration)
     await flushPromises()
 
-    // Root note visible from cache (not from API which is blocked)
     expect(
       findSidebarItem(
         wrapper,
         fixtures.topNoteRealm.note.noteTopology.title
       )?.exists()
     ).toBe(true)
-    // Nested note visible from cache
     expect(
       findSidebarItem(
         wrapper,

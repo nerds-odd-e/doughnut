@@ -8,7 +8,6 @@ import makeMe from "doughnut-test-fixtures/makeMe"
 import { mockSdkService, wrapSdkResponse } from "@tests/helpers"
 import {
   mountNoteNewForm,
-  mockWikidataSearchResult,
   noteTitleText,
   notebookRootProps,
   openWikidataDialog,
@@ -70,7 +69,6 @@ describe("NoteNewForm wikidata and soft-delete", () => {
         attachTo: document.body,
       })
       await setNoteNewFormTitle(wrapper, "note title")
-      vi.clearAllTimers()
     })
 
     afterEach(() => {
@@ -134,6 +132,7 @@ describe("NoteNewForm wikidata and soft-delete", () => {
 
   describe("search wikidata entry", () => {
     beforeEach(() => {
+      vi.useFakeTimers()
       sdkSpies.searchForRelationshipTargetWithinSpy.mockResolvedValue(
         wrapSdkResponse([])
       )
@@ -147,7 +146,12 @@ describe("NoteNewForm wikidata and soft-delete", () => {
       })
     })
 
-    it("opens wikidata dialog on search and closes on cancel", async () => {
+    afterEach(() => {
+      vi.runOnlyPendingTimers()
+      vi.useRealTimers()
+    })
+
+    it("opens dialog, cancels, then applies matching-title selections", async () => {
       resolveWikidataSearch(searchWikidataSpy, "dog", "Q1")
       await openWikidataDialog(wrapper, "dog")
       expect(searchWikidataSpy).toHaveBeenCalledWith({
@@ -157,27 +161,19 @@ describe("NoteNewForm wikidata and soft-delete", () => {
 
       wikidataCancelButton().click()
       await flushPromises()
-
       expect(wikidataDialogIsOpen()).toBe(false)
+
+      await openWikidataDialog(wrapper, "dog")
+      await selectWikidataSearchResult("Q1")
+      expect(wikidataDialogIsOpen()).toBe(false)
+      expect(noteTitleText(wrapper)).toBe("dog")
+
+      resolveWikidataSearch(searchWikidataSpy, "Dog", "Q1")
+      await openWikidataDialog(wrapper, "dog")
+      await selectWikidataSearchResult("Q1")
+      expect(wikidataDialogIsOpen()).toBe(false)
+      expect(noteTitleText(wrapper)).toBe("Dog")
     })
-
-    it.each`
-      searchTitle | wikidataTitle | wikidataId | expectedTitle
-      ${"dog"}    | ${"dog"}      | ${"Q1"}    | ${"dog"}
-      ${"dog"}    | ${"Dog"}      | ${"Q1"}    | ${"Dog"}
-    `(
-      "search $searchTitle get $wikidataTitle without title action updates title as $expectedTitle",
-      async ({ searchTitle, wikidataTitle, wikidataId, expectedTitle }) => {
-        searchWikidataSpy.mockResolvedValue(
-          wrapSdkResponse([mockWikidataSearchResult(wikidataTitle, wikidataId)])
-        )
-        await openWikidataDialog(wrapper, searchTitle)
-        await selectWikidataSearchResult(wikidataId)
-
-        expect(wikidataDialogIsOpen()).toBe(false)
-        expect(noteTitleText(wrapper)).toBe(expectedTitle)
-      }
-    )
 
     it("replace then append title actions update title for differing wikidata label", async () => {
       resolveWikidataSearch(searchWikidataSpy, "Canine", "Q1")

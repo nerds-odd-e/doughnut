@@ -57,7 +57,9 @@ describe("SidebarFolderItem", () => {
     vi.restoreAllMocks()
   })
 
-  it("requests expansion when it is the active folder on folder page", async () => {
+  async function mountActiveFolderItem(isIntersecting: boolean) {
+    const scrollSpy = vi.spyOn(HTMLElement.prototype, "scrollIntoView")
+    restoreIntersectionObserver = stubIntersectionObserver(isIntersecting)
     const activeFolder = makeMe.aFolder.folder(42, "Alpha").please()
     wrapper = mountFolderItem(router, {
       folderId: 42,
@@ -65,12 +67,18 @@ describe("SidebarFolderItem", () => {
       activeFolder,
     })
     await flushPromises()
-    const updates = wrapper.emitted("update:expandedFolderIds") as
+    return { scrollSpy, activeFolder }
+  }
+
+  it("requests expansion for the active folder and does not scroll when intersecting", async () => {
+    const { scrollSpy, activeFolder } = await mountActiveFolderItem(true)
+    const updates = wrapper!.emitted("update:expandedFolderIds") as
       | [Set<number>][]
       | undefined
-    expect(updates?.some(([ids]) => ids.has(42))).toBe(true)
-    await wrapper.setProps({ expandedFolderIds: new Set([42]) })
-    expect(wrapper.attributes("aria-expanded")).toBe("true")
+    expect(updates?.some(([ids]) => ids.has(activeFolder.id))).toBe(true)
+    await wrapper!.setProps({ expandedFolderIds: new Set([activeFolder.id]) })
+    expect(wrapper!.attributes("aria-expanded")).toBe("true")
+    expect(scrollSpy).not.toHaveBeenCalled()
   })
 
   it("renders a link to folderPage with encoded ids", async () => {
@@ -82,40 +90,7 @@ describe("SidebarFolderItem", () => {
   })
 
   it("scrolls folder row into view when active folder row is not intersecting", async () => {
-    const scrollSpy = vi.spyOn(HTMLElement.prototype, "scrollIntoView")
-    restoreIntersectionObserver = stubIntersectionObserver(false)
-
-    const activeFolder = makeMe.aFolder.folder(42, "Alpha").please()
-    wrapper = mountFolderItem(router, {
-      folderId: 42,
-      notebookId: 7,
-      activeFolder,
-    })
-    await flushPromises()
-    await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()))
-    await flushPromises()
-    await vi.waitUntil(() => scrollSpy.mock.calls.length > 0)
+    const { scrollSpy } = await mountActiveFolderItem(false)
     expect(scrollSpy).toHaveBeenCalled()
-  })
-
-  it("does not scroll folder row when active folder row is already intersecting", async () => {
-    const scrollSpy = vi.spyOn(HTMLElement.prototype, "scrollIntoView")
-    restoreIntersectionObserver = stubIntersectionObserver(true)
-
-    const activeFolder = makeMe.aFolder.folder(42, "Alpha").please()
-    wrapper = mountFolderItem(router, {
-      folderId: 42,
-      notebookId: 7,
-      activeFolder,
-    })
-    await flushPromises()
-    await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()))
-    await flushPromises()
-    await vi.waitFor(
-      () => {
-        expect(scrollSpy).not.toHaveBeenCalled()
-      },
-      { timeout: 100, interval: 10 }
-    )
   })
 })

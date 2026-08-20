@@ -1,5 +1,5 @@
 import { useRecallData } from "@/composables/useRecallData"
-import { fireEvent, screen } from "@testing-library/vue"
+import { fireEvent } from "@testing-library/vue"
 import { flushPromises } from "@vue/test-utils"
 import { beforeEach, describe, it, expect, vi } from "vitest"
 import {
@@ -23,6 +23,14 @@ vi.mock("@/managedApi/AiReplyEventSource", async () => {
 
 setupMainMenuTests()
 
+function resumeLink() {
+  return document.querySelector('[aria-label="Resume"]')
+}
+
+function toggleMenuButton() {
+  return document.querySelector('[aria-label="Toggle menu"]')
+}
+
 describe("MainMenu resume recall", () => {
   beforeEach(() => {
     vi.mocked(useRecallData).mockReturnValue(
@@ -33,11 +41,12 @@ describe("MainMenu resume recall", () => {
     )
   })
 
-  it("shows highlighted Resume before Note when recall is paused", async () => {
+  it("shows highlighted Resume before Note when recall is paused; hides when not", async () => {
     await renderComponent()
 
-    const resumeRecallLink = screen.getByLabelText("Resume")
-    expect(resumeRecallLink.closest(".nav-item")).toHaveClass(
+    const resumeRecallLink = resumeLink()
+    expect(resumeRecallLink).not.toBeNull()
+    expect(resumeRecallLink!.closest(".nav-item")).toHaveClass(
       "resume-recall-active"
     )
 
@@ -52,18 +61,15 @@ describe("MainMenu resume recall", () => {
     expect(allNavItems.indexOf(resumeNavItem!)).toBeLessThan(
       allNavItems.indexOf(noteNavItem!)
     )
-  })
 
-  it("does not show Resume when recall is not paused", async () => {
+    document.body.innerHTML = ""
     vi.mocked(useRecallData).mockReturnValue(
       createUseRecallDataMock({
         isRecallPaused: false,
       })
     )
-
     await renderComponent()
-
-    expect(screen.queryByLabelText("Resume")).not.toBeInTheDocument()
+    expect(resumeLink()).toBeNull()
   })
 
   it("resumes recall from collapsed horizontal menu without expanding", async () => {
@@ -79,9 +85,8 @@ describe("MainMenu resume recall", () => {
 
     mountMainMenu()
 
-    expect(screen.getByLabelText("Toggle menu")).toBeInTheDocument()
-
-    await fireEvent.click(screen.getByLabelText("Resume"))
+    expect(toggleMenuButton()).not.toBeNull()
+    await fireEvent.click(resumeLink()!)
 
     expect(resumeRecallSpy).toHaveBeenCalled()
   })
@@ -171,7 +176,7 @@ describe("MainMenu resume recall", () => {
 
       await renderComponent()
 
-      expect(!!screen.queryByLabelText("Resume")).toBe(shouldShow)
+      expect(!!resumeLink()).toBe(shouldShow)
     }
   )
 })

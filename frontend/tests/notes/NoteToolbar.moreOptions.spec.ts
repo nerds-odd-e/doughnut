@@ -91,7 +91,7 @@ describe("NoteToolbar more options", () => {
     expect((details.element as HTMLDetailsElement).open).toBe(false)
   })
 
-  it("toggles the audio tools panel from the inline more-options button", async () => {
+  it("toggles the audio tools panel from the inline button and overflow menu", async () => {
     const noteRealm = makeMe.aNoteRealm.title("Dummy Title").please()
     wrapper = await mountNoteToolbar(noteRealm)
     await layoutNoteToolbar(wrapper, allMoreOptionsFitNavWidth())
@@ -124,19 +124,14 @@ describe("NoteToolbar more options", () => {
     expect(audioToolsButton.classes()).not.toContain("daisy-btn-soft")
     expect(audioToolsButton.classes()).not.toContain("daisy-btn-primary")
     expect(audioToolsButton.attributes("aria-pressed")).toBe("false")
-  })
 
-  it("toggles the audio tools panel from the overflow menu", async () => {
-    const noteRealm = makeMe.aNoteRealm.title("Dummy Title").please()
-    wrapper = await mountNoteToolbar(noteRealm)
     await layoutNoteToolbar(wrapper, overflowTogglesNavWidth())
-
     await noteToolbarAction(wrapper, titles.overflowMenu).trigger("click")
     await flushPromises()
 
-    const audioToolsButton = overflowMenuItem(titles.audio) as HTMLButtonElement
-    expect(audioToolsButton).toBeTruthy()
-    audioToolsButton.click()
+    const overflowAudio = overflowMenuItem(titles.audio) as HTMLButtonElement
+    expect(overflowAudio).toBeTruthy()
+    overflowAudio.click()
     await flushPromises()
 
     expect(

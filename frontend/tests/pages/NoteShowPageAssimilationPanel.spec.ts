@@ -1,11 +1,13 @@
 import { useAssimilationView } from "@/composables/useAssimilationView"
 import {
   createNoteShowPageRouter,
-  renderNoteShowPage,
+  mainNoteContentEl,
+  renderNoteShowPageWithoutSidebar,
   setupNoteShowPageAssimilationPanelMocks,
 } from "@tests/pages/noteShowPageTestSupport"
 import { assimilateButtonSelector } from "@tests/components/recall/assimilationPanelTestSupport"
-import { beforeEach, describe, expect, it, vi } from "vitest"
+import { flushPromises } from "@vue/test-utils"
+import { beforeEach, describe, expect, it } from "vitest"
 
 describe("note show page inline assimilation panel", () => {
   const router = createNoteShowPageRouter()
@@ -15,25 +17,19 @@ describe("note show page inline assimilation panel", () => {
     noteRealm = setupNoteShowPageAssimilationPanelMocks()
   })
 
-  it("renders assimilate button when assimilation settings are on", async () => {
-    useAssimilationView().openForNote(noteRealm.id)
-    await renderNoteShowPage(router, noteRealm.id)
+  it("toggles assimilate button with assimilation settings", async () => {
+    await renderNoteShowPageWithoutSidebar(router, noteRealm.id)
+    await flushPromises()
 
-    await vi.waitFor(() => {
-      expect(document.querySelector(assimilateButtonSelector)).not.toBeNull()
-    })
-  })
-
-  it("does not render assimilation panel when settings are off", async () => {
-    await renderNoteShowPage(router, noteRealm.id)
-
-    await vi.waitFor(() => {
-      expect(document.getElementById("main-note-content")).not.toBeNull()
-    })
-
+    expect(mainNoteContentEl()).not.toBeNull()
     expect(document.querySelector(assimilateButtonSelector)).toBeNull()
     expect(
       document.querySelector('[data-testid="note-toolbar-panel-shell"]')
     ).toBeNull()
+
+    useAssimilationView().openForNote(noteRealm.id)
+    await flushPromises()
+
+    expect(document.querySelector(assimilateButtonSelector)).not.toBeNull()
   })
 })

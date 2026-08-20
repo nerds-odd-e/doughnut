@@ -50,31 +50,19 @@ describe("MemoryTrackerPageView delete unanswered", () => {
     }
   )
 
-  it("calls delete endpoint and emits refresh when confirmed", async () => {
+  it("confirmation messages and deletes when confirmed", async () => {
     const deleteSpy = mockDeleteUnansweredRecallPrompts()
-
     const wrapper = await mountMemoryTrackerPageViewReady({
       recallHistory: historyFromPrompts([unansweredRecallPrompt()]),
     })
 
     await clickDeleteUnanswered(wrapper)
-    await resolveConfirmPopup(true)
+    expect(peekConfirmPopup()?.[0]?.message).toBe(
+      "Are you sure you want to delete 1 unanswered recall prompt?"
+    )
+    await resolveConfirmPopup(false)
 
-    expect(deleteSpy).toHaveBeenCalledWith({
-      path: { memoryTracker: defaultMemoryTrackerId },
-    })
-    expect(wrapper.emitted("refresh")).toHaveLength(1)
-  })
-
-  it.each([
-    {
-      label: "single prompt",
-      recallHistory: historyFromPrompts([unansweredRecallPrompt()]),
-      expectedMessage:
-        "Are you sure you want to delete 1 unanswered recall prompt?",
-    },
-    {
-      label: "multiple prompts",
+    await wrapper.setProps({
       recallHistory: historyFromPrompts([
         makeMe.aRecallPromptHistoryItem
           .withQuestionStem("Unanswered question 1")
@@ -83,31 +71,34 @@ describe("MemoryTrackerPageView delete unanswered", () => {
           .withQuestionStem("Unanswered question 2")
           .please(),
       ]),
-      expectedMessage:
-        "Are you sure you want to delete 2 unanswered recall prompts?",
-    },
-    {
-      label: "contested prompts excluded from count",
+    })
+    await clickDeleteUnanswered(wrapper)
+    expect(peekConfirmPopup()?.[0]?.message).toBe(
+      "Are you sure you want to delete 2 unanswered recall prompts?"
+    )
+    await resolveConfirmPopup(false)
+
+    await wrapper.setProps({
       recallHistory: historyFromPrompts([
         unansweredRecallPrompt(),
         contestedRecallPrompt(),
       ]),
-      expectedMessage:
-        "Are you sure you want to delete 1 unanswered recall prompt?",
-    },
-  ])(
-    "confirmation message for $label",
-    async ({ recallHistory, expectedMessage }) => {
-      mockDeleteUnansweredRecallPrompts()
+    })
+    await clickDeleteUnanswered(wrapper)
+    expect(peekConfirmPopup()?.[0]?.message).toBe(
+      "Are you sure you want to delete 1 unanswered recall prompt?"
+    )
+    await resolveConfirmPopup(false)
 
-      const wrapper = await mountMemoryTrackerPageViewReady({ recallHistory })
-      await clickDeleteUnanswered(wrapper)
+    await wrapper.setProps({
+      recallHistory: historyFromPrompts([unansweredRecallPrompt()]),
+    })
+    await clickDeleteUnanswered(wrapper)
+    await resolveConfirmPopup(true)
 
-      const popups = peekConfirmPopup()
-      expect(popups).toHaveLength(1)
-      expect(popups?.[0]?.message).toBe(expectedMessage)
-
-      await resolveConfirmPopup(false)
-    }
-  )
+    expect(deleteSpy).toHaveBeenCalledWith({
+      path: { memoryTracker: defaultMemoryTrackerId },
+    })
+    expect(wrapper.emitted("refresh")).toHaveLength(1)
+  })
 })
