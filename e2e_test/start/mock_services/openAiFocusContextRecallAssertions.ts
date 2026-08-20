@@ -4,9 +4,6 @@ import {
   type RecordedImposterRequest,
 } from './openAiImposterRecordedRequests'
 
-const FOCUS_CONTEXT_POST_POLL_MS = 250
-const FOCUS_CONTEXT_POST_POLL_ATTEMPTS = 40
-
 const focusContextQuestionGenerationPostBodies = (
   requests: RecordedImposterRequest[]
 ): string[] =>
@@ -21,8 +18,8 @@ const assertFocusContextRetrievalPromptShapes = (bodies: string[]) => {
       'Focus context recall E2E: expected at least 3 OpenAI Responses POST bodies',
       'that include the rendered focus block (<focus_context>) and JSON "input".',
       'Recall eager-fetches one question per due memory tracker, so fewer bodies usually means',
-      'fewer assimilated notes, failed requests, Mountebank stubs not matching, or',
-      'the assertion ran before eager-fetch finished (increase poll attempts if flaky).',
+      'fewer assimilated notes, failed requests, or Mountebank stubs not matching.',
+      'Wait for all due recall-prompt GETs before asserting so eager-fetch can finish.',
       `Found ${bodies.length} matching body/bodies.`,
     ].join('\n')
   ).to.be.at.least(3)
@@ -96,18 +93,11 @@ const assertFocusContextRetrievalPromptShapes = (bodies: string[]) => {
   ).to.eq(true)
 }
 
-const pollFocusContextQuestionGenerationPostBodies = (attempt = 0): void => {
+/** Assert focus-context prompt shapes after recall-prompt GETs for all due trackers have completed. */
+export const assertFocusContextRetrievalPromptShapesMatch = (): void => {
   cyFetchOpenAiImposterRequests().then((requests) => {
-    const bodies = focusContextQuestionGenerationPostBodies(requests)
-    if (bodies.length >= 3 || attempt >= FOCUS_CONTEXT_POST_POLL_ATTEMPTS) {
-      assertFocusContextRetrievalPromptShapes(bodies)
-      return
-    }
-    cy.wait(FOCUS_CONTEXT_POST_POLL_MS)
-    pollFocusContextQuestionGenerationPostBodies(attempt + 1)
+    assertFocusContextRetrievalPromptShapes(
+      focusContextQuestionGenerationPostBodies(requests)
+    )
   })
-}
-
-export const pollUntilFocusContextRetrievalPromptShapesMatch = (): void => {
-  pollFocusContextQuestionGenerationPostBodies()
 }

@@ -23,7 +23,12 @@ function removeNotebookFromBazaarTableRow(notebook: string) {
 function modelManagement() {
   return {
     chooseModel(model: string, task: string) {
-      submittableForm.submitWith({ [task]: model })
+      cy.intercept('POST', '**/api/settings/current-model-version').as(
+        'saveModelVersions'
+      )
+      submittableForm.fill({ [task]: model })
+      cy.findByRole('button', { name: 'Save' }).click()
+      cy.wait('@saveModelVersions').its('response.statusCode').should('eq', 200)
       return this
     },
   }
@@ -127,7 +132,15 @@ export function assumeAdminDashboardPage() {
     },
 
     goToModelManagement() {
-      this.openAdminDashboardTab('Manage Models')
+      cy.intercept('GET', '**/api/ai/available-gpt-models').as(
+        'availableGptModels'
+      )
+      cy.intercept('GET', '**/api/settings/current-model-version').as(
+        'currentModelVersions'
+      )
+      const tab = ADMIN_DASHBOARD_TAB_QUERY['Manage Models']
+      cy.visit(`/admin-dashboard?tab=${tab}`)
+      cy.wait(['@availableGptModels', '@currentModelVersions'])
       return modelManagement()
     },
 

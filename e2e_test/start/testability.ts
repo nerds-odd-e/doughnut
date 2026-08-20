@@ -14,12 +14,9 @@ import type {
 import type { NotesTestDataWritable } from '@generated/doughnut-backend-api'
 import {
   ConversationMessageController,
-  MemoryTrackerController,
   NoteController,
   NotebookBooksController,
   NotebookController,
-  RecallPromptController,
-  RecallsController,
   TestabilityRestController,
   TextContentController,
 } from '@generated/doughnut-backend-api/sdk.gen'
@@ -559,47 +556,6 @@ const testability = () => {
     ...bazaarTestabilityMethods,
     ...recallTestabilityMethods,
     ...timeTravelTestabilityMethods,
-
-    dueRecallPrompt() {
-      const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
-      return cy
-        .wrap(
-          RecallsController.recalling({
-            query: { timezone, dueindays: 0 },
-          }),
-          { log: false }
-        )
-        .then((dueMemoryTrackers) => {
-          const trackerId = dueMemoryTrackers?.toRepeat?.[0]?.memoryTrackerId
-          expect(trackerId, 'expected one due memory tracker for recall').to
-            .exist
-          return cy.wrap(
-            MemoryTrackerController.getRecallPrompt({
-              path: { memoryTracker: trackerId! },
-            }),
-            { log: false }
-          )
-        })
-    },
-
-    submitWrongMcqRecallAnswer(wrongChoiceText: string) {
-      return this.dueRecallPrompt().then((recallPrompt) => {
-        const choices = recallPrompt?.mcq?.responseChoices
-        expect(choices, 'expected MCQ response choices').to.exist
-        const choiceIndex = choices!.indexOf(wrongChoiceText)
-        expect(
-          choiceIndex,
-          `expected choice "${wrongChoiceText}" in ${JSON.stringify(choices)}`
-        ).to.be.at.least(0)
-        return cy.wrap(
-          RecallPromptController.answer({
-            path: { recallPrompt: recallPrompt!.id },
-            body: { choiceIndex, thinkingTimeMs: 1000 },
-          }),
-          { log: false }
-        )
-      })
-    },
 
     startConversationAboutNote(noteTitle: string, message: string) {
       return this.getInjectedNoteIdByTitle(noteTitle).then((noteId) =>

@@ -92,10 +92,23 @@ When('I am recalling my note on day {int}', (day: number) => {
   start.recall().visitRecallPage()
 })
 
+Given('a due recall prompt is ready on day {int}', (day: number) => {
+  start.testability().backendTimeTravelTo(day, 8)
+  start.testability().dueRecallPrompt()
+})
+
 When('I visit recall for a due recall prompt on day {int}', (day: number) => {
   start.testability().backendTimeTravelTo(day, 8)
-  start.recall().visitRecallPageAndWaitForQuestion()
+  start.recall().visitRecallPageAndWaitForQuestions(1)
 })
+
+When(
+  'I visit recall waiting for {int} due recall prompts on day {int}',
+  (promptCount: number, day: number) => {
+    start.testability().backendTimeTravelTo(day, 8)
+    start.recall().visitRecallPageAndWaitForQuestions(promptCount)
+  }
+)
 
 When('I visit recall', () => {
   start.recall().visitRecallPage()
@@ -174,13 +187,6 @@ Then(
     start.assumeAnsweredQuestionPage().expectSpellingAnswerToBeIncorrect(answer)
   }
 )
-
-Then('I should see that my answer is correct as the last question', () => {
-  start
-    .assumeAnsweredQuestionPage()
-    .goToLastAnsweredQuestion()
-    .expectMCQAnswerToBeCorrect()
-})
 
 Then('I should see that my last answer to spelling question is correct', () => {
   start

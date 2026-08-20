@@ -33,10 +33,6 @@ Given('I am logged in as an existing user', () => {
   start.loginAs('old_learner')
 })
 
-Given('I am logged in as an admin', () => {
-  start.loginAsAdmin()
-})
-
 Given('I am re-logged in as an admin', () => {
   start.reloginAsAdmin()
 })

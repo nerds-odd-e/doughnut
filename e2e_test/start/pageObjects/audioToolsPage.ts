@@ -19,13 +19,6 @@ const audioToolsPage = () => {
       waitUntilAppIsNotBusy()
       return this
     },
-    downloadAudioFile(fileName: string) {
-      const downloadsFolder = Cypress.config('downloadsFolder')
-      const filePath = `${downloadsFolder}/${fileName}`
-      cy.findByRole('button', { name: `Save Audio Locally` }).click()
-      cy.task('fileShouldExistSoon', filePath).should('equal', filePath)
-      return this
-    },
   }
 }
 

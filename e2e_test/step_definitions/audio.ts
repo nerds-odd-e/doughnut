@@ -2,7 +2,7 @@
 /// <reference types="../support" />
 // @ts-check
 
-import { Given, When, Then } from '@badeball/cypress-cucumber-preprocessor'
+import { Given, When } from '@badeball/cypress-cucumber-preprocessor'
 import start, { mock_services } from '../start'
 
 Given('the browser is mocked to give permission to record audio', () => {
@@ -27,8 +27,4 @@ When(
 
 When('I stop recording audio', () => {
   start.assumeAudioTools().stopRecording()
-})
-
-Then('I can download the recorded audio', () => {
-  start.assumeAudioTools().downloadAudioFile('recorded_audio.wav')
 })

@@ -2,12 +2,7 @@
 /// <reference types="../support" />
 // @ts-check
 
-import {
-  type DataTable,
-  Given,
-  Then,
-  When,
-} from '@badeball/cypress-cucumber-preprocessor'
+import { type DataTable, Given } from '@badeball/cypress-cucumber-preprocessor'
 import start from '../start'
 import { mock_services } from '../start'
 import { REFINEMENT_LAYOUT_INSTRUCTION_PATTERN } from '../start/mock_services/createOpenAiResponsesMock'
@@ -198,44 +193,5 @@ Given(
         },
       ])
     })
-  }
-)
-
-When(
-  'I export the extract request for refinement layout items {string} and {string}',
-  (firstItem: string, secondItem: string) => {
-    start
-      .assumeAssimilationPage()
-      .exportExtractRequestForLayoutItems(firstItem, secondItem)
-  }
-)
-
-When('I export the breakdown request from refinement layout', () => {
-  start.assumeAssimilationPage().exportBreakdownRequest()
-})
-
-Then('the export request dialog should show AI request JSON', () => {
-  start.assumeAssimilationPage().expectExportRequestDialogShowsAiRequestJson()
-})
-
-When('I open Refine note from the answered question', () => {
-  start.assumeAnsweredQuestionPage().openRefineNoteModal()
-})
-
-Then(
-  'refinement layout items {string} should be selected',
-  (layoutItemText: string) => {
-    start
-      .assumeAnsweredQuestionPage()
-      .expectRefinementLayoutItemsSelected(layoutItemText)
-  }
-)
-
-Then(
-  'refinement layout items {string} and {string} should not be selected',
-  (firstItem: string, secondItem: string) => {
-    start
-      .assumeAnsweredQuestionPage()
-      .expectRefinementLayoutItemsNotSelected(firstItem, secondItem)
   }
 )

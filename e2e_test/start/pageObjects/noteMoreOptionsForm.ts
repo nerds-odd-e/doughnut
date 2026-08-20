@@ -90,17 +90,6 @@ export const noteMoreOptions = () => {
       waitUntilAppIsNotBusy()
       return assumeAssimilationPage()
     },
-    reopenAssimilationSettingsWaitingForRecallInfo() {
-      cy.intercept('GET', '**/api/notes/**/note-info**').as('noteRecallInfo')
-      noteShowToolbar().should('exist')
-      clickMoreOption(titles.assimilation)
-      cy.get(assimilateButtonSelector).should('not.exist')
-      clickMoreOption(titles.assimilation)
-      cy.wait('@noteRecallInfo', { timeout: 15000 })
-      assimilateButton({ timeout: 15000 }).should('be.visible')
-      waitUntilAppIsNotBusy()
-      return assumeAssimilationPage().waitForAssimilationReady()
-    },
     assimilateNote() {
       this.openAssimilationSettings().clickAssimilate()
       waitUntilAppIsNotBusy()

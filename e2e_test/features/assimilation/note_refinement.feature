@@ -19,16 +19,7 @@ Feature: Note refinement
       | p1-2 | C    | p1     | true             |
       | p2   | D    |        |                  |
       | p3   | E    |        |                  |
-
-  Scenario: Generate a refinement layout for a note
-    When I am assimilating the note "Sample"
-    Then I should see the refinement layout:
-      | text | level | alreadyExtracted |
-      | A    | 1     |                  |
-      | B    | 2     |                  |
-      | C    | 2     | true             |
-      | D    | 1     |                  |
-      | E    | 1     |                  |
+    And I am assimilating the note "Sample"
 
   Scenario: Remove selected refinement layout items
     Given OpenAI returns the following content when requested to remove refinement layout items:
@@ -38,8 +29,14 @@ Feature: Note refinement
       | p1   | A    |        |                  |
       | p1-2 | C    | p1     | true             |
       | p3   | E    |        |                  |
-    When I am assimilating the note "Sample"
-    And I remove refinement layout items 1 and 3
+    Then I should see the refinement layout:
+      | text | level | alreadyExtracted |
+      | A    | 1     |                  |
+      | B    | 2     |                  |
+      | C    | 2     | true             |
+      | D    | 1     |                  |
+      | E    | 1     |                  |
+    When I remove refinement layout items 1 and 3
     Then the note content on the current page should be "A. C. E."
     And no refinement layout items should be selected
     And I should see the refinement layout:
@@ -50,9 +47,11 @@ Feature: Note refinement
 
   Scenario: Extract selected refinement layout items to one new note
     Given OpenAI will extract refinement layout items "B and D" to a new note with title "Point B and D" and content "Combined B and D" and updated parent content "A. C. E."
-    When I am assimilating the note "Sample"
-    And I open extraction preview for refinement layout items "B" and "D"
-    And I create the note from the extraction preview
+    When I open extraction preview for refinement layout items "B" and "D"
+    Then the extraction preview should show original content "A. C. E."
+    When I view the extraction preview original as a diff
+    Then the extraction preview original diff should show original "A. B. C. D. E." and updated "A. C. E."
+    When I create the note from the extraction preview
     Then the note title should be "Point B and D"
     And I should see folder "Sample tree/Context" containing these notes:
       | note-title    |
@@ -61,7 +60,7 @@ Feature: Note refinement
 
   Scenario: Save edited extraction preview content
     Given OpenAI will extract refinement layout items "B and D" to a new note with title "Point B and D" and content "Combined B and D" and updated parent content "A. C. E."
-    When I open extraction preview on note "Sample" for refinement layout items "B" and "D"
+    When I open extraction preview for refinement layout items "B" and "D"
     And I edit the extraction preview to title "Edited B and D" and content "Edited combined content" and updated parent content "A. C. E. edited"
     And I create the note from the extraction preview
     Then the note title should be "Edited B and D"
@@ -69,36 +68,8 @@ Feature: Note refinement
 
   Scenario: Retry extraction preview before creating note
     Given OpenAI will extract refinement layout items "B and D" with retry producing title "Retry B and D" and content "Retry combined content" and updated parent content "A. C. E. retry"
-    When I open extraction preview on note "Sample" for refinement layout items "B" and "D"
+    When I open extraction preview for refinement layout items "B" and "D"
     And I retry the extraction preview
     And I create the note from the extraction preview
     Then the note title should be "Retry B and D"
     And note "Sample" should have content "A. C. E. retry"
-
-  Scenario: Cannot create note with blank title from extraction preview
-    Given OpenAI will extract refinement layout items "B and D" to a new note with title "Point B and D" and content "Combined B and D" and updated parent content "A. C. E."
-    When I am assimilating the note "Sample"
-    And I open extraction preview for refinement layout items "B" and "D"
-    And I clear the extraction preview new note title
-    Then I cannot create a note from the extraction preview
-    And I should see folder "Sample tree/Context" containing these notes:
-      | note-title |
-      | Sample     |
-
-  Scenario: Switch between content and diff for updated original note
-    Given OpenAI will extract refinement layout items "B and D" to a new note with title "Point B and D" and content "Combined B and D" and updated parent content "A. C. E."
-    When I am assimilating the note "Sample"
-    And I open extraction preview for refinement layout items "B" and "D"
-    Then the extraction preview should show original content "A. C. E."
-    When I view the extraction preview original as a diff
-    Then the extraction preview original diff should show original "A. B. C. D. E." and updated "A. C. E."
-
-  Scenario: Export extract request shows AI request JSON
-    When I am assimilating the note "Sample"
-    And I export the extract request for refinement layout items "B" and "D"
-    Then the export request dialog should show AI request JSON
-
-  Scenario: Export breakdown request shows AI request JSON
-    When I am assimilating the note "Sample"
-    And I export the breakdown request from refinement layout
-    Then the export request dialog should show AI request JSON

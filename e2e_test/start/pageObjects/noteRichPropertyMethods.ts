@@ -1,4 +1,3 @@
-import { waitUntilAppIsNotBusy } from '../pageBase'
 import {
   confirmPropertyMemoryTrackerChange,
   findNoteContentRegion,
@@ -96,35 +95,6 @@ export const noteRichPropertyMethods = () => ({
       cy.get(richNotePropertyRow(key)).within(() => {
         cy.findByTestId('rich-note-property-row-options-toggle').click()
         cy.findByTestId('rich-note-property-row-remove').click()
-      })
-    })
-    confirmPropertyMemoryTrackerChange()
-    return this.flushPendingContentSave()
-  },
-  removeMarkdownNotePropertyConfirmingMemoryTrackerChange(key: string) {
-    this.openMarkdownContentEditor()
-    cy.get('textarea').then(($ta) => {
-      const lines = String($ta.val() ?? '').split('\n')
-      const withoutProperty = lines
-        .filter((line) => !new RegExp(`^\\s*${key}\\s*:`).test(line))
-        .join('\n')
-      cy.wrap($ta).clear().invoke('val', withoutProperty).trigger('input')
-    })
-    findNoteContentRegion().find('textarea').filter(':visible').first().blur()
-    cy.get('body').click(0, 0, { force: true })
-    confirmPropertyMemoryTrackerChange()
-    cy.get('.dirty').should('not.exist')
-    waitUntilAppIsNotBusy()
-    return this
-  },
-  renameRichNotePropertyKey(oldKey: string, newKey: string) {
-    this.switchToRichContent()
-    findNoteContentRegion().within(() => {
-      cy.get(richNotePropertyRow(oldKey), { timeout: 15000 }).within(() => {
-        cy.get('[data-testid="rich-note-property-row-key-input"]')
-          .clear()
-          .type(newKey)
-          .blur()
       })
     })
     confirmPropertyMemoryTrackerChange()

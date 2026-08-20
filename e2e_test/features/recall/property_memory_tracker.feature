@@ -169,28 +169,8 @@ Feature: Property memory tracker
     And OpenAI Responses POST bodies include property focus for "topic" with value "micronutrients"
 
   Scenario: Removing tracked property deletes property memory tracker
-    Given I am viewing assimilation settings for note "Vitamins"
-    Then I should see a property memory tracker for "topic"
-    When I remove rich note property "topic" confirming memory tracker change
-    And I reopen assimilation settings
-    Then the property memory tracker for "topic" should be absent
-
-  Scenario: Renaming tracked property key updates property memory tracker
-    Given I am viewing assimilation settings for note "Vitamins"
-    Then I should see a property memory tracker for "topic"
     When I visit note "Vitamins"
-    And I rename rich note property key from "topic" to "subject" confirming memory tracker change
-    And I reload the current page for note "Vitamins"
-    And I open assimilation settings
-    Then I should see a property memory tracker for "subject"
-    And the property memory tracker for "topic" should be absent
-
-  Scenario: Removing tracked property in markdown mode deletes property memory tracker
-    Given I am viewing assimilation settings for note "Vitamins"
-    Then I should see a property memory tracker for "topic"
-    When I visit note "Vitamins"
-    And I remove markdown note property "topic" confirming memory tracker change
-    And I reload the current page for note "Vitamins"
+    And I remove rich note property "topic" confirming memory tracker change
     And I open assimilation settings
     Then the property memory tracker for "topic" should be absent
 

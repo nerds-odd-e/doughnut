@@ -62,11 +62,6 @@ export function assimilationRefinementLayoutExpectations() {
       removeRefinementLayoutButton().should('be.disabled')
       return this
     },
-    extractLayoutItemsToNewNote(...layoutItemTexts: string[]) {
-      this.openExtractionPreviewForLayoutItems(...layoutItemTexts)
-      this.createNoteFromExtractionPreview()
-      return this
-    },
     selectRefinementLayoutItems(...layoutItemTexts: string[]) {
       showRefinementLayout.call(this)
       layoutItemTexts.forEach((layoutItemText) => {
@@ -81,39 +76,6 @@ export function assimilationRefinementLayoutExpectations() {
       })
       waitForExtractNotePreview()
       extractionPreviewPanel().should('be.visible')
-      return this
-    },
-    exportExtractRequestForLayoutItems(...layoutItemTexts: string[]) {
-      this.selectRefinementLayoutItems(...layoutItemTexts)
-      refinementLayoutPanel()
-        .find('[data-test-id="export-extract-request"]')
-        .click()
-      return this
-    },
-    exportBreakdownRequest() {
-      showRefinementLayout.call(this)
-      refinementLayoutPanel()
-        .find('[data-test-id="export-breakdown-request"]')
-        .click()
-      return this
-    },
-    expectExportRequestDialogShowsAiRequestJson() {
-      cy.get('[data-testid="export-textarea"]').should(($textarea) => {
-        const content = ($textarea.val() as string).trim()
-        expect(
-          content,
-          `Expected export dialog to show AI request JSON, but found: ${content}`
-        ).to.not.equal('')
-        expect(
-          content,
-          `Expected export dialog JSON to start with "{", but found: ${content}`
-        ).to.match(/^\{/)
-        const json = JSON.parse(content) as Record<string, unknown>
-        expect(
-          json,
-          `Expected export JSON to include "model" and "instructions" keys, but found: ${content}`
-        ).to.include.all.keys('model', 'instructions')
-      })
       return this
     },
     editExtractionPreviewFields(fields: ExtractionPreviewFields) {
@@ -131,18 +93,6 @@ export function assimilationRefinementLayoutExpectations() {
           .invoke('val', fields.updatedOriginalNoteContent)
           .trigger('input')
       })
-      return this
-    },
-    clearExtractionPreviewNewNoteTitle() {
-      extractionPreviewPanel().within(() => {
-        cy.get('[data-test-id="extraction-preview-new-title"]').clear()
-      })
-      return this
-    },
-    expectCannotCreateNoteFromExtractionPreview() {
-      extractionPreviewPanel()
-        .find('[data-test-id="extraction-preview-create"]')
-        .should('be.disabled')
       return this
     },
     expectExtractionPreviewShowsOriginalContent(content: string) {

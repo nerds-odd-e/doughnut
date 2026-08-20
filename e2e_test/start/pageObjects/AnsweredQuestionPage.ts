@@ -7,7 +7,6 @@ import {
   expectOverlapTryAgainAlert,
   openResolveAndClickMatchedNoteCta,
 } from './answeredQuestionAccidentalMatch'
-import { answeredQuestionRefineMethods } from './answeredQuestionRefine'
 import { assumeMemoryTrackerPage } from './memoryTrackerPage'
 
 const addWikiLinkOrRelationshipLabel = 'Add wiki link or relationship'
@@ -16,12 +15,6 @@ const assumeAnsweredQuestionPage = () => {
   cy.get('body').should('be.visible')
 
   const self = {
-    expectMCQAnswerToBeCorrect() {
-      cy.get('[data-test="question-section"]').within(() => {
-        cy.get('.is-correct.is-selected').should('exist')
-      })
-      return self
-    },
     expectSpellingAnswerToBeCorrect() {
       cy.findByText('Correct!').should('exist')
       return self
@@ -213,7 +206,7 @@ const assumeAnsweredQuestionPage = () => {
       return self
     },
   }
-  return Object.assign(self, answeredQuestionRefineMethods(self))
+  return self
 }
 
 export { assumeAnsweredQuestionPage }

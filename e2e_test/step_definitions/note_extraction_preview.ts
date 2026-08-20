@@ -6,30 +6,10 @@ import { Then, When } from '@badeball/cypress-cucumber-preprocessor'
 import start from '../start'
 
 When(
-  'I extract refinement layout items {string} and {string} to a new note',
-  (firstItem: string, secondItem: string) => {
-    start
-      .assumeAssimilationPage()
-      .extractLayoutItemsToNewNote(firstItem, secondItem)
-  }
-)
-
-When(
   'I open extraction preview for refinement layout items {string} and {string}',
   (firstItem: string, secondItem: string) => {
     start
       .assumeAssimilationPage()
-      .openExtractionPreviewForLayoutItems(firstItem, secondItem)
-  }
-)
-
-When(
-  'I open extraction preview on note {string} for refinement layout items {string} and {string}',
-  (noteTitle: string, firstItem: string, secondItem: string) => {
-    start
-      .jumpToNotePage(noteTitle)
-      .moreOptions()
-      .openAssimilationSettings()
       .openExtractionPreviewForLayoutItems(firstItem, secondItem)
   }
 )
@@ -56,14 +36,6 @@ When(
     })
   }
 )
-
-When('I clear the extraction preview new note title', () => {
-  start.assumeAssimilationPage().clearExtractionPreviewNewNoteTitle()
-})
-
-Then('I cannot create a note from the extraction preview', () => {
-  start.assumeAssimilationPage().expectCannotCreateNoteFromExtractionPreview()
-})
 
 Then(
   'the extraction preview should show original content {string}',

@@ -31,8 +31,9 @@ export const noteConversationAndQuestionMethods = () => ({
   addQuestion(row: Record<string, string>) {
     this.openQuestionList().addQuestionPage().addQuestion(row)
   },
-  refineQuestion(row: Record<string, string>) {
-    this.openQuestionList().addQuestionPage().refineQuestion(row)
+  refineQuestionInForm(row: Record<string, string>) {
+    addQuestionPage().refineQuestion(row)
+    return this
   },
   expectQuestionInForm(expected: Record<string, string>) {
     addQuestionPage().expectQuestionInForm(expected)

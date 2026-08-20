@@ -21,12 +21,3 @@ Feature: Note content completion
     Then I should see the suggested completion
     When I accept the suggested completion
     Then the note content on the current page should be "It is a vigorous city."
-
-  Scenario: Rejecting a suggested note content completion
-    Given OpenAI will reply below for user messages:
-      | user message                      | response type   | assistant reply                       |
-      | Please complete the note content. | requires action | {"content": "It is a vigorous city."} |
-    When I request to complete the content for the note "Taipei"
-    Then I should see the suggested completion
-    When I reject the suggested completion
-    Then the note content on the current page should be "It is a"

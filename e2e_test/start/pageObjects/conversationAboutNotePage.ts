@@ -47,7 +47,7 @@ function exportMessagesFromJson(json: Record<string, unknown>): Array<{
 
 export class ConversationAboutNotePage {
   replyToConversationAndInviteAiToReply(msg: string) {
-    cy.focused().type(msg)
+    cy.focused().type(msg, { delay: 0 })
     cy.findByRole('button', {
       name: 'Send message and invite AI to reply',
     }).click()
@@ -91,14 +91,6 @@ export class ConversationAboutNotePage {
   acceptCompletion() {
     cy.findByRole('dialog').within(() => {
       cy.findByRole('button', { name: 'Accept' }).click()
-    })
-    waitUntilAppIsNotBusy()
-    return this
-  }
-
-  cancelCompletion() {
-    cy.findByRole('dialog').within(() => {
-      cy.findByRole('button', { name: 'Cancel' }).click()
     })
     waitUntilAppIsNotBusy()
     return this

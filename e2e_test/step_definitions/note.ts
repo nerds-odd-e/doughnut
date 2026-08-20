@@ -34,15 +34,10 @@ When(
   }
 )
 
-When(
-  'I refine the following question for the note {string}:',
-  (noteTopology: string, data: DataTable) => {
-    expect(data.hashes().length, 'please add one question at a time.').to.equal(
-      1
-    )
-    start.jumpToNotePage(noteTopology, true).refineQuestion(data.hashes()[0]!)
-  }
-)
+When('I refine the question in the form:', (data: DataTable) => {
+  expect(data.hashes().length, 'please add one question at a time.').to.equal(1)
+  start.assumeNotePage().refineQuestionInForm(data.hashes()[0]!)
+})
 
 When('I type {string} in the title', (content: string) => {
   cy.focused().clear().type(content)
@@ -71,7 +66,6 @@ When(
       .replyToConversationAndInviteAiToReply(
         'Please complete the note content.'
       )
-    start.waitUntilAppIsNotBusy()
   }
 )
 
@@ -103,7 +97,7 @@ Then(
 
 When('I generate a question with AI for note {string}', (noteName: string) => {
   start
-    .jumpToNotePage(noteName, true)
+    .jumpToNotePage(noteName)
     .openQuestionList()
     .addQuestionPage()
     .generateQuestionWithAI()
