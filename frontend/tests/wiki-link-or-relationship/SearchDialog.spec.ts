@@ -9,15 +9,17 @@ import MakeMe from "doughnut-test-fixtures/makeMe"
 import helper, { mockSdkService } from "@tests/helpers"
 import { dispatchArrowKey } from "@tests/helpers/searchDialogKeyboardTestSupport"
 import { advanceSearchDebounce } from "@tests/helpers/searchDebounceTestSupport"
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
+import { describe, expect, it } from "vitest"
 import {
   allSearchResultItems,
   makeNoteHit,
   renderSearchForm,
+  setupSearchDialogFakeTimers,
   setupSearchDialogTests,
   titleEl,
   typeInSearch,
 } from "./searchDialogTestSupport"
+import { deadWikiLinkPayload } from "./searchDialogDeadWikiLinkTestSupport"
 
 const searchInputId = "searchTerm-searchKey"
 
@@ -25,14 +27,7 @@ describe("SearchForm", () => {
   setupSearchDialogTests()
 
   describe("Matches / Recent list mode", () => {
-    beforeEach(() => {
-      vi.useFakeTimers()
-    })
-
-    afterEach(() => {
-      vi.runOnlyPendingTimers()
-      vi.useRealTimers()
-    })
+    setupSearchDialogFakeTimers()
 
     it("keeps search key and switches between Matches and Recent", async () => {
       const note = MakeMe.aNote.please()
@@ -69,25 +64,30 @@ describe("SearchForm", () => {
       expect(searchInput).toHaveValue("Sed")
     })
 
-    it("allows switching to Recent when search is prefilled from a dead link", async () => {
+    it("prefills dead-link display text, auto-searches, and can switch to Recent", async () => {
       const note = MakeMe.aNote.please()
       mockSdkService(NoteController, "getRecentNotes", [
         MakeMe.aNoteSearchResult.title("Recent Note").please(),
       ])
-      mockSdkService(SearchController, "searchForRelationshipTargetWithin", [
-        makeNoteHit("Selected Note", note.noteTopology.id + 100),
-      ])
+      const searchSpy = mockSdkService(
+        SearchController,
+        "searchForRelationshipTargetWithin",
+        [makeNoteHit("Selected Note", note.noteTopology.id + 100)]
+      )
 
       const searchInput = await renderSearchForm({
         note,
-        deadWikiLinkPayload: {
-          targetToken: "original text",
-          displayText: "original text",
-        },
+        deadWikiLinkPayload,
       })
       expect(searchInput).toHaveValue("original text")
       await advanceSearchDebounce()
       expect(screen.getByText("Selected Note")).toBeInTheDocument()
+      expect(searchSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          path: { note: note.id },
+          body: expect.objectContaining({ searchKey: "original text" }),
+        })
+      )
 
       fireEvent.click(screen.getByTestId("search-list-mode-recent"))
       await flushPromises()

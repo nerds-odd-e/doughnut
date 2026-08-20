@@ -7,37 +7,38 @@ import { fireEvent, screen } from "@testing-library/vue"
 import { flushPromises } from "@vue/test-utils"
 import MakeMe from "doughnut-test-fixtures/makeMe"
 import { mockSdkService, wrapSdkError } from "@tests/helpers"
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
+import { describe, expect, it } from "vitest"
 import {
   confirmMovePopup,
   makeNotebookHit,
   renderSearchForm,
   searchAndClickMoveUnder,
+  setupSearchDialogFakeTimers,
   setupSearchDialogTests,
   typeInSearch,
 } from "./searchDialogTestSupport"
 
 describe("SearchForm actions", () => {
   setupSearchDialogTests()
-
-  beforeEach(() => {
-    vi.useFakeTimers()
-  })
-
-  afterEach(() => {
-    vi.runOnlyPendingTimers()
-    vi.useRealTimers()
-  })
+  setupSearchDialogFakeTimers()
 
   describe("Move Under folder hit", () => {
     const targetFolderId = 42
 
-    it("calls moveNoteToFolder with folder id after confirm", async () => {
+    it("calls moveNoteToFolder with folder id; soft-deleted title conflict shows rename confirm", async () => {
       const note = MakeMe.aNote.please()
+      const conflictMessage =
+        "A note with this title already exists here but was deleted."
       const moveNoteToFolderSpy = mockSdkService(
         RelationController,
         "moveNoteToFolder",
         []
+      ).mockResolvedValue(
+        wrapSdkError({
+          status: 409,
+          errorType: "SOFT_DELETED_TITLE_CONFLICT",
+          message: conflictMessage,
+        })
       )
 
       await searchAndClickMoveUnder(note, targetFolderId)
@@ -52,26 +53,6 @@ describe("SearchForm actions", () => {
           targetFolder: targetFolderId,
         },
       })
-    })
-
-    it("shows confirm when move is blocked by soft-deleted title at destination", async () => {
-      const note = MakeMe.aNote.please()
-      const conflictMessage =
-        "A note with this title already exists here but was deleted."
-      mockSdkService(
-        RelationController,
-        "moveNoteToFolder",
-        []
-      ).mockResolvedValue(
-        wrapSdkError({
-          status: 409,
-          errorType: "SOFT_DELETED_TITLE_CONFLICT",
-          message: conflictMessage,
-        })
-      )
-
-      await searchAndClickMoveUnder(note, targetFolderId)
-      await confirmMovePopup()
 
       const conflictPopup = usePopups().popups.peek()?.[0]
       expect(conflictPopup?.type).toBe("confirm")

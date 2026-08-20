@@ -17,15 +17,10 @@ import {
 import { searchResultItemTestId } from "@/utils/searchDialogKeyboard"
 import { testIdSelector } from "@tests/helpers/searchDialogKeyboardTestSupport"
 import { advanceSearchDebounce } from "@tests/helpers/searchDebounceTestSupport"
-import { beforeEach, expect, vi } from "vitest"
+import { afterEach, beforeEach, expect, vi } from "vitest"
 import { defineComponent } from "vue"
 
 export const searchResultItemSelector = testIdSelector(searchResultItemTestId)
-
-export const deadWikiLinkPayload = {
-  targetToken: "original text",
-  displayText: "original text",
-} as const
 
 export function allSearchResultItems(): Element[] {
   return Array.from(document.querySelectorAll(searchResultItemSelector))
@@ -167,5 +162,15 @@ export function setupSearchDialogTests() {
     vi.clearAllMocks()
     clearSearchKeyHistoryCookie()
     setupSearchFormSdkMocks()
+  })
+}
+
+export function setupSearchDialogFakeTimers() {
+  beforeEach(() => {
+    vi.useFakeTimers()
+  })
+  afterEach(() => {
+    vi.runOnlyPendingTimers()
+    vi.useRealTimers()
   })
 }

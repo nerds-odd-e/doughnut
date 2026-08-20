@@ -318,47 +318,19 @@ Status: done
 
 ### Optimize remaining RichMarkdownEditor property specs
 Type: Structure
-Status: planned
+Status: done
 
-**Tests (remaining slow cases in these files):**
-- `tests/components/form/RichMarkdownEditor.properties.spec.ts`
-- `tests/components/form/RichMarkdownEditor.overlapsProperty.spec.ts`
-- `tests/components/form/RichMarkdownEditor.aliasesProperty.spec.ts`
-- `tests/components/form/RichMarkdownEditor.propertyValuePopup.spec.ts`
-- `tests/components/form/RichMarkdownEditor.propertyValuePopupReorder.spec.ts`
-- `tests/components/form/RichMarkdownEditor.propertyKeyPresets.spec.ts`
-- `tests/components/form/RichMarkdownEditor.propertyKeyPresets.listAppend.spec.ts`
-- `tests/components/form/RichMarkdownEditor.propertyTouchFocus.spec.ts`
+**Done:** Merged properties/overlaps/aliases/popup/reorder/listAppend/touchFocus; ~48→31 tests.
 
-**Goals:** Merge/delete redundant property-editor scenarios; hoist shared mount; fake timers / flushPromises. Skip already-optimized modeSwitch / propertyRelationImageIndex.
-
-**Verify:**
-```bash
-pnpm frontend:test tests/components/form/RichMarkdownEditor.properties.spec.ts tests/components/form/RichMarkdownEditor.overlapsProperty.spec.ts tests/components/form/RichMarkdownEditor.aliasesProperty.spec.ts tests/components/form/RichMarkdownEditor.propertyValuePopup.spec.ts tests/components/form/RichMarkdownEditor.propertyValuePopupReorder.spec.ts tests/components/form/RichMarkdownEditor.propertyKeyPresets.spec.ts tests/components/form/RichMarkdownEditor.propertyKeyPresets.listAppend.spec.ts tests/components/form/RichMarkdownEditor.propertyTouchFocus.spec.ts
-```
 
 ---
 
 ### Optimize remaining NoteRefinement specs
 Type: Structure
-Status: planned
+Status: done
 
-**Tests:**
-- `tests/components/recall/NoteRefinement.layoutSelection.spec.ts`
-- `tests/components/recall/NoteRefinement.removeLayout.spec.ts`
-- `tests/components/recall/NoteRefinement.extractNote.create.spec.ts`
-- `tests/components/recall/NoteRefinement.extractNote.loading.spec.ts`
-- `tests/components/recall/NoteRefinement.extractionPreview.cancel.spec.ts`
-- `tests/components/recall/NoteRefinement.extractionPreview.cancel.edges.spec.ts`
-- `tests/components/recall/NoteRefinement.exportExtractRequest.spec.ts`
-- `tests/components/recall/RefineNoteModal.extractNote.close.spec.ts`
+**Done:** Merged loading/create/remove/layout/export/cancel.edges remounts; 19 tests green.
 
-**Goals:** Merge remounts/loading cases; share fixtures with existing noteRefinement*TestSupport.
-
-**Verify:**
-```bash
-pnpm frontend:test tests/components/recall/NoteRefinement.layoutSelection.spec.ts tests/components/recall/NoteRefinement.removeLayout.spec.ts tests/components/recall/NoteRefinement.extractNote.create.spec.ts tests/components/recall/NoteRefinement.extractNote.loading.spec.ts tests/components/recall/NoteRefinement.extractionPreview.cancel.spec.ts tests/components/recall/NoteRefinement.extractionPreview.cancel.edges.spec.ts tests/components/recall/NoteRefinement.exportExtractRequest.spec.ts tests/components/recall/RefineNoteModal.extractNote.close.spec.ts
-```
 
 ---
 
@@ -411,21 +383,10 @@ pnpm frontend:test tests/notes/WikidataAssociationDialog.titleActions.spec.ts te
 
 ### Optimize SearchDialog / wiki-link remainder
 Type: Structure
-Status: planned
+Status: done
 
-**Tests:**
-- `tests/wiki-link-or-relationship/SearchDialog.actions.spec.ts`
-- `tests/wiki-link-or-relationship/SearchDialog.deadWikiLink.spec.ts`
-- `tests/wiki-link-or-relationship/SearchDialog.searchKeyHistory.spec.ts`
-- `tests/wiki-link-or-relationship/SearchDialog.spec.ts`
-- `tests/wiki-link-or-relationship/InsertWikiLink.spec.ts`
+**Done:** Merged deadWikiLink variants, actions Move Under, searchKeyHistory; 18 tests green.
 
-**Goals:** Merge dead-link spelling variants; hoist search setup; drop paths covered by InsertWikiLink.
-
-**Verify:**
-```bash
-pnpm frontend:test tests/wiki-link-or-relationship/SearchDialog.actions.spec.ts tests/wiki-link-or-relationship/SearchDialog.deadWikiLink.spec.ts tests/wiki-link-or-relationship/SearchDialog.searchKeyHistory.spec.ts tests/wiki-link-or-relationship/SearchDialog.spec.ts tests/wiki-link-or-relationship/InsertWikiLink.spec.ts
-```
 
 ---
 
