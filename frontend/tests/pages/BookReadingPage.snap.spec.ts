@@ -59,7 +59,7 @@ describe("BookReadingPage snap", () => {
     snapHoldActivateMock.fn.mockClear()
   })
 
-  it("snaps back and keeps panel visible on first boundary crossing (same-page: scrolls to block start)", async () => {
+  it("snaps back on first boundary crossing and when landing two+ blocks ahead", async () => {
     const wrapper = await mountFirstBlockBboxScenario({
       contentFitsInViewport: true,
     })
@@ -74,13 +74,10 @@ describe("BookReadingPage snap", () => {
     expect(snapHoldActivateMock.fn).toHaveBeenCalledWith(500)
     expect(snapToBottomSpy).not.toHaveBeenCalled()
     expect(readingControlPanel(wrapper).exists()).toBe(true)
-  })
 
-  it("snaps back when scrolling lands two or more blocks ahead (not just immediate successor)", async () => {
-    const wrapper = await mountFirstBlockBboxScenario({
-      contentFitsInViewport: true,
-    })
-
+    snapHoldActivateMock.fn.mockClear()
+    await expireSnapHold()
+    await clickBookBlockAndExpectSelection(wrapper, "Section 1")
     await selectSection1WithVisibleGeometry(wrapper)
     await emitSuccessorCrossing(wrapper, { mid: 600, bottom: 1000 })
 

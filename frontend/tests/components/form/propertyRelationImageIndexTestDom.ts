@@ -20,25 +20,6 @@ export async function openRelationDialog(editorRoot: ParentNode) {
   await flushPromises()
 }
 
-export function customRelationRadioEl(
-  dialogRoot: ParentNode = document
-): HTMLInputElement {
-  const el = dialogRoot.querySelector(
-    `input[value="${CUSTOM_RELATION_RADIO_SENTINEL}"]`
-  ) as HTMLInputElement | null
-  expect(el).not.toBeNull()
-  return el!
-}
-
-export async function selectCustomRelationRadio(
-  dialogRoot: ParentNode = document
-) {
-  const radio = customRelationRadioEl(dialogRoot)
-  radio.checked = true
-  radio.dispatchEvent(new Event("change", { bubbles: true }))
-  await flushPromises()
-}
-
 export function customRelationTextInputEl(
   dialogRoot: ParentNode = document
 ): HTMLInputElement {

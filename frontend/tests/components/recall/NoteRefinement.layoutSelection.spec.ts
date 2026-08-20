@@ -22,10 +22,15 @@ import {
 setupNoteRefinementTests()
 
 describe("NoteRefinement layout selection", () => {
-  it("cascades parent selection and indeterminate state to children", async () => {
+  it("cascades parent selection and marks already extracted items without disabling", async () => {
     const wrapper = await mountNoteRefinementWithLayoutReady(
       sampleNestedLayout()
     )
+
+    expect(
+      wrapper.find('[data-test-id="refinement-layout-item-p1-2"]').text()
+    ).toContain("Already extracted")
+    expect(layoutCheckbox(wrapper, "p1-2").disabled).toBe(false)
 
     await selectRefinementLayoutItem(wrapper, "p1")
 
@@ -41,50 +46,20 @@ describe("NoteRefinement layout selection", () => {
     expect(layoutCheckbox(wrapper, "p1-2").checked).toBe(false)
   })
 
-  it("marks already extracted refinement layout items clearly without disabling selection", async () => {
-    const wrapper = await mountNoteRefinementWithLayoutReady(
-      sampleNestedLayout()
-    )
+  it("submits only checked descendants when parent is indeterminate for remove", async () => {
+    const spy = mockSdkService(AiController, "removeRefinementSuggestion", {
+      content: "Updated content",
+    })
+    const { layout, wrapper } =
+      await mountNestedLayoutWithIndeterminateParentSelection()
+    await clickRemoveRefinementLayout(wrapper)
 
-    const alreadyExtractedItem = wrapper.find(
-      '[data-test-id="refinement-layout-item-p1-2"]'
+    expect(spy).toHaveBeenCalledWith(
+      refinementLayoutSelectionApiCall(note.id, layout, ["p1-1"])
     )
-
-    expect(alreadyExtractedItem.text()).toContain("Already extracted")
-    expect(layoutCheckbox(wrapper, "p1-2").disabled).toBe(false)
   })
 
-  it.each([
-    {
-      action: "extract",
-      method: "extractNotePreview" as const,
-      response: sampleExtractionPreview(),
-      trigger: clickExtractRefinementLayout,
-    },
-    {
-      action: "remove",
-      method: "removeRefinementSuggestion" as const,
-      response: { content: "Updated content" },
-      trigger: clickRemoveRefinementLayout,
-    },
-  ])(
-    "submits only checked descendants when parent is indeterminate ($action)",
-    async ({ method, response, trigger }) => {
-      const spy = mockSdkService(AiController, method, response)
-      const { layout, wrapper } =
-        await mountNestedLayoutWithIndeterminateParentSelection()
-      await trigger(wrapper)
-      await flushPromises()
-
-      expect(spy).toHaveBeenCalledWith(
-        refinementLayoutSelectionApiCall(note.id, layout, ["p1-1"], {
-          signal: method === "extractNotePreview",
-        })
-      )
-    }
-  )
-
-  it("includes parent id when all descendants are selected again", async () => {
+  it("submits checked descendants then parent id when all descendants are selected again", async () => {
     const extractNotePreviewSpy = mockSdkService(
       AiController,
       "extractNotePreview",
@@ -92,6 +67,18 @@ describe("NoteRefinement layout selection", () => {
     )
     const { layout, wrapper } =
       await mountNestedLayoutWithIndeterminateParentSelection()
+    await clickExtractRefinementLayout(wrapper)
+    await flushPromises()
+    expect(extractNotePreviewSpy).toHaveBeenCalledWith(
+      refinementLayoutSelectionApiCall(note.id, layout, ["p1-1"], {
+        signal: true,
+      })
+    )
+
+    await wrapper
+      .find('[data-test-id="extraction-preview-back"]')
+      .trigger("click")
+    await flushPromises()
     await selectRefinementLayoutItem(wrapper, "p1-2", true)
     await clickExtractRefinementLayout(wrapper)
     await flushPromises()
@@ -127,29 +114,27 @@ describe("NoteRefinement layout selection", () => {
     )
   })
 
-  it("preselects ledToQuestion items when question context is provided", async () => {
-    const layout = refinementLayoutItems(
-      ["Question-led point", "Other point"],
-      { ledToQuestion: [true, false] }
+  it("preselects ledToQuestion items only when question context is provided", async () => {
+    const withContext = await mountNoteRefinementWithLayoutReady(
+      refinementLayoutItems(["Question-led point", "Other point"], {
+        ledToQuestion: [true, false],
+      }),
+      {
+        questionContext: {
+          stem: "What is the capital?",
+          choices: ["Paris", "London"],
+          correctAnswerIndex: 0,
+        },
+      }
     )
-    const wrapper = await mountNoteRefinementWithLayoutReady(layout, {
-      questionContext: {
-        stem: "What is the capital?",
-        choices: ["Paris", "London"],
-        correctAnswerIndex: 0,
-      },
-    })
+    expect(layoutCheckbox(withContext, "p1").checked).toBe(true)
+    expect(layoutCheckbox(withContext, "p2").checked).toBe(false)
 
-    expect(layoutCheckbox(wrapper, "p1").checked).toBe(true)
-    expect(layoutCheckbox(wrapper, "p2").checked).toBe(false)
-  })
-
-  it("starts with empty selection when no question context", async () => {
-    const layout = refinementLayoutItems(["Flagged without context"], {
-      ledToQuestion: [true],
-    })
-    const wrapper = await mountNoteRefinementWithLayoutReady(layout)
-
-    expect(layoutCheckbox(wrapper, "p1").checked).toBe(false)
+    const withoutContext = await mountNoteRefinementWithLayoutReady(
+      refinementLayoutItems(["Flagged without context"], {
+        ledToQuestion: [true],
+      })
+    )
+    expect(layoutCheckbox(withoutContext, "p1").checked).toBe(false)
   })
 })

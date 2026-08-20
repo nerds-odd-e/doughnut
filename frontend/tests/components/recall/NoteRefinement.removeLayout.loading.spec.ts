@@ -9,7 +9,7 @@ import {
 } from "./noteRefinementLayoutLoadingTestSupport"
 import { clickRemoveRefinementLayout } from "./noteRefinementRemoveTestSupport"
 import {
-  mountNoteRefinementReady,
+  mountNoteRefinementWithFirstItemSelected,
   refinementLayoutItems,
   selectFirstLayoutItem,
   setupNoteRefinementTests,
@@ -18,13 +18,9 @@ import {
 setupNoteRefinementTests()
 
 describe("NoteRefinement remove layout loading modal", () => {
-  async function mountReadyForRemove() {
-    const wrapper = await mountNoteRefinementReady(["Point 1", "Point 2"])
-    await selectFirstLayoutItem(wrapper)
-    return wrapper
-  }
-
   it("shows LoadingModal while removing refinement layout items and hides on success or failure", async () => {
+    const wrapper = await mountNoteRefinementWithFirstItemSelected(["Point 1"])
+
     const successGate = createDeferredGate()
     mockSdkServiceWithImplementation(
       AiController,
@@ -34,8 +30,7 @@ describe("NoteRefinement remove layout loading modal", () => {
         return { content: "Updated content" }
       }
     )
-    const successWrapper = await mountReadyForRemove()
-    await clickRemoveRefinementLayout(successWrapper)
+    await clickRemoveRefinementLayout(wrapper)
 
     expect(loadingModalMask()).toBeTruthy()
     expect(document.body.textContent).toContain("AI is removing content...")
@@ -43,6 +38,7 @@ describe("NoteRefinement remove layout loading modal", () => {
     await flushPromises()
     expect(loadingModalMask()).toBeNull()
 
+    await selectFirstLayoutItem(wrapper)
     const failureGate = createDeferredGate()
     mockSdkServiceWithImplementation(
       AiController,
@@ -52,8 +48,7 @@ describe("NoteRefinement remove layout loading modal", () => {
         return wrapSdkError("API Error")
       }
     )
-    const failureWrapper = await mountReadyForRemove()
-    await clickRemoveRefinementLayout(failureWrapper)
+    await clickRemoveRefinementLayout(wrapper)
 
     expect(loadingModalMask()).toBeTruthy()
     failureGate.resolve()
@@ -63,7 +58,7 @@ describe("NoteRefinement remove layout loading modal", () => {
 
   it("keeps remove continuous blocker noncancelable while nested layout regenerates", async () => {
     const layoutGate = createDeferredGate()
-    const wrapper = await mountReadyForRemove()
+    const wrapper = await mountNoteRefinementWithFirstItemSelected(["Point 1"])
     mockSdkServiceWithImplementation(
       AiController,
       "generateRefinementSuggestions",

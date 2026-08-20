@@ -45,12 +45,15 @@ describe("Sidebar route navigation: sticky realm during uncached note load", () 
     return router
   }
 
-  it("keeps sidebar chrome when navigating to an uncached note in the same notebook", async () => {
+  it("keeps sidebar chrome for an uncached same-notebook note, then clears active on leave", async () => {
     const uncachedNote = uncachedNoteInSameNotebook(
       fixtures.topNoteRealm.notebookRealm,
       "uncached"
     )
     stubShowNotePending()
+    mockSdkServiceWithImplementation(NotebookController, "get", () =>
+      neverResolving()
+    )
 
     const router = await mountLayoutAtNote(fixtures.firstGeneration.id)
     const activeTitle = fixtures.firstGeneration.note.noteTopology.title
@@ -63,18 +66,6 @@ describe("Sidebar route navigation: sticky realm during uncached note load", () 
 
     expect(sidebarShowsActiveItem(wrapper, activeTitle)).toBe(true)
     expect(wrapper.text()).toContain(notebookName)
-  })
-
-  it("clears the active note when leaving the noteShow route", async () => {
-    stubShowNotePending()
-    mockSdkServiceWithImplementation(NotebookController, "get", () =>
-      neverResolving()
-    )
-
-    const router = await mountLayoutAtNote(fixtures.firstGeneration.id)
-    const activeTitle = fixtures.firstGeneration.note.noteTopology.title
-
-    expect(sidebarShowsActiveItem(wrapper, activeTitle)).toBe(true)
 
     await router.push({
       name: "notebookPage",

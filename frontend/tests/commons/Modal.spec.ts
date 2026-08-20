@@ -10,7 +10,6 @@ import {
   mountDefaultModal,
   mountModal,
   settleModalAutofocus,
-  waitForActiveElementId,
   waitForDialog,
   waitForDialogCount,
   waitForTopAlignedDialog,
@@ -22,6 +21,7 @@ describe("Modal", () => {
   afterEach(() => {
     wrapper?.unmount()
     document.body.innerHTML = ""
+    vi.useRealTimers()
   })
 
   it("adds top alignment class when content requests stable modal top", async () => {
@@ -80,7 +80,9 @@ describe("Modal", () => {
     expect(wrapper.emitted("close_request")).toHaveLength(1)
   })
 
-  it("focuses the explicit autofocus target after opening the dialog", async () => {
+  it("focuses autofocus target and prefers text controls in a marked autofocus container", async () => {
+    vi.useFakeTimers({ toFake: ["requestAnimationFrame"] })
+
     wrapper = mountModal(`
       <Modal @close_request="$emit('close_request')">
         <template #body>
@@ -89,12 +91,10 @@ describe("Modal", () => {
         </template>
       </Modal>
     `)
-
     await settleModalAutofocus()
     expect(document.activeElement?.id).toBe("target-input")
-  })
+    wrapper.unmount()
 
-  it("prefers text controls inside a marked autofocus container", async () => {
     wrapper = mountModal(`
       <Modal @close_request="$emit('close_request')">
         <template #body>
@@ -105,9 +105,7 @@ describe("Modal", () => {
         </template>
       </Modal>
     `)
-
     await settleModalAutofocus()
-    await waitForActiveElementId("search-input")
     expect(document.activeElement?.id).toBe("search-input")
   })
 

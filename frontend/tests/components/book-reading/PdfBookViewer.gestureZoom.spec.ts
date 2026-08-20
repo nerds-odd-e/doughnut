@@ -2,7 +2,6 @@ import { describe, expect, it } from "vitest"
 import {
   dispatchPinchZoom,
   dispatchWheelOnViewer,
-  flushAnimationFrame,
   mountGestureZoomViewerReady,
   setupPdfBookViewerGestureZoomTests,
 } from "./pdfBookViewerGestureZoomTestSupport"
@@ -10,30 +9,25 @@ import {
 describe("PdfBookViewer gesture zoom (mocked pdf.js)", () => {
   setupPdfBookViewerGestureZoomTests()
 
-  it.each([
-    { modifier: "ctrl", ctrlKey: true, metaKey: false },
-    { modifier: "meta", ctrlKey: false, metaKey: true },
-  ])(
-    "$modifier+wheel on the viewer prevents default and updates pdf scale",
-    async ({ ctrlKey, metaKey }) => {
-      const { wrapper, host, container, viewer } =
-        await mountGestureZoomViewerReady()
-      expect(viewer).not.toBeNull()
-      const baseline = viewer!.currentScale
+  it("ctrl or meta+wheel on the viewer prevents default and updates pdf scale", async () => {
+    const { wrapper, host, container, viewer } =
+      await mountGestureZoomViewerReady()
+    expect(viewer).not.toBeNull()
 
-      const { ev, notCanceled } = dispatchWheelOnViewer(container, host, {
-        ctrlKey,
-        metaKey,
-      })
+    for (const keys of [
+      { ctrlKey: true, metaKey: false },
+      { ctrlKey: false, metaKey: true },
+    ] as const) {
+      const baseline = viewer!.currentScale
+      const { ev, notCanceled } = dispatchWheelOnViewer(container, host, keys)
 
       expect(ev.defaultPrevented).toBe(true)
       expect(notCanceled).toBe(false)
-      await flushAnimationFrame()
       expect(viewer!.currentScale).toBeGreaterThan(baseline)
-
-      wrapper.unmount()
     }
-  )
+
+    wrapper.unmount()
+  })
 
   it("wheel without ctrl/meta does not cancel (no browser-zoom block path)", async () => {
     const { wrapper, host, container, viewer } =

@@ -4,7 +4,7 @@ import helper, { mockSdkService } from "@tests/helpers"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
 import makeMe from "doughnut-test-fixtures/makeMe"
 import type { ComponentPublicInstance } from "vue"
-import { afterEach } from "vitest"
+import { afterEach, vi } from "vitest"
 import { h, nextTick } from "vue"
 
 export let wrapper: VueWrapper<ComponentPublicInstance>
@@ -68,10 +68,25 @@ export function contentSlotTextarea() {
 
 /** Matches `scheduleReferencedTitleBlurDiscardCheck` double-rAF timing. */
 export async function flushReferencedTitleBlurDiscardCheck() {
-  await new Promise<void>((resolve) =>
-    requestAnimationFrame(() => requestAnimationFrame(() => resolve()))
-  )
+  if (vi.isFakeTimers()) {
+    await vi.advanceTimersToNextFrame()
+    await vi.advanceTimersToNextFrame()
+  } else {
+    await new Promise<void>((resolve) =>
+      requestAnimationFrame(() => requestAnimationFrame(() => resolve()))
+    )
+  }
   await nextTick()
+}
+
+/** Fake only rAF so blur-discard double-rAF checks stay deterministic. */
+export async function withFakeRequestAnimationFrame(run: () => Promise<void>) {
+  vi.useFakeTimers({ toFake: ["requestAnimationFrame"] })
+  try {
+    await run()
+  } finally {
+    vi.useRealTimers()
+  }
 }
 
 export function mountReferencedTitle() {

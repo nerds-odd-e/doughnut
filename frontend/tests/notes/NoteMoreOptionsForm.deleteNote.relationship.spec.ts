@@ -55,11 +55,14 @@ describe("NoteMoreOptionsForm delete relationship note", () => {
     expect(loadingModalMask()).toBeNull()
   })
 
-  it("offers reduce-to-property when deleting a qualifying relationship note", async () => {
+  it("offers reduce-to-property using the current note after prop change without remount", async () => {
     deleteNoteSpy.mockResolvedValue(wrapSdkResponse([]))
-    const { relationRealm } = qualifyingRelationRealmForDelete()
-    seedRelationRealmWithInboundReferences(relationRealm)
-    const wrapper = await mountDeleteFormReady(relationRealm.note)
+    const { relationId, moonNote, relationNote } =
+      relationNotesForPropChangeTest()
+    const wrapper = await mountDeleteFormWithNotePropChange(
+      moonNote,
+      relationNote
+    )
 
     await clickDeleteNote(wrapper)
 
@@ -69,16 +72,18 @@ describe("NoteMoreOptionsForm delete relationship note", () => {
     expect(popup?.type).toBe("options")
     if (popup?.type !== "options") throw new Error("Expected options popup")
     expect(popup.message).toBe(
-      '"Note1.1.1" is a relationship. What should happen?'
+      `"${relationNote.noteTopology.title}" is a relationship. What should happen?`
     )
     expect(popup.options[0]?.label).toBe("Reduce to a property of the source")
-    expect(popup.options[1]?.label).toBe('Delete "Note1.1.1"')
+    expect(popup.options[1]?.label).toBe(
+      `Delete "${relationNote.noteTopology.title}"`
+    )
 
     usePopups().popups.done("REDUCE_TO_SOURCE_PROPERTY")
     await flushPromises()
 
     expect(deleteNoteSpy).toHaveBeenCalledWith({
-      path: { note: relationRealm.id },
+      path: { note: relationId },
       body: {
         referenceHandling: "REDUCE_TO_SOURCE_PROPERTY",
         sourcePropertyKey: "a part of",
@@ -104,36 +109,6 @@ describe("NoteMoreOptionsForm delete relationship note", () => {
 
     expect(deleteNoteSpy).toHaveBeenCalledWith({
       path: { note: relationRealm.id },
-      body: { referenceHandling: "LEAVE_DEAD_LINKS" },
-    })
-  })
-
-  it("uses the current note id when note prop changes without remount", async () => {
-    deleteNoteSpy.mockResolvedValue(wrapSdkResponse([]))
-    const { relationId, moonNote, relationNote } =
-      relationNotesForPropChangeTest()
-    const wrapper = await mountDeleteFormWithNotePropChange(
-      moonNote,
-      relationNote
-    )
-
-    await clickDeleteNote(wrapper)
-
-    const popups = usePopups().popups.peek()
-    expect(popups?.length).toBe(1)
-    expect(popups?.[0]?.type).toBe("options")
-    if (popups?.[0]?.type !== "options") {
-      throw new Error("Expected relationship delete options")
-    }
-    expect(popups[0].message).toBe(
-      `"${relationNote.noteTopology.title}" is a relationship. What should happen?`
-    )
-
-    usePopups().popups.done("LEAVE_DEAD_LINKS")
-    await flushPromises()
-
-    expect(deleteNoteSpy).toHaveBeenCalledWith({
-      path: { note: relationId },
       body: { referenceHandling: "LEAVE_DEAD_LINKS" },
     })
   })

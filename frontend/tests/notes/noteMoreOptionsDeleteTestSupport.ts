@@ -178,7 +178,6 @@ export async function mountDeleteFormWithNotePropChange(
   relationNote: Note
 ) {
   const wrapper = renderer.withProps({ note: moonNote }).mount()
-  await flushPromises()
   await wrapper.setProps({ note: relationNote })
   await flushPromises()
   return wrapper

@@ -45,17 +45,32 @@ export function layoutCheckbox(
     .element as HTMLInputElement
 }
 
+type LayoutCheckboxWrapper = {
+  find: (s: string) => { setValue: (v: boolean) => Promise<unknown> }
+}
+
+export async function selectRefinementLayoutItems(
+  wrapper: LayoutCheckboxWrapper,
+  ...selections: Array<string | { itemId: string; checked?: boolean }>
+) {
+  for (const selection of selections) {
+    const itemId =
+      typeof selection === "string" ? selection : selection.itemId
+    const checked =
+      typeof selection === "string" ? true : (selection.checked ?? true)
+    await wrapper
+      .find(`[data-test-id="refinement-layout-checkbox-${itemId}"]`)
+      .setValue(checked)
+  }
+  await flushPromises()
+}
+
 export async function selectRefinementLayoutItem(
-  wrapper: {
-    find: (s: string) => { setValue: (v: boolean) => Promise<unknown> }
-  },
+  wrapper: LayoutCheckboxWrapper,
   itemId: string,
   checked = true
 ) {
-  await wrapper
-    .find(`[data-test-id="refinement-layout-checkbox-${itemId}"]`)
-    .setValue(checked)
-  await flushPromises()
+  await selectRefinementLayoutItems(wrapper, { itemId, checked })
 }
 
 export function refinementActionButton(

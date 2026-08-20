@@ -14,7 +14,7 @@ describe("RichMarkdownEditor property value popup reorder", () => {
     h.cleanup()
   })
 
-  it("preserves reordered list items in composed YAML when saved from popup", async () => {
+  it("disables edge moves, reorders items including duplicates, and saves YAML order", async () => {
     const markdown = `---
 tags:
   - alpha
@@ -26,30 +26,39 @@ Body`
     const wrapper = await h.mountEditor(markdown, { attachToBody: true })
     await openValuePopup(wrapper)
 
+    const moveUpFirst = document.querySelector(
+      '[data-testid="rich-note-property-value-popup-list-move-up-0"]'
+    ) as HTMLButtonElement
+    const moveDownLast = document.querySelector(
+      '[data-testid="rich-note-property-value-popup-list-move-down-2"]'
+    ) as HTMLButtonElement
+    expect(moveUpFirst.disabled).toBe(true)
+    expect(moveDownLast.disabled).toBe(true)
+
     clickListMoveDown(0)
     await flushPromises()
     clickSave()
     await flushPromises()
 
-    const last = h.lastEmittedMarkdown()
-    const alphaIdx = last.indexOf("- alpha")
-    const betaIdx = last.indexOf("- beta")
-    const gammaIdx = last.indexOf("- gamma")
+    const reordered = h.lastEmittedMarkdown()
+    const alphaIdx = reordered.indexOf("- alpha")
+    const betaIdx = reordered.indexOf("- beta")
+    const gammaIdx = reordered.indexOf("- gamma")
     expect(betaIdx).toBeLessThan(alphaIdx)
     expect(alphaIdx).toBeLessThan(gammaIdx)
     expect(document.querySelector("dialog")).toBeNull()
-  })
 
-  it("reorders duplicate list items as distinct rows in popup", async () => {
-    const markdown = `---
+    await wrapper.setProps({
+      modelValue: `---
 tags:
   - dup
   - dup
   - unique
 ---
 
-Body`
-    const wrapper = await h.mountEditor(markdown, { attachToBody: true })
+Body`,
+    })
+    await flushPromises()
     await openValuePopup(wrapper)
 
     clickListMoveUp(2)
@@ -57,28 +66,6 @@ Body`
     clickSave()
     await flushPromises()
 
-    const last = h.lastEmittedMarkdown()
-    expect(last).toMatch(/- dup\n\s*- unique\n\s*- dup/)
-  })
-
-  it("disables move up on first item and move down on last item", async () => {
-    const markdown = `---
-tags:
-  - first
-  - last
----
-
-Body`
-    const wrapper = await h.mountEditor(markdown, { attachToBody: true })
-    await openValuePopup(wrapper)
-
-    const moveUpFirst = document.querySelector(
-      '[data-testid="rich-note-property-value-popup-list-move-up-0"]'
-    ) as HTMLButtonElement
-    const moveDownLast = document.querySelector(
-      '[data-testid="rich-note-property-value-popup-list-move-down-1"]'
-    ) as HTMLButtonElement
-    expect(moveUpFirst.disabled).toBe(true)
-    expect(moveDownLast.disabled).toBe(true)
+    expect(h.lastEmittedMarkdown()).toMatch(/- dup\n\s*- unique\n\s*- dup/)
   })
 })

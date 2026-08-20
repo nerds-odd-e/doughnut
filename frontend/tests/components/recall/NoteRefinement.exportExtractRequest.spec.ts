@@ -24,24 +24,7 @@ import {
 setupNoteRefinementTests()
 
 describe("NoteRefinement export extract request", () => {
-  it.each([
-    { itemId: null as string | null, expectedDisabled: true },
-    { itemId: "p1", expectedDisabled: false },
-  ])(
-    "export button disabled=$expectedDisabled when selection is $itemId",
-    async ({ itemId, expectedDisabled }) => {
-      const wrapper = await mountNoteRefinementReady(["Point 1", "Point 2"])
-      if (itemId) {
-        await selectRefinementLayoutItem(wrapper, itemId)
-      }
-
-      expect(
-        refinementActionButton(wrapper, "export-extract-request").disabled
-      ).toBe(expectedDisabled)
-    }
-  )
-
-  it("opens export dialog with extract request JSON for the selection", async () => {
+  it("toggles export button with selection and opens dialog with extract request JSON", async () => {
     const layout = refinementLayoutItems(["Point 1", "Point 2"])
     const exportData = sampleExtractExportData
     let resolveExport!: (value: typeof exportData) => void
@@ -55,7 +38,15 @@ describe("NoteRefinement export extract request", () => {
     )
     const wrapper = await mountNoteRefinementWithLayoutReady(layout)
 
+    expect(
+      refinementActionButton(wrapper, "export-extract-request").disabled
+    ).toBe(true)
+
     await selectRefinementLayoutItem(wrapper, "p2")
+    expect(
+      refinementActionButton(wrapper, "export-extract-request").disabled
+    ).toBe(false)
+
     await clickExportExtractRequest(wrapper)
     await nextTick()
 

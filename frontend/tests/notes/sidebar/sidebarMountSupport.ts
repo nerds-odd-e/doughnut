@@ -77,18 +77,30 @@ export function sidebarShowsActiveItem(
 
 export type SidebarTestHelper = typeof import("@tests/helpers").default
 
+/** Mount sidebar with `active` and assert each listed note title is present. */
+export async function mountSidebarNotesReady(
+  h: SidebarTestHelper,
+  active: NoteRealm,
+  noteTitles: string[]
+) {
+  const wrapper = mountSidebar(h, active)
+  await flushPromises()
+  for (const title of noteTitles) {
+    const item = findSidebarItem(wrapper, title)
+    expect(item, `sidebar note row "${title}"`).toBeDefined()
+    expect(item!.exists()).toBe(true)
+  }
+  return wrapper
+}
+
 /** Mount first-generation sidebar and assert the active note row is in the DOM. */
 export async function mountSidebarFirstGenReady(
   h: SidebarTestHelper,
   fixtures: SidebarTreeFixtures
 ) {
-  const wrapper = mountSidebar(h, fixtures.firstGeneration)
-  await flushPromises()
-  const title = fixtures.firstGeneration.note.noteTopology.title
-  const item = findSidebarItem(wrapper, title)
-  expect(item, `sidebar note row "${title}"`).toBeDefined()
-  expect(item!.exists()).toBe(true)
-  return wrapper
+  return mountSidebarNotesReady(h, fixtures.firstGeneration, [
+    fixtures.firstGeneration.note.noteTopology.title,
+  ])
 }
 
 export function mountSidebar(

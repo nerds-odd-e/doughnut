@@ -41,7 +41,6 @@ describe("NoteRefinement extract note loading", () => {
       }
     )
     const successWrapper = await mountNoteRefinementReady(["Test layout point"])
-
     await selectRefinementLayoutItem(successWrapper, "p1")
     await clickExtractRefinementLayout(successWrapper)
     await nextTick()
@@ -64,7 +63,6 @@ describe("NoteRefinement extract note loading", () => {
       return wrapSdkError({ message: "Preview failed" })
     })
     const failureWrapper = await mountNoteRefinementReady(["Test layout point"])
-
     await selectRefinementLayoutItem(failureWrapper, "p1")
     await clickExtractRefinementLayout(failureWrapper)
     await nextTick()
@@ -76,47 +74,28 @@ describe("NoteRefinement extract note loading", () => {
     expectExtractionPreviewError(failureWrapper, "Preview failed")
   })
 
-  it("shows LoadingModal while creating note from preview", async () => {
-    const { gate, resolve } = createDeferredGate()
-    mockSdkService(
+  it("shows LoadingModal while retrying extract preview and while creating note", async () => {
+    const retryGate = createDeferredGate()
+    const createGate = createDeferredGate()
+    let previewCalls = 0
+    mockSdkServiceWithImplementation(
       AiController,
       "extractNotePreview",
-      sampleExtractionPreview()
+      async () => {
+        previewCalls++
+        if (previewCalls === 1) {
+          return sampleExtractionPreview()
+        }
+        await retryGate.gate
+        return labeledExtractionPreview("Retry")
+      }
     )
     mockSdkServiceWithImplementation(
       AiController,
       "createExtractedNote",
       async () => {
-        await gate
+        await createGate.gate
         return makeMe.aNoteRealm.please()
-      }
-    )
-    const wrapper = await mountNoteRefinementReady(["Test layout point"])
-
-    await openExtractionPreview(wrapper, "p1")
-    await clickCreateNoteFromExtractionPreview(wrapper)
-    await nextTick()
-
-    expect(loadingModalMask()).toBeTruthy()
-    expect(document.body.textContent).toContain("AI is creating note...")
-    resolve()
-    await flushPromises()
-    expect(loadingModalMask()).toBeNull()
-  })
-
-  it("shows LoadingModal while retrying extract preview", async () => {
-    const { gate, resolve } = createDeferredGate()
-    let callCount = 0
-    mockSdkServiceWithImplementation(
-      AiController,
-      "extractNotePreview",
-      async () => {
-        callCount++
-        if (callCount === 1) {
-          return sampleExtractionPreview()
-        }
-        await gate
-        return labeledExtractionPreview("Retry")
       }
     )
     const wrapper = await mountNoteRefinementReady(["Test layout point"])
@@ -127,7 +106,17 @@ describe("NoteRefinement extract note loading", () => {
 
     expect(loadingModalMask()).toBeTruthy()
     expect(document.body.textContent).toContain("AI is generating preview...")
-    resolve()
+    retryGate.resolve()
+    await flushPromises()
+    expect(loadingModalMask()).toBeNull()
+
+    await clickCreateNoteFromExtractionPreview(wrapper)
+    await nextTick()
+
+    expect(loadingModalMask()).toBeTruthy()
+    expect(document.body.textContent).toContain("AI is creating note...")
+    expect(document.body.textContent).not.toContain("Cancel")
+    createGate.resolve()
     await flushPromises()
     expect(loadingModalMask()).toBeNull()
   })

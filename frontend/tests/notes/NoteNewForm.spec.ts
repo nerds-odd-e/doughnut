@@ -170,7 +170,6 @@ describe("adding new note", () => {
   })
 
   it("selects all text when the default Untitled title is shown", async () => {
-    vi.useRealTimers()
     const wrapper = mountNoteNewForm(notebookRootProps, {
       attachTo: document.body,
     })
@@ -185,7 +184,6 @@ describe("adding new note", () => {
   })
 
   it("places the caret after a trailing space when initialTitle comes from a template", async () => {
-    vi.useRealTimers()
     const wrapper = mountNoteNewForm(
       {
         ...notebookRootProps,

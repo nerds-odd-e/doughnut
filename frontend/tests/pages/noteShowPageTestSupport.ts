@@ -7,6 +7,7 @@ import {
 import type { Circle } from "@generated/doughnut-backend-api"
 import { useAssimilationView } from "@/composables/useAssimilationView"
 import { noteShowLocation } from "@/routes/noteShowLocation"
+import NoteShowPage from "@/pages/NoteShowPage.vue"
 import NoteShowPageWithNotebookSidebarLayout from "@tests/fixtures/NoteShowPageWithNotebookSidebarLayout.vue"
 import {
   createRouter,
@@ -68,20 +69,56 @@ export function setupNoteShowPageConversationMocks() {
   return noteRealm
 }
 
-function noteShowPageMount(router: Router, noteId: number) {
+function noteShowPageHelper(
+  component: typeof NoteShowPage | typeof NoteShowPageWithNotebookSidebarLayout,
+  router: Router,
+  noteId: number
+) {
   return helper
-    .component(NoteShowPageWithNotebookSidebarLayout)
+    .component(component)
     .withCurrentUser(makeMe.aUser.please())
     .withCleanStorage()
     .withProps({ noteId })
     .withRouter(router)
 }
 
-export async function renderNoteShowPage(router: Router, noteId: number) {
-  noteShowPageMount(router, noteId)
-    .currentRoute(noteShowLocation(noteId))
-    .render()
+function noteShowPageWithSidebarLayoutMount(router: Router, noteId: number) {
+  return noteShowPageHelper(
+    NoteShowPageWithNotebookSidebarLayout,
+    router,
+    noteId
+  )
+}
+
+function noteShowPageMount(router: Router, noteId: number) {
+  return noteShowPageHelper(NoteShowPage, router, noteId)
+}
+
+async function renderNoteShowAtNoteLocation(
+  mount: (
+    router: Router,
+    noteId: number
+  ) => ReturnType<typeof noteShowPageHelper>,
+  router: Router,
+  noteId: number
+) {
+  mount(router, noteId).currentRoute(noteShowLocation(noteId)).render()
   await flushPromises()
+}
+
+export async function renderNoteShowPage(router: Router, noteId: number) {
+  await renderNoteShowAtNoteLocation(
+    noteShowPageWithSidebarLayoutMount,
+    router,
+    noteId
+  )
+}
+
+export async function renderNoteShowPageWithoutSidebar(
+  router: Router,
+  noteId: number
+) {
+  await renderNoteShowAtNoteLocation(noteShowPageMount, router, noteId)
 }
 
 export async function renderNoteShowPageWithConversation(
@@ -89,9 +126,12 @@ export async function renderNoteShowPageWithConversation(
   noteId: number
 ) {
   await router.push(noteShowConversationLocation(noteId))
-  await flushPromises()
   noteShowPageMount(router, noteId).render()
   await flushPromises()
+}
+
+export function mainNoteContentEl() {
+  return document.getElementById("main-note-content")
 }
 
 export function noteContentWrapperEl() {
@@ -108,31 +148,12 @@ export function conversationContainerEl() {
 
 export function toggleMaximizeButtonEl() {
   return document.querySelector(
-    '[aria-label="Toggle maximize"]'
+    "button.maximize-button"
   ) as HTMLButtonElement | null
 }
 
 export function closeConversationButtonEl() {
   return document.querySelector(
-    '[aria-label="Close dialog"]'
+    "button.minimize-button"
   ) as HTMLButtonElement | null
-}
-
-export async function withStubbedInnerWidth<T>(
-  width: number,
-  run: () => Promise<T>
-): Promise<T> {
-  const innerWidthDesc = Object.getOwnPropertyDescriptor(window, "innerWidth")
-  Object.defineProperty(window, "innerWidth", {
-    configurable: true,
-    writable: true,
-    value: width,
-  })
-  try {
-    return await run()
-  } finally {
-    if (innerWidthDesc) {
-      Object.defineProperty(window, "innerWidth", innerWidthDesc)
-    }
-  }
 }

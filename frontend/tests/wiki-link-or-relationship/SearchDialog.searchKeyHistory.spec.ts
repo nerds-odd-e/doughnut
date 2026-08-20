@@ -9,7 +9,7 @@ import {
   clearSearchKeyHistoryCookie,
   readSearchKeyHistory,
 } from "@/utils/searchKeyHistoryCookie"
-import { afterEach, describe, expect, it, vi } from "vitest"
+import { describe, expect, it } from "vitest"
 import {
   historyDropdown,
   makeNoteHit,
@@ -17,6 +17,7 @@ import {
   renderSearchForm,
   renderSearchFormInModal,
   renderSearchWithKeyHistory,
+  setupSearchDialogFakeTimers,
   setupSearchDialogTests,
   titleEl,
   typeInSearch,
@@ -26,14 +27,7 @@ describe("SearchForm search key history", () => {
   setupSearchDialogTests()
 
   describe("search key recording", () => {
-    afterEach(() => {
-      vi.runOnlyPendingTimers()
-      vi.useRealTimers()
-    })
-
-    beforeEach(() => {
-      vi.useFakeTimers()
-    })
+    setupSearchDialogFakeTimers()
 
     it("records trimmed search key after debounced search completes", async () => {
       clearSearchKeyHistoryCookie()
@@ -72,41 +66,32 @@ describe("SearchForm search key history", () => {
     expect(input.value).toBe("newer")
   })
 
-  it.each([
-    {
-      scenario: "clicking the search input",
-      click: (input: HTMLElement) => fireEvent.click(input),
-    },
-    {
-      scenario: "clicking a search scope toggle",
-      click: () => titleEl("All My Circles").click(),
-    },
-  ])("collapses search key history when $scenario", async ({ click }) => {
+  it("collapses search key history when clicking the search input or a scope toggle", async () => {
     const note = MakeMe.aNote.please()
     const input = await renderSearchWithKeyHistory(note)
     await openSearchKeyHistoryDropdown()
-    click(input)
+    fireEvent.click(input)
     await flushPromises()
     expect(historyDropdown().open).toBe(false)
-  })
 
-  it("collapses search key history inside a modal when clicking elsewhere in that modal", async () => {
-    const note = MakeMe.aNote.please()
-    appendSearchKeyToHistory("older")
-    await renderSearchFormInModal(note)
     await openSearchKeyHistoryDropdown()
     titleEl("All My Circles").click()
     await flushPromises()
     expect(historyDropdown().open).toBe(false)
   })
 
-  it("renders search key history panel inside the modal dialog so it is not covered by the dialog top layer", async () => {
+  it("renders history panel inside the modal dialog and collapses on click elsewhere in that modal", async () => {
     const note = MakeMe.aNote.please()
     appendSearchKeyToHistory("older")
     await renderSearchFormInModal(note)
     await openSearchKeyHistoryDropdown()
+
     const dialog = document.querySelector("dialog.modal-mask")
     const panel = document.querySelector("[data-dropdown-portal-panel]")
     expect(dialog?.contains(panel)).toBe(true)
+
+    titleEl("All My Circles").click()
+    await flushPromises()
+    expect(historyDropdown().open).toBe(false)
   })
 })

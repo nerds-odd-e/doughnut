@@ -24,22 +24,7 @@ describe("AnsweredQuestionComponent", () => {
   })
 
   describe("note under question", () => {
-    it("renders note under question when note is present", async () => {
-      const note = makeMe.aNote.title("Test Note Title").please()
-      const answeredQuestion = makeMe.anAnsweredQuestion.withNote(note).please()
-
-      wrapper = helper
-        .component(AnsweredQuestionComponent)
-        .withRouter()
-        .withProps({ answeredQuestion, conversationButton: false })
-        .mount()
-
-      await flushPromises()
-
-      expect(wrapper.text()).toContain("Test Note Title")
-    })
-
-    it("updates note display when answeredQuestion prop changes", async () => {
+    it("renders note under question and updates when answeredQuestion prop changes", async () => {
       const note1 = makeMe.aNote.title("First Note").please()
       const note2 = makeMe.aNote.title("Second Note").please()
       const answeredQuestion1 = makeMe.anAnsweredQuestion
@@ -59,16 +44,10 @@ describe("AnsweredQuestionComponent", () => {
         .mount()
 
       await flushPromises()
-
-      // Verify first note is displayed
       expect(wrapper.text()).toContain("First Note")
-      expect(wrapper.text()).not.toContain("Second Note")
 
-      // Update prop to second answered question
       await wrapper.setProps({ answeredQuestion: answeredQuestion2 })
       await flushPromises()
-
-      // Verify second note is now displayed
       expect(wrapper.text()).toContain("Second Note")
       expect(wrapper.text()).not.toContain("First Note")
     })
@@ -95,44 +74,7 @@ describe("AnsweredQuestionComponent", () => {
         .mount({ attachTo: document.body })
     }
 
-    it("shows Refine note next to View Memory Tracker and opens refine modal", async () => {
-      const noteRealm = makeMe.aNoteRealm
-        .title("Contentful Note")
-        .content("Body to refine")
-        .please()
-
-      wrapper = mountWithSeededNote(noteRealm)
-      await flushPromises()
-
-      expect(wrapper.text()).toContain("View Memory Tracker")
-      const refineButton = wrapper.find('[data-test="open-refine-note-modal"]')
-      expect(refineButton.exists()).toBe(true)
-      expect(refineButton.text()).toContain("Refine note")
-
-      await refineButton.trigger("click")
-      await flushPromises()
-
-      const modal = document.querySelector('[data-test="refine-note-modal"]')
-      expect(modal).not.toBeNull()
-      expect(modal!.classList.contains("daisy-modal-open")).toBe(true)
-      expect(
-        document.querySelector('[data-test-id="refinement-layout-empty"]')
-      ).not.toBeNull()
-    })
-
-    it("hides Refine note when recalled note content is blank", async () => {
-      const noteRealm = makeMe.aNoteRealm.content("   ").please()
-
-      wrapper = mountWithSeededNote(noteRealm)
-      await flushPromises()
-
-      expect(wrapper.text()).toContain("View Memory Tracker")
-      expect(
-        wrapper.find('[data-test="open-refine-note-modal"]').exists()
-      ).toBe(false)
-    })
-
-    it("passes MCQ context when opening Refine note", async () => {
+    it("shows Refine note, opens refine modal, and passes MCQ context when present", async () => {
       const mcq = makeMe.anMcq
         .withQuestionStem("What is the capital of France?")
         .withChoices(["Paris", "London", "Berlin"])
@@ -166,11 +108,20 @@ describe("AnsweredQuestionComponent", () => {
         .mount({ attachTo: document.body })
       await flushPromises()
 
-      await wrapper
-        .find('[data-test="open-refine-note-modal"]')
-        .trigger("click")
+      expect(wrapper.text()).toContain("View Memory Tracker")
+      const refineButton = wrapper.find('[data-test="open-refine-note-modal"]')
+      expect(refineButton.exists()).toBe(true)
+      expect(refineButton.text()).toContain("Refine note")
+
+      await refineButton.trigger("click")
       await flushPromises()
 
+      const modal = document.querySelector('[data-test="refine-note-modal"]')
+      expect(modal).not.toBeNull()
+      expect(modal!.classList.contains("daisy-modal-open")).toBe(true)
+      expect(
+        document.querySelector('[data-test-id="refinement-layout-empty"]')
+      ).not.toBeNull()
       expect(generateSpy).toHaveBeenCalledWith(
         expect.objectContaining({
           path: { note: noteRealm.note.id },
@@ -182,6 +133,18 @@ describe("AnsweredQuestionComponent", () => {
           },
         })
       )
+    })
+
+    it("hides Refine note when recalled note content is blank", async () => {
+      const noteRealm = makeMe.aNoteRealm.content("   ").please()
+
+      wrapper = mountWithSeededNote(noteRealm)
+      await flushPromises()
+
+      expect(wrapper.text()).toContain("View Memory Tracker")
+      expect(
+        wrapper.find('[data-test="open-refine-note-modal"]').exists()
+      ).toBe(false)
     })
   })
 })

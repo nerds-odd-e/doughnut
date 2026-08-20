@@ -83,19 +83,10 @@ describe("Sidebar peer sort", () => {
     await flushPromises()
   }
 
-  it("shows sort control in the sidebar toolbar", async () => {
-    wrapper = mountSidebarSignedIn(
-      helper,
-      fixtures.topNoteRealm,
-      fixtures.topNoteRealm.notebookRealm.notebook.id
-    )
-    await flushPromises()
-    expect(wrapper.find("[data-note-sidebar-sort]").exists()).toBe(true)
-  })
-
   it("lists folders above notes (A–Z) and reorders root peers when Title (Z–A) is chosen", async () => {
     await mountZebraAppleRootSidebar()
 
+    expect(wrapper.find("[data-note-sidebar-sort]").exists()).toBe(true)
     expect(rootRowLabels(wrapper)).toEqual([...DEFAULT_ROOT_PEER_ORDER])
 
     await chooseTitleZa()

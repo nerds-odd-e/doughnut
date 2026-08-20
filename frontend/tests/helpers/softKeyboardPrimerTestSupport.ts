@@ -3,6 +3,7 @@ import {
   scheduleFocusTargetWithin,
   softKeyboardPrimerId,
 } from "@/utils/focusTarget"
+import { advanceAnimationFrame } from "@tests/helpers/focusTargetTestSupport"
 import { mount } from "@vue/test-utils"
 import { expect } from "vitest"
 
@@ -31,7 +32,7 @@ export function expectSoftKeyboardPrimerIsNotFocused() {
 }
 
 export async function waitUntilFocused(selector: string) {
-  await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()))
+  await advanceAnimationFrame()
   const element = document.querySelector(selector) as HTMLElement | null
   expect(element).toBeTruthy()
   expect(document.activeElement).toBe(element)

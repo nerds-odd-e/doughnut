@@ -5,21 +5,33 @@ import {
   parseNoteContentMarkdown,
 } from "@/utils/noteContentFrontmatter"
 import {
-  addNewAliasesProperty,
-  ALIASES_SCALAR_MARKDOWN,
-  mountAliasesValuePopup,
-  POPUP_ALIAS_CONSTRAINT_CASES,
-  propertyRowValidationText,
+  propertyValidationText,
   triggerRowKeyBlurValidation,
-} from "./aliasesPropertyTestSupport"
+} from "./propertiesTestDom"
 import {
   clickListAdd,
+  clickModeTab,
   dialogEl,
+  mountPropertyValuePopup,
   popupValidationText,
   savePopup,
   setListItemValue,
+  setTextareaValue,
 } from "./propertyValuePopupTestDom"
 import { createRichMarkdownEditorTestHarness } from "./richMarkdownEditorTestHarness"
+
+const ALIASES_LIST_MARKDOWN = `---
+aliases:
+  - color
+---
+
+Body`
+
+const ALIASES_SCALAR_MARKDOWN = `---
+aliases: color
+---
+
+Body`
 
 describe("RichMarkdownEditor aliases property", () => {
   const h = createRichMarkdownEditorTestHarness()
@@ -28,23 +40,25 @@ describe("RichMarkdownEditor aliases property", () => {
     h.cleanup()
   })
 
-  it.each(POPUP_ALIAS_CONSTRAINT_CASES)(
-    "shows alias constraint for $case",
-    async ({ prepareInvalidValue, expectDialogOpen }) => {
-      const wrapper = await mountAliasesValuePopup(h)
-      await prepareInvalidValue()
-      await savePopup()
+  it("rejects invalid aliases in popup then saves a valid list", async () => {
+    const wrapper = await mountPropertyValuePopup(h, ALIASES_LIST_MARKDOWN)
 
-      expect(popupValidationText()).toBe(AUTHORED_ALIASES_MESSAGE)
-      if (expectDialogOpen) {
-        expect(dialogEl()).not.toBeNull()
-      }
-      expect(wrapper.emitted("update:modelValue")).toBeUndefined()
-    }
-  )
+    clickModeTab("rich-note-property-value-popup-mode-text")
+    await flushPromises()
+    setTextareaValue("single alias")
+    await savePopup()
+    expect(popupValidationText()).toBe(AUTHORED_ALIASES_MESSAGE)
+    expect(dialogEl()).not.toBeNull()
+    expect(wrapper.emitted("update:modelValue")).toBeUndefined()
 
-  it("emits valid aliases list edits from popup", async () => {
-    await mountAliasesValuePopup(h)
+    clickModeTab("rich-note-property-value-popup-mode-list")
+    await flushPromises()
+    setListItemValue(0, "bad|alias")
+    await savePopup()
+    expect(popupValidationText()).toBe(AUTHORED_ALIASES_MESSAGE)
+    expect(wrapper.emitted("update:modelValue")).toBeUndefined()
+
+    setListItemValue(0, "color")
     clickListAdd()
     await flushPromises()
     setListItemValue(1, "hue")
@@ -56,8 +70,8 @@ describe("RichMarkdownEditor aliases property", () => {
     expect(dialogEl()).toBeNull()
   })
 
-  it("inserts the first alias as a list when adding a new aliases property", async () => {
-    await addNewAliasesProperty(h, "color")
+  it("inserts aliases as a list and blocks scalar aliases on row commit", async () => {
+    await h.mountAndCommitInsertProperty("aliases", "color")
 
     expect(
       h
@@ -69,13 +83,19 @@ describe("RichMarkdownEditor aliases property", () => {
     expect(parsed.ok).toBe(true)
     if (!parsed.ok) return
     expect(parsed.properties.aliases).toEqual(listPropertyValue(["color"]))
-  })
 
-  it("blocks commit when parsed aliases row is scalar", async () => {
-    const wrapper = await h.mountEditor(ALIASES_SCALAR_MARKDOWN)
+    const wrapper = h.getWrapper()
+    await wrapper.setProps({ modelValue: ALIASES_SCALAR_MARKDOWN })
+    await flushPromises()
+    const emissionsBeforeBlur =
+      wrapper.emitted("update:modelValue")?.length ?? 0
     await triggerRowKeyBlurValidation(wrapper)
 
-    expect(propertyRowValidationText(wrapper)).toBe(AUTHORED_ALIASES_MESSAGE)
-    expect(wrapper.emitted("update:modelValue")).toBeUndefined()
+    expect(propertyValidationText(wrapper.element)).toBe(
+      AUTHORED_ALIASES_MESSAGE
+    )
+    expect(wrapper.emitted("update:modelValue")?.length ?? 0).toBe(
+      emissionsBeforeBlur
+    )
   })
 })

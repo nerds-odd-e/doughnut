@@ -6,6 +6,7 @@ import {
   getTextareaValue,
   isModeTabActive,
   modeTabEl,
+  openValuePopup,
   setTextareaValue,
 } from "./propertyValuePopupTestDom"
 import {
@@ -23,8 +24,8 @@ describe("RichMarkdownEditor property value popup", () => {
     h.cleanup()
   })
 
-  it("saves edited scalar value from popup without changing YAML shape to a list", async () => {
-    await mountTopicValuePopup(h)
+  it("cancel discards edits; reopen save keeps scalar YAML shape", async () => {
+    const wrapper = await mountTopicValuePopup(h)
 
     expect(dialogEl()).not.toBeNull()
     expect(isModeTabActive("rich-note-property-value-popup-mode-text")).toBe(
@@ -32,6 +33,22 @@ describe("RichMarkdownEditor property value popup", () => {
     )
     expect(getTextareaValue()).toBe("training")
 
+    setTextareaValue("changed but not saved")
+    await flushPromises()
+    const emitCountBefore = wrapper.emitted("update:modelValue")?.length ?? 0
+    clickCancel()
+    await flushPromises()
+
+    expect(wrapper.emitted("update:modelValue")?.length ?? 0).toBe(
+      emitCountBefore
+    )
+    expect(dialogEl()).toBeNull()
+    expect(
+      wrapper.find('[data-testid="rich-note-property-row-value-input"]').text()
+    ).toContain("training")
+
+    await openValuePopup(wrapper)
+    expect(getTextareaValue()).toBe("training")
     setTextareaValue("advanced workshop")
     await flushPromises()
     clickSave()
@@ -42,28 +59,6 @@ describe("RichMarkdownEditor property value popup", () => {
     expect(last).not.toMatch(/topic:\s*\n\s*-/)
     expect(last).toContain("Body")
     expect(dialogEl()).toBeNull()
-  })
-
-  it("cancel closes popup without emitting property changes", async () => {
-    const wrapper = await mountTopicValuePopup(h)
-
-    setTextareaValue("changed but not saved")
-    await flushPromises()
-
-    const emitCountBefore = wrapper.emitted("update:modelValue")?.length ?? 0
-
-    clickCancel()
-    await flushPromises()
-
-    expect(wrapper.emitted("update:modelValue")?.length ?? 0).toBe(
-      emitCountBefore
-    )
-    expect(dialogEl()).toBeNull()
-
-    const valField = wrapper.find(
-      '[data-testid="rich-note-property-row-value-input"]'
-    )
-    expect(valField.text()).toContain("training")
   })
 
   it("hides list mode for scalar-only structural keys", async () => {

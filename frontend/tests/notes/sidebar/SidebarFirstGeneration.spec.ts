@@ -1,12 +1,12 @@
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import helper from "@tests/helpers"
-import { flushPromises } from "@vue/test-utils"
 import { vi, describe, it, expect, beforeEach, afterEach } from "vitest"
 import { sidebarDefaultTreeFixtures } from "./sidebarDefaultTree"
 import {
   findSidebarItem,
   isBefore,
-  mountSidebar,
+  mountSidebarFirstGenReady,
+  mountSidebarNotesReady,
   prepareSidebarDefaultMountContext,
   stubIntersectionObserver,
   teardownSidebarComponentTest,
@@ -30,53 +30,24 @@ describe("Sidebar first generation", () => {
     teardownSidebarComponentTest(wrapper)
   })
 
-  it("should scroll to active note", async () => {
-    wrapper = mountSidebar(helper, fixtures.firstGeneration)
-    await flushPromises()
-    await new Promise((resolve) =>
-      requestAnimationFrame(() => resolve(undefined))
-    )
-    await vi.waitUntil(() =>
-      findSidebarItem(
-        wrapper,
-        fixtures.firstGeneration.note.noteTopology.title
-      )?.exists()
-    )
+  it("shows the active note without scrolling when already intersecting", async () => {
+    const restoreIntersectionObserver = stubIntersectionObserver(true)
+
+    wrapper = await mountSidebarFirstGenReady(helper, fixtures)
     const activeElement = wrapper.find(".active-item")
     expect(activeElement.exists()).toBe(true)
     expect(activeElement.text()).toContain(
       fixtures.firstGeneration.note.noteTopology.title
     )
-  })
-
-  it("should not scroll if already visible", async () => {
-    const restoreIntersectionObserver = stubIntersectionObserver(true)
-
-    wrapper = mountSidebar(helper, fixtures.firstGeneration)
-    await flushPromises()
-    await new Promise((resolve) =>
-      requestAnimationFrame(() => resolve(undefined))
-    )
-    await flushPromises()
     expect(HTMLElement.prototype.scrollIntoView).not.toHaveBeenCalled()
     restoreIntersectionObserver()
   })
 
   it("orders nested child note before same-folder sibling when deeper note is active", async () => {
-    wrapper = mountSidebar(helper, fixtures.secondGeneration)
-    await flushPromises()
-    await vi.waitUntil(() =>
-      findSidebarItem(
-        wrapper,
-        fixtures.secondGeneration.note.noteTopology.title
-      )?.exists()
-    )
-    await vi.waitUntil(() =>
-      findSidebarItem(
-        wrapper,
-        fixtures.firstGenerationSibling.note.noteTopology.title
-      )?.exists()
-    )
+    wrapper = await mountSidebarNotesReady(helper, fixtures.secondGeneration, [
+      fixtures.secondGeneration.note.noteTopology.title,
+      fixtures.firstGenerationSibling.note.noteTopology.title,
+    ])
 
     const secondGen = findSidebarItem(
       wrapper,

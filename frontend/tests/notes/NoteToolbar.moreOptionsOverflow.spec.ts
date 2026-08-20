@@ -13,8 +13,12 @@ import {
   noteToolbarEditTitles,
 } from "@/components/notes/widgets/noteMoreOptionsTitles"
 import {
+  dispatchDocumentKey,
   mountOverflowToolbar,
   noteToolbarAction,
+  noteToolbarNewDisplayed,
+  noteToolbarWikiHidden,
+  openNoteToolbarOverflowMenu,
   overflowMenuItem,
   resetNoteToolbarTestState,
 } from "@tests/notes/noteToolbarTestHelpers"
@@ -51,7 +55,7 @@ describe("NoteToolbar more-options overflow", () => {
     expect(noteToolbarAction(wrapper, titles.delete).exists()).toBe(true)
   })
 
-  it("hides delete first when the full more-options set does not fit", async () => {
+  it("overflows delete first and lists only that action in more options", async () => {
     wrapper = await mountOverflowToolbar()
     await layoutNoteToolbar(wrapper, deleteOverflowNavWidth())
 
@@ -64,14 +68,8 @@ describe("NoteToolbar more-options overflow", () => {
     expect(
       noteToolbarAction(wrapper, noteToolbarEditTitles.markdown).exists()
     ).toBe(true)
-  })
 
-  it("lists only overflowed actions in more options", async () => {
-    wrapper = await mountOverflowToolbar()
-    await layoutNoteToolbar(wrapper, deleteOverflowNavWidth())
-
-    await noteToolbarAction(wrapper, titles.overflowMenu).trigger("click")
-    await flushPromises()
+    await openNoteToolbarOverflowMenu(wrapper)
 
     expect(overflowMenuItem(titles.delete)).not.toBeNull()
     expect(overflowMenuItem(noteToolbarEditTitles.markdown)).toBeNull()
@@ -92,7 +90,7 @@ describe("NoteToolbar more-options overflow", () => {
     expect(noteToolbarAction(wrapper, titles.export).exists()).toBe(true)
   })
 
-  it("keeps Edit on the bar after Export has overflowed", async () => {
+  it("overflows Export then Edit, and Edit still works from menu and m", async () => {
     wrapper = await mountOverflowToolbar()
     await layoutNoteToolbar(wrapper, exportOverflowNavWidth())
 
@@ -100,55 +98,30 @@ describe("NoteToolbar more-options overflow", () => {
       noteToolbarAction(wrapper, noteToolbarEditTitles.markdown).exists()
     ).toBe(true)
     expect(noteToolbarAction(wrapper, titles.export).exists()).toBe(false)
-  })
 
-  it("moves Edit into more options when the bar is tighter than Export overflow", async () => {
-    wrapper = await mountOverflowToolbar()
     await layoutNoteToolbar(wrapper, editOverflowNavWidth())
 
     expect(
       noteToolbarAction(wrapper, noteToolbarEditTitles.markdown).exists()
     ).toBe(false)
     expect(noteToolbarAction(wrapper, titles.conversation).exists()).toBe(true)
-    expect(noteToolbarAction(wrapper, titles.wiki).isVisible()).toBe(true)
-    expect(noteToolbarAction(wrapper, titles.new).isVisible()).toBe(true)
+    expect(noteToolbarWikiHidden(wrapper)).toBe(false)
+    expect(noteToolbarNewDisplayed(wrapper)).toBe(true)
 
-    await noteToolbarAction(wrapper, titles.overflowMenu).trigger("click")
+    dispatchDocumentKey({ key: "m", code: "KeyM" })
     await flushPromises()
+    expect(wrapper.emitted("edit-as-markdown")).toEqual([[true]])
+
+    await openNoteToolbarOverflowMenu(wrapper)
 
     const editItem = overflowMenuItem(noteToolbarEditTitles.markdown)
     expect(editItem).not.toBeNull()
     expect(editItem?.textContent).toContain(noteToolbarEditTitles.markdown)
     expect(overflowMenuItem(titles.export)).not.toBeNull()
-  })
 
-  it("emits edit-as-markdown from the overflow Edit row", async () => {
-    wrapper = await mountOverflowToolbar()
-    await layoutNoteToolbar(wrapper, editOverflowNavWidth())
-
-    await noteToolbarAction(wrapper, titles.overflowMenu).trigger("click")
+    editItem?.click()
     await flushPromises()
 
-    overflowMenuItem(noteToolbarEditTitles.markdown)?.click()
-    await flushPromises()
-
-    expect(wrapper.emitted("edit-as-markdown")).toEqual([[true]])
-  })
-
-  it("still toggles edit mode with m when Edit is in more options", async () => {
-    wrapper = await mountOverflowToolbar()
-    await layoutNoteToolbar(wrapper, editOverflowNavWidth())
-
-    document.dispatchEvent(
-      new KeyboardEvent("keydown", {
-        key: "m",
-        code: "KeyM",
-        bubbles: true,
-        cancelable: true,
-      })
-    )
-    await flushPromises()
-
-    expect(wrapper.emitted("edit-as-markdown")).toEqual([[true]])
+    expect(wrapper.emitted("edit-as-markdown")).toEqual([[true], [true]])
   })
 })

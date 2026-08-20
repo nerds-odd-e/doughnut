@@ -1,4 +1,5 @@
 import Modal from "@/components/commons/Modal.vue"
+import { advanceAnimationFrame } from "@tests/helpers/focusTargetTestSupport"
 import { flushPromises, mount, type VueWrapper } from "@vue/test-utils"
 import { nextTick } from "vue"
 import { createMemoryHistory, createRouter } from "vue-router"
@@ -58,18 +59,9 @@ export async function waitForDialogCount(count: number, attempts = 20) {
 
 export async function settleModalAutofocus() {
   await waitForDialog()
-  await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()))
+  await advanceAnimationFrame()
   await flushPromises()
   await nextTick()
-}
-
-export async function waitForActiveElementId(id: string, attempts = 20) {
-  for (let i = 0; i < attempts; i++) {
-    await flushPromises()
-    await nextTick()
-    if (document.activeElement?.id === id) return
-  }
-  expect(document.activeElement?.id).toBe(id)
 }
 
 const defaultTestComponent = {

@@ -138,9 +138,10 @@ describe("AssimilationPanel loading modal", () => {
     nextAssimilation.resolve()
     await flushPromises()
     expect(loadingModal()).toBeNull()
+    wrapper.unmount()
   }
 
-  it("keeps the global modal open from assimilate through loading the next unit", async () => {
+  it("keeps the global modal open from assimilate through next unit and hides on assimilate error", async () => {
     await expectGlobalModalThroughNextUnit(
       async (wrapper) => {
         await wrapper.find(assimilateButtonSelector).trigger("click")
@@ -148,21 +149,7 @@ describe("AssimilationPanel loading modal", () => {
       delaySuccessfulAssimilation,
       "Assimilating..."
     )
-  })
 
-  it("keeps the global modal open from skip through loading the next unit", async () => {
-    await expectGlobalModalThroughNextUnit(
-      async (wrapper) => {
-        await wrapper.find(skipButtonSelector).trigger("click")
-        usePopups().popups.done(true)
-        await flushPromises()
-      },
-      delaySuccessfulSkip,
-      "Skipping..."
-    )
-  })
-
-  it("hides global modal when assimilate API returns an error", async () => {
     let resolveApi: () => void = () => undefined
     assimilateSpy.mockImplementation(async () => {
       await new Promise<void>((r) => {
@@ -182,5 +169,18 @@ describe("AssimilationPanel loading modal", () => {
     resolveApi()
     await flushPromises()
     expect(loadingModal()).toBeNull()
+    wrapper.unmount()
+  })
+
+  it("keeps the global modal open from skip through loading the next unit", async () => {
+    await expectGlobalModalThroughNextUnit(
+      async (wrapper) => {
+        await wrapper.find(skipButtonSelector).trigger("click")
+        usePopups().popups.done(true)
+        await flushPromises()
+      },
+      delaySuccessfulSkip,
+      "Skipping..."
+    )
   })
 })

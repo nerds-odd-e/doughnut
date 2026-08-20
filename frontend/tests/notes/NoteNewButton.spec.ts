@@ -67,12 +67,14 @@ describe("NoteNewButton keyboard shortcut", () => {
       .mount({ attachTo: document.body })
 
     await flushPromises()
-    expect(screen.queryByTestId("note-new-form")).toBeNull()
+    expect(document.querySelector('[data-testid="note-new-form"]')).toBeNull()
 
     dispatchNoteNewShortcut()
     await flushPromises()
 
-    expect(await screen.findByTestId("note-new-form")).toBeInTheDocument()
+    expect(
+      document.querySelector('[data-testid="note-new-form"]')
+    ).not.toBeNull()
   })
 
   it.each(["input", "textarea"])(

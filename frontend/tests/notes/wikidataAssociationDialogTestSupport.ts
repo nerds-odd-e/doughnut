@@ -165,14 +165,6 @@ export async function clickWikidataTitleAction(action: "Replace" | "Append") {
   await flushPromises()
 }
 
-export async function selectWikidataSearchResultWithTitleAction(
-  wikidataId: string,
-  titleAction: "Replace" | "Append"
-) {
-  await clickWikidataSearchResult(wikidataId)
-  await clickWikidataTitleAction(titleAction)
-}
-
 export function expectReplaceTitleAndAddAliasControls(suggestedLabel: string) {
   const modal = wikidataModal()
   expect(modal?.textContent).toContain(`Suggested Title: ${suggestedLabel}`)

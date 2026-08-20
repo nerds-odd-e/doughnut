@@ -16,16 +16,21 @@ import {
 setupNoteMoreOptionsDeleteFormTests()
 
 describe("NoteMoreOptionsForm delete note", () => {
-  it("calls deleteNote API when delete button is clicked and confirmed", async () => {
+  it("calls deleteNote when confirmed and skips when cancelled", async () => {
     deleteNoteSpy.mockResolvedValue(wrapSdkResponse([]))
     const wrapper = renderer.withProps({ note }).mount()
 
     await flushPromises()
     await clickDeleteNote(wrapper)
 
+    expect(usePopups().popups.peek()?.[0]?.type).toBe("confirm")
+    usePopups().popups.done(false)
+    await flushPromises()
+    expect(deleteNoteSpy).not.toHaveBeenCalled()
+
+    await clickDeleteNote(wrapper)
     const popups = usePopups().popups.peek()
     expect(popups?.length).toBe(1)
-    expect(popups?.[0]?.type).toBe("confirm")
     expect(popups?.[0]?.message).toBe('Confirm to delete "Note1.1.1"?')
 
     usePopups().popups.done(true)
@@ -68,20 +73,5 @@ describe("NoteMoreOptionsForm delete note", () => {
       path: { note: noteRealm.id },
       body: { referenceHandling: "REMOVE_FROM_PROPERTIES" },
     })
-  })
-
-  it("does not call deleteNote when confirmation is cancelled", async () => {
-    const wrapper = renderer.withProps({ note }).mount()
-
-    await flushPromises()
-    await clickDeleteNote(wrapper)
-
-    const popups = usePopups().popups.peek()
-    expect(popups?.length).toBe(1)
-
-    usePopups().popups.done(false)
-    await flushPromises()
-
-    expect(deleteNoteSpy).not.toHaveBeenCalled()
   })
 })

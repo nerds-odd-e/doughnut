@@ -42,6 +42,7 @@ describe("FolderSelector", () => {
   let wrapper: VueWrapper | undefined
 
   beforeEach(() => {
+    vi.useFakeTimers({ toFake: ["requestAnimationFrame"] })
     mockSdkService(NotebookController, "listNotebookFolderListing", {
       folders: [],
     })
@@ -56,6 +57,7 @@ describe("FolderSelector", () => {
     matchMediaSpy = undefined
     wrapper?.unmount()
     document.body.innerHTML = ""
+    vi.useRealTimers()
   })
 
   const mountSelector = () => {
@@ -84,19 +86,19 @@ describe("FolderSelector", () => {
     await wrapper?.vm.$nextTick()
   }
 
+  const expectSearchDialogOpen = () => {
+    expect(
+      document.querySelector('[data-testid="folder-selector-search-dialog"]')
+    ).not.toBeNull()
+  }
+
   describe("keyboard navigation", () => {
     async function openFolderSearchDialog() {
       matchMediaSpy = mockCoarsePointer(false)
       mountSelector()
       await flushPromises()
       await clickSearchMoreButtonAndSettle()
-      await vi.waitUntil(
-        () =>
-          document.querySelector(
-            '[data-testid="folder-selector-search-input"]'
-          ) !== null,
-        { timeout: 2000 }
-      )
+      expectSearchDialogOpen()
       return document.querySelector(
         '[data-testid="folder-selector-search-input"]'
       ) as HTMLInputElement
@@ -124,7 +126,7 @@ describe("FolderSelector", () => {
   })
 
   describe("soft keyboard primer", () => {
-    it("focuses primer synchronously when search is opened on touch device", async () => {
+    it("focuses primer then search input when search is opened on touch device", async () => {
       matchMediaSpy = mockCoarsePointer(true)
       mountSelector()
       await flushPromises()
@@ -132,25 +134,11 @@ describe("FolderSelector", () => {
       expect(primer).toBeTruthy()
 
       clickSearchMoreButton()
-
       expect(document.activeElement).toBe(primer)
-    })
 
-    it("transfers focus to search input after folder index loads", async () => {
-      matchMediaSpy = mockCoarsePointer(true)
-      mountSelector()
       await flushPromises()
-
-      await clickSearchMoreButtonAndSettle()
-
-      await vi.waitUntil(
-        () =>
-          document.querySelector(
-            '[data-testid="folder-selector-search-dialog"]'
-          ) !== null,
-        { timeout: 2000 }
-      )
-
+      await wrapper?.vm.$nextTick()
+      expectSearchDialogOpen()
       await waitUntilFocused('[data-testid="folder-selector-search-input"]')
     })
 

@@ -8,10 +8,10 @@ import {
 } from "@tests/helpers/softKeyboardPrimerTestSupport"
 import {
   clickWikidataSearchResult,
+  clickWikidataTitleAction,
   expectReplaceTitleAndAddAliasControls,
   mockWikidataSearchResult,
   mountWikidataDialogReady,
-  selectWikidataSearchResultWithTitleAction,
   useWikidataAssociationDialogTestLifecycle,
   wikidataInput,
   wikidataSaveButton,
@@ -39,67 +39,29 @@ describe("WikidataAssociationDialog title actions and save", () => {
     matchMediaSpy = undefined
   })
 
-  it("emits selected with no titleAction when titles match", async () => {
-    const searchResult = mockWikidataSearchResult(
-      getSdkSpies().searchWikidataSpy,
-      "dog",
-      "Q11399"
-    )
-    const dialog = mountDialog("dog")
-    await flushPromises()
-    await clickWikidataSearchResult("Q11399")
-    const emitted = dialog.emitted("selected")?.[0]
-    expect(emitted?.[0]).toEqual(searchResult)
-    expect(emitted?.[1]).toBeUndefined()
-    expect(wikidataInput().value).toBe("Q11399")
-  })
-
-  it("emits selected with no titleAction when titles match case-insensitively", async () => {
-    const searchResult = mockWikidataSearchResult(
-      getSdkSpies().searchWikidataSpy,
-      "Dog",
-      "Q11399"
-    )
-    const dialog = mountDialog("DOG")
-    await flushPromises()
-    await clickWikidataSearchResult("Q11399")
-    const emitted = dialog.emitted("selected")?.[0]
-    expect(emitted?.[0]).toEqual(searchResult)
-    expect(emitted?.[1]).toBeUndefined()
-  })
-
-  it("shows replace title and add alias controls when suggested title differs", async () => {
-    mockWikidataSearchResult(
-      getSdkSpies().searchWikidataSpy,
-      "Canine",
-      "Q11399"
-    )
-    mountDialog("dog")
-    await flushPromises()
-    await clickWikidataSearchResult("Q11399")
-    expectReplaceTitleAndAddAliasControls("Canine")
-  })
-
-  it.each([false, true])(
-    "emits selected with replace action when showSaveButton is %s",
-    async (showSaveButton) => {
-      const { wrapper: dialog, searchResult } = await mountWikidataDialogReady({
-        searchWikidataSpy: getSdkSpies().searchWikidataSpy,
-        searchKey: "dog",
-        searchLabel: "Canine",
-        wikidataId: "Q11399",
-        mountOptions: showSaveButton ? { showSaveButton: true } : undefined,
-      })
-      trackWrapper(dialog)
-      await selectWikidataSearchResultWithTitleAction("Q11399", "Replace")
+  it.each([
+    { searchKey: "dog", label: "dog" },
+    { searchKey: "DOG", label: "Dog" },
+  ])(
+    "emits selected with no titleAction when titles match ($searchKey / $label)",
+    async ({ searchKey, label }) => {
+      const searchResult = mockWikidataSearchResult(
+        getSdkSpies().searchWikidataSpy,
+        label,
+        "Q11399"
+      )
+      const dialog = mountDialog(searchKey)
+      await flushPromises()
+      await clickWikidataSearchResult("Q11399")
       const emitted = dialog.emitted("selected")?.[0]
       expect(emitted?.[0]).toEqual(searchResult)
-      expect(emitted?.[1]).toBe("replace")
+      expect(emitted?.[1]).toBeUndefined()
+      expect(wikidataInput().value).toBe("Q11399")
     }
   )
 
   it.each([false, true])(
-    "emits selected with add alias action when showSaveButton is %s",
+    "emits replace then append when showSaveButton is %s",
     async (showSaveButton) => {
       const { wrapper: dialog, searchResult } = await mountWikidataDialogReady({
         searchWikidataSpy: getSdkSpies().searchWikidataSpy,
@@ -109,10 +71,14 @@ describe("WikidataAssociationDialog title actions and save", () => {
         mountOptions: showSaveButton ? { showSaveButton: true } : undefined,
       })
       trackWrapper(dialog)
-      await selectWikidataSearchResultWithTitleAction("Q11399", "Append")
-      const emitted = dialog.emitted("selected")?.[0]
-      expect(emitted?.[0]).toEqual(searchResult)
-      expect(emitted?.[1]).toBe("append")
+      await clickWikidataSearchResult("Q11399")
+      expectReplaceTitleAndAddAliasControls("Canine")
+
+      await clickWikidataTitleAction("Replace")
+      expect(dialog.emitted("selected")?.[0]).toEqual([searchResult, "replace"])
+
+      await clickWikidataTitleAction("Append")
+      expect(dialog.emitted("selected")?.[1]).toEqual([searchResult, "append"])
     }
   )
 
@@ -128,6 +94,32 @@ describe("WikidataAssociationDialog title actions and save", () => {
     wikidataSaveButton().click()
     await flushPromises()
     expect(dialog.emitted("save")?.[0]).toEqual(["Q11399"])
+  })
+
+  it.each([
+    {
+      case: "unchanged saved value",
+      options: {
+        showSaveButton: true,
+        modelValue: "Q123",
+        savedValue: "Q123",
+      },
+      expectDisabled: true,
+    },
+    {
+      case: "both empty",
+      options: {
+        showSaveButton: true,
+        canSaveEmptyToClear: true,
+        modelValue: "",
+        savedValue: "",
+      },
+      expectDisabled: true,
+    },
+  ])("disables Save when $case", async ({ options, expectDisabled }) => {
+    mountDialog("dog", options)
+    await flushPromises()
+    expect(wikidataSaveButton().disabled).toBe(expectDisabled)
   })
 
   it("enables Save and emits empty string when clearing with canSaveEmptyToClear", async () => {
@@ -149,30 +141,14 @@ describe("WikidataAssociationDialog title actions and save", () => {
     expect(dialog.emitted("save")?.[0]).toEqual([""])
   })
 
-  it("disables Save when current value equals savedValue", async () => {
-    mountDialog("dog", {
-      showSaveButton: true,
-      modelValue: "Q123",
-      savedValue: "Q123",
-    })
-    await flushPromises()
-    expect(wikidataSaveButton().disabled).toBe(true)
-  })
-
-  it("disables Save when both current and saved are empty", async () => {
-    mountDialog("dog", {
-      showSaveButton: true,
-      canSaveEmptyToClear: true,
-      modelValue: "",
-      savedValue: "",
-    })
-    await flushPromises()
-    expect(wikidataSaveButton().disabled).toBe(true)
-  })
-
   describe("soft keyboard primer", () => {
     beforeEach(() => {
+      vi.useFakeTimers({ toFake: ["requestAnimationFrame"] })
       mountSoftKeyboardPrimer()
+    })
+
+    afterEach(() => {
+      vi.useRealTimers()
     })
 
     it("transfers focus to wikidata ID input after mount when showSaveButton", async () => {

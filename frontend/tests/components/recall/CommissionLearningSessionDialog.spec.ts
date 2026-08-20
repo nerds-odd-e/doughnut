@@ -127,34 +127,7 @@ describe("CommissionLearningSessionDialog", () => {
     expect(wrapper.emitted("recorded")).toBeTruthy()
   })
 
-  it("shows rejection warning on partial success", async () => {
-    mockSdkService(LearningSessionController, "record", {
-      recordedAt: "1989-01-02T09:00:00Z",
-      recordedItems: [{ noteTitle: "Hola", score: 4, memoryTrackerId: 11 }],
-      rejectedEntries: [
-        {
-          line: "Unknown: 3",
-          reason: "Note title not found in notebook.",
-        },
-      ],
-    })
-    await openRequestMode()
-
-    await clickRecordReportSubmit()
-
-    expect(
-      document.body.querySelector(
-        '[data-test="learning-session-report-rejections"]'
-      )
-    ).toBeTruthy()
-    expect(
-      document.body.querySelector(
-        '[data-test="learning-session-report-rejections"]'
-      )?.textContent
-    ).toContain("Unknown: 3")
-  })
-
-  it("keeps report textarea when record fails", async () => {
+  it("keeps report textarea when record fails and shows rejection warning on partial success", async () => {
     const recordSpy = vi.spyOn(LearningSessionController, "record")
     recordSpy.mockResolvedValue(wrapSdkError("record failed") as never)
     await openRequestMode()
@@ -169,5 +142,25 @@ describe("CommissionLearningSessionDialog", () => {
     expect(
       document.body.querySelector('[data-test="learning-session-report"]')
     ).toBeTruthy()
+
+    document.body.querySelectorAll("dialog").forEach((el) => el.remove())
+    mockSdkService(LearningSessionController, "record", {
+      recordedAt: "1989-01-02T09:00:00Z",
+      recordedItems: [{ noteTitle: "Hola", score: 4, memoryTrackerId: 11 }],
+      rejectedEntries: [
+        {
+          line: "Unknown: 3",
+          reason: "Note title not found in notebook.",
+        },
+      ],
+    })
+    await openRequestMode()
+    await clickRecordReportSubmit()
+
+    expect(
+      document.body.querySelector(
+        '[data-test="learning-session-report-rejections"]'
+      )?.textContent
+    ).toContain("Unknown: 3")
   })
 })

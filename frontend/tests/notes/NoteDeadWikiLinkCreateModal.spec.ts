@@ -64,6 +64,7 @@ describe("NoteDeadWikiLinkCreateModal", () => {
   let wrapper: VueWrapper | undefined
 
   beforeEach(() => {
+    vi.useFakeTimers({ toFake: ["requestAnimationFrame"] })
     alertMock.mockReset()
     const storageAccessor = useStorageAccessor()
     storageAccessor.value = createNoteStorage()
@@ -85,6 +86,7 @@ describe("NoteDeadWikiLinkCreateModal", () => {
     matchMediaSpy = undefined
     wrapper?.unmount()
     document.body.innerHTML = ""
+    vi.useRealTimers()
   })
 
   const mountModal = (
@@ -104,9 +106,8 @@ describe("NoteDeadWikiLinkCreateModal", () => {
   }
 
   const waitForChooser = async () => {
-    await vi.waitUntil(() => screen.queryByText(createNoteLabel) !== null, {
-      timeout: 1000,
-    })
+    await flushPromises()
+    expect(screen.getByText(createNoteLabel)).toBeTruthy()
   }
 
   const tapChooser = (label: RegExp | string) => {
@@ -173,11 +174,19 @@ describe("NoteDeadWikiLinkCreateModal", () => {
 
   describe("soft keyboard primer", () => {
     it.each([
-      { branch: "create", label: createNoteLabel },
-      { branch: "point-at-existing", label: pointAtExistingNoteLabel },
+      {
+        branch: "create",
+        label: createNoteLabel,
+        focusSelector: '[data-test="note-title"]',
+      },
+      {
+        branch: "point-at-existing",
+        label: pointAtExistingNoteLabel,
+        focusSelector: 'input[placeholder="Search"]',
+      },
     ])(
-      "focuses primer synchronously when $branch is tapped on touch device",
-      async ({ label }) => {
+      "focuses primer then $branch target on touch device",
+      async ({ label, focusSelector }) => {
         matchMediaSpy = mockCoarsePointer(true)
         mountModal()
         await waitForChooser()
@@ -185,30 +194,13 @@ describe("NoteDeadWikiLinkCreateModal", () => {
         expect(primer).toBeTruthy()
 
         tapChooser(label)
-
         expect(document.activeElement).toBe(primer)
+
+        await flushPromises()
+        await wrapper?.vm.$nextTick()
+        await waitUntilFocused(focusSelector)
       }
     )
-
-    it("transfers focus to note title after create form mounts", async () => {
-      matchMediaSpy = mockCoarsePointer(true)
-      mountModal()
-      await waitForChooser()
-
-      await tapChooserAndSettle(createNoteLabel)
-
-      await waitUntilFocused('[data-test="note-title"]')
-    })
-
-    it("transfers focus to search input after point-at-existing form mounts", async () => {
-      matchMediaSpy = mockCoarsePointer(true)
-      mountModal()
-      await waitForChooser()
-
-      await tapChooserAndSettle(pointAtExistingNoteLabel)
-
-      await waitUntilFocused('input[placeholder="Search"]')
-    })
 
     it("does not focus primer on create tap when pointer is not coarse", async () => {
       matchMediaSpy = mockCoarsePointer(false)

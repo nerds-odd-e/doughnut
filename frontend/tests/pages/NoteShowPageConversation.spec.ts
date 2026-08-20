@@ -12,26 +12,24 @@ import { flushPromises } from "@vue/test-utils"
 import { beforeEach, describe, expect, it, vi } from "vitest"
 
 describe("note show page conversation", () => {
-  let router: ReturnType<typeof createNoteShowPageRouter>
+  const router = createNoteShowPageRouter()
   let noteId: number
 
   beforeEach(() => {
-    router = createNoteShowPageRouter()
     noteId = setupNoteShowPageConversationMocks().id
   })
 
   it("maximizes and restores note content when maximize is toggled", async () => {
     await renderNoteShowPageWithConversation(router, noteId)
 
-    await vi.waitFor(() => {
-      expect(toggleMaximizeButtonEl()).not.toBeNull()
-    })
+    const maximize = toggleMaximizeButtonEl()
+    expect(maximize).not.toBeNull()
 
-    toggleMaximizeButtonEl()!.click()
+    maximize!.click()
     await flushPromises()
     expect(noteContentWrapperEl()).toBeNull()
 
-    toggleMaximizeButtonEl()!.click()
+    maximize!.click()
     await flushPromises()
     expect(noteContentWrapperEl()).not.toBeNull()
   })
@@ -39,11 +37,10 @@ describe("note show page conversation", () => {
   it("restores note content and clears conversation query on close", async () => {
     await renderNoteShowPageWithConversation(router, noteId)
 
-    await vi.waitFor(() => {
-      expect(toggleMaximizeButtonEl()).not.toBeNull()
-    })
+    const maximize = toggleMaximizeButtonEl()
+    expect(maximize).not.toBeNull()
 
-    toggleMaximizeButtonEl()!.click()
+    maximize!.click()
     await flushPromises()
 
     closeConversationButtonEl()!.click()
