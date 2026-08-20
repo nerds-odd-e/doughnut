@@ -61,7 +61,7 @@ Each slice is **Structure**: delete one backfill family; remaining tests pass; e
 ### 5. Drop ungraded-New last-recall backfill
 
 - **Type:** Structure
-- **Status:** planned
+- **Status:** done
 - **Done:** `V300000276`, `UngradedNewLastRecallBackfill`, and its test gone.
 
 ### 6. Drop still-New mapped first-rating backfill
