@@ -7,23 +7,34 @@ import {
 import { noteShowLocation } from "@/routes/noteShowLocation"
 import { wikiTitleFromAuthoredToken } from "@/utils/wikiLinkMarkup"
 import {
-  addNewOverlapsProperty,
-  mountOverlapsValuePopup,
-  OVERLAPS_LIST_MARKDOWN,
-  OVERLAPS_SCALAR_MARKDOWN,
-  overlapsListValue,
-  POPUP_OVERLAPS_CONSTRAINT_CASES,
-  propertyRowValidationText,
+  propertyRowListValue,
+  propertyValidationText,
   triggerRowKeyBlurValidation,
-} from "./overlapsPropertyTestSupport"
+} from "./propertiesTestDom"
 import {
   clickListAdd,
+  clickModeTab,
   dialogEl,
+  mountPropertyValuePopup,
   popupValidationText,
   savePopup,
   setListItemValue,
+  setTextareaValue,
 } from "./propertyValuePopupTestDom"
 import { createRichMarkdownEditorTestHarness } from "./richMarkdownEditorTestHarness"
+
+const OVERLAPS_LIST_MARKDOWN = `---
+overlaps:
+  - "[[Other Note]]"
+---
+
+Body`
+
+const OVERLAPS_SCALAR_MARKDOWN = `---
+overlaps: "[[Other Note]]"
+---
+
+Body`
 
 describe("RichMarkdownEditor overlaps property", () => {
   const h = createRichMarkdownEditorTestHarness()
@@ -32,23 +43,25 @@ describe("RichMarkdownEditor overlaps property", () => {
     h.cleanup()
   })
 
-  it.each(POPUP_OVERLAPS_CONSTRAINT_CASES)(
-    "shows overlaps constraint for $case",
-    async ({ prepareInvalidValue, expectDialogOpen }) => {
-      const wrapper = await mountOverlapsValuePopup(h)
-      await prepareInvalidValue()
-      await savePopup()
+  it("rejects invalid overlaps in popup then saves a valid list", async () => {
+    const wrapper = await mountPropertyValuePopup(h, OVERLAPS_LIST_MARKDOWN)
 
-      expect(popupValidationText()).toBe(AUTHORED_OVERLAPS_MESSAGE)
-      if (expectDialogOpen) {
-        expect(dialogEl()).not.toBeNull()
-      }
-      expect(wrapper.emitted("update:modelValue")).toBeUndefined()
-    }
-  )
+    clickModeTab("rich-note-property-value-popup-mode-text")
+    await flushPromises()
+    setTextareaValue("[[Other Note]]")
+    await savePopup()
+    expect(popupValidationText()).toBe(AUTHORED_OVERLAPS_MESSAGE)
+    expect(dialogEl()).not.toBeNull()
+    expect(wrapper.emitted("update:modelValue")).toBeUndefined()
 
-  it("emits valid overlaps list edits from popup", async () => {
-    await mountOverlapsValuePopup(h)
+    clickModeTab("rich-note-property-value-popup-mode-list")
+    await flushPromises()
+    setListItemValue(0, "plain alias")
+    await savePopup()
+    expect(popupValidationText()).toBe(AUTHORED_OVERLAPS_MESSAGE)
+    expect(wrapper.emitted("update:modelValue")).toBeUndefined()
+
+    setListItemValue(0, "[[Other Note]]")
     clickListAdd()
     await flushPromises()
     setListItemValue(1, "[[Hue Note]]")
@@ -61,7 +74,7 @@ describe("RichMarkdownEditor overlaps property", () => {
   })
 
   it("inserts overlaps as a list and blocks scalar overlaps on row commit", async () => {
-    await addNewOverlapsProperty(h, "[[Other Note]]")
+    await h.mountAndCommitInsertProperty("overlaps", "[[Other Note]]")
 
     expect(
       h
@@ -79,10 +92,13 @@ describe("RichMarkdownEditor overlaps property", () => {
     const wrapper = h.getWrapper()
     await wrapper.setProps({ modelValue: OVERLAPS_SCALAR_MARKDOWN })
     await flushPromises()
-    const emissionsBeforeBlur = wrapper.emitted("update:modelValue")?.length ?? 0
+    const emissionsBeforeBlur =
+      wrapper.emitted("update:modelValue")?.length ?? 0
     await triggerRowKeyBlurValidation(wrapper)
 
-    expect(propertyRowValidationText(wrapper)).toBe(AUTHORED_OVERLAPS_MESSAGE)
+    expect(propertyValidationText(wrapper.element)).toBe(
+      AUTHORED_OVERLAPS_MESSAGE
+    )
     expect(wrapper.emitted("update:modelValue")?.length ?? 0).toBe(
       emissionsBeforeBlur
     )
@@ -95,7 +111,7 @@ describe("RichMarkdownEditor overlaps property", () => {
     })
     await flushPromises()
 
-    const resolved = overlapsListValue(wrapper)
+    const resolved = propertyRowListValue(wrapper, "overlaps")
     const resolvedLink = resolved.find("a.router-link")
     expect(resolvedLink.exists()).toBe(true)
     expect(resolvedLink.text()).toBe("Other Note")
@@ -115,7 +131,7 @@ Body`,
     })
     await flushPromises()
 
-    const livePath = overlapsListValue(wrapper)
+    const livePath = propertyRowListValue(wrapper, "overlaps")
     const liveLink = livePath.find("a.router-link")
     expect(liveLink.exists()).toBe(true)
     expect(liveLink.text()).toBe("Title")
@@ -137,7 +153,7 @@ Body`,
     })
     await flushPromises()
 
-    const deadPath = overlapsListValue(wrapper)
+    const deadPath = propertyRowListValue(wrapper, "overlaps")
     const deadLink = deadPath.find("a.dead-wiki-link")
     expect(deadLink.exists()).toBe(true)
     expect(deadLink.text()).toBe("Title")

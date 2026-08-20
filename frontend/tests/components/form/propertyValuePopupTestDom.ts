@@ -1,4 +1,7 @@
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
+import type { createRichMarkdownEditorTestHarness } from "./richMarkdownEditorTestHarness"
+
+type Harness = ReturnType<typeof createRichMarkdownEditorTestHarness>
 
 export async function openValuePopup(wrapper: VueWrapper) {
   const openBtn = wrapper.find(
@@ -7,6 +10,12 @@ export async function openValuePopup(wrapper: VueWrapper) {
   expect(openBtn.exists()).toBe(true)
   await openBtn.trigger("click")
   await flushPromises()
+}
+
+export async function mountPropertyValuePopup(h: Harness, markdown: string) {
+  const wrapper = await h.mountEditor(markdown, { attachToBody: true })
+  await openValuePopup(wrapper)
+  return wrapper
 }
 
 export function clickModeTab(testId: string) {

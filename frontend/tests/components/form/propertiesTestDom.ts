@@ -1,3 +1,5 @@
+import { flushPromises, type VueWrapper } from "@vue/test-utils"
+
 export function propertyRowSelector(key: string): string {
   return `[data-testid="rich-note-property-row"][data-property-key="${key}"]`
 }
@@ -61,6 +63,23 @@ export function propertyValidationText(root: ParentNode): string {
   const el = root.querySelector('[data-testid="rich-note-property-validation"]')
   expect(el).not.toBeNull()
   return el!.textContent ?? ""
+}
+
+export async function triggerRowKeyBlurValidation(wrapper: VueWrapper) {
+  const keyInput = wrapper.find(
+    '[data-testid="rich-note-property-row-key-input"]'
+  )
+  await keyInput.trigger("focus")
+  await keyInput.trigger("blur")
+  await flushPromises()
+}
+
+export function propertyRowListValue(wrapper: VueWrapper, key: string) {
+  const row = wrapper
+    .findAll('[data-testid="rich-note-property-row"]')
+    .find((r) => (r.element as HTMLElement).dataset.propertyKey === key)
+  expect(row).toBeDefined()
+  return row!.find('[data-testid="rich-note-property-row-list-value"]')
 }
 
 export function deadWikiLinkInPropertyValueEl(

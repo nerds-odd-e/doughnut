@@ -100,8 +100,19 @@ export function createRichMarkdownEditorTestHarness() {
     await flushPromises()
   }
 
-  async function flushAnimationFrame() {
-    await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()))
+  async function commitInsertProperty(key: string, value: string) {
+    await openAddProperty()
+    const keyInput = wrapper.find('[data-testid="rich-note-property-key"]')
+    const valInput = wrapper.find('[data-testid="rich-note-property-value"]')
+    await keyInput.setValue(key)
+    await setPropertyValueField(valInput, value)
+    await valInput.trigger("blur")
+    await flushPromises()
+  }
+
+  async function mountAndCommitInsertProperty(key: string, value: string) {
+    await mountEditor("# Body", { attachToBody: true })
+    await commitInsertProperty(key, value)
   }
 
   async function mountEditor(
@@ -146,6 +157,7 @@ export function createRichMarkdownEditorTestHarness() {
     completePropertyValueFieldTap,
     propertyValueFieldElement,
     openAddProperty,
-    flushAnimationFrame,
+    commitInsertProperty,
+    mountAndCommitInsertProperty,
   }
 }

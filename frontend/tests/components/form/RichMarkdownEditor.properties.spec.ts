@@ -1,6 +1,5 @@
 import { flushPromises } from "@vue/test-utils"
 import {
-  expandAndClickPropertyRowRemove,
   expandPropertyRowOptions,
   propertyRowKeyInputEl,
   propertyRowOptionsPanelEl,
@@ -195,34 +194,11 @@ Workshop body.`
     )
   })
 
-  it("removing one property row emits markdown without that key and retains the rest", async () => {
+  it("expands options independently then removes a row keeping remaining collapsed", async () => {
     const wrapper = await h.mountEditor(twoPropertyMarkdown)
-
-    await expandAndClickPropertyRowRemove(wrapper, propertyRowSelector("alpha"))
-
-    const last = h.lastEmittedMarkdown()
-    expect(last).not.toContain("alpha:")
-    expect(last).toContain("beta:")
-  })
-
-  it("removing an expanded property leaves remaining rows collapsed", async () => {
-    const wrapper = await h.mountEditor(twoPropertyMarkdown)
-
-    await expandAndClickPropertyRowRemove(wrapper, propertyRowSelector("alpha"))
-
-    const betaRow = wrapper.find(propertyRowSelector("beta")).element
-    expect(propertyRowOptionsPanelEl(betaRow)).toBeNull()
-    expect(
-      propertyRowOptionsToggleEl(betaRow).getAttribute("aria-expanded")
-    ).toBe("false")
-  })
-
-  it("caret toggles options panel and rows expand independently", async () => {
-    const wrapper = await h.mountEditor(twoPropertyMarkdown)
-    const rows = propertyRows(wrapper.element)
-
     const alphaRow = propertyRowSelector("alpha")
     const betaRow = propertyRowSelector("beta")
+    const rows = propertyRows(wrapper.element)
 
     expect(propertyRowOptionsPanelEl(rows[0]!)).toBeNull()
     expect(propertyRowOptionsPanelEl(rows[1]!)).toBeNull()
@@ -233,12 +209,25 @@ Workshop body.`
       propertyRowOptionsPanelEl(wrapper.find(alphaRow).element)
     ).not.toBeNull()
     expect(propertyRowOptionsPanelEl(wrapper.find(betaRow).element)).toBeNull()
-
     expect(
       propertyRowOptionsToggleEl(rows[0]!).getAttribute("aria-expanded")
     ).toBe("true")
     expect(
       propertyRowOptionsToggleEl(rows[1]!).getAttribute("aria-expanded")
+    ).toBe("false")
+
+    await wrapper
+      .find(`${alphaRow} [data-testid="rich-note-property-row-remove"]`)
+      .trigger("click")
+
+    const last = h.lastEmittedMarkdown()
+    expect(last).not.toContain("alpha:")
+    expect(last).toContain("beta:")
+
+    const betaEl = wrapper.find(betaRow).element
+    expect(propertyRowOptionsPanelEl(betaEl)).toBeNull()
+    expect(
+      propertyRowOptionsToggleEl(betaEl).getAttribute("aria-expanded")
     ).toBe("false")
   })
 })

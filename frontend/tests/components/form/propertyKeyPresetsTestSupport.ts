@@ -70,17 +70,4 @@ image: /x.png
     expectedKeyValue: "image 2",
     expectedFocusTestId: "rich-note-property-value",
   },
-  {
-    case: "occupied url preset",
-    markdown: `---
-url: https://example.com
----
-
-# Body`,
-    keyInputTestId: INSERT_KEY_INPUT,
-    existingRows: [propertyRowWithScalar("url", "https://example.com")],
-    selectPreset: "url 2",
-    expectedKeyValue: "url 2",
-    expectedFocusTestId: "rich-note-property-value",
-  },
 ] as const

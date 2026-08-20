@@ -1,9 +1,33 @@
+import { flushPromises } from "@vue/test-utils"
 import {
   listPropertyValue,
   parseNoteContentMarkdown,
 } from "@/utils/noteContentFrontmatter"
 import { propertyRowWithScalar } from "@/utils/noteContentPropertyRows"
 import { createRichMarkdownEditorTestHarness } from "./richMarkdownEditorTestHarness"
+
+const SCALAR_MARKDOWN = `---
+example of: "[[A]]"
+example of 2: "[[B]]"
+---
+
+# Body`
+
+const LIST_MARKDOWN = `---
+example of:
+  - "[[A]]"
+  - "[[B]]"
+---
+
+# Body`
+
+const LEGACY_SUFFIX_MARKDOWN = `---
+example of: one
+example of 2: two
+example of 3: three
+---
+
+# Body`
 
 describe("RichMarkdownEditor list-capable preset append", () => {
   const h = createRichMarkdownEditorTestHarness()
@@ -12,28 +36,12 @@ describe("RichMarkdownEditor list-capable preset append", () => {
     h.cleanup()
   })
 
-  it("appends another value to exact list-capable key as a list item", async () => {
-    const markdown = `---
-example of: "[[A]]"
-example of 2: "[[B]]"
----
+  it("appends to exact list-capable keys without folding legacy suffixes", async () => {
+    const wrapper = await h.mountEditor(SCALAR_MARKDOWN, { attachToBody: true })
 
-# Body`
-    await h.mountEditor(markdown, { attachToBody: true })
-    await h.openAddProperty()
-
-    const keyInput = h
-      .getWrapper()
-      .find('[data-testid="rich-note-property-key"]')
-    const valInput = h
-      .getWrapper()
-      .find('[data-testid="rich-note-property-value"]')
-    await keyInput.setValue("example of")
-    await h.setPropertyValueField(valInput, "[[C]]")
-    await valInput.trigger("blur")
-
+    await h.commitInsertProperty("example of", "[[C]]")
     const last = h.lastEmittedMarkdown()
-    const parsed = parseNoteContentMarkdown(last)
+    let parsed = parseNoteContentMarkdown(last)
     expect(parsed.ok).toBe(true)
     if (!parsed.ok) return
     expect(parsed.properties["example of"]).toEqual(
@@ -45,59 +53,21 @@ example of 2: "[[B]]"
     expect(last).toContain('"[[A]]"')
     expect(last).toContain('"[[C]]"')
     expect(last).toContain('example of 2: "[[B]]"')
-  })
 
-  it("appends to an existing list value on the exact key", async () => {
-    const markdown = `---
-example of:
-  - "[[A]]"
-  - "[[B]]"
----
-
-# Body`
-    await h.mountEditor(markdown, { attachToBody: true })
-    await h.openAddProperty()
-
-    const keyInput = h
-      .getWrapper()
-      .find('[data-testid="rich-note-property-key"]')
-    const valInput = h
-      .getWrapper()
-      .find('[data-testid="rich-note-property-value"]')
-    await keyInput.setValue("example of")
-    await h.setPropertyValueField(valInput, "[[C]]")
-    await valInput.trigger("blur")
-
-    const parsed = parseNoteContentMarkdown(h.lastEmittedMarkdown())
+    await wrapper.setProps({ modelValue: LIST_MARKDOWN })
+    await flushPromises()
+    await h.commitInsertProperty("example of", "[[C]]")
+    parsed = parseNoteContentMarkdown(h.lastEmittedMarkdown())
     expect(parsed.ok).toBe(true)
     if (!parsed.ok) return
     expect(parsed.properties["example of"]).toEqual(
       listPropertyValue(["[[A]]", "[[B]]", "[[C]]"])
     )
-  })
 
-  it("does not fold legacy suffix keys when adding to the exact base key", async () => {
-    const markdown = `---
-example of: one
-example of 2: two
-example of 3: three
----
-
-# Body`
-    await h.mountEditor(markdown, { attachToBody: true })
-    await h.openAddProperty()
-
-    const keyInput = h
-      .getWrapper()
-      .find('[data-testid="rich-note-property-key"]')
-    const valInput = h
-      .getWrapper()
-      .find('[data-testid="rich-note-property-value"]')
-    await keyInput.setValue("example of")
-    await h.setPropertyValueField(valInput, "four")
-    await valInput.trigger("blur")
-
-    const parsed = parseNoteContentMarkdown(h.lastEmittedMarkdown())
+    await wrapper.setProps({ modelValue: LEGACY_SUFFIX_MARKDOWN })
+    await flushPromises()
+    await h.commitInsertProperty("example of", "four")
+    parsed = parseNoteContentMarkdown(h.lastEmittedMarkdown())
     expect(parsed.ok).toBe(true)
     if (!parsed.ok) return
     expect(parsed.properties["example of"]).toEqual(
