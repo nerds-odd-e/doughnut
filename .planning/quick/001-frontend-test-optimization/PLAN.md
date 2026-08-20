@@ -316,1037 +316,193 @@ Status: done
 
 ---
 
-### Optimize batch 12 (ranks 34–36)
+### Optimize remaining RichMarkdownEditor property specs
 Type: Structure
 Status: planned
 
-**Tests:**
-- `tests/components/recall/NoteRefinement.layoutSelection.spec.ts` — "NoteRefinement layout selection includes parent id when all descendants are selected again" (~25ms)
+**Tests (remaining slow cases in these files):**
+- `tests/components/form/RichMarkdownEditor.properties.spec.ts`
+- `tests/components/form/RichMarkdownEditor.overlapsProperty.spec.ts`
+- `tests/components/form/RichMarkdownEditor.aliasesProperty.spec.ts`
+- `tests/components/form/RichMarkdownEditor.propertyValuePopup.spec.ts`
+- `tests/components/form/RichMarkdownEditor.propertyValuePopupReorder.spec.ts`
+- `tests/components/form/RichMarkdownEditor.propertyKeyPresets.spec.ts`
+- `tests/components/form/RichMarkdownEditor.propertyKeyPresets.listAppend.spec.ts`
+- `tests/components/form/RichMarkdownEditor.propertyTouchFocus.spec.ts`
 
-
-**Note:** modeSwitch scalar↔list and conversationWiki overflow already optimized in batches 9–10 — skip those ranks.
-
-
-**Goals:** Speed up only the listed tests (delete/merge redundant coverage first; then setup/selectors/waits). If no meaningful speedup after a serious attempt, append Candidate(s) to `ongoing/test-optimization-blacklist.md` and mark done.
+**Goals:** Merge/delete redundant property-editor scenarios; hoist shared mount; fake timers / flushPromises. Skip already-optimized modeSwitch / propertyRelationImageIndex.
 
 **Verify:**
-
 ```bash
-pnpm frontend:test tests/components/form/RichMarkdownEditor.propertyValuePopupModeSwitch.spec.ts tests/components/recall/NoteRefinement.layoutSelection.spec.ts tests/notes/NoteToolbar.conversationWikiNewOverflow.spec.ts
+pnpm frontend:test tests/components/form/RichMarkdownEditor.properties.spec.ts tests/components/form/RichMarkdownEditor.overlapsProperty.spec.ts tests/components/form/RichMarkdownEditor.aliasesProperty.spec.ts tests/components/form/RichMarkdownEditor.propertyValuePopup.spec.ts tests/components/form/RichMarkdownEditor.propertyValuePopupReorder.spec.ts tests/components/form/RichMarkdownEditor.propertyKeyPresets.spec.ts tests/components/form/RichMarkdownEditor.propertyKeyPresets.listAppend.spec.ts tests/components/form/RichMarkdownEditor.propertyTouchFocus.spec.ts
 ```
-
-(Paths are relative to `frontend/` as accepted by `pnpm frontend:test`.)
 
 ---
 
-### Optimize batch 13 (ranks 37–39)
+### Optimize remaining NoteRefinement specs
 Type: Structure
 Status: planned
 
 **Tests:**
-- `tests/components/form/RichMarkdownEditor.properties.spec.ts` — "RichMarkdownEditor properties shows read-only Properties above Quill when content includes supported YAML frontmatter" (~24ms)
-- `tests/components/form/RichMarkdownEditor.overlapsProperty.spec.ts` — "RichMarkdownEditor overlaps property emits valid overlaps list edits from popup" (~24ms)
+- `tests/components/recall/NoteRefinement.layoutSelection.spec.ts`
+- `tests/components/recall/NoteRefinement.removeLayout.spec.ts`
+- `tests/components/recall/NoteRefinement.extractNote.create.spec.ts`
+- `tests/components/recall/NoteRefinement.extractNote.loading.spec.ts`
+- `tests/components/recall/NoteRefinement.extractionPreview.cancel.spec.ts`
+- `tests/components/recall/NoteRefinement.extractionPreview.cancel.edges.spec.ts`
+- `tests/components/recall/NoteRefinement.exportExtractRequest.spec.ts`
+- `tests/components/recall/RefineNoteModal.extractNote.close.spec.ts`
 
-**Note:** pinnedToggles already done in batch 5 — skip.
-
-
-**Goals:** Speed up only the listed tests (delete/merge redundant coverage first; then setup/selectors/waits). If no meaningful speedup after a serious attempt, append Candidate(s) to `ongoing/test-optimization-blacklist.md` and mark done.
+**Goals:** Merge remounts/loading cases; share fixtures with existing noteRefinement*TestSupport.
 
 **Verify:**
-
 ```bash
-pnpm frontend:test tests/components/form/RichMarkdownEditor.properties.spec.ts tests/notes/NoteToolbar.pinnedToggles.spec.ts tests/components/form/RichMarkdownEditor.overlapsProperty.spec.ts
+pnpm frontend:test tests/components/recall/NoteRefinement.layoutSelection.spec.ts tests/components/recall/NoteRefinement.removeLayout.spec.ts tests/components/recall/NoteRefinement.extractNote.create.spec.ts tests/components/recall/NoteRefinement.extractNote.loading.spec.ts tests/components/recall/NoteRefinement.extractionPreview.cancel.spec.ts tests/components/recall/NoteRefinement.extractionPreview.cancel.edges.spec.ts tests/components/recall/NoteRefinement.exportExtractRequest.spec.ts tests/components/recall/RefineNoteModal.extractNote.close.spec.ts
 ```
-
-(Paths are relative to `frontend/` as accepted by `pnpm frontend:test`.)
 
 ---
 
-### Optimize batch 14 (ranks 40–42)
+### Optimize remaining NoteToolbar and note chrome
 Type: Structure
 Status: planned
 
 **Tests:**
-- `tests/components/form/RichMarkdownEditor.propertyValuePopupReorder.spec.ts` — "RichMarkdownEditor property value popup reorder preserves reordered list items in composed YAML when saved from popup" (~24ms)
-- `tests/components/form/RichMarkdownEditor.aliasesProperty.spec.ts` — "RichMarkdownEditor aliases property emits valid aliases list edits from popup" (~24ms)
+- `tests/notes/NoteToolbar.moreOptions.spec.ts`
+- `tests/notes/NoteToolbar.assimilationPanel.spec.ts`
+- `tests/notes/NoteMoreOptionsForm.deleteNote.spec.ts`
+- `tests/notes/NoteMoreOptionsForm.deleteNote.relationship.spec.ts`
+- `tests/notes/NoteEditableContent.spec.ts`
+- `tests/notes/NoteEditableContent.paste.spec.ts`
+- `tests/notes/NoteEditableContent.relationProperty.spec.ts`
+- `tests/notes/NoteTextContent.titleEdit.spec.ts`
+- `tests/notes/NoteTextContent.titleEdit.saveRace.spec.ts`
+- `tests/components/notes/NoteTextContentUndo.spec.ts`
+- `tests/notes/NoteNewButton.spec.ts`
+- `tests/notes/NoteNewForm.spec.ts`
+- `tests/notes/NoteNewForm.parentRelationship.spec.ts`
+- `tests/notes/NoteDeadWikiLinkCreateModal.spec.ts`
+- `tests/notes/FolderSelector.spec.ts`
 
-**Note:** pinnedToggles already done in batch 5 — skip.
-
-
-**Goals:** Speed up only the listed tests (delete/merge redundant coverage first; then setup/selectors/waits). If no meaningful speedup after a serious attempt, append Candidate(s) to `ongoing/test-optimization-blacklist.md` and mark done.
+**Goals:** Merge remount-heavy toolbar/form cases; fake timers for soft-keyboard primers.
 
 **Verify:**
-
 ```bash
-pnpm frontend:test tests/components/form/RichMarkdownEditor.propertyValuePopupReorder.spec.ts tests/components/form/RichMarkdownEditor.aliasesProperty.spec.ts tests/notes/NoteToolbar.pinnedToggles.spec.ts
+pnpm frontend:test tests/notes/NoteToolbar.moreOptions.spec.ts tests/notes/NoteToolbar.assimilationPanel.spec.ts tests/notes/NoteMoreOptionsForm.deleteNote.spec.ts tests/notes/NoteMoreOptionsForm.deleteNote.relationship.spec.ts tests/notes/NoteEditableContent.spec.ts tests/notes/NoteEditableContent.paste.spec.ts tests/notes/NoteEditableContent.relationProperty.spec.ts tests/notes/NoteTextContent.titleEdit.spec.ts tests/notes/NoteTextContent.titleEdit.saveRace.spec.ts tests/components/notes/NoteTextContentUndo.spec.ts tests/notes/NoteNewButton.spec.ts tests/notes/NoteNewForm.spec.ts tests/notes/NoteNewForm.parentRelationship.spec.ts tests/notes/NoteDeadWikiLinkCreateModal.spec.ts tests/notes/FolderSelector.spec.ts
 ```
-
-(Paths are relative to `frontend/` as accepted by `pnpm frontend:test`.)
 
 ---
 
-### Optimize batch 15 (ranks 43–45)
+### Optimize Wikidata association and NoteNewForm wikidata remainder
 Type: Structure
 Status: planned
 
 **Tests:**
-- `tests/pages/NoteShowPageAssimilationPanel.spec.ts` — "note show page inline assimilation panel renders assimilate button when assimilation settings are on" (~24ms)
-- `tests/components/form/RichMarkdownEditor.propertyKeyPresets.listAppend.spec.ts` — "RichMarkdownEditor list-capable preset append appends another value to exact list-capable key as a list item" (~23ms)
-- `tests/components/recall/NoteRefinement.removeLayout.spec.ts` — "NoteRefinement remove refinement layout items selection and confirmation calls API and emits contentUpdated when removal is confirmed" (~23ms)
+- `tests/notes/WikidataAssociationDialog.titleActions.spec.ts`
+- `tests/notes/NoteNewForm.wikidata.spec.ts` (remaining non-merged cases)
 
-**Goals:** Speed up only the listed tests (delete/merge redundant coverage first; then setup/selectors/waits). If no meaningful speedup after a serious attempt, append Candidate(s) to `ongoing/test-optimization-blacklist.md` and mark done.
+**Goals:** Parameterize title-action matrix; soft-keyboard primers with fake timers.
 
 **Verify:**
-
 ```bash
-pnpm frontend:test tests/pages/NoteShowPageAssimilationPanel.spec.ts tests/components/form/RichMarkdownEditor.propertyKeyPresets.listAppend.spec.ts tests/components/recall/NoteRefinement.removeLayout.spec.ts
+pnpm frontend:test tests/notes/WikidataAssociationDialog.titleActions.spec.ts tests/notes/NoteNewForm.wikidata.spec.ts
 ```
-
-(Paths are relative to `frontend/` as accepted by `pnpm frontend:test`.)
 
 ---
 
-### Optimize batch 16 (ranks 46–48)
+### Optimize SearchDialog / wiki-link remainder
 Type: Structure
 Status: planned
 
 **Tests:**
-- `tests/components/form/RichMarkdownEditor.overlapsProperty.spec.ts` — "RichMarkdownEditor overlaps property shows overlaps constraint for 'scalar text in popup'" (~23ms)
-- `tests/wiki-link-or-relationship/AddRelationship.spec.ts` — "AddRelationshipFinalize shows LoadingModal while creating relationship note" (~23ms)
-- `tests/wiki-link-or-relationship/AddRelationship.spec.ts` — "AddRelationshipFinalize shows placement options with relations subfolder selected by default" (~23ms)
+- `tests/wiki-link-or-relationship/SearchDialog.actions.spec.ts`
+- `tests/wiki-link-or-relationship/SearchDialog.deadWikiLink.spec.ts`
+- `tests/wiki-link-or-relationship/SearchDialog.searchKeyHistory.spec.ts`
+- `tests/wiki-link-or-relationship/SearchDialog.spec.ts`
+- `tests/wiki-link-or-relationship/InsertWikiLink.spec.ts`
 
-**Goals:** Speed up only the listed tests (delete/merge redundant coverage first; then setup/selectors/waits). If no meaningful speedup after a serious attempt, append Candidate(s) to `ongoing/test-optimization-blacklist.md` and mark done.
+**Goals:** Merge dead-link spelling variants; hoist search setup; drop paths covered by InsertWikiLink.
 
 **Verify:**
-
 ```bash
-pnpm frontend:test tests/components/form/RichMarkdownEditor.overlapsProperty.spec.ts tests/wiki-link-or-relationship/AddRelationship.spec.ts
+pnpm frontend:test tests/wiki-link-or-relationship/SearchDialog.actions.spec.ts tests/wiki-link-or-relationship/SearchDialog.deadWikiLink.spec.ts tests/wiki-link-or-relationship/SearchDialog.searchKeyHistory.spec.ts tests/wiki-link-or-relationship/SearchDialog.spec.ts tests/wiki-link-or-relationship/InsertWikiLink.spec.ts
 ```
-
-(Paths are relative to `frontend/` as accepted by `pnpm frontend:test`.)
 
 ---
 
-### Optimize batch 17 (ranks 49–51)
+### Optimize sidebar specs
 Type: Structure
 Status: planned
 
 **Tests:**
-- `tests/wiki-link-or-relationship/AddRelationship.spec.ts` — "AddRelationshipFinalize creates relationship note, navigates, and emits success" (~23ms)
-- `tests/notes/NoteEditableContent.spec.ts` — "NoteEditableContent should preserve second edit when first save response arrives after second edit" (~23ms)
-- `tests/notes/NoteTextContent.titleEdit.spec.ts` — "NoteTextContent title edit when save fails with a binding error clears the error after a successful edit" (~23ms)
+- `tests/notes/sidebar/SidebarFirstGeneration.spec.ts`
+- `tests/notes/sidebar/SidebarFolderItem.spec.ts`
+- `tests/notes/sidebar/SidebarPeerSort.spec.ts`
+- `tests/notes/sidebar/SidebarRouteNavigation.spec.ts`
+- `tests/notes/sidebar/SidebarAncestorLoading.spec.ts`
 
-**Goals:** Speed up only the listed tests (delete/merge redundant coverage first; then setup/selectors/waits). If no meaningful speedup after a serious attempt, append Candidate(s) to `ongoing/test-optimization-blacklist.md` and mark done.
+**Goals:** Share sidebar mount fixtures; drop redundant scroll/nav remounts.
 
 **Verify:**
-
 ```bash
-pnpm frontend:test tests/wiki-link-or-relationship/AddRelationship.spec.ts tests/notes/NoteEditableContent.spec.ts tests/notes/NoteTextContent.titleEdit.spec.ts
+pnpm frontend:test tests/notes/sidebar/SidebarFirstGeneration.spec.ts tests/notes/sidebar/SidebarFolderItem.spec.ts tests/notes/sidebar/SidebarPeerSort.spec.ts tests/notes/sidebar/SidebarRouteNavigation.spec.ts tests/notes/sidebar/SidebarAncestorLoading.spec.ts
 ```
-
-(Paths are relative to `frontend/` as accepted by `pnpm frontend:test`.)
 
 ---
 
-### Optimize batch 18 (ranks 52–54)
+### Optimize remaining pages (Folder, Assimilation, Book, Recall, Catalog, Memory)
 Type: Structure
 Status: planned
 
 **Tests:**
-- `tests/components/form/RichMarkdownEditor.propertyValuePopupModeSwitch.spec.ts` — "RichMarkdownEditor property value popup mode switch seeds text mode from populated list when switching from list mode" (~23ms)
-- `tests/notes/NoteTextContent.titleEdit.spec.ts` — "NoteTextContent title edit keeps newer local edits when API returns an older title" (~23ms)
-- `tests/pages/FolderPage.moveDestination.spec.ts` — "FolderPage move destinations move sends destinationNotebookId and navigates after cross-notebook root move" (~23ms)
+- `tests/pages/NoteShowPageAssimilationPanel.spec.ts`
+- `tests/pages/FolderPage.renameDissolve.spec.ts`
+- `tests/pages/FolderPage.moveConflict.spec.ts`
+- `tests/pages/FolderPage.moveDestination.spec.ts` (any remaining)
+- `tests/pages/BookReadingPage.snap.spec.ts`
+- `tests/pages/BookReadingPage.snap.budgets.spec.ts`
+- `tests/pages/BookReadingPage.readingPosition.spec.ts`
+- `tests/pages/RecallPage.spelling.spec.ts`
+- `tests/pages/RecallPageOverlap.spec.ts`
+- `tests/pages/NotebookCatalogList.spec.ts`
+- `tests/pages/NotebookCatalogExport.spec.ts`
+- `tests/pages/MemoryTrackerPageView.deleteUnanswered.spec.ts`
+- `tests/pages/settings/AccessTokensSettingsTab.spec.ts`
+- `tests/toolbars/MainMenu.resume.spec.ts`
 
-**Goals:** Speed up only the listed tests (delete/merge redundant coverage first; then setup/selectors/waits). If no meaningful speedup after a serious attempt, append Candidate(s) to `ongoing/test-optimization-blacklist.md` and mark done.
+**Goals:** Merge parameterized confirmation messages; lighter page mounts; fake timers where waits remain.
 
 **Verify:**
-
 ```bash
-pnpm frontend:test tests/components/form/RichMarkdownEditor.propertyValuePopupModeSwitch.spec.ts tests/notes/NoteTextContent.titleEdit.spec.ts tests/pages/FolderPage.moveDestination.spec.ts
+pnpm frontend:test tests/pages/NoteShowPageAssimilationPanel.spec.ts tests/pages/FolderPage.renameDissolve.spec.ts tests/pages/FolderPage.moveConflict.spec.ts tests/pages/BookReadingPage.snap.spec.ts tests/pages/BookReadingPage.snap.budgets.spec.ts tests/pages/BookReadingPage.readingPosition.spec.ts tests/pages/RecallPage.spelling.spec.ts tests/pages/RecallPageOverlap.spec.ts tests/pages/NotebookCatalogList.spec.ts tests/pages/NotebookCatalogExport.spec.ts tests/pages/MemoryTrackerPageView.deleteUnanswered.spec.ts tests/pages/settings/AccessTokensSettingsTab.spec.ts tests/toolbars/MainMenu.resume.spec.ts
 ```
-
-(Paths are relative to `frontend/` as accepted by `pnpm frontend:test`.)
 
 ---
 
-### Optimize batch 19 (ranks 55–57)
+### Optimize remaining misc recall/commons components
 Type: Structure
 Status: planned
 
 **Tests:**
-- `tests/components/form/RichMarkdownEditor.propertyValuePopup.spec.ts` — "RichMarkdownEditor property value popup saves edited scalar value from popup without changing YAML shape to a list" (~23ms)
-- `tests/components/recall/NoteRefinement.layoutSelection.spec.ts` — "NoteRefinement layout selection removes non-contiguous selected refinement layout items" (~23ms)
-- `tests/components/recall/NoteRefinement.removeLayout.loading.spec.ts` — "NoteRefinement remove layout loading modal keeps remove continuous blocker noncancelable while nested layout regenerates" (~23ms)
+- `tests/components/recall/AssimilationPanel.property.spec.ts`
+- `tests/components/recall/AssimilationPanel.loadingModal.spec.ts`
+- `tests/components/recall/AnsweredQuestionComponent.spec.ts`
+- `tests/components/recall/CommissionLearningSessionDialog.spec.ts`
+- `tests/components/commons/Modal.spec.ts`
+- `tests/components/form/SeamlessTextEditor.spec.ts`
+- `tests/components/form/TextInput.spec.ts`
+- `tests/components/recallStats/recallStatsTheme.spec.ts`
+- `tests/components/admin/FailureReportList.spec.ts`
 
-**Goals:** Speed up only the listed tests (delete/merge redundant coverage first; then setup/selectors/waits). If no meaningful speedup after a serious attempt, append Candidate(s) to `ongoing/test-optimization-blacklist.md` and mark done.
+**Goals:** Merge loading-modal paths; drop redundant assertions; fake timers for caret sync.
 
 **Verify:**
-
 ```bash
-pnpm frontend:test tests/components/form/RichMarkdownEditor.propertyValuePopup.spec.ts tests/components/recall/NoteRefinement.layoutSelection.spec.ts tests/components/recall/NoteRefinement.removeLayout.loading.spec.ts
+pnpm frontend:test tests/components/recall/AssimilationPanel.property.spec.ts tests/components/recall/AssimilationPanel.loadingModal.spec.ts tests/components/recall/AnsweredQuestionComponent.spec.ts tests/components/recall/CommissionLearningSessionDialog.spec.ts tests/components/commons/Modal.spec.ts tests/components/form/SeamlessTextEditor.spec.ts tests/components/form/TextInput.spec.ts tests/components/recallStats/recallStatsTheme.spec.ts tests/components/admin/FailureReportList.spec.ts
 ```
-
-(Paths are relative to `frontend/` as accepted by `pnpm frontend:test`.)
 
 ---
 
-### Optimize batch 20 (ranks 58–60)
-Type: Structure
-Status: planned
-
-**Tests:**
-- `tests/components/recall/RefineNoteModal.extractNote.close.spec.ts` — "RefineNoteModal extract note close closes the refine note modal after creating a note from extraction preview" (~22ms)
-- `tests/wiki-link-or-relationship/InsertWikiLink.spec.ts` — "InsertWikiLink calls the insert-wiki-link-as-property inserter when Add wiki link as a new property is clicked" (~22ms)
-- `tests/components/form/RichMarkdownEditor.aliasesProperty.spec.ts` — "RichMarkdownEditor aliases property shows alias constraint for 'scalar text in popup'" (~22ms)
-
-**Goals:** Speed up only the listed tests (delete/merge redundant coverage first; then setup/selectors/waits). If no meaningful speedup after a serious attempt, append Candidate(s) to `ongoing/test-optimization-blacklist.md` and mark done.
-
-**Verify:**
-
-```bash
-pnpm frontend:test tests/components/recall/RefineNoteModal.extractNote.close.spec.ts tests/wiki-link-or-relationship/InsertWikiLink.spec.ts tests/components/form/RichMarkdownEditor.aliasesProperty.spec.ts
-```
-
-(Paths are relative to `frontend/` as accepted by `pnpm frontend:test`.)
-
----
-
-### Optimize batch 21 (ranks 61–63)
-Type: Structure
-Status: planned
-
-**Tests:**
-- `tests/components/form/RichMarkdownEditor.propertyValuePopupReorder.spec.ts` — "RichMarkdownEditor property value popup reorder disables move up on first item and move down on last item" (~22ms)
-- `tests/components/form/RichMarkdownEditor.aliasesProperty.spec.ts` — "RichMarkdownEditor aliases property inserts the first alias as a list when adding a new aliases property" (~22ms)
-- `tests/notes/NoteNewForm.wikidata.spec.ts` — "NoteNewForm wikidata and soft-delete search wikidata entry search 'dog' get 'dog' with action undefined updates title as 'dog'" (~21ms)
-
-**Goals:** Speed up only the listed tests (delete/merge redundant coverage first; then setup/selectors/waits). If no meaningful speedup after a serious attempt, append Candidate(s) to `ongoing/test-optimization-blacklist.md` and mark done.
-
-**Verify:**
-
-```bash
-pnpm frontend:test tests/components/form/RichMarkdownEditor.propertyValuePopupReorder.spec.ts tests/components/form/RichMarkdownEditor.aliasesProperty.spec.ts tests/notes/NoteNewForm.wikidata.spec.ts
-```
-
-(Paths are relative to `frontend/` as accepted by `pnpm frontend:test`.)
-
----
-
-### Optimize batch 22 (ranks 64–66)
-Type: Structure
-Status: planned
-
-**Tests:**
-- `tests/notes/WikidataAssociationDialog.titleActions.spec.ts` — "WikidataAssociationDialog title actions and save soft keyboard primer transfers focus to wikidata ID input after mount when showSaveButton" (~21ms)
-- `tests/notes/sidebar/SidebarFirstGeneration.spec.ts` — "Sidebar first generation should scroll to active note" (~21ms)
-- `tests/wiki-link-or-relationship/InsertWikiLink.spec.ts` — "InsertWikiLink does not call the inserter when Add a new relationship note is clicked" (~21ms)
-
-**Goals:** Speed up only the listed tests (delete/merge redundant coverage first; then setup/selectors/waits). If no meaningful speedup after a serious attempt, append Candidate(s) to `ongoing/test-optimization-blacklist.md` and mark done.
-
-**Verify:**
-
-```bash
-pnpm frontend:test tests/notes/WikidataAssociationDialog.titleActions.spec.ts tests/notes/sidebar/SidebarFirstGeneration.spec.ts tests/wiki-link-or-relationship/InsertWikiLink.spec.ts
-```
-
-(Paths are relative to `frontend/` as accepted by `pnpm frontend:test`.)
-
----
-
-### Optimize batch 23 (ranks 67–69)
-Type: Structure
-Status: planned
-
-**Tests:**
-- `tests/notes/NoteToolbar.moreOptions.spec.ts` — "NoteToolbar more options copies export markdown while keeping the export dialog open" (~21ms)
-- `tests/components/form/RichMarkdownEditor.propertyRelationImageIndex.spec.ts` — "RichMarkdownEditor property relation and index relation property in rich mode opens dialog with custom text prefilled for an unknown relation" (~21ms)
-- `tests/notes/NoteNewForm.wikidata.spec.ts` — "NoteNewForm wikidata and soft-delete search wikidata entry opens wikidata dialog on search and closes on cancel" (~21ms)
-
-**Goals:** Speed up only the listed tests (delete/merge redundant coverage first; then setup/selectors/waits). If no meaningful speedup after a serious attempt, append Candidate(s) to `ongoing/test-optimization-blacklist.md` and mark done.
-
-**Verify:**
-
-```bash
-pnpm frontend:test tests/notes/NoteToolbar.moreOptions.spec.ts tests/components/form/RichMarkdownEditor.propertyRelationImageIndex.spec.ts tests/notes/NoteNewForm.wikidata.spec.ts
-```
-
-(Paths are relative to `frontend/` as accepted by `pnpm frontend:test`.)
-
----
-
-### Optimize batch 24 (ranks 70–72)
-Type: Structure
-Status: planned
-
-**Tests:**
-- `tests/notes/NoteTextContent.titleEdit.spec.ts` — "NoteTextContent title edit displays an editable title by default" (~21ms)
-- `tests/components/form/SeamlessTextEditor.spec.ts` — "SeamlessTextEditor keeps caret offset when modelValue is synced with same-length text" (~21ms)
-- `tests/components/recall/NoteRefinement.extractNote.create.spec.ts` — "NoteRefinement extract note create shows create errors in the preview" (~21ms)
-
-**Goals:** Speed up only the listed tests (delete/merge redundant coverage first; then setup/selectors/waits). If no meaningful speedup after a serious attempt, append Candidate(s) to `ongoing/test-optimization-blacklist.md` and mark done.
-
-**Verify:**
-
-```bash
-pnpm frontend:test tests/notes/NoteTextContent.titleEdit.spec.ts tests/components/form/SeamlessTextEditor.spec.ts tests/components/recall/NoteRefinement.extractNote.create.spec.ts
-```
-
-(Paths are relative to `frontend/` as accepted by `pnpm frontend:test`.)
-
----
-
-### Optimize batch 25 (ranks 73–75)
-Type: Structure
-Status: planned
-
-**Tests:**
-- `tests/components/recall/NoteRefinement.extractNote.spec.ts` — "NoteRefinement extract note preview shows inline error when retry preview API fails" (~21ms)
-- `tests/components/recall/NoteRefinement.extractNote.loading.spec.ts` — "NoteRefinement extract note loading shows LoadingModal while creating note from preview" (~21ms)
-- `tests/components/recall/NoteRefinement.extractNote.loading.spec.ts` — "NoteRefinement extract note loading shows LoadingModal while retrying extract preview" (~21ms)
-
-**Goals:** Speed up only the listed tests (delete/merge redundant coverage first; then setup/selectors/waits). If no meaningful speedup after a serious attempt, append Candidate(s) to `ongoing/test-optimization-blacklist.md` and mark done.
-
-**Verify:**
-
-```bash
-pnpm frontend:test tests/components/recall/NoteRefinement.extractNote.spec.ts tests/components/recall/NoteRefinement.extractNote.loading.spec.ts
-```
-
-(Paths are relative to `frontend/` as accepted by `pnpm frontend:test`.)
-
----
-
-### Optimize batch 26 (ranks 76–78)
-Type: Structure
-Status: planned
-
-**Tests:**
-- `tests/notes/NoteMoreOptionsForm.deleteNote.relationship.spec.ts` — "NoteMoreOptionsForm delete relationship note uses confirm when relationship note source does not resolve" (~20ms)
-- `tests/components/recall/NoteRefinement.extractionPreview.cancel.edges.spec.ts` — "NoteRefinement extraction preview cancel edges create-note pending shows creating message without Cancel" (~20ms)
-- `tests/pages/BookReadingPage.snap.spec.ts` — "BookReadingPage snap snaps back and keeps panel visible on first boundary crossing (same-page: scrolls to block start)" (~20ms)
-
-**Goals:** Speed up only the listed tests (delete/merge redundant coverage first; then setup/selectors/waits). If no meaningful speedup after a serious attempt, append Candidate(s) to `ongoing/test-optimization-blacklist.md` and mark done.
-
-**Verify:**
-
-```bash
-pnpm frontend:test tests/notes/NoteMoreOptionsForm.deleteNote.relationship.spec.ts tests/components/recall/NoteRefinement.extractionPreview.cancel.edges.spec.ts tests/pages/BookReadingPage.snap.spec.ts
-```
-
-(Paths are relative to `frontend/` as accepted by `pnpm frontend:test`.)
-
----
-
-### Optimize batch 27 (ranks 79–81)
-Type: Structure
-Status: planned
-
-**Tests:**
-- `tests/wiki-link-or-relationship/SearchDialog.actions.spec.ts` — "SearchForm actions Move Under folder hit shows confirm when move is blocked by soft-deleted title at destination" (~20ms)
-- `tests/wiki-link-or-relationship/SearchDialog.deadWikiLink.spec.ts` — "SearchForm dead wiki link actions Dead link - link to existing note rewrites path Markdown dead link '/Folder/Missing' keeping Markdown spelling" (~20ms)
-- `tests/components/recall/NoteRefinement.extractNote.spec.ts` — "NoteRefinement extract note preview returns to the layout when Back is clicked" (~20ms)
-
-**Goals:** Speed up only the listed tests (delete/merge redundant coverage first; then setup/selectors/waits). If no meaningful speedup after a serious attempt, append Candidate(s) to `ongoing/test-optimization-blacklist.md` and mark done.
-
-**Verify:**
-
-```bash
-pnpm frontend:test tests/wiki-link-or-relationship/SearchDialog.actions.spec.ts tests/wiki-link-or-relationship/SearchDialog.deadWikiLink.spec.ts tests/components/recall/NoteRefinement.extractNote.spec.ts
-```
-
-(Paths are relative to `frontend/` as accepted by `pnpm frontend:test`.)
-
----
-
-### Optimize batch 28 (ranks 82–84)
-Type: Structure
-Status: planned
-
-**Tests:**
-- `tests/wiki-link-or-relationship/SearchDialog.deadWikiLink.spec.ts` — "SearchForm dead wiki link actions Dead link - link to existing note rewrites every matching path Markdown dead link token" (~20ms)
-- `tests/notes/NoteNewForm.wikidata.spec.ts` — "NoteNewForm wikidata and soft-delete search wikidata entry search 'dog' get 'Dog' with action undefined updates title as 'Dog'" (~20ms)
-- `tests/wiki-link-or-relationship/SearchDialog.actions.spec.ts` — "SearchForm actions Move to notebook root on NOTEBOOK hit calls moveNoteToNotebookRootInNotebook with notebook id after confirm" (~20ms)
-
-**Goals:** Speed up only the listed tests (delete/merge redundant coverage first; then setup/selectors/waits). If no meaningful speedup after a serious attempt, append Candidate(s) to `ongoing/test-optimization-blacklist.md` and mark done.
-
-**Verify:**
-
-```bash
-pnpm frontend:test tests/wiki-link-or-relationship/SearchDialog.deadWikiLink.spec.ts tests/notes/NoteNewForm.wikidata.spec.ts tests/wiki-link-or-relationship/SearchDialog.actions.spec.ts
-```
-
-(Paths are relative to `frontend/` as accepted by `pnpm frontend:test`.)
-
----
-
-### Optimize batch 29 (ranks 85–87)
-Type: Structure
-Status: planned
-
-**Tests:**
-- `tests/wiki-link-or-relationship/SearchDialog.deadWikiLink.spec.ts` — "SearchForm dead wiki link actions Dead link - link to existing note rewrites path Markdown dead link '/Folder/Missing.md' keeping Markdown spelling" (~20ms)
-- `tests/components/recall/NoteRefinement.extractNote.create.spec.ts` — "NoteRefinement extract note create toggles Create note disabled state from new note title" (~20ms)
-- `tests/wiki-link-or-relationship/SearchDialog.searchKeyHistory.spec.ts` — "SearchForm search key history collapses search key history inside a modal when clicking elsewhere in that modal" (~20ms)
-
-**Goals:** Speed up only the listed tests (delete/merge redundant coverage first; then setup/selectors/waits). If no meaningful speedup after a serious attempt, append Candidate(s) to `ongoing/test-optimization-blacklist.md` and mark done.
-
-**Verify:**
-
-```bash
-pnpm frontend:test tests/wiki-link-or-relationship/SearchDialog.deadWikiLink.spec.ts tests/components/recall/NoteRefinement.extractNote.create.spec.ts tests/wiki-link-or-relationship/SearchDialog.searchKeyHistory.spec.ts
-```
-
-(Paths are relative to `frontend/` as accepted by `pnpm frontend:test`.)
-
----
-
-### Optimize batch 30 (ranks 88–90)
-Type: Structure
-Status: planned
-
-**Tests:**
-- `tests/notes/FolderSelector.spec.ts` — "FolderSelector soft keyboard primer transfers focus to search input after folder index loads" (~20ms)
-- `tests/notes/NoteMoreOptionsForm.deleteNote.spec.ts` — "NoteMoreOptionsForm delete note does not call deleteNote when confirmation is cancelled" (~20ms)
-- `tests/components/recall/AssimilationPanel.loadingModal.spec.ts` — "AssimilationPanel loading modal keeps the global modal open from assimilate through loading the next unit" (~20ms)
-
-**Goals:** Speed up only the listed tests (delete/merge redundant coverage first; then setup/selectors/waits). If no meaningful speedup after a serious attempt, append Candidate(s) to `ongoing/test-optimization-blacklist.md` and mark done.
-
-**Verify:**
-
-```bash
-pnpm frontend:test tests/notes/FolderSelector.spec.ts tests/notes/NoteMoreOptionsForm.deleteNote.spec.ts tests/components/recall/AssimilationPanel.loadingModal.spec.ts
-```
-
-(Paths are relative to `frontend/` as accepted by `pnpm frontend:test`.)
-
----
-
-### Optimize batch 31 (ranks 91–93)
-Type: Structure
-Status: planned
-
-**Tests:**
-- `tests/notes/NoteToolbar.assimilationPanel.spec.ts` — "NoteToolbar assimilation panel hides assimilation when audio opens and vice versa" (~20ms)
-- `tests/components/form/RichMarkdownEditor.propertyValuePopupReorder.spec.ts` — "RichMarkdownEditor property value popup reorder reorders duplicate list items as distinct rows in popup" (~19ms)
-- `tests/pages/NotebookCatalogList.spec.ts` — "catalog list returns to title A–Z after title Z–A" (~19ms)
-
-**Goals:** Speed up only the listed tests (delete/merge redundant coverage first; then setup/selectors/waits). If no meaningful speedup after a serious attempt, append Candidate(s) to `ongoing/test-optimization-blacklist.md` and mark done.
-
-**Verify:**
-
-```bash
-pnpm frontend:test tests/notes/NoteToolbar.assimilationPanel.spec.ts tests/components/form/RichMarkdownEditor.propertyValuePopupReorder.spec.ts tests/pages/NotebookCatalogList.spec.ts
-```
-
-(Paths are relative to `frontend/` as accepted by `pnpm frontend:test`.)
-
----
-
-### Optimize batch 32 (ranks 94–96)
-Type: Structure
-Status: planned
-
-**Tests:**
-- `tests/components/recall/NoteRefinement.extractionPreview.cancel.spec.ts` — "NoteRefinement extraction preview cancel cancels Ask AI to retry without wiping prior preview" (~19ms)
-- `tests/notes/NoteToolbar.conversationWikiNewOverflow.spec.ts` — "NoteToolbar Conversation, Wiki, and New overflow still opens wiki search when Wiki is in more options" (~19ms)
-- `tests/notes/NoteNewForm.spec.ts` — "adding new note selects all text when the default Untitled title is shown" (~19ms)
-
-**Goals:** Speed up only the listed tests (delete/merge redundant coverage first; then setup/selectors/waits). If no meaningful speedup after a serious attempt, append Candidate(s) to `ongoing/test-optimization-blacklist.md` and mark done.
-
-**Verify:**
-
-```bash
-pnpm frontend:test tests/components/recall/NoteRefinement.extractionPreview.cancel.spec.ts tests/notes/NoteToolbar.conversationWikiNewOverflow.spec.ts tests/notes/NoteNewForm.spec.ts
-```
-
-(Paths are relative to `frontend/` as accepted by `pnpm frontend:test`.)
-
----
-
-### Optimize batch 33 (ranks 97–99)
-Type: Structure
-Status: planned
-
-**Tests:**
-- `tests/components/form/RichMarkdownEditor.propertyValuePopup.spec.ts` — "RichMarkdownEditor property value popup cancel closes popup without emitting property changes" (~19ms)
-- `tests/components/recall/NoteRefinement.removeLayout.spec.ts` — "NoteRefinement remove refinement layout items selection and confirmation does not save or emit contentUpdated when removal returns unchanged content" (~19ms)
-- `tests/components/form/RichMarkdownEditor.propertyKeyPresets.spec.ts` — "RichMarkdownEditor property key presets preset dropdown for 'occupied url preset' shows options and sets key on selection" (~19ms)
-
-**Goals:** Speed up only the listed tests (delete/merge redundant coverage first; then setup/selectors/waits). If no meaningful speedup after a serious attempt, append Candidate(s) to `ongoing/test-optimization-blacklist.md` and mark done.
-
-**Verify:**
-
-```bash
-pnpm frontend:test tests/components/form/RichMarkdownEditor.propertyValuePopup.spec.ts tests/components/recall/NoteRefinement.removeLayout.spec.ts tests/components/form/RichMarkdownEditor.propertyKeyPresets.spec.ts
-```
-
-(Paths are relative to `frontend/` as accepted by `pnpm frontend:test`.)
-
----
-
-### Optimize batch 34 (ranks 100–102)
-Type: Structure
-Status: planned
-
-**Tests:**
-- `tests/components/form/TextInput.spec.ts` — "TextInput.vue does not select text when initialSelectAll is false" (~19ms)
-- `tests/components/form/RichMarkdownEditor.propertyValuePopup.spec.ts` — "RichMarkdownEditor property value popup 'shows value edit icon on list propert…'" (~18ms)
-- `tests/components/recallStats/recallStatsTheme.spec.ts` — "recall stats charts use theme tokens (dark-mode safe) calendar empty and filled cells are not hardcoded GitHub hex and adapt to dark theme" (~18ms)
-
-**Goals:** Speed up only the listed tests (delete/merge redundant coverage first; then setup/selectors/waits). If no meaningful speedup after a serious attempt, append Candidate(s) to `ongoing/test-optimization-blacklist.md` and mark done.
-
-**Verify:**
-
-```bash
-pnpm frontend:test tests/components/form/TextInput.spec.ts tests/components/form/RichMarkdownEditor.propertyValuePopup.spec.ts tests/components/recallStats/recallStatsTheme.spec.ts
-```
-
-(Paths are relative to `frontend/` as accepted by `pnpm frontend:test`.)
-
----
-
-### Optimize batch 35 (ranks 103–105)
-Type: Structure
-Status: planned
-
-**Tests:**
-- `tests/notes/NoteDeadWikiLinkCreateModal.spec.ts` — "NoteDeadWikiLinkCreateModal soft keyboard primer transfers focus to note title after create form mounts" (~18ms)
-- `tests/wiki-link-or-relationship/SearchDialog.spec.ts` — "SearchForm Matches / Recent list mode keeps search key and switches between Matches and Recent" (~18ms)
-- `tests/components/recall/AnsweredSpellingQuestionAccidentalMatch.spec.ts` — "AnsweredSpellingQuestion accidental match omits mutating CTAs when reviewed notebook is readonly" (~18ms)
-
-**Goals:** Speed up only the listed tests (delete/merge redundant coverage first; then setup/selectors/waits). If no meaningful speedup after a serious attempt, append Candidate(s) to `ongoing/test-optimization-blacklist.md` and mark done.
-
-**Verify:**
-
-```bash
-pnpm frontend:test tests/notes/NoteDeadWikiLinkCreateModal.spec.ts tests/wiki-link-or-relationship/SearchDialog.spec.ts tests/components/recall/AnsweredSpellingQuestionAccidentalMatch.spec.ts
-```
-
-(Paths are relative to `frontend/` as accepted by `pnpm frontend:test`.)
-
----
-
-### Optimize batch 36 (ranks 106–108)
-Type: Structure
-Status: planned
-
-**Tests:**
-- `tests/components/recall/NoteRefinement.removeLayout.spec.ts` — "NoteRefinement remove refinement layout items selection and confirmation clears selection and reloads layout after confirmed removal" (~18ms)
-- `tests/pages/NoteShowPageConversation.spec.ts` — "note show page conversation opens conversation when URL has conversation=true" (~18ms)
-- `tests/components/recall/NoteRefinement.extractNote.loading.spec.ts` — "NoteRefinement extract note loading shows LoadingModal during extract preview and hides on success or failure" (~18ms)
-
-**Goals:** Speed up only the listed tests (delete/merge redundant coverage first; then setup/selectors/waits). If no meaningful speedup after a serious attempt, append Candidate(s) to `ongoing/test-optimization-blacklist.md` and mark done.
-
-**Verify:**
-
-```bash
-pnpm frontend:test tests/components/recall/NoteRefinement.removeLayout.spec.ts tests/pages/NoteShowPageConversation.spec.ts tests/components/recall/NoteRefinement.extractNote.loading.spec.ts
-```
-
-(Paths are relative to `frontend/` as accepted by `pnpm frontend:test`.)
-
----
-
-### Optimize batch 37 (ranks 109–111)
-Type: Structure
-Status: planned
-
-**Tests:**
-- `tests/notes/NoteNewForm.parentRelationship.spec.ts` — "NoteNewForm parent relationship submits parent frontmatter when Under current is selected" (~18ms)
-- `tests/notes/NoteToolbar.conversationWikiNewOverflow.spec.ts` — "NoteToolbar Conversation, Wiki, and New overflow moves Conversation into more options before Wiki or New" (~18ms)
-- `tests/pages/BookReadingPage.snap.budgets.spec.ts` — "BookReadingPage snap budgets marking READ clears snap reminder: block no longer snaps when re-visited" (~18ms)
-
-**Goals:** Speed up only the listed tests (delete/merge redundant coverage first; then setup/selectors/waits). If no meaningful speedup after a serious attempt, append Candidate(s) to `ongoing/test-optimization-blacklist.md` and mark done.
-
-**Verify:**
-
-```bash
-pnpm frontend:test tests/notes/NoteNewForm.parentRelationship.spec.ts tests/notes/NoteToolbar.conversationWikiNewOverflow.spec.ts tests/pages/BookReadingPage.snap.budgets.spec.ts
-```
-
-(Paths are relative to `frontend/` as accepted by `pnpm frontend:test`.)
-
----
-
-### Optimize batch 38 (ranks 112–114)
-Type: Structure
-Status: planned
-
-**Tests:**
-- `tests/notes/WikidataAssociationDialog.titleActions.spec.ts` — "WikidataAssociationDialog title actions and save emits selected with replace action when showSaveButton is true" (~18ms)
-- `tests/components/recall/AssimilationPanel.loadingModal.spec.ts` — "AssimilationPanel loading modal hides global modal when assimilate API returns an error" (~18ms)
-- `tests/components/form/RichMarkdownEditor.properties.spec.ts` — "RichMarkdownEditor properties editing an existing property row emits renamed keys and updated values" (~18ms)
-
-**Goals:** Speed up only the listed tests (delete/merge redundant coverage first; then setup/selectors/waits). If no meaningful speedup after a serious attempt, append Candidate(s) to `ongoing/test-optimization-blacklist.md` and mark done.
-
-**Verify:**
-
-```bash
-pnpm frontend:test tests/notes/WikidataAssociationDialog.titleActions.spec.ts tests/components/recall/AssimilationPanel.loadingModal.spec.ts tests/components/form/RichMarkdownEditor.properties.spec.ts
-```
-
-(Paths are relative to `frontend/` as accepted by `pnpm frontend:test`.)
-
----
-
-### Optimize batch 39 (ranks 115–117)
-Type: Structure
-Status: planned
-
-**Tests:**
-- `tests/notes/WikidataAssociationDialog.titleActions.spec.ts` — "WikidataAssociationDialog title actions and save emits selected with replace action when showSaveButton is false" (~17ms)
-- `tests/notes/WikidataAssociationDialog.titleActions.spec.ts` — "WikidataAssociationDialog title actions and save emits selected with add alias action when showSaveButton is true" (~17ms)
-- `tests/components/form/RichMarkdownEditor.propertyKeyPresets.spec.ts` — "RichMarkdownEditor property key presets preset dropdown for 'existing row' shows options and sets key on selection" (~17ms)
-
-**Goals:** Speed up only the listed tests (delete/merge redundant coverage first; then setup/selectors/waits). If no meaningful speedup after a serious attempt, append Candidate(s) to `ongoing/test-optimization-blacklist.md` and mark done.
-
-**Verify:**
-
-```bash
-pnpm frontend:test tests/notes/WikidataAssociationDialog.titleActions.spec.ts tests/components/form/RichMarkdownEditor.propertyKeyPresets.spec.ts
-```
-
-(Paths are relative to `frontend/` as accepted by `pnpm frontend:test`.)
-
----
-
-### Optimize batch 40 (ranks 118–120)
-Type: Structure
-Status: planned
-
-**Tests:**
-- `tests/notes/NoteDeadWikiLinkCreateModal.spec.ts` — "NoteDeadWikiLinkCreateModal soft keyboard primer transfers focus to search input after point-at-existing form mounts" (~17ms)
-- `tests/notes/FolderSelector.spec.ts` — "FolderSelector soft keyboard primer does not focus primer when pointer is not coarse" (~17ms)
-- `tests/pages/FolderPage.renameDissolve.spec.ts` — "FolderPage rename and dissolve dissolve shows merge confirm when dissolve returns 409 and retries with merge=true" (~17ms)
-
-**Goals:** Speed up only the listed tests (delete/merge redundant coverage first; then setup/selectors/waits). If no meaningful speedup after a serious attempt, append Candidate(s) to `ongoing/test-optimization-blacklist.md` and mark done.
-
-**Verify:**
-
-```bash
-pnpm frontend:test tests/notes/NoteDeadWikiLinkCreateModal.spec.ts tests/notes/FolderSelector.spec.ts tests/pages/FolderPage.renameDissolve.spec.ts
-```
-
-(Paths are relative to `frontend/` as accepted by `pnpm frontend:test`.)
-
----
-
-### Optimize batch 41 (ranks 121–123)
-Type: Structure
-Status: planned
-
-**Tests:**
-- `tests/notes/NoteNewForm.spec.ts` — "adding new note places the caret after a trailing space when initialTitle comes from a template" (~17ms)
-- `tests/notes/sidebar/SidebarFolderItem.spec.ts` — "SidebarFolderItem scrolls folder row into view when active folder row is not intersecting" (~17ms)
-- `tests/components/recall/AnsweredQuestionComponent.spec.ts` — "AnsweredQuestionComponent refine note passes MCQ context when opening Refine note" (~17ms)
-
-**Goals:** Speed up only the listed tests (delete/merge redundant coverage first; then setup/selectors/waits). If no meaningful speedup after a serious attempt, append Candidate(s) to `ongoing/test-optimization-blacklist.md` and mark done.
-
-**Verify:**
-
-```bash
-pnpm frontend:test tests/notes/NoteNewForm.spec.ts tests/notes/sidebar/SidebarFolderItem.spec.ts tests/components/recall/AnsweredQuestionComponent.spec.ts
-```
-
-(Paths are relative to `frontend/` as accepted by `pnpm frontend:test`.)
-
----
-
-### Optimize batch 42 (ranks 124–126)
-Type: Structure
-Status: planned
-
-**Tests:**
-- `tests/notes/WikidataAssociationDialog.titleActions.spec.ts` — "WikidataAssociationDialog title actions and save emits selected with add alias action when showSaveButton is false" (~17ms)
-- `tests/components/form/RichMarkdownEditor.propertyTouchFocus.spec.ts` — "RichMarkdownEditor property touch focus does not focus primer when pointer is not coarse" (~17ms)
-- `tests/components/recall/NoteRefinement.layoutSelection.spec.ts` — "NoteRefinement layout selection submits only checked descendants when parent is indeterminate ('extract')" (~17ms)
-
-**Goals:** Speed up only the listed tests (delete/merge redundant coverage first; then setup/selectors/waits). If no meaningful speedup after a serious attempt, append Candidate(s) to `ongoing/test-optimization-blacklist.md` and mark done.
-
-**Verify:**
-
-```bash
-pnpm frontend:test tests/notes/WikidataAssociationDialog.titleActions.spec.ts tests/components/form/RichMarkdownEditor.propertyTouchFocus.spec.ts tests/components/recall/NoteRefinement.layoutSelection.spec.ts
-```
-
-(Paths are relative to `frontend/` as accepted by `pnpm frontend:test`.)
-
----
-
-### Optimize batch 43 (ranks 127–129)
-Type: Structure
-Status: planned
-
-**Tests:**
-- `tests/components/book-reading/PdfBookViewer.gestureZoom.spec.ts` — "PdfBookViewer gesture zoom (mocked pdf.js) wheel without ctrl/meta does not cancel (no browser-zoom block path)" (~17ms)
-- `tests/notes/NoteNewForm.wikidata.spec.ts` — "NoteNewForm wikidata and soft-delete submit errors displays reserved title error when api returns binding error for newTitle" (~17ms)
-- `tests/notes/WikidataAssociationDialog.titleActions.spec.ts` — "WikidataAssociationDialog title actions and save defers selected until Save when showSaveButton is true" (~17ms)
-
-**Goals:** Speed up only the listed tests (delete/merge redundant coverage first; then setup/selectors/waits). If no meaningful speedup after a serious attempt, append Candidate(s) to `ongoing/test-optimization-blacklist.md` and mark done.
-
-**Verify:**
-
-```bash
-pnpm frontend:test tests/components/book-reading/PdfBookViewer.gestureZoom.spec.ts tests/notes/NoteNewForm.wikidata.spec.ts tests/notes/WikidataAssociationDialog.titleActions.spec.ts
-```
-
-(Paths are relative to `frontend/` as accepted by `pnpm frontend:test`.)
-
----
-
-### Optimize batch 44 (ranks 130–132)
-Type: Structure
-Status: planned
-
-**Tests:**
-- `tests/notes/WikidataAssociationDialog.titleActions.spec.ts` — "WikidataAssociationDialog title actions and save enables Save and emits empty string when clearing with canSaveEmptyToClear" (~17ms)
-- `tests/commons/Modal.spec.ts` — "Modal prefers text controls inside a marked autofocus container" (~17ms)
-- `tests/components/book-reading/PdfBookViewer.gestureZoom.spec.ts` — "PdfBookViewer gesture zoom (mocked pdf.js) two-finger pinch touchmove updates scale around the midpoint" (~17ms)
-
-**Goals:** Speed up only the listed tests (delete/merge redundant coverage first; then setup/selectors/waits). If no meaningful speedup after a serious attempt, append Candidate(s) to `ongoing/test-optimization-blacklist.md` and mark done.
-
-**Verify:**
-
-```bash
-pnpm frontend:test tests/notes/WikidataAssociationDialog.titleActions.spec.ts tests/commons/Modal.spec.ts tests/components/book-reading/PdfBookViewer.gestureZoom.spec.ts
-```
-
-(Paths are relative to `frontend/` as accepted by `pnpm frontend:test`.)
-
----
-
-### Optimize batch 45 (ranks 133–135)
-Type: Structure
-Status: planned
-
-**Tests:**
-- `tests/notes/sidebar/SidebarPeerSort.spec.ts` — "Sidebar peer sort keeps Title (Z–A) on a later visit after the tab session is gone" (~17ms)
-- `tests/notes/NoteEditableContent.relationProperty.spec.ts` — "NoteEditableContent relation property row in rich mode shows relation type picker when noteContent includes relation frontmatter" (~17ms)
-- `tests/notes/NoteMoreOptionsForm.deleteNote.relationship.spec.ts` — "NoteMoreOptionsForm delete relationship note offers reduce-to-property when deleting a qualifying relationship note" (~17ms)
-
-**Goals:** Speed up only the listed tests (delete/merge redundant coverage first; then setup/selectors/waits). If no meaningful speedup after a serious attempt, append Candidate(s) to `ongoing/test-optimization-blacklist.md` and mark done.
-
-**Verify:**
-
-```bash
-pnpm frontend:test tests/notes/sidebar/SidebarPeerSort.spec.ts tests/notes/NoteEditableContent.relationProperty.spec.ts tests/notes/NoteMoreOptionsForm.deleteNote.relationship.spec.ts
-```
-
-(Paths are relative to `frontend/` as accepted by `pnpm frontend:test`.)
-
----
-
-### Optimize batch 46 (ranks 136–138)
-Type: Structure
-Status: planned
-
-**Tests:**
-- `tests/notes/sidebar/SidebarFolderItem.spec.ts` — "SidebarFolderItem does not scroll folder row when active folder row is already intersecting" (~17ms)
-- `tests/notes/sidebar/SidebarRouteNavigation.spec.ts` — "Sidebar route navigation: sticky realm during uncached note load keeps sidebar chrome when navigating to an uncached note in the same notebook" (~17ms)
-- `tests/notes/NoteDeadWikiLinkCreateModal.spec.ts` — "NoteDeadWikiLinkCreateModal soft keyboard primer does not focus primer on create tap when pointer is not coarse" (~17ms)
-
-**Goals:** Speed up only the listed tests (delete/merge redundant coverage first; then setup/selectors/waits). If no meaningful speedup after a serious attempt, append Candidate(s) to `ongoing/test-optimization-blacklist.md` and mark done.
-
-**Verify:**
-
-```bash
-pnpm frontend:test tests/notes/sidebar/SidebarFolderItem.spec.ts tests/notes/sidebar/SidebarRouteNavigation.spec.ts tests/notes/NoteDeadWikiLinkCreateModal.spec.ts
-```
-
-(Paths are relative to `frontend/` as accepted by `pnpm frontend:test`.)
-
----
-
-### Optimize batch 47 (ranks 139–141)
-Type: Structure
-Status: planned
-
-**Tests:**
-- `tests/pages/NoteShowPageAssimilationPanel.spec.ts` — "note show page inline assimilation panel does not render assimilation panel when settings are off" (~17ms)
-- `tests/pages/FolderPage.moveConflict.spec.ts` — "FolderPage move conflicts move shows error message when move 409 and user cancels merge" (~17ms)
-- `tests/pages/FolderPage.renameDissolve.spec.ts` — "FolderPage rename and dissolve dissolve shows inline error when dissolve returns soft-deleted title conflict" (~17ms)
-
-**Goals:** Speed up only the listed tests (delete/merge redundant coverage first; then setup/selectors/waits). If no meaningful speedup after a serious attempt, append Candidate(s) to `ongoing/test-optimization-blacklist.md` and mark done.
-
-**Verify:**
-
-```bash
-pnpm frontend:test tests/pages/NoteShowPageAssimilationPanel.spec.ts tests/pages/FolderPage.moveConflict.spec.ts tests/pages/FolderPage.renameDissolve.spec.ts
-```
-
-(Paths are relative to `frontend/` as accepted by `pnpm frontend:test`.)
-
----
-
-### Optimize batch 48 (ranks 142–144)
-Type: Structure
-Status: planned
-
-**Tests:**
-- `tests/pages/RecallPageOverlap.spec.ts` — "overlap try-again stay and retry stays on the same tracker, skips threshold, and remounts spelling on Try again" (~17ms)
-- `tests/components/form/RichMarkdownEditor.propertyTouchFocus.spec.ts` — "RichMarkdownEditor property touch focus transfers focus to property key after insert form mounts with 'existing rows'" (~17ms)
-- `tests/notes/NoteToolbar.moreOptionsOverflow.spec.ts` — "NoteToolbar more-options overflow moves Edit into more options when the bar is tighter than Export overflow" (~16ms)
-
-**Goals:** Speed up only the listed tests (delete/merge redundant coverage first; then setup/selectors/waits). If no meaningful speedup after a serious attempt, append Candidate(s) to `ongoing/test-optimization-blacklist.md` and mark done.
-
-**Verify:**
-
-```bash
-pnpm frontend:test tests/pages/RecallPageOverlap.spec.ts tests/components/form/RichMarkdownEditor.propertyTouchFocus.spec.ts tests/notes/NoteToolbar.moreOptionsOverflow.spec.ts
-```
-
-(Paths are relative to `frontend/` as accepted by `pnpm frontend:test`.)
-
----
-
-### Optimize batch 49 (ranks 145–147)
-Type: Structure
-Status: planned
-
-**Tests:**
-- `tests/components/recall/AssimilationPanel.property.spec.ts` — "AssimilationPanel property assimilation removes a property tracker from recall and shows Revive" (~16ms)
-- `tests/notes/sidebar/SidebarFirstGeneration.spec.ts` — "Sidebar first generation should not scroll if already visible" (~16ms)
-- `tests/components/form/RichMarkdownEditor.propertyValuePopup.spec.ts` — "RichMarkdownEditor property value popup hides list mode for scalar-only structural keys" (~16ms)
-
-**Goals:** Speed up only the listed tests (delete/merge redundant coverage first; then setup/selectors/waits). If no meaningful speedup after a serious attempt, append Candidate(s) to `ongoing/test-optimization-blacklist.md` and mark done.
-
-**Verify:**
-
-```bash
-pnpm frontend:test tests/components/recall/AssimilationPanel.property.spec.ts tests/notes/sidebar/SidebarFirstGeneration.spec.ts tests/components/form/RichMarkdownEditor.propertyValuePopup.spec.ts
-```
-
-(Paths are relative to `frontend/` as accepted by `pnpm frontend:test`.)
-
----
-
-### Optimize batch 50 (ranks 148–150)
-Type: Structure
-Status: planned
-
-**Tests:**
-- `tests/components/recall/AssimilationPanel.property.spec.ts` — "AssimilationPanel property assimilation advances to the next unit and reloads note info when assimilating a property" (~16ms)
-- `tests/notes/NoteTextContent.titleEdit.saveRace.spec.ts` — "NoteTextContent title edit save race saves the last title after an earlier in-flight save finishes" (~16ms)
-- `tests/components/recall/CommissionLearningSessionDialog.spec.ts` — "CommissionLearningSessionDialog keeps report textarea when record fails" (~16ms)
-
-**Goals:** Speed up only the listed tests (delete/merge redundant coverage first; then setup/selectors/waits). If no meaningful speedup after a serious attempt, append Candidate(s) to `ongoing/test-optimization-blacklist.md` and mark done.
-
-**Verify:**
-
-```bash
-pnpm frontend:test tests/components/recall/AssimilationPanel.property.spec.ts tests/notes/NoteTextContent.titleEdit.saveRace.spec.ts tests/components/recall/CommissionLearningSessionDialog.spec.ts
-```
-
-(Paths are relative to `frontend/` as accepted by `pnpm frontend:test`.)
-
----
-
-### Optimize batch 51 (ranks 151–153)
-Type: Structure
-Status: planned
-
-**Tests:**
-- `tests/wiki-link-or-relationship/SearchDialog.searchKeyHistory.spec.ts` — "SearchForm search key history collapses search key history when 'clicking a search scope toggle'" (~16ms)
-- `tests/components/form/RichMarkdownEditor.propertyKeyPresets.spec.ts` — "RichMarkdownEditor property key presets preset dropdown for 'occupied image preset' shows options and sets key on selection" (~16ms)
-- `tests/wiki-link-or-relationship/SearchDialog.searchKeyHistory.spec.ts` — "SearchForm search key history collapses search key history when 'clicking the search input'" (~16ms)
-
-**Goals:** Speed up only the listed tests (delete/merge redundant coverage first; then setup/selectors/waits). If no meaningful speedup after a serious attempt, append Candidate(s) to `ongoing/test-optimization-blacklist.md` and mark done.
-
-**Verify:**
-
-```bash
-pnpm frontend:test tests/wiki-link-or-relationship/SearchDialog.searchKeyHistory.spec.ts tests/components/form/RichMarkdownEditor.propertyKeyPresets.spec.ts
-```
-
-(Paths are relative to `frontend/` as accepted by `pnpm frontend:test`.)
-
----
-
-### Optimize batch 52 (ranks 154–156)
-Type: Structure
-Status: planned
-
-**Tests:**
-- `tests/notes/NoteToolbar.moreOptionsOverflow.spec.ts` — "NoteToolbar more-options overflow still toggles edit mode with m when Edit is in more options" (~16ms)
-- `tests/notes/NoteToolbar.assimilationPanel.spec.ts` — "NoteToolbar assimilation panel shows assimilation settings in the shared panel shell when opened" (~16ms)
-- `tests/components/form/RichMarkdownEditor.overlapsProperty.spec.ts` — "RichMarkdownEditor overlaps property shows overlaps constraint for 'plain list item in popup'" (~16ms)
-
-**Goals:** Speed up only the listed tests (delete/merge redundant coverage first; then setup/selectors/waits). If no meaningful speedup after a serious attempt, append Candidate(s) to `ongoing/test-optimization-blacklist.md` and mark done.
-
-**Verify:**
-
-```bash
-pnpm frontend:test tests/notes/NoteToolbar.moreOptionsOverflow.spec.ts tests/notes/NoteToolbar.assimilationPanel.spec.ts tests/components/form/RichMarkdownEditor.overlapsProperty.spec.ts
-```
-
-(Paths are relative to `frontend/` as accepted by `pnpm frontend:test`.)
-
----
-
-### Optimize batch 53 (ranks 157–159)
-Type: Structure
-Status: planned
-
-**Tests:**
-- `tests/components/recall/AssimilationPanel.property.spec.ts` — "AssimilationPanel property assimilation returns a skipped property to the sequence without creating a tracker or reviving" (~16ms)
-- `tests/notes/NoteNewButton.spec.ts` — "NoteNewButton keyboard shortcut opens the new-note dialog when n is pressed and the button is mounted" (~16ms)
-- `tests/components/form/RichMarkdownEditor.aliasesProperty.spec.ts` — "RichMarkdownEditor aliases property shows alias constraint for 'invalid list item in popup'" (~16ms)
-
-**Goals:** Speed up only the listed tests (delete/merge redundant coverage first; then setup/selectors/waits). If no meaningful speedup after a serious attempt, append Candidate(s) to `ongoing/test-optimization-blacklist.md` and mark done.
-
-**Verify:**
-
-```bash
-pnpm frontend:test tests/components/recall/AssimilationPanel.property.spec.ts tests/notes/NoteNewButton.spec.ts tests/components/form/RichMarkdownEditor.aliasesProperty.spec.ts
-```
-
-(Paths are relative to `frontend/` as accepted by `pnpm frontend:test`.)
-
----
-
-### Optimize batch 54 (ranks 160–162)
-Type: Structure
-Status: planned
-
-**Tests:**
-- `tests/pages/MemoryTrackerPageView.deleteUnanswered.spec.ts` — "MemoryTrackerPageView delete unanswered confirmation message for 'multiple prompts'" (~16ms)
-- `tests/components/recall/NoteRefinement.extractNote.spec.ts` — "NoteRefinement extract note preview shows inline error when extract preview API fails" (~15ms)
-- `tests/toolbars/MainMenu.resume.spec.ts` — "MainMenu resume recall shows highlighted Resume before Note when recall is paused" (~15ms)
-
-**Goals:** Speed up only the listed tests (delete/merge redundant coverage first; then setup/selectors/waits). If no meaningful speedup after a serious attempt, append Candidate(s) to `ongoing/test-optimization-blacklist.md` and mark done.
-
-**Verify:**
-
-```bash
-pnpm frontend:test tests/pages/MemoryTrackerPageView.deleteUnanswered.spec.ts tests/components/recall/NoteRefinement.extractNote.spec.ts tests/toolbars/MainMenu.resume.spec.ts
-```
-
-(Paths are relative to `frontend/` as accepted by `pnpm frontend:test`.)
-
----
-
-### Optimize batch 55 (ranks 163–165)
-Type: Structure
-Status: planned
-
-**Tests:**
-- `tests/wiki-link-or-relationship/SearchDialog.actions.spec.ts` — "SearchForm actions Move Under folder hit calls moveNoteToFolder with folder id after confirm" (~15ms)
-- `tests/notes/NoteEditableContent.paste.spec.ts` — "NoteEditableContent paste quill editor shows options popup based on content after paste" (~15ms)
-- `tests/pages/MemoryTrackerPageView.deleteUnanswered.spec.ts` — "MemoryTrackerPageView delete unanswered confirmation message for 'contested prompts excluded from count'" (~15ms)
-
-**Goals:** Speed up only the listed tests (delete/merge redundant coverage first; then setup/selectors/waits). If no meaningful speedup after a serious attempt, append Candidate(s) to `ongoing/test-optimization-blacklist.md` and mark done.
-
-**Verify:**
-
-```bash
-pnpm frontend:test tests/wiki-link-or-relationship/SearchDialog.actions.spec.ts tests/notes/NoteEditableContent.paste.spec.ts tests/pages/MemoryTrackerPageView.deleteUnanswered.spec.ts
-```
-
-(Paths are relative to `frontend/` as accepted by `pnpm frontend:test`.)
-
----
-
-### Optimize batch 56 (ranks 166–168)
-Type: Structure
-Status: planned
-
-**Tests:**
-- `tests/components/recall/NoteRefinement.exportExtractRequest.spec.ts` — "NoteRefinement export extract request does not show export button on the extraction preview screen" (~15ms)
-- `tests/notes/sidebar/SidebarAncestorLoading.spec.ts` — "Sidebar gradual ancestor population loads ancestor branches for a deep note through folder listings without showNote" (~15ms)
-- `tests/components/notes/NoteTextContentUndo.spec.ts` — "undo editing should call addEditingToUndoHistory on submitChange" (~15ms)
-
-**Goals:** Speed up only the listed tests (delete/merge redundant coverage first; then setup/selectors/waits). If no meaningful speedup after a serious attempt, append Candidate(s) to `ongoing/test-optimization-blacklist.md` and mark done.
-
-**Verify:**
-
-```bash
-pnpm frontend:test tests/components/recall/NoteRefinement.exportExtractRequest.spec.ts tests/notes/sidebar/SidebarAncestorLoading.spec.ts tests/components/notes/NoteTextContentUndo.spec.ts
-```
-
-(Paths are relative to `frontend/` as accepted by `pnpm frontend:test`.)
-
----
-
-### Optimize batch 57 (ranks 169–171)
-Type: Structure
-Status: planned
-
-**Tests:**
-- `tests/notes/FolderSelector.spec.ts` — "FolderSelector keyboard navigation moves focus through folder results and back to search input with ArrowDown and ArrowUp" (~15ms)
-- `tests/pages/settings/AccessTokensSettingsTab.spec.ts` — "AccessTokensSettingsTab displays "No Label" when token label is empty" (~15ms)
-- `tests/pages/MemoryTrackerPageView.deleteUnanswered.spec.ts` — "MemoryTrackerPageView delete unanswered confirmation message for 'single prompt'" (~15ms)
-
-**Goals:** Speed up only the listed tests (delete/merge redundant coverage first; then setup/selectors/waits). If no meaningful speedup after a serious attempt, append Candidate(s) to `ongoing/test-optimization-blacklist.md` and mark done.
-
-**Verify:**
-
-```bash
-pnpm frontend:test tests/notes/FolderSelector.spec.ts tests/pages/settings/AccessTokensSettingsTab.spec.ts tests/pages/MemoryTrackerPageView.deleteUnanswered.spec.ts
-```
-
-(Paths are relative to `frontend/` as accepted by `pnpm frontend:test`.)
-
----
-
-### Optimize batch 58 (ranks 172–174)
-Type: Structure
-Status: planned
-
-**Tests:**
-- `tests/pages/NotebookCatalogExport.spec.ts` — "Notebook catalog export falls back to the notebook name when Content-Disposition is not printable ASCII" (~15ms)
-- `tests/pages/RecallPage.spelling.spec.ts` — "RecallPage spelling quiz focuses the spelling answer input when resuming recall" (~15ms)
-- `tests/pages/BookReadingPage.readingPosition.spec.ts` — "BookReadingPage reading position PATCH reading position includes selectedBookBlockId after layout click" (~15ms)
-
-**Goals:** Speed up only the listed tests (delete/merge redundant coverage first; then setup/selectors/waits). If no meaningful speedup after a serious attempt, append Candidate(s) to `ongoing/test-optimization-blacklist.md` and mark done.
-
-**Verify:**
-
-```bash
-pnpm frontend:test tests/pages/NotebookCatalogExport.spec.ts tests/pages/RecallPage.spelling.spec.ts tests/pages/BookReadingPage.readingPosition.spec.ts
-```
-
-(Paths are relative to `frontend/` as accepted by `pnpm frontend:test`.)
-
----
-
-### Optimize batch 59 (ranks 175–177)
-Type: Structure
-Status: planned
-
-**Tests:**
-- `tests/notes/NoteToolbar.moreOptions.spec.ts` — "NoteToolbar more options toggles the audio tools panel from the overflow menu" (~15ms)
-- `tests/components/admin/FailureReportList.spec.ts` — "FailureReportList selecting and deleting reports deletes selected reports when confirmed" (~15ms)
-- `tests/notes/NoteNewForm.spec.ts` — "adding new note searches when user edits title back to 'Untitled'" (~15ms)
-
-**Goals:** Speed up only the listed tests (delete/merge redundant coverage first; then setup/selectors/waits). If no meaningful speedup after a serious attempt, append Candidate(s) to `ongoing/test-optimization-blacklist.md` and mark done.
-
-**Verify:**
-
-```bash
-pnpm frontend:test tests/notes/NoteToolbar.moreOptions.spec.ts tests/components/admin/FailureReportList.spec.ts tests/notes/NoteNewForm.spec.ts
-```
-
-(Paths are relative to `frontend/` as accepted by `pnpm frontend:test`.)
-
----
-
-### Optimize batch 60 (ranks 178–179)
-Type: Structure
-Status: planned
-
-**Tests:**
-- `tests/components/recall/NoteRefinement.extractNote.create.spec.ts` — "NoteRefinement extract note create creates a note from the preview and navigates to the new note" (~15ms)
-- `tests/components/recall/NoteRefinement.extractNote.create.spec.ts` — "NoteRefinement extract note create creates a note from edited preview fields" (~15ms)
-
-**Goals:** Speed up only the listed tests (delete/merge redundant coverage first; then setup/selectors/waits). If no meaningful speedup after a serious attempt, append Candidate(s) to `ongoing/test-optimization-blacklist.md` and mark done.
-
-**Verify:**
-
-```bash
-pnpm frontend:test tests/components/recall/NoteRefinement.extractNote.create.spec.ts
-```
-
-(Paths are relative to `frontend/` as accepted by `pnpm frontend:test`.)
+**Plan adjustment (2026-08-20):** After batches 1–11, remaining batches-of-3 were re-grouped into 8 file-family slices. Cross-file triples caused shotgun revisits; within-file merges delivered the wins. Original top-10% table retained above for baseline.
 
 ---
 
