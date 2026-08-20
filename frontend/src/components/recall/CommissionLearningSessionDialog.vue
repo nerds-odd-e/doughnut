@@ -45,7 +45,7 @@
                   :key="index"
                   data-test="learning-session-recorded-item"
                 >
-                  {{ item.noteTitle }}: {{ item.score }}
+                  {{ item.noteTitle }}: {{ item.grade }}
                 </span>
               </div>
             </div>

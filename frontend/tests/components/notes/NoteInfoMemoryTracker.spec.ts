@@ -80,11 +80,11 @@ describe("NoteInfoMemoryTracker", () => {
     expect(wrapper.text()).toContain("Commissioned")
   })
 
-  it("shows tutor feedback score for commissioned tracker", () => {
+  it("shows tutor feedback grade for commissioned tracker", () => {
     const memoryTracker = makeMe.aMemoryTracker
       .removedFromTracking(false)
       .commissioned()
-      .latestTutorFeedbackScore(4)
+      .latestTutorFeedbackGrade(4)
       .please()
 
     wrapper = helper
@@ -94,11 +94,11 @@ describe("NoteInfoMemoryTracker", () => {
       })
       .mount({ attachTo: document.body })
 
-    expect(wrapper.find('[data-test="tutor-feedback-score-4"]').exists()).toBe(
+    expect(wrapper.find('[data-test="tutor-feedback-grade-4"]').exists()).toBe(
       true
     )
     expect(wrapper.text()).toContain(
-      "tutor feedback score 4 from a learning session"
+      "tutor feedback grade 4 from a learning session"
     )
   })
 

@@ -92,7 +92,7 @@ class NoteController {
         recallLogRepository
             .findLatestTutorGradeByMemoryTrackerId(tracker.getId())
             .map(Grade::getValue)
-            .ifPresent(tracker::setLatestTutorFeedbackScore);
+            .ifPresent(tracker::setLatestTutorFeedbackGrade);
       }
     }
     noteRecallInfo.setMemoryTrackers(memoryTrackers);

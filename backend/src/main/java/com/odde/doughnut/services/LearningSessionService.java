@@ -80,7 +80,7 @@ public class LearningSessionService {
             .getRejectedEntries()
             .add(
                 RejectedLearningSessionReportEntryMapper.of(
-                    entry.noteTitle() + ": " + entry.score(),
+                    entry.noteTitle() + ": " + entry.grade().getValue(),
                     "No commissioned memory tracker for this note."));
         continue;
       }
@@ -92,13 +92,13 @@ public class LearningSessionService {
     }
 
     for (MatchedReportEntry matched : matchedEntries) {
-      Grade grade = Grade.fromValue(matched.entry().score());
+      Grade grade = matched.entry().grade();
       memoryTrackerService.persistRecallLog(matched.tracker(), now, grade, null);
       matched.tracker().applyGrade(now, grade);
 
       RecordedLearningSessionItem recorded = new RecordedLearningSessionItem();
       recorded.setNoteTitle(matched.entry().noteTitle());
-      recorded.setScore(grade.getValue());
+      recorded.setGrade(grade.getValue());
       recorded.setMemoryTrackerId(matched.tracker().getId());
       response.getRecordedItems().add(recorded);
     }

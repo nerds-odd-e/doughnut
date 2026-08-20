@@ -616,7 +616,7 @@ export type MemoryTracker = {
     propertyKey?: string;
     recallCount?: number;
     recalledNote?: RecalledNote;
-    latestTutorFeedbackScore?: number;
+    latestTutorFeedbackGrade?: number;
     spelling?: boolean;
 };
 
@@ -633,7 +633,7 @@ export type RecordLearningSessionResponse = {
 
 export type RecordedLearningSessionItem = {
     noteTitle: string;
-    score: number;
+    grade: number;
     memoryTrackerId: number;
 };
 
@@ -1228,7 +1228,7 @@ export type MemoryTrackerWritable = {
     propertyKey?: string;
     recallCount?: number;
     recalledNote?: RecalledNote;
-    latestTutorFeedbackScore?: number;
+    latestTutorFeedbackGrade?: number;
     spelling?: boolean;
 };
 

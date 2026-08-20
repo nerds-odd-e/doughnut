@@ -31,7 +31,7 @@ Feature: Commissioned learning session
     Then the learning session request should list session items for notes "Hola, Gracias"
     And the learning session request should include the tutoring status of "Hola"
     And the learning session request should include focus context with note body "Hello"
-    And the learning session request should instruct the tutor to report one score per session item
+    And the learning session request should instruct the tutor to report one grade per session item
     And I should see 1 potential learning session for notebook "Spanish conversation"
 
   Scenario: Notes from different notebooks are commissioned as separate learning sessions
@@ -53,22 +53,22 @@ Feature: Commissioned learning session
       """
       # Learning Session Report
 
-      <session_item_scores>
+      <session_item_grades>
       Hola: 4
       Gracias: 1
-      </session_item_scores>
+      </session_item_grades>
       """
     Then the recorded Feedback for notebook "Spanish conversation" should be shown
     And the commissioned memory tracker for "Hola" should have recall count 1
     And the commissioned memory tracker for "Gracias" should have recall count 1
-    And the commissioned memory tracker for "Hola" should have tutor feedback score 4
+    And the commissioned memory tracker for "Hola" should have tutor feedback grade 4
     And I should see 0 potential learning session for notebook "Spanish conversation"
 
-  Scenario Outline: First tutor score on a new tracker sets Stability and Difficulty
+  Scenario Outline: First tutor grade on a new tracker sets Stability and Difficulty
     Given the notes "Hola, Gracias" are assimilated as commissioned on day 1
-    And I have recorded a learning session for notebook "Spanish conversation" on day 2 with scores:
-      | Note    | Score   |
-      | Hola    | <score> |
+    And I have recorded a learning session for notebook "Spanish conversation" on day 2 with grades:
+      | Note    | Grade   |
+      | Hola    | <grade> |
       | Gracias | 1       |
     When I visit the commissioned memory tracker for "Hola"
     Then I should see Stability <Stability>
@@ -76,16 +76,16 @@ Feature: Commissioned learning session
     And I should see <hours> hours between last and next recall
 
     Examples:
-      | score | Stability | Difficulty | hours |
+      | grade | Stability | Difficulty | hours |
       | 4     | 199       | 1          | 199   |
       | 3     | 55        | 2.1181     | 55    |
       | 2     | 31        | 5.11217    | 31    |
       | 1     | 5         | 6.4133     | 5     |
 
-  Scenario Outline: On-time second tutor score grows Stability
+  Scenario Outline: On-time second tutor grade grows Stability
     Given the notes "Hola, Gracias" are assimilated as commissioned on day 1
-    And I have recorded a learning session for notebook "Spanish conversation" on day 2 with scores:
-      | Note    | Score |
+    And I have recorded a learning session for notebook "Spanish conversation" on day 2 with grades:
+      | Note    | Grade |
       | Hola    | 3     |
       | Gracias | 1     |
     And It's day 4, 16 hour
@@ -94,16 +94,16 @@ Feature: Commissioned learning session
       """
       # Learning Session Report
 
-      <session_item_scores>
-      Hola: <score>
+      <session_item_grades>
+      Hola: <grade>
       Gracias: 1
-      </session_item_scores>
+      </session_item_grades>
       """
     And I visit the commissioned memory tracker for "Hola"
     Then I should see Stability <Stability>
 
     Examples:
-      | score | Stability |
+      | grade | Stability |
       | 4     | 484       |
       | 3     | 284       |
       | 2     | 193       |

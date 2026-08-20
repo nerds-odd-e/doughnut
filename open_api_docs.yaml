@@ -4380,7 +4380,7 @@ components:
           format: int32
         recalledNote:
           $ref: "#/components/schemas/RecalledNote"
-        latestTutorFeedbackScore:
+        latestTutorFeedbackGrade:
           type: integer
           format: int32
         spelling:
@@ -4422,16 +4422,16 @@ components:
       properties:
         noteTitle:
           type: string
-        score:
+        grade:
           type: integer
           format: int32
         memoryTrackerId:
           type: integer
           format: int32
       required:
+      - grade
       - memoryTrackerId
       - noteTitle
-      - score
     RejectedLearningSessionReportEntry:
       type: object
       properties:

@@ -86,7 +86,7 @@ public class LearningSessionRequestMarkdownBuilder {
   private void appendHowToReport(StringBuilder sb, List<MemoryTracker> trackers) {
     sb.append("<how_to_report>\n");
     sb.append("Teach the session items above, then return a Learning Session Report giving one\n");
-    sb.append("score from 1 to 4 per item:\n\n");
+    sb.append("Grade from 1 to 4 per item:\n\n");
     sb.append("- 4 — mastered the session item with full fluency\n");
     sb.append("- 3 — mastered the session item with fluency\n");
     sb.append(
@@ -95,16 +95,16 @@ public class LearningSessionRequestMarkdownBuilder {
         "- 1 — needed several reminders, or could not reach the session item even with help\n\n");
     sb.append("Example of how to provide feedback:\n\n");
     sb.append("# Learning Session Report\n\n");
-    sb.append(LearningSessionReportParser.SESSION_ITEM_SCORES_OPEN_TAG).append("\n");
-    appendExampleReportScores(sb, trackers);
-    sb.append("\n").append(LearningSessionReportParser.SESSION_ITEM_SCORES_CLOSE_TAG);
+    sb.append(LearningSessionReportParser.SESSION_ITEM_GRADES_OPEN_TAG).append("\n");
+    appendExampleReportGrades(sb, trackers);
+    sb.append("\n").append(LearningSessionReportParser.SESSION_ITEM_GRADES_CLOSE_TAG);
     sb.append(
-        "\n\nOnly score session items that were actually taught in this session. Do not list\n");
+        "\n\nOnly grade session items that were actually taught in this session. Do not list\n");
     sb.append("items that were not taught in the session.\n");
     sb.append("</how_to_report>\n");
   }
 
-  private void appendExampleReportScores(StringBuilder sb, List<MemoryTracker> trackers) {
+  private void appendExampleReportGrades(StringBuilder sb, List<MemoryTracker> trackers) {
     if (trackers.isEmpty()) {
       return;
     }

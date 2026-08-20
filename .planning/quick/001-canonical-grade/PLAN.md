@@ -53,15 +53,11 @@ API query `grade` replaces `successful`; web/CLI/E2E use Good/Again. Schedule st
 
 **Learning:** CLI session-level `successful` for shared MCQ/spelling flow is separate from just-review wire params — leave until a dedicated CLI session cleanup if needed.
 
-### 4. Learning Session Feedback is Grade — **Behavior** — planned
+### 4. Learning Session Feedback is Grade — **Behavior** — done
 
-**Pre:** Commissioned Learning Session Report with grades.  
-**Trigger:** Learner records the report / views request / sees latest tutor feedback.  
-**Post:** Request uses grades rubric + `<session_item_grades>` example; parser/DTO/API/UI use `grade` / `latestTutorFeedbackGrade`; recorded items and memory-tracker info show Grade G (1–4) without “score” naming.
+Request/report/DTO/API/UI use grades + `<session_item_grades>` / `grade` / `latestTutorFeedbackGrade`. Parser emits `Grade` at parse time; legacy scores tag still accepted for slice 5.
 
-Touch parser, request markdown builder, `LearningSessionService`, DTOs, NoteController projection, frontend commission dialog + NoteInfo, fixtures, E2E `commissioned_learning_session.feature` + steps. Regenerate TypeScript client.
-
-**Verify:** Backend learning-session controller/parser tests + frontend commission/NoteInfo tests + targeted E2E feature.
+**Learning:** Keep `ParsedReportEntry.grade` as `Grade` (not int) so the service does not re-wrap.
 
 ### 5. Legacy `<session_item_scores>` still grades — **Behavior** — planned
 

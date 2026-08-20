@@ -3,11 +3,11 @@
     <td :class="{ 'strikethrough': isSkipped }">
       <div>{{ trackerTypeLabel }}</div>
       <div
-        v-if="tutorFeedbackScore !== undefined"
-        :data-test="`tutor-feedback-score-${tutorFeedbackScore}`"
+        v-if="tutorFeedbackGrade !== undefined"
+        :data-test="`tutor-feedback-grade-${tutorFeedbackGrade}`"
         class="text-sm mt-1"
       >
-        tutor feedback score {{ tutorFeedbackScore }} from a learning session
+        tutor feedback grade {{ tutorFeedbackGrade }} from a learning session
       </div>
     </td>
     <td :class="{ 'strikethrough': isSkipped }">
@@ -53,12 +53,12 @@ const trackerTypeLabel = computed(() => {
   return spelling ? "spelling" : "normal"
 })
 
-const tutorFeedbackScore = computed(() => {
-  const { type, latestTutorFeedbackScore } = localMemoryTracker.value
-  if (type !== "COMMISSIONED" || latestTutorFeedbackScore == null) {
+const tutorFeedbackGrade = computed(() => {
+  const { type, latestTutorFeedbackGrade } = localMemoryTracker.value
+  if (type !== "COMMISSIONED" || latestTutorFeedbackGrade == null) {
     return undefined
   }
-  return latestTutorFeedbackScore
+  return latestTutorFeedbackGrade
 })
 
 watch(

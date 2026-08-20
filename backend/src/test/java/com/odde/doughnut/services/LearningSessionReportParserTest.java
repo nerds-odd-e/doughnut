@@ -1,12 +1,13 @@
 package com.odde.doughnut.services;
 
-import static com.odde.doughnut.services.LearningSessionReportParser.SESSION_ITEM_SCORES_CLOSE_TAG;
-import static com.odde.doughnut.services.LearningSessionReportParser.SESSION_ITEM_SCORES_OPEN_TAG;
+import static com.odde.doughnut.services.LearningSessionReportParser.SESSION_ITEM_GRADES_CLOSE_TAG;
+import static com.odde.doughnut.services.LearningSessionReportParser.SESSION_ITEM_GRADES_OPEN_TAG;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import com.odde.doughnut.entities.Grade;
 import com.odde.doughnut.services.LearningSessionReportParser.ParseResult;
 import com.odde.doughnut.services.LearningSessionReportParser.RejectedReportEntry;
 import java.util.Set;
@@ -36,7 +37,7 @@ class LearningSessionReportParserTest {
   }
 
   @Test
-  void rejectsNonIntegerScore() {
+  void rejectsNonIntegerGrade() {
     ParseResult result = parser.parse("Hola: six\n", SPANISH_TITLES, Set.of());
 
     assertThat(result.entries(), empty());
@@ -45,24 +46,24 @@ class LearningSessionReportParserTest {
   }
 
   @Test
-  void acceptsScoreFromOneToFour() {
+  void acceptsGradeFromOneToFour() {
     ParseResult result = parser.parse("Hola: 4\n", SPANISH_TITLES, Set.of());
 
     assertThat(result.rejected(), empty());
     assertThat(result.entries(), hasSize(1));
     assertEquals("Hola", result.entries().get(0).noteTitle());
-    assertEquals(4, result.entries().get(0).score());
+    assertEquals(Grade.EASY, result.entries().get(0).grade());
   }
 
   @ParameterizedTest
   @CsvSource({"0", "5", "6"})
-  void rejectsScoreOutsideOneToFour(int score) {
-    String line = "Hola: %d".formatted(score);
+  void rejectsGradeOutsideOneToFour(int grade) {
+    String line = "Hola: %d".formatted(grade);
     ParseResult result = parser.parse(line + "\n", SPANISH_TITLES, Set.of());
 
     assertThat(result.entries(), empty());
     assertThat(result.rejected(), hasSize(1));
-    assertRejected(result.rejected().get(0), line, "Score must be 1, 2, 3, or 4.");
+    assertRejected(result.rejected().get(0), line, "Grade must be 1, 2, 3, or 4.");
   }
 
   @Test
@@ -81,7 +82,7 @@ class LearningSessionReportParserTest {
     assertThat(result.rejected(), empty());
     assertThat(result.entries(), hasSize(1));
     assertEquals("Hola", result.entries().get(0).noteTitle());
-    assertEquals(4, result.entries().get(0).score());
+    assertEquals(Grade.EASY, result.entries().get(0).grade());
   }
 
   @Test
@@ -90,7 +91,7 @@ class LearningSessionReportParserTest {
 
     assertThat(result.entries(), hasSize(1));
     assertEquals("Hola", result.entries().get(0).noteTitle());
-    assertEquals(4, result.entries().get(0).score());
+    assertEquals(Grade.EASY, result.entries().get(0).grade());
     assertThat(result.rejected(), hasSize(1));
     assertRejected(result.rejected().get(0), "Hola: 3", "Duplicate note title");
   }
@@ -113,7 +114,7 @@ class LearningSessionReportParserTest {
   }
 
   @Test
-  void parsesScoresInsideTagIgnoringSurroundingProse() {
+  void parsesGradesInsideTagIgnoringSurroundingProse() {
     ParseResult result =
         parser.parse(
             """
@@ -128,16 +129,16 @@ class LearningSessionReportParserTest {
 
             Hola: 99
             """
-                .formatted(SESSION_ITEM_SCORES_OPEN_TAG, SESSION_ITEM_SCORES_CLOSE_TAG),
+                .formatted(SESSION_ITEM_GRADES_OPEN_TAG, SESSION_ITEM_GRADES_CLOSE_TAG),
             SPANISH_TITLES,
             Set.of());
 
     assertThat(result.rejected(), empty());
     assertThat(result.entries(), hasSize(2));
     assertEquals("Hola", result.entries().get(0).noteTitle());
-    assertEquals(4, result.entries().get(0).score());
+    assertEquals(Grade.EASY, result.entries().get(0).grade());
     assertEquals("Gracias", result.entries().get(1).noteTitle());
-    assertEquals(1, result.entries().get(1).score());
+    assertEquals(Grade.AGAIN, result.entries().get(1).grade());
   }
 
   @Test
@@ -150,7 +151,7 @@ class LearningSessionReportParserTest {
             %s
             %s
             """
-                .formatted(SESSION_ITEM_SCORES_OPEN_TAG, SESSION_ITEM_SCORES_CLOSE_TAG),
+                .formatted(SESSION_ITEM_GRADES_OPEN_TAG, SESSION_ITEM_GRADES_CLOSE_TAG),
             SPANISH_TITLES,
             Set.of());
 
@@ -159,21 +160,21 @@ class LearningSessionReportParserTest {
   }
 
   @Test
-  void parsesScoresWhenClosingTagMissing() {
+  void parsesGradesWhenClosingTagMissing() {
     ParseResult result =
         parser.parse(
             """
             %s
             Hola: 3
             """
-                .formatted(SESSION_ITEM_SCORES_OPEN_TAG),
+                .formatted(SESSION_ITEM_GRADES_OPEN_TAG),
             SPANISH_TITLES,
             Set.of());
 
     assertThat(result.rejected(), empty());
     assertThat(result.entries(), hasSize(1));
     assertEquals("Hola", result.entries().get(0).noteTitle());
-    assertEquals(3, result.entries().get(0).score());
+    assertEquals(Grade.GOOD, result.entries().get(0).grade());
   }
 
   private void assertRejected(RejectedReportEntry rejected, String line, String reasonFragment) {

@@ -77,7 +77,8 @@ export const recallLearningSessionMethods = () => ({
   },
   expectLearningSessionRequestIncludesRubric() {
     this.learningSessionRequestText().should((text) => {
-      expect(text).to.contain('score from 1 to 4 per item')
+      expect(text).to.contain('Grade from 1 to 4 per item')
+      expect(text).to.contain('<session_item_grades>')
       expect(text).to.contain('Hola: 4')
     })
     return this

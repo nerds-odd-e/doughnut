@@ -11,7 +11,7 @@ public class RecordedLearningSessionItem {
   private String noteTitle;
 
   @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
-  private int score;
+  private int grade;
 
   @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
   private int memoryTrackerId;

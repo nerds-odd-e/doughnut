@@ -160,11 +160,11 @@ public class MemoryTracker extends EntityIdentifiedByIdOnly {
   @Setter
   private Timestamp deletedAt;
 
-  @JsonProperty("latestTutorFeedbackScore")
+  @JsonProperty("latestTutorFeedbackGrade")
   @Transient
   @Getter
   @Setter
-  private Integer latestTutorFeedbackScore;
+  private Integer latestTutorFeedbackGrade;
 
   private MemoryTracker() {}
 

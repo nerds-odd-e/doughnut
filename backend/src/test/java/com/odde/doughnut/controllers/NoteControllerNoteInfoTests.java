@@ -74,7 +74,7 @@ class NoteControllerNoteInfoTests extends ControllerTestBase {
 
   @ParameterizedTest
   @CsvSource({"EASY, 4", "GOOD, 3", "HARD, 2", "AGAIN, 1"})
-  void commissionedTrackerShowsMappedScoreFromLatestTutorLog(Grade grade, int score)
+  void commissionedTrackerShowsMappedGradeFromLatestTutorLog(Grade grade, int gradeValue)
       throws UnexpectedNoAccessRightException {
     Note note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
     makeMe
@@ -83,12 +83,12 @@ class NoteControllerNoteInfoTests extends ControllerTestBase {
         .please();
 
     assertThat(
-        controller.getNoteInfo(note).getMemoryTrackers().getFirst().getLatestTutorFeedbackScore(),
-        equalTo(score));
+        controller.getNoteInfo(note).getMemoryTrackers().getFirst().getLatestTutorFeedbackGrade(),
+        equalTo(gradeValue));
   }
 
   @Test
-  void latestTutorLogWinsForTutorFeedbackScore() throws UnexpectedNoAccessRightException {
+  void latestTutorLogWinsForTutorFeedbackGrade() throws UnexpectedNoAccessRightException {
     Note note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
     var tracker = makeMe.aMemoryTrackerFor(note).commissioned().please();
     makeMe
@@ -103,7 +103,7 @@ class NoteControllerNoteInfoTests extends ControllerTestBase {
         .please();
 
     assertThat(
-        controller.getNoteInfo(note).getMemoryTrackers().getFirst().getLatestTutorFeedbackScore(),
+        controller.getNoteInfo(note).getMemoryTrackers().getFirst().getLatestTutorFeedbackGrade(),
         equalTo(3));
   }
 }

@@ -82,8 +82,8 @@ class MemoryTrackerBuilder extends Builder<MemoryTracker> {
     return this
   }
 
-  latestTutorFeedbackScore(score: number): MemoryTrackerBuilder {
-    this.data.latestTutorFeedbackScore = score
+  latestTutorFeedbackGrade(grade: number): MemoryTrackerBuilder {
+    this.data.latestTutorFeedbackGrade = grade
     return this
   }
 

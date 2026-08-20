@@ -43,8 +43,8 @@ abstract class LearningSessionControllerTestBase extends ControllerTestBase {
     currentUser.setUser(makeMe.aUser().please());
   }
 
-  protected static String learningSessionReport(String title, int score) {
-    return "# Learning Session Report\n\n%s: %d\n".formatted(title, score);
+  protected static String learningSessionReport(String title, int grade) {
+    return "# Learning Session Report\n\n%s: %d\n".formatted(title, grade);
   }
 
   protected RecordLearningSessionRequest recordRequest(Notebook notebook, String reportMarkdown) {

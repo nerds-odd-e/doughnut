@@ -7,15 +7,15 @@ import type { DataTable } from '@cucumber/cucumber'
 import { LearningSessionController } from '@generated/doughnut-backend-api/sdk.gen'
 import start from '../start'
 
-const SESSION_ITEM_SCORES_OPEN_TAG = '<session_item_scores>'
-const SESSION_ITEM_SCORES_CLOSE_TAG = '</session_item_scores>'
+const SESSION_ITEM_GRADES_OPEN_TAG = '<session_item_grades>'
+const SESSION_ITEM_GRADES_CLOSE_TAG = '</session_item_grades>'
 
 Given(
-  'I have recorded a learning session for notebook {string} on day {int} with scores:',
+  'I have recorded a learning session for notebook {string} on day {int} with grades:',
   (notebookTitle: string, day: number, dataTable: DataTable) => {
     start.testability().timeTravelTo(day, 9)
-    const lines = dataTable.hashes().map((row) => `${row.Note}: ${row.Score}`)
-    const reportMarkdown = `# Learning Session Report\n\n${SESSION_ITEM_SCORES_OPEN_TAG}\n${lines.join('\n')}\n${SESSION_ITEM_SCORES_CLOSE_TAG}\n`
+    const lines = dataTable.hashes().map((row) => `${row.Note}: ${row.Grade}`)
+    const reportMarkdown = `# Learning Session Report\n\n${SESSION_ITEM_GRADES_OPEN_TAG}\n${lines.join('\n')}\n${SESSION_ITEM_GRADES_CLOSE_TAG}\n`
     const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
     start
       .testability()
@@ -68,13 +68,13 @@ Then(
 )
 
 Then(
-  'the commissioned memory tracker for {string} should have tutor feedback score {int}',
-  (noteTitle: string, score: number) => {
+  'the commissioned memory tracker for {string} should have tutor feedback grade {int}',
+  (noteTitle: string, grade: number) => {
     commissionedMemoryTracker(noteTitle).then((tracker) => {
       expect(
-        tracker.latestTutorFeedbackScore,
-        `tutor feedback score for ${noteTitle}`
-      ).to.eq(score)
+        tracker.latestTutorFeedbackGrade,
+        `tutor feedback grade for ${noteTitle}`
+      ).to.eq(grade)
     })
   }
 )
@@ -110,7 +110,7 @@ Then(
 )
 
 Then(
-  'the learning session request should instruct the tutor to report one score per session item',
+  'the learning session request should instruct the tutor to report one grade per session item',
   () => {
     start
       .recall()

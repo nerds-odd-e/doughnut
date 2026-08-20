@@ -61,19 +61,19 @@ class LearningSessionRequestTests extends LearningSessionControllerTestBase {
         markdown,
         containsString(
             "Teach the session items above, then return a Learning Session Report giving one"));
-    assertThat(markdown, containsString("score from 1 to 4 per item"));
+    assertThat(markdown, containsString("Grade from 1 to 4 per item"));
     assertThat(markdown, containsString("Example of how to provide feedback:"));
     assertThat(
         markdown,
         containsString(
             "# Learning Session Report\n\n"
-                + LearningSessionReportParser.SESSION_ITEM_SCORES_OPEN_TAG
+                + LearningSessionReportParser.SESSION_ITEM_GRADES_OPEN_TAG
                 + "\nHola: 4\nGracias: 1\n"
-                + LearningSessionReportParser.SESSION_ITEM_SCORES_CLOSE_TAG));
+                + LearningSessionReportParser.SESSION_ITEM_GRADES_CLOSE_TAG));
     assertThat(
         markdown,
         containsString(
-            "Only score session items that were actually taught in this session. Do not list"));
+            "Only grade session items that were actually taught in this session. Do not list"));
     assertThat(markdown, containsString("items that were not taught in the session."));
     assertThat(markdown, containsString("</how_to_report>"));
     assertThat(markdown, containsString("- 4 — mastered the session item with full fluency"));

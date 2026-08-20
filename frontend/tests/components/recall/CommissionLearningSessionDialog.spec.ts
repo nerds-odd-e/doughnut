@@ -91,8 +91,8 @@ describe("CommissionLearningSessionDialog", () => {
     const recordSpy = mockSdkService(LearningSessionController, "record", {
       recordedAt: "1989-01-02T09:00:00Z",
       recordedItems: [
-        { noteTitle: "Hola", score: 4, memoryTrackerId: 11 },
-        { noteTitle: "Gracias", score: 1, memoryTrackerId: 12 },
+        { noteTitle: "Hola", grade: 4, memoryTrackerId: 11 },
+        { noteTitle: "Gracias", grade: 1, memoryTrackerId: 12 },
       ],
       rejectedEntries: [],
     })
@@ -146,7 +146,7 @@ describe("CommissionLearningSessionDialog", () => {
     document.body.querySelectorAll("dialog").forEach((el) => el.remove())
     mockSdkService(LearningSessionController, "record", {
       recordedAt: "1989-01-02T09:00:00Z",
-      recordedItems: [{ noteTitle: "Hola", score: 4, memoryTrackerId: 11 }],
+      recordedItems: [{ noteTitle: "Hola", grade: 4, memoryTrackerId: 11 }],
       rejectedEntries: [
         {
           line: "Unknown: 3",
