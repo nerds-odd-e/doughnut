@@ -7,7 +7,6 @@ import com.odde.doughnut.entities.Answer;
 import com.odde.doughnut.entities.AnswerOutcome;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.ProductOutcome;
 import com.odde.doughnut.entities.QuestionType;
 import com.odde.doughnut.entities.RecallPrompt;
 import com.odde.doughnut.entities.User;
@@ -111,7 +110,7 @@ final class SpellingRecallGrading {
                   target -> {
                     memoryTrackerService.applyConfusionAdjustment(target, currentUTCTimestamp);
                     memoryTrackerService.persistRecallLog(
-                        target, currentUTCTimestamp, ProductOutcome.CONFUSION, gradedAnswer);
+                        target, currentUTCTimestamp, null, gradedAnswer);
                   });
         }
       }

@@ -1,6 +1,5 @@
 package com.odde.doughnut.controllers;
 
-import com.odde.doughnut.algorithms.CommissionedLearningSessionFeedbackScheduling;
 import com.odde.doughnut.controllers.dto.*;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.repositories.AssimilationSequenceSkipRepository;
@@ -91,8 +90,8 @@ class NoteController {
     for (MemoryTracker tracker : memoryTrackers) {
       if (tracker.isCommissioned()) {
         recallLogRepository
-            .findLatestTutorProductOutcomeByMemoryTrackerId(tracker.getId())
-            .map(CommissionedLearningSessionFeedbackScheduling::scoreForProductOutcome)
+            .findLatestTutorGradeByMemoryTrackerId(tracker.getId())
+            .map(Grade::getValue)
             .ifPresent(tracker::setLatestTutorFeedbackScore);
       }
     }

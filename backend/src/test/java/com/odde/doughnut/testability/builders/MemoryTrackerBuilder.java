@@ -31,7 +31,7 @@ public class MemoryTrackerBuilder extends EntityBuilder<MemoryTracker> {
 
   public MemoryTrackerBuilder afterNthStrictRecall(Integer recallDone) {
     for (int i = 0; i < recallDone; i++) {
-      entity.recalledSuccessfully(entity.getNextRecallAt());
+      entity.applyGrade(entity.getNextRecallAt(), Grade.GOOD);
     }
     return this;
   }
@@ -47,8 +47,7 @@ public class MemoryTrackerBuilder extends EntityBuilder<MemoryTracker> {
   @Override
   protected void afterCreate(boolean needPersist) {
     for (int i = 0; i < recallLogsToCreate; i++) {
-      RecallLog log =
-          makeMe.aRecallLogFor(entity).productOutcome(ProductOutcome.GOOD).please(needPersist);
+      RecallLog log = makeMe.aRecallLogFor(entity).grade(Grade.GOOD).please(needPersist);
       entity.addRecallLog(log);
     }
   }

@@ -8,9 +8,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.controllers.dto.AnswerDTO;
 import com.odde.doughnut.controllers.dto.AnsweredQuestion;
+import com.odde.doughnut.entities.Grade;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.ProductOutcome;
 import com.odde.doughnut.entities.RecallLog;
 import com.odde.doughnut.entities.RecallPrompt;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
@@ -49,7 +49,7 @@ class RecallPromptAnswerControllerTest extends RecallPromptControllerTestBase {
     List<RecallLog> logs = memoryTrackerController.getRecallLogs(memoryTracker);
     assertThat(logs, hasSize(1));
     RecallLog log = logs.get(0);
-    assertThat(log.getProductOutcome(), is(ProductOutcome.GOOD));
+    assertThat(log.getGrade(), is(Grade.GOOD));
     assertThat(log.getAnswerId(), equalTo(answerResult.getAnswer().getId()));
   }
 
@@ -178,7 +178,7 @@ class RecallPromptAnswerControllerTest extends RecallPromptControllerTestBase {
       AnsweredQuestion answerResult = controller.answer(recallPrompt, answerDTO);
 
       List<RecallLog> logs = memoryTrackerController.getRecallLogs(memoryTracker);
-      assertThat(logs.get(0).getProductOutcome(), is(ProductOutcome.AGAIN));
+      assertThat(logs.get(0).getGrade(), is(Grade.AGAIN));
       assertThat(logs.get(0).getAnswerId(), equalTo(answerResult.getAnswer().getId()));
     }
 

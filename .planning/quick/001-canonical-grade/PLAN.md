@@ -41,13 +41,11 @@ Amended Accepted 0001 and Proposed 0003 / 0005 in place (status unchanged). Grad
 
 **Learning:** Keep intentional “score”/Yes-No only as negations or parser-legacy notes so later name-sweep (slice 6) does not strip those.
 
-### 2. `Grade` owns scheduling and graded RecallLog — **Structure** — planned
+### 2. `Grade` owns scheduling and graded RecallLog — **Structure** — done
 
-Introduce `Grade`. Route MemoryTracker / MemoryTrackerService / tutor recording / recall-prompt correct·incorrect paths through `Grade` (boolean correctness becomes `GOOD`/`AGAIN` at the grading boundary once). Persist graded RecallLog as `Grade`; keep CONFUSION non-grade without a second grade rep. Delete `CommissionedLearningSessionFeedbackScheduling`. Parser/service may already emit `Grade` from numeric G (identity, not “score”). Wire renames for public score/successful can wait for Behavior slices if needed for stop-safety, but **no** live bidirectional score↔Grade or Yes/No↔Grade helpers may remain.
+Introduced `Grade`; deleted `CommissionedLearningSessionFeedbackScheduling` and `ProductOutcome`. Graded RecallLog uses `Grade`; CONFUSION via null grade + converter. Public `score`/`successful` wire names deferred to Behavior slices 3–4.
 
-**Verify:** Focused backend scheduling + tutor feedback + just-review controller tests still pass with identical numeric schedule outcomes.
-
-**Done when:** One `Grade` type drives scheduling; translation class gone; CONFUSION/Overlap unchanged in behavior.
+**Learning:** Call sites should use `applyGrade` directly; Yes/No wrappers on MemoryTracker were dead after the structure cut.
 
 ### 3. Just review submits Good / Again — **Behavior** — planned
 

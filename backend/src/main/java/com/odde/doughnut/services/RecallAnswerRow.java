@@ -2,7 +2,7 @@ package com.odde.doughnut.services;
 
 import com.odde.doughnut.entities.Answer;
 import com.odde.doughnut.entities.AnswerOutcome;
-import com.odde.doughnut.entities.ProductOutcome;
+import com.odde.doughnut.entities.Grade;
 import java.sql.Timestamp;
 
 /**
@@ -13,12 +13,12 @@ import java.sql.Timestamp;
 public record RecallAnswerRow(
     Timestamp answerCreatedAt,
     AnswerOutcome answerOutcome,
-    ProductOutcome productOutcome,
+    Grade grade,
     Integer thinkingTimeMs,
     Timestamp promptCreatedAt) {
 
   boolean correct() {
-    return Boolean.TRUE.equals(Answer.correctFrom(answerOutcome, productOutcome));
+    return Boolean.TRUE.equals(Answer.correctFrom(answerOutcome, grade));
   }
 
   boolean countsAsReview() {

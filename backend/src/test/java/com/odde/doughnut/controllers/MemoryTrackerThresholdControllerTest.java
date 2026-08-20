@@ -4,9 +4,9 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import com.odde.doughnut.entities.Grade;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.ProductOutcome;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import java.sql.Timestamp;
 import org.junit.jupiter.api.Test;
@@ -23,7 +23,7 @@ class MemoryTrackerThresholdControllerTest extends MemoryTrackerControllerTestBa
     Note note = ownedNote();
     MemoryTracker tracker = ownedTracker(note);
     Timestamp day1 = makeMe.aTimestamp().of(1, 8).fromShanghai().please();
-    addRecallLogs(tracker, ProductOutcome.AGAIN, againLogs, day1);
+    addRecallLogs(tracker, Grade.AGAIN, againLogs, day1);
 
     testabilitySettings.timeTravelTo(day1);
     var result = controller.getThresholdExceeded(tracker);
@@ -39,7 +39,7 @@ class MemoryTrackerThresholdControllerTest extends MemoryTrackerControllerTestBa
     MemoryTracker noteLevelTracker = ownedTracker(note);
     MemoryTracker propertyTracker = makeMe.aMemoryTrackerFor(note).propertyKey("topic").please();
     Timestamp day1 = makeMe.aTimestamp().of(1, 8).fromShanghai().please();
-    addRecallLogs(propertyTracker, ProductOutcome.AGAIN, 5, day1);
+    addRecallLogs(propertyTracker, Grade.AGAIN, 5, day1);
 
     testabilitySettings.timeTravelTo(day1);
     var noteLevelResult = controller.getThresholdExceeded(noteLevelTracker);
@@ -54,7 +54,7 @@ class MemoryTrackerThresholdControllerTest extends MemoryTrackerControllerTestBa
   void confusionDoesNotCountTowardThreshold() throws UnexpectedNoAccessRightException {
     MemoryTracker tracker = ownedTracker();
     Timestamp day1 = makeMe.aTimestamp().of(1, 8).fromShanghai().please();
-    addRecallLogs(tracker, ProductOutcome.CONFUSION, 5, day1);
+    addConfusionRecallLogs(tracker, 5, day1);
 
     testabilitySettings.timeTravelTo(day1);
     var result = controller.getThresholdExceeded(tracker);
@@ -66,7 +66,7 @@ class MemoryTrackerThresholdControllerTest extends MemoryTrackerControllerTestBa
     MemoryTracker tracker = ownedTracker();
     Timestamp now = makeMe.aTimestamp().of(15, 8).fromShanghai().please();
     Timestamp beforeWindow = makeMe.aTimestamp().of(0, 8).fromShanghai().please();
-    addRecallLogs(tracker, ProductOutcome.AGAIN, 1, beforeWindow);
+    addRecallLogs(tracker, Grade.AGAIN, 1, beforeWindow);
 
     testabilitySettings.timeTravelTo(now);
     var result = controller.getThresholdExceeded(tracker);

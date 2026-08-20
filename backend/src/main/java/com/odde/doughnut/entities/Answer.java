@@ -58,7 +58,10 @@ public class Answer extends EntityIdentifiedByIdOnly {
       return correct;
     }
     for (RecallLog log : recallLogs) {
-      Boolean fromLog = correctFrom(null, log.getProductOutcome());
+      if (log.isConfusion()) {
+        continue;
+      }
+      Boolean fromLog = correctFrom(null, log.getGrade());
       if (fromLog != null) {
         return fromLog;
       }
@@ -70,14 +73,14 @@ public class Answer extends EntityIdentifiedByIdOnly {
     recallLogs.add(recallLog);
   }
 
-  public static Boolean correctFrom(AnswerOutcome outcome, ProductOutcome productOutcome) {
+  public static Boolean correctFrom(AnswerOutcome outcome, Grade grade) {
     if (outcome == AnswerOutcome.OVERLAP) {
       return true;
     }
-    if (productOutcome == ProductOutcome.GOOD) {
+    if (grade == Grade.GOOD) {
       return true;
     }
-    if (productOutcome == ProductOutcome.AGAIN) {
+    if (grade == Grade.AGAIN) {
       return false;
     }
     return null;

@@ -82,7 +82,7 @@ public class MemoryTracker extends EntityIdentifiedByIdOnly {
   public Integer getRecallCount() {
     int count = 0;
     for (RecallLog log : recallLogs) {
-      if (log.getProductOutcome() != ProductOutcome.CONFUSION) {
+      if (!log.isConfusion()) {
         count++;
       }
     }
@@ -187,35 +187,20 @@ public class MemoryTracker extends EntityIdentifiedByIdOnly {
     setNextRecallAt(scheduled);
   }
 
-  public void recalledSuccessfully(Timestamp now) {
-    applyRecall(now, Fsrs.afterGoodRecall(getStability(), getDifficulty(), elapsedHoursUntil(now)));
-  }
-
-  public void recalledEasily(Timestamp now) {
-    applyRecall(now, Fsrs.afterEasyRecall(getStability(), getDifficulty(), elapsedHoursUntil(now)));
-  }
-
-  public void recalledHard(Timestamp now) {
-    applyRecall(now, Fsrs.afterHardRecall(getStability(), getDifficulty(), elapsedHoursUntil(now)));
-  }
-
-  private void applyRecall(Timestamp now, Fsrs.NextMemory next) {
+  public void applyGrade(Timestamp now, Grade grade) {
+    long elapsed = elapsedHoursUntil(now);
+    Float stability = getStability();
+    Float difficulty = getDifficulty();
+    Fsrs.NextMemory next =
+        switch (grade) {
+          case GOOD -> Fsrs.afterGoodRecall(stability, difficulty, elapsed);
+          case EASY -> Fsrs.afterEasyRecall(stability, difficulty, elapsed);
+          case HARD -> Fsrs.afterHardRecall(stability, difficulty, elapsed);
+          case AGAIN -> Fsrs.afterAgainRecall(stability, difficulty, elapsed);
+        };
     setDifficulty(next.difficulty());
     MemoryTrackerNextStability.write(this, next.stability());
     scheduleNextRecallFromStability(now);
-  }
-
-  public void recalledAgain(Timestamp now) {
-    applyRecall(
-        now, Fsrs.afterAgainRecall(getStability(), getDifficulty(), elapsedHoursUntil(now)));
-  }
-
-  public void markAsRecalled(Timestamp currentUTCTimestamp, boolean successful) {
-    if (successful) {
-      recalledSuccessfully(currentUTCTimestamp);
-    } else {
-      recalledAgain(currentUTCTimestamp);
-    }
   }
 
   public void adjustForConfusion(Timestamp currentUTCTimestamp) {

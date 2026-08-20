@@ -5,9 +5,9 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.doughnut.controllers.dto.LearningSessionRequestResponse;
+import com.odde.doughnut.entities.Grade;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Notebook;
-import com.odde.doughnut.entities.ProductOutcome;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.LearningSessionReportParser;
 import com.odde.doughnut.services.focusContext.FocusContextConstants;
@@ -123,7 +123,7 @@ class LearningSessionRequestTests extends LearningSessionControllerTestBase {
     SpanishNotebookFixture fixture = spanishNotebookFixture(dayTwo);
     makeMe
         .aRecallLogFor(fixture.holaTracker())
-        .productOutcome(ProductOutcome.GOOD)
+        .grade(Grade.GOOD)
         .recordedAt(priorSessionAt)
         .please();
 
@@ -149,7 +149,7 @@ class LearningSessionRequestTests extends LearningSessionControllerTestBase {
         makeMe.aMemoryTrackerFor(fixture.holaTracker().getNote()).please();
     makeMe
         .aRecallLogFor(understandingTracker)
-        .productOutcome(ProductOutcome.GOOD)
+        .grade(Grade.GOOD)
         .recordedAt(priorSessionAt)
         .please();
 

@@ -5,9 +5,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
@@ -48,13 +47,15 @@ public class RecallLog extends EntityIdentifiedByIdOnly {
   @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
   private Integer elapsedHours;
 
+  /**
+   * Graded outcome as {@link Grade}; {@code null} means CONFUSION (non-grade). Persisted in {@code
+   * product_outcome} as the grade name or {@code CONFUSION}.
+   */
   @Column(name = "product_outcome", nullable = false)
-  @Enumerated(EnumType.STRING)
+  @Convert(converter = GradeOrConfusionConverter.class)
   @Getter
   @Setter
-  @NotNull
-  @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
-  private ProductOutcome productOutcome;
+  private Grade grade;
 
   @ManyToOne
   @JoinColumn(name = "answer_id")
@@ -62,6 +63,24 @@ public class RecallLog extends EntityIdentifiedByIdOnly {
   @Getter
   @Setter
   private Answer answer;
+
+  @JsonIgnore
+  public boolean isConfusion() {
+    return grade == null;
+  }
+
+  public void setConfusion() {
+    this.grade = null;
+  }
+
+  /** Wire name kept for API stop-safety; values are grade names or CONFUSION. */
+  @JsonProperty("productOutcome")
+  @Schema(
+      requiredMode = Schema.RequiredMode.REQUIRED,
+      allowableValues = {"AGAIN", "HARD", "GOOD", "EASY", "CONFUSION"})
+  public String getProductOutcome() {
+    return isConfusion() ? GradeOrConfusionConverter.CONFUSION : grade.name();
+  }
 
   @JsonProperty
   @Schema(requiredMode = Schema.RequiredMode.REQUIRED)

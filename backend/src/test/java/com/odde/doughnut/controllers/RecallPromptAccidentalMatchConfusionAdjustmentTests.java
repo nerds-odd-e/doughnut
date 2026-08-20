@@ -12,7 +12,6 @@ import com.odde.doughnut.controllers.dto.AnswerSpellingDTO;
 import com.odde.doughnut.entities.Fsrs;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.ProductOutcome;
 import com.odde.doughnut.entities.RecallLog;
 import com.odde.doughnut.entities.RecallPrompt;
 import com.odde.doughnut.entities.repositories.MemoryTrackerRepository;
@@ -55,7 +54,7 @@ class RecallPromptAccidentalMatchConfusionAdjustmentTests extends RecallPromptCo
       Integer promptedAnswerId =
           memoryTrackerController.getRecallLogs(promptedTracker).get(0).getAnswerId();
       List<RecallLog> matchedLogs = memoryTrackerController.getRecallLogs(matchedSpellingTracker);
-      assertThat(matchedLogs.get(0).getProductOutcome(), is(ProductOutcome.CONFUSION));
+      assertThat(matchedLogs.get(0).isConfusion(), is(true));
       assertThat(matchedLogs.get(0).getAnswerId(), equalTo(promptedAnswerId));
     }
 
@@ -221,9 +220,7 @@ class RecallPromptAccidentalMatchConfusionAdjustmentTests extends RecallPromptCo
 
   private void assertConfusionLogged(MemoryTracker tracker)
       throws UnexpectedNoAccessRightException {
-    assertThat(
-        memoryTrackerController.getRecallLogs(tracker).get(0).getProductOutcome(),
-        is(ProductOutcome.CONFUSION));
+    assertThat(memoryTrackerController.getRecallLogs(tracker).get(0).isConfusion(), is(true));
   }
 
   private void assertNoConfusionLog(MemoryTracker tracker) throws UnexpectedNoAccessRightException {

@@ -17,7 +17,7 @@ class MemoryTrackerIncorrectRecallSchedulingTest extends MemoryTrackerRecallSche
   void onTimeIncorrectRecallUsesFsrsAgainPostLapseStability() {
     MemoryTracker memoryTracker = aGradedTrackerAtThreeDayStability();
 
-    memoryTracker.markAsRecalled(onTimeGradeTime(memoryTracker), false);
+    memoryTracker.applyGrade(onTimeGradeTime(memoryTracker), Grade.AGAIN);
 
     assertThat(memoryTracker.getStability(), equalTo(17.0f));
   }
@@ -26,8 +26,9 @@ class MemoryTrackerIncorrectRecallSchedulingTest extends MemoryTrackerRecallSche
   void yearOverdueIncorrectRecallOnFiveHourStabilityStaysAtFive() {
     MemoryTracker memoryTracker = aGradedTrackerAtStability(5f, 1f);
 
-    memoryTracker.markAsRecalled(
-        TimestampOperations.addHoursToTimestamp(memoryTracker.getLastRecalledAt(), 8760), false);
+    memoryTracker.applyGrade(
+        TimestampOperations.addHoursToTimestamp(memoryTracker.getLastRecalledAt(), 8760),
+        Grade.AGAIN);
 
     assertThat(memoryTracker.getStability(), equalTo(5f));
   }
@@ -36,8 +37,8 @@ class MemoryTrackerIncorrectRecallSchedulingTest extends MemoryTrackerRecallSche
   void overdueIncorrectRecallLeavesMoreRemainingStabilityThanOnTime() {
     MemoryTracker onTime = aGradedTrackerAtThreeDayStability();
     MemoryTracker overdue = aGradedTrackerAtThreeDayStability();
-    onTime.markAsRecalled(onTimeGradeTime(onTime), false);
-    overdue.markAsRecalled(overdueGradeTime(overdue), false);
+    onTime.applyGrade(onTimeGradeTime(onTime), Grade.AGAIN);
+    overdue.applyGrade(overdueGradeTime(overdue), Grade.AGAIN);
 
     assertThat(overdue.getStability(), greaterThan(onTime.getStability()));
   }
@@ -48,8 +49,8 @@ class MemoryTrackerIncorrectRecallSchedulingTest extends MemoryTrackerRecallSche
     MemoryTracker harder = aGradedTrackerAtThreeDayStability(8f);
     Timestamp gradeTime = onTimeGradeTime(easier);
 
-    easier.markAsRecalled(gradeTime, false);
-    harder.markAsRecalled(gradeTime, false);
+    easier.applyGrade(gradeTime, Grade.AGAIN);
+    harder.applyGrade(gradeTime, Grade.AGAIN);
 
     assertThat(harder.getStability(), lessThan(easier.getStability()));
   }
@@ -58,7 +59,7 @@ class MemoryTrackerIncorrectRecallSchedulingTest extends MemoryTrackerRecallSche
   void incorrectRecallFromOneHourStabilityPersistsOneHour() {
     MemoryTracker memoryTracker = aGradedTrackerAtStability(1f);
 
-    memoryTracker.markAsRecalled(onTimeGradeTime(memoryTracker), false);
+    memoryTracker.applyGrade(onTimeGradeTime(memoryTracker), Grade.AGAIN);
 
     assertThat(memoryTracker.getStability(), equalTo(1f));
   }
@@ -68,7 +69,7 @@ class MemoryTrackerIncorrectRecallSchedulingTest extends MemoryTrackerRecallSche
     MemoryTracker memoryTracker = makeMe.aMemoryTrackerFor(note).by(user).inMemoryPlease();
     Timestamp gradeTime = memoryTracker.getNextRecallAt();
 
-    memoryTracker.markAsRecalled(gradeTime, false);
+    memoryTracker.applyGrade(gradeTime, Grade.AGAIN);
 
     assertThat(memoryTracker.getDifficulty(), equalTo(FIRST_AGAIN_DIFFICULTY));
     assertThat(memoryTracker.getStability(), equalTo(FIRST_AGAIN_STABILITY_HOURS));
@@ -82,10 +83,10 @@ class MemoryTrackerIncorrectRecallSchedulingTest extends MemoryTrackerRecallSche
   @Test
   void onTimeIncorrectRecallAfterFirstGoodUsesFsrsAgainFromS0AndD0Good() {
     MemoryTracker memoryTracker = makeMe.aMemoryTrackerFor(note).by(user).inMemoryPlease();
-    memoryTracker.recalledSuccessfully(memoryTracker.getNextRecallAt());
+    memoryTracker.applyGrade(memoryTracker.getNextRecallAt(), Grade.GOOD);
     Timestamp gradeTime = onTimeGradeTime(memoryTracker);
 
-    memoryTracker.markAsRecalled(gradeTime, false);
+    memoryTracker.applyGrade(gradeTime, Grade.AGAIN);
 
     assertThat(memoryTracker.getStability(), equalTo(15.0f));
     assertThat(memoryTracker.getDifficulty(), equalTo(7.3945026f));
@@ -98,7 +99,7 @@ class MemoryTrackerIncorrectRecallSchedulingTest extends MemoryTrackerRecallSche
   void onTimeIncorrectRecallUpdatesDifficultyWithFsrsAgainNextD() {
     MemoryTracker memoryTracker = aGradedTrackerAtThreeDayStability();
 
-    memoryTracker.markAsRecalled(onTimeGradeTime(memoryTracker), false);
+    memoryTracker.applyGrade(onTimeGradeTime(memoryTracker), Grade.AGAIN);
 
     assertThat(memoryTracker.getDifficulty(), equalTo(8.341763f));
   }
@@ -114,8 +115,8 @@ class MemoryTrackerIncorrectRecallSchedulingTest extends MemoryTrackerRecallSche
     MemoryTracker difficultyFive = aGradedTrackerAtThreeDayStability();
     Timestamp gradeTime = onTimeGradeTime(unsetDifficulty);
 
-    unsetDifficulty.markAsRecalled(gradeTime, false);
-    difficultyFive.markAsRecalled(gradeTime, false);
+    unsetDifficulty.applyGrade(gradeTime, Grade.AGAIN);
+    difficultyFive.applyGrade(gradeTime, Grade.AGAIN);
 
     assertThat(unsetDifficulty.getDifficulty(), equalTo(difficultyFive.getDifficulty()));
   }

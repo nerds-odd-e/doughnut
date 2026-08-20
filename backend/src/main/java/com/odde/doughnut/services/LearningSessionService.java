@@ -1,6 +1,5 @@
 package com.odde.doughnut.services;
 
-import com.odde.doughnut.algorithms.CommissionedLearningSessionFeedbackScheduling;
 import com.odde.doughnut.controllers.dto.LearningSessionRequestResponse;
 import com.odde.doughnut.controllers.dto.RecordLearningSessionResponse;
 import com.odde.doughnut.controllers.dto.RecordedLearningSessionItem;
@@ -93,16 +92,13 @@ public class LearningSessionService {
     }
 
     for (MatchedReportEntry matched : matchedEntries) {
-      int score = matched.entry().score();
-      ProductOutcome productOutcome =
-          CommissionedLearningSessionFeedbackScheduling.productOutcomeForScore(score);
-      memoryTrackerService.persistRecallLog(matched.tracker(), now, productOutcome, null);
-      CommissionedLearningSessionFeedbackScheduling.recordFeedback(
-          matched.tracker(), now, productOutcome);
+      Grade grade = Grade.fromValue(matched.entry().score());
+      memoryTrackerService.persistRecallLog(matched.tracker(), now, grade, null);
+      matched.tracker().applyGrade(now, grade);
 
       RecordedLearningSessionItem recorded = new RecordedLearningSessionItem();
       recorded.setNoteTitle(matched.entry().noteTitle());
-      recorded.setScore(score);
+      recorded.setScore(grade.getValue());
       recorded.setMemoryTrackerId(matched.tracker().getId());
       response.getRecordedItems().add(recorded);
     }

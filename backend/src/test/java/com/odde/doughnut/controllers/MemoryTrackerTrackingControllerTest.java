@@ -4,9 +4,9 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import com.odde.doughnut.entities.Grade;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.ProductOutcome;
 import com.odde.doughnut.entities.RecallLog;
 import com.odde.doughnut.entities.repositories.MemoryTrackerRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
@@ -79,7 +79,7 @@ class MemoryTrackerTrackingControllerTest extends MemoryTrackerControllerTestBas
     List<RecallLog> logs = controller.getRecallLogs(tracker);
     assertThat(logs, hasSize(1));
     RecallLog log = logs.get(0);
-    assertThat(log.getProductOutcome(), is(ProductOutcome.GOOD));
+    assertThat(log.getGrade(), is(Grade.GOOD));
     assertThat(log.getRecordedAt(), equalTo(recalledAt));
     assertThat(log.getElapsedHours(), equalTo(0));
     assertThat(log.getAnswerId(), nullValue());
@@ -113,7 +113,7 @@ class MemoryTrackerTrackingControllerTest extends MemoryTrackerControllerTestBas
 
     List<RecallLog> logs = controller.getRecallLogs(tracker);
     assertThat(logs, hasSize(2));
-    assertThat(logs.get(0).getProductOutcome(), is(ProductOutcome.AGAIN));
+    assertThat(logs.get(0).getGrade(), is(Grade.AGAIN));
   }
 
   @Test
@@ -121,7 +121,7 @@ class MemoryTrackerTrackingControllerTest extends MemoryTrackerControllerTestBas
     Note note = ownedNote();
     MemoryTracker tracker = ownedTracker(note);
     Timestamp day1 = makeMe.aTimestamp().of(1, 8).fromShanghai().please();
-    addRecallLogs(tracker, ProductOutcome.AGAIN, 5, day1);
+    addRecallLogs(tracker, Grade.AGAIN, 5, day1);
     testabilitySettings.timeTravelTo(day1);
 
     controller.markAsRecalled(tracker, false);

@@ -5,9 +5,9 @@ import com.odde.doughnut.controllers.dto.AssimilationRequestDTO;
 import com.odde.doughnut.controllers.dto.RecallHistoryItem;
 import com.odde.doughnut.controllers.dto.ThresholdExceededResult;
 import com.odde.doughnut.entities.Answer;
+import com.odde.doughnut.entities.Grade;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.ProductOutcome;
 import com.odde.doughnut.entities.RecallLog;
 import com.odde.doughnut.entities.RecallPrompt;
 import com.odde.doughnut.entities.User;
@@ -80,12 +80,9 @@ public class MemoryTrackerService {
 
   public boolean markAsRecalled(
       Timestamp currentUTCTimestamp, Boolean correct, MemoryTracker memoryTracker, Answer answer) {
-    persistRecallLog(
-        memoryTracker,
-        currentUTCTimestamp,
-        correct ? ProductOutcome.GOOD : ProductOutcome.AGAIN,
-        answer);
-    memoryTracker.markAsRecalled(currentUTCTimestamp, correct);
+    Grade grade = correct ? Grade.GOOD : Grade.AGAIN;
+    persistRecallLog(memoryTracker, currentUTCTimestamp, grade, answer);
+    memoryTracker.applyGrade(currentUTCTimestamp, grade);
     entityPersister.save(memoryTracker);
 
     if (!correct) {
@@ -94,16 +91,14 @@ public class MemoryTrackerService {
     return false;
   }
 
+  /** Persist a graded recall log, or CONFUSION when {@code grade} is null. */
   void persistRecallLog(
-      MemoryTracker memoryTracker,
-      Timestamp recordedAt,
-      ProductOutcome productOutcome,
-      Answer answer) {
+      MemoryTracker memoryTracker, Timestamp recordedAt, Grade grade, Answer answer) {
     RecallLog recallLog = new RecallLog();
     recallLog.setMemoryTracker(memoryTracker);
     recallLog.setRecordedAt(recordedAt);
     recallLog.setElapsedHours((int) memoryTracker.elapsedHoursUntil(recordedAt));
-    recallLog.setProductOutcome(productOutcome);
+    recallLog.setGrade(grade);
     recallLog.setAnswer(answer);
     entityPersister.save(recallLog);
     memoryTracker.addRecallLog(recallLog);

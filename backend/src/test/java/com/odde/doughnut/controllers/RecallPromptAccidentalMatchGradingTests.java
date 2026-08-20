@@ -8,9 +8,9 @@ import com.odde.doughnut.controllers.dto.AnswerSpellingDTO;
 import com.odde.doughnut.controllers.dto.AnsweredQuestion;
 import com.odde.doughnut.controllers.dto.NoteTopology;
 import com.odde.doughnut.entities.AnswerOutcome;
+import com.odde.doughnut.entities.Grade;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.ProductOutcome;
 import com.odde.doughnut.entities.RecallPrompt;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import org.junit.jupiter.api.BeforeEach;
@@ -53,8 +53,7 @@ class RecallPromptAccidentalMatchGradingTests extends RecallPromptControllerTest
     controller.answerSpelling(recallPrompt, answerDTO);
 
     assertThat(
-        memoryTrackerController.getRecallLogs(memoryTracker).get(0).getProductOutcome(),
-        is(ProductOutcome.AGAIN));
+        memoryTrackerController.getRecallLogs(memoryTracker).get(0).getGrade(), is(Grade.AGAIN));
   }
 
   @Test

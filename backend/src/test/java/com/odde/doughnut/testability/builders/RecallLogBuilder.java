@@ -1,14 +1,15 @@
 package com.odde.doughnut.testability.builders;
 
 import com.odde.doughnut.entities.Answer;
+import com.odde.doughnut.entities.Grade;
 import com.odde.doughnut.entities.MemoryTracker;
-import com.odde.doughnut.entities.ProductOutcome;
 import com.odde.doughnut.entities.RecallLog;
 import com.odde.doughnut.testability.EntityBuilder;
 import com.odde.doughnut.testability.MakeMe;
 import java.sql.Timestamp;
 
 public class RecallLogBuilder extends EntityBuilder<RecallLog> {
+  private boolean outcomeSet;
 
   public RecallLogBuilder(MakeMe makeMe) {
     super(makeMe, new RecallLog());
@@ -30,8 +31,15 @@ public class RecallLogBuilder extends EntityBuilder<RecallLog> {
     return this;
   }
 
-  public RecallLogBuilder productOutcome(ProductOutcome productOutcome) {
-    entity.setProductOutcome(productOutcome);
+  public RecallLogBuilder grade(Grade grade) {
+    entity.setGrade(grade);
+    outcomeSet = true;
+    return this;
+  }
+
+  public RecallLogBuilder confusion() {
+    entity.setConfusion();
+    outcomeSet = true;
     return this;
   }
 
@@ -48,8 +56,8 @@ public class RecallLogBuilder extends EntityBuilder<RecallLog> {
     if (entity.getRecordedAt() == null) {
       entity.setRecordedAt(makeMe.testabilitySettings.getCurrentUTCTimestamp());
     }
-    if (entity.getProductOutcome() == null) {
-      entity.setProductOutcome(ProductOutcome.GOOD);
+    if (!outcomeSet) {
+      entity.setGrade(Grade.GOOD);
     }
   }
 }

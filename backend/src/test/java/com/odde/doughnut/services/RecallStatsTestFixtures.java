@@ -2,7 +2,7 @@ package com.odde.doughnut.services;
 
 import com.odde.doughnut.controllers.dto.RecallStatsDTO;
 import com.odde.doughnut.entities.AnswerOutcome;
-import com.odde.doughnut.entities.ProductOutcome;
+import com.odde.doughnut.entities.Grade;
 import java.sql.Timestamp;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -22,7 +22,7 @@ final class RecallStatsTestFixtures {
     return new RecallAnswerRow(
         answerAt,
         null,
-        correct ? ProductOutcome.GOOD : ProductOutcome.AGAIN,
+        correct ? Grade.GOOD : Grade.AGAIN,
         thinkingTimeMs,
         promptAt != null ? promptAt : answerAt);
   }

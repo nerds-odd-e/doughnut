@@ -3,7 +3,7 @@ package com.odde.doughnut.controllers;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
-import com.odde.doughnut.entities.ProductOutcome;
+import com.odde.doughnut.entities.Grade;
 import com.odde.doughnut.entities.RecallLog;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import java.sql.Timestamp;
@@ -19,7 +19,7 @@ class LearningSessionRecordTutorFeedbackRecallLogTests extends LearningSessionCo
 
   @ParameterizedTest
   @CsvSource({"4, EASY", "3, GOOD", "2, HARD", "1, AGAIN"})
-  void matchedScoreLeavesMappedRecallLog(int score, ProductOutcome outcome)
+  void matchedScoreLeavesMappedRecallLog(int score, Grade grade)
       throws UnexpectedNoAccessRightException {
     Timestamp dayTwo = makeMe.aTimestamp().of(1, 9).please();
     testabilitySettings.timeTravelTo(dayTwo);
@@ -30,8 +30,8 @@ class LearningSessionRecordTutorFeedbackRecallLogTests extends LearningSessionCo
 
     List<RecallLog> logs = memoryTrackerController.getRecallLogs(fixture.holaTracker());
     RecallLog log = logs.get(0);
-    assertThat(log.getProductOutcome(), is(outcome));
-    if (outcome == ProductOutcome.GOOD) {
+    assertThat(log.getGrade(), is(grade));
+    if (grade == Grade.GOOD) {
       assertThat(log.getAnswerId(), nullValue());
     }
   }

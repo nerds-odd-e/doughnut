@@ -5,9 +5,9 @@ import static org.hamcrest.Matchers.is;
 
 import com.odde.doughnut.controllers.dto.UpdateMemoryTrackerPropertyKeyDTO;
 import com.odde.doughnut.entities.Conversation;
+import com.odde.doughnut.entities.Grade;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.ProductOutcome;
 import com.odde.doughnut.entities.RecallPrompt;
 import com.odde.doughnut.services.NoteService;
 import java.sql.Timestamp;
@@ -54,9 +54,15 @@ abstract class MemoryTrackerControllerTestBase extends ControllerTestBase {
     return ownedTracker(ownedNote());
   }
 
-  void addRecallLogs(MemoryTracker tracker, ProductOutcome outcome, int count, Timestamp day) {
+  void addRecallLogs(MemoryTracker tracker, Grade grade, int count, Timestamp day) {
     for (int i = 0; i < count; i++) {
-      makeMe.aRecallLogFor(tracker).productOutcome(outcome).recordedAt(day).please();
+      makeMe.aRecallLogFor(tracker).grade(grade).recordedAt(day).please();
+    }
+  }
+
+  void addConfusionRecallLogs(MemoryTracker tracker, int count, Timestamp day) {
+    for (int i = 0; i < count; i++) {
+      makeMe.aRecallLogFor(tracker).confusion().recordedAt(day).please();
     }
   }
 

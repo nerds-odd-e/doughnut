@@ -1,6 +1,6 @@
 package com.odde.doughnut.entities.repositories;
 
-import com.odde.doughnut.entities.ProductOutcome;
+import com.odde.doughnut.entities.Grade;
 import com.odde.doughnut.entities.RecallLog;
 import java.sql.Timestamp;
 import java.util.List;
@@ -19,22 +19,22 @@ public interface RecallLogRepository extends CrudRepository<RecallLog, Integer> 
       FROM RecallLog rl
       WHERE rl.memoryTracker.id = :memoryTrackerId
         AND rl.answer IS NULL
-        AND rl.productOutcome <> com.odde.doughnut.entities.ProductOutcome.CONFUSION
+        AND rl.grade IS NOT NULL
       """)
   TutorLogSummary summarizeTutorLogsByMemoryTrackerId(
       @Param("memoryTrackerId") Integer memoryTrackerId);
 
   @Query(
       """
-      SELECT rl.productOutcome
+      SELECT rl.grade
       FROM RecallLog rl
       WHERE rl.memoryTracker.id = :memoryTrackerId
         AND rl.answer IS NULL
-        AND rl.productOutcome <> com.odde.doughnut.entities.ProductOutcome.CONFUSION
+        AND rl.grade IS NOT NULL
       ORDER BY rl.recordedAt DESC, rl.id DESC
       LIMIT 1
       """)
-  Optional<ProductOutcome> findLatestTutorProductOutcomeByMemoryTrackerId(
+  Optional<Grade> findLatestTutorGradeByMemoryTrackerId(
       @Param("memoryTrackerId") Integer memoryTrackerId);
 
   @Query(
@@ -42,7 +42,7 @@ public interface RecallLogRepository extends CrudRepository<RecallLog, Integer> 
       SELECT COUNT(rl)
       FROM RecallLog rl
       WHERE rl.memoryTracker.id = :memoryTrackerId
-        AND rl.productOutcome = com.odde.doughnut.entities.ProductOutcome.AGAIN
+        AND rl.grade = com.odde.doughnut.entities.Grade.AGAIN
         AND rl.recordedAt >= :since
       """)
   int countAgainOutcomesSinceForMemoryTracker(

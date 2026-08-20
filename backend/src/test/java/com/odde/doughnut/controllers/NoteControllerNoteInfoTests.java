@@ -5,8 +5,8 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.doughnut.controllers.dto.NoteRecallInfo;
+import com.odde.doughnut.entities.Grade;
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.ProductOutcome;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.httpQuery.HttpClientAdapter;
 import org.junit.jupiter.api.BeforeEach;
@@ -74,12 +74,12 @@ class NoteControllerNoteInfoTests extends ControllerTestBase {
 
   @ParameterizedTest
   @CsvSource({"EASY, 4", "GOOD, 3", "HARD, 2", "AGAIN, 1"})
-  void commissionedTrackerShowsMappedScoreFromLatestTutorLog(ProductOutcome outcome, int score)
+  void commissionedTrackerShowsMappedScoreFromLatestTutorLog(Grade grade, int score)
       throws UnexpectedNoAccessRightException {
     Note note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
     makeMe
         .aRecallLogFor(makeMe.aMemoryTrackerFor(note).commissioned().please())
-        .productOutcome(outcome)
+        .grade(grade)
         .please();
 
     assertThat(
@@ -93,12 +93,12 @@ class NoteControllerNoteInfoTests extends ControllerTestBase {
     var tracker = makeMe.aMemoryTrackerFor(note).commissioned().please();
     makeMe
         .aRecallLogFor(tracker)
-        .productOutcome(ProductOutcome.EASY)
+        .grade(Grade.EASY)
         .recordedAt(makeMe.aTimestamp().of(1, 8).please())
         .please();
     makeMe
         .aRecallLogFor(tracker)
-        .productOutcome(ProductOutcome.GOOD)
+        .grade(Grade.GOOD)
         .recordedAt(makeMe.aTimestamp().of(2, 8).please())
         .please();
 

@@ -13,7 +13,7 @@ class MemoryTrackerSameHourRecallSchedulingTest extends MemoryTrackerRecallSched
   void sameHourCorrectRecallGrowsFirstIntervalStabilityToTwentyFive() {
     MemoryTracker memoryTracker = aGradedTrackerAtStability(24f);
 
-    memoryTracker.recalledSuccessfully(sameHourGradeTime(memoryTracker));
+    memoryTracker.applyGrade(sameHourGradeTime(memoryTracker), Grade.GOOD);
 
     assertThat(memoryTracker.getStability(), equalTo(25.0f));
   }
@@ -22,7 +22,7 @@ class MemoryTrackerSameHourRecallSchedulingTest extends MemoryTrackerRecallSched
   void sameHourEasyRecallGrowsFirstIntervalStabilityToFortyThree() {
     MemoryTracker memoryTracker = aGradedTrackerAtStability(24f);
 
-    memoryTracker.recalledEasily(sameHourGradeTime(memoryTracker));
+    memoryTracker.applyGrade(sameHourGradeTime(memoryTracker), Grade.EASY);
 
     assertThat(memoryTracker.getStability(), equalTo(43.0f));
   }
@@ -31,7 +31,7 @@ class MemoryTrackerSameHourRecallSchedulingTest extends MemoryTrackerRecallSched
   void sameHourHardRecallDoesNotShrinkFirstIntervalStability() {
     MemoryTracker memoryTracker = aGradedTrackerAtStability(24f);
 
-    memoryTracker.recalledHard(sameHourGradeTime(memoryTracker));
+    memoryTracker.applyGrade(sameHourGradeTime(memoryTracker), Grade.HARD);
 
     assertThat(memoryTracker.getStability(), equalTo(24.0f));
   }
@@ -40,7 +40,7 @@ class MemoryTrackerSameHourRecallSchedulingTest extends MemoryTrackerRecallSched
   void sameHourCorrectRecallDoesNotShrinkThreeDayStability() {
     MemoryTracker memoryTracker = aGradedTrackerAtThreeDayStability();
 
-    memoryTracker.recalledSuccessfully(sameHourGradeTime(memoryTracker));
+    memoryTracker.applyGrade(sameHourGradeTime(memoryTracker), Grade.GOOD);
 
     assertThat(memoryTracker.getStability(), equalTo(STABILITY_HOURS));
   }
