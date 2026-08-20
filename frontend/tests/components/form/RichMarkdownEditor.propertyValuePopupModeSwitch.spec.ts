@@ -26,47 +26,33 @@ describe("RichMarkdownEditor property value popup mode switch", () => {
     h.cleanup()
   })
 
-  it("saves scalar as list when user switches to list mode in popup", async () => {
-    await mountTopicValuePopup(h)
+  it("switches scalar↔list in popup, seeds text from list, and saves each mode", async () => {
+    const wrapper = await mountTopicValuePopup(h)
     await switchToListMode()
     await writeListItems("workshop", "retreat")
     await savePopup()
 
-    const last = h.lastEmittedMarkdown()
-    expect(last).toMatch(/topic:\s*\n\s*- workshop/)
-    expect(last).toMatch(/- retreat/)
-    expect(last).toContain("Body")
+    const asList = h.lastEmittedMarkdown()
+    expect(asList).toMatch(/topic:\s*\n\s*- workshop/)
+    expect(asList).toMatch(/- retreat/)
+    expect(asList).toContain("Body")
     expect(dialogEl()).toBeNull()
-  })
 
-  it("seeds text mode from populated list when switching from list mode", async () => {
-    await mountTopicValuePopup(h, LIST_TOPIC_MARKDOWN)
-    await switchToTextMode()
-
-    const textareaValue = getTextareaValue()
-    expect(textareaValue).toContain("alpha")
-    expect(textareaValue).toContain("beta")
-
-    await savePopup()
-
-    const last = h.lastEmittedMarkdown()
-    expect(last).toContain("topic: alpha, beta")
-    expect(last).not.toMatch(/topic:\s*\n\s*-/)
-    expect(dialogEl()).toBeNull()
-  })
-
-  it("saves list as scalar when user switches to text mode in popup", async () => {
-    await mountTopicValuePopup(h, LIST_TOPIC_MARKDOWN)
-
+    await wrapper.setProps({ modelValue: asList })
+    await openValuePopup(wrapper)
     expect(isListModeTabActive()).toBe(true)
 
     await switchToTextMode()
+    const seeded = getTextareaValue()
+    expect(seeded).toContain("workshop")
+    expect(seeded).toContain("retreat")
+
     setTextareaValue("combined value")
     await savePopup()
 
-    const last = h.lastEmittedMarkdown()
-    expect(last).toContain("topic: combined value")
-    expect(last).not.toMatch(/topic:\s*\n\s*-/)
+    const asScalar = h.lastEmittedMarkdown()
+    expect(asScalar).toContain("topic: combined value")
+    expect(asScalar).not.toMatch(/topic:\s*\n\s*-/)
     expect(dialogEl()).toBeNull()
   })
 

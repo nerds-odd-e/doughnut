@@ -11,6 +11,7 @@ import {
   mountOverlapsValuePopup,
   OVERLAPS_LIST_MARKDOWN,
   OVERLAPS_SCALAR_MARKDOWN,
+  overlapsListValue,
   POPUP_OVERLAPS_CONSTRAINT_CASES,
   propertyRowValidationText,
   triggerRowKeyBlurValidation,
@@ -59,7 +60,7 @@ describe("RichMarkdownEditor overlaps property", () => {
     expect(dialogEl()).toBeNull()
   })
 
-  it("inserts the first overlap as a list when adding a new overlaps property", async () => {
+  it("inserts overlaps as a list and blocks scalar overlaps on row commit", async () => {
     await addNewOverlapsProperty(h, "[[Other Note]]")
 
     expect(
@@ -74,91 +75,71 @@ describe("RichMarkdownEditor overlaps property", () => {
     expect(parsed.properties.overlaps).toEqual(
       listPropertyValue(["[[Other Note]]"])
     )
-  })
 
-  it("blocks commit when parsed overlaps row is scalar", async () => {
-    const wrapper = await h.mountEditor(OVERLAPS_SCALAR_MARKDOWN)
+    const wrapper = h.getWrapper()
+    await wrapper.setProps({ modelValue: OVERLAPS_SCALAR_MARKDOWN })
+    await flushPromises()
+    const emissionsBeforeBlur = wrapper.emitted("update:modelValue")?.length ?? 0
     await triggerRowKeyBlurValidation(wrapper)
 
     expect(propertyRowValidationText(wrapper)).toBe(AUTHORED_OVERLAPS_MESSAGE)
-    expect(wrapper.emitted("update:modelValue")).toBeUndefined()
+    expect(wrapper.emitted("update:modelValue")?.length ?? 0).toBe(
+      emissionsBeforeBlur
+    )
   })
 
-  it("renders overlaps list items as in-app wiki links", async () => {
+  it("renders overlaps list items as wiki links (resolved, path live, path dead)", async () => {
+    const pathItem = "[Title](/Folder/Title.md)"
     const wrapper = await h.mountEditor(OVERLAPS_LIST_MARKDOWN, {
       wikiTitles: [wikiTitleFromAuthoredToken("Other Note", 42)],
     })
     await flushPromises()
 
-    const overlapsRow = wrapper
-      .findAll('[data-testid="rich-note-property-row"]')
-      .find(
-        (r) => (r.element as HTMLElement).dataset.propertyKey === "overlaps"
-      )
-    expect(overlapsRow).toBeDefined()
-    const listValue = overlapsRow!.find(
-      '[data-testid="rich-note-property-row-list-value"]'
-    )
-    const link = listValue.find("a.router-link")
-    expect(link.exists()).toBe(true)
-    expect(link.text()).toBe("Other Note")
-    expect(listValue.text()).not.toContain("[[")
-    expect(JSON.parse(link.attributes("to") ?? "{}")).toEqual(
+    const resolved = overlapsListValue(wrapper)
+    const resolvedLink = resolved.find("a.router-link")
+    expect(resolvedLink.exists()).toBe(true)
+    expect(resolvedLink.text()).toBe("Other Note")
+    expect(resolved.text()).not.toContain("[[")
+    expect(JSON.parse(resolvedLink.attributes("to") ?? "{}")).toEqual(
       noteShowLocation(42)
     )
-  })
 
-  it("renders a path-Markdown overlaps item as a live wiki-equivalent link", async () => {
-    const pathItem = "[Title](/Folder/Title.md)"
-    const wrapper = await h.mountEditor(
-      `---
+    await wrapper.setProps({
+      modelValue: `---
 overlaps:
   - "${pathItem}"
 ---
 
 Body`,
-      {
-        wikiTitles: [wikiTitleFromAuthoredToken(pathItem, 42)],
-      }
-    )
+      wikiTitles: [wikiTitleFromAuthoredToken(pathItem, 42)],
+    })
     await flushPromises()
 
-    const overlapsRow = wrapper
-      .findAll('[data-testid="rich-note-property-row"]')
-      .find(
-        (r) => (r.element as HTMLElement).dataset.propertyKey === "overlaps"
-      )
-    expect(overlapsRow).toBeDefined()
-    const listValue = overlapsRow!.find(
-      '[data-testid="rich-note-property-row-list-value"]'
-    )
-    const link = listValue.find("a.router-link")
-    expect(link.exists()).toBe(true)
-    expect(link.text()).toBe("Title")
-    expect(link.attributes("data-wiki-title")).toBe("/Folder/Title.md")
-    expect(JSON.parse(link.attributes("to") ?? "{}")).toEqual(
+    const livePath = overlapsListValue(wrapper)
+    const liveLink = livePath.find("a.router-link")
+    expect(liveLink.exists()).toBe(true)
+    expect(liveLink.text()).toBe("Title")
+    expect(liveLink.attributes("data-wiki-title")).toBe("/Folder/Title.md")
+    expect(JSON.parse(liveLink.attributes("to") ?? "{}")).toEqual(
       noteShowLocation(42)
     )
-    expect(listValue.attributes("title")).toContain(pathItem)
-    expect(listValue.text()).not.toContain("[[")
-  })
+    expect(livePath.attributes("title")).toContain(pathItem)
+    expect(livePath.text()).not.toContain("[[")
 
-  it("renders an unresolved path-Markdown overlaps item as a dead wiki-equivalent link", async () => {
-    const wrapper = await h.mountEditor(
-      `---
+    await wrapper.setProps({
+      modelValue: `---
 overlaps:
   - "[Title](/Folder/Title.md)"
 ---
 
-Body`
-    )
+Body`,
+      wikiTitles: [],
+    })
     await flushPromises()
 
-    const listValue = wrapper.find(
-      '[data-testid="rich-note-property-row-list-value"]'
-    )
-    const link = listValue.find("a.dead-wiki-link")
-    expect(link.exists()).toBe(true)
-    expect(link.text()).toBe("Title")
+    const deadPath = overlapsListValue(wrapper)
+    const deadLink = deadPath.find("a.dead-wiki-link")
+    expect(deadLink.exists()).toBe(true)
+    expect(deadLink.text()).toBe("Title")
   })
 })

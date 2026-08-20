@@ -35,6 +35,18 @@ export function propertyRowValidationText(wrapper: VueWrapper): string {
   return wrapper.find('[data-testid="rich-note-property-validation"]').text()
 }
 
+export function overlapsListValue(wrapper: VueWrapper) {
+  const overlapsRow = wrapper
+    .findAll('[data-testid="rich-note-property-row"]')
+    .find(
+      (r) => (r.element as HTMLElement).dataset.propertyKey === "overlaps"
+    )
+  expect(overlapsRow).toBeDefined()
+  return overlapsRow!.find(
+    '[data-testid="rich-note-property-row-list-value"]'
+  )
+}
+
 export async function addNewOverlapsProperty(h: Harness, wikiLink: string) {
   await h.mountEditor("# Body", { attachToBody: true })
   await h.openAddProperty()
