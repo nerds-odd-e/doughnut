@@ -120,40 +120,8 @@ describe("FolderPage move destinations", () => {
       wrapper.unmount()
     })
 
-    it("sends destinationNotebookId and newParentFolderId for cross-notebook folder move", async () => {
-      const { wrapper, folderRealm, destinationNotebook, destParent } =
-        await mountCrossNotebookFolderMovePage(router, 10, "Moved")
-
-      const moveSpy = vi
-        .spyOn(NotebookController, "moveFolder")
-        .mockResolvedValue(wrapSdkResponse(folderRealm.folder) as never)
-
-      await selectCrossNotebookDestination(
-        wrapper,
-        destinationNotebook.id,
-        destParent.id
-      )
-      await submitMoveForm(wrapper)
-
-      expect(moveSpy).toHaveBeenCalledWith(
-        expect.objectContaining({
-          path: {
-            notebook: folderRealm.notebookRealm.notebook.id,
-            folder: folderRealm.folder.id,
-          },
-          body: {
-            destinationNotebookId: destinationNotebook.id,
-            newParentFolderId: destParent.id,
-            merge: false,
-          },
-        })
-      )
-
-      wrapper.unmount()
-    })
-
     it("retries cross-notebook folder move with merge after 409 conflict", async () => {
-      const { wrapper, destinationNotebook, destParent } =
+      const { wrapper, folderRealm, destinationNotebook, destParent } =
         await mountCrossNotebookFolderMovePage(router, 10, "Dup")
       const targetFolder = makeMe.aFolder.folder(99, "Dup").please()
 
@@ -175,6 +143,22 @@ describe("FolderPage move destinations", () => {
         destParent.id
       )
       await submitMoveForm(wrapper)
+
+      expect(moveSpy).toHaveBeenNthCalledWith(
+        1,
+        expect.objectContaining({
+          path: {
+            notebook: folderRealm.notebookRealm.notebook.id,
+            folder: folderRealm.folder.id,
+          },
+          body: {
+            destinationNotebookId: destinationNotebook.id,
+            newParentFolderId: destParent.id,
+            merge: false,
+          },
+        })
+      )
+
       resolveTopConfirm(true)
       await flushPromises()
 

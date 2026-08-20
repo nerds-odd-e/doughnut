@@ -113,11 +113,13 @@ export async function selectCrossNotebookDestination(
   destParentId: number
 ) {
   await selectDestinationNotebook(wrapper, destinationNotebookId)
-  await flushPromises()
   await selectDestinationParentFolder(wrapper, destParentId)
 }
 
 export async function openFolderSettingsTab(wrapper: VueWrapper) {
+  if (wrapper.find('[data-testid="folder-move-dialog"]').exists()) {
+    return
+  }
   const settingsTab = wrapper.find('[data-testid="folder-tab-settings"]')
   if (settingsTab.exists()) {
     await settingsTab.trigger("click")
