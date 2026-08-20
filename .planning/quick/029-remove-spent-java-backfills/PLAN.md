@@ -67,8 +67,9 @@ Each slice is **Structure**: delete one backfill family; remaining tests pass; e
 ### 6. Drop still-New mapped first-rating backfill
 
 - **Type:** Structure
-- **Status:** planned
+- **Status:** done
 - **Done:** `V300000277`, `StillNewMappedFirstRatingBackfill`, and its test gone. `SHRINK` / `AGAIN_ZERO` literals in Java drop with this class (remaining Java alias rewrite is slice 8).
+- **Learnings:** Remaining Java `SHRINK`/`AGAIN_ZERO` on RemovedGraded (slice 7) and Alias (slice 8). ADR class cite deferred to slice 11.
 
 ### 7. Drop removed-graded last-recall backfill
 
