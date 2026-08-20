@@ -224,22 +224,9 @@ not applicable to Vitest unit tests (E2E tag only).
 
 ### Optimize batch 1 (ranks 1–3)
 Type: Structure
-Status: planned
+Status: done
 
-**Tests:**
-- `tests/pages/NoteShowPageConversation.spec.ts` — "note show page conversation maximizes and restores note content when maximize is toggled" (~47ms)
-- `tests/pages/FolderPage.moveDestination.spec.ts` — "FolderPage move destinations move retries cross-notebook folder move with merge after 409 conflict" (~43ms)
-- `tests/pages/FolderPage.moveDestination.spec.ts` — "FolderPage move destinations move sends destinationNotebookId and newParentFolderId for cross-notebook folder move" (~39ms)
-
-**Goals:** Speed up only the listed tests (delete/merge redundant coverage first; then setup/selectors/waits). If no meaningful speedup after a serious attempt, append Candidate(s) to `ongoing/test-optimization-blacklist.md` and mark done.
-
-**Verify:**
-
-```bash
-pnpm frontend:test tests/pages/NoteShowPageConversation.spec.ts tests/pages/FolderPage.moveDestination.spec.ts
-```
-
-(Paths are relative to `frontend/` as accepted by `pnpm frontend:test`.)
+**Done:** Merged redundant FolderPage cross-notebook move case into 409-merge test; lighter NoteShow maximize mount (no sidebar); shared helpers. 6 tests green ×3.
 
 ---
 
