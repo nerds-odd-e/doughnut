@@ -82,21 +82,9 @@ Status: done
 
 ### Optimize note_content_completion
 Type: Structure
-Status: planned
+Status: done
 
-**Tests:**
-- `e2e_test/features/ai_generated_content/note_content_completion.feature` — Content completion fails when OpenAI is unavailable (~15162ms); Rejecting… (~10766ms); Accepting… (~10739ms)
-
-**Goals:**
-- Share Background; drop redundant navigation; merge accept/reject if one scenario can cover both deltas via Outline or shared steps without losing coverage.
-- Prefer testability / intercepts over full UI setup duplication.
-
-**Verify:**
-
-```bash
-source /workspace/scripts/cloud_agent_setup.sh
-xvfb-run -a pnpm cypress run --spec e2e_test/features/ai_generated_content/note_content_completion.feature --config-file e2e_test/config/ci.ts
-```
+**Done:** Dropped reject scenario (frontend unit coverage); removed dead cancel step/PO; redundant app-busy wait; `{delay:0}` typing. 3→2 scenarios (~8–9s warm).
 
 ---
 
