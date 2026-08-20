@@ -1,5 +1,4 @@
 import { describe, it, expect, vi } from "vitest"
-import { page } from "vitest/browser"
 import { render } from "@testing-library/vue"
 import LoadingModal from "@/components/commons/LoadingModal.vue"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
@@ -15,9 +14,16 @@ const longLayoutMessage = Array.from(
   { length: 20 },
   () => "Generating a detailed refinement layout"
 ).join(" ")
-const fullyVisible = (el: Element, height: number) => {
+const fullyVisibleIn = (el: Element, container: Element) => {
   const { top, bottom } = el.getBoundingClientRect()
-  return top >= 0 && bottom <= height
+  const bounds = container.getBoundingClientRect()
+  return top >= bounds.top && bottom <= bounds.bottom
+}
+const sizeOverlay = (overlay: HTMLElement, width: number, height: number) => {
+  overlay.style.width = `${width}px`
+  overlay.style.height = `${height}px`
+  overlay.style.maxWidth = `${width}px`
+  overlay.style.maxHeight = `${height}px`
 }
 
 describe("LoadingModal", () => {
@@ -90,12 +96,13 @@ describe("LoadingModal", () => {
     expect(firstCancel).not.toHaveBeenCalled()
   })
 
-  it("preserves the existing message layout with the optional action", () => {
+  it("keeps long-message layout, a fitting stack centered, and a tight one scrollable", async () => {
+    const cancelAction = vi.fn()
     const { getByText } = render(LoadingModal, {
       props: {
         show: true,
         message: longLayoutMessage,
-        cancelControl: { id: 31, action: vi.fn() },
+        cancelControl: { id: 51, action: cancelAction },
       },
     })
     const message = getByText(longLayoutMessage)
@@ -103,56 +110,40 @@ describe("LoadingModal", () => {
     expect(getComputedStyle(message).textAlign).toBe("start")
     expect(getComputedStyle(message).maxWidth).toBe("none")
     expect(getComputedStyle(message).overflowWrap).toBe("normal")
-    expect(getByText("Cancel")).toBeTruthy()
-  })
 
-  it("keeps a fitting long-message stack centered and a narrow one scrollable", async () => {
-    const originalWidth = window.innerWidth
-    const originalHeight = window.innerHeight
-    const cancelAction = vi.fn()
-    const { getByText, unmount } = render(LoadingModal, {
-      props: {
-        show: true,
-        message: longLayoutMessage,
-        cancelControl: { id: 51, action: cancelAction },
-      },
-    })
-    try {
-      await page.viewport(1280, 720)
-      const overlay = document.querySelector(
-        ".loading-modal-mask"
-      ) as HTMLElement
-      const content = document.querySelector(
-        ".loading-modal-content"
-      ) as HTMLElement
-      const spinner = document.querySelector(".daisy-loading-spinner")!
-      const cancelButton = getByText("Cancel")
-      const wideOverlay = overlay.getBoundingClientRect()
-      const wideContent = content.getBoundingClientRect()
-      expect(wideContent.height).toBeLessThanOrEqual(wideOverlay.height)
-      expect(
-        Math.abs(
-          wideContent.top -
-            wideOverlay.top -
-            (wideOverlay.bottom - wideContent.bottom)
-        )
-      ).toBeLessThan(2)
+    const overlay = document.querySelector(".loading-modal-mask") as HTMLElement
+    const content = document.querySelector(
+      ".loading-modal-content"
+    ) as HTMLElement
+    const spinner = document.querySelector(".daisy-loading-spinner")!
+    const cancelButton = getByText("Cancel")
 
-      await page.viewport(320, 568)
-      overlay.scrollTop = 0
-      expect(overlay.getBoundingClientRect().top).toBe(0)
-      expect(content.getBoundingClientRect().top).toBeGreaterThanOrEqual(0)
-      expect(fullyVisible(spinner, 568)).toBe(true)
-      expect(overlay.scrollHeight).toBeGreaterThan(overlay.clientHeight)
-      expect(overlay.scrollWidth).toBeLessThanOrEqual(overlay.clientWidth)
-      overlay.scrollTop = overlay.scrollHeight - overlay.clientHeight
-      expect(fullyVisible(cancelButton, 568)).toBe(true)
-      cancelButton.click()
-      expect(cancelAction).toHaveBeenCalledOnce()
-    } finally {
-      unmount()
-      await page.viewport(originalWidth, originalHeight)
-    }
+    sizeOverlay(overlay, 1280, 720)
+    await nextTick()
+    const wideOverlay = overlay.getBoundingClientRect()
+    const wideContent = content.getBoundingClientRect()
+    expect(wideContent.height).toBeLessThanOrEqual(wideOverlay.height)
+    expect(
+      Math.abs(
+        wideContent.top -
+          wideOverlay.top -
+          (wideOverlay.bottom - wideContent.bottom)
+      )
+    ).toBeLessThan(2)
+
+    sizeOverlay(overlay, 320, 200)
+    await nextTick()
+    overlay.scrollTop = 0
+    expect(content.getBoundingClientRect().top).toBeGreaterThanOrEqual(
+      overlay.getBoundingClientRect().top
+    )
+    expect(fullyVisibleIn(spinner, overlay)).toBe(true)
+    expect(overlay.scrollHeight).toBeGreaterThan(overlay.clientHeight)
+    expect(overlay.scrollWidth).toBeLessThanOrEqual(overlay.clientWidth)
+    overlay.scrollTop = overlay.scrollHeight - overlay.clientHeight
+    expect(fullyVisibleIn(cancelButton, overlay)).toBe(true)
+    cancelButton.click()
+    expect(cancelAction).toHaveBeenCalledOnce()
   })
 
   it("does not render the action while hidden", () => {

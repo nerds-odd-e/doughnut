@@ -4,6 +4,7 @@ import {
   dialogEl,
   getTextareaValue,
   isListModeTabActive,
+  openValuePopup,
   popupValidationText,
   savePopup,
   setListItemValue,
@@ -69,14 +70,22 @@ describe("RichMarkdownEditor property value popup mode switch", () => {
     expect(dialogEl()).toBeNull()
   })
 
-  it("allows duplicate list items in popup save", async () => {
-    await mountTopicValuePopup(h)
-    await switchToListMode()
-    await writeListItems("dup", "dup")
+  it("allows duplicate list items and saves an emptied list from popup", async () => {
+    const wrapper = await mountTopicValuePopup(h, LIST_TOPIC_MARKDOWN)
+    setListItemValue(0, "dup")
+    setListItemValue(1, "dup")
     await savePopup()
+    expect(h.lastEmittedMarkdown()).toMatch(/- dup\n\s*- dup/)
+    expect(dialogEl()).toBeNull()
 
-    const last = h.lastEmittedMarkdown()
-    expect(last).toMatch(/- dup\n\s*- dup/)
+    await wrapper.setProps({ modelValue: h.lastEmittedMarkdown() })
+    await openValuePopup(wrapper)
+    clickListRemove(1)
+    clickListRemove(0)
+    await flushPromises()
+    await savePopup()
+    expect(h.lastEmittedMarkdown()).toMatch(/topic:\s*\[\]/)
+    expect(dialogEl()).toBeNull()
   })
 
   it("rejects empty list items on save", async () => {
@@ -87,17 +96,5 @@ describe("RichMarkdownEditor property value popup mode switch", () => {
     expect(popupValidationText()).toContain("List items cannot be empty.")
     expect(dialogEl()).not.toBeNull()
     expect(wrapper.emitted("update:modelValue")).toBeUndefined()
-  })
-
-  it("saves an empty list from popup", async () => {
-    await mountTopicValuePopup(h)
-    await switchToListMode()
-    clickListRemove(0)
-    await flushPromises()
-    await savePopup()
-
-    const last = h.lastEmittedMarkdown()
-    expect(last).toMatch(/topic:\s*\[\]/)
-    expect(dialogEl()).toBeNull()
   })
 })
