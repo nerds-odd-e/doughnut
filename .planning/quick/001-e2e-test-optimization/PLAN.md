@@ -74,23 +74,9 @@ tag Scenario or Feature `@skipOptimizationDueToKnownNecessarySlowness`.
 
 ### Optimize assimilation note_refinement
 Type: Structure
-Status: planned
+Status: done
 
-**Tests:** (9 scenarios in top 10%, ~131s combined)
-- `e2e_test/features/assimilation/note_refinement.feature` — all listed refinement scenarios above
-
-**Goals:**
-- Merge redundant extract-preview / export / blank-title variants where coverage overlaps.
-- Hoist shared assimilation + OpenAI stub setup; prefer API/testability inject over repeated UI assimilate paths.
-- Remove fixed waits if any; use intercepts / app-busy waits.
-
-**Verify:**
-
-```bash
-source /workspace/scripts/cloud_agent_setup.sh
-xvfb-run -a pnpm cypress run --spec e2e_test/features/assimilation/note_refinement.feature --config-file e2e_test/config/ci.ts
-# 3 consecutive green runs before close
-```
+**Done:** 9→4 scenarios (~20s warm). Background assimilate; merged generate→remove and content/diff→extract; dropped blank-title + export (frontend unit coverage). Removed dead step defs / page-object methods.
 
 ---
 

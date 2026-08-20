@@ -201,23 +201,6 @@ Given(
   }
 )
 
-When(
-  'I export the extract request for refinement layout items {string} and {string}',
-  (firstItem: string, secondItem: string) => {
-    start
-      .assumeAssimilationPage()
-      .exportExtractRequestForLayoutItems(firstItem, secondItem)
-  }
-)
-
-When('I export the breakdown request from refinement layout', () => {
-  start.assumeAssimilationPage().exportBreakdownRequest()
-})
-
-Then('the export request dialog should show AI request JSON', () => {
-  start.assumeAssimilationPage().expectExportRequestDialogShowsAiRequestJson()
-})
-
 When('I open Refine note from the answered question', () => {
   start.assumeAnsweredQuestionPage().openRefineNoteModal()
 })
