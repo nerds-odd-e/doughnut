@@ -13,13 +13,88 @@ published open FSRS.
 
 ## Decision
 
+This ADR is the glossary for **recall** and schedule terms. Other product
+language: [ADR 0001](./0001-ubiquitous-language.md). When citing FSRS,
+pair once then use Doughnut terms.
+
+### Recall glossary
+
+- **Memory tracker** — One learner's scheduled memory for a note (or
+  **property**). Open FSRS **card**. Types (how it is created):
+  [ADR 0001](./0001-ubiquitous-language.md) **understanding**,
+  **spelling**, **property**, **commissioned**.
+- **Memory tracking** — Creating and maintaining memory trackers.
+  Tracker-level opt-out is **Remove from recall**.
+- **Recall** — Spaced retrieval of assimilated material. Doughnut name
+  for FSRS **review**. Methods: **recall prompt** or **just review**.
+- **Recall prompt** — One ask during recall for a memory tracker. Kinds:
+  **spelling** (no MCQ) or **MCQ** (the prompt HAS_A an MCQ). An MCQ is
+  not a type of recall prompt.
+- **MCQ** — Multiple-choice content on a note (stem, choices, solution).
+  A recall prompt may have an MCQ; an MCQ is not a type of recall prompt.
+  **Contested** marks an MCQ as not feasible. Origin (AI-generated vs
+  manually added) is how the content was produced, not a prompt kind.
+- **Contested** — Marks an MCQ as not feasible. Distinct from a kind of
+  recall prompt.
+- **Contest** — Challenge an MCQ shown in a recall prompt; the MCQ may be
+  marked contested and replaced.
+- **Just review** — Recall by reviewing the note and self-evaluating.
+  Short UI: **Just review**. Two buttons (see **Just review** below).
+- **Answer** — The learner's response to a **recall prompt**. Prompt
+  grades and **confusion** link a RecallLog row to this answer.
+- **Accidental match** — Spelling answer that fails the note under recall
+  but names another accessible note by title or plain alias. Transitions:
+  **Accidental-match and overlap transitions**.
+- **Confusion** — Secondary memory-state adjustment on the matched note's
+  tracker after an accidental match. Not a grade and not FSRS Again.
+- **Overlap** — Declared non-distinguishing spelling outcome. No memory
+  change.
+- **Remove from recall** — Stop an existing memory tracker from appearing
+  in recall; the unit does not re-enter the assimilation sequence. Short
+  UI: **Remove** / **Remove from recall**. `remove` is not a grade.
+- **Revive** — Re-enable recall for a tracker that was removed from
+  recall. Short UI: **Revive**. Not a grade.
+- **New** — Memory tracker that is ungraded (`S = 0`, Difficulty unset /
+  **N/A**). Assimilation is not a grade; confusion is not a grade. Not
+  “never succeeded.” After any mapped grade the tracker is no longer New.
+  Due at `assimilatedAt`. No FSRS Learning / Review / Relearning
+  card-state machine.
+- **Stability** — Persisted current interval of a memory tracker, in
+  whole hours. After a grade, `nextRecallAt = lastRecalledAt + I(r, S)`
+  with requested retention `r` locked at 0.9 (`I(0.9, S) = S`). A **New**
+  tracker has Stability 0 (due now). Short UI: **Stability**.
+- **Difficulty** — Persisted memory state in `[1, 10]`. Shown on the
+  Memory Tracker Information card as the API number, or **N/A** when
+  unset (New / assimilate-only). Fallback **5** when Stability > 0 and
+  Difficulty is null.
+- **Retrievability** — FSRS `R`: predicted probability of recall at
+  elapsed time, from Stability. Computed at grade time for long-term
+  next-S (Hard/Good/Easy increment and post-lapse Again); not stored.
+- **Requested retention** — FSRS `request_retention` (desired recall rate
+  at due). Not Retrievability. Locked globally at **0.9**. At this `r`,
+  `I(0.9, S) = S` in whole hours. May be shown read-only as the color
+  hinge of the observed-recall-rate heatmap.
+- **`lastRecalledAt`** — Time of the last mapped grade (FSRS
+  `last_review`). Unset on New.
+- **`assimilatedAt`** — Time the tracker was created by assimilation.
+  New due.
+- **`nextRecallAt`** — Due time. After a grade, last recall plus
+  `I(0.9, S)`.
+- **RecallLog** — One persisted memory-state transition for a memory
+  tracker. Doughnut name for FSRS-shaped review history. Prompt grades
+  and confusion link an **answer**; just review and Tutor Feedback do
+  not. Shape: **RecallLog** below.
+- **Thinking time** — Duration the prompt measured while the learner
+  answered. Recorded on the answer for display; not a memory-state
+  input.
+
 ### Doughnut vs FSRS terms
 
-When citing FSRS, pair once then use Doughnut terms. Glossary: [ADR 0001](./0001-ubiquitous-language.md). Product outcomes → G: **Outcome-to-grade compatibility map**.
+Product outcomes → G: **Outcome-to-grade compatibility map**.
 
 | Doughnut                | Open FSRS           | Notes                                           |
 | ----------------------- | ------------------- | ----------------------------------------------- |
-| **Recall**              | **Review**          |                                                 |
+| **Recall**              | **Review**          | Because "'recall' is better than 'review'" .    |
 | **Just review**         |                     | A method of recall                              |
 | **Assimilation**        | **New** card        | Introduce, ungraded                             |
 | **New**                 | **New**             | Ungraded; no Learning / Review / Relearning     |
@@ -96,7 +171,7 @@ concern.
 
 Difficulty is persisted memory state in `[1, 10]`. It is shown on the Memory Tracker page (Information card), next to Stability, as the number returned by the API or **N/A** when unset (New / assimilate-only). Harder items gain less Stability on a successful recall. A correct recall also updates Difficulty with Good next-D (see **Difficulty after a mapped grade**).
 
-A **New** tracker ([ADR 0001](./0001-ubiquitous-language.md)) has Stability 0, Difficulty unset / **N/A**, and no last recall (due from `assimilatedAt`; see Stability). There is no FSRS card-state machine: no Learning / Review / Relearning step list or column. The first mapped grade initializes Stability and Difficulty with FSRS-6 first-rating (see **First rating on New**); after that the tracker is a graded DSR tracker. Difficulty **5** remains only as the fallback when Stability > 0 and Difficulty is null.
+A **New** tracker has Stability 0, Difficulty unset / **N/A**, and no last recall (due from `assimilatedAt`; see **New**). There is no FSRS card-state machine: no Learning / Review / Relearning step list or column. The first mapped grade initializes Stability and Difficulty with FSRS-6 first-rating (see **First rating on New**); after that the tracker is a graded DSR tracker. Difficulty **5** remains only as the fallback when Stability > 0 and Difficulty is null.
 
 Ordinary correct recall with Stability > 0 updates Stability with open-FSRS-6 Good-equivalent rules (own implementation) and Difficulty with Good next-D.
 
@@ -147,7 +222,7 @@ Just review stays **two buttons**. **Yes, I remember** is ordinary correct (Tuto
 
 ### Commissioned Learning Session feedback
 
-A commissioned memory tracker is graded from Tutor Feedback (score 1–4), not from a recall prompt Doughnut asked. [ADR 0001](./0001-ubiquitous-language.md) defines the vocabulary and [ADR 0005](./0005-commissioned-learning-session-protocol.md) defines what the score means to the Tutor. Valid scores are **1, 2, 3, and 4**. The score **is** FSRS G: **1** Again, **2** Hard, **3** Good, **4** Easy. Shared schedule rules:
+A commissioned memory tracker is graded from Tutor Feedback (score 1–4), not from a recall prompt Doughnut asked. Commissioned vocabulary: [ADR 0001](./0001-ubiquitous-language.md). What the score means to the Tutor: [ADR 0005](./0005-commissioned-learning-session-protocol.md). Valid scores are **1, 2, 3, and 4**. The score **is** FSRS G: **1** Again, **2** Hard, **3** Good, **4** Easy. Shared schedule rules:
 
 - A recorded score is a grade: it counts the recall, sets `lastRecalledAt`, and reschedules the tracker.
 - A Session Item that never receives Feedback supplies no graded recall result: its tracker stays unchanged and the item is abandoned with its session.
@@ -288,8 +363,7 @@ name the property. No confirm action.
 
 ### RecallLog
 
-Each memory-state transition is a **RecallLog**
-([ADR 0001](./0001-ubiquitous-language.md)). Tutor Feedback is a log row, not a
+Each memory-state transition is a **RecallLog**. Tutor Feedback is a log row, not a
 session bag.
 
 A `recall_log` has `memory_tracker_id`, `recorded_at`, `elapsed_hours`,
@@ -414,7 +488,7 @@ Empty pending accept.
 ## Related
 
 - Tracker (pointer + deferred IDs, not a second policy map): [`.planning/research/FSRS-COMPATIBILITY-GAP.md`](../../.planning/research/FSRS-COMPATIBILITY-GAP.md)
-- ADR 0001 [ubiquitous language](./0001-ubiquitous-language.md) — Doughnut terms; FSRS pairing in **Doughnut vs FSRS terms**
+- ADR 0001 [ubiquitous language](./0001-ubiquitous-language.md) — notes, assimilation, tracker types, commissioned Learning Session terms. This ADR is the recall and schedule glossary.
 - ADR 0005 [commissioned learning session protocol](./0005-commissioned-learning-session-protocol.md) — what a score means to the Tutor
 - Anki answer semantics: <https://docs.ankiweb.net/studying.html#answer-buttons>
 - FSRS overdue-recall: <https://github.com/open-spaced-repetition/awesome-fsrs/wiki/The-Algorithm>

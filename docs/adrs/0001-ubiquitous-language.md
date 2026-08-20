@@ -11,10 +11,12 @@ Doughnut’s product vocabulary should be **consistent**: each idea has one name
 and each name means one thing. Humans, UI copy, APIs, and coding agents then
 share those terms.
 
-This ADR is the **canonical ubiquitous language**. The glossary below is
-the source of truth; prefer these meanings in UI copy, APIs, tests, and
-code identifiers. This glossary is amended in place. Add or change domain
-terms here; do not supersede this ADR with a new one.
+This ADR is the **canonical ubiquitous language** for Doughnut domain
+terms other than recall and spaced-repetition scheduling. Prefer these
+meanings in UI copy, APIs, tests, and code identifiers. This glossary is
+amended in place. Add or change domain terms here; do not supersede this
+ADR with a new one. Recall, memory-state, and schedule terms live in
+[ADR 0003](./0003-spaced-repetition-scheduling-policy.md).
 
 ## Notebook / note structure
 
@@ -62,7 +64,8 @@ terms here; do not supersede this ADR with a new one.
   Q-id).
 - **Skip Memory Tracking** — Notebook setting that opts the notebook out
   of the assimilation sequence and blocks Bazaar subscribe. Distinct
-  from opting out of **recall**.
+  from **Remove from recall**
+  ([ADR 0003](./0003-spaced-repetition-scheduling-policy.md)).
 
 ## Book
 
@@ -84,12 +87,13 @@ terms here; do not supersede this ADR with a new one.
   findings, then typically lints again
 - **Semantic search** — Meaning-based find of notes via embeddings
 
-## Assimilation and recall
+## Assimilation
 
 - **Subscription** — Following a shared notebook (from the Bazaar or a
   Circle) with a daily assimilation quota. The action is **subscribe**.
 - **Assimilation** — First-pass intake of a note into the learner’s
-  memory schedule
+  memory schedule. Creates a **New** memory tracker
+  ([ADR 0003](./0003-spaced-repetition-scheduling-policy.md)).
 - **Assimilation sequence** — Ordered units offered as next-to-assimilate
   (menu walkthrough, `/next`). Distinct from assimilating on a note. A
   unit is in the sequence iff it has not been skipped from the sequence
@@ -106,70 +110,32 @@ terms here; do not supersede this ADR with a new one.
   title by spelling. The learner creates it.
 - **Remember spelling** — Learner action at assimilation: verify the note
   title (or alias), then create a spelling memory tracker
-- **Recall** — Spaced retrieval of assimilated material. Doughnut names
-  the activity **recall**, not FSRS/Anki **review**. Methods: **recall
-  prompt** or **just review**.
-- **Recall prompt** — One ask during recall for a memory tracker. Kinds:
-  **spelling** (no MCQ) or **MCQ** (the prompt HAS_A an MCQ). An MCQ is
-  not a type of recall prompt.
-- **MCQ** — Multiple-choice content on a note (stem, choices, solution).
-  A recall prompt may have an MCQ; an MCQ is not a type of recall prompt.
-  **Contested** marks an MCQ as not feasible. Origin (AI-generated vs
-  manually added) is how the content was produced, not a prompt kind.
-- **Contested** — Marks an MCQ as not feasible. Distinct from a kind of
-  recall prompt.
-- **Contest** — Challenge an MCQ shown in a recall prompt; the MCQ may be
-  marked contested and replaced.
-- **Just review** — Recall by reviewing the note and self-evaluating. A
-  method of recall. Short UI: **Just review**
-- **Accidental match** — Recall result that matches an unintended note
-- **Memory tracking** — Creating and maintaining memory trackers for
-  notes. Tracker-level opt-out is **Remove from recall**.
-- **Remove from recall** — Stop an existing memory tracker from appearing
-  in recall; the unit does not re-enter the sequence. Short UI:
-  **Remove** / **Remove from recall**
-- **Revive** — Re-enable recall for a tracker that was removed from
-  recall. Short UI: **Revive**
 - **Property memory tracker** — Understanding memory tracker keyed by a
   **property** name (the frontmatter key).
-- **Stability** — Persisted current interval of a memory tracker, in
-  whole hours. After a grade, next recall time is last recalled time plus
-  `I(r, S)` with **requested retention** `r` locked at 0.9 (so due hours
-  equal Stability hours). A **New** tracker has Stability 0 (due now).
-  Short UI: **Stability**
-- **New** — Memory tracker that is ungraded (`S = 0`, Difficulty unset /
-  **N/A**; Difficulty:
-  [ADR 0003](./0003-spaced-repetition-scheduling-policy.md)).
-  Assimilation is not a grade; confusion is not a grade. Not “never
-  succeeded.” After any mapped grade the tracker is no longer New.
-- **Requested retention** — FSRS `request_retention` (desired recall rate
-  at due). Not Retrievability. Locked globally at **0.9**. At this `r`,
-  `I(0.9, S) = S` in whole hours. May be shown read-only as the color
-  hinge of the observed-recall-rate heatmap.
-- **Retrievability** — FSRS `R`: predicted probability of recall at
-  elapsed time, from Stability. Computed, not stored.
-- **RecallLog** — One persisted memory-state transition for a memory
-  tracker. Doughnut’s name for the FSRS-shaped review history (review
-  (FSRS) = recall). Prompt grades and confusion link an **answer**; just
-  review and Tutor Feedback do not. Shape:
-  [ADR 0003](./0003-spaced-repetition-scheduling-policy.md).
 - **Daily assimilation target** — Max new understanding memory trackers
   to create per day (profile or subscription). Spelling and commissioned
   trackers do not consume this count.
+
+Recall, **memory tracking**, **recall prompt** / **MCQ** / **just
+review**, **New**, DSR (**Stability** / **Difficulty** /
+**Retrievability**), **RecallLog**, and schedule fields:
+[ADR 0003](./0003-spaced-repetition-scheduling-policy.md).
 
 ## Focus context
 
 - **Focus context** — Bounded neighborhood around a **focus note** (depth
   0) plus related notes reached by wiki links, inbound references, and
   sampled folder peers, within a token budget. Used for conversation,
-  recall-prompt generation, note automation, Learning Session Request,
-  and export.
+  recall-prompt generation
+  ([ADR 0003](./0003-spaced-repetition-scheduling-policy.md)), note
+  automation, Learning Session Request, and export.
 - **Focus note** — The center note of a **focus context** (depth 0).
 
 ## Conversation
 
 - **Conversation** — Thread of messages about a **note** or **recall
-  prompt**. Participants may be humans and/or the **AI Assistant**.
+  prompt** ([ADR 0003](./0003-spaced-repetition-scheduling-policy.md)).
+  Participants may be humans and/or the **AI Assistant**.
 - **Message** — One utterance in a conversation
 - **Message center** — Inbox UI for conversations and unread state.
   Short UI: **Messages**
@@ -184,7 +150,8 @@ commission from Doughnut:
 - **Learning Orchestrator** — The Doughnut component that directs and
   coordinates Learning Sessions
 - **Commissioned memory tracker** — Memory tracker maintained through
-  commissioned Learning Sessions rather than ordinary recall
+  commissioned Learning Sessions rather than ordinary **recall**
+  ([ADR 0003](./0003-spaced-repetition-scheduling-policy.md))
 - **Tutor** — Party that conducts a Learning Session from the request and
   produces a report; may be a person or an AI assistant, and is outside
   Doughnut
@@ -204,13 +171,18 @@ commission from Doughnut:
 ## Alignment policy
 
 - Features, tests, OpenAPI names, and packages follow this glossary.
+  Recall and schedule names follow
+  [ADR 0003](./0003-spaced-repetition-scheduling-policy.md).
 - Same nouns in UI, API, and schema, with **minimum DTO**. Do not
 introduce a translation type that wraps one as the other.
-- Agents treat this ADR as binding for naming choices. Humans and agents share an explicit dictionary instead of inferring synonyms.
+- Agents treat this ADR as binding for naming choices except recall and
+  schedule terms (ADR 0003). Humans and agents share an explicit
+  dictionary instead of inferring synonyms.
 
 ## Prerequisites / Assumptions
 
-- No Accepted ADR yet constrains domain naming (only ADR-0000 on using ADRs).
+- Recall and schedule terms are constrained by
+  [ADR 0003](./0003-spaced-repetition-scheduling-policy.md).
 
 ## Related
 
@@ -219,7 +191,6 @@ introduce a translation type that wraps one as the other.
 - Links: playbook [README.md](./README.md); ADR-0000
 [use-adrs-accepted.md](./0000-use-adrs-accepted.md); ADR 0003
 [spaced-repetition scheduling policy](./0003-spaced-repetition-scheduling-policy.md)
-(FSRS **review** = Doughnut **recall**; **Stability** / **New** /
-**Retrievability** / **RecallLog**); ADR 0004
+(recall and schedule glossary); ADR 0004
 [OKF-compatible notebook Markdown](./0004-okf-compatible-notebook-markdown-accepted.md)
 (portable Markdown profile)
