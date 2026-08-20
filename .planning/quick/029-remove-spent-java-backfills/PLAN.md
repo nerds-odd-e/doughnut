@@ -40,8 +40,9 @@ Each slice is **Structure**: delete one backfill family; remaining tests pass; e
 ### 2. Drop note concept-type backfill and gate
 
 - **Type:** Structure
-- **Status:** planned
+- **Status:** done
 - **Done:** `V300000269` and `V300000270` gone (same runner). `NoteConceptTypeBackfill` gone. `note_concept_type_backfill` removed from all `application.yml` documents and `application-prod.yml`. `NoteConceptType.ensureStoredType` unchanged.
+- **Learnings:** Dual gate migrations share one runner; clear placeholder from every Flyway map (yml ×3 + prod).
 
 ### 3. Drop gated still-New first-rating backfills
 
