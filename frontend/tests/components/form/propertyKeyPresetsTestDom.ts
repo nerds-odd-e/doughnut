@@ -1,8 +1,17 @@
 import { flushPromises } from "@vue/test-utils"
 import { nextTick } from "vue"
+import { vi } from "vitest"
 
 export const INSERT_KEY_INPUT = "rich-note-property-key"
 export const ROW_KEY_INPUT = "rich-note-property-row-key-input"
+
+export async function advanceAnimationFrame() {
+  if (vi.isFakeTimers()) {
+    await vi.advanceTimersToNextFrame()
+    return
+  }
+  await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()))
+}
 
 export function keyInputEl(testId: string): HTMLInputElement {
   const el = document.querySelector(
@@ -33,8 +42,9 @@ export function presetOptionEls(): HTMLElement[] {
 export function assertPresetOptionsVisible(expectedKeys: readonly string[]) {
   const options = presetOptionEls()
   expect(options.length).toBe(expectedKeys.length)
+  const found = new Set(options.map((o) => o.dataset.presetKey))
   for (const key of expectedKeys) {
-    expect(options.find((o) => o.dataset.presetKey === key)).toBeDefined()
+    expect(found.has(key)).toBe(true)
   }
 }
 
@@ -45,5 +55,5 @@ export async function selectPresetKey(presetKey: string) {
   btn!.click()
   await flushPromises()
   await nextTick()
-  await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()))
+  await advanceAnimationFrame()
 }

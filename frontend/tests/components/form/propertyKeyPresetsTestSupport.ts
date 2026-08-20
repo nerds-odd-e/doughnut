@@ -4,6 +4,7 @@ import {
   type PropertyRow,
 } from "@/utils/noteContentPropertyRows"
 import {
+  advanceAnimationFrame,
   assertPresetOptionsVisible,
   focusKeyInput,
   INSERT_KEY_INPUT,
@@ -24,8 +25,10 @@ export async function preparePropertyKeyPresetDropdown(
   await h.mountEditor(markdown, { attachToBody: true })
   if (options.keyInputTestId === INSERT_KEY_INPUT) {
     await h.openAddProperty()
+    await advanceAnimationFrame()
+  } else {
+    await focusKeyInput(options.keyInputTestId)
   }
-  await focusKeyInput(options.keyInputTestId)
   assertPresetOptionsVisible(
     richModeKeyDropdownPresetKeysForPropertyRows(false, options.existingRows)
   )

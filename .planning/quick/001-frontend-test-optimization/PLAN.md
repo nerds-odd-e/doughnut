@@ -264,64 +264,28 @@ Status: done
 
 ### Optimize batch 6 (ranks 16–18)
 Type: Structure
-Status: planned
+Status: done
 
-**Tests:**
-- `tests/components/recall/NoteRefinement.extractNote.spec.ts` — "NoteRefinement extract note preview replaces preview fields when Ask AI to retry is clicked" (~28ms)
-- `tests/notes/NoteToolbar.pinnedToggles.spec.ts` — "NoteToolbar pinned on-state toggles returns 'audio' to the overflow menu when the pinned toolbar toggle is turned off" (~28ms)
-- `tests/wiki-link-or-relationship/AddRelationship.spec.ts` — "AddRelationshipFinalize emits success without navigating when navigateOnSuccess is false" (~28ms)
+**Done:** Merged extract preview+retry; merged AddRelationship navigate on/off; skip pinnedToggles.
 
-**Goals:** Speed up only the listed tests (delete/merge redundant coverage first; then setup/selectors/waits). If no meaningful speedup after a serious attempt, append Candidate(s) to `ongoing/test-optimization-blacklist.md` and mark done.
-
-**Verify:**
-
-```bash
-pnpm frontend:test tests/components/recall/NoteRefinement.extractNote.spec.ts tests/notes/NoteToolbar.pinnedToggles.spec.ts tests/wiki-link-or-relationship/AddRelationship.spec.ts
-```
-
-(Paths are relative to `frontend/` as accepted by `pnpm frontend:test`.)
 
 ---
 
 ### Optimize batch 7 (ranks 19–21)
 Type: Structure
-Status: planned
+Status: done
 
-**Tests:**
-- `tests/components/commons/LoadingModal.spec.ts` — "LoadingModal keeps a fitting long-message stack centered and a narrow one scrollable" (~27ms)
-- `tests/components/form/RichMarkdownEditor.propertyValuePopupModeSwitch.spec.ts` — "RichMarkdownEditor property value popup mode switch allows duplicate list items in popup save" (~27ms)
-- `tests/components/form/RichMarkdownEditor.propertyValuePopupModeSwitch.spec.ts` — "RichMarkdownEditor property value popup mode switch saves an empty list from popup" (~27ms)
+**Done:** Merged LoadingModal layout cases; merged modeSwitch duplicate+empty-list into one mount.
 
-**Goals:** Speed up only the listed tests (delete/merge redundant coverage first; then setup/selectors/waits). If no meaningful speedup after a serious attempt, append Candidate(s) to `ongoing/test-optimization-blacklist.md` and mark done.
-
-**Verify:**
-
-```bash
-pnpm frontend:test tests/components/commons/LoadingModal.spec.ts tests/components/form/RichMarkdownEditor.propertyValuePopupModeSwitch.spec.ts
-```
-
-(Paths are relative to `frontend/` as accepted by `pnpm frontend:test`.)
 
 ---
 
 ### Optimize batch 8 (ranks 22–24)
 Type: Structure
-Status: planned
+Status: done
 
-**Tests:**
-- `tests/components/recall/NoteRefinement.layoutSelection.spec.ts` — "NoteRefinement layout selection submits only checked descendants when parent is indeterminate ('remove')" (~27ms)
-- `tests/notes/NoteNewForm.wikidata.spec.ts` — "NoteNewForm wikidata and soft-delete search wikidata entry search 'dog' get 'Canine' with action 'append' updates title as 'dog'" (~27ms)
-- `tests/components/form/RichMarkdownEditor.propertyKeyPresets.spec.ts` — "RichMarkdownEditor property key presets preset dropdown for 'insert row' shows options and sets key on selection" (~27ms)
+**Done:** Faster layoutSelection flushes; merged wikidata replace+append; fake rAF for presets.
 
-**Goals:** Speed up only the listed tests (delete/merge redundant coverage first; then setup/selectors/waits). If no meaningful speedup after a serious attempt, append Candidate(s) to `ongoing/test-optimization-blacklist.md` and mark done.
-
-**Verify:**
-
-```bash
-pnpm frontend:test tests/components/recall/NoteRefinement.layoutSelection.spec.ts tests/notes/NoteNewForm.wikidata.spec.ts tests/components/form/RichMarkdownEditor.propertyKeyPresets.spec.ts
-```
-
-(Paths are relative to `frontend/` as accepted by `pnpm frontend:test`.)
 
 ---
 
@@ -330,9 +294,11 @@ Type: Structure
 Status: planned
 
 **Tests:**
-- `tests/notes/NoteNewForm.wikidata.spec.ts` — "NoteNewForm wikidata and soft-delete search wikidata entry search 'dog' get 'Canine' with action 'replace' updates title as 'Canine'" (~26ms)
 - `tests/notes/NoteToolbar.moreOptionsOverflow.spec.ts` — "NoteToolbar more-options overflow emits edit-as-markdown from the overflow Edit row" (~26ms)
 - `tests/notes/NoteToolbar.conversationWikiNewOverflow.spec.ts` — "NoteToolbar Conversation, Wiki, and New overflow keeps only the on-toggle and more options on an extremely narrow bar" (~26ms)
+
+**Note:** wikidata replace already optimized via batch 8 merge — skip.
+
 
 **Goals:** Speed up only the listed tests (delete/merge redundant coverage first; then setup/selectors/waits). If no meaningful speedup after a serious attempt, append Candidate(s) to `ongoing/test-optimization-blacklist.md` and mark done.
 
@@ -415,8 +381,10 @@ Status: planned
 
 **Tests:**
 - `tests/components/form/RichMarkdownEditor.properties.spec.ts` — "RichMarkdownEditor properties shows read-only Properties above Quill when content includes supported YAML frontmatter" (~24ms)
-- `tests/notes/NoteToolbar.pinnedToggles.spec.ts` — "NoteToolbar pinned on-state toggles pins 'assimilation' on a narrow toolbar and omits it from overflow" (~24ms)
 - `tests/components/form/RichMarkdownEditor.overlapsProperty.spec.ts` — "RichMarkdownEditor overlaps property emits valid overlaps list edits from popup" (~24ms)
+
+**Note:** pinnedToggles already done in batch 5 — skip.
+
 
 **Goals:** Speed up only the listed tests (delete/merge redundant coverage first; then setup/selectors/waits). If no meaningful speedup after a serious attempt, append Candidate(s) to `ongoing/test-optimization-blacklist.md` and mark done.
 
@@ -437,7 +405,9 @@ Status: planned
 **Tests:**
 - `tests/components/form/RichMarkdownEditor.propertyValuePopupReorder.spec.ts` — "RichMarkdownEditor property value popup reorder preserves reordered list items in composed YAML when saved from popup" (~24ms)
 - `tests/components/form/RichMarkdownEditor.aliasesProperty.spec.ts` — "RichMarkdownEditor aliases property emits valid aliases list edits from popup" (~24ms)
-- `tests/notes/NoteToolbar.pinnedToggles.spec.ts` — "NoteToolbar pinned on-state toggles pins 'audio' on a narrow toolbar and omits it from overflow" (~24ms)
+
+**Note:** pinnedToggles already done in batch 5 — skip.
+
 
 **Goals:** Speed up only the listed tests (delete/merge redundant coverage first; then setup/selectors/waits). If no meaningful speedup after a serious attempt, append Candidate(s) to `ongoing/test-optimization-blacklist.md` and mark done.
 

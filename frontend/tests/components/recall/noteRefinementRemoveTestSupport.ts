@@ -2,10 +2,10 @@ import usePopups from "@/components/commons/Popups/usePopups"
 import type { NoteRefinementLayoutItem } from "@generated/doughnut-backend-api"
 import { flushPromises } from "@vue/test-utils"
 import { expect } from "vitest"
+import { selectRefinementLayoutItems } from "./noteRefinementLayoutFixtures"
 import {
   mountNoteRefinement,
   mountNoteRefinementWithLayoutReady,
-  selectRefinementLayoutItem,
 } from "./noteRefinementTestSupport"
 
 export const sampleNestedLayout = (): NoteRefinementLayoutItem[] => [
@@ -43,8 +43,10 @@ export const sampleNestedLayout = (): NoteRefinementLayoutItem[] => [
 export async function mountNestedLayoutWithIndeterminateParentSelection() {
   const layout = sampleNestedLayout()
   const wrapper = await mountNoteRefinementWithLayoutReady(layout)
-  await selectRefinementLayoutItem(wrapper, "p1")
-  await selectRefinementLayoutItem(wrapper, "p1-2", false)
+  await selectRefinementLayoutItems(wrapper, "p1", {
+    itemId: "p1-2",
+    checked: false,
+  })
   return { layout, wrapper }
 }
 
@@ -54,7 +56,6 @@ export async function openRemoveRefinementConfirmDialog(
   await wrapper
     .find('[data-test-id="remove-refinement-layout"]')
     .trigger("click")
-  await flushPromises()
 }
 
 export function expectRemoveConfirmPopup() {

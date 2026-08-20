@@ -1,4 +1,9 @@
-import { keyInputValue, selectPresetKey } from "./propertyKeyPresetsTestDom"
+import { afterEach, beforeEach, vi } from "vitest"
+import {
+  advanceAnimationFrame,
+  keyInputValue,
+  selectPresetKey,
+} from "./propertyKeyPresetsTestDom"
 import {
   PRESET_DROPDOWN_CASES,
   preparePropertyKeyPresetDropdown,
@@ -9,13 +14,19 @@ import { createRichMarkdownEditorTestHarness } from "./richMarkdownEditorTestHar
 describe("RichMarkdownEditor property key presets", () => {
   const h = createRichMarkdownEditorTestHarness()
 
+  beforeEach(() => {
+    vi.useFakeTimers({ toFake: ["requestAnimationFrame"] })
+  })
+
   afterEach(() => {
     h.cleanup()
+    vi.useRealTimers()
   })
 
   it("inserting a property emits composed frontmatter and preserves body", async () => {
     await h.mountEditor("# Hello Body")
     await h.openAddProperty()
+    await advanceAnimationFrame()
 
     const keyInput = h
       .getWrapper()

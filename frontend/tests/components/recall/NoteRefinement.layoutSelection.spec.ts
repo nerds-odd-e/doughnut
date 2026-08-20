@@ -74,7 +74,9 @@ describe("NoteRefinement layout selection", () => {
       const { layout, wrapper } =
         await mountNestedLayoutWithIndeterminateParentSelection()
       await trigger(wrapper)
-      await flushPromises()
+      if (method === "extractNotePreview") {
+        await flushPromises()
+      }
 
       expect(spy).toHaveBeenCalledWith(
         refinementLayoutSelectionApiCall(note.id, layout, ["p1-1"], {
