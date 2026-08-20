@@ -5,7 +5,7 @@ Feature: Manage AI models
   I want to choose which AI model is used for each task.
 
   Background:
-    Given I am logged in as an admin
+    Given I have a session as "admin"
     And OpenAI has models "gpt-future, gpt-3.5" available
 
   Scenario: Admin chooses a default model

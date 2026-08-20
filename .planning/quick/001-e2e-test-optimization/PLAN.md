@@ -130,58 +130,25 @@ Status: done
 
 ### Optimize refine_note_after_mcq
 Type: Structure
-Status: planned
+Status: done
 
-**Tests:**
-- `e2e_test/features/recall/refine_note_after_mcq.feature` — Question-led refinement layout items are preselected… (~10578ms)
-
-**Goals:**
-- Testability inject post-MCQ state; skip full quiz loop if covered elsewhere; direct route to refine.
-
-**Verify:**
-
-```bash
-source /workspace/scripts/cloud_agent_setup.sh
-xvfb-run -a pnpm cypress run --spec e2e_test/features/recall/refine_note_after_mcq.feature --config-file e2e_test/config/ci.ts
-```
+**Done:** Deleted feature + E2E helpers; covered by frontend NoteRefinement/AnsweredQuestion unit tests and assimilation refine E2E.
 
 ---
 
 ### Optimize mcq_management
 Type: Structure
-Status: planned
+Status: done
 
-**Tests:**
-- `e2e_test/features/note_creation_and_update/mcq_management.feature` — Generate a question with AI (~10576ms); Refine a question with AI (~9989ms)
-
-**Goals:**
-- Shared OpenAI stubs + note seed; merge generate/refine setup; no fixed waits.
-
-**Verify:**
-
-```bash
-source /workspace/scripts/cloud_agent_setup.sh
-xvfb-run -a pnpm cypress run --spec e2e_test/features/note_creation_and_update/mcq_management.feature --config-file e2e_test/config/ci.ts
-```
+**Done:** Merged generate+refine into one scenario; router.push; consolidated MCQ stub helpers. ~9s→~6s warm AI path.
 
 ---
 
 ### Optimize manage_ai_models
 Type: Structure
-Status: planned
+Status: done
 
-**Tests:**
-- `e2e_test/features/user_admin/manage_ai_models.feature` — Admin chooses a default model (~10384ms)
-
-**Goals:**
-- Direct admin route; slim login/seed; remove redundant UI.
-
-**Verify:**
-
-```bash
-source /workspace/scripts/cloud_agent_setup.sh
-xvfb-run -a pnpm cypress run --spec e2e_test/features/user_admin/manage_ai_models.feature --config-file e2e_test/config/ci.ts
-```
+**Done:** Session-as-admin (skip notebooks); direct Manage Models tab + intercept waits; save via alias. ~4.9s→~3.6s warm.
 
 ---
 
