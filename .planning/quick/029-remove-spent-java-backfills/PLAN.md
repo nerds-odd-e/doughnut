@@ -98,9 +98,10 @@ Each slice is **Structure**: delete one backfill family; remaining tests pass; e
 ### 11. Drop RecallLog DSR rebuild backfill
 
 - **Type:** Structure
-- **Status:** planned
+- **Status:** done
 - **Done:** `V300000283`, `RecallLogDsrBackfill`, and `RecallLogDsrBackfillTest` gone. `ProductOutcome.mappedGradeSqlInList` / `isMappedGrade` gone if no remaining callers; `ProductOutcomeTest` gone if it only pinned that SQL list. Live `Fsrs` grading unchanged.
-- **Docs in this slice** (the named runner is gone): ADR 0003 **DSR snapshot** keeps the cache-of-fold / live-update / no-query-time-fold policy; one-time Flyway is **past** (applied, not in the chain) and does not cite deleted classes. [SEED-004](../../seeds/SEED-004-close-spaced-repetition-scheduling-policy-gap.md) and [FSRS-COMPATIBILITY-GAP.md](../../research/FSRS-COMPATIBILITY-GAP.md) drop `RecallLogDsrBackfill` / `V300000283` code pointers.
+- **Docs:** ADR 0003 DSR snapshot policy kept; one-time Flyway past (no deleted-class cites). SEED-004 and FSRS-COMPATIBILITY-GAP drop `RecallLogDsrBackfill` / `V283` code pointers.
+- **Learnings:** Remaining Java Flyway = `StabilityIndexToHoursBackfill` / V260 only; SQL tip V282. STATE.md / quick 028 cleanup = slice 12.
 
 ### 12. Drop spent Flyway version mentions in project state
 

@@ -1,6 +1,6 @@
 # Doughnut ↔ open FSRS gap (toward ADR 0003)
 
-**Status:** Interval fuzz is **closed** (not used; due follows S). Thinking-time overlay is **closed** (RT is not a DSR input). New last recall is **closed** (`lastRecalledAt` is the last mapped grade; New has none). RecallLog elapsed hours is **closed** (`elapsed_hours` required; [ADR 0003](../../docs/adrs/0003-spaced-repetition-scheduling-policy.md) RecallLog). Proposed ADR 0003/0005 Decision locks commissioned Tutor scores as **1–4**, identical to FSRS G (`1` Again, `2` Hard, `3` Good, `4` Easy). Short-term window is **live** in `Fsrs` (elapsed whole hours **< 24** all four G; **≥ 24** long-term, Again = post-lapse; New → Again **5h** → Good at 5h → **6h**) and locked in Proposed ADR 0003 Decision. Post-lapse cap is **closed** in `FsrsAgainRecall` (elapsed **≥ 24**, a fail cannot lengthen S). DSR snapshot is **closed** (see ADR 0003 **DSR snapshot**; ungated `V300000283` / `RecallLogDsrBackfill`). Remaining deferred: **E4** fitting, plus **accept ADR 0003** (human). Shipped FSRS-6 locks live in ADR 0003 Decision and code.
+**Status:** Interval fuzz is **closed** (not used; due follows S). Thinking-time overlay is **closed** (RT is not a DSR input). New last recall is **closed** (`lastRecalledAt` is the last mapped grade; New has none). RecallLog elapsed hours is **closed** (`elapsed_hours` required; [ADR 0003](../../docs/adrs/0003-spaced-repetition-scheduling-policy.md) RecallLog). Proposed ADR 0003/0005 Decision locks commissioned Tutor scores as **1–4**, identical to FSRS G (`1` Again, `2` Hard, `3` Good, `4` Easy). Short-term window is **live** in `Fsrs` (elapsed whole hours **< 24** all four G; **≥ 24** long-term, Again = post-lapse; New → Again **5h** → Good at 5h → **6h**) and locked in Proposed ADR 0003 Decision. Post-lapse cap is **closed** in `FsrsAgainRecall` (elapsed **≥ 24**, a fail cannot lengthen S). DSR snapshot is **closed** (see ADR 0003 **DSR snapshot**; one-time Flyway past / applied). Remaining deferred: **E4** fitting, plus **accept ADR 0003** (human). Shipped FSRS-6 locks live in ADR 0003 Decision and code.
 
 **Updated:** 2026-08-20
 
@@ -28,6 +28,6 @@ Humans still own accept / reject / supersede of ADR 0003 (`docs/adrs/README.md`)
 - [ADR 0001](../../docs/adrs/0001-ubiquitous-language.md) — **recall** vs FSRS **review**; **New** = ungraded
 - [ADR 0005](../../docs/adrs/0005-commissioned-learning-session-protocol.md) — Tutor 1–4 meaning (`score = G`)
 - Seed: [SEED-004](../seeds/SEED-004-close-spaced-repetition-scheduling-policy-gap.md)
-- Code: `Fsrs`, `FsrsAgainRecall`, `MemoryTracker`; one-time DSR snapshot: `RecallLogDsrBackfill` / `V300000283`; Flyway replay only: `db.migration.StabilityIndexToHoursBackfill` / `V300000260`
+- Code: `Fsrs`, `FsrsAgainRecall`, `MemoryTracker`; Flyway replay only: `db.migration.StabilityIndexToHoursBackfill` / `V300000260`
 - [FSRS-6 algorithm](https://github.com/open-spaced-repetition/awesome-fsrs/wiki/The-Algorithm)
 - [ts-fsrs](https://open-spaced-repetition.github.io/ts-fsrs/)
