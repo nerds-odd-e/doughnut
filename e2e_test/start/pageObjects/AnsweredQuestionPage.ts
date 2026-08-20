@@ -7,7 +7,6 @@ import {
   expectOverlapTryAgainAlert,
   openResolveAndClickMatchedNoteCta,
 } from './answeredQuestionAccidentalMatch'
-import { answeredQuestionRefineMethods } from './answeredQuestionRefine'
 import { assumeMemoryTrackerPage } from './memoryTrackerPage'
 
 const addWikiLinkOrRelationshipLabel = 'Add wiki link or relationship'
@@ -207,7 +206,7 @@ const assumeAnsweredQuestionPage = () => {
       return self
     },
   }
-  return Object.assign(self, answeredQuestionRefineMethods(self))
+  return self
 }
 
 export { assumeAnsweredQuestionPage }
