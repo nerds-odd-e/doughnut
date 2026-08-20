@@ -1,6 +1,6 @@
 # 0003 — Spaced-repetition scheduling policy
 
-**Status:** Proposed  
+**Status:** Accepted  
 **Date:** 2026-08-05  
 **Decision makers:** Terry Yin
 **Consulted:** None
@@ -53,26 +53,12 @@ relearning step list.
 - **Retrievability** — The predicted probability of recalling a memory at a
   particular elapsed time, given its Stability. It is an input to a scheduling
   transition, not part of the persisted current memory state.
-- **Requested retention** — The product's target probability of successful
-  recall at the scheduled time. It determines the scheduled interval implied
-  by Stability.
-- **Scheduled interval** — The duration from a graded recall to the next due
-  time at the requested retention.
-- **Maximum interval** — The product-wide upper bound on a scheduled interval.
-  It prevents unbounded schedules and is not a learner setting.
-- **Last recalled at** — The time of the latest Grade for a memory tracker. New
-  trackers do not have one.
-- **Assimilated at** — The time a memory tracker was created through
-  assimilation. It anchors the immediate due time while the tracker is New.
-- **Next recall at** — The time at which a memory tracker is next due.
-- **Grade** — The single scheduling evaluation of a recall: **Again**, **Hard**,
-  **Good**, or **Easy**, in increasing order of demonstrated recall. Recall
-  prompts, just review, and Tutor Feedback all use this concept.
 - **RecallLog** — The durable history of scheduling events for one memory
   tracker. It records Grades and confusion adjustments in enough context to
   explain and reconstruct the tracker's memory state.
 - **Thinking time** — How long the learner took to answer a measured prompt.
-  It may be reported to the learner but is not evidence of memory state.
+  It is retained for presentation and analysis rather than used as a scheduling
+  input.
 - **Confusion** — A secondary, deliberately weaker memory adjustment when a
   spelling answer accidentally identifies another eligible note. It is not a
   Grade or recall credit.
@@ -82,29 +68,26 @@ relearning step list.
 ### FSRS profile
 
 Doughnut owns its open-FSRS-6 implementation instead of adopting a scheduling
-library. It uses one product-wide requested retention and maximum interval;
-per-user fitting is deferred.
+library. It uses one product-wide requested retention—the target probability
+of successful recall at the scheduled time—and one product-wide maximum
+interval. Neither is a learner setting; per-user fitting is deferred.
 
 The scheduler uses elapsed time at whole-hour precision. It does not use
 calendar-day boundaries, interval fuzz, or FSRS card-state step lists.
 Short-term and long-term recall follow the corresponding open-FSRS-6 behavior.
 
-### Lapse
-
-A **Lapse** is an Again Grade on a previously graded tracker. FSRS-6 derives
-post-lapse Stability from the tracker's Difficulty, Stability, and
-Retrievability; cumulative lapse count is not a scheduling input. Doughnut
-represents lapse history as Again outcomes in RecallLog and uses that history
-for the frequent-failure warning.
-
 ### Grade transitions
 
-A Grade is evaluated from the memory state immediately before the recall and
-the elapsed time since the previous Grade:
+[ADR 0001](./0001-ubiquitous-language.md) defines Grade and the experiences that
+produce it. The scheduler evaluates a Grade from the memory state immediately
+before the recall and the elapsed time since the previous Grade:
 
 - The first Grade of a New tracker initializes Stability and Difficulty.
 - Again represents failed recall and weakens the memory state without creating
-  a permanent short-interval trap.
+  a permanent short-interval trap. FSRS calls Again on a previously graded
+  tracker a lapse and derives its new Stability from the current Difficulty,
+  Stability, and Retrievability. Doughnut records lapse history as Again
+  outcomes in RecallLog, which also support the frequent-failure warning.
 - Hard, Good, and Easy represent successful recall. Their effect increases in
   that order, while more difficult memories gain less Stability.
 - A successful overdue recall may gain more Stability than an otherwise equal
@@ -112,15 +95,13 @@ the elapsed time since the previous Grade:
   and Retrievability, not on punishment or reward for queue compliance, and is
   bounded.
 
-Every Grade appends to RecallLog and updates the memory tracker's Stability,
-Difficulty, Last recalled at, and Next recall at. The next recall is strictly
-after the Grade. Queue lateness, thinking time, time zone, and time of day are
-not memory-state inputs.
+Every Grade appends to RecallLog and updates the memory tracker's current memory
+state and due time. The next recall is strictly after the Grade. Scheduling uses
+the Grade, current Stability and Difficulty, and elapsed time; Thinking time
+remains attached to the Answer for presentation and analysis.
 
-All sources of a Grade have the same scheduling meaning. In particular, Tutor
-Feedback from a commissioned Learning Session is a Grade at its recorded time.
-A Session Item without Feedback supplies no Grade and therefore does not change
-its memory tracker. Tutor semantics are defined by [ADR
+All sources of a Grade have the same scheduling meaning. Commissioned Learning
+Session semantics are defined by [ADR
 0005](./0005-commissioned-learning-session-protocol.md).
 
 ### Accidental matches, confusion, and overlap
@@ -134,8 +115,8 @@ effects:
 
 Confusion must remain less harmful than Again. It may bring the due time closer
 and weaken Stability, but it does not change Difficulty, count as a Grade or
-failed recall, or become the Last recalled at anchor. It remains attributable
-to the answer that caused it. If there is no unambiguous eligible tracker, no
+failed recall, or establish a new recall-time anchor. It remains attributable to
+the answer that caused it. If there is no unambiguous eligible tracker, no
 secondary adjustment is made.
 
 For a declared Overlap, neither tracker receives recall credit, Again, or
@@ -148,42 +129,27 @@ RecallLog is the durable sequence of Grades and Confusion events. A prompt
 event remains attributable to its Answer; a Grade from just review or Tutor
 Feedback need not have an Answer.
 
-MemoryTracker stores the current scheduling state. Each scheduling event
-updates that state transactionally so due work remains a direct query. The
-scheduling state can be rebuilt deterministically from RecallLog when needed;
-normal due-work queries do not replay the log. Removed trackers retain their
-history, while deleted trackers are outside reconstruction.
+A memory tracker carries the current Stability, Difficulty, and due time. Each
+scheduling event updates that state transactionally so due work remains a
+direct query. The state can be rebuilt deterministically from RecallLog when
+needed; normal due-work queries do not replay the log. Removed trackers retain
+their history, while deleted trackers are outside reconstruction.
 
 ## Consequences
 
-- Spaced-repetition terminology has one official domain reference without
-  turning the ADR into a second implementation.
-- Scheduling responds to demonstrated recall and elapsed time, not compliance
-  with the due queue.
-- All Grade-producing experiences share one transition model.
-- RecallLog explains history while the current MemoryTracker state keeps
+- Scheduling responds to demonstrated recall and elapsed time, and all
+  Grade-producing experiences share one transition model.
+- RecallLog explains history while the memory tracker's current state keeps
   due-work queries efficient.
-- Algorithm mechanics can evolve within this policy without synchronizing
-  formulas or numeric examples in prose.
-- A change to the meaning of a concept or to a transition invariant requires an
-  ADR update as well as an implementation change.
+- Algorithm mechanics can evolve within this policy. A change to a domain
+  concept or transition invariant requires an ADR update.
 
 ## Prerequisites / Assumptions
 
 - Grades are trustworthy enough to be the primary scheduling signal.
-- A scheduling event has the current tracker state, its recorded time, and the
-  elapsed time needed to apply the policy.
-- RecallLog carries enough information to reconstruct the current scheduling
-  state on MemoryTracker.
 
 ## Options considered
 
-- **Adopt an open-FSRS library** — Rejected in favor of owning the
-  open-FSRS-compatible implementation and its Doughnut-specific policy.
-- **Judge early or overdue recall by queue compliance** — Rejected. Memory
-  transitions use elapsed time and Retrievability.
-- **Use a linear lateness bonus** — Rejected because overdue growth must remain
-  bounded.
 - **Replay RecallLog for every due-work query** — Rejected in favor of current
   scheduling fields on MemoryTracker.
 - **Separate lapse counter** — Rejected because RecallLog already represents
