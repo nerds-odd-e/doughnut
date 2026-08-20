@@ -7,17 +7,9 @@
 
 ## Context
 
-The planned recall time is a queue target. Missing it can reflect
-availability, queue size, MCQ readiness, or system behavior. A
-memory-state transition uses the recall outcome and the actual elapsed
-time since the previous state-changing recall.
-
-Established schedulers (including FSRS) treat schedule compliance as
-separate from memory-state inputs: a successful overdue recall still
-updates memory from the outcome and elapsed time. This ADR states
-Doughnut's durable scheduling policy, the locked open FSRS-6 shape
-(own implementation, frozen weights, requested retention 0.9, maximum
-interval), and safety properties.
+Doughnut's recall schedule follows the **open FSRS-6** model. This ADR
+locks that compliance and names every deliberate divergence from
+published open FSRS.
 
 ## Decision
 
