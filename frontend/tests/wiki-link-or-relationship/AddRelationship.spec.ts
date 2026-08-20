@@ -1,29 +1,18 @@
-import {
-  NoteController,
-  NotebookController,
-  TextContentController,
-} from "@generated/doughnut-backend-api/sdk.gen"
-import AddRelationshipFinalize from "@/components/wiki-link-or-relationship/AddRelationshipFinalize.vue"
+import { NotebookController } from "@generated/doughnut-backend-api/sdk.gen"
 import { noteShowLocation } from "@/routes/noteShowLocation"
 import { formatRelationshipNoteTitle } from "@/utils/relationshipNoteCompose"
 import makeMe from "doughnut-test-fixtures/makeMe"
-import type {
-  Note,
-  NoteRealm,
-  NoteSearchResult,
-} from "@generated/doughnut-backend-api"
-import helper, {
-  mockSdkService,
-  mockSdkServiceWithImplementation,
-  testFolderStub,
-} from "@tests/helpers"
-import GlobalApiLoadingModal from "@tests/helpers/GlobalApiLoadingModal"
-import { useStorageAccessor } from "@/composables/useStorageAccessor"
+import { mockSdkService, testFolderStub } from "@tests/helpers"
 import { teardownGlobalClientForTesting } from "@/managedApi/clientSetup"
-import { flushPromises, type VueWrapper } from "@vue/test-utils"
-import { fireEvent } from "@testing-library/vue"
-import { defineComponent, nextTick, type PropType } from "vue"
+import { nextTick } from "vue"
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest"
+import {
+  mountAddRelationshipFinalize,
+  mockRelationshipNoteCreation,
+  selectRelationType,
+  sourceAndCreatedRelationshipRealms,
+  targetSearchResult,
+} from "./addRelationshipFinalizeTestSupport"
 
 const routerReplace = vi.fn()
 
@@ -36,89 +25,6 @@ vi.mock("vue-router", async (importOriginal) => {
     }),
   }
 })
-
-function targetSearchResult(title = "Target"): NoteSearchResult {
-  return makeMe.aNoteSearchResult.title(title).notebookId(1).do()
-}
-
-function mountAddRelationshipFinalize({
-  note,
-  targetSearchResult,
-  seedRealm,
-  navigateOnSuccess = true,
-}: {
-  note: Note
-  targetSearchResult: NoteSearchResult
-  seedRealm?: NoteRealm
-  navigateOnSuccess?: boolean
-}) {
-  const Host = defineComponent({
-    components: { AddRelationshipFinalize, GlobalApiLoadingModal },
-    props: {
-      note: { type: Object as PropType<Note>, required: true },
-      targetSearchResult: {
-        type: Object as PropType<NoteSearchResult>,
-        required: true,
-      },
-      navigateOnSuccess: { type: Boolean, default: true },
-    },
-    emits: ["success", "goBack"],
-    template: `
-      <AddRelationshipFinalize
-        :note="note"
-        :target-search-result="targetSearchResult"
-        :navigate-on-success="navigateOnSuccess"
-        @success="$emit('success')"
-        @goBack="$emit('goBack')"
-      />
-      <GlobalApiLoadingModal />
-    `,
-  })
-  const renderer = helper.component(Host).withCleanStorage()
-  if (seedRealm) {
-    useStorageAccessor().value.refreshNoteRealm(seedRealm)
-  }
-  return renderer
-    .withProps({ note, targetSearchResult, navigateOnSuccess })
-    .mount({ attachTo: document.body })
-}
-
-async function selectRelationType(wrapper: VueWrapper, relationType: string) {
-  const radio = wrapper.find(`[id="relationship-${relationType}"]`)
-  expect(radio.exists()).toBe(true)
-  await fireEvent.click(radio.element)
-  await flushPromises()
-}
-
-function mockRelationshipNoteCreation(
-  sourceRealm: NoteRealm,
-  createdRealm: NoteRealm,
-  holdCreate?: Promise<void>
-) {
-  mockSdkService(NoteController, "showNote", sourceRealm)
-  mockSdkService(TextContentController, "updateNoteContent", sourceRealm)
-  if (holdCreate) {
-    return mockSdkServiceWithImplementation(
-      NotebookController,
-      "createNoteAtNotebookRoot",
-      async () => {
-        await holdCreate
-        return createdRealm
-      }
-    )
-  }
-  return mockSdkService(
-    NotebookController,
-    "createNoteAtNotebookRoot",
-    createdRealm
-  )
-}
-
-function sourceAndCreatedRelationshipRealms() {
-  const sourceRealm = makeMe.aNoteRealm.title("Source").please()
-  const createdRealm = makeMe.aNoteRealm.title("Created relationship").please()
-  return { sourceRealm, note: sourceRealm.note, createdRealm }
-}
 
 describe("AddRelationshipFinalize", () => {
   beforeEach(() => {
@@ -175,6 +81,7 @@ describe("AddRelationshipFinalize", () => {
       note,
       targetSearchResult: targetSearchResult(),
       seedRealm: sourceRealm,
+      withLoadingModal: true,
     })
 
     const selectPromise = selectRelationType(wrapper, "related to")
@@ -189,7 +96,7 @@ describe("AddRelationshipFinalize", () => {
     expect(document.querySelector(".loading-modal-mask")).toBeNull()
   })
 
-  it("creates relationship note, navigates, and emits success", async () => {
+  it("creates relationship note, navigates when enabled, and skips navigate when disabled", async () => {
     const { sourceRealm, note, createdRealm } =
       sourceAndCreatedRelationshipRealms()
     const target = targetSearchResult()
@@ -198,20 +105,18 @@ describe("AddRelationshipFinalize", () => {
       createdRealm
     )
 
-    const wrapper = mountAddRelationshipFinalize({
+    const navigating = mountAddRelationshipFinalize({
       note,
       targetSearchResult: target,
       seedRealm: sourceRealm,
     })
-
-    await selectRelationType(wrapper, "related to")
+    await selectRelationType(navigating, "related to")
 
     const expectedTitle = formatRelationshipNoteTitle(
       note.noteTopology.title,
       "related to",
       target.noteTopology.title
     )
-
     expect(createNoteSpy).toHaveBeenCalledWith({
       path: { notebook: sourceRealm.notebookRealm.notebook.id },
       body: expect.objectContaining({
@@ -222,24 +127,20 @@ describe("AddRelationshipFinalize", () => {
     expect(routerReplace).toHaveBeenCalledWith(
       noteShowLocation(createdRealm.id)
     )
-    expect(wrapper.emitted().success).toHaveLength(1)
-  })
+    expect(navigating.emitted().success).toHaveLength(1)
 
-  it("emits success without navigating when navigateOnSuccess is false", async () => {
-    const { sourceRealm, note, createdRealm } =
-      sourceAndCreatedRelationshipRealms()
-    mockRelationshipNoteCreation(sourceRealm, createdRealm)
+    routerReplace.mockClear()
+    createNoteSpy.mockClear()
 
-    const wrapper = mountAddRelationshipFinalize({
+    const withoutNav = mountAddRelationshipFinalize({
       note,
-      targetSearchResult: targetSearchResult(),
+      targetSearchResult: target,
       seedRealm: sourceRealm,
       navigateOnSuccess: false,
     })
-
-    await selectRelationType(wrapper, "related to")
+    await selectRelationType(withoutNav, "related to")
 
     expect(routerReplace).not.toHaveBeenCalled()
-    expect(wrapper.emitted().success).toHaveLength(1)
+    expect(withoutNav.emitted().success).toHaveLength(1)
   })
 })

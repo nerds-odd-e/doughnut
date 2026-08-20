@@ -45,33 +45,37 @@ describe("NoteRefinement extract note preview", () => {
     ).toHaveLength(1)
   })
 
-  it("shows an editable preview after extracting selected refinement layout items", async () => {
-    const preview = sampleExtractionPreview({
-      newNoteTitle: "Point 2 title",
-      newNoteContent: "Point 2 content",
-      updatedOriginalNoteContent: "Remaining content",
-    })
-    const extractNotePreviewSpy = mockSdkService(
-      AiController,
-      "extractNotePreview",
-      preview
+  it("shows an editable preview then replaces fields when Ask AI to retry is clicked", async () => {
+    const layout = threePointLayout()
+    const firstPreview = labeledExtractionPreview("First")
+    const retryPreview = labeledExtractionPreview("Retry")
+    const extractNotePreviewSpy = mockExtractNotePreviewResponses(
+      firstPreview,
+      retryPreview
     )
-    const wrapper = await mountNoteRefinementReady([...threePointLayoutTexts])
+    const wrapper = await mountNoteRefinementWithLayoutReady(layout)
 
     await openExtractionPreview(wrapper, "p2")
 
     expect(extractNotePreviewSpy).toHaveBeenCalledWith(
-      refinementLayoutSelectionApiCall(note.id, threePointLayout(), ["p2"], {
+      refinementLayoutSelectionApiCall(note.id, layout, ["p2"], {
         signal: true,
       })
     )
     expectExtractionPreviewVisible(wrapper)
-    expectPreviewFields(wrapper, {
-      newTitle: "Point 2 title",
-      newContent: "Point 2 content",
-      originalContent: "Remaining content",
-    })
+    expectPreviewFields(wrapper, extractionPreviewFieldsFor("First"))
     expect(wrapper.findAll("li")).toHaveLength(0)
+
+    await retryExtractionPreview(wrapper)
+
+    expect(extractNotePreviewSpy).toHaveBeenCalledTimes(2)
+    expect(extractNotePreviewSpy).toHaveBeenNthCalledWith(
+      2,
+      refinementLayoutSelectionApiCall(note.id, layout, ["p2"], {
+        signal: true,
+      })
+    )
+    expectPreviewFields(wrapper, extractionPreviewFieldsFor("Retry"))
   })
 
   it("extracts multiple selected refinement layout items into one preview", async () => {
@@ -93,30 +97,6 @@ describe("NoteRefinement extract note preview", () => {
         signal: true,
       })
     )
-    expectExtractionPreviewVisible(wrapper)
-  })
-
-  it("replaces preview fields when Ask AI to retry is clicked", async () => {
-    const layout = threePointLayout()
-    const firstPreview = labeledExtractionPreview("First")
-    const retryPreview = labeledExtractionPreview("Retry")
-    const extractNotePreviewSpy = mockExtractNotePreviewResponses(
-      firstPreview,
-      retryPreview
-    )
-    const wrapper = await mountNoteRefinementWithLayoutReady(layout)
-
-    await openExtractionPreview(wrapper, "p2")
-    await retryExtractionPreview(wrapper)
-
-    expect(extractNotePreviewSpy).toHaveBeenCalledTimes(2)
-    expect(extractNotePreviewSpy).toHaveBeenNthCalledWith(
-      2,
-      refinementLayoutSelectionApiCall(note.id, layout, ["p2"], {
-        signal: true,
-      })
-    )
-    expectPreviewFields(wrapper, extractionPreviewFieldsFor("Retry"))
     expectExtractionPreviewVisible(wrapper)
   })
 
