@@ -1,6 +1,6 @@
 # RecallLog DSR rebuild leftover cohesion
 
-**Status:** in progress  
+**Status:** complete  
 **Goal:** Close the one test hole that can hide a wrong confusion due, and drop redundant skip / dead-branch leftovers in `RecallLogDsrBackfill`. Do not invent a second live fold.
 
 ## Inspection (028)
@@ -40,8 +40,8 @@ No production fold bug found. Live `MemoryTracker.applyRecall` / `adjustForConfu
 ### 2. Drop redundant New skip and dead confusion arm
 
 - **Type:** Structure
-- **Status:** planned
-- **Cleanup only:** Delete `leavesNewWithNoMappedGradeUnchanged` (and its unused first-Good sibling). Leftover unmapped skip, confusion-only skip, removed include, and deleted skip stay. Drop the `CONFUSION` throw in `afterMappedGrade` (exhaustive mapped-grade switch, or `isMappedGrade()`). Remaining `RecallLogDsrBackfillTest` still passes.
+- **Status:** done
+- **Done:** Deleted `leavesNewWithNoMappedGradeUnchanged` (and unused first-Good sibling). `afterMappedGrade` is mapped-grade cases + `default` (no dead CONFUSION throw). Leftover unmapped / confusion-only / removed / deleted pins stay.
 
 ## Jidoka
 

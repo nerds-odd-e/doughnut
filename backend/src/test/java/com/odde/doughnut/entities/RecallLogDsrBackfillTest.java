@@ -3,7 +3,6 @@ package com.odde.doughnut.entities;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.closeTo;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.nullValue;
 
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.builders.MemoryTrackerBuilder;
@@ -110,19 +109,6 @@ class RecallLogDsrBackfillTest {
         equalTo(
             TimestampOperations.addHoursToTimestamp(
                 firstGoodAt, Fsrs.intervalHours(expectedStability))));
-  }
-
-  @Test
-  void leavesNewWithNoMappedGradeUnchanged() throws Exception {
-    leftoverFirstMappedGood(
-        makeMe.aTimestamp().of(1, 0).please(), makeMe.aTimestamp().of(2, 0).please());
-    MemoryTracker ungradedNew = makeMe.aMemoryTrackerFor(makeMe.aNote().please()).please();
-
-    runBackfill();
-
-    TrackerRow row = trackerRow(ungradedNew.getId());
-    assertThat(row.stability(), equalTo(Fsrs.NEW_STABILITY_HOURS));
-    assertThat(row.difficulty(), nullValue());
   }
 
   @Test

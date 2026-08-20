@@ -98,7 +98,7 @@ public final class RecallLogDsrBackfill {
       case EASY -> Fsrs.afterEasyRecall(stability, difficulty, elapsedHours);
       case HARD -> Fsrs.afterHardRecall(stability, difficulty, elapsedHours);
       case AGAIN -> Fsrs.afterAgainRecall(stability, difficulty, elapsedHours);
-      case CONFUSION -> throw new IllegalStateException("confusion is not a mapped grade");
+      default -> throw new IllegalStateException("not a mapped grade: " + outcome);
     };
   }
 
