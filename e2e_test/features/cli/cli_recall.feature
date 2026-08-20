@@ -26,7 +26,7 @@ Feature: CLI recall
       Then I should see "1 note to recall today" in past CLI assistant messages
 
     @disableOpenAiService
-    Scenario: Just-review recall accepts remembered and declines load more
+    Scenario: Just-review recall accepts Good and declines load more
       Given the note "sedation" was assimilated on day 1
       And It's day 2
       When I enter the slash command "/recall" in the interactive CLI

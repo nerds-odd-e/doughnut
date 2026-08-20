@@ -15,7 +15,7 @@ import org.junit.jupiter.api.Test;
 class LearningSessionRecordTests extends LearningSessionControllerTestBase {
 
   @Test
-  void recordsMatchedScoresAsRecallLogsAndSchedulesTrackers()
+  void recordsMatchedGradesAsRecallLogsAndSchedulesTrackers()
       throws UnexpectedNoAccessRightException {
     Timestamp dayTwo = makeMe.aTimestamp().of(1, 9).please();
     testabilitySettings.timeTravelTo(dayTwo);

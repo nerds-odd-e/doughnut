@@ -6,7 +6,7 @@
         memoryTrackerId,
       }"
     />
-    <SelfEvaluateButtons
+    <JustReviewButtons
       @grade="justReview($event)"
       :key="memoryTrackerId"
     />
@@ -17,7 +17,7 @@
 import { MemoryTrackerController } from "@generated/doughnut-backend-api/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import MemoryTrackerAsync from "./MemoryTrackerAsync.vue"
-import SelfEvaluateButtons from "./SelfEvaluateButtons.vue"
+import JustReviewButtons from "./JustReviewButtons.vue"
 
 const props = defineProps({
   memoryTrackerId: Number,

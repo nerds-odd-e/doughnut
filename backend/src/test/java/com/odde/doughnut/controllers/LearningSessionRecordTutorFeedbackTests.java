@@ -22,7 +22,7 @@ class LearningSessionRecordTutorFeedbackTests extends LearningSessionControllerT
   static final float FIRST_AGAIN_STABILITY_HOURS = 5f;
 
   @Test
-  void firstScoreThreeOnNewPersistsD0Good() throws UnexpectedNoAccessRightException {
+  void firstGradeThreeOnNewPersistsD0Good() throws UnexpectedNoAccessRightException {
     Timestamp dayTwo = makeMe.aTimestamp().of(1, 9).please();
     testabilitySettings.timeTravelTo(dayTwo);
 
@@ -42,62 +42,62 @@ class LearningSessionRecordTutorFeedbackTests extends LearningSessionControllerT
   }
 
   @Test
-  void firstScoreFourOnNewPersistsD0Easy() throws UnexpectedNoAccessRightException {
-    MemoryTracker hola = holaAfterFirstScore(4);
+  void firstGradeFourOnNewPersistsD0Easy() throws UnexpectedNoAccessRightException {
+    MemoryTracker hola = holaAfterFirstGrade(4);
     assertThat(hola.getDifficulty(), equalTo(FIRST_EASY_DIFFICULTY));
     assertThat(hola.getStability(), equalTo(FIRST_EASY_STABILITY_HOURS));
   }
 
   @Test
-  void firstScoreTwoOnNewPersistsD0Hard() throws UnexpectedNoAccessRightException {
-    MemoryTracker hola = holaAfterFirstScore(2);
+  void firstGradeTwoOnNewPersistsD0Hard() throws UnexpectedNoAccessRightException {
+    MemoryTracker hola = holaAfterFirstGrade(2);
     assertThat(hola.getDifficulty(), equalTo(FIRST_HARD_DIFFICULTY));
     assertThat(hola.getStability(), equalTo(FIRST_HARD_STABILITY_HOURS));
   }
 
   @ParameterizedTest
   @CsvSource({"4, 484", "3, 284", "2, 193"})
-  void onTimeSecondScorePersistsStability(int score, float expectedStability)
+  void onTimeSecondGradePersistsStability(int grade, float expectedStability)
       throws UnexpectedNoAccessRightException {
     assertThat(
-        afterOnTimeSecondScore(score).holaTracker().getStability(), equalTo(expectedStability));
+        afterOnTimeSecondGrade(grade).holaTracker().getStability(), equalTo(expectedStability));
   }
 
   @Test
-  void onTimeSecondScoreThreePersistsGoodNextDifficulty() throws UnexpectedNoAccessRightException {
-    assertThat(afterOnTimeSecondScore(3).holaTracker().getDifficulty(), equalTo(2.1112142f));
+  void onTimeSecondGradeThreePersistsGoodNextDifficulty() throws UnexpectedNoAccessRightException {
+    assertThat(afterOnTimeSecondGrade(3).holaTracker().getDifficulty(), equalTo(2.1112142f));
   }
 
   @Test
-  void onTimeSecondScoreFourPersistsEasyNextDifficulty() throws UnexpectedNoAccessRightException {
-    assertThat(afterOnTimeSecondScore(4).holaTracker().getDifficulty(), equalTo(1f));
+  void onTimeSecondGradeFourPersistsEasyNextDifficulty() throws UnexpectedNoAccessRightException {
+    assertThat(afterOnTimeSecondGrade(4).holaTracker().getDifficulty(), equalTo(1f));
   }
 
   @Test
-  void onTimeSecondScoreTwoPersistsHardNextDifficulty() throws UnexpectedNoAccessRightException {
-    assertThat(afterOnTimeSecondScore(2).holaTracker().getDifficulty(), equalTo(4.7528586f));
+  void onTimeSecondGradeTwoPersistsHardNextDifficulty() throws UnexpectedNoAccessRightException {
+    assertThat(afterOnTimeSecondGrade(2).holaTracker().getDifficulty(), equalTo(4.7528586f));
   }
 
   @ParameterizedTest
   @CsvSource({"3, 416", "4, 731", "2, 272"})
-  void overdueSecondScorePersistsStability(int score, float expectedStability)
+  void overdueSecondGradePersistsStability(int grade, float expectedStability)
       throws UnexpectedNoAccessRightException {
     assertThat(
-        afterStaggeredSecondScore(score).graciasTracker().getStability(),
+        afterStaggeredSecondGrade(grade).graciasTracker().getStability(),
         equalTo(expectedStability));
   }
 
   @Test
-  void overdueSecondScoreThreeGrowsStabilityMoreThanOnTime()
+  void overdueSecondGradeThreeGrowsStabilityMoreThanOnTime()
       throws UnexpectedNoAccessRightException {
-    SpanishNotebookFixture fixture = afterStaggeredSecondScore(3);
+    SpanishNotebookFixture fixture = afterStaggeredSecondGrade(3);
     assertThat(
         fixture.graciasTracker().getStability(), greaterThan(fixture.holaTracker().getStability()));
   }
 
   @Test
-  void onTimeSecondScoreOnePersistsAgainSchedule() throws UnexpectedNoAccessRightException {
-    MemoryTracker hola = afterOnTimeSecondScore(1).holaTracker();
+  void onTimeSecondGradeOnePersistsAgainSchedule() throws UnexpectedNoAccessRightException {
+    MemoryTracker hola = afterOnTimeSecondGrade(1).holaTracker();
     assertThat(hola.getStability(), equalTo(15f));
     assertThat(hola.getDifficulty(), equalTo(7.3945026f));
     assertThat(
@@ -108,22 +108,22 @@ class LearningSessionRecordTutorFeedbackTests extends LearningSessionControllerT
   }
 
   @Test
-  void firstScoreOneOnNewPersistsD0Again() throws UnexpectedNoAccessRightException {
-    MemoryTracker hola = holaAfterFirstScore(1);
+  void firstGradeOneOnNewPersistsD0Again() throws UnexpectedNoAccessRightException {
+    MemoryTracker hola = holaAfterFirstGrade(1);
     assertThat(hola.getDifficulty(), equalTo(FIRST_AGAIN_DIFFICULTY));
     assertThat(hola.getStability(), equalTo(FIRST_AGAIN_STABILITY_HOURS));
   }
 
-  private MemoryTracker holaAfterFirstScore(int score) throws UnexpectedNoAccessRightException {
+  private MemoryTracker holaAfterFirstGrade(int grade) throws UnexpectedNoAccessRightException {
     Timestamp dayTwo = makeMe.aTimestamp().of(1, 9).please();
     testabilitySettings.timeTravelTo(dayTwo);
     SpanishNotebookFixture fixture = spanishNotebookFixture(dayTwo);
     controller.record(
-        recordRequest(fixture.notebook(), learningSessionReport("Hola", score)), "Asia/Shanghai");
+        recordRequest(fixture.notebook(), learningSessionReport("Hola", grade)), "Asia/Shanghai");
     return fixture.holaTracker();
   }
 
-  private SpanishNotebookFixture afterOnTimeSecondScore(int score)
+  private SpanishNotebookFixture afterOnTimeSecondGrade(int grade)
       throws UnexpectedNoAccessRightException {
     Timestamp firstRecord = makeMe.aTimestamp().of(1, 9).please();
     testabilitySettings.timeTravelTo(firstRecord);
@@ -136,12 +136,12 @@ class LearningSessionRecordTutorFeedbackTests extends LearningSessionControllerT
             firstRecord, Math.round(FIRST_GOOD_STABILITY_HOURS));
     testabilitySettings.timeTravelTo(secondRecord);
     controller.record(
-        recordRequest(fixture.notebook(), learningSessionReport("Hola", score)), "Asia/Shanghai");
+        recordRequest(fixture.notebook(), learningSessionReport("Hola", grade)), "Asia/Shanghai");
 
     return fixture;
   }
 
-  private SpanishNotebookFixture afterStaggeredSecondScore(int score)
+  private SpanishNotebookFixture afterStaggeredSecondGrade(int grade)
       throws UnexpectedNoAccessRightException {
     Timestamp firstRecord = makeMe.aTimestamp().of(1, 9).please();
     testabilitySettings.timeTravelTo(firstRecord);
@@ -153,13 +153,13 @@ class LearningSessionRecordTutorFeedbackTests extends LearningSessionControllerT
         TimestampOperations.addHoursToTimestamp(
             firstRecord, Math.round(FIRST_GOOD_STABILITY_HOURS)));
     controller.record(
-        recordRequest(fixture.notebook(), learningSessionReport("Hola", score)), "Asia/Shanghai");
+        recordRequest(fixture.notebook(), learningSessionReport("Hola", grade)), "Asia/Shanghai");
 
     testabilitySettings.timeTravelTo(
         TimestampOperations.addHoursToTimestamp(
             firstRecord, Math.round(FIRST_GOOD_STABILITY_HOURS) * 2));
     controller.record(
-        recordRequest(fixture.notebook(), learningSessionReport("Gracias", score)),
+        recordRequest(fixture.notebook(), learningSessionReport("Gracias", grade)),
         "Asia/Shanghai");
 
     return fixture;

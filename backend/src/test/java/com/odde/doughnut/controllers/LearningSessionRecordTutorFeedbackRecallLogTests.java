@@ -19,14 +19,15 @@ class LearningSessionRecordTutorFeedbackRecallLogTests extends LearningSessionCo
 
   @ParameterizedTest
   @CsvSource({"4, EASY", "3, GOOD", "2, HARD", "1, AGAIN"})
-  void matchedScoreLeavesMappedRecallLog(int score, Grade grade)
+  void matchedGradeLeavesMappedRecallLog(int gradeValue, Grade grade)
       throws UnexpectedNoAccessRightException {
     Timestamp dayTwo = makeMe.aTimestamp().of(1, 9).please();
     testabilitySettings.timeTravelTo(dayTwo);
 
     SpanishNotebookFixture fixture = spanishNotebookFixture(dayTwo);
     controller.record(
-        recordRequest(fixture.notebook(), learningSessionReport("Hola", score)), "Asia/Shanghai");
+        recordRequest(fixture.notebook(), learningSessionReport("Hola", gradeValue)),
+        "Asia/Shanghai");
 
     List<RecallLog> logs = memoryTrackerController.getRecallLogs(fixture.holaTracker());
     RecallLog log = logs.get(0);
