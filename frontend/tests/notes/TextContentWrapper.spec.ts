@@ -25,20 +25,26 @@ describe("TextContentWrapper referenced title rename", () => {
 
   afterEach(() => {
     vi.restoreAllMocks()
+    vi.useRealTimers()
   })
 
   it("discards dirty title and hides save actions when focus leaves the wrapper", async () => {
-    await mountReferencedTitleReady()
+    vi.useFakeTimers({ toFake: ["requestAnimationFrame"] })
+    try {
+      await mountReferencedTitleReady()
 
-    const input = await editReferencedTitle()
-    expect(referencedTitleSavePanel()).toBeTruthy()
+      const input = await editReferencedTitle()
+      expect(referencedTitleSavePanel()).toBeTruthy()
 
-    input.blur()
-    await flushPromises()
-    await flushReferencedTitleBlurDiscardCheck()
+      input.blur()
+      await flushPromises()
+      await flushReferencedTitleBlurDiscardCheck()
 
-    expect(input.value).toBe(referencedTitleOriginal)
-    expect(referencedTitleSavePanel()).toBeNull()
+      expect(input.value).toBe(referencedTitleOriginal)
+      expect(referencedTitleSavePanel()).toBeNull()
+    } finally {
+      vi.useRealTimers()
+    }
   })
 
   it("keeps the draft when choosing a save option (click does not discard before save)", async () => {

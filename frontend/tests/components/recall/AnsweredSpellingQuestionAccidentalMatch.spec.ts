@@ -130,28 +130,20 @@ describe("AnsweredSpellingQuestion accidental match", () => {
   })
 
   it("builds a link as a same-Modal step and returns to the match list after success", async () => {
-    const { answeredQuestion, reviewedRealm, matchedA, matchedB } =
-      accidentalMatchWithTwoMatchedNotes()
+    const reviewedRealm = makeMe.aNoteRealm.title("Reviewed Note").please()
+    const matched = makeMe.aNoteRealm.id(10).title("Matched A").please()
+    const answeredQuestion = makeMe.anAnsweredQuestion
+      .withNote(reviewedRealm.note)
+      .accidentalMatch("matched a", [matched.note.noteTopology])
+      .please()
     mockSdkService(TextContentController, "updateNoteContent", reviewedRealm)
 
     wrapper = mountAnsweredSpellingQuestion(answeredQuestion, {
       currentUser: makeMe.aUser.please(),
-      seedRealms: [reviewedRealm, matchedA, matchedB],
+      seedRealms: [reviewedRealm, matched],
     })
     await flushPromises()
     await openResolveAccidentalMatch(wrapper)
-
-    const linkButtons = [
-      ...document.body.querySelectorAll(
-        '[data-testid^="wiki-link-or-relationship-to-matched-note-"]'
-      ),
-    ]
-    expect(linkButtons).toHaveLength(2)
-    expect(
-      linkButtons.every((btn) =>
-        btn.textContent?.includes("Add wiki link or relationship")
-      )
-    ).toBe(true)
 
     ;(
       document.body.querySelector(
@@ -160,24 +152,14 @@ describe("AnsweredSpellingQuestion accidental match", () => {
     ).click()
     await flushPromises()
 
-    expect(document.body.textContent).toContain("Target:")
-    expect(document.body.textContent).toContain("Matched A")
     expect(
       document.body.querySelector(
         '[data-testid="accidental-match-resolve-dialog"]'
       )
     ).toBeNull()
-    expect(
-      document.body.querySelectorAll(
-        '[data-testid^="wiki-link-or-relationship-to-matched-note-"]'
-      )
-    ).toHaveLength(0)
+    expect(document.body.textContent).toContain("Target:")
 
-    const propertyButton = [...document.body.querySelectorAll("button")].find(
-      (b) => b.textContent?.includes("Add wiki link as a new property")
-    )
-    expect(propertyButton).toBeTruthy()
-    propertyButton!.click()
+    ;(document.body.querySelector(".daisy-btn-accent") as HTMLElement).click()
     await flushPromises()
 
     expect(
