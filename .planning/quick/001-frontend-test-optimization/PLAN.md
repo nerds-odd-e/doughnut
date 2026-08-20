@@ -240,22 +240,9 @@ Status: done
 
 ### Optimize batch 3 (ranks 7–9)
 Type: Structure
-Status: planned
+Status: done
 
-**Tests:**
-- `tests/components/form/RichMarkdownEditor.propertyRelationImageIndex.spec.ts` — "RichMarkdownEditor property relation and index relation property in rich mode commits custom relationship text from the dialog and emits updated frontmatter" (~35ms)
-- `tests/components/book-reading/PdfBookViewer.gestureZoom.spec.ts` — "PdfBookViewer gesture zoom (mocked pdf.js) 'meta'+wheel on the viewer prevents default and updates pdf scale" (~33ms)
-- `tests/pages/NoteShowPageConversation.spec.ts` — "note show page conversation restores note content and clears conversation query on close" (~33ms)
-
-**Goals:** Speed up only the listed tests (delete/merge redundant coverage first; then setup/selectors/waits). If no meaningful speedup after a serious attempt, append Candidate(s) to `ongoing/test-optimization-blacklist.md` and mark done.
-
-**Verify:**
-
-```bash
-pnpm frontend:test tests/components/form/RichMarkdownEditor.propertyRelationImageIndex.spec.ts tests/components/book-reading/PdfBookViewer.gestureZoom.spec.ts tests/pages/NoteShowPageConversation.spec.ts
-```
-
-(Paths are relative to `frontend/` as accepted by `pnpm frontend:test`.)
+**Done:** Merged relation open+commit; merged PDF ctrl+meta zoom into one mount + fake rAF; dropped waitFor on conversation close. 13 tests green ×3.
 
 ---
 
@@ -265,15 +252,16 @@ Status: planned
 
 **Tests:**
 - `tests/components/recall/NoteRefinement.removeLayout.loading.spec.ts` — "NoteRefinement remove layout loading modal shows LoadingModal while removing refinement layout items and hides on success or failure" (~31ms)
-- `tests/components/book-reading/PdfBookViewer.gestureZoom.spec.ts` — "PdfBookViewer gesture zoom (mocked pdf.js) 'ctrl'+wheel on the viewer prevents default and updates pdf scale" (~30ms)
 - `tests/pages/NoteShowPageAssimilationPanel.spec.ts` — "note show page inline assimilation panel keeps assimilation settings in the shared toolbar panel when sidebar is open" (~30ms)
+
+**Note:** PDF ctrl+wheel already optimized via batch 3 merge — skip that rank.
 
 **Goals:** Speed up only the listed tests (delete/merge redundant coverage first; then setup/selectors/waits). If no meaningful speedup after a serious attempt, append Candidate(s) to `ongoing/test-optimization-blacklist.md` and mark done.
 
 **Verify:**
 
 ```bash
-pnpm frontend:test tests/components/recall/NoteRefinement.removeLayout.loading.spec.ts tests/components/book-reading/PdfBookViewer.gestureZoom.spec.ts tests/pages/NoteShowPageAssimilationPanel.spec.ts
+pnpm frontend:test tests/components/recall/NoteRefinement.removeLayout.loading.spec.ts tests/pages/NoteShowPageAssimilationPanel.spec.ts
 ```
 
 (Paths are relative to `frontend/` as accepted by `pnpm frontend:test`.)

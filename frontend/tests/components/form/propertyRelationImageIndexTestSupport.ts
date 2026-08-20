@@ -12,7 +12,6 @@ export function editorRoot(h: Harness): HTMLElement {
 
 export async function mountRelationNote(h: Harness, relation: string) {
   await h.mountEditor(RELATION_NOTE(relation))
-  await flushPromises()
 }
 
 export async function emitQuillBodyHtml(wrapper: VueWrapper, html: string) {

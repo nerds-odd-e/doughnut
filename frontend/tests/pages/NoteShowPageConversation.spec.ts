@@ -37,11 +37,10 @@ describe("note show page conversation", () => {
   it("restores note content and clears conversation query on close", async () => {
     await renderNoteShowPageWithConversation(router, noteId)
 
-    await vi.waitFor(() => {
-      expect(toggleMaximizeButtonEl()).not.toBeNull()
-    })
+    const maximize = toggleMaximizeButtonEl()
+    expect(maximize).not.toBeNull()
 
-    toggleMaximizeButtonEl()!.click()
+    maximize!.click()
     await flushPromises()
 
     closeConversationButtonEl()!.click()

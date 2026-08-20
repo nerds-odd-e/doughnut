@@ -1,7 +1,7 @@
 import PdfBookViewer from "@/components/book-reading/PdfBookViewer.vue"
 import helper from "@tests/helpers"
 import { flushPromises } from "@vue/test-utils"
-import { beforeEach, vi } from "vitest"
+import { afterEach, beforeEach, vi } from "vitest"
 
 const harness = vi.hoisted(() => {
   const mockPdf = {
@@ -145,10 +145,6 @@ export function pdfViewerContainerEl(host: HTMLElement) {
   return host.querySelector('[data-testid="pdf-book-viewer"]') as HTMLElement
 }
 
-export async function flushAnimationFrame() {
-  await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()))
-}
-
 export function resetPdfGestureZoomHarness() {
   harness.lastViewer = null
 }
@@ -156,6 +152,11 @@ export function resetPdfGestureZoomHarness() {
 export function setupPdfBookViewerGestureZoomTests() {
   beforeEach(() => {
     resetPdfGestureZoomHarness()
+    vi.useFakeTimers({ toFake: ["requestAnimationFrame"] })
+  })
+
+  afterEach(() => {
+    vi.useRealTimers()
   })
 }
 
@@ -171,7 +172,7 @@ export async function mountGestureZoomViewerReady() {
   host.style.height = "500px"
 
   await flushPromises()
-  await flushAnimationFrame()
+  await vi.advanceTimersToNextFrame()
 
   const container = pdfViewerContainerEl(host)
   const viewer = harness.lastViewer

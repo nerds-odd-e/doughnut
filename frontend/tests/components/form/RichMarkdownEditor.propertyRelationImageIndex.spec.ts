@@ -6,7 +6,6 @@ import {
   customRelationTextInputEl,
   openRelationDialog,
   relationTypeButtonText,
-  selectCustomRelationRadio,
 } from "./propertyRelationImageIndexTestDom"
 import {
   expandAndClickPropertyRowRemove,
@@ -49,18 +48,7 @@ describe("RichMarkdownEditor property relation and index", () => {
       }
     )
 
-    it("commits custom relationship text from the dialog and emits updated frontmatter", async () => {
-      await mountRelationNote(h, "similar-to")
-      await openRelationDialog(editorRoot(h))
-      await selectCustomRelationRadio()
-      await commitCustomRelationText("novel connector phrase")
-
-      expect(h.lastEmittedMarkdown()).toContain(
-        "relation: novel-connector-phrase"
-      )
-    })
-
-    it("opens dialog with custom text prefilled for an unknown relation", async () => {
+    it("opens custom relation dialog prefilled and commits updated frontmatter", async () => {
       await mountRelationNote(h, "xyz-unknown-kebab")
       await openRelationDialog(editorRoot(h))
 
@@ -69,6 +57,11 @@ describe("RichMarkdownEditor property relation and index", () => {
       expect(
         customRelationRadioLabelEl().classList.contains("bg-primary")
       ).toBe(true)
+
+      await commitCustomRelationText("novel connector phrase")
+      expect(h.lastEmittedMarkdown()).toContain(
+        "relation: novel-connector-phrase"
+      )
     })
   })
 
