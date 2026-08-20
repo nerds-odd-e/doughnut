@@ -46,8 +46,6 @@ spring:
       tz_repair: "1=0"
       dummy_note_sequence_skip_convert: "1=0"
       dummy_property_sequence_skip_convert: "1=0"
-      still_new_again_first_rating_backfill: "1=0"
-      still_new_hard_first_rating_backfill: "1=0"
   jpa:
     generate-ddl: false
     show-sql: false

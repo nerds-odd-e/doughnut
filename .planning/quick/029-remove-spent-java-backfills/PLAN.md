@@ -47,8 +47,9 @@ Each slice is **Structure**: delete one backfill family; remaining tests pass; e
 ### 3. Drop gated still-New first-rating backfills
 
 - **Type:** Structure
-- **Status:** planned
+- **Status:** done
 - **Done:** `V300000271` / `V300000272` gone. `StillNewAgainFirstRatingBackfill`, `StillNewFirstRatingBackfill`, and `StillNewFirstRatingBackfillTest` gone. Placeholders `still_new_again_first_rating_backfill` and `still_new_hard_first_rating_backfill` removed from all Flyway placeholder maps.
+- **Learnings:** `StillNewMappedFirstRatingBackfill` correctly deferred to slice 6.
 
 ### 4. Drop over-cap Stability backfill
 
