@@ -17,24 +17,25 @@ published open FSRS.
 
 When citing FSRS, pair once then use Doughnut terms. Glossary: [ADR 0001](./0001-ubiquitous-language.md). Product outcomes → G: **Outcome-to-grade compatibility map**.
 
-| Doughnut            | Open FSRS          | Notes                                       |
-| ------------------- | ------------------ | ------------------------------------------- |
-| **Recall**          | **Review**         |                                             |
-| **Just review**     |                    | A method of recall                          |
-| **Assimilation**    | **New** card       | Introduce, ungraded                         |
-| **New**             | **New**            | Ungraded; no Learning / Review / Relearning |
-| **Memory tracker**  | Card               |                                             |
-| **Stability**       | Stability `S`      | Whole hours                                 |
-| **Difficulty**      | Difficulty `D`     |                                             |
-| **Retrievability**  | Retrievability `R` |                                             |
-| `lastRecalledAt`    | `last_review`      |                                             |
-| `assimilatedAt`     |                    | New due                                     |
-| `nextRecallAt`      | Due                | `I(r, S)`                                   |
-| **RecallLog**       | Review history     |                                             |
-| First mapped grade  | First-rating       | `S0(G)` / `D0(G)`                           |
-| Tutor score **1–4** | Grade `G`          |                                             |
-| **Confusion**       |                    | Doughnut outcome; not a grade               |
-| **Overlap**         |                    | Doughnut outcome; no memory change          |
+| Doughnut                | Open FSRS           | Notes                                           |
+| ----------------------- | ------------------- | ----------------------------------------------- |
+| **Recall**              | **Review**          |                                                 |
+| **Just review**         |                     | A method of recall                              |
+| **Assimilation**        | **New** card        | Introduce, ungraded                             |
+| **New**                 | **New**             | Ungraded; no Learning / Review / Relearning     |
+| **Memory tracker**      | Card                |                                                 |
+| **Stability**           | Stability `S`       | Whole hours                                     |
+| **Difficulty**          | Difficulty `D`      |                                                 |
+| **Retrievability**      | Retrievability `R`  | Computed, not stored                            |
+| **Requested retention** | `request_retention` | Desired recall rate at due; not `R`; locked 0.9 |
+| `lastRecalledAt`        | `last_review`       |                                                 |
+| `assimilatedAt`         |                     | New due                                         |
+| `nextRecallAt`          | Due                 | `I(r, S)`                                       |
+| **RecallLog**           | Review history      |                                                 |
+| First mapped grade      | First-rating        | `S0(G)` / `D0(G)`                               |
+| Tutor score **1–4**     | Grade `G`           |                                                 |
+| **Confusion**           |                     | Doughnut outcome; not a grade                   |
+| **Overlap**             |                     | Doughnut outcome; no memory change              |
 
 ### Open FSRS-compatible shape, own implementation
 
@@ -51,12 +52,16 @@ update rules), not `ts-fsrs`, `fsrs-rs`, or another library.
   `nextRecallAt = assimilatedAt` (due now). First mapped grades on New use
   first-rating (see **First rating on New**); due then comes from `I`
   (`I` non-positive → 24h).
-- **Retrievability** is computed from elapsed whole hours and Stability, not stored.
+- **Retrievability** `R` is the FSRS predicted probability of recall at
+  elapsed time, from Stability. Doughnut computes it from whole hours vs
+  `S` and does not store it. Stability updates that consume `R` (Good
+  increment, post-lapse Again) use that computed value.
 - A recall transition consumes the graded outcome, elapsed time, and that state — never queue lateness.
-- **Requested retention** `r` is a **global constant 0.9**. It may be shown
-  read-only in recall statistics (e.g. the heatmap color anchor). There is
-  **no lapse count** (see **Lapses**). Memory-state transitions are a
-  **RecallLog** (see **RecallLog**).
+- **Requested retention** is FSRS `request_retention`, the scheduler
+  parameter that sets `I(r, S)`. It is not Retrievability. Doughnut locks
+  `r` at **0.9**, so `I(0.9, S) = S` in whole hours (due hours equal
+  Stability hours). It may be shown read-only as the color hinge of the
+  observed-recall-rate heatmap.
 - **Maximum interval** is a **global constant 36500 days** (open FSRS
   `S_MAX`), compared and persisted as **876000 whole hours**. It is not a
   persisted field. Memory Tracker shows Stability. After next Stability is

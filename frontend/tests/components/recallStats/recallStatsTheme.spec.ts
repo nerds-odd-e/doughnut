@@ -106,15 +106,15 @@ describe("recall stats charts use theme tokens (dark-mode safe)", () => {
     const answered = emptyGrid()
     const correct = emptyGrid()
     setCell(answered, 0, 0, 10)
-    setCell(correct, 0, 0, 10) // 100% -> deep green
+    setCell(correct, 0, 0, 10) // 100% observed rate -> deep green
     setCell(answered, 1, 0, 10)
-    setCell(correct, 1, 0, 9) // 90% -> lightest green (at requested retention)
+    setCell(correct, 1, 0, 9) // 90% observed rate -> lightest green (requested retention hinge)
     setCell(answered, 2, 0, 10)
-    setCell(correct, 2, 0, 8) // 80% -> red-leaning (below requested retention)
+    setCell(correct, 2, 0, 8) // 80% observed rate -> red-leaning (below requested retention)
     setCell(answered, 3, 0, 10)
-    setCell(correct, 3, 0, 6) // 60% -> deep red
+    setCell(correct, 3, 0, 6) // 60% observed rate -> deep red
     setCell(answered, 4, 0, 100)
-    setCell(correct, 4, 0, 87) // 87% -> red-leaning (below requested retention)
+    setCell(correct, 4, 0, 87) // 87% observed rate -> red-leaning (below requested retention)
     const wrapper = helper
       .component(WeekdayHourHeatmap)
       .withProps({ mode: "retention", counts: answered, correct })

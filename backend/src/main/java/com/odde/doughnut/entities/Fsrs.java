@@ -17,7 +17,7 @@ public final class Fsrs {
   };
   static final double HOURS_PER_DAY = 24.0;
 
-  /** Global requested retention; not a Settings knob. */
+  /** FSRS `request_retention` (Requested retention). Locked 0.9. Not Retrievability `R`. */
   static final double REQUESTED_RETENTION = 0.9;
 
   /** Global maximum interval in whole hours; not a Settings knob. */
@@ -81,7 +81,7 @@ public final class Fsrs {
     return Math.max(1f, Math.round((s + againHours) / 2.0f));
   }
 
-  /** Open FSRS identity: I(0.9, S) = S in whole hours. */
+  /** Open FSRS: at requested retention 0.9, `I(r, S) = S` in whole hours. */
   static int intervalHours(float stabilityHours) {
     return Math.round(stabilityHours);
   }
@@ -90,6 +90,11 @@ public final class Fsrs {
     return Math.min(stabilityHours, MAXIMUM_INTERVAL_HOURS);
   }
 
+  /**
+   * FSRS Retrievability `R`: predicted recall probability at elapsed time, from Stability. The
+   * forgetting-curve factor uses {@link #REQUESTED_RETENTION} because FSRS-6 defines `S` as the
+   * interval where `R` equals requested retention.
+   */
   static double retrievability(double elapsedDays, double stabilityDays) {
     double decay = -W[20];
     double factor = Math.exp(Math.log(REQUESTED_RETENTION) / decay) - 1.0;

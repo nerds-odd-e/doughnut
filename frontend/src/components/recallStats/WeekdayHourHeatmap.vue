@@ -65,7 +65,7 @@ const cellSize = 16
 const leftGutter = 28
 const topGutter = 16
 const bottomGutter = 16
-// Requested retention as percent (Fsrs.REQUESTED_RETENTION, ADR 0003)
+// Observed recall rate (correct/answered). Color hinge is requested retention, not Retrievability.
 const REQUESTED_RETENTION_PCT = 90
 // Band around the hinge; a 0–100 linear scale collapses typical days into one bucket
 const RETENTION_GRANULARITY_SPAN = 15
@@ -96,6 +96,7 @@ const maxCount = () => {
   return max
 }
 
+// Observed correct/answered rate — not Retrievability `R`.
 const retentionPct = (wd: number, hr: number) => {
   const answered = countAt(wd, hr)
   if (answered === 0) return 0
