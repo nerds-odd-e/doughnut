@@ -256,22 +256,9 @@ Status: done
 
 ### Optimize batch 5 (ranks 13–15)
 Type: Structure
-Status: planned
+Status: done
 
-**Tests:**
-- `tests/notes/TextContentWrapper.spec.ts` — "TextContentWrapper referenced title rename does not discard when focusout has a misleading relatedTarget but focus remains inside the wrapper" (~30ms)
-- `tests/notes/NoteToolbar.pinnedToggles.spec.ts` — "NoteToolbar pinned on-state toggles returns 'assimilation' to the overflow menu when the pinned toolbar toggle is turned off" (~28ms)
-- `tests/components/form/RichMarkdownEditor.propertyValuePopupModeSwitch.spec.ts` — "RichMarkdownEditor property value popup mode switch rejects empty list items on save" (~28ms)
-
-**Goals:** Speed up only the listed tests (delete/merge redundant coverage first; then setup/selectors/waits). If no meaningful speedup after a serious attempt, append Candidate(s) to `ongoing/test-optimization-blacklist.md` and mark done.
-
-**Verify:**
-
-```bash
-pnpm frontend:test tests/notes/TextContentWrapper.spec.ts tests/notes/NoteToolbar.pinnedToggles.spec.ts tests/components/form/RichMarkdownEditor.propertyValuePopupModeSwitch.spec.ts
-```
-
-(Paths are relative to `frontend/` as accepted by `pnpm frontend:test`.)
+**Done:** Fake rAF for relatedTarget; merged pin+return toolbar toggles; seed list markdown for empty-item reject. 12 tests green.
 
 ---
 

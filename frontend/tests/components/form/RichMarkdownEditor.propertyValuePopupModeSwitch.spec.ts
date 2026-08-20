@@ -6,6 +6,7 @@ import {
   isListModeTabActive,
   popupValidationText,
   savePopup,
+  setListItemValue,
   setTextareaValue,
 } from "./propertyValuePopupTestDom"
 import {
@@ -79,9 +80,8 @@ describe("RichMarkdownEditor property value popup mode switch", () => {
   })
 
   it("rejects empty list items on save", async () => {
-    const wrapper = await mountTopicValuePopup(h)
-    await switchToListMode()
-    await writeListItems("valid", "   ")
+    const wrapper = await mountTopicValuePopup(h, LIST_TOPIC_MARKDOWN)
+    setListItemValue(1, "   ")
     await savePopup()
 
     expect(popupValidationText()).toContain("List items cannot be empty.")

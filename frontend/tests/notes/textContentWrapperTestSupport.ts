@@ -79,6 +79,16 @@ export async function flushReferencedTitleBlurDiscardCheck() {
   await nextTick()
 }
 
+/** Fake only rAF so blur-discard double-rAF checks stay deterministic. */
+export async function withFakeRequestAnimationFrame(run: () => Promise<void>) {
+  vi.useFakeTimers({ toFake: ["requestAnimationFrame"] })
+  try {
+    await run()
+  } finally {
+    vi.useRealTimers()
+  }
+}
+
 export function mountReferencedTitle() {
   wrapper = helper
     .component(TextContentWrapper)

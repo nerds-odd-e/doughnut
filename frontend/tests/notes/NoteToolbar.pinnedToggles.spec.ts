@@ -43,6 +43,9 @@ async function expectPinnedOnNarrowToolbar(
 
   expect(overflowMenuItem(pinnedTitle)).toBeNull()
   expect(overflowMenuItem(menuTitle)).not.toBeNull()
+
+  await noteToolbarAction(wrapper, titles.overflowMenu).trigger("click")
+  await flushPromises()
 }
 
 const pinnedToggleCases = [
@@ -75,7 +78,7 @@ describe("NoteToolbar pinned on-state toggles", () => {
   })
 
   it.each(pinnedToggleCases)(
-    "pins $name on a narrow toolbar and omits it from overflow",
+    "pins $name on a narrow toolbar then returns it to overflow when turned off",
     async ({ title, menuTitle }) => {
       const noteRealm = makeMe.aNoteRealm.title("Dummy Title").please()
       wrapper = await mountNoteToolbar(noteRealm)
@@ -83,17 +86,7 @@ describe("NoteToolbar pinned on-state toggles", () => {
 
       await turnOnFromOverflow(wrapper, title)
       await expectPinnedOnNarrowToolbar(wrapper, title, menuTitle)
-    }
-  )
 
-  it.each(pinnedToggleCases)(
-    "returns $name to the overflow menu when the pinned toolbar toggle is turned off",
-    async ({ title }) => {
-      const noteRealm = makeMe.aNoteRealm.title("Dummy Title").please()
-      wrapper = await mountNoteToolbar(noteRealm)
-      await layoutNoteToolbar(wrapper, overflowTogglesNavWidth())
-
-      await turnOnFromOverflow(wrapper, title)
       await noteToolbarAction(wrapper, title).trigger("click")
       await flushPromises()
 

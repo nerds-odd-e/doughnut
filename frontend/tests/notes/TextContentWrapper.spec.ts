@@ -14,6 +14,7 @@ import {
   referencedTitleSavePanel,
   setupTextContentWrapperTests,
   titleSlotInput,
+  withFakeRequestAnimationFrame,
   wrapper,
 } from "@tests/notes/textContentWrapperTestSupport"
 import makeMe from "doughnut-test-fixtures/makeMe"
@@ -29,8 +30,7 @@ describe("TextContentWrapper referenced title rename", () => {
   })
 
   it("discards dirty title and hides save actions when focus leaves the wrapper", async () => {
-    vi.useFakeTimers({ toFake: ["requestAnimationFrame"] })
-    try {
+    await withFakeRequestAnimationFrame(async () => {
       await mountReferencedTitleReady()
 
       const input = await editReferencedTitle()
@@ -42,9 +42,7 @@ describe("TextContentWrapper referenced title rename", () => {
 
       expect(input.value).toBe(referencedTitleOriginal)
       expect(referencedTitleSavePanel()).toBeNull()
-    } finally {
-      vi.useRealTimers()
-    }
+    })
   })
 
   it("keeps the draft when choosing a save option (click does not discard before save)", async () => {
@@ -68,23 +66,25 @@ describe("TextContentWrapper referenced title rename", () => {
   })
 
   it("does not discard when focusout has a misleading relatedTarget but focus remains inside the wrapper", async () => {
-    await mountReferencedTitleReady()
-    await editReferencedTitle()
+    await withFakeRequestAnimationFrame(async () => {
+      await mountReferencedTitleReady()
+      await editReferencedTitle()
 
-    const keepBtn = referencedTitleSaveKeepVisibleTextButton()
-    keepBtn.focus()
+      const keepBtn = referencedTitleSaveKeepVisibleTextButton()
+      keepBtn.focus()
 
-    wrapper.element.dispatchEvent(
-      new FocusEvent("focusout", {
-        bubbles: false,
-        relatedTarget: document.body,
-      })
-    )
-    await flushPromises()
-    await flushReferencedTitleBlurDiscardCheck()
+      wrapper.element.dispatchEvent(
+        new FocusEvent("focusout", {
+          bubbles: false,
+          relatedTarget: document.body,
+        })
+      )
+      await flushPromises()
+      await flushReferencedTitleBlurDiscardCheck()
 
-    expect(titleSlotInput().value).toBe(referencedTitleEdited)
-    expect(referencedTitleSavePanel()).toBeTruthy()
+      expect(titleSlotInput().value).toBe(referencedTitleEdited)
+      expect(referencedTitleSavePanel()).toBeTruthy()
+    })
   })
 })
 
