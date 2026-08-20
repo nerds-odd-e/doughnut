@@ -80,7 +80,7 @@ Each slice is **Structure**: delete one backfill family; remaining tests pass; e
 ### 8. Drop alias RecallLog grade rewrite
 
 - **Type:** Structure
-- **Status:** planned
+- **Status:** done
 - **Done:** `V300000279`, `AliasRecallLogGradeBackfill`, and its test gone. No remaining Java production code mentions `SHRINK` / `AGAIN_ZERO`. `ProductOutcome` enum unchanged (`GOOD`/`EASY`/`HARD`/`AGAIN`/`CONFUSION`).
 
 ### 9. Drop OS-invalid display-name backfill
