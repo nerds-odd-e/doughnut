@@ -23,6 +23,11 @@ function entryContent(notebookName: string, entryPath: string) {
 
 /** Assertions against a catalog-exported notebook ZIP download. */
 export const downloadedNotebookZip = (notebookName: string) => ({
+  /** Remove any prior download so wait-for-exist tracks this export, not a previous scenario. */
+  clearBeforeExport() {
+    cy.task('deleteFolder', Cypress.config('downloadsFolder'))
+    return this
+  },
   expectDownloaded() {
     const filePath = zipPath(notebookName)
     cy.task('fileShouldExistSoon', filePath).should('equal', filePath)

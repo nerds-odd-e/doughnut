@@ -5,6 +5,7 @@ import {
   NOTEBOOK_CATALOG_EXPORT_ACTION,
   notebookList,
 } from './NotebookList'
+import { downloadedNotebookZip } from './notebookExportZip'
 import notebookPage from './notebookPage'
 
 export const notebookCard = (notebook: string) => ({
@@ -13,6 +14,7 @@ export const notebookCard = (notebook: string) => ({
     findNotebookCardButton(notebook, 'Move to group…').click()
   },
   exportNotebook() {
+    downloadedNotebookZip(notebook).clearBeforeExport()
     findNotebookCardButton(notebook, NOTEBOOK_CATALOG_EXPORT_ACTION).click()
   },
   updateSubscription() {
