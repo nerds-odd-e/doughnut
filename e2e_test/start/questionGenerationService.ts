@@ -126,12 +126,10 @@ export const questionGenerationService = () => ({
   },
 
   /**
-   * One imposter with three predicates (depth-two wiki path, folder siblings, Bahamas wiki link).
+   * Three predicates on the shared OpenAI imposter (depth-two wiki path, folder siblings, Bahamas wiki link).
    * Table rows must be in this order: depth-two question, folder-sibling question, wiki-linked question.
    */
-  resetAndStubMcqForFocusContextRetrievalCases: (
-    rows: Record<string, string>[]
-  ) => {
+  stubMcqForFocusContextRetrievalCases: (rows: Record<string, string>[]) => {
     if (rows.length !== 3) {
       throw new Error(
         `Expected exactly 3 MCQ rows (depth-two, folder siblings, wiki-linked), got ${rows.length}`
@@ -141,7 +139,6 @@ export const questionGenerationService = () => ({
     const folderSiblings = rows[1]!
     const wikiLinked = rows[2]!
     cy.then(async () => {
-      await mock_services.openAi().restartImposter()
       await addFocusContextShapeMcqStubs(depthTwo, folderSiblings, wikiLinked)
     })
   },

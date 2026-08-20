@@ -65,9 +65,7 @@ Given(
   'OpenAI generates these MCQs when focus context matches depth-two wiki path, folder siblings, and wiki-linked Bahamas note:',
   (questionTable: DataTable) => {
     const rows = questionTable.hashes()
-    start
-      .questionGenerationService()
-      .resetAndStubMcqForFocusContextRetrievalCases(rows)
+    start.questionGenerationService().stubMcqForFocusContextRetrievalCases(rows)
   }
 )
 

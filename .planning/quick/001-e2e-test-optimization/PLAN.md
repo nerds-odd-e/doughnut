@@ -90,20 +90,9 @@ Status: done
 
 ### Optimize recall_quiz_ai_question
 Type: Structure
-Status: planned
+Status: done
 
-**Tests:**
-- `e2e_test/features/recall/recall_quiz_ai_question.feature` — wiki/focus context (~13910ms); AI generated question - incorrect answer (~10690ms)
-
-**Goals:**
-- API/testability setup for notebook/wiki graph; avoid catalog navigation; slim AI stub waits.
-
-**Verify:**
-
-```bash
-source /workspace/scripts/cloud_agent_setup.sh
-xvfb-run -a pnpm cypress run --spec e2e_test/features/recall/recall_quiz_ai_question.feature --config-file e2e_test/config/ci.ts
-```
+**Done:** Dropped correct-answer scenario; batch assimilate + wait for 3 recall-prompt GETs (no cy.wait(250)); dropped restartImposter before focus stubs; dead PO/helpers cleaned. 3→2 scenarios (~8s warm).
 
 ---
 

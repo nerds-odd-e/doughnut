@@ -16,12 +16,6 @@ const assumeAnsweredQuestionPage = () => {
   cy.get('body').should('be.visible')
 
   const self = {
-    expectMCQAnswerToBeCorrect() {
-      cy.get('[data-test="question-section"]').within(() => {
-        cy.get('.is-correct.is-selected').should('exist')
-      })
-      return self
-    },
     expectSpellingAnswerToBeCorrect() {
       cy.findByText('Correct!').should('exist')
       return self

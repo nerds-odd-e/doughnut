@@ -13,16 +13,21 @@ function recallProgressFromTriple(triple: string) {
   }
 }
 
-function loadRecallPage(options?: { waitForQuestion?: boolean }) {
-  if (options?.waitForQuestion) {
+function loadRecallPage(options?: { waitForQuestionCount?: number }) {
+  const waitForQuestionCount = options?.waitForQuestionCount
+  const shouldWaitForPrompts =
+    waitForQuestionCount !== undefined && waitForQuestionCount > 0
+  if (shouldWaitForPrompts) {
     cy.intercept(
       'GET',
       /\/api\/memory-trackers\/[^/]+\/recall-prompt(?:\?.*)?$/
     ).as('recallPrompt')
   }
   cy.visit('/recall')
-  if (options?.waitForQuestion) {
-    cy.wait('@recallPrompt', { timeout: 15000 })
+  if (shouldWaitForPrompts) {
+    for (let i = 0; i < waitForQuestionCount; i++) {
+      cy.wait('@recallPrompt', { timeout: 15000 })
+    }
   }
   waitUntilAppIsNotBusy()
 }
@@ -181,8 +186,8 @@ export const recall = () => {
       loadRecallPage()
       return recallPage()
     },
-    visitRecallPageAndWaitForQuestion() {
-      loadRecallPage({ waitForQuestion: true })
+    visitRecallPageAndWaitForQuestions(count: number) {
+      loadRecallPage({ waitForQuestionCount: count })
       return recallPage()
     },
     navigateToRecallPage() {

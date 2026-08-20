@@ -2,7 +2,7 @@ import { FlexiPredicate, HttpMethod, Operator } from '@anev/ts-mountebank'
 import ServiceMocker from '../../support/ServiceMocker'
 import testability from '../testability'
 import createOpenAiResponsesMock from './createOpenAiResponsesMock'
-import { pollUntilFocusContextRetrievalPromptShapesMatch } from './openAiFocusContextRecallAssertions'
+import { assertFocusContextRetrievalPromptShapesMatch } from './openAiFocusContextRecallAssertions'
 import { pollUntilPropertyFocusInFocusContextMatches } from './openAiPropertyFocusRecallAssertions'
 import {
   cyFetchOpenAiImposterRequests,
@@ -126,7 +126,7 @@ const openAiService = () => {
     },
 
     expectResponsesPostBodiesIncludeFocusContextRetrievalPromptShapes() {
-      pollUntilFocusContextRetrievalPromptShapesMatch()
+      assertFocusContextRetrievalPromptShapesMatch()
     },
 
     expectResponsesPostBodiesIncludePropertyFocusInFocusContext(
