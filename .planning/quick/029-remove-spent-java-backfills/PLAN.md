@@ -86,7 +86,7 @@ Each slice is **Structure**: delete one backfill family; remaining tests pass; e
 ### 9. Drop OS-invalid display-name backfill
 
 - **Type:** Structure
-- **Status:** planned
+- **Status:** done
 - **Done:** `V300000280`, `DisplayNameOsInvalidCharsBackfill`, its test, and `DisplayNameUniqueKeyJdbcConversion` gone (last caller). Live `normalizeDisplayName` / wiki-token rewrite unchanged.
 
 ### 10. Drop null elapsed-hours reconstruction
