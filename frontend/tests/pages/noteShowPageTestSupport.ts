@@ -94,11 +94,31 @@ function noteShowPageMount(router: Router, noteId: number) {
   return noteShowPageHelper(NoteShowPage, router, noteId)
 }
 
-export async function renderNoteShowPage(router: Router, noteId: number) {
-  noteShowPageWithSidebarLayoutMount(router, noteId)
-    .currentRoute(noteShowLocation(noteId))
-    .render()
+async function renderNoteShowAtNoteLocation(
+  mount: (
+    router: Router,
+    noteId: number
+  ) => ReturnType<typeof noteShowPageHelper>,
+  router: Router,
+  noteId: number
+) {
+  mount(router, noteId).currentRoute(noteShowLocation(noteId)).render()
   await flushPromises()
+}
+
+export async function renderNoteShowPage(router: Router, noteId: number) {
+  await renderNoteShowAtNoteLocation(
+    noteShowPageWithSidebarLayoutMount,
+    router,
+    noteId
+  )
+}
+
+export async function renderNoteShowPageWithoutSidebar(
+  router: Router,
+  noteId: number
+) {
+  await renderNoteShowAtNoteLocation(noteShowPageMount, router, noteId)
 }
 
 export async function renderNoteShowPageWithConversation(
@@ -108,6 +128,10 @@ export async function renderNoteShowPageWithConversation(
   await router.push(noteShowConversationLocation(noteId))
   noteShowPageMount(router, noteId).render()
   await flushPromises()
+}
+
+export function mainNoteContentEl() {
+  return document.getElementById("main-note-content")
 }
 
 export function noteContentWrapperEl() {

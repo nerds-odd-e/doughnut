@@ -45,13 +45,15 @@ describe("NoteRefinement extract note preview", () => {
     ).toHaveLength(1)
   })
 
-  it("shows an editable preview then replaces fields when Ask AI to retry is clicked", async () => {
+  it("shows editable preview, retries without confirm, and confirms when fields were edited", async () => {
     const layout = threePointLayout()
     const firstPreview = labeledExtractionPreview("First")
     const retryPreview = labeledExtractionPreview("Retry")
+    const confirmedPreview = labeledExtractionPreview("Confirmed")
     const extractNotePreviewSpy = mockExtractNotePreviewResponses(
       firstPreview,
-      retryPreview
+      retryPreview,
+      confirmedPreview
     )
     const wrapper = await mountNoteRefinementWithLayoutReady(layout)
 
@@ -76,6 +78,34 @@ describe("NoteRefinement extract note preview", () => {
       })
     )
     expectPreviewFields(wrapper, extractionPreviewFieldsFor("Retry"))
+
+    await setPreviewFields(wrapper, {
+      newTitle: "Edited title",
+      newContent: "Edited content",
+      originalContent: "Edited original",
+    })
+    await clickRetryExtractionPreview(wrapper)
+
+    const popups = usePopups().popups.peek()
+    expect(popups).toHaveLength(1)
+    expect(popups[0]!.type).toBe("confirm")
+    expect(popups[0]!.message).toContain("discard")
+    expect(extractNotePreviewSpy).toHaveBeenCalledTimes(2)
+
+    usePopups().popups.done(false)
+    await flushPromises()
+    expect(extractNotePreviewSpy).toHaveBeenCalledTimes(2)
+    expectPreviewFields(wrapper, {
+      newTitle: "Edited title",
+      newContent: "Edited content",
+      originalContent: "Edited original",
+    })
+
+    await clickRetryExtractionPreview(wrapper)
+    usePopups().popups.done(true)
+    await flushPromises()
+    expect(extractNotePreviewSpy).toHaveBeenCalledTimes(3)
+    expectPreviewFields(wrapper, extractionPreviewFieldsFor("Confirmed"))
   })
 
   it("extracts multiple selected refinement layout items into one preview", async () => {
@@ -98,46 +128,6 @@ describe("NoteRefinement extract note preview", () => {
       })
     )
     expectExtractionPreviewVisible(wrapper)
-  })
-
-  it("confirms retry when preview fields were edited, keeping edits on cancel and replacing on confirm", async () => {
-    const layout = threePointLayout()
-    const firstPreview = labeledExtractionPreview("First")
-    const retryPreview = labeledExtractionPreview("Retry")
-    const extractNotePreviewSpy = mockExtractNotePreviewResponses(
-      firstPreview,
-      retryPreview
-    )
-    const wrapper = await mountNoteRefinementWithLayoutReady(layout)
-
-    await openExtractionPreview(wrapper, "p2")
-    await setPreviewFields(wrapper, {
-      newTitle: "Edited title",
-      newContent: "Edited content",
-      originalContent: "Edited original",
-    })
-    await clickRetryExtractionPreview(wrapper)
-
-    const popups = usePopups().popups.peek()
-    expect(popups).toHaveLength(1)
-    expect(popups[0]!.type).toBe("confirm")
-    expect(popups[0]!.message).toContain("discard")
-    expect(extractNotePreviewSpy).toHaveBeenCalledTimes(1)
-
-    usePopups().popups.done(false)
-    await flushPromises()
-    expect(extractNotePreviewSpy).toHaveBeenCalledTimes(1)
-    expectPreviewFields(wrapper, {
-      newTitle: "Edited title",
-      newContent: "Edited content",
-      originalContent: "Edited original",
-    })
-
-    await clickRetryExtractionPreview(wrapper)
-    usePopups().popups.done(true)
-    await flushPromises()
-    expect(extractNotePreviewSpy).toHaveBeenCalledTimes(2)
-    expectPreviewFields(wrapper, extractionPreviewFieldsFor("Retry"))
   })
 
   it("returns to the layout when Back is clicked", async () => {

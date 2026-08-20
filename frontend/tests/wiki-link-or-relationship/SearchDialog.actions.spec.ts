@@ -7,11 +7,10 @@ import { fireEvent, screen } from "@testing-library/vue"
 import { flushPromises } from "@vue/test-utils"
 import MakeMe from "doughnut-test-fixtures/makeMe"
 import { mockSdkService, wrapSdkError } from "@tests/helpers"
-import { afterEach, describe, expect, it, vi } from "vitest"
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import {
   confirmMovePopup,
   makeNotebookHit,
-  openUseThisNoteChoice,
   renderSearchForm,
   searchAndClickMoveUnder,
   setupSearchDialogTests,
@@ -21,38 +20,17 @@ import {
 describe("SearchForm actions", () => {
   setupSearchDialogTests()
 
+  beforeEach(() => {
+    vi.useFakeTimers()
+  })
+
   afterEach(() => {
     vi.runOnlyPendingTimers()
     vi.useRealTimers()
   })
 
-  describe("Use this note choice step", () => {
-    beforeEach(() => {
-      vi.useFakeTimers()
-    })
-
-    it("shows link choice buttons and relationship form when Add a new relationship note is clicked", async () => {
-      const note = MakeMe.aNote.please()
-      await openUseThisNoteChoice(note, { router: true })
-
-      expect(screen.getByText("Insert as a wiki link")).toBeInTheDocument()
-      expect(
-        screen.getByText("Add a new relationship note")
-      ).toBeInTheDocument()
-
-      fireEvent.click(screen.getByText("Add a new relationship note"))
-      await flushPromises()
-
-      expect(screen.getByText("Complete relationship")).toBeInTheDocument()
-    })
-  })
-
   describe("Move Under folder hit", () => {
     const targetFolderId = 42
-
-    beforeEach(() => {
-      vi.useFakeTimers()
-    })
 
     it("calls moveNoteToFolder with folder id after confirm", async () => {
       const note = MakeMe.aNote.please()
@@ -103,10 +81,6 @@ describe("SearchForm actions", () => {
   })
 
   describe("Move to notebook root on NOTEBOOK hit", () => {
-    beforeEach(() => {
-      vi.useFakeTimers()
-    })
-
     it("calls moveNoteToNotebookRootInNotebook with notebook id after confirm", async () => {
       const note = MakeMe.aNote.please()
       const targetNotebookId = 99

@@ -1,12 +1,12 @@
 import { NoteController } from "@generated/doughnut-backend-api/sdk.gen"
-import { within } from "@testing-library/vue"
 import makeMe from "doughnut-test-fixtures/makeMe"
 import { mockNotebookGetForNoteRealm, mockSdkService } from "@tests/helpers"
 import {
   createNoteShowPageRouter,
-  renderNoteShowPage,
+  mainNoteContentEl,
+  renderNoteShowPageWithoutSidebar,
 } from "@tests/pages/noteShowPageTestSupport"
-import { beforeEach, describe, expect, it, vi } from "vitest"
+import { beforeEach, describe, expect, it } from "vitest"
 
 describe("note show page", () => {
   const noteRealm = makeMe.aNoteRealm.please()
@@ -20,15 +20,11 @@ describe("note show page", () => {
   })
 
   it("loads note by id from route", async () => {
-    await renderNoteShowPage(router, noteRealm.id)
+    await renderNoteShowPageWithoutSidebar(router, noteRealm.id)
 
-    await vi.waitFor(() => {
-      const main = document.getElementById("main-note-content")
-      expect(main).not.toBeNull()
-      expect(
-        within(main as HTMLElement).getByText(noteRealm.note.noteTopology.title)
-      ).toBeInTheDocument()
-    })
+    const main = mainNoteContentEl()
+    expect(main).not.toBeNull()
+    expect(main!.textContent).toContain(noteRealm.note.noteTopology.title)
 
     expect(showNoteSpy).toHaveBeenCalledWith({
       path: { note: noteRealm.id },

@@ -291,66 +291,28 @@ Status: done
 
 ### Optimize batch 9 (ranks 25–27)
 Type: Structure
-Status: planned
+Status: done
 
-**Tests:**
-- `tests/notes/NoteToolbar.moreOptionsOverflow.spec.ts` — "NoteToolbar more-options overflow emits edit-as-markdown from the overflow Edit row" (~26ms)
-- `tests/notes/NoteToolbar.conversationWikiNewOverflow.spec.ts` — "NoteToolbar Conversation, Wiki, and New overflow keeps only the on-toggle and more options on an extremely narrow bar" (~26ms)
+**Done:** Merged moreOptionsOverflow and conversationWikiNewOverflow cases (13→6 tests).
 
-**Note:** wikidata replace already optimized via batch 8 merge — skip.
-
-
-**Goals:** Speed up only the listed tests (delete/merge redundant coverage first; then setup/selectors/waits). If no meaningful speedup after a serious attempt, append Candidate(s) to `ongoing/test-optimization-blacklist.md` and mark done.
-
-**Verify:**
-
-```bash
-pnpm frontend:test tests/notes/NoteNewForm.wikidata.spec.ts tests/notes/NoteToolbar.moreOptionsOverflow.spec.ts tests/notes/NoteToolbar.conversationWikiNewOverflow.spec.ts
-```
-
-(Paths are relative to `frontend/` as accepted by `pnpm frontend:test`.)
 
 ---
 
 ### Optimize batch 10 (ranks 28–30)
 Type: Structure
-Status: planned
+Status: done
 
-**Tests:**
-- `tests/components/form/RichMarkdownEditor.overlapsProperty.spec.ts` — "RichMarkdownEditor overlaps property inserts the first overlap as a list when adding a new overlaps property" (~25ms)
-- `tests/components/form/RichMarkdownEditor.propertyValuePopupModeSwitch.spec.ts` — "RichMarkdownEditor property value popup mode switch saves list as scalar when user switches to text mode in popup" (~25ms)
-- `tests/notes/NoteMoreOptionsForm.deleteNote.relationship.spec.ts` — "NoteMoreOptionsForm delete relationship note uses the current note id when note prop changes without remount" (~25ms)
+**Done:** Merged overlaps wiki-link/insert; modeSwitch scalar↔list round-trip; relationship delete prop-change.
 
-**Goals:** Speed up only the listed tests (delete/merge redundant coverage first; then setup/selectors/waits). If no meaningful speedup after a serious attempt, append Candidate(s) to `ongoing/test-optimization-blacklist.md` and mark done.
-
-**Verify:**
-
-```bash
-pnpm frontend:test tests/components/form/RichMarkdownEditor.overlapsProperty.spec.ts tests/components/form/RichMarkdownEditor.propertyValuePopupModeSwitch.spec.ts tests/notes/NoteMoreOptionsForm.deleteNote.relationship.spec.ts
-```
-
-(Paths are relative to `frontend/` as accepted by `pnpm frontend:test`.)
 
 ---
 
 ### Optimize batch 11 (ranks 31–33)
 Type: Structure
-Status: planned
+Status: done
 
-**Tests:**
-- `tests/pages/NoteShowPage.spec.ts` — "note show page loads note by id from route" (~25ms)
-- `tests/wiki-link-or-relationship/SearchDialog.actions.spec.ts` — "SearchForm actions Use this note choice step shows link choice buttons and relationship form when Add a new relationship note is clicked" (~25ms)
-- `tests/components/recall/NoteRefinement.extractNote.spec.ts` — "NoteRefinement extract note preview confirms retry when preview fields were edited, keeping edits on cancel and replacing on confirm" (~25ms)
+**Done:** Lighter NoteShowPage mount; drop redundant SearchDialog choice path; merge extract retry confirm.
 
-**Goals:** Speed up only the listed tests (delete/merge redundant coverage first; then setup/selectors/waits). If no meaningful speedup after a serious attempt, append Candidate(s) to `ongoing/test-optimization-blacklist.md` and mark done.
-
-**Verify:**
-
-```bash
-pnpm frontend:test tests/pages/NoteShowPage.spec.ts tests/wiki-link-or-relationship/SearchDialog.actions.spec.ts tests/components/recall/NoteRefinement.extractNote.spec.ts
-```
-
-(Paths are relative to `frontend/` as accepted by `pnpm frontend:test`.)
 
 ---
 
@@ -359,9 +321,11 @@ Type: Structure
 Status: planned
 
 **Tests:**
-- `tests/components/form/RichMarkdownEditor.propertyValuePopupModeSwitch.spec.ts` — "RichMarkdownEditor property value popup mode switch saves scalar as list when user switches to list mode in popup" (~25ms)
 - `tests/components/recall/NoteRefinement.layoutSelection.spec.ts` — "NoteRefinement layout selection includes parent id when all descendants are selected again" (~25ms)
-- `tests/notes/NoteToolbar.conversationWikiNewOverflow.spec.ts` — "NoteToolbar Conversation, Wiki, and New overflow still opens new note when New is in more options" (~25ms)
+
+
+**Note:** modeSwitch scalar↔list and conversationWiki overflow already optimized in batches 9–10 — skip those ranks.
+
 
 **Goals:** Speed up only the listed tests (delete/merge redundant coverage first; then setup/selectors/waits). If no meaningful speedup after a serious attempt, append Candidate(s) to `ongoing/test-optimization-blacklist.md` and mark done.
 

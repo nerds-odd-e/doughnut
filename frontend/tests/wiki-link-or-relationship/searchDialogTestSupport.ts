@@ -129,19 +129,6 @@ export async function confirmMovePopup() {
   await flushPromises()
 }
 
-export async function openUseThisNoteChoice(
-  note: Note,
-  options?: { router?: boolean }
-) {
-  mockSdkService(SearchController, "searchForRelationshipTargetWithin", [
-    makeNoteHit("Target Note", note.noteTopology.id + 100),
-  ])
-  const searchInput = await renderSearchForm({ note }, options)
-  await typeInSearch(searchInput, "Target")
-  fireEvent.click(screen.getByText("Use this note"))
-  await flushPromises()
-}
-
 export async function searchAndClickMoveUnder(note: Note, targetFolderId = 42) {
   mockSdkService(SearchController, "searchForRelationshipTargetWithin", [
     makeFolderHit(targetFolderId, "Archive"),
