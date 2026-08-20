@@ -54,8 +54,9 @@ Each slice is **Structure**: delete one backfill family; remaining tests pass; e
 ### 4. Drop over-cap Stability backfill
 
 - **Type:** Structure
-- **Status:** planned
+- **Status:** done
 - **Done:** `V300000274`, `OverCapStabilityBackfill`, and `OverCapStabilityBackfillTest` gone. Live over-cap clamp on `Fsrs` / recall scheduling tests unchanged. ADR 0003 no longer names those deleted classes (keep the one-time Flyway *policy* wording until slice 11).
+- **Learnings:** Ungated DML-only family — no yml placeholder cleanup. STATE.md V274 mention deferred to slice 12.
 
 ### 5. Drop ungraded-New last-recall backfill
 

@@ -324,8 +324,9 @@ RecallLog** under this locked policy. Live grading still updates the snapshot
 on each mapped grade and on confusion. Do **not** fold the log on every
 due-work query.
 
-A **one-time ungated Java Flyway** (same pattern as `OverCapStabilityBackfill`
-/ `StillNewMappedFirstRatingBackfill`) aligns leftover snapshots:
+A **one-time ungated Java Flyway** (same pattern as other ungated DML
+backfills such as `StillNewMappedFirstRatingBackfill`) aligns leftover
+snapshots:
 
 - Fold **every** tracker that has at least one mapped grade (`GOOD` / `EASY` /
   `HARD` / `AGAIN`), from New, in `recorded_at`, then `id` order. Use **stored**
