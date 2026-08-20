@@ -3,7 +3,6 @@ package com.odde.doughnut.entities;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.closeTo;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.lessThanOrEqualTo;
 import static org.hamcrest.Matchers.nullValue;
 
 import com.odde.doughnut.testability.MakeMe;
@@ -102,14 +101,15 @@ class RecallLogDsrBackfillTest {
         Fsrs.cappedStabilityHours(
             Fsrs.confusionAdjusted(
                 FIRST_GOOD_STABILITY_HOURS, FIRST_GOOD_DIFFICULTY, confusionElapsedHours));
-    Timestamp goodDue =
-        TimestampOperations.addHoursToTimestamp(
-            firstGoodAt, Fsrs.intervalHours(FIRST_GOOD_STABILITY_HOURS));
     TrackerRow row = trackerRow(leftover.getId());
     assertThat(row.stability(), equalTo(expectedStability));
     assertThat((double) row.difficulty(), closeTo(FIRST_GOOD_DIFFICULTY, 1e-5));
     assertThat(row.lastRecalledAt(), equalTo(firstGoodAt));
-    assertThat(row.nextRecallAt(), lessThanOrEqualTo(goodDue));
+    assertThat(
+        row.nextRecallAt(),
+        equalTo(
+            TimestampOperations.addHoursToTimestamp(
+                firstGoodAt, Fsrs.intervalHours(expectedStability))));
   }
 
   @Test
