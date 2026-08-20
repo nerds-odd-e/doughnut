@@ -71,7 +71,6 @@ When(
       .replyToConversationAndInviteAiToReply(
         'Please complete the note content.'
       )
-    start.waitUntilAppIsNotBusy()
   }
 )
 
