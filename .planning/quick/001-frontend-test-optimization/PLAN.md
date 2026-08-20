@@ -232,22 +232,9 @@ Status: done
 
 ### Optimize batch 2 (ranks 4–6)
 Type: Structure
-Status: planned
+Status: done
 
-**Tests:**
-- `tests/components/recall/AnsweredSpellingQuestionAccidentalMatch.spec.ts` — "AnsweredSpellingQuestion accidental match builds a link as a same-Modal step and returns to the match list after success" (~39ms)
-- `tests/components/commons/LoadingModal.topLayer.spec.ts` — "LoadingModal top layer paints the spinner above an already-open native modal dialog" (~38ms)
-- `tests/notes/TextContentWrapper.spec.ts` — "TextContentWrapper referenced title rename discards dirty title and hides save actions when focus leaves the wrapper" (~35ms)
-
-**Goals:** Speed up only the listed tests (delete/merge redundant coverage first; then setup/selectors/waits). If no meaningful speedup after a serious attempt, append Candidate(s) to `ongoing/test-optimization-blacklist.md` and mark done.
-
-**Verify:**
-
-```bash
-pnpm frontend:test tests/components/recall/AnsweredSpellingQuestionAccidentalMatch.spec.ts tests/components/commons/LoadingModal.topLayer.spec.ts tests/notes/TextContentWrapper.spec.ts
-```
-
-(Paths are relative to `frontend/` as accepted by `pnpm frontend:test`.)
+**Done:** Slim AccidentalMatch fixture; single-host LoadingModal.topLayer; fake rAF for TextContentWrapper discard. 12 tests green ×3.
 
 ---
 
