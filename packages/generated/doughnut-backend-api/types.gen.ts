@@ -3052,7 +3052,7 @@ export type MarkAsRecalledData = {
         memoryTracker: number;
     };
     query: {
-        grade: 'AGAIN' | 'HARD' | 'GOOD' | 'EASY';
+        grade: 'GOOD' | 'AGAIN';
     };
     url: '/api/memory-trackers/{memoryTracker}/mark-as-recalled';
 };

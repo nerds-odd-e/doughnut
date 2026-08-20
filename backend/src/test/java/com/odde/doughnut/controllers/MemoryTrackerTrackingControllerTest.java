@@ -13,7 +13,11 @@ import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import java.sql.Timestamp;
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
 class MemoryTrackerTrackingControllerTest extends MemoryTrackerControllerTestBase {
   @Autowired MemoryTrackerRepository memoryTrackerRepository;
@@ -114,6 +118,20 @@ class MemoryTrackerTrackingControllerTest extends MemoryTrackerControllerTestBas
     List<RecallLog> logs = controller.getRecallLogs(tracker);
     assertThat(logs, hasSize(2));
     assertThat(logs.get(0).getGrade(), is(Grade.AGAIN));
+  }
+
+  @ParameterizedTest
+  @EnumSource(
+      value = Grade.class,
+      names = {"HARD", "EASY"})
+  void markAsRecalledRejectsHardAndEasy(Grade grade) {
+    MemoryTracker tracker = ownedTracker();
+
+    ResponseStatusException ex =
+        assertThrows(
+            ResponseStatusException.class, () -> controller.markAsRecalled(tracker, grade));
+
+    assertThat(ex.getStatusCode(), equalTo(HttpStatus.BAD_REQUEST));
   }
 
   @Test

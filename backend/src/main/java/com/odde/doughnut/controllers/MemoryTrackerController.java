@@ -14,11 +14,14 @@ import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.MemoryTrackerService;
 import com.odde.doughnut.services.RecallQuestionService;
 import com.odde.doughnut.testability.TestabilitySettings;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import java.util.List;
+import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequestMapping("/api/memory-trackers")
@@ -104,8 +107,18 @@ class MemoryTrackerController {
   @Transactional
   public MemoryTracker markAsRecalled(
       @PathVariable("memoryTracker") @Schema(type = "integer") MemoryTracker memoryTracker,
-      @RequestParam("grade") Grade grade) {
+      @Parameter(
+              schema =
+                  @Schema(
+                      type = "string",
+                      allowableValues = {"GOOD", "AGAIN"}))
+          @RequestParam("grade")
+          Grade grade) {
     authorizationService.assertLoggedIn();
+    if (!grade.isJustReviewGrade()) {
+      throw new ResponseStatusException(
+          HttpStatus.BAD_REQUEST, "Just review accepts only GOOD or AGAIN");
+    }
     memoryTrackerService.markAsRecalled(
         testabilitySettings.getCurrentUTCTimestamp(), grade, memoryTracker, null);
     return memoryTracker;

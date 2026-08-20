@@ -40,13 +40,9 @@
 
 Blank `<session_item_grades>` (whitespace only) is treated as absent so legacy `<session_item_scores>` wins. Non-blank unparseable grades content still rejects. Tag-block cases live in `LearningSessionReportTagBlockParsingTest`.
 
-### 2. Just-review mark-as-recalled accepts only Good / Again — **Behavior** — planned
+### 2. Just-review mark-as-recalled accepts only Good / Again — **Behavior** — done
 
-**Pre:** Caller hits `mark-as-recalled`.  
-**Trigger:** Sends HARD or EASY.  
-**Post:** Request rejected; GOOD/AGAIN still schedule as today.
-
-Narrow OpenAPI + controller/service validation; regenerate TypeScript; extend MemoryTracker controller tests. Web/CLI already send only Good/Again.
+HARD/EASY on `mark-as-recalled` return 400; OpenAPI/TS param is GOOD|AGAIN. Membership lives on `Grade.isJustReviewGrade()`; service still accepts full `Grade` for learning session.
 
 ### 3. Learning-session grades go through `markAsRecalled` — **Structure** — planned
 
@@ -81,7 +77,7 @@ One focused CLI unit assertion (extend existing mock spy); do not broaden sessio
 ## Definition of done
 
 - [x] Blank grades tag no longer shadows legacy scores
-- [ ] Just-review HTTP API cannot schedule HARD/EASY
+- [x] Just-review HTTP API cannot schedule HARD/EASY
 - [ ] One non-null graded apply path for quiz/just-review/session
 - [ ] RecallLog JSON has a single outcome field (`productOutcome`)
 - [ ] No duplicate FSRS float matrix in learning-session tutor tests; recall-log assert not GOOD-only

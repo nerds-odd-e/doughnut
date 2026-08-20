@@ -2188,10 +2188,8 @@ paths:
         schema:
           type: string
           enum:
-          - AGAIN
-          - HARD
           - GOOD
-          - EASY
+          - AGAIN
       responses:
         "200":
           description: OK

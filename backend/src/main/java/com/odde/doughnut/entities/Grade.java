@@ -32,4 +32,9 @@ public enum Grade {
   public static Grade fromCorrect(boolean correct) {
     return correct ? GOOD : AGAIN;
   }
+
+  /** Just review accepts only Good and Again (same set as {@link #fromCorrect(boolean)}). */
+  public boolean isJustReviewGrade() {
+    return this == GOOD || this == AGAIN;
+  }
 }
