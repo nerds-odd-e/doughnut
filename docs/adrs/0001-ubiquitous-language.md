@@ -136,8 +136,13 @@ DSR and schedule terms live in the **Spaced repetition glossary** of
   recall prompt.
 - **Contest** — Challenge an MCQ shown in a recall prompt; the MCQ may be
   marked contested and replaced.
-- **Just review** — Recall by reviewing the note and self-evaluating.
-  Short UI: **Just review**.
+- **Just review** — Recall by reviewing the note and self-evaluating
+  with **Grade** Good or Again. Short UI: **Just review**.
+- **Grade** — The single scheduling evaluation concept: Again (1),
+  Hard (2), Good (3), Easy (4). The numeric value **is** FSRS `G`.
+  Used by recall prompts, **just review**, and Tutor **Feedback**.
+  **Confusion** and **Overlap** are not grades. Scheduling detail:
+  [ADR 0003](./0003-spaced-repetition-scheduling-policy.md).
 - **Answer** — The learner's response to a **recall prompt**. Prompt
   grades and **confusion** link a RecallLog row to this answer.
 - **Accidental match** — Spelling answer that fails the note under recall
@@ -194,8 +199,8 @@ commission from Doughnut:
   Feedback per Session Item
 - **Session Item** — One memory tracker within a Learning Session, and
   the Feedback recorded for it
-- **Feedback** — A Tutor's evaluation of a Session Item (score, and later
-  descriptive feedback and recommendations)
+- **Feedback** — A Tutor's evaluation of a Session Item (a **Grade**,
+  and later descriptive feedback and recommendations)
 
 ## Alignment policy
 

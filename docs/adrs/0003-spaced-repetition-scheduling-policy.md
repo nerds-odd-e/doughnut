@@ -34,7 +34,7 @@ or transition through the FSRS scheduler's **Learning**, **Review**, and
 
 - **New** — Ungraded memory tracker (`S = 0`, Difficulty unset / **N/A**).
   Created by assimilation and due immediately: `nextRecallAt = assimilatedAt`.
-  The first mapped grade initializes Stability and Difficulty, after which the
+  The first grade initializes Stability and Difficulty, after which the
   tracker is no longer New.
 - **Stability** — Persisted current interval of a memory tracker, in
   whole hours.
@@ -50,7 +50,7 @@ or transition through the FSRS scheduler's **Learning**, **Review**, and
 - **Maximum interval** — Global, non-persisted FSRS `S_MAX`: **36500 days** =
   **876000 whole hours**. Clamp each computed next Stability to this maximum,
   then derive due from the capped value.
-- **`lastRecalledAt`** — Time of the last mapped grade (FSRS
+- **`lastRecalledAt`** — Time of the last grade (FSRS
   `last_review`). Unset on New.
 - **`assimilatedAt`** — Time the tracker was created by assimilation.
   New due.
@@ -83,26 +83,24 @@ already-due items is not a memory-state concern.
 ### Difficulty on correct recall
 
 Harder items gain less Stability on a successful recall. Ordinary correct
-recall with Stability > 0 updates Stability with open-FSRS-6 Good-equivalent
+recall with Stability > 0 updates Stability with open-FSRS-6 Good
 rules (own implementation) and Difficulty with Good next-D (see **Difficulty
-after a mapped grade**).
+after a grade**).
 
 ### First rating on New
 
-Every mapped grade on a New tracker uses published FSRS-6 first-rating (own
-implementation, frozen `Fsrs.W`), with `G` from the **Outcome-to-grade
-compatibility map**:
+Every grade on a New tracker uses published FSRS-6 first-rating (own
+implementation, frozen `Fsrs.W`), with Grade `G`:
 
 - Stability `S0(G) = w[G−1]` days, persisted as whole hours. With frozen weights: Again **5**, Hard **31**, Good **55**, Easy **199**.
 - Difficulty is `D0(G)` clamped to `[1, 10]`, persisted as the Java float from that formula (API number, no extra rounding). Persisted first Easy Difficulty is **1**.
-- `D0(Easy)` stays **unclamped** as the later mean-reversion target (see **Difficulty after a mapped grade**).
+- `D0(Easy)` stays **unclamped** as the later mean-reversion target (see **Difficulty after a grade**).
 - Elapsed time does **not** change first-rating; see **RecallLog**.
 
-### Difficulty after a mapped grade
+### Difficulty after a grade
 
-When Stability > 0, a mapped grade updates Difficulty with published open
-FSRS-6 next Difficulty (own implementation, frozen `Fsrs.W`), using `G` from
-the **Outcome-to-grade compatibility map**:
+When Stability > 0, a grade updates Difficulty with published open
+FSRS-6 next Difficulty (own implementation, frozen `Fsrs.W`), using Grade `G`:
 
 - `ΔD = -w6 · (G − 3)`
 - `D' = D + ΔD · (10 − D) / 9`
@@ -113,35 +111,37 @@ New first-rating uses clamped `D0(G)` (see **First rating on New**). Confusion
 does not change Difficulty. Display the persisted API number without extra
 rounding.
 
-### Outcome-to-grade compatibility map
+### Grade
 
-Keep Doughnut product outcomes first-class. Do not replace the Tutor 1–4 rubric with Anki Again / Hard / Good / Easy buttons. The report **score is FSRS G**. When memory updates follow an FSRS-shaped engine, map as follows:
+**Grade** is the single scheduling evaluation concept. Its numeric value **is**
+FSRS `G`:
 
-| Product | Schedule |
-|---------|----------|
-| Just review Yes / ordinary correct / Tutor **3** | FSRS-6 Good |
-| Tutor **4** | FSRS-6 Easy |
-| Tutor **2** | FSRS-6 Hard |
-| Just review No / ordinary incorrect / Tutor **1** | FSRS-6 Again |
-| Confusion | Not a grade; Again-midpoint S; due not later |
-| Overlap | No memory change |
+| Grade | G |
+|-------|---|
+| Again | 1 |
+| Hard | 2 |
+| Good | 3 |
+| Easy | 4 |
 
-See **Accidental-match and overlap transitions** for Confusion and Overlap.
+Recall prompts, **just review**, and Tutor **Feedback** all submit a Grade.
+**Confusion** and **Overlap** are not grades (see **Accidental-match and
+overlap transitions**). There is no separate Tutor “score” or Yes/No domain
+concept.
 
 ### Just review
 
-Just review stays **two buttons**: **Yes, I remember** is ordinary correct;
-**No, I need more recall** is ordinary incorrect. Use the compatibility map;
-Hard and Easy remain commissioned-only.
+Just review stays **two buttons**: **Good** and **Again**. Labels are grade
+names, not Yes/No. Hard and Easy remain available via commissioned Learning
+Sessions (and other graded paths that offer all four), not just review.
 
 ### Commissioned Learning Session feedback
 
-A commissioned memory tracker is graded from Tutor Feedback, not a Doughnut
-recall prompt; use the **Outcome-to-grade compatibility map**. Vocabulary:
+A commissioned memory tracker is graded from Tutor Feedback (a **Grade**), not
+a Doughnut recall prompt. Vocabulary:
 [ADR 0001](./0001-ubiquitous-language.md); Tutor semantics: [ADR
 0005](./0005-commissioned-learning-session-protocol.md). Shared rules:
 
-- A recorded score is a grade at its recorded time: it counts the recall, sets
+- A recorded Grade at its recorded time counts the recall, sets
   `lastRecalledAt`, and updates and reschedules the tracker by the common rules.
 - A Session Item that never receives Feedback supplies no graded recall result: its tracker stays unchanged and the item is abandoned with its session.
 - Effort is neutral. A Tutor session carries no trustworthy effort measurement.
@@ -152,20 +152,20 @@ recall prompt; use the **Outcome-to-grade compatibility map**. Vocabulary:
 
 Memory updates with Stability > 0:
 
-- **4 (Easy):** Good increment times the Easy factor; next Stability is
-  strictly longer than the same state under score 3. Overdue extra applies.
-- **3 (Good):** same update as ordinary correct recall; overdue extra applies.
-- **2 (Hard):** Good increment times the Hard factor; next Stability is at
-  least current Stability and strictly shorter than the same state under score
-  3. Overdue extra applies.
-- **1 (Again):** same update as ordinary incorrect recall; see **Incorrect
+- **Easy (4):** Good increment times the Easy factor; next Stability is
+  strictly longer than the same state under Good. Overdue extra applies.
+- **Good (3):** same update as ordinary correct recall; overdue extra applies.
+- **Hard (2):** Good increment times the Hard factor; next Stability is at
+  least current Stability and strictly shorter than the same state under Good.
+  Overdue extra applies.
+- **Again (1):** same update as ordinary incorrect recall; see **Incorrect
   recall (Again)**.
 
-All four update Difficulty by **Difficulty after a mapped grade**.
+All four update Difficulty by **Difficulty after a grade**.
 
 ### Incorrect recall (Again)
 
-Ordinary incorrect recall (MCQ, just review No, spelling fail) is FSRS **Again**.
+Ordinary incorrect recall (MCQ, just review Again, spelling fail) is FSRS **Again**.
 
 When Stability is greater than 0, elapsed whole hours **< 24** use the
 short-term rule in **Whole-hour elapsed-time precision** with `G = 1`; elapsed
@@ -197,7 +197,7 @@ discarding any sub-hour remainder. Queue lateness vs `nextRecallAt` is not an
 input. This is independent of time zone and calendar day; morning/afternoon
 recall windows make day precision too coarse.
 When elapsed whole hours are **< 24** and Stability is greater than 0, all four
-mapped grades update Stability with published open FSRS-6 short-term next
+grades update Stability with published open FSRS-6 short-term next
 Stability (own implementation, frozen `Fsrs.W`): convert persisted whole hours to days,
 `S' = S · e^{w17 · (G − 3 + w18)} · S^{-w19}`, then persist whole hours.
 Clamp **SInc ≥ 1** only for **G ≥ 2** so Hard/Good/Easy next Stability does
@@ -268,7 +268,7 @@ to now (see **DSR snapshot**); do not clamp that due to now.
 
 ### Manual and admin paths
 
-`mark-as-recalled` uses the **Just review** mappings. `remove` and `revive` do
+`mark-as-recalled` uses the **Just review** Grades (Good / Again). `remove` and `revive` do
 not write `lastRecalledAt`.
 
 ### Spelling memory tracker
@@ -291,10 +291,10 @@ A `recall_log` has `memory_tracker_id`, `recorded_at`, `elapsed_hours`,
 session bag.
 
 `elapsed_hours` is always present (whole hours; see **Whole-hour elapsed-time
-precision**) and required. The first mapped grade on a tracker is **0**. Later
-mapped grades are whole hours since the previous mapped grade's `recorded_at`
+precision**) and required. The first grade on a tracker is **0**. Later
+grades are whole hours since the previous grade's `recorded_at`
 on that tracker (`GOOD` / `EASY` / `HARD` / `AGAIN`). `CONFUSION` uses the same
-elapsed vs the last mapped grade, else **0**, and is not an anchor. Order is
+elapsed vs the last grade, else **0**, and is not an anchor. Order is
 `recorded_at`, then `id`. A negative diff is **0**.
 
 A row has `answer_id` xor none: prompt grade and confusion set `answer_id`;
@@ -307,22 +307,23 @@ Current Stability, Difficulty, `lastRecalledAt`, and `nextRecallAt` stay on
 index.
 
 `product_outcome`: `GOOD` | `EASY` | `HARD` | `AGAIN` | `CONFUSION`. Persist
-named grades. Latest tutor feedback is **1–4** via `AGAIN→1`, `HARD→2`,
-`GOOD→3`, `EASY→4` ([ADR 0005](./0005-commissioned-learning-session-protocol.md)).
+named grades (`GOOD` / `EASY` / `HARD` / `AGAIN` are **Grade**; `CONFUSION` is
+not). Latest tutor feedback is that Grade's `G` (**1–4**)
+([ADR 0005](./0005-commissioned-learning-session-protocol.md)).
 
 ### DSR snapshot
 
 The persisted DSR on `memory_tracker` (`Stability`, `Difficulty`,
 `lastRecalledAt`, `nextRecallAt`) is a **cache of folding that tracker's
 RecallLog** under this locked policy. Live grading still updates the snapshot
-on each mapped grade and on confusion. Do **not** fold the log on every
+on each grade and on confusion. Do **not** fold the log on every
 due-work query.
 
 Fold semantics:
 
-- Fold **every** tracker that has at least one mapped grade (`GOOD` / `EASY` /
+- Fold **every** tracker that has at least one grade (`GOOD` / `EASY` /
   `HARD` / `AGAIN`), from New, in `recorded_at`, then `id` order. Use **stored**
-  `elapsed_hours`. The first mapped grade is first-rating.
+  `elapsed_hours`. The first grade is first-rating.
 - **Leave** New, confusion-only, and `S > 0` with no mapped-grade log.
   Include **removed-from-tracking**. Skip `deleted_at IS NOT NULL`.
 - Write Stability, Difficulty, `lastRecalledAt` (last mapped `recorded_at`),
@@ -363,10 +364,10 @@ Fold semantics:
   adopting an open-FSRS library was rejected.
 - **Rebuild DSR from RecallLog on every due-work query** — rejected: due-work
   needs a queryable snapshot; do not fold at query time.
-- **Tutor rubric** — direct scores **1–4 = G** were selected; a shifted 0–5
-  rubric was rejected.
-- **Just review Hard / Easy buttons** — rejected: just review is rare; keep two
-  buttons mapped to Tutor **3** and **1**.
+- **Tutor rubric** — Grades with numeric values **1–4 = G** were selected; a
+  shifted 0–5 rubric was rejected.
+- **Just review Hard / Easy buttons** — rejected: just review is rare; keep
+  **Good** and **Again** only.
 - **Persist a lapse count** — rejected: scheduling does not consume it;
   RecallLog and the frequent-failure warning already represent the history.
 - **FSRS interval fuzz** — rejected: due follows Stability; hour-precision
@@ -384,7 +385,7 @@ Fold semantics:
 
 - Tracker (pointer + deferred IDs, not a second policy map): [`.planning/research/FSRS-COMPATIBILITY-GAP.md`](../../.planning/research/FSRS-COMPATIBILITY-GAP.md)
 - ADR 0001 [ubiquitous language](./0001-ubiquitous-language.md) — notes, assimilation, recall, tracker types, commissioned Learning Session terms. This ADR is the **Spaced repetition glossary**.
-- ADR 0005 [commissioned learning session protocol](./0005-commissioned-learning-session-protocol.md) — what a score means to the Tutor
+- ADR 0005 [commissioned learning session protocol](./0005-commissioned-learning-session-protocol.md) — what a Grade means to the Tutor
 - Anki answer semantics: <https://docs.ankiweb.net/studying.html#answer-buttons>
 - FSRS overdue-recall: <https://github.com/open-spaced-repetition/awesome-fsrs/wiki/The-Algorithm>
 - Reddy et al.: <https://arxiv.org/abs/1602.07032>

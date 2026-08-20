@@ -19,7 +19,7 @@ MVP, no transport at all: the learner copies the Learning Session Request out an
 pastes the Learning Session Report back.
 
 Both documents are therefore written and read by people and by general-purpose
-LLMs, with no schema validator anywhere. Doughnut still has to record scores
+LLMs, with no schema validator anywhere. Doughnut still has to record Grades
 against the right Session Items without guessing. That needs a stated contract.
 
 Existing learning-interoperability standards do not fit this shape:
@@ -56,7 +56,7 @@ in place.
    Report back into Doughnut for that notebook. Because there is no persisted
    session to target, neither document carries a session identifier.
 3. Both documents are self-describing. A Tutor who has never seen Doughnut can act
-   on the Request alone, including how to score.
+   on the Request alone, including how to grade.
 
 ### Learning Session Request
 
@@ -118,7 +118,7 @@ Thank you
 
 <how_to_report>
 Teach the session items above, then return a Learning Session Report giving one
-score from 1 to 4 per item:
+Grade from 1 to 4 per item:
 
 - 4 — mastered the session item with full fluency
 - 3 — mastered the session item with fluency
@@ -129,38 +129,39 @@ Example of how to provide feedback:
 
 # Learning Session Report
 
-<session_item_scores>
+<session_item_grades>
 Hola: 4
 Gracias: 1
-</session_item_scores>
+</session_item_grades>
 
-Only score session items that were actually taught in this session. Do not list
+Only grade session items that were actually taught in this session. Do not list
 items that were not taught in the session.
 </how_to_report>
 ```
 
 ### Learning Session Report
 
-The Tutor returns one score per note title inside a tagged block. Prose and
-markdown headers outside the block are ignored.
+The Tutor returns one Grade per note title inside a tagged block. Line values
+are `1`–`4` (= FSRS `G`). Prose and markdown headers outside the block are
+ignored.
 
 ```markdown
 # Learning Session Report
 
 Thanks for a great session today.
 
-<session_item_scores>
+<session_item_grades>
 Hola: 4
 Gracias: 1
-</session_item_scores>
+</session_item_grades>
 ```
 
-If `<session_item_scores>` is absent, Doughnut falls back to parsing the whole
-document (minus the optional `# Learning Session Report` header) so older pasted
-reports still work.
-
-Descriptive prose may accompany a score line inside the block; the MVP tolerates
-and ignores it rather than rejecting the Report.
+Doughnut prefers `<session_item_grades>`. Accept `<session_item_scores>`
+**only** as legacy parser spelling; normalize to Grade immediately and never
+expose “score” past that boundary. If neither tagged block is present,
+fall back to the whole document (minus the optional `# Learning Session Report`
+header) so older pastes still work. Descriptive prose beside a grade line is
+tolerated and ignored.
 
 ### Matching and recording
 
@@ -169,24 +170,24 @@ and ignores it rather than rejecting the Report.
    (`answer_id` null) on that commissioned tracker and scheduling it. Unmatched
    entries are rejected and reported to the learner. Recording is not
    all-or-nothing: a partly usable Report still moves the trackers it matched.
-3. A matched entry whose score is not an integer from 1 to 4 is rejected and
+3. A matched entry whose Grade is not an integer from 1 to 4 is rejected and
    reported the same way.
 4. A Session Item with no matching entry receives no Feedback, and its tracker is
    unchanged.
 5. A further Report is another recording: new RecallLogs and another schedule
    update. Doughnut does not keep a session bag to amend, and does not mark
    recorded sessions in a list.
-6. What a score does to the schedule is ADR 0003, not this ADR — including
-   whether a later score re-grades from an earlier snapshot or applies on top of
-   the state the earlier score already produced.
-7. The Memory Tracker's latest tutor feedback score is the latest tutor RecallLog
-   on that commissioned tracker (`answer_id` null, excluding CONFUSION), mapped
-   **4 / 3 / 2 / 1** from `EASY` / `GOOD` / `HARD` / `AGAIN`.
+6. What a Grade does to the schedule is ADR 0003, not this ADR — including
+   whether a later Grade re-grades from an earlier snapshot or applies on top of
+   the state the earlier Grade already produced.
+7. The Memory Tracker's latest tutor feedback Grade is the latest tutor
+   RecallLog on that commissioned tracker (`answer_id` null, excluding
+   CONFUSION): that row's Grade (`G` **1–4**).
 
 ### Out of scope
 
 - Descriptive feedback and recommendations as recorded Feedback — the protocol
-  tolerates prose, but only scores are recorded for now
+  tolerates prose, but only Grades are recorded for now
 - Machine transport (HTTP, MCP), Tutor authentication, Tutor identity in the record
 - Learning Sessions spanning more than one notebook
 - AI-assisted request shaping (the "smart" generator)
@@ -199,7 +200,7 @@ and ignores it rather than rejecting the Report.
 - Note titles become protocol identifiers within a notebook. Duplicate titles in
   one notebook are ambiguous and must be reported as unmatched, never guessed.
 - Renaming a note between commissioning and recording breaks matching for that
-  item; the learner sees it as unmatched rather than silently losing a score.
+  item; the learner sees it as unmatched rather than silently losing a Grade.
 - Growing to descriptive feedback, recommendations, or a machine transport is
   additive — Session Item (in the documents) and Feedback (as RecallLog) already
   carry the concepts.
@@ -224,19 +225,18 @@ and ignores it rather than rejecting the Report.
 
 - Note titles are unique within a notebook in practice.
 - Learners can copy and paste between Doughnut and their Tutor's channel.
-- People and LLMs can follow a short rubric well enough for a 1–4 score to mean
+- People and LLMs can follow a short rubric well enough for a 1–4 Grade to mean
   something.
 - The tutoring status the Request exposes is enough for a Tutor to pitch the
   session appropriately.
 
 ## Options considered
 
-- **Tutor scores 1–4 identical to FSRS G** (`1` Again, `2` Hard, `3` Good,
-  `4` Easy; `score = G`) — accepted (Decision above). The Request rubric is
-  those four lines; latest tutor feedback is **4/3/2/1** from `EASY` / `GOOD` /
-  `HARD` / `AGAIN`.
+- **Tutor Grades 1–4 identical to FSRS G** (`1` Again, `2` Hard, `3` Good,
+  `4` Easy) — accepted (Decision above). The Request rubric is those four
+  lines; latest tutor feedback is that Grade's `G`.
 - **A 0–5 rubric with a shifted Good/Hard/Easy map** — rejected: valid report
-  scores are 1, 2, 3, and 4; the score is G.
+  Grades are 1, 2, 3, and 4; the numeric value is G.
 
 ## Related
 
