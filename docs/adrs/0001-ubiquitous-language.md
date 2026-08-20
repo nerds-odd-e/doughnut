@@ -11,11 +11,11 @@ Doughnut’s product vocabulary should be **consistent**: each idea has one name
 and each name means one thing. Humans, UI copy, APIs, and coding agents then
 share those terms.
 
-This ADR is the **canonical ubiquitous language** for Doughnut domain
-terms other than recall and spaced-repetition scheduling. Prefer these
-meanings in UI copy, APIs, tests, and code identifiers. This glossary is
-amended in place. Add or change domain terms here; do not supersede this
-ADR with a new one. Recall, memory-state, and schedule terms live in
+This ADR is the **canonical ubiquitous language**. The glossary below is
+the source of truth; prefer these meanings in UI copy, APIs, tests, and
+code identifiers. This glossary is amended in place. Add or change domain
+terms here; do not supersede this ADR with a new one. Spaced-repetition
+DSR and schedule terms live in the **Spaced repetition glossary** of
 [ADR 0003](./0003-spaced-repetition-scheduling-policy.md).
 
 ## Notebook / note structure
@@ -64,8 +64,7 @@ ADR with a new one. Recall, memory-state, and schedule terms live in
   Q-id).
 - **Skip Memory Tracking** — Notebook setting that opts the notebook out
   of the assimilation sequence and blocks Bazaar subscribe. Distinct
-  from **Remove from recall**
-  ([ADR 0003](./0003-spaced-repetition-scheduling-policy.md)).
+  from **Remove from recall**.
 
 ## Book
 
@@ -116,9 +115,42 @@ ADR with a new one. Recall, memory-state, and schedule terms live in
   to create per day (profile or subscription). Spelling and commissioned
   trackers do not consume this count.
 
-Recall, **memory tracking**, **recall prompt** / **MCQ** / **just
-review**, **New**, DSR (**Stability** / **Difficulty** /
-**Retrievability**), **RecallLog**, and schedule fields:
+## Recall
+
+- **Memory tracker** — One learner's scheduled memory for a note (or
+  **property**). Types (how it is created): **understanding**,
+  **spelling**, **property**, **commissioned**.
+- **Memory tracking** — Creating and maintaining memory trackers.
+  Tracker-level opt-out is **Remove from recall**.
+- **Recall** — Spaced retrieval of assimilated material. Doughnut name
+  for FSRS **review** (recall is better than review). Methods: **recall
+  prompt** or **just review**.
+- **Recall prompt** — One ask during recall for a memory tracker. Kinds:
+  **spelling** (no MCQ) or **MCQ** (the prompt HAS_A an MCQ). An MCQ is
+  not a type of recall prompt.
+- **MCQ** — Multiple-choice content on a note (stem, choices, solution).
+  A recall prompt may have an MCQ; an MCQ is not a type of recall prompt.
+  Origin (AI-generated vs manually added) is how the content was produced,
+  not a prompt kind.
+- **Contested** — Marks an MCQ as not feasible. Distinct from a kind of
+  recall prompt.
+- **Contest** — Challenge an MCQ shown in a recall prompt; the MCQ may be
+  marked contested and replaced.
+- **Just review** — Recall by reviewing the note and self-evaluating.
+  Short UI: **Just review**.
+- **Answer** — The learner's response to a **recall prompt**. Prompt
+  grades and **confusion** link a RecallLog row to this answer.
+- **Accidental match** — Spelling answer that fails the note under recall
+  but names another accessible note by title or plain alias. Transitions:
+  [ADR 0003](./0003-spaced-repetition-scheduling-policy.md).
+- **Remove from recall** — Stop an existing memory tracker from appearing
+  in recall; the unit does not re-enter the assimilation sequence. Short
+  UI: **Remove** / **Remove from recall**. Not a grade.
+- **Revive** — Re-enable recall for a tracker that was removed from
+  recall. Short UI: **Revive**. Not a grade.
+
+**New**, DSR (**Stability** / **Difficulty** / **Retrievability**),
+**RecallLog**, and schedule fields: **Spaced repetition glossary** in
 [ADR 0003](./0003-spaced-repetition-scheduling-policy.md).
 
 ## Focus context
@@ -126,16 +158,14 @@ review**, **New**, DSR (**Stability** / **Difficulty** /
 - **Focus context** — Bounded neighborhood around a **focus note** (depth
   0) plus related notes reached by wiki links, inbound references, and
   sampled folder peers, within a token budget. Used for conversation,
-  recall-prompt generation
-  ([ADR 0003](./0003-spaced-repetition-scheduling-policy.md)), note
-  automation, Learning Session Request, and export.
+  recall-prompt generation, note automation, Learning Session Request,
+  and export.
 - **Focus note** — The center note of a **focus context** (depth 0).
 
 ## Conversation
 
 - **Conversation** — Thread of messages about a **note** or **recall
-  prompt** ([ADR 0003](./0003-spaced-repetition-scheduling-policy.md)).
-  Participants may be humans and/or the **AI Assistant**.
+  prompt**. Participants may be humans and/or the **AI Assistant**.
 - **Message** — One utterance in a conversation
 - **Message center** — Inbox UI for conversations and unread state.
   Short UI: **Messages**
@@ -151,7 +181,6 @@ commission from Doughnut:
   coordinates Learning Sessions
 - **Commissioned memory tracker** — Memory tracker maintained through
   commissioned Learning Sessions rather than ordinary **recall**
-  ([ADR 0003](./0003-spaced-repetition-scheduling-policy.md))
 - **Tutor** — Party that conducts a Learning Session from the request and
   produces a report; may be a person or an AI assistant, and is outside
   Doughnut
@@ -171,17 +200,19 @@ commission from Doughnut:
 ## Alignment policy
 
 - Features, tests, OpenAPI names, and packages follow this glossary.
-  Recall and schedule names follow
+  Spaced-repetition DSR and schedule names follow the **Spaced
+  repetition glossary** in
   [ADR 0003](./0003-spaced-repetition-scheduling-policy.md).
 - Same nouns in UI, API, and schema, with **minimum DTO**. Do not
 introduce a translation type that wraps one as the other.
-- Agents treat this ADR as binding for naming choices except recall and
-  schedule terms (ADR 0003). Humans and agents share an explicit
-  dictionary instead of inferring synonyms.
+- Agents treat this ADR as binding for naming choices. Spaced-repetition
+  DSR and schedule terms follow ADR 0003. Humans and agents share an
+  explicit dictionary instead of inferring synonyms.
 
 ## Prerequisites / Assumptions
 
-- Recall and schedule terms are constrained by
+- Spaced-repetition DSR and schedule terms are constrained by the
+  **Spaced repetition glossary** in
   [ADR 0003](./0003-spaced-repetition-scheduling-policy.md).
 
 ## Related
@@ -191,6 +222,6 @@ introduce a translation type that wraps one as the other.
 - Links: playbook [README.md](./README.md); ADR-0000
 [use-adrs-accepted.md](./0000-use-adrs-accepted.md); ADR 0003
 [spaced-repetition scheduling policy](./0003-spaced-repetition-scheduling-policy.md)
-(recall and schedule glossary); ADR 0004
+(**Spaced repetition glossary**); ADR 0004
 [OKF-compatible notebook Markdown](./0004-okf-compatible-notebook-markdown-accepted.md)
 (portable Markdown profile)
