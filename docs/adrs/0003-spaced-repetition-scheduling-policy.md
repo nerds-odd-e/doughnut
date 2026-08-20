@@ -7,375 +7,207 @@
 
 ## Context
 
-Doughnut's recall schedule follows the **open FSRS-6** model. This ADR
-locks that compliance and names every deliberate divergence from
-published open FSRS.
+Doughnut bases its recall schedule on open FSRS-6. The product needs stable
+language for memory state and durable policy for how recall outcomes affect a
+schedule.
+
+This ADR is the canonical reference for Doughnut's spaced-repetition domain
+concepts. It deliberately does not restate executable details already expressed
+by the implementation, such as formulas, weights, persistence columns, wire
+values, rounding steps, or worked examples.
 
 ## Decision
 
-This ADR's **Spaced repetition glossary** locks DSR and schedule terms.
-Doughnut owns its open-FSRS implementation rather than adopting a library.
-Product recall language: [ADR 0001](./0001-ubiquitous-language.md). When citing
-FSRS, pair once then use Doughnut terms.
+### Authority boundary
 
-### Doughnut vs FSRS terms and card states
+The **Spaced-repetition glossary** below owns the meaning of Doughnut's
+spaced-repetition terms. Amend it in place when a domain concept changes, and
+use the same meanings in product language, code, APIs, and tests. General
+product recall language remains in [ADR 0001](./0001-ubiquitous-language.md).
 
-In Doughnut, **recall** names the activity that FSRS calls a **review**. The
-product prefers “recall” because it describes retrieving a memory more
-precisely than “review.” **Just review** is one method of recall.
+This ADR also records durable scheduling policy: which events affect memory,
+which inputs are relevant, and the invariants those transitions preserve.
+Source code and tests own the exact FSRS mechanics and their numeric outcomes.
+A mechanical change within these policies does not need prose copied here; a
+change to a concept or policy does.
 
-**Assimilation** is the initial intake action that creates a **New** memory
-tracker. Its closest FSRS analogue is creating a **New** card. A Doughnut
-**memory tracker** corresponds to an FSRS **card**. Doughnut does not persist
-or transition through the FSRS scheduler's **Learning**, **Review**, and
-**Relearning** card states, and has no learning or relearning step list.
+### Doughnut and FSRS language
 
-### Spaced repetition glossary
+In Doughnut, **recall** is the activity that FSRS calls a **review**. **Just
+review** is one method of recall, alongside a recall prompt. A Doughnut **memory
+tracker** corresponds to an FSRS card.
 
-- **New** — Ungraded memory tracker (`S = 0`, Difficulty unset / **N/A**).
-  Created by assimilation and due immediately: `nextRecallAt = assimilatedAt`.
-  The first grade initializes Stability and Difficulty, after which the
-  tracker is no longer New.
-- **Stability** — Persisted current interval of a memory tracker, in
-  whole hours.
-- **Difficulty** — Persisted memory state in `[1, 10]`.
-  Fallback **5** when Stability > 0 and Difficulty is null.
-- **Retrievability** — FSRS `R`: predicted probability of recall at
-  elapsed time since `lastRecalledAt`, given Stability. Computed during
-  long-term grading to calculate next Stability; not stored.
-- **Requested retention** — FSRS `request_retention`: desired recall rate
-  at due. Locked at **0.9**, so `I(0.9, S) = S`.
-- **Scheduled interval** — FSRS `I(r, S)`: interval for requested retention
-  `r` and Stability `S`. Scheduling uses whole hours.
-- **Maximum interval** — Global, non-persisted FSRS `S_MAX`: **36500 days** =
-  **876000 whole hours**. Clamp each computed next Stability to this maximum,
-  then derive due from the capped value.
-- **`lastRecalledAt`** — Time of the last grade (FSRS
-  `last_review`). Unset on New.
-- **`assimilatedAt`** — Time the tracker was created by assimilation.
-  New due.
-- **`nextRecallAt`** — Due time. After a grade,
-  `lastRecalledAt + I(0.9, S)`.
-- **RecallLog** — One persisted memory-state transition (FSRS-shaped
-  review history). Schema: **RecallLog** below.
-- **Thinking time** — Duration the prompt measured while the learner
-  answered. Recorded on the answer for display; not a memory-state input.
-- **Confusion** — Secondary memory-state adjustment on the matched note's
-  tracker after an accidental match. Not a grade and not FSRS Again.
-- **Overlap** — Declared non-distinguishing spelling outcome. No memory
-  change.
+**Assimilation** creates a New memory tracker. Doughnut does not model FSRS
+Learning, Review, and Relearning as product states and has no learning or
+relearning step list.
 
-### Lapses
+### Spaced-repetition glossary
 
-There is **no lapse count**; do not persist or display one. Open FSRS-6
-After-Again Stability does not consume it. Again outcomes remain on
-**RecallLog**; repeated failures surface through the **frequent-failure
-warning**, not the memory state. See **Incorrect recall (Again)** for the
-post-lapse rule.
+- **New** — A memory tracker that has not been graded. It is due immediately.
+  Its first Grade establishes its initial memory state.
+- **Stability** — The interval over which a memory is expected to remain
+  recallable at the requested retention. Higher Stability means slower
+  forgetting and normally permits a longer scheduled interval.
+- **Difficulty** — The estimated inherent difficulty of retaining a memory.
+  Higher Difficulty reduces the Stability gained from a successful recall.
+- **DSR** — The FSRS memory model described by Difficulty, Stability, and
+  Retrievability. Difficulty and Stability describe the current memory;
+  Retrievability is derived for a particular elapsed time.
+- **Retrievability** — The predicted probability of recalling a memory at a
+  particular elapsed time, given its Stability. It is an input to a scheduling
+  transition, not part of the persisted current memory state.
+- **Requested retention** — The product's target probability of successful
+  recall at the scheduled time. It determines the scheduled interval implied
+  by Stability.
+- **Scheduled interval** — The duration from a graded recall to the next due
+  time at the requested retention.
+- **Maximum interval** — The product-wide upper bound on a scheduled interval.
+  It prevents unbounded schedules and is not a learner setting.
+- **Last recalled at** — The time of the latest Grade for a memory tracker. New
+  trackers do not have one.
+- **Assimilated at** — The time a memory tracker was created through
+  assimilation. It anchors the immediate due time while the tracker is New.
+- **Next recall at** — The time at which a memory tracker is next due.
+- **Grade** — The single scheduling evaluation of a recall: **Again**, **Hard**,
+  **Good**, or **Easy**, in increasing order of demonstrated recall. Recall
+  prompts, just review, and Tutor Feedback all use this concept.
+- **RecallLog** — The durable history of scheduling events for one memory
+  tracker. It records Grades and confusion adjustments in enough context to
+  explain and reconstruct the tracker's memory state.
+- **DSR snapshot** — The current Difficulty, Stability, and recall timing of a
+  memory tracker. It is the queryable projection of that tracker's RecallLog,
+  not a separate source of historical truth.
+- **Thinking time** — How long the learner took to answer a measured prompt.
+  It may be reported to the learner but is not evidence of memory state.
+- **Confusion** — A secondary, deliberately weaker memory adjustment when a
+  spelling answer accidentally identifies another eligible note. It is not a
+  Grade or recall credit.
+- **Overlap** — A declared non-distinguishing spelling outcome. It is neither a
+  Grade nor a memory-state transition.
 
-### Fuzz
+### FSRS profile
 
-There is **no interval fuzz**: do not jitter Stability or due. Open FSRS may
-randomize intervals to spread same-calendar-day clumps; Doughnut's whole-hour
-dues are already anchored to each recall instant. Session order among
-already-due items is not a memory-state concern.
+Doughnut owns its open-FSRS-6 implementation instead of adopting a scheduling
+library. It uses one product-wide requested retention and maximum interval;
+per-user fitting is deferred.
 
-### Difficulty on correct recall
+The scheduler uses elapsed time at whole-hour precision. It does not use
+calendar-day boundaries, interval fuzz, or FSRS card-state step lists.
+Short-term and long-term recall follow the corresponding open-FSRS-6 behavior.
 
-Harder items gain less Stability on a successful recall. Ordinary correct
-recall with Stability > 0 updates Stability with open-FSRS-6 Good
-rules (own implementation) and Difficulty with Good next-D (see **Difficulty
-after a grade**).
+### Lapse
 
-### First rating on New
+A **Lapse** is an Again Grade on a previously graded tracker. FSRS-6 derives
+post-lapse Stability from the tracker's Difficulty, Stability, and
+Retrievability; cumulative lapse count is not a scheduling input. Doughnut
+represents lapse history as Again outcomes in RecallLog and uses that history
+for the frequent-failure warning.
 
-Every grade on a New tracker uses published FSRS-6 first-rating (own
-implementation, frozen `Fsrs.W`), with Grade `G`:
+### Grade transitions
 
-- Stability `S0(G) = w[G−1]` days, persisted as whole hours. With frozen weights: Again **5**, Hard **31**, Good **55**, Easy **199**.
-- Difficulty is `D0(G)` clamped to `[1, 10]`, persisted as the Java float from that formula (API number, no extra rounding). Persisted first Easy Difficulty is **1**.
-- `D0(Easy)` stays **unclamped** as the later mean-reversion target (see **Difficulty after a grade**).
-- Elapsed time does **not** change first-rating; see **RecallLog**.
+A Grade is evaluated from the memory state immediately before the recall and
+the elapsed time since the previous Grade:
 
-### Difficulty after a grade
+- The first Grade of a New tracker initializes Stability and Difficulty.
+- Again represents failed recall and weakens the memory state without creating
+  a permanent short-interval trap.
+- Hard, Good, and Easy represent successful recall. Their effect increases in
+  that order, while more difficult memories gain less Stability.
+- A successful overdue recall may gain more Stability than an otherwise equal
+  recall at the scheduled interval. That extra growth is based on elapsed time
+  and Retrievability, not on punishment or reward for queue compliance, and is
+  bounded.
 
-When Stability > 0, a grade updates Difficulty with published open
-FSRS-6 next Difficulty (own implementation, frozen `Fsrs.W`), using Grade `G`:
+Every Grade advances Last recalled at, appends to RecallLog, updates the DSR
+snapshot, and schedules the next recall strictly after the Grade. Queue
+lateness, thinking time, time zone, and time of day are not memory-state inputs.
 
-- `ΔD = -w6 · (G − 3)`
-- `D' = D + ΔD · (10 − D) / 9`
-- `D'' = w7 · D0(Easy) + (1 − w7) · D'`, then clamp to `[1, 10]`
-- `D0(G) = w4 − e^{w5·(G−1)} + 1`; **`D0(Easy)` is unclamped** `D0(4)` (negative with default weights)
+All sources of a Grade have the same scheduling meaning. In particular, Tutor
+Feedback from a commissioned Learning Session is a Grade at its recorded time.
+A Session Item without Feedback supplies no Grade and therefore does not change
+its memory tracker. Tutor semantics are defined by [ADR
+0005](./0005-commissioned-learning-session-protocol.md).
 
-New first-rating uses clamped `D0(G)` (see **First rating on New**). Confusion
-does not change Difficulty. Display the persisted API number without extra
-rounding.
+### Accidental matches, confusion, and overlap
 
-### Grade
+Without a declared Overlap, an accidental spelling match has two possible
+effects:
 
-**Grade** is the single scheduling evaluation concept. Its numeric value **is**
-FSRS `G`:
+1. The tracker under recall receives Again.
+2. When the answer identifies exactly one accessible note with an eligible
+   active note-level tracker, that matched tracker receives Confusion.
 
-| Grade | G | Meaning and Stability effect when `S > 0` |
-|-------|---|---------------------------------------------|
-| Again | 1 | Failed recall; ordinary incorrect-recall update |
-| Hard | 2 | Difficult success; below Good, never below current `S` |
-| Good | 3 | Successful recall; ordinary correct-recall update |
-| Easy | 4 | Easy success; above Good |
+Confusion must remain less harmful than Again. It may bring the due time closer
+and weaken Stability, but it does not change Difficulty, count as a Grade or
+failed recall, or become the Last recalled at anchor. It remains attributable
+to the answer that caused it. If there is no unambiguous eligible tracker, no
+secondary adjustment is made.
 
-Hard, Good, and Easy inherit the bounded overdue extra. Every grade updates
-Difficulty by **Difficulty after a grade**.
+For a declared Overlap, neither tracker receives recall credit, Again, or
+Confusion. Their schedules remain unchanged and the learner retries with a more
+specific answer.
 
-Recall prompts, **just review**, and Tutor **Feedback** all submit a Grade.
-**Confusion** and **Overlap** are not grades (see **Accidental-match and
-overlap transitions**). There is no separate Tutor “score” or Yes/No domain
-concept.
+### Recall history and current state
 
-### Just review
+RecallLog is the durable sequence of Grades and Confusion events. A prompt
+event remains attributable to its Answer; a Grade from just review or Tutor
+Feedback need not have an Answer.
 
-Just review stays **two buttons**: **Good** and **Again**. Labels are grade
-names, not Yes/No. Hard and Easy remain available via commissioned Learning
-Sessions (and other graded paths that offer all four), not just review.
-
-### Commissioned Learning Session feedback
-
-A commissioned memory tracker is graded from Tutor Feedback (a **Grade**), not
-a Doughnut recall prompt. Vocabulary:
-[ADR 0001](./0001-ubiquitous-language.md); Tutor semantics: [ADR
-0005](./0005-commissioned-learning-session-protocol.md). Shared rules:
-
-- A recorded Grade at its recorded time counts the recall, sets
-  `lastRecalledAt`, and updates and reschedules the tracker by the common rules.
-- A Session Item that never receives Feedback supplies no graded recall result: its tracker stays unchanged and the item is abandoned with its session.
-- Effort is neutral. A Tutor session carries no trustworthy effort measurement.
-- A late session does not weaken the result.
-- A commissioned tracker is presented only when the learner commissions
-  another Learning Session.
-- On New, use **First rating on New**.
-
-### Incorrect recall (Again)
-
-Ordinary incorrect recall (MCQ, just review Again, spelling fail) is FSRS **Again**.
-
-When Stability is greater than 0, elapsed whole hours **< 24** use the
-short-term rule in **Whole-hour elapsed-time precision** with `G = 1`; elapsed
-**≥ 24** uses open-FSRS-6 post-lapse Stability. Compute `Sf`, then persist
-`S' = min(current S, max(1, round(Sf)))` whole hours. Ordinary incorrect also
-uses Again next Difficulty.
-
-On New, Again follows **First rating on New**. Failure must not permanently
-trap the tracker; later correct recalls must be able to restore expanding
-intervals.
-
-### Overdue correct recall: bounded extra growth
-
-A correct recall after more elapsed whole hours than the tracker's
-**Stability** must result in a next Stability **strictly longer** than the
-same correct recall at elapsed hours equal to that Stability. Extra growth
-is driven by elapsed time vs Stability
-(low Retrievability), not by lateness vs `nextRecallAt`. It is **bounded**:
-further delay must not increase the next interval without limit. A linear
-lateness bonus is not allowed. Exact increment math is an implementation
-detail; policy tests assert the observable next interval in hours.
-All mapped correct grades inherit this extra; Again does not.
-
-### Whole-hour elapsed-time precision
-
-Recall transitions use the mapped outcome and memory state. Their time input is
-**whole elapsed hours** between the current recall time and `lastRecalledAt`,
-discarding any sub-hour remainder. Queue lateness vs `nextRecallAt` is not an
-input. This is independent of time zone and calendar day; morning/afternoon
-recall windows make day precision too coarse.
-When elapsed whole hours are **< 24** and Stability is greater than 0, all four
-grades update Stability with published open FSRS-6 short-term next
-Stability (own implementation, frozen `Fsrs.W`): convert persisted whole hours to days,
-`S' = S · e^{w17 · (G − 3 + w18)} · S^{-w19}`, then persist whole hours.
-Clamp **SInc ≥ 1** only for **G ≥ 2** so Hard/Good/Easy next Stability does
-not shrink. Again (G=1) may shrink. Floor **1 hour**. With frozen weights
-and rounding, short-term next Stability: Good **24h** → **25h**; Easy
-**24h** → **43h**; Hard **24h** stays **24h** (clamp); Good **72h** stays
-**72h** (clamp); same-hour Again after first Good **55h** → **18h**;
-same-hour Again on **72h** / D=5 → **24h** (elapsed 0 and 23 are the same
-next S). Elapsed whole hours **≥ 24** use long-term next Stability; Again
-is then post-lapse (see **Incorrect recall (Again)**): on-time **72h** /
-D=5 → **17h**, elapsed **24** → **15h**; on-time after first Good **55h**
-→ **15h**; **5h** / D=**1** / elapsed **8760** stays **5h**, not **6h**.
-See **Accidental-match and overlap transitions** for confusion and **First
-rating on New** for Stability 0. Observable pin:
-New → Again
-(`S0(1)` = **5h**) → Good at elapsed 5 → short-term next Stability **6h**
-(not long-term **21h**).
-
-### Thinking time
-
-Record thinking time on the answer when the prompt measured it. Show it in
-recall statistics and Memory Tracker prompt history.
-
-### Accidental-match and overlap transitions
-
-Unless the notes have a declared overlap, an accidental match has the
-following consequences:
-
-1. The spelling tracker under recall receives the ordinary incorrect-recall
-   transition, including its full negative memory-state adjustment and due.
-   It advances `lastRecalledAt` and `recallCount` and counts as a failed
-   recall for that tracker.
-2. A secondary **confusion adjustment** applies only when the answer matches
-   exactly one accessible note and that learner has an eligible active tracker
-   for it. Prefer its spelling tracker; otherwise use its note-level
-   understanding tracker. Never select a property or commissioned tracker, a
-   removed or deleted tracker, or create a tracker implicitly.
-3. The confusion adjustment must stay strictly weaker than ordinary incorrect
-   recall. When Stability is greater
-   than 0, next Stability is the whole-hour midpoint of current Stability and
-   FSRS-6 Again Stability for the same Difficulty (using the glossary fallback),
-   elapsed whole hours vs `lastRecalledAt`, and current Stability.
-   Floor 1 hour. Next Stability must be less than current Stability and
-   greater than Again Stability when rounding still distinguishes them.
-   Difficulty, `lastRecalledAt`, and `recallCount` are unchanged. Due never
-   later (`min(existing due, lastRecalledAt + I(0.9, S))`). Stability 0
-   stays 0. It must not count as a failed recall.
-4. The primary incorrect transition and any secondary confusion adjustment are
-   one atomic grading operation. The secondary adjustment must remain durably
-   attributable to the accidental-match answer that caused it.
-5. When no eligible secondary tracker exists, or more than one accessible note
-   matches, only the tracker under recall changes. Do not choose a matched note
-   arbitrarily.
-
-A declared **overlap** is a separate, non-distinguishing outcome: the answer is
-accepted by the note under recall, that note explicitly declares overlap with
-another accessible note, and the same answer is accepted by the declared note.
-Neither tracker receives recall credit, an incorrect transition, or a confusion
-adjustment; schedule fields stay unchanged. Retry in session with a more specific answer.
-
-### Strictly-future fallback (non-positive interval)
-
-After a grade, the tracker must be due strictly after the recorded time. When
-the computed interval is non-positive (due would be at or before the grade
-instant), schedule **24 hours** after the recorded time. This fallback is not
-first-rating Stability. The DSR snapshot may leave a due already past relative
-to now (see **DSR snapshot**); do not clamp that due to now.
-
-### Manual and admin paths
-
-`mark-as-recalled` uses the **Just review** Grades (Good / Again). `remove` and `revive` do
-not write `lastRecalledAt`.
-
-### Spelling memory tracker
-
-Creation and assimilation-quota semantics are defined by [ADR
-0001](./0001-ubiquitous-language.md). Grading follows
-**Accidental-match and overlap transitions**.
-
-### Frequent-failure warning
-
-When a tracker has ≥ 5 incorrect recalls in the last 14 days, Doughnut warns
-the learner (`wrongCount`, `threshold`, `periodDays`) and does not change the
-schedule or remove the tracker. **Overlap** does not count. Property trackers
-name the property. No confirm action.
-
-### RecallLog
-
-A `recall_log` has `memory_tracker_id`, `recorded_at`, `elapsed_hours`,
-`product_outcome`, and optional `answer_id`. Tutor Feedback is a log row, not a
-session bag.
-
-`elapsed_hours` is always present (whole hours; see **Whole-hour elapsed-time
-precision**) and required. The first grade on a tracker is **0**. Later
-grades are whole hours since the previous grade's `recorded_at`
-on that tracker (`GOOD` / `EASY` / `HARD` / `AGAIN`). `CONFUSION` uses the same
-elapsed vs the last grade, else **0**, and is not an anchor. Order is
-`recorded_at`, then `id`. A negative diff is **0**.
-
-A row has `answer_id` xor none: prompt grade and confusion set `answer_id`;
-just review and Tutor Feedback set none. Do not store `recall_prompt_id`
-(redundant with `answer` → `recall_prompt`).
-
-Do not store FSRS G, Retrievability, `I`, or pre/post Stability/Difficulty.
-Current Stability, Difficulty, `lastRecalledAt`, and `nextRecallAt` stay on
-`memory_tracker` (see **DSR snapshot**). `next_recall_at` stays the due-work
-index.
-
-`product_outcome`: `GOOD` | `EASY` | `HARD` | `AGAIN` | `CONFUSION`. The first
-four are Grades; `CONFUSION` is not. Latest tutor feedback is the latest
-persisted Grade
-([ADR 0005](./0005-commissioned-learning-session-protocol.md)).
-
-### DSR snapshot
-
-The persisted DSR on `memory_tracker` (`Stability`, `Difficulty`,
-`lastRecalledAt`, `nextRecallAt`) is a **cache of folding that tracker's
-RecallLog** under this locked policy. Live grading still updates the snapshot
-on each grade and on confusion. Do **not** fold the log on every
-due-work query.
-
-Fold semantics:
-
-- Fold **every** tracker that has at least one grade (`GOOD` / `EASY` /
-  `HARD` / `AGAIN`), from New, in `recorded_at`, then `id` order. Use **stored**
-  `elapsed_hours`. The first grade is first-rating.
-- **Leave** New, confusion-only, and `S > 0` with no mapped-grade log.
-  Include **removed-from-tracking**. Skip `deleted_at IS NOT NULL`.
-- Write Stability, Difficulty, `lastRecalledAt` (last mapped `recorded_at`),
-  and `nextRecallAt` by the common scheduled-interval and fallback rules.
-  **Past due is allowed**; do not clamp to now.
-- Fold confusion by **Accidental-match and overlap transitions**.
-
-### Deferred
-
-- **E4:** Fitting / per-user weights
+The DSR snapshot is updated transactionally with each scheduling event so due
+work remains a direct query. It can be rebuilt deterministically from RecallLog
+when needed; normal due-work queries do not replay the log. Removed trackers
+retain their history, while deleted trackers are outside reconstruction.
 
 ## Consequences
 
-- Busy users are judged on demonstrated recall, not schedule compliance.
-- Aligns memory-state transitions with recall results rather than availability,
-  and prevents immediate/daily traps after correct answers.
-- Overdue correct recall lengthens Stability more than on-time correct recall
-  at the same Stability; monitor interval lengths and success rates.
-- Tutor Feedback is a grading source alongside Doughnut's own recall prompts
-  and just review.
-- Due-work stays a snapshot read. Some trackers may be honestly past due
-  (see **DSR snapshot**).
-- Allows a data-fitted scheduler later without a library lock-in; per-user
-  fitting remains deferred.
+- Spaced-repetition terminology has one official domain reference without
+  turning the ADR into a second implementation.
+- Scheduling responds to demonstrated recall and elapsed time, not compliance
+  with the due queue.
+- All Grade-producing experiences share one transition model.
+- RecallLog explains history while the DSR snapshot keeps due-work queries
+  efficient.
+- Algorithm mechanics can evolve within this policy without synchronizing
+  formulas or numeric examples in prose.
+- A change to the meaning of a concept or to a transition invariant requires an
+  ADR update as well as an implementation change.
 
 ## Prerequisites / Assumptions
 
-- Graded outcomes are trustworthy enough to be the primary scheduling signal.
-- Answer time and the current tracker snapshot are available when grading;
-  mapped-grade RecallLog rows are sufficient to rebuild the **DSR snapshot**.
+- Grades are trustworthy enough to be the primary scheduling signal.
+- A scheduling event has the current tracker state, its recorded time, and the
+  elapsed time needed to apply the policy.
+- RecallLog carries enough information to reconstruct the DSR snapshot.
 
 ## Options considered
 
-- **Overdue handling** — symmetric early/late penalties, on-time-only growth,
-  and linear lateness bonuses were rejected. They conflate queue compliance
-  with memory or miss the bounded effect of elapsed time vs Stability.
-- **Implementation** — Doughnut owns the FSRS-compatible implementation;
-  adopting an open-FSRS library was rejected.
-- **Rebuild DSR from RecallLog on every due-work query** — rejected: due-work
-  needs a queryable snapshot; do not fold at query time.
-- **Tutor rubric** — The canonical Grade scale was selected; a shifted 0–5
-  rubric was rejected.
-- **Just review Hard / Easy buttons** — rejected: just review is rare; keep
-  **Good** and **Again** only.
-- **Persist a lapse count** — rejected: scheduling does not consume it;
-  RecallLog and the frequent-failure warning already represent the history.
-- **FSRS interval fuzz** — rejected: due follows Stability; hour-precision
-  recall instants already spread same-calendar-day clumps.
-- **RT as Stability input** — rejected: thinking time is not a DSR input
-  (G, elapsed time, D/S/R only); record it for display instead.
-- **FSRS card states or last recall at assimilation** — rejected: New remains
-  ungraded until first-rating; there is no step list or card-state column.
-- **Calendar same-day short-term window** — rejected in favor of whole elapsed
-  hours.
-- **After-Again cap** — post-lapse `S'` cannot exceed current Stability;
-  extending that cap to the short-term rule was rejected.
+- **Adopt an open-FSRS library** — Rejected in favor of owning the
+  open-FSRS-compatible implementation and its Doughnut-specific policy.
+- **Judge early or overdue recall by queue compliance** — Rejected. Memory
+  transitions use elapsed time and Retrievability.
+- **Use a linear lateness bonus** — Rejected because overdue growth must remain
+  bounded.
+- **Rebuild DSR for every due-work query** — Rejected in favor of a queryable
+  snapshot backed by RecallLog.
+- **Separate lapse counter** — Rejected because RecallLog already represents
+  lapse history and drives the frequent-failure warning.
+- **FSRS card states** — Rejected because Doughnut does not use learning or
+  relearning step lists.
+- **Randomize intervals** — Rejected; Doughnut does not use interval fuzz.
+- **Use thinking time as a memory-state input** — Rejected. It is display and
+  analysis data only.
 
 ## Related
 
-- Tracker (pointer + deferred IDs, not a second policy map): [`.planning/research/FSRS-COMPATIBILITY-GAP.md`](../../.planning/research/FSRS-COMPATIBILITY-GAP.md)
-- ADR 0001 [ubiquitous language](./0001-ubiquitous-language.md) — notes, assimilation, recall, tracker types, commissioned Learning Session terms. This ADR is the **Spaced repetition glossary**.
-- ADR 0005 [commissioned learning session protocol](./0005-commissioned-learning-session-protocol.md) — what a Grade means to the Tutor
-- Anki answer semantics: <https://docs.ankiweb.net/studying.html#answer-buttons>
-- FSRS overdue-recall: <https://github.com/open-spaced-repetition/awesome-fsrs/wiki/The-Algorithm>
-- Reddy et al.: <https://arxiv.org/abs/1602.07032>
+- [ADR 0001: Ubiquitous language](./0001-ubiquitous-language.md) — general
+  recall, memory tracker, and assimilation language
+- [ADR 0005: Commissioned Learning Session
+  protocol](./0005-commissioned-learning-session-protocol.md) — Tutor Feedback
+  semantics
+- [`Fsrs`](../../backend/src/main/java/com/odde/doughnut/entities/Fsrs.java) —
+  exact algorithm, weights, constants, and numeric rules
+- [`MemoryTracker`](../../backend/src/main/java/com/odde/doughnut/entities/MemoryTracker.java)
+  — Grade and Confusion transitions and DSR snapshot updates
+- [`RecallLog`](../../backend/src/main/java/com/odde/doughnut/entities/RecallLog.java)
+  — persisted event shape
+- [FSRS algorithm reference](https://github.com/open-spaced-repetition/awesome-fsrs/wiki/The-Algorithm)
