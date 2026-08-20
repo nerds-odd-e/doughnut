@@ -74,7 +74,7 @@ Each slice is **Structure**: delete one backfill family; remaining tests pass; e
 ### 7. Drop removed-graded last-recall backfill
 
 - **Type:** Structure
-- **Status:** planned
+- **Status:** done
 - **Done:** `V300000278`, `RemovedGradedLastRecallBackfill`, and its test gone.
 
 ### 8. Drop alias RecallLog grade rewrite
