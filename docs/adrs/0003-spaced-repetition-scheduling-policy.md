@@ -2,23 +2,22 @@
 
 **Status:** Proposed  
 **Date:** 2026-08-05  
-**Decision makers:** Terry Yin (approval pending advice)  
-**Consulted:** To be filled by the decision maker
+**Decision makers:** Terry Yin
+**Consulted:** None
 
 ## Context
 
 The planned recall time is a queue target. Missing it can reflect
-availability, queue size, MCQ readiness, or system behavior — not that the
-learner forgot. A memory-state transition uses the recall outcome and the
-actual elapsed time since the previous state-changing recall.
+availability, queue size, MCQ readiness, or system behavior. A
+memory-state transition uses the recall outcome and the actual elapsed
+time since the previous state-changing recall.
 
-Established schedulers (including FSRS) separate memory-state inputs from
-schedule compliance: successful overdue recall is not a failure. This ADR
-states Doughnut's durable scheduling policy, the locked open FSRS-6 shape
+Established schedulers (including FSRS) treat schedule compliance as
+separate from memory-state inputs: a successful overdue recall still
+updates memory from the outcome and elapsed time. This ADR states
+Doughnut's durable scheduling policy, the locked open FSRS-6 shape
 (own implementation, frozen weights, requested retention 0.9, maximum
-interval), and safety properties. Meeting or missing the due time is not
-an input to the memory-state transition even when a one-time RecallLog
-rebuild leaves a tracker past due (see **DSR snapshot**).
+interval), and safety properties.
 
 ## Decision
 
@@ -46,26 +45,22 @@ state, qualitative update rules), not with a particular crate or version.
   When `I` is non-positive, due is 24 hours after the grade (strictly-future
   fallback). A **New** tracker has Stability 0, `lastRecalledAt` unset, and
   `nextRecallAt = assimilatedAt` (due now). First mapped grades on New use
-  first-rating (see **First rating on New**); due then comes from `I`, not
-  from the 24-hour fallback. Spacing is Stability, not a Settings day list.
-  Live scheduling must not walk a spacing-index ladder.
+  first-rating (see **First rating on New**); due then comes from `I`
+  (`I` non-positive → 24h).
 - **Retrievability** is computed from elapsed whole hours and Stability, not stored.
 - A recall transition consumes the graded outcome, elapsed time, and that state — never queue lateness.
-- **Requested retention** `r` is a **global constant 0.9** — not a Settings
-  knob, not persisted, and not otherwise configurable. It may be shown
+- **Requested retention** `r` is a **global constant 0.9**. It may be shown
   read-only in recall statistics (e.g. the heatmap color anchor). There is
   **no lapse count** (see **Lapses**). Memory-state transitions are a
   **RecallLog** (see **RecallLog**).
 - **Maximum interval** is a **global constant 36500 days** (open FSRS
-  `S_MAX`), compared and persisted as **876000 whole hours** — not a Settings
-  knob, not persisted as its own field, and not otherwise configurable. It is
-  not shown as its own UI; Memory Tracker still shows Stability (migrated
-  rows may drop). After next Stability is computed (FSRS update, confusion
-  midpoint), on every write of next Stability: `S = min(S, 876000)`. Due
-  follows from that S (`nextRecallAt = lastRecalledAt + I(0.9, S)`). Do not
-  keep an unbounded S beside a capped due. Same strictly-future fallback
-  when `I` is non-positive. Existing over-cap rows **will** be clamped (S
-  and due). There is **no interval fuzz** (see **Fuzz**).
+  `S_MAX`), compared and persisted as **876000 whole hours**. It is not a
+  persisted field. Memory Tracker shows Stability. After next Stability is
+  computed (FSRS update, confusion midpoint), on every write of next
+  Stability: `S = min(S, 876000)`. Due follows from that S
+  (`nextRecallAt = lastRecalledAt + I(0.9, S)`). Stability and due stay
+  consistent under the same cap. Same strictly-future fallback when `I` is
+  non-positive. There is **no interval fuzz** (see **Fuzz**).
 
 ### Lapses
 
@@ -86,7 +81,7 @@ non-positive). Do not jitter Stability or due. Open FSRS may randomize the
 scheduled interval to spread same-calendar-day clumps; Doughnut already
 spreads dues because they are anchored to the actual recall instant in
 whole hours. Session order among already-due items is not a memory-state
-concern. Fuzz is not a Settings knob.
+concern.
 
 ### Difficulty on correct recall
 
@@ -94,7 +89,7 @@ Difficulty is persisted memory state in `[1, 10]`. It is shown on the Memory Tra
 
 A **New** tracker ([ADR 0001](./0001-ubiquitous-language.md)) has Stability 0, Difficulty unset / **N/A**, and no last recall (due from `assimilatedAt`; see Stability). There is no FSRS card-state machine: no Learning / Review / Relearning step list or column. The first mapped grade initializes Stability and Difficulty with FSRS-6 first-rating (see **First rating on New**); after that the tracker is a graded DSR tracker. Difficulty **5** remains only as the fallback when Stability > 0 and Difficulty is null.
 
-Ordinary correct recall with Stability > 0 updates Stability with open-FSRS-6 Good-equivalent rules (own implementation) and Difficulty with Good next-D. Locked overdue extra growth still holds.
+Ordinary correct recall with Stability > 0 updates Stability with open-FSRS-6 Good-equivalent rules (own implementation) and Difficulty with Good next-D.
 
 ### First rating on New
 
@@ -104,11 +99,10 @@ First mapped grade on a New tracker (ordinary correct / just review Yes / Tutor 
 - Difficulty is `D0(G)` clamped to `[1, 10]`, persisted as the Java float from that formula (API number, no extra rounding). Persisted first Easy Difficulty is **1**.
 - `D0(Easy)` stays **unclamped** as the later mean-reversion target (see **Difficulty after a mapped grade**).
 - Elapsed time does **not** change first-rating. Overdue extra does not apply.
-  First-mapped `elapsed_hours` is **0** (see **RecallLog**); that 0 still does
-  not change `S0`/`D0`.
+  First-mapped `elapsed_hours` is **0** (see **RecallLog**).
 - Due is `lastRecalledAt` plus those hours.
 
-Going-forward New has no memory-state grade: every mapped grade uses first-rating (all four G) and the tracker is no longer New.
+A New tracker has no mapped grade: the first mapped grade uses first-rating (all four G) and the tracker is no longer New.
 
 The 24-hour strictly-future fallback is for non-positive `I`, not a New first-rating interval.
 
@@ -205,8 +199,7 @@ D=5 → **17h**, elapsed **24** → **15h**; on-time after first Good **55h**
 → **15h**; **5h** / D=**1** / elapsed **8760** stays **5h**, not **6h**.
 Confusion is unchanged as a non-grade (inherits Again S). New (Stability 0)
 first-rating is unchanged by elapsed time (see **First rating on New**).
-The short-term rule is not a Settings knob. The one-time RecallLog fold
-uses this same locked window (see **DSR snapshot**). Observable pin:
+Observable pin:
 New → Again
 (`S0(1)` = **5h**) → Good at elapsed 5 → short-term next Stability **6h**
 (not long-term **21h**).
@@ -217,8 +210,6 @@ Thinking time is **not** a memory-state input. Memory-state transitions use
 grade G, elapsed whole hours, and D/S/R only. Record thinking time on the
 answer when the prompt measured it. Show it in recall statistics and Memory
 Tracker prompt history. It must not change Stability, Difficulty, or due.
-Do not rewrite existing Stability that was computed under a previous overlay.
-Do not replace the overlay with interval fuzz or any other due shuffle.
 
 ### Accidental-match and overlap transitions
 
@@ -263,9 +254,8 @@ adjustment; schedule fields stay unchanged. Retry in session with a more specifi
 After a grade, the tracker must be due strictly after the recorded time. When
 the computed interval is non-positive (due would be at or before the grade
 instant), schedule **24 hours** after the recorded time. This fallback is not
-first-rating Stability. Do not use the spacing-index ladder as this fallback.
-The one-time RecallLog fold may leave a due already past relative to now
-(see **DSR snapshot**); do not clamp that due to now.
+first-rating Stability. The DSR snapshot may leave a due already past relative
+to now (see **DSR snapshot**); do not clamp that due to now.
 
 ### Manual and admin paths
 
@@ -324,8 +314,7 @@ RecallLog** under this locked policy. Live grading still updates the snapshot
 on each mapped grade and on confusion. Do **not** fold the log on every
 due-work query.
 
-A **one-time Flyway** alignment already ran on long-lived databases (applied;
-not in the current migration chain). It aligned leftover snapshots:
+Fold semantics:
 
 - Fold **every** tracker that has at least one mapped grade (`GOOD` / `EASY` /
   `HARD` / `AGAIN`), from New, in `recorded_at`, then `id` order. Use **stored**
@@ -335,8 +324,8 @@ not in the current migration chain). It aligned leftover snapshots:
 - Write Stability, Difficulty, `lastRecalledAt` (last mapped `recorded_at`),
   and `nextRecallAt` = last + `I(0.9, S)`. Apply the 24-hour fallback only
   when `I` is non-positive versus that grade instant. **Past due is allowed**
-  (no clamp to now, no fuzz).
-- Confusion is today's non-grade: midpoint Stability; Difficulty and last
+  (do not clamp to now).
+- Confusion is a non-grade: midpoint Stability; Difficulty and last
   recall unchanged; due never later.
 
 ### Deferred
@@ -352,14 +341,12 @@ Empty pending accept.
 - Busy users are judged on demonstrated recall, not schedule compliance.
 - Aligns memory-state transitions with recall results rather than availability,
   and prevents immediate/daily traps after correct answers.
-- Some overdue correct answers will get longer intervals than today; existing
-  trackers were scheduled under different semantics — monitor interval lengths
-  and success rates after release.
+- Overdue correct recall lengthens Stability more than on-time correct recall
+  at the same Stability; monitor interval lengths and success rates.
 - Tutor Feedback is a grading source alongside Doughnut's own recall prompts
-  (and just review), and is the first place this policy quantifies an
-  adjustment.
-- Due-work stays a snapshot read. After the one-time RecallLog alignment,
-  some trackers may be honestly past due (see **DSR snapshot**).
+  and just review.
+- Due-work stays a snapshot read. Some trackers may be honestly past due
+  (see **DSR snapshot**).
 - Allows a data-fitted scheduler later without a library lock-in. Requested
   retention is locked at 0.9. Maximum interval is locked at 36500 days
   (876000 whole hours). A lapse count is not memory state. There is no
@@ -383,19 +370,12 @@ Empty pending accept.
 - **Adopt an open-FSRS library** — rejected: Doughnut owns the implementation.
 - **Name the FSRS-compatible shape without requiring a library** — accepted
   (Decision above).
-- **Overdue correct equals on-time increment only** — rejected as the
-  destination; the extra is required.
+- **Overdue correct equals on-time increment only** — rejected; the extra
+  is required.
 - **Linear lateness bonus (SM-2-style)** — rejected: extra must converge and
   follow elapsed time vs Stability, not `nextRecallAt`.
-- **Settings day list as the interval source** — rejected as the destination;
-  spacing is persisted Stability in whole hours. Requested retention is a
-  global constant 0.9, not a Settings knob. Maximum interval is a global
-  constant (36500 days / 876000 whole hours), not a Settings knob.
 - **Rebuild DSR from RecallLog on every due-work query** — rejected: due-work
   needs a queryable snapshot; do not fold at query time.
-- **One-time rebuild of the DSR snapshot from RecallLog** — accepted as a
-  one-time alignment of leftover rows, not on-demand due-work (see **DSR
-  snapshot**).
 - **Tutor scores 1–4 identical to FSRS G** (`1` Again, `2` Hard, `3` Good,
   `4` Easy; `score = G`) — accepted (Decision above).
 - **A 0–5 commissioned rubric with a shifted Good/Hard/Easy map** — rejected:
@@ -410,29 +390,13 @@ Empty pending accept.
   fuzz as optional (`enable_fuzz` defaults off in ts-fsrs).
 - **RT as Stability input** — rejected: thinking time is not a DSR input
   (G, elapsed t, D/S/R only). Record it on the answer and show it in stats /
-  prompt history. Do not change S, D, or due. Do not rewrite existing S. Do
-  not replace the overlay with fuzz or another shuffle.
+  prompt history.
 - **FSRS card states (Learning / Review / Relearning) or last recall at
   assimilate** — rejected: `lastRecalledAt` is the last mapped grade only;
   New has no last recall and is due at `assimilatedAt`. After first-rating
   the tracker is a graded DSR tracker. No step list or card-state column.
-- **Keep Always-post-lapse Again** (post-lapse at every elapsed, including 0
-  and 5) — rejected as the destination: when S > 0, elapsed **< 24** uses
-  short-term `S'(S,G)` for Again too; elapsed **≥ 24** stays post-lapse.
-- **ts-fsrs `t === 0` for Again only** — rejected: one time gate for all
-  four G (elapsed whole hours **< 24** short-term; **≥ 24** long-term).
-- **Short-term success only when elapsed whole hours are 0** — rejected:
-  published FSRS-6 short-term applies while elapsed hours are **< 24** for
-  all four G.
 - **Calendar same-day short-term window** — rejected: whole-hour elapsed is
   the time input; there is no calendar-day rule.
-- **Open FSRS `enable_short_term` off** — rejected: Doughnut uses the
-  published short-term path for all four G when elapsed **< 24**; the switch
-  is not a Settings knob.
-- **Invert post-lapse to recover previous S when the short-term window
-  changed** — rejected: do not invent a previous S from post-lapse. The
-  one-time RecallLog fold starts from New and applies locked FSRS-6
-  (including short-term) in log order.
 - **Allow post-lapse `Sf` to exceed current S** — rejected: open FSRS-4.5+ /
   FSRS-6 uses `S' = min(Sf, S)` so a fail cannot lengthen Stability.
 - **Cap short-term After-Again too** — rejected: open FSRS applies `min` on
