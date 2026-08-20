@@ -106,20 +106,9 @@ Status: done
 
 ### Optimize record_live_audio
 Type: Structure
-Status: planned
+Status: done
 
-**Tests:**
-- `e2e_test/features/note_creation_and_update/record_live_audio.feature` — Continuous transcription… (~11316ms); Append live recording… (~10947ms)
-
-**Goals:**
-- Share recording stub setup; remove fixed waits; merge overlapping continuous/append paths if same protection.
-
-**Verify:**
-
-```bash
-source /workspace/scripts/cloud_agent_setup.sh
-xvfb-run -a pnpm cypress run --spec e2e_test/features/note_creation_and_update/record_live_audio.feature --config-file e2e_test/config/ci.ts
-```
+**Done:** Merged continuous+append into one scenario; dropped download E2E (frontend unit coverage); removed dead helpers. ~9.4s→~5.4s warm.
 
 ---
 
