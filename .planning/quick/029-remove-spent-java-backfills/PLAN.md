@@ -92,7 +92,7 @@ Each slice is **Structure**: delete one backfill family; remaining tests pass; e
 ### 10. Drop null elapsed-hours reconstruction
 
 - **Type:** Structure
-- **Status:** planned
+- **Status:** done
 - **Done:** `V300000281`, `RecallLogElapsedHoursBackfill`, and its test gone. `V300000282` stays.
 
 ### 11. Drop RecallLog DSR rebuild backfill
