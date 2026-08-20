@@ -13,21 +13,33 @@ published open FSRS.
 
 ## Decision
 
-Locked policy for Proposed ADR 0003. Humans still own accept.
+### Doughnut vs FSRS terms
 
-### Recall, not FSRS "review"
+When citing FSRS, pair once then use Doughnut terms. Glossary: [ADR 0001](./0001-ubiquitous-language.md). Product outcomes → G: **Outcome-to-grade compatibility map**.
 
-Keep **recall**. FSRS **review** is the same activity; Doughnut names it recall
-because **recall is better than review**. Glossary: [ADR 0001](./0001-ubiquitous-language.md).
-Do not use **review** for the spaced activity. **Just review** is a recall method,
-not FSRS review. When citing FSRS, pair once (**review (FSRS) = recall**) then use Doughnut terms.
+| Doughnut            | Open FSRS          | Notes                                       |
+| ------------------- | ------------------ | ------------------------------------------- |
+| **Recall**          | **Review**         |                                             |
+| **Just review**     |                    | A method of recall                          |
+| **Assimilation**    | **New** card       | Introduce, ungraded                         |
+| **New**             | **New**            | Ungraded; no Learning / Review / Relearning |
+| **Memory tracker**  | Card               |                                             |
+| **Stability**       | Stability `S`      | Whole hours                                 |
+| **Difficulty**      | Difficulty `D`     |                                             |
+| **Retrievability**  | Retrievability `R` |                                             |
+| `lastRecalledAt`    | `last_review`      |                                             |
+| `assimilatedAt`     |                    | New due                                     |
+| `nextRecallAt`      | Due                | `I(r, S)`                                   |
+| **RecallLog**       | Review history     |                                             |
+| First mapped grade  | First-rating       | `S0(G)` / `D0(G)`                           |
+| Tutor score **1–4** | Grade `G`          |                                             |
+| **Confusion**       |                    | Doughnut outcome; not a grade               |
+| **Overlap**         |                    | Doughnut outcome; no memory change          |
 
 ### Open FSRS-compatible shape, own implementation
 
-The memory-state shape is **open-FSRS-compatible**. Doughnut **implements
-that shape itself**. Do not take a dependency on `ts-fsrs`, `fsrs-rs`, or
-any other FSRS library. Compatibility is with the open FSRS model (inputs,
-state, qualitative update rules), not with a particular crate or version.
+Doughnut implements the open FSRS model itself (inputs, state, qualitative
+update rules), not `ts-fsrs`, `fsrs-rs`, or another library.
 
 - **Stability** is persisted memory state: the current interval in **whole
   hours**. `lastRecalledAt` is the last mapped grade only (FSRS
@@ -397,7 +409,7 @@ Empty pending accept.
 ## Related
 
 - Tracker (pointer + deferred IDs, not a second policy map): [`.planning/research/FSRS-COMPATIBILITY-GAP.md`](../../.planning/research/FSRS-COMPATIBILITY-GAP.md)
-- ADR 0001 [ubiquitous language](./0001-ubiquitous-language.md) — **recall** (not FSRS **review**); **recall prompt** / **MCQ** / **just review**; **New**; **RecallLog**; commissioned Learning Session terms; spelling memory tracker
+- ADR 0001 [ubiquitous language](./0001-ubiquitous-language.md) — Doughnut terms; FSRS pairing in **Doughnut vs FSRS terms**
 - ADR 0005 [commissioned learning session protocol](./0005-commissioned-learning-session-protocol.md) — what a score means to the Tutor
 - Anki answer semantics: <https://docs.ankiweb.net/studying.html#answer-buttons>
 - FSRS overdue-recall: <https://github.com/open-spaced-repetition/awesome-fsrs/wiki/The-Algorithm>
