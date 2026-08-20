@@ -32,9 +32,7 @@ class LearningSessionRecordTutorFeedbackRecallLogTests extends LearningSessionCo
     List<RecallLog> logs = memoryTrackerController.getRecallLogs(fixture.holaTracker());
     RecallLog log = logs.get(0);
     assertThat(log.getGrade(), is(grade));
-    if (grade == Grade.GOOD) {
-      assertThat(log.getAnswerId(), nullValue());
-    }
+    assertThat(log.getAnswerId(), nullValue());
   }
 
   @Test

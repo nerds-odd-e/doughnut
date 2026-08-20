@@ -20,22 +20,6 @@ abstract class LearningSessionControllerTestBase extends ControllerTestBase {
       Gracias: 1
       """;
 
-  protected static final String HOLA3_GRACIAS1_REPORT =
-      """
-      # Learning Session Report
-
-      Hola: 3
-      Gracias: 1
-      """;
-
-  protected static final String HOLA3_GRACIAS3_REPORT =
-      """
-      # Learning Session Report
-
-      Hola: 3
-      Gracias: 3
-      """;
-
   @Autowired LearningSessionController controller;
   @Autowired RecallLogRepository recallLogRepository;
 

@@ -52,11 +52,9 @@ HARD/EASY on `mark-as-recalled` return 400; OpenAPI/TS param is GOOD|AGAIN. Memb
 
 `@JsonIgnore` on `RecallLog.grade`; OpenAPI/client drop duplicate optional `grade`. Frontend still uses `productOutcome`.
 
-### 5. Thin tutor-feedback FSRS asserts; fix recall-log assert — **Structure** — planned
+### 5. Thin tutor-feedback FSRS asserts; fix recall-log assert — **Structure** — done
 
-In `LearningSessionRecordTutorFeedbackTests`, drop redundant first/second-grade float matrix that duplicates entity scheduling tests; keep controller-level “recorded + schedule advanced” coverage (minimal smoke). In `LearningSessionRecordTutorFeedbackRecallLogTests`, assert `answerId` null once for all grades (or drop if already covered).
-
-**Verify:** Focused learning-session + entity scheduling tests green.
+Tutor-feedback tests keep one schedule-advance smoke (no float matrix). Recall-log tests assert `answerId` null for all grades. Unused HOLA3 report constants removed from test base.
 
 ### 6. CLI just-review asserts grade query — **Behavior** — planned
 
@@ -74,7 +72,7 @@ One focused CLI unit assertion (extend existing mock spy); do not broaden sessio
 - [x] Just-review HTTP API cannot schedule HARD/EASY
 - [x] One non-null graded apply path for quiz/just-review/session
 - [x] RecallLog JSON has a single outcome field (`productOutcome`)
-- [ ] No duplicate FSRS float matrix in learning-session tutor tests; recall-log assert not GOOD-only
+- [x] No duplicate FSRS float matrix in learning-session tutor tests; recall-log assert not GOOD-only
 - [ ] CLI just-review tests pin GOOD/AGAIN query
 - [ ] Focused tests + `generateTypeScript` (when API changes) + format/whitespace green
 
