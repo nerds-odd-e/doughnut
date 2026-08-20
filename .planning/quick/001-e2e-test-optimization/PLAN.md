@@ -114,20 +114,9 @@ Status: done
 
 ### Optimize property_memory_tracker
 Type: Structure
-Status: planned
+Status: done
 
-**Tests:**
-- `e2e_test/features/recall/property_memory_tracker.feature` — Removing tracked property… (~11088ms); Renaming tracked property… (~10210ms)
-
-**Goals:**
-- Shared note+tracker seed via API; assert only unique deltas; avoid full recall UI where unit coverage exists.
-
-**Verify:**
-
-```bash
-source /workspace/scripts/cloud_agent_setup.sh
-xvfb-run -a pnpm cypress run --spec e2e_test/features/recall/property_memory_tracker.feature --config-file e2e_test/config/ci.ts
-```
+**Done:** Dropped rename + markdown-remove E2E (backend/frontend unit coverage); slimmed rich remove path; removed dead steps/POs. Slow pair gone (~21s cold).
 
 ---
 

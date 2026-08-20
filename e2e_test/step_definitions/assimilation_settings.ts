@@ -20,13 +20,6 @@ When('I open assimilation settings', () => {
   start.assumeNotePage().moreOptions().openAssimilationSettings()
 })
 
-When('I reopen assimilation settings', () => {
-  start
-    .assumeNotePage()
-    .moreOptions()
-    .reopenAssimilationSettingsWaitingForRecallInfo()
-})
-
 When('I assimilate on the assimilation panel', () => {
   start.assumeAssimilationPage().assimilateOnPanel()
 })
