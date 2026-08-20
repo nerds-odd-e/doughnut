@@ -3,7 +3,6 @@
 // @ts-check
 
 import { type DataTable, Given } from '@badeball/cypress-cucumber-preprocessor'
-import start from '../start'
 import { mock_services } from '../start'
 import { REFINEMENT_LAYOUT_INSTRUCTION_PATTERN } from '../start/mock_services/createOpenAiResponsesMock'
 

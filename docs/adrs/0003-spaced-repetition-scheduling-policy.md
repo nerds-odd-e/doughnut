@@ -19,12 +19,14 @@ citing FSRS, pair once then use Doughnut terms.
 
 ### Doughnut vs FSRS terms
 
-| ----------------------- | ------------------- | ----------------------------------------------- |
-| **Recall**              | **Review**          | Because "'recall' is better than 'review'" .    |
-| **Just review**         |                     | A method of recall                              |
-| **Assimilation**        | Create **New** card | Initial intake; not FSRS Learning               |
-| **New**                 | **New**             | Ungraded until the first mapped grade           |
-| **Memory tracker**      | Card                |                                                 |
+In Doughnut, **recall** names the activity that FSRS calls a **review**. The
+product prefers “recall” because it describes retrieving a memory more
+precisely than “review.” **Just review** is one method of recall.
+
+**Assimilation** is the initial intake action that creates a **New** memory
+tracker. Its closest FSRS analogue is creating a **New** card, not entering the
+FSRS **Learning** state. A Doughnut **memory tracker** corresponds to an FSRS
+**card**.
 
 ### Spaced repetition glossary
 
