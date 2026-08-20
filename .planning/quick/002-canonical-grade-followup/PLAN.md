@@ -44,13 +44,9 @@ Blank `<session_item_grades>` (whitespace only) is treated as absent so legacy `
 
 HARD/EASY on `mark-as-recalled` return 400; OpenAPI/TS param is GOOD|AGAIN. Membership lives on `Grade.isJustReviewGrade()`; service still accepts full `Grade` for learning session.
 
-### 3. Learning-session grades go through `markAsRecalled` — **Structure** — planned
+### 3. Learning-session grades go through `markAsRecalled` — **Structure** — done
 
-Route `LearningSessionService.record` through `MemoryTrackerService.markAsRecalled(..., grade, tracker, null)`. Require non-null `Grade` in `markAsRecalled` (confusion stays on `persistRecallLog` only).
-
-**Unlocks:** Same save/threshold side-effect surface for all graded paths; removes null-NPE footgun.
-
-**Verify:** Existing learning-session record + recall-log tests still pass.
+`LearningSessionService.record` uses `MemoryTrackerService.markAsRecalled(..., grade, tracker, null)`. `markAsRecalled` requires non-null `Grade`; confusion stays on `persistRecallLog` only.
 
 ### 4. RecallLog wire exposes only `productOutcome` — **Structure** — planned
 
@@ -78,7 +74,7 @@ One focused CLI unit assertion (extend existing mock spy); do not broaden sessio
 
 - [x] Blank grades tag no longer shadows legacy scores
 - [x] Just-review HTTP API cannot schedule HARD/EASY
-- [ ] One non-null graded apply path for quiz/just-review/session
+- [x] One non-null graded apply path for quiz/just-review/session
 - [ ] RecallLog JSON has a single outcome field (`productOutcome`)
 - [ ] No duplicate FSRS float matrix in learning-session tutor tests; recall-log assert not GOOD-only
 - [ ] CLI just-review tests pin GOOD/AGAIN query

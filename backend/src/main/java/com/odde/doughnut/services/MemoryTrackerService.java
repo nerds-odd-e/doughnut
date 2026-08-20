@@ -19,6 +19,7 @@ import com.odde.doughnut.entities.repositories.RecallPromptRepository;
 import com.odde.doughnut.factoryServices.EntityPersister;
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -84,6 +85,7 @@ public class MemoryTrackerService {
 
   public boolean markAsRecalled(
       Timestamp currentUTCTimestamp, Grade grade, MemoryTracker memoryTracker, Answer answer) {
+    Objects.requireNonNull(grade, "grade");
     persistRecallLog(memoryTracker, currentUTCTimestamp, grade, answer);
     memoryTracker.applyGrade(currentUTCTimestamp, grade);
     entityPersister.save(memoryTracker);

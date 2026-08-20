@@ -93,8 +93,7 @@ public class LearningSessionService {
 
     for (MatchedReportEntry matched : matchedEntries) {
       Grade grade = matched.entry().grade();
-      memoryTrackerService.persistRecallLog(matched.tracker(), now, grade, null);
-      matched.tracker().applyGrade(now, grade);
+      memoryTrackerService.markAsRecalled(now, grade, matched.tracker(), null);
 
       RecordedLearningSessionItem recorded = new RecordedLearningSessionItem();
       recorded.setNoteTitle(matched.entry().noteTitle());
