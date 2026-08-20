@@ -17,6 +17,15 @@ This ADR's **Spaced repetition glossary** locks DSR and schedule terms.
 Product recall language: [ADR 0001](./0001-ubiquitous-language.md). When
 citing FSRS, pair once then use Doughnut terms.
 
+### Doughnut vs FSRS terms
+
+| ----------------------- | ------------------- | ----------------------------------------------- |
+| **Recall**              | **Review**          | Because "'recall' is better than 'review'" .    |
+| **Just review**         |                     | A method of recall                              |
+| **Assimilation**        | Create **New** card | Initial intake; not FSRS Learning               |
+| **New**                 | **New**             | Ungraded until the first mapped grade           |
+| **Memory tracker**      | Card                |                                                 |
+
 ### Spaced repetition glossary
 
 - **New** — Ungraded memory tracker (`S = 0`, Difficulty unset / **N/A**).
@@ -24,17 +33,16 @@ citing FSRS, pair once then use Doughnut terms.
   The first mapped grade initializes Stability and Difficulty, after which the
   tracker is no longer New.
 - **Stability** — Persisted current interval of a memory tracker, in
-  whole hours. Short UI: **Stability**.
-- **Difficulty** — Persisted memory state in `[1, 10]`. Shown on the
-  Memory Tracker Information card as the API number, or **N/A** when
-  unset. Fallback **5** when Stability > 0 and Difficulty is null.
+  whole hours.
+- **Difficulty** — Persisted memory state in `[1, 10]`.
+  Fallback **5** when Stability > 0 and Difficulty is null.
 - **Retrievability** — FSRS `R`: predicted probability of recall at
-  elapsed time, from Stability. Computed at long-term grade for next-S;
-  not stored.
+  elapsed time since `lastRecalledAt`, given Stability. Computed during
+  long-term grading to calculate next Stability; not stored.
 - **Requested retention** — FSRS `request_retention`: desired recall rate
-  at due. Not Retrievability. Locked at **0.9**, so `I(0.9, S) = S`. May
-  be shown read-only as the color hinge of the observed-recall-rate
-  heatmap.
+  at due. Locked at **0.9**, so `I(0.9, S) = S`.
+- **Scheduled interval** — FSRS `I(r, S)`: interval for requested retention
+  `r` and Stability `S`. Scheduling uses whole hours.
 - **`lastRecalledAt`** — Time of the last mapped grade (FSRS
   `last_review`). Unset on New.
 - **`assimilatedAt`** — Time the tracker was created by assimilation.
@@ -49,30 +57,6 @@ citing FSRS, pair once then use Doughnut terms.
   tracker after an accidental match. Not a grade and not FSRS Again.
 - **Overlap** — Declared non-distinguishing spelling outcome. No memory
   change.
-
-### Doughnut vs FSRS terms
-
-Product outcomes → G: **Outcome-to-grade compatibility map**.
-
-| Doughnut                | Open FSRS           | Notes                                           |
-| ----------------------- | ------------------- | ----------------------------------------------- |
-| **Recall**              | **Review**          | Because "'recall' is better than 'review'" .    |
-| **Just review**         |                     | A method of recall                              |
-| **Assimilation**        | Create **New** card | Initial intake; not FSRS Learning               |
-| **New**                 | **New**             | Ungraded until the first mapped grade           |
-| **Memory tracker**      | Card                |                                                 |
-| **Stability**           | Stability `S`       | Whole hours                                     |
-| **Difficulty**          | Difficulty `D`      |                                                 |
-| **Retrievability**      | Retrievability `R`  | Computed, not stored                            |
-| **Requested retention** | `request_retention` | Desired recall rate at due; not `R`; locked 0.9 |
-| `lastRecalledAt`        | `last_review`       |                                                 |
-| `assimilatedAt`         |                     | New due                                         |
-| `nextRecallAt`          | Due                 | `I(r, S)`                                       |
-| **RecallLog**           | Review history      |                                                 |
-| First mapped grade      | First-rating        | `S0(G)` / `D0(G)`                               |
-| Tutor score **1–4**     | Grade `G`           |                                                 |
-| **Confusion**           |                     | Doughnut outcome; not a grade                   |
-| **Overlap**             |                     | Doughnut outcome; no memory change              |
 
 ### Open FSRS-compatible shape, own implementation
 

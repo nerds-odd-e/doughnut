@@ -21,10 +21,9 @@ export function overflowMenuItem(title: string) {
 }
 
 export async function openNoteToolbarOverflowMenu(wrapper: VueWrapper) {
-  await noteToolbarAction(
-    wrapper,
-    noteMoreOptionsTitles.overflowMenu
-  ).trigger("click")
+  await noteToolbarAction(wrapper, noteMoreOptionsTitles.overflowMenu).trigger(
+    "click"
+  )
   await flushPromises()
 }
 
@@ -40,9 +39,11 @@ export function dispatchDocumentKey(init: KeyboardEventInit) {
 
 /** Wiki uses `hidden` when overflowed (still in DOM). */
 export function noteToolbarWikiHidden(wrapper: VueWrapper) {
-  return noteToolbarAction(wrapper, noteMoreOptionsTitles.wiki).attributes(
-    "hidden"
-  ) !== undefined
+  return (
+    noteToolbarAction(wrapper, noteMoreOptionsTitles.wiki).attributes(
+      "hidden"
+    ) !== undefined
+  )
 }
 
 /** New uses `v-show` on a `display:contents` host (still in DOM when overflowed). */

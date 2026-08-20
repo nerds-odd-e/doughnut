@@ -54,8 +54,7 @@ export async function selectRefinementLayoutItems(
   ...selections: Array<string | { itemId: string; checked?: boolean }>
 ) {
   for (const selection of selections) {
-    const itemId =
-      typeof selection === "string" ? selection : selection.itemId
+    const itemId = typeof selection === "string" ? selection : selection.itemId
     const checked =
       typeof selection === "string" ? true : (selection.checked ?? true)
     await wrapper
