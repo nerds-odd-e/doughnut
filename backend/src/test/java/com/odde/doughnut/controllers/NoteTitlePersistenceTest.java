@@ -24,7 +24,7 @@ class NoteTitlePersistenceTest extends ControllerTestBase {
             String.class);
     assertTrue(
         "NO".equalsIgnoreCase(isNullable),
-        "Run backend/gradlew -p backend migrateTestDB so V300000158 applies (note.title NOT NULL).");
+        "Run backend/gradlew -p backend migrateTestDB so note.title is NOT NULL.");
   }
 
   @Test

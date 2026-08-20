@@ -35,5 +35,4 @@ Also surface when changing success/failure interval math or commissioned score â
 - `backend/src/main/java/com/odde/doughnut/entities/Fsrs.java`
 - `backend/src/main/java/com/odde/doughnut/entities/FsrsAgainRecall.java`
 - `backend/src/main/java/com/odde/doughnut/entities/MemoryTracker.java`
-- `backend/src/main/java/db/migration/StabilityIndexToHoursBackfill.java` (Flyway replay of `V300000260` only; not live scheduling)
 - https://github.com/open-spaced-repetition/awesome-fsrs/wiki/The-Algorithm

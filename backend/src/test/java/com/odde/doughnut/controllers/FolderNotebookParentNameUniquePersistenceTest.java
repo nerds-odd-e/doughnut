@@ -26,7 +26,7 @@ class FolderNotebookParentNameUniquePersistenceTest extends ControllerTestBase {
             Long.class);
     assertTrue(
         count != null && count >= 1L,
-        "Run backend/gradlew -p backend migrateTestDB so V300000164 applies.");
+        "Run backend/gradlew -p backend migrateTestDB so the folder sibling-name unique index exists.");
   }
 
   @Test

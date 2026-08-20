@@ -24,15 +24,15 @@ The project uses Flyway for database migrations, configured in Spring Boot.
 * SQL migrations: `backend/src/main/resources/db/migration/`
 * Java migrations: `backend/src/main/java/db/migration/`
 * Files follow the naming convention: `V{version}__{description}.sql` (or `.java`)
-    * Example: `V300000231__rename_a_column.sql` (version must exceed **`300000230`**)
+    * Example: `V300000301__rename_a_column.sql` (version must exceed **`300000300`**)
 
 ## Version Numbering
 
 * Versions use a numerical format
 
-The project uses versioned files named `V{number}__{description}.sql`. The current full application DDL is collapsed into **`V100000000__baseline.sql`**; **`V300000230__db_migration_placeholder.sql`** is a placeholder for the next migration.
+The project uses versioned files named `V{number}__{description}.sql`. The current full application DDL is collapsed into **`V100000000__baseline.sql`**; **`V300000300__db_migration_placeholder.sql`** is a placeholder for the next migration.
 
-New migrations need to use a **greater** version number than **`300000230`**.
+New migrations need to use a **greater** version number than **`300000300`**.
 
 ### Migration Process
 
@@ -43,7 +43,7 @@ New migrations need to use a **greater** version number than **`300000230`**.
 ## Migration file structure
 
 * **`V100000000__baseline.sql`** holds the collapsed full DDL (fresh installs).
-* **`V300000230__db_migration_placeholder.sql`** is the tail placeholder; add new migrations with a higher version.
+* **`V300000300__db_migration_placeholder.sql`** is the tail placeholder; add new migrations with a higher version.
 * Each **new** file after that should contain one atomic change (create/alter/rename/drop as needed).
 
 ## Best Practices:
@@ -59,7 +59,7 @@ Rare maintenance: collapse applied migrations into the baseline so the repo keep
 
 ### Invariants
 
-* **Tip placeholder first.** Add a **new** no-op placeholder whose version is **greater than every migration you will delete**. Reusing an old placeholder that already sits behind later versions is wrong.
+* **Tip placeholder first.** Add a **new** no-op placeholder whose version is **greater than every version ever applied** — not just the files currently in the repo. Spent migrations that were already deleted still own their version in every long-lived `flyway_schema_history`, so check git history and an existing database before picking. Reusing a version (or an old placeholder that already sits behind later versions) is wrong.
 * **Deploy and confirm** that tip placeholder on production (and any other long-lived environments) before deleting files. Check `flyway_schema_history`.
 * **Freeze** new schema migrations until the squash commit is deployed.
 * **Keep the baseline version number** (`V100000000`). Replace **file contents only**. Renaming/renumbering the baseline makes Flyway treat it as a new pending migration and can run full `CREATE` DDL on an existing DB.
@@ -69,8 +69,8 @@ Rare maintenance: collapse applied migrations into the baseline so the repo keep
 
 ### Procedure
 
-1. Find the highest existing migration version (SQL under `resources/db/migration/` and Java under `java/db/migration/`).
-2. Add a no-op tip placeholder, e.g. `V{max+1}__db_migration_placeholder.sql`, with a short comment that future migrations must use a greater version.
+1. Find the highest version **ever used** — current files (SQL under `resources/db/migration/`, Java under `java/db/migration/`), versions deleted in git history, and `SELECT MAX(version) FROM flyway_schema_history` on a long-lived database.
+2. Add a no-op tip placeholder above that, e.g. `V{max+1}__db_migration_placeholder.sql`, with a short comment that future migrations must use a greater version.
 3. Commit, deploy, and confirm the placeholder row exists in production `flyway_schema_history`. Freeze further migrations.
 4. On a local DB migrated through that tip, dump the full schema (no data). Prefer the same shape as the current baseline (CREATE statements; no `flyway_schema_history`).
 5. Replace the **contents** of `V100000000__baseline.sql` with that dump (same filename/version). Delete every migration file (`.sql` and `.java`) with version **strictly between** baseline and the tip placeholder. Keep baseline + tip placeholder.
@@ -84,7 +84,7 @@ Rare maintenance: collapse applied migrations into the baseline so the repo keep
 
 If destructive DML **must** ship as a migration:
 
-1. **Placeholder gate** — follow `V300000233`–`V300000235`: wrap the DML in `WHERE ${tz_repair}` (or a dedicated placeholder). Default the placeholder to `1=0` in every application profile so the migration is a no-op in dev/test/CI. Enable it (`1=1`) only for the deliberate production deploy that ships the migration, then remove the production override after confirming Flyway applied it. While the migration is pending, add a focused migration test that proves the default no-op and intended enabled selection; remove that migration-only test after successful production application because committed migrations are immutable and no product behavior depends on their test harness.
+1. **Placeholder gate** — wrap the DML in `WHERE ${some_repair_gate}` and declare that Flyway placeholder in every application profile (`spring.flyway.placeholders`) with the default `1=0`, so the migration is a no-op in dev/test/CI. Enable it (`1=1`) only for the deliberate production deploy that ships the migration, then remove the production override after confirming Flyway applied it. Drop the placeholder from the profiles once the gated migration is spent. While the migration is pending, add a focused migration test that proves the default no-op and intended enabled selection; remove that migration-only test after successful production application because committed migrations are immutable and no product behavior depends on their test harness.
 2. **Record the production row count** before enabling the gate.
 3. **Walk the FK delete closure** before any `DELETE` — CASCADE edges extend the blast radius; `NO ACTION` / `RESTRICT` edges block it. Regenerate **`docs/database-erd.md`** and read delete-rule labels on every edge in the closure. For declared hard-delete roots, `DeletableEntityFkClosureTest` fails CI when a restricting FK enters the subtree.
 4. **CI cannot validate DML alone** — `migrateTestDB` (see `ci.yml`) runs migrations against an **empty** database, so a `DELETE` that matches zero rows always passes. Row-selection tests and schema-structural guards are both required.

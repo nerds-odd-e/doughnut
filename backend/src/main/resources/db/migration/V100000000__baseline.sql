@@ -1,10 +1,10 @@
 -- Full application schema (CREATE statements only, no data). flyway_schema_history omitted.
 
--- MySQL dump 10.13  Distrib 8.4.9, for macos26.5 (arm64)
+-- MySQL dump 10.13  Distrib 8.4.10, for macos26.5 (arm64)
 --
 -- Host: 127.0.0.1    Database: doughnut_test
 -- ------------------------------------------------------
--- Server version	8.4.9
+-- Server version	8.4.10
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -41,6 +41,48 @@ CREATE TABLE `admin_data_migration_progress` (
   KEY `fk_admin_data_migration_progress_last_note` (`last_processed_note_id`),
   CONSTRAINT `fk_admin_data_migration_progress_last_note` FOREIGN KEY (`last_processed_note_id`) REFERENCES `note` (`id`) ON DELETE SET NULL
 ) ENGINE=InnoDB AUTO_INCREMENT=841 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `answer`
+--
+
+DROP TABLE IF EXISTS `answer`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `answer` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `result` tinyint(1) NOT NULL DEFAULT '0',
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `choice_index` tinyint DEFAULT NULL,
+  `thinking_time_ms` int DEFAULT NULL,
+  `spelling_answer` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `outcome` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `idx_answer_created_at` (`created_at`)
+) ENGINE=InnoDB AUTO_INCREMENT=5038 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `assimilation_sequence_skip`
+--
+
+DROP TABLE IF EXISTS `assimilation_sequence_skip`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `assimilation_sequence_skip` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `user_id` int unsigned NOT NULL,
+  `note_id` int unsigned NOT NULL,
+  `property_key` varchar(255) NOT NULL DEFAULT '',
+  `skipped_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_assimilation_sequence_skip_user_note_property` (`user_id`,`note_id`,`property_key`),
+  KEY `fk_assimilation_sequence_skip_note` (`note_id`),
+  CONSTRAINT `fk_assimilation_sequence_skip_note` FOREIGN KEY (`note_id`) REFERENCES `note` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_assimilation_sequence_skip_user` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -237,7 +279,7 @@ CREATE TABLE `conversation` (
   CONSTRAINT `conversation_ibfk_1` FOREIGN KEY (`subject_ownership_id`) REFERENCES `ownership` (`id`),
   CONSTRAINT `conversation_ibfk_2` FOREIGN KEY (`conversation_initiator_id`) REFERENCES `user` (`id`),
   CONSTRAINT `conversation_ibfk_3` FOREIGN KEY (`note_id`) REFERENCES `note` (`id`),
-  CONSTRAINT `conversation_ibfk_4` FOREIGN KEY (`recall_prompt_id`) REFERENCES `recall_prompt` (`id`)
+  CONSTRAINT `fk_conversation_recall_prompt` FOREIGN KEY (`recall_prompt_id`) REFERENCES `recall_prompt` (`id`) ON DELETE SET NULL
 ) ENGINE=InnoDB AUTO_INCREMENT=4371 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -280,7 +322,6 @@ CREATE TABLE `failure_report` (
 ) ENGINE=InnoDB AUTO_INCREMENT=529 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
-
 --
 -- Table structure for table `folder`
 --
@@ -295,7 +336,7 @@ CREATE TABLE `folder` (
   `name` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `index_content` mediumtext COLLATE utf8mb4_unicode_ci,
+  `readme_content` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uk_folder_notebook_parent_name` (`notebook_id`,(ifnull(`parent_folder_id`,0)),`name`),
   KEY `idx_folder_notebook_id` (`notebook_id`),
@@ -346,6 +387,32 @@ CREATE TABLE `image` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `mcq`
+--
+
+DROP TABLE IF EXISTS `mcq`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `mcq` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `correct_answer_index` tinyint DEFAULT NULL,
+  `note_id` int unsigned DEFAULT NULL,
+  `raw_json_question` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `image_url` varchar(1024) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `image_mask` varchar(1024) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `is_contested` tinyint(1) NOT NULL DEFAULT '0',
+  `context_seed` bigint DEFAULT NULL,
+  `tested_focus` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `validation_rationale` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  PRIMARY KEY (`id`),
+  KEY `fk_mcq_note` (`note_id`),
+  CONSTRAINT `fk_mcq_note` FOREIGN KEY (`note_id`) REFERENCES `note` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=7596 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `memory_tracker`
 --
 
@@ -355,21 +422,22 @@ DROP TABLE IF EXISTS `memory_tracker`;
 CREATE TABLE `memory_tracker` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
   `user_id` int unsigned NOT NULL,
-  `recall_count` int NOT NULL DEFAULT '100',
-  `forgetting_curve_index` float NOT NULL DEFAULT '100',
-  `last_recalled_at` timestamp NOT NULL,
+  `stability` float NOT NULL DEFAULT '0',
+  `last_recalled_at` datetime DEFAULT NULL,
   `assimilated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `next_recall_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `next_recall_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `removed_from_tracking` tinyint NOT NULL DEFAULT '0',
   `note_id` int unsigned DEFAULT NULL,
-  `spelling` tinyint(1) NOT NULL DEFAULT '0',
   `deleted_at` timestamp NULL DEFAULT NULL,
   `property_key` varchar(255) NOT NULL DEFAULT '',
+  `type` varchar(32) NOT NULL DEFAULT 'UNDERSTANDING',
+  `difficulty` float DEFAULT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `user_note_spelling_active` (`user_id`,`note_id`,`spelling`,`property_key`,(if((`deleted_at` is null),1,NULL))),
+  UNIQUE KEY `user_note_spelling_active` (`user_id`,`note_id`,`type`,`property_key`,(if((`deleted_at` is null),1,NULL))),
   KEY `last_recalled_at` (`last_recalled_at`),
   KEY `FK_memory_tracker_user_id` (`user_id`),
   KEY `review_point_fk_note_id` (`note_id`),
+  KEY `idx_memory_tracker_user_next_recall_at` (`user_id`,`next_recall_at`),
   CONSTRAINT `memory_tracker_fk_note_id` FOREIGN KEY (`note_id`) REFERENCES `note` (`id`) ON DELETE CASCADE,
   CONSTRAINT `memory_tracker_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=17858 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
@@ -393,8 +461,6 @@ CREATE TABLE `note` (
   `deleted_at` timestamp(3) NULL DEFAULT NULL,
   `title` varchar(150) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
   `content` mediumtext,
-  `remember_spelling` tinyint NOT NULL DEFAULT '0',
-  `skip_memory_tracking` tinyint NOT NULL DEFAULT '0',
   `level` tinyint NOT NULL DEFAULT '0',
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
@@ -529,7 +595,7 @@ CREATE TABLE `notebook` (
   `notebook_group_id` int unsigned DEFAULT NULL,
   `description` varchar(500) DEFAULT NULL,
   `name` varchar(150) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
-  `index_content` mediumtext,
+  `readme_content` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uk_notebook_ownership_name` (`ownership_id`,`name`),
   KEY `fk_notes_book_creator_id` (`creator_id`),
@@ -580,32 +646,6 @@ CREATE TABLE `ownership` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Table structure for table `predefined_question`
---
-
-DROP TABLE IF EXISTS `predefined_question`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `predefined_question` (
-  `id` int unsigned NOT NULL AUTO_INCREMENT,
-  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `correct_answer_index` tinyint DEFAULT NULL,
-  `note_id` int unsigned DEFAULT NULL,
-  `raw_json_question` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `image_url` varchar(1024) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `image_mask` varchar(1024) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `is_contested` tinyint(1) NOT NULL DEFAULT '0',
-  `context_seed` bigint DEFAULT NULL,
-  `tested_focus` text COLLATE utf8mb4_unicode_ci,
-  `validation_rationale` text COLLATE utf8mb4_unicode_ci,
-  PRIMARY KEY (`id`),
-  KEY `quiz_question_fk_note_id` (`note_id`),
-  CONSTRAINT `quiz_question_fk_note_id` FOREIGN KEY (`note_id`) REFERENCES `note` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=7596 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
 -- Table structure for table `question_generation_batch`
 --
 
@@ -615,13 +655,13 @@ DROP TABLE IF EXISTS `question_generation_batch`;
 CREATE TABLE `question_generation_batch` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
   `user_id` int unsigned NOT NULL,
-  `status` varchar(32) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `status` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `planned_at` timestamp(3) NOT NULL,
-  `openai_input_file_id` varchar(128) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `openai_batch_id` varchar(128) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `openai_input_file_id` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `openai_batch_id` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `submitted_at` timestamp(3) NULL DEFAULT NULL,
-  `openai_output_file_id` varchar(128) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `openai_error_file_id` varchar(128) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `openai_output_file_id` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `openai_error_file_id` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `output_collected_at` timestamp(3) NULL DEFAULT NULL,
   `imported_at` timestamp(3) NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
@@ -639,10 +679,10 @@ DROP TABLE IF EXISTS `question_generation_batch_maintenance_run`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `question_generation_batch_maintenance_run` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
-  `trigger_source` varchar(32) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `trigger_source` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `started_at` timestamp(3) NOT NULL,
   `finished_at` timestamp(3) NULL DEFAULT NULL,
-  `error` text COLLATE utf8mb4_unicode_ci,
+  `error` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `considered_user_count` int DEFAULT NULL,
   `submitted_count` int DEFAULT NULL,
   `failed_count` int DEFAULT NULL,
@@ -663,12 +703,12 @@ CREATE TABLE `question_generation_batch_request` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
   `batch_id` int unsigned NOT NULL,
   `memory_tracker_id` int unsigned NOT NULL,
-  `custom_id` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `custom_id` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `context_seed` bigint NOT NULL,
-  `status` varchar(32) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'PENDING',
-  `raw_success_payload` longtext COLLATE utf8mb4_unicode_ci,
-  `raw_error_payload` longtext COLLATE utf8mb4_unicode_ci,
-  `error_detail` text COLLATE utf8mb4_unicode_ci,
+  `status` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'PENDING',
+  `raw_success_payload` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `raw_error_payload` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `error_detail` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_question_generation_batch_request_custom_id` (`custom_id`),
   UNIQUE KEY `uq_question_generation_batch_request_batch_tracker` (`batch_id`,`memory_tracker_id`),
@@ -679,24 +719,25 @@ CREATE TABLE `question_generation_batch_request` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Table structure for table `quiz_answer`
+-- Table structure for table `recall_log`
 --
 
-DROP TABLE IF EXISTS `quiz_answer`;
+DROP TABLE IF EXISTS `recall_log`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `quiz_answer` (
+CREATE TABLE `recall_log` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
-  `result` tinyint(1) NOT NULL DEFAULT '0',
-  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `choice_index` tinyint DEFAULT NULL,
-  `correct` tinyint(1) NOT NULL DEFAULT '0',
-  `thinking_time_ms` int DEFAULT NULL,
-  `spelling_answer` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `memory_tracker_id` int unsigned NOT NULL,
+  `recorded_at` timestamp(3) NOT NULL,
+  `elapsed_hours` int NOT NULL,
+  `product_outcome` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `answer_id` int unsigned DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `idx_quiz_answer_created_at` (`created_at`)
-) ENGINE=InnoDB AUTO_INCREMENT=5038 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  KEY `fk_recall_log_memory_tracker` (`memory_tracker_id`),
+  KEY `fk_recall_log_answer` (`answer_id`),
+  CONSTRAINT `fk_recall_log_answer` FOREIGN KEY (`answer_id`) REFERENCES `answer` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `fk_recall_log_memory_tracker` FOREIGN KEY (`memory_tracker_id`) REFERENCES `memory_tracker` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -710,16 +751,16 @@ CREATE TABLE `recall_prompt` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
   `memory_tracker_id` int unsigned NOT NULL,
   `question_type` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `predefined_question_id` int unsigned DEFAULT NULL,
-  `quiz_answer_id` int unsigned DEFAULT NULL,
+  `mcq_id` int unsigned DEFAULT NULL,
+  `answer_id` int unsigned DEFAULT NULL,
   `created_at` timestamp(3) NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `fk_recall_prompt_memory_tracker` (`memory_tracker_id`),
-  KEY `fk_recall_prompt_predefined_question` (`predefined_question_id`),
-  KEY `fk_recall_prompt_quiz_answer` (`quiz_answer_id`),
-  CONSTRAINT `fk_recall_prompt_memory_tracker` FOREIGN KEY (`memory_tracker_id`) REFERENCES `memory_tracker` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `fk_recall_prompt_predefined_question` FOREIGN KEY (`predefined_question_id`) REFERENCES `predefined_question` (`id`),
-  CONSTRAINT `fk_recall_prompt_quiz_answer` FOREIGN KEY (`quiz_answer_id`) REFERENCES `quiz_answer` (`id`)
+  KEY `fk_recall_prompt_mcq` (`mcq_id`),
+  KEY `fk_recall_prompt_answer` (`answer_id`),
+  CONSTRAINT `fk_recall_prompt_answer` FOREIGN KEY (`answer_id`) REFERENCES `answer` (`id`),
+  CONSTRAINT `fk_recall_prompt_mcq` FOREIGN KEY (`mcq_id`) REFERENCES `mcq` (`id`),
+  CONSTRAINT `fk_recall_prompt_memory_tracker` FOREIGN KEY (`memory_tracker_id`) REFERENCES `memory_tracker` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=7699 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -731,10 +772,10 @@ DROP TABLE IF EXISTS `shedlock`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `shedlock` (
-  `name` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `lock_until` timestamp(3) NOT NULL,
   `locked_at` timestamp(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
-  `locked_by` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `locked_by` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   PRIMARY KEY (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -774,7 +815,7 @@ CREATE TABLE `user` (
   `name` varchar(100) NOT NULL,
   `external_identifier` varchar(100) NOT NULL,
   `daily_assimilation_count` int unsigned NOT NULL DEFAULT '10',
-  `space_intervals` varchar(100) DEFAULT NULL,
+  `health_remove_empty_folders_default` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   UNIQUE KEY `user_external_identifier` (`external_identifier`)
 ) ENGINE=InnoDB AUTO_INCREMENT=88905 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
@@ -810,4 +851,4 @@ CREATE TABLE `user_token` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-07-10 12:10:27
+-- Dump completed

@@ -13,7 +13,7 @@ scope: large
 
 MySQL `TIMESTAMP` cannot store instants after `2038-01-19 03:14:07` UTC. Open FSRS `S_MAX` is 36500 days (876000 whole hours). `last_recalled_at + I(S)` at that cap is ~100 years later and cannot persist on `TIMESTAMP`. JDBC already writes UTC (`connectionTimeZone=UTC`). `DATETIME` is timezone-naive and can hold that due if the session TZ stays UTC.
 
-`V300000273` converted only `memory_tracker.last_recalled_at` and `next_recall_at`. Other `TIMESTAMP` columns (including `assimilated_at`, created/updated/deleted, job locks) still hit 2038.
+Only `memory_tracker.last_recalled_at` and `next_recall_at` are `DATETIME`. Other `TIMESTAMP` columns (including `assimilated_at`, created/updated/deleted, job locks) still hit 2038.
 
 ## When to Surface
 
@@ -27,10 +27,8 @@ Also surface when adding scheduling columns, changing JDBC timezone, or revisiti
 
 ## Breadcrumbs
 
-- `backend/src/main/resources/db/migration/V300000273__convert_memory_tracker_recall_due_to_datetime.sql` — DATETIME for the two recall-due columns only
 - `docs/adrs/0003-spaced-repetition-scheduling-policy.md` — maximum interval; due from capped S
-- `backend/src/main/resources/db/migration/V100000000__baseline.sql` — `memory_tracker.last_recalled_at` / `next_recall_at` / `assimilated_at` as `timestamp`
-- `backend/src/main/resources/db/migration/V300000234__repair_tz_skewed_memory_tracker_scheduling.sql` — prior TZ incident on these columns
+- `backend/src/main/resources/db/migration/V100000000__baseline.sql` — recall-due columns as `datetime`, `assimilated_at` and the rest as `timestamp`
 - `backend/src/main/resources/application-prod.yml` (and `db-dev.properties`, `db-test.properties`) — `connectionTimeZone=UTC`
 - `backend/src/main/java/com/odde/doughnut/entities/MemoryTracker.java`
 

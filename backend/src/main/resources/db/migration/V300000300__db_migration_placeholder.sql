@@ -2,4 +2,4 @@
 --
 -- Please create a new migration file for any future database changes.
 -- The file name should be in the format `V{version}__{description}.sql`
--- For example: `V300000231__change_a_field_type.sql`
+-- For example: `V300000301__change_a_field_type.sql`
