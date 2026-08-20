@@ -122,20 +122,9 @@ Status: done
 
 ### Optimize conversation_about_a_note
 Type: Structure
-Status: planned
+Status: done
 
-**Tests:**
-- `e2e_test/features/messages/conversation_about_a_note.feature` — Asking AI… (~10710ms); Follow-up… (~10600ms); Exporting… (~9579ms)
-
-**Goals:**
-- Chain follow-up in one scenario if stop-safe; API/testability for note+AI stub; drop redundant open/export setup.
-
-**Verify:**
-
-```bash
-source /workspace/scripts/cloud_agent_setup.sh
-xvfb-run -a pnpm cypress run --spec e2e_test/features/messages/conversation_about_a_note.feature --config-file e2e_test/config/ci.ts
-```
+**Done:** 3→1 chained ask/follow-up/export; Background OpenAI stubs; slim follow-up asserts. ~12s→~5.5s warm.
 
 ---
 
