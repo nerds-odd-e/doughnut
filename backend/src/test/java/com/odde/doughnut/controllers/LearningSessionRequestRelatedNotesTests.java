@@ -4,8 +4,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
 import com.odde.doughnut.controllers.dto.LearningSessionRequestResponse;
-import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.focusContext.FocusContextConstants;
 import java.sql.Timestamp;
@@ -20,17 +18,12 @@ class LearningSessionRequestRelatedNotesTests extends LearningSessionControllerT
     Timestamp dayTwo = makeMe.aTimestamp().of(1, 9).please();
     testabilitySettings.timeTravelTo(dayTwo);
 
-    Notebook notebook =
-        makeMe
-            .aNotebook()
-            .creatorAndOwner(currentUser.getUser())
-            .name("Spanish conversation")
-            .please();
-    makeMe.aNote().notebook(notebook).title("Saludos").content("Greetings").please();
-    commissionSpanishSessionItems(
-        notebook, dayTwo, "Hello. See [[Saludos]]", "Thank you. See [[Saludos]]");
+    SpanishNotebookFixture fixture =
+        spanishNotebookFixture(dayTwo, "Hello. See [[Saludos]]", "Thank you. See [[Saludos]]");
+    makeMe.aNote().notebook(fixture.notebook()).title("Saludos").content("Greetings").please();
 
-    LearningSessionRequestResponse response = controller.request(notebook.getId(), "Asia/Shanghai");
+    LearningSessionRequestResponse response =
+        controller.request(fixture.notebook().getId(), "Asia/Shanghai");
     String markdown = response.getRequestMarkdown();
 
     assertThat(markdown, containsString(FocusContextConstants.RELATED_NOTES_OPEN_MARKER));
@@ -52,15 +45,11 @@ class LearningSessionRequestRelatedNotesTests extends LearningSessionControllerT
     Timestamp dayTwo = makeMe.aTimestamp().of(1, 9).please();
     testabilitySettings.timeTravelTo(dayTwo);
 
-    Notebook notebook =
-        makeMe
-            .aNotebook()
-            .creatorAndOwner(currentUser.getUser())
-            .name("Spanish conversation")
-            .please();
-    commissionSpanishSessionItems(notebook, dayTwo, "Hello. See [[Gracias]]", "Thank you");
+    SpanishNotebookFixture fixture =
+        spanishNotebookFixture(dayTwo, "Hello. See [[Gracias]]", "Thank you");
 
-    LearningSessionRequestResponse response = controller.request(notebook.getId(), "Asia/Shanghai");
+    LearningSessionRequestResponse response =
+        controller.request(fixture.notebook().getId(), "Asia/Shanghai");
     String markdown = response.getRequestMarkdown();
 
     assertThat(
@@ -69,14 +58,5 @@ class LearningSessionRequestRelatedNotesTests extends LearningSessionControllerT
     assertThat(
         markdown,
         not(containsString(FocusContextConstants.RETRIEVED_NOTE_OPEN_MARKER + "\nTitle: Gracias")));
-  }
-
-  private void commissionSpanishSessionItems(
-      Notebook notebook, Timestamp dueAt, String holaContent, String graciasContent) {
-    Note hola = makeMe.aNote().notebook(notebook).title("Hola").content(holaContent).please();
-    Note gracias =
-        makeMe.aNote().notebook(notebook).title("Gracias").content(graciasContent).please();
-    makeMe.aMemoryTrackerFor(hola).commissioned().nextRecallAt(dueAt).please();
-    makeMe.aMemoryTrackerFor(gracias).commissioned().nextRecallAt(dueAt).please();
   }
 }

@@ -50,14 +50,20 @@ abstract class LearningSessionControllerTestBase extends ControllerTestBase {
       Notebook notebook, MemoryTracker holaTracker, MemoryTracker graciasTracker) {}
 
   protected SpanishNotebookFixture spanishNotebookFixture(Timestamp dueAt) {
+    return spanishNotebookFixture(dueAt, "Hello", "Thank you");
+  }
+
+  protected SpanishNotebookFixture spanishNotebookFixture(
+      Timestamp dueAt, String holaContent, String graciasContent) {
     Notebook notebook =
         makeMe
             .aNotebook()
             .creatorAndOwner(currentUser.getUser())
             .name("Spanish conversation")
             .please();
-    Note hola = makeMe.aNote().notebook(notebook).title("Hola").content("Hello").please();
-    Note gracias = makeMe.aNote().notebook(notebook).title("Gracias").content("Thank you").please();
+    Note hola = makeMe.aNote().notebook(notebook).title("Hola").content(holaContent).please();
+    Note gracias =
+        makeMe.aNote().notebook(notebook).title("Gracias").content(graciasContent).please();
     MemoryTracker holaTracker =
         makeMe.aMemoryTrackerFor(hola).commissioned().nextRecallAt(dueAt).please();
     MemoryTracker graciasTracker =

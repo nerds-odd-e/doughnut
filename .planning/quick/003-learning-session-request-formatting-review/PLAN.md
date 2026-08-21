@@ -1,6 +1,6 @@
 # Learning Session Request — post-implementation review fixes
 
-**Status:** in progress — slice 2 next
+**Status:** in progress — slice 3 next
 
 **Jidoka resolved (2026-08-21):**
 
@@ -87,16 +87,10 @@ contains `"</related_notes>\n\n<how_to_report>"`. Assertion uses
 ### 2. Consolidate duplicate Spanish-notebook test fixture — Structure
 
 Type: Structure
-Status: planned
+Status: done
 
-- Extend `LearningSessionControllerTestBase.spanishNotebookFixture` with an
-  overload taking Hola/Gracias content strings (default overload keeps
-  "Hello" / "Thank you" for existing callers).
-- Replace `LearningSessionRequestRelatedNotesTests.commissionSpanishSessionItems`
-  with calls to the shared fixture; add the extra "Saludos" note directly in
-  the one test that needs it.
-- Verification: existing `LearningSessionRequestTests` and
-  `LearningSessionRequestRelatedNotesTests` stay green — no behavior change.
+`spanishNotebookFixture(dueAt, holaContent, graciasContent)` on the base class;
+`LearningSessionRequestRelatedNotesTests` uses it and adds "Saludos" only where needed.
 
 ### 3. Direct unit coverage for `renderRelatedNotes` — Structure
 
