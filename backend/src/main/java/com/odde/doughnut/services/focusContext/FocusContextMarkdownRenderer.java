@@ -1,5 +1,6 @@
 package com.odde.doughnut.services.focusContext;
 
+import java.util.List;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -11,19 +12,14 @@ public class FocusContextMarkdownRenderer {
     sb.append(FocusContextConstants.FOCUS_CONTEXT_OPEN_TAG);
     sb.append("Purpose: Context around the focus note for AI use.\n");
     sb.append("Max depth: ").append(config.getMaxDepth()).append("\n");
-
-    appendFocusNote(sb, result.getFocusNote());
-
-    for (FocusContextNote note : result.getRelatedNotes()) {
-      sb.append("\n---\n");
-      appendRetrievedNote(sb, note);
-    }
-
+    sb.append(renderFocusNote(result.getFocusNote()));
+    sb.append(renderRelatedNotes(result.getRelatedNotes(), config.getMaxDepth()));
     sb.append(FocusContextConstants.FOCUS_CONTEXT_CLOSE_TAG);
     return sb.toString();
   }
 
-  private void appendFocusNote(StringBuilder sb, FocusContextFocusNote focusNote) {
+  public String renderFocusNote(FocusContextFocusNote focusNote) {
+    StringBuilder sb = new StringBuilder();
     sb.append(FocusContextConstants.FOCUS_NOTE_SECTION_START);
     appendTitleNotebookFolderDepth(
         sb,
@@ -33,6 +29,16 @@ public class FocusContextMarkdownRenderer {
         focusNote.getDepth());
     appendTruncationAndContent(sb, focusNote.isContentTruncated(), focusNote.getContent());
     sb.append(FocusContextConstants.FOCUS_NOTE_CLOSE_TAG);
+    return sb.toString();
+  }
+
+  public String renderRelatedNotes(List<FocusContextNote> relatedNotes, int maxDepth) {
+    StringBuilder sb = new StringBuilder();
+    for (FocusContextNote note : relatedNotes) {
+      sb.append("\n---\n");
+      appendRetrievedNote(sb, note);
+    }
+    return sb.toString();
   }
 
   private void appendRetrievedNote(StringBuilder sb, FocusContextNote note) {

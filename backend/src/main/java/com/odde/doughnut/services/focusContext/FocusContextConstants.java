@@ -18,6 +18,11 @@ public class FocusContextConstants {
   public static final String RETRIEVED_NOTE_SECTION_START = "\n" + RETRIEVED_NOTE_OPEN_TAG;
   public static final String RETRIEVED_NOTE_CLOSE_TAG = "</" + RETRIEVED_NOTE_ELEMENT + ">\n";
 
+  public static final String RELATED_NOTES_ELEMENT = "related_notes";
+  public static final String RELATED_NOTES_OPEN_MARKER = "<" + RELATED_NOTES_ELEMENT + ">";
+  public static final String RELATED_NOTES_OPEN_TAG = RELATED_NOTES_OPEN_MARKER + "\n";
+  public static final String RELATED_NOTES_CLOSE_TAG = "</" + RELATED_NOTES_ELEMENT + ">\n";
+
   public static final int FOCUS_NOTE_CONTENT_MAX_TOKENS = 1500;
   public static final int RELATED_NOTE_CONTENT_MAX_TOKENS = 200;
 
