@@ -5132,12 +5132,6 @@ components:
           type: array
           items:
             type: string
-        edgeType:
-          type: string
-          enum:
-          - OutgoingWikiLink
-          - InboundWikiReference
-          - FolderSibling
         createdAt:
           type: string
           format: date-time

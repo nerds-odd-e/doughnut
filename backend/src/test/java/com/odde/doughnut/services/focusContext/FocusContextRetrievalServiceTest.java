@@ -72,13 +72,12 @@ class FocusContextRetrievalServiceTest extends FocusContextRetrievalTestBase {
     }
 
     @Test
-    void outgoingWikiLinkEmitsTargetWithEdgeTypeDepthAndPath() {
+    void outgoingWikiLinkEmitsTargetWithDepthAndPath() {
       FocusContextResult result = service.retrieve(focusNote, viewer, RetrievalConfig.depth1());
 
       assertThat(result.getRelatedNotes(), hasSize(1));
       FocusContextNote related = result.getRelatedNotes().get(0);
       assertThat(related.getTitle(), equalTo("Linked"));
-      assertThat(related.getEdgeType(), equalTo(FocusContextEdgeType.OutgoingWikiLink));
       assertThat(related.getDepth(), equalTo(1));
       List<String> path = related.getRetrievalPath();
       assertThat(path, hasSize(2));
@@ -107,20 +106,18 @@ class FocusContextRetrievalServiceTest extends FocusContextRetrievalTestBase {
     }
 
     @Test
-    void inboundReferrerEmittedWithCorrectEdgeType() {
+    void inboundReferrerIsEmitted() {
       FocusContextResult result = service.retrieve(focusNote, viewer, RetrievalConfig.depth1());
 
       assertThat(result.getRelatedNotes(), hasSize(1));
-      FocusContextNote related = result.getRelatedNotes().get(0);
-      assertThat(related.getTitle(), equalTo("Referrer"));
-      assertThat(related.getEdgeType(), equalTo(FocusContextEdgeType.InboundWikiReference));
+      assertThat(result.getRelatedNotes().get(0).getTitle(), equalTo("Referrer"));
     }
   }
 
   @Nested
   class Deduplication {
     @Test
-    void noteReachedAsBothOutgoingAndInboundKeepsOutgoingEdgeType() {
+    void noteReachedAsBothOutgoingAndInboundAppearsOnce() {
       User viewer = makeMe.aUser().please();
       Note focusNote =
           makeMe.aNote().notebookOwnedBy(viewer).title("Focus").content("See [[Both]].").please();
@@ -138,9 +135,6 @@ class FocusContextRetrievalServiceTest extends FocusContextRetrievalTestBase {
 
       assertThat(result.getRelatedNotes(), hasSize(1));
       assertThat(result.getRelatedNotes().get(0).getTitle(), equalTo("Both"));
-      assertThat(
-          result.getRelatedNotes().get(0).getEdgeType(),
-          equalTo(FocusContextEdgeType.OutgoingWikiLink));
     }
   }
 }

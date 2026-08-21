@@ -42,13 +42,12 @@ class NoteControllerGraphTests extends ControllerTestBase {
   }
 
   @Test
-  void relatedNotesExposeEdgeTypeDepthAndPath() throws UnexpectedNoAccessRightException {
+  void relatedNotesExposeDepthAndPath() throws UnexpectedNoAccessRightException {
     makeMe.aNote("Linked").underSameNotebookAs(rootNote).content("See [[Root]]").please();
 
     FocusContextResult result = controller.getGraph(rootNote, 5000);
     assertThat(result.getRelatedNotes(), is(not(empty())));
     var related = result.getRelatedNotes().getFirst();
-    assertThat(related.getEdgeType(), is(notNullValue()));
     assertThat(related.getDepth(), greaterThan(0));
     assertThat(related.getRetrievalPath(), is(notNullValue()));
   }

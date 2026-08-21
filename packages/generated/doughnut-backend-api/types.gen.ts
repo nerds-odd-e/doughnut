@@ -1002,7 +1002,6 @@ export type FocusContextNote = {
     folderPath?: string;
     depth?: number;
     retrievalPath?: Array<string>;
-    edgeType?: 'OutgoingWikiLink' | 'InboundWikiReference' | 'FolderSibling';
     createdAt?: string;
     content?: string;
     contentTruncated?: boolean;

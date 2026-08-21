@@ -140,17 +140,13 @@ class FocusContextRetrievalFolderPeerTest extends FocusContextRetrievalTestBase 
     FocusContextResult result =
         service.retrieve(focus, viewer, RetrievalConfig.forQuestionGeneration(null));
 
-    List<String> peerTitles = folderPeerTitles(result);
-    assertThat(peerTitles, hasItem("OtherFolderPeer"));
-    assertThat(
-        "wiki-resolved targets are not duplicated as folder peers",
-        peerTitles,
-        not(hasItem("LinkT")));
+    assertThat(relatedTitles(result), containsInAnyOrder("LinkT", "OtherFolderPeer"));
     assertThat(isWikiReached(relatedByTitle(result, "LinkT")), is(true));
+    assertThat(isFolderPeer(relatedByTitle(result, "OtherFolderPeer")), is(true));
   }
 
   @Test
-  void folderPeerIsNotWikiExpansionFrontier() {
+  void deepOnlyIsNotRetrieved() {
     User viewer = makeMe.aUser().please();
     Note focus =
         makeMe.aNote().notebookOwnedBy(viewer).title("RootFS").content("[[MidFS]].").please();
@@ -168,6 +164,6 @@ class FocusContextRetrievalFolderPeerTest extends FocusContextRetrievalTestBase 
     FocusContextResult result = service.retrieve(focus, viewer, RetrievalConfig.defaultMaxDepth());
 
     assertThat(relatedTitles(result), hasItem("MidFS"));
-    assertThat(wikiReachedTitles(result), not(hasItem("DeepOnly")));
+    assertThat(relatedTitles(result), not(hasItem("DeepOnly")));
   }
 }

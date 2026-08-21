@@ -7,15 +7,15 @@ Doughnut gathers **bounded context around one focus note** for AI features (ques
 - **Focus note** — Depth `0`. Always included; content may be truncated to a fixed token budget.
 - **Related notes** — Reached by breadth-first expansion up to a configured **max depth** (default `2`), within a **related-note token budget** (default `2500`, overridable per graph request).
 
-## Edges
+## Retrieval
 
-| Type | Meaning |
-|------|---------|
-| `OutgoingWikiLink` | Target of a `[[wiki link]]` from note content or YAML front matter. |
-| `InboundWikiReference` | Another note in scope that links to this title (wiki title cache). |
-| `FolderSibling` | Sampled peer in the same folder or notebook root; not used as an expansion frontier. |
+Related notes come from three inclusion sources (retrieval mechanics only — not labelled on the payload):
 
-Within a depth, **OutgoingWikiLink** is preferred over **InboundWikiReference** when the same note is reached both ways. Notes dedupe by internal id; the **shortest** path wins.
+1. **Outgoing wiki links** — Targets of `[[wiki link]]` from note content or YAML front matter.
+2. **Inbound wiki references** — Other notes in scope that link to this title (wiki title cache).
+3. **Sampled folder peers** — Peers in the same folder or notebook root; not used as an expansion frontier.
+
+Notes dedupe by internal id within each wiki depth: first proposal wins when the same note is proposed more than once.
 
 **Per-depth sampling cap** (inbound wiki references per parent, and folder siblings per anchor) at graph depth:
 
@@ -36,7 +36,7 @@ For **folder siblings**, an anchor at wiki depth `d` uses `sampleCapAtGraphDepth
 ## API shape (`FocusContextResult`)
 
 - `focusNote` — `notebook`, `title`, `folderPath`, `depth`, `outgoingLinks`, `inboundReferences`, `sampleSiblings` (wiki-style URI strings), `content`, `contentTruncated`, optional `createdAt`.
-- `relatedNotes` — Same core fields plus `depth`, `retrievalPath` (wiki URI chain), `edgeType`, optional `reason`, `createdAt`, `content`, `contentTruncated`.
+- `relatedNotes` — Same core fields plus `depth`, `retrievalPath` (wiki URI chain), `createdAt`, `content`, `contentTruncated`.
 
 ## Markdown rendering
 

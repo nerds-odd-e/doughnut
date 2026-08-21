@@ -8,13 +8,8 @@ import com.odde.doughnut.services.ApproximateUtf8TokenBudget;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.NoteService;
 import com.odde.doughnut.services.WikiTitleCacheService;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +22,8 @@ public class FocusContextRetrievalService {
   private final NoteRepository noteRepository;
   private final AuthorizationService authorizationService;
   private final NoteService noteService;
+  private final FocusContextWikiBfsExpander wikiBfsExpander;
+  private final FocusContextFolderPeerAppender folderPeerAppender;
 
   @Autowired
   public FocusContextRetrievalService(
@@ -38,6 +35,8 @@ public class FocusContextRetrievalService {
     this.noteRepository = noteRepository;
     this.authorizationService = authorizationService;
     this.noteService = noteService;
+    this.wikiBfsExpander = new FocusContextWikiBfsExpander(wikiTitleCacheService, noteRepository);
+    this.folderPeerAppender = new FocusContextFolderPeerAppender(noteRepository, noteService);
   }
 
   public FocusContextResult retrieve(Note focusNote, RetrievalConfig config) {
@@ -140,264 +139,24 @@ public class FocusContextRetrievalService {
       siblingBudgetTotal = 0;
     }
 
-    int wikiRemainingBudget = wikiBudgetTotal;
-    String focusWikiUri = FocusContextWikiUri.ofFocusNote(hydrated);
+    var wikiExpansion =
+        wikiBfsExpander.expand(
+            result,
+            hydrated,
+            focusId,
+            viewer,
+            config.getMaxDepth(),
+            wikiBudgetTotal,
+            config.getSampleSeed());
 
-    Map<Integer, List<String>> pathEndingAtWikiUriByNoteId = new HashMap<>();
-    if (focusId != null) {
-      pathEndingAtWikiUriByNoteId.put(focusId, List.of(focusWikiUri));
-    }
-
-    List<Note> frontier = new ArrayList<>();
-    frontier.add(hydrated);
-
-    Set<Integer> wikiClaimedNoteIds = new HashSet<>();
-    if (focusId != null) {
-      wikiClaimedNoteIds.add(focusId);
-    }
-
-    List<SiblingAnchor> siblingAnchors = new ArrayList<>();
-    siblingAnchors.add(new SiblingAnchor(hydrated, 0, List.of(focusWikiUri)));
-
-    for (int depth = 1; depth <= config.getMaxDepth(); depth++) {
-      if (wikiRemainingBudget <= 0 || frontier.isEmpty()) {
-        break;
-      }
-
-      List<Proposal> proposals = new ArrayList<>();
-      for (Note parent : frontier) {
-        List<String> parentPath = pathEndingAtWikiUriByNoteId.get(parent.getId());
-        if (parentPath == null) {
-          continue;
-        }
-
-        List<Note> outgoing =
-            wikiTitleCacheService.outgoingWikiLinkTargetNotesForViewer(parent, viewer);
-
-        Set<Integer> inboundExclude = new HashSet<>();
-        if (focusId != null) {
-          inboundExclude.add(focusId);
-        }
-        for (Note o : outgoing) {
-          if (o.getId() != null) {
-            inboundExclude.add(o.getId());
-          }
-        }
-        List<Note> sampledInbound =
-            wikiTitleCacheService.sampledReferencesNotesForFocusContext(
-                parent,
-                viewer,
-                inboundExclude,
-                FocusContextConstants.sampleCapAtGraphDepth(depth),
-                config.getSampleSeed());
-
-        for (Note target : outgoing) {
-          if (target.getId() == null || target.getId().equals(focusId)) {
-            continue;
-          }
-          List<String> childPath = appendWikiUri(parentPath, target);
-          proposals.add(
-              new Proposal(
-                  target.getId(), depth, childPath, FocusContextEdgeType.OutgoingWikiLink));
-        }
-
-        for (Note target : sampledInbound) {
-          List<String> childPath = appendWikiUri(parentPath, target);
-          proposals.add(
-              new Proposal(
-                  target.getId(), depth, childPath, FocusContextEdgeType.InboundWikiReference));
-        }
-      }
-
-      Map<Integer, Proposal> bestById = new HashMap<>();
-      for (Proposal p : proposals) {
-        Proposal existing = bestById.get(p.noteId);
-        if (existing == null || beats(p, existing)) {
-          bestById.put(p.noteId, p);
-        }
-      }
-
-      List<Proposal> orderedUnique = new ArrayList<>();
-      Set<Integer> seenWinnerIds = new HashSet<>();
-      for (Proposal p : proposals) {
-        Proposal winner = bestById.get(p.noteId);
-        if (winner != null && winner.equals(p) && seenWinnerIds.add(p.noteId)) {
-          orderedUnique.add(p);
-        }
-      }
-
-      List<Integer> idsToHydrate = orderedUnique.stream().map(p -> p.noteId).toList();
-      Map<Integer, Note> hydratedById = new LinkedHashMap<>();
-      if (!idsToHydrate.isEmpty()) {
-        for (Note n :
-            noteRepository.hydrateNonDeletedNotesWithNotebookAndFolderByIds(idsToHydrate)) {
-          hydratedById.put(n.getId(), n);
-        }
-      }
-
-      List<Note> nextFrontier = new ArrayList<>();
-      for (Proposal p : orderedUnique) {
-        if (wikiRemainingBudget <= 0) {
-          break;
-        }
-        Note hydratedNote = hydratedById.get(p.noteId);
-        if (hydratedNote == null) {
-          continue;
-        }
-        String truncatedContent =
-            ApproximateUtf8TokenBudget.truncateByApproxTokens(
-                hydratedNote.getContent(), FocusContextConstants.RELATED_NOTE_CONTENT_MAX_TOKENS);
-        boolean truncated =
-            truncatedContent != null
-                && hydratedNote.getContent() != null
-                && truncatedContent.length() < hydratedNote.getContent().length();
-        int cost = Math.max(1, ApproximateUtf8TokenBudget.estimateApproxTokens(truncatedContent));
-        wikiRemainingBudget -= cost;
-        result.addRelatedNote(
-            new FocusContextNote(
-                hydratedNote.getNotebook() != null ? hydratedNote.getNotebook().getName() : null,
-                hydratedNote.getTitle(),
-                FolderTrailSegments.crumbPathJoinedBySlashSpace(hydratedNote),
-                p.depth,
-                p.retrievalPath,
-                p.edgeType,
-                hydratedNote.getCreatedAt(),
-                truncatedContent,
-                truncated));
-        wikiClaimedNoteIds.add(hydratedNote.getId());
-        pathEndingAtWikiUriByNoteId.put(hydratedNote.getId(), p.retrievalPath);
-        nextFrontier.add(hydratedNote);
-        siblingAnchors.add(new SiblingAnchor(hydratedNote, p.depth, p.retrievalPath));
-      }
-
-      frontier = nextFrontier;
-    }
-
-    appendFolderSiblings(
+    folderPeerAppender.append(
         result,
         focusId,
-        siblingAnchors,
+        wikiExpansion.siblingAnchors(),
         siblingBudgetTotal,
-        wikiClaimedNoteIds,
+        wikiExpansion.wikiClaimedNoteIds(),
         config.getSampleSeed());
 
     return result;
   }
-
-  private void appendFolderSiblings(
-      FocusContextResult result,
-      Integer focusId,
-      List<SiblingAnchor> siblingAnchors,
-      int siblingBudgetTokens,
-      Set<Integer> wikiClaimedNoteIds,
-      Optional<Long> sampleSeed) {
-    if (siblingBudgetTokens <= 0) {
-      return;
-    }
-
-    List<SiblingOffer> offers = new ArrayList<>();
-    int anchorIndex = 0;
-    for (SiblingAnchor anchor : siblingAnchors) {
-      int cap = FocusContextConstants.sampleCapAtGraphDepth(anchor.wikiDepth + 1);
-      List<Note> candidates =
-          noteService.findStructuralPeerNotesSample(
-              anchor.note, focusId, wikiClaimedNoteIds, cap, sampleSeed);
-      for (Note p : candidates) {
-        offers.add(
-            new SiblingOffer(
-                p.getId(),
-                anchor.wikiDepth,
-                anchorIndex,
-                List.copyOf(anchor.pathToAnchorWikiUris)));
-      }
-      anchorIndex++;
-    }
-
-    offers.sort(
-        Comparator.comparingInt(SiblingOffer::anchorWikiDepth)
-            .thenComparingInt(SiblingOffer::anchorIndex));
-
-    Set<Integer> reservedSiblingIds = new HashSet<>(wikiClaimedNoteIds);
-    List<SiblingOffer> uniqueOffers = new ArrayList<>();
-    for (SiblingOffer o : offers) {
-      if (reservedSiblingIds.add(o.noteId)) {
-        uniqueOffers.add(o);
-      }
-    }
-
-    List<Integer> idsToHydrate = uniqueOffers.stream().map(SiblingOffer::noteId).toList();
-    if (idsToHydrate.isEmpty()) {
-      return;
-    }
-    Map<Integer, Note> hydratedById = new LinkedHashMap<>();
-    for (Note n : noteRepository.hydrateNonDeletedNotesWithNotebookAndFolderByIds(idsToHydrate)) {
-      hydratedById.put(n.getId(), n);
-    }
-
-    int siblingRemaining = siblingBudgetTokens;
-    for (SiblingOffer o : uniqueOffers) {
-      if (siblingRemaining <= 0) {
-        break;
-      }
-      Note hydratedNote = hydratedById.get(o.noteId);
-      if (hydratedNote == null) {
-        continue;
-      }
-      String truncatedContent =
-          ApproximateUtf8TokenBudget.truncateByApproxTokens(
-              hydratedNote.getContent(), FocusContextConstants.RELATED_NOTE_CONTENT_MAX_TOKENS);
-      boolean truncated =
-          truncatedContent != null
-              && hydratedNote.getContent() != null
-              && truncatedContent.length() < hydratedNote.getContent().length();
-      int cost = Math.max(1, ApproximateUtf8TokenBudget.estimateApproxTokens(truncatedContent));
-      if (cost > siblingRemaining) {
-        continue;
-      }
-      siblingRemaining -= cost;
-      result.addRelatedNote(
-          new FocusContextNote(
-              hydratedNote.getNotebook() != null ? hydratedNote.getNotebook().getName() : null,
-              hydratedNote.getTitle(),
-              FolderTrailSegments.crumbPathJoinedBySlashSpace(hydratedNote),
-              o.anchorWikiDepth + 1,
-              o.pathToAnchor,
-              FocusContextEdgeType.FolderSibling,
-              hydratedNote.getCreatedAt(),
-              truncatedContent,
-              truncated));
-    }
-  }
-
-  private record SiblingAnchor(Note note, int wikiDepth, List<String> pathToAnchorWikiUris) {}
-
-  private record SiblingOffer(
-      int noteId, int anchorWikiDepth, int anchorIndex, List<String> pathToAnchor) {}
-
-  private static List<String> appendWikiUri(List<String> prefix, Note target) {
-    List<String> path = new ArrayList<>(prefix);
-    path.add(FocusContextWikiUri.of(target));
-    return List.copyOf(path);
-  }
-
-  private static boolean beats(Proposal candidate, Proposal existing) {
-    if (candidate.depth < existing.depth) {
-      return true;
-    }
-    if (candidate.depth > existing.depth) {
-      return false;
-    }
-    return edgePriority(candidate.edgeType) < edgePriority(existing.edgeType);
-  }
-
-  private static int edgePriority(FocusContextEdgeType t) {
-    return switch (t) {
-      case OutgoingWikiLink -> 0;
-      case InboundWikiReference -> 1;
-      case FolderSibling -> 2;
-    };
-  }
-
-  private record Proposal(
-      int noteId, int depth, List<String> retrievalPath, FocusContextEdgeType edgeType) {}
 }

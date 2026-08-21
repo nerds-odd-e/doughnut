@@ -51,7 +51,7 @@ export const getNoteGraphTool = createTool(
 
 What this returns (JSON):
 - **focusNote** — The requested note (depth 0) with title, notebook, folder path, truncated **content** when needed, and lightweight lists: **outgoingLinks** and **inboundReferences** (wiki-style link strings), plus **sampleSiblings** (a small capped sample of peers in the same folder or notebook root).
-- **relatedNotes** — Notes reached within the post-focus share of the combined token budget and max traversal depth. Each entry includes **depth**, **retrievalPath** (how the note was reached from the focus), **edgeType** (\`OutgoingWikiLink\`, \`InboundWikiReference\`, or \`FolderSibling\`), and truncated **content** when needed.
+- **relatedNotes** — Notes reached within the post-focus share of the combined token budget and max traversal depth. Each entry includes **depth**, **retrievalPath** (how the note was reached from the focus), and truncated **content** when needed.
 
 Use cases:
 - Inspect how a note connects to the rest of the notebook before answering questions about it.

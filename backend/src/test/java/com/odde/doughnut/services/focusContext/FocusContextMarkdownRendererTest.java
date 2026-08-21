@@ -105,15 +105,7 @@ class FocusContextMarkdownRendererTest {
       FocusContextResult result = new FocusContextResult(focusNote("NB", "A", "focus", false));
       result.addRelatedNote(
           new FocusContextNote(
-              "NB",
-              "B",
-              "",
-              1,
-              List.of("[[A]]", "[[NB: B]]"),
-              FocusContextEdgeType.OutgoingWikiLink,
-              null,
-              "content of B",
-              false));
+              "NB", "B", "", 1, List.of("[[A]]", "[[NB: B]]"), null, "content of B", false));
 
       String output = renderer.render(result, depth1Config);
 
@@ -135,7 +127,6 @@ class FocusContextMarkdownRendererTest {
               "",
               2,
               List.of("[[Focus]]", "[[NB: Mid]]", "[[NB: Far]]"),
-              FocusContextEdgeType.OutgoingWikiLink,
               null,
               "far content",
               true));
@@ -149,20 +140,12 @@ class FocusContextMarkdownRendererTest {
     }
 
     @Test
-    void folderSiblingShowsPathToAnchor() {
+    void folderPeerShowsPathToAnchor() {
       FocusContextResult result =
           new FocusContextResult(focusNote("NB", "AnchorTitle", "focus", false));
       result.addRelatedNote(
           new FocusContextNote(
-              "NB",
-              "Peer",
-              "",
-              1,
-              List.of("[[AnchorTitle]]"),
-              FocusContextEdgeType.FolderSibling,
-              null,
-              "peer body",
-              false));
+              "NB", "Peer", "", 1, List.of("[[AnchorTitle]]"), null, "peer body", false));
 
       String output = renderer.render(result, depth1Config);
 

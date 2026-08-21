@@ -51,9 +51,7 @@ public class FocusContextConstants {
   /**
    * Below this many approximate tokens left <em>after</em> focus note content (e.g. tight {@code
    * GET /notes/{id}/graph} limits), omit folder-peer sampling: no {@code sampleSiblings} on the
-   * focus note and no {@link
-   * com.odde.doughnut.services.focusContext.FocusContextEdgeType#FolderSibling} rows. Wiki BFS
-   * still uses the full post-focus remainder.
+   * focus note and no folder-peer related notes. Wiki BFS still uses the full post-focus remainder.
    */
   public static final int MIN_RELATED_TOKENS_FOR_FOLDER_PEER_CONTEXT = 100;
 
