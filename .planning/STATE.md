@@ -6,9 +6,9 @@ current_phase: null
 current_phase_name: null
 status: ready
 stopped_at: null
-last_updated: "2026-08-21T09:30:00Z"
+last_updated: "2026-08-21T17:20:00Z"
 last_activity: 2026-08-21
-last_activity_desc: "Quick plan 003 complete; spent plan cleaned"
+last_activity_desc: "Quick plan 003 slice 1 done (ADR blank-line); slice 2 MergedRelatedNotes test remaining"
 progress:
   total_phases: 0
   completed_phases: 0
@@ -34,3 +34,4 @@ Scheduling follows Accepted [ADR 0003](../docs/adrs/0003-spaced-repetition-sched
 ## Operator Next Steps
 
 - After deploying the Flyway squash, confirm startup succeeded and `flyway_schema_history` shows the baseline repaired, the collapsed versions marked `DELETE`, and `V300000300` applied
+- Continue `.planning/quick/003-learning-session-request-review-followups/PLAN.md` — slice 2 (`MergedRelatedNotes` direct unit test) remaining; open question #3 (per-session-item token budget) still needs developer judgment if pursued

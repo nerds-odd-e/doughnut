@@ -87,6 +87,7 @@ Wait for the learner's instruction before starting the learning session.
 <session_items>
 ### Hola
 - Tutoring status: 1 previous session, last on 2026-08-06
+
 <focus_note>
 Title: Hola
 Notebook: Spanish conversation
@@ -99,6 +100,7 @@ Hello. See [[Saludos]]
 
 ### Gracias
 - Tutoring status: not yet tutored
+
 <focus_note>
 Title: Gracias
 Notebook: Spanish conversation
