@@ -34,4 +34,4 @@ Scheduling follows Accepted [ADR 0003](../docs/adrs/0003-spaced-repetition-sched
 ## Operator Next Steps
 
 - After deploying the Flyway squash, confirm startup succeeded and `flyway_schema_history` shows the baseline repaired, the collapsed versions marked `DELETE`, and `V300000300` applied
-- Optional follow-up (not planned): whether Learning Session Request should cap total focus/related content across session items (today each item gets the full per-note Focus Context budget; ADR 0005 already documents that)
+- Optional follow-up (not planned): whether Learning Session Request should cap total focus/related content across session items (today each item gets the full per-note Focus Context budget)

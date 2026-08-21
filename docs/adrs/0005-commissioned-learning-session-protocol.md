@@ -41,12 +41,21 @@ that a later machine transport can carry the same concepts unchanged.
 
 ## Decision
 
+This ADR owns the **domain meaning** of a commissioned Learning Session and the
+**document protocol** for Request and Report. Source code owns rendering,
+parsing, and persistence.
+
+### Domain
+
 A Learning Session is the Request/Report **activity**, not a persisted aggregate.
-There is no `learning_session` or `session_item` table. Session Item is Request
-and Report document vocabulary (ADR 0001), not a row. Recording Feedback writes
-RecallLogs and updates the Memory Tracker schedule (ADR 0003). The learner does
-not paste a Report into a stored session, and Doughnut does not amend a session
-in place.
+Session Item is Request and Report document vocabulary (ADR 0001), not a stored
+row. The learner does not paste a Report into a stored session, and Doughnut
+does not amend a session in place.
+
+Recording Feedback applies a **Grade** to the matching commissioned memory
+tracker. What that Grade does to the schedule is ADR 0003 — including whether a
+later Grade re-grades from an earlier snapshot or applies on top of the state
+the earlier Grade already produced.
 
 ### Exchange medium
 
@@ -60,22 +69,40 @@ in place.
 
 ### Learning Session Request
 
-Doughnut states the notebook, how to report (with the rubric inline), and one
-section per Session Item keyed by note title, carrying the learner's tutoring
-status and a `<focus_note>` with the note body. Related notes for all Session
-Items are retrieved with the normal per-note Focus Context budget
-(`defaultMaxDepth`), merged into one deduped `<related_notes>` list (by notebook
-+ title, first-seen; Session Item titles excluded), and placed after
-`</session_items>`.
+The Request names the notebook, the Session Items to teach (keyed by note
+title), tutoring status per item, the notes to teach from, related notes for
+context, and how to report (with the rubric inline).
+
+Document structure, in order:
+
+1. Heading `# Learning Session Request`
+2. `<instructions>` — tutor role for this notebook, any notebook-specific
+   instruction, and to wait for the learner before starting
+3. `<session_item_titles>` — the Session Item titles in this session
+4. `<session_items>` — one `### {title}` section per Session Item, with tutoring
+   status and a `<focus_note>` for that item
+5. `<related_notes>` — notes related to the Session Items, for tutor context;
+   Session Items themselves are not repeated here
+6. `<how_to_report>` — the Grade 1–4 rubric and a worked Report example
+
+Focus notes and related notes are **Focus Context** (ADR 0001), not a second
+note format.
+
+The rubric in `<how_to_report>` is:
+
+- 4 — mastered the session item with full fluency
+- 3 — mastered the session item with fluency
+- 2 — mastered the session item but not fluent, or needed a reminder then showed mastery
+- 1 — needed several reminders, or could not reach the session item even with help
+
+Those four values are Grade (ADR 0001) and FSRS `G` (ADR 0003). The Tutor is
+told to grade only Session Items actually taught in this session.
 
 ```markdown
 # Learning Session Request
 
 <instructions>
 You are the tutor to help the learner to study Spanish conversation.
-
-Focus on conversational phrases.
-
 Wait for the learner's instruction before starting the learning session.
 </instructions>
 
@@ -86,76 +113,30 @@ Wait for the learner's instruction before starting the learning session.
 
 <session_items>
 ### Hola
-- Tutoring status: 1 previous session, last on 2026-08-06
-
-<focus_note>
-Title: Hola
-Notebook: Spanish conversation
-Depth: 0
-
-```doughnut-note-md
-Hello. See [[Saludos]]
-```
-</focus_note>
+- Tutoring status: …
+<focus_note>…</focus_note>
 
 ### Gracias
-- Tutoring status: not yet tutored
-
-<focus_note>
-Title: Gracias
-Notebook: Spanish conversation
-Depth: 0
-
-```doughnut-note-md
-Thank you
-```
-</focus_note>
+- Tutoring status: …
+<focus_note>…</focus_note>
 </session_items>
 
 <related_notes>
-Purpose: Notes related to the session items, for tutor context.
-Max depth: 2
-
-<retrieved_note>
-Title: Saludos
-Notebook: Spanish conversation
-Depth: 1
-Path: [[Hola]] -> [[Spanish conversation: Saludos]]
-
-```doughnut-note-md
-Greetings
-```
-</retrieved_note>
+…
 </related_notes>
 
 <how_to_report>
 Teach the session items above, then return a Learning Session Report giving one
-Grade from 1 to 4 per item:
-
-- 4 — mastered the session item with full fluency
-- 3 — mastered the session item with fluency
-- 2 — mastered the session item but not fluent, or needed a reminder then showed mastery
-- 1 — needed several reminders, or could not reach the session item even with help
-
-Example of how to provide feedback:
-
-# Learning Session Report
-
-<session_item_grades>
-Hola: 4
-Gracias: 1
-</session_item_grades>
-
-Only grade session items that were actually taught in this session. Do not list
-items that were not taught in the session.
+Grade from 1 to 4 per item.
+…
 </how_to_report>
 ```
 
 ### Learning Session Report
 
-The Tutor returns one Grade per note title inside a tagged block. Line values
-are `1`–`4` (= FSRS `G`). Prose and markdown headers outside the block are
-ignored.
+The Tutor returns one Grade per taught Session Item inside
+`<session_item_grades>`. Line form is `{title}: {1–4}`. Prose and markdown
+outside the block are not Feedback.
 
 ```markdown
 # Learning Session Report
@@ -168,33 +149,18 @@ Gracias: 1
 </session_item_grades>
 ```
 
-Doughnut prefers `<session_item_grades>`. Accept `<session_item_scores>`
-**only** as legacy parser spelling; normalize to Grade immediately and never
-expose “score” past that boundary. If neither tagged block is present,
-fall back to the whole document (minus the optional `# Learning Session Report`
-header) so older pastes still work. Descriptive prose beside a grade line is
-tolerated and ignored.
-
-### Matching and recording
+### Matching
 
 1. Entries match Session Items by note title within the notebook.
-2. Doughnut records Feedback for every matched entry by writing a RecallLog
-   (`answer_id` null) on that commissioned tracker and scheduling it. Unmatched
-   entries are rejected and reported to the learner. Recording is not
-   all-or-nothing: a partly usable Report still moves the trackers it matched.
-3. A matched entry whose Grade is not an integer from 1 to 4 is rejected and
-   reported the same way.
-4. A Session Item with no matching entry receives no Feedback, and its tracker is
+2. Duplicate titles in one notebook are ambiguous: they do not match, and
+   Doughnut does not guess.
+3. Unmatched entries and Grades that are not integers from 1 to 4 are rejected
+   and reported to the learner. Recording is not all-or-nothing: a partly usable
+   Report still records Feedback for the Session Items it matched.
+4. A Session Item with no matching entry receives no Feedback; its tracker is
    unchanged.
-5. A further Report is another recording: new RecallLogs and another schedule
-   update. Doughnut does not keep a session bag to amend, and does not mark
-   recorded sessions in a list.
-6. What a Grade does to the schedule is ADR 0003, not this ADR — including
-   whether a later Grade re-grades from an earlier snapshot or applies on top of
-   the state the earlier Grade already produced.
-7. The Memory Tracker's latest tutor feedback Grade is the latest tutor
-   RecallLog on that commissioned tracker (`answer_id` null, excluding
-   CONFUSION): that row's Grade (`G` **1–4**).
+5. A further Report is another recording. Doughnut does not keep a session bag
+   to amend.
 
 ### Out of scope
 
@@ -214,8 +180,8 @@ tolerated and ignored.
 - Renaming a note between commissioning and recording breaks matching for that
   item; the learner sees it as unmatched rather than silently losing a Grade.
 - Growing to descriptive feedback, recommendations, or a machine transport is
-  additive — Session Item (in the documents) and Feedback (as RecallLog) already
-  carry the concepts.
+  additive — Session Item (in the documents) and Feedback already carry the
+  concepts.
 - There is no past session to reopen and amend; a later Report appends history.
 - No document versioning: the Request restates the rubric every time, so an old
   copy stays interpretable on its own.
@@ -246,7 +212,7 @@ tolerated and ignored.
 
 - **Tutor Grades 1–4 identical to FSRS G** (`1` Again, `2` Hard, `3` Good,
   `4` Easy) — accepted (Decision above). The Request rubric is those four
-  lines; latest tutor feedback is that Grade's `G`.
+  lines.
 - **A 0–5 rubric with a shifted Good/Hard/Easy map** — rejected: valid report
   Grades are 1, 2, 3, and 4; the numeric value is G.
 
