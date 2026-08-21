@@ -39,7 +39,7 @@ Legacy shapes stay accepted for grade-only reports: `<session_item_grades>`,
 | Block tag | `<session_item_feedback>` preferred; grades/scores blocks legacy | Outer name states Feedback (Grade + text), not just grades |
 | Persistence | `tutor_feedback` text on the same tutor `RecallLog` row (`answer_id` null) | One Feedback = one history entry (ADR 0001); "last two" is one query |
 | Grade required | Item block without a valid `Grade:` line is rejected and reported | A grade-less `RecallLog` means CONFUSION; text-only Feedback has no clean representation |
-| Recording semantics | Unchanged from ADR 0005 — partial recording, append-only, per-notebook | No new failure mode |
+| Recording semantics | Unchanged from ADR 0003 — partial recording, append-only, per-notebook | No new failure mode |
 | Learner review | `RecallHistory` on the memory tracker page | Feedback history already lives there |
 
 ## Open forks (Jidoka before the slice that needs them)
@@ -56,7 +56,8 @@ Legacy shapes stay accepted for grade-only reports: `<session_item_grades>`,
 
 ### 1. Protocol decision recorded — Docs
 
-ADR 0005 currently lists descriptive feedback as out of scope; that line is the
+The [commissioned learning session protocol](../../../docs/commissioned-learning-session-protocol.md)
+currently lists descriptive feedback as out of scope; that line is the
 blocker for every slice below.
 
 - Move descriptive Feedback out of **Out of scope** (recommendations, Tutor
@@ -66,9 +67,8 @@ blocker for every slice below.
   carrying the last two dated Feedbacks.
 - ADR 0001 **Feedback** gloss: descriptive feedback is recorded now;
   recommendations remain later.
-- Status stays **Proposed** — only the human Accepts.
 
-Verify: docs only; `docs/adrs/README.md` index untouched (no status change).
+Verify: protocol doc and ADR 0001 Feedback gloss only; no new ADR.
 
 ### 2. Report `<session_item_feedback>` records Grades — Behavior
 

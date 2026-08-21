@@ -199,8 +199,12 @@ commission from Doughnut:
   Feedback per Session Item
 - **Session Item** — One memory tracker within a Learning Session, and
   the Feedback recorded for it
-- **Feedback** — A Tutor's evaluation of a Session Item (a **Grade**,
-  and later descriptive feedback and recommendations)
+- **Feedback** — A Tutor's evaluation of a Session Item (a **Grade**)
+
+Request/Report documents:
+[commissioned learning session protocol](../commissioned-learning-session-protocol.md).
+Scheduling of recorded Grades:
+[ADR 0003](./0003-spaced-repetition-scheduling-policy-accepted.md).
 
 ## Alignment policy
 
@@ -228,4 +232,6 @@ introduce a translation type that wraps one as the other.
 [spaced-repetition scheduling policy](./0003-spaced-repetition-scheduling-policy-accepted.md)
 (**Spaced repetition glossary**); ADR 0004
 [OKF-compatible notebook Markdown](./0004-okf-compatible-notebook-markdown-accepted.md)
-(portable Markdown profile)
+(portable Markdown profile); [commissioned learning session
+protocol](../commissioned-learning-session-protocol.md) (Request/Report
+documents)

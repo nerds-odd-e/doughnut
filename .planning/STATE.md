@@ -6,9 +6,9 @@ current_phase: null
 current_phase_name: null
 status: ready
 stopped_at: null
-last_updated: "2026-08-21T18:25:00Z"
+last_updated: "2026-08-21T19:20:00Z"
 last_activity: 2026-08-21
-last_activity_desc: "Quick plan 003 complete (ADR blank-line + MergedRelatedNotesTest); plan cleaned up"
+last_activity_desc: "Commissioned learning: domain in ADR 0003, protocol in docs/commissioned-learning-session-protocol.md"
 progress:
   total_phases: 0
   completed_phases: 0
