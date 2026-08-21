@@ -1,27 +1,38 @@
 package com.odde.doughnut.services.focusContext;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 
-/** Merges related notes across focuses; first-seen wins by (notebook, title). */
+/** Merges related notes across focuses by (notebook, title); first-seen wins. */
 public class MergedRelatedNotes {
-  private final Map<String, FocusContextNote> byNotebookAndTitle = new LinkedHashMap<>();
+  private final Set<String> claimedKeys = new HashSet<>();
+  private final List<FocusContextNote> notes = new ArrayList<>();
 
-  public void addAll(List<FocusContextNote> notes) {
-    for (FocusContextNote note : notes) {
-      byNotebookAndTitle.putIfAbsent(identityKey(note), note);
+  public void exclude(String notebook, String title) {
+    claimedKeys.add(identityKey(notebook, title));
+  }
+
+  public void addAll(List<FocusContextNote> notesToAdd) {
+    for (FocusContextNote note : notesToAdd) {
+      if (claimedKeys.add(identityKey(note))) {
+        notes.add(note);
+      }
     }
   }
 
   public List<FocusContextNote> asList() {
-    return new ArrayList<>(byNotebookAndTitle.values());
+    return new ArrayList<>(notes);
   }
 
   private static String identityKey(FocusContextNote note) {
-    String notebook = note.getNotebook() != null ? note.getNotebook() : "";
-    String title = note.getTitle() != null ? note.getTitle() : "";
-    return notebook + "\0" + title;
+    return identityKey(note.getNotebook(), note.getTitle());
+  }
+
+  private static String identityKey(String notebook, String title) {
+    String notebookPart = notebook != null ? notebook : "";
+    String titlePart = title != null ? title : "";
+    return notebookPart + "\0" + titlePart;
   }
 }

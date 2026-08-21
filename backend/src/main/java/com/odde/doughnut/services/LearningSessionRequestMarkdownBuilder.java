@@ -79,6 +79,10 @@ public class LearningSessionRequestMarkdownBuilder {
       StringBuilder sb, User viewer, List<MemoryTracker> trackers, ZoneId zoneId) {
     RetrievalConfig config = RetrievalConfig.defaultMaxDepth();
     MergedRelatedNotes mergedRelatedNotes = new MergedRelatedNotes();
+    for (MemoryTracker tracker : trackers) {
+      Note note = tracker.getNote();
+      mergedRelatedNotes.exclude(note.getNotebook().getName(), note.getTitle());
+    }
     sb.append("<session_items>\n");
     for (MemoryTracker tracker : trackers) {
       appendSessionItem(sb, viewer, tracker, zoneId, config, mergedRelatedNotes);

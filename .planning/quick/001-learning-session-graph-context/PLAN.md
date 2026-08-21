@@ -80,13 +80,10 @@ via `MergedRelatedNotes` (notebook+title, first-seen). Removed `focusNoteOnly`.
 E2E asserts related body; unit test asserts shared link appears once.
 
 ### 3. Session-item notes never appear as related notes — Behavior
+Status: done
 
-A session item linked from another session item (Hola → `[[Gracias]]`) must appear
-only under `<session_items>` with its full body, never in `<related_notes>`.
-
-- Exclude the session items' `(notebook, title)` keys when merging.
-- Test: `LearningSessionRequestTests` — cross-linked "Hola"/"Gracias" produce no
-  `<retrieved_note>` for either.
+`MergedRelatedNotes.exclude` pre-claims session-item (notebook, title) keys.
+Cross-linked session items stay under `<session_items>` only.
 
 ### 4. Document the new Request shape — Docs
 
