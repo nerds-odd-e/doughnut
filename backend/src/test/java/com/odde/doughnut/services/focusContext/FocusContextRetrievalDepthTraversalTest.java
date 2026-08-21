@@ -67,15 +67,12 @@ class FocusContextRetrievalDepthTraversalTest extends FocusContextRetrievalTestB
     refreshWikiCache(focus, viewer);
     refreshWikiCache(mid, viewer);
 
-    FocusContextResult result = service.retrieve(focus, viewer, RetrievalConfig.depth1());
+    FocusContextResult result =
+        service.retrieve(
+            focus, viewer, new RetrievalConfig(1, null, CONTENT_BUDGET_WITHOUT_FOLDER_PEERS));
 
     assertThat(relatedTitles(result), hasItem("MidShallow"));
-    assertThat(
-        result.getRelatedNotes().stream()
-            .filter(n -> n.getEdgeType() == FocusContextEdgeType.OutgoingWikiLink)
-            .map(FocusContextNote::getTitle)
-            .toList(),
-        not(hasItem("LeafShallow")));
+    assertThat(relatedTitles(result), not(hasItem("LeafShallow")));
   }
 
   @Test
@@ -147,11 +144,11 @@ class FocusContextRetrievalDepthTraversalTest extends FocusContextRetrievalTestB
 
     FocusContextNote hubNote = relatedByTitle(result, "HubInbound");
     assertThat(hubNote.getDepth(), equalTo(1));
-    assertThat(hubNote.getEdgeType(), equalTo(FocusContextEdgeType.InboundWikiReference));
+    assertThat(isWikiReached(hubNote), is(true));
 
     FocusContextNote d2 = relatedByTitle(result, "RefersToHub");
     assertThat(d2.getDepth(), equalTo(2));
-    assertThat(d2.getEdgeType(), equalTo(FocusContextEdgeType.InboundWikiReference));
+    assertThat(isWikiReached(d2), is(true));
   }
 
   @Test
@@ -194,14 +191,7 @@ class FocusContextRetrievalDepthTraversalTest extends FocusContextRetrievalTestB
                 /* combined content budget: tight enough that depth-1 spends exhaust wiki share before BridgeBudget */
                 800));
 
-    List<String> wikiTitles =
-        result.getRelatedNotes().stream()
-            .filter(
-                n ->
-                    n.getEdgeType() == FocusContextEdgeType.OutgoingWikiLink
-                        || n.getEdgeType() == FocusContextEdgeType.InboundWikiReference)
-            .map(FocusContextNote::getTitle)
-            .toList();
+    List<String> wikiTitles = wikiReachedTitles(result);
     assertThat(wikiTitles, not(hasItem("BridgeBudget")));
     assertThat(wikiTitles, not(hasItem("LeafAfterBudget")));
   }

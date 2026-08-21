@@ -87,7 +87,7 @@ without rewriting assertions at the same time.
 - `FocusContextRetrievalTestBase` — replace `folderSiblingTitles` with helpers
   built on the path-shape fact above (folder peer: `retrievalPath.size() ==
   depth`; wiki-reached: `== depth + 1`).
-- `FocusContextRetrievalFolderSiblingTest`, `…DepthTraversalTest`,
+- `FocusContextRetrievalFolderPeerTest` (was FolderSibling), `…DepthTraversalTest`,
   `…InboundSamplingTest` — switch every `getEdgeType()` filter to those helpers.
   For the wiki-only claims in `Depth1CapAndSeed`, `Depth2InboundCap` and
   `maxDepthOneSkipsSecondHop`, prefer a content budget under
@@ -98,7 +98,12 @@ All existing tests must still pass unchanged in intent.
 
 **Tests:** backend unit suite.
 
-Status: planned
+Status: done
+
+**Learnings:** Path-shape helpers + `CONTENT_BUDGET_WITHOUT_FOLDER_PEERS` are
+ready for slice 3 field deletion. Remaining `edgeType` asserts live in
+`FocusContextRetrievalServiceTest`, `NoteControllerGraphTests`, and markdown
+fixture constructors.
 
 ### 3. Focus context payload drops `edgeType` — Behavior
 

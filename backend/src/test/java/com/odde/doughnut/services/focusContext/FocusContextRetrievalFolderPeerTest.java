@@ -13,7 +13,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-class FocusContextRetrievalFolderSiblingTest extends FocusContextRetrievalTestBase {
+class FocusContextRetrievalFolderPeerTest extends FocusContextRetrievalTestBase {
 
   @Nested
   class SamplingStability {
@@ -31,19 +31,19 @@ class FocusContextRetrievalFolderSiblingTest extends FocusContextRetrievalTestBa
     }
 
     @Test
-    void repeatRetrieveSameSiblingOrderForNullAndFixedSeed() {
+    void repeatRetrieveSamePeerOrderForNullAndFixedSeed() {
       for (Long seed : new Long[] {null, 42L}) {
         RetrievalConfig cfg = RetrievalConfig.forQuestionGeneration(seed);
-        List<String> first = folderSiblingTitles(service.retrieve(focus, viewer, cfg));
-        List<String> second = folderSiblingTitles(service.retrieve(focus, viewer, cfg));
+        List<String> first = folderPeerTitles(service.retrieve(focus, viewer, cfg));
+        List<String> second = folderPeerTitles(service.retrieve(focus, viewer, cfg));
         assertThat(first, equalTo(second));
       }
     }
 
     @Test
-    void siblingSampleSizeRespectsDepthOneCap() {
+    void peerSampleSizeRespectsDepthOneCap() {
       assertThat(
-          folderSiblingTitles(
+          folderPeerTitles(
                   service.retrieve(focus, viewer, RetrievalConfig.forQuestionGeneration(null)))
               .size(),
           lessThanOrEqualTo(FocusContextConstants.sampleCapAtGraphDepth(1)));
@@ -119,11 +119,11 @@ class FocusContextRetrievalFolderSiblingTest extends FocusContextRetrievalTestBa
     FocusContextResult result = service.retrieve(focus, viewer, RetrievalConfig.forGraphApi(10));
 
     assertThat(result.getFocusNote().getSampleSiblings(), is(empty()));
-    assertThat(folderSiblingTitles(result), is(empty()));
+    assertThat(folderPeerTitles(result), is(empty()));
   }
 
   @Test
-  void folderSiblingsIncludeStructuralPeersInSameFolder() {
+  void folderPeersIncludeStructuralPeersInSameFolder() {
     User viewer = makeMe.aUser().please();
     Folder folder = makeMe.aFolder().notebookOwnedBy(viewer).please();
     Note focus = makeMe.aNote().folder(folder).title("FocusF").content("See [[LinkT]].").please();
@@ -140,19 +140,17 @@ class FocusContextRetrievalFolderSiblingTest extends FocusContextRetrievalTestBa
     FocusContextResult result =
         service.retrieve(focus, viewer, RetrievalConfig.forQuestionGeneration(null));
 
-    List<String> siblingTitles = folderSiblingTitles(result);
-    assertThat(siblingTitles, hasItem("OtherFolderPeer"));
+    List<String> peerTitles = folderPeerTitles(result);
+    assertThat(peerTitles, hasItem("OtherFolderPeer"));
     assertThat(
-        "wiki-resolved targets are not duplicated as folder siblings",
-        siblingTitles,
+        "wiki-resolved targets are not duplicated as folder peers",
+        peerTitles,
         not(hasItem("LinkT")));
-    assertThat(
-        relatedByTitle(result, "LinkT").getEdgeType(),
-        equalTo(FocusContextEdgeType.OutgoingWikiLink));
+    assertThat(isWikiReached(relatedByTitle(result, "LinkT")), is(true));
   }
 
   @Test
-  void folderSiblingIsNotWikiExpansionFrontier() {
+  void folderPeerIsNotWikiExpansionFrontier() {
     User viewer = makeMe.aUser().please();
     Note focus =
         makeMe.aNote().notebookOwnedBy(viewer).title("RootFS").content("[[MidFS]].").please();
@@ -170,10 +168,6 @@ class FocusContextRetrievalFolderSiblingTest extends FocusContextRetrievalTestBa
     FocusContextResult result = service.retrieve(focus, viewer, RetrievalConfig.defaultMaxDepth());
 
     assertThat(relatedTitles(result), hasItem("MidFS"));
-    assertThat(
-        result.getRelatedNotes().stream()
-            .filter(n -> "DeepOnly".equals(n.getTitle()))
-            .noneMatch(n -> n.getEdgeType() == FocusContextEdgeType.OutgoingWikiLink),
-        is(true));
+    assertThat(wikiReachedTitles(result), not(hasItem("DeepOnly")));
   }
 }

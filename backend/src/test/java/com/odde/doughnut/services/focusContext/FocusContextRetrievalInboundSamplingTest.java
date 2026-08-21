@@ -13,13 +13,6 @@ import org.junit.jupiter.api.Test;
 
 class FocusContextRetrievalInboundSamplingTest extends FocusContextRetrievalTestBase {
 
-  private List<String> inboundReferrerTitles(Note focus, User viewer, RetrievalConfig cfg) {
-    return service.retrieve(focus, viewer, cfg).getRelatedNotes().stream()
-        .filter(n -> n.getEdgeType() == FocusContextEdgeType.InboundWikiReference)
-        .map(FocusContextNote::getTitle)
-        .toList();
-  }
-
   private void addInboundReferrers(Note focus, User viewer, int count, String titlePrefix) {
     for (int i = 0; i < count; i++) {
       Note r =
@@ -75,16 +68,21 @@ class FocusContextRetrievalInboundSamplingTest extends FocusContextRetrievalTest
     }
 
     private List<String> sortedInboundReferrerTitles(long seed) {
-      return inboundReferrerTitles(focusNote, viewer, RetrievalConfig.forQuestionGeneration(seed))
+      return relatedTitles(
+              service.retrieve(
+                  focusNote,
+                  viewer,
+                  RetrievalConfig.forQuestionGeneration(seed, CONTENT_BUDGET_WITHOUT_FOLDER_PEERS)))
           .stream()
           .sorted()
           .toList();
     }
 
     private void assertInboundSampleStableAndCapped(Long seed) {
-      RetrievalConfig cfg = RetrievalConfig.forQuestionGeneration(seed);
-      List<String> first = inboundReferrerTitles(focusNote, viewer, cfg);
-      List<String> second = inboundReferrerTitles(focusNote, viewer, cfg);
+      RetrievalConfig cfg =
+          RetrievalConfig.forQuestionGeneration(seed, CONTENT_BUDGET_WITHOUT_FOLDER_PEERS);
+      List<String> first = relatedTitles(service.retrieve(focusNote, viewer, cfg));
+      List<String> second = relatedTitles(service.retrieve(focusNote, viewer, cfg));
       assertThat(first.size(), equalTo(6));
       assertThat(first, equalTo(second));
     }
@@ -112,9 +110,7 @@ class FocusContextRetrievalInboundSamplingTest extends FocusContextRetrievalTest
       FocusContextResult result =
           service.retrieve(hub, viewer, RetrievalConfig.forQuestionGeneration(null));
 
-      assertThat(
-          relatedByTitle(result, "XShared").getEdgeType(),
-          equalTo(FocusContextEdgeType.OutgoingWikiLink));
+      assertThat(isWikiReached(relatedByTitle(result, "XShared")), is(true));
     }
   }
 
@@ -135,16 +131,13 @@ class FocusContextRetrievalInboundSamplingTest extends FocusContextRetrievalTest
       addInboundReferrers(depth1Ref, viewer, 3, "D2Ref");
 
       FocusContextResult result =
-          service.retrieve(focusNote, viewer, RetrievalConfig.forQuestionGeneration(1L));
+          service.retrieve(
+              focusNote,
+              viewer,
+              RetrievalConfig.forQuestionGeneration(1L, CONTENT_BUDGET_WITHOUT_FOLDER_PEERS));
 
-      long depth2InboundCount =
-          result.getRelatedNotes().stream()
-              .filter(
-                  n ->
-                      n.getDepth() == 2
-                          && n.getEdgeType() == FocusContextEdgeType.InboundWikiReference)
-              .count();
-      assertThat(depth2InboundCount, lessThanOrEqualTo(2L));
+      long depth2Count = result.getRelatedNotes().stream().filter(n -> n.getDepth() == 2).count();
+      assertThat(depth2Count, lessThanOrEqualTo(2L));
     }
   }
 }
