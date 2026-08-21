@@ -22,7 +22,7 @@ The key insight for Doughnut: **in a zettelkasten, wiki links ARE concept anchor
 
 - The graph-structural approach is **defensible**, not idiosyncratic-in-a-bad-way. The field is fragmented between embedding-RAG, user-curated scope, and concept-grouped retrieval; no de-facto standard exists for "focus note context windows" as of 2026.
 - OKF v0.2 is a *format* spec (markdown + YAML frontmatter, `type` required, file path = identity, links = graph). It deliberately says nothing about context windows, retrieval depth, or envelopes — that's producer's choice.
-- No surveyed tool exposes "how a note was reached" (edge type / reason) to the model. Retrieval reason is a UI affordance everywhere, never a model input. This validates the in-flight `edgeType` removal plan — we are moving *toward* the field norm.
+- No surveyed tool exposes "how a note was reached" (edge type / reason) to the model. Retrieval reason is a UI affordance everywhere, never a model input. Doughnut's focus-context payload matches that: related notes carry depth and path, not an edge label.
 - Doughnut's `<focus_context>` XML envelope with per-note Title/Notebook/Folder/Depth metadata is **more structured than any tool surveyed** (NotebookLM uses plain text with citation markers; Heptabase/Tana expose context via MCP tools returning JSON the client renders). This is a deliberate design choice, not a debt.
 
 ## Sources
