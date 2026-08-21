@@ -108,8 +108,7 @@ install_nixpkg_manager() {
       log "Installing nix using Determinate Systems installer (Attempt $attempt/$max_attempts)..."
 
       # Adding --retry and --retry-connrefused to curl for better network resilience
-      # if curl --proto '=https' --tlsv1.2 -sSf -L --retry 3 --retry-connrefused --connect-timeout 10 https://install.determinate.systems/nix | sh -s -- install --determinate --no-confirm; then
-      if curl --proto '=https' --tlsv1.2 -sSf -L --retry 3 --retry-connrefused --connect-timeout 10 https://github.com/DeterminateSystems/nix-installer/releases/download/v3.22.0/nix-installer.sh | sh -s -- install --determinate --no-confirm; then
+      if curl --proto '=https' --tlsv1.2 -sSf -L --retry 3 --retry-connrefused --connect-timeout 10 https://install.determinate.systems/nix | sh -s -- install --determinate --no-confirm; then
          installed=true
          break
       else
