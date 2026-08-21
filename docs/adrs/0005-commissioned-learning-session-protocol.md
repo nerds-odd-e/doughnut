@@ -62,7 +62,11 @@ in place.
 
 Doughnut states the notebook, how to report (with the rubric inline), and one
 section per Session Item keyed by note title, carrying the learner's tutoring
-status and a focus-note-only Focus Context block with the note body.
+status and a `<focus_note>` with the note body. Related notes for all Session
+Items are retrieved with the normal per-note Focus Context budget
+(`defaultMaxDepth`), merged into one deduped `<related_notes>` list (by notebook
++ title, first-seen; Session Item titles excluded), and placed after
+`</session_items>`.
 
 ```markdown
 # Learning Session Request
@@ -83,27 +87,18 @@ Wait for the learner's instruction before starting the learning session.
 <session_items>
 ### Hola
 - Tutoring status: 1 previous session, last on 2026-08-06
-<focus_context>
-Purpose: Context around the focus note for AI use.
-Max depth: 0
-
 <focus_note>
 Title: Hola
 Notebook: Spanish conversation
 Depth: 0
 
 ```doughnut-note-md
-Hello
+Hello. See [[Saludos]]
 ```
 </focus_note>
-</focus_context>
 
 ### Gracias
 - Tutoring status: not yet tutored
-<focus_context>
-Purpose: Context around the focus note for AI use.
-Max depth: 0
-
 <focus_note>
 Title: Gracias
 Notebook: Spanish conversation
@@ -113,8 +108,23 @@ Depth: 0
 Thank you
 ```
 </focus_note>
-</focus_context>
 </session_items>
+
+<related_notes>
+Purpose: Notes related to the session items, for tutor context.
+Max depth: 2
+
+<retrieved_note>
+Title: Saludos
+Notebook: Spanish conversation
+Depth: 1
+Path: [[Hola]] -> [[Spanish conversation: Saludos]]
+
+```doughnut-note-md
+Greetings
+```
+</retrieved_note>
+</related_notes>
 
 <how_to_report>
 Teach the session items above, then return a Learning Session Report giving one
