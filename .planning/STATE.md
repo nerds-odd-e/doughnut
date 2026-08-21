@@ -6,9 +6,9 @@ current_phase: null
 current_phase_name: null
 status: ready
 stopped_at: null
-last_updated: "2026-08-21T19:20:00Z"
+last_updated: "2026-08-21T19:25:00Z"
 last_activity: 2026-08-21
-last_activity_desc: "Commissioned learning: domain in ADR 0003, protocol in docs/commissioned-learning-session-protocol.md"
+last_activity_desc: "Cleaned spent commissioned-learning planning notes"
 progress:
   total_phases: 0
   completed_phases: 0
@@ -34,4 +34,3 @@ Scheduling follows Accepted [ADR 0003](../docs/adrs/0003-spaced-repetition-sched
 ## Operator Next Steps
 
 - After deploying the Flyway squash, confirm startup succeeded and `flyway_schema_history` shows the baseline repaired, the collapsed versions marked `DELETE`, and `V300000300` applied
-- Optional follow-up (not planned): whether Learning Session Request should cap total focus/related content across session items (today each item gets the full per-note Focus Context budget)
