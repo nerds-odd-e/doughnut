@@ -14,6 +14,8 @@ Keep nested XML-like tags. Do **not** add `"---"` between sibling `<retrieved_no
 
 The current shape (`<related_notes>` / `<retrieved_note>`) matches the vendor-canonical hierarchy for multi-document context. Sibling child tags are themselves the delimiter.
 
+**Product stance (2026-08-21):** Mixing user markdown (note bodies, metadata) inside instruction XML envelopes is **not** regarded as bad for Doughnut. Keep the current hybrid. No Gemini-format-consistency spike unless tutoring quality on Gemini specifically regresses.
+
 ## Research (admitted — with sources)
 
 - Nested XML-like tags are recommended when content has a natural hierarchy. Anthropic: nest tags (documents inside a parent, each document inside its own tag). Doughnut's `<related_notes>` / `<retrieved_note>` is that pattern.
@@ -48,22 +50,14 @@ DATA_0c230e44_END
 
 ## Unresolved (could not stand behind)
 
-- Whether mixing Markdown (headings, fenced `doughnut-note-md` bodies) with XML envelopes inside one prompt is harmful. OpenAI recommends combining Markdown and XML. Gemini 3 says choose one format and use it consistently in a single prompt. Doughnut already mixes them (XML envelopes + markdown metadata + fenced note bodies). Not changing that without a Gemini-targeted tutoring spike.
-
-DATA_db09ea53_START
-XML tags can help delineate where one piece of content (like a supporting document used for reference) begins and ends.
-DATA_db09ea53_END
-
-DATA_e96c4580_START
-XML-style tags (e.g. instructions, context) or Markdown headings are effective. Choose one format and use it consistently within a single prompt.
-DATA_e96c4580_END
-
-  Ledger reason: source-vs-prior conflict (OpenAI vs Gemini 3; both primary for their own models).
-
 - Whether the model runs an XML parser on the prompt. No vendor doc states that. Tags are prompt structure, not a schema contract. Ledger reason: unverifiable.
+
+## Vendor conflict closed by product decision
+
+OpenAI recommends combining Markdown and XML; Gemini 3 says choose one format per prompt. Doughnut keeps the hybrid (XML envelopes + markdown metadata + fenced note bodies) by explicit product stance above — not as an unresolved research claim.
 
 ## Implications for plan 003
 
 - Slice 1 blank-line fix stays caller-side (1A) — spacing between *top-level* envelopes, unrelated to nesting.
 - No slice 4 for `"---"` between related notes.
-- `FocusContextMarkdownRenderer.render()` still uses `"\n---\n"` *inside* `<focus_context>` for multiple related notes. That is a different envelope (single-focus QG/conversation), not this learning-session `<related_notes>` list. Leave that path alone unless a later spike targets Gemini-format consistency.
+- `FocusContextMarkdownRenderer.render()` still uses `"\n---\n"` *inside* `<focus_context>` for multiple related notes. That is a different envelope (single-focus QG/conversation), not this learning-session `<related_notes>` list. Leave that path alone.

@@ -88,9 +88,13 @@ public class LearningSessionRequestMarkdownBuilder {
       appendSessionItem(sb, viewer, tracker, zoneId, config, mergedRelatedNotes);
     }
     sb.append("</session_items>\n\n");
-    sb.append(
+    String relatedNotes =
         focusContextMarkdownRenderer.renderRelatedNotes(
-            mergedRelatedNotes.asList(), config.getMaxDepth()));
+            mergedRelatedNotes.asList(), config.getMaxDepth());
+    sb.append(relatedNotes);
+    if (!relatedNotes.isEmpty()) {
+      sb.append("\n");
+    }
   }
 
   private void appendHowToReport(StringBuilder sb, List<MemoryTracker> trackers) {

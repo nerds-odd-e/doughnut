@@ -35,6 +35,9 @@ class LearningSessionRequestRelatedNotesTests extends LearningSessionControllerT
 
     assertThat(markdown, containsString(FocusContextConstants.RELATED_NOTES_OPEN_MARKER));
     assertThat(markdown, containsString("Greetings"));
+    assertThat(
+        markdown,
+        containsString(FocusContextConstants.RELATED_NOTES_CLOSE_TAG + "\n<how_to_report>"));
     int relatedNotesStart = markdown.indexOf(FocusContextConstants.RELATED_NOTES_OPEN_MARKER);
     int relatedNotesEnd =
         markdown.indexOf(FocusContextConstants.RELATED_NOTES_CLOSE_TAG, relatedNotesStart)

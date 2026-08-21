@@ -1,11 +1,12 @@
 # Learning Session Request — post-implementation review fixes
 
-**Status:** planned (no slice started)
+**Status:** in progress — slice 2 next
 
 **Jidoka resolved (2026-08-21):**
 
 1. Blank-line fix: **1A** — caller-side in `LearningSessionRequestMarkdownBuilder`.
 2. Separators between related notes: **leave as-is** (no `"---"`, no slice 4). Nested `<related_notes>` / `<retrieved_note>` is recommended prompt structure; sibling child tags are the delimiter. See `.planning/notes/nested-xml-like-tags-in-llm-prompts.md`.
+3. Mixing user markdown inside instruction XML envelopes: **accepted** (not regarded as bad).
 
 ## Context
 
@@ -76,18 +77,17 @@ is a different envelope; leave it alone.
 
 ### 1. Related notes read as one document, not two run-together tags — Behavior
 
-- Fix: ensure exactly one blank line always precedes `<how_to_report>`,
-  regardless of whether `<related_notes>` was empty (e.g. append `"\n"` after
-  a non-empty `renderRelatedNotes()` result in `appendSessionItems`, or have
-  `appendHowToReport` guarantee the leading blank line itself — pick whichever
-  keeps `LearningSessionRequestMarkdownBuilder` simplest).
-- Test: `LearningSessionRequestRelatedNotesTests` — when a related note exists,
-  assert the markdown contains the exact substring
-  `"</related_notes>\n\n<how_to_report>"`. Keep existing
-  `returnsRequestMarkdownFromDueTrackersWithoutWritingRecallLogs` green (no
-  related notes in that fixture — unaffected).
+Type: Behavior
+Status: done
+
+Caller-side: after non-empty `renderRelatedNotes()`, append `\n` so the request
+contains `"</related_notes>\n\n<how_to_report>"`. Assertion uses
+`RELATED_NOTES_CLOSE_TAG + "\n<how_to_report>"`.
 
 ### 2. Consolidate duplicate Spanish-notebook test fixture — Structure
+
+Type: Structure
+Status: planned
 
 - Extend `LearningSessionControllerTestBase.spanishNotebookFixture` with an
   overload taking Hola/Gracias content strings (default overload keeps
@@ -99,6 +99,9 @@ is a different envelope; leave it alone.
   `LearningSessionRequestRelatedNotesTests` stay green — no behavior change.
 
 ### 3. Direct unit coverage for `renderRelatedNotes` — Structure
+
+Type: Structure
+Status: planned
 
 - Add `@Nested` cases (or a sibling test class) to
   `FocusContextMarkdownRendererTest` covering `renderRelatedNotes` directly:
