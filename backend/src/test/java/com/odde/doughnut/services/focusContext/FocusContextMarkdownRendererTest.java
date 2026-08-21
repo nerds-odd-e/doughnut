@@ -153,4 +153,44 @@ class FocusContextMarkdownRendererTest {
       assertThat(output, containsString("Depth: 1"));
     }
   }
+
+  @Nested
+  class RelatedNotesBlock {
+    private static FocusContextNote relatedNote(String title) {
+      return new FocusContextNote("NB", title, "", 1, List.of(), null, "body of " + title, false);
+    }
+
+    @Test
+    void emptyListReturnsEmptyString() {
+      assertThat(renderer.renderRelatedNotes(List.of(), 1), equalTo(""));
+    }
+
+    @Test
+    void nonEmptyOutputIncludesEnvelopePurposeAndMaxDepth() {
+      String output = renderer.renderRelatedNotes(List.of(relatedNote("Only")), 3);
+
+      assertThat(output, containsString(FocusContextConstants.RELATED_NOTES_OPEN_MARKER));
+      assertThat(output, containsString(FocusContextConstants.RELATED_NOTES_CLOSE_TAG));
+      assertThat(
+          output,
+          containsString("Purpose: Notes related to the session items, for tutor context."));
+      assertThat(output, containsString("Max depth: 3"));
+    }
+
+    @Test
+    void multipleNotesEachRenderRetrievedNoteBlock() {
+      String output =
+          renderer.renderRelatedNotes(List.of(relatedNote("First"), relatedNote("Second")), 1);
+
+      assertThat(
+          output,
+          stringContainsInOrder(
+              FocusContextConstants.RETRIEVED_NOTE_OPEN_MARKER,
+              "Title: First",
+              FocusContextConstants.RETRIEVED_NOTE_CLOSE_TAG,
+              FocusContextConstants.RETRIEVED_NOTE_OPEN_MARKER,
+              "Title: Second",
+              FocusContextConstants.RETRIEVED_NOTE_CLOSE_TAG));
+    }
+  }
 }
