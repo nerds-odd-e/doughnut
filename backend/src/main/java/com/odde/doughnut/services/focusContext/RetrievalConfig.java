@@ -32,15 +32,6 @@ public class RetrievalConfig {
     return new RetrievalConfig(1, null, null);
   }
 
-  /** Focus note only — no related-note expansion (e.g. commissioned Learning Session items). */
-  public static RetrievalConfig focusNoteOnly() {
-    return new RetrievalConfig(0, null, null);
-  }
-
-  public static RetrievalConfig focusNoteOnly(int contentTokenBudget) {
-    return new RetrievalConfig(0, null, contentTokenBudget);
-  }
-
   /**
    * Combined approximate token budget for focus and related note content for {@code GET
    * /notes/{id}/graph}.

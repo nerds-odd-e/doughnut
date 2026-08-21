@@ -5,6 +5,12 @@ function learningSessionRequestEntryLabel(notebookTitle: string) {
   return `${notebookTitle} — Request`
 }
 
+function doughnutNoteBodiesIn(markdown: string): string[] {
+  return [...markdown.matchAll(/```doughnut-note-md\n([\s\S]*?)\n```/g)].map(
+    (match) => match[1]
+  )
+}
+
 function closeLearningSessionDetailIfOpen() {
   cy.get('body').then(($body) => {
     if (
@@ -63,15 +69,35 @@ export const recallLearningSessionMethods = () => ({
     })
     return this
   },
-  expectLearningSessionRequestIncludesFocusContextNoteBody(content: string) {
+  expectLearningSessionRequestIncludesFocusNoteBody(content: string) {
     this.learningSessionRequestText().should((text) => {
       expect(text).not.to.contain('Expected learning content:')
-      expect(text).to.contain('<focus_context>')
-      expect(text).to.contain('```doughnut-note-md')
-      const noteBodies = [
-        ...text.matchAll(/```doughnut-note-md\n([\s\S]*?)\n```/g),
-      ].map((match) => match[1])
-      expect(noteBodies.some((body) => body.includes(content))).to.equal(true)
+      expect(text).to.contain('<focus_note>')
+      const focusSections = [
+        ...text.matchAll(/<focus_note>[\s\S]*?<\/focus_note>/g),
+      ].map((match) => match[0])
+      expect(focusSections.length, 'focus_note blocks').to.be.greaterThan(0)
+      expect(
+        doughnutNoteBodiesIn(focusSections.join('\n')).some((body) =>
+          body.includes(content)
+        )
+      ).to.equal(true)
+    })
+    return this
+  },
+  expectLearningSessionRequestIncludesRelatedNoteBody(content: string) {
+    this.learningSessionRequestText().should((text) => {
+      expect(text).to.contain('<related_notes>')
+      expect(text).to.contain('<retrieved_note>')
+      const relatedSection = text.match(
+        /<related_notes>[\s\S]*?<\/related_notes>/
+      )?.[0]
+      expect(relatedSection, 'related_notes block').to.exist
+      expect(
+        doughnutNoteBodiesIn(relatedSection!).some((body) =>
+          body.includes(content)
+        )
+      ).to.equal(true)
     })
     return this
   },

@@ -7,11 +7,13 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import com.odde.doughnut.controllers.dto.LearningSessionRequestResponse;
 import com.odde.doughnut.entities.Grade;
 import com.odde.doughnut.entities.MemoryTracker;
+import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.LearningSessionReportParser;
 import com.odde.doughnut.services.focusContext.FocusContextConstants;
 import java.sql.Timestamp;
+import java.util.regex.Pattern;
 import org.junit.jupiter.api.Test;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -50,7 +52,7 @@ class LearningSessionRequestTests extends LearningSessionControllerTestBase {
     assertThat(markdown, containsString("- Tutoring status: not yet tutored"));
     assertThat(markdown, containsString("Hello"));
     assertThat(markdown, containsString("Thank you"));
-    assertThat(markdown, containsString(FocusContextConstants.FOCUS_CONTEXT_OPEN_MARKER));
+    assertThat(markdown, not(containsString(FocusContextConstants.FOCUS_CONTEXT_OPEN_MARKER)));
     assertThat(markdown, containsString(FocusContextConstants.FOCUS_NOTE_OPEN_MARKER));
     assertThat(markdown, containsString("```doughnut-note-md"));
     assertThat(markdown, containsString("Title: Hola"));
@@ -158,6 +160,44 @@ class LearningSessionRequestTests extends LearningSessionControllerTestBase {
 
     assertThat(response.getRequestMarkdown(), not(containsString("previous session")));
     assertThat(response.getRequestMarkdown(), containsString("- Tutoring status: not yet tutored"));
+  }
+
+  @Test
+  void relatedNoteLinkedFromBothSessionItemsAppearsOnceInRelatedNotes()
+      throws UnexpectedNoAccessRightException {
+    Timestamp dayTwo = makeMe.aTimestamp().of(1, 9).please();
+    testabilitySettings.timeTravelTo(dayTwo);
+
+    Notebook notebook =
+        makeMe
+            .aNotebook()
+            .creatorAndOwner(currentUser.getUser())
+            .name("Spanish conversation")
+            .please();
+    makeMe.aNote().notebook(notebook).title("Saludos").content("Greetings").please();
+    Note hola =
+        makeMe.aNote().notebook(notebook).title("Hola").content("Hello. See [[Saludos]]").please();
+    Note gracias =
+        makeMe
+            .aNote()
+            .notebook(notebook)
+            .title("Gracias")
+            .content("Thank you. See [[Saludos]]")
+            .please();
+    makeMe.aMemoryTrackerFor(hola).commissioned().nextRecallAt(dayTwo).please();
+    makeMe.aMemoryTrackerFor(gracias).commissioned().nextRecallAt(dayTwo).please();
+
+    LearningSessionRequestResponse response = controller.request(notebook.getId(), "Asia/Shanghai");
+    String markdown = response.getRequestMarkdown();
+
+    assertThat(markdown, containsString(FocusContextConstants.RELATED_NOTES_OPEN_MARKER));
+    assertThat(markdown, containsString("Greetings"));
+    int relatedNotesStart = markdown.indexOf(FocusContextConstants.RELATED_NOTES_OPEN_MARKER);
+    int relatedNotesEnd =
+        markdown.indexOf(FocusContextConstants.RELATED_NOTES_CLOSE_TAG, relatedNotesStart)
+            + FocusContextConstants.RELATED_NOTES_CLOSE_TAG.length();
+    String relatedNotes = markdown.substring(relatedNotesStart, relatedNotesEnd);
+    assertThat(relatedNotes.split(Pattern.quote("Title: Saludos"), -1).length - 1, equalTo(1));
   }
 
   @Test

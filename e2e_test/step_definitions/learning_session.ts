@@ -100,12 +100,22 @@ Then(
 )
 
 Then(
-  'the learning session request should include focus context with note body {string}',
+  'the learning session request should include focus note with note body {string}',
   (content: string) => {
     start
       .recall()
       .assumeRecallPage()
-      .expectLearningSessionRequestIncludesFocusContextNoteBody(content)
+      .expectLearningSessionRequestIncludesFocusNoteBody(content)
+  }
+)
+
+Then(
+  'the learning session request should include related notes with note body {string}',
+  (content: string) => {
+    start
+      .recall()
+      .assumeRecallPage()
+      .expectLearningSessionRequestIncludesRelatedNoteBody(content)
   }
 )
 

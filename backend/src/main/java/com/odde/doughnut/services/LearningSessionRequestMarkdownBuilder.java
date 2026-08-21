@@ -10,6 +10,7 @@ import com.odde.doughnut.entities.repositories.TutorLogSummary;
 import com.odde.doughnut.services.focusContext.FocusContextMarkdownRenderer;
 import com.odde.doughnut.services.focusContext.FocusContextResult;
 import com.odde.doughnut.services.focusContext.FocusContextRetrievalService;
+import com.odde.doughnut.services.focusContext.MergedRelatedNotes;
 import com.odde.doughnut.services.focusContext.RetrievalConfig;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -76,11 +77,16 @@ public class LearningSessionRequestMarkdownBuilder {
 
   private void appendSessionItems(
       StringBuilder sb, User viewer, List<MemoryTracker> trackers, ZoneId zoneId) {
+    RetrievalConfig config = RetrievalConfig.defaultMaxDepth();
+    MergedRelatedNotes mergedRelatedNotes = new MergedRelatedNotes();
     sb.append("<session_items>\n");
     for (MemoryTracker tracker : trackers) {
-      appendSessionItem(sb, viewer, tracker, zoneId);
+      appendSessionItem(sb, viewer, tracker, zoneId, config, mergedRelatedNotes);
     }
     sb.append("</session_items>\n\n");
+    sb.append(
+        focusContextMarkdownRenderer.renderRelatedNotes(
+            mergedRelatedNotes.asList(), config.getMaxDepth()));
   }
 
   private void appendHowToReport(StringBuilder sb, List<MemoryTracker> trackers) {
@@ -115,21 +121,22 @@ public class LearningSessionRequestMarkdownBuilder {
   }
 
   private void appendSessionItem(
-      StringBuilder sb, User viewer, MemoryTracker tracker, ZoneId zoneId) {
+      StringBuilder sb,
+      User viewer,
+      MemoryTracker tracker,
+      ZoneId zoneId,
+      RetrievalConfig config,
+      MergedRelatedNotes mergedRelatedNotes) {
     Note note = tracker.getNote();
 
     sb.append("### ").append(note.getTitle()).append("\n");
     sb.append("- Tutoring status: ")
         .append(tutoringStatusLine(tracker.getId(), zoneId))
         .append("\n");
-    appendFocusContext(sb, note, viewer);
-  }
-
-  private void appendFocusContext(StringBuilder sb, Note note, User viewer) {
-    RetrievalConfig config = RetrievalConfig.focusNoteOnly();
     FocusContextResult focusContextResult =
         focusContextRetrievalService.retrieve(note, viewer, config);
-    sb.append(focusContextMarkdownRenderer.render(focusContextResult, config));
+    sb.append(focusContextMarkdownRenderer.renderFocusNote(focusContextResult.getFocusNote()));
+    mergedRelatedNotes.addAll(focusContextResult.getRelatedNotes());
   }
 
   private String tutoringStatusLine(Integer memoryTrackerId, ZoneId zoneId) {

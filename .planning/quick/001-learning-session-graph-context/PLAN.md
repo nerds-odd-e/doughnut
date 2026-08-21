@@ -73,24 +73,11 @@ Public `renderFocusNote` / `renderRelatedNotes`; `render()` composes them.
 `<related_notes>` constants ready for slice 2. Existing focus-context consumers unchanged.
 
 ### 2. Related notes reach the Tutor as one merged list — Behavior
+Status: done
 
-- `LearningSessionRequestMarkdownBuilder`: retrieve per session item with
-  `defaultMaxDepth()`; render each item's `<focus_note>`; collect related notes
-  across items into one deduped list; render one `<related_notes>` block between
-  `</session_items>` and `<how_to_report>`.
-- Merge/dedupe by `(notebook, title)` — put it in `services/focusContext/`
-  (e.g. `MergedRelatedNotes`) since it owns `FocusContextNote` identity, not in
-  the already-busy request builder.
-- Tests:
-  - E2E `commissioned_learning_session.feature` (tag `@wip` first): notebook where
-    "Hola" links `[[Saludos]]`; new step asserting the request includes a related
-    note body. Update `expectLearningSessionRequestIncludesFocusContextNoteBody`
-    from `<focus_context>` to `<focus_note>`.
-  - `LearningSessionRequestTests`: a note linked from **both** session items
-    appears exactly once in `<related_notes>`.
-- Cleanup: `RetrievalConfig.focusNoteOnly()` loses its last production caller and
-  `focusNoteOnly(int)` already has none — remove both plus their
-  `RetrievalConfigTest` cases.
+Per item: `defaultMaxDepth()` + `<focus_note>`; one session-wide `<related_notes>`
+via `MergedRelatedNotes` (notebook+title, first-seen). Removed `focusNoteOnly`.
+E2E asserts related body; unit test asserts shared link appears once.
 
 ### 3. Session-item notes never appear as related notes — Behavior
 

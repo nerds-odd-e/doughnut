@@ -6,9 +6,10 @@ Feature: Commissioned learning session
   Background:
     Given I am logged in as an existing user
     And I have a notebook "Spanish conversation" with notes:
-      | Title   | Content   |
-      | Hola    | Hello     |
-      | Gracias | Thank you |
+      | Title   | Content                    |
+      | Saludos | Greetings                  |
+      | Hola    | Hello. See [[Saludos]]     |
+      | Gracias | Thank you                  |
     And It's day 1, 8 hour
 
   Scenario: Assimilating a note with a tutor creates a commissioned memory tracker
@@ -30,7 +31,8 @@ Feature: Commissioned learning session
     When I open the learning session request for notebook "Spanish conversation"
     Then the learning session request should list session items for notes "Hola, Gracias"
     And the learning session request should include the tutoring status of "Hola"
-    And the learning session request should include focus context with note body "Hello"
+    And the learning session request should include focus note with note body "Hello"
+    And the learning session request should include related notes with note body "Greetings"
     And the learning session request should instruct the tutor to report one grade per session item
     And I should see 1 potential learning session for notebook "Spanish conversation"
 

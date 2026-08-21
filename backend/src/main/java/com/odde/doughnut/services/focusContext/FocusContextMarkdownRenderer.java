@@ -13,7 +13,10 @@ public class FocusContextMarkdownRenderer {
     sb.append("Purpose: Context around the focus note for AI use.\n");
     sb.append("Max depth: ").append(config.getMaxDepth()).append("\n");
     sb.append(renderFocusNote(result.getFocusNote()));
-    sb.append(renderRelatedNotes(result.getRelatedNotes(), config.getMaxDepth()));
+    for (FocusContextNote note : result.getRelatedNotes()) {
+      sb.append("\n---\n");
+      appendRetrievedNote(sb, note);
+    }
     sb.append(FocusContextConstants.FOCUS_CONTEXT_CLOSE_TAG);
     return sb.toString();
   }
@@ -33,11 +36,17 @@ public class FocusContextMarkdownRenderer {
   }
 
   public String renderRelatedNotes(List<FocusContextNote> relatedNotes, int maxDepth) {
+    if (relatedNotes.isEmpty()) {
+      return "";
+    }
     StringBuilder sb = new StringBuilder();
+    sb.append(FocusContextConstants.RELATED_NOTES_OPEN_TAG);
+    sb.append("Purpose: Notes related to the session items, for tutor context.\n");
+    sb.append("Max depth: ").append(maxDepth).append("\n");
     for (FocusContextNote note : relatedNotes) {
-      sb.append("\n---\n");
       appendRetrievedNote(sb, note);
     }
+    sb.append(FocusContextConstants.RELATED_NOTES_CLOSE_TAG);
     return sb.toString();
   }
 
