@@ -1,4 +1,8 @@
 import {
+  focusContextRecallPromptBodyHints,
+  focusContextRecallPromptMatches,
+} from './focusContextRecallPromptShapes'
+import {
   cyFetchOpenAiImposterRequests,
   postRequestBodies,
   type RecordedImposterRequest,
@@ -25,45 +29,21 @@ const assertFocusContextRetrievalPromptShapes = (bodies: string[]) => {
   ).to.be.at.least(3)
 
   const wikiLinked = bodies.some(
-    (b) =>
-      b.includes('Title: WikiRecall') &&
-      b.includes('Title: Bahamas') &&
-      b.includes('Reached by: OutgoingWikiLink')
+    focusContextRecallPromptMatches.wikiLinkedBahamas
   )
-  const depthTwoWiki = bodies.some(
-    (b) =>
-      b.includes('Title: FarDepthTwo') &&
-      b.includes('Path:') &&
-      b.includes('->') &&
-      b.includes('Reached by: OutgoingWikiLink')
+  const depthTwoWiki = bodies.some(focusContextRecallPromptMatches.depthTwoWiki)
+  const folderSiblings = bodies.some(
+    focusContextRecallPromptMatches.folderSiblings
   )
-  const folderSiblings = bodies.some((b) => {
-    const matches = b.match(/Reached by: FolderSibling/g)
-    return matches !== null && matches.length >= 2
-  })
 
-  const perBodyHints = bodies
-    .map((b, i) => {
-      const folderSiblingHits = b.match(/Reached by: FolderSibling/g)
-      return [
-        `--- body[${i}] (chars=${b.length}) ---`,
-        `  Title:WikiRecall: ${b.includes('Title: WikiRecall')}`,
-        `  Title:Bahamas: ${b.includes('Title: Bahamas')}`,
-        `  OutgoingWikiLink: ${b.includes('Reached by: OutgoingWikiLink')}`,
-        `  Title:FarDepthTwo: ${b.includes('Title: FarDepthTwo')}`,
-        `  Path+arrow: ${b.includes('Path:') && b.includes('->')}`,
-        `  FolderSibling count: ${folderSiblingHits?.length ?? 0}`,
-      ].join('\n')
-    })
-    .join('\n')
+  const perBodyHints = focusContextRecallPromptBodyHints(bodies)
 
   expect(
     wikiLinked,
     [
       'Focus context recall E2E — wiki-linked retrieval: no single POST body matched all of:',
       '  "Title: WikiRecall" (focus note title in the feature table),',
-      '  "Title: Bahamas" (outlinked note),',
-      '  "Reached by: OutgoingWikiLink".',
+      '  "Title: Bahamas" (outlinked note).',
       'Fix the scenario note titles/content (e.g. [[Bahamas]] on WikiRecall) or update this check if titles changed.',
       perBodyHints,
     ].join('\n')
@@ -74,9 +54,9 @@ const assertFocusContextRetrievalPromptShapes = (bodies: string[]) => {
     [
       'Focus context recall E2E — depth-two wiki path: no POST body matched all of:',
       '  "Title: FarDepthTwo" (leaf note title in the feature table),',
-      '  "Path:", "->", and "Reached by: OutgoingWikiLink" (markdown path to depth 2).',
-      'If you renamed FarDepthTwo, update this assertion and the Mountebank stub regex in',
-      'e2e_test/start/questionGenerationService.ts (addFocusContextShapeMcqStubs).',
+      '  "Path:" with two "->" (markdown path to depth 2).',
+      'If you renamed FarDepthTwo, update focusContextRecallPromptShapes.ts',
+      '(stub regex and match predicates stay in one place).',
       perBodyHints,
     ].join('\n')
   ).to.eq(true)
@@ -84,8 +64,9 @@ const assertFocusContextRetrievalPromptShapes = (bodies: string[]) => {
   expect(
     folderSiblings,
     [
-      'Focus context recall E2E — folder siblings: no POST body contained',
-      '  "Reached by: FolderSibling" at least twice (two retrieved folder peers).',
+      'Focus context recall E2E — folder siblings: no POST body matched all of:',
+      '  "Title: FocusFolder" (focus note),',
+      '  "Title: SibOne" and "Title: SibTwo" (two retrieved folder peers).',
       'Fix the scenario: FocusFolder plus two peers in the same Folder column (e.g. peers),',
       'or update this check if retrieval wording changed.',
       perBodyHints,

@@ -61,7 +61,6 @@ note body (may include frontmatter)
 <retrieved_note>
 Title: Related
 …
-Reached by: OutgoingWikiLink
 
 ```doughnut-note-md
 …

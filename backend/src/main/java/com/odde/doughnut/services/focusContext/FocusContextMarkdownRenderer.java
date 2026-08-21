@@ -25,50 +25,48 @@ public class FocusContextMarkdownRenderer {
 
   private void appendFocusNote(StringBuilder sb, FocusContextFocusNote focusNote) {
     sb.append(FocusContextConstants.FOCUS_NOTE_SECTION_START);
-    sb.append("Title: ")
-        .append(focusNote.getTitle() != null ? focusNote.getTitle() : "")
-        .append("\n");
-    if (focusNote.getNotebook() != null) {
-      sb.append("Notebook: ").append(focusNote.getNotebook()).append("\n");
-    }
-    if (focusNote.getFolderPath() != null && !focusNote.getFolderPath().isEmpty()) {
-      sb.append("Folder: ").append(focusNote.getFolderPath()).append("\n");
-    }
-    sb.append("Depth: ").append(focusNote.getDepth()).append("\n");
-    if (focusNote.isContentTruncated()) {
-      sb.append("Truncated: true\n");
-    }
-    if (hasRenderableContent(focusNote.getContent())) {
-      sb.append("\nContent:\n\n");
-      appendFencedContent(sb, focusNote.getContent());
-    }
+    appendTitleNotebookFolderDepth(
+        sb,
+        focusNote.getTitle(),
+        focusNote.getNotebook(),
+        focusNote.getFolderPath(),
+        focusNote.getDepth());
+    appendTruncationAndContent(sb, focusNote.isContentTruncated(), focusNote.getContent());
     sb.append(FocusContextConstants.FOCUS_NOTE_CLOSE_TAG);
   }
 
   private void appendRetrievedNote(StringBuilder sb, FocusContextNote note) {
     sb.append(FocusContextConstants.RETRIEVED_NOTE_SECTION_START);
-    sb.append("Title: ").append(note.getTitle() != null ? note.getTitle() : "").append("\n");
-    if (note.getNotebook() != null) {
-      sb.append("Notebook: ").append(note.getNotebook()).append("\n");
-    }
-    if (note.getFolderPath() != null && !note.getFolderPath().isEmpty()) {
-      sb.append("Folder: ").append(note.getFolderPath()).append("\n");
-    }
-    sb.append("Depth: ").append(note.getDepth()).append("\n");
+    appendTitleNotebookFolderDepth(
+        sb, note.getTitle(), note.getNotebook(), note.getFolderPath(), note.getDepth());
     if (note.getRetrievalPath() != null && !note.getRetrievalPath().isEmpty()) {
       sb.append("Path: ").append(String.join(" -> ", note.getRetrievalPath())).append("\n");
     }
-    if (note.getEdgeType() != null) {
-      sb.append("Reached by: ").append(note.getEdgeType()).append("\n");
+    appendTruncationAndContent(sb, note.isContentTruncated(), note.getContent());
+    sb.append(FocusContextConstants.RETRIEVED_NOTE_CLOSE_TAG);
+  }
+
+  private static void appendTitleNotebookFolderDepth(
+      StringBuilder sb, String title, String notebook, String folderPath, int depth) {
+    sb.append("Title: ").append(title != null ? title : "").append("\n");
+    if (notebook != null) {
+      sb.append("Notebook: ").append(notebook).append("\n");
     }
-    if (note.isContentTruncated()) {
+    if (folderPath != null && !folderPath.isEmpty()) {
+      sb.append("Folder: ").append(folderPath).append("\n");
+    }
+    sb.append("Depth: ").append(depth).append("\n");
+  }
+
+  private void appendTruncationAndContent(
+      StringBuilder sb, boolean contentTruncated, String content) {
+    if (contentTruncated) {
       sb.append("Truncated: true\n");
     }
-    if (hasRenderableContent(note.getContent())) {
+    if (hasRenderableContent(content)) {
       sb.append("\nContent:\n\n");
-      appendFencedContent(sb, note.getContent());
+      appendFencedContent(sb, content);
     }
-    sb.append(FocusContextConstants.RETRIEVED_NOTE_CLOSE_TAG);
   }
 
   private static boolean hasRenderableContent(String content) {

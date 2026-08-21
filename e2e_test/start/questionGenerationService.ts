@@ -1,4 +1,5 @@
 import type { TextMessageToMatch } from './mock_services/MessageToMatch'
+import { focusContextRecallStubUserContent } from './mock_services/focusContextRecallPromptShapes'
 import mock_services from './mock_services'
 
 /** Shape of JSON returned by OpenAI tool calls for MCQ (not all fields are in OpenAPI). */
@@ -90,24 +91,21 @@ const addFocusContextShapeMcqStubs = async (
   await addJsonSchemaMcqStubForUserMessage(
     {
       role: 'user',
-      content:
-        '[\\s\\S]*Title: FarDepthTwo[\\s\\S]*Path:[\\s\\S]*->[\\s\\S]*->[\\s\\S]*Reached by: OutgoingWikiLink[\\s\\S]*',
+      content: focusContextRecallStubUserContent.depthTwoWiki,
     },
     depthTwoRow
   )
   await addJsonSchemaMcqStubForUserMessage(
     {
       role: 'user',
-      content:
-        '[\\s\\S]*Reached by: FolderSibling[\\s\\S]*Reached by: FolderSibling[\\s\\S]*',
+      content: focusContextRecallStubUserContent.folderSiblings,
     },
     folderSiblingsRow
   )
   await addJsonSchemaMcqStubForUserMessage(
     {
       role: 'user',
-      content:
-        '[\\s\\S]*Title: WikiRecall[\\s\\S]*Title: Bahamas[\\s\\S]*Reached by: OutgoingWikiLink[\\s\\S]*',
+      content: focusContextRecallStubUserContent.wikiLinkedBahamas,
     },
     wikiLinkedBahamasRow
   )

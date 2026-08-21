@@ -101,7 +101,7 @@ class FocusContextMarkdownRendererTest {
   @Nested
   class RetrievedNoteBlock {
     @Test
-    void depth1OutgoingLinkFormatsPathEdgeAndBody() {
+    void depth1OutgoingLinkFormatsPathAndBody() {
       FocusContextResult result = new FocusContextResult(focusNote("NB", "A", "focus", false));
       result.addRelatedNote(
           new FocusContextNote(
@@ -121,7 +121,6 @@ class FocusContextMarkdownRendererTest {
       assertThat(output, containsString(FocusContextConstants.RETRIEVED_NOTE_CLOSE_TAG));
       assertThat(output, not(containsString("## Retrieved Note")));
       assertThat(output, containsString("Path: [[A]] -> [[NB: B]]"));
-      assertThat(output, containsString("Reached by: OutgoingWikiLink"));
       assertThat(output, containsString("content of B"));
     }
 
@@ -150,7 +149,7 @@ class FocusContextMarkdownRendererTest {
     }
 
     @Test
-    void folderSiblingShowsPathToAnchorAndEdgeType() {
+    void folderSiblingShowsPathToAnchor() {
       FocusContextResult result =
           new FocusContextResult(focusNote("NB", "AnchorTitle", "focus", false));
       result.addRelatedNote(
@@ -167,7 +166,6 @@ class FocusContextMarkdownRendererTest {
 
       String output = renderer.render(result, depth1Config);
 
-      assertThat(output, containsString("Reached by: FolderSibling"));
       assertThat(output, containsString("Path: [[AnchorTitle]]"));
       assertThat(output, containsString("Depth: 1"));
     }
