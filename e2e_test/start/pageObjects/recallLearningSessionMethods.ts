@@ -101,11 +101,20 @@ export const recallLearningSessionMethods = () => ({
     })
     return this
   },
-  expectLearningSessionRequestIncludesRubric() {
+  expectLearningSessionRequestInstructsDescriptiveFeedback() {
     this.learningSessionRequestText().should((text) => {
-      expect(text).to.contain('Grade from 1 to 4 per item')
-      expect(text).to.contain('<session_item_grades>')
-      expect(text).to.contain('Hola: 4')
+      expect(
+        text,
+        'how_to_report should ask for Grade plus descriptive text'
+      ).to.contain('Grade from 1 to 4 and descriptive text per item')
+      expect(
+        text,
+        'how_to_report should prefer the session_item_feedback block'
+      ).to.contain('<session_item_feedback>')
+      expect(
+        text,
+        'how_to_report example should include a Grade: line'
+      ).to.contain('Grade: 4')
     })
     return this
   },

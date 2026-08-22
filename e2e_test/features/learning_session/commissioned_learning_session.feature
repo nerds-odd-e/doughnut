@@ -33,7 +33,7 @@ Feature: Commissioned learning session
     And the learning session request should include the tutoring status of "Hola"
     And the learning session request should include focus note with note body "Hello"
     And the learning session request should include related notes with note body "Greetings"
-    And the learning session request should instruct the tutor to report one grade per session item
+    And the learning session request should instruct the tutor to report a grade and descriptive text per session item
     And I should see 1 potential learning session for notebook "Spanish conversation"
 
   Scenario: Notes from different notebooks are commissioned as separate learning sessions

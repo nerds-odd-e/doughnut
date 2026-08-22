@@ -9,7 +9,6 @@ import com.odde.doughnut.entities.Grade;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.doughnut.services.LearningSessionReportParser;
 import com.odde.doughnut.services.focusContext.FocusContextConstants;
 import java.sql.Timestamp;
 import org.junit.jupiter.api.Test;
@@ -61,15 +60,7 @@ class LearningSessionRequestTests extends LearningSessionControllerTestBase {
         markdown,
         containsString(
             "Teach the session items above, then return a Learning Session Report giving one"));
-    assertThat(markdown, containsString("Grade from 1 to 4 per item"));
     assertThat(markdown, containsString("Example of how to provide feedback:"));
-    assertThat(
-        markdown,
-        containsString(
-            "# Learning Session Report\n\n"
-                + LearningSessionReportParser.SESSION_ITEM_GRADES_OPEN_TAG
-                + "\nHola: 4\nGracias: 1\n"
-                + LearningSessionReportParser.SESSION_ITEM_GRADES_CLOSE_TAG));
     assertThat(
         markdown,
         containsString(
@@ -88,6 +79,34 @@ class LearningSessionRequestTests extends LearningSessionControllerTestBase {
         containsString(
             "- 1 — needed several reminders, or could not reach the session item even with help"));
     assertThat(recallLogRepository.count(), equalTo(logsBefore));
+  }
+
+  @Test
+  void requestMarkdownInstructsDescriptiveFeedback() throws UnexpectedNoAccessRightException {
+    Timestamp dayTwo = makeMe.aTimestamp().of(1, 9).please();
+    testabilitySettings.timeTravelTo(dayTwo);
+
+    Notebook notebook = spanishNotebook(dayTwo);
+
+    String markdown = controller.request(notebook.getId(), "Asia/Shanghai").getRequestMarkdown();
+
+    assertThat(markdown, containsString("Grade from 1 to 4 and descriptive text per item"));
+    assertThat(
+        markdown,
+        containsString(
+            """
+            # Learning Session Report
+
+            <session_item_feedback>
+            ### Hola
+            Grade: 4
+            Pronunciation was clear; still mixes ser/estar under pressure.
+
+            ### Gracias
+            Grade: 1
+            Needed several reminders on the soft g.
+            </session_item_feedback>
+            """));
   }
 
   @Test

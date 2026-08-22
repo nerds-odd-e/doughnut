@@ -120,11 +120,11 @@ Then(
 )
 
 Then(
-  'the learning session request should instruct the tutor to report one grade per session item',
+  'the learning session request should instruct the tutor to report a grade and descriptive text per session item',
   () => {
     start
       .recall()
       .assumeRecallPage()
-      .expectLearningSessionRequestIncludesRubric()
+      .expectLearningSessionRequestInstructsDescriptiveFeedback()
   }
 )

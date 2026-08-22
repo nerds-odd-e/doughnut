@@ -1,6 +1,6 @@
 # Tutor descriptive feedback in Learning Session protocol
 
-**Status:** in progress (slices 1–4 done)
+**Status:** in progress (slices 1–5 done)
 
 ## Goal
 
@@ -102,11 +102,10 @@ blank-to-null seam. E2E extends the existing feedback-report scenario.
 
 ### 5. Request asks for descriptive feedback — Behavior
 
-`<how_to_report>` describes the new format and the worked example includes prose,
-so Tutors actually produce what slice 4 can store.
+Status: done
 
-- E2E: extend the existing "instruct the tutor to report one grade per session
-  item" assertion to cover the descriptive-feedback instruction.
+`<how_to_report>` prefers `<session_item_feedback>` (`###`, `Grade: N`, prose).
+E2E step now asserts a grade **and** descriptive-text instruction.
 
 ### 6. Request carries the last two Feedbacks with dates — Behavior
 
