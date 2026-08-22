@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.configs.ObjectMapperConfig;
-import com.odde.doughnut.services.ai.MultipleChoicesQuestion;
+import com.odde.doughnut.entities.MultipleChoicesQuestion;
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 import java.io.IOException;

@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.odde.doughnut.controllers.dto.AnswerDTO;
 import com.odde.doughnut.entities.converters.MCQToJsonConverter;
-import com.odde.doughnut.services.ai.MultipleChoicesQuestion;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;

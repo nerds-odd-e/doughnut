@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.odde.doughnut.entities.Mcq;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.repositories.NoteRepository;
-import com.odde.doughnut.services.ai.MultipleChoicesQuestion;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.Data;
@@ -30,13 +29,11 @@ public class McqsTestData {
     private String oneWrongChoice;
 
     public Mcq buildMcq(Note note) {
-      MultipleChoicesQuestion multipleChoicesQuestion = new MultipleChoicesQuestion();
-      multipleChoicesQuestion.setQuestionStem(question);
-      multipleChoicesQuestion.setResponseChoices(List.of(answer, oneWrongChoice));
       Mcq mcq = new Mcq();
       mcq.setNote(note);
+      mcq.setQuestionStem(question);
+      mcq.setResponseChoices(List.of(answer, oneWrongChoice));
       mcq.setCorrectAnswerIndex(0);
-      mcq.setMultipleChoicesQuestion(multipleChoicesQuestion);
       return mcq;
     }
   }

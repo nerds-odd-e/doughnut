@@ -31,7 +31,7 @@ The shipped glossary is Proposed [ADR 0001](../../docs/adrs/0001-ubiquitous-lang
 - `frontend/src/components/notes/Questions.vue`
 - `backend/src/main/java/com/odde/doughnut/services/RecallQuestionService.java`
 - `cli/src/commands/recall/recallQuestionAnswerOutcome.ts`
-- `backend/src/main/java/com/odde/doughnut/services/ai/MultipleChoicesQuestion.java`
+- `backend/src/main/java/com/odde/doughnut/entities/MultipleChoicesQuestion.java`
 - `docs/adrs/0001-ubiquitous-language.md`
 
 ## Notes
