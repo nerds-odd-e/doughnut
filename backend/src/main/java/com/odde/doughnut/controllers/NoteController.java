@@ -89,8 +89,9 @@ class NoteController {
     List<MemoryTracker> memoryTrackers = userService.getMemoryTrackersFor(user, note);
     for (MemoryTracker tracker : memoryTrackers) {
       if (tracker.isCommissioned()) {
-        recallLogRepository
-            .findLatestTutorGradeByMemoryTrackerId(tracker.getId())
+        recallLogRepository.findTutorLogsByMemoryTrackerId(tracker.getId()).stream()
+            .findFirst()
+            .map(RecallLog::getGrade)
             .map(Grade::getValue)
             .ifPresent(tracker::setLatestTutorFeedbackGrade);
       }
