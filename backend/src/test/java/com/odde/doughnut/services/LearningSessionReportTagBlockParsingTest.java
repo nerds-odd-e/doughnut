@@ -1,5 +1,6 @@
 package com.odde.doughnut.services;
 
+import static com.odde.doughnut.services.LearningSessionReportParseAssertions.assertRejected;
 import static com.odde.doughnut.services.LearningSessionReportParser.SESSION_ITEM_GRADES_CLOSE_TAG;
 import static com.odde.doughnut.services.LearningSessionReportParser.SESSION_ITEM_GRADES_OPEN_TAG;
 import static com.odde.doughnut.services.LearningSessionReportParser.SESSION_ITEM_SCORES_CLOSE_TAG;
@@ -11,7 +12,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.odde.doughnut.entities.Grade;
 import com.odde.doughnut.services.LearningSessionReportParser.ParseResult;
-import com.odde.doughnut.services.LearningSessionReportParser.RejectedReportEntry;
 import java.util.Set;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
@@ -157,12 +157,5 @@ class LearningSessionReportTagBlockParsingTest {
     return Stream.of(
         Arguments.of(SESSION_ITEM_GRADES_OPEN_TAG, SESSION_ITEM_GRADES_CLOSE_TAG),
         Arguments.of(SESSION_ITEM_SCORES_OPEN_TAG, SESSION_ITEM_SCORES_CLOSE_TAG));
-  }
-
-  private void assertRejected(RejectedReportEntry rejected, String line, String reasonFragment) {
-    assertEquals(line, rejected.line());
-    org.junit.jupiter.api.Assertions.assertTrue(
-        rejected.reason().contains(reasonFragment),
-        () -> "expected reason containing '" + reasonFragment + "' but was: " + rejected.reason());
   }
 }

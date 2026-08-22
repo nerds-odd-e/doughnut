@@ -66,6 +66,30 @@ Feature: Commissioned learning session
     And the commissioned memory tracker for "Hola" should have tutor feedback grade 4
     And I should see 0 potential learning session for notebook "Spanish conversation"
 
+  Scenario: Recording a session item feedback report writes Feedback and schedules each tracker
+    Given the notes "Hola, Gracias" are assimilated as commissioned on day 1
+    And It's day 2, 9 hour
+    When I open the learning session request for notebook "Spanish conversation"
+    And I record the learning session report:
+      """
+      # Learning Session Report
+
+      <session_item_feedback>
+      ### Hola
+      Grade: 4
+      Pronunciation was clear; still mixes ser/estar under pressure.
+
+      ### Gracias
+      Grade: 1
+      Needed several reminders on the soft g.
+      </session_item_feedback>
+      """
+    Then the recorded Feedback for notebook "Spanish conversation" should be shown
+    And the commissioned memory tracker for "Hola" should have recall count 1
+    And the commissioned memory tracker for "Gracias" should have recall count 1
+    And the commissioned memory tracker for "Hola" should have tutor feedback grade 4
+    And I should see 0 potential learning session for notebook "Spanish conversation"
+
   Scenario Outline: First tutor grade on a new tracker sets Stability and Difficulty
     Given the notes "Hola, Gracias" are assimilated as commissioned on day 1
     And I have recorded a learning session for notebook "Spanish conversation" on day 2 with grades:

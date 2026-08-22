@@ -1,6 +1,6 @@
 # Tutor descriptive feedback in Learning Session protocol
 
-**Status:** in progress (slice 1 done)
+**Status:** in progress (slices 1–2 done)
 
 ## Goal
 
@@ -70,17 +70,14 @@ Learning: the commissioned-learning ADR was already removed (glossary in ADR
 
 ### 2. Report `<session_item_feedback>` records Grades — Behavior
 
-Parser prefers the new block: `###` title, `Grade: N`, prose tolerated and
-ignored for now. Legacy blocks behave exactly as today.
+Status: done
 
-- E2E (`commissioned_learning_session.feature`): record a report in the new
-  format → Feedback shown, both trackers scheduled.
-- Unit (`LearningSessionReportParser` boundary): item without `Grade:` rejected;
-  grade outside 1–4 rejected; unknown title rejected; duplicate title rejected;
-  new block wins over a legacy block present in the same document.
+Preferred `<session_item_feedback>` records Grades (prose ignored). Legacy
+grade-only shapes unchanged. Parser dispatch: feedback block wins when present;
+`SessionItemFeedbackBlockParser` owns `###` + `Grade: N` grammar.
 
-Stop-safe alone: Tutors can use the richer shape; prose is ignored, nothing lost
-that Doughnut promised to keep.
+Learning: E2E scenario added beside the existing grades-block scenario; parser
+tests live in `LearningSessionReportFeedbackBlockParsingTest`.
 
 ### 3. Tutor feedback column — Structure
 

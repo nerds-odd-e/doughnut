@@ -1,5 +1,6 @@
 package com.odde.doughnut.services;
 
+import static com.odde.doughnut.services.LearningSessionReportParseAssertions.assertRejected;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasSize;
@@ -7,7 +8,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.odde.doughnut.entities.Grade;
 import com.odde.doughnut.services.LearningSessionReportParser.ParseResult;
-import com.odde.doughnut.services.LearningSessionReportParser.RejectedReportEntry;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -109,12 +109,5 @@ class LearningSessionReportParserTest {
 
     assertThat(result.rejected(), empty());
     assertThat(result.entries(), hasSize(2));
-  }
-
-  private void assertRejected(RejectedReportEntry rejected, String line, String reasonFragment) {
-    assertEquals(line, rejected.line());
-    org.junit.jupiter.api.Assertions.assertTrue(
-        rejected.reason().contains(reasonFragment),
-        () -> "expected reason containing '" + reasonFragment + "' but was: " + rejected.reason());
   }
 }

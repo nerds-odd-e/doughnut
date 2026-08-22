@@ -1,7 +1,6 @@
 package com.odde.doughnut.services;
 
 import com.odde.doughnut.entities.Grade;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -11,6 +10,9 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class LearningSessionReportParser {
+
+  public static final String SESSION_ITEM_FEEDBACK_OPEN_TAG = "<session_item_feedback>";
+  public static final String SESSION_ITEM_FEEDBACK_CLOSE_TAG = "</session_item_feedback>";
 
   public static final String SESSION_ITEM_GRADES_OPEN_TAG = "<session_item_grades>";
   public static final String SESSION_ITEM_GRADES_CLOSE_TAG = "</session_item_grades>";
@@ -31,15 +33,25 @@ public class LearningSessionReportParser {
 
   public ParseResult parse(
       String reportMarkdown, Set<String> notebookTitles, Set<String> ambiguousTitles) {
-    List<ParsedReportEntry> entries = new ArrayList<>();
-    List<RejectedReportEntry> rejected = new ArrayList<>();
-    Set<String> seenTitles = new HashSet<>();
-
     if (reportMarkdown == null || reportMarkdown.isBlank()) {
-      return new ParseResult(entries, rejected);
+      return new ParseResult(List.of(), List.of());
     }
 
-    for (String rawLine : extractGradeContent(reportMarkdown).split("\\R")) {
+    String feedbackBlock =
+        extractTaggedBlock(
+            reportMarkdown, SESSION_ITEM_FEEDBACK_OPEN_TAG, SESSION_ITEM_FEEDBACK_CLOSE_TAG);
+    if (feedbackBlock != null) {
+      return SessionItemFeedbackBlockParser.parse(feedbackBlock, notebookTitles, ambiguousTitles);
+    }
+    return parseGradeLines(extractGradeContent(reportMarkdown), notebookTitles, ambiguousTitles);
+  }
+
+  private ParseResult parseGradeLines(
+      String gradeContent, Set<String> notebookTitles, Set<String> ambiguousTitles) {
+    LearningSessionReportParseCollector collector =
+        new LearningSessionReportParseCollector(notebookTitles, ambiguousTitles);
+
+    for (String rawLine : gradeContent.split("\\R")) {
       String line = rawLine.trim();
       if (line.isEmpty()) {
         continue;
@@ -50,36 +62,19 @@ public class LearningSessionReportParser {
 
       Matcher matcher = GRADE_LINE.matcher(line);
       if (!matcher.matches()) {
-        rejected.add(new RejectedReportEntry(line, "Could not parse note title and grade."));
+        collector.reject(line, "Could not parse note title and grade.");
         continue;
       }
 
       String title = matcher.group(1).trim();
       int gradeValue = Integer.parseInt(matcher.group(2));
-      if (gradeValue < 1 || gradeValue > 4) {
-        rejected.add(new RejectedReportEntry(line, "Grade must be 1, 2, 3, or 4."));
+      if (collector.rejectIfGradeOutOfRange(line, gradeValue)) {
         continue;
       }
-
-      if (ambiguousTitles.contains(title)) {
-        rejected.add(new RejectedReportEntry(line, "Ambiguous note title in notebook."));
-        continue;
-      }
-
-      if (!notebookTitles.contains(title)) {
-        rejected.add(new RejectedReportEntry(line, "Note title not found in notebook."));
-        continue;
-      }
-
-      if (!seenTitles.add(title)) {
-        rejected.add(new RejectedReportEntry(line, "Duplicate note title in report."));
-        continue;
-      }
-
-      entries.add(new ParsedReportEntry(title, Grade.fromValue(gradeValue)));
+      collector.acceptEntry(line, title, gradeValue);
     }
 
-    return new ParseResult(entries, rejected);
+    return collector.result();
   }
 
   private String extractGradeContent(String reportMarkdown) {
