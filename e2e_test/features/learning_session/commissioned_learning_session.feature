@@ -66,7 +66,7 @@ Feature: Commissioned learning session
     And the commissioned memory tracker for "Hola" should have tutor feedback grade 4
     And I should see 0 potential learning session for notebook "Spanish conversation"
 
-  Scenario: Recording a session item feedback report writes Feedback and schedules each tracker
+  Scenario: Recording a session item feedback report shows tutor Feedback text on the tracker
     Given the notes "Hola, Gracias" are assimilated as commissioned on day 1
     And It's day 2, 9 hour
     When I open the learning session request for notebook "Spanish conversation"
@@ -85,10 +85,6 @@ Feature: Commissioned learning session
       </session_item_feedback>
       """
     Then the recorded Feedback for notebook "Spanish conversation" should be shown
-    And the commissioned memory tracker for "Hola" should have recall count 1
-    And the commissioned memory tracker for "Gracias" should have recall count 1
-    And the commissioned memory tracker for "Hola" should have tutor feedback grade 4
-    And I should see 0 potential learning session for notebook "Spanish conversation"
     When I visit the commissioned memory tracker for "Hola"
     Then I should see the tutor's feedback "Pronunciation was clear; still mixes ser/estar under pressure."
 
