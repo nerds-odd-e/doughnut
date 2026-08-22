@@ -4,7 +4,9 @@ import com.fasterxml.jackson.annotation.JsonClassDescription;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -43,6 +45,14 @@ public class GeneratedMcq {
   public boolean isValid() {
     if (questionStem == null || questionStem.isBlank()) return false;
     if (correctAnswer == null || correctAnswer.isBlank()) return false;
-    return distractors != null && !distractors.isEmpty();
+    if (distractors == null || distractors.size() != 3) return false;
+
+    Set<String> choiceIdentities = new HashSet<>();
+    choiceIdentities.add(correctAnswer.strip());
+    for (String distractor : distractors) {
+      if (distractor == null || distractor.isBlank()) return false;
+      if (!choiceIdentities.add(distractor.strip())) return false;
+    }
+    return true;
   }
 }

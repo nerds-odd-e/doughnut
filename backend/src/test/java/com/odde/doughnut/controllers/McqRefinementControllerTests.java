@@ -62,7 +62,11 @@ class McqRefinementControllerTests extends ControllerTestBase {
   @Test
   void invalidRefinedQuestionIsRejected() throws UnexpectedNoAccessRightException {
     openAiStructuredResponseMock.stubStructuredResponse(
-        makeMe.aGeneratedMcq().correctAnswer("").please());
+        makeMe
+            .aGeneratedMcq()
+            .correctAnswer("correct answer")
+            .distractors("first", "second", " correct answer ")
+            .please());
 
     assertThat(controller.refine(note, mcq), nullValue());
   }

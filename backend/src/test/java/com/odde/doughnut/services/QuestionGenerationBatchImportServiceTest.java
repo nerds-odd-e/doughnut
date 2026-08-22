@@ -154,6 +154,32 @@ class QuestionGenerationBatchImportServiceTest {
               importableRequest.getMemoryTracker().getId());
       assertThat(recallPrompts.size(), is(1));
     }
+
+    @Test
+    void invalidSemanticAnswerSetFailsWithoutCreatingRecallPrompt() throws JsonProcessingException {
+      QuestionGenerationBatchRequest invalidRequest =
+          createRequest(
+              "invalid-semantic-answers", QuestionGenerationBatchRequestStatus.OUTPUT_READY);
+      GeneratedMcq invalidMcq =
+          makeMe
+              .aGeneratedMcq()
+              .correctAnswer("correct answer")
+              .distractors("first", "second", " correct answer ")
+              .please();
+      invalidRequest.setRawSuccessPayload(
+          batchSuccessLine(invalidRequest.getCustomId(), invalidMcq));
+      batchRequestRepository.save(invalidRequest);
+
+      batchImportService.importCompletedBatches(currentTime);
+
+      assertThat(
+          reloadRequest(invalidRequest).getStatus(),
+          is(QuestionGenerationBatchRequestStatus.FAILED));
+      assertThat(
+          recallPromptRepository.findAllByMemoryTracker_IdOrderByIdDesc(
+              invalidRequest.getMemoryTracker().getId()),
+          is(List.of()));
+    }
   }
 
   @Nested
