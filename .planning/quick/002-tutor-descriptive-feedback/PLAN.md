@@ -1,6 +1,6 @@
 # Tutor descriptive feedback in Learning Session protocol
 
-**Status:** in progress (slices 1–2 done)
+**Status:** in progress (slices 1–3 done)
 
 ## Goal
 
@@ -81,13 +81,13 @@ tests live in `LearningSessionReportFeedbackBlockParsingTest`.
 
 ### 3. Tutor feedback column — Structure
 
-- Migration `V300000301__add_tutor_feedback_to_recall_log.sql` — `tutor_feedback`
-  TEXT NULL on `recall_log`.
-- `RecallLog` field + JSON property; regenerate `docs/database-erd.md`
-  (`database-erd` skill) and the frontend API client (`generate-api-client`).
+Status: done
 
-Verify: no observable change; backend + frontend suites stay green. Exists only
-for slice 4.
+`V300000301__add_tutor_feedback_to_recall_log.sql` adds nullable `tutor_feedback`
+TEXT. `RecallLog.tutorFeedback` is on the JSON wire. ERD regenerated with no
+diagram delta (exporter draws PK/UK/FK only). API client regenerated.
+
+Exists only for slice 4.
 
 ### 4. Descriptive feedback recorded and reviewable — Behavior
 
