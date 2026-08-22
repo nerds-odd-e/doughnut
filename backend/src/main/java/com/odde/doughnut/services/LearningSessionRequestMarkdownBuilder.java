@@ -4,14 +4,15 @@ import com.odde.doughnut.algorithms.FrontmatterQuestionGenerationInstruction;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
+import com.odde.doughnut.entities.RecallLog;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.RecallLogRepository;
-import com.odde.doughnut.entities.repositories.TutorLogSummary;
 import com.odde.doughnut.services.focusContext.FocusContextMarkdownRenderer;
 import com.odde.doughnut.services.focusContext.FocusContextResult;
 import com.odde.doughnut.services.focusContext.FocusContextRetrievalService;
 import com.odde.doughnut.services.focusContext.MergedRelatedNotes;
 import com.odde.doughnut.services.focusContext.RetrievalConfig;
+import java.sql.Timestamp;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
@@ -153,25 +154,46 @@ public class LearningSessionRequestMarkdownBuilder {
     Note note = tracker.getNote();
 
     sb.append("### ").append(note.getTitle()).append("\n");
-    sb.append("- Tutoring status: ")
-        .append(tutoringStatusLine(tracker.getId(), zoneId))
-        .append("\n");
+    List<RecallLog> tutorLogs = recallLogRepository.findTutorLogsByMemoryTrackerId(tracker.getId());
+    sb.append("- Tutoring status: ").append(tutoringStatusLine(tutorLogs, zoneId)).append("\n");
+    appendRecentFeedbacks(sb, tutorLogs, zoneId);
     FocusContextResult focusContextResult =
         focusContextRetrievalService.retrieve(note, viewer, config);
     sb.append(focusContextMarkdownRenderer.renderFocusNote(focusContextResult.getFocusNote()));
     mergedRelatedNotes.addAll(focusContextResult.getRelatedNotes());
   }
 
-  private String tutoringStatusLine(Integer memoryTrackerId, ZoneId zoneId) {
-    TutorLogSummary summary =
-        recallLogRepository.summarizeTutorLogsByMemoryTrackerId(memoryTrackerId);
-    if (summary.logCount() == 0) {
+  private void appendRecentFeedbacks(StringBuilder sb, List<RecallLog> tutorLogs, ZoneId zoneId) {
+    for (RecallLog log : tutorLogs.stream().limit(2).toList().reversed()) {
+      appendDatedFeedback(sb, log, zoneId);
+    }
+  }
+
+  private void appendDatedFeedback(StringBuilder sb, RecallLog log, ZoneId zoneId) {
+    sb.append("- ")
+        .append(isoDate(log.getRecordedAt(), zoneId))
+        .append(" — Grade: ")
+        .append(log.getGrade().getValue())
+        .append("\n");
+    String descriptiveText = log.getTutorFeedback();
+    if (descriptiveText != null && !descriptiveText.isBlank()) {
+      sb.append("  ").append(descriptiveText).append("\n");
+    }
+  }
+
+  private String tutoringStatusLine(List<RecallLog> tutorLogs, ZoneId zoneId) {
+    if (tutorLogs.isEmpty()) {
       return "not yet tutored";
     }
+    String sessionWord = tutorLogs.size() == 1 ? "session" : "sessions";
+    return tutorLogs.size()
+        + " previous "
+        + sessionWord
+        + ", last on "
+        + isoDate(tutorLogs.getFirst().getRecordedAt(), zoneId);
+  }
 
-    String lastDate =
-        summary.lastRecordedAt().toInstant().atZone(zoneId).toLocalDate().format(ISO_DATE);
-    String sessionWord = summary.logCount() == 1 ? "session" : "sessions";
-    return summary.logCount() + " previous " + sessionWord + ", last on " + lastDate;
+  private static String isoDate(Timestamp recordedAt, ZoneId zoneId) {
+    return recordedAt.toInstant().atZone(zoneId).toLocalDate().format(ISO_DATE);
   }
 }

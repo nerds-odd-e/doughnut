@@ -135,7 +135,8 @@ class LearningSessionRequestTests extends LearningSessionControllerTestBase {
   @Test
   void requestMarkdownReflectsPriorRecordedFeedbackPerTracker()
       throws UnexpectedNoAccessRightException {
-    Timestamp priorSessionAt = makeMe.aTimestamp().of(5, 10).fromShanghai().please();
+    Timestamp firstSessionAt = makeMe.aTimestamp().of(5, 10).fromShanghai().please();
+    Timestamp secondSessionAt = makeMe.aTimestamp().of(7, 10).fromShanghai().please();
     Timestamp dayTwo = makeMe.aTimestamp().of(1, 9).fromShanghai().please();
     testabilitySettings.timeTravelTo(dayTwo);
 
@@ -143,17 +144,44 @@ class LearningSessionRequestTests extends LearningSessionControllerTestBase {
     makeMe
         .aRecallLogFor(fixture.holaTracker())
         .grade(Grade.GOOD)
-        .recordedAt(priorSessionAt)
+        .tutorFeedback("Pronunciation was clear")
+        .recordedAt(firstSessionAt)
+        .please();
+    makeMe
+        .aRecallLogFor(fixture.holaTracker())
+        .grade(Grade.EASY)
+        .tutorFeedback("Fluent greeting")
+        .recordedAt(secondSessionAt)
         .please();
 
     LearningSessionRequestResponse response =
         controller.request(fixture.notebook().getId(), "Asia/Shanghai");
 
     String markdown = response.getRequestMarkdown();
-    assertThat(markdown, containsString("### Hola"));
-    assertThat(markdown, containsString("1 previous session, last on 1989-01-06"));
-    assertThat(markdown, containsString("### Gracias"));
-    assertThat(markdown, containsString("- Tutoring status: not yet tutored"));
+    String holaItem = sessionItem(markdown, "Hola");
+    String graciasItem = sessionItem(markdown, "Gracias");
+    assertThat(
+        holaItem,
+        containsString(
+            """
+            - Tutoring status: 2 previous sessions, last on 1989-01-08
+            - 1989-01-06 — Grade: 3
+              Pronunciation was clear
+            - 1989-01-08 — Grade: 4
+              Fluent greeting
+            """));
+    assertThat(graciasItem, containsString("- Tutoring status: not yet tutored"));
+    assertThat(graciasItem, not(containsString("Grade:")));
+  }
+
+  private static String sessionItem(String markdown, String title) {
+    int itemsStart = markdown.indexOf("<session_items>");
+    int itemsEnd = markdown.indexOf("</session_items>");
+    String sessionItems = markdown.substring(itemsStart, itemsEnd);
+    String heading = "### " + title;
+    int start = sessionItems.indexOf(heading);
+    int next = sessionItems.indexOf("### ", start + heading.length());
+    return next < 0 ? sessionItems.substring(start) : sessionItems.substring(start, next);
   }
 
   @Test

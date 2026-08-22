@@ -14,15 +14,14 @@ public interface RecallLogRepository extends CrudRepository<RecallLog, Integer> 
 
   @Query(
       """
-      SELECT new com.odde.doughnut.entities.repositories.TutorLogSummary(
-        COUNT(rl), MAX(rl.recordedAt))
+      SELECT rl
       FROM RecallLog rl
       WHERE rl.memoryTracker.id = :memoryTrackerId
         AND rl.answer IS NULL
         AND rl.grade IS NOT NULL
+      ORDER BY rl.recordedAt DESC, rl.id DESC
       """)
-  TutorLogSummary summarizeTutorLogsByMemoryTrackerId(
-      @Param("memoryTrackerId") Integer memoryTrackerId);
+  List<RecallLog> findTutorLogsByMemoryTrackerId(@Param("memoryTrackerId") Integer memoryTrackerId);
 
   @Query(
       """

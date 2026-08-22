@@ -48,6 +48,11 @@ public class RecallLogBuilder extends EntityBuilder<RecallLog> {
     return this;
   }
 
+  public RecallLogBuilder tutorFeedback(String tutorFeedback) {
+    entity.setTutorFeedback(tutorFeedback);
+    return this;
+  }
+
   @Override
   protected void beforeCreate(boolean needPersist) {
     if (entity.getMemoryTracker() == null) {

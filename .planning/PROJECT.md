@@ -10,7 +10,7 @@ Healthy mainline for learning and knowledge work. Approved [ADR 0002](../docs/ad
 
 ## Current State
 
-**Shipped v1.3 (2026-08-08):** Commissioned learning session — assimilate as commissioned, potential sessions on recall progress bar, Request markdown ([commissioned learning session protocol](../docs/commissioned-learning-session-protocol.md)), record Report with ADR 0003 scheduling (`e2e_test/features/learning_session/commissioned_learning_session.feature`). Request is ephemeral (`GET /api/learning-sessions/request` from due trackers). Recall list shows potential sessions.
+**Shipped v1.3 (2026-08-08):** Commissioned learning session — assimilate as commissioned, potential sessions on recall progress bar, Request markdown ([commissioned learning session protocol](../docs/commissioned-learning-session-protocol.md)), record Report with ADR 0003 scheduling (`e2e_test/features/learning_session/commissioned_learning_session.feature`). Request is ephemeral (`GET /api/learning-sessions/request` from due trackers). Recall list shows potential sessions. Tutor Feedback is a Grade and descriptive text; the next Request carries the last two dated Feedbacks per Session Item.
 
 **Shipped v1.2 (2026-08-06):** Accidental-match resolve dialog UX; distinct `overlaps` frontmatter; reviewed note stays primary.
 
@@ -38,6 +38,7 @@ Portable content direction is ADR 0002 (git-native notebooks). Catalog ZIP downl
 - ✓ Potential learning sessions by notebook on recall (POT-01, POT-02) — v1.3
 - ✓ Commission Learning Session + Request markdown (COM-01–03) — v1.3
 - ✓ Record Report → Grade schedule + feedback log (REC-01–05) — v1.3
+- ✓ Descriptive Feedback on tutor RecallLog, recall history, and last two in the Request
 
 ### Active
 
@@ -52,7 +53,8 @@ Portable content direction is ADR 0002 (git-native notebooks). Catalog ZIP downl
 - Stacked matched `NoteShow` bodies on accidental-match result — replaced by dialog
 - Content peek in resolve dialog — identity only
 - Forced resolve / try-again or SRS reclaim after dialog overlap declare — locked anti-features
-- Descriptive Feedback, smart request generator, in-app Tutor, machine transport — v2 / later
+- Smart request generator, in-app Tutor, machine transport — later
+- Feedback recommendations of what to study next — later
 - Commissioned trackers for properties in UI — domain allows; UI deferred (TRK-04)
 - Commissioned assimilation (first intake via Tutor only) — TRK-05 deferred
 
@@ -85,4 +87,4 @@ Accepted ADRs under `docs/adrs/`. Planning history for completed milestones is n
 This document evolves at phase transitions and milestone boundaries.
 
 ---
-*Last updated: 2026-08-21*
+*Last updated: 2026-08-22*

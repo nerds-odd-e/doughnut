@@ -92,6 +92,23 @@ Feature: Commissioned learning session
     When I visit the commissioned memory tracker for "Hola"
     Then I should see the tutor's feedback "Pronunciation was clear; still mixes ser/estar under pressure."
 
+  Scenario: Request carries the last two dated Feedbacks per Session Item
+    Given the notes "Hola, Gracias" are assimilated as commissioned on day 1
+    And I have recorded a learning session for notebook "Spanish conversation" on day 2, 9 hour with feedback:
+      | Note    | Grade | Text                                |
+      | Hola    | 3     | Pronunciation was clear             |
+      | Gracias | 1     | Needed several reminders on the soft g |
+    And I have recorded a learning session for notebook "Spanish conversation" on day 4, 16 hour with feedback:
+      | Note    | Grade | Text             |
+      | Hola    | 4     | Fluent greeting  |
+      | Gracias | 1     | Still needed help |
+    And It's day 25, 8 hour
+    When I open the learning session request for notebook "Spanish conversation"
+    Then the learning session request should include dated Feedbacks for "Hola":
+      | Grade | Text                    |
+      | 3     | Pronunciation was clear |
+      | 4     | Fluent greeting         |
+
   Scenario Outline: First tutor grade on a new tracker sets Stability and Difficulty
     Given the notes "Hola, Gracias" are assimilated as commissioned on day 1
     And I have recorded a learning session for notebook "Spanish conversation" on day 2 with grades:

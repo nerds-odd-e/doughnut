@@ -9,6 +9,28 @@ import start from '../start'
 
 const SESSION_ITEM_GRADES_OPEN_TAG = '<session_item_grades>'
 const SESSION_ITEM_GRADES_CLOSE_TAG = '</session_item_grades>'
+const SESSION_ITEM_FEEDBACK_OPEN_TAG = '<session_item_feedback>'
+const SESSION_ITEM_FEEDBACK_CLOSE_TAG = '</session_item_feedback>'
+
+function recordLearningSessionForNotebook(
+  notebookTitle: string,
+  reportMarkdown: string
+) {
+  const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
+  start
+    .testability()
+    .getNotebookIdByName(notebookTitle)
+    .then((notebookId) =>
+      cy.wrap(
+        LearningSessionController.record({
+          body: { notebookId, reportMarkdown },
+          query: { timezone },
+        }),
+        { log: false }
+      )
+    )
+  start.recall().visitRecallPage()
+}
 
 Given(
   'I have recorded a learning session for notebook {string} on day {int} with grades:',
@@ -16,20 +38,20 @@ Given(
     start.testability().timeTravelTo(day, 9)
     const lines = dataTable.hashes().map((row) => `${row.Note}: ${row.Grade}`)
     const reportMarkdown = `# Learning Session Report\n\n${SESSION_ITEM_GRADES_OPEN_TAG}\n${lines.join('\n')}\n${SESSION_ITEM_GRADES_CLOSE_TAG}\n`
-    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
-    start
-      .testability()
-      .getNotebookIdByName(notebookTitle)
-      .then((notebookId) =>
-        cy.wrap(
-          LearningSessionController.record({
-            body: { notebookId, reportMarkdown },
-            query: { timezone },
-          }),
-          { log: false }
-        )
-      )
-    start.recall().visitRecallPage()
+    recordLearningSessionForNotebook(notebookTitle, reportMarkdown)
+  }
+)
+
+Given(
+  'I have recorded a learning session for notebook {string} on day {int}, {int} hour with feedback:',
+  (notebookTitle: string, day: number, hour: number, dataTable: DataTable) => {
+    start.testability().timeTravelTo(day, hour)
+    const items = dataTable
+      .hashes()
+      .map((row) => `### ${row.Note}\nGrade: ${row.Grade}\n${row.Text}`)
+      .join('\n\n')
+    const reportMarkdown = `# Learning Session Report\n\n${SESSION_ITEM_FEEDBACK_OPEN_TAG}\n${items}\n${SESSION_ITEM_FEEDBACK_CLOSE_TAG}\n`
+    recordLearningSessionForNotebook(notebookTitle, reportMarkdown)
   }
 )
 
@@ -126,5 +148,18 @@ Then(
       .recall()
       .assumeRecallPage()
       .expectLearningSessionRequestInstructsDescriptiveFeedback()
+  }
+)
+
+Then(
+  'the learning session request should include dated Feedbacks for {string}:',
+  (noteTitle: string, dataTable: DataTable) => {
+    start
+      .recall()
+      .assumeRecallPage()
+      .expectLearningSessionRequestIncludesDatedFeedbacks(
+        noteTitle,
+        dataTable.hashes()
+      )
   }
 )
