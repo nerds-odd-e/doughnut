@@ -36,6 +36,38 @@ class LearningSessionRecordTutorFeedbackRecallLogTests extends LearningSessionCo
   }
 
   @Test
+  void recordingWritesTutorFeedbackOnRecallLog() throws UnexpectedNoAccessRightException {
+    Timestamp dayTwo = makeMe.aTimestamp().of(1, 9).please();
+    testabilitySettings.timeTravelTo(dayTwo);
+
+    SpanishNotebookFixture fixture = spanishNotebookFixture(dayTwo);
+    controller.record(
+        recordRequest(
+            fixture.notebook(),
+            sessionItemFeedbackReport(
+                "Hola", 4, "Pronunciation was clear; still mixes ser/estar under pressure.")),
+        "Asia/Shanghai");
+
+    RecallLog log = memoryTrackerController.getRecallLogs(fixture.holaTracker()).get(0);
+    assertThat(
+        log.getTutorFeedback(),
+        is("Pronunciation was clear; still mixes ser/estar under pressure."));
+  }
+
+  @Test
+  void legacyGradeOnlyReportLeavesTutorFeedbackNull() throws UnexpectedNoAccessRightException {
+    Timestamp dayTwo = makeMe.aTimestamp().of(1, 9).please();
+    testabilitySettings.timeTravelTo(dayTwo);
+
+    SpanishNotebookFixture fixture = spanishNotebookFixture(dayTwo);
+    controller.record(
+        recordRequest(fixture.notebook(), learningSessionReport("Hola", 4)), "Asia/Shanghai");
+
+    RecallLog log = memoryTrackerController.getRecallLogs(fixture.holaTracker()).get(0);
+    assertThat(log.getTutorFeedback(), nullValue());
+  }
+
+  @Test
   void unmatchedTitleWritesNoRecallLog() throws UnexpectedNoAccessRightException {
     Timestamp dayTwo = makeMe.aTimestamp().of(1, 9).please();
     testabilitySettings.timeTravelTo(dayTwo);

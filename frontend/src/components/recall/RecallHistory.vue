@@ -57,6 +57,13 @@ const historyItemKey = (item: RecallHistoryItem, index: number) => {
           <span>Recorded: {{ new Date(item.recallLog.recordedAt).toLocaleString() }}</span>
           <span>Elapsed hours: {{ item.recallLog.elapsedHours }}</span>
         </div>
+        <p
+          v-if="item.recallLog?.tutorFeedback"
+          data-testid="recall-log-tutor-feedback"
+          class="text-sm mb-2 whitespace-pre-wrap"
+        >
+          {{ item.recallLog.tutorFeedback }}
+        </p>
         <template v-if="item.recallPrompt">
           <div class="text-sm text-base-content/70 mb-2 flex gap-2 flex-wrap">
             <span v-if="item.recallPrompt.questionGeneratedTime">

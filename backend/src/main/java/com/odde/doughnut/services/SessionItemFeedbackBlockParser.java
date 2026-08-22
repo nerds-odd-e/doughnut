@@ -1,6 +1,7 @@
 package com.odde.doughnut.services;
 
 import com.odde.doughnut.services.LearningSessionReportParser.ParseResult;
+import java.util.Arrays;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -51,16 +52,30 @@ final class SessionItemFeedbackBlockParser {
     if (collector.rejectIfGradeOutOfRange(gradeLine, gradeValue)) {
       return;
     }
-    collector.acceptEntry(headingLine, title, gradeValue);
+    collector.acceptEntry(headingLine, title, gradeValue, descriptiveTextAfterGrade(body));
+  }
+
+  private static String descriptiveTextAfterGrade(String body) {
+    String[] lines = body.split("\\R", -1);
+    int gradeLineIndex = firstNonBlankLineIndex(lines);
+    if (gradeLineIndex < 0 || gradeLineIndex + 1 >= lines.length) {
+      return null;
+    }
+    return String.join("\n", Arrays.copyOfRange(lines, gradeLineIndex + 1, lines.length));
   }
 
   private static String firstNonBlankLine(String body) {
-    for (String line : body.split("\\R")) {
-      String trimmed = line.trim();
-      if (!trimmed.isEmpty()) {
-        return trimmed;
+    String[] lines = body.split("\\R");
+    int index = firstNonBlankLineIndex(lines);
+    return index < 0 ? "" : lines[index].trim();
+  }
+
+  private static int firstNonBlankLineIndex(String[] lines) {
+    for (int i = 0; i < lines.length; i++) {
+      if (!lines[i].trim().isEmpty()) {
+        return i;
       }
     }
-    return "";
+    return -1;
   }
 }

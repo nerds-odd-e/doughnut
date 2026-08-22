@@ -89,6 +89,8 @@ Feature: Commissioned learning session
     And the commissioned memory tracker for "Gracias" should have recall count 1
     And the commissioned memory tracker for "Hola" should have tutor feedback grade 4
     And I should see 0 potential learning session for notebook "Spanish conversation"
+    When I visit the commissioned memory tracker for "Hola"
+    Then I should see the tutor's feedback "Pronunciation was clear; still mixes ser/estar under pressure."
 
   Scenario Outline: First tutor grade on a new tracker sets Stability and Difficulty
     Given the notes "Hola, Gracias" are assimilated as commissioned on day 1

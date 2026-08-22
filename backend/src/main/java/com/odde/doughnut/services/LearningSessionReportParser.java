@@ -25,7 +25,12 @@ public class LearningSessionReportParser {
 
   private static final Pattern GRADE_LINE = Pattern.compile("^(.+?):\\s*(\\d+)(?:\\s.*)?$");
 
-  public record ParsedReportEntry(String noteTitle, Grade grade) {}
+  public record ParsedReportEntry(String noteTitle, Grade grade, String descriptiveText) {
+    public ParsedReportEntry {
+      descriptiveText =
+          descriptiveText == null || descriptiveText.isBlank() ? null : descriptiveText.strip();
+    }
+  }
 
   public record RejectedReportEntry(String line, String reason) {}
 
@@ -71,7 +76,7 @@ public class LearningSessionReportParser {
       if (collector.rejectIfGradeOutOfRange(line, gradeValue)) {
         continue;
       }
-      collector.acceptEntry(line, title, gradeValue);
+      collector.acceptEntry(line, title, gradeValue, null);
     }
 
     return collector.result();

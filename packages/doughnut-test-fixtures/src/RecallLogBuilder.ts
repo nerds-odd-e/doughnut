@@ -33,6 +33,11 @@ class RecallLogBuilder extends Builder<RecallLog> {
     return this
   }
 
+  tutorFeedback(tutorFeedback: string): RecallLogBuilder {
+    this.data.tutorFeedback = tutorFeedback
+    return this
+  }
+
   do(): RecallLog {
     return this.data
   }

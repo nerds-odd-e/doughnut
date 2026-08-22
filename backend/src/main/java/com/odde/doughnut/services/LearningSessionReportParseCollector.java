@@ -33,7 +33,7 @@ final class LearningSessionReportParseCollector {
     return true;
   }
 
-  void acceptEntry(String displayLine, String title, int gradeValue) {
+  void acceptEntry(String displayLine, String title, int gradeValue, String descriptiveText) {
     if (ambiguousTitles.contains(title)) {
       reject(displayLine, "Ambiguous note title in notebook.");
       return;
@@ -46,7 +46,7 @@ final class LearningSessionReportParseCollector {
       reject(displayLine, "Duplicate note title in report.");
       return;
     }
-    entries.add(new ParsedReportEntry(title, Grade.fromValue(gradeValue)));
+    entries.add(new ParsedReportEntry(title, Grade.fromValue(gradeValue), descriptiveText));
   }
 
   ParseResult result() {

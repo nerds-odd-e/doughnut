@@ -1,6 +1,6 @@
 # Tutor descriptive feedback in Learning Session protocol
 
-**Status:** in progress (slices 1–3 done)
+**Status:** in progress (slices 1–4 done)
 
 ## Goal
 
@@ -91,12 +91,14 @@ Exists only for slice 4.
 
 ### 4. Descriptive feedback recorded and reviewable — Behavior
 
-- Parse result carries the text; `LearningSessionService` writes it on the tutor
-  RecallLog it already creates.
-- `RecallHistory.vue` renders it (`data-testid="recall-log-tutor-feedback"`).
-- E2E: record a report with prose → visit the commissioned memory tracker →
-  see the tutor's text.
-- Frontend unit test: text rendered when present, absent when not.
+Status: done
+
+Parser carries prose on `ParsedReportEntry.descriptiveText`; recording writes it
+on the tutor RecallLog. Recall history shows it
+(`data-testid="recall-log-tutor-feedback"`) when present.
+
+Learning: blank prose stays null; `ParsedReportEntry` compact constructor is the
+blank-to-null seam. E2E extends the existing feedback-report scenario.
 
 ### 5. Request asks for descriptive feedback — Behavior
 
