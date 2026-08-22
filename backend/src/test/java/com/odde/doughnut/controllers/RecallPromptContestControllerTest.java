@@ -12,7 +12,6 @@ import com.odde.doughnut.entities.RecallPrompt;
 import com.odde.doughnut.exceptions.OpenAiNotAvailableException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.GlobalSettingsService;
-import com.odde.doughnut.services.ai.GeneratedMcq;
 import com.odde.doughnut.services.ai.QuestionEvaluation;
 import com.openai.models.responses.StructuredResponseCreateParams;
 import org.junit.jupiter.api.BeforeEach;
@@ -47,12 +46,11 @@ class RecallPromptContestControllerTest extends RecallPromptControllerTestBase {
   @Test
   void shouldNotBeAbleToContestForOthersMemoryTracker() {
     MemoryTracker othersTracker = memoryTrackerOwnedByAnotherUser();
-    GeneratedMcq aiGeneratedQuestion = makeMe.aGeneratedMcq().please();
     RecallPrompt othersPrompt =
         makeMe
             .aRecallPrompt()
             .forMemoryTracker(othersTracker)
-            .ofAIGeneratedQuestion(aiGeneratedQuestion, othersTracker.getNote())
+            .withMcqForNote(othersTracker.getNote())
             .please();
     assertThrows(UnexpectedNoAccessRightException.class, () -> controller.contest(othersPrompt));
   }

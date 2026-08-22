@@ -4,6 +4,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import com.odde.doughnut.entities.Mcq;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.exceptions.OpenAiNotAvailableException;
 import com.odde.doughnut.testability.MakeMe;
@@ -57,10 +58,11 @@ class AiQuestionGeneratorTests {
         makeMe.aGeneratedMcq().stem("What is the first color in the rainbow?").please();
     openAiStructuredResponseMock.stubStructuredResponse(jsonQuestion);
 
-    GeneratedMcq result =
-        aiQuestionGenerator.getAiGeneratedQuestion(noteReadyForQuestionGeneration(), null);
+    Note note = noteReadyForQuestionGeneration();
+    Mcq result = aiQuestionGenerator.getAiGeneratedQuestion(note, null);
 
     assertThat(result.getQuestionStem(), equalTo("What is the first color in the rainbow?"));
+    assertThat(result.getNote(), equalTo(note));
   }
 
   @Test

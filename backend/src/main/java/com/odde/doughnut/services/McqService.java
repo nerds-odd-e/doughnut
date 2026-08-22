@@ -4,7 +4,6 @@ import com.odde.doughnut.controllers.dto.QuestionContestResult;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.factoryServices.EntityPersister;
 import com.odde.doughnut.services.ai.AiQuestionGenerator;
-import com.odde.doughnut.services.ai.GeneratedMcq;
 import com.odde.doughnut.services.ai.QuestionEvaluation;
 import java.sql.Timestamp;
 import java.util.concurrent.ThreadLocalRandom;
@@ -39,12 +38,7 @@ public class McqService {
   }
 
   public Mcq refineAIQuestion(Note note, Mcq mcq) {
-    GeneratedMcq aiGeneratedRefineQuestion =
-        aiQuestionGenerator.getAiGeneratedRefineQuestion(note, mcq);
-    if (aiGeneratedRefineQuestion == null) {
-      return null;
-    }
-    return aiGeneratedRefineQuestion.toMcq(note);
+    return aiQuestionGenerator.getAiGeneratedRefineQuestion(note, mcq);
   }
 
   public QuestionContestResult contest(Mcq mcq) {
@@ -67,13 +61,12 @@ public class McqService {
 
   public Mcq generateAFeasibleQuestion(Note note, String propertyKey) {
     Long contextSeedBoxed = Long.valueOf(ThreadLocalRandom.current().nextLong());
-    GeneratedMcq generatedMcq =
+    Mcq result =
         aiQuestionGenerator.getAiGeneratedQuestion(note, null, contextSeedBoxed, propertyKey);
-    if (generatedMcq == null) {
+    if (result == null) {
       return null;
     }
 
-    Mcq result = generatedMcq.toMcq(note, contextSeedBoxed);
     entityPersister.save(result);
 
     for (int i = 0; i < regenerationTimes; i++) {
@@ -84,12 +77,11 @@ public class McqService {
       }
 
       Long regSeedBoxed = Long.valueOf(ThreadLocalRandom.current().nextLong());
-      GeneratedMcq regeneratedQuestion =
+      Mcq regeneratedQuestion =
           aiQuestionGenerator.regenerateQuestion(
               contestResult, note, result, regSeedBoxed, propertyKey);
       if (regeneratedQuestion != null) {
-        Mcq regenerated = regeneratedQuestion.toMcq(note, regSeedBoxed);
-        result = entityPersister.save(regenerated);
+        result = entityPersister.save(regeneratedQuestion);
       } else {
         return result;
       }

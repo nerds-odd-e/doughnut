@@ -7,7 +7,6 @@ import com.odde.doughnut.controllers.dto.QuestionContestResult;
 import com.odde.doughnut.entities.Mcq;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.services.ai.AiQuestionGenerator;
-import com.odde.doughnut.services.ai.GeneratedMcq;
 import com.odde.doughnut.services.ai.QuestionEvaluation;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.OpenAiStructuredResponseMock;
@@ -50,15 +49,15 @@ class AiOpenAiAssistantFactoryWithDBTest {
       questionEvaluation.feasibleQuestion = true;
       questionEvaluation.improvementAdvices = "what a horrible question!";
 
-      GeneratedMcq aiGeneratedQuestion =
+      Note note = makeMe.aNote().please();
+      mcq =
           makeMe
-              .aGeneratedMcq()
+              .anMcq()
+              .forNote(note)
               .stem("What is the first color in the rainbow?")
               .choices("red", "black", "green")
               .correctAnswerIndex(0)
               .please();
-      Note note = makeMe.aNote().please();
-      mcq = makeMe.anMcq().ofAIGeneratedQuestion(aiGeneratedQuestion, note).please();
     }
 
     @Test

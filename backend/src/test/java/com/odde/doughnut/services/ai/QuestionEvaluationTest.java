@@ -6,27 +6,27 @@ import static org.hamcrest.Matchers.equalTo;
 
 import com.odde.doughnut.controllers.dto.QuestionContestResult;
 import com.odde.doughnut.entities.Mcq;
-import com.odde.doughnut.testability.MakeMeWithoutDB;
+import com.odde.doughnut.testability.MakeMe;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class QuestionEvaluationTest {
   private QuestionEvaluation questionEvaluation;
   private Mcq mcq;
-  private MakeMeWithoutDB makeMe;
+  private final MakeMe makeMe = MakeMe.makeMeWithoutFactoryService();
 
   @BeforeEach
   void setup() {
-    makeMe = new MakeMeWithoutDB();
     questionEvaluation = new QuestionEvaluation();
     mcq =
         makeMe
-            .aGeneratedMcq()
+            .anMcq()
+            .forNote(null)
             .stem("What is the capital of France?")
             .choices("Paris", "London", "Berlin")
             .correctAnswerIndex(0)
-            .please()
-            .toMcq(null);
+            .inMemoryPlease();
   }
 
   @Test
@@ -75,12 +75,12 @@ class QuestionEvaluationTest {
     questionEvaluation.correctChoices = new int[] {1};
     Mcq mcqWithNullChoices =
         makeMe
-            .aGeneratedMcq()
+            .anMcq()
+            .forNote(null)
             .stem("What is the capital of France?")
+            .choices((List<String>) null)
             .correctAnswerIndex(0)
-            .please()
-            .toMcq(null);
-    mcqWithNullChoices.setResponseChoices(null);
+            .inMemoryPlease();
 
     QuestionContestResult result = questionEvaluation.getQuestionContestResult(mcqWithNullChoices);
     assertThat(result.advice, equalTo("The question has no choices defined."));

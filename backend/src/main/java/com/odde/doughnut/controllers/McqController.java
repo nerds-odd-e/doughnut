@@ -44,11 +44,7 @@ class McqController {
   @PostMapping("/generate")
   public Mcq generate(@RequestParam(value = "note") @Schema(type = "integer") Note note) {
     authorizationService.assertLoggedIn();
-    GeneratedMcq generatedMcq = aiQuestionGenerator.getAiGeneratedQuestion(note, null);
-    if (generatedMcq == null) {
-      return null;
-    }
-    return generatedMcq.toMcq(note);
+    return aiQuestionGenerator.getAiGeneratedQuestion(note, null);
   }
 
   @GetMapping("/{note}")

@@ -209,7 +209,7 @@ public class NoteBuilder extends EntityBuilder<Note> {
   }
 
   public NoteBuilder hasAnMcq() {
-    McqBuilder mcqBuilder = makeMe.anMcq().ofAIGeneratedQuestionForNote(entity);
+    McqBuilder mcqBuilder = makeMe.anMcq().forNote(entity);
     this.mcqBuilders.add(mcqBuilder);
     return this;
   }

@@ -1,5 +1,7 @@
 package com.odde.doughnut.services.ai;
 
+import com.odde.doughnut.entities.Mcq;
+import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.testability.TestabilitySettings;
 import java.util.ArrayList;
 import java.util.List;
@@ -13,29 +15,28 @@ public class GeneratedQuestionPostProcessor {
     this.testabilitySettings = testabilitySettings;
   }
 
-  public GeneratedMcq postProcess(GeneratedMcq original) {
+  public Mcq assembleMcq(GeneratedMcq original, Note note, Long contextSeed) {
     if (original == null) {
-      return original;
+      return null;
     }
     if (!original.isValid()) {
       throw new IllegalArgumentException("generated question must be valid before post-processing");
     }
-    if (!original.isChoicesMayBeShuffled()) {
-      return original;
+
+    List<IndexedChoice> choices = indexedChoices(original.getResponseChoices());
+    if (original.isChoicesMayBeShuffled()) {
+      choices = testabilitySettings.getRandomizer().shuffle(choices);
     }
 
-    List<IndexedChoice> indexedChoices = indexedChoices(original.getResponseChoices());
-    List<IndexedChoice> shuffledChoices =
-        testabilitySettings.getRandomizer().shuffle(indexedChoices);
-    int newCorrectIndex = newCorrectIndex(shuffledChoices, original.getCorrectAnswerIndex());
-
-    return new GeneratedMcq(
-        original.getQuestionStem(),
-        shuffledChoices.stream().map(IndexedChoice::choice).toList(),
-        newCorrectIndex,
-        true,
-        original.getTestedFocus(),
-        original.getValidationRationale());
+    Mcq mcq = new Mcq();
+    mcq.setNote(note);
+    mcq.setQuestionStem(original.getQuestionStem());
+    mcq.setResponseChoices(choices.stream().map(IndexedChoice::choice).toList());
+    mcq.setCorrectAnswerIndex(newCorrectIndex(choices, original.getCorrectAnswerIndex()));
+    mcq.setContextSeed(contextSeed);
+    mcq.setTestedFocus(original.getTestedFocus());
+    mcq.setValidationRationale(original.getValidationRationale());
+    return mcq;
   }
 
   private List<IndexedChoice> indexedChoices(List<String> choices) {

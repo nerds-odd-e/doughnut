@@ -4,8 +4,6 @@ import com.fasterxml.jackson.annotation.JsonClassDescription;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
-import com.odde.doughnut.entities.Mcq;
-import com.odde.doughnut.entities.Note;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -50,21 +48,5 @@ public class GeneratedMcq {
     if (questionStem == null || questionStem.isBlank()) return false;
     if (responseChoices == null || responseChoices.isEmpty()) return false;
     return correctAnswerIndex >= 0 && correctAnswerIndex < responseChoices.size();
-  }
-
-  public Mcq toMcq(Note note) {
-    return toMcq(note, null);
-  }
-
-  public Mcq toMcq(Note note, Long contextSeed) {
-    Mcq mcq = new Mcq();
-    mcq.setNote(note);
-    mcq.setQuestionStem(questionStem);
-    mcq.setResponseChoices(responseChoices);
-    mcq.setCorrectAnswerIndex(correctAnswerIndex);
-    mcq.setContextSeed(contextSeed);
-    mcq.setTestedFocus(testedFocus);
-    mcq.setValidationRationale(validationRationale);
-    return mcq;
   }
 }

@@ -49,7 +49,7 @@ class McqControllerTests extends ControllerTestBase {
     @Test
     void getMcqsWhenThereIsOne() throws UnexpectedNoAccessRightException {
       Note note = ownedNote();
-      Mcq mcq = makeMe.anMcq().ofAIGeneratedQuestionForNote(note).please();
+      Mcq mcq = makeMe.anMcq().forNote(note).please();
       makeMe.refresh(note);
 
       assertThat(controller.list(note), contains(mcq));
@@ -58,7 +58,7 @@ class McqControllerTests extends ControllerTestBase {
     @Test
     void getMcqsWhenThereAreSeveral() throws UnexpectedNoAccessRightException {
       Note note = makeMe.theNote(ownedNote()).hasAnMcq().please();
-      makeMe.anMcq().ofAIGeneratedQuestionForNote(note).please();
+      makeMe.anMcq().forNote(note).please();
       makeMe.refresh(note);
 
       assertThat(controller.list(note), hasSize(2));

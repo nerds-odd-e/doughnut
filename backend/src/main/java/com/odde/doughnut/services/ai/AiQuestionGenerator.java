@@ -22,31 +22,30 @@ public class AiQuestionGenerator {
     this.generatedQuestionPostProcessor = generatedQuestionPostProcessor;
   }
 
-  public GeneratedMcq getAiGeneratedQuestion(Note note, String additionalMessage) {
+  public Mcq getAiGeneratedQuestion(Note note, String additionalMessage) {
     return getAiGeneratedQuestion(note, additionalMessage, null, null);
   }
 
-  public GeneratedMcq getAiGeneratedQuestion(
-      Note note, String additionalMessage, Long contextSeed) {
+  public Mcq getAiGeneratedQuestion(Note note, String additionalMessage, Long contextSeed) {
     return getAiGeneratedQuestion(note, additionalMessage, contextSeed, null);
   }
 
-  public GeneratedMcq getAiGeneratedQuestion(
+  public Mcq getAiGeneratedQuestion(
       Note note, String additionalMessage, Long contextSeed, String propertyKey) {
     try {
       GeneratedMcq original =
           noteQuestionGenerationService.generateQuestion(
               note, additionalMessage, contextSeed, propertyKey);
-      return generatedQuestionPostProcessor.postProcess(original);
+      return generatedQuestionPostProcessor.assembleMcq(original, note, contextSeed);
     } catch (JsonProcessingException e) {
       throw new RuntimeException(e);
     }
   }
 
-  public GeneratedMcq getAiGeneratedRefineQuestion(Note note, Mcq mcq) {
+  public Mcq getAiGeneratedRefineQuestion(Note note, Mcq mcq) {
     return noteQuestionGenerationService
         .refineQuestion(note, mcq)
-        .map(generatedQuestionPostProcessor::postProcess)
+        .map(question -> generatedQuestionPostProcessor.assembleMcq(question, note, null))
         .orElse(null);
   }
 
@@ -58,12 +57,12 @@ public class AiQuestionGenerator {
     }
   }
 
-  public GeneratedMcq regenerateQuestion(
+  public Mcq regenerateQuestion(
       QuestionContestResult contestResult, Note note, Mcq mcq, Long contextSeed) {
     return regenerateQuestion(contestResult, note, mcq, contextSeed, null);
   }
 
-  public GeneratedMcq regenerateQuestion(
+  public Mcq regenerateQuestion(
       QuestionContestResult contestResult,
       Note note,
       Mcq mcq,

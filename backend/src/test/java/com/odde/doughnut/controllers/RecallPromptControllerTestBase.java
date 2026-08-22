@@ -6,7 +6,6 @@ import com.odde.doughnut.controllers.dto.Randomization;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.RecallPrompt;
-import com.odde.doughnut.services.ai.GeneratedMcq;
 import com.odde.doughnut.services.ai.QuestionEvaluation;
 import com.odde.doughnut.testability.OpenAiStructuredResponseMock;
 import com.openai.client.OpenAIClient;
@@ -53,12 +52,7 @@ abstract class RecallPromptControllerTestBase extends ControllerTestBase {
   }
 
   RecallPrompt mcqPrompt(MemoryTracker tracker, Note note) {
-    GeneratedMcq mcq = makeMe.aGeneratedMcq().please();
-    return makeMe
-        .aRecallPrompt()
-        .forMemoryTracker(tracker)
-        .ofAIGeneratedQuestion(mcq, note)
-        .please();
+    return makeMe.aRecallPrompt().forMemoryTracker(tracker).withMcqForNote(note).please();
   }
 
   RecallPrompt spellingPrompt(MemoryTracker tracker) {

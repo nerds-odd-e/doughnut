@@ -61,8 +61,8 @@ public class QuestionGenerationBatchRowImportService {
 
     MemoryTracker memoryTracker = request.getMemoryTracker();
     Note note = memoryTracker.getNote();
-    GeneratedMcq postProcessedQuestion = generatedQuestionPostProcessor.postProcess(generatedMcq);
-    Mcq mcq = postProcessedQuestion.toMcq(note, request.getContextSeed());
+    Mcq mcq =
+        generatedQuestionPostProcessor.assembleMcq(generatedMcq, note, request.getContextSeed());
     entityPersister.save(mcq);
 
     RecallPrompt recallPrompt = new RecallPrompt();

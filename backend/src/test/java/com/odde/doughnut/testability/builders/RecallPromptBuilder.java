@@ -8,7 +8,6 @@ import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.QuestionType;
 import com.odde.doughnut.entities.RecallPrompt;
-import com.odde.doughnut.services.ai.GeneratedMcq;
 import com.odde.doughnut.testability.EntityBuilder;
 import com.odde.doughnut.testability.MakeMe;
 import java.sql.Timestamp;
@@ -67,12 +66,12 @@ public class RecallPromptBuilder extends EntityBuilder<RecallPrompt> {
   }
 
   public RecallPromptBuilder withMcqForNote(Note note) {
-    this.mcqBuilder.ofAIGeneratedQuestionForNote(note);
+    this.mcqBuilder.forNote(note);
     return this;
   }
 
-  public RecallPromptBuilder ofAIGeneratedQuestion(GeneratedMcq generatedMcq, Note note) {
-    this.mcqBuilder.ofAIGeneratedQuestion(generatedMcq, note);
+  public RecallPromptBuilder withMcq(Mcq mcq) {
+    this.mcqBuilder.mcq(mcq);
     return this;
   }
 

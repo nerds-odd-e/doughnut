@@ -3,6 +3,8 @@ package com.odde.doughnut.services.ai;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
+import com.odde.doughnut.entities.Mcq;
+import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.odde.doughnut.utils.Randomizer;
 import java.util.ArrayList;
@@ -13,7 +15,7 @@ import org.junit.jupiter.api.Test;
 class GeneratedQuestionPostProcessorTest {
 
   @Test
-  void preservesChoiceOrderWhenChoicesMayNotBeShuffled() {
+  void assemblesMcqWithoutShufflingChoiceOrder() {
     GeneratedQuestionPostProcessor postProcessor =
         new GeneratedQuestionPostProcessor(new TestabilitySettings());
     GeneratedMcq originalQuestion =
@@ -25,9 +27,16 @@ class GeneratedQuestionPostProcessorTest {
             "focus",
             "rationale");
 
-    GeneratedMcq result = postProcessor.postProcess(originalQuestion);
+    Note note = new Note();
+    Mcq result = postProcessor.assembleMcq(originalQuestion, note, 37L);
 
-    assertThat(result, equalTo(originalQuestion));
+    assertThat(result.getNote(), equalTo(note));
+    assertThat(result.getQuestionStem(), equalTo(originalQuestion.getQuestionStem()));
+    assertThat(result.getResponseChoices(), equalTo(originalQuestion.getResponseChoices()));
+    assertThat(result.getCorrectAnswerIndex(), equalTo(originalQuestion.getCorrectAnswerIndex()));
+    assertThat(result.getContextSeed(), equalTo(37L));
+    assertThat(result.getTestedFocus(), equalTo("focus"));
+    assertThat(result.getValidationRationale(), equalTo("rationale"));
   }
 
   @Test
@@ -49,7 +58,7 @@ class GeneratedQuestionPostProcessorTest {
             "focus",
             "rationale");
 
-    GeneratedMcq result = postProcessor.postProcess(originalQuestion);
+    Mcq result = postProcessor.assembleMcq(originalQuestion, null, null);
 
     assertThat(
         result.getResponseChoices(),
