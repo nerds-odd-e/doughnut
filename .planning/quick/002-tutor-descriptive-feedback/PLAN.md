@@ -1,6 +1,6 @@
 # Tutor descriptive feedback in Learning Session protocol
 
-**Status:** planned (not started)
+**Status:** in progress (slice 1 done)
 
 ## Goal
 
@@ -37,10 +37,10 @@ Legacy shapes stay accepted for grade-only reports: `<session_item_grades>`,
 |---|---|---|
 | Item structure | `###` heading + `Grade: N` + prose | Matches Request `<session_items>`; nested `<session_item>` tags are the part LLM paste breaks |
 | Block tag | `<session_item_feedback>` preferred; grades/scores blocks legacy | Outer name states Feedback (Grade + text), not just grades |
-| Persistence | `tutor_feedback` text on the same tutor `RecallLog` row (`answer_id` null) | One Feedback = one history entry (ADR 0001); "last two" is one query |
+| Persistence | descriptive text on the same tutor `RecallLog` (`answer_id` null) | One Feedback = one history entry (ADR 0001); "last two" is one query |
 | Grade required | Item block without a valid `Grade:` line is rejected and reported | A grade-less `RecallLog` means CONFUSION; text-only Feedback has no clean representation |
 | Recording semantics | Unchanged from ADR 0003 — partial recording, append-only, per-notebook | No new failure mode |
-| Learner review | `RecallHistory` on the memory tracker page | Feedback history already lives there |
+| Learner review | recall history on the memory tracker page | Feedback history already lives there |
 
 ## Open forks (Jidoka before the slice that needs them)
 
@@ -49,26 +49,24 @@ Legacy shapes stay accepted for grade-only reports: `<session_item_grades>`,
    Needed by slice 6.
 2. **Prose size** — no cap on stored or echoed text initially (recommended);
    revisit if Requests bloat against the related-notes budget. Needed by slice 6.
-3. **Legacy grades block** — keep `<session_item_grades>` as a supported
-   grade-only shape rather than deprecating it (recommended). Needed by slice 1.
+
+Fork 3 (legacy grades block) is closed: keep `<session_item_grades>` as a
+supported grade-only shape (recorded in the protocol).
 
 ## Slices
 
 ### 1. Protocol decision recorded — Docs
 
-The [commissioned learning session protocol](../../../docs/commissioned-learning-session-protocol.md)
-currently lists descriptive feedback as out of scope; that line is the
-blocker for every slice below.
+Status: done
 
-- Move descriptive Feedback out of **Out of scope** (recommendations, Tutor
-  identity, machine transport stay out).
-- Add the `<session_item_feedback>` Report shape, per-item `Grade: N` + prose,
-  Grade-required rule, storage as text on the tutor RecallLog, and the Request
-  carrying the last two dated Feedbacks.
-- ADR 0001 **Feedback** gloss: descriptive feedback is recorded now;
-  recommendations remain later.
+Protocol (`docs/commissioned-learning-session-protocol.md`) now documents
+preferred `<session_item_feedback>` (`###` + `Grade: N` + prose), Grade-required,
+storage on the tutor RecallLog, and Request last-two dated Feedbacks. Legacy
+grade-only shapes remain accepted. ADR 0001 **Feedback** gloss: Grade and
+descriptive text; recommendations remain later. No new ADR.
 
-Verify: protocol doc and ADR 0001 Feedback gloss only; no new ADR.
+Learning: the commissioned-learning ADR was already removed (glossary in ADR
+0001; protocol in the normal doc). There was no Out of scope section to edit.
 
 ### 2. Report `<session_item_feedback>` records Grades — Behavior
 
@@ -121,7 +119,5 @@ so Tutors actually produce what slice 4 can store.
 
 ## Notes
 
-- The working tree still holds the deleted `quick/001-.../PLAN.md`; commit that
-  housekeeping separately from this plan.
 - Migration versions must exceed `300000300` (`db-migration.mdc`).
 - No product artifact carries plan or slice numbers.
