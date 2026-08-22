@@ -1092,6 +1092,7 @@ export type RecallLog = {
     recordedAt: string;
     elapsedHours: number;
     productOutcome: 'AGAIN' | 'HARD' | 'GOOD' | 'EASY' | 'CONFUSION';
+    tutorFeedback?: string;
     memoryTrackerId: number;
     answerId?: number;
 };

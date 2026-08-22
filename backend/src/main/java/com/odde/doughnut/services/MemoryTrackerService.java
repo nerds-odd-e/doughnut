@@ -80,13 +80,18 @@ public class MemoryTrackerService {
         currentUTCTimestamp,
         Grade.fromCorrect(Boolean.TRUE.equals(correct)),
         memoryTracker,
-        answer);
+        answer,
+        null);
   }
 
   public boolean markAsRecalled(
-      Timestamp currentUTCTimestamp, Grade grade, MemoryTracker memoryTracker, Answer answer) {
+      Timestamp currentUTCTimestamp,
+      Grade grade,
+      MemoryTracker memoryTracker,
+      Answer answer,
+      String tutorFeedback) {
     Objects.requireNonNull(grade, "grade");
-    persistRecallLog(memoryTracker, currentUTCTimestamp, grade, answer);
+    persistRecallLog(memoryTracker, currentUTCTimestamp, grade, answer, tutorFeedback);
     memoryTracker.applyGrade(currentUTCTimestamp, grade);
     entityPersister.save(memoryTracker);
 
@@ -98,13 +103,18 @@ public class MemoryTrackerService {
 
   /** Persist a graded recall log, or CONFUSION when {@code grade} is null. */
   void persistRecallLog(
-      MemoryTracker memoryTracker, Timestamp recordedAt, Grade grade, Answer answer) {
+      MemoryTracker memoryTracker,
+      Timestamp recordedAt,
+      Grade grade,
+      Answer answer,
+      String tutorFeedback) {
     RecallLog recallLog = new RecallLog();
     recallLog.setMemoryTracker(memoryTracker);
     recallLog.setRecordedAt(recordedAt);
     recallLog.setElapsedHours((int) memoryTracker.elapsedHoursUntil(recordedAt));
     recallLog.setGrade(grade);
     recallLog.setAnswer(answer);
+    recallLog.setTutorFeedback(tutorFeedback);
     entityPersister.save(recallLog);
     memoryTracker.addRecallLog(recallLog);
     if (answer != null) {

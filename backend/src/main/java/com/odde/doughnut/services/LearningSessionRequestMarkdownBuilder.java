@@ -4,14 +4,15 @@ import com.odde.doughnut.algorithms.FrontmatterQuestionGenerationInstruction;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
+import com.odde.doughnut.entities.RecallLog;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.RecallLogRepository;
-import com.odde.doughnut.entities.repositories.TutorLogSummary;
 import com.odde.doughnut.services.focusContext.FocusContextMarkdownRenderer;
 import com.odde.doughnut.services.focusContext.FocusContextResult;
 import com.odde.doughnut.services.focusContext.FocusContextRetrievalService;
 import com.odde.doughnut.services.focusContext.MergedRelatedNotes;
 import com.odde.doughnut.services.focusContext.RetrievalConfig;
+import java.sql.Timestamp;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
@@ -100,32 +101,47 @@ public class LearningSessionRequestMarkdownBuilder {
   private void appendHowToReport(StringBuilder sb, List<MemoryTracker> trackers) {
     sb.append("<how_to_report>\n");
     sb.append("Teach the session items above, then return a Learning Session Report giving one\n");
-    sb.append("Grade from 1 to 4 per item:\n\n");
+    sb.append("Grade from 1 to 4 and descriptive text per item:\n\n");
     sb.append("- 4 — mastered the session item with full fluency\n");
     sb.append("- 3 — mastered the session item with fluency\n");
     sb.append(
         "- 2 — mastered the session item but not fluent, or needed a reminder then showed mastery\n");
     sb.append(
         "- 1 — needed several reminders, or could not reach the session item even with help\n\n");
+    sb.append("Preferred report format: one `###` heading per item, then `Grade: N`, then\n");
+    sb.append("descriptive text until the next heading or the close tag.\n\n");
     sb.append("Example of how to provide feedback:\n\n");
     sb.append("# Learning Session Report\n\n");
-    sb.append(LearningSessionReportParser.SESSION_ITEM_GRADES_OPEN_TAG).append("\n");
-    appendExampleReportGrades(sb, trackers);
-    sb.append("\n").append(LearningSessionReportParser.SESSION_ITEM_GRADES_CLOSE_TAG);
+    sb.append(LearningSessionReportParser.SESSION_ITEM_FEEDBACK_OPEN_TAG).append("\n");
+    appendExampleReportFeedback(sb, trackers);
+    sb.append("\n").append(LearningSessionReportParser.SESSION_ITEM_FEEDBACK_CLOSE_TAG);
     sb.append(
         "\n\nOnly grade session items that were actually taught in this session. Do not list\n");
     sb.append("items that were not taught in the session.\n");
     sb.append("</how_to_report>\n");
   }
 
-  private void appendExampleReportGrades(StringBuilder sb, List<MemoryTracker> trackers) {
+  private void appendExampleReportFeedback(StringBuilder sb, List<MemoryTracker> trackers) {
     if (trackers.isEmpty()) {
       return;
     }
-    sb.append(trackers.getFirst().getNote().getTitle()).append(": 4");
+    appendExampleFeedbackItem(
+        sb,
+        trackers.getFirst().getNote().getTitle(),
+        4,
+        "Pronunciation was clear; still mixes ser/estar under pressure.");
     if (trackers.size() > 1) {
-      sb.append("\n").append(trackers.get(1).getNote().getTitle()).append(": 1");
+      sb.append("\n\n");
+      appendExampleFeedbackItem(
+          sb, trackers.get(1).getNote().getTitle(), 1, "Needed several reminders on the soft g.");
     }
+  }
+
+  private void appendExampleFeedbackItem(
+      StringBuilder sb, String title, int grade, String descriptiveText) {
+    sb.append("### ").append(title).append("\n");
+    sb.append("Grade: ").append(grade).append("\n");
+    sb.append(descriptiveText);
   }
 
   private void appendSessionItem(
@@ -138,25 +154,46 @@ public class LearningSessionRequestMarkdownBuilder {
     Note note = tracker.getNote();
 
     sb.append("### ").append(note.getTitle()).append("\n");
-    sb.append("- Tutoring status: ")
-        .append(tutoringStatusLine(tracker.getId(), zoneId))
-        .append("\n");
+    List<RecallLog> tutorLogs = recallLogRepository.findTutorLogsByMemoryTrackerId(tracker.getId());
+    sb.append("- Tutoring status: ").append(tutoringStatusLine(tutorLogs, zoneId)).append("\n");
+    appendRecentFeedbacks(sb, tutorLogs, zoneId);
     FocusContextResult focusContextResult =
         focusContextRetrievalService.retrieve(note, viewer, config);
     sb.append(focusContextMarkdownRenderer.renderFocusNote(focusContextResult.getFocusNote()));
     mergedRelatedNotes.addAll(focusContextResult.getRelatedNotes());
   }
 
-  private String tutoringStatusLine(Integer memoryTrackerId, ZoneId zoneId) {
-    TutorLogSummary summary =
-        recallLogRepository.summarizeTutorLogsByMemoryTrackerId(memoryTrackerId);
-    if (summary.logCount() == 0) {
+  private void appendRecentFeedbacks(StringBuilder sb, List<RecallLog> tutorLogs, ZoneId zoneId) {
+    for (RecallLog log : tutorLogs.stream().limit(2).toList().reversed()) {
+      appendDatedFeedback(sb, log, zoneId);
+    }
+  }
+
+  private void appendDatedFeedback(StringBuilder sb, RecallLog log, ZoneId zoneId) {
+    sb.append("- ")
+        .append(isoDate(log.getRecordedAt(), zoneId))
+        .append(" — Grade: ")
+        .append(log.getGrade().getValue())
+        .append("\n");
+    String descriptiveText = log.getTutorFeedback();
+    if (descriptiveText != null && !descriptiveText.isBlank()) {
+      sb.append("  ").append(descriptiveText).append("\n");
+    }
+  }
+
+  private String tutoringStatusLine(List<RecallLog> tutorLogs, ZoneId zoneId) {
+    if (tutorLogs.isEmpty()) {
       return "not yet tutored";
     }
+    String sessionWord = tutorLogs.size() == 1 ? "session" : "sessions";
+    return tutorLogs.size()
+        + " previous "
+        + sessionWord
+        + ", last on "
+        + isoDate(tutorLogs.getFirst().getRecordedAt(), zoneId);
+  }
 
-    String lastDate =
-        summary.lastRecordedAt().toInstant().atZone(zoneId).toLocalDate().format(ISO_DATE);
-    String sessionWord = summary.logCount() == 1 ? "session" : "sessions";
-    return summary.logCount() + " previous " + sessionWord + ", last on " + lastDate;
+  private static String isoDate(Timestamp recordedAt, ZoneId zoneId) {
+    return recordedAt.toInstant().atZone(zoneId).toLocalDate().format(ISO_DATE);
   }
 }

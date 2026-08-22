@@ -120,7 +120,7 @@ class MemoryTrackerController {
           HttpStatus.BAD_REQUEST, "Just review accepts only GOOD or AGAIN");
     }
     memoryTrackerService.markAsRecalled(
-        testabilitySettings.getCurrentUTCTimestamp(), grade, memoryTracker, null);
+        testabilitySettings.getCurrentUTCTimestamp(), grade, memoryTracker, null, null);
     return memoryTracker;
   }
 

@@ -199,7 +199,8 @@ commission from Doughnut:
   Feedback per Session Item
 - **Session Item** — One memory tracker within a Learning Session, and
   the Feedback recorded for it
-- **Feedback** — A Tutor's evaluation of a Session Item (a **Grade**)
+- **Feedback** — A Tutor's evaluation of a Session Item: a **Grade** and
+  descriptive text. Recommendations of what to study next are not Feedback.
 
 Request/Report documents:
 [commissioned learning session protocol](../commissioned-learning-session-protocol.md).

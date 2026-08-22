@@ -5345,6 +5345,8 @@ components:
           - GOOD
           - EASY
           - CONFUSION
+        tutorFeedback:
+          type: string
         memoryTrackerId:
           type: integer
           format: int32

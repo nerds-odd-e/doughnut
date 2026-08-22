@@ -65,6 +65,7 @@ final class SpellingRecallGrading {
         currentUTCTimestamp,
         Grade.fromCorrect(Boolean.TRUE.equals(answer.getCorrect())),
         memoryTracker,
+        null,
         null);
     return recallPrompt;
   }
@@ -114,7 +115,7 @@ final class SpellingRecallGrading {
                   target -> {
                     memoryTrackerService.applyConfusionAdjustment(target, currentUTCTimestamp);
                     memoryTrackerService.persistRecallLog(
-                        target, currentUTCTimestamp, null, gradedAnswer);
+                        target, currentUTCTimestamp, null, gradedAnswer, null);
                   });
         }
       }
@@ -125,7 +126,8 @@ final class SpellingRecallGrading {
         currentUTCTimestamp,
         Grade.fromCorrect(Boolean.TRUE.equals(correct)),
         memoryTracker,
-        persistedAnswer);
+        persistedAnswer,
+        null);
     return new MemoryTrackerService.SpellingAnswerResult(recallPrompt, matches);
   }
 

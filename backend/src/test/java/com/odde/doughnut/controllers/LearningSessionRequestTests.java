@@ -9,7 +9,6 @@ import com.odde.doughnut.entities.Grade;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.doughnut.services.LearningSessionReportParser;
 import com.odde.doughnut.services.focusContext.FocusContextConstants;
 import java.sql.Timestamp;
 import org.junit.jupiter.api.Test;
@@ -61,15 +60,7 @@ class LearningSessionRequestTests extends LearningSessionControllerTestBase {
         markdown,
         containsString(
             "Teach the session items above, then return a Learning Session Report giving one"));
-    assertThat(markdown, containsString("Grade from 1 to 4 per item"));
     assertThat(markdown, containsString("Example of how to provide feedback:"));
-    assertThat(
-        markdown,
-        containsString(
-            "# Learning Session Report\n\n"
-                + LearningSessionReportParser.SESSION_ITEM_GRADES_OPEN_TAG
-                + "\nHola: 4\nGracias: 1\n"
-                + LearningSessionReportParser.SESSION_ITEM_GRADES_CLOSE_TAG));
     assertThat(
         markdown,
         containsString(
@@ -88,6 +79,34 @@ class LearningSessionRequestTests extends LearningSessionControllerTestBase {
         containsString(
             "- 1 — needed several reminders, or could not reach the session item even with help"));
     assertThat(recallLogRepository.count(), equalTo(logsBefore));
+  }
+
+  @Test
+  void requestMarkdownInstructsDescriptiveFeedback() throws UnexpectedNoAccessRightException {
+    Timestamp dayTwo = makeMe.aTimestamp().of(1, 9).please();
+    testabilitySettings.timeTravelTo(dayTwo);
+
+    Notebook notebook = spanishNotebook(dayTwo);
+
+    String markdown = controller.request(notebook.getId(), "Asia/Shanghai").getRequestMarkdown();
+
+    assertThat(markdown, containsString("Grade from 1 to 4 and descriptive text per item"));
+    assertThat(
+        markdown,
+        containsString(
+            """
+            # Learning Session Report
+
+            <session_item_feedback>
+            ### Hola
+            Grade: 4
+            Pronunciation was clear; still mixes ser/estar under pressure.
+
+            ### Gracias
+            Grade: 1
+            Needed several reminders on the soft g.
+            </session_item_feedback>
+            """));
   }
 
   @Test
@@ -116,7 +135,8 @@ class LearningSessionRequestTests extends LearningSessionControllerTestBase {
   @Test
   void requestMarkdownReflectsPriorRecordedFeedbackPerTracker()
       throws UnexpectedNoAccessRightException {
-    Timestamp priorSessionAt = makeMe.aTimestamp().of(5, 10).fromShanghai().please();
+    Timestamp firstSessionAt = makeMe.aTimestamp().of(5, 10).fromShanghai().please();
+    Timestamp secondSessionAt = makeMe.aTimestamp().of(7, 10).fromShanghai().please();
     Timestamp dayTwo = makeMe.aTimestamp().of(1, 9).fromShanghai().please();
     testabilitySettings.timeTravelTo(dayTwo);
 
@@ -124,17 +144,44 @@ class LearningSessionRequestTests extends LearningSessionControllerTestBase {
     makeMe
         .aRecallLogFor(fixture.holaTracker())
         .grade(Grade.GOOD)
-        .recordedAt(priorSessionAt)
+        .tutorFeedback("Pronunciation was clear")
+        .recordedAt(firstSessionAt)
+        .please();
+    makeMe
+        .aRecallLogFor(fixture.holaTracker())
+        .grade(Grade.EASY)
+        .tutorFeedback("Fluent greeting")
+        .recordedAt(secondSessionAt)
         .please();
 
     LearningSessionRequestResponse response =
         controller.request(fixture.notebook().getId(), "Asia/Shanghai");
 
     String markdown = response.getRequestMarkdown();
-    assertThat(markdown, containsString("### Hola"));
-    assertThat(markdown, containsString("1 previous session, last on 1989-01-06"));
-    assertThat(markdown, containsString("### Gracias"));
-    assertThat(markdown, containsString("- Tutoring status: not yet tutored"));
+    String holaItem = sessionItem(markdown, "Hola");
+    String graciasItem = sessionItem(markdown, "Gracias");
+    assertThat(
+        holaItem,
+        containsString(
+            """
+            - Tutoring status: 2 previous sessions, last on 1989-01-08
+            - 1989-01-06 — Grade: 3
+              Pronunciation was clear
+            - 1989-01-08 — Grade: 4
+              Fluent greeting
+            """));
+    assertThat(graciasItem, containsString("- Tutoring status: not yet tutored"));
+    assertThat(graciasItem, not(containsString("Grade:")));
+  }
+
+  private static String sessionItem(String markdown, String title) {
+    int itemsStart = markdown.indexOf("<session_items>");
+    int itemsEnd = markdown.indexOf("</session_items>");
+    String sessionItems = markdown.substring(itemsStart, itemsEnd);
+    String heading = "### " + title;
+    int start = sessionItems.indexOf(heading);
+    int next = sessionItems.indexOf("### ", start + heading.length());
+    return next < 0 ? sessionItems.substring(start) : sessionItems.substring(start, next);
   }
 
   @Test

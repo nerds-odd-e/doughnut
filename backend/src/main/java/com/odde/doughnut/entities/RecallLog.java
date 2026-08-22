@@ -22,6 +22,7 @@ import lombok.Setter;
   "recordedAt",
   "elapsedHours",
   "productOutcome",
+  "tutorFeedback",
   "memoryTrackerId",
   "answerId"
 })
@@ -64,6 +65,11 @@ public class RecallLog extends EntityIdentifiedByIdOnly {
   @Getter
   @Setter
   private Answer answer;
+
+  @Column(name = "tutor_feedback", columnDefinition = "TEXT")
+  @Getter
+  @Setter
+  private String tutorFeedback;
 
   @JsonIgnore
   public boolean isConfusion() {

@@ -11,6 +11,24 @@ function doughnutNoteBodiesIn(markdown: string): string[] {
   )
 }
 
+function escapeRegExp(value: string) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+}
+
+function sessionItemSection(markdown: string, noteTitle: string) {
+  const sessionItems = markdown.match(
+    /<session_items>[\s\S]*?<\/session_items>/
+  )?.[0]
+  expect(sessionItems, 'session_items block').to.exist
+  const heading = `### ${noteTitle}`
+  const headingAt = sessionItems!.indexOf(heading)
+  expect(headingAt, `Session Item heading ${noteTitle}`).to.be.greaterThan(-1)
+  const nextHeading = sessionItems!.indexOf('### ', headingAt + heading.length)
+  return nextHeading === -1
+    ? sessionItems!.slice(headingAt)
+    : sessionItems!.slice(headingAt, nextHeading)
+}
+
 function closeLearningSessionDetailIfOpen() {
   cy.get('body').then(($body) => {
     if (
@@ -101,11 +119,47 @@ export const recallLearningSessionMethods = () => ({
     })
     return this
   },
-  expectLearningSessionRequestIncludesRubric() {
+  expectLearningSessionRequestInstructsDescriptiveFeedback() {
     this.learningSessionRequestText().should((text) => {
-      expect(text).to.contain('Grade from 1 to 4 per item')
-      expect(text).to.contain('<session_item_grades>')
-      expect(text).to.contain('Hola: 4')
+      expect(
+        text,
+        'how_to_report should ask for Grade plus descriptive text'
+      ).to.contain('Grade from 1 to 4 and descriptive text per item')
+      expect(
+        text,
+        'how_to_report should prefer the session_item_feedback block'
+      ).to.contain('<session_item_feedback>')
+      expect(
+        text,
+        'how_to_report example should include a Grade: line'
+      ).to.contain('Grade: 4')
+    })
+    return this
+  },
+  expectLearningSessionRequestIncludesDatedFeedbacks(
+    noteTitle: string,
+    feedbacks: Array<{ Grade?: string; Text?: string }>
+  ) {
+    this.learningSessionRequestText().should((text) => {
+      const item = sessionItemSection(text, noteTitle)
+      expect(
+        item,
+        `tutoring status for ${noteTitle} should remain beside dated Feedbacks`
+      ).to.match(
+        /Tutoring status: \d+ previous sessions?, last on \d{4}-\d{2}-\d{2}/
+      )
+      let remaining = item
+      for (const row of feedbacks) {
+        const pattern = new RegExp(
+          `- \\d{4}-\\d{2}-\\d{2} — Grade: ${row.Grade}\\n  ${escapeRegExp(row.Text ?? '')}`
+        )
+        const match = remaining.match(pattern)
+        expect(
+          match,
+          `dated Feedback Grade ${row.Grade} with text ${JSON.stringify(row.Text)} for ${noteTitle}. Actual Session Item:\n${item}`
+        ).to.exist
+        remaining = remaining.slice((match!.index ?? 0) + match![0].length)
+      }
     })
     return this
   },

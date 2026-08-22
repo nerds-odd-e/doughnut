@@ -33,7 +33,7 @@ Feature: Commissioned learning session
     And the learning session request should include the tutoring status of "Hola"
     And the learning session request should include focus note with note body "Hello"
     And the learning session request should include related notes with note body "Greetings"
-    And the learning session request should instruct the tutor to report one grade per session item
+    And the learning session request should instruct the tutor to report a grade and descriptive text per session item
     And I should see 1 potential learning session for notebook "Spanish conversation"
 
   Scenario: Notes from different notebooks are commissioned as separate learning sessions
@@ -65,6 +65,49 @@ Feature: Commissioned learning session
     And the commissioned memory tracker for "Gracias" should have recall count 1
     And the commissioned memory tracker for "Hola" should have tutor feedback grade 4
     And I should see 0 potential learning session for notebook "Spanish conversation"
+
+  Scenario: Recording a session item feedback report writes Feedback and schedules each tracker
+    Given the notes "Hola, Gracias" are assimilated as commissioned on day 1
+    And It's day 2, 9 hour
+    When I open the learning session request for notebook "Spanish conversation"
+    And I record the learning session report:
+      """
+      # Learning Session Report
+
+      <session_item_feedback>
+      ### Hola
+      Grade: 4
+      Pronunciation was clear; still mixes ser/estar under pressure.
+
+      ### Gracias
+      Grade: 1
+      Needed several reminders on the soft g.
+      </session_item_feedback>
+      """
+    Then the recorded Feedback for notebook "Spanish conversation" should be shown
+    And the commissioned memory tracker for "Hola" should have recall count 1
+    And the commissioned memory tracker for "Gracias" should have recall count 1
+    And the commissioned memory tracker for "Hola" should have tutor feedback grade 4
+    And I should see 0 potential learning session for notebook "Spanish conversation"
+    When I visit the commissioned memory tracker for "Hola"
+    Then I should see the tutor's feedback "Pronunciation was clear; still mixes ser/estar under pressure."
+
+  Scenario: Request carries the last two dated Feedbacks per Session Item
+    Given the notes "Hola, Gracias" are assimilated as commissioned on day 1
+    And I have recorded a learning session for notebook "Spanish conversation" on day 2, 9 hour with feedback:
+      | Note    | Grade | Text                                |
+      | Hola    | 3     | Pronunciation was clear             |
+      | Gracias | 1     | Needed several reminders on the soft g |
+    And I have recorded a learning session for notebook "Spanish conversation" on day 4, 16 hour with feedback:
+      | Note    | Grade | Text             |
+      | Hola    | 4     | Fluent greeting  |
+      | Gracias | 1     | Still needed help |
+    And It's day 25, 8 hour
+    When I open the learning session request for notebook "Spanish conversation"
+    Then the learning session request should include dated Feedbacks for "Hola":
+      | Grade | Text                    |
+      | 3     | Pronunciation was clear |
+      | 4     | Fluent greeting         |
 
   Scenario Outline: First tutor grade on a new tracker sets Stability and Difficulty
     Given the notes "Hola, Gracias" are assimilated as commissioned on day 1

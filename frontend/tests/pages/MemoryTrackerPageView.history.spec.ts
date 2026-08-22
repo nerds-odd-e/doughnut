@@ -49,6 +49,32 @@ describe("MemoryTrackerPageView recall history", () => {
     expect(outcomes.map((el) => el.text())).toContain("AGAIN")
   })
 
+  it("shows tutor feedback when the recall log has descriptive text", async () => {
+    const wrapper = await mountMemoryTrackerPageViewReady({
+      recallHistory: historyFromLogs([
+        makeMe.aRecallLog
+          .tutorFeedback(
+            "Pronunciation was clear; still mixes ser/estar under pressure."
+          )
+          .please(),
+      ]),
+    })
+
+    expect(
+      wrapper.find('[data-testid="recall-log-tutor-feedback"]').text()
+    ).toBe("Pronunciation was clear; still mixes ser/estar under pressure.")
+  })
+
+  it("does not show tutor feedback when the recall log has none", async () => {
+    const wrapper = await mountMemoryTrackerPageViewReady({
+      recallHistory: historyFromLogs([makeMe.aRecallLog.please()]),
+    })
+
+    expect(
+      wrapper.find('[data-testid="recall-log-tutor-feedback"]').exists()
+    ).toBe(false)
+  })
+
   it("shows a paired recall log and question in the same card", async () => {
     const wrapper = await mountMemoryTrackerPageViewReady({
       recallHistory: [

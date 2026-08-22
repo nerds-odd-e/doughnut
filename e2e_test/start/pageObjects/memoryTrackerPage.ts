@@ -210,6 +210,17 @@ const assumeMemoryTrackerPage = () => {
       )
       return assumeMemoryTrackerPage()
     },
+    expectTutorFeedback(feedback: string) {
+      expectMemoryTrackerPage()
+      cy.get('[data-testid="recall-log-tutor-feedback"]').should(($el) => {
+        const actual = $el.text().trim()
+        expect(
+          actual,
+          `Expected tutor feedback to be ${feedback}, but found ${actual}`
+        ).to.equal(feedback)
+      })
+      return assumeMemoryTrackerPage()
+    },
   }
 }
 
