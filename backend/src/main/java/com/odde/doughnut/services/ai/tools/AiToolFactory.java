@@ -52,13 +52,12 @@ public class AiToolFactory {
     - If the Focus Note is weak, generic, uncertain, truncated, or mostly empty, test only the most concrete stable point available and note the limitation in validationRationale.
     - The stem must be self-contained.
     - Learner-facing fields must not say "focus note", "retrieved note", "above context", "this note", or "according to the context".
-    - Provide exactly 4 choices.
+    - Provide one correct answer and exactly three distractors.
     - Do not prefix choices with labels such as "A.", "B.", "C.", "1.", "2.", or "3."; provide only the choice text.
     - Exactly one choice must be correct under a reasonable interpretation.
     - Distractors must be plausible but clearly incorrect.
     - Do not use meta-choices such as "All of the above", "None of the above", "Both A and B", "A and C only", or any choice that refers to another choice.
     - Each choice must be independent and safe to reorder.
-    - Set choicesMayBeShuffled to true.
     - Avoid making the correct answer consistently longer or more specific than the distractors.
     - Markdown is allowed only when useful for clarity.
 
@@ -68,7 +67,6 @@ public class AiToolFactory {
     - No hidden-context labels appear in learner-facing text.
     - No choice labels or numbering appear inside the choices.
     - No meta-choices or order-dependent choices are used.
-    - choicesMayBeShuffled is true.
     - The question tests recall rather than outside knowledge.
 
     Output:
@@ -119,7 +117,7 @@ Please assume the role of a Memory Assistant, which involves helping me recall a
 
       1. Examine the below MCQ, which may be incomplete or incorrect. It was written against hidden Markdown context that includes the focus note and linked or referencing notes.
       2. The user does not see that hidden context; the stem and choices must stand alone.
-      3. Provide 2 to 4 choices with only 1 correct answer.
+      3. Provide one correct answer and exactly three plausible, independent distractors that are safe to reorder.
       4. Vary the lengths of the choice texts so that the correct answer isn't consistently the longest.
       5. Provide a better question based on my question and the note. Please correct any grammar.
 

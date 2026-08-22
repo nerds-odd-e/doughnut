@@ -5,12 +5,14 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 
+import com.odde.doughnut.controllers.dto.Randomization;
 import com.odde.doughnut.entities.repositories.McqRepository;
 import com.odde.doughnut.services.McqService;
 import com.odde.doughnut.services.ai.GeneratedMcq;
 import com.odde.doughnut.services.ai.QuestionEvaluation;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.OpenAiStructuredResponseMock;
+import com.odde.doughnut.testability.TestabilitySettings;
 import com.openai.client.OpenAIClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -31,16 +33,14 @@ class McqTest {
   @Autowired MakeMe makeMe;
   @Autowired McqService mcqService;
   @Autowired McqRepository mcqRepository;
+  @Autowired TestabilitySettings testabilitySettings;
 
   OpenAiStructuredResponseMock openAiStructuredResponseMock;
 
   @BeforeEach
   void setup() {
     openAiStructuredResponseMock = new OpenAiStructuredResponseMock(officialClient);
-  }
-
-  private GeneratedMcq anUnshuffledGeneratedMcq() {
-    return makeMe.aGeneratedMcq().choicesMayBeShuffled(false).please();
+    testabilitySettings.setRandomization(new Randomization(Randomization.RandomStrategy.first, 0));
   }
 
   private static QuestionEvaluation evaluation(
@@ -52,13 +52,13 @@ class McqTest {
     return evaluation;
   }
 
-  private static QuestionEvaluation accepting(GeneratedMcq mcq) {
-    return evaluation(true, new int[] {mcq.getCorrectAnswerIndex()}, "");
+  private static QuestionEvaluation accepting() {
+    return evaluation(true, new int[] {0}, "");
   }
 
   private void stubAcceptedGeneration(GeneratedMcq mcq) {
     openAiStructuredResponseMock.stubStructuredResponse(mcq);
-    openAiStructuredResponseMock.stubStructuredResponse(accepting(mcq));
+    openAiStructuredResponseMock.stubStructuredResponse(accepting());
   }
 
   @Nested
@@ -69,7 +69,7 @@ class McqTest {
     @BeforeEach
     void setup() {
       note = makeMe.aNote().please();
-      generatedMcq = anUnshuffledGeneratedMcq();
+      generatedMcq = makeMe.aGeneratedMcq().please();
     }
 
     @Test
@@ -101,14 +101,13 @@ class McqTest {
     }
 
     @Test
-    void shouldRegenerateQuestionWhenEvaluationShowsNotFeasible() {
-      GeneratedMcq regeneratedQuestion =
-          makeMe.aGeneratedMcq().stem("regenerated stem").choicesMayBeShuffled(false).please();
+    void shouldRegenerateQuestionWhenEvaluatorDisagreesWithoutRewritingOriginalAnswer() {
+      GeneratedMcq regeneratedQuestion = makeMe.aGeneratedMcq().stem("regenerated stem").please();
       openAiStructuredResponseMock.enqueueStructuredResponse(generatedMcq);
       openAiStructuredResponseMock.enqueueStructuredResponse(regeneratedQuestion);
       openAiStructuredResponseMock.enqueueStructuredResponse(
-          evaluation(false, new int[] {}, "not feasible"));
-      openAiStructuredResponseMock.enqueueStructuredResponse(accepting(regeneratedQuestion));
+          evaluation(true, new int[] {1}, "answer disagreement"));
+      openAiStructuredResponseMock.enqueueStructuredResponse(accepting());
 
       Mcq result = mcqService.generateAFeasibleQuestion(note);
 
@@ -124,6 +123,7 @@ class McqTest {
       }
       assertThat(contestedOriginal, notNullValue());
       assertThat(contestedOriginal.getQuestionStem(), equalTo(generatedMcq.getQuestionStem()));
+      assertThat(contestedOriginal.getCorrectAnswerIndex(), equalTo(0));
     }
   }
 }

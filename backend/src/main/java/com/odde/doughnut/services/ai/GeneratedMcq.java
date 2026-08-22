@@ -22,18 +22,14 @@ public class GeneratedMcq {
   @JsonProperty(required = true)
   private String questionStem;
 
-  @JsonPropertyDescription("List of choices. Markdown allowed.")
+  @JsonPropertyDescription("The one correct answer. Markdown allowed.")
   @JsonProperty(required = true)
-  private List<String> responseChoices;
-
-  @JsonPropertyDescription("Index of the correct choice. 0-based.")
-  @JsonProperty(required = true)
-  private int correctAnswerIndex;
+  private String correctAnswer;
 
   @JsonPropertyDescription(
-      "Whether choices can be safely reordered before display. False if any choice depends on position or refers to another choice.")
+      "Exactly three plausible but clearly incorrect answers. Each must be independent and safe to reorder. Markdown allowed.")
   @JsonProperty(required = true)
-  private boolean choicesMayBeShuffled = true;
+  private List<String> distractors;
 
   @JsonPropertyDescription(
       "Internal summary of the specific focus-note knowledge point tested. Up to a few sentences, at most 50 words. Not shown to the learner.")
@@ -46,7 +42,7 @@ public class GeneratedMcq {
   @JsonIgnore
   public boolean isValid() {
     if (questionStem == null || questionStem.isBlank()) return false;
-    if (responseChoices == null || responseChoices.isEmpty()) return false;
-    return correctAnswerIndex >= 0 && correctAnswerIndex < responseChoices.size();
+    if (correctAnswer == null || correctAnswer.isBlank()) return false;
+    return distractors != null && !distractors.isEmpty();
   }
 }

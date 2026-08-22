@@ -3,27 +3,26 @@ package com.odde.doughnut.services.ai;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
+import com.odde.doughnut.controllers.dto.Randomization;
 import com.odde.doughnut.entities.Mcq;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.testability.TestabilitySettings;
-import com.odde.doughnut.utils.Randomizer;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import org.junit.jupiter.api.Test;
 
 class GeneratedQuestionPostProcessorTest {
 
   @Test
-  void assemblesMcqWithoutShufflingChoiceOrder() {
+  void assemblesSemanticAnswerAndMetadata() {
+    TestabilitySettings testabilitySettings = new TestabilitySettings();
+    testabilitySettings.setRandomization(new Randomization(Randomization.RandomStrategy.first, 0));
     GeneratedQuestionPostProcessor postProcessor =
-        new GeneratedQuestionPostProcessor(new TestabilitySettings());
+        new GeneratedQuestionPostProcessor(testabilitySettings);
     GeneratedMcq originalQuestion =
         new GeneratedMcq(
             "Which ordered choice is correct?",
-            List.of("first choice", "second choice", "third choice"),
-            1,
-            false,
+            "correct choice",
+            List.of("first distractor", "second distractor", "third distractor"),
             "focus",
             "rationale");
 
@@ -32,64 +31,14 @@ class GeneratedQuestionPostProcessorTest {
 
     assertThat(result.getNote(), equalTo(note));
     assertThat(result.getQuestionStem(), equalTo(originalQuestion.getQuestionStem()));
-    assertThat(result.getResponseChoices(), equalTo(originalQuestion.getResponseChoices()));
-    assertThat(result.getCorrectAnswerIndex(), equalTo(originalQuestion.getCorrectAnswerIndex()));
+    assertThat(
+        result.getResponseChoices(),
+        equalTo(
+            List.of(
+                "correct choice", "first distractor", "second distractor", "third distractor")));
+    assertThat(result.getCorrectAnswerIndex(), equalTo(0));
     assertThat(result.getContextSeed(), equalTo(37L));
     assertThat(result.getTestedFocus(), equalTo("focus"));
     assertThat(result.getValidationRationale(), equalTo("rationale"));
-  }
-
-  @Test
-  void preservesCorrectChoiceIndexWhenShuffledChoicesHaveDuplicateText() {
-    GeneratedQuestionPostProcessor postProcessor =
-        new GeneratedQuestionPostProcessor(
-            new TestabilitySettings() {
-              @Override
-              public Randomizer getRandomizer() {
-                return new ReorderingRandomizer(0, 2, 1, 3);
-              }
-            });
-    GeneratedMcq originalQuestion =
-        new GeneratedMcq(
-            "Which duplicate answer is the intended solution?",
-            List.of("same answer", "different answer", "same answer", "last answer"),
-            2,
-            true,
-            "focus",
-            "rationale");
-
-    Mcq result = postProcessor.assembleMcq(originalQuestion, null, null);
-
-    assertThat(
-        result.getResponseChoices(),
-        equalTo(List.of("same answer", "same answer", "different answer", "last answer")));
-    assertThat(result.getCorrectAnswerIndex(), equalTo(1));
-  }
-
-  private static class ReorderingRandomizer implements Randomizer {
-    private final int[] order;
-
-    private ReorderingRandomizer(int... order) {
-      this.order = order;
-    }
-
-    @Override
-    public <T> List<T> shuffle(List<T> list) {
-      List<T> shuffled = new ArrayList<>();
-      for (int index : order) {
-        shuffled.add(list.get(index));
-      }
-      return shuffled;
-    }
-
-    @Override
-    public <T> Optional<T> chooseOneRandomly(List<T> list) {
-      return Optional.empty();
-    }
-
-    @Override
-    public int randomInteger(int min, int max) {
-      return min;
-    }
   }
 }

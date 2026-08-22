@@ -19,9 +19,9 @@ Feature: MCQ management
   Scenario: Generate then refine a question with AI
     Given I have a notebook "Cow jokes" with a note "The cow joke"
     And OpenAI will return these questions in order:
-      | Question Stem                            | Correct Choice           | Incorrect Choice 1 | Incorrect Choice 2 |
-      | Why do cows have hooves instead of feet? | they lactose             | they moo           | they have          |
-      | Why did the cow cross the road?          | To get to the udder side | To see the chicken | To find grass      |
+      | Question Stem                            | Correct Choice           | Incorrect Choice 1 | Incorrect Choice 2 | Incorrect Choice 3 |
+      | Why do cows have hooves instead of feet? | they lactose             | they moo           | they have          | they graze         |
+      | Why did the cow cross the road?          | To get to the udder side | To see the chicken | To find grass      | To reach the barn  |
     When I generate a question with AI for note "The cow joke"
     Then the question in the form becomes:
       | Stem                                     | Choice 0     | Choice 1 | Choice 2  | Correct Choice Index |

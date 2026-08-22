@@ -14,7 +14,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.test.context.ActiveProfiles;
 
-/** Regression test for OpenAI batch success-line parsing using a captured fixture. */
+/** Regression test for OpenAI batch success-line parsing using the semantic MCQ contract. */
 @SpringBootTest
 @ActiveProfiles("test")
 class QuestionGenerationBatchOutputFixtureTest {
@@ -22,9 +22,9 @@ class QuestionGenerationBatchOutputFixtureTest {
   @Autowired OpenAiApiHandler openAiApiHandler;
 
   @Test
-  void parsesCapturedOpenAiBatchSuccessLine() throws IOException {
+  void parsesSemanticMcqBatchSuccessLine() throws IOException {
     String line =
-        new ClassPathResource("openai-batch-fixtures/live_batch_success_line.json")
+        new ClassPathResource("openai-batch-fixtures/semantic_mcq_batch_success_line.json")
             .getContentAsString(StandardCharsets.UTF_8);
 
     GeneratedMcq mcq =
@@ -34,6 +34,6 @@ class QuestionGenerationBatchOutputFixtureTest {
 
     assertThat(mcq.isValid(), is(true));
     assertThat(mcq.getQuestionStem(), containsStringIgnoringCase("sunlight"));
-    assertThat(mcq.getCorrectAnswerIndex(), is(0));
+    assertThat(mcq.getCorrectAnswer(), is("Photosynthesis"));
   }
 }

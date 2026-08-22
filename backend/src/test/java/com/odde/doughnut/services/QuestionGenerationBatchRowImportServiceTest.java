@@ -76,9 +76,9 @@ class QuestionGenerationBatchRowImportServiceTest {
     generatedMcq =
         makeMe
             .aGeneratedMcq()
-            .stem("What color is the sky on a clear day?")
-            .choices("Blue", "Green", "Red")
-            .correctAnswerIndex(0)
+            .stem("Which Japanese form means 'does not do'?")
+            .correctAnswer("しない")
+            .distractors("しなかった", "しなくて", "しないで")
             .please();
 
     outputReadyRequest =
@@ -124,8 +124,8 @@ class QuestionGenerationBatchRowImportServiceTest {
       assertThat(mcq.isContested(), is(false));
 
       assertThat(mcq.getQuestionStem(), is(generatedMcq.getQuestionStem()));
-      assertThat(mcq.getResponseChoices(), is(List.of("Red", "Green", "Blue")));
-      assertThat(mcq.getCorrectAnswerIndex(), is(2));
+      assertThat(mcq.getResponseChoices(), is(List.of("しないで", "しなくて", "しなかった", "しない")));
+      assertThat(mcq.getResponseChoices().get(mcq.getCorrectAnswerIndex()), is("しない"));
     }
 
     @Test

@@ -114,8 +114,13 @@ caller can bypass the one conversion boundary used by slice 2.
 
 ### 2. Valid semantic AI answer becomes the indexed choice
 
-**Status:** planned
+**Status:** done
 **Type:** Behavior
+
+`GeneratedMcq` now carries semantic answer identities. The assembler tags the
+correct answer before always shuffling all choices and derives the persisted
+index afterward. Live, refined, regenerated, and batch-created MCQs share this
+behavior; prompts, fixtures, and generated-MCQ E2E tables use four choices.
 
 **Precondition:** OpenAI returns a valid stem, one correct answer, and three
 distinct distractors.

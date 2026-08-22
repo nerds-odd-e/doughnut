@@ -113,7 +113,11 @@ class McqControllerTests extends ControllerTestBase {
       assertThat(
           request.get("input").toString(), containsString("There are 42 prefectures in Japan"));
       assertThat(findValidFields(request), empty());
-      assertThat(request.toString(), containsString("correctAnswerIndex"));
+      assertThat(request.toString(), containsString("correctAnswer"));
+      assertThat(request.toString(), containsString("distractors"));
+      assertThat(request.toString(), not(containsString("responseChoices")));
+      assertThat(request.toString(), not(containsString("correctAnswerIndex")));
+      assertThat(request.toString(), not(containsString("choicesMayBeShuffled")));
       assertThat(request.toString(), not(containsString("solutionChoiceIndex")));
       assertThat(request.toString(), not(containsString("MCQWithAnswer")));
     }

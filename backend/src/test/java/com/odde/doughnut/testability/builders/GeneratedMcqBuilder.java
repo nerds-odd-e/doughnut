@@ -10,8 +10,11 @@ public class GeneratedMcqBuilder {
     if (generatedMcq.getQuestionStem() == null) {
       generatedMcq.setQuestionStem("a default question stem");
     }
-    if (generatedMcq.getResponseChoices() == null) {
-      generatedMcq.setResponseChoices(List.of("choice1", "choice2", "choice3"));
+    if (generatedMcq.getCorrectAnswer() == null) {
+      generatedMcq.setCorrectAnswer("correct answer");
+    }
+    if (generatedMcq.getDistractors() == null) {
+      generatedMcq.setDistractors(List.of("distractor1", "distractor2", "distractor3"));
     }
     return generatedMcq;
   }
@@ -21,18 +24,13 @@ public class GeneratedMcqBuilder {
     return this;
   }
 
-  public GeneratedMcqBuilder choices(String... choices) {
-    generatedMcq.setResponseChoices(List.of(choices));
+  public GeneratedMcqBuilder correctAnswer(String correctAnswer) {
+    generatedMcq.setCorrectAnswer(correctAnswer);
     return this;
   }
 
-  public GeneratedMcqBuilder correctAnswerIndex(int i) {
-    generatedMcq.setCorrectAnswerIndex(i);
-    return this;
-  }
-
-  public GeneratedMcqBuilder choicesMayBeShuffled(boolean b) {
-    generatedMcq.setChoicesMayBeShuffled(b);
+  public GeneratedMcqBuilder distractors(String... distractors) {
+    generatedMcq.setDistractors(List.of(distractors));
     return this;
   }
 }

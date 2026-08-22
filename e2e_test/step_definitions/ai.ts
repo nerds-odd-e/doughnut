@@ -99,6 +99,7 @@ const defaultReplacementMcq = {
   'Correct Choice': 'Rescue Diver',
   'Incorrect Choice 1': 'Divemaster',
   'Incorrect Choice 2': 'Open Water Diver',
+  'Incorrect Choice 3': 'Advanced Open Water Diver',
 }
 
 Given('OpenAI evaluates the question as legitimate', () => {

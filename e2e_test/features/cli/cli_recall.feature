@@ -59,8 +59,8 @@ Feature: CLI recall
     @usingMockedOpenAiService
     Scenario: MCQ recall accepts the correct choice
       Given OpenAI generates this question:
-        | Question Stem                    | Correct Choice     | Incorrect Choice 1 | Incorrect Choice 2 |
-        | What is the meaning of sedition? | to incite violence | to sleep           | Open Water Diver   |
+        | Question Stem                    | Correct Choice     | Incorrect Choice 1 | Incorrect Choice 2 | Incorrect Choice 3 |
+        | What is the meaning of sedition? | to incite violence | to sleep           | Open Water Diver   | to stay silent     |
       And OpenAI evaluates the question as legitimate
       And the note "sedition" was assimilated on day 1
       And It's day 2
@@ -76,8 +76,8 @@ Feature: CLI recall
     @usingMockedOpenAiService
     Scenario: MCQ recall rejects the next choice
       Given OpenAI generates this question:
-        | Question Stem                    | Correct Choice     | Incorrect Choice 1 | Incorrect Choice 2 |
-        | What is the meaning of sedition? | to incite violence | to sleep           | Open Water Diver   |
+        | Question Stem                    | Correct Choice     | Incorrect Choice 1 | Incorrect Choice 2 | Incorrect Choice 3 |
+        | What is the meaning of sedition? | to incite violence | to sleep           | Open Water Diver   | to stay silent     |
       And OpenAI evaluates the question as legitimate
       And the note "sedition" was assimilated on day 1
       And It's day 2

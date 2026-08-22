@@ -65,13 +65,7 @@ class QuestionGenerationBatchImportServiceTest {
             .please();
     makeMe.entityPersister.flush();
 
-    generatedMcq =
-        makeMe
-            .aGeneratedMcq()
-            .stem("What color is the sky on a clear day?")
-            .choices("Blue", "Green", "Red")
-            .correctAnswerIndex(0)
-            .please();
+    generatedMcq = makeMe.aGeneratedMcq().please();
 
     importableRequest =
         createRequest("importable", QuestionGenerationBatchRequestStatus.OUTPUT_READY);

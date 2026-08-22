@@ -122,13 +122,7 @@ class QuestionGenerationBatchRowImportServiceAtomicTest {
                     .please();
             makeMe.entityPersister.flush();
 
-            GeneratedMcq committedMcq =
-                makeMe
-                    .aGeneratedMcq()
-                    .stem("What color is the sky on a clear day?")
-                    .choices("Blue", "Green", "Red")
-                    .correctAnswerIndex(0)
-                    .please();
+            GeneratedMcq committedMcq = makeMe.aGeneratedMcq().please();
 
             QuestionGenerationBatchRequest request =
                 makeMe

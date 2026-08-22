@@ -66,14 +66,9 @@ class AiQuestionGeneratorTests {
   }
 
   @Test
-  void shouldRejectQuestionWithInvalidChoiceIndex() {
+  void shouldRejectQuestionWithBlankCorrectAnswer() {
     GeneratedMcq invalidQuestion =
-        makeMe
-            .aGeneratedMcq()
-            .stem("What is 2+2?")
-            .choices("4", "3", "5")
-            .correctAnswerIndex(3)
-            .please();
+        makeMe.aGeneratedMcq().stem("What is 2+2?").correctAnswer("").please();
     openAiStructuredResponseMock.stubStructuredResponse(invalidQuestion);
 
     assertThat(

@@ -15,7 +15,7 @@ class AiToolFactoryTest {
     assertThat(result.getMessageBody(), containsString("Question Designer"));
     assertThat(result.getMessageBody(), containsString("focus note"));
     assertThat(result.getMessageBody(), containsString("memory-stimulating, single-answer MCQ"));
-    assertThat(result.getMessageBody(), containsString("exactly 4 choices"));
+    assertThat(result.getMessageBody(), containsString("exactly three distractors"));
     assertThat(result.getMessageBody(), containsString("The learner cannot see this context"));
     assertThat(result.getParameterClass(), equalTo(GeneratedMcq.class));
   }

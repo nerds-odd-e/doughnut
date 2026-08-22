@@ -11,8 +11,8 @@ Feature: AI recall quiz
       | Title    | Content                        |
       | sedition | Sedition means incite violence |
     And OpenAI generates this question:
-      | Question Stem                    | Correct Choice     | Incorrect Choice 1 | Incorrect Choice 2 |
-      | What is the meaning of sedition? | to incite violence | to sleep           | Open Water Diver   |
+      | Question Stem                    | Correct Choice     | Incorrect Choice 1 | Incorrect Choice 2 | Incorrect Choice 3 |
+      | What is the meaning of sedition? | to incite violence | to sleep           | Open Water Diver   | to stay silent     |
     And the note "sedition" was assimilated on day 1
     When I visit recall for a due recall prompt on day 2
     Then I should be asked "What is the meaning of sedition?"
@@ -32,10 +32,10 @@ Feature: AI recall quiz
       | FocusFolder | Focus only content                                     | peers  |
     And the notes "SibOne, SibTwo" are skipped from the assimilation sequence
     And OpenAI generates these MCQs when focus context matches depth-two wiki path, folder siblings, and wiki-linked Bahamas note:
-      | Question Stem              | Correct Choice | Incorrect Choice 1 | Incorrect Choice 2 |
-      | How high is K2 in meters?  | 8611           | 3776               | 8849               |
-      | What is the focus content? | Focus only     | sibling one        | unrelated          |
-      | What is the Bahamas?       | An archipelago | A continent        | An act of sedition |
+      | Question Stem              | Correct Choice | Incorrect Choice 1 | Incorrect Choice 2 | Incorrect Choice 3 |
+      | How high is K2 in meters?  | 8611           | 3776               | 8849               | 5895               |
+      | What is the focus content? | Focus only     | sibling one        | unrelated          | sibling two        |
+      | What is the Bahamas?       | An archipelago | A continent        | An act of sedition | A mountain range   |
     And the notes "WikiRecall, DepthRecall, FocusFolder" are assimilated on day 1
     When I visit recall waiting for 3 due recall prompts on day 2
     Then OpenAI Responses POST bodies include wiki-linked, depth-two wiki path, and folder-sibling focus context prompts

@@ -81,13 +81,7 @@ class QuestionGenerationBatchMaintenanceServiceTest {
             .please();
     makeMe.entityPersister.flush();
 
-    GeneratedMcq generatedMcq =
-        makeMe
-            .aGeneratedMcq()
-            .stem("What color is the sky on a clear day?")
-            .choices("Blue", "Green", "Red")
-            .correctAnswerIndex(0)
-            .please();
+    GeneratedMcq generatedMcq = makeMe.aGeneratedMcq().please();
 
     when(openAiApiHandler.retrieveBatch("batch-openai-1")).thenReturn(completedOpenAiBatch());
     when(openAiApiHandler.downloadFileContent("file-output"))

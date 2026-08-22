@@ -16,7 +16,6 @@ import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.testability.OpenAiStructuredResponseMock;
 import com.openai.client.OpenAIClient;
 import com.openai.models.responses.StructuredResponseCreateParams;
-import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -53,28 +52,17 @@ class McqRefinementControllerTests extends ControllerTestBase {
       throws UnexpectedNoAccessRightException {
     testabilitySettings.setRandomization(new Randomization(last, 0));
     openAiStructuredResponseMock.stubStructuredResponse(
-        makeMe
-            .aGeneratedMcq()
-            .choices("Blue", "Green", "Red")
-            .correctAnswerIndex(0)
-            .choicesMayBeShuffled(true)
-            .please());
+        makeMe.aGeneratedMcq().correctAnswer("しない").distractors("しなかった", "しなくて", "しないで").please());
 
     Mcq result = controller.refine(note, mcq);
 
-    assertThat(result.getResponseChoices(), equalTo(List.of("Red", "Green", "Blue")));
-    assertThat(result.getCorrectAnswerIndex(), equalTo(2));
+    assertThat(result.getResponseChoices().get(result.getCorrectAnswerIndex()), equalTo("しない"));
   }
 
   @Test
   void invalidRefinedQuestionIsRejected() throws UnexpectedNoAccessRightException {
     openAiStructuredResponseMock.stubStructuredResponse(
-        makeMe
-            .aGeneratedMcq()
-            .choices("Blue", "Green", "Red")
-            .correctAnswerIndex(3)
-            .choicesMayBeShuffled(true)
-            .please());
+        makeMe.aGeneratedMcq().correctAnswer("").please());
 
     assertThat(controller.refine(note, mcq), nullValue());
   }

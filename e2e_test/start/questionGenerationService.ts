@@ -5,9 +5,8 @@ import mock_services from './mock_services'
 /** Shape of JSON returned by OpenAI tool calls for MCQ (not all fields are in OpenAPI). */
 type GeneratedMcq = {
   questionStem: string
-  responseChoices: string[]
-  correctAnswerIndex: number
-  choicesMayBeShuffled: boolean
+  correctAnswer: string
+  distractors: string[]
   testedFocus?: string
   validationRationale?: string
 }
@@ -16,12 +15,12 @@ const createGeneratedMcq = (
   stem: string,
   correctChoice: string,
   incorrectChoice1: string,
-  incorrectChoice2: string
+  incorrectChoice2: string,
+  incorrectChoice3: string
 ): GeneratedMcq => ({
-  correctAnswerIndex: 0,
-  choicesMayBeShuffled: false,
   questionStem: stem,
-  responseChoices: [correctChoice, incorrectChoice1, incorrectChoice2],
+  correctAnswer: correctChoice,
+  distractors: [incorrectChoice1, incorrectChoice2, incorrectChoice3],
 })
 
 const mcqReplyJson = (record: Record<string, string>) =>
@@ -30,7 +29,8 @@ const mcqReplyJson = (record: Record<string, string>) =>
       record['Question Stem']!,
       record['Correct Choice']!,
       record['Incorrect Choice 1']!,
-      record['Incorrect Choice 2']!
+      record['Incorrect Choice 2']!,
+      record['Incorrect Choice 3']!
     )
   )
 

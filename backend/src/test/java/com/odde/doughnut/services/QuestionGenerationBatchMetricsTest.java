@@ -107,13 +107,7 @@ class QuestionGenerationBatchMetricsTest {
     when(openAiApiHandler.downloadFileContent("file-error")).thenReturn("");
     outputCollectionService.collectOutputForCompletedBatches(currentTime);
 
-    GeneratedMcq generatedMcq =
-        makeMe
-            .aGeneratedMcq()
-            .stem("What color is the sky on a clear day?")
-            .choices("Blue", "Green", "Red")
-            .correctAnswerIndex(0)
-            .please();
+    GeneratedMcq generatedMcq = makeMe.aGeneratedMcq().please();
     when(openAiApiHandler.parseStructuredOutputFromBatchSuccessLine(anyString(), any(Class.class)))
         .thenReturn(Optional.of(generatedMcq));
     batchImportService.importCompletedBatches(currentTime);

@@ -3,8 +3,8 @@ package com.odde.doughnut.services.ai;
 import com.odde.doughnut.entities.Mcq;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.testability.TestabilitySettings;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -23,38 +23,35 @@ public class GeneratedQuestionPostProcessor {
       throw new IllegalArgumentException("generated question must be valid before post-processing");
     }
 
-    List<IndexedChoice> choices = indexedChoices(original.getResponseChoices());
-    if (original.isChoicesMayBeShuffled()) {
-      choices = testabilitySettings.getRandomizer().shuffle(choices);
-    }
+    List<TaggedChoice> choices =
+        testabilitySettings.getRandomizer().shuffle(taggedChoices(original));
 
     Mcq mcq = new Mcq();
     mcq.setNote(note);
     mcq.setQuestionStem(original.getQuestionStem());
-    mcq.setResponseChoices(choices.stream().map(IndexedChoice::choice).toList());
-    mcq.setCorrectAnswerIndex(newCorrectIndex(choices, original.getCorrectAnswerIndex()));
+    mcq.setResponseChoices(choices.stream().map(TaggedChoice::text).toList());
+    mcq.setCorrectAnswerIndex(correctAnswerIndex(choices));
     mcq.setContextSeed(contextSeed);
     mcq.setTestedFocus(original.getTestedFocus());
     mcq.setValidationRationale(original.getValidationRationale());
     return mcq;
   }
 
-  private List<IndexedChoice> indexedChoices(List<String> choices) {
-    List<IndexedChoice> indexedChoices = new ArrayList<>();
-    for (int index = 0; index < choices.size(); index++) {
-      indexedChoices.add(new IndexedChoice(index, choices.get(index)));
-    }
-    return indexedChoices;
+  private List<TaggedChoice> taggedChoices(GeneratedMcq generatedMcq) {
+    return Stream.concat(
+            Stream.of(new TaggedChoice(true, generatedMcq.getCorrectAnswer())),
+            generatedMcq.getDistractors().stream().map(text -> new TaggedChoice(false, text)))
+        .toList();
   }
 
-  private int newCorrectIndex(List<IndexedChoice> choices, int originalCorrectIndex) {
+  private int correctAnswerIndex(List<TaggedChoice> choices) {
     for (int index = 0; index < choices.size(); index++) {
-      if (choices.get(index).originalIndex() == originalCorrectIndex) {
+      if (choices.get(index).correct()) {
         return index;
       }
     }
-    throw new IllegalArgumentException("correct choice index missing after shuffle");
+    throw new IllegalArgumentException("correct answer missing after shuffle");
   }
 
-  private record IndexedChoice(int originalIndex, String choice) {}
+  private record TaggedChoice(boolean correct, String text) {}
 }

@@ -147,8 +147,8 @@ Feature: Property memory tracker
     And It's day 1, 20 hour
     And I assimilated one note "Vitamins" at the current time
     And OpenAI generates this question:
-      | Question Stem                      | Correct Choice | Incorrect Choice 1 | Incorrect Choice 2 |
-      | What does the topic property mean? | micronutrients | vitamins           | minerals           |
+      | Question Stem                      | Correct Choice | Incorrect Choice 1 | Incorrect Choice 2 | Incorrect Choice 3 |
+      | What does the topic property mean? | micronutrients | vitamins           | minerals           | proteins           |
     And OpenAI evaluates the question as legitimate
     When I visit recall for a due recall prompt on day 2
     Then I should be asked "What does the topic property mean?"
@@ -161,8 +161,8 @@ Feature: Property memory tracker
   @usingMockedOpenAiService
   Scenario: Recalling a property tracker sends property focus to OpenAI
     And OpenAI generates this question:
-      | Question Stem                      | Correct Choice | Incorrect Choice 1 | Incorrect Choice 2 |
-      | What does the topic property mean? | micronutrients | vitamins           | minerals           |
+      | Question Stem                      | Correct Choice | Incorrect Choice 1 | Incorrect Choice 2 | Incorrect Choice 3 |
+      | What does the topic property mean? | micronutrients | vitamins           | minerals           | proteins           |
     And OpenAI evaluates the question as legitimate
     When I visit recall for a due recall prompt on day 2
     Then I should be asked "What does the topic property mean?"
