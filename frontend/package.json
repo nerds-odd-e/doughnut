@@ -52,7 +52,7 @@
     "@vue/compiler-core": "3.5.41",
     "@vue/server-renderer": "3.5.41",
     "@vue/test-utils": "2.4.11",
-    "daisyui": "5.7.19",
+    "daisyui": "5.7.20",
     "doughnut-test-fixtures": "workspace:*",
     "es-toolkit": "^1.51.0",
     "esbuild": "0.28.2",
@@ -60,7 +60,7 @@
     "marked": "^18.0.10",
     "optionator": "^0.9.4",
     "playwright": "^1.62.1",
-    "sass": "1.103.0",
+    "sass": "1.103.1",
     "storybook": "10.5.8",
     "tailwindcss": "4.3.3",
     "terser": "^5.50.0",
@@ -78,7 +78,7 @@
     "vitest-fetch-mock": "^0.4.5",
     "vue": "3.5.41",
     "vue-router": "5.2.0",
-    "vue-tsc": "3.3.10"
+    "vue-tsc": "3.3.11"
   },
   "overrides": {
     "quill": "npm:@dotwee/quill@2.0.9"
