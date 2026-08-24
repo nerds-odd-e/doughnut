@@ -8,12 +8,11 @@
       Assimilation settings
       <AssimilationProgressSummary />
     </h2>
-    <NoteInfoBar
-      ref="noteInfoBarRef"
-      :note-id="note.id"
+    <NoteInfoComponent
+      v-if="noteRecallInfo"
       :note="note"
+      :note-recall-info="noteRecallInfo"
       @level-changed="emit('levelChanged', $event)"
-      @note-recall-info-loaded="onNoteRecallInfoLoaded"
     />
     <section
       v-if="propertyRows.length > 0"
@@ -139,8 +138,8 @@
 </template>
 
 <script setup lang="ts">
-import type { Note, NoteRecallInfo } from "@generated/doughnut-backend-api"
-import NoteInfoBar from "../notes/NoteInfoBar.vue"
+import type { Note } from "@generated/doughnut-backend-api"
+import NoteInfoComponent from "../notes/NoteInfoComponent.vue"
 import AssimilationButtons from "./AssimilationButtons.vue"
 import AssimilationProgressSummary from "./AssimilationProgressSummary.vue"
 import RefineNoteModal from "./RefineNoteModal.vue"
@@ -154,6 +153,7 @@ import {
 } from "@/utils/noteContentFrontmatter"
 import { compactDisplayForPropertyValue } from "@/utils/noteProperties"
 import { usePendingAssimilationProperty } from "@/composables/usePendingAssimilationProperty"
+import { useInjectedMemoryTrackerActions } from "@/composables/useMemoryTrackerActions"
 import { computed, ref, toRef } from "vue"
 import {
   hasNoteLevelTrackerOfType,
@@ -170,7 +170,6 @@ const { note, noteInfoLoaded, assimilateDisabled, assimilatingPropertyKey } =
 
 const emit = defineEmits<{
   (e: "levelChanged", value: unknown): void
-  (e: "noteRecallInfoLoaded", value: NoteRecallInfo): void
   (e: "assimilate", request: AssimilateEvent): void
   (e: "skip", request: { propertyKey?: string }): void
   (e: "revive", request: { propertyKey?: string }): void
@@ -180,8 +179,7 @@ const emit = defineEmits<{
 }>()
 
 const showRefineNoteModal = ref(false)
-const noteInfoBarRef = ref<InstanceType<typeof NoteInfoBar> | null>(null)
-const noteRecallInfo = ref<NoteRecallInfo | null>(null)
+const { noteRecallInfo } = useInjectedMemoryTrackerActions(toRef(() => note.id))
 const { propertiesSectionOpen, isPendingProperty, setPropertyRowRef } =
   usePendingAssimilationProperty(toRef(() => note.id))
 
@@ -190,11 +188,6 @@ const propertyRows = computed(() => {
   if (!parsed.ok) return []
   return sortedPropertyRowsFromNoteProperties(parsed.properties)
 })
-
-const onNoteRecallInfoLoaded = (info: NoteRecallInfo) => {
-  noteRecallInfo.value = info
-  emit("noteRecallInfoLoaded", info)
-}
 
 const assimilateDisabledForProperty = (propertyKey: string) =>
   noteRecallInfo.value?.memoryTrackers?.some(
@@ -223,12 +216,4 @@ const showSpellingOption = computed(
 
 const showRemoveFromRecall = (propertyKey?: string) =>
   activeUnderstandingTrackers(noteRecallInfo.value, propertyKey).length > 0
-
-const reloadNoteInfo = async () => {
-  await noteInfoBarRef.value?.reload()
-  noteRecallInfo.value =
-    noteInfoBarRef.value?.noteRecallInfo ?? noteRecallInfo.value
-}
-
-defineExpose({ reloadNoteInfo })
 </script>

@@ -96,7 +96,7 @@
 </template>
 
 <script setup lang="ts">
-import { inject, ref, watch, type PropType, type Ref } from "vue"
+import { inject, ref, toRef, watch, type PropType, type Ref } from "vue"
 import ContentLoader from "@/components/commons/ContentLoader.vue"
 import NoteRealmLoader from "./NoteRealmLoader.vue"
 import type { Folder, NoteRealm, User } from "@generated/doughnut-backend-api"
@@ -110,6 +110,7 @@ import NoteRecentUpdateIndicator from "./NoteRecentUpdateIndicator.vue"
 import NoteDeadWikiLinkCreateModal from "./NoteDeadWikiLinkCreateModal.vue"
 import type { DeadWikiLinkPayload } from "@/utils/wikiLinkMarkup"
 import { provideNoteShortcutScope } from "@/composables/noteShortcutScope"
+import { provideMemoryTrackerActions } from "@/composables/useMemoryTrackerActions"
 import { isReservedReadmeNoteTitle } from "@/utils/reservedReadmeTitles"
 
 const props = defineProps({
@@ -126,6 +127,7 @@ const props = defineProps({
 })
 
 provideNoteShortcutScope(() => props.ownsShortcuts)
+provideMemoryTrackerActions(toRef(() => props.noteId))
 
 const currentUser = inject<Ref<User | undefined>>("currentUser")
 const readonly = (noteRealm: NoteRealm) =>

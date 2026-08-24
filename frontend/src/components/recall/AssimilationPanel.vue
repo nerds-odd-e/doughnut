@@ -1,17 +1,15 @@
 <template>
   <AssimilationSettings
-    ref="settingsRef"
     :note="note"
     :note-info-loaded="noteInfoLoaded"
     :assimilate-disabled="assimilateDisabled"
     :assimilating-property-key="assimilatingPropertyKey"
     @level-changed="emit('reloadNeeded')"
-    @note-recall-info-loaded="onNoteRecallInfoLoaded"
-    @assimilate="processAssimilate"
-    @skip="processSkip"
-    @revive="processRevive"
-    @return-to-sequence="processReturnToSequence"
-    @remove-from-recall="processRemoveFromRecall"
+    @assimilate="onAssimilate"
+    @skip="onSkip"
+    @revive="onRevive"
+    @return-to-sequence="onReturnToSequence"
+    @remove-from-recall="onRemoveFromRecall"
     @refinement-content-updated="emit('reloadNeeded')"
   />
   <Teleport to="body">
@@ -27,36 +25,22 @@
     :show="showSpellingPopup"
     :note-id="note.id"
     @cancel="handleSpellingCancel"
-    @verified="handleSpellingVerified"
+    @verified="onSpellingVerified"
   />
 </template>
 
 <script setup lang="ts">
-import type { Note, NoteRecallInfo } from "@generated/doughnut-backend-api"
-import usePopups from "../commons/Popups/usePopups"
+import type { Note } from "@generated/doughnut-backend-api"
 import AssimilationSettings from "./AssimilationSettings.vue"
 import SpellingVerificationPopup from "./SpellingVerificationPopup.vue"
-import { computed, ref } from "vue"
+import { provide, toRef } from "vue"
+import type { AssimilateEvent } from "@/composables/useAssimilateUnit"
 import {
-  useAssimilateUnit,
-  type AssimilateEvent,
-} from "@/composables/useAssimilateUnit"
-import {
-  SEQUENCE_SKIP_CONFIRM,
-  useAssimilationSequenceSkip,
-} from "@/composables/useAssimilationSequenceSkip"
-import {
-  hasUnderstandingNoteLevelTracker,
-  activeUnderstandingTrackers,
-} from "./assimilationMemoryTrackers"
-import {
-  trackersToRevive,
-  useReviveMemoryTracker,
-} from "@/composables/useReviveMemoryTracker"
-import {
-  REMOVE_FROM_RECALL_CONFIRM,
-  useRemoveFromRecall,
-} from "@/composables/useRemoveFromRecall"
+  memoryTrackerActionsKey,
+  useInjectedMemoryTrackerActions,
+  type MemoryTrackerActionRequest,
+  type MemoryTrackerActionResult,
+} from "@/composables/useMemoryTrackerActions"
 
 const { note } = defineProps<{
   note: Note
@@ -66,142 +50,62 @@ const emit = defineEmits<{
   (e: "reloadNeeded"): void
 }>()
 
-const { popups } = usePopups()
-const { assimilateUnit } = useAssimilateUnit()
-const { skipFromAssimilationSequence, returnToAssimilationSequence } =
-  useAssimilationSequenceSkip()
-const { reviveMemoryTrackers } = useReviveMemoryTracker()
-const { removeMemoryTrackersFromRecall } = useRemoveFromRecall()
-
-const settingsRef = ref<InstanceType<typeof AssimilationSettings> | null>(null)
-
-const pendingAssimilateAfterSpelling = ref<AssimilateEvent | null>(null)
-const showSpellingPopup = computed(
-  () => pendingAssimilateAfterSpelling.value !== null
+// Re-provide the resolved instance so `AssimilationSettings.vue` (our own
+// child) always shares it, even in isolated mounts (tests) that render
+// this panel without `NoteShow.vue`'s ancestor provider.
+const memoryTrackerActions = useInjectedMemoryTrackerActions(
+  toRef(() => note.id)
 )
-const assimilatingPropertyKey = ref<string | null>(null)
+provide(memoryTrackerActionsKey, memoryTrackerActions)
 
-const noteInfoLoaded = ref(false)
-const noteRecallInfo = ref<NoteRecallInfo | null>(null)
+const {
+  noteInfoLoaded,
+  assimilateDisabled,
+  assimilatingPropertyKey,
+  showSpellingPopup,
+  handleSpellingCancel,
+} = memoryTrackerActions
 
-const onNoteRecallInfoLoaded = (info: NoteRecallInfo) => {
-  noteRecallInfo.value = info
-  noteInfoLoaded.value = true
-}
-
-const assimilateDisabled = computed(() =>
-  hasUnderstandingNoteLevelTracker(noteRecallInfo.value?.memoryTrackers)
-)
-
-const processAssimilate = async (event: AssimilateEvent) => {
-  if (event.assimilateAsSpelling) {
-    pendingAssimilateAfterSpelling.value = event
+const afterAction = (
+  result: MemoryTrackerActionResult,
+  { emitReloadOnStay = false }: { emitReloadOnStay?: boolean } = {}
+) => {
+  if (!result.completed) {
     return
   }
 
-  await doAssimilate(event)
-}
-
-const processSkip = async ({ propertyKey }: { propertyKey?: string } = {}) => {
-  const confirmed = await popups.confirm(SEQUENCE_SKIP_CONFIRM)
-  if (!confirmed) {
-    return
-  }
-
-  const result = await skipFromAssimilationSequence(note.id, propertyKey)
-  if (!result.success) {
-    return
-  }
-
-  await settingsRef.value?.reloadNoteInfo()
-
-  if (!result.navigated) {
+  if (emitReloadOnStay && !result.navigated) {
     emit("reloadNeeded")
   }
 }
 
-const processRevive = async ({ propertyKey }: { propertyKey?: string }) => {
-  const trackers = trackersToRevive(noteRecallInfo.value, propertyKey)
-  if (trackers.length === 0) {
-    return
-  }
-
-  const success = await reviveMemoryTrackers(trackers)
-  if (success) {
-    await settingsRef.value?.reloadNoteInfo()
-  }
+const onAssimilate = async (event: AssimilateEvent) => {
+  const result = await memoryTrackerActions.assimilate(event)
+  afterAction(result, { emitReloadOnStay: true })
 }
 
-const processReturnToSequence = async ({
-  propertyKey,
-}: {
-  propertyKey?: string
-} = {}) => {
-  const success = await returnToAssimilationSequence(note.id, propertyKey)
-  if (success) {
-    await settingsRef.value?.reloadNoteInfo()
-  }
+const onSpellingVerified = async () => {
+  const result = await memoryTrackerActions.handleSpellingVerified()
+  afterAction(result, { emitReloadOnStay: true })
 }
 
-const processRemoveFromRecall = async ({
-  propertyKey,
-}: {
-  propertyKey?: string
-} = {}) => {
-  const trackers = activeUnderstandingTrackers(
-    noteRecallInfo.value,
-    propertyKey
-  )
-  if (trackers.length === 0) {
-    return
-  }
-
-  const confirmed = await popups.confirm(REMOVE_FROM_RECALL_CONFIRM)
-  if (!confirmed) {
-    return
-  }
-
-  const success = await removeMemoryTrackersFromRecall(trackers)
-  if (success) {
-    await settingsRef.value?.reloadNoteInfo()
-  }
+const onSkip = async (request: MemoryTrackerActionRequest = {}) => {
+  const result = await memoryTrackerActions.skip(request)
+  afterAction(result, { emitReloadOnStay: true })
 }
 
-const doAssimilate = async ({
-  propertyKey,
-  assimilateAsCommissioned,
-  assimilateAsSpelling,
-}: AssimilateEvent) => {
-  assimilatingPropertyKey.value = propertyKey ?? null
-  try {
-    const result = await assimilateUnit({
-      noteId: note.id,
-      propertyKey,
-      assimilateAsCommissioned,
-      assimilateAsSpelling,
-    })
-
-    if (!result.success) {
-      return
-    }
-
-    await settingsRef.value?.reloadNoteInfo()
-
-    if (!result.navigated) {
-      emit("reloadNeeded")
-    }
-  } finally {
-    assimilatingPropertyKey.value = null
-  }
+const onRevive = async (request: MemoryTrackerActionRequest) => {
+  const result = await memoryTrackerActions.revive(request)
+  afterAction(result)
 }
 
-const handleSpellingVerified = async () => {
-  const pending = pendingAssimilateAfterSpelling.value
-  pendingAssimilateAfterSpelling.value = null
-  await doAssimilate(pending!)
+const onReturnToSequence = async (request: MemoryTrackerActionRequest = {}) => {
+  const result = await memoryTrackerActions.returnToSequence(request)
+  afterAction(result)
 }
 
-const handleSpellingCancel = () => {
-  pendingAssimilateAfterSpelling.value = null
+const onRemoveFromRecall = async (request: MemoryTrackerActionRequest = {}) => {
+  const result = await memoryTrackerActions.removeFromRecall(request)
+  afterAction(result)
 }
 </script>
