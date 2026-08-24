@@ -1,4 +1,5 @@
-import { computed, nextTick, type Ref } from "vue"
+import { computed, nextTick, toRef, type Ref } from "vue"
+import { useInjectedMemoryTrackerActions } from "@/composables/useMemoryTrackerActions"
 import { usePropertyMemoryTrackerGuard } from "@/composables/usePropertyMemoryTrackerGuard"
 import { relationKebabFromLabel } from "@/models/relationTypeOptions"
 import { primeSoftKeyboard } from "@/utils/focusTarget"
@@ -35,8 +36,11 @@ export function useRichFrontmatterPropertyEditing(options: {
   isReadOnly: () => boolean
   parsedOk: () => boolean
 }) {
+  const { reloadNoteInfo } = useInjectedMemoryTrackerActions(
+    toRef(() => options.noteId() ?? 0)
+  )
   const { confirmAndApplyRemoval, confirmAndApplyRename } =
-    usePropertyMemoryTrackerGuard(options.noteId)
+    usePropertyMemoryTrackerGuard(options.noteId, reloadNoteInfo)
 
   function filterForEmit(rows: PropertyRow[]): PropertyRow[] {
     if (!options.isReadmeContext()) return rows

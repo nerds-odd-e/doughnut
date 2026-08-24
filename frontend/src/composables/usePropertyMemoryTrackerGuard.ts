@@ -20,9 +20,11 @@ function findPropertyMemoryTracker(
 }
 
 export function usePropertyMemoryTrackerGuard(
-  noteId: () => number | undefined
+  noteId: () => number | undefined,
+  onMemoryTrackerChanged?: () => void | Promise<void>
 ) {
   const { popups } = usePopups()
+  const notifyChanged = onMemoryTrackerChanged ?? (() => undefined)
   let noteInfoCache: NoteRecallInfo | undefined
   let noteInfoLoadPromise: Promise<NoteRecallInfo | undefined> | undefined
 
@@ -86,6 +88,7 @@ export function usePropertyMemoryTrackerGuard(
     }
 
     invalidateNoteInfoCache()
+    await notifyChanged()
     return true
   }
 
@@ -122,6 +125,7 @@ export function usePropertyMemoryTrackerGuard(
     }
 
     invalidateNoteInfoCache()
+    await notifyChanged()
     return true
   }
 
