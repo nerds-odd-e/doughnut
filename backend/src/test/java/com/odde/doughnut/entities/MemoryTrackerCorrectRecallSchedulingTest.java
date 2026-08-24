@@ -32,13 +32,24 @@ class MemoryTrackerCorrectRecallSchedulingTest extends MemoryTrackerRecallSchedu
   }
 
   @Test
-  void correctRecallAfterNewAgainUsesShortTermGoodStability() {
+  void onTimeCorrectRecallAfterNewAgainUsesLongTermGoodStability() {
     MemoryTracker memoryTracker = makeMe.aMemoryTrackerFor(note).by(user).inMemoryPlease();
     memoryTracker.applyGrade(memoryTracker.getNextRecallAt(), Grade.AGAIN);
 
     memoryTracker.applyGrade(onTimeGradeTime(memoryTracker), Grade.GOOD);
 
-    assertThat(memoryTracker.getStability(), equalTo(6.0f));
+    assertThat(memoryTracker.getStability(), equalTo(21.0f));
+  }
+
+  @Test
+  void repeatedOnTimeCorrectRecallAfterNewAgainGrowsPastOneDay() {
+    MemoryTracker memoryTracker = makeMe.aMemoryTrackerFor(note).by(user).inMemoryPlease();
+    memoryTracker.applyGrade(memoryTracker.getNextRecallAt(), Grade.AGAIN);
+
+    memoryTracker.applyGrade(onTimeGradeTime(memoryTracker), Grade.GOOD);
+    memoryTracker.applyGrade(onTimeGradeTime(memoryTracker), Grade.GOOD);
+
+    assertThat(memoryTracker.getStability(), equalTo(74.0f));
   }
 
   @Test

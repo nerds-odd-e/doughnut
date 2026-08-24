@@ -126,12 +126,13 @@ public final class Fsrs {
   }
 
   /**
-   * Elapsed hours under 24 use FSRS-6 short-term next Stability for all four G; otherwise the
-   * long-term continuation (Stability increase for Hard/Good/Easy, post-lapse for Again).
+   * Early reviews (elapsed shorter than the scheduled interval, and under 24 hours) use FSRS-6
+   * short-term next Stability. On-time and overdue reviews use the long-term continuation so
+   * sub-day Stability cannot trap successful recall on a repeating short interval.
    */
   static float hoursAfterShortTermOrLongTerm(
       float stabilityHours, int grade, long elapsedInHours, float longTermHours) {
-    if (elapsedInHours < HOURS_PER_DAY) {
+    if (elapsedInHours < HOURS_PER_DAY && elapsedInHours < intervalHours(stabilityHours)) {
       return hoursAfterShortTermRecall(stabilityHours, grade);
     }
     return longTermHours;

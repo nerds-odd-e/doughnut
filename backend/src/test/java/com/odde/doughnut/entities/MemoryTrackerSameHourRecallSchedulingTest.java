@@ -46,6 +46,16 @@ class MemoryTrackerSameHourRecallSchedulingTest extends MemoryTrackerRecallSched
   }
 
   @Test
+  void sameHourCorrectRecallAfterNewAgainUsesShortTermGoodStability() {
+    MemoryTracker memoryTracker = makeMe.aMemoryTrackerFor(note).by(user).inMemoryPlease();
+    memoryTracker.applyGrade(memoryTracker.getNextRecallAt(), Grade.AGAIN);
+
+    memoryTracker.applyGrade(sameHourGradeTime(memoryTracker), Grade.GOOD);
+
+    assertThat(memoryTracker.getStability(), equalTo(6.0f));
+  }
+
+  @Test
   void twentyThreeHourCorrectRecallDoesNotShrinkThreeDayStability() {
     assertThat(nextStabilityHours(23), equalTo(STABILITY_HOURS));
   }
