@@ -45,6 +45,10 @@ deactivate_nvm
 # Setup core environment
 setup_env_vars
 
+# Keep .claude/skills/ symlinked to .agents/skills/ so Claude Code picks up
+# this repo's skills (it doesn't scan .agents/skills/ on its own).
+setup_claude_skills
+
 # Load CLI OAuth credentials for dev (pnpm cli /add gmail)
 if [ -f ./cli/.env.local ]; then
   set -a

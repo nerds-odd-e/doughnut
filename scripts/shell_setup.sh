@@ -34,6 +34,30 @@ setup_fzf() {
   fi
 }
 
+# Expose .agents/skills/ to Claude Code, which only discovers skills under
+# .claude/skills/ (gitignored, so this can't just be committed there directly).
+setup_claude_skills() {
+  local skills_src="${PWD}/.agents/skills"
+  local skills_dst="${PWD}/.claude/skills"
+  [ -d "${skills_src}" ] || return 0
+
+  mkdir -p "${skills_dst}"
+
+  # Drop stale symlinks whose source skill no longer exists.
+  local link name
+  for link in "${skills_dst}"/*/; do
+    [ -L "${link%/}" ] || continue
+    name="$(basename "${link}")"
+    [ -d "${skills_src}/${name}" ] || rm -f "${skills_dst}/${name}"
+  done
+
+  local dir
+  for dir in "${skills_src}"/*/; do
+    name="$(basename "${dir}")"
+    [ -e "${skills_dst}/${name}" ] || ln -s "../../.agents/skills/${name}" "${skills_dst}/${name}"
+  done
+}
+
 # Setup core environment variables
 setup_env_vars() {
   export LANG="en_US.UTF-8"
