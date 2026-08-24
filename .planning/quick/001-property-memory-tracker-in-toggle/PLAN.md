@@ -112,7 +112,22 @@ in `AssimilationSettings.vue`'s Properties section until slice 3.
 E2E: extend/add a scenario covering assimilating (or skipping) a property
 from its toggle-options row.
 
-Status: planned.
+Status: done.
+
+**Result:** `RichFrontmatterEditablePropertyRow.vue`'s expanded options area
+now renders `AssimilationButtons`, wired to
+`useInjectedMemoryTrackerActions` for per-property assimilate / skip /
+revive / return-to-sequence / remove-from-recall. The row's
+"expanded options" area (Remove button + `AssimilationButtons` + composable
+wiring) was extracted into a sibling `RichFrontmatterPropertyRowOptions.vue`
+to keep the parent under the file-size limit. The `assimilateDisabledForProperty`
+and `showRemoveFromRecall` predicates were promoted from local closures in
+`AssimilationSettings.vue` into shared exports on `assimilationMemoryTrackers.ts`
+(alongside `activeUnderstandingTrackers`/`hasNoteLevelTrackerOfType`) so both
+components use the same logic instead of duplicating it. Added an E2E scenario
+("Assimilate a property from its own toggle-options row") and a frontend unit
+spec (`RichMarkdownEditor.propertyAssimilation.spec.ts`) covering assimilate
+and skip from the toggle row.
 
 ### 3. [Behavior] Remove per-property rows from Assimilation settings panel
 

@@ -1,3 +1,4 @@
+import { waitUntilAppIsNotBusy } from '../pageBase'
 import {
   confirmPropertyMemoryTrackerChange,
   findNoteContentRegion,
@@ -87,6 +88,29 @@ export const noteRichPropertyMethods = () => ({
     findNoteContentRegion().within(() => {
       cy.get(richNotePropertyRow(key)).should('not.exist')
     })
+    return this
+  },
+  assimilateRichNotePropertyFromToggle(key: string) {
+    this.switchToRichContent()
+    findNoteContentRegion().within(() => {
+      cy.get(richNotePropertyRow(key)).within(() => {
+        cy.findByTestId('rich-note-property-row-options-toggle').click()
+        cy.get('[data-test="assimilate"]').click()
+      })
+    })
+    waitUntilAppIsNotBusy()
+    return this
+  },
+  skipRichNotePropertyFromToggle(key: string) {
+    this.switchToRichContent()
+    findNoteContentRegion().within(() => {
+      cy.get(richNotePropertyRow(key)).within(() => {
+        cy.findByTestId('rich-note-property-row-options-toggle').click()
+        cy.get('[data-test="skip"]').click()
+      })
+    })
+    cy.findByRole('button', { name: 'OK' }).click()
+    waitUntilAppIsNotBusy()
     return this
   },
   removeRichNoteProperty(key: string) {

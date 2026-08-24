@@ -65,6 +65,7 @@ export function useMemoryTrackerActions(
   )
 
   const reloadNoteInfo = async () => {
+    if (!noteId.value) return
     const { data, error } = await apiCallWithLoading(() =>
       NoteController.getNoteInfo({ path: { note: noteId.value } })
     )

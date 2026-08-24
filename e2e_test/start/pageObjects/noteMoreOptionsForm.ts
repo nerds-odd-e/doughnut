@@ -3,6 +3,7 @@ import {
   assumeAssimilationPage,
   assimilateButton,
   assimilateButtonSelector,
+  isNoteLevelAssimilationControl,
 } from './assimilationPage'
 import { questionListPage } from './questionListPage'
 
@@ -82,7 +83,10 @@ export const noteMoreOptions = () => {
     },
     openAssimilationSettings() {
       cy.document().then((doc) => {
-        if (!doc.querySelector(assimilateButtonSelector)) {
+        const hasNoteLevelAssimilateButton = [
+          ...doc.querySelectorAll(assimilateButtonSelector),
+        ].some(isNoteLevelAssimilationControl)
+        if (!hasNoteLevelAssimilateButton) {
           clickMoreOption(titles.assimilation)
         }
       })

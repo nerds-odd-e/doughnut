@@ -174,6 +174,27 @@ Feature: Property memory tracker
     And I open assimilation settings
     Then the property memory tracker for "topic" should be absent
 
+  @disableOpenAiService
+  Scenario: Assimilate a property from its own toggle-options row
+    Given I am re-logged in as "another_old_learner"
+    And I have a notebook "Property toggle"
+    And I have a note "Iron" under notebook "Property toggle" with content:
+      """
+      ---
+      topic: iron
+      ---
+
+      Body.
+      """
+    And It's day 1, 8 hour
+    And I assimilated one note "Iron" at the current time
+    When I visit note "Iron"
+    And I assimilate rich note property "topic" from its toggle options
+    Then I should see the no more notes to assimilate toast
+    When I visit note "Iron"
+    And I open assimilation settings
+    Then I should see a property memory tracker for "topic"
+
   Scenario: Property memory tracker page shows note and focused property
     Given I am viewing assimilation settings for note "Vitamins"
     When I open the property memory tracker for "topic"

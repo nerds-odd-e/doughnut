@@ -125,27 +125,19 @@
         </div>
       </div>
     </div>
-    <div
+    <RichFrontmatterPropertyRowOptions
       v-if="optionsExpanded"
-      class="pl-8"
-      data-testid="rich-note-property-row-options"
-    >
-      <button
-        type="button"
-        class="daisy-btn daisy-btn-ghost daisy-btn-sm square shrink-0"
-        :aria-label="`Remove note property ${modelValue.key}`"
-        data-testid="rich-note-property-row-remove"
-        @click="emit('remove')"
-      >
-        <Minus class="h-4 w-4" aria-hidden="true" />
-      </button>
-    </div>
+      :property-key="modelValue.key"
+      :note-id="noteId"
+      @remove="emit('remove')"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ChevronDown, ChevronRight, Minus } from "@lucide/vue"
+import { ChevronDown, ChevronRight } from "@lucide/vue"
 import { computed, ref } from "vue"
+import RichFrontmatterPropertyRowOptions from "@/components/form/RichFrontmatterPropertyRowOptions.vue"
 import RichFrontmatterImagePropertyValue from "@/components/form/RichFrontmatterImagePropertyValue.vue"
 import RichFrontmatterPropertyExternalLink from "@/components/form/RichFrontmatterPropertyExternalLink.vue"
 import RichFrontmatterPropertyKeyPresets from "@/components/form/RichFrontmatterPropertyKeyPresets.vue"

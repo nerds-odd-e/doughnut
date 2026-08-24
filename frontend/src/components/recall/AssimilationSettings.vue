@@ -57,7 +57,7 @@
                   size="sm"
                   :disabled="assimilatingPropertyKey === row.key"
                   :assimilate-disabled="
-                    assimilateDisabledForProperty(row.key)
+                    assimilateDisabledForProperty(noteRecallInfo, row.key)
                   "
                   :skipped-for-recall="
                     isSkippedForRecall(noteRecallInfo, row.key)
@@ -65,7 +65,9 @@
                   :skipped-from-assimilation-sequence="
                     isSkippedFromAssimilationSequence(noteRecallInfo, row.key)
                   "
-                  :show-remove-from-recall="showRemoveFromRecall(row.key)"
+                  :show-remove-from-recall="
+                    showRemoveFromRecall(noteRecallInfo, row.key)
+                  "
                   @assimilate="
                     emit('assimilate', {
                       propertyKey: row.key,
@@ -107,7 +109,7 @@
           :skipped-from-assimilation-sequence="
             isSkippedFromAssimilationSequence(noteRecallInfo)
           "
-          :show-remove-from-recall="showRemoveFromRecall()"
+          :show-remove-from-recall="showRemoveFromRecall(noteRecallInfo)"
           :show-commissioned-option="showCommissionedOption"
           :show-spelling-option="showSpellingOption"
           @assimilate="emit('assimilate', {})"
@@ -157,7 +159,8 @@ import { useInjectedMemoryTrackerActions } from "@/composables/useMemoryTrackerA
 import { computed, ref, toRef } from "vue"
 import {
   hasNoteLevelTrackerOfType,
-  activeUnderstandingTrackers,
+  assimilateDisabledForProperty,
+  showRemoveFromRecall,
 } from "./assimilationMemoryTrackers"
 
 const { note, noteInfoLoaded, assimilateDisabled, assimilatingPropertyKey } =
@@ -189,11 +192,6 @@ const propertyRows = computed(() => {
   return sortedPropertyRowsFromNoteProperties(parsed.properties)
 })
 
-const assimilateDisabledForProperty = (propertyKey: string) =>
-  noteRecallInfo.value?.memoryTrackers?.some(
-    (mt) => mt.propertyKey === propertyKey
-  ) ?? false
-
 const hasNoteContent = computed(() => !!(note.content ?? "").trim())
 const isLinkNote = computed(
   () => relationTypeLabelFromNoteContent(note.content) !== undefined
@@ -213,7 +211,4 @@ const showSpellingOption = computed(
     !isLinkNote.value &&
     !hasNoteLevelTrackerOfType(noteRecallInfo.value?.memoryTrackers, "SPELLING")
 )
-
-const showRemoveFromRecall = (propertyKey?: string) =>
-  activeUnderstandingTrackers(noteRecallInfo.value, propertyKey).length > 0
 </script>

@@ -95,6 +95,20 @@ When(
   }
 )
 
+When(
+  'I assimilate rich note property {string} from its toggle options',
+  (key: string) => {
+    start.assumeNotePage().assimilateRichNotePropertyFromToggle(key)
+  }
+)
+
+When(
+  'I skip rich note property {string} from its toggle options',
+  (key: string) => {
+    start.assumeNotePage().skipRichNotePropertyFromToggle(key)
+  }
+)
+
 When('I visit note {string}', (noteTopology: string) => {
   start.jumpToNotePage(noteTopology)
 })

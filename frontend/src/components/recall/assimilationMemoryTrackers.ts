@@ -50,3 +50,21 @@ export function activeUnderstandingTrackers(
     ) ?? []
   )
 }
+
+export function assimilateDisabledForProperty(
+  noteRecallInfo: NoteRecallInfo | null | undefined,
+  propertyKey: string
+): boolean {
+  return (
+    noteRecallInfo?.memoryTrackers?.some(
+      (mt) => mt.propertyKey === propertyKey
+    ) ?? false
+  )
+}
+
+export function showRemoveFromRecall(
+  noteRecallInfo: NoteRecallInfo | null | undefined,
+  propertyKey?: string
+): boolean {
+  return activeUnderstandingTrackers(noteRecallInfo, propertyKey).length > 0
+}

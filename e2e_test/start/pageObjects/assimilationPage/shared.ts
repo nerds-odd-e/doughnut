@@ -17,7 +17,8 @@ export const assimilationPropertyRow = (propertyKey: string) =>
   )
 
 export const isNoteLevelAssimilationControl = (el: Element) =>
-  el.closest('[data-test="assimilation-property-row"]') === null
+  el.closest('[data-test="assimilation-property-row"]') === null &&
+  el.closest('[data-testid="rich-note-property-row"]') === null
 
 const noteLevelControl =
   (selector: string) => (options?: { timeout?: number }) =>
