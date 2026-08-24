@@ -17,7 +17,7 @@ Feature: Property memory tracker
     And It's day 1, 8 hour
     And the note "Vitamins" has assimilated property "topic"
 
-  @disableOpenAiService @wip
+  @disableOpenAiService
   Scenario: Untracked example of property appears in assimilation queue
     Given I am re-logged in as "another_old_learner"
     And I have a notebook "Property queue"
@@ -35,7 +35,7 @@ Feature: Property memory tracker
     Then I should see assimilation progress "1/2/2"
     And I should see pending assimilation property "example of"
 
-  @disableOpenAiService @wip
+  @disableOpenAiService
   Scenario: Skip a property does not create a dummy understanding tracker
     Given I am re-logged in as "another_old_learner"
     And I have a notebook "Property skip"
@@ -59,7 +59,7 @@ Feature: Property memory tracker
     And assimilate for property "topic" should be enabled
     And I should see Return to sequence for property "topic"
 
-  @disableOpenAiService @wip
+  @disableOpenAiService
   Scenario: Return to sequence restores a skipped property to the sequence
     Given I am re-logged in as "another_old_learner"
     And I have a notebook "Property return"
@@ -85,7 +85,7 @@ Feature: Property memory tracker
     When I start assimilation from the menu
     Then I should see pending assimilation property "topic"
 
-  @disableOpenAiService @wip
+  @disableOpenAiService
   Scenario: Assimilating a skipped property creates a property understanding tracker
     Given I am re-logged in as "another_old_learner"
     And I have a notebook "Property skip assimilate"

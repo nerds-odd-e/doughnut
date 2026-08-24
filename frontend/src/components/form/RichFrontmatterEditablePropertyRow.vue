@@ -4,6 +4,9 @@
     data-testid="rich-note-property-row"
     :data-row-index="idx"
     :data-property-key="modelValue.key"
+    :data-test-pending="isPending ? 'true' : undefined"
+    :class="{ 'rounded bg-primary/10 ring-1 ring-primary/30': isPending }"
+    :ref="(el) => setPropertyRowRef(modelValue.key, el)"
   >
     <div
       class="grid grid-cols-[auto_minmax(8rem,auto)_minmax(0,1fr)] gap-x-4 items-center"
@@ -12,15 +15,11 @@
         type="button"
         class="daisy-btn daisy-btn-ghost daisy-btn-sm square shrink-0"
         :aria-label="`Toggle options for note property ${modelValue.key}`"
-        :aria-expanded="optionsExpanded"
+        :aria-expanded="expanded"
         data-testid="rich-note-property-row-options-toggle"
         @click="optionsExpanded = !optionsExpanded"
       >
-        <ChevronRight
-          v-if="!optionsExpanded"
-          class="h-4 w-4"
-          aria-hidden="true"
-        />
+        <ChevronRight v-if="!expanded" class="h-4 w-4" aria-hidden="true" />
         <ChevronDown v-else class="h-4 w-4" aria-hidden="true" />
       </button>
       <div
@@ -126,7 +125,7 @@
       </div>
     </div>
     <RichFrontmatterPropertyRowOptions
-      v-if="optionsExpanded"
+      v-if="expanded"
       :property-key="modelValue.key"
       :note-id="noteId"
       @remove="emit('remove')"
@@ -136,8 +135,9 @@
 
 <script setup lang="ts">
 import { ChevronDown, ChevronRight } from "@lucide/vue"
-import { computed, ref } from "vue"
+import { computed, ref, toRef } from "vue"
 import RichFrontmatterPropertyRowOptions from "@/components/form/RichFrontmatterPropertyRowOptions.vue"
+import { usePendingAssimilationProperty } from "@/composables/usePendingAssimilationProperty"
 import RichFrontmatterImagePropertyValue from "@/components/form/RichFrontmatterImagePropertyValue.vue"
 import RichFrontmatterPropertyExternalLink from "@/components/form/RichFrontmatterPropertyExternalLink.vue"
 import RichFrontmatterPropertyKeyPresets from "@/components/form/RichFrontmatterPropertyKeyPresets.vue"
@@ -186,6 +186,12 @@ const emit = defineEmits<{
 const presetPanelOpen = ref(false)
 const optionsExpanded = ref(false)
 const valueAreaRef = ref<HTMLElement | null>(null)
+
+const { isPendingProperty, setPropertyRowRef } = usePendingAssimilationProperty(
+  toRef(() => props.noteId ?? 0)
+)
+const isPending = computed(() => isPendingProperty(props.modelValue.key))
+const expanded = computed(() => optionsExpanded.value || isPending.value)
 
 const scalarValue = computed(
   () => scalarStringFromPropertyValue(props.modelValue.value) ?? ""

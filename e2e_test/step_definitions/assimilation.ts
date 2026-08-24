@@ -115,18 +115,14 @@ Then('I should see assimilation progress {string}', (triple: string) => {
 Then(
   'I should see pending assimilation property {string}',
   (propertyKey: string) => {
-    start
-      .assumeAssimilationPage()
-      .expectPendingAssimilationProperty(propertyKey)
+    start.assumeNotePage().expectPendingAssimilationProperty(propertyKey)
   }
 )
 
 Then(
   'I should not see pending assimilation property {string}',
   (propertyKey: string) => {
-    start
-      .assumeAssimilationPage()
-      .expectPendingAssimilationPropertyAbsent(propertyKey)
+    start.assumeNotePage().expectPendingAssimilationPropertyAbsent(propertyKey)
   }
 )
 

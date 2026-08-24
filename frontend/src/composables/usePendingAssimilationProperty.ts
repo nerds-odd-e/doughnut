@@ -1,14 +1,7 @@
 import { useAssimilationView } from "@/composables/useAssimilationView"
-import {
-  nextTick,
-  ref,
-  watch,
-  type ComponentPublicInstance,
-  type Ref,
-} from "vue"
+import { nextTick, watch, type ComponentPublicInstance, type Ref } from "vue"
 
 export function usePendingAssimilationProperty(noteId: Ref<number>) {
-  const propertiesSectionOpen = ref(false)
   const propertyRowElements = new Map<string, HTMLElement>()
   const { targetNoteId, pendingPropertyKey } = useAssimilationView()
 
@@ -32,7 +25,6 @@ export function usePendingAssimilationProperty(noteId: Ref<number>) {
     if (targetNoteId.value !== noteId.value || !key) {
       return
     }
-    propertiesSectionOpen.value = true
     await nextTick()
     propertyRowElements.get(key)?.scrollIntoView({
       behavior: "smooth",
@@ -48,12 +40,7 @@ export function usePendingAssimilationProperty(noteId: Ref<number>) {
     { immediate: true }
   )
 
-  watch(noteId, () => {
-    propertiesSectionOpen.value = false
-  })
-
   return {
-    propertiesSectionOpen,
     isPendingProperty,
     setPropertyRowRef,
   }

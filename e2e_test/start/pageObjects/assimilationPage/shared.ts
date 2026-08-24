@@ -11,11 +11,6 @@ export const assimilateAsCommissionedSelector =
   '[data-test="assimilate-as-commissioned"]'
 export const rememberSpellingSelector = '[data-test="remember-spelling"]'
 
-export const assimilationPropertyRow = (propertyKey: string) =>
-  cy.get(
-    `[data-test="assimilation-property-row"][data-property-key="${propertyKey}"]`
-  )
-
 export const isNoteLevelAssimilationControl = (el: Element) =>
   el.closest('[data-testid="rich-note-property-row"]') === null
 

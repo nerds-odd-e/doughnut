@@ -1,7 +1,6 @@
 import { commonSenseSplit } from 'support/string_util'
 import { waitUntilAppIsNotBusy } from '../../pageBase'
 import { assimilationPropertyMemoryTrackerExpectations } from './propertyMemoryTrackerExpectations'
-import { assimilationPropertyFlow } from './assimilationPropertyFlow'
 import { assimilationRefinementLayoutExpectations } from './refinementLayoutExpectations'
 import {
   assimilateAsCommissionedButton,
@@ -35,7 +34,6 @@ const chooseAssimilateOption = (
 
 export const assumeAssimilationPage = () => ({
   ...assimilationPropertyMemoryTrackerExpectations(),
-  ...assimilationPropertyFlow(),
   ...assimilationRefinementLayoutExpectations(),
   expectAssimilationProgressSummary(triple: string) {
     cy.get('[data-test="assimilation-progress-summary"]')
