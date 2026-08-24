@@ -40,70 +40,46 @@ When('I return to sequence on the assimilation panel', () => {
   start.assumeAssimilationPage().returnToSequenceOnPanel()
 })
 
-When('I expand assimilation properties', () => {
-  start.assumeAssimilationPage().expandAssimilationPropertiesSection()
-})
-
-When(
-  'I skip property {string} on the assimilation panel',
-  (propertyKey: string) => {
-    start.assumeAssimilationPage().skipPropertyOnPanel(propertyKey)
-  }
-)
-
-When(
-  'I assimilate property {string} on the assimilation panel',
-  (propertyKey: string) => {
-    start.assumeAssimilationPage().assimilateProperty(propertyKey)
-  }
-)
-
 Then(
   'assimilate for property {string} should be disabled',
   (propertyKey: string) => {
-    start.assumeAssimilationPage().expectPropertyAssimilateDisabled(propertyKey)
+    start.assumeNotePage().expectRichNotePropertyAssimilateDisabled(propertyKey)
   }
 )
 
 Then(
   'assimilate for property {string} should be enabled',
   (propertyKey: string) => {
-    start.assumeAssimilationPage().expectPropertyAssimilateEnabled(propertyKey)
+    start.assumeNotePage().expectRichNotePropertyAssimilateEnabled(propertyKey)
   }
 )
 
 Then('I should see Skip for property {string}', (propertyKey: string) => {
-  start.assumeAssimilationPage().expectSkipForProperty(propertyKey)
+  start.assumeNotePage().expectRichNotePropertyToggleAction(propertyKey, 'skip')
 })
 
 Then(
   'I should see Return to sequence for property {string}',
   (propertyKey: string) => {
     start
-      .assumeAssimilationPage()
-      .expectReturnToSequenceForProperty(propertyKey)
+      .assumeNotePage()
+      .expectRichNotePropertyToggleAction(propertyKey, 'return-to-sequence')
   }
 )
-
-When('I return property {string} to the sequence', (propertyKey: string) => {
-  start.assumeAssimilationPage().returnPropertyToSequenceOnPanel(propertyKey)
-})
 
 Then(
   'I should see Remove from recall for property {string}',
   (propertyKey: string) => {
     start
-      .assumeAssimilationPage()
-      .expectRemoveFromRecallForProperty(propertyKey)
+      .assumeNotePage()
+      .expectRichNotePropertyToggleAction(propertyKey, 'remove-from-recall')
   }
 )
 
-When('I remove property {string} from recall', (propertyKey: string) => {
-  start.assumeAssimilationPage().removePropertyFromRecallOnPanel(propertyKey)
-})
-
 Then('I should see Revive for property {string}', (propertyKey: string) => {
-  start.assumeAssimilationPage().expectReviveForProperty(propertyKey)
+  start
+    .assumeNotePage()
+    .expectRichNotePropertyToggleAction(propertyKey, 'revive')
 })
 
 Then('I should see Skip on the assimilation panel', () => {

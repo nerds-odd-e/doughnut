@@ -14,80 +14,6 @@
       :note-recall-info="noteRecallInfo"
       @level-changed="emit('levelChanged', $event)"
     />
-    <section
-      v-if="propertyRows.length > 0"
-      data-test="assimilation-properties-section"
-      class="mt-4"
-    >
-      <div
-        class="daisy-collapse daisy-collapse-arrow border border-base-300 bg-base-200/50 rounded-lg"
-      >
-        <input
-          v-model="propertiesSectionOpen"
-          type="checkbox"
-          data-test="assimilation-properties-toggle"
-        />
-        <div class="daisy-collapse-title min-h-0 py-3 text-sm font-medium">
-          Properties
-        </div>
-        <div class="daisy-collapse-content">
-          <ul class="flex flex-col gap-2 pb-3">
-            <li
-              v-for="row in propertyRows"
-              :key="row.key"
-              :ref="(el) => setPropertyRowRef(row.key, el)"
-              data-test="assimilation-property-row"
-              :data-property-key="row.key"
-              :data-test-pending="
-                isPendingProperty(row.key) ? 'true' : undefined
-              "
-              class="flex flex-wrap items-center gap-2 gap-y-1 border-t border-base-300 pt-2 first:border-t-0 first:pt-0"
-              :class="{
-                'rounded bg-primary/10 ring-1 ring-primary/30':
-                  isPendingProperty(row.key),
-              }"
-            >
-              <span class="font-medium shrink-0">{{ row.key }}</span>
-              <span
-                class="min-w-0 flex-1 truncate text-sm text-base-content/70"
-                :title="compactDisplayForPropertyValue(row.value)"
-              >{{ compactDisplayForPropertyValue(row.value) }}</span>
-              <span class="shrink-0">
-                <AssimilationButtons
-                  size="sm"
-                  :disabled="assimilatingPropertyKey === row.key"
-                  :assimilate-disabled="
-                    assimilateDisabledForProperty(noteRecallInfo, row.key)
-                  "
-                  :skipped-for-recall="
-                    isSkippedForRecall(noteRecallInfo, row.key)
-                  "
-                  :skipped-from-assimilation-sequence="
-                    isSkippedFromAssimilationSequence(noteRecallInfo, row.key)
-                  "
-                  :show-remove-from-recall="
-                    showRemoveFromRecall(noteRecallInfo, row.key)
-                  "
-                  @assimilate="
-                    emit('assimilate', {
-                      propertyKey: row.key,
-                    })
-                  "
-                  @skip="emit('skip', { propertyKey: row.key })"
-                  @revive="emit('revive', { propertyKey: row.key })"
-                  @return-to-sequence="
-                    emit('returnToSequence', { propertyKey: row.key })
-                  "
-                  @remove-from-recall="
-                    emit('removeFromRecall', { propertyKey: row.key })
-                  "
-                />
-              </span>
-            </li>
-          </ul>
-        </div>
-      </div>
-    </section>
     <div class="daisy-divider my-4" />
     <div
       class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
@@ -149,27 +75,18 @@ import type { AssimilateEvent } from "@/composables/useAssimilateUnit"
 import { isSkippedFromAssimilationSequence } from "@/composables/useAssimilationSequenceSkip"
 import { isSkippedForRecall } from "@/composables/useReviveMemoryTracker"
 import { relationTypeLabelFromNoteContent } from "@/models/relationTypeOptions"
-import {
-  parseNoteContentMarkdown,
-  sortedPropertyRowsFromNoteProperties,
-} from "@/utils/noteContentFrontmatter"
-import { compactDisplayForPropertyValue } from "@/utils/noteProperties"
-import { usePendingAssimilationProperty } from "@/composables/usePendingAssimilationProperty"
 import { useInjectedMemoryTrackerActions } from "@/composables/useMemoryTrackerActions"
 import { computed, ref, toRef } from "vue"
 import {
   hasNoteLevelTrackerOfType,
-  assimilateDisabledForProperty,
   showRemoveFromRecall,
 } from "./assimilationMemoryTrackers"
 
-const { note, noteInfoLoaded, assimilateDisabled, assimilatingPropertyKey } =
-  defineProps<{
-    note: Note
-    noteInfoLoaded: boolean
-    assimilateDisabled: boolean
-    assimilatingPropertyKey?: string | null
-  }>()
+const { note, noteInfoLoaded, assimilateDisabled } = defineProps<{
+  note: Note
+  noteInfoLoaded: boolean
+  assimilateDisabled: boolean
+}>()
 
 const emit = defineEmits<{
   (e: "levelChanged", value: unknown): void
@@ -183,14 +100,6 @@ const emit = defineEmits<{
 
 const showRefineNoteModal = ref(false)
 const { noteRecallInfo } = useInjectedMemoryTrackerActions(toRef(() => note.id))
-const { propertiesSectionOpen, isPendingProperty, setPropertyRowRef } =
-  usePendingAssimilationProperty(toRef(() => note.id))
-
-const propertyRows = computed(() => {
-  const parsed = parseNoteContentMarkdown(note.content ?? "")
-  if (!parsed.ok) return []
-  return sortedPropertyRowsFromNoteProperties(parsed.properties)
-})
 
 const hasNoteContent = computed(() => !!(note.content ?? "").trim())
 const isLinkNote = computed(

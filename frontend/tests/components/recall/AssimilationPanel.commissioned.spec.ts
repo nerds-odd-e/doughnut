@@ -7,7 +7,6 @@ import {
   assimilateAsCommissionedButtonEl,
   assimilateButtonEl,
   assimilateOptionsCaretEl,
-  assimilateOptionsCaretSelector,
   assimilateSpy,
   assimilatedCountOfTheDay,
   clickAssimilateAsCommissioned,
@@ -84,27 +83,5 @@ describe("AssimilationPanel commissioned assimilation", () => {
     expect(assimilateOptionsCaretEl(wrapper)).not.toBeNull()
     await clickAssimilateAsCommissioned(wrapper)
     expect(assimilateSpy).toHaveBeenCalled()
-  })
-
-  it("does not offer assimilate options on property assimilation rows", async () => {
-    const noteWithProperty = makeMe.aNote
-      .id(note.id)
-      .content("---\ntopic: Spanish\n---\n")
-      .please()
-    mockSdkService(NoteController, "getNoteInfo", {
-      memoryTrackers: [],
-    })
-    const wrapper = await mountAssimilationPanelReady({
-      note: noteWithProperty,
-    })
-
-    const propertyRow = wrapper.element.querySelector(
-      '[data-test="assimilation-property-row"]'
-    )
-    expect(propertyRow).not.toBeNull()
-    expect(
-      propertyRow?.querySelector(assimilateOptionsCaretSelector)
-    ).toBeNull()
-    expect(assimilateOptionsCaretEl(wrapper)).not.toBeNull()
   })
 })

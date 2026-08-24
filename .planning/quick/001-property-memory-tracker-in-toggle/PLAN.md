@@ -142,7 +142,34 @@ Property-level actions are reachable solely via each property's own toggle
 (slice 2). This is the point where the "move" is actually complete rather
 than duplicated.
 
-Status: planned.
+Status: done.
+
+**Result:** Deleted the "Properties" collapsible section from
+`AssimilationSettings.vue` (per-property `AssimilationButtons` rows,
+`propertiesSectionOpen`/`isPendingProperty`/`setPropertyRowRef` wiring,
+`propertyRows` computed, property-scoped emit handlers); kept
+`NoteInfoComponent` and the whole-note `AssimilationButtons` block. Deleted
+now-redundant specs (`AssimilationSettings.spec.ts`,
+`AssimilationPanel.property.spec.ts` + their support files) — that coverage
+now lives in `RichMarkdownEditor.propertyAssimilation.spec.ts` (slice 2).
+
+E2E fallout required a developer decision (Jidoka stop, resolved): removing
+the panel's per-property rows broke 6 scenarios that depended on it for
+setup or assertions. Added the missing toggle-path E2E helpers
+(`reviveRichNotePropertyFromToggle`, `returnRichNotePropertyToSequenceFromToggle`,
+`removeRichNotePropertyFromRecallFromToggle`, plus
+`expectRichNotePropertyAssimilateDisabled/Enabled`) alongside the existing
+assimilate/skip ones — split into a new
+`e2e_test/start/pageObjects/noteRichPropertyAssimilationMethods.ts` to keep
+`noteRichPropertyMethods.ts` under the file-size limit — and repointed 2
+scenarios to them ("Remove from recall...", "Note-level assimilation stays
+available..."). The remaining 4 scenarios assert the "pending assimilation
+property" highlight, which only exists on the now-deleted panel row;
+re-wiring that highlight to the toggle row is slice 4's job, so those 4 are
+tagged `@wip` (setup/action steps already repointed to the toggle path —
+only the highlight assertion is red) until slice 4 lands and removes the tag.
+`usePendingAssimilationProperty.ts` itself is untouched — slice 4 still needs
+it, just pointed at the property row instead of the deleted panel row.
 
 ### 4. [Behavior] "Next to assimilate" auto-expands and highlights the property's toggle
 

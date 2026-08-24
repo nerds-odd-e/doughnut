@@ -17,7 +17,7 @@ Feature: Property memory tracker
     And It's day 1, 8 hour
     And the note "Vitamins" has assimilated property "topic"
 
-  @disableOpenAiService
+  @disableOpenAiService @wip
   Scenario: Untracked example of property appears in assimilation queue
     Given I am re-logged in as "another_old_learner"
     And I have a notebook "Property queue"
@@ -35,7 +35,7 @@ Feature: Property memory tracker
     Then I should see assimilation progress "1/2/2"
     And I should see pending assimilation property "example of"
 
-  @disableOpenAiService
+  @disableOpenAiService @wip
   Scenario: Skip a property does not create a dummy understanding tracker
     Given I am re-logged in as "another_old_learner"
     And I have a notebook "Property skip"
@@ -51,16 +51,15 @@ Feature: Property memory tracker
     And I assimilated one note "Minerals" at the current time
     When I start assimilation from the menu
     Then I should see pending assimilation property "topic"
-    When I skip property "topic" on the assimilation panel
+    When I skip rich note property "topic" from its toggle options
     Then I should see the no more notes to assimilate toast
     When I visit note "Minerals"
     And I open assimilation settings
-    And I expand assimilation properties
     Then the property memory tracker for "topic" should be absent
     And assimilate for property "topic" should be enabled
     And I should see Return to sequence for property "topic"
 
-  @disableOpenAiService
+  @disableOpenAiService @wip
   Scenario: Return to sequence restores a skipped property to the sequence
     Given I am re-logged in as "another_old_learner"
     And I have a notebook "Property return"
@@ -76,18 +75,17 @@ Feature: Property memory tracker
     And I assimilated one note "Minerals" at the current time
     When I start assimilation from the menu
     Then I should see pending assimilation property "topic"
-    When I skip property "topic" on the assimilation panel
+    When I skip rich note property "topic" from its toggle options
     Then I should see the no more notes to assimilate toast
     When I visit note "Minerals"
     And I open assimilation settings
-    And I expand assimilation properties
     Then I should see Return to sequence for property "topic"
-    When I return property "topic" to the sequence
+    When I return rich note property "topic" to the sequence from its toggle options
     Then I should see Skip for property "topic"
     When I start assimilation from the menu
     Then I should see pending assimilation property "topic"
 
-  @disableOpenAiService
+  @disableOpenAiService @wip
   Scenario: Assimilating a skipped property creates a property understanding tracker
     Given I am re-logged in as "another_old_learner"
     And I have a notebook "Property skip assimilate"
@@ -103,12 +101,11 @@ Feature: Property memory tracker
     And I assimilated one note "Minerals" at the current time
     When I start assimilation from the menu
     Then I should see pending assimilation property "topic"
-    When I skip property "topic" on the assimilation panel
+    When I skip rich note property "topic" from its toggle options
     Then I should see the no more notes to assimilate toast
     When I visit note "Minerals"
     And I open assimilation settings
-    And I expand assimilation properties
-    And I assimilate property "topic" on the assimilation panel
+    And I assimilate rich note property "topic" from its toggle options
     Then I should see the no more notes to assimilate toast
     When I visit note "Minerals"
     And I open assimilation settings
@@ -118,9 +115,8 @@ Feature: Property memory tracker
   Scenario: Remove from recall on assimilation settings for a property
     Given I assimilated one note "Vitamins" at the current time
     And I am viewing assimilation settings for note "Vitamins"
-    And I expand assimilation properties
     Then I should see Remove from recall for property "topic"
-    When I remove property "topic" from recall
+    When I remove rich note property "topic" from recall from its toggle options
     Then I should see Revive for property "topic"
     When I start assimilation from the menu
     Then I should see the no more notes to assimilate toast

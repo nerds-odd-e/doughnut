@@ -16,6 +16,7 @@ import {
 } from './notePageContentRegion'
 import { noteRelationshipMethods } from './noteRelationshipMethods'
 import { noteRichPropertyMethods } from './noteRichPropertyMethods'
+import { noteRichPropertyAssimilationMethods } from './noteRichPropertyAssimilationMethods'
 
 /** Matches `noteShowHref()` (`/n{id}`), `/n/:id`, or legacy `/d/n/:id` note links. */
 const noteShowHref = /^\/d\/n\/\d+$|^\/n\/\d+$|^\/n\d+$/
@@ -241,6 +242,7 @@ export const assumeNotePage = (
     },
     ...noteContentEditingMethods(),
     ...noteRichPropertyMethods(),
+    ...noteRichPropertyAssimilationMethods(),
     ...noteRelationshipMethods(),
     ...sidebarChildNotePageMethods(),
     ...noteConversationAndQuestionMethods(),

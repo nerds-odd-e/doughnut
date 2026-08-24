@@ -3,7 +3,6 @@
     :note="note"
     :note-info-loaded="noteInfoLoaded"
     :assimilate-disabled="assimilateDisabled"
-    :assimilating-property-key="assimilatingPropertyKey"
     @level-changed="emit('reloadNeeded')"
     @assimilate="onAssimilate"
     @skip="onSkip"
@@ -61,7 +60,6 @@ provide(memoryTrackerActionsKey, memoryTrackerActions)
 const {
   noteInfoLoaded,
   assimilateDisabled,
-  assimilatingPropertyKey,
   showSpellingPopup,
   handleSpellingCancel,
 } = memoryTrackerActions

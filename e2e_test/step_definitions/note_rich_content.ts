@@ -109,6 +109,27 @@ When(
   }
 )
 
+When(
+  'I revive rich note property {string} from its toggle options',
+  (key: string) => {
+    start.assumeNotePage().reviveRichNotePropertyFromToggle(key)
+  }
+)
+
+When(
+  'I return rich note property {string} to the sequence from its toggle options',
+  (key: string) => {
+    start.assumeNotePage().returnRichNotePropertyToSequenceFromToggle(key)
+  }
+)
+
+When(
+  'I remove rich note property {string} from recall from its toggle options',
+  (key: string) => {
+    start.assumeNotePage().removeRichNotePropertyFromRecallFromToggle(key)
+  }
+)
+
 When('I visit note {string}', (noteTopology: string) => {
   start.jumpToNotePage(noteTopology)
 })
