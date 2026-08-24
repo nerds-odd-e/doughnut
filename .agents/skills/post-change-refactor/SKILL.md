@@ -5,10 +5,11 @@ description: >-
   Use concept-bounded scope even when completion requires untouched code, but
   Jidoka-stop before unapproved cross-subsystem refactoring. Remove duplication,
   unclear naming, shotgun surgery, dead / test-only / redundant code, and
-  oversized files; run related tests. Local slice wrap-up overlay (execute-plan /
-  gsd-execute-phase). Use after a slice, before commit, or on: refactor change,
-  clean up change, post-change refactor, before commit cleanup, tidy current
-  change.
+  oversized files; run related tests only when the refactor edits. Local slice
+  wrap-up overlay (execute-plan / gsd-execute-phase). Use after a slice, before
+  commit, or on:
+  refactor change, clean up change, post-change refactor, before commit cleanup,
+  tidy current change.
 ---
 
 <objective>
@@ -54,7 +55,7 @@ and `open_api_docs.yaml`.
 **Plan justification (decision boundary):**
 Keep code justified by the **current change** or the **immediate next**
 slice in the active plan
-(`.planning/phases/*/`, `.planning/quick/*/`, or legacy `ongoing/*.md`).
+(`.planning/phases/*/`, `.planning/quick/*/`).
 Anything justified only by a later slice, or by "we might need it later",
 is speculative — remove it. No plan → justification comes only from the
 current change. The immediate next slice may justify retaining code, but
@@ -105,9 +106,14 @@ first cross-subsystem edit and leave no partial candidate: reverse only this
 agent's edits for that candidate, never pre-existing user changes.
 </preflight_gate>
 
-After the gate passes, execute the recorded candidates **in check order**.
-Do not repeat broad discovery. After all checks pass, return to the caller —
-**do not commit** from inside this skill.
+After the gates, **decide first**: if `map_concept_impact` recorded no edit
+candidates (and the cross-subsystem gate did not stop), skip the edit steps
+and `confirm_related_tests`; report "none — already clean" and emit
+`## REFACTOR COMPLETE`. Do not run related tests as a pre-triage gate.
+
+If there are edit candidates, execute them **in check order**, then
+`confirm_related_tests`. Do not repeat broad discovery. After all checks
+pass, return to the caller — **do not commit** from inside this skill.
 
 <step name="duplication">
 - **"New" duplication** means at least one copy is newly introduced or
@@ -171,6 +177,8 @@ For every file in the current diff and every file proposed for editing:
 wc -l <path>
 ```
 
+(`wc` is a host command — do not start a nix shell just to count lines.)
+
 - Files **over 250 lines** must be split (applies to test code too).
 - Split along **cohesive seams** — one concept per module, not arbitrary
   line cuts.
@@ -178,7 +186,10 @@ wc -l <path>
 </step>
 
 <step name="confirm_related_tests">
-Run **related** tests for the changed files — not the whole suite.
+Skip this step when triage recorded no refactor edits.
+
+Otherwise run **related** tests for the files this refactor changed — not the
+whole suite, and not before deciding to edit.
 Use `CURSOR_DEV=true nix develop -c …` for all commands except `git`.
 
 | Area touched | Focused command |
@@ -204,7 +215,7 @@ the refactor (not the original change), fix it now.
 - No cross-subsystem refactoring without concept-specific human authorization
 - No speculative structure beyond current change / immediate next slice
 - Duplication, naming, shotgun, dead-code, and 250-line checks applied
-- Related focused tests green
+- Related focused tests green when this skill edited; skipped when triage made no edits
 - No commit created by this skill
 - Final output includes `## REFACTOR COMPLETE`
 </success_criteria>
@@ -215,7 +226,8 @@ On successful completion, report a short summary to the caller:
 1. Which checks led to changes — duplication / naming / shotgun / dead code /
    file size (or "none — already clean").
 2. Files renamed, extracted, split, or deleted.
-3. Which related tests were run and confirmed passing.
+3. Which related tests were run and confirmed passing — or "skipped — no
+   refactor edits".
 
 ```
 ## REFACTOR COMPLETE
@@ -249,6 +261,10 @@ must not consider refactoring complete or commit until the human decides.
   human authorization.
 - Do not start a new slice or add new behavior — Structure only.
 - Do not run the entire test suite or trigger CI.
+- Do not run related tests when triage recorded no refactor edits.
 - Do not regenerate the OpenAPI client unless controller/DTO signatures
   changed as part of this refactor (use `generate-api-client` when needed).
+- Do not commit, push, or amend from inside this skill.
+- Do not prefix `git` with `nix develop -c` — git runs directly; other tooling
+  uses nix (`CURSOR_DEV=true nix develop -c`).
 </out_of_scope>

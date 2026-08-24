@@ -66,15 +66,13 @@ Active work lives under `.planning/`:
 | `.planning/phases/NN-slug/` | GSD phase directory: `*-CONTEXT.md`, `*-PLAN.md`, `*-SUMMARY.md`, `*-VERIFICATION.md`, … |
 | `.planning/codebase/` | Codebase maps |
 | `.planning/quick/` | Ad-hoc plans that are not yet on the roadmap |
-| `ongoing/` | Legacy only — do not put new plans here |
 
-Prefer GSD phase dirs and filenames. Local flat `.planning/<name>.md` is legacy-compatible for execute-plan but **new** plans should use `.planning/phases/NN-slug/` or `.planning/quick/NNN-slug/`.
 
 **Product code, tests, and permanent docs** stay capability-named — never encode GSD phase or slice numbers there. Those numbers belong only under `.planning/`. In `PLAN.md`, number slices (`### 1. Capability heading`)
 
 ### Plan history (resume vs cleanup)
 
-- **While a plan is in progress:** keep enough history in the PLAN file (slice status, brief learnings, remaining slices) plus CONTEXT/SUMMARY so work can **stop and resume across sessions and environments**.
+- **While a plan is in progress:** keep enough history in the PLAN file (slice status, brief learnings, remaining slices) plus CONTEXT/SUMMARY so work can **stop and resume across sessions and environments**. `execute-plan` writes that resume state into the PLAN it is running — not GSD `STATE.md`.
 - **As soon as the plan is fully executed** and outcomes live in code and permanent docs: **actively clean up** spent planning history (prune done-slice detail, delete disposable notes, drop obsolete SUMMARY/discussion noise). Keep only what still helps a future reader of the *product*, or a short pointer in ROADMAP if the milestone continues.
 - Do **not** leave completed plans as a permanent diary under `.planning/`.
 

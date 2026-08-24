@@ -2,7 +2,7 @@
 name: execute-plan
 description: >-
   Autonomously execute a plan under .planning/phases/ or
-  .planning/quick/ (GSD PLAN.md files, or legacy flat/ongoing plans).
+  .planning/quick/ .
   Applies local wrap-up on every slice: Jidoka, post-change-refactor,
   plan update, commit, and push. Parallel waves OK when safe.
   Triggers on: execute plan, run plan, execute slices, start plan,
@@ -25,11 +25,10 @@ waiting on the developer.
 <context>
 **Mandatory first read:** `.cursor/agent-map.md` (navigation + focused test commands).
 
-**Plan locations (preferred → legacy):**
+**Plan locations:**
 
 1. `.planning/phases/NN-slug/*-PLAN.md`
 2. `.planning/quick/NNN-slug/PLAN.md` (or `*-PLAN.md`)
-3. Legacy flat `.planning/*.md` or `ongoing/*.md`
 
 Every executable unit (slice, or GSD plan wave that is one slice) must obey
 **Behavior | Structure**, stop-safe, one observable behavior
@@ -50,8 +49,9 @@ run post-change-refactor themselves (nested agents routinely skip spawning a
 second Task). The coordinator spawns a **fresh** refactor agent and must see
 `## REFACTOR COMPLETE` (or handle `## REFACTOR JIDOKA STOP`) before committing.
 
-**Resume:** The PLAN file is the source of truth for remaining slices (status,
-learnings, adjusted later slices).
+**Resume:** The PLAN file being executed is the source of truth for remaining
+slices (status, learnings, adjusted later slices). Do **not** write
+`.planning/STATE.md`, and do not treat it as execution or resume state.
 
 **Parallelism:** Run multiple independent plans/slices in parallel (GSD waves or
 Task agents) when `files_modified` / touch sets do not overlap and they do not
@@ -101,7 +101,7 @@ decision** the developer needs. Then wait.
 
 <step name="coordinator_loop">
 ```
-1. Read the plan (GSD phase dir PLAN.md / GSD *-PLAN.md / quick PLAN.md / legacy flat file)
+1. Read the plan (GSD phase dir PLAN.md / GSD *-PLAN.md / quick PLAN.md)
 2. Find the next slice whose status is NOT "done"
 3. Pre-slice Jidoka + Behavior/Structure check
    → If stop condition → report & STOP
@@ -116,28 +116,7 @@ decision** the developer needs. Then wait.
       (do not continue as if wrap-up succeeded). Prefer fixing by soft-resetting
       an unpushed commit only when safe and the developer has not forbidden it;
       otherwise wait for developer judgment.
-6. COORDINATOR WRAP-UP (required — do not skip):
-   a. Spawn a fresh Task (`generalPurpose`) whose prompt is: read and follow
-      `.agents/skills/post-change-refactor/SKILL.md` end-to-end on the current
-      uncommitted change. Pass slice text, plan path, nix prefix. Instruct:
-      do not commit; return must include `## REFACTOR COMPLETE` or
-      `## REFACTOR JIDOKA STOP`.
-   b. Accept only when the refactor agent output contains `## REFACTOR COMPLETE`.
-      On `## REFACTOR JIDOKA STOP`, relay to the developer and STOP (leave
-      working tree as the refactor agent left it).
-      On missing marker → re-dispatch refactor once; if still missing, STOP.
-   c. Format: `CURSOR_DEV=true nix develop -c pnpm format:all`
-      (includes lint + auto-fix; do **not** also run `pnpm lint:all` —
-      that is CI check-only). Fix remaining issues.
-   d. If backend controller/DTO signatures changed and client not yet regenerated,
-      run generate-api-client.
-   e. Update PLAN (and SUMMARY if present): mark slice done; brief
-      learnings; prune obsolete detail; adjust future slices if warranted.
-   f. Post-slice Jidoka — if learnings need developer judgment: commit and push
-      work so far, then STOP.
-   g. Commit only when CI-safe (no intentional non-`@wip` red; no full-CI
-      preflight) then `git push`.
-   h. Verify: `## REFACTOR COMPLETE` was observed this slice AND commit is pushed.
+6. COORDINATOR WRAP-UP (required — do not skip): follow `<step name="wrap_up">`.
 7. Go to step 1 (next slice)
 8. All slices done → clean up spent plan history (planning.mdc) → report & STOP
 ```
@@ -166,24 +145,22 @@ below; do not rely on `gsd-executor` to run local post-change-refactor).
 The implementer prompt **must** include:
 
 1. **Plan file path** and **which slice** to implement (paste the
-   slice text).
-2. **Jidoka stop conditions** (copy the list above).
+   slice text). Do **not** paste this skill or the full Jidoka list.
+2. **Jidoka:** stop and return on value/design forks, missing credentials,
+   undiagnosed unrelated failure, or ambiguity. Do not guess those.
 3. **Implementation rules**: `planning.mdc` (Behavior/Structure, TDD, slice
    discipline, **time budget** ~5 min fuzzy / >10 min hard finer-decompose,
    **no commit on red**, **do not deliberately break CI** — unfinished E2E
    stays `@wip`; run tests relevant to the change, not the full CI suite),
-   `gsd-coexistence.mdc`, and other applicable rules. **Naming:**
-   permanent artifacts by **capability/domain**, never GSD phase number.
-4. **Hard stop before wrap-up:** Do **not** commit. Do **not** push. Do **not**
-   update PLAN to `done`. Do **not** run post-change-refactor (and do not
-   "apply the refactor skill yourself"). Leave the working tree uncommitted
-   with relevant tests green for the coordinator (non-`@wip` failures that CI
-   would run are not acceptable).
-5. **Revert & split** instructions (see `revert_and_split` step).
+   `gsd-coexistence.mdc`. **Naming:** capability/domain, never GSD phase number.
+4. **Hard stop before wrap-up:** Do **not** commit, push, mark PLAN `done`, or
+   run post-change-refactor. Leave the tree uncommitted with relevant tests
+   green (non-`@wip` CI failures are not acceptable).
+5. **Revert & split** if the slice is too big (`revert_and_split`).
 6. **Nix prefix**: `CURSOR_DEV=true nix develop -c <command>` unless Cloud VM
-   (`cloud-vm-setup`). **Git commands do not need the Nix prefix.**
-7. **Return**: short summary — implementation ready for wrap-up (tests run),
-   Jidoka stop, or reverted and split. Do not claim slice "done" in git terms.
+   (`cloud-vm-setup`). Git does not need it.
+7. **Return**: short summary — ready for wrap-up (tests run), Jidoka stop, or
+   reverted and split. Do not claim slice "done" in git terms.
 
 **Do NOT pass entire plan history** — only the current slice. Resume context
 lives in the PLAN file on disk.
@@ -203,24 +180,29 @@ non-`@wip` CI-safe, uncommitted):
    - Return must end with `## REFACTOR COMPLETE` or `## REFACTOR JIDOKA STOP`
 2. **Gate** — Proceed only on `## REFACTOR COMPLETE`. On Jidoka stop or missing
    marker, follow the coordinator_loop rules above (do not commit).
-3. **Format** — `CURSOR_DEV=true nix develop -c pnpm format:all`. That
-   command already lints and auto-fixes (Biome `check --write`, Spotless
-   apply, `vue-tsc`). Do **not** also run `pnpm lint:all` (CI check-only).
-   Fix any remaining issues.
-4. **Regenerate API client** — if backend controller or DTO signatures changed,
+3. **Regenerate API client** — if backend controller or DTO signatures changed,
    run **generate-api-client** before committing.
-5. **Reflect & re-plan** — update PLAN (and SUMMARY if present):
+4. **Reflect & re-plan** — update the PLAN being executed (and SUMMARY if
+   present). Do **not** write `.planning/STATE.md`.
    - Brief learnings that change remaining work.
    - Mark slice **done**; prune obsolete detail from that slice.
    - Adjust future slices when warranted.
-6. **Post-slice Jidoka** — if learnings need developer judgment: commit and push
+5. **Post-slice Jidoka** — if learnings need developer judgment: commit and push
    work so far, then return a Jidoka stop (do not silently continue).
-7. **Commit** — only when the tree would not intentionally break CI: no
+6. **Commit** — only when the tree would not intentionally break CI: no
    non-`@wip` failing tests from this change; unfinished E2E must stay `@wip`.
    Do **not** run the full CI suite as a pre-commit gate — rely on relevant
-   local tests already run. Stage all changes; message may use GSD-style
-   `{type}({phase}-{plan}): …` or the repo's recent convention.
-8. **Push** — `git push`.
+   local tests already run. Do **not** run `lint:all` or `format:all` before
+   the first commit attempt; `scripts/git-hooks/pre-commit` runs
+   `pnpm format:changed` (which already lints). Stage all changes; message may
+   use GSD-style `{type}({phase}-{plan}): …` or the repo's recent convention.
+   If the commit fails on format/lint: fix from the hook output (run
+   `format:changed` or `format:all` only to reproduce/fix — never also
+   `lint:all`), then retry.
+   Do **not** restore extra dirty files as format-only unless each path
+   passes `git diff -w --exit-code -- <path>`. `--stat` is not a proof; keep
+   the file if that command fails.
+7. **Push** — `git push`.
 </step>
 
 <step name="revert_and_split">
@@ -249,7 +231,7 @@ When this happens:
 
 <success_criteria>
 - Each slice implemented by a fresh sub-agent (coordinator does not accumulate implementation context)
-- Coordinator owns wrap-up: fresh post-change-refactor Task → `## REFACTOR COMPLETE` → format (`pnpm format:all` only) → plan update → commit → push
+- Coordinator owns wrap-up: fresh post-change-refactor Task → `## REFACTOR COMPLETE` → plan update → commit → push (format/lint only if that commit fails)
 - Pre- and post-slice Jidoka checks applied
 - Parallel waves only when touch sets and PLAN writes do not conflict
 - Spent planning history cleaned when entire plan is done
@@ -260,7 +242,8 @@ When this happens:
 When the loop ends (all slices done or a stop condition):
 
 1. **Summary** — which slices were completed this run.
-2. **Current state** — PLAN.md path and next undone slice for resume (if stopped).
+2. **Current state** — the PLAN being executed and next undone slice for resume
+   (if stopped). Do not report GSD `STATE.md` as execution state.
 3. **Next action** — developer decision needed, or confirm cleanup done.
 
 ```
@@ -279,4 +262,8 @@ When the loop ends (all slices done or a stop condition):
 - Do not continue past a Jidoka stop without developer input.
 - Do not commit on TDD red alone, or close a slice with deliberate CI-breaking
   failures (use `@wip` for unfinished E2E). Do not run full CI before commit.
+- Do not run `lint:all` or `format:all` before the first commit attempt.
+- Do not write `.planning/STATE.md`; execution state lives in the PLAN file.
+- Do not `git checkout` files as format-only / unrelated after a failed-commit
+  `format:all` unless `git diff -w --exit-code -- <path>` succeeds for that path.
 </out_of_scope>
