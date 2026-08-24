@@ -18,10 +18,38 @@ write_fake_curl() {
 	{
 		printf '#!%s\n' "$(command -v bash)"
 		cat <<EOS
-set -e
-url="\${@: -1}"
+set -euo pipefail
+output_file=""
+write_code=0
+url=""
+while [[ \$# -gt 0 ]]; do
+	case "\$1" in
+	-o)
+		output_file="\$2"
+		shift 2
+		;;
+	-w)
+		write_code=1
+		shift 2
+		;;
+	-sk)
+		shift
+		;;
+	*)
+		url="\$1"
+		shift
+		;;
+	esac
+done
 echo "curl \$url" >>"\${CURL_LOG:?}"
-printf '%s' "$response"
+if [[ -n "\$output_file" ]]; then
+	printf '%s' "$response" >"\$output_file"
+else
+	printf '%s' "$response"
+fi
+if [[ "\$write_code" == "1" ]]; then
+	printf '%s' "\${CURL_HTTP_CODE:-200}"
+fi
 EOS
 	} >"$fake_bin/curl"
 	chmod +x "$fake_bin/curl"
@@ -35,6 +63,7 @@ test_succeeds_when_response_contains_ok() {
 	write_fake_curl "$fake_bin" "OK"
 	export CURL_LOG="$work/curl.log"
 	: >"$CURL_LOG"
+	export CURL_HTTP_CODE=200
 	export HEALTHCHECK_URL="https://example.test/api/healthcheck"
 	export HEALTHCHECK_RETRY_COUNT=1
 	export HEALTHCHECK_RETRY_SLEEP_SECONDS=0
@@ -45,19 +74,20 @@ test_succeeds_when_response_contains_ok() {
 }
 
 test_fails_when_response_never_ok() {
-	local work fake_bin
+	local work fake_bin output
 	work=$(mktemp -d)
 	trap 'rm -rf "$work"' EXIT
 	fake_bin="$work/fakebin"
 	write_fake_curl "$fake_bin" "503 no healthy upstream"
 	export CURL_LOG="$work/curl.log"
 	: >"$CURL_LOG"
+	export CURL_HTTP_CODE=503
 	export HEALTHCHECK_URL="https://bogus.example.test/api/healthcheck"
 	export HEALTHCHECK_RETRY_COUNT=1
 	export HEALTHCHECK_RETRY_SLEEP_SECONDS=0
-	if PATH="$fake_bin:$PATH" bash "$HEALTHCHECK_SCRIPT" 2>/dev/null; then
-		fail "expected non-zero exit when healthcheck never returns OK"
-	fi
+	output=$(PATH="$fake_bin:$PATH" bash "$HEALTHCHECK_SCRIPT" 2>&1) && fail "expected non-zero exit when healthcheck never returns OK"
+	printf '%s\n' "$output" | grep -q 'last status=503' || fail "failure message missing last status; got: $output"
+	printf '%s\n' "$output" | grep -q 'body=503 no healthy upstream' || fail "failure message missing last body; got: $output"
 	trap - EXIT
 	rm -rf "$work"
 }

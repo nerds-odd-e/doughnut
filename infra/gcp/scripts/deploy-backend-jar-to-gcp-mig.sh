@@ -63,6 +63,8 @@ gsutil cp "$JAR_PATH" "$JAR_DEST"
 
 bash "$SCRIPT_DIR/update-mig-startup-script.sh"
 
+bash "$SCRIPT_DIR/check-mig-rollout.sh"
+
 bash "$SCRIPT_DIR/app-instance-healthcheck.sh"
 
 jq -n \

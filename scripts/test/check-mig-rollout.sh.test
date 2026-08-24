@@ -1,0 +1,77 @@
+#!/usr/bin/env bash
+#
+# Unit tests for infra/gcp/scripts/check-mig-rollout.sh
+
+set -euo pipefail
+
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+ROLLOUT_SCRIPT="$REPO_ROOT/infra/gcp/scripts/check-mig-rollout.sh"
+
+fail() {
+	echo "FAIL: $*" >&2
+	exit 1
+}
+
+write_fake_gcloud() {
+	local fake_bin=$1
+	mkdir -p "$fake_bin"
+	{
+		printf '#!%s\n' "$(command -v bash)"
+		cat <<'EOS'
+set -e
+echo "gcloud $*" >>"${GCLOUD_LOG:?}"
+if [[ "${GCLOUD_SHOULD_FAIL:-}" == "1" ]]; then
+	exit 1
+fi
+exit 0
+EOS
+	} >"$fake_bin/gcloud"
+	chmod +x "$fake_bin/gcloud"
+}
+
+test_waits_for_version_target_reached() {
+	local work fake_bin
+	work=$(mktemp -d)
+	trap 'rm -rf "$work"' EXIT
+	fake_bin="$work/fakebin"
+	write_fake_gcloud "$fake_bin"
+	export GCLOUD_LOG="$work/gcloud.log"
+	: >"$GCLOUD_LOG"
+	unset GCLOUD_SHOULD_FAIL
+	export MIG_ROLLOUT_TIMEOUT_SECONDS=12
+	PATH="$fake_bin:$PATH" bash "$ROLLOUT_SCRIPT"
+	grep -q 'wait-until doughnut-app-group' "$work/gcloud.log" || fail "expected wait-until for doughnut-app-group"
+	grep -q -- '--version-target-reached' "$work/gcloud.log" || fail "expected --version-target-reached"
+	grep -q -- '--zone=us-east1-b' "$work/gcloud.log" || fail "expected --zone=us-east1-b"
+	grep -q -- '--timeout=12' "$work/gcloud.log" || fail "expected --timeout from MIG_ROLLOUT_TIMEOUT_SECONDS"
+	trap - EXIT
+	rm -rf "$work"
+}
+
+test_fails_when_gcloud_fails() {
+	local work fake_bin
+	work=$(mktemp -d)
+	trap 'rm -rf "$work"' EXIT
+	fake_bin="$work/fakebin"
+	write_fake_gcloud "$fake_bin"
+	export GCLOUD_LOG="$work/gcloud.log"
+	: >"$GCLOUD_LOG"
+	export GCLOUD_SHOULD_FAIL=1
+	export MIG_ROLLOUT_TIMEOUT_SECONDS=5
+	if PATH="$fake_bin:$PATH" bash "$ROLLOUT_SCRIPT" 2>/dev/null; then
+		fail "expected non-zero exit when gcloud wait-until fails"
+	fi
+	unset GCLOUD_SHOULD_FAIL
+	grep -q 'wait-until doughnut-app-group' "$work/gcloud.log" || fail "gcloud wait-until not invoked on failure path"
+	trap - EXIT
+	rm -rf "$work"
+}
+
+main() {
+	[[ -x "$ROLLOUT_SCRIPT" ]] || fail "rollout script not found or not executable: $ROLLOUT_SCRIPT"
+	test_waits_for_version_target_reached
+	test_fails_when_gcloud_fails
+	echo "ok check-mig-rollout.sh tests"
+}
+
+main "$@"

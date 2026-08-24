@@ -61,7 +61,7 @@ gcloud compute instance-groups managed rolling-action replace doughnut-app-group
 ### Step 4: Monitor Rollout
 
 ```bash
-# Check if rollout is stable
+# Wait until instances are on the new template version
 ./infra/gcp/scripts/check-mig-rollout.sh
 
 # Or check health status

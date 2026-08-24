@@ -78,7 +78,7 @@ gcloud compute instance-groups managed rolling-action replace $MIG_NAME \
 
 echo ""
 echo "Rolling replacement started!"
-echo "Monitor progress with:"
+echo "Wait until instances reach the new template version with:"
 echo "  ./infra/gcp/scripts/check-mig-rollout.sh"
 echo ""
 echo "Or check health with:"

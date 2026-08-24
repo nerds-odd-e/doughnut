@@ -22,10 +22,13 @@ assert_not_file_exists() {
 
 init_deploy_test_logs() {
 	local work=$1
-	export GSUTIL_LOG="$work/gsutil.log" ROLLING_LOG="$work/rolling.log" GCLOUD_LOG="$work/gcloud.log" HEALTHCHECK_LOG="$work/healthcheck.log"
+	export GSUTIL_LOG="$work/gsutil.log" ROLLING_LOG="$work/rolling.log" GCLOUD_LOG="$work/gcloud.log"
+	export HEALTHCHECK_LOG="$work/healthcheck.log" ROLLOUT_LOG="$work/rollout.log" STEPS_LOG="$work/steps.log"
 	: >"$GSUTIL_LOG"
 	: >"$GCLOUD_LOG"
 	: >"$HEALTHCHECK_LOG"
+	: >"$ROLLOUT_LOG"
+	: >"$STEPS_LOG"
 	rm -f "$ROLLING_LOG"
 }
 
@@ -45,6 +48,16 @@ assert_healthcheck_invoked() {
 assert_healthcheck_not_invoked() {
 	local log=$1 msg=${2:-healthcheck invoked when deploy skipped}
 	! grep -q app-instance-healthcheck.sh "$log" 2>/dev/null || fail "$msg"
+}
+
+assert_rollout_invoked() {
+	local log=$1 msg=${2:-rollout wait not invoked}
+	grep -q check-mig-rollout.sh "$log" || fail "$msg"
+}
+
+assert_rollout_not_invoked() {
+	local log=$1 msg=${2:-rollout wait invoked when deploy skipped}
+	! grep -q check-mig-rollout.sh "$log" 2>/dev/null || fail "$msg"
 }
 
 write_fake_bin() {
@@ -117,10 +130,20 @@ EOS
 case "$*" in
 *update-mig-startup-script.sh*)
 	echo "update-mig-startup-script $*" >>"${ROLLING_LOG:?}"
+	echo "update-mig-startup-script" >>"${STEPS_LOG:?}"
+	exit 0
+	;;
+*check-mig-rollout.sh*)
+	echo "check-mig-rollout $*" >>"${ROLLOUT_LOG:?}"
+	echo "check-mig-rollout" >>"${STEPS_LOG:?}"
+	if [[ "${ROLLOUT_SHOULD_FAIL:-}" == "1" ]]; then
+		exit 1
+	fi
 	exit 0
 	;;
 *app-instance-healthcheck.sh*)
 	echo "app-instance-healthcheck $*" >>"${HEALTHCHECK_LOG:?}"
+	echo "app-instance-healthcheck" >>"${STEPS_LOG:?}"
 	if [[ "${HEALTHCHECK_SHOULD_FAIL:-}" == "1" ]]; then
 		exit 1
 	fi
@@ -138,12 +161,13 @@ run_deploy() {
 		cd "$1"
 		PATH="$2:$PATH"
 		export GCS_BUCKET ARTIFACT VERSION GITHUB_SHA
-		export GSUTIL_LOG ROLLING_LOG GCLOUD_LOG HEALTHCHECK_LOG
+		export GSUTIL_LOG ROLLING_LOG GCLOUD_LOG HEALTHCHECK_LOG ROLLOUT_LOG STEPS_LOG
 		export REPO_ROOT="$REPO_ROOT"
 		export DEPLOY_JAR_PATH="${DEPLOY_JAR_PATH:-}"
 		export RECORD_JSON_FILE="${RECORD_JSON_FILE:-}"
 		export FORCE_FULL_DEPLOY="${FORCE_FULL_DEPLOY:-}"
 		export HEALTHCHECK_SHOULD_FAIL="${HEALTHCHECK_SHOULD_FAIL:-}"
+		export ROLLOUT_SHOULD_FAIL="${ROLLOUT_SHOULD_FAIL:-}"
 		bash "$DEPLOY_SCRIPT"
 	)
 }

@@ -48,6 +48,7 @@ test_skips_upload_and_replace_when_record_matches_jar_hash() {
 	grep -q 'url-maps import' "$work/gcloud.log" || fail "url map import not invoked when jar deploy skipped"
 	assert_not_file_exists "$work/rolling.log"
 	assert_healthcheck_not_invoked "$work/healthcheck.log"
+	assert_rollout_not_invoked "$work/rollout.log"
 	local cp_count cat_count
 	cp_count=$(grep -c '^cp ' "$GSUTIL_LOG" 2>/dev/null || true)
 	[[ -n "$cp_count" ]] || cp_count=0
@@ -97,6 +98,7 @@ test_deploys_when_no_record() {
 	run_deploy "$work" "$fake_bin"
 	assert_file_exists "$work/rolling.log"
 	grep -q update-mig-startup-script.sh "$work/rolling.log" || fail "MIG template update not invoked"
+	assert_rollout_invoked "$work/rollout.log"
 	assert_healthcheck_invoked "$work/healthcheck.log"
 	grep -q 'cp .*backend_app_jar' "$GSUTIL_LOG" || fail "jar upload not logged"
 	grep -q 'cp - gs://' "$GSUTIL_LOG" || fail "record upload (stdin) not logged"
@@ -176,6 +178,56 @@ test_fails_without_writing_record_when_healthcheck_fails() {
 	rm -rf "$work"
 }
 
+test_waits_for_rollout_before_healthcheck() {
+	local work fake_bin jar
+	work=$(mktemp -d)
+	trap 'rm -rf "$work"' EXIT
+	fake_bin="$work/fakebin"
+	write_fake_bin "$fake_bin"
+	init_deploy_test_logs "$work"
+	jar="$work/a-1.jar"
+	printf 'new-jar' >"$jar"
+	unset RECORD_JSON_FILE
+	export GCS_BUCKET=b ARTIFACT=a VERSION=1 GITHUB_SHA="$TEST_GIT_SHA"
+	export DEPLOY_JAR_PATH="$jar"
+	run_deploy "$work" "$fake_bin"
+	assert_rollout_invoked "$work/rollout.log"
+	assert_healthcheck_invoked "$work/healthcheck.log"
+	awk '
+		/check-mig-rollout/ { r=NR }
+		/app-instance-healthcheck/ { h=NR }
+		END { if (!r || !h || r >= h) exit 1 }
+	' "$work/steps.log" || fail "rollout wait must run before healthcheck"
+	trap - EXIT
+	rm -rf "$work"
+}
+
+test_fails_without_writing_record_when_rollout_wait_fails() {
+	local work fake_bin jar cp_count
+	work=$(mktemp -d)
+	trap 'rm -rf "$work"' EXIT
+	fake_bin="$work/fakebin"
+	write_fake_bin "$fake_bin"
+	init_deploy_test_logs "$work"
+	jar="$work/a-1.jar"
+	printf 'new-jar' >"$jar"
+	unset RECORD_JSON_FILE
+	export GCS_BUCKET=b ARTIFACT=a VERSION=1 GITHUB_SHA="$TEST_GIT_SHA"
+	export DEPLOY_JAR_PATH="$jar"
+	export ROLLOUT_SHOULD_FAIL=1
+	if run_deploy "$work" "$fake_bin" 2>/dev/null; then
+		fail "expected non-zero exit when rollout wait fails"
+	fi
+	unset ROLLOUT_SHOULD_FAIL
+	assert_rollout_invoked "$work/rollout.log" "rollout wait not invoked before failure"
+	assert_healthcheck_not_invoked "$work/healthcheck.log" "healthcheck invoked after failed rollout wait"
+	cp_count=$(grep -c 'cp - gs://' "$GSUTIL_LOG" 2>/dev/null || true)
+	[[ -n "$cp_count" ]] || cp_count=0
+	assert_equals "0" "$cp_count" "no success record when rollout wait fails"
+	trap - EXIT
+	rm -rf "$work"
+}
+
 main() {
 	[[ -x "$DEPLOY_SCRIPT" ]] || fail "deploy script not found or not executable: $DEPLOY_SCRIPT"
 	command -v sha256sum >/dev/null || fail "sha256sum required"
@@ -189,6 +241,8 @@ main() {
 	test_deploys_when_no_record
 	test_deploys_when_record_hash_differs
 	test_fails_without_writing_record_when_healthcheck_fails
+	test_waits_for_rollout_before_healthcheck
+	test_fails_without_writing_record_when_rollout_wait_fails
 	echo "ok deploy-backend-jar-to-gcp-mig.sh tests"
 }
 
