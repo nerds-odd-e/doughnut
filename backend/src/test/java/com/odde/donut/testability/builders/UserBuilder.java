@@ -1,0 +1,38 @@
+package com.odde.donut.testability.builders;
+
+import com.odde.donut.entities.User;
+import com.odde.donut.testability.EntityBuilder;
+import com.odde.donut.testability.MakeMe;
+import java.util.UUID;
+
+public class UserBuilder extends EntityBuilder<User> {
+  static final TestObjectCounter nameCounter =
+      new TestObjectCounter(n -> "user-" + UUID.randomUUID() + "-" + n);
+
+  public UserBuilder(MakeMe makeMe) {
+    super(makeMe, new User());
+    setInfo(nameCounter.generate());
+  }
+
+  public UserBuilder(MakeMe makeMe, String userName) {
+    super(makeMe, new User());
+    setInfo(userName);
+  }
+
+  public UserBuilder(MakeMe makeMe, User user) {
+    super(makeMe, user);
+  }
+
+  private void setInfo(String userName) {
+    entity.setExternalIdentifier(userName);
+    entity.setName(userName);
+  }
+
+  public UserBuilder dailyAssimilationCount(int i) {
+    entity.setDailyAssimilationCount(i);
+    return this;
+  }
+
+  @Override
+  public void beforeCreate(boolean needPersist) {}
+}

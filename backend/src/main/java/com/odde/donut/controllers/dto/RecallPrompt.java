@@ -1,0 +1,35 @@
+package com.odde.donut.controllers.dto;
+
+import com.odde.donut.entities.Mcq;
+import com.odde.donut.entities.Notebook;
+import com.odde.donut.entities.QuestionType;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+public class RecallPrompt {
+  @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
+  private int id;
+
+  @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
+  private Notebook notebook;
+
+  private Mcq mcq;
+
+  private SpellingQuestion spellingQuestion;
+
+  public static RecallPrompt from(com.odde.donut.entities.RecallPrompt recallPrompt) {
+    RecallPrompt prompt = new RecallPrompt();
+    prompt.setId(recallPrompt.getId());
+    prompt.setNotebook(recallPrompt.getNotebook());
+    if (recallPrompt.getQuestionType() == QuestionType.MCQ) {
+      Mcq persisted = recallPrompt.getMcq();
+      prompt.setMcq(persisted == null ? null : persisted.withoutSolution());
+    } else {
+      prompt.setSpellingQuestion(recallPrompt.getSpellingQuestion());
+    }
+    return prompt;
+  }
+}

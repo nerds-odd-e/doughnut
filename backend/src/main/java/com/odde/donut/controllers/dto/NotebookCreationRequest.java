@@ -1,0 +1,15 @@
+package com.odde.donut.controllers.dto;
+
+import jakarta.validation.constraints.Size;
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
+public class NotebookCreationRequest extends NoteUpdateTitleDTO {
+
+  @Size(max = 500)
+  private String description;
+
+  private Integer notebookGroupId;
+}

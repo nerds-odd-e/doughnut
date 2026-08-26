@@ -1,0 +1,81 @@
+package com.odde.donut.testability.builders;
+
+import com.odde.donut.entities.Circle;
+import com.odde.donut.entities.DisplayName;
+import com.odde.donut.entities.Notebook;
+import com.odde.donut.entities.User;
+import com.odde.donut.testability.EntityBuilder;
+import com.odde.donut.testability.MakeMe;
+import java.sql.Timestamp;
+
+public class NotebookBuilder extends EntityBuilder<Notebook> {
+  private BookBuilder bookAttachment;
+
+  public NotebookBuilder(Notebook notebook, MakeMe makeMe) {
+    super(makeMe, notebook != null ? notebook : new Notebook());
+  }
+
+  @Override
+  protected void beforeCreate(boolean needPersist) {
+    Timestamp now = new Timestamp(System.currentTimeMillis());
+    if (entity.getCreatedAt() == null) {
+      entity.setCreatedAt(now);
+      entity.setUpdatedAt(now);
+    } else if (entity.getUpdatedAt() == null) {
+      entity.setUpdatedAt(entity.getCreatedAt());
+    }
+    if (entity.getName().isBlank()) {
+      entity.setName(new DisplayName(NoteBuilder.notebookTestNameCounter.generate()));
+    }
+    if (entity.getCreator() == null) {
+      entity.setCreator(makeMe.aUser().please(needPersist));
+    }
+    if (entity.getOwnership() == null) {
+      entity.setOwnership(makeMe.aUser().please(needPersist).getOwnership());
+    }
+  }
+
+  @Override
+  protected void afterCreate(boolean needPersist) {
+    if (bookAttachment != null) {
+      bookAttachment.notebook(entity);
+      bookAttachment.please(needPersist);
+    }
+  }
+
+  public NotebookBuilder withBook(String name) {
+    this.bookAttachment = makeMe.aBook().bookName(name);
+    return this;
+  }
+
+  public NotebookBuilder creatorAndOwner(User user) {
+    entity.setOwnership(user.getOwnership());
+    entity.setCreator(user);
+    return this;
+  }
+
+  public NotebookBuilder name(String name) {
+    entity.setName(new DisplayName(name));
+    return this;
+  }
+
+  public NotebookBuilder owner(User user) {
+    entity.setOwnership(user.getOwnership());
+    return this;
+  }
+
+  public NotebookBuilder owner(Circle circle) {
+    entity.setOwnership(circle.getOwnership());
+    return this;
+  }
+
+  public NotebookBuilder readmeContent(String content) {
+    entity.setReadmeContent(content);
+    return this;
+  }
+
+  public NotebookBuilder skipMemoryTrackingEntirely(boolean skip) {
+    entity.getNotebookSettings().setSkipMemoryTrackingEntirely(skip);
+    return this;
+  }
+}

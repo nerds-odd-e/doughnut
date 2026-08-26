@@ -1,0 +1,58 @@
+package com.odde.donut.controllers.dto;
+
+import com.odde.donut.entities.Answer;
+import com.odde.donut.entities.Mcq;
+import com.odde.donut.entities.Note;
+import com.odde.donut.entities.QuestionType;
+import com.odde.donut.entities.RecallPrompt;
+import io.swagger.v3.oas.annotations.media.Schema;
+import java.util.List;
+import java.util.Objects;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+public class AnsweredQuestion {
+  @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
+  private int id;
+
+  @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
+  private QuestionType questionType;
+
+  @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
+  private int memoryTrackerId;
+
+  @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
+  private RecalledNote recalledNote;
+
+  @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
+  private Answer answer;
+
+  private Mcq mcq;
+
+  private List<NoteTopology> matchedNotes;
+
+  public static AnsweredQuestion from(RecallPrompt recallPrompt) {
+    Objects.requireNonNull(recallPrompt.getAnswer(), "answered question requires an answer");
+    AnsweredQuestion answeredQuestion = new AnsweredQuestion();
+    answeredQuestion.setId(recallPrompt.getId());
+    answeredQuestion.setQuestionType(recallPrompt.getQuestionType());
+    answeredQuestion.setMemoryTrackerId(recallPrompt.requireMemoryTracker().getId());
+    answeredQuestion.setRecalledNote(
+        RecalledNote.from(recallPrompt.getNote(), recallPrompt.getPropertyKey()));
+    answeredQuestion.setAnswer(recallPrompt.getAnswer());
+    if (recallPrompt.getQuestionType() == QuestionType.MCQ) {
+      answeredQuestion.setMcq(recallPrompt.getMcq());
+    }
+    return answeredQuestion;
+  }
+
+  public static AnsweredQuestion from(RecallPrompt recallPrompt, List<Note> matches) {
+    AnsweredQuestion answeredQuestion = from(recallPrompt);
+    if (matches != null && !matches.isEmpty()) {
+      answeredQuestion.setMatchedNotes(matches.stream().map(Note::getNoteTopology).toList());
+    }
+    return answeredQuestion;
+  }
+}

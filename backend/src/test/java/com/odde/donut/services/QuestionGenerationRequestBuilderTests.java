@@ -1,0 +1,109 @@
+package com.odde.donut.services;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.not;
+
+import com.odde.donut.controllers.currentUser.CurrentUser;
+import com.odde.donut.entities.Note;
+import com.odde.donut.entities.User;
+import com.odde.donut.services.ai.GeneratedMcq;
+import com.odde.donut.services.focusContext.FocusContextConstants;
+import com.odde.donut.services.focusContext.FocusContextMarkdownAugmenter;
+import com.odde.donut.testability.MakeMe;
+import com.openai.models.responses.StructuredResponseCreateParams;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.convention.TestBean;
+import org.springframework.transaction.annotation.Transactional;
+
+@SpringBootTest
+@ActiveProfiles("test")
+@Transactional
+class QuestionGenerationRequestBuilderTests {
+
+  @Autowired MakeMe makeMe;
+  @Autowired NoteQuestionGenerationService noteQuestionGenerationService;
+  @Autowired QuestionGenerationRequestBuilder questionGenerationRequestBuilder;
+  @Autowired WikiTitleCacheService wikiTitleCacheService;
+  @TestBean CurrentUser currentUser;
+
+  private User user;
+
+  static CurrentUser currentUser() {
+    return new CurrentUser();
+  }
+
+  @BeforeEach
+  void setup() {
+    user = makeMe.aUser().please();
+    currentUser.setUser(user);
+  }
+
+  private String instructionText(StructuredResponseCreateParams<GeneratedMcq> request) {
+    return request.rawParams().instructions().orElse("");
+  }
+
+  private String inputText(StructuredResponseCreateParams<GeneratedMcq> request) {
+    return request.rawParams().input().flatMap(input -> input.text()).orElse("");
+  }
+
+  private Note propertyFocusNote() {
+    Note target = makeMe.aNote().title("Heart").notebookOwnedBy(user).please();
+    String markdown =
+        "---\n"
+            + "a part of: Circulatory system includes [[Heart]]\n"
+            + "---\n"
+            + "The human body overview.\n";
+    Note focus = makeMe.aNote().notebook(target.getNotebook()).content(markdown).please();
+    wikiTitleCacheService.refreshForNote(focus, user);
+    return focus;
+  }
+
+  @Test
+  void shouldIncludePropertyFocusInFocusContextKeyValueAndLinkTargets() {
+    Note focus = propertyFocusNote();
+
+    StructuredResponseCreateParams<GeneratedMcq> request =
+        noteQuestionGenerationService.buildQuestionGenerationRequest(focus, null, "a part of");
+
+    assertThat(
+        instructionText(request),
+        not(containsString(FocusContextMarkdownAugmenter.PROPERTY_FOCUS_CONTEXT_HEADER)));
+
+    String focusContext = inputText(request);
+    assertThat(
+        focusContext, containsString(FocusContextMarkdownAugmenter.PROPERTY_FOCUS_CONTEXT_HEADER));
+    assertThat(focusContext, containsString("Focus on property \"a part of\""));
+    assertThat(focusContext, containsString("Property key: a part of"));
+    assertThat(
+        focusContext, containsString("Property value: Circulatory system includes [[Heart]]"));
+    assertThat(focusContext, containsString("Heart"));
+  }
+
+  @Test
+  void shouldUseExplicitViewerForWikiTitlesWithoutSessionCurrentUser() {
+    User viewer = makeMe.aUser().please();
+    User stranger = makeMe.aUser().please();
+    currentUser.setUser(stranger);
+    Note target = makeMe.aNote().title("Heart").notebookOwnedBy(viewer).please();
+    String markdown =
+        "---\n"
+            + "a part of: Circulatory system includes [[Heart]]\n"
+            + "---\n"
+            + "The human body overview.\n";
+    Note focus = makeMe.aNote().notebook(target.getNotebook()).content(markdown).please();
+    wikiTitleCacheService.refreshForNote(focus, viewer);
+
+    StructuredResponseCreateParams<GeneratedMcq> request =
+        questionGenerationRequestBuilder.buildQuestionGenerationResponseRequest(
+            focus, null, null, "a part of", viewer);
+
+    String focusContext = inputText(request);
+    assertThat(focusContext, containsString(FocusContextConstants.RETRIEVED_NOTE_OPEN_MARKER));
+    assertThat(focusContext, containsString("Title: Heart"));
+  }
+}

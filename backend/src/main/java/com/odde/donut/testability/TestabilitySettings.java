@@ -1,0 +1,117 @@
+package com.odde.donut.testability;
+
+import com.odde.donut.controllers.dto.Randomization;
+import com.odde.donut.services.GithubService;
+import com.odde.donut.utils.Randomizer;
+import com.odde.donut.utils.randomizers.NonRandomizer;
+import com.odde.donut.utils.randomizers.RealRandomizer;
+import java.sql.Timestamp;
+import java.util.HashMap;
+import java.util.Map;
+import lombok.Getter;
+import lombok.Setter;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.web.context.annotation.ApplicationScope;
+
+@Component
+@ApplicationScope
+public class TestabilitySettings {
+  private Timestamp timestamp = null;
+  private Randomizer randomizer = null;
+  @Getter @Setter Boolean useRealGithub = true;
+  @Autowired GithubService githubService;
+  @Getter private boolean featureToggleEnabled = false;
+
+  private final Map<String, String> replacedServiceUrls = new HashMap<>();
+  private final Map<String, String> defaultServiceUrls =
+      Map.of("wikidata", "https://www.wikidata.org", "openAi", "https://api.openai.com/v1/");
+
+  private String openAiTokenOverride = null;
+
+  public Timestamp timeTravelTo(Timestamp timestamp) {
+    this.timestamp = timestamp;
+    if (randomizer == null) {
+      randomizer = new NonRandomizer();
+    }
+    return timestamp;
+  }
+
+  public Timestamp getCurrentUTCTimestamp() {
+    if (timestamp == null) {
+      return new Timestamp(System.currentTimeMillis());
+    }
+    return timestamp;
+  }
+
+  public Randomizer getRandomizer() {
+    if (randomizer == null) {
+      return new RealRandomizer();
+    }
+    return randomizer;
+  }
+
+  public void setRandomization(Randomization option) {
+    if (option.choose == Randomization.RandomStrategy.seed) {
+      randomizer = new RealRandomizer(option.seed);
+      return;
+    }
+    NonRandomizer nonRandomizer = new NonRandomizer();
+    nonRandomizer.setAlwaysChoose(option.choose);
+    randomizer = nonRandomizer;
+  }
+
+  public GithubService getGithubService() {
+    if (useRealGithub) {
+      return githubService;
+    }
+    return new NullGithubService();
+  }
+
+  public void enableFeatureToggle(boolean enabled) {
+    this.featureToggleEnabled = enabled;
+  }
+
+  public String getWikidataServiceUrl() {
+    return getServiceUrl("wikidata");
+  }
+
+  private String getServiceUrl(String serviceName) {
+    if (this.replacedServiceUrls.containsKey(serviceName)) {
+      return this.replacedServiceUrls.get(serviceName);
+    }
+    return this.defaultServiceUrls.get(serviceName);
+  }
+
+  public void replaceServiceUrls(Map<String, String> setWikidataService) {
+    setWikidataService.forEach(
+        (key, value) -> {
+          if (value == null || value.isEmpty()) {
+            this.replacedServiceUrls.remove(key);
+            return;
+          }
+          this.replacedServiceUrls.put(key, value);
+        });
+  }
+
+  public String getOpenAiApiUrl() {
+    return getServiceUrl("openAi");
+  }
+
+  public String getOpenAiTokenOverride() {
+    return openAiTokenOverride;
+  }
+
+  public void setOpenAiTokenOverride(String token) {
+    this.openAiTokenOverride = token;
+  }
+
+  void init() {
+    timeTravelTo(null);
+    setUseRealGithub(false);
+    enableFeatureToggle(false);
+    setRandomization(new Randomization(Randomization.RandomStrategy.first, 0));
+    replacedServiceUrls.clear();
+    openAiTokenOverride = null;
+  }
+}

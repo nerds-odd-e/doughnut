@@ -1,0 +1,52 @@
+package com.odde.donut.testability.builders;
+
+import com.odde.donut.entities.MemoryTracker;
+import com.odde.donut.entities.QuestionGenerationBatch;
+import com.odde.donut.entities.QuestionGenerationBatchRequest;
+import com.odde.donut.entities.QuestionGenerationBatchRequestStatus;
+import com.odde.donut.testability.EntityBuilder;
+import com.odde.donut.testability.MakeMe;
+
+public class QuestionGenerationBatchRequestBuilder
+    extends EntityBuilder<QuestionGenerationBatchRequest> {
+
+  public QuestionGenerationBatchRequestBuilder(MakeMe makeMe) {
+    super(makeMe, new QuestionGenerationBatchRequest());
+    entity.setContextSeed(42L);
+  }
+
+  public QuestionGenerationBatchRequestBuilder batch(QuestionGenerationBatch batch) {
+    entity.setBatch(batch);
+    return this;
+  }
+
+  public QuestionGenerationBatchRequestBuilder memoryTracker(MemoryTracker memoryTracker) {
+    entity.setMemoryTracker(memoryTracker);
+    return this;
+  }
+
+  public QuestionGenerationBatchRequestBuilder contextSeed(long contextSeed) {
+    entity.setContextSeed(contextSeed);
+    return this;
+  }
+
+  public QuestionGenerationBatchRequestBuilder status(QuestionGenerationBatchRequestStatus status) {
+    entity.setStatus(status);
+    return this;
+  }
+
+  @Override
+  protected void beforeCreate(boolean needPersist) {
+    if (entity.getBatch() == null) {
+      throw new IllegalStateException("call batch() before please()");
+    }
+    if (entity.getMemoryTracker() == null) {
+      throw new IllegalStateException("call memoryTracker() before please()");
+    }
+    if (entity.getCustomId() == null) {
+      entity.setCustomId(
+          QuestionGenerationBatchRequest.customIdFor(
+              entity.getBatch().getId(), entity.getMemoryTracker().getId()));
+    }
+  }
+}

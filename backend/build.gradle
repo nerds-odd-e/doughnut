@@ -23,7 +23,7 @@ plugins {
 apply plugin: 'io.spring.dependency-management'
 
 springBoot {
-  mainClass = 'com.odde.doughnut.DoughnutApplication'
+  mainClass = 'com.odde.donut.DonutApplication'
 }
 
 group = 'com.odde'
@@ -128,10 +128,10 @@ def configureSpringBootTask = { task, description, taskName ->
   task.group = 'application'
   task.description = description
   task.classpath = sourceSets.main.runtimeClasspath
-  task.mainClass = 'com.odde.doughnut.DoughnutApplication'
+  task.mainClass = 'com.odde.donut.DonutApplication'
   task.systemProperty("spring.profiles.active", "test")
   task.args = ['--server.port=0'] // Using 0 will let Spring Boot pick a random available port
-  task.systemProperty("odd-e.doughnut.task", taskName)
+  task.systemProperty("odd-e.donut.task", taskName)
   task.jvmArgs(jdkUnsafeMemoryAccessJvmArgs)
 }
 

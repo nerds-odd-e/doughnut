@@ -1,0 +1,45 @@
+package com.odde.donut.services;
+
+import com.odde.donut.entities.Notebook;
+import com.odde.donut.entities.repositories.FolderRepository;
+import com.odde.donut.entities.repositories.NoteRepository;
+import com.odde.donut.services.notebookExport.ExportFolderRow;
+import com.odde.donut.services.notebookExport.ExportNoteRow;
+import com.odde.donut.services.notebookExport.NotebookZipBuilder;
+import java.util.List;
+import org.springframework.stereotype.Service;
+
+@Service
+public class NotebookExportService {
+  private final FolderRepository folderRepository;
+  private final NoteRepository noteRepository;
+
+  public NotebookExportService(FolderRepository folderRepository, NoteRepository noteRepository) {
+    this.folderRepository = folderRepository;
+    this.noteRepository = noteRepository;
+  }
+
+  public byte[] exportNotebookAsZip(Notebook notebook) {
+    List<ExportFolderRow> folders =
+        folderRepository.findByNotebookIdOrderByIdAsc(notebook.getId()).stream()
+            .map(
+                f ->
+                    new ExportFolderRow(
+                        f.getId(), f.getParentFolderId(), f.getName(), f.getReadmeContent()))
+            .toList();
+    List<ExportNoteRow> notes =
+        noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId()).stream()
+            .map(
+                n ->
+                    new ExportNoteRow(
+                        n.getFolder() == null ? null : n.getFolder().getId(),
+                        n.getTitle(),
+                        n.getContent()))
+            .toList();
+    return NotebookZipBuilder.build(notebook.getReadmeContent(), folders, notes);
+  }
+
+  public String exportFileName(Notebook notebook) {
+    return notebook.getName() + ".zip";
+  }
+}

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-  <conversionRule conversionWord="truncatedEx" class="com.odde.doughnut.configs.TruncatedStackTraceConverter" />
+  <conversionRule conversionWord="truncatedEx" class="com.odde.donut.configs.TruncatedStackTraceConverter" />
   <property name="LOGS_ABSOLUTE_PATH" value="${user.dir}/logs" />
   <property name="PATTERN" value="%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n%truncatedEx" />
 

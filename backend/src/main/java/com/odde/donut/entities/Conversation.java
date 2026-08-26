@@ -1,0 +1,85 @@
+package com.odde.donut.entities;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Entity
+@Table(name = "conversation")
+public class Conversation extends EntityIdentifiedByIdOnly {
+  @OneToMany(mappedBy = "conversation", fetch = FetchType.LAZY)
+  @JsonIgnore
+  List<ConversationMessage> conversationMessages = new ArrayList<>();
+
+  @Embedded private ConversationSubject subject = new ConversationSubject();
+
+  @ManyToOne
+  @JoinColumn(name = "subject_ownership_id", referencedColumnName = "id")
+  Ownership subjectOwnership;
+
+  @ManyToOne
+  @Setter
+  @JoinColumn(name = "conversation_initiator_id", referencedColumnName = "id")
+  User conversationInitiator;
+
+  @Column(name = "created_at")
+  @NotNull
+  @Setter
+  private Timestamp createdAt = new Timestamp(new Date().getTime());
+
+  @Column(name = "updated_at")
+  @NotNull
+  private Timestamp updatedAt = new Timestamp(new Date().getTime());
+
+  @JsonIgnore
+  public void setNote(Note note) {
+    this.subject.setNote(note);
+    this.subjectOwnership = note.getNotebook().getOwnership();
+  }
+
+  @JsonIgnore
+  public void setRecallPrompt(RecallPrompt recallPrompt) {
+    this.subject.setRecallPrompt(recallPrompt);
+    this.subjectOwnership = recallPrompt.getNotebook().getOwnership();
+  }
+
+  @JsonIgnore
+  public Note getSubjectNote() {
+    Note note = subject.getNote();
+    if (note != null) {
+      return note;
+    }
+
+    RecallPrompt recallPrompt = subject.getRecallPrompt();
+    if (recallPrompt != null && recallPrompt.getMcq() != null) {
+      return recallPrompt.getMcq().getNote();
+    }
+
+    return null;
+  }
+
+  @JsonIgnore
+  public String getAdditionalContextForSubject() {
+    RecallPrompt recallPrompt = subject.getRecallPrompt();
+    if (recallPrompt != null) {
+      return """
+          User attempted to answer the following question about the note of focus.
+          Please note that user is not prompted with the specific note of focus,
+          but only with the broader notebook name. A question that is not possible to answer
+          is regarded as a wrong question.
+          Here's the question definition and user's answer:
+
+          """
+          + recallPrompt.getQuestionDetails();
+    }
+
+    return null;
+  }
+}

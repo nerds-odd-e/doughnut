@@ -96,6 +96,8 @@ Verify: frontend, cli, mcp-server typecheck and their test suites.
 
 ### 4. Java backend package rename (Structure)
 
+Status: done
+
 Move `backend/src/main/java/com/odde/doughnut` and
 `backend/src/test/java/com/odde/doughnut` to `com/odde/donut` (~903 files);
 update every package/import statement; update `build.gradle` `mainClass`

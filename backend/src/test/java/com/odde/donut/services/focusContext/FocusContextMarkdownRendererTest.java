@@ -1,0 +1,196 @@
+package com.odde.donut.services.focusContext;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
+
+import java.util.List;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+
+class FocusContextMarkdownRendererTest {
+
+  private FocusContextMarkdownRenderer renderer;
+  private RetrievalConfig depth1Config;
+
+  @BeforeEach
+  void setup() {
+    renderer = new FocusContextMarkdownRenderer();
+    depth1Config = RetrievalConfig.depth1();
+  }
+
+  private static FocusContextFocusNote focusNote(
+      String notebook, String title, String content, boolean contentTruncated) {
+    return new FocusContextFocusNote(
+        notebook, title, "", 0, List.of(), List.of(), List.of(), null, content, contentTruncated);
+  }
+
+  @Nested
+  class SafeFenceSelection {
+    @Test
+    void safeFenceEscalatesWithLongestRunOfBackticksInContent() {
+      assertThat(FocusContextMarkdownRenderer.safeFence("no backticks here"), equalTo("```"));
+      assertThat(
+          FocusContextMarkdownRenderer.safeFence("some ```java\ncode\n```"), equalTo("````"));
+      assertThat(FocusContextMarkdownRenderer.safeFence("has ```` fences"), equalTo("`````"));
+      assertThat(FocusContextMarkdownRenderer.safeFence(null), equalTo("```"));
+      assertThat(FocusContextMarkdownRenderer.safeFence(""), equalTo("```"));
+    }
+  }
+
+  @Nested
+  class FocusContextEnvelope {
+    @Test
+    void outputWrapsContentInFocusContextTags() {
+      FocusContextResult result = new FocusContextResult(focusNote("NB", "Title", "body", false));
+
+      String output = renderer.render(result, depth1Config);
+
+      assertThat(output, startsWith(FocusContextConstants.FOCUS_CONTEXT_OPEN_TAG));
+      assertThat(output, endsWith(FocusContextConstants.FOCUS_CONTEXT_CLOSE_TAG));
+      assertThat(output, not(containsString("# Focus Context")));
+    }
+  }
+
+  @Nested
+  class FocusNoteBlock {
+    @Test
+    void focusNoteSectionIncludesMetadataFenceAndOmitsRetrievedBlockWhenNoRelated() {
+      FocusContextFocusNote focus = focusNote("My Notebook", "My Title", "Some content", false);
+      FocusContextResult result = new FocusContextResult(focus);
+
+      String output = renderer.render(result, depth1Config);
+
+      assertThat(output, containsString(FocusContextConstants.FOCUS_NOTE_OPEN_MARKER));
+      assertThat(output, containsString(FocusContextConstants.FOCUS_NOTE_CLOSE_TAG));
+      assertThat(output, not(containsString("## Focus Note")));
+      assertThat(output, containsString("Title: My Title"));
+      assertThat(output, containsString("Notebook: My Notebook"));
+      assertThat(output, containsString("Depth: 0"));
+      assertThat(output, containsString("Max depth: 1"));
+      assertThat(output, containsString("```doughnut-note-md"));
+      assertThat(output, containsString("Some content"));
+      assertThat(output, not(containsString("## Retrieved Note")));
+    }
+
+    @Test
+    void truncatedFocusNoteIncludesTruncatedLine() {
+      String truncatedOut =
+          renderer.render(
+              new FocusContextResult(focusNote("NB", "T", "short…", true)), depth1Config);
+      assertThat(truncatedOut, containsString("Truncated: true"));
+    }
+
+    @Test
+    void nonTruncatedFocusNoteOmitsTruncatedLine() {
+      String fullOut =
+          renderer.render(
+              new FocusContextResult(focusNote("NB", "T", "full content", false)), depth1Config);
+      assertThat(fullOut, not(containsString("Truncated:")));
+    }
+
+    @Test
+    void focusNoteWithBlankBodyOmitsContentSection() {
+      String out =
+          renderer.render(new FocusContextResult(focusNote("NB", "T", "", false)), depth1Config);
+      assertThat(out, not(containsString("\nContent:\n")));
+      assertThat(out, not(containsString("doughnut-note-md")));
+    }
+  }
+
+  @Nested
+  class RetrievedNoteBlock {
+    @Test
+    void depth1OutgoingLinkFormatsPathAndBody() {
+      FocusContextResult result = new FocusContextResult(focusNote("NB", "A", "focus", false));
+      result.addRelatedNote(
+          new FocusContextNote(
+              "NB", "B", "", 1, List.of("[[A]]", "[[NB: B]]"), null, "content of B", false));
+
+      String output = renderer.render(result, depth1Config);
+
+      assertThat(output, containsString(FocusContextConstants.RETRIEVED_NOTE_OPEN_MARKER));
+      assertThat(output, containsString(FocusContextConstants.RETRIEVED_NOTE_CLOSE_TAG));
+      assertThat(output, not(containsString("## Retrieved Note")));
+      assertThat(output, containsString("Path: [[A]] -> [[NB: B]]"));
+      assertThat(output, containsString("content of B"));
+    }
+
+    @Test
+    void depthTwoOutgoingFormatsPathTruncationAndDefaultMaxDepthHeader() {
+      FocusContextResult result =
+          new FocusContextResult(focusNote("NB", "Focus", "focus body", false));
+      result.addRelatedNote(
+          new FocusContextNote(
+              "NB",
+              "Far",
+              "",
+              2,
+              List.of("[[Focus]]", "[[NB: Mid]]", "[[NB: Far]]"),
+              null,
+              "far content",
+              true));
+
+      String output = renderer.render(result, RetrievalConfig.defaultMaxDepth());
+
+      assertThat(output, containsString("Max depth: 2"));
+      assertThat(output, containsString("Depth: 2"));
+      assertThat(output, containsString("Path: [[Focus]] -> [[NB: Mid]] -> [[NB: Far]]"));
+      assertThat(output, containsString("Truncated: true"));
+    }
+
+    @Test
+    void folderPeerShowsPathToAnchor() {
+      FocusContextResult result =
+          new FocusContextResult(focusNote("NB", "AnchorTitle", "focus", false));
+      result.addRelatedNote(
+          new FocusContextNote(
+              "NB", "Peer", "", 1, List.of("[[AnchorTitle]]"), null, "peer body", false));
+
+      String output = renderer.render(result, depth1Config);
+
+      assertThat(output, containsString("Path: [[AnchorTitle]]"));
+      assertThat(output, containsString("Depth: 1"));
+    }
+  }
+
+  @Nested
+  class RelatedNotesBlock {
+    private static FocusContextNote relatedNote(String title) {
+      return new FocusContextNote("NB", title, "", 1, List.of(), null, "body of " + title, false);
+    }
+
+    @Test
+    void emptyListReturnsEmptyString() {
+      assertThat(renderer.renderRelatedNotes(List.of(), 1), equalTo(""));
+    }
+
+    @Test
+    void nonEmptyOutputIncludesEnvelopePurposeAndMaxDepth() {
+      String output = renderer.renderRelatedNotes(List.of(relatedNote("Only")), 3);
+
+      assertThat(output, containsString(FocusContextConstants.RELATED_NOTES_OPEN_MARKER));
+      assertThat(output, containsString(FocusContextConstants.RELATED_NOTES_CLOSE_TAG));
+      assertThat(
+          output,
+          containsString("Purpose: Notes related to the session items, for tutor context."));
+      assertThat(output, containsString("Max depth: 3"));
+    }
+
+    @Test
+    void multipleNotesEachRenderRetrievedNoteBlock() {
+      String output =
+          renderer.renderRelatedNotes(List.of(relatedNote("First"), relatedNote("Second")), 1);
+
+      assertThat(
+          output,
+          stringContainsInOrder(
+              FocusContextConstants.RETRIEVED_NOTE_OPEN_MARKER,
+              "Title: First",
+              FocusContextConstants.RETRIEVED_NOTE_CLOSE_TAG,
+              FocusContextConstants.RETRIEVED_NOTE_OPEN_MARKER,
+              "Title: Second",
+              FocusContextConstants.RETRIEVED_NOTE_CLOSE_TAG));
+    }
+  }
+}

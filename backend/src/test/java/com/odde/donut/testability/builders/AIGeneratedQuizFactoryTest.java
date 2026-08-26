@@ -1,0 +1,77 @@
+package com.odde.donut.testability.builders;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import com.odde.donut.entities.Mcq;
+import com.odde.donut.entities.MemoryTracker;
+import com.odde.donut.entities.Note;
+import com.odde.donut.entities.RecallPrompt;
+import com.odde.donut.testability.MakeMe;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.annotation.Transactional;
+
+@SpringBootTest
+@ActiveProfiles("test")
+@Transactional
+class AIGeneratedQuizFactoryTest {
+
+  @Autowired MakeMe makeMe;
+  Note note;
+  MemoryTracker memoryTracker;
+  Mcq mcq;
+
+  @BeforeEach
+  void setup() {
+    note = makeMe.aNote("saying").content("Rome is not built in a day").please();
+    memoryTracker = makeMe.aMemoryTrackerFor(note).please();
+    mcq =
+        makeMe
+            .anMcq()
+            .forNote(note)
+            .stem("How long did it take to build Rome?")
+            .choices("1/2 day", "1 day", "more than 1 day")
+            .correctAnswerIndex(2)
+            .inMemoryPlease();
+  }
+
+  @Test
+  void shouldIncludeQuestionStem() {
+    RecallPrompt recallPrompt = buildQuestion();
+    assertThat(
+        recallPrompt.getMcq().getQuestionStem(),
+        containsString("How long did it take to build Rome?"));
+  }
+
+  @Nested
+  class Answer {
+
+    @Test
+    void wrong() {
+      RecallPrompt recallPrompt = questionBuilder().answerChoiceIndex(0).please(false);
+      assertFalse(recallPrompt.getAnswer().getCorrect());
+    }
+
+    @Test
+    void correct() {
+      RecallPrompt recallPrompt =
+          questionBuilder().answerChoiceIndex(mcq.getCorrectAnswerIndex()).please(false);
+      assertTrue(recallPrompt.getAnswer().getCorrect());
+    }
+  }
+
+  private RecallPromptBuilder questionBuilder() {
+    return makeMe.aRecallPrompt().forMemoryTracker(memoryTracker).withMcq(mcq);
+  }
+
+  private RecallPrompt buildQuestion() {
+    return questionBuilder().inMemoryPlease();
+  }
+}

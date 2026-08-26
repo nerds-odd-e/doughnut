@@ -1,0 +1,35 @@
+package com.odde.donut.controllers.dto;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.odde.donut.entities.Folder;
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
+import java.util.List;
+import lombok.Getter;
+import lombok.Setter;
+
+@Schema(
+    description =
+        "Notebook chrome, ancestor folder trail, and optional scoped readme markdown for scoped title"
+            + " patterns (shared by note and folder page realms).")
+@Getter
+@Setter
+public class RealmNotebookSidebar {
+
+  @NotNull
+  @Schema(
+      description =
+          "Notebook chrome: entity plus optional catalog hints and optional notebook readme"
+              + " content.")
+  private NotebookRealm notebookRealm;
+
+  @Schema(description = "Folders from notebook root outward; see each realm for trail semantics.")
+  private List<Folder> ancestorFolders = List.of();
+
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  @Schema(
+      description =
+          "Full markdown of the container readme that supplies the nearest non-blank title_pattern"
+              + " (inner scope toward notebook root). Omitted when none applies.")
+  private String scopedReadmeContent;
+}

@@ -1,0 +1,193 @@
+package com.odde.donut.controllers;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.verify;
+
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.LoggerContext;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.read.ListAppender;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.odde.donut.controllers.dto.NoteRefinementLayoutDTO;
+import com.odde.donut.controllers.dto.NoteRefinementQuestionContextDTO;
+import com.odde.donut.entities.Note;
+import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
+import com.odde.donut.services.ai.NoteRefinementLayout;
+import com.odde.donut.services.ai.NoteRefinementLayoutItems;
+import com.odde.donut.services.ai.NoteRefinementLayoutValidator;
+import com.odde.donut.testability.OpenAiStructuredResponseMock;
+import com.openai.client.OpenAIClient;
+import com.openai.models.responses.ResponseTextConfig;
+import com.openai.models.responses.StructuredResponseCreateParams;
+import java.util.List;
+import java.util.Optional;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.ArgumentCaptor;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.web.server.ResponseStatusException;
+
+class AiControllerNoteRefinementTest extends ControllerTestBase {
+  @Autowired AiController controller;
+
+  @MockitoBean(name = "officialOpenAiClient")
+  OpenAIClient officialClient;
+
+  OpenAiStructuredResponseMock openAiStructuredResponseMock;
+  Note testNote;
+
+  @BeforeEach
+  void setup() {
+    currentUser.setUser(makeMe.aUser().please());
+    testNote = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
+    openAiStructuredResponseMock = new OpenAiStructuredResponseMock(officialClient);
+  }
+
+  @Nested
+  class GenerateRefinementSuggestions {
+    @ParameterizedTest
+    @NullAndEmptySource
+    @ValueSource(strings = {"   "})
+    void shouldReturnEmptyListWhenNoteContentIsBlank(String content)
+        throws UnexpectedNoAccessRightException, JsonProcessingException {
+      testNote.setContent(content);
+
+      assertThat(controller.generateRefinementSuggestions(testNote, null).getItems()).isEmpty();
+    }
+
+    @Test
+    void shouldCallResponsesApiWithStructuredInstructions()
+        throws UnexpectedNoAccessRightException, JsonProcessingException {
+      openAiStructuredResponseMock.stubStructuredResponse(
+          new NoteRefinementLayout(
+              List.of(
+                  NoteRefinementLayoutItems.parent(
+                      "p1",
+                      "Point 1",
+                      List.of(
+                          NoteRefinementLayoutItems.leaf(
+                              "p1-1", "[[Already extracted note]]", true, false))),
+                  NoteRefinementLayoutItems.leaf("p2", "Point 2"))));
+      testNote.setContent("Some note content");
+
+      NoteRefinementLayoutDTO result = controller.generateRefinementSuggestions(testNote, null);
+
+      assertThat(result.getItems()).hasSize(2);
+      assertThat(result.getItems().getFirst().getText()).isEqualTo("Point 1");
+      assertThat(result.getItems().getFirst().getChildren().getFirst().isAlreadyExtracted())
+          .isTrue();
+
+      @SuppressWarnings({"unchecked", "rawtypes"})
+      ArgumentCaptor<StructuredResponseCreateParams<NoteRefinementLayout>> paramsCaptor =
+          ArgumentCaptor.forClass((Class) StructuredResponseCreateParams.class);
+      verify(openAiStructuredResponseMock.responseService()).create(paramsCaptor.capture());
+      StructuredResponseCreateParams<NoteRefinementLayout> params = paramsCaptor.getValue();
+      String instructions = params.rawParams().instructions().orElse("");
+      assertThat(instructions)
+          .contains("Return one current-content refinement layout for the note content")
+          .contains("not alternative breakdown suggestions")
+          .contains("Do not create grandchildren")
+          .contains("simple standalone wiki-link-only lines")
+          .contains("Focus Note content only")
+          .contains("only source for refinement layout items")
+          .contains("Retrieved Notes are secondary context only")
+          .contains(
+              "do not add refinement layout items for content that appears only in Retrieved Notes")
+          .contains("Set ledToQuestion to false for every item")
+          .doesNotContain("Set ledToQuestion=true");
+      assertThat(params.rawParams().text().flatMap(ResponseTextConfig::format)).isPresent();
+      assertThat(params.rawParams().input().flatMap(input -> input.text()).orElse("")).isNotBlank();
+      assertThat(params.rawParams().maxOutputTokens()).isEqualTo(Optional.of(1000L));
+    }
+
+    @Test
+    void shouldAppendQuestionLedGuidanceWhenQuestionContextProvided()
+        throws UnexpectedNoAccessRightException, JsonProcessingException {
+      openAiStructuredResponseMock.stubStructuredResponse(
+          new NoteRefinementLayout(
+              List.of(NoteRefinementLayoutItems.leaf("p1", "Capital of France", false, true))));
+      testNote.setContent("Paris is the capital of France.");
+
+      NoteRefinementQuestionContextDTO questionContext = new NoteRefinementQuestionContextDTO();
+      questionContext.setStem("What is the capital of France?");
+      questionContext.setChoices(List.of("Paris", "London", "Berlin"));
+      questionContext.setCorrectAnswerIndex(0);
+      questionContext.setTestedFocus("capital city");
+
+      controller.generateRefinementSuggestions(testNote, questionContext);
+
+      @SuppressWarnings({"unchecked", "rawtypes"})
+      ArgumentCaptor<StructuredResponseCreateParams<NoteRefinementLayout>> paramsCaptor =
+          ArgumentCaptor.forClass((Class) StructuredResponseCreateParams.class);
+      verify(openAiStructuredResponseMock.responseService()).create(paramsCaptor.capture());
+      String instructions = paramsCaptor.getValue().rawParams().instructions().orElse("");
+      assertThat(instructions)
+          .contains("What is the capital of France?")
+          .contains("0. Paris")
+          .contains("1. London")
+          .contains("2. Berlin")
+          .contains("Correct answer index: 0")
+          .contains("Tested focus: capital city")
+          .contains("Set ledToQuestion=true")
+          .contains("Set ledToQuestion=false on all other items")
+          .doesNotContain("Set ledToQuestion to false for every item");
+    }
+
+    @Test
+    void shouldReturnEmptyLayoutWhenAiReturnsNoResponse()
+        throws UnexpectedNoAccessRightException, JsonProcessingException {
+      openAiStructuredResponseMock.stubStructuredResponse(null);
+      testNote.setContent("Some note content");
+
+      assertThat(controller.generateRefinementSuggestions(testNote, null).getItems()).isEmpty();
+    }
+
+    @Test
+    void shouldReturnEmptyLayoutWhenAiReturnsInvalidLayout()
+        throws UnexpectedNoAccessRightException, JsonProcessingException {
+      LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
+      Logger validatorLogger = loggerContext.getLogger(NoteRefinementLayoutValidator.class);
+      Level originalLevel = validatorLogger.getLevel();
+      validatorLogger.setLevel(Level.ALL);
+      ListAppender<ILoggingEvent> logAppender = new ListAppender<>();
+      logAppender.setContext(loggerContext);
+      logAppender.start();
+      validatorLogger.addAppender(logAppender);
+      try {
+        openAiStructuredResponseMock.stubStructuredResponse(
+            new NoteRefinementLayout(
+                List.of(
+                    NoteRefinementLayoutItems.leaf("same", "Point 1"),
+                    NoteRefinementLayoutItems.leaf("same", "Point 2"))));
+        testNote.setContent("Some note content");
+
+        assertThat(controller.generateRefinementSuggestions(testNote, null).getItems()).isEmpty();
+        assertThat(logAppender.list)
+            .anyMatch(
+                event ->
+                    event.getLevel() == Level.WARN
+                        && event.getFormattedMessage().contains("duplicate item id"));
+      } finally {
+        logAppender.stop();
+        validatorLogger.detachAppender(logAppender);
+        validatorLogger.setLevel(originalLevel);
+      }
+    }
+
+    @Test
+    void shouldRequireUserToBeLoggedIn() {
+      currentUser.setUser(null);
+      assertThrows(
+          ResponseStatusException.class,
+          () -> controller.generateRefinementSuggestions(testNote, null));
+    }
+  }
+}

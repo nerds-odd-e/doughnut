@@ -1,0 +1,11 @@
+package com.odde.donut.services.wikidataApis;
+
+public record WikidataId(String wikidataId) {
+  public boolean isHuman() {
+    return "Q5".equals(wikidataId);
+  }
+
+  public WikidataIdWithApi withApi(WikidataApi wikidataApi) {
+    return WikidataIdWithApi.create(wikidataId, wikidataApi);
+  }
+}

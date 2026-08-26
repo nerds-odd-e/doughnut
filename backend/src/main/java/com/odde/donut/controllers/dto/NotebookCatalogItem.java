@@ -1,0 +1,28 @@
+package com.odde.donut.controllers.dto;
+
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import io.swagger.v3.oas.annotations.media.DiscriminatorMapping;
+import io.swagger.v3.oas.annotations.media.Schema;
+
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type", include = JsonTypeInfo.As.PROPERTY)
+@JsonSubTypes({
+  @JsonSubTypes.Type(value = NotebookCatalogNotebookItem.class, name = "notebook"),
+  @JsonSubTypes.Type(value = NotebookCatalogGroupItem.class, name = "notebookGroup"),
+  @JsonSubTypes.Type(
+      value = NotebookCatalogSubscribedNotebookItem.class,
+      name = "subscribedNotebook"),
+})
+@Schema(
+    discriminatorProperty = "type",
+    discriminatorMapping = {
+      @DiscriminatorMapping(value = "notebook", schema = NotebookCatalogNotebookItem.class),
+      @DiscriminatorMapping(value = "notebookGroup", schema = NotebookCatalogGroupItem.class),
+      @DiscriminatorMapping(
+          value = "subscribedNotebook",
+          schema = NotebookCatalogSubscribedNotebookItem.class)
+    })
+public sealed interface NotebookCatalogItem
+    permits NotebookCatalogNotebookItem,
+        NotebookCatalogGroupItem,
+        NotebookCatalogSubscribedNotebookItem {}

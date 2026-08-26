@@ -1,0 +1,68 @@
+package com.odde.donut.controllers.dto;
+
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
+import com.odde.donut.entities.Folder;
+import com.odde.donut.entities.Note;
+import jakarta.validation.constraints.NotNull;
+import java.util.List;
+import lombok.Getter;
+import lombok.Setter;
+
+@JsonPropertyOrder({
+  "id",
+  "note",
+  "notebookRealm",
+  "ancestorFolders",
+  "references",
+  "wikiTitles",
+  "scopedReadmeContent"
+})
+public class NoteRealm {
+  /**
+   * Referring notes (wiki-title cache inbound links), as {@link NoteTopology}, deduplicated by
+   * referring note id and ordered by id, with the same visibility rules as {@link
+   * com.odde.donut.services.WikiTitleCacheService#referencesNotesForViewer}.
+   */
+  @Getter @Setter private List<NoteTopology> references;
+
+  @NotNull @Getter private Note note;
+
+  @JsonUnwrapped private final RealmNotebookSidebar sidebar = new RealmNotebookSidebar();
+
+  @Getter private final List<WikiTitle> wikiTitles;
+
+  public NoteRealm(Note note, List<WikiTitle> wikiTitles) {
+    this.note = note;
+    this.wikiTitles = List.copyOf(wikiTitles);
+  }
+
+  @NotNull
+  public Integer getId() {
+    return note.getId();
+  }
+
+  public NotebookRealm getNotebookRealm() {
+    return sidebar.getNotebookRealm();
+  }
+
+  public void setNotebookRealm(NotebookRealm notebookRealm) {
+    sidebar.setNotebookRealm(notebookRealm);
+  }
+
+  public List<Folder> getAncestorFolders() {
+    return sidebar.getAncestorFolders();
+  }
+
+  public void setAncestorFolders(List<Folder> ancestorFolders) {
+    sidebar.setAncestorFolders(ancestorFolders);
+  }
+
+  public String getScopedReadmeContent() {
+    return sidebar.getScopedReadmeContent();
+  }
+
+  public void setScopedReadmeContent(String scopedReadmeContent) {
+    sidebar.setScopedReadmeContent(scopedReadmeContent);
+  }
+}

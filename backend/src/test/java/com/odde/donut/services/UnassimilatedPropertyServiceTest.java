@@ -1,0 +1,212 @@
+package com.odde.donut.services;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
+
+import com.odde.donut.entities.Note;
+import com.odde.donut.entities.NotePropertyIndex;
+import com.odde.donut.entities.Notebook;
+import com.odde.donut.entities.Subscription;
+import com.odde.donut.entities.User;
+import com.odde.donut.entities.repositories.NotePropertyIndexRepository;
+import com.odde.donut.testability.MakeMe;
+import java.util.List;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.annotation.Transactional;
+
+@SpringBootTest
+@ActiveProfiles("test")
+@Transactional
+class UnassimilatedPropertyServiceTest {
+
+  @Autowired MakeMe makeMe;
+  @Autowired NotePropertyIndexService notePropertyIndexService;
+  @Autowired NotePropertyIndexRepository notePropertyIndexRepository;
+  @Autowired UnassimilatedPropertyService unassimilatedPropertyService;
+
+  private Note noteWithContent(User user, String content) {
+    Note note = makeMe.aNote().notebookOwnedBy(user).content(content).please();
+    notePropertyIndexService.refreshForNote(note);
+    return note;
+  }
+
+  @Test
+  void mixed_exact_keys_remain_separate_property_units() {
+    User user = makeMe.aUser().please();
+    noteWithContent(
+        user,
+        "---\n"
+            + "example of:\n"
+            + "  - alpha\n"
+            + "  - beta\n"
+            + "example of 2: gamma\n"
+            + "---\n\nbody");
+
+    List<String> propertyKeys =
+        unassimilatedPropertyService.streamUnassimilatedPropertiesForUser(user).toList().stream()
+            .map(AssimilationUnit::propertyKey)
+            .toList();
+    assertThat(propertyKeys, containsInAnyOrder("example of", "example of 2"));
+  }
+
+  @Test
+  void list_property_emits_one_unit_after_refresh() {
+    User user = makeMe.aUser().please();
+    noteWithContent(user, "---\n" + "example of:\n" + "  - alpha\n" + "  - beta\n" + "---\n\nbody");
+
+    assertThat(unassimilatedPropertyService.countUnassimilatedPropertiesForUser(user), equalTo(1));
+    AssimilationUnit pending =
+        unassimilatedPropertyService.streamUnassimilatedPropertiesForUser(user).findFirst().get();
+    assertThat(pending.propertyKey(), equalTo("example of"));
+  }
+
+  @Test
+  void counts_indexed_example_of_when_no_property_tracker() {
+    User user = makeMe.aUser().please();
+    Note note = noteWithContent(user, "---\nexample of: \"[[Word]]\"\n---\n\nbody");
+
+    AssimilationUnit pending =
+        unassimilatedPropertyService.streamUnassimilatedPropertiesForUser(user).findFirst().get();
+    assertThat(pending.propertyKey(), equalTo("example of"));
+    assertThat(pending.note(), equalTo(note));
+  }
+
+  @Test
+  void does_not_count_when_property_tracker_exists() {
+    User user = makeMe.aUser().please();
+    Note note = noteWithContent(user, "---\ntopic: physics\n---\n\nbody");
+    makeMe.aMemoryTrackerFor(note).propertyKey("topic").please();
+
+    assertThat(unassimilatedPropertyService.countUnassimilatedPropertiesForUser(user), equalTo(0));
+  }
+
+  @Test
+  void does_not_count_when_property_tracker_is_skipped() {
+    User user = makeMe.aUser().please();
+    Note note = noteWithContent(user, "---\ntopic: physics\n---\n\nbody");
+    makeMe.aMemoryTrackerFor(note).propertyKey("topic").removedFromTracking().please();
+
+    assertThat(unassimilatedPropertyService.countUnassimilatedPropertiesForUser(user), equalTo(0));
+  }
+
+  @Test
+  void does_not_count_when_property_has_sequence_skip() {
+    User user = makeMe.aUser().please();
+    Note note = noteWithContent(user, "---\ntopic: physics\n---\n\nbody");
+    makeMe.anAssimilationSequenceSkipFor(note).propertyKey("topic").please();
+
+    assertThat(unassimilatedPropertyService.countUnassimilatedPropertiesForUser(user), equalTo(0));
+  }
+
+  @Test
+  void does_not_count_reserved_keys_not_in_index() {
+    User user = makeMe.aUser().please();
+    noteWithContent(user, "---\nimage: /x\nurl: https://example.com\n---\n\nbody");
+
+    assertThat(unassimilatedPropertyService.countUnassimilatedPropertiesForUser(user), equalTo(0));
+  }
+
+  @Test
+  void does_not_count_stale_reserved_structural_keys_for_subscription() {
+    User owner = makeMe.aUser().please();
+    User subscriber = makeMe.aUser().please();
+    Notebook notebook = makeMe.aNotebook().creatorAndOwner(owner).please();
+    makeMe.aSubscription().forNotebook(notebook).forUser(subscriber).please();
+    Note note = noteWithExampleOfAndUrl(notebook);
+    insertAdditionalIndexRow(note, "url", 0);
+    makeMe.refresh(subscriber);
+
+    Subscription subscription = subscriber.getSubscriptions().stream().findFirst().orElseThrow();
+    List<AssimilationUnit> pending =
+        unassimilatedPropertyService
+            .streamUnassimilatedPropertiesForSubscription(subscription)
+            .toList();
+    assertThat(pending, hasSize(1));
+    assertThat(pending.get(0).propertyKey(), equalTo("example of"));
+  }
+
+  @Test
+  void does_not_count_stale_reserved_structural_keys_for_owner() {
+    User user = makeMe.aUser().please();
+    Note note =
+        noteWithContent(
+            user, "---\nexample of: \"[[Word]]\"\nurl: https://example.com\n---\n\nbody");
+    insertAdditionalIndexRow(note, "url", 0);
+
+    List<AssimilationUnit> pending =
+        unassimilatedPropertyService.streamUnassimilatedPropertiesForUser(user).toList();
+    assertThat(pending, hasSize(1));
+    assertThat(pending.get(0).propertyKey(), equalTo("example of"));
+  }
+
+  @Test
+  void emits_one_property_unit_when_multiple_index_rows_share_exact_key() {
+    User user = makeMe.aUser().please();
+    Note note = noteWithContent(user, "---\nexample of: \"[[Word]]\"\n---\n\nbody");
+    insertAdditionalIndexRow(note, "example of", 1);
+
+    List<AssimilationUnit> pending =
+        unassimilatedPropertyService.streamUnassimilatedPropertiesForUser(user).toList();
+    assertThat(pending, hasSize(1));
+    assertThat(pending.get(0).note(), equalTo(note));
+  }
+
+  @Test
+  void property_tracker_suppresses_all_index_rows_for_exact_key() {
+    User user = makeMe.aUser().please();
+    Note note = noteWithContent(user, "---\ntopic: physics\n---\n\nbody");
+    insertAdditionalIndexRow(note, "topic", 1);
+    makeMe.aMemoryTrackerFor(note).propertyKey("topic").please();
+
+    assertThat(unassimilatedPropertyService.countUnassimilatedPropertiesForUser(user), equalTo(0));
+  }
+
+  @Test
+  void counts_unassimilated_properties_in_subscribed_notebook() {
+    User owner = makeMe.aUser().please();
+    User subscriber = makeMe.aUser().please();
+    Notebook notebook = makeMe.aNotebook().creatorAndOwner(owner).please();
+    makeMe.aSubscription().forNotebook(notebook).forUser(subscriber).please();
+    Note note =
+        makeMe
+            .aNote()
+            .notebook(notebook)
+            .content("---\nexample of: \"[[Word]]\"\n---\n\nbody")
+            .please();
+    notePropertyIndexService.refreshForNote(note);
+    makeMe.refresh(subscriber);
+
+    Subscription subscription = subscriber.getSubscriptions().stream().findFirst().orElseThrow();
+    List<AssimilationUnit> pending =
+        unassimilatedPropertyService
+            .streamUnassimilatedPropertiesForSubscription(subscription)
+            .toList();
+    assertThat(pending, hasSize(1));
+    assertThat(pending.get(0).propertyKey(), equalTo("example of"));
+    assertThat(
+        unassimilatedPropertyService.countUnassimilatedPropertiesForSubscription(subscription),
+        equalTo(1));
+  }
+
+  private Note noteWithExampleOfAndUrl(Notebook notebook) {
+    Note note =
+        makeMe
+            .aNote()
+            .notebook(notebook)
+            .content("---\nexample of: \"[[Word]]\"\nurl: https://example.com\n---\n\nbody")
+            .please();
+    notePropertyIndexService.refreshForNote(note);
+    return note;
+  }
+
+  private void insertAdditionalIndexRow(Note note, String propertyKey, int itemIndex) {
+    NotePropertyIndex row = new NotePropertyIndex();
+    row.setNote(note);
+    row.setPropertyKey(propertyKey);
+    row.setItemIndex(itemIndex);
+    notePropertyIndexRepository.save(row);
+  }
+}

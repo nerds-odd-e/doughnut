@@ -1,0 +1,28 @@
+package com.odde.donut.testability.builders;
+
+import com.odde.donut.entities.User;
+import com.odde.donut.entities.UserToken;
+import com.odde.donut.testability.EntityBuilder;
+import com.odde.donut.testability.MakeMe;
+import java.util.UUID;
+
+public class UserTokenBuilder extends EntityBuilder<UserToken> {
+
+  public UserTokenBuilder(MakeMe makeMe) {
+    super(makeMe, new UserToken());
+    this.entity.setToken(UUID.randomUUID().toString());
+  }
+
+  public UserTokenBuilder forUser(User user) {
+    this.entity.setUserId(user.getId());
+    return this;
+  }
+
+  public UserTokenBuilder withLabel(String label) {
+    this.entity.setLabel(label);
+    return this;
+  }
+
+  @Override
+  public void beforeCreate(boolean needPersist) {}
+}

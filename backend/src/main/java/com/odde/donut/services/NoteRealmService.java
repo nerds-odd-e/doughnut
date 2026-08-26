@@ -1,0 +1,155 @@
+package com.odde.donut.services;
+
+import com.odde.donut.algorithms.Frontmatter;
+import com.odde.donut.algorithms.FrontmatterQuestionGenerationInstruction;
+import com.odde.donut.algorithms.NoteContentMarkdown;
+import com.odde.donut.controllers.dto.FolderTrailSegments;
+import com.odde.donut.controllers.dto.NoteRealm;
+import com.odde.donut.entities.Folder;
+import com.odde.donut.entities.Note;
+import com.odde.donut.entities.Notebook;
+import com.odde.donut.entities.User;
+import com.odde.donut.entities.repositories.NoteRepository;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import org.springframework.stereotype.Service;
+
+@Service
+public class NoteRealmService {
+
+  /** Canonical `title_pattern` first; legacy camelCase supported for existing notes. */
+  private static final List<String> TITLE_PATTERN_KEYS = List.of("title_pattern", "titlePattern");
+
+  private final WikiTitleCacheService wikiTitleCacheService;
+  private final NoteRepository noteRepository;
+  private final NotebookCatalogService notebookCatalogService;
+
+  public NoteRealmService(
+      WikiTitleCacheService wikiTitleCacheService,
+      NoteRepository noteRepository,
+      NotebookCatalogService notebookCatalogService) {
+    this.wikiTitleCacheService = wikiTitleCacheService;
+    this.noteRepository = noteRepository;
+    this.notebookCatalogService = notebookCatalogService;
+  }
+
+  public NoteRealm build(Note note, User viewer) {
+    Note focus = hydrateNote(note);
+    var wikiTitles = wikiTitleCacheService.wikiTitlesForViewer(focus, viewer);
+    NoteRealm realm = new NoteRealm(focus, wikiTitles);
+    List<Note> refNotes =
+        hydrateNoteList(wikiTitleCacheService.referencesNotesForViewer(focus, viewer));
+    realm.setReferences(refNotes.stream().map(Note::getNoteTopology).toList());
+    realm.setNotebookRealm(notebookCatalogService.notebookRealmFor(focus.getNotebook(), viewer));
+    realm.setAncestorFolders(FolderTrailSegments.fromRootToContainingFolder(focus));
+    realm.setScopedReadmeContent(resolveScopedReadmeContentForNote(focus));
+    return realm;
+  }
+
+  public String resolveScopedReadmeContentForFolder(Folder folder) {
+    if (folder.getNotebook() == null) {
+      return null;
+    }
+    return resolveScopedReadmeContent(
+        FolderTrailSegments.fromRootToFolder(folder), folder.getNotebook());
+  }
+
+  /**
+   * Every distinct {@code question_generation_instruction} on the trail to {@code focus}, each
+   * rendered as a source-labeled block. Order: notebook readme, folders outermost → innermost, then
+   * the focus note. Levels without a non-blank instruction are omitted; no level overrides another;
+   * identical instruction text appears only once (outermost occurrence wins).
+   */
+  public List<String> questionGenerationInstructionBlocks(Note focus) {
+    List<String> blocks = new ArrayList<>();
+    Set<String> seenInstructionText = new HashSet<>();
+    Notebook notebook = focus.getNotebook();
+    if (notebook != null) {
+      addLabeledInstructionBlockIfDistinct(
+          blocks,
+          seenInstructionText,
+          notebook.getReadmeContent(),
+          "Instruction from notebook \"" + notebook.getName() + "\":");
+      for (Folder folder : FolderTrailSegments.fromRootToContainingFolder(focus)) {
+        addLabeledInstructionBlockIfDistinct(
+            blocks,
+            seenInstructionText,
+            folder.getReadmeContent(),
+            "Instruction from folder \"" + folder.getName() + "\":");
+      }
+    }
+    addLabeledInstructionBlockIfDistinct(
+        blocks, seenInstructionText, focus.getContent(), "Instruction from the focus note:");
+    return blocks;
+  }
+
+  private void addLabeledInstructionBlockIfDistinct(
+      List<String> blocks, Set<String> seenInstructionText, String content, String label) {
+    FrontmatterQuestionGenerationInstruction.fromNoteContent(content)
+        .filter(instruction -> seenInstructionText.add(instruction))
+        .ifPresent(instruction -> blocks.add(label + "\n" + instruction));
+  }
+
+  private String resolveScopedReadmeContentForNote(Note focus) {
+    if (focus.getNotebook() == null) {
+      return null;
+    }
+    return resolveScopedReadmeContent(
+        FolderTrailSegments.fromRootToContainingFolder(focus), focus.getNotebook());
+  }
+
+  private String resolveScopedReadmeContent(List<Folder> outerToInner, Notebook notebook) {
+    for (int i = outerToInner.size() - 1; i >= 0; i--) {
+      String content = outerToInner.get(i).getReadmeContent();
+      if (hasNonBlankTitlePatternInContent(content)) {
+        return content;
+      }
+    }
+    String nbContent = notebook.getReadmeContent();
+    return hasNonBlankTitlePatternInContent(nbContent) ? nbContent : null;
+  }
+
+  private boolean hasNonBlankTitlePatternInContent(String content) {
+    if (content == null || content.isBlank()) {
+      return false;
+    }
+    return NoteContentMarkdown.splitLeadingFrontmatter(content)
+        .map(NoteContentMarkdown.LeadingFrontmatter::frontmatter)
+        .filter(this::frontmatterHasNonBlankTitlePattern)
+        .isPresent();
+  }
+
+  private boolean frontmatterHasNonBlankTitlePattern(Frontmatter fm) {
+    for (String key : TITLE_PATTERN_KEYS) {
+      if (fm.getString(key).map(String::trim).filter(s -> !s.isEmpty()).isPresent()) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /** Re-load notes with associations so JSON serialization does not hit Hibernate proxies. */
+  private Note hydrateNote(Note note) {
+    return noteRepository
+        .hydrateNonDeletedNotesWithNotebookAndFolderByIds(List.of(note.getId()))
+        .stream()
+        .findFirst()
+        .orElse(note);
+  }
+
+  private List<Note> hydrateNoteList(List<Note> notes) {
+    if (notes.isEmpty()) {
+      return notes;
+    }
+    List<Integer> ids = notes.stream().map(Note::getId).distinct().toList();
+    Map<Integer, Note> byId = new LinkedHashMap<>();
+    for (Note n : noteRepository.hydrateNonDeletedNotesWithNotebookAndFolderByIds(ids)) {
+      byId.putIfAbsent(n.getId(), n);
+    }
+    return notes.stream().map(n -> byId.getOrDefault(n.getId(), n)).toList();
+  }
+}

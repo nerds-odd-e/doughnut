@@ -1,0 +1,46 @@
+package com.odde.donut.services;
+
+import com.odde.donut.entities.Folder;
+import com.odde.donut.entities.Note;
+import com.odde.donut.entities.Notebook;
+import com.odde.donut.factoryServices.EntityPersister;
+import org.springframework.stereotype.Service;
+
+@Service
+public class NoteMotionService {
+  private final EntityPersister entityPersister;
+  private final NoteTitlePlacementRules noteTitlePlacementRules;
+
+  public NoteMotionService(
+      EntityPersister entityPersister, NoteTitlePlacementRules noteTitlePlacementRules) {
+    this.entityPersister = entityPersister;
+    this.noteTitlePlacementRules = noteTitlePlacementRules;
+  }
+
+  /** Places {@code source} in {@code targetFolder}. */
+  public void executeMoveIntoFolder(Note source, Folder targetFolder) {
+    Notebook targetNotebook = targetFolder.getNotebook();
+    noteTitlePlacementRules.requireNoSoftDeletedTitleAt(
+        targetNotebook, targetFolder, source.getTitle());
+    source.assignNotebook(targetNotebook);
+    source.setFolder(targetFolder);
+    entityPersister.flush();
+    entityPersister.merge(source);
+    entityPersister.flush();
+  }
+
+  /** Clears {@code subject}'s folder so it sits in its current notebook's root. */
+  public void executeMoveToNotebookRoot(Note subject) {
+    executeMoveToNotebookRoot(subject, subject.getNotebook());
+  }
+
+  /** Assigns {@code source} to {@code targetNotebook} and clears folder (notebook root). */
+  public void executeMoveToNotebookRoot(Note source, Notebook targetNotebook) {
+    noteTitlePlacementRules.requireNoSoftDeletedTitleAt(targetNotebook, null, source.getTitle());
+    source.assignNotebook(targetNotebook);
+    source.setFolder(null);
+    entityPersister.flush();
+    entityPersister.merge(source);
+    entityPersister.flush();
+  }
+}

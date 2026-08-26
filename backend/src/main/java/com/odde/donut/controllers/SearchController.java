@@ -1,0 +1,80 @@
+package com.odde.donut.controllers;
+
+import com.odde.donut.controllers.dto.NoteSearchResult;
+import com.odde.donut.controllers.dto.RelationshipLiteralSearchHit;
+import com.odde.donut.controllers.dto.SearchTerm;
+import com.odde.donut.entities.Note;
+import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
+import com.odde.donut.services.AuthorizationService;
+import com.odde.donut.services.search.NoteSearchService;
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.Valid;
+import java.util.List;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.context.annotation.SessionScope;
+
+@RestController
+@SessionScope
+@RequestMapping("/api/notes")
+class SearchController {
+
+  private final NoteSearchService noteSearchService;
+  private final AuthorizationService authorizationService;
+
+  public SearchController(
+      NoteSearchService noteSearchService, AuthorizationService authorizationService) {
+    this.noteSearchService = noteSearchService;
+    this.authorizationService = authorizationService;
+  }
+
+  @PostMapping("/search")
+  public List<RelationshipLiteralSearchHit> searchForRelationshipTarget(
+      @Valid @RequestBody SearchTerm searchTerm) throws UnexpectedNoAccessRightException {
+    if (searchTerm == null) {
+      throw new IllegalArgumentException("SearchTerm cannot be null");
+    }
+    authorizationService.assertLoggedIn();
+    return noteSearchService.searchForNotes(authorizationService.getCurrentUser(), searchTerm);
+  }
+
+  @PostMapping("/{note}/search")
+  public List<RelationshipLiteralSearchHit> searchForRelationshipTargetWithin(
+      @PathVariable("note") @Schema(type = "integer") Note note,
+      @Valid @RequestBody SearchTerm searchTerm)
+      throws UnexpectedNoAccessRightException {
+    if (searchTerm == null) {
+      throw new IllegalArgumentException("SearchTerm cannot be null");
+    }
+    authorizationService.assertLoggedIn();
+    return noteSearchService.searchForNotesInRelationTo(
+        authorizationService.getCurrentUser(), searchTerm, note);
+  }
+
+  @PostMapping("/semantic-search")
+  public List<NoteSearchResult> semanticSearch(@Valid @RequestBody SearchTerm searchTerm)
+      throws UnexpectedNoAccessRightException {
+    if (searchTerm == null) {
+      throw new IllegalArgumentException("SearchTerm cannot be null");
+    }
+    authorizationService.assertLoggedIn();
+    return noteSearchService.semanticSearchForNotes(
+        authorizationService.getCurrentUser(), searchTerm);
+  }
+
+  @PostMapping("/{note}/semantic-search")
+  public List<NoteSearchResult> semanticSearchWithin(
+      @PathVariable("note") @Schema(type = "integer") Note note,
+      @Valid @RequestBody SearchTerm searchTerm)
+      throws UnexpectedNoAccessRightException {
+    if (searchTerm == null) {
+      throw new IllegalArgumentException("SearchTerm cannot be null");
+    }
+    authorizationService.assertLoggedIn();
+    return noteSearchService.semanticSearchForNotesInRelationTo(
+        authorizationService.getCurrentUser(), searchTerm, note);
+  }
+}

@@ -1,0 +1,20 @@
+package com.odde.donut.controllers.dto;
+
+import java.sql.Timestamp;
+import java.util.Map;
+import lombok.Data;
+
+@Data
+public class QuestionGenerationBatchAdminStatusDTO {
+  private Map<String, Long> batchCountsByStatus;
+  private Map<String, Long> requestCountsByStatus;
+  private boolean openAiTokenConfigured;
+  private boolean prodProfileActive;
+  private boolean schedulerActive;
+  private Timestamp lastScheduledMaintenanceStartedAt;
+  private Timestamp lastScheduledMaintenanceFinishedAt;
+  private String lastScheduledMaintenanceError;
+  private Timestamp lastManualMaintenanceStartedAt;
+  private Timestamp lastManualMaintenanceFinishedAt;
+  private String lastManualMaintenanceError;
+}

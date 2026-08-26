@@ -1,0 +1,116 @@
+package com.odde.donut.services;
+
+import com.odde.donut.controllers.dto.AssimilationRequestDTO;
+import com.odde.donut.entities.MemoryTracker;
+import com.odde.donut.entities.MemoryTrackerType;
+import com.odde.donut.entities.Note;
+import com.odde.donut.entities.User;
+import com.odde.donut.entities.repositories.AssimilationSequenceSkipRepository;
+import com.odde.donut.factoryServices.EntityPersister;
+import java.sql.Timestamp;
+import java.util.List;
+
+/** Creates memory trackers for assimilate requests. */
+final class MemoryTrackerAssimilation {
+  private final EntityPersister entityPersister;
+  private final UserService userService;
+  private final AssimilationSequenceSkipRepository skipRepository;
+
+  MemoryTrackerAssimilation(
+      EntityPersister entityPersister,
+      UserService userService,
+      AssimilationSequenceSkipRepository skipRepository) {
+    this.entityPersister = entityPersister;
+    this.userService = userService;
+    this.skipRepository = skipRepository;
+  }
+
+  List<MemoryTracker> assimilate(
+      AssimilationRequestDTO request, User currentUser, Timestamp currentTime) {
+    Note note = entityPersister.find(Note.class, request.noteId);
+    List<MemoryTracker> existingTrackers = userService.getMemoryTrackersFor(currentUser, note);
+
+    if (Boolean.TRUE.equals(request.assimilateAsCommissioned)) {
+      return assimilateAsNoteLevelType(
+          request,
+          existingTrackers,
+          note,
+          currentUser,
+          currentTime,
+          MemoryTrackerType.COMMISSIONED);
+    }
+
+    if (Boolean.TRUE.equals(request.assimilateAsSpelling)) {
+      return assimilateAsNoteLevelType(
+          request, existingTrackers, note, currentUser, currentTime, MemoryTrackerType.SPELLING);
+    }
+
+    if (isPropertyLevelRequest(request)) {
+      boolean propertyTrackerExists =
+          existingTrackers.stream().anyMatch(mt -> request.propertyKey.equals(mt.getPropertyKey()));
+      if (propertyTrackerExists) {
+        return List.of();
+      }
+      return List.of(
+          initializeNewTracker(
+              MemoryTracker.buildMemoryTrackerForProperty(note, request.propertyKey),
+              currentUser,
+              currentTime,
+              MemoryTrackerType.UNDERSTANDING));
+    }
+
+    return assimilateAsNoteLevelType(
+        request, existingTrackers, note, currentUser, currentTime, MemoryTrackerType.UNDERSTANDING);
+  }
+
+  private List<MemoryTracker> assimilateAsNoteLevelType(
+      AssimilationRequestDTO request,
+      List<MemoryTracker> existingTrackers,
+      Note note,
+      User currentUser,
+      Timestamp currentTime,
+      MemoryTrackerType type) {
+    if (isPropertyLevelRequest(request)) {
+      return List.of();
+    }
+    if (hasNoteLevelType(existingTrackers, type)) {
+      return List.of();
+    }
+    return List.of(
+        initializeNewTracker(
+            MemoryTracker.buildMemoryTrackerForNote(note), currentUser, currentTime, type));
+  }
+
+  private static boolean isPropertyLevelRequest(AssimilationRequestDTO request) {
+    return request.propertyKey != null && !request.propertyKey.isEmpty();
+  }
+
+  private static boolean hasNoteLevelType(List<MemoryTracker> trackers, MemoryTrackerType type) {
+    return trackers.stream()
+        .filter(MemoryTracker::isNoteLevelTracker)
+        .anyMatch(mt -> mt.getType() == type);
+  }
+
+  private MemoryTracker initializeNewTracker(
+      MemoryTracker memoryTracker,
+      User currentUser,
+      Timestamp currentTime,
+      MemoryTrackerType type) {
+    memoryTracker.setType(type);
+    memoryTracker.setUser(currentUser);
+    memoryTracker.setAssimilatedAt(currentTime);
+    memoryTracker.setNextRecallAt(memoryTracker.calculateNextRecallAt());
+    entityPersister.save(memoryTracker);
+    if (type == MemoryTrackerType.UNDERSTANDING) {
+      deleteMatchingSequenceSkip(currentUser, memoryTracker);
+    }
+    return memoryTracker;
+  }
+
+  private void deleteMatchingSequenceSkip(User currentUser, MemoryTracker memoryTracker) {
+    skipRepository
+        .findByUserAndNoteAndPropertyKey(
+            currentUser, memoryTracker.getNote(), memoryTracker.getPropertyKey())
+        .ifPresent(entityPersister::remove);
+  }
+}
