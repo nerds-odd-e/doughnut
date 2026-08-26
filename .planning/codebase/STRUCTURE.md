@@ -42,7 +42,7 @@ doughnut/
 - Key files: `src/main.ts`, `src/DonutApp.vue`, `src/routes/routes.ts`
 
 **cli:**
-- Purpose: Interactive and non-interactive Doughnut CLI
+- Purpose: Interactive and non-interactive Donut CLI
 - Contains: `src/commands/`, Ink UI, `backendApi/`, session scrollback
 - Key files: `src/index.ts`, `src/main.ts`, `src/run.ts`, `src/InteractiveCliApp.tsx`
 
