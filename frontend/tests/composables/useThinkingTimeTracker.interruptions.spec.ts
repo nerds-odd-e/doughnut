@@ -1,31 +1,14 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from "vitest"
-import { flushPromises, mount } from "@vue/test-utils"
+import { describe, it, expect } from "vitest"
 import { defineComponent, ref, nextTick } from "vue"
 import { useThinkingTimeTracker } from "@/composables/useThinkingTimeTracker"
+import {
+  mountAndFlush,
+  setupTrackerClock,
+  stopAndExpect,
+} from "./thinkingTimeTrackerTestSupport"
 
 describe("useThinkingTimeTracker interruption accumulators", () => {
-  let performanceNowSpy: ReturnType<typeof vi.spyOn>
-
-  beforeEach(() => {
-    vi.useFakeTimers()
-    performanceNowSpy = vi.spyOn(performance, "now").mockReturnValue(0)
-    vi.stubGlobal("requestAnimationFrame", (callback: FrameRequestCallback) => {
-      callback(0)
-      return 1
-    })
-  })
-
-  afterEach(() => {
-    Object.defineProperty(document, "hidden", { value: false, writable: true })
-    vi.unstubAllGlobals()
-    vi.useRealTimers()
-    vi.restoreAllMocks()
-  })
-
-  const flushStart = async () => {
-    await nextTick()
-    await flushPromises()
-  }
+  const { setTime } = setupTrackerClock()
 
   const createStartedTrackerComponent = () =>
     defineComponent({
@@ -79,24 +62,8 @@ describe("useThinkingTimeTracker interruption accumulators", () => {
       `,
     })
 
-  const setTime = (ms: number) => {
-    performanceNowSpy.mockReturnValue(ms)
-    vi.advanceTimersByTime(ms)
-  }
-
-  const mountStartedTracker = async () => {
-    const wrapper = mount(createStartedTrackerComponent())
-    await flushStart()
-    return wrapper
-  }
-
-  const stopAndExpect = async (
-    wrapper: ReturnType<typeof mount>,
-    expected: string
-  ) => {
-    await wrapper.get('[data-testid="stop"]').trigger("click")
-    expect(wrapper.get('[data-testid="result"]').text()).toBe(expected)
-  }
+  const mountStartedTracker = () =>
+    mountAndFlush(createStartedTrackerComponent())
 
   it("records away time and count when the page becomes hidden and visible again", async () => {
     const wrapper = await mountStartedTracker()

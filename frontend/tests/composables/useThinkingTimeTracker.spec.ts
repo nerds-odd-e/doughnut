@@ -1,31 +1,14 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from "vitest"
-import { flushPromises, mount } from "@vue/test-utils"
-import { defineComponent, ref, nextTick } from "vue"
+import { describe, it, vi } from "vitest"
+import { defineComponent, ref } from "vue"
 import { useThinkingTimeTracker } from "@/composables/useThinkingTimeTracker"
+import {
+  mountAndFlush,
+  setupTrackerClock,
+  stopAndExpect,
+} from "./thinkingTimeTrackerTestSupport"
 
 describe("useThinkingTimeTracker", () => {
-  let performanceNowSpy: ReturnType<typeof vi.spyOn>
-
-  beforeEach(() => {
-    vi.useFakeTimers()
-    performanceNowSpy = vi.spyOn(performance, "now").mockReturnValue(0)
-    vi.stubGlobal("requestAnimationFrame", (callback: FrameRequestCallback) => {
-      callback(0)
-      return 1
-    })
-  })
-
-  afterEach(() => {
-    Object.defineProperty(document, "hidden", { value: false, writable: true })
-    vi.unstubAllGlobals()
-    vi.useRealTimers()
-    vi.restoreAllMocks()
-  })
-
-  const flushStart = async () => {
-    await nextTick()
-    await flushPromises()
-  }
+  const { setTime, mockNow } = setupTrackerClock()
 
   const createStartedTrackerComponent = () =>
     defineComponent({
@@ -49,24 +32,8 @@ describe("useThinkingTimeTracker", () => {
       `,
     })
 
-  const setTime = (ms: number) => {
-    performanceNowSpy.mockReturnValue(ms)
-    vi.advanceTimersByTime(ms)
-  }
-
-  const mountStartedTracker = async () => {
-    const wrapper = mount(createStartedTrackerComponent())
-    await flushStart()
-    return wrapper
-  }
-
-  const stopAndExpect = async (
-    wrapper: ReturnType<typeof mount>,
-    expected: string
-  ) => {
-    await wrapper.get('[data-testid="stop"]').trigger("click")
-    expect(wrapper.get('[data-testid="result"]').text()).toBe(expected)
-  }
+  const mountStartedTracker = () =>
+    mountAndFlush(createStartedTrackerComponent())
 
   it("starts timer after nextTick and requestAnimationFrame", async () => {
     const wrapper = await mountStartedTracker()
@@ -161,7 +128,7 @@ describe("useThinkingTimeTracker", () => {
 
     // Jump the clock only — do not advance fake timers, so the 250ms
     // watchdog interval has no chance to tick before stop() is called.
-    performanceNowSpy.mockReturnValue(1000 + 6 * 60 * 60 * 1000)
+    mockNow(1000 + 6 * 60 * 60 * 1000)
 
     await stopAndExpect(wrapper, "1000")
   })

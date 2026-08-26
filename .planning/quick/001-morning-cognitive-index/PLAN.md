@@ -246,11 +246,28 @@ detour accumulator before the answer is submitted — a pre-existing interaction
 with simulated-time E2E tests, unrelated to the detour wiring itself (verified
 correct via unit tests) and out of this slice's scope to fix.
 
-#### 7. Idling in place past the threshold is recorded — Behavior `[ ]`
+#### 7. Idling in place past the threshold is recorded — Behavior `[x]`
 
 Leave a question untouched on screen past the threshold (45–60 s, deliberately
 generous — genuine hard thinking without input is common): the idle time is shown
 and flagged. Censors the attempt; never subtracts silently.
+
+Done: idle is a fresh mechanism, not a third `createInterruptionAccumulator()`
+instance — it deliberately does **not** pause the clock (idle time stays
+inside `thinkingTimeMs`, per "never subtracts silently"), so there is no
+`idleCount` to match the `idle_ms`-only schema from slice 4. `lastActivityAt`
+resets on `mousemove`/`keydown`/`click`/`touchstart`/`scroll`; the existing
+250ms watchdog's `checkIdle()` accumulates only the portion of an inactivity
+stretch beyond `IDLE_THRESHOLD_MS = 60000` (upper end of the 45–60s range, no
+prior precedent — mirrors how slice 3 picked `SUSPEND_GAP_THRESHOLD_MS`) once
+that stretch first crosses the threshold; new activity resets detection for
+the next stretch without erasing what was already counted. Wired
+`idleMs` → `QuestionDisplay.vue` → `AnswerDTO`/`Answer` → `RecallHistory.vue`
+(`daisy-badge-warning`, `data-testid="recall-history-idle-time"`, shown only
+when truthy). API client regenerated. No E2E scenario — none required by this
+slice; unit/controller coverage is sufficient (idle detection depends on
+DOM input events at real timescales, not something Cypress simulates
+usefully here).
 
 ### Pace channel — no schema change
 

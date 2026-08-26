@@ -1,43 +1,20 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from "vitest"
-import { flushPromises, mount } from "@vue/test-utils"
+import { describe, it, expect } from "vitest"
+import type { VueWrapper } from "@vue/test-utils"
 import {
   defineComponent,
   ref,
   KeepAlive,
   onActivated,
   onDeactivated,
-  nextTick,
 } from "vue"
 import { useThinkingTimeTracker } from "@/composables/useThinkingTimeTracker"
+import {
+  mountAndFlush,
+  setupTrackerClock,
+} from "./thinkingTimeTrackerTestSupport"
 
 describe("useThinkingTimeTracker KeepAlive lifecycle", () => {
-  let performanceNowSpy: ReturnType<typeof vi.spyOn>
-
-  beforeEach(() => {
-    vi.useFakeTimers()
-    performanceNowSpy = vi.spyOn(performance, "now").mockReturnValue(0)
-    vi.stubGlobal("requestAnimationFrame", (callback: FrameRequestCallback) => {
-      callback(0)
-      return 1
-    })
-  })
-
-  afterEach(() => {
-    Object.defineProperty(document, "hidden", { value: false, writable: true })
-    vi.unstubAllGlobals()
-    vi.useRealTimers()
-    vi.restoreAllMocks()
-  })
-
-  const flushStart = async () => {
-    await nextTick()
-    await flushPromises()
-  }
-
-  const setTime = (ms: number) => {
-    performanceNowSpy.mockReturnValue(ms)
-    vi.advanceTimersByTime(ms)
-  }
+  const { setTime } = setupTrackerClock()
 
   const InnerComponent = defineComponent({
     setup() {
@@ -85,16 +62,9 @@ describe("useThinkingTimeTracker KeepAlive lifecycle", () => {
     `,
   })
 
-  const mountKeepAliveHarness = async () => {
-    const wrapper = mount(WrapperComponent)
-    await flushStart()
-    return wrapper
-  }
+  const mountKeepAliveHarness = () => mountAndFlush(WrapperComponent)
 
-  const innerStopAndExpect = async (
-    wrapper: ReturnType<typeof mount>,
-    expected: string
-  ) => {
+  const innerStopAndExpect = async (wrapper: VueWrapper, expected: string) => {
     await wrapper.get('[data-testid="inner-stop"]').trigger("click")
     expect(wrapper.get('[data-testid="inner-result"]').text()).toBe(expected)
   }

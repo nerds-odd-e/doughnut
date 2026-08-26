@@ -163,6 +163,10 @@ export function recallPromptWithDetourTime(
   return recallPromptWithAnswer({ detourMs, detourCount })
 }
 
+export function recallPromptWithIdleTime(idleMs: number) {
+  return recallPromptWithAnswer({ idleMs })
+}
+
 export function noteUnderQuestionSections(wrapper: VueWrapper) {
   return wrapper.findAll(".note-under-question")
 }

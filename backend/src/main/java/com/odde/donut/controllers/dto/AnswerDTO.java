@@ -10,4 +10,5 @@ public class AnswerDTO {
   @Getter @Setter private Integer awayCount;
   @Getter @Setter private Integer detourMs;
   @Getter @Setter private Integer detourCount;
+  @Getter @Setter private Integer idleMs;
 }

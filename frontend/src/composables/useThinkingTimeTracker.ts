@@ -17,6 +17,13 @@ export type ThinkingTimeTrackerOptions = {
 // real event-loop delay. Anything beyond this is excluded from thinking time.
 const SUSPEND_GAP_THRESHOLD_MS = 5000
 
+// No prior precedent in the codebase. Genuine hard thinking with no mouse/
+// keyboard/touch/scroll input is common, so this is deliberately generous
+// (upper end of the 45-60s range the plan calls for) to avoid flagging normal
+// pauses. Unlike away/detour, idle does NOT pause the clock: it only flags a
+// stretch of thinkingTimeMs that the reviewer should discount.
+const IDLE_THRESHOLD_MS = 60000
+
 export function useThinkingTimeTracker(
   options: ThinkingTimeTrackerOptions = {}
 ) {
@@ -90,6 +97,40 @@ export function useThinkingTimeTracker(
   // tracker's own internal away detection or from plain pause()/resume().
   const detour = createInterruptionAccumulator()
 
+  // Idle: absence of mouse/keyboard/touch/scroll input while the question is
+  // on-screen and the clock is running (not paused for away/detour/viewing a
+  // previous answer). Stays inside thinkingTimeMs the whole time — this only
+  // accumulates the portion of an inactivity stretch beyond IDLE_THRESHOLD_MS
+  // once that stretch first crosses the threshold, so short pauses under the
+  // threshold contribute nothing. New activity resets detection for the next
+  // stretch but never retroactively removes idleMs already counted.
+  const idleMs = ref(0)
+  const lastActivityAt = ref<number | null>(null)
+  const idleAccumulatingSince = ref<number | null>(null)
+
+  const recordActivity = () => {
+    if (!isRunning.value) return
+    lastActivityAt.value = clock.now()
+    idleAccumulatingSince.value = null
+  }
+
+  const checkIdle = () => {
+    if (!isRunning.value || lastActivityAt.value === null) return
+
+    const now = clock.now()
+    const sinceActivity = now - lastActivityAt.value
+    if (sinceActivity < IDLE_THRESHOLD_MS) {
+      idleAccumulatingSince.value = null
+      return
+    }
+
+    if (idleAccumulatingSince.value === null) {
+      idleAccumulatingSince.value = lastActivityAt.value + IDLE_THRESHOLD_MS
+    }
+    idleMs.value += now - idleAccumulatingSince.value
+    idleAccumulatingSince.value = now
+  }
+
   const reconcileGap = () => {
     if (!isRunning.value || runningStart.value === null) return
 
@@ -112,6 +153,7 @@ export function useThinkingTimeTracker(
     if (document.hidden) return
 
     runningStart.value = clock.now()
+    lastActivityAt.value = runningStart.value
     isRunning.value = true
     isPaused.value = false
 
@@ -125,6 +167,8 @@ export function useThinkingTimeTracker(
         reconcileGap()
         if (document.hidden) {
           away.pauseFor()
+        } else {
+          checkIdle()
         }
       }
     }, 250)
@@ -191,6 +235,11 @@ export function useThinkingTimeTracker(
     window.addEventListener("pageshow", handlePageShow)
     window.addEventListener("blur", handleBlur)
     window.addEventListener("focus", handleFocus)
+    window.addEventListener("mousemove", recordActivity)
+    window.addEventListener("keydown", recordActivity)
+    window.addEventListener("click", recordActivity)
+    window.addEventListener("touchstart", recordActivity)
+    window.addEventListener("scroll", recordActivity, true)
   }
 
   const removeEventListeners = () => {
@@ -199,6 +248,11 @@ export function useThinkingTimeTracker(
     window.removeEventListener("pageshow", handlePageShow)
     window.removeEventListener("blur", handleBlur)
     window.removeEventListener("focus", handleFocus)
+    window.removeEventListener("mousemove", recordActivity)
+    window.removeEventListener("keydown", recordActivity)
+    window.removeEventListener("click", recordActivity)
+    window.removeEventListener("touchstart", recordActivity)
+    window.removeEventListener("scroll", recordActivity, true)
   }
 
   setupEventListeners()
@@ -222,5 +276,6 @@ export function useThinkingTimeTracker(
     resumeFromDetour: detour.resumeFrom,
     detourMs: detour.ms,
     detourCount: detour.count,
+    idleMs,
   }
 }

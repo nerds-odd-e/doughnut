@@ -9,6 +9,7 @@ import {
   noteUnderQuestionSections,
   recallPromptWithAwayTime,
   recallPromptWithDetourTime,
+  recallPromptWithIdleTime,
   recallPromptWithThinkingTime,
 } from "./memoryTrackerPageViewTestSupport"
 
@@ -120,6 +121,14 @@ describe("MemoryTrackerPageView display", () => {
     })
 
     expect(wrapper.text()).toContain("Detour: 4.2s (1x)")
+  })
+
+  it("shows idle time flagged beside thinking time", async () => {
+    const wrapper = await mountMemoryTrackerPageViewReady({
+      recallHistory: historyFromPrompts([recallPromptWithIdleTime(12000)]),
+    })
+
+    expect(wrapper.text()).toContain("Idle: 12.0s")
   })
 
   it("does not display detour time for answers predating instrumentation", async () => {

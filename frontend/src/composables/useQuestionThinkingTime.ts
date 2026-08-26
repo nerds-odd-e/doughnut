@@ -23,6 +23,7 @@ export function useQuestionThinkingTime(
     awayCount,
     detourMs,
     detourCount,
+    idleMs,
   } = useThinkingTimeTracker()
   const { isViewingAnsweredQuestion } = useRecallData()
 
@@ -67,5 +68,6 @@ export function useQuestionThinkingTime(
     awayCount,
     detourMs,
     detourCount,
+    idleMs,
   }
 }

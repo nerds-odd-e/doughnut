@@ -100,6 +100,13 @@ const historyItemKey = (item: RecallHistoryItem, index: number) => {
               Detour: {{ formatThinkingTime(item.recallPrompt.answer.detourMs) }}
               ({{ item.recallPrompt.answer.detourCount }}x)
             </span>
+            <span
+              v-if="item.recallPrompt.answer?.idleMs"
+              data-testid="recall-history-idle-time"
+              class="daisy-badge daisy-badge-warning"
+            >
+              Idle: {{ formatThinkingTime(item.recallPrompt.answer.idleMs) }}
+            </span>
           </div>
           <div v-if="item.recallPrompt.questionType === 'SPELLING'">
             <div v-if="item.recallPrompt.answer" class="space-y-2">

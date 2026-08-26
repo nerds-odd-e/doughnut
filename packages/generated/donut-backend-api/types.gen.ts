@@ -276,6 +276,7 @@ export type AnswerDto = {
     awayCount?: number;
     detourMs?: number;
     detourCount?: number;
+    idleMs?: number;
 };
 
 export type Answer = {

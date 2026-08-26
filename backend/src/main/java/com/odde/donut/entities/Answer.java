@@ -118,6 +118,7 @@ public class Answer extends EntityIdentifiedByIdOnly {
     answer.setAwayCount(answerDTO.getAwayCount());
     answer.setDetourMs(answerDTO.getDetourMs());
     answer.setDetourCount(answerDTO.getDetourCount());
+    answer.setIdleMs(answerDTO.getIdleMs());
     return answer;
   }
 }

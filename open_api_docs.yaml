@@ -3780,6 +3780,9 @@ components:
         detourCount:
           type: integer
           format: int32
+        idleMs:
+          type: integer
+          format: int32
     Answer:
       type: object
       properties:
