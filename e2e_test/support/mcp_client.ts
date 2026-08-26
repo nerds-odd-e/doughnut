@@ -68,7 +68,7 @@ class McpClient {
       env: {
         ...process.env,
         NODE_PATH: nodePath,
-        DOUGHNUT_API_BASE_URL: apiBaseUrl,
+        DONUT_API_BASE_URL: apiBaseUrl,
         DOUGHNUT_API_AUTH_TOKEN: accessToken,
       },
     })
