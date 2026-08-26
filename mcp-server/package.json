@@ -1,7 +1,7 @@
 {
-  "name": "doughnut-mcp-server",
+  "name": "donut-mcp-server",
   "version": "0.1.0",
-  "description": "A Model Context Protocol server for doughnut",
+  "description": "A Model Context Protocol server for donut",
   "private": true,
   "type": "module",
   "engines": {

@@ -146,6 +146,8 @@ Verify: `cli` vitest suite green.
 
 ### 7. MCP server internal rename (Structure)
 
+Status: done
+
 `mcp-server/package.json` `name` → `donut-mcp-server`, `description` → "...
 for donut". `mcp-server/src/server.ts` server identity `name:
 'doughnut-mcp-server'` → `'donut-mcp-server'`.

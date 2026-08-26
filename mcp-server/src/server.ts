@@ -7,7 +7,7 @@ import type { ServerContext, ToolDescriptor } from './types.js'
 
 export function createServer(tools: ToolDescriptor[], context: ServerContext) {
   const server = new Server(
-    { name: 'doughnut-mcp-server', version: '0.1.0' },
+    { name: 'donut-mcp-server', version: '0.1.0' },
     { capabilities: { tools: {} } }
   )
 
