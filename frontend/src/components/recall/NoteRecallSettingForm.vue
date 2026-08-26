@@ -10,8 +10,8 @@
 </template>
 
 <script lang="ts">
-import type { NoteRecallSetting } from "@generated/doughnut-backend-api"
-import { NoteController } from "@generated/doughnut-backend-api/sdk.gen"
+import type { NoteRecallSetting } from "@generated/donut-backend-api"
+import { NoteController } from "@generated/donut-backend-api/sdk.gen"
 import { toOpenApiError } from "@/managedApi/openApiError"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import type { PropType } from "vue"

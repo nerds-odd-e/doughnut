@@ -19,7 +19,7 @@
 <script setup lang="ts">
 import { ref, watch, onMounted, type PropType } from "vue"
 import { useRouter } from "vue-router"
-import type { WikiTitle } from "@generated/doughnut-backend-api"
+import type { WikiTitle } from "@generated/donut-backend-api"
 import {
   handleRichContentAnchorClick,
   type DeadWikiLinkPayload,

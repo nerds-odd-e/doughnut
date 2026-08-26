@@ -1,4 +1,4 @@
-import { MemoryTrackerController } from "@generated/doughnut-backend-api/sdk.gen"
+import { MemoryTrackerController } from "@generated/donut-backend-api/sdk.gen"
 import RecentlyRecalledNotes from "@/components/recent/RecentlyRecalledNotes.vue"
 import { flushPromises } from "@vue/test-utils"
 import helper, { mockSdkService } from "@tests/helpers"

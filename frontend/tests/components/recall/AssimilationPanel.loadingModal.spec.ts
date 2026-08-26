@@ -1,6 +1,6 @@
 import { flushPromises } from "@vue/test-utils"
-import type { AssimilationNextDto } from "@generated/doughnut-backend-api"
-import { AssimilationController } from "@generated/doughnut-backend-api/sdk.gen"
+import type { AssimilationNextDto } from "@generated/donut-backend-api"
+import { AssimilationController } from "@generated/donut-backend-api/sdk.gen"
 import LoadingModal from "@/components/commons/LoadingModal.vue"
 import AssimilationPanel from "@/components/recall/AssimilationPanel.vue"
 import usePopups from "@/components/commons/Popups/usePopups"

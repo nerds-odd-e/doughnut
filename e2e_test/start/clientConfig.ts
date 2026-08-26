@@ -1,4 +1,4 @@
-import { client } from '@generated/doughnut-backend-api/client.gen'
+import { client } from '@generated/donut-backend-api/client.gen'
 
 client.setConfig({
   baseUrl: '',

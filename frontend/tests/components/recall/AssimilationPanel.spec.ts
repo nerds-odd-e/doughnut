@@ -2,7 +2,7 @@ import {
   AssimilationSequenceSkipController,
   MemoryTrackerController,
   NoteController,
-} from "@generated/doughnut-backend-api/sdk.gen"
+} from "@generated/donut-backend-api/sdk.gen"
 import { describe, expect, it, vi } from "vitest"
 import makeMe from "donut-test-fixtures/makeMe"
 import {

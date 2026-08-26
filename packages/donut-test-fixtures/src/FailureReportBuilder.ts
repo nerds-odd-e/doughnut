@@ -1,7 +1,7 @@
 import type {
   FailureReport,
   FailureReportForView,
-} from '@generated/doughnut-backend-api'
+} from '@generated/donut-backend-api'
 import Builder from './Builder'
 
 class FailureReportBuilder extends Builder<FailureReport> {

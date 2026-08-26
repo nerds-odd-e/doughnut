@@ -1,5 +1,5 @@
-import { UserController } from '@generated/doughnut-backend-api/sdk.gen'
-import type { MenuDataDto } from '@generated/doughnut-backend-api'
+import { UserController } from '@generated/donut-backend-api/sdk.gen'
+import type { MenuDataDto } from '@generated/donut-backend-api'
 import { waitUntilAppIsNotBusy } from '../../pageBase'
 import {
   assimilationDueFromTriple,

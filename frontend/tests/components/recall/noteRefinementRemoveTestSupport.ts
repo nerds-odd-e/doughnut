@@ -1,5 +1,5 @@
 import usePopups from "@/components/commons/Popups/usePopups"
-import type { NoteRefinementLayoutItem } from "@generated/doughnut-backend-api"
+import type { NoteRefinementLayoutItem } from "@generated/donut-backend-api"
 import { flushPromises } from "@vue/test-utils"
 import { expect } from "vitest"
 import { selectRefinementLayoutItems } from "./noteRefinementLayoutFixtures"

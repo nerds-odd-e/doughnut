@@ -1,4 +1,4 @@
-import type { RelationshipLiteralSearchHit } from "@generated/doughnut-backend-api"
+import type { RelationshipLiteralSearchHit } from "@generated/donut-backend-api"
 
 /** Stable key for deduping hits and Vue list keys. */
 export function relationshipLiteralSearchHitKey(

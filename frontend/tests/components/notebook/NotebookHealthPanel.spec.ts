@@ -1,4 +1,4 @@
-import { UserController } from "@generated/doughnut-backend-api/sdk.gen"
+import { UserController } from "@generated/donut-backend-api/sdk.gen"
 import makeMe from "donut-test-fixtures/makeMe"
 import {
   createHealthPanelSpies,

@@ -12,7 +12,7 @@
 
 <script setup lang="ts">
 import { inject, onMounted, type Ref } from "vue"
-import type { User } from "@generated/doughnut-backend-api"
+import type { User } from "@generated/donut-backend-api"
 import { useNotebookCatalog } from "@/composables/useNotebookCatalog"
 import NotebooksPageView from "./NotebooksPageView.vue"
 import ContentLoader from "@/components/commons/ContentLoader.vue"

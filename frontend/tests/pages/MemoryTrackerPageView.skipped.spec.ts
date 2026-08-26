@@ -1,4 +1,4 @@
-import { MemoryTrackerController } from "@generated/doughnut-backend-api/sdk.gen"
+import { MemoryTrackerController } from "@generated/donut-backend-api/sdk.gen"
 import { flushPromises } from "@vue/test-utils"
 import makeMe from "donut-test-fixtures/makeMe"
 import { mockSdkService } from "@tests/helpers"

@@ -1,10 +1,10 @@
-import { AiController } from "@generated/doughnut-backend-api/sdk.gen"
+import { AiController } from "@generated/donut-backend-api/sdk.gen"
 import { noteShowLocation } from "@/routes/noteShowLocation"
 import { nextTick } from "vue"
 import { beforeEach, describe, expect, it, vi } from "vitest"
 import makeMe from "donut-test-fixtures/makeMe"
 import { mockSdkService, wrapSdkError } from "@tests/helpers"
-import type { NoteExtractionResult } from "@generated/doughnut-backend-api"
+import type { NoteExtractionResult } from "@generated/donut-backend-api"
 import {
   createNoteFromExtractionPreview,
   expectExtractionPreviewError,

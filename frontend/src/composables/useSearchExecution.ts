@@ -1,5 +1,5 @@
-import type { SearchTerm } from "@generated/doughnut-backend-api"
-import { NoteController } from "@generated/doughnut-backend-api/sdk.gen"
+import type { SearchTerm } from "@generated/donut-backend-api"
+import { NoteController } from "@generated/donut-backend-api/sdk.gen"
 import { debounce } from "mini-debounce"
 import {
   computed,

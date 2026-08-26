@@ -7,7 +7,7 @@ import type {
   DayCount,
   AmPmResponseTime,
   DayAvgResponseTime,
-} from "@generated/doughnut-backend-api"
+} from "@generated/donut-backend-api"
 import { afterEach, describe, expect, it } from "vitest"
 
 const OLD_EMPTY = "rgb(235, 237, 240)"

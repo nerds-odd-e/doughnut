@@ -1,4 +1,4 @@
-import type { NotebookCatalogGroupItem } from "@generated/doughnut-backend-api"
+import type { NotebookCatalogGroupItem } from "@generated/donut-backend-api"
 
 export function narrowGroupNotebooksForCatalogFilter(
   group: NotebookCatalogGroupItem,

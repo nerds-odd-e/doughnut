@@ -59,7 +59,7 @@
 </template>
 
 <script setup lang="ts">
-import type { MemoryTracker } from "@generated/doughnut-backend-api"
+import type { MemoryTracker } from "@generated/donut-backend-api"
 
 defineProps<{
   memoryTracker: MemoryTracker

@@ -4,7 +4,7 @@ import {
   type BookNavigationTarget,
 } from "@/lib/book-reading/pdfOutlineV1Anchor"
 import { locatorAsPdfNavigationTarget } from "@/composables/bookReaderViewerRef"
-import type { ContentLocatorFull } from "@generated/doughnut-backend-api"
+import type { ContentLocatorFull } from "@generated/donut-backend-api"
 import type { PDFViewer } from "pdfjs-dist/web/pdf_viewer.mjs"
 
 type PendingNavigation = {

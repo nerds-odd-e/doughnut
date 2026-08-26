@@ -5,7 +5,7 @@ import type {
   NoteTopology,
   Mcq,
   RecallPromptHistoryItem,
-} from '@generated/doughnut-backend-api'
+} from '@generated/donut-backend-api'
 import Builder from './Builder'
 import generateId from './generateId'
 import makeMe from './makeMe'

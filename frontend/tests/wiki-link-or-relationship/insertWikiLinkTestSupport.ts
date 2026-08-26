@@ -1,5 +1,5 @@
-import { SearchController } from "@generated/doughnut-backend-api/sdk.gen"
-import type { Note, NoteSearchResult } from "@generated/doughnut-backend-api"
+import { SearchController } from "@generated/donut-backend-api/sdk.gen"
+import type { Note, NoteSearchResult } from "@generated/donut-backend-api"
 import { useContentCursorInserter } from "@/composables/useContentCursorInserter"
 import { fireEvent, screen } from "@testing-library/vue"
 import { flushPromises } from "@vue/test-utils"

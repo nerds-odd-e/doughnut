@@ -1,6 +1,6 @@
 import RetentionTrendChart from "@/components/recallStats/RetentionTrendChart.vue"
 import helper from "@tests/helpers"
-import type { DayRetention } from "@generated/doughnut-backend-api"
+import type { DayRetention } from "@generated/donut-backend-api"
 import { describe, it, expect } from "vitest"
 
 describe("RetentionTrendChart", () => {

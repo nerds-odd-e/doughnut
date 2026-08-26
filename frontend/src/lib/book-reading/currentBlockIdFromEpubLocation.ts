@@ -3,7 +3,7 @@ import {
   epubSpinePathMatches,
   splitEpubHref,
 } from "@/lib/book-reading/epubHrefMatch"
-import type { BookBlockFull } from "@generated/doughnut-backend-api"
+import type { BookBlockFull } from "@generated/donut-backend-api"
 
 export type BookBlockEpubLocationRow = Pick<
   BookBlockFull,

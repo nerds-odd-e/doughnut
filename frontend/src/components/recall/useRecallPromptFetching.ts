@@ -2,8 +2,8 @@ import { ref } from "vue"
 import type {
   MemoryTrackerLite,
   RecallPrompt,
-} from "@generated/doughnut-backend-api"
-import { MemoryTrackerController } from "@generated/doughnut-backend-api/sdk.gen"
+} from "@generated/donut-backend-api"
+import { MemoryTrackerController } from "@generated/donut-backend-api/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 
 export function useRecallPromptFetching(props: {

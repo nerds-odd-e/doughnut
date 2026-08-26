@@ -3,8 +3,8 @@ import type {
   BookBlockFull,
   BookLayoutReorganizationSuggestion,
   BookMutationResponseFull,
-} from "@generated/doughnut-backend-api"
-import { NotebookBooksController } from "@generated/doughnut-backend-api/sdk.gen"
+} from "@generated/donut-backend-api"
+import { NotebookBooksController } from "@generated/donut-backend-api/sdk.gen"
 import { computed, ref, toValue, type MaybeRefOrGetter } from "vue"
 
 const BOOK_LAYOUT_SUGGEST_LOADING_MESSAGE = "Analyzing book layout…"

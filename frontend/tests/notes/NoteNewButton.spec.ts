@@ -2,7 +2,7 @@ import {
   NoteController,
   NotebookController,
   SearchController,
-} from "@generated/doughnut-backend-api/sdk.gen"
+} from "@generated/donut-backend-api/sdk.gen"
 import NoteNewButton from "@/components/notes/core/NoteNewButton.vue"
 import makeMe from "donut-test-fixtures/makeMe"
 import helper, { mockSdkService } from "@tests/helpers"

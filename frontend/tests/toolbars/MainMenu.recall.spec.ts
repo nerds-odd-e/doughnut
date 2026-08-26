@@ -1,4 +1,4 @@
-import { UserController } from "@generated/doughnut-backend-api/sdk.gen"
+import { UserController } from "@generated/donut-backend-api/sdk.gen"
 import { useRecallData } from "@/composables/useRecallData"
 import { screen } from "@testing-library/vue"
 import { mockSdkService } from "@tests/helpers"

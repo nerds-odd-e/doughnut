@@ -1,8 +1,8 @@
 import type {
   NoteSearchResult,
   RelationshipLiteralSearchHit,
-} from "@generated/doughnut-backend-api"
-import { SearchController } from "@generated/doughnut-backend-api/sdk.gen"
+} from "@generated/donut-backend-api"
+import { SearchController } from "@generated/donut-backend-api/sdk.gen"
 import SearchResults from "@/components/search/SearchResults.vue"
 import helper, { mockSdkService, wrapSdkResponse } from "@tests/helpers"
 import makeMe from "donut-test-fixtures/makeMe"

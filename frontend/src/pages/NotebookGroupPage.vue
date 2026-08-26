@@ -33,7 +33,7 @@ import { computed, inject, onMounted, type Ref } from "vue"
 import type {
   NotebookCatalogGroupItem,
   User,
-} from "@generated/doughnut-backend-api"
+} from "@generated/donut-backend-api"
 import { useNotebookCatalog } from "@/composables/useNotebookCatalog"
 import ContentLoader from "@/components/commons/ContentLoader.vue"
 import NotebookGroupPageView from "./NotebookGroupPageView.vue"

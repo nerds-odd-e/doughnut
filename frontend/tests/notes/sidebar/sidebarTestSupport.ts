@@ -6,11 +6,11 @@ import {
   teardownGlobalClientForTesting,
 } from "@/managedApi/clientSetup"
 import createNoteStorage from "@/store/createNoteStorage"
-import type { NoteRealm, NotebookRealm } from "@generated/doughnut-backend-api"
+import type { NoteRealm, NotebookRealm } from "@generated/donut-backend-api"
 import {
   NoteController,
   NotebookController,
-} from "@generated/doughnut-backend-api/sdk.gen"
+} from "@generated/donut-backend-api/sdk.gen"
 import makeMe from "donut-test-fixtures/makeMe"
 import { mockSdkServiceWithImplementation } from "@tests/helpers"
 import { type VueWrapper } from "@vue/test-utils"

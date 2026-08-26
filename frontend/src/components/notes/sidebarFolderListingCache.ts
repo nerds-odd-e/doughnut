@@ -1,4 +1,4 @@
-import type { FolderListing } from "@generated/doughnut-backend-api"
+import type { FolderListing } from "@generated/donut-backend-api"
 
 const cache = new Map<string, FolderListing>()
 

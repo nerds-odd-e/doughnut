@@ -1,7 +1,4 @@
-import type {
-  FolderRealm,
-  NotebookRealm,
-} from '@generated/doughnut-backend-api'
+import type { FolderRealm, NotebookRealm } from '@generated/donut-backend-api'
 import Builder from './Builder'
 import NotebookBuilder from './NotebookBuilder'
 

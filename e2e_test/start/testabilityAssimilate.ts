@@ -1,10 +1,10 @@
 /// <reference types="Cypress" />
 // @ts-check
-import type { AssimilationRequestDto } from '@generated/doughnut-backend-api'
+import type { AssimilationRequestDto } from '@generated/donut-backend-api'
 import {
   AssimilationController,
   AssimilationSequenceSkipController,
-} from '@generated/doughnut-backend-api/sdk.gen'
+} from '@generated/donut-backend-api/sdk.gen'
 
 type InjectedNoteIds = {
   getInjectedNoteIdByTitle(noteTitle: string): Cypress.Chainable<number>

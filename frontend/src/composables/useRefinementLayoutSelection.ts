@@ -1,4 +1,4 @@
-import type { NoteRefinementLayoutItem } from "@generated/doughnut-backend-api"
+import type { NoteRefinementLayoutItem } from "@generated/donut-backend-api"
 import { computed, ref, type Ref } from "vue"
 
 export function flattenLayoutItems(

@@ -1,5 +1,5 @@
 import { useRecallData } from "@/composables/useRecallData"
-import type { AnsweredQuestion } from "@generated/doughnut-backend-api"
+import type { AnsweredQuestion } from "@generated/donut-backend-api"
 import makeMe from "donut-test-fixtures/makeMe"
 import { wrapSdkResponse } from "@tests/helpers"
 import { flushPromises } from "@vue/test-utils"

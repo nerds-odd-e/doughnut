@@ -1,5 +1,5 @@
-import { NoteController } from "@generated/doughnut-backend-api/sdk.gen"
-import type { NoteRealm } from "@generated/doughnut-backend-api"
+import { NoteController } from "@generated/donut-backend-api/sdk.gen"
+import type { NoteRealm } from "@generated/donut-backend-api"
 import NoteToolbar from "@/components/notes/core/NoteToolbar.vue"
 import { noteMoreOptionsTitles } from "@/components/notes/widgets/noteMoreOptionsTitles"
 import makeMe from "donut-test-fixtures/makeMe"

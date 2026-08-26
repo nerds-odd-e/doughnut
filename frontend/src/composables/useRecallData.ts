@@ -3,7 +3,7 @@ import { useRouter } from "vue-router"
 import type {
   DueCommissionedMemoryTrackerLite,
   MemoryTrackerLite,
-} from "@generated/doughnut-backend-api/types.gen"
+} from "@generated/donut-backend-api/types.gen"
 import { primeSoftKeyboard } from "@/utils/focusTarget"
 
 export type PotentialLearningSession = {

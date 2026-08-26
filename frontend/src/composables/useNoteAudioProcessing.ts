@@ -1,9 +1,9 @@
 import { ref, type Ref } from "vue"
-import type { Note } from "@generated/doughnut-backend-api"
+import type { Note } from "@generated/donut-backend-api"
 import {
   AiAudioController,
   AiController,
-} from "@generated/doughnut-backend-api/sdk.gen"
+} from "@generated/donut-backend-api/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import type { AudioChunk } from "@/models/audio/audioProcessingScheduler"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"

@@ -24,7 +24,7 @@ import type {
   BookFull,
   ContentLocatorFull,
   EpubLocatorFull,
-} from "@generated/doughnut-backend-api"
+} from "@generated/donut-backend-api"
 import ePub, { type Book as EpubJsBook, type Rendition } from "epubjs"
 import { nextTick, onBeforeUnmount, onMounted, ref, watch } from "vue"
 

@@ -2,7 +2,7 @@ import { reactive } from "vue"
 import type {
   NoteSearchResult,
   RelationshipLiteralSearchHit,
-} from "@generated/doughnut-backend-api"
+} from "@generated/donut-backend-api"
 import {
   computeSearchDisplayState,
   type DisplayState,

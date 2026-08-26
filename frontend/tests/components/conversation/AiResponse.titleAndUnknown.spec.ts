@@ -1,5 +1,5 @@
-import { TextContentController } from "@generated/doughnut-backend-api/sdk.gen"
-import type { TitleReplacement } from "@generated/doughnut-backend-api"
+import { TextContentController } from "@generated/donut-backend-api/sdk.gen"
+import type { TitleReplacement } from "@generated/donut-backend-api"
 import makeMe from "donut-test-fixtures/makeMe"
 import { mockSdkService } from "@tests/helpers"
 import { flushPromises } from "@vue/test-utils"

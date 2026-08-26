@@ -46,7 +46,7 @@ import type {
   AnsweredQuestion,
   Note,
   NoteRefinementQuestionContextDto,
-} from "@generated/doughnut-backend-api"
+} from "@generated/donut-backend-api"
 import type { PropType } from "vue"
 import { computed, ref } from "vue"
 import QuestionDisplay from "./QuestionDisplay.vue"

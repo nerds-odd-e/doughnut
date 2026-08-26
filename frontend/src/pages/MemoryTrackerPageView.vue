@@ -52,12 +52,12 @@ import { computed, type PropType } from "vue"
 import type {
   RecallHistoryItem,
   MemoryTracker,
-} from "@generated/doughnut-backend-api"
+} from "@generated/donut-backend-api"
 import NoteUnderQuestion from "@/components/recall/NoteUnderQuestion.vue"
 import { recalledNoteUnderQuestionProps } from "@/components/recall/recalledNoteUnderQuestionProps"
 import MemoryTrackerInformation from "@/components/recall/MemoryTrackerInformation.vue"
 import RecallHistory from "@/components/recall/RecallHistory.vue"
-import { MemoryTrackerController } from "@generated/doughnut-backend-api/sdk.gen"
+import { MemoryTrackerController } from "@generated/donut-backend-api/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import usePopups from "@/components/commons/Popups/usePopups"
 import { REMOVE_FROM_RECALL_CONFIRM } from "@/composables/useRemoveFromRecall"

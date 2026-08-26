@@ -1,4 +1,4 @@
-import type { NotebookRealm } from "@generated/doughnut-backend-api"
+import type { NotebookRealm } from "@generated/donut-backend-api"
 
 export function groupCatalogMemberPreviewHint(args: {
   groupName: string

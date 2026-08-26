@@ -136,11 +136,11 @@
 
 <script lang="ts" setup>
 import { computed, onMounted, ref } from "vue"
-import { AdminQuestionGenerationBatchController } from "@generated/doughnut-backend-api/sdk.gen"
+import { AdminQuestionGenerationBatchController } from "@generated/donut-backend-api/sdk.gen"
 import type {
   QuestionGenerationBatchAdminStatusDto,
   QuestionGenerationBatchSubmissionSummaryDto,
-} from "@generated/doughnut-backend-api"
+} from "@generated/donut-backend-api"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import {
   formatLastManualMaintenanceRun,

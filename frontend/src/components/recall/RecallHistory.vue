@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { RecallHistoryItem } from "@generated/doughnut-backend-api"
+import type { RecallHistoryItem } from "@generated/donut-backend-api"
 import QuestionDisplay from "@/components/recall/QuestionDisplay.vue"
 import ConversationButton from "@/components/recall/ConversationButton.vue"
 

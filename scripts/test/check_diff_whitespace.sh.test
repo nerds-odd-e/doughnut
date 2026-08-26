@@ -39,12 +39,12 @@ test_ignores_generated_api_whitespace() {
 	work=$(mktemp -d)
 	trap 'rm -rf "$work"' EXIT
 	init_repo "$work"
-	mkdir -p "$work/packages/generated/doughnut-backend-api"
-	printf 'clean\n' >"$work/packages/generated/doughnut-backend-api/sdk.gen.ts"
+	mkdir -p "$work/packages/generated/donut-backend-api"
+	printf 'clean\n' >"$work/packages/generated/donut-backend-api/sdk.gen.ts"
 	printf 'openapi: clean\n' >"$work/open_api_docs.yaml"
 	git -C "$work" add .
 	git -C "$work" commit -qm initial
-	printf 'generated   \n' >>"$work/packages/generated/doughnut-backend-api/sdk.gen.ts"
+	printf 'generated   \n' >>"$work/packages/generated/donut-backend-api/sdk.gen.ts"
 	printf 'openapi: generated   \n' >>"$work/open_api_docs.yaml"
 
 	(cd "$work" && "$SCRIPT_UNDER_TEST")

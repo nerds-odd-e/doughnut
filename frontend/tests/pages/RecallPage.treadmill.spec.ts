@@ -1,6 +1,6 @@
-import { MemoryTrackerController } from "@generated/doughnut-backend-api/sdk.gen"
+import { MemoryTrackerController } from "@generated/donut-backend-api/sdk.gen"
 import { useRecallData } from "@/composables/useRecallData"
-import type { MemoryTrackerLite } from "@generated/doughnut-backend-api"
+import type { MemoryTrackerLite } from "@generated/donut-backend-api"
 import makeMe from "donut-test-fixtures/makeMe"
 import { mockSdkService } from "@tests/helpers"
 import { beforeEach, describe, expect, it, vi } from "vitest"

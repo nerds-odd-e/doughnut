@@ -4,7 +4,7 @@ import helper from "@tests/helpers"
 import QuestionDisplay from "@/components/recall/QuestionDisplay.vue"
 import makeMe from "donut-test-fixtures/makeMe"
 import markdownizer from "@/components/form/markdownizer"
-import type { Answer } from "@generated/doughnut-backend-api"
+import type { Answer } from "@generated/donut-backend-api"
 import { questionDisplayProps } from "./questionDisplayTestSupport"
 
 describe("QuestionDisplay", () => {

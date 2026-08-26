@@ -2,7 +2,7 @@ import {
   MemoryTrackerController,
   NoteController,
   RecallPromptController,
-} from "@generated/doughnut-backend-api/sdk.gen"
+} from "@generated/donut-backend-api/sdk.gen"
 import Quiz from "@/components/recall/Quiz.vue"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
 import makeMe from "donut-test-fixtures/makeMe"
@@ -15,7 +15,7 @@ import type {
   AnsweredQuestion,
   MemoryTrackerLite,
   RecallPrompt,
-} from "@generated/doughnut-backend-api"
+} from "@generated/donut-backend-api"
 import { afterEach, beforeEach, vi } from "vitest"
 import { spellingAnswerInputSelector } from "@tests/components/recall/spellingQuestionDisplayTestSupport"
 import { createDeferredGate } from "@tests/components/recall/noteRefinementTestSupport"

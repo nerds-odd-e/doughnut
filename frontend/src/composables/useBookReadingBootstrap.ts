@@ -5,8 +5,8 @@ import type {
   ContentLocatorFull,
   EpubLocatorFull,
   PdfLocatorFull,
-} from "@generated/doughnut-backend-api"
-import { NotebookBooksController } from "@generated/doughnut-backend-api/sdk.gen"
+} from "@generated/donut-backend-api"
+import { NotebookBooksController } from "@generated/donut-backend-api/sdk.gen"
 import { onMounted, ref, type Ref } from "vue"
 
 export type BookReadingBootstrap =

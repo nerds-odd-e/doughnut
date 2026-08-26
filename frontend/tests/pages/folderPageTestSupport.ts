@@ -1,6 +1,6 @@
-import type { Notebook } from "@generated/doughnut-backend-api"
+import type { Notebook } from "@generated/donut-backend-api"
 import type { NotebookCatalogEntry } from "@/components/notebook/patchNotebookInCatalogItems"
-import { NotebookController } from "@generated/doughnut-backend-api/sdk.gen"
+import { NotebookController } from "@generated/donut-backend-api/sdk.gen"
 import FolderPage from "@/pages/FolderPage.vue"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
 import makeMe from "donut-test-fixtures/makeMe"

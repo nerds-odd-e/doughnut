@@ -1,4 +1,4 @@
-import { NotebookController } from "@generated/doughnut-backend-api/sdk.gen"
+import { NotebookController } from "@generated/donut-backend-api/sdk.gen"
 import NotebookSidebarLayout from "@/layouts/NotebookSidebarLayout.vue"
 import { noteShowLocation } from "@/routes/noteShowLocation"
 import routes from "@/routes/routes"

@@ -1,4 +1,4 @@
-import { UserController } from "@generated/doughnut-backend-api/sdk.gen"
+import { UserController } from "@generated/donut-backend-api/sdk.gen"
 import RecallStatsSettingsTab from "@/pages/settings/RecallStatsSettingsTab.vue"
 import helper, { mockSdkService } from "@tests/helpers"
 import timezoneParam from "@/managedApi/window/timezoneParam"
@@ -7,7 +7,7 @@ import type {
   DayCount,
   DayAvgResponseTime,
   DayRetention,
-} from "@generated/doughnut-backend-api"
+} from "@generated/donut-backend-api"
 import { flushPromises } from "@vue/test-utils"
 import { describe, it, expect, beforeEach, vi } from "vitest"
 

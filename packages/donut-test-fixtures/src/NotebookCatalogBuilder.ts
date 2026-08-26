@@ -3,7 +3,7 @@ import type {
   NotebookCatalogGroupItem,
   NotebookCatalogNotebookItem,
   NotebookCatalogSubscribedNotebookItem,
-} from '@generated/doughnut-backend-api'
+} from '@generated/donut-backend-api'
 import Builder from './Builder'
 import NotebookCatalogGroupItemBuilder from './NotebookCatalogGroupItemBuilder'
 import NotebookCatalogNotebookItemBuilder from './NotebookCatalogNotebookItemBuilder'

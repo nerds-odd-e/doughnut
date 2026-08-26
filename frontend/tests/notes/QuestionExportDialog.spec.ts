@@ -1,4 +1,4 @@
-import { McqController } from "@generated/doughnut-backend-api/sdk.gen"
+import { McqController } from "@generated/donut-backend-api/sdk.gen"
 import { describe, it, vi, expect, beforeEach, afterEach } from "vitest"
 import { nextTick } from "vue"
 import helper, {

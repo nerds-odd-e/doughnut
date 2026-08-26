@@ -1,4 +1,4 @@
-import type { BookBlockReadingRecordListItem } from "@generated/doughnut-backend-api"
+import type { BookBlockReadingRecordListItem } from "@generated/donut-backend-api"
 import {
   readBlockIdsFromRecords,
   readingDispositionByBlockId,

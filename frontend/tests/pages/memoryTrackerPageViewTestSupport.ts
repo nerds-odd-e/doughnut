@@ -3,8 +3,8 @@ import type {
   RecallPromptHistoryItem,
   RecallLog,
   RecallHistoryItem,
-} from "@generated/doughnut-backend-api"
-import { MemoryTrackerController } from "@generated/doughnut-backend-api/sdk.gen"
+} from "@generated/donut-backend-api"
+import { MemoryTrackerController } from "@generated/donut-backend-api/sdk.gen"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
 import makeMe from "donut-test-fixtures/makeMe"
 import helper, { mockSdkService } from "@tests/helpers"

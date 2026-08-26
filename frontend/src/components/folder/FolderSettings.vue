@@ -80,7 +80,7 @@
 </template>
 
 <script setup lang="ts">
-import type { FolderRealm } from "@generated/doughnut-backend-api"
+import type { FolderRealm } from "@generated/donut-backend-api"
 import { toRef } from "vue"
 import FolderSelector from "@/components/notes/FolderSelector.vue"
 import { useFolderAdmin } from "@/composables/useFolderAdmin"

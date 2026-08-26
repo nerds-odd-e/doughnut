@@ -1,7 +1,7 @@
 import type {
   MemoryTracker,
   NoteRecallInfo,
-} from "@generated/doughnut-backend-api"
+} from "@generated/donut-backend-api"
 
 function isNoteLevelMemoryTracker(mt: MemoryTracker) {
   return !mt.propertyKey

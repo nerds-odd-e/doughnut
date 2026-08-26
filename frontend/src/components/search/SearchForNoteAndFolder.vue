@@ -151,7 +151,7 @@ import { ref } from "vue"
 import { BookOpen, Clock, Sparkles, Users, X } from "@lucide/vue"
 import TextInput from "../form/TextInput.vue"
 import SearchResults from "./SearchResults.vue"
-import type { NoteSearchResult } from "@generated/doughnut-backend-api"
+import type { NoteSearchResult } from "@generated/donut-backend-api"
 import { readSearchKeyHistory } from "@/utils/searchKeyHistoryCookie"
 import {
   bindSearchDialogListKeydown,

@@ -1,4 +1,4 @@
-import { CircleController } from "@generated/doughnut-backend-api/sdk.gen"
+import { CircleController } from "@generated/donut-backend-api/sdk.gen"
 import CircleShowPage from "@/pages/CircleShowPage.vue"
 import { describe, it, beforeEach, expect } from "vitest"
 import makeMe from "donut-test-fixtures/makeMe"

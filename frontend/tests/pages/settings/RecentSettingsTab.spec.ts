@@ -1,4 +1,4 @@
-import { MemoryTrackerController } from "@generated/doughnut-backend-api/sdk.gen"
+import { MemoryTrackerController } from "@generated/donut-backend-api/sdk.gen"
 import { describe, it, expect, beforeEach, vi } from "vitest"
 import RecentSettingsTab from "@/pages/settings/RecentSettingsTab.vue"
 import routes from "@/routes/routes"

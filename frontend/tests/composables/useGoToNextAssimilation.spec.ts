@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from "vitest"
-import type { AssimilationNextDto } from "@generated/doughnut-backend-api"
-import { AssimilationController } from "@generated/doughnut-backend-api/sdk.gen"
+import type { AssimilationNextDto } from "@generated/donut-backend-api"
+import { AssimilationController } from "@generated/donut-backend-api/sdk.gen"
 import {
   DAILY_GOAL_TOAST,
   NO_MORE_TOAST,

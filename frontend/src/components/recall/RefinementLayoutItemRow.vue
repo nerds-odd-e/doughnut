@@ -24,7 +24,7 @@
 </template>
 
 <script setup lang="ts">
-import type { NoteRefinementLayoutItem } from "@generated/doughnut-backend-api"
+import type { NoteRefinementLayoutItem } from "@generated/donut-backend-api"
 
 defineProps<{
   item: NoteRefinementLayoutItem

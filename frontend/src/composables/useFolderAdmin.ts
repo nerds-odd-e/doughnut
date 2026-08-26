@@ -1,5 +1,5 @@
-import type { Folder, FolderRealm } from "@generated/doughnut-backend-api"
-import { NotebookController } from "@generated/doughnut-backend-api/sdk.gen"
+import type { Folder, FolderRealm } from "@generated/donut-backend-api"
+import { NotebookController } from "@generated/donut-backend-api/sdk.gen"
 import { computed, onMounted, ref, watch, type Ref } from "vue"
 import { useRouter } from "vue-router"
 import { notebooksFromCatalogItems } from "@/components/notebook/notebooksFromCatalogItems"

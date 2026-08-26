@@ -91,10 +91,10 @@ import RetentionTrendChart from "@/components/recallStats/RetentionTrendChart.vu
 import WeekdayHourHeatmap from "@/components/recallStats/WeekdayHourHeatmap.vue"
 import AmPmResponseTimeChart from "@/components/recallStats/AmPmResponseTimeChart.vue"
 import ContentLoader from "@/components/commons/ContentLoader.vue"
-import { UserController } from "@generated/doughnut-backend-api/sdk.gen"
+import { UserController } from "@generated/donut-backend-api/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import timezoneParam from "@/managedApi/window/timezoneParam"
-import type { RecallStatsDto } from "@generated/doughnut-backend-api"
+import type { RecallStatsDto } from "@generated/donut-backend-api"
 import { computed, onMounted, ref } from "vue"
 
 const stats = ref<RecallStatsDto | undefined>()

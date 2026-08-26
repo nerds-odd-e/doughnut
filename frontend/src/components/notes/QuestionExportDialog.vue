@@ -8,7 +8,7 @@
 
 <script setup lang="ts">
 import AiRequestExportDialog from "@/components/commons/AiRequestExportDialog.vue"
-import { McqController } from "@generated/doughnut-backend-api/sdk.gen"
+import { McqController } from "@generated/donut-backend-api/sdk.gen"
 import {} from "@/managedApi/clientSetup"
 
 const props = defineProps<{

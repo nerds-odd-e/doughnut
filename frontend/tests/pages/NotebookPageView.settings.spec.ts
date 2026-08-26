@@ -1,4 +1,4 @@
-import { NotebookController } from "@generated/doughnut-backend-api/sdk.gen"
+import { NotebookController } from "@generated/donut-backend-api/sdk.gen"
 import { wrapSdkError, wrapSdkResponse } from "@tests/helpers"
 import { flushPromises } from "@vue/test-utils"
 import { afterEach, describe, it, expect, vi } from "vitest"

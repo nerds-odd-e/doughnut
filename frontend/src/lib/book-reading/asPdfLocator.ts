@@ -2,7 +2,7 @@ import type {
   BookBlockFull,
   ContentLocatorFull,
   PdfLocatorFull,
-} from "@generated/doughnut-backend-api"
+} from "@generated/donut-backend-api"
 
 export function asPdfLocator(loc: ContentLocatorFull): PdfLocatorFull | null {
   if (loc.type !== "PdfLocator_Full") {

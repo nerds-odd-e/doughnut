@@ -40,14 +40,14 @@ const commonConfig = {
         repoRoot,
         'packages',
         'generated',
-        'doughnut-backend-api'
+        'donut-backend-api'
       )
       on(
         'file:preprocessor',
         createBundler({
           plugins: [createEsbuildPlugin(config)],
           alias: {
-            '@generated/doughnut-backend-api': generatedBackendPath,
+            '@generated/donut-backend-api': generatedBackendPath,
           },
         })
       )

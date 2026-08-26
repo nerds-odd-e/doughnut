@@ -46,7 +46,7 @@
 </template>
 
 <script setup lang="ts">
-import type { DayCount } from "@generated/doughnut-backend-api"
+import type { DayCount } from "@generated/donut-backend-api"
 import { computed } from "vue"
 
 const props = defineProps<{ calendar: DayCount[] }>()

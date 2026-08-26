@@ -1,4 +1,4 @@
-import { NotebookController } from "@generated/doughnut-backend-api/sdk.gen"
+import { NotebookController } from "@generated/donut-backend-api/sdk.gen"
 import { VueWrapper, flushPromises } from "@vue/test-utils"
 import type { ComponentPublicInstance } from "vue"
 import { mockSdkService, testFolderStub } from "@tests/helpers"

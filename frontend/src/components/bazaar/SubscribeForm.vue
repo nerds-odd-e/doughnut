@@ -23,8 +23,8 @@
 
 <script lang="ts">
 import TextInput from "@/components/form/TextInput.vue"
-import type { Notebook, SubscriptionDto } from "@generated/doughnut-backend-api"
-import { SubscriptionController } from "@generated/doughnut-backend-api/sdk.gen"
+import type { Notebook, SubscriptionDto } from "@generated/donut-backend-api"
+import { SubscriptionController } from "@generated/donut-backend-api/sdk.gen"
 import { toOpenApiError } from "@/managedApi/openApiError"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import type { PropType } from "vue"

@@ -18,9 +18,9 @@
 </template>
 
 <script setup lang="ts">
-import type { User } from "@generated/doughnut-backend-api"
+import type { User } from "@generated/donut-backend-api"
 import type { PropType } from "vue"
-import { UserController } from "@generated/doughnut-backend-api/sdk.gen"
+import { UserController } from "@generated/donut-backend-api/sdk.gen"
 import { watch, computed } from "vue"
 import { useAssimilationCount } from "@/composables/useAssimilationCount"
 import timezoneParam from "@/managedApi/window/timezoneParam"

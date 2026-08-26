@@ -2,7 +2,7 @@ import {
   NoteController,
   SearchController,
   TextContentController,
-} from "@generated/doughnut-backend-api/sdk.gen"
+} from "@generated/donut-backend-api/sdk.gen"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import createNoteStorage from "@/store/createNoteStorage"
 import { fireEvent, screen } from "@testing-library/vue"

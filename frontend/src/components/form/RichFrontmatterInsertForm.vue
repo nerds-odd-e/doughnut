@@ -113,7 +113,7 @@ import RichFrontmatterImagePropertyValue from "@/components/form/RichFrontmatter
 import RichFrontmatterPropertyExternalLink from "@/components/form/RichFrontmatterPropertyExternalLink.vue"
 import RichFrontmatterPropertyKeyPresets from "@/components/form/RichFrontmatterPropertyKeyPresets.vue"
 import PropertyValueField from "@/components/form/PropertyValueField.vue"
-import type { WikiTitle } from "@generated/doughnut-backend-api"
+import type { WikiTitle } from "@generated/donut-backend-api"
 import {
   isImagePropertyKey,
   isUrlPropertyKey,

@@ -1,6 +1,6 @@
 import { readFile } from 'node:fs/promises'
 import { basename } from 'node:path'
-import type { AttachBookRequestFull } from '../../../packages/generated/doughnut-backend-api/types.gen.js'
+import type { AttachBookRequestFull } from '../../../packages/generated/donut-backend-api/types.gen.js'
 import {
   configureClient,
   getApiConfig,

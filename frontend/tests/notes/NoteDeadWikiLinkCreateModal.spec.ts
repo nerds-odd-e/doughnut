@@ -2,7 +2,7 @@ import {
   NoteController,
   NotebookController,
   SearchController,
-} from "@generated/doughnut-backend-api/sdk.gen"
+} from "@generated/donut-backend-api/sdk.gen"
 import NoteDeadWikiLinkCreateModal from "@/components/notes/NoteDeadWikiLinkCreateModal.vue"
 import { mockCoarsePointer } from "@tests/helpers/mockCoarsePointer"
 import {

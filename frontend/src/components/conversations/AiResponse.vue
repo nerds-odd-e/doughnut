@@ -35,7 +35,7 @@
 
 <script setup lang="ts">
 import { ref, computed, watch } from "vue"
-import type { Conversation } from "@generated/doughnut-backend-api"
+import type { Conversation } from "@generated/donut-backend-api"
 import type { ToolCallResult } from "@/models/aiReplyState"
 import { Bot } from "@lucide/vue"
 import markdownizer from "../form/markdownizer"

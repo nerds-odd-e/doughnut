@@ -1,4 +1,4 @@
-import { client } from '@generated/doughnut-backend-api/client.gen'
+import { client } from '@generated/donut-backend-api/client.gen'
 import {
   MemoryTrackerController,
   NotebookBooksController,
@@ -6,7 +6,7 @@ import {
   RecallsController,
   RecallPromptController,
   UserController,
-} from '@generated/doughnut-backend-api/sdk.gen'
+} from '@generated/donut-backend-api/sdk.gen'
 import type {
   Answer,
   AnswerDto,
@@ -30,7 +30,7 @@ import type {
   SpellingQuestion,
   TokenConfigDto,
   UserToken,
-} from '@generated/doughnut-backend-api'
+} from '@generated/donut-backend-api'
 
 let sdkHttpStatusOnErrorInterceptorInstalled = false
 
@@ -104,4 +104,4 @@ export type {
   TokenConfigDto,
   UserToken,
 }
-export type { RequestOptions } from '@generated/doughnut-backend-api/client/types.gen'
+export type { RequestOptions } from '@generated/donut-backend-api/client/types.gen'

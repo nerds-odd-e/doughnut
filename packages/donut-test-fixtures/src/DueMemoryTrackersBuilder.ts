@@ -2,7 +2,7 @@ import type {
   DueMemoryTrackers,
   DueCommissionedMemoryTrackerLite,
   MemoryTrackerLite,
-} from '@generated/doughnut-backend-api'
+} from '@generated/donut-backend-api'
 import Builder from './Builder'
 
 class DueMemoryTrackersBuilder extends Builder<DueMemoryTrackers> {

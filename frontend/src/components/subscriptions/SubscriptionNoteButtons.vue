@@ -67,8 +67,8 @@ import { ref } from "vue"
 import type {
   Subscription,
   SubscriptionForNotebooksListing,
-} from "@generated/doughnut-backend-api"
-import { SubscriptionController } from "@generated/doughnut-backend-api/sdk.gen"
+} from "@generated/donut-backend-api"
+import { SubscriptionController } from "@generated/donut-backend-api/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import Modal from "../commons/Modal.vue"
 import AutoCollapseDropdown from "../commons/AutoCollapseDropdown.vue"

@@ -66,7 +66,7 @@
 </template>
 
 <script setup lang="ts">
-import type { Note } from "@generated/doughnut-backend-api"
+import type { Note } from "@generated/donut-backend-api"
 import NoteInfoComponent from "../notes/NoteInfoComponent.vue"
 import AssimilationButtons from "./AssimilationButtons.vue"
 import AssimilationProgressSummary from "./AssimilationProgressSummary.vue"

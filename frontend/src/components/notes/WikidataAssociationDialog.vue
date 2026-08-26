@@ -45,7 +45,7 @@
 
 <script setup lang="ts">
 import { ref } from "vue"
-import type { WikidataSearchEntity } from "@generated/doughnut-backend-api"
+import type { WikidataSearchEntity } from "@generated/donut-backend-api"
 import Modal from "../commons/Modal.vue"
 import WikidataAssociationDialogBody from "./WikidataAssociationDialogBody.vue"
 

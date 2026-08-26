@@ -1,4 +1,4 @@
-import type { HealthFindingGroup } from "@generated/doughnut-backend-api"
+import type { HealthFindingGroup } from "@generated/donut-backend-api"
 import NotebookHealthFindings from "@/components/notebook/NotebookHealthFindings.vue"
 import { noteShowLocation } from "@/routes/noteShowLocation"
 import helper from "@tests/helpers"

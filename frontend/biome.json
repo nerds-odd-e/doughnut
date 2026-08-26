@@ -23,7 +23,7 @@
       "!**/farm.config.ts",
       "!**/index.d.ts",
       "!**/index.html",
-      "!**/packages/generated/doughnut-backend-api/**",
+      "!**/packages/generated/donut-backend-api/**",
       "!**/shims-vue.d.ts",
       "!**/storyFiles.generated.ts",
       "!**/tests/**/*.js",

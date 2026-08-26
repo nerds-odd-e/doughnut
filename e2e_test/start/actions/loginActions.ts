@@ -1,6 +1,6 @@
 import { waitUntilAppIsNotBusy } from '../pageBase'
 import { mainMenu } from '../pageObjects/mainMenu'
-import { HealthCheckController } from '@generated/doughnut-backend-api/sdk.gen'
+import { HealthCheckController } from '@generated/donut-backend-api/sdk.gen'
 
 export const loginActions = {
   logout() {

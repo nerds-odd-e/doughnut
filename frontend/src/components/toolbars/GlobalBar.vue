@@ -26,7 +26,7 @@
 
 <script setup lang="ts">
 import type { Ref } from "vue"
-import type { User } from "@generated/doughnut-backend-api"
+import type { User } from "@generated/donut-backend-api"
 import { inject, ref } from "vue"
 import { Search } from "@lucide/vue"
 import PopButton from "@/components/commons/Popups/PopButton.vue"

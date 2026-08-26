@@ -1,5 +1,5 @@
-import { AiController } from "@generated/doughnut-backend-api/sdk.gen"
-import type { NoteRefinementLayoutItem } from "@generated/doughnut-backend-api"
+import { AiController } from "@generated/donut-backend-api/sdk.gen"
+import type { NoteRefinementLayoutItem } from "@generated/donut-backend-api"
 import { mockSdkServiceWithImplementation } from "@tests/helpers"
 import { screen } from "@testing-library/vue"
 import { nextTick } from "vue"

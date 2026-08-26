@@ -1,14 +1,14 @@
 ---
-description: Frontend API integration for files importing @generated/doughnut-backend-api/sdk.gen, apiCallWithLoading, blockUi loading, data-app-busy / waitUntilAppIsNotBusy E2E pairing, wrapped responses, toOpenApiError
+description: Frontend API integration for files importing @generated/donut-backend-api/sdk.gen, apiCallWithLoading, blockUi loading, data-app-busy / waitUntilAppIsNotBusy E2E pairing, wrapped responses, toOpenApiError
 alwaysApply: false
 ---
 # Frontend API Rules
 
-Use this rule when frontend code imports services from `@generated/doughnut-backend-api/sdk.gen`, handles wrapped API responses, or maps backend validation errors.
+Use this rule when frontend code imports services from `@generated/donut-backend-api/sdk.gen`, handles wrapped API responses, or maps backend validation errors.
 
 ## API Integration
 
-- Import services directly from `@generated/doughnut-backend-api/sdk.gen`.
+- Import services directly from `@generated/donut-backend-api/sdk.gen`.
 - Use the wrapped response pattern: `{ data, error, request, response }`.
 - Follow the API types from generated code.
 - Use `apiCallWithLoading` for user-initiated actions that need loading indicators.
@@ -16,7 +16,7 @@ Use this rule when frontend code imports services from `@generated/doughnut-back
 - Non-wrapped calls are silent: no loading state and no error toasts.
 
 ```typescript
-import { UserController } from "@generated/doughnut-backend-api/sdk.gen"
+import { UserController } from "@generated/donut-backend-api/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 
 const { data: newUser, error } = await apiCallWithLoading(() =>
@@ -165,7 +165,7 @@ After a Cypress action that starts loading work, call `waitUntilAppIsNotBusy()` 
 The global client is configured with `responseStyle: "fields"` and `throwOnError: false`, so services return a wrapped response: `{ data, error, request, response }`.
 
 ```typescript
-import { getTokens } from "@generated/doughnut-backend-api/sdk.gen"
+import { getTokens } from "@generated/donut-backend-api/sdk.gen"
 
 const { data: tokens, error } = await getTokens()
 

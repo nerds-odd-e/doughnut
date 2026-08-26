@@ -1,5 +1,5 @@
 import QuestionGenerationBatchStatus from "@/components/admin/QuestionGenerationBatchStatus.vue"
-import { AdminQuestionGenerationBatchController } from "@generated/doughnut-backend-api/sdk.gen"
+import { AdminQuestionGenerationBatchController } from "@generated/donut-backend-api/sdk.gen"
 import { flushPromises } from "@vue/test-utils"
 import { beforeEach, describe, expect, it } from "vitest"
 import helper, {

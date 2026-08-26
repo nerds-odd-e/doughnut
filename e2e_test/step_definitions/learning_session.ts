@@ -4,7 +4,7 @@
 
 import { Given, Then, When } from '@badeball/cypress-cucumber-preprocessor'
 import type { DataTable } from '@cucumber/cucumber'
-import { LearningSessionController } from '@generated/doughnut-backend-api/sdk.gen'
+import { LearningSessionController } from '@generated/donut-backend-api/sdk.gen'
 import start from '../start'
 
 const SESSION_ITEM_GRADES_OPEN_TAG = '<session_item_grades>'

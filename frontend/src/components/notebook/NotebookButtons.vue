@@ -67,7 +67,7 @@
 import { computed, inject, ref, type ComputedRef } from "vue"
 import { useRouter } from "vue-router"
 import { BookOpen, MoreHorizontal } from "@lucide/vue"
-import type { Notebook, User } from "@generated/doughnut-backend-api"
+import type { Notebook, User } from "@generated/donut-backend-api"
 import BazaarNotebookButtons from "@/components/bazaar/BazaarNotebookButtons.vue"
 import AutoCollapseDropdown from "@/components/commons/AutoCollapseDropdown.vue"
 import DropdownMenu from "@/components/commons/DropdownMenu.vue"

@@ -2,7 +2,7 @@ import type {
   BookNavigationTarget,
   NormalizedPageBbox,
 } from "@/lib/book-reading/pdfOutlineV1Anchor"
-import type { ContentLocatorFull } from "@generated/doughnut-backend-api"
+import type { ContentLocatorFull } from "@generated/donut-backend-api"
 
 export type ViewerLocatorRect = {
   top: number

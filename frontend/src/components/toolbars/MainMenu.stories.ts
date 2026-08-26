@@ -1,13 +1,13 @@
 import type { Meta, StoryObj } from "@storybook/vue3-vite"
 import MainMenu from "./MainMenu.vue"
 import makeMe from "donut-test-fixtures/makeMe"
-import { UserController } from "@generated/doughnut-backend-api/sdk.gen"
+import { UserController } from "@generated/donut-backend-api/sdk.gen"
 import type {
   MenuDataDto,
   ConversationMessage,
-} from "@generated/doughnut-backend-api"
-import type { Options } from "@generated/doughnut-backend-api/client/types.gen"
-import type { GetMenuDataData } from "@generated/doughnut-backend-api"
+} from "@generated/donut-backend-api"
+import type { Options } from "@generated/donut-backend-api/client/types.gen"
+import type { GetMenuDataData } from "@generated/donut-backend-api"
 
 const meta = {
   title: "Toolbars/MainMenu",

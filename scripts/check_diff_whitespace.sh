@@ -7,4 +7,4 @@ cd "$repo_root"
 
 git diff --check "$@" -- . \
 	":(exclude)open_api_docs.yaml" \
-	":(exclude)packages/generated/doughnut-backend-api/**"
+	":(exclude)packages/generated/donut-backend-api/**"

@@ -13,7 +13,7 @@
 </template>
 
 <script setup lang="ts">
-import type { Folder } from "@generated/doughnut-backend-api"
+import type { Folder } from "@generated/donut-backend-api"
 import type { PropType } from "vue"
 import BasicBreadcrumb from "@/components/commons/BasicBreadcrumb.vue"
 

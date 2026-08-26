@@ -56,7 +56,7 @@
 
 <script setup lang="ts">
 import { onMounted, ref, computed, watch, inject, type Ref } from "vue"
-import { ConversationMessageController } from "@generated/doughnut-backend-api/sdk.gen"
+import { ConversationMessageController } from "@generated/donut-backend-api/sdk.gen"
 import {} from "@/managedApi/clientSetup"
 import GlobalBar from "@/components/toolbars/GlobalBar.vue"
 import ContentLoader from "@/components/commons/ContentLoader.vue"
@@ -66,7 +66,7 @@ import type {
   Conversation,
   ConversationListItem,
   User,
-} from "@generated/doughnut-backend-api"
+} from "@generated/donut-backend-api"
 import { messageCenter } from "@/store/messageCenter"
 import { useRouter } from "vue-router"
 

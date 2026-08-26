@@ -124,7 +124,7 @@
 import type {
   Note,
   NoteRefinementQuestionContextDto,
-} from "@generated/doughnut-backend-api"
+} from "@generated/donut-backend-api"
 import AiRequestExportDialog from "@/components/commons/AiRequestExportDialog.vue"
 import { useNoteRefinement } from "@/composables/useNoteRefinement"
 import NoteExtractionPreview from "./NoteExtractionPreview.vue"

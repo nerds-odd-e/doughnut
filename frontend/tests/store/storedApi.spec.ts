@@ -2,7 +2,7 @@ import {
   NoteController,
   RelationController,
   TextContentController,
-} from "@generated/doughnut-backend-api/sdk.gen"
+} from "@generated/donut-backend-api/sdk.gen"
 import type { Router } from "vue-router"
 import { noteShowLocation } from "@/routes/noteShowLocation"
 import createNoteStorage from "@/store/createNoteStorage"

@@ -21,8 +21,8 @@ import { computed, ref, onMounted } from "vue"
 import type {
   RecallHistoryItem,
   MemoryTracker,
-} from "@generated/doughnut-backend-api"
-import { MemoryTrackerController } from "@generated/doughnut-backend-api/sdk.gen"
+} from "@generated/donut-backend-api"
+import { MemoryTrackerController } from "@generated/donut-backend-api/sdk.gen"
 import {} from "@/managedApi/clientSetup"
 import ContainerPage from "@/pages/commons/ContainerPage.vue"
 import ContentLoader from "@/components/commons/ContentLoader.vue"

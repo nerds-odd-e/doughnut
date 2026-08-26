@@ -1,4 +1,4 @@
-import { BazaarController } from "@generated/doughnut-backend-api/sdk.gen"
+import { BazaarController } from "@generated/donut-backend-api/sdk.gen"
 import BazaarPage from "@/pages/BazaarPage.vue"
 import { describe, it, expect } from "vitest"
 import makeMe from "donut-test-fixtures/makeMe"

@@ -64,7 +64,7 @@ import type {
   WikidataSearchEntity,
   Note,
   NoteCreationDto,
-} from "@generated/doughnut-backend-api"
+} from "@generated/donut-backend-api"
 import { ref, computed, watch } from "vue"
 import SearchResults from "../search/SearchResults.vue"
 import FolderSelector from "./FolderSelector.vue"

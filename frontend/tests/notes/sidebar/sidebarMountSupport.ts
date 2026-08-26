@@ -1,5 +1,5 @@
 import Sidebar from "@/components/notes/Sidebar.vue"
-import type { NoteRealm } from "@generated/doughnut-backend-api"
+import type { NoteRealm } from "@generated/donut-backend-api"
 import makeMe from "donut-test-fixtures/makeMe"
 import { type VueWrapper, DOMWrapper, flushPromises } from "@vue/test-utils"
 import { computed, defineComponent } from "vue"

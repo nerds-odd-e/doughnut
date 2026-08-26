@@ -2,14 +2,14 @@ import {
   NoteController,
   NotebookController,
   TextContentController,
-} from "@generated/doughnut-backend-api/sdk.gen"
+} from "@generated/donut-backend-api/sdk.gen"
 import MatchedNoteWikiLinkOrRelationshipOffer from "@/components/recall/MatchedNoteWikiLinkOrRelationshipOffer.vue"
 import RelationTypeSelect from "@/components/wiki-link-or-relationship/RelationTypeSelect.vue"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import helper, { mockSdkService, testFolderStub } from "@tests/helpers"
 import { teardownGlobalClientForTesting } from "@/managedApi/clientSetup"
 import makeMe from "donut-test-fixtures/makeMe"
-import type { NoteRealm } from "@generated/doughnut-backend-api"
+import type { NoteRealm } from "@generated/donut-backend-api"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest"
 

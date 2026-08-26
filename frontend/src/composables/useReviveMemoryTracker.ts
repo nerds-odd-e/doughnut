@@ -1,8 +1,8 @@
 import type {
   MemoryTracker,
   NoteRecallInfo,
-} from "@generated/doughnut-backend-api"
-import { MemoryTrackerController } from "@generated/doughnut-backend-api/sdk.gen"
+} from "@generated/donut-backend-api"
+import { MemoryTrackerController } from "@generated/donut-backend-api/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import { useRecallData } from "@/composables/useRecallData"
 

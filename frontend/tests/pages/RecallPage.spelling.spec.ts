@@ -1,9 +1,9 @@
 import {
   MemoryTrackerController,
   RecallPromptController,
-} from "@generated/doughnut-backend-api/sdk.gen"
+} from "@generated/donut-backend-api/sdk.gen"
 import { useRecallData } from "@/composables/useRecallData"
-import type { AnsweredQuestion } from "@generated/doughnut-backend-api"
+import type { AnsweredQuestion } from "@generated/donut-backend-api"
 import makeMe from "donut-test-fixtures/makeMe"
 import { mockSdkService, wrapSdkResponse } from "@tests/helpers"
 import { focusDirective } from "@tests/helpers/softKeyboardPrimerTestSupport"

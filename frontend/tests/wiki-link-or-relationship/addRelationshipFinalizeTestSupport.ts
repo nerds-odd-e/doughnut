@@ -2,13 +2,13 @@ import {
   NoteController,
   NotebookController,
   TextContentController,
-} from "@generated/doughnut-backend-api/sdk.gen"
+} from "@generated/donut-backend-api/sdk.gen"
 import AddRelationshipFinalize from "@/components/wiki-link-or-relationship/AddRelationshipFinalize.vue"
 import type {
   Note,
   NoteRealm,
   NoteSearchResult,
-} from "@generated/doughnut-backend-api"
+} from "@generated/donut-backend-api"
 import helper, {
   mockSdkService,
   mockSdkServiceWithImplementation,

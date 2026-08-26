@@ -4,7 +4,7 @@ import {
   setupGlobalClient,
   teardownGlobalClientForTesting,
 } from "@/managedApi/clientSetup"
-import { NotebookBooksController } from "@generated/doughnut-backend-api/sdk.gen"
+import { NotebookBooksController } from "@generated/donut-backend-api/sdk.gen"
 import { wrapSdkResponse } from "@tests/helpers"
 import makeMe from "donut-test-fixtures/makeMe"
 import { flushPromises } from "@vue/test-utils"

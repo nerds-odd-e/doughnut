@@ -1,4 +1,4 @@
-import type { BookBlockFull } from "@generated/doughnut-backend-api"
+import type { BookBlockFull } from "@generated/donut-backend-api"
 
 /**
  * The last direct-content locator in a block, shared by PDF and EPUB readers for

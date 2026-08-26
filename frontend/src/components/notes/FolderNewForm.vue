@@ -37,8 +37,8 @@
 </template>
 
 <script setup lang="ts">
-import type { Folder } from "@generated/doughnut-backend-api"
-import { NotebookController } from "@generated/doughnut-backend-api/sdk.gen"
+import type { Folder } from "@generated/donut-backend-api"
+import { NotebookController } from "@generated/donut-backend-api/sdk.gen"
 import { ref, watch } from "vue"
 import { useRouter } from "vue-router"
 import PathNameEditor from "@/components/notes/core/PathNameEditor.vue"

@@ -1,17 +1,17 @@
 /// <reference types="Cypress" />
 // @ts-check
-import type { Randomization } from '@generated/doughnut-backend-api'
+import type { Randomization } from '@generated/donut-backend-api'
 import type ServiceMocker from '../support/ServiceMocker'
-import type { NoteTestData } from '@generated/doughnut-backend-api'
-import type { McqsTestData } from '@generated/doughnut-backend-api'
+import type { NoteTestData } from '@generated/donut-backend-api'
+import type { McqsTestData } from '@generated/donut-backend-api'
 import type {
   AttachBookRequestFull,
   Folder,
   FolderCreationRequest,
   NoteRealm,
   NotebooksViewedByUser,
-} from '@generated/doughnut-backend-api'
-import type { NotesTestDataWritable } from '@generated/doughnut-backend-api'
+} from '@generated/donut-backend-api'
+import type { NotesTestDataWritable } from '@generated/donut-backend-api'
 import {
   ConversationMessageController,
   NoteController,
@@ -19,7 +19,7 @@ import {
   NotebookController,
   TestabilityRestController,
   TextContentController,
-} from '@generated/doughnut-backend-api/sdk.gen'
+} from '@generated/donut-backend-api/sdk.gen'
 import { circleIdAlias } from './pageObjects/circlePage'
 import { assimilateTestabilityMethods } from './testabilityAssimilate'
 import { bazaarTestabilityMethods } from './testabilityBazaar'

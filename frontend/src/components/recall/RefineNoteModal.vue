@@ -39,7 +39,7 @@
 import type {
   Note,
   NoteRefinementQuestionContextDto,
-} from "@generated/doughnut-backend-api"
+} from "@generated/donut-backend-api"
 import { useDaisyDialog } from "@/composables/useDaisyDialog"
 import { ref, toRef, watch } from "vue"
 import NoteRefinement from "./NoteRefinement.vue"

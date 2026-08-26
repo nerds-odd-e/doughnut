@@ -3,8 +3,8 @@ import type {
   BookBlockFull,
   BookFull,
   BookMutationResponseFull,
-} from "@generated/doughnut-backend-api"
-import { NotebookBooksController } from "@generated/doughnut-backend-api/sdk.gen"
+} from "@generated/donut-backend-api"
+import { NotebookBooksController } from "@generated/donut-backend-api/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import { predecessorBookBlockIdInPreorder } from "@/lib/book-reading/predecessorBookBlockIdInPreorder"
 

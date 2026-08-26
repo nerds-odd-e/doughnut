@@ -8,7 +8,7 @@
 
 <script setup lang="ts">
 import type { PropType } from "vue"
-import type { BazaarNotebook } from "@generated/doughnut-backend-api"
+import type { BazaarNotebook } from "@generated/donut-backend-api"
 import NotebookCardsWithButtons from "../notebook/NotebookCardsWithButtons.vue"
 import BazaarNotebookButtons from "./BazaarNotebookButtons.vue"
 

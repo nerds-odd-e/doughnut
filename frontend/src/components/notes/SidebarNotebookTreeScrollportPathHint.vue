@@ -34,7 +34,7 @@
 </template>
 
 <script setup lang="ts">
-import type { Folder } from "@generated/doughnut-backend-api"
+import type { Folder } from "@generated/donut-backend-api"
 import { ChevronUp } from "@lucide/vue"
 import { computed, onBeforeUnmount, ref, watch } from "vue"
 import { RouterLink } from "vue-router"

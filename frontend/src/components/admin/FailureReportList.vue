@@ -196,8 +196,8 @@
 <script setup lang="ts">
 import { useDaisyDialog } from "@/composables/useDaisyDialog"
 import { ref, computed, watch, nextTick, onMounted } from "vue"
-import type { FailureReport } from "@generated/doughnut-backend-api"
-import { FailureReportController } from "@generated/doughnut-backend-api/sdk.gen"
+import type { FailureReport } from "@generated/donut-backend-api"
+import { FailureReportController } from "@generated/donut-backend-api/sdk.gen"
 import { toOpenApiError } from "@/managedApi/openApiError"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import ContainerPage from "@/pages/commons/ContainerPage.vue"

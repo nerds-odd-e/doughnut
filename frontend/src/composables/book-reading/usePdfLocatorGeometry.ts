@@ -1,6 +1,6 @@
 import type { ViewerLocatorRect } from "@/composables/bookReaderViewerRef"
 import { locatorAsPdfNavigationTarget } from "@/composables/bookReaderViewerRef"
-import type { ContentLocatorFull } from "@generated/doughnut-backend-api"
+import type { ContentLocatorFull } from "@generated/donut-backend-api"
 import type { PDFViewer } from "pdfjs-dist/web/pdf_viewer.mjs"
 import type { Ref } from "vue"
 

@@ -1,6 +1,6 @@
 import RecallProgressBar from "@/components/recall/RecallProgressBar.vue"
 import type { PotentialLearningSession } from "@/composables/useRecallData"
-import { LearningSessionController } from "@generated/doughnut-backend-api/sdk.gen"
+import { LearningSessionController } from "@generated/donut-backend-api/sdk.gen"
 import helper, { mockSdkService } from "@tests/helpers"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import type { VueWrapper } from "@vue/test-utils"

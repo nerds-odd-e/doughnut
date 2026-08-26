@@ -2,8 +2,8 @@ import type {
   Note,
   NoteExtractionResult,
   NoteRefinementLayoutSelectionRequestDto,
-} from "@generated/doughnut-backend-api"
-import { AiController } from "@generated/doughnut-backend-api/sdk.gen"
+} from "@generated/donut-backend-api"
+import { AiController } from "@generated/donut-backend-api/sdk.gen"
 import {
   apiCallWithLoading,
   runWithBlockingApiLoading,

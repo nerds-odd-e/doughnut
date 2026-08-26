@@ -2,7 +2,7 @@ import type {
   BookBlockFull,
   EpubLocatorFull,
   PdfLocatorFull,
-} from '@generated/doughnut-backend-api'
+} from '@generated/donut-backend-api'
 import Builder from './Builder'
 
 class BookBlockFullBuilder extends Builder<BookBlockFull> {

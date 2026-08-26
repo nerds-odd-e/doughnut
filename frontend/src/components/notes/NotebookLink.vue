@@ -10,7 +10,7 @@
 
 <script setup lang="ts">
 import type { PropType } from "vue"
-import type { Notebook } from "@generated/doughnut-backend-api"
+import type { Notebook } from "@generated/donut-backend-api"
 import { BookText } from "@lucide/vue"
 
 defineProps({

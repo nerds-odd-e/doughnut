@@ -1,6 +1,6 @@
 import { useBookReadingBootstrap } from "@/composables/useBookReadingBootstrap"
-import type { PdfLocatorFull } from "@generated/doughnut-backend-api"
-import { NotebookBooksController } from "@generated/doughnut-backend-api/sdk.gen"
+import type { PdfLocatorFull } from "@generated/donut-backend-api"
+import { NotebookBooksController } from "@generated/donut-backend-api/sdk.gen"
 import { mockSdkService, wrapSdkResponse } from "@tests/helpers"
 import makeMe from "donut-test-fixtures/makeMe"
 import { flushPromises, mount, type VueWrapper } from "@vue/test-utils"

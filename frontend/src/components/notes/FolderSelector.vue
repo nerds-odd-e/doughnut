@@ -65,7 +65,7 @@
 </template>
 
 <script setup lang="ts">
-import type { Folder } from "@generated/doughnut-backend-api"
+import type { Folder } from "@generated/donut-backend-api"
 import { MoreHorizontal } from "@lucide/vue"
 import { computed, ref, toRef, watch } from "vue"
 import Modal from "@/components/commons/Modal.vue"

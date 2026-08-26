@@ -33,7 +33,7 @@
 
 <script setup lang="ts">
 import { ref, computed, nextTick } from "vue"
-import type { Note, NoteSearchResult } from "@generated/doughnut-backend-api"
+import type { Note, NoteSearchResult } from "@generated/donut-backend-api"
 import AddRelationshipFinalize from "./AddRelationshipFinalize.vue"
 import WikiLinkOrRelationshipChoice from "./WikiLinkOrRelationshipChoice.vue"
 import SearchForNoteAndFolder from "../search/SearchForNoteAndFolder.vue"

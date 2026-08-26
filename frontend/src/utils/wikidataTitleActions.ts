@@ -1,4 +1,4 @@
-import type { WikidataSearchEntity } from "@generated/doughnut-backend-api"
+import type { WikidataSearchEntity } from "@generated/donut-backend-api"
 import { appendItemToFrontmatterStringList } from "./frontmatterStringList"
 
 /**

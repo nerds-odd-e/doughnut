@@ -1,8 +1,8 @@
 import type {
   AnsweredQuestion,
   ThresholdExceededResult,
-} from "@generated/doughnut-backend-api"
-import { MemoryTrackerController } from "@generated/doughnut-backend-api/sdk.gen"
+} from "@generated/donut-backend-api"
+import { MemoryTrackerController } from "@generated/donut-backend-api/sdk.gen"
 import usePopups from "@/components/commons/Popups/usePopups"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import type { Ref } from "vue"

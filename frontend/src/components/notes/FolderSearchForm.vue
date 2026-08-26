@@ -88,8 +88,8 @@
 </template>
 
 <script setup lang="ts">
-import type { Folder } from "@generated/doughnut-backend-api"
-import { NotebookController } from "@generated/doughnut-backend-api/sdk.gen"
+import type { Folder } from "@generated/donut-backend-api"
+import { NotebookController } from "@generated/donut-backend-api/sdk.gen"
 import { Search } from "@lucide/vue"
 import { computed, nextTick, onMounted, ref, watch } from "vue"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"

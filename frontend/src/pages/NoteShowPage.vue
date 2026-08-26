@@ -40,7 +40,7 @@ import NoteShow from "../components/notes/NoteShow.vue"
 import NoteConversation from "../components/conversations/NoteConversation.vue"
 import ContentLoader from "@/components/commons/ContentLoader.vue"
 import { noteShowLocation } from "@/routes/noteShowLocation"
-import type { NoteRealm } from "@generated/doughnut-backend-api"
+import type { NoteRealm } from "@generated/donut-backend-api"
 import { useAssimilationView } from "@/composables/useAssimilationView"
 
 const router = useRouter()

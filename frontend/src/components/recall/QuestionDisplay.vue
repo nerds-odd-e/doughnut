@@ -37,7 +37,7 @@
 <script setup lang="ts">
 import { computed } from "vue"
 import type { PropType } from "vue"
-import type { Answer, AnswerDto } from "@generated/doughnut-backend-api"
+import type { Answer, AnswerDto } from "@generated/donut-backend-api"
 import InactiveRecallMask from "./InactiveRecallMask.vue"
 import QuestionChoices from "./QuestionChoices.vue"
 import QuestionStem from "./QuestionStem.vue"

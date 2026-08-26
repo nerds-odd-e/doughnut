@@ -1,4 +1,4 @@
-import { NotebookController } from "@generated/doughnut-backend-api/sdk.gen"
+import { NotebookController } from "@generated/donut-backend-api/sdk.gen"
 import NotebookNewForm from "@/components/notebook/NotebookNewForm.vue"
 import { beforeEach, describe, expect, it } from "vitest"
 import makeMe from "donut-test-fixtures/makeMe"

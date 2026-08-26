@@ -1,5 +1,5 @@
 import './clientConfig'
-import { UserController } from '@generated/doughnut-backend-api/sdk.gen'
+import { UserController } from '@generated/donut-backend-api/sdk.gen'
 import mock_services from './mock_services/index'
 import { waitUntilAppIsNotBusy as waitForAppNotBusy } from './pageBase'
 import { questionGenerationService } from './questionGenerationService'

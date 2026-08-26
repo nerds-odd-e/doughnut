@@ -14,7 +14,7 @@
 </template>
 
 <script setup lang="ts">
-import type { DayAvgResponseTime } from "@generated/doughnut-backend-api"
+import type { DayAvgResponseTime } from "@generated/donut-backend-api"
 import { computed } from "vue"
 import TrendLineChart from "./TrendLineChart.vue"
 

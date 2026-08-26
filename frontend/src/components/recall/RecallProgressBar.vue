@@ -79,7 +79,7 @@ import CommissionLearningSessionDialog from "./CommissionLearningSessionDialog.v
 import RecallLearningSessionActions from "./RecallLearningSessionActions.vue"
 import { useRecallData } from "@/composables/useRecallData"
 
-import type { AnsweredQuestion } from "@generated/doughnut-backend-api"
+import type { AnsweredQuestion } from "@generated/donut-backend-api"
 import type { PotentialLearningSession } from "@/composables/useRecallData"
 
 defineProps({

@@ -1,4 +1,4 @@
-import type { UpdateNoteContentData } from "@generated/doughnut-backend-api"
+import type { UpdateNoteContentData } from "@generated/donut-backend-api"
 import { flushPromises } from "@vue/test-utils"
 import { vi, describe, it, expect, beforeEach, afterEach } from "vitest"
 import {

@@ -1,9 +1,9 @@
 import { describe, test, expect, vi, beforeEach } from 'vitest'
 import makeMe from 'donut-test-fixtures/makeMe'
 import { createMockContext, findTool } from '../helpers/index.js'
-import { SearchController } from '@generated/doughnut-backend-api/sdk.gen'
+import { SearchController } from '@generated/donut-backend-api/sdk.gen'
 
-vi.mock('@generated/doughnut-backend-api/sdk.gen', () => ({
+vi.mock('@generated/donut-backend-api/sdk.gen', () => ({
   SearchController: {
     searchForRelationshipTarget: vi.fn(),
   },

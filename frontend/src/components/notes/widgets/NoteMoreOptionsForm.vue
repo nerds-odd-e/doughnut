@@ -14,7 +14,7 @@
 </template>
 
 <script setup lang="ts">
-import type { Note } from "@generated/doughnut-backend-api"
+import type { Note } from "@generated/donut-backend-api"
 import DropdownMenu from "@/components/commons/DropdownMenu.vue"
 import NoteMoreOptionsActions from "./NoteMoreOptionsActions.vue"
 import type { NoteMoreOptionsActionId } from "./noteMoreOptionsTitles"

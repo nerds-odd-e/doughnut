@@ -1,4 +1,4 @@
-import type { Note } from '@generated/doughnut-backend-api'
+import type { Note } from '@generated/donut-backend-api'
 import type { RelationTypeLabel } from './relationTypeLabel'
 import Builder from './Builder'
 import generateId from './generateId'

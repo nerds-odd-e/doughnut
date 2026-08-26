@@ -11,7 +11,7 @@ description: >-
 Regenerate the frontend TypeScript API client from the backend OpenAPI spec and
 fix any broken frontend usage.
 
-Purpose: Keep `packages/generated/doughnut-backend-api` in sync with Java
+Purpose: Keep `packages/generated/donut-backend-api` in sync with Java
 controllers — never hand-edit generated output.
 
 Output: Regenerated client + green frontend tests + summary ending with
@@ -19,7 +19,7 @@ Output: Regenerated client + green frontend tests + summary ending with
 </objective>
 
 <context>
-The frontend API client at `packages/generated/doughnut-backend-api` is
+The frontend API client at `packages/generated/donut-backend-api` is
 auto-generated from the backend OpenAPI spec.
 
 **Never edit generated code directly.** This includes whitespace-only cleanup in

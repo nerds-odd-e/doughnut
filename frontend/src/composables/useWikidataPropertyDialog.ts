@@ -1,8 +1,8 @@
 import { computed, ref } from "vue"
 import WikidataAssociationDialog from "@/components/notes/WikidataAssociationDialog.vue"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
-import type { WikidataSearchEntity } from "@generated/doughnut-backend-api"
-import { WikidataController } from "@generated/doughnut-backend-api/sdk.gen"
+import type { WikidataSearchEntity } from "@generated/donut-backend-api"
+import { WikidataController } from "@generated/donut-backend-api/sdk.gen"
 import { toOpenApiError } from "@/managedApi/openApiError"
 import {
   appendAliasToNoteContent,

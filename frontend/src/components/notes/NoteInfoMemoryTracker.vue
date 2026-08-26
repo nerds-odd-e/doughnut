@@ -25,7 +25,7 @@
 <script setup lang="ts">
 import type { PropType } from "vue"
 import { ref, watch, computed } from "vue"
-import type { MemoryTracker } from "@generated/doughnut-backend-api"
+import type { MemoryTracker } from "@generated/donut-backend-api"
 
 const props = defineProps({
   modelValue: {

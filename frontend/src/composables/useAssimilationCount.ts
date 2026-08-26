@@ -1,4 +1,4 @@
-import type { AssimilationCountDto } from "@generated/doughnut-backend-api"
+import type { AssimilationCountDto } from "@generated/donut-backend-api"
 import { ref } from "vue"
 
 export type AssimilationProgressCounts = {

@@ -1,8 +1,8 @@
-import { MemoryTrackerController } from "@generated/doughnut-backend-api/sdk.gen"
+import { MemoryTrackerController } from "@generated/donut-backend-api/sdk.gen"
 import type {
   MemoryTracker,
   RecallHistoryItem,
-} from "@generated/doughnut-backend-api"
+} from "@generated/donut-backend-api"
 import MemoryTrackerPage from "@/pages/MemoryTrackerPage.vue"
 import makeMe from "donut-test-fixtures/makeMe"
 import helper, { mockSdkService, wrapSdkResponse } from "@tests/helpers"

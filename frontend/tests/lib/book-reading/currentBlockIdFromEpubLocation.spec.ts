@@ -1,6 +1,6 @@
 import type { BookBlockEpubLocationRow } from "@/lib/book-reading/currentBlockIdFromEpubLocation"
 import { currentBlockIdFromEpubLocation } from "@/lib/book-reading/currentBlockIdFromEpubLocation"
-import type { EpubLocatorFull } from "@generated/doughnut-backend-api"
+import type { EpubLocatorFull } from "@generated/donut-backend-api"
 import { describe, expect, it } from "vitest"
 
 function epubLoc(href: string, fragment?: string): EpubLocatorFull {

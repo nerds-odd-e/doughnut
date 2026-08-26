@@ -1,8 +1,8 @@
 import type {
   Notebook,
   SubscriptionForNotebooksListing,
-} from "@generated/doughnut-backend-api"
-import { NotebookController } from "@generated/doughnut-backend-api/sdk.gen"
+} from "@generated/donut-backend-api"
+import { NotebookController } from "@generated/donut-backend-api/sdk.gen"
 import type { NotebookCatalogEntry } from "@/components/notebook/patchNotebookInCatalogItems"
 import NotebooksPage from "@/pages/NotebooksPage.vue"
 import NotebooksPageView from "@/pages/NotebooksPageView.vue"

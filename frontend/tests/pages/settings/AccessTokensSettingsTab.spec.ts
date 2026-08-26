@@ -1,4 +1,4 @@
-import { UserController } from "@generated/doughnut-backend-api/sdk.gen"
+import { UserController } from "@generated/donut-backend-api/sdk.gen"
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest"
 import AccessTokensSettingsTab from "@/pages/settings/AccessTokensSettingsTab.vue"
 import helper, { mockSdkService } from "@tests/helpers"

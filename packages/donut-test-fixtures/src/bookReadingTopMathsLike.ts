@@ -1,7 +1,7 @@
 import type {
   BookBlockFull,
   PdfLocatorFull,
-} from '@generated/doughnut-backend-api'
+} from '@generated/donut-backend-api'
 import { pdfLocatorPageIndexOnly, pdfLocatorWithBbox } from './pdfLocatorFull'
 
 export const TOP_MATHS_LIKE_BLOCK_IDS = [101, 102, 103, 104, 105, 106] as const

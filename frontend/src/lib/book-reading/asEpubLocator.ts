@@ -2,7 +2,7 @@ import type {
   BookBlockFull,
   ContentLocatorFull,
   EpubLocatorFull,
-} from "@generated/doughnut-backend-api"
+} from "@generated/donut-backend-api"
 
 export function asEpubLocator(
   loc: ContentLocatorFull | undefined

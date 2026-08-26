@@ -4,13 +4,13 @@ import type {
   MemoryTracker,
   NoteRecallInfo,
   RecallPrompt,
-} from '@generated/doughnut-backend-api'
+} from '@generated/donut-backend-api'
 import {
   MemoryTrackerController,
   NoteController,
   RecallPromptController,
   RecallsController,
-} from '@generated/doughnut-backend-api/sdk.gen'
+} from '@generated/donut-backend-api/sdk.gen'
 import { unwrapData } from './unwrapApi'
 
 type InjectedNoteIds = {

@@ -42,7 +42,7 @@
 
 <script setup lang="ts">
 import { ref, watch } from "vue"
-import type { NoteRealm } from "@generated/doughnut-backend-api"
+import type { NoteRealm } from "@generated/donut-backend-api"
 import Modal from "@/components/commons/Modal.vue"
 import usePopups from "@/components/commons/Popups/usePopups"
 import { realmLeafFolder } from "./useNoteSidebarTree"

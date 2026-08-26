@@ -46,7 +46,7 @@ git diff --cached
 ```
 
 Whitespace hygiene: `scripts/check_diff_whitespace.sh` (not raw `git diff --check`) —
-excludes generated API artifacts under `packages/generated/doughnut-backend-api/**`
+excludes generated API artifacts under `packages/generated/donut-backend-api/**`
 and `open_api_docs.yaml`.
 
 **Git does not use the Nix prefix.** All other repo tooling does:

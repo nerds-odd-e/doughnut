@@ -1,8 +1,8 @@
 import {
   NoteController,
   SearchController,
-} from "@generated/doughnut-backend-api/sdk.gen"
-import type { Note } from "@generated/doughnut-backend-api"
+} from "@generated/donut-backend-api/sdk.gen"
+import type { Note } from "@generated/donut-backend-api"
 import SearchForm from "@/components/wiki-link-or-relationship/SearchForm.vue"
 import Modal from "@/components/commons/Modal.vue"
 import usePopups from "@/components/commons/Popups/usePopups"

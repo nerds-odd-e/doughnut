@@ -1,4 +1,4 @@
-import { FailureReportController } from "@generated/doughnut-backend-api/sdk.gen"
+import { FailureReportController } from "@generated/donut-backend-api/sdk.gen"
 import FailureReportList from "@/components/admin/FailureReportList.vue"
 import { flushPromises } from "@vue/test-utils"
 import { describe, expect, it } from "vitest"

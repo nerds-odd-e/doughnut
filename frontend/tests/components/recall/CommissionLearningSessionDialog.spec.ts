@@ -1,5 +1,5 @@
 import CommissionLearningSessionDialog from "@/components/recall/CommissionLearningSessionDialog.vue"
-import { LearningSessionController } from "@generated/doughnut-backend-api/sdk.gen"
+import { LearningSessionController } from "@generated/donut-backend-api/sdk.gen"
 import { flushPromises } from "@vue/test-utils"
 import { beforeEach, describe, expect, it, vi } from "vitest"
 import { mockSdkService, wrapSdkError } from "@tests/helpers"

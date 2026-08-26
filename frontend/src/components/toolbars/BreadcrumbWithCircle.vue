@@ -37,7 +37,7 @@
 </template>
 
 <script setup lang="ts">
-import type { Folder, NotebookRealm } from "@generated/doughnut-backend-api"
+import type { Folder, NotebookRealm } from "@generated/donut-backend-api"
 import type { PropType } from "vue"
 import { BookText } from "@lucide/vue"
 import Breadcrumb from "@/components/toolbars/Breadcrumb.vue"

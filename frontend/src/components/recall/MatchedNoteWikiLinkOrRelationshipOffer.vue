@@ -20,7 +20,7 @@
 
 <script setup lang="ts">
 import { computed, nextTick, ref } from "vue"
-import type { Note, NoteSearchResult } from "@generated/doughnut-backend-api"
+import type { Note, NoteSearchResult } from "@generated/donut-backend-api"
 import AddRelationshipFinalize from "@/components/wiki-link-or-relationship/AddRelationshipFinalize.vue"
 import WikiLinkOrRelationshipChoice from "@/components/wiki-link-or-relationship/WikiLinkOrRelationshipChoice.vue"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"

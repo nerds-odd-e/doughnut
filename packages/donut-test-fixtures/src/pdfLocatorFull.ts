@@ -1,4 +1,4 @@
-import type { PdfLocatorFull } from '@generated/doughnut-backend-api'
+import type { PdfLocatorFull } from '@generated/donut-backend-api'
 
 /** Page anchor without bbox (tests mirror `GET …/book` page-only heading shape). */
 export function pdfLocatorPageIndexOnly(pageIndex: number): PdfLocatorFull {

@@ -119,7 +119,7 @@ import {
   bookLayoutBlockDragShouldCapture,
 } from "@/lib/book-reading/bookLayoutBlockDragIntent"
 import type { BookBlockReadingDisposition } from "@/lib/book-reading/readBlockIdsFromRecords"
-import type { BookBlockFull } from "@generated/doughnut-backend-api"
+import type { BookBlockFull } from "@generated/donut-backend-api"
 import { ref, watch } from "vue"
 
 const opened = defineModel<boolean>("opened", { required: true })

@@ -1,11 +1,11 @@
-import { UserController } from "@generated/doughnut-backend-api/sdk.gen"
+import { UserController } from "@generated/donut-backend-api/sdk.gen"
 import GeneralSettingsTab from "@/pages/settings/GeneralSettingsTab.vue"
 import makeMe from "donut-test-fixtures/makeMe"
 import helper, { mockSdkService } from "@tests/helpers"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import { ref, type Ref } from "vue"
-import type { User } from "@generated/doughnut-backend-api"
+import type { User } from "@generated/donut-backend-api"
 
 describe("GeneralSettingsTab", () => {
   let wrapper: VueWrapper

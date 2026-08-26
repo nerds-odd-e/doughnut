@@ -2,7 +2,7 @@ import {
   NoteController,
   NotebookController,
   SearchController,
-} from "@generated/doughnut-backend-api/sdk.gen"
+} from "@generated/donut-backend-api/sdk.gen"
 import NoteNewForm from "@/components/notes/NoteNewForm.vue"
 import type { ComponentPublicInstance } from "vue"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"

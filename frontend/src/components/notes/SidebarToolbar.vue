@@ -49,7 +49,7 @@ import type {
   Folder,
   FolderRealm,
   NoteRealm,
-} from "@generated/doughnut-backend-api"
+} from "@generated/donut-backend-api"
 import { peerSortTriggerIcon } from "@/composables/peerSortMenuRows"
 import PeerSortDropdownMenu from "@/components/commons/PeerSortDropdownMenu.vue"
 import { usePeerSort, type PeerSortSpec } from "@/composables/usePeerSort"

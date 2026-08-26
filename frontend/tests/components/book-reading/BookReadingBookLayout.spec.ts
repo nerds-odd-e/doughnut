@@ -1,6 +1,6 @@
 import BookReadingBookLayout from "@/components/book-reading/BookReadingBookLayout.vue"
 import helper from "@tests/helpers"
-import type { BookBlockFull } from "@generated/doughnut-backend-api"
+import type { BookBlockFull } from "@generated/donut-backend-api"
 import { describe, expect, it } from "vitest"
 
 const panelId = "book-reading-book-layout-panel-test"

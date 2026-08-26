@@ -64,9 +64,9 @@ import { useRouter } from "vue-router"
 import type {
   AttachBookRequestFull,
   BookFull,
-} from "@generated/doughnut-backend-api"
-import { client } from "@generated/doughnut-backend-api/client.gen"
-import { NotebookBooksController } from "@generated/doughnut-backend-api/sdk.gen"
+} from "@generated/donut-backend-api"
+import { client } from "@generated/donut-backend-api/client.gen"
+import { NotebookBooksController } from "@generated/donut-backend-api/sdk.gen"
 import usePopups from "@/components/commons/Popups/usePopups"
 import {
   apiCallWithLoading,

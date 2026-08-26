@@ -1,4 +1,4 @@
-import { SearchController } from "@generated/doughnut-backend-api/sdk.gen"
+import { SearchController } from "@generated/donut-backend-api/sdk.gen"
 import SearchForm from "@/components/wiki-link-or-relationship/SearchForm.vue"
 import { fireEvent, screen } from "@testing-library/vue"
 import { flushPromises } from "@vue/test-utils"

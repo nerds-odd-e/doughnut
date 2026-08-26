@@ -46,7 +46,7 @@
 import { computed } from "vue"
 import RichFrontmatterPropertyExternalLink from "@/components/form/RichFrontmatterPropertyExternalLink.vue"
 import WikiLinkToken from "@/components/notes/WikiLinkToken.vue"
-import type { WikiTitle } from "@generated/doughnut-backend-api"
+import type { WikiTitle } from "@generated/donut-backend-api"
 import { isOverlapsPropertyKey } from "@/utils/authoredOverlapsValidation"
 import { isUrlPropertyKey } from "@/utils/noteContentPropertyKeys"
 import {

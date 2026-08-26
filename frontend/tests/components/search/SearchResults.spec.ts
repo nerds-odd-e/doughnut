@@ -1,7 +1,7 @@
 import {
   NoteController,
   SearchController,
-} from "@generated/doughnut-backend-api/sdk.gen"
+} from "@generated/donut-backend-api/sdk.gen"
 import {
   mockSdkService,
   mockSdkServiceWithImplementation,

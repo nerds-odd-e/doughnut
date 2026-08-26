@@ -34,7 +34,7 @@ import type {
   FolderListing,
   NoteTopology,
   Folder,
-} from "@generated/doughnut-backend-api"
+} from "@generated/donut-backend-api"
 import SidebarFolderItem from "./SidebarFolderItem.vue"
 import SidebarNoteItem from "./SidebarNoteItem.vue"
 import { sidebarStructuralRefreshKey } from "./sidebarStructuralRefresh"

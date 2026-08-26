@@ -13,7 +13,7 @@
 │  `frontend/`     │  `cli/`          │  `mcp-server/`    │  `e2e_test/`      │
 └────────┬─────────┴────────┬─────────┴─────────┬─────────┴─────────┬─────────┘
          │                  │                   │                   │
-         │   `@generated/doughnut-backend-api` + `packages/donut-api`
+         │   `@generated/donut-backend-api` + `packages/donut-api`
          ▼                  ▼                   ▼                   ▼
 ┌─────────────────────────────────────────────────────────────────────────────┐
 │  Local LB (dev) / GCP URL map (prod) → `/api/*` → Spring Boot backend       │
@@ -45,7 +45,7 @@
 | Pure algorithms | Cloze, markdown/frontmatter, spaced repetition math | `backend/src/main/java/com/odde/doughnut/algorithms/` |
 | Persistence | JPA entities, Spring Data repositories, `EntityPersister` | `backend/src/main/java/com/odde/doughnut/entities/`, `.../factoryServices/EntityPersister.java` |
 | Vue SPA | Pages, components, composables, client-side note cache | `frontend/src/` |
-| Generated SDK | TypeScript client from OpenAPI | `packages/generated/doughnut-backend-api/` |
+| Generated SDK | TypeScript client from OpenAPI | `packages/generated/donut-backend-api/` |
 | Shared API wrapper | CLI/MCP-friendly SDK setup + re-exports | `packages/donut-api/src/index.ts` |
 | Test fixtures | `makeMe` builders for API-shaped data | `packages/donut-test-fixtures/src/` |
 | CLI | Interactive Ink TTY + non-interactive subcommands | `cli/src/` |
@@ -59,7 +59,7 @@
 **Key Characteristics:**
 - Controllers stay thin: authorize via `AuthorizationService`, delegate to services, return entities or view DTOs (e.g. `NoteRealm`).
 - Path variables bind JPA entities by id (`@PathVariable Note note`) via Spring Data domain conversion.
-- Frontend talks only through `@generated/doughnut-backend-api/sdk.gen`, wrapped by `apiCallWithLoading` for UX loading/errors.
+- Frontend talks only through `@generated/donut-backend-api/sdk.gen`, wrapped by `apiCallWithLoading` for UX loading/errors.
 - CLI and MCP reuse the same generated types via `donut-api` / direct SDK, not ad-hoc HTTP shapes.
 - Dev stack assumes `pnpm sut` (backend + frontend + local LB + Mountebank) under Nix.
 
@@ -69,7 +69,7 @@
 - Purpose: User UI (web, terminal, IDE agents)
 - Location: `frontend/src/`, `cli/src/`, `mcp-server/src/`
 - Contains: Vue pages/components, Ink React UI, MCP tool handlers
-- Depends on: Generated SDK (`packages/generated/doughnut-backend-api/`), optionally `packages/donut-api/`
+- Depends on: Generated SDK (`packages/generated/donut-backend-api/`), optionally `packages/donut-api/`
 - Used by: End users, Cypress E2E, Cursor/IDE MCP hosts
 
 **API / transport:**
@@ -125,7 +125,7 @@
 ### OpenAPI → TypeScript codegen
 
 1. Backend controllers + DTOs define the contract.
-2. `pnpm generateTypeScript` runs Gradle `generateOpenAPIDocs` → `open_api_docs.yaml` → `@hey-api/openapi-ts` into `packages/generated/doughnut-backend-api/`.
+2. `pnpm generateTypeScript` runs Gradle `generateOpenAPIDocs` → `open_api_docs.yaml` → `@hey-api/openapi-ts` into `packages/generated/donut-backend-api/`.
 3. Clients must import generated SDK; never hand-edit generated files.
 
 **State Management:**
@@ -157,7 +157,7 @@
 
 **Generated SDK + apiCallWithLoading:**
 - Purpose: Typed HTTP client with consistent loading bar / block-UI / toast behavior
-- Examples: `packages/generated/doughnut-backend-api/sdk.gen.ts`, `frontend/src/managedApi/clientSetup.ts`
+- Examples: `packages/generated/donut-backend-api/sdk.gen.ts`, `frontend/src/managedApi/clientSetup.ts`
 - Pattern: Import `*Controller` from sdk.gen; wrap user-initiated calls with `apiCallWithLoading`
 
 **makeMe fixtures:**
@@ -197,7 +197,7 @@
 - **Threading:** Spring Boot request threads for HTTP; scheduled/maintenance jobs use ShedLock (`configs/ShedLockConfig.java`) for distributed locking. Frontend and CLI are single-threaded JS event loops; Ink CLI uses React effects carefully for TTY ordering.
 - **Global state:** Frontend module-level `apiStatusHandler` in `clientSetup.ts`; CLI credentials under config dir; avoid new process-wide mutable singletons in backend — prefer Spring beans and request scope (`CurrentUserFetcherFromRequest` is `@RequestScope`).
 - **Circular imports:** Frontend uses `@/` path alias; keep pages → components → composables → managedApi one-way. Backend packages: controllers → services → entities/repos (do not import controllers from services).
-- **Generated artifacts:** `open_api_docs.yaml` and `packages/generated/doughnut-backend-api/**` are regenerated only; never edit by hand.
+- **Generated artifacts:** `open_api_docs.yaml` and `packages/generated/donut-backend-api/**` are regenerated only; never edit by hand.
 - **Schema changes:** New Flyway scripts only under `backend/src/main/resources/db/migration/`; never edit committed migrations (see `db-migration` rule).
 - **Auth models:** Production uses OAuth2 login (`ProductionConfiguration`); API clients use Bearer tokens; non-prod has relaxed security + testability endpoints.
 
@@ -207,7 +207,7 @@
 
 **What happens:** Defining local interfaces that duplicate OpenAPI note/recall shapes.
 **Why it's wrong:** Drift from backend DTOs breaks at runtime; fixtures and SDK already encode the contract.
-**Do this instead:** Import types from `@generated/doughnut-backend-api` and build data with `donut-test-fixtures/makeMe`.
+**Do this instead:** Import types from `@generated/donut-backend-api` and build data with `donut-test-fixtures/makeMe`.
 
 ### Skipping AuthorizationService in controllers
 

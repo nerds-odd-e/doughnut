@@ -1,4 +1,4 @@
-import type { WikidataEntityData } from '@generated/doughnut-backend-api'
+import type { WikidataEntityData } from '@generated/donut-backend-api'
 import Builder from './Builder'
 
 class WikidataEntityBuilder extends Builder<WikidataEntityData> {

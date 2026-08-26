@@ -1,4 +1,4 @@
-import type { RecallLog } from '@generated/doughnut-backend-api'
+import type { RecallLog } from '@generated/donut-backend-api'
 import Builder from './Builder'
 import generateId from './generateId'
 

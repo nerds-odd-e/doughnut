@@ -2,7 +2,7 @@ import {
   AiController,
   NoteController,
   TextContentController,
-} from "@generated/doughnut-backend-api/sdk.gen"
+} from "@generated/donut-backend-api/sdk.gen"
 import NoteRefinement from "@/components/recall/NoteRefinement.vue"
 import { flushPromises } from "@vue/test-utils"
 import makeMe from "donut-test-fixtures/makeMe"
@@ -15,7 +15,7 @@ import type {
   Note,
   NoteRefinementLayoutItem,
   NoteRefinementQuestionContextDto,
-} from "@generated/doughnut-backend-api"
+} from "@generated/donut-backend-api"
 import { afterEach, beforeEach, vi } from "vitest"
 import { defineComponent, type PropType } from "vue"
 import {

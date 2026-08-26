@@ -1,4 +1,4 @@
-import type { RelationshipLiteralSearchHit } from "@generated/doughnut-backend-api"
+import type { RelationshipLiteralSearchHit } from "@generated/donut-backend-api"
 import type { SearchListPreference } from "./searchListPreference"
 
 export interface DisplayState {

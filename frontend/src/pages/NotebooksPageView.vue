@@ -151,7 +151,7 @@ import type {
   Notebook,
   SubscriptionForNotebooksListing,
   User,
-} from "@generated/doughnut-backend-api"
+} from "@generated/donut-backend-api"
 import type { NotebookCatalogEntry } from "@/components/notebook/patchNotebookInCatalogItems"
 import { sortNotebookCatalogByPeerSpec } from "@/components/notebook/sortNotebookCatalogByPeerSpec"
 import { peerSortTriggerIcon } from "@/composables/peerSortMenuRows"

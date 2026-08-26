@@ -1,4 +1,4 @@
-import type { Mcq } from "@generated/doughnut-backend-api"
+import type { Mcq } from "@generated/donut-backend-api"
 
 export function questionDisplayProps(
   mcq: Pick<Mcq, "questionStem" | "responseChoices">

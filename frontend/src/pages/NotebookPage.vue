@@ -18,7 +18,7 @@
 
 <script setup lang="ts">
 import { inject, computed, type Ref } from "vue"
-import type { User, NotebookRealm } from "@generated/doughnut-backend-api"
+import type { User, NotebookRealm } from "@generated/donut-backend-api"
 import NotebookPageReadonlySummary from "@/components/notebook/NotebookPageReadonlySummary.vue"
 import NotebookPageView from "./NotebookPageView.vue"
 import ContentLoader from "@/components/commons/ContentLoader.vue"

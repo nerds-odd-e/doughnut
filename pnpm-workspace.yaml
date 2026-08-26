@@ -4,7 +4,7 @@ packages:
   - cli
   - packages/donut-api
   - packages/donut-test-fixtures
-  - packages/generated/doughnut-backend-api
+  - packages/generated/donut-backend-api
 
 # @inkjs/ui imports react but only declares peer `ink`; without this, unbundled
 # `pnpm cli` (tsx) fails with ERR_MODULE_NOT_FOUND for react under pnpm isolation.

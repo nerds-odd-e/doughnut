@@ -1,4 +1,4 @@
-import type { ConversationListItem } from '@generated/doughnut-backend-api'
+import type { ConversationListItem } from '@generated/donut-backend-api'
 import Builder from './Builder'
 import generateId from './generateId'
 

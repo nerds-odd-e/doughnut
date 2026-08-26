@@ -1,6 +1,6 @@
 import NoteAudioTools from "@/components/notes/widgets/NoteAudioTools.vue"
 import type { AudioChunk } from "@/models/audio/audioProcessingScheduler"
-import type { Note } from "@generated/doughnut-backend-api"
+import type { Note } from "@generated/donut-backend-api"
 import makeMe from "donut-test-fixtures/makeMe"
 import helper, { mockShowNote } from "@tests/helpers"
 import {

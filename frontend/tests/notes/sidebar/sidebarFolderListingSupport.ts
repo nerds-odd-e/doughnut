@@ -3,11 +3,11 @@ import type {
   NoteRealm,
   Options,
   ShowNoteData,
-} from "@generated/doughnut-backend-api"
+} from "@generated/donut-backend-api"
 import {
   NoteController,
   NotebookController,
-} from "@generated/doughnut-backend-api/sdk.gen"
+} from "@generated/donut-backend-api/sdk.gen"
 import {
   mockSdkServiceWithImplementation,
   testFolderStub,

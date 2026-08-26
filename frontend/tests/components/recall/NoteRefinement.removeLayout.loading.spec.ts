@@ -1,4 +1,4 @@
-import { AiController } from "@generated/doughnut-backend-api/sdk.gen"
+import { AiController } from "@generated/donut-backend-api/sdk.gen"
 import { flushPromises } from "@vue/test-utils"
 import { screen } from "@testing-library/vue"
 import { describe, expect, it } from "vitest"

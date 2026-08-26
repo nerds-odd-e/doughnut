@@ -1,7 +1,7 @@
 import {
   AiController,
   TextContentController,
-} from "@generated/doughnut-backend-api/sdk.gen"
+} from "@generated/donut-backend-api/sdk.gen"
 import { flushPromises } from "@vue/test-utils"
 import { describe, expect, it, vi } from "vitest"
 import makeMe from "donut-test-fixtures/makeMe"

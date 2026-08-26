@@ -3,8 +3,8 @@ import {
   type BookBlockReadingDisposition,
 } from "@/lib/book-reading/readBlockIdsFromRecords"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
-import type { BookBlockReadingRecordListItem } from "@generated/doughnut-backend-api"
-import { NotebookBooksController } from "@generated/doughnut-backend-api/sdk.gen"
+import type { BookBlockReadingRecordListItem } from "@generated/donut-backend-api"
+import { NotebookBooksController } from "@generated/donut-backend-api/sdk.gen"
 import { computed, ref, toValue, type MaybeRefOrGetter } from "vue"
 
 export function useNotebookBookReadingRecords(

@@ -1,4 +1,4 @@
-import type { WikiTitle } from "@generated/doughnut-backend-api"
+import type { WikiTitle } from "@generated/donut-backend-api"
 import { hrefLooksLikeConceptNotePath } from "@/routes/noteShowLocation"
 
 /** Splits inner wiki text on the first `|`; empty right-hand side is treated as no pipe. */

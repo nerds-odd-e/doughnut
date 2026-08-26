@@ -41,7 +41,7 @@ import type {
   FolderRealm,
   NoteRealm,
   User,
-} from "@generated/doughnut-backend-api"
+} from "@generated/donut-backend-api"
 import SidebarToolbar from "./SidebarToolbar.vue"
 import SidebarInner from "./SidebarInner.vue"
 import SidebarNotebookTreeScrollportPathHint from "./SidebarNotebookTreeScrollportPathHint.vue"

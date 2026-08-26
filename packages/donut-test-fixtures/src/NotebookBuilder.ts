@@ -1,4 +1,4 @@
-import type { Note, Notebook } from '@generated/doughnut-backend-api'
+import type { Note, Notebook } from '@generated/donut-backend-api'
 import Builder from './Builder'
 import NoteBuilder from './NoteBuilder'
 import generateId from './generateId'

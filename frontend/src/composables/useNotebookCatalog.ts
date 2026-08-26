@@ -2,8 +2,8 @@ import { ref } from "vue"
 import type {
   Notebook,
   SubscriptionForNotebooksListing,
-} from "@generated/doughnut-backend-api"
-import { NotebookController } from "@generated/doughnut-backend-api/sdk.gen"
+} from "@generated/donut-backend-api"
+import { NotebookController } from "@generated/donut-backend-api/sdk.gen"
 import {
   patchNotebookInCatalogItems,
   type NotebookCatalogEntry,

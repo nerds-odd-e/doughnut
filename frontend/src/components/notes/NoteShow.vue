@@ -99,7 +99,7 @@
 import { inject, ref, toRef, watch, type PropType, type Ref } from "vue"
 import ContentLoader from "@/components/commons/ContentLoader.vue"
 import NoteRealmLoader from "./NoteRealmLoader.vue"
-import type { Folder, NoteRealm, User } from "@generated/doughnut-backend-api"
+import type { Folder, NoteRealm, User } from "@generated/donut-backend-api"
 import BreadcrumbWithCircle from "@/components/toolbars/BreadcrumbWithCircle.vue"
 import NoteTextContent from "./core/NoteTextContent.vue"
 import NoteReferences from "./NoteReferences.vue"

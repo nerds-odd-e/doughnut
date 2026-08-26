@@ -1,4 +1,4 @@
-import { CircleController } from "@generated/doughnut-backend-api/sdk.gen"
+import { CircleController } from "@generated/donut-backend-api/sdk.gen"
 import CirclesPage from "@/pages/CirclesPage.vue"
 import { flushPromises } from "@vue/test-utils"
 import helper, { mockSdkService } from "@tests/helpers"

@@ -1,5 +1,5 @@
-import { AiController } from "@generated/doughnut-backend-api/sdk.gen"
-import type { NoteExtractionResult } from "@generated/doughnut-backend-api"
+import { AiController } from "@generated/donut-backend-api/sdk.gen"
+import type { NoteExtractionResult } from "@generated/donut-backend-api"
 import {
   mockSdkService,
   mockSdkServiceWithImplementation,

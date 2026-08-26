@@ -1,4 +1,4 @@
-import type { Folder } from "@generated/doughnut-backend-api"
+import type { Folder } from "@generated/donut-backend-api"
 
 /** Builds root-to-leaf folder segments for breadcrumbs using the flat folder index. */
 export function folderBreadcrumbChainFromFlatIndex(

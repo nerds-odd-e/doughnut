@@ -2,7 +2,7 @@ import type {
   AnsweredQuestion,
   Conversation,
   Note,
-} from '@generated/doughnut-backend-api'
+} from '@generated/donut-backend-api'
 import Builder from './Builder'
 import generateId from './generateId'
 import NoteBuilder from './NoteBuilder'

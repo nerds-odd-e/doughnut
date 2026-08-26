@@ -31,11 +31,11 @@ import TextInput from "@/components/form/TextInput.vue"
 import type {
   Circle,
   NotebookCreationRequest,
-} from "@generated/doughnut-backend-api"
+} from "@generated/donut-backend-api"
 import {
   CircleController,
   NotebookController,
-} from "@generated/doughnut-backend-api/sdk.gen"
+} from "@generated/donut-backend-api/sdk.gen"
 import { toOpenApiError } from "@/managedApi/openApiError"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import type { PropType } from "vue"

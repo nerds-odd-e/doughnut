@@ -1,4 +1,4 @@
-import { NotebookController } from "@generated/doughnut-backend-api/sdk.gen"
+import { NotebookController } from "@generated/donut-backend-api/sdk.gen"
 
 /** Notebook root when `parentFolderId` is null; otherwise notes and child folders under that folder. */
 export function requestNotebookFolderListing(

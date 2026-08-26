@@ -1,4 +1,4 @@
-import { NotebookHealthController } from "@generated/doughnut-backend-api/sdk.gen"
+import { NotebookHealthController } from "@generated/donut-backend-api/sdk.gen"
 import {
   createHealthPanelSpies,
   fixButton,

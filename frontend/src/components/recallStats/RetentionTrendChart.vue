@@ -15,7 +15,7 @@
 </template>
 
 <script setup lang="ts">
-import type { DayRetention } from "@generated/doughnut-backend-api"
+import type { DayRetention } from "@generated/donut-backend-api"
 import { computed } from "vue"
 import TrendLineChart from "./TrendLineChart.vue"
 

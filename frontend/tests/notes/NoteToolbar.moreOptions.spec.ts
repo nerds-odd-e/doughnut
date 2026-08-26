@@ -1,4 +1,4 @@
-import { NoteController } from "@generated/doughnut-backend-api/sdk.gen"
+import { NoteController } from "@generated/donut-backend-api/sdk.gen"
 import makeMe from "donut-test-fixtures/makeMe"
 import { mockSdkService } from "@tests/helpers"
 import {

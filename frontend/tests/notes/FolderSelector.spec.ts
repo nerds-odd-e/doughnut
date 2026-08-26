@@ -1,4 +1,4 @@
-import { NotebookController } from "@generated/doughnut-backend-api/sdk.gen"
+import { NotebookController } from "@generated/donut-backend-api/sdk.gen"
 import FolderSelector from "@/components/notes/FolderSelector.vue"
 import { mockCoarsePointer } from "@tests/helpers/mockCoarsePointer"
 import { mockSdkService, testFolderStub } from "@tests/helpers"

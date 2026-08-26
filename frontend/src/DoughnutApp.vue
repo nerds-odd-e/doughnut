@@ -11,11 +11,11 @@ import {
 import { setupGlobalClient, nonReloadingClient } from "./managedApi/clientSetup"
 import LoadingThinBar from "./components/commons/LoadingThinBar.vue"
 import LoadingModal from "./components/commons/LoadingModal.vue"
-import type { User } from "@generated/doughnut-backend-api"
+import type { User } from "@generated/donut-backend-api"
 import {
   CurrentUserInfoController,
   TestabilityRestController,
-} from "@generated/doughnut-backend-api/sdk.gen"
+} from "@generated/donut-backend-api/sdk.gen"
 import getEnvironment from "./managedApi/window/getEnvironment"
 import MainMenu from "./components/toolbars/MainMenu.vue"
 import SoftKeyboardPrimer from "./components/commons/SoftKeyboardPrimer.vue"

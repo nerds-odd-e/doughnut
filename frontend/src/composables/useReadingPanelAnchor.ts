@@ -1,6 +1,6 @@
 import type { BookReaderViewerRef } from "@/composables/bookReaderViewerRef"
 import { lastDirectContentLocator } from "@/lib/book-reading/bookBlockDirectContent"
-import type { BookBlockFull } from "@generated/doughnut-backend-api"
+import type { BookBlockFull } from "@generated/donut-backend-api"
 import { ref, type Ref } from "vue"
 
 export const READING_PANEL_OBSTRUCTION_PX = 80

@@ -1,4 +1,4 @@
-import { TextContentController } from "@generated/doughnut-backend-api/sdk.gen"
+import { TextContentController } from "@generated/donut-backend-api/sdk.gen"
 import TextContentWrapper from "@/components/notes/core/TextContentWrapper.vue"
 import helper, { mockSdkService } from "@tests/helpers"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"

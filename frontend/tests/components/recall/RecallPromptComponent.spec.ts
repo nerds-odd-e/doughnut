@@ -1,4 +1,4 @@
-import { RecallPromptController } from "@generated/doughnut-backend-api/sdk.gen"
+import { RecallPromptController } from "@generated/donut-backend-api/sdk.gen"
 import RecallPromptComponent from "@/components/recall/RecallPromptComponent.vue"
 import { flushPromises } from "@vue/test-utils"
 import helper, {

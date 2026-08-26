@@ -1,5 +1,5 @@
-import type { MemoryTracker } from "@generated/doughnut-backend-api"
-import { AssimilationController } from "@generated/doughnut-backend-api/sdk.gen"
+import type { MemoryTracker } from "@generated/donut-backend-api"
+import { AssimilationController } from "@generated/donut-backend-api/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import { useAssimilationCount } from "@/composables/useAssimilationCount"
 import { useGoToNextAssimilation } from "@/composables/useGoToNextAssimilation"

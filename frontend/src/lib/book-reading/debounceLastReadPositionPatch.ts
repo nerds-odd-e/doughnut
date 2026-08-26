@@ -3,7 +3,7 @@ import type {
   ContentLocatorFull,
   EpubLocatorFull,
   PdfLocatorFull,
-} from "@generated/doughnut-backend-api"
+} from "@generated/donut-backend-api"
 
 export type LastReadPositionPatchBody = {
   locator: ContentLocatorFull

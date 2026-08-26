@@ -1,5 +1,5 @@
 import { computed, ref } from "vue"
-import type { MemoryTrackerLite } from "@generated/doughnut-backend-api"
+import type { MemoryTrackerLite } from "@generated/donut-backend-api"
 import { vi } from "vitest"
 
 export const memoryTrackerLitesStub = (n: number): MemoryTrackerLite[] =>

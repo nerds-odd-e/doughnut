@@ -1,8 +1,5 @@
-import { client as globalClient } from "@generated/doughnut-backend-api/client.gen"
-import {
-  createClient,
-  type Config,
-} from "@generated/doughnut-backend-api/client"
+import { client as globalClient } from "@generated/donut-backend-api/client.gen"
+import { createClient, type Config } from "@generated/donut-backend-api/client"
 import type {
   ApiLoadingOptions,
   ApiLoadingState,

@@ -48,7 +48,7 @@
 <script setup lang="ts">
 import RichFrontmatterListPropertyValue from "@/components/form/RichFrontmatterListPropertyValue.vue"
 import RichFrontmatterPropertyExternalLink from "@/components/form/RichFrontmatterPropertyExternalLink.vue"
-import type { WikiTitle } from "@generated/doughnut-backend-api"
+import type { WikiTitle } from "@generated/donut-backend-api"
 import { relationLabelFromKebab } from "@/models/relationTypeOptions"
 import {
   isRelationPropertyKey,

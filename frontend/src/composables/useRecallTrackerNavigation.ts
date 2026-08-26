@@ -1,5 +1,5 @@
 import { computed, watch, type Ref } from "vue"
-import type { MemoryTrackerLite } from "@generated/doughnut-backend-api"
+import type { MemoryTrackerLite } from "@generated/donut-backend-api"
 
 interface RecallTrackerNavigationDeps {
   toRepeat: Ref<MemoryTrackerLite[] | undefined>

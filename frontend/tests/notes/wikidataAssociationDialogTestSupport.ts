@@ -1,4 +1,4 @@
-import { WikidataController } from "@generated/doughnut-backend-api/sdk.gen"
+import { WikidataController } from "@generated/donut-backend-api/sdk.gen"
 import WikidataAssociationDialog from "@/components/notes/WikidataAssociationDialog.vue"
 import { type VueWrapper, flushPromises } from "@vue/test-utils"
 import makeMe from "donut-test-fixtures/makeMe"

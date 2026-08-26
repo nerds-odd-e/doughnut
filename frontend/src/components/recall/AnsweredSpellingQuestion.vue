@@ -43,7 +43,7 @@
 
 <script setup lang="ts">
 import { computed, type PropType } from "vue"
-import type { AnsweredQuestion } from "@generated/doughnut-backend-api"
+import type { AnsweredQuestion } from "@generated/donut-backend-api"
 import NoteShow from "@/components/notes/NoteShow.vue"
 import PopButton from "@/components/commons/Popups/PopButton.vue"
 import AccidentalMatchResolveDialog from "@/components/recall/AccidentalMatchResolveDialog.vue"

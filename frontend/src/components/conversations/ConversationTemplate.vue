@@ -102,7 +102,7 @@
 
 <script setup lang="ts">
 import { ref } from "vue"
-import type { Conversation } from "@generated/doughnut-backend-api"
+import type { Conversation } from "@generated/donut-backend-api"
 import ConversationExportDialog from "./ConversationExportDialog.vue"
 import ConversationMessageComposer from "./ConversationMessageComposer.vue"
 import { Upload } from "@lucide/vue"

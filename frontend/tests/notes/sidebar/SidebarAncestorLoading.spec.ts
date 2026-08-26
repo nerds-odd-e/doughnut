@@ -1,7 +1,7 @@
 import {
   NoteController,
   NotebookController,
-} from "@generated/doughnut-backend-api/sdk.gen"
+} from "@generated/donut-backend-api/sdk.gen"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import createNoteStorage from "@/store/createNoteStorage"
 import helper, { mockSdkServiceWithImplementation } from "@tests/helpers"

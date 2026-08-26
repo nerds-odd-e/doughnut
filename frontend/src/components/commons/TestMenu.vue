@@ -33,9 +33,9 @@
 </template>
 
 <script lang="ts">
-import type { User } from "@generated/doughnut-backend-api"
-import type { Randomization } from "@generated/doughnut-backend-api"
-import { TestabilityRestController } from "@generated/doughnut-backend-api/sdk.gen"
+import type { User } from "@generated/donut-backend-api"
+import type { Randomization } from "@generated/donut-backend-api"
+import { TestabilityRestController } from "@generated/donut-backend-api/sdk.gen"
 import type { PropType } from "vue"
 import { defineComponent } from "vue"
 import CheckInput from "../form/CheckInput.vue"

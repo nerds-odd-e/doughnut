@@ -99,7 +99,7 @@
 import type {
   HealthFindingGroup,
   HealthFindingItem,
-} from "@generated/doughnut-backend-api"
+} from "@generated/donut-backend-api"
 import { noteShowLocation } from "@/routes/noteShowLocation"
 
 defineProps<{

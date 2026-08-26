@@ -15,19 +15,19 @@ Short navigation index — start here before generated API files or long docs. S
 
 ## Generated API
 
-Use `packages/generated/doughnut-backend-api/api-summary.md` as the default endpoint lookup. The larger generated API files are intentionally ignored by default indexing:
+Use `packages/generated/donut-backend-api/api-summary.md` as the default endpoint lookup. The larger generated API files are intentionally ignored by default indexing:
 
-- `packages/generated/doughnut-backend-api/types.gen.ts`
-- `packages/generated/doughnut-backend-api/sdk.gen.ts`
+- `packages/generated/donut-backend-api/types.gen.ts`
+- `packages/generated/donut-backend-api/sdk.gen.ts`
 - `open_api_docs.yaml`
 
-For frontend calls, import services from `@generated/doughnut-backend-api/sdk.gen`. For API-shaped fixtures, import `makeMe` from `donut-test-fixtures/makeMe`. Open `sdk.gen.ts` or `types.gen.ts` only when checking an exact generated signature. After backend controller signature or DTO changes, run:
+For frontend calls, import services from `@generated/donut-backend-api/sdk.gen`. For API-shaped fixtures, import `makeMe` from `donut-test-fixtures/makeMe`. Open `sdk.gen.ts` or `types.gen.ts` only when checking an exact generated signature. After backend controller signature or DTO changes, run:
 
 ```bash
 CURSOR_DEV=true nix develop -c pnpm generateTypeScript
 ```
 
-Never hand-edit `packages/generated/doughnut-backend-api/**` or `open_api_docs.yaml`; regenerate them. For whitespace hygiene, use `scripts/check_diff_whitespace.sh` instead of raw `git diff --check` so generated artifacts are not manually "fixed".
+Never hand-edit `packages/generated/donut-backend-api/**` or `open_api_docs.yaml`; regenerate them. For whitespace hygiene, use `scripts/check_diff_whitespace.sh` instead of raw `git diff --check` so generated artifacts are not manually "fixed".
 
 ## Commands
 

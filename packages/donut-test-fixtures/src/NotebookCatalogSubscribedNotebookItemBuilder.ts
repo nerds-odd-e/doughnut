@@ -1,7 +1,7 @@
 import type {
   Notebook,
   NotebookCatalogSubscribedNotebookItem,
-} from '@generated/doughnut-backend-api'
+} from '@generated/donut-backend-api'
 import Builder from './Builder'
 import NotebookBuilder from './NotebookBuilder'
 import generateId from './generateId'

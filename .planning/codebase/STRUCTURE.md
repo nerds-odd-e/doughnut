@@ -11,7 +11,7 @@ doughnut/
 ├── cli/                     # TypeScript/Ink terminal client
 ├── mcp-server/              # MCP stdio server for note tools
 ├── packages/
-│   ├── generated/doughnut-backend-api/  # OpenAPI → TS SDK (generated)
+│   ├── generated/donut-backend-api/  # OpenAPI → TS SDK (generated)
 │   ├── donut-api/        # Thin shared client wrapper for CLI/MCP
 │   └── donut-test-fixtures/  # makeMe builders for API-shaped data
 ├── e2e_test/                # Cypress + Cucumber E2E
@@ -54,7 +54,7 @@ doughnut/
 **packages:**
 - Purpose: Shared TypeScript libraries across frontend/cli/mcp/e2e
 - Contains: Generated SDK, `donut-api`, test fixtures
-- Key files: `packages/generated/doughnut-backend-api/api-summary.md`, `packages/donut-test-fixtures/src/makeMe.ts`
+- Key files: `packages/generated/donut-backend-api/api-summary.md`, `packages/donut-test-fixtures/src/makeMe.ts`
 
 **e2e_test:**
 - Purpose: Behavior specs and Cypress automation
@@ -170,7 +170,7 @@ doughnut/
 
 ## Special Directories
 
-**packages/generated/doughnut-backend-api:**
+**packages/generated/donut-backend-api:**
 - Purpose: Hey API OpenAPI TypeScript client (`sdk.gen.ts`, `types.gen.ts`, `api-summary.md`)
 - Generated: Yes (`pnpm generateTypeScript`)
 - Committed: Yes — regenerate after controller/DTO changes; never hand-edit

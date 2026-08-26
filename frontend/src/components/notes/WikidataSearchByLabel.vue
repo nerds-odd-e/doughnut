@@ -20,7 +20,7 @@
 </template>
 
 <script lang="ts">
-import type { WikidataSearchEntity } from "@generated/doughnut-backend-api"
+import type { WikidataSearchEntity } from "@generated/donut-backend-api"
 import { defineComponent } from "vue"
 import SvgWikidata from "../svgs/SvgWikidata.vue"
 import { primeSoftKeyboard } from "@/utils/focusTarget"

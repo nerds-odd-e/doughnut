@@ -3,7 +3,7 @@ import type {
   NoteRealm,
   MemoryTracker,
   RecalledNote,
-} from '@generated/doughnut-backend-api'
+} from '@generated/donut-backend-api'
 import Builder from './Builder'
 import NoteBuilder from './NoteBuilder'
 import generateId from './generateId'

@@ -81,7 +81,7 @@
 
 <script setup lang="ts">
 import type { PropType } from "vue"
-import type { RelationshipLiteralSearchHit } from "@generated/doughnut-backend-api"
+import type { RelationshipLiteralSearchHit } from "@generated/donut-backend-api"
 import { BookText, FileText, Folder } from "@lucide/vue"
 import { computed, type Component } from "vue"
 import NoteTitleWithLink from "../notes/NoteTitleWithLink.vue"

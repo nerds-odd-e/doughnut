@@ -62,7 +62,7 @@ import RichFrontmatterListPropertyValue from "@/components/form/RichFrontmatterL
 import RichFrontmatterPropertyExternalLink from "@/components/form/RichFrontmatterPropertyExternalLink.vue"
 import RichFrontmatterPropertyValueDialog from "@/components/form/RichFrontmatterPropertyValueDialog.vue"
 import PropertyValueField from "@/components/form/PropertyValueField.vue"
-import type { WikiTitle } from "@generated/doughnut-backend-api"
+import type { WikiTitle } from "@generated/donut-backend-api"
 import {
   isScalarOnlyStructuralPropertyKey,
   isTextCapablePropertyRow,

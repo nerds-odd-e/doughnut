@@ -103,7 +103,7 @@
 </template>
 
 <script setup lang="ts">
-import type { NoteExtractionResult } from "@generated/doughnut-backend-api"
+import type { NoteExtractionResult } from "@generated/donut-backend-api"
 import DiffView from "@/components/commons/DiffView.vue"
 import { ref } from "vue"
 

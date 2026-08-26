@@ -58,7 +58,7 @@
 </template>
 
 <script setup lang="ts">
-import type { AmPmResponseTime } from "@generated/doughnut-backend-api"
+import type { AmPmResponseTime } from "@generated/donut-backend-api"
 import { computed } from "vue"
 
 const props = defineProps<{ amPm: AmPmResponseTime }>()

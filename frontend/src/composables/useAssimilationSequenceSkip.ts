@@ -1,5 +1,5 @@
-import type { NoteRecallInfo } from "@generated/doughnut-backend-api"
-import { AssimilationSequenceSkipController } from "@generated/doughnut-backend-api/sdk.gen"
+import type { NoteRecallInfo } from "@generated/donut-backend-api"
+import { AssimilationSequenceSkipController } from "@generated/donut-backend-api/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import { useGoToNextAssimilation } from "@/composables/useGoToNextAssimilation"
 

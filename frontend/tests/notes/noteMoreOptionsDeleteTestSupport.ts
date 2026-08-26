@@ -1,5 +1,5 @@
-import type { Note, NoteRealm } from "@generated/doughnut-backend-api"
-import { NoteController } from "@generated/doughnut-backend-api/sdk.gen"
+import type { Note, NoteRealm } from "@generated/donut-backend-api"
+import { NoteController } from "@generated/donut-backend-api/sdk.gen"
 import NoteMoreOptionsForm from "@/components/notes/widgets/NoteMoreOptionsForm.vue"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import GlobalApiLoadingModal from "@tests/helpers/GlobalApiLoadingModal"

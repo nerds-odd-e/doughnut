@@ -1,7 +1,7 @@
 import type {
   QuestionGenerationBatchAdminStatusDto,
   QuestionGenerationBatchSubmissionSummaryDto,
-} from "@generated/doughnut-backend-api"
+} from "@generated/donut-backend-api"
 
 export const formatSubmissionSummary = (
   summary: QuestionGenerationBatchSubmissionSummaryDto | undefined

@@ -1,4 +1,4 @@
-import { AiController } from "@generated/doughnut-backend-api/sdk.gen"
+import { AiController } from "@generated/donut-backend-api/sdk.gen"
 import RefineNoteModal from "@/components/recall/RefineNoteModal.vue"
 import { flushPromises } from "@vue/test-utils"
 import makeMe from "donut-test-fixtures/makeMe"

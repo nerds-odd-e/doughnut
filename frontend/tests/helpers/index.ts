@@ -4,13 +4,13 @@ import makeMe from "donut-test-fixtures/makeMe"
 import {
   NoteController,
   NotebookController,
-} from "@generated/doughnut-backend-api/sdk.gen"
+} from "@generated/donut-backend-api/sdk.gen"
 import type {
   Circle,
   Folder,
   NoteRealm,
   Notebook,
-} from "@generated/doughnut-backend-api"
+} from "@generated/donut-backend-api"
 import { vi } from "vitest"
 
 /** API-shaped `Folder` rows for tests and stories (timestamps required by the type). */

@@ -1,6 +1,6 @@
 import ResponseTimeTrendChart from "@/components/recallStats/ResponseTimeTrendChart.vue"
 import helper from "@tests/helpers"
-import type { DayAvgResponseTime } from "@generated/doughnut-backend-api"
+import type { DayAvgResponseTime } from "@generated/donut-backend-api"
 import { describe, it, expect } from "vitest"
 
 describe("ResponseTimeTrendChart", () => {

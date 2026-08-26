@@ -3,8 +3,8 @@ import type {
   DueCommissionedMemoryTrackerLite,
   DueMemoryTrackers,
   MemoryTrackerLite,
-} from "@generated/doughnut-backend-api"
-import { RecallsController } from "@generated/doughnut-backend-api/sdk.gen"
+} from "@generated/donut-backend-api"
+import { RecallsController } from "@generated/donut-backend-api/sdk.gen"
 import getEnvironment from "@/managedApi/window/getEnvironment"
 import timezoneParam from "@/managedApi/window/timezoneParam"
 import { shuffle } from "es-toolkit"

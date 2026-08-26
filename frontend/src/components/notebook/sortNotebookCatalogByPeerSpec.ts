@@ -1,4 +1,4 @@
-import type { NotebookRealm } from "@generated/doughnut-backend-api"
+import type { NotebookRealm } from "@generated/donut-backend-api"
 import type { NotebookCatalogEntry } from "@/components/notebook/patchNotebookInCatalogItems"
 import type { PeerSortSpec } from "@/composables/usePeerSort"
 

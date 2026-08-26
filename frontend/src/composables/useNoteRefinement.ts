@@ -1,7 +1,7 @@
 import type {
   Note,
   NoteRefinementQuestionContextDto,
-} from "@generated/doughnut-backend-api"
+} from "@generated/donut-backend-api"
 import { useNoteExtractionPreview } from "@/composables/useNoteExtractionPreview"
 import { useNoteRefinementLayout } from "@/composables/useNoteRefinementLayout"
 import { type Ref } from "vue"

@@ -15,7 +15,7 @@ const httpMethods = new Set([
 
 const defaultInputPath = path.resolve('open_api_docs.yaml')
 const defaultOutputPath = path.resolve(
-  'packages/generated/doughnut-backend-api/api-summary.md'
+  'packages/generated/donut-backend-api/api-summary.md'
 )
 
 export async function generateApiSummary({

@@ -40,8 +40,8 @@
 import type {
   AnsweredQuestion,
   RecallPrompt,
-} from "@generated/doughnut-backend-api"
-import { RecallPromptController } from "@generated/doughnut-backend-api/sdk.gen"
+} from "@generated/donut-backend-api"
+import { RecallPromptController } from "@generated/donut-backend-api/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import type { PropType } from "vue"
 import { ref } from "vue"

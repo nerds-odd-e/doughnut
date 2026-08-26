@@ -1,6 +1,6 @@
 import AnsweredQuestionComponent from "@/components/recall/AnsweredQuestionComponent.vue"
-import type { NoteRealm } from "@generated/doughnut-backend-api"
-import { AiController } from "@generated/doughnut-backend-api/sdk.gen"
+import type { NoteRealm } from "@generated/donut-backend-api"
+import { AiController } from "@generated/donut-backend-api/sdk.gen"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
 import helper, { mockSdkService, mockShowNote } from "@tests/helpers"

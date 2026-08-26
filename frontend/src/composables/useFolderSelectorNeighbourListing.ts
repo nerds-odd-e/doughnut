@@ -1,4 +1,4 @@
-import type { Folder } from "@generated/doughnut-backend-api"
+import type { Folder } from "@generated/donut-backend-api"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import { requestNotebookFolderListing } from "@/utils/notebookFolderListingRequest"
 import { ref, type Ref } from "vue"

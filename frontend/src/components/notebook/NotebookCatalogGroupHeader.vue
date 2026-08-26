@@ -38,7 +38,7 @@
 <script setup lang="ts">
 import type { PropType } from "vue"
 import { RouterLink } from "vue-router"
-import type { NotebookCatalogGroupItem } from "@generated/doughnut-backend-api"
+import type { NotebookCatalogGroupItem } from "@generated/donut-backend-api"
 import NotebookCatalogGroupActions from "./NotebookCatalogGroupActions.vue"
 
 defineProps({

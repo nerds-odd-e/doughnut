@@ -1,7 +1,7 @@
 import {
   ConversationMessageController,
   NoteController,
-} from "@generated/doughnut-backend-api/sdk.gen"
+} from "@generated/donut-backend-api/sdk.gen"
 import { expect, vi, beforeEach, afterEach, describe, it } from "vitest"
 import ConversationComponent from "@/components/conversations/ConversationComponent.vue"
 import helper, { mockSdkService } from "@tests/helpers"

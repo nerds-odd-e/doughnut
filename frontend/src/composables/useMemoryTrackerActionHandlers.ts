@@ -1,4 +1,4 @@
-import type { NoteRecallInfo } from "@generated/doughnut-backend-api"
+import type { NoteRecallInfo } from "@generated/donut-backend-api"
 import { computed, ref, type ComputedRef, type Ref } from "vue"
 import usePopups from "@/components/commons/Popups/usePopups"
 import {

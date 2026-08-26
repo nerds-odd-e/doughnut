@@ -5,10 +5,8 @@
     "moduleResolution": "Bundler",
     "noEmit": true,
     "paths": {
-      "@generated/doughnut-backend-api": ["../generated/doughnut-backend-api"],
-      "@generated/doughnut-backend-api/*": [
-        "../generated/doughnut-backend-api/*"
-      ]
+      "@generated/donut-backend-api": ["../generated/donut-backend-api"],
+      "@generated/donut-backend-api/*": ["../generated/donut-backend-api/*"]
     }
   },
   "include": ["src/**/*"]

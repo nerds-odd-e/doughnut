@@ -83,8 +83,8 @@
 
 <script setup lang="ts">
 import { onMounted, ref, watch } from "vue"
-import type { Note } from "@generated/doughnut-backend-api"
-import { NoteController } from "@generated/doughnut-backend-api/sdk.gen"
+import type { Note } from "@generated/donut-backend-api"
+import { NoteController } from "@generated/donut-backend-api/sdk.gen"
 import {} from "@/managedApi/clientSetup"
 import JsonExportSection from "../../commons/JsonExportSection.vue"
 

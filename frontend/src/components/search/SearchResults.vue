@@ -81,7 +81,7 @@
 import type {
   NoteSearchResult,
   RelationshipLiteralSearchHit,
-} from "@generated/doughnut-backend-api"
+} from "@generated/donut-backend-api"
 import { computed, toRef } from "vue"
 import SearchDropdownHitList from "./SearchDropdownHitList.vue"
 import SearchResultsPanelHeader from "./SearchResultsPanelHeader.vue"

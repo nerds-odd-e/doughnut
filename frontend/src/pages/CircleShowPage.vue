@@ -164,8 +164,8 @@ import type {
   Notebook,
   NotebookCatalogGroupItem,
   User,
-} from "@generated/doughnut-backend-api"
-import { CircleController } from "@generated/doughnut-backend-api/sdk.gen"
+} from "@generated/donut-backend-api"
+import { CircleController } from "@generated/donut-backend-api/sdk.gen"
 import type { Ref } from "vue"
 import { computed, inject, onMounted, provide, ref, watch } from "vue"
 import { useRouter } from "vue-router"

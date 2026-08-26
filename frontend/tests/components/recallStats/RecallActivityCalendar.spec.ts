@@ -1,6 +1,6 @@
 import RecallActivityCalendar from "@/components/recallStats/RecallActivityCalendar.vue"
 import helper from "@tests/helpers"
-import type { DayCount } from "@generated/doughnut-backend-api"
+import type { DayCount } from "@generated/donut-backend-api"
 import { describe, it, expect } from "vitest"
 
 const cellSize = 12

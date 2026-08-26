@@ -1,5 +1,5 @@
-import type { Folder, FolderRealm } from "@generated/doughnut-backend-api"
-import { NotebookController } from "@generated/doughnut-backend-api/sdk.gen"
+import type { Folder, FolderRealm } from "@generated/donut-backend-api"
+import { NotebookController } from "@generated/donut-backend-api/sdk.gen"
 import type { Ref } from "vue"
 import type { Router } from "vue-router"
 import { refreshSidebarStructuralListings } from "@/components/notes/sidebarStructuralRefresh"

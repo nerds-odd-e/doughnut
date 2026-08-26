@@ -1,4 +1,4 @@
-import { ConversationMessageController } from "@generated/doughnut-backend-api/sdk.gen"
+import { ConversationMessageController } from "@generated/donut-backend-api/sdk.gen"
 import NoteConversation from "@/components/conversations/NoteConversation.vue"
 import makeMe from "donut-test-fixtures/makeMe"
 import helper, { mockSdkService } from "@tests/helpers"

@@ -39,8 +39,8 @@ import ContentLoader from "@/components/commons/ContentLoader.vue"
 import type {
   QuestionGenerationBatchUserScheduleDto,
   User,
-} from "@generated/doughnut-backend-api"
-import { UserController } from "@generated/doughnut-backend-api/sdk.gen"
+} from "@generated/donut-backend-api"
+import { UserController } from "@generated/donut-backend-api/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import { computed, inject, onMounted, ref, type Ref } from "vue"
 import { toOpenApiError } from "@/managedApi/openApiError"

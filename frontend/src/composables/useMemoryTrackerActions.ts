@@ -1,5 +1,5 @@
-import type { NoteRecallInfo } from "@generated/doughnut-backend-api"
-import { NoteController } from "@generated/doughnut-backend-api/sdk.gen"
+import type { NoteRecallInfo } from "@generated/donut-backend-api"
+import { NoteController } from "@generated/donut-backend-api/sdk.gen"
 import {
   computed,
   inject,

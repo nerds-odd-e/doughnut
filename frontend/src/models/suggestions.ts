@@ -1,4 +1,4 @@
-import type { NoteContentCompletion } from "@generated/doughnut-backend-api"
+import type { NoteContentCompletion } from "@generated/donut-backend-api"
 import type { ToolCallResult } from "./aiReplyState"
 import type { StorageAccessor } from "@/store/createNoteStorage"
 

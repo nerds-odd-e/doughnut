@@ -5,7 +5,7 @@ import helper from "@tests/helpers"
 import type {
   NoteSearchResult,
   RelationshipLiteralSearchHit,
-} from "@generated/doughnut-backend-api"
+} from "@generated/donut-backend-api"
 import { describe, it, expect } from "vitest"
 
 function noteHit(r: NoteSearchResult): RelationshipLiteralSearchHit {

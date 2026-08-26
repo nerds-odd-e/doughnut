@@ -1,8 +1,8 @@
 import type {
   FailureReport,
   FailureReportsResponse,
-} from "@generated/doughnut-backend-api"
-import { FailureReportController } from "@generated/doughnut-backend-api/sdk.gen"
+} from "@generated/donut-backend-api"
+import { FailureReportController } from "@generated/donut-backend-api/sdk.gen"
 import FailureReportList from "@/components/admin/FailureReportList.vue"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
 import { createMemoryHistory, createRouter } from "vue-router"

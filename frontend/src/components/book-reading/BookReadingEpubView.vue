@@ -78,7 +78,7 @@ import type {
   BookFull,
   ContentLocatorFull,
   EpubLocatorFull,
-} from "@generated/doughnut-backend-api"
+} from "@generated/donut-backend-api"
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from "vue"
 
 type EpubViewerExposed = Pick<

@@ -1,4 +1,4 @@
-import { WikidataController } from "@generated/doughnut-backend-api/sdk.gen"
+import { WikidataController } from "@generated/donut-backend-api/sdk.gen"
 import {} from "@/managedApi/clientSetup"
 import nonBlockingPopup from "@/managedApi/window/nonBlockingPopup"
 

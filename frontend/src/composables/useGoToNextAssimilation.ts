@@ -1,4 +1,4 @@
-import { AssimilationController } from "@generated/doughnut-backend-api/sdk.gen"
+import { AssimilationController } from "@generated/donut-backend-api/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import timezoneParam from "@/managedApi/window/timezoneParam"
 import { useAssimilationCount } from "@/composables/useAssimilationCount"

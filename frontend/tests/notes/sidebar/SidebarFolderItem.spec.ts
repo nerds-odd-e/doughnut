@@ -1,5 +1,5 @@
 import SidebarFolderItem from "@/components/notes/SidebarFolderItem.vue"
-import type { Folder } from "@generated/doughnut-backend-api"
+import type { Folder } from "@generated/donut-backend-api"
 import makeMe from "donut-test-fixtures/makeMe"
 import { flushPromises, mount, type VueWrapper } from "@vue/test-utils"
 import { createRouter, createWebHistory } from "vue-router"

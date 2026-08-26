@@ -10,8 +10,8 @@
 <script setup lang="ts">
 import { ref, watch } from "vue"
 import { useRoute } from "vue-router"
-import type { NotebookRealm } from "@generated/doughnut-backend-api"
-import { NotebookController } from "@generated/doughnut-backend-api/sdk.gen"
+import type { NotebookRealm } from "@generated/donut-backend-api"
+import { NotebookController } from "@generated/donut-backend-api/sdk.gen"
 import NotebookSidebarLayout from "@/layouts/NotebookSidebarLayout.vue"
 import NotebookPage from "@/pages/NotebookPage.vue"
 

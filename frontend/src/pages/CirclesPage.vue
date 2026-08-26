@@ -29,8 +29,8 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from "vue"
-import type { Circle } from "@generated/doughnut-backend-api"
-import { CircleController } from "@generated/doughnut-backend-api/sdk.gen"
+import type { Circle } from "@generated/donut-backend-api"
+import { CircleController } from "@generated/donut-backend-api/sdk.gen"
 import {} from "@/managedApi/clientSetup"
 import CircleNewForm from "@/components/circles/CircleNewForm.vue"
 import ContentLoader from "@/components/commons/ContentLoader.vue"

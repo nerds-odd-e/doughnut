@@ -61,8 +61,8 @@
 <script setup lang="ts">
 import type { PropType } from "vue"
 import { ref, watch } from "vue"
-import type { Notebook, User } from "@generated/doughnut-backend-api"
-import { NotebookController } from "@generated/doughnut-backend-api/sdk.gen"
+import type { Notebook, User } from "@generated/donut-backend-api"
+import { NotebookController } from "@generated/donut-backend-api/sdk.gen"
 import NotebookHealthPanel from "@/components/notebook/NotebookHealthPanel.vue"
 import AutosavingPageNameEditor from "@/components/commons/AutosavingPageNameEditor.vue"
 import NotebookSettings from "@/components/notebook/NotebookSettings.vue"

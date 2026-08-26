@@ -25,7 +25,7 @@
 
 **Types:**
 - **Java:** PascalCase classes/interfaces; DTOs often `*DTO` under `controllers/dto/`; domain entities under `entities/`.
-- **TypeScript:** PascalCase for types/interfaces imported from `@generated/doughnut-backend-api`; prefer generated API types over hand-rolled wire shapes.
+- **TypeScript:** PascalCase for types/interfaces imported from `@generated/donut-backend-api`; prefer generated API types over hand-rolled wire shapes.
 - Vue props via `defineProps<{ ... }>()`; emits via `defineEmits<{ ... }>()`.
 
 **Test selectors:**
@@ -52,15 +52,15 @@
 
 **Order (observed practice):**
 1. External / framework packages (`vue`, `vitest`, Spring, JUnit).
-2. Generated API (`@generated/doughnut-backend-api/...`).
+2. Generated API (`@generated/donut-backend-api/...`).
 3. Internal aliases (`@/…`, `@tests/…`) or same-package relatives.
 4. Type-only imports where Biome warns (`useImportType`).
 
 **Path aliases:**
 - Frontend: `@` → `frontend/src`, `@tests` → `frontend/tests` (see `frontend/vitest.config.ts`).
-- Generated SDK: `@generated/doughnut-backend-api/sdk.gen` and types from `@generated/doughnut-backend-api`.
+- Generated SDK: `@generated/donut-backend-api/sdk.gen` and types from `@generated/donut-backend-api`.
 - Shared fixtures: `donut-test-fixtures/makeMe` only — do not import the bare package name or deep `src/` paths.
-- CLI / MCP resolve `@generated/doughnut-backend-api` via Vitest aliases to `packages/generated/doughnut-backend-api`.
+- CLI / MCP resolve `@generated/donut-backend-api` via Vitest aliases to `packages/generated/donut-backend-api`.
 
 **Organize imports:** Biome `organizeImports` assist is **off** in both biome configs — do not rely on auto-sort; keep imports tidy manually.
 

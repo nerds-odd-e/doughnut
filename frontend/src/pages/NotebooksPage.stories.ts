@@ -4,7 +4,7 @@ import makeMe from "donut-test-fixtures/makeMe"
 import type {
   SubscriptionForNotebooksListing,
   User,
-} from "@generated/doughnut-backend-api"
+} from "@generated/donut-backend-api"
 
 const meta = {
   title: "Page Views/NotebooksPageView",

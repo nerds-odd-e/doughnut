@@ -4,7 +4,7 @@ import type {
   NotebookCatalogNotebookItem,
   NotebookCatalogSubscribedNotebookItem,
   NotebookRealm,
-} from "@generated/doughnut-backend-api"
+} from "@generated/donut-backend-api"
 
 export type NotebookCatalogEntry =
   | NotebookCatalogGroupItem

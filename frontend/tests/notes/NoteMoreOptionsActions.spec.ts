@@ -1,4 +1,4 @@
-import { NoteController } from "@generated/doughnut-backend-api/sdk.gen"
+import { NoteController } from "@generated/donut-backend-api/sdk.gen"
 import NoteMoreOptionsActions from "@/components/notes/widgets/NoteMoreOptionsActions.vue"
 import usePopups from "@/components/commons/Popups/usePopups"
 import makeMe from "donut-test-fixtures/makeMe"

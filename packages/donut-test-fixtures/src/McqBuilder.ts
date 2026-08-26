@@ -1,4 +1,4 @@
-import type { Mcq } from '@generated/doughnut-backend-api'
+import type { Mcq } from '@generated/donut-backend-api'
 import Builder from './Builder'
 import generateId from './generateId'
 

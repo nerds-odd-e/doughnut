@@ -37,7 +37,7 @@
 
 <script setup lang="ts">
 import { computed } from "vue"
-import type { NoteTopology } from "@generated/doughnut-backend-api"
+import type { NoteTopology } from "@generated/donut-backend-api"
 import NoteTitleComponent from "../notes/core/NoteTitleComponent.vue"
 import { Reply } from "@lucide/vue"
 

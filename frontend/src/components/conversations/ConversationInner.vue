@@ -64,13 +64,13 @@
 
 <script setup lang="ts">
 import { ref, onMounted, watch, computed } from "vue"
-import { ConversationMessageController } from "@generated/doughnut-backend-api/sdk.gen"
+import { ConversationMessageController } from "@generated/donut-backend-api/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import type {
   User,
   ConversationMessage,
   Conversation,
-} from "@generated/doughnut-backend-api"
+} from "@generated/donut-backend-api"
 import { Bot, User as UserIcon } from "@lucide/vue"
 import ScrollTo from "@/components/commons/ScrollTo.vue"
 import ConversationTemplate from "./ConversationTemplate.vue"

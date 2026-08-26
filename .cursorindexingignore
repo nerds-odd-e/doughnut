@@ -2,6 +2,6 @@
 ongoing/
 docs/
 open_api_docs.yaml
-packages/generated/doughnut-backend-api/*.gen.ts
-packages/generated/doughnut-backend-api/index.ts
-packages/generated/doughnut-backend-api/client/
+packages/generated/donut-backend-api/*.gen.ts
+packages/generated/donut-backend-api/index.ts
+packages/generated/donut-backend-api/client/

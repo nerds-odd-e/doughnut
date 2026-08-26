@@ -29,7 +29,7 @@
 </template>
 
 <script setup lang="ts">
-import type { NoteTopology } from "@generated/doughnut-backend-api"
+import type { NoteTopology } from "@generated/donut-backend-api"
 import { RouterLink } from "vue-router"
 import ScrollTo from "@/components/commons/ScrollTo.vue"
 import NoteTitleComponent from "./core/NoteTitleComponent.vue"

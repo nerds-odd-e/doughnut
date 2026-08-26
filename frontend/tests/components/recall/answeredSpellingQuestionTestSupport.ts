@@ -3,7 +3,7 @@ import type {
   AnsweredQuestion,
   NoteRealm,
   User,
-} from "@generated/doughnut-backend-api"
+} from "@generated/donut-backend-api"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import { buildWikiLinkText } from "@/utils/buildWikiLinkText"
 import helper from "@tests/helpers"

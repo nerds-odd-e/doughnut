@@ -1,7 +1,7 @@
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import routes from "@/routes/routes"
 import createNoteStorage from "@/store/createNoteStorage"
-import type { User } from "@generated/doughnut-backend-api"
+import type { User } from "@generated/donut-backend-api"
 import { render } from "@testing-library/vue"
 import { mount } from "@vue/test-utils"
 import { merge } from "es-toolkit"

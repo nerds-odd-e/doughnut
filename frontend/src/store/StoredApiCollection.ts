@@ -4,13 +4,13 @@ import type {
   NoteDeleteDto,
   NoteRealm,
   NoteUpdateTitleDto,
-} from "@generated/doughnut-backend-api"
+} from "@generated/donut-backend-api"
 import {
   RelationController,
   NoteController,
   TextContentController,
   NotebookController,
-} from "@generated/doughnut-backend-api/sdk.gen"
+} from "@generated/donut-backend-api/sdk.gen"
 import {
   toOpenApiError,
   setErrorObjectForFieldErrors,

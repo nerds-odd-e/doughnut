@@ -1,8 +1,5 @@
 import type { Router } from "vue-router"
-import type {
-  NoteCreationDto,
-  NoteRealm,
-} from "@generated/doughnut-backend-api"
+import type { NoteCreationDto, NoteRealm } from "@generated/donut-backend-api"
 import { parseSoftDeletedTitleConflict } from "@/managedApi/softDeletedTitleConflict"
 import {
   applyParentRelationshipToCreateContent,

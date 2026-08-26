@@ -2,7 +2,7 @@ import type {
   CircleForUserView,
   Notebook,
   NotebookCatalogNotebookItem,
-} from '@generated/doughnut-backend-api'
+} from '@generated/donut-backend-api'
 import NotebooksBuilder from './BazaarNotebooksBuilder'
 import Builder from './Builder'
 import generateId from './generateId'

@@ -69,7 +69,7 @@ import type {
   NotebookCatalogGroupItem,
   SubscriptionForNotebooksListing,
   User,
-} from "@generated/doughnut-backend-api"
+} from "@generated/donut-backend-api"
 import NotebookCatalogGroupPanel from "@/components/notebook/NotebookCatalogGroupPanel.vue"
 import { useNotebooksLayout } from "@/composables/useNotebooksLayout"
 import GlobalBar from "@/components/toolbars/GlobalBar.vue"

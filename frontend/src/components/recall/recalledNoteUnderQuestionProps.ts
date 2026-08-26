@@ -1,4 +1,4 @@
-import type { RecalledNote } from "@generated/doughnut-backend-api"
+import type { RecalledNote } from "@generated/donut-backend-api"
 
 export function recalledNoteUnderQuestionProps(recalledNote: RecalledNote) {
   return {

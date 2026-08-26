@@ -1,7 +1,7 @@
 import {
   NoteController,
   TextContentController,
-} from "@generated/doughnut-backend-api/sdk.gen"
+} from "@generated/donut-backend-api/sdk.gen"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
 import { mockSdkService } from "@tests/helpers"
 import makeMe from "donut-test-fixtures/makeMe"

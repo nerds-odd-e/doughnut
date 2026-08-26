@@ -59,8 +59,8 @@
 <script setup lang="ts">
 import type { PropType } from "vue"
 import { computed, ref } from "vue"
-import type { Note, Mcq } from "@generated/doughnut-backend-api"
-import { McqController } from "@generated/doughnut-backend-api/sdk.gen"
+import type { Note, Mcq } from "@generated/donut-backend-api"
+import { McqController } from "@generated/donut-backend-api/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import isMcqValid from "@/models/isMcqValid"
 import TextArea from "../form/TextArea.vue"

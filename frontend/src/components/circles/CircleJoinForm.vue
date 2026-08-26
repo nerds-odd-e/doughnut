@@ -17,8 +17,8 @@ import { defineComponent } from "vue"
 import type {
   Circle,
   CircleJoiningByInvitation,
-} from "@generated/doughnut-backend-api"
-import { CircleController } from "@generated/doughnut-backend-api/sdk.gen"
+} from "@generated/donut-backend-api"
+import { CircleController } from "@generated/donut-backend-api/sdk.gen"
 import { toOpenApiError } from "@/managedApi/openApiError"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import TextInput from "@/components/form/TextInput.vue"

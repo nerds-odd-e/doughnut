@@ -1,4 +1,4 @@
-import type { NoteRealm } from "@generated/doughnut-backend-api"
+import type { NoteRealm } from "@generated/donut-backend-api"
 import { relationTypeLabelFromNoteContent } from "@/models/relationTypeOptions"
 import {
   authoredLinkOccurrences,

@@ -24,7 +24,7 @@
 
 <script setup lang="ts">
 import { computed, type PropType } from "vue"
-import type { WikiTitle } from "@generated/doughnut-backend-api"
+import type { WikiTitle } from "@generated/donut-backend-api"
 import { noteShowLocation } from "@/routes/noteShowLocation"
 import {
   noteIdForAuthoredToken,

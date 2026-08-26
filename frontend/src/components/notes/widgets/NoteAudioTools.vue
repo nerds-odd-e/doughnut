@@ -66,7 +66,7 @@
 import { onBeforeUnmount, ref, type PropType } from "vue"
 import { createAudioRecorder } from "../../../models/audio/audioRecorder"
 import { createWakeLocker } from "../../../models/wakeLocker"
-import type { Note } from "@generated/doughnut-backend-api"
+import type { Note } from "@generated/donut-backend-api"
 import Waveform from "./Waveform.vue"
 import NoteAudioToolsAdvancedOptions from "./NoteAudioToolsAdvancedOptions.vue"
 import { Mic } from "@lucide/vue"

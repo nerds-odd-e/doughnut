@@ -53,7 +53,7 @@ import { MoreHorizontal } from "@lucide/vue"
 import type {
   Circle,
   NotebookCatalogGroupItem,
-} from "@generated/doughnut-backend-api"
+} from "@generated/donut-backend-api"
 import AutoCollapseDropdown from "@/components/commons/AutoCollapseDropdown.vue"
 import DropdownMenu from "@/components/commons/DropdownMenu.vue"
 import DropdownMenuItem from "@/components/commons/DropdownMenuItem.vue"

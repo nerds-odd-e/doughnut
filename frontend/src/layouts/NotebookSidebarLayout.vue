@@ -74,11 +74,7 @@
 <script setup lang="ts">
 import { computed, inject, ref, watch, type Ref } from "vue"
 import { RouterView, useRoute } from "vue-router"
-import type {
-  Folder,
-  NotebookRealm,
-  User,
-} from "@generated/doughnut-backend-api"
+import type { Folder, NotebookRealm, User } from "@generated/donut-backend-api"
 import { PanelLeft, PanelLeftClose } from "@lucide/vue"
 import GlobalBar from "@/components/toolbars/GlobalBar.vue"
 import BreadcrumbWithCircle from "@/components/toolbars/BreadcrumbWithCircle.vue"

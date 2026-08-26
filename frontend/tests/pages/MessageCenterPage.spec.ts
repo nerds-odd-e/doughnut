@@ -1,4 +1,4 @@
-import { ConversationMessageController } from "@generated/doughnut-backend-api/sdk.gen"
+import { ConversationMessageController } from "@generated/donut-backend-api/sdk.gen"
 import MessageCenterPage from "@/pages/MessageCenterPage.vue"
 import routes from "@/routes/routes"
 import { describe, it, expect, beforeEach, vi } from "vitest"

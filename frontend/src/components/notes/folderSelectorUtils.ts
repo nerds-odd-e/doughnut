@@ -1,4 +1,4 @@
-import type { Folder } from "@generated/doughnut-backend-api"
+import type { Folder } from "@generated/donut-backend-api"
 
 export function folderRowsById(rows: Folder[]): Map<number, Folder> {
   return new Map(rows.map((r) => [r.id, r]))

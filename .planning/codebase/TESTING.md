@@ -120,7 +120,7 @@ Base class: `backend/src/test/java/com/odde/doughnut/controllers/ControllerTestB
 import { describe, it, expect, beforeEach } from "vitest"
 import { render } from "@testing-library/vue"
 import helper, { mockSdkService } from "@tests/helpers"
-import { NoteController } from "@generated/doughnut-backend-api/sdk.gen"
+import { NoteController } from "@generated/donut-backend-api/sdk.gen"
 import makeMe from "donut-test-fixtures/makeMe"
 
 beforeEach(() => {
@@ -156,7 +156,7 @@ describe("LoadingModal", () => {
 
 ```typescript
 // Frontend — type-safe SDK mock (auto-wraps { data, error, request, response })
-import { NoteController } from "@generated/doughnut-backend-api/sdk.gen"
+import { NoteController } from "@generated/donut-backend-api/sdk.gen"
 import { mockSdkService, wrapSdkResponse } from "@tests/helpers"
 
 const spy = mockSdkService(NoteController, "showNote", makeMe.aNoteRealm.please())

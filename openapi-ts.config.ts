@@ -14,8 +14,8 @@ export default defineConfig({
     },
   ],
   output: {
-    path: path.resolve('./packages/generated/doughnut-backend-api'),
-    name: 'DoughnutApi',
+    path: path.resolve('./packages/generated/donut-backend-api'),
+    name: 'DonutApi',
     clean: true,
   },
   typescript: {

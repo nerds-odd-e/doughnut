@@ -38,12 +38,12 @@
 </template>
 
 <script setup lang="ts">
-import type { User, Conversation } from "@generated/doughnut-backend-api"
+import type { User, Conversation } from "@generated/donut-backend-api"
 import NoteShow from "@/components/notes/NoteShow.vue"
 import AnsweredQuestionComponent from "@/components/recall/AnsweredQuestionComponent.vue"
 import { useRouter } from "vue-router"
 import { ref, onMounted } from "vue"
-import { ConversationMessageController } from "@generated/doughnut-backend-api/sdk.gen"
+import { ConversationMessageController } from "@generated/donut-backend-api/sdk.gen"
 import ConversationInner from "@/components/conversations/ConversationInner.vue"
 import { noteShowLocation } from "@/routes/noteShowLocation"
 

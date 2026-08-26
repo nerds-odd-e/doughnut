@@ -1,7 +1,7 @@
 /// <reference types="Cypress" />
 // @ts-check
-import type { TimeTravelRelativeToNow } from '@generated/doughnut-backend-api'
-import { TestabilityRestController } from '@generated/doughnut-backend-api/sdk.gen'
+import type { TimeTravelRelativeToNow } from '@generated/donut-backend-api'
+import { TestabilityRestController } from '@generated/donut-backend-api/sdk.gen'
 
 function clockAt(days: number, hours: number) {
   // Backend time-travel parses JSON.stringify clock fields as naive local time.

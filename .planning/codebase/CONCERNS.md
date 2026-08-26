@@ -142,7 +142,7 @@
 - Test coverage: Stronger after restructure, but still sensitive to JPQL order vs `AssimilationUnit.ORDER`.
 
 **Generated OpenAPI client sync:**
-- Files: `packages/generated/doughnut-backend-api/**`, `open_api_docs.yaml`, skill `.agents/skills/generate-api-client/SKILL.md`
+- Files: `packages/generated/donut-backend-api/**`, `open_api_docs.yaml`, skill `.agents/skills/generate-api-client/SKILL.md`
 - Why fragile: Backend DTO/controller changes require `pnpm generateTypeScript`; hand-edits are forbidden; OpenAPI approval tests fail if skipped.
 - Safe modification: Regenerate after every controller/DTO change; never manually fix generated whitespace (`scripts/check_diff_whitespace.sh`).
 - Test coverage: Backend OpenAPI approval tests; frontend breaks at compile/runtime if stale.

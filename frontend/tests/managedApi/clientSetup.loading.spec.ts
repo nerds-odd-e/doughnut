@@ -5,7 +5,7 @@ import {
   type CancelableApiResult,
   setupGlobalClient,
 } from "@/managedApi/clientSetup"
-import { UserController } from "@generated/doughnut-backend-api/sdk.gen"
+import { UserController } from "@generated/donut-backend-api/sdk.gen"
 import { beforeEach, describe, expect, expectTypeOf, it, vi } from "vitest"
 import createFetchMock from "vitest-fetch-mock"
 

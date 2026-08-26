@@ -1,5 +1,5 @@
-import type { SearchTerm } from "@generated/doughnut-backend-api"
-import { SearchController } from "@generated/doughnut-backend-api/sdk.gen"
+import type { SearchTerm } from "@generated/donut-backend-api"
+import { SearchController } from "@generated/donut-backend-api/sdk.gen"
 import type { SearchResultsModel } from "@/models/searchResultsModel"
 import { appendSearchKeyToHistory } from "@/utils/searchKeyHistoryCookie"
 

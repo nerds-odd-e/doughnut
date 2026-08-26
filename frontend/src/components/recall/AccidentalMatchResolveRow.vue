@@ -41,7 +41,7 @@
 
 <script setup lang="ts">
 import type { PropType } from "vue"
-import type { NoteTopology } from "@generated/doughnut-backend-api"
+import type { NoteTopology } from "@generated/donut-backend-api"
 import NoteTitleWithLink from "@/components/notes/NoteTitleWithLink.vue"
 import BreadcrumbWithCircle from "@/components/toolbars/BreadcrumbWithCircle.vue"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"

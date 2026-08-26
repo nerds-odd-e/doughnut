@@ -1,10 +1,10 @@
 import {
   NoteController,
   SearchController,
-} from "@generated/doughnut-backend-api/sdk.gen"
+} from "@generated/donut-backend-api/sdk.gen"
 import GlobalBar from "@/components/toolbars/GlobalBar.vue"
 import SoftKeyboardPrimer from "@/components/commons/SoftKeyboardPrimer.vue"
-import type { User } from "@generated/doughnut-backend-api"
+import type { User } from "@generated/donut-backend-api"
 import NoteEditingHistory from "@/store/NoteEditingHistory"
 import createNoteStorage from "@/store/createNoteStorage"
 import {

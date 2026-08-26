@@ -1,4 +1,4 @@
-import { RecallsController } from '@generated/doughnut-backend-api/sdk.gen'
+import { RecallsController } from '@generated/donut-backend-api/sdk.gen'
 import { commonSenseSplit } from 'support/string_util'
 import { waitUntilAppIsNotBusy } from '../pageBase'
 import router from '../router'

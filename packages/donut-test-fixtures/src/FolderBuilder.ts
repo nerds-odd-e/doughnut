@@ -1,4 +1,4 @@
-import type { Folder } from '@generated/doughnut-backend-api'
+import type { Folder } from '@generated/donut-backend-api'
 import Builder from './Builder'
 
 const DEFAULT_FOLDER_DATE_TIME = '2000-01-01T00:00:00.000Z'

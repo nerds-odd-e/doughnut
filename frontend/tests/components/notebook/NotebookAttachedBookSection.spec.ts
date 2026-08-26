@@ -1,5 +1,5 @@
-import { client } from "@generated/doughnut-backend-api/client.gen"
-import { NotebookBooksController } from "@generated/doughnut-backend-api/sdk.gen"
+import { client } from "@generated/donut-backend-api/client.gen"
+import { NotebookBooksController } from "@generated/donut-backend-api/sdk.gen"
 import usePopups from "@/components/commons/Popups/usePopups"
 import { teardownGlobalClientForTesting } from "@/managedApi/clientSetup"
 import makeMe from "donut-test-fixtures/makeMe"

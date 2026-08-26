@@ -47,7 +47,7 @@ import { computed } from "vue"
 import { SkipForward } from "@lucide/vue"
 import Modal from "../commons/Modal.vue"
 import { useRecallData } from "@/composables/useRecallData"
-import type { AnsweredQuestion } from "@generated/doughnut-backend-api"
+import type { AnsweredQuestion } from "@generated/donut-backend-api"
 
 const props = defineProps({
   canMoveToEnd: { type: Boolean, required: true },

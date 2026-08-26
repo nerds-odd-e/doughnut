@@ -34,7 +34,7 @@ import type {
   MemoryTracker,
   Note,
   NoteRecallInfo,
-} from "@generated/doughnut-backend-api"
+} from "@generated/donut-backend-api"
 import { computed, ref, watch } from "vue"
 import { useRouter } from "vue-router"
 import NoteRecallSettingForm from "../recall/NoteRecallSettingForm.vue"

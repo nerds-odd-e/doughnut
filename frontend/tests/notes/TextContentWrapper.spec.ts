@@ -1,4 +1,4 @@
-import { TextContentController } from "@generated/doughnut-backend-api/sdk.gen"
+import { TextContentController } from "@generated/donut-backend-api/sdk.gen"
 import { advanceNoteContentSaveDebounce } from "@tests/helpers/noteContentDebounceTestSupport"
 import { mockSdkService } from "@tests/helpers"
 import {

@@ -69,11 +69,11 @@ import { computed, inject, onMounted, ref, type Ref } from "vue"
 import type {
   NotebookHealthLintReport,
   User,
-} from "@generated/doughnut-backend-api"
+} from "@generated/donut-backend-api"
 import {
   NotebookHealthController,
   UserController,
-} from "@generated/doughnut-backend-api/sdk.gen"
+} from "@generated/donut-backend-api/sdk.gen"
 import CheckInput from "@/components/form/CheckInput.vue"
 import NotebookHealthFindings from "@/components/notebook/NotebookHealthFindings.vue"
 import { refreshSidebarStructuralListings } from "@/components/notes/sidebarStructuralRefresh"

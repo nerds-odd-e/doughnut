@@ -33,7 +33,7 @@
 
 <script setup lang="ts">
 import { computed, inject, ref, type PropType, type Ref } from "vue"
-import type { NoteTopology, User } from "@generated/doughnut-backend-api"
+import type { NoteTopology, User } from "@generated/donut-backend-api"
 import AccidentalMatchResolveRow from "@/components/recall/AccidentalMatchResolveRow.vue"
 import MatchedNoteWikiLinkOrRelationshipOffer from "@/components/recall/MatchedNoteWikiLinkOrRelationshipOffer.vue"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"

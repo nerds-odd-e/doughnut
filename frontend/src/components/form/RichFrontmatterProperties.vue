@@ -109,7 +109,7 @@ import RichFrontmatterEditablePropertyRow from "@/components/form/RichFrontmatte
 import RichFrontmatterInsertForm from "@/components/form/RichFrontmatterInsertForm.vue"
 import { richFrontmatterIsReadmeContextKey } from "@/components/form/richFrontmatterProvide"
 import WikidataAssociationDialog from "@/components/notes/WikidataAssociationDialog.vue"
-import type { WikiTitle } from "@generated/doughnut-backend-api"
+import type { WikiTitle } from "@generated/donut-backend-api"
 import { usePropertyRowClientIds } from "@/composables/usePropertyRowClientIds"
 import { useRichFrontmatterPropertyEditing } from "@/composables/useRichFrontmatterPropertyEditing"
 import { useWikidataPropertyDialog } from "@/composables/useWikidataPropertyDialog"

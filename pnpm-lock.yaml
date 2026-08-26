@@ -421,21 +421,21 @@ importers:
 
   packages/donut-api:
     dependencies:
-      '@generated/doughnut-backend-api':
+      '@generated/donut-backend-api':
         specifier: workspace:*
-        version: link:../generated/doughnut-backend-api
+        version: link:../generated/donut-backend-api
 
   packages/donut-test-fixtures:
     dependencies:
-      '@generated/doughnut-backend-api':
+      '@generated/donut-backend-api':
         specifier: workspace:*
-        version: link:../generated/doughnut-backend-api
+        version: link:../generated/donut-backend-api
     devDependencies:
       '@biomejs/biome':
         specifier: 2.5.10
         version: 2.5.10
 
-  packages/generated/doughnut-backend-api: {}
+  packages/generated/donut-backend-api: {}
 
 packages:
 

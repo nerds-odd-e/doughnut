@@ -2,14 +2,14 @@ import {
   MemoryTrackerController,
   NoteController,
   RecallsController,
-} from "@generated/doughnut-backend-api/sdk.gen"
+} from "@generated/donut-backend-api/sdk.gen"
 import { useRecallData } from "@/composables/useRecallData"
 import type { PotentialLearningSession } from "@/composables/useRecallData"
 import RecallPage from "@/pages/RecallPage.vue"
 import type {
   DueCommissionedMemoryTrackerLite,
   MemoryTrackerLite,
-} from "@generated/doughnut-backend-api"
+} from "@generated/donut-backend-api"
 import makeMe from "donut-test-fixtures/makeMe"
 import helper, { mockSdkService } from "@tests/helpers"
 import { flushPromises } from "@vue/test-utils"

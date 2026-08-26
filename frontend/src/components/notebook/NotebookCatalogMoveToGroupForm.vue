@@ -71,12 +71,12 @@
 
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from "vue"
-import type { NotebookCatalogGroupItem } from "@generated/doughnut-backend-api"
+import type { NotebookCatalogGroupItem } from "@generated/donut-backend-api"
 import {
   NotebookController,
   NotebookGroupController,
   SubscriptionController,
-} from "@generated/doughnut-backend-api/sdk.gen"
+} from "@generated/donut-backend-api/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import { toOpenApiError } from "@/managedApi/openApiError"
 import { useToast } from "@/composables/useToast"

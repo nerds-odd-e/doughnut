@@ -15,7 +15,7 @@
 </template>
 
 <script setup lang="ts">
-import type { Folder } from "@generated/doughnut-backend-api"
+import type { Folder } from "@generated/donut-backend-api"
 import PopButton from "../../commons/Popups/PopButton.vue"
 import FolderNewForm from "../FolderNewForm.vue"
 

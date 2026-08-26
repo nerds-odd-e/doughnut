@@ -1,5 +1,5 @@
 import PdfBookViewer from "@/components/book-reading/PdfBookViewer.vue"
-import { NotebookBooksController } from "@generated/doughnut-backend-api/sdk.gen"
+import { NotebookBooksController } from "@generated/donut-backend-api/sdk.gen"
 import { mockSdkService } from "@tests/helpers"
 import makeMe from "donut-test-fixtures/makeMe"
 import { flushPromises } from "@vue/test-utils"

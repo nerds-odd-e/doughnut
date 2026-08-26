@@ -3,7 +3,7 @@ import type {
   NoteRealm,
   NotebookRealm,
   WikiTitle,
-} from '@generated/doughnut-backend-api'
+} from '@generated/donut-backend-api'
 import Builder from './Builder'
 import FolderBuilder from './FolderBuilder'
 import NoteBuilder from './NoteBuilder'

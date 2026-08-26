@@ -6,9 +6,9 @@ export default defineConfig({
   plugins: [pythonAsTextVitePlugin()],
   resolve: {
     alias: {
-      '@generated/doughnut-backend-api': resolve(
+      '@generated/donut-backend-api': resolve(
         import.meta.dirname,
-        '../packages/generated/doughnut-backend-api'
+        '../packages/generated/donut-backend-api'
       ),
     },
   },

@@ -1,4 +1,4 @@
-import { NoteController } from "@generated/doughnut-backend-api/sdk.gen"
+import { NoteController } from "@generated/donut-backend-api/sdk.gen"
 import { describe, it, expect } from "vitest"
 import type { VueWrapper } from "@vue/test-utils"
 import helper, { mockSdkService } from "@tests/helpers"

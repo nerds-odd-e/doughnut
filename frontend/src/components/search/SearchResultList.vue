@@ -51,7 +51,7 @@
 
 <script setup lang="ts">
 import type { PropType } from "vue"
-import type { RelationshipLiteralSearchHit } from "@generated/doughnut-backend-api"
+import type { RelationshipLiteralSearchHit } from "@generated/donut-backend-api"
 import SearchResultListItem from "./SearchResultListItem.vue"
 import { relationshipLiteralSearchHitKey } from "@/models/relationshipLiteralSearchHitKey"
 import { searchResultListTestId } from "@/utils/searchDialogKeyboard"

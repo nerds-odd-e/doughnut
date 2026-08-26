@@ -62,7 +62,7 @@
 </template>
 
 <script setup lang="ts">
-import type { HeadlineStats } from "@generated/doughnut-backend-api"
+import type { HeadlineStats } from "@generated/donut-backend-api"
 import { computed } from "vue"
 
 const props = defineProps<{ totals: HeadlineStats }>()

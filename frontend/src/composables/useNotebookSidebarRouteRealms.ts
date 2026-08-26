@@ -1,8 +1,5 @@
-import type {
-  FolderRealm,
-  NotebookRealm,
-} from "@generated/doughnut-backend-api"
-import { NotebookController } from "@generated/doughnut-backend-api/sdk.gen"
+import type { FolderRealm, NotebookRealm } from "@generated/donut-backend-api"
+import { NotebookController } from "@generated/donut-backend-api/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import { computed, ref, watch } from "vue"
 import type { RouteLocationNormalizedLoaded } from "vue-router"

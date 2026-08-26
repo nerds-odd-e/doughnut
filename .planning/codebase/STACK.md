@@ -66,7 +66,7 @@
 - `com.mysql:mysql-connector-j:9.7.0` — MySQL driver
 - Spring Security + OAuth2 client — GitHub login in prod (`ProductionConfiguration.java`, `application.yml`)
 - `com.google.cloud:google-cloud-storage` (BOM `libraries-bom:26.85.0`) — prod book PDF storage
-- `@generated/doughnut-backend-api` — generated SDK consumed by frontend, CLI, MCP via `packages/donut-api`
+- `@generated/donut-backend-api` — generated SDK consumed by frontend, CLI, MCP via `packages/donut-api`
 - Quill (`@dotwee/quill`), PDF.js, epub.js — note/book reading editors (`frontend/package.json`)
 - Tailwind CSS 4.3.2 + DaisyUI 5.6.18 — frontend styling
 - ShedLock (JDBC) — distributed scheduled job locking (`ShedLockConfig.java`)

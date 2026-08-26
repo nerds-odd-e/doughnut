@@ -18,7 +18,7 @@ import type {
   Folder,
   FolderRealm,
   NoteRealm,
-} from "@generated/doughnut-backend-api"
+} from "@generated/donut-backend-api"
 import { NotebookPen } from "@lucide/vue"
 import NoteNewButton from "./core/NoteNewButton.vue"
 import { useNoteCreationToolbarContext } from "@/composables/useNoteCreationToolbarContext"

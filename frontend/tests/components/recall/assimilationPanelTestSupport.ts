@@ -3,7 +3,7 @@ import {
   AssimilationController,
   AssimilationSequenceSkipController,
   NoteController,
-} from "@generated/doughnut-backend-api/sdk.gen"
+} from "@generated/donut-backend-api/sdk.gen"
 import AssimilationPanel from "@/components/recall/AssimilationPanel.vue"
 import { flushPromises } from "@vue/test-utils"
 import makeMe from "donut-test-fixtures/makeMe"
@@ -11,7 +11,7 @@ import helper, { mockSdkService } from "@tests/helpers"
 import RenderingHelper from "@tests/helpers/RenderingHelper"
 import { useRecallData } from "@/composables/useRecallData"
 import { useAssimilationCount } from "@/composables/useAssimilationCount"
-import type { MemoryTrackerLite } from "@generated/doughnut-backend-api"
+import type { MemoryTrackerLite } from "@generated/donut-backend-api"
 import { computed, ref } from "vue"
 import usePopups from "@/components/commons/Popups/usePopups"
 import { closeButtonEl } from "@tests/commons/modalTestSupport"

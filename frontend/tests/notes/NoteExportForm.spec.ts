@@ -2,10 +2,10 @@ import { describe, it, vi, expect, beforeEach, afterEach } from "vitest"
 import helper, { mockSdkService, wrapSdkResponse } from "@tests/helpers"
 import makeMe from "donut-test-fixtures/makeMe"
 import NoteExportForm from "@/components/notes/core/NoteExportForm.vue"
-import { NoteController } from "@generated/doughnut-backend-api/sdk.gen"
+import { NoteController } from "@generated/donut-backend-api/sdk.gen"
 import { saveAs } from "file-saver"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
-import type { Note } from "@generated/doughnut-backend-api"
+import type { Note } from "@generated/donut-backend-api"
 
 vi.mock("file-saver", () => ({ saveAs: vi.fn() }))
 

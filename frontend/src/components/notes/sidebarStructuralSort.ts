@@ -1,4 +1,4 @@
-import type { Folder, NoteTopology } from "@generated/doughnut-backend-api"
+import type { Folder, NoteTopology } from "@generated/donut-backend-api"
 import type { PeerSortSpec } from "@/composables/usePeerSort"
 
 export type SidebarStructuralRow =

@@ -155,9 +155,9 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from "vue"
-import { FailureReportController } from "@generated/doughnut-backend-api/sdk.gen"
+import { FailureReportController } from "@generated/donut-backend-api/sdk.gen"
 import ContainerPage from "./commons/ContainerPage.vue"
-import type { FailureReport } from "@generated/doughnut-backend-api"
+import type { FailureReport } from "@generated/donut-backend-api"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 
 interface Props {

@@ -1,4 +1,4 @@
-import type { WikiTitle } from "@generated/doughnut-backend-api"
+import type { WikiTitle } from "@generated/donut-backend-api"
 import {
   hrefLooksLikeConceptNotePath,
   noteShowHref,

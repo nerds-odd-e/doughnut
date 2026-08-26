@@ -80,6 +80,8 @@ Verify: `pnpm install`, repo-wide typecheck/build for the touched packages.
 
 ### 3. Generated backend API client rename (Structure)
 
+Status: done
+
 - `openapi-ts.config.ts`: output path `packages/generated/doughnut-backend-api`
   → `packages/generated/donut-backend-api`; generator `name: 'DoughnutApi'` →
   `'DonutApi'`.

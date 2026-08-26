@@ -122,7 +122,7 @@ import type {
   Notebook,
   SubscriptionForNotebooksListing,
   User,
-} from "@generated/doughnut-backend-api"
+} from "@generated/donut-backend-api"
 import NotebookButtons from "./NotebookButtons.vue"
 import NotebookCard from "../notebooks/NotebookCard.vue"
 import NotebookCatalogGroupPanel from "./NotebookCatalogGroupPanel.vue"

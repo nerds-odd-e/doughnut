@@ -8,11 +8,11 @@
 </template>
 <script lang="ts" setup>
 import { onMounted, ref } from "vue"
-import type { GlobalAiModelSettings } from "@generated/doughnut-backend-api"
+import type { GlobalAiModelSettings } from "@generated/donut-backend-api"
 import {
   AiController,
   GlobalSettingsController,
-} from "@generated/doughnut-backend-api/sdk.gen"
+} from "@generated/donut-backend-api/sdk.gen"
 import ContentLoader from "@/components/commons/ContentLoader.vue"
 import ManageModelInner from "./ManageModelInner.vue"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"

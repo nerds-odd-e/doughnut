@@ -2,7 +2,7 @@ import type {
   Notebook,
   RecallPrompt,
   SpellingQuestion,
-} from '@generated/doughnut-backend-api'
+} from '@generated/donut-backend-api'
 import Builder from './Builder'
 import generateId from './generateId'
 import NotebookBuilder from './NotebookBuilder'

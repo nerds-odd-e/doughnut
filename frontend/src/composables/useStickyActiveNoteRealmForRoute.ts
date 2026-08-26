@@ -1,4 +1,4 @@
-import type { NoteRealm } from "@generated/doughnut-backend-api"
+import type { NoteRealm } from "@generated/donut-backend-api"
 import type NoteStorage from "@/store/NoteStorage"
 import { ref, watch, type Ref } from "vue"
 import type { RouteLocationNormalizedLoaded } from "vue-router"

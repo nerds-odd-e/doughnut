@@ -22,7 +22,7 @@
 
 <script setup lang="ts">
 import PopButton from "../../commons/Popups/PopButton.vue"
-import type { Folder, Note } from "@generated/doughnut-backend-api"
+import type { Folder, Note } from "@generated/donut-backend-api"
 import NoteNewForm from "../NoteNewForm.vue"
 import { useKeyboardShortcut } from "@/composables/useKeyboardShortcut"
 import { useNoteShortcutScope } from "@/composables/noteShortcutScope"

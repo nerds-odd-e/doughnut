@@ -32,7 +32,7 @@
 
 <script setup lang="ts">
 import { type PropType } from "vue"
-import type { Note, WikiTitle } from "@generated/doughnut-backend-api"
+import type { Note, WikiTitle } from "@generated/donut-backend-api"
 import NoteEditableTitle from "./NoteEditableTitle.vue"
 import NoteEditableContent from "./NoteEditableContent.vue"
 import type { DeadWikiLinkPayload } from "@/utils/wikiLinkMarkup"

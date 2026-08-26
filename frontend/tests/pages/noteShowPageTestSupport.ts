@@ -3,8 +3,8 @@ import {
   AssimilationController,
   ConversationMessageController,
   NoteController,
-} from "@generated/doughnut-backend-api/sdk.gen"
-import type { Circle } from "@generated/doughnut-backend-api"
+} from "@generated/donut-backend-api/sdk.gen"
+import type { Circle } from "@generated/donut-backend-api"
 import { useAssimilationView } from "@/composables/useAssimilationView"
 import { noteShowLocation } from "@/routes/noteShowLocation"
 import NoteShowPage from "@/pages/NoteShowPage.vue"

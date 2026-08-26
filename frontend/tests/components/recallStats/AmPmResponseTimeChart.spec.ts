@@ -1,6 +1,6 @@
 import AmPmResponseTimeChart from "@/components/recallStats/AmPmResponseTimeChart.vue"
 import helper from "@tests/helpers"
-import type { AmPmResponseTime } from "@generated/doughnut-backend-api"
+import type { AmPmResponseTime } from "@generated/donut-backend-api"
 import { describe, it, expect } from "vitest"
 
 describe("AmPmResponseTimeChart", () => {

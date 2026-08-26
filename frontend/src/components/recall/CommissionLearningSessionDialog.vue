@@ -86,11 +86,11 @@
 
 <script setup lang="ts">
 import { computed, onMounted, ref } from "vue"
-import { LearningSessionController } from "@generated/doughnut-backend-api/sdk.gen"
+import { LearningSessionController } from "@generated/donut-backend-api/sdk.gen"
 import type {
   RecordedLearningSessionItem,
   RejectedLearningSessionReportEntry,
-} from "@generated/doughnut-backend-api/types.gen"
+} from "@generated/donut-backend-api/types.gen"
 import Modal from "@/components/commons/Modal.vue"
 import CopyButton from "@/components/commons/CopyButton.vue"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"

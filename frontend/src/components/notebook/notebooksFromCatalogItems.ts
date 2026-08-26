@@ -1,4 +1,4 @@
-import type { Notebook } from "@generated/doughnut-backend-api"
+import type { Notebook } from "@generated/donut-backend-api"
 import type { NotebookCatalogEntry } from "@/components/notebook/patchNotebookInCatalogItems"
 
 export function notebooksFromCatalogItems(

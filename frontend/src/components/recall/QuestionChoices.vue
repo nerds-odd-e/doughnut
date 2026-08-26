@@ -34,7 +34,7 @@
 
 
 <script lang="ts">
-import type { AnswerDto } from "@generated/doughnut-backend-api"
+import type { AnswerDto } from "@generated/donut-backend-api"
 import { defineComponent } from "vue"
 import markdownizer from "../form/markdownizer"
 import { RICH_CONTENT_PROSE_SM } from "@/constants/richContentProse"

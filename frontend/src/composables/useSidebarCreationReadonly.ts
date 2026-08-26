@@ -1,4 +1,4 @@
-import type { NoteRealm, User } from "@generated/doughnut-backend-api"
+import type { NoteRealm, User } from "@generated/donut-backend-api"
 import { computed, type MaybeRefOrGetter, toValue, type Ref } from "vue"
 
 export function useSidebarCreationReadonly(

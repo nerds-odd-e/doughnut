@@ -20,7 +20,7 @@
 <script setup lang="ts">
 import type { PropType } from "vue"
 import { computed } from "vue"
-import type { NoteTopology } from "@generated/doughnut-backend-api"
+import type { NoteTopology } from "@generated/donut-backend-api"
 import { noteShowLocation as noteShowLocationForRoute } from "@/routes/noteShowLocation"
 import NoteTitleWithLink from "./NoteTitleWithLink.vue"
 

@@ -12,7 +12,7 @@ import type {
   Conversation,
   Note,
   NoteRealm,
-} from "@generated/doughnut-backend-api"
+} from "@generated/donut-backend-api"
 
 export const simulateAiResponse = (content = "## I'm ChatGPT") => {
   const instance = getLastInstance()

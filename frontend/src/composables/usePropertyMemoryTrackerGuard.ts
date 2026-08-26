@@ -1,11 +1,11 @@
 import type {
   MemoryTracker,
   NoteRecallInfo,
-} from "@generated/doughnut-backend-api"
+} from "@generated/donut-backend-api"
 import {
   MemoryTrackerController,
   NoteController,
-} from "@generated/doughnut-backend-api/sdk.gen"
+} from "@generated/donut-backend-api/sdk.gen"
 import usePopups from "@/components/commons/Popups/usePopups"
 import { toOpenApiError } from "@/managedApi/openApiError"
 import type { PropertyKeyChange } from "@/utils/noteContentFrontmatter"

@@ -1,6 +1,6 @@
 import QuestionGenerationBatchStatus from "@/components/admin/QuestionGenerationBatchStatus.vue"
-import { AdminQuestionGenerationBatchController } from "@generated/doughnut-backend-api/sdk.gen"
-import type { QuestionGenerationBatchAdminStatusDto } from "@generated/doughnut-backend-api/types.gen"
+import { AdminQuestionGenerationBatchController } from "@generated/donut-backend-api/sdk.gen"
+import type { QuestionGenerationBatchAdminStatusDto } from "@generated/donut-backend-api/types.gen"
 import { flushPromises } from "@vue/test-utils"
 import { beforeEach, describe, expect, it } from "vitest"
 import helper, {

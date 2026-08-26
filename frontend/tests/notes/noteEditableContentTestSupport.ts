@@ -2,9 +2,9 @@ import {
   MemoryTrackerController,
   NoteController,
   TextContentController,
-} from "@generated/doughnut-backend-api/sdk.gen"
+} from "@generated/donut-backend-api/sdk.gen"
 import NoteEditableContent from "@/components/notes/core/NoteEditableContent.vue"
-import type { UpdateNoteContentData } from "@generated/doughnut-backend-api"
+import type { UpdateNoteContentData } from "@generated/donut-backend-api"
 import usePopups from "@/components/commons/Popups/usePopups"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
 import type { ComponentPublicInstance } from "vue"

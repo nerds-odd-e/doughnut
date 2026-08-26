@@ -1,11 +1,11 @@
 /// <reference types="Cypress" />
 // @ts-check
-import type { BazaarNotebook } from '@generated/doughnut-backend-api'
+import type { BazaarNotebook } from '@generated/donut-backend-api'
 import {
   BazaarController,
   SubscriptionController,
   TestabilityRestController,
-} from '@generated/doughnut-backend-api/sdk.gen'
+} from '@generated/donut-backend-api/sdk.gen'
 import { unwrapData } from './unwrapApi'
 
 export const bazaarTestabilityMethods = {

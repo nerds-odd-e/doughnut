@@ -7,7 +7,7 @@ import type {
   DayCount,
   AmPmResponseTime,
   DayAvgResponseTime,
-} from "@generated/doughnut-backend-api"
+} from "@generated/donut-backend-api"
 import { describe, expect, it } from "vitest"
 
 function buildCalendar(): DayCount[] {

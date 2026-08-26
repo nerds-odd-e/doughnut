@@ -1,7 +1,7 @@
 import type {
   NoteSearchResult,
   RelationshipLiteralSearchHit,
-} from "@generated/doughnut-backend-api"
+} from "@generated/donut-backend-api"
 import { relationshipLiteralSearchHitKey } from "./relationshipLiteralSearchHitKey"
 
 function hitDistance(h: RelationshipLiteralSearchHit): number {

@@ -2,11 +2,11 @@
  * Book layout reorganize / new-block scenarios: thin glue to `bookReadingPage`.
  */
 import { Given, Then, When } from '@badeball/cypress-cucumber-preprocessor'
-import type { BookFull, NoteRealm } from '@generated/doughnut-backend-api'
+import type { BookFull, NoteRealm } from '@generated/donut-backend-api'
 import {
   NoteController,
   NotebookBooksController,
-} from '@generated/doughnut-backend-api/sdk.gen'
+} from '@generated/donut-backend-api/sdk.gen'
 import bookReadingPage from '../start/pageObjects/bookReadingPage'
 import { mock_services } from '../start'
 import testability from '../start/testability'

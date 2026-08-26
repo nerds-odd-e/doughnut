@@ -33,7 +33,7 @@
 import type { PropType } from "vue"
 import { ref } from "vue"
 import { useRouter } from "vue-router"
-import type { Note, NoteSearchResult } from "@generated/doughnut-backend-api"
+import type { Note, NoteSearchResult } from "@generated/donut-backend-api"
 import RadioButtons from "../form/RadioButtons.vue"
 import RelationTypeSelect from "./RelationTypeSelect.vue"
 import NoteTitleComponent from "../notes/core/NoteTitleComponent.vue"

@@ -3,7 +3,7 @@ import type { BookBlockReadingDisposition } from "@/lib/book-reading/readBlockId
 import type {
   BookBlockFull,
   EpubLocatorFull,
-} from "@generated/doughnut-backend-api"
+} from "@generated/donut-backend-api"
 import { flushPromises, mount } from "@vue/test-utils"
 import { beforeEach, describe, expect, it, vi } from "vitest"
 import { computed, defineComponent, nextTick, ref } from "vue"

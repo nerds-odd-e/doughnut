@@ -15,9 +15,9 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      '@generated/doughnut-backend-api': resolve(
+      '@generated/donut-backend-api': resolve(
         __dirname,
-        '../packages/generated/doughnut-backend-api'
+        '../packages/generated/donut-backend-api'
       ),
     },
   },

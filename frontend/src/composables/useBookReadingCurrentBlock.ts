@@ -6,7 +6,7 @@ import {
   createLastReadPositionPatchDebouncer,
   type LastReadPositionPatchDebouncer,
 } from "@/lib/book-reading/debounceLastReadPositionPatch"
-import { NotebookBooksController } from "@generated/doughnut-backend-api/sdk.gen"
+import { NotebookBooksController } from "@generated/donut-backend-api/sdk.gen"
 import {
   onBeforeUnmount,
   toValue,

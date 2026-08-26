@@ -1,4 +1,4 @@
-import { NoteController } from "@generated/doughnut-backend-api/sdk.gen"
+import { NoteController } from "@generated/donut-backend-api/sdk.gen"
 import NoteShow from "@/components/notes/NoteShow.vue"
 import { type VueWrapper, flushPromises } from "@vue/test-utils"
 import makeMe from "donut-test-fixtures/makeMe"

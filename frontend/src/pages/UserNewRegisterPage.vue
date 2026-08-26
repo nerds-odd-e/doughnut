@@ -20,8 +20,8 @@
 
 <script setup lang="ts">
 import { ref } from "vue"
-import type { User } from "@generated/doughnut-backend-api"
-import { UserController } from "@generated/doughnut-backend-api/sdk.gen"
+import type { User } from "@generated/donut-backend-api"
+import { UserController } from "@generated/donut-backend-api/sdk.gen"
 import { toOpenApiError } from "@/managedApi/openApiError"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import TextInput from "@/components/form/TextInput.vue"

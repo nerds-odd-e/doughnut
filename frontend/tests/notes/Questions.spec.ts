@@ -1,4 +1,4 @@
-import { McqController } from "@generated/doughnut-backend-api/sdk.gen"
+import { McqController } from "@generated/donut-backend-api/sdk.gen"
 import { describe, it, expect } from "vitest"
 import { mockSdkService } from "@tests/helpers"
 import {

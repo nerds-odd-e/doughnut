@@ -1,5 +1,5 @@
 import type { BookBlockReadingDisposition } from "@/lib/book-reading/readBlockIdsFromRecords"
-import type { BookBlockFull } from "@generated/doughnut-backend-api"
+import type { BookBlockFull } from "@generated/donut-backend-api"
 import { toValue, unref, type MaybeRefOrGetter, type Ref, watch } from "vue"
 
 export function useAutoMarkNoDirectContentPredecessor(options: {

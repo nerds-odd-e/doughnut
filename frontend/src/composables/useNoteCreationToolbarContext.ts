@@ -3,7 +3,7 @@ import type {
   FolderRealm,
   Note,
   NoteRealm,
-} from "@generated/doughnut-backend-api"
+} from "@generated/donut-backend-api"
 import { realmLeafFolder } from "@/components/notes/useNoteSidebarTree"
 import { titlePatternFromNoteMarkdown } from "@/utils/noteContentFrontmatter"
 import { renderTitleFromPattern } from "@/utils/titlePatternRender"

@@ -6,7 +6,7 @@ import {
 import {
   CurrentUserInfoController,
   TestabilityRestController,
-} from "@generated/doughnut-backend-api/sdk.gen"
+} from "@generated/donut-backend-api/sdk.gen"
 import helper, { mockSdkService } from "@tests/helpers"
 import { flushPromises } from "@vue/test-utils"
 import { afterEach, describe, expect, it } from "vitest"

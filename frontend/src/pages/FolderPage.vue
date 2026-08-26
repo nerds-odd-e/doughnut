@@ -49,8 +49,8 @@
 </template>
 
 <script setup lang="ts">
-import type { FolderRealm } from "@generated/doughnut-backend-api"
-import { NotebookController } from "@generated/doughnut-backend-api/sdk.gen"
+import type { FolderRealm } from "@generated/donut-backend-api"
+import { NotebookController } from "@generated/donut-backend-api/sdk.gen"
 import { computed, ref } from "vue"
 import NotebookPageReadonlySummary from "@/components/notebook/NotebookPageReadonlySummary.vue"
 import FolderSettings from "@/components/folder/FolderSettings.vue"

@@ -9,7 +9,7 @@
 
 <script setup lang="ts">
 import type { PropType } from "vue"
-import type { NoteTopology } from "@generated/doughnut-backend-api"
+import type { NoteTopology } from "@generated/donut-backend-api"
 import { noteShowLocation } from "@/routes/noteShowLocation"
 import NoteTitleComponent from "./core/NoteTitleComponent.vue"
 

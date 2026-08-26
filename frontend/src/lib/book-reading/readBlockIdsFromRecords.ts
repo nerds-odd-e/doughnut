@@ -1,7 +1,7 @@
 import type {
   BookBlockReadingRecordListItem,
   BookBlockReadingRecordPutRequest,
-} from "@generated/doughnut-backend-api"
+} from "@generated/donut-backend-api"
 
 /** Same values as `BookBlockReadingRecordPutRequest.status` on the wire. */
 export type BookBlockReadingDisposition =

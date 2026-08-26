@@ -1,7 +1,7 @@
 import type {
   NoteExtractionResult,
   NoteRefinementLayoutItem,
-} from "@generated/doughnut-backend-api"
+} from "@generated/donut-backend-api"
 import { flushPromises } from "@vue/test-utils"
 import { expect } from "vitest"
 
