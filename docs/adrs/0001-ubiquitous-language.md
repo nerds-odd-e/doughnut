@@ -15,7 +15,7 @@ This ADR is the **canonical ubiquitous language**. The glossary below is
 the source of truth; prefer these meanings in UI copy, APIs, tests, and
 code identifiers. This glossary is amended in place. Add or change domain
 terms here; do not supersede this ADR with a new one. Spaced-repetition domain
-concepts live in the **Spaced repetition glossary** of [ADR
+concepts, including **Cognitive index** measurement, live in [ADR
 0003](./0003-spaced-repetition-scheduling-policy-accepted.md).
 
 ## Notebook / note structure
@@ -153,42 +153,14 @@ concepts live in the **Spaced repetition glossary** of [ADR
   UI: **Remove** / **Remove from recall**. Not a grade.
 - **Revive** — Re-enable recall for a tracker that was removed from
   recall. Short UI: **Revive**. Not a grade.
+- **Cognitive index** — Daily readout of how a morning's recall compared
+  with expectation and with the learner's own baseline. Not diagnostic of
+  cause. Measurement:
+  [ADR 0003](./0003-spaced-repetition-scheduling-policy-accepted.md).
 
 **New**, **Stability**, **Difficulty**, **Retrievability**, **RecallLog**,
 **Thinking time**, **Confusion**, and **Overlap**: **Spaced repetition
 glossary** in [ADR 0003](./0003-spaced-repetition-scheduling-policy-accepted.md).
-
-## Cognitive index
-
-*Draft — pending review; introduced by the morning-cognitive-index plan
-(`.planning/quick/001-morning-cognitive-index/`).*
-
-- **Away** — Interval where the learner switches to another tab or app while
-  a **recall prompt** is active, excluded from **thinking time**. Distinct
-  from a **detour**.
-- **Detour** — Interval where the learner navigates away from an active
-  **recall prompt** to view a note or notebook and returns via **Resume**,
-  excluded from **thinking time**. Attributed to the note that was opened.
-  Distinct from **away**.
-- **Idle** — Stretch of an active **recall prompt** with no learner input
-  past a generous threshold. Stays inside **thinking time** (unlike away/
-  detour, the clock is not paused) — it only flags the attempt as one to
-  discount, never silently subtracts.
-- **Pace** — A learner's per-item time intensity on a given morning,
-  expressed against their own recent history rather than as a raw duration.
-  One of the three residual channels beneath the **cognitive index**.
-- **Retrieval lapse** — A **correct** answer whose **thinking time** is
-  unusually slow relative to that item's own expectation. Distinct from an
-  incorrect answer (a knowledge gap) and from **Confusion**/**Overlap**
-  (not **grades**; see ADR 0003).
-- **Cognitive index** — Daily composite readout comparing a morning's recall
-  outcomes, pace, and consistency against expectation and against the
-  learner's own baseline. A residual signal, not a restatement of what the
-  scheduler scheduled, and not diagnostic of cause.
-- **Daily probe** — Optional, opt-in standalone task (~60 seconds, identical
-  stimuli every day) offered once per local day before the first **recall**
-  session, used to validate the **cognitive index** independently of recall
-  item content.
 
 ## Focus context
 
@@ -263,7 +235,7 @@ introduce a translation type that wraps one as the other.
 - Links: playbook [README.md](./README.md); ADR-0000
 [use-adrs-accepted.md](./0000-use-adrs-accepted.md); ADR 0003
 [spaced-repetition scheduling policy](./0003-spaced-repetition-scheduling-policy-accepted.md)
-(**Spaced repetition glossary**); ADR 0004
+(**Spaced repetition glossary**, Cognitive index measurement); ADR 0004
 [OKF-compatible notebook Markdown](./0004-okf-compatible-notebook-markdown-accepted.md)
 (portable Markdown profile); [commissioned learning session
 protocol](../commissioned-learning-session-protocol.md) (Request/Report

@@ -10,6 +10,7 @@
 Doughnut bases its recall schedule on open FSRS-6. This ADR owns
 spaced-repetition domain terms and scheduling policy: which events affect
 memory, which inputs matter, and which invariants those transitions preserve.
+It also owns how a morning's recall is measured for the **Cognitive index**.
 General product recall language remains in
 [ADR 0001](./0001-ubiquitous-language.md). Source code and tests own FSRS
 mechanics and numeric outcomes.
@@ -36,11 +37,42 @@ Learning, Review, and Relearning as product states.
 - **RecallLog** — The durable history of scheduling events for one memory
   tracker (Grades and Confusion).
 - **Thinking time** — How long the learner took to answer a measured prompt.
-  Presentation and analysis only; not a scheduling input.
+  Presentation and analysis only; not a scheduling input. Excludes **away**
+  and **detour**; **idle** stays inside it.
 - **Confusion** — A secondary, weaker memory adjustment when a spelling answer
   accidentally identifies another eligible note. Not a Grade or recall credit.
 - **Overlap** — A declared non-distinguishing spelling outcome. Neither a Grade
   nor a memory-state transition.
+
+### Cognitive index
+
+[ADR 0001](./0001-ubiquitous-language.md) names **Cognitive index**. It is a
+residual analysis of a morning's recall, not a scheduling input and not a
+restatement of what the scheduler scheduled.
+
+- **Away** — Interval where the learner switches to another tab or app while
+  a recall prompt is active, excluded from thinking time. Distinct from a
+  detour.
+- **Detour** — Interval where the learner navigates away from an active recall
+  prompt to view a note or notebook and returns via Resume, excluded from
+  thinking time. Attributed to the note that was opened. Distinct from away.
+- **Idle** — Stretch of an active recall prompt with no learner input past a
+  generous threshold. Stays inside thinking time (unlike away and detour, the
+  clock is not paused). It flags the attempt as one to discount; it never
+  silently subtracts.
+- **Pace** — A learner's per-item time intensity on a given morning, expressed
+  against their own recent history rather than as a raw duration. One of the
+  three residual channels beneath the Cognitive index.
+- **Retrieval lapse** — A correct answer whose thinking time is unusually slow
+  relative to that item's own expectation. Distinct from an incorrect answer
+  (a knowledge gap) and from Confusion or Overlap (not Grades).
+- **Cognitive index** — Daily composite readout comparing a morning's recall
+  outcomes, pace, and consistency against expectation and against the
+  learner's own baseline. A residual signal, not diagnostic of cause.
+- **Daily probe** — Optional, opt-in standalone task (~60 seconds, identical
+  stimuli every day) offered once per local day before the first recall
+  session, used to validate the Cognitive index independently of recall item
+  content.
 
 ### FSRS profile
 
@@ -118,7 +150,7 @@ Tutor Feedback need not have an Answer.
 ## Related
 
 - [ADR 0001: Ubiquitous language](./0001-ubiquitous-language.md) — general
-  recall, memory tracker, and assimilation language
+  recall, memory tracker, assimilation, and Cognitive index product language
 - [Commissioned learning session protocol](../commissioned-learning-session-protocol.md)
   — Request/Report documents and matching by note title
 - [`Fsrs`](../../backend/src/main/java/com/odde/donut/entities/Fsrs.java) —
