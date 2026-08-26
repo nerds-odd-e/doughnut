@@ -24,11 +24,13 @@ final class RecallStatsTestFixtures {
         null,
         Grade.fromCorrect(correct),
         thinkingTimeMs,
-        promptAt != null ? promptAt : answerAt);
+        promptAt != null ? promptAt : answerAt,
+        null,
+        null);
   }
 
   static RecallAnswerRow overlapAnswered(Timestamp answerAt) {
-    return new RecallAnswerRow(answerAt, AnswerOutcome.OVERLAP, null, null, answerAt);
+    return new RecallAnswerRow(answerAt, AnswerOutcome.OVERLAP, null, null, answerAt, null, null);
   }
 
   static Timestamp utc(int day, int hour) {

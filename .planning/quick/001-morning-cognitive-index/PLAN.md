@@ -271,11 +271,18 @@ usefully here).
 
 ### Pace channel — no schema change
 
-#### 8. Extend the `RecallAnswerRow` projection — Structure `[ ]`
+#### 8. Extend the `RecallAnswerRow` projection — Structure `[x]`
 
 Add memory tracker id and note id to the existing single projection query.
 
 - **Enables slice 9 only.** No second query, no entity hydration.
+
+Done: appended `Integer memoryTrackerId, Integer noteId` to the
+`RecallAnswerRow` record; `RecallPromptRepository.findAnsweredRecallAnswerRows`
+now also selects `mt.id, mt.note.id` in the same JPQL constructor expression —
+`mt.note.id` traverses the existing `MemoryTracker.note` association directly,
+no extra join needed. `RecallStatsTestFixtures.answered()`/`overlapAnswered()`
+pass `null, null` placeholders since nothing consumes the fields yet.
 
 #### 9. Recall Stats shows today's pace against your usual — Behavior `[ ]`
 

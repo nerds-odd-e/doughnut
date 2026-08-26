@@ -1,6 +1,7 @@
 package com.odde.donut.entities.repositories;
 
 import com.odde.donut.entities.RecallPrompt;
+import com.odde.donut.services.RecallAnswerRow;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
@@ -48,13 +49,14 @@ public interface RecallPromptRepository extends CrudRepository<RecallPrompt, Int
   // answer/mcq/memoryTracker associations. Correctness is derived from answer outcome / linked log.
   @Query(
       "SELECT new com.odde.donut.services.RecallAnswerRow("
-          + "a.createdAt, a.outcome, rl.grade, a.thinkingTimeMs, rp.createdAt) "
+          + "a.createdAt, a.outcome, rl.grade, a.thinkingTimeMs, rp.createdAt, "
+          + "mt.id, mt.note.id) "
           + "FROM RecallPrompt rp JOIN rp.answer a JOIN rp.memoryTracker mt "
           + "LEFT JOIN RecallLog rl ON rl.answer = a AND rl.memoryTracker = mt "
           + "AND rl.grade IS NOT NULL "
           + "WHERE mt.user.id = :userId AND a.createdAt >= :startTime AND a.createdAt < :endTime "
           + "ORDER BY a.createdAt ASC")
-  List<com.odde.donut.services.RecallAnswerRow> findAnsweredRecallAnswerRows(
+  List<RecallAnswerRow> findAnsweredRecallAnswerRows(
       @Param("userId") Integer userId,
       @Param("startTime") Timestamp startTime,
       @Param("endTime") Timestamp endTime);
