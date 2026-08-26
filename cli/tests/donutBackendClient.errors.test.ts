@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest'
-import { withBackendClient } from '../src/backendApi/doughnutBackendClient.js'
+import { withBackendClient } from '../src/backendApi/donutBackendClient.js'
 
 describe('withBackendClient error messages', () => {
   test('uses API message for HTTP 413 attach failures', async () => {

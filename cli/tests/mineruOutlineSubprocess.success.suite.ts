@@ -45,7 +45,7 @@ export function describeMineruOutlineSubprocessSuccess(): void {
         const args = vi.mocked(childProcess.spawn).mock.calls[0]![1] as string[]
         const scriptArg = args[0]!
         expect(existsSync(scriptArg)).toBe(true)
-        expect(readFileSync(scriptArg, 'utf8')).toContain('Doughnut CLI')
+        expect(readFileSync(scriptArg, 'utf8')).toContain('Donut CLI')
       } finally {
         rmSync(isolatedCwd, { recursive: true, force: true })
       }

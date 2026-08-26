@@ -1,8 +1,8 @@
 import { UserController, type UserToken } from 'donut-api'
 import {
-  doughnutSdkOptions,
+  donutSdkOptions,
   withBackendJson,
-} from '../../backendApi/doughnutBackendClient.js'
+} from '../../backendApi/donutBackendClient.js'
 import { saveStoredAccessToken } from '../../backendApi/accessTokenStorage.js'
 
 export async function setAccessToken(
@@ -10,7 +10,7 @@ export async function setAccessToken(
   signal?: AbortSignal
 ): Promise<void> {
   const identity = await withBackendJson<UserToken>(token, () =>
-    UserController.getTokenInfo(doughnutSdkOptions(signal))
+    UserController.getTokenInfo(donutSdkOptions(signal))
   )
   saveStoredAccessToken({ label: identity.label, token })
 }

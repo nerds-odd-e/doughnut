@@ -7,9 +7,9 @@ import {
   type RecallPrompt,
 } from 'donut-api'
 import {
-  doughnutSdkOptions,
+  donutSdkOptions,
   runDefaultBackendJson,
-} from '../../backendApi/doughnutBackendClient.js'
+} from '../../backendApi/donutBackendClient.js'
 import { resolvedTerminalWidth } from '../../terminalColumns.js'
 import { breadcrumbTrailFromRecalledNote } from './recallNoteContext.js'
 import {
@@ -93,7 +93,7 @@ export async function contestAndRegenerateMcq(
   const contestResult = await runDefaultBackendJson<QuestionContestResult>(() =>
     RecallPromptController.contest({
       path: { recallPrompt: currentRecallPromptId },
-      ...doughnutSdkOptions(signal),
+      ...donutSdkOptions(signal),
     })
   )
   if (contestResult.rejected === true) {
@@ -104,7 +104,7 @@ export async function contestAndRegenerateMcq(
     RecallPromptController.regenerate({
       path: { recallPrompt: currentRecallPromptId },
       body: contestResult,
-      ...doughnutSdkOptions(signal),
+      ...donutSdkOptions(signal),
     })
   )
   const mapped = recallMcqPayloadFromRecallPrompt(memoryTrackerId, regenerated)
@@ -123,7 +123,7 @@ export async function submitMcqAnswer(
     RecallPromptController.answer({
       path: { recallPrompt: recallPromptId },
       body: { choiceIndex },
-      ...doughnutSdkOptions(signal),
+      ...donutSdkOptions(signal),
     })
   )
 }

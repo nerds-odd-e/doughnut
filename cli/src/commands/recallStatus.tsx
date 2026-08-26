@@ -1,8 +1,8 @@
 import { RecallsController, type DueMemoryTrackers } from 'donut-api'
 import {
-  doughnutSdkOptions,
+  donutSdkOptions,
   runDefaultBackendJson,
-} from '../backendApi/doughnutBackendClient.js'
+} from '../backendApi/donutBackendClient.js'
 import { AsyncAssistantFetchStage } from './gmail/AsyncAssistantFetchStage.js'
 import type {
   CommandDoc,
@@ -15,7 +15,7 @@ export async function recallStatus(signal?: AbortSignal): Promise<string> {
   const trackers = await runDefaultBackendJson<DueMemoryTrackers>(() =>
     RecallsController.recalling({
       query: dueRecallQuery(0),
-      ...doughnutSdkOptions(signal),
+      ...donutSdkOptions(signal),
     })
   )
   const count = trackers.toRepeat?.length ?? 0

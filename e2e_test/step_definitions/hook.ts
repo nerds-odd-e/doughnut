@@ -115,12 +115,12 @@ After({ tags: '@bundleCliE2eInstall' }, () =>
 
 Before({ tags: '@mockMineruLib', order: 0 }, () => {
   cy.task<string>('getMineruE2eMockSitePath').then((p) => {
-    Cypress.env('DOUGHNUT_E2E_MINERU_MOCK_SITE', p)
+    Cypress.env('DONUT_E2E_MINERU_MOCK_SITE', p)
   })
 })
 
 After({ tags: '@mockMineruLib' }, () => {
-  Cypress.env('DOUGHNUT_E2E_MINERU_MOCK_SITE', undefined)
+  Cypress.env('DONUT_E2E_MINERU_MOCK_SITE', undefined)
 })
 
 Before({ tags: '@withCliConfig', order: 1 }, () => {
@@ -142,7 +142,7 @@ Before({ tags: '@withCliGmailMockAccountConfig', order: 1 }, () => {
 Before({ tags: '@interactiveCLI', order: 2 }, () => {
   cli.ttyAssertTerminal().kill()
   cy.get<string>('@cliConfigDir').then((configDir) => {
-    const mockSite = Cypress.env('DOUGHNUT_E2E_MINERU_MOCK_SITE') as
+    const mockSite = Cypress.env('DONUT_E2E_MINERU_MOCK_SITE') as
       | string
       | undefined
     if (typeof mockSite === 'string' && mockSite.length > 0) {
@@ -166,7 +166,7 @@ Before({ tags: '@interactiveCLI', order: 2 }, () => {
 Before({ tags: '@interactiveCLIGmail', order: 2 }, () => {
   cli.ttyAssertTerminal().kill()
   cy.get<string>('@cliConfigDir').then((configDir) => {
-    const mockSite = Cypress.env('DOUGHNUT_E2E_MINERU_MOCK_SITE') as
+    const mockSite = Cypress.env('DONUT_E2E_MINERU_MOCK_SITE') as
       | string
       | undefined
     const base: NodeJS.ProcessEnv = {

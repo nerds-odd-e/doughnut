@@ -4,9 +4,9 @@ import {
   type RecallPromptHistoryItem,
 } from 'donut-api'
 import {
-  doughnutSdkOptions,
+  donutSdkOptions,
   runDefaultBackendJson,
-} from '../../backendApi/doughnutBackendClient.js'
+} from '../../backendApi/donutBackendClient.js'
 
 export type RecallMcqCardPayload = {
   readonly memoryTrackerId: number
@@ -76,7 +76,7 @@ export async function tryLoadMcqPayload(
       const prompt = await runDefaultBackendJson<RecallPrompt>(() =>
         MemoryTrackerController.getRecallPrompt({
           path: { memoryTracker: memoryTrackerId },
-          ...doughnutSdkOptions(signal),
+          ...donutSdkOptions(signal),
         })
       )
       if (prompt.mcq != null) {

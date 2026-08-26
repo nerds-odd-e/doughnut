@@ -71,7 +71,7 @@ export async function runMineruOutlineSubprocess(
 
   const args = [scriptPath, bookPath, '--json-result']
   if (ext === 'pdf') {
-    const tmpDir = await mkdtemp(join(tmpdir(), 'doughnut-mineru-out-'))
+    const tmpDir = await mkdtemp(join(tmpdir(), 'donut-mineru-out-'))
     args.push('--output-dir', tmpDir)
     const start = options.pdfStartPage ?? 0
     if (start !== 0) {

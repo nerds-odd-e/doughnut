@@ -5,7 +5,7 @@ import { useEffect, useRef } from 'react'
 import { Box } from 'ink'
 import { Spinner } from '@inkjs/ui'
 import type { BookBlockFull, BookFull, Notebook } from 'donut-api'
-import { attachNotebookBookFile } from '../../backendApi/doughnutBackendClient.js'
+import { attachNotebookBookFile } from '../../backendApi/donutBackendClient.js'
 import { userVisibleSlashCommandError } from '../../userVisibleSlashCommandError.js'
 import type {
   CommandDoc,

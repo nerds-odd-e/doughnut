@@ -34,7 +34,7 @@ export function describeMineruOutlineSubprocessSpawn(): void {
       const args = vi.mocked(childProcess.spawn).mock.calls[0]![1] as string[]
       expect(args).toContain('--output-dir')
       const outIdx = args.indexOf('--output-dir')
-      expect(args[outIdx + 1]).toMatch(/^.*doughnut-mineru-out-/)
+      expect(args[outIdx + 1]).toMatch(/^.*donut-mineru-out-/)
       expect(args).toContain('--end-page')
       expect(args).toContain('3')
     })

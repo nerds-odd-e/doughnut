@@ -13,12 +13,12 @@
 
   <springProfile name="e2e">
     <appender name="E2E_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-      <file>${LOGS_ABSOLUTE_PATH}/doughnut-e2e.log</file>
+      <file>${LOGS_ABSOLUTE_PATH}/donut-e2e.log</file>
       <encoder>
         <pattern>${PATTERN}</pattern>
       </encoder>
       <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
-        <fileNamePattern>${LOGS_ABSOLUTE_PATH}/archived/doughnut-e2e.%i.log</fileNamePattern>
+        <fileNamePattern>${LOGS_ABSOLUTE_PATH}/archived/donut-e2e.%i.log</fileNamePattern>
         <minIndex>1</minIndex>
         <maxIndex>3</maxIndex>
       </rollingPolicy>
@@ -26,7 +26,7 @@
         <maxFileSize>5MB</maxFileSize>
       </triggeringPolicy>
     </appender>
-    <logger name="com.odde.doughnut" level="INFO" />
+    <logger name="com.odde.donut" level="INFO" />
     <logger name="org.springframework" level="INFO" />
     <logger name="org.hibernate" level="WARN" />
 
@@ -38,16 +38,16 @@
 
   <springProfile name="dev">
     <appender name="DEV_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-      <file>${LOGS_ABSOLUTE_PATH}/doughnut-dev.log</file>
+      <file>${LOGS_ABSOLUTE_PATH}/donut-dev.log</file>
       <encoder>
         <pattern>${PATTERN}</pattern>
       </encoder>
       <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-        <fileNamePattern>${LOGS_ABSOLUTE_PATH}/archived/doughnut-dev-%d{yyyy-MM-dd}.log</fileNamePattern>
+        <fileNamePattern>${LOGS_ABSOLUTE_PATH}/archived/donut-dev-%d{yyyy-MM-dd}.log</fileNamePattern>
         <maxHistory>30</maxHistory>
       </rollingPolicy>
     </appender>
-    <logger name="com.odde.doughnut" level="DEBUG" />
+    <logger name="com.odde.donut" level="DEBUG" />
     <logger name="org.springframework" level="INFO" />
     <logger name="org.hibernate" level="INFO" />
 
@@ -65,12 +65,12 @@
 
   <springProfile name="prod">
     <appender name="PROD_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-      <file>${LOGS_ABSOLUTE_PATH}/doughnut-prod.log</file>
+      <file>${LOGS_ABSOLUTE_PATH}/donut-prod.log</file>
       <encoder>
         <pattern>${PATTERN}</pattern>
       </encoder>
       <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
-        <fileNamePattern>${LOGS_ABSOLUTE_PATH}/archived/doughnut-prod.%i.log</fileNamePattern>
+        <fileNamePattern>${LOGS_ABSOLUTE_PATH}/archived/donut-prod.%i.log</fileNamePattern>
         <minIndex>1</minIndex>
         <maxIndex>3</maxIndex>
       </rollingPolicy>
@@ -83,7 +83,7 @@
       <neverBlock>true</neverBlock>
       <queueSize>256</queueSize>
     </appender>
-    <logger name="com.odde.doughnut" level="INFO" />
+    <logger name="com.odde.donut" level="INFO" />
     <logger name="org.springframework" level="INFO" />
     <logger name="org.hibernate" level="WARN" />
     <logger name="com.zaxxer.hikari" level="WARN" />

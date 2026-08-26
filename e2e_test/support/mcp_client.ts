@@ -29,7 +29,7 @@ class McpClient {
     }
     this.client = new Client(
       {
-        name: 'doughnut-mcp-client',
+        name: 'donut-mcp-client',
         version: '1.0.0',
       },
       {

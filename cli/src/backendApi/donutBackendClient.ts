@@ -10,17 +10,15 @@ import {
 import { loadStoredAccessToken } from './accessTokenStorage.js'
 
 /**
- * For every call to the generated Doughnut HTTP client that runs inside
+ * For every call to the generated donut-backend-api HTTP client that runs inside
  * {@link withBackendClient} / {@link runWithDefaultBackendClient}: non-OK responses and
  * fetch failures throw instead of returning `{ error }`.
  */
-export type DoughnutSdkCallOptions = Partial<Pick<RequestOptions, 'signal'>> & {
+export type DonutSdkCallOptions = Partial<Pick<RequestOptions, 'signal'>> & {
   throwOnError: true
 }
 
-export function doughnutSdkOptions(
-  signal?: AbortSignal
-): DoughnutSdkCallOptions {
+export function donutSdkOptions(signal?: AbortSignal): DonutSdkCallOptions {
   return signal === undefined
     ? { throwOnError: true }
     : { throwOnError: true, signal }
@@ -96,7 +94,7 @@ function httpStatusFromSdkThrowable(cause: SdkThrowable): number | undefined {
   return
 }
 
-function doughnutApiErrorFromThrowable(
+function donutApiErrorFromThrowable(
   cause: SdkThrowable
 ): { errorType: string; message?: string } | undefined {
   if (typeof cause !== 'object' || cause === null) return
@@ -161,7 +159,7 @@ function userVisibleMessageForSdkThrowable(cause: SdkThrowable): string {
   if (status === 401) {
     return authenticatedBackendCallFailureAdvice.http401StoredTokenRejected
   }
-  const apiErr = doughnutApiErrorFromThrowable(cause)
+  const apiErr = donutApiErrorFromThrowable(cause)
   if (apiErr !== undefined) {
     if (apiErr.message !== undefined) return apiErr.message
     return userVisibleMessageForKnownApiErrorWithoutBodyMessage(
@@ -269,7 +267,7 @@ export async function runWithDefaultBackendClient<T>(
 
 /**
  * Parses the JSON `data` field from a successful SDK response. Use only with calls that pass
- * {@link doughnutSdkOptions} (so failures throw instead of returning an error envelope).
+ * {@link donutSdkOptions} (so failures throw instead of returning an error envelope).
  */
 export async function runDefaultBackendJson<T>(
   fn: () => Promise<unknown>

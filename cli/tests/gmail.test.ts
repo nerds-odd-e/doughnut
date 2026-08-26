@@ -10,7 +10,7 @@ import {
 } from '../src/commands/gmail/gmail.js'
 
 function createTempDir(): string {
-  return fs.mkdtempSync(path.join(os.tmpdir(), 'doughnut-gmail-test-'))
+  return fs.mkdtempSync(path.join(os.tmpdir(), 'donut-gmail-test-'))
 }
 
 function accountConfig(

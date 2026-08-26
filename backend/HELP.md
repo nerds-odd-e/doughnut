@@ -2,7 +2,7 @@
 
 ## Initial Setup Note
 
-The original package name 'com.odd-e.doughnut' is invalid and this project uses 'com.odde.doughnut' instead.
+The original package name 'com.odd-e.doughnut' is invalid and this project uses 'com.odde.donut' instead.
 
 ## Reference Documentation
 

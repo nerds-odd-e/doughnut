@@ -8,9 +8,9 @@ import {
   type RecallPrompt,
 } from 'donut-api'
 import {
-  doughnutSdkOptions,
+  donutSdkOptions,
   runDefaultBackendJson,
-} from '../../backendApi/doughnutBackendClient.js'
+} from '../../backendApi/donutBackendClient.js'
 import { dueRecallQuery } from './dueRecallQuery.js'
 import { noteBreadcrumbTrailTitles } from './recallNoteContext.js'
 import {
@@ -43,7 +43,7 @@ export async function fetchDueMemoryTrackerIds(
   const due = await runDefaultBackendJson<DueMemoryTrackers>(() =>
     RecallsController.recalling({
       query: dueRecallQuery(dueInDays),
-      ...doughnutSdkOptions(signal),
+      ...donutSdkOptions(signal),
     })
   )
   return due.toRepeat ?? []
@@ -118,7 +118,7 @@ export async function loadRecallCardForMemoryTrackerId(
       const prompt = await runDefaultBackendJson<RecallPrompt>(() =>
         MemoryTrackerController.getRecallPrompt({
           path: { memoryTracker: memoryTrackerId },
-          ...doughnutSdkOptions(signal),
+          ...donutSdkOptions(signal),
         })
       )
       if (prompt.spellingQuestion != null) {
@@ -154,7 +154,7 @@ export async function loadRecallCardForMemoryTrackerId(
   const prompts = await runDefaultBackendJson<RecallPromptHistoryItem[]>(() =>
     MemoryTrackerController.getRecallPrompts({
       path: { memoryTracker: memoryTrackerId },
-      ...doughnutSdkOptions(signal),
+      ...donutSdkOptions(signal),
     })
   )
 
@@ -171,7 +171,7 @@ export async function loadRecallCardForMemoryTrackerId(
   const mt = await runDefaultBackendJson<MemoryTracker>(() =>
     MemoryTrackerController.showMemoryTracker({
       path: { memoryTracker: memoryTrackerId },
-      ...doughnutSdkOptions(signal),
+      ...donutSdkOptions(signal),
     })
   )
   return {

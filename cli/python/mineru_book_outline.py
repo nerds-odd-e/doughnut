@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Doughnut CLI: heading outline (layers 1–3) from PDF or EPUB for attach-book layout extraction.
+Donut CLI: heading outline (layers 1–3) from PDF or EPUB for attach-book layout extraction.
 
 PDF: MinerU `do_parse` (pipeline). Example venv: `.venv-mineru/bin/pip install 'mineru[pipeline]'`.
 
@@ -468,7 +468,7 @@ def main() -> int:
     out_dir = args.output_dir
     cleanup_out = False
     if out_dir is None:
-        out_dir = Path(tempfile.mkdtemp(prefix="doughnut-mineru-outline-"))
+        out_dir = Path(tempfile.mkdtemp(prefix="donut-mineru-outline-"))
         cleanup_out = True
     else:
         out_dir = out_dir.expanduser().resolve()

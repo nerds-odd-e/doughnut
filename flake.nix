@@ -1,5 +1,5 @@
 {
-  description = "doughnut development environment";
+  description = "donut development environment";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-26.05";
@@ -125,7 +125,7 @@
 
       in {
         devShells.default = pkgs.mkShell {
-          name = "doughnut";
+          name = "donut";
           nativeBuildInputs = with pkgs; [ autoPatchelfHook ];
           buildInputs = shellBuildInputs;
 

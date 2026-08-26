@@ -261,20 +261,23 @@ Brand, repo, URL, and live-external `doughnut` names left unchanged.
 
 ### 13. Final verification sweep (Structure)
 
+Status: done
+
 Repo-wide case-insensitive `doughnut` grep excluding: the Slice 1 ADR,
 `infra/gcp/**`, generated/build/log/lockfile artifacts, and the documented
 live-external-resource values and brand-name text listed in "Goal" above.
 Fix anything else found. Close with one full run of the backend, frontend,
 cli, and mcp-server test suites together as the final gate.
 
-Known leftovers after slice 12 (in scope here, not docs):
-- `e2e_test/support/mcp_client.ts`: `DOUGHNUT_API_BASE_URL`, `doughnut-mcp-client`
-- `backend/src/main/resources/logback-spring.xml`: logger `com.odde.doughnut`;
-  log files `doughnut-e2e.log` / `doughnut-dev.log` / `doughnut-prod.log`
-- `README.md`: `cli/dist/doughnut-cli.bundle.mjs`
-- `backend/HELP.md`: `com.odde.doughnut`
-- Fence name `doughnut-note-md` still used in code — decide with the grep,
-  do not assume it renames.
+Fixed the "known leftovers" plus a further sweep: `cli/src/backendApi/
+donutBackendClient.ts` (renamed from `doughnutBackendClient.ts`, plus its
+internal identifiers and 9 importers), `cli/src/configDir.ts`'s production
+config-dir default (`~/.config/donut`), `logback-spring.xml`'s logger
+categories and log filenames, `backend/HELP.md`, `README.md`'s CLI bundle
+path, `flake.nix`, `pyproject.toml`, `e2e_test/support/mcp_client.ts`,
+`e2e_test/step_definitions/hook.ts`, and `.cursor/rules/mcp-server.mdc`'s
+stale frontmatter description. Full backend/frontend/cli/mcp-server test
+suites all green as the closing gate.
 
 ## Discoveries affecting remaining work
 

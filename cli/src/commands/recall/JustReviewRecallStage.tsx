@@ -7,9 +7,9 @@ import {
 } from 'react'
 import { Text } from 'ink'
 import {
-  doughnutSdkOptions,
+  donutSdkOptions,
   runDefaultBackendJson,
-} from '../../backendApi/doughnutBackendClient.js'
+} from '../../backendApi/donutBackendClient.js'
 import { renderMarkdownToTerminal } from '../../markdown.js'
 import { resolvedTerminalWidth } from '../../terminalColumns.js'
 import { YesNoStagePrompt } from '../../commonUIComponents/YesNoStagePrompt.js'
@@ -92,7 +92,7 @@ export function JustReviewRecallStage({
             MemoryTrackerController.markAsRecalled({
               path: { memoryTracker: p.memoryTrackerId },
               query: { grade },
-              ...doughnutSdkOptions(ac.signal),
+              ...donutSdkOptions(ac.signal),
             })
           )
         } catch (err: unknown) {

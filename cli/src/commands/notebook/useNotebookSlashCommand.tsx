@@ -6,9 +6,9 @@ import {
   type NotebooksViewedByUser,
 } from 'donut-api'
 import {
-  doughnutSdkOptions,
+  donutSdkOptions,
   runDefaultBackendJson,
-} from '../../backendApi/doughnutBackendClient.js'
+} from '../../backendApi/donutBackendClient.js'
 import { AsyncAssistantFetchStage } from '../gmail/AsyncAssistantFetchStage.js'
 import type {
   CommandDoc,
@@ -92,7 +92,7 @@ function UseNotebookStage({
     async (signal: AbortSignal) => {
       const view = await runDefaultBackendJson<NotebooksViewedByUser>(() =>
         NotebookController.myNotebooks({
-          ...doughnutSdkOptions(signal),
+          ...donutSdkOptions(signal),
         })
       )
 
@@ -122,7 +122,7 @@ function UseNotebookStage({
   const runLoadPickerList = useCallback(async (signal: AbortSignal) => {
     const view = await runDefaultBackendJson<NotebooksViewedByUser>(() =>
       NotebookController.myNotebooks({
-        ...doughnutSdkOptions(signal),
+        ...donutSdkOptions(signal),
       })
     )
     const listed = notebooksFromMyNotebooksView(view)

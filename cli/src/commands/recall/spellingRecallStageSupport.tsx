@@ -7,9 +7,9 @@ import {
   type RecallPrompt,
 } from 'donut-api'
 import {
-  doughnutSdkOptions,
+  donutSdkOptions,
   runDefaultBackendJson,
-} from '../../backendApi/doughnutBackendClient.js'
+} from '../../backendApi/donutBackendClient.js'
 import { resolvedTerminalWidth } from '../../terminalColumns.js'
 import { userVisibleSlashCommandError } from '../../userVisibleSlashCommandError.js'
 import type { SpellingRecallSessionPayload } from './nextRecallCardLoad.js'
@@ -28,7 +28,7 @@ async function fetchSpellingRecallPrompt(
   const prompt = await runDefaultBackendJson<RecallPrompt>(() =>
     MemoryTrackerController.getRecallPrompt({
       path: { memoryTracker: memoryTrackerId },
-      ...doughnutSdkOptions(signal),
+      ...donutSdkOptions(signal),
     })
   )
   if (prompt.spellingQuestion == null) {
@@ -50,7 +50,7 @@ export async function submitSpellingAnswer(
     RecallPromptController.answerSpelling({
       path: { recallPrompt: recallPromptId },
       body: { spellingAnswer },
-      ...doughnutSdkOptions(signal),
+      ...donutSdkOptions(signal),
     })
   )
 }

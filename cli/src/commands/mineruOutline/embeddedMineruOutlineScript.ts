@@ -9,7 +9,7 @@ export function materializeEmbeddedMineruOutlineScript(): string {
   if (materializedPath !== null) {
     return materializedPath
   }
-  const dir = mkdtempSync(join(tmpdir(), 'doughnut-mineru-outline-'))
+  const dir = mkdtempSync(join(tmpdir(), 'donut-mineru-outline-'))
   const path = join(dir, 'mineru_book_outline.py')
   writeFileSync(path, getEmbeddedMineruOutlineSource(), 'utf8')
   materializedPath = path

@@ -90,10 +90,10 @@ test_deploys_when_no_record() {
 	fake_bin="$work/fakebin"
 	write_fake_bin "$fake_bin"
 	init_deploy_test_logs "$work"
-	jar="$work/doughnut-0.0.1-SNAPSHOT.jar"
+	jar="$work/donut-0.0.1-SNAPSHOT.jar"
 	printf 'new-jar' >"$jar"
 	unset RECORD_JSON_FILE
-	export GCS_BUCKET=mybucket ARTIFACT=doughnut VERSION=0.0.1-SNAPSHOT GITHUB_SHA="$TEST_GIT_SHA"
+	export GCS_BUCKET=mybucket ARTIFACT=donut VERSION=0.0.1-SNAPSHOT GITHUB_SHA="$TEST_GIT_SHA"
 	export DEPLOY_JAR_PATH="$jar"
 	run_deploy "$work" "$fake_bin"
 	assert_file_exists "$work/rolling.log"

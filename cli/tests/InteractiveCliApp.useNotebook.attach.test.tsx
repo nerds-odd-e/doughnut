@@ -13,7 +13,7 @@ import { tmpdir } from 'node:os'
 import { join, resolve as pathResolve } from 'node:path'
 import { NotebookController } from 'donut-api'
 import makeMe from 'donut-test-fixtures/makeMe'
-import * as doughnutBackendClient from '../src/backendApi/doughnutBackendClient.js'
+import * as donutBackendClient from '../src/backendApi/donutBackendClient.js'
 import { InteractiveCliApp } from '../src/InteractiveCliApp.js'
 import { renderInkWhenCommandLineReady } from './inkTestHelpers.js'
 import { myNotebooksApiRow } from './myNotebooksApiRow.js'
@@ -44,7 +44,7 @@ describe('InteractiveCliApp /use notebook /attach', () => {
     myNotebooksSpy.mockResolvedValue({
       data: { notebooks: [myNotebooksApiRow('Top Maths')] },
     } as Awaited<ReturnType<typeof NotebookController.myNotebooks>>)
-    attachBookSpy = vi.spyOn(doughnutBackendClient, 'attachNotebookBookFile')
+    attachBookSpy = vi.spyOn(donutBackendClient, 'attachNotebookBookFile')
     runMineruOutlineSubprocess.mockResolvedValue({
       ok: true,
       outline: 'o',
@@ -196,7 +196,7 @@ describe('InteractiveCliApp /use notebook /attach', () => {
     'shows user-visible error for %s',
     async (_label, error, message) => {
       attachBookSpy.mockImplementation(() =>
-        doughnutBackendClient.withBackendClient('t', async () => {
+        donutBackendClient.withBackendClient('t', async () => {
           throw error
         })
       )

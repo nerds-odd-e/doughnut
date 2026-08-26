@@ -32,7 +32,7 @@ function inlineCodeMarkdown(inner: string): string {
 const CODE_PLACEHOLDER_PREFIX = '\uE000CODE'
 const CODE_PLACEHOLDER_SUFFIX = '\uE001'
 
-function convertDoughnutInlineHtmlToMarkdown(content: string): string {
+function convertDonutInlineHtmlToMarkdown(content: string): string {
   let s = content.replace(/<br\s*\/?>/gi, '\n')
 
   const codeChunks: string[] = []
@@ -77,7 +77,7 @@ export function renderMarkdownToTerminal(md: string, width?: number): string {
   if (!trimmed) return ''
   const markdown = hasBlockLevelHtml(trimmed)
     ? htmlToMarkdown(trimmed)
-    : convertDoughnutInlineHtmlToMarkdown(trimmed)
+    : convertDonutInlineHtmlToMarkdown(trimmed)
   return render(markdown, {
     width: width ?? process.stdout.columns ?? 80,
     wrap: true,

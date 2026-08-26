@@ -88,7 +88,7 @@ export function expectSuccessLineOnceOnScreen(
 }
 
 export function createTestConfigDir(): string {
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'doughnut-cli-test-'))
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'donut-cli-test-'))
   vi.stubEnv('DONUT_CONFIG_DIR', dir)
   return dir
 }

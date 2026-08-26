@@ -15,7 +15,7 @@ describe('InteractiveCliApp /set-access-token', () => {
   let getTokenInfoSpy: ReturnType<typeof vi.spyOn>
 
   beforeEach(() => {
-    configDir = fs.mkdtempSync(path.join(os.tmpdir(), 'doughnut-cli-at-'))
+    configDir = fs.mkdtempSync(path.join(os.tmpdir(), 'donut-cli-at-'))
     savedConfigDir = process.env.DONUT_CONFIG_DIR
     process.env.DONUT_CONFIG_DIR = configDir
     getTokenInfoSpy = vi

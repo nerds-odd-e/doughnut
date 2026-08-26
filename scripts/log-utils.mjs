@@ -23,7 +23,7 @@ export const repoRoot = path.resolve(
 
 export const LOG_TARGETS = {
   sut: path.join(repoRoot, 'sut.log'),
-  'backend-e2e': path.join(repoRoot, 'backend/logs/doughnut-e2e.log'),
+  'backend-e2e': path.join(repoRoot, 'backend/logs/donut-e2e.log'),
   mountebank: path.join(repoRoot, 'sut.log'),
 }
 
