@@ -39,4 +39,53 @@ describe("PaceTile", () => {
       "Not enough recall history yet for a pace comparison"
     )
   })
+
+  it("shows a low-confidence badge when confidence is below 0.5", () => {
+    const wrapper = helper
+      .component(PaceTile)
+      .withProps({
+        pace: {
+          pctVsUsual: 42,
+          sampleSize: 5,
+          totalAnsweredToday: 8,
+          confidence: 0.3,
+        },
+      })
+      .mount()
+
+    const badge = wrapper.find('[data-testid="recall-pace-low-confidence"]')
+    expect(badge.exists()).toBe(true)
+    expect(badge.text()).toContain("low confidence")
+  })
+
+  it("does not show a low-confidence badge when confidence is 0.5 or above", () => {
+    const wrapper = helper
+      .component(PaceTile)
+      .withProps({
+        pace: {
+          pctVsUsual: 42,
+          sampleSize: 5,
+          totalAnsweredToday: 8,
+          confidence: 0.5,
+        },
+      })
+      .mount()
+
+    expect(
+      wrapper.find('[data-testid="recall-pace-low-confidence"]').exists()
+    ).toBe(false)
+  })
+
+  it("does not show a low-confidence badge when confidence is absent", () => {
+    const wrapper = helper
+      .component(PaceTile)
+      .withProps({
+        pace: { pctVsUsual: 42, sampleSize: 5, totalAnsweredToday: 8 },
+      })
+      .mount()
+
+    expect(
+      wrapper.find('[data-testid="recall-pace-low-confidence"]').exists()
+    ).toBe(false)
+  })
 })

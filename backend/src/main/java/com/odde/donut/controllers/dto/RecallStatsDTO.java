@@ -57,6 +57,7 @@ public class RecallStatsDTO {
     private Double pctVsUsual;
     private Integer sampleSize;
     private Integer totalAnsweredToday;
+    private Double confidence;
   }
 
   @Data

@@ -355,10 +355,25 @@ baseline over time; only today's reported number is robustified. `pctVsUsual`
 switched from mean to median of `todaysResiduals` via a new private `median()`
 helper. No DTO/API change, no migration.
 
-#### 12. Cold-start items stop adding noise — Behavior `[ ]`
+#### 12. Cold-start items stop adding noise — Behavior `[x]`
 
 Confidence weight `w_j = m_j / (m_j + 3)`. A morning of freshly assimilated cards
 reports lower confidence rather than a wrong number.
+
+Done: `RecallPaceAggregator` now tracks `m_j` (prior surviving observation
+count) per item alongside `tauByItem`, read before increment on the same
+rows that update the EWMA. Each today's residual is paired with its weight
+`w_j = m_j/(m_j+3.0)` in a new `WeightedResidual(residual, weight)` record;
+`pctVsUsual` is now a **weighted** median over these pairs (cumulative weight
+crosses half of total weight), so a cold-start item barely moves the number
+instead of distorting it. A new `PaceStats.confidence` field (plain mean of
+today's `w_j`, null when `sampleSize==0`) surfaces the aggregate certainty.
+`PaceTile.vue` shows a `daisy-badge-warning` ("low confidence — mostly new
+cards") when `confidence < 0.5`, matching the existing idle-time badge
+convention. API client regenerated (`PaceStats.confidence` is new on the
+wire). No E2E — slice 9's pace E2E is already `@wip` for an unrelated clock
+mismatch; backend + frontend unit tests cover this slice, matching slice 7's
+precedent.
 
 #### 13. Recall Stats shows today's retrieval-lapse count — Behavior `[ ]`
 

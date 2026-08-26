@@ -6,6 +6,7 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.List;
@@ -30,9 +31,16 @@ final class RecallPaceAggregator {
   /** Result of the chronological pace walk: the tile stats plus rows judged implausibly fast. */
   record PaceResult(PaceStats stats, Set<RecallAnswerRow> implausiblyFastRows) {}
 
+  /**
+   * A cold-start item's baseline is built from very few observations, so its residual is noisy.
+   * {@code weight} down-weights such rows in the pace tile's weighted median and confidence score.
+   */
+  private record WeightedResidual(double residual, double weight) {}
+
   static PaceResult compute(List<RecallAnswerRow> allTimeReviews, LocalDate today, ZoneId zoneId) {
     Map<Integer, Double> tauByItem = new HashMap<>();
-    List<Double> todaysResiduals = new ArrayList<>();
+    Map<Integer, Integer> priorObservationCountByItem = new HashMap<>();
+    List<WeightedResidual> todaysResiduals = new ArrayList<>();
     Set<RecallAnswerRow> implausiblyFastRows = Collections.newSetFromMap(new IdentityHashMap<>());
     int totalAnsweredToday = 0;
     for (RecallAnswerRow r : allTimeReviews) {
@@ -66,24 +74,52 @@ final class RecallPaceAggregator {
         continue;
       }
       double lnRt = Math.log(rt.get());
+      int priorObservationCount = priorObservationCountByItem.getOrDefault(itemId, 0);
       if (baseline != null && isToday) {
         double rawResidual = lnRt - baseline;
-        todaysResiduals.add(Math.min(rawResidual, RESIDUAL_CAP));
+        double weight = priorObservationCount / (priorObservationCount + 3.0);
+        todaysResiduals.add(new WeightedResidual(Math.min(rawResidual, RESIDUAL_CAP), weight));
       }
       tauByItem.put(
           itemId, baseline == null ? lnRt : EWMA_ALPHA * lnRt + (1 - EWMA_ALPHA) * baseline);
+      priorObservationCountByItem.put(itemId, priorObservationCount + 1);
     }
     int sampleSize = todaysResiduals.size();
-    Double pctVsUsual = sampleSize > 0 ? (Math.exp(median(todaysResiduals)) - 1) * 100 : null;
+    Double pctVsUsual = sampleSize > 0 ? weightedPctVsUsual(todaysResiduals) : null;
+    Double confidence = sampleSize > 0 ? averageWeight(todaysResiduals) : null;
     return new PaceResult(
-        new PaceStats(pctVsUsual, sampleSize, totalAnsweredToday), implausiblyFastRows);
+        new PaceStats(pctVsUsual, sampleSize, totalAnsweredToday, confidence), implausiblyFastRows);
   }
 
-  private static double median(List<Double> values) {
-    List<Double> sorted = new ArrayList<>(values);
-    Collections.sort(sorted);
-    int size = sorted.size();
-    int mid = size / 2;
-    return size % 2 == 1 ? sorted.get(mid) : (sorted.get(mid - 1) + sorted.get(mid)) / 2.0;
+  private static Double weightedPctVsUsual(List<WeightedResidual> residuals) {
+    Double weightedMedian = weightedMedian(residuals);
+    return weightedMedian == null ? null : (Math.exp(weightedMedian) - 1) * 100;
+  }
+
+  private static double averageWeight(List<WeightedResidual> residuals) {
+    return residuals.stream().mapToDouble(WeightedResidual::weight).average().orElse(0);
+  }
+
+  /**
+   * Weighted median: sorts by residual ascending and returns the residual at which cumulative
+   * weight first reaches half of the total. Cold-start rows (weight near 0) barely move it, letting
+   * established items dominate. Returns {@code null} when total weight is zero (every contributing
+   * row is cold-start), since such weights carry no information either way.
+   */
+  private static Double weightedMedian(List<WeightedResidual> residuals) {
+    double totalWeight = residuals.stream().mapToDouble(WeightedResidual::weight).sum();
+    if (totalWeight == 0) {
+      return null;
+    }
+    List<WeightedResidual> sorted = new ArrayList<>(residuals);
+    sorted.sort(Comparator.comparingDouble(WeightedResidual::residual));
+    double cumulativeWeight = 0;
+    for (WeightedResidual wr : sorted) {
+      cumulativeWeight += wr.weight();
+      if (cumulativeWeight >= totalWeight / 2.0) {
+        return wr.residual();
+      }
+    }
+    return sorted.get(sorted.size() - 1).residual();
   }
 }

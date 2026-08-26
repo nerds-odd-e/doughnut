@@ -4993,6 +4993,9 @@ components:
         totalAnsweredToday:
           type: integer
           format: int32
+        confidence:
+          type: number
+          format: double
     RecallStatsDTO:
       type: object
       properties:

@@ -939,6 +939,7 @@ export type PaceStats = {
     pctVsUsual?: number;
     sampleSize?: number;
     totalAnsweredToday?: number;
+    confidence?: number;
 };
 
 export type RecallStatsDto = {
