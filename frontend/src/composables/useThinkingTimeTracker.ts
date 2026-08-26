@@ -12,6 +12,11 @@ export type ThinkingTimeTrackerOptions = {
   clock?: Clock
 }
 
+// A device suspend (e.g. phone lock) leaves no pause() call behind, so a
+// wall-clock jump this large between two checks can only be a suspend, never
+// real event-loop delay. Anything beyond this is excluded from thinking time.
+const SUSPEND_GAP_THRESHOLD_MS = 5000
+
 export function useThinkingTimeTracker(
   options: ThinkingTimeTrackerOptions = {}
 ) {
@@ -22,12 +27,14 @@ export function useThinkingTimeTracker(
   const isPaused = ref(false)
   const hasStopped = ref(false)
 
-  let visibilitySyncIntervalId: ReturnType<typeof setInterval> | null = null
+  // Ticks every 250ms while running: reconciles suspend gaps (see
+  // reconcileGap) and syncs pause state with document.hidden.
+  let watchdogIntervalId: ReturnType<typeof setInterval> | null = null
 
-  const clearVisibilitySync = () => {
-    if (visibilitySyncIntervalId !== null) {
-      clearInterval(visibilitySyncIntervalId)
-      visibilitySyncIntervalId = null
+  const clearWatchdog = () => {
+    if (watchdogIntervalId !== null) {
+      clearInterval(watchdogIntervalId)
+      watchdogIntervalId = null
     }
   }
 
@@ -39,25 +46,45 @@ export function useThinkingTimeTracker(
     runningStart.value = null
     isRunning.value = false
     isPaused.value = true
-    clearVisibilitySync()
+    clearWatchdog()
+  }
+
+  const reconcileGap = () => {
+    if (!isRunning.value || runningStart.value === null) return
+
+    const now = clock.now()
+    const elapsed = now - runningStart.value
+    if (elapsed <= SUSPEND_GAP_THRESHOLD_MS) {
+      accumulatedMs.value += elapsed
+    }
+    runningStart.value = now
   }
 
   const resume = () => {
-    if (hasStopped.value || isRunning.value) return
+    if (hasStopped.value) return
+    if (isRunning.value) {
+      // Already "running" per our state, but a device suspend fires no
+      // pause() — this wake-up call is the first chance to reconcile it.
+      reconcileGap()
+      return
+    }
     if (document.hidden) return
 
     runningStart.value = clock.now()
     isRunning.value = true
     isPaused.value = false
 
-    clearVisibilitySync()
-    visibilitySyncIntervalId = setInterval(() => {
+    clearWatchdog()
+    watchdogIntervalId = setInterval(() => {
       if (hasStopped.value) {
-        clearVisibilitySync()
+        clearWatchdog()
         return
       }
-      if (isRunning.value && document.hidden) {
-        pause()
+      if (isRunning.value) {
+        reconcileGap()
+        if (document.hidden) {
+          pause()
+        }
       }
     }, 250)
   }
@@ -74,11 +101,7 @@ export function useThinkingTimeTracker(
   }
 
   const updateAccumulatedTime = (): number => {
-    if (isRunning.value && runningStart.value !== null) {
-      const now = clock.now()
-      accumulatedMs.value += now - runningStart.value
-      runningStart.value = now
-    }
+    reconcileGap()
     return Math.round(accumulatedMs.value)
   }
 
@@ -141,7 +164,7 @@ export function useThinkingTimeTracker(
 
   onUnmounted(() => {
     removeEventListeners()
-    clearVisibilitySync()
+    clearWatchdog()
     pause()
   })
 

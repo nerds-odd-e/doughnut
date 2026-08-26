@@ -143,7 +143,7 @@ reads route through `clock.now()`, following the existing options-object
 precedent in `useDebouncedTextAutosave.ts`. No `Date.now()` calls existed.
 Consumer (`useQuestionThinkingTime.ts`) unaffected — still calls with no args.
 
-#### 3. A suspended device no longer inflates thinking time — Behavior `[ ]`
+#### 3. A suspended device no longer inflates thinking time — Behavior `[x]`
 
 Lock the phone mid-question, unlock, answer: the suspended interval is excluded.
 Covers the `resume()` early-return and reconciles on watchdog tick and in
@@ -152,6 +152,14 @@ Covers the `resume()` early-return and reconciles on watchdog tick and in
 - Unit: `useThinkingTimeTracker` with the injected clock — the deliberate
   isolated contract, replaying event sequences no real browser produces on demand
 - Deliberately **no** `freeze`/`resume` listeners
+
+Done: added `reconcileGap()`, a wall-clock gap detector wired into three
+places — `resume()`'s existing early-return branch (the exact stale state a
+silent device suspend leaves), the existing 250ms watchdog interval
+(renamed `watchdogIntervalId`, previously used only to detect
+`document.hidden`), and `stop()`. Threshold `SUSPEND_GAP_THRESHOLD_MS = 5000`
+(no prior precedent in the codebase). No `freeze`/`resume`/`visibilitychange`
+listeners added, per the plan's design decision.
 
 ### Interruption record
 

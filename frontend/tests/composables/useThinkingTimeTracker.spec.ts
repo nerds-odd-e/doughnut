@@ -149,6 +149,37 @@ describe("useThinkingTimeTracker", () => {
     await stopAndExpect(wrapper, "1235")
   })
 
+  it("excludes a suspend gap reconciled by the watchdog tick, with no pause() called", async () => {
+    const wrapper = await mountStartedTracker()
+    setTime(1000)
+
+    // Device suspends without firing any pause/resume event. The clock
+    // jumps forward by hours in a single tick — this is what a watchdog
+    // tick observes once the interval fires again after wake.
+    setTime(1000 + 6 * 60 * 60 * 1000)
+
+    setTime(1000 + 6 * 60 * 60 * 1000 + 500)
+    await stopAndExpect(wrapper, "1500")
+  })
+
+  it("excludes a suspend gap reconciled in stop() before any watchdog tick fires", async () => {
+    const wrapper = await mountStartedTracker()
+    setTime(1000)
+
+    // Jump the clock only — do not advance fake timers, so the 250ms
+    // watchdog interval has no chance to tick before stop() is called.
+    performanceNowSpy.mockReturnValue(1000 + 6 * 60 * 60 * 1000)
+
+    await stopAndExpect(wrapper, "1000")
+  })
+
+  it("does not exclude ordinary small clock drift", async () => {
+    const wrapper = await mountStartedTracker()
+    setTime(1000)
+    setTime(4000)
+    await stopAndExpect(wrapper, "4000")
+  })
+
   describe("KeepAlive lifecycle", () => {
     const InnerComponent = defineComponent({
       setup() {
