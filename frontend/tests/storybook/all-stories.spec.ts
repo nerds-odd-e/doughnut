@@ -6,7 +6,7 @@ import type { RouteRecordRaw } from "vue-router"
 import { routeMetadata } from "@/routes/routeMetadata"
 import { ref } from "vue"
 import type { User } from "@generated/doughnut-backend-api"
-import makeMe from "doughnut-test-fixtures/makeMe"
+import makeMe from "donut-test-fixtures/makeMe"
 import { mockShowNote } from "@tests/helpers"
 import { storyFiles } from "../../storyFiles.generated"
 

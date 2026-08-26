@@ -4,7 +4,7 @@ import {
   NotebookController,
   type Notebook,
   type NotebooksViewedByUser,
-} from 'doughnut-api'
+} from 'donut-api'
 import {
   doughnutSdkOptions,
   runDefaultBackendJson,

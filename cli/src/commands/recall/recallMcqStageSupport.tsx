@@ -5,7 +5,7 @@ import {
   type AnsweredQuestion,
   type QuestionContestResult,
   type RecallPrompt,
-} from 'doughnut-api'
+} from 'donut-api'
 import {
   doughnutSdkOptions,
   runDefaultBackendJson,

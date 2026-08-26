@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/vue3-vite"
 import NoteUnderQuestion from "./NoteUnderQuestion.vue"
-import makeMe from "doughnut-test-fixtures/makeMe"
+import makeMe from "donut-test-fixtures/makeMe"
 
 function folderStub(id: number, name: string) {
   return makeMe.aFolder.folder(id, name).please()

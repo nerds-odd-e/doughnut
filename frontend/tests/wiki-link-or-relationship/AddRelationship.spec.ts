@@ -1,7 +1,7 @@
 import { NotebookController } from "@generated/doughnut-backend-api/sdk.gen"
 import { noteShowLocation } from "@/routes/noteShowLocation"
 import { formatRelationshipNoteTitle } from "@/utils/relationshipNoteCompose"
-import makeMe from "doughnut-test-fixtures/makeMe"
+import makeMe from "donut-test-fixtures/makeMe"
 import { mockSdkService, testFolderStub } from "@tests/helpers"
 import { teardownGlobalClientForTesting } from "@/managedApi/clientSetup"
 import { nextTick } from "vue"

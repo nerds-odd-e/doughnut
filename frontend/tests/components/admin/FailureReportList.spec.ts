@@ -2,7 +2,7 @@ import { FailureReportController } from "@generated/doughnut-backend-api/sdk.gen
 import FailureReportList from "@/components/admin/FailureReportList.vue"
 import { flushPromises } from "@vue/test-utils"
 import { describe, expect, it } from "vitest"
-import makeMe from "doughnut-test-fixtures/makeMe"
+import makeMe from "donut-test-fixtures/makeMe"
 import helper, { mockSdkService } from "@tests/helpers"
 import {
   aFailureReport,

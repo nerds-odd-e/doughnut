@@ -1,5 +1,5 @@
 import NoteEditingHistory from "@/store/NoteEditingHistory"
-import makeMe from "doughnut-test-fixtures/makeMe"
+import makeMe from "donut-test-fixtures/makeMe"
 import { describe, it, expect, beforeEach } from "vitest"
 
 describe("storeUndoCommand", () => {

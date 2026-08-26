@@ -4,7 +4,7 @@ import {
   UserController,
 } from "@generated/doughnut-backend-api/sdk.gen"
 import NotebookHealthPanel from "@/components/notebook/NotebookHealthPanel.vue"
-import makeMe from "doughnut-test-fixtures/makeMe"
+import makeMe from "donut-test-fixtures/makeMe"
 import helper, { mockSdkService } from "@tests/helpers"
 import type { VueWrapper } from "@vue/test-utils"
 import { vi } from "vitest"

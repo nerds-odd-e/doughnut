@@ -1,4 +1,4 @@
-import type { NotebookController } from 'doughnut-api'
+import type { NotebookController } from 'donut-api'
 import { describe, test } from 'vitest'
 import { pressEscapeAndWaitForCancelledLine } from './inkTestHelpers.js'
 import { myNotebooksApiRow } from './myNotebooksApiRow.js'

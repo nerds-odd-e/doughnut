@@ -3,7 +3,7 @@ import {
   AiController,
   TextContentController,
 } from "@generated/doughnut-backend-api/sdk.gen"
-import makeMe from "doughnut-test-fixtures/makeMe"
+import makeMe from "donut-test-fixtures/makeMe"
 import { mockSdkService } from "@tests/helpers"
 import {
   mountNoteAudioTools,

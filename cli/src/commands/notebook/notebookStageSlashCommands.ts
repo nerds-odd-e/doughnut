@@ -1,4 +1,4 @@
-import type { Notebook } from 'doughnut-api'
+import type { Notebook } from 'donut-api'
 import type { InteractiveSlashCommand } from '../interactiveSlashCommand.js'
 import { attachNotebookSlashCommandFor } from './notebookAttachSlashCommand.js'
 

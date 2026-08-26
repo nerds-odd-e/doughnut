@@ -1,6 +1,6 @@
 import { flushPromises } from "@vue/test-utils"
 import { describe, expect, it } from "vitest"
-import makeMe from "doughnut-test-fixtures/makeMe"
+import makeMe from "donut-test-fixtures/makeMe"
 import { wrapSdkResponse } from "@tests/helpers"
 import usePopups from "@/components/commons/Popups/usePopups"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"

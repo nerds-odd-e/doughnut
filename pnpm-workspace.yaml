@@ -2,8 +2,8 @@ packages:
   - frontend
   - mcp-server
   - cli
-  - packages/doughnut-api
-  - packages/doughnut-test-fixtures
+  - packages/donut-api
+  - packages/donut-test-fixtures
   - packages/generated/doughnut-backend-api
 
 # @inkjs/ui imports react but only declares peer `ink`; without this, unbundled

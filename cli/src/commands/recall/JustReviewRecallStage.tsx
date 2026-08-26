@@ -1,4 +1,4 @@
-import { MemoryTrackerController } from 'doughnut-api'
+import { MemoryTrackerController } from 'donut-api'
 import {
   useCallback,
   useState,

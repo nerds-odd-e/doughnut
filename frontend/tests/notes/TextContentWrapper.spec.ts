@@ -17,7 +17,7 @@ import {
   withFakeRequestAnimationFrame,
   wrapper,
 } from "@tests/notes/textContentWrapperTestSupport"
-import makeMe from "doughnut-test-fixtures/makeMe"
+import makeMe from "donut-test-fixtures/makeMe"
 import { flushPromises } from "@vue/test-utils"
 import { describe, it, expect, vi, afterEach } from "vitest"
 

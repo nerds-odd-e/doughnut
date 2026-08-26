@@ -1,7 +1,7 @@
 import { WikidataController } from "@generated/doughnut-backend-api/sdk.gen"
 import WikidataAssociationDialog from "@/components/notes/WikidataAssociationDialog.vue"
 import { type VueWrapper, flushPromises } from "@vue/test-utils"
-import makeMe from "doughnut-test-fixtures/makeMe"
+import makeMe from "donut-test-fixtures/makeMe"
 import helper, { mockSdkService, wrapSdkResponse } from "@tests/helpers"
 import { afterEach, beforeEach, expect, vi } from "vitest"
 

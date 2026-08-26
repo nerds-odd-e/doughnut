@@ -1,4 +1,4 @@
-import type { AttachBookLayoutRequestFull } from 'doughnut-api'
+import type { AttachBookLayoutRequestFull } from 'donut-api'
 import type {
   MineruOutlineOk,
   MineruOutlineResult,

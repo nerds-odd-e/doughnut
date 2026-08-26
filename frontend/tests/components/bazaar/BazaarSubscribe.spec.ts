@@ -1,6 +1,6 @@
 import BazaarNotebookButtons from "@/components/bazaar/BazaarNotebookButtons.vue"
 import SubscribeForm from "@/components/bazaar/SubscribeForm.vue"
-import makeMe from "doughnut-test-fixtures/makeMe"
+import makeMe from "donut-test-fixtures/makeMe"
 import helper from "@tests/helpers"
 import { afterEach, describe, expect, it } from "vitest"
 

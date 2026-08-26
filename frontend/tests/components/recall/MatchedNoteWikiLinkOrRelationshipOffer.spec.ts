@@ -8,7 +8,7 @@ import RelationTypeSelect from "@/components/wiki-link-or-relationship/RelationT
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import helper, { mockSdkService, testFolderStub } from "@tests/helpers"
 import { teardownGlobalClientForTesting } from "@/managedApi/clientSetup"
-import makeMe from "doughnut-test-fixtures/makeMe"
+import makeMe from "donut-test-fixtures/makeMe"
 import type { NoteRealm } from "@generated/doughnut-backend-api"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest"

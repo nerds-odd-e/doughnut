@@ -5,7 +5,7 @@ import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
 import helper, { mockSdkService, mockShowNote } from "@tests/helpers"
 import { teardownGlobalClientForTesting } from "@/managedApi/clientSetup"
-import makeMe from "doughnut-test-fixtures/makeMe"
+import makeMe from "donut-test-fixtures/makeMe"
 import { refinementLayoutItems } from "./noteRefinementTestSupport"
 import { afterEach, beforeEach, describe, it, expect } from "vitest"
 

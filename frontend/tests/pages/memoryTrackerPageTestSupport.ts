@@ -4,7 +4,7 @@ import type {
   RecallHistoryItem,
 } from "@generated/doughnut-backend-api"
 import MemoryTrackerPage from "@/pages/MemoryTrackerPage.vue"
-import makeMe from "doughnut-test-fixtures/makeMe"
+import makeMe from "donut-test-fixtures/makeMe"
 import helper, { mockSdkService, wrapSdkResponse } from "@tests/helpers"
 import { flushPromises } from "@vue/test-utils"
 import { vi } from "vitest"

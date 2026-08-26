@@ -1,4 +1,4 @@
-import makeMe from "doughnut-test-fixtures/makeMe"
+import makeMe from "donut-test-fixtures/makeMe"
 import { testFolderStub } from "@tests/helpers"
 import {
   FOLDER_FIRST_GEN_CHILDREN_ID,

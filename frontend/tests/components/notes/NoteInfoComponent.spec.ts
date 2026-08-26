@@ -2,7 +2,7 @@ import NoteInfoComponent from "@/components/notes/NoteInfoComponent.vue"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
 import { afterEach, describe, expect, it, vi } from "vitest"
 import helper from "@tests/helpers"
-import makeMe from "doughnut-test-fixtures/makeMe"
+import makeMe from "donut-test-fixtures/makeMe"
 describe("NoteInfoComponent", () => {
   let wrapper: VueWrapper
 

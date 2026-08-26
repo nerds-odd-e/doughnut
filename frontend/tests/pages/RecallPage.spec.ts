@@ -1,6 +1,6 @@
 import { useRecallData } from "@/composables/useRecallData"
 import type { AnsweredQuestion } from "@generated/doughnut-backend-api"
-import makeMe from "doughnut-test-fixtures/makeMe"
+import makeMe from "donut-test-fixtures/makeMe"
 import { wrapSdkResponse } from "@tests/helpers"
 import { flushPromises } from "@vue/test-utils"
 import { describe, expect, it, vi } from "vitest"

@@ -2,7 +2,7 @@ import { MemoryTrackerController } from "@generated/doughnut-backend-api/sdk.gen
 import RecentlyAssimilatedNotes from "@/components/recent/RecentlyAssimilatedNotes.vue"
 import { flushPromises } from "@vue/test-utils"
 import helper, { mockSdkService } from "@tests/helpers"
-import makeMe from "doughnut-test-fixtures/makeMe"
+import makeMe from "donut-test-fixtures/makeMe"
 import { describe, it, expect } from "vitest"
 
 describe("RecentlyAssimilatedNotes", () => {

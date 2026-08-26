@@ -1,4 +1,4 @@
-import { configureClient, getApiConfig } from 'doughnut-api'
+import { configureClient, getApiConfig } from 'donut-api'
 import type { ServerContext } from './types.js'
 
 export function createServerContext(): ServerContext {

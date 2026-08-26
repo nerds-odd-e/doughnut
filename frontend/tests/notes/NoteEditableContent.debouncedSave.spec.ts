@@ -1,7 +1,7 @@
 import { vi, describe, it, expect, beforeEach, afterEach } from "vitest"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
 import type { ComponentPublicInstance } from "vue"
-import makeMe from "doughnut-test-fixtures/makeMe"
+import makeMe from "donut-test-fixtures/makeMe"
 import { mockSdkServiceWithImplementation } from "@tests/helpers"
 import { TextContentController } from "@generated/doughnut-backend-api/sdk.gen"
 import { advanceNoteContentSaveDebounce } from "@tests/helpers/noteContentDebounceTestSupport"

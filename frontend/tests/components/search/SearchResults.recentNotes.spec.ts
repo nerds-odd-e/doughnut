@@ -2,7 +2,7 @@ import type { NoteSearchResult } from "@generated/doughnut-backend-api"
 import { NoteController } from "@generated/doughnut-backend-api/sdk.gen"
 import { mockSdkService } from "@tests/helpers"
 import { flushPromises } from "@vue/test-utils"
-import makeMe from "doughnut-test-fixtures/makeMe"
+import makeMe from "donut-test-fixtures/makeMe"
 import { nextTick } from "vue"
 import { describe, it, expect, vi } from "vitest"
 import {

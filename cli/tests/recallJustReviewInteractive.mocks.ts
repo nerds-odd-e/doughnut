@@ -1,5 +1,5 @@
-import type { MemoryTrackerController, RecallsController } from 'doughnut-api'
-import makeMe from 'doughnut-test-fixtures/makeMe'
+import type { MemoryTrackerController, RecallsController } from 'donut-api'
+import makeMe from 'donut-test-fixtures/makeMe'
 import type { MockInstance } from 'vitest'
 import { deferred } from './recallInteractiveShared.js'
 

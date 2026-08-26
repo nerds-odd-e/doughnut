@@ -1,6 +1,6 @@
 import SearchResultListItem from "@/components/search/SearchResultListItem.vue"
 import { screen } from "@testing-library/vue"
-import makeMe from "doughnut-test-fixtures/makeMe"
+import makeMe from "donut-test-fixtures/makeMe"
 import helper from "@tests/helpers"
 import type {
   NoteSearchResult,

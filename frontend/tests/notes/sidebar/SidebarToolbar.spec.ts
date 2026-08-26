@@ -5,7 +5,7 @@ import { notebookSidebarClosedPlugin } from "@tests/helpers/notebookSidebarTestP
 import { flushPromises } from "@vue/test-utils"
 import { vi, describe, it, expect, beforeEach, afterEach } from "vitest"
 import { sidebarDefaultTreeFixtures } from "./sidebarDefaultTree"
-import makeMe from "doughnut-test-fixtures/makeMe"
+import makeMe from "donut-test-fixtures/makeMe"
 import {
   mountSidebar,
   mountSidebarSignedIn,

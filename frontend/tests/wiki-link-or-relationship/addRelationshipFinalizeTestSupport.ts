@@ -17,7 +17,7 @@ import GlobalApiLoadingModal from "@tests/helpers/GlobalApiLoadingModal"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
 import { defineComponent, type PropType } from "vue"
-import makeMe from "doughnut-test-fixtures/makeMe"
+import makeMe from "donut-test-fixtures/makeMe"
 import { expect } from "vitest"
 
 export function targetSearchResult(title = "Target"): NoteSearchResult {

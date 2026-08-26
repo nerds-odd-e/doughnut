@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/vue3-vite"
 import QuestionDisplay from "./QuestionDisplay.vue"
-import makeMe from "doughnut-test-fixtures/makeMe"
+import makeMe from "donut-test-fixtures/makeMe"
 
 function fromMcq(mcqBuilder: {
   please: () => { questionStem: string; responseChoices: string[] }

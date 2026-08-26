@@ -6,7 +6,7 @@ import {
 } from "@/managedApi/clientSetup"
 import { NotebookBooksController } from "@generated/doughnut-backend-api/sdk.gen"
 import { wrapSdkResponse } from "@tests/helpers"
-import makeMe from "doughnut-test-fixtures/makeMe"
+import makeMe from "donut-test-fixtures/makeMe"
 import { flushPromises } from "@vue/test-utils"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import {

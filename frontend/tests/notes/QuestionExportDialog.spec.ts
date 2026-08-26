@@ -6,7 +6,7 @@ import helper, {
   mockSdkServiceWithImplementation,
   wrapSdkError,
 } from "../helpers"
-import makeMe from "doughnut-test-fixtures/makeMe"
+import makeMe from "donut-test-fixtures/makeMe"
 import QuestionExportDialog from "@/components/notes/QuestionExportDialog.vue"
 import { type VueWrapper } from "@vue/test-utils"
 import { flushPromises } from "@vue/test-utils"

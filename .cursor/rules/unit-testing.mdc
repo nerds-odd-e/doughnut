@@ -14,7 +14,7 @@ A **"small test"** means: a fast, in-process unit test (JUnit, Vitest, Bach, …
 - **Drive the outermost (or domain-stable) interface.** Prefer the public surface under test — e.g. a controller, mounted component, CLI `run` / `runInteractive`, MCP tool — or an interface that is itself a deliberate, domain-stable contract (pure algorithm, validation API). Do not add a test class per internal production class, and do not widen exports only so tests can reach helpers.
 - **Cover lower layers with data, not with more test surfaces.** Craft realistic, scenario-specific preconditions and fixtures so one boundary test exercises the real lower-level production routines. Prefer that over isolating each collaborator behind mocks or thin wrapper tests.
 - **Build those fixtures with `makeMe`** — keep construction concise (see below).
-- **Do not mock unless external or exceptional.** Mock only true external dependencies (third-party APIs, network services, and the like) or extremely rare special cases. Package rules name the allowed exceptions (`OpenAIClient`, frontend `mockSdkService` for the backend HTTP API, CLI spies on `doughnut-api`, etc.). Prefer the real database, real in-process collaborators, and real browser rendering inside the system under test.
+- **Do not mock unless external or exceptional.** Mock only true external dependencies (third-party APIs, network services, and the like) or extremely rare special cases. Package rules name the allowed exceptions (`OpenAIClient`, frontend `mockSdkService` for the backend HTTP API, CLI spies on `donut-api`, etc.). Prefer the real database, real in-process collaborators, and real browser rendering inside the system under test.
 
 ## Focused assertions
 
@@ -53,7 +53,7 @@ The concise-fixture guidance below is correct for **behavior** tests. For **hard
 
 ## Concise makeMe setup
 
-- Build fixtures with **`makeMe`** (`doughnut-test-fixtures/makeMe` on TS; backend `MakeMe` on Java). Rely on **builder defaults** when a value is unused in assertions and does not affect the logic under test. **Exception:** destructive operations above — do not minimize away FK children.
+- Build fixtures with **`makeMe`** (`donut-test-fixtures/makeMe` on TS; backend `MakeMe` on Java). Rely on **builder defaults** when a value is unused in assertions and does not affect the logic under test. **Exception:** destructive operations above — do not minimize away FK children.
 - Do **not** create users, notebooks, or owners only to satisfy wiring if the builder already defaults them and the test never refers to them.
 - Prefer ownership helpers so dependents inherit the owner (e.g. backend `notebookOwnedBy` → tracker `.by` default).
 - Prefer builder APIs over **post-construction mutation** (e.g. `.id(10)`, not `note.id = 10`).

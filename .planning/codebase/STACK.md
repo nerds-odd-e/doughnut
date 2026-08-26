@@ -24,7 +24,7 @@
 **Package Manager:**
 - pnpm 11.11.0 (`packageManager` / `engines.pnpm`; only-allow enforced)
 - Lockfile: `pnpm-lock.yaml` present (lockfileVersion 9.0)
-- Workspace: `pnpm-workspace.yaml` — `frontend`, `mcp-server`, `cli`, `packages/doughnut-api`
+- Workspace: `pnpm-workspace.yaml` — `frontend`, `mcp-server`, `cli`, `packages/donut-api`
 - Gradle 9.6.1 (wrapper in `backend/gradle/wrapper/`) for backend
 - Poetry (`pyproject.toml`) for Python deps used by scripts/CLI MinerU path
 
@@ -66,7 +66,7 @@
 - `com.mysql:mysql-connector-j:9.7.0` — MySQL driver
 - Spring Security + OAuth2 client — GitHub login in prod (`ProductionConfiguration.java`, `application.yml`)
 - `com.google.cloud:google-cloud-storage` (BOM `libraries-bom:26.85.0`) — prod book PDF storage
-- `@generated/doughnut-backend-api` — generated SDK consumed by frontend, CLI, MCP via `packages/doughnut-api`
+- `@generated/doughnut-backend-api` — generated SDK consumed by frontend, CLI, MCP via `packages/donut-api`
 - Quill (`@dotwee/quill`), PDF.js, epub.js — note/book reading editors (`frontend/package.json`)
 - Tailwind CSS 4.3.2 + DaisyUI 5.6.18 — frontend styling
 - ShedLock (JDBC) — distributed scheduled job locking (`ShedLockConfig.java`)

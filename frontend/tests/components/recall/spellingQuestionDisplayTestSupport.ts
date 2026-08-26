@@ -2,7 +2,7 @@ import { MemoryTrackerController } from "@generated/doughnut-backend-api/sdk.gen
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
 import helper, { mockSdkService } from "@tests/helpers"
 import SpellingQuestionDisplay from "@/components/recall/SpellingQuestionDisplay.vue"
-import makeMe from "doughnut-test-fixtures/makeMe"
+import makeMe from "donut-test-fixtures/makeMe"
 import { vi } from "vitest"
 
 export const spellingAnswerInputSelector =

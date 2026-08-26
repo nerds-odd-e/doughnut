@@ -4,7 +4,7 @@ import {
   NoteController,
 } from "@generated/doughnut-backend-api/sdk.gen"
 import { describe, expect, it, vi } from "vitest"
-import makeMe from "doughnut-test-fixtures/makeMe"
+import makeMe from "donut-test-fixtures/makeMe"
 import {
   mockSdkService,
   mockSdkServiceWithImplementation,

@@ -3,7 +3,7 @@ import { vi, beforeEach, afterEach, describe, it, expect } from "vitest"
 import { defineComponent, KeepAlive, nextTick } from "vue"
 import helper from "@tests/helpers"
 import QuestionDisplay from "@/components/recall/QuestionDisplay.vue"
-import makeMe from "doughnut-test-fixtures/makeMe"
+import makeMe from "donut-test-fixtures/makeMe"
 import { questionDisplayProps } from "./questionDisplayTestSupport"
 
 describe("QuestionDisplay thinking time", () => {

@@ -1,5 +1,5 @@
 import { SearchController } from "@generated/doughnut-backend-api/sdk.gen"
-import makeMe from "doughnut-test-fixtures/makeMe"
+import makeMe from "donut-test-fixtures/makeMe"
 import helper, { mockSdkService } from "@tests/helpers"
 import { notebookSidebarClosedPlugin } from "@tests/helpers/notebookSidebarTestProvide"
 import {

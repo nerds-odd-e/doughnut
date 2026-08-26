@@ -4,7 +4,7 @@ import { basename, extname, resolve } from 'node:path'
 import { useEffect, useRef } from 'react'
 import { Box } from 'ink'
 import { Spinner } from '@inkjs/ui'
-import type { BookBlockFull, BookFull, Notebook } from 'doughnut-api'
+import type { BookBlockFull, BookFull, Notebook } from 'donut-api'
 import { attachNotebookBookFile } from '../../backendApi/doughnutBackendClient.js'
 import { userVisibleSlashCommandError } from '../../userVisibleSlashCommandError.js'
 import type {

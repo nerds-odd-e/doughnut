@@ -5,7 +5,7 @@ import {
 } from "@generated/doughnut-backend-api/sdk.gen"
 import Quiz from "@/components/recall/Quiz.vue"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
-import makeMe from "doughnut-test-fixtures/makeMe"
+import makeMe from "donut-test-fixtures/makeMe"
 import helper, {
   mockSdkService,
   wrapSdkResponse,

@@ -12,7 +12,7 @@ import {
   softKeyboardPrimerElement,
   waitUntilFocused,
 } from "@tests/helpers/softKeyboardPrimerTestSupport"
-import makeMe from "doughnut-test-fixtures/makeMe"
+import makeMe from "donut-test-fixtures/makeMe"
 import { mockSdkService } from "@tests/helpers"
 import createNoteStorage from "@/store/createNoteStorage"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"

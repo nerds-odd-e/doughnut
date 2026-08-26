@@ -63,6 +63,8 @@ No code changes. Verify: `adr-awareness` conventions followed (frontmatter,
 
 ### 2. Workspace & build identity (Structure)
 
+Status: done
+
 - Root `package.json` `name` → `donut`; rename its scripts/env vars that
   spell out `doughnut` (`DOUGHNUT_API_BASE_URL` / `DOUGHNUT_CONFIG_DIR` in the
   `cli` script → `DONUT_*`, consistent with Slice 6).

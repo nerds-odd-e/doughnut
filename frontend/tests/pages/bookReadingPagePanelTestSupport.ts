@@ -1,6 +1,6 @@
 import ReadingControlPanel from "@/components/book-reading/ReadingControlPanel.vue"
 import { wrapSdkResponse } from "@tests/helpers"
-import makeMe from "doughnut-test-fixtures/makeMe"
+import makeMe from "donut-test-fixtures/makeMe"
 import { flushPromises } from "@vue/test-utils"
 import { vi } from "vitest"
 import {

@@ -1,6 +1,6 @@
 import * as fs from 'node:fs'
-import { RecallsController } from 'doughnut-api'
-import makeMe from 'doughnut-test-fixtures/makeMe'
+import { RecallsController } from 'donut-api'
+import makeMe from 'donut-test-fixtures/makeMe'
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 import { recallStatus } from '../src/commands/recallStatus.js'
 import { tempConfigWithToken } from './tempConfigTestHelpers.js'

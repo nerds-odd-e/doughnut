@@ -1,6 +1,6 @@
 import NoteUnderQuestion from "@/components/recall/NoteUnderQuestion.vue"
 import helper from "@tests/helpers"
-import makeMe from "doughnut-test-fixtures/makeMe"
+import makeMe from "donut-test-fixtures/makeMe"
 import { describe, it, expect } from "vitest"
 
 describe("NoteUnderQuestion", () => {

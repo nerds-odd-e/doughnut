@@ -6,7 +6,7 @@ import {
 import NoteNewForm from "@/components/notes/NoteNewForm.vue"
 import type { ComponentPublicInstance } from "vue"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
-import makeMe from "doughnut-test-fixtures/makeMe"
+import makeMe from "donut-test-fixtures/makeMe"
 import helper, { mockSdkService, wrapSdkResponse } from "@tests/helpers"
 import {
   clickWikidataSearchResult,

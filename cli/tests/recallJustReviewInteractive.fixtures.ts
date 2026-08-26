@@ -1,4 +1,4 @@
-import makeMe from 'doughnut-test-fixtures/makeMe'
+import makeMe from 'donut-test-fixtures/makeMe'
 
 export function alphaNoteRealm() {
   return makeMe.aNoteRealm.title('Alpha').content('body').please()

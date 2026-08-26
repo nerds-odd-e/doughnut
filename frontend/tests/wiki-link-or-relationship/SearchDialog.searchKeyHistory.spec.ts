@@ -2,7 +2,7 @@ import { SearchController } from "@generated/doughnut-backend-api/sdk.gen"
 import SearchForm from "@/components/wiki-link-or-relationship/SearchForm.vue"
 import { fireEvent, screen } from "@testing-library/vue"
 import { flushPromises } from "@vue/test-utils"
-import MakeMe from "doughnut-test-fixtures/makeMe"
+import MakeMe from "donut-test-fixtures/makeMe"
 import helper, { mockSdkService } from "@tests/helpers"
 import {
   appendSearchKeyToHistory,

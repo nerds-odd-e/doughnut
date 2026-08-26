@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest"
-import MakeMe from "doughnut-test-fixtures/makeMe"
+import MakeMe from "donut-test-fixtures/makeMe"
 import {
   deadWikiLinkPayload,
   pointDeadWikiLinkAndCaptureUpdate,

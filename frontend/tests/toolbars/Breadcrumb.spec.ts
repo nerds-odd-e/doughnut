@@ -1,6 +1,6 @@
 import BreadcrumbWithCircle from "@/components/toolbars/BreadcrumbWithCircle.vue"
 import { screen } from "@testing-library/vue"
-import makeMe from "doughnut-test-fixtures/makeMe"
+import makeMe from "donut-test-fixtures/makeMe"
 import helper from "@tests/helpers"
 import { describe, it, expect } from "vitest"
 

@@ -8,7 +8,7 @@ import Modal from "@/components/commons/Modal.vue"
 import usePopups from "@/components/commons/Popups/usePopups"
 import { fireEvent, screen } from "@testing-library/vue"
 import { flushPromises } from "@vue/test-utils"
-import MakeMe from "doughnut-test-fixtures/makeMe"
+import MakeMe from "donut-test-fixtures/makeMe"
 import helper, { mockSdkService } from "@tests/helpers"
 import {
   appendSearchKeyToHistory,

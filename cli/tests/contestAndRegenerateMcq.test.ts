@@ -1,6 +1,6 @@
 import * as fs from 'node:fs'
-import { RecallPromptController } from 'doughnut-api'
-import makeMe from 'doughnut-test-fixtures/makeMe'
+import { RecallPromptController } from 'donut-api'
+import makeMe from 'donut-test-fixtures/makeMe'
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 import { contestAndRegenerateMcq } from '../src/commands/recall/recallMcqStageSupport.js'
 import { tempConfigWithToken } from './tempConfigTestHelpers.js'

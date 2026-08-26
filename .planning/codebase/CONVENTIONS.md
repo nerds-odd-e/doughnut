@@ -59,7 +59,7 @@
 **Path aliases:**
 - Frontend: `@` → `frontend/src`, `@tests` → `frontend/tests` (see `frontend/vitest.config.ts`).
 - Generated SDK: `@generated/doughnut-backend-api/sdk.gen` and types from `@generated/doughnut-backend-api`.
-- Shared fixtures: `doughnut-test-fixtures/makeMe` only — do not import the bare package name or deep `src/` paths.
+- Shared fixtures: `donut-test-fixtures/makeMe` only — do not import the bare package name or deep `src/` paths.
 - CLI / MCP resolve `@generated/doughnut-backend-api` via Vitest aliases to `packages/generated/doughnut-backend-api`.
 
 **Organize imports:** Biome `organizeImports` assist is **off** in both biome configs — do not rely on auto-sort; keep imports tidy manually.

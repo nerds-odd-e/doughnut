@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest"
-import makeMe from "doughnut-test-fixtures/makeMe"
+import makeMe from "donut-test-fixtures/makeMe"
 import { qualifyRelationNoteForReduceOnDelete } from "@/utils/relationNoteReduceOnDelete"
 import { wikiTitleFromAuthoredToken } from "@/utils/wikiLinkMarkup"
 import { relationshipNoteContent } from "@tests/notes/relationshipNoteTestContent"

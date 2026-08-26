@@ -1,6 +1,6 @@
 import { describe, it, vi, expect, beforeEach, afterEach } from "vitest"
 import helper, { mockSdkService, wrapSdkResponse } from "@tests/helpers"
-import makeMe from "doughnut-test-fixtures/makeMe"
+import makeMe from "donut-test-fixtures/makeMe"
 import NoteExportForm from "@/components/notes/core/NoteExportForm.vue"
 import { NoteController } from "@generated/doughnut-backend-api/sdk.gen"
 import { saveAs } from "file-saver"

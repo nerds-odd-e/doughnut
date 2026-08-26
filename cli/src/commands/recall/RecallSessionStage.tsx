@@ -1,6 +1,6 @@
 import { useCallback, useRef, useState, type ReactNode } from 'react'
 import { Box, Text } from 'ink'
-import type { MemoryTrackerLite } from 'doughnut-api'
+import type { MemoryTrackerLite } from 'donut-api'
 import type { InteractiveSlashCommandStageProps } from '../interactiveSlashCommand.js'
 import { YesNoStagePrompt } from '../../commonUIComponents/YesNoStagePrompt.js'
 import { AsyncAssistantFetchStage } from '../gmail/AsyncAssistantFetchStage.js'

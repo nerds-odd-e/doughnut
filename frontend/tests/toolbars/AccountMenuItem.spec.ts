@@ -1,7 +1,7 @@
 import AccountMenuItem from "@/components/toolbars/AccountMenuItem.vue"
 import helper from "@tests/helpers"
 import { fireEvent, screen } from "@testing-library/vue"
-import makeMe from "doughnut-test-fixtures/makeMe"
+import makeMe from "donut-test-fixtures/makeMe"
 import { flushPromises } from "@vue/test-utils"
 import { describe, expect, it, vi } from "vitest"
 

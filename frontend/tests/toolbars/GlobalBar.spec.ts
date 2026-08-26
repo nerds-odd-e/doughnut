@@ -14,7 +14,7 @@ import {
 import { mockCoarsePointer } from "@tests/helpers/mockCoarsePointer"
 import { screen } from "@testing-library/vue"
 import { mount } from "@vue/test-utils"
-import makeMe from "doughnut-test-fixtures/makeMe"
+import makeMe from "donut-test-fixtures/makeMe"
 import helper, { mockSdkService } from "@tests/helpers"
 import { beforeEach, vi, describe, it, expect, afterEach } from "vitest"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"

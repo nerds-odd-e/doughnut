@@ -6,7 +6,7 @@ import { expect, vi, beforeEach, afterEach, describe, it } from "vitest"
 import ConversationComponent from "@/components/conversations/ConversationComponent.vue"
 import helper, { mockSdkService } from "@tests/helpers"
 import { noteShowLocation } from "@/routes/noteShowLocation"
-import makeMe from "doughnut-test-fixtures/makeMe"
+import makeMe from "donut-test-fixtures/makeMe"
 
 const mockedPush = vi.fn()
 vi.mock("vue-router", async (importOriginal) => {

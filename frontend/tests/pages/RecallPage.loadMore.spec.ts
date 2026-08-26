@@ -1,5 +1,5 @@
 import { useRecallData } from "@/composables/useRecallData"
-import makeMe from "doughnut-test-fixtures/makeMe"
+import makeMe from "donut-test-fixtures/makeMe"
 import { wrapSdkResponse } from "@tests/helpers"
 import { flushPromises } from "@vue/test-utils"
 import { beforeEach, describe, expect, it, vi } from "vitest"

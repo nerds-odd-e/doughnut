@@ -1,7 +1,7 @@
 import { NoteController } from "@generated/doughnut-backend-api/sdk.gen"
 import NoteMoreOptionsActions from "@/components/notes/widgets/NoteMoreOptionsActions.vue"
 import usePopups from "@/components/commons/Popups/usePopups"
-import makeMe from "doughnut-test-fixtures/makeMe"
+import makeMe from "donut-test-fixtures/makeMe"
 import helper, { mockSdkService } from "@tests/helpers"
 import { wrapWithNoteShortcutScope } from "@tests/helpers/noteShortcutScopeTestHelpers"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"

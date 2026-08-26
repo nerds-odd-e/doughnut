@@ -54,7 +54,7 @@ CURSOR_DEV=true nix develop -c pnpm format:all
 | CLI | `cli/src/` | `cli/tests/` (`.test.ts` / `.test.tsx`; interactive under `cli/tests/interactive/` when present) |
 | MCP | `mcp-server/src/` | `mcp-server/tests/` |
 | E2E | app under test | `e2e_test/features/`, `step_definitions/`, `start/pageObjects/` |
-| Shared API fixtures | — | `packages/doughnut-test-fixtures/` |
+| Shared API fixtures | — | `packages/donut-test-fixtures/` |
 | Scripts | `scripts/` | `scripts/test/*.test` |
 
 **Naming:**
@@ -121,7 +121,7 @@ import { describe, it, expect, beforeEach } from "vitest"
 import { render } from "@testing-library/vue"
 import helper, { mockSdkService } from "@tests/helpers"
 import { NoteController } from "@generated/doughnut-backend-api/sdk.gen"
-import makeMe from "doughnut-test-fixtures/makeMe"
+import makeMe from "donut-test-fixtures/makeMe"
 
 beforeEach(() => {
   mockSdkService(NoteController, "showNote", makeMe.aNoteRealm.please())
@@ -169,7 +169,7 @@ mockSdkServiceWithImplementation(TextContentController, "updateNoteContent", asy
 ```
 
 ```typescript
-// CLI — spy generated doughnut-api controllers; build data with makeMe
+// CLI — spy generated donut-api controllers; build data with makeMe
 vi.spyOn(RecallsController, "recalling").mockResolvedValue({
   data: makeMe.aDueMemoryTrackersList.please(),
 } as Awaited<ReturnType<typeof RecallsController.recalling>>)
@@ -201,7 +201,7 @@ Note note = makeMe.aNote()
 
 ```typescript
 // Frontend / CLI — API-shaped builders
-import makeMe from "doughnut-test-fixtures/makeMe"
+import makeMe from "donut-test-fixtures/makeMe"
 
 const note = makeMe.aNoteRealm
   .topicConstructor("Dummy Title")
@@ -211,7 +211,7 @@ const note = makeMe.aNoteRealm
 
 **Location:**
 - Backend: `MakeMe` / builders in `backend/src/test/java/com/odde/doughnut/testability/` (`NoteBuilder`, `NotebookBuilder`, `UserBuilder`, …).
-- Shared TS: `packages/doughnut-test-fixtures/` (`makeMe.ts` + `*Builder.ts`). Import only `doughnut-test-fixtures/makeMe`.
+- Shared TS: `packages/donut-test-fixtures/` (`makeMe.ts` + `*Builder.ts`). Import only `donut-test-fixtures/makeMe`.
 - E2E: Given steps + data tables; inject via testability APIs; clean up after each test. Notebook note tables place children under the previous row when batch-created (no `Folder` column).
 
 ## Coverage

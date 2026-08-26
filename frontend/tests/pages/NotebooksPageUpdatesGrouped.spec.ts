@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it } from "vitest"
-import makeMe from "doughnut-test-fixtures/makeMe"
+import makeMe from "donut-test-fixtures/makeMe"
 import {
   catalogHeadingTexts,
   clearNotebooksPageStorage,

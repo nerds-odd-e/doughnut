@@ -1,5 +1,5 @@
 import { describe, test, expect, vi, beforeEach } from 'vitest'
-import makeMe from 'doughnut-test-fixtures/makeMe'
+import makeMe from 'donut-test-fixtures/makeMe'
 import { createMockContext, findTool } from '../helpers/index.js'
 import { SearchController } from '@generated/doughnut-backend-api/sdk.gen'
 

@@ -10,7 +10,7 @@ import type {
   DueCommissionedMemoryTrackerLite,
   MemoryTrackerLite,
 } from "@generated/doughnut-backend-api"
-import makeMe from "doughnut-test-fixtures/makeMe"
+import makeMe from "donut-test-fixtures/makeMe"
 import helper, { mockSdkService } from "@tests/helpers"
 import { flushPromises } from "@vue/test-utils"
 import { computed, ref } from "vue"

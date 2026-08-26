@@ -1,6 +1,6 @@
 import NotebooksPageView from "@/pages/NotebooksPageView.vue"
 import { beforeEach, describe, expect, it, vi } from "vitest"
-import makeMe from "doughnut-test-fixtures/makeMe"
+import makeMe from "donut-test-fixtures/makeMe"
 import helper from "@tests/helpers"
 import { flushPromises } from "@vue/test-utils"
 import { clearNotebooksPageStorage } from "./notebooksPageTestSupport"

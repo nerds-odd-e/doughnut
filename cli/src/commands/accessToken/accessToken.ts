@@ -1,4 +1,4 @@
-import { UserController, type UserToken } from 'doughnut-api'
+import { UserController, type UserToken } from 'donut-api'
 import {
   doughnutSdkOptions,
   withBackendJson,

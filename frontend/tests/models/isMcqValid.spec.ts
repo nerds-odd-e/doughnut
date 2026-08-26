@@ -1,6 +1,6 @@
 import type { Mcq } from "@generated/doughnut-backend-api"
 import isMcqValid from "@/models/isMcqValid"
-import makeMe from "doughnut-test-fixtures/makeMe"
+import makeMe from "donut-test-fixtures/makeMe"
 
 describe("isMcqValid", () => {
   it("should return true when the Mcq is valid", () => {

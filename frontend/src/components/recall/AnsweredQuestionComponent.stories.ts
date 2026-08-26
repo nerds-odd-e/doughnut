@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/vue3-vite"
 import AnsweredQuestionComponent from "./AnsweredQuestionComponent.vue"
-import makeMe from "doughnut-test-fixtures/makeMe"
+import makeMe from "donut-test-fixtures/makeMe"
 import type { AnsweredQuestion } from "@generated/doughnut-backend-api"
 
 const meta = {

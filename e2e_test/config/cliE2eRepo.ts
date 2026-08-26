@@ -120,7 +120,7 @@ function maxMtimeMsUnderDir(absDir: string): number {
   return max
 }
 
-/** Rebuild `cli/dist/doughnut-cli.bundle.mjs` when missing or older than CLI / doughnut-api sources. */
+/** Rebuild `cli/dist/doughnut-cli.bundle.mjs` when missing or older than CLI / donut-api sources. */
 export function ensureCliBundleFresh(repoRoot: string): void {
   const bundlePath = join(repoRoot, CLI_BUNDLE_RELATIVE_PATH)
   let inputMax = maxMtimeMsOfFiles(repoRoot, [
@@ -128,7 +128,7 @@ export function ensureCliBundleFresh(repoRoot: string): void {
     'cli/tsconfig.json',
     'e2e_test/config/cliGmailE2eConfig.ts',
   ])
-  for (const rel of ['cli/src', 'packages/doughnut-api/src'] as const) {
+  for (const rel of ['cli/src', 'packages/donut-api/src'] as const) {
     const d = join(repoRoot, rel)
     if (existsSync(d)) {
       inputMax = Math.max(inputMax, maxMtimeMsUnderDir(d))

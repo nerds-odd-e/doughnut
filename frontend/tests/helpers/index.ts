@@ -1,6 +1,6 @@
 import RenderingHelper from "./RenderingHelper"
 import matchByText from "./matchByText"
-import makeMe from "doughnut-test-fixtures/makeMe"
+import makeMe from "donut-test-fixtures/makeMe"
 import {
   NoteController,
   NotebookController,

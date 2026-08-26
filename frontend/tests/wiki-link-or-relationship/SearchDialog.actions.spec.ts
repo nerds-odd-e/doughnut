@@ -5,7 +5,7 @@ import {
 import usePopups from "@/components/commons/Popups/usePopups"
 import { fireEvent, screen } from "@testing-library/vue"
 import { flushPromises } from "@vue/test-utils"
-import MakeMe from "doughnut-test-fixtures/makeMe"
+import MakeMe from "donut-test-fixtures/makeMe"
 import { mockSdkService, wrapSdkError } from "@tests/helpers"
 import { describe, expect, it } from "vitest"
 import {

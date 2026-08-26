@@ -1,7 +1,7 @@
 import { NoteController } from "@generated/doughnut-backend-api/sdk.gen"
 import { flushPromises } from "@vue/test-utils"
 import { mockSdkService } from "@tests/helpers"
-import makeMe from "doughnut-test-fixtures/makeMe"
+import makeMe from "donut-test-fixtures/makeMe"
 import { beforeEach, describe, it, expect } from "vitest"
 import { mountAnsweredSpellingQuestion } from "./answeredSpellingQuestionTestSupport"
 

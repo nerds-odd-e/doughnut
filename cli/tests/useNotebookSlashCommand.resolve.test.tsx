@@ -1,5 +1,5 @@
 import { render } from 'ink-testing-library'
-import type { NotebookController } from 'doughnut-api'
+import type { NotebookController } from 'donut-api'
 import { describe, expect, test } from 'vitest'
 import {
   extendInkRenderForInteractiveTests,

@@ -7,7 +7,7 @@ import {
   mockSdkServiceWithImplementation,
   wrapSdkResponse,
 } from "@tests/helpers"
-import makeMe from "doughnut-test-fixtures/makeMe"
+import makeMe from "donut-test-fixtures/makeMe"
 import { nextTick } from "vue"
 import { describe, it, expect, vi } from "vitest"
 import {

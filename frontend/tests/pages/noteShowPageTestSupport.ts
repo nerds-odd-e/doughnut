@@ -16,7 +16,7 @@ import {
   type Router,
 } from "vue-router"
 import routes from "@/routes/routes"
-import makeMe from "doughnut-test-fixtures/makeMe"
+import makeMe from "donut-test-fixtures/makeMe"
 import helper, {
   mockNotebookGetForNoteRealm,
   mockSdkService,

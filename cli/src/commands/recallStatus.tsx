@@ -1,4 +1,4 @@
-import { RecallsController, type DueMemoryTrackers } from 'doughnut-api'
+import { RecallsController, type DueMemoryTrackers } from 'donut-api'
 import {
   doughnutSdkOptions,
   runDefaultBackendJson,

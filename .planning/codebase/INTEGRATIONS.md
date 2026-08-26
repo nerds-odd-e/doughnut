@@ -74,7 +74,7 @@
   - Secrets: `OAUTH2_github_client_id`, `OAUTH2_github_client_secret` (Secret Manager)
 - Non-prod (test/e2e): HTTP Basic + in-memory users (`NonProductConfiguration.java`); frontend `/users/identify` flow; remember-me always on
 - API tokens for CLI/MCP: user-generated Bearer tokens (`UserController`, `CurrentUserFetcherFromRequest.java`)
-  - Clients set `DOUGHNUT_API_AUTH_TOKEN` and `DOUGHNUT_API_BASE_URL` (`packages/doughnut-api/src/index.ts`)
+  - Clients set `DOUGHNUT_API_AUTH_TOKEN` and `DOUGHNUT_API_BASE_URL` (`packages/donut-api/src/index.ts`)
 - CLI Google OAuth: separate from web login; used for Gmail command only
 
 ## Monitoring & Observability

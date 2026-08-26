@@ -1,7 +1,7 @@
 import BookReadingContent from "@/components/book-reading/BookReadingContent.vue"
 import GlobalApiLoadingModal from "@tests/helpers/GlobalApiLoadingModal"
 import helper from "@tests/helpers"
-import makeMe from "doughnut-test-fixtures/makeMe"
+import makeMe from "donut-test-fixtures/makeMe"
 import { vi } from "vitest"
 import { defineComponent } from "vue"
 

@@ -1,7 +1,7 @@
 import type { Notebook } from "@generated/doughnut-backend-api"
 import { NOTEBOOK_EXPORT_BUTTON_LABEL } from "@/utils/notebookExport"
 import { beforeEach, describe, expect, it, vi } from "vitest"
-import makeMe from "doughnut-test-fixtures/makeMe"
+import makeMe from "donut-test-fixtures/makeMe"
 import { fireEvent, screen } from "@testing-library/vue"
 import { flushPromises } from "@vue/test-utils"
 import { saveAs } from "file-saver"

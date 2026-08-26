@@ -11,7 +11,7 @@ import {
   NoteController,
   NotebookController,
 } from "@generated/doughnut-backend-api/sdk.gen"
-import makeMe from "doughnut-test-fixtures/makeMe"
+import makeMe from "donut-test-fixtures/makeMe"
 import { mockSdkServiceWithImplementation } from "@tests/helpers"
 import { type VueWrapper } from "@vue/test-utils"
 import { vi } from "vitest"

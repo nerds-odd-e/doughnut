@@ -1,7 +1,7 @@
 import type { Notebook } from "@generated/doughnut-backend-api"
 import { NotebookBooksController } from "@generated/doughnut-backend-api/sdk.gen"
 import NotebookPageView from "@/pages/NotebookPageView.vue"
-import makeMe from "doughnut-test-fixtures/makeMe"
+import makeMe from "donut-test-fixtures/makeMe"
 import helper, { wrapSdkError } from "@tests/helpers"
 import { beforeEach, vi } from "vitest"
 

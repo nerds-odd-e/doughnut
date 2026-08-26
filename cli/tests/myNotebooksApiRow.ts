@@ -1,4 +1,4 @@
-import makeMe from 'doughnut-test-fixtures/makeMe'
+import makeMe from 'donut-test-fixtures/makeMe'
 
 /** One element of `NotebooksViewedByUser.notebooks` from `myNotebooks`. */
 export function myNotebooksApiRow(name: string) {

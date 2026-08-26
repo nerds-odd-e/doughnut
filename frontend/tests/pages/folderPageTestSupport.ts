@@ -3,7 +3,7 @@ import type { NotebookCatalogEntry } from "@/components/notebook/patchNotebookIn
 import { NotebookController } from "@generated/doughnut-backend-api/sdk.gen"
 import FolderPage from "@/pages/FolderPage.vue"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
-import makeMe from "doughnut-test-fixtures/makeMe"
+import makeMe from "donut-test-fixtures/makeMe"
 import helper, { mockSdkService, testFolderStub } from "@tests/helpers"
 import usePopups from "@/components/commons/Popups/usePopups"
 import { createRouter, createWebHistory, type Router } from "vue-router"

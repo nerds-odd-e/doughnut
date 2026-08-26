@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest"
 import { createRouter, createWebHistory } from "vue-router"
 import routes from "@/routes/routes"
-import makeMe from "doughnut-test-fixtures/makeMe"
+import makeMe from "donut-test-fixtures/makeMe"
 import {
   clearNotebooksPageStorage,
   mockMyNotebooks,

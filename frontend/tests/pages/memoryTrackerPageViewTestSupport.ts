@@ -6,7 +6,7 @@ import type {
 } from "@generated/doughnut-backend-api"
 import { MemoryTrackerController } from "@generated/doughnut-backend-api/sdk.gen"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
-import makeMe from "doughnut-test-fixtures/makeMe"
+import makeMe from "donut-test-fixtures/makeMe"
 import helper, { mockSdkService } from "@tests/helpers"
 import usePopups from "@/components/commons/Popups/usePopups"
 import MemoryTrackerPageView from "@/pages/MemoryTrackerPageView.vue"

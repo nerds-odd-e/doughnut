@@ -1,7 +1,7 @@
 import { TextContentController } from "@generated/doughnut-backend-api/sdk.gen"
 import NoteTextContent from "@/components/notes/core/NoteTextContent.vue"
 import type { Note, WikiTitle } from "@generated/doughnut-backend-api"
-import makeMe from "doughnut-test-fixtures/makeMe"
+import makeMe from "donut-test-fixtures/makeMe"
 import helper, { mockSdkServiceWithImplementation } from "@tests/helpers"
 import { type VueWrapper, flushPromises } from "@vue/test-utils"
 import { vi } from "vitest"

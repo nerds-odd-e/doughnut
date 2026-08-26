@@ -1,6 +1,6 @@
 import { ConversationMessageController } from "@generated/doughnut-backend-api/sdk.gen"
 import NoteConversation from "@/components/conversations/NoteConversation.vue"
-import makeMe from "doughnut-test-fixtures/makeMe"
+import makeMe from "donut-test-fixtures/makeMe"
 import helper, { mockSdkService } from "@tests/helpers"
 import { flushPromises } from "@vue/test-utils"
 import { expect, vi, describe, beforeEach, afterEach } from "vitest"

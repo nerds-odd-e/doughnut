@@ -1,5 +1,5 @@
 import * as fs from 'node:fs'
-import { NotebookController } from 'doughnut-api'
+import { NotebookController } from 'donut-api'
 import { afterEach, beforeEach, describe, test, vi } from 'vitest'
 import { InteractiveCliApp } from '../src/InteractiveCliApp.js'
 import { renderInkWhenCommandLineReady } from './inkTestHelpers.js'

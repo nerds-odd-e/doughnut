@@ -1,7 +1,7 @@
 import { NotebookController } from "@generated/doughnut-backend-api/sdk.gen"
 import NotebookNewForm from "@/components/notebook/NotebookNewForm.vue"
 import { beforeEach, describe, expect, it } from "vitest"
-import makeMe from "doughnut-test-fixtures/makeMe"
+import makeMe from "donut-test-fixtures/makeMe"
 import helper, { mockSdkService } from "@tests/helpers"
 import { flushPromises } from "@vue/test-utils"
 

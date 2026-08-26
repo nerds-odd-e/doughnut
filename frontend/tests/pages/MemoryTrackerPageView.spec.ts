@@ -1,4 +1,4 @@
-import makeMe from "doughnut-test-fixtures/makeMe"
+import makeMe from "donut-test-fixtures/makeMe"
 import { describe, expect, it, beforeEach } from "vitest"
 import {
   defaultMemoryTracker,

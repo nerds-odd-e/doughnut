@@ -8,7 +8,7 @@ import type { UpdateNoteContentData } from "@generated/doughnut-backend-api"
 import usePopups from "@/components/commons/Popups/usePopups"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
 import type { ComponentPublicInstance } from "vue"
-import makeMe from "doughnut-test-fixtures/makeMe"
+import makeMe from "donut-test-fixtures/makeMe"
 import helper, { mockSdkService, wrapSdkResponse } from "@tests/helpers"
 import { vi } from "vitest"
 

@@ -1,7 +1,7 @@
 import { McqController } from "@generated/doughnut-backend-api/sdk.gen"
 import Questions from "@/components/notes/Questions.vue"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
-import makeMe from "doughnut-test-fixtures/makeMe"
+import makeMe from "donut-test-fixtures/makeMe"
 import helper, { mockSdkService } from "@tests/helpers"
 import { afterEach, beforeEach, vi } from "vitest"
 import { createMemoryHistory, createRouter } from "vue-router"

@@ -4,7 +4,7 @@ import {
 } from "@generated/doughnut-backend-api/sdk.gen"
 import { VueWrapper, flushPromises } from "@vue/test-utils"
 import type { ComponentPublicInstance } from "vue"
-import makeMe from "doughnut-test-fixtures/makeMe"
+import makeMe from "donut-test-fixtures/makeMe"
 import { mockSdkService, wrapSdkResponse } from "@tests/helpers"
 import {
   mountNoteNewForm,

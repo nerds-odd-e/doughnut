@@ -1,7 +1,7 @@
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import { PEER_SORT_STORAGE_KEY } from "@/composables/usePeerSort"
 import createNoteStorage from "@/store/createNoteStorage"
-import makeMe from "doughnut-test-fixtures/makeMe"
+import makeMe from "donut-test-fixtures/makeMe"
 import helper from "@tests/helpers"
 import { flushPromises } from "@vue/test-utils"
 import { vi, describe, it, expect, beforeEach, afterEach } from "vitest"

@@ -7,7 +7,7 @@ import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import createNoteStorage from "@/store/createNoteStorage"
 import { fireEvent, screen } from "@testing-library/vue"
 import { flushPromises } from "@vue/test-utils"
-import MakeMe from "doughnut-test-fixtures/makeMe"
+import MakeMe from "donut-test-fixtures/makeMe"
 import { mockSdkService } from "@tests/helpers"
 import {
   makeNoteHit,

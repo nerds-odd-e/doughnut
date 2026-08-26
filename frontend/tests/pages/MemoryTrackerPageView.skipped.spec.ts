@@ -1,6 +1,6 @@
 import { MemoryTrackerController } from "@generated/doughnut-backend-api/sdk.gen"
 import { flushPromises } from "@vue/test-utils"
-import makeMe from "doughnut-test-fixtures/makeMe"
+import makeMe from "donut-test-fixtures/makeMe"
 import { mockSdkService } from "@tests/helpers"
 import { beforeEach, describe, expect, it } from "vitest"
 import {

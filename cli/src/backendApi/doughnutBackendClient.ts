@@ -6,7 +6,7 @@ import {
   getApiConfig,
   type BookFull,
   type RequestOptions,
-} from 'doughnut-api'
+} from 'donut-api'
 import { loadStoredAccessToken } from './accessTokenStorage.js'
 
 /**

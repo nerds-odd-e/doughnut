@@ -13,7 +13,7 @@
 │  `frontend/`     │  `cli/`          │  `mcp-server/`    │  `e2e_test/`      │
 └────────┬─────────┴────────┬─────────┴─────────┬─────────┴─────────┬─────────┘
          │                  │                   │                   │
-         │   `@generated/doughnut-backend-api` + `packages/doughnut-api`
+         │   `@generated/doughnut-backend-api` + `packages/donut-api`
          ▼                  ▼                   ▼                   ▼
 ┌─────────────────────────────────────────────────────────────────────────────┐
 │  Local LB (dev) / GCP URL map (prod) → `/api/*` → Spring Boot backend       │
@@ -46,8 +46,8 @@
 | Persistence | JPA entities, Spring Data repositories, `EntityPersister` | `backend/src/main/java/com/odde/doughnut/entities/`, `.../factoryServices/EntityPersister.java` |
 | Vue SPA | Pages, components, composables, client-side note cache | `frontend/src/` |
 | Generated SDK | TypeScript client from OpenAPI | `packages/generated/doughnut-backend-api/` |
-| Shared API wrapper | CLI/MCP-friendly SDK setup + re-exports | `packages/doughnut-api/src/index.ts` |
-| Test fixtures | `makeMe` builders for API-shaped data | `packages/doughnut-test-fixtures/src/` |
+| Shared API wrapper | CLI/MCP-friendly SDK setup + re-exports | `packages/donut-api/src/index.ts` |
+| Test fixtures | `makeMe` builders for API-shaped data | `packages/donut-test-fixtures/src/` |
 | CLI | Interactive Ink TTY + non-interactive subcommands | `cli/src/` |
 | MCP server | Stdio MCP tools over backend API | `mcp-server/src/` |
 | E2E harness | Cucumber features, page objects, Mountebank mocks | `e2e_test/` |
@@ -60,7 +60,7 @@
 - Controllers stay thin: authorize via `AuthorizationService`, delegate to services, return entities or view DTOs (e.g. `NoteRealm`).
 - Path variables bind JPA entities by id (`@PathVariable Note note`) via Spring Data domain conversion.
 - Frontend talks only through `@generated/doughnut-backend-api/sdk.gen`, wrapped by `apiCallWithLoading` for UX loading/errors.
-- CLI and MCP reuse the same generated types via `doughnut-api` / direct SDK, not ad-hoc HTTP shapes.
+- CLI and MCP reuse the same generated types via `donut-api` / direct SDK, not ad-hoc HTTP shapes.
 - Dev stack assumes `pnpm sut` (backend + frontend + local LB + Mountebank) under Nix.
 
 ## Layers
@@ -69,7 +69,7 @@
 - Purpose: User UI (web, terminal, IDE agents)
 - Location: `frontend/src/`, `cli/src/`, `mcp-server/src/`
 - Contains: Vue pages/components, Ink React UI, MCP tool handlers
-- Depends on: Generated SDK (`packages/generated/doughnut-backend-api/`), optionally `packages/doughnut-api/`
+- Depends on: Generated SDK (`packages/generated/doughnut-backend-api/`), optionally `packages/donut-api/`
 - Used by: End users, Cypress E2E, Cursor/IDE MCP hosts
 
 **API / transport:**
@@ -119,7 +119,7 @@
 ### CLI / MCP path
 
 1. CLI (`cli/src/main.ts` → `run.ts`) or MCP (`mcp-server/src/index.ts`) configures API base URL + bearer token.
-2. Calls go through `doughnut-api` / generated controllers (e.g. `RecallsController`, note search tools).
+2. Calls go through `donut-api` / generated controllers (e.g. `RecallsController`, note search tools).
 3. Same backend authorization and services as the web app.
 
 ### OpenAPI → TypeScript codegen
@@ -162,7 +162,7 @@
 
 **makeMe fixtures:**
 - Purpose: One builder API for backend and frontend/CLI tests matching OpenAPI shapes
-- Examples: `packages/doughnut-test-fixtures/src/makeMe.ts`
+- Examples: `packages/donut-test-fixtures/src/makeMe.ts`
 - Pattern: Prefer `makeMe.aNoteRealm()` etc. over hand-built literals
 
 ## Entry Points
@@ -207,7 +207,7 @@
 
 **What happens:** Defining local interfaces that duplicate OpenAPI note/recall shapes.
 **Why it's wrong:** Drift from backend DTOs breaks at runtime; fixtures and SDK already encode the contract.
-**Do this instead:** Import types from `@generated/doughnut-backend-api` and build data with `doughnut-test-fixtures/makeMe`.
+**Do this instead:** Import types from `@generated/doughnut-backend-api` and build data with `donut-test-fixtures/makeMe`.
 
 ### Skipping AuthorizationService in controllers
 

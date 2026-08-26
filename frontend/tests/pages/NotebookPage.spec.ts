@@ -1,5 +1,5 @@
 import { NotebookController } from "@generated/doughnut-backend-api/sdk.gen"
-import makeMe from "doughnut-test-fixtures/makeMe"
+import makeMe from "donut-test-fixtures/makeMe"
 import { wrapSdkResponse } from "@tests/helpers"
 import { beforeEach, describe, it, expect, vi } from "vitest"
 import { flushPromises } from "@vue/test-utils"

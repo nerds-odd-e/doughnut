@@ -119,8 +119,8 @@ await wrapper.setProps({ value: newValue })
 
 ## Data Builders
 
-- Use `makeMe` for API-shaped test data; implementation lives in `packages/doughnut-test-fixtures`.
-- Import `doughnut-test-fixtures/makeMe` only. Do not import the bare package name or deep paths into `src/`.
+- Use `makeMe` for API-shaped test data; implementation lives in `packages/donut-test-fixtures`.
+- Import `donut-test-fixtures/makeMe` only. Do not import the bare package name or deep paths into `src/`.
 - Concise setup, defaults, and extending builders: `unit-testing.mdc`.
 
 ```typescript

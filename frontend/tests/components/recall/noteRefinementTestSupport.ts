@@ -5,7 +5,7 @@ import {
 } from "@generated/doughnut-backend-api/sdk.gen"
 import NoteRefinement from "@/components/recall/NoteRefinement.vue"
 import { flushPromises } from "@vue/test-utils"
-import makeMe from "doughnut-test-fixtures/makeMe"
+import makeMe from "donut-test-fixtures/makeMe"
 import helper, { mockSdkService } from "@tests/helpers"
 import GlobalApiLoadingModal from "@tests/helpers/GlobalApiLoadingModal"
 import RenderingHelper from "@tests/helpers/RenderingHelper"

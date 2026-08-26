@@ -1,7 +1,7 @@
 import { CircleController } from "@generated/doughnut-backend-api/sdk.gen"
 import NotebookMoveForm from "@/components/notebook/NotebookMoveForm.vue"
 import { describe, it, beforeEach, expect } from "vitest"
-import makeMe from "doughnut-test-fixtures/makeMe"
+import makeMe from "donut-test-fixtures/makeMe"
 import helper, { mockSdkService } from "@tests/helpers"
 import { screen } from "@testing-library/vue"
 import { flushPromises } from "@vue/test-utils"

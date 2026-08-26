@@ -1,7 +1,7 @@
 import NotebooksPageView from "@/pages/NotebooksPageView.vue"
 import { beforeEach, describe, expect, it } from "vitest"
 import { RouterLink } from "vue-router"
-import makeMe from "doughnut-test-fixtures/makeMe"
+import makeMe from "donut-test-fixtures/makeMe"
 import helper from "@tests/helpers"
 import { fireEvent } from "@testing-library/vue"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"

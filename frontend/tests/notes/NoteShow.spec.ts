@@ -1,7 +1,7 @@
 import { NoteController } from "@generated/doughnut-backend-api/sdk.gen"
 import NoteShow from "@/components/notes/NoteShow.vue"
 import { type VueWrapper, flushPromises } from "@vue/test-utils"
-import makeMe from "doughnut-test-fixtures/makeMe"
+import makeMe from "donut-test-fixtures/makeMe"
 import helper, { mockSdkService } from "@tests/helpers"
 import { describe, it, expect, vi, beforeAll, afterEach } from "vitest"
 

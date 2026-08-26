@@ -1,6 +1,6 @@
 import * as fs from 'node:fs'
-import { MemoryTrackerController, RecallsController } from 'doughnut-api'
-import makeMe from 'doughnut-test-fixtures/makeMe'
+import { MemoryTrackerController, RecallsController } from 'donut-api'
+import makeMe from 'donut-test-fixtures/makeMe'
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 import {
   LEAVE_RECALL_PROMPT,

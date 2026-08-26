@@ -1,6 +1,6 @@
 import { UserController } from "@generated/doughnut-backend-api/sdk.gen"
 import GeneralSettingsTab from "@/pages/settings/GeneralSettingsTab.vue"
-import makeMe from "doughnut-test-fixtures/makeMe"
+import makeMe from "donut-test-fixtures/makeMe"
 import helper, { mockSdkService } from "@tests/helpers"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"

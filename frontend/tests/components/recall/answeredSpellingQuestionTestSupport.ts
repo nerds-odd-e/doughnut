@@ -7,7 +7,7 @@ import type {
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import { buildWikiLinkText } from "@/utils/buildWikiLinkText"
 import helper from "@tests/helpers"
-import makeMe from "doughnut-test-fixtures/makeMe"
+import makeMe from "donut-test-fixtures/makeMe"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
 
 const noteShowStub = {

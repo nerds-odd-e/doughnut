@@ -19,10 +19,10 @@ Storybook starts on `http://localhost:6006` by default.
 
 ## Shared Test Data Builders
 
-Storybook stories reuse the same `makeMe` builders as unit tests. Source code lives in `packages/doughnut-test-fixtures`.
+Storybook stories reuse the same `makeMe` builders as unit tests. Source code lives in `packages/donut-test-fixtures`.
 
 ```typescript
-import makeMe from "doughnut-test-fixtures/makeMe"
+import makeMe from "donut-test-fixtures/makeMe"
 ```
 
 The `makeMe` object provides access to test data builders:
@@ -53,7 +53,7 @@ const questionWithNote = makeMe.anAnsweredQuestion
 
 ```typescript
 import type { Meta, StoryObj } from "@storybook/vue3"
-import makeMe from "doughnut-test-fixtures/makeMe"
+import makeMe from "donut-test-fixtures/makeMe"
 import MyComponent from "./MyComponent.vue"
 
 const meta = {
@@ -98,7 +98,7 @@ Storybook supports the same module aliases as the main application:
 - `@tests/*` points to `tests/`, for example `@tests/helpers`.
 - `@generated/` points to `generated/`.
 
-For API-shaped fixtures, import `makeMe` from `doughnut-test-fixtures/makeMe`; do not use an `@tests/fixtures` alias.
+For API-shaped fixtures, import `makeMe` from `donut-test-fixtures/makeMe`; do not use an `@tests/fixtures` alias.
 
 ## Global Styles
 

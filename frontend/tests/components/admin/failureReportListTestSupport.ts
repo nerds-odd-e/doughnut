@@ -6,7 +6,7 @@ import { FailureReportController } from "@generated/doughnut-backend-api/sdk.gen
 import FailureReportList from "@/components/admin/FailureReportList.vue"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
 import { createMemoryHistory, createRouter } from "vue-router"
-import makeMe from "doughnut-test-fixtures/makeMe"
+import makeMe from "donut-test-fixtures/makeMe"
 import helper, { mockSdkService, wrapSdkResponse } from "@tests/helpers"
 
 export const failureReportListRouter = createRouter({

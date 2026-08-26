@@ -17,12 +17,12 @@
     "format": "biome check --write src/"
   },
   "dependencies": {
-    "doughnut-api": "workspace:*"
+    "donut-api": "workspace:*"
   },
   "devDependencies": {
     "@modelcontextprotocol/sdk": "^1.30.0",
     "@types/node": "26.2.0",
-    "doughnut-test-fixtures": "workspace:*",
+    "donut-test-fixtures": "workspace:*",
     "esbuild": "0.28.2",
     "typescript": "6.0.3",
     "vitest": "4.1.11",

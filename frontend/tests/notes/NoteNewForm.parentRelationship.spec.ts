@@ -1,6 +1,6 @@
 import NoteNewForm from "@/components/notes/NoteNewForm.vue"
 import { flushPromises } from "@vue/test-utils"
-import makeMe from "doughnut-test-fixtures/makeMe"
+import makeMe from "donut-test-fixtures/makeMe"
 import helper, { testFolderStub } from "@tests/helpers"
 import {
   mountNoteNewForm,

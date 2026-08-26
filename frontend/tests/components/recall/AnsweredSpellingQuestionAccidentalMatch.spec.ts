@@ -8,7 +8,7 @@ import {
   mockSdkServiceWithImplementation,
 } from "@tests/helpers"
 import { closeButtonEl } from "@tests/commons/modalTestSupport"
-import makeMe from "doughnut-test-fixtures/makeMe"
+import makeMe from "donut-test-fixtures/makeMe"
 import { afterEach, beforeEach, describe, it, expect } from "vitest"
 import {
   accidentalMatchWithTwoMatchedNotes,

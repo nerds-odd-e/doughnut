@@ -8,7 +8,7 @@ import NotebooksPage from "@/pages/NotebooksPage.vue"
 import NotebooksPageView from "@/pages/NotebooksPageView.vue"
 import { PEER_SORT_STORAGE_KEY } from "@/composables/usePeerSort"
 import helper, { mockSdkService } from "@tests/helpers"
-import makeMe from "doughnut-test-fixtures/makeMe"
+import makeMe from "donut-test-fixtures/makeMe"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
 import type { Router } from "vue-router"
 

@@ -1,4 +1,4 @@
-import type { AttachBookLayoutRequestFull } from 'doughnut-api'
+import type { AttachBookLayoutRequestFull } from 'donut-api'
 
 export const MINERU_OUTLINE_DEFAULT_TIMEOUT_MS = 30 * 60 * 1000
 

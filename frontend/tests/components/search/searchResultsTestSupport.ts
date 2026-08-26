@@ -5,7 +5,7 @@ import type {
 import { SearchController } from "@generated/doughnut-backend-api/sdk.gen"
 import SearchResults from "@/components/search/SearchResults.vue"
 import helper, { mockSdkService, wrapSdkResponse } from "@tests/helpers"
-import makeMe from "doughnut-test-fixtures/makeMe"
+import makeMe from "donut-test-fixtures/makeMe"
 
 export { advanceSearchDebounce as waitForDebounce } from "@tests/helpers/searchDebounceTestSupport"
 

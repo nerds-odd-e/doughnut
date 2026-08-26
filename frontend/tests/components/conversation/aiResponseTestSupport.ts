@@ -1,7 +1,7 @@
 import AiResponse from "@/components/conversations/AiResponse.vue"
 import createNoteStorage from "@/store/createNoteStorage"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
-import makeMe from "doughnut-test-fixtures/makeMe"
+import makeMe from "donut-test-fixtures/makeMe"
 import helper, { mockShowNote } from "@tests/helpers"
 import {
   getLastInstance,

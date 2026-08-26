@@ -2,7 +2,7 @@ import { RecallPromptController } from "@generated/doughnut-backend-api/sdk.gen"
 import { describe, expect, it, beforeEach, afterEach, vi } from "vitest"
 import { flushPromises } from "@vue/test-utils"
 import ContestableQuestion from "@/components/recall/ContestableQuestion.vue"
-import makeMe from "doughnut-test-fixtures/makeMe"
+import makeMe from "donut-test-fixtures/makeMe"
 import helper, { mockSdkService } from "@tests/helpers"
 import type { AnswerDto } from "@generated/doughnut-backend-api"
 

@@ -1,7 +1,7 @@
 import BookReadingPage from "@/pages/BookReadingPage.vue"
 import { NotebookBooksController } from "@generated/doughnut-backend-api/sdk.gen"
 import helper, { mockSdkService } from "@tests/helpers"
-import makeMe from "doughnut-test-fixtures/makeMe"
+import makeMe from "donut-test-fixtures/makeMe"
 import { flushPromises } from "@vue/test-utils"
 import createFetchMock from "vitest-fetch-mock"
 import { expect, vi } from "vitest"

@@ -2,7 +2,7 @@ import { AiController } from "@generated/doughnut-backend-api/sdk.gen"
 import { noteShowLocation } from "@/routes/noteShowLocation"
 import { nextTick } from "vue"
 import { beforeEach, describe, expect, it, vi } from "vitest"
-import makeMe from "doughnut-test-fixtures/makeMe"
+import makeMe from "donut-test-fixtures/makeMe"
 import { mockSdkService, wrapSdkError } from "@tests/helpers"
 import type { NoteExtractionResult } from "@generated/doughnut-backend-api"
 import {

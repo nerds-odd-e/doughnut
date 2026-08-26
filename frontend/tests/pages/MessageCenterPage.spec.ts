@@ -3,7 +3,7 @@ import MessageCenterPage from "@/pages/MessageCenterPage.vue"
 import routes from "@/routes/routes"
 import { describe, it, expect, beforeEach, vi } from "vitest"
 import helper, { mockSdkService } from "@tests/helpers"
-import makeMe from "doughnut-test-fixtures/makeMe"
+import makeMe from "donut-test-fixtures/makeMe"
 import { flushPromises } from "@vue/test-utils"
 import { createMemoryHistory, createRouter } from "vue-router"
 

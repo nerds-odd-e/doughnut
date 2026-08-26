@@ -6,7 +6,7 @@ import {
 } from "@generated/doughnut-backend-api/sdk.gen"
 import AssimilationPanel from "@/components/recall/AssimilationPanel.vue"
 import { flushPromises } from "@vue/test-utils"
-import makeMe from "doughnut-test-fixtures/makeMe"
+import makeMe from "donut-test-fixtures/makeMe"
 import helper, { mockSdkService } from "@tests/helpers"
 import RenderingHelper from "@tests/helpers/RenderingHelper"
 import { useRecallData } from "@/composables/useRecallData"

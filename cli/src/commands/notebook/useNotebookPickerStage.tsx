@@ -7,7 +7,7 @@ import {
 } from 'react'
 import type { Key } from 'ink'
 import { Box, Text, useInput, useStdout } from 'ink'
-import type { Notebook } from 'doughnut-api'
+import type { Notebook } from 'donut-api'
 import { GuidanceListInk } from '../../commonUIComponents/guidanceListWindowInk.js'
 import { SetStageKeyHandlerContext } from '../../commonUIComponents/stageKeyForwardContext.js'
 import { handleSelectListInkKey } from '../../interactions/selectListInteraction.js'

@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/vue3-vite"
 import MainMenu from "./MainMenu.vue"
-import makeMe from "doughnut-test-fixtures/makeMe"
+import makeMe from "donut-test-fixtures/makeMe"
 import { UserController } from "@generated/doughnut-backend-api/sdk.gen"
 import type {
   MenuDataDto,

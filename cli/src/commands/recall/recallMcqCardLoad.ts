@@ -2,7 +2,7 @@ import {
   MemoryTrackerController,
   type RecallPrompt,
   type RecallPromptHistoryItem,
-} from 'doughnut-api'
+} from 'donut-api'
 import {
   doughnutSdkOptions,
   runDefaultBackendJson,

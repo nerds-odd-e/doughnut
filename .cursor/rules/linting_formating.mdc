@@ -17,7 +17,7 @@ alwaysApply: false
 ## Overview
 
 This project uses multiple linting tools to ensure code quality:
-- **Biome**: Frontend, CLI, MCP server, `packages/doughnut-test-fixtures`, Cypress, and other root-level TypeScript/JavaScript code
+- **Biome**: Frontend, CLI, MCP server, `packages/donut-test-fixtures`, Cypress, and other root-level TypeScript/JavaScript code
 - **Redocly CLI**: OpenAPI specification validation
 - **Backend linting**: Java code quality checks (via Gradle)
 
@@ -39,7 +39,7 @@ This runs:
 - Backend Java linting (`pnpm backend:lint`)
 - Frontend TypeScript/Vue linting (`pnpm frontend:lint`)
 - CLI TypeScript linting (`pnpm cli:lint`)
-- Shared API test fixtures (`packages/doughnut-test-fixtures`) via Biome (`pnpm test-fixtures:lint`)
+- Shared API test fixtures (`packages/donut-test-fixtures`) via Biome (`pnpm test-fixtures:lint`)
 - Cypress E2E test linting (`pnpm cy:lint`)
 - OpenAPI specification linting (`pnpm openapi:lint`)
 
@@ -48,7 +48,7 @@ This runs:
 - `pnpm backend:lint` - Java code linting
 - `pnpm frontend:lint` - Frontend TypeScript/Vue linting
 - `pnpm cli:lint` - CLI TypeScript linting
-- `pnpm test-fixtures:lint` - Biome on `packages/doughnut-test-fixtures` only
+- `pnpm test-fixtures:lint` - Biome on `packages/donut-test-fixtures` only
 - `pnpm cy:lint` - Cypress E2E test linting
 - `pnpm openapi:lint` - OpenAPI spec validation
 
@@ -88,11 +88,11 @@ After API changes, also run frontend unit tests and fix call sites — see the `
 
 ## Biome Configuration (2.4.x)
 
-This project uses `@biomejs/biome@2.4.x` across the workspace (`package.json`, `frontend/package.json`, `packages/doughnut-test-fixtures/package.json`). Keep those versions pinned and in sync — `syncpack fix` runs on `postinstall` to help.
+This project uses `@biomejs/biome@2.4.x` across the workspace (`package.json`, `frontend/package.json`, `packages/donut-test-fixtures/package.json`). Keep those versions pinned and in sync — `syncpack fix` runs on `postinstall` to help.
 
 ### Monorepo config layout
 
-- **`biome.json`** (workspace root) — governs `e2e_test/`, `cli/`, `mcp-server/`, `scripts/`, `infra/`, `packages/doughnut-test-fixtures/`, etc. Implicit `root: true`.
+- **`biome.json`** (workspace root) — governs `e2e_test/`, `cli/`, `mcp-server/`, `scripts/`, `infra/`, `packages/donut-test-fixtures/`, etc. Implicit `root: true`.
 - **`frontend/biome.json`** — sets `"root": false`; governs `frontend/` only. Uses Vue-specific rules (`noVueReservedProps`, `noVueDuplicateKeys`, `noVueSetupPropsReactivityLoss`, etc.).
 
 When running `pnpm biome check` from the workspace root, Biome walks up from each file to find the nearest config. The frontend subtree uses the frontend config; everything else uses the root config.

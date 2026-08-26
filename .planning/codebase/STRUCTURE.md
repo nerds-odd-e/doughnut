@@ -12,8 +12,8 @@ doughnut/
 ├── mcp-server/              # MCP stdio server for note tools
 ├── packages/
 │   ├── generated/doughnut-backend-api/  # OpenAPI → TS SDK (generated)
-│   ├── doughnut-api/        # Thin shared client wrapper for CLI/MCP
-│   └── doughnut-test-fixtures/  # makeMe builders for API-shaped data
+│   ├── donut-api/        # Thin shared client wrapper for CLI/MCP
+│   └── donut-test-fixtures/  # makeMe builders for API-shaped data
 ├── e2e_test/                # Cypress + Cucumber E2E
 ├── scripts/                 # Dev SUT, LB, logs, codegen helpers
 ├── infra/                   # GCP, Salt, Nix, path-routing
@@ -53,8 +53,8 @@ doughnut/
 
 **packages:**
 - Purpose: Shared TypeScript libraries across frontend/cli/mcp/e2e
-- Contains: Generated SDK, `doughnut-api`, test fixtures
-- Key files: `packages/generated/doughnut-backend-api/api-summary.md`, `packages/doughnut-test-fixtures/src/makeMe.ts`
+- Contains: Generated SDK, `donut-api`, test fixtures
+- Key files: `packages/generated/doughnut-backend-api/api-summary.md`, `packages/donut-test-fixtures/src/makeMe.ts`
 
 **e2e_test:**
 - Purpose: Behavior specs and Cypress automation
@@ -111,7 +111,7 @@ doughnut/
 - CLI: `cli/tests/` (`*.test.ts`)
 - MCP: `mcp-server/tests/`
 - E2E: `e2e_test/features/` + `e2e_test/step_definitions/`
-- Shared fixtures: `packages/doughnut-test-fixtures/src/`
+- Shared fixtures: `packages/donut-test-fixtures/src/`
 
 ## Naming Conventions
 
@@ -166,7 +166,7 @@ doughnut/
 - Repo scripts: `scripts/` (prefer existing script patterns; follow `script.mdc` for shell)
 
 **API-shaped test data:**
-- Add builders in `packages/doughnut-test-fixtures/src/` and export via `makeMe.ts`
+- Add builders in `packages/donut-test-fixtures/src/` and export via `makeMe.ts`
 
 ## Special Directories
 

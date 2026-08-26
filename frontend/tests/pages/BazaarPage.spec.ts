@@ -1,7 +1,7 @@
 import { BazaarController } from "@generated/doughnut-backend-api/sdk.gen"
 import BazaarPage from "@/pages/BazaarPage.vue"
 import { describe, it, expect } from "vitest"
-import makeMe from "doughnut-test-fixtures/makeMe"
+import makeMe from "donut-test-fixtures/makeMe"
 import helper, { mockSdkService } from "@tests/helpers"
 
 describe("bazaar page", () => {

@@ -4,7 +4,7 @@ import {
   SearchController,
 } from "@generated/doughnut-backend-api/sdk.gen"
 import NoteNewButton from "@/components/notes/core/NoteNewButton.vue"
-import makeMe from "doughnut-test-fixtures/makeMe"
+import makeMe from "donut-test-fixtures/makeMe"
 import helper, { mockSdkService } from "@tests/helpers"
 import { wrapWithNoteShortcutScope } from "@tests/helpers/noteShortcutScopeTestHelpers"
 import { flushPromises } from "@vue/test-utils"

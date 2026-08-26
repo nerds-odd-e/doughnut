@@ -3,9 +3,9 @@ import {
   MemoryTrackerController,
   RecallPromptController,
   RecallsController,
-} from 'doughnut-api'
-import type { AnsweredQuestion, NoteRealm, RecallPrompt } from 'doughnut-api'
-import makeMe from 'doughnut-test-fixtures/makeMe'
+} from 'donut-api'
+import type { AnsweredQuestion, NoteRealm, RecallPrompt } from 'donut-api'
+import makeMe from 'donut-test-fixtures/makeMe'
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 import { InteractiveCliApp } from '../src/InteractiveCliApp.js'
 import { pressEscape, renderInkWhenCommandLineReady } from './inkTestHelpers.js'

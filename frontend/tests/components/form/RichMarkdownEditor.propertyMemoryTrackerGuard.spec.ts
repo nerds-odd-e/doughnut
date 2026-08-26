@@ -3,7 +3,7 @@ import {
   NoteController,
 } from "@generated/doughnut-backend-api/sdk.gen"
 import { flushPromises } from "@vue/test-utils"
-import makeMe from "doughnut-test-fixtures/makeMe"
+import makeMe from "donut-test-fixtures/makeMe"
 import { mockSdkService, wrapSdkResponse } from "@tests/helpers"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import {

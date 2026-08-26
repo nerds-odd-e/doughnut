@@ -1,5 +1,5 @@
 import HomePage from "@/pages/HomePage.vue"
-import makeMe from "doughnut-test-fixtures/makeMe"
+import makeMe from "donut-test-fixtures/makeMe"
 import helper from "@tests/helpers"
 import { describe, expect, it } from "vitest"
 

@@ -1,4 +1,4 @@
-import makeMe from 'doughnut-test-fixtures/makeMe'
+import makeMe from 'donut-test-fixtures/makeMe'
 import { describe, expect, test } from 'vitest'
 import type { InteractiveSlashCommand } from '../src/commands/interactiveSlashCommand.js'
 import { notebookStageSlashCommandsFor } from '../src/commands/notebook/notebookStageSlashCommands.js'
