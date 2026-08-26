@@ -194,7 +194,7 @@ Use `CURSOR_DEV=true nix develop -c …` for all commands except `git`.
 
 | Area touched | Focused command |
 |--------------|-----------------|
-| Backend Java | `CURSOR_DEV=true nix develop -c backend/gradlew -p backend test -Dspring.profiles.active=test --tests "com.odde.doughnut....ClassName"` per affected class (or package pattern). If `backend/src/main/resources/db/migration/` changed → `CURSOR_DEV=true nix develop -c pnpm backend:test` |
+| Backend Java | `CURSOR_DEV=true nix develop -c backend/gradlew -p backend test -Dspring.profiles.active=test --tests "com.odde.donut....ClassName"` per affected class (or package pattern). If `backend/src/main/resources/db/migration/` changed → `CURSOR_DEV=true nix develop -c pnpm backend:test` |
 | Frontend Vue/TS | `CURSOR_DEV=true nix develop -c pnpm frontend:test tests/path/to/File.spec.ts` |
 | E2E (only if behavior under test changed) | `CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/<name>.feature` |
 | CLI | `CURSOR_DEV=true nix develop -c pnpm cli:test` (or narrower path under `cli/`) |

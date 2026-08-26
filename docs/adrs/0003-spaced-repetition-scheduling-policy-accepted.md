@@ -121,11 +121,11 @@ Tutor Feedback need not have an Answer.
   recall, memory tracker, and assimilation language
 - [Commissioned learning session protocol](../commissioned-learning-session-protocol.md)
   — Request/Report documents and matching by note title
-- [`Fsrs`](../../backend/src/main/java/com/odde/doughnut/entities/Fsrs.java) —
+- [`Fsrs`](../../backend/src/main/java/com/odde/donut/entities/Fsrs.java) —
   exact algorithm, weights, constants, and numeric rules
-- [`MemoryTracker`](../../backend/src/main/java/com/odde/doughnut/entities/MemoryTracker.java)
+- [`MemoryTracker`](../../backend/src/main/java/com/odde/donut/entities/MemoryTracker.java)
   — Grade and Confusion transitions and current scheduling-state updates
-- [`RecallLog`](../../backend/src/main/java/com/odde/doughnut/entities/RecallLog.java)
+- [`RecallLog`](../../backend/src/main/java/com/odde/donut/entities/RecallLog.java)
   — persisted event shape
 - [FSRS algorithm reference](https://github.com/open-spaced-repetition/awesome-fsrs/wiki/The-Algorithm)
 - [Anki answer-button semantics](https://docs.ankiweb.net/studying.html#answer-buttons)

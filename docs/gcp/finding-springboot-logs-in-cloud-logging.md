@@ -36,7 +36,7 @@ logName="projects/carbon-syntax-298809/logs/stdout"
 
 ```
 resource.type="gce_instance"
-textPayload=~"com.odde.doughnut"
+textPayload=~"com.odde.donut"
 ```
 
 ### Using gcloud CLI
@@ -49,7 +49,7 @@ gcloud logging read "resource.type=gce_instance AND resource.labels.instance_id=
 gcloud logging tail "resource.type=gce_instance AND resource.labels.instance_id=<instance-id> AND logName=~stdout"
 
 # Or search for application logs by content
-gcloud logging read "resource.type=gce_instance AND textPayload=~'com.odde.doughnut'" --limit=50
+gcloud logging read "resource.type=gce_instance AND textPayload=~'com.odde.donut'" --limit=50
 ```
 
 ### Finding Instance IDs
@@ -69,7 +69,7 @@ The production profile now includes proper logging configuration:
 - **Logback**: Logs to CONSOLE appender (stdout/stderr)
 - **Log Levels**:
   - Root: INFO
-  - Application (`com.odde.doughnut`): INFO
+  - Application (`com.odde.donut`): INFO
   - Spring Framework: INFO
   - Hibernate: WARN
   - HikariCP: WARN

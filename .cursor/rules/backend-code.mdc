@@ -44,14 +44,14 @@ CURSOR_DEV=true nix develop -c pnpm export:database-erd
 Avoid:
 
 ```java
-ObjectMapper mapper = new com.odde.doughnut.configs.ObjectMapperConfig().objectMapper();
+ObjectMapper mapper = new com.odde.donut.configs.ObjectMapperConfig().objectMapper();
 List<com.theokanning.openai.completion.chat.ChatMessage> messages = ...;
 ```
 
 Prefer:
 
 ```java
-import com.odde.doughnut.configs.ObjectMapperConfig;
+import com.odde.donut.configs.ObjectMapperConfig;
 import com.theokanning.openai.completion.chat.ChatMessage;
 
 ObjectMapper mapper = new ObjectMapperConfig().objectMapper();

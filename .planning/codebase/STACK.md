@@ -60,7 +60,7 @@
 ## Key Dependencies
 
 **Critical:**
-- `com.openai:openai-java:4.42.0` — chat/responses, embeddings, audio transcription, batch APIs (`backend/src/main/java/com/odde/doughnut/configs/OpenAiApiConfig.java`)
+- `com.openai:openai-java:4.42.0` — chat/responses, embeddings, audio transcription, batch APIs (`backend/src/main/java/com/odde/donut/configs/OpenAiApiConfig.java`)
 - Spring Data JPA + Hibernate — persistence (`spring-boot-starter-data-jpa`)
 - Flyway + `flyway-mysql` — schema migrations
 - `com.mysql:mysql-connector-j:9.7.0` — MySQL driver
@@ -84,7 +84,7 @@
 - Spring profiles: `test` (default in `application.yml`), `e2e`, `dev`, `prod`
 - DB credentials via imported property files: `db-test.properties`, `db-e2e.properties`, `db-dev.properties`
 - Prod secrets injected at MIG startup from Google Secret Manager (`infra/gcp/scripts/mig-zulu25-openai-app-instance-startup.sh`)
-- Critical env/system properties: `OPENAI_API_TOKEN`, `MYSQL_PASSWORD`, `OAUTH2_github_client_id` / `OAUTH2_github_client_secret`, `GITHUB_FOR_ISSUES_API_TOKEN`, `DOUGHNUT_SPA_PUBLIC_BASE_URL`, `DOUGHNUT_API_BASE_URL`, `DOUGHNUT_API_AUTH_TOKEN`
+- Critical env/system properties: `OPENAI_API_TOKEN`, `MYSQL_PASSWORD`, `OAUTH2_github_client_id` / `OAUTH2_github_client_secret`, `GITHUB_FOR_ISSUES_API_TOKEN`, `DOUGHNUT_SPA_PUBLIC_BASE_URL`, `DONUT_API_BASE_URL`, `DOUGHNUT_API_AUTH_TOKEN`
 - CLI Google OAuth (Gmail): `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` (bundled via esbuild defines)
 - Team secrets collaboration: git-secret + GnuPG (`docs/secrets_management.md`)
 - `.env*` files not present at repo root (CLI may use optional `cli/.env.local` for bundle defines — do not commit secrets)

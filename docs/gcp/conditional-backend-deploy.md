@@ -42,7 +42,7 @@ To bypass the hash skip when invoking the script yourself:
 
 ```bash
 FORCE_FULL_DEPLOY=1 GITHUB_SHA="$(git rev-parse HEAD)" \
-  GCS_BUCKET=… ARTIFACT=doughnut VERSION=0.0.1-SNAPSHOT \
+  GCS_BUCKET=… ARTIFACT=donut VERSION=0.0.1-SNAPSHOT \
   infra/gcp/scripts/deploy-backend-jar-to-gcp-mig.sh
 ```
 

@@ -35,7 +35,7 @@ source /workspace/scripts/cloud_agent_setup.sh
 ./backend/gradlew -p backend test -Dspring.profiles.active=test --build-cache --parallel
 
 # Run specific test
-./backend/gradlew -p backend test --tests "com.odde.doughnut.services.ai.QuestionEvaluationTest"
+./backend/gradlew -p backend test --tests "com.odde.donut.services.ai.QuestionEvaluationTest"
 ```
 
 ### What the Setup Script Does

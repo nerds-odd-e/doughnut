@@ -5,7 +5,7 @@
 ## Naming Patterns
 
 **Files:**
-- **Backend Java:** PascalCase class files matching the type — e.g. `BooksController.java`, `NoteBuilder.java`, `ClozeDescriptionTest.java`. Package path mirrors `com.odde.doughnut.*` under `backend/src/main/java/` and `backend/src/test/java/`.
+- **Backend Java:** PascalCase class files matching the type — e.g. `BooksController.java`, `NoteBuilder.java`, `ClozeDescriptionTest.java`. Package path mirrors `com.odde.donut.*` under `backend/src/main/java/` and `backend/src/test/java/`.
 - **Frontend Vue:** PascalCase component files — e.g. `NoteShow.vue`, `Modal.vue`, `LoadingModal.vue` in `frontend/src/components/`. TypeScript modules use camelCase or descriptive names — e.g. `clientSetup.ts`, `useStorageAccessor.ts`.
 - **Frontend tests:** Match the component/capability with a `.spec.ts` suffix — e.g. `LoadingModal.spec.ts`, `RecallPage.spec.ts` under `frontend/tests/`.
 - **CLI / MCP:** Production under `cli/src/`, `mcp-server/src/`; tests use `.test.ts` / `.test.tsx` under `cli/tests/`, `mcp-server/tests/`.
@@ -72,7 +72,7 @@ deliberate catch; never swallow).
 **Stack patterns:**
 - **Backend HTTP:** `@ControllerAdvice` in `CustomRestExceptionHandler.java` and `ControllerSetup.java` map exceptions to `ApiError` / status codes (validation, integrity, OpenAI auth, multipart, etc.). Domain access failures throw `UnexpectedNoAccessRightException` (asserted in controller tests with `assertThrows`).
 - **Frontend API:** Client uses `responseStyle: "fields"` and `throwOnError: false`. Always check `error` before using `data`. User-initiated calls go through `apiCallWithLoading` in `frontend/src/managedApi/clientSetup.ts` (loading bar + error toasts). Field validation: `toOpenApiError(error)` from `frontend/src/managedApi/openApiError.ts`. Silent background fetches call the SDK directly without `apiCallWithLoading`.
-- **Whole-UI blocking:** `apiCallWithLoading(..., { blockUi: true, message? })` or `runWithBlockingApiLoading` — do not add component-local `LoadingModal` for global blocking; global modal is mounted from `DoughnutApp.vue`.
+- **Whole-UI blocking:** `apiCallWithLoading(..., { blockUi: true, message? })` or `runWithBlockingApiLoading` — do not add component-local `LoadingModal` for global blocking; global modal is mounted from `DonutApp.vue`.
 - **Frontend API ↔ E2E busy contract:** loading UI that means unfinished work marks `data-app-busy` (`LoadingThinBar`, `ContentLoader`, `LoadingModal`); Cypress waits with `waitUntilAppIsNotBusy()` from `e2e_test/start/pageBase.ts` (`.cursor/rules/frontend-api.mdc`, `.cursor/rules/e2e-authoring.mdc`).
 - **CLI:** Map slash-command failures with `userVisibleSlashCommandError`; red transcript lines via `pastAssistantErrorBlock.tsx`.
 - **E2E:** Assertions must include expected vs actual and domain meaning; put assertions in page objects when that keeps steps thin (`.cursor/rules/e2e-authoring.mdc`).

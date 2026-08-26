@@ -17,6 +17,6 @@ Launch your IntelliJ IDE from your host OS.
 - Setup IntelliJ in Gradle perspective -> Gradle Settings (Wrench Icon) -> Run tests with -> IntelliJ IDEA
   - ![Gradle Settings](./images/gradle_settings.png "Gradle Settings")
   - ![Gradle Run tests with IDEA](./images/gradle_jvm_run_tests_with_idea.png "Run tests with IDEA")
-- Locate your test file in IDE (e.g. [`backend/src/test/java/com/odde/doughnut/controllers/RestNoteControllerTests.java`](../backend/src/test/java/com/odde/doughnut/controllers/RestNoteControllerTests.java)).
+- Locate your test file in IDE (e.g. [`backend/src/test/java/com/odde/donut/controllers/RestNoteControllerTests.java`](../backend/src/test/java/com/odde/donut/controllers/RestNoteControllerTests.java)).
   - Locate specific test method to run and look out for green run arrow icon in line number gutter.
   - Click on the green run arrow icon to kick off incremental build and single test run.

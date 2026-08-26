@@ -250,7 +250,7 @@ CURSOR_DEV=true nix develop -c pnpm frontend:test tests/pages/SomePage.spec.ts
 CURSOR_DEV=true nix develop -c pnpm cli:test
 
 # Backend class
-CURSOR_DEV=true nix develop -c backend/gradlew -p backend test -Dspring.profiles.active=test --tests "com.odde.doughnut....ClassName"
+CURSOR_DEV=true nix develop -c backend/gradlew -p backend test -Dspring.profiles.active=test --tests "com.odde.donut....ClassName"
 ```
 
 E2E groups: **3+ consecutive green runs** on touched specs before closing a slice.

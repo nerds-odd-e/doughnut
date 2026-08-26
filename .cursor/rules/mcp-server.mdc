@@ -3,7 +3,7 @@ description: Doughnut MCP server — structure, build, tests, Cursor/IDE configu
 alwaysApply: false
 ---
 
-# doughnut-mcp-server MCP Server
+# donut-mcp-server MCP Server
 
 A Model Context Protocol server for Doughnut.
 
@@ -20,8 +20,8 @@ mcp-server/
   src/                    # Production source code
     index.ts              # boot: create context, start stdio
     server.ts             # assemble server, list tools, route calls
-    context.ts            # read env, create DoughnutApi
-    api.ts                # DoughnutApi factory
+    context.ts            # read env, create DonutApi
+    api.ts                # DonutApi factory
     schemas.ts            # tool input schemas (shared)
     tools/index.ts        # tool registry + handlers
     types.ts              # shared types
@@ -93,7 +93,7 @@ For Cursor:
 ```json
 {
   "mcpServers": {
-    "doughnut": {
+    "donut": {
       "disabled": false,
       "timeout": 60,
       "transportType": "stdio",
@@ -102,7 +102,7 @@ For Cursor:
         "<doughnut root folder>/mcp-server/dist/mcp-server.bundle.mjs"
       ],
       "env": {
-        "DOUGHNUT_API_BASE_URL": "http://localhost:9081",
+        "DONUT_API_BASE_URL": "http://localhost:9081",
         "DOUGHNUT_API_AUTH_TOKEN": "your-token-here"
       }
     }
@@ -114,13 +114,13 @@ For VS Code (you need to put the following content into `./.vscode/mcp.json`):
 ```json
 {
   "servers": {
-    "doughnut": {
+    "donut": {
       "command": "node",
       "args": [
         "<doughnut root folder>/mcp-server/dist/mcp-server.bundle.mjs"
       ],
       "env": {
-        "DOUGHNUT_API_BASE_URL": "http://localhost:9081",
+        "DONUT_API_BASE_URL": "http://localhost:9081",
         "DOUGHNUT_API_AUTH_TOKEN": "your-token-here"
       }
     }
@@ -131,7 +131,7 @@ For IntelliJ IDE you need to go to the general settings/tools/GitHub Copilot/MCP
 ```json
 {
   "servers": {
-    "doughnut": {
+    "donut": {
       "disabled": false,
       "timeout": 60,
       "transportType": "stdio",
@@ -140,7 +140,7 @@ For IntelliJ IDE you need to go to the general settings/tools/GitHub Copilot/MCP
         "<doughnut root folder>/mcp-server/dist/mcp-server.bundle.mjs"
       ],
       "env": {
-        "DOUGHNUT_API_BASE_URL": "http://localhost:9081",
+        "DONUT_API_BASE_URL": "http://localhost:9081",
         "DOUGHNUT_API_AUTH_TOKEN": "your-token-here"
       }
     }

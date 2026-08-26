@@ -30,7 +30,7 @@ const { data: users, error: loadError } = await UserController.getUserProfile()
 
 ## Loading indicators
 
-`apiCallWithLoading` drives two global surfaces mounted from `DoughnutApp.vue`:
+`apiCallWithLoading` drives two global surfaces mounted from `DonutApp.vue`:
 
 - **Thin loading bar** — shown while any wrapped call is in flight.
 - **Whole-UI blocking modal** — shown when an in-flight call passed `{ blockUi: true }`; its message comes from the latest blocking state. Each call pushes/pops a state by id, so concurrent blockers clean up correctly. The modal is a native `<dialog>` opened with `showModal()`, so it lives in the browser top layer and paints above other top-layer modals (e.g. the Refine note dialog) — `z-index` cannot reach the top layer.

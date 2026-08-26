@@ -252,16 +252,12 @@ path/script referenced actually exists post-rename.
 
 ### 12. Docs sweep (Structure)
 
-Update `docs/**`, `CLAUDE.md`, `AGENTS.md`, `.cursor/rules/**`,
-`.agents/**`, and non-history `.planning/**` docs so every technical
-reference (paths, package names, env vars, command names, Java package,
-script names) matches what Slices 2–11 actually produced. Preserve
-human-facing brand mentions of "Doughnut" (product description, repo name,
-external URL) unchanged. No negation/history language anywhere here — that
-lives only in the Slice 1 ADR.
+Status: done
 
-Verify: targeted grep for stale internal references introduced by earlier
-slices' renamed paths/names.
+Aligned technical refs in `docs/**`, `.cursor/rules/**`, `.cursor/agent-map.md`,
+`.agents/**`, and non-history `.planning/**` with slices 2–11 (`com.odde.donut`,
+`DonutApplication` / `DonutApp.vue`, `donut-cli.bundle.mjs`, `donut:` config).
+Brand, repo, URL, and live-external `doughnut` names left unchanged.
 
 ### 13. Final verification sweep (Structure)
 
@@ -270,6 +266,15 @@ Repo-wide case-insensitive `doughnut` grep excluding: the Slice 1 ADR,
 live-external-resource values and brand-name text listed in "Goal" above.
 Fix anything else found. Close with one full run of the backend, frontend,
 cli, and mcp-server test suites together as the final gate.
+
+Known leftovers after slice 12 (in scope here, not docs):
+- `e2e_test/support/mcp_client.ts`: `DOUGHNUT_API_BASE_URL`, `doughnut-mcp-client`
+- `backend/src/main/resources/logback-spring.xml`: logger `com.odde.doughnut`;
+  log files `doughnut-e2e.log` / `doughnut-dev.log` / `doughnut-prod.log`
+- `README.md`: `cli/dist/doughnut-cli.bundle.mjs`
+- `backend/HELP.md`: `com.odde.doughnut`
+- Fence name `doughnut-note-md` still used in code — decide with the grep,
+  do not assume it renames.
 
 ## Discoveries affecting remaining work
 

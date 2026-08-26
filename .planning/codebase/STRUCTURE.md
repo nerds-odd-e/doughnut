@@ -33,13 +33,13 @@ doughnut/
 
 **backend:**
 - Purpose: HTTP API, domain logic, JPA persistence, Flyway, OpenAPI source of truth
-- Contains: Java sources under `src/main/java/com/odde/doughnut/`, resources, Gradle build
-- Key files: `DoughnutApplication.java`, `controllers/`, `services/`, `entities/`, `src/main/resources/db/migration/`
+- Contains: Java sources under `src/main/java/com/odde/donut/`, resources, Gradle build
+- Key files: `DonutApplication.java`, `controllers/`, `services/`, `entities/`, `src/main/resources/db/migration/`
 
 **frontend:**
 - Purpose: Browser SPA for notes, recall, bazaar, circles, books
 - Contains: `src/pages/`, `src/components/`, `src/composables/`, `src/managedApi/`, `src/routes/`, Vitest under `tests/`
-- Key files: `src/main.ts`, `src/DoughnutApp.vue`, `src/routes/routes.ts`
+- Key files: `src/main.ts`, `src/DonutApp.vue`, `src/routes/routes.ts`
 
 **cli:**
 - Purpose: Interactive and non-interactive Doughnut CLI
@@ -79,7 +79,7 @@ doughnut/
 ## Key File Locations
 
 **Entry Points:**
-- `backend/src/main/java/com/odde/doughnut/DoughnutApplication.java`: Spring Boot main
+- `backend/src/main/java/com/odde/donut/DonutApplication.java`: Spring Boot main
 - `frontend/src/main.ts`: Vue app bootstrap
 - `cli/src/index.ts`: CLI process entry
 - `mcp-server/src/index.ts`: MCP stdio entry
@@ -95,10 +95,10 @@ doughnut/
 - `pnpm-workspace.yaml`: Workspace membership
 
 **Core Logic:**
-- Backend controllers: `backend/src/main/java/com/odde/doughnut/controllers/`
-- Backend services: `backend/src/main/java/com/odde/doughnut/services/`
-- Backend algorithms: `backend/src/main/java/com/odde/doughnut/algorithms/`
-- Backend entities: `backend/src/main/java/com/odde/doughnut/entities/`
+- Backend controllers: `backend/src/main/java/com/odde/donut/controllers/`
+- Backend services: `backend/src/main/java/com/odde/donut/services/`
+- Backend algorithms: `backend/src/main/java/com/odde/donut/algorithms/`
+- Backend entities: `backend/src/main/java/com/odde/donut/entities/`
 - Frontend pages: `frontend/src/pages/`
 - Frontend note UI: `frontend/src/components/notes/`
 - Frontend API glue: `frontend/src/managedApi/`
@@ -106,7 +106,7 @@ doughnut/
 - MCP tools: `mcp-server/src/tools/`
 
 **Testing:**
-- Backend: `backend/src/test/java/com/odde/doughnut/` (prefer `controllers/` tests)
+- Backend: `backend/src/test/java/com/odde/donut/` (prefer `controllers/` tests)
 - Frontend: `frontend/tests/` (mirrors `src/` domains; `*.spec.ts`)
 - CLI: `cli/tests/` (`*.test.ts`)
 - MCP: `mcp-server/tests/`
@@ -133,7 +133,7 @@ doughnut/
 ## Where to Add New Code
 
 **New Feature (full stack):**
-- API endpoint: `backend/src/main/java/com/odde/doughnut/controllers/` + service in `services/`
+- API endpoint: `backend/src/main/java/com/odde/donut/controllers/` + service in `services/`
 - Persistence if needed: entity/repo under `entities/` + new Flyway migration only
 - Regenerate SDK: `CURSOR_DEV=true nix develop -c pnpm generateTypeScript`
 - Web UI: page under `frontend/src/pages/`, components under `frontend/src/components/<domain>/`, composable under `frontend/src/composables/`
@@ -141,7 +141,7 @@ doughnut/
 - Tests: backend controller test; frontend `frontend/tests/.../*.spec.ts`; targeted E2E feature under `e2e_test/features/<domain>/`
 
 **New Backend Service Only:**
-- Implementation: `backend/src/main/java/com/odde/doughnut/services/` (subpackage if cohesive: `ai/`, `book/`, `search/`, …)
+- Implementation: `backend/src/main/java/com/odde/donut/services/` (subpackage if cohesive: `ai/`, `book/`, `search/`, …)
 - Pure helpers: `algorithms/` when no Spring/DB needed
 - Tests: alongside related controller/service tests under `backend/src/test/java/`
 
@@ -162,7 +162,7 @@ doughnut/
 
 **Utilities:**
 - Frontend shared helpers: `frontend/src/utils/` or `frontend/src/lib/`
-- Backend utils: `backend/src/main/java/com/odde/doughnut/utils/`
+- Backend utils: `backend/src/main/java/com/odde/donut/utils/`
 - Repo scripts: `scripts/` (prefer existing script patterns; follow `script.mdc` for shell)
 
 **API-shaped test data:**
@@ -180,7 +180,7 @@ doughnut/
 - Generated: No
 - Committed: Yes — add new files only; do not rewrite history
 
-**backend/src/main/java/com/odde/doughnut/testability:**
+**backend/src/main/java/com/odde/donut/testability:**
 - Purpose: Non-prod hooks for E2E (time, tokens, DB clean, GitHub stub)
 - Generated: No
 - Committed: Yes — keep out of production behavior paths

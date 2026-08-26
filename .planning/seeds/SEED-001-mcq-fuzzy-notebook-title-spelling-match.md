@@ -34,10 +34,10 @@ Likely a full milestone covering some or all of: MCQ accidental-match, fuzzy/par
 - `.planning/PROJECT.md` — Next Milestone Goals / Out of Scope (MCQ, fuzzy, `Notebook:Title`)
 - `.planning/milestones/v1.1-ROADMAP.md` — deferred v2 line: MCQ accidental-match, fuzzy matching, Notebook:Title typing
 - `.planning/MILESTONES.md` — v1.1 shipped record
-- `backend/src/main/java/com/odde/doughnut/entities/AnswerOutcome.java`
-- `backend/src/main/java/com/odde/doughnut/entities/Answer.java`
-- `backend/src/main/java/com/odde/doughnut/controllers/dto/AnsweredQuestion.java`
-- `backend/src/main/java/com/odde/doughnut/services/MemoryTrackerService.java`
+- `backend/src/main/java/com/odde/donut/entities/AnswerOutcome.java`
+- `backend/src/main/java/com/odde/donut/entities/Answer.java`
+- `backend/src/main/java/com/odde/donut/controllers/dto/AnsweredQuestion.java`
+- `backend/src/main/java/com/odde/donut/services/MemoryTrackerService.java`
 - `e2e_test/step_definitions/recall.ts`
 
 ## Notes

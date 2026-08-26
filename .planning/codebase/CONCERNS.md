@@ -7,33 +7,33 @@
 **Oversized modules (past the 250-line cohesion guideline):**
 - Issue: Many production files far exceed the post-change-refactor 250-line split guideline, concentrating shotgun-surgery risk and slowing navigation.
 - Files:
-  - `backend/src/main/java/com/odde/doughnut/services/book/EpubStructureExtractor.java` (~890 lines)
-  - `backend/src/main/java/com/odde/doughnut/services/book/BookService.java` (~703 lines)
+  - `backend/src/main/java/com/odde/donut/services/book/EpubStructureExtractor.java` (~890 lines)
+  - `backend/src/main/java/com/odde/donut/services/book/BookService.java` (~703 lines)
   - `frontend/src/store/StoredApiCollection.ts` (~592 lines)
   - `e2e_test/step_definitions/note.ts` (~930 lines)
   - `e2e_test/start/pageObjects/notePage.ts` (~725 lines)
   - `frontend/src/pages/FolderPage.vue` (~481 lines)
   - `frontend/src/components/book-reading/BookReadingContent.vue` (~474 lines)
-  - `backend/src/main/java/com/odde/doughnut/controllers/NotebookController.java` (~450 lines)
-  - `backend/src/main/java/com/odde/doughnut/services/focusContext/FocusContextRetrievalService.java` (~403 lines)
+  - `backend/src/main/java/com/odde/donut/controllers/NotebookController.java` (~450 lines)
+  - `backend/src/main/java/com/odde/donut/services/focusContext/FocusContextRetrievalService.java` (~403 lines)
 - Impact: Changes to notes, books, or search touch megamodules; regressions are harder to localize; agents and humans both burn context reading unrelated behavior.
 - Fix approach: Split by capability (EPUB parse vs attach orchestration; note store mutations vs reads; note E2E steps by feature folder) when the next behavior change touches these files — do not big-bang refactor.
 
 **HTTP security is permit-all; auth is manual per controller:**
 - Issue: Spring Security allows almost every request at the filter chain (`anyRequest().permitAll()`), with CSRF disabled. Authorization is enforced only when controllers call `AuthorizationService`.
-- Files: `backend/src/main/java/com/odde/doughnut/configs/CommonConfiguration.java`, `backend/src/main/java/com/odde/doughnut/configs/ProductionConfiguration.java`, `backend/src/main/java/com/odde/doughnut/services/AuthorizationService.java`
+- Files: `backend/src/main/java/com/odde/donut/configs/CommonConfiguration.java`, `backend/src/main/java/com/odde/donut/configs/ProductionConfiguration.java`, `backend/src/main/java/com/odde/donut/services/AuthorizationService.java`
 - Impact: Any new endpoint that forgets `assertAuthorization` / `assertLoggedIn` / `assertReadAuthorization` is publicly reachable. This is a recurring footgun, not a one-off bug.
 - Fix approach: Prefer method-security or a default-deny HTTP policy for `/api/**` with explicit permit lists; add controller-review checklist / static guard for missing auth calls on mutating endpoints.
 
 **Unauthenticated OpenAI-cost endpoint:**
 - Issue: `AiAudioController.audioToText` has no `AuthorizationService` usage; Spring permits anonymous POSTs to `/api/audio/audio-to-text`, which calls OpenAI transcription/completion.
-- Files: `backend/src/main/java/com/odde/doughnut/controllers/AiAudioController.java`, caller `frontend/src/components/notes/widgets/NoteAudioTools.vue`
+- Files: `backend/src/main/java/com/odde/donut/controllers/AiAudioController.java`, caller `frontend/src/components/notes/widgets/NoteAudioTools.vue`
 - Impact: Cost abuse and DoS via expensive AI calls if the API is reachable without a session.
 - Fix approach: Add `assertLoggedIn()` (and preferably note-scoped auth if audio is bound to a note) before any OpenAI call; add a controller test that anonymous access returns 401/403.
 
 **Unauthenticated attachment image serving:**
 - Issue: `AttachmentController` serves image bytes by numeric image id with no ownership check.
-- Files: `backend/src/main/java/com/odde/doughnut/controllers/AttachmentController.java`, `backend/src/main/java/com/odde/doughnut/entities/Image.java`
+- Files: `backend/src/main/java/com/odde/donut/controllers/AttachmentController.java`, `backend/src/main/java/com/odde/donut/entities/Image.java`
 - Impact: IDOR for note images if ids are guessable or leaked; private notebook images may be readable without login.
 - Fix approach: Resolve image → note → `assertReadAuthorization(note)` before returning bytes; cover with a controller test for foreign-notebook denial.
 
@@ -45,7 +45,7 @@
 
 **Derived index coherence (wiki title / property / alias):**
 - Issue: Note content properties live as YAML frontmatter; discoverability depends on derived tables refreshed via `WikiTitleCacheService.refreshForNote` and related backfills. Missed refresh sites recreate assimilation/search bugs.
-- Files: `backend/src/main/java/com/odde/doughnut/services/WikiTitleCacheService.java` (and call sites in `NoteService`, `NoteConstructionService`, `TextContentController`, wiki-link rewrite), `backend/src/main/java/com/odde/doughnut/services/NotePropertyIndex*.java`
+- Files: `backend/src/main/java/com/odde/donut/services/WikiTitleCacheService.java` (and call sites in `NoteService`, `NoteConstructionService`, `TextContentController`, wiki-link rewrite), `backend/src/main/java/com/odde/donut/services/NotePropertyIndex*.java`
 - Impact: Stale assimilation queues, wrong wiki resolution, skipped property trackers after content edits if a write path skips refresh.
 - Fix approach: Keep one refresh boundary for content saves; when adding a write path, always call the same refresh seam; prefer a controller-level unit test that asserts index rows after content PATCH ("small test" style: `unit-testing.mdc`).
 
@@ -73,8 +73,8 @@
 
 **Application-level auth only:**
 - Risk: Missing auth on a single controller method exposes user data or expensive side effects.
-- Files: Controllers under `backend/src/main/java/com/odde/doughnut/controllers/` without `AuthorizationService` include at least `AiAudioController.java`, `AttachmentController.java`, `WikidataController.java`, `InstallController.java`, `CurrentUserInfoController.java`
-- Current mitigation: Most note/notebook controllers call `AuthorizationService`; testability APIs are `@Profile({"e2e", "test"})` in `backend/src/main/java/com/odde/doughnut/testability/TestabilityRestController.java`
+- Files: Controllers under `backend/src/main/java/com/odde/donut/controllers/` without `AuthorizationService` include at least `AiAudioController.java`, `AttachmentController.java`, `WikidataController.java`, `InstallController.java`, `CurrentUserInfoController.java`
+- Current mitigation: Most note/notebook controllers call `AuthorizationService`; testability APIs are `@Profile({"e2e", "test"})` in `backend/src/main/java/com/odde/donut/testability/TestabilityRestController.java`
 - Recommendations: Default-deny for `/api/**`; require login for Wikidata proxy and AI audio; authorize attachments; keep testability out of prod profiles (already profile-gated — verify prod packaging never includes `e2e`/`test`).
 
 **CSRF disabled in all profiles:**
@@ -93,13 +93,13 @@
 
 **Embedding maintenance scans every notebook every 5 minutes:**
 - Problem: Prod job iterates `notebookRepository.findAll()` then indexes each notebook.
-- Files: `backend/src/main/java/com/odde/doughnut/services/EmbeddingMaintenanceJob.java`, `backend/src/main/java/com/odde/doughnut/services/NotebookIndexingService.java`
+- Files: `backend/src/main/java/com/odde/donut/services/EmbeddingMaintenanceJob.java`, `backend/src/main/java/com/odde/donut/services/NotebookIndexingService.java`
 - Cause: Full catalog scan on a fixed cron (`0 */5 * * * *`); each notebook may still call OpenAI for notes needing embeddings.
 - Improvement path: Query only notebooks with dirty notes; batch/limit work per tick; keep ShedLock/pool sizing aligned with question-generation maintenance.
 
 **EPUB structure extraction cost and size:**
 - Problem: Large EPUB packages stress a monolithic extractor with XML DOM walks and size caps.
-- Files: `backend/src/main/java/com/odde/doughnut/services/book/EpubStructureExtractor.java`, helpers in `EpubPackageIo`
+- Files: `backend/src/main/java/com/odde/donut/services/book/EpubStructureExtractor.java`, helpers in `EpubPackageIo`
 - Cause: Full spine/TOC parse into `BookBlock` trees in one class.
 - Improvement path: Split parse stages; stream large spines; keep fail-fast for DRM/unsupported packages; measure attach latency on larger fixtures.
 
@@ -136,7 +136,7 @@
 - Test coverage: Prefer targeted E2E for delete/rename; watch for async bleed between Vitest mocks.
 
 **Assimilation queue ordering / caps:**
-- Files: `backend/src/main/java/com/odde/doughnut/services/AssimilationService.java`, `AssimilationUnitSource` implementations
+- Files: `backend/src/main/java/com/odde/donut/services/AssimilationService.java`, `AssimilationUnitSource` implementations
 - Why fragile: Unified ordering and subscription daily budgets intertwine note and property units; easy to reintroduce count/queue drift or subscription-cap bugs.
 - Safe modification: Extend `AssimilationServicePropertyUnitsTest` / ordering regression tests when changing sources; do not reintroduce eager in-memory sort of full streams.
 - Test coverage: Stronger after restructure, but still sensitive to JPQL order vs `AssimilationUnit.ORDER`.
@@ -148,7 +148,7 @@
 - Test coverage: Backend OpenAPI approval tests; frontend breaks at compile/runtime if stale.
 
 **Testability surface:**
-- Files: `backend/src/main/java/com/odde/doughnut/testability/TestabilityRestController.java` (~445 lines)
+- Files: `backend/src/main/java/com/odde/donut/testability/TestabilityRestController.java` (~445 lines)
 - Why fragile: Powerful DB clean / time travel / service URL override APIs; safe only under `e2e`/`test` profiles.
 - Safe modification: Never widen profiles; keep E2E page objects as the only callers; avoid production dependency on testability beans.
 - Test coverage: Profile annotations + packaging checks.

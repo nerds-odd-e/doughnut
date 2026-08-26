@@ -90,10 +90,10 @@ Send to the **backend service (MIG)** at least:
 | Path prefix / pattern | Why |
 |----------------------|-----|
 | `/api/*` | REST API |
-| `/attachments/*` | [`AttachmentController`](../../backend/src/main/java/com/odde/doughnut/controllers/AttachmentController.java) |
-| `/logout` | Spring Security logout ([`CommonConfiguration`](../../backend/src/main/java/com/odde/doughnut/configs/CommonConfiguration.java)) |
-| `/users/identify` | Prod auth entry ([`ApplicationController`](../../backend/src/main/java/com/odde/doughnut/controllers/ApplicationController.java)) |
-| `/install` | CLI install script ([`InstallController`](../../backend/src/main/java/com/odde/doughnut/controllers/InstallController.java)) |
+| `/attachments/*` | [`AttachmentController`](../../backend/src/main/java/com/odde/donut/controllers/AttachmentController.java) |
+| `/logout` | Spring Security logout ([`CommonConfiguration`](../../backend/src/main/java/com/odde/donut/configs/CommonConfiguration.java)) |
+| `/users/identify` | Prod auth entry ([`ApplicationController`](../../backend/src/main/java/com/odde/donut/controllers/ApplicationController.java)) |
+| `/install` | CLI install script ([`InstallController`](../../backend/src/main/java/com/odde/donut/controllers/InstallController.java)) |
 | `/oauth2/*`, `/login/oauth2/*` (and any other OAuth paths your Spring Security config uses) | OAuth2 login |
 
 **Optional:** `/robots.txt` can be served from GCS if you upload it in the static tree, or left on the MIG.

@@ -96,7 +96,7 @@ journalctl -u google-startup-scripts.service --no-pager | tail -100
 
 ```
 resource.type="gce_instance"
-textPayload=~"com.odde.doughnut"
+textPayload=~"com.odde.donut"
 ```
 
 ### Method 3: Search Startup Script Output
@@ -104,7 +104,7 @@ textPayload=~"com.odde.doughnut"
 ```
 resource.type="gce_instance"
 logName="projects/carbon-syntax-298809/logs/stdout"
-textPayload=~"Spring Boot\|doughnut\|Started DoughnutApplication"
+textPayload=~"Spring Boot\|doughnut\|Started DonutApplication"
 ```
 
 ## Expected Log Output
@@ -112,7 +112,7 @@ textPayload=~"Spring Boot\|doughnut\|Started DoughnutApplication"
 When Spring Boot starts successfully, you should see logs like:
 
 ```
-Started DoughnutApplication in X.XXX seconds
+Started DonutApplication in X.XXX seconds
 Tomcat started on port(s): 8081 (http)
 ```
 

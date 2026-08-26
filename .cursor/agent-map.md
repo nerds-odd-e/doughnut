@@ -4,8 +4,8 @@ Short navigation index — start here before generated API files or long docs. S
 
 ## Work Areas
 
-- Backend HTTP/API behavior: start in `backend/src/main/java/com/odde/doughnut/controllers/`, then follow services in `backend/src/main/java/com/odde/doughnut/services/` and entities/repositories in `backend/src/main/java/com/odde/doughnut/entities/`.
-- Backend tests: prefer controller-level unit tests under `backend/src/test/java/com/odde/doughnut/controllers/`; use `makeMe` fixtures and real database transactions ("small test" style: `unit-testing.mdc`). Stack details: `backend-testing.mdc`.
+- Backend HTTP/API behavior: start in `backend/src/main/java/com/odde/donut/controllers/`, then follow services in `backend/src/main/java/com/odde/donut/services/` and entities/repositories in `backend/src/main/java/com/odde/donut/entities/`.
+- Backend tests: prefer controller-level unit tests under `backend/src/test/java/com/odde/donut/controllers/`; use `makeMe` fixtures and real database transactions ("small test" style: `unit-testing.mdc`). Stack details: `backend-testing.mdc`.
 - Frontend pages and components: start in `frontend/src/pages/`, `frontend/src/components/`, `frontend/src/composables/`, and `frontend/src/store/`.
 - Frontend tests: use `frontend/tests/`; drive mounted components; mock only the backend API via `mockSdkService()` and build payloads with `donut-test-fixtures/makeMe` (`unit-testing.mdc`). Stack details: `frontend-testing.mdc`.
 - E2E behavior: start with `e2e_test/features/`, then the matching step definitions in `e2e_test/step_definitions/`, then page objects in `e2e_test/start/`. After UI actions that leave the app busy (`data-app-busy`), wait with `waitUntilAppIsNotBusy()` (paired in `frontend-api.mdc` / `e2e-authoring.mdc`).

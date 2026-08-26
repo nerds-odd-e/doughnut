@@ -38,12 +38,12 @@
 
 | Component | Responsibility | File |
 |-----------|----------------|------|
-| Spring Boot app | Boot, OpenAPI generation tasks, migrate-test-DB tasks | `backend/src/main/java/com/odde/doughnut/DoughnutApplication.java` |
-| REST controllers | HTTP `/api/*` surface; auth checks; prefer entity/DTO returns | `backend/src/main/java/com/odde/doughnut/controllers/` |
-| Authorization | Read/write access by ownership, circle, bazaar, admin | `backend/src/main/java/com/odde/doughnut/services/AuthorizationService.java` |
-| Domain services | Note/notebook/recall/AI/book/search business logic | `backend/src/main/java/com/odde/doughnut/services/` |
-| Pure algorithms | Cloze, markdown/frontmatter, spaced repetition math | `backend/src/main/java/com/odde/doughnut/algorithms/` |
-| Persistence | JPA entities, Spring Data repositories, `EntityPersister` | `backend/src/main/java/com/odde/doughnut/entities/`, `.../factoryServices/EntityPersister.java` |
+| Spring Boot app | Boot, OpenAPI generation tasks, migrate-test-DB tasks | `backend/src/main/java/com/odde/donut/DonutApplication.java` |
+| REST controllers | HTTP `/api/*` surface; auth checks; prefer entity/DTO returns | `backend/src/main/java/com/odde/donut/controllers/` |
+| Authorization | Read/write access by ownership, circle, bazaar, admin | `backend/src/main/java/com/odde/donut/services/AuthorizationService.java` |
+| Domain services | Note/notebook/recall/AI/book/search business logic | `backend/src/main/java/com/odde/donut/services/` |
+| Pure algorithms | Cloze, markdown/frontmatter, spaced repetition math | `backend/src/main/java/com/odde/donut/algorithms/` |
+| Persistence | JPA entities, Spring Data repositories, `EntityPersister` | `backend/src/main/java/com/odde/donut/entities/`, `.../factoryServices/EntityPersister.java` |
 | Vue SPA | Pages, components, composables, client-side note cache | `frontend/src/` |
 | Generated SDK | TypeScript client from OpenAPI | `packages/generated/donut-backend-api/` |
 | Shared API wrapper | CLI/MCP-friendly SDK setup + re-exports | `packages/donut-api/src/index.ts` |
@@ -74,21 +74,21 @@
 
 **API / transport:**
 - Purpose: HTTP contract and auth gate
-- Location: `backend/src/main/java/com/odde/doughnut/controllers/`, security in `configs/ProductionConfiguration.java` / `NonProductConfiguration.java`
+- Location: `backend/src/main/java/com/odde/donut/controllers/`, security in `configs/ProductionConfiguration.java` / `NonProductConfiguration.java`
 - Contains: `@RestController` classes under `/api/...`, OpenAPI annotations, DTOs in `controllers/dto/`
 - Depends on: Services, `AuthorizationService`, entities
 - Used by: All clients via local LB or GCP path routing
 
 **Application / domain services:**
 - Purpose: Use-case orchestration and domain rules
-- Location: `backend/src/main/java/com/odde/doughnut/services/` (+ subpackages `ai/`, `book/`, `focusContext/`, `search/`, `openAiApis/`, `wikidataApis/`)
+- Location: `backend/src/main/java/com/odde/donut/services/` (+ subpackages `ai/`, `book/`, `focusContext/`, `search/`, `openAiApis/`, `wikidataApis/`)
 - Contains: Note construction/motion, recall, assimilation, embeddings, bazaar, circles, conversations
 - Depends on: Repositories, `EntityPersister`, algorithms, external HTTP clients
 - Used by: Controllers and scheduled jobs (e.g. `EmbeddingMaintenanceJob`)
 
 **Domain algorithms (pure):**
 - Purpose: Stateless text/SRS helpers without Spring wiring
-- Location: `backend/src/main/java/com/odde/doughnut/algorithms/`
+- Location: `backend/src/main/java/com/odde/donut/algorithms/`
 - Contains: `ClozedString`, `NoteContentMarkdown`, wiki-link parsing, property indexing planners
 - Depends on: Minimal JDK / shared types
 - Used by: Entities and services
@@ -102,7 +102,7 @@
 
 **Cross-cutting config & testability:**
 - Purpose: Security, scheduling, OpenAPI, exception mapping, E2E hooks
-- Location: `backend/src/main/java/com/odde/doughnut/configs/`, `testability/`
+- Location: `backend/src/main/java/com/odde/donut/configs/`, `testability/`
 - Contains: OAuth2 login (prod), exception handlers, ShedLock, `TestabilityRestController`
 - Used by: Runtime and Cypress setup steps
 
@@ -168,18 +168,18 @@
 ## Entry Points
 
 **Backend HTTP:**
-- Location: `backend/src/main/java/com/odde/doughnut/DoughnutApplication.java`
+- Location: `backend/src/main/java/com/odde/donut/DonutApplication.java`
 - Triggers: `pnpm backend:sut` / Gradle `bootRunE2E`, production JVM
-- Responsibilities: Spring context, scheduled jobs, OpenAPI/migrate tasks via `DoughnutTaskRunner`
+- Responsibilities: Spring context, scheduled jobs, OpenAPI/migrate tasks via `DonutTaskRunner`
 
 **Frontend SPA:**
-- Location: `frontend/src/main.ts` → `DoughnutApp.vue`
+- Location: `frontend/src/main.ts` → `DonutApp.vue`
 - Triggers: Vite dev (`pnpm frontend:sut`) or static assets served behind LB
 - Responsibilities: Router, toast plugin, autofocus directive, mount app
 
 **CLI:**
 - Location: `cli/src/index.ts` → `main.ts` → `run.ts`
-- Triggers: `pnpm cli`, bundled `cli/dist/doughnut-cli.bundle.mjs`, install script from `/install`
+- Triggers: `pnpm cli`, bundled `cli/dist/donut-cli.bundle.mjs`, install script from `/install`
 - Responsibilities: Arg routing, interactive Ink session vs non-interactive commands
 
 **MCP:**

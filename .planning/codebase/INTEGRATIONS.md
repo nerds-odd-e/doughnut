@@ -6,21 +6,21 @@
 
 **AI (OpenAI):**
 - OpenAI API — question generation, conversation AI (Responses API + SSE), embeddings (semantic search), audio transcription (Whisper), transcription→markdown, batch question generation
-  - SDK/Client: `com.openai:openai-java` via `OpenAIOkHttpClient` in `backend/src/main/java/com/odde/doughnut/configs/OpenAiApiConfig.java`
+  - SDK/Client: `com.openai:openai-java` via `OpenAIOkHttpClient` in `backend/src/main/java/com/odde/donut/configs/OpenAiApiConfig.java`
   - Auth: `OPENAI_API_TOKEN` / `spring.openai.token`
   - Default base: `https://api.openai.com/v1/` (overridable for test imposters)
   - E2E: Mountebank OpenAI imposter (`e2e_test/start/mock_services/`)
 
 **Knowledge graph (Wikidata):**
 - Wikidata EntityData + MediaWiki API — note entity enrichment and search
-  - Client: custom HTTP via `backend/src/main/java/com/odde/doughnut/services/wikidataApis/` and `WikidataService`
+  - Client: custom HTTP via `backend/src/main/java/com/odde/donut/services/wikidataApis/` and `WikidataService`
   - Endpoints: `https://www.wikidata.org/wiki/Special:EntityData/{id}.json`, `https://www.wikidata.org/w/api.php`
   - Auth: none (public API)
   - Backend routes: `WikidataController` at `/api/wikidata`
 
 **GitHub Issues API:**
 - Creates/lists failure-report issues against configured repos
-  - Client: `RealGithubService` (`backend/src/main/java/com/odde/doughnut/services/RealGithubService.java`)
+  - Client: `RealGithubService` (`backend/src/main/java/com/odde/donut/services/RealGithubService.java`)
   - Auth: `GITHUB_FOR_ISSUES_API_TOKEN` / `spring.github_for_issues.token`
   - Prod repo: `nerds-odd-e/doughnut`; non-prod sandbox: `nerds-odd-e/doughnut_sandbox`
 
@@ -53,9 +53,9 @@
   - Local ports: `3309` (dev/e2e DBs via Nix MySQL)
 
 **File Storage:**
-- Non-prod book PDFs / attachments: MySQL `AttachmentBlob` via `DbBookStorage` (`backend/src/main/java/com/odde/doughnut/services/book/DbBookStorage.java`)
+- Non-prod book PDFs / attachments: MySQL `AttachmentBlob` via `DbBookStorage` (`backend/src/main/java/com/odde/donut/services/book/DbBookStorage.java`)
 - Prod book PDFs: Google Cloud Storage via `GcsBookStorage` (`BookStorageConfiguration.java`)
-  - Bucket config: `doughnut.book-pdf.gcs.bucket` = `doughnut-book-pdf-carbon-syntax-298809`
+  - Bucket config: `donut.book-pdf.gcs.bucket` = `doughnut-book-pdf-carbon-syntax-298809`
   - Auth: Application Default Credentials / GCE service account (`StorageOptions.getDefaultInstance()`)
 - Prod SPA + CLI binary: GCS bucket `dough-frontend-01` (public LB backend)
 - Deploy artifacts (fat JAR, `deploy/last-successful-deploy.json`): GCS bucket `dough-01`
@@ -74,7 +74,7 @@
   - Secrets: `OAUTH2_github_client_id`, `OAUTH2_github_client_secret` (Secret Manager)
 - Non-prod (test/e2e): HTTP Basic + in-memory users (`NonProductConfiguration.java`); frontend `/users/identify` flow; remember-me always on
 - API tokens for CLI/MCP: user-generated Bearer tokens (`UserController`, `CurrentUserFetcherFromRequest.java`)
-  - Clients set `DOUGHNUT_API_AUTH_TOKEN` and `DOUGHNUT_API_BASE_URL` (`packages/donut-api/src/index.ts`)
+  - Clients set `DOUGHNUT_API_AUTH_TOKEN` and `DONUT_API_BASE_URL` (`packages/donut-api/src/index.ts`)
 - CLI Google OAuth: separate from web login; used for Gmail command only
 
 ## Monitoring & Observability
@@ -113,7 +113,7 @@
 - `OAUTH2_github_client_id` / `OAUTH2_github_client_secret` — prod web login
 - `GITHUB_FOR_ISSUES_API_TOKEN` — failure-report issues
 - `DOUGHNUT_SPA_PUBLIC_BASE_URL` — prod SPA public URL (default `https://doughnut.odd-e.com`)
-- `DOUGHNUT_API_BASE_URL` / `DOUGHNUT_API_AUTH_TOKEN` — CLI and MCP → backend
+- `DONUT_API_BASE_URL` / `DOUGHNUT_API_AUTH_TOKEN` — CLI and MCP → backend
 - `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` — CLI Gmail OAuth (and CI jar reproducibility)
 - CI-only: DB user/password secrets, Slack/Discord webhooks
 - Deploy workflow: `GCS_BUCKET`, `GCS_FRONTEND_BUCKET`, `GCP_CREDENTIALS`

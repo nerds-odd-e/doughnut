@@ -31,8 +31,8 @@ Key risk: Savaal's per-concept win **scales with document length**. At single-no
 
 ## Breadcrumbs
 
-- `backend/src/main/java/com/odde/doughnut/services/focusContext/FocusContextRetrievalService.java` — `Proposal` / `retrievalPath` already track the proposing parent
-- `backend/src/main/java/com/odde/doughnut/services/focusContext/FocusContextMarkdownRenderer.java` — single-envelope renderer; would need a per-group variant
+- `backend/src/main/java/com/odde/donut/services/focusContext/FocusContextRetrievalService.java` — `Proposal` / `retrievalPath` already track the proposing parent
+- `backend/src/main/java/com/odde/donut/services/focusContext/FocusContextMarkdownRenderer.java` — single-envelope renderer; would need a per-group variant
 - `docs/focus-context/focus_context_retrieval_design.md` — current retrieval design
 - `.planning/notes/graph-structural-retrieval-as-implicit-concept-grouping.md` — why wiki links are concept anchors
 - `.planning/notes/qg-retrieval-summarization-highest-leverage.md` — companion finding; summarization may be a stronger lever than splitting

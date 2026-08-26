@@ -30,7 +30,7 @@ Also surface when adding scheduling columns, changing JDBC timezone, or revisiti
 - `docs/adrs/0003-spaced-repetition-scheduling-policy-accepted.md` — maximum interval; due from capped S
 - `backend/src/main/resources/db/migration/V100000000__baseline.sql` — recall-due columns as `datetime`, `assimilated_at` and the rest as `timestamp`
 - `backend/src/main/resources/application-prod.yml` (and `db-dev.properties`, `db-test.properties`) — `connectionTimeZone=UTC`
-- `backend/src/main/java/com/odde/doughnut/entities/MemoryTracker.java`
+- `backend/src/main/java/com/odde/donut/entities/MemoryTracker.java`
 
 ## Notes
 

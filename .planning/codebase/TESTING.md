@@ -66,7 +66,7 @@ CURSOR_DEV=true nix develop -c pnpm format:all
 
 **Structure:**
 ```
-backend/src/test/java/com/odde/doughnut/
+backend/src/test/java/com/odde/donut/
   controllers/          # Preferred behavior entry (extends ControllerTestBase)
   algorithms/           # Pure logic / parameterized contracts
   testability/          # MakeMe + builders + OpenAI mocks
@@ -112,7 +112,7 @@ class BooksControllerTest extends ControllerTestBase {
 }
 ```
 
-Base class: `backend/src/test/java/com/odde/doughnut/controllers/ControllerTestBase.java` (`MakeMe`, `CurrentUser` `@TestBean`, testability cleanup).
+Base class: `backend/src/test/java/com/odde/donut/controllers/ControllerTestBase.java` (`MakeMe`, `CurrentUser` `@TestBean`, testability cleanup).
 
 **Suite Organization (frontend):**
 
@@ -148,7 +148,7 @@ describe("LoadingModal", () => {
 ## Mocking
 
 **Framework:**
-- Backend: Mockito `@MockitoBean` (e.g. `OpenAIClient`); `OpenAiStructuredResponseMock` / stream mockers under `backend/src/test/java/com/odde/doughnut/testability/`.
+- Backend: Mockito `@MockitoBean` (e.g. `OpenAIClient`); `OpenAiStructuredResponseMock` / stream mockers under `backend/src/test/java/com/odde/donut/testability/`.
 - Frontend / CLI: Vitest `vi.spyOn`.
 - E2E: Mountebank + `mock_services` fluent stubs in step defs; tags like `@usingMockedOpenAiService`, `@mockBrowserTime`.
 
@@ -210,7 +210,7 @@ const note = makeMe.aNoteRealm
 ```
 
 **Location:**
-- Backend: `MakeMe` / builders in `backend/src/test/java/com/odde/doughnut/testability/` (`NoteBuilder`, `NotebookBuilder`, `UserBuilder`, …).
+- Backend: `MakeMe` / builders in `backend/src/test/java/com/odde/donut/testability/` (`NoteBuilder`, `NotebookBuilder`, `UserBuilder`, …).
 - Shared TS: `packages/donut-test-fixtures/` (`makeMe.ts` + `*Builder.ts`). Import only `donut-test-fixtures/makeMe`.
 - E2E: Given steps + data tables; inject via testability APIs; clean up after each test. Notebook note tables place children under the previous row when batch-created (no `Folder` column).
 
@@ -234,7 +234,7 @@ CURSOR_DEV=true nix develop -c pnpm -C mcp-server exec vitest run --coverage
 This repo uses **E2E** and **unit tests** only — nothing in between. Write unit tests in the **"small test"** style (`.cursor/rules/unit-testing.mdc`).
 
 **Unit tests** ("small test" style — stable-boundary JUnit/Vitest/…):
-- **Backend:** Prefer controller tests with real MySQL transactions (`ControllerTestBase`). Direct algorithm tests under `backend/src/test/java/com/odde/doughnut/algorithms/` when that API is the stable contract (e.g. `ClozeDescriptionTest` with `@ParameterizedTest` / `@CsvSource`).
+- **Backend:** Prefer controller tests with real MySQL transactions (`ControllerTestBase`). Direct algorithm tests under `backend/src/test/java/com/odde/donut/algorithms/` when that API is the stable contract (e.g. `ClozeDescriptionTest` with `@ParameterizedTest` / `@CsvSource`).
 - **Frontend:** Component/page tests in browser mode with mocked SDK + real Vue render; utils/composables/models under `frontend/tests/utils/`, `composables/`, `models/` for pure inputs → outputs.
 - **CLI:** argv routing via `run` (`cli/tests/index.test.ts`); interactive via `runInteractive` + mock TTY / Ink helpers.
 - **MCP:** tool registry shape and utils in `mcp-server/tests/`.
