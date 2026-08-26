@@ -22,6 +22,8 @@ final class RecallPaceAggregator {
   private static final double EWMA_ALPHA = 0.3;
   private static final double ABSOLUTE_FLOOR_MS = 300;
   private static final double BASELINE_FLOOR_FACTOR = 0.25;
+  private static final double HARD_DROP_MS = 300_000;
+  private static final double RESIDUAL_CAP = Math.log(8);
 
   private RecallPaceAggregator() {}
 
@@ -57,23 +59,31 @@ final class RecallPaceAggregator {
         implausiblyFastRows.add(r);
         continue;
       }
+      if (rt.get() >= HARD_DROP_MS) {
+        // Genuinely slow-but-valid attempts still count toward retention, but a single very
+        // slow attempt on-task is dropped from the pace tile entirely and must not pollute the
+        // item's baseline.
+        continue;
+      }
       double lnRt = Math.log(rt.get());
       if (baseline != null && isToday) {
-        todaysResiduals.add(lnRt - baseline);
+        double rawResidual = lnRt - baseline;
+        todaysResiduals.add(Math.min(rawResidual, RESIDUAL_CAP));
       }
       tauByItem.put(
           itemId, baseline == null ? lnRt : EWMA_ALPHA * lnRt + (1 - EWMA_ALPHA) * baseline);
     }
     int sampleSize = todaysResiduals.size();
-    Double pctVsUsual = null;
-    if (sampleSize > 0) {
-      double sumResiduals = 0;
-      for (double residual : todaysResiduals) {
-        sumResiduals += residual;
-      }
-      pctVsUsual = (Math.exp(sumResiduals / sampleSize) - 1) * 100;
-    }
+    Double pctVsUsual = sampleSize > 0 ? (Math.exp(median(todaysResiduals)) - 1) * 100 : null;
     return new PaceResult(
         new PaceStats(pctVsUsual, sampleSize, totalAnsweredToday), implausiblyFastRows);
+  }
+
+  private static double median(List<Double> values) {
+    List<Double> sorted = new ArrayList<>(values);
+    Collections.sort(sorted);
+    int size = sorted.size();
+    int mid = size / 2;
+    return size % 2 == 1 ? sorted.get(mid) : (sorted.get(mid - 1) + sorted.get(mid)) / 2.0;
   }
 }

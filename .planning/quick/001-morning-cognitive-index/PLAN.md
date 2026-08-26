@@ -334,11 +334,26 @@ numerator. `totalAnsweredToday` (session position) is unaffected — it still
 counts every today row regardless of speed, per slice 9's precedent. No DTO
 shape change, no migration, no API regeneration needed.
 
-#### 11. A single very slow attempt stops dominating pace — Behavior `[ ]`
+#### 11. A single very slow attempt stops dominating pace — Behavior `[x]`
 
 Winsorized log-residual (cap ≈ `ln(8)`) and median-of-logs: one six-minute think
 shifts the tile slightly instead of swamping it. Hard drop only above ~5 min
 on-task.
+
+Done: scoped to `RecallPaceAggregator` only — retention/accuracy is untouched,
+since a genuinely slow-but-correct answer is real signal, not noise. Added
+`HARD_DROP_MS = 300_000`: a row at or above 5 minutes on-task is skipped
+entirely (no residual, no EWMA update, not added to slice 10's
+`implausiblyFastRows` set since that set drives retention exclusion and slow
+attempts must keep counting there) but still counts toward
+`totalAnsweredToday`. For rows between the fast-tail floor and the hard drop,
+the raw residual (`lnRt - baseline`) is winsorized via
+`Math.min(rawResidual, RESIDUAL_CAP)` (`RESIDUAL_CAP = Math.log(8)`) before
+being added to `todaysResiduals` — but `tauByItem`'s EWMA update still uses
+the raw, uncapped `lnRt`, so a genuinely slow item still teaches its own
+baseline over time; only today's reported number is robustified. `pctVsUsual`
+switched from mean to median of `todaysResiduals` via a new private `median()`
+helper. No DTO/API change, no migration.
 
 #### 12. Cold-start items stop adding noise — Behavior `[ ]`
 
