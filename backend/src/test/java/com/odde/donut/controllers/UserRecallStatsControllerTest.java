@@ -47,6 +47,9 @@ class UserRecallStatsControllerTest extends ControllerTestBase {
     assertThat(dto.getRetentionTrend(), everyItem(hasProperty("retentionPct", nullValue())));
     assertThat(dto.getTotals(), notNullValue());
     assertThat(dto.getTotals().getRetentionPct365(), nullValue());
+    assertThat(dto.getPace(), notNullValue());
+    assertThat(dto.getPace().getSampleSize(), equalTo(0));
+    assertThat(dto.getPace().getPctVsUsual(), nullValue());
   }
 
   @Test

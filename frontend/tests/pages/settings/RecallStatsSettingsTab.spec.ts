@@ -79,6 +79,11 @@ const fixture: RecallStatsDto = {
     worstHour: 20,
     worstHourRetentionPct: 40,
   },
+  pace: {
+    pctVsUsual: 15,
+    sampleSize: 4,
+    totalAnsweredToday: 6,
+  },
 }
 
 describe("RecallStatsSettingsTab", () => {
@@ -120,6 +125,9 @@ describe("RecallStatsSettingsTab", () => {
     const bestWorst = wrapper.find('[data-testid="best-worst-hours"]')
     expect(bestWorst.text()).toContain("10")
     expect(bestWorst.text()).toContain("20")
+    expect(wrapper.find('[data-testid="pace-tile"]').text()).toContain(
+      "15% slower than usual"
+    )
   })
 
   it("shows an empty state when there are no reviews yet", async () => {

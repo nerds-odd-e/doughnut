@@ -19,13 +19,22 @@ final class RecallStatsTestFixtures {
 
   static RecallAnswerRow answered(
       Timestamp answerAt, Integer thinkingTimeMs, boolean correct, Timestamp promptAt) {
+    return answered(answerAt, thinkingTimeMs, correct, promptAt, null);
+  }
+
+  static RecallAnswerRow answered(
+      Timestamp answerAt,
+      Integer thinkingTimeMs,
+      boolean correct,
+      Timestamp promptAt,
+      Integer memoryTrackerId) {
     return new RecallAnswerRow(
         answerAt,
         null,
         Grade.fromCorrect(correct),
         thinkingTimeMs,
         promptAt != null ? promptAt : answerAt,
-        null,
+        memoryTrackerId,
         null);
   }
 

@@ -216,6 +216,54 @@ class RecallStatsServiceTest {
   }
 
   @Nested
+  class Pace {
+    @Test
+    void itemSlowerThanUsualTodayYieldsPositivePctVsUsual() {
+      Timestamp now = utc(11, 12); // today = 1989-01-11
+      List<RecallAnswerRow> rows =
+          List.of(
+              answered(utc(9, 10), 5000, true, null, 1),
+              answered(utc(9, 11), 5000, true, null, 1),
+              answered(utc(11, 10), 20000, true, null, 1));
+      RecallStatsDTO dto = aggregate(rows, now);
+      RecallStatsDTO.PaceStats pace = dto.getPace();
+      assertThat(pace.getSampleSize(), equalTo(1));
+      assertThat(pace.getPctVsUsual(), closeTo(300.0, 5.0));
+    }
+
+    @Test
+    void itemFasterThanUsualTodayYieldsNegativePctVsUsual() {
+      Timestamp now = utc(11, 12);
+      List<RecallAnswerRow> rows =
+          List.of(
+              answered(utc(9, 10), 20000, true, null, 2),
+              answered(utc(9, 11), 20000, true, null, 2),
+              answered(utc(11, 10), 5000, true, null, 2));
+      RecallStatsDTO dto = aggregate(rows, now);
+      assertThat(dto.getPace().getPctVsUsual(), lessThan(0.0));
+    }
+
+    @Test
+    void itemWithNoPriorHistoryTodayExcludedFromSampleSizeButCountsTowardTotalAnsweredToday() {
+      Timestamp now = utc(11, 12);
+      List<RecallAnswerRow> rows = List.of(answered(utc(11, 10), 5000, true, null, 3));
+      RecallStatsDTO dto = aggregate(rows, now);
+      RecallStatsDTO.PaceStats pace = dto.getPace();
+      assertThat(pace.getSampleSize(), equalTo(0));
+      assertThat(pace.getPctVsUsual(), nullValue());
+      assertThat(pace.getTotalAnsweredToday(), equalTo(1));
+    }
+
+    @Test
+    void sampleSizeZeroWhenNoQualifyingResiduals() {
+      Timestamp now = utc(11, 12);
+      RecallStatsDTO dto = aggregate(List.of(), now);
+      assertThat(dto.getPace().getSampleSize(), equalTo(0));
+      assertThat(dto.getPace().getPctVsUsual(), nullValue());
+    }
+  }
+
+  @Nested
   class CalendarShape {
     @Test
     void calendarHas365ZeroFilledEntries() {

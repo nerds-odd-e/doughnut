@@ -46,6 +46,10 @@ import { noteSidebar } from './pageObjects/noteSidebar'
 import { assumeNoteTargetSearchDialog } from './pageObjects/noteTargetSearchDialog'
 import { assumeQuestionPage } from './pageObjects/QuizQuestionPage'
 import { recall } from './pageObjects/recallPage'
+import {
+  recallStatsPage,
+  visitRecallStatsPage,
+} from './pageObjects/recallStatsPage'
 import { form } from './forms'
 
 const start = {
@@ -88,6 +92,8 @@ const start = {
   notebookCard,
   noteSidebar,
   recall,
+  recallStatsPage,
+  visitRecallStatsPage,
   navigateToNotebookPage,
   navigateToNotebooksPage,
 

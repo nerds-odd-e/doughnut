@@ -6,6 +6,7 @@ import com.odde.donut.controllers.dto.RecallStatsDTO.DayAvgResponseTime;
 import com.odde.donut.controllers.dto.RecallStatsDTO.DayCount;
 import com.odde.donut.controllers.dto.RecallStatsDTO.DayRetention;
 import com.odde.donut.controllers.dto.RecallStatsDTO.HeadlineStats;
+import com.odde.donut.controllers.dto.RecallStatsDTO.PaceStats;
 import com.odde.donut.entities.User;
 import com.odde.donut.entities.repositories.RecallPromptRepository;
 import com.odde.donut.utils.TimestampOperations;
@@ -115,9 +116,10 @@ public class RecallStatsService {
             retentionPct365,
             hourCorrect,
             hourAnswered);
+    PaceStats pace = RecallPaceAggregator.buildPace(allTimeReviews, today, zoneId);
 
     return new RecallStatsDTO(
-        calendar, trend, retentionTrend, amPm, weekdayHourCounts, weekdayHourCorrect, totals);
+        calendar, trend, retentionTrend, amPm, weekdayHourCounts, weekdayHourCorrect, totals, pace);
   }
 
   private static Timestamp minusDays(Timestamp ts, int days) {

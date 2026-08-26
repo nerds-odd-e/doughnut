@@ -115,7 +115,8 @@ export const recallTestabilityMethods = {
 
   submitWrongMcqRecallAnswer(
     this: { dueRecallPrompt(): Cypress.Chainable<RecallPrompt> },
-    wrongChoiceText: string
+    wrongChoiceText: string,
+    thinkingTimeMs = 1000
   ) {
     return this.dueRecallPrompt().then((recallPrompt) => {
       const choices = recallPrompt?.mcq?.responseChoices
@@ -128,7 +129,7 @@ export const recallTestabilityMethods = {
       return cy.wrap(
         RecallPromptController.answer({
           path: { recallPrompt: recallPrompt!.id },
-          body: { choiceIndex, thinkingTimeMs: 1000 },
+          body: { choiceIndex, thinkingTimeMs },
         }),
         { log: false }
       )

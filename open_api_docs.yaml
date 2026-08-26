@@ -4981,6 +4981,18 @@ components:
         worstHourRetentionPct:
           type: number
           format: double
+    PaceStats:
+      type: object
+      properties:
+        pctVsUsual:
+          type: number
+          format: double
+        sampleSize:
+          type: integer
+          format: int32
+        totalAnsweredToday:
+          type: integer
+          format: int32
     RecallStatsDTO:
       type: object
       properties:
@@ -5014,6 +5026,8 @@ components:
               format: int32
         totals:
           $ref: "#/components/schemas/HeadlineStats"
+        pace:
+          $ref: "#/components/schemas/PaceStats"
     QuestionGenerationBatchUserScheduleDTO:
       type: object
       properties:

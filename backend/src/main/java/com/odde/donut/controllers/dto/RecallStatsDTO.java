@@ -14,6 +14,7 @@ public class RecallStatsDTO {
   private int[][] weekdayHourCounts;
   private int[][] weekdayHourCorrect;
   private HeadlineStats totals;
+  private PaceStats pace;
 
   @Data
   @AllArgsConstructor
@@ -48,6 +49,14 @@ public class RecallStatsDTO {
     private Integer eveningSamples;
     private Long nightMs;
     private Integer nightSamples;
+  }
+
+  @Data
+  @AllArgsConstructor
+  public static class PaceStats {
+    private Double pctVsUsual;
+    private Integer sampleSize;
+    private Integer totalAnsweredToday;
   }
 
   @Data

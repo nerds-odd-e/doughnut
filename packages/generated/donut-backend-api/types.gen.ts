@@ -935,6 +935,12 @@ export type HeadlineStats = {
     worstHourRetentionPct?: number;
 };
 
+export type PaceStats = {
+    pctVsUsual?: number;
+    sampleSize?: number;
+    totalAnsweredToday?: number;
+};
+
 export type RecallStatsDto = {
     calendar?: Array<DayCount>;
     trend?: Array<DayAvgResponseTime>;
@@ -943,6 +949,7 @@ export type RecallStatsDto = {
     weekdayHourCounts?: Array<Array<number>>;
     weekdayHourCorrect?: Array<Array<number>>;
     totals?: HeadlineStats;
+    pace?: PaceStats;
 };
 
 export type QuestionGenerationBatchUserScheduleDto = {

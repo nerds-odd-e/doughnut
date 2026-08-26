@@ -284,7 +284,7 @@ now also selects `mt.id, mt.note.id` in the same JPQL constructor expression —
 no extra join needed. `RecallStatsTestFixtures.answered()`/`overlapAnswered()`
 pass `null, null` placeholders since nothing consumes the fields yet.
 
-#### 9. Recall Stats shows today's pace against your usual — Behavior `[ ]`
+#### 9. Recall Stats shows today's pace against your usual — Behavior `[x]`
 
 Per-item time-intensity EWMA plus session position, as a tile above
 `RecallStatsTiles`.
@@ -292,6 +292,24 @@ Per-item time-intensity EWMA plus session position, as a tile above
 - **Interim:** no retrievability or difficulty correction — removed by slice 17.
 - E2E: new `recall/recall_stats.feature` (no existing coverage)
 - Backend unit: through `UserController.getRecallStats` with `makeMe` data
+
+Done: the research memo linked at the top of this plan is not accessible
+(private artifact); design confirmed with the developer instead —
+`RecallPaceAggregator.buildPace()` maintains a per-item (`memoryTrackerId`)
+EWMA of `ln(responseTimeMs)` (alpha=0.3, seeded on first valid answer);
+today's residual per qualifying item is `ln(observed) − τ_j` (baseline taken
+*before* today's update); the tile's `pctVsUsual = (exp(mean residual) − 1) ×
+100` (positive = slower). Items with no prior baseline are excluded from
+`sampleSize` (slice 12 addresses cold-start weighting later) but still count
+toward `totalAnsweredToday` ("session position" context). New
+`RecallStatsDTO.PaceStats`, new `PaceTile.vue` rendered above
+`RecallStatsTiles`. E2E scenario added but left `@wip`: root cause is
+`Answer.createdAt` using `System.currentTimeMillis()` (real wall clock) while
+the stats query window derives from the testability time-travel clock — the
+same category of clock mismatch already hit by slice 6's detour scenario, out
+of scope to fix here. Backend (`RecallStatsServiceTest.Pace`) and frontend
+(`PaceTile.spec.ts`, `RecallStatsSettingsTab.spec.ts`) unit tests are the
+primary verification.
 
 #### 10. Implausibly fast attempts stop distorting pace — Behavior `[ ]`
 
