@@ -14,7 +14,7 @@ inputs:
   redis_container_name:
     description: "Redis container name"
     required: false
-    default: "redis-doughnut"
+    default: "redis-donut"
 runs:
   using: "composite"
   steps:

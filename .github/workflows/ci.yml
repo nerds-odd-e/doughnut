@@ -1,7 +1,7 @@
 # This workflow will build a package using Gradle and then publish it to GitHub packages when a release is created
 # For more information see: https://github.com/actions/setup-java#publishing-using-gradle
 
-name: doughnut CI
+name: donut CI
 
 on:
   push:
@@ -13,7 +13,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  ARTIFACT: "doughnut"
+  ARTIFACT: "donut"
   VERSION: "0.0.1-SNAPSHOT"
   FRONTEND_DIST_ARTIFACT: frontend-dist
   CLI_DIST_ARTIFACT: cli-dist

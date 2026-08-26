@@ -1,8 +1,8 @@
-name: doughnut deploy
+name: donut deploy
 
 on:
   workflow_run:
-    workflows: ["doughnut CI"]
+    workflows: ["donut CI"]
     types: [completed]
     branches: [main]
 
@@ -11,7 +11,7 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  ARTIFACT: "doughnut"
+  ARTIFACT: "donut"
   VERSION: "0.0.1-SNAPSHOT"
   FRONTEND_DIST_ARTIFACT: frontend-dist
   CLI_DIST_ARTIFACT: cli-dist
@@ -149,6 +149,6 @@ jobs:
                       - type: mrkdwn
                         text: "*deploy run*\n<${{ steps.ctx.outputs.run_url }}|${{ github.workflow }}>"
                       - type: mrkdwn
-                        text: "*CI run*\n<${{ steps.ctx.outputs.ci_run_url }}|doughnut CI>"
+                        text: "*CI run*\n<${{ steps.ctx.outputs.ci_run_url }}|donut CI>"
                       - type: mrkdwn
                         text: "*event*\nworkflow_run on `${{ github.event.workflow_run.head_branch }}`"

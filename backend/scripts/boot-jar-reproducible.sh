@@ -13,7 +13,7 @@ set -euo pipefail
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "$REPO_ROOT"
 
-JAR="backend/build/libs/doughnut-0.0.1-SNAPSHOT.jar"
+JAR="backend/build/libs/donut-0.0.1-SNAPSHOT.jar"
 
 fail() {
 	echo "boot-jar-reproducible.sh: $*" >&2

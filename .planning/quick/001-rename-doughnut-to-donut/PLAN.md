@@ -240,6 +240,8 @@ confirm they still pass.
 
 ### 11. CI workflow internal naming (Structure)
 
+Status: done
+
 Rename internal artifact/job/step names and script paths (updated by earlier
 slices) in `.github/workflows/*.yml` and the composite actions under
 `.github/*/action.yml`. Leave the literal external repo path
