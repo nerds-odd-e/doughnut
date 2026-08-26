@@ -34,12 +34,12 @@ const LOCAL_SPA_SHELL_PATHS = new Set(
 /** Default: same as prod GCS object; from `pnpm cli:bundle`. */
 const CLI_DEFAULT_INSTALL_BUNDLE = path.join(
   repoRoot,
-  'cli/dist/doughnut-cli.bundle.mjs'
+  'cli/dist/donut-cli.bundle.mjs'
 )
 /** Cypress `@bundleCliE2eInstall` builds here so install scenarios do not overwrite the default bundle. */
 const CLI_CYPRESS_ALT_INSTALL_BUNDLE = path.join(
   repoRoot,
-  'cli/dist/e2e-install-doughnut-cli.bundle.mjs'
+  'cli/dist/e2e-install-donut-cli.bundle.mjs'
 )
 
 function cliInstallBundlePath() {

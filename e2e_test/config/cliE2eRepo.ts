@@ -1,5 +1,5 @@
 /**
- * Run or bundle the Doughnut CLI from a repo checkout (Node only; no Cypress).
+ * Run or bundle the Donut CLI from a repo checkout (Node only; no Cypress).
  */
 
 import { spawnSync } from 'node:child_process'
@@ -16,7 +16,7 @@ import {
   GMAIL_E2E_GOOGLE_CLIENT_SECRET,
 } from './cliGmailE2eConfig'
 
-export const CLI_BUNDLE_RELATIVE_PATH = 'cli/dist/doughnut-cli.bundle.mjs'
+export const CLI_BUNDLE_RELATIVE_PATH = 'cli/dist/donut-cli.bundle.mjs'
 
 /** Subprocess `pnpm` from Cypress may inherit user config pointing at a missing project pnpmfile. */
 export const CLI_E2E_PNPM_SPAWN_ENV: NodeJS.ProcessEnv = {
@@ -43,10 +43,9 @@ function defaultCliBundleHasGmailE2eClientId(repoRoot: string): boolean {
 
 /** Cypress install scenarios build here so version bumps do not overwrite the default bundle. */
 export const CLI_E2E_INSTALL_BUNDLE_RELATIVE_PATH =
-  'cli/dist/e2e-install-doughnut-cli.bundle.mjs'
+  'cli/dist/e2e-install-donut-cli.bundle.mjs'
 
-const CLI_E2E_INSTALL_BUNDLE_OUTFILE =
-  './dist/e2e-install-doughnut-cli.bundle.mjs'
+const CLI_E2E_INSTALL_BUNDLE_OUTFILE = './dist/e2e-install-donut-cli.bundle.mjs'
 
 export function readCliPackageVersion(repoRoot: string): string {
   const pkg = JSON.parse(
@@ -67,11 +66,11 @@ function cliE2eInstallBundleVersion(
 }
 
 function cliE2eInstallBundleCacheRelativePath(version: string): string {
-  return `cli/dist/e2e-install-doughnut-cli-${version}.bundle.mjs`
+  return `cli/dist/e2e-install-donut-cli-${version}.bundle.mjs`
 }
 
 /** Env: set to `1` to spawn `tsx src/index.ts` instead of the bundle (debug only). */
-export const CLI_E2E_USE_TSX_ENV = 'DOUGHNUT_CLI_E2E_USE_TSX' as const
+export const CLI_E2E_USE_TSX_ENV = 'DONUT_CLI_E2E_USE_TSX' as const
 
 const SKIP_DIR_NAMES = new Set(['node_modules', '.git'])
 
@@ -120,7 +119,7 @@ function maxMtimeMsUnderDir(absDir: string): number {
   return max
 }
 
-/** Rebuild `cli/dist/doughnut-cli.bundle.mjs` when missing or older than CLI / donut-api sources. */
+/** Rebuild `cli/dist/donut-cli.bundle.mjs` when missing or older than CLI / donut-api sources. */
 export function ensureCliBundleFresh(repoRoot: string): void {
   const bundlePath = join(repoRoot, CLI_BUNDLE_RELATIVE_PATH)
   let inputMax = maxMtimeMsOfFiles(repoRoot, [

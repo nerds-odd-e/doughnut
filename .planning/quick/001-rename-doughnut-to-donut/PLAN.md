@@ -165,6 +165,8 @@ unchanged.
 
 ### 9. E2E / Cypress internal references (Structure)
 
+Status: done
+
 Update `e2e_test/**` and Cypress config/support files for the renames from
 Slices 2, 3, 4, 6 (fixture imports, CLI env var names/binary name, any Java
 package path strings). Leave assertions on the kept external URL or the
