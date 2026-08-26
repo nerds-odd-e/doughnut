@@ -41,6 +41,26 @@ public class Answer extends EntityIdentifiedByIdOnly {
   @Setter
   private String spellingAnswer;
 
+  @Column(name = "away_ms")
+  @Setter
+  private Integer awayMs;
+
+  @Column(name = "away_count")
+  @Setter
+  private Integer awayCount;
+
+  @Column(name = "detour_ms")
+  @Setter
+  private Integer detourMs;
+
+  @Column(name = "detour_count")
+  @Setter
+  private Integer detourCount;
+
+  @Column(name = "idle_ms")
+  @Setter
+  private Integer idleMs;
+
   @Transient @Getter @Setter private Long matchedNoteId;
 
   @Column(name = "outcome")

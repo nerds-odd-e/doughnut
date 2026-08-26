@@ -166,15 +166,24 @@ listeners added, per the plan's design decision.
 Each slice writes one kind of pause **and** renders it, so nothing is write-only
 data waiting for a consumer.
 
-#### 4. Pause columns on `answer` — Structure `[ ]`
+#### 4. Pause columns on `answer` — Structure `[x]`
 
-`V300000303__add_pause_record_to_answer.sql`: `away_ms`, `away_count`,
+`V300000302__add_pause_tracking_to_answer.sql`: `away_ms`, `away_count`,
 `detour_ms`, `detour_count`, `idle_ms`, all nullable with no default, plus entity
 fields. NULL must mean "predates the instrumentation" — a `NOT NULL DEFAULT 0`
 would make an uninstrumented answer indistinguishable from an uninterrupted one.
 
 - `thinking_time_ms` is **not** renamed; it is on the wire and rendered today.
 - **Enables slice 5 only.** Regenerate `docs/database-erd.md`.
+
+Done: migration filename is `V300000302` (next available after `V300000301`,
+not the `V300000303` guessed when this plan was drafted — later slices should
+likewise compute their number fresh from the migration directory rather than
+trusting a hardcoded number in this plan text; **slice 15's stated
+`V300000302` will collide and must be recomputed when that slice runs**).
+`Answer.java` gained 5 nullable boxed `Integer` fields matching the existing
+`thinkingTimeMs` pattern. `docs/database-erd.md` regenerated — no diff, since
+none of the new columns are keys/FKs.
 
 #### 5. Time away from the tab is recorded and shown — Behavior `[ ]`
 
@@ -246,6 +255,9 @@ baseline (median and MAD, trailing 60 days, excluding the last 3).
 `V300000302__add_memory_state_to_recall_log.sql`: `stability_before FLOAT NULL`,
 `difficulty_before FLOAT NULL`, `retrievability DOUBLE NULL`, plus entity fields.
 
+- **Note:** slice 4 already claimed `V300000302` — compute the actual next
+  available version number from `backend/src/main/resources/db/migration/` at
+  implementation time rather than reusing this stale filename.
 - **Jidoka first — see ADR 0003 tension above.**
 - **Enables slice 16 only.** Regenerate `docs/database-erd.md`.
 
