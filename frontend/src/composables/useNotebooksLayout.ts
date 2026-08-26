@@ -1,6 +1,6 @@
 import { onMounted, ref, watch } from "vue"
 
-const NOTEBOOKS_LAYOUT_STORAGE_KEY = "doughnut.notebooksPage.layout"
+const NOTEBOOKS_LAYOUT_STORAGE_KEY = "donut.notebooksPage.layout"
 
 export function useNotebooksLayout() {
   const notebooksLayout = ref<"list" | "grid">("list")

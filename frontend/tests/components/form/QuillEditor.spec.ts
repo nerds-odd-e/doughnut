@@ -111,7 +111,7 @@ describe("QuillEditor.vue", () => {
 
     await mountEditor({
       modelValue:
-        '<p><a href="https://example.com/path">ext</a> <a href="/n1" class="doughnut-wiki-link">wiki</a></p>',
+        '<p><a href="https://example.com/path">ext</a> <a href="/n1" class="donut-wiki-link">wiki</a></p>',
       readonly: true,
     })
     await vi.waitUntil(() => document.querySelector(".ql-editor a"))
@@ -134,7 +134,7 @@ describe("QuillEditor.vue", () => {
     pushSpy.mockClear()
 
     const wiki = document.querySelector(
-      ".ql-editor a.doughnut-wiki-link"
+      ".ql-editor a.donut-wiki-link"
     ) as HTMLAnchorElement
     wiki.dispatchEvent(
       new MouseEvent("click", { bubbles: true, cancelable: true })

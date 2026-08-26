@@ -4,23 +4,23 @@ import { ref } from "vue"
 
 export default interface NoteStorage {
   refreshNoteRealm(data: NoteRealm): NoteRealm
-  removeNoteRealm(noteId: Doughnut.ID): void
-  refOfNoteRealm(noteId: Doughnut.ID): Ref<NoteRealm | undefined>
+  removeNoteRealm(noteId: Donut.ID): void
+  refOfNoteRealm(noteId: Donut.ID): Ref<NoteRealm | undefined>
 }
 
 export class StorageImplementation implements NoteStorage {
-  cache: Map<Doughnut.ID, Ref<NoteRealm | undefined>> = new Map()
+  cache: Map<Donut.ID, Ref<NoteRealm | undefined>> = new Map()
 
   refreshNoteRealm(noteRealm: NoteRealm): NoteRealm {
     this.refOfNoteRealm(noteRealm?.id).value = noteRealm
     return noteRealm
   }
 
-  removeNoteRealm(noteId: Doughnut.ID): void {
+  removeNoteRealm(noteId: Donut.ID): void {
     this.cache.delete(noteId)
   }
 
-  refOfNoteRealm(noteId: Doughnut.ID): Ref<NoteRealm | undefined> {
+  refOfNoteRealm(noteId: Donut.ID): Ref<NoteRealm | undefined> {
     if (!this.cache.has(noteId)) {
       this.cache.set(noteId, ref(undefined))
     }

@@ -8,7 +8,7 @@ import {
 } from "@/components/form/quillHtmlPreprocess"
 import {
   DEAD_WIKI_LINK_CLASS,
-  DOUGHNUT_WIKI_LINK_CLASS,
+  DONUT_WIKI_LINK_CLASS,
 } from "@/utils/wikiLinkDomMarkers"
 import { wikiAnchorToMarkdownToken } from "@/utils/wikiLinkMarkup"
 
@@ -168,12 +168,12 @@ turndownService.addRule("italicWithEscapedEntities", {
   },
 })
 
-turndownService.addRule("doughnutWikiLink", {
+turndownService.addRule("donutWikiLink", {
   filter(node) {
     if (node.nodeName !== "A") return false
     const el = node as HTMLElement
     return (
-      el.classList.contains(DOUGHNUT_WIKI_LINK_CLASS) ||
+      el.classList.contains(DONUT_WIKI_LINK_CLASS) ||
       el.classList.contains(DEAD_WIKI_LINK_CLASS)
     )
   },
@@ -182,7 +182,7 @@ turndownService.addRule("doughnutWikiLink", {
   },
 })
 
-/** Pasted HTML often has plain note-show hrefs without doughnut-wiki-link class. */
+/** Pasted HTML often has plain note-show hrefs without donut-wiki-link class. */
 function hrefIsInternalNoteShow(href: string | null): boolean {
   if (!href?.trim()) return false
   try {
@@ -193,11 +193,11 @@ function hrefIsInternalNoteShow(href: string | null): boolean {
   }
 }
 
-turndownService.addRule("doughnutNoteShowHrefWikiLink", {
+turndownService.addRule("donutNoteShowHrefWikiLink", {
   filter(node) {
     if (node.nodeName !== "A") return false
     const el = node as HTMLAnchorElement
-    if (el.classList.contains(DOUGHNUT_WIKI_LINK_CLASS)) {
+    if (el.classList.contains(DONUT_WIKI_LINK_CLASS)) {
       return false
     }
     return hrefIsInternalNoteShow(el.getAttribute("href"))

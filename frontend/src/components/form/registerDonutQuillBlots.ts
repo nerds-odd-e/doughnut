@@ -57,8 +57,8 @@ class MarkBlot extends Inline {
 
 let registered = false
 
-/** Registers Doughnut-specific Quill blots once per page load. */
-export function registerDoughnutQuillBlots() {
+/** Registers Donut-specific Quill blots once per page load. */
+export function registerDonutQuillBlots() {
   if (registered) return
   registered = true
 
@@ -80,5 +80,4 @@ export function registerDoughnutQuillBlots() {
   )
 }
 
-export const doughnutQuillBrMatcher = () =>
-  new Delta().insert({ softbreak: true })
+export const donutQuillBrMatcher = () => new Delta().insert({ softbreak: true })

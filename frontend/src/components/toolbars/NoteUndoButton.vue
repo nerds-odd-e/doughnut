@@ -56,7 +56,7 @@ const getNoteTopology = () => {
   return noteRealm?.note?.noteTopology
 }
 
-const getNoteIdentifier = (noteId: Doughnut.ID): string => {
+const getNoteIdentifier = (noteId: Donut.ID): string => {
   const title =
     storageAccessor.value.refOfNoteRealm(noteId).value?.note?.noteTopology.title
   return quotedNoteLabel(title, noteId)

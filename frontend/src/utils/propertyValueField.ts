@@ -2,7 +2,7 @@ import type { WikiTitle } from "@generated/donut-backend-api"
 import { noteShowHref } from "@/routes/noteShowLocation"
 import {
   DEAD_WIKI_LINK_CLASS,
-  DOUGHNUT_WIKI_LINK_CLASS,
+  DONUT_WIKI_LINK_CLASS,
 } from "@/utils/wikiLinkDomMarkers"
 import {
   authoredLinkOccurrences,
@@ -44,9 +44,7 @@ export function propertyValuePlainToDisplayHtml(
       out += wikiLinkAnchorHtml({
         href: target,
         className:
-          noteId === undefined
-            ? DEAD_WIKI_LINK_CLASS
-            : DOUGHNUT_WIKI_LINK_CLASS,
+          noteId === undefined ? DEAD_WIKI_LINK_CLASS : DONUT_WIKI_LINK_CLASS,
         target,
         display,
         noteId,
@@ -67,7 +65,7 @@ export function propertyValuePlainToDisplayHtml(
         ? ` data-wiki-display="${escapeHtmlAttributeValue(display)}"`
         : ""
     if (noteId !== undefined) {
-      out += `<a href="${noteShowHref(noteId)}" class="${DOUGHNUT_WIKI_LINK_CLASS}" data-wiki-title="${attrTarget}"${displayAttr}>${innerHtml}</a>`
+      out += `<a href="${noteShowHref(noteId)}" class="${DONUT_WIKI_LINK_CLASS}" data-wiki-title="${attrTarget}"${displayAttr}>${innerHtml}</a>`
     } else {
       out += `<a href="#" class="${DEAD_WIKI_LINK_CLASS}" data-wiki-title="${attrTarget}"${displayAttr}>${innerHtml}</a>`
     }
@@ -86,7 +84,7 @@ export function serializePropertyValueFieldRoot(el: HTMLElement): string {
       continue
     } else if (node instanceof HTMLAnchorElement) {
       if (
-        node.classList.contains(DOUGHNUT_WIKI_LINK_CLASS) ||
+        node.classList.contains(DONUT_WIKI_LINK_CLASS) ||
         node.classList.contains(DEAD_WIKI_LINK_CLASS)
       ) {
         out += wikiAnchorToMarkdownToken(node)

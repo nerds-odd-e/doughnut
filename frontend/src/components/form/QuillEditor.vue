@@ -9,16 +9,16 @@ import Quill, { type QuillOptions, type Range } from "quill"
 import "quill/dist/quill.bubble.css"
 import markdownizer from "./markdownizer"
 import {
-  doughnutQuillBrMatcher,
-  registerDoughnutQuillBlots,
-} from "./registerDoughnutQuillBlots"
+  donutQuillBrMatcher,
+  registerDonutQuillBlots,
+} from "./registerDonutQuillBlots"
 import {
   handleRichContentAnchorClick,
   type DeadWikiLinkPayload,
 } from "@/utils/wikiLinkMarkup"
 import { DEAD_WIKI_LINK_CLASS } from "@/utils/wikiLinkDomMarkers"
 
-registerDoughnutQuillBlots()
+registerDonutQuillBlots()
 
 const props = defineProps({
   modelValue: String,
@@ -83,7 +83,7 @@ const options: QuillOptions = {
       },
     },
     clipboard: {
-      matchers: [["BR", doughnutQuillBrMatcher]],
+      matchers: [["BR", donutQuillBrMatcher]],
       matchVisual: false,
     },
   },

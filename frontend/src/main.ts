@@ -6,7 +6,7 @@ import "vue-toastification/dist/index.css"
 import routes from "./routes/routes"
 import "./assets/daisyui.css"
 import "./assets/dirty-indicator.css"
-import DoughnutAppVue from "./DoughnutApp.vue"
+import DonutAppVue from "./DonutApp.vue"
 import { scheduleFocusTargetWithin } from "./utils/focusTarget"
 
 const router = createRouter({
@@ -17,7 +17,7 @@ const router = createRouter({
 // to accelerate e2e test
 Object.assign(window, { router })
 
-const app = createApp(DoughnutAppVue)
+const app = createApp(DonutAppVue)
 
 app.use(router)
 

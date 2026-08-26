@@ -8,7 +8,7 @@ function makeTarget(title: string, notebookId: number, notebookName?: string) {
 describe("buildWikiLinkText", () => {
   it("returns simple wiki link when source and target are in the same notebook", () => {
     expect(
-      buildWikiLinkText(makeTarget("CI", 1, "Doughnut"), { notebookId: 1 })
+      buildWikiLinkText(makeTarget("CI", 1, "Donut"), { notebookId: 1 })
     ).toBe("[[CI]]")
   })
 
@@ -44,7 +44,7 @@ describe("buildWikiLinkText", () => {
 
   it("adds display text after pipe when different from target inner", () => {
     expect(
-      buildWikiLinkText(makeTarget("CI", 1, "Doughnut"), {
+      buildWikiLinkText(makeTarget("CI", 1, "Donut"), {
         notebookId: 1,
         displayText: "friendly",
       })
@@ -62,7 +62,7 @@ describe("buildWikiLinkText", () => {
 
   it("ignores whitespace-only display text", () => {
     expect(
-      buildWikiLinkText(makeTarget("CI", 1, "Doughnut"), {
+      buildWikiLinkText(makeTarget("CI", 1, "Donut"), {
         notebookId: 1,
         displayText: "   \t\n",
       })
@@ -71,7 +71,7 @@ describe("buildWikiLinkText", () => {
 
   it("omits pipe when display text equals default inner", () => {
     expect(
-      buildWikiLinkText(makeTarget("CI", 1, "Doughnut"), {
+      buildWikiLinkText(makeTarget("CI", 1, "Donut"), {
         notebookId: 1,
         displayText: "CI",
       })
@@ -86,13 +86,13 @@ describe("buildWikiLinkText", () => {
 
   it("trims display text before comparing and emitting", () => {
     expect(
-      buildWikiLinkText(makeTarget("CI", 1, "Doughnut"), {
+      buildWikiLinkText(makeTarget("CI", 1, "Donut"), {
         notebookId: 1,
         displayText: "  CI  ",
       })
     ).toBe("[[CI]]")
     expect(
-      buildWikiLinkText(makeTarget("CI", 1, "Doughnut"), {
+      buildWikiLinkText(makeTarget("CI", 1, "Donut"), {
         notebookId: 1,
         displayText: "  label  ",
       })

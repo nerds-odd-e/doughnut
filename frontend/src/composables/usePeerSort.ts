@@ -8,7 +8,7 @@ export type PeerSortSpec = {
   direction: PeerSortDirection
 }
 
-export const PEER_SORT_STORAGE_KEY = "doughnut.noteSidebar.peerSort"
+export const PEER_SORT_STORAGE_KEY = "donut.noteSidebar.peerSort"
 
 const defaultSpec: PeerSortSpec = {
   field: "title",

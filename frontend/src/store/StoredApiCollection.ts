@@ -69,14 +69,12 @@ function throwStoredApiError(
 }
 
 export interface StoredApi {
-  getNoteRealmRefAndLoadWhenNeeded(
-    noteId: Doughnut.ID
-  ): Ref<NoteRealm | undefined>
+  getNoteRealmRefAndLoadWhenNeeded(noteId: Donut.ID): Ref<NoteRealm | undefined>
 
-  getNoteRealmRef(noteId: Doughnut.ID): Ref<NoteRealm | undefined>
+  getNoteRealmRef(noteId: Donut.ID): Ref<NoteRealm | undefined>
 
   /** Loads a note realm into storage (same as navigating to the note-id route). */
-  loadNoteRealm(noteId: Doughnut.ID): Promise<NoteRealm>
+  loadNoteRealm(noteId: Donut.ID): Promise<NoteRealm>
 
   createRootNoteAtNotebook(
     router: Router,
@@ -90,13 +88,13 @@ export interface StoredApi {
   ): Promise<NoteRealm>
 
   /** PATCH undo-delete for a soft-deleted note; refreshes storage and navigates to the note. */
-  restoreDeletedNote(router: Router, noteId: Doughnut.ID): Promise<NoteRealm>
+  restoreDeletedNote(router: Router, noteId: Donut.ID): Promise<NoteRealm>
 
   /** Refresh storage, sidebar listings, and navigate to this note (replace route). */
   focusNoteRealm(router: Router, noteRealm: NoteRealm): Promise<NoteRealm>
 
   updateTextField(
-    noteId: Doughnut.ID,
+    noteId: Donut.ID,
     field: "edit title" | "edit content",
     value: string,
     options?: {
@@ -105,31 +103,28 @@ export interface StoredApi {
   ): Promise<void>
 
   /** Persists note content without recording undo (e.g. initial body after create). */
-  setNoteContentWithoutUndo(noteId: Doughnut.ID, content: string): Promise<void>
+  setNoteContentWithoutUndo(noteId: Donut.ID, content: string): Promise<void>
 
   completeContent(
-    noteId: Doughnut.ID,
+    noteId: Donut.ID,
     value?: NoteContentCompletion
   ): Promise<void>
 
   /** PATCH note content with current stored body so the backend rebuilds wiki title cache. */
-  refreshWikiLinkCacheForNote(noteId: Doughnut.ID): Promise<void>
+  refreshWikiLinkCacheForNote(noteId: Donut.ID): Promise<void>
 
   undo(router: Router): Promise<NoteRealm | undefined>
 
   deleteNote(
     router: Router,
-    noteId: Doughnut.ID,
+    noteId: Donut.ID,
     options: NoteDeleteOptions
   ): Promise<NoteRealm | undefined>
 
-  moveNoteToFolder(
-    sourceId: Doughnut.ID,
-    targetFolderId: Doughnut.ID
-  ): Promise<void>
+  moveNoteToFolder(sourceId: Donut.ID, targetFolderId: Donut.ID): Promise<void>
 
   moveNoteToNotebookRoot(
-    sourceId: Doughnut.ID,
+    sourceId: Donut.ID,
     targetNotebookId: number
   ): Promise<void>
 }
@@ -152,7 +147,7 @@ export default class StoredApiCollection implements StoredApi {
   }
 
   private async updateTextContentWithoutUndo(
-    noteId: Doughnut.ID,
+    noteId: Donut.ID,
     field: "edit title" | "edit content",
     content: string,
     titleReferenceHandling?: TitleRenameReferenceHandling
@@ -167,7 +162,7 @@ export default class StoredApiCollection implements StoredApi {
   }
 
   private async callUpdateApi(
-    noteId: Doughnut.ID,
+    noteId: Donut.ID,
     field: "edit title" | "edit content",
     content: string,
     titleReferenceHandling?: TitleRenameReferenceHandling
@@ -211,7 +206,7 @@ export default class StoredApiCollection implements StoredApi {
     return data
   }
 
-  private async loadNote(noteId: Doughnut.ID) {
+  private async loadNote(noteId: Donut.ID) {
     const { data: noteRealm, error } = await apiCallWithLoading(() =>
       NoteController.showNote({
         path: { note: noteId },
@@ -223,17 +218,17 @@ export default class StoredApiCollection implements StoredApi {
     return this.storage.refreshNoteRealm(noteRealm)
   }
 
-  async loadNoteRealm(noteId: Doughnut.ID): Promise<NoteRealm> {
+  async loadNoteRealm(noteId: Donut.ID): Promise<NoteRealm> {
     return this.loadNote(noteId)
   }
 
-  getNoteRealmRefAndLoadWhenNeeded(noteId: Doughnut.ID) {
+  getNoteRealmRefAndLoadWhenNeeded(noteId: Donut.ID) {
     const result = this.storage.refOfNoteRealm(noteId)
     if (!result.value) this.loadNote(noteId)
     return result
   }
 
-  getNoteRealmRef(noteId: Doughnut.ID) {
+  getNoteRealmRef(noteId: Donut.ID) {
     return this.storage.refOfNoteRealm(noteId)
   }
 
@@ -289,7 +284,7 @@ export default class StoredApiCollection implements StoredApi {
     return this.navigateToFocusedNote(router, focus)
   }
 
-  async restoreDeletedNote(router: Router, noteId: Doughnut.ID) {
+  async restoreDeletedNote(router: Router, noteId: Donut.ID) {
     const { data: noteRealm, error } = await apiCallWithLoading(() =>
       NoteController.undoDeleteNote({
         path: { note: noteId },
@@ -306,7 +301,7 @@ export default class StoredApiCollection implements StoredApi {
     refreshSidebarStructuralListings()
   }
 
-  private placementUndoForNote(sourceId: Doughnut.ID): {
+  private placementUndoForNote(sourceId: Donut.ID): {
     folderId: number | null
     notebookId: number
   } | null {
@@ -319,7 +314,7 @@ export default class StoredApiCollection implements StoredApi {
   }
 
   async updateTextField(
-    noteId: Doughnut.ID,
+    noteId: Donut.ID,
     field: "edit title" | "edit content",
     value: string,
     options?: { titleReferenceHandling?: TitleRenameReferenceHandling }
@@ -343,11 +338,11 @@ export default class StoredApiCollection implements StoredApi {
     )
   }
 
-  async setNoteContentWithoutUndo(noteId: Doughnut.ID, content: string) {
+  async setNoteContentWithoutUndo(noteId: Donut.ID, content: string) {
     await this.updateTextContentWithoutUndo(noteId, "edit content", content)
   }
 
-  async completeContent(noteId: Doughnut.ID, value?: NoteContentCompletion) {
+  async completeContent(noteId: Donut.ID, value?: NoteContentCompletion) {
     if (!value || !value.content) return
 
     let currentNote = this.storage.refOfNoteRealm(noteId).value?.note
@@ -358,7 +353,7 @@ export default class StoredApiCollection implements StoredApi {
     await this.updateTextField(noteId, "edit content", value.content)
   }
 
-  async refreshWikiLinkCacheForNote(noteId: Doughnut.ID): Promise<void> {
+  async refreshWikiLinkCacheForNote(noteId: Donut.ID): Promise<void> {
     let realm = this.storage.refOfNoteRealm(noteId).value
     if (!realm?.note) {
       realm = await this.loadNote(noteId)
@@ -405,8 +400,8 @@ export default class StoredApiCollection implements StoredApi {
   }
 
   private async undoMoveNote(
-    noteId: Doughnut.ID,
-    originalFolderId: Doughnut.ID | null,
+    noteId: Donut.ID,
+    originalFolderId: Donut.ID | null,
     originalNotebookId?: number
   ): Promise<NoteRealm> {
     if (originalFolderId != null) {
@@ -445,7 +440,7 @@ export default class StoredApiCollection implements StoredApi {
     return noteRealms[0]!
   }
 
-  private async undoCreateNote(noteId: Doughnut.ID): Promise<{
+  private async undoCreateNote(noteId: Donut.ID): Promise<{
     noteRealm: NoteRealm | undefined
     notebookFallbackId?: number
   }> {
@@ -489,7 +484,7 @@ export default class StoredApiCollection implements StoredApi {
 
   async deleteNote(
     router: Router,
-    noteId: Doughnut.ID,
+    noteId: Donut.ID,
     options: NoteDeleteOptions
   ) {
     const { referenceHandling, sourcePropertyKey, sourceNoteId } = options
@@ -543,7 +538,7 @@ export default class StoredApiCollection implements StoredApi {
     return focusRealm
   }
 
-  async moveNoteToFolder(sourceId: Doughnut.ID, targetFolderId: Doughnut.ID) {
+  async moveNoteToFolder(sourceId: Donut.ID, targetFolderId: Donut.ID) {
     const undoPlacement = this.placementUndoForNote(sourceId)
 
     const {
@@ -568,10 +563,7 @@ export default class StoredApiCollection implements StoredApi {
     }
   }
 
-  async moveNoteToNotebookRoot(
-    sourceId: Doughnut.ID,
-    targetNotebookId: number
-  ) {
+  async moveNoteToNotebookRoot(sourceId: Donut.ID, targetNotebookId: number) {
     const undoPlacement = this.placementUndoForNote(sourceId)
 
     const {

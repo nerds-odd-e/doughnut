@@ -171,7 +171,7 @@ import { computed, inject, onMounted, provide, ref, watch } from "vue"
 import { useRouter } from "vue-router"
 import ContainerPage from "./commons/ContainerPage.vue"
 
-const CIRCLE_NOTEBOOKS_SORT_STORAGE_KEY = "doughnut.circlePage.sortOrder"
+const CIRCLE_NOTEBOOKS_SORT_STORAGE_KEY = "donut.circlePage.sortOrder"
 
 const router = useRouter()
 

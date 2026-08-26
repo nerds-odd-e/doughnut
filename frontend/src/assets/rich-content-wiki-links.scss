@@ -5,14 +5,14 @@
     cursor: pointer;
   }
 
-  a.doughnut-wiki-link {
+  a.donut-wiki-link {
     color: var(--color-accent);
     text-decoration: underline;
     text-decoration-style: dotted;
     text-underline-offset: 0.15em;
   }
 
-  a:not(.doughnut-wiki-link):not(.dead-wiki-link) {
+  a:not(.donut-wiki-link):not(.dead-wiki-link) {
     color: var(--color-info);
     text-decoration: underline;
     text-underline-offset: 0.15em;

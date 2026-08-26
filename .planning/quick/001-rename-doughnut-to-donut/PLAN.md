@@ -156,6 +156,8 @@ Verify: `mcp-server` test suite green.
 
 ### 8. Frontend internal identifiers (Structure)
 
+Status: done
+
 Rename internal-only identifiers (variables, types, component/file names,
 test names, comments) containing `doughnut`/`Doughnut` across `frontend/src`
 (~169 non-import hits) and `frontend/package.json` `name` →

@@ -7,7 +7,7 @@
   >
     <div v-if="$slots.append" class="daisy-join w-full path-name-editor-join">
       <div
-        class="path-name-editor-join-editor daisy-join-item doughnut-field-control-surface flex flex-1 min-w-0 items-center px-3 py-2"
+        class="path-name-editor-join-editor daisy-join-item donut-field-control-surface flex flex-1 min-w-0 items-center px-3 py-2"
       >
         <div class="w-full min-w-0">
           <slot name="title" :bindings="seamlessBindings" :editor="SeamlessTextEditor">
@@ -24,7 +24,7 @@
 
     <div
       v-else-if="!$slots.title"
-      class="path-name-editor-shell doughnut-field-control-surface w-full min-w-0 flex items-center px-3 py-2 rounded-lg"
+      class="path-name-editor-shell donut-field-control-surface w-full min-w-0 flex items-center px-3 py-2 rounded-lg"
     >
       <div class="w-full min-w-0">
         <SeamlessTextEditor v-bind="seamlessBindings" />

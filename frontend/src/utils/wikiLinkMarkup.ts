@@ -5,7 +5,7 @@ import {
 } from "@/routes/noteShowLocation"
 import {
   DEAD_WIKI_LINK_CLASS,
-  DOUGHNUT_WIKI_LINK_CLASS,
+  DONUT_WIKI_LINK_CLASS,
 } from "@/utils/wikiLinkDomMarkers"
 
 export {
@@ -134,7 +134,7 @@ export function handleRichContentAnchorClick(
     return
   }
   const noteId = anchor.getAttribute("data-note-id")
-  if (anchor.classList.contains(DOUGHNUT_WIKI_LINK_CLASS) && noteId) {
+  if (anchor.classList.contains(DONUT_WIKI_LINK_CLASS) && noteId) {
     handlers.navigateInApp(noteShowHref(Number(noteId)))
     return
   }

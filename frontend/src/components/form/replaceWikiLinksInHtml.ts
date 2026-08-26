@@ -5,7 +5,7 @@ import {
 } from "@/routes/noteShowLocation"
 import {
   DEAD_WIKI_LINK_CLASS,
-  DOUGHNUT_WIKI_LINK_CLASS,
+  DONUT_WIKI_LINK_CLASS,
 } from "@/utils/wikiLinkDomMarkers"
 import {
   escapeHtmlAttributeValue,
@@ -35,10 +35,10 @@ function upgradeDeadWikiAnchors(html: string, wikiTitles: WikiTitle[]): string {
   }
   const parser = new DOMParser()
   const doc = parser.parseFromString(
-    `<div id="doughnut-wiki-upgrade-wrap">${html}</div>`,
+    `<div id="donut-wiki-upgrade-wrap">${html}</div>`,
     "text/html"
   )
-  const wrap = doc.getElementById("doughnut-wiki-upgrade-wrap")
+  const wrap = doc.getElementById("donut-wiki-upgrade-wrap")
   if (!wrap) return html
 
   for (const w of wikiTitles) {
@@ -55,7 +55,7 @@ function upgradeDeadWikiAnchors(html: string, wikiTitles: WikiTitle[]): string {
       }
       const live = doc.createElement("a")
       live.setAttribute("href", href)
-      live.className = DOUGHNUT_WIKI_LINK_CLASS
+      live.className = DONUT_WIKI_LINK_CLASS
       live.setAttribute("data-wiki-title", target)
       if (display !== target) {
         live.setAttribute("data-wiki-display", display)
@@ -91,7 +91,7 @@ function upgradePathMarkdownAnchors(
     const attrTarget = escapeHtmlAttributeValue(target)
     const live = wikiLinkAnchorHtml({
       href: target,
-      className: DOUGHNUT_WIKI_LINK_CLASS,
+      className: DONUT_WIKI_LINK_CLASS,
       target,
       display,
       noteId: w.noteId,
@@ -142,7 +142,7 @@ export function replaceWikiLinksInHtml(
       `[[${inner}]]`,
       wikiLinkAnchorHtml({
         href: noteShowHref(w.noteId),
-        className: DOUGHNUT_WIKI_LINK_CLASS,
+        className: DONUT_WIKI_LINK_CLASS,
         target,
         display,
       })

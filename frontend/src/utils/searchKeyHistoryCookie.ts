@@ -1,4 +1,4 @@
-export const SEARCH_KEY_HISTORY_COOKIE_NAME = "doughnut.searchKeyHistory"
+export const SEARCH_KEY_HISTORY_COOKIE_NAME = "donut.searchKeyHistory"
 
 const MAX_KEYS = 100
 /** Stored substring length so long queries still fit in a single cookie with ~4KB total limit. */

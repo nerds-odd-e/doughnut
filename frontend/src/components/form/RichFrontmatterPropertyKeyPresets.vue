@@ -39,7 +39,7 @@ const emit = defineEmits<{
     v-if="presetKeys.length"
     :id="listId"
     role="listbox"
-    class="doughnut-menu-panel daisy-menu absolute left-0 right-0 top-full z-20 mt-0.5 w-full rounded-box bg-base-100 p-1 shadow"
+    class="donut-menu-panel daisy-menu absolute left-0 right-0 top-full z-20 mt-0.5 w-full rounded-box bg-base-100 p-1 shadow"
     data-testid="rich-note-property-key-preset-list"
   >
     <li

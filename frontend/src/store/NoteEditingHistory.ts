@@ -5,7 +5,7 @@ export interface HistoryRecord {
     | "delete note"
     | "create note"
     | "move note"
-  noteId: Doughnut.ID
+  noteId: Donut.ID
   textContent?: string
   /** Previous folder before the move; null means notebook root. */
   originalFolderId?: number | null
@@ -26,7 +26,7 @@ export default class NoteEditingHistory {
   }
 
   addEditingToUndoHistory(
-    noteId: Doughnut.ID,
+    noteId: Donut.ID,
     field: "edit title" | "edit content",
     textContent?: string
   ) {
@@ -50,16 +50,16 @@ export default class NoteEditingHistory {
     this.noteUndoHistories.pop()
   }
 
-  deleteNote(noteId: Doughnut.ID) {
+  deleteNote(noteId: Donut.ID) {
     this.noteUndoHistories.push({ type: "delete note", noteId })
   }
 
-  createNote(noteId: Doughnut.ID) {
+  createNote(noteId: Donut.ID) {
     this.noteUndoHistories.push({ type: "create note", noteId })
   }
 
   moveNote(
-    noteId: Doughnut.ID,
+    noteId: Donut.ID,
     undoPlacement: { folderId: number | null; notebookId: number }
   ) {
     this.noteUndoHistories.push({

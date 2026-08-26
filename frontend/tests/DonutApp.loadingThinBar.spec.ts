@@ -1,4 +1,4 @@
-import DoughnutApp from "@/DoughnutApp.vue"
+import DonutApp from "@/DonutApp.vue"
 import {
   apiCallWithLoading,
   teardownGlobalClientForTesting,
@@ -12,7 +12,7 @@ import { flushPromises } from "@vue/test-utils"
 import { afterEach, describe, expect, it } from "vitest"
 import { nextTick } from "vue"
 
-describe("DoughnutApp thin loading bar", () => {
+describe("DonutApp thin loading bar", () => {
   afterEach(() => {
     teardownGlobalClientForTesting()
   })
@@ -24,7 +24,7 @@ describe("DoughnutApp thin loading bar", () => {
       externalIdentifier: undefined,
     })
 
-    helper.component(DoughnutApp).withRouter().render()
+    helper.component(DonutApp).withRouter().render()
     await flushPromises()
     expect(
       document.querySelector("[data-app-busy]"),

@@ -10,7 +10,7 @@ import { prepareQuestionStemMarkdown } from "@/utils/prepareQuestionStemMarkdown
 import QuillEditor from "../form/QuillEditor.vue"
 import markdownizer from "../form/markdownizer"
 
-/** Markdown question stem (doughnut flavor: supports <mark> for cloze masks). Shown via read-only Quill for parity with note editor. */
+/** Markdown question stem (donut flavor: supports <mark> for cloze masks). Shown via read-only Quill for parity with note editor. */
 const props = defineProps<{
   stem: string | undefined
 }>()

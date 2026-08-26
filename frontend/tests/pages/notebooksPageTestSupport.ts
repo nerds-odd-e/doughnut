@@ -13,7 +13,7 @@ import { flushPromises, type VueWrapper } from "@vue/test-utils"
 import type { Router } from "vue-router"
 
 export function clearNotebooksPageStorage() {
-  localStorage.removeItem("doughnut.notebooksPage.layout")
+  localStorage.removeItem("donut.notebooksPage.layout")
   sessionStorage.removeItem(PEER_SORT_STORAGE_KEY)
   localStorage.removeItem(PEER_SORT_STORAGE_KEY)
 }

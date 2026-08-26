@@ -2,7 +2,7 @@
   <router-link
     v-if="resolved?.noteId !== undefined"
     :to="noteShowLocation(resolved.noteId)"
-    :class="DOUGHNUT_WIKI_LINK_CLASS"
+    :class="DONUT_WIKI_LINK_CLASS"
     v-bind="resolved.linkAttrs"
     >{{ resolved.display }}</router-link
   >
@@ -32,7 +32,7 @@ import {
 } from "@/utils/authoredLinkMarkup"
 import {
   DEAD_WIKI_LINK_CLASS,
-  DOUGHNUT_WIKI_LINK_CLASS,
+  DONUT_WIKI_LINK_CLASS,
 } from "@/utils/wikiLinkDomMarkers"
 import {
   wikiTitleNoteIdLookup,

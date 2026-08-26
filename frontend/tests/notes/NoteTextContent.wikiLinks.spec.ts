@@ -49,10 +49,10 @@ describe("NoteTextContent wiki link display", () => {
     )
     await flushPromises()
     await vi.waitUntil(() =>
-      document.querySelector(".ql-editor a.doughnut-wiki-link")
+      document.querySelector(".ql-editor a.donut-wiki-link")
     )
     const live = document.querySelector(
-      ".ql-editor a.doughnut-wiki-link"
+      ".ql-editor a.donut-wiki-link"
     ) as HTMLAnchorElement
     expect(live.textContent).toContain("friendly label")
     expect(live.textContent).not.toContain("Target Title|")
@@ -92,10 +92,10 @@ describe("NoteTextContent wiki link display", () => {
     )
     await flushPromises()
     await vi.waitUntil(() =>
-      document.querySelector(".ql-editor a.doughnut-wiki-link")
+      document.querySelector(".ql-editor a.donut-wiki-link")
     )
     const live = document.querySelector(
-      ".ql-editor a.doughnut-wiki-link"
+      ".ql-editor a.donut-wiki-link"
     ) as HTMLAnchorElement
     expect(live.textContent).toContain("label")
     expect(live.getAttribute("href")).toBe("/Folder/Title.md")

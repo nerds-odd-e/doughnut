@@ -30,7 +30,7 @@ describe("wikiLinkMarkup utils", () => {
 
   it("handleRichContentAnchorClick navigates path markdown wiki links via data-note-id", () => {
     const anchor = document.createElement("a")
-    anchor.className = "doughnut-wiki-link"
+    anchor.className = "donut-wiki-link"
     anchor.setAttribute("href", "/Folder/Title.md")
     anchor.setAttribute("data-note-id", "42")
     anchor.textContent = "label"

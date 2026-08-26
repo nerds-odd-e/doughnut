@@ -60,7 +60,7 @@ describe("propertyValueField utils", () => {
       wikiTitleFromAuthoredToken("[Moon](/Moon.md)", 42),
     ])
     expect(html).toBe(
-      '<a href="/Moon.md" class="doughnut-wiki-link" data-wiki-title="/Moon.md" data-wiki-display="Moon" data-note-id="42">Moon</a>'
+      '<a href="/Moon.md" class="donut-wiki-link" data-wiki-title="/Moon.md" data-wiki-display="Moon" data-note-id="42">Moon</a>'
     )
   })
 
@@ -68,7 +68,7 @@ describe("propertyValueField utils", () => {
     const html = propertyValuePlainToDisplayHtml("[Moon](/Moon.md)", [])
     expect(html).toContain('class="dead-wiki-link"')
     expect(html).toContain('href="/Moon.md"')
-    expect(html).not.toContain("doughnut-wiki-link")
+    expect(html).not.toContain("donut-wiki-link")
     expect(html).not.toContain("wiki-bracket")
     expect(html).not.toContain("/n")
   })
@@ -78,20 +78,20 @@ describe("propertyValueField utils", () => {
     root.innerHTML = propertyValuePlainToDisplayHtml("[Moon](/Moon.md)", [
       wikiTitleFromAuthoredToken("[Moon](/Moon.md)", 42),
     ])
-    expect(root.querySelector("a.doughnut-wiki-link")).not.toBeNull()
+    expect(root.querySelector("a.donut-wiki-link")).not.toBeNull()
     expect(serializePropertyValueFieldRoot(root)).toBe("[Moon](/Moon.md)")
   })
 
   it("does not treat a bare YAML path as a link", () => {
     const html = propertyValuePlainToDisplayHtml("/folder/File.md", [])
-    expect(html).not.toContain("doughnut-wiki-link")
+    expect(html).not.toContain("donut-wiki-link")
     expect(html).not.toContain("dead-wiki-link")
   })
 
   it("does not treat malformed nested brackets as a wiki link", () => {
     const plain = "x[[a[b]]y"
     const html = propertyValuePlainToDisplayHtml(plain, [])
-    expect(html).not.toContain("doughnut-wiki-link")
+    expect(html).not.toContain("donut-wiki-link")
     expect(html).not.toContain("dead-wiki-link")
     expect(html).toContain(escapeHtmlForWikiLinkDisplay(plain))
   })
@@ -100,7 +100,7 @@ describe("propertyValueField utils", () => {
     const html = propertyValuePlainToDisplayHtml("[[My Note]]", [
       wikiTitleFromAuthoredToken("My Note", 42),
     ])
-    expect(html).toContain("doughnut-wiki-link")
+    expect(html).toContain("donut-wiki-link")
     expect(html).toContain("/n42")
     expect(html).toContain('class="wiki-bracket"')
   })
@@ -109,7 +109,7 @@ describe("propertyValueField utils", () => {
     const html = propertyValuePlainToDisplayHtml("[[Target Page|friendly]]", [
       wikiTitleFromAuthoredToken("Target Page|friendly", 99),
     ])
-    expect(html).toContain("doughnut-wiki-link")
+    expect(html).toContain("donut-wiki-link")
     expect(html).toContain("/n99")
     expect(html).toContain("friendly")
     expect(html).not.toContain("Target Page|friendly")
@@ -134,7 +134,7 @@ describe("propertyValueField utils", () => {
     root.innerHTML = propertyValuePlainToDisplayHtml("[[English]]", [
       wikiTitleFromAuthoredToken("English", 1),
     ])
-    const a = root.querySelector("a.doughnut-wiki-link") as HTMLAnchorElement
+    const a = root.querySelector("a.donut-wiki-link") as HTMLAnchorElement
     a.textContent = "[[Eng]"
     expect(serializePropertyValueFieldRoot(root)).toBe("[[Eng]")
   })
