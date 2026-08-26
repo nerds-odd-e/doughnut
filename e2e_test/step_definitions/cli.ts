@@ -12,11 +12,11 @@ Given('the backend is serving the CLI and install script', () =>
 When('I install the CLI from localhost without affecting my system', () =>
   cli.installation().installFromLocalhost()
 )
-When('I run the installed doughnut version command', () =>
+When('I run the installed donut version command', () =>
   cli.installation().runVersion()
 )
 When(
-  'I run the installed doughnut update command with BASE_URL from localhost',
+  'I run the installed donut update command with BASE_URL from localhost',
   () => cli.installation().runUpdate()
 )
 
@@ -39,7 +39,7 @@ Then(
   () => cli.nonInteractiveOutput().expectUpdatedFromInstalledToNewer()
 )
 
-When('I run the installed doughnut command in interactive mode', () =>
+When('I run the installed donut command in interactive mode', () =>
   cli.installation().runInteractiveMode()
 )
 

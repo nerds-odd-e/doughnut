@@ -24,13 +24,13 @@ describe('version', () => {
   })
 
   test.each([
-    ['doughnut 0.2.0', '0.2.0'],
-    ['other text doughnut 1.2.3 more', '1.2.3'],
+    ['donut 0.2.0', '0.2.0'],
+    ['other text donut 1.2.3 more', '1.2.3'],
   ])('parseVersionFromOutput extracts from %j', (output, expected) => {
     expect(parseVersionFromOutput(output)).toBe(expected)
   })
 
-  test.each(['', 'hello world', 'doughnut'])(
+  test.each(['', 'hello world', 'donut'])(
     'parseVersionFromOutput returns null for %j',
     (output) => {
       expect(parseVersionFromOutput(output)).toBeNull()

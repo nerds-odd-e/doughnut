@@ -11,28 +11,28 @@ function installation() {
       cy.task<string>('installCli', e2eAppBaseUrl())
         .should('be.a', 'string')
         .and('not.be.empty')
-        .as('doughnutPath')
+        .as('donutPath')
     },
     runVersion() {
-      cy.get<string>('@doughnutPath').then((doughnutPath) => {
+      cy.get<string>('@donutPath').then((donutPath) => {
         cy.task<null>('runInstalledCli', {
-          doughnutPath,
+          donutPath,
           args: ['version'],
         })
       })
     },
     runUpdate(baseUrl = e2eAppBaseUrl()) {
-      cy.get<string>('@doughnutPath').then((doughnutPath) => {
+      cy.get<string>('@donutPath').then((donutPath) => {
         cy.task<null>('runInstalledCli', {
-          doughnutPath,
+          donutPath,
           args: ['update'],
           env: { BASE_URL: baseUrl },
         })
       })
     },
     runInteractiveMode() {
-      cy.get<string>('@doughnutPath').then((doughnutPath) => {
-        ttyAssertTerminal().startInstalledInteractive({ doughnutPath })
+      cy.get<string>('@donutPath').then((donutPath) => {
+        ttyAssertTerminal().startInstalledInteractive({ donutPath })
       })
     },
   }

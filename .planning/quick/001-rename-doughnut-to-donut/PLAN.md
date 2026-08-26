@@ -178,6 +178,51 @@ product-name UI text untouched.
 
 Verify: run the affected spec files (not the full E2E suite).
 
+### 9b. CLI installed binary name rename (Structure)
+
+Status: done
+
+Discovered while wrapping up Slice 8: the plan's own key design decision
+("the CLI's invoked command name changes to `donut` too") was never actually
+executed — Slice 6 found no npm `bin` field and concluded there was nothing
+to rename, missing that the real invoked name is the *local install target
+filename* written by `install.sh`/`install.ps1`, independent of the GCS
+source object name (which stays `doughnut` — a live external resource, see
+Goal). Rename the local install target and every place that names or
+displays the running binary:
+
+- `backend/src/main/resources/install.sh` / `install.ps1`: local install
+  target `$INSTALL_DIR/doughnut` / `$InstallPrefix\doughnut` → `donut`.
+  Leave the GCS `DOWNLOAD_URL`/`$DownloadUrl` (`doughnut-cli-latest/doughnut`)
+  unchanged — live external resource.
+- `cli/src/cliExit.ts`: error prefix `doughnut: ${message}` → `donut: ...`.
+- `cli/src/commands/version.ts`: self-identification string `doughnut
+  ${getVersion()}` and its parsing regex → `donut ...`.
+- `cli/src/commands/update.ts`: local temp-file prefix `doughnut-update-` and
+  the "Updated doughnut from..." log message → `donut`. Leave
+  `DOWNLOAD_PATH` (GCS source) unchanged.
+- `e2e_test/config/cliE2ePluginTasks.ts`,
+  `e2e_test/start/pageObjects/cli/ttyAssertTerminal.ts`,
+  `e2e_test/start/pageObjects/cli/execution.ts`: rename the `doughnutPath`
+  variable/property/Cypress-alias plumbing to `donutPath`, the installed
+  binary path segment (`join(installDir, 'bin', 'doughnut')`) to `'donut'`,
+  and the temp-dir prefix `cypress-doughnut-cli-` → `cypress-donut-cli-`.
+  Leave GCS-URL references inside log/error messages unchanged.
+- `cli/tests/update.test.ts`, `e2e_test/config/cliVersion.ts`,
+  `e2e_test/start/pageObjects/recallLearningSessionMethods.ts`, and any other
+  test asserting on the self-identification strings above — update to match.
+- `frontend/src/pages/HomePage.vue`: "Doughnut CLI" heading → "Donut CLI"
+  (describes the internal tool, matching `cli/package.json`'s already-renamed
+  description) and the bare `doughnut` command shown in the copy-paste
+  install snippet → `donut` (must match what actually works post-rename).
+  Leave the `https://doughnut.odd-e.com/install` URLs, the "To Doughnut"
+  welcome name, and the "Doughnut will eventually become..." tagline
+  unchanged — external URL / kept product brand text.
+
+Verify: `cli` vitest suite green; run the CLI install E2E spec
+(`e2e_test/features/cli/cli_install_and_run.feature`, the only non-`@ignore`
+CLI spec CI runs) to confirm the renamed local binary installs and runs.
+
 ### 10. Scripts & root dev tooling (Structure)
 
 - `setup-doughnut-dev.sh` → `setup-donut-dev.sh`; update its content and

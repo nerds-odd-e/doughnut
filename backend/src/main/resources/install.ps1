@@ -4,6 +4,6 @@ $InstallPrefix = if ($env:INSTALL_PREFIX) { $env:INSTALL_PREFIX } else { "$env:U
 $DownloadUrl = "$BaseUrl/doughnut-cli-latest/doughnut"
 
 New-Item -ItemType Directory -Force -Path $InstallPrefix | Out-Null
-Invoke-WebRequest -Uri $DownloadUrl -OutFile "$InstallPrefix\doughnut" -UseBasicParsing
-Write-Host "Installed doughnut to $InstallPrefix\doughnut"
+Invoke-WebRequest -Uri $DownloadUrl -OutFile "$InstallPrefix\donut" -UseBasicParsing
+Write-Host "Installed donut to $InstallPrefix\donut"
 Write-Host "Ensure $InstallPrefix is in your PATH"

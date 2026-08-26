@@ -17,11 +17,11 @@ export function getVersion(): string {
 }
 
 export function formatVersionOutput(): string {
-  return `doughnut ${getVersion()}`
+  return `donut ${getVersion()}`
 }
 
 export function parseVersionFromOutput(output: string): string | null {
-  const match = output.match(/doughnut\s+(\d+\.\d+\.\d+)/)
+  const match = output.match(/donut\s+(\d+\.\d+\.\d+)/)
   return match ? match[1] : null
 }
 

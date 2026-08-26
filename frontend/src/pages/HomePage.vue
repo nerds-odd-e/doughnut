@@ -19,13 +19,13 @@
     </div>
   </div>
   <div class="cli-section">
-    <h3>Doughnut CLI</h3>
+    <h3>Donut CLI</h3>
     <pre class="cli-install-code"><code># Install (macOS, Linux, WSL)
 curl https://doughnut.odd-e.com/install -fsS | bash
 # Install (Windows PowerShell)
 irm 'https://doughnut.odd-e.com/install?win32=true' | iex
 # Run CLI
-doughnut</code></pre>
+donut</code></pre>
   </div>
   <div class="ending">
     <p>Our goal of note taking is not to remember, but to forget.</p>

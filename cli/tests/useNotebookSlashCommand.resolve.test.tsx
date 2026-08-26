@@ -55,7 +55,7 @@ describe('useNotebookSlashCommand resolve', () => {
     }
 
     await waitForFramesToInclude(
-      'Access token is invalid or expired. Run doughnut login or configure a new token.'
+      'Access token is invalid or expired. Run donut login or configure a new token.'
     )
   })
 

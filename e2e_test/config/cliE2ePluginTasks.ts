@@ -26,12 +26,12 @@ import type { ManagedTtyAssertInput, ManagedTtySession } from 'tty-assert'
 type WithOptionalCliEnv = { env?: NodeJS.ProcessEnv }
 
 type RunInstalledCliTask = WithOptionalCliEnv & {
-  doughnutPath: string
+  donutPath: string
   args?: string[]
 }
 
 type RunInstalledCliInteractiveTask = WithOptionalCliEnv & {
-  doughnutPath: string
+  donutPath: string
 }
 
 type RunRepoCliInteractiveTask = WithOptionalCliEnv
@@ -110,7 +110,7 @@ export function createCliE2ePluginTasks(
     },
     async installCli(baseUrl: string) {
       pty.dispose()
-      const installDir = mkdtempSync(join(tmpdir(), 'cypress-doughnut-cli-'))
+      const installDir = mkdtempSync(join(tmpdir(), 'cypress-donut-cli-'))
       const installScriptPath = join(installDir, 'install.sh')
       const response = await fetch(`${baseUrl}/install`)
       if (!response.ok) {
@@ -127,33 +127,33 @@ export function createCliE2ePluginTasks(
           BASE_URL: baseUrl,
         },
       })
-      const doughnutPath = join(installDir, 'bin', 'doughnut')
-      if (!existsSync(doughnutPath)) {
+      const donutPath = join(installDir, 'bin', 'donut')
+      if (!existsSync(donutPath)) {
         throw new Error(
-          `installCli: doughnut binary not found at ${doughnutPath} after install. Check that ${baseUrl}/doughnut-cli-latest/doughnut is served.`
+          `installCli: donut binary not found at ${donutPath} after install. Check that ${baseUrl}/doughnut-cli-latest/doughnut is served.`
         )
       }
-      return doughnutPath
+      return donutPath
     },
-    async runInstalledCli({ doughnutPath, args, env }: RunInstalledCliTask) {
-      if (!doughnutPath) {
+    async runInstalledCli({ donutPath, args, env }: RunInstalledCliTask) {
+      if (!donutPath) {
         throw new Error(
-          `runInstalledCli: doughnutPath required, got ${JSON.stringify(doughnutPath)}`
+          `runInstalledCli: donutPath required, got ${JSON.stringify(donutPath)}`
         )
       }
-      if (!existsSync(doughnutPath)) {
+      if (!existsSync(donutPath)) {
         throw new Error(
-          `runInstalledCli: doughnut binary not found at ${doughnutPath}. Ensure prior step "I install the CLI" succeeded.`
+          `runInstalledCli: donut binary not found at ${donutPath}. Ensure prior step "I install the CLI" succeeded.`
         )
       }
-      const cwd = dirname(doughnutPath)
+      const cwd = dirname(donutPath)
       pty.dispose()
       let managed: ManagedTtySession | undefined
       try {
         managed = await startManagedTtySession(
           {
             command: process.execPath,
-            args: [doughnutPath, ...(args ?? [])],
+            args: [donutPath, ...(args ?? [])],
             cwd,
             env: { ...process.env, ...cliEnv(env) },
           },
@@ -172,23 +172,23 @@ export function createCliE2ePluginTasks(
       return null
     },
     async runInstalledCliInteractive({
-      doughnutPath,
+      donutPath,
       env,
     }: RunInstalledCliInteractiveTask): Promise<null> {
-      if (!doughnutPath) {
+      if (!donutPath) {
         throw new Error(
-          `runInstalledCliInteractive: doughnutPath required, got ${JSON.stringify(doughnutPath)}`
+          `runInstalledCliInteractive: donutPath required, got ${JSON.stringify(donutPath)}`
         )
       }
-      if (!existsSync(doughnutPath)) {
+      if (!existsSync(donutPath)) {
         throw new Error(
-          `runInstalledCliInteractive: doughnut binary not found at ${doughnutPath}. Ensure prior install step succeeded.`
+          `runInstalledCliInteractive: donut binary not found at ${donutPath}. Ensure prior install step succeeded.`
         )
       }
       await pty.startInteractive({
         command: process.execPath,
-        args: [doughnutPath],
-        cwd: dirname(doughnutPath),
+        args: [donutPath],
+        cwd: dirname(donutPath),
         env,
       })
       return null

@@ -34,7 +34,7 @@ describe('run entry routing', () => {
     async (...argv) => {
       await expect(run([...argv])).rejects.toThrow(ProcessExitForTest)
       await new Promise((r) => setImmediate(r))
-      expect(errorSpy).toHaveBeenCalledWith('doughnut: invalid option')
+      expect(errorSpy).toHaveBeenCalledWith('donut: invalid option')
       expect(exitSpy).toHaveBeenCalledWith(1)
     }
   )
@@ -43,7 +43,7 @@ describe('run entry routing', () => {
     await expect(run(['help'])).rejects.toThrow(ProcessExitForTest)
     await new Promise((r) => setImmediate(r))
     expect(errorSpy).toHaveBeenCalledWith(
-      'doughnut: not a terminal (use version or update)'
+      'donut: not a terminal (use version or update)'
     )
     expect(exitSpy).toHaveBeenCalledWith(1)
   })
@@ -59,7 +59,7 @@ describe('run entry routing', () => {
       await expect(run([])).rejects.toThrow(ProcessExitForTest)
       await new Promise((r) => setImmediate(r))
       expect(errorSpy).toHaveBeenCalledWith(
-        'doughnut: not a terminal (use version or update)'
+        'donut: not a terminal (use version or update)'
       )
       expect(exitSpy).toHaveBeenCalledWith(1)
     } finally {
@@ -82,7 +82,7 @@ describe('run entry routing', () => {
       await run(['version'])
       await new Promise((r) => setImmediate(r))
       expect(logSpy).toHaveBeenCalledWith(
-        expect.stringMatching(/doughnut \d+\.\d+\.\d+/)
+        expect.stringMatching(/donut \d+\.\d+\.\d+/)
       )
       expect(exitSpy).not.toHaveBeenCalled()
     } finally {

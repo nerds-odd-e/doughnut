@@ -20,7 +20,7 @@ vi.mock('node:fs', async (importOriginal) => {
 })
 
 beforeEach(() => {
-  process.argv[1] = '/path/to/doughnut'
+  process.argv[1] = '/path/to/donut'
 })
 
 describe('runUpdate', () => {
@@ -55,7 +55,7 @@ describe('runUpdate', () => {
     )
   })
 
-  test('reports Updated doughnut from … to … when incoming version is newer (install E2E)', async () => {
+  test('reports Updated donut from … to … when incoming version is newer (install E2E)', async () => {
     const consoleSpy = vi
       .spyOn(console, 'log')
       .mockImplementation(() => undefined)
@@ -71,7 +71,7 @@ describe('runUpdate', () => {
     const current = getVersion()
     const newer = newerThan(current)
     vi.mocked(childProcess.spawnSync).mockReturnValue({
-      stdout: `doughnut ${newer}`,
+      stdout: `donut ${newer}`,
       stderr: '',
       status: 0,
       error: undefined,
@@ -83,7 +83,7 @@ describe('runUpdate', () => {
     await runUpdate()
 
     expect(consoleSpy).toHaveBeenCalledWith(
-      `Updated doughnut from ${current} to ${newer}`
+      `Updated donut from ${current} to ${newer}`
     )
   })
 
@@ -108,7 +108,7 @@ describe('runUpdate', () => {
     await expect(runUpdate()).rejects.toThrow('exit')
 
     expect(consoleSpy).toHaveBeenCalledWith(
-      expect.stringMatching(/doughnut: download failed: HTTP 404/)
+      expect.stringMatching(/donut: download failed: HTTP 404/)
     )
     expect(exitSpy).toHaveBeenCalledWith(1)
   })

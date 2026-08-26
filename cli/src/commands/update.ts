@@ -24,7 +24,7 @@ export async function runUpdate(): Promise<void> {
   if (!currentPath) {
     exitCliError('could not determine executable path')
   }
-  const tempFile = join(tmpdir(), `doughnut-update-${Date.now()}`)
+  const tempFile = join(tmpdir(), `donut-update-${Date.now()}`)
 
   let response: Response
   try {
@@ -67,7 +67,7 @@ export async function runUpdate(): Promise<void> {
     exitCliError(`failed to replace binary: ${exceptionText(e)}`)
   }
 
-  console.log(`Updated doughnut from ${currentVersion} to ${incomingVersion}`)
+  console.log(`Updated donut from ${currentVersion} to ${incomingVersion}`)
 }
 
 export const updateDoc = {

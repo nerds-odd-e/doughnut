@@ -4,7 +4,7 @@
  */
 
 export function formatCliVersionBanner(version: string): string {
-  return `doughnut ${version}`
+  return `donut ${version}`
 }
 
 /** Next major — always newer than the installed package version for update scenarios. */
@@ -17,5 +17,5 @@ export function cliUpdateSuccessMessage(
   fromVersion: string,
   toVersion: string
 ): string {
-  return `Updated doughnut from ${fromVersion} to ${toVersion}`
+  return `Updated donut from ${fromVersion} to ${toVersion}`
 }

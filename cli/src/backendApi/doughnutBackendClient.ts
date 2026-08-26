@@ -27,12 +27,11 @@ export function doughnutSdkOptions(
 }
 
 const authenticatedBackendCallFailureAdvice = {
-  noAccessTokenInConfig:
-    'No access token configured. Run doughnut login first.',
+  noAccessTokenInConfig: 'No access token configured. Run donut login first.',
   serviceUnreachableOrUnclassifiedFailure:
     'Doughnut service is not available. Check DONUT_API_BASE_URL and ensure the service is running.',
   http401StoredTokenRejected:
-    'Access token is invalid or expired. Run doughnut login or configure a new token.',
+    'Access token is invalid or expired. Run donut login or configure a new token.',
   http403StoredTokenForbidden:
     'Access token does not have permission for this operation. Contact support if you believe this is an error.',
   http502Upstream: 'A dependency service failed (HTTP 502). Try again later.',

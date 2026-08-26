@@ -20,7 +20,7 @@ import {
 type RunRepoCliInteractiveArg = { env?: NodeJS.ProcessEnv }
 
 type RunInstalledCliInteractiveArg = {
-  doughnutPath: string
+  donutPath: string
   env?: NodeJS.ProcessEnv
 }
 
@@ -30,10 +30,10 @@ function ttyAssertTerminal() {
       return cy.task('runRepoCliInteractive', opts ?? {})
     },
     startInstalledInteractive({
-      doughnutPath,
+      donutPath,
       env,
     }: RunInstalledCliInteractiveArg) {
-      return cy.task('runInstalledCliInteractive', { doughnutPath, env })
+      return cy.task('runInstalledCliInteractive', { donutPath, env })
     },
     write(data: string) {
       return cy.task('cliInteractiveWriteRaw', { data })
