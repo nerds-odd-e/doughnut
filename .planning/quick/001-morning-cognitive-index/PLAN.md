@@ -78,6 +78,18 @@ the roadmap has no active milestone. Promote to `.planning/phases/` via
   `recall_stats.feature`; there is nothing to extend.
 - **Package rename in flight.** The working tree is mid `doughnut → donut`
   (ADR 0005). Java package paths in any slice must follow whatever has landed.
+- **Slice 6 has no "open the note mid-question" affordance to hook.** The
+  active/unanswered `RecallPrompt` DTO (`RecallPrompt.java`) exposes only
+  `notebook`, `mcq`, `spellingQuestion` — no note reference. `Mcq.java` has a
+  `@JsonIgnore` note field, stripped by `Mcq.withoutSolution()` before the
+  frontend ever sees it. `Quiz.vue`'s `NotebookLink` goes to the whole
+  notebook (not "the" note) via a full `router-link` navigation — there's no
+  `<keep-alive>` anywhere in the frontend (`grep -rl "keep-alive" frontend/src`
+  is empty), so clicking it tears down `RecallPage`/`useThinkingTimeTracker`
+  entirely rather than producing a resumable "detour." The only place a note
+  *is* surfaced during recall is `AnsweredQuestionComponent.vue`'s
+  `recalledNoteUnderQuestionProps` — the post-answer / view-history case
+  slice 1 already covers and slice 6 explicitly must not conflate with.
 
 ## Jidoka checkpoints — stop for developer judgement
 
@@ -205,10 +217,18 @@ regenerated. E2E scenario passes for real (not `@wip`) by dispatching
 `blur`/`focus` on `window` and waiting the away duration in real wall-clock
 time, since the tracker reads real `performance.now()`.
 
-#### 6. A detour into a note is recorded separately — Behavior `[ ]`
+#### 6. A detour into a note is recorded separately — Behavior `[ ]` **JIDOKA STOP**
 
 Open the note mid-question: Recall History distinguishes a study detour from a
 tab-away. Detour is attributed to the note of the open prompt.
+
+**Blocked — needs developer decision.** No UI affordance currently lets a
+learner open the note of the *active, unanswered* prompt without leaving
+recall entirely (see Discoveries above). Before this slice can proceed,
+decide: (a) add a new in-recall note-preview affordance (what should it look
+like — overlay vs. panel vs. something else — and should `RecallPrompt`
+start exposing a note reference to the frontend?), or (b) redefine/drop this
+slice. Do not guess the UX.
 
 #### 7. Idling in place past the threshold is recorded — Behavior `[ ]`
 
