@@ -90,6 +90,10 @@ the roadmap has no active milestone. Promote to `.planning/phases/` via
   *is* surfaced during recall is `AnsweredQuestionComponent.vue`'s
   `recalledNoteUnderQuestionProps` — the post-answer / view-history case
   slice 1 already covers and slice 6 explicitly must not conflate with.
+  **Resolved:** this is by design — opening a note is a full navigation away
+  from `RecallPage`, not an in-page overlay; the learner returns via the
+  existing "Resume" menu entry, with state remembered across the navigation.
+  See slice 6.
 
 ## Jidoka checkpoints — stop for developer judgement
 
@@ -217,18 +221,21 @@ regenerated. E2E scenario passes for real (not `@wip`) by dispatching
 `blur`/`focus` on `window` and waiting the away duration in real wall-clock
 time, since the tracker reads real `performance.now()`.
 
-#### 6. A detour into a note is recorded separately — Behavior `[ ]` **JIDOKA STOP**
+#### 6. A detour into a note is recorded separately — Behavior `[ ]`
 
 Open the note mid-question: Recall History distinguishes a study detour from a
 tab-away. Detour is attributed to the note of the open prompt.
 
-**Blocked — needs developer decision.** No UI affordance currently lets a
-learner open the note of the *active, unanswered* prompt without leaving
-recall entirely (see Discoveries above). Before this slice can proceed,
-decide: (a) add a new in-recall note-preview affordance (what should it look
-like — overlay vs. panel vs. something else — and should `RecallPrompt`
-start exposing a note reference to the frontend?), or (b) redefine/drop this
-slice. Do not guess the UX.
+**Resolved (developer clarification):** opening the note is a full navigation
+away from `RecallPage` — there is no in-page overlay. The existing "Resume"
+entry point (menu-driven; the flow slice 1's tests already drive via
+`shouldResumeRecall`) is how the learner returns, and app state is remembered
+across that navigation. The detour interval is therefore the wall-clock time
+between leaving (opening the note) and returning via Resume — computed from
+state that survives `RecallPage` unmount/remount (e.g. `useRecallData.ts`'s
+module-level shared state, the same home slice 1 used for
+`isViewingAnsweredQuestion`), not from the per-mount `useThinkingTimeTracker`
+instance, which is destroyed on navigation away.
 
 #### 7. Idling in place past the threshold is recorded — Behavior `[ ]`
 
