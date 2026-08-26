@@ -158,6 +158,38 @@ concepts live in the **Spaced repetition glossary** of [ADR
 **Thinking time**, **Confusion**, and **Overlap**: **Spaced repetition
 glossary** in [ADR 0003](./0003-spaced-repetition-scheduling-policy-accepted.md).
 
+## Cognitive index
+
+*Draft — pending review; introduced by the morning-cognitive-index plan
+(`.planning/quick/001-morning-cognitive-index/`).*
+
+- **Away** — Interval where the learner switches to another tab or app while
+  a **recall prompt** is active, excluded from **thinking time**. Distinct
+  from a **detour**.
+- **Detour** — Interval where the learner navigates away from an active
+  **recall prompt** to view a note or notebook and returns via **Resume**,
+  excluded from **thinking time**. Attributed to the note that was opened.
+  Distinct from **away**.
+- **Idle** — Stretch of an active **recall prompt** with no learner input
+  past a generous threshold. Stays inside **thinking time** (unlike away/
+  detour, the clock is not paused) — it only flags the attempt as one to
+  discount, never silently subtracts.
+- **Pace** — A learner's per-item time intensity on a given morning,
+  expressed against their own recent history rather than as a raw duration.
+  One of the three residual channels beneath the **cognitive index**.
+- **Retrieval lapse** — A **correct** answer whose **thinking time** is
+  unusually slow relative to that item's own expectation. Distinct from an
+  incorrect answer (a knowledge gap) and from **Confusion**/**Overlap**
+  (not **grades**; see ADR 0003).
+- **Cognitive index** — Daily composite readout comparing a morning's recall
+  outcomes, pace, and consistency against expectation and against the
+  learner's own baseline. A residual signal, not a restatement of what the
+  scheduler scheduled, and not diagnostic of cause.
+- **Daily probe** — Optional, opt-in standalone task (~60 seconds, identical
+  stimuli every day) offered once per local day before the first **recall**
+  session, used to validate the **cognitive index** independently of recall
+  item content.
+
 ## Focus context
 
 - **Focus context** — Bounded neighborhood around a **focus note** (depth
