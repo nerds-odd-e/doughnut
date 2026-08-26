@@ -53,12 +53,12 @@ export async function runMineruOutlineSubprocess(
 
   const scriptPath =
     options.scriptPath ??
-    process.env.DOUGHNUT_MINERU_OUTLINE_SCRIPT ??
+    process.env.DONUT_MINERU_OUTLINE_SCRIPT ??
     resolveDefaultScriptPath(cwd) ??
     materializeEmbeddedMineruOutlineScript()
 
   const python =
-    options.pythonExecutable ?? process.env.DOUGHNUT_MINERU_PYTHON ?? 'python3'
+    options.pythonExecutable ?? process.env.DONUT_MINERU_PYTHON ?? 'python3'
   const timeoutMs = options.timeoutMs ?? MINERU_OUTLINE_DEFAULT_TIMEOUT_MS
   const ext = bookPath.toLowerCase().endsWith('.pdf')
     ? 'pdf'

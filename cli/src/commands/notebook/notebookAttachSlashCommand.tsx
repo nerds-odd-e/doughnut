@@ -19,11 +19,11 @@ const attachNotebookDoc: CommandDoc = {
   name: '/attach',
   usage: '/attach <path to .pdf or .epub>',
   description:
-    'Attach a book file to the active notebook (POST attach-book). PDF: MinerU outline extraction, then upload. EPUB: raw upload (no Python or preprocessing). PDF options — DOUGHNUT_MINERU_PDF_END_PAGE (inclusive last page), DOUGHNUT_MINERU_PYTHON, DOUGHNUT_MINERU_OUTLINE_SCRIPT.',
+    'Attach a book file to the active notebook (POST attach-book). PDF: MinerU outline extraction, then upload. EPUB: raw upload (no Python or preprocessing). PDF options — DONUT_MINERU_PDF_END_PAGE (inclusive last page), DONUT_MINERU_PYTHON, DONUT_MINERU_OUTLINE_SCRIPT.',
 }
 
 function pdfEndPageFromMineruEnv(): number | undefined {
-  const raw = process.env.DOUGHNUT_MINERU_PDF_END_PAGE?.trim()
+  const raw = process.env.DONUT_MINERU_PDF_END_PAGE?.trim()
   if (raw === undefined || raw === '') return
   const n = Number.parseInt(raw, 10)
   if (!Number.isFinite(n) || n < 0) return

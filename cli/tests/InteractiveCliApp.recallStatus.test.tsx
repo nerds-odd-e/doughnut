@@ -17,17 +17,17 @@ describe('InteractiveCliApp /recall-status', () => {
 
   beforeEach(() => {
     configDir = tempConfigWithToken()
-    savedConfigDir = process.env.DOUGHNUT_CONFIG_DIR
-    process.env.DOUGHNUT_CONFIG_DIR = configDir
+    savedConfigDir = process.env.DONUT_CONFIG_DIR
+    process.env.DONUT_CONFIG_DIR = configDir
     recallingSpy = vi.spyOn(RecallsController, 'recalling')
   })
 
   afterEach(() => {
     recallingSpy.mockRestore()
     if (savedConfigDir === undefined) {
-      delete process.env.DOUGHNUT_CONFIG_DIR
+      delete process.env.DONUT_CONFIG_DIR
     } else {
-      process.env.DOUGHNUT_CONFIG_DIR = savedConfigDir
+      process.env.DONUT_CONFIG_DIR = savedConfigDir
     }
     fs.rmSync(configDir, { recursive: true, force: true })
   })

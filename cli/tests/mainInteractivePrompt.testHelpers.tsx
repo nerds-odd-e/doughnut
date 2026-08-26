@@ -52,16 +52,16 @@ export function installMainInteractivePromptConfig(): {
   let prevDoughnutConfigDir: string | undefined
 
   beforeEach(() => {
-    prevDoughnutConfigDir = process.env.DOUGHNUT_CONFIG_DIR
+    prevDoughnutConfigDir = process.env.DONUT_CONFIG_DIR
     promptConfigDir = fs.mkdtempSync(path.join(os.tmpdir(), 'doughnut-mip-'))
-    process.env.DOUGHNUT_CONFIG_DIR = promptConfigDir
+    process.env.DONUT_CONFIG_DIR = promptConfigDir
   })
 
   afterEach(() => {
     if (prevDoughnutConfigDir === undefined) {
-      delete process.env.DOUGHNUT_CONFIG_DIR
+      delete process.env.DONUT_CONFIG_DIR
     } else {
-      process.env.DOUGHNUT_CONFIG_DIR = prevDoughnutConfigDir
+      process.env.DONUT_CONFIG_DIR = prevDoughnutConfigDir
     }
     fs.rmSync(promptConfigDir, { recursive: true, force: true })
   })

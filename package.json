@@ -18,7 +18,7 @@
     "mcp-server:format": "pnpm --frozen-lockfile --silent recursive install && pnpm -C mcp-server format",
     "test-fixtures:format": "pnpm --frozen-lockfile --silent recursive install && pnpm -C packages/donut-test-fixtures format",
     "test-fixtures:lint": "pnpm --frozen-lockfile --silent recursive install && pnpm -C packages/donut-test-fixtures lint",
-    "cli": "pnpm --frozen-lockfile --silent recursive install && DOUGHNUT_API_BASE_URL=http://localhost:9081 DOUGHNUT_CONFIG_DIR=$HOME/.config/doughnut-dev pnpm -C cli exec tsx src/index.ts",
+    "cli": "pnpm --frozen-lockfile --silent recursive install && DONUT_API_BASE_URL=http://localhost:9081 DONUT_CONFIG_DIR=$HOME/.config/donut-dev pnpm -C cli exec tsx src/index.ts",
     "cli:bundle": "pnpm --frozen-lockfile --silent recursive install && pnpm -C cli bundle",
     "cli:format": "pnpm --frozen-lockfile --silent recursive install && pnpm -C cli format",
     "cli:lint": "pnpm --frozen-lockfile --silent recursive install && pnpm -C cli lint",

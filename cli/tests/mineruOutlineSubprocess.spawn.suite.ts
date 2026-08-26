@@ -39,8 +39,8 @@ export function describeMineruOutlineSubprocessSpawn(): void {
       expect(args).toContain('3')
     })
 
-    test('uses DOUGHNUT_MINERU_PYTHON when set', async () => {
-      process.env.DOUGHNUT_MINERU_PYTHON = '/opt/venv/bin/python'
+    test('uses DONUT_MINERU_PYTHON when set', async () => {
+      process.env.DONUT_MINERU_PYTHON = '/opt/venv/bin/python'
       fakeChild((child) => {
         setImmediate(() => {
           child.stdout!.end(

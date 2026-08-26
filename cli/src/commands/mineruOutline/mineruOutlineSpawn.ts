@@ -8,7 +8,7 @@ const MINERU_STDERR_EXCERPT_CHARS = 12_000
 const MINERU_IMPORT_DETAIL_MAX_CHARS = 800
 
 const MINERU_IMPORT_HINT =
-  "MinerU is missing or could not be imported. Install MinerU for PDF outlines (e.g. pip install 'mineru[pipeline]' in the Python environment used by the CLI), or set DOUGHNUT_MINERU_OUTLINE_SCRIPT to a different outline script."
+  "MinerU is missing or could not be imported. Install MinerU for PDF outlines (e.g. pip install 'mineru[pipeline]' in the Python environment used by the CLI), or set DONUT_MINERU_OUTLINE_SCRIPT to a different outline script."
 
 export type SpawnOutcome = {
   code: number | null
@@ -85,10 +85,10 @@ function messageForPythonSpawnFailure(
   const code = errnoCode(err)
   const msg = err instanceof Error ? err.message : String(err)
   if (code === 'ENOENT') {
-    return `Could not run "${pythonExecutable}" (not found on PATH or missing interpreter). Install Python 3 and ensure it is on PATH, or set DOUGHNUT_MINERU_PYTHON to the full path of your python3 binary.`
+    return `Could not run "${pythonExecutable}" (not found on PATH or missing interpreter). Install Python 3 and ensure it is on PATH, or set DONUT_MINERU_PYTHON to the full path of your python3 binary.`
   }
   if (code === 'EACCES') {
-    return `Permission denied when starting "${pythonExecutable}". Check that the file is executable, or choose another interpreter via DOUGHNUT_MINERU_PYTHON.`
+    return `Permission denied when starting "${pythonExecutable}". Check that the file is executable, or choose another interpreter via DONUT_MINERU_PYTHON.`
   }
   return `Failed to start outline extraction (${pythonExecutable}): ${msg}`
 }
@@ -154,5 +154,5 @@ export function timeoutErrorMessage(timeoutMs: number, isPdf: boolean): string {
   if (!isPdf) {
     return base
   }
-  return `${base} For large PDFs, set DOUGHNUT_MINERU_PDF_END_PAGE to cap the page range.`
+  return `${base} For large PDFs, set DONUT_MINERU_PDF_END_PAGE to cap the page range.`
 }

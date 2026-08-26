@@ -20,19 +20,19 @@ async function withLocalApi(
   })
   const addr = server.address() as net.AddressInfo
   const configDir = tempConfigWithToken()
-  const prevConfigDir = process.env.DOUGHNUT_CONFIG_DIR
-  const prevApiBaseUrl = process.env.DOUGHNUT_API_BASE_URL
-  process.env.DOUGHNUT_CONFIG_DIR = configDir
-  process.env.DOUGHNUT_API_BASE_URL = `http://127.0.0.1:${addr.port}`
+  const prevConfigDir = process.env.DONUT_CONFIG_DIR
+  const prevApiBaseUrl = process.env.DONUT_API_BASE_URL
+  process.env.DONUT_CONFIG_DIR = configDir
+  process.env.DONUT_API_BASE_URL = `http://127.0.0.1:${addr.port}`
   try {
     await run()
   } finally {
     await new Promise<void>((resolve) => server.close(() => resolve()))
     fs.rmSync(configDir, { recursive: true, force: true })
-    if (prevConfigDir === undefined) delete process.env.DOUGHNUT_CONFIG_DIR
-    else process.env.DOUGHNUT_CONFIG_DIR = prevConfigDir
-    if (prevApiBaseUrl === undefined) delete process.env.DOUGHNUT_API_BASE_URL
-    else process.env.DOUGHNUT_API_BASE_URL = prevApiBaseUrl
+    if (prevConfigDir === undefined) delete process.env.DONUT_CONFIG_DIR
+    else process.env.DONUT_CONFIG_DIR = prevConfigDir
+    if (prevApiBaseUrl === undefined) delete process.env.DONUT_API_BASE_URL
+    else process.env.DONUT_API_BASE_URL = prevApiBaseUrl
   }
 }
 
@@ -41,15 +41,15 @@ describe('real SDK HTTP errors classify for user-visible messages', () => {
   let savedApiBaseUrl: string | undefined
 
   beforeAll(() => {
-    savedConfigDir = process.env.DOUGHNUT_CONFIG_DIR
-    savedApiBaseUrl = process.env.DOUGHNUT_API_BASE_URL
+    savedConfigDir = process.env.DONUT_CONFIG_DIR
+    savedApiBaseUrl = process.env.DONUT_API_BASE_URL
   })
 
   afterAll(() => {
-    if (savedConfigDir === undefined) delete process.env.DOUGHNUT_CONFIG_DIR
-    else process.env.DOUGHNUT_CONFIG_DIR = savedConfigDir
-    if (savedApiBaseUrl === undefined) delete process.env.DOUGHNUT_API_BASE_URL
-    else process.env.DOUGHNUT_API_BASE_URL = savedApiBaseUrl
+    if (savedConfigDir === undefined) delete process.env.DONUT_CONFIG_DIR
+    else process.env.DONUT_CONFIG_DIR = savedConfigDir
+    if (savedApiBaseUrl === undefined) delete process.env.DONUT_API_BASE_URL
+    else process.env.DONUT_API_BASE_URL = savedApiBaseUrl
   })
 
   test.each([

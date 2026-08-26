@@ -242,7 +242,7 @@ export async function addGmailAccount(
   console.log(
     `Opening browser for authentication. If it does not open, visit:\n${authUrl.toString()}`
   )
-  if (!process.env.DOUGHNUT_NO_BROWSER) {
+  if (!process.env.DONUT_NO_BROWSER) {
     openBrowser(authUrl.toString())
   }
 

@@ -22,7 +22,7 @@ export function describeMineruOutlineSubprocessSuccess(): void {
     useMineruOutlineSubprocessFixture()
 
     test('uses embedded default script path when env unset and cwd has no checkout cli/python', async () => {
-      delete process.env.DOUGHNUT_MINERU_OUTLINE_SCRIPT
+      delete process.env.DONUT_MINERU_OUTLINE_SCRIPT
       const isolatedCwd = mkdtempSync(join(tmpdir(), 'mineru-no-repo-'))
       const isolatedEpub = join(isolatedCwd, 'book.epub')
       writeFileSync(isolatedEpub, '')

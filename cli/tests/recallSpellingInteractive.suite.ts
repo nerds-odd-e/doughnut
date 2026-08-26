@@ -126,8 +126,8 @@ export function describeRecallSpellingInteractive(
 
     beforeEach(() => {
       configDir = tempConfigWithToken()
-      savedConfigDir = process.env.DOUGHNUT_CONFIG_DIR
-      process.env.DOUGHNUT_CONFIG_DIR = configDir
+      savedConfigDir = process.env.DONUT_CONFIG_DIR
+      process.env.DONUT_CONFIG_DIR = configDir
 
       spellingFixtureNoteRealm = makeMe.aNoteRealm
         .title('sedition')
@@ -167,9 +167,9 @@ export function describeRecallSpellingInteractive(
       getRecallPromptSpy.mockRestore()
       answerSpellingSpy.mockRestore()
       if (savedConfigDir === undefined) {
-        delete process.env.DOUGHNUT_CONFIG_DIR
+        delete process.env.DONUT_CONFIG_DIR
       } else {
-        process.env.DOUGHNUT_CONFIG_DIR = savedConfigDir
+        process.env.DONUT_CONFIG_DIR = savedConfigDir
       }
       fs.rmSync(configDir, { recursive: true, force: true })
     })

@@ -10,7 +10,7 @@ if [[ -z "$DEST_BUCKET" ]]; then
 	DEST_BUCKET="$GCS_BUCKET"
 fi
 
-CLI_SOURCE="${CLI_BUNDLE_SOURCE:-cli/dist/doughnut-cli.bundle.mjs}"
+CLI_SOURCE="${CLI_BUNDLE_SOURCE:-cli/dist/donut-cli.bundle.mjs}"
 if [[ ! -f "$CLI_SOURCE" ]]; then
 	echo "error: CLI bundle not found: $CLI_SOURCE" >&2
 	exit 1

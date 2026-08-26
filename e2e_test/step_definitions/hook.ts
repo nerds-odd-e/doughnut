@@ -151,14 +151,14 @@ Before({ tags: '@interactiveCLI', order: 2 }, () => {
         .then((pythonPath) =>
           cli.ttyAssertTerminal().startRepoInteractive({
             env: {
-              DOUGHNUT_CONFIG_DIR: configDir,
+              DONUT_CONFIG_DIR: configDir,
               PYTHONPATH: pythonPath,
             },
           })
         )
     }
     return cli.ttyAssertTerminal().startRepoInteractive({
-      env: { DOUGHNUT_CONFIG_DIR: configDir },
+      env: { DONUT_CONFIG_DIR: configDir },
     })
   })
 })
@@ -170,9 +170,9 @@ Before({ tags: '@interactiveCLIGmail', order: 2 }, () => {
       | string
       | undefined
     const base: NodeJS.ProcessEnv = {
-      DOUGHNUT_CONFIG_DIR: configDir,
+      DONUT_CONFIG_DIR: configDir,
       GOOGLE_BASE_URL: GMAIL_E2E_GOOGLE_MOCK_BASE_URL,
-      DOUGHNUT_NO_BROWSER: '1',
+      DONUT_NO_BROWSER: '1',
     }
     if (typeof mockSite === 'string' && mockSite.length > 0) {
       return cy

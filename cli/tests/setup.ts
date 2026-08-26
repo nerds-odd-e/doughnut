@@ -1,1 +1,1 @@
-process.env.DOUGHNUT_NO_BROWSER = '1'
+process.env.DONUT_NO_BROWSER = '1'

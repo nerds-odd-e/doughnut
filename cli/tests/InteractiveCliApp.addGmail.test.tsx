@@ -48,7 +48,7 @@ describe('InteractiveCliApp /add gmail (mocked HTTP APIs)', () => {
     configDir = createTestConfigDir()
     vi.stubEnv('GOOGLE_CLIENT_ID', 'unit-test-client-id')
     vi.stubEnv('GOOGLE_CLIENT_SECRET', 'unit-test-client-secret')
-    vi.stubEnv('DOUGHNUT_NO_BROWSER', '1')
+    vi.stubEnv('DONUT_NO_BROWSER', '1')
     oauthLog = captureOAuthLog()
     stubGmailApiFetchForAddAccount('staged@test.com')
   })

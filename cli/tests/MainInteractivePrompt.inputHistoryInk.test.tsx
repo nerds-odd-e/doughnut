@@ -117,8 +117,8 @@ describe('MainInteractivePrompt user input history persistence', () => {
     await waitUntilLastFrame((f) => lineWithMainPrompt(f).includes('from-disk'))
   })
 
-  test('DOUGHNUT_CLI_DISABLE_INPUT_HISTORY=1 skips writing history file', async () => {
-    process.env.DOUGHNUT_CLI_DISABLE_INPUT_HISTORY = '1'
+  test('DONUT_CLI_DISABLE_INPUT_HISTORY=1 skips writing history file', async () => {
+    process.env.DONUT_CLI_DISABLE_INPUT_HISTORY = '1'
     try {
       const onCommittedLine = vi.fn()
       const { stdin, waitUntilLastFrame } =
@@ -132,7 +132,7 @@ describe('MainInteractivePrompt user input history persistence', () => {
       const p = path.join(getPromptConfigDir(), USER_INPUT_HISTORY_FILENAME)
       expect(fs.existsSync(p)).toBe(false)
     } finally {
-      delete process.env.DOUGHNUT_CLI_DISABLE_INPUT_HISTORY
+      delete process.env.DONUT_CLI_DISABLE_INPUT_HISTORY
     }
   })
 })

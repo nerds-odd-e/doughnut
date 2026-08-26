@@ -16,8 +16,8 @@ describe('InteractiveCliApp /set-access-token', () => {
 
   beforeEach(() => {
     configDir = fs.mkdtempSync(path.join(os.tmpdir(), 'doughnut-cli-at-'))
-    savedConfigDir = process.env.DOUGHNUT_CONFIG_DIR
-    process.env.DOUGHNUT_CONFIG_DIR = configDir
+    savedConfigDir = process.env.DONUT_CONFIG_DIR
+    process.env.DONUT_CONFIG_DIR = configDir
     getTokenInfoSpy = vi
       .spyOn(UserController, 'getTokenInfo')
       .mockResolvedValue({
@@ -27,8 +27,8 @@ describe('InteractiveCliApp /set-access-token', () => {
 
   afterEach(() => {
     getTokenInfoSpy.mockRestore()
-    if (savedConfigDir === undefined) delete process.env.DOUGHNUT_CONFIG_DIR
-    else process.env.DOUGHNUT_CONFIG_DIR = savedConfigDir
+    if (savedConfigDir === undefined) delete process.env.DONUT_CONFIG_DIR
+    else process.env.DONUT_CONFIG_DIR = savedConfigDir
     fs.rmSync(configDir, { recursive: true, force: true })
   })
 

@@ -9,7 +9,7 @@ function userInputHistoryPath(configDir: string): string {
 }
 
 function shouldSkipUserInputHistoryPersistence(): boolean {
-  return process.env.DOUGHNUT_CLI_DISABLE_INPUT_HISTORY === '1'
+  return process.env.DONUT_CLI_DISABLE_INPUT_HISTORY === '1'
 }
 
 function normalizeLoadedHistory(raw: unknown): string[] {

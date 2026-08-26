@@ -124,6 +124,8 @@ Verify: backend config-binding tests green.
 
 ### 6. CLI internal rename (Structure)
 
+Status: done
+
 - `cli/package.json`: `name` → `donut-cli`, `description` → `Donut CLI`, and
   the invoked command name → `donut`.
 - Release bundle filename `doughnut-cli.bundle.mjs` → `donut-cli.bundle.mjs`
@@ -223,3 +225,18 @@ cli, and mcp-server test suites together as the final gate.
 - `infra/gcp/scripts/upload-cli-binary-to-gcs.sh` is the one file inside the
   otherwise-excluded `infra/gcp/**` that must still change, because it
   references the CLI bundle filename this rename renames (Slice 6).
+- Slice 6's env var rename (`DOUGHNUT_API_BASE_URL`) is actually read in
+  `packages/donut-api/src/index.ts` (`getApiConfig()`, shared by cli and
+  mcp-server), not directly in `cli/src/**` — Slice 6 updated that read too,
+  since renaming only `cli/src/**` would have left the CLI's env var override
+  inert.
+- After Slice 6, `e2e_test/config/cliE2eRepo.ts`, `cliGmailE2eConfig.ts`, and
+  `scripts/local-lb.mjs` still reference the pre-rename bundle path
+  `cli/dist/doughnut-cli.bundle.mjs` (now producing `donut-cli.bundle.mjs`) —
+  CI runs `e2e_test/features/cli/**` on push, so Slice 9 must land (and be
+  pushed together with Slice 6, not separately) to avoid a red CI window.
+- Many `doughnut`-named identifiers remain inside `cli/src`/`cli/tests` after
+  Slice 6 (e.g. `doughnutSdkOptions`, `DoughnutSdkCallOptions`,
+  `doughnutBackendClient.ts`, `cliExit.ts`'s `doughnut: ` prefix, "Run
+  doughnut login" text) — out of Slice 6's scope by plan text; the Slice 13
+  final sweep must catch these.

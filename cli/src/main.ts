@@ -6,8 +6,8 @@ export async function main(): Promise<void> {
   const args = rawArgs.filter((a) => a !== '-P' && a !== '--production')
 
   if (production) {
-    delete process.env.DOUGHNUT_CONFIG_DIR
-    process.env.DOUGHNUT_API_BASE_URL = 'https://doughnut.odd-e.com'
+    delete process.env.DONUT_CONFIG_DIR
+    process.env.DONUT_API_BASE_URL = 'https://doughnut.odd-e.com'
   }
 
   await run(args)

@@ -52,11 +52,11 @@ export function describeMineruOutlineSubprocessErrors(): void {
       expect(result.ok).toBe(false)
       if (!result.ok) {
         expect(result.error).toContain('timed out')
-        expect(result.error).not.toContain('DOUGHNUT_MINERU_PDF_END_PAGE')
+        expect(result.error).not.toContain('DONUT_MINERU_PDF_END_PAGE')
       }
     })
 
-    test('PDF timeout message mentions DOUGHNUT_MINERU_PDF_END_PAGE', async () => {
+    test('PDF timeout message mentions DONUT_MINERU_PDF_END_PAGE', async () => {
       fakeChild((child) => {
         child.kill = vi.fn(() => {
           setImmediate(() => child.emit('close', null, 'SIGTERM'))
@@ -71,7 +71,7 @@ export function describeMineruOutlineSubprocessErrors(): void {
 
       expect(result.ok).toBe(false)
       if (!result.ok) {
-        expect(result.error).toContain('DOUGHNUT_MINERU_PDF_END_PAGE')
+        expect(result.error).toContain('DONUT_MINERU_PDF_END_PAGE')
       }
     })
 
@@ -93,7 +93,7 @@ export function describeMineruOutlineSubprocessErrors(): void {
       expect(result).toEqual({
         ok: false,
         error: expect.stringMatching(
-          /Could not run "python3".*DOUGHNUT_MINERU_PYTHON/s
+          /Could not run "python3".*DONUT_MINERU_PYTHON/s
         ),
       })
     })
@@ -116,7 +116,7 @@ export function describeMineruOutlineSubprocessErrors(): void {
       expect(result.ok).toBe(false)
       if (!result.ok) {
         expect(result.error).toContain('Permission denied')
-        expect(result.error).toContain('DOUGHNUT_MINERU_PYTHON')
+        expect(result.error).toContain('DONUT_MINERU_PYTHON')
       }
     })
 

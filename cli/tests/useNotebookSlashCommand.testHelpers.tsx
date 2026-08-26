@@ -91,17 +91,17 @@ export function installUseNotebookStageConfig() {
 
   beforeEach(() => {
     configDir = tempConfigWithToken()
-    savedConfigDir = process.env.DOUGHNUT_CONFIG_DIR
-    process.env.DOUGHNUT_CONFIG_DIR = configDir
+    savedConfigDir = process.env.DONUT_CONFIG_DIR
+    process.env.DONUT_CONFIG_DIR = configDir
     myNotebooksSpy = vi.spyOn(NotebookController, 'myNotebooks')
   })
 
   afterEach(() => {
     myNotebooksSpy.mockRestore()
     if (savedConfigDir === undefined) {
-      delete process.env.DOUGHNUT_CONFIG_DIR
+      delete process.env.DONUT_CONFIG_DIR
     } else {
-      process.env.DOUGHNUT_CONFIG_DIR = savedConfigDir
+      process.env.DONUT_CONFIG_DIR = savedConfigDir
     }
     fs.rmSync(configDir, { recursive: true, force: true })
   })

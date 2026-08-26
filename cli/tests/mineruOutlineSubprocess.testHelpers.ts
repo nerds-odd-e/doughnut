@@ -26,9 +26,9 @@ export let pdfPath: string
 
 export function useMineruOutlineSubprocessFixture(): void {
   beforeEach(() => {
-    process.env.DOUGHNUT_MINERU_OUTLINE_SCRIPT =
+    process.env.DONUT_MINERU_OUTLINE_SCRIPT =
       '/fake/cli/python/mineru_book_outline.py'
-    delete process.env.DOUGHNUT_MINERU_PYTHON
+    delete process.env.DONUT_MINERU_PYTHON
     workDir = mkdtempSync(join(tmpdir(), 'mineru-outline-test-'))
     epubPath = join(workDir, 'book.epub')
     pdfPath = join(workDir, 'book.pdf')
@@ -39,7 +39,7 @@ export function useMineruOutlineSubprocessFixture(): void {
   afterEach(() => {
     rmSync(workDir, { recursive: true, force: true })
     vi.mocked(childProcess.spawn).mockReset()
-    delete process.env.DOUGHNUT_MINERU_PYTHON
+    delete process.env.DONUT_MINERU_PYTHON
   })
 }
 

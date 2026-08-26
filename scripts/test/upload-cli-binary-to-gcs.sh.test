@@ -54,7 +54,7 @@ test_cp_invoked_with_dest() {
 	log="$work/log"
 	touch "$log"
 	mkdir -p "$work/cli/dist"
-	echo '#!/usr/bin/env node' >"$work/cli/dist/doughnut-cli.bundle.mjs"
+	echo '#!/usr/bin/env node' >"$work/cli/dist/donut-cli.bundle.mjs"
 	(
 		cd "$work"
 		PATH="$fake_bin:$PATH"
@@ -76,7 +76,7 @@ test_cp_prefers_gcs_frontend_bucket() {
 	log="$work/log"
 	touch "$log"
 	mkdir -p "$work/cli/dist"
-	echo '#!/usr/bin/env node' >"$work/cli/dist/doughnut-cli.bundle.mjs"
+	echo '#!/usr/bin/env node' >"$work/cli/dist/donut-cli.bundle.mjs"
 	(
 		cd "$work"
 		PATH="$fake_bin:$PATH"
