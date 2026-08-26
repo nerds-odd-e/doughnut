@@ -25,6 +25,7 @@ final class RecallPaceAggregator {
   private static final double BASELINE_FLOOR_FACTOR = 0.25;
   private static final double HARD_DROP_MS = 300_000;
   private static final double RESIDUAL_CAP = Math.log(8);
+  private static final double LAPSE_FACTOR = 2.5;
 
   private RecallPaceAggregator() {}
 
@@ -43,6 +44,7 @@ final class RecallPaceAggregator {
     List<WeightedResidual> todaysResiduals = new ArrayList<>();
     Set<RecallAnswerRow> implausiblyFastRows = Collections.newSetFromMap(new IdentityHashMap<>());
     int totalAnsweredToday = 0;
+    int lapseCount = 0;
     for (RecallAnswerRow r : allTimeReviews) {
       if (r.answerCreatedAt() == null) {
         continue;
@@ -79,6 +81,9 @@ final class RecallPaceAggregator {
         double rawResidual = lnRt - baseline;
         double weight = priorObservationCount / (priorObservationCount + 3.0);
         todaysResiduals.add(new WeightedResidual(Math.min(rawResidual, RESIDUAL_CAP), weight));
+        if (r.correct() && rt.get() >= LAPSE_FACTOR * Math.exp(baseline)) {
+          lapseCount++;
+        }
       }
       tauByItem.put(
           itemId, baseline == null ? lnRt : EWMA_ALPHA * lnRt + (1 - EWMA_ALPHA) * baseline);
@@ -88,7 +93,8 @@ final class RecallPaceAggregator {
     Double pctVsUsual = sampleSize > 0 ? weightedPctVsUsual(todaysResiduals) : null;
     Double confidence = sampleSize > 0 ? averageWeight(todaysResiduals) : null;
     return new PaceResult(
-        new PaceStats(pctVsUsual, sampleSize, totalAnsweredToday, confidence), implausiblyFastRows);
+        new PaceStats(pctVsUsual, sampleSize, totalAnsweredToday, confidence, lapseCount),
+        implausiblyFastRows);
   }
 
   private static Double weightedPctVsUsual(List<WeightedResidual> residuals) {

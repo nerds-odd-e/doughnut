@@ -375,11 +375,22 @@ wire). No E2E — slice 9's pace E2E is already `@wip` for an unrelated clock
 mismatch; backend + frontend unit tests cover this slice, matching slice 7's
 precedent.
 
-#### 13. Recall Stats shows today's retrieval-lapse count — Behavior `[ ]`
+#### 13. Recall Stats shows today's retrieval-lapse count — Behavior `[x]`
 
 Correct answers taking ≥ 2.5× their expected time, counted. Restricted to
 *correct* answers deliberately: a slow wrong answer is a knowledge gap, a slow
 right answer is the retrieval analogue of a vigilance lapse.
+
+Done: `PaceStats` gained a plain `int lapseCount`. Counted inside the same
+chronological walk, at the same guard (`baseline != null && isToday`) that
+produces today's residuals — so a lapse candidate naturally inherits the
+fast-tail floor and 5-minute hard-drop exclusions already sitting earlier in
+the loop (too extreme in either direction to be a momentary attention lapse).
+Unweighted plain count, unlike `pctVsUsual`: `r.correct() && rt >= 2.5 *
+exp(baseline)`. `PaceTile.vue` renders "N retrieval lapse(s) today" only when
+`lapseCount > 0`. API client regenerated. Backend tests split into their own
+`RecallStatsServiceLapseAggregationTest.java` (post-change-refactor,
+file-size convention) alongside the existing pace-comparison test file.
 
 #### 14. Recall Stats shows today's consistency — Behavior `[ ]`
 

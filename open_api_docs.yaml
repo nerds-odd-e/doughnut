@@ -4996,6 +4996,9 @@ components:
         confidence:
           type: number
           format: double
+        lapseCount:
+          type: integer
+          format: int32
     RecallStatsDTO:
       type: object
       properties:

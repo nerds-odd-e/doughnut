@@ -88,4 +88,40 @@ describe("PaceTile", () => {
       wrapper.find('[data-testid="recall-pace-low-confidence"]').exists()
     ).toBe(false)
   })
+
+  it("shows the retrieval-lapse count when there is at least one lapse today", () => {
+    const wrapper = helper
+      .component(PaceTile)
+      .withProps({
+        pace: {
+          pctVsUsual: 42,
+          sampleSize: 5,
+          totalAnsweredToday: 8,
+          lapseCount: 2,
+        },
+      })
+      .mount()
+
+    const lapseReadout = wrapper.find('[data-testid="recall-pace-lapse-count"]')
+    expect(lapseReadout.exists()).toBe(true)
+    expect(lapseReadout.text()).toContain("2 retrieval lapses today")
+  })
+
+  it("does not show the retrieval-lapse readout when lapseCount is 0", () => {
+    const wrapper = helper
+      .component(PaceTile)
+      .withProps({
+        pace: {
+          pctVsUsual: 42,
+          sampleSize: 5,
+          totalAnsweredToday: 8,
+          lapseCount: 0,
+        },
+      })
+      .mount()
+
+    expect(
+      wrapper.find('[data-testid="recall-pace-lapse-count"]').exists()
+    ).toBe(false)
+  })
 })

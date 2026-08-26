@@ -16,6 +16,14 @@
       >
         low confidence — mostly new cards
       </div>
+      <div
+        v-if="pace.lapseCount"
+        data-testid="recall-pace-lapse-count"
+        class="text-xs opacity-70"
+      >
+        {{ pace.lapseCount }} retrieval
+        {{ pace.lapseCount === 1 ? "lapse" : "lapses" }} today
+      </div>
     </template>
     <template v-else>
       <div class="text-sm opacity-70">
