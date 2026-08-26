@@ -9,7 +9,7 @@ spring:
       root: OFF
       org.springframework: OFF
       org.springframework.web: ERROR
-      com.odde.doughnut: ERROR
+      com.odde.donut: ERROR
       org.hibernate: ERROR
   web:
     resources:
@@ -45,7 +45,7 @@ spring:
   openai:
     token: ${OPENAI_API_TOKEN:}
 # Book PDF storage: any non-`prod` profile → DbBookStorage (AttachmentBlob). Profile `prod` → GcsBookStorage only
-# (`doughnut.book-pdf.gcs.bucket` required; optional `object-prefix`). Max PDF part size: `spring.servlet.multipart.max-file-size` (100MB). Ops: docs/gcp/prod_env.md §7.
+# (`donut.book-pdf.gcs.bucket` required; optional `object-prefix`). Max PDF part size: `spring.servlet.multipart.max-file-size` (100MB). Ops: docs/gcp/prod_env.md §7.
 question:
   regeneration:
     times: 0
@@ -69,7 +69,7 @@ spring:
       root: INFO
       org.springframework: INFO
       org.springframework.web: INFO
-      com.odde.doughnut: INFO
+      com.odde.donut: INFO
       org.hibernate: WARN
   servlet:
     multipart:
@@ -133,7 +133,7 @@ spring:
       root: INFO
       org.springframework: INFO
       org.springframework.web: INFO
-      com.odde.doughnut: DEBUG
+      com.odde.donut: DEBUG
       org.hibernate: INFO
   servlet:
     multipart:

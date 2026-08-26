@@ -9,7 +9,7 @@ spring:
       root: INFO
       org.springframework: INFO
       org.springframework.web: INFO
-      com.odde.doughnut: INFO
+      com.odde.donut: INFO
       org.hibernate: WARN
       com.zaxxer.hikari: WARN
   web:
@@ -68,7 +68,7 @@ spring:
 question:
   regeneration:
     times: 0
-doughnut:
+donut:
   # prod: book PDF bytes live in this bucket (GcsBookStorage). Non-prod uses DB storage instead.
   book-pdf:
     gcs:

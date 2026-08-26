@@ -109,6 +109,8 @@ Verify: full backend build + test suite green (`./gradlew build`).
 
 ### 5. Backend config namespace rename (Structure)
 
+Status: done
+
 Rename the custom Spring config prefix `doughnut:` (e.g.
 `doughnut.book-pdf.gcs.bucket`) to `donut:` in `application.yml` /
 `application-prod.yml` and its `@ConfigurationProperties` binding class,

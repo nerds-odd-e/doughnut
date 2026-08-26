@@ -24,8 +24,8 @@ public class BookStorageConfiguration {
   @Profile("prod")
   BookStorage gcsBookStorage(
       Storage bookGcsClient,
-      @Value("${doughnut.book-pdf.gcs.bucket}") String bucket,
-      @Value("${doughnut.book-pdf.gcs.object-prefix:}") String objectPrefix) {
+      @Value("${donut.book-pdf.gcs.bucket}") String bucket,
+      @Value("${donut.book-pdf.gcs.object-prefix:}") String objectPrefix) {
     return new GcsBookStorage(bookGcsClient, bucket, objectPrefix);
   }
 
