@@ -37,7 +37,7 @@ const titleRenameReferenceSaveTestId: Record<
 
 function wikiLinkInNoteContentFluent(wikiLinkText: string) {
   const locator = () =>
-    findNoteContentRegion().find('a.doughnut-wiki-link').contains(wikiLinkText)
+    findNoteContentRegion().find('a.donut-wiki-link').contains(wikiLinkText)
   return {
     expectNoteShowHref() {
       locator().should('have.attr', 'href').and('match', noteShowHref)
