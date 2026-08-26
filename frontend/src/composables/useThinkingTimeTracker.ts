@@ -1,6 +1,21 @@
 import { ref, onUnmounted, nextTick } from "vue"
 
-export function useThinkingTimeTracker() {
+export type Clock = {
+  now: () => number
+}
+
+const realClock: Clock = {
+  now: () => performance.now(),
+}
+
+export type ThinkingTimeTrackerOptions = {
+  clock?: Clock
+}
+
+export function useThinkingTimeTracker(
+  options: ThinkingTimeTrackerOptions = {}
+) {
+  const clock = options.clock ?? realClock
   const accumulatedMs = ref(0)
   const runningStart = ref<number | null>(null)
   const isRunning = ref(false)
@@ -19,7 +34,7 @@ export function useThinkingTimeTracker() {
   const pause = () => {
     if (!isRunning.value || runningStart.value === null) return
 
-    const now = performance.now()
+    const now = clock.now()
     accumulatedMs.value += now - runningStart.value
     runningStart.value = null
     isRunning.value = false
@@ -31,7 +46,7 @@ export function useThinkingTimeTracker() {
     if (hasStopped.value || isRunning.value) return
     if (document.hidden) return
 
-    runningStart.value = performance.now()
+    runningStart.value = clock.now()
     isRunning.value = true
     isPaused.value = false
 
@@ -60,7 +75,7 @@ export function useThinkingTimeTracker() {
 
   const updateAccumulatedTime = (): number => {
     if (isRunning.value && runningStart.value !== null) {
-      const now = performance.now()
+      const now = clock.now()
       accumulatedMs.value += now - runningStart.value
       runningStart.value = now
     }

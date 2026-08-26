@@ -130,12 +130,18 @@ or read recorded thinking time back out of Recall History; a future slice
 needing that should add the testability hook rather than reusing ad-hoc
 timing assertions.
 
-#### 2. Inject a clock into the thinking-time tracker — Structure `[ ]`
+#### 2. Inject a clock into the thinking-time tracker — Structure `[x]`
 
 Replace direct `performance.now()` / `Date.now()` reads with an injected clock.
 No observable change; existing tests pass unchanged.
 
 - **Enables slice 3 only** — a wall-clock jump cannot be simulated otherwise.
+
+Done: `useThinkingTimeTracker.ts` takes `ThinkingTimeTrackerOptions { clock?: Clock }`,
+defaulting to a `realClock` backed by `performance.now()`; all three internal
+reads route through `clock.now()`, following the existing options-object
+precedent in `useDebouncedTextAutosave.ts`. No `Date.now()` calls existed.
+Consumer (`useQuestionThinkingTime.ts`) unaffected — still calls with no args.
 
 #### 3. A suspended device no longer inflates thinking time — Behavior `[ ]`
 
