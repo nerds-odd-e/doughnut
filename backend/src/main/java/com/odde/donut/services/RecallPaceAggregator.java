@@ -26,6 +26,10 @@ final class RecallPaceAggregator {
   private static final double HARD_DROP_MS = 300_000;
   private static final double RESIDUAL_CAP = Math.log(8);
   private static final double LAPSE_FACTOR = 2.5;
+  private static final int BASELINE_WINDOW_START_DAYS_AGO = 63;
+  private static final int BASELINE_WINDOW_END_DAYS_AGO = 4;
+  private static final int MIN_BASELINE_DAYS = 10;
+  private static final double MAD_TO_SD_SCALE = 1.4826;
 
   private RecallPaceAggregator() {}
 
@@ -42,17 +46,21 @@ final class RecallPaceAggregator {
     Map<Integer, Double> tauByItem = new HashMap<>();
     Map<Integer, Integer> priorObservationCountByItem = new HashMap<>();
     List<WeightedResidual> todaysResiduals = new ArrayList<>();
+    Map<LocalDate, List<Double>> residualsByDate = new HashMap<>();
     Set<RecallAnswerRow> implausiblyFastRows = Collections.newSetFromMap(new IdentityHashMap<>());
+    LocalDate baselineWindowStart = today.minusDays(BASELINE_WINDOW_START_DAYS_AGO);
+    LocalDate baselineWindowEnd = today.minusDays(BASELINE_WINDOW_END_DAYS_AGO);
     int totalAnsweredToday = 0;
     int lapseCount = 0;
     for (RecallAnswerRow r : allTimeReviews) {
       if (r.answerCreatedAt() == null) {
         continue;
       }
-      boolean isToday =
-          TimestampOperations.getZonedDateTime(r.answerCreatedAt(), zoneId)
-              .toLocalDate()
-              .equals(today);
+      LocalDate rowDate =
+          TimestampOperations.getZonedDateTime(r.answerCreatedAt(), zoneId).toLocalDate();
+      boolean isToday = rowDate.equals(today);
+      boolean isInBaselineWindow =
+          !rowDate.isBefore(baselineWindowStart) && !rowDate.isAfter(baselineWindowEnd);
       if (isToday) {
         totalAnsweredToday++;
       }
@@ -77,12 +85,16 @@ final class RecallPaceAggregator {
       }
       double lnRt = Math.log(rt.get());
       int priorObservationCount = priorObservationCountByItem.getOrDefault(itemId, 0);
-      if (baseline != null && isToday) {
-        double rawResidual = lnRt - baseline;
-        double weight = priorObservationCount / (priorObservationCount + 3.0);
-        todaysResiduals.add(new WeightedResidual(Math.min(rawResidual, RESIDUAL_CAP), weight));
-        if (r.correct() && rt.get() >= LAPSE_FACTOR * Math.exp(baseline)) {
-          lapseCount++;
+      if (baseline != null) {
+        double cappedResidual = Math.min(lnRt - baseline, RESIDUAL_CAP);
+        if (isToday) {
+          double weight = priorObservationCount / (priorObservationCount + 3.0);
+          todaysResiduals.add(new WeightedResidual(cappedResidual, weight));
+          if (r.correct() && rt.get() >= LAPSE_FACTOR * Math.exp(baseline)) {
+            lapseCount++;
+          }
+        } else if (isInBaselineWindow) {
+          residualsByDate.computeIfAbsent(rowDate, k -> new ArrayList<>()).add(cappedResidual);
         }
       }
       tauByItem.put(
@@ -92,9 +104,54 @@ final class RecallPaceAggregator {
     int sampleSize = todaysResiduals.size();
     Double pctVsUsual = sampleSize > 0 ? weightedPctVsUsual(todaysResiduals) : null;
     Double confidence = sampleSize > 0 ? averageWeight(todaysResiduals) : null;
+    Double consistencyZScore = consistencyZScore(todaysResiduals, residualsByDate);
     return new PaceResult(
-        new PaceStats(pctVsUsual, sampleSize, totalAnsweredToday, confidence, lapseCount),
+        new PaceStats(
+            pctVsUsual, sampleSize, totalAnsweredToday, confidence, lapseCount, consistencyZScore),
         implausiblyFastRows);
+  }
+
+  /**
+   * Standardizes today's within-session residual spread (MAD) against the learner's own trailing
+   * baseline spread (median/MAD of per-day MAD over the last 60-day window, itself excluding the
+   * last 3 days). Positive means today is more erratic than usual, matching {@code pctVsUsual}'s
+   * convention where positive is slower/worse. Returns {@code null} when there isn't enough data
+   * (fewer than 2 residuals today, fewer than 10 qualifying baseline days, or a baseline with zero
+   * spread that can't be used to standardize against).
+   */
+  private static Double consistencyZScore(
+      List<WeightedResidual> todaysResiduals, Map<LocalDate, List<Double>> residualsByDate) {
+    List<Double> todaysPlainResiduals =
+        todaysResiduals.stream().map(WeightedResidual::residual).toList();
+    Double todaySpread = todaysPlainResiduals.size() >= 2 ? mad(todaysPlainResiduals) : null;
+    List<Double> baselineSpreads =
+        residualsByDate.values().stream()
+            .filter(values -> values.size() >= 2)
+            .map(RecallPaceAggregator::mad)
+            .toList();
+    if (todaySpread == null || baselineSpreads.size() < MIN_BASELINE_DAYS) {
+      return null;
+    }
+    double baselineMedian = median(baselineSpreads);
+    double baselineMad = mad(baselineSpreads);
+    if (baselineMad == 0) {
+      return null;
+    }
+    return (todaySpread - baselineMedian) / (baselineMad * MAD_TO_SD_SCALE);
+  }
+
+  /** Plain median of a list of values (average of the two middle values when the size is even). */
+  private static double median(List<Double> values) {
+    List<Double> sorted = new ArrayList<>(values);
+    Collections.sort(sorted);
+    int n = sorted.size();
+    return n % 2 == 1 ? sorted.get(n / 2) : (sorted.get(n / 2 - 1) + sorted.get(n / 2)) / 2.0;
+  }
+
+  /** Median absolute deviation: median distance of each value from the set's median. */
+  private static double mad(List<Double> values) {
+    double medianValue = median(values);
+    return median(values.stream().map(v -> Math.abs(v - medianValue)).toList());
   }
 
   private static Double weightedPctVsUsual(List<WeightedResidual> residuals) {

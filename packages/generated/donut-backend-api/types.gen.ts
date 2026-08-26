@@ -941,6 +941,7 @@ export type PaceStats = {
     totalAnsweredToday?: number;
     confidence?: number;
     lapseCount?: number;
+    consistencyZScore?: number;
 };
 
 export type RecallStatsDto = {

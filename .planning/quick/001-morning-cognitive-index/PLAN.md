@@ -392,10 +392,28 @@ exp(baseline)`. `PaceTile.vue` renders "N retrieval lapse(s) today" only when
 `RecallStatsServiceLapseAggregationTest.java` (post-change-refactor,
 file-size convention) alongside the existing pace-comparison test file.
 
-#### 14. Recall Stats shows today's consistency — Behavior `[ ]`
+#### 14. Recall Stats shows today's consistency — Behavior `[x]`
 
 Spread of within-session residuals, standardized against the learner's own
 baseline (median and MAD, trailing 60 days, excluding the last 3).
+
+Done: the plan gave no exact formula for this one (unlike slices 10-13), so
+the coordinator resolved it before delegating. The same capped-residual
+computation used for `pctVsUsual` now also fires for rows in a baseline
+window `[today-63, today-4]` (60 days, excluding the 3 immediately before
+today), accumulated per day in `residualsByDate`. `todaySpread`/each
+qualifying day's spread is MAD (median absolute deviation) of that day's
+residuals, requiring ≥2 residuals/day; the baseline needs ≥10 qualifying
+days (`MIN_BASELINE_DAYS`) or `consistencyZScore` is null.
+`consistencyZScore = (todaySpread − median(baselineSpreads)) /
+(mad(baselineSpreads) × 1.4826)` — `1.4826` is the standard MAD-to-SD scaling
+constant; null if `baselineMad == 0`. Positive = more erratic than usual,
+matching `pctVsUsual`'s sign convention. `PaceTile.vue` shows a
+"more erratic than usual" badge only when `consistencyZScore > 1`, mirroring
+the low-confidence badge exactly (one-sided; no "more consistent" messaging
+in this slice). API client regenerated. This closes the "Pace channel — no
+schema change" section (slices 8-14); next section is "Accuracy channel"
+(slice 15), which needs the ADR 0003 Jidoka decision before starting.
 
 ### Accuracy channel
 

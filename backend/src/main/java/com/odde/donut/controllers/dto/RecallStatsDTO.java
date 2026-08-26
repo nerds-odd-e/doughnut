@@ -59,6 +59,7 @@ public class RecallStatsDTO {
     private Integer totalAnsweredToday;
     private Double confidence;
     private int lapseCount;
+    private Double consistencyZScore;
   }
 
   @Data

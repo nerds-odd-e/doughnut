@@ -4999,6 +4999,9 @@ components:
         lapseCount:
           type: integer
           format: int32
+        consistencyZScore:
+          type: number
+          format: double
     RecallStatsDTO:
       type: object
       properties:

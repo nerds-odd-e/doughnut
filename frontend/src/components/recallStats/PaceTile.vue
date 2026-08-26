@@ -17,6 +17,13 @@
         low confidence — mostly new cards
       </div>
       <div
+        v-if="isInconsistent"
+        data-testid="recall-pace-inconsistent"
+        class="daisy-badge daisy-badge-warning mt-1"
+      >
+        more erratic than usual
+      </div>
+      <div
         v-if="pace.lapseCount"
         data-testid="recall-pace-lapse-count"
         class="text-xs opacity-70"
@@ -50,6 +57,15 @@ const isLowConfidence = computed(
   () =>
     props.pace.confidence != null &&
     props.pace.confidence < LOW_CONFIDENCE_THRESHOLD
+)
+
+// Above this z-score, today's residual spread reads as meaningfully more erratic than usual.
+const INCONSISTENT_Z_SCORE_THRESHOLD = 1
+
+const isInconsistent = computed(
+  () =>
+    props.pace.consistencyZScore != null &&
+    props.pace.consistencyZScore > INCONSISTENT_Z_SCORE_THRESHOLD
 )
 
 const paceLabel = computed(() => {
