@@ -103,6 +103,15 @@ class RecallPromptAnswerControllerTest extends RecallPromptControllerTestBase {
   }
 
   @Test
+  void shouldSaveDetourMsAndDetourCount() throws UnexpectedNoAccessRightException {
+    answerDTO.setDetourMs(4000);
+    answerDTO.setDetourCount(1);
+    Answer answer = controller.answer(recallPrompt, answerDTO).getAnswer();
+    assertThat(answer.getDetourMs(), equalTo(4000));
+    assertThat(answer.getDetourCount(), equalTo(1));
+  }
+
+  @Test
   void ordinaryGoodNextMemoryStateIgnoresThinkingTime() throws UnexpectedNoAccessRightException {
     Note zeroNote = ownedNote();
     MemoryTracker zeroMs = ownedTracker(zeroNote);

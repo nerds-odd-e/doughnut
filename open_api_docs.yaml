@@ -3774,6 +3774,12 @@ components:
         awayCount:
           type: integer
           format: int32
+        detourMs:
+          type: integer
+          format: int32
+        detourCount:
+          type: integer
+          format: int32
     Answer:
       type: object
       properties:

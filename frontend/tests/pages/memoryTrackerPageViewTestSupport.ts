@@ -156,6 +156,13 @@ export function recallPromptWithAwayTime(awayMs: number, awayCount: number) {
   return recallPromptWithAnswer({ awayMs, awayCount })
 }
 
+export function recallPromptWithDetourTime(
+  detourMs: number,
+  detourCount: number
+) {
+  return recallPromptWithAnswer({ detourMs, detourCount })
+}
+
 export function noteUnderQuestionSections(wrapper: VueWrapper) {
   return wrapper.findAll(".note-under-question")
 }

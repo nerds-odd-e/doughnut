@@ -57,6 +57,11 @@ const assumeQuestionPage = (stem?: string) => {
       })
       return this
     },
+    openNotebookLink() {
+      cy.get('.notebook-source a').click()
+      waitUntilAppIsNotBusy()
+      return this
+    },
   }
 }
 

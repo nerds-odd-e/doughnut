@@ -116,6 +116,8 @@ public class Answer extends EntityIdentifiedByIdOnly {
     answer.setThinkingTimeMs(answerDTO.getThinkingTimeMs());
     answer.setAwayMs(answerDTO.getAwayMs());
     answer.setAwayCount(answerDTO.getAwayCount());
+    answer.setDetourMs(answerDTO.getDetourMs());
+    answer.setDetourCount(answerDTO.getDetourCount());
     return answer;
   }
 }

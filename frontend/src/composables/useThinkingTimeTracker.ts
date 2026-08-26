@@ -27,14 +27,6 @@ export function useThinkingTimeTracker(
   const isPaused = ref(false)
   const hasStopped = ref(false)
 
-  // Away time/count: accumulated only from the tracker's own internal
-  // tab-away detection (visibilitychange/pagehide/blur and the watchdog's
-  // hidden-document sync) — never from externally invoked pause()/resume()
-  // calls made by other composables for unrelated reasons.
-  const awayMs = ref(0)
-  const awayCount = ref(0)
-  const awayPauseStart = ref<number | null>(null)
-
   // Ticks every 250ms while running: reconciles suspend gaps (see
   // reconcileGap) and syncs pause state with document.hidden.
   let watchdogIntervalId: ReturnType<typeof setInterval> | null = null
@@ -57,21 +49,46 @@ export function useThinkingTimeTracker(
     clearWatchdog()
   }
 
-  const pauseForAway = () => {
-    if (!isRunning.value || runningStart.value === null) return
+  // Tracks one category of interruption (away, detour, ...) as its own
+  // paused-duration total and interruption count. Each category's
+  // pauseFor()/resumeFrom() pair wraps the shared pause()/resume() so the
+  // interruption is timed independently without double-pausing the tracker.
+  const createInterruptionAccumulator = () => {
+    const ms = ref(0)
+    const count = ref(0)
+    const pauseStart = ref<number | null>(null)
 
-    pause()
-    awayPauseStart.value = clock.now()
-    awayCount.value += 1
-  }
+    const pauseFor = () => {
+      if (!isRunning.value || runningStart.value === null) return
 
-  const resumeFromAway = () => {
-    if (awayPauseStart.value !== null) {
-      awayMs.value += clock.now() - awayPauseStart.value
-      awayPauseStart.value = null
+      pause()
+      pauseStart.value = clock.now()
+      count.value += 1
     }
-    resume()
+
+    const resumeFrom = () => {
+      if (pauseStart.value !== null) {
+        ms.value += clock.now() - pauseStart.value
+        pauseStart.value = null
+      }
+      resume()
+    }
+
+    return { ms, count, pauseFor, resumeFrom }
   }
+
+  // Away: accumulated only from the tracker's own internal tab-away
+  // detection (visibilitychange/pagehide/blur and the watchdog's
+  // hidden-document sync) — never from externally invoked pause()/resume()
+  // calls made by other composables for unrelated reasons.
+  const away = createInterruptionAccumulator()
+
+  // Detour: accumulated only from the publicly exposed
+  // pauseForDetour()/resumeFromDetour() pair, called by an external
+  // composable (useQuestionThinkingTime) when the learner navigates away to
+  // a note/notebook mid-question and returns via Resume — never from the
+  // tracker's own internal away detection or from plain pause()/resume().
+  const detour = createInterruptionAccumulator()
 
   const reconcileGap = () => {
     if (!isRunning.value || runningStart.value === null) return
@@ -107,7 +124,7 @@ export function useThinkingTimeTracker(
       if (isRunning.value) {
         reconcileGap()
         if (document.hidden) {
-          pauseForAway()
+          away.pauseFor()
         }
       }
     }, 250)
@@ -145,27 +162,27 @@ export function useThinkingTimeTracker(
 
   const handleVisibilityChange = () => {
     if (document.hidden) {
-      pauseForAway()
+      away.pauseFor()
     } else {
-      resumeFromAway()
+      away.resumeFrom()
     }
   }
 
   const handlePageHide = () => {
-    pauseForAway()
+    away.pauseFor()
   }
 
   const handlePageShow = () => {
-    resumeFromAway()
+    away.resumeFrom()
   }
 
   const handleBlur = () => {
-    pauseForAway()
+    away.pauseFor()
   }
 
   const handleFocus = () => {
     if (document.hidden) return
-    resumeFromAway()
+    away.resumeFrom()
   }
 
   const setupEventListeners = () => {
@@ -199,7 +216,11 @@ export function useThinkingTimeTracker(
     resume,
     isRunning,
     isPaused,
-    awayMs,
-    awayCount,
+    awayMs: away.ms,
+    awayCount: away.count,
+    pauseForDetour: detour.pauseFor,
+    resumeFromDetour: detour.resumeFrom,
+    detourMs: detour.ms,
+    detourCount: detour.count,
   }
 }

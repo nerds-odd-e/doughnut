@@ -218,6 +218,15 @@ const assumeMemoryTrackerPage = () => {
         .and('contain.text', 'x)')
       return assumeMemoryTrackerPage()
     },
+    expectDetourTimeAndCount() {
+      expectMemoryTrackerPage()
+      cy.get('[data-testid="recall-history-detour-time"]')
+        .should('be.visible')
+        .and('contain.text', 'Detour:')
+        .and('contain.text', 'x)')
+      cy.get('[data-testid="recall-history-away-time"]').should('not.exist')
+      return assumeMemoryTrackerPage()
+    },
     expectTutorFeedback(feedback: string) {
       expectMemoryTrackerPage()
       cy.get('[data-testid="recall-log-tutor-feedback"]').should(($el) => {

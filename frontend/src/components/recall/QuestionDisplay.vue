@@ -69,7 +69,7 @@ const answeredWithAiNotes = computed(
     !!(props.testedFocus?.trim() || props.validationRationale?.trim())
 )
 
-const { stop, isPaused, awayMs, awayCount } =
+const { stop, isPaused, awayMs, awayCount, detourMs, detourCount } =
   useQuestionThinkingTime(isActiveQuestion)
 
 const submitAnswer = async (answerData: AnswerDto) => {
@@ -79,6 +79,8 @@ const submitAnswer = async (answerData: AnswerDto) => {
     thinkingTimeMs,
     awayMs: Math.round(awayMs.value),
     awayCount: awayCount.value,
+    detourMs: Math.round(detourMs.value),
+    detourCount: detourCount.value,
   })
 }
 </script>

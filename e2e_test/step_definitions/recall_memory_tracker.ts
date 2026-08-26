@@ -32,6 +32,13 @@ Then(
   }
 )
 
+Then(
+  'the recall history should show detour time and count distinct from away time',
+  () => {
+    assumeMemoryTrackerPage().expectDetourTimeAndCount()
+  }
+)
+
 Then("I should see the tutor's feedback {string}", (feedback: string) => {
   assumeMemoryTrackerPage().expectTutorFeedback(feedback)
 })

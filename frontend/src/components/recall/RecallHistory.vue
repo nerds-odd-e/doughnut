@@ -92,6 +92,14 @@ const historyItemKey = (item: RecallHistoryItem, index: number) => {
               Away: {{ formatThinkingTime(item.recallPrompt.answer.awayMs) }}
               ({{ item.recallPrompt.answer.awayCount }}x)
             </span>
+            <span
+              v-if="item.recallPrompt.answer?.detourMs"
+              data-testid="recall-history-detour-time"
+              class="daisy-badge daisy-badge-outline"
+            >
+              Detour: {{ formatThinkingTime(item.recallPrompt.answer.detourMs) }}
+              ({{ item.recallPrompt.answer.detourCount }}x)
+            </span>
           </div>
           <div v-if="item.recallPrompt.questionType === 'SPELLING'">
             <div v-if="item.recallPrompt.answer" class="space-y-2">

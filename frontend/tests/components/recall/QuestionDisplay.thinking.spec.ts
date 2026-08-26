@@ -55,6 +55,36 @@ describe("QuestionDisplay thinking time", () => {
     return wrapper
   }
 
+  async function mountKeepAliveQuestion(
+    mcq: ReturnType<typeof activeQuestion>
+  ) {
+    const WrapperComponent = defineComponent({
+      components: { QuestionDisplay, KeepAlive },
+      data() {
+        return { show: true, question: mcq }
+      },
+      template: `
+        <KeepAlive>
+          <QuestionDisplay
+            v-if="show"
+            key="question"
+            :questionStem="question.questionStem"
+            :responseChoices="question.responseChoices"
+          />
+        </KeepAlive>
+      `,
+    })
+
+    const wrapper = helper.component(WrapperComponent).mount()
+    await flushPromises()
+
+    const questionComponent = wrapper.findComponent(QuestionDisplay)
+    await questionComponent.vm.$nextTick()
+    flushRAF()
+
+    return { wrapper, questionComponent }
+  }
+
   it("includes thinking time in answer submission", async () => {
     const wrapper = await mountActiveQuestion()
     setTime(5000)
@@ -129,31 +159,9 @@ describe("QuestionDisplay thinking time", () => {
   })
 
   it("pauses timer when component is deactivated (KeepAlive)", async () => {
-    const mcq = activeQuestion()
-
-    const WrapperComponent = defineComponent({
-      components: { QuestionDisplay, KeepAlive },
-      data() {
-        return { show: true, question: mcq }
-      },
-      template: `
-        <KeepAlive>
-          <QuestionDisplay
-            v-if="show"
-            key="question"
-            :questionStem="question.questionStem"
-            :responseChoices="question.responseChoices"
-          />
-        </KeepAlive>
-      `,
-    })
-
-    const wrapper = helper.component(WrapperComponent).mount()
-    await flushPromises()
-
-    const questionComponent = wrapper.findComponent(QuestionDisplay)
-    await questionComponent.vm.$nextTick()
-    flushRAF()
+    const { wrapper, questionComponent } = await mountKeepAliveQuestion(
+      activeQuestion()
+    )
     setTime(1000)
 
     await wrapper.setData({ show: false })
@@ -173,5 +181,31 @@ describe("QuestionDisplay thinking time", () => {
     }
     expect(answerData?.thinkingTimeMs).toBeLessThan(2000)
     expect(answerData?.thinkingTimeMs).toBeGreaterThanOrEqual(1000)
+  })
+
+  it("records a detour when deactivated and reactivated (KeepAlive)", async () => {
+    const { wrapper, questionComponent } = await mountKeepAliveQuestion(
+      activeQuestion()
+    )
+    setTime(1000)
+
+    await wrapper.setData({ show: false })
+    await wrapper.vm.$nextTick()
+    setTime(2500)
+
+    await wrapper.setData({ show: true })
+    await questionComponent.vm.$nextTick()
+    flushRAF()
+    setTime(3000)
+
+    await questionComponent.find("li.choice button").trigger("click")
+    await flushPromises()
+
+    const answerData = questionComponent.emitted("answer")?.[0]?.[0] as {
+      detourMs?: number
+      detourCount?: number
+    }
+    expect(answerData?.detourCount).toBe(1)
+    expect(answerData?.detourMs).toBeGreaterThanOrEqual(1500)
   })
 })

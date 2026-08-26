@@ -180,6 +180,15 @@ export const recall = () => {
       waitUntilAppIsNotBusy()
       return recallPage()
     },
+    returnToRecallFromDetour() {
+      // A detour on the current (still unanswered) question does not
+      // advance currentIndex, so the nav item stays labelled "Recall"
+      // rather than "Resume" - the underlying route is the same, and it
+      // reactivates the KeepAlive'd RecallPage exactly like Resume does.
+      cy.findByLabelText('Recall').click()
+      waitUntilAppIsNotBusy()
+      return recallPage()
+    },
     visitRecallPage() {
       loadRecallPage()
       return recallPage()

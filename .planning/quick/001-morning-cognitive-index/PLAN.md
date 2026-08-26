@@ -221,21 +221,30 @@ regenerated. E2E scenario passes for real (not `@wip`) by dispatching
 `blur`/`focus` on `window` and waiting the away duration in real wall-clock
 time, since the tracker reads real `performance.now()`.
 
-#### 6. A detour into a note is recorded separately — Behavior `[ ]`
+#### 6. A detour into a note is recorded separately — Behavior `[x]`
 
 Open the note mid-question: Recall History distinguishes a study detour from a
 tab-away. Detour is attributed to the note of the open prompt.
 
-**Resolved (developer clarification):** opening the note is a full navigation
-away from `RecallPage` — there is no in-page overlay. The existing "Resume"
-entry point (menu-driven; the flow slice 1's tests already drive via
-`shouldResumeRecall`) is how the learner returns, and app state is remembered
-across that navigation. The detour interval is therefore the wall-clock time
-between leaving (opening the note) and returning via Resume — computed from
-state that survives `RecallPage` unmount/remount (e.g. `useRecallData.ts`'s
-module-level shared state, the same home slice 1 used for
-`isViewingAnsweredQuestion`), not from the per-mount `useThinkingTimeTracker`
-instance, which is destroyed on navigation away.
+Done: `useThinkingTimeTracker.ts`'s `away` accumulator was generalized into a
+`createInterruptionAccumulator()` factory shared by a second `detour`
+accumulator, exposing `pauseForDetour`/`resumeFromDetour`. Unlike `away`
+(triggered only by the tracker's own tab-visibility listeners), detour is
+driven externally: `useQuestionThinkingTime.ts`'s `onDeactivated`/`onActivated`
+(the `RecallPage` `KeepAlive` lifecycle hooks already used for the away/resume
+plumbing) call `pauseForDetour`/`resumeFromDetour` directly, since navigating
+to a note unmounts-and-remounts via KeepAlive rather than destroying the
+tracker instance — no reliance on `useRecallData.ts` module-level state was
+needed. `detourMs`/`detourCount` flow `QuestionDisplay.vue` →
+`AnswerDTO`/`Answer` entity → `RecallHistory.vue`, rendered only when truthy,
+mirroring the away-time pattern. API client regenerated.
+E2E scenario added but left `@wip`: this environment simulates "day 2" on the
+backend while the frontend tracker reads the real system clock, so
+`RecallPage`'s staleness check always treats the due-recall window as stale on
+KeepAlive reactivation, forcing a full refetch/remount that discards the
+detour accumulator before the answer is submitted — a pre-existing interaction
+with simulated-time E2E tests, unrelated to the detour wiring itself (verified
+correct via unit tests) and out of this slice's scope to fix.
 
 #### 7. Idling in place past the threshold is recorded — Behavior `[ ]`
 

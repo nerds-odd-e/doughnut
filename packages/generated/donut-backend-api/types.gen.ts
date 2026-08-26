@@ -274,6 +274,8 @@ export type AnswerDto = {
     thinkingTimeMs?: number;
     awayMs?: number;
     awayCount?: number;
+    detourMs?: number;
+    detourCount?: number;
 };
 
 export type Answer = {
