@@ -17,8 +17,8 @@ test-install-constructs-download-url-from-base-url-assert() {
 test-install-constructs-install-path-from-install-prefix() {
   INSTALL_PREFIX="/custom/prefix"
   INSTALL_DIR="$INSTALL_PREFIX/bin"
-  @out "$INSTALL_DIR/doughnut"
+  @out "$INSTALL_DIR/donut"
 }
 test-install-constructs-install-path-from-install-prefix-assert() {
-  @out "/custom/prefix/bin/doughnut"
+  @out "/custom/prefix/bin/donut"
 }

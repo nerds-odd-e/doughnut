@@ -50,7 +50,7 @@ git add --renormalize .
 Install Nix package manager if you haven't already with
 
 ```bash
-./setup-doughnut-dev.sh
+./setup-donut-dev.sh
 ```
 
 For developers on macOS 15 Sequoia, please run the below if you face issue installing or starting up `nix` ([see here for full details](https://github.com/NixOS/nix/issues/10892))

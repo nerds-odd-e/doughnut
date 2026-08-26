@@ -149,14 +149,14 @@ main() {
     exit 1
   fi
 
-  log "Starting doughnut development environment setup"
+  log "Starting donut development environment setup"
   check_wsl2
   install_nixpkg_manager || rc=$?
 
   if [[ $rc -eq 0 ]]; then
     log "------------------------------------------ CONGRATS !!! ----------------------------------------------------"
-    log "  doughnut basic nix development environment tooling setup completed successfully."
-    log "  Please exit this shell terminal and start a new one in doughnut root directory then execute 'nix develop'."
+    log "  donut basic nix development environment tooling setup completed successfully."
+    log "  Please exit this shell terminal and start a new one in donut root directory then execute 'nix develop'."
     log "  To uninstall Nix in the future, you can run: /nix/nix-installer uninstall"
     log "------------------------------------------    END       ----------------------------------------------------"
   else

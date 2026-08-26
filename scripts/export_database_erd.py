@@ -27,12 +27,12 @@ def _mysql_base_cmd() -> list[str]:
     return [
         "mysql",
         "-h",
-        _env("DOUGHNUT_ERD_MYSQL_HOST", "127.0.0.1"),
+        _env("DONUT_ERD_MYSQL_HOST", "127.0.0.1"),
         "-P",
-        _env("DOUGHNUT_ERD_MYSQL_PORT", "3309"),
+        _env("DONUT_ERD_MYSQL_PORT", "3309"),
         "-u",
-        _env("DOUGHNUT_ERD_MYSQL_USER", "doughnut"),
-        f"-p{_env('DOUGHNUT_ERD_MYSQL_PASSWORD', 'doughnut')}",
+        _env("DONUT_ERD_MYSQL_USER", "doughnut"),
+        f"-p{_env('DONUT_ERD_MYSQL_PASSWORD', 'doughnut')}",
     ]
 
 
@@ -66,13 +66,13 @@ def _table_count(schema: str) -> int:
 
 
 def _pick_schema() -> str:
-    explicit = os.environ.get("DOUGHNUT_ERD_SCHEMA", "").strip()
+    explicit = os.environ.get("DONUT_ERD_SCHEMA", "").strip()
     if explicit:
         if not _valid_schema(explicit):
-            sys.exit("DOUGHNUT_ERD_SCHEMA must be alphanumeric plus underscores only")
+            sys.exit("DONUT_ERD_SCHEMA must be alphanumeric plus underscores only")
         if _table_count(explicit) == 0:
             sys.exit(
-                f"No tables in schema {explicit!r}. Start MySQL, migrate, or set DOUGHNUT_ERD_SCHEMA.",
+                f"No tables in schema {explicit!r}. Start MySQL, migrate, or set DONUT_ERD_SCHEMA.",
             )
         return explicit
 
@@ -85,7 +85,7 @@ def _pick_schema() -> str:
 
     sys.exit(
         "No Flyway-populated schema found (tried doughnut_development, doughnut_test, doughnut_e2e_test). "
-        "Start MySQL on 3309 and run migrations, or set DOUGHNUT_ERD_SCHEMA.",
+        "Start MySQL on 3309 and run migrations, or set DONUT_ERD_SCHEMA.",
     )
 
 

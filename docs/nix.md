@@ -1,6 +1,6 @@
 # Local development machine development environment setup with nix
 
-## :warning: 🚨 **ONLY PROCEED**  with the subsequent steps if `./setup-doughnut-dev.sh` (see [README.md](../README.md)) somehow failed horribly for you!!!
+## :warning: 🚨 **ONLY PROCEED**  with the subsequent steps if `./setup-donut-dev.sh` (see [README.md](../README.md)) somehow failed horribly for you!!!
 
 ### 1. Install Nix
 

@@ -35,7 +35,7 @@ test('runLogsTail treats a missing known log as an empty safe tail', async () =>
     argv: ['backend-e2e'],
     out,
     err,
-    resolveTarget: () => path.resolve('/tmp/doughnut-missing-test.log'),
+    resolveTarget: () => path.resolve('/tmp/donut-missing-test.log'),
   })
 
   assert.strictEqual(code, 0)

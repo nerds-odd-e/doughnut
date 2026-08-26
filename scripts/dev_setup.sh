@@ -18,9 +18,9 @@ start_detached() {
 }
 
 # Skip the pnpm install when direnv/nix runs the shell hook more than once per cd.
-DOUGHNUT_PNPM_FINGERPRINT_FILE="${DOUGHNUT_PNPM_FINGERPRINT_FILE:-.doughnut-pnpm-lock.sha256}"
+DONUT_PNPM_FINGERPRINT_FILE="${DONUT_PNPM_FINGERPRINT_FILE:-.donut-pnpm-lock.sha256}"
 
-doughnut_workspace_deps_fingerprint() {
+donut_workspace_deps_fingerprint() {
   if [ ! -f "${PWD}/pnpm-lock.yaml" ] || [ ! -f "${PWD}/package.json" ]; then
     return 1
   fi
@@ -33,14 +33,14 @@ doughnut_workspace_deps_fingerprint() {
   fi
 }
 
-doughnut_needs_pnpm_install() {
+donut_needs_pnpm_install() {
   local current
-  [ "${DOUGHNUT_SHELL_HOOK_FORCE_PNPM:-}" = "1" ] && return 0
+  [ "${DONUT_SHELL_HOOK_FORCE_PNPM:-}" = "1" ] && return 0
   [ ! -d "${PWD}/node_modules" ] && return 0
-  current="$(doughnut_workspace_deps_fingerprint)" || return 0
+  current="$(donut_workspace_deps_fingerprint)" || return 0
   [ -z "${current}" ] && return 0
-  [ ! -f "${PWD}/${DOUGHNUT_PNPM_FINGERPRINT_FILE}" ] && return 0
-  [ "$(cat "${PWD}/${DOUGHNUT_PNPM_FINGERPRINT_FILE}" 2>/dev/null)" != "${current}" ] && return 0
+  [ ! -f "${PWD}/${DONUT_PNPM_FINGERPRINT_FILE}" ] && return 0
+  [ "$(cat "${PWD}/${DONUT_PNPM_FINGERPRINT_FILE}" 2>/dev/null)" != "${current}" ] && return 0
   return 1
 }
 
@@ -49,10 +49,10 @@ setup_pnpm_and_biome() {
   log "Setting up PNPM..."
   # pnpm is provided by the nix dev shell (flake.nix pins 11.15.1 under nodejs_26).
   # Node 26 dropped bundled corepack, so we no longer activate pnpm via corepack.
-  if doughnut_needs_pnpm_install; then
-    pnpm --frozen-lockfile recursive install && doughnut_workspace_deps_fingerprint >"${PWD}/${DOUGHNUT_PNPM_FINGERPRINT_FILE}"
+  if donut_needs_pnpm_install; then
+    pnpm --frozen-lockfile recursive install && donut_workspace_deps_fingerprint >"${PWD}/${DONUT_PNPM_FINGERPRINT_FILE}"
   else
-    log "Skipping pnpm install (workspace fingerprint unchanged). Set DOUGHNUT_SHELL_HOOK_FORCE_PNPM=1 to force."
+    log "Skipping pnpm install (workspace fingerprint unchanged). Set DONUT_SHELL_HOOK_FORCE_PNPM=1 to force."
   fi
 
   if [ -e /etc/NIXOS ] || [ -e /etc/nixos ]; then

@@ -4,7 +4,7 @@ ongoing/*-profile-results.json
 .planning/quick/**/*-profile-results.json
 
 # Miscellaneous
-.doughnut-pnpm-lock.sha256
+.donut-pnpm-lock.sha256
 *.class
 *.log
 *.pyc

@@ -40,11 +40,11 @@ exporter after schema changes.
 
 | Variable | Default |
 |----------|---------|
-| `DOUGHNUT_ERD_SCHEMA` | (auto: development → test → e2e) |
-| `DOUGHNUT_ERD_MYSQL_HOST` | `127.0.0.1` |
-| `DOUGHNUT_ERD_MYSQL_PORT` | `3309` |
-| `DOUGHNUT_ERD_MYSQL_USER` | `doughnut` |
-| `DOUGHNUT_ERD_MYSQL_PASSWORD` | `doughnut` |
+| `DONUT_ERD_SCHEMA` | (auto: development → test → e2e) |
+| `DONUT_ERD_MYSQL_HOST` | `127.0.0.1` |
+| `DONUT_ERD_MYSQL_PORT` | `3309` |
+| `DONUT_ERD_MYSQL_USER` | `doughnut` |
+| `DONUT_ERD_MYSQL_PASSWORD` | `doughnut` |
 </context>
 
 <process>
@@ -57,7 +57,7 @@ Ensure MySQL is reachable on **127.0.0.1:3309** with user **`doughnut`**
 <step name="ensure_migrated_schema">
 Ensure at least one migrated schema exists (Flyway has run). The script picks,
 in order: **`doughnut_development`**, then **`doughnut_test`**, then
-**`doughnut_e2e_test`**, unless **`DOUGHNUT_ERD_SCHEMA`** is set to a
+**`doughnut_e2e_test`**, unless **`DONUT_ERD_SCHEMA`** is set to a
 specific catalog.
 </step>
 
@@ -84,7 +84,7 @@ after).
 
 <success_criteria>
 - MySQL reachable on 127.0.0.1:3309 with user `doughnut`
-- At least one migrated schema available (or `DOUGHNUT_ERD_SCHEMA` set)
+- At least one migrated schema available (or `DONUT_ERD_SCHEMA` set)
 - Exporter run with Nix prefix
 - `docs/database-erd.md` updated and ready to commit
 - Final output includes `## ERD EXPORTED`
@@ -93,7 +93,7 @@ after).
 <output>
 Report a short summary to the caller, then the completion marker:
 
-1. Schema catalog used (auto-selected or `DOUGHNUT_ERD_SCHEMA` override).
+1. Schema catalog used (auto-selected or `DONUT_ERD_SCHEMA` override).
 2. Whether `docs/database-erd.md` changed.
 
 ```

@@ -225,6 +225,8 @@ CLI spec CI runs) to confirm the renamed local binary installs and runs.
 
 ### 10. Scripts & root dev tooling (Structure)
 
+Status: done
+
 - `setup-doughnut-dev.sh` → `setup-donut-dev.sh`; update its content and
   every doc/CI reference to it.
 - `.doughnut-pnpm-lock.sha256` → `.donut-pnpm-lock.sha256`; update whatever

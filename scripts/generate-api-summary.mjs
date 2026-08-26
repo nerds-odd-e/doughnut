@@ -30,7 +30,7 @@ export function renderApiSummary(openApi, inputPath = defaultInputPath) {
   const groups = collectOperations(openApi)
   const sourceName = path.basename(inputPath)
   const lines = [
-    '# Doughnut Backend API Summary',
+    '# Donut Backend API Summary',
     '',
     `Generated from \`${sourceName}\` by \`scripts/generate-api-summary.mjs\`.`,
     'Use this for endpoint lookup; open `sdk.gen.ts` or `types.gen.ts` only for exact generated signatures.',

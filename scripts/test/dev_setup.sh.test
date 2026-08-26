@@ -4,9 +4,9 @@
 
 # Captured before Bach rewrites PATH so the real-execution test below can spawn a
 # clean bash that sources the real dev_setup.sh (see start_detached test).
-DOUGHNUT_TEST_REAL_PATH="$PATH"
-DOUGHNUT_TEST_REAL_BASH="$(command -v bash)"
-DOUGHNUT_TEST_DEV_SETUP_SH="$(cd "$(dirname "$0")/.." && pwd)/dev_setup.sh"
+DONUT_TEST_REAL_PATH="$PATH"
+DONUT_TEST_REAL_BASH="$(command -v bash)"
+DONUT_TEST_DEV_SETUP_SH="$(cd "$(dirname "$0")/.." && pwd)/dev_setup.sh"
 
 source "$(dirname "$0")/vendor/bach.sh"
 
@@ -31,9 +31,9 @@ PROBE
 
     # env -i clears Bach's exported mock functions so the child bash sources the
     # real dev_setup.sh instead of Bach's `source` stub.
-    @real env -i "PATH=${DOUGHNUT_TEST_REAL_PATH}" \
-        "${DOUGHNUT_TEST_REAL_BASH}" "${probe}" \
-        "${DOUGHNUT_TEST_REAL_PATH}" "${DOUGHNUT_TEST_DEV_SETUP_SH}" "${fd3}" "${out}" \
+    @real env -i "PATH=${DONUT_TEST_REAL_PATH}" \
+        "${DONUT_TEST_REAL_BASH}" "${probe}" \
+        "${DONUT_TEST_REAL_PATH}" "${DONUT_TEST_DEV_SETUP_SH}" "${fd3}" "${out}" \
         >/dev/null 2>&1
 
     @assert-equals "fd3=[] out=[redirected]" "fd3=[$(@cat "${fd3}")] out=[$(@cat "${out}")]"
