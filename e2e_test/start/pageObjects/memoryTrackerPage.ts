@@ -210,6 +210,14 @@ const assumeMemoryTrackerPage = () => {
       )
       return assumeMemoryTrackerPage()
     },
+    expectAwayTimeAndCount() {
+      expectMemoryTrackerPage()
+      cy.get('[data-testid="recall-history-away-time"]')
+        .should('be.visible')
+        .and('contain.text', 'Away:')
+        .and('contain.text', 'x)')
+      return assumeMemoryTrackerPage()
+    },
     expectTutorFeedback(feedback: string) {
       expectMemoryTrackerPage()
       cy.get('[data-testid="recall-log-tutor-feedback"]').should(($el) => {

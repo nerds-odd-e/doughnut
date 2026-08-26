@@ -3768,6 +3768,12 @@ components:
         thinkingTimeMs:
           type: integer
           format: int32
+        awayMs:
+          type: integer
+          format: int32
+        awayCount:
+          type: integer
+          format: int32
     Answer:
       type: object
       properties:
@@ -3784,6 +3790,21 @@ components:
           format: int32
         spellingAnswer:
           type: string
+        awayMs:
+          type: integer
+          format: int32
+        awayCount:
+          type: integer
+          format: int32
+        detourMs:
+          type: integer
+          format: int32
+        detourCount:
+          type: integer
+          format: int32
+        idleMs:
+          type: integer
+          format: int32
         matchedNoteId:
           type: integer
           format: int64

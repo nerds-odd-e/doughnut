@@ -25,6 +25,13 @@ Then('I should see an AGAIN RecallLog', () => {
   assumeMemoryTrackerPage().expectAgainRecallLog()
 })
 
+Then(
+  'the recall history should show away time and count beside thinking time',
+  () => {
+    assumeMemoryTrackerPage().expectAwayTimeAndCount()
+  }
+)
+
 Then("I should see the tutor's feedback {string}", (feedback: string) => {
   assumeMemoryTrackerPage().expectTutorFeedback(feedback)
 })

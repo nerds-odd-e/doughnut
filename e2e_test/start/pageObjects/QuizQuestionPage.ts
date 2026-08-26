@@ -44,6 +44,19 @@ const assumeQuestionPage = (stem?: string) => {
       waitUntilAppIsNotBusy()
       return this
     },
+    switchAwayFromTabFor(seconds: number) {
+      // The tracked away duration is real wall-clock time (performance.now()),
+      // so this wait simulates the user behavior under test rather than
+      // polling for app state.
+      cy.window().then((win) => {
+        win.dispatchEvent(new Event('blur'))
+      })
+      cy.wait(seconds * 1000)
+      cy.window().then((win) => {
+        win.dispatchEvent(new Event('focus'))
+      })
+      return this
+    },
   }
 }
 

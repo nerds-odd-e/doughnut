@@ -174,6 +174,10 @@ When('I choose answer {string}', (answer: string) => {
   start.assumeQuestionPage().answer(answer)
 })
 
+When('I switch away from the tab for {int} seconds', (seconds: number) => {
+  start.assumeQuestionPage().switchAwayFromTabFor(seconds)
+})
+
 Then(
   'I should see that my MCQ answer {string} is incorrect',
   (answer: string) => {

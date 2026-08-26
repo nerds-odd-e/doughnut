@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.donut.controllers.dto.AnswerDTO;
 import com.odde.donut.controllers.dto.AnsweredQuestion;
+import com.odde.donut.entities.Answer;
 import com.odde.donut.entities.Grade;
 import com.odde.donut.entities.MemoryTracker;
 import com.odde.donut.entities.Note;
@@ -90,6 +91,15 @@ class RecallPromptAnswerControllerTest extends RecallPromptControllerTestBase {
     answerDTO.setThinkingTimeMs(5000);
     assertThat(
         controller.answer(recallPrompt, answerDTO).getAnswer().getThinkingTimeMs(), equalTo(5000));
+  }
+
+  @Test
+  void shouldSaveAwayMsAndAwayCount() throws UnexpectedNoAccessRightException {
+    answerDTO.setAwayMs(3000);
+    answerDTO.setAwayCount(2);
+    Answer answer = controller.answer(recallPrompt, answerDTO).getAnswer();
+    assertThat(answer.getAwayMs(), equalTo(3000));
+    assertThat(answer.getAwayCount(), equalTo(2));
   }
 
   @Test

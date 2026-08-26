@@ -85,6 +85,13 @@ const historyItemKey = (item: RecallHistoryItem, index: number) => {
               Thinking time:
               {{ formatThinkingTime(item.recallPrompt.answer.thinkingTimeMs) }}
             </span>
+            <span
+              v-if="item.recallPrompt.answer?.awayMs"
+              data-testid="recall-history-away-time"
+            >
+              Away: {{ formatThinkingTime(item.recallPrompt.answer.awayMs) }}
+              ({{ item.recallPrompt.answer.awayCount }}x)
+            </span>
           </div>
           <div v-if="item.recallPrompt.questionType === 'SPELLING'">
             <div v-if="item.recallPrompt.answer" class="space-y-2">

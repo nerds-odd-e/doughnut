@@ -27,6 +27,14 @@ export function useThinkingTimeTracker(
   const isPaused = ref(false)
   const hasStopped = ref(false)
 
+  // Away time/count: accumulated only from the tracker's own internal
+  // tab-away detection (visibilitychange/pagehide/blur and the watchdog's
+  // hidden-document sync) — never from externally invoked pause()/resume()
+  // calls made by other composables for unrelated reasons.
+  const awayMs = ref(0)
+  const awayCount = ref(0)
+  const awayPauseStart = ref<number | null>(null)
+
   // Ticks every 250ms while running: reconciles suspend gaps (see
   // reconcileGap) and syncs pause state with document.hidden.
   let watchdogIntervalId: ReturnType<typeof setInterval> | null = null
@@ -47,6 +55,22 @@ export function useThinkingTimeTracker(
     isRunning.value = false
     isPaused.value = true
     clearWatchdog()
+  }
+
+  const pauseForAway = () => {
+    if (!isRunning.value || runningStart.value === null) return
+
+    pause()
+    awayPauseStart.value = clock.now()
+    awayCount.value += 1
+  }
+
+  const resumeFromAway = () => {
+    if (awayPauseStart.value !== null) {
+      awayMs.value += clock.now() - awayPauseStart.value
+      awayPauseStart.value = null
+    }
+    resume()
   }
 
   const reconcileGap = () => {
@@ -83,7 +107,7 @@ export function useThinkingTimeTracker(
       if (isRunning.value) {
         reconcileGap()
         if (document.hidden) {
-          pause()
+          pauseForAway()
         }
       }
     }, 250)
@@ -121,27 +145,27 @@ export function useThinkingTimeTracker(
 
   const handleVisibilityChange = () => {
     if (document.hidden) {
-      pause()
+      pauseForAway()
     } else {
-      resume()
+      resumeFromAway()
     }
   }
 
   const handlePageHide = () => {
-    pause()
+    pauseForAway()
   }
 
   const handlePageShow = () => {
-    resume()
+    resumeFromAway()
   }
 
   const handleBlur = () => {
-    pause()
+    pauseForAway()
   }
 
   const handleFocus = () => {
     if (document.hidden) return
-    resume()
+    resumeFromAway()
   }
 
   const setupEventListeners = () => {
@@ -175,5 +199,7 @@ export function useThinkingTimeTracker(
     resume,
     isRunning,
     isPaused,
+    awayMs,
+    awayCount,
   }
 }

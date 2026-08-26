@@ -114,6 +114,8 @@ public class Answer extends EntityIdentifiedByIdOnly {
     answer.choiceIndex = answerDTO.getChoiceIndex();
     answer.setCorrect(mcq.checkAnswer(answerDTO));
     answer.setThinkingTimeMs(answerDTO.getThinkingTimeMs());
+    answer.setAwayMs(answerDTO.getAwayMs());
+    answer.setAwayCount(answerDTO.getAwayCount());
     return answer;
   }
 }

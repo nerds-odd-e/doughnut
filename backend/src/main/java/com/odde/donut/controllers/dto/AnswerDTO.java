@@ -6,4 +6,6 @@ import lombok.Setter;
 public class AnswerDTO {
   @Getter @Setter private Integer choiceIndex;
   @Getter @Setter private Integer thinkingTimeMs;
+  @Getter @Setter private Integer awayMs;
+  @Getter @Setter private Integer awayCount;
 }

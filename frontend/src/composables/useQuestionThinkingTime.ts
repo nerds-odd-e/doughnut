@@ -11,7 +11,8 @@ import { useRecallData } from "./useRecallData"
 export function useQuestionThinkingTime(
   isActiveQuestion: ComputedRef<boolean>
 ) {
-  const { start, stop, pause, resume, isPaused } = useThinkingTimeTracker()
+  const { start, stop, pause, resume, isPaused, awayMs, awayCount } =
+    useThinkingTimeTracker()
   const { isViewingAnsweredQuestion } = useRecallData()
 
   watch(
@@ -51,5 +52,7 @@ export function useQuestionThinkingTime(
   return {
     stop,
     isPaused,
+    awayMs,
+    awayCount,
   }
 }

@@ -185,12 +185,25 @@ trusting a hardcoded number in this plan text; **slice 15's stated
 `thinkingTimeMs` pattern. `docs/database-erd.md` regenerated — no diff, since
 none of the new columns are keys/FKs.
 
-#### 5. Time away from the tab is recorded and shown — Behavior `[ ]`
+#### 5. Time away from the tab is recorded and shown — Behavior `[x]`
 
 Switch away mid-question and back: Recall History shows away time and count
 beside the thinking time.
 
 - E2E: new `recall/recall_timing.feature`
+
+Done: `useThinkingTimeTracker.ts` gained internal `pauseForAway()`/
+`resumeFromAway()` wrapping the existing `pause()`/`resume()`, triggered only
+by the tracker's own tab-visibility listeners — NOT by external callers like
+slice 1's view-history pause, which stays uncategorized (excluded from
+thinking time but not counted as "away"). `awayMs`/`awayCount` flow
+DTO → `Answer.buildAnswer()` → entity, mirroring `thinkingTimeMs`.
+`RecallHistory.vue` renders them only when truthy (old rows stay silent, not
+zero). MCQ path only — `AnswerSpellingDTO` untouched, since spelling's
+Recall History branch doesn't render thinking/away time at all. API client
+regenerated. E2E scenario passes for real (not `@wip`) by dispatching
+`blur`/`focus` on `window` and waiting the away duration in real wall-clock
+time, since the tracker reads real `performance.now()`.
 
 #### 6. A detour into a note is recorded separately — Behavior `[ ]`
 

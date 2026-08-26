@@ -7,6 +7,7 @@ import {
   mockMemoryTrackerPageViewDefaults,
   mountMemoryTrackerPageViewReady,
   noteUnderQuestionSections,
+  recallPromptWithAwayTime,
   recallPromptWithThinkingTime,
 } from "./memoryTrackerPageViewTestSupport"
 
@@ -95,6 +96,22 @@ describe("MemoryTrackerPageView display", () => {
       expect(wrapper.text()).toContain(expected)
     }
   )
+
+  it("shows away time and count beside thinking time", async () => {
+    const wrapper = await mountMemoryTrackerPageViewReady({
+      recallHistory: historyFromPrompts([recallPromptWithAwayTime(6500, 2)]),
+    })
+
+    expect(wrapper.text()).toContain("Away: 6.5s (2x)")
+  })
+
+  it("does not display away time for answers predating instrumentation", async () => {
+    const wrapper = await mountMemoryTrackerPageViewReady({
+      recallHistory: historyFromPrompts([recallPromptWithThinkingTime(5234)]),
+    })
+
+    expect(wrapper.text()).not.toContain("Away:")
+  })
 
   it("does not display thinking time for unanswered questions", async () => {
     const wrapper = await mountMemoryTrackerPageViewReady({

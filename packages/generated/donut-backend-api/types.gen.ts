@@ -272,6 +272,8 @@ export type SpellingQuestion = {
 export type AnswerDto = {
     choiceIndex?: number;
     thinkingTimeMs?: number;
+    awayMs?: number;
+    awayCount?: number;
 };
 
 export type Answer = {
@@ -280,6 +282,11 @@ export type Answer = {
     correct?: boolean;
     thinkingTimeMs?: number;
     spellingAnswer?: string;
+    awayMs?: number;
+    awayCount?: number;
+    detourMs?: number;
+    detourCount?: number;
+    idleMs?: number;
     matchedNoteId?: number;
     outcome?: 'ACCIDENTAL_MATCH' | 'OVERLAP';
 };

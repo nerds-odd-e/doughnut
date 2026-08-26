@@ -1,4 +1,5 @@
 import type {
+  Answer,
   MemoryTracker,
   RecallPromptHistoryItem,
   RecallLog,
@@ -134,7 +135,7 @@ export async function resolveConfirmPopup(confirmed: boolean) {
   await flushPromises()
 }
 
-export function recallPromptWithThinkingTime(thinkingTimeMs: number) {
+function recallPromptWithAnswer(answerOverrides: Omit<Answer, "id">) {
   return makeMe.aRecallPromptHistoryItem
     .withQuestionStem("Test question")
     .withChoices(["A", "B", "C"])
@@ -142,9 +143,17 @@ export function recallPromptWithThinkingTime(thinkingTimeMs: number) {
       id: 1,
       choiceIndex: 0,
       correct: true,
-      thinkingTimeMs,
+      ...answerOverrides,
     })
     .please()
+}
+
+export function recallPromptWithThinkingTime(thinkingTimeMs: number) {
+  return recallPromptWithAnswer({ thinkingTimeMs })
+}
+
+export function recallPromptWithAwayTime(awayMs: number, awayCount: number) {
+  return recallPromptWithAnswer({ awayMs, awayCount })
 }
 
 export function noteUnderQuestionSections(wrapper: VueWrapper) {
