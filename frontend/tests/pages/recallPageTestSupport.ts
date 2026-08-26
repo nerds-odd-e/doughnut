@@ -24,6 +24,7 @@ export function createUseRecallDataMock(overrides?: {
   currentRecallWindowEndAt?: string
   totalAssimilatedCount?: number
   isRecallPaused?: boolean
+  isViewingAnsweredQuestion?: boolean
   shouldResumeRecall?: boolean
   treadmillMode?: boolean
   currentIndex?: number
@@ -36,6 +37,9 @@ export function createUseRecallDataMock(overrides?: {
   const treadmillModeRef = ref(overrides?.treadmillMode ?? false)
   const currentIndexRef = ref(overrides?.currentIndex ?? 0)
   const diligentModeRef = ref(overrides?.diligentMode ?? false)
+  const isViewingAnsweredQuestionRef = ref(
+    overrides?.isViewingAnsweredQuestion ?? false
+  )
   const dueRecallsRefreshNonce = ref(0)
   const potentialLearningSessions = computed(
     () => overrides?.potentialLearningSessions ?? []
@@ -48,6 +52,7 @@ export function createUseRecallDataMock(overrides?: {
     currentRecallWindowEndAt: ref(overrides?.currentRecallWindowEndAt),
     totalAssimilatedCount: ref(overrides?.totalAssimilatedCount ?? 0),
     isRecallPaused: ref(overrides?.isRecallPaused ?? false),
+    isViewingAnsweredQuestion: isViewingAnsweredQuestionRef,
     shouldResumeRecall: ref(overrides?.shouldResumeRecall ?? false),
     treadmillMode: treadmillModeRef,
     currentIndex: currentIndexRef,
@@ -63,6 +68,9 @@ export function createUseRecallDataMock(overrides?: {
     setCurrentRecallWindowEndAt: vi.fn(),
     setTotalAssimilatedCount: vi.fn(),
     setIsRecallPaused: vi.fn(),
+    setIsViewingAnsweredQuestion: vi.fn((viewing: boolean) => {
+      isViewingAnsweredQuestionRef.value = viewing
+    }),
     resumeRecall: vi.fn(),
     clearShouldResumeRecall: vi.fn(),
     setTreadmillMode: vi.fn((enabled: boolean) => {

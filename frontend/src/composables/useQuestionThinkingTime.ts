@@ -6,11 +6,13 @@ import {
   type ComputedRef,
 } from "vue"
 import { useThinkingTimeTracker } from "./useThinkingTimeTracker"
+import { useRecallData } from "./useRecallData"
 
 export function useQuestionThinkingTime(
   isActiveQuestion: ComputedRef<boolean>
 ) {
   const { start, stop, pause, resume, isPaused } = useThinkingTimeTracker()
+  const { isViewingAnsweredQuestion } = useRecallData()
 
   watch(
     isActiveQuestion,
@@ -21,6 +23,14 @@ export function useQuestionThinkingTime(
     },
     { immediate: true }
   )
+
+  watch(isViewingAnsweredQuestion, (viewing) => {
+    if (viewing) {
+      pause()
+    } else if (isActiveQuestion.value) {
+      resume()
+    }
+  })
 
   onMounted(() => {
     if (isActiveQuestion.value) {

@@ -18,6 +18,7 @@ const dueCommissioned = ref<DueCommissionedMemoryTrackerLite[] | undefined>(
 const currentRecallWindowEndAt = ref<string | undefined>(undefined)
 const totalAssimilatedCount = ref<number | undefined>(undefined)
 const isRecallPaused = ref(false)
+const isViewingAnsweredQuestion = ref(false)
 const shouldResumeRecall = ref(false)
 const treadmillMode = ref<boolean>(false)
 const currentIndex = ref(0)
@@ -70,6 +71,10 @@ export function useRecallData() {
     isRecallPaused.value = paused
   }
 
+  const setIsViewingAnsweredQuestion = (viewing: boolean) => {
+    isViewingAnsweredQuestion.value = viewing
+  }
+
   const resumeRecall = () => {
     const current = toRepeat.value?.[currentIndex.value]
     if (current?.spelling && !treadmillMode.value) {
@@ -107,6 +112,7 @@ export function useRecallData() {
     currentRecallWindowEndAt,
     totalAssimilatedCount,
     isRecallPaused,
+    isViewingAnsweredQuestion,
     shouldResumeRecall,
     treadmillMode,
     currentIndex,
@@ -116,6 +122,7 @@ export function useRecallData() {
     setCurrentRecallWindowEndAt,
     setTotalAssimilatedCount,
     setIsRecallPaused,
+    setIsViewingAnsweredQuestion,
     resumeRecall,
     clearShouldResumeRecall,
     setTreadmillMode,

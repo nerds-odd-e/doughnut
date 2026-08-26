@@ -22,6 +22,17 @@ Feature: Browse answers and notes while recalling
     And I type my answer "sedition"
     Then I should see that my last spelling answer was correct with recall count 1
 
+  @wip
+  Scenario: Viewing a previous answer does not count toward the current question's thinking time
+    Given the note "sedition" was assimilated as spelling on day 1
+    And the note "sedition" was assimilated on day 1
+    When I visit recall waiting for 2 due recall prompts on day 2
+    And I type my answer "sedition"
+    And I view the last answered question for 5 seconds
+    And I resume recalling
+    And I choose the correct answer
+    Then the recall history should show a thinking time under 2 seconds for that answer
+
   @skipOptimizationDueToKnownNecessarySlowness
   Scenario: Browse notes while recalling and come back
     Given the note "sedition" was assimilated on day 1

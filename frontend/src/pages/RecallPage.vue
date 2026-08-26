@@ -94,6 +94,7 @@ const {
   totalAssimilatedCount,
   setTotalAssimilatedCount,
   setIsRecallPaused,
+  setIsViewingAnsweredQuestion,
   shouldResumeRecall,
   clearShouldResumeRecall,
   treadmillMode,
@@ -176,6 +177,7 @@ watch(
   () => previousAnsweredQuestionCursor.value,
   (cursor) => {
     setIsRecallPaused(cursor !== undefined)
+    setIsViewingAnsweredQuestion(cursor !== undefined)
   },
   { immediate: true }
 )
