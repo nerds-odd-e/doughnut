@@ -311,11 +311,28 @@ of scope to fix here. Backend (`RecallStatsServiceTest.Pace`) and frontend
 (`PaceTile.spec.ts`, `RecallStatsSettingsTab.spec.ts`) unit tests are the
 primary verification.
 
-#### 10. Implausibly fast attempts stop distorting pace — Behavior `[ ]`
+#### 10. Implausibly fast attempts stop distorting pace — Behavior `[x]`
 
 A 200 ms mistap drops out of the tile **and** out of retention, instead of
 counting as a fast correct answer. Item-relative floor:
 `t < max(300ms, 0.25 · exp(τ_j))`.
+
+Done: `RecallPaceAggregator.buildPace` became `compute(...)`, returning
+`PaceResult(PaceStats stats, Set<RecallAnswerRow> implausiblyFastRows)` from
+the same single chronological walk (no second pass, no duplicated EWMA
+logic) — a row with a present-but-implausibly-fast response time (floor
+computed against the item's prior baseline, or a flat 300ms when the item has
+no baseline yet) is added to the identity-based `implausiblyFastRows` set and
+excluded from both `todaysResiduals` and the `tauByItem` EWMA update, so one
+mistap can't corrupt that item's future baseline. `RecallStatsService.aggregateRows`
+now calls `compute(...)` once and skips any row in that set in the retention
+loop over `recentReviews` — relying on `recentReviews`/`recent` sharing the
+same `RecallAnswerRow` object references as `allTime` (verified). Also fixed
+`totalReviews365`, previously `recentReviews.size()`, to an in-loop counter so
+an excluded row drops out of the retention denominator too, not just the
+numerator. `totalAnsweredToday` (session position) is unaffected — it still
+counts every today row regardless of speed, per slice 9's precedent. No DTO
+shape change, no migration, no API regeneration needed.
 
 #### 11. A single very slow attempt stops dominating pace — Behavior `[ ]`
 

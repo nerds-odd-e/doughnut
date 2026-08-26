@@ -68,11 +68,19 @@ public class RecallStatsService {
       amPmValues[i] = new ArrayList<>();
     }
     int totalCorrect365 = 0;
+    int totalReviews365 = 0;
+
+    RecallPaceAggregator.PaceResult paceResult =
+        RecallPaceAggregator.compute(allTimeReviews, today, zoneId);
 
     for (RecallAnswerRow r : recentReviews) {
       if (r.answerCreatedAt() == null) {
         continue;
       }
+      if (paceResult.implausiblyFastRows().contains(r)) {
+        continue;
+      }
+      totalReviews365++;
       ZonedDateTime zdt = TimestampOperations.getZonedDateTime(r.answerCreatedAt(), zoneId);
       LocalDate localDate = zdt.toLocalDate();
       int wd = zdt.getDayOfWeek().getValue() - 1;
@@ -102,7 +110,6 @@ public class RecallStatsService {
         RecallStatsAggregator.buildRetentionTrend(today, perDayRetention);
     AmPmResponseTime amPm = RecallStatsAggregator.buildAmPm(amPmValues);
 
-    int totalReviews365 = recentReviews.size();
     Double retentionPct365 = RecallStatsAggregator.pct(totalCorrect365, totalReviews365);
     int reviewsToday = perDayRetention.getOrDefault(today, new int[] {0, 0})[1];
 
@@ -116,7 +123,7 @@ public class RecallStatsService {
             retentionPct365,
             hourCorrect,
             hourAnswered);
-    PaceStats pace = RecallPaceAggregator.buildPace(allTimeReviews, today, zoneId);
+    PaceStats pace = paceResult.stats();
 
     return new RecallStatsDTO(
         calendar, trend, retentionTrend, amPm, weekdayHourCounts, weekdayHourCorrect, totals, pace);

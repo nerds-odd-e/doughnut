@@ -5,23 +5,33 @@ import com.odde.donut.utils.TimestampOperations;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * Compares today's per-item response times against each item's own EWMA baseline to answer "am I
- * faster or slower than usual this morning".
+ * faster or slower than usual this morning". Also flags rows that are implausibly fast relative to
+ * that per-item baseline (e.g. a mistap), so callers can exclude them from both pace and retention.
  */
 final class RecallPaceAggregator {
   private static final double EWMA_ALPHA = 0.3;
+  private static final double ABSOLUTE_FLOOR_MS = 300;
+  private static final double BASELINE_FLOOR_FACTOR = 0.25;
 
   private RecallPaceAggregator() {}
 
-  static PaceStats buildPace(List<RecallAnswerRow> allTimeReviews, LocalDate today, ZoneId zoneId) {
+  /** Result of the chronological pace walk: the tile stats plus rows judged implausibly fast. */
+  record PaceResult(PaceStats stats, Set<RecallAnswerRow> implausiblyFastRows) {}
+
+  static PaceResult compute(List<RecallAnswerRow> allTimeReviews, LocalDate today, ZoneId zoneId) {
     Map<Integer, Double> tauByItem = new HashMap<>();
     List<Double> todaysResiduals = new ArrayList<>();
+    Set<RecallAnswerRow> implausiblyFastRows = Collections.newSetFromMap(new IdentityHashMap<>());
     int totalAnsweredToday = 0;
     for (RecallAnswerRow r : allTimeReviews) {
       if (r.answerCreatedAt() == null) {
@@ -38,9 +48,16 @@ final class RecallPaceAggregator {
       if (rt.isEmpty()) {
         continue;
       }
-      double lnRt = Math.log(rt.get());
       Integer itemId = r.memoryTrackerId();
       Double baseline = tauByItem.get(itemId);
+      double floorMs =
+          Math.max(
+              ABSOLUTE_FLOOR_MS, baseline == null ? 0 : BASELINE_FLOOR_FACTOR * Math.exp(baseline));
+      if (rt.get() < floorMs) {
+        implausiblyFastRows.add(r);
+        continue;
+      }
+      double lnRt = Math.log(rt.get());
       if (baseline != null && isToday) {
         todaysResiduals.add(lnRt - baseline);
       }
@@ -56,6 +73,7 @@ final class RecallPaceAggregator {
       }
       pctVsUsual = (Math.exp(sumResiduals / sampleSize) - 1) * 100;
     }
-    return new PaceStats(pctVsUsual, sampleSize, totalAnsweredToday);
+    return new PaceResult(
+        new PaceStats(pctVsUsual, sampleSize, totalAnsweredToday), implausiblyFastRows);
   }
 }

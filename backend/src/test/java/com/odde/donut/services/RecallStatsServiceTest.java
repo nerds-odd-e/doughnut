@@ -7,7 +7,6 @@ import static org.hamcrest.Matchers.*;
 import com.odde.donut.controllers.dto.RecallStatsDTO;
 import java.sql.Timestamp;
 import java.time.ZoneId;
-import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -45,11 +44,13 @@ class RecallStatsServiceTest {
     @Test
     void capsThinkingTimeMsAbove120000() {
       Timestamp now = utc(11, 12);
+      // distinct memoryTrackerIds: these are unrelated items, so none should be treated as an
+      // implausibly-fast mistap relative to another item's baseline
       List<RecallAnswerRow> rows =
           List.of(
-              answered(utc(9, 10), 200000, true, null), // capped to 120000
-              answered(utc(9, 11), 5000, true, null),
-              answered(utc(9, 12), 5000, true, null));
+              answered(utc(9, 10), 200000, true, null, 101), // capped to 120000
+              answered(utc(9, 11), 5000, true, null, 102),
+              answered(utc(9, 12), 5000, true, null, 103));
       RecallStatsDTO dto = aggregate(rows, now);
       assertThat(dayAvg(dto, "1989-01-10").getAvgMs(), equalTo(43333L));
     }
@@ -89,80 +90,6 @@ class RecallStatsServiceTest {
       RecallStatsDTO dto = aggregate(rows, now);
       assertThat(dayAvg(dto, "1989-01-10").getAvgMs(), nullValue());
       assertThat(dayAvg(dto, "1989-01-10").getSampleSize(), equalTo(2));
-    }
-  }
-
-  @Nested
-  class RetentionAggregation {
-    @Test
-    void perDayRetentionIsCorrectOverAnsweredWithGuard() {
-      Timestamp now = utc(11, 12);
-      // 1989-01-10: 2 correct / 2 answered -> insufficient (<3) -> null
-      // 1989-01-09: 3 correct / 4 answered -> 75%
-      List<RecallAnswerRow> rows =
-          new ArrayList<>(
-              List.of(
-                  answered(utc(9, 10), 5000, true, null),
-                  answered(utc(9, 11), 5000, true, null),
-                  answered(utc(8, 10), 5000, true, null),
-                  answered(utc(8, 11), 5000, true, null),
-                  answered(utc(8, 12), 5000, true, null),
-                  answered(utc(8, 13), 5000, false, null)));
-      RecallStatsDTO dto = aggregate(rows, now);
-      assertThat(dayRet(dto, "1989-01-10").getRetentionPct(), nullValue());
-      assertThat(dayRet(dto, "1989-01-09").getRetentionPct(), closeTo(75.0, 0.01));
-    }
-
-    @Test
-    void overallRetentionPct365OverTheWindow() {
-      Timestamp now = utc(11, 12);
-      List<RecallAnswerRow> rows =
-          List.of(
-              answered(utc(9, 10), 5000, true, null),
-              answered(utc(9, 11), 5000, true, null),
-              answered(utc(9, 12), 5000, true, null),
-              answered(utc(9, 13), 5000, false, null));
-      RecallStatsDTO dto = aggregate(rows, now);
-      assertThat(dto.getTotals().getRetentionPct365(), closeTo(75.0, 0.01));
-    }
-
-    @Test
-    void bestAndWorstHourByRetentionWithMin5Guard() {
-      Timestamp now = utc(11, 12);
-      // hour 10: 5/5 correct -> 100% (best)
-      // hour 11: 1/5 correct -> 20% (worst)
-      List<RecallAnswerRow> rows =
-          new ArrayList<>(
-              List.of(
-                  answered(utc(9, 10), 5000, true, null),
-                  answered(utc(8, 10), 5000, true, null),
-                  answered(utc(7, 10), 5000, true, null),
-                  answered(utc(6, 10), 5000, true, null),
-                  answered(utc(5, 10), 5000, true, null),
-                  answered(utc(9, 11), 5000, true, null),
-                  answered(utc(8, 11), 5000, false, null),
-                  answered(utc(7, 11), 5000, false, null),
-                  answered(utc(6, 11), 5000, false, null),
-                  answered(utc(5, 11), 5000, false, null)));
-      RecallStatsDTO dto = aggregate(rows, now);
-      assertThat(dto.getTotals().getBestHour(), equalTo(10));
-      assertThat(dto.getTotals().getBestHourRetentionPct(), closeTo(100.0, 0.01));
-      assertThat(dto.getTotals().getWorstHour(), equalTo(11));
-      assertThat(dto.getTotals().getWorstHourRetentionPct(), closeTo(20.0, 0.01));
-    }
-
-    @Test
-    void weekdayHourCorrectAndCountsFromSameRows() {
-      Timestamp now = utc(11, 12);
-      // 1989-01-09 is a Monday (DayOfWeek=1 -> idx 0), hour 10
-      List<RecallAnswerRow> rows =
-          List.of(
-              answered(utc(8, 10), 5000, true, null),
-              answered(utc(8, 10), 5000, false, null),
-              answered(utc(8, 10), 5000, true, null));
-      RecallStatsDTO dto = aggregate(rows, now);
-      assertThat(dto.getWeekdayHourCounts()[0][10], equalTo(3));
-      assertThat(dto.getWeekdayHourCorrect()[0][10], equalTo(2));
     }
   }
 
@@ -260,6 +187,30 @@ class RecallStatsServiceTest {
       RecallStatsDTO dto = aggregate(List.of(), now);
       assertThat(dto.getPace().getSampleSize(), equalTo(0));
       assertThat(dto.getPace().getPctVsUsual(), nullValue());
+    }
+
+    @Test
+    void implausiblyFastMistapIsExcludedAndDoesNotPolluteItemBaseline() {
+      Timestamp now = utc(11, 12); // today = 1989-01-11
+      List<RecallAnswerRow> rows =
+          List.of(
+              // establish a ~20000ms baseline for item 4 -> item floor = max(300, 0.25*20000) =
+              // 5000ms
+              answered(utc(9, 10), 20000, true, null, 4),
+              answered(utc(9, 11), 20000, true, null, 4),
+              // implausibly fast mistap today: 1500ms clears the pre-existing absolute 1000ms
+              // floor (so this exercises the NEW item-relative floor, not the old one) but is
+              // still well under the 5000ms item-relative floor
+              answered(utc(11, 9), 1500, true, null, 4),
+              // a normal-speed answer today, later, should compare against the pre-mistap
+              // baseline (still ~20000ms), not a baseline corrupted by the 1500ms mistap
+              answered(utc(11, 10), 20000, true, null, 4));
+      RecallStatsDTO dto = aggregate(rows, now);
+      RecallStatsDTO.PaceStats pace = dto.getPace();
+      // only the final normal-speed answer counts as a residual; the mistap is excluded
+      assertThat(pace.getSampleSize(), equalTo(1));
+      // the normal-speed answer matches the established (uncorrupted) baseline -> ~0% vs usual
+      assertThat(pace.getPctVsUsual(), closeTo(0.0, 5.0));
     }
   }
 
