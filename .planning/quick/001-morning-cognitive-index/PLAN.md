@@ -1,6 +1,6 @@
 # Morning cognitive index from recall history
 
-**Status:** in progress — slices 1–14, 14.1–14.6 done; **next: 14.7** (repair
+**Status:** in progress — slices 1–14, 14.1–14.7 done; **next: 14.8** (repair
 shipped readouts before Accuracy). `recall_stats.feature`'s pace scenario
 stays `@wip` — a second, unrelated E2E race condition was found (see
 Discoveries).
@@ -130,9 +130,7 @@ the roadmap has no active milestone. Promote to `.planning/phases/` via
   pair). `QuestionDisplay.thinking.spec.ts`'s "pauses timer when deactivated"
   is a weaker duplicate of the detour case. PaceTile "badge absent when field
   absent" repeats the canonical render test. MemoryTracker "does not display
-  away" and "does not display detour" share one fixture. Slice 1's E2E
-  scenario is `@wip` with **no step definitions** for viewing duration or
-  thinking-time-under-2s.
+  away" and "does not display detour" share one fixture.
 - **`useThinkingTimeTracker.ts` is 281 lines** (over the 250-line split
   threshold). The injected `clock` option from slice 2 is unused: tests spy
   `performance.now()` instead. `useQuestionThinkingTime` calls `start()` from
@@ -195,9 +193,7 @@ Done: added a sibling shared-state flag `isViewingAnsweredQuestion` on
 automatically on wrong answers and has different consumers). `RecallPage.vue`
 sets it from the existing `previousAnsweredQuestionCursor` watcher;
 `useQuestionThinkingTime.ts` watches it and calls the tracker's existing
-`pause()`/`resume()`. E2E scenario added but left `@wip` — missing step
-definitions for viewing duration and reading thinking time back out of Recall
-History. **Slice 14.7 finishes that scenario.**
+`pause()`/`resume()`. E2E finished in slice 14.7.
 
 #### 2. Inject a clock into the thinking-time tracker — Structure `[x]`
 
@@ -589,14 +585,16 @@ reactivation leaves `toRepeat` alone; a genuinely changed window (production
 half-day rollover) still refreshes it. `recall_timing.feature`'s detour
 scenario un-`@wip`'d and passes end-to-end.
 
-#### 14.7 Viewing a previous answer's E2E scenario passes — Behavior `[ ]`
+#### 14.7 Viewing a previous answer's E2E scenario passes — Behavior `[x]`
 
-The slice 1 scenario in `browse_answer_and_notes_while_recalling.feature` is
-`@wip` with no step definitions. Feature already has `@mockBrowserTime`. Add
-steps for "view the last answered question for 5 seconds" and "thinking time
-under 2 seconds" in Recall History, make the scenario pass, remove `@wip`.
-Do not add a second unit test — `RecallPage.viewHistoryThinkingTime.spec.ts`
-already owns that boundary.
+Done: the slice 1 scenario is green without `@wip`. It stubs a known MCQ via
+`@usingMockedOpenAiService` (learner-facing `getRecallPrompt` strips
+`correctAnswerIndex`). Other scenarios in the file keep `@disableOpenAiService`.
+View-history linger uses a real `setTimeout` (not `cy.wait` under `cy.clock()`,
+which would fake-tick and break Vue clicks). `resumeRecall` does `cy.tick(1)`
+so the restored question is clickable. Recall History exposes
+`data-thinking-time-ms`; the Then asserts that raw number on the understanding
+tracker (the current MCQ, not spelling). No second unit test.
 
 #### 14.8 Cold-start items stop dominating the consistency badge — Behavior `[ ]`
 

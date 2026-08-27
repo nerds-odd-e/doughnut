@@ -179,6 +179,13 @@ When('I switch away from the tab for {int} seconds', (seconds: number) => {
 })
 
 When(
+  'I view the last answered question for {int} seconds',
+  (seconds: number) => {
+    start.recall().assumeRecallPage().viewLastAnsweredQuestionFor(seconds)
+  }
+)
+
+When(
   'I take a detour into the notebook for {int} seconds',
   (seconds: number) => {
     start.assumeQuestionPage().openNotebookLink()

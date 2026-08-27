@@ -39,6 +39,13 @@ Then(
   }
 )
 
+Then(
+  'the recall history should show a thinking time under {int} seconds for that answer',
+  (seconds: number) => {
+    assumeMemoryTrackerPage().expectThinkingTimeUnderSeconds(seconds)
+  }
+)
+
 Then("I should see the tutor's feedback {string}", (feedback: string) => {
   assumeMemoryTrackerPage().expectTutorFeedback(feedback)
 })

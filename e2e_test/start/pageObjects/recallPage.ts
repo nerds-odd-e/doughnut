@@ -2,6 +2,7 @@ import { RecallsController } from '@generated/donut-backend-api/sdk.gen'
 import { commonSenseSplit } from 'support/string_util'
 import { waitUntilAppIsNotBusy } from '../pageBase'
 import router from '../router'
+import { assumeQuestionPage } from './QuizQuestionPage'
 import { recallLearningSessionMethods } from './recallLearningSessionMethods'
 
 function recallProgressFromTriple(triple: string) {
@@ -57,7 +58,7 @@ const recallPage = () => {
     },
     typeSpellingAnswer(answer: string) {
       waitUntilAppIsNotBusy()
-      cy.get('[data-test="question-section"]', { timeout: 15000 })
+      cy.get('[data-test="question-section"]:visible', { timeout: 15000 })
         .should('be.visible')
         .as('spellingQuestion')
       cy.get('@spellingQuestion')
@@ -139,11 +140,25 @@ const recallPage = () => {
         }
       })
     },
-    expectCurrentQuestion() {
-      // Verify we're back to the quiz view (current question) by checking that
-      // the question section exists, which means we're viewing a question, not an answered question
+    viewLastAnsweredQuestionFor(seconds: number) {
+      // Linger on real wall-clock so performance.now() thinking time advances
+      // without ticking cy.clock().
+      cy.get('button[title="view last answered question"]')
+        .should('be.visible')
+        .and('not.be.disabled')
+        .click()
       waitUntilAppIsNotBusy()
-      cy.get('[data-test="question-section"]').should('exist')
+      cy.then(
+        () =>
+          new Promise<void>((resolve) => {
+            setTimeout(resolve, seconds * 1000)
+          })
+      )
+      return this
+    },
+    expectCurrentQuestion() {
+      waitUntilAppIsNotBusy()
+      assumeQuestionPage().getQuestionSection().should('be.visible')
       return this
     },
   }
@@ -178,6 +193,9 @@ export const recall = () => {
     resumeRecall() {
       cy.findByLabelText('Resume').click()
       waitUntilAppIsNotBusy()
+      // Flush Vue remount timeouts under cy.clock() so the restored question is clickable.
+      cy.tick(1)
+      assumeQuestionPage().getQuestionSection().should('be.visible')
       return recallPage()
     },
     returnToRecallFromDetour() {

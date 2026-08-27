@@ -1,4 +1,5 @@
 import { waitUntilAppIsNotBusy } from '../pageBase'
+import { memoryTrackerRecallHistoryMethods } from './memoryTrackerRecallHistory'
 
 const SKIPPED_MEMORY_TRACKER_MESSAGE =
   'This memory tracker is currently skipped and will not appear in recall sessions.'
@@ -43,10 +44,9 @@ const labeledPair = (firstLabel: string, secondLabel: string) =>
     labeledValue(secondLabel).then((second) => ({ first, second }))
   )
 
-const recallLogs = () => cy.get('[data-testid="recall-log"]')
-
 const assumeMemoryTrackerPage = () => {
   return {
+    ...memoryTrackerRecallHistoryMethods(expectMemoryTrackerPage),
     removeFromRecall() {
       expectMemoryTrackerPage()
       cy.findByRole('button', {
@@ -186,55 +186,6 @@ const assumeMemoryTrackerPage = () => {
             `Next Recall Time (${nextRecallTime}) should be earlier than recorded ${recorded}`
           ).to.be.lessThan(before)
         })
-      })
-      return assumeMemoryTrackerPage()
-    },
-    expectGoodRecallLogWithoutAnswer() {
-      expectMemoryTrackerPage()
-      recallLogs().should('have.length', 1)
-      cy.get('[data-testid="recall-log-product-outcome"]').should(
-        'have.text',
-        'GOOD'
-      )
-      recallLogs().should('contain.text', 'Recorded:')
-      recallLogs().should('contain.text', 'Elapsed hours:')
-      cy.get('[data-testid="recall-log-answer-id"]').should('not.exist')
-      return assumeMemoryTrackerPage()
-    },
-    expectAgainRecallLog() {
-      expectMemoryTrackerPage()
-      recallLogs().should('have.length', 2)
-      recallLogs().contains(
-        '[data-testid="recall-log-product-outcome"]',
-        'AGAIN'
-      )
-      return assumeMemoryTrackerPage()
-    },
-    expectAwayTimeAndCount() {
-      expectMemoryTrackerPage()
-      cy.get('[data-testid="recall-history-away-time"]')
-        .should('be.visible')
-        .and('contain.text', 'Away:')
-        .and('contain.text', 'x)')
-      return assumeMemoryTrackerPage()
-    },
-    expectDetourTimeAndCount() {
-      expectMemoryTrackerPage()
-      cy.get('[data-testid="recall-history-detour-time"]')
-        .should('be.visible')
-        .and('contain.text', 'Detour:')
-        .and('contain.text', 'x)')
-      cy.get('[data-testid="recall-history-away-time"]').should('not.exist')
-      return assumeMemoryTrackerPage()
-    },
-    expectTutorFeedback(feedback: string) {
-      expectMemoryTrackerPage()
-      cy.get('[data-testid="recall-log-tutor-feedback"]').should(($el) => {
-        const actual = $el.text().trim()
-        expect(
-          actual,
-          `Expected tutor feedback to be ${feedback}, but found ${actual}`
-        ).to.equal(feedback)
       })
       return assumeMemoryTrackerPage()
     },

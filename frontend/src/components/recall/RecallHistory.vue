@@ -81,7 +81,11 @@ const historyItemKey = (item: RecallHistoryItem, index: number) => {
               {{ new Date(item.recallPrompt.answerTime).toLocaleString() }}
             </span>
             <span v-else>Unanswered</span>
-            <span v-if="item.recallPrompt.answer?.thinkingTimeMs">
+            <span
+              v-if="item.recallPrompt.answer?.thinkingTimeMs"
+              data-testid="recall-history-thinking-time"
+              :data-thinking-time-ms="item.recallPrompt.answer.thinkingTimeMs"
+            >
               Thinking time:
               {{ formatThinkingTime(item.recallPrompt.answer.thinkingTimeMs) }}
             </span>

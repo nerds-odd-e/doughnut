@@ -2,11 +2,12 @@ import { waitUntilAppIsNotBusy } from '../pageBase'
 
 const assumeQuestionPage = (stem?: string) => {
   if (stem) {
-    cy.get('[data-test="question-section"]')
+    cy.get('[data-test="question-section"]:visible')
       .find('[data-test="stem"]')
       .should('contain.text', stem)
   }
-  const getQuestionSection = () => cy.get('[data-test="question-section"]')
+  const getQuestionSection = () =>
+    cy.get('[data-test="question-section"]:visible')
 
   return {
     getQuestionSection,
