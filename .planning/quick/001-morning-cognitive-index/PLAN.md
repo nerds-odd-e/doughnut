@@ -1,6 +1,7 @@
 # Morning cognitive index from recall history
 
-**Status:** planned — not started
+**Status:** in progress — slices 1–14 done; **next: 14.1** (repair shipped
+readouts before Accuracy)
 **Type:** ad-hoc plan (`.planning/quick/`)
 **Research memo:** https://claude.ai/code/artifact/9e13f954-fc5e-48e5-868f-f75d03f811c1
 
@@ -14,7 +15,7 @@ Every readout is a **residual**: observed outcome minus the expectation derived
 from retrievability, difficulty and per-item time intensity, standardized
 against that learner's own recent history.
 
-**Size warning:** 33 slices is milestone-sized for `quick/`. It is here because
+**Size warning:** ~40 slices is milestone-sized for `quick/`. It is here because
 the roadmap has no active milestone. Promote to `.planning/phases/` via
 `/gsd-new-milestone` if this should be tracked as a GSD capability.
 
@@ -23,10 +24,15 @@ the roadmap has no active milestone. Promote to `.planning/phases/` via
 1. **Timer accuracy first.** Slices 1–3 fix a live defect in the response-time
    statistic that already ships. Worth doing even if nothing else here is built.
 2. **The pace channel needs no migration.** `thinking_time_ms` already exists and
-   per-item time intensity is computable from history. Stopping after slice 14
-   leaves three working dashboard readouts and an untouched schema.
-3. **Accuracy needs schema plus backfill**, so it comes second.
-4. **The composite waits for the reliability gate.** Component readouts are plain
+   per-item time intensity is computable from history.
+3. **Repair the shipped readouts (14.1–14.8) before Accuracy.** Inspection of
+   slices 1–14 found live defects (idle counts device sleep; pace inherits the
+   old chart's 1s-drop / 2min-cap so mistaps still inflate retention), dead
+   projection fields, redundant tests, a spelling gap, and two clock mismatches
+   that leave the new E2E `@wip`. Stopping after 14.8 leaves trustworthy timer
+   and pace readouts. **Do not start slice 15 until 14.1–14.8 are done.**
+4. **Accuracy needs schema plus backfill**, so it comes after the repairs.
+5. **The composite waits for the reliability gate.** Component readouts are plain
    statistics that defend themselves; only the number labelled as a cognitive
    index makes a claim about the person.
 
@@ -74,26 +80,63 @@ the roadmap has no active milestone. Promote to `.planning/phases/` via
 - **`viewLastAnsweredQuestion` fires automatically on every wrong answer**
   (`useRecallAnswerHandling.ts`), which is what sets `isRecallPaused`. That flag
   cannot be used as an interruption signal.
-- **Recall Stats has no E2E coverage at all.** Slice 9 creates
-  `recall_stats.feature`; there is nothing to extend.
-- **Package rename in flight.** The working tree is mid `doughnut → donut`
-  (ADR 0005). Java package paths in any slice must follow whatever has landed.
+- **Recall Stats E2E exists but is `@wip`.** Slice 9 created
+  `recall_stats.feature`; slice 14.5 unblocks it.
 - **Slice 6 has no "open the note mid-question" affordance to hook.** The
   active/unanswered `RecallPrompt` DTO (`RecallPrompt.java`) exposes only
   `notebook`, `mcq`, `spellingQuestion` — no note reference. `Mcq.java` has a
   `@JsonIgnore` note field, stripped by `Mcq.withoutSolution()` before the
   frontend ever sees it. `Quiz.vue`'s `NotebookLink` goes to the whole
-  notebook (not "the" note) via a full `router-link` navigation — there's no
-  `<keep-alive>` anywhere in the frontend (`grep -rl "keep-alive" frontend/src`
-  is empty), so clicking it tears down `RecallPage`/`useThinkingTimeTracker`
-  entirely rather than producing a resumable "detour." The only place a note
-  *is* surfaced during recall is `AnsweredQuestionComponent.vue`'s
-  `recalledNoteUnderQuestionProps` — the post-answer / view-history case
-  slice 1 already covers and slice 6 explicitly must not conflate with.
-  **Resolved:** this is by design — opening a note is a full navigation away
-  from `RecallPage`, not an in-page overlay; the learner returns via the
-  existing "Resume" menu entry, with state remembered across the navigation.
-  See slice 6.
+  notebook (not "the" note) via a full `router-link` navigation. **Resolved:**
+  `DonutApp.vue` now KeepAlive-includes `RecallPage`; opening a note is a full
+  navigation away; the learner returns via Resume. See slice 6.
+- **Idle still counts a silent device suspend (post slice 3+7).**
+  `reconcileGap()` resets `runningStart` when the jump exceeds 5s, but leaves
+  `lastActivityAt` in the past. The next watchdog tick then runs `checkIdle()`
+  and adds the whole sleep to `idleMs`. Slice 3's exact scenario (no
+  `visibilitychange`, `isRunning` still true) is fixed for thinking time and
+  broken for idle. `stop()` also never flushes idle, so the last stretch can
+  be short by up to one watchdog interval.
+- **Pace inherits the trend-chart response-time policy.**
+  `RecallPaceAggregator` calls `RecallStatsAggregator.responseTimeMs`, which
+  drops `<1000ms` and caps thinking time at 120s. A 200ms correct mistap
+  therefore never enters `implausiblyFastRows` (the empty Optional is
+  `continue`d) and **still counts toward retention** — contradicting slice 10.
+  A 3-minute instrumented think is scored as 2 minutes; the 5-minute hard-drop
+  only fires on the null-`thinkingTimeMs` diff-fallback path used in tests, not
+  on real `thinking_time_ms` rows. Trend AM/PM averages should keep the old
+  caps; pace must not.
+- **`noteId` on `RecallAnswerRow` has no consumer.** Slice 8 added
+  `mt.note.id` to the JPQL constructor; only `memoryTrackerId` is read.
+  Remaining slices do not need it. Dead projection field.
+- **Spelling drops interruption fields.** Slice 5's justification ("spelling
+  Recall History does not render thinking/away") is wrong: those spans live in
+  the shared header of `RecallHistory.vue`. `SpellingQuestionDisplay` already
+  uses `useQuestionThinkingTime` (clock pauses correctly) but submits only
+  `thinkingTimeMs`. `AnswerSpellingDTO` has no away/detour/idle. ADR 0003
+  thinking time applies to every measured prompt.
+- **Two clock mismatches leave E2E `@wip`.** (1) `Answer.createdAt` is
+  `System.currentTimeMillis()` while stats windows and recall logs use
+  `testabilitySettings.getCurrentUTCTimestamp()` — time-travelled answers fall
+  outside the query; `recall_stats.feature` is `@wip`. (2)
+  `useRecallPageLoading` onActivated compares `new Date()` to
+  `currentRecallWindowEndAt`, so a simulated day-2 window is always "stale"
+  vs 2026; KeepAlive reactivation refetches and remounts Quiz, discarding the
+  detour accumulator; the detour scenario in `recall_timing.feature` is `@wip`.
+- **Redundant tests.** `useThinkingTimeTracker.keepAlive.spec.ts` drives
+  `pause()`/`resume()` on KeepAlive, which production no longer uses (detour
+  pair). `QuestionDisplay.thinking.spec.ts`'s "pauses timer when deactivated"
+  is a weaker duplicate of the detour case. PaceTile "badge absent when field
+  absent" repeats the canonical render test. MemoryTracker "does not display
+  away" and "does not display detour" share one fixture. Slice 1's E2E
+  scenario is `@wip` with **no step definitions** for viewing duration or
+  thinking-time-under-2s.
+- **`useThinkingTimeTracker.ts` is 281 lines** (over the 250-line split
+  threshold). The injected `clock` option from slice 2 is unused: tests spy
+  `performance.now()` instead. `useQuestionThinkingTime` calls `start()` from
+  both an immediate watch and `onMounted`.
+- **Package rename has landed** (`com.odde.donut`). The in-flight rename
+  discovery above is historical.
 
 ## Jidoka checkpoints — stop for developer judgement
 
@@ -109,10 +152,9 @@ derivable value. Alternative design: compute by replay at query time and add no
 columns at all. Decide, and amend ADR 0003 or record why no amendment is needed
 — do not drift silently. Humans own the advice process.
 
-**Before slice 9 — new vocabulary.** ADR 0001 owns ubiquitous language. This
-plan introduces *pace*, *retrieval lapse*, *detour*, *daily probe* and the index
-itself as user-facing terms. Decide whether they enter the glossary or stay
-deliberately out of it.
+**Before slice 9 — new vocabulary.** **Done** (commits `97cc69940f`,
+`f67d894175`): *pace*, *retrieval lapse*, *detour*, *away*, *idle*, *daily
+probe*, and *cognitive index* are in ADR 0001 / ADR 0003.
 
 **Before slice 22 — the reliability gate.** If slice 21 reports split-half
 reliability below ~0.6, slices 22–25 do not ship. The component readouts stand
@@ -140,11 +182,9 @@ Done: added a sibling shared-state flag `isViewingAnsweredQuestion` on
 automatically on wrong answers and has different consumers). `RecallPage.vue`
 sets it from the existing `previousAnsweredQuestionCursor` watcher;
 `useQuestionThinkingTime.ts` watches it and calls the tracker's existing
-`pause()`/`resume()`. E2E scenario added but left `@wip` — the existing
-Cypress step vocabulary has no way to control elapsed viewing time precisely
-or read recorded thinking time back out of Recall History; a future slice
-needing that should add the testability hook rather than reusing ad-hoc
-timing assertions.
+`pause()`/`resume()`. E2E scenario added but left `@wip` — missing step
+definitions for viewing duration and reading thinking time back out of Recall
+History. **Slice 14.7 finishes that scenario.**
 
 #### 2. Inject a clock into the thinking-time tracker — Structure `[x]`
 
@@ -238,13 +278,10 @@ tracker instance — no reliance on `useRecallData.ts` module-level state was
 needed. `detourMs`/`detourCount` flow `QuestionDisplay.vue` →
 `AnswerDTO`/`Answer` entity → `RecallHistory.vue`, rendered only when truthy,
 mirroring the away-time pattern. API client regenerated.
-E2E scenario added but left `@wip`: this environment simulates "day 2" on the
-backend while the frontend tracker reads the real system clock, so
-`RecallPage`'s staleness check always treats the due-recall window as stale on
-KeepAlive reactivation, forcing a full refetch/remount that discards the
-detour accumulator before the answer is submitted — a pre-existing interaction
-with simulated-time E2E tests, unrelated to the detour wiring itself (verified
-correct via unit tests) and out of this slice's scope to fix.
+E2E scenario added but left `@wip`: `useRecallPageLoading` onActivated
+compares `new Date()` to the due-recall window, so simulated-time E2E always
+treats the window as stale and remounts Quiz, discarding the detour
+accumulator. **Slice 14.6 fixes that.** Unit tests cover the wiring.
 
 #### 7. Idling in place past the threshold is recorded — Behavior `[x]`
 
@@ -302,14 +339,12 @@ today's residual per qualifying item is `ln(observed) − τ_j` (baseline taken
 100` (positive = slower). Items with no prior baseline are excluded from
 `sampleSize` (slice 12 addresses cold-start weighting later) but still count
 toward `totalAnsweredToday` ("session position" context). New
-`RecallStatsDTO.PaceStats`, new `PaceTile.vue` rendered above
-`RecallStatsTiles`. E2E scenario added but left `@wip`: root cause is
-`Answer.createdAt` using `System.currentTimeMillis()` (real wall clock) while
-the stats query window derives from the testability time-travel clock — the
-same category of clock mismatch already hit by slice 6's detour scenario, out
-of scope to fix here. Backend (`RecallStatsServiceTest.Pace`) and frontend
-(`PaceTile.spec.ts`, `RecallStatsSettingsTab.spec.ts`) unit tests are the
-primary verification.
+`RecallStatsDTO.PaceStats`, new `PaceTile.vue` rendered above `RecallStatsTiles`. E2E scenario added but left
+`@wip`: `Answer.createdAt` uses `System.currentTimeMillis()` while the stats
+query window uses the testability clock. **Slice 14.5 fixes that.** Backend
+(`RecallStatsServicePaceAggregationTest`) and frontend (`PaceTile.spec.ts`,
+`RecallStatsSettingsTab.spec.ts`) unit tests are the primary verification
+until then.
 
 #### 10. Implausibly fast attempts stop distorting pace — Behavior `[x]`
 
@@ -332,7 +367,9 @@ same `RecallAnswerRow` object references as `allTime` (verified). Also fixed
 an excluded row drops out of the retention denominator too, not just the
 numerator. `totalAnsweredToday` (session position) is unaffected — it still
 counts every today row regardless of speed, per slice 9's precedent. No DTO
-shape change, no migration, no API regeneration needed.
+shape change, no migration, no API regeneration needed. **Gap found later:**
+sub-1000ms rows never join `implausiblyFastRows` because
+`responseTimeMs` returns empty first — slice 14.3.
 
 #### 11. A single very slow attempt stops dominating pace — Behavior `[x]`
 
@@ -411,13 +448,132 @@ constant; null if `baselineMad == 0`. Positive = more erratic than usual,
 matching `pctVsUsual`'s sign convention. `PaceTile.vue` shows a
 "more erratic than usual" badge only when `consistencyZScore > 1`, mirroring
 the low-confidence badge exactly (one-sided; no "more consistent" messaging
-in this slice). API client regenerated. This closes the "Pace channel — no
-schema change" section (slices 8-14); next section is "Accuracy channel"
-(slice 15), which needs the ADR 0003 Jidoka decision before starting.
+in this slice). API client regenerated. This closes the original "Pace channel
+— no schema change" implementation (slices 8-14). **Do not start Accuracy
+(slice 15) yet** — repair slices 14.1–14.8 first. The ADR 0003 Jidoka before
+slice 15 still applies.
+
+### Repair the shipped readouts
+
+Inspection of slices 1–14 (commits `c5c1449bdc`..`15609de4af`). Execute 14.1–14.8
+in this order before slice 15. Each is stop-safe: stopping after any of them
+leaves the already-shipped timer/pace channel more trustworthy than before.
+
+#### 14.1 Split the thinking-time tracker and drop redundant tracker tests — Structure `[ ]`
+
+`useThinkingTimeTracker.ts` is 281 lines. Extract idle detection and/or
+`createInterruptionAccumulator` so the file is under 250. Delete
+`useThinkingTimeTracker.keepAlive.spec.ts` (production KeepAlive uses
+`pauseForDetour`, already covered by the QuestionDisplay detour test). Drop
+the weaker "pauses timer when deactivated (KeepAlive)" case from
+`QuestionDisplay.thinking.spec.ts`. Drive remaining tracker tests through the
+injected `clock` option (slice 2's unused seam) rather than spying
+`performance.now()`. Collapse the duplicate `start()` in
+`useQuestionThinkingTime` (immediate watch plus `onMounted`). Strip production
+comments that refer to "the plan".
+
+- **Enables 14.2 only** — idle-suspend adds tests; must not grow the oversized
+  file.
+
+#### 14.2 A silent device suspend is not recorded as idle — Behavior `[ ]`
+
+Lock the phone mid-question with no `visibilitychange`, wait, unlock, answer:
+thinking time still excludes the gap (slice 3), and idle time does not include
+it. Reset `lastActivityAt` / idle accumulation when `reconcileGap()` drops a
+gap. Flush idle on `stop()`.
+
+- Unit: tracker with the injected clock — replay a jump above
+  `SUSPEND_GAP_THRESHOLD_MS` then assert `idleMs` is not the sleep duration
+- Existing suspend tests keep asserting thinking time only; this slice's unique
+  claim is idle
+
+#### 14.3 Pace and retention exclusion use on-task time, not the trend-chart caps — Behavior `[ ]`
+
+A 200ms correct mistap drops out of retention as well as pace. A 3-minute
+instrumented think is scored as 3 minutes, not capped to 120s. The 5-minute
+hard-drop applies to `thinkingTimeMs` rows, not only the null-thinkingTimeMs
+diff fallback.
+
+`RecallPaceAggregator` must read raw `thinkingTimeMs` (diff fallback only when
+null) and apply its own floor / hard-drop. Leave `RecallStatsAggregator.responseTimeMs`
+(1s drop, 120s cap, 300s diff cap) for the trend / AM-PM charts.
+
+- Backend unit: through `aggregateRows` — 200ms correct excluded from
+  `totalReviews365`; `thinkingTimeMs = 180_000` is not treated as 120s for
+  `pctVsUsual`; `thinkingTimeMs >= 300_000` hard-dropped
+- Wrap-up dead code: drop unused `noteId` from `RecallAnswerRow` and the JPQL
+  constructor; drop the dead `weightedMedian` total-weight-zero branch if still
+  unreachable; fix the stale "projection selects only the 4 fields" comment in
+  `RecallStatsService`
+
+#### 14.4 Spelling answers record away, detour, and idle — Behavior `[ ]`
+
+Answer a spelling prompt after tab-away (or a detour, or idle): Recall History
+shows the interruption beside thinking time, same as MCQ.
+
+- Extend `AnswerSpellingDTO` + `SpellingQuestionDisplay` submit payload +
+  `SpellingRecallGrading` persist path
+- Controller: spelling save of pause fields; also add the missing MCQ
+  `idleMs` persist test (sibling of the existing away/detour tests)
+- Frontend: mounted `SpellingQuestionDisplay` emits the fields
+- Wrap-up: merge MemoryTracker "does not display away" and "does not display
+  detour" into one canonical silent-uninstrumented fixture (and assert idle
+  stays silent there too)
+
+#### 14.5 Answers are stamped with the scheduling clock — Behavior `[ ]`
+
+Answer under time-travel: the row's `createdAt` is the same timestamp used for
+the recall log and for the stats query window, so it appears in that simulated
+day's Recall Stats.
+
+Set `Answer.createdAt` from the `currentUTCTimestamp` already passed into MCQ
+and spelling grading (`TestabilitySettings.getCurrentUTCTimestamp()`; production
+returns wall-clock now). Un-`@wip` `recall_stats.feature`.
+
+- E2E: `recall/recall_stats.feature` — today's slower answer shows slower than
+  usual
+- Backend unit: answering through the controller while time-travelled stamps
+  `createdAt` with the testability clock (not `System.currentTimeMillis()`)
+
+#### 14.6 Returning to recall does not remount an in-flight question unless the due window changed — Behavior `[ ]`
+
+Open a prompt, detour into the notebook, return: detour time is still on the
+answer. Do not compare `new Date()` to `currentRecallWindowEndAt` on
+KeepAlive activation. The recalling response is already fetched in
+`loadSessionStrips` — remount `toRepeat` only when that response's due-window
+identity actually changed (production half-day rollover still refreshes;
+simulated-time E2E no longer remounts). Un-`@wip` the detour scenario in
+`recall_timing.feature`.
+
+- E2E: `recall/recall_timing.feature` detour scenario
+- Unit: mounted RecallPage / `useRecallPageLoading` — activation with an
+  unchanged window does not clear `toRepeat`
+
+#### 14.7 Viewing a previous answer's E2E scenario passes — Behavior `[ ]`
+
+The slice 1 scenario in `browse_answer_and_notes_while_recalling.feature` is
+`@wip` with no step definitions. Feature already has `@mockBrowserTime`. Add
+steps for "view the last answered question for 5 seconds" and "thinking time
+under 2 seconds" in Recall History, make the scenario pass, remove `@wip`.
+Do not add a second unit test — `RecallPage.viewHistoryThinkingTime.spec.ts`
+already owns that boundary.
+
+#### 14.8 Cold-start items stop dominating the consistency badge — Behavior `[ ]`
+
+A morning of mostly new cards with one established item no longer flips
+"more erratic than usual" just because the new cards' residuals are noisy.
+Apply the same `w_j = m_j/(m_j+3)` already used for `pctVsUsual` to today's
+spread (unweighted MAD of capped residuals is the gap slice 14 left).
+
+- Backend unit: through `aggregateRows` — unique claim is `consistencyZScore`
+- Wrap-up: delete PaceTile tests that only re-assert a badge is absent when
+  the field is omitted (canonical render tests already omit those fields)
 
 ### Accuracy channel
 
 #### 15. Memory-state columns on `recall_log` — Structure `[ ]`
+
+**Do not start until 14.1–14.8 are done.**
 
 `V300000302__add_memory_state_to_recall_log.sql`: `stability_before FLOAT NULL`,
 `difficulty_before FLOAT NULL`, `retrievability DOUBLE NULL`, plus entity fields.
@@ -436,8 +592,9 @@ outcome. Makes the new snapshot immediately verifiable instead of write-only.
 #### 17. Recall Stats shows today's accuracy against expected — Behavior `[ ]`
 
 Standardized Poisson-binomial residual `A = Σ(y−p̂) / √Σp̂(1−p̂)` on raw FSRS
-retrievability. **Removes slice 9's interim** by feeding `R` and `D` into the
-pace expectation.
+retrievability. **Removes slice 9's remaining interim** by feeding `R` and `D`
+into the pace expectation. Pace already uses on-task thinking time (14.3);
+this slice must not reintroduce the trend-chart 1s/2min caps.
 
 #### 18. Historical reviews gain their memory state — Behavior `[ ]`
 
@@ -563,10 +720,10 @@ MCQ subset, fitted on residualized latencies.
 
 | Artifact | Slices |
 |----------|--------|
-| `e2e_test/features/recall/recall_timing.feature` | 5–7 |
-| `e2e_test/features/recall/recall_stats.feature` | 9–14, 17, 22–25, 31 |
+| `e2e_test/features/recall/recall_timing.feature` | 5–7, 14.6 |
+| `e2e_test/features/recall/recall_stats.feature` | 9–14, 14.5, 17, 22–25, 31 |
 | `e2e_test/features/recall/daily_cognitive_probe.feature` | 28, 30 |
-| `e2e_test/features/recall/browse_answer_and_notes_while_recalling.feature` | 1 (extend) |
+| `e2e_test/features/recall/browse_answer_and_notes_while_recalling.feature` | 1, 14.7 |
 | `e2e_test/features/users/user_profile.feature` | 27 (extend) |
 | `scripts/` backfill script | 18 |
 
