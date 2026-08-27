@@ -670,6 +670,24 @@ the existing outcome/recorded/elapsed-hours row, shown only when
 `retrievability != null` (old rows stay silent). No migration, no API
 regeneration needed (slice 15's already-done regen covers these fields).
 
+**Second gap found in CI, not by this slice's own tests:** grading a New
+tracker (never graded, `stability = 0`) for the first time made
+`Fsrs.retrievabilityFromHours` divide `0/0` (elapsed is also 0 with no prior
+`lastRecalledAt`), producing `NaN`, which crashed on JDBC bind
+(`'NaN' is not a valid numeric value`) — broke `LearningSessionRecordTests`
+and two accidental-match E2E scenarios on `main`. The implementer's own tests
+used `ownedTracker()`/`ownedSpellingTracker()` fixtures, which set
+`stabilityAndNextRecallAt(200.0f)` — never a genuinely New tracker — so the
+edge case wasn't caught locally. Fixed: `retrievabilityAt` returns `null` for
+a New tracker (`isNew()`), since Retrievability is undefined before any grade
+exists; `RecallHistory.vue`'s existing `!= null` guard already handles it.
+New regression test added with a real New-tracker fixture
+(`makeMe.aMemoryTrackerFor(note).please()`, no stability override). **Lesson
+for future slices touching FSRS inputs:** a fixture that pre-sets stability
+to establish a tracker (the common case for testing an already-scheduled
+item) will never exercise the New/first-grade edge case — test that
+explicitly when a formula divides by Stability or Difficulty.
+
 #### 17. Recall Stats shows today's accuracy against expected — Behavior `[ ]`
 
 Standardized Poisson-binomial residual `A = Σ(y−p̂) / √Σp̂(1−p̂)` on raw FSRS

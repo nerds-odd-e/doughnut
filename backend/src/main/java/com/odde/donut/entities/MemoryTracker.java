@@ -176,7 +176,11 @@ public class MemoryTracker extends EntityIdentifiedByIdOnly {
     return MemoryTrackerRecallDue.elapsedHoursUntil(this, currentUTCTimestamp);
   }
 
-  public double retrievabilityAt(Timestamp now) {
+  /** {@code null} for a New tracker: Retrievability is undefined before any grade exists. */
+  public Double retrievabilityAt(Timestamp now) {
+    if (isNew()) {
+      return null;
+    }
     return Fsrs.retrievabilityFromHours(getStability(), elapsedHoursUntil(now));
   }
 

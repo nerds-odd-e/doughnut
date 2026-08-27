@@ -5,6 +5,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.nullValue;
 
 import com.odde.donut.controllers.dto.AnswerSpellingDTO;
 import com.odde.donut.entities.Grade;
@@ -30,6 +31,18 @@ class MemoryTrackerRecallHistoryRetrievabilityTest extends RecallPromptControlle
     assertThat(log.getDifficultyBefore(), equalTo(difficultyBefore));
     assertThat(log.getRetrievability(), notNullValue());
     assertThat(tracker.getStability(), is(not(stabilityBefore)));
+  }
+
+  @Test
+  void gradingANewTrackerForTheFirstTimeDoesNotProduceNaNRetrievability()
+      throws UnexpectedNoAccessRightException {
+    MemoryTracker newTracker = makeMe.aMemoryTrackerFor(ownedNote()).please();
+
+    memoryTrackerController.markAsRecalled(newTracker, Grade.GOOD);
+
+    RecallLog log = memoryTrackerController.getRecallLogs(newTracker).get(0);
+    assertThat(log.getStabilityBefore(), equalTo(0f));
+    assertThat(log.getRetrievability(), nullValue());
   }
 
   @Test
