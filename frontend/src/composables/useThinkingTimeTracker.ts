@@ -102,6 +102,9 @@ export function useThinkingTimeTracker(
     const elapsed = now - runningStart.value
     if (elapsed <= SUSPEND_GAP_THRESHOLD_MS) {
       accumulatedMs.value += elapsed
+    } else {
+      // Dropped suspend gap: rebase idle too, or it reads as sleep-long idle.
+      markActivityAt(now)
     }
     runningStart.value = now
   }
@@ -162,6 +165,7 @@ export function useThinkingTimeTracker(
     hasStopped.value = true
 
     updateAccumulatedTime()
+    checkIdle() // flush in-progress idle before isRunning flips false below
     runningStart.value = null
     isRunning.value = false
 

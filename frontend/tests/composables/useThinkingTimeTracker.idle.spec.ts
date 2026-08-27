@@ -8,7 +8,7 @@ import {
 } from "./thinkingTimeTrackerTestSupport"
 
 describe("useThinkingTimeTracker idle detection", () => {
-  const { clock, setTime } = setupTrackerClock()
+  const { clock, setTime, mockNow } = setupTrackerClock()
 
   const createStartedTrackerComponent = () =>
     defineComponent({
@@ -78,6 +78,38 @@ describe("useThinkingTimeTracker idle detection", () => {
     window.dispatchEvent(new Event("mousemove"))
     time = advanceTimeTo(time, 70500)
     await nextTick()
+
+    expect(wrapper.get('[data-testid="idle-ms"]').text()).toBe("10000")
+  })
+
+  it("excludes a silent device suspend gap from idle time", async () => {
+    const wrapper = await mountStartedTracker()
+    setTime(1000)
+
+    // Device suspends without firing any pause/resume event and without any
+    // recorded activity beforehand. If the idle detector's activity
+    // baseline weren't rebased when reconcileGap() drops this gap, the next
+    // watchdog tick would attribute the whole sleep duration to idle time.
+    setTime(1000 + 6 * 60 * 60 * 1000)
+    await nextTick()
+
+    expect(wrapper.get('[data-testid="idle-ms"]').text()).toBe("0")
+
+    setTime(1000 + 6 * 60 * 60 * 1000 + 500)
+    await stopAndExpect(wrapper, "1500")
+    expect(wrapper.get('[data-testid="idle-ms"]').text()).toBe("0")
+  })
+
+  it("flushes the in-progress idle stretch on stop() without waiting for the watchdog", async () => {
+    const wrapper = await mountStartedTracker()
+
+    advanceTimeTo(0, 69500)
+    await nextTick()
+    expect(wrapper.get('[data-testid="idle-ms"]').text()).toBe("9500")
+
+    // Move the clock only — no watchdog tick fires before stop() is called.
+    mockNow(70000)
+    await stopAndExpect(wrapper, "70000")
 
     expect(wrapper.get('[data-testid="idle-ms"]').text()).toBe("10000")
   })

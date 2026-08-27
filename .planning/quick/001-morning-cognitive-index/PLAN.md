@@ -1,7 +1,7 @@
 # Morning cognitive index from recall history
 
-**Status:** in progress — slices 1–14, 14.1 done; **next: 14.2** (repair shipped
-readouts before Accuracy)
+**Status:** in progress — slices 1–14, 14.1–14.2 done; **next: 14.3** (repair
+shipped readouts before Accuracy)
 **Type:** ad-hoc plan (`.planning/quick/`)
 **Research memo:** https://claude.ai/code/artifact/9e13f954-fc5e-48e5-868f-f75d03f811c1
 
@@ -475,17 +475,20 @@ tracker spec files pass `{ clock }` explicitly. Removed the redundant
 `watch(isActiveQuestion, ..., { immediate: true })` already covers setup.
 Production comments referencing "the plan" removed. No DTO/API/schema change.
 
-#### 14.2 A silent device suspend is not recorded as idle — Behavior `[ ]`
+#### 14.2 A silent device suspend is not recorded as idle — Behavior `[x]`
 
-Lock the phone mid-question with no `visibilitychange`, wait, unlock, answer:
-thinking time still excludes the gap (slice 3), and idle time does not include
-it. Reset `lastActivityAt` / idle accumulation when `reconcileGap()` drops a
-gap. Flush idle on `stop()`.
-
-- Unit: tracker with the injected clock — replay a jump above
-  `SUSPEND_GAP_THRESHOLD_MS` then assert `idleMs` is not the sleep duration
-- Existing suspend tests keep asserting thinking time only; this slice's unique
-  claim is idle
+Done: `reconcileGap()` now calls `thinkingIdleDetection.ts`'s existing
+`markActivityAt(now)` when a dropped gap exceeds `SUSPEND_GAP_THRESHOLD_MS`,
+rebasing the idle detector's activity baseline so the next watchdog
+`checkIdle()` doesn't attribute the sleep to idle. `stop()` now calls
+`checkIdle()` before `isRunning.value` flips false, flushing any
+in-progress idle-accumulating stretch instead of losing up to one watchdog
+interval. `useThinkingTimeTracker.ts` stayed under the 250-line budget (249
+lines). New tests in `useThinkingTimeTracker.idle.spec.ts`: a 6-hour silent
+clock jump excludes from both thinking time and idle time; a `stop()` mid
+idle-accumulation flushes the partial stretch without waiting for the
+watchdog. Existing suspend tests (thinking-time-only claim) unchanged and
+still passing.
 
 #### 14.3 Pace and retention exclusion use on-task time, not the trend-chart caps — Behavior `[ ]`
 
