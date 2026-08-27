@@ -1,9 +1,9 @@
 # Morning cognitive index from recall history
 
-**Status:** in progress — slices 1–14, 14.1–14.8 done; repair of shipped
-readouts complete. **next: 15** (Accuracy channel — Jidoka checkpoint first,
-see below). `recall_stats.feature`'s pace scenario stays `@wip` — a second,
-unrelated E2E race condition was found (see Discoveries).
+**Status:** in progress — slices 1–14, 14.1–14.8, 15 done. **next: 16**
+(Accuracy channel — Recall History shows what recall was predicted).
+`recall_stats.feature`'s pace scenario stays `@wip` — a second, unrelated E2E
+race condition was found (see Discoveries).
 **Type:** ad-hoc plan (`.planning/quick/`)
 **Research memo:** https://claude.ai/code/artifact/9e13f954-fc5e-48e5-868f-f75d03f811c1
 
@@ -622,18 +622,24 @@ DTO/API/schema change.
 
 ### Accuracy channel
 
-#### 15. Memory-state columns on `recall_log` — Structure `[ ]`
+#### 15. Memory-state columns on `recall_log` — Structure `[x]`
 
-**Do not start until 14.1–14.8 are done.**
-
-`V300000302__add_memory_state_to_recall_log.sql`: `stability_before FLOAT NULL`,
-`difficulty_before FLOAT NULL`, `retrievability DOUBLE NULL`, plus entity fields.
-
-- **Note:** slice 4 already claimed `V300000302` — compute the actual next
-  available version number from `backend/src/main/resources/db/migration/` at
-  implementation time rather than reusing this stale filename.
-- **Jidoka first — see ADR 0003 tension above.**
-- **Enables slice 16 only.** Regenerate `docs/database-erd.md`.
+Done: migration is `V300000303__add_memory_state_to_recall_log.sql` (302 was
+already taken by slice 4's `answer` pause-tracking migration, as anticipated —
+version recomputed fresh from the migration directory). Adds `stability_before
+FLOAT NULL`, `difficulty_before FLOAT NULL`, `retrievability DOUBLE NULL` to
+`recall_log`, no defaults (NULL means "predates this instrumentation", same
+convention as slice 4). `RecallLog.java` gained matching `Float
+stabilityBefore`, `Float difficultyBefore`, `Double retrievability` fields
+with per-field `@Column`/`@Getter`/`@Setter`, matching this entity's existing
+style. `docs/database-erd.md` regenerated — no diff, since none of the new
+columns are keys/FKs (same precedent as slice 4). Nothing reads or writes
+these fields yet — that's slice 16. Verified via a controller test that
+forces a real Flyway migration apply + Hibernate schema validation
+(`MemoryTrackerRecallHistoryControllerTest`, `--rerun-tasks`), not a fake
+behavior test, since this is a pure Structure slice. **Jidoka checkpoint
+resolved beforehand** — see the resolution note above and ADR 0003 (commit
+`5a8b19c085`).
 
 #### 16. Recall History shows what recall was predicted — Behavior `[ ]`
 

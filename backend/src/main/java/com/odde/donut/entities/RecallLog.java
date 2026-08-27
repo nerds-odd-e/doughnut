@@ -71,6 +71,21 @@ public class RecallLog extends EntityIdentifiedByIdOnly {
   @Setter
   private String tutorFeedback;
 
+  @Column(name = "stability_before")
+  @Getter
+  @Setter
+  private Float stabilityBefore;
+
+  @Column(name = "difficulty_before")
+  @Getter
+  @Setter
+  private Float difficultyBefore;
+
+  @Column(name = "retrievability")
+  @Getter
+  @Setter
+  private Double retrievability;
+
   @JsonIgnore
   public boolean isConfusion() {
     return grade == null;
