@@ -34,6 +34,30 @@ describe("MemoryTrackerPageView recall history", () => {
     expect(log.text()).toMatch(/Elapsed hours:\s*24/)
   })
 
+  it("shows the predicted recall probability when retrievability is present", async () => {
+    const wrapper = await mountMemoryTrackerPageViewReady({
+      recallHistory: historyFromLogs([
+        makeMe.aRecallLog.retrievability(0.873).please(),
+      ]),
+    })
+
+    const log = wrapper.find('[data-testid="recall-log"]')
+    expect(log.find('[data-testid="recall-log-retrievability"]').text()).toBe(
+      "Predicted: 87%"
+    )
+  })
+
+  it("does not show a predicted recall probability when retrievability is absent", async () => {
+    const wrapper = await mountMemoryTrackerPageViewReady({
+      recallHistory: historyFromLogs([makeMe.aRecallLog.please()]),
+    })
+
+    const log = wrapper.find('[data-testid="recall-log"]')
+    expect(log.find('[data-testid="recall-log-retrievability"]').exists()).toBe(
+      false
+    )
+  })
+
   it("shows an AGAIN recall log as a second log", async () => {
     const wrapper = await mountMemoryTrackerPageViewReady({
       recallHistory: historyFromLogs([

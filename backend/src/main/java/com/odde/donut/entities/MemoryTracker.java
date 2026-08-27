@@ -176,6 +176,10 @@ public class MemoryTracker extends EntityIdentifiedByIdOnly {
     return MemoryTrackerRecallDue.elapsedHoursUntil(this, currentUTCTimestamp);
   }
 
+  public double retrievabilityAt(Timestamp now) {
+    return Fsrs.retrievabilityFromHours(getStability(), elapsedHoursUntil(now));
+  }
+
   void scheduleNextRecallFromStability(Timestamp currentUTCTimestamp) {
     setLastRecalledAt(currentUTCTimestamp);
     Timestamp scheduled = calculateNextRecallAt();

@@ -20,6 +20,9 @@ const formatThinkingTime = (ms: number): string => {
   return `${minutes}m ${remainingSeconds}s`
 }
 
+const formatRetrievability = (retrievability: number): string =>
+  `Predicted: ${Math.round(retrievability * 100)}%`
+
 const historyItemKey = (item: RecallHistoryItem, index: number) => {
   if (item.recallLog) {
     return `log-${item.recallLog.id}`
@@ -56,6 +59,12 @@ const historyItemKey = (item: RecallHistoryItem, index: number) => {
           }}</span>
           <span>Recorded: {{ new Date(item.recallLog.recordedAt).toLocaleString() }}</span>
           <span>Elapsed hours: {{ item.recallLog.elapsedHours }}</span>
+          <span
+            v-if="item.recallLog.retrievability != null"
+            data-testid="recall-log-retrievability"
+          >
+            {{ formatRetrievability(item.recallLog.retrievability) }}
+          </span>
         </div>
         <p
           v-if="item.recallLog?.tutorFeedback"

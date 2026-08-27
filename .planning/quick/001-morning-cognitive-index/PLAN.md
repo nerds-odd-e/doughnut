@@ -1,9 +1,9 @@
 # Morning cognitive index from recall history
 
-**Status:** in progress — slices 1–14, 14.1–14.8, 15 done. **next: 16**
-(Accuracy channel — Recall History shows what recall was predicted).
-`recall_stats.feature`'s pace scenario stays `@wip` — a second, unrelated E2E
-race condition was found (see Discoveries).
+**Status:** in progress — slices 1–14, 14.1–14.8, 15, 16 done. **next: 17**
+(Recall Stats shows today's accuracy against expected). `recall_stats.feature`'s
+pace scenario stays `@wip` — a second, unrelated E2E race condition was found
+(see Discoveries).
 **Type:** ad-hoc plan (`.planning/quick/`)
 **Research memo:** https://claude.ai/code/artifact/9e13f954-fc5e-48e5-868f-f75d03f811c1
 
@@ -649,10 +649,26 @@ not exempt from API regeneration even when nothing yet reads/writes those
 fields — check for this the next time a "Structure only, no DTO/API change"
 slice touches an entity embedded in a response DTO.
 
-#### 16. Recall History shows what recall was predicted — Behavior `[ ]`
+#### 16. Recall History shows what recall was predicted — Behavior `[x]`
 
-Answer a card: the history row shows the predicted recall probability beside the
-outcome. Makes the new snapshot immediately verifiable instead of write-only.
+Done: `persistRecallLog` (`MemoryTrackerService.java`), the single choke point
+creating every `RecallLog` row, now sets `stabilityBefore`, `difficultyBefore`,
+and `retrievability` right after `elapsedHours`. `MemoryTracker.java` gained
+`public double retrievabilityAt(Timestamp now)`, delegating to the existing
+package-private `Fsrs.retrievabilityFromHours`. **Real ordering bug found and
+fixed:** `persistRecallLog` has two call sites, and they called it in opposite
+order relative to the tracker's Stability/Difficulty mutation — the Grade path
+(`markAsRecalled`) already called it *before* `applyGrade` (correct), but the
+Confusion path (`SpellingRecallGrading.java`, accidental spelling match)
+called it *after* `applyConfusionAdjustment`, which would have silently
+captured the already-adjusted state as "before." Fixed by reordering the
+Confusion path's two calls to match the Grade path's pattern; a new
+regression test (`MemoryTrackerRecallHistoryRetrievabilityTest.java`) asserts
+pre-adjustment state specifically on the Confusion path, not just the
+happy-path Grade case. `RecallHistory.vue` renders `Predicted: NN%` beside
+the existing outcome/recorded/elapsed-hours row, shown only when
+`retrievability != null` (old rows stay silent). No migration, no API
+regeneration needed (slice 15's already-done regen covers these fields).
 
 #### 17. Recall Stats shows today's accuracy against expected — Behavior `[ ]`
 

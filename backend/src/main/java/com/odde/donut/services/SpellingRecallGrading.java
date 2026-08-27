@@ -115,9 +115,9 @@ final class SpellingRecallGrading {
               .findConfusionAdjustmentTracker(user, matches.getFirst())
               .ifPresent(
                   target -> {
-                    memoryTrackerService.applyConfusionAdjustment(target, currentUTCTimestamp);
                     memoryTrackerService.persistRecallLog(
                         target, currentUTCTimestamp, null, gradedAnswer, null);
+                    memoryTrackerService.applyConfusionAdjustment(target, currentUTCTimestamp);
                   });
         }
       }

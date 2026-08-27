@@ -38,6 +38,11 @@ class RecallLogBuilder extends Builder<RecallLog> {
     return this
   }
 
+  retrievability(retrievability: number): RecallLogBuilder {
+    this.data.retrievability = retrievability
+    return this
+  }
+
   do(): RecallLog {
     return this.data
   }

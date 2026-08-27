@@ -112,6 +112,9 @@ public class MemoryTrackerService {
     recallLog.setMemoryTracker(memoryTracker);
     recallLog.setRecordedAt(recordedAt);
     recallLog.setElapsedHours((int) memoryTracker.elapsedHoursUntil(recordedAt));
+    recallLog.setStabilityBefore(memoryTracker.getStability());
+    recallLog.setDifficultyBefore(memoryTracker.getDifficulty());
+    recallLog.setRetrievability(memoryTracker.retrievabilityAt(recordedAt));
     recallLog.setGrade(grade);
     recallLog.setAnswer(answer);
     recallLog.setTutorFeedback(tutorFeedback);
