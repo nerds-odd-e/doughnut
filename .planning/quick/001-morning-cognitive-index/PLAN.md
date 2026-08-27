@@ -639,7 +639,15 @@ forces a real Flyway migration apply + Hibernate schema validation
 (`MemoryTrackerRecallHistoryControllerTest`, `--rerun-tasks`), not a fake
 behavior test, since this is a pure Structure slice. **Jidoka checkpoint
 resolved beforehand** — see the resolution note above and ADR 0003 (commit
-`5a8b19c085`).
+`5a8b19c085`). **Gap found in CI, not by this slice's own verification:**
+the new fields have public getters and `RecallLog` is nested directly inside
+`RecallHistoryItem` (no `@JsonIgnore`), so they were already on the wire —
+`RobotsTests.openApiDocsMatchCommittedYaml` failed until `open_api_docs.yaml`
+and the generated TS client were regenerated (commit `c72eae010e`). A
+Structure slice that adds fields to an entity nested in a serialized DTO is
+not exempt from API regeneration even when nothing yet reads/writes those
+fields — check for this the next time a "Structure only, no DTO/API change"
+slice touches an entity embedded in a response DTO.
 
 #### 16. Recall History shows what recall was predicted — Behavior `[ ]`
 
