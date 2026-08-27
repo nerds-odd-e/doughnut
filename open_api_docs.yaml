@@ -5421,6 +5421,15 @@ components:
         answerId:
           type: integer
           format: int32
+        stabilityBefore:
+          type: number
+          format: float
+        difficultyBefore:
+          type: number
+          format: float
+        retrievability:
+          type: number
+          format: double
       required:
       - elapsedHours
       - id

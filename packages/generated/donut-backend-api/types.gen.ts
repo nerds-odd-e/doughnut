@@ -1120,6 +1120,9 @@ export type RecallLog = {
     tutorFeedback?: string;
     memoryTrackerId: number;
     answerId?: number;
+    stabilityBefore?: number;
+    difficultyBefore?: number;
+    retrievability?: number;
 };
 
 export type RecallHistoryItem = {
