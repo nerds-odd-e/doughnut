@@ -165,29 +165,21 @@ final class RecallStatsAggregator {
     return longest;
   }
 
+  /**
+   * Response time for the trend/AM-PM charts: {@link RecallAnswerRow#rawElapsedMs()}, capped (120s
+   * when it came from {@code thinkingTimeMs}, 300s when it came from the timestamp-diff fallback)
+   * and dropped below 1s. Unlike {@link RecallPaceAggregator}'s on-task time, this value is
+   * deliberately clamped so a single very slow or instrumentation-glitched answer can't distort a
+   * chart average.
+   */
   static Optional<Long> responseTimeMs(RecallAnswerRow r) {
-    if (r.answerCreatedAt() == null) {
+    Optional<Long> raw = r.rawElapsedMs();
+    if (raw.isEmpty()) {
       return Optional.empty();
     }
-    long value;
-    if (r.thinkingTimeMs() != null) {
-      value = r.thinkingTimeMs();
-      if (value > THINKING_CAP_MS) {
-        value = THINKING_CAP_MS;
-      }
-    } else {
-      if (r.promptCreatedAt() == null) {
-        return Optional.empty();
-      }
-      value = r.answerCreatedAt().getTime() - r.promptCreatedAt().getTime();
-      if (value > DIFF_CAP_MS) {
-        value = DIFF_CAP_MS;
-      }
-    }
-    if (value < MIN_VALID_MS) {
-      return Optional.empty();
-    }
-    return Optional.of(value);
+    long cap = r.thinkingTimeMs() != null ? THINKING_CAP_MS : DIFF_CAP_MS;
+    long value = Math.min(raw.get(), cap);
+    return value < MIN_VALID_MS ? Optional.empty() : Optional.of(value);
   }
 
   static Long trimmedMean(List<Long> values) {

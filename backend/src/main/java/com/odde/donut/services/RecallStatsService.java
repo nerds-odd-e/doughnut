@@ -33,7 +33,7 @@ public class RecallStatsService {
 
   public RecallStatsDTO compute(User user, ZoneId zoneId, Timestamp now) {
     // One projection query over the all-time window (5y); derive the 1y "recent" set in Java.
-    // The projection selects only the 4 fields the aggregator needs, so Hibernate never hydrates
+    // The projection selects only the fields the aggregator needs, so Hibernate never hydrates
     // RecallPrompt entities or their eager associations — this is what avoids the production
     // N+1/timeout.
     Timestamp sinceYear = minusDays(now, 365);

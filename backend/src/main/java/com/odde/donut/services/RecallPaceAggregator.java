@@ -33,6 +33,15 @@ final class RecallPaceAggregator {
 
   private RecallPaceAggregator() {}
 
+  /**
+   * On-task time for pace/retention purposes: {@link RecallAnswerRow#rawElapsedMs()} as-is. Unlike
+   * {@link RecallStatsAggregator#responseTimeMs}, this applies no 1s drop and no 120s/300s caps —
+   * this aggregator applies its own item-relative floor and its own {@link #HARD_DROP_MS} instead.
+   */
+  private static Optional<Long> onTaskTimeMs(RecallAnswerRow r) {
+    return r.rawElapsedMs();
+  }
+
   /** Result of the chronological pace walk: the tile stats plus rows judged implausibly fast. */
   record PaceResult(PaceStats stats, Set<RecallAnswerRow> implausiblyFastRows) {}
 
@@ -64,33 +73,34 @@ final class RecallPaceAggregator {
       if (isToday) {
         totalAnsweredToday++;
       }
-      Optional<Long> rt = RecallStatsAggregator.responseTimeMs(r);
+      Optional<Long> rt = onTaskTimeMs(r);
       if (rt.isEmpty()) {
         continue;
       }
+      long onTaskMs = rt.get();
       Integer itemId = r.memoryTrackerId();
       Double baseline = tauByItem.get(itemId);
       double floorMs =
           Math.max(
               ABSOLUTE_FLOOR_MS, baseline == null ? 0 : BASELINE_FLOOR_FACTOR * Math.exp(baseline));
-      if (rt.get() < floorMs) {
+      if (onTaskMs < floorMs) {
         implausiblyFastRows.add(r);
         continue;
       }
-      if (rt.get() >= HARD_DROP_MS) {
+      if (onTaskMs >= HARD_DROP_MS) {
         // Genuinely slow-but-valid attempts still count toward retention, but a single very
         // slow attempt on-task is dropped from the pace tile entirely and must not pollute the
         // item's baseline.
         continue;
       }
-      double lnRt = Math.log(rt.get());
+      double lnRt = Math.log(onTaskMs);
       int priorObservationCount = priorObservationCountByItem.getOrDefault(itemId, 0);
       if (baseline != null) {
         double cappedResidual = Math.min(lnRt - baseline, RESIDUAL_CAP);
         if (isToday) {
           double weight = priorObservationCount / (priorObservationCount + 3.0);
           todaysResiduals.add(new WeightedResidual(cappedResidual, weight));
-          if (r.correct() && rt.get() >= LAPSE_FACTOR * Math.exp(baseline)) {
+          if (r.correct() && onTaskMs >= LAPSE_FACTOR * Math.exp(baseline)) {
             lapseCount++;
           }
         } else if (isInBaselineWindow) {
@@ -154,9 +164,8 @@ final class RecallPaceAggregator {
     return median(values.stream().map(v -> Math.abs(v - medianValue)).toList());
   }
 
-  private static Double weightedPctVsUsual(List<WeightedResidual> residuals) {
-    Double weightedMedian = weightedMedian(residuals);
-    return weightedMedian == null ? null : (Math.exp(weightedMedian) - 1) * 100;
+  private static double weightedPctVsUsual(List<WeightedResidual> residuals) {
+    return (Math.exp(weightedMedian(residuals)) - 1) * 100;
   }
 
   private static double averageWeight(List<WeightedResidual> residuals) {
@@ -165,15 +174,11 @@ final class RecallPaceAggregator {
 
   /**
    * Weighted median: sorts by residual ascending and returns the residual at which cumulative
-   * weight first reaches half of the total. Cold-start rows (weight near 0) barely move it, letting
-   * established items dominate. Returns {@code null} when total weight is zero (every contributing
-   * row is cold-start), since such weights carry no information either way.
+   * weight first reaches half of the total. Cold-start rows (weight as low as 0.25, the minimum a
+   * residual-producing row can carry) barely move it, letting established items dominate.
    */
-  private static Double weightedMedian(List<WeightedResidual> residuals) {
+  private static double weightedMedian(List<WeightedResidual> residuals) {
     double totalWeight = residuals.stream().mapToDouble(WeightedResidual::weight).sum();
-    if (totalWeight == 0) {
-      return null;
-    }
     List<WeightedResidual> sorted = new ArrayList<>(residuals);
     sorted.sort(Comparator.comparingDouble(WeightedResidual::residual));
     double cumulativeWeight = 0;

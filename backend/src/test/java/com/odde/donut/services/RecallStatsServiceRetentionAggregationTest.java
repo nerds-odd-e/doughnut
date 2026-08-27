@@ -104,6 +104,27 @@ class RecallStatsServiceRetentionAggregationTest {
   }
 
   @Test
+  void implausiblyFastMistapBelowOldOneSecondDropIsAlsoExcludedFromRetention() {
+    Timestamp now = utc(11, 12);
+    List<RecallAnswerRow> rows =
+        List.of(
+            // establish a ~20000ms baseline for item 19 -> item floor = max(300, 0.25*20000) =
+            // 5000ms
+            answered(utc(9, 10), 20000, true, null, 19),
+            answered(utc(9, 11), 20000, true, null, 19),
+            // 200ms mistap: below the trend-chart aggregator's 1000ms drop threshold (which
+            // used to make this row silently skip the implausibly-fast check entirely and
+            // still count toward retention) but still well under the item-relative 5000ms
+            // floor -> must be excluded from retention just like the 1500ms case above.
+            answered(utc(9, 12), 200, true, null, 19),
+            answered(utc(9, 13), 20000, true, null, 19));
+    RecallStatsDTO dto = aggregate(rows, now);
+    // 4 rows total, but the 200ms mistap is dropped entirely: 3 answered, all correct -> 100%
+    assertThat(dto.getTotals().getTotalReviews365(), equalTo(3));
+    assertThat(dto.getTotals().getRetentionPct365(), closeTo(100.0, 0.01));
+  }
+
+  @Test
   void itemWithNoPriorBaselineCountsTowardRetentionAboveFlat300msFloor() {
     Timestamp now = utc(11, 12);
     List<RecallAnswerRow> rows =

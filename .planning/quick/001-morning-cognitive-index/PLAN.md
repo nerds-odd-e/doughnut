@@ -1,6 +1,6 @@
 # Morning cognitive index from recall history
 
-**Status:** in progress — slices 1–14, 14.1–14.2 done; **next: 14.3** (repair
+**Status:** in progress — slices 1–14, 14.1–14.3 done; **next: 14.4** (repair
 shipped readouts before Accuracy)
 **Type:** ad-hoc plan (`.planning/quick/`)
 **Research memo:** https://claude.ai/code/artifact/9e13f954-fc5e-48e5-868f-f75d03f811c1
@@ -490,24 +490,28 @@ idle-accumulation flushes the partial stretch without waiting for the
 watchdog. Existing suspend tests (thinking-time-only claim) unchanged and
 still passing.
 
-#### 14.3 Pace and retention exclusion use on-task time, not the trend-chart caps — Behavior `[ ]`
+#### 14.3 Pace and retention exclusion use on-task time, not the trend-chart caps — Behavior `[x]`
 
-A 200ms correct mistap drops out of retention as well as pace. A 3-minute
-instrumented think is scored as 3 minutes, not capped to 120s. The 5-minute
-hard-drop applies to `thinkingTimeMs` rows, not only the null-thinkingTimeMs
-diff fallback.
-
-`RecallPaceAggregator` must read raw `thinkingTimeMs` (diff fallback only when
-null) and apply its own floor / hard-drop. Leave `RecallStatsAggregator.responseTimeMs`
-(1s drop, 120s cap, 300s diff cap) for the trend / AM-PM charts.
-
-- Backend unit: through `aggregateRows` — 200ms correct excluded from
-  `totalReviews365`; `thinkingTimeMs = 180_000` is not treated as 120s for
-  `pctVsUsual`; `thinkingTimeMs >= 300_000` hard-dropped
-- Wrap-up dead code: drop unused `noteId` from `RecallAnswerRow` and the JPQL
-  constructor; drop the dead `weightedMedian` total-weight-zero branch if still
-  unreachable; fix the stale "projection selects only the 4 fields" comment in
-  `RecallStatsService`
+Done: extracted the shared raw-extraction logic (thinkingTimeMs, diff-fallback
+only when null) into `RecallAnswerRow.rawElapsedMs()`, a single source of
+truth used by both a new `RecallPaceAggregator.onTaskTimeMs` (uncapped, own
+floor/hard-drop, feeds pace/retention) and the existing
+`RecallStatsAggregator.responseTimeMs` (unchanged 1s-drop/120s-cap/300s-diff-cap
+policy layered on top, still feeding only the trend/AM-PM charts). A 200ms
+correct mistap now lands in `implausiblyFastRows` and is excluded from
+`totalReviews365`/retention, not just pace. `thinkingTimeMs = 180_000` (3 min)
+now feeds `pctVsUsual` uncapped instead of being clamped to 120s.
+`thinkingTimeMs >= 300_000` hard-drops via the real field, not only the
+null-fallback diff path used in older tests. Dead-code wrap-up: removed
+unused `noteId` from `RecallAnswerRow` and the `mt.note.id` JPQL selection in
+`RecallPromptRepository`; confirmed and removed the dead
+`weightedMedian` total-weight-zero branch (every recorded residual carries
+`priorObservationCount >= 1`, so `weight >= 0.25` and `totalWeight` can never
+be 0 when the list is non-empty); fixed the stale field-count comment in
+`RecallStatsService`. `RecallStatsServicePaceAggregationTest` split into
+itself (core weighted-median/confidence mechanics) plus a new
+`RecallStatsServicePaceExclusionTest` (exclusion/hard-drop/winsorization) to
+stay under the 250-line file-size convention.
 
 #### 14.4 Spelling answers record away, detour, and idle — Behavior `[ ]`
 
