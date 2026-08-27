@@ -108,13 +108,21 @@ public class LearningSessionRequestMarkdownBuilder {
         "- 2 — mastered the session item but not fluent, or needed a reminder then showed mastery\n");
     sb.append(
         "- 1 — needed several reminders, or could not reach the session item even with help\n\n");
-    sb.append("Preferred report format: one `###` heading per item, then `Grade: N`, then\n");
-    sb.append("descriptive text until the next heading or the close tag.\n\n");
+    sb.append("Each session item is a ")
+        .append(LearningSessionReportParser.SESSION_ITEM_OPEN_TAG)
+        .append(" whose first line is {title}: {1–4}, then descriptive text until ")
+        .append(LearningSessionReportParser.SESSION_ITEM_CLOSE_TAG)
+        .append(".\n");
+    sb.append("Wrap the ")
+        .append(LearningSessionReportParser.SESSION_ITEM_FEEDBACK_OPEN_TAG)
+        .append(" block in a fenced code block when the chat app formats the message.\n\n");
     sb.append("Example of how to provide feedback:\n\n");
+    sb.append("```\n");
     sb.append("# Learning Session Report\n\n");
     sb.append(LearningSessionReportParser.SESSION_ITEM_FEEDBACK_OPEN_TAG).append("\n");
     appendExampleReportFeedback(sb, trackers);
     sb.append("\n").append(LearningSessionReportParser.SESSION_ITEM_FEEDBACK_CLOSE_TAG);
+    sb.append("\n```");
     sb.append(
         "\n\nOnly grade session items that were actually taught in this session. Do not list\n");
     sb.append("items that were not taught in the session.\n");
@@ -131,7 +139,7 @@ public class LearningSessionRequestMarkdownBuilder {
         4,
         "Pronunciation was clear; still mixes ser/estar under pressure.");
     if (trackers.size() > 1) {
-      sb.append("\n\n");
+      sb.append("\n");
       appendExampleFeedbackItem(
           sb, trackers.get(1).getNote().getTitle(), 1, "Needed several reminders on the soft g.");
     }
@@ -139,9 +147,10 @@ public class LearningSessionRequestMarkdownBuilder {
 
   private void appendExampleFeedbackItem(
       StringBuilder sb, String title, int grade, String descriptiveText) {
-    sb.append("### ").append(title).append("\n");
-    sb.append("Grade: ").append(grade).append("\n");
-    sb.append(descriptiveText);
+    sb.append(LearningSessionReportParser.SESSION_ITEM_OPEN_TAG).append("\n");
+    sb.append(title).append(": ").append(grade).append("\n");
+    sb.append(descriptiveText).append("\n");
+    sb.append(LearningSessionReportParser.SESSION_ITEM_CLOSE_TAG);
   }
 
   private void appendSessionItem(

@@ -1,6 +1,6 @@
 # Nested session_item Learning Session Report
 
-**Status:** in progress (slice 1 done)
+**Status:** in progress (slices 1–2 done)
 
 ## Goal
 
@@ -38,22 +38,16 @@ and descriptive text. Parser: each item is one `<session_item>`; first
 E2E and table-built Feedback helpers emit nested tags.
 
 Learning: same-feature “hours between last and next recall” examples can flake
-on locale date parsing (`03/06` vs `11/06`); grade-only path, not this parser.
-Do not treat as a slice 2/3 blocker. Request `<how_to_report>` still `###` /
-`Grade:` until slice 2.
+on locale date parsing (`03/06` vs `11/06`); grade-only path. Do not treat as
+a slice 3 blocker.
 
 ### 2. Request shows nested session_item and a fenced example — Behavior
 
-Opening a potential session, the Request’s `<how_to_report>` contains a worked
-Report with `<session_item>` and `{title}: {1–4}`, inside a fenced code block.
+Status: done
 
-- `LearningSessionRequestMarkdownBuilder.appendHowToReport` / example items.
-- E2E: existing “instruct the tutor…” assertion
-  (`expectLearningSessionRequestInstructsDescriptiveFeedback`) looks for
-  `<session_item>` and a fenced `<session_item_feedback>` example (the `Grade:
-  4` line assertion becomes `Hola: 4` or the first session item’s title).
-- Unit: `LearningSessionRequestTests` example block matches the protocol
-  sample.
+Opening a potential session, `<how_to_report>` describes nested
+`<session_item>` (`{title}: {1–4}` plus text) and wraps the Feedback example
+in a fenced code block. Request Session Items remain `### {title}`.
 
 ### 3. Title-grade sequence in the Feedback block records text — Behavior
 

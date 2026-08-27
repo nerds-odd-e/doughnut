@@ -95,17 +95,20 @@ class LearningSessionRequestTests extends LearningSessionControllerTestBase {
         markdown,
         containsString(
             """
+            ```
             # Learning Session Report
 
             <session_item_feedback>
-            ### Hola
-            Grade: 4
+            <session_item>
+            Hola: 4
             Pronunciation was clear; still mixes ser/estar under pressure.
-
-            ### Gracias
-            Grade: 1
+            </session_item>
+            <session_item>
+            Gracias: 1
             Needed several reminders on the soft g.
+            </session_item>
             </session_item_feedback>
+            ```
             """));
   }
 
