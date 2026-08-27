@@ -151,17 +151,13 @@ the roadmap has no active milestone. Promote to `.planning/phases/` via
 
 ## Jidoka checkpoints — stop for developer judgement
 
-**Before slice 15 — ADR 0003 tension.** ADR 0003 states Retrievability "is a
-scheduling input, not part of the persisted current memory state", defines
-RecallLog as the history of "Grades and Confusion", and asserts "the state can
-be rebuilt from RecallLog". Persisting `stability_before` / `difficulty_before`
-/ `retrievability` on `recall_log` extends that definition.
-
-The honest justification is **query cost, not correctness**: the ADR freezes the
-FSRS profile, so replay is valid, and the columns are a materialized cache of a
-derivable value. Alternative design: compute by replay at query time and add no
-columns at all. Decide, and amend ADR 0003 or record why no amendment is needed
-— do not drift silently. Humans own the advice process.
+**Before slice 15 — ADR 0003 tension.** **Resolved** (commit `5a8b19c085`):
+developer decided to persist `stability_before` / `difficulty_before` /
+`retrievability` on `recall_log` rather than replay history per query. ADR
+0003 amended — the Retrievability glossary entry and "Recall history and
+current state" now state these columns are a materialized cache of a value
+the frozen FSRS profile always reproduces by replay, not a new source of
+truth; RecallLog's Grades and Confusion remain the record.
 
 **Before slice 9 — new vocabulary.** **Done** (commits `97cc69940f`,
 `f67d894175`): *pace*, *retrieval lapse*, *detour*, *away*, *idle*, *daily
