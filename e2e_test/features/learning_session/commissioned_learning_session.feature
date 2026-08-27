@@ -89,6 +89,23 @@ Feature: Commissioned learning session
     When I visit the commissioned memory tracker for "Hola"
     Then I should see the tutor's feedback "Pronunciation was clear; still mixes ser/estar under pressure."
 
+  Scenario: Recording session item feedback copied without inner tags shows tutor Feedback text on the tracker
+    Given the notes "Hola, Gracias" are assimilated as commissioned on day 1
+    And It's day 2, 9 hour
+    When I open the learning session request for notebook "Spanish conversation"
+    And I record the learning session report:
+      """
+      # Learning Session Report
+
+      <session_item_feedback>
+      Hola: 4
+      Pronunciation was clear; still mixes ser/estar under pressure.
+      </session_item_feedback>
+      """
+    Then the recorded Feedback for notebook "Spanish conversation" should be shown
+    When I visit the commissioned memory tracker for "Hola"
+    Then I should see the tutor's feedback "Pronunciation was clear; still mixes ser/estar under pressure."
+
   Scenario: Request carries the last two dated Feedbacks per Session Item
     Given the notes "Hola, Gracias" are assimilated as commissioned on day 1
     And I have recorded a learning session for notebook "Spanish conversation" on day 2, 9 hour with feedback:
