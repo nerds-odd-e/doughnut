@@ -1,5 +1,6 @@
 package com.odde.donut.services;
 
+import static com.odde.donut.services.LearningSessionReportParseAssertions.assertRejected;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasSize;
@@ -50,6 +51,26 @@ class LearningSessionReportTitleGradeSequenceParsingTest {
     assertEquals(Grade.AGAIN, result.entries().get(1).grade());
     assertEquals(
         "Needed several reminders on the soft g.", result.entries().get(1).descriptiveText());
+  }
+
+  @Test
+  void rejectsOutOfRangeGradeInTitleGradeSequenceAndRecordsFollowingItem() {
+    ParseResult result =
+        parser.parse(
+            """
+            <session_item_feedback>
+            Hola: 5
+            Gracias: 1
+            Needed several reminders on the soft g.
+            </session_item_feedback>
+            """,
+            SPANISH_TITLES,
+            Set.of());
+
+    assertThat(result.rejected(), hasSize(1));
+    assertRejected(result.rejected().get(0), "Hola: 5", "Grade must be 1, 2, 3, or 4.");
+    assertThat(result.entries(), hasSize(1));
+    assertEquals("Gracias", result.entries().get(0).noteTitle());
   }
 
   @Test

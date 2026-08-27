@@ -48,11 +48,7 @@ final class SessionItemFeedbackBlockParser {
   private static boolean isNotebookSessionItemTitleGradeLine(
       String line, Set<String> notebookTitles) {
     Matcher matcher = LearningSessionReportParser.GRADE_LINE.matcher(line.trim());
-    if (!matcher.matches()) {
-      return false;
-    }
-    int gradeValue = Integer.parseInt(matcher.group(2));
-    return notebookTitles.contains(matcher.group(1).trim()) && gradeValue >= 1 && gradeValue <= 4;
+    return matcher.matches() && notebookTitles.contains(matcher.group(1).trim());
   }
 
   private static String joinLines(String[] lines, int from, int to) {
