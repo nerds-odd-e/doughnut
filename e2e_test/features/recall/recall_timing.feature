@@ -22,18 +22,6 @@ Feature: Recall timing
     And I visit the understanding memory tracker for "sedition"
     Then the recall history should show away time and count beside thinking time
 
-  # This environment simulates "day 2" on the backend while the frontend's
-  # thinking-time tracker reads the real system clock. That mismatch means
-  # RecallPage's onActivated always finds its due-recall window "stale"
-  # (real now is always later than the simulated window end), triggering a
-  # full toRepeat refetch and Quiz remount on every KeepAlive reactivation -
-  # which discards the client-only detour accumulator before the answer is
-  # submitted. This is a pre-existing interaction between
-  # useRecallPageLoading's staleness check and simulated-time E2E tests,
-  # unrelated to the detour pause/resume wiring itself (verified correct via
-  # unit tests - see useThinkingTimeTracker.spec.ts and
-  # QuestionDisplay.thinking.spec.ts), and out of this slice's scope to fix.
-  @wip
   Scenario: Taking a detour into the note's notebook mid-question and back records detour time and count
     When I visit recall for a due recall prompt on day 2
     Then I should be asked "What is the meaning of sedition?"

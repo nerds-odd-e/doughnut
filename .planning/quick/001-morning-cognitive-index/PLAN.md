@@ -1,6 +1,6 @@
 # Morning cognitive index from recall history
 
-**Status:** in progress — slices 1–14, 14.1–14.5 done; **next: 14.6** (repair
+**Status:** in progress — slices 1–14, 14.1–14.6 done; **next: 14.7** (repair
 shipped readouts before Accuracy). `recall_stats.feature`'s pace scenario
 stays `@wip` — a second, unrelated E2E race condition was found (see
 Discoveries).
@@ -575,19 +575,19 @@ scope here; a future fix would sequence these steps so each request's
 promise resolves before the next fires. The backend controller test above is
 this slice's actual verification.
 
-#### 14.6 Returning to recall does not remount an in-flight question unless the due window changed — Behavior `[ ]`
+#### 14.6 Returning to recall does not remount an in-flight question unless the due window changed — Behavior `[x]`
 
-Open a prompt, detour into the notebook, return: detour time is still on the
-answer. Do not compare `new Date()` to `currentRecallWindowEndAt` on
-KeepAlive activation. The recalling response is already fetched in
-`loadSessionStrips` — remount `toRepeat` only when that response's due-window
-identity actually changed (production half-day rollover still refreshes;
-simulated-time E2E no longer remounts). Un-`@wip` the detour scenario in
-`recall_timing.feature`.
-
-- E2E: `recall/recall_timing.feature` detour scenario
-- Unit: mounted RecallPage / `useRecallPageLoading` — activation with an
-  unchanged window does not clear `toRepeat`
+Done: `useRecallPageLoading.ts`'s `onActivated` no longer compares `new
+Date()` to `currentRecallWindowEndAt`. `loadSessionStrips` now returns the
+fetched `DueMemoryTrackers` response (mirroring `loadMore`'s existing
+pattern in the same file); `onActivated` awaits it and only calls
+`loadCurrentDueRecalls()` (which clears/remounts `toRepeat`) when
+`response.currentRecallWindowEndAt !== currentRecallWindowEndAt.value` — the
+due-window identity, not wall-clock staleness. New
+`RecallPage.activation.spec.ts` covers both directions: unchanged window on
+reactivation leaves `toRepeat` alone; a genuinely changed window (production
+half-day rollover) still refreshes it. `recall_timing.feature`'s detour
+scenario un-`@wip`'d and passes end-to-end.
 
 #### 14.7 Viewing a previous answer's E2E scenario passes — Behavior `[ ]`
 

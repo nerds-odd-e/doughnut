@@ -58,7 +58,9 @@ export function useRecallPageLoading(options: {
     })
     if (!error && response) {
       applySessionStrips(response)
+      return response
     }
+    return
   }
 
   const loadMore = async (dueInDays?: number) => {
@@ -123,13 +125,12 @@ export function useRecallPageLoading(options: {
     loadPreviouslyAnsweredRecallPrompts()
   })
 
-  onActivated(() => {
+  onActivated(async () => {
     isProgressBarVisible.value = true
-    loadSessionStrips()
-    const currentTime = new Date().toISOString()
+    const response = await loadSessionStrips()
     if (
-      currentRecallWindowEndAt.value &&
-      currentTime > currentRecallWindowEndAt.value
+      response &&
+      response.currentRecallWindowEndAt !== currentRecallWindowEndAt.value
     ) {
       loadCurrentDueRecalls()
     }
