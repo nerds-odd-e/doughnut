@@ -1,8 +1,5 @@
 <template>
-  <div
-    class="content h-full"
-    :class="{ 'quiz--contestable': showContestableDummyInput }"
-  >
+  <div class="content h-full">
     <ContentLoader v-if="!currentRecallPromptFetched || isCurrentMemoryTrackerFetching" />
     <template v-else>
       <div class="pt-5 h-full">
@@ -40,19 +37,11 @@
       </template>
       </div>
     </template>
-    <div v-if="showContestableDummyInput" class="contestable-dummy-input-bar">
-      <textarea
-        v-model="contestableDummyInput"
-        rows="2"
-        class="daisy-textarea daisy-textarea-bordered w-full resize-none"
-        data-testid="contestable-dummy-input"
-      />
-    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, onMounted } from "vue"
+import { computed, watch, onMounted } from "vue"
 import ContentLoader from "@/components/commons/ContentLoader.vue"
 import type {
   AnswerSpellingDto,
@@ -111,14 +100,6 @@ const currentRecallPrompt = computed(() => {
     ? recallPromptCache.value[memoryTrackerId]
     : undefined
 })
-const showContestableDummyInput = computed(
-  () =>
-    currentRecallPromptFetched.value &&
-    !isCurrentMemoryTrackerFetching.value &&
-    !currentMemoryTracker.value?.spelling &&
-    currentRecallPrompt.value !== undefined
-)
-const contestableDummyInput = ref("")
 
 // Methods
 const memoryTrackerAt = (index: number): MemoryTrackerLite | undefined =>
@@ -146,50 +127,10 @@ const onAnswered = (answerResult: AnsweredQuestion) => {
 }
 
 // Watchers
-watch(
-  () => currentMemoryTrackerId.value,
-  () => {
-    contestableDummyInput.value = ""
-    fetchRecallPrompts()
-  }
-)
+watch(() => currentMemoryTrackerId.value, fetchRecallPrompts)
 
 // Lifecycle hooks
 onMounted(() => {
   fetchRecallPrompts()
 })
 </script>
-
-<style scoped lang="scss">
-@use "@/assets/menu-variables.scss" as *;
-
-$contestable-dummy-textarea-height: 4.5rem;
-$contestable-dummy-input-reserve: calc(
-  0.5rem + $contestable-dummy-textarea-height +
-    max(0.75rem, env(safe-area-inset-bottom))
-);
-
-.quiz--contestable {
-  margin-bottom: $contestable-dummy-input-reserve;
-}
-
-.contestable-dummy-input-bar {
-  position: fixed;
-  right: 0;
-  bottom: 0;
-  left: $main-menu-width;
-  z-index: 40;
-  padding: 0.5rem 1rem max(0.75rem, env(safe-area-inset-bottom));
-  background-color: var(--color-base-100);
-
-  :deep(textarea) {
-    min-height: $contestable-dummy-textarea-height;
-  }
-}
-
-@media (max-width: 1024px) {
-  .contestable-dummy-input-bar {
-    left: 0;
-  }
-}
-</style>

@@ -4,7 +4,6 @@ import { describe, it, expect } from "vitest"
 import {
   getRecallPromptSpy,
   contentLoaderVisible,
-  contestableDummyInput,
   contestableQuestionVisible,
   createDeferredGate,
   getRecallPrompt,
@@ -99,27 +98,6 @@ describe("repeat page", () => {
       const emitted = quizWrapper.emitted()
       expect(emitted.answered).toBeTruthy()
       expect(emitted.answered![0]).toEqual([answerResult])
-    })
-  })
-
-  describe("contestable dummy input", () => {
-    it("clears when advancing to the next question", async () => {
-      const recallPrompt = getRecallPrompt()
-      const secondRecallPrompt = makeMe.aRecallPrompt
-        .withQuestionStem("Second question")
-        .please()
-      getRecallPromptSpy
-        .mockResolvedValueOnce(wrapSdkResponse(recallPrompt))
-        .mockResolvedValueOnce(wrapSdkResponse(secondRecallPrompt))
-
-      const quizWrapper = await mountQuizReady([1, 2], 2)
-      const dummyInput = contestableDummyInput(quizWrapper)
-      await dummyInput.setValue("notes from previous question")
-
-      await quizWrapper.setProps({ currentIndex: 1 })
-      await flushPromises()
-
-      expect(dummyInput.element.value).toBe("")
     })
   })
 

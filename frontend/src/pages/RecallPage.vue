@@ -71,6 +71,16 @@
       </template>
     </div>
 
+    <div
+      v-if="currentAnsweredQuestion"
+      class="p-2 pb-[max(0.75rem,env(safe-area-inset-bottom))]"
+    >
+      <textarea
+        rows="2"
+        class="daisy-textarea daisy-textarea-bordered w-full resize-none"
+        data-testid="speaking-practice-input"
+      />
+    </div>
   </div>
 </template>
 

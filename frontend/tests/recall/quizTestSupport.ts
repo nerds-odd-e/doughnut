@@ -23,8 +23,6 @@ import { createDeferredGate } from "@tests/components/recall/noteRefinementTestS
 export { createDeferredGate, wrapSdkError, wrapSdkResponse }
 
 export const contentLoaderSelector = ".daisy-loading.daisy-loading-spinner"
-export const contestableDummyInputSelector =
-  '[data-testid="contestable-dummy-input"]'
 export const recallPromptSelector = ".recall-prompt"
 export const justReviewButtonText = "Good"
 
@@ -114,10 +112,6 @@ export function spellingQuestionVisible(quizWrapper: VueWrapper) {
 
 export function contestableQuestionVisible(quizWrapper: VueWrapper) {
   return quizWrapper.find(recallPromptSelector).exists()
-}
-
-export function contestableDummyInput(quizWrapper: VueWrapper) {
-  return quizWrapper.find<HTMLTextAreaElement>(contestableDummyInputSelector)
 }
 
 export async function submitSpellingAnswerFromQuiz(
