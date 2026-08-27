@@ -33,7 +33,8 @@ Learning, Review, and Relearning as product states.
   Higher Difficulty reduces the Stability gained from a successful recall.
 - **Retrievability** — The predicted probability of recalling a memory at a
   particular elapsed time, given its Stability. It is a scheduling input, not
-  part of the persisted current memory state.
+  part of the persisted current memory state (though a RecallLog row may cache
+  it as a historical snapshot — see "Recall history and current state").
 - **RecallLog** — The durable history of scheduling events for one memory
   tracker (Grades and Confusion).
 - **Thinking time** — How long the learner took to answer a measured prompt.
@@ -139,6 +140,16 @@ A memory tracker carries current Stability, Difficulty, and due time, updated
 transactionally with each scheduling event so due work is a direct query. The
 state can be rebuilt from RecallLog; due-work queries do not replay the log.
 Removed trackers retain history; deleted trackers are outside reconstruction.
+
+A RecallLog row may also cache the Stability, Difficulty, and Retrievability
+that produced it (`stability_before`, `difficulty_before`, `retrievability` on
+`recall_log`), for readouts that would otherwise replay history per query
+(e.g. the Cognitive index's accuracy channel). This is a materialized cache of
+a value the frozen FSRS profile always reproduces by replay, not a new source
+of truth: RecallLog's Grades and Confusion remain the record, and the cached
+columns must never diverge from what replay would produce. If the FSRS profile
+ever changes, existing cached columns describe scheduling as it was, not as it
+would be recomputed.
 
 A prompt event remains attributable to its Answer. A Grade from just review or
 Tutor Feedback need not have an Answer.
