@@ -3,7 +3,7 @@ import type {
   NoteRecallInfo,
 } from "@generated/donut-backend-api"
 
-function isNoteLevelMemoryTracker(mt: MemoryTracker) {
+export function isNoteLevelMemoryTracker(mt: MemoryTracker) {
   return !mt.propertyKey
 }
 

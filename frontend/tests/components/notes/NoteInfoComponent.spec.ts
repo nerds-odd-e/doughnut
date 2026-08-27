@@ -12,7 +12,7 @@ describe("NoteInfoComponent", () => {
     document.body.innerHTML = ""
   })
 
-  it("should display all memory trackers including skipped ones", () => {
+  it("should display skipped note-level memory trackers in the table", () => {
     const noteRealm = makeMe.aNoteRealm.please()
     const noteRecallInfo = makeMe.aNoteRecallInfo
       .memoryTrackers([
@@ -35,6 +35,29 @@ describe("NoteInfoComponent", () => {
 
     const rows = wrapper.findAll("tbody tr")
     expect(rows).toHaveLength(2)
+  })
+
+  it("should omit skipped property memory trackers from the table", () => {
+    const noteRealm = makeMe.aNoteRealm.please()
+    const noteRecallInfo = makeMe.aNoteRecallInfo
+      .memoryTrackers([
+        makeMe.aMemoryTracker
+          .withPropertyKey("topic")
+          .removedFromTracking(true)
+          .please(),
+      ])
+      .please()
+
+    wrapper = helper
+      .component(NoteInfoComponent)
+      .withProps({
+        note: noteRealm.note,
+        noteRecallInfo,
+      })
+      .withRouter()
+      .mount({ attachTo: document.body })
+
+    expect(wrapper.text()).not.toContain("property: topic")
   })
 
   it("should show ordinary and commissioned memory trackers together", () => {

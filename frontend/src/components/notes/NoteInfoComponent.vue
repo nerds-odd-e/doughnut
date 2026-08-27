@@ -6,8 +6,8 @@
     }"
     @level-changed="$emit('levelChanged', $event)"
   />
-  <h6 v-if="memoryTrackers.length">Memory Trackers</h6>
-  <table v-if="memoryTrackers.length" class="daisy-table daisy-table-bordered">
+  <h6 v-if="listedMemoryTrackers.length">Memory Trackers</h6>
+  <table v-if="listedMemoryTrackers.length" class="daisy-table daisy-table-bordered">
     <thead>
       <tr>
         <th>Type</th>
@@ -18,7 +18,7 @@
     </thead>
     <tbody>
       <NoteInfoMemoryTracker
-        v-for="memoryTracker in memoryTrackers"
+        v-for="memoryTracker in listedMemoryTrackers"
         :key="memoryTracker.id"
         :model-value="memoryTracker"
         class="clickable-row"
@@ -37,6 +37,7 @@ import type {
 } from "@generated/donut-backend-api"
 import { computed, ref, watch } from "vue"
 import { useRouter } from "vue-router"
+import { isNoteLevelMemoryTracker } from "../recall/assimilationMemoryTrackers"
 import NoteRecallSettingForm from "../recall/NoteRecallSettingForm.vue"
 import NoteInfoMemoryTracker from "./NoteInfoMemoryTracker.vue"
 
@@ -52,6 +53,11 @@ defineEmits<{
 const router = useRouter()
 
 const memoryTrackers = ref(props.noteRecallInfo.memoryTrackers ?? [])
+const listedMemoryTrackers = computed(() =>
+  memoryTrackers.value.filter(
+    (mt) => isNoteLevelMemoryTracker(mt) || mt.removedFromTracking !== true
+  )
+)
 const recallSetting = computed(() => props.noteRecallInfo.recallSetting)
 
 watch(

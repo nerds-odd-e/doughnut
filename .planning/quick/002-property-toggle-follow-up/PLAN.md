@@ -30,11 +30,6 @@ Inspected original plan (last copy at `5c7163c45f`) and commits
 
 **Bugs**
 
-- **Skipped property rows still listed.** `NoteInfoComponent` renders
-  every `getNoteInfo` tracker, including `removedFromTracking` property
-  rows (backfill dummies and Remove from recall). Test
-  `should display all memory trackers including skipped ones` only covers
-  note-level skipped rows; it never excluded property grain.
 - **Next property still opens Assimilation settings.**
   `useAssimilationView.openForNote` always sets `activePanel` to
   `"assimilation"`. Original slice 4 said the pending property should
@@ -45,12 +40,9 @@ Inspected original plan (last copy at `5c7163c45f`) and commits
 
 **Weak / leftover tests**
 
-- Skip scenario still opens Assimilation settings and asserts
-  `the property memory tracker for "topic" should be absent`. Skip does
-  not create a tracker, so that assertion is true for the wrong reason.
-  The observable outcome is already “Return to sequence” on the toggle.
 - Several scenarios `open assimilation settings` only to then drive the
-  property toggle (Skip / Return to sequence / Remove from recall).
+  property toggle (Return to sequence / Remove from recall). Skip no
+  longer opens settings just to look at the list.
 - Cucumber step `I should not see pending assimilation property` and
   `expectPendingAssimilationPropertyAbsent` have **no feature caller**.
 - Unit skip/assimilate cases in
@@ -71,7 +63,8 @@ Inspected original plan (last copy at `5c7163c45f`) and commits
 **Out of scope**
 
 - Pre-existing E2E `Removing tracked property deletes property memory
-  tracker` (failed on main before this work).
+  tracker` (listed as a possible independent failure; passed during
+  slice 1).
 - Unifying Skip and Remove from recall onto one Revive button.
 - Hiding *active* property trackers from the note list (still the path
   to the property tracker page).
@@ -81,25 +74,17 @@ Inspected original plan (last copy at `5c7163c45f`) and commits
 ### 1. Skipped property trackers leave the note Memory Trackers table
 
 Type: Behavior
-Status: planned
+Status: done
 
-Pre-condition: a note has a property understanding tracker; the learner
-has removed that property from recall (or a skipped property tracker
-already exists).
+List omits `removedFromTracking` property trackers via
+`isNoteLevelMemoryTracker` (note-level skipped rows stay). Skip E2E
+asserts **Return to sequence** on the toggle only; Remove from recall
+asserts **Revive** then table absence. Unit:
+`should omit skipped property memory trackers from the table`.
 
-Trigger: open Assimilation settings.
-
-Post-condition: the Memory Trackers table has no strikethrough
-`property: …` row. The property toggle shows **Revive**. Skip (never
-assimilated) still shows **Return to sequence** on the toggle; that
-scenario no longer asserts list absence and no longer opens settings
-just to look at the list.
-
-E2E: in `property_memory_tracker.feature`, rewrite Skip to assert
-Return to sequence on the toggle only; extend Remove from recall so
-after Revive is visible the property is absent from the table. Unit:
-`NoteInfoComponent` — skipped property tracker omitted; skipped
-note-level tracker still listed.
+Learning: table filter reuses `isNoteLevelMemoryTracker`; do not treat
+list absence as the Skip outcome. Out-of-scope “removing tracked
+property” E2E passed in this run.
 
 ### 2. Next property to assimilate does not open Assimilation settings
 

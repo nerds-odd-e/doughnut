@@ -54,10 +54,7 @@ Feature: Property memory tracker
     When I skip rich note property "topic" from its toggle options
     Then I should see the no more notes to assimilate toast
     When I visit note "Minerals"
-    And I open assimilation settings
-    Then the property memory tracker for "topic" should be absent
-    And assimilate for property "topic" should be enabled
-    And I should see Return to sequence for property "topic"
+    Then I should see Return to sequence for property "topic"
 
   @disableOpenAiService
   Scenario: Return to sequence restores a skipped property to the sequence
@@ -118,6 +115,7 @@ Feature: Property memory tracker
     Then I should see Remove from recall for property "topic"
     When I remove rich note property "topic" from recall from its toggle options
     Then I should see Revive for property "topic"
+    And the property memory tracker for "topic" should be absent
     When I start assimilation from the menu
     Then I should see the no more notes to assimilate toast
 
