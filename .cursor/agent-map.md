@@ -60,7 +60,7 @@ Assume `pnpm sut` is already running. If unsure, check `CURSOR_DEV=true nix deve
 
 ## Ignored Reference Material
 
-`docs/` and legacy `ongoing/` are excluded from default indexing to reduce retrieval noise. Active planning lives in `.planning/` (GSD `phases/`, `quick/`, `STATE`, … — see `gsd-coexistence.mdc`). `ongoing/` holds only residual holdouts (e.g. `test-optimization-blacklist.md`); read it when a skill points there. Read `docs/` explicitly when the user asks for docs, a rule points to a document, or an ADR check is required (`docs/adrs/`).
+`docs/` and leftover `ongoing/` files are excluded from default indexing to reduce retrieval noise. Active planning lives in `.planning/` (GSD `phases/`, `quick/`, `STATE`, … — see `gsd-coexistence.mdc`). Test-optimization candidates: `.planning/test-optimization-blacklist.md`. Read `docs/` explicitly when the user asks for docs, a rule points to a document, or an ADR check is required (`docs/adrs/`).
 
 ## Planning modes (GSD vs local)
 

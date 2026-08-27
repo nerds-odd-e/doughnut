@@ -19,8 +19,7 @@ doughnut/
 ├── infra/                   # GCP, Salt, Nix, path-routing
 ├── mysql/ · redis/          # Local data dirs for Nix process-compose
 ├── docs/                    # Human docs (not default-indexed)
-├── .planning/               # GSD: phases/, quick/, STATE, codebase/
-├── ongoing/                 # Legacy holdouts only (e.g. test-optimization blacklist)
+├── .planning/               # GSD: phases/, quick/, STATE, codebase/, test-optimization blacklist
 ├── .cursor/                 # Agent map, rules, skills
 ├── open_api_docs.yaml       # Generated OpenAPI (do not hand-edit)
 ├── package.json             # pnpm workspace root scripts
@@ -186,7 +185,7 @@ doughnut/
 - Committed: Yes — keep out of production behavior paths
 
 **.planning/:**
-- Purpose: GSD project state (`STATE.md`, `ROADMAP.md`, `phases/`, `quick/`, `codebase/`)
+- Purpose: GSD project state (`STATE.md`, `ROADMAP.md`, `phases/`, `quick/`, `codebase/`) plus `test-optimization-blacklist.md` (Candidates from optimization runs)
 - Generated: Partial (GSD workflows + agents)
 - Committed: Yes (default GSD `commit_docs: true`); profile JSON gitignored
 
@@ -199,11 +198,6 @@ doughnut/
 - Purpose: Timer / ad-hoc slices not yet on the roadmap
 - Generated: No (local slice-planning / `/gsd-quick`)
 - Committed: Yes while active; delete when done
-
-**ongoing/:**
-- Purpose: Legacy holdouts only — currently `test-optimization-blacklist.md`. New plans go to `.planning/phases/` or `quick/`
-- Generated: No
-- Committed: Yes — excluded from default agent indexing
 
 **docs/:**
 - Purpose: Human architecture/tech/practice documentation

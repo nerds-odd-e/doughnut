@@ -31,7 +31,7 @@ Command:
 3. Flaky = failure.
 
 Hard-to-improve tests: propose under **Candidates** in
-`ongoing/test-optimization-blacklist.md`. Permanent skip (developer Jidoka only):
+`.planning/test-optimization-blacklist.md`. Permanent skip (developer Jidoka only):
 tag Scenario or Feature `@skipOptimizationDueToKnownNecessarySlowness`.
 
 ---

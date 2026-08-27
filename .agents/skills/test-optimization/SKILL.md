@@ -24,7 +24,7 @@ Output: Optimized tests with per-slice commits + summary ending with
 | Invocation | Mode | What runs |
 |------------|------|-----------|
 | `/test-optimization` (default) | **Optimize** | Full `<process>`: profile → select top 10% → plan → execute-plan → re-profile. |
-| `/test-optimization --resolve` | **Resolve-only** | Run **only** the `resolve_candidates` step against `ongoing/test-optimization-blacklist.md`. **No profiling, no top-10% selection, no optimization.** |
+| `/test-optimization --resolve` | **Resolve-only** | Run **only** the `resolve_candidates` step against `.planning/test-optimization-blacklist.md`. **No profiling, no top-10% selection, no optimization.** |
 
 When `--resolve` is given, skip every other step and go straight to
 `resolve_candidates`.
@@ -56,7 +56,7 @@ or Feature marks known-necessary slowness. Profile runs exclude it via
 `--env tags=…` (see `profile`). Adding the tag is a developer decision (Jidoka)
 — propose only; do not add it yourself.
 
-**Candidates:** `ongoing/test-optimization-blacklist.md` holds **Candidates**
+**Candidates:** `.planning/test-optimization-blacklist.md` holds **Candidates**
 from optimization runs (proposals only). Keep that section; do not invent a
 Skip list there.
 
@@ -69,7 +69,7 @@ Skip list there.
 
 <step name="resolve_candidates">
 **Only runs in `--resolve` mode** (see `<modes>`). Triage every entry under
-**Candidates** in `ongoing/test-optimization-blacklist.md`. Do **not** profile,
+**Candidates** in `.planning/test-optimization-blacklist.md`. Do **not** profile,
 select a top 10%, or optimize any test here.
 
 **Goal:** for each Candidate, decide whether the slow test earns its cost, or
@@ -144,7 +144,7 @@ Store baseline locally (e.g. `.planning/quick/<scope>-profile-results.json` with
 <step name="eligible_set">
 Eligible tests = all profiled tests (E2E skip-tagged scenarios were already
 excluded by the profile tag filter). Optionally read
-`ongoing/test-optimization-blacklist.md` **Candidates** for context only — do
+`.planning/test-optimization-blacklist.md` **Candidates** for context only — do
 not auto-exclude Candidates from the top 10%.
 </step>
 
@@ -194,7 +194,7 @@ Each group slice (sub-agent):
 attempt, or would need product/design trade-off:
 
 1. Do **not** force a weak change.
-2. Append under **Candidates** in `ongoing/test-optimization-blacklist.md`: file,
+2. Append under **Candidates** in `.planning/test-optimization-blacklist.md`: file,
    test/scenario, duration, why hard, date (`YYYY-MM-DD`).
 3. Mark slice done (or Jidoka-stop if value decision required).
 
@@ -279,7 +279,7 @@ When optimization pass is **done**:
 2. Optionally keep one-line note in STATE/ROADMAP; otherwise delete spent `quick/`
    PLAN and SUMMARY noise (see `planning.mdc` history cleanup).
 3. **Never commit** profile JSON.
-4. Leave **`ongoing/test-optimization-blacklist.md`** and active GSD milestone
+4. Leave **`.planning/test-optimization-blacklist.md`** and active GSD milestone
    artifacts untouched.
 
 If user asks only to clean up: remove completed test-opt plans; do not delete

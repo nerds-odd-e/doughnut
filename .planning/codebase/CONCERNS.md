@@ -111,7 +111,7 @@
 
 **External OpenAI E2E is intentionally expensive:**
 - Problem: Real OpenAI transcription feature is blacklisted from test-optimization and is slow/flaky by nature.
-- Files: `e2e_test/features/note_creation_and_update/record_live_audio_with_real_open_ai_service.feature`, `ongoing/test-optimization-blacklist.md`
+- Files: `e2e_test/features/note_creation_and_update/record_live_audio_with_real_open_ai_service.feature`, `.planning/test-optimization-blacklist.md`
 - Cause: Live network + polling
 - Improvement path: Keep mocked coverage in `record_live_audio.feature`; run real-service spec sparingly outside the hot path.
 
