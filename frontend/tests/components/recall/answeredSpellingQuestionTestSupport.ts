@@ -56,6 +56,16 @@ export async function openResolveAccidentalMatch(wrapper: VueWrapper) {
   await flushPromises()
 }
 
+export function accidentalMatchWithOneMatchedNote() {
+  const reviewedRealm = makeMe.aNoteRealm.title("Reviewed Note").please()
+  const matched = makeMe.aNoteRealm.id(10).title("Matched A").please()
+  const answeredQuestion = makeMe.anAnsweredQuestion
+    .withNote(reviewedRealm.note)
+    .accidentalMatch("matched a", [matched.note.noteTopology])
+    .please()
+  return { answeredQuestion, reviewedRealm, matched }
+}
+
 export function accidentalMatchWithTwoMatchedNotes(
   options: { notebookNames?: [string, string]; reviewedReadonly?: boolean } = {}
 ) {

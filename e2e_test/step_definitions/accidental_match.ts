@@ -103,6 +103,10 @@ When(
   }
 )
 
+When('I open the accidentally matched note from the answer', () => {
+  start.assumeAnsweredQuestionPage().openAccidentallyMatchedNoteFromAnswer()
+})
+
 When('I go back to the recall result', () => {
   start.assumeAnsweredQuestionPage().goBackToRecallResult()
 })

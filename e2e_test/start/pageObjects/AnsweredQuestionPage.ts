@@ -11,6 +11,11 @@ import { assumeMemoryTrackerPage } from './memoryTrackerPage'
 
 const addWikiLinkOrRelationshipLabel = 'Add wiki link or relationship'
 
+const waitUntilOnNoteShowPage = () => {
+  waitUntilAppIsNotBusy()
+  cy.url({ timeout: 15000 }).should('match', /\/d\/n\/\d+|\/n\/\d+|\/n\d+/)
+}
+
 const assumeAnsweredQuestionPage = () => {
   cy.get('body').should('be.visible')
 
@@ -127,8 +132,15 @@ const assumeAnsweredQuestionPage = () => {
       cy.findByTestId('accidental-match-resolve-dialog').within(() => {
         cy.contains('a', title).should('be.visible').click()
       })
-      waitUntilAppIsNotBusy()
-      cy.url({ timeout: 15000 }).should('match', /\/d\/n\/\d+|\/n\/\d+|\/n\d+/)
+      waitUntilOnNoteShowPage()
+      return self
+    },
+    openAccidentallyMatchedNoteFromAnswer() {
+      cy.findByTestId('accidental-match-answer-link')
+        .scrollIntoView()
+        .should('be.visible')
+        .click()
+      waitUntilOnNoteShowPage()
       return self
     },
     goBackToRecallResult() {

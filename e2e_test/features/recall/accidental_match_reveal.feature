@@ -22,6 +22,14 @@ Feature: Accidental match reveal
     When I type my answer "sedation"
     Then I should see an accidental match reveal for spelling answer "sedation" with reviewed note "sedition" and matched note "sedation"
 
+  Scenario: Unique accidental match answer opens that note
+    When I visit recall for a due recall prompt on day 2
+    Then I should be asked spelling question "means incite violence" from notebook "English practice"
+    When I type my answer "sedation"
+    Then I should see an accidental match reveal for spelling answer "sedation" with reviewed note "sedition" and matched note "sedation"
+    When I open the accidentally matched note from the answer
+    Then the note title should be "sedation"
+
   Scenario: Offer adds the matched note as a wiki link in a new property without leaving the result
     When I visit recall for a due recall prompt on day 2
     Then I should be asked spelling question "means incite violence" from notebook "English practice"

@@ -11,6 +11,7 @@ import { closeButtonEl } from "@tests/commons/modalTestSupport"
 import makeMe from "donut-test-fixtures/makeMe"
 import { afterEach, beforeEach, describe, it, expect } from "vitest"
 import {
+  accidentalMatchWithOneMatchedNote,
   accidentalMatchWithTwoMatchedNotes,
   mountAnsweredSpellingQuestion,
   openResolveAccidentalMatch,
@@ -51,6 +52,22 @@ describe("AnsweredSpellingQuestion accidental match", () => {
     expect(resolveCta.exists()).toBe(true)
     expect(resolveCta.attributes("title")).toBe("Resolve accidental match")
     expect(resolveCta.attributes("aria-label")).toBe("Resolve accidental match")
+    expect(
+      wrapper.find('[data-testid="accidental-match-answer-link"]').exists()
+    ).toBe(false)
+  })
+
+  it("links unique accidental-match answer to that note", async () => {
+    const { answeredQuestion } = accidentalMatchWithOneMatchedNote()
+
+    wrapper = mountAnsweredSpellingQuestion(answeredQuestion)
+    await flushPromises()
+
+    expect(
+      wrapper
+        .find('[data-testid="accidental-match-answer-link"]')
+        .attributes("to")
+    ).toMatch(/10/)
   })
 
   it("opens resolve dialog with clickable titles and notebook path identity", async () => {
@@ -130,12 +147,8 @@ describe("AnsweredSpellingQuestion accidental match", () => {
   })
 
   it("builds a link as a same-Modal step and returns to the match list after success", async () => {
-    const reviewedRealm = makeMe.aNoteRealm.title("Reviewed Note").please()
-    const matched = makeMe.aNoteRealm.id(10).title("Matched A").please()
-    const answeredQuestion = makeMe.anAnsweredQuestion
-      .withNote(reviewedRealm.note)
-      .accidentalMatch("matched a", [matched.note.noteTopology])
-      .please()
+    const { answeredQuestion, reviewedRealm, matched } =
+      accidentalMatchWithOneMatchedNote()
     mockSdkService(TextContentController, "updateNoteContent", reviewedRealm)
 
     wrapper = mountAnsweredSpellingQuestion(answeredQuestion, {
