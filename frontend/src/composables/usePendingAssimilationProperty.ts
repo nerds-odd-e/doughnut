@@ -34,9 +34,7 @@ export function usePendingAssimilationProperty(noteId: Ref<number>) {
 
   watch(
     [pendingPropertyKey, targetNoteId, noteId],
-    () => {
-      scrollPendingPropertyIntoView().catch(() => undefined)
-    },
+    scrollPendingPropertyIntoView,
     { immediate: true }
   )
 

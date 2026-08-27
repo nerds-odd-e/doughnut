@@ -6,7 +6,7 @@
     :data-property-key="modelValue.key"
     :data-test-pending="isPending ? 'true' : undefined"
     :class="{ 'rounded bg-primary/10 ring-1 ring-primary/30': isPending }"
-    :ref="(el) => setPropertyRowRef(modelValue.key, el)"
+    :ref="setRootRef"
   >
     <div
       class="grid grid-cols-[auto_minmax(8rem,auto)_minmax(0,1fr)] gap-x-4 items-center"
@@ -135,9 +135,8 @@
 
 <script setup lang="ts">
 import { ChevronDown, ChevronRight } from "@lucide/vue"
-import { computed, ref, toRef } from "vue"
+import { computed, ref, type ComponentPublicInstance } from "vue"
 import RichFrontmatterPropertyRowOptions from "@/components/form/RichFrontmatterPropertyRowOptions.vue"
-import { usePendingAssimilationProperty } from "@/composables/usePendingAssimilationProperty"
 import RichFrontmatterImagePropertyValue from "@/components/form/RichFrontmatterImagePropertyValue.vue"
 import RichFrontmatterPropertyExternalLink from "@/components/form/RichFrontmatterPropertyExternalLink.vue"
 import RichFrontmatterPropertyKeyPresets from "@/components/form/RichFrontmatterPropertyKeyPresets.vue"
@@ -170,6 +169,8 @@ const props = defineProps<{
   presetListId: string
   propertyRows: PropertyRow[]
   noteId?: number
+  isPending: boolean
+  setRootRef: (el: Element | ComponentPublicInstance | null) => void
 }>()
 
 const emit = defineEmits<{
@@ -187,11 +188,7 @@ const presetPanelOpen = ref(false)
 const optionsExpanded = ref(false)
 const valueAreaRef = ref<HTMLElement | null>(null)
 
-const { isPendingProperty, setPropertyRowRef } = usePendingAssimilationProperty(
-  toRef(() => props.noteId ?? 0)
-)
-const isPending = computed(() => isPendingProperty(props.modelValue.key))
-const expanded = computed(() => optionsExpanded.value || isPending.value)
+const expanded = computed(() => optionsExpanded.value || props.isPending)
 
 const scalarValue = computed(
   () => scalarStringFromPropertyValue(props.modelValue.value) ?? ""

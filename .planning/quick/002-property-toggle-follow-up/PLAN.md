@@ -37,8 +37,6 @@ Inspected original plan (last copy at `5c7163c45f`) and commits
 - Several scenarios `open assimilation settings` only to then drive the
   property toggle (Return to sequence / Remove from recall). Skip no
   longer opens settings just to look at the list.
-- Cucumber step `I should not see pending assimilation property` and
-  `expectPendingAssimilationPropertyAbsent` have **no feature caller**.
 - Unit skip/assimilate cases in
   `RichMarkdownEditor.propertyAssimilation.spec.ts` overlap E2E on the
   happy path; they still pin the API payload. Keep them. Do not add more
@@ -46,13 +44,7 @@ Inspected original plan (last copy at `5c7163c45f`) and commits
 
 **Missed refactor / smells**
 
-- `usePendingAssimilationProperty` is constructed **once per property
-  row**, each with its own `Map` + `watch`. Only that row’s key is ever
-  registered. One instance on the properties list is enough.
-- `scrollPendingPropertyIntoView().catch(() => undefined)` swallows
-  failures (`error-handling.mdc`).
-- `RichFrontmatterProperties.vue` is 249 lines — hoisting pending state
-  into it must not push it over 250; extract if needed.
+(none remaining from this plan)
 
 **Out of scope**
 
@@ -97,24 +89,14 @@ the unused pending-absent helper.
 ### 3. One pending-property owner; drop dead pending-absent E2E
 
 Type: Structure
-Status: planned
+Status: done
 
-Unlocks nothing further; this is the missed wrap-up of original slice 4
-(pending highlight wired per row, unused absent helper, swallowed
-scroll).
-
-- Construct `usePendingAssimilationProperty` once (properties list, not
-  each row); pass pending + root-ref into the row. Stay under 250 lines
-  (extract if `RichFrontmatterProperties.vue` would overflow).
-- Propagate scroll failure; do not `.catch(() => undefined)`.
-- Delete unused `I should not see pending assimilation property` and
-  `expectPendingAssimilationPropertyAbsent`. Keep
-  `I should not see assimilation settings` /
-  `expectAssimilationSettingsAbsent` (slice 2 behavior).
-
-Existing pending E2E and
-`RichMarkdownEditor.propertyAssimilation.spec.ts` auto-expand tests
-must still pass.
+One `usePendingAssimilationProperty` on
+`RichFrontmatterEditablePropertyList` (extracted so
+`RichFrontmatterProperties.vue` stays under 250). Rows take `isPending`
++ `setRootRef`. List owns `usePropertyRowClientIds`. Scroll failures
+propagate. Unused pending-absent E2E step/helper deleted;
+`expectAssimilationSettingsAbsent` kept.
 
 ## Out of scope
 

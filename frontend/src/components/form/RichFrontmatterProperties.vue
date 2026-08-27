@@ -26,29 +26,20 @@
       :property-rows="propertyRows"
       :wiki-titles="wikiTitles"
     />
-    <div
+    <RichFrontmatterEditablePropertyList
       v-else-if="propertyRows.length > 0"
-      class="flex flex-col gap-2 text-sm"
-    >
-      <RichFrontmatterEditablePropertyRow
-        v-for="(_, idx) in propertyRows"
-        :key="rowClientIds[idx]"
-        v-model="propertyRows[idx]!"
-        :idx="idx"
-        :wiki-titles="wikiTitles"
-        :note-id="noteId"
-        :property-rows="propertyRows"
-        :key-input-id="rowKeyInputId(idx)"
-        :preset-list-id="rowKeyPresetListId(idx)"
-        @row-focus="onRowFocus(idx)"
-        @commit="commitRow(idx)"
-        @remove="removeRow(idx)"
-        @wikidata-dialog-open="openWikidataDialog({ type: 'row', idx })"
-        @dead-wiki-link-click="emits('deadWikiLinkClick', $event)"
-        @relation-type-selected="onRelationTypeSelected(idx, $event)"
-        @image-upload-state="emits('image-upload-state', $event)"
-      />
-    </div>
+      v-model="propertyRows"
+      :wiki-titles="wikiTitles"
+      :note-id="noteId"
+      :heading-id="headingId"
+      @row-focus="onRowFocus"
+      @commit="commitRow"
+      @remove="removeRow"
+      @wikidata-dialog-open="openWikidataDialog({ type: 'row', idx: $event })"
+      @dead-wiki-link-click="emits('deadWikiLinkClick', $event)"
+      @relation-type-selected="onRelationTypeSelected"
+      @image-upload-state="emits('image-upload-state', $event)"
+    />
     <p
       v-if="validationMessage"
       role="alert"
@@ -105,12 +96,11 @@
 import { Plus } from "@lucide/vue"
 import { computed, provide, ref, useId, watch } from "vue"
 import RichFrontmatterReadOnlyList from "@/components/form/RichFrontmatterReadOnlyList.vue"
-import RichFrontmatterEditablePropertyRow from "@/components/form/RichFrontmatterEditablePropertyRow.vue"
+import RichFrontmatterEditablePropertyList from "@/components/form/RichFrontmatterEditablePropertyList.vue"
 import RichFrontmatterInsertForm from "@/components/form/RichFrontmatterInsertForm.vue"
 import { richFrontmatterIsReadmeContextKey } from "@/components/form/richFrontmatterProvide"
 import WikidataAssociationDialog from "@/components/notes/WikidataAssociationDialog.vue"
 import type { WikiTitle } from "@generated/donut-backend-api"
-import { usePropertyRowClientIds } from "@/composables/usePropertyRowClientIds"
 import { useRichFrontmatterPropertyEditing } from "@/composables/useRichFrontmatterPropertyEditing"
 import { useWikidataPropertyDialog } from "@/composables/useWikidataPropertyDialog"
 import {
@@ -148,7 +138,6 @@ provide(
 
 const parsed = computed(() => parseNoteContentMarkdown(props.contentMarkdown))
 const propertyRows = ref<PropertyRow[]>([])
-const rowClientIds = usePropertyRowClientIds(propertyRows)
 const insertOpen = ref(false)
 const draftKey = ref("")
 const draftValue = ref("")
@@ -224,10 +213,6 @@ const {
     emits("properties-changed", filterForEmit(rows)),
   wikidataAssociationDialogRef,
 })
-
-const rowKeyInputId = (idx: number) => `${headingId}-row-${idx}-key`
-const rowKeyPresetListId = (idx: number) =>
-  `${headingId}-row-${idx}-key-presets`
 
 watch(
   () => props.contentMarkdown,

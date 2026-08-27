@@ -102,15 +102,4 @@ export const noteRichPropertyAssimilationMethods = () => ({
     })
     return this
   },
-  expectPendingAssimilationPropertyAbsent(key: string) {
-    this.switchToRichContent()
-    findNoteContentRegion().within(() => {
-      cy.get(richNotePropertyRow(key)).should(
-        'not.have.attr',
-        'data-test-pending',
-        'true'
-      )
-    })
-    return this
-  },
 })

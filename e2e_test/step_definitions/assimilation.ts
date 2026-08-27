@@ -123,13 +123,6 @@ Then('I should not see assimilation settings', () => {
   start.assumeNotePage().expectAssimilationSettingsAbsent()
 })
 
-Then(
-  'I should not see pending assimilation property {string}',
-  (propertyKey: string) => {
-    start.assumeNotePage().expectPendingAssimilationPropertyAbsent(propertyKey)
-  }
-)
-
 Then('I should see the daily assimilation goal toast', () => {
   start.assimilation().expectDailyAssimilationGoalToast()
 })
