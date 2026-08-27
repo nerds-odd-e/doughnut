@@ -36,18 +36,15 @@ public class RecallPromptBuilder extends EntityBuilder<RecallPrompt> {
       }
     }
     if (answerDTO != null && entity.getQuestionType() != QuestionType.SPELLING) {
-      Answer answer = Answer.buildAnswer(answerDTO, entity.getMcq(), entity.getAnswer());
-      if (answerTimestamp != null) {
-        answer.setCreatedAt(answerTimestamp);
-      }
+      Answer answer =
+          Answer.buildAnswer(
+              answerDTO, entity.getMcq(), entity.getAnswer(), resolvedAnswerTimestamp());
       entity.setAnswer(answer);
     } else if (spellingAnswerText != null) {
       Answer answer = new Answer();
       answer.setSpellingAnswer(spellingAnswerText);
       answer.setCorrect(true);
-      if (answerTimestamp != null) {
-        answer.setCreatedAt(answerTimestamp);
-      }
+      answer.setCreatedAt(resolvedAnswerTimestamp());
       entity.setAnswer(answer);
     }
     if (entity.getAnswer() != null && answerOutcome != null) {
@@ -108,6 +105,10 @@ public class RecallPromptBuilder extends EntityBuilder<RecallPrompt> {
   public RecallPromptBuilder answerTimestamp(Timestamp timestamp) {
     this.answerTimestamp = timestamp;
     return this;
+  }
+
+  private Timestamp resolvedAnswerTimestamp() {
+    return answerTimestamp != null ? answerTimestamp : new Timestamp(System.currentTimeMillis());
   }
 
   public RecallPromptBuilder overlap() {

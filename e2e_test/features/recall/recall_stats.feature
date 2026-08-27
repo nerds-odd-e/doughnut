@@ -15,24 +15,35 @@ Feature: Recall stats pace comparison
       | What is the meaning of sedition? | to incite violence | to sleep           | Open Water Diver   | to stay silent     |
     And the note "sedition" was assimilated on day 1
 
-  # This is new E2E ground (no prior /settings/recall-stats coverage to
-  # extend). Root cause found: `Answer.createdAt` is set from
-  # `System.currentTimeMillis()` (real wall clock), but
-  # `RecallStatsService.compute`'s query window bounds derive from
-  # `testabilitySettings.getCurrentUTCTimestamp()` (the simulated
-  # backend-time-travel clock this scenario uses to fabricate "day 2..4").
-  # Those are two different clocks in this environment: every answer this
-  # scenario records is real-wall-clock-stamped, while the stats query's
-  # [startTime, endTime) window is computed relative to the simulated day,
-  # so the answers fall outside it and totalReviewsAllTime comes back 0 -
-  # same category of clock mismatch already documented on the detour
-  # scenario in recall_timing.feature. Fixing this would mean either making
-  # Answer.createdAt testability-clock-aware (a behavior change well beyond
-  # this slice) or adding a dedicated backdating testability endpoint - both
-  # out of scope here. Left @wip (CI skips it); backend and frontend unit
-  # tests (RecallStatsServiceTest.Pace, PaceTile.spec.ts,
-  # RecallStatsSettingsTab.spec.ts) are the primary verification for this
-  # slice.
+  # Answer.createdAt now correctly uses the testability clock (fixed in this
+  # slice) - confirmed by direct DB inspection after a Cypress run: answers
+  # ARE persisted with their simulated day's timestamp, not real wall-clock
+  # time, and the backend unit test
+  # (RecallPromptAnswerControllerTest.shouldStampAnswerCreatedAtWithTheTestabilityClock)
+  # proves it at the controller level.
+  #
+  # This scenario still fails, but for a DIFFERENT, pre-existing reason: the
+  # `answerSlowlyOnDay` step calls `backendTimeTravelTo(day, 8)` immediately
+  # followed by `submitWrongMcqRecallAnswer(...)`, both built on generated
+  # SDK calls (`client.post(...)`) that dispatch their underlying `fetch`
+  # eagerly, synchronously, at call time - not lazily deferred until Cypress
+  # reaches that command in its queue. Looping this twice in
+  # `answerSlowlyOnDay` back-to-back (once per day) fires multiple time-travel
+  # and answer requests concurrently before any of them resolve, so the
+  # backend's shared ApplicationScope testability clock can be overwritten by
+  # a later request before an earlier day's answer is actually persisted.
+  # Confirmed via DB: two of the three answers landed on the SAME simulated
+  # day (both stamped with day 3's timestamp) instead of three distinct days,
+  # so the pace aggregator never sees the two-prior-day baseline it needs
+  # before today's answer produces a residual, and the tile reads "Not enough
+  # recall history yet for a pace comparison".
+  #
+  # This is an E2E step/SDK sequencing issue (a race condition), unrelated to
+  # the Answer.createdAt clock-mismatch this slice targets. Fixing it would
+  # mean changing how these steps sequence requests (e.g. not firing the next
+  # step's request until the previous one's promise/cy chain has resolved) -
+  # out of scope here. Left @wip; the backend controller unit test above is
+  # the verification for this slice's actual behavior change.
   @wip
   Scenario: Today's much-slower answer shows a slower-than-usual pace
     When I answer "sedition" slowly with thinking time 5000 ms over 2 days since day 2

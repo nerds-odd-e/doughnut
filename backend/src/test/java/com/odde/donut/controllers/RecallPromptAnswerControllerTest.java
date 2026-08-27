@@ -163,6 +163,13 @@ class RecallPromptAnswerControllerTest extends RecallPromptControllerTestBase {
   }
 
   @Test
+  void shouldStampAnswerCreatedAtWithTheTestabilityClock() throws UnexpectedNoAccessRightException {
+    testabilitySettings.timeTravelTo(memoryTracker.getNextRecallAt());
+    Answer answer = controller.answer(recallPrompt, answerDTO).getAnswer();
+    assertThat(answer.getCreatedAt(), equalTo(testabilitySettings.getCurrentUTCTimestamp()));
+  }
+
+  @Test
   void shouldNotBeAbleToSeeNoteIDontHaveAccessTo() {
     currentUser.setUser(null);
     assertThrows(

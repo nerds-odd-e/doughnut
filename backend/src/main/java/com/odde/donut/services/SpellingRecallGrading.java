@@ -57,6 +57,7 @@ final class SpellingRecallGrading {
     recallPrompt.setMemoryTracker(memoryTracker);
     recallPrompt.setQuestionType(QuestionType.SPELLING);
     Answer answer = new Answer();
+    answer.setCreatedAt(currentUTCTimestamp);
     answer.setSpellingAnswer(answerSpellingDTO.getSpellingAnswer());
     answer.setCorrect(memoryTracker.getNote().matchAnswer(answerSpellingDTO.getSpellingAnswer()));
     applyAnswerTimingMetrics(answer, answerSpellingDTO);
@@ -87,6 +88,7 @@ final class SpellingRecallGrading {
     Boolean correct = note.matchAnswer(spellingAnswer);
 
     Answer answer = new Answer();
+    answer.setCreatedAt(currentUTCTimestamp);
     answer.setSpellingAnswer(spellingAnswer);
     answer.setCorrect(correct);
     applyAnswerTimingMetrics(answer, answerSpellingDTO);

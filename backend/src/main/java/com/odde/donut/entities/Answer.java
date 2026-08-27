@@ -106,11 +106,13 @@ public class Answer extends EntityIdentifiedByIdOnly {
     return null;
   }
 
-  public static Answer buildAnswer(AnswerDTO answerDTO, Mcq mcq, Answer existingAnswer) {
+  public static Answer buildAnswer(
+      AnswerDTO answerDTO, Mcq mcq, Answer existingAnswer, Timestamp currentUTCTimestamp) {
     if (existingAnswer != null) {
       throw new QuestionAnswerException("The question is already answered");
     }
     Answer answer = new Answer();
+    answer.setCreatedAt(currentUTCTimestamp);
     answer.choiceIndex = answerDTO.getChoiceIndex();
     answer.setCorrect(mcq.checkAnswer(answerDTO));
     answer.setThinkingTimeMs(answerDTO.getThinkingTimeMs());

@@ -1,7 +1,9 @@
 # Morning cognitive index from recall history
 
-**Status:** in progress — slices 1–14, 14.1–14.4 done; **next: 14.5** (repair
-shipped readouts before Accuracy)
+**Status:** in progress — slices 1–14, 14.1–14.5 done; **next: 14.6** (repair
+shipped readouts before Accuracy). `recall_stats.feature`'s pace scenario
+stays `@wip` — a second, unrelated E2E race condition was found (see
+Discoveries).
 **Type:** ad-hoc plan (`.planning/quick/`)
 **Research memo:** https://claude.ai/code/artifact/9e13f954-fc5e-48e5-868f-f75d03f811c1
 
@@ -137,6 +139,17 @@ the roadmap has no active milestone. Promote to `.planning/phases/` via
   both an immediate watch and `onMounted`.
 - **Package rename has landed** (`com.odde.donut`). The in-flight rename
   discovery above is historical.
+- **`recall_stats.feature`'s pace scenario has a second, independent blocker
+  beyond the clock mismatch (post slice 14.5).** With `Answer.createdAt` now
+  correctly testability-clock-stamped, the scenario still fails: its
+  `answerSlowlyOnDay` step fires `backendTimeTravelTo` + generated-SDK answer
+  calls back-to-back across a loop, but the SDK's `fetch` dispatches eagerly
+  at call time rather than deferred to Cypress's command queue, so requests
+  for different simulated days race against the backend's shared
+  `@ApplicationScope` testability clock. DB inspection confirmed two of three
+  expected answers landed on the same simulated day. Needs the E2E step
+  helpers to sequence requests (await each before firing the next) — not
+  fixed by this plan; left `@wip`.
 
 ## Jidoka checkpoints — stop for developer judgement
 
@@ -534,20 +547,33 @@ merged into one canonical uninstrumented fixture, extended to assert idle
 stays silent too. API client regenerated (`AnswerSpellingDto` gained the new
 optional fields).
 
-#### 14.5 Answers are stamped with the scheduling clock — Behavior `[ ]`
+#### 14.5 Answers are stamped with the scheduling clock — Behavior `[x]`
 
-Answer under time-travel: the row's `createdAt` is the same timestamp used for
-the recall log and for the stats query window, so it appears in that simulated
-day's Recall Stats.
+Done: `currentUTCTimestamp` now threads through `Answer.buildAnswer(...)` →
+`AnswerService.createAnswerForQuestion(...)` → `RecallQuestionService` (which
+already received it) and both `SpellingRecallGrading` construction sites, so
+`Answer.createdAt` is stamped from `TestabilitySettings.getCurrentUTCTimestamp()`
+instead of `System.currentTimeMillis()`. Production-neutral: that method
+returns real wall-clock time when no time-travel is set. Verified by a new
+controller test (`shouldStampAnswerCreatedAtWithTheTestabilityClock`) and by
+direct DB inspection during E2E runs — answers now persist with their
+simulated day's timestamp, not real wall-clock time.
 
-Set `Answer.createdAt` from the `currentUTCTimestamp` already passed into MCQ
-and spelling grading (`TestabilitySettings.getCurrentUTCTimestamp()`; production
-returns wall-clock now). Un-`@wip` `recall_stats.feature`.
-
-- E2E: `recall/recall_stats.feature` — today's slower answer shows slower than
-  usual
-- Backend unit: answering through the controller while time-travelled stamps
-  `createdAt` with the testability clock (not `System.currentTimeMillis()`)
+**`recall_stats.feature`'s pace scenario stays `@wip` — new root cause found,
+not the one this slice targeted.** The clock-mismatch fix works (confirmed
+above), but `answerSlowlyOnDay`'s repeated `backendTimeTravelTo(day, 8)` +
+`submitWrongMcqRecallAnswer(...)` pairs are built on generated-SDK calls
+whose underlying `fetch` fires eagerly at call time rather than being
+deferred until Cypress's command queue reaches that step. Looping this
+across days dispatches overlapping time-travel + answer requests before
+earlier ones resolve, so the backend's shared `@ApplicationScope`
+testability clock gets overwritten mid-flight — confirmed via DB inspection
+showing two of three expected answers landed on the same simulated day. The
+pace aggregator then never sees the two-prior-day baseline it needs. This is
+an E2E step/SDK sequencing race, unrelated to `Answer.createdAt` — out of
+scope here; a future fix would sequence these steps so each request's
+promise resolves before the next fires. The backend controller test above is
+this slice's actual verification.
 
 #### 14.6 Returning to recall does not remount an in-flight question unless the due window changed — Behavior `[ ]`
 
