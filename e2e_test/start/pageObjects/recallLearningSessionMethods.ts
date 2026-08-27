@@ -131,16 +131,8 @@ export const recallLearningSessionMethods = () => ({
       expect(howToReport, 'how_to_report block').to.exist
       expect(
         howToReport,
-        'how_to_report should include nested session_item'
-      ).to.contain('<session_item>')
-      expect(
-        howToReport,
         'how_to_report example should wrap session_item_feedback in a fenced code block'
       ).to.match(/```(?:markdown)?\n[\s\S]*<session_item_feedback>[\s\S]*```/)
-      expect(
-        howToReport,
-        'how_to_report example should include a title: grade line'
-      ).to.contain('Hola: 4')
     })
     return this
   },

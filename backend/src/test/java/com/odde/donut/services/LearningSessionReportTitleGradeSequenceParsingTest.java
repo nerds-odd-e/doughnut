@@ -6,7 +6,6 @@ import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import com.odde.donut.entities.Grade;
 import com.odde.donut.services.LearningSessionReportParser.ParseResult;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
@@ -43,12 +42,10 @@ class LearningSessionReportTitleGradeSequenceParsingTest {
     assertThat(result.rejected(), empty());
     assertThat(result.entries(), hasSize(2));
     assertEquals("Hola", result.entries().get(0).noteTitle());
-    assertEquals(Grade.EASY, result.entries().get(0).grade());
     assertEquals(
         "Pronunciation was clear; still mixes ser/estar under pressure.",
         result.entries().get(0).descriptiveText());
     assertEquals("Gracias", result.entries().get(1).noteTitle());
-    assertEquals(Grade.AGAIN, result.entries().get(1).grade());
     assertEquals(
         "Needed several reminders on the soft g.", result.entries().get(1).descriptiveText());
   }

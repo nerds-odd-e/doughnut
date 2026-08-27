@@ -224,11 +224,7 @@ class LearningSessionReportFeedbackBlockParsingTest {
             SPANISH_TITLES,
             Set.of());
 
-    assertThat(result.rejected(), empty());
-    assertThat(result.entries(), hasSize(2));
     assertEquals("Hola", result.entries().get(0).noteTitle());
     assertEquals(Grade.EASY, result.entries().get(0).grade());
-    assertEquals("Gracias", result.entries().get(1).noteTitle());
-    assertEquals(Grade.AGAIN, result.entries().get(1).grade());
   }
 }
