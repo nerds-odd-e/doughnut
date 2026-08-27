@@ -16,6 +16,15 @@ export function expectAccidentalMatchRevealForNotes(
   matchedNoteTitles: string[]
 ) {
   expectAccidentalMatchAlert(answer)
+  if (matchedNoteTitles.length === 1) {
+    cy.findByTestId('accidental-match-answer-link')
+      .should('be.visible')
+      .and('have.text', answer)
+      .and('have.attr', 'href')
+      .and('match', /\/n\d+/)
+  } else {
+    cy.findByTestId('accidental-match-answer-link').should('not.exist')
+  }
   cy.findByText(`Your answer \`${answer}\` is incorrect.`).should('not.exist')
   cy.findByTestId('resolve-accidental-match')
     .scrollIntoView()

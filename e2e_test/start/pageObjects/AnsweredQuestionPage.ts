@@ -135,14 +135,6 @@ const assumeAnsweredQuestionPage = () => {
       waitUntilOnNoteShowPage()
       return self
     },
-    openAccidentallyMatchedNoteFromAnswer() {
-      cy.findByTestId('accidental-match-answer-link')
-        .scrollIntoView()
-        .should('be.visible')
-        .click()
-      waitUntilOnNoteShowPage()
-      return self
-    },
     goBackToRecallResult() {
       cy.go('back')
       waitUntilAppIsNotBusy()
