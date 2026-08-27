@@ -24,20 +24,21 @@ class LearningSessionReportFeedbackBlockParsingTest {
   }
 
   @Test
-  void parsesHeadingAndGrade() {
+  void parsesNestedSessionItems() {
     ParseResult result =
         parser.parse(
             """
             # Learning Session Report
 
             <session_item_feedback>
-            ### Hola
-            Grade: 4
+            <session_item>
+            Hola: 4
             Pronunciation was clear; still mixes ser/estar under pressure.
-
-            ### Gracias
-            Grade: 1
+            </session_item>
+            <session_item>
+            Gracias: 1
             Needed several reminders on the soft g.
+            </session_item>
             </session_item_feedback>
             """,
             SPANISH_TITLES,
@@ -62,8 +63,9 @@ class LearningSessionReportFeedbackBlockParsingTest {
         parser.parse(
             """
             <session_item_feedback>
-            ### Hola
-            Grade: 4
+            <session_item>
+            Hola: 4
+            </session_item>
             </session_item_feedback>
             """,
             SPANISH_TITLES,
@@ -78,9 +80,10 @@ class LearningSessionReportFeedbackBlockParsingTest {
         parser.parse(
             """
             <session_item_feedback>
-            ### Hola
-            Grade: 4
+            <session_item>
+            Hola: 4
 
+            </session_item>
             </session_item_feedback>
             """,
             SPANISH_TITLES,
@@ -90,16 +93,17 @@ class LearningSessionReportFeedbackBlockParsingTest {
   }
 
   @Test
-  void rejectsItemWithoutGrade() {
+  void rejectsItemWithoutTitleGradeLine() {
     ParseResult result =
         parser.parse(
             """
             <session_item_feedback>
-            ### Hola
+            <session_item>
             Pronunciation was clear.
-
-            ### Gracias
-            Grade: 1
+            </session_item>
+            <session_item>
+            Gracias: 1
+            </session_item>
             </session_item_feedback>
             """,
             SPANISH_TITLES,
@@ -108,7 +112,7 @@ class LearningSessionReportFeedbackBlockParsingTest {
     assertThat(result.entries(), hasSize(1));
     assertEquals("Gracias", result.entries().get(0).noteTitle());
     assertThat(result.rejected(), hasSize(1));
-    assertRejected(result.rejected().get(0), "### Hola", "Grade is required");
+    assertRejected(result.rejected().get(0), "Pronunciation was clear.", "Grade is required");
   }
 
   @Test
@@ -117,8 +121,9 @@ class LearningSessionReportFeedbackBlockParsingTest {
         parser.parse(
             """
             <session_item_feedback>
-            ### Hola
-            Grade: 5
+            <session_item>
+            Hola: 5
+            </session_item>
             </session_item_feedback>
             """,
             SPANISH_TITLES,
@@ -126,7 +131,7 @@ class LearningSessionReportFeedbackBlockParsingTest {
 
     assertThat(result.entries(), empty());
     assertThat(result.rejected(), hasSize(1));
-    assertRejected(result.rejected().get(0), "Grade: 5", "Grade must be 1, 2, 3, or 4.");
+    assertRejected(result.rejected().get(0), "Hola: 5", "Grade must be 1, 2, 3, or 4.");
   }
 
   @Test
@@ -135,8 +140,9 @@ class LearningSessionReportFeedbackBlockParsingTest {
         parser.parse(
             """
             <session_item_feedback>
-            ### UnknownNote
-            Grade: 3
+            <session_item>
+            UnknownNote: 3
+            </session_item>
             </session_item_feedback>
             """,
             SPANISH_TITLES,
@@ -144,7 +150,7 @@ class LearningSessionReportFeedbackBlockParsingTest {
 
     assertThat(result.entries(), empty());
     assertThat(result.rejected(), hasSize(1));
-    assertRejected(result.rejected().get(0), "### UnknownNote", "Note title not found in notebook");
+    assertRejected(result.rejected().get(0), "UnknownNote: 3", "Note title not found in notebook");
   }
 
   @Test
@@ -153,11 +159,12 @@ class LearningSessionReportFeedbackBlockParsingTest {
         parser.parse(
             """
             <session_item_feedback>
-            ### Hola
-            Grade: 4
-
-            ### Hola
-            Grade: 3
+            <session_item>
+            Hola: 4
+            </session_item>
+            <session_item>
+            Hola: 3
+            </session_item>
             </session_item_feedback>
             """,
             SPANISH_TITLES,
@@ -167,7 +174,30 @@ class LearningSessionReportFeedbackBlockParsingTest {
     assertEquals("Hola", result.entries().get(0).noteTitle());
     assertEquals(Grade.EASY, result.entries().get(0).grade());
     assertThat(result.rejected(), hasSize(1));
-    assertRejected(result.rejected().get(0), "### Hola", "Duplicate note title");
+    assertRejected(result.rejected().get(0), "Hola: 3", "Duplicate note title");
+  }
+
+  @Test
+  void unclosedSessionItemRunsToEndOfBlock() {
+    ParseResult result =
+        parser.parse(
+            """
+            <session_item_feedback>
+            <session_item>
+            Hola: 4
+            Pronunciation was clear; still mixes ser/estar under pressure.
+            </session_item_feedback>
+            """,
+            SPANISH_TITLES,
+            Set.of());
+
+    assertThat(result.rejected(), empty());
+    assertThat(result.entries(), hasSize(1));
+    assertEquals("Hola", result.entries().get(0).noteTitle());
+    assertEquals(Grade.EASY, result.entries().get(0).grade());
+    assertEquals(
+        "Pronunciation was clear; still mixes ser/estar under pressure.",
+        result.entries().get(0).descriptiveText());
   }
 
   @Test
@@ -178,10 +208,12 @@ class LearningSessionReportFeedbackBlockParsingTest {
             # Learning Session Report
 
             <session_item_feedback>
-            ### Hola
-            Grade: 4
-            ### Gracias
-            Grade: 1
+            <session_item>
+            Hola: 4
+            </session_item>
+            <session_item>
+            Gracias: 1
+            </session_item>
             </session_item_feedback>
 
             <session_item_grades>

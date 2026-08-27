@@ -4,70 +4,42 @@ import com.odde.donut.services.LearningSessionReportParser.ParseResult;
 import java.util.Arrays;
 import java.util.Set;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 final class SessionItemFeedbackBlockParser {
-  private static final Pattern HEADING = Pattern.compile("^###\\s+(.+)$");
-  private static final Pattern GRADE = Pattern.compile("^Grade:\\s*(\\d+)(?:\\s.*)?$");
-
   private SessionItemFeedbackBlockParser() {}
 
   static ParseResult parse(String block, Set<String> notebookTitles, Set<String> ambiguousTitles) {
     LearningSessionReportParseCollector collector =
         new LearningSessionReportParseCollector(notebookTitles, ambiguousTitles);
-    String currentTitle = null;
-    StringBuilder body = new StringBuilder();
-    for (String rawLine : block.split("\\R")) {
-      Matcher heading = HEADING.matcher(rawLine.trim());
-      if (heading.matches()) {
-        acceptItem(currentTitle, body.toString(), collector);
-        currentTitle = heading.group(1).trim();
-        body.setLength(0);
-        continue;
-      }
-      if (currentTitle != null) {
-        if (!body.isEmpty()) {
-          body.append('\n');
-        }
-        body.append(rawLine);
-      }
+    for (String itemBody :
+        LearningSessionReportParser.extractSuccessiveTaggedBlocks(
+            block,
+            LearningSessionReportParser.SESSION_ITEM_OPEN_TAG,
+            LearningSessionReportParser.SESSION_ITEM_CLOSE_TAG)) {
+      acceptItem(itemBody, collector);
     }
-    acceptItem(currentTitle, body.toString(), collector);
     return collector.result();
   }
 
-  private static void acceptItem(
-      String title, String body, LearningSessionReportParseCollector collector) {
-    if (title == null || title.isEmpty()) {
-      return;
-    }
-    String headingLine = "### " + title;
-    String gradeLine = firstNonBlankLine(body);
-    Matcher gradeMatcher = GRADE.matcher(gradeLine);
-    if (!gradeMatcher.matches()) {
-      collector.reject(headingLine, "Grade is required.");
-      return;
-    }
-    int gradeValue = Integer.parseInt(gradeMatcher.group(1));
-    if (collector.rejectIfGradeOutOfRange(gradeLine, gradeValue)) {
-      return;
-    }
-    collector.acceptEntry(headingLine, title, gradeValue, descriptiveTextAfterGrade(body));
-  }
-
-  private static String descriptiveTextAfterGrade(String body) {
+  private static void acceptItem(String body, LearningSessionReportParseCollector collector) {
     String[] lines = body.split("\\R", -1);
-    int gradeLineIndex = firstNonBlankLineIndex(lines);
-    if (gradeLineIndex < 0 || gradeLineIndex + 1 >= lines.length) {
-      return null;
+    int titleGradeLineIndex = firstNonBlankLineIndex(lines);
+    String titleGradeLine = titleGradeLineIndex < 0 ? "" : lines[titleGradeLineIndex].trim();
+    Matcher matcher = LearningSessionReportParser.GRADE_LINE.matcher(titleGradeLine);
+    if (!matcher.matches()) {
+      collector.reject(titleGradeLine, "Grade is required.");
+      return;
     }
-    return String.join("\n", Arrays.copyOfRange(lines, gradeLineIndex + 1, lines.length));
-  }
-
-  private static String firstNonBlankLine(String body) {
-    String[] lines = body.split("\\R");
-    int index = firstNonBlankLineIndex(lines);
-    return index < 0 ? "" : lines[index].trim();
+    String title = matcher.group(1).trim();
+    int gradeValue = Integer.parseInt(matcher.group(2));
+    if (collector.rejectIfGradeOutOfRange(titleGradeLine, gradeValue)) {
+      return;
+    }
+    String descriptiveText =
+        titleGradeLineIndex + 1 >= lines.length
+            ? null
+            : String.join("\n", Arrays.copyOfRange(lines, titleGradeLineIndex + 1, lines.length));
+    collector.acceptEntry(titleGradeLine, title, gradeValue, descriptiveText);
   }
 
   private static int firstNonBlankLineIndex(String[] lines) {

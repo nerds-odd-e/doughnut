@@ -11,6 +11,8 @@ const SESSION_ITEM_GRADES_OPEN_TAG = '<session_item_grades>'
 const SESSION_ITEM_GRADES_CLOSE_TAG = '</session_item_grades>'
 const SESSION_ITEM_FEEDBACK_OPEN_TAG = '<session_item_feedback>'
 const SESSION_ITEM_FEEDBACK_CLOSE_TAG = '</session_item_feedback>'
+const SESSION_ITEM_OPEN_TAG = '<session_item>'
+const SESSION_ITEM_CLOSE_TAG = '</session_item>'
 
 function recordLearningSessionForNotebook(
   notebookTitle: string,
@@ -48,7 +50,10 @@ Given(
     start.testability().timeTravelTo(day, hour)
     const items = dataTable
       .hashes()
-      .map((row) => `### ${row.Note}\nGrade: ${row.Grade}\n${row.Text}`)
+      .map(
+        (row) =>
+          `${SESSION_ITEM_OPEN_TAG}\n${row.Note}: ${row.Grade}\n${row.Text}\n${SESSION_ITEM_CLOSE_TAG}`
+      )
       .join('\n\n')
     const reportMarkdown = `# Learning Session Report\n\n${SESSION_ITEM_FEEDBACK_OPEN_TAG}\n${items}\n${SESSION_ITEM_FEEDBACK_CLOSE_TAG}\n`
     recordLearningSessionForNotebook(notebookTitle, reportMarkdown)

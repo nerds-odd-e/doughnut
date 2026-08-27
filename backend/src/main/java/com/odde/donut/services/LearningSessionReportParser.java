@@ -1,6 +1,7 @@
 package com.odde.donut.services;
 
 import com.odde.donut.entities.Grade;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -14,6 +15,9 @@ public class LearningSessionReportParser {
   public static final String SESSION_ITEM_FEEDBACK_OPEN_TAG = "<session_item_feedback>";
   public static final String SESSION_ITEM_FEEDBACK_CLOSE_TAG = "</session_item_feedback>";
 
+  public static final String SESSION_ITEM_OPEN_TAG = "<session_item>";
+  public static final String SESSION_ITEM_CLOSE_TAG = "</session_item>";
+
   public static final String SESSION_ITEM_GRADES_OPEN_TAG = "<session_item_grades>";
   public static final String SESSION_ITEM_GRADES_CLOSE_TAG = "</session_item_grades>";
 
@@ -23,7 +27,7 @@ public class LearningSessionReportParser {
   /** Legacy Report spelling; prefer {@link #SESSION_ITEM_GRADES_CLOSE_TAG}. */
   public static final String SESSION_ITEM_SCORES_CLOSE_TAG = "</session_item_scores>";
 
-  private static final Pattern GRADE_LINE = Pattern.compile("^(.+?):\\s*(\\d+)(?:\\s.*)?$");
+  static final Pattern GRADE_LINE = Pattern.compile("^(.+?):\\s*(\\d+)(?:\\s.*)?$");
 
   public record ParsedReportEntry(String noteTitle, Grade grade, String descriptiveText) {
     public ParsedReportEntry {
@@ -100,16 +104,29 @@ public class LearningSessionReportParser {
 
   /** Returns tagged content, or null when the open tag is absent. */
   private static String extractTaggedBlock(String markdown, String openTag, String closeTag) {
-    int openIndex = markdown.indexOf(openTag);
-    if (openIndex < 0) {
-      return null;
+    List<String> blocks = extractSuccessiveTaggedBlocks(markdown, openTag, closeTag);
+    return blocks.isEmpty() ? null : blocks.getFirst();
+  }
+
+  /** Each open tag starts a block; a missing close tag runs to the end of markdown. */
+  static List<String> extractSuccessiveTaggedBlocks(
+      String markdown, String openTag, String closeTag) {
+    List<String> blocks = new ArrayList<>();
+    int searchFrom = 0;
+    while (true) {
+      int openIndex = markdown.indexOf(openTag, searchFrom);
+      if (openIndex < 0) {
+        return blocks;
+      }
+      int contentStart = openIndex + openTag.length();
+      int closeIndex = markdown.indexOf(closeTag, contentStart);
+      if (closeIndex < 0) {
+        blocks.add(markdown.substring(contentStart));
+        return blocks;
+      }
+      blocks.add(markdown.substring(contentStart, closeIndex));
+      searchFrom = closeIndex + closeTag.length();
     }
-    int contentStart = openIndex + openTag.length();
-    int closeIndex = markdown.indexOf(closeTag, contentStart);
-    if (closeIndex < 0) {
-      return markdown.substring(contentStart);
-    }
-    return markdown.substring(contentStart, closeIndex);
   }
 
   public static Set<String> ambiguousTitles(Iterable<String> titles) {

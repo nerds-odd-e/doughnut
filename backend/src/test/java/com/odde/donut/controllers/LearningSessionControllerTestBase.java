@@ -38,9 +38,10 @@ abstract class LearningSessionControllerTestBase extends ControllerTestBase {
         # Learning Session Report
 
         <session_item_feedback>
-        ### %s
-        Grade: %d
+        <session_item>
+        %s: %d
         %s
+        </session_item>
         </session_item_feedback>
         """
         .formatted(title, grade, descriptiveText);

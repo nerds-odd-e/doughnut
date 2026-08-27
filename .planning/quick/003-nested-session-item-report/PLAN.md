@@ -1,6 +1,6 @@
 # Nested session_item Learning Session Report
 
-**Status:** planned (not started)
+**Status:** in progress (slice 1 done)
 
 ## Goal
 
@@ -30,24 +30,17 @@ tests.
 
 ### 1. Nested session_item Report records Feedback — Behavior
 
+Status: done
+
 Learner pastes a Report with `<session_item>` elements; Doughnut records Grade
-and descriptive text on the commissioned tracker.
+and descriptive text. Parser: each item is one `<session_item>`; first
+`{title}: {1–4}` is Grade; rest is text; unclosed item runs to end of block.
+E2E and table-built Feedback helpers emit nested tags.
 
-- E2E: `commissioned_learning_session.feature` “Recording a session item
-  feedback report…” uses the nested-tag Report; tracker still shows the tutor
-  text. Table-built reports in step defs use the same shape
-  (`e2e_test/step_definitions/learning_session.ts`).
-- Parser (`SessionItemFeedbackBlockParser` via `LearningSessionReportParser`):
-  each `<session_item>` is one item; first `{title}: {1–4}` is Grade; rest is
-  text. Unit tests at that boundary: two items; item with no `Title: N` line
-  reported; Grade outside 1–4 reported; unknown title reported; duplicate title
-  reported; unclosed item runs to end of block.
-- Helpers that emit the Feedback block
-  (`LearningSessionControllerTestBase`, request-builder tests that embed a
-  sample Report) use nested tags so they stay green with the parser.
-
-Request `<how_to_report>` still shows `###` / `Grade:` until slice 2. Run slice
-2 next in the same sitting.
+Learning: same-feature “hours between last and next recall” examples can flake
+on locale date parsing (`03/06` vs `11/06`); grade-only path, not this parser.
+Do not treat as a slice 2/3 blocker. Request `<how_to_report>` still `###` /
+`Grade:` until slice 2.
 
 ### 2. Request shows nested session_item and a fenced example — Behavior
 
