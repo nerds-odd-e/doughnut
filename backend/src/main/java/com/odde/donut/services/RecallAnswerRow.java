@@ -44,6 +44,7 @@ public record RecallAnswerRow(
     if (promptCreatedAt == null) {
       return Optional.empty();
     }
-    return Optional.of(answerCreatedAt.getTime() - promptCreatedAt.getTime());
+    long diff = answerCreatedAt.getTime() - promptCreatedAt.getTime();
+    return diff > 0 ? Optional.of(diff) : Optional.empty();
   }
 }
