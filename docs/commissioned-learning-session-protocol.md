@@ -112,8 +112,7 @@ Doughnut reads a Report as follows:
    it until the next such line are descriptive text.
 
 Grade is an integer from 1 to 4. Doughnut records Feedback for those items and
-reports any other lines to the learner. Confusion on a RecallLog is a missing
-Grade (ADR 0003).
+reports remaining lines to the learner.
 
 `<how_to_report>` shows wrapping `<session_item_feedback>` in a fenced code
 block so a formatted chat message copies the tags.
