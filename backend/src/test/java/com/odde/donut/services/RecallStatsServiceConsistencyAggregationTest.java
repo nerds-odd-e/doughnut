@@ -39,6 +39,53 @@ class RecallStatsServiceConsistencyAggregationTest {
     rows.add(answered(utc(day, 9), highRt, true, null, itemIdBase + 1));
   }
 
+  /**
+   * Gives {@code itemId} {@code priorObservationCount} valid answers before today, all at {@code
+   * baselineMs} so its EWMA baseline stays exactly {@code ln(baselineMs)}, spread across days
+   * 0..priorObservationCount-1 (well before {@link #BASELINE_START}) so they don't contribute to
+   * {@code residualsByDate}.
+   */
+  private static void establishItem(
+      List<RecallAnswerRow> rows, int itemId, int priorObservationCount, int baselineMs) {
+    for (int day = 0; day < priorObservationCount; day++) {
+      rows.add(answered(utc(day, 6), baselineMs, true, null, itemId));
+    }
+  }
+
+  @Test
+  void coldStartResidualsDoNotDominateConsistencyBadgeWhenOneItemIsWellEstablished() {
+    List<RecallAnswerRow> rows = new ArrayList<>();
+    // 60 qualifying baseline days, spread alternating 0.009/0.011 -> median 0.01, MAD 0.001.
+    for (int day = BASELINE_START; day <= BASELINE_END; day++) {
+      double spread = (day % 2 == 0) ? 0.009 : 0.011;
+      addDayWithSpread(rows, day, spread, 1000 + (day - BASELINE_START) * 10);
+    }
+    // One well-established item (30 prior observations -> weight 30/33 ~= 0.91): today's answer
+    // matches its baseline exactly, so its own residual is tight/consistent.
+    int establishedItemId = 8000;
+    establishItem(rows, establishedItemId, 30, 5000);
+    rows.add(answered(utc(TODAY, 10), 5000, true, null, establishedItemId));
+    // Several cold-start items (1 prior observation each -> weight 1/4 = 0.25): today's answers
+    // are wildly spread relative to their own barely-formed baseline.
+    int coldStartFastA = 9001;
+    int coldStartFastB = 9002;
+    int coldStartSlow = 9003;
+    establishItem(rows, coldStartFastA, 1, 5000);
+    establishItem(rows, coldStartFastB, 1, 5000);
+    establishItem(rows, coldStartSlow, 1, 5000);
+    rows.add(answered(utc(TODAY, 11), 1300, true, null, coldStartFastA));
+    rows.add(answered(utc(TODAY, 12), 1300, true, null, coldStartFastB));
+    rows.add(answered(utc(TODAY, 13), 39000, true, null, coldStartSlow));
+
+    Timestamp now = utc(TODAY, 14);
+    RecallStatsDTO dto = aggregate(rows, now);
+    // The established item alone (weight ~0.91) outweighs all three cold-start items combined
+    // (weight 0.75), so the weighted spread should stay near the established item's tight
+    // residual (~0) rather than being dragged up by cold-start noise.
+    assertThat(dto.getPace().getConsistencyZScore(), notNullValue());
+    assertThat(dto.getPace().getConsistencyZScore(), lessThan(1.0));
+  }
+
   @Test
   void fewerThanTenQualifyingBaselineDaysYieldsNullConsistencyZScoreEvenWithPlentyOfToday() {
     List<RecallAnswerRow> rows = new ArrayList<>();
@@ -64,7 +111,13 @@ class RecallStatsServiceConsistencyAggregationTest {
     }
     // Today's spread matches the baseline median (0.01) -> z-score should be near 0.
     addDayWithSpread(rows, TODAY, 0.01, 9000);
-    Timestamp now = utc(TODAY, 12);
+    // A third, equal-weight item with a residual of 0 breaks the exact half-weight tie between
+    // the two symmetric points above (today's spread is now weighted, and weightedMedian resolves
+    // an exact tie by picking the lower value rather than averaging), so the weighted spread still
+    // reflects the intended 0.01.
+    establishItem(rows, 9500, 1, 5000);
+    rows.add(answered(utc(TODAY, 20), 5000, true, null, 9500));
+    Timestamp now = utc(TODAY, 21);
     RecallStatsDTO dto = aggregate(rows, now);
     assertThat(dto.getPace().getConsistencyZScore(), closeTo(0.0, 0.3));
   }
@@ -78,7 +131,13 @@ class RecallStatsServiceConsistencyAggregationTest {
     }
     // Today's spread is far larger than any baseline day.
     addDayWithSpread(rows, TODAY, 0.5, 9000);
-    Timestamp now = utc(TODAY, 12);
+    // A third, equal-weight item with a residual of 0 breaks the exact half-weight tie between
+    // the two symmetric points above (today's spread is now weighted, and weightedMedian resolves
+    // an exact tie by picking the lower value rather than averaging), so the weighted spread still
+    // reflects the intended 0.5.
+    establishItem(rows, 9500, 1, 5000);
+    rows.add(answered(utc(TODAY, 20), 5000, true, null, 9500));
+    Timestamp now = utc(TODAY, 21);
     RecallStatsDTO dto = aggregate(rows, now);
     assertThat(dto.getPace().getConsistencyZScore(), notNullValue());
     assertThat(dto.getPace().getConsistencyZScore(), greaterThan(1.0));

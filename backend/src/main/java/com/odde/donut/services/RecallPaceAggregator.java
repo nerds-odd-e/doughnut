@@ -131,9 +131,7 @@ final class RecallPaceAggregator {
    */
   private static Double consistencyZScore(
       List<WeightedResidual> todaysResiduals, Map<LocalDate, List<Double>> residualsByDate) {
-    List<Double> todaysPlainResiduals =
-        todaysResiduals.stream().map(WeightedResidual::residual).toList();
-    Double todaySpread = todaysPlainResiduals.size() >= 2 ? mad(todaysPlainResiduals) : null;
+    Double todaySpread = todaysResiduals.size() >= 2 ? weightedMad(todaysResiduals) : null;
     List<Double> baselineSpreads =
         residualsByDate.values().stream()
             .filter(values -> values.size() >= 2)
@@ -162,6 +160,23 @@ final class RecallPaceAggregator {
   private static double mad(List<Double> values) {
     double medianValue = median(values);
     return median(values.stream().map(v -> Math.abs(v - medianValue)).toList());
+  }
+
+  /**
+   * Weighted median absolute deviation: same cold-start down-weighting as {@link
+   * #weightedPctVsUsual}, applied to today's spread so a morning of noisy new cards can't flip the
+   * consistency badge when a well-established item's residual is tight.
+   */
+  private static double weightedMad(List<WeightedResidual> residuals) {
+    double weightedMedianValue = weightedMedian(residuals);
+    List<WeightedResidual> deviations =
+        residuals.stream()
+            .map(
+                wr ->
+                    new WeightedResidual(
+                        Math.abs(wr.residual() - weightedMedianValue), wr.weight()))
+            .toList();
+    return weightedMedian(deviations);
   }
 
   private static double weightedPctVsUsual(List<WeightedResidual> residuals) {

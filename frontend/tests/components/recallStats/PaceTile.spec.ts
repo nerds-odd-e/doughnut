@@ -76,19 +76,6 @@ describe("PaceTile", () => {
     ).toBe(false)
   })
 
-  it("does not show a low-confidence badge when confidence is absent", () => {
-    const wrapper = helper
-      .component(PaceTile)
-      .withProps({
-        pace: { pctVsUsual: 42, sampleSize: 5, totalAnsweredToday: 8 },
-      })
-      .mount()
-
-    expect(
-      wrapper.find('[data-testid="recall-pace-low-confidence"]').exists()
-    ).toBe(false)
-  })
-
   it("shows the retrieval-lapse count when there is at least one lapse today", () => {
     const wrapper = helper
       .component(PaceTile)
@@ -153,19 +140,6 @@ describe("PaceTile", () => {
           totalAnsweredToday: 8,
           consistencyZScore: 1,
         },
-      })
-      .mount()
-
-    expect(
-      wrapper.find('[data-testid="recall-pace-inconsistent"]').exists()
-    ).toBe(false)
-  })
-
-  it("does not show the more-erratic-than-usual badge when consistencyZScore is absent", () => {
-    const wrapper = helper
-      .component(PaceTile)
-      .withProps({
-        pace: { pctVsUsual: 42, sampleSize: 5, totalAnsweredToday: 8 },
       })
       .mount()
 

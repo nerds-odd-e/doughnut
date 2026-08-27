@@ -1,9 +1,9 @@
 # Morning cognitive index from recall history
 
-**Status:** in progress — slices 1–14, 14.1–14.7 done; **next: 14.8** (repair
-shipped readouts before Accuracy). `recall_stats.feature`'s pace scenario
-stays `@wip` — a second, unrelated E2E race condition was found (see
-Discoveries).
+**Status:** in progress — slices 1–14, 14.1–14.8 done; repair of shipped
+readouts complete. **next: 15** (Accuracy channel — Jidoka checkpoint first,
+see below). `recall_stats.feature`'s pace scenario stays `@wip` — a second,
+unrelated E2E race condition was found (see Discoveries).
 **Type:** ad-hoc plan (`.planning/quick/`)
 **Research memo:** https://claude.ai/code/artifact/9e13f954-fc5e-48e5-868f-f75d03f811c1
 
@@ -596,16 +596,33 @@ so the restored question is clickable. Recall History exposes
 `data-thinking-time-ms`; the Then asserts that raw number on the understanding
 tracker (the current MCQ, not spelling). No second unit test.
 
-#### 14.8 Cold-start items stop dominating the consistency badge — Behavior `[ ]`
+#### 14.8 Cold-start items stop dominating the consistency badge — Behavior `[x]`
 
-A morning of mostly new cards with one established item no longer flips
-"more erratic than usual" just because the new cards' residuals are noisy.
-Apply the same `w_j = m_j/(m_j+3)` already used for `pctVsUsual` to today's
-spread (unweighted MAD of capped residuals is the gap slice 14 left).
-
-- Backend unit: through `aggregateRows` — unique claim is `consistencyZScore`
-- Wrap-up: delete PaceTile tests that only re-assert a badge is absent when
-  the field is omitted (canonical render tests already omit those fields)
+Done: `RecallPaceAggregator` gained a `weightedMad(List<WeightedResidual>)`
+helper — weighted median of residuals, then weighted median of the deviations
+from that median — reusing the existing `weightedMedian` machinery rather
+than duplicating it. `consistencyZScore`'s `todaySpread` now calls
+`weightedMad(todaysResiduals)` instead of the old plain
+`mad(todaysPlainResiduals)`, so the same `w_j = priorObservationCount/(priorObservationCount+3)`
+weight already used for `pctVsUsual` also down-weights cold-start items in
+today's spread. `residualsByDate` (the 60-day baseline spread) is
+deliberately untouched — still plain/unweighted, per this slice's stated
+scope. New backend test in `RecallStatsServiceConsistencyAggregationTest`
+covers a morning with several wildly-spread cold-start items (weight 0.25
+each) plus one tight, well-established item (weight ≈0.91): confirmed the
+score is dominated by the established item instead of flipping "more erratic
+than usual" on cold-start noise alone. **Gap found in two pre-existing
+tests:** `weightedMedian` resolves an exact half-total-weight tie by
+returning the lower value — a tie-break an existing pinned test elsewhere
+relies on, so it was not changed — which two older consistency tests'
+"today" data (exactly 2 equal-weight symmetric residuals) happened to hit
+once `todaySpread` became weighted; fixed by adding a third equal-weight
+zero-residual item to those tests' "today" construction (odd-sized sample
+sidesteps the tie), preserving each test's original intent. Deleted two
+`PaceTile.spec.ts` tests that only asserted a badge is absent when its
+backing field (`confidence`, `consistencyZScore`) was omitted from props —
+redundant with canonical render tests that already omit those fields. No
+DTO/API/schema change.
 
 ### Accuracy channel
 

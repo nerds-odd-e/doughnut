@@ -28,9 +28,10 @@ Document structure, in order:
    status, the last two dated Feedbacks for that Session Item, and a
    `<focus_note>` for that item
 5. `<related_notes>` — notes related to the Session Items, for tutor context;
-   Session Items themselves are not repeated here
-6. `<how_to_report>` — the Grade 1–4 rubric, the `<session_item_feedback>`
-   Report shape, and a worked Report example
+   Session Item notes appear only under `<session_items>`
+6. `<how_to_report>` — the Grade 1–4 rubric, the nested `<session_item>`
+   Report shape, a worked Report example, and wrapping that block in a fenced
+   code block when the chat app formats the message
 
 Focus notes and related notes use **Focus Context** (ADR 0001).
 
@@ -84,35 +85,44 @@ Grade from 1 to 4 and descriptive text per item.
 
 ## Learning Session Report
 
-The preferred Report carries Feedback inside `<session_item_feedback>`. Each
-Session Item is a `### {title}` heading, then a first structured line
-`Grade: {1–4}`, then descriptive text until the next `###` heading or the close
-tag. Prose and markdown outside the block are not Feedback.
+Feedback is the content of `<session_item_feedback>`. Each Session Item is a
+`<session_item>` element. The first structured line is `{title}: {1–4}` (title
+and Grade). Following lines up to `</session_item>` are descriptive text.
 
 ```markdown
 # Learning Session Report
 
 <session_item_feedback>
-### Hola
-Grade: 4
+<session_item>
+Hola: 4
 Pronunciation was clear; still mixes ser/estar under pressure.
-
-### Gracias
-Grade: 1
+</session_item>
+<session_item>
+Gracias: 1
 Needed several reminders on the soft g.
+</session_item>
 </session_item_feedback>
 ```
 
-A Session Item block without a valid `Grade:` line is rejected and reported. A
-RecallLog without a Grade is Confusion (ADR 0003); text-only Feedback has no
-representation.
+Doughnut reads a Report as follows:
 
-When `<session_item_feedback>` is present, it is the Feedback. Grade-only
-Reports remain accepted in these legacy shapes:
+1. Each `<session_item>…</session_item>` is one Session Item.
+2. Where the block is a sequence of `{title}: {1–4}` lines, each line whose
+   title is a Session Item in this notebook starts an item, and the lines after
+   it until the next such line are descriptive text.
+
+Grade is an integer from 1 to 4. Doughnut records Feedback for those items and
+reports any other lines to the learner. Confusion on a RecallLog is a missing
+Grade (ADR 0003).
+
+`<how_to_report>` shows wrapping `<session_item_feedback>` in a fenced code
+block so a formatted chat message copies the tags.
+
+These grade-only Reports are also Feedback:
 
 - `<session_item_grades>` — `{title}: {1–4}` lines
-- `<session_item_scores>` — the same line form (legacy tag spelling)
-- untagged `{title}: {1–4}` lines in the document
+- `<session_item_scores>` — the same line form
+- `{title}: {1–4}` lines in the document
 
 ```markdown
 # Learning Session Report
@@ -127,9 +137,9 @@ Gracias: 1
 
 ## Matching
 
-Entries match Session Items by note title within the notebook. Duplicate titles
-in one notebook are unmatched. A title that no longer exists in the notebook is
-unmatched.
+Entries match Session Items by note title within the notebook. A unique live
+note title in that notebook matches. Duplicate titles in one notebook, and
+titles with no live note in the notebook, are reported to the learner.
 
 ## Recording Feedback
 
