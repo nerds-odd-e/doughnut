@@ -1,6 +1,6 @@
 # Morning cognitive index from recall history
 
-**Status:** in progress — slices 1–14 done; **next: 14.1** (repair shipped
+**Status:** in progress — slices 1–14, 14.1 done; **next: 14.2** (repair shipped
 readouts before Accuracy)
 **Type:** ad-hoc plan (`.planning/quick/`)
 **Research memo:** https://claude.ai/code/artifact/9e13f954-fc5e-48e5-868f-f75d03f811c1
@@ -459,21 +459,21 @@ Inspection of slices 1–14 (commits `c5c1449bdc`..`15609de4af`). Execute 14.1�
 in this order before slice 15. Each is stop-safe: stopping after any of them
 leaves the already-shipped timer/pace channel more trustworthy than before.
 
-#### 14.1 Split the thinking-time tracker and drop redundant tracker tests — Structure `[ ]`
+#### 14.1 Split the thinking-time tracker and drop redundant tracker tests — Structure `[x]`
 
-`useThinkingTimeTracker.ts` is 281 lines. Extract idle detection and/or
-`createInterruptionAccumulator` so the file is under 250. Delete
-`useThinkingTimeTracker.keepAlive.spec.ts` (production KeepAlive uses
-`pauseForDetour`, already covered by the QuestionDisplay detour test). Drop
-the weaker "pauses timer when deactivated (KeepAlive)" case from
-`QuestionDisplay.thinking.spec.ts`. Drive remaining tracker tests through the
-injected `clock` option (slice 2's unused seam) rather than spying
-`performance.now()`. Collapse the duplicate `start()` in
-`useQuestionThinkingTime` (immediate watch plus `onMounted`). Strip production
-comments that refer to "the plan".
-
-- **Enables 14.2 only** — idle-suspend adds tests; must not grow the oversized
-  file.
+Done: extracted idle detection into new sibling module
+`thinkingIdleDetection.ts` (`createIdleDetector(clock, isRunning)`, 51 lines),
+following the existing sibling-module convention (e.g. `folderAdminMutations.ts`
+next to `useFolderAdmin.ts`). `useThinkingTimeTracker.ts` now 245 lines (was
+281), just wiring the extracted detector in. Deleted
+`useThinkingTimeTracker.keepAlive.spec.ts` and the weaker KeepAlive-deactivation
+case in `QuestionDisplay.thinking.spec.ts`; the stronger detour case remains.
+`thinkingTimeTrackerTestSupport.ts`'s `setupTrackerClock()` now returns an
+injectable `Clock` object instead of spying `performance.now()`; the three
+tracker spec files pass `{ clock }` explicitly. Removed the redundant
+`onMounted` start call in `useQuestionThinkingTime` — the existing
+`watch(isActiveQuestion, ..., { immediate: true })` already covers setup.
+Production comments referencing "the plan" removed. No DTO/API/schema change.
 
 #### 14.2 A silent device suspend is not recorded as idle — Behavior `[ ]`
 

@@ -8,12 +8,12 @@ import {
 } from "./thinkingTimeTrackerTestSupport"
 
 describe("useThinkingTimeTracker idle detection", () => {
-  const { setTime } = setupTrackerClock()
+  const { clock, setTime } = setupTrackerClock()
 
   const createStartedTrackerComponent = () =>
     defineComponent({
       setup() {
-        const { start, stop, idleMs } = useThinkingTimeTracker()
+        const { start, stop, idleMs } = useThinkingTimeTracker({ clock })
         const result = ref<number | null>(null)
 
         start()

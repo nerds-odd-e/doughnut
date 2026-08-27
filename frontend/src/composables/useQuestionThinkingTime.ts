@@ -1,10 +1,4 @@
-import {
-  onMounted,
-  onActivated,
-  onDeactivated,
-  watch,
-  type ComputedRef,
-} from "vue"
+import { onActivated, onDeactivated, watch, type ComputedRef } from "vue"
 import { useThinkingTimeTracker } from "./useThinkingTimeTracker"
 import { useRecallData } from "./useRecallData"
 
@@ -42,12 +36,6 @@ export function useQuestionThinkingTime(
       pause()
     } else if (isActiveQuestion.value) {
       resume()
-    }
-  })
-
-  onMounted(() => {
-    if (isActiveQuestion.value) {
-      start()
     }
   })
 

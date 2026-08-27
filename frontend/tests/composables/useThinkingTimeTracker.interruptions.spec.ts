@@ -8,7 +8,7 @@ import {
 } from "./thinkingTimeTrackerTestSupport"
 
 describe("useThinkingTimeTracker interruption accumulators", () => {
-  const { setTime } = setupTrackerClock()
+  const { clock, setTime } = setupTrackerClock()
 
   const createStartedTrackerComponent = () =>
     defineComponent({
@@ -24,7 +24,7 @@ describe("useThinkingTimeTracker interruption accumulators", () => {
           awayCount,
           detourMs,
           detourCount,
-        } = useThinkingTimeTracker()
+        } = useThinkingTimeTracker({ clock })
         const result = ref<number | null>(null)
 
         start()

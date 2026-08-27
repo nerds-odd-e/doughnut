@@ -158,31 +158,6 @@ describe("QuestionDisplay thinking time", () => {
     )
   })
 
-  it("pauses timer when component is deactivated (KeepAlive)", async () => {
-    const { wrapper, questionComponent } = await mountKeepAliveQuestion(
-      activeQuestion()
-    )
-    setTime(1000)
-
-    await wrapper.setData({ show: false })
-    await wrapper.vm.$nextTick()
-    setTime(2000)
-
-    await wrapper.setData({ show: true })
-    await questionComponent.vm.$nextTick()
-    flushRAF()
-    setTime(2500)
-
-    await questionComponent.find("li.choice button").trigger("click")
-    await flushPromises()
-
-    const answerData = questionComponent.emitted("answer")?.[0]?.[0] as {
-      thinkingTimeMs?: number
-    }
-    expect(answerData?.thinkingTimeMs).toBeLessThan(2000)
-    expect(answerData?.thinkingTimeMs).toBeGreaterThanOrEqual(1000)
-  })
-
   it("records a detour when deactivated and reactivated (KeepAlive)", async () => {
     const { wrapper, questionComponent } = await mountKeepAliveQuestion(
       activeQuestion()

@@ -8,12 +8,12 @@ import {
 } from "./thinkingTimeTrackerTestSupport"
 
 describe("useThinkingTimeTracker", () => {
-  const { setTime, mockNow } = setupTrackerClock()
+  const { clock, setTime, mockNow } = setupTrackerClock()
 
   const createStartedTrackerComponent = () =>
     defineComponent({
       setup() {
-        const { start, stop } = useThinkingTimeTracker()
+        const { start, stop } = useThinkingTimeTracker({ clock })
         const result = ref<number | null>(null)
 
         start()

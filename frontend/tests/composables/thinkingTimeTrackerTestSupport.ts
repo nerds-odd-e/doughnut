@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, expect, vi } from "vitest"
 import { flushPromises, mount, type VueWrapper } from "@vue/test-utils"
 import { nextTick, type Component } from "vue"
+import type { Clock } from "@/composables/useThinkingTimeTracker"
 
 export const flushStart = async () => {
   await nextTick()
@@ -13,15 +14,16 @@ export const mountAndFlush = async (component: Component) => {
   return wrapper
 }
 
-// Fake timers + a controllable performance.now() so tests can move the
-// tracker's clock in discrete steps, plus a synchronous requestAnimationFrame
-// stub so start() resolves without waiting a real frame.
+// Fake timers + an injectable clock so tests can move the tracker's clock in
+// discrete steps, plus a synchronous requestAnimationFrame stub so start()
+// resolves without waiting a real frame.
 export const setupTrackerClock = () => {
-  let performanceNowSpy: ReturnType<typeof vi.spyOn>
+  let currentMs = 0
+  const clock: Clock = { now: () => currentMs }
 
   beforeEach(() => {
+    currentMs = 0
     vi.useFakeTimers()
-    performanceNowSpy = vi.spyOn(performance, "now").mockReturnValue(0)
     vi.stubGlobal("requestAnimationFrame", (callback: FrameRequestCallback) => {
       callback(0)
       return 1
@@ -36,18 +38,18 @@ export const setupTrackerClock = () => {
   })
 
   const setTime = (ms: number) => {
-    performanceNowSpy.mockReturnValue(ms)
+    currentMs = ms
     vi.advanceTimersByTime(ms)
   }
 
-  // Moves only performance.now(), without advancing fake timers — for
-  // asserting behavior that must be reconciled before any timer (e.g. the
-  // watchdog interval) has a chance to fire.
+  // Moves only the clock, without advancing fake timers — for asserting
+  // behavior that must be reconciled before any timer (e.g. the watchdog
+  // interval) has a chance to fire.
   const mockNow = (ms: number) => {
-    performanceNowSpy.mockReturnValue(ms)
+    currentMs = ms
   }
 
-  return { setTime, mockNow }
+  return { clock, setTime, mockNow }
 }
 
 export const stopAndExpect = async (wrapper: VueWrapper, expected: string) => {
