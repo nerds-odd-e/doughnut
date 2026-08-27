@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-col gap-2 text-sm">
     <RichFrontmatterEditablePropertyRow
-      v-for="(_, idx) in propertyRows"
+      v-for="(row, idx) in propertyRows"
       :key="rowClientIds[idx]"
       v-model="propertyRows[idx]!"
       :idx="idx"
@@ -10,8 +10,8 @@
       :property-rows="propertyRows"
       :key-input-id="rowKeyInputId(idx)"
       :preset-list-id="rowKeyPresetListId(idx)"
-      :is-pending="isPendingProperty(propertyRows[idx]!.key)"
-      :set-root-ref="(el) => setPropertyRowRef(propertyRows[idx]!.key, el)"
+      :is-pending="isPendingProperty(row!.key)"
+      :set-root-ref="(el) => setPropertyRowRef(row!.key, el)"
       @row-focus="emit('row-focus', idx)"
       @commit="emit('commit', idx)"
       @remove="emit('remove', idx)"
