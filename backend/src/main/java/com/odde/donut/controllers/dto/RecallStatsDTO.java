@@ -15,6 +15,7 @@ public class RecallStatsDTO {
   private int[][] weekdayHourCorrect;
   private HeadlineStats totals;
   private PaceStats pace;
+  private AccuracyStats accuracy;
 
   @Data
   @AllArgsConstructor
@@ -60,6 +61,20 @@ public class RecallStatsDTO {
     private Double confidence;
     private int lapseCount;
     private Double consistencyZScore;
+  }
+
+  /**
+   * Standardized Poisson-binomial residual comparing today's observed correctness against each
+   * answer's raw FSRS retrievability at the time it was answered: {@code A = Σ(y−p̂) / √Σp̂(1−p̂)}.
+   * Positive means recalling better than the model expected; negative means worse. {@code
+   * standardizedResidual} is {@code null} when the denominator is 0 (no qualifying rows, or every
+   * retrievability is 0 or 1).
+   */
+  @Data
+  @AllArgsConstructor
+  public static class AccuracyStats {
+    private Double standardizedResidual;
+    private Integer sampleSize;
   }
 
   @Data

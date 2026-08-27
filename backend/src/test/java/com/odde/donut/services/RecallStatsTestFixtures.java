@@ -28,17 +28,28 @@ final class RecallStatsTestFixtures {
       boolean correct,
       Timestamp promptAt,
       Integer memoryTrackerId) {
+    return answered(answerAt, thinkingTimeMs, correct, promptAt, memoryTrackerId, null);
+  }
+
+  static RecallAnswerRow answered(
+      Timestamp answerAt,
+      Integer thinkingTimeMs,
+      boolean correct,
+      Timestamp promptAt,
+      Integer memoryTrackerId,
+      Double retrievability) {
     return new RecallAnswerRow(
         answerAt,
         null,
         Grade.fromCorrect(correct),
         thinkingTimeMs,
         promptAt != null ? promptAt : answerAt,
-        memoryTrackerId);
+        memoryTrackerId,
+        retrievability);
   }
 
   static RecallAnswerRow overlapAnswered(Timestamp answerAt) {
-    return new RecallAnswerRow(answerAt, AnswerOutcome.OVERLAP, null, null, answerAt, null);
+    return new RecallAnswerRow(answerAt, AnswerOutcome.OVERLAP, null, null, answerAt, null, null);
   }
 
   static Timestamp utc(int day, int hour) {

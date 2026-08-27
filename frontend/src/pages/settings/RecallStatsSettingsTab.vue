@@ -1,6 +1,9 @@
 <template>
   <div v-if="stats && hasData">
-    <PaceTile :pace="stats.pace ?? {}" />
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+      <PaceTile :pace="stats.pace ?? {}" />
+      <AccuracyTile :accuracy="stats.accuracy ?? {}" />
+    </div>
     <div class="mt-3">
       <RecallStatsTiles :totals="stats.totals ?? {}" />
     </div>
@@ -89,6 +92,7 @@
 <script setup lang="ts">
 import RecallStatsTiles from "@/components/recallStats/RecallStatsTiles.vue"
 import PaceTile from "@/components/recallStats/PaceTile.vue"
+import AccuracyTile from "@/components/recallStats/AccuracyTile.vue"
 import RecallActivityCalendar from "@/components/recallStats/RecallActivityCalendar.vue"
 import ResponseTimeTrendChart from "@/components/recallStats/ResponseTimeTrendChart.vue"
 import RetentionTrendChart from "@/components/recallStats/RetentionTrendChart.vue"

@@ -4906,6 +4906,15 @@ components:
       required:
       - id
       - label
+    AccuracyStats:
+      type: object
+      properties:
+        standardizedResidual:
+          type: number
+          format: double
+        sampleSize:
+          type: integer
+          format: int32
     AmPmResponseTime:
       type: object
       properties:
@@ -5052,6 +5061,8 @@ components:
           $ref: "#/components/schemas/HeadlineStats"
         pace:
           $ref: "#/components/schemas/PaceStats"
+        accuracy:
+          $ref: "#/components/schemas/AccuracyStats"
     QuestionGenerationBatchUserScheduleDTO:
       type: object
       properties:

@@ -899,6 +899,11 @@ export type UserToken = {
     label: string;
 };
 
+export type AccuracyStats = {
+    standardizedResidual?: number;
+    sampleSize?: number;
+};
+
 export type AmPmResponseTime = {
     morningMs?: number;
     morningSamples?: number;
@@ -958,6 +963,7 @@ export type RecallStatsDto = {
     weekdayHourCorrect?: Array<Array<number>>;
     totals?: HeadlineStats;
     pace?: PaceStats;
+    accuracy?: AccuracyStats;
 };
 
 export type QuestionGenerationBatchUserScheduleDto = {

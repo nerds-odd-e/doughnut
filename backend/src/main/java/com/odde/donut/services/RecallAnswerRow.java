@@ -17,7 +17,8 @@ public record RecallAnswerRow(
     Grade grade,
     Integer thinkingTimeMs,
     Timestamp promptCreatedAt,
-    Integer memoryTrackerId) {
+    Integer memoryTrackerId,
+    Double retrievability) {
 
   boolean correct() {
     return Boolean.TRUE.equals(Answer.correctFrom(answerOutcome, grade));

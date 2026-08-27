@@ -1,6 +1,7 @@
 package com.odde.donut.services;
 
 import com.odde.donut.controllers.dto.RecallStatsDTO;
+import com.odde.donut.controllers.dto.RecallStatsDTO.AccuracyStats;
 import com.odde.donut.controllers.dto.RecallStatsDTO.AmPmResponseTime;
 import com.odde.donut.controllers.dto.RecallStatsDTO.DayAvgResponseTime;
 import com.odde.donut.controllers.dto.RecallStatsDTO.DayCount;
@@ -69,6 +70,7 @@ public class RecallStatsService {
     }
     int totalCorrect365 = 0;
     int totalReviews365 = 0;
+    List<RecallAnswerRow> todaysQualifyingRows = new ArrayList<>();
 
     RecallPaceAggregator.PaceResult paceResult =
         RecallPaceAggregator.compute(allTimeReviews, today, zoneId);
@@ -85,6 +87,10 @@ public class RecallStatsService {
       LocalDate localDate = zdt.toLocalDate();
       int wd = zdt.getDayOfWeek().getValue() - 1;
       int hour = zdt.getHour();
+
+      if (localDate.equals(today)) {
+        todaysQualifyingRows.add(r);
+      }
 
       boolean correct = r.correct();
       weekdayHourCounts[wd][hour]++;
@@ -124,9 +130,18 @@ public class RecallStatsService {
             hourCorrect,
             hourAnswered);
     PaceStats pace = paceResult.stats();
+    AccuracyStats accuracy = RecallAccuracyAggregator.compute(todaysQualifyingRows);
 
     return new RecallStatsDTO(
-        calendar, trend, retentionTrend, amPm, weekdayHourCounts, weekdayHourCorrect, totals, pace);
+        calendar,
+        trend,
+        retentionTrend,
+        amPm,
+        weekdayHourCounts,
+        weekdayHourCorrect,
+        totals,
+        pace,
+        accuracy);
   }
 
   private static Timestamp minusDays(Timestamp ts, int days) {

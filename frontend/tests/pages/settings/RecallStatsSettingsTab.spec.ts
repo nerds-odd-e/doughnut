@@ -84,6 +84,10 @@ const fixture: RecallStatsDto = {
     sampleSize: 4,
     totalAnsweredToday: 6,
   },
+  accuracy: {
+    standardizedResidual: 1.8,
+    sampleSize: 6,
+  },
 }
 
 describe("RecallStatsSettingsTab", () => {
@@ -127,6 +131,9 @@ describe("RecallStatsSettingsTab", () => {
     expect(bestWorst.text()).toContain("20")
     expect(wrapper.find('[data-testid="pace-tile"]').text()).toContain(
       "15% slower than usual"
+    )
+    expect(wrapper.find('[data-testid="accuracy-tile"]').text()).toContain(
+      "Recalling better than expected"
     )
   })
 

@@ -1,7 +1,9 @@
 # Morning cognitive index from recall history
 
-**Status:** in progress — slices 1–14, 14.1–14.8, 15, 16 done. **next: 17**
-(Recall Stats shows today's accuracy against expected). `recall_stats.feature`'s
+**Status:** in progress — slices 1–14, 14.1–14.8, 15, 16, 17 done. Slice 17.1
+(pace-expectation R/D correction, split from 17) is **blocked** pending a
+developer-specified formula (see Jidoka checkpoints). **Next: 18**
+(historical backfill script), independent of 17.1. `recall_stats.feature`'s
 pace scenario stays `@wip` — a second, unrelated E2E race condition was found
 (see Discoveries).
 **Type:** ad-hoc plan (`.planning/quick/`)
@@ -694,12 +696,30 @@ to establish a tracker (the common case for testing an already-scheduled
 item) will never exercise the New/first-grade edge case — test that
 explicitly when a formula divides by Stability or Difficulty.
 
-#### 17. Recall Stats shows today's accuracy against expected — Behavior `[ ]`
+#### 17. Recall Stats shows today's accuracy against expected — Behavior `[x]`
 
-Standardized Poisson-binomial residual `A = Σ(y−p̂) / √Σp̂(1−p̂)` on raw FSRS
-retrievability. Pace already uses on-task thinking time (14.3); this slice
-must not touch the pace-expectation formula and must not reintroduce the
-trend-chart 1s/2min caps.
+Done: `RecallAnswerRow` gained a `retrievability` field, sourced from
+`RecallLog.retrievability` via a new `rl.retrievability` selection in
+`RecallPromptRepository.findAnsweredRecallAnswerRows`'s existing JPQL
+projection — no second query. New `RecallAccuracyAggregator.compute(...)`
+(dedicated class, mirroring `RecallPaceAggregator`'s cohesion rather than a
+method bolted onto it, since accuracy and pace are distinct concepts) sums
+`A = Σ(y−p̂) / √Σp̂(1−p̂)` over qualifying rows, excluding any row with null
+retrievability (a New tracker's first grade, per slice 16) and returning null
+when the denominator is 0 (no qualifying rows, or all p̂ at 0/1) rather than
+dividing by zero. `RecallStatsService.aggregateRows` collects today's
+qualifying rows from the same loop that already skips
+`paceResult.implausiblyFastRows()`, so implausibly-fast mistaps are excluded
+from accuracy too — consistent with the plan's stated design decision that a
+mistap invalidates the accuracy observation, not just the timing. New
+`RecallStatsDTO.AccuracyStats { standardizedResidual, sampleSize }` field
+`accuracy`; new `AccuracyTile.vue` rendered beside `PaceTile.vue` in
+`RecallStatsSettingsTab.vue`. Pace's own time-expectation formula
+(`RecallPaceAggregator`) was not touched, per the slice-17/17.1 split above.
+API client regenerated. No new E2E scenario — slice 9's pace E2E precedent
+(backend/frontend unit tests as primary verification) followed, since the
+existing `recall_stats.feature` pace scenario is already `@wip` for an
+unrelated SDK-sequencing race documented in Discoveries.
 
 #### 17.1. Pace expectation is corrected for retrievability and difficulty — Behavior `[ ]`
 
