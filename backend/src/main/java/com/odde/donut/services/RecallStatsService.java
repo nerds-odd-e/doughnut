@@ -130,7 +130,11 @@ public class RecallStatsService {
             hourCorrect,
             hourAnswered);
     PaceStats pace = paceResult.stats();
-    AccuracyStats accuracy = RecallAccuracyAggregator.compute(todaysQualifyingRows);
+    List<RecallAnswerRow> allTimeQualifyingRows =
+        allTimeReviews.stream().filter(r -> !paceResult.implausiblyFastRows().contains(r)).toList();
+    AccuracyStats accuracy =
+        RecallAccuracyAggregator.compute(
+            todaysQualifyingRows, allTimeQualifyingRows, today, zoneId);
 
     return new RecallStatsDTO(
         calendar,

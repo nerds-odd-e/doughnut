@@ -1,10 +1,10 @@
 # Morning cognitive index from recall history
 
-**Status:** in progress — slices 1–14, 14.1–14.8, 15, 16, 17, 18 done. Slice
-17.1 (pace-expectation R/D correction, split from 17) is **blocked** pending a
-developer-specified formula (see Jidoka checkpoints). **Next: 19** (personal
-recalibration), independent of 17.1. `recall_stats.feature`'s pace scenario
-stays `@wip` — a second, unrelated E2E race condition was found (see
+**Status:** in progress — slices 1–14, 14.1–14.8, 15, 16, 17, 18, 19 done.
+Slice 17.1 (pace-expectation R/D correction, split from 17) is **blocked**
+pending a developer-specified formula (see Jidoka checkpoints). **Next: 20**
+(fitted guessing floor), independent of 17.1. `recall_stats.feature`'s pace
+scenario stays `@wip` — a second, unrelated E2E race condition was found (see
 Discoveries).
 **Type:** ad-hoc plan (`.planning/quick/`)
 **Research memo:** https://claude.ai/code/artifact/9e13f954-fc5e-48e5-868f-f75d03f811c1
@@ -765,10 +765,40 @@ already-populated rows. `answer` pause columns confirmed not backfilled, per
 plan. Not run against production data — building/testing the script was this
 slice's deliverable; running it is an operator action outside this plan.
 
-#### 19. Personal recalibration removes the scheduler's bias — Behavior `[ ]`
+#### 19. Personal recalibration removes the scheduler's bias — Behavior `[x]`
 
-`logit` α and β fitted on trailing 180 days, refit nightly. A learner FSRS is
-consistently overconfident about stops reading as permanently below par.
+Done: the plan's second sentence was garbled/unparseable
+("A learner FSRS is consistently overconfident about stops reading as
+permanently below par") — the coordinator confirmed real intent with the
+developer before delegating rather than guessing. **Clarified intent:** fit a
+2-parameter logistic (Platt-scaling) recalibration
+`p̂ = sigmoid(α + β·logit(retrievability))` from trailing history, so a
+scheduler that's systematically over/under-confident for a learner doesn't
+make the accuracy readout perpetually read "worse than expected" for reasons
+that are really the scheduler's bias, not the learner's. New
+`RecallCalibrationFitter.java` — Newton-Raphson/IRLS fit with backtracking
+line search (a bare Newton step oscillated/diverged; step-halving on
+log-likelihood improvement fixed it); no new dependency (no numerics library
+existed in this repo — hand-rolled following `Fsrs.java`'s self-contained
+numeric style). `RecallAccuracyAggregator` fits calibration live per request
+from trailing-180-day rows (excluding today, non-null retrievability,
+non-implausibly-fast), then uses the recalibrated p̂ in place of raw
+retrievability in slice 17's `A = Σ(y−p̂)/√Σp̂(1−p̂)` sum. **"Refit nightly"
+resolved as live-per-request, not a new scheduled job**: this codebase has no
+`@Scheduled`/cron mechanism for this kind of statistic; trailing-window
+recalculation happens inline per stats request, matching the existing
+`consistencyZScore` baseline pattern in `RecallPaceAggregator`.
+`MIN_CALIBRATION_SAMPLES = 50` trailing qualifying rows; below that, or on
+no-outcome-variance, or a numerically degenerate fit (singular Fisher
+information, NaN/Infinite, or a non-improving step), falls back to the
+identity mapping (α=0, β=1 — raw retrievability unchanged via a
+reference-equality fast path, so pre-slice behavior is exactly preserved
+below the threshold). `RecallStatsService` passes `allTimeQualifyingRows`,
+`today`, and `zoneId` through. New `RecallCalibrationFitterTest` and
+`RecallStatsServiceAccuracyCalibrationTest`; existing accuracy tests
+unmodified (none reach the 50-sample threshold, so they exercise the
+identity fallback exactly as before). No DTO/schema/controller signature
+change, no API regeneration needed.
 
 #### 20. The guessing floor is fitted rather than assumed — Behavior `[ ]`
 
