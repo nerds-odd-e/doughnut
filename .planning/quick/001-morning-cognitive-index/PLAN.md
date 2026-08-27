@@ -168,6 +168,12 @@ reliability below ~0.6, slices 22–25 do not ship. The component readouts stand
 on their own and the composite is abandoned or reworked. Do not tune weights to
 rescue the number.
 
+**Before slice 17.1 — pace-expectation correction formula.** Unresolved. Slice
+17's original text asserted R/D would correct the pace time-expectation but
+gave no model. The developer needs to specify how retrievability and/or
+difficulty should adjust the expected response time before 17.1 can be
+planned into Behavior/Structure steps.
+
 ---
 
 ## Slices
@@ -691,9 +697,21 @@ explicitly when a formula divides by Stability or Difficulty.
 #### 17. Recall Stats shows today's accuracy against expected — Behavior `[ ]`
 
 Standardized Poisson-binomial residual `A = Σ(y−p̂) / √Σp̂(1−p̂)` on raw FSRS
-retrievability. **Removes slice 9's remaining interim** by feeding `R` and `D`
-into the pace expectation. Pace already uses on-task thinking time (14.3);
-this slice must not reintroduce the trend-chart 1s/2min caps.
+retrievability. Pace already uses on-task thinking time (14.3); this slice
+must not touch the pace-expectation formula and must not reintroduce the
+trend-chart 1s/2min caps.
+
+#### 17.1. Pace expectation is corrected for retrievability and difficulty — Behavior `[ ]`
+
+**Split from slice 17** (pre-slice Jidoka stop — developer chose to split
+rather than have the coordinator guess a formula). Slice 9's interim note
+says the per-item EWMA time baseline has no retrievability/difficulty
+correction, and slice 17's original text said this slice would "remove that
+interim by feeding `R` and `D` into the pace expectation," but neither slice
+specifies the correction model itself (e.g. a multiplicative adjustment to
+the EWMA baseline, a regression term, or something else). Needs a formula
+decision — see Jidoka checkpoints — before this can be sliced into
+Behavior/Structure steps.
 
 #### 18. Historical reviews gain their memory state — Behavior `[ ]`
 
