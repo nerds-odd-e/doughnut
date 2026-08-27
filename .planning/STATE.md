@@ -6,9 +6,9 @@ current_phase: null
 current_phase_name: null
 status: ready
 stopped_at: null
-last_updated: "2026-08-22T06:30:00Z"
-last_activity: 2026-08-22
-last_activity_desc: "No active plan; spent tutor-feedback quick plans removed"
+last_updated: "2026-08-27T04:55:00Z"
+last_activity: 2026-08-27
+last_activity_desc: "Quick plan 003 nested session_item Report (not started)"
 progress:
   total_phases: 0
   completed_phases: 0
@@ -33,4 +33,5 @@ Scheduling follows Accepted [ADR 0003](../docs/adrs/0003-spaced-repetition-sched
 
 ## Operator Next Steps
 
+- Nested Report shape is in `docs/commissioned-learning-session-protocol.md`; implement via `.planning/quick/003-nested-session-item-report/PLAN.md`
 - After deploying the Flyway squash, confirm startup succeeded and `flyway_schema_history` shows the baseline repaired, the collapsed versions marked `DELETE`, and `V300000300` applied
