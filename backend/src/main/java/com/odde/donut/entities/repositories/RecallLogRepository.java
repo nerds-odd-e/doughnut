@@ -10,6 +10,17 @@ import org.springframework.data.repository.query.Param;
 public interface RecallLogRepository extends CrudRepository<RecallLog, Integer> {
   List<RecallLog> findAllByMemoryTracker_IdOrderByRecordedAtDescIdDesc(Integer memoryTrackerId);
 
+  /** Oldest first, for {@code RecallLogMemoryStateBackfill}'s per-tracker replay order. */
+  List<RecallLog> findAllByMemoryTracker_IdOrderByRecordedAtAscIdAsc(Integer memoryTrackerId);
+
+  @Query(
+      """
+      SELECT DISTINCT rl.memoryTracker.id
+      FROM RecallLog rl
+      WHERE rl.stabilityBefore IS NULL
+      """)
+  List<Integer> findDistinctMemoryTrackerIdsWithNullStabilityBefore();
+
   @Query(
       """
       SELECT rl

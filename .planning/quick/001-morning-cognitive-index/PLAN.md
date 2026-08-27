@@ -1,11 +1,11 @@
 # Morning cognitive index from recall history
 
-**Status:** in progress — slices 1–14, 14.1–14.8, 15, 16, 17 done. Slice 17.1
-(pace-expectation R/D correction, split from 17) is **blocked** pending a
-developer-specified formula (see Jidoka checkpoints). **Next: 18**
-(historical backfill script), independent of 17.1. `recall_stats.feature`'s
-pace scenario stays `@wip` — a second, unrelated E2E race condition was found
-(see Discoveries).
+**Status:** in progress — slices 1–14, 14.1–14.8, 15, 16, 17, 18 done. Slice
+17.1 (pace-expectation R/D correction, split from 17) is **blocked** pending a
+developer-specified formula (see Jidoka checkpoints). **Next: 19** (personal
+recalibration), independent of 17.1. `recall_stats.feature`'s pace scenario
+stays `@wip` — a second, unrelated E2E race condition was found (see
+Discoveries).
 **Type:** ad-hoc plan (`.planning/quick/`)
 **Research memo:** https://claude.ai/code/artifact/9e13f954-fc5e-48e5-868f-f75d03f811c1
 
@@ -733,16 +733,37 @@ the EWMA baseline, a regression term, or something else). Needs a formula
 decision — see Jidoka checkpoints — before this can be sliced into
 Behavior/Structure steps.
 
-#### 18. Historical reviews gain their memory state — Behavior `[ ]`
+#### 18. Historical reviews gain their memory state — Behavior `[x]`
 
-One-time script under `scripts/`, replaying each tracker's ordered grades and
-`elapsed_hours` through FSRS. The accuracy trend visibly extends backwards past
-the deploy date.
-
-- **Not a Flyway migration** — the repo's migration rule keeps one-off data repair
-  out of the permanent chain, and this needs the FSRS implementation.
-- Unreplayable rows keep NULL; NULL means excluded from the index.
-- `answer` pause columns are **not** backfillable — that data was never recorded.
+Done: **location deviates from this plan's literal text** — "under `scripts/`"
+turned out to have no precedent for JVM/JPA-touching data repair (that
+directory is all shell/Node dev tooling); the repo already has an established,
+actively-used convention for exactly this instead —
+`backend/src/main/java/com/odde/donut/services/` backfill classes
+(`NotePropertyTrackingBackfill.java`, `NotePropertyIndexTargetNoteBackfill.java`:
+`public final class`, private constructor, static `run(...)`, invoked only
+from a `@SpringBootTest`, no wired runner). New
+`RecallLogMemoryStateBackfill.java` follows that shape. For each tracker with
+NULL `stability_before` rows, replays its `recall_log` rows oldest-first
+through the real production `MemoryTracker` methods (`applyGrade`,
+`adjustForConfusion`, `retrievabilityAt`) on a scratch, never-persisted
+`MemoryTracker` — no FSRS math reimplemented — writing each row's "before"
+snapshot prior to applying that row's own effect (state is derived purely
+from the row sequence, so it can't reintroduce slice 16's Grade-vs-Confusion
+ordering bug). Each row's stored `elapsed_hours` doubles as a checksum: on
+mismatch, that row and everything later for the tracker is left NULL rather
+than guessed (unreplayable → NULL → excluded from the index). Stops at the
+first row that already has `stability_before` set (the live-instrumented
+boundary — new data is always the tail). New `RecallLogRepository` queries
+`findAllByMemoryTracker_IdOrderByRecordedAtAscIdAsc` and
+`findDistinctMemoryTrackerIdsWithNullStabilityBefore`. New
+`RecallLogMemoryStateBackfillTest` (4 tests): grade-path history,
+confusion-path history from a genuine New tracker, a corrupted-`elapsed_hours`
+row correctly left NULL along with everything later, and the
+live/pre-instrumented boundary correctly stopping without touching
+already-populated rows. `answer` pause columns confirmed not backfilled, per
+plan. Not run against production data — building/testing the script was this
+slice's deliverable; running it is an operator action outside this plan.
 
 #### 19. Personal recalibration removes the scheduler's bias — Behavior `[ ]`
 
