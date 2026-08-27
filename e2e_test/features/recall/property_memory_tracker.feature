@@ -32,8 +32,8 @@ Feature: Property memory tracker
     And It's day 1, 8 hour
     And I assimilated one note "Kanji" at the current time
     When I start assimilation from the menu
-    Then I should see assimilation progress "1/2/2"
-    And I should see pending assimilation property "example of"
+    Then I should see pending assimilation property "example of"
+    And I should not see assimilation settings
 
   @disableOpenAiService
   Scenario: Skip a property does not create a dummy understanding tracker

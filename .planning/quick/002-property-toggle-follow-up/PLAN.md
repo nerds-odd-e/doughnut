@@ -30,13 +30,7 @@ Inspected original plan (last copy at `5c7163c45f`) and commits
 
 **Bugs**
 
-- **Next property still opens Assimilation settings.**
-  `useAssimilationView.openForNote` always sets `activePanel` to
-  `"assimilation"`. Original slice 4 said the pending property should
-  land on the toggle “with no old panel involved.” Note-level next
-  should still open the panel. `resetForNote` re-opens the panel when
-  staying on the same note, so a property pending would also reopen
-  settings after navigation.
+(none remaining from this plan)
 
 **Weak / leftover tests**
 
@@ -89,25 +83,16 @@ property” E2E passed in this run.
 ### 2. Next property to assimilate does not open Assimilation settings
 
 Type: Behavior
-Status: planned
+Status: done
 
-Pre-condition: the next assimilation unit is a property (e.g. untracked
-`example of` after the note itself is assimilated).
+`openForNote` / `resetForNote` share `openSettingsUnlessPropertyPending`
+(close settings if already open when `pendingPropertyKey` is set).
+Note-level next still opens settings. Queue E2E asserts pending
+`example of` and `I should not see assimilation settings` (progress
+`1/2/2` dropped — that triple only lives inside the settings panel).
 
-Trigger: start assimilation from the menu (or go to next after a
-previous assimilation).
-
-Post-condition: the target property row is pending (expanded,
-highlighted). Assimilation settings is **not** shown. Note-level next
-(no `propertyKey`) still opens settings.
-
-`openForNote` / `resetForNote` must not force the panel open when
-`pendingPropertyKey` is set. E2E: existing “Untracked example of
-property appears in assimilation queue” asserts the pending row and
-that `#assimilation-settings` (or `data-testid="assimilation-settings"`)
-is absent. Unit: `useGoToNextAssimilation` / `useAssimilationView` —
-property next leaves `showAssimilationSettings` false; note next still
-true.
+Learning: keep `expectAssimilationSettingsAbsent` when slice 3 deletes
+the unused pending-absent helper.
 
 ### 3. One pending-property owner; drop dead pending-absent E2E
 
@@ -123,7 +108,9 @@ scroll).
   (extract if `RichFrontmatterProperties.vue` would overflow).
 - Propagate scroll failure; do not `.catch(() => undefined)`.
 - Delete unused `I should not see pending assimilation property` and
-  `expectPendingAssimilationPropertyAbsent`.
+  `expectPendingAssimilationPropertyAbsent`. Keep
+  `I should not see assimilation settings` /
+  `expectAssimilationSettingsAbsent` (slice 2 behavior).
 
 Existing pending E2E and
 `RichMarkdownEditor.propertyAssimilation.spec.ts` auto-expand tests

@@ -95,7 +95,7 @@ describe("useGoToNextAssimilation", () => {
     })
   })
 
-  it("stores pending property key when nextUnit includes propertyKey", async () => {
+  it("leaves settings off and stores pending property key when nextUnit includes propertyKey", async () => {
     mockSdkService(AssimilationController, "next", {
       nextUnit: { noteId: 42, propertyKey: "example of" },
       counts: {
@@ -108,7 +108,9 @@ describe("useGoToNextAssimilation", () => {
     const { goToNextAssimilation } = useGoToNextAssimilation()
     await goToNextAssimilation()
 
-    const { pendingPropertyKey } = useAssimilationView()
+    const { showAssimilationSettings, pendingPropertyKey } =
+      useAssimilationView()
+    expect(showAssimilationSettings.value).toBe(false)
     expect(pendingPropertyKey.value).toBe("example of")
   })
 

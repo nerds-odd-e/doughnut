@@ -16,7 +16,18 @@ describe("useAssimilationView", () => {
     expect(targetNoteId.value).toBe(5)
   })
 
-  it("resetForNote shows settings only when pending matches the note", () => {
+  it("openForNote with a property key leaves settings off", () => {
+    const { openForNote, showAssimilationSettings, pendingPropertyKey } =
+      useAssimilationView()
+
+    openForNote(5)
+    openForNote(5, "example of")
+
+    expect(showAssimilationSettings.value).toBe(false)
+    expect(pendingPropertyKey.value).toBe("example of")
+  })
+
+  it("resetForNote shows settings only for the target note", () => {
     const { openForNote, resetForNote, showAssimilationSettings } =
       useAssimilationView()
 
@@ -28,7 +39,17 @@ describe("useAssimilationView", () => {
     expect(showAssimilationSettings.value).toBe(false)
   })
 
-  it("resetForNote hides settings when pending is null", () => {
+  it("resetForNote does not reopen settings when a property is pending", () => {
+    const { openForNote, resetForNote, showAssimilationSettings } =
+      useAssimilationView()
+
+    openForNote(5, "example of")
+    resetForNote(5)
+
+    expect(showAssimilationSettings.value).toBe(false)
+  })
+
+  it("resetForNote hides settings when there is no target note", () => {
     const { resetForNote, showAssimilationSettings } = useAssimilationView()
 
     resetForNote(5)

@@ -87,6 +87,10 @@ export const noteRichPropertyAssimilationMethods = () => ({
     })
     return this
   },
+  expectAssimilationSettingsAbsent() {
+    cy.get('[data-testid="assimilation-settings"]').should('not.exist')
+    return this
+  },
   expectPendingAssimilationProperty(key: string) {
     this.switchToRichContent()
     findNoteContentRegion().within(() => {

@@ -119,6 +119,10 @@ Then(
   }
 )
 
+Then('I should not see assimilation settings', () => {
+  start.assumeNotePage().expectAssimilationSettingsAbsent()
+})
+
 Then(
   'I should not see pending assimilation property {string}',
   (propertyKey: string) => {

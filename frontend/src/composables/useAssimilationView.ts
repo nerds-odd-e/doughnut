@@ -19,27 +19,37 @@ export function useAssimilationView() {
   const isOpenForNote = (noteId: number) =>
     showAssimilationSettings.value && targetNoteId.value === noteId
 
+  const closeAssimilationSettingsIfOpen = () => {
+    if (showAssimilationSettings.value) {
+      closePanel()
+    }
+  }
+
+  const openSettingsUnlessPropertyPending = () => {
+    if (pendingPropertyKey.value) {
+      closeAssimilationSettingsIfOpen()
+      return
+    }
+    activePanel.value = "assimilation"
+  }
+
   const openForNote = (noteId: number, propertyKey?: string | null) => {
     targetNoteId.value = noteId
     pendingPropertyKey.value = propertyKey ?? null
-    activePanel.value = "assimilation"
+    openSettingsUnlessPropertyPending()
   }
 
   const resetForNote = (noteId: number) => {
     if (targetNoteId.value === noteId) {
-      activePanel.value = "assimilation"
+      openSettingsUnlessPropertyPending()
       return
     }
-    if (activePanel.value === "assimilation") {
-      closePanel()
-    }
+    closeAssimilationSettingsIfOpen()
   }
 
   const dismiss = () => {
     clearAssimilationTargets()
-    if (activePanel.value === "assimilation") {
-      closePanel()
-    }
+    closeAssimilationSettingsIfOpen()
   }
 
   const toggle = (noteId: number) => {
