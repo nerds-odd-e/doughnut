@@ -50,7 +50,7 @@ public interface RecallPromptRepository extends CrudRepository<RecallPrompt, Int
   @Query(
       "SELECT new com.odde.donut.services.RecallAnswerRow("
           + "a.createdAt, a.outcome, rl.grade, a.thinkingTimeMs, rp.createdAt, "
-          + "mt.id, rl.retrievability) "
+          + "mt.id, rl.retrievability, rp.questionType) "
           + "FROM RecallPrompt rp JOIN rp.answer a JOIN rp.memoryTracker mt "
           + "LEFT JOIN RecallLog rl ON rl.answer = a AND rl.memoryTracker = mt "
           + "AND rl.grade IS NOT NULL "

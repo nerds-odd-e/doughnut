@@ -1,19 +1,24 @@
 package com.odde.donut.services;
 
 import com.odde.donut.controllers.dto.RecallStatsDTO.AccuracyStats;
-import com.odde.donut.services.RecallCalibrationFitter.CalibrationFit;
+import com.odde.donut.entities.QuestionType;
+import com.odde.donut.services.RecallGuessingFloorFitter.ThreePlFit;
 import com.odde.donut.utils.TimestampOperations;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Standardized Poisson-binomial residual comparing today's observed correctness against each
  * answer's <em>recalibrated</em> recall probability p̂ — raw FSRS retrievability (persisted on
  * {@code RecallLog.retrievability} by {@code MemoryTrackerService#persistRecallLog}) run through a
- * per-learner {@link RecallCalibrationFitter} fit on the trailing 180 days, so a scheduler that is
- * systematically over- or under-confident for this learner doesn't make the accuracy readout
+ * per-learner, per-{@code RecallPrompt.questionType} {@link RecallGuessingFloorFitter} 3PL fit
+ * ({@code p̂ = γ + (1−γ)·σ(α + β·logit(retrievability))}, γ fitted rather than assumed — see slice
+ * 20) on the trailing 180 days, so a scheduler that is systematically over- or under-confident for
+ * this learner, or a question type with a genuine guessing floor, doesn't make the accuracy readout
  * perpetually read "worse/better than expected" for a reason that has nothing to do with today.
  * {@code A = Σ(y−p̂) / √Σp̂(1−p̂)}: positive means recalling better than the (recalibrated) model
  * expected, negative means worse.
@@ -39,8 +44,8 @@ final class RecallAccuracyAggregator {
       List<RecallAnswerRow> allTimeQualifyingRows,
       LocalDate today,
       ZoneId zoneId) {
-    CalibrationFit fit =
-        RecallCalibrationFitter.fit(trailingCalibrationRows(allTimeQualifyingRows, today, zoneId));
+    Map<QuestionType, ThreePlFit> fitsByQuestionType =
+        fitPerQuestionType(trailingCalibrationRows(allTimeQualifyingRows, today, zoneId));
 
     double sumResidual = 0;
     double sumVariance = 0;
@@ -50,6 +55,7 @@ final class RecallAccuracyAggregator {
       if (rawRetrievability == null) {
         continue;
       }
+      ThreePlFit fit = fitsByQuestionType.getOrDefault(r.questionType(), ThreePlFit.IDENTITY);
       double p = fit.recalibrate(rawRetrievability);
       double y = r.correct() ? 1 : 0;
       sumResidual += y - p;
@@ -58,6 +64,22 @@ final class RecallAccuracyAggregator {
     }
     Double standardizedResidual = sumVariance > 0 ? sumResidual / Math.sqrt(sumVariance) : null;
     return new AccuracyStats(standardizedResidual, sampleSize);
+  }
+
+  /** One 3PL fit per {@code RecallPrompt.questionType}, using only that type's trailing rows. */
+  private static Map<QuestionType, ThreePlFit> fitPerQuestionType(List<RecallAnswerRow> rows) {
+    Map<QuestionType, List<RecallAnswerRow>> rowsByType = new EnumMap<>(QuestionType.class);
+    for (QuestionType type : QuestionType.values()) {
+      rowsByType.put(type, new ArrayList<>());
+    }
+    for (RecallAnswerRow r : rows) {
+      rowsByType.get(r.questionType()).add(r);
+    }
+    Map<QuestionType, ThreePlFit> fits = new EnumMap<>(QuestionType.class);
+    for (Map.Entry<QuestionType, List<RecallAnswerRow>> entry : rowsByType.entrySet()) {
+      fits.put(entry.getKey(), RecallGuessingFloorFitter.fit(entry.getValue()));
+    }
+    return fits;
   }
 
   /**

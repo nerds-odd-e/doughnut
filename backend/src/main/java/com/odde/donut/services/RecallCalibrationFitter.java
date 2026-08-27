@@ -1,5 +1,9 @@
 package com.odde.donut.services;
 
+import static com.odde.donut.services.RecallProbabilityMath.clamp;
+import static com.odde.donut.services.RecallProbabilityMath.logit;
+import static com.odde.donut.services.RecallProbabilityMath.sigmoid;
+
 import java.util.List;
 
 /**
@@ -26,7 +30,6 @@ final class RecallCalibrationFitter {
 
   private static final int MAX_ITERATIONS = 25;
   private static final double CONVERGENCE_TOLERANCE = 1e-6;
-  private static final double PROBABILITY_EPSILON = 1e-6;
 
   private RecallCalibrationFitter() {}
 
@@ -158,17 +161,5 @@ final class RecallCalibrationFitter {
       total += y[i] == 1.0 ? -Math.log1p(Math.exp(-z)) : -Math.log1p(Math.exp(z));
     }
     return total;
-  }
-
-  private static double clamp(double p) {
-    return Math.min(1 - PROBABILITY_EPSILON, Math.max(PROBABILITY_EPSILON, p));
-  }
-
-  private static double logit(double p) {
-    return Math.log(p / (1 - p));
-  }
-
-  private static double sigmoid(double z) {
-    return 1.0 / (1.0 + Math.exp(-z));
   }
 }

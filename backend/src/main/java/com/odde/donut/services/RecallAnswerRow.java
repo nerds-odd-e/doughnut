@@ -3,6 +3,7 @@ package com.odde.donut.services;
 import com.odde.donut.entities.Answer;
 import com.odde.donut.entities.AnswerOutcome;
 import com.odde.donut.entities.Grade;
+import com.odde.donut.entities.QuestionType;
 import java.sql.Timestamp;
 import java.util.Optional;
 
@@ -18,7 +19,8 @@ public record RecallAnswerRow(
     Integer thinkingTimeMs,
     Timestamp promptCreatedAt,
     Integer memoryTrackerId,
-    Double retrievability) {
+    Double retrievability,
+    QuestionType questionType) {
 
   boolean correct() {
     return Boolean.TRUE.equals(Answer.correctFrom(answerOutcome, grade));

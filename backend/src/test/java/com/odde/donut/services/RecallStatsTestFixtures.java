@@ -3,6 +3,7 @@ package com.odde.donut.services;
 import com.odde.donut.controllers.dto.RecallStatsDTO;
 import com.odde.donut.entities.AnswerOutcome;
 import com.odde.donut.entities.Grade;
+import com.odde.donut.entities.QuestionType;
 import java.sql.Timestamp;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -38,6 +39,24 @@ final class RecallStatsTestFixtures {
       Timestamp promptAt,
       Integer memoryTrackerId,
       Double retrievability) {
+    return answered(
+        answerAt,
+        thinkingTimeMs,
+        correct,
+        promptAt,
+        memoryTrackerId,
+        retrievability,
+        QuestionType.MCQ);
+  }
+
+  static RecallAnswerRow answered(
+      Timestamp answerAt,
+      Integer thinkingTimeMs,
+      boolean correct,
+      Timestamp promptAt,
+      Integer memoryTrackerId,
+      Double retrievability,
+      QuestionType questionType) {
     return new RecallAnswerRow(
         answerAt,
         null,
@@ -45,11 +64,13 @@ final class RecallStatsTestFixtures {
         thinkingTimeMs,
         promptAt != null ? promptAt : answerAt,
         memoryTrackerId,
-        retrievability);
+        retrievability,
+        questionType);
   }
 
   static RecallAnswerRow overlapAnswered(Timestamp answerAt) {
-    return new RecallAnswerRow(answerAt, AnswerOutcome.OVERLAP, null, null, answerAt, null, null);
+    return new RecallAnswerRow(
+        answerAt, AnswerOutcome.OVERLAP, null, null, answerAt, null, null, QuestionType.MCQ);
   }
 
   static Timestamp utc(int day, int hour) {

@@ -1,11 +1,12 @@
 # Morning cognitive index from recall history
 
-**Status:** in progress — slices 1–14, 14.1–14.8, 15, 16, 17, 18, 19 done.
-Slice 17.1 (pace-expectation R/D correction, split from 17) is **blocked**
-pending a developer-specified formula (see Jidoka checkpoints). **Next: 20**
-(fitted guessing floor), independent of 17.1. `recall_stats.feature`'s pace
-scenario stays `@wip` — a second, unrelated E2E race condition was found (see
-Discoveries).
+**Status:** in progress — slices 1–14, 14.1–14.8, 15, 16, 17, 18, 19, 20 done.
+This closes the Accuracy channel. Slice 17.1 (pace-expectation R/D
+correction, split from 17) is **blocked** pending a developer-specified
+formula (see Jidoka checkpoints). **Next: 21** (split-half reliability — the
+reliability gate; see Jidoka checkpoints before starting), independent of
+17.1. `recall_stats.feature`'s pace scenario stays `@wip` — a second,
+unrelated E2E race condition was found (see Discoveries).
 **Type:** ad-hoc plan (`.planning/quick/`)
 **Research memo:** https://claude.ai/code/artifact/9e13f954-fc5e-48e5-868f-f75d03f811c1
 
@@ -800,11 +801,42 @@ unmodified (none reach the 50-sample threshold, so they exercise the
 identity fallback exactly as before). No DTO/schema/controller signature
 change, no API regeneration needed.
 
-#### 20. The guessing floor is fitted rather than assumed — Behavior `[ ]`
+#### 20. The guessing floor is fitted rather than assumed — Behavior `[x]`
 
-3PL γ, bounded to [0, 0.5], held at 0 until ~300 trailing reviews. Fitted per
-question type; spelling's γ landing near zero is the built-in check that the fit
-is sane.
+Done, on the second attempt. **A first attempt was rejected**: it fit α/β
+once unconditionally and only grid-searched γ against that fixed fit —
+numerically safe but biased low (a true injected γ=0.3 recovered as only
+~0.05). The developer chose to redo it properly rather than accept the
+damped estimate. The accepted implementation does the mathematically correct
+**conditional refit / profile likelihood**: new
+`RecallGuessingFloorFitter.java` grid-searches γ over `[0, 0.5]` (step 0.02),
+and at each candidate γ runs a fresh Newton-Raphson (BHHH
+outer-product-of-gradients Hessian approximation, backtracking line search,
+warm-started via continuation from the previous grid point's converged α/β)
+to *refit* α/β conditional on that γ, maximizing the exact 3PL log-likelihood
+`p̂ = γ + (1−γ)·σ(α+β·logit(retrievability))`. The γ with the highest
+profile log-likelihood wins. Verified against a finite-difference
+gradient/Hessian check (analytic vs. numerical gradient agreed within
+`1e-4`), catching the sign/derivative bugs this kind of math invites.
+**Sanity checks (on synthetic data):** spelling-shaped data (no genuine
+guessing floor) fit γ = 0.0 (bar was ≤0.02); MCQ-shaped data with an injected
+true γ=0.3 fit γ ≈ 0.28 — confirming the refit is genuinely conditional,
+unlike the rejected attempt. Below `MIN_TRAILING_REVIEWS = 300` qualifying
+rows for a question type, γ is held at exactly 0, delegating straight to
+slice 19's `RecallCalibrationFitter` 2PL fit (which separately still enforces
+its own `MIN_CALIBRATION_SAMPLES = 50` threshold — two independent
+thresholds gating two different parameters). "Fitted per question type" uses
+the existing `RecallPrompt.questionType` (`MCQ`/`SPELLING`) discriminator,
+added to `RecallAnswerRow`/the JPQL projection (projection-only, no second
+query, no API regen — slice 8/17 precedent);
+`RecallAccuracyAggregator` groups both today's rows and the trailing
+calibration rows by type and fits/applies an independent `ThreePlFit` per
+type, so MCQ and spelling never share a guessing floor. Post-change-refactor
+extracted the `clamp`/`logit`/`sigmoid` primitives duplicated between slice
+19's and slice 20's fitters into a shared `RecallProbabilityMath.java`; the
+Newton-Raphson loop bodies themselves were deliberately left unshared since
+the 2PL analytic-Hessian scoring and 3PL BHHH-approximation scoring are
+genuinely different math.
 
 ### The index
 
