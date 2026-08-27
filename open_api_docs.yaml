@@ -3879,6 +3879,21 @@ components:
         thinkingTimeMs:
           type: integer
           format: int32
+        awayMs:
+          type: integer
+          format: int32
+        awayCount:
+          type: integer
+          format: int32
+        detourMs:
+          type: integer
+          format: int32
+        detourCount:
+          type: integer
+          format: int32
+        idleMs:
+          type: integer
+          format: int32
     SpellingVerificationResult:
       type: object
       properties:

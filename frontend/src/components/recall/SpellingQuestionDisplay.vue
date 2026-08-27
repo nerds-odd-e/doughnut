@@ -60,7 +60,8 @@ const loading = ref(true)
 const submitted = ref(false)
 
 const isActiveQuestion = computed(() => !loading.value)
-const { stop, isPaused } = useQuestionThinkingTime(isActiveQuestion)
+const { stop, isPaused, awayMs, awayCount, detourMs, detourCount, idleMs } =
+  useQuestionThinkingTime(isActiveQuestion)
 
 const stem = computed(() => recallPrompt.value?.spellingQuestion?.stem || "")
 
@@ -85,6 +86,11 @@ const submitAnswer = () => {
     spellingAnswer: spellingAnswer.value,
     thinkingTimeMs,
     recallPromptId: recallPrompt.value?.id,
+    awayMs: Math.round(awayMs.value),
+    awayCount: awayCount.value,
+    detourMs: Math.round(detourMs.value),
+    detourCount: detourCount.value,
+    idleMs: Math.round(idleMs.value),
   })
 }
 

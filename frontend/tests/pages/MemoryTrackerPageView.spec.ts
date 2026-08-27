@@ -107,14 +107,6 @@ describe("MemoryTrackerPageView display", () => {
     expect(wrapper.text()).toContain("Away: 6.5s (2x)")
   })
 
-  it("does not display away time for answers predating instrumentation", async () => {
-    const wrapper = await mountMemoryTrackerPageViewReady({
-      recallHistory: historyFromPrompts([recallPromptWithThinkingTime(5234)]),
-    })
-
-    expect(wrapper.text()).not.toContain("Away:")
-  })
-
   it("shows detour time and count beside thinking time", async () => {
     const wrapper = await mountMemoryTrackerPageViewReady({
       recallHistory: historyFromPrompts([recallPromptWithDetourTime(4200, 1)]),
@@ -131,12 +123,14 @@ describe("MemoryTrackerPageView display", () => {
     expect(wrapper.text()).toContain("Idle: 12.0s")
   })
 
-  it("does not display detour time for answers predating instrumentation", async () => {
+  it("does not display any interruption when uninstrumented", async () => {
     const wrapper = await mountMemoryTrackerPageViewReady({
       recallHistory: historyFromPrompts([recallPromptWithThinkingTime(5234)]),
     })
 
+    expect(wrapper.text()).not.toContain("Away:")
     expect(wrapper.text()).not.toContain("Detour:")
+    expect(wrapper.text()).not.toContain("Idle:")
   })
 
   it("does not display thinking time for unanswered questions", async () => {

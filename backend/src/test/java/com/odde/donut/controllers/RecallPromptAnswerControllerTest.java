@@ -112,6 +112,13 @@ class RecallPromptAnswerControllerTest extends RecallPromptControllerTestBase {
   }
 
   @Test
+  void shouldSaveIdleMs() throws UnexpectedNoAccessRightException {
+    answerDTO.setIdleMs(1500);
+    Answer answer = controller.answer(recallPrompt, answerDTO).getAnswer();
+    assertThat(answer.getIdleMs(), equalTo(1500));
+  }
+
+  @Test
   void ordinaryGoodNextMemoryStateIgnoresThinkingTime() throws UnexpectedNoAccessRightException {
     Note zeroNote = ownedNote();
     MemoryTracker zeroMs = ownedTracker(zeroNote);

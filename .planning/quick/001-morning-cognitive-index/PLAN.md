@@ -1,6 +1,6 @@
 # Morning cognitive index from recall history
 
-**Status:** in progress — slices 1–14, 14.1–14.3 done; **next: 14.4** (repair
+**Status:** in progress — slices 1–14, 14.1–14.4 done; **next: 14.5** (repair
 shipped readouts before Accuracy)
 **Type:** ad-hoc plan (`.planning/quick/`)
 **Research memo:** https://claude.ai/code/artifact/9e13f954-fc5e-48e5-868f-f75d03f811c1
@@ -513,19 +513,26 @@ itself (core weighted-median/confidence mechanics) plus a new
 `RecallStatsServicePaceExclusionTest` (exclusion/hard-drop/winsorization) to
 stay under the 250-line file-size convention.
 
-#### 14.4 Spelling answers record away, detour, and idle — Behavior `[ ]`
+#### 14.4 Spelling answers record away, detour, and idle — Behavior `[x]`
 
-Answer a spelling prompt after tab-away (or a detour, or idle): Recall History
-shows the interruption beside thinking time, same as MCQ.
-
-- Extend `AnswerSpellingDTO` + `SpellingQuestionDisplay` submit payload +
-  `SpellingRecallGrading` persist path
-- Controller: spelling save of pause fields; also add the missing MCQ
-  `idleMs` persist test (sibling of the existing away/detour tests)
-- Frontend: mounted `SpellingQuestionDisplay` emits the fields
-- Wrap-up: merge MemoryTracker "does not display away" and "does not display
-  detour" into one canonical silent-uninstrumented fixture (and assert idle
-  stays silent there too)
+Done: `AnswerSpellingDTO` gained `awayMs`/`awayCount`/`detourMs`/`detourCount`/
+`idleMs` (matching `AnswerDTO` exactly); `SpellingRecallGrading` copies them
+onto the persisted `Answer` entity via a shared `applyAnswerTimingMetrics`
+helper (was duplicated across its two overloads). `SpellingQuestionDisplay.vue`
+now destructures these from `useQuestionThinkingTime` into its emit payload.
+**Gap found beyond the stated scope:** `Quiz.vue`'s `onSpellingAnswer` was
+hand-picking only `spellingAnswer`/`thinkingTimeMs` into the API call body
+(unlike MCQ, which forwards the whole `answerData` object), which would have
+silently dropped the new fields one hop after the emit fix — changed to
+`body: answerData` to forward everything, removing the hand-picking pattern
+that caused the gap so it can't recur for future fields. Added the missing
+MCQ `idleMs` persist test (sibling to existing away/detour persist tests)
+plus a spelling equivalent. `RecallHistory.vue` needed no changes — its
+away/detour/idle rendering is already generic on `item.recallPrompt.answer`.
+MemoryTracker's "does not display away"/"does not display detour" tests
+merged into one canonical uninstrumented fixture, extended to assert idle
+stays silent too. API client regenerated (`AnswerSpellingDto` gained the new
+optional fields).
 
 #### 14.5 Answers are stamped with the scheduling clock — Behavior `[ ]`
 

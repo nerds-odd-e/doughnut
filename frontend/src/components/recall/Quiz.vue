@@ -133,10 +133,7 @@ const onSpellingAnswer = async (
   const { data: answerResult, error } = await apiCallWithLoading(() =>
     RecallPromptController.answerSpelling({
       path: { recallPrompt: answerData.recallPromptId! },
-      body: {
-        spellingAnswer: answerData.spellingAnswer!,
-        thinkingTimeMs: answerData.thinkingTimeMs,
-      },
+      body: answerData,
     })
   )
   if (!error) {

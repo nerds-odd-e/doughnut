@@ -77,6 +77,23 @@ class RecallPromptAnswerSpellingControllerTest extends RecallPromptControllerTes
   }
 
   @Test
+  void shouldPersistAwayDetourAndIdleOnAnswerEntity() throws UnexpectedNoAccessRightException {
+    answerDTO.setAwayMs(3000);
+    answerDTO.setAwayCount(2);
+    answerDTO.setDetourMs(4000);
+    answerDTO.setDetourCount(1);
+    answerDTO.setIdleMs(1500);
+    controller.answerSpelling(recallPrompt, answerDTO);
+
+    Answer answer = makeMe.refresh(recallPrompt).getAnswer();
+    assertThat(answer.getAwayMs(), equalTo(3000));
+    assertThat(answer.getAwayCount(), equalTo(2));
+    assertThat(answer.getDetourMs(), equalTo(4000));
+    assertThat(answer.getDetourCount(), equalTo(1));
+    assertThat(answer.getIdleMs(), equalTo(1500));
+  }
+
+  @Test
   void shouldNotAllowAnsweringTwice() throws UnexpectedNoAccessRightException {
     controller.answerSpelling(recallPrompt, answerDTO);
     assertThrows(

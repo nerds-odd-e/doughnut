@@ -84,6 +84,30 @@ describe("SpellingQuestionDisplay", () => {
     expect(answerData?.recallPromptId).toBeDefined()
   })
 
+  it("emits away, detour, and idle fields alongside thinking time on submit", async () => {
+    const wrapper = await mountSpellingQuestionDisplay(
+      { memoryTrackerId: 1 },
+      { rafCallbacks }
+    )
+
+    performanceNowSpy.mockReturnValue(5000)
+    vi.advanceTimersByTime(5000)
+    await submitSpellingAnswer(wrapper)
+
+    const answerData = wrapper.emitted("answer")?.[0]?.[0] as {
+      awayMs?: number
+      awayCount?: number
+      detourMs?: number
+      detourCount?: number
+      idleMs?: number
+    }
+    expect(answerData?.awayMs).toBe(0)
+    expect(answerData?.awayCount).toBe(0)
+    expect(answerData?.detourMs).toBe(0)
+    expect(answerData?.detourCount).toBe(0)
+    expect(answerData?.idleMs).toBeDefined()
+  })
+
   it("emits answer only once when submit is triggered multiple times", async () => {
     const wrapper = await mountSpellingQuestionDisplay(
       { memoryTrackerId: 1 },

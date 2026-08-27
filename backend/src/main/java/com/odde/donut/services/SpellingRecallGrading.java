@@ -59,7 +59,7 @@ final class SpellingRecallGrading {
     Answer answer = new Answer();
     answer.setSpellingAnswer(answerSpellingDTO.getSpellingAnswer());
     answer.setCorrect(memoryTracker.getNote().matchAnswer(answerSpellingDTO.getSpellingAnswer()));
-    answer.setThinkingTimeMs(answerSpellingDTO.getThinkingTimeMs());
+    applyAnswerTimingMetrics(answer, answerSpellingDTO);
     recallPrompt.setAnswer(answer);
     memoryTrackerService.markAsRecalled(
         currentUTCTimestamp,
@@ -89,7 +89,7 @@ final class SpellingRecallGrading {
     Answer answer = new Answer();
     answer.setSpellingAnswer(spellingAnswer);
     answer.setCorrect(correct);
-    answer.setThinkingTimeMs(answerSpellingDTO.getThinkingTimeMs());
+    applyAnswerTimingMetrics(answer, answerSpellingDTO);
     recallPrompt.setAnswer(answer);
     recallPrompt = entityPersister.save(recallPrompt);
 
@@ -129,6 +129,15 @@ final class SpellingRecallGrading {
         persistedAnswer,
         null);
     return new MemoryTrackerService.SpellingAnswerResult(recallPrompt, matches);
+  }
+
+  private void applyAnswerTimingMetrics(Answer answer, AnswerSpellingDTO answerSpellingDTO) {
+    answer.setThinkingTimeMs(answerSpellingDTO.getThinkingTimeMs());
+    answer.setAwayMs(answerSpellingDTO.getAwayMs());
+    answer.setAwayCount(answerSpellingDTO.getAwayCount());
+    answer.setDetourMs(answerSpellingDTO.getDetourMs());
+    answer.setDetourCount(answerSpellingDTO.getDetourCount());
+    answer.setIdleMs(answerSpellingDTO.getIdleMs());
   }
 
   private boolean isNonDistinguishingOverlap(Note reviewedNote, String spellingAnswer, User user) {

@@ -314,6 +314,11 @@ export type RecalledNote = {
 export type AnswerSpellingDto = {
     spellingAnswer?: string;
     thinkingTimeMs?: number;
+    awayMs?: number;
+    awayCount?: number;
+    detourMs?: number;
+    detourCount?: number;
+    idleMs?: number;
 };
 
 export type SpellingVerificationResult = {
