@@ -21,10 +21,10 @@ Opening Recall, or returning to it in the **same half-day**, keeps the already-s
 ## Key design decisions
 
 - **Same window ⇒ keep `toRepeat` and `currentIndex`.** `onActivated` may still refresh session strips (`dueCommissioned`); it must not call `loadCurrentDueRecalls()` unless the half-day actually changed.
-- **Window identity is the half-day boundary**, not leftover sub-seconds from `now`. `alignByHalfADay` today zeros minutes and seconds but not nanos, so menu `getMenuData` and Recall’s `recalling` return different ISO strings in the same half-day. Frontend comparison must treat those as the same window even if the backend is unchanged.
+- **Window identity is the half-day boundary**, not leftover sub-seconds from `now`. Backend `alignByHalfADay` / `startOfHalfADay` truncate to the hour (slice 3). Frontend KeepAlive still treats ISO strings as the same window when they agree at second precision (slice 1), including mocked millis-different pairs and `Z` vs `+00:00`.
 - **Shuffle is session-start randomization**, not a KeepAlive side effect. `loadMore` may still shuffle when it *replaces* the queue. Tests keep skipping shuffle (`getEnvironment() !== "testing"`).
 - **Do not shuffle on every activation** to “get randomization.” That is the bug. First visit after slices 1–4 uses the menu-loaded (DB) order unless slice 5 is done.
-- **Prefetch single-flight is the spinner.** `fetchRecallPrompts` drops a second call while a loop is in flight; a mid-loop `toRepeat` replace leaves the new index-0 unfetched and `ContentLoader` up with `data-app-busy`.
+- **Prefetch coalescing.** `fetchRecallPrompts` queues another pass if a loop is already in flight so a mid-prefetch `toRepeat` replace still fetches the new index-0 (slice 4).
 
 ## Discoveries
 
@@ -47,7 +47,7 @@ Status legend: `[ ]` planned · `[~]` in progress · `[x]` done
 
 **Shipped:** `sameHalfDayWindow` in `useRecallPageLoading` (ISO parse, truncate to seconds) skips `loadCurrentDueRecalls()` when KeepAlive fetches the same half-day. Tests: first activation + reactivation with `…00:00.123+00:00` vs `…00:00.456Z`; rollover still remounts.
 
-**Learning:** Backend `alignByHalfADay` already has `.withNano(0)` on main (`b5662122c1`); that commit also dropped residue tests. Slice 3 still needs those tests. Slice 2 is the E2E net.
+**Learning:** Frontend second-precision compare is the KeepAlive defense for mocked/serialized format differences. Slice 3 made production menu vs Recall strings equal as well.
 
 ### 2. Returning from a note in the same half-day keeps the unanswered prompt — Behavior `[x]`
 
