@@ -65,6 +65,7 @@ bash "$SCRIPT_DIR/update-mig-startup-script.sh"
 
 bash "$SCRIPT_DIR/check-mig-rollout.sh"
 
+export GITHUB_SHA
 bash "$SCRIPT_DIR/app-instance-healthcheck.sh"
 
 jq -n \

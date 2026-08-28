@@ -6,15 +6,29 @@ set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 HEALTHCHECK_SCRIPT="$REPO_ROOT/infra/gcp/scripts/app-instance-healthcheck.sh"
+TEST_GIT_SHA=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+STALE_GIT_SHA=bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
 
 fail() {
 	echo "FAIL: $*" >&2
 	exit 1
 }
 
+healthcheck_body() {
+	printf 'OK. Active Profile: prod. Commit: %s' "$1"
+}
+
 write_fake_curl() {
-	local fake_bin=$1 response=$2
-	mkdir -p "$fake_bin"
+	local fake_bin=$1
+	shift
+	mkdir -p "$fake_bin/bodies"
+	local i=1
+	for body in "$@"; do
+		printf '%s' "$body" >"$fake_bin/bodies/$i"
+		i=$((i + 1))
+	done
+	echo 0 >"$fake_bin/attempt"
+	local last=$((i - 1))
 	{
 		printf '#!%s\n' "$(command -v bash)"
 		cat <<EOS
@@ -42,10 +56,18 @@ while [[ \$# -gt 0 ]]; do
 	esac
 done
 echo "curl \$url" >>"\${CURL_LOG:?}"
+attempt_file="$fake_bin/attempt"
+n=\$(cat "\$attempt_file")
+n=\$((n + 1))
+echo "\$n" >"\$attempt_file"
+body_file="$fake_bin/bodies/\$n"
+if [[ ! -f "\$body_file" ]]; then
+	body_file="$fake_bin/bodies/$last"
+fi
 if [[ -n "\$output_file" ]]; then
-	printf '%s' "$response" >"\$output_file"
+	cat "\$body_file" >"\$output_file"
 else
-	printf '%s' "$response"
+	cat "\$body_file"
 fi
 if [[ "\$write_code" == "1" ]]; then
 	printf '%s' "\${CURL_HTTP_CODE:-200}"
@@ -55,20 +77,98 @@ EOS
 	chmod +x "$fake_bin/curl"
 }
 
-test_succeeds_when_response_contains_ok() {
+run_healthcheck() {
+	local fake_bin=$1
+	export HEALTHCHECK_URL="${HEALTHCHECK_URL:-https://example.test/api/healthcheck}"
+	export HEALTHCHECK_RETRY_SLEEP_SECONDS=0
+	PATH="$fake_bin:$PATH" bash "$HEALTHCHECK_SCRIPT"
+}
+
+test_succeeds_when_ok_and_commit_matches() {
 	local work fake_bin
 	work=$(mktemp -d)
 	trap 'rm -rf "$work"' EXIT
 	fake_bin="$work/fakebin"
-	write_fake_curl "$fake_bin" "OK"
+	write_fake_curl "$fake_bin" "$(healthcheck_body "$TEST_GIT_SHA")"
 	export CURL_LOG="$work/curl.log"
 	: >"$CURL_LOG"
 	export CURL_HTTP_CODE=200
-	export HEALTHCHECK_URL="https://example.test/api/healthcheck"
+	export GITHUB_SHA="$TEST_GIT_SHA"
 	export HEALTHCHECK_RETRY_COUNT=1
-	export HEALTHCHECK_RETRY_SLEEP_SECONDS=0
-	PATH="$fake_bin:$PATH" bash "$HEALTHCHECK_SCRIPT"
+	run_healthcheck "$fake_bin"
 	grep -q 'curl https://example.test/api/healthcheck' "$work/curl.log" || fail "expected curl against override URL"
+	trap - EXIT
+	rm -rf "$work"
+}
+
+test_fails_when_ok_but_commit_does_not_match() {
+	local work fake_bin output body
+	work=$(mktemp -d)
+	trap 'rm -rf "$work"' EXIT
+	fake_bin="$work/fakebin"
+	body=$(healthcheck_body "$STALE_GIT_SHA")
+	write_fake_curl "$fake_bin" "$body"
+	export CURL_LOG="$work/curl.log"
+	: >"$CURL_LOG"
+	export CURL_HTTP_CODE=200
+	export GITHUB_SHA="$TEST_GIT_SHA"
+	export HEALTHCHECK_RETRY_COUNT=1
+	output=$(run_healthcheck "$fake_bin" 2>&1) && fail "expected non-zero exit when healthcheck commit does not match GITHUB_SHA"
+	printf '%s\n' "$output" | grep -q "$TEST_GIT_SHA" || fail "failure message missing expected SHA; got: $output"
+	printf '%s\n' "$output" | grep -qF "$body" || fail "failure message missing last body; got: $output"
+	trap - EXIT
+	rm -rf "$work"
+}
+
+test_fails_when_ok_but_commit_missing() {
+	local work fake_bin output
+	work=$(mktemp -d)
+	trap 'rm -rf "$work"' EXIT
+	fake_bin="$work/fakebin"
+	write_fake_curl "$fake_bin" "OK. Active Profile: prod"
+	export CURL_LOG="$work/curl.log"
+	: >"$CURL_LOG"
+	export CURL_HTTP_CODE=200
+	export GITHUB_SHA="$TEST_GIT_SHA"
+	export HEALTHCHECK_RETRY_COUNT=1
+	output=$(run_healthcheck "$fake_bin" 2>&1) && fail "expected non-zero exit when healthcheck body has no Commit:"
+	printf '%s\n' "$output" | grep -q "$TEST_GIT_SHA" || fail "failure message missing expected SHA; got: $output"
+	printf '%s\n' "$output" | grep -q 'OK. Active Profile: prod' || fail "failure message missing last body; got: $output"
+	trap - EXIT
+	rm -rf "$work"
+}
+
+test_retries_then_succeeds_when_stale_commit_then_match() {
+	local work fake_bin curl_count
+	work=$(mktemp -d)
+	trap 'rm -rf "$work"' EXIT
+	fake_bin="$work/fakebin"
+	write_fake_curl "$fake_bin" "$(healthcheck_body "$STALE_GIT_SHA")" "$(healthcheck_body "$TEST_GIT_SHA")"
+	export CURL_LOG="$work/curl.log"
+	: >"$CURL_LOG"
+	export CURL_HTTP_CODE=200
+	export GITHUB_SHA="$TEST_GIT_SHA"
+	export HEALTHCHECK_RETRY_COUNT=2
+	run_healthcheck "$fake_bin"
+	curl_count=$(grep -c '^curl ' "$work/curl.log")
+	[[ "$curl_count" == "2" ]] || fail "expected 2 curls (retry on stale commit); got $curl_count"
+	trap - EXIT
+	rm -rf "$work"
+}
+
+test_fails_when_github_sha_unset() {
+	local work fake_bin
+	work=$(mktemp -d)
+	trap 'rm -rf "$work"' EXIT
+	fake_bin="$work/fakebin"
+	write_fake_curl "$fake_bin" "$(healthcheck_body "$TEST_GIT_SHA")"
+	export CURL_LOG="$work/curl.log"
+	: >"$CURL_LOG"
+	unset GITHUB_SHA
+	export HEALTHCHECK_RETRY_COUNT=1
+	if run_healthcheck "$fake_bin" 2>/dev/null; then
+		fail "expected non-zero exit when GITHUB_SHA is unset"
+	fi
 	trap - EXIT
 	rm -rf "$work"
 }
@@ -82,10 +182,10 @@ test_fails_when_response_never_ok() {
 	export CURL_LOG="$work/curl.log"
 	: >"$CURL_LOG"
 	export CURL_HTTP_CODE=503
+	export GITHUB_SHA="$TEST_GIT_SHA"
 	export HEALTHCHECK_URL="https://bogus.example.test/api/healthcheck"
 	export HEALTHCHECK_RETRY_COUNT=1
-	export HEALTHCHECK_RETRY_SLEEP_SECONDS=0
-	output=$(PATH="$fake_bin:$PATH" bash "$HEALTHCHECK_SCRIPT" 2>&1) && fail "expected non-zero exit when healthcheck never returns OK"
+	output=$(run_healthcheck "$fake_bin" 2>&1) && fail "expected non-zero exit when healthcheck never returns OK"
 	printf '%s\n' "$output" | grep -q 'last status=503' || fail "failure message missing last status; got: $output"
 	printf '%s\n' "$output" | grep -q 'body=503 no healthy upstream' || fail "failure message missing last body; got: $output"
 	trap - EXIT
@@ -94,7 +194,11 @@ test_fails_when_response_never_ok() {
 
 main() {
 	[[ -x "$HEALTHCHECK_SCRIPT" ]] || fail "healthcheck script not found or not executable: $HEALTHCHECK_SCRIPT"
-	test_succeeds_when_response_contains_ok
+	test_succeeds_when_ok_and_commit_matches
+	test_fails_when_ok_but_commit_does_not_match
+	test_fails_when_ok_but_commit_missing
+	test_retries_then_succeeds_when_stale_commit_then_match
+	test_fails_when_github_sha_unset
 	test_fails_when_response_never_ok
 	echo "ok app-instance-healthcheck.sh tests"
 }

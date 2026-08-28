@@ -100,6 +100,7 @@ test_deploys_when_no_record() {
 	grep -q update-mig-startup-script.sh "$work/rolling.log" || fail "MIG template update not invoked"
 	assert_rollout_invoked "$work/rollout.log"
 	assert_healthcheck_invoked "$work/healthcheck.log"
+	grep -q "GITHUB_SHA=$TEST_GIT_SHA" "$work/healthcheck.log" || fail "GITHUB_SHA not passed through to healthcheck"
 	grep -q 'cp .*backend_app_jar' "$GSUTIL_LOG" || fail "jar upload not logged"
 	grep -q 'cp - gs://' "$GSUTIL_LOG" || fail "record upload (stdin) not logged"
 	trap - EXIT

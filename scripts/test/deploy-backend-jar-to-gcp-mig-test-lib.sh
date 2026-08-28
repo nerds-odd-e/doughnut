@@ -143,6 +143,7 @@ case "$*" in
 	;;
 *app-instance-healthcheck.sh*)
 	echo "app-instance-healthcheck $*" >>"${HEALTHCHECK_LOG:?}"
+	echo "GITHUB_SHA=${GITHUB_SHA:-}" >>"${HEALTHCHECK_LOG:?}"
 	echo "app-instance-healthcheck" >>"${STEPS_LOG:?}"
 	if [[ "${HEALTHCHECK_SHOULD_FAIL:-}" == "1" ]]; then
 		exit 1
