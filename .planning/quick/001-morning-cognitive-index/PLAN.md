@@ -124,10 +124,14 @@ the roadmap has no active milestone. Promote to `.planning/phases/` via
   `System.currentTimeMillis()` while stats windows and recall logs use
   `testabilitySettings.getCurrentUTCTimestamp()` — time-travelled answers fall
   outside the query; `recall_stats.feature` is `@wip`. (2)
-  `useRecallPageLoading` onActivated compares `new Date()` to
-  `currentRecallWindowEndAt`, so a simulated day-2 window is always "stale"
-  vs 2026; KeepAlive reactivation refetches and remounts Quiz, discarding the
-  detour accumulator; the detour scenario in `recall_timing.feature` is `@wip`.
+  `useRecallPageLoading` onActivated compared `new Date()` to
+  `currentRecallWindowEndAt`, so a simulated day-2 window was always "stale"
+  vs 2026; KeepAlive reactivation refetched and remounted Quiz, discarding the
+  detour accumulator. **Slice 14.6 replaced that with string identity**; the
+  replacement is itself unstable (`alignByHalfADay` leftover nanos), so every
+  activation remounts in production. Repair is
+  [004-recall-same-window-queue](../004-recall-same-window-queue/PLAN.md), not
+  more 001 slices.
 - **Redundant tests.** `useThinkingTimeTracker.keepAlive.spec.ts` drives
   `pause()`/`resume()` on KeepAlive, which production no longer uses (detour
   pair). `QuestionDisplay.thinking.spec.ts`'s "pauses timer when deactivated"
