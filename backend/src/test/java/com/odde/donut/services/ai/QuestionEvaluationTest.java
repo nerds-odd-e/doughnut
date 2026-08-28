@@ -3,6 +3,7 @@ package com.odde.donut.services.ai;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.not;
 
 import com.odde.donut.controllers.dto.QuestionContestResult;
 import com.odde.donut.entities.Mcq;
@@ -37,10 +38,9 @@ class QuestionEvaluationTest {
     assertThat(result.advice, containsString("what a horrible question!"));
     assertThat(result.advice, containsString("Unclear answer detected"));
     assertThat(
-        result.advice,
-        containsString(
-            "original question assume one correct choice index (0-based) of 0 (\"Paris\")"));
+        result.advice, containsString("original question assume one correct choice of \"Paris\""));
     assertThat(result.advice, containsString("none are correct to the question"));
+    assertThat(result.advice, not(containsString("0-based")));
   }
 
   @Test
@@ -48,9 +48,7 @@ class QuestionEvaluationTest {
     questionEvaluation.feasibleQuestion = true;
     questionEvaluation.correctChoices = new int[] {1, 2};
     QuestionContestResult result = questionEvaluation.getQuestionContestResult(mcq);
-    assertThat(
-        result.advice,
-        containsString("1 (\"London\"), 2 (\"Berlin\") are correct to the question"));
+    assertThat(result.advice, containsString("\"London\", \"Berlin\" are correct to the question"));
   }
 
   @Test
@@ -66,7 +64,19 @@ class QuestionEvaluationTest {
     questionEvaluation.feasibleQuestion = true;
     questionEvaluation.correctChoices = new int[] {3};
     QuestionContestResult result = questionEvaluation.getQuestionContestResult(mcq);
-    assertThat(result.advice, containsString("3 (invalid index)"));
+    assertThat(result.advice, containsString("none are correct to the question"));
+  }
+
+  @Test
+  void shouldQuoteUnknownWhenStoredCorrectIndexIsInvalid() {
+    questionEvaluation.feasibleQuestion = true;
+    Mcq mcqWithUnknownCorrectChoice =
+        makeMe.anMcq().forNote(null).correctAnswerIndex(3).inMemoryPlease();
+    QuestionContestResult result =
+        questionEvaluation.getQuestionContestResult(mcqWithUnknownCorrectChoice);
+    assertThat(
+        result.advice,
+        containsString("original question assume one correct choice of \"unknown\""));
   }
 
   @Test

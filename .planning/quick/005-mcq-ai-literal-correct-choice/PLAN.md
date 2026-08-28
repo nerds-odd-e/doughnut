@@ -1,6 +1,6 @@
 # Describe MCQ correct answers as choice text in AI prompts
 
-**Status:** planned — not started.
+**Status:** in progress — slice 1 done.
 **Type:** ad-hoc plan (`.planning/quick/`)
 **Origin:** Generation already emits `GeneratedMcq` (`correctAnswer` + `distractors`). Contest advice and two related prompts still talk in 0-based indexes.
 
@@ -19,7 +19,7 @@ When a model is told what the current correct choice is (contest advice, regener
 - **Evaluation schema stays indexes.** `QuestionEvaluation.correctChoices` is still `int[]` (“pick from this ordered list”). Do not change that contract, E2E stubs, or comparison to `Mcq.correctAnswerIndex`.
 - **Persistence and answering stay indexes.** `Mcq.correctAnswerIndex`, recall UI, CLI number keys, and `NoteRefinementQuestionContextDTO.correctAnswerIndex` stay. Only the **prompt/advice wording** resolves index → text.
 - **No new E2E.** `question_contest.feature` already covers contest → replacement and does not assert advice copy. Extend existing unit/controller tests that already pin this text.
-- **Advice copy** (slice 1): quote literals only. Example: original `"Paris"`; re-evaluation `"London", "Berlin"`; no `0 ("Paris")` and no `1 ("London")`. Out-of-bounds evaluation indexes contribute no text (same as none). Invalid stored index quotes `"unknown"`.
+- **Advice copy** (slice 1, done): quote literals only. Original `"Paris"`; re-evaluation `"London", "Berlin"`; OOB evaluation indexes contribute no text (`none`); invalid stored index quotes `"unknown"`.
 
 ## Out of scope
 
@@ -36,14 +36,11 @@ None required. If evaluation should also return choice texts instead of indexes,
 
 Status legend: `[ ]` planned · `[~]` in progress · `[x]` done
 
-### 1. Contest disagreement advice quotes choice text — Behavior `[ ]`
+### 1. Contest disagreement advice quotes choice text — Behavior `[x]`
 
-**Pre:** An MCQ has one stored correct choice (e.g. `"Paris"`); evaluation does not agree that only that choice is correct.
-**Trigger:** `QuestionEvaluation.getQuestionContestResult` builds contest advice (learner contest or auto-regenerate).
-**Post:** Advice names original and re-evaluated answers as quoted choice text. It does not mention a 0-based index.
+Advice from `QuestionEvaluation.getQuestionContestResult` quotes original and re-evaluated choice text (`quotedOriginalChoice` / `quotedCorrectChoices`). `correctChoices` stays `int[]`. Covered in `QuestionEvaluationTest`.
 
-- Extend `QuestionEvaluationTest` (this class is the stable contract for the advice string). Update the no-agreement, multiple-correct, and out-of-bounds cases; do not add a new test class.
-- Production: `QuestionEvaluation.java` advice builder only.
+**Learning:** quoting is advice-only; do not extract a shared “index → text” helper for slice 2 (`GeneratedMcq` is a different shape).
 
 ### 2. Regeneration describes the previous question as generated shape — Behavior `[ ]`
 

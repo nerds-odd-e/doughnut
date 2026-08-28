@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.odde.donut.controllers.dto.QuestionContestResult;
 import com.odde.donut.entities.Mcq;
 import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @JsonClassDescription("answer and evaluate the question to check its quality")
@@ -47,35 +48,34 @@ public class QuestionEvaluation {
         result.advice = "The question has no choices defined.";
         return result;
       }
-      String correctChoicesStr =
-          correctChoices == null
-              ? "none"
-              : Arrays.stream(correctChoices)
-                  .mapToObj(
-                      i -> {
-                        if (i < 0 || i >= choices.size()) {
-                          return i + " (invalid index)";
-                        }
-                        return i + " (\"" + choices.get(i) + "\")";
-                      })
-                  .collect(Collectors.joining(", "));
-
-      String originalChoice =
-          (correctChoiceIndex >= 0 && correctChoiceIndex < choices.size())
-              ? choices.get(correctChoiceIndex)
-              : "invalid index";
-
       result.advice =
-          "Unclear answer detected. The original question assume one correct choice index (0-based) of "
-              + correctChoiceIndex
-              + " (\""
-              + originalChoice
-              + "\"). however, the re-evaluation of the question shows that "
-              + correctChoicesStr
+          "Unclear answer detected. The original question assume one correct choice of "
+              + quotedOriginalChoice(correctChoiceIndex, choices)
+              + ". however, the re-evaluation of the question shows that "
+              + quotedCorrectChoices(correctChoices, choices)
               + " are correct to the question.\n"
               + "Please make sure the correct answer is correct and unique.\n\n";
     }
     result.advice += improvementAdvices == null ? "" : improvementAdvices;
     return result;
+  }
+
+  private static String quotedOriginalChoice(int correctChoiceIndex, List<String> choices) {
+    if (correctChoiceIndex >= 0 && correctChoiceIndex < choices.size()) {
+      return "\"" + choices.get(correctChoiceIndex) + "\"";
+    }
+    return "\"unknown\"";
+  }
+
+  private static String quotedCorrectChoices(int[] correctChoices, List<String> choices) {
+    if (correctChoices == null) {
+      return "none";
+    }
+    String quoted =
+        Arrays.stream(correctChoices)
+            .filter(i -> i >= 0 && i < choices.size())
+            .mapToObj(i -> "\"" + choices.get(i) + "\"")
+            .collect(Collectors.joining(", "));
+    return quoted.isEmpty() ? "none" : quoted;
   }
 }
