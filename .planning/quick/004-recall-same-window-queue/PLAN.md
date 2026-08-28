@@ -1,6 +1,6 @@
 # Keep the recall queue across the same half-day
 
-**Status:** in progress — slices 1–3 done.
+**Status:** in progress — slices 1–4 done. **Stopped at slice 5 Jidoka** (shuffle before first paint?).
 **Type:** ad-hoc plan (`.planning/quick/`)
 **Origin:** slice 14.6 of [001-morning-cognitive-index](../001-morning-cognitive-index/PLAN.md) (`48763b341d`). That slice meant “remount only when the due window rolls over.” The check uses exact `currentRecallWindowEndAt` string equality, which almost never holds.
 
@@ -61,15 +61,11 @@ Status legend: `[ ]` planned · `[~]` in progress · `[x]` done
 
 **Learning:** Main had dropped `.withNano(0)` in `b5662122c1`; this restores stable identity. Slice 1’s frontend second-precision compare remains defense for mocked/serialized format differences.
 
-### 4. Replacing the due list mid-prefetch still shows the current prompt — Behavior `[ ]`
+### 4. Replacing the due list mid-prefetch still shows the current prompt — Behavior `[x]`
 
-**Pre:** Quiz is prefetching (`eagerFetchCount` 5); the first `getRecallPrompt` has not returned.
-**Trigger:** `memoryTrackers` is replaced so index 0 is a different tracker.
-**Post:** That new current prompt is fetched and shown; `ContentLoader` does not stick after the in-flight calls finish.
+**Shipped:** `fetchRecallPrompts` queues another pass when a prefetch is already in flight. Quiz test gates tracker 1, replaces the list with ids 6–10, asserts `getRecallPrompt` for 6 and the contestable prompt is visible.
 
-- Extend `frontend/tests/recall/Quiz.spec.ts` (gated first fetch, then `setProps` to a new id list). Assert `getRecallPrompt` for the new current id and the contestable prompt visible.
-- Production: do not drop a prefetch because one loop is in flight — queue another pass so the current index is fetched after the list change.
-- Still needed after slices 1–3: real remounts (rollover, nonce refresh, load more) can replace the list while Quiz is mounted.
+**Learning:** KeepAlive same-window no longer remounts (slices 1–3), but rollover / nonce / load-more still replace `toRepeat` while Quiz is mounted; the queue is still needed.
 
 ### 5. A new recall session is shuffled before the first prompt — Behavior `[ ]`
 
