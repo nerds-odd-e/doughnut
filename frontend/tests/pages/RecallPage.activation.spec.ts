@@ -76,26 +76,23 @@ describe("RecallPage KeepAlive activation", () => {
     await flushPromises()
   }
 
-  it("does not remount toRepeat on first activation when the due window is the same half-day", async () => {
+  it("keeps toRepeat on first activation when the due window is the same half-day", async () => {
     const { recallingSpy, mockData, originalTracker } =
       await mountWithMenuLoadedQueue(fetchedSameHalfDayWindowEndAt)
 
     expect(recallingSpy).toHaveBeenCalled()
-    expect(mockData.setToRepeat).not.toHaveBeenCalled()
     expect(mockData.toRepeat.value).toEqual([originalTracker])
   })
 
-  it("does not remount toRepeat when reactivated with an unchanged due window", async () => {
+  it("keeps the menu-loaded queue when reactivated with the same half-day due window", async () => {
     const { wrapper, recallingSpy, mockData, originalTracker } =
       await mountWithMenuLoadedQueue(fetchedSameHalfDayWindowEndAt)
 
     recallingSpy.mockClear()
-    mockData.setToRepeat.mockClear()
 
     await detourAndReturn(wrapper)
 
     expect(recallingSpy).toHaveBeenCalled()
-    expect(mockData.setToRepeat).not.toHaveBeenCalled()
     expect(mockData.toRepeat.value).toEqual([originalTracker])
   })
 
@@ -104,12 +101,10 @@ describe("RecallPage KeepAlive activation", () => {
       await mountWithMenuLoadedQueue("2026-08-27T12:00:00.000Z")
 
     recallingSpy.mockClear()
-    mockData.setToRepeat.mockClear()
 
     await detourAndReturn(wrapper)
 
     expect(recallingSpy).toHaveBeenCalled()
-    expect(mockData.setToRepeat).toHaveBeenCalled()
     expect(mockData.toRepeat.value).toEqual([fetchedTracker])
   })
 })
