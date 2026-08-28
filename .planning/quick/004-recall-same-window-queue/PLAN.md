@@ -1,6 +1,6 @@
 # Keep the recall queue across the same half-day
 
-**Status:** in progress — slice 1 done.
+**Status:** in progress — slices 1–2 done.
 **Type:** ad-hoc plan (`.planning/quick/`)
 **Origin:** slice 14.6 of [001-morning-cognitive-index](../001-morning-cognitive-index/PLAN.md) (`48763b341d`). That slice meant “remount only when the due window rolls over.” The check uses exact `currentRecallWindowEndAt` string equality, which almost never holds.
 
@@ -49,15 +49,11 @@ Status legend: `[ ]` planned · `[~]` in progress · `[x]` done
 
 **Learning:** Backend `alignByHalfADay` already has `.withNano(0)` on main (`b5662122c1`); that commit also dropped residue tests. Slice 3 still needs those tests. Slice 2 is the E2E net.
 
-### 2. Returning from a note in the same half-day keeps the unanswered prompt — Behavior `[ ]`
+### 2. Returning from a note in the same half-day keeps the unanswered prompt — Behavior `[x]`
 
-**Pre:** At least two due recall prompts this half-day; the learner is on the first unanswered one.
-**Trigger:** Open another note (KeepAlive deactivate), then return to Recall.
-**Post:** The same question stem is still showing (not a shuffled sibling).
+**Shipped:** New scenario in `browse_answer_and_notes_while_recalling.feature` — two assimilated notes, two generated stems; same stem after visiting `medical` and `I return to recalling` (Recall nav + `waitUntilAppIsNotBusy`). No extra production code (slice 1 was enough).
 
-- Extend `e2e_test/features/recall/browse_answer_and_notes_while_recalling.feature` with a **new** scenario (leave the existing one-item spelling browse as-is). Two assimilated notes, two generated stems; `Then I should be asked "…"` before the detour and again after return.
-- Tag and wait with the same conventions as the sibling scenarios (`waitUntilAppIsNotBusy` on return). `@wip` until green.
-- Targeted `cypress run --spec` that feature only.
+**Learning:** Resume is not on the unanswered first card; the return path that hits KeepAlive is Recall in the nav. Cypress `localhost` skips shuffle (`getEnvironment() === "testing"`); the two-stem assertion is still the user-path net. Mocked OpenAI E2E needs `OPENAI_API_TOKEN` set on `backend:sut:ci` even with Mountebank.
 
 ### 3. Due-window timestamp is a stable half-day identity — Behavior `[ ]`
 

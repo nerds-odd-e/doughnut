@@ -223,6 +223,12 @@ When('I resume recalling', () => {
   start.recall().resumeRecall()
 })
 
+When('I return to recalling', () => {
+  start.recall().returnToRecallFromDetour()
+  // Flush Vue remount timeouts under cy.clock() so the restored question is visible.
+  cy.tick(1)
+})
+
 Then('I should be back to the current question', () => {
   start.recall().assumeRecallPage().expectCurrentQuestion()
 })
