@@ -83,25 +83,10 @@ policy. Do not restore the file.
 
 ### 2. Web UI product copy (Behavior)
 
-Status: planned
+Status: done
 
-- **Pre-condition:** homepage fallback welcome is “To Doughnut”, tagline says
-  “Doughnut will eventually…”, sidebar brand is “Doughnut by”, bazaar says
-  “doughnut users”, browser `<title>` starts with “Doughnut”.
-- **Trigger:** open home, bazaar, or any page with the sidebar; read the tab title.
-- **Post-condition:** those strings use **Donut** (bazaar: “donut users”).
-  Install URLs on the homepage stay `https://doughnut.odd-e.com`.
-
-Files: `HomePage.vue`, `VerticalMenu.vue`, `BazaarPage.vue`,
-`frontend/index.html`.
-
-Tests: extend `frontend/tests/pages/HomePage.welcome.spec.ts` with a focused
-case for fallback welcome + tagline (do not re-assert the capture/assimilate
-copy). Extend `BazaarPage.spec.ts` with a sibling that only asserts the
-blurb. Add a small VerticalMenu assertion for “Donut by”.
-
-Verify: `pnpm frontend:test tests/pages/HomePage.welcome.spec.ts` plus the
-bazaar/menu spec(s) you touch.
+Homepage fallback + tagline, sidebar “Donut by”, bazaar “donut users”, tab
+title. Install URLs stay `https://doughnut.odd-e.com`.
 
 ### 3. README product copy and CLI command (Behavior)
 

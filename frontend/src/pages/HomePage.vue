@@ -2,7 +2,7 @@
   <GlobalBar />
   <div class="home-container">
     <HomeWelcomeSection
-      :user-name="user?.name || 'To Doughnut'"
+      :user-name="user?.name || 'To Donut'"
       :nav-items="upperNavItems"
     />
 
@@ -29,7 +29,7 @@ donut</code></pre>
   </div>
   <div class="ending">
     <p>Our goal of note taking is not to remember, but to forget.</p>
-    <p>Doughnut will eventually become our digital twin, our shadow.</p>
+    <p>Donut will eventually become our digital twin, our shadow.</p>
     <p>It will think independently, for us, as us.</p>
   </div>
 </template>

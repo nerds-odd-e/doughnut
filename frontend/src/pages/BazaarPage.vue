@@ -5,7 +5,7 @@
       title: 'Welcome To The Bazaar',
     }"
   >
-    <p>These are shared notes from doughnut users.</p>
+    <p>These are shared notes from donut users.</p>
     <div v-if="bazaarNotebooks">
       <NotebookBazaarViewCards
         :bazaar-notebooks="bazaarNotebooks"

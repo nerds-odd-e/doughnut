@@ -29,7 +29,7 @@
           to="/"
           class="brand-text [writing-mode:vertical-lr] text-center py-4 font-bold text-neutral-400 whitespace-nowrap no-underline"
         >
-          Doughnut by
+          Donut by
         </router-link>
         <a href="https://odd-e.com" target="_blank" class="mb-4">
           <img

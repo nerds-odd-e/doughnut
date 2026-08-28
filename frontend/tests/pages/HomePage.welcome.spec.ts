@@ -15,4 +15,12 @@ describe("HomePage welcome copy", () => {
     expect(text).toContain("Your notebooks grow as you capture")
     expect(text).toContain("as you recall")
   })
+
+  it("uses Donut in the fallback welcome and tagline", () => {
+    const wrapper = helper.component(HomePage).withRouter().mount()
+
+    const text = wrapper.text()
+    expect(text).toContain("To Donut")
+    expect(text).toContain("Donut will eventually")
+  })
 })
