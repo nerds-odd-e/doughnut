@@ -25,13 +25,16 @@ import java.util.Map;
  *
  * <p>Callers pass only rows that already qualify (answered today, counted as a review, not an
  * implausibly-fast mistap — see {@link RecallPaceAggregator}) for the numerator/denominator sum,
- * plus the all-time reviews (same exclusions applied) the calibration fit is refit from on every
- * call — there is no background job; refitting live from the already-fetched projection rows on
- * every stats request is this codebase's existing pattern for trailing-window statistics (see
- * {@code RecallPaceAggregator#consistencyZScore}'s 60-day baseline). This class applies the one
- * exclusion rule specific to the accuracy formula and the calibration fit alike: a row with no
- * persisted retrievability (e.g. a New tracker's first grade, per slice 16) is excluded — null
- * propagates, it is never treated as zero.
+ * plus the all-time reviews (same exclusions applied) the calibration fit is refit from. {@link
+ * #compute} fits then applies. Callers scoring more than one subset of the same day should {@link
+ * #fit} once and {@link #apply} each subset — the fit depends only on all-time qualifying rows,
+ * {@code today}, and {@code zoneId}, never on which of today's rows are being scored. There is no
+ * background job; refitting live from the already-fetched projection rows on every stats request is
+ * this codebase's existing pattern for trailing-window statistics (see {@code
+ * RecallPaceAggregator#consistencyZScore}'s 60-day baseline). This class applies the one exclusion
+ * rule specific to the accuracy formula and the calibration fit alike: a row with no persisted
+ * retrievability (e.g. a New tracker's first grade, per slice 16) is excluded — null propagates, it
+ * is never treated as zero.
  */
 final class RecallAccuracyAggregator {
   /** Trailing window the calibration fit is refit from on every request. */
@@ -44,9 +47,20 @@ final class RecallAccuracyAggregator {
       List<RecallAnswerRow> allTimeQualifyingRows,
       LocalDate today,
       ZoneId zoneId) {
-    Map<QuestionType, ThreePlFit> fitsByQuestionType =
-        fitPerQuestionType(trailingCalibrationRows(allTimeQualifyingRows, today, zoneId));
+    return apply(todaysQualifyingRows, fit(allTimeQualifyingRows, today, zoneId));
+  }
 
+  /**
+   * Per-question-type 3PL fits from the trailing calibration window strictly before {@code today}.
+   */
+  static Map<QuestionType, ThreePlFit> fit(
+      List<RecallAnswerRow> allTimeQualifyingRows, LocalDate today, ZoneId zoneId) {
+    return fitPerQuestionType(trailingCalibrationRows(allTimeQualifyingRows, today, zoneId));
+  }
+
+  /** Apply already-fitted 3PL curves to {@code todaysQualifyingRows}. Does not refit. */
+  static AccuracyStats apply(
+      List<RecallAnswerRow> todaysQualifyingRows, Map<QuestionType, ThreePlFit> fitsByQuestionType) {
     double sumResidual = 0;
     double sumVariance = 0;
     int sampleSize = 0;
@@ -55,8 +69,8 @@ final class RecallAccuracyAggregator {
       if (rawRetrievability == null) {
         continue;
       }
-      ThreePlFit fit = fitsByQuestionType.getOrDefault(r.questionType(), ThreePlFit.IDENTITY);
-      double p = fit.recalibrate(rawRetrievability);
+      ThreePlFit typeFit = fitsByQuestionType.getOrDefault(r.questionType(), ThreePlFit.IDENTITY);
+      double p = typeFit.recalibrate(rawRetrievability);
       double y = r.correct() ? 1 : 0;
       sumResidual += y - p;
       sumVariance += p * (1 - p);

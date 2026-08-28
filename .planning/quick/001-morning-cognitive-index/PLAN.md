@@ -1,15 +1,15 @@
 # Morning cognitive index from recall history
 
 **Status:** in progress — slices 1–14, 14.1–14.8, 15, 16, 17, 18, 19, 20,
-21.1–21.6 done. Repair pass **21.7 remaining (21.8 optional)** — **next:
-21.7**. Once that is done, the reliability endpoint
-(`GET /api/user/recall-split-half-reliability`) still needs **the developer
-to query it and decide against the ~0.6 gate before slice 22 starts** (see
-Jidoka checkpoints — this is a required stop, not an autonomous continuation
-point). Slice 17.1 (pace-expectation R/D correction, split from 17) is
-separately **blocked** pending a developer-specified formula, independent of
-21.x. `recall_stats.feature`'s pace scenario stays `@wip` — a second,
-unrelated E2E race condition was found (see Discoveries).
+21.1–21.7 done. Repair pass **21.8 optional remaining**. The reliability
+endpoint (`GET /api/user/recall-split-half-reliability`) still needs **the
+developer to query it and decide against the ~0.6 gate before slice 22
+starts** (see Jidoka checkpoints — this is a required stop, not an
+autonomous continuation point). Slice 17.1 (pace-expectation R/D correction,
+split from 17) is separately **blocked** pending a developer-specified
+formula, independent of 21.x. `recall_stats.feature`'s pace scenario stays
+`@wip` — a second, unrelated E2E race condition was found (see
+Discoveries).
 **Type:** ad-hoc plan (`.planning/quick/`)
 **Research memo:** https://claude.ai/code/artifact/9e13f954-fc5e-48e5-868f-f75d03f811c1
 
@@ -1029,32 +1029,17 @@ Aggregation tests unchanged (they remain the sparse/identity-fallback cases).
 
 - **Enables 21.7 only.**
 
-#### 21.7 The reliability diagnostic scores both halves of a day without duplicating expensive work — Behavior `[ ]`
+#### 21.7 The reliability diagnostic scores both halves of a day without duplicating expensive work — Structure `[x]`
 
-`RecallSplitHalfReliability.compute()` calls
-`RecallMorningHalfIndex.compute(..., Half.ODD)` and `...Half.EVEN)` as two
-fully independent calls per candidate day, across up to a 90-day window.
-Each call independently redoes the entire day-level setup from scratch — a
-whole-day `RecallPaceAggregator.compute` pass for `implausiblyFastRows`,
-rebuilding `dayQualifyingRowsInOrder`, and (most expensively)
-`RecallAccuracyAggregator`'s per-question-type 3PL guessing-floor fit (up to
-a 26-point grid search × up to 25 Newton-Raphson iterations each, over the
-trailing 180-day window) — none of which depends on which half is being
-scored (`implausiblyFastRows` is computed before any half-restriction; the
-calibration fit depends only on `allTimeQualifyingRows`/`today`/`zoneId`,
-never on which rows are "today's qualifying rows"). The single most
-expensive computation in the whole pipeline currently runs twice per day for
-no reason, on top of the up-to-90-day loop. `RecallStatsService`'s own
-documentation already says this exact class of problem — an endpoint whose
-cost silently scales with a user's full history — previously caused a
-production timeout; here it's redundant CPU-bound refitting rather than an
-N+1 query, but the risk and the fix's value are the same.
-
-Restructure so both halves of a day are scored from one shared day-level
-setup computed once (e.g. `RecallMorningHalfIndex` gains a method returning
-both halves' index values together), and `RecallSplitHalfReliability`'s loop
-calls it once per day instead of twice. Must not change any observable
-output — same numbers, just not computed twice.
+Done (plan heading said Behavior; implemented as Structure — same numbers).
+`RecallMorningHalfIndex.computeBothHalves` prepares one `DaySetup`
+(whole-day pace exclusions, qualifying-row order, per-question-type 3PL
+`RecallAccuracyAggregator.fit`) and `scoreHalf`s both sides.
+`RecallAccuracyAggregator` split into `fit` / `apply`; full-day `compute`
+still fit-then-apply. `RecallSplitHalfReliability` calls
+`computeBothHalves` once per candidate day. Characterization test:
+`scoringBothHalvesTogetherMatchesScoringEachHalfIndependently`. Per-half
+`compute(..., Half)` kept for existing tests.
 
 #### 21.8 (optional) Share the Newton-Raphson line-search scaffold between the two fitters — Structure `[ ]`
 
