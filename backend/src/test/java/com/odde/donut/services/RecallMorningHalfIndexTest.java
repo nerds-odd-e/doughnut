@@ -63,4 +63,19 @@ class RecallMorningHalfIndexTest {
     // zA_even) = 2.5 * 2*sqrt(2) = 5*sqrt(2).
     assertThat(oddIndex - evenIndex, closeTo(5 * Math.sqrt(2), 0.001));
   }
+
+  @Test
+  void scoringBothHalvesTogetherMatchesScoringEachHalfIndependently() {
+    List<RecallAnswerRow> rows = RecallStatsTestFixtures.warmedUpBaselines();
+    RecallStatsTestFixtures.addScorableMorning(
+        rows, TODAY, 9001, new boolean[] {true, false, true, false});
+
+    RecallMorningHalfIndex.HalfIndexes both =
+        RecallMorningHalfIndex.computeBothHalves(rows, TODAY_DATE, UTC);
+    Double odd = RecallMorningHalfIndex.compute(rows, TODAY_DATE, UTC, Half.ODD);
+    Double even = RecallMorningHalfIndex.compute(rows, TODAY_DATE, UTC, Half.EVEN);
+
+    assertThat(both.odd(), closeTo(odd, 0.0001));
+    assertThat(both.even(), closeTo(even, 0.0001));
+  }
 }

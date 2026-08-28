@@ -2,6 +2,8 @@ package com.odde.donut.services;
 
 import com.odde.donut.controllers.dto.RecallStatsDTO.AccuracyStats;
 import com.odde.donut.controllers.dto.RecallStatsDTO.PaceStats;
+import com.odde.donut.entities.QuestionType;
+import com.odde.donut.services.RecallGuessingFloorFitter.ThreePlFit;
 import com.odde.donut.services.RecallPaceAggregator.PaceResult;
 import com.odde.donut.utils.TimestampOperations;
 import java.time.LocalDate;
@@ -10,26 +12,32 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.IdentityHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
- * Scores one half (odd- or even-indexed attempts, 1-indexed by within-day chronological order) of a
- * single historical day D's recall attempts through the same accuracy/pace/lapse/consistency
- * machinery already used to score a whole day (slices 17-20, 21.1) — producing one composite index
- * value (slice 21.2's formula) for that half. Enables slice 21.4's split-half reliability check.
+ * Scores odd- or even-indexed halves (1-indexed by within-day chronological order) of a single
+ * historical day D's recall attempts through the same accuracy/pace/lapse/consistency machinery
+ * already used to score a whole day (slices 17-20, 21.1) — producing one composite index value
+ * (slice 21.2's formula) per half. Enables slice 21.4's split-half reliability check.
  *
  * <p>Trailing-window calibration/baselines are never recomputed per half: they are derived from
  * history strictly before D (the accuracy calibration's trailing-180-day window excludes today by
  * construction, and the pace/lapse/consistency baseline window already ends {@code
  * BASELINE_WINDOW_END_DAYS_AGO} days before D regardless of which of D's own rows are being scored)
  * — restricting to a half only changes which of D's own rows feed the numerator, never what they
- * are compared against.
+ * are compared against. {@link #computeBothHalves} therefore prepares that shared day-level setup
+ * once (whole-day pace exclusions, qualifying-row order, and the per-question-type 3PL fit) and
+ * applies it to each half.
  */
 final class RecallMorningHalfIndex {
   enum Half {
     ODD,
     EVEN
   }
+
+  /** Index values for both halves of one day. Either side may be {@code null}. */
+  record HalfIndexes(Double odd, Double even) {}
 
   private RecallMorningHalfIndex() {}
 
@@ -40,20 +48,49 @@ final class RecallMorningHalfIndex {
    */
   static Double compute(
       List<RecallAnswerRow> allTimeReviews, LocalDate day, ZoneId zoneId, Half half) {
+    return scoreHalf(prepareDay(allTimeReviews, day, zoneId), half);
+  }
+
+  /**
+   * Scores both halves from one shared day-level setup. Either value may be {@code null} under the
+   * same conditions as {@link #compute(List, LocalDate, ZoneId, Half)}.
+   */
+  static HalfIndexes computeBothHalves(
+      List<RecallAnswerRow> allTimeReviews, LocalDate day, ZoneId zoneId) {
+    DaySetup setup = prepareDay(allTimeReviews, day, zoneId);
+    return new HalfIndexes(scoreHalf(setup, Half.ODD), scoreHalf(setup, Half.EVEN));
+  }
+
+  private record DaySetup(
+      List<RecallAnswerRow> allTimeReviews,
+      LocalDate day,
+      ZoneId zoneId,
+      List<RecallAnswerRow> dayQualifyingRowsInOrder,
+      Map<QuestionType, ThreePlFit> accuracyFits) {}
+
+  private static DaySetup prepareDay(
+      List<RecallAnswerRow> allTimeReviews, LocalDate day, ZoneId zoneId) {
     PaceResult wholeDayPaceResult = RecallPaceAggregator.compute(allTimeReviews, day, zoneId);
     Set<RecallAnswerRow> implausiblyFastRows = wholeDayPaceResult.implausiblyFastRows();
-
     List<RecallAnswerRow> dayQualifyingRowsInOrder =
         dayQualifyingRowsInOrder(allTimeReviews, day, zoneId, implausiblyFastRows);
-    Set<RecallAnswerRow> halfRows = selectHalf(dayQualifyingRowsInOrder, half);
-
     List<RecallAnswerRow> allTimeQualifyingRows =
         allTimeReviews.stream().filter(r -> !implausiblyFastRows.contains(r)).toList();
-    List<RecallAnswerRow> halfQualifyingRows =
-        dayQualifyingRowsInOrder.stream().filter(halfRows::contains).toList();
+    return new DaySetup(
+        allTimeReviews,
+        day,
+        zoneId,
+        dayQualifyingRowsInOrder,
+        RecallAccuracyAggregator.fit(allTimeQualifyingRows, day, zoneId));
+  }
+
+  private static Double scoreHalf(DaySetup setup, Half half) {
+    List<RecallAnswerRow> halfQualifyingRows = selectHalf(setup.dayQualifyingRowsInOrder(), half);
+    Set<RecallAnswerRow> halfRows = Collections.newSetFromMap(new IdentityHashMap<>());
+    halfRows.addAll(halfQualifyingRows);
 
     AccuracyStats accuracy =
-        RecallAccuracyAggregator.compute(halfQualifyingRows, allTimeQualifyingRows, day, zoneId);
+        RecallAccuracyAggregator.apply(halfQualifyingRows, setup.accuracyFits());
     if (accuracy.getStandardizedResidual() == null) {
       return null;
     }
@@ -62,7 +99,8 @@ final class RecallMorningHalfIndex {
     // "worse than usual" convention, per 21.2's deferred note.
     double zA = -accuracy.getStandardizedResidual();
 
-    PaceResult halfPaceResult = RecallPaceAggregator.compute(allTimeReviews, day, zoneId, halfRows);
+    PaceResult halfPaceResult =
+        RecallPaceAggregator.compute(setup.allTimeReviews(), setup.day(), setup.zoneId(), halfRows);
     PaceStats stats = halfPaceResult.stats();
     if (stats.getPctVsUsual() == null || stats.getConsistencyZScore() == null) {
       return null;
@@ -111,13 +149,13 @@ final class RecallMorningHalfIndex {
 
   /**
    * 1-indexed by within-day chronological order: odd positions (1st, 3rd, ...) in one half, even
-   * positions (2nd, 4th, ...) in the other. Identity-based, matching {@code implausiblyFastRows}'
-   * existing precedent (slice 10) of tracking specific row objects rather than relying on {@link
-   * RecallAnswerRow}'s structural equality.
+   * positions (2nd, 4th, ...) in the other. Returns the selected row objects themselves so callers
+   * can identity-match them (matching {@code implausiblyFastRows}' existing precedent of tracking
+   * specific row objects rather than relying on {@link RecallAnswerRow}'s structural equality).
    */
-  private static Set<RecallAnswerRow> selectHalf(
+  private static List<RecallAnswerRow> selectHalf(
       List<RecallAnswerRow> dayQualifyingRowsInOrder, Half half) {
-    Set<RecallAnswerRow> selected = Collections.newSetFromMap(new IdentityHashMap<>());
+    List<RecallAnswerRow> selected = new ArrayList<>();
     for (int i = 0; i < dayQualifyingRowsInOrder.size(); i++) {
       boolean isOddPosition = (i + 1) % 2 == 1;
       if ((half == Half.ODD) == isOddPosition) {

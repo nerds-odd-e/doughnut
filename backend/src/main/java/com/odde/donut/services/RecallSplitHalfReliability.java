@@ -1,6 +1,6 @@
 package com.odde.donut.services;
 
-import com.odde.donut.services.RecallMorningHalfIndex.Half;
+import com.odde.donut.services.RecallMorningHalfIndex.HalfIndexes;
 import com.odde.donut.utils.TimestampOperations;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -12,9 +12,9 @@ import java.util.Map;
 /**
  * Internal diagnostic (slice 21.4) for the morning cognitive index's split-half reliability: across
  * a trailing window of historical mornings, scores each qualifying day's odd- and even-indexed
- * attempts independently ({@link RecallMorningHalfIndex}, slice 21.3) and reports how well the two
- * halves agree. This is the reliability gate the plan's "The index" section requires before slices
- * 22-25 (the user-facing composite) can ship — see the Jidoka checkpoint before slice 22.
+ * attempts ({@link RecallMorningHalfIndex#computeBothHalves}) and reports how well the two halves
+ * agree. This is the reliability gate the plan's "The index" section requires before slices 22-25
+ * (the user-facing composite) can ship — see the Jidoka checkpoint before slice 22.
  *
  * <p>Not wired into {@link com.odde.donut.controllers.dto.RecallStatsDTO} or any user-facing page.
  */
@@ -31,9 +31,9 @@ final class RecallSplitHalfReliability {
    * Mirrors {@code RecallPaceAggregator.consistencyZScore}'s own minimum of >= 2 residuals for a
    * half to produce a non-null consistency z-score: 4 total rows is the fewest that can put >= 2 in
    * each of two non-empty halves. This is a coarse, cheap pre-filter only — the real gate is still
-   * "did {@link RecallMorningHalfIndex#compute} return non-null for both halves" (a day can pass
-   * this row-count filter and still be excluded, e.g. if some rows lack a warmed-up per-item
-   * baseline).
+   * "did {@link RecallMorningHalfIndex#computeBothHalves} return non-null for both halves" (a day
+   * can pass this row-count filter and still be excluded, e.g. if some rows lack a warmed-up
+   * per-item baseline).
    */
   private static final int MIN_QUALIFYING_ROWS_PER_DAY = 4;
 
@@ -62,10 +62,9 @@ final class RecallSplitHalfReliability {
   static Result compute(List<RecallAnswerRow> allTimeReviews, LocalDate today, ZoneId zoneId) {
     List<double[]> pairs = new ArrayList<>();
     for (LocalDate day : candidateDays(allTimeReviews, today, zoneId)) {
-      Double odd = RecallMorningHalfIndex.compute(allTimeReviews, day, zoneId, Half.ODD);
-      Double even = RecallMorningHalfIndex.compute(allTimeReviews, day, zoneId, Half.EVEN);
-      if (odd != null && even != null) {
-        pairs.add(new double[] {odd, even});
+      HalfIndexes halves = RecallMorningHalfIndex.computeBothHalves(allTimeReviews, day, zoneId);
+      if (halves.odd() != null && halves.even() != null) {
+        pairs.add(new double[] {halves.odd(), halves.even()});
       }
     }
     if (pairs.size() < MIN_PAIRS_FOR_CORRELATION) {
@@ -81,7 +80,8 @@ final class RecallSplitHalfReliability {
    * #MIN_QUALIFYING_ROWS_PER_DAY} rows, in ascending order. A coarse pre-filter over raw row counts
    * (not accounting for implausibly-fast rows or per-item baseline warm-up) purely so {@link
    * #compute} doesn't run the full half-index pipeline against every historical day; the real
-   * qualification is {@link RecallMorningHalfIndex#compute} returning non-null for both halves.
+   * qualification is {@link RecallMorningHalfIndex#computeBothHalves} returning non-null for both
+   * halves.
    */
   private static List<LocalDate> candidateDays(
       List<RecallAnswerRow> allTimeReviews, LocalDate today, ZoneId zoneId) {
