@@ -70,6 +70,26 @@ Feature: Wiki links in notes
       | wiki link | WikiCross Tgt NB:WikiCross Deep |
     And the wiki link "WikiCross Tgt NB:WikiCross Deep" should open the note titled "WikiCross Deep"
 
+  Scenario: An unconfirmed wiki link stays pending until save confirms it is missing
+    When I update note "WikiLinks E2E CI" content using markdown to become:
+      """
+      Saved [[WikiLinks E2E Already Missing]].
+      """
+    Then I should see the note content rendered as:
+      | Kind           | Text                          |
+      | dead wiki link | WikiLinks E2E Already Missing |
+    When I hold the next note content save
+    And I add the wiki link "[[WikiLinks E2E Nowhere]]" in the note content
+    Then I should see the note content rendered as:
+      | Kind              | Text                          |
+      | dead wiki link    | WikiLinks E2E Already Missing |
+      | pending wiki link | WikiLinks E2E Nowhere         |
+    When I release the held note content save
+    Then I should see the note content rendered as:
+      | Kind           | Text                          |
+      | dead wiki link | WikiLinks E2E Already Missing |
+      | dead wiki link | WikiLinks E2E Nowhere         |
+
   @mockBrowserTime
   Scenario: Moving a note across notebooks keeps outgoing wiki links pointed at the old notebook
     Given I have a notebook "WikiMove Old NB" with notes:

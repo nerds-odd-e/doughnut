@@ -3,6 +3,8 @@ import { wikiTitleFromAuthoredToken } from "@/utils/wikiLinkMarkup"
 import { type VueWrapper, flushPromises } from "@vue/test-utils"
 import { afterEach, describe, expect, it, vi } from "vitest"
 import type { ComponentPublicInstance } from "vue"
+import { TextContentController } from "@generated/donut-backend-api/sdk.gen"
+import { mockSdkServiceWithImplementation } from "@tests/helpers"
 import { mountNoteTextContent } from "./noteTextContentTestSupport"
 
 describe("NoteTextContent wiki link display", () => {
@@ -100,5 +102,79 @@ describe("NoteTextContent wiki link display", () => {
     expect(live.textContent).toContain("label")
     expect(live.getAttribute("href")).toBe("/Folder/Title.md")
     expect(live.getAttribute("data-note-id")).toBe(String(targetNote.id))
+  })
+
+  it("shows a new wiki link as pending until content save confirms it is missing", async () => {
+    const savedContent = "Saved [[WikiLinks E2E Already Missing]]."
+    const note = makeMe.aNote
+      .title("Wiki carrier")
+      .content(savedContent)
+      .please()
+    const inFlightContent = `${savedContent} See [[WikiLinks E2E Nowhere]].`
+
+    let releaseSave!: () => void
+    const saveHeld = new Promise<void>((resolve) => {
+      releaseSave = resolve
+    })
+    mockSdkServiceWithImplementation(
+      TextContentController,
+      "updateNoteContent",
+      async (options) => {
+        await saveHeld
+        return makeMe.aNoteRealm
+          .id(note.id!)
+          .content(options.body?.content ?? "")
+          .wikiTitles([])
+          .please()
+      }
+    )
+
+    wrapper = mountNoteTextContent(note, { readonly: false, wikiTitles: [] })
+    await flushPromises()
+    await vi.waitUntil(() =>
+      document.querySelector(".ql-editor a.dead-wiki-link")
+    )
+
+    wrapper
+      .findComponent({ name: "QuillEditor" })
+      .vm.$emit(
+        "update:modelValue",
+        `<p>Saved <a href="#" class="dead-wiki-link" data-wiki-title="WikiLinks E2E Already Missing">WikiLinks E2E Already Missing</a>. See [[WikiLinks E2E Nowhere]].</p>`
+      )
+    await flushPromises()
+    await vi.waitUntil(() =>
+      document.querySelector(".ql-editor a.pending-wiki-link")
+    )
+
+    const pending = document.querySelector(
+      ".ql-editor a.pending-wiki-link"
+    ) as HTMLAnchorElement
+    expect(pending.textContent).toContain("WikiLinks E2E Nowhere")
+    expect(
+      document.querySelector(".ql-editor a.dead-wiki-link")?.textContent
+    ).toContain("WikiLinks E2E Already Missing")
+
+    releaseSave()
+    await flushPromises()
+    await wrapper.setProps({
+      note: makeMe.aNote
+        .id(note.id!)
+        .title("Wiki carrier")
+        .content(inFlightContent)
+        .please(),
+      wikiTitles: [],
+    })
+    await flushPromises()
+    await vi.waitUntil(
+      () =>
+        document.querySelectorAll(".ql-editor a.dead-wiki-link").length === 2
+    )
+
+    expect(document.querySelector(".ql-editor a.pending-wiki-link")).toBeNull()
+    const deadTitles = [
+      ...document.querySelectorAll(".ql-editor a.dead-wiki-link"),
+    ].map((a) => a.getAttribute("data-wiki-title"))
+    expect(deadTitles).toContain("WikiLinks E2E Already Missing")
+    expect(deadTitles).toContain("WikiLinks E2E Nowhere")
   })
 })

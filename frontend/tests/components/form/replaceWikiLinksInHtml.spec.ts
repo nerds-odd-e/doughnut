@@ -73,4 +73,60 @@ describe("replaceWikiLinksInHtml", () => {
       '<p><a href="/n42" class="donut-wiki-link" data-wiki-title="MyNote">MyNote</a></p>'
     )
   })
+
+  it("marks a new token pending when it is absent from last-saved markdown", () => {
+    expect(
+      replaceWikiLinksInHtml("<p>[[WikiLinks E2E Nowhere]]</p>", [], "Saved.")
+    ).toBe(
+      '<p><a href="#" class="pending-wiki-link" data-wiki-title="WikiLinks E2E Nowhere">WikiLinks E2E Nowhere</a></p>'
+    )
+  })
+
+  it("marks a last-saved unmatched token dead", () => {
+    expect(
+      replaceWikiLinksInHtml(
+        "<p>[[WikiLinks E2E Already Missing]]</p>",
+        [],
+        "Saved [[WikiLinks E2E Already Missing]]."
+      )
+    ).toBe(
+      '<p><a href="#" class="dead-wiki-link" data-wiki-title="WikiLinks E2E Already Missing">WikiLinks E2E Already Missing</a></p>'
+    )
+  })
+
+  it("keeps a wikiTitles hit live even when last-saved markdown is provided", () => {
+    expect(
+      replaceWikiLinksInHtml(
+        "<p>[[MyNote]]</p>",
+        [wikiTitleFromAuthoredToken("MyNote", 42)],
+        "[[MyNote]]"
+      )
+    ).toBe(
+      '<p><a href="/n42" class="donut-wiki-link" data-wiki-title="MyNote">MyNote</a></p>'
+    )
+  })
+
+  it("turns a pending anchor dead once the token is in last-saved markdown", () => {
+    expect(
+      replaceWikiLinksInHtml(
+        '<p><a href="#" class="pending-wiki-link" data-wiki-title="WikiLinks E2E Nowhere">WikiLinks E2E Nowhere</a></p>',
+        [],
+        "See [[WikiLinks E2E Nowhere]]."
+      )
+    ).toBe(
+      '<p><a href="#" class="dead-wiki-link" data-wiki-title="WikiLinks E2E Nowhere">WikiLinks E2E Nowhere</a></p>'
+    )
+  })
+
+  it("upgrades a last-saved pending anchor to live when wikiTitles resolve", () => {
+    expect(
+      replaceWikiLinksInHtml(
+        '<p><a href="#" class="pending-wiki-link" data-wiki-title="MyNote">MyNote</a></p>',
+        [wikiTitleFromAuthoredToken("MyNote", 42)],
+        "[[MyNote]]"
+      )
+    ).toBe(
+      '<p><a href="/n42" class="donut-wiki-link" data-wiki-title="MyNote">MyNote</a></p>'
+    )
+  })
 })

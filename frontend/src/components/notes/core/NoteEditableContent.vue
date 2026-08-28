@@ -29,6 +29,7 @@
         :model-value="value"
         :readonly="readonly"
         :wiki-titles="wikiTitles"
+        :last-saved-markdown="noteContent ?? ''"
         :note-title-for-wikidata-search="noteTitleForWikidataSearch"
         :note-id="noteId"
         :is-readme-context="isReadmeContext"

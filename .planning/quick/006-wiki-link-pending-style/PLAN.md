@@ -1,6 +1,6 @@
 # Pending style for unconfirmed wiki links
 
-**Status:** planned — not started.
+**Status:** in progress — slice 1 done; slices 2–4 remaining.
 **Type:** ad-hoc plan (`.planning/quick/`)
 
 ## Goal
@@ -71,38 +71,21 @@ missing.”
 
 ### 1. Unconfirmed body wiki link uses the pending style until save confirms missing (Behavior)
 
-**Status:** planned
+**Status:** done
 
-**Pre:** Loaded note; `wikiTitles` is the last persisted snapshot; body has
-no `[[WikiLinks E2E Nowhere]]`.
+Last-saved markdown (`note.content`) is passed through `NoteEditableContent`
+→ `RichMarkdownEditor` → `replaceWikiLinksInHtml`. Unresolved tokens only in
+current markdown are `pending-wiki-link`; unresolved tokens already in
+last-saved stay `dead-wiki-link`; hits in `wikiTitles` stay live.
+`quillHtmlToMarkdown` round-trips pending anchors as `[[…]]`. E2E holds real
+`PATCH /api/text_content/*/content`, asserts pending, then dead.
 
-**Trigger:** Learner adds that wiki link in rich content. Content save is
-still in flight (new wiki tokens flush immediately).
-
-**Post:** That token is a `pending-wiki-link`, not red dead. Existing saved
-dead links (if any) stay dead. When the PATCH returns and the token is
-still unresolved, it becomes `dead-wiki-link`.
-
-Wire last-saved markdown (`note.content`) through
-`NoteEditableContent` → `RichMarkdownEditor` → `replaceWikiLinksInHtml`.
-Add marker, CSS, and markdown round-trip in this slice (needed for the
-observable style; not a leading Structure-only slice).
-
-Tests:
-
-- Unit: `replaceWikiLinksInHtml` — new token vs last-saved → pending;
-  token in last-saved and absent from `wikiTitles` → dead; hit in
-  `wikiTitles` → live. `quillHtmlToMarkdown` pending → `[[…]]`.
-- Unit: mounted note body with delayed `updateNoteContent` — pending
-  then dead (`NoteEditableContent` / `NoteTextContent`).
-- E2E: extend `e2e_test/features/note_topology/wiki_link.feature`. Hold
-  real `PATCH /api/text_content/*/content`, assert pending, release,
-  assert dead. Add kind `pending wiki link` in
-  `noteContentEditingMethods.ts`. Point `live wiki link` at
-  `a.donut-wiki-link`.
-
-`@wip` until the scenario passes. Existing dead-after-save scenarios
-must stay green.
+**Learnings for remaining slices:** After PATCH, pending anchors now in
+last-saved are confirmed dead, then existing `upgradeDeadWikiAnchors` can
+still make them live (insert-wiki-link-to-existing-note stays green). Slice 2
+still needs hold-PATCH-then-live and pending→live if in-flight HTML is
+already a pending anchor. In-flight existing-target tokens already paint
+pending via the same inference.
 
 ### 2. Unconfirmed wiki link to an existing note becomes live after save (Behavior)
 
@@ -120,10 +103,8 @@ realm includes that title. Must not stay dead.
 Same inference as slice 1; this slice is the other post-condition.
 E2E in `wiki_link.feature` (hold PATCH, then live). Upgrade helpers
 (`upgradeDeadWikiAnchors` / pending → live) if in-flight HTML is
-already a pending anchor.
-
-Stop after slice 1: missing links no longer flash red; existing-target
-links may still flash red then live until this slice.
+already a pending anchor. In-flight style is already pending; after-save
+may still go pending→dead→live until this upgrade exists.
 
 ### 3. Clicking a pending wiki link does not start the missing-note flow (Behavior)
 

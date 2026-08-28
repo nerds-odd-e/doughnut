@@ -54,6 +54,7 @@ describe("quillHtmlToMarkdown", () => {
     ${"note href without donut-wiki-link"}            | ${'<p><a href="/n123">looks internal</a></p>'}                                                                                                               | ${"[[looks internal]]"}
     ${"converts dead wiki anchors"}                   | ${'<p><a href="#" class="dead-wiki-link" data-wiki-title="Unknown"><span class="wiki-bracket">[[</span>Unknown<span class="wiki-bracket">]]</span></a></p>'} | ${"[[Unknown]]"}
     ${"converts plain dead wiki anchors"}             | ${'<p><a href="#" class="dead-wiki-link" data-wiki-title="Unknown">Unknown</a></p>'}                                                                         | ${"[[Unknown]]"}
+    ${"converts pending wiki anchors"}                | ${'<p><a href="#" class="pending-wiki-link" data-wiki-title="Unknown">Unknown</a></p>'}                                                                      | ${"[[Unknown]]"}
     ${"donut-wiki-link with piped wiki attrs"}        | ${'<p><a href="/n1" class="donut-wiki-link" data-wiki-title="A" data-wiki-display="B">B</a></p>'}                                                            | ${"[[A|B]]"}
     ${"path markdown donut-wiki-link keeps markdown"} | ${'<p><a href="/Folder/Title.md" class="donut-wiki-link" data-wiki-title="/Folder/Title.md" data-wiki-display="label" data-note-id="42">label</a></p>'}      | ${"[label](/Folder/Title.md)"}
     ${"path markdown without .md keeps href"}         | ${'<p><a href="/Folder/Title" class="donut-wiki-link" data-wiki-title="/Folder/Title" data-wiki-display="label">label</a></p>'}                              | ${"[label](/Folder/Title)"}
@@ -83,5 +84,15 @@ describe("quillHtmlToMarkdown", () => {
   `("linkified wiki links: $label", ({ raw, resolves, expected }) => {
     const html = replaceWikiLinksInHtml(raw, [...resolves])
     expect(htmlToMarkdown(html)).toBe(expected)
+  })
+
+  it("round-trips a pending wiki link to authored wiki markup", () => {
+    const html = replaceWikiLinksInHtml(
+      "<p>[[WikiLinks E2E Nowhere]]</p>",
+      [],
+      ""
+    )
+    expect(html).toContain("pending-wiki-link")
+    expect(htmlToMarkdown(html)).toBe("[[WikiLinks E2E Nowhere]]")
   })
 })

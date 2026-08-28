@@ -9,6 +9,7 @@ import {
 import {
   DEAD_WIKI_LINK_CLASS,
   DONUT_WIKI_LINK_CLASS,
+  PENDING_WIKI_LINK_CLASS,
 } from "@/utils/wikiLinkDomMarkers"
 import { wikiAnchorToMarkdownToken } from "@/utils/wikiLinkMarkup"
 
@@ -174,7 +175,8 @@ turndownService.addRule("donutWikiLink", {
     const el = node as HTMLElement
     return (
       el.classList.contains(DONUT_WIKI_LINK_CLASS) ||
-      el.classList.contains(DEAD_WIKI_LINK_CLASS)
+      el.classList.contains(DEAD_WIKI_LINK_CLASS) ||
+      el.classList.contains(PENDING_WIKI_LINK_CLASS)
     )
   },
   replacement(_content, node) {
