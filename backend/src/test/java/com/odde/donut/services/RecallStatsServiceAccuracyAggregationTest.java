@@ -11,8 +11,11 @@ import org.junit.jupiter.api.Test;
 
 /**
  * Tests for the accuracy tile's standardized Poisson-binomial residual {@code A = Σ(y−p̂) /
- * √Σp̂(1−p̂)} on raw FSRS retrievability. Split out to keep {@link RecallStatsServiceTest} under
- * the 250-line limit, matching the pace/lapse/consistency test-file precedent.
+ * √Σp̂(1−p̂)} against the recalibrated recall probability {@code p̂} (see {@link
+ * RecallAccuracyAggregator}). These cases sit below the calibration sample threshold, so the
+ * identity fallback applies and {@code p̂} equals raw FSRS retrievability. Split out to keep {@link
+ * RecallStatsServiceTest} under the 250-line limit, matching the pace/lapse/consistency test-file
+ * precedent.
  */
 class RecallStatsServiceAccuracyAggregationTest {
   @Test

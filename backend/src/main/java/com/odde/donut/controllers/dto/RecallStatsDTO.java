@@ -65,10 +65,13 @@ public class RecallStatsDTO {
 
   /**
    * Standardized Poisson-binomial residual comparing today's observed correctness against each
-   * answer's raw FSRS retrievability at the time it was answered: {@code A = Σ(y−p̂) / √Σp̂(1−p̂)}.
-   * Positive means recalling better than the model expected; negative means worse. {@code
+   * answer's recalibrated recall probability {@code p̂}: raw FSRS retrievability run through a
+   * per-learner, per-question-type 3PL fit with a fitted guessing floor, falling back to the
+   * identity mapping ({@code p̂} = raw retrievability) when trailing history is sparse. See {@link
+   * com.odde.donut.services.RecallAccuracyAggregator}. {@code A = Σ(y−p̂) / √Σp̂(1−p̂)}. Positive
+   * means recalling better than the (recalibrated) model expected; negative means worse. {@code
    * standardizedResidual} is {@code null} when the denominator is 0 (no qualifying rows, or every
-   * retrievability is 0 or 1).
+   * {@code p̂} is 0 or 1).
    */
   @Data
   @AllArgsConstructor
