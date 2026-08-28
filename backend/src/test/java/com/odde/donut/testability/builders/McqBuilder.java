@@ -51,6 +51,16 @@ public class McqBuilder extends EntityBuilder<Mcq> {
     return this;
   }
 
+  public McqBuilder testedFocus(String testedFocus) {
+    entity.setTestedFocus(testedFocus);
+    return this;
+  }
+
+  public McqBuilder validationRationale(String validationRationale) {
+    entity.setValidationRationale(validationRationale);
+    return this;
+  }
+
   public McqBuilder contested() {
     this.entity.setContested(true);
     return this;
