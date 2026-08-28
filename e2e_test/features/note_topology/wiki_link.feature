@@ -90,6 +90,21 @@ Feature: Wiki links in notes
       | dead wiki link | WikiLinks E2E Already Missing |
       | dead wiki link | WikiLinks E2E Nowhere         |
 
+  Scenario: An unconfirmed wiki link to an existing note becomes live after save
+    When I update note "WikiLinks E2E Tech" content using markdown to become:
+      """
+      Saved.
+      """
+    When I hold the next note content save
+    And I add the wiki link "[[WikiLinks E2E CI]]" in the note content
+    Then I should see the note content rendered as:
+      | Kind              | Text             |
+      | pending wiki link | WikiLinks E2E CI |
+    When I release the held note content save
+    Then I should see the note content rendered as:
+      | Kind           | Text             |
+      | live wiki link | WikiLinks E2E CI |
+
   @mockBrowserTime
   Scenario: Moving a note across notebooks keeps outgoing wiki links pointed at the old notebook
     Given I have a notebook "WikiMove Old NB" with notes:

@@ -1,6 +1,6 @@
 # Pending style for unconfirmed wiki links
 
-**Status:** in progress — slice 1 done; slices 2–4 remaining.
+**Status:** in progress — slices 1–2 done; slices 3–4 remaining.
 **Type:** ad-hoc plan (`.planning/quick/`)
 
 ## Goal
@@ -80,31 +80,14 @@ last-saved stay `dead-wiki-link`; hits in `wikiTitles` stay live.
 `quillHtmlToMarkdown` round-trips pending anchors as `[[…]]`. E2E holds real
 `PATCH /api/text_content/*/content`, asserts pending, then dead.
 
-**Learnings for remaining slices:** After PATCH, pending anchors now in
-last-saved are confirmed dead, then existing `upgradeDeadWikiAnchors` can
-still make them live (insert-wiki-link-to-existing-note stays green). Slice 2
-still needs hold-PATCH-then-live and pending→live if in-flight HTML is
-already a pending anchor. In-flight existing-target tokens already paint
-pending via the same inference.
-
 ### 2. Unconfirmed wiki link to an existing note becomes live after save (Behavior)
 
-**Status:** planned
+**Status:** done
 
-**Pre:** Target note already exists (e.g. `WikiLinks E2E CI`). Carrier
-body has no wiki link to it yet.
-
-**Trigger:** Learner adds `[[WikiLinks E2E CI]]` (or insert-wiki-link);
-save in flight then completes.
-
-**Post:** Pending while in flight; `donut-wiki-link` after the returned
-realm includes that title. Must not stay dead.
-
-Same inference as slice 1; this slice is the other post-condition.
-E2E in `wiki_link.feature` (hold PATCH, then live). Upgrade helpers
-(`upgradeDeadWikiAnchors` / pending → live) if in-flight HTML is
-already a pending anchor. In-flight style is already pending; after-save
-may still go pending→dead→live until this upgrade exists.
+`upgradeUnresolvedWikiAnchors` upgrades pending and dead when `wikiTitles`
+has a hit, and runs before confirming leftover pending as dead, so in-flight
+HTML goes pending → live. E2E holds real PATCH, asserts pending, then live
+(`WikiLinks E2E Tech` → `[[WikiLinks E2E CI]]`).
 
 ### 3. Clicking a pending wiki link does not start the missing-note flow (Behavior)
 

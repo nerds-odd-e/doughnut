@@ -52,11 +52,8 @@ function authoredTokenFromWikiAnchor(anchor: Element): string {
   return target
 }
 
-/** Visible inner text of a dead-wiki-link anchor (bracket UI or plain). */
-function deadWikiLinkBracketDisplayMatches(
-  anchor: Element,
-  display: string
-): boolean {
+/** Visible inner text of a wiki-link anchor (bracket UI or plain). */
+function wikiAnchorDisplayMatches(anchor: Element, display: string): boolean {
   const raw = anchor.textContent?.trim() ?? ""
   const innerM = /^\[\[(.*)\]\]$/.exec(raw)
   const visibleInner = innerM?.[1] !== undefined ? innerM[1].trim() : raw
@@ -76,25 +73,31 @@ function parseWikiHtmlFragment(
   return { wrap, doc }
 }
 
-/** Rich editor HTML uses dead-wiki-link anchors, not [[ ]] literals; upgrade when titles resolve. */
-function upgradeDeadWikiAnchors(html: string, wikiTitles: WikiTitle[]): string {
-  if (wikiTitles.length === 0 || !html.includes(DEAD_WIKI_LINK_CLASS)) {
-    return html
-  }
+/** Rich editor HTML uses dead/pending wiki-link anchors, not [[ ]] literals; upgrade when titles resolve. */
+function upgradeUnresolvedWikiAnchors(
+  html: string,
+  wikiTitles: WikiTitle[]
+): string {
+  if (wikiTitles.length === 0) return html
+  const unresolvedClasses = [DEAD_WIKI_LINK_CLASS, PENDING_WIKI_LINK_CLASS]
+  if (!unresolvedClasses.some((c) => html.includes(c))) return html
   const parsed = parseWikiHtmlFragment(html)
   if (!parsed) return html
   const { wrap, doc } = parsed
+  const unresolvedAnchorSelector = unresolvedClasses
+    .map((c) => `a.${c}`)
+    .join(", ")
 
   for (const w of wikiTitles) {
     if (isPathMarkdownWikiTitle(w)) continue
     const { target, display } = wikiTitleParts(w)
     const href = noteShowHref(w.noteId)
-    for (const a of [...wrap.querySelectorAll(`a.${DEAD_WIKI_LINK_CLASS}`)]) {
+    for (const a of [...wrap.querySelectorAll(unresolvedAnchorSelector)]) {
       const dt = a.getAttribute("data-wiki-title")
       if (dt !== null && dt !== "") {
         if (dt !== target && dt.trim() !== target.trim()) continue
-        if (!deadWikiLinkBracketDisplayMatches(a, display)) continue
-      } else if (!deadWikiLinkBracketDisplayMatches(a, display)) {
+        if (!wikiAnchorDisplayMatches(a, display)) continue
+      } else if (!wikiAnchorDisplayMatches(a, display)) {
         continue
       }
       const live = doc.createElement("a")
@@ -229,7 +232,7 @@ export function replaceWikiLinksInHtml(
     )
   })
   result = upgradePathMarkdownAnchors(result, wikiTitles)
+  result = upgradeUnresolvedWikiAnchors(result, wikiTitles)
   result = confirmPendingWikiAnchorsAsDead(result, lastSavedTokens)
-  result = upgradeDeadWikiAnchors(result, wikiTitles)
   return markUnresolvedWikiLinks(result, lastSavedTokens)
 }
