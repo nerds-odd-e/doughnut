@@ -881,12 +881,18 @@ change. New `RecallPaceAggregatorDayBaselineTest.java`. File size (269 lines,
 generic-looking statistics helpers (`weightedPctVsUsual`, `averageWeight`)
 are pace-domain-specific, not generic math, so a split would be artificial.
 
-#### 21.2 The composite index can be computed for any single day — Structure `[ ]`
+#### 21.2 The composite index can be computed for any single day — Structure `[x]`
 
-A new pure function/class takes one day's `zA`, `zPace`, `zLapse`,
-`zConsistency` (sign convention above) and returns
-`index = 100 − 10 × mean(...)`. Unit-tested in isolation against the formula;
-not yet wired to a real morning's rows.
+Done: new `RecallCognitiveIndex.java` (package-private, final, static-only,
+mirroring slice 20's `RecallProbabilityMath` shape) — `static double
+compute(double zA, double zPace, double zLapse, double zConsistency)` →
+`100 - 10 * mean(...)`. No dependency on `RecallStatsService`, aggregators,
+or Spring/JPA — pure arithmetic, deliberately narrow: it assumes its four
+inputs are already correctly-signed z-scores and does not decide how
+`A`/`lapseCount` get sign-flipped into that convention (javadoc notes that
+inversion is deferred to 21.3, which has the real per-morning values to wire
+up). New `RecallCognitiveIndexTest.java` (4 tests: all-zero baseline → 100,
+uniform positive/negative z's, mixed z's).
 
 - **Enables 21.3 only.**
 
