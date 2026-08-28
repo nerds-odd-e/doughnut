@@ -24,6 +24,17 @@ apply plugin: 'io.spring.dependency-management'
 
 springBoot {
   mainClass = 'com.odde.donut.DonutApplication'
+  buildInfo {
+    excludes = ['time']
+    properties {
+      additional = [
+        commit: providers.exec {
+          commandLine 'git', 'rev-parse', 'HEAD'
+          workingDir rootDir
+        }.standardOutput.asText.map { it.trim() }
+      ]
+    }
+  }
 }
 
 group = 'com.odde'

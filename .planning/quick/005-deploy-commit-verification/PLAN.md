@@ -1,6 +1,6 @@
 # Deployed commit verification
 
-**Status:** planned — no slices started.
+**Status:** in progress — slice 1 done; next is slice 2.
 **Type:** ad-hoc plan (`.planning/quick/`)
 
 ## Goal
@@ -67,20 +67,15 @@ multi-hour investigation.
 ## Slices
 
 ### 1. Build carries its own commit SHA (Structure)
+**Status:** done
 
-Wire Gradle's built-in `bootBuildInfo` task (part of the already-applied
-`org.springframework.boot` plugin — no new dependency) to embed
-`git rev-parse HEAD` as a custom property into
-`META-INF/build-info.properties`, so a `BuildProperties` bean carrying the
-commit becomes available in the Spring context.
+`backend/build.gradle` `springBoot.buildInfo` embeds `git rev-parse HEAD` as
+`build.commit`. `time` is excluded so two `bootJar` runs of the same tree still
+hash the same (`boot-jar-reproducible.sh`). No `HealthCheckController` test
+class exists; healthcheck response is unchanged.
 
-No external behavior changes — `/api/healthcheck`'s response is unchanged.
-Verify by confirming existing `HealthCheckController` tests still pass
-unchanged, and that `unzip -p`/`jar tf` on a local build shows
-`META-INF/build-info.properties` containing the current `git rev-parse HEAD`
-value.
-
-Justified only because slice 2 (immediately next) consumes it.
+Verified: `bootJar` jar contains `META-INF/build-info.properties` with
+`build.commit` matching `git rev-parse HEAD`.
 
 ### 2. Healthcheck reports the deployed commit (Behavior)
 
