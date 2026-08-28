@@ -1,12 +1,8 @@
 # Morning cognitive index from recall history
 
-**Status:** in progress — slices 1–14, 14.1–14.8, 15, 16, 17, 18, 19, 20 done.
-Slice 21 (split-half reliability) was split into 21.1–21.4 (pre-slice
-Jidoka: needed a composite formula the plan never specified, resolved with
-the developer — see "The index" section) — **21.1–21.4 all done.** A
-session-wide code review across slices 17–21.4 (developer-requested) found
-gaps addressed in a new repair pass, **21.5–21.7 (21.8 optional)** — **next:
-21.5**. Once those are done, the reliability endpoint
+**Status:** in progress — slices 1–14, 14.1–14.8, 15, 16, 17, 18, 19, 20,
+21.1–21.5 done. Repair pass **21.6–21.7 remaining (21.8 optional)** — **next:
+21.6**. Once those are done, the reliability endpoint
 (`GET /api/user/recall-split-half-reliability`) still needs **the developer
 to query it and decide against the ~0.6 gate before slice 22 starts** (see
 Jidoka checkpoints — this is a required stop, not an autonomous continuation
@@ -1005,29 +1001,21 @@ stopping after any of them leaves the already-shipped accuracy/index
 readouts more trustworthy than before, same as 14.1–14.8 did for the
 timer/pace channel.
 
-#### 21.5 The reliability endpoint's real-correlation path has regression coverage — Behavior `[ ]`
+#### 21.5 The reliability endpoint's real-correlation path has regression coverage — Behavior `[x]`
 
-`RecallSplitHalfReliability.compute()`'s path for >= `MIN_PAIRS_FOR_CORRELATION`
-(10) qualifying day-pairs — the one that actually produces the Pearson
-correlation and its Spearman-Brown correction the developer is about to read
-the ~0.6 gate off of — has no test exercising it end-to-end. Every test that
-calls `compute()` deliberately stays below the 10-pair threshold (asserting
-null correlations); the one test that looks like it covers the real-number
-path, `RecallSplitHalfReliabilityTest.spearmanBrownCorrectsTheRawCorrelationUpward`,
-is vacuous — it hardcodes `r = 0.5` and checks `(2*r)/(1+r)` against a
-literal, without calling `compute()` or any production method at all.
+Done: `RecallSplitHalfReliabilityTest.tenScorableMorningsYieldThePearsonOfTheirHalfIndexesAndTheSpearmanBrownCorrection`
+builds 10 scorable mornings, independently scores each day's odd/even halves
+via `RecallMorningHalfIndex.compute`, and asserts `compute()` returns that
+pair count, the same Pearson `r`, and Spearman-Brown `2r/(1+r)`. Vacuous
+`spearmanBrownCorrectsTheRawCorrelationUpward` (hardcoded `r = 0.5`, never
+called production) deleted. Production already implemented this path;
+no formula change.
 
-Add a test building >= 10 qualifying day-pairs (reuse
-`RecallStatsTestFixtures.warmedUpBaselines()`/`addWarmedUpBaselineDay` and
-`RecallMorningHalfIndexTest`'s "oddAndEvenHalvesAreScoredIndependently..."
-pattern for constructing scorable half-pairs) and assert `pairCount >= 10`,
-`rawCorrelation` non-null and matching an independently-computed expected
-Pearson value, and `spearmanBrownCorrelation` equal to `2r/(1+r)` for that
-real `r`. This is a regression-test-first exercise, not an
-assumed-passing addition: if the new test fails on first run, fix the
-underlying bug it reveals rather than adjusting the assertion to match
-whatever the code currently outputs. Once real coverage exists, delete or
-fold in the vacuous `spearmanBrownCorrectsTheRawCorrelationUpward` test.
+**Learning for remaining 21.x tests:** the two-value even/odd
+`warmedUpBaselines()` pace/lapse pattern majority-votes MAD to 0 when a
+later scored morning also sits in an earlier morning's trailing baseline
+window, which makes half-indexes null. Multi-day half-index fixtures must
+use `variedBaselinesThrough` (3-phase pace/lapse) plus `addScorableMorning`.
 
 #### 21.6 Accuracy documentation and tests reflect recalibration, not raw retrievability — Structure `[ ]`
 

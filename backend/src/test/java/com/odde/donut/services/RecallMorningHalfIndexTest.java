@@ -47,15 +47,11 @@ class RecallMorningHalfIndexTest {
   @Test
   void oddAndEvenHalvesAreScoredIndependentlyAndReflectTheirOwnOutcomes() {
     List<RecallAnswerRow> rows = RecallStatsTestFixtures.warmedUpBaselines();
-    int[] items = {9001, 9002, 9003, 9004};
-    boolean[] correctByPosition = {true, false, true, false}; // odd = correct, even = incorrect
-    for (int i = 0; i < items.length; i++) {
-      rows.add(answered(utc(0, 8), BASELINE_MS, true, null, items[i]));
-      // Answered exactly at its own established baseline -> zero pace residual, so pace/lapse/
-      // consistency come out identical between the two halves; only accuracy (zA) differs, by
-      // construction, isolating the sign-flip/wiring this slice is responsible for.
-      rows.add(answered(utc(TODAY, 8 + i), BASELINE_MS, correctByPosition[i], null, items[i], 0.5));
-    }
+    // Answered exactly at each item's established baseline -> zero pace residual, so pace/lapse/
+    // consistency come out identical between the two halves; only accuracy (zA) differs, by
+    // construction, isolating the sign-flip/wiring this class is responsible for.
+    RecallStatsTestFixtures.addScorableMorning(
+        rows, TODAY, 9001, new boolean[] {true, false, true, false});
 
     Double oddIndex = RecallMorningHalfIndex.compute(rows, TODAY_DATE, UTC, Half.ODD);
     Double evenIndex = RecallMorningHalfIndex.compute(rows, TODAY_DATE, UTC, Half.EVEN);
