@@ -9,7 +9,7 @@
     :aria-label="ariaLabel"
     :data-testid="dataTestid"
     @input="onInput"
-    @blur="emit('blur')"
+    @blur="onBlur"
     @click.capture="onClickCapture"
     @keydown.enter.prevent="onEnter"
     @paste="onPaste"
@@ -35,6 +35,7 @@ const props = defineProps({
     type: Array as PropType<WikiTitle[]>,
     required: true,
   },
+  lastSavedMarkdown: { type: String, default: undefined },
   readonly: { type: Boolean, default: false },
   ariaLabel: { type: String, required: false },
   dataTestid: { type: String, required: false },
@@ -56,8 +57,14 @@ function pushDisplayHtml(plain: string) {
   if (!root.value) return
   root.value.innerHTML = propertyValuePlainToDisplayHtml(
     plain,
-    props.wikiTitles
+    props.wikiTitles,
+    props.lastSavedMarkdown
   )
+}
+
+function restyleFromPlain(plain: string) {
+  lastEmittedPlain.value = plain
+  pushDisplayHtml(plain)
 }
 
 watch(
@@ -65,24 +72,20 @@ watch(
   (v) => {
     const plain = v ?? ""
     if (plain === lastEmittedPlain.value) return
-    lastEmittedPlain.value = plain
-    pushDisplayHtml(plain)
+    restyleFromPlain(plain)
   }
 )
 
 watch(
-  () => props.wikiTitles,
+  () => [props.wikiTitles, props.lastSavedMarkdown] as const,
   () => {
-    const plain = props.modelValue ?? ""
-    lastEmittedPlain.value = plain
-    pushDisplayHtml(plain)
+    restyleFromPlain(props.modelValue ?? "")
   },
   { deep: true }
 )
 
 onMounted(() => {
-  lastEmittedPlain.value = props.modelValue ?? ""
-  pushDisplayHtml(lastEmittedPlain.value)
+  restyleFromPlain(props.modelValue ?? "")
 })
 
 function onInput() {
@@ -105,6 +108,11 @@ function onClickCapture(event: MouseEvent) {
     },
     { deadWikiLinksEnabled: true }
   )
+}
+
+function onBlur() {
+  restyleFromPlain(props.modelValue ?? "")
+  emit("blur")
 }
 
 function onEnter() {

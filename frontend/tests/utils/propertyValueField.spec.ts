@@ -96,6 +96,55 @@ describe("propertyValueField utils", () => {
     expect(html).toContain(escapeHtmlForWikiLinkDisplay(plain))
   })
 
+  it("renders a token only in current text as pending when last-saved markdown is provided", () => {
+    const html = propertyValuePlainToDisplayHtml(
+      "[[WikiLinks E2E Nowhere]]",
+      [],
+      "topic: old"
+    )
+    expect(html).toContain('class="pending-wiki-link"')
+    expect(html).not.toContain("dead-wiki-link")
+  })
+
+  it("renders unresolved path Markdown as pending when it is only in current text", () => {
+    const html = propertyValuePlainToDisplayHtml(
+      "[Moon](/Moon.md)",
+      [],
+      "topic: old"
+    )
+    expect(html).toContain('class="pending-wiki-link"')
+    expect(html).not.toContain("dead-wiki-link")
+  })
+
+  it("renders an unresolved token already in last-saved markdown as dead", () => {
+    const html = propertyValuePlainToDisplayHtml(
+      "[[WikiLinks E2E Nowhere]]",
+      [],
+      'topic: "[[WikiLinks E2E Nowhere]]"'
+    )
+    expect(html).toContain('class="dead-wiki-link"')
+    expect(html).not.toContain("pending-wiki-link")
+  })
+
+  it("keeps a wikiTitles hit live even when last-saved markdown is provided", () => {
+    const html = propertyValuePlainToDisplayHtml(
+      "[[My Note]]",
+      [wikiTitleFromAuthoredToken("My Note", 42)],
+      "topic: old"
+    )
+    expect(html).toContain("donut-wiki-link")
+    expect(html).toContain("/n42")
+    expect(html).not.toContain("pending-wiki-link")
+    expect(html).not.toContain("dead-wiki-link")
+  })
+
+  it("round-trips pending wiki anchors from a field root", () => {
+    const root = document.createElement("div")
+    root.innerHTML = propertyValuePlainToDisplayHtml("[[Ghost]]", [], "")
+    expect(root.querySelector("a.pending-wiki-link")).not.toBeNull()
+    expect(serializePropertyValueFieldRoot(root)).toBe("[[Ghost]]")
+  })
+
   it("resolves wiki markers when title is known", () => {
     const html = propertyValuePlainToDisplayHtml("[[My Note]]", [
       wikiTitleFromAuthoredToken("My Note", 42),

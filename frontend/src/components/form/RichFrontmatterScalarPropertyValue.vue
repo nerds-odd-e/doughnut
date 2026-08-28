@@ -10,6 +10,7 @@
         :value="listValue"
         :property-key="propertyKey"
         :wiki-titles="wikiTitles"
+        :last-saved-markdown="lastSavedMarkdown"
         @dead-wiki-link-click="emit('dead-wiki-link-click', $event)"
       />
     </div>
@@ -21,6 +22,7 @@
       <PropertyValueField
         :model-value="scalarValue"
         :wiki-titles="wikiTitles"
+        :last-saved-markdown="lastSavedMarkdown"
         :aria-label="valueAriaLabel"
         data-testid="rich-note-property-row-value-input"
         @update:model-value="emit('update:modelValue', $event)"
@@ -81,6 +83,7 @@ const props = defineProps<{
   modelValue: string
   propertyRow: PropertyRow
   wikiTitles: WikiTitle[]
+  lastSavedMarkdown?: string
   rowIndex: number
 }>()
 
