@@ -1,12 +1,13 @@
 # Morning cognitive index from recall history
 
 **Status:** in progress — slices 1–14, 14.1–14.8, 15, 16, 17, 18, 19, 20 done.
-This closes the Accuracy channel. Slice 17.1 (pace-expectation R/D
-correction, split from 17) is **blocked** pending a developer-specified
-formula (see Jidoka checkpoints). **Next: 21** (split-half reliability — the
-reliability gate; see Jidoka checkpoints before starting), independent of
-17.1. `recall_stats.feature`'s pace scenario stays `@wip` — a second,
-unrelated E2E race condition was found (see Discoveries).
+This closes the Accuracy channel. Slice 21 (split-half reliability) was split
+into 21.1–21.4 (pre-slice Jidoka: needed a composite formula the plan never
+specified, resolved with the developer — see "The index" section) — **next:
+21.1**. Slice 17.1 (pace-expectation R/D correction, split from 17) is
+**blocked** pending a developer-specified formula (see Jidoka checkpoints),
+independent of 21.x. `recall_stats.feature`'s pace scenario stays `@wip` — a
+second, unrelated E2E race condition was found (see Discoveries).
 **Type:** ad-hoc plan (`.planning/quick/`)
 **Research memo:** https://claude.ai/code/artifact/9e13f954-fc5e-48e5-868f-f75d03f811c1
 
@@ -170,10 +171,11 @@ truth; RecallLog's Grades and Confusion remain the record.
 `f67d894175`): *pace*, *retrieval lapse*, *detour*, *away*, *idle*, *daily
 probe*, and *cognitive index* are in ADR 0001 / ADR 0003.
 
-**Before slice 22 — the reliability gate.** If slice 21 reports split-half
+**Before slice 22 — the reliability gate.** If slice 21.4 reports split-half
 reliability below ~0.6, slices 22–25 do not ship. The component readouts stand
 on their own and the composite is abandoned or reworked. Do not tune weights to
-rescue the number.
+rescue the number. (Slice 21 was split into 21.1–21.4 — see that section for
+the composite formula and why.)
 
 **Before slice 17.1 — pace-expectation correction formula.** Unresolved. Slice
 17's original text asserted R/D would correct the pace time-expectation but
@@ -844,13 +846,70 @@ genuinely different math.
 
 ### The index
 
-#### 21. Split-half reliability is reported internally — Behavior `[ ]`
+Slice 21 was split into 21.1–21.4 below (pre-slice Jidoka: computing "the
+index" for the first time needed a composite formula the plan never
+specified — resolved with the developer, see the composite-formula note at
+21.2 — and then turned out to need day-level baselines that don't exist yet
+for two of the four components, more than one observable behavior).
 
-Odd/even split of each morning's attempts, index computed on each half,
-correlated across mornings. Internal diagnostic endpoint; the developer is the
-observer. Composite computed internally, no user-facing number yet.
+**Composite formula (developer-approved, applies from 21.2 onward):**
+`index = 100 − 10 × mean(zA, zPace, zLapse, zConsistency)`, equal-weight, no
+per-component weight tuning at this stage — the plan explicitly says "do not
+tune weights to rescue the number." Each z is signed so positive =
+worse-than-usual; `zA` and `zLapse` are sign-flipped (higher-raw-value =
+better) so all four share pace/consistency's "positive = worse" convention.
 
-- **This is the gate.** See Jidoka above.
+#### 21.1 Pace and lapses gain day-level baselines like consistency — Structure `[ ]`
+
+`RecallPaceAggregator`'s `consistencyZScore` already tracks a per-day
+baseline (`residualsByDate`, median/MAD, `MIN_BASELINE_DAYS` gate) — the
+existing precedent for "how this codebase turns a daily statistic into a
+cross-morning z-score." `pctVsUsual` and `lapseCount` have no equivalent yet:
+nothing records each day's value across many mornings to compute their own
+median/MAD baseline. Extend the same per-day tracking to also capture that
+day's pace residual and lapse count, so both can be expressed as z-scores the
+same way consistency already is. No composite, no wiring yet.
+
+- **Enables 21.2 only.**
+
+#### 21.2 The composite index can be computed for any single day — Structure `[ ]`
+
+A new pure function/class takes one day's `zA`, `zPace`, `zLapse`,
+`zConsistency` (sign convention above) and returns
+`index = 100 − 10 × mean(...)`. Unit-tested in isolation against the formula;
+not yet wired to a real morning's rows.
+
+- **Enables 21.3 only.**
+
+#### 21.3 A morning's index can be computed from just its odd or even attempts — Structure `[ ]`
+
+The existing per-day aggregation (accuracy/pace/lapse/consistency — already
+parameterized by a target day and zone, per slice 19/20's `today`/`zoneId`
+threading into `RecallPaceAggregator`/`RecallAccuracyAggregator`) can be
+invoked against an arbitrary historical morning's rows restricted to only the
+odd-indexed or even-indexed attempts of that morning (by within-morning
+sequence), producing two index values (via 21.2) for that morning.
+**Investigate first**: confirm whether "day" is already a free parameter on
+these aggregators (it appears to be, from slice 19/20's wiring) — if so this
+slice is mostly wiring/filtering, not new generalization; if a hidden
+"today" assumption remains somewhere, generalize only that spot.
+
+- **Enables 21.4 only.**
+
+#### 21.4 The developer can see split-half reliability across recent mornings — Behavior `[ ]`
+
+New internal diagnostic endpoint: for each of the trailing N mornings with
+enough attempts to split, compute the odd-half and even-half index (21.3),
+collect the pairs across mornings, and report **both** the raw Pearson
+correlation and its Spearman-Brown-corrected estimate (`2r / (1+r)`) side by
+side — the plan's "~0.6" threshold doesn't say which is meant, so report
+both rather than silently picking one; the developer decides against either
+when evaluating the gate below. Not user-facing.
+
+- **This is the gate.** See Jidoka above. If reliability comes back below
+  ~0.6 (by whichever of the two numbers the developer judges appropriate),
+  slices 22–25 do not ship — the component readouts stand on their own and
+  the composite is abandoned or reworked.
 
 #### 22. Recall Stats leads with the morning index — Behavior `[ ]`
 
