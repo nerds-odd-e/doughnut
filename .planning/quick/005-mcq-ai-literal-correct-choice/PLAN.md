@@ -1,8 +1,8 @@
 # Describe MCQ correct answers as choice text in AI prompts
 
-**Status:** in progress — slice 1 done.
+**Status:** in progress — slices 1–2 done.
 **Type:** ad-hoc plan (`.planning/quick/`)
-**Origin:** Generation already emits `GeneratedMcq` (`correctAnswer` + `distractors`). Contest advice and two related prompts still talk in 0-based indexes.
+**Origin:** Generation already emits `GeneratedMcq` (`correctAnswer` + `distractors`). Remaining leftover: note-refinement layout prompt still talks in 0-based indexes.
 
 ## Goal
 
@@ -42,14 +42,11 @@ Advice from `QuestionEvaluation.getQuestionContestResult` quotes original and re
 
 **Learning:** quoting is advice-only; do not extract a shared “index → text” helper for slice 2 (`GeneratedMcq` is a different shape).
 
-### 2. Regeneration describes the previous question as generated shape — Behavior `[ ]`
+### 2. Regeneration describes the previous question as generated shape — Behavior `[x]`
 
-**Pre:** Slice 1 done. A contested MCQ is regenerated.
-**Trigger:** `AiToolFactory.buildRegenerateQuestionMessage` is included in the OpenAI generate request.
-**Post:** The previous-question JSON uses `questionStem`, `correctAnswer`, and `distractors`. It does not include `correctAnswerIndex` or `responseChoices`.
+`RegenerateQuestionMessage` serializes a `GeneratedMcq` view (stem, correct answer text, distractors, `testedFocus` / `validationRationale`). `AiToolFactory.buildRegenerateQuestionMessage` delegates. Covered in `RecallPromptRegenerateControllerTest`.
 
-- Extend `RecallPromptRegenerateControllerTest.shouldPassOldQuestionAndContestResultToOpenAiApi` (existing payload capture). Assert the generated-shape fields and absence of the persisted-shape fields.
-- Production: serialize a `GeneratedMcq` view of the persisted MCQ (correct choice text + other choices as distractors). Keep `testedFocus` / `validationRationale` when present.
+**Learning:** keep this conversion in the regenerate message (not a shared index→text helper). Slice 3 is still `NoteRefinementAiToolFactory` only.
 
 ### 3. Note refinement layout prompt names the correct choice by text — Behavior `[ ]`
 

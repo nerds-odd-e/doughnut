@@ -1,6 +1,5 @@
 package com.odde.donut.services.ai.tools;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.donut.configs.ObjectMapperConfig;
 import com.odde.donut.controllers.dto.BookLayoutReorganizationSuggestion;
 import com.odde.donut.controllers.dto.NoteRefinementQuestionContextDTO;
@@ -225,26 +224,6 @@ Please assume the role of a Memory Assistant, which involves helping me recall a
 
   public static String buildRegenerateQuestionMessage(
       QuestionContestResult contestResult, Mcq mcq) {
-    String mcqJson;
-    try {
-      mcqJson =
-          new ObjectMapperConfig()
-              .objectMapper()
-              .writerWithDefaultPrettyPrinter()
-              .writeValueAsString(mcq);
-    } catch (JsonProcessingException e) {
-      throw new RuntimeException(e);
-    }
-    return """
-                Previously generated non-feasible question:
-
-                %s
-
-                Improvement advice:
-
-                %s
-
-                Please regenerate or refine the question based on the above advice."""
-        .formatted(mcqJson, contestResult.advice);
+    return RegenerateQuestionMessage.build(contestResult, mcq);
   }
 }
