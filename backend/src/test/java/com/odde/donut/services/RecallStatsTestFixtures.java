@@ -91,8 +91,8 @@ final class RecallStatsTestFixtures {
   /**
    * One morning of established items scored at their own baseline time, split across odd/even
    * positions by {@code correctByPosition}. Both halves are scorable when the array has length 4
-   * (2/2) and a warmed-up trailing day-baseline is present. Shared by
-   * {@code RecallMorningHalfIndexTest} and {@code RecallSplitHalfReliabilityTest}.
+   * (2/2) and a warmed-up trailing day-baseline is present. Shared by {@code
+   * RecallMorningHalfIndexTest} and {@code RecallSplitHalfReliabilityTest}.
    */
   static void addScorableMorning(
       List<RecallAnswerRow> rows, int day, int itemIdBase, boolean[] correctByPosition) {
@@ -101,12 +101,7 @@ final class RecallStatsTestFixtures {
       rows.add(answered(utc(0, 8), WARMED_UP_BASELINE_MS, true, null, itemId));
       rows.add(
           answered(
-              utc(day, 8 + i),
-              WARMED_UP_BASELINE_MS,
-              correctByPosition[i],
-              null,
-              itemId,
-              0.5));
+              utc(day, 8 + i), WARMED_UP_BASELINE_MS, correctByPosition[i], null, itemId, 0.5));
     }
   }
 

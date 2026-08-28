@@ -120,10 +120,10 @@ final class RecallGuessingFloorFitter {
   }
 
   /**
-   * Outer-product-of-gradients (BHHH) curvature for a <em>fixed</em> gamma, rather than the analytic
-   * second derivative through gamma's non-canonical link: simpler and safer to get the sign right,
-   * at the cost of possibly more iterations. Validated against a finite-difference gradient check in
-   * {@code RecallGuessingFloorFitterTest}.
+   * Outer-product-of-gradients (BHHH) curvature for a <em>fixed</em> gamma, rather than the
+   * analytic second derivative through gamma's non-canonical link: simpler and safer to get the
+   * sign right, at the cost of possibly more iterations. Validated against a finite-difference
+   * gradient check in {@code RecallGuessingFloorFitterTest}.
    *
    * <p>Per-row score {@code u_i = ((y_i − p_i) / (p_i·(1−p_i))) · dp_i/dz_i}, where {@code
    * dp_i/dz_i = (1−γ)·σ(z_i)·(1−σ(z_i))}; gradient {@code g = Σ u_i·[1, x_i]}; BHHH curvature

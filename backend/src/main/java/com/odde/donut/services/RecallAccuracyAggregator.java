@@ -60,7 +60,8 @@ final class RecallAccuracyAggregator {
 
   /** Apply already-fitted 3PL curves to {@code todaysQualifyingRows}. Does not refit. */
   static AccuracyStats apply(
-      List<RecallAnswerRow> todaysQualifyingRows, Map<QuestionType, ThreePlFit> fitsByQuestionType) {
+      List<RecallAnswerRow> todaysQualifyingRows,
+      Map<QuestionType, ThreePlFit> fitsByQuestionType) {
     double sumResidual = 0;
     double sumVariance = 0;
     int sampleSize = 0;
