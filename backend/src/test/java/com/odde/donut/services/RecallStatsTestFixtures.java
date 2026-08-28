@@ -38,19 +38,76 @@ final class RecallStatsTestFixtures {
    * One trailing baseline day: two items, each with a pre-existing baseline from day 0, answered
    * again on {@code day} so that day contributes exactly two residuals (needed for the consistency
    * spread baseline's own {@code >= 2 residuals/day} qualification) with a non-degenerate pace and
-   * lapse spread across days. Shared by {@code RecallMorningHalfIndexTest} and {@code
-   * RecallSplitHalfReliabilityTest}.
+   * lapse spread across days (two-value even/odd pattern).
    */
-  static void addWarmedUpBaselineDay(List<RecallAnswerRow> rows, int day, int itemIdBase) {
+  private static void addWarmedUpBaselineDay(List<RecallAnswerRow> rows, int day, int itemIdBase) {
+    boolean evenDay = (day - WARMED_UP_BASELINE_WINDOW_START) % 2 == 0;
+    int onTaskMsA = evenDay ? 4500 : 6000; // gives every baseline day a non-zero pace spread
+    int onTaskMsB = evenDay ? 15000 : WARMED_UP_BASELINE_MS; // itemB lapses on half the days
+    addWarmedUpBaselineDay(rows, day, itemIdBase, onTaskMsA, onTaskMsB);
+  }
+
+  private static void addWarmedUpBaselineDay(
+      List<RecallAnswerRow> rows, int day, int itemIdBase, int onTaskMsA, int onTaskMsB) {
     int itemA = itemIdBase;
     int itemB = itemIdBase + 1;
     rows.add(answered(utc(0, 6), WARMED_UP_BASELINE_MS, true, null, itemA));
     rows.add(answered(utc(0, 7), WARMED_UP_BASELINE_MS, true, null, itemB));
-    boolean evenDay = (day - WARMED_UP_BASELINE_WINDOW_START) % 2 == 0;
-    int onTaskMsA = evenDay ? 4500 : 6000; // gives every baseline day a non-zero pace spread
-    int onTaskMsB = evenDay ? 15000 : WARMED_UP_BASELINE_MS; // itemB lapses on half the days
     rows.add(answered(utc(day, 10), onTaskMsA, true, null, itemA));
     rows.add(answered(utc(day, 11), onTaskMsB, true, null, itemB));
+  }
+
+  /**
+   * Trailing baseline days whose per-day pace and lapse values take more than two distinct values,
+   * so later scored mornings that also fall in the window cannot collapse MAD to 0 the way the
+   * two-value even/odd pattern of {@link #addWarmedUpBaselineDay(List, int, int)} does.
+   */
+  static List<RecallAnswerRow> variedBaselinesThrough(int lastDayInclusive) {
+    List<RecallAnswerRow> rows = new ArrayList<>();
+    int itemId = 2000;
+    for (int day = WARMED_UP_BASELINE_WINDOW_START; day <= lastDayInclusive; day++) {
+      // Three lapse-count phases (0/1/2) and non-identical on-task times so pace and consistency
+      // spreads also take more than two values — a two-value series has MAD 0 whenever one value
+      // is a strict majority.
+      int phase = day % 3;
+      int onTaskMsA;
+      int onTaskMsB;
+      if (phase == 0) {
+        onTaskMsA = 4000 + (day % 11) * 300;
+        onTaskMsB = 5500 + (day % 7) * 200;
+      } else if (phase == 1) {
+        onTaskMsA = 15000;
+        onTaskMsB = 6000;
+      } else {
+        onTaskMsA = 15000;
+        onTaskMsB = 20000;
+      }
+      addWarmedUpBaselineDay(rows, day, itemId, onTaskMsA, onTaskMsB);
+      itemId += 2;
+    }
+    return rows;
+  }
+
+  /**
+   * One morning of established items scored at their own baseline time, split across odd/even
+   * positions by {@code correctByPosition}. Both halves are scorable when the array has length 4
+   * (2/2) and a warmed-up trailing day-baseline is present. Shared by
+   * {@code RecallMorningHalfIndexTest} and {@code RecallSplitHalfReliabilityTest}.
+   */
+  static void addScorableMorning(
+      List<RecallAnswerRow> rows, int day, int itemIdBase, boolean[] correctByPosition) {
+    for (int i = 0; i < correctByPosition.length; i++) {
+      int itemId = itemIdBase + i;
+      rows.add(answered(utc(0, 8), WARMED_UP_BASELINE_MS, true, null, itemId));
+      rows.add(
+          answered(
+              utc(day, 8 + i),
+              WARMED_UP_BASELINE_MS,
+              correctByPosition[i],
+              null,
+              itemId,
+              0.5));
+    }
   }
 
   /**
