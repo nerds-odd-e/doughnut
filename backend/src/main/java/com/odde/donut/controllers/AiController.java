@@ -75,23 +75,21 @@ public class AiController {
 
   @PostMapping("/generate-refinement-suggestions/{note}")
   @Transactional
-  public NoteRefinementLayoutDTO generateRefinementSuggestions(
+  public NoteRefinementLayout generateRefinementSuggestions(
       @PathVariable(value = "note") @Schema(type = "integer") Note note,
       @RequestBody(required = false) NoteRefinementQuestionContextDTO questionContext)
       throws UnexpectedNoAccessRightException, JsonProcessingException {
     authorizationService.assertAuthorization(note);
     String content = note.getContent();
     if (content == null || content.trim().isEmpty()) {
-      return new NoteRefinementLayoutDTO(NoteRefinementLayout.empty());
+      return NoteRefinementLayout.empty();
     }
     try {
-      NoteRefinementLayout layout =
-          notebookAssistantForNoteServiceFactory
-              .createNoteAutomationService(note)
-              .generateRefinementSuggestions(questionContext);
-      return new NoteRefinementLayoutDTO(layout);
+      return notebookAssistantForNoteServiceFactory
+          .createNoteAutomationService(note)
+          .generateRefinementSuggestions(questionContext);
     } catch (OpenAiNotAvailableException e) {
-      return new NoteRefinementLayoutDTO(NoteRefinementLayout.empty());
+      return NoteRefinementLayout.empty();
     }
   }
 

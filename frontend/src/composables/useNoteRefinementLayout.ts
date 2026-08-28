@@ -1,5 +1,6 @@
 import type {
   Note,
+  NoteRefinementLayout,
   NoteRefinementLayoutItem,
   NoteRefinementQuestionContextDto,
 } from "@generated/donut-backend-api"
@@ -64,9 +65,9 @@ export function useNoteRefinementLayout(
       data,
       error,
     }: {
-      data?: { items?: NoteRefinementLayoutItem[] } | null
+      data?: NoteRefinementLayout | null
       error?: unknown
-    }) => settleLayout(!error && data?.items ? data.items : [])
+    }) => settleLayout(!error && data ? data.items : [])
 
     const requestLayout = (signal?: AbortSignal) =>
       AiController.generateRefinementSuggestions({

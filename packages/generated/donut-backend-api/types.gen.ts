@@ -773,10 +773,6 @@ export type NoteRefinementQuestionContextDto = {
     testedFocus?: string;
 };
 
-export type NoteRefinementLayoutDto = {
-    items?: Array<NoteRefinementLayoutItem>;
-};
-
 export type NoteExtractionResult = {
     newNoteTitle: string;
     newNoteContent: string;
@@ -2693,7 +2689,7 @@ export type GenerateRefinementSuggestionsResponses = {
     /**
      * OK
      */
-    200: NoteRefinementLayoutDto;
+    200: NoteRefinementLayout;
 };
 
 export type GenerateRefinementSuggestionsResponse = GenerateRefinementSuggestionsResponses[keyof GenerateRefinementSuggestionsResponses];

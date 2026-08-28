@@ -10,7 +10,6 @@ import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.odde.donut.controllers.dto.NoteRefinementLayoutDTO;
 import com.odde.donut.controllers.dto.NoteRefinementQuestionContextDTO;
 import com.odde.donut.entities.Note;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
@@ -78,7 +77,7 @@ class AiControllerNoteRefinementTest extends ControllerTestBase {
                   NoteRefinementLayoutItems.leaf("p2", "Point 2"))));
       testNote.setContent("Some note content");
 
-      NoteRefinementLayoutDTO result = controller.generateRefinementSuggestions(testNote, null);
+      NoteRefinementLayout result = controller.generateRefinementSuggestions(testNote, null);
 
       assertThat(result.getItems()).hasSize(2);
       assertThat(result.getItems().getFirst().getText()).isEqualTo("Point 1");

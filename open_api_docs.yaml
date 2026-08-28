@@ -1663,7 +1663,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/NoteRefinementLayoutDTO"
+                $ref: "#/components/schemas/NoteRefinementLayout"
   /api/ai/extract-note-preview/{note}:
     post:
       tags:
@@ -4711,13 +4711,6 @@ components:
         testedFocus:
           type: string
           description: Optional description of what the question was testing
-    NoteRefinementLayoutDTO:
-      type: object
-      properties:
-        items:
-          type: array
-          items:
-            $ref: "#/components/schemas/NoteRefinementLayoutItem"
     NoteExtractionResult:
       type: object
       properties:
