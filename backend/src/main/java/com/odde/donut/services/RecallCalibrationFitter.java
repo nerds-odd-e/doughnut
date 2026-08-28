@@ -28,9 +28,6 @@ final class RecallCalibrationFitter {
    */
   private static final int MIN_CALIBRATION_SAMPLES = 50;
 
-  private static final int MAX_ITERATIONS = 25;
-  private static final double CONVERGENCE_TOLERANCE = 1e-6;
-
   private RecallCalibrationFitter() {}
 
   record CalibrationFit(double alpha, double beta) {
@@ -80,76 +77,46 @@ final class RecallCalibrationFitter {
   }
 
   /**
-   * Newton-Raphson with backtracking line search. A full undamped Newton step can overshoot badly
-   * on the first few iterations here (the two-parameter fit is well-conditioned but the starting
-   * point is arbitrary), so each step is halved until the log-likelihood actually improves — the
-   * standard fix that restores Newton's guaranteed convergence for a concave objective like
-   * logistic log-likelihood. Starts at {@code alpha=0, beta=0} (the "retrievability carries no
-   * information" point), not {@code beta=1} (the identity mapping) — starting exactly at the
-   * no-slope point turned out to make the first step's direction unstable for this problem.
+   * Canonical 2PL Newton-Raphson via {@link RecallNewtonRaphson}. Starts at {@code alpha=0, beta=0}
+   * (the "retrievability carries no information" point), not {@code beta=1} (the identity mapping)
+   * — starting exactly at the no-slope point turned out to make the first step's direction unstable
+   * for this problem. Degenerate/NaN/non-improving steps fall back to {@link
+   * CalibrationFit#IDENTITY}; max-iter keeps the last parameters.
    */
   private static CalibrationFit newtonRaphson(double[] x, double[] y) {
-    double alpha = 0.0;
-    double beta = 0.0;
-    double logLikelihood = logLikelihood(alpha, beta, x, y);
-    for (int iter = 0; iter < MAX_ITERATIONS; iter++) {
-      double gradAlpha = 0;
-      double gradBeta = 0;
-      double hAA = 0;
-      double hAB = 0;
-      double hBB = 0;
-      for (int i = 0; i < x.length; i++) {
-        double p = sigmoid(alpha + beta * x[i]);
-        double w = p * (1 - p);
-        double residual = y[i] - p;
-        gradAlpha += residual;
-        gradBeta += residual * x[i];
-        hAA += w;
-        hAB += w * x[i];
-        hBB += w * x[i] * x[i];
-      }
-      double determinant = hAA * hBB - hAB * hAB;
-      if (determinant < 1e-9) {
-        // Near-singular Fisher information (e.g. every row shares the same retrievability, so
-        // alpha and beta are not jointly identifiable) — bail out rather than blow up.
-        return CalibrationFit.IDENTITY;
-      }
-      double deltaAlpha = (hBB * gradAlpha - hAB * gradBeta) / determinant;
-      double deltaBeta = (hAA * gradBeta - hAB * gradAlpha) / determinant;
-      if (Double.isNaN(deltaAlpha) || Double.isNaN(deltaBeta)) {
-        return CalibrationFit.IDENTITY;
-      }
-      double step = 1.0;
-      double newAlpha = alpha;
-      double newBeta = beta;
-      double newLogLikelihood = Double.NEGATIVE_INFINITY;
-      for (int halving = 0; halving < 30; halving++) {
-        newAlpha = alpha + step * deltaAlpha;
-        newBeta = beta + step * deltaBeta;
-        newLogLikelihood = logLikelihood(newAlpha, newBeta, x, y);
-        if (newLogLikelihood >= logLikelihood) {
-          break;
-        }
-        step /= 2;
-      }
-      if (Double.isNaN(newAlpha)
-          || Double.isNaN(newBeta)
-          || Double.isInfinite(newAlpha)
-          || Double.isInfinite(newBeta)
-          || newLogLikelihood < logLikelihood) {
-        return CalibrationFit.IDENTITY;
-      }
-      boolean converged =
-          Math.abs(newAlpha - alpha) < CONVERGENCE_TOLERANCE
-              && Math.abs(newBeta - beta) < CONVERGENCE_TOLERANCE;
-      alpha = newAlpha;
-      beta = newBeta;
-      logLikelihood = newLogLikelihood;
-      if (converged) {
-        return new CalibrationFit(alpha, beta);
-      }
+    RecallNewtonRaphson.Fit fit =
+        RecallNewtonRaphson.maximize(
+            0.0,
+            0.0,
+            (alpha, beta) -> score(alpha, beta, x, y),
+            (alpha, beta) -> logLikelihood(alpha, beta, x, y));
+    return fit.converged() ? new CalibrationFit(fit.alpha(), fit.beta()) : CalibrationFit.IDENTITY;
+  }
+
+  /**
+   * Analytic Fisher-scoring gradient and Hessian for the canonical logistic: residual {@code y−p}
+   * and weight {@code p(1−p)}. Near-singular Fisher (e.g. every row shares the same retrievability,
+   * so alpha and beta are not jointly identifiable) is detected by the shared Newton step, which
+   * then bails out.
+   */
+  private static RecallNewtonRaphson.Score score(
+      double alpha, double beta, double[] x, double[] y) {
+    double gradAlpha = 0;
+    double gradBeta = 0;
+    double hAA = 0;
+    double hAB = 0;
+    double hBB = 0;
+    for (int i = 0; i < x.length; i++) {
+      double p = sigmoid(alpha + beta * x[i]);
+      double w = p * (1 - p);
+      double residual = y[i] - p;
+      gradAlpha += residual;
+      gradBeta += residual * x[i];
+      hAA += w;
+      hAB += w * x[i];
+      hBB += w * x[i] * x[i];
     }
-    return new CalibrationFit(alpha, beta);
+    return new RecallNewtonRaphson.Score(gradAlpha, gradBeta, hAA, hAB, hBB);
   }
 
   /** Numerically stable Bernoulli log-likelihood under the current alpha/beta. */

@@ -1,15 +1,14 @@
 # Morning cognitive index from recall history
 
 **Status:** in progress — slices 1–14, 14.1–14.8, 15, 16, 17, 18, 19, 20,
-21.1–21.7 done. Repair pass **21.8 optional remaining**. The reliability
-endpoint (`GET /api/user/recall-split-half-reliability`) still needs **the
-developer to query it and decide against the ~0.6 gate before slice 22
-starts** (see Jidoka checkpoints — this is a required stop, not an
-autonomous continuation point). Slice 17.1 (pace-expectation R/D correction,
-split from 17) is separately **blocked** pending a developer-specified
-formula, independent of 21.x. `recall_stats.feature`'s pace scenario stays
-`@wip` — a second, unrelated E2E race condition was found (see
-Discoveries).
+21.1–21.8 done. The 21.x repair pass is complete. The reliability endpoint
+(`GET /api/user/recall-split-half-reliability`) still needs **the developer
+to query it and decide against the ~0.6 gate before slice 22 starts** (see
+Jidoka checkpoints — this is a required stop, not an autonomous continuation
+point). Slice 17.1 (pace-expectation R/D correction, split from 17) is
+separately **blocked** pending a developer-specified formula, independent of
+21.x. `recall_stats.feature`'s pace scenario stays `@wip` — a second,
+unrelated E2E race condition was found (see Discoveries).
 **Type:** ad-hoc plan (`.planning/quick/`)
 **Research memo:** https://claude.ai/code/artifact/9e13f954-fc5e-48e5-868f-f75d03f811c1
 
@@ -996,10 +995,9 @@ rescue a low number** — that would defeat the point of the gate.
 At the developer's request, a full session-wide code review across every
 slice landed this session (17–21.4: accuracy, recalibration, guessing floor,
 historical backfill, and split-half reliability) found the gaps below.
-Execute 21.5–21.7 before slice 22; 21.8 is optional. Each is stop-safe:
-stopping after any of them leaves the already-shipped accuracy/index
-readouts more trustworthy than before, same as 14.1–14.8 did for the
-timer/pace channel.
+21.5–21.8 are done. Each is stop-safe: stopping after any
+of them leaves the already-shipped accuracy/index readouts more trustworthy
+than before, same as 14.1–14.8 did for the timer/pace channel.
 
 #### 21.5 The reliability endpoint's real-correlation path has regression coverage — Behavior `[x]`
 
@@ -1041,26 +1039,18 @@ still fit-then-apply. `RecallSplitHalfReliability` calls
 `scoringBothHalvesTogetherMatchesScoringEachHalfIndependently`. Per-half
 `compute(..., Half)` kept for existing tests.
 
-#### 21.8 (optional) Share the Newton-Raphson line-search scaffold between the two fitters — Structure `[ ]`
+#### 21.8 (optional) Share the Newton-Raphson line-search scaffold between the two fitters — Structure `[x]`
 
-`RecallCalibrationFitter.newtonRaphson` and `RecallGuessingFloorFitter.fitConditional`
-duplicate an entire ~25-line backtracking-line-search/convergence/bailout
-scaffold (step-halving loop, NaN/Infinite/non-improving-step bailout,
-convergence check) almost line-for-line — they differ only in how the
-per-row gradient/Hessian/log-likelihood is computed inside that scaffold
-(canonical logistic score vs. BHHH approximation for the 3PL). Slice 20's
-post-change-refactor considered merging these and declined, reasoning that
-"the 2PL analytic-Hessian scoring and 3PL BHHH-approximation scoring are
-genuinely different math" — true of the scoring step, but the surrounding
-line-search skeleton really is identical. A shared helper taking a
-per-iteration score-computing function (gradient + curvature +
-log-likelihood) could remove the duplication without touching either fit's
-actual math.
+Done: extracted the duplicated iteration / 2×2 Newton step / 30-halving
+line search / NaN-Infinite-non-improving bailout / convergence check into
+`RecallNewtonRaphson.maximize` (dedicated class; clamp/logit/sigmoid stay in
+`RecallProbabilityMath`). Callers still own scoring math: 2PL analytic
+Fisher in `RecallCalibrationFitter.score`, 3PL BHHH in
+`RecallGuessingFloorFitter.score`. Bailout mapping unchanged (2PL →
+`CalibrationFit.IDENTITY`; 3PL grid skips a γ when `converged=false`;
+max-iter still counts as success). Numeric tests unchanged.
 
-**Marked optional/lower-priority, not a prerequisite for slice 22**: this
-duplication was already reviewed once and knowingly kept, and the codebase's
-own principle is to avoid premature abstraction. Worth doing if convenient;
-skip it without regret otherwise.
+Not a prerequisite for slice 22.
 
 #### 22. Recall Stats leads with the morning index — Behavior `[ ]`
 

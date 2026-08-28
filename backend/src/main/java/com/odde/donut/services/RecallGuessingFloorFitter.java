@@ -32,8 +32,6 @@ final class RecallGuessingFloorFitter {
   private static final double GAMMA_MIN = 0.0;
   private static final double GAMMA_MAX = 0.5;
   private static final double GAMMA_STEP = 0.02;
-  private static final int MAX_ITERATIONS = 25;
-  private static final double CONVERGENCE_TOLERANCE = 1e-6;
 
   private RecallGuessingFloorFitter() {}
 
@@ -49,10 +47,6 @@ final class RecallGuessingFloorFitter {
       return gamma + (1 - gamma) * s;
     }
   }
-
-  /** One (alpha, beta) candidate at a fixed gamma, and the log-likelihood it converged to. */
-  private record ConditionalFit(
-      double alpha, double beta, double logLikelihood, boolean converged) {}
 
   /**
    * Fits the 3PL model for one question type's trailing qualifying rows. Callers pass only rows
@@ -101,7 +95,12 @@ final class RecallGuessingFloorFitter {
     int steps = (int) Math.round((GAMMA_MAX - GAMMA_MIN) / GAMMA_STEP);
     for (int i = 0; i <= steps; i++) {
       double gamma = Math.min(GAMMA_MAX, GAMMA_MIN + i * GAMMA_STEP);
-      ConditionalFit fit = fitConditional(x, y, gamma, warmAlpha, warmBeta);
+      RecallNewtonRaphson.Fit fit =
+          RecallNewtonRaphson.maximize(
+              warmAlpha,
+              warmBeta,
+              (alpha, beta) -> score(alpha, beta, gamma, x, y),
+              (alpha, beta) -> logLikelihood(alpha, beta, gamma, x, y));
       if (!fit.converged()) {
         continue;
       }
@@ -121,79 +120,34 @@ final class RecallGuessingFloorFitter {
   }
 
   /**
-   * Newton-Raphson maximizing the 3PL log-likelihood for a <em>fixed</em> gamma, with backtracking
-   * line search — mirrors {@code RecallCalibrationFitter#newtonRaphson}'s structure and convergence
-   * tolerance. Uses the outer-product-of-gradients (BHHH) approximation of the Hessian rather than
-   * the analytic second derivative through gamma's non-canonical link: simpler and safer to get the
-   * sign right, at the cost of possibly more iterations. Validated against a finite-difference
-   * gradient check in {@code RecallGuessingFloorFitterTest}.
+   * Outer-product-of-gradients (BHHH) curvature for a <em>fixed</em> gamma, rather than the analytic
+   * second derivative through gamma's non-canonical link: simpler and safer to get the sign right,
+   * at the cost of possibly more iterations. Validated against a finite-difference gradient check in
+   * {@code RecallGuessingFloorFitterTest}.
    *
    * <p>Per-row score {@code u_i = ((y_i − p_i) / (p_i·(1−p_i))) · dp_i/dz_i}, where {@code
    * dp_i/dz_i = (1−γ)·σ(z_i)·(1−σ(z_i))}; gradient {@code g = Σ u_i·[1, x_i]}; BHHH curvature
    * {@code M = Σ u_i²·[1,x_i][1,x_i]ᵀ ≈ -H}, so the Newton step solves {@code M·Δ = g}.
    */
-  private static ConditionalFit fitConditional(
-      double[] x, double[] y, double gamma, double alphaInit, double betaInit) {
-    double alpha = alphaInit;
-    double beta = betaInit;
-    double logLikelihood = logLikelihood(alpha, beta, gamma, x, y);
-    for (int iter = 0; iter < MAX_ITERATIONS; iter++) {
-      double gradAlpha = 0;
-      double gradBeta = 0;
-      double hAA = 0;
-      double hAB = 0;
-      double hBB = 0;
-      for (int i = 0; i < x.length; i++) {
-        double s = sigmoid(alpha + beta * x[i]);
-        double p = clamp(gamma + (1 - gamma) * s);
-        double dpdz = (1 - gamma) * s * (1 - s);
-        double u = ((y[i] - p) / (p * (1 - p))) * dpdz;
-        gradAlpha += u;
-        gradBeta += u * x[i];
-        hAA += u * u;
-        hAB += u * u * x[i];
-        hBB += u * u * x[i] * x[i];
-      }
-      double determinant = hAA * hBB - hAB * hAB;
-      if (determinant < 1e-9) {
-        return new ConditionalFit(alpha, beta, logLikelihood, false);
-      }
-      double deltaAlpha = (hBB * gradAlpha - hAB * gradBeta) / determinant;
-      double deltaBeta = (hAA * gradBeta - hAB * gradAlpha) / determinant;
-      if (Double.isNaN(deltaAlpha) || Double.isNaN(deltaBeta)) {
-        return new ConditionalFit(alpha, beta, logLikelihood, false);
-      }
-      double step = 1.0;
-      double newAlpha = alpha;
-      double newBeta = beta;
-      double newLogLikelihood = Double.NEGATIVE_INFINITY;
-      for (int halving = 0; halving < 30; halving++) {
-        newAlpha = alpha + step * deltaAlpha;
-        newBeta = beta + step * deltaBeta;
-        newLogLikelihood = logLikelihood(newAlpha, newBeta, gamma, x, y);
-        if (newLogLikelihood >= logLikelihood) {
-          break;
-        }
-        step /= 2;
-      }
-      if (Double.isNaN(newAlpha)
-          || Double.isNaN(newBeta)
-          || Double.isInfinite(newAlpha)
-          || Double.isInfinite(newBeta)
-          || newLogLikelihood < logLikelihood) {
-        return new ConditionalFit(alpha, beta, logLikelihood, false);
-      }
-      boolean converged =
-          Math.abs(newAlpha - alpha) < CONVERGENCE_TOLERANCE
-              && Math.abs(newBeta - beta) < CONVERGENCE_TOLERANCE;
-      alpha = newAlpha;
-      beta = newBeta;
-      logLikelihood = newLogLikelihood;
-      if (converged) {
-        return new ConditionalFit(alpha, beta, logLikelihood, true);
-      }
+  private static RecallNewtonRaphson.Score score(
+      double alpha, double beta, double gamma, double[] x, double[] y) {
+    double gradAlpha = 0;
+    double gradBeta = 0;
+    double hAA = 0;
+    double hAB = 0;
+    double hBB = 0;
+    for (int i = 0; i < x.length; i++) {
+      double s = sigmoid(alpha + beta * x[i]);
+      double p = clamp(gamma + (1 - gamma) * s);
+      double dpdz = (1 - gamma) * s * (1 - s);
+      double u = ((y[i] - p) / (p * (1 - p))) * dpdz;
+      gradAlpha += u;
+      gradBeta += u * x[i];
+      hAA += u * u;
+      hAB += u * u * x[i];
+      hBB += u * u * x[i] * x[i];
     }
-    return new ConditionalFit(alpha, beta, logLikelihood, true);
+    return new RecallNewtonRaphson.Score(gradAlpha, gradBeta, hAA, hAB, hBB);
   }
 
   /** Numerically stable Bernoulli log-likelihood under the current alpha/beta/gamma. */
