@@ -3,15 +3,17 @@
 **Status:** in progress — slices 1–14, 14.1–14.8, 15, 16, 17, 18, 19, 20 done.
 Slice 21 (split-half reliability) was split into 21.1–21.4 (pre-slice
 Jidoka: needed a composite formula the plan never specified, resolved with
-the developer — see "The index" section) — **21.1–21.4 all done.** The
-reliability endpoint (`GET /api/user/recall-split-half-reliability`) exists;
-**the developer needs to query it and decide against the ~0.6 gate before
-slice 22 starts** (see Jidoka checkpoints — this is a required stop, not an
-autonomous continuation point). Slice 17.1 (pace-expectation R/D correction,
-split from 17) is separately **blocked** pending a developer-specified
-formula, independent of 21.x. `recall_stats.feature`'s pace scenario stays
-`@wip` — a second, unrelated E2E race condition was found (see
-Discoveries).
+the developer — see "The index" section) — **21.1–21.4 all done.** A
+session-wide code review across slices 17–21.4 (developer-requested) found
+gaps addressed in a new repair pass, **21.5–21.7 (21.8 optional)** — **next:
+21.5**. Once those are done, the reliability endpoint
+(`GET /api/user/recall-split-half-reliability`) still needs **the developer
+to query it and decide against the ~0.6 gate before slice 22 starts** (see
+Jidoka checkpoints — this is a required stop, not an autonomous continuation
+point). Slice 17.1 (pace-expectation R/D correction, split from 17) is
+separately **blocked** pending a developer-specified formula, independent of
+21.x. `recall_stats.feature`'s pace scenario stays `@wip` — a second,
+unrelated E2E race condition was found (see Discoveries).
 **Type:** ad-hoc plan (`.planning/quick/`)
 **Research memo:** https://claude.ai/code/artifact/9e13f954-fc5e-48e5-868f-f75d03f811c1
 
@@ -992,6 +994,112 @@ rescue a low number** — that would defeat the point of the gate.
   ~0.6 (by whichever of the two numbers the developer judges appropriate),
   slices 22–25 do not ship — the component readouts stand on their own and
   the composite is abandoned or reworked.
+
+### Repair the accuracy/index readouts (session review)
+
+At the developer's request, a full session-wide code review across every
+slice landed this session (17–21.4: accuracy, recalibration, guessing floor,
+historical backfill, and split-half reliability) found the gaps below.
+Execute 21.5–21.7 before slice 22; 21.8 is optional. Each is stop-safe:
+stopping after any of them leaves the already-shipped accuracy/index
+readouts more trustworthy than before, same as 14.1–14.8 did for the
+timer/pace channel.
+
+#### 21.5 The reliability endpoint's real-correlation path has regression coverage — Behavior `[ ]`
+
+`RecallSplitHalfReliability.compute()`'s path for >= `MIN_PAIRS_FOR_CORRELATION`
+(10) qualifying day-pairs — the one that actually produces the Pearson
+correlation and its Spearman-Brown correction the developer is about to read
+the ~0.6 gate off of — has no test exercising it end-to-end. Every test that
+calls `compute()` deliberately stays below the 10-pair threshold (asserting
+null correlations); the one test that looks like it covers the real-number
+path, `RecallSplitHalfReliabilityTest.spearmanBrownCorrectsTheRawCorrelationUpward`,
+is vacuous — it hardcodes `r = 0.5` and checks `(2*r)/(1+r)` against a
+literal, without calling `compute()` or any production method at all.
+
+Add a test building >= 10 qualifying day-pairs (reuse
+`RecallStatsTestFixtures.warmedUpBaselines()`/`addWarmedUpBaselineDay` and
+`RecallMorningHalfIndexTest`'s "oddAndEvenHalvesAreScoredIndependently..."
+pattern for constructing scorable half-pairs) and assert `pairCount >= 10`,
+`rawCorrelation` non-null and matching an independently-computed expected
+Pearson value, and `spearmanBrownCorrelation` equal to `2r/(1+r)` for that
+real `r`. This is a regression-test-first exercise, not an
+assumed-passing addition: if the new test fails on first run, fix the
+underlying bug it reveals rather than adjusting the assertion to match
+whatever the code currently outputs. Once real coverage exists, delete or
+fold in the vacuous `spearmanBrownCorrectsTheRawCorrelationUpward` test.
+
+#### 21.6 Accuracy documentation and tests reflect recalibration, not raw retrievability — Structure `[ ]`
+
+`RecallStatsDTO.AccuracyStats`'s javadoc and
+`RecallStatsServiceAccuracyAggregationTest`'s class javadoc both still say
+the standardized residual compares against "raw FSRS retrievability" — true
+only through slice 17. Slices 19–20 layered personal recalibration
+(`RecallCalibrationFitter`) and a fitted 3PL guessing floor
+(`RecallGuessingFloorFitter`) on top; `RecallAccuracyAggregator`'s own class
+javadoc was kept accurate each time, but these two other comments were never
+revisited, since each slice's post-change-refactor pass only reviewed that
+slice's own diff. Update both to describe the recalibrated/guessing-floor-
+adjusted formula, cross-referencing `RecallAccuracyAggregator`, matching the
+already-accurate language in `RecallStatsServiceAccuracyCalibrationTest`'s
+and `RecallStatsServiceAccuracyGuessingFloorTest`'s class javadocs.
+
+Bundle in one redundant-test cleanup found in the same area:
+`RecallStatsServiceAccuracyCalibrationTest.todaysAccuracyUsesRawRetrievabilityWhenTrailingHistoryIsSparse`
+re-covers exactly the same identity-fallback behavior
+`RecallStatsServiceAccuracyAggregationTest`'s six tests already establish;
+delete it and keep that file's other, genuinely distinct test.
+
+- **Enables 21.7 only** (shares the same files' context; sequenced so 21.7's
+  restructuring starts from accurate documentation).
+
+#### 21.7 The reliability diagnostic scores both halves of a day without duplicating expensive work — Behavior `[ ]`
+
+`RecallSplitHalfReliability.compute()` calls
+`RecallMorningHalfIndex.compute(..., Half.ODD)` and `...Half.EVEN)` as two
+fully independent calls per candidate day, across up to a 90-day window.
+Each call independently redoes the entire day-level setup from scratch — a
+whole-day `RecallPaceAggregator.compute` pass for `implausiblyFastRows`,
+rebuilding `dayQualifyingRowsInOrder`, and (most expensively)
+`RecallAccuracyAggregator`'s per-question-type 3PL guessing-floor fit (up to
+a 26-point grid search × up to 25 Newton-Raphson iterations each, over the
+trailing 180-day window) — none of which depends on which half is being
+scored (`implausiblyFastRows` is computed before any half-restriction; the
+calibration fit depends only on `allTimeQualifyingRows`/`today`/`zoneId`,
+never on which rows are "today's qualifying rows"). The single most
+expensive computation in the whole pipeline currently runs twice per day for
+no reason, on top of the up-to-90-day loop. `RecallStatsService`'s own
+documentation already says this exact class of problem — an endpoint whose
+cost silently scales with a user's full history — previously caused a
+production timeout; here it's redundant CPU-bound refitting rather than an
+N+1 query, but the risk and the fix's value are the same.
+
+Restructure so both halves of a day are scored from one shared day-level
+setup computed once (e.g. `RecallMorningHalfIndex` gains a method returning
+both halves' index values together), and `RecallSplitHalfReliability`'s loop
+calls it once per day instead of twice. Must not change any observable
+output — same numbers, just not computed twice.
+
+#### 21.8 (optional) Share the Newton-Raphson line-search scaffold between the two fitters — Structure `[ ]`
+
+`RecallCalibrationFitter.newtonRaphson` and `RecallGuessingFloorFitter.fitConditional`
+duplicate an entire ~25-line backtracking-line-search/convergence/bailout
+scaffold (step-halving loop, NaN/Infinite/non-improving-step bailout,
+convergence check) almost line-for-line — they differ only in how the
+per-row gradient/Hessian/log-likelihood is computed inside that scaffold
+(canonical logistic score vs. BHHH approximation for the 3PL). Slice 20's
+post-change-refactor considered merging these and declined, reasoning that
+"the 2PL analytic-Hessian scoring and 3PL BHHH-approximation scoring are
+genuinely different math" — true of the scoring step, but the surrounding
+line-search skeleton really is identical. A shared helper taking a
+per-iteration score-computing function (gradient + curvature +
+log-likelihood) could remove the duplication without touching either fit's
+actual math.
+
+**Marked optional/lower-priority, not a prerequisite for slice 22**: this
+duplication was already reviewed once and knowingly kept, and the codebase's
+own principle is to avoid premature abstraction. Worth doing if convenient;
+skip it without regret otherwise.
 
 #### 22. Recall Stats leads with the morning index — Behavior `[ ]`
 
