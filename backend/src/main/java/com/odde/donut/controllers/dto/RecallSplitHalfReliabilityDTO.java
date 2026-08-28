@@ -15,4 +15,10 @@ public class RecallSplitHalfReliabilityDTO {
   private Integer pairCount;
   private Double rawCorrelation;
   private Double spearmanBrownCorrelation;
+
+  // TEMP-DEBUG (slice 21.4 prod investigation, remove once cause of prod pairCount=0 is found):
+  private Integer tempDebugCandidateDayCount;
+  private Integer tempDebugAccuracyNullCount;
+  private Integer tempDebugPaceStatsNullCount;
+  private Integer tempDebugDayBaselineNullCount;
 }

@@ -14,8 +14,6 @@ import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Scores odd- or even-indexed halves (1-indexed by within-day chronological order) of a single
@@ -33,9 +31,17 @@ import org.slf4j.LoggerFactory;
  * applies it to each half.
  */
 final class RecallMorningHalfIndex {
-  // TEMP-DEBUG (slice 21.4 prod investigation, remove before merge stays):
-  private static final Logger TEMP_DEBUG_LOG =
-      LoggerFactory.getLogger(RecallMorningHalfIndex.class);
+  // TEMP-DEBUG (slice 21.4 prod investigation, remove once cause of prod pairCount=0 is found):
+  // thread-confined per-request counters (each HTTP request runs on its own thread); reset at the
+  // start of RecallSplitHalfReliability.compute and read back at the end.
+  static final ThreadLocal<int[]> TEMP_DEBUG_COUNTERS = ThreadLocal.withInitial(() -> new int[3]);
+  static final int TEMP_DEBUG_ACCURACY_NULL = 0;
+  static final int TEMP_DEBUG_PACE_STATS_NULL = 1;
+  static final int TEMP_DEBUG_DAY_BASELINE_NULL = 2;
+
+  private static void tempDebugCount(int index) {
+    TEMP_DEBUG_COUNTERS.get()[index]++;
+  }
 
   enum Half {
     ODD,
@@ -98,12 +104,7 @@ final class RecallMorningHalfIndex {
     AccuracyStats accuracy =
         RecallAccuracyAggregator.apply(halfQualifyingRows, setup.accuracyFits());
     if (accuracy.getStandardizedResidual() == null) {
-      TEMP_DEBUG_LOG.warn(
-          "TEMP-DEBUG splitHalf day={} half={} reason=accuracyNull halfRows={} sampleSize={}",
-          setup.day(),
-          half,
-          halfQualifyingRows.size(),
-          accuracy.getSampleSize());
+      tempDebugCount(TEMP_DEBUG_ACCURACY_NULL);
       return null;
     }
     // A is already an approximately-standardized residual (slices 17/19/20) where positive means
@@ -115,14 +116,7 @@ final class RecallMorningHalfIndex {
         RecallPaceAggregator.compute(setup.allTimeReviews(), setup.day(), setup.zoneId(), halfRows);
     PaceStats stats = halfPaceResult.stats();
     if (stats.getPctVsUsual() == null || stats.getConsistencyZScore() == null) {
-      TEMP_DEBUG_LOG.warn(
-          "TEMP-DEBUG splitHalf day={} half={} reason=paceStatsNull halfRows={} pctVsUsualNull={}"
-              + " consistencyZNull={}",
-          setup.day(),
-          half,
-          halfQualifyingRows.size(),
-          stats.getPctVsUsual() == null,
-          stats.getConsistencyZScore() == null);
+      tempDebugCount(TEMP_DEBUG_PACE_STATS_NULL);
       return null;
     }
     Double zPace =
@@ -135,15 +129,7 @@ final class RecallMorningHalfIndex {
         RecallDayBaseline.zScoreAgainstDayBaseline(
             stats.getLapseCount(), halfPaceResult.lapseDayBaseline());
     if (zPace == null || zLapse == null) {
-      TEMP_DEBUG_LOG.warn(
-          "TEMP-DEBUG splitHalf day={} half={} reason=dayBaselineNull zPaceNull={} zLapseNull={}"
-              + " paceBaselineDays={} lapseBaselineDays={}",
-          setup.day(),
-          half,
-          zPace == null,
-          zLapse == null,
-          halfPaceResult.paceDayBaseline(),
-          halfPaceResult.lapseDayBaseline());
+      tempDebugCount(TEMP_DEBUG_DAY_BASELINE_NULL);
       return null;
     }
     double zConsistency = stats.getConsistencyZScore();

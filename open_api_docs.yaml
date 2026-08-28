@@ -5086,6 +5086,18 @@ components:
         spearmanBrownCorrelation:
           type: number
           format: double
+        tempDebugCandidateDayCount:
+          type: integer
+          format: int32
+        tempDebugAccuracyNullCount:
+          type: integer
+          format: int32
+        tempDebugPaceStatsNullCount:
+          type: integer
+          format: int32
+        tempDebugDayBaselineNullCount:
+          type: integer
+          format: int32
     QuestionGenerationBatchUserScheduleDTO:
       type: object
       properties:

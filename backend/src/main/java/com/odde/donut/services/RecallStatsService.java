@@ -61,7 +61,13 @@ public class RecallStatsService {
     RecallSplitHalfReliability.Result result =
         RecallSplitHalfReliability.compute(allTimeReviews, today, zoneId);
     return new RecallSplitHalfReliabilityDTO(
-        result.pairCount(), result.rawCorrelation(), result.spearmanBrownCorrelation());
+        result.pairCount(),
+        result.rawCorrelation(),
+        result.spearmanBrownCorrelation(),
+        result.candidateDayCount(),
+        result.tempDebugAccuracyNullCount(),
+        result.tempDebugPaceStatsNullCount(),
+        result.tempDebugDayBaselineNullCount());
   }
 
   private List<RecallAnswerRow> findAllTimeAnsweredRows(User user, Timestamp now) {

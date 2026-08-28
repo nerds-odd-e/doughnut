@@ -966,6 +966,10 @@ export type RecallSplitHalfReliabilityDto = {
     pairCount?: number;
     rawCorrelation?: number;
     spearmanBrownCorrelation?: number;
+    tempDebugCandidateDayCount?: number;
+    tempDebugAccuracyNullCount?: number;
+    tempDebugPaceStatsNullCount?: number;
+    tempDebugDayBaselineNullCount?: number;
 };
 
 export type QuestionGenerationBatchUserScheduleDto = {

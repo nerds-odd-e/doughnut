@@ -8,8 +8,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Internal diagnostic (slice 21.4) for the morning cognitive index's split-half reliability: across
@@ -21,10 +19,6 @@ import org.slf4j.LoggerFactory;
  * <p>Not wired into {@link com.odde.donut.controllers.dto.RecallStatsDTO} or any user-facing page.
  */
 final class RecallSplitHalfReliability {
-  // TEMP-DEBUG (slice 21.4 prod investigation, remove before merge stays):
-  private static final Logger TEMP_DEBUG_LOG =
-      LoggerFactory.getLogger(RecallSplitHalfReliability.class);
-
   /**
    * How far back to look for qualifying mornings. 90 days keeps the estimate about *recent*
    * reliability (consistent with the ~60-day windows the pace/consistency baselines already use)
@@ -63,9 +57,19 @@ final class RecallSplitHalfReliability {
    *     full-morning (not half-morning) reliability; {@code null} under the same conditions as
    *     {@code rawCorrelation}.
    */
-  record Result(int pairCount, Double rawCorrelation, Double spearmanBrownCorrelation) {}
+  record Result(
+      int pairCount,
+      Double rawCorrelation,
+      Double spearmanBrownCorrelation,
+      // TEMP-DEBUG (slice 21.4 prod investigation, remove once cause of prod pairCount=0 is
+      // found): counts of why a half failed to score, summed across every candidate day/half.
+      int candidateDayCount,
+      int tempDebugAccuracyNullCount,
+      int tempDebugPaceStatsNullCount,
+      int tempDebugDayBaselineNullCount) {}
 
   static Result compute(List<RecallAnswerRow> allTimeReviews, LocalDate today, ZoneId zoneId) {
+    RecallMorningHalfIndex.TEMP_DEBUG_COUNTERS.remove();
     List<LocalDate> candidates = candidateDays(allTimeReviews, today, zoneId);
     List<double[]> pairs = new ArrayList<>();
     for (LocalDate day : candidates) {
@@ -74,17 +78,32 @@ final class RecallSplitHalfReliability {
         pairs.add(new double[] {halves.odd(), halves.even()});
       }
     }
-    TEMP_DEBUG_LOG.warn(
-        "TEMP-DEBUG splitHalf summary allTimeReviews={} candidateDays={} pairs={}",
-        allTimeReviews.size(),
-        candidates.size(),
-        pairs.size());
+    int[] debugCounters = RecallMorningHalfIndex.TEMP_DEBUG_COUNTERS.get();
+    int candidateDayCount = candidates.size();
+    int accuracyNullCount = debugCounters[RecallMorningHalfIndex.TEMP_DEBUG_ACCURACY_NULL];
+    int paceStatsNullCount = debugCounters[RecallMorningHalfIndex.TEMP_DEBUG_PACE_STATS_NULL];
+    int dayBaselineNullCount = debugCounters[RecallMorningHalfIndex.TEMP_DEBUG_DAY_BASELINE_NULL];
+    RecallMorningHalfIndex.TEMP_DEBUG_COUNTERS.remove();
     if (pairs.size() < MIN_PAIRS_FOR_CORRELATION) {
-      return new Result(pairs.size(), null, null);
+      return new Result(
+          pairs.size(),
+          null,
+          null,
+          candidateDayCount,
+          accuracyNullCount,
+          paceStatsNullCount,
+          dayBaselineNullCount);
     }
     Double r = pearson(pairs);
     Double correctedR = r == null ? null : (2 * r) / (1 + r);
-    return new Result(pairs.size(), r, correctedR);
+    return new Result(
+        pairs.size(),
+        r,
+        correctedR,
+        candidateDayCount,
+        accuracyNullCount,
+        paceStatsNullCount,
+        dayBaselineNullCount);
   }
 
   /**
