@@ -6,10 +6,12 @@ Product-facing prose, UI copy, protocol identifiers, env vars, and remaining
 internal names use `donut` / `Donut`. Only **live external resource
 identifiers** stay `doughnut`.
 
-This finishes the rename started by ADR 0005 and
+This finishes the rename started by
 `.planning/quick/001-rename-doughnut-to-donut` (executed then deleted). That
 pass left a keep-list that treated product-facing "Doughnut" as brand, deferred
-the `doughnut-note-md` fence, and missed a handful of internal names.
+the `doughnut-note-md` fence, and missed a handful of internal names. The
+keep-list now lives in [ADR 0001](../../../docs/adrs/0001-ubiquitous-language.md)
+Alignment policy (ADR 0005 was removed).
 
 ## Keep `doughnut` (do not migrate)
 
@@ -46,14 +48,13 @@ the `doughnut-note-md` fence, and missed a handful of internal names.
 - Dead: `DOUGHNUT_SPA_PUBLIC_BASE_URL` (planning-only, unused in code);
   `biome.json` `doughnut_mobile` ignore (no such tree); `.gitignore`
   `infra/salt/.../doughnut_env.sh` (path moved under `infra/gcp/`)
-- `backend/HELP.md` Initializr history sentence (history belongs only in ADR 0005)
+- `backend/HELP.md` Initializr history sentence (delete it; do not move it elsewhere)
 
 ## Key design decisions
 
-- **Amend ADR 0005 in place**, do not add ADR 0006. Same decision (internal
-  naming is `donut`); the keep-list narrows. The human already decided this
-  in conversation. ADR 0005 remains the sole file allowed to describe rename
-  history.
+- **No ADR 0005.** Human instruction after this plan was drafted: delete the
+  rename ADR; put the current keep-list in accepted ADRs (ADR 0001 Alignment
+  policy); do not keep rename history in ADRs. Do not restore ADR 0005.
 - **Product name in prose/UI is Donut.** The GitHub repository and live
   endpoints remain `doughnut`. That split is the new boundary — not "public
   brand stays Doughnut."
@@ -65,19 +66,20 @@ the `doughnut-note-md` fence, and missed a handful of internal names.
 - Bulk-rename slices may exceed the ~5 minute fuzzy budget (same exception as
   the original rename). Each slice is still independently stop-safe.
 
+## Learnings
+
+- `ec3507e38f` already deleted ADR 0005 and rewrote ADRs 0000–0004 / README
+  index to current Donut prose. Slice 1 is done by that commit. Slice 8 still
+  needs `docs/commissioned-learning-session-protocol.md`.
+
 ## Slices
 
 ### 1. Amend ADR 0005 keep-list (Structure)
 
-Status: planned
+Status: done
 
-Rewrite `docs/adrs/0005-rename-internal-naming-to-donut-accepted.md` Decision /
-Consequences so the keep-list matches **Keep `doughnut`** above, and so
-product-facing prose/UI is `Donut`. Point Related at this plan instead of the
-deleted `001-rename-doughnut-to-donut`. No history language in other files.
-
-No code changes. Verify: ADR still Accepted; keep-list names local DBs, GCS
-install path, clone folder, `.doughnut-sync`, and `infra/gcp/**`.
+Superseded before execution: ADR 0005 deleted; keep-list is ADR 0001 Alignment
+policy. Do not restore the file.
 
 ### 2. Web UI product copy (Behavior)
 
@@ -153,7 +155,7 @@ Files: `FocusContextMarkdownRenderer.java` + its test,
 any `.planning` note that quotes the fence.
 
 Verify: backend tests for the renderer and Learning Session Request; no
-`doughnut-note-md` left outside ADR 0005.
+`doughnut-note-md` left in the repo.
 
 ### 6. Auth env var `DONUT_API_AUTH_TOKEN` (Behavior)
 
@@ -196,15 +198,14 @@ Verify: targeted `pnpm cypress run --spec` for
 
 Status: planned
 
-Product-prose “Doughnut” → “Donut” in `docs/adrs/0000`–`0004`,
-`docs/adrs/README.md` index title for 0001, and
+ADRs 0000–0004 and the README index title are already current Donut prose
+(`ec3507e38f`). Remaining: product-prose “Doughnut” → “Donut” in
 `docs/commissioned-learning-session-protocol.md`.
 
 Keep `.doughnut-sync`, GitHub paths, and any live URLs. No “renamed from”
 language.
 
-Verify: grep those files for product-prose `Doughnut`; ADR 0005 still contains
-the history.
+Verify: grep that protocol file for product-prose `Doughnut`.
 
 ### 9. Remaining prose, dead artifacts, final grep (Structure)
 
