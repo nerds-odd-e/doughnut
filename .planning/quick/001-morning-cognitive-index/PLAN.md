@@ -1052,6 +1052,68 @@ max-iter still counts as success). Numeric tests unchanged.
 
 Not a prerequisite for slice 22.
 
+#### 21.9 Nearly every review's retrievability is null — find why `memory_tracker.stability` reads as New — Structure `[ ]`
+
+Found while finally querying 21.4's endpoint against real production data
+(prod investigation via three rounds of temporary, response-embedded debug
+counters on `RecallSplitHalfReliabilityDTO`, each deployed then reverted —
+current production state is clean, byte-identical to before this
+investigation). Today's whole-day `RecallStatsDTO.AccuracyStats.sampleSize`
+was 4 against `totals.reviewsToday = 61` (`pace.totalAnsweredToday = 85`) —
+roughly 5% of today's reviews had a usable retrievability. Across the
+split-half diagnostic's 90-day window (91 candidate days), 180 of 182
+candidate half-scorings failed on `RecallAccuracyAggregator`'s
+zero-*sample* branch (0 rows with non-null retrievability in that half),
+not the zero-*variance* branch (a degenerate 3PL fit) — 0 of 180 — which
+rules out 21.8's Newton-Raphson refactor as the cause.
+
+`RecallAnswerRow.retrievability` comes from `RecallPromptRepository`'s
+`LEFT JOIN RecallLog rl ON rl.answer = a AND rl.memoryTracker = mt AND
+rl.grade IS NOT NULL`. `MemoryTracker.retrievabilityAt(now)` — the value
+`persistRecallLog` writes on every live-graded answer, present or absent
+alike — returns null for exactly one reason: `isNew()`, i.e. `stability <=
+Fsrs.NEW_STABILITY_HOURS` (`0.0f`), the field's default. So the finding is
+really: as far as `memory_tracker.stability` is concerned, most trackers
+this account reviews are perpetually "New" — never observed to have
+received a prior grade — despite the account having 126,440 total reviews
+and a 200-day streak.
+
+**Developer's hint, not yet verified:** `RecallLog` is a recent addition
+and current data was backfilled from previously-answered questions; that
+backfill may be incomplete. Worth checking, but note one thing already
+established by reading `RecallLogMemoryStateBackfill` (slice 18): it
+replays history onto a **scratch, never-persisted** `MemoryTracker` purely
+to fill in `recall_log.stability_before` / `difficulty_before` /
+`retrievability` retrospectively on old rows — it never writes back to the
+*live* `memory_tracker.stability`/`difficulty` columns, and it's explicitly
+"not wired to run automatically." So even a fully complete backfill would
+not, by itself, explain *today's* live-instrumented answers reading null —
+today's `stability` comes from whatever is currently persisted on the
+`memory_tracker` row itself, updated by `applyGrade` on every graded
+review. That points at a second, more consequential hypothesis worth
+ruling in/out first: `memory_tracker.stability` updates from `applyGrade`
+are not sticking (a transaction/session issue around
+`entityPersister.save`, a stale read elsewhere, or something — a
+migration, a reset — that zeroed `stability` back to `NEW_STABILITY_HOURS`
+for pre-existing trackers without re-deriving it from history). If true,
+this isn't just starving this stats readout — it would silently be
+feeding the live FSRS *scheduler* wrong stability for most items too.
+
+**Suggested first step:** a direct read-only query (DB console, not the
+stats API) — count `memory_tracker` rows where `stability <= 0` but that
+have more than one `recall_log` row — would directly confirm or rule out
+the "updates aren't sticking" hypothesis before touching production code
+again. If confirmed, check whether `RecallLogMemoryStateBackfill` (or
+whatever ran the historical `RecallLog` backfill in production) was
+supposed to also seed `memory_tracker.stability`/`difficulty` from the
+last-known state and didn't, versus a live persistence bug in `applyGrade`
+itself.
+
+- **Blocks the slice 22–25 gate** (see "This is the gate" at 21.4): the
+  split-half reliability number cannot be trusted, or even meaningfully
+  computed past `pairCount` ≈ 1, until this is resolved — independent of
+  whether the composite formula itself is sound.
+
 #### 22. Recall Stats leads with the morning index — Behavior `[ ]`
 
 Hero readout above `RecallStatsTiles`, against a personal baseline of 100, with
