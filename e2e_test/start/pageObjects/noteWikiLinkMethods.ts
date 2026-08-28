@@ -8,7 +8,6 @@ import { assumeNoteTargetSearchDialog } from './noteTargetSearchDialog'
 const noteShowHref = /^\/d\/n\/\d+$|^\/n\/\d+$|^\/n\d+$/
 const noteShowPathInUrl = /\/d\/n\/\d+|\/n\/\d+|\/n\d+/
 
-const createNewNoteOffer = 'Create a new note named'
 const pointAtExistingNoteOffer = 'Point at an existing note'
 
 type AssumeNotePage = typeof import('./notePage').assumeNotePage
@@ -16,15 +15,6 @@ type RichContentSwitcher = { switchToRichContent: () => unknown }
 
 function findWikiLinkInNoteContent(linkClass: string, wikiLinkText: string) {
   return findNoteContentRegion().find(`a.${linkClass}`).contains(wikiLinkText)
-}
-
-function clickWikiLinkInNoteContent(
-  page: RichContentSwitcher,
-  linkClass: string,
-  wikiLinkText: string
-) {
-  page.switchToRichContent()
-  findWikiLinkInNoteContent(linkClass, wikiLinkText).click()
 }
 
 function wikiLinkInNoteContentFluent(
@@ -61,39 +51,6 @@ export const noteWikiLinkMethods = (assumeNotePage: AssumeNotePage) => ({
     findWikiLinkInNoteContent('dead-wiki-link', wikiLinkText)
     return this
   },
-  followPendingWikiLink(this: RichContentSwitcher, wikiLinkText: string) {
-    clickWikiLinkInNoteContent(this, 'pending-wiki-link', wikiLinkText)
-    return this
-  },
-  expectCreateOrPointAtNoteNotOffered() {
-    cy.get('body').should(($body) => {
-      const text = $body.text()
-      expect(
-        text,
-        'pending wiki link should not offer creating a note'
-      ).not.to.include(createNewNoteOffer)
-      expect(
-        text,
-        'pending wiki link should not offer pointing at an existing note'
-      ).not.to.include(pointAtExistingNoteOffer)
-    })
-    return this
-  },
-  expectCreateOrPointAtNoteOffered() {
-    cy.get('dialog')
-      .filter(':visible')
-      .should(($dialog) => {
-        const text = $dialog.text()
-        expect(text, 'dead wiki link should offer creating a note').to.include(
-          createNewNoteOffer
-        )
-        expect(
-          text,
-          'dead wiki link should offer pointing at an existing note'
-        ).to.include(pointAtExistingNoteOffer)
-      })
-    return this
-  },
   expectCannotCreateNoteFromPath() {
     cy.get('dialog')
       .filter(':visible')
@@ -109,7 +66,8 @@ export const noteWikiLinkMethods = (assumeNotePage: AssumeNotePage) => ({
     return this
   },
   followDeadWikiLink(this: RichContentSwitcher, wikiLinkText: string) {
-    clickWikiLinkInNoteContent(this, 'dead-wiki-link', wikiLinkText)
+    this.switchToRichContent()
+    findWikiLinkInNoteContent('dead-wiki-link', wikiLinkText).click()
     const chooseCreateNewNote = () => {
       cy.findByRole('button', { name: /Create a new note/ }).click()
     }

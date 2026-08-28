@@ -5,8 +5,6 @@ import {
 } from './notePageContentRegion'
 import { toolbarButton } from './toolbarButton'
 
-let releaseHeldNoteContentSave: (() => void) | undefined
-
 export const noteContentEditingMethods = () => ({
   switchToRichContent() {
     cy.get('body').then(($body) => {
@@ -27,54 +25,6 @@ export const noteContentEditingMethods = () => ({
     cy.get('body').click(0, 0, { force: true })
     cy.get('.dirty').should('not.exist')
     waitUntilAppIsNotBusy()
-    return this
-  },
-  holdNextContentSave() {
-    const held = new Promise<void>((resolve) => {
-      releaseHeldNoteContentSave = resolve
-    })
-    cy.intercept(
-      { method: 'PATCH', url: /\/api\/text_content\/\d+\/content$/, times: 1 },
-      (req) => {
-        req.continue(async () => {
-          await held
-        })
-      }
-    ).as('heldNoteContentSave')
-    return this
-  },
-  releaseHeldContentSave() {
-    cy.then(() => {
-      expect(
-        releaseHeldNoteContentSave,
-        'held note content save to release'
-      ).to.be.a('function')
-      releaseHeldNoteContentSave!()
-      releaseHeldNoteContentSave = undefined
-    })
-    cy.wait('@heldNoteContentSave')
-    waitUntilAppIsNotBusy()
-    return this
-  },
-  addWikiLinkInRichContentWithoutWaitingForSave(wikiLinkMarkup: string) {
-    this.switchToRichContent()
-    cy.findByRole(noteContentRegion.role, {
-      name: noteContentRegion.name,
-    }).within(() => {
-      cy.get('.ql-editor[contenteditable="true"]')
-        .first()
-        .click()
-        .then(($el) => {
-          const el = $el[0]
-          const range = document.createRange()
-          range.selectNodeContents(el)
-          range.collapse(false)
-          const sel = window.getSelection()
-          sel?.removeAllRanges()
-          sel?.addRange(range)
-        })
-    })
-    cy.focused().type(` ${wikiLinkMarkup}`, { delay: 0 })
     return this
   },
   openMarkdownContentEditor() {
@@ -115,7 +65,6 @@ export const noteContentEditingMethods = () => ({
       'table cell': 'td',
       'wiki link': 'a',
       'dead wiki link': 'a.dead-wiki-link',
-      'pending wiki link': 'a.pending-wiki-link',
       'live wiki link': 'a.donut-wiki-link',
     }
     for (const element of elements) {
