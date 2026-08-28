@@ -90,19 +90,10 @@ title. Install URLs stay `https://doughnut.odd-e.com`.
 
 ### 3. README product copy and CLI command (Behavior)
 
-Status: planned
+Status: done
 
-- **Pre-condition:** README title is `# Doughnut`, About/CLI headings say
-  Doughnut, install snippet runs `doughnut`.
-- **Trigger:** read README.
-- **Post-condition:** title/headings/blurb say **Donut**; run command is
-  `donut`. GitHub badge URLs, Gitter, backlog `doughnut.odd-e.com`, clone
-  `cd doughnut`, and `mysql -u doughnut` stay.
-
-No dual “Doughnut CLI” heading. Match HomePage (`Donut CLI` + `donut`).
-
-Verify: grep README for leftover product-prose `Doughnut` that is not a URL,
-repo path, or DB user.
+Title/headings/blurb **Donut**; install command `donut`. Keep-list URLs, clone
+`cd doughnut`, and `mysql -u doughnut` stay.
 
 ### 4. CLI user-visible copy (Behavior)
 

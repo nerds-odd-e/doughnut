@@ -23,7 +23,7 @@ public abstract class TimestampOperations {
 
   public static Timestamp alignByHalfADay(Timestamp currentUTCTimestamp, ZoneId timeZone) {
     final ZonedDateTime alignedZonedDt = alignDayAndHourByHalfADay(currentUTCTimestamp, timeZone);
-    return Timestamp.from(alignedZonedDt.withMinute(0).withSecond(0).toInstant());
+    return Timestamp.from(alignedZonedDt.withMinute(0).withSecond(0).withNano(0).toInstant());
   }
 
   public static Timestamp startOfHalfADay(Timestamp currentUTCTimestamp, ZoneId timeZone) {

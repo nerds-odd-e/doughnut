@@ -2,11 +2,27 @@ package com.odde.donut.utils;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.sql.Timestamp;
+import java.time.Instant;
+import java.time.ZoneId;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
 class TimestampOperationsTest {
+
+  @Test
+  void alignByHalfADayIsStableWithinTheHalfDayDespiteSubSecondResidue() {
+    ZoneId shanghai = ZoneId.of("Asia/Shanghai");
+    Timestamp earlier = Timestamp.from(Instant.parse("2026-08-28T02:15:45.123456789Z"));
+    Timestamp later = Timestamp.from(Instant.parse("2026-08-28T03:59:59.987654321Z"));
+
+    assertEquals(
+        TimestampOperations.alignByHalfADay(earlier, shanghai),
+        TimestampOperations.alignByHalfADay(later, shanghai));
+  }
 
   @ParameterizedTest
   @CsvSource({

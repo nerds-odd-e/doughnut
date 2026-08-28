@@ -1,10 +1,10 @@
-# Doughnut
+# Donut
 
 ![dough CI CD](https://github.com/nerds-odd-e/doughnut/actions/workflows/ci.yml/badge.svg) [![Join the chat at https://gitter.im/Odd-e-doughnut/community](https://badges.gitter.im/Odd-e-doughnut/community.svg)](https://gitter.im/Odd-e-doughnut/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 ## About
 
-Doughnut is a Personal Knowledge
+Donut is a Personal Knowledge
 Management ([PKM](https://en.wikipedia.org/wiki/Personal_knowledge_management)) tool
 combining [zettelkasten](https://eugeneyan.com/writing/note-taking-zettelkasten/) style of knowledge
 capture with spaced repetition and recall, and the ability to
@@ -19,18 +19,18 @@ For more background info you can read::
 
 [Story Map](https://miro.com/app/board/o9J_lTB77Mc=/)
 
-## Doughnut CLI
+## Donut CLI
 
 ```bash
 # Install (macOS, Linux, WSL)
 curl https://doughnut.odd-e.com/install -fsS | bash
 # Install (Windows PowerShell)
 irm 'https://doughnut.odd-e.com/install?win32=true' | iex
-# Run interactive session
-doughnut
+# Run CLI
+donut
 ```
 
-## [Doughnut Technology Stack](./docs/tech_stack.md)
+## [Donut Technology Stack](./docs/tech_stack.md)
 
 ## [Current Architecture Videos](./docs/current_architecture_workshops.md)
 
@@ -272,7 +272,7 @@ Expect the Vue production build under `frontend/dist`. The CLI install URL is se
 
 - [GCP production notes](./docs/gcp/prod_env.md) — includes **conditional backend deploy** (when CI skips GCS/MIG on unchanged jar) and how to **force a full deploy** with `force-deployment: true` in the deploy commit message; details in [conditional-backend-deploy.md](./docs/gcp/conditional-backend-deploy.md).
 
-### 12. [Doughnut source code secrets management](./docs/secrets_management.md)
+### 12. [Donut source code secrets management](./docs/secrets_management.md)
 
 ### 13. Architecture and Design documentation
 
