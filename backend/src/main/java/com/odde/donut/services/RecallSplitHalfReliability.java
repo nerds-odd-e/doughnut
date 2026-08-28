@@ -66,9 +66,7 @@ final class RecallSplitHalfReliability {
       int candidateDayCount,
       int tempDebugAccuracyNullCount,
       int tempDebugPaceStatsNullCount,
-      int tempDebugDayBaselineNullCount,
-      int tempDebugAccuracyZeroSampleCount,
-      int tempDebugAccuracyZeroVarianceCount) {}
+      int tempDebugDayBaselineNullCount) {}
 
   static Result compute(List<RecallAnswerRow> allTimeReviews, LocalDate today, ZoneId zoneId) {
     RecallMorningHalfIndex.TEMP_DEBUG_COUNTERS.remove();
@@ -85,10 +83,6 @@ final class RecallSplitHalfReliability {
     int accuracyNullCount = debugCounters[RecallMorningHalfIndex.TEMP_DEBUG_ACCURACY_NULL];
     int paceStatsNullCount = debugCounters[RecallMorningHalfIndex.TEMP_DEBUG_PACE_STATS_NULL];
     int dayBaselineNullCount = debugCounters[RecallMorningHalfIndex.TEMP_DEBUG_DAY_BASELINE_NULL];
-    int accuracyZeroSampleCount =
-        debugCounters[RecallMorningHalfIndex.TEMP_DEBUG_ACCURACY_ZERO_SAMPLE];
-    int accuracyZeroVarianceCount =
-        debugCounters[RecallMorningHalfIndex.TEMP_DEBUG_ACCURACY_ZERO_VARIANCE];
     RecallMorningHalfIndex.TEMP_DEBUG_COUNTERS.remove();
     if (pairs.size() < MIN_PAIRS_FOR_CORRELATION) {
       return new Result(
@@ -98,9 +92,7 @@ final class RecallSplitHalfReliability {
           candidateDayCount,
           accuracyNullCount,
           paceStatsNullCount,
-          dayBaselineNullCount,
-          accuracyZeroSampleCount,
-          accuracyZeroVarianceCount);
+          dayBaselineNullCount);
     }
     Double r = pearson(pairs);
     Double correctedR = r == null ? null : (2 * r) / (1 + r);
@@ -111,9 +103,7 @@ final class RecallSplitHalfReliability {
         candidateDayCount,
         accuracyNullCount,
         paceStatsNullCount,
-        dayBaselineNullCount,
-        accuracyZeroSampleCount,
-        accuracyZeroVarianceCount);
+        dayBaselineNullCount);
   }
 
   /**

@@ -34,12 +34,10 @@ final class RecallMorningHalfIndex {
   // TEMP-DEBUG (slice 21.4 prod investigation, remove once cause of prod pairCount=0 is found):
   // thread-confined per-request counters (each HTTP request runs on its own thread); reset at the
   // start of RecallSplitHalfReliability.compute and read back at the end.
-  static final ThreadLocal<int[]> TEMP_DEBUG_COUNTERS = ThreadLocal.withInitial(() -> new int[5]);
+  static final ThreadLocal<int[]> TEMP_DEBUG_COUNTERS = ThreadLocal.withInitial(() -> new int[3]);
   static final int TEMP_DEBUG_ACCURACY_NULL = 0;
   static final int TEMP_DEBUG_PACE_STATS_NULL = 1;
   static final int TEMP_DEBUG_DAY_BASELINE_NULL = 2;
-  static final int TEMP_DEBUG_ACCURACY_ZERO_SAMPLE = 3;
-  static final int TEMP_DEBUG_ACCURACY_ZERO_VARIANCE = 4;
 
   private static void tempDebugCount(int index) {
     TEMP_DEBUG_COUNTERS.get()[index]++;
@@ -107,10 +105,6 @@ final class RecallMorningHalfIndex {
         RecallAccuracyAggregator.apply(halfQualifyingRows, setup.accuracyFits());
     if (accuracy.getStandardizedResidual() == null) {
       tempDebugCount(TEMP_DEBUG_ACCURACY_NULL);
-      tempDebugCount(
-          accuracy.getSampleSize() != null && accuracy.getSampleSize() > 0
-              ? TEMP_DEBUG_ACCURACY_ZERO_VARIANCE
-              : TEMP_DEBUG_ACCURACY_ZERO_SAMPLE);
       return null;
     }
     // A is already an approximately-standardized residual (slices 17/19/20) where positive means

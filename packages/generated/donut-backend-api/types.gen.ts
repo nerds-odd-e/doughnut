@@ -970,8 +970,6 @@ export type RecallSplitHalfReliabilityDto = {
     tempDebugAccuracyNullCount?: number;
     tempDebugPaceStatsNullCount?: number;
     tempDebugDayBaselineNullCount?: number;
-    tempDebugAccuracyZeroSampleCount?: number;
-    tempDebugAccuracyZeroVarianceCount?: number;
 };
 
 export type QuestionGenerationBatchUserScheduleDto = {
