@@ -859,18 +859,27 @@ tune weights to rescue the number." Each z is signed so positive =
 worse-than-usual; `zA` and `zLapse` are sign-flipped (higher-raw-value =
 better) so all four share pace/consistency's "positive = worse" convention.
 
-#### 21.1 Pace and lapses gain day-level baselines like consistency — Structure `[ ]`
+#### 21.1 Pace and lapses gain day-level baselines like consistency — Structure `[x]`
 
-`RecallPaceAggregator`'s `consistencyZScore` already tracks a per-day
-baseline (`residualsByDate`, median/MAD, `MIN_BASELINE_DAYS` gate) — the
-existing precedent for "how this codebase turns a daily statistic into a
-cross-morning z-score." `pctVsUsual` and `lapseCount` have no equivalent yet:
-nothing records each day's value across many mornings to compute their own
-median/MAD baseline. Extend the same per-day tracking to also capture that
-day's pace residual and lapse count, so both can be expressed as z-scores the
-same way consistency already is. No composite, no wiring yet.
-
-- **Enables 21.2 only.**
+Done: `RecallPaceAggregator`'s `residualsByDate` changed from
+`Map<LocalDate, List<Double>>` to `Map<LocalDate, List<WeightedResidual>>` so
+baseline-window days retain each residual's cold-start weight, not just its
+value. New `Map<LocalDate, Integer> lapseCountByDate`. New
+`paceDayBaseline(...)` reuses the exact `weightedPctVsUsual` transform
+already used for today's tile, applied per baseline-window day; new
+`lapseDayBaseline(...)` computes median/MAD of each day's plain lapse count.
+Both route through a new shared `dayBaseline(...)` helper (returning a
+`DayBaseline(median, mad)` record) gated by the existing `MIN_BASELINE_DAYS`
+constant — post-change-refactor consolidated `consistencyZScore`'s own
+previously-inline gate/median/MAD logic onto this same helper, so "gated
+day-level median/MAD" now has one representation in the file instead of
+three near-duplicates. `PaceResult` gained `paceDayBaseline`/
+`lapseDayBaseline` fields — deliberately internal (not `PaceStats`/DTO), per
+this slice's Structure-only scope; no composite, no wiring, no user-facing
+change. New `RecallPaceAggregatorDayBaselineTest.java`. File size (269 lines,
+~8% over the 250-line convention) was reviewed and left as one file — the
+generic-looking statistics helpers (`weightedPctVsUsual`, `averageWeight`)
+are pace-domain-specific, not generic math, so a split would be artificial.
 
 #### 21.2 The composite index can be computed for any single day — Structure `[ ]`
 

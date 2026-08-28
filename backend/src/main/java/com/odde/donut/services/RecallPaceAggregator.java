@@ -42,8 +42,24 @@ final class RecallPaceAggregator {
     return r.rawElapsedMs();
   }
 
-  /** Result of the chronological pace walk: the tile stats plus rows judged implausibly fast. */
-  record PaceResult(PaceStats stats, Set<RecallAnswerRow> implausiblyFastRows) {}
+  /**
+   * Result of the chronological pace walk: the tile stats, rows judged implausibly fast, and each
+   * of {@code pctVsUsual}/{@code lapseCount}'s own cross-morning baseline (median/MAD of that
+   * statistic's per-day value over the trailing baseline window), mirroring {@code
+   * consistencyZScore}'s existing per-day baseline. Not yet turned into a z-score or wired into
+   * {@link PaceStats} — that is a later slice.
+   */
+  record PaceResult(
+      PaceStats stats,
+      Set<RecallAnswerRow> implausiblyFastRows,
+      DayBaseline paceDayBaseline,
+      DayBaseline lapseDayBaseline) {}
+
+  /**
+   * Median and MAD of a statistic's per-day value across qualifying trailing baseline days. Both
+   * fields are {@code null} when fewer than {@link #MIN_BASELINE_DAYS} days qualify.
+   */
+  record DayBaseline(Double median, Double mad) {}
 
   /**
    * A cold-start item's baseline is built from very few observations, so its residual is noisy.
@@ -55,7 +71,8 @@ final class RecallPaceAggregator {
     Map<Integer, Double> tauByItem = new HashMap<>();
     Map<Integer, Integer> priorObservationCountByItem = new HashMap<>();
     List<WeightedResidual> todaysResiduals = new ArrayList<>();
-    Map<LocalDate, List<Double>> residualsByDate = new HashMap<>();
+    Map<LocalDate, List<WeightedResidual>> residualsByDate = new HashMap<>();
+    Map<LocalDate, Integer> lapseCountByDate = new HashMap<>();
     Set<RecallAnswerRow> implausiblyFastRows = Collections.newSetFromMap(new IdentityHashMap<>());
     LocalDate baselineWindowStart = today.minusDays(BASELINE_WINDOW_START_DAYS_AGO);
     LocalDate baselineWindowEnd = today.minusDays(BASELINE_WINDOW_END_DAYS_AGO);
@@ -97,14 +114,18 @@ final class RecallPaceAggregator {
       int priorObservationCount = priorObservationCountByItem.getOrDefault(itemId, 0);
       if (baseline != null) {
         double cappedResidual = Math.min(lnRt - baseline, RESIDUAL_CAP);
+        double weight = priorObservationCount / (priorObservationCount + 3.0);
+        boolean isLapse = r.correct() && onTaskMs >= LAPSE_FACTOR * Math.exp(baseline);
         if (isToday) {
-          double weight = priorObservationCount / (priorObservationCount + 3.0);
           todaysResiduals.add(new WeightedResidual(cappedResidual, weight));
-          if (r.correct() && onTaskMs >= LAPSE_FACTOR * Math.exp(baseline)) {
+          if (isLapse) {
             lapseCount++;
           }
         } else if (isInBaselineWindow) {
-          residualsByDate.computeIfAbsent(rowDate, k -> new ArrayList<>()).add(cappedResidual);
+          residualsByDate
+              .computeIfAbsent(rowDate, k -> new ArrayList<>())
+              .add(new WeightedResidual(cappedResidual, weight));
+          lapseCountByDate.merge(rowDate, isLapse ? 1 : 0, Integer::sum);
         }
       }
       tauByItem.put(
@@ -118,7 +139,42 @@ final class RecallPaceAggregator {
     return new PaceResult(
         new PaceStats(
             pctVsUsual, sampleSize, totalAnsweredToday, confidence, lapseCount, consistencyZScore),
-        implausiblyFastRows);
+        implausiblyFastRows,
+        paceDayBaseline(residualsByDate),
+        lapseDayBaseline(lapseCountByDate));
+  }
+
+  /**
+   * Per-day pace baseline: applies the exact same weighted-median transform used for today's {@code
+   * pctVsUsual} ({@link #weightedPctVsUsual}) to each qualifying baseline-window day's own
+   * residuals, then reports median/MAD of those per-day values across days.
+   */
+  private static DayBaseline paceDayBaseline(
+      Map<LocalDate, List<WeightedResidual>> residualsByDate) {
+    List<Double> perDayPctVsUsual =
+        residualsByDate.values().stream().map(RecallPaceAggregator::weightedPctVsUsual).toList();
+    return dayBaseline(perDayPctVsUsual);
+  }
+
+  /**
+   * Per-day lapse-count baseline: each qualifying baseline-window day's plain {@code lapseCount}
+   * (no per-day computation needed, unlike pace), median/MAD across days.
+   */
+  private static DayBaseline lapseDayBaseline(Map<LocalDate, Integer> lapseCountByDate) {
+    List<Double> perDayLapseCount =
+        lapseCountByDate.values().stream().map(Integer::doubleValue).toList();
+    return dayBaseline(perDayLapseCount);
+  }
+
+  /**
+   * Shared gating/computation for a statistic's cross-morning baseline: {@code null}/{@code null}
+   * below {@link #MIN_BASELINE_DAYS} qualifying days, otherwise median/MAD of the per-day values.
+   */
+  private static DayBaseline dayBaseline(List<Double> perDayValues) {
+    if (perDayValues.size() < MIN_BASELINE_DAYS) {
+      return new DayBaseline(null, null);
+    }
+    return new DayBaseline(median(perDayValues), mad(perDayValues));
   }
 
   /**
@@ -130,22 +186,27 @@ final class RecallPaceAggregator {
    * spread that can't be used to standardize against).
    */
   private static Double consistencyZScore(
-      List<WeightedResidual> todaysResiduals, Map<LocalDate, List<Double>> residualsByDate) {
+      List<WeightedResidual> todaysResiduals,
+      Map<LocalDate, List<WeightedResidual>> residualsByDate) {
     Double todaySpread = todaysResiduals.size() >= 2 ? weightedMad(todaysResiduals) : null;
     List<Double> baselineSpreads =
         residualsByDate.values().stream()
             .filter(values -> values.size() >= 2)
-            .map(RecallPaceAggregator::mad)
+            .map(RecallPaceAggregator::madOfResiduals)
             .toList();
-    if (todaySpread == null || baselineSpreads.size() < MIN_BASELINE_DAYS) {
+    DayBaseline spreadBaseline = dayBaseline(baselineSpreads);
+    if (todaySpread == null || spreadBaseline.median() == null || spreadBaseline.mad() == 0) {
       return null;
     }
-    double baselineMedian = median(baselineSpreads);
-    double baselineMad = mad(baselineSpreads);
-    if (baselineMad == 0) {
-      return null;
-    }
-    return (todaySpread - baselineMedian) / (baselineMad * MAD_TO_SD_SCALE);
+    return (todaySpread - spreadBaseline.median()) / (spreadBaseline.mad() * MAD_TO_SD_SCALE);
+  }
+
+  /**
+   * Plain (unweighted) MAD of a baseline day's residuals — deliberately ignores each residual's
+   * cold-start weight, unlike {@link #weightedMad} used for today's spread.
+   */
+  private static double madOfResiduals(List<WeightedResidual> residuals) {
+    return mad(residuals.stream().map(WeightedResidual::residual).toList());
   }
 
   /** Plain median of a list of values (average of the two middle values when the size is even). */
