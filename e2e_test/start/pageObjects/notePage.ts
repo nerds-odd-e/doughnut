@@ -1,10 +1,7 @@
 import { commonSenseSplit } from '../../support/string_util'
-import { clickPopupConfirmOk } from '../../support/daisyModalHelpers'
 import { waitUntilAppIsNotBusy } from '../pageBase'
 import testability from '../testability'
 import audioToolsPage from './audioToolsPage'
-import noteCreationForm from './forms/noteCreationForm'
-import { assumeNoteTargetSearchDialog } from './noteTargetSearchDialog'
 import { sidebarChildNotePageMethods } from './sidebarChildNotePageMethods'
 import { noteMoreOptions } from './noteMoreOptionsForm'
 import { toolbarButton } from './toolbarButton'
@@ -17,10 +14,7 @@ import {
 import { noteRelationshipMethods } from './noteRelationshipMethods'
 import { noteRichPropertyMethods } from './noteRichPropertyMethods'
 import { noteRichPropertyAssimilationMethods } from './noteRichPropertyAssimilationMethods'
-
-/** Matches `noteShowHref()` (`/n{id}`), `/n/:id`, or legacy `/d/n/:id` note links. */
-const noteShowHref = /^\/d\/n\/\d+$|^\/n\/\d+$|^\/n\d+$/
-const noteShowPathInUrl = /\/d\/n\/\d+|\/n\/\d+|\/n\d+/
+import { noteWikiLinkMethods } from './noteWikiLinkMethods'
 
 const mainNoteHeadingTitleSelector =
   '#main-note-content h2.path-name-heading [role=title]'
@@ -33,32 +27,6 @@ const titleRenameReferenceSaveTestId: Record<
 > = {
   KEEP_VISIBLE_TEXT: 'referenced-title-save-keep-visible-text',
   UPDATE_VISIBLE_TEXT: 'referenced-title-save-update-visible-text',
-}
-
-function wikiLinkInNoteContentFluent(wikiLinkText: string) {
-  const locator = () =>
-    findNoteContentRegion().find('a.donut-wiki-link').contains(wikiLinkText)
-  return {
-    expectNoteShowHref() {
-      locator().should('have.attr', 'href').and('match', noteShowHref)
-      return this
-    },
-    expectHrefPointsToNote(noteTitle: string) {
-      testability()
-        .getInjectedNoteIdByTitle(noteTitle)
-        .then((noteId) => {
-          locator()
-            .should('have.attr', 'href')
-            .and('match', new RegExp(`/n${noteId}$|/n/${noteId}$`))
-        })
-      return this
-    },
-    followAndAssumeNote(noteTitle: string) {
-      locator().click()
-      cy.url({ timeout: 15000 }).should('match', noteShowPathInUrl)
-      return assumeNotePage(noteTitle)
-    },
-  }
 }
 
 export const assumeNotePage = (
@@ -193,53 +161,7 @@ export const assumeNotePage = (
       waitUntilAppIsNotBusy()
       return assumeNotePage()
     },
-    expectDeadWikiLink(wikiLinkText: string) {
-      findNoteContentRegion().find('a.dead-wiki-link').contains(wikiLinkText)
-      return this
-    },
-    expectCannotCreateNoteFromPath() {
-      cy.get('dialog')
-        .filter(':visible')
-        .contains(
-          'Cannot create a note from a path. You can point at an existing note instead.'
-        )
-        .should('be.visible')
-      clickPopupConfirmOk()
-      cy.findByTestId('note-new-form').should('not.exist')
-      cy.findByRole('button', { name: 'Point at an existing note' }).should(
-        'be.visible'
-      )
-      return this
-    },
-    followDeadWikiLink(wikiLinkText: string) {
-      this.switchToRichContent()
-      findNoteContentRegion()
-        .find('a.dead-wiki-link')
-        .contains(wikiLinkText)
-        .click()
-      const chooseCreateNewNote = () => {
-        cy.findByRole('button', { name: /Create a new note/ }).click()
-      }
-      return {
-        chooseCreateNewNote,
-        createNote: () => {
-          chooseCreateNewNote()
-          noteCreationForm.submit()
-        },
-        pointAtExistingNote: (
-          existingNoteTitle: string,
-          displayText: string
-        ) => {
-          cy.findByRole('button', { name: 'Point at an existing note' }).click()
-          assumeNoteTargetSearchDialog()
-            .findTarget(existingNoteTitle)
-            .pointWikiLinkAtTarget(existingNoteTitle, displayText)
-        },
-      }
-    },
-    wikiLinkInNoteContent(wikiLinkText: string) {
-      return wikiLinkInNoteContentFluent(wikiLinkText)
-    },
+    ...noteWikiLinkMethods(assumeNotePage),
     ...noteContentEditingMethods(),
     ...noteRichPropertyMethods(),
     ...noteRichPropertyAssimilationMethods(),

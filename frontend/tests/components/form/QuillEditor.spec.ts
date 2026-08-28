@@ -35,6 +35,15 @@ describe("QuillEditor.vue", () => {
     return quill!
   }
 
+  async function clickEditorAnchor(selector: string) {
+    await vi.waitUntil(() => document.querySelector(selector))
+    const anchor = document.querySelector(selector) as HTMLAnchorElement
+    anchor.dispatchEvent(
+      new MouseEvent("click", { bubbles: true, cancelable: true })
+    )
+    await nextTick()
+  }
+
   it("renders simple HTML content", async () => {
     await mountEditor({ modelValue: `<h1>Hello</h1><p>World</p>` })
     await vi.waitUntil(() => document.querySelector(".ql-editor h1"))
@@ -114,15 +123,7 @@ describe("QuillEditor.vue", () => {
         '<p><a href="https://example.com/path">ext</a> <a href="/n1" class="donut-wiki-link">wiki</a></p>',
       readonly: true,
     })
-    await vi.waitUntil(() => document.querySelector(".ql-editor a"))
-
-    const ext = document.querySelector(
-      ".ql-editor a[href='https://example.com/path']"
-    ) as HTMLAnchorElement
-    ext.dispatchEvent(
-      new MouseEvent("click", { bubbles: true, cancelable: true })
-    )
-    await nextTick()
+    await clickEditorAnchor(".ql-editor a[href='https://example.com/path']")
     expect(openSpy).toHaveBeenCalledWith(
       "https://example.com/path",
       "_blank",
@@ -133,13 +134,7 @@ describe("QuillEditor.vue", () => {
     openSpy.mockClear()
     pushSpy.mockClear()
 
-    const wiki = document.querySelector(
-      ".ql-editor a.donut-wiki-link"
-    ) as HTMLAnchorElement
-    wiki.dispatchEvent(
-      new MouseEvent("click", { bubbles: true, cancelable: true })
-    )
-    await nextTick()
+    await clickEditorAnchor(".ql-editor a.donut-wiki-link")
     expect(openSpy).not.toHaveBeenCalled()
     expect(pushSpy).toHaveBeenCalledWith("/n1")
 
@@ -157,21 +152,26 @@ describe("QuillEditor.vue", () => {
         modelValue: `<p><a href="${href}" class="dead-wiki-link" data-wiki-title="Ghost">Ghost</a></p>`,
         readonly: false,
       })
-      await vi.waitUntil(() =>
-        document.querySelector(".ql-editor a.dead-wiki-link")
-      )
-
-      const dead = document.querySelector(
-        ".ql-editor a.dead-wiki-link"
-      ) as HTMLAnchorElement
-      dead.dispatchEvent(
-        new MouseEvent("click", { bubbles: true, cancelable: true })
-      )
-      await nextTick()
+      await clickEditorAnchor(".ql-editor a.dead-wiki-link")
 
       expect(wrapper.emitted("deadWikiLinkClick")?.[0]).toEqual([
         { targetToken: "Ghost", displayText: "Ghost" },
       ])
     }
   )
+
+  it("does not emit deadWikiLinkClick when a pending wiki link is clicked", async () => {
+    const pushSpy = vi.spyOn(router, "push").mockResolvedValue(undefined)
+
+    await mountEditor({
+      modelValue: `<p><a href="#" class="pending-wiki-link" data-wiki-title="Ghost">Ghost</a></p>`,
+      readonly: false,
+    })
+    await clickEditorAnchor(".ql-editor a.pending-wiki-link")
+
+    expect(wrapper.emitted("deadWikiLinkClick")).toBeUndefined()
+    expect(pushSpy).not.toHaveBeenCalled()
+
+    pushSpy.mockRestore()
+  })
 })

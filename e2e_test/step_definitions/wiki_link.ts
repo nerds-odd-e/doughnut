@@ -27,6 +27,28 @@ When('I release the held note content save', () => {
   start.assumeNotePage().releaseHeldContentSave()
 })
 
+When('I follow the pending wiki link {string}', (wikiLinkText: string) => {
+  start.assumeNotePage().followPendingWikiLink(wikiLinkText)
+})
+
+When('I follow the dead wiki link {string}', (wikiLinkText: string) => {
+  start.assumeNotePage().followDeadWikiLink(wikiLinkText)
+})
+
+Then(
+  'I should not be offered to create a note or point at an existing note',
+  () => {
+    start.assumeNotePage().expectCreateOrPointAtNoteNotOffered()
+  }
+)
+
+Then(
+  'I should be offered to create a note or point at an existing note',
+  () => {
+    start.assumeNotePage().expectCreateOrPointAtNoteOffered()
+  }
+)
+
 When(
   'I move the current note to notebook {string} root',
   (notebookName: string) => {

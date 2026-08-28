@@ -6,6 +6,7 @@ import {
 import {
   DEAD_WIKI_LINK_CLASS,
   DONUT_WIKI_LINK_CLASS,
+  PENDING_WIKI_LINK_CLASS,
 } from "@/utils/wikiLinkDomMarkers"
 
 export {
@@ -131,6 +132,9 @@ export function handleRichContentAnchorClick(
     anchor.classList.contains(DEAD_WIKI_LINK_CLASS)
   ) {
     handlers.onDeadWikiLink(deadWikiLinkPayloadFromAnchor(anchor))
+    return
+  }
+  if (anchor.classList.contains(PENDING_WIKI_LINK_CLASS)) {
     return
   }
   const noteId = anchor.getAttribute("data-note-id")
