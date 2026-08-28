@@ -129,4 +129,16 @@ describe("replaceWikiLinksInHtml", () => {
       '<p><a href="/n42" class="donut-wiki-link" data-wiki-title="MyNote">MyNote</a></p>'
     )
   })
+
+  it("upgrades an in-flight pending anchor to live when wikiTitles resolve", () => {
+    expect(
+      replaceWikiLinksInHtml(
+        '<p><a href="#" class="pending-wiki-link" data-wiki-title="MyNote">MyNote</a></p>',
+        [wikiTitleFromAuthoredToken("MyNote", 42)],
+        "Saved."
+      )
+    ).toBe(
+      '<p><a href="/n42" class="donut-wiki-link" data-wiki-title="MyNote">MyNote</a></p>'
+    )
+  })
 })

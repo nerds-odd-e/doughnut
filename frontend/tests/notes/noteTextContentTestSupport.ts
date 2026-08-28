@@ -1,6 +1,6 @@
 import { TextContentController } from "@generated/donut-backend-api/sdk.gen"
 import NoteTextContent from "@/components/notes/core/NoteTextContent.vue"
-import type { Note, WikiTitle } from "@generated/donut-backend-api"
+import type { Note, NoteRealm, WikiTitle } from "@generated/donut-backend-api"
 import makeMe from "donut-test-fixtures/makeMe"
 import helper, { mockSdkServiceWithImplementation } from "@tests/helpers"
 import { type VueWrapper, flushPromises } from "@vue/test-utils"
@@ -18,6 +18,24 @@ export function mockUpdateNoteTitle() {
     "updateNoteTitle",
     async (options) => await mockedUpdateTitleCall(options)
   )
+}
+
+export function holdNoteContentSave(
+  realmAfterSave: (savedContent: string) => NoteRealm
+): () => void {
+  let releaseSave!: () => void
+  const saveHeld = new Promise<void>((resolve) => {
+    releaseSave = resolve
+  })
+  mockSdkServiceWithImplementation(
+    TextContentController,
+    "updateNoteContent",
+    async (options) => {
+      await saveHeld
+      return realmAfterSave(options.body?.content ?? "")
+    }
+  )
+  return releaseSave
 }
 
 export function mountNoteTextContent(

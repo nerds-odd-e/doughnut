@@ -3,9 +3,10 @@ import { wikiTitleFromAuthoredToken } from "@/utils/wikiLinkMarkup"
 import { type VueWrapper, flushPromises } from "@vue/test-utils"
 import { afterEach, describe, expect, it, vi } from "vitest"
 import type { ComponentPublicInstance } from "vue"
-import { TextContentController } from "@generated/donut-backend-api/sdk.gen"
-import { mockSdkServiceWithImplementation } from "@tests/helpers"
-import { mountNoteTextContent } from "./noteTextContentTestSupport"
+import {
+  holdNoteContentSave,
+  mountNoteTextContent,
+} from "./noteTextContentTestSupport"
 
 describe("NoteTextContent wiki link display", () => {
   let wrapper: VueWrapper<ComponentPublicInstance>
@@ -112,21 +113,8 @@ describe("NoteTextContent wiki link display", () => {
       .please()
     const inFlightContent = `${savedContent} See [[WikiLinks E2E Nowhere]].`
 
-    let releaseSave!: () => void
-    const saveHeld = new Promise<void>((resolve) => {
-      releaseSave = resolve
-    })
-    mockSdkServiceWithImplementation(
-      TextContentController,
-      "updateNoteContent",
-      async (options) => {
-        await saveHeld
-        return makeMe.aNoteRealm
-          .id(note.id!)
-          .content(options.body?.content ?? "")
-          .wikiTitles([])
-          .please()
-      }
+    const releaseSave = holdNoteContentSave((content) =>
+      makeMe.aNoteRealm.id(note.id!).content(content).wikiTitles([]).please()
     )
 
     wrapper = mountNoteTextContent(note, { readonly: false, wikiTitles: [] })
@@ -176,5 +164,58 @@ describe("NoteTextContent wiki link display", () => {
     ].map((a) => a.getAttribute("data-wiki-title"))
     expect(deadTitles).toContain("WikiLinks E2E Already Missing")
     expect(deadTitles).toContain("WikiLinks E2E Nowhere")
+  })
+
+  it("shows a new wiki link to an existing note as live after content save", async () => {
+    const savedContent = "Saved."
+    const note = makeMe.aNote
+      .title("Wiki carrier")
+      .content(savedContent)
+      .please()
+    const targetNote = makeMe.aNote.title("WikiLinks E2E CI").please()
+    const liveWikiTitles = [
+      wikiTitleFromAuthoredToken("WikiLinks E2E CI", targetNote.id!),
+    ]
+    const inFlightContent = `${savedContent} See [[WikiLinks E2E CI]].`
+
+    const releaseSave = holdNoteContentSave((content) =>
+      makeMe.aNoteRealm
+        .id(note.id!)
+        .content(content)
+        .wikiTitles(liveWikiTitles)
+        .please()
+    )
+
+    wrapper = mountNoteTextContent(note, { readonly: false, wikiTitles: [] })
+    await flushPromises()
+
+    wrapper
+      .findComponent({ name: "QuillEditor" })
+      .vm.$emit("update:modelValue", `<p>Saved. See [[WikiLinks E2E CI]].</p>`)
+    await flushPromises()
+    await vi.waitUntil(() =>
+      document.querySelector(".ql-editor a.pending-wiki-link")
+    )
+
+    releaseSave()
+    await flushPromises()
+    await wrapper.setProps({
+      note: makeMe.aNote
+        .id(note.id!)
+        .title("Wiki carrier")
+        .content(inFlightContent)
+        .please(),
+      wikiTitles: liveWikiTitles,
+    })
+    await flushPromises()
+    await vi.waitUntil(() =>
+      document.querySelector(".ql-editor a.donut-wiki-link")
+    )
+
+    const live = document.querySelector(
+      ".ql-editor a.donut-wiki-link"
+    ) as HTMLAnchorElement
+    expect(live.getAttribute("data-wiki-title")).toBe("WikiLinks E2E CI")
+    expect(live.getAttribute("href")).toBe(`/n${targetNote.id}`)
   })
 })
