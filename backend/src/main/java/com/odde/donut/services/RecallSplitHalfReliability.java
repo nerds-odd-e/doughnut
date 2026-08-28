@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Internal diagnostic (slice 21.4) for the morning cognitive index's split-half reliability: across
@@ -19,6 +21,10 @@ import java.util.Map;
  * <p>Not wired into {@link com.odde.donut.controllers.dto.RecallStatsDTO} or any user-facing page.
  */
 final class RecallSplitHalfReliability {
+  // TEMP-DEBUG (slice 21.4 prod investigation, remove before merge stays):
+  private static final Logger TEMP_DEBUG_LOG =
+      LoggerFactory.getLogger(RecallSplitHalfReliability.class);
+
   /**
    * How far back to look for qualifying mornings. 90 days keeps the estimate about *recent*
    * reliability (consistent with the ~60-day windows the pace/consistency baselines already use)
@@ -60,13 +66,19 @@ final class RecallSplitHalfReliability {
   record Result(int pairCount, Double rawCorrelation, Double spearmanBrownCorrelation) {}
 
   static Result compute(List<RecallAnswerRow> allTimeReviews, LocalDate today, ZoneId zoneId) {
+    List<LocalDate> candidates = candidateDays(allTimeReviews, today, zoneId);
     List<double[]> pairs = new ArrayList<>();
-    for (LocalDate day : candidateDays(allTimeReviews, today, zoneId)) {
+    for (LocalDate day : candidates) {
       HalfIndexes halves = RecallMorningHalfIndex.computeBothHalves(allTimeReviews, day, zoneId);
       if (halves.odd() != null && halves.even() != null) {
         pairs.add(new double[] {halves.odd(), halves.even()});
       }
     }
+    TEMP_DEBUG_LOG.warn(
+        "TEMP-DEBUG splitHalf summary allTimeReviews={} candidateDays={} pairs={}",
+        allTimeReviews.size(),
+        candidates.size(),
+        pairs.size());
     if (pairs.size() < MIN_PAIRS_FOR_CORRELATION) {
       return new Result(pairs.size(), null, null);
     }
