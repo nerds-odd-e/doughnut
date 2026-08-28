@@ -37,7 +37,6 @@
       "!**/cucumber-json-formatter",
       "!**/cucumber-messages.ndjson",
       "!**/packages/generated/donut-backend-api/**",
-      "!**/fvm/**",
       "!**/graphify-out/**"
     ],
     "ignoreUnknown": true
