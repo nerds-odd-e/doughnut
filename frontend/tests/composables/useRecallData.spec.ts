@@ -1,4 +1,5 @@
 import { useRecallData } from "@/composables/useRecallData"
+import { useResumeRecall } from "@/composables/useResumeRecall"
 import { mockCoarsePointer } from "@tests/helpers/mockCoarsePointer"
 import {
   expectSoftKeyboardPrimerIsFocused,
@@ -30,8 +31,8 @@ const ResumeHarness = defineComponent({
     treadmillMode: { type: Boolean, default: false },
   },
   setup(props) {
-    const { resumeRecall, setToRepeat, setCurrentIndex, setTreadmillMode } =
-      useRecallData()
+    const { setToRepeat, setCurrentIndex, setTreadmillMode } = useRecallData()
+    const { resumeRecall } = useResumeRecall()
     setToRepeat([{ memoryTrackerId: 1, spelling: props.spelling }])
     setCurrentIndex(0)
     setTreadmillMode(props.treadmillMode)
@@ -85,7 +86,7 @@ function resetRecallDataState() {
   wrapper.unmount()
 }
 
-describe("useRecallData resumeRecall", () => {
+describe("useResumeRecall", () => {
   let matchMediaSpy: ReturnType<typeof mockCoarsePointer> | undefined
 
   afterEach(() => {

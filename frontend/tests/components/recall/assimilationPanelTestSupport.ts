@@ -105,7 +105,6 @@ export function setupAssimilationPanelTests() {
       setTotalAssimilatedCount: vi.fn(),
       setIsRecallPaused: vi.fn(),
       setIsViewingAnsweredQuestion: vi.fn(),
-      resumeRecall: vi.fn(),
       clearShouldResumeRecall: vi.fn(),
       setTreadmillMode: vi.fn(),
       setCurrentIndex: vi.fn(),

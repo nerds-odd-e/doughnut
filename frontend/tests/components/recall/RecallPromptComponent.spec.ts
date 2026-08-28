@@ -44,7 +44,6 @@ describe("RecallPromptComponent", () => {
 
     return helper
       .component(RecallPromptComponent)
-      .withRouter()
       .withProps({ recallPrompt, nextIsSpelling })
       .mount({ attachTo: document.body })
   }

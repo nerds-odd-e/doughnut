@@ -102,7 +102,7 @@ import NavigationItem from "@/components/navigation/NavigationItem.vue"
 import AccountMenuItem from "@/components/toolbars/AccountMenuItem.vue"
 import { ChevronRight, Menu } from "@lucide/vue"
 import { isWithinAutoCollapseDropdownTree } from "@/composables/dropdownPortalContext"
-import { useRecallData } from "@/composables/useRecallData"
+import { useResumeRecall } from "@/composables/useResumeRecall"
 import { useGoToNextAssimilation } from "@/composables/useGoToNextAssimilation"
 import { isNavigationActionItem } from "@/components/navigation/navigationActionItems"
 
@@ -179,7 +179,7 @@ const handleMenuWrapperClick = (event: MouseEvent) => {
   }
 }
 
-const { resumeRecall } = useRecallData()
+const { resumeRecall } = useResumeRecall()
 const { goToNextAssimilation } = useGoToNextAssimilation()
 
 const handleMenuIconClick = (event: MouseEvent) => {

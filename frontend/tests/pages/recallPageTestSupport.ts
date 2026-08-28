@@ -71,7 +71,6 @@ export function createUseRecallDataMock(overrides?: {
     setIsViewingAnsweredQuestion: vi.fn((viewing: boolean) => {
       isViewingAnsweredQuestionRef.value = viewing
     }),
-    resumeRecall: vi.fn(),
     clearShouldResumeRecall: vi.fn(),
     setTreadmillMode: vi.fn((enabled: boolean) => {
       treadmillModeRef.value = enabled

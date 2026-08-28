@@ -1,10 +1,8 @@
 import { computed, ref } from "vue"
-import { useRouter } from "vue-router"
 import type {
   DueCommissionedMemoryTrackerLite,
   MemoryTrackerLite,
 } from "@generated/donut-backend-api/types.gen"
-import { primeSoftKeyboard } from "@/utils/focusTarget"
 
 export type PotentialLearningSession = {
   notebookId: number
@@ -47,8 +45,6 @@ const potentialLearningSessions = computed((): PotentialLearningSession[] => {
 })
 
 export function useRecallData() {
-  const router = useRouter()
-
   const setToRepeat = (trackers: MemoryTrackerLite[] | undefined) => {
     toRepeat.value = trackers
   }
@@ -73,15 +69,6 @@ export function useRecallData() {
 
   const setIsViewingAnsweredQuestion = (viewing: boolean) => {
     isViewingAnsweredQuestion.value = viewing
-  }
-
-  const resumeRecall = () => {
-    const current = toRepeat.value?.[currentIndex.value]
-    if (current?.spelling && !treadmillMode.value) {
-      primeSoftKeyboard()
-    }
-    shouldResumeRecall.value = true
-    router.push({ name: "recall" })
   }
 
   const clearShouldResumeRecall = () => {
@@ -123,7 +110,6 @@ export function useRecallData() {
     setTotalAssimilatedCount,
     setIsRecallPaused,
     setIsViewingAnsweredQuestion,
-    resumeRecall,
     clearShouldResumeRecall,
     setTreadmillMode,
     setCurrentIndex,

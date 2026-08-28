@@ -1,4 +1,5 @@
 import { useRecallData } from "@/composables/useRecallData"
+import { useResumeRecall } from "@/composables/useResumeRecall"
 import { fireEvent } from "@testing-library/vue"
 import { flushPromises } from "@vue/test-utils"
 import { beforeEach, describe, it, expect, vi } from "vitest"
@@ -15,6 +16,7 @@ import {
 } from "./mainMenuTestSupport"
 
 vi.mock("@/composables/useRecallData")
+vi.mock("@/composables/useResumeRecall")
 vi.mock("@/composables/useGoToNextAssimilation")
 vi.mock("@/managedApi/AiReplyEventSource", async () => {
   const { aiReplyEventSourceMockExports } = await import("./mainMenuMocks")
@@ -39,6 +41,7 @@ describe("MainMenu resume recall", () => {
         toRepeat: memoryTrackerLitesStub(5),
       })
     )
+    vi.mocked(useResumeRecall).mockReturnValue({ resumeRecall: vi.fn() })
   })
 
   it("shows highlighted Resume before Note when recall is paused; hides when not", async () => {
@@ -79,9 +82,11 @@ describe("MainMenu resume recall", () => {
       createUseRecallDataMock({
         isRecallPaused: true,
         toRepeat: memoryTrackerLitesStub(5),
-        resumeRecall: resumeRecallSpy,
       })
     )
+    vi.mocked(useResumeRecall).mockReturnValue({
+      resumeRecall: resumeRecallSpy,
+    })
 
     mountMainMenu()
 

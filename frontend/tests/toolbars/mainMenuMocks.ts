@@ -33,7 +33,6 @@ export const createUseRecallDataMock = (overrides?: {
   toRepeat?: MemoryTrackerLite[]
   isRecallPaused?: boolean
   currentIndex?: number
-  resumeRecall?: () => void
   diligentMode?: boolean
 }) => {
   const toRepeat = ref<MemoryTrackerLite[] | undefined>(
@@ -63,7 +62,6 @@ export const createUseRecallDataMock = (overrides?: {
     setTotalAssimilatedCount: vi.fn(),
     setIsRecallPaused: vi.fn(),
     setIsViewingAnsweredQuestion: vi.fn(),
-    resumeRecall: (overrides?.resumeRecall ?? vi.fn()) as () => void,
     clearShouldResumeRecall: vi.fn(),
     setTreadmillMode: vi.fn(),
     setCurrentIndex: vi.fn(),

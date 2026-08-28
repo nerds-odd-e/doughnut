@@ -50,7 +50,7 @@ import type { PropType, Component } from "vue"
 import LoginButton from "@/components/toolbars/LoginButton.vue"
 import NavigationItem from "@/components/navigation/NavigationItem.vue"
 import AccountMenuItem from "@/components/toolbars/AccountMenuItem.vue"
-import { useRecallData } from "@/composables/useRecallData"
+import { useResumeRecall } from "@/composables/useResumeRecall"
 import { useGoToNextAssimilation } from "@/composables/useGoToNextAssimilation"
 
 type NavigationItemType = {
@@ -77,7 +77,7 @@ defineProps({
   logout: { type: Function as PropType<() => void>, required: true },
 })
 
-const { resumeRecall } = useRecallData()
+const { resumeRecall } = useResumeRecall()
 const { goToNextAssimilation } = useGoToNextAssimilation()
 const handleResumeRecall = () => {
   resumeRecall()
