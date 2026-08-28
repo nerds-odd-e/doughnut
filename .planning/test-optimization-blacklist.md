@@ -8,7 +8,7 @@ is a developer decision after review, not an automatic move from this list.
 Profile E2E with:
 
 ```bash
---env tags='not @ignore and not @skipOptimizationDueToKnownNecessarySlowness'
+--expose tags='not @ignore and not @skipOptimizationDueToKnownNecessarySlowness'
 ```
 
 ## Candidates

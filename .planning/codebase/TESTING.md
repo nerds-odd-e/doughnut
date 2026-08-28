@@ -241,7 +241,7 @@ This repo uses **E2E** and **unit tests** only — nothing in between. Write uni
 - **Infra:** path-routing Node tests under `infra/` (also run from `lint:all` scripts).
 
 **E2E Tests:**
-- Cypress + Cucumber under `e2e_test/`. Default tag filter: `not @ignore` (CI also excludes `@wip`). Do not commit `@focus` / `@only` (`scripts/check_focus_tags.sh`).
+- Cypress + Cucumber under `e2e_test/`. Default tag filter is `expose.tags` in `e2e_test/config/ci.ts`: `not @ignore` (CI also excludes `@wip`). Override with `--expose tags='...'`, not `--env`. Do not commit `@focus` / `@only` (`scripts/check_focus_tags.sh`).
 - Thin step defs → fluent page objects in `e2e_test/start/pageObjects/`. CLI E2E uses `cli.*` page objects; interactive TTY depth belongs in `cli/tests/interactive/` Vitest, not a second Cypress PTY stack.
 - Origin: `http://localhost:5173` through local load balancer.
 - Prefer dumb automation: one path per scenario; distinguish variants with different steps/methods, not runtime mode flags.

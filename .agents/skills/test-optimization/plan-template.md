@@ -9,7 +9,7 @@ Status: in-progress
 Command:
 
 - **N tests**, suite wall ~**Xs**
-- Eligible: **E** (E2E: profiled with `--env tags='not @ignore and not @skipOptimizationDueToKnownNecessarySlowness'`)
+- Eligible: **E** (E2E: profiled with `--expose tags='not @ignore and not @skipOptimizationDueToKnownNecessarySlowness'`)
 - Raw profile: `<local path>` — **do not commit**
 
 ### Top 10% slowest (n = ceil(E × 0.10))

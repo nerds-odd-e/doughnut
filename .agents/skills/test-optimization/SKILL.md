@@ -53,7 +53,7 @@ Do not accumulate context across slices in one agent.
 
 **E2E skip tag:** `@skipOptimizationDueToKnownNecessarySlowness` on a Scenario
 or Feature marks known-necessary slowness. Profile runs exclude it via
-`--env tags=…` (see `profile`). Adding the tag is a developer decision (Jidoka)
+`--expose tags=…` (see `profile`). Adding the tag is a developer decision (Jidoka)
 — propose only; do not add it yourself.
 
 **Candidates:** `.planning/test-optimization-blacklist.md` holds **Candidates**
@@ -121,13 +121,13 @@ Run the **full** suite for the target scope once. Capture per-test durations.
 
 | Scope | Profile command | Parse durations from |
 |-------|-----------------|----------------------|
-| **E2E** | `CURSOR_DEV=true nix develop -c pnpm cy:run-on-sut --reporter json --env tags='not @ignore and not @skipOptimizationDueToKnownNecessarySlowness'` (SUT up; `pnpm sut:healthcheck`) | JSON blocks in stdout — tee to `/tmp/e2e-profile.log` |
+| **E2E** | `CURSOR_DEV=true nix develop -c pnpm cy:run-on-sut --reporter json --expose tags='not @ignore and not @skipOptimizationDueToKnownNecessarySlowness'` (SUT up; `pnpm sut:healthcheck`) | JSON blocks in stdout — tee to `/tmp/e2e-profile.log` |
 | **Frontend** | `CURSOR_DEV=true nix develop -c pnpm -C frontend exec vitest run --reporter=json` | Vitest JSON `testResults[].assertionResults[].duration` |
 | **CLI** | `cd cli && CURSOR_DEV=true nix develop -c pnpm exec vitest run --reporter=json` | Same as Vitest |
 | **Backend** | `CURSOR_DEV=true nix develop -c pnpm backend:test_only` then parse | `backend/build/test-results/test/TEST-*.xml` → `testcase@time` |
 | **MCP server** | `CURSOR_DEV=true nix develop -c pnpm -C mcp-server exec vitest run --reporter=json` | Vitest JSON |
 
-**E2E tags:** Always pass `--env tags='not @ignore and not @skipOptimizationDueToKnownNecessarySlowness'` for profile (and re-profile) so tagged scenarios/features are not run and do not enter the top 10%. CI default tags still apply for normal runs; this override is profile-only. In CI, also keep excluding `@wip` if you mirror CI: `not @ignore and not @wip and not @skipOptimizationDueToKnownNecessarySlowness`.
+**E2E tags:** Always pass `--expose tags='not @ignore and not @skipOptimizationDueToKnownNecessarySlowness'` for profile (and re-profile) so tagged scenarios/features are not run and do not enter the top 10%. CI default tags still apply for normal runs; this override is profile-only. In CI, also keep excluding `@wip` if you mirror CI: `not @ignore and not @wip and not @skipOptimizationDueToKnownNecessarySlowness`. Use `--expose` / `-x`, not `--env` — preprocessor v27 on Cypress >= 15.17 ignores `env.tags`.
 
 **Frontend note:** `frontend:test` runs Vitest **browser mode** (`--browser=chromium`).
 Profile uses plain `vitest run` for `duration` data; verify changes with
@@ -261,7 +261,7 @@ E2E groups: **3+ consecutive green runs** on touched specs before closing a slic
 <step name="reprofile_and_close">
 After all group slices (via execute-plan):
 
-- Re-run same profile command as baseline (same `--env tags=…` for E2E).
+- Re-run same profile command as baseline (same `--expose tags=…` for E2E).
 - Record: test count, suite wall, top-10 table, top-10% **total CPU** (Vitest) or
   sum of slow scenarios (E2E).
 - Note any new **Candidates** proposed.
@@ -305,7 +305,7 @@ one-off inline Node script is enough.
 
 <success_criteria>
 **Optimize mode:**
-- Full-suite profile captured with E2E skip tag excluded via `--env tags`
+- Full-suite profile captured with E2E skip tag excluded via `--expose tags`
 - Top 10% selected from eligible (profiled) tests
 - Plan written and executed via execute-plan (commit + push per group)
 - Non-negotiable rules applied (no redundant tests left, no fixed waits, no flaky)
