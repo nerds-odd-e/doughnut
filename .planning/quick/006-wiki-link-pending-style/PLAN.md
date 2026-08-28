@@ -1,6 +1,6 @@
 # Pending style for unconfirmed wiki links
 
-**Status:** in progress — slices 1–2 done; slices 3–4 remaining.
+**Status:** in progress — slices 1–3 done; slice 4 remaining.
 **Type:** ad-hoc plan (`.planning/quick/`)
 
 ## Goal
@@ -91,18 +91,17 @@ HTML goes pending → live. E2E holds real PATCH, asserts pending, then live
 
 ### 3. Clicking a pending wiki link does not start the missing-note flow (Behavior)
 
-**Status:** planned
+**Status:** done
 
-**Pre:** Pending wiki link is visible (save held or delayed mock).
+`handleRichContentAnchorClick` returns immediately for `pending-wiki-link`.
+Only `dead-wiki-link` starts create / point-at. Unit: mounted Quill editor.
+E2E in `pending_wiki_link.feature` (held PATCH, follow pending, no chooser;
+after release, dead click still offers). Pending body scenarios from slices
+1–2 live in that feature; existing dead-link create/point-at stay in
+`wiki_link.feature`.
 
-**Trigger:** Learner clicks it.
-
-**Post:** Create-note / point-at-existing UI does not open. After the
-link becomes dead, the existing click flow still works.
-
-`handleRichContentAnchorClick` / Quill: only `dead-wiki-link` starts
-that flow. Unit on mounted editor; E2E can share the held-PATCH setup
-from slice 1.
+**Learning:** property fields share this click helper, so a pending property
+anchor would also no-op once it has the pending class (slice 4 styling).
 
 ### 4. Frontmatter property wiki links use the same three styles (Behavior)
 
