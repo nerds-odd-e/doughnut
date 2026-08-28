@@ -47,14 +47,21 @@ export function useRecallPromptFetching(props: {
     }
   }
 
+  let queuedFetch = false
+
   const fetchRecallPrompts = async () => {
-    if (!fetching.value) {
-      fetching.value = true
-      try {
+    if (fetching.value) {
+      queuedFetch = true
+      return
+    }
+    fetching.value = true
+    try {
+      do {
+        queuedFetch = false
         await fetchNextRecallPrompts()
-      } finally {
-        fetching.value = false
-      }
+      } while (queuedFetch)
+    } finally {
+      fetching.value = false
     }
   }
 

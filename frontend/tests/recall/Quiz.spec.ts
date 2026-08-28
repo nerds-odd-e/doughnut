@@ -6,10 +6,12 @@ import {
   contentLoaderVisible,
   contestableQuestionVisible,
   createDeferredGate,
+  createMemoryTrackerLite,
   getRecallPrompt,
   justReviewVisible,
   mockAnswerSpelling,
   mockSpellingRecallServices,
+  mountQuiz,
   mountQuizReady,
   setupQuizTests,
   spellingQuestionVisible,
@@ -47,6 +49,37 @@ describe("repeat page", () => {
         }
       }
     )
+
+    it("fetches the new current prompt when the tracker list changes during prefetch", async () => {
+      const { gate, resolve } = createDeferredGate()
+      getRecallPromptSpy.mockImplementation(async (options) => {
+        const memoryTracker = (options as { path: { memoryTracker: number } })
+          .path.memoryTracker
+        if (memoryTracker === 1) {
+          await gate
+        }
+        return wrapSdkResponse(getRecallPrompt())
+      })
+
+      const quizWrapper = mountQuiz([1, 2, 3, 4, 5], 5)
+      await quizWrapper.vm.$nextTick()
+
+      await quizWrapper.setProps({
+        memoryTrackers: [6, 7, 8, 9, 10].map((id) =>
+          createMemoryTrackerLite(id)
+        ),
+      })
+
+      resolve()
+      await flushPromises()
+
+      expect(getRecallPromptSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          path: { memoryTracker: 6 },
+        })
+      )
+      expect(contestableQuestionVisible(quizWrapper)).toBe(true)
+    })
 
     it("does not fetch question 2 again after prefetched", async () => {
       const quizWrapper = await mountQuizReady([1, 2, 3, 4], 2)
