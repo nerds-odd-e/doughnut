@@ -89,6 +89,7 @@
             <PropertyValueField
               :model-value="draftValue"
               :wiki-titles="wikiTitles"
+              :last-saved-markdown="lastSavedMarkdown"
               aria-label="Property value"
               data-testid="rich-note-property-value"
               @update:model-value="emit('update:draftValue', $event)"
@@ -128,6 +129,7 @@ defineProps<{
   draftKey: string
   draftValue: string
   wikiTitles: WikiTitle[]
+  lastSavedMarkdown?: string
   insertKeyInputId: string
   insertKeyPresetListId: string
   propertyRows: PropertyRow[]

@@ -6,6 +6,7 @@
       v-model="propertyRows[idx]!"
       :idx="idx"
       :wiki-titles="wikiTitles"
+      :last-saved-markdown="lastSavedMarkdown"
       :note-id="noteId"
       :property-rows="propertyRows"
       :key-input-id="rowKeyInputId(idx)"
@@ -36,6 +37,7 @@ const propertyRows = defineModel<PropertyRow[]>({ required: true })
 
 const props = defineProps<{
   wikiTitles: WikiTitle[]
+  lastSavedMarkdown?: string
   noteId?: number
   headingId: string
 }>()

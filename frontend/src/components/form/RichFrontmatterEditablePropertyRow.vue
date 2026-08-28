@@ -54,6 +54,7 @@
           :model-value="scalarValue"
           :property-row="modelValue"
           :wiki-titles="wikiTitles"
+          :last-saved-markdown="lastSavedMarkdown"
           :row-index="idx"
           @update:model-value="onValueUpdate"
           @update:property-value="onPropertyValueUpdate"
@@ -165,6 +166,7 @@ const props = defineProps<{
   modelValue: PropertyRow
   idx: number
   wikiTitles: WikiTitle[]
+  lastSavedMarkdown?: string
   keyInputId: string
   presetListId: string
   propertyRows: PropertyRow[]

@@ -1,15 +1,19 @@
 import type { WikiTitle } from "@generated/donut-backend-api"
 import { noteShowHref } from "@/routes/noteShowLocation"
 import {
-  DEAD_WIKI_LINK_CLASS,
-  DONUT_WIKI_LINK_CLASS,
-} from "@/utils/wikiLinkDomMarkers"
-import {
   authoredLinkOccurrences,
   noteIdForAuthoredToken,
   splitAuthoredToken,
   splitWikiLinkInner,
 } from "@/utils/authoredLinkMarkup"
+import {
+  lastSavedAuthoredTokens,
+  unresolvedWikiClass,
+} from "@/utils/unresolvedWikiLinkStyle"
+import {
+  DONUT_WIKI_LINK_CLASS,
+  isWikiLinkAnchor,
+} from "@/utils/wikiLinkDomMarkers"
 import {
   escapeHtmlAttributeValue,
   escapeHtmlForWikiLinkDisplay,
@@ -23,13 +27,15 @@ import {
 /**
  * Renders a YAML property scalar with clickable wiki and path-Markdown links.
  * Well-formed wiki `[[title]]` uses bracket UI; path Markdown uses the same
- * live/dead wiki-link classes as body path links (plain display, path href).
+ * live/dead/pending wiki-link classes as body path links (plain display, path href).
  */
 export function propertyValuePlainToDisplayHtml(
   plain: string,
-  wikiTitles: WikiTitle[]
+  wikiTitles: WikiTitle[],
+  lastSavedMarkdown?: string
 ): string {
   const map = wikiTitleNoteIdLookup(wikiTitles)
+  const lastSavedTokens = lastSavedAuthoredTokens(lastSavedMarkdown)
 
   let out = ""
   let lastIndex = 0
@@ -44,7 +50,9 @@ export function propertyValuePlainToDisplayHtml(
       out += wikiLinkAnchorHtml({
         href: target,
         className:
-          noteId === undefined ? DEAD_WIKI_LINK_CLASS : DONUT_WIKI_LINK_CLASS,
+          noteId === undefined
+            ? unresolvedWikiClass(occ.token, lastSavedTokens)
+            : DONUT_WIKI_LINK_CLASS,
         target,
         display,
         noteId,
@@ -67,7 +75,8 @@ export function propertyValuePlainToDisplayHtml(
     if (noteId !== undefined) {
       out += `<a href="${noteShowHref(noteId)}" class="${DONUT_WIKI_LINK_CLASS}" data-wiki-title="${attrTarget}"${displayAttr}>${innerHtml}</a>`
     } else {
-      out += `<a href="#" class="${DEAD_WIKI_LINK_CLASS}" data-wiki-title="${attrTarget}"${displayAttr}>${innerHtml}</a>`
+      const className = unresolvedWikiClass(occ.token, lastSavedTokens)
+      out += `<a href="#" class="${className}" data-wiki-title="${attrTarget}"${displayAttr}>${innerHtml}</a>`
     }
   }
   out += escapeHtmlForWikiLinkDisplay(plain.slice(lastIndex))
@@ -83,10 +92,7 @@ export function serializePropertyValueFieldRoot(el: HTMLElement): string {
     } else if (node instanceof HTMLBRElement) {
       continue
     } else if (node instanceof HTMLAnchorElement) {
-      if (
-        node.classList.contains(DONUT_WIKI_LINK_CLASS) ||
-        node.classList.contains(DEAD_WIKI_LINK_CLASS)
-      ) {
+      if (isWikiLinkAnchor(node)) {
         out += wikiAnchorToMarkdownToken(node)
         continue
       }

@@ -7,9 +7,8 @@ import {
   preserveCodeBlockContent,
 } from "@/components/form/quillHtmlPreprocess"
 import {
-  DEAD_WIKI_LINK_CLASS,
   DONUT_WIKI_LINK_CLASS,
-  PENDING_WIKI_LINK_CLASS,
+  isWikiLinkAnchor,
 } from "@/utils/wikiLinkDomMarkers"
 import { wikiAnchorToMarkdownToken } from "@/utils/wikiLinkMarkup"
 
@@ -172,12 +171,7 @@ turndownService.addRule("italicWithEscapedEntities", {
 turndownService.addRule("donutWikiLink", {
   filter(node) {
     if (node.nodeName !== "A") return false
-    const el = node as HTMLElement
-    return (
-      el.classList.contains(DONUT_WIKI_LINK_CLASS) ||
-      el.classList.contains(DEAD_WIKI_LINK_CLASS) ||
-      el.classList.contains(PENDING_WIKI_LINK_CLASS)
-    )
+    return isWikiLinkAnchor(node)
   },
   replacement(_content, node) {
     return wikiAnchorToMarkdownToken(node as HTMLAnchorElement)

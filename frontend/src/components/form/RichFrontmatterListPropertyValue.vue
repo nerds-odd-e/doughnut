@@ -17,6 +17,7 @@
       <WikiLinkToken
         :token="item"
         :wiki-titles="wikiTitles ?? []"
+        :last-saved-markdown="lastSavedMarkdown"
         @dead-wiki-link-click="emit('deadWikiLinkClick', $event)"
       />
     </template>
@@ -59,6 +60,7 @@ const props = defineProps<{
   value: Extract<PropertyValue, { kind: "list" }>
   propertyKey?: string
   wikiTitles?: WikiTitle[]
+  lastSavedMarkdown?: string
   compact?: boolean
 }>()
 

@@ -25,11 +25,13 @@
       v-if="propertyRows.length > 0 && isReadOnly"
       :property-rows="propertyRows"
       :wiki-titles="wikiTitles"
+      :last-saved-markdown="lastSavedMarkdown"
     />
     <RichFrontmatterEditablePropertyList
       v-else-if="propertyRows.length > 0"
       v-model="propertyRows"
       :wiki-titles="wikiTitles"
+      :last-saved-markdown="lastSavedMarkdown"
       :note-id="noteId"
       :heading-id="headingId"
       @row-focus="onRowFocus"
@@ -64,6 +66,7 @@
       :draft-key="draftKey"
       :draft-value="draftValue"
       :wiki-titles="wikiTitles"
+      :last-saved-markdown="lastSavedMarkdown"
       :note-id="noteId"
       :property-rows="propertyRows"
       :insert-key-input-id="insertKeyInputId"
@@ -114,6 +117,7 @@ const props = defineProps<{
   contentMarkdown: string
   readOnly?: boolean
   wikiTitles: WikiTitle[]
+  lastSavedMarkdown?: string
   noteTitleForWikidataSearch?: string
   noteId?: number
   interactionLocked?: boolean

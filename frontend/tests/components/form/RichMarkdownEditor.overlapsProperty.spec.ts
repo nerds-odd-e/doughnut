@@ -158,4 +158,32 @@ Body`,
     expect(deadLink.exists()).toBe(true)
     expect(deadLink.text()).toBe("Title")
   })
+
+  it("shows a new overlaps wiki link as pending until last-saved includes it", async () => {
+    const inFlight = `---
+overlaps:
+  - "[[Other Note]]"
+  - "[[WikiLinks E2E Nowhere]]"
+---
+
+Body`
+    const wrapper = await h.mountEditor(inFlight, {
+      lastSavedMarkdown: OVERLAPS_LIST_MARKDOWN,
+      wikiTitles: [],
+    })
+    await flushPromises()
+
+    const list = propertyRowListValue(wrapper, "overlaps")
+    expect(list.find("a.pending-wiki-link").text()).toBe(
+      "WikiLinks E2E Nowhere"
+    )
+    expect(list.find("a.dead-wiki-link").text()).toBe("Other Note")
+
+    await wrapper.setProps({ lastSavedMarkdown: inFlight, wikiTitles: [] })
+    await flushPromises()
+
+    expect(list.find("a.pending-wiki-link").exists()).toBe(false)
+    const deadTitles = list.findAll("a.dead-wiki-link").map((a) => a.text())
+    expect(deadTitles).toEqual(["Other Note", "WikiLinks E2E Nowhere"])
+  })
 })

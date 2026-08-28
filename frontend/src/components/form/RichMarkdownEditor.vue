@@ -5,6 +5,7 @@
       :content-markdown="modelValue ?? ''"
       :read-only="readonly"
       :wiki-titles="wikiTitles"
+      :last-saved-markdown="lastSavedMarkdown"
       :note-title-for-wikidata-search="noteTitleForWikidataSearch"
       :note-id="noteId"
       :interaction-locked="imageUploadInProgress"

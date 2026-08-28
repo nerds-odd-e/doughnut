@@ -10,6 +10,7 @@
           :value="row.value"
           :property-key="row.key"
           :wiki-titles="wikiTitles"
+          :last-saved-markdown="lastSavedMarkdown"
           compact
         />
         <template v-else-if="isRelationPropertyKey(row.key)">{{
@@ -58,5 +59,9 @@ import {
 } from "@/utils/noteContentFrontmatter"
 import { isListPropertyValue } from "@/utils/noteProperties"
 
-defineProps<{ propertyRows: PropertyRow[]; wikiTitles: WikiTitle[] }>()
+defineProps<{
+  propertyRows: PropertyRow[]
+  wikiTitles: WikiTitle[]
+  lastSavedMarkdown?: string
+}>()
 </script>

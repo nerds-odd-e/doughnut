@@ -10,13 +10,8 @@ import {
 } from "./propertiesTestDom"
 import {
   attemptRenamePropertyKey,
-  clickDeadWikiLinkInPropertyValue,
-  DEAD_LINK_CLICK_CASES,
   mountDuplicateKeysEditor,
-  propertyWikiLinkMarkdown,
 } from "./propertiesTestSupport"
-import { relationshipNoteContent } from "@tests/notes/relationshipNoteTestContent"
-import { wikiTitleFromAuthoredToken } from "@/utils/wikiLinkMarkup"
 import { createRichMarkdownEditorTestHarness } from "./richMarkdownEditorTestHarness"
 
 const twoPropertyMarkdown = `---
@@ -128,30 +123,6 @@ Hello`
     const payload = h.lastEmittedPasteComplete()
     expect(payload).toContain("topic: training")
     expect(payload).toMatch(/^---\n/)
-  })
-
-  it.each(DEAD_LINK_CLICK_CASES)(
-    "emits deadWikiLinkClick for property wiki link ($case)",
-    async ({ wikiToken, expected }) => {
-      const wrapper = await h.mountEditor(propertyWikiLinkMarkdown(wikiToken))
-      await clickDeadWikiLinkInPropertyValue(wrapper)
-      expect(wrapper.emitted("deadWikiLinkClick")?.[0]).toEqual([expected])
-    }
-  )
-
-  it("shows path Markdown in a relationship source as a live wiki-style link", async () => {
-    const wrapper = await h.mountEditor(
-      relationshipNoteContent("a-part-of", "[Moon](/Moon.md)", "[[Earth]]"),
-      {
-        wikiTitles: [wikiTitleFromAuthoredToken("[Moon](/Moon.md)", 42)],
-      }
-    )
-    const live = wrapper
-      .find(propertyRowSelector("source"))
-      .element.querySelector("a.donut-wiki-link") as HTMLAnchorElement
-    expect(live.getAttribute("href")).toBe("/Moon.md")
-    expect(live.textContent).toBe("Moon")
-    expect(live.querySelector(".wiki-bracket")).toBeNull()
   })
 
   it("editing an existing property row emits renamed keys and updated values", async () => {

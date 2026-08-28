@@ -3,12 +3,15 @@ import {
   hrefLooksLikeConceptNotePath,
   noteShowHref,
 } from "@/routes/noteShowLocation"
-import { authoredLinkOccurrences } from "@/utils/authoredLinkMarkup"
 import {
   DEAD_WIKI_LINK_CLASS,
   DONUT_WIKI_LINK_CLASS,
   PENDING_WIKI_LINK_CLASS,
 } from "@/utils/wikiLinkDomMarkers"
+import {
+  lastSavedAuthoredTokens,
+  unresolvedWikiClass,
+} from "@/utils/unresolvedWikiLinkStyle"
 import {
   escapeHtmlAttributeValue,
   escapeHtmlForWikiLinkDisplay,
@@ -18,23 +21,6 @@ import {
   wikiLinkAnchorHtml,
   wikiTitleParts,
 } from "@/utils/wikiLinkMarkup"
-
-function lastSavedAuthoredTokens(
-  lastSavedMarkdown: string | undefined
-): Set<string> | undefined {
-  if (lastSavedMarkdown === undefined) return undefined
-  return new Set(authoredLinkOccurrences(lastSavedMarkdown).map((o) => o.token))
-}
-
-function unresolvedWikiClass(
-  token: string,
-  lastSavedTokens: Set<string> | undefined
-): string {
-  if (lastSavedTokens === undefined || lastSavedTokens.has(token)) {
-    return DEAD_WIKI_LINK_CLASS
-  }
-  return PENDING_WIKI_LINK_CLASS
-}
 
 function authoredTokenFromWikiAnchor(anchor: Element): string {
   const target = anchor.getAttribute("data-wiki-title") ?? ""
