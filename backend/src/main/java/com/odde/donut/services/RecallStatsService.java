@@ -67,7 +67,9 @@ public class RecallStatsService {
         result.candidateDayCount(),
         result.tempDebugAccuracyNullCount(),
         result.tempDebugPaceStatsNullCount(),
-        result.tempDebugDayBaselineNullCount());
+        result.tempDebugDayBaselineNullCount(),
+        result.tempDebugAccuracyZeroSampleCount(),
+        result.tempDebugAccuracyZeroVarianceCount());
   }
 
   private List<RecallAnswerRow> findAllTimeAnsweredRows(User user, Timestamp now) {

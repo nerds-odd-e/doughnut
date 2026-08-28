@@ -21,4 +21,6 @@ public class RecallSplitHalfReliabilityDTO {
   private Integer tempDebugAccuracyNullCount;
   private Integer tempDebugPaceStatsNullCount;
   private Integer tempDebugDayBaselineNullCount;
+  private Integer tempDebugAccuracyZeroSampleCount;
+  private Integer tempDebugAccuracyZeroVarianceCount;
 }

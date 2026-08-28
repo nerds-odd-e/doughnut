@@ -5098,6 +5098,12 @@ components:
         tempDebugDayBaselineNullCount:
           type: integer
           format: int32
+        tempDebugAccuracyZeroSampleCount:
+          type: integer
+          format: int32
+        tempDebugAccuracyZeroVarianceCount:
+          type: integer
+          format: int32
     QuestionGenerationBatchUserScheduleDTO:
       type: object
       properties:
