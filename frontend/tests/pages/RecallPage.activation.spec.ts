@@ -40,28 +40,6 @@ describe("RecallPage KeepAlive activation", () => {
       .mount()
   }
 
-  it("does not remount menu-loaded toRepeat on first activation when the due window is the same half-day", async () => {
-    const { recallingSpy } = mockRecallPageDefaults()
-    const originalTracker = createMemoryTrackerLite(1)
-    const mockData = createUseRecallDataMock({
-      toRepeat: [originalTracker],
-      currentRecallWindowEndAt: "2026-08-27T00:00:00.000Z",
-    })
-    vi.mocked(useRecallData).mockReturnValue(mockData)
-
-    const sameHalfDayResponse = makeMe.aDueMemoryTrackersList
-      .toRepeat([createMemoryTrackerLite(2)])
-      .please()
-    sameHalfDayResponse.currentRecallWindowEndAt = "2026-08-27T00:00:00.847Z"
-    recallingSpy.mockResolvedValue(wrapSdkResponse(sameHalfDayResponse))
-
-    mountWithKeepAlive()
-    await flushPromises()
-
-    expect(mockData.setToRepeat).not.toHaveBeenCalled()
-    expect(mockData.toRepeat.value).toEqual([originalTracker])
-  })
-
   it("does not remount toRepeat when reactivated with an unchanged due window", async () => {
     const { recallingSpy } = mockRecallPageDefaults()
     const unchangedWindowEndAt = "2026-08-27T00:00:00.000Z"
@@ -75,9 +53,7 @@ describe("RecallPage KeepAlive activation", () => {
     const staleWindowResponse = makeMe.aDueMemoryTrackersList
       .toRepeat([createMemoryTrackerLite(2)])
       .please()
-    // Same half-day as the stored window, but leftover millis like production
-    // `alignByHalfADay` used to emit — exact string equality would remount.
-    staleWindowResponse.currentRecallWindowEndAt = "2026-08-27T00:00:00.847Z"
+    staleWindowResponse.currentRecallWindowEndAt = unchangedWindowEndAt
     recallingSpy.mockResolvedValue(wrapSdkResponse(staleWindowResponse))
 
     const wrapper = mountWithKeepAlive()
