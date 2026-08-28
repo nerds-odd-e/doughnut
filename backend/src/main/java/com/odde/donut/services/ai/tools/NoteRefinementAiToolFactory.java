@@ -10,7 +10,6 @@ import com.odde.donut.services.ai.RegeneratedNoteContent;
 import com.odde.donut.services.focusContext.FocusContextConstants;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 final class NoteRefinementAiToolFactory {
 
@@ -57,19 +56,12 @@ final class NoteRefinementAiToolFactory {
     if (choices.isEmpty()) {
       questionBlock.append("(none)\n");
     } else {
-      IntStream.range(0, choices.size())
-          .forEach(
-              i ->
-                  questionBlock
-                      .append(i)
-                      .append(". ")
-                      .append(nullToEmpty(choices.get(i)))
-                      .append('\n'));
+      choices.forEach(choice -> questionBlock.append(nullToEmpty(choice)).append('\n'));
     }
     if (questionContext.getCorrectAnswerIndex() != null) {
       questionBlock
-          .append("Correct answer index: ")
-          .append(questionContext.getCorrectAnswerIndex())
+          .append("Correct answer: ")
+          .append(nullToEmpty(choices.get(questionContext.getCorrectAnswerIndex())))
           .append('\n');
     }
     if (questionContext.getTestedFocus() != null && !questionContext.getTestedFocus().isBlank()) {

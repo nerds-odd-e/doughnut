@@ -131,10 +131,9 @@ class AiControllerNoteRefinementTest extends ControllerTestBase {
       String instructions = paramsCaptor.getValue().rawParams().instructions().orElse("");
       assertThat(instructions)
           .contains("What is the capital of France?")
-          .contains("0. Paris")
-          .contains("1. London")
-          .contains("2. Berlin")
-          .contains("Correct answer index: 0")
+          .contains("Choices:\nParis\nLondon\nBerlin")
+          .contains("Correct answer: Paris")
+          .doesNotContain("Correct answer index")
           .contains("Tested focus: capital city")
           .contains("Set ledToQuestion=true")
           .contains("Set ledToQuestion=false on all other items")
