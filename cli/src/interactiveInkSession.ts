@@ -10,7 +10,7 @@ import { formatInteractiveWelcomeBanner } from './welcomeBanner.js'
  * Interactive TTY entry: real terminal I/O stops here and hands off to Ink.
  *
  * Injectable `stdin` / `stdout` keep this module the narrow infrastructure edge
- * (tests pass mock streams; no Doughnut domain logic). Behavior and stages live
+ * (tests pass mock streams; no Donut domain logic). Behavior and stages live
  * in `InteractiveCliApp` and `commands/`.
  */
 export async function runInteractive(

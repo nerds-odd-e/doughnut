@@ -101,14 +101,14 @@ describe('InteractiveCliApp /last email (mocked HTTP APIs)', () => {
           json: () =>
             Promise.resolve({
               payload: {
-                headers: [{ name: 'Subject', value: 'Welcome to Doughnut' }],
+                headers: [{ name: 'Subject', value: 'Welcome to Donut' }],
               },
             }),
         })
     )
 
     const { stdin, lastFrame, lastStrippedFrame } = await renderApp()
-    const successLine = 'Welcome to Doughnut'
+    const successLine = 'Welcome to Donut'
 
     stdin.write('/last email\r')
     await waitForLastFrame(

@@ -97,22 +97,10 @@ Title/headings/blurb **Donut**; install command `donut`. Keep-list URLs, clone
 
 ### 4. CLI user-visible copy (Behavior)
 
-Status: planned
+Status: done
 
-- **Pre-condition:** unavailable-service message, access-token slash-command
-  description, and Gmail demo subject use “Doughnut”.
-- **Trigger:** run CLI / those tests.
-- **Post-condition:** they say **Donut**. Download path
-  `/doughnut-cli-latest/doughnut` and `https://doughnut.odd-e.com` stay.
-
-Files: `donutBackendClient.ts`, `setAccessTokenSlashCommand.ts`,
-`interactiveInkSession.ts` comment, `cli_gmail.feature` +
-`InteractiveCliApp.lastEmail.test.tsx`.
-
-Tests: existing `recallMcqInteractive.contest.test.tsx` (“Donut service is not
-available”) and last-email test. No new test class.
-
-Verify: `pnpm -C cli test` for those files (or the cli vitest suite if cheaper).
+Unavailable-service message, slash-command description, Gmail subject, and
+session comment say **Donut**. GCS download path and site URL stay.
 
 ### 5. Fence language `donut-note-md` (Behavior)
 

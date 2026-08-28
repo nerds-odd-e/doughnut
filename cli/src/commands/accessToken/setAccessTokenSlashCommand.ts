@@ -7,7 +7,7 @@ import { SetAccessTokenStage } from './SetAccessTokenStage.js'
 const setAccessTokenDoc: CommandDoc = {
   name: '/set-access-token',
   usage: '/set-access-token <token>',
-  description: 'Set the Doughnut API access token',
+  description: 'Set the Donut API access token',
 }
 
 const PREFIX = '/set-access-token'

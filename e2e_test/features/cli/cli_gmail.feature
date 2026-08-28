@@ -15,6 +15,6 @@ Feature: CLI Gmail
   @withCliGmailMockAccountConfig
   @interactiveCLIGmail
   Scenario: Last email shows the subject for a configured account
-    Given the Google API mock returns messages and message "msg-1" with subject "Welcome to Doughnut"
+    Given the Google API mock returns messages and message "msg-1" with subject "Welcome to Donut"
     When I enter the slash command "/last email" in the interactive CLI
-    Then I should see "Welcome to Doughnut" in past CLI assistant messages
+    Then I should see "Welcome to Donut" in past CLI assistant messages

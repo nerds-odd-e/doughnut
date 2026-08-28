@@ -52,7 +52,7 @@ describeRecallMcqInteractive((api) => {
     startRecall(ink.stdin)
     await waitMcqVisible(ink)
     ink.stdin.write('/contest\r')
-    await ink.waitForLastFrameToInclude('Doughnut service is not available')
+    await ink.waitForLastFrameToInclude('Donut service is not available')
     expect(api.answerSpy).not.toHaveBeenCalled()
   })
 })

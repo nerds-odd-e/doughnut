@@ -1,0 +1,199 @@
+export const authenticatedBackendCallFailureAdvice = {
+  noAccessTokenInConfig: 'No access token configured. Run donut login first.',
+  serviceUnreachableOrUnclassifiedFailure:
+    'Donut service is not available. Check DONUT_API_BASE_URL and ensure the service is running.',
+  http401StoredTokenRejected:
+    'Access token is invalid or expired. Run donut login or configure a new token.',
+  http403StoredTokenForbidden:
+    'Access token does not have permission for this operation. Contact support if you believe this is an error.',
+  http502Upstream: 'A dependency service failed (HTTP 502). Try again later.',
+  http503Unavailable:
+    'The service is temporarily unavailable (HTTP 503). Try again later.',
+  http504Timeout: 'The request timed out (HTTP 504). Try again.',
+  http5xxServer: 'The server returned an error. Try again later.',
+  http400BadRequest:
+    'The server rejected this request. Check your input or try again in the web app.',
+  http404NotFound:
+    'The resource was not found. It may have been removed, or the link is wrong.',
+  http409Conflict:
+    'This action conflicts with the current state on the server. Contact support if you need help.',
+  http413PayloadTooLarge:
+    'The file exceeds the maximum upload size the server accepts. Try a smaller file.',
+} as const
+
+type SdkThrowable = unknown
+
+const MAX_CLIENT_ERROR_DETAIL_CHARS = 500
+
+function readableClientErrorDetail(cause: SdkThrowable): string | undefined {
+  if (typeof cause !== 'object' || cause === null) return
+  const o = cause as Record<string, unknown>
+  for (const key of ['message', 'detail'] as const) {
+    const raw = o[key]
+    if (typeof raw !== 'string') continue
+    const t = raw.trim()
+    if (t === '') continue
+    return t.length > MAX_CLIENT_ERROR_DETAIL_CHARS
+      ? `${t.slice(0, MAX_CLIENT_ERROR_DETAIL_CHARS)}…`
+      : t
+  }
+  return
+}
+
+const backendApiErrorTypes = new Set([
+  'OPENAI_UNAUTHORIZED',
+  'BINDING_ERROR',
+  'RESOURCE_CONFLICT',
+  'MULTIPART_SIZE_EXCEEDED',
+  'MULTIPART_ERROR',
+  'OPENAI_TIMEOUT',
+  'OPENAI_SERVICE_ERROR',
+  'OPENAI_NOT_AVAILABLE',
+  'WIKIDATA_SERVICE_ERROR',
+  'ASSESSMENT_SERVICE_ERROR',
+  'QUESTION_ANSWER_ERROR',
+])
+
+function httpStatusFromSdkThrowable(cause: SdkThrowable): number | undefined {
+  if (typeof cause !== 'object' || cause === null) return
+  const o = cause as Record<string, unknown>
+  if (typeof o.status === 'number' && Number.isFinite(o.status)) {
+    return o.status
+  }
+  const res = o.response
+  if (typeof res === 'object' && res !== null) {
+    const s = (res as Record<string, unknown>).status
+    if (typeof s === 'number' && Number.isFinite(s)) return s
+  }
+  return
+}
+
+function donutApiErrorFromThrowable(
+  cause: SdkThrowable
+): { errorType: string; message?: string } | undefined {
+  if (typeof cause !== 'object' || cause === null) return
+  const o = cause as Record<string, unknown>
+  const errorType = o.errorType
+  if (typeof errorType !== 'string' || !backendApiErrorTypes.has(errorType)) {
+    return
+  }
+  const raw = o.message
+  const message =
+    typeof raw === 'string' && raw.trim() !== '' ? raw.trim() : undefined
+  return { errorType, message }
+}
+
+function messageForHttpServerError(status: number): string {
+  if (status === 502)
+    return authenticatedBackendCallFailureAdvice.http502Upstream
+  if (status === 503)
+    return authenticatedBackendCallFailureAdvice.http503Unavailable
+  if (status === 504)
+    return authenticatedBackendCallFailureAdvice.http504Timeout
+  if (status >= 500) return authenticatedBackendCallFailureAdvice.http5xxServer
+  return authenticatedBackendCallFailureAdvice.serviceUnreachableOrUnclassifiedFailure
+}
+
+function userVisibleMessageForKnownApiErrorWithoutBodyMessage(
+  errorType: string,
+  statusHint: number | undefined
+): string {
+  const st = statusHint ?? inferredStatusForBackendErrorType(errorType)
+  if (st >= 500) return messageForHttpServerError(st)
+  if (st === 400) return authenticatedBackendCallFailureAdvice.http400BadRequest
+  if (st === 409) return authenticatedBackendCallFailureAdvice.http409Conflict
+  if (st === 413)
+    return authenticatedBackendCallFailureAdvice.http413PayloadTooLarge
+  return authenticatedBackendCallFailureAdvice.serviceUnreachableOrUnclassifiedFailure
+}
+
+function isLikelyTransportLayerFailure(cause: SdkThrowable): boolean {
+  if (typeof cause !== 'object' || cause === null) return false
+  const code = (cause as NodeJS.ErrnoException).code
+  if (
+    code === 'ECONNREFUSED' ||
+    code === 'ENOTFOUND' ||
+    code === 'ETIMEDOUT' ||
+    code === 'ECONNRESET'
+  ) {
+    return true
+  }
+  if (cause instanceof TypeError && /fetch failed/i.test(cause.message)) {
+    return true
+  }
+  const message = cause instanceof Error ? cause.message : ''
+  return /network|timeout|ECONNREFUSED|ENOTFOUND|ETIMEDOUT/i.test(message)
+}
+
+export function userVisibleMessageForSdkThrowable(cause: SdkThrowable): string {
+  if (isLikelyTransportLayerFailure(cause)) {
+    return authenticatedBackendCallFailureAdvice.serviceUnreachableOrUnclassifiedFailure
+  }
+  const status = httpStatusFromSdkThrowable(cause)
+  if (status === 401) {
+    return authenticatedBackendCallFailureAdvice.http401StoredTokenRejected
+  }
+  const apiErr = donutApiErrorFromThrowable(cause)
+  if (apiErr !== undefined) {
+    if (apiErr.message !== undefined) return apiErr.message
+    return userVisibleMessageForKnownApiErrorWithoutBodyMessage(
+      apiErr.errorType,
+      status
+    )
+  }
+  if (status === 403) {
+    return authenticatedBackendCallFailureAdvice.http403StoredTokenForbidden
+  }
+  if (status === 400) {
+    return (
+      readableClientErrorDetail(cause) ??
+      authenticatedBackendCallFailureAdvice.http400BadRequest
+    )
+  }
+  if (status === 404) {
+    return (
+      readableClientErrorDetail(cause) ??
+      authenticatedBackendCallFailureAdvice.http404NotFound
+    )
+  }
+  if (status === 409) {
+    return (
+      readableClientErrorDetail(cause) ??
+      authenticatedBackendCallFailureAdvice.http409Conflict
+    )
+  }
+  if (status === 413) {
+    return (
+      readableClientErrorDetail(cause) ??
+      authenticatedBackendCallFailureAdvice.http413PayloadTooLarge
+    )
+  }
+  if (status !== undefined && status >= 500) {
+    return messageForHttpServerError(status)
+  }
+  return authenticatedBackendCallFailureAdvice.serviceUnreachableOrUnclassifiedFailure
+}
+
+function inferredStatusForBackendErrorType(errorType: string): number {
+  switch (errorType) {
+    case 'OPENAI_TIMEOUT':
+      return 504
+    case 'OPENAI_SERVICE_ERROR':
+    case 'WIKIDATA_SERVICE_ERROR':
+    case 'ASSESSMENT_SERVICE_ERROR':
+      return 502
+    case 'OPENAI_NOT_AVAILABLE':
+      return 503
+    case 'OPENAI_UNAUTHORIZED':
+    case 'QUESTION_ANSWER_ERROR':
+    case 'BINDING_ERROR':
+    case 'MULTIPART_ERROR':
+      return 400
+    case 'RESOURCE_CONFLICT':
+      return 409
+    case 'MULTIPART_SIZE_EXCEEDED':
+      return 413
+    default:
+      return 500
+  }
+}
