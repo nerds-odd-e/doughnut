@@ -104,7 +104,7 @@ tasks.named('bootRun') {
 
 tasks.register("bootRunE2E", BootRun) {
   group = "application"
-  description = "Runs Doughnut SpringBoot application with the e2e profile (SUT; DevTools on classpath for live reload with pnpm backend:watch)"
+  description = "Runs Donut SpringBoot application with the e2e profile (SUT; DevTools on classpath for live reload with pnpm backend:watch)"
   classpath = sourceSets.main.runtimeClasspath
   mainClass = springBoot.mainClass
   systemProperty("spring.profiles.active", "e2e")

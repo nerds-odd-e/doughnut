@@ -112,7 +112,6 @@
 - `MYSQL_PASSWORD` — prod DB (Secret Manager)
 - `OAUTH2_github_client_id` / `OAUTH2_github_client_secret` — prod web login
 - `GITHUB_FOR_ISSUES_API_TOKEN` — failure-report issues
-- `DOUGHNUT_SPA_PUBLIC_BASE_URL` — prod SPA public URL (default `https://doughnut.odd-e.com`)
 - `DONUT_API_BASE_URL` / `DONUT_API_AUTH_TOKEN` — CLI and MCP → backend
 - `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` — CLI Gmail OAuth (and CI jar reproducibility)
 - CI-only: DB user/password secrets, Slack/Discord webhooks

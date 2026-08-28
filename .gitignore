@@ -103,7 +103,6 @@ nohup.out
 
 # infra secrets
 !infra/gitpod
-!infra/salt/states/base_os/templates/doughnut_env.sh
 infra/ssl/
 
 # Frontend Vue/Vite related

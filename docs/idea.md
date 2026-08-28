@@ -8,7 +8,7 @@ Launch your IntelliJ IDE from your host OS.
   - e.g. On macOS this could look like `/nix/store/l4b6n5yhxcs3ys5s7kia7ch23dp8zyzq-zulu-ca-jdk-25.0.0/Library/Java/JavaVirtualMachines/zulu-25.jdk/Contents/Home`.
 - **File -> Project Structure -> Platform Settings -> SDKs -> Add JDK...**
   - Enter the full path of above (e.g. `/nix/store/l4b6n5yhxcs3ys5s7kia7ch23dp8zyzq-zulu-ca-jdk-25.0.0/Library/Java/JavaVirtualMachines/zulu-25.jdk/Contents/Home`).
-    ![Sample `nix develop` JAVA_HOME](./images/01_doughnut_nix_develop_JAVA_HOME.png "Sample nix develop JAVA_HOME")
+    ![Sample `nix develop` JAVA_HOME](./images/01_donut_nix_develop_JAVA_HOME.png "Sample nix develop JAVA_HOME")
   - Ensure JDK level is set to appropriate JDK version defined in your backend project's `build.gradle` file.
     ![Project Structure -> Project SDK -> Language Level](./images/jdk_language_level.png "Language Level Setting")
 

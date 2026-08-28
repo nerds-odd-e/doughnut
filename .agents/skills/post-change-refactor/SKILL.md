@@ -133,7 +133,7 @@ pass, return to the caller — **do not commit** from inside this skill.
 - Read every new or renamed identifier — files, modules, classes, functions,
   variables, tests, Cypress feature files, fixtures.
 - Ask: does the name match what a domain reader expects? Does it match
-  Doughnut's ubiquitous language (notes, circles, assessments, etc.)?
+  Donut's ubiquitous language (notes, circles, assessments, etc.)?
 - **Action:** rename when intent is unclear, misleading, mixes layers, or
   leaks GSD phase numbers / sequence info. Names describe **capability**, not
   development history. GSD phase numbers belong only under `.planning/`.

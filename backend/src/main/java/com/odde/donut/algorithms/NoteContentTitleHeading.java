@@ -4,8 +4,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Doughnut stores the note title separately from markdown body. AI extract sometimes still emits
- * the title as a leading {@code #} heading; strip that redundant heading when it matches the title.
+ * Donut stores the note title separately from markdown body. AI extract sometimes still emits the
+ * title as a leading {@code #} heading; strip that redundant heading when it matches the title.
  */
 public final class NoteContentTitleHeading {
   private static final Pattern LEADING_HEADING =

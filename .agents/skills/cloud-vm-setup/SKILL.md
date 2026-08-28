@@ -1,14 +1,14 @@
 ---
 name: cloud-vm-setup
 description: >-
-  Set up and run the doughnut dev environment on Cursor Cloud VM (no Nix).
+  Set up and run the Donut dev environment on Cursor Cloud VM (no Nix).
   Use when working on Cloud VM, running tests on Cloud VM, or encountering
   command errors related to missing nix. Triggers on: cloud VM, cloud agent,
   no nix available, /workspace path.
 ---
 
 <objective>
-Set up and run the doughnut dev environment on Cursor Cloud VM without Nix.
+Set up and run the Donut dev environment on Cursor Cloud VM without Nix.
 
 Purpose: Cloud-agent development and testing when `nix develop` is unavailable.
 

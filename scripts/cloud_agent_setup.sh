@@ -105,11 +105,11 @@ fi
 
 # Initialize doughnut databases (idempotent - safe to run multiple times)
 if "${MYSQL_HOME}/bin/mysql" -u root -S "$MYSQL_SOCKET" -e "SHOW DATABASES LIKE 'doughnut_test'" 2>/dev/null | grep -q doughnut_test; then
-    echo "==> Doughnut databases already exist"
+    echo "==> doughnut databases already exist"
 else
     echo "==> Setting up doughnut databases..."
     "${MYSQL_HOME}/bin/mysql" -u root -S "$MYSQL_SOCKET" < /workspace/scripts/sql/init_doughnut_db.sql
-    echo "==> Doughnut databases initialized"
+    echo "==> doughnut databases initialized"
 fi
 
 # Export environment variables for tests (port 3309 matches db-test.properties)

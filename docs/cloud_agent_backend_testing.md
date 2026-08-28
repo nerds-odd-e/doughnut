@@ -6,7 +6,7 @@ This document explains how to run backend unit tests in Cursor's cloud agent env
 
 ## Problem
 
-The Doughnut project has these requirements:
+The Donut project has these requirements:
 - **Java 25**: The backend requires Java 25 (specified in `build.gradle`)
 - **MySQL**: Backend tests use real database interactions with MySQL
 - **Local Environment**: Uses Nix (`flake.nix`) to manage these dependencies
@@ -58,7 +58,7 @@ The script performs these steps:
    - Initializes with empty root password (for testing only)
    - Starts MySQL server on port 3306 with socket at `/tmp/mysql.sock`
 
-4. **Sets up Doughnut Databases**
+4. **Sets up doughnut databases**
    - Creates `doughnut_test`, `doughnut_development`, and `doughnut_e2e_test` databases
    - Creates `doughnut` user with password `doughnut`
    - Grants necessary privileges

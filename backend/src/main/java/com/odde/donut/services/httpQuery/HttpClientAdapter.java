@@ -20,7 +20,7 @@ public class HttpClientAdapter {
                 HttpRequest.newBuilder(uri)
                     .header(
                         "User-Agent",
-                        "Doughnut/1.0 (https://github.com/nerds-odd-e/doughnut; contact@odd-e.com)")
+                        "Donut/1.0 (https://github.com/nerds-odd-e/doughnut; contact@odd-e.com)")
                     .header("Accept", "application/json")
                     .build(),
                 HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));

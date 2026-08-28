@@ -1,8 +1,4 @@
-# Doughnut Backend
-
-## Initial Setup Note
-
-The original package name 'com.odd-e.doughnut' is invalid and this project uses 'com.odde.donut' instead.
+# Donut Backend
 
 ## Reference Documentation
 

@@ -1,13 +1,13 @@
 ---
 name: manual-testing
 description: >-
-  Browser-based manual testing of the doughnut web app. Use ONLY when the
+  Browser-based manual testing of the Donut web app. Use ONLY when the
   developer explicitly asks to test manually or when a slice includes
   manual testing. Do NOT use proactively.
 ---
 
 <objective>
-Manually verify doughnut web-app behavior in a browser using MCP browser tools.
+Manually verify Donut web-app behavior in a browser using MCP browser tools.
 
 Purpose: Human-directed or plan-mandated exploratory testing — not a default
 agent workflow.

@@ -194,7 +194,7 @@
 
 ## Missing Critical Features
 
-**Obsidian ↔ Doughnut sync (user stories ahead of implementation):**
+**Obsidian ↔ Donut sync (user stories ahead of implementation):**
 - Problem: Bidirectional Obsidian sync is not a complete CLI product contract (ADR 0002 points at git-native notebooks instead of `.doughnut-sync`).
 - Blocks: Reliable bidirectional Obsidian workflows (dry-run sync, deletion rules, parent property sync).
 

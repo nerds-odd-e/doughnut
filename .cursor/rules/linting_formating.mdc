@@ -2,7 +2,7 @@
 description: Linting, formatting, code quality, Biome (2.4.x), Redocly, OpenAPI validation, code style, fix formatting errors, biome.json config, Vue SFC project-domain rule limitation, multi-file analysis (MFA)
 alwaysApply: false
 ---
-# Linting and Formatting in Doughnut Project
+# Linting and Formatting in Donut Project
 
 ## When to Use This Rule
 

@@ -7,7 +7,7 @@ import java.util.regex.Pattern;
 import org.apache.logging.log4j.util.Strings;
 
 /**
- * Produces markdown with masked (clozed) portions. Doughnut markdown supports inline {@code <mark>}
+ * Produces markdown with masked (clozed) portions. Donut markdown supports inline {@code <mark>}
  * for masking in recall question stems.
  */
 public class ClozedString {

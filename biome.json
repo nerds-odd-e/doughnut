@@ -37,7 +37,6 @@
       "!**/cucumber-json-formatter",
       "!**/cucumber-messages.ndjson",
       "!**/packages/generated/donut-backend-api/**",
-      "!**/doughnut_mobile/**",
       "!**/fvm/**",
       "!**/graphify-out/**"
     ],

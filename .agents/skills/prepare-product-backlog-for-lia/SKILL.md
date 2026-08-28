@@ -5,7 +5,7 @@ description: >-
   LeSS in Action (LIA) class. Use when selecting class-sized product features,
   investigating how much of an idea already exists, turning feature themes
   into vertical interdependent user stories, adding high-value items, or
-  facilitating Product Backlog refinement for teams working on Doughnut or
+  facilitating Product Backlog refinement for teams working on Donut or
   another production product.
 ---
 
@@ -297,7 +297,7 @@ Retain these lessons:
    publishing to an existing remote into a product story merely to put Git or
    GitHub in the backlog. Once the local OKF/Git tree is stable, users already have that
    capability. Fold Git-friendly behavior into that on-disk contract unless
-   Doughnut adds domain-specific value.
+   Donut adds domain-specific value.
 5. Delegate authentication to existing secure mechanisms and design CI around
    local substitutes when possible.
 6. Preserve conflicts, idempotency, partial failure, and recovery while slicing;

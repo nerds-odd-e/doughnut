@@ -7,7 +7,7 @@
 - A [Ona](https://app.gitpod.io) account signed up using your Github account above.
 - _Optional_ [Chrome extension for Ona](https://chromewebstore.google.com/detail/ona/dodmmooeoklaejobgleioelladacbeki). This chrome extension gives you a nice green 'Ona' button at the top of [doughnut Github](https://github.com/nerds-odd-e/doughnut) repo to launch your Ona workspace. You may also enter the URL [https://app.gitpod.io/#https://github.com/nerds-odd-e/doughnut/](https://app.gitpod.io/#https://github.com/nerds-odd-e/doughnut/) to achieve the same effect.
 
-## Up & running your Ona `doughnut` development environment
+## Up & running your Ona Donut development environment
 
 ### Basic Ona VSCode workspace
 
@@ -39,7 +39,7 @@ pnpm sut
 
 This starts backend, frontend, and mountebank - all with auto-reload on code changes. You can now develop and test without manually restarting services.
 
-### Preparation steps to run doughnut backend unit tests & cypress End-to-End tests
+### Preparation steps to run Donut backend unit tests & cypress End-to-End tests
 
 - From the root of the `doughnut` codebase (this should be on path `/workspace/doughnut`), boot up your `nix` development environment (with `direnv` just `cd` to the `doughtnut` source directory, else, `nix develop` to prepare End-to-End testing tooling setup.
 - From root of `doughnut` source path, execute `pnpm verify` to execute the full headless cypress End-to-End test suite.

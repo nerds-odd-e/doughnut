@@ -5,13 +5,13 @@ alwaysApply: false
 
 # donut-mcp-server MCP Server
 
-A Model Context Protocol server for Doughnut.
+A Model Context Protocol server for Donut.
 
 Is in the `mcp-server` folder.
 
 This is a TypeScript-based MCP server that demonstrates core MCP concepts by providing:
 
-- Tools that read note context from the Doughnut backend API (search and graph).
+- Tools that read note context from the Donut backend API (search and graph).
 
 ## Structure (minimal)
 

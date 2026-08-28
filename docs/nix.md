@@ -12,7 +12,7 @@ Full details on Nix installation via Determinate nix-installer [here](https://gi
 curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install --determinate
 ```
 
-### 2. Setup and run doughnut for the first time (local development profile)
+### 2. Setup and run Donut for the first time (local development profile)
 
 ```bash
 mkdir -p ~/.config/nix
@@ -20,7 +20,7 @@ echo 'experimental-features = nix-command flakes' >> ~/.config/nix/nix.conf
 ```
 
 Launch a new terminal in your favourite shell (I highly recommend zsh).
-Clone full all-in-one doughnut codebase from Github (Microsoft Windows OS users, please clone the repo to a non-Windows mount directory)
+Clone full all-in-one Donut codebase from Github (Microsoft Windows OS users, please clone the repo to a non-Windows mount directory)
 
 ```bash
 git config --global core.autocrlf input
@@ -28,7 +28,7 @@ git clone git@github.com:nerds-odd-e/doughnut.git
 git add --renormalize .
 ```
 
-Boot up your doughnut development environment.
+Boot up your Donut development environment.
 MySQL DB server wil be started and initialised on entering the local cloned `doughnut` source directory via `direnv` else run `nix develop`.
 
 ```bash

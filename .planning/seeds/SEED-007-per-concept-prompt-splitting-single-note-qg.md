@@ -13,7 +13,7 @@ scope: medium
 
 Research on concept-grouped retrieval for question generation surfaced Savaal (arXiv 2502.12477), which splits the LLM call **per concept**: each call receives one main idea plus its top-k retrieved passages, and generates N/M questions per idea in separate calls. Savaal reports 6.5× better depth-of-understanding on dissertations and 1.5× on papers vs direct-prompting.
 
-In Doughnut, the wiki links of the focus note ARE concept anchors (each linked note is an atomic concept node — see `.planning/notes/graph-structural-retrieval-as-implicit-concept-grouping.md`). So the per-concept split translates to: **one question-generation call per linked-note-group**, where each call receives the focus note plus the related notes reached through that one link, rather than one call with all related notes batched together.
+In Donut, the wiki links of the focus note ARE concept anchors (each linked note is an atomic concept node — see `.planning/notes/graph-structural-retrieval-as-implicit-concept-grouping.md`). So the per-concept split translates to: **one question-generation call per linked-note-group**, where each call receives the focus note plus the related notes reached through that one link, rather than one call with all related notes batched together.
 
 This is a different prompt structure from the current single `<focus_context>` envelope that batches all related notes. It is the most concrete structural change the research points to for deepening QG.
 

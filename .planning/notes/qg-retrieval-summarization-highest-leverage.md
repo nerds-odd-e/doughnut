@@ -12,14 +12,14 @@ ConQuer (which Quizard adapts) ran an ablation on its question-generation pipeli
 
 Savaal's results corroborate this from a different angle: concept-grouped retrieval beats whole-document retrieval on **depth of understanding** (6.5× better on dissertations, 1.5× on papers), but both score ~90% on **clarity**. The win is in conceptual depth and coverage, not coherence. The depth win scales with document length.
 
-## What this means for Doughnut
+## What this means for Donut
 
-Doughnut's current `<focus_context>` envelope feeds **raw note bodies** in fenced `donut-note-md` blocks, bounded by a token budget (~2500 tokens for related notes). The research suggests the highest-leverage change to improve QG quality is **not** restructuring the envelope or reorganizing which notes are selected — it is adding a **summarization pass** before generation, so the model receives compressed, signal-dense context rather than raw note bodies it has to compress itself.
+Donut's current `<focus_context>` envelope feeds **raw note bodies** in fenced `donut-note-md` blocks, bounded by a token budget (~2500 tokens for related notes). The research suggests the highest-leverage change to improve QG quality is **not** restructuring the envelope or reorganizing which notes are selected — it is adding a **summarization pass** before generation, so the model receives compressed, signal-dense context rather than raw note bodies it has to compress itself.
 
 This is a stronger lever than:
 - Switching from graph-structural to embedding-based retrieval (the field norm, but not obviously better for a zettelkasten where links are deliberate).
 - Splitting the prompt per linked-note-group (Savaal-style — see SEED-007; pays off mainly at document scale, untested at single-note scale).
-- Adding more metadata to the envelope (Doughnut is already the most structured in the field).
+- Adding more metadata to the envelope (Donut is already the most structured in the field).
 
 ## Caveats
 
@@ -29,7 +29,7 @@ This is a stronger lever than:
 
 ## Open question
 
-Whether a summarization pass helps at **single-note** scale (Doughnut's case) vs **large-document** scale (Savaal/ConQuer's case) is untested. At single-note scale the focus note itself is already atomic; the question is whether summarizing the *related notes* before generation improves QG. This is the most direct spike available.
+Whether a summarization pass helps at **single-note** scale (Donut's case) vs **large-document** scale (Savaal/ConQuer's case) is untested. At single-note scale the focus note itself is already atomic; the question is whether summarizing the *related notes* before generation improves QG. This is the most direct spike available.
 
 ## Sources
 

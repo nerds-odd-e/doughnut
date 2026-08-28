@@ -36,7 +36,7 @@ donut
 
 ## Getting started
 
-### 1. Quick Start - doughnut development environment setup
+### 1. Quick Start - Donut development environment setup
 
 :checkered_flag: From the root of doughnut directory, in a terminal, run:
 
@@ -87,9 +87,9 @@ run `sudo dpkg-reconfigure dash` and answer "No" to reconfigure to `bash` as def
 :vertical_traffic_light: :construction: 🚨 **ONLY** if you hit problems with the above quick-start setup, you should manually walk through
 the [local development environment nix setup](./docs/nix.md).
 
-### 2. Setup and run doughnut with migrations in 'E2E' profile (backend app started on port 9081)
+### 2. Setup and run Donut with migrations in 'E2E' profile (backend app started on port 9081)
 
-From the root of your doughnut directory, start your doughnut nix development environment with
+From the root of your doughnut directory, start your Donut nix development environment with
 
 If you have `direnv` installed & configured right, just `cd` to the path where you cloned `doughnut` Github source code and the `nix` develop environment will autoload, **OTHERWISE** run:
 
@@ -291,7 +291,7 @@ Expect the Vue production build under `frontend/dist`. The CLI install URL is se
   - [GitHub Discussions](https://github.com/nerds-odd-e/doughnut/discussions) for product
     ideas/features,
   - [GitHub Issues](https://github.com/nerds-odd-e/doughnut/issues) for reporting issues or bugs, OR
-  - [doughnut gitter.im](https://gitter.im/Odd-e-doughnut/community)
+  - [Odd-e-doughnut gitter](https://gitter.im/Odd-e-doughnut/community)
 - FOSS style; Fork and submit GitHub PR.
   - Please keep the PR small and on only one topic
   - The code need to come with tests.

@@ -1,4 +1,4 @@
-name: doughnut GCP MIG Status Check
+name: Donut GCP MIG Status Check
 
 on:
   schedule:
@@ -17,7 +17,7 @@ jobs:
         with:
           credentials_json: ${{ env.GCP_CREDENTIALS }}
           skip_install: ${{ runner.os == 'Linux' && vars.GCP_FORCE_GCLOUD_INSTALL != 'true' }}
-      - name: Check doughnut MIG Status
+      - name: Check Donut MIG Status
         run: |
           PROJECT_ID=$(gcloud config get-value project)
           ZONE=us-east1-b
@@ -37,13 +37,13 @@ jobs:
             if [ $? -eq 0 ]; then
               status_case_insensitive=$(echo "$status" | tr '[:upper:]' '[:lower:]')
               if [ "$status_case_insensitive" = "true" ]; then
-                echo "doughnut MIG is STABLE."
+                echo "Donut MIG is STABLE."
                 exit 0
               else
-                echo "doughnut MIG is NOT Stable. Current status: $status"
+                echo "Donut MIG is NOT Stable. Current status: $status"
               fi
             else
-              echo "Error querying doughnut MIG status: $status"
+              echo "Error querying Donut MIG status: $status"
               echo "Retrying..."
             fi
 
@@ -51,8 +51,8 @@ jobs:
             attempt=$((attempt+1))
           done
 
-          echo "doughnut MIG did not stabilize within the expected time"
-          echo "Final doughnut MIG details:"
+          echo "Donut MIG did not stabilize within the expected time"
+          echo "Final Donut MIG details:"
           gcloud compute instance-groups managed describe $MIG_NAME \
             --project=$PROJECT_ID \
             --zone=$ZONE
@@ -63,5 +63,5 @@ jobs:
         uses: 8398a7/action-slack@v3
         with:
           status: ${{ job.status }}
-          text: "doughnut MIG Status Check Failed. Please check the logs for more details."
+          text: "Donut MIG Status Check Failed. Please check the logs for more details."
           webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
