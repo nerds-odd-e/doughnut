@@ -1,8 +1,8 @@
 # Morning cognitive index from recall history
 
 **Status:** in progress — slices 1–14, 14.1–14.8, 15, 16, 17, 18, 19, 20,
-21.1–21.5 done. Repair pass **21.6–21.7 remaining (21.8 optional)** — **next:
-21.6**. Once those are done, the reliability endpoint
+21.1–21.6 done. Repair pass **21.7 remaining (21.8 optional)** — **next:
+21.7**. Once that is done, the reliability endpoint
 (`GET /api/user/recall-split-half-reliability`) still needs **the developer
 to query it and decide against the ~0.6 gate before slice 22 starts** (see
 Jidoka checkpoints — this is a required stop, not an autonomous continuation
@@ -1017,29 +1017,17 @@ later scored morning also sits in an earlier morning's trailing baseline
 window, which makes half-indexes null. Multi-day half-index fixtures must
 use `variedBaselinesThrough` (3-phase pace/lapse) plus `addScorableMorning`.
 
-#### 21.6 Accuracy documentation and tests reflect recalibration, not raw retrievability — Structure `[ ]`
+#### 21.6 Accuracy documentation and tests reflect recalibration, not raw retrievability — Structure `[x]`
 
-`RecallStatsDTO.AccuracyStats`'s javadoc and
-`RecallStatsServiceAccuracyAggregationTest`'s class javadoc both still say
-the standardized residual compares against "raw FSRS retrievability" — true
-only through slice 17. Slices 19–20 layered personal recalibration
-(`RecallCalibrationFitter`) and a fitted 3PL guessing floor
-(`RecallGuessingFloorFitter`) on top; `RecallAccuracyAggregator`'s own class
-javadoc was kept accurate each time, but these two other comments were never
-revisited, since each slice's post-change-refactor pass only reviewed that
-slice's own diff. Update both to describe the recalibrated/guessing-floor-
-adjusted formula, cross-referencing `RecallAccuracyAggregator`, matching the
-already-accurate language in `RecallStatsServiceAccuracyCalibrationTest`'s
-and `RecallStatsServiceAccuracyGuessingFloorTest`'s class javadocs.
+Done: `RecallStatsDTO.AccuracyStats` and
+`RecallStatsServiceAccuracyAggregationTest` javadocs now describe the
+recalibrated 3PL `p̂` (identity fallback when trailing history is sparse),
+cross-referencing `RecallAccuracyAggregator`. Deleted redundant
+`todaysAccuracyUsesRawRetrievabilityWhenTrailingHistoryIsSparse`; kept
+`todaysAccuracyIsScoredAgainstTheRecalibratedProbabilityWhenTrailingHistoryIsAbundant`.
+Aggregation tests unchanged (they remain the sparse/identity-fallback cases).
 
-Bundle in one redundant-test cleanup found in the same area:
-`RecallStatsServiceAccuracyCalibrationTest.todaysAccuracyUsesRawRetrievabilityWhenTrailingHistoryIsSparse`
-re-covers exactly the same identity-fallback behavior
-`RecallStatsServiceAccuracyAggregationTest`'s six tests already establish;
-delete it and keep that file's other, genuinely distinct test.
-
-- **Enables 21.7 only** (shares the same files' context; sequenced so 21.7's
-  restructuring starts from accurate documentation).
+- **Enables 21.7 only.**
 
 #### 21.7 The reliability diagnostic scores both halves of a day without duplicating expensive work — Behavior `[ ]`
 

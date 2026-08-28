@@ -43,22 +43,4 @@ class RecallStatsServiceAccuracyCalibrationTest {
     // = 1.0, not the raw-retrievability value of (1-0.9)/sqrt(0.09) = 0.333.
     assertThat(accuracy.getStandardizedResidual(), closeTo(1.0, 0.05));
   }
-
-  @Test
-  void todaysAccuracyUsesRawRetrievabilityWhenTrailingHistoryIsSparse() {
-    Timestamp now = utc(11, 12); // today = 1989-01-11
-    // Only a handful of trailing rows — far below the minimum calibration sample size, so the
-    // fit falls back to the identity mapping and today's accuracy is scored on raw
-    // retrievability, exactly as before this slice.
-    List<RecallAnswerRow> rows =
-        List.of(
-            answered(utc(9, 9), 5000, false, null, 1, 0.9),
-            answered(utc(9, 10), 5000, true, null, 2, 0.9),
-            answered(utc(11, 10), 5000, true, null, 3, 0.9));
-    RecallStatsDTO dto = aggregate(rows, now);
-    RecallStatsDTO.AccuracyStats accuracy = dto.getAccuracy();
-    assertThat(accuracy.getSampleSize(), equalTo(1));
-    // (1 - 0.9) / sqrt(0.9 * 0.1) = 0.1 / 0.3 = 0.333
-    assertThat(accuracy.getStandardizedResidual(), closeTo(0.333, 0.001));
-  }
 }
