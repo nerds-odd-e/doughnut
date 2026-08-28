@@ -3,7 +3,7 @@
 # Set the metadata server to the get projct id
 PROJECTID=$(curl -s "http://metadata.google.internal/computeMetadata/v1/project/project-id" -H "Metadata-Flavor: Google")
 BUCKET=$(curl -s "http://metadata.google.internal/computeMetadata/v1/instance/attributes/BUCKET" -H "Metadata-Flavor: Google")
-ARTIFACT="doughnut"
+ARTIFACT="donut"
 VERSION="0.0.1-SNAPSHOT"
 
 echo "Project ID: ${PROJECTID} Bucket: ${BUCKET}"
