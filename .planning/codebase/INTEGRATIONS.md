@@ -74,7 +74,7 @@
   - Secrets: `OAUTH2_github_client_id`, `OAUTH2_github_client_secret` (Secret Manager)
 - Non-prod (test/e2e): HTTP Basic + in-memory users (`NonProductConfiguration.java`); frontend `/users/identify` flow; remember-me always on
 - API tokens for CLI/MCP: user-generated Bearer tokens (`UserController`, `CurrentUserFetcherFromRequest.java`)
-  - Clients set `DOUGHNUT_API_AUTH_TOKEN` and `DONUT_API_BASE_URL` (`packages/donut-api/src/index.ts`)
+  - Clients set `DONUT_API_AUTH_TOKEN` and `DONUT_API_BASE_URL` (`packages/donut-api/src/index.ts`)
 - CLI Google OAuth: separate from web login; used for Gmail command only
 
 ## Monitoring & Observability
@@ -113,7 +113,7 @@
 - `OAUTH2_github_client_id` / `OAUTH2_github_client_secret` — prod web login
 - `GITHUB_FOR_ISSUES_API_TOKEN` — failure-report issues
 - `DOUGHNUT_SPA_PUBLIC_BASE_URL` — prod SPA public URL (default `https://doughnut.odd-e.com`)
-- `DONUT_API_BASE_URL` / `DOUGHNUT_API_AUTH_TOKEN` — CLI and MCP → backend
+- `DONUT_API_BASE_URL` / `DONUT_API_AUTH_TOKEN` — CLI and MCP → backend
 - `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` — CLI Gmail OAuth (and CI jar reproducibility)
 - CI-only: DB user/password secrets, Slack/Discord webhooks
 - Deploy workflow: `GCS_BUCKET`, `GCS_FRONTEND_BUCKET`, `GCP_CREDENTIALS`

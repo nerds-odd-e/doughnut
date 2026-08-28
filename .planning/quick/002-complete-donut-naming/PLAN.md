@@ -111,23 +111,10 @@ examples use `donut-note-md`.
 
 ### 6. Auth env var `DONUT_API_AUTH_TOKEN` (Behavior)
 
-Status: planned
+Status: done
 
-- **Pre-condition:** MCP/CLI auth token is read from `DOUGHNUT_API_AUTH_TOKEN`.
-- **Trigger:** start MCP client / `getApiConfig()`.
-- **Post-condition:** only `DONUT_API_AUTH_TOKEN` is read. Samples in
-  `.cursor/rules/mcp-server.mdc` match. Planning docs that listed the old name
-  are updated in this slice (they document the live env var).
-
-Files: `packages/donut-api/src/index.ts`, `e2e_test/support/mcp_client.ts`,
-mcp-server rule samples, `.planning/codebase/STACK.md` + `INTEGRATIONS.md` +
-`SEED-002` token mentions.
-
-No `DOUGHNUT_API_AUTH_TOKEN` alias. Do **not** invent
-`DONUT_SPA_PUBLIC_BASE_URL` — delete the dead SPA env var in slice 9.
-
-Verify: MCP E2E that spawns the client
-(`e2e_test/features/mcp/mcp_services.feature`) still authenticates.
+MCP/CLI read only `DONUT_API_AUTH_TOKEN`. Samples and planning docs that list
+the live env var match. No alias.
 
 ### 7. E2E Gherkin product language (Structure)
 

@@ -103,7 +103,7 @@ For Cursor:
       ],
       "env": {
         "DONUT_API_BASE_URL": "http://localhost:9081",
-        "DOUGHNUT_API_AUTH_TOKEN": "your-token-here"
+        "DONUT_API_AUTH_TOKEN": "your-token-here"
       }
     }
   }
@@ -121,7 +121,7 @@ For VS Code (you need to put the following content into `./.vscode/mcp.json`):
       ],
       "env": {
         "DONUT_API_BASE_URL": "http://localhost:9081",
-        "DOUGHNUT_API_AUTH_TOKEN": "your-token-here"
+        "DONUT_API_AUTH_TOKEN": "your-token-here"
       }
     }
   }
@@ -141,7 +141,7 @@ For IntelliJ IDE you need to go to the general settings/tools/GitHub Copilot/MCP
       ],
       "env": {
         "DONUT_API_BASE_URL": "http://localhost:9081",
-        "DOUGHNUT_API_AUTH_TOKEN": "your-token-here"
+        "DONUT_API_AUTH_TOKEN": "your-token-here"
       }
     }
   }

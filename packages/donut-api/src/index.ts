@@ -59,7 +59,7 @@ function ensureSdkErrorsIncludeHttpStatus(): void {
 export function getApiConfig() {
   return {
     apiBaseUrl: process.env.DONUT_API_BASE_URL || 'https://doughnut.odd-e.com',
-    authToken: process.env.DOUGHNUT_API_AUTH_TOKEN,
+    authToken: process.env.DONUT_API_AUTH_TOKEN,
   }
 }
 

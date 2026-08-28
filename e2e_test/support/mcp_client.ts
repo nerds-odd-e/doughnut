@@ -69,7 +69,7 @@ class McpClient {
         ...process.env,
         NODE_PATH: nodePath,
         DONUT_API_BASE_URL: apiBaseUrl,
-        DOUGHNUT_API_AUTH_TOKEN: accessToken,
+        DONUT_API_AUTH_TOKEN: accessToken,
       },
     })
     await this.client.connect(this.transport)

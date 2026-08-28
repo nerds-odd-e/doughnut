@@ -28,7 +28,7 @@ Also surface when changing MCP transport (stdio → HTTP), Package-artifacts / p
 **Medium–large** — several Behavior phases, likely including Structure for transport:
 
 1. HTTPS MCP transport (streamable HTTP or current MCP remote convention) reachable behind the prod LB (or equivalent public URL).
-2. Auth: reuse / adapt Bearer-token model used by CLI and local MCP (`DOUGHNUT_API_AUTH_TOKEN` today); decide how remote clients present credentials over HTTPS.
+2. Auth: reuse / adapt Bearer-token model used by CLI and local MCP (`DONUT_API_AUTH_TOKEN`); decide how remote clients present credentials over HTTPS.
 3. Deploy wiring: run the MCP HTTP surface with the app (or a dedicated service), not as a static GCS object.
 4. Document IDE config from the prod HTTPS URL; drop any remaining “download bundle” framing; smoke-check alongside `prod-frontend-static-lb.md` / install docs.
 5. Keep local stdio for E2E/dev unless/until HTTP is the only supported path.
