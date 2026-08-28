@@ -90,7 +90,7 @@ public class FocusContextMarkdownRenderer {
 
   private void appendFencedContent(StringBuilder sb, String content) {
     String fence = safeFence(content);
-    sb.append(fence).append("doughnut-note-md\n");
+    sb.append(fence).append("donut-note-md\n");
     if (content != null) {
       sb.append(content);
       if (!content.endsWith("\n")) {

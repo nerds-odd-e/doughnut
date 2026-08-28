@@ -104,22 +104,10 @@ session comment say **Donut**. GCS download path and site URL stay.
 
 ### 5. Fence language `donut-note-md` (Behavior)
 
-Status: planned
+Status: done
 
-- **Pre-condition:** focus-context / Learning Session Request markdown fences
-  notes with `doughnut-note-md`.
-- **Trigger:** render focus context or a Learning Session Request.
-- **Post-condition:** fence is `donut-note-md`. Parser, tests, and design
-  examples match.
-
-Files: `FocusContextMarkdownRenderer.java` + its test,
-`LearningSessionRequestTests.java`,
-`e2e_test/start/pageObjects/recallLearningSessionMethods.ts`
-(`donutNoteBodiesIn`), `docs/focus-context/focus_context_retrieval_design.md`,
-any `.planning` note that quotes the fence.
-
-Verify: backend tests for the renderer and Learning Session Request; no
-`doughnut-note-md` left in the repo.
+Focus-context / Learning Session Request fences, parser, tests, and design
+examples use `donut-note-md`.
 
 ### 6. Auth env var `DONUT_API_AUTH_TOKEN` (Behavior)
 

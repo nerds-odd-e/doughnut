@@ -68,7 +68,7 @@ class FocusContextMarkdownRendererTest {
       assertThat(output, containsString("Notebook: My Notebook"));
       assertThat(output, containsString("Depth: 0"));
       assertThat(output, containsString("Max depth: 1"));
-      assertThat(output, containsString("```doughnut-note-md"));
+      assertThat(output, containsString("```donut-note-md"));
       assertThat(output, containsString("Some content"));
       assertThat(output, not(containsString("## Retrieved Note")));
     }
@@ -94,7 +94,7 @@ class FocusContextMarkdownRendererTest {
       String out =
           renderer.render(new FocusContextResult(focusNote("NB", "T", "", false)), depth1Config);
       assertThat(out, not(containsString("\nContent:\n")));
-      assertThat(out, not(containsString("doughnut-note-md")));
+      assertThat(out, not(containsString("donut-note-md")));
     }
   }
 

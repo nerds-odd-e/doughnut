@@ -51,7 +51,7 @@ class LearningSessionRequestTests extends LearningSessionControllerTestBase {
     assertThat(markdown, containsString("Thank you"));
     assertThat(markdown, not(containsString(FocusContextConstants.FOCUS_CONTEXT_OPEN_MARKER)));
     assertThat(markdown, containsString(FocusContextConstants.FOCUS_NOTE_OPEN_MARKER));
-    assertThat(markdown, containsString("```doughnut-note-md"));
+    assertThat(markdown, containsString("```donut-note-md"));
     assertThat(markdown, containsString("Title: Hola"));
     assertThat(markdown, containsString("Title: Gracias"));
     assertThat(markdown, containsString("</session_items>"));

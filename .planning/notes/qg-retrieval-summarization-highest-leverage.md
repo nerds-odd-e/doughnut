@@ -14,7 +14,7 @@ Savaal's results corroborate this from a different angle: concept-grouped retrie
 
 ## What this means for Doughnut
 
-Doughnut's current `<focus_context>` envelope feeds **raw note bodies** in fenced `doughnut-note-md` blocks, bounded by a token budget (~2500 tokens for related notes). The research suggests the highest-leverage change to improve QG quality is **not** restructuring the envelope or reorganizing which notes are selected — it is adding a **summarization pass** before generation, so the model receives compressed, signal-dense context rather than raw note bodies it has to compress itself.
+Doughnut's current `<focus_context>` envelope feeds **raw note bodies** in fenced `donut-note-md` blocks, bounded by a token budget (~2500 tokens for related notes). The research suggests the highest-leverage change to improve QG quality is **not** restructuring the envelope or reorganizing which notes are selected — it is adding a **summarization pass** before generation, so the model receives compressed, signal-dense context rather than raw note bodies it has to compress itself.
 
 This is a stronger lever than:
 - Switching from graph-structural to embedding-based retrieval (the field norm, but not obviously better for a zettelkasten where links are deliberate).

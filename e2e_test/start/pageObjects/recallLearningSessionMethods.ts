@@ -5,8 +5,8 @@ function learningSessionRequestEntryLabel(notebookTitle: string) {
   return `${notebookTitle} — Request`
 }
 
-function doughnutNoteBodiesIn(markdown: string): string[] {
-  return [...markdown.matchAll(/```doughnut-note-md\n([\s\S]*?)\n```/g)].map(
+function donutNoteBodiesIn(markdown: string): string[] {
+  return [...markdown.matchAll(/```donut-note-md\n([\s\S]*?)\n```/g)].map(
     (match) => match[1]
   )
 }
@@ -96,7 +96,7 @@ export const recallLearningSessionMethods = () => ({
       ].map((match) => match[0])
       expect(focusSections.length, 'focus_note blocks').to.be.greaterThan(0)
       expect(
-        doughnutNoteBodiesIn(focusSections.join('\n')).some((body) =>
+        donutNoteBodiesIn(focusSections.join('\n')).some((body) =>
           body.includes(content)
         )
       ).to.equal(true)
@@ -112,7 +112,7 @@ export const recallLearningSessionMethods = () => ({
       )?.[0]
       expect(relatedSection, 'related_notes block').to.exist
       expect(
-        doughnutNoteBodiesIn(relatedSection!).some((body) =>
+        donutNoteBodiesIn(relatedSection!).some((body) =>
           body.includes(content)
         )
       ).to.equal(true)

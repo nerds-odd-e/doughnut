@@ -40,7 +40,7 @@ For **folder siblings**, an anchor at wiki depth `d` uses `sampleCapAtGraphDepth
 
 ## Markdown rendering
 
-For LLM prompts, the same retrieval result is rendered as an XML envelope with markdown metadata and fenced `doughnut-note-md` bodies (fence width chosen so note content cannot break out):
+For LLM prompts, the same retrieval result is rendered as an XML envelope with markdown metadata and fenced `donut-note-md` bodies (fence width chosen so note content cannot break out):
 
 ````markdown
 <focus_context>
@@ -53,7 +53,7 @@ Notebook: My Notebook
 Folder: path/here
 Depth: 0
 
-```doughnut-note-md
+```donut-note-md
 note body (may include frontmatter)
 ```
 </focus_note>
@@ -62,7 +62,7 @@ note body (may include frontmatter)
 Title: Related
 …
 
-```doughnut-note-md
+```donut-note-md
 …
 ```
 </retrieved_note>
