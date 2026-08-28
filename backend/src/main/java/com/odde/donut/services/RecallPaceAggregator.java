@@ -1,6 +1,7 @@
 package com.odde.donut.services;
 
 import com.odde.donut.controllers.dto.RecallStatsDTO.PaceStats;
+import com.odde.donut.services.RecallDayBaseline.DayBaseline;
 import com.odde.donut.utils.TimestampOperations;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -28,8 +29,6 @@ final class RecallPaceAggregator {
   private static final double LAPSE_FACTOR = 2.5;
   private static final int BASELINE_WINDOW_START_DAYS_AGO = 63;
   private static final int BASELINE_WINDOW_END_DAYS_AGO = 4;
-  private static final int MIN_BASELINE_DAYS = 10;
-  private static final double MAD_TO_SD_SCALE = 1.4826;
 
   private RecallPaceAggregator() {}
 
@@ -56,18 +55,29 @@ final class RecallPaceAggregator {
       DayBaseline lapseDayBaseline) {}
 
   /**
-   * Median and MAD of a statistic's per-day value across qualifying trailing baseline days. Both
-   * fields are {@code null} when fewer than {@link #MIN_BASELINE_DAYS} days qualify.
-   */
-  record DayBaseline(Double median, Double mad) {}
-
-  /**
    * A cold-start item's baseline is built from very few observations, so its residual is noisy.
    * {@code weight} down-weights such rows in the pace tile's weighted median and confidence score.
    */
   private record WeightedResidual(double residual, double weight) {}
 
   static PaceResult compute(List<RecallAnswerRow> allTimeReviews, LocalDate today, ZoneId zoneId) {
+    return compute(allTimeReviews, today, zoneId, null);
+  }
+
+  /**
+   * @param todayRowsToScore restricts which of today's rows feed the today-residual/lapse-count
+   *     collection step — used to score just one half (odd/even within-day sequence) of a split
+   *     morning (slice 21.3, via {@link RecallMorningHalfIndex}). {@code null} means every one of
+   *     today's rows counts, matching the original whole-day behavior used by every other caller.
+   *     The per-item EWMA baseline ({@code tauByItem}) is never restricted by this — every row,
+   *     regardless of which half it falls in, still updates its item's baseline, since the baseline
+   *     is built from full chronological history, not from "today" at all.
+   */
+  static PaceResult compute(
+      List<RecallAnswerRow> allTimeReviews,
+      LocalDate today,
+      ZoneId zoneId,
+      Set<RecallAnswerRow> todayRowsToScore) {
     Map<Integer, Double> tauByItem = new HashMap<>();
     Map<Integer, Integer> priorObservationCountByItem = new HashMap<>();
     List<WeightedResidual> todaysResiduals = new ArrayList<>();
@@ -85,9 +95,10 @@ final class RecallPaceAggregator {
       LocalDate rowDate =
           TimestampOperations.getZonedDateTime(r.answerCreatedAt(), zoneId).toLocalDate();
       boolean isToday = rowDate.equals(today);
+      boolean scoreToday = isToday && (todayRowsToScore == null || todayRowsToScore.contains(r));
       boolean isInBaselineWindow =
           !rowDate.isBefore(baselineWindowStart) && !rowDate.isAfter(baselineWindowEnd);
-      if (isToday) {
+      if (scoreToday) {
         totalAnsweredToday++;
       }
       Optional<Long> rt = onTaskTimeMs(r);
@@ -116,7 +127,7 @@ final class RecallPaceAggregator {
         double cappedResidual = Math.min(lnRt - baseline, RESIDUAL_CAP);
         double weight = priorObservationCount / (priorObservationCount + 3.0);
         boolean isLapse = r.correct() && onTaskMs >= LAPSE_FACTOR * Math.exp(baseline);
-        if (isToday) {
+        if (scoreToday) {
           todaysResiduals.add(new WeightedResidual(cappedResidual, weight));
           if (isLapse) {
             lapseCount++;
@@ -153,7 +164,7 @@ final class RecallPaceAggregator {
       Map<LocalDate, List<WeightedResidual>> residualsByDate) {
     List<Double> perDayPctVsUsual =
         residualsByDate.values().stream().map(RecallPaceAggregator::weightedPctVsUsual).toList();
-    return dayBaseline(perDayPctVsUsual);
+    return RecallDayBaseline.dayBaseline(perDayPctVsUsual);
   }
 
   /**
@@ -163,18 +174,7 @@ final class RecallPaceAggregator {
   private static DayBaseline lapseDayBaseline(Map<LocalDate, Integer> lapseCountByDate) {
     List<Double> perDayLapseCount =
         lapseCountByDate.values().stream().map(Integer::doubleValue).toList();
-    return dayBaseline(perDayLapseCount);
-  }
-
-  /**
-   * Shared gating/computation for a statistic's cross-morning baseline: {@code null}/{@code null}
-   * below {@link #MIN_BASELINE_DAYS} qualifying days, otherwise median/MAD of the per-day values.
-   */
-  private static DayBaseline dayBaseline(List<Double> perDayValues) {
-    if (perDayValues.size() < MIN_BASELINE_DAYS) {
-      return new DayBaseline(null, null);
-    }
-    return new DayBaseline(median(perDayValues), mad(perDayValues));
+    return RecallDayBaseline.dayBaseline(perDayLapseCount);
   }
 
   /**
@@ -194,11 +194,10 @@ final class RecallPaceAggregator {
             .filter(values -> values.size() >= 2)
             .map(RecallPaceAggregator::madOfResiduals)
             .toList();
-    DayBaseline spreadBaseline = dayBaseline(baselineSpreads);
-    if (todaySpread == null || spreadBaseline.median() == null || spreadBaseline.mad() == 0) {
-      return null;
-    }
-    return (todaySpread - spreadBaseline.median()) / (spreadBaseline.mad() * MAD_TO_SD_SCALE);
+    DayBaseline spreadBaseline = RecallDayBaseline.dayBaseline(baselineSpreads);
+    return todaySpread == null
+        ? null
+        : RecallDayBaseline.zScoreAgainstDayBaseline(todaySpread, spreadBaseline);
   }
 
   /**
@@ -206,21 +205,7 @@ final class RecallPaceAggregator {
    * cold-start weight, unlike {@link #weightedMad} used for today's spread.
    */
   private static double madOfResiduals(List<WeightedResidual> residuals) {
-    return mad(residuals.stream().map(WeightedResidual::residual).toList());
-  }
-
-  /** Plain median of a list of values (average of the two middle values when the size is even). */
-  private static double median(List<Double> values) {
-    List<Double> sorted = new ArrayList<>(values);
-    Collections.sort(sorted);
-    int n = sorted.size();
-    return n % 2 == 1 ? sorted.get(n / 2) : (sorted.get(n / 2 - 1) + sorted.get(n / 2)) / 2.0;
-  }
-
-  /** Median absolute deviation: median distance of each value from the set's median. */
-  private static double mad(List<Double> values) {
-    double medianValue = median(values);
-    return median(values.stream().map(v -> Math.abs(v - medianValue)).toList());
+    return RecallDayBaseline.mad(residuals.stream().map(WeightedResidual::residual).toList());
   }
 
   /**

@@ -896,18 +896,48 @@ uniform positive/negative z's, mixed z's).
 
 - **Enables 21.3 only.**
 
-#### 21.3 A morning's index can be computed from just its odd or even attempts — Structure `[ ]`
+#### 21.3 A morning's index can be computed from just its odd or even attempts — Structure `[x]`
 
-The existing per-day aggregation (accuracy/pace/lapse/consistency — already
-parameterized by a target day and zone, per slice 19/20's `today`/`zoneId`
-threading into `RecallPaceAggregator`/`RecallAccuracyAggregator`) can be
-invoked against an arbitrary historical morning's rows restricted to only the
-odd-indexed or even-indexed attempts of that morning (by within-morning
-sequence), producing two index values (via 21.2) for that morning.
-**Investigate first**: confirm whether "day" is already a free parameter on
-these aggregators (it appears to be, from slice 19/20's wiring) — if so this
-slice is mostly wiring/filtering, not new generalization; if a hidden
-"today" assumption remains somewhere, generalize only that spot.
+Done: `RecallPaceAggregator.compute` gained an overload taking an explicit
+`Set<RecallAnswerRow> todayRowsToScore`, splitting the existing `isToday`
+(still drives the unconditional per-item EWMA update — baselines are never
+rebuilt per half) from a new `scoreToday` gate
+(`isToday && (todayRowsToScore == null || todayRowsToScore.contains(r))`)
+that restricts `totalAnsweredToday`/residual/lapse capture to the given
+subset; the original 3-arg overload delegates with `null` (unchanged full-day
+behavior for every existing caller). New `RecallMorningHalfIndex.compute(...)`
+(package-private `Half { ODD, EVEN }`): for a given day D, runs a full-day
+`RecallPaceAggregator.compute` once for `implausiblyFastRows` (invariant to
+the half), 1-indexes D's qualifying rows chronologically into the two halves
+(identity-based `Set`, matching slice 10's precedent), then scores each half
+by calling `RecallAccuracyAggregator` with just that half's rows and
+re-invoking `RecallPaceAggregator.compute` with the half `Set` for
+pace/lapse/consistency — the trailing-window calibration and day-baselines
+are derived from history before D exactly as if D were "today," never
+rebuilt per half, and each half is z-scored against the *same* existing
+full-day baseline (`paceDayBaseline`/`lapseDayBaseline`/consistency spread),
+not a separate half-day baseline, since a shared reference is all a
+split-half correlation needs. Returns `null` if any component is unavailable
+(e.g. a half with <2 consistency residuals).
+**Sign-convention correction found during implementation, and confirmed
+correct on review:** `zA = -A` (accuracy is higher-is-better, needs
+flipping), but **lapse needs no flip** — unlike accuracy, `lapseCount` is
+already higher-is-*worse* in raw form (more lapses = worse), so its
+day-baseline z-score already matches the composite's "positive = worse"
+convention directly; flipping it would have silently inverted that
+component. This corrects an error in 21's original approved-formula prose
+("zA and zLapse are ... sign-flipped"), which mischaracterized lapse's
+natural direction — the composite formula itself (`100 −
+10×mean(zA,zPace,zLapse,zConsistency)`, positive=worse) is unaffected, only
+which raw values need inverting to reach that convention. Post-change-refactor
+also fixed 21.2's `RecallCognitiveIndex` javadoc, which had stated the
+now-incorrect "zA and zLapse are sign-flipped" claim. New
+`RecallMorningHalfIndexTest` (3 tests). Post-change-refactor extracted the
+day-baseline/z-score machinery (`DayBaseline`, `dayBaseline()`,
+`zScoreAgainstDayBaseline()`, `median()`, `mad()` — generic day-level
+statistics, distinct from the per-item EWMA walk) into a new
+`RecallDayBaseline.java`, bringing `RecallPaceAggregator` back under the
+250-line convention (254 lines) after this slice had pushed it to 297.
 
 - **Enables 21.4 only.**
 
