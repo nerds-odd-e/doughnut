@@ -1,14 +1,21 @@
 # Morning cognitive index from recall history
 
-**Status:** in progress — slices 1–14, 14.1–14.8, 15, 16, 17, 18, 19, 20,
-21.1–21.8 done. The 21.x repair pass is complete. The reliability endpoint
-(`GET /api/user/recall-split-half-reliability`) still needs **the developer
-to query it and decide against the ~0.6 gate before slice 22 starts** (see
-Jidoka checkpoints — this is a required stop, not an autonomous continuation
-point). Slice 17.1 (pace-expectation R/D correction, split from 17) is
-separately **blocked** pending a developer-specified formula, independent of
-21.x. `recall_stats.feature`'s pace scenario stays `@wip` — a second,
-unrelated E2E race condition was found (see Discoveries).
+**Status:** the 001 plan's active scope is complete. Slices 1–14, 14.1–14.8,
+15, 16, 17, 18, 19, 20, 21.1–21.8 done. Slice 17.1 (pace-expectation R/D
+correction, split from 17) is **dropped**. Slice 21.9 (why retrievability
+reads null for ~95% of reviews) found a likely root cause — `RecallLog` is
+new and current data may be incompletely backfilled, or, more seriously,
+`memory_tracker.stability` updates from `applyGrade` may not be persisting —
+but confirming it needs a production read-only query only the developer can
+run; it is **closed in this plan and escalated** to
+`.planning/notes/memory-tracker-stability-not-persisting.md` rather than
+chased further here. Because of that, the slice 22–25 reliability gate is
+treated as **failed**: the composite morning index is **dropped**, and the
+component readouts (pace, accuracy, consistency, lapse count) ship as the
+plan's final deliverable. `recall_stats.feature`'s pace scenario stays `@wip`
+— a second, unrelated E2E race condition was found (see Discoveries).
+Slices 26–33 (daily probe, optional tail) were not started; 32–33 reference
+the now-dropped composite index and need re-scoping if picked up later.
 **Type:** ad-hoc plan (`.planning/quick/`)
 **Research memo:** https://claude.ai/code/artifact/9e13f954-fc5e-48e5-868f-f75d03f811c1
 
@@ -172,17 +179,34 @@ truth; RecallLog's Grades and Confusion remain the record.
 `f67d894175`): *pace*, *retrieval lapse*, *detour*, *away*, *idle*, *daily
 probe*, and *cognitive index* are in ADR 0001 / ADR 0003.
 
-**Before slice 22 — the reliability gate.** If slice 21.4 reports split-half
-reliability below ~0.6, slices 22–25 do not ship. The component readouts stand
-on their own and the composite is abandoned or reworked. Do not tune weights to
-rescue the number. (Slice 21 was split into 21.1–21.4 — see that section for
-the composite formula and why.)
+**Before slice 22 — the reliability gate.** **Resolved: gate failed, slices
+22–25 dropped.** The gate said: if slice 21.4 reports split-half reliability
+below ~0.6, slices 22–25 do not ship, and do not tune weights to rescue the
+number. 21.9 found the input feeding both the reliability calculation and the
+accuracy component is null for ~95% of reviews (`memory_tracker.stability`
+reads as New almost everywhere) — the gate cannot be meaningfully evaluated,
+let alone pass, on that basis. Per the gate's own stated fallback, the
+composite is abandoned rather than reworked; the component readouts (pace,
+accuracy, consistency, lapse count) stand on their own and already ship.
+21.9's underlying data-integrity finding is escalated separately — see that
+slice's section and
+`.planning/notes/memory-tracker-stability-not-persisting.md` — rather than
+resolved inside this plan. (Slice 21 was split into 21.1–21.4 — see that
+section for the composite formula and why.)
 
-**Before slice 17.1 — pace-expectation correction formula.** Unresolved. Slice
-17's original text asserted R/D would correct the pace time-expectation but
-gave no model. The developer needs to specify how retrievability and/or
-difficulty should adjust the expected response time before 17.1 can be
-planned into Behavior/Structure steps.
+**Before slice 17.1 — pace-expectation correction formula.** **Resolved:
+dropped.** Slice 17's original text asserted R/D would correct the pace
+time-expectation but gave no model. Rather than specify one, the developer
+chose to drop 17.1 outright: 21.9 found retrievability null for ~95% of
+reviews (`memory_tracker.stability` reads as New almost everywhere), and even
+where populated it comes from recently-backfilled data of unproven accuracy —
+correcting a time-expectation baseline against a signal that's mostly absent
+or noisy adds complexity ("keep it simple") for a correction that mostly
+wouldn't fire. The per-item EWMA baseline from slice 9 ships as the permanent
+pace expectation, uncorrected. Cost: an item with genuinely low retrievability
+that takes longer to retrieve will register as "slower than usual" even though
+slowness was expected — accepted as a minor false positive. Confirmed no dead
+code results (slice 17 built nothing speculative for pace — see 17.1 below).
 
 ---
 
@@ -347,7 +371,8 @@ pass `null, null` placeholders since nothing consumes the fields yet.
 Per-item time-intensity EWMA plus session position, as a tile above
 `RecallStatsTiles`.
 
-- **Interim:** no retrievability or difficulty correction — removed by slice 17.
+- **Interim:** no retrievability or difficulty correction. **Permanent, not
+  removed by slice 17** — see 17.1's dropped-decision note.
 - E2E: new `recall/recall_stats.feature` (no existing coverage)
 - Backend unit: through `UserController.getRecallStats` with `makeMe` data
 
@@ -729,7 +754,7 @@ API client regenerated. No new E2E scenario — slice 9's pace E2E precedent
 existing `recall_stats.feature` pace scenario is already `@wip` for an
 unrelated SDK-sequencing race documented in Discoveries.
 
-#### 17.1. Pace expectation is corrected for retrievability and difficulty — Behavior `[ ]`
+#### 17.1. Pace expectation is corrected for retrievability and difficulty — Behavior `[dropped]`
 
 **Split from slice 17** (pre-slice Jidoka stop — developer chose to split
 rather than have the coordinator guess a formula). Slice 9's interim note
@@ -737,9 +762,21 @@ says the per-item EWMA time baseline has no retrievability/difficulty
 correction, and slice 17's original text said this slice would "remove that
 interim by feeding `R` and `D` into the pace expectation," but neither slice
 specifies the correction model itself (e.g. a multiplicative adjustment to
-the EWMA baseline, a regression term, or something else). Needs a formula
-decision — see Jidoka checkpoints — before this can be sliced into
-Behavior/Structure steps.
+the EWMA baseline, a regression term, or something else).
+
+**Dropped, not implemented.** The developer decided against specifying a
+formula at all, given 21.9's finding that retrievability is null for ~95% of
+reviews and even populated values come from recently-backfilled data of
+unproven accuracy — building a correction on top of a mostly-absent, unproven
+signal contradicts "keep it simple." Slice 9's uncorrected per-item EWMA
+baseline is the permanent pace expectation. Verified this leaves no dead code:
+`RecallPaceAggregator.java` has zero references to retrievability/difficulty
+and never had a stub or hook anticipating this slice; the `retrievability`
+field slice 17 added to `RecallAnswerRow` is fully consumed by the accuracy
+pipeline only (`RecallAccuracyAggregator`/`RecallCalibrationFitter`/
+`RecallGuessingFloorFitter`); `PaceStats`/`PaceTile.vue` have no unwired
+fields. Slice 17 built nothing speculative for pace, so nothing needs
+cleanup.
 
 #### 18. Historical reviews gain their memory state — Behavior `[x]`
 
@@ -985,10 +1022,9 @@ threshold (by whichever of the two reported numbers is judged appropriate)
 whether slices 22–25 proceed. **Do not tune 21.2's formula weights to
 rescue a low number** — that would defeat the point of the gate.
 
-- **This is the gate.** See Jidoka above. If reliability comes back below
-  ~0.6 (by whichever of the two numbers the developer judges appropriate),
-  slices 22–25 do not ship — the component readouts stand on their own and
-  the composite is abandoned or reworked.
+- **This is the gate. Resolved: failed, via 21.9 rather than a low
+  correlation number.** See Jidoka above and 21.9's section — slices 22–25 are
+  dropped; the component readouts stand on their own.
 
 ### Repair the accuracy/index readouts (session review)
 
@@ -1052,7 +1088,7 @@ max-iter still counts as success). Numeric tests unchanged.
 
 Not a prerequisite for slice 22.
 
-#### 21.9 Nearly every review's retrievability is null — find why `memory_tracker.stability` reads as New — Structure `[ ]`
+#### 21.9 Nearly every review's retrievability is null — find why `memory_tracker.stability` reads as New — Structure `[escalated, closed in this plan]`
 
 Found while finally querying 21.4's endpoint against real production data
 (prod investigation via three rounds of temporary, response-embedded debug
@@ -1109,31 +1145,59 @@ supposed to also seed `memory_tracker.stability`/`difficulty` from the
 last-known state and didn't, versus a live persistence bug in `applyGrade`
 itself.
 
-- **Blocks the slice 22–25 gate** (see "This is the gate" at 21.4): the
+- **Blocked the slice 22–25 gate** (see "This is the gate" at 21.4): the
   split-half reliability number cannot be trusted, or even meaningfully
   computed past `pairCount` ≈ 1, until this is resolved — independent of
   whether the composite formula itself is sound.
 
-#### 22. Recall Stats leads with the morning index — Behavior `[ ]`
+**Closed in this plan, escalated separately.** Confirming or ruling out the
+"`memory_tracker.stability` updates aren't sticking" hypothesis needs a
+direct read-only production query the developer runs themselves — outside
+`quick/001`'s scope either way. More importantly, if confirmed, it is a live
+FSRS *scheduler* bug (wrong stability feeding real scheduling for most items),
+not a stats-readout defect — too consequential to leave as a sub-slice of a
+stats-display plan. Escalated in
+`.planning/notes/memory-tracker-stability-not-persisting.md`. This plan
+treats the reliability gate as **failed**, not pending: slices 22–25 are
+dropped, per "This is the gate" — the component readouts (pace, accuracy,
+consistency, lapses) stand on their own; the composite is not built.
+
+#### 22. Recall Stats leads with the morning index — Behavior `[dropped]`
 
 Hero readout above `RecallStatsTiles`, against a personal baseline of 100, with
 shrinkage `n/(n+8)` and sample size. Morning = first qualifying session of the
 local day, not a clock-hour bucket.
 
-#### 23. A thin morning says so instead of showing a number — Behavior `[ ]`
+**Dropped along with 23–25**, per the reliability gate at 21.4/21.9: the
+composite index needs retrievability data that's null for ~95% of reviews, so
+the gate cannot pass and the composite is abandoned rather than reworked
+around missing data. The component readouts (pace, accuracy, consistency,
+lapse count) already ship independently and stand on their own.
+
+#### 23. A thin morning says so instead of showing a number — Behavior `[dropped]`
 
 Under ~6 valid attempts the hero reads "not enough reviews this morning",
 falling out of the same shrinkage term rather than a separate rule.
 
-#### 24. Contribution bars explain the index — Behavior `[ ]`
+Dropped with 22 — no hero readout, no thin-morning case needed.
+
+#### 24. Contribution bars explain the index — Behavior `[dropped]`
 
 Signed A / S / L / V bars turn "96" into "accuracy normal, slower and more
 erratic than usual".
 
-#### 25. The index gets a trend — Behavior `[ ]`
+Dropped with 22 — no index to explain. **Note for slices 32–33 below**, which
+were written assuming this index exists: 32 compares "index versus probe" and
+33's trigger condition references "slice 24 shows speed and accuracy moving
+against each other" — both need re-scoping if/when the daily-probe slices
+(26+) are picked up, since the composite index they reference won't exist.
+
+#### 25. The index gets a trend — Behavior `[dropped]`
 
 Reuses the existing 30 / 90 / All toggle and the established insufficient-data
 legend rather than introducing a second control grammar.
+
+Dropped with 22 — no index to trend.
 
 ### Daily probe
 
@@ -1207,7 +1271,7 @@ MCQ subset, fitted on residualized latencies.
 | Artifact | Slices |
 |----------|--------|
 | `e2e_test/features/recall/recall_timing.feature` | 5–7, 14.6 |
-| `e2e_test/features/recall/recall_stats.feature` | 9–14, 14.5, 17, 22–25, 31 |
+| `e2e_test/features/recall/recall_stats.feature` | 9–14, 14.5, 17, 31 |
 | `e2e_test/features/recall/daily_cognitive_probe.feature` | 28, 30 |
 | `e2e_test/features/recall/browse_answer_and_notes_while_recalling.feature` | 1, 14.7 |
 | `e2e_test/features/users/user_profile.feature` | 27 (extend) |
