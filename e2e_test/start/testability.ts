@@ -524,7 +524,7 @@ const testability = () => {
       )
     },
 
-    /** The note's current content in Doughnut itself, not an exported markdown file. */
+    /** The note's current content in Donut itself, not an exported markdown file. */
     getInjectedNoteContent(noteTitle: string) {
       return this.getInjectedNoteIdByTitle(noteTitle).then((noteId) =>
         cy

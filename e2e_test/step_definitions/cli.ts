@@ -90,7 +90,7 @@ When('I choose the next MCQ choice in the interactive CLI', () =>
   cli.interactiveCli().chooseNextMcqChoice()
 )
 
-When('I save the Doughnut Access Token in the interactive CLI', () => {
+When('I save the Donut Access Token in the interactive CLI', () => {
   cy.get<string>('@savedAccessToken').then((token) => {
     expect(token, 'saved access token').to.be.a('string')
     return cli.interactiveCli().saveAccessToken(token)

@@ -114,7 +114,7 @@ Then('I should see the following messages:', (data: DataTable) => {
   start.assumeConversationAboutNotePage().expectMessages(data.hashes())
 })
 
-Then('OpenAI responses were called with Doughnut focus context', () => {
+Then('OpenAI responses were called with Donut focus context', () => {
   mock_services.openAi().expectLastResponsesPostBodyContains('<focus_context>')
 })
 

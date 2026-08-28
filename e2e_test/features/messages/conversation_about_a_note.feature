@@ -17,7 +17,7 @@ Feature: Conversation about a note with AI
       | role      | message              |
       | user      | Is Naba one of them? |
       | assistant | No. It is not.       |
-    And OpenAI responses were called with Doughnut focus context
+    And OpenAI responses were called with Donut focus context
     When I send the message "Is this note correct?" to AI
     Then I should see the following messages:
       | role      | message                      |

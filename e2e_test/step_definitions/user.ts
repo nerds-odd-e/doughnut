@@ -110,7 +110,7 @@ When('I change my display name to {string}', (name: string) => {
 })
 
 When(
-  'I generate a new Doughnut Access Token with label {string}',
+  'I generate a new Donut Access Token with label {string}',
   (label: string) => {
     visitManageAccessTokensPage()
       .generateToken(label)
@@ -118,7 +118,7 @@ When(
   }
 )
 
-Then('the new Doughnut Access Token should be a valid UUID', () => {
+Then('the new Donut Access Token should be a valid UUID', () => {
   cy.get('@generatedAccessToken').should(
     'match',
     /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
@@ -126,7 +126,7 @@ Then('the new Doughnut Access Token should be a valid UUID', () => {
 })
 
 Given(
-  'I have a valid Doughnut Access Token with label {string}',
+  'I have a valid Donut Access Token with label {string}',
   (label: string) => {
     cy.wrap(
       start
@@ -141,20 +141,17 @@ Given(
   }
 )
 
-When(
-  'I delete the Doughnut Access Token with label {string}',
-  (label: string) => {
-    visitManageAccessTokensPage()
-      .deleteToken(label)
-      .expectTokenWithLabelNotListed(label)
-  }
-)
+When('I delete the Donut Access Token with label {string}', (label: string) => {
+  visitManageAccessTokensPage()
+    .deleteToken(label)
+    .expectTokenWithLabelNotListed(label)
+})
 
-Then('calling token-info with the Doughnut Access Token is denied', () => {
+Then('calling token-info with the Donut Access Token is denied', () => {
   start.mcpApi().getTokenInfo().shouldBeDenied()
 })
 
-Given('calling token-info with the Doughnut Access Token succeeds', () => {
+Given('calling token-info with the Donut Access Token succeeds', () => {
   start.mcpApi().getTokenInfo().shouldBeAccepted()
 })
 

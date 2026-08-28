@@ -118,20 +118,10 @@ the live env var match. No alias.
 
 ### 7. E2E Gherkin product language (Structure)
 
-Status: planned
+Status: done
 
-Rename Gherkin/step text: “Donut Access Token”, “Donut MCP service”, “Donut
-focus context”, “changed in Donut” / “in Donut should still hold”, bazaar and
-MCP feature blurbs. Step-definition strings must match features.
-
-Settings UI already says “Access Tokens” without a product prefix — this slice
-is test vocabulary only. Existing scenarios must keep passing.
-
-Verify: targeted `pnpm cypress run --spec` for
-`e2e_test/features/users/user_access_token.feature`,
-`e2e_test/features/mcp/mcp_services.feature`,
-`e2e_test/features/messages/conversation_about_a_note.feature`,
-`e2e_test/features/cli/cli_access_token.feature` (if not `@ignore`).
+Gherkin/step text uses Donut (access token, MCP, focus context, in-Donut
+notes, bazaar/MCP blurbs). `cli_access_token.feature` remains `@ignore`.
 
 ### 8. ADRs 0000–0004 and protocol docs (Structure)
 

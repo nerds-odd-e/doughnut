@@ -1,5 +1,5 @@
 Feature: Bazaar sharing
-  There should be a bazaar in Doughnut that people can share their public notes,
+  There should be a bazaar in Donut that people can share their public notes,
   and others can subscribe to their notes.
 
   Background:

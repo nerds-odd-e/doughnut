@@ -100,16 +100,16 @@ Given('note {string} has content:', (noteTitle: string, content: string) => {
   start.testability().setInjectedNoteContent(noteTitle, content)
 })
 
-/** A change made in Doughnut itself, as opposed to one made in an exported markdown file. */
+/** A change made in Donut itself, as opposed to one made in an exported markdown file. */
 When(
-  'the note {string} is changed in Doughnut to {string}',
+  'the note {string} is changed in Donut to {string}',
   (noteTitle: string, content: string) => {
     start.testability().setInjectedNoteContent(noteTitle, content)
   }
 )
 
 Then(
-  'the note {string} in Doughnut should still hold {string}',
+  'the note {string} in Donut should still hold {string}',
   (noteTitle: string, expected: string) => {
     start
       .testability()

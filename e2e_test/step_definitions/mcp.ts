@@ -1,12 +1,9 @@
 import { Given, When, Then } from '@badeball/cypress-cucumber-preprocessor'
 import start from '../start'
 
-Given(
-  'I connect to an MCP client that connects to Doughnut MCP service',
-  () => {
-    start.mcpAgentActions().connect()
-  }
-)
+Given('I connect to an MCP client that connects to Donut MCP service', () => {
+  start.mcpAgentActions().connect()
+})
 
 When('AI agent calls the {string} MCP tool', (apiName: string) => {
   start.mcpAgentActions().callTool(apiName)

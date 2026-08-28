@@ -1,13 +1,13 @@
 @BundleFirstAndTerminateMCPServerWhenTeardown
 Feature: MCP (Model Context Protocol) Services
   As a note taker, I want my AI clients like Cursor to use the MCP services from
-  Doughnut, so that AI can automatically update my notes and fetch information from my
+  Donut, so that AI can automatically update my notes and fetch information from my
   notes.
 
   Background:
     Given I am logged in as "old_learner"
-    And I have a valid Doughnut Access Token with label "For MCP services"
-    And I connect to an MCP client that connects to Doughnut MCP service
+    And I have a valid Donut Access Token with label "For MCP services"
+    And I connect to an MCP client that connects to Donut MCP service
     And I have a notebook "CS concepts" with notes:
       | Title           | Folder               |
       | Object Oriented | Programming Concepts |
