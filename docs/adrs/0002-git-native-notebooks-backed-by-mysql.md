@@ -7,20 +7,19 @@
 
 ## Context
 
-Doughnut stores notes, folders, and readmes as mutable MySQL rows. Local
-export is a ZIP of Markdown. Path-keyed CLI sync and private `.doughnut-sync`
-baselines are retired (not part of the product).
+Donut stores notes, folders, and readmes as mutable MySQL rows. Local
+export is a ZIP of Markdown.
 
-We want Git revisions stored by Doughnut to be authoritative for portable
+We want Git revisions stored by Donut to be authoritative for portable
 notebook content (notes, folders, readmes). Relational note/folder *content*
 becomes a rebuildable projection of the accepted Git head. Permissions,
-subscriptions, memory trackers, questions, and other Doughnut-specific
+subscriptions, memory trackers, questions, and other Donut-specific
 behavior stay authoritative relational data.
 
 Local copies should be OKF-compatible Markdown trees (see
 [ADR 0004](./0004-okf-compatible-notebook-markdown-accepted.md)), real Git
-repositories, free of Doughnut note IDs in the working tree, and syncable
-with Doughnut. Doughnut keeps stable internal identities privately so
+repositories, free of Donut note IDs in the working tree, and syncable
+with Donut. Donut keeps stable internal identities privately so
 learning data stays attached across renames.
 
 Git objects and refs live in MySQL so accepting a ref, recording identity
@@ -50,7 +49,7 @@ Authority and representation:
    reject entirely. Force push is forbidden. Web autosave may be draft until a
    commit is accepted. Existing notebooks migrate as a single initial commit.
 5. **MVP transport and concurrency.** Accept only `main`. The local OKF tree is a
-   real Git repo; Git fetch/push with the server go through the Doughnut CLI (not
+   real Git repo; Git fetch/push with the server go through the Donut CLI (not
    yet a Git remote). While a push is accepted, the server notebook is locked;
    the server never merges — merge/rebase and conflict resolution are always
    local. ZIP/OKF export may remain for one-way portability, not as equivalent
@@ -60,7 +59,7 @@ Authority and representation:
 
 Does not change Level 1 authority. Deferred until needed:
 
-- Doughnut as a standard Git remote (HTTPS clone/fetch/push); CLI ceases to be
+- Donut as a standard Git remote (HTTPS clone/fetch/push); CLI ceases to be
   the only sync transport
 - Unlock server during push; server-side conflict resolution while web editing
 - External remotes (e.g. GitHub) with auto-sync from the server
@@ -70,7 +69,7 @@ Does not change Level 1 authority. Deferred until needed:
 
 ## Consequences
 
-- Retired `.doughnut-sync` baselines are replaced by the Git commit graph as merge-base.
+- The Git commit graph is the merge-base for local clones.
 - Hardest Level 1 work: identity-free rename lineage, and web writes → commits.
 - History outlives soft-deleted MySQL rows and local clones; retention/erasure
   must account for that.
@@ -93,12 +92,10 @@ Does not change Level 1 authority. Deferred until needed:
 - Exact Git object IDs are stored and retained for accepted history.
 - Accept of ref + lineage + coherent projection is transactional.
 - Codec round-trip is lossless for the canonical profile.
-- Doughnut auth gates all accept operations; quotas apply to objects/packs.
+- Donut auth gates all accept operations; quotas apply to objects/packs.
 
 ## Related
 
-- Supersedes: (none)
-- Superseded by: (none)
 - Links:
   - ADR-0000 [Use Architectural Decision Records](./0000-use-adrs-accepted.md)
   - [ADR 0004 — OKF-compatible notebook Markdown](./0004-okf-compatible-notebook-markdown-accepted.md)

@@ -1,4 +1,4 @@
-# 0001 — Ubiquitous language for Doughnut domain concepts
+# 0001 — Ubiquitous language for Donut domain concepts
 
 **Status:** Accepted  
 **Date:** 2026-08-15  
@@ -7,7 +7,7 @@
 
 ## Context
 
-Doughnut’s product vocabulary should be **consistent**: each idea has one name,
+Donut’s product vocabulary should be **consistent**: each idea has one name,
 and each name means one thing. Humans, UI copy, APIs, and coding agents then
 share those terms.
 
@@ -43,7 +43,7 @@ concepts, including **Cognitive index** measurement, live in [ADR
 - **Circle** — Multi-user shared space with members and notebooks
 - **Bazaar** — Marketplace where notebooks are shared for others to
   browse and subscribe
-- **Wiki link** — In-content reference to a note. Doughnut-authored form
+- **Wiki link** — In-content reference to a note. Donut-authored form
   is wiki `[[target]]` / `[[target|display]]` (optionally
   `Notebook:Title`). Path Markdown `[display](/folder/File.md)` is the
   same link, not a second kind. Spelling rules:
@@ -122,7 +122,7 @@ concepts, including **Cognitive index** measurement, live in [ADR
   **spelling**, **property**, **commissioned**.
 - **Memory tracking** — Creating and maintaining memory trackers.
   Tracker-level opt-out is **Remove from recall**.
-- **Recall** — Spaced retrieval of assimilated material. Doughnut name
+- **Recall** — Spaced retrieval of assimilated material. Donut name
   for FSRS **review** (recall is better than review). Methods: **recall
   prompt** or **just review**.
 - **Recall prompt** — One ask during recall for a memory tracker. Kinds:
@@ -183,21 +183,21 @@ glossary** in [ADR 0003](./0003-spaced-repetition-scheduling-policy-accepted.md)
 
 ## Commissioned Learning Session
 
-Vocabulary for Learning Sessions that a Tutor conducts outside Doughnut, on
-commission from Doughnut:
+Vocabulary for Learning Sessions that a Tutor conducts outside Donut, on
+commission from Donut:
 
-- **Learning Orchestrator** — The Doughnut component that directs and
+- **Learning Orchestrator** — The Donut component that directs and
   coordinates Learning Sessions
 - **Commissioned memory tracker** — Memory tracker maintained through
   commissioned Learning Sessions rather than ordinary **recall**
 - **Tutor** — Party that conducts a Learning Session from the request and
   produces a report; may be a person or an AI assistant, and is outside
-  Doughnut
+  Donut
 - **Learning Session** — One commissioned unit of tutoring, covering the
   due commissioned memory trackers of a single notebook
 - **Potential learning session** — Due commissioned memory trackers that
   could be commissioned but have no Learning Session yet
-- **Learning Session Request** — The document Doughnut gives the Tutor to
+- **Learning Session Request** — The document Donut gives the Tutor to
   conduct the session
 - **Learning Session Report** — The document the Tutor returns, carrying
   Feedback per Session Item
@@ -213,6 +213,12 @@ Scheduling of recorded Grades:
 
 ## Alignment policy
 
+- Product and internal names use **Donut** / `donut`. For now, `doughnut` is
+  allowed only as the literal identifier of a live external resource this
+  product does not migrate (GitHub repo `nerds-odd-e/doughnut`, site
+  `https://doughnut.odd-e.com`, GCS objects and buckets, MySQL user and
+  databases, Gitpod image, names under `infra/gcp/**`) — not in product
+  prose, UI, or new identifiers.
 - Features, tests, OpenAPI names, and packages follow this glossary.
   Spaced-repetition domain concepts follow the **Spaced repetition glossary** in
   [ADR 0003](./0003-spaced-repetition-scheduling-policy-accepted.md).
@@ -230,8 +236,6 @@ introduce a translation type that wraps one as the other.
 
 ## Related
 
-- Supersedes: (none)
-- Superseded by: (none)
 - Links: playbook [README.md](./README.md); ADR-0000
 [use-adrs-accepted.md](./0000-use-adrs-accepted.md); ADR 0003
 [spaced-repetition scheduling policy](./0003-spaced-repetition-scheduling-policy-accepted.md)

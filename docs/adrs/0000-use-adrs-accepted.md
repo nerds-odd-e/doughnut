@@ -6,7 +6,7 @@
 
 ## Context
 
-Architectural choices for Doughnut must not depend on a standing architect role,
+Architectural choices for Donut must not depend on a standing architect role,
 nor on a community that becomes an accidental decision forum. Teams need
 autonomy to decide, a duty to seek advice from people who care, and a durable
 record so humans and AI agents can recall *why* we chose something.

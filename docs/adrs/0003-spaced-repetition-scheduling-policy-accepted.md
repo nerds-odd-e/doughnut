@@ -7,7 +7,7 @@
 
 ## Context
 
-Doughnut bases its recall schedule on open FSRS-6. This ADR owns
+Donut bases its recall schedule on open FSRS-6. This ADR owns
 spaced-repetition domain terms and scheduling policy: which events affect
 memory, which inputs matter, and which invariants those transitions preserve.
 It also owns how a morning's recall is measured for the **Cognitive index**.
@@ -17,10 +17,10 @@ mechanics and numeric outcomes.
 
 ## Decision
 
-### Doughnut and FSRS language
+### Donut and FSRS language
 
 **Recall** is FSRS **review**. A **memory tracker** is an FSRS card.
-**Assimilation** creates a New memory tracker. Doughnut does not model FSRS
+**Assimilation** creates a New memory tracker. Donut does not model FSRS
 Learning, Review, and Relearning as product states.
 
 ### Spaced-repetition glossary
@@ -77,7 +77,7 @@ restatement of what the scheduler scheduled.
 
 ### FSRS profile
 
-Doughnut owns its open-FSRS-6 implementation. It uses one product-wide
+Donut owns its open-FSRS-6 implementation. It uses one product-wide
 requested retention and one product-wide maximum interval; neither is a learner
 setting.
 

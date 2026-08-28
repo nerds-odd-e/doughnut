@@ -7,20 +7,20 @@
 
 ## Context
 
-Doughnut exports and syncs notebooks as Markdown trees. Portable knowledge
+Donut exports and syncs notebooks as Markdown trees. Portable knowledge
 should follow the
 [Open Knowledge Format (OKF) v0.2](https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/SPEC.md)
 so local copies work with OKF tooling, Obsidian-style editing, and (with
 [ADR 0002](./0002-git-native-notebooks-backed-by-mysql.md)) Git-native sync.
 
 OKF standardizes a small structural floor (concepts as files, path as ID,
-required `type`). Filename-as-title, wiki-link spelling, and what Doughnut
-keeps out of the tree are Doughnut producer choices on top of that floor —
+required `type`). Filename-as-title, wiki-link spelling, and what Donut
+keeps out of the tree are Donut producer choices on top of that floor —
 the profile this ADR records.
 
 ## Decision
 
-Doughnut’s canonical portable notebook tree conforms to OKF v0.2 plus this
+Donut’s canonical portable notebook tree conforms to OKF v0.2 plus this
 profile. Codec round-trips must be lossless for these rules.
 
 ### Bundle and concepts
@@ -40,8 +40,8 @@ profile. Codec round-trips must be lossless for these rules.
   as authored. Preserve author YAML. `type: Readme` is export-only;
   stored readme columns are the authored text.
 - `readme` / `readme.md` are the only hard-reserved note titles.
-- Doughnut does not generate OKF `index.md` listings; omitting them is
-  conformant. Doughnut does not emit `okf_version`; OKF allows that
+- Donut does not generate OKF `index.md` listings; omitting them is
+  conformant. Donut does not emit `okf_version`; OKF allows that
   declaration only on a bundle-root listing.
 - Concept titles that would become `index.md` or `log.md` (`index`,
   `index.md`, `log`, `log.md`, case-insensitive) are allowed. The product
@@ -66,21 +66,21 @@ profile. Codec round-trips must be lossless for these rules.
   preserves author headings, including a leading heading that matches
   the title.
 - Public identity in the tree is the path,  **folder path + display name**.
-  Doughnut note ID is server-side.
+  Donut note ID is server-side.
 
 ### Links and attachments
 
-- Doughnut-authored inter-note links are wiki `[[target]]` /
+- Donut-authored inter-note links are wiki `[[target]]` /
   `[[target|display]]`. Product insert writes wiki. Unqualified `[[Title]]`
   resolves by title (lowest note id when titles collide across folders).
   `Notebook:Title` is a valid wiki target.
 - These rules apply to the **body and to YAML frontmatter values** (scalars
   and one-level list items), including relationship `source` / `target` and
-  `overlaps` items. Doughnut-authored frontmatter is wiki. Path Markdown
+  `overlaps` items. Donut-authored frontmatter is wiki. Path Markdown
   in those values is the same link. No conversion. A bare YAML path
   (`source: /folder/File.md`) is not a link. OKF §6.2 path-valued fields
   (`resource`, `sources[].resource`, …) are a different key family;
-  Doughnut relationship endpoints are not those fields.
+  Donut relationship endpoints are not those fields.
 - Path Markdown `[display](/folder/File.md)` is the same link as
   `[[folder/File|display]]`. Leading `/` on Markdown hrefs is bundle-relative
   (notebook root). Wiki path form has no leading `/`.
@@ -112,14 +112,14 @@ profile. Codec round-trips must be lossless for these rules.
   is authored YAML; the codec does not wrap `title:` to compensate for a
   basename that is not the display name. Stored notes use the title
   column.
-- Inter-note links are dual-spelling in body and frontmatter: Doughnut
+- Inter-note links are dual-spelling in body and frontmatter: Donut
   writes wiki; path Markdown is the authored spelling. ZIP does not rewrite wiki
-  to path Markdown. Wiki in Doughnut-authored YAML is the same profile
+  to path Markdown. Wiki in Donut-authored YAML is the same profile
   exception as wiki in the body.
-- Obsidian and OKF consumers can open a Doughnut notebook tree. Public
+- Obsidian and OKF consumers can open a Donut notebook tree. Public
   identity in the files is the path, except a user-insisted concept
   `index.md` / `log.md`, which OKF tools may treat as a listing/log or reject.
-  Tools that do not resolve wiki links will not follow Doughnut-authored
+  Tools that do not resolve wiki links will not follow Donut-authored
   `[[…]]` until they support both spellings.
 
 ## Pros
@@ -130,13 +130,11 @@ profile. Codec round-trips must be lossless for these rules.
 ## Cons
 
 - Strict validation rejects some free-form trees until fixed.
-- Wiki in Doughnut-authored trees is a profile exception to OKF path-link
+- Wiki in Donut-authored trees is a profile exception to OKF path-link
   preference.
 
 ## Related
 
-- Supersedes: (none)
-- Superseded by: (none)
 - Links:
   - [ADR 0001 — Ubiquitous language](./0001-ubiquitous-language.md) (**Wiki link**)
   - [ADR 0002 — Git-native notebooks](./0002-git-native-notebooks-backed-by-mysql.md)
