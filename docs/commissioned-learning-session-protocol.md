@@ -1,9 +1,9 @@
 # Commissioned learning session protocol
 
-Doughnut commissions a Tutor — a person, or a general-purpose AI assistant —
+Donut commissions a Tutor — a person, or a general-purpose AI assistant —
 to conduct a Learning Session covering the due commissioned memory trackers of
 one notebook. The learner copies the Learning Session Request to the Tutor and
-pastes the Learning Session Report back into Doughnut for that notebook.
+pastes the Learning Session Report back into Donut for that notebook.
 
 Vocabulary is in [ADR 0001](./adrs/0001-ubiquitous-language.md). How recorded
 Feedback Grades affect the memory schedule is
@@ -104,14 +104,14 @@ Needed several reminders on the soft g.
 </session_item_feedback>
 ```
 
-Doughnut reads a Report as follows:
+Donut reads a Report as follows:
 
 1. Each `<session_item>…</session_item>` is one Session Item.
 2. Where the block is a sequence of `{title}: {1–4}` lines, each line whose
    title is a Session Item in this notebook starts an item, and the lines after
    it until the next such line are descriptive text.
 
-Grade is an integer from 1 to 4. Doughnut records Feedback for those items and
+Grade is an integer from 1 to 4. Donut records Feedback for those items and
 reports remaining lines to the learner.
 
 `<how_to_report>` shows wrapping `<session_item_feedback>` in a fenced code

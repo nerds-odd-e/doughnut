@@ -125,16 +125,9 @@ notes, bazaar/MCP blurbs). `cli_access_token.feature` remains `@ignore`.
 
 ### 8. ADRs 0000–0004 and protocol docs (Structure)
 
-Status: planned
+Status: done
 
-ADRs 0000–0004 and the README index title are already current Donut prose
-(`ec3507e38f`). Remaining: product-prose “Doughnut” → “Donut” in
-`docs/commissioned-learning-session-protocol.md`.
-
-Keep `.doughnut-sync`, GitHub paths, and any live URLs. No “renamed from”
-language.
-
-Verify: grep that protocol file for product-prose `Doughnut`.
+ADRs were already current. Protocol doc product-prose is **Donut**.
 
 ### 9. Remaining prose, dead artifacts, final grep (Structure)
 
