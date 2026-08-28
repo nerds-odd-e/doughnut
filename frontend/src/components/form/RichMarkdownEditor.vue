@@ -66,6 +66,7 @@ const props = defineProps({
   errors: Object,
   readonly: Boolean,
   wikiTitles: { type: Array as PropType<WikiTitle[]>, required: true },
+  lastSavedMarkdown: { type: String, default: undefined },
   noteTitleForWikidataSearch: { type: String, default: "" },
   noteId: { type: Number as PropType<number | undefined>, default: undefined },
   isReadmeContext: { type: Boolean, default: false },
@@ -110,6 +111,9 @@ const markdownForRichDisplay = computed(() => {
   return props.modelValue ?? ""
 })
 
+const htmlWithWikiLinks = (html: string) =>
+  replaceWikiLinksInHtml(html, props.wikiTitles, props.lastSavedMarkdown)
+
 const htmlValue = computed(() => {
   const p = parsedContent.value
   if (
@@ -118,7 +122,7 @@ const htmlValue = computed(() => {
     p.ok &&
     p.body === currentIntervalBodyMarkdown
   ) {
-    return replaceWikiLinksInHtml(currentIntervalHtml, props.wikiTitles)
+    return htmlWithWikiLinks(currentIntervalHtml)
   }
   if (
     currentIntervalHtml !== undefined &&
@@ -126,11 +130,10 @@ const htmlValue = computed(() => {
     !p.ok &&
     (props.modelValue ?? "") === currentIntervalBodyMarkdown
   ) {
-    return replaceWikiLinksInHtml(currentIntervalHtml, props.wikiTitles)
+    return htmlWithWikiLinks(currentIntervalHtml)
   }
-  return replaceWikiLinksInHtml(
-    markdownizer.markdownToHtml(markdownForRichDisplay.value),
-    props.wikiTitles
+  return htmlWithWikiLinks(
+    markdownizer.markdownToHtml(markdownForRichDisplay.value)
   )
 })
 

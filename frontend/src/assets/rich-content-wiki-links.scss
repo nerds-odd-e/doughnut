@@ -12,7 +12,7 @@
     text-underline-offset: 0.15em;
   }
 
-  a:not(.donut-wiki-link):not(.dead-wiki-link) {
+  a:not(.donut-wiki-link):not(.dead-wiki-link):not(.pending-wiki-link) {
     color: var(--color-info);
     text-decoration: underline;
     text-underline-offset: 0.15em;
@@ -20,5 +20,12 @@
 
   a.dead-wiki-link {
     color: red;
+  }
+
+  a.pending-wiki-link {
+    color: var(--color-warning);
+    text-decoration: underline;
+    text-decoration-style: dashed;
+    text-underline-offset: 0.15em;
   }
 }
