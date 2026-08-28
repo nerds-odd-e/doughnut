@@ -1,6 +1,6 @@
 # Deployed commit verification
 
-**Status:** in progress — slice 1 done; next is slice 2.
+**Status:** in progress — slices 1–2 done; next is slice 3.
 **Type:** ad-hoc plan (`.planning/quick/`)
 
 ## Goal
@@ -78,22 +78,16 @@ Verified: `bootJar` jar contains `META-INF/build-info.properties` with
 `build.commit` matching `git rev-parse HEAD`.
 
 ### 2. Healthcheck reports the deployed commit (Behavior)
+**Status:** done
 
-**Pre-condition:** app built with slice 1's build-info wiring.
-**Trigger:** `GET /api/healthcheck`.
-**Post-condition:** response includes the commit SHA from `BuildProperties`
-(e.g. `OK. Active Profile: prod. Commit: <sha>`), alongside the existing
-active-profile text — keep the existing `"OK"` substring so
-`app-instance-healthcheck.sh`'s current `[[ "$last_body" == *"OK"* ]]` match
-keeps working unchanged.
+`GET /api/healthcheck` returns
+`OK. Active Profile: <profiles>. Commit: <sha>` from required `BuildProperties`.
+`"OK"` substring is unchanged so `app-instance-healthcheck.sh` still matches.
 
-Test: extend the existing `HealthCheckController` test to assert the response
-contains a commit value sourced from the injected `BuildProperties` bean
-(inject a test double/fixture value rather than asserting a specific real SHA).
-
-This alone already delivers the core value: anyone can `curl` prod and know
-in one call what commit is actually running, instead of the multi-round-trip
-SSH/jar-diffing this plan's Origin required.
+Test: new `HealthCheckControllerTest` injects `@TestBean` `BuildProperties`
+with fixture SHA `fixture-commit-sha` (there was no prior controller test).
+`bootBuildInfo` is on the test classpath, so other SpringBootTests start
+without a per-test bean.
 
 ### 3. Deploy pipeline fails loudly on commit mismatch (Behavior)
 

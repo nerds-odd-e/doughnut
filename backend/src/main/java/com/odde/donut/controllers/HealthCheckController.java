@@ -4,6 +4,7 @@ import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.services.AuthorizationService;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.info.BuildProperties;
 import org.springframework.core.env.Environment;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,9 +18,14 @@ class HealthCheckController {
 
   @Autowired private AuthorizationService authorizationService;
 
+  @Autowired private BuildProperties buildProperties;
+
   @GetMapping("/healthcheck")
   public String ping() {
-    return "OK. Active Profile: " + String.join(", ", environment.getActiveProfiles());
+    return "OK. Active Profile: "
+        + String.join(", ", environment.getActiveProfiles())
+        + ". Commit: "
+        + buildProperties.get("commit");
   }
 
   @GetMapping("/data_upgrade")
