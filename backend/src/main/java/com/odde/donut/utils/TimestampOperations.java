@@ -7,6 +7,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.TextStyle;
+import java.time.temporal.ChronoUnit;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
@@ -23,14 +24,14 @@ public abstract class TimestampOperations {
 
   public static Timestamp alignByHalfADay(Timestamp currentUTCTimestamp, ZoneId timeZone) {
     final ZonedDateTime alignedZonedDt = alignDayAndHourByHalfADay(currentUTCTimestamp, timeZone);
-    return Timestamp.from(alignedZonedDt.withMinute(0).withSecond(0).toInstant());
+    return Timestamp.from(alignedZonedDt.truncatedTo(ChronoUnit.HOURS).toInstant());
   }
 
   public static Timestamp startOfHalfADay(Timestamp currentUTCTimestamp, ZoneId timeZone) {
     final ZonedDateTime zonedDateTime = getZonedDateTime(currentUTCTimestamp, timeZone);
     ZonedDateTime startZonedDt =
         zonedDateTime.getHour() < 12 ? zonedDateTime.withHour(0) : zonedDateTime.withHour(12);
-    return Timestamp.from(startZonedDt.withMinute(0).withSecond(0).withNano(0).toInstant());
+    return Timestamp.from(startZonedDt.truncatedTo(ChronoUnit.HOURS).toInstant());
   }
 
   private static ZonedDateTime alignDayAndHourByHalfADay(

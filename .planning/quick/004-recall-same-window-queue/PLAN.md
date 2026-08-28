@@ -1,6 +1,6 @@
 # Keep the recall queue across the same half-day
 
-**Status:** in progress — slices 1–2 done.
+**Status:** in progress — slices 1–3 done.
 **Type:** ad-hoc plan (`.planning/quick/`)
 **Origin:** slice 14.6 of [001-morning-cognitive-index](../001-morning-cognitive-index/PLAN.md) (`48763b341d`). That slice meant “remount only when the due window rolls over.” The check uses exact `currentRecallWindowEndAt` string equality, which almost never holds.
 
@@ -55,15 +55,11 @@ Status legend: `[ ]` planned · `[~]` in progress · `[x]` done
 
 **Learning:** Resume is not on the unanswered first card; the return path that hits KeepAlive is Recall in the nav. Cypress `localhost` skips shuffle (`getEnvironment() === "testing"`); the two-stem assertion is still the user-path net. Mocked OpenAI E2E needs `OPENAI_API_TOKEN` set on `backend:sut:ci` even with Mountebank.
 
-### 3. Due-window timestamp is a stable half-day identity — Behavior `[ ]`
+### 3. Due-window timestamp is a stable half-day identity — Behavior `[x]`
 
-**Pre:** Current time is inside a half-day (e.g. morning in `Asia/Shanghai`).
-**Trigger:** `recalling` (or menu `recallStatus`) twice, milliseconds apart, same timezone and `dueindays`.
-**Post:** `currentRecallWindowEndAt` is equal.
+**Shipped:** `alignByHalfADay` and `startOfHalfADay` truncate to the hour (`truncatedTo(ChronoUnit.HOURS)`), so leftover nanos cannot differ between menu and Recall. Residue test: two Asia/Shanghai morning instants with different sub-second residue yield equal windows.
 
-- `alignByHalfADay` must `.withNano(0)` like `startOfHalfADay` already does.
-- Test through `TimestampOperations` (two instants in the same half-day) and keep `RecallsControllerTests` half-day alignment green. Frozen-time tests already compare equal windows; the new test is the residue case they never covered.
-- Stop-safe even without slice 1: production menu vs Recall strings start matching. Slice 1 still required for mocked millis-different responses and as defense if serialization format differs.
+**Learning:** Main had dropped `.withNano(0)` in `b5662122c1`; this restores stable identity. Slice 1’s frontend second-precision compare remains defense for mocked/serialized format differences.
 
 ### 4. Replacing the due list mid-prefetch still shows the current prompt — Behavior `[ ]`
 
