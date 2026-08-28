@@ -1,6 +1,6 @@
 # Keep the recall queue across the same half-day
 
-**Status:** planned — not started.
+**Status:** in progress — slice 1 done.
 **Type:** ad-hoc plan (`.planning/quick/`)
 **Origin:** slice 14.6 of [001-morning-cognitive-index](../001-morning-cognitive-index/PLAN.md) (`48763b341d`). That slice meant “remount only when the due window rolls over.” The check uses exact `currentRecallWindowEndAt` string equality, which almost never holds.
 
@@ -43,18 +43,11 @@ Opening Recall, or returning to it in the **same half-day**, keeps the already-s
 
 Status legend: `[ ]` planned · `[~]` in progress · `[x]` done
 
-### 1. Same half-day activation does not remount the due queue — Behavior `[ ]`
+### 1. Same half-day activation does not remount the due queue — Behavior `[x]`
 
-**Pre:** `toRepeat` and `currentRecallWindowEndAt` are already set (menu or an earlier load). The half-day has not rolled over.
-**Trigger:** RecallPage KeepAlive activates (first mount inside KeepAlive, or return from a detour).
-**Post:** `toRepeat` is unchanged; the first unanswered prompt stays the same.
+**Shipped:** `sameHalfDayWindow` in `useRecallPageLoading` (ISO parse, truncate to seconds) skips `loadCurrentDueRecalls()` when KeepAlive fetches the same half-day. Tests: first activation + reactivation with `…00:00.123+00:00` vs `…00:00.456Z`; rollover still remounts.
 
-- Extend `frontend/tests/pages/RecallPage.activation.spec.ts` (do not add a second file):
-  - First activation with a menu-loaded queue and a fetched window that is the **same half-day at different millisecond precision** must not call `setToRepeat`.
-  - Existing “unchanged window” reactivation case must use that millis-different pair (the identical-string case is what let 14.6 ship).
-  - Existing rollover case still remounts (`00:00` vs `12:00`).
-- Production: `onActivated` treats two window timestamps as the same half-day when they agree at second precision (parse ISO; ignore sub-second residue and `Z` vs `+00:00`). Only then skip `loadCurrentDueRecalls()`.
-- No E2E in this slice — one-item features cannot fail for the right reason. Slice 2 is the user-path net.
+**Learning:** Backend `alignByHalfADay` already has `.withNano(0)` on main (`b5662122c1`); that commit also dropped residue tests. Slice 3 still needs those tests. Slice 2 is the E2E net.
 
 ### 2. Returning from a note in the same half-day keeps the unanswered prompt — Behavior `[ ]`
 

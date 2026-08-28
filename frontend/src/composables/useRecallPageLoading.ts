@@ -17,6 +17,18 @@ import {
   type Ref,
 } from "vue"
 
+const sameHalfDayWindow = (
+  fetchedWindowEndAt: string | undefined,
+  storedWindowEndAt: string | undefined
+) => {
+  if (fetchedWindowEndAt === storedWindowEndAt) return true
+  if (!fetchedWindowEndAt || !storedWindowEndAt) return false
+  return (
+    Math.trunc(Date.parse(fetchedWindowEndAt) / 1000) ===
+    Math.trunc(Date.parse(storedWindowEndAt) / 1000)
+  )
+}
+
 export function useRecallPageLoading(options: {
   currentIndex: Ref<number>
   previousAnsweredQuestions: Ref<(AnsweredQuestion | undefined)[]>
@@ -130,7 +142,10 @@ export function useRecallPageLoading(options: {
     const response = await loadSessionStrips()
     if (
       response &&
-      response.currentRecallWindowEndAt !== currentRecallWindowEndAt.value
+      !sameHalfDayWindow(
+        response.currentRecallWindowEndAt,
+        currentRecallWindowEndAt.value
+      )
     ) {
       loadCurrentDueRecalls()
     }
