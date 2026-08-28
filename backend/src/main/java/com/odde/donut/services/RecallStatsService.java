@@ -1,5 +1,6 @@
 package com.odde.donut.services;
 
+import com.odde.donut.controllers.dto.RecallSplitHalfReliabilityDTO;
 import com.odde.donut.controllers.dto.RecallStatsDTO;
 import com.odde.donut.controllers.dto.RecallStatsDTO.AccuracyStats;
 import com.odde.donut.controllers.dto.RecallStatsDTO.AmPmResponseTime;
@@ -38,9 +39,7 @@ public class RecallStatsService {
     // RecallPrompt entities or their eager associations — this is what avoids the production
     // N+1/timeout.
     Timestamp sinceYear = minusDays(now, 365);
-    List<RecallAnswerRow> allTime =
-        recallPromptRepository.findAnsweredRecallAnswerRows(
-            user.getId(), minusDays(now, 5 * 365), now);
+    List<RecallAnswerRow> allTime = findAllTimeAnsweredRows(user, now);
     List<RecallAnswerRow> recent = new ArrayList<>();
     for (RecallAnswerRow r : allTime) {
       if (!r.answerCreatedAt().before(sinceYear)) {
@@ -50,13 +49,31 @@ public class RecallStatsService {
     return aggregateRows(recent, allTime, zoneId, now);
   }
 
+  /**
+   * Slice 21.4's internal diagnostic: split-half reliability of the (not-yet-shipped) morning
+   * cognitive index across the current user's own trailing history. Same same-user-only projection
+   * query as {@link #compute}; not wired into {@link RecallStatsDTO}.
+   */
+  public RecallSplitHalfReliabilityDTO computeSplitHalfReliability(
+      User user, ZoneId zoneId, Timestamp now) {
+    List<RecallAnswerRow> allTimeReviews = reviewsOnly(findAllTimeAnsweredRows(user, now));
+    LocalDate today = localToday(now, zoneId);
+    RecallSplitHalfReliability.Result result =
+        RecallSplitHalfReliability.compute(allTimeReviews, today, zoneId);
+    return new RecallSplitHalfReliabilityDTO(
+        result.pairCount(), result.rawCorrelation(), result.spearmanBrownCorrelation());
+  }
+
+  private List<RecallAnswerRow> findAllTimeAnsweredRows(User user, Timestamp now) {
+    return recallPromptRepository.findAnsweredRecallAnswerRows(
+        user.getId(), minusDays(now, 5 * 365), now);
+  }
+
   static RecallStatsDTO aggregateRows(
       List<RecallAnswerRow> recent, List<RecallAnswerRow> allTime, ZoneId zoneId, Timestamp now) {
-    List<RecallAnswerRow> recentReviews =
-        recent.stream().filter(RecallAnswerRow::countsAsReview).toList();
-    List<RecallAnswerRow> allTimeReviews =
-        allTime.stream().filter(RecallAnswerRow::countsAsReview).toList();
-    LocalDate today = now.toInstant().atZone(zoneId).toLocalDate();
+    List<RecallAnswerRow> recentReviews = reviewsOnly(recent);
+    List<RecallAnswerRow> allTimeReviews = reviewsOnly(allTime);
+    LocalDate today = localToday(now, zoneId);
 
     Map<LocalDate, List<Long>> perDayTimes = new HashMap<>();
     Map<LocalDate, int[]> perDayRetention = new HashMap<>();
@@ -146,6 +163,14 @@ public class RecallStatsService {
         totals,
         pace,
         accuracy);
+  }
+
+  private static List<RecallAnswerRow> reviewsOnly(List<RecallAnswerRow> rows) {
+    return rows.stream().filter(RecallAnswerRow::countsAsReview).toList();
+  }
+
+  private static LocalDate localToday(Timestamp now, ZoneId zoneId) {
+    return now.toInstant().atZone(zoneId).toLocalDate();
   }
 
   private static Timestamp minusDays(Timestamp ts, int days) {

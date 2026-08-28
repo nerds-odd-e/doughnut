@@ -22,44 +22,14 @@ import org.junit.jupiter.api.Test;
  * own rows entirely).
  */
 class RecallMorningHalfIndexTest {
-  private static final int TODAY = 100;
-  private static final int BASELINE_START = TODAY - 63; // 37
-  private static final int BASELINE_END = TODAY - 4; // 96
+  private static final int TODAY = RecallStatsTestFixtures.WARMED_UP_BASELINE_TODAY;
   private static final ZoneId UTC = ZoneId.of("UTC");
-  private static final LocalDate TODAY_DATE = LocalDate.of(1989, 1, 1).plusDays(TODAY);
-  private static final int BASELINE_MS = 5000;
-
-  /**
-   * One trailing baseline day: two items, each with a pre-existing baseline from day 0, answered
-   * again on {@code day} so that day contributes exactly two residuals (needed for the consistency
-   * spread baseline's own {@code >= 2 residuals/day} qualification) with a non-degenerate pace and
-   * lapse spread across days, mirroring {@link RecallPaceAggregatorDayBaselineTest}.
-   */
-  private static void addBaselineDay(List<RecallAnswerRow> rows, int day, int itemIdBase) {
-    int itemA = itemIdBase;
-    int itemB = itemIdBase + 1;
-    rows.add(answered(utc(0, 6), BASELINE_MS, true, null, itemA));
-    rows.add(answered(utc(0, 7), BASELINE_MS, true, null, itemB));
-    boolean evenDay = (day - BASELINE_START) % 2 == 0;
-    int onTaskMsA = evenDay ? 4500 : 6000; // gives every baseline day a non-zero pace spread
-    int onTaskMsB = evenDay ? 15000 : BASELINE_MS; // itemB lapses on half the days
-    rows.add(answered(utc(day, 10), onTaskMsA, true, null, itemA));
-    rows.add(answered(utc(day, 11), onTaskMsB, true, null, itemB));
-  }
-
-  private static List<RecallAnswerRow> withWarmedUpBaselines() {
-    List<RecallAnswerRow> rows = new ArrayList<>();
-    int itemId = 2000;
-    for (int day = BASELINE_START; day <= BASELINE_END; day++) {
-      addBaselineDay(rows, day, itemId);
-      itemId += 2;
-    }
-    return rows;
-  }
+  private static final LocalDate TODAY_DATE = RecallStatsTestFixtures.WARMED_UP_BASELINE_TODAY_DATE;
+  private static final int BASELINE_MS = RecallStatsTestFixtures.WARMED_UP_BASELINE_MS;
 
   @Test
   void aDayWithNoQualifyingRowsYieldsNoIndexForEitherHalf() {
-    List<RecallAnswerRow> rows = withWarmedUpBaselines();
+    List<RecallAnswerRow> rows = RecallStatsTestFixtures.warmedUpBaselines();
     assertThat(RecallMorningHalfIndex.compute(rows, TODAY_DATE, UTC, Half.ODD), nullValue());
     assertThat(RecallMorningHalfIndex.compute(rows, TODAY_DATE, UTC, Half.EVEN), nullValue());
   }
@@ -76,7 +46,7 @@ class RecallMorningHalfIndexTest {
 
   @Test
   void oddAndEvenHalvesAreScoredIndependentlyAndReflectTheirOwnOutcomes() {
-    List<RecallAnswerRow> rows = withWarmedUpBaselines();
+    List<RecallAnswerRow> rows = RecallStatsTestFixtures.warmedUpBaselines();
     int[] items = {9001, 9002, 9003, 9004};
     boolean[] correctByPosition = {true, false, true, false}; // odd = correct, even = incorrect
     for (int i = 0; i < items.length; i++) {

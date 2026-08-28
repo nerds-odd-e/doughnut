@@ -966,6 +966,12 @@ export type RecallStatsDto = {
     accuracy?: AccuracyStats;
 };
 
+export type RecallSplitHalfReliabilityDto = {
+    pairCount?: number;
+    rawCorrelation?: number;
+    spearmanBrownCorrelation?: number;
+};
+
 export type QuestionGenerationBatchUserScheduleDto = {
     nextScheduledAt?: string;
     reason?: string;
@@ -3218,6 +3224,24 @@ export type GetRecallStatsResponses = {
 };
 
 export type GetRecallStatsResponse = GetRecallStatsResponses[keyof GetRecallStatsResponses];
+
+export type GetRecallSplitHalfReliabilityData = {
+    body?: never;
+    path?: never;
+    query: {
+        timezone: string;
+    };
+    url: '/api/user/recall-split-half-reliability';
+};
+
+export type GetRecallSplitHalfReliabilityResponses = {
+    /**
+     * OK
+     */
+    200: RecallSplitHalfReliabilityDto;
+};
+
+export type GetRecallSplitHalfReliabilityResponse = GetRecallSplitHalfReliabilityResponses[keyof GetRecallSplitHalfReliabilityResponses];
 
 export type GetQuestionGenerationBatchScheduleData = {
     body?: never;

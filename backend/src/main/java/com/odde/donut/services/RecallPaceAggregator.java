@@ -2,12 +2,12 @@ package com.odde.donut.services;
 
 import com.odde.donut.controllers.dto.RecallStatsDTO.PaceStats;
 import com.odde.donut.services.RecallDayBaseline.DayBaseline;
+import com.odde.donut.services.RecallWeightedResidualStats.WeightedResidual;
 import com.odde.donut.utils.TimestampOperations;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.List;
@@ -53,12 +53,6 @@ final class RecallPaceAggregator {
       Set<RecallAnswerRow> implausiblyFastRows,
       DayBaseline paceDayBaseline,
       DayBaseline lapseDayBaseline) {}
-
-  /**
-   * A cold-start item's baseline is built from very few observations, so its residual is noisy.
-   * {@code weight} down-weights such rows in the pace tile's weighted median and confidence score.
-   */
-  private record WeightedResidual(double residual, double weight) {}
 
   static PaceResult compute(List<RecallAnswerRow> allTimeReviews, LocalDate today, ZoneId zoneId) {
     return compute(allTimeReviews, today, zoneId, null);
@@ -144,8 +138,10 @@ final class RecallPaceAggregator {
       priorObservationCountByItem.put(itemId, priorObservationCount + 1);
     }
     int sampleSize = todaysResiduals.size();
-    Double pctVsUsual = sampleSize > 0 ? weightedPctVsUsual(todaysResiduals) : null;
-    Double confidence = sampleSize > 0 ? averageWeight(todaysResiduals) : null;
+    Double pctVsUsual =
+        sampleSize > 0 ? RecallWeightedResidualStats.weightedPctVsUsual(todaysResiduals) : null;
+    Double confidence =
+        sampleSize > 0 ? RecallWeightedResidualStats.averageWeight(todaysResiduals) : null;
     Double consistencyZScore = consistencyZScore(todaysResiduals, residualsByDate);
     return new PaceResult(
         new PaceStats(
@@ -157,13 +153,16 @@ final class RecallPaceAggregator {
 
   /**
    * Per-day pace baseline: applies the exact same weighted-median transform used for today's {@code
-   * pctVsUsual} ({@link #weightedPctVsUsual}) to each qualifying baseline-window day's own
-   * residuals, then reports median/MAD of those per-day values across days.
+   * pctVsUsual} ({@link RecallWeightedResidualStats#weightedPctVsUsual}) to each qualifying
+   * baseline-window day's own residuals, then reports median/MAD of those per-day values across
+   * days.
    */
   private static DayBaseline paceDayBaseline(
       Map<LocalDate, List<WeightedResidual>> residualsByDate) {
     List<Double> perDayPctVsUsual =
-        residualsByDate.values().stream().map(RecallPaceAggregator::weightedPctVsUsual).toList();
+        residualsByDate.values().stream()
+            .map(RecallWeightedResidualStats::weightedPctVsUsual)
+            .toList();
     return RecallDayBaseline.dayBaseline(perDayPctVsUsual);
   }
 
@@ -188,67 +187,18 @@ final class RecallPaceAggregator {
   private static Double consistencyZScore(
       List<WeightedResidual> todaysResiduals,
       Map<LocalDate, List<WeightedResidual>> residualsByDate) {
-    Double todaySpread = todaysResiduals.size() >= 2 ? weightedMad(todaysResiduals) : null;
+    Double todaySpread =
+        todaysResiduals.size() >= 2
+            ? RecallWeightedResidualStats.weightedMad(todaysResiduals)
+            : null;
     List<Double> baselineSpreads =
         residualsByDate.values().stream()
             .filter(values -> values.size() >= 2)
-            .map(RecallPaceAggregator::madOfResiduals)
+            .map(RecallWeightedResidualStats::madOfResiduals)
             .toList();
     DayBaseline spreadBaseline = RecallDayBaseline.dayBaseline(baselineSpreads);
     return todaySpread == null
         ? null
         : RecallDayBaseline.zScoreAgainstDayBaseline(todaySpread, spreadBaseline);
-  }
-
-  /**
-   * Plain (unweighted) MAD of a baseline day's residuals — deliberately ignores each residual's
-   * cold-start weight, unlike {@link #weightedMad} used for today's spread.
-   */
-  private static double madOfResiduals(List<WeightedResidual> residuals) {
-    return RecallDayBaseline.mad(residuals.stream().map(WeightedResidual::residual).toList());
-  }
-
-  /**
-   * Weighted median absolute deviation: same cold-start down-weighting as {@link
-   * #weightedPctVsUsual}, applied to today's spread so a morning of noisy new cards can't flip the
-   * consistency badge when a well-established item's residual is tight.
-   */
-  private static double weightedMad(List<WeightedResidual> residuals) {
-    double weightedMedianValue = weightedMedian(residuals);
-    List<WeightedResidual> deviations =
-        residuals.stream()
-            .map(
-                wr ->
-                    new WeightedResidual(
-                        Math.abs(wr.residual() - weightedMedianValue), wr.weight()))
-            .toList();
-    return weightedMedian(deviations);
-  }
-
-  private static double weightedPctVsUsual(List<WeightedResidual> residuals) {
-    return (Math.exp(weightedMedian(residuals)) - 1) * 100;
-  }
-
-  private static double averageWeight(List<WeightedResidual> residuals) {
-    return residuals.stream().mapToDouble(WeightedResidual::weight).average().orElse(0);
-  }
-
-  /**
-   * Weighted median: sorts by residual ascending and returns the residual at which cumulative
-   * weight first reaches half of the total. Cold-start rows (weight as low as 0.25, the minimum a
-   * residual-producing row can carry) barely move it, letting established items dominate.
-   */
-  private static double weightedMedian(List<WeightedResidual> residuals) {
-    double totalWeight = residuals.stream().mapToDouble(WeightedResidual::weight).sum();
-    List<WeightedResidual> sorted = new ArrayList<>(residuals);
-    sorted.sort(Comparator.comparingDouble(WeightedResidual::residual));
-    double cumulativeWeight = 0;
-    for (WeightedResidual wr : sorted) {
-      cumulativeWeight += wr.weight();
-      if (cumulativeWeight >= totalWeight / 2.0) {
-        return wr.residual();
-      }
-    }
-    return sorted.get(sorted.size() - 1).residual();
   }
 }

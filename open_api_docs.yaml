@@ -2311,6 +2311,24 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/RecallStatsDTO"
+  /api/user/recall-split-half-reliability:
+    get:
+      tags:
+      - user-controller
+      operationId: getRecallSplitHalfReliability
+      parameters:
+      - name: timezone
+        in: query
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/RecallSplitHalfReliabilityDTO"
   /api/user/question-generation-batch-schedule:
     get:
       tags:
@@ -5063,6 +5081,18 @@ components:
           $ref: "#/components/schemas/PaceStats"
         accuracy:
           $ref: "#/components/schemas/AccuracyStats"
+    RecallSplitHalfReliabilityDTO:
+      type: object
+      properties:
+        pairCount:
+          type: integer
+          format: int32
+        rawCorrelation:
+          type: number
+          format: double
+        spearmanBrownCorrelation:
+          type: number
+          format: double
     QuestionGenerationBatchUserScheduleDTO:
       type: object
       properties:

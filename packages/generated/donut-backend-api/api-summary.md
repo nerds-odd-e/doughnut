@@ -28,6 +28,7 @@ Use this for endpoint lookup; open `sdk.gen.ts` or `types.gen.ts` only for exact
 - `getTokenInfo`: GET `/api/user/token-info` -> `GetTokenInfoResponse` (request: none; response body: UserToken)
 - `revokeToken`: DELETE `/api/user/token-info` -> `RevokeTokenResponse` (request: none; response body: void)
 - `getRecallStats`: GET `/api/user/recall-stats` -> `GetRecallStatsResponse` (request: `GetRecallStatsData`; query: timezone; response body: RecallStatsDto)
+- `getRecallSplitHalfReliability`: GET `/api/user/recall-split-half-reliability` -> `GetRecallSplitHalfReliabilityResponse` (request: `GetRecallSplitHalfReliabilityData`; query: timezone; response body: RecallSplitHalfReliabilityDto)
 - `getQuestionGenerationBatchSchedule`: GET `/api/user/question-generation-batch-schedule` -> `GetQuestionGenerationBatchScheduleResponse` (request: none; response body: QuestionGenerationBatchUserScheduleDto)
 - `getMenuData`: GET `/api/user/menu-data` -> `GetMenuDataResponse` (request: `GetMenuDataData`; query: timezone; response body: MenuDataDto)
 - `getTokens`: GET `/api/user/get-tokens` -> `GetTokensResponse` (request: none; response body: Array<UserToken>)

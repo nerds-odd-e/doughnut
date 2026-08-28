@@ -1,13 +1,17 @@
 # Morning cognitive index from recall history
 
 **Status:** in progress — slices 1–14, 14.1–14.8, 15, 16, 17, 18, 19, 20 done.
-This closes the Accuracy channel. Slice 21 (split-half reliability) was split
-into 21.1–21.4 (pre-slice Jidoka: needed a composite formula the plan never
-specified, resolved with the developer — see "The index" section) — **next:
-21.1**. Slice 17.1 (pace-expectation R/D correction, split from 17) is
-**blocked** pending a developer-specified formula (see Jidoka checkpoints),
-independent of 21.x. `recall_stats.feature`'s pace scenario stays `@wip` — a
-second, unrelated E2E race condition was found (see Discoveries).
+Slice 21 (split-half reliability) was split into 21.1–21.4 (pre-slice
+Jidoka: needed a composite formula the plan never specified, resolved with
+the developer — see "The index" section) — **21.1–21.4 all done.** The
+reliability endpoint (`GET /api/user/recall-split-half-reliability`) exists;
+**the developer needs to query it and decide against the ~0.6 gate before
+slice 22 starts** (see Jidoka checkpoints — this is a required stop, not an
+autonomous continuation point). Slice 17.1 (pace-expectation R/D correction,
+split from 17) is separately **blocked** pending a developer-specified
+formula, independent of 21.x. `recall_stats.feature`'s pace scenario stays
+`@wip` — a second, unrelated E2E race condition was found (see
+Discoveries).
 **Type:** ad-hoc plan (`.planning/quick/`)
 **Research memo:** https://claude.ai/code/artifact/9e13f954-fc5e-48e5-868f-f75d03f811c1
 
@@ -941,15 +945,48 @@ statistics, distinct from the per-item EWMA walk) into a new
 
 - **Enables 21.4 only.**
 
-#### 21.4 The developer can see split-half reliability across recent mornings — Behavior `[ ]`
+#### 21.4 The developer can see split-half reliability across recent mornings — Behavior `[x]`
 
-New internal diagnostic endpoint: for each of the trailing N mornings with
-enough attempts to split, compute the odd-half and even-half index (21.3),
-collect the pairs across mornings, and report **both** the raw Pearson
-correlation and its Spearman-Brown-corrected estimate (`2r / (1+r)`) side by
-side — the plan's "~0.6" threshold doesn't say which is meant, so report
-both rather than silently picking one; the developer decides against either
-when evaluating the gate below. Not user-facing.
+Done: new `RecallSplitHalfReliability.compute(allTimeReviews, today, zoneId)`
+enumerates candidate mornings in a trailing 90-day window
+(`TRAILING_MORNING_WINDOW_DAYS`, consistent with existing baseline-window
+magnitudes elsewhere in this code), pre-filters with
+`MIN_QUALIFYING_ROWS_PER_DAY = 4` (2+2, the minimum to feed both halves —
+mirrors consistency's own ≥2-residuals-per-half precedent), calls
+`RecallMorningHalfIndex.compute` for both halves per candidate day, and
+keeps only pairs where **both** halves are non-null (a day where one half
+returns null contributes no reliability information and is excluded, not
+zero-filled). Reports raw Pearson correlation (null if either series has
+zero variance — mathematically undefined) and its Spearman-Brown correction
+`2r/(1+r)`, both null below `MIN_PAIRS_FOR_CORRELATION = 10`
+(mirroring `RecallDayBaseline.MIN_BASELINE_DAYS`, this codebase's existing
+precedent for "how many days before a cross-day statistic is trustworthy").
+New `RecallSplitHalfReliabilityDTO { pairCount, rawCorrelation,
+spearmanBrownCorrelation }`. New endpoint
+`GET /api/user/recall-split-half-reliability` on `UserController`, using the
+exact same auth pattern as `getRecallStats` (current-user-only, no new
+admin/elevated-role concept — this is per-user diagnostic data like the rest
+of Recall Stats). Not wired into `RecallStatsDTO` or any user-facing page.
+API client regenerated (no frontend call site — diagnostic-only). New
+`RecallSplitHalfReliabilityTest` (Pearson math incl. the zero-variance→null
+case) and `UserRecallSplitHalfReliabilityControllerTest`.
+Post-change-refactor (reviewing the whole 21.1–21.4 arc for cohesion, not
+just this slice's diff) extracted three duplicated helpers in
+`RecallStatsService` (`findAllTimeAnsweredRows`, `reviewsOnly`,
+`localToday`) shared by `compute()`/`computeSplitHalfReliability()`/
+`aggregateRows()`; moved a fully-duplicated test fixture out of
+`RecallSplitHalfReliabilityTest` (copy-pasted from
+`RecallMorningHalfIndexTest`) into the shared `RecallStatsTestFixtures`; and
+extracted `RecallPaceAggregator`'s pure weighted-median/MAD statistics
+(`WeightedResidual`, `weightedMedian`, `weightedMad`, `weightedPctVsUsual`,
+`averageWeight`, `madOfResiduals`) into a new `RecallWeightedResidualStats`,
+bringing `RecallPaceAggregator` to 204 lines.
+
+**This closes slices 21.1–21.4.** The endpoint exists; the developer still
+needs to query it against real history and decide against the ~0.6
+threshold (by whichever of the two reported numbers is judged appropriate)
+whether slices 22–25 proceed. **Do not tune 21.2's formula weights to
+rescue a low number** — that would defeat the point of the gate.
 
 - **This is the gate.** See Jidoka above. If reliability comes back below
   ~0.6 (by whichever of the two numbers the developer judges appropriate),

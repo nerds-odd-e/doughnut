@@ -3,6 +3,7 @@ package com.odde.donut.controllers;
 import com.odde.donut.controllers.dto.GeneratedTokenDTO;
 import com.odde.donut.controllers.dto.MenuDataDTO;
 import com.odde.donut.controllers.dto.QuestionGenerationBatchUserScheduleDTO;
+import com.odde.donut.controllers.dto.RecallSplitHalfReliabilityDTO;
 import com.odde.donut.controllers.dto.RecallStatsDTO;
 import com.odde.donut.controllers.dto.TokenConfigDTO;
 import com.odde.donut.controllers.dto.UserDTO;
@@ -210,6 +211,22 @@ class UserController {
     ZoneId timeZone = TimezoneUtils.parseTimezone(timezone);
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
     return recallStatsService.compute(user, timeZone, currentUTCTimestamp);
+  }
+
+  /**
+   * Internal diagnostic (slice 21.4, morning-cognitive-index plan) — not wired into any user-facing
+   * page. Same same-user auth/scoping as {@link #getRecallStats} since it is a per-user reliability
+   * check over one learner's own history, not a cross-user admin view.
+   */
+  @GetMapping("/recall-split-half-reliability")
+  @Transactional(readOnly = true)
+  public RecallSplitHalfReliabilityDTO getRecallSplitHalfReliability(
+      @RequestParam(value = "timezone") String timezone) {
+    authorizationService.assertLoggedIn();
+    User user = authorizationService.getCurrentUser();
+    ZoneId timeZone = TimezoneUtils.parseTimezone(timezone);
+    Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
+    return recallStatsService.computeSplitHalfReliability(user, timeZone, currentUTCTimestamp);
   }
 
   @GetMapping("/question-generation-batch-schedule")

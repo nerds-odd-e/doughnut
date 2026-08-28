@@ -5,8 +5,10 @@ import com.odde.donut.entities.AnswerOutcome;
 import com.odde.donut.entities.Grade;
 import com.odde.donut.entities.QuestionType;
 import java.sql.Timestamp;
+import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -16,7 +18,54 @@ import java.util.List;
 final class RecallStatsTestFixtures {
   // day 0 = 1989-01-01; day 9 = 1989-01-10; day 10 = 1989-01-11 (UTC).
 
+  /**
+   * "Today" for the {@link RecallPaceAggregator}/{@link RecallMorningHalfIndex} baseline-window
+   * family of tests (slices 21.1, 21.3, 21.4): day 100, with the pace/lapse baseline window being
+   * the same trailing {@code [today - 63, today - 4]} window {@link RecallPaceAggregator} itself
+   * uses.
+   */
+  static final int WARMED_UP_BASELINE_TODAY = 100;
+
+  static final int WARMED_UP_BASELINE_WINDOW_START = WARMED_UP_BASELINE_TODAY - 63; // 37
+  static final int WARMED_UP_BASELINE_WINDOW_END = WARMED_UP_BASELINE_TODAY - 4; // 96
+  static final LocalDate WARMED_UP_BASELINE_TODAY_DATE =
+      LocalDate.of(1989, 1, 1).plusDays(WARMED_UP_BASELINE_TODAY);
+  static final int WARMED_UP_BASELINE_MS = 5000;
+
   private RecallStatsTestFixtures() {}
+
+  /**
+   * One trailing baseline day: two items, each with a pre-existing baseline from day 0, answered
+   * again on {@code day} so that day contributes exactly two residuals (needed for the consistency
+   * spread baseline's own {@code >= 2 residuals/day} qualification) with a non-degenerate pace and
+   * lapse spread across days. Shared by {@code RecallMorningHalfIndexTest} and {@code
+   * RecallSplitHalfReliabilityTest}.
+   */
+  static void addWarmedUpBaselineDay(List<RecallAnswerRow> rows, int day, int itemIdBase) {
+    int itemA = itemIdBase;
+    int itemB = itemIdBase + 1;
+    rows.add(answered(utc(0, 6), WARMED_UP_BASELINE_MS, true, null, itemA));
+    rows.add(answered(utc(0, 7), WARMED_UP_BASELINE_MS, true, null, itemB));
+    boolean evenDay = (day - WARMED_UP_BASELINE_WINDOW_START) % 2 == 0;
+    int onTaskMsA = evenDay ? 4500 : 6000; // gives every baseline day a non-zero pace spread
+    int onTaskMsB = evenDay ? 15000 : WARMED_UP_BASELINE_MS; // itemB lapses on half the days
+    rows.add(answered(utc(day, 10), onTaskMsA, true, null, itemA));
+    rows.add(answered(utc(day, 11), onTaskMsB, true, null, itemB));
+  }
+
+  /**
+   * Full warmed-up baseline history across the trailing window: two fresh items per day, so every
+   * baseline day contributes exactly two residuals.
+   */
+  static List<RecallAnswerRow> warmedUpBaselines() {
+    List<RecallAnswerRow> rows = new ArrayList<>();
+    int itemId = 2000;
+    for (int day = WARMED_UP_BASELINE_WINDOW_START; day <= WARMED_UP_BASELINE_WINDOW_END; day++) {
+      addWarmedUpBaselineDay(rows, day, itemId);
+      itemId += 2;
+    }
+    return rows;
+  }
 
   static RecallAnswerRow answered(
       Timestamp answerAt, Integer thinkingTimeMs, boolean correct, Timestamp promptAt) {
