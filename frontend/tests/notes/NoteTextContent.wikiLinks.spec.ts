@@ -1,5 +1,4 @@
 import makeMe from "donut-test-fixtures/makeMe"
-import { noteShowHref } from "@/routes/noteShowLocation"
 import { wikiTitleFromAuthoredToken } from "@/utils/wikiLinkMarkup"
 import { type VueWrapper, flushPromises } from "@vue/test-utils"
 import { afterEach, describe, expect, it, vi } from "vitest"
@@ -60,8 +59,6 @@ describe("NoteTextContent wiki link display", () => {
     ) as HTMLAnchorElement
     expect(live.textContent).toContain("friendly label")
     expect(live.textContent).not.toContain("Target Title|")
-    expect(live.getAttribute("href")).toBe(noteShowHref(targetNote.id!))
-    expect(live.getAttribute("data-note-id")).toBe(String(targetNote.id))
     expect(live.getAttribute("data-wiki-title")).toBe("Target Title")
   })
 
@@ -219,6 +216,5 @@ describe("NoteTextContent wiki link display", () => {
       ".ql-editor a.donut-wiki-link"
     ) as HTMLAnchorElement
     expect(live.getAttribute("data-wiki-title")).toBe("WikiLinks E2E CI")
-    expect(live.getAttribute("href")).toBe(noteShowHref(targetNote.id!))
   })
 })

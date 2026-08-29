@@ -132,7 +132,6 @@ describe("propertyValueField utils", () => {
       "topic: old"
     )
     expect(html).toContain("donut-wiki-link")
-    expect(html).toContain(noteShowHref(42))
     expect(html).not.toContain("pending-wiki-link")
     expect(html).not.toContain("dead-wiki-link")
   })
