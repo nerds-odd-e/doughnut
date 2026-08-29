@@ -2,6 +2,7 @@ package com.odde.donut.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.odde.donut.controllers.dto.RecalledNote;
 import com.odde.donut.utils.TimestampOperations;
 import jakarta.persistence.CascadeType;
@@ -25,6 +26,22 @@ import org.hibernate.annotations.FetchMode;
 
 @Entity
 @Table(name = "memory_tracker")
+@JsonPropertyOrder({
+  "id",
+  "note",
+  "lastRecalledAt",
+  "nextRecallAt",
+  "assimilatedAt",
+  "stability",
+  "difficulty",
+  "removedFromTracking",
+  "type",
+  "propertyKey",
+  "recallCount",
+  "recalledNote",
+  "latestTutorFeedbackGrade",
+  "spelling"
+})
 public class MemoryTracker extends EntityIdentifiedByIdOnly {
   public static MemoryTracker buildMemoryTrackerForNote(Note note) {
     MemoryTracker entity = new MemoryTracker();
