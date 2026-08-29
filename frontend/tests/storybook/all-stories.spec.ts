@@ -2,33 +2,16 @@ import { beforeEach, describe, it } from "vitest"
 import { render } from "vitest-browser-vue"
 import type { Meta, StoryObj } from "@storybook/vue3"
 import { createRouter, createWebHistory } from "vue-router"
-import type { RouteRecordRaw } from "vue-router"
-import { routeMetadata } from "@/routes/routeMetadata"
+import { dummyRouteRecordsFromMetadata } from "@/routes/dummyRouteRecords"
 import { ref } from "vue"
 import type { User } from "@generated/donut-backend-api"
 import makeMe from "donut-test-fixtures/makeMe"
 import { mockShowNote } from "@tests/helpers"
 import { storyFiles } from "../../storyFiles.generated"
 
-// Mock router for components that use vue-router (same as Storybook preview)
-const mockRoutes: RouteRecordRaw[] = routeMetadata.map((metadata) => {
-  if (metadata.redirect !== undefined) {
-    return {
-      path: metadata.path,
-      redirect: metadata.redirect,
-    } as RouteRecordRaw
-  }
-  return {
-    ...metadata,
-    component: {
-      template: `<div>${metadata.name} (Mock)</div>`,
-    },
-  }
-}) as RouteRecordRaw[]
-
 const router = createRouter({
   history: createWebHistory("/"),
-  routes: mockRoutes,
+  routes: dummyRouteRecordsFromMetadata,
 })
 
 describe("All Storybook Stories", () => {

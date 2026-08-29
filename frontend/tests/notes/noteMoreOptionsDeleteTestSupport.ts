@@ -10,6 +10,7 @@ import makeMe from "donut-test-fixtures/makeMe"
 import helper, { mockSdkService } from "@tests/helpers"
 import RenderingHelper from "@tests/helpers/RenderingHelper"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
+import { dummyRouteRecordsFromMetadata } from "@/routes/dummyRouteRecords"
 import { createMemoryHistory, createRouter } from "vue-router"
 import { afterEach, beforeEach, vi } from "vitest"
 import { defineComponent, type PropType } from "vue"
@@ -31,27 +32,7 @@ export let deleteNoteSpy: ReturnType<typeof mockSdkService>
 
 export const noteMoreOptionsDeleteFormRouter = createRouter({
   history: createMemoryHistory(),
-  routes: [
-    { path: "/", component: { template: "<div />" } },
-    {
-      path: "/notebooks/:notebookId/folders/:folderId",
-      name: "folderPage",
-      component: { template: "<div />" },
-      props: true,
-    },
-    {
-      path: "/notebooks/:notebookId",
-      name: "notebookPage",
-      component: { template: "<div />" },
-      props: true,
-    },
-    {
-      path: "/n:noteId",
-      name: "noteShow",
-      component: { template: "<div />" },
-      props: true,
-    },
-  ],
+  routes: dummyRouteRecordsFromMetadata,
 })
 
 export const loadingModalMask = () =>

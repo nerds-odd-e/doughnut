@@ -4,19 +4,12 @@ import NotebookPageWithNotebookSidebarLayout from "@tests/fixtures/NotebookPageW
 import helper, { mockSdkService } from "@tests/helpers"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
 import makeMe from "donut-test-fixtures/makeMe"
+import { dummyRouteRecordsFromMetadata } from "@/routes/dummyRouteRecords"
 import { createMemoryHistory, createRouter, type Router } from "vue-router"
 
 export const notebookPageRouter = createRouter({
   history: createMemoryHistory(),
-  routes: [
-    { path: "/", redirect: "/notebooks/0" },
-    {
-      path: "/notebooks/:notebookId",
-      name: "notebookPage",
-      component: { template: "<div />" },
-      props: true,
-    },
-  ],
+  routes: dummyRouteRecordsFromMetadata,
 })
 
 export type MountNotebookPageOptions = {

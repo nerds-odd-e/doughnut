@@ -1,6 +1,6 @@
 # Named SPA route table honesty
 
-**Status:** in progress (slices 1–5 done).
+**Status:** in progress (slices 1–6 done).
 **Type:** ad-hoc plan (`.planning/quick/`)
 **Related ADR:** [0005 — Web routes](../../../docs/adrs/0005-web-routes.md) (**Proposed**, not Accepted). This plan makes production and unit tests match a stricter reading of the Decision at “SPA route convention” so that ADR can be tightened without lying. Agents do not set Status to Accepted.
 
@@ -94,16 +94,9 @@ Live wiki clicks with `data-note-id` call `navigateInApp(noteShowLocation(id))` 
 
 Renderer specs assert compiled href via `noteShowHref(id)`. `quillHtmlToMarkdown.spec.ts` inbound `/n701` fixtures stay path strings.
 
-### 6. Test stub routers come from the named table — Structure `[ ]`
+### 6. Test stub routers come from the named table — Structure `[x]`
 
-Extract the Storybook `routeMetadata` → dummy `RouteRecordRaw[]` mapping (preview + `all-stories.spec.ts`) into one helper. Switch hand-rolled test routers that duplicate SPA paths to that stub or to production `routes`:
-
-- `failureReportListTestSupport.ts` (wrong path today)
-- `notebookPageTestSupport.ts`
-- `noteMoreOptionsDeleteTestSupport.ts`
-- `SidebarFolderItem.spec.ts`
-
-Named navigation in those tests must still resolve. Do not keep a second path dialect.
+One helper: `dummyRouteRecordsFromMetadata` in `frontend/src/routes/dummyRouteRecords.ts`. Storybook preview, `all-stories.spec.ts`, `noteShowHref`, and the four listed test routers consume it. Failure-report stub no longer uses `/failure-reports/:id`.
 
 ### 7. Settings names and paths live in `routeMetadata` — Structure `[ ]`
 

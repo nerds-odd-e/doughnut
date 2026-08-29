@@ -1,7 +1,8 @@
 import { describe, it, expect, beforeEach } from "vitest"
 import { h } from "vue"
-import { createRouter, createWebHistory } from "vue-router"
+import { createMemoryHistory, createRouter, createWebHistory } from "vue-router"
 import type { RouteRecordRaw } from "vue-router"
+import { dummyRouteRecordsFromMetadata } from "@/routes/dummyRouteRecords"
 import { noteShowHref, noteShowLocation } from "@/routes/noteShowLocation"
 import routes from "@/routes/routes"
 
@@ -105,6 +106,22 @@ describe("routes", () => {
       expect(
         router.currentRoute.value.matched.some((r) => r.name === "noteShow")
       ).toBe(false)
+    })
+  })
+
+  describe("dummy metadata records", () => {
+    it("compile the same failureReport href as production", () => {
+      const dummyRouter = createRouter({
+        history: createMemoryHistory(),
+        routes: dummyRouteRecordsFromMetadata,
+      })
+      const location = {
+        name: "failureReport",
+        params: { failureReportId: "1" },
+      }
+      expect(dummyRouter.resolve(location).path).toBe(
+        router.resolve(location).path
+      )
     })
   })
 

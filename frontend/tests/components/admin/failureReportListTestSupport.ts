@@ -5,20 +5,14 @@ import type {
 import { FailureReportController } from "@generated/donut-backend-api/sdk.gen"
 import FailureReportList from "@/components/admin/FailureReportList.vue"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
+import { dummyRouteRecordsFromMetadata } from "@/routes/dummyRouteRecords"
 import { createMemoryHistory, createRouter } from "vue-router"
 import makeMe from "donut-test-fixtures/makeMe"
 import helper, { mockSdkService, wrapSdkResponse } from "@tests/helpers"
 
 export const failureReportListRouter = createRouter({
   history: createMemoryHistory(),
-  routes: [
-    { path: "/", component: { template: "<div />" } },
-    {
-      path: "/failure-reports/:failureReportId",
-      name: "failureReport",
-      component: { template: "<div />" },
-    },
-  ],
+  routes: dummyRouteRecordsFromMetadata,
 })
 
 export function aFailureReport(id: number, errorName?: string) {

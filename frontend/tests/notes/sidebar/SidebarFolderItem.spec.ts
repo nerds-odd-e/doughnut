@@ -2,6 +2,7 @@ import SidebarFolderItem from "@/components/notes/SidebarFolderItem.vue"
 import type { Folder } from "@generated/donut-backend-api"
 import makeMe from "donut-test-fixtures/makeMe"
 import { flushPromises, mount, type VueWrapper } from "@vue/test-utils"
+import { dummyRouteRecordsFromMetadata } from "@/routes/dummyRouteRecords"
 import { createRouter, createWebHistory } from "vue-router"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import { stubIntersectionObserver } from "./sidebarTestSupport"
@@ -37,14 +38,7 @@ describe("SidebarFolderItem", () => {
   beforeEach(async () => {
     router = createRouter({
       history: createWebHistory(),
-      routes: [
-        { path: "/", component: { template: "<div/>" } },
-        {
-          path: "/notebooks/:notebookId(\\d+)/folders/:folderId(\\d+)",
-          name: "folderPage",
-          component: { template: "<div/>" },
-        },
-      ],
+      routes: dummyRouteRecordsFromMetadata,
     })
     await router.push("/")
   })
@@ -84,8 +78,12 @@ describe("SidebarFolderItem", () => {
   it("renders a link to folderPage with encoded ids", async () => {
     wrapper = mountFolderItem(router, { folderId: 42, notebookId: 7 })
     const link = wrapper.get('[data-testid="sidebar-folder-open-page-link"]')
-    expect(link.attributes("href")).toContain("notebooks/7")
-    expect(link.attributes("href")).toContain("folders/42")
+    expect(link.attributes("href")).toBe(
+      router.resolve({
+        name: "folderPage",
+        params: { notebookId: "7", folderId: "42" },
+      }).href
+    )
     expect(link.text()).toContain("Alpha")
   })
 

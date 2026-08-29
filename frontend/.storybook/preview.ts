@@ -1,34 +1,15 @@
 import type { Preview } from "@storybook/vue3-vite"
 import { setup } from "@storybook/vue3-vite"
 import { createRouter, createWebHistory } from "vue-router"
-import type { RouteRecordRaw } from "vue-router"
-import { routeMetadata } from "../src/routes/routeMetadata"
+import { dummyRouteRecordsFromMetadata } from "../src/routes/dummyRouteRecords"
 import "../src/assets/daisyui.css"
 import { ref } from "vue"
 import type { User } from "@generated/donut-backend-api"
 import makeMe from "donut-test-fixtures/makeMe"
 
-// Reuse route metadata from production code without importing page components
-// This eliminates duplication - route definitions are defined once in routeMetadata.ts
-const mockRoutes: RouteRecordRaw[] = routeMetadata.map((metadata) => {
-  if (metadata.redirect !== undefined) {
-    return {
-      path: metadata.path,
-      redirect: metadata.redirect,
-    } as RouteRecordRaw
-  }
-  return {
-    ...metadata,
-    component: {
-      template: `<div>${metadata.name} (Mock)</div>`,
-    },
-  }
-})
-
-// Mock router for components that use vue-router
 const router = createRouter({
   history: createWebHistory("/"),
-  routes: mockRoutes,
+  routes: dummyRouteRecordsFromMetadata,
 })
 
 setup((app) => {
