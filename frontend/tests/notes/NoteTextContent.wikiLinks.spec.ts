@@ -60,6 +60,7 @@ describe("NoteTextContent wiki link display", () => {
     expect(live.textContent).toContain("friendly label")
     expect(live.textContent).not.toContain("Target Title|")
     expect(live.getAttribute("href")).toBe(`/n${targetNote.id}`)
+    expect(live.getAttribute("data-note-id")).toBe(String(targetNote.id))
     expect(live.getAttribute("data-wiki-title")).toBe("Target Title")
   })
 

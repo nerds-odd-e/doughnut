@@ -63,7 +63,7 @@ describe("RichMarkdownEditor", () => {
     await nextTick()
 
     expect(h.quillModelHtml()).toContain(
-      '<a href="/n42" class="donut-wiki-link" data-wiki-title="MyNote"'
+      '<a href="/n42" class="donut-wiki-link" data-wiki-title="MyNote" data-note-id="42"'
     )
   })
 

@@ -64,6 +64,7 @@ Body`
     )
     expect(live.exists()).toBe(true)
     expect(live.attributes("href")).toBe("/n42")
+    expect(live.attributes("data-note-id")).toBe("42")
   })
 
   it("shows path Markdown in a relationship source as a live wiki-style link", async () => {

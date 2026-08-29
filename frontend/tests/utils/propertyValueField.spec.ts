@@ -151,6 +151,7 @@ describe("propertyValueField utils", () => {
     ])
     expect(html).toContain("donut-wiki-link")
     expect(html).toContain("/n42")
+    expect(html).toContain('data-note-id="42"')
     expect(html).toContain('class="wiki-bracket"')
   })
 

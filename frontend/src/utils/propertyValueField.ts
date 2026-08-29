@@ -73,7 +73,7 @@ export function propertyValuePlainToDisplayHtml(
         ? ` data-wiki-display="${escapeHtmlAttributeValue(display)}"`
         : ""
     if (noteId !== undefined) {
-      out += `<a href="${noteShowHref(noteId)}" class="${DONUT_WIKI_LINK_CLASS}" data-wiki-title="${attrTarget}"${displayAttr}>${innerHtml}</a>`
+      out += `<a href="${noteShowHref(noteId)}" class="${DONUT_WIKI_LINK_CLASS}" data-wiki-title="${attrTarget}"${displayAttr} data-note-id="${noteId}">${innerHtml}</a>`
     } else {
       const className = unresolvedWikiClass(occ.token, lastSavedTokens)
       out += `<a href="#" class="${className}" data-wiki-title="${attrTarget}"${displayAttr}>${innerHtml}</a>`

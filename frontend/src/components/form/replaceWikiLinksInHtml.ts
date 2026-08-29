@@ -69,7 +69,7 @@ function upgradeUnresolvedWikiAnchors(
   if (!unresolvedClasses.some((c) => html.includes(c))) return html
   const parsed = parseWikiHtmlFragment(html)
   if (!parsed) return html
-  const { wrap, doc } = parsed
+  const { wrap } = parsed
   const unresolvedAnchorSelector = unresolvedClasses
     .map((c) => `a.${c}`)
     .join(", ")
@@ -86,15 +86,13 @@ function upgradeUnresolvedWikiAnchors(
       } else if (!wikiAnchorDisplayMatches(a, display)) {
         continue
       }
-      const live = doc.createElement("a")
-      live.setAttribute("href", href)
-      live.className = DONUT_WIKI_LINK_CLASS
-      live.setAttribute("data-wiki-title", target)
-      if (display !== target) {
-        live.setAttribute("data-wiki-display", display)
-      }
-      live.textContent = display
-      a.replaceWith(live)
+      a.outerHTML = wikiLinkAnchorHtml({
+        href,
+        className: DONUT_WIKI_LINK_CLASS,
+        target,
+        display,
+        noteId: w.noteId,
+      })
     }
   }
   return wrap.innerHTML
@@ -214,6 +212,7 @@ export function replaceWikiLinksInHtml(
         className: DONUT_WIKI_LINK_CLASS,
         target,
         display,
+        noteId: w.noteId,
       })
     )
   })

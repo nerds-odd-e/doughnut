@@ -1,6 +1,6 @@
 # Named SPA route table honesty
 
-**Status:** in progress (slices 1–2 done).
+**Status:** in progress (slices 1–3 done).
 **Type:** ad-hoc plan (`.planning/quick/`)
 **Related ADR:** [0005 — Web routes](../../../docs/adrs/0005-web-routes.md) (**Proposed**, not Accepted). This plan makes production and unit tests match a stricter reading of the Decision at “SPA route convention” so that ADR can be tightened without lying. Agents do not set Status to Accepted.
 
@@ -82,13 +82,9 @@ Verify with `CURSOR_DEV=true nix develop -c pnpm frontend:test` (or the spec pat
 
 `/n/:noteId` redirect returns `{ name: "noteShow", params: { noteId: id } }`. URL contract in `routes.spec.ts` unchanged (`push("/n/888")` → `/n888`).
 
-### 3. Live token wiki anchors include `data-note-id` — Structure `[ ]`
+### 3. Live token wiki anchors include `data-note-id` — Structure `[x]`
 
-Pass `noteId` into `wikiLinkAnchorHtml` from `replaceWikiLinksInHtml` (both the `[[inner]]` replace and the unresolved-upgrade live element) and from `propertyValueField` live wiki HTML. Path-markdown anchors already have the attribute.
-
-- Tests that snapshot token-wiki HTML must expect `data-note-id` (and may still use `/n42` until slice 5).
-- No click-handler change yet.
-- **Enables slice 4 only.**
+Live token wiki `<a>` tags include `data-note-id` (`replaceWikiLinksInHtml` `[[inner]]` + unresolved-upgrade via `wikiLinkAnchorHtml`; property-field live tags keep `[[brackets]]` and add the attribute). Path-markdown already had it. Click handling unchanged.
 
 ### 4. Wiki in-app navigation pushes a named location — Structure `[ ]`
 
