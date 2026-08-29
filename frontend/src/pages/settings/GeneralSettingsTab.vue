@@ -14,6 +14,19 @@
         v-model="formData.dailyAssimilationCount"
         :error-message="errors.dailyAssimilationCount"
       />
+      <div class="flex flex-col gap-2">
+        <CheckInput
+          scope-name="user"
+          field="dailyProbeEnabled"
+          title="Daily probe"
+          v-model="formData.dailyProbeEnabled"
+          :error-message="errors.dailyProbeEnabled"
+        />
+        <p class="text-xs text-base-content/60 leading-snug mt-1">
+          Turning this off stops new Daily probes and ends the probe's own trend
+          readout.
+        </p>
+      </div>
       <section class="my-4">
         <h3 class="mb-2 text-base font-semibold">Batch questions</h3>
         <div class="text-sm" data-testid="batch-question-schedule">
@@ -35,6 +48,7 @@
 
 <script setup lang="ts">
 import TextInput from "@/components/form/TextInput.vue"
+import CheckInput from "@/components/form/CheckInput.vue"
 import ContentLoader from "@/components/commons/ContentLoader.vue"
 import type {
   QuestionGenerationBatchUserScheduleDto,

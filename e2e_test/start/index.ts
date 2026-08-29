@@ -28,7 +28,10 @@ import { assumeBazaarPage, navigateToBazaar } from './pageObjects/bazaarPage'
 import { assumeCirclePage, navigateToCircle } from './pageObjects/circlePage'
 import { assumeHomePage, visitHomePage } from './pageObjects/homePage'
 import { assumeConversationAboutNotePage } from './pageObjects/conversationAboutNotePage'
-import { mainMenu } from './pageObjects/mainMenu'
+import {
+  assumeUserSettingsPage,
+  mainMenu,
+} from './pageObjects/mainMenu'
 import { mcpAgentActions } from './pageObjects/mcpAgentActions'
 import { messageCenterIndicator } from './pageObjects/messageCenterIndicator'
 import {
@@ -75,6 +78,7 @@ const start = {
   assumeAudioTools,
   assumeCirclePage,
   assumeHomePage,
+  assumeUserSettingsPage,
   visitHomePage,
   assumeConversationAboutNotePage,
   assumeMessageCenterPage,

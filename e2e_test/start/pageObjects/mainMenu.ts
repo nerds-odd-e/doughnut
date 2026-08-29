@@ -5,6 +5,40 @@ import { assumeAdminDashboardPage } from './adminPages/adminDashboardPage'
 import { messageCenterIndicator } from './messageCenterIndicator'
 import { manageAccessTokensPage } from './manageAccessTokensPage'
 
+const userSettingsForm = () => {
+  const dailyProbeField = () => form.getField('Daily probe')
+  return {
+    submit() {
+      cy.findByText('Submit').click()
+      waitUntilAppIsNotBusy()
+      return this
+    },
+    turnDailyProbeOn() {
+      dailyProbeField().check()
+      return this.submit()
+    },
+    turnDailyProbeOff() {
+      dailyProbeField().uncheck()
+      return this.submit()
+    },
+    reload() {
+      cy.reload()
+      waitUntilAppIsNotBusy()
+      return this
+    },
+    expectDailyProbeOn() {
+      dailyProbeField().shouldBeChecked()
+      return this
+    },
+    expectDailyProbeOff() {
+      dailyProbeField().shouldNotBeChecked()
+      return this
+    },
+  }
+}
+
+export const assumeUserSettingsPage = () => userSettingsForm()
+
 export const mainMenu = () => {
   navigateToNotebooksPage()
 
@@ -26,12 +60,13 @@ export const mainMenu = () => {
 
         userSettings(userName: string) {
           this.userSettingsButton(userName).click()
+          waitUntilAppIsNotBusy()
           return {
             changeName(name: string) {
               form.getField('Name').assignValue(name)
-              cy.findByText('Submit').click()
-              waitUntilAppIsNotBusy()
+              return this.submit()
             },
+            ...userSettingsForm(),
           }
         },
 

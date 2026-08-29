@@ -2,6 +2,7 @@ import { UserController } from "@generated/donut-backend-api/sdk.gen"
 import GeneralSettingsTab from "@/pages/settings/GeneralSettingsTab.vue"
 import makeMe from "donut-test-fixtures/makeMe"
 import helper, { mockSdkService } from "@tests/helpers"
+import { fireEvent } from "@testing-library/vue"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import { ref, type Ref } from "vue"
@@ -91,5 +92,47 @@ describe("GeneralSettingsTab", () => {
     await flushPromises()
 
     expect(currentUser.value).toEqual(updatedUser)
+  })
+
+  const renderTab = async (user: User = makeMe.aUser.please()) => {
+    mockSdkService(UserController, "getUserProfile", user)
+    mockSdkService(UserController, "getQuestionGenerationBatchSchedule", {})
+    const view = helper
+      .component(GeneralSettingsTab)
+      .withRouter()
+      .withCurrentUserRef(currentUser)
+      .render()
+    await flushPromises()
+    return view
+  }
+
+  it("Daily probe is off by default and explains what turning it off does", async () => {
+    const { getByLabelText, getByText } = await renderTab()
+
+    expect((getByLabelText("Daily probe") as HTMLInputElement).checked).toBe(
+      false
+    )
+    getByText(
+      "Turning this off stops new Daily probes and ends the probe's own trend readout."
+    )
+  })
+
+  it("submits Daily probe as enabled with the profile", async () => {
+    const user = makeMe.aUser.please()
+    const updateUser = mockSdkService(UserController, "updateUser", {
+      ...user,
+      dailyProbeEnabled: true,
+    })
+    const { getByLabelText, getByDisplayValue } = await renderTab(user)
+
+    await fireEvent.click(getByLabelText("Daily probe"))
+    await fireEvent.click(getByDisplayValue("Submit"))
+    await flushPromises()
+
+    expect(updateUser).toHaveBeenCalledWith(
+      expect.objectContaining({
+        body: expect.objectContaining({ dailyProbeEnabled: true }),
+      })
+    )
   })
 })

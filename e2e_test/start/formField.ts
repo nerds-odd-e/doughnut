@@ -79,6 +79,28 @@ const formField = (label: string) => {
       inputElement(label).check()
       return self
     },
+    uncheck() {
+      inputElement(label).uncheck()
+      return self
+    },
+    shouldBeChecked() {
+      inputElement(label).should(($input) => {
+        expect(
+          $input.prop('checked'),
+          `Expected "${label}" to be on, but it was off`
+        ).to.equal(true)
+      })
+      return self
+    },
+    shouldNotBeChecked() {
+      inputElement(label).should(($input) => {
+        expect(
+          $input.prop('checked'),
+          `Expected "${label}" to be off, but it was on`
+        ).to.equal(false)
+      })
+      return self
+    },
     click() {
       inputElement(label).click()
       return self
