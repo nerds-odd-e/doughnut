@@ -1,7 +1,8 @@
 # Daily probe
 
-**Status:** planned, not started. Refined into commit-sized slices; do not
-execute until the pre-execution gates below are resolved.
+**Status:** in progress. Slice 1 shipped. Stopped before slice 2 for the
+human-owned ADR 0003 resolution (Jidoka). Protocol and daily-consumption
+gates still block slices 3 and 8.
 **Type:** ad-hoc plan (`.planning/quick/`)
 **Extracted from:** `.planning/quick/001-morning-cognitive-index/PLAN.md`
 (unbuilt slices 26–31).
@@ -74,16 +75,17 @@ Status legend: `[ ]` planned · `[~]` in progress · `[x]` done
 
 ## Slices
 
-### 1. Store the Daily probe opt-in in the user profile contract — Structure `[ ]`
+### 1. Store the Daily probe opt-in in the user profile contract — Structure `[x]`
 
-Add `daily_probe_enabled` as `TINYINT(1) NOT NULL DEFAULT '0'`, map it on
-`User` and `UserDTO`, cover the default/update contract at the controller
-boundary, extend the test fixture, and regenerate the TypeScript client. No UI
-uses the field yet and no probe can run.
+Shipped: `V300000304__add_daily_probe_enabled_to_user.sql` (`TINYINT(1) NOT
+NULL DEFAULT '0'`), mapped on `User` / `UserDTO` / `UserController.updateUser`
+like `health_remove_empty_folders_default`. Controller tests cover default
+false and persist-true. TS `UserBuilder` defaults the field off and has a
+setter for slice 2. Client regenerated. ERD unchanged (key columns only).
+Backend unit suite green (1908 tests).
 
-- Compute the Flyway version from the migration directory at execution time.
-- Verify the migration plus all backend unit tests.
-- **Enables slice 2 only.**
+**Enables slice 2 only.** Slice 2 remains blocked on the ADR 0003 help-text
+resolution below.
 
 ### 2. The learner can opt in or out in General settings — Behavior `[ ]`
 
