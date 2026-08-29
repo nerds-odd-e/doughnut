@@ -13,24 +13,31 @@
         <h3 class="mt-0 mb-2 text-base font-semibold">Activity</h3>
         <RecallActivityCalendar :calendar="stats.calendar ?? []" />
       </section>
+    </template>
 
-      <section class="mt-6">
-        <div class="mb-2 flex items-center justify-between">
-          <h3 class="mt-0 text-base font-semibold">Daily trends</h3>
-          <div class="daisy-join">
-            <button
-              v-for="opt in windowOptions"
-              :key="opt"
-              type="button"
-              class="daisy-join-item daisy-btn daisy-btn-sm"
-              :class="window === opt ? 'daisy-btn-active' : ''"
-              :data-testid="`trend-window-${opt}`"
-              @click="window = opt"
-            >
-              {{ opt === "all" ? "All" : `${opt}d` }}
-            </button>
-          </div>
+    <section class="mt-6">
+      <div
+        class="mb-2 flex items-center"
+        :class="hasReviews ? 'justify-between' : 'justify-end'"
+      >
+        <h3 v-if="hasReviews" class="mt-0 text-base font-semibold">
+          Daily trends
+        </h3>
+        <div class="daisy-join">
+          <button
+            v-for="opt in windowOptions"
+            :key="opt"
+            type="button"
+            class="daisy-join-item daisy-btn daisy-btn-sm"
+            :class="window === opt ? 'daisy-btn-active' : ''"
+            :data-testid="`trend-window-${opt}`"
+            @click="window = opt"
+          >
+            {{ opt === "all" ? "All" : `${opt}d` }}
+          </button>
         </div>
+      </div>
+      <template v-if="hasReviews">
         <div class="grid md:grid-cols-2 gap-4">
           <ResponseTimeTrendChart :trend="visibleTrend" />
           <RetentionTrendChart :retention-trend="visibleRetentionTrend" />
@@ -38,8 +45,10 @@
         <p class="mt-1 text-xs opacity-70">
           <span class="rs-legend-dot">●</span> = insufficient data (fewer than 3 answers)
         </p>
-      </section>
+      </template>
+    </section>
 
+    <template v-if="hasReviews">
       <section class="mt-6">
         <h3 class="mt-0 mb-2 text-base font-semibold">By weekday and hour</h3>
         <div class="grid md:grid-cols-2 gap-4">

@@ -1,7 +1,7 @@
 ---
 title: Daily probe trial and scoring protocol
 date: 2026-08-29
-context: Locks the six holes that blocked `.planning/quick/007-daily-cognitive-probe` slice 3. Product name stays in ADR 0001 / 0003; this note owns measurement.
+context: Product name stays in ADR 0001 / 0003; this note owns measurement.
 ---
 
 # Daily probe trial and scoring protocol
@@ -100,11 +100,3 @@ Consumed **only when the 20 scored trials are complete**. Abandoning
 (navigate away, close, stop mid-run) **writes nothing**. The same local day
 offers the probe again until one run completes. Persistence is completed rows
 only — no incomplete status.
-
-## Slice mapping (plan 007)
-
-- Slice 3: sequence, mapping, trial records, injected clock, speed only.
-- Slice 5: accuracy.
-- Slice 6: lapse count.
-- Slice 7: variability.
-- Slice 8+: completed rows only.
