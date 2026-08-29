@@ -1,6 +1,6 @@
 # SPA hydrate after testability inject
 
-**Status:** in progress (slices 1–5 done; 6 remaining).
+**Status:** in progress (slices 1–5 done; slice 6 timers done, CI not green yet).
 **Type:** ad-hoc plan (`.planning/quick/`)
 **Depends on:** Proposed [ADR 0005](../../../docs/adrs/0005-web-routes.md) E2E intent table; shipped identity-jump interims (`jumpToNotebookPage` for skip-tracking and note creation).
 
@@ -113,18 +113,16 @@ Timing (`stats.duration`): 2.925 / 2.813 / 2.867 → median **2.867s** vs 2.854s
 
 ---
 
-### 6. Re-profile timers and CI green — Structure `[ ]`
+### 6. Re-profile timers and CI green — Structure `[~]`
 
-Re-run the same 3× JSON timers as slice 2 (plus wiki_link if slice 4 added it). Fill after-table. If any spec fails the gate, stop and revert the offending slice — do not “accept slower.”
-
-Then watch `donut CI` on `main` for the branch tip until green (lint, backend unit, frontend, E2E jobs as the workflow defines). If red, fix in a follow-up slice on this plan; do not declare done.
+Timers re-run (mocha `stats.duration`, 3× each). All gates pass. First `donut CI` on `d14e4c189e` ([run 33263336257](https://github.com/nerds-odd-e/doughnut/actions/runs/33263336257)) **red**: `record_live_audio_with_real_open_ai_service.feature` — stop button stayed disabled; backend `OpenAIInvalidDataException`. Lint / backend unit / frontend unit green; other E2E shards cancelled. Same `note_creation_and_update` shard was **green** on slice 4 (`7c227f5056`). Not a hydrate-spec failure; watching CI on the next push.
 
 | Metric | Before (slice 2) | After |
 |--------|------------------|-------|
-| note_tree_view median | 7.403s | |
-| assimilation_walkthrough median | 15.100s | |
-| notebook_catalog_navigation median | 2.854s | |
-| wiki_link median (if timed) | 27.059s | |
+| note_tree_view median | 7.403s | 7.448s |
+| assimilation_walkthrough median | 15.100s | 15.333s |
+| notebook_catalog_navigation median | 2.854s | 2.813s |
+| wiki_link median (if timed) | 27.059s | 26.564s |
 
 ---
 
