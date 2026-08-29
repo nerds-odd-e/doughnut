@@ -15,7 +15,7 @@ This ADR is the **canonical ubiquitous language**. The glossary below is
 the source of truth; prefer these meanings in UI copy, APIs, tests, and
 code identifiers. This glossary is amended in place. Add or change domain
 terms here; do not supersede this ADR with a new one. Spaced-repetition domain
-concepts, including **Cognitive index** measurement, live in [ADR
+concepts, including morning recall residual measurement, live in [ADR
 0003](./0003-spaced-repetition-scheduling-policy-accepted.md).
 
 ## Notebook / note structure
@@ -157,13 +157,14 @@ concepts, including **Cognitive index** measurement, live in [ADR
   UI: **Remove** / **Remove from recall**. Not a grade.
 - **Revive** — Re-enable recall for a tracker that was removed from
   recall. Short UI: **Revive**. Not a grade.
-- **Cognitive index** — Daily readout of how a morning's recall compared
-  with expectation and with the learner's own baseline. Not diagnostic of
-  cause. Measurement:
+- **Pace**, **Accuracy**, **Consistency**, and **Retrieval lapse** —
+  Separate residual readouts of a morning's recall against expectation
+  and the learner's own baseline. Not diagnostic of cause. There is no
+  composite index of them. Measurement:
   [ADR 0003](./0003-spaced-repetition-scheduling-policy-accepted.md).
 - **Daily probe** — Optional opt-in standalone task before recall,
   independent of recall item content. Not a scheduling input and not a
-  validation of the Cognitive index. Measurement:
+  check on Pace, Accuracy, or Consistency. Measurement:
   [ADR 0003](./0003-spaced-repetition-scheduling-policy-accepted.md).
 
 **New**, **Stability**, **Difficulty**, **Retrievability**, **RecallLog**,
@@ -247,7 +248,7 @@ introduce a translation type that wraps one as the other.
 - Links: playbook [README.md](./README.md); ADR-0000
 [use-adrs-accepted.md](./0000-use-adrs-accepted.md); ADR 0003
 [spaced-repetition scheduling policy](./0003-spaced-repetition-scheduling-policy-accepted.md)
-(**Spaced repetition glossary**, Cognitive index measurement); ADR 0004
+(**Spaced repetition glossary**, morning recall residuals); ADR 0004
 [OKF-compatible notebook Markdown](./0004-okf-compatible-notebook-markdown-accepted.md)
 (portable Markdown profile); ADR 0005
 [web routes](./0005-web-routes.md) (`noteShow` / `noteProperty`); [commissioned learning session
