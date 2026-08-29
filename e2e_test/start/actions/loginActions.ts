@@ -47,17 +47,6 @@ export const loginActions = {
     })
   },
 
-  reloginAndEnsureHomePage(username: string) {
-    const displayName = username
-      .split('_')
-      .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-      .join(' ')
-    return this.reloginAs(username).then(() => {
-      router().visitNamed('root')
-      mainMenu().userOptions().userSettingsButton(displayName)
-    })
-  },
-
   loginAsAdmin() {
     return this.loginAs('admin')
   },

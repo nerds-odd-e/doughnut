@@ -28,13 +28,6 @@ function injectCircleWithNotebook(
     )
 }
 
-When(
-  'I create a new circle {string} and copy the invitation code',
-  (circleName: string) => {
-    start.navigateToMyCircles().createNewCircle(circleName).copyInvitationCode()
-  }
-)
-
 When('I visit the invitation link', () => {
   cy.get<string>('@circleInvitationCode').then((code) => {
     router().visitNamed('circleJoin', { invitationCode: code })

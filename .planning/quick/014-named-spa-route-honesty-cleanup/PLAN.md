@@ -1,8 +1,7 @@
 # Named SPA route honesty cleanup
 
-**Status:** planned (slice 6 done; slices 1–5 not started).
+**Status:** in progress (slices 1 and 6 done; 2–5 remaining).
 **Type:** ad-hoc plan (`.planning/quick/`)
-**Do not execute until the developer approves.**
 **Depends on:** shipped `.planning/quick/011-named-spa-route-honesty-follow-up/` (PLAN retired; named visit gate, `namedLocationHref`, Proposed [ADR 0005](../../../docs/adrs/0005-web-routes.md) E2E table remain on `main`)
 
 ## Goal
@@ -15,7 +14,7 @@ Scope: 011’s route-honesty commits (unit leftovers + E2E gate + ADR rewrite), 
 
 ### Sliced (meaningful)
 
-1. **Dead E2E navigation leftovers.** (a) `When I create a new circle … and copy the invitation code` has no feature caller. `e2e_test/start/pageObjects/myCirclesPage.ts` (`navigateToMyCircles`, `createNewCircle`, `copyInvitationCode`) and `start.navigateToMyCircles` exist only for that step. 011 renamed the copy alias to `@circleInvitationCode`. The UI field is a **full invitation URL** (`origin` + production `resolve(circleJoin)`). If that step were wired, `visitNamed('circleJoin', { invitationCode: url })` would stuff the URL into a path param. Circles scenarios inject a **raw code** and `visitNamed('circleJoin')` — that path is honest. (b) `Given I am re-logged in as {string} and reload the page` / `reloginAndEnsureHomePage` have no feature caller (011 still converted them to `visitNamed('root')`). `visitHomePage` **is** used (`feature_toggle.feature`). Delete the unused clusters; do not invent a UI-copy or reload-home scenario here.
+1. **Dead E2E navigation leftovers.** Done in slice 1. Invitation join stays inject + `visitNamed('circleJoin')`. `visitHomePage` kept (`feature_toggle.feature`).
 
 2. **Given shortcuts still remount after first load.** ADR / `e2e-authoring.mdc`: after first SPA load, Given-shaped jumps use named `router.push`; `visitNamed` is first load, inbound URL, or **explicit remount**. Slice 10 converted leftover `cy.visit('/…')` to `visitNamed` and left them there. `push` already falls back to `visitNamed` when `@firstVisited` is not `yes`. Call sites that remount after login:
 
@@ -51,7 +50,7 @@ Scope: 011’s route-honesty commits (unit leftovers + E2E gate + ADR rewrite), 
 | `wikiLinkMarkup.ts` at 248 lines | Under 250. |
 | Duplicate ADR vs `e2e-authoring.mdc` intent table | Each artifact stands alone; 011 kept both. |
 | Invitation does not visit a UI-copied URL | 011 slice 11 dropped `@savedInvitationCode` on purpose; inject + `visitNamed('circleJoin')` matches that decision. |
-| Convert `visitHomePage` to `push` | Only first-load `feature_toggle.feature`. Dead `reloginAndEnsureHomePage` is slice 1. |
+| Convert `visitHomePage` to `push` | Only first-load `feature_toggle.feature`. |
 
 ## Design decisions
 
@@ -66,11 +65,9 @@ Scope: 011’s route-honesty commits (unit leftovers + E2E gate + ADR rewrite), 
 
 Status legend: `[ ]` planned · `[~]` in progress · `[x]` done
 
-### 1. Remove unused my-circles and reload-home E2E — Structure `[ ]`
+### 1. Remove unused my-circles and reload-home E2E — Structure `[x]`
 
-Delete the uncalled create-and-copy Gherkin step, `myCirclesPage.ts` (or every helper that only it uses), and `start.navigateToMyCircles`. Delete `Given I am re-logged in as {string} and reload the page` and `reloginAndEnsureHomePage`. Keep `visitHomePage`. Existing inject + `visitNamed('circleJoin')` circles scenarios still pass.
-
-**Verify:** `pnpm cypress run --spec e2e_test/features/circles/creating_circles.feature`. Confirm no remaining imports of `myCirclesPage` or `reloginAndEnsureHomePage`. Once: `e2e_test/features/testability/feature_toggle.feature` (still uses `visitHomePage`).
+Deleted unused create-and-copy step, `myCirclesPage.ts`, `start.navigateToMyCircles`, reload-home Given, and `reloginAndEnsureHomePage`. Kept `visitHomePage`. `creating_circles.feature` and `feature_toggle.feature` passed.
 
 ---
 

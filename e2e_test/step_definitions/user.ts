@@ -23,13 +23,6 @@ Given('I am re-logged in as {string}', (externalIdentifier: string) => {
   })
 })
 
-Given(
-  'I am re-logged in as {string} and reload the page',
-  (externalIdentifier: string) => {
-    start.reloginAndEnsureHomePage(externalIdentifier)
-  }
-)
-
 Given('I am logged in as an existing user', () => {
   start.loginAs('old_learner')
 })

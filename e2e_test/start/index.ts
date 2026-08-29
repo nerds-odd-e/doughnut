@@ -34,7 +34,6 @@ import {
   assumeMessageCenterPage,
   navigateToMessageCenter,
 } from './pageObjects/messageCenterPage'
-import { navigateToMyCircles } from './pageObjects/myCirclesPage'
 import {
   navigateToNotebookPage,
   navigateToNotebooksPage,
@@ -80,7 +79,6 @@ const start = {
   navigateToBazaar,
   navigateToCircle,
   navigateToMessageCenter,
-  navigateToMyCircles,
   notebookCard,
   noteSidebar,
   recall,
