@@ -22,6 +22,7 @@ Spec paths are relative to `frontend/`. Do not pass `--` before the path (Vitest
 - DaisyUI uses the `daisy-` prefix (`daisy-btn`, `daisy-card`). Unprefixed Tailwind utilities. No Bootstrap. Scoped SCSS. Lucide via `@lucide/vue` (`currentColor`, `:size` or Tailwind `size-*`).
 - Derived state: `computed`, not a `ref` that mirrors props/store. `ref` only for owned mutable state (input, toggles).
 - Modals: `Modal` from `@/components/commons/Modal.vue`. In tests, query `document.querySelector("dialog")`.
+- Routing: name and params (helpers such as `noteShowLocation`); href only via `noteShowHref`. ADR 0005.
 
 ## API
 

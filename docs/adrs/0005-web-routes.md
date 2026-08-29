@@ -62,8 +62,9 @@ covers how those links relate to **web** destinations.
   `doughnut-routing.json`.
 - The non-production login screen is a named SPA route, production continue is a
   backend path hint, and a `prod` backend must not present the password form.
-- E2E may `visit` a URL on first load; later in-app moves use named
-  `router.push`.
+- E2E prefers UI for the trigger; a direct location change is a Given
+  shortcut. When it uses a route, first load may `visit` an href from
+  the named table; later jumps use named `router.push`.
 
 ### Wiki links as web destinations
 
