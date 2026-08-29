@@ -1,65 +1,71 @@
 <template>
-  <div v-if="stats && hasData">
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-      <PaceTile :pace="stats.pace ?? {}" />
-      <AccuracyTile :accuracy="stats.accuracy ?? {}" />
-    </div>
-    <div class="mt-3">
-      <RecallStatsTiles :totals="stats.totals ?? {}" />
-    </div>
+  <div v-if="stats && (hasReviews || hasVisibleDailyProbe)">
+    <template v-if="hasReviews">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <PaceTile :pace="stats.pace ?? {}" />
+        <AccuracyTile :accuracy="stats.accuracy ?? {}" />
+      </div>
+      <div class="mt-3">
+        <RecallStatsTiles :totals="stats.totals ?? {}" />
+      </div>
 
-    <section class="mt-6">
-      <h3 class="mt-0 mb-2 text-base font-semibold">Activity</h3>
-      <RecallActivityCalendar :calendar="stats.calendar ?? []" />
-    </section>
+      <section class="mt-6">
+        <h3 class="mt-0 mb-2 text-base font-semibold">Activity</h3>
+        <RecallActivityCalendar :calendar="stats.calendar ?? []" />
+      </section>
 
-    <section class="mt-6">
-      <div class="mb-2 flex items-center justify-between">
-        <h3 class="mt-0 text-base font-semibold">Daily trends</h3>
-        <div class="daisy-join">
-          <button
-            v-for="opt in windowOptions"
-            :key="opt"
-            type="button"
-            class="daisy-join-item daisy-btn daisy-btn-sm"
-            :class="window === opt ? 'daisy-btn-active' : ''"
-            :data-testid="`trend-window-${opt}`"
-            @click="window = opt"
-          >
-            {{ opt === "all" ? "All" : `${opt}d` }}
-          </button>
+      <section class="mt-6">
+        <div class="mb-2 flex items-center justify-between">
+          <h3 class="mt-0 text-base font-semibold">Daily trends</h3>
+          <div class="daisy-join">
+            <button
+              v-for="opt in windowOptions"
+              :key="opt"
+              type="button"
+              class="daisy-join-item daisy-btn daisy-btn-sm"
+              :class="window === opt ? 'daisy-btn-active' : ''"
+              :data-testid="`trend-window-${opt}`"
+              @click="window = opt"
+            >
+              {{ opt === "all" ? "All" : `${opt}d` }}
+            </button>
+          </div>
         </div>
-      </div>
-      <div class="grid md:grid-cols-2 gap-4">
-        <ResponseTimeTrendChart :trend="visibleTrend" />
-        <RetentionTrendChart :retention-trend="visibleRetentionTrend" />
-      </div>
-      <p class="mt-1 text-xs opacity-70">
-        <span class="rs-legend-dot">●</span> = insufficient data (fewer than 3 answers)
-      </p>
-    </section>
+        <div class="grid md:grid-cols-2 gap-4">
+          <ResponseTimeTrendChart :trend="visibleTrend" />
+          <RetentionTrendChart :retention-trend="visibleRetentionTrend" />
+        </div>
+        <p class="mt-1 text-xs opacity-70">
+          <span class="rs-legend-dot">●</span> = insufficient data (fewer than 3 answers)
+        </p>
+      </section>
 
-    <section class="mt-6">
-      <h3 class="mt-0 mb-2 text-base font-semibold">By weekday and hour</h3>
-      <div class="grid md:grid-cols-2 gap-4">
-        <WeekdayHourHeatmap
-          mode="count"
-          label="Reviews"
-          :counts="stats.weekdayHourCounts ?? []"
-        />
-        <WeekdayHourHeatmap
-          mode="retention"
-          label="Retention %"
-          :counts="stats.weekdayHourCounts ?? []"
-          :correct="stats.weekdayHourCorrect ?? []"
-        />
-      </div>
-    </section>
+      <section class="mt-6">
+        <h3 class="mt-0 mb-2 text-base font-semibold">By weekday and hour</h3>
+        <div class="grid md:grid-cols-2 gap-4">
+          <WeekdayHourHeatmap
+            mode="count"
+            label="Reviews"
+            :counts="stats.weekdayHourCounts ?? []"
+          />
+          <WeekdayHourHeatmap
+            mode="retention"
+            label="Retention %"
+            :counts="stats.weekdayHourCounts ?? []"
+            :correct="stats.weekdayHourCorrect ?? []"
+          />
+        </div>
+      </section>
 
-    <section class="mt-6">
-      <h3 class="mt-0 mb-2 text-base font-semibold">Response time by time of day</h3>
-      <AmPmResponseTimeChart :am-pm="stats.amPm ?? {}" />
-    </section>
+      <section class="mt-6">
+        <h3 class="mt-0 mb-2 text-base font-semibold">Response time by time of day</h3>
+        <AmPmResponseTimeChart :am-pm="stats.amPm ?? {}" />
+      </section>
+    </template>
+    <DailyProbeTrend
+      v-if="hasVisibleDailyProbe"
+      :points="visibleDailyProbe"
+    />
   </div>
   <div
     v-else-if="stats"
@@ -98,6 +104,11 @@ import ResponseTimeTrendChart from "@/components/recallStats/ResponseTimeTrendCh
 import RetentionTrendChart from "@/components/recallStats/RetentionTrendChart.vue"
 import WeekdayHourHeatmap from "@/components/recallStats/WeekdayHourHeatmap.vue"
 import AmPmResponseTimeChart from "@/components/recallStats/AmPmResponseTimeChart.vue"
+import DailyProbeTrend from "@/components/recallStats/DailyProbeTrend.vue"
+import {
+  dailyProbePointsInWindow,
+  localDayIso,
+} from "@/components/recallStats/dailyProbeWindow"
 import ContentLoader from "@/components/commons/ContentLoader.vue"
 import { UserController } from "@generated/donut-backend-api/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
@@ -110,7 +121,7 @@ const error = ref(false)
 const window = ref<number | "all">(90)
 const windowOptions: (number | "all")[] = [30, 90, "all"]
 
-const hasData = computed(
+const hasReviews = computed(
   () => (stats.value?.totals?.totalReviewsAllTime ?? 0) > 0
 )
 
@@ -127,6 +138,16 @@ const visibleRetentionTrend = computed(() => {
   const trend = stats.value?.retentionTrend ?? []
   return trend.slice(Math.max(0, trend.length - sliceSize.value))
 })
+
+const visibleDailyProbe = computed(() =>
+  dailyProbePointsInWindow(
+    stats.value?.dailyProbe ?? [],
+    window.value,
+    localDayIso(timezoneParam())
+  )
+)
+
+const hasVisibleDailyProbe = computed(() => visibleDailyProbe.value.length > 0)
 
 const load = async () => {
   error.value = false
