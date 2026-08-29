@@ -1,6 +1,6 @@
 # Daily probe follow-up (bugs, ADR gap, redundant tests)
 
-**Status:** in progress (slices 1–3 done).
+**Status:** in progress (slices 1–4 done).
 **Type:** ad-hoc plan (`.planning/quick/`)
 **Depends on:** shipped `.planning/quick/007-daily-cognitive-probe/PLAN.md`
 **Measurement spec:** [daily-probe-protocol.md](../../notes/daily-probe-protocol.md)
@@ -114,14 +114,13 @@ Result screen `saveStatus` is `unsaved` | `saved` | `failed`. Continue is
 disabled until Saved; failed persist shows Retry and does not emit
 `complete`. Retry calls `createDailyProbe` again.
 
-### 4. Extract the Daily probe offer branch from RecallPage — Structure `[ ]`
+### 4. Extract the Daily probe offer branch from RecallPage — Structure `[x]`
 
-Move `useDailyProbeOffer` plus the `DailyProbe` / ordinary-recall template
-branch into a capability-named component (e.g. `DailyProbeGate.vue`) with a
-slot for ordinary recall. No new UI. `RecallPage.vue` stays under 250 lines.
-Existing `RecallPage.dailyProbe.spec.ts` still pass.
+`DailyProbeGate.vue` owns `useDailyProbeOffer` plus the probe / ordinary-recall
+slot. `RecallPage.vue` wraps existing recall UI in that slot (~240 lines).
+No new UI. Existing `RecallPage.dailyProbe.spec.ts` still pass.
 
-Justifies slice 5 only.
+Justified slice 5.
 
 ### 5. A failed offer check shows retry, not a blank recall page — Behavior `[ ]`
 
