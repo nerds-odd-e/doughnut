@@ -96,6 +96,7 @@ const variabilityText = computed(() => variability.value?.toFixed(2))
 let stimulusOnsetMs = 0
 let respondedThisTrial = false
 let scheduled: ReturnType<typeof setTimeout> | undefined
+let abandoned = false
 
 function clearScheduled() {
   if (scheduled !== undefined) {
@@ -169,6 +170,17 @@ function detachKeyListener() {
   window.removeEventListener("keydown", onKeydown)
 }
 
+function abandonUnfinishedRun() {
+  clearScheduled()
+  trialIndex.value = 0
+  stimulus.value = undefined
+  scoredTrials.value = []
+  finished.value = false
+  saved.value = false
+  respondedThisTrial = false
+  abandoned = true
+}
+
 onMounted(() => {
   attachKeyListener()
   startTrial()
@@ -177,6 +189,15 @@ onUnmounted(() => {
   detachKeyListener()
   clearScheduled()
 })
-onActivated(attachKeyListener)
-onDeactivated(detachKeyListener)
+onActivated(() => {
+  attachKeyListener()
+  if (!abandoned) return
+  abandoned = false
+  startTrial()
+})
+onDeactivated(() => {
+  detachKeyListener()
+  if (finished.value) return
+  abandonUnfinishedRun()
+})
 </script>

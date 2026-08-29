@@ -1,8 +1,7 @@
 # Daily probe follow-up (bugs, ADR gap, redundant tests)
 
-**Status:** planned, not started.
+**Status:** in progress (slice 1 done).
 **Type:** ad-hoc plan (`.planning/quick/`)
-**Do not execute until the developer approves.**
 **Depends on:** shipped `.planning/quick/007-daily-cognitive-probe/PLAN.md`
 **Measurement spec:** [daily-probe-protocol.md](../../notes/daily-probe-protocol.md)
 
@@ -92,20 +91,15 @@ post-change-refactor checks were the bar.
 
 Status legend: `[ ]` planned · `[~]` in progress · `[x]` done
 
-### 1. Leaving recall mid-probe writes nothing — Behavior `[ ]`
+### 1. Leaving recall mid-probe writes nothing — Behavior `[x]`
 
-**Pre:** Opted in; Daily probe is on a scored or practice trial (not the
-result screen).
-**Trigger:** In-app navigate away from recall, wait long enough that the old
-timers would have finished the run, then return via in-app Recall.
-**Post:** No `daily_probe` row; the probe is offered again from the
-instruction / first stimulus (not Saved / Continue).
+KeepAlive deactivate while unfinished calls `abandonUnfinishedRun` (clear
+timers, reset, no POST). Next `onActivated` starts a fresh run. First mount
+still starts once (`abandoned` is false). Finished result screen is left
+alone so an in-flight save can complete.
 
-Tests: mounted KeepAlive detour on `DailyProbe` (fake timers, assert
-`createDailyProbe` not called, run resets); E2E in
-`e2e_test/features/recall/daily_probe.feature` using in-app navigation.
-Implementation: `DailyProbe.vue` — `onDeactivated` clears timers and resets
-unfinished state; do not double-`startTrial` on first mount.
+**Learning:** E2E first entry can still `visit recall`; the KeepAlive path
+is note detour + `I return to recalling`, not a second `cy.visit('/recall')`.
 
 ### 2. Saving notebook health defaults leaves Daily probe unchanged — Behavior `[ ]`
 
@@ -186,7 +180,6 @@ on the touched specs. No E2E behavior change.
 
 ## Out of scope
 
-- Executing this plan
 - Backend recomputation of speed / accuracy / lapses / variability
 - Unique local-day constraint
 - Changing `e2e_test/start/testabilityTimeTravel.ts` further

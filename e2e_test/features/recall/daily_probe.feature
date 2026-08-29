@@ -24,6 +24,15 @@ Feature: Daily probe
     When I continue from the Daily probe
     Then I should see ordinary recall
 
+  Scenario: Leaving recall mid-probe does not save a run
+    Given Daily probe is on
+    When I visit recall
+    Then I should see the Daily probe instruction
+    When I visit note "Note 1"
+    And it is 2 minutes later in the browser
+    And I return to recalling
+    Then I should see the Daily probe instruction
+
   Scenario: A second recall session on the same day skips the probe
     Given Daily probe is on
     When I visit recall
