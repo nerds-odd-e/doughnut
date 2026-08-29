@@ -43,19 +43,22 @@ describe("replaceWikiLinksInHtml", () => {
 
   it("marks leftover concept-path anchors as unresolved wiki links with hash href", () => {
     expect(
-      replaceWikiLinksInHtml('<p><a href="/Folder/Missing.md">label</a></p>', [])
+      replaceWikiLinksInHtml(
+        '<p><a href="/Folder/Missing.md">label</a></p>',
+        []
+      )
     ).toBe(
       '<p><a href="#" class="dead-wiki-link" data-wiki-title="/Folder/Missing.md" data-wiki-display="label">label</a></p>'
     )
   })
 
   it.each`
-    label                                         | html
-    ${"leftover dead with concept-path href"}     | ${'<p><a href="/Folder/Title.md" class="dead-wiki-link" data-wiki-title="/Folder/Title.md" data-wiki-display="label">label</a></p>'}
-    ${"leftover pending with concept-path href"}  | ${'<p><a href="/Folder/Title.md" class="pending-wiki-link" data-wiki-title="/Folder/Title.md" data-wiki-display="label">label</a></p>'}
-    ${"dead with hash href"}                      | ${'<p><a href="#" class="dead-wiki-link" data-wiki-title="/Folder/Title.md" data-wiki-display="label">label</a></p>'}
-    ${"pending with hash href"}                   | ${'<p><a href="#" class="pending-wiki-link" data-wiki-title="/Folder/Title.md" data-wiki-display="label">label</a></p>'}
-    ${"leftover live with concept-path href"}     | ${'<p><a href="/Folder/Title.md" class="donut-wiki-link" data-wiki-title="/Folder/Title.md" data-wiki-display="label" data-note-id="42">label</a></p>'}
+    label                                        | html
+    ${"leftover dead with concept-path href"}    | ${'<p><a href="/Folder/Title.md" class="dead-wiki-link" data-wiki-title="/Folder/Title.md" data-wiki-display="label">label</a></p>'}
+    ${"leftover pending with concept-path href"} | ${'<p><a href="/Folder/Title.md" class="pending-wiki-link" data-wiki-title="/Folder/Title.md" data-wiki-display="label">label</a></p>'}
+    ${"dead with hash href"}                     | ${'<p><a href="#" class="dead-wiki-link" data-wiki-title="/Folder/Title.md" data-wiki-display="label">label</a></p>'}
+    ${"pending with hash href"}                  | ${'<p><a href="#" class="pending-wiki-link" data-wiki-title="/Folder/Title.md" data-wiki-display="label">label</a></p>'}
+    ${"leftover live with concept-path href"}    | ${'<p><a href="/Folder/Title.md" class="donut-wiki-link" data-wiki-title="/Folder/Title.md" data-wiki-display="label" data-note-id="42">label</a></p>'}
   `(
     "upgrades $label path markdown anchors to a note-show href when wikiTitles resolve",
     ({ html }) => {

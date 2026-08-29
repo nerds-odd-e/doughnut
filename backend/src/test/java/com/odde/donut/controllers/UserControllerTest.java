@@ -81,8 +81,7 @@ class UserControllerTest extends ControllerTestBase {
   }
 
   @Test
-  void updateUserLeavesDailyProbeEnabledWhenOmitted()
-      throws UnexpectedNoAccessRightException {
+  void updateUserLeavesDailyProbeEnabledWhenOmitted() throws UnexpectedNoAccessRightException {
     User user = currentUser.getUser();
     user.setDailyProbeEnabled(true);
 
@@ -91,7 +90,6 @@ class UserControllerTest extends ControllerTestBase {
     healthDefaults.setDailyAssimilationCount(user.getDailyAssimilationCount());
     healthDefaults.setHealthRemoveEmptyFoldersDefault(true);
 
-    assertThat(
-        controller.updateUser(user, healthDefaults).getDailyProbeEnabled(), equalTo(true));
+    assertThat(controller.updateUser(user, healthDefaults).getDailyProbeEnabled(), equalTo(true));
   }
 }
