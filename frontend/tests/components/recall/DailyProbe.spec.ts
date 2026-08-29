@@ -6,7 +6,11 @@ import {
   dailyProbeScoredSequence,
 } from "@/models/dailyProbe"
 import { DailyProbeController } from "@generated/donut-backend-api/sdk.gen"
-import helper, { mockSdkService } from "@tests/helpers"
+import helper, {
+  mockSdkService,
+  wrapSdkError,
+  wrapSdkResponse,
+} from "@tests/helpers"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import { defineComponent, KeepAlive, nextTick } from "vue"
@@ -123,6 +127,48 @@ describe("DailyProbe", () => {
       [{ body: { trials: unknown[] } }],
     ]
     expect(posted[0][0].body.trials).toHaveLength(20)
+  })
+
+  it("keeps Continue disabled until Saved", async () => {
+    let resolveSave!: () => void
+    createDailyProbe.mockImplementation(
+      () =>
+        new Promise((resolve) => {
+          resolveSave = () => resolve(wrapSdkResponse({ id: 1 }))
+        })
+    )
+    const view = mountProbe()
+    await completeProbeWithMappedKeys()
+    const continueButton = view.find('[data-testid="daily-probe-continue"]')
+    expect(continueButton.attributes("disabled")).toBeDefined()
+    expect(view.find('[data-testid="daily-probe-saved"]').exists()).toBe(false)
+
+    resolveSave()
+    await flushPromises()
+    expect(continueButton.attributes("disabled")).toBeUndefined()
+  })
+
+  it("shows retry after a failed save and does not emit complete", async () => {
+    createDailyProbe.mockResolvedValue(wrapSdkError("save failed"))
+    const view = mountProbe()
+    await completeProbeWithMappedKeys()
+    expect(view.find('[data-testid="daily-probe-retry"]').exists()).toBe(true)
+    const continueButton = view.find('[data-testid="daily-probe-continue"]')
+    ;(continueButton.element as HTMLButtonElement).click()
+    await flushPromises()
+    expect(view.emitted("complete")).toBeUndefined()
+  })
+
+  it("posts again when retrying a failed save", async () => {
+    createDailyProbe.mockResolvedValueOnce(wrapSdkError("save failed"))
+    const view = mountProbe()
+    await completeProbeWithMappedKeys()
+    expect(createDailyProbe).toHaveBeenCalledTimes(1)
+
+    await view.find('[data-testid="daily-probe-retry"]').trigger("click")
+    await flushPromises()
+    expect(createDailyProbe).toHaveBeenCalledTimes(2)
+    expect(view.find('[data-testid="daily-probe-saved"]').text()).toBe("Saved")
   })
 
   it("does not post and restarts after a KeepAlive detour mid-run", async () => {
