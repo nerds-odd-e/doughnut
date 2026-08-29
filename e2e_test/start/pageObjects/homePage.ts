@@ -1,5 +1,6 @@
 import { formField } from '../formField'
 import { waitUntilAppIsNotBusy } from '../pageBase'
+import router from '../router'
 
 const UNFINISHED_FEATURE_INDICATOR = 'Feature Toggle is On'
 
@@ -28,7 +29,7 @@ export const assumeHomePage = () => {
 }
 
 export const visitHomePage = () => {
-  cy.visit('/')
+  router().visitNamed('root')
   cy.contains('Welcome')
   return assumeHomePage()
 }
