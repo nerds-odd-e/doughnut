@@ -6,9 +6,9 @@ current_phase: null
 current_phase_name: null
 status: ready
 stopped_at: null
-last_updated: "2026-08-29T14:10:00Z"
+last_updated: "2026-08-29T15:10:00Z"
 last_activity: 2026-08-29
-last_activity_desc: "Removed spent quick plans; 013 and 014 remain"
+last_activity_desc: "015 SPA hydrate after inject planned; tree-view identity jump shipped"
 progress:
   total_phases: 0
   completed_phases: 0
@@ -36,7 +36,8 @@ Daily probe measurement (not an ADR): [daily-probe-protocol.md](notes/daily-prob
 ## Operator Next Steps
 
 - Canonical property path (`noteProperty`, `#prop:` wiki): `.planning/quick/013-note-property-canonical-path/PLAN.md` (planned, not started). Policy already in ADR 0001 / ADR 0004 / Proposed 0005.
-- Named SPA route honesty leftovers (dead E2E + Given shortcuts as named `push`): `.planning/quick/014-named-spa-route-honesty-cleanup/PLAN.md` (planned, not started). 011 is shipped; its PLAN is retired.
+- Named SPA route honesty leftovers (dead E2E + Given shortcuts as named `push`): `.planning/quick/014-named-spa-route-honesty-cleanup/PLAN.md` (slices 2–5 remaining). 011 is shipped; its PLAN is retired.
+- SPA hydrate after testability inject (identity jumps vs stale catalog; revert menu `route.name` refetch): `.planning/quick/015-spa-hydrate-after-testability-inject/PLAN.md` (slice 1 done; 2–6 not started). Do not overlap 014 bazaar `push`.
 - After deploying the Flyway squash, confirm startup succeeded and `flyway_schema_history` shows the baseline repaired, the collapsed versions marked `DELETE`, and `V300000300` applied.
 
 Parked work: SEED-001, SEED-002, SEED-005, SEED-006, SEED-007, SEED-008; ADR 0002 Level 1. See [ROADMAP.md](ROADMAP.md).
