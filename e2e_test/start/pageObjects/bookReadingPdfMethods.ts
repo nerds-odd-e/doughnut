@@ -3,12 +3,15 @@ import {
   openDaisyDialog,
 } from '../../support/daisyModalHelpers'
 import { waitUntilAppIsNotBusy } from '../pageBase'
-import { assertPdfCanvasIsRendered } from './bookReadingShared'
+import {
+  BOOK_READING_PATHNAME,
+  assertPdfCanvasIsRendered,
+} from './bookReadingShared'
 
 export const bookReadingPdfMethods = () => ({
   expectPdfBeginningVisible() {
     waitUntilAppIsNotBusy()
-    cy.location('pathname').should('match', /^\/notebooks\/\d+\/book$/)
+    cy.location('pathname').should('match', BOOK_READING_PATHNAME)
     this.expectCurrentPage(1)
     return this
   },

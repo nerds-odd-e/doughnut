@@ -29,7 +29,7 @@ export const assumeCirclePage = (circleName: string) => {
       cy.get('#invitation-code')
         .invoke('val')
         .then((text) => {
-          cy.wrap(text).as('savedInvitationCode')
+          cy.wrap(text).as('circleInvitationCode')
         })
     },
   }

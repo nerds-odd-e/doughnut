@@ -1,8 +1,11 @@
 import { waitUntilAppIsNotBusy } from '../pageBase'
+import router from '../router'
 import {
+  BOOK_READING_PATHNAME,
   bookBlockRowByTitle,
   ensureOnBookReadingPage,
   epubHostViewportIntersectsMarker,
+  notebookIdFromBookReadingPathname,
 } from './bookReadingShared'
 
 export const bookReadingEpubMethods = () => ({
@@ -145,25 +148,23 @@ export const bookReadingEpubMethods = () => ({
   leaveEpubReadingViewAndReturn() {
     waitUntilAppIsNotBusy()
     cy.get('[data-testid="epub-book-viewer"]').should('be.visible')
-    cy.location('pathname')
-      .should('match', /^\/notebooks\/\d+\/book$/)
-      .then((pathname) => {
-        const readingPath = pathname as unknown as string
-        cy.wait(2000)
-        cy.contains('a', 'Notebook').click()
-        cy.location('pathname').should('not.match', /^\/notebooks\/\d+\/book$/)
-        cy.visit(readingPath)
-        waitUntilAppIsNotBusy()
-        cy.get('[data-testid="epub-book-viewer"]', {
-          timeout: 30000,
-        }).should('be.visible')
-        cy.wait(1500)
-      })
+    cy.location('pathname').then((pathname) => {
+      const notebookId = notebookIdFromBookReadingPathname(String(pathname))
+      cy.wait(2000)
+      cy.contains('a', 'Notebook').click()
+      cy.location('pathname').should('not.match', BOOK_READING_PATHNAME)
+      router().visitNamed('bookReading', { notebookId })
+      waitUntilAppIsNotBusy()
+      cy.get('[data-testid="epub-book-viewer"]', {
+        timeout: 30000,
+      }).should('be.visible')
+      cy.wait(1500)
+    })
     return this
   },
   expectBookLayoutBlockEpubStartHrefContains(title: string, substring: string) {
     waitUntilAppIsNotBusy()
-    cy.location('pathname').should('match', /^\/notebooks\/\d+\/book$/)
+    cy.location('pathname').should('match', BOOK_READING_PATHNAME)
     bookBlockRowByTitle(title)
       .invoke('attr', 'data-epub-start-href')
       .should('include', substring)

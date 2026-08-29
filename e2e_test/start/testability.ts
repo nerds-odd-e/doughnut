@@ -634,17 +634,10 @@ const testability = () => {
               `inject_circle did not return id and invitation code for "${circleName}"`
             )
           }
-          const origin =
-            Cypress.config('baseUrl')?.toString() ?? 'http://localhost:5173'
           return cy
             .wrap(circleId)
             .as(circleIdAlias(circleName))
             .then(() => cy.wrap(invitationCode).as('circleInvitationCode'))
-            .then(() =>
-              cy
-                .wrap(`${origin}/circles/join/${invitationCode}`)
-                .as('savedInvitationCode')
-            )
         })
     },
 

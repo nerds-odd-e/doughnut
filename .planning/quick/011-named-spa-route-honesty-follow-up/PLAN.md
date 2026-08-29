@@ -1,6 +1,6 @@
 # Named SPA route honesty follow-up
 
-**Status:** in progress — slices 1–10 done; next is slice 11.
+**Status:** in progress — slices 1–11 done; next is slice 12.
 **Type:** ad-hoc plan (`.planning/quick/`)
 **Depends on:** shipped `.planning/quick/009-named-spa-route-honesty/` (PLAN retired; code and Proposed [ADR 0005](../../../docs/adrs/0005-web-routes.md) remain)
 **Merged from:** this file’s 009 leftovers **and** the former `.planning/quick/011-e2e-named-route-honesty/` (deleted as a duplicate 011).
@@ -245,18 +245,14 @@ Bazaar, recall remount (`visitNamed('recall')` still `cy.visit` of compiled href
 
 ---
 
-### 11. Inbound invitation URL and epub remount — Behavior `[ ]`
+### 11. Inbound invitation URL and epub remount — Behavior `[x]`
 
-**Timing:** yes — **circles** vs slice 7; **epub** before/after in this slice (3× with `@ignore` tags).
-
-Invitation alias from `namedLocationHref({ name: 'circleJoin', params: { invitationCode } })` + origin. Join-then-show: `visitNamed('circleShow', { circleId })`. Epub: `cy.reload()` or `visitNamed('bookReading', …)`.
+Invitation: `visitNamed('circleJoin' | 'circleShow')`. Epub remount: `visitNamed('bookReading', { notebookId })` after UI leave (`cy.reload` would reload notebooks). Dropped unused `@savedInvitationCode`.
 
 | Spec | Median before | Median after | Gate |
 |---|---|---|---|
-| circles | 11790 | | |
-| epub | (this slice) | | |
-
-**Verify:** `creating_circles.feature` 3×; epub feature 3× with ignore tags.
+| circles | 11790 | 11660 | pass (≤ 14790) |
+| epub | 67666 | 68233 | duration pass (≤ 77816); **not** 3× consecutive green (`@ignore` flake in `chooseBookBlockByTitle`, not leave/return) |
 
 ---
 
