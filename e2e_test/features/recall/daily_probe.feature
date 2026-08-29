@@ -48,3 +48,11 @@ Feature: Daily probe
     When I visit recall
     Then I should not see the Daily probe instruction
     And I should see ordinary recall
+
+  Scenario: Recall Stats shows the Daily probe trend
+    Given Daily probe is on
+    When I visit recall
+    Then I should see the Daily probe instruction
+    When I complete the Daily probe
+    And I visit my recall stats
+    Then I should see the Daily probe trend

@@ -1,7 +1,7 @@
 # Daily probe
 
-**Status:** in progress. Slices 1–11 shipped. Next: slice 12 (Recall Stats
-read model series).
+**Status:** in progress. Slices 1–12 shipped. Next: slice 13 (Recall Stats
+shows Daily probe trend).
 **Type:** ad-hoc plan (`.planning/quick/`)
 **Extracted from:** `.planning/quick/001-morning-cognitive-index/PLAN.md`
 (unbuilt slices 26–31).
@@ -169,16 +169,13 @@ today already used local-day bounds; no production change.
 
 **Enables slice 12.**
 
-### 12. Expose completed Daily-probe days to Recall Stats — Structure `[ ]`
+### 12. Expose completed Daily-probe days to Recall Stats — Structure `[x]`
 
-Extend the current-user Recall Stats read model with one cohesive daily series
-containing mean reciprocal response time, lapses, and variability for completed
-probe results. Group by the request timezone and exclude incomplete attempts.
-Regenerate the TypeScript client. The page does not render the series yet.
+Shipped: `RecallStatsDTO.dailyProbe` — sparse `{ date, speed, lapses,
+variability }` points, oldest-first, request timezone, latest row per local
+day. Empty list when none. Client regenerated. Page does not render yet.
 
-- Backend controller/service tests cover ordering, timezone grouping, empty
-  history, and incomplete-attempt exclusion through the stable boundary.
-- **Enables slice 13 only.**
+**Enables slice 13 only.**
 
 ### 13. Recall Stats shows the Daily probe trend — Behavior `[ ]`
 

@@ -9,6 +9,10 @@ export const recallStatsPage = () => {
       )
       return this
     },
+    expectDailyProbeTrend() {
+      cy.get('[data-testid="daily-probe-trend"]').should('be.visible')
+      return this
+    },
   }
 }
 

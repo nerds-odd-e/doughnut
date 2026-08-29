@@ -1,5 +1,9 @@
 import { UserController } from "@generated/donut-backend-api/sdk.gen"
 import RecallStatsSettingsTab from "@/pages/settings/RecallStatsSettingsTab.vue"
+import {
+  isoDateDaysBefore,
+  localDayIso,
+} from "@/components/recallStats/dailyProbeWindow"
 import helper, { mockSdkService } from "@tests/helpers"
 import timezoneParam from "@/managedApi/window/timezoneParam"
 import type {
@@ -10,6 +14,10 @@ import type {
 } from "@generated/donut-backend-api"
 import { flushPromises } from "@vue/test-utils"
 import { describe, it, expect, beforeEach, vi } from "vitest"
+
+function isoDateDaysAgo(daysAgo: number): string {
+  return isoDateDaysBefore(localDayIso(timezoneParam()), daysAgo)
+}
 
 function buildCalendar(): DayCount[] {
   const days: DayCount[] = []
@@ -152,6 +160,44 @@ describe("RecallStatsSettingsTab", () => {
     expect(wrapper.find('[data-testid="recall-stats-empty"]').exists()).toBe(
       true
     )
+  })
+
+  it("shows the Daily probe trend with speed, lapses, and variability", async () => {
+    mockSdkService(UserController, "getRecallStats", {
+      totals: { totalReviewsAllTime: 0 },
+      dailyProbe: [
+        {
+          date: isoDateDaysAgo(7),
+          speed: 3.2,
+          lapses: 1,
+          variability: 0.4,
+        },
+        {
+          date: isoDateDaysAgo(0),
+          speed: 3.5,
+          lapses: 0,
+          variability: 0.3,
+        },
+      ],
+    })
+
+    const wrapper = helper
+      .component(RecallStatsSettingsTab)
+      .withRouter()
+      .mount()
+    await flushPromises()
+
+    const trend = wrapper.find('[data-testid="daily-probe-trend"]')
+    expect(trend.exists()).toBe(true)
+    expect(trend.find('[data-testid="daily-probe-speed-chart"]').exists()).toBe(
+      true
+    )
+    expect(
+      trend.find('[data-testid="daily-probe-lapses-chart"]').exists()
+    ).toBe(true)
+    expect(
+      trend.find('[data-testid="daily-probe-variability-chart"]').exists()
+    ).toBe(true)
   })
 
   it("retries after an error state", async () => {

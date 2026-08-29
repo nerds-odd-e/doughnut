@@ -38,3 +38,7 @@ When('I visit my recall stats', () => {
 Then("I should see today's pace is slower than usual", () => {
   start.recallStatsPage().expectPaceTileContains('slower than usual')
 })
+
+Then('I should see the Daily probe trend', () => {
+  start.recallStatsPage().expectDailyProbeTrend()
+})
