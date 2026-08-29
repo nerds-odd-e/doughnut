@@ -10,8 +10,9 @@
 Donut bases its recall schedule on open FSRS-6. This ADR owns
 spaced-repetition domain terms and scheduling policy: which events affect
 memory, which inputs matter, and which invariants those transitions preserve.
-It also owns the **Daily probe** and how a morning's recall is measured for
-the **Cognitive index**. General product recall language remains in
+It also owns the **Daily probe** and the residual readouts of a morning's
+recall (**Pace**, **Accuracy**, **Consistency**, **Retrieval lapse**).
+General product recall language remains in
 [ADR 0001](./0001-ubiquitous-language.md). Source code and tests own FSRS
 mechanics and numeric outcomes.
 
@@ -45,11 +46,12 @@ Learning, Review, and Relearning as product states.
 - **Overlap** — A declared non-distinguishing spelling outcome. Neither a Grade
   nor a memory-state transition.
 
-### Cognitive index
+### Morning recall residuals
 
-[ADR 0001](./0001-ubiquitous-language.md) names **Cognitive index**. It is a
-residual analysis of a morning's recall, not a scheduling input and not a
-restatement of what the scheduler scheduled.
+[ADR 0001](./0001-ubiquitous-language.md) names **Pace**, **Accuracy**,
+**Consistency**, and **Retrieval lapse**. They are separate residual
+readouts of a morning's recall, not a scheduling input, not a restatement
+of what the scheduler scheduled, and not a composite index.
 
 - **Away** — Interval where the learner switches to another tab or app while
   a recall prompt is active, excluded from thinking time. Distinct from a
@@ -62,14 +64,15 @@ restatement of what the scheduler scheduled.
   clock is not paused). It flags the attempt as one to discount; it never
   silently subtracts.
 - **Pace** — A learner's per-item time intensity on a given morning, expressed
-  against their own recent history rather than as a raw duration. One of the
-  three residual channels beneath the Cognitive index.
+  against their own recent history rather than as a raw duration.
+- **Accuracy** — A learner's morning recall outcomes against the scheduler's
+  per-attempt expectation, not a raw percent correct.
+- **Consistency** — How widely a morning's per-attempt residuals spread
+  compared with that learner's recent baseline. Shown when more erratic than
+  usual; not combined with Pace or Accuracy.
 - **Retrieval lapse** — A correct answer whose thinking time is unusually slow
   relative to that item's own expectation. Distinct from an incorrect answer
   (a knowledge gap) and from Confusion or Overlap (not Grades).
-- **Cognitive index** — Daily composite readout comparing a morning's recall
-  outcomes, pace, and consistency against expectation and against the
-  learner's own baseline. A residual signal, not diagnostic of cause.
 
 ### Daily probe
 
@@ -77,8 +80,8 @@ restatement of what the scheduler scheduled.
   60 seconds, using the same stimuli every day, offered at most once per
   local day before recall. It reads the learner's speed, accuracy, lapses,
   and variability independently of recall item content. It is not a
-  scheduling input and does not validate the Cognitive index. Turning it off
-  stops new probes and ends the probe's own trend readout.
+  scheduling input and does not validate Pace, Accuracy, or Consistency.
+  Turning it off stops new probes and ends the probe's own trend readout.
 
 ### FSRS profile
 
@@ -149,7 +152,7 @@ Removed trackers retain history; deleted trackers are outside reconstruction.
 A RecallLog row may also cache the Stability, Difficulty, and Retrievability
 that produced it (`stability_before`, `difficulty_before`, `retrievability` on
 `recall_log`), for readouts that would otherwise replay history per query
-(e.g. the Cognitive index's accuracy channel). This is a materialized cache of
+(e.g. the Accuracy residual). This is a materialized cache of
 a value the frozen FSRS profile always reproduces by replay, not a new source
 of truth: RecallLog's Grades and Confusion remain the record, and the cached
 columns must never diverge from what replay would produce. If the FSRS profile
@@ -166,7 +169,7 @@ Tutor Feedback need not have an Answer.
 ## Related
 
 - [ADR 0001: Ubiquitous language](./0001-ubiquitous-language.md) — general
-  recall, memory tracker, assimilation, Cognitive index, and Daily probe
+  recall, memory tracker, assimilation, residual readouts, and Daily probe
   product language
 - [Commissioned learning session protocol](../commissioned-learning-session-protocol.md)
   — Request/Report documents and matching by note title

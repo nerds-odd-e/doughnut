@@ -6,9 +6,9 @@ current_phase: null
 current_phase_name: null
 status: ready
 stopped_at: null
-last_updated: "2026-08-29T10:00:00Z"
+last_updated: "2026-08-29T14:10:00Z"
 last_activity: 2026-08-29
-last_activity_desc: "Quick plan 013 note-property canonical path (planned, not started)"
+last_activity_desc: "Removed spent quick plans; 013 and 014 remain"
 progress:
   total_phases: 0
   completed_phases: 0
@@ -31,15 +31,12 @@ Scheduling follows Accepted [ADR 0003](../docs/adrs/0003-spaced-repetition-sched
 
 **Flyway:** every applied migration is squashed into `V100000000__baseline.sql`; `V300000300__db_migration_placeholder.sql` is the tip. New migrations use a greater version.
 
+Daily probe measurement (not an ADR): [daily-probe-protocol.md](notes/daily-probe-protocol.md).
+
 ## Operator Next Steps
 
-- Memory-tracker stability investigation closed: live `applyGrade` persists; `RecallLogMemoryStateBackfill` ran 2026-08-29 (125,570 rows); the 21.9/21.4 gate re-run still fails (`r=0.076`) but on complete data. See `.planning/quick/001-morning-cognitive-index/PLAN.md` slices 21.9/21.4.
-- Canonical property path (`noteProperty`, `#prop:` wiki): `.planning/quick/013-note-property-canonical-path/PLAN.md` (planned, not started). Policy already in ADR 0001 / 0004 / Proposed 0005.
-- Compile path-Markdown HTML `href` (live `noteShowHref`, unresolved `#`): `.planning/quick/012-wiki-anchor-compiled-href/PLAN.md` (complete)
-- Split SPA `/users/identify` from production OAuth continue via `.planning/quick/010-sign-in-path-split/PLAN.md` (planned, not started)
-- Infer pending vs dead wiki links and show a third style via `.planning/quick/006-wiki-link-pending-style/PLAN.md` (planned, not executed)
-- Complete remaining doughnut → donut naming via `.planning/quick/002-complete-donut-naming/PLAN.md`
-- Nested Report shape is in `docs/commissioned-learning-session-protocol.md`; implement via `.planning/quick/003-nested-session-item-report/PLAN.md`
-- Opt-in daily cognitive probe, extracted from the closed morning-index plan: `.planning/quick/007-daily-cognitive-probe/PLAN.md` (planned, not started)
-- Probe convergent-validity and EZ-diffusion analyses, extracted and re-scoped but not yet planned: `.planning/quick/008-probe-convergent-analyses/PLAN.md` (needs a `/slice-planning` pass before execution)
-- After deploying the Flyway squash, confirm startup succeeded and `flyway_schema_history` shows the baseline repaired, the collapsed versions marked `DELETE`, and `V300000300` applied
+- Canonical property path (`noteProperty`, `#prop:` wiki): `.planning/quick/013-note-property-canonical-path/PLAN.md` (planned, not started). Policy already in ADR 0001 / ADR 0004 / Proposed 0005.
+- Named SPA route honesty leftovers (dead E2E + Given shortcuts as named `push`): `.planning/quick/014-named-spa-route-honesty-cleanup/PLAN.md` (planned, not started). 011 is shipped; its PLAN is retired.
+- After deploying the Flyway squash, confirm startup succeeded and `flyway_schema_history` shows the baseline repaired, the collapsed versions marked `DELETE`, and `V300000300` applied.
+
+Parked work: SEED-001, SEED-002, SEED-005, SEED-006, SEED-007, SEED-008; ADR 0002 Level 1. See [ROADMAP.md](ROADMAP.md).
