@@ -1,6 +1,6 @@
 # SPA hydrate after testability inject
 
-**Status:** in progress (slices 1–2 done; 3–6 remaining).
+**Status:** in progress (slices 1–3 done; 4–6 remaining).
 **Type:** ad-hoc plan (`.planning/quick/`)
 **Depends on:** Proposed [ADR 0005](../../../docs/adrs/0005-web-routes.md) E2E intent table; shipped identity-jump interims (`jumpToNotebookPage` for skip-tracking and note creation; tree-view `I route to the note`).
 
@@ -17,7 +17,7 @@ One protocol for **login → testability inject → named `push`**: Given-shaped
 | Notebook catalog | **Page** (`onMounted` fetch) | Entering the catalog; in-app create/update/refresh | `push('notebooks')` while already there is a no-op → empty listing |
 | Menu assimilation counts | **Session chrome** | First load `getMenuData`; in-app assimilate / `next()` DTO | Testability assimilate + jump to a note left login counts (`0/0`) |
 
-Vue is coherent: **page bodies refetch on mount; layout chrome is session-scoped.** Testability writes do not invalidate either. Interim `route.name` → `getMenuData` (commit `37897066dc`) is a **navigation proxy**, not an assimilation event. It will miss same-name jumps and over-fetch unrelated screens.
+Vue is coherent: **page bodies refetch on mount; layout chrome is session-scoped.** Testability writes do not invalidate either. Slice 3 dropped the `route.name` → `getMenuData` navigation proxy (commit `37897066dc`). Catalog listing after inject is still stale until slice 5.
 
 ## Already shipped (do not redo)
 
@@ -26,7 +26,7 @@ Vue is coherent: **page bodies refetch on mount; layout chrome is session-scoped
 | Skip Memory Tracking → `jumpToNotebookPage` | **Keep.** Domain is notebook settings, not catalog browsing (ADR 0001). |
 | Note creation under folder → `jumpToNotebookPage` | **Keep.** Same Given-shaped identity jump. |
 | Tree-view Gherkin → `I route to the note` (slice 1) | **Interim wording.** Unique behavior is the sidebar tree. Restore `{notepath}` after the helper jumps by leaf (slice 4). |
-| MainMenu refetch on `route.name` | **Revert in slice 3.** Not a domain invalidation. |
+| MainMenu refetch on `route.name` | **Reverted (slice 3).** Login hydrate + in-app assimilate / `next()` DTO only. |
 
 ## Design decisions
 
@@ -80,15 +80,13 @@ Score field: Cypress mocha JSON `stats.duration` (ms → s). Logs under `/tmp/hy
 
 ---
 
-### 3. Menu bar after in-app assimilate — Behavior `[ ]`
+### 3. Menu bar after in-app assimilate — Behavior `[x]`
 
 **Pre:** day 1, notes 1–5, daily cap 2; SPA session already loaded. **Trigger:** assimilate via the walkthrough (menu / panel), not testability-only. **Post:** assimilate menu progress bar visible (`assimilated > 0 && due > 0`).
 
-- Revert `route.name` `getMenuData` watch and the “refetches when the route name changes” unit test.
-- Rewrite `Menu shows assimilation progress midway through daily plan` so the bar is asserted after in-app assimilate (or after explicit remount if you keep a hydrate-from-server claim — prefer in-app; it is the domain path).
-- Keep skip-tracking `jumpToNotebookPage`.
+Shipped: dropped `route.name` `getMenuData` watch and its unit test. Walkthrough asserts the bar after menu + in-app panel assimilate. Skip-tracking `jumpToNotebookPage` unchanged. In-app path was enough (no remount).
 
-**Verify:** `MainMenu.assimilate.spec.ts`; `pnpm cypress run --spec e2e_test/features/assimilation/assimilation_walkthrough.feature` (3 consecutive green). Timing: walkthrough median vs slice-2 baseline (gate above).
+Timing (`stats.duration`): 15.536 / 15.307 / 15.281 → median **15.307s** vs 15.100s (gate ≤ 18.100s) — pass.
 
 ---
 
@@ -138,7 +136,7 @@ Then watch `donut CI` on `main` for the branch tip until green (lint, backend un
 ## Jidoka
 
 - Do not convert `When I visit recall` to sidebar (014 / KeepAlive).
-- Do not refetch menu on every route name change (slice 3 reverts that).
+- Do not refetch menu on every route name change (slice 3 reverted that).
 - Timing fail → revert that slice.
 - Human owns ADR 0005 accept.
 - If catalog listing **must** remount the whole document, stop and ask; do not silently make every `navigateToNotebooksPage` a `visitNamed`.

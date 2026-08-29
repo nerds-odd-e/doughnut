@@ -9,8 +9,9 @@ Feature: Assimilation walkthrough
     And there are notes from Note 1 to Note 5
 
   Scenario: Menu shows assimilation progress midway through daily plan
-    Given the note "Note 1" was assimilated on day 1
-    When I jump to the note page of "Note 2"
+    Given It's day 1
+    When I start assimilation from the menu
+    And I assimilate on the assimilation panel
     Then I should see assimilation menu progress
 
   Scenario: Starting assimilation shows blocking loading for the next note

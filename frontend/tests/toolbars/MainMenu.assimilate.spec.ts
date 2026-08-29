@@ -8,7 +8,6 @@ import { createMenuData } from "./mainMenuMocks"
 import {
   mountMainMenu,
   renderComponent,
-  router,
   setupMainMenuTests,
   user,
 } from "./mainMenuTestSupport"
@@ -75,29 +74,6 @@ describe("MainMenu assimilate", () => {
       })
 
       await rerender({ user: { ...user, id: 2 } })
-      await flushPromises()
-
-      expect(getMenuDataSpy).toHaveBeenCalledTimes(2)
-    })
-
-    it("refetches menu data when the route name changes", async () => {
-      const getMenuDataSpy = mockSdkService(
-        UserController,
-        "getMenuData",
-        createMenuData({
-          assimilationCount: {
-            dueCount: 1,
-            assimilatedCountOfTheDay: 1,
-            totalUnassimilatedCount: 4,
-          },
-        })
-      )
-
-      mountMainMenu()
-      await flushPromises()
-      expect(getMenuDataSpy).toHaveBeenCalledTimes(1)
-
-      await router.push({ name: "notebooks" })
       await flushPromises()
 
       expect(getMenuDataSpy).toHaveBeenCalledTimes(2)
