@@ -4,6 +4,7 @@ import {
   dailyProbePracticeSequence,
   dailyProbeScoredSequence,
   dailyProbeSpeed,
+  dailyProbeVariability,
   mapDailyProbeKey,
   recordDailyProbeTrial,
 } from "@/models/dailyProbe"
@@ -141,5 +142,14 @@ describe("dailyProbe", () => {
 
   it("does not count a false start as a lapse", () => {
     expect(dailyProbeLapseCount([recordAt("left", 50, "f")])).toBe(0)
+  })
+
+  it("variability is 1.41 s⁻¹ for reciprocal RTs 4.00 and 2.00", () => {
+    const trials = [recordAt("left", 250, "f"), recordAt("right", 500, "j")]
+    expect(dailyProbeVariability(trials)?.toFixed(2)).toBe("1.41")
+  })
+
+  it("omits variability when fewer than 2 correct valid RTs", () => {
+    expect(dailyProbeVariability([recordAt("left", 250, "f")])).toBeUndefined()
   })
 })

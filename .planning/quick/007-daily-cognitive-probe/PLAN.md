@@ -1,6 +1,7 @@
 # Daily probe
 
-**Status:** in progress. Slices 1–6 shipped. Next: slice 7 (variability).
+**Status:** in progress. Slices 1–7 shipped. Next: slice 8 (`daily_probe`
+table, completed rows only).
 **Type:** ad-hoc plan (`.planning/quick/`)
 **Extracted from:** `.planning/quick/001-morning-cognitive-index/PLAN.md`
 (unbuilt slices 26–31).
@@ -125,14 +126,13 @@ are not lapses. Result shows the count. E2E all-correct 250 ms path asserts 0.
 
 **Enables slice 7.**
 
-### 7. The completed result reports variability — Behavior `[ ]`
+### 7. The completed result reports variability — Behavior `[x]`
 
-**Pre-condition:** the completed run has the response-time pattern from the
-approved variability example. **Trigger:** the result appears.
-**Post-condition:** it also reports variability using the approved unit and
-rounding.
+Shipped: `dailyProbeVariability` — sample SD of the reciprocal RTs that enter
+speed. Display 2 decimals; omit if fewer than 2 values. Protocol example 1.41
+s⁻¹. E2E all-correct 250 ms asserts 0.00.
 
-- Add one pure calculation test and extend the existing result UI/E2E path.
+**Enables slice 8.**
 
 ### 8. Represent Daily probe attempts and results durably — Structure `[ ]`
 
