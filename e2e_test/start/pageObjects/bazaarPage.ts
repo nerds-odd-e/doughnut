@@ -1,4 +1,5 @@
 import { bazaarOrCircle } from './BazaarOrCircle'
+import router from '../router'
 
 export const assumeBazaarPage = () => {
   cy.findByText('Welcome To The Bazaar')
@@ -7,7 +8,7 @@ export const assumeBazaarPage = () => {
 }
 
 export const navigateToBazaar = () => {
-  cy.visit('/bazaar')
+  router().visitNamed('bazaar')
   cy.get('h2', { timeout: 3000 }).should('contain', 'Welcome To The Bazaar')
 
   return assumeBazaarPage()

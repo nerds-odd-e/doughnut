@@ -46,13 +46,11 @@ export const assumeMessageCenterPage = () => {
   }
 }
 
-export const interceptConversationList = () => {
+const interceptConversationList = () => {
   cy.intercept('GET', '**/api/conversation/all').as('conversationList')
 }
 
-export const waitForConversationList = (options?: {
-  expectedSubject?: string
-}) => {
+const waitForConversationList = (options?: { expectedSubject?: string }) => {
   cy.wait('@conversationList').should(({ response }) => {
     expect(response?.statusCode, 'load message center conversations').to.equal(
       200
@@ -70,9 +68,11 @@ export const waitForConversationList = (options?: {
   waitUntilAppIsNotBusy()
 }
 
-export const navigateToMessageCenter = () => {
+export const navigateToMessageCenter = (options?: {
+  expectedSubject?: string
+}) => {
   interceptConversationList()
   router().push('messageCenter')
-  waitForConversationList()
+  waitForConversationList(options)
   return assumeMessageCenterPage()
 }

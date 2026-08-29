@@ -1,6 +1,6 @@
 # Named SPA route honesty follow-up
 
-**Status:** in progress — slices 1–9 done; next is slice 10.
+**Status:** in progress — slices 1–10 done; next is slice 11.
 **Type:** ad-hoc plan (`.planning/quick/`)
 **Depends on:** shipped `.planning/quick/009-named-spa-route-honesty/` (PLAN retired; code and Proposed [ADR 0005](../../../docs/adrs/0005-web-routes.md) remain)
 **Merged from:** this file’s 009 leftovers **and** the former `.planning/quick/011-e2e-named-route-honesty/` (deleted as a duplicate 011).
@@ -234,18 +234,14 @@ Skip epub (slice 11).
 
 ---
 
-### 10. Remaining screen visits use visitNamed — Structure `[ ]`
+### 10. Remaining screen visits use visitNamed — Structure `[x]`
 
-**Timing:** yes — **bazaar** and **recall_remount** (remount lower-bound applies).
-
-Replace leftover `cy.visit('/…')` in bazaar, recall remount, recall stats, access tokens, message-center, circles list/show, identify, admin dashboard (`name: adminDashboard`, `query: { tab }`). `conversation.ts` uses the message-center helper.
+Bazaar, recall remount (`visitNamed('recall')` still `cy.visit` of compiled href), settings, circles list/show, identify, admin tab query. `conversation.ts` uses `navigateToMessageCenter`. Invitation and epub left for slice 11.
 
 | Spec | Median before (7) | Median after | Gate |
 |---|---|---|---|
-| bazaar | 8562 | | |
-| recall_remount | 12275 | | (also ≥ 70% of before → ≥ 8592) |
-
-**Verify:** those two specs 3× green + gates. If the slice blows the time-box, split by area; keep the same timing specs on the recall/bazaar half.
+| bazaar | 8562 | 8693 | pass (≤ 11562) |
+| recall_remount | 12275 | 11897 | pass (≤ 15275 and ≥ 8592) |
 
 ---
 

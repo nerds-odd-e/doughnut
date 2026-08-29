@@ -7,6 +7,7 @@ import { waitUntilAppIsNotBusy } from '../pageBase'
 import notebookPage from './notebookPage'
 import notebookCreationForm from './forms/notebookCreationForm'
 import { completeMoveNotebookToNewGroupDialog } from './notebookCatalogMoveToGroup'
+import router from '../router'
 
 export const circleIdAlias = (circleName: string) =>
   `circleId-${circleName.replace(/\s+/g, '-')}`
@@ -65,10 +66,10 @@ export const navigateToCircle = (circleName: string) => {
       | undefined
     if (aliases?.[alias]) {
       return cy.get(`@${alias}`, { log: false }).then((circleId) => {
-        cy.visit(`/circles/${circleId}`)
+        router().visitNamed('circleShow', { circleId: String(circleId) })
       })
     }
-    cy.visit('/circles')
+    router().visitNamed('circles')
     cy.findByText(circleName, { selector: 'a', timeout: 15000 })
       .should('be.visible')
       .click()

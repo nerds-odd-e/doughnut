@@ -1,8 +1,9 @@
 import { waitUntilAppIsNotBusy } from '../pageBase'
 import { submittableForm } from 'start/forms'
+import router from '../router'
 
 export const visitManageAccessTokensPage = () => {
-  cy.visit('/settings/access-tokens')
+  router().visitNamed('settingsAccessTokens')
   waitUntilAppIsNotBusy()
   return manageAccessTokensPage()
 }

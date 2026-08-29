@@ -1,24 +1,8 @@
 import { Then, When } from '@badeball/cypress-cucumber-preprocessor'
 import mock_services from '../start/mock_services/index'
 import start from '../start'
-import {
-  interceptConversationList,
-  waitForConversationList,
-} from '../start/pageObjects/messageCenterPage'
 import { waitForMenuDataUnreadCount } from '../start/pageObjects/messageCenterIndicator'
 import type { DataTable } from '@cucumber/cucumber'
-
-function openMessageCenter(expectedSubject: string) {
-  interceptConversationList()
-  cy.visit('/message-center')
-  waitForConversationList({ expectedSubject })
-}
-
-function reloginAndOpenMessageCenter(user: string, subject: string) {
-  return start.reloginAs(user).then(() => {
-    openMessageCenter(subject)
-  })
-}
 
 function expectConversationInMessageCenter(
   subject: string,
@@ -26,15 +10,19 @@ function expectConversationInMessageCenter(
   message: string,
   options: { reloginAs?: string } = {}
 ) {
+  const open = () =>
+    start
+      .navigateToMessageCenter({ expectedSubject: subject })
+      .openConversation(subject, partner)
+      .expectMessage(message)
+
   if (options.reloginAs) {
-    reloginAndOpenMessageCenter(options.reloginAs, subject)
+    start.reloginAs(options.reloginAs).then(() => {
+      open()
+    })
   } else {
-    openMessageCenter(subject)
+    open()
   }
-  start
-    .assumeMessageCenterPage()
-    .openConversation(subject, partner)
-    .expectMessage(message)
 }
 
 When(
