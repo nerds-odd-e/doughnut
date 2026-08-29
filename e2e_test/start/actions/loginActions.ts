@@ -1,5 +1,6 @@
 import { waitUntilAppIsNotBusy } from '../pageBase'
 import { mainMenu } from '../pageObjects/mainMenu'
+import router from '../router'
 import { HealthCheckController } from '@generated/donut-backend-api/sdk.gen'
 
 export const loginActions = {
@@ -36,7 +37,7 @@ export const loginActions = {
       if (username === 'none') {
         return
       }
-      cy.visit('/notebooks')
+      router().visitNamed('notebooks')
     })
   },
 
@@ -52,7 +53,7 @@ export const loginActions = {
       .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
       .join(' ')
     return this.reloginAs(username).then(() => {
-      cy.visit('/')
+      router().visitNamed('root')
       mainMenu().userOptions().userSettingsButton(displayName)
     })
   },

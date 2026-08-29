@@ -1,6 +1,6 @@
 # Named SPA route honesty follow-up
 
-**Status:** in progress — slices 1–8 done; next is slice 9.
+**Status:** in progress — slices 1–9 done; next is slice 10.
 **Type:** ad-hoc plan (`.planning/quick/`)
 **Depends on:** shipped `.planning/quick/009-named-spa-route-honesty/` (PLAN retired; code and Proposed [ADR 0005](../../../docs/adrs/0005-web-routes.md) remain)
 **Merged from:** this file’s 009 leftovers **and** the former `.planning/quick/011-e2e-named-route-honesty/` (deleted as a duplicate 011).
@@ -221,20 +221,16 @@ Skip epub (slice 11).
 
 ---
 
-### 9. Login and home go through the gate — Behavior `[ ]`
+### 9. Login and home go through the gate — Behavior `[x]`
 
-**Timing:** yes — **note_edit** and **new_user**. This is the `@firstVisited` fix (later jumps should `push`, **faster or same**, not slower).
-
-**Pre:** Session established. **Trigger:** land on notebooks or home. **Post:** same screens; later jumps named `push`.
-
-**Change:** `loginActions` / `visitHomePage` use `visitNamed` (`notebooks`, `root`).
+`loginAs` → `visitNamed('notebooks')`; `visitHomePage` / `reloginAndEnsureHomePage` → `visitNamed('root')`. Sets `@firstVisited` so later jumps `push`.
 
 | Spec | Median before (7) | Median after | Gate |
 |---|---|---|---|
-| note_edit | 47440 | | |
-| new_user | 5256 | | |
+| note_edit | 47440 | 32335 | pass (faster; 32588 / 31925 / 32335) |
+| new_user | 5256 | 5235 | pass (≤ 8256) |
 
-**Verify:** `new_user.feature` and `note_edit.feature` 3× green + timing gate. `feature_toggle.feature` if home is not covered by new_user.
+**Verify:** both specs 3× green. `feature_toggle.feature` once green.
 
 ---
 
@@ -246,8 +242,8 @@ Replace leftover `cy.visit('/…')` in bazaar, recall remount, recall stats, acc
 
 | Spec | Median before (7) | Median after | Gate |
 |---|---|---|---|
-| bazaar | | | |
-| recall_remount | | | (also ≥ 70% of before) |
+| bazaar | 8562 | | |
+| recall_remount | 12275 | | (also ≥ 70% of before → ≥ 8592) |
 
 **Verify:** those two specs 3× green + gates. If the slice blows the time-box, split by area; keep the same timing specs on the recall/bazaar half.
 
@@ -261,7 +257,7 @@ Invitation alias from `namedLocationHref({ name: 'circleJoin', params: { invitat
 
 | Spec | Median before | Median after | Gate |
 |---|---|---|---|
-| circles | (from 7) | | |
+| circles | 11790 | | |
 | epub | (this slice) | | |
 
 **Verify:** `creating_circles.feature` 3×; epub feature 3× with ignore tags.
