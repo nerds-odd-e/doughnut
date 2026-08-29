@@ -1,6 +1,6 @@
 # Named SPA route honesty follow-up
 
-**Status:** in progress — slices 1–4 done; next is slice 5.
+**Status:** in progress — slices 1–5 done; next is slice 6.
 **Type:** ad-hoc plan (`.planning/quick/`)
 **Depends on:** shipped `.planning/quick/009-named-spa-route-honesty/` (PLAN retired; code and Proposed [ADR 0005](../../../docs/adrs/0005-web-routes.md) remain)
 **Merged from:** this file’s 009 leftovers **and** the former `.planning/quick/011-e2e-named-route-honesty/` (deleted as a duplicate 011).
@@ -173,13 +173,13 @@ Optional already-escaped `innerHtml` on `wikiLinkAnchorHtml`. Property-field liv
 
 ---
 
-### 5. E2E bundles the compile helper — Structure `[ ]`
+### 5. E2E bundles the compile helper — Structure `[x]`
 
-**Timing:** no.
+Cypress esbuild and `e2e_test/tsconfig.json` alias `@/routes` → `frontend/src/routes` (not `@/` → pages). `e2e_test/start/router.ts` re-exports `namedLocationHref`. Navigation still uses fallback paths. `rootDir: ".."` + `noEmit: true` so the frontend href module is a legal TS input.
 
-Cypress esbuild + `e2e_test/tsconfig.json` alias to the href module (not page components). Import from `e2e_test/start/router.ts` so the bundle resolves.
+**Verify:** esbuild bundle of the router re-export includes href modules, not `.vue` pages. Runtime in slice 6.
 
-**Verify:** preprocess/import; runtime in slice 6.
+**Learning for slice 6:** import `noteShowHref` from `@/routes/noteShowLocation` (covered by the `@/routes` prefix).
 
 ---
 

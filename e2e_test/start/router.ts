@@ -54,4 +54,5 @@ const router = () => {
   }
 }
 
+export { namedLocationHref } from '@/routes/namedLocationHref'
 export default router
