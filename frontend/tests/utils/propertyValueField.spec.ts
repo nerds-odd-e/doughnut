@@ -7,6 +7,8 @@ import {
 import {
   deadWikiLinkPayloadFromAnchor,
   escapeHtmlForWikiLinkDisplay,
+  wikiLinkAnchorHtml,
+  wikiLinkBracketedInnerHtml,
   wikiTitleFromAuthoredToken,
 } from "@/utils/wikiLinkMarkup"
 
@@ -43,11 +45,17 @@ describe("propertyValueField utils", () => {
 
   it("turns only well-formed wiki markers into dead-wiki-link anchors with visible brackets", () => {
     const html = propertyValuePlainToDisplayHtml("See [[X]] here", [])
-    expect(html).toContain('class="dead-wiki-link"')
-    expect(html).toContain('class="wiki-bracket"')
-    expect(html).toContain("data-wiki-title")
-    expect(html).toContain("X")
-    expect(html).toContain("See ")
+    const innerHtml = wikiLinkBracketedInnerHtml("X")
+    expect(html).toContain(innerHtml)
+    expect(html).toBe(
+      `See ${wikiLinkAnchorHtml({
+        href: "#",
+        className: "dead-wiki-link",
+        target: "X",
+        display: "X",
+        innerHtml,
+      })} here`
+    )
   })
 
   it("does not treat empty or whitespace-only brackets as a wiki link", () => {
@@ -150,7 +158,6 @@ describe("propertyValueField utils", () => {
     expect(html).toContain("donut-wiki-link")
     expect(html).toContain(noteShowHref(42))
     expect(html).toContain('data-note-id="42"')
-    expect(html).toContain('class="wiki-bracket"')
   })
 
   it("resolves piped wiki marker using target and shows display as visible link", () => {

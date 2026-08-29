@@ -51,9 +51,7 @@ function wikiAnchorDisplayMatches(anchor: Element, display: string): boolean {
   return visibleInner === display.trim()
 }
 
-function parseWikiHtmlFragment(
-  html: string
-): { wrap: HTMLElement; doc: Document } | undefined {
+function parseWikiHtmlFragment(html: string): HTMLElement | undefined {
   const parser = new DOMParser()
   const doc = parser.parseFromString(
     `<div id="donut-wiki-html-wrap">${html}</div>`,
@@ -61,7 +59,7 @@ function parseWikiHtmlFragment(
   )
   const wrap = doc.getElementById("donut-wiki-html-wrap")
   if (!wrap) return undefined
-  return { wrap, doc }
+  return wrap
 }
 
 /** Rich editor HTML uses dead/pending wiki-link anchors, not [[ ]] literals; upgrade when titles resolve. */
@@ -71,9 +69,8 @@ function upgradeUnresolvedWikiAnchors(
 ): string {
   if (wikiTitles.length === 0) return html
   if (!UNRESOLVED_WIKI_LINK_CLASSES.some((c) => html.includes(c))) return html
-  const parsed = parseWikiHtmlFragment(html)
-  if (!parsed) return html
-  const { wrap } = parsed
+  const wrap = parseWikiHtmlFragment(html)
+  if (!wrap) return html
   const unresolvedAnchorSelector = UNRESOLVED_WIKI_LINK_CLASSES.map(
     (c) => `a.${c}`
   ).join(", ")
@@ -114,18 +111,16 @@ function confirmPendingWikiAnchorsAsDead(
   ) {
     return html
   }
-  const parsed = parseWikiHtmlFragment(html)
-  if (!parsed) return html
+  const wrap = parseWikiHtmlFragment(html)
+  if (!wrap) return html
 
-  for (const a of [
-    ...parsed.wrap.querySelectorAll(`a.${PENDING_WIKI_LINK_CLASS}`),
-  ]) {
+  for (const a of [...wrap.querySelectorAll(`a.${PENDING_WIKI_LINK_CLASS}`)]) {
     a.className = unresolvedWikiClass(
       authoredTokenFromWikiAnchor(a),
       lastSavedTokens
     )
   }
-  return parsed.wrap.innerHTML
+  return wrap.innerHTML
 }
 
 function unresolvedWikiAnchorHtmlFromInner(

@@ -15,7 +15,6 @@ import {
   isWikiLinkAnchor,
 } from "@/utils/wikiLinkDomMarkers"
 import {
-  escapeHtmlAttributeValue,
   escapeHtmlForWikiLinkDisplay,
   isValidWikiLinkInner,
   wikiAnchorToMarkdownToken,
@@ -66,18 +65,17 @@ export function propertyValuePlainToDisplayHtml(
 
     const { target, display } = splitWikiLinkInner(occ.token)
     const noteId = noteIdForAuthoredToken(occ.token, map)
-    const innerHtml = wikiLinkBracketedInnerHtml(display)
-    const attrTarget = escapeHtmlAttributeValue(target)
-    const displayAttr =
-      display !== target
-        ? ` data-wiki-display="${escapeHtmlAttributeValue(display)}"`
-        : ""
-    if (noteId !== undefined) {
-      out += `<a href="${noteShowHref(noteId)}" class="${DONUT_WIKI_LINK_CLASS}" data-wiki-title="${attrTarget}"${displayAttr} data-note-id="${noteId}">${innerHtml}</a>`
-    } else {
-      const className = unresolvedWikiClass(occ.token, lastSavedTokens)
-      out += `<a href="#" class="${className}" data-wiki-title="${attrTarget}"${displayAttr}>${innerHtml}</a>`
-    }
+    out += wikiLinkAnchorHtml({
+      href: noteId === undefined ? "#" : noteShowHref(noteId),
+      className:
+        noteId === undefined
+          ? unresolvedWikiClass(occ.token, lastSavedTokens)
+          : DONUT_WIKI_LINK_CLASS,
+      target,
+      display,
+      noteId,
+      innerHtml: wikiLinkBracketedInnerHtml(display),
+    })
   }
   out += escapeHtmlForWikiLinkDisplay(plain.slice(lastIndex))
   return out

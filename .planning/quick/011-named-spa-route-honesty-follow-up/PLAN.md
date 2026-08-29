@@ -1,6 +1,6 @@
 # Named SPA route honesty follow-up
 
-**Status:** in progress — slices 1–2 done; next is slice 3.
+**Status:** in progress — slices 1–3 done; next is slice 4.
 **Type:** ad-hoc plan (`.planning/quick/`)
 **Depends on:** shipped `.planning/quick/009-named-spa-route-honesty/` (PLAN retired; code and Proposed [ADR 0005](../../../docs/adrs/0005-web-routes.md) remain)
 **Merged from:** this file’s 009 leftovers **and** the former `.planning/quick/011-e2e-named-route-honesty/` (deleted as a duplicate 011).
@@ -19,7 +19,7 @@ Scope: the eight route-honesty commits only (not later Daily probe work). Bar: P
 
 2. **Live wiki HTML is asserted many times.** Canonical live tag lives in `replaceWikiLinksInHtml` “replaces known wikilink text with a note href”. Sibling helper cases and mounted specs now assert only their delta (slice 2). Dummy lockstep is one `it.each` (failureReport + four settings names).
 
-3. **Second live-token `<a>` builder.** `wikiLinkAnchorHtml` already owns href / class / `data-wiki-title` / display / `data-note-id`. `propertyValueField` still concatenates that attribute soup by hand so the body can be `wikiLinkBracketedInnerHtml`. Unresolved token tags in the same function do the same. Slice 3 of 009 kept this on purpose so serialize round-trip stayed `[[N]]`; the missing step is optional inner HTML on the helper, not a second attribute dialect. `parseWikiHtmlFragment` still returns `doc` after the unresolved-upgrade path switched to `outerHTML`; callers only use `wrap`.
+3. **Second live-token `<a>` builder.** `wikiLinkAnchorHtml` owns href / class / `data-wiki-title` / display / `data-note-id` / optional already-escaped inner HTML. `propertyValueField` live and unresolved tokens call it with `wikiLinkBracketedInnerHtml` (slice 3). `parseWikiHtmlFragment` returns the wrap element only.
 
 ### Sliced (meaningful) — E2E vs ADR lines 73–75
 
@@ -157,13 +157,11 @@ Canonical live HTML stays in the known-`[[MyNote]]` helper spec. Siblings assert
 
 ---
 
-### 3. Property-field token anchors go through `wikiLinkAnchorHtml` — Structure `[ ]`
+### 3. Property-field token anchors go through `wikiLinkAnchorHtml` — Structure `[x]`
 
-**Timing:** no.
+Optional already-escaped `innerHtml` on `wikiLinkAnchorHtml`. Property-field live/unresolved tokens call it with `wikiLinkBracketedInnerHtml`. Canonical property HTML shape is the dead well-formed case; live sibling keeps href/`data-note-id` delta. `parseWikiHtmlFragment` returns the wrap only. Serialize round-trip still `[[N]]`.
 
-Optional inner HTML on `wikiLinkAnchorHtml`; `propertyValueField` live and unresolved token `<a>` tags use it with `wikiLinkBracketedInnerHtml`. Serialize round-trip remains `[[N]]`. Return only the wrap from `parseWikiHtmlFragment`.
-
-**Verify:** `propertyValueField.spec.ts` and wiki helper specs touched.
+**Verify:** `propertyValueField.spec.ts` + `wikiLinkMarkup.spec.ts` — 26 passed after refactor; `replaceWikiLinksInHtml.spec.ts` also green during implementation.
 
 ---
 

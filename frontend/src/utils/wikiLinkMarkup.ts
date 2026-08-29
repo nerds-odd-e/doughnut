@@ -41,13 +41,14 @@ export function escapeHtmlAttributeValue(s: string): string {
   return s.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;")
 }
 
-/** Wiki-style `<a>`: live/dead class, `data-wiki-title`, optional display and note id. */
+/** Wiki-style `<a>`: live/dead class, `data-wiki-title`, optional display, note id, and already-escaped inner HTML. */
 export function wikiLinkAnchorHtml(attrs: {
   href: string
   className: string
   target: string
   display: string
   noteId?: number
+  innerHtml?: string
 }): string {
   const attrHref = escapeHtmlAttributeValue(attrs.href)
   const attrTarget = escapeHtmlAttributeValue(attrs.target)
@@ -57,7 +58,8 @@ export function wikiLinkAnchorHtml(attrs: {
       : ""
   const noteIdAttr =
     attrs.noteId === undefined ? "" : ` data-note-id="${attrs.noteId}"`
-  return `<a href="${attrHref}" class="${attrs.className}" data-wiki-title="${attrTarget}"${displayAttr}${noteIdAttr}>${escapeHtmlForWikiLinkDisplay(attrs.display)}</a>`
+  const body = attrs.innerHtml ?? escapeHtmlForWikiLinkDisplay(attrs.display)
+  return `<a href="${attrHref}" class="${attrs.className}" data-wiki-title="${attrTarget}"${displayAttr}${noteIdAttr}>${body}</a>`
 }
 
 /** `[[` / `]]` shown literally; title text escaped (same visible shape as plain wiki syntax). */
