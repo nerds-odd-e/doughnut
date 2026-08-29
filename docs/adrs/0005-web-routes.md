@@ -79,19 +79,26 @@ covers how those links relate to **web** destinations.
 - A **live** wiki link in the web app navigates to the **note-show** named
   route (id). The stored token is unchanged.
 - A path-Markdown href with a leading `/` is **bundle-relative** (ADR 0004),
-  not an SPA path. Classify hrefs before routing: note-show SPA vs concept
-  path vs external. Concept paths must not be fed to the router as locations.
+  not an SPA path. The two languages share a `/` prefix; they are not
+  disjoint by string shape. Treat a token by **context**: notebook content
+  vs a compiled location. Do not classify a leading `/` as a Vue path.
+- The HTML `href` of a wiki or path-Markdown anchor is **compiled** from
+  that named location (`noteShowHref` when live; `#` when unresolved). The
+  concept path stays in the stored token and on `data-wiki-title` — never
+  as a navigable `href`.
 - Paste or strip of a note-show (or legacy) URL in note content becomes a
   wiki token. SPA addresses are not the stored form of a wiki link.
 - Unresolved (dead / pending) wiki links do not navigate. `http(s)` opens a
-  new tab. Other in-app hrefs go through the router.
+  new tab. Other in-app hrefs go through the router as named locations (or
+  helpers). Concept-path strings and `#` are not locations.
 
 ## Consequences
 
 - Bookmarks and in-app wiki clicks share one web identity: note id.
 - Exported trees stay portable: no Donut SPA URLs required in the markdown.
 - Agents must not treat a concept path as a Vue location, or a note-show URL
-  as portable identity.
+  as portable identity. Do not put a concept path on an HTML `href` the
+  browser can follow.
 - Changing a path shape is a route-table (plus redirect) change; callers that
   used names keep working.
 

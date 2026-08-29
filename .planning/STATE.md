@@ -8,7 +8,7 @@ status: ready
 stopped_at: null
 last_updated: "2026-08-29T00:00:00Z"
 last_activity: 2026-08-29
-last_activity_desc: "Quick plan 011 named SPA route honesty follow-up (merged unit leftovers + E2E gate, planned)"
+last_activity_desc: "Quick plan 012 wiki-anchor compiled href (planned, not started)"
 progress:
   total_phases: 0
   completed_phases: 0
@@ -35,6 +35,7 @@ Scheduling follows Accepted [ADR 0003](../docs/adrs/0003-spaced-repetition-sched
 
 - Memory-tracker stability investigation closed: live `applyGrade` persists; `RecallLogMemoryStateBackfill` ran 2026-08-29 (125,570 rows); the 21.9/21.4 gate re-run still fails (`r=0.076`) but on complete data. See `.planning/quick/001-morning-cognitive-index/PLAN.md` slices 21.9/21.4.
 - Finish Proposed [ADR 0005](../docs/adrs/0005-web-routes.md) honesty (009 unit leftovers + E2E named-route gate, with navigation timing): `.planning/quick/011-named-spa-route-honesty-follow-up/PLAN.md` (planned, not started)
+- Compile path-Markdown HTML `href` (live `noteShowHref`, unresolved `#`): `.planning/quick/012-wiki-anchor-compiled-href/PLAN.md` (planned, not started)
 - Split SPA `/users/identify` from production OAuth continue via `.planning/quick/010-sign-in-path-split/PLAN.md` (planned, not started)
 - Infer pending vs dead wiki links and show a third style via `.planning/quick/006-wiki-link-pending-style/PLAN.md` (planned, not executed)
 - Complete remaining doughnut → donut naming via `.planning/quick/002-complete-donut-naming/PLAN.md`
