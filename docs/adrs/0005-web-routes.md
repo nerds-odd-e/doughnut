@@ -57,18 +57,26 @@ covers how those links relate to **web** destinations.
   from named metadata entries.
 - The URL identifies the **server-side note id**, not the portable path
   (ADR 0004). A **property** adds the **authored key** (no property
-  surrogate id). Note-show URLs are compact. Nested property path stays
-  under that note. Retired shapes redirect into the current table; do
-  not keep a second tree of screens.
+  surrogate id). Named route helpers receive the exact decoded key and
+  Vue Router serializes it as one path parameter; callers do not pre-encode
+  it. Note-show URLs are compact. Nested property path stays under that
+  note. Retired shapes redirect into the current table; do not keep a
+  second tree of screens.
 - Chrome on the current resource (conversation open) is **query on that
   named route**, not a new path.
 - A **property** is a nested resource, not chrome: named route
-  `noteProperty`, child of `noteShow`, last segment the authored key.
-  Same note page with that property open. Later expansion keeps this
-  path (or a child of it). Opening or closing the property **replaces**
-  within the note family; inbound links **push**. Product surfaces that
-  already know a property (next to assimilate, answered question, memory
-  tracker) navigate to `noteProperty` — not a side channel on `noteShow`.
+  `noteProperty`, nested under the note URL family, last segment the
+  authored key. It uses the same note page and shared notebook-layout parent
+  as `noteShow`. Later expansion keeps this path (or a child of it). Opening
+  or closing the property **replaces** within the note family; inbound links
+  **push**. Product surfaces that already know a property (next to
+  assimilate, answered question, memory tracker) navigate to
+  `noteProperty` — not a side channel on `noteShow`.
+- `noteShow` and `noteProperty` are one **note route family** for notebook
+  chrome, sidebar state, active navigation, and conversation query. A
+  route to a readable note with a missing property keeps the note visible
+  but shows an explicit unresolved-property state; it must not silently
+  look like `noteShow`.
 - E2E navigation goes through `e2e_test/start/router.ts` (`visitNamed` /
   named `push`). Compile hrefs with `namedLocationHref` / `noteShowHref`.
   Page objects and steps do not call `cy.visit` with SPA path strings
@@ -97,8 +105,11 @@ covers how those links relate to **web** destinations.
   named location. The concept path and `#prop:` key stay in the stored
   token — never as a navigable `href`.
 - Paste or strip of a `noteShow` or `noteProperty` (or legacy) URL in note
-  content becomes a wiki token (property URLs become `#prop:`). SPA
-  addresses are not the stored form of a wiki link.
+  content becomes a wiki token only after the note id is resolved to its
+  portable target (and cross-notebook qualification when needed).
+  Property URLs add the encoded `#prop:` component. Anchor text is display
+  text, never portable identity. SPA addresses are not the stored form of
+  a wiki link.
 - Unresolved (dead / pending) tokens do not navigate.
 
 ## Consequences

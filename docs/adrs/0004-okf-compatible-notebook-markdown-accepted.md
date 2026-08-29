@@ -87,19 +87,28 @@ profile. Codec round-trips must be lossless for these rules.
 - `.md` on a **path-shaped** target is optional and ignored (`/folder/File` =
   `/folder/File.md`; `[[folder/File.md]]` = `[[folder/File]]`). Do not strip
   `.md` from unqualified wiki titles (`[[File.md]]` may be a title).
-- A link may target a **property**: note target plus `#prop:` and the
-  authored key. Wiki: `[[Moon#prop:a part of]]`. Path Markdown:
-  `[a part of](/Solar/Moon.md#prop:a%20part%20of)` (percent-encoded key;
-  `.md` still optional **before** the fragment). Product insert writes
-  wiki. `#prop:` is this profile’s property marker, not a heading id.
-  Other fragments are not property links. Bare YAML paths (with or
+- A link may target a **property**: note target plus the reserved
+  `#prop:` separator and one non-empty encoded property-key component.
+  The component is the exact authored YAML key encoded from UTF-8 bytes:
+  RFC 3986 unreserved characters (`A-Z a-z 0-9 - . _ ~`) stay literal;
+  every other byte is `%HH`. Product output uses uppercase hex; readers
+  accept either hex case. Decode exactly once; an invalid escape or invalid
+  UTF-8 makes the property target unresolved. Compare the resulting key
+  case-sensitively. Wiki:
+  `[[Moon#prop:a%20part%20of]]`. Path Markdown:
+  `[a part of](/Solar/Moon.md#prop:a%20part%20of)` (`.md` remains
+  optional **before** the fragment). Product insert writes wiki. A
+  literal `#prop:` is reserved for this property separator, not a heading
+  id; other fragments are not property links. Bare YAML paths (with or
   without a fragment) are not links.
 - No active conversion of stored `[[…]]` ↔ `[…](…)`, including save/paste
   round-trip of path Markdown. ZIP export copies stored spelling. 
 - Both spellings share one resolved-link cache `(note, target_note,
   link_text)`. No style column. No second cache. Strip `#prop:…` to
-  resolve the note; property presence is an extra check on that note.
-  `link_text` includes the `#prop:` suffix.
+  resolve the note; decode the suffix and require that exact property on
+  the resolved note. `link_text` includes the encoded `#prop:` suffix.
+  A cached row must not keep a property link live after the target
+  property is removed or renamed.
 
 ### Validation
 

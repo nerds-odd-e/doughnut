@@ -46,15 +46,16 @@ concepts, including **Cognitive index** measurement, live in [ADR
 - **Wiki link** — In-content reference to a **note** or a **property**
   on a note. Donut-authored form is wiki `[[target]]` /
   `[[target|display]]` (optionally `Notebook:Title`; a property appends
-  `#prop:key`). Path Markdown is the same link. Spelling:
+  `#prop:<encoded-key>`). Path Markdown is the same link. Spelling and
+  property-key encoding:
   [ADR 0004](./0004-okf-compatible-notebook-markdown-accepted.md). Web
   destination: [ADR 0005](./0005-web-routes.md).
 - **Property** — YAML frontmatter key–value on a note (scalar or
   one-level list). Distinct from a **relationship note**. A value may
   contain **wiki links**. Relation-like keys (`example of`, `a part of`)
-  are still properties. Portable identity is (concept path, YAML key)
-  via `#prop:` (ADR 0004). Web canonical location is `noteProperty`
-  (ADR 0005).
+  are still properties. Portable identity is (concept path, exact YAML
+  key) via `#prop:<encoded-key>` (ADR 0004). Web canonical location is
+  `noteProperty` (ADR 0005).
 - **Relationship** — Typed association between notes (e.g. “similar to”,
   “a part of”)
 - **Relationship note** — A note that represents a relationship
