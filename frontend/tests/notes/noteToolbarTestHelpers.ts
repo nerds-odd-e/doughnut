@@ -77,7 +77,7 @@ export function mockDefaultNoteRecallInfo() {
   mockSdkService(NoteController, "getNoteInfo", makeMe.aNoteRecallInfo.please())
 }
 
-type NoteToolbarMountOptions = {
+export type NoteToolbarMountOptions = {
   router?: Router
   plugin?: Parameters<
     ReturnType<typeof helper.component<typeof NoteToolbar>>["withPlugin"]

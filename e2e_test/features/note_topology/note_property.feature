@@ -78,3 +78,10 @@ Feature: Note property location
     Then I should be at property "topic" of note "Vitamins" with conversation query
     When I close the value panel
     Then I should be at note "Vitamins" with conversation query
+
+  Scenario: Starting and closing a conversation keeps the property location
+    Given I visit property "wikidata_id" of note "Vitamins"
+    When I start a conversation about this note
+    Then I should be at property "wikidata_id" of note "Vitamins" with conversation query
+    When I close the conversation
+    Then I should be at property "wikidata_id" of note "Vitamins"

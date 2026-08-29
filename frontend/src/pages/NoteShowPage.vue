@@ -22,7 +22,7 @@
             <NoteConversation
               :note-id="conversationRealm.id"
               :is-maximized="isContentMinimized"
-              @close-dialog="handleCloseConversation(conversationRealm)"
+              @close-dialog="handleCloseConversation"
               @toggle-maximize="toggleMaximize"
             />
           </div>
@@ -39,8 +39,7 @@ import { useRoute, useRouter } from "vue-router"
 import NoteShow from "../components/notes/NoteShow.vue"
 import NoteConversation from "../components/conversations/NoteConversation.vue"
 import ContentLoader from "@/components/commons/ContentLoader.vue"
-import { noteShowLocation } from "@/routes/noteShowLocation"
-import type { NoteRealm } from "@generated/donut-backend-api"
+import { currentRouteSettingConversation } from "@/routes/noteShowLocation"
 import { useAssimilationView } from "@/composables/useAssimilationView"
 
 const router = useRouter()
@@ -74,12 +73,9 @@ const toggleMaximize = () => {
   isContentMinimized.value = !isContentMinimized.value
 }
 
-const handleCloseConversation = (conversationRealm: NoteRealm) => {
+const handleCloseConversation = () => {
   isContentMinimized.value = false
-  router.replace({
-    ...noteShowLocation(conversationRealm.id),
-    query: {},
-  })
+  router.replace(currentRouteSettingConversation(route, false))
 }
 </script>
 

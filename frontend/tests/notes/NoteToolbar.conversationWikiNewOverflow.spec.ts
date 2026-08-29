@@ -22,8 +22,11 @@ import {
   overflowMenuItem,
   resetNoteToolbarTestState,
 } from "@tests/notes/noteToolbarTestHelpers"
+import { mountNoteToolbarAt } from "@tests/notes/noteToolbarRouteMount"
+import { notebookSidebarClosedPlugin } from "@tests/helpers/notebookSidebarTestProvide"
 import { setupNoteNewFormSdkMocks } from "@tests/notes/noteNewFormTestSupport"
 import { setupSearchFormSdkMocks } from "@tests/wiki-link-or-relationship/searchDialogTestSupport"
+import { notePropertyLocation } from "@/routes/noteShowLocation"
 import { describe, it, expect, afterEach, beforeEach, vi } from "vitest"
 import { type VueWrapper, flushPromises } from "@vue/test-utils"
 
@@ -115,5 +118,23 @@ describe("NoteToolbar Conversation, Wiki, and New overflow", () => {
     expect(noteToolbarWikiHidden(wrapper)).toBe(true)
     expect(noteToolbarNewDisplayed(wrapper)).toBe(false)
     expect(noteToolbarAction(wrapper, titles.audio).exists()).toBe(false)
+  })
+
+  it("keeps the current property location when starting a conversation from overflow", async () => {
+    const mounted = await mountNoteToolbarAt(
+      (noteId) => notePropertyLocation(noteId, "topic"),
+      { plugin: notebookSidebarClosedPlugin() }
+    )
+    wrapper = mounted.wrapper
+    const { router, noteRealm } = mounted
+    await layoutNoteToolbar(wrapper, conversationOverflowNavWidth())
+    await openNoteToolbarOverflowMenu(wrapper)
+    overflowMenuItem(titles.conversation)!.click()
+    await flushPromises()
+
+    expect(router.currentRoute.value).toMatchObject(
+      notePropertyLocation(noteRealm.note.id, "topic")
+    )
+    expect(router.currentRoute.value.query).toEqual({ conversation: "true" })
   })
 })

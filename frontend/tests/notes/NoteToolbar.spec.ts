@@ -10,14 +10,17 @@ import {
   mountNoteToolbar,
   resetNoteToolbarTestState,
 } from "@tests/notes/noteToolbarTestHelpers"
+import { mountNoteToolbarAt } from "@tests/notes/noteToolbarRouteMount"
 import { wrapWithNoteShortcutScope } from "@tests/helpers/noteShortcutScopeTestHelpers"
 import NoteToolbar from "@/components/notes/core/NoteToolbar.vue"
 import { noteToolbarEditTitles } from "@/components/notes/widgets/noteMoreOptionsTitles"
+import {
+  notePropertyLocation,
+  noteShowLocation,
+} from "@/routes/noteShowLocation"
 import { screen } from "@testing-library/vue"
 import { describe, it, expect, afterEach, beforeEach, vi } from "vitest"
 import { type VueWrapper, flushPromises } from "@vue/test-utils"
-import { createRouter, createWebHistory } from "vue-router"
-import routes from "@/routes/routes"
 
 describe("NoteToolbar", () => {
   // biome-ignore lint/suspicious/noExplicitAny: wrapper for testing
@@ -35,27 +38,42 @@ describe("NoteToolbar", () => {
     resetNoteToolbarTestState()
   })
 
-  it("routes to note show by id when starting a conversation about the note", async () => {
-    const router = createRouter({
-      history: createWebHistory(),
-      routes,
-    })
+  it("replaces conversation query on the current note location", async () => {
+    const mounted = await mountNoteToolbarAt(noteShowLocation)
+    wrapper = mounted.wrapper
+    const { router, noteRealm } = mounted
+    const replaceSpy = vi.spyOn(router, "replace")
     const pushSpy = vi.spyOn(router, "push")
-    const noteRealm = makeMe.aNoteRealm.title("Dummy Title").please()
 
-    wrapper = await mountNoteToolbar(noteRealm, { router })
     await wrapper
       .find('[title="Start a conversation about this note"]')
       .trigger("click")
     await flushPromises()
 
-    expect(pushSpy).toHaveBeenCalledWith({
-      name: "noteShow",
-      params: {
-        noteId: String(noteRealm.note.id),
-      },
+    expect(pushSpy).not.toHaveBeenCalled()
+    expect(replaceSpy).toHaveBeenCalledTimes(1)
+    expect(router.currentRoute.value).toMatchObject({
+      ...noteShowLocation(noteRealm.note.id),
       query: { conversation: "true" },
     })
+  })
+
+  it("keeps the focused property when starting a conversation", async () => {
+    const mounted = await mountNoteToolbarAt((noteId) =>
+      notePropertyLocation(noteId, "topic")
+    )
+    wrapper = mounted.wrapper
+    const { router, noteRealm } = mounted
+
+    await wrapper
+      .find('[title="Start a conversation about this note"]')
+      .trigger("click")
+    await flushPromises()
+
+    expect(router.currentRoute.value).toMatchObject(
+      notePropertyLocation(noteRealm.note.id, "topic")
+    )
+    expect(router.currentRoute.value.query).toEqual({ conversation: "true" })
   })
 
   function dispatchWikiLinkOrRelationshipShortcut() {

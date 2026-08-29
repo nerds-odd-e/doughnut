@@ -54,6 +54,23 @@ export function notePropertyKeyFromRoute(
   return Array.isArray(raw) ? raw[0] : raw
 }
 
+export function currentRouteSettingConversation(
+  route: Pick<RouteLocationNormalizedLoaded, "name" | "params" | "query">,
+  conversationOpen: boolean
+): RouteLocationNamedRaw {
+  const query = { ...route.query }
+  if (conversationOpen) {
+    query.conversation = "true"
+  } else {
+    delete query.conversation
+  }
+  return {
+    name: route.name ?? undefined,
+    params: { ...route.params },
+    query,
+  }
+}
+
 const unmatchedLocation: RouteRecordRaw = {
   path: "/:pathMatch(.*)*",
   component: { template: "<div />" },

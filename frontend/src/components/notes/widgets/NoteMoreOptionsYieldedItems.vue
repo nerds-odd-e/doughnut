@@ -33,7 +33,6 @@
 </template>
 
 <script setup lang="ts">
-import type { Note } from "@generated/donut-backend-api"
 import {
   FileCode,
   LayoutTemplate,
@@ -43,9 +42,9 @@ import {
 } from "@lucide/vue"
 import DropdownMenuActionButton from "@/components/commons/DropdownMenuActionButton.vue"
 import DropdownMenuItem from "@/components/commons/DropdownMenuItem.vue"
-import { noteShowLocation } from "@/routes/noteShowLocation"
+import { currentRouteSettingConversation } from "@/routes/noteShowLocation"
 import { computed } from "vue"
-import { useRouter } from "vue-router"
+import { useRoute, useRouter } from "vue-router"
 import {
   noteMoreOptionsTitles,
   noteToolbarEditTitle,
@@ -56,7 +55,6 @@ const titles = noteMoreOptionsTitles
 
 const props = withDefaults(
   defineProps<{
-    note: Note
     only?: NoteMoreOptionsActionId[]
     asMarkdown?: boolean
   }>(),
@@ -71,6 +69,7 @@ const emit = defineEmits<{
 }>()
 
 const router = useRouter()
+const route = useRoute()
 const editTitle = computed(() => noteToolbarEditTitle(props.asMarkdown))
 const show = (id: NoteMoreOptionsActionId) =>
   !props.only || props.only.includes(id)
@@ -83,12 +82,7 @@ const closeAfter = (action: () => void) => {
 const onNew = () => closeAfter(() => emit("open-new"))
 const onWiki = () => closeAfter(() => emit("open-wiki"))
 const onConversation = () =>
-  closeAfter(() =>
-    router.push({
-      ...noteShowLocation(props.note.noteTopology.id),
-      query: { conversation: "true" },
-    })
-  )
+  closeAfter(() => router.replace(currentRouteSettingConversation(route, true)))
 const onEdit = () =>
   closeAfter(() => emit("edit-as-markdown", !props.asMarkdown))
 </script>

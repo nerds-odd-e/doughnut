@@ -38,10 +38,7 @@
         class="daisy-btn daisy-btn-ghost daisy-btn-sm"
         role="button"
         :aria-label="noteMoreOptionsTitles.conversation"
-        @click="() => router.push({
-          ...noteShowLocation(note.noteTopology.id),
-          query: { conversation: 'true' },
-        })"
+        @click="startNoteConversation"
         :title="noteMoreOptionsTitles.conversation"
       >
         <MessageCircle class="w-6 h-6" />
@@ -98,10 +95,10 @@ import NoteToolbarPanelShell from "./NoteToolbarPanelShell.vue"
 import { useNoteToolbarPanel } from "@/composables/useNoteToolbarPanel"
 import { useAssimilationView } from "@/composables/useAssimilationView"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
-import { useRouter } from "vue-router"
+import { useRoute, useRouter } from "vue-router"
 import NoteToolbarMoreOptions from "../widgets/NoteToolbarMoreOptions.vue"
 import { noteChromeToolbarNavClass } from "../noteChromeToolbarNavClass"
-import { noteShowLocation } from "@/routes/noteShowLocation"
+import { currentRouteSettingConversation } from "@/routes/noteShowLocation"
 import NoteCreationNewButton from "../NoteCreationNewButton.vue"
 import { useNotebookSidebarOpened } from "@/composables/notebookSidebarOpened"
 import { useKeyboardShortcut } from "@/composables/useKeyboardShortcut"
@@ -162,7 +159,12 @@ const newOverflowed = computed(() => overflowedIds.value.includes("new"))
 const editTitle = computed(() => noteToolbarEditTitle(props.asMarkdown))
 
 const router = useRouter()
+const route = useRoute()
 const shortcutScope = useNoteShortcutScope()
+
+function startNoteConversation() {
+  return router.replace(currentRouteSettingConversation(route, true))
+}
 
 const emit = defineEmits<{
   (e: "edit-as-markdown", value: boolean): void

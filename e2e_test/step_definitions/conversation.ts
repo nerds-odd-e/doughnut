@@ -85,6 +85,14 @@ When(
   }
 )
 
+When('I start a conversation about this note', () => {
+  start.assumeNotePage().startAConversationAboutNote()
+})
+
+When('I close the conversation', () => {
+  start.assumeNotePage().closeConversation()
+})
+
 When(
   'I start a conversation about the note {string} inviting AI with the message {string}',
   (note: string, conversation: string) => {

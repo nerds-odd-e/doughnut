@@ -54,6 +54,11 @@ export const noteConversationAndQuestionMethods = () => ({
     return assumeConversationAboutNotePage()
   },
 
+  closeConversation() {
+    assumeConversationAboutNotePage().closeConversation()
+    return this
+  },
+
   sendMessageToAI(message: string) {
     this.startAConversationAboutNote().replyToConversationAndInviteAiToReply(
       message

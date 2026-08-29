@@ -1,7 +1,6 @@
 <template>
   <template v-if="layout === 'menu'">
     <NoteMoreOptionsYieldedItems
-      :note="note"
       :only="only"
       :as-markdown="asMarkdown"
       @close-dialog="closeDialogIfMenu"

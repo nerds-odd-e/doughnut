@@ -8,6 +8,7 @@ import {
   setupNoteShowPageConversationMocks,
   toggleMaximizeButtonEl,
 } from "@tests/pages/noteShowPageTestSupport"
+import { notePropertyLocation } from "@/routes/noteShowLocation"
 import { flushPromises } from "@vue/test-utils"
 import { beforeEach, describe, expect, it, vi } from "vitest"
 
@@ -49,6 +50,20 @@ describe("note show page conversation", () => {
     expect(router.currentRoute.value.query.conversation).toBeUndefined()
     expect(noteContentWrapperEl()).not.toBeNull()
     expect(conversationContainerEl()).toBeNull()
+  })
+
+  it("clears conversation query without leaving the property location", async () => {
+    await renderNoteShowPageWithConversation(router, noteId, {
+      ...notePropertyLocation(noteId, "topic"),
+      query: { conversation: "true" },
+    })
+
+    closeConversationButtonEl()!.click()
+    await flushPromises()
+
+    expect(router.currentRoute.value).toMatchObject(
+      notePropertyLocation(noteId, "topic")
+    )
   })
 
   it("opens conversation when URL has conversation=true", async () => {

@@ -123,9 +123,10 @@ export async function renderNoteShowPageWithoutSidebar(
 
 export async function renderNoteShowPageWithConversation(
   router: Router,
-  noteId: number
+  noteId: number,
+  location: RouteLocationNamedRaw = noteShowConversationLocation(noteId)
 ) {
-  await router.push(noteShowConversationLocation(noteId))
+  await router.push(location)
   noteShowPageMount(router, noteId).render()
   await flushPromises()
 }

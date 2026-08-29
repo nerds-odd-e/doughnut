@@ -74,6 +74,12 @@ export class ConversationAboutNotePage {
     return this
   }
 
+  closeConversation() {
+    cy.findByRole('button', { name: 'Close dialog' }).click()
+    waitUntilAppIsNotBusy()
+    return this
+  }
+
   shouldShowCompletion() {
     cy.findByRole('dialog')
       .should('be.visible')
