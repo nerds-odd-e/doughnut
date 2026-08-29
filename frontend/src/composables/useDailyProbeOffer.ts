@@ -19,8 +19,9 @@ export function useDailyProbeOffer(
           query: { timezone: timezoneParam() },
         })
       )
-      if (error) return
-      completedToday.value = data.completed
+      if (!error) {
+        completedToday.value = data!.completed
+      }
     },
     { immediate: true }
   )

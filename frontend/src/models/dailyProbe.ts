@@ -47,6 +47,7 @@ export const dailyProbeScoredSequence = [
 export function mapDailyProbeKey(key: string): DailyProbeSide | undefined {
   if (key === "f" || key === "F" || key === "ArrowLeft") return "left"
   if (key === "j" || key === "J" || key === "ArrowRight") return "right"
+  return undefined
 }
 
 export function recordDailyProbeTrial(input: {

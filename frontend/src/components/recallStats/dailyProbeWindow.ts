@@ -14,7 +14,7 @@ export function localDayIso(timeZone: string, instant = new Date()): string {
 }
 
 export function isoDateDaysBefore(iso: string, days: number): string {
-  const [year, month, day] = iso.split("-").map(Number)
+  const [year = 1970, month = 1, day = 1] = iso.split("-").map(Number)
   return new Date(Date.UTC(year, month - 1, day - days))
     .toISOString()
     .slice(0, 10)
