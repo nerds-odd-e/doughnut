@@ -1,4 +1,7 @@
 <template>
+  <RichFrontmatterPropertyNotFound
+    :property-keys="propertyRows.map((row) => row.key)"
+  />
   <section
     v-if="showSection"
     class="mb-3"
@@ -101,6 +104,7 @@ import { computed, provide, ref, useId, watch } from "vue"
 import RichFrontmatterReadOnlyList from "@/components/form/RichFrontmatterReadOnlyList.vue"
 import RichFrontmatterEditablePropertyList from "@/components/form/RichFrontmatterEditablePropertyList.vue"
 import RichFrontmatterInsertForm from "@/components/form/RichFrontmatterInsertForm.vue"
+import RichFrontmatterPropertyNotFound from "@/components/form/RichFrontmatterPropertyNotFound.vue"
 import { richFrontmatterIsReadmeContextKey } from "@/components/form/richFrontmatterProvide"
 import WikidataAssociationDialog from "@/components/notes/WikidataAssociationDialog.vue"
 import type { WikiTitle } from "@generated/donut-backend-api"

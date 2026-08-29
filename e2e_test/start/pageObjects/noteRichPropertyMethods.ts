@@ -70,6 +70,22 @@ export const noteRichPropertyMethods = () => ({
     cy.get('dialog').should('not.exist')
     return this
   },
+  expectRichNotePropertyNotFound(key: string) {
+    this.switchToRichContent()
+    const expected = `Property "${key}" not found`
+    findNoteContentRegion().within(() => {
+      cy.get('[data-testid="rich-note-property-not-found"]').should(($el) => {
+        const actual = $el.text().trim()
+        expect(
+          actual,
+          `Expected property-not-found state ${JSON.stringify(expected)}, but found ${JSON.stringify(actual)}`
+        ).to.equal(expected)
+      })
+      cy.get('[data-property-focused="true"]').should('not.exist')
+    })
+    cy.get('dialog').should('not.exist')
+    return this
+  },
   expectRichNotePropertyDisplayed(key: string, value: string) {
     findNoteContentRegion().within(() => {
       cy.contains('h4', 'Properties')

@@ -51,3 +51,11 @@ Feature: Note property location
       | note-title |
       | Minerals   |
     And the rich note property "topic" should be focused showing "micronutrients" without a value dialog
+
+  Scenario: Visiting a stale property location shows that the property is not found
+    Given I visit note "Vitamins"
+    When I visit property "example of" of note "Vitamins"
+    Then I should see the note tree in the sidebar
+      | note-title |
+      | Vitamins   |
+    And the property "example of" should not be found

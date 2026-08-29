@@ -135,29 +135,6 @@ When('I visit note {string}', (noteTopology: string) => {
 })
 
 When(
-  'I visit property {string} of note {string}',
-  (propertyKey: string, noteTopology: string) => {
-    start.jumpToNoteProperty(noteTopology, propertyKey)
-  }
-)
-
-Then(
-  'the rich note property {string} should be focused with its value dialog open',
-  (key: string) => {
-    start.assumeNotePage().expectFocusedRichNoteProperty(key)
-  }
-)
-
-Then(
-  'the rich note property {string} should be focused showing {string} without a value dialog',
-  (key: string, value: string) => {
-    start
-      .assumeNotePage()
-      .expectFocusedRichNotePropertyValueWithoutDialog(key, value)
-  }
-)
-
-When(
   'I update note {string} content using markdown to become:',
   (noteTopology: string, newContent: string) => {
     start.jumpToNotePage(noteTopology).updateContentAsMarkdown(newContent)

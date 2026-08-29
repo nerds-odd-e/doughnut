@@ -1,5 +1,12 @@
 import { notePropertyKeyFromRoute } from "@/routes/noteShowLocation"
-import { computed, nextTick, watch, type ComponentPublicInstance } from "vue"
+import {
+  computed,
+  nextTick,
+  toValue,
+  watch,
+  type ComponentPublicInstance,
+  type MaybeRefOrGetter,
+} from "vue"
 import { useRoute } from "vue-router"
 
 function scrollPropertyRowIntoView(element: HTMLElement) {
@@ -9,10 +16,22 @@ function scrollPropertyRowIntoView(element: HTMLElement) {
   })
 }
 
-export function useFocusedNoteProperty() {
+export function useFocusedNoteProperty(
+  propertyKeys?: MaybeRefOrGetter<readonly string[]>
+) {
   const route = useRoute()
   const propertyRowElements = new Map<string, HTMLElement>()
   const focusedPropertyKey = computed(() => notePropertyKeyFromRoute(route))
+  const unresolvedPropertyKey = computed(() => {
+    if (propertyKeys === undefined) {
+      return
+    }
+    const key = focusedPropertyKey.value
+    if (!key || toValue(propertyKeys).includes(key)) {
+      return
+    }
+    return key
+  })
 
   const isFocusedProperty = (propertyKey: string) =>
     focusedPropertyKey.value === propertyKey
@@ -45,5 +64,6 @@ export function useFocusedNoteProperty() {
   return {
     isFocusedProperty,
     setPropertyRowRef,
+    unresolvedPropertyKey,
   }
 }

@@ -91,4 +91,22 @@ Workshop body.`
     ).toBe(true)
     expect(dialogEl()).toBeNull()
   })
+
+  it("visiting noteProperty for a missing key shows not-found with the decoded key and does not open a value dialog", async () => {
+    const wrapper = await h.mountEditor(markdown, {
+      attachToBody: true,
+      noteId,
+      route: notePropertyLocation(noteId, "example of"),
+    })
+
+    expect(
+      wrapper.find('[data-testid="rich-note-property-not-found"]').text()
+    ).toBe('Property "example of" not found')
+    expect(
+      wrapper
+        .find(propertyRowSelector("topic"))
+        .attributes("data-property-focused")
+    ).toBeUndefined()
+    expect(dialogEl()).toBeNull()
+  })
 })

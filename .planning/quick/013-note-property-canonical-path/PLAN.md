@@ -1,6 +1,6 @@
 # Note property canonical path
 
-**Status:** in progress (slices 1–3 done; 4–17 remaining).
+**Status:** in progress (slices 1–4 done; 5–17 remaining).
 **Type:** ad-hoc plan (`.planning/quick/`)
 **Policy:** [ADR 0001](../../../docs/adrs/0001-ubiquitous-language.md) (**Property**, **Wiki link**), [ADR 0004](../../../docs/adrs/0004-okf-compatible-notebook-markdown-accepted.md) (`#prop:`), Proposed [ADR 0005](../../../docs/adrs/0005-web-routes.md) (`noteProperty`).
 **Human-owned exception (2026-08-29):** ADR 0001 / ADR 0004 may depend on
@@ -126,11 +126,11 @@ and subscribed read-only rows highlight and scroll without a value dialog.
 E2E in `note_property.feature`. Focused-row Cypress assertion:
 `expectRichNotePropertyRowFocused`.
 
-### 4. A stale property location fails visibly — **Behavior** — planned
+### 4. A stale property location fails visibly — **Behavior** — done
 
-**Pre:** readable note without the routed property key. **Trigger:** visit
-`noteProperty`. **Post:** note context remains visible and an explicit
-property-not-found state names the decoded key; no other property dialog opens.
+Stay on `noteProperty`. Banner `Property "<decoded key>" not found` via
+`RichFrontmatterPropertyNotFound`. No other dialog. E2E in
+`note_property.feature`; steps in `e2e_test/step_definitions/note_property.ts`.
 
 ### 5. Property panel transitions update the location — **Behavior** — planned
 
@@ -262,11 +262,14 @@ invent identity from the label. Extend the internal-URL classifier so
   separate stricter serialization.
 - Sticky realm, drawer, and main-nav consume `isNoteRouteFamily`; do not
   re-append `noteShow` to those lists when adding `noteProperty`.
-- Slice 2–3: `useFocusedNoteProperty` is the route-neutral focus seam for
-  slices 3–4. Editable text-capable rows also open the value dialog from
-  `isFocused`. Do not add a second focus source. Pending-property dual-ref
-  stays until slice 9. Highlight classes on editable rows still serve
-  pending-assimilation (removed in slice 9) as well as route focus.
+- Missing-key stays on `noteProperty` with `RichFrontmatterPropertyNotFound`.
+  Intentional deletion of the focused key (slice 8) still replaces to
+  `noteShow` — do not reuse the not-found banner for that case.
+- `useFocusedNoteProperty` is the route-neutral focus seam. Editable
+  text-capable rows also open the value dialog from `isFocused`. Do not add
+  a second focus source. Pending-property dual-ref stays until slice 9.
+  Highlight classes on editable rows still serve pending-assimilation
+  (removed in slice 9) as well as route focus.
 - Next-assimilate already distinguishes property units (settings off, pending
   row). The route replaces both the destination and the pending-property
   memory/selector language.
