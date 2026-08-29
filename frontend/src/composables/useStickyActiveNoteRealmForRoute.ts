@@ -1,11 +1,12 @@
 import type { NoteRealm } from "@generated/donut-backend-api"
 import type NoteStorage from "@/store/NoteStorage"
+import { noteRouteFamilyNoteId } from "@/routes/noteRouteFamily"
 import { ref, watch, type Ref } from "vue"
 import type { RouteLocationNormalizedLoaded } from "vue-router"
 
 /**
- * On noteShow, keeps the last loaded NoteRealm until the target note is cached,
- * so sidebar chrome does not blank while showNote is in flight.
+ * On note-family routes, keeps the last loaded NoteRealm until the target note
+ * is cached, so sidebar chrome does not blank while showNote is in flight.
  */
 export function useStickyActiveNoteRealmForRoute(
   route: RouteLocationNormalizedLoaded,
@@ -15,20 +16,17 @@ export function useStickyActiveNoteRealmForRoute(
 
   watch(
     () => {
-      if (route.name !== "noteShow") {
-        return { onNoteShow: false as const, realm: undefined }
-      }
-      const id = Number(route.params.noteId)
+      const id = Number(noteRouteFamilyNoteId(route))
       if (!Number.isFinite(id)) {
-        return { onNoteShow: false as const, realm: undefined }
+        return { onNoteFamily: false as const, realm: undefined }
       }
       return {
-        onNoteShow: true as const,
+        onNoteFamily: true as const,
         realm: storageAccessor.value.refOfNoteRealm(id).value,
       }
     },
-    ({ onNoteShow, realm }) => {
-      if (!onNoteShow) {
+    ({ onNoteFamily, realm }) => {
+      if (!onNoteFamily) {
         activeNoteRealm.value = undefined
       } else if (realm !== undefined) {
         activeNoteRealm.value = realm

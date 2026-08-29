@@ -1,4 +1,5 @@
 import { provideNotebookSidebarOpened } from "@/composables/notebookSidebarOpened"
+import { noteRouteFamilyNoteId } from "@/routes/noteRouteFamily"
 import { computed, onBeforeUnmount, onMounted, ref, watch, type Ref } from "vue"
 import type { RouteLocationNormalizedLoaded } from "vue-router"
 
@@ -46,10 +47,7 @@ export function useNotebookSidebarDrawer(
   }
 
   watch(
-    () => [
-      currentNotebookId.value,
-      route.name === "noteShow" ? route.params.noteId : undefined,
-    ],
+    () => [currentNotebookId.value, noteRouteFamilyNoteId(route)],
     closeSidebarOnMobile
   )
 

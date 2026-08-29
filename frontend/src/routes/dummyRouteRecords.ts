@@ -1,19 +1,22 @@
-import type { RouteRecordRaw } from "vue-router"
+import type { RouteComponent, RouteRecordRaw } from "vue-router"
 import { routeMetadata } from "./routeMetadata"
+import {
+  legacyDeeplinkPrefixRedirect,
+  routeRecordsFromMetadata,
+} from "./routeRecordsFromMetadata"
+
+function dummyComponent(name: string): RouteComponent {
+  return {
+    template: `<div>${name} (Mock)</div>`,
+  }
+}
 
 /** Metadata table with dummy components so href can compile without page imports. */
-export const dummyRouteRecordsFromMetadata: RouteRecordRaw[] =
-  routeMetadata.map((metadata) => {
-    if (metadata.redirect !== undefined) {
-      return {
-        path: metadata.path,
-        redirect: metadata.redirect,
-      } as RouteRecordRaw
-    }
-    return {
-      ...metadata,
-      component: {
-        template: `<div>${metadata.name} (Mock)</div>`,
-      },
-    }
-  }) as RouteRecordRaw[]
+export const dummyRouteRecordsFromMetadata: RouteRecordRaw[] = [
+  ...routeRecordsFromMetadata(
+    routeMetadata,
+    (name) => dummyComponent(name),
+    dummyComponent("notebookSidebar")
+  ),
+  legacyDeeplinkPrefixRedirect,
+]

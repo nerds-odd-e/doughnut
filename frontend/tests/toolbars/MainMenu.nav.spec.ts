@@ -61,6 +61,14 @@ describe("MainMenu navigation", () => {
       context: "folder page",
     },
     {
+      linkLabel: "Note",
+      route: {
+        name: "noteShow",
+        params: { noteId: "1" },
+      } as RouteLocationRaw,
+      context: "note show",
+    },
+    {
       linkLabel: "Circles",
       route: {
         name: "circleShow",

@@ -77,4 +77,27 @@ describe("Sidebar route navigation: sticky realm during uncached note load", () 
 
     expect(sidebarShowsActiveItem(wrapper, activeTitle)).toBe(false)
   })
+
+  it("closes the mobile drawer when navigating to another note", async () => {
+    const originalWidth = window.innerWidth
+    Object.defineProperty(window, "innerWidth", {
+      configurable: true,
+      value: 500,
+    })
+    try {
+      const router = await mountLayoutAtNote(fixtures.firstGeneration.id)
+      await wrapper.get('[aria-label="Show sidebar"]').trigger("click")
+      expect(wrapper.find('[aria-label="Hide sidebar"]').exists()).toBe(true)
+
+      await router.push(noteShowLocation(fixtures.firstGenerationSibling.id))
+      await flushPromises()
+
+      expect(wrapper.find('[aria-label="Show sidebar"]').exists()).toBe(true)
+    } finally {
+      Object.defineProperty(window, "innerWidth", {
+        configurable: true,
+        value: originalWidth,
+      })
+    }
+  })
 })

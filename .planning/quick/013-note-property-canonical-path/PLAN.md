@@ -1,8 +1,7 @@
 # Note property canonical path
 
-**Status:** planned, not started.
+**Status:** in progress (slice 1 done; 2–17 remaining).
 **Type:** ad-hoc plan (`.planning/quick/`)
-**Do not execute until the developer approves.**
 **Policy:** [ADR 0001](../../../docs/adrs/0001-ubiquitous-language.md) (**Property**, **Wiki link**), [ADR 0004](../../../docs/adrs/0004-okf-compatible-notebook-markdown-accepted.md) (`#prop:`), Proposed [ADR 0005](../../../docs/adrs/0005-web-routes.md) (`noteProperty`).
 **Human-owned exception (2026-08-29):** ADR 0001 / ADR 0004 may depend on
 Proposed ADR 0005 while this route policy is being refined. Do not change
@@ -95,21 +94,21 @@ Capability-named artifacts only. E2E: Given may `push` a named location; trigger
 - Tracker / answered-question link: same feature (tracker page already has “note under question”) plus a recall answered-question path if one already mounts `NoteUnderQuestion`.
 - Wiki live/dead, target note rename/move, and cache freshness: extend `e2e_test/features/note_topology/wiki_link.feature` plus backend small tests through resolver/controller boundaries.
 - Route table / family / helpers / paste / property-key codec: Vitest
-  (`routes.spec.ts`, mounted property components, authored-link helpers,
-  strip-paste). Backend changes run the full backend unit suite per repo rules.
+  (`routes.spec.ts`, `noteRouteFamily.spec.ts`, mounted property components,
+  authored-link helpers, strip-paste). Backend changes run the full backend
+  unit suite per repo rules.
 - Codec fixtures cover spaces, Unicode, `/`, `%`, `|`, `]`, `?`, `#`, and
   mixed-case keys; Java and TypeScript use the same input/output examples.
 
 ## Slices
 
-### 1. Consolidate the existing note route family — **Structure** — planned
+### 1. Consolidate the existing note route family — **Structure** — done
 
-Refactor current `noteShow` routing so one shared `/n:noteId` sidebar parent,
-one note-route-family predicate / metadata contract, and one route-table-based
-internal-URL classifier own note-page membership. Update sticky active realm,
-mobile drawer, and main-navigation state to consume that contract. Do **not**
-register `noteProperty` yet; existing `noteShow` URLs and behavior remain
-unchanged. This structure exists only to enable slice 2.
+Shared `/n:noteId` sidebar parent via `routeRecordsFromMetadata`; family
+contract `isNoteRouteFamily` / `noteRouteFamilyNoteId`; classifier
+`pathnameLooksLikeInternalNoteFamily`. Sticky realm, drawer, and main-nav
+consume it. `noteProperty` is not registered; `/n123/p/…` is still not
+internal until slice 2 adds the child.
 
 ### 2. Visiting `noteProperty` focuses an editable property — **Behavior** — planned
 
@@ -249,34 +248,25 @@ invent identity from the label. Extend the internal-URL classifier so
 
 ## Discoveries
 
-- `noteShow` is already a named child under `NotebookSidebarLayout` at
-  `/n:noteId`. A separate top-level metadata row at `/n:noteId/p/:key`
-  would create a second layout parent and remount chrome on every panel
-  toggle. Build one parent with sibling `noteShow` / `noteProperty` children;
-  `NoteShowPage` does not contain a child `RouterView`. Concretely,
-  `routes.ts`'s `notebookSidebarNestedRouteNames` mechanism today maps
-  each `routeMetadata` entry to its own implicit `{ parent, one child at
-  path: "" }` pair; slice 1 must change that generation to group multiple
-  metadata entries under one shared parent — that code-shape change is the
-  crux of why slice 1 is Structure before slice 2 can register `noteProperty`.
-- `pathnameLooksLikeInternalNoteShow` is an OR of three patterns — legacy
-  `/^\/d\/n\/\d+(\/|$)/`, legacy `/^\/n\/\d+(\/|$)/`, and compact
-  `/^\/n\d+$/` — none of which match `/n123/p/…`, so a property URL is not
-  treated as internal today (paste/classifier). All three legacy shapes
-  need equivalent treatment when this classifier is extended, not just the
-  compact one.
+- Slice 1: `routeRecordsFromMetadata` groups sibling metadata under one
+  sidebar parent (`noteShow` / `notebookPage` / `folderPage` paths from
+  `routeMetadata`). Family tests live in `noteRouteFamily.spec.ts`.
+  Classifier follows `/d/` and `/n/:id` redirects. `/n123/p/…` joins the
+  family when slice 2 registers the child — do not add a second path parser.
+- `NoteShowPage` does not contain a child `RouterView`. Register `noteProperty`
+  as a sibling child of the shared `/n:noteId` parent, not a second layout.
 - Vue Router named-param resolution round-trips decoded keys containing spaces,
   `/`, `%`, `|`, `]`, `?`, `#`, and Unicode through one path segment. Helpers
   must pass the decoded key exactly once; portable `#prop:` encoding remains a
   separate stricter serialization.
-- `useStickyActiveNoteRealmForRoute`, `useNotebookSidebarDrawer`, and
-  `useNavigationItems` all encode `noteShow` membership separately. Route
-  family is a shared concept, not another appended name in three lists.
+- Sticky realm, drawer, and main-nav consume `isNoteRouteFamily`; do not
+  re-append `noteShow` to those lists when adding `noteProperty`.
+- Dummy route records still need a `noteProperty` metadata row (or the
+  mapper grouping) so `notePropertyHref` compiles honestly in slice 2.
 - Next-assimilate already distinguishes property units (settings off, pending
   row). The route replaces both the destination and the pending-property
   memory/selector language.
 - Conversation toolbar hard-codes `noteShowLocation`; must follow ADR 0005 “query on **that** named route.”
-- Dummy route records are a flat map of `routeMetadata`; nested production children still need a metadata row (or mapper change) so `notePropertyHref` compiles honestly.
 - `WikiLinkTargetReference` currently resolves and rewrites the whole authored
   target as a note title. Without a property-target codec,
   `Title#prop:key` cannot resolve and title/folder/notebook rewrites can drop

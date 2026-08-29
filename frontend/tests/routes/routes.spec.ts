@@ -141,6 +141,7 @@ describe("routes", () => {
     }
 
     it.each([
+      { name: "noteShow", params: { noteId: "123" } },
       { name: "failureReport", params: { failureReportId: "1" } },
       { name: "settingsGeneral" },
       { name: "settingsRecent" },
@@ -159,6 +160,16 @@ describe("routes", () => {
       expect(resolved.matched.some((r) => r.name === "notebookPage")).toBe(
         false
       )
+    })
+
+    it("keeps folderPage on its own sidebar parent, not under notebookPage", () => {
+      const notebookParent = routes.find(
+        (r) => r.path === "/notebooks/:notebookId(\\d+)"
+      )
+      expect(
+        notebookParent?.children?.some((child) => child.name === "folderPage")
+      ).toBe(false)
+      expect(findRouteRecordByName(routes, "folderPage")?.path).toBe("")
     })
   })
 })

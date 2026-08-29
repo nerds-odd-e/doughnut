@@ -1,8 +1,4 @@
-import type {
-  RouteComponent,
-  RouteLocationRaw,
-  RouteRecordRaw,
-} from "vue-router"
+import type { RouteComponent, RouteRecordRaw } from "vue-router"
 import HomePage from "@/pages/HomePage.vue"
 import BazaarPage from "@/pages/BazaarPage.vue"
 import NotebooksPage from "@/pages/NotebooksPage.vue"
@@ -27,10 +23,12 @@ import AccessTokensSettingsTab from "@/pages/settings/AccessTokensSettingsTab.vu
 import RecallStatsSettingsTab from "@/pages/settings/RecallStatsSettingsTab.vue"
 import NotebookSidebarLayout from "@/layouts/NotebookSidebarLayout.vue"
 import { routeMetadata } from "./routeMetadata"
+import {
+  legacyDeeplinkPrefixRedirect,
+  relativePathUnder,
+  routeRecordsFromMetadata,
+} from "./routeRecordsFromMetadata"
 
-// Legacy bookmarks used a `/d/…` prefix; strip it and re-resolve (see `legacyDeeplinkPrefixRedirect`).
-
-// Map route names to components
 const componentMap: Record<string, RouteComponent> = {
   root: HomePage,
   notebooks: NotebooksPage,
@@ -50,12 +48,6 @@ const componentMap: Record<string, RouteComponent> = {
   folderPage: FolderPage,
   bookReading: BookReadingPage,
 }
-
-const notebookSidebarNestedRouteNames = new Set([
-  "noteShow",
-  "notebookPage",
-  "folderPage",
-])
 
 const settingsTabComponents = {
   settingsGeneral: GeneralSettingsTab,
@@ -78,62 +70,11 @@ function routeMetadataByName(name: string) {
   return found
 }
 
-function relativePathUnder(parentPath: string, childPath: string): string {
-  if (childPath === parentPath) {
-    return ""
-  }
-  const prefix = `${parentPath}/`
-  if (!childPath.startsWith(prefix)) {
-    throw new Error(`Path "${childPath}" is not under "${parentPath}"`)
-  }
-  return childPath.slice(prefix.length)
-}
-
-// Combine route metadata with components
-const routesFromMetadata: RouteRecordRaw[] = routeMetadata
-  .filter((metadata) => !isSettingsTabName(metadata.name))
-  .map((metadata) => {
-    if (metadata.redirect !== undefined) {
-      return {
-        path: metadata.path,
-        redirect: metadata.redirect,
-      } as RouteRecordRaw
-    }
-    const name = metadata.name!
-    if (notebookSidebarNestedRouteNames.has(name)) {
-      const parent: RouteRecordRaw = {
-        path: metadata.path,
-        component: NotebookSidebarLayout,
-        children: [
-          {
-            path: "",
-            name,
-            component: componentMap[name]!,
-            props: metadata.props,
-            meta: metadata.meta,
-          },
-        ],
-      }
-      if (metadata.alias !== undefined) {
-        parent.alias = metadata.alias
-      }
-      return parent
-    }
-    return {
-      ...metadata,
-      component: componentMap[name]!,
-    }
-  }) as RouteRecordRaw[]
-
-const legacyDeeplinkPrefixRedirect: RouteRecordRaw = {
-  path: "/d/:pathMatch(.*)*",
-  redirect: (to): RouteLocationRaw => {
-    const pm = to.params.pathMatch
-    if (pm === undefined || pm === "") return "/"
-    const suffix = Array.isArray(pm) ? pm.join("/") : String(pm)
-    return suffix === "" ? "/" : `/${suffix}`
-  },
-}
+const routesFromMetadata: RouteRecordRaw[] = routeRecordsFromMetadata(
+  routeMetadata.filter((metadata) => !isSettingsTabName(metadata.name)),
+  (name) => componentMap[name]!,
+  NotebookSidebarLayout
+)
 
 const settingsGeneralMetadata = routeMetadataByName("settingsGeneral")
 

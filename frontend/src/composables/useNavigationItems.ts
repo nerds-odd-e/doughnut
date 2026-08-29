@@ -2,6 +2,7 @@ import { computed } from "vue"
 import { useRoute } from "vue-router"
 import { useAssimilationCount } from "@/composables/useAssimilationCount"
 import { useRecallData } from "@/composables/useRecallData"
+import { isNoteRouteFamily } from "@/routes/noteRouteFamily"
 import {
   BookText,
   CalendarCheck,
@@ -30,13 +31,10 @@ export function useNavigationItems() {
         name: "notebooks",
         label: "Note",
         icon: BookText,
-        isActive: [
-          "notebooks",
-          "notebookGroup",
-          "noteShow",
-          "notebookPage",
-          "folderPage",
-        ].includes(route.name as string),
+        isActive:
+          ["notebooks", "notebookGroup", "notebookPage", "folderPage"].includes(
+            route.name as string
+          ) || isNoteRouteFamily(route),
       },
       {
         name: "assimilate",
