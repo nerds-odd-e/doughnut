@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest"
+import { noteShowHref } from "@/routes/noteShowLocation"
 import {
   propertyValuePlainToDisplayHtml,
   serializePropertyValueFieldRoot,
@@ -133,7 +134,7 @@ describe("propertyValueField utils", () => {
       "topic: old"
     )
     expect(html).toContain("donut-wiki-link")
-    expect(html).toContain("/n42")
+    expect(html).toContain(noteShowHref(42))
     expect(html).not.toContain("pending-wiki-link")
     expect(html).not.toContain("dead-wiki-link")
   })
@@ -150,7 +151,7 @@ describe("propertyValueField utils", () => {
       wikiTitleFromAuthoredToken("My Note", 42),
     ])
     expect(html).toContain("donut-wiki-link")
-    expect(html).toContain("/n42")
+    expect(html).toContain(noteShowHref(42))
     expect(html).toContain('data-note-id="42"')
     expect(html).toContain('class="wiki-bracket"')
   })
@@ -160,7 +161,7 @@ describe("propertyValueField utils", () => {
       wikiTitleFromAuthoredToken("Target Page|friendly", 99),
     ])
     expect(html).toContain("donut-wiki-link")
-    expect(html).toContain("/n99")
+    expect(html).toContain(noteShowHref(99))
     expect(html).toContain("friendly")
     expect(html).not.toContain("Target Page|friendly")
   })

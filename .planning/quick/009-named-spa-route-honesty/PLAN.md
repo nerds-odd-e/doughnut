@@ -1,6 +1,6 @@
 # Named SPA route table honesty
 
-**Status:** in progress (slices 1–4 done).
+**Status:** in progress (slices 1–5 done).
 **Type:** ad-hoc plan (`.planning/quick/`)
 **Related ADR:** [0005 — Web routes](../../../docs/adrs/0005-web-routes.md) (**Proposed**, not Accepted). This plan makes production and unit tests match a stricter reading of the Decision at “SPA route convention” so that ADR can be tightened without lying. Agents do not set Status to Accepted.
 
@@ -90,11 +90,9 @@ Live token wiki `<a>` tags include `data-note-id` (`replaceWikiLinksInHtml` `[[i
 
 Live wiki clicks with `data-note-id` call `navigateInApp(noteShowLocation(id))` (`RouteLocationRaw`). Leftover in-app hrefs still push the string. User URL unchanged.
 
-### 5. Wiki HTML unit tests pin `noteShowHref`, not `/n` literals — Structure `[ ]`
+### 5. Wiki HTML unit tests pin `noteShowHref`, not `/n` literals — Structure `[x]`
 
-Replace rendered-href expectations with `noteShowHref(id)` in the wiki renderer tests: `replaceWikiLinksInHtml.spec.ts`, `propertyValueField.spec.ts`, `NoteTextContent.wikiLinks.spec.ts`, `RichMarkdownEditor.spec.ts`, `RichMarkdownEditor.propertyWikiLinks.spec.ts`. Leave `quillHtmlToMarkdown.spec.ts` inbound `/n701` fixtures as path strings.
-
-- If the file list blows the time-box, commit the renderer specs first and finish editor specs in the same slice only if still green and small; otherwise split at Jidoka.
+Renderer specs assert compiled href via `noteShowHref(id)`. `quillHtmlToMarkdown.spec.ts` inbound `/n701` fixtures stay path strings.
 
 ### 6. Test stub routers come from the named table — Structure `[ ]`
 

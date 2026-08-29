@@ -1,5 +1,6 @@
 import { flushPromises } from "@vue/test-utils"
 import { relationshipNoteContent } from "@tests/notes/relationshipNoteTestContent"
+import { noteShowHref } from "@/routes/noteShowLocation"
 import { wikiTitleFromAuthoredToken } from "@/utils/wikiLinkMarkup"
 import { propertyRowSelector } from "./propertiesTestDom"
 import {
@@ -63,7 +64,7 @@ Body`
       '[data-testid="rich-note-property-row-value-input"] a.donut-wiki-link'
     )
     expect(live.exists()).toBe(true)
-    expect(live.attributes("href")).toBe("/n42")
+    expect(live.attributes("href")).toBe(noteShowHref(42))
     expect(live.attributes("data-note-id")).toBe("42")
   })
 

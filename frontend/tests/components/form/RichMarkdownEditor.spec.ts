@@ -1,3 +1,4 @@
+import { noteShowHref } from "@/routes/noteShowLocation"
 import { wikiTitleFromAuthoredToken } from "@/utils/wikiLinkMarkup"
 import { nextTick } from "vue"
 import { createRichMarkdownEditorTestHarness } from "./richMarkdownEditorTestHarness"
@@ -63,7 +64,7 @@ describe("RichMarkdownEditor", () => {
     await nextTick()
 
     expect(h.quillModelHtml()).toContain(
-      '<a href="/n42" class="donut-wiki-link" data-wiki-title="MyNote" data-note-id="42"'
+      `<a href="${noteShowHref(42)}" class="donut-wiki-link" data-wiki-title="MyNote" data-note-id="42"`
     )
   })
 

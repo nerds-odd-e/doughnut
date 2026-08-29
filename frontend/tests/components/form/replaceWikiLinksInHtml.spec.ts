@@ -1,4 +1,5 @@
 import { replaceWikiLinksInHtml } from "@/components/form/replaceWikiLinksInHtml"
+import { noteShowHref } from "@/routes/noteShowLocation"
 import { wikiTitleFromAuthoredToken } from "@/utils/wikiLinkMarkup"
 import { describe, it, expect } from "vitest"
 
@@ -9,7 +10,7 @@ describe("replaceWikiLinksInHtml", () => {
         wikiTitleFromAuthoredToken("MyNote", 42),
       ])
     ).toBe(
-      '<p><a href="/n42" class="donut-wiki-link" data-wiki-title="MyNote" data-note-id="42">MyNote</a></p>'
+      `<p><a href="${noteShowHref(42)}" class="donut-wiki-link" data-wiki-title="MyNote" data-note-id="42">MyNote</a></p>`
     )
   })
 
@@ -19,7 +20,7 @@ describe("replaceWikiLinksInHtml", () => {
         wikiTitleFromAuthoredToken("Target|label", 7),
       ])
     ).toBe(
-      '<p><a href="/n7" class="donut-wiki-link" data-wiki-title="Target" data-wiki-display="label" data-note-id="7">label</a></p>'
+      `<p><a href="${noteShowHref(7)}" class="donut-wiki-link" data-wiki-title="Target" data-wiki-display="label" data-note-id="7">label</a></p>`
     )
   })
 
@@ -30,7 +31,7 @@ describe("replaceWikiLinksInHtml", () => {
     ])
     expect(out).not.toContain("dead-wiki-link")
     expect(out).toBe(
-      '<p><a href="/n42" class="donut-wiki-link" data-wiki-title="MyNote" data-note-id="42">MyNote</a> then <a href="/n42" class="donut-wiki-link" data-wiki-title="MyNote" data-note-id="42">MyNote</a></p>'
+      `<p><a href="${noteShowHref(42)}" class="donut-wiki-link" data-wiki-title="MyNote" data-note-id="42">MyNote</a> then <a href="${noteShowHref(42)}" class="donut-wiki-link" data-wiki-title="MyNote" data-note-id="42">MyNote</a></p>`
     )
   })
 
@@ -70,7 +71,7 @@ describe("replaceWikiLinksInHtml", () => {
         [wikiTitleFromAuthoredToken("MyNote", 42)]
       )
     ).toBe(
-      '<p><a href="/n42" class="donut-wiki-link" data-wiki-title="MyNote" data-note-id="42">MyNote</a></p>'
+      `<p><a href="${noteShowHref(42)}" class="donut-wiki-link" data-wiki-title="MyNote" data-note-id="42">MyNote</a></p>`
     )
   })
 
@@ -102,7 +103,7 @@ describe("replaceWikiLinksInHtml", () => {
         "[[MyNote]]"
       )
     ).toBe(
-      '<p><a href="/n42" class="donut-wiki-link" data-wiki-title="MyNote" data-note-id="42">MyNote</a></p>'
+      `<p><a href="${noteShowHref(42)}" class="donut-wiki-link" data-wiki-title="MyNote" data-note-id="42">MyNote</a></p>`
     )
   })
 
@@ -126,7 +127,7 @@ describe("replaceWikiLinksInHtml", () => {
         "[[MyNote]]"
       )
     ).toBe(
-      '<p><a href="/n42" class="donut-wiki-link" data-wiki-title="MyNote" data-note-id="42">MyNote</a></p>'
+      `<p><a href="${noteShowHref(42)}" class="donut-wiki-link" data-wiki-title="MyNote" data-note-id="42">MyNote</a></p>`
     )
   })
 
@@ -138,7 +139,7 @@ describe("replaceWikiLinksInHtml", () => {
         "Saved."
       )
     ).toBe(
-      '<p><a href="/n42" class="donut-wiki-link" data-wiki-title="MyNote" data-note-id="42">MyNote</a></p>'
+      `<p><a href="${noteShowHref(42)}" class="donut-wiki-link" data-wiki-title="MyNote" data-note-id="42">MyNote</a></p>`
     )
   })
 })
