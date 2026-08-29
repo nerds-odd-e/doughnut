@@ -1,6 +1,6 @@
 # Daily probe follow-up (bugs, ADR gap, redundant tests)
 
-**Status:** in progress (slice 1 done).
+**Status:** in progress (slices 1–2 done).
 **Type:** ad-hoc plan (`.planning/quick/`)
 **Depends on:** shipped `.planning/quick/007-daily-cognitive-probe/PLAN.md`
 **Measurement spec:** [daily-probe-protocol.md](../../notes/daily-probe-protocol.md)
@@ -101,16 +101,12 @@ alone so an in-flight save can complete.
 **Learning:** E2E first entry can still `visit recall`; the KeepAlive path
 is note detour + `I return to recalling`, not a second `cy.visit('/recall')`.
 
-### 2. Saving notebook health defaults leaves Daily probe unchanged — Behavior `[ ]`
+### 2. Saving notebook health defaults leaves Daily probe unchanged — Behavior `[x]`
 
-**Pre:** Daily probe is on.
-**Trigger:** PATCH `/api/user/{id}` without `dailyProbeEnabled` (the
-notebook health “save as defaults” body).
-**Post:** `dailyProbeEnabled` stays on.
-
-Test: `UserControllerTest` — enable the flag, `updateUser` with name /
-assimilation / health default only, assert still enabled. Production caller
-`NotebookHealthPanel` can keep omitting the field.
+Missing `dailyProbeEnabled` on PATCH is null on `UserDTO`; `updateUser`
+applies the flag only when non-null. `healthRemoveEmptyFoldersDefault`
+still defaults missing to false. `NotebookHealthPanel` still omits the
+field. Generated TS was already `dailyProbeEnabled?: boolean`.
 
 ### 3. Continue into recall only after the result is saved — Behavior `[ ]`
 

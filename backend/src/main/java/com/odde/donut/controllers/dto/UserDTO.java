@@ -19,5 +19,5 @@ public class UserDTO {
 
   @Getter @Setter private Boolean healthRemoveEmptyFoldersDefault = false;
 
-  @Getter @Setter private Boolean dailyProbeEnabled = false;
+  @Getter @Setter private Boolean dailyProbeEnabled;
 }

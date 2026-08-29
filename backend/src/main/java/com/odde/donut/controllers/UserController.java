@@ -97,7 +97,9 @@ class UserController {
     user.setDailyAssimilationCount(updates.getDailyAssimilationCount());
     user.setHealthRemoveEmptyFoldersDefault(
         Objects.requireNonNullElse(updates.getHealthRemoveEmptyFoldersDefault(), false));
-    user.setDailyProbeEnabled(Objects.requireNonNullElse(updates.getDailyProbeEnabled(), false));
+    if (updates.getDailyProbeEnabled() != null) {
+      user.setDailyProbeEnabled(updates.getDailyProbeEnabled());
+    }
     entityPersister.save(user);
     return user;
   }
