@@ -105,8 +105,35 @@ Then("I haven't login", () => {
   start.logout()
 })
 
+const userSettings = () =>
+  start.mainMenu().userOptions().userSettings('Old Learner')
+
 When('I change my display name to {string}', (name: string) => {
-  start.mainMenu().userOptions().userSettings('Old Learner').changeName(name)
+  userSettings().changeName(name)
+})
+
+Given('Daily probe is off', () => {
+  userSettings().expectDailyProbeOff()
+})
+
+Given('Daily probe is on', () => {
+  userSettings().turnDailyProbeOn().expectDailyProbeOn()
+})
+
+When('I turn Daily probe on', () => {
+  userSettings().turnDailyProbeOn()
+})
+
+When('I turn Daily probe off', () => {
+  userSettings().turnDailyProbeOff()
+})
+
+Then('Daily probe is on after I reload my settings', () => {
+  start.assumeUserSettingsPage().reload().expectDailyProbeOn()
+})
+
+Then('Daily probe is off after I reload my settings', () => {
+  start.assumeUserSettingsPage().reload().expectDailyProbeOff()
 })
 
 When(

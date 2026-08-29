@@ -1,8 +1,8 @@
 # Daily probe
 
-**Status:** in progress. Slice 1 shipped. ADR 0003 Daily probe amended in
-place (independent of the Cognitive index). Next: slice 2. Protocol and
-daily-consumption gates still block slices 3 and 8.
+**Status:** in progress. Slices 1–2 shipped. Stopped before slice 3 for the
+human-owned trial/scoring protocol (Jidoka). Daily-consumption still blocks
+slice 8.
 **Type:** ad-hoc plan (`.planning/quick/`)
 **Extracted from:** `.planning/quick/001-morning-cognitive-index/PLAN.md`
 (unbuilt slices 26–31).
@@ -86,16 +86,15 @@ Backend unit suite green (1908 tests).
 
 **Enables slice 2 only.**
 
-### 2. The learner can opt in or out in General settings — Behavior `[ ]`
+### 2. The learner can opt in or out in General settings — Behavior `[x]`
 
-**Pre-condition:** the learner is on General settings and the Daily probe is
-off by default. **Trigger:** they change the Daily probe checkbox and submit.
-**Post-condition:** the selected state remains after reloading the profile.
+Shipped: General settings **Daily probe** checkbox (default off) PATCHes with
+the profile. Help text: turning it off stops new probes and ends the probe's
+own trend readout (ADR 0003; no Cognitive index). Mounted
+`GeneralSettingsTab` tests cover default-off and persist-true. E2E
+`users/user_profile.feature` Scenario Outline enable/disable, then reload.
 
-- Mounted-page test drives the form through the generated API mock.
-- E2E extends `users/user_profile.feature`; enable and disable are variants of
-  the same persistence behavior, not separate slices.
-- Use the ADR-resolved help text; do not claim a feature that does not exist.
+**Enables slice 3 only.** Slice 3 remains blocked on the protocol gate below.
 
 ### 3. Fix the Daily probe trial and scoring contract — Structure `[ ]`
 
