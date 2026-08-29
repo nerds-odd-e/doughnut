@@ -79,7 +79,7 @@ function submitNoteTitleUnderFolder(
   folder: string,
   notebook: string
 ) {
-  start.navigateToNotebooksPage().navigateToNotebook(notebook)
+  start.jumpToNotebookPage(notebook)
   start
     .noteSidebar()
     .activateFolderByLabel(folder)
