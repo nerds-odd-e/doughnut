@@ -5,13 +5,11 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Cross-morning median/MAD baseline for a single per-day statistic (pace's {@code pctVsUsual},
- * lapse count, or consistency spread), gated by a minimum qualifying-day sample size, plus the
- * shared z-score against it. Extracted from {@link RecallPaceAggregator} (slice 21.3) once {@code
- * zScoreAgainstDayBaseline} gained a second caller outside that file ({@link
- * RecallMorningHalfIndex}) — this is generic day-baseline statistics on plain {@code double}
- * values, distinct from {@link RecallPaceAggregator}'s per-item weighted-residual EWMA walk that
- * produces the per-day values feeding it.
+ * Cross-morning median/MAD baseline for a single per-day statistic (the Pace tile's consistency
+ * spread), gated by a minimum qualifying-day sample size, plus the shared z-score against it. This
+ * is generic day-baseline statistics on plain {@code double} values, distinct from {@link
+ * RecallPaceAggregator}'s per-item weighted-residual EWMA walk that produces the per-day values
+ * feeding it.
  */
 final class RecallDayBaseline {
   private static final int MIN_BASELINE_DAYS = 10;

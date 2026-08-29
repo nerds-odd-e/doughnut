@@ -41,18 +41,8 @@ final class RecallPaceAggregator {
     return r.rawElapsedMs();
   }
 
-  /**
-   * Result of the chronological pace walk: the tile stats, rows judged implausibly fast, and each
-   * of {@code pctVsUsual}/{@code lapseCount}'s own cross-morning baseline (median/MAD of that
-   * statistic's per-day value over the trailing baseline window), mirroring {@code
-   * consistencyZScore}'s existing per-day baseline. Not yet turned into a z-score or wired into
-   * {@link PaceStats} — that is a later slice.
-   */
-  record PaceResult(
-      PaceStats stats,
-      Set<RecallAnswerRow> implausiblyFastRows,
-      DayBaseline paceDayBaseline,
-      DayBaseline lapseDayBaseline) {}
+  /** Result of the chronological pace walk: the tile stats and rows judged implausibly fast. */
+  record PaceResult(PaceStats stats, Set<RecallAnswerRow> implausiblyFastRows) {}
 
   static PaceResult compute(List<RecallAnswerRow> allTimeReviews, LocalDate today, ZoneId zoneId) {
     return compute(allTimeReviews, today, zoneId, null);
@@ -61,11 +51,11 @@ final class RecallPaceAggregator {
   /**
    * @param todayRowsToScore restricts which of today's rows feed the today-residual/lapse-count
    *     collection step — used to score just one half (odd/even within-day sequence) of a split
-   *     morning (slice 21.3, via {@link RecallMorningHalfIndex}). {@code null} means every one of
-   *     today's rows counts, matching the original whole-day behavior used by every other caller.
-   *     The per-item EWMA baseline ({@code tauByItem}) is never restricted by this — every row,
-   *     regardless of which half it falls in, still updates its item's baseline, since the baseline
-   *     is built from full chronological history, not from "today" at all.
+   *     morning. {@code null} means every one of today's rows counts, matching the original
+   *     whole-day behavior used by every other caller. The per-item EWMA baseline ({@code
+   *     tauByItem}) is never restricted by this — every row, regardless of which half it falls in,
+   *     still updates its item's baseline, since the baseline is built from full chronological
+   *     history, not from "today" at all.
    */
   static PaceResult compute(
       List<RecallAnswerRow> allTimeReviews,
@@ -76,7 +66,6 @@ final class RecallPaceAggregator {
     Map<Integer, Integer> priorObservationCountByItem = new HashMap<>();
     List<WeightedResidual> todaysResiduals = new ArrayList<>();
     Map<LocalDate, List<WeightedResidual>> residualsByDate = new HashMap<>();
-    Map<LocalDate, Integer> lapseCountByDate = new HashMap<>();
     Set<RecallAnswerRow> implausiblyFastRows = Collections.newSetFromMap(new IdentityHashMap<>());
     LocalDate baselineWindowStart = today.minusDays(BASELINE_WINDOW_START_DAYS_AGO);
     LocalDate baselineWindowEnd = today.minusDays(BASELINE_WINDOW_END_DAYS_AGO);
@@ -130,7 +119,6 @@ final class RecallPaceAggregator {
           residualsByDate
               .computeIfAbsent(rowDate, k -> new ArrayList<>())
               .add(new WeightedResidual(cappedResidual, weight));
-          lapseCountByDate.merge(rowDate, isLapse ? 1 : 0, Integer::sum);
         }
       }
       tauByItem.put(
@@ -146,34 +134,7 @@ final class RecallPaceAggregator {
     return new PaceResult(
         new PaceStats(
             pctVsUsual, sampleSize, totalAnsweredToday, confidence, lapseCount, consistencyZScore),
-        implausiblyFastRows,
-        paceDayBaseline(residualsByDate),
-        lapseDayBaseline(lapseCountByDate));
-  }
-
-  /**
-   * Per-day pace baseline: applies the exact same weighted-median transform used for today's {@code
-   * pctVsUsual} ({@link RecallWeightedResidualStats#weightedPctVsUsual}) to each qualifying
-   * baseline-window day's own residuals, then reports median/MAD of those per-day values across
-   * days.
-   */
-  private static DayBaseline paceDayBaseline(
-      Map<LocalDate, List<WeightedResidual>> residualsByDate) {
-    List<Double> perDayPctVsUsual =
-        residualsByDate.values().stream()
-            .map(RecallWeightedResidualStats::weightedPctVsUsual)
-            .toList();
-    return RecallDayBaseline.dayBaseline(perDayPctVsUsual);
-  }
-
-  /**
-   * Per-day lapse-count baseline: each qualifying baseline-window day's plain {@code lapseCount}
-   * (no per-day computation needed, unlike pace), median/MAD across days.
-   */
-  private static DayBaseline lapseDayBaseline(Map<LocalDate, Integer> lapseCountByDate) {
-    List<Double> perDayLapseCount =
-        lapseCountByDate.values().stream().map(Integer::doubleValue).toList();
-    return RecallDayBaseline.dayBaseline(perDayLapseCount);
+        implausiblyFastRows);
   }
 
   /**

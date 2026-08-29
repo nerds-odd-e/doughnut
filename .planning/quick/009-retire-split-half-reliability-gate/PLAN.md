@@ -150,7 +150,7 @@ wrap-up rather than committing a known-red intermediate state. `pnpm
 frontend:test` (328 files, 1732 tests) also confirmed no frontend call site
 depended on the removed wire shape.
 
-### 5. Stop computing day-level pace/lapse baselines on every request — Structure `[ ]`
+### 5. Stop computing day-level pace/lapse baselines on every request — Structure `[x]`
 
 In `RecallPaceAggregator.java`, remove:
 - `PaceResult.paceDayBaseline` / `PaceResult.lapseDayBaseline` record fields
@@ -169,6 +169,14 @@ fields).
   green; targeted E2E for `recall_stats.feature` still passes (Pace/
   Consistency tiles unaffected — this removes internal fields never on the
   DTO/wire).
+
+**Done:** also cleaned a stray `{@link RecallMorningHalfIndex}` Javadoc
+reference in `RecallPaceAggregator.java` and rewrote `RecallDayBaseline`'s
+stale class-level Javadoc (it described a second caller that no longer
+exists). E2E run skipped by judgment — internal fields never reached the
+DTO/wire, fully covered by the green `RecallStatsService*` backend suite
+(49 tests). `RecallStatsTestFixtures.java` still references
+`RecallMorningHalfIndex` (lines ~22, 95) — left untouched, that's slice 6.
 
 ### 6. Remove the now-orphaned test fixture helpers — Structure `[ ]`
 
