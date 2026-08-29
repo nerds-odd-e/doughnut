@@ -1,4 +1,5 @@
 import makeMe from "donut-test-fixtures/makeMe"
+import { noteShowHref } from "@/routes/noteShowLocation"
 import { wikiTitleFromAuthoredToken } from "@/utils/wikiLinkMarkup"
 import { type VueWrapper, flushPromises } from "@vue/test-utils"
 import { afterEach, describe, expect, it, vi } from "vitest"

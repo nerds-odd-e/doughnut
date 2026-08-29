@@ -1,5 +1,6 @@
 import { flushPromises } from "@vue/test-utils"
 import { relationshipNoteContent } from "@tests/notes/relationshipNoteTestContent"
+import { noteShowHref } from "@/routes/noteShowLocation"
 import { wikiTitleFromAuthoredToken } from "@/utils/wikiLinkMarkup"
 import { propertyRowSelector } from "./propertiesTestDom"
 import {
