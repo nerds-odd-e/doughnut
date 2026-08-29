@@ -56,3 +56,18 @@ Feature: Daily probe
     When I complete the Daily probe
     And I visit my recall stats
     Then I should see the Daily probe trend
+
+  Scenario: The existing window control filters the Daily probe trend
+    Given Daily probe is on
+    When I visit recall
+    Then I should see the Daily probe instruction
+    When I complete the Daily probe
+    And I continue from the Daily probe
+    And the browser and backend are on day 40
+    When I visit recall
+    Then I should see the Daily probe instruction
+    When I complete the Daily probe
+    And I visit my recall stats
+    Then I should see 2 days on the Daily probe speed trend
+    When I view the last 30 days of trends
+    Then I should see 1 day on the Daily probe speed trend

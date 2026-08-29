@@ -11,9 +11,8 @@ does not add new research, estimation, or review beyond that — treat the
 re-scoped text as a starting hypothesis for a proper planning pass, not a
 ready-to-execute spec.
 **Type:** ad-hoc plan (`.planning/quick/`)
-**Depends on:** `.planning/quick/007-daily-cognitive-probe/PLAN.md` (slice 1
-needs the probe fully built and shipped — it has no value with zero probe
-history); `.planning/quick/001-morning-cognitive-index/PLAN.md` for the
+**Depends on:** `.planning/quick/007-daily-cognitive-probe/PLAN.md` (the probe
+has shipped — slice 1 here needs probe history); `.planning/quick/001-morning-cognitive-index/PLAN.md` for the
 shipped component readouts (pace, accuracy, consistency, lapse count) slice
 1 validates against.
 

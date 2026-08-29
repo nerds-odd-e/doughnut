@@ -3,6 +3,14 @@
 import type { TimeTravelRelativeToNow } from '@generated/donut-backend-api'
 import { TestabilityRestController } from '@generated/donut-backend-api/sdk.gen'
 
+const MOCKED_CLOCK_FNS = [
+  'setTimeout',
+  'setInterval',
+  'clearInterval',
+  'clearTimeout',
+  'Date',
+] as const
+
 function clockAt(days: number, hours: number) {
   // Backend time-travel parses JSON.stringify clock fields as naive local time.
   // Date.UTC keeps the requested hour regardless of the machine timezone.
@@ -18,6 +26,10 @@ function postTimeTravel(date: Date) {
   )
 }
 
+function installBrowserClock(day: number, hour: number) {
+  cy.clock(clockAt(day, hour), [...MOCKED_CLOCK_FNS])
+}
+
 type TimeTravelApi = {
   backendTimeTravelTo(day: number, hour: number): Cypress.Chainable<unknown>
 }
@@ -25,9 +37,11 @@ type TimeTravelApi = {
 export const timeTravelTestabilityMethods = {
   timeTravelTo(this: TimeTravelApi, day: number, hour: number) {
     this.backendTimeTravelTo(day, hour)
-    cy.window().then((window) => {
-      cy.tick(clockAt(day, hour).getTime() - new window.Date().getTime())
+    // Reinstall so cy.visit keeps Date on this day.
+    cy.clock().then((clock) => {
+      clock.restore()
     })
+    installBrowserClock(day, hour)
   },
 
   backendTimeTravelTo(day: number, hour: number) {
@@ -53,12 +67,6 @@ export const timeTravelTestabilityMethods = {
     // for Vue component with v-if for a ref/react object that is changed during mount by async call
     // the event, eg. click, will not work.
     //
-    cy.clock(clockAt(0, 0), [
-      'setTimeout',
-      'setInterval',
-      'clearInterval',
-      'clearTimeout',
-      'Date',
-    ])
+    installBrowserClock(0, 0)
   },
 }
