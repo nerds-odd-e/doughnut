@@ -1,13 +1,13 @@
 # Named SPA route honesty cleanup
 
-**Status:** planned, not started.
+**Status:** planned (slice 6 done; slices 1–5 not started).
 **Type:** ad-hoc plan (`.planning/quick/`)
 **Do not execute until the developer approves.**
 **Depends on:** shipped `.planning/quick/011-named-spa-route-honesty-follow-up/` (PLAN retired; named visit gate, `namedLocationHref`, Proposed [ADR 0005](../../../docs/adrs/0005-web-routes.md) E2E table remain on `main`)
 
 ## Goal
 
-Close leftovers from 011: **dead E2E**, the ADR table’s **later-jump = named `push`** (slice 10 still `visitNamed`s most Given shortcuts), and **stale operator STATE**. Do not reopen unit-wiki HTML pinning, recall remount, or ADR accept.
+Close leftovers from 011: **dead E2E** and the ADR table’s **later-jump = named `push`** (slice 10 still `visitNamed`s most Given shortcuts). Operator STATE no longer points at the retired 011 PLAN (spent-plan cleanup 2026-08-29). Do not reopen unit-wiki HTML pinning, recall remount, or ADR accept.
 
 ## Inspection (011 on `main`)
 
@@ -32,7 +32,7 @@ Scope: 011’s route-honesty commits (unit leftovers + E2E gate + ADR rewrite), 
 
    **`push` has no `query`.** Add optional query in the same slice that converts admin tabs — not a standalone unused parameter.
 
-3. **`.planning/STATE.md` still lists 011 as planned** and points at a deleted PLAN. 011’s closeout left operator next steps stale (`execute-plan` must not write `STATE.md`; this slice may).
+3. **`.planning/STATE.md` 011 pointer** — done (spent-plan cleanup 2026-08-29). Do not resurrect the 011 diary.
 
 ### Inspected and not slicing
 
@@ -59,7 +59,7 @@ Scope: 011’s route-honesty commits (unit leftovers + E2E gate + ADR rewrite), 
 - **One proving observable for push vs remount:** after `loginAs`, set a marker on `window` in the existing logged-in bazaar step path (do not add a Gherkin phrase about `window`). `cy.visit` remount clears it; named `push` does not. Logged-out `browsing.feature` is first load (`push` → `visitNamed` fallback) — not the proof.
 - **Optional `query` on `push`** only when converting admin tabs in the same slice.
 - **Timing:** only slice 2. Median of 3 Cypress JSON spec scores; pass if after ≤ before + max(15% of before, 3s). Time `e2e_test/features/bazaar/bazaar_subscription.feature` (login then bazaar). Do not use logged-out `browsing.feature` as the push timer.
-- **STATE:** mark 011 complete / drop the deleted PLAN pointer. Do not add a permanent 011 diary. Mention this cleanup plan only while it is active.
+- **STATE:** 011 pointer already dropped (spent-plan cleanup). Do not add a permanent 011 diary. Mention this cleanup plan only while it is active.
 - **Do not** convert recall remount, epub remount, identify, invitation `circleJoin`, `loginAs` notebooks, or `visitHomePage`.
 
 ## Slices
@@ -110,11 +110,9 @@ Delete the uncalled create-and-copy Gherkin step, `myCirclesPage.ts` (or every h
 
 ---
 
-### 6. Operator STATE matches shipped 011 — Structure `[ ]`
+### 6. Operator STATE matches shipped 011 — Structure `[x]`
 
-Update `.planning/STATE.md`: 011 is done (PLAN retired); drop “planned, not started” for the deleted path. Optionally list this cleanup plan as planned until it finishes. Do not resurrect 011 diary files.
-
-**Verify:** `STATE.md` has no link to `.planning/quick/011-named-spa-route-honesty-follow-up/PLAN.md`.
+Done in spent-plan cleanup 2026-08-29: `.planning/STATE.md` no longer links the retired 011 PLAN; this cleanup plan is listed while it is active. Do not resurrect 011 diary files.
 
 ## Jidoka
 
