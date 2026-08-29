@@ -12,3 +12,5 @@ are stored as completed rows and shown as a trend on Recall Stats (existing
 
 Canonical name: **Daily probe** / `daily_probe` / `DailyProbe` (ADR 0001 /
 0003). Follow-on analyses: `.planning/quick/008-probe-convergent-analyses/PLAN.md`.
+Follow-up (bugs, ADR gap, redundant tests — not executed):
+`.planning/quick/010-daily-probe-follow-up/PLAN.md`.
