@@ -45,30 +45,25 @@ Then(
     start
       .assumeNotePage()
       .wikiLinkInNoteContent(wikiLinkText)
-      .expectNoteShowHref()
       .expectHrefPointsToNote(wikiLinkText)
   }
 )
 
+function followWikiLinkToNote(wikiLinkText: string, noteTitle: string) {
+  start
+    .assumeNotePage()
+    .wikiLinkInNoteContent(wikiLinkText)
+    .followAndAssumeNote(noteTitle)
+}
+
 Then(
   'the wiki link {string} should open the note titled {string}',
-  (wikiLinkText: string, noteTitle: string) => {
-    start
-      .assumeNotePage()
-      .wikiLinkInNoteContent(wikiLinkText)
-      .expectNoteShowHref()
-      .followAndAssumeNote(noteTitle)
-  }
+  followWikiLinkToNote
 )
 
 Then(
   'following the wiki link {string} should open the note titled {string}',
-  (wikiLinkText: string, noteTitle: string) => {
-    start
-      .assumeNotePage()
-      .wikiLinkInNoteContent(wikiLinkText)
-      .followAndAssumeNote(noteTitle)
-  }
+  followWikiLinkToNote
 )
 
 function createNoteFromDeadWikiLink(displayText: string, newNoteTitle: string) {

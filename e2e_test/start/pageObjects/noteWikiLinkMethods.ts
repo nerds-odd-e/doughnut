@@ -1,11 +1,11 @@
+import { noteShowHref } from '@/routes/noteShowLocation'
 import { clickPopupConfirmOk } from '../../support/daisyModalHelpers'
 import testability from '../testability'
 import noteCreationForm from './forms/noteCreationForm'
 import { findNoteContentRegion } from './notePageContentRegion'
 import { assumeNoteTargetSearchDialog } from './noteTargetSearchDialog'
 
-/** Matches `noteShowHref()` (`/n{id}`), `/n/:id`, or legacy `/d/n/:id` note links. */
-const noteShowHref = /^\/d\/n\/\d+$|^\/n\/\d+$|^\/n\d+$/
+/** Classifier for inbound/legacy note-show paths in `cy.url()`, not a compile of the named table. */
 const noteShowPathInUrl = /\/d\/n\/\d+|\/n\/\d+|\/n\d+/
 
 const pointAtExistingNoteOffer = 'Point at an existing note'
@@ -24,17 +24,13 @@ function wikiLinkInNoteContentFluent(
   const locator = () =>
     findWikiLinkInNoteContent('donut-wiki-link', wikiLinkText)
   return {
-    expectNoteShowHref() {
-      locator().should('have.attr', 'href').and('match', noteShowHref)
-      return this
-    },
     expectHrefPointsToNote(noteTitle: string) {
       testability()
         .getInjectedNoteIdByTitle(noteTitle)
-        .then((noteId) => {
+        .then((noteId: number) => {
           locator()
             .should('have.attr', 'href')
-            .and('match', new RegExp(`/n${noteId}$|/n/${noteId}$`))
+            .and('equal', noteShowHref(noteId))
         })
       return this
     },

@@ -1,6 +1,6 @@
 # Named SPA route honesty follow-up
 
-**Status:** in progress — slices 1–5 done; next is slice 6.
+**Status:** in progress — slices 1–6 done; next is slice 7.
 **Type:** ad-hoc plan (`.planning/quick/`)
 **Depends on:** shipped `.planning/quick/009-named-spa-route-honesty/` (PLAN retired; code and Proposed [ADR 0005](../../../docs/adrs/0005-web-routes.md) remain)
 **Merged from:** this file’s 009 leftovers **and** the former `.planning/quick/011-e2e-named-route-honesty/` (deleted as a duplicate 011).
@@ -183,13 +183,11 @@ Cypress esbuild and `e2e_test/tsconfig.json` alias `@/routes` → `frontend/src/
 
 ---
 
-### 6. Wiki live href equals compiled note-show href — Behavior `[ ]`
+### 6. Wiki live href equals compiled note-show href — Behavior `[x]`
 
-**Timing:** no (assertion only).
+Live wiki `href` equals imported `noteShowHref(id)` (`expectHrefPointsToNote`). Classifier regex on the live href removed. `noteShowPathInUrl` still classifies `cy.url()` after click. Title→id lookup is not used on “should open” steps (two notes can share a title).
 
-**Pre:** Live wiki link in note content. **Trigger:** assert href. **Post:** `href` equals `noteShowHref(id)`. Keep a classifier regex only for inbound/legacy URL shapes, not for compiling the current table.
-
-**Verify:** `pnpm cypress run --spec e2e_test/features/note_topology/wiki_link.feature`
+**Verify:** `wiki_link.feature` — 14 passed.
 
 ---
 
