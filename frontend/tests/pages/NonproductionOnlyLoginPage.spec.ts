@@ -1,30 +1,60 @@
+import { HealthCheckController } from "@generated/donut-backend-api/sdk.gen"
+import * as signInRedirect from "@/managedApi/window/signInRedirect"
 import NonproductionOnlyLoginPage from "@/pages/NonproductionOnlyLoginPage.vue"
-import routes from "@/routes/routes"
-import helper from "@tests/helpers"
+import helper, { healthcheckPingBody, mockSdkService } from "@tests/helpers"
 import { screen } from "@testing-library/vue"
-import { describe, expect, it } from "vitest"
-import { createMemoryHistory, createRouter } from "vue-router"
+import { flushPromises } from "@vue/test-utils"
+import { afterEach, describe, expect, it, vi } from "vitest"
+
+async function renderIdentifyPage(query: { from?: string } = {}) {
+  helper
+    .component(NonproductionOnlyLoginPage)
+    .withRouter()
+    .currentRoute({ path: "/users/identify", query })
+    .render()
+  await flushPromises()
+}
 
 describe("NonproductionOnlyLoginPage", () => {
-  it("shows dev-only sign-in copy and credential fields", async () => {
-    const router = createRouter({
-      history: createMemoryHistory(),
-      routes,
-    })
-    await router.push({
-      path: "/users/identify",
-      query: { from: "/notebooks/1" },
-    })
-    await router.isReady()
+  afterEach(() => {
+    vi.restoreAllMocks()
+  })
 
-    helper.component(NonproductionOnlyLoginPage).withRouter(router).render()
+  it("shows dev-only sign-in copy and credential fields when backend is not prod", async () => {
+    mockSdkService(HealthCheckController, "ping", healthcheckPingBody("e2e"))
+    await renderIdentifyPage({ from: "/notebooks/1" })
 
     expect(
-      screen.getByText(/This login page is for test and development only/i)
+      await screen.findByText(
+        /This login page is for test and development only/i
+      )
     ).toBeInTheDocument()
     expect(screen.getByText(/Please sign in/i)).toBeInTheDocument()
     expect(document.getElementById("username")).not.toBeNull()
     expect(document.getElementById("password")).not.toBeNull()
     expect(document.getElementById("login-button")).not.toBeNull()
+  })
+
+  it("does not show the password form and sends the browser to continue when backend is prod", async () => {
+    mockSdkService(HealthCheckController, "ping", healthcheckPingBody("prod"))
+    const assignSpy = vi
+      .spyOn(signInRedirect.browserLocation, "assign")
+      .mockImplementation(() => undefined)
+    await renderIdentifyPage({ from: "/notebooks/1" })
+
+    expect(document.getElementById("username")).toBeNull()
+    expect(document.getElementById("password")).toBeNull()
+    expect(assignSpy).toHaveBeenCalledWith("/login/continue?from=/notebooks/1")
+  })
+
+  it("continues to / when the identify screen has no from query", async () => {
+    mockSdkService(HealthCheckController, "ping", healthcheckPingBody("prod"))
+    const assignSpy = vi
+      .spyOn(signInRedirect.browserLocation, "assign")
+      .mockImplementation(() => undefined)
+    await renderIdentifyPage()
+
+    expect(document.getElementById("username")).toBeNull()
+    expect(assignSpy).toHaveBeenCalledWith("/login/continue?from=/")
   })
 })

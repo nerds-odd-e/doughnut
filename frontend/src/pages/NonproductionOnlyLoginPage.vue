@@ -1,43 +1,51 @@
 <template>
-  <h2>This login page is for test and development only</h2>
-  <h3>Please sign in</h3>
-  <p>
-    It will redirect to the following url after login
-    <br />
-    {{ redirectAfterLogin }}
-  </p>
   <div v-if="errorMessage" class="daisy-alert daisy-alert-error">
     {{ errorMessage }}
   </div>
+  <div v-if="showPasswordForm">
+    <h2>This login page is for test and development only</h2>
+    <h3>Please sign in</h3>
+    <p>
+      It will redirect to the following url after login
+      <br />
+      {{ redirectAfterLogin }}
+    </p>
 
-  <div class="min-h-screen flex justify-center items-center">
-    <form @submit.prevent="handleSubmit" class="text-center">
-      <div class="daisy-form-control mb-4">
-        <label for="username" class="daisy-label">Username</label>
-        <input
-          type="text"
-          v-model="username"
-          class="daisy-input"
-          id="username"
-          required
-        />
-      </div>
-      <div class="daisy-form-control mb-4">
-        <label for="password" class="daisy-label">Password</label>
-        <input
-          type="password"
-          v-model="password"
-          class="daisy-input"
-          id="password"
-          required
-        />
-      </div>
-      <button type="submit" id="login-button" class="daisy-btn daisy-btn-primary">Login</button>
-    </form>
+    <div class="min-h-screen flex justify-center items-center">
+      <form @submit.prevent="handleSubmit" class="text-center">
+        <div class="daisy-form-control mb-4">
+          <label for="username" class="daisy-label">Username</label>
+          <input
+            type="text"
+            v-model="username"
+            class="daisy-input"
+            id="username"
+            required
+          />
+        </div>
+        <div class="daisy-form-control mb-4">
+          <label for="password" class="daisy-label">Password</label>
+          <input
+            type="password"
+            v-model="password"
+            class="daisy-input"
+            id="password"
+            required
+          />
+        </div>
+        <button type="submit" id="login-button" class="daisy-btn daisy-btn-primary">Login</button>
+      </form>
+    </div>
   </div>
 </template>
 
 <script lang="ts">
+import {
+  browserLocation,
+  healthcheckPing,
+  pingHasProdProfile,
+  signInRedirectHref,
+} from "@/managedApi/window/signInRedirect"
 import { defineComponent } from "vue"
 
 export default defineComponent({
@@ -45,7 +53,21 @@ export default defineComponent({
     return {
       username: "",
       password: "",
-      errorMessage: undefined,
+      errorMessage: undefined as unknown,
+      showPasswordForm: false,
+    }
+  },
+  async mounted() {
+    try {
+      const ping = await healthcheckPing()
+      if (pingHasProdProfile(ping)) {
+        const from = (this.$route?.query?.from as string) || "/"
+        browserLocation.assign(signInRedirectHref(from, ping))
+        return
+      }
+      this.showPasswordForm = true
+    } catch (error) {
+      this.errorMessage = error
     }
   },
   computed: {

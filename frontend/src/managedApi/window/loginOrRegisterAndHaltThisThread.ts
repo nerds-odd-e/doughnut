@@ -1,9 +1,13 @@
-/** Visible for unit tests; keeps sign-in return URL construction in one place. */
-export const signInRedirectHref = (fromHref: string) =>
-  `/users/identify?from=${fromHref}`
+import {
+  browserLocation,
+  healthcheckPing,
+  signInRedirectHref,
+} from "./signInRedirect"
 
 const loginOrRegisterAndHaltThisThread = async () => {
-  window.location.href = signInRedirectHref(window.location.href)
+  browserLocation.assign(
+    signInRedirectHref(window.location.href, await healthcheckPing())
+  )
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   await new Promise(() => {
     // noop

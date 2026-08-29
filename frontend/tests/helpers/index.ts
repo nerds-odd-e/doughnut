@@ -70,6 +70,9 @@ export function wrapSdkResponse<T>(data: T) {
   }
 }
 
+export const healthcheckPingBody = (profiles: string) =>
+  `OK. Active Profile: ${profiles}. Commit: fixture`
+
 /**
  * Wraps an error in the standard SDK response format.
  * Useful for mocking error responses in tests.

@@ -1,6 +1,6 @@
 # Sign-in: SPA identify vs backend continue
 
-**Status:** in progress (slice 1 done)
+**Status:** in progress (slices 1–2 done; slice 3 gated on 1–2 deployed)
 **Type:** ad-hoc plan (`.planning/quick/`)
 **Related:** proposed [ADR 0005](../../../docs/adrs/0005-web-routes.md)
 
@@ -63,22 +63,17 @@ exactly (it does not inherit). Keep the dual-map until slice 3.
 
 **Enables slice 2.**
 
-### 2. Production backend does not show the password form; sign-in goes to continue — Behavior `[ ]`
+### 2. Production backend does not show the password form; sign-in goes to continue — Behavior `[x]`
 
-**Pre-condition:** `/login/continue` exists (slice 1). **Trigger:** (a) login
-/ 401 / circle-join helper runs against a `prod` healthcheck; (b) the
-identify **screen** loads against a `prod` healthcheck. **Post-condition:**
-browser is sent to `/login/continue?from=…`; username/password fields are
-not shown. Against a non-`prod` healthcheck, helper and screen still use
-`/users/identify` and the form (CI E2E and `pnpm sut` unchanged).
+Done: `signInRedirect.ts` parses healthcheck `Active Profile:` (comma-separated
+token equal to `prod`, not substring). Helper and identify page send the
+browser to `/login/continue?from=…` on `prod` and keep `/users/identify` plus
+the password form otherwise. No new JSON API.
 
-- Unit tests at `signInRedirectHref` / helper and mounted identify page
-  (mock healthcheck body). Do not add a new public JSON API unless parsing
-  the existing ping string is unclear; prefer a small parser with tests.
-- No E2E change expected; `new_user.feature` and circle invite still hit
-  the form on the e2e profile.
-- **Enables slice 3.** Public `/users/identify` may still be Spring until
-  slice 3; the helper already prefers continue on `prod`.
+**Learning:** ping parse + href live in one module; identify page must not
+import the halt-thread helper. `production` as a token must not match.
+
+**Enables slice 3** once slices 1–2 are **deployed** (not only on `main`).
 
 ### 3. `/users/identify` is SPA-owned; local LB needs no identify override — Behavior `[ ]`
 
