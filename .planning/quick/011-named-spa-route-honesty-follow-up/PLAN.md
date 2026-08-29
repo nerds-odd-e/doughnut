@@ -1,6 +1,6 @@
 # Named SPA route honesty follow-up
 
-**Status:** in progress — slices 1–6 done; next is slice 7.
+**Status:** in progress — slices 1–7 done; next is slice 8.
 **Type:** ad-hoc plan (`.planning/quick/`)
 **Depends on:** shipped `.planning/quick/009-named-spa-route-honesty/` (PLAN retired; code and Proposed [ADR 0005](../../../docs/adrs/0005-web-routes.md) remain)
 **Merged from:** this file’s 009 leftovers **and** the former `.planning/quick/011-e2e-named-route-honesty/` (deleted as a duplicate 011).
@@ -191,23 +191,21 @@ Live wiki `href` equals imported `noteShowHref(id)` (`expectHrefPointsToNote`). 
 
 ---
 
-### 7. E2E navigation timing baseline — Structure `[ ]`
+### 7. E2E navigation timing baseline — Structure `[x]`
 
-**Timing:** this **is** the before. No product change.
-
-Run the timing protocol on **note_edit**, **new_user**, **bazaar**, **recall_remount**, **circles**. Skip **epub** here if `@ignore` setup is painful; capture epub **before** in slice 11 immediately before changing the remount helper.
-
-Fill:
+No product change. Scores = sum of Cypress JSON `tests[].duration`. Median of 3 consecutive greens.
 
 | Spec | Run1 ms | Run2 ms | Run3 ms | Median before |
 |---|---|---|---|---|
-| note_edit | | | | |
-| new_user | | | | |
-| bazaar | | | | |
-| recall_remount | | | | |
-| circles | | | | |
+| note_edit | 47918 | 47440 | 47434 | 47440 |
+| new_user | 5256 | 5285 | 5246 | 5256 |
+| bazaar | 8562 | 8508 | 8615 | 8562 |
+| recall_remount | 15953 | 12275 | 12079 | 12275 |
+| circles | 11791 | 11790 | 11668 | 11790 |
 
-**Verify:** all three runs green per spec.
+**Learning:** Cloud VM `pnpm sut` needs a dummy `OPENAI_API_TOKEN` (e.g. `mock-token-for-e2e-testing`) so the official OpenAI Java client can construct. `@usingMockedOpenAiService` still uses Mountebank. First recall run after restart was warmup (15953 vs ~12s).
+
+Skip epub (slice 11).
 
 ---
 
@@ -219,7 +217,7 @@ Fill:
 
 | Spec | Median before (7) | Median after | Gate |
 |---|---|---|---|
-| note_edit | | | |
+| note_edit | 47440 | | |
 
 **Verify:** `note_edit.feature` 3× green + timing gate.
 
