@@ -3,6 +3,7 @@ import { commonSenseSplit } from 'support/string_util'
 import { waitUntilAppIsNotBusy } from '../pageBase'
 import router from '../router'
 import { assumeQuestionPage } from './QuizQuestionPage'
+import { recallDailyProbeMethods } from './recallDailyProbeMethods'
 import { recallLearningSessionMethods } from './recallLearningSessionMethods'
 
 function recallProgressFromTriple(triple: string) {
@@ -36,6 +37,7 @@ function loadRecallPage(options?: { waitForQuestionCount?: number }) {
 const recallPage = () => {
   return {
     ...recallLearningSessionMethods(),
+    ...recallDailyProbeMethods(),
     chooseGood() {
       cy.on('uncaught:exception', (err) => {
         if (

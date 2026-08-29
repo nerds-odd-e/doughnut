@@ -7,7 +7,10 @@ export interface DailyProbeTrial {
   correct: boolean
 }
 
-const TIMEOUT_MS = 2000
+export const DAILY_PROBE_TIMEOUT_MS = 2000
+export const DAILY_PROBE_ISI_MS = 2000
+export const DAILY_PROBE_INSTRUCTION =
+  "Each trial shows ← or →. Press F for left, J for right (arrow keys also work). Go as fast as you can without mistakes."
 const FALSE_START_MS = 100
 
 export const dailyProbePracticeSequence = [
@@ -58,7 +61,7 @@ export function recordDailyProbeTrial(input: {
   }
 
   const rtMs = responseMs - stimulusOnsetMs
-  if (rtMs >= TIMEOUT_MS) {
+  if (rtMs >= DAILY_PROBE_TIMEOUT_MS) {
     return { stimulus, correct: false }
   }
   if (rtMs < FALSE_START_MS) {

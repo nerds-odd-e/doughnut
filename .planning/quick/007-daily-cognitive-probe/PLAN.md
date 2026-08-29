@@ -1,7 +1,7 @@
 # Daily probe
 
-**Status:** in progress. Slices 1–3 shipped. Next: slice 4 (probe screen +
-speed before recall).
+**Status:** in progress. Slices 1–4 shipped. Next: slice 5 (accuracy on the
+result).
 **Type:** ad-hoc plan (`.planning/quick/`)
 **Extracted from:** `.planning/quick/001-morning-cognitive-index/PLAN.md`
 (unbuilt slices 26–31).
@@ -104,21 +104,13 @@ example. No screen yet.
 
 **Enables slice 4 only.**
 
-### 4. An opted-in learner completes the probe and sees speed before recall — Behavior `[ ]`
+### 4. An opted-in learner completes the probe and sees speed before recall — Behavior `[x]`
 
-**Pre-condition:** Daily probe is enabled and the learner enters recall.
-**Trigger:** they complete the fixed trial sequence. **Post-condition:** they
-see this run's mean reciprocal response time and can continue into ordinary
-recall; a learner with the setting off enters recall unchanged.
+Shipped: `DailyProbe.vue` before `/recall` when opted in; Continue into
+ordinary recall. Speed shown to 2 decimals. Disabled path unchanged. In-memory
+only until slice 9. E2E `recall/daily_probe.feature`.
 
-- Add the narrow Daily-probe screen/component and the smallest recall-entry
-  seam needed to host it.
-- Mounted-component test covers timing and completion; E2E starts
-  `recall/daily_probe.feature` and covers the enabled path plus the disabled
-  regression.
-- **Interim through slice 8:** the result exists only in memory and the probe
-  may appear again in another session. This is an explicit early-feedback
-  increment and disappears when persistence lands in slice 9.
+**Enables slice 5.**
 
 ### 5. The completed result reports accuracy — Behavior `[ ]`
 
