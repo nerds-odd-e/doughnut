@@ -1,130 +1,253 @@
-# Daily cognitive probe
+# Daily probe
 
-**Status:** planned, not started. Extracted unbuilt from
-`.planning/quick/001-morning-cognitive-index/PLAN.md` (slices 26–31 there),
-which is otherwise fully closed: its timer/pace/accuracy channels shipped,
-and its composite morning-index effort was dropped after the split-half
-reliability gate failed decisively on real production data
-(`pairCount: 91`, `rawCorrelation: 0.076`, `spearmanBrownCorrelation: 0.141`,
-all far below the ~0.6 threshold). None of this plan's slices were touched
-before extraction.
+**Status:** planned, not started. Refined into commit-sized slices; do not
+execute until the pre-execution gates below are resolved.
 **Type:** ad-hoc plan (`.planning/quick/`)
-**Related:** `.planning/quick/001-morning-cognitive-index/PLAN.md` (shipped
-component readouts — pace, accuracy, consistency, lapse count — this plan
-does not depend on them); `.planning/quick/008-probe-convergent-analyses/PLAN.md`
-(analyses that consume this plan's probe once shipped — extracted
-separately because they need re-scoping before they're executable).
+**Extracted from:** `.planning/quick/001-morning-cognitive-index/PLAN.md`
+(unbuilt slices 26–31).
+**Related:** `.planning/quick/008-probe-convergent-analyses/PLAN.md` consumes
+probe history only after this plan ships.
+
+The timer, pace, accuracy, consistency, and lapse-count work in `quick/001`
+already shipped. Its composite morning index was dropped after the
+split-half reliability gate failed on production data (`pairCount: 91`,
+`rawCorrelation: 0.076`, `spearmanBrownCorrelation: 0.141`). This plan does
+not depend on that composite.
 
 ## Goal
 
-Give the learner an opt-in, ~60-second daily cognitive probe — identical
-stimuli every day — as an independent, item-structure-free measurement of
-speed, accuracy, and lapses. This was originally motivated as a
-convergent-validity criterion for the morning cognitive index (an
-independent speeded task with no shared item structure is what makes a
-usable criterion). **That composite index no longer exists** (see Status
-above), so this plan stands on its own: the probe's own trend (slice 6) is
-its deliverable, not a validation instrument for something else. Whether the
-probe is later worth correlating against anything is `quick/008`'s question,
-not this plan's.
+Give the learner an opt-in, approximately 60-second **Daily probe** before
+recall. The task uses the same fixed stimulus protocol every day and produces
+an item-structure-free readout of speed, accuracy, lapses, and variability.
+Store raw trials so the summaries can be recomputed later, offer the task at
+most once per local day, and show its history on Recall Stats.
+
+## Accepted-ADR constraints and pre-execution gates
+
+- Follow [ADR 0001 — Ubiquitous language](../../../docs/adrs/0001-ubiquitous-language.md)
+  and [ADR 0003 — Spaced-repetition scheduling policy](../../../docs/adrs/0003-spaced-repetition-scheduling-policy-accepted.md):
+  the canonical capability name is **Daily probe**. Permanent artifacts use
+  `daily_probe` / `DailyProbe`, not `cognitive_probe` / `CognitiveProbe`.
+- **Human-owned ADR resolution required before slice 2.** ADR 0003 still says
+  the Daily probe validates the Cognitive index, while this plan records that
+  composite as dropped and intentionally avoids that claim in product copy.
+  A human must amend/supersede the ADR or explicitly own this plan's exception.
+- **Human-owned protocol required before slice 3.** Lock the stimulus set and
+  order, response mapping, practice/instruction flow, trial pacing, exact trial
+  count, and the formulas/units for mean reciprocal response time, lapse, and
+  variability. “~20 trials / ~60 seconds” is not precise enough to implement
+  or test without inventing measurement semantics.
+- **Human-owned daily-consumption rule required before slice 8.** Decide
+  whether the local-day offer is consumed when the screen is shown, when the
+  learner starts, or only on completion, and what an abandoned probe does.
+  The schema nullability and the same-day eligibility test depend on this.
+
+These are Jidoka gates, not implementation slices or commits.
 
 ## Key design decisions
 
-- **Identical stimuli every day.** Removes every item confound by
-  construction — the whole point of a probe distinct from recall history,
-  where item identity, prior exposure, and personal difficulty are all
-  confounded with performance.
-- **Opt-in, default off.** A daily ~60-second tax beyond recall itself needs
-  explicit consent, not an ambient default. Help text must be honest about
-  what turning it off forecloses — originally "the convergent-validity
-  route" to the index; since that index is gone, describe the tradeoff as
-  losing the probe's own trend readout (slice 6) plus whatever `quick/008`
-  builds on top of it, not a specific named feature that no longer exists.
-- **Raw trials stored alongside summaries** (`trials_json` on
-  `cognitive_probe`). Summary statistics cannot be un-summarized: a revised
-  lapse definition or an EZ-diffusion fit (see `quick/008` slice 2) needs the
-  per-trial array, not just aggregates computed once at probe time.
-- **Offered once per local day.** A second recall session the same morning
-  does not re-prompt — the probe measures a daily baseline state, not
-  something to average across repeated same-day attempts.
+- **Opt-in, default off.** The time cost needs explicit consent. Help text
+  describes losing the probe's own trend readout when disabled; final wording
+  follows the ADR resolution above.
+- **Fixed protocol every day.** The approved stimulus identifiers and order
+  are deterministic. Tests advance a controlled clock; they do not spend a
+  real minute waiting.
+- **Raw trials are the source data.** Each stored trial contains enough data
+  to recompute every displayed summary. Persisted summaries are query-friendly
+  readouts, not a replacement for `trials_json`.
+- **Local day comes from the request timezone.** The backend uses its
+  testability-aware current timestamp plus the supplied IANA timezone for
+  eligibility and trend grouping. Invalid timezones fail visibly through the
+  existing timezone parser.
+- **Incomplete attempts never enter trends.** Exact incomplete-attempt
+  persistence follows the daily-consumption decision above.
 
-## Slices
+## Slice sizing and commit contract
+
+Each numbered slice below is one commit-and-push boundary and targets about
+five minutes of implementation plus focused tests. Generated client or ERD
+output stays in the slice that changes its source contract. If a slice crosses
+the 5-minute scrutiny point because the change is larger—not because a single
+required test is slow—stop and refine that slice again before continuing.
 
 Status legend: `[ ]` planned · `[~]` in progress · `[x]` done
 
-### 1. Probe flag on `user` — Structure `[ ]`
+## Slices
 
-`V<next>__add_daily_probe_enabled_to_user.sql`: `TINYINT(1) NOT NULL DEFAULT
-'0'`, following `health_remove_empty_folders_default`. Plus the DTO field
-and a regenerated TypeScript client.
+### 1. Store the Daily probe opt-in in the user profile contract — Structure `[ ]`
 
-- The one deliberate exception to the nullable-pause-column rule elsewhere in
-  this codebase's recall instrumentation: this is a setting, not an
-  observation, and default-off is the intended behaviour for existing users.
-- **Compute the migration version fresh from the migration directory at
-  implementation time** — plan text guessing a specific `V` number has
-  repeatedly collided with migrations landed by other work in this
-  codebase's history; don't trust a hardcoded number here.
+Add `daily_probe_enabled` as `TINYINT(1) NOT NULL DEFAULT '0'`, map it on
+`User` and `UserDTO`, cover the default/update contract at the controller
+boundary, extend the test fixture, and regenerate the TypeScript client. No UI
+uses the field yet and no probe can run.
+
+- Compute the Flyway version from the migration directory at execution time.
+- Verify the migration plus all backend unit tests.
 - **Enables slice 2 only.**
 
-### 2. The daily probe can be switched on in General settings — Behavior `[ ]`
+### 2. The learner can opt in or out in General settings — Behavior `[ ]`
 
-A checkbox in `GeneralSettingsTab.vue` that persists, default off. Nothing
-runs yet — but the learner opts in before anything is measured.
+**Pre-condition:** the learner is on General settings and the Daily probe is
+off by default. **Trigger:** they change the Daily probe checkbox and submit.
+**Post-condition:** the selected state remains after reloading the profile.
 
-- E2E: extend `users/user_profile.feature`
-- Help text must state what turning the probe off forecloses (see Key
-  design decisions above — do not reference "the index" or
-  convergent-validity by name, since neither currently exists).
+- Mounted-page test drives the form through the generated API mock.
+- E2E extends `users/user_profile.feature`; enable and disable are variants of
+  the same persistence behavior, not separate slices.
+- Use the ADR-resolved help text; do not claim a feature that does not exist.
 
-### 3. The probe runs and shows this morning's result — Behavior `[ ]`
+### 3. Fix the Daily probe trial and scoring contract — Structure `[ ]`
 
-~20 trials, about 60 seconds, offered before the first recall of the day
-when enabled. Identical stimuli every day — that is what removes every item
-confound by construction.
+Represent the approved fixed stimuli, response keys, trial records, controlled
+clock input, and summary calculations in one cohesive, pure Daily-probe module.
+Contract tests prove deterministic stimuli/order and the approved response-time
+calculation. There is no screen or recall-flow change.
 
-- **Interim:** result is not stored — removed by slice 5.
-- E2E: new `recall/daily_cognitive_probe.feature`
+- Do not introduce generic experiment/task frameworks.
+- Add lapse and variability calculations only in slices 6 and 7; this slice
+  contains only what the immediate next behavior needs.
+- **Enables slice 4 only.**
 
-### 4. `cognitive_probe` table — Structure `[ ]`
+### 4. An opted-in learner completes the probe and sees speed before recall — Behavior `[ ]`
 
-`V<next>__create_cognitive_probe.sql`: user FK with CASCADE, `started_at
-timestamp(3)`, summary columns, and `trials_json` for the raw per-trial
-array.
+**Pre-condition:** Daily probe is enabled and the learner enters recall.
+**Trigger:** they complete the fixed trial sequence. **Post-condition:** they
+see this run's mean reciprocal response time and can continue into ordinary
+recall; a learner with the setting off enters recall unchanged.
 
-- Raw trials as well as summaries, deliberately: summary statistics cannot
-  be un-summarized, and a revised lapse definition or an EZ fit (see
-  `quick/008`) needs them.
-- Compute the migration version fresh from the migration directory, per
-  slice 1's note.
-- **Enables slice 5 only.** Regenerate `docs/database-erd.md`.
+- Add the narrow Daily-probe screen/component and the smallest recall-entry
+  seam needed to host it.
+- Mounted-component test covers timing and completion; E2E starts
+  `recall/daily_probe.feature` and covers the enabled path plus the disabled
+  regression.
+- **Interim through slice 8:** the result exists only in memory and the probe
+  may appear again in another session. This is an explicit early-feedback
+  increment and disappears when persistence lands in slice 9.
 
-### 5. The probe result persists and is offered once a day — Behavior `[ ]`
+### 5. The completed result reports accuracy — Behavior `[ ]`
 
-A second recall session the same morning does not re-prompt.
+**Pre-condition:** the learner has completed a mix of correct and incorrect
+Daily-probe trials. **Trigger:** the result appears. **Post-condition:** it
+also reports accuracy using the approved unit and rounding.
 
-### 6. Recall Stats shows the probe trend — Behavior `[ ]`
+- Extend the mounted test and the existing Daily-probe E2E scenario; do not
+  create another trial runner.
 
-Mean reciprocal RT, lapses and variability over the same window toggle
-already used elsewhere on the Recall Stats page (30 / 90 / All).
+### 6. The completed result reports lapses — Behavior `[ ]`
 
----
+**Pre-condition:** the completed run contains responses on both sides of the
+approved lapse boundary. **Trigger:** the result appears. **Post-condition:**
+it also reports the correct lapse count.
+
+- Add the lapse calculation to the stable trial/scoring contract, cover its
+  boundary with a pure unit test, and extend the same result UI/E2E path.
+
+### 7. The completed result reports variability — Behavior `[ ]`
+
+**Pre-condition:** the completed run has the response-time pattern from the
+approved variability example. **Trigger:** the result appears.
+**Post-condition:** it also reports variability using the approved unit and
+rounding.
+
+- Add one pure calculation test and extend the existing result UI/E2E path.
+
+### 8. Represent Daily probe attempts and results durably — Structure `[ ]`
+
+Create the `daily_probe` table and cohesive backend persistence model. Include
+the user FK with CASCADE, timestamps/status nullability required by the
+approved daily-consumption rule, all four summaries, and `trials_json`.
+Completed rows must retain the raw trial array exactly.
+
+- Compute the Flyway version fresh at execution time.
+- Extend `MakeMe` only as needed for concise controller fixtures.
+- Regenerate `docs/database-erd.md` with the `database-erd` skill.
+- No endpoint or UI behavior changes in this slice.
+- **Enables slice 9 only.**
+
+### 9. Completing the probe durably saves the result — Behavior `[ ]`
+
+**Pre-condition:** the learner starts and completes the Daily probe.
+**Trigger:** the final trial is submitted. **Post-condition:** the learner sees
+that today's result was saved, and the backend retains the exact raw trials
+plus their four summaries for that learner.
+
+- Drive backend persistence through the controller boundary with the real DB;
+  derive ownership from the authenticated learner instead of accepting a
+  client-supplied user id.
+- Regenerate the TypeScript client, submit through the normal wrapped API, and
+  extend the Daily-probe E2E scenario through the visible saved state.
+- This slice removes the in-memory-only interim from slice 4.
+
+### 10. A second recall session on the same local day bypasses the probe — Behavior `[ ]`
+
+**Pre-condition:** the Daily probe is enabled and today's offer has been
+consumed according to the approved rule. **Trigger:** the learner starts
+another recall session in the same local day. **Post-condition:** ordinary
+recall opens without another probe prompt.
+
+- Controller test owns the timezone boundary and same-user lookup.
+- E2E uses the testability clock; no browser sleeps.
+
+### 11. The next local day offers the same fixed probe again — Behavior `[ ]`
+
+**Pre-condition:** yesterday's Daily-probe offer was consumed and the setting
+remains enabled. **Trigger:** the learner starts recall after local midnight.
+**Post-condition:** the probe is offered again with the same approved fixed
+stimulus protocol.
+
+- Test a non-UTC timezone around midnight at the controller boundary and one
+  next-day E2E path with the testability clock.
+
+### 12. Expose completed Daily-probe days to Recall Stats — Structure `[ ]`
+
+Extend the current-user Recall Stats read model with one cohesive daily series
+containing mean reciprocal response time, lapses, and variability for completed
+probe results. Group by the request timezone and exclude incomplete attempts.
+Regenerate the TypeScript client. The page does not render the series yet.
+
+- Backend controller/service tests cover ordering, timezone grouping, empty
+  history, and incomplete-attempt exclusion through the stable boundary.
+- **Enables slice 13 only.**
+
+### 13. Recall Stats shows the Daily probe trend — Behavior `[ ]`
+
+**Pre-condition:** the learner has completed Daily probes on multiple local
+days. **Trigger:** they open Recall Stats. **Post-condition:** the default
+90-day view shows the three approved probe readouts together as one Daily
+probe trend, without changing existing recall-derived charts.
+
+- Mounted-page test uses the generated DTO fixture; E2E creates probe history
+  through the product flow and asserts the user-visible trend.
+
+### 14. The existing window control filters the Daily probe trend — Behavior `[ ]`
+
+**Pre-condition:** completed Daily-probe history spans the 30-day and 90-day
+boundaries. **Trigger:** the learner selects 30d, 90d, or All on the existing
+Recall Stats control. **Post-condition:** the Daily-probe trend shows exactly
+the matching local-day points.
+
+- Reuse the existing control and date-slicing grammar; do not add a second
+  window selector.
 
 ## Permanent artifacts (capability-named)
 
 | Artifact | Slices |
 |----------|--------|
-| `e2e_test/features/recall/daily_cognitive_probe.feature` | 3, 5 |
 | `e2e_test/features/users/user_profile.feature` | 2 (extend) |
+| `e2e_test/features/recall/daily_probe.feature` | 4–11, 13–14 |
+| `daily_probe` schema/entity/repository | 8–12 |
+| Daily-probe frontend component and scoring module | 3–9 |
 
 ## Per-slice wrap-up
 
-Per `.cursor/rules/planning.mdc`: test first and confirm it fails for the
-right reason → smallest change to green → `post-change-refactor` on the
-uncommitted change → update this plan → commit and push before the next
-slice. Targeted `cypress run --spec` only, never the full suite. Unfinished
-E2E stays `@wip`; never commit on red.
+For every slice: Jidoka before/after → test first and confirm the right failure
+→ smallest change to green → `post-change-refactor` on the uncommitted change
+→ update this plan → commit and push before the next slice. Run all backend
+unit tests when backend code changes, focused frontend tests while iterating,
+and only the targeted Cypress feature. Unfinished E2E stays `@wip`; never
+commit on red.
 
-Migration slices additionally regenerate `docs/database-erd.md`
-(`database-erd` skill). Slices changing a controller signature regenerate
-the TypeScript client (`generate-api-client` skill).
+Migration slices use the `database-erd` skill. A changed controller signature
+uses the `generate-api-client` skill. When the final slice ships and the
+outcomes live in product code/tests/docs, remove spent plan history rather
+than retaining this file as a permanent implementation diary.
