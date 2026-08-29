@@ -178,7 +178,7 @@ DTO/wire, fully covered by the green `RecallStatsService*` backend suite
 (49 tests). `RecallStatsTestFixtures.java` still references
 `RecallMorningHalfIndex` (lines ~22, 95) — left untouched, that's slice 6.
 
-### 6. Remove the now-orphaned test fixture helpers — Structure `[ ]`
+### 6. Remove the now-orphaned test fixture helpers — Structure `[x]`
 
 In `RecallStatsTestFixtures.java`, remove `variedBaselinesThrough`,
 `addScorableMorning`, `warmedUpBaselines` (lines ~65, ~97, ~112 as of this
@@ -189,6 +189,14 @@ writing — re-locate at execution time since line numbers shift after slices
   (`grep -rn "variedBaselinesThrough\|addScorableMorning\|warmedUpBaselines" backend/src`)
   — expected empty after slices 1–3 removed their only callers. Full
   backend build green.
+
+**Done:** post-change-refactor found this also orphaned
+`addWarmedUpBaselineDay` (both overloads) and the `WARMED_UP_BASELINE_*`
+constants — their only callers were the three methods just deleted — so
+those were removed too, plus the now-unused `LocalDate`/`ArrayList`
+imports. `RecallStatsTestFixtures.java` is now 106 lines. Final
+confirmation: `grep -rn "RecallMorningHalfIndex\|RecallCognitiveIndex\|SplitHalfReliability" backend/src`
+returns nothing — the whole diagnostic cluster is gone.
 
 ### 7. Full backend test run and close plan 001's text — Structure `[ ]`
 
