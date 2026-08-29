@@ -1,6 +1,6 @@
 # Named SPA route honesty follow-up
 
-**Status:** in progress — slices 1–7 done; next is slice 8.
+**Status:** in progress — slices 1–8 done; next is slice 9.
 **Type:** ad-hoc plan (`.planning/quick/`)
 **Depends on:** shipped `.planning/quick/009-named-spa-route-honesty/` (PLAN retired; code and Proposed [ADR 0005](../../../docs/adrs/0005-web-routes.md) remain)
 **Merged from:** this file’s 009 leftovers **and** the former `.planning/quick/011-e2e-named-route-honesty/` (deleted as a duplicate 011).
@@ -209,17 +209,15 @@ Skip epub (slice 11).
 
 ---
 
-### 8. Named push / visitNamed gate; drop fallback paths — Structure `[ ]`
+### 8. Named push / visitNamed gate; drop fallback paths — Structure `[x]`
 
-**Timing:** yes — **note_edit** after vs slice 7 median.
-
-`router.ts`: `visitNamed` + named `push` only. Update `navigationActions`, `toRoot`, `toMessageCenter`, `notebooksPage`, `folder_page`. `forceLoadPage` → `visitNamed('noteShow', { noteId })`. Drop fallback strings and `time` query.
+`visitNamed` compiles href via `namedLocationHref` then `cy.visit` and sets `@firstVisited`. Named `push` only (no fallback path, no `time` query). `forceLoadPage` → `visitNamed('noteShow', { noteId })`. Folder jump: `jumpToFolderPage` in `navigationActions`. Login/home/bazaar/recall still `cy.visit('/…')`.
 
 | Spec | Median before (7) | Median after | Gate |
 |---|---|---|---|
-| note_edit | 47440 | | |
+| note_edit | 47440 | 46972 | pass (≤ 54556) |
 
-**Verify:** `note_edit.feature` 3× green + timing gate.
+**Verify:** `note_edit.feature` 3× green + timing. After refactor, one more note_edit + folder_page_readme green.
 
 ---
 
@@ -233,8 +231,8 @@ Skip epub (slice 11).
 
 | Spec | Median before (7) | Median after | Gate |
 |---|---|---|---|
-| note_edit | | | |
-| new_user | | | |
+| note_edit | 47440 | | |
+| new_user | 5256 | | |
 
 **Verify:** `new_user.feature` and `note_edit.feature` 3× green + timing gate. `feature_toggle.feature` if home is not covered by new_user.
 

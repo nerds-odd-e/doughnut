@@ -121,7 +121,7 @@ export const notebooksPage = () => {
       })
       notebookCreationForm.createNotebookWithNameAndDescription(notebookName)
       waitUntilAppIsNotBusy()
-      router().push('/notebooks', 'notebooks', {})
+      router().push('notebooks')
       waitUntilAppIsNotBusy()
       return notebooksPage()
     },
@@ -135,7 +135,7 @@ export const notebooksPage = () => {
 }
 
 export const navigateToNotebooksPage = () => {
-  router().push('/notebooks', 'notebooks', {})
+  router().push('notebooks')
   waitUntilAppIsNotBusy()
   return notebooksPage()
 }

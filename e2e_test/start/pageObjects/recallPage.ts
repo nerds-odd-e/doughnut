@@ -218,7 +218,7 @@ export const recall = () => {
       return recallPage()
     },
     navigateToRecallPage() {
-      router().toRoot()
+      router().push('root')
       getRecallListItemInSidebar(($el) => {
         $el.click()
       })

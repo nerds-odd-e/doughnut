@@ -72,7 +72,7 @@ export const waitForConversationList = (options?: {
 
 export const navigateToMessageCenter = () => {
   interceptConversationList()
-  router().toMessageCenter()
+  router().push('messageCenter')
   waitForConversationList()
   return assumeMessageCenterPage()
 }
