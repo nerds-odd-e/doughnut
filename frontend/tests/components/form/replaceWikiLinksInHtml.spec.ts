@@ -41,16 +41,22 @@ describe("replaceWikiLinksInHtml", () => {
     )
   })
 
-  it("upgrades dead path markdown anchors to live when wikiTitles resolve", () => {
-    expect(
-      replaceWikiLinksInHtml(
-        '<p><a href="/Folder/Title.md" class="dead-wiki-link" data-wiki-title="/Folder/Title.md" data-wiki-display="label">label</a></p>',
-        [wikiTitleFromAuthoredToken("[label](/Folder/Title.md)", 42)]
+  it.each`
+    label                                     | html
+    ${"dead"}                                 | ${'<p><a href="/Folder/Title.md" class="dead-wiki-link" data-wiki-title="/Folder/Title.md" data-wiki-display="label">label</a></p>'}
+    ${"leftover live with concept-path href"} | ${'<p><a href="/Folder/Title.md" class="donut-wiki-link" data-wiki-title="/Folder/Title.md" data-wiki-display="label" data-note-id="42">label</a></p>'}
+  `(
+    "upgrades $label path markdown anchors to a note-show href when wikiTitles resolve",
+    ({ html }) => {
+      expect(
+        replaceWikiLinksInHtml(html, [
+          wikiTitleFromAuthoredToken("[label](/Folder/Title.md)", 42),
+        ])
+      ).toBe(
+        `<p><a href="${noteShowHref(42)}" class="donut-wiki-link" data-wiki-title="/Folder/Title.md" data-wiki-display="label" data-note-id="42">label</a></p>`
       )
-    ).toBe(
-      '<p><a href="/Folder/Title.md" class="donut-wiki-link" data-wiki-title="/Folder/Title.md" data-wiki-display="label" data-note-id="42">label</a></p>'
-    )
-  })
+    }
+  )
 
   it("preserves Quill hr markup without rewriting through DOMParser", () => {
     const quillHr = "<p><hr></p>"

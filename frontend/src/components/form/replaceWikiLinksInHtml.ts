@@ -149,12 +149,15 @@ function upgradePathMarkdownAnchors(
     if (!isPathMarkdownWikiTitle(w)) continue
     const { target, display } = wikiTitleParts(w)
     const attrTarget = escapeHtmlAttributeValue(target)
-    const live = wikiLinkAnchorHtml({
-      href: target,
+    const livePathMarkdownAttrs = {
       className: DONUT_WIKI_LINK_CLASS,
       target,
       display,
       noteId: w.noteId,
+    }
+    const live = wikiLinkAnchorHtml({
+      href: noteShowHref(w.noteId),
+      ...livePathMarkdownAttrs,
     })
     result = result.replaceAll(`<a href="${attrTarget}">${display}</a>`, live)
     result = result.replaceAll(
@@ -164,6 +167,10 @@ function upgradePathMarkdownAnchors(
         target,
         display,
       }),
+      live
+    )
+    result = result.replaceAll(
+      wikiLinkAnchorHtml({ href: target, ...livePathMarkdownAttrs }),
       live
     )
   }

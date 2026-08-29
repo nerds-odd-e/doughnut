@@ -1,8 +1,7 @@
 # Compiled href for wiki / path-Markdown anchors
 
-**Status:** planned, not started.
+**Status:** in progress (slice 1 done).
 **Type:** ad-hoc plan (`.planning/quick/`)
-**Do not execute until the developer approves.**
 **Depends on:** Proposed [ADR 0005](../../../docs/adrs/0005-web-routes.md) wiki-destination clause (compiled `href`; concept path is not a Vue location). ADR wording for this policy is already in that draft — this plan is the product change.
 
 ## Goal
@@ -11,11 +10,11 @@ Live path-Markdown anchors use the same compiled note-show `href` as live `[[wik
 
 ## Inspection
 
-Today live `[[wiki]]` compiles `href` via `noteShowHref`. Live path Markdown keeps the bundle-relative path as `href` (`/Folder/Title.md`). Unresolved wiki uses `#`; unresolved path Markdown keeps the concept path. `handleRichContentAnchorClick` still `navigateInApp(href)` for leftover non-http strings, so a concept path can be fed to the router. Quill left-click `preventDefault`s, so the user-visible hole is middle-click / copy-link / open-in-new-tab, plus any leftover click that misses `data-note-id`.
+Live `[[wiki]]` and live **body** path Markdown compile `href` via `noteShowHref`. Property-field path Markdown still uses the concept path as `href`. Unresolved wiki uses `#`; unresolved path Markdown still keeps the concept path. `handleRichContentAnchorClick` still `navigateInApp(href)` for leftover non-http strings. Quill left-click `preventDefault`s; user-visible hole is middle-click / copy-link / open-in-new-tab, plus leftover click that misses `data-note-id`.
 
 `WikiLinkToken.vue` already uses named `noteShowLocation` / `href="#"`. Backend token parse is unchanged.
 
-Existing E2E `path_markdown_link.feature` follows live path Markdown but uses `following the wiki link`, which does **not** assert `href`. Wiki spelling already has `the wiki link … should open the note titled …` (`expectNoteShowHref`).
+`path_markdown_link.feature` live outline asserts `expectNoteShowHref` via `the wiki link … should open`.
 
 ## Design decisions
 
@@ -32,15 +31,15 @@ Status legend: `[ ]` planned · `[~]` in progress · `[x]` done
 
 Verify with `CURSOR_DEV=true nix develop -c pnpm frontend:test` on the specs named in the slice. Slice 1 also runs `path_markdown_link.feature` (`cypress run --spec`). No full E2E suite.
 
-### 1. Live path-Markdown in note body has a note-show href — Behavior `[ ]`
+### 1. Live path-Markdown in note body has a note-show href — Behavior `[x]`
 
 **Pre:** Note body contains a resolved path-Markdown link (wikiTitles hit).
 **Trigger:** View the note as rich content.
-**Post:** The live anchor’s `href` is `noteShowHref(id)` (same shape as live `[[wiki]]`). Stored markdown is still the path-Markdown token. Following the link still opens the target note.
+**Post:** The live anchor’s `href` is `noteShowHref(id)`. Stored markdown is still the path-Markdown token. Following the link still opens the target note.
 
-Tests first: `NoteTextContent.wikiLinks.spec.ts` (live path Markdown `href` is `/Folder/Title.md` today); `replaceWikiLinksInHtml.spec.ts` (dead→live path Markdown expected `href`). E2E: in `e2e_test/features/note_topology/path_markdown_link.feature`, the live outline uses `following the wiki link` — switch that Then to `the wiki link "<display>" should open the note titled "<target_title>"` so `expectNoteShowHref` runs (existing step; will fail until production changes). `quillHtmlToMarkdown.spec.ts`: keep inbound fixtures that still have a concept-path `href`; add or adjust that a live tag with `noteShowHref` + `data-wiki-title` still serializes to `[label](/Folder/Title.md)`.
+**Done:** `upgradePathMarkdownAnchors` emits `noteShowHref(w.noteId)` and still matches marked concept-path `<a href>` plus leftover live/dead tags whose `href` is the concept path. Serialize still uses `data-wiki-title`.
 
-Production: `upgradePathMarkdownAnchors` live `href` is `noteShowHref(w.noteId)`. Still match marked `<a href="{concept}">` and existing live/dead tags whose `href` is still the concept path. Do not change unresolved wrapping yet.
+**Learning:** leftover in-session live tags with a concept-path `href` needed an extra replace (shared `livePathMarkdownAttrs`). Slice 3 still must match `href="#"` after unresolved wrapping.
 
 ### 2. Live path-Markdown in a property field has a note-show href — Behavior `[ ]`
 
@@ -72,7 +71,6 @@ Test: `wikiLinkMarkup.spec.ts` — extend `handleRichContentAnchorClick` (concep
 
 ## Out of scope
 
-- Executing this plan until the developer approves
 - Requiring `.md` on path-Markdown (0004 tightening)
 - Changing compact `/n:id` or SPA prefixes
 - Teaching `hrefLooksLikeConceptNotePath` a `routeMetadata` denylist

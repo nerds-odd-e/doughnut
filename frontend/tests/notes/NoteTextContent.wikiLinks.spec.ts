@@ -103,7 +103,7 @@ describe("NoteTextContent wiki link display", () => {
       ".ql-editor a.donut-wiki-link"
     ) as HTMLAnchorElement
     expect(live.textContent).toContain("label")
-    expect(live.getAttribute("href")).toBe("/Folder/Title.md")
+    expect(live.getAttribute("href")).toBe(noteShowHref(targetNote.id!))
     expect(live.getAttribute("data-note-id")).toBe(String(targetNote.id))
   })
 
