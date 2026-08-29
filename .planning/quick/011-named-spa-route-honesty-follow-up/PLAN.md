@@ -1,8 +1,7 @@
 # Named SPA route honesty follow-up
 
-**Status:** planned, not started.
+**Status:** in progress — slice 1 done; next is slice 2.
 **Type:** ad-hoc plan (`.planning/quick/`)
-**Do not execute until the developer approves.**
 **Depends on:** shipped `.planning/quick/009-named-spa-route-honesty/` (PLAN retired; code and Proposed [ADR 0005](../../../docs/adrs/0005-web-routes.md) remain)
 **Merged from:** this file’s 009 leftovers **and** the former `.planning/quick/011-e2e-named-route-honesty/` (deleted as a duplicate 011).
 
@@ -16,7 +15,7 @@ Scope: the eight route-honesty commits only (not later Daily probe work). Bar: P
 
 ### Sliced (meaningful) — unit leftovers
 
-1. **ADR still overclaims test routers.** Decision says test routers use production `routes` or `routeMetadata` stubs, not a hand-copied path dialect. `frontend/tests/composables/useRecallData.spec.ts` still stubs `path: "/recall"`. That is the only remaining **screen** path copied next to a named route. Dummy `/` catch-alls (`questionsRouter`, `modalRouter`, `popButtonRouter`) and `useRoute` mocks of `path: "/"` are not a second screen dialect.
+1. **ADR still overclaims test routers.** Decision says test routers use production `routes` or `routeMetadata` stubs, not a hand-copied path dialect. Dummy `/` catch-alls (`questionsRouter`, `modalRouter`, `popButtonRouter`) and `useRoute` mocks of `path: "/"` are not a second screen dialect. `useRecallData.spec.ts` now uses `dummyRouteRecordsFromMetadata` (slice 1).
 
 2. **Live wiki HTML is asserted many times.** `replaceWikiLinksInHtml.spec.ts` repeats the same compiled live tag (href via `noteShowHref` + `data-note-id`) for known `[[MyNote]]`, last-saved + wikiTitles, dead-anchor upgrade, last-saved pending upgrade, and in-flight pending upgrade. The two pending→live cases have the same input HTML and the same post-condition (`upgradeUnresolvedWikiAnchors` runs before `confirmPendingWikiAnchorsAsDead`, so last-saved vs `"Saved."` does not change the outcome). Mounted specs (`NoteTextContent.wikiLinks`, `RichMarkdownEditor`, `RichMarkdownEditor.propertyWikiLinks`) re-pin `data-note-id` / `noteShowHref` after the helper already does. `routes.spec.ts` dummy lockstep is two blocks (failureReport + settings `it.each`) for the same “dummy path equals production path” claim. `propertyValueField.spec.ts` repeats `noteShowHref` on the last-saved-live sibling of “resolves wiki markers”.
 
@@ -142,13 +141,11 @@ Status legend: `[ ]` planned · `[~]` in progress · `[x]` done
 
 Frontend slices: `CURSOR_DEV=true nix develop -c pnpm frontend:test` on the specs named. No E2E until slice 6.
 
-### 1. Recall test router comes from the named table — Structure `[ ]`
+### 1. Recall test router comes from the named table — Structure `[x]`
 
-**Timing:** no (Vitest). If this spec’s wall time jumps by **seconds**, stop — dummy table should be milliseconds.
+`useRecallData.spec.ts` builds the memory-history router from `dummyRouteRecordsFromMetadata` (shared factory, including potential-session mount). Resume click asserts `currentRoute.name === "recall"`. In-browser suite ~35ms; dummy table is not seconds.
 
-In `useRecallData.spec.ts`, build the router from `dummyRouteRecordsFromMetadata` (memory history). Remove the hand-copied `/recall` (and extra `/` if `root` is already in metadata). Named `recall` navigation in that spec must still resolve.
-
-**Verify:** `pnpm frontend:test tests/composables/useRecallData.spec.ts`
+**Verify:** `pnpm frontend:test tests/composables/useRecallData.spec.ts` — 6 passed.
 
 ---
 
