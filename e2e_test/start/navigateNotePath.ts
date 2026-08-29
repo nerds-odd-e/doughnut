@@ -1,8 +1,37 @@
+import type NotePath from '../support/NotePath'
+import { navigationActions } from './actions/navigationActions'
+import { navigateToBazaar } from './pageObjects/bazaarPage'
 import { notebookList } from './pageObjects/NotebookList'
 import { assumeNotePage } from './pageObjects/notePage'
 import { noteSidebar } from './pageObjects/noteSidebar'
 
-export const BAZAAR_NOTE_PATH_ROOT = 'Bazaar'
+const BAZAAR_NOTE_PATH_ROOT = 'Bazaar'
+
+/** Owned paths identity-jump to the leaf note. Bazaar-rooted paths walk the bazaar catalog. */
+export function navigateToNoteFromPath(notePath: NotePath) {
+  const segments = notePath.path
+  if (segments.length === 0) {
+    return
+  }
+  if (segments[0] === BAZAAR_NOTE_PATH_ROOT) {
+    navigateToBazaarNoteFromPath(segments)
+    return
+  }
+  jumpToOwnedNoteFromPath(segments)
+}
+
+function navigateToBazaarNoteFromPath(segments: string[]) {
+  navigateToBazaar()
+  const catalogSegments = segments.slice(1)
+  if (catalogSegments.length === 0) {
+    return
+  }
+  navigateAlongNotebookCatalogPath(catalogSegments)
+}
+
+function jumpToOwnedNoteFromPath(segments: string[]) {
+  navigationActions.jumpToNotePage(segments[segments.length - 1]!)
+}
 
 function navigateAlongSidebarToNote(titles: string[]) {
   const sidebar = noteSidebar()

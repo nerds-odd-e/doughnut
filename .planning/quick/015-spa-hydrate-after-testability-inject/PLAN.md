@@ -1,8 +1,8 @@
 # SPA hydrate after testability inject
 
-**Status:** in progress (slices 1–3 done; 4–6 remaining).
+**Status:** in progress (slices 1–4 done; 5–6 remaining).
 **Type:** ad-hoc plan (`.planning/quick/`)
-**Depends on:** Proposed [ADR 0005](../../../docs/adrs/0005-web-routes.md) E2E intent table; shipped identity-jump interims (`jumpToNotebookPage` for skip-tracking and note creation; tree-view `I route to the note`).
+**Depends on:** Proposed [ADR 0005](../../../docs/adrs/0005-web-routes.md) E2E intent table; shipped identity-jump interims (`jumpToNotebookPage` for skip-tracking and note creation).
 
 ## Goal
 
@@ -25,7 +25,7 @@ Vue is coherent: **page bodies refetch on mount; layout chrome is session-scoped
 |---|---|
 | Skip Memory Tracking → `jumpToNotebookPage` | **Keep.** Domain is notebook settings, not catalog browsing (ADR 0001). |
 | Note creation under folder → `jumpToNotebookPage` | **Keep.** Same Given-shaped identity jump. |
-| Tree-view Gherkin → `I route to the note` (slice 1) | **Interim wording.** Unique behavior is the sidebar tree. Restore `{notepath}` after the helper jumps by leaf (slice 4). |
+| Tree-view Gherkin `{notepath}` | **Restored (slice 4).** Helper identity-jumps the leaf; path still documents tree position. |
 | MainMenu refetch on `route.name` | **Reverted (slice 3).** Login hydrate + in-app assimilate / `next()` DTO only. |
 
 ## Design decisions
@@ -90,14 +90,16 @@ Timing (`stats.duration`): 15.536 / 15.307 / 15.281 → median **15.307s** vs 15
 
 ---
 
-### 4. Owned `{notepath}` jumps to the leaf note — Behavior `[ ]`
+### 4. Owned `{notepath}` jumps to the leaf note — Behavior `[x]`
 
-**Pre:** login + inject; unique behavior is **being on that note**, not browsing cards. **Trigger:** `I navigate to "{notebook}/…/{title}" note`. **Post:** that note’s screen (wiki_link path steps, tree-view if paths restored).
+**Pre:** login + inject; unique behavior is **being on that note**, not browsing cards. **Trigger:** `I navigate to "{notebook}/…/{title}" note`. **Post:** that note’s screen.
 
-- Non-bazaar `navigateToNoteFromPath`: `jumpToNotePage(last segment)`. Keep Bazaar root on bazaar catalog.
-- Restore tree-view Gherkin to `{notepath}` (same observable as slice 1; path documents tree position).
+Shipped: owned `{notepath}` → `jumpToNotePage(last segment)`; Bazaar root still catalog-walks. Tree-view Gherkin restored to `{notepath}`. Helpers: `jumpToOwnedNoteFromPath` / `navigateToBazaarNoteFromPath` in `navigateNotePath.ts`.
 
-**Verify:** `note_tree_view.feature` and `wiki_link.feature` (3 green on tree-view; wiki_link once unless red). Timing: tree-view vs slice-2; wiki_link median vs a **new** 3-run baseline taken at the start of this slice (file was not in slice 2).
+| Spec | Before median | After median | Gate | Result |
+|------|---------------|--------------|------|--------|
+| note_tree_view | 7.403s | 7.389s | ≤ 10.403s | pass |
+| wiki_link | 27.059s (new at slice start) | 26.318s | ≤ 31.118s | pass |
 
 ---
 
@@ -129,7 +131,7 @@ Then watch `donut CI` on `main` for the branch tip until green (lint, backend un
 | note_tree_view median | 7.403s | |
 | assimilation_walkthrough median | 15.100s | |
 | notebook_catalog_navigation median | 2.854s | |
-| wiki_link median (if timed) | | |
+| wiki_link median (if timed) | 27.059s | |
 
 ---
 
