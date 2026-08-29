@@ -1,7 +1,7 @@
 # Daily probe
 
-**Status:** in progress. Slices 1–10 shipped. Next: slice 11 (next local day
-offers the probe again).
+**Status:** in progress. Slices 1–11 shipped. Next: slice 12 (Recall Stats
+read model series).
 **Type:** ad-hoc plan (`.planning/quick/`)
 **Extracted from:** `.planning/quick/001-morning-cognitive-index/PLAN.md`
 (unbuilt slices 26–31).
@@ -161,15 +161,13 @@ E2E: second `visit recall` on day 1 shows ordinary recall.
 
 **Enables slice 11.**
 
-### 11. The next local day offers the same fixed probe again — Behavior `[ ]`
+### 11. The next local day offers the same fixed probe again — Behavior `[x]`
 
-**Pre-condition:** yesterday's Daily-probe offer was consumed and the setting
-remains enabled. **Trigger:** the learner starts recall after local midnight.
-**Post-condition:** the probe is offered again with the same approved fixed
-stimulus protocol.
+Shipped: controller midnight (Asia/Shanghai day 1 23:00 → day 2 00:00 →
+`completed` false). E2E day 2 visit shows the same probe instruction. GET
+today already used local-day bounds; no production change.
 
-- Test a non-UTC timezone around midnight at the controller boundary and one
-  next-day E2E path with the testability clock.
+**Enables slice 12.**
 
 ### 12. Expose completed Daily-probe days to Recall Stats — Structure `[ ]`
 
