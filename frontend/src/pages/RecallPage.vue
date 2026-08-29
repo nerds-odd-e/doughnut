@@ -1,5 +1,10 @@
 <template>
   <div ref="recallPageRoot" class="recall-page h-full flex flex-col">
+    <DailyProbe
+      v-if="currentUser?.dailyProbeEnabled && !dailyProbeFinished"
+      @complete="dailyProbeFinished = true"
+    />
+    <template v-else>
     <GlobalBar
       v-if="isProgressBarVisible"
       :class="[
@@ -81,17 +86,19 @@
         data-testid="speaking-practice-input"
       />
     </div>
+    </template>
   </div>
 </template>
 
 <script setup lang="ts">
+import DailyProbe from "@/components/recall/DailyProbe.vue"
 import Quiz from "@/components/recall/Quiz.vue"
 import RecallProgressBar from "@/components/recall/RecallProgressBar.vue"
 import AnsweredQuestionComponent from "@/components/recall/AnsweredQuestionComponent.vue"
 import AnsweredSpellingQuestion from "@/components/recall/AnsweredSpellingQuestion.vue"
 import GlobalBar from "@/components/toolbars/GlobalBar.vue"
-import type { AnsweredQuestion } from "@generated/donut-backend-api"
-import { computed, ref, watch } from "vue"
+import type { AnsweredQuestion, User } from "@generated/donut-backend-api"
+import { computed, inject, ref, watch, type Ref } from "vue"
 import { useRecallData } from "@/composables/useRecallData"
 import { useRecallTrackerNavigation } from "@/composables/useRecallTrackerNavigation"
 import { useRecallAnswerHandling } from "@/composables/useRecallAnswerHandling"
@@ -121,6 +128,9 @@ const {
 defineProps({
   eagerFetchCount: Number,
 })
+
+const currentUser = inject<Ref<User | undefined>>("currentUser")
+const dailyProbeFinished = ref(false)
 
 const currentIndex = ref(0)
 const previousAnsweredQuestions = ref<(AnsweredQuestion | undefined)[]>([])
