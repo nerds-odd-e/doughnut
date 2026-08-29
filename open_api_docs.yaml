@@ -1330,6 +1330,24 @@ paths:
             '*/*':
               schema:
                 type: string
+  /api/daily-probes:
+    post:
+      tags:
+      - daily-probe-controller
+      operationId: createDailyProbe
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DailyProbeRequestDTO"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/DailyProbe"
   /api/conversation/{conversationId}/send:
     post:
       tags:
@@ -4487,6 +4505,62 @@ components:
       required:
       - line
       - reason
+    DailyProbeRequestDTO:
+      type: object
+      properties:
+        trials:
+          type: array
+          items:
+            $ref: "#/components/schemas/DailyProbeTrialDTO"
+        speed:
+          type: number
+          format: double
+        accuracy:
+          type: integer
+          format: int32
+        lapseCount:
+          type: integer
+          format: int32
+        variability:
+          type: number
+          format: double
+    DailyProbeTrialDTO:
+      type: object
+      properties:
+        stimulus:
+          type: string
+        response:
+          type: string
+        rtMs:
+          type: integer
+          format: int32
+        correct:
+          type: boolean
+    DailyProbe:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        completedAt:
+          type: string
+          format: date-time
+        speed:
+          type: number
+          format: double
+        accuracy:
+          type: integer
+          format: int32
+        lapseCount:
+          type: integer
+          format: int32
+        variability:
+          type: number
+          format: double
+        trialsJson:
+          type: string
+      required:
+      - id
     ConversationMessage:
       type: object
       properties:

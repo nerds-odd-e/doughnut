@@ -34,6 +34,7 @@
       >
         {{ variabilityText }}
       </p>
+      <p v-if="saved" data-testid="daily-probe-saved">Saved</p>
       <button class="daisy-btn daisy-btn-primary" @click="emit('complete')">
         Continue
       </button>
@@ -57,6 +58,8 @@ import {
   type DailyProbeSide,
   type DailyProbeTrial,
 } from "@/models/dailyProbe"
+import { DailyProbeController } from "@generated/donut-backend-api/sdk.gen"
+import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import {
   computed,
   onActivated,
@@ -80,17 +83,15 @@ const trialIndex = ref(0)
 const stimulus = ref<DailyProbeSide | undefined>()
 const scoredTrials = ref<DailyProbeTrial[]>([])
 const finished = ref(false)
+const saved = ref(false)
 
-const speedText = computed(() =>
-  dailyProbeSpeed(scoredTrials.value)?.toFixed(2)
-)
-const accuracyText = computed(
-  () => `${dailyProbeAccuracy(scoredTrials.value)}%`
-)
+const speed = computed(() => dailyProbeSpeed(scoredTrials.value))
+const accuracy = computed(() => dailyProbeAccuracy(scoredTrials.value))
 const lapseCount = computed(() => dailyProbeLapseCount(scoredTrials.value))
-const variabilityText = computed(() =>
-  dailyProbeVariability(scoredTrials.value)?.toFixed(2)
-)
+const variability = computed(() => dailyProbeVariability(scoredTrials.value))
+const speedText = computed(() => speed.value?.toFixed(2))
+const accuracyText = computed(() => `${accuracy.value}%`)
+const variabilityText = computed(() => variability.value?.toFixed(2))
 
 let stimulusOnsetMs = 0
 let respondedThisTrial = false
@@ -127,12 +128,30 @@ function finishTrial(key?: string) {
   stimulus.value = undefined
   if (trialIndex.value === runSequence.length - 1) {
     finished.value = true
+    persistCompletedProbe()
     return
   }
   scheduled = setTimeout(() => {
     trialIndex.value += 1
     startTrial()
   }, DAILY_PROBE_ISI_MS)
+}
+
+async function persistCompletedProbe() {
+  const { error } = await apiCallWithLoading(() =>
+    DailyProbeController.createDailyProbe({
+      body: {
+        trials: scoredTrials.value,
+        speed: speed.value,
+        accuracy: accuracy.value,
+        lapseCount: lapseCount.value,
+        variability: variability.value,
+      },
+    })
+  )
+  if (!error) {
+    saved.value = true
+  }
 }
 
 function onKeydown(event: KeyboardEvent) {

@@ -658,6 +658,31 @@ export type RejectedLearningSessionReportEntry = {
     reason: string;
 };
 
+export type DailyProbeRequestDto = {
+    trials?: Array<DailyProbeTrialDto>;
+    speed?: number;
+    accuracy?: number;
+    lapseCount?: number;
+    variability?: number;
+};
+
+export type DailyProbeTrialDto = {
+    stimulus?: string;
+    response?: string;
+    rtMs?: number;
+    correct?: boolean;
+};
+
+export type DailyProbe = {
+    id: number;
+    completedAt?: string;
+    speed?: number;
+    accuracy?: number;
+    lapseCount?: number;
+    variability?: number;
+    trialsJson?: string;
+};
+
 export type ConversationMessage = {
     id: number;
     message: string;
@@ -2399,6 +2424,22 @@ export type TriggerFailureResponses = {
 };
 
 export type TriggerFailureResponse = TriggerFailureResponses[keyof TriggerFailureResponses];
+
+export type CreateDailyProbeData = {
+    body: DailyProbeRequestDto;
+    path?: never;
+    query?: never;
+    url: '/api/daily-probes';
+};
+
+export type CreateDailyProbeResponses = {
+    /**
+     * OK
+     */
+    200: DailyProbe;
+};
+
+export type CreateDailyProbeResponse = CreateDailyProbeResponses[keyof CreateDailyProbeResponses];
 
 export type ReplyToConversationData = {
     body: string;

@@ -4,7 +4,8 @@ import {
   dailyProbePracticeSequence,
   dailyProbeScoredSequence,
 } from "@/models/dailyProbe"
-import helper from "@tests/helpers"
+import { DailyProbeController } from "@generated/donut-backend-api/sdk.gen"
+import helper, { mockSdkService } from "@tests/helpers"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 
@@ -43,9 +44,18 @@ async function completeProbeWithMappedKeys({
 
 describe("DailyProbe", () => {
   let wrapper: VueWrapper | undefined
+  let createDailyProbe: ReturnType<typeof mockSdkService>
 
   beforeEach(() => {
     vi.useFakeTimers()
+    createDailyProbe = mockSdkService(
+      DailyProbeController,
+      "createDailyProbe",
+      {
+        id: 1,
+      }
+    )
+    createDailyProbe.mockClear()
   })
 
   afterEach(() => {
@@ -100,5 +110,16 @@ describe("DailyProbe", () => {
     expect(
       view.find('[data-testid="daily-probe-variability"]').text()
     ).toContain("1.41")
+  })
+
+  it("shows Saved after posting twenty scored trials", async () => {
+    const view = mountProbe()
+    await completeProbeWithMappedKeys()
+    expect(view.find('[data-testid="daily-probe-saved"]').text()).toBe("Saved")
+    expect(createDailyProbe).toHaveBeenCalledTimes(1)
+    const posted = createDailyProbe.mock.calls as [
+      [{ body: { trials: unknown[] } }],
+    ]
+    expect(posted[0][0].body.trials).toHaveLength(20)
   })
 })

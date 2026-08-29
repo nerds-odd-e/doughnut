@@ -166,6 +166,10 @@ Use this for endpoint lookup; open `sdk.gen.ts` or `types.gen.ts` only for exact
 - `showFailureReport`: GET `/api/failure-reports/{failureReport}` -> `ShowFailureReportResponse` (request: `ShowFailureReportData`; path: failureReport; response body: FailureReportForView)
 - `deleteFailureReports`: DELETE `/api/failure-reports/delete` -> `DeleteFailureReportsResponse` (request: `DeleteFailureReportsData`; body: Array<number>; response body: void)
 
+## Daily Probe Controller
+
+- `createDailyProbe`: POST `/api/daily-probes` -> `CreateDailyProbeResponse` (request: `CreateDailyProbeData`; body: DailyProbeRequestDto; response body: DailyProbe)
+
 ## Conversation Message Controller
 
 - `replyToConversation`: POST `/api/conversation/{conversationId}/send` -> `ReplyToConversationResponse` (request: `ReplyToConversationData`; path: conversationId; body: string; response body: ConversationMessage)
