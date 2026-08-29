@@ -34,6 +34,16 @@ Feature: Daily probe
     Then I should not see the Daily probe instruction
     And I should see ordinary recall
 
+  Scenario: The next local day offers the same Daily probe
+    Given Daily probe is on
+    When I visit recall
+    Then I should see the Daily probe instruction
+    When I complete the Daily probe
+    And I continue from the Daily probe
+    And the browser and backend are on day 2
+    When I visit recall
+    Then I should see the Daily probe instruction
+
   Scenario: Learner with Daily probe off enters recall unchanged
     When I visit recall
     Then I should not see the Daily probe instruction

@@ -85,6 +85,16 @@ class DailyProbeControllerTest extends ControllerTestBase {
   }
 
   @Test
+  void getTodayNotCompletedAfterShanghaiMidnightWhenCompletedBeforeMidnight() {
+    testabilitySettings.timeTravelTo(makeMe.aTimestamp().of(1, 23).fromShanghai().please());
+    makeMe.aDailyProbe().by(currentUser.getUser()).please();
+
+    testabilitySettings.timeTravelTo(makeMe.aTimestamp().of(2, 0).fromShanghai().please());
+
+    assertThat(controller.getDailyProbeToday("Asia/Shanghai").completed(), is(false));
+  }
+
+  @Test
   void getTodayNotCompletedWithoutARow() {
     assertThat(controller.getDailyProbeToday("Asia/Shanghai").completed(), is(false));
   }
