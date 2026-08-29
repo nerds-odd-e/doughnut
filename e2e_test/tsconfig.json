@@ -9,8 +9,11 @@
     "typeRoots": ["types", "../node_modules/@types"],
     "noUnusedLocals": false,
     "noUnusedParameters": false,
+    "rootDir": "..",
+    "noEmit": true,
     "paths": {
       "@generated/*": ["../packages/generated/donut-backend-api/*"],
+      "@/routes/*": ["../frontend/src/routes/*"],
       "support/*": ["./support/*"],
       "start/*": ["./start/*"]
     }

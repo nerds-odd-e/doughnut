@@ -42,12 +42,14 @@ const commonConfig = {
         'generated',
         'donut-backend-api'
       )
+      const frontendRoutesPath = join(repoRoot, 'frontend', 'src', 'routes')
       on(
         'file:preprocessor',
         createBundler({
           plugins: [createEsbuildPlugin(config)],
           alias: {
             '@generated/donut-backend-api': generatedBackendPath,
+            '@/routes': frontendRoutesPath,
           },
         })
       )
