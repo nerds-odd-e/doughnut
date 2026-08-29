@@ -1,8 +1,7 @@
 # Daily probe
 
-**Status:** in progress. Slices 1–2 shipped. Stopped before slice 3 for the
-human-owned trial/scoring protocol (Jidoka). Daily-consumption still blocks
-slice 8.
+**Status:** in progress. Slices 1–2 shipped. Protocol and daily-consumption
+gates locked — see `.planning/notes/daily-probe-protocol.md`. Next: slice 3.
 **Type:** ad-hoc plan (`.planning/quick/`)
 **Extracted from:** `.planning/quick/001-morning-cognitive-index/PLAN.md`
 (unbuilt slices 26–31).
@@ -33,17 +32,17 @@ most once per local day, and show its history on Recall Stats.
   does not validate the Cognitive index. Settings help text follows that
   glossary: turning it off stops new probes and ends the probe's own trend
   readout. Do not mention Cognitive index in product copy.
-- **Human-owned protocol required before slice 3.** Lock the stimulus set and
-  order, response mapping, practice/instruction flow, trial pacing, exact trial
-  count, and the formulas/units for mean reciprocal response time, lapse, and
-  variability. “~20 trials / ~60 seconds” is not precise enough to implement
-  or test without inventing measurement semantics.
-- **Human-owned daily-consumption rule required before slice 8.** Decide
-  whether the local-day offer is consumed when the screen is shown, when the
-  learner starts, or only on completion, and what an abandoned probe does.
-  The schema nullability and the same-day eligibility test depend on this.
+- **Protocol locked** in
+  [daily-probe-protocol.md](../../notes/daily-probe-protocol.md): 4 practice +
+  20 scored two-choice left/right trials, F/J (and arrows), 2000 ms timeout and
+  ISI, mean reciprocal RT / accuracy / lapses / variability as specified there.
+  Do not copy the formulas into an ADR.
+- **Daily offer consumed only on completion.** An abandoned probe writes
+  nothing. Same local day re-offers until one run finishes. Persistence is
+  completed rows only.
 
-These remaining items are Jidoka gates, not implementation slices or commits.
+These gates are resolved. Measurement lives in the protocol note, not in an
+ADR.
 
 ## Key design decisions
 
@@ -60,8 +59,8 @@ These remaining items are Jidoka gates, not implementation slices or commits.
   testability-aware current timestamp plus the supplied IANA timezone for
   eligibility and trend grouping. Invalid timezones fail visibly through the
   existing timezone parser.
-- **Incomplete attempts never enter trends.** Exact incomplete-attempt
-  persistence follows the daily-consumption decision above.
+- **Incomplete attempts never enter trends.** They also never enter the
+  table: abandon writes nothing; only a completed 20-trial run is stored.
 
 ## Slice sizing and commit contract
 
@@ -94,14 +93,14 @@ own trend readout (ADR 0003; no Cognitive index). Mounted
 `GeneralSettingsTab` tests cover default-off and persist-true. E2E
 `users/user_profile.feature` Scenario Outline enable/disable, then reload.
 
-**Enables slice 3 only.** Slice 3 remains blocked on the protocol gate below.
+**Enables slice 3 only.**
 
 ### 3. Fix the Daily probe trial and scoring contract — Structure `[ ]`
 
-Represent the approved fixed stimuli, response keys, trial records, controlled
-clock input, and summary calculations in one cohesive, pure Daily-probe module.
-Contract tests prove deterministic stimuli/order and the approved response-time
-calculation. There is no screen or recall-flow change.
+Represent the protocol note's fixed stimuli, response keys, trial records,
+injected clock, and **speed** (mean reciprocal RT) in one cohesive, pure
+Daily-probe module. Contract tests prove deterministic stimuli/order and the
+worked 3.00 s⁻¹ speed example. There is no screen or recall-flow change.
 
 - Do not introduce generic experiment/task frameworks.
 - Add lapse and variability calculations only in slices 6 and 7; this slice
@@ -153,10 +152,10 @@ rounding.
 
 ### 8. Represent Daily probe attempts and results durably — Structure `[ ]`
 
-Create the `daily_probe` table and cohesive backend persistence model. Include
-the user FK with CASCADE, timestamps/status nullability required by the
-approved daily-consumption rule, all four summaries, and `trials_json`.
-Completed rows must retain the raw trial array exactly.
+Create the `daily_probe` table and cohesive backend persistence model.
+Completed rows only: user FK with CASCADE, completion timestamp, all four
+summaries, and `trials_json` with the 20 scored trials exactly. No incomplete
+status column — abandon leaves no row.
 
 - Compute the Flyway version fresh at execution time.
 - Extend `MakeMe` only as needed for concise controller fixtures.
