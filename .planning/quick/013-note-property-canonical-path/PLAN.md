@@ -143,7 +143,9 @@ replaces to `noteShow`; unrelated query values are preserved.
 **Pre:** on `noteProperty`. **Trigger:** start or close the note conversation.
 **Post:** only the conversation query changes; route name, note id, and focused
 property key remain. Apply the same current-route helper to toolbar and overflow
-conversation actions.
+conversation actions, and to `NoteShowPage.vue`'s `handleCloseConversation` — a
+third hardcoded `noteShowLocation` call site (conversation close), not just the
+toolbar's open action.
 
 ### 7. Renaming the focused property follows its new location — **Behavior** — planned
 
@@ -165,16 +167,30 @@ replaces to `noteShow`; unrelated query values remain.
 
 ### 10. Answered question and memory tracker link to `noteProperty` — **Behavior** — planned
 
-**Pre:** property-keyed recalled note (`focusedPropertyKey` set). **Trigger:** follow the note link on answered question or memory tracker. **Post:** `noteProperty` with that property open. Note-level trackers still use `noteShow`. One link helper (extend `NoteTitleWithLink` or the breadcrumb additional slot) — do not fork two `:to` dialects.
+**Pre:** property-keyed recalled note (`focusedPropertyKey` set). **Trigger:** follow the note link on answered question or memory tracker. **Post:** `noteProperty` with that property open. Note-level trackers still use `noteShow`. One link helper (extend `NoteTitleWithLink` or the breadcrumb additional slot) — do not fork two `:to` dialects. `focusedPropertyKey` already flows from `RecalledNote.propertyKey` through `recalledNoteUnderQuestionProps` into `NoteUnderQuestion.vue`; today it only reaches a static `FocusedPropertyIndicator` text display and is not forwarded to `NoteTitleWithLink`. This slice wires that existing prop into the link — it is not adding a new field.
 
 ### 11. Java property-target codec preserves note-link behavior — **Structure** — planned
 
 Introduce one domain-shaped Java authored-target parser/formatter: note target
-plus optional encoded property key. Refactor current note-only parser call
-sites to consume its note-target portion while proving every existing
-note-only output unchanged. Pure contract tests establish encoded property
-parsing/formatting, but do not make property tokens live or rewrite them yet.
-This structure exists only to enable slice 12.
+plus optional encoded property key. Reuse the existing `PropertyKeyNaming` /
+`NotePropertyIndex.propertyKey` domain concept for key semantics rather than
+reinventing it — property keys are not a new concept, only the `#prop:`
+token-splitting codec on the link-target string is. Refactor **both**
+existing full-token rewrite families to consume its note-target portion:
+`WikiLinkTargetReference` (rename/move: `replaceNoteTitle`,
+`replaceFolderName`, `replaceNotebookName`) and `WikiLinkMarkdownRewrite`
+(regex-level markdown splice). Also cover `WikiLinkResolver.resolveAnyTargetWikiLinkToken`
+(the viewer-unaware path used for cross-notebook-move co-migration matching,
+outside the main `resolveToken`/`resolveWikiLinkToken` path) — easy to miss.
+Before layering the codec on, add a regression test for the existing bug this
+codec must not inherit: `PathShapedTarget.tryParse` already returns
+`Optional.empty()` for any target containing `:`, so `Qualified`
+(`Notebook:Title`) rewrites already silently drop any suffix today — prove
+this is understood, not accidentally relied on, once `#prop:` (which
+contains `:`) is introduced. Prove every existing note-only output unchanged.
+Pure contract tests establish encoded property parsing/formatting, but do not
+make property tokens live or rewrite them yet. This structure exists only to
+enable slice 12.
 
 ### 12. Property wiki resolution requires the exact target property — **Behavior** — planned
 
@@ -190,8 +206,12 @@ note-only links remain unchanged.
 Introduce the matching TypeScript authored-target codec and refactor current
 note-only render/click helpers to consume the parsed note target with unchanged
 outputs. Share the ADR examples and edge-case fixture table with Java tests.
-Do not change property-link rendering yet. This structure exists only to
-enable slice 14.
+`WikiLinkMarkdown.isConceptPathHref` currently strips and discards a path-Markdown
+`#…` fragment purely to reject it during validation — the new codec must
+intentionally keep what that check throws away, and the two code paths
+(accept-check vs. extract) are coupled through the same regex, so this is an
+easy spot to introduce a regression; add a targeted test. Do not change
+property-link rendering yet. This structure exists only to enable slice 14.
 
 ### 14. Live `#prop:` wiki goes to `noteProperty` — **Behavior** — planned
 
@@ -233,8 +253,18 @@ invent identity from the label. Extend the internal-URL classifier so
   `/n:noteId`. A separate top-level metadata row at `/n:noteId/p/:key`
   would create a second layout parent and remount chrome on every panel
   toggle. Build one parent with sibling `noteShow` / `noteProperty` children;
-  `NoteShowPage` does not contain a child `RouterView`.
-- `pathnameLooksLikeInternalNoteShow` anchors `/n\d+$`, so `/n123/p/…` is not treated as internal today (paste/classifier).
+  `NoteShowPage` does not contain a child `RouterView`. Concretely,
+  `routes.ts`'s `notebookSidebarNestedRouteNames` mechanism today maps
+  each `routeMetadata` entry to its own implicit `{ parent, one child at
+  path: "" }` pair; slice 1 must change that generation to group multiple
+  metadata entries under one shared parent — that code-shape change is the
+  crux of why slice 1 is Structure before slice 2 can register `noteProperty`.
+- `pathnameLooksLikeInternalNoteShow` is an OR of three patterns — legacy
+  `/^\/d\/n\/\d+(\/|$)/`, legacy `/^\/n\/\d+(\/|$)/`, and compact
+  `/^\/n\d+$/` — none of which match `/n123/p/…`, so a property URL is not
+  treated as internal today (paste/classifier). All three legacy shapes
+  need equivalent treatment when this classifier is extended, not just the
+  compact one.
 - Vue Router named-param resolution round-trips decoded keys containing spaces,
   `/`, `%`, `|`, `]`, `?`, `#`, and Unicode through one path segment. Helpers
   must pass the decoded key exactly once; portable `#prop:` encoding remains a
@@ -250,10 +280,26 @@ invent identity from the label. Extend the internal-URL classifier so
 - `WikiLinkTargetReference` currently resolves and rewrites the whole authored
   target as a note title. Without a property-target codec,
   `Title#prop:key` cannot resolve and title/folder/notebook rewrites can drop
-  or corrupt the suffix.
+  or corrupt the suffix. This is sharper than it sounds: `replaceNoteTitle`
+  (qualified case) and `PathShapedTarget.tryParse` (which already returns
+  `Optional.empty()` for any target containing `:`) mean a `Notebook:Title`
+  rewrite can silently drop a suffix **today**, before `#prop:` exists —
+  add a regression test for this pre-existing behavior before layering the
+  codec on top, not as an incidental side effect of slice 11.
+  `NotePropertyIndex.propertyKey` / `PropertyKeyNaming` already model
+  property-key semantics and can be reused rather than reinvented.
 - Current paste/strip code converts internal URLs with anchor text as the wiki
   target. A property URL contains only server note id + key, so correct portable
   conversion requires resolving the note's concept identity.
+- `WikiLinkResolver.resolveAnyTargetWikiLinkToken` (used by
+  `WikiLinkRewriteSupport.coMovedTargetResolvesFrom` for cross-notebook-move
+  co-migration matching) is a second, viewer-unaware resolution path outside
+  the main `resolveToken` / `resolveWikiLinkToken` path — easy to miss; slice
+  11/12 must confirm it is covered too.
+- A note title that itself contains the literal substring `#prop:` (e.g.
+  `Foo#prop:bar`) cannot be the sole unqualified target of a link — the
+  parser always splits on the first `#prop:` marker. Accepted as a trade-off
+  in ADR 0004 rather than adding escaping.
 
 ```
 ## SLICE PLAN WRITTEN

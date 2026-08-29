@@ -100,7 +100,11 @@ profile. Codec round-trips must be lossless for these rules.
   optional **before** the fragment). Product insert writes wiki. A
   literal `#prop:` is reserved for this property separator, not a heading
   id; other fragments are not property links. Bare YAML paths (with or
-  without a fragment) are not links.
+  without a fragment) are not links. A note title that itself contains the
+  literal substring `#prop:` cannot be the sole (unqualified, no-property)
+  target of a wiki or path-Markdown link — the parser always splits on the
+  first `#prop:` marker. Accepted trade-off: title authors avoid `#prop:`
+  in titles; this profile does not add escaping for it.
 - No active conversion of stored `[[…]]` ↔ `[…](…)`, including save/paste
   round-trip of path Markdown. ZIP export copies stored spelling. 
 - Both spellings share one resolved-link cache `(note, target_note,

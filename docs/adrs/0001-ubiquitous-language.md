@@ -49,13 +49,15 @@ concepts, including **Cognitive index** measurement, live in [ADR
   `#prop:<encoded-key>`). Path Markdown is the same link. Spelling and
   property-key encoding:
   [ADR 0004](./0004-okf-compatible-notebook-markdown-accepted.md). Web
-  destination: [ADR 0005](./0005-web-routes.md).
+  destination: `noteProperty`, once Proposed
+  [ADR 0005](./0005-web-routes.md) is Accepted — human-owned exception
+  trailed in `.planning/quick/013-note-property-canonical-path/PLAN.md`.
 - **Property** — YAML frontmatter key–value on a note (scalar or
   one-level list). Distinct from a **relationship note**. A value may
   contain **wiki links**. Relation-like keys (`example of`, `a part of`)
   are still properties. Portable identity is (concept path, exact YAML
   key) via `#prop:<encoded-key>` (ADR 0004). Web canonical location is
-  `noteProperty` (ADR 0005).
+  `noteProperty`, once Proposed ADR 0005 is Accepted (see above).
 - **Relationship** — Typed association between notes (e.g. “similar to”,
   “a part of”)
 - **Relationship note** — A note that represents a relationship
