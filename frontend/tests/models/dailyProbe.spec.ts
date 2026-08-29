@@ -1,5 +1,6 @@
 import {
   dailyProbeAccuracy,
+  dailyProbeLapseCount,
   dailyProbePracticeSequence,
   dailyProbeScoredSequence,
   dailyProbeSpeed,
@@ -117,5 +118,28 @@ describe("dailyProbe", () => {
       recordAt("left", 250, "j"),
     ]
     expect(dailyProbeAccuracy(trials)).toBe(95)
+  })
+
+  it("counts a 500 ms trial as a lapse", () => {
+    expect(dailyProbeLapseCount([recordAt("left", 500, "f")])).toBe(1)
+  })
+
+  it("does not count a 499 ms trial as a lapse", () => {
+    expect(dailyProbeLapseCount([recordAt("left", 499, "f")])).toBe(0)
+  })
+
+  it("counts a timeout as a lapse", () => {
+    expect(
+      dailyProbeLapseCount([
+        recordDailyProbeTrial({
+          stimulus: "right",
+          stimulusOnsetMs: 1_000,
+        }),
+      ])
+    ).toBe(1)
+  })
+
+  it("does not count a false start as a lapse", () => {
+    expect(dailyProbeLapseCount([recordAt("left", 50, "f")])).toBe(0)
   })
 })

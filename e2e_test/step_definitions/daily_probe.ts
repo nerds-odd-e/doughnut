@@ -25,6 +25,10 @@ Then('I should see Daily probe accuracy {string}', (accuracy: string) => {
   start.recall().assumeRecallPage().expectDailyProbeAccuracy(accuracy)
 })
 
+Then('I should see Daily probe lapses {string}', (lapses: string) => {
+  start.recall().assumeRecallPage().expectDailyProbeLapses(lapses)
+})
+
 When('I continue from the Daily probe', () => {
   start.recall().assumeRecallPage().continueFromDailyProbe()
 })

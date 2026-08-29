@@ -12,6 +12,7 @@ export const DAILY_PROBE_ISI_MS = 2000
 export const DAILY_PROBE_INSTRUCTION =
   "Each trial shows ← or →. Press F for left, J for right (arrow keys also work). Go as fast as you can without mistakes."
 const FALSE_START_MS = 100
+const LAPSE_MS = 500
 
 export const dailyProbePracticeSequence = [
   "left",
@@ -92,4 +93,14 @@ export function dailyProbeSpeed(
 export function dailyProbeAccuracy(trials: readonly DailyProbeTrial[]): number {
   const correctCount = trials.filter((trial) => trial.correct).length
   return Math.round((100 * correctCount) / dailyProbeScoredSequence.length)
+}
+
+export function dailyProbeLapseCount(
+  trials: readonly DailyProbeTrial[]
+): number {
+  return trials.filter((trial) =>
+    trial.rtMs !== undefined
+      ? trial.rtMs >= LAPSE_MS
+      : trial.response === undefined
+  ).length
 }

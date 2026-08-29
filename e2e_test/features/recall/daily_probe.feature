@@ -18,6 +18,7 @@ Feature: Daily probe
     When I complete the Daily probe
     Then I should see Daily probe speed "4.00"
     And I should see Daily probe accuracy "100%"
+    And I should see Daily probe lapses "0"
     When I continue from the Daily probe
     Then I should see ordinary recall
 
