@@ -1,4 +1,5 @@
 import { waitUntilAppIsNotBusy } from '../pageBase'
+import router from '../router'
 
 export const recallStatsPage = () => {
   return {
@@ -45,7 +46,7 @@ export const recallStatsPage = () => {
 }
 
 export const visitRecallStatsPage = () => {
-  cy.visit('/settings/recall-stats')
+  router().visitNamed('settingsRecallStats')
   waitUntilAppIsNotBusy()
   return recallStatsPage()
 }

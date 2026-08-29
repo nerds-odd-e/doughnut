@@ -116,6 +116,20 @@ describe("routes", () => {
         router.resolve({ name: "notebooks" }).href
       )
     })
+
+    it("compiles a named location with query", () => {
+      expect(
+        namedLocationHref({
+          name: "adminDashboard",
+          query: { tab: "failureReport" },
+        })
+      ).toBe(
+        router.resolve({
+          name: "adminDashboard",
+          query: { tab: "failureReport" },
+        }).href
+      )
+    })
   })
 
   describe("dummy metadata records", () => {

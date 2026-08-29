@@ -25,7 +25,7 @@ function loadRecallPage(options?: { waitForQuestionCount?: number }) {
       /\/api\/memory-trackers\/[^/]+\/recall-prompt(?:\?.*)?$/
     ).as('recallPrompt')
   }
-  cy.visit('/recall')
+  router().visitNamed('recall')
   if (shouldWaitForPrompts) {
     for (let i = 0; i < waitForQuestionCount; i++) {
       cy.wait('@recallPrompt', { timeout: 15000 })

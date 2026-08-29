@@ -4,6 +4,7 @@
 import { namedLocationHref } from '@/routes/namedLocationHref'
 
 type RouteParams = Record<string, string | number>
+type RouteQuery = Record<string, string>
 
 type CustomWindow = Omit<Cypress.AUTWindow, 'Infinity' | 'NaN'> & {
   Infinity: number
@@ -22,9 +23,15 @@ const namedLocation = (name: string, params: RouteParams = {}) => ({
 })
 
 const router = () => {
-  const visitNamed = (name: string, params: RouteParams = {}) => {
+  const visitNamed = (
+    name: string,
+    params: RouteParams = {},
+    query?: RouteQuery
+  ) => {
     cy.wrap('yes').as('firstVisited')
-    return cy.visit(namedLocationHref(namedLocation(name, params)))
+    return cy.visit(
+      namedLocationHref({ ...namedLocation(name, params), query })
+    )
   }
 
   const push = (name: string, params: RouteParams = {}) => {

@@ -7,6 +7,7 @@ import { Given, Then, When } from '@badeball/cypress-cucumber-preprocessor'
 import type { DataTable } from '@cucumber/cucumber'
 import start from '../start'
 import { visitManageAccessTokensPage } from '../start/pageObjects/manageAccessTokensPage'
+import router from '../start/router'
 
 Given('I am logged in as {string}', (externalIdentifier: string) => {
   return start.loginAs(externalIdentifier)
@@ -42,7 +43,7 @@ Given('my session is logged out', () => {
 })
 
 Given('I am on the sign-in page', () => {
-  cy.visit('/users/identify')
+  router().visitNamed('nonproductionOnlyLogin')
 })
 
 When('I identify myself as a new user', () => {

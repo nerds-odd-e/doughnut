@@ -2,12 +2,17 @@ import { clickDaisyDialogButton } from '../../../support/daisyModalHelpers'
 import { commonSenseSplit } from '../../../support/string_util'
 import { waitUntilAppIsNotBusy } from '../../pageBase'
 import { submittableForm } from '../../forms'
+import router from '../../router'
 
 const ADMIN_DASHBOARD_TAB_QUERY: Record<string, string> = {
   'Failure Reports': 'failureReport',
   'Manage Models': 'manageModel',
   'Manage Bazaar': 'manageBazaar',
   Users: 'users',
+}
+
+function visitAdminDashboardTab(tab: string) {
+  router().visitNamed('adminDashboard', {}, { tab })
 }
 
 function removeNotebookFromBazaarTableRow(notebook: string) {
@@ -75,7 +80,7 @@ export function assumeAdminDashboardPage() {
     openFailureReports() {
       cy.on('uncaught:exception', () => false)
       const tab = ADMIN_DASHBOARD_TAB_QUERY['Failure Reports']
-      cy.visit(`/admin-dashboard?tab=${tab}`)
+      visitAdminDashboardTab(tab)
       waitUntilAppIsNotBusy()
       return this
     },
@@ -106,7 +111,7 @@ export function assumeAdminDashboardPage() {
       if (!tab) {
         throw new Error(`Unknown admin dashboard tab: ${tabName}`)
       }
-      cy.visit(`/admin-dashboard?tab=${tab}`)
+      visitAdminDashboardTab(tab)
       cy.location('search').should('include', `tab=${tab}`)
       waitUntilAppIsNotBusy()
       return this
@@ -139,7 +144,7 @@ export function assumeAdminDashboardPage() {
         'currentModelVersions'
       )
       const tab = ADMIN_DASHBOARD_TAB_QUERY['Manage Models']
-      cy.visit(`/admin-dashboard?tab=${tab}`)
+      visitAdminDashboardTab(tab)
       cy.wait(['@availableGptModels', '@currentModelVersions'])
       return modelManagement()
     },
