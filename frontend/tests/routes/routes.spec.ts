@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach } from "vitest"
 import { h } from "vue"
 import { createRouter, createWebHistory } from "vue-router"
 import type { RouteRecordRaw } from "vue-router"
+import { noteShowHref, noteShowLocation } from "@/routes/noteShowLocation"
 import routes from "@/routes/routes"
 
 function findRouteRecordByName(
@@ -77,6 +78,10 @@ describe("routes", () => {
       expect(route.name).toBe("noteShow")
       expect(route.path).toBe("/n888")
       expect(route.params.noteId).toBe("888")
+    })
+
+    it("compiles noteShowHref from the named location", () => {
+      expect(noteShowHref(123)).toBe(router.resolve(noteShowLocation(123)).href)
     })
 
     it("navigates by name with noteId param", async () => {
