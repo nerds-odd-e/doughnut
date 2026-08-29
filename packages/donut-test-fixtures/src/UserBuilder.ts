@@ -14,6 +14,7 @@ class UserBuilder extends Builder<User> {
       ownership: { id: 0 },
       dailyAssimilationCount: 5,
       healthRemoveEmptyFoldersDefault: false,
+      dailyProbeEnabled: false,
       admin: false,
     }
   }
@@ -40,6 +41,11 @@ class UserBuilder extends Builder<User> {
 
   withoutHealthRemoveEmptyFoldersDefault() {
     delete this.data.healthRemoveEmptyFoldersDefault
+    return this
+  }
+
+  dailyProbeEnabled(value: boolean) {
+    this.data.dailyProbeEnabled = value
     return this
   }
 

@@ -18,4 +18,6 @@ public class UserDTO {
   @Getter @Setter private Integer dailyAssimilationCount = 15;
 
   @Getter @Setter private Boolean healthRemoveEmptyFoldersDefault = false;
+
+  @Getter @Setter private Boolean dailyProbeEnabled = false;
 }

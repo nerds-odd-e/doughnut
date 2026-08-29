@@ -43,6 +43,11 @@ public class User extends EntityIdentifiedByIdOnly {
   @Setter
   private Boolean healthRemoveEmptyFoldersDefault = false;
 
+  @Column(name = "daily_probe_enabled")
+  @Getter
+  @Setter
+  private Boolean dailyProbeEnabled = false;
+
   @JoinTable(
       name = "circle_user",
       joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)},

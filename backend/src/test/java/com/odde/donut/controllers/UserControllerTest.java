@@ -62,4 +62,21 @@ class UserControllerTest extends ControllerTestBase {
         controller.updateUser(user, dto).getHealthRemoveEmptyFoldersDefault(), equalTo(true));
     assertThat(controller.getUserProfile().getHealthRemoveEmptyFoldersDefault(), equalTo(true));
   }
+
+  @Test
+  void dailyProbeEnabledIsFalse() {
+    assertThat(controller.getUserProfile().getDailyProbeEnabled(), equalTo(false));
+  }
+
+  @Test
+  void updateUserPersistsDailyProbeEnabled() throws UnexpectedNoAccessRightException {
+    User user = currentUser.getUser();
+    UserDTO dto = new UserDTO();
+    dto.setName(user.getName());
+    dto.setDailyAssimilationCount(user.getDailyAssimilationCount());
+    dto.setDailyProbeEnabled(true);
+
+    assertThat(controller.updateUser(user, dto).getDailyProbeEnabled(), equalTo(true));
+    assertThat(controller.getUserProfile().getDailyProbeEnabled(), equalTo(true));
+  }
 }
