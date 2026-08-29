@@ -50,6 +50,10 @@ export const recallDailyProbeMethods = () => ({
     cy.get('[data-testid="daily-probe-accuracy"]').should('contain', accuracy)
     return this
   },
+  expectDailyProbeLapses(lapses: string) {
+    cy.get('[data-testid="daily-probe-lapses"]').should('contain', lapses)
+    return this
+  },
   continueFromDailyProbe() {
     cy.contains('button', 'Continue').click()
     waitUntilAppIsNotBusy()

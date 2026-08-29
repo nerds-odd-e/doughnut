@@ -1,6 +1,6 @@
 # Daily probe
 
-**Status:** in progress. Slices 1–5 shipped. Next: slice 6 (lapses).
+**Status:** in progress. Slices 1–6 shipped. Next: slice 7 (variability).
 **Type:** ad-hoc plan (`.planning/quick/`)
 **Extracted from:** `.planning/quick/001-morning-cognitive-index/PLAN.md`
 (unbuilt slices 26–31).
@@ -118,14 +118,12 @@ on scored trials. Result shows `N%`. E2E all-correct path asserts `100%`.
 
 **Enables slice 6.**
 
-### 6. The completed result reports lapses — Behavior `[ ]`
+### 6. The completed result reports lapses — Behavior `[x]`
 
-**Pre-condition:** the completed run contains responses on both sides of the
-approved lapse boundary. **Trigger:** the result appears. **Post-condition:**
-it also reports the correct lapse count.
+Shipped: `dailyProbeLapseCount` — scored RT ≥ 500 ms or timeout; false starts
+are not lapses. Result shows the count. E2E all-correct 250 ms path asserts 0.
 
-- Add the lapse calculation to the stable trial/scoring contract, cover its
-  boundary with a pure unit test, and extend the same result UI/E2E path.
+**Enables slice 7.**
 
 ### 7. The completed result reports variability — Behavior `[ ]`
 

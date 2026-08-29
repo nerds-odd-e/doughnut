@@ -20,12 +20,18 @@ function pressMappedKey(side: "left" | "right") {
   )
 }
 
-async function completeProbeWithMappedKeys(wrongScoredIndex?: number) {
+async function completeProbeWithMappedKeys(
+  wrongScoredIndex?: number,
+  rtMsForScoredIndex: (scoredIndex: number) => number = () => 250
+) {
   const practiceCount = dailyProbePracticeSequence.length
   const sequence = [...dailyProbePracticeSequence, ...dailyProbeScoredSequence]
   for (const [index, side] of sequence.entries()) {
-    vi.advanceTimersByTime(250)
-    const invert = index - practiceCount === wrongScoredIndex
+    const scoredIndex = index - practiceCount
+    vi.advanceTimersByTime(
+      scoredIndex < 0 ? 250 : rtMsForScoredIndex(scoredIndex)
+    )
+    const invert = scoredIndex === wrongScoredIndex
     pressMappedKey(invert ? (side === "left" ? "right" : "left") : side)
     vi.advanceTimersByTime(DAILY_PROBE_ISI_MS)
   }
@@ -68,5 +74,13 @@ describe("DailyProbe", () => {
     expect(view.find('[data-testid="daily-probe-accuracy"]').text()).toContain(
       "95%"
     )
+  })
+
+  it("shows lapse count 1 after one 500 ms scored trial among 250 ms trials", async () => {
+    const view = mountProbe()
+    await completeProbeWithMappedKeys(undefined, (scoredIndex) =>
+      scoredIndex === 0 ? 500 : 250
+    )
+    expect(view.find('[data-testid="daily-probe-lapses"]').text()).toContain("1")
   })
 })
