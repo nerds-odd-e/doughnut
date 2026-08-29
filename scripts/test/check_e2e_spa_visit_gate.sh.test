@@ -1,0 +1,81 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+SCRIPT_UNDER_TEST="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)/scripts/check_e2e_spa_visit_gate.sh"
+
+fail() {
+	echo "FAIL: $*" >&2
+	exit 1
+}
+
+begin_e2e_tree() {
+	work=$(mktemp -d)
+	trap 'rm -rf "$work"' EXIT
+	e2e_dir="$work/e2e_test"
+	mkdir -p "$e2e_dir/start/pageObjects"
+	cat >"$e2e_dir/start/router.ts" <<'EOF'
+const visitNamed = () => {
+  return cy.visit(
+    namedLocationHref({ name: 'recall' })
+  )
+}
+EOF
+}
+
+end_e2e_tree() {
+	trap - EXIT
+	rm -rf "$work"
+}
+
+test_fails_for_planted_visit_in_page_object() {
+	local out rc=0
+	begin_e2e_tree
+	cat >"$e2e_dir/start/pageObjects/recallPage.ts" <<'EOF'
+const recallPage = {
+  open() {
+    cy.visit('/recall')
+  },
+}
+EOF
+
+	out=$("$SCRIPT_UNDER_TEST" "$e2e_dir" 2>&1) || rc=$?
+	[[ "$rc" -ne 0 ]] || fail "expected planted cy.visit in a page object to fail"
+	[[ "$out" == *"recallPage.ts:3:"* ]] || fail "expected file and line of offender, got: $out"
+
+	end_e2e_tree
+}
+
+test_allows_router_visit() {
+	begin_e2e_tree
+	printf 'export const homePage = {}\n' >"$e2e_dir/start/pageObjects/homePage.ts"
+
+	"$SCRIPT_UNDER_TEST" "$e2e_dir"
+
+	end_e2e_tree
+}
+
+test_ignores_commented_visit() {
+	begin_e2e_tree
+	cat >"$e2e_dir/start/pageObjects/recallPage.ts" <<'EOF'
+const recallPage = {
+  open() {
+    // cy.visit('/recall')
+    return this
+  },
+}
+EOF
+
+	"$SCRIPT_UNDER_TEST" "$e2e_dir"
+
+	end_e2e_tree
+}
+
+main() {
+	test_fails_for_planted_visit_in_page_object
+	test_allows_router_visit
+	test_ignores_commented_visit
+	echo "ok check_e2e_spa_visit_gate.sh tests"
+}
+
+main "$@"
