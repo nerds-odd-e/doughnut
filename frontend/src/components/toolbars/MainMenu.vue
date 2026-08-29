@@ -43,6 +43,8 @@ const isHomePage = computed(() => route.name === "home")
 
 const { applyAssimilationCountDto } = useAssimilationCount()
 const {
+  toRepeat,
+  currentRecallWindowEndAt,
   setToRepeat,
   setDueCommissioned,
   setCurrentRecallWindowEndAt,
@@ -56,11 +58,15 @@ const fetchMenuData = async () => {
   if (!error && menuData) {
     applyAssimilationCountDto(menuData.assimilationCount)
     if (menuData.recallStatus) {
-      setToRepeat(menuData.recallStatus.toRepeat)
+      if ((toRepeat.value?.length ?? 0) === 0) {
+        setToRepeat(menuData.recallStatus.toRepeat)
+      }
       setDueCommissioned(menuData.recallStatus.dueCommissioned)
-      setCurrentRecallWindowEndAt(
-        menuData.recallStatus.currentRecallWindowEndAt
-      )
+      if (!currentRecallWindowEndAt.value) {
+        setCurrentRecallWindowEndAt(
+          menuData.recallStatus.currentRecallWindowEndAt
+        )
+      }
       setTotalAssimilatedCount(menuData.recallStatus.totalAssimilatedCount)
     }
     if (menuData.unreadMessages !== undefined) {

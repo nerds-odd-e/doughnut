@@ -3,17 +3,25 @@
 **Status:** the 001 plan's active scope is complete. Slices 1–14, 14.1–14.8,
 15, 16, 17, 18, 19, 20, 21.1–21.8 done. Slice 17.1 (pace-expectation R/D
 correction, split from 17) is **dropped**. Slice 21.9 (why retrievability
-reads null for ~95% of reviews) found a likely root cause — `RecallLog` is
-new and current data may be incompletely backfilled, or, more seriously,
-`memory_tracker.stability` updates from `applyGrade` may not be persisting —
-but confirming it needs a production read-only query only the developer can
-run; it is **closed in this plan and escalated** to
-`.planning/notes/memory-tracker-stability-not-persisting.md` rather than
-chased further here. Because of that, the slice 22–25 reliability gate is
-treated as **failed**: the composite morning index is **dropped**, and the
-component readouts (pace, accuracy, consistency, lapse count) ship as the
-plan's final deliverable. `recall_stats.feature`'s pace scenario stays `@wip`
-— a second, unrelated E2E race condition was found (see Discoveries).
+reads null for ~95% of reviews) escalated to
+`.planning/notes/memory-tracker-stability-not-persisting.md`; that note's
+2026-08-28 verdict ruled out the scheduler-bug hypothesis — `applyGrade`
+persistence is fine — and traced the null-retrievability gap to a rollout
+timing artifact (memory-state columns only started being written in
+production ~09:56 UTC on 2026-08-28, then backfilled for real on
+2026-08-29). **The reliability gate was re-run on 2026-08-29 against
+production data via the developer's access token, after that fix**:
+`GET /api/user/recall-split-half-reliability` now returns `pairCount: 91`
+(healthy — nearly the full 90-day window, well past the `MIN_PAIRS_FOR_
+CORRELATION = 10` floor), `rawCorrelation: 0.076`, `spearmanBrownCorrelation:
+0.141`. Both are far below the ~0.6 threshold. **The gate still fails, but
+now on a real, fully-powered measurement rather than a data-availability
+artifact** — the composite morning index remains **dropped**, this time on
+solid footing, and the component readouts (pace, accuracy, consistency,
+lapse count) ship as the plan's final deliverable. Per the gate's own
+rule, weights are not tuned to rescue this number. `recall_stats.feature`'s
+pace scenario stays `@wip` — a second, unrelated E2E race condition was
+found (see Discoveries).
 Slices 26–33 (daily probe, optional tail) were not started; 32–33 reference
 the now-dropped composite index and need re-scoping if picked up later.
 **Type:** ad-hoc plan (`.planning/quick/`)
@@ -138,9 +146,8 @@ the roadmap has no active milestone. Promote to `.planning/phases/` via
   vs 2026; KeepAlive reactivation refetched and remounted Quiz, discarding the
   detour accumulator. **Slice 14.6 replaced that with string identity**; the
   replacement is itself unstable (`alignByHalfADay` leftover nanos), so every
-  activation remounts in production. Repair is
-  [004-recall-same-window-queue](../004-recall-same-window-queue/PLAN.md), not
-  more 001 slices.
+  activation remounts in production. Repair is in `useRecallPageLoading`
+  (same half-day queue and first-load due-list order), not more 001 slices.
 - **Redundant tests.** `useThinkingTimeTracker.keepAlive.spec.ts` drives
   `pause()`/`resume()` on KeepAlive, which production no longer uses (detour
   pair). `QuestionDisplay.thinking.spec.ts`'s "pauses timer when deactivated"
@@ -1022,9 +1029,12 @@ threshold (by whichever of the two reported numbers is judged appropriate)
 whether slices 22–25 proceed. **Do not tune 21.2's formula weights to
 rescue a low number** — that would defeat the point of the gate.
 
-- **This is the gate. Resolved: failed, via 21.9 rather than a low
-  correlation number.** See Jidoka above and 21.9's section — slices 22–25 are
-  dropped; the component readouts stand on their own.
+- **This is the gate. Resolved: failed.** First closed via 21.9's data-gap
+  finding, then **re-run on 2026-08-29 after that gap was fixed** —
+  `pairCount: 91`, `rawCorrelation: 0.076`, `spearmanBrownCorrelation: 0.141`,
+  both far below ~0.6 on a fully-powered measurement. See Jidoka above and
+  21.9's section — slices 22–25 are dropped; the component readouts stand on
+  their own.
 
 ### Repair the accuracy/index readouts (session review)
 

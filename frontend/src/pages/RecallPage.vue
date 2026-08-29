@@ -206,6 +206,7 @@ watch(
 const { isProgressBarVisible, isLoadingMore, loadMore } = useRecallPageLoading({
   currentIndex,
   previousAnsweredQuestions,
+  toRepeat,
   currentRecallWindowEndAt,
   dueRecallsRefreshNonce,
   setToRepeat,

@@ -32,6 +32,7 @@ const sameHalfDayWindow = (
 export function useRecallPageLoading(options: {
   currentIndex: Ref<number>
   previousAnsweredQuestions: Ref<(AnsweredQuestion | undefined)[]>
+  toRepeat: Ref<MemoryTrackerLite[] | undefined>
   currentRecallWindowEndAt: Ref<string | undefined>
   dueRecallsRefreshNonce: Ref<number>
   setToRepeat: (trackers: MemoryTrackerLite[] | undefined) => void
@@ -45,6 +46,7 @@ export function useRecallPageLoading(options: {
   const {
     currentIndex,
     previousAnsweredQuestions,
+    toRepeat,
     currentRecallWindowEndAt,
     dueRecallsRefreshNonce,
     setToRepeat,
@@ -61,43 +63,40 @@ export function useRecallPageLoading(options: {
     setDueCommissioned(response.dueCommissioned ?? [])
   }
 
-  const loadSessionStrips = async () => {
+  const fetchDueRecalls = async (dueInDays?: number) => {
     const { data: response, error } = await RecallsController.recalling({
       query: {
         timezone: timezoneParam(),
-        dueindays: 0,
+        dueindays: dueInDays,
       },
     })
-    if (!error && response) {
-      applySessionStrips(response)
-      return response
-    }
+    if (!error && response) return response
     return
+  }
+
+  const applyDueList = (response: DueMemoryTrackers, dueInDays?: number) => {
+    applySessionStrips(response)
+    let trackers = response.toRepeat
+    currentIndex.value = 0
+    setTotalAssimilatedCount(response.totalAssimilatedCount)
+    const loadingFutureDays = (dueInDays ?? 0) > 0
+    setDiligentMode(loadingFutureDays)
+    if (
+      getEnvironment() !== "testing" &&
+      loadingFutureDays &&
+      trackers?.length
+    ) {
+      trackers = shuffle(trackers)
+    }
+    setToRepeat(trackers)
   }
 
   const loadMore = async (dueInDays?: number) => {
     isLoadingMore.value = true
     try {
-      const { data: response, error } = await RecallsController.recalling({
-        query: {
-          timezone: timezoneParam(),
-          dueindays: dueInDays,
-        },
-      })
-      if (!error && response) {
-        applySessionStrips(response)
-        let trackers = response.toRepeat
-        currentIndex.value = 0
-        setTotalAssimilatedCount(response.totalAssimilatedCount)
-        setDiligentMode((dueInDays ?? 0) > 0)
-        if (trackers?.length === 0) {
-          setToRepeat(trackers)
-          return response
-        }
-        if (getEnvironment() !== "testing" && trackers) {
-          trackers = shuffle(trackers)
-        }
-        setToRepeat(trackers)
+      const response = await fetchDueRecalls(dueInDays)
+      if (response) {
+        applyDueList(response, dueInDays)
         return response
       }
       return
@@ -129,6 +128,15 @@ export function useRecallPageLoading(options: {
     }
   }
 
+  const dueQueueNeedsReload = (fetchedWindowEndAt: string | undefined) => {
+    if (toRepeat.value === undefined) return true
+    const storedWindowEndAt = currentRecallWindowEndAt.value
+    return (
+      !!storedWindowEndAt &&
+      !sameHalfDayWindow(fetchedWindowEndAt, storedWindowEndAt)
+    )
+  }
+
   watch(dueRecallsRefreshNonce, async () => {
     await loadCurrentDueRecalls()
   })
@@ -139,15 +147,16 @@ export function useRecallPageLoading(options: {
 
   onActivated(async () => {
     isProgressBarVisible.value = true
-    const response = await loadSessionStrips()
-    if (
-      response &&
-      !sameHalfDayWindow(
-        response.currentRecallWindowEndAt,
-        currentRecallWindowEndAt.value
-      )
-    ) {
-      loadCurrentDueRecalls()
+    const response = await fetchDueRecalls(0)
+    if (!response) return
+    if (dueQueueNeedsReload(response.currentRecallWindowEndAt)) {
+      applyDueList(response, 0)
+      setCurrentRecallWindowEndAt(response.currentRecallWindowEndAt)
+      return
+    }
+    applySessionStrips(response)
+    if (!currentRecallWindowEndAt.value) {
+      setCurrentRecallWindowEndAt(response.currentRecallWindowEndAt)
     }
   })
 

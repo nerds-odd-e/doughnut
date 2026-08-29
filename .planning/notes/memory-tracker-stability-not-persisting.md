@@ -158,3 +158,19 @@ this write-up and treated its reliability gate as failed (composite morning
 index dropped, component readouts ship on their own) rather than waiting on
 this. This note is the handoff point for a follow-up investigation, sized
 and scoped on its own.
+
+## Follow-up: the reliability gate was re-run after this verdict (2026-08-29)
+
+With the scheduler-bug hypothesis ruled out and the rollout/backfill gap
+fixed, `quick/001`'s slice 21.4 diagnostic
+(`GET /api/user/recall-split-half-reliability`) was queried again against
+production, via the developer's access token: `pairCount: 91`,
+`rawCorrelation: 0.076`, `spearmanBrownCorrelation: 0.141`. `pairCount = 91`
+confirms the data gap is gone (nearly the full 90-day window is now
+scorable); both correlations remain far below the plan's ~0.6 threshold.
+The morning-cognitive-index composite (slices 22–25) stays dropped in
+`quick/001`, now on a fully-powered real measurement rather than a
+data-availability artifact — see that plan's Status header and the "This is
+the gate" note under slice 21.4. No further action needed here; this note's
+own question (does `applyGrade` persist correctly?) is answered "yes" and
+closed.

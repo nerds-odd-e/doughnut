@@ -76,6 +76,23 @@ describe("RecallPage KeepAlive activation", () => {
     await flushPromises()
   }
 
+  it("loads the due queue on first activation when menu has not populated toRepeat", async () => {
+    const { recallingSpy } = mockRecallPageDefaults()
+    const loadedTracker = createMemoryTrackerLite(7)
+    const loadedResponse = makeMe.aDueMemoryTrackersList
+      .toRepeat([loadedTracker])
+      .please()
+    loadedResponse.currentRecallWindowEndAt = fetchedSameHalfDayWindowEndAt
+    recallingSpy.mockResolvedValue(wrapSdkResponse(loadedResponse))
+    const mockData = createUseRecallDataMock({ toRepeat: undefined })
+    vi.mocked(useRecallData).mockReturnValue(mockData)
+
+    mountWithKeepAlive()
+    await flushPromises()
+
+    expect(mockData.toRepeat.value).toEqual([loadedTracker])
+  })
+
   it("keeps toRepeat on first activation when the due window is the same half-day", async () => {
     const { recallingSpy, mockData, originalTracker } =
       await mountWithMenuLoadedQueue(fetchedSameHalfDayWindowEndAt)
