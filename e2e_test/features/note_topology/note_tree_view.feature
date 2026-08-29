@@ -20,7 +20,7 @@ Feature: Note tree view
     Then I should see sidebar folder "LeSS in Action"
 
   Scenario: Sidebar shows the whole notebook from TDD
-    When I navigate to "LeSS training/LeSS in Action/TDD" note
+    When I route to the note "TDD"
     And I expand the children of note "TDD" in the sidebar
     Then I should see the note tree in the sidebar
       | note-title     |
@@ -31,7 +31,7 @@ Feature: Note tree view
       | LeSS in Action |
 
   Scenario: Sidebar shows the tree when opening a deep note directly
-    When I navigate to "LeSS training/LeSS in Action/TDD/TPP/Const" note
+    When I route to the note "Const"
     And I open the notebook sidebar
     Then I should see the note tree in the sidebar
       | note-title     |
@@ -43,7 +43,7 @@ Feature: Note tree view
       | LeSS in Action |
 
   Scenario: Sidebar shows the whole notebook from ATDD
-    Given I navigate to "LeSS training/LeSS in Action/TDD" note
+    Given I route to the note "TDD"
     When I route to the note "ATDD"
     And I expand the children of note "TDD" in the sidebar
     And I expand the children of note "ATDD" in the sidebar
@@ -57,7 +57,7 @@ Feature: Note tree view
       | LeSS in Action |
 
   Scenario: Sidebar tree stays populated when opening another note from the sidebar
-    Given I navigate to "LeSS training/LeSS in Action/TDD" note
+    Given I route to the note "TDD"
     When I open the notebook sidebar
     And I expand the children of note "TDD" in the sidebar
     Then I should see the note tree in the sidebar
@@ -77,7 +77,7 @@ Feature: Note tree view
       | LeSS in Action |
 
   Scenario: Expand nested children in the sidebar
-    Given I navigate to "LeSS training/LeSS in Action" note
+    Given I route to the note "LeSS in Action"
     When I expand the children of note "LeSS in Action" in the sidebar
     And I expand the children of note "TDD" in the sidebar
     Then I should see the note tree in the sidebar
