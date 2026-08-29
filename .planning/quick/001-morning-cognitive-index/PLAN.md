@@ -1,27 +1,25 @@
 # Morning cognitive index from recall history
 
 **Status:** the 001 plan's active scope is complete. Slices 1–14, 14.1–14.8,
-15, 16, 17, 18, 19, 20, 21.1–21.8 done. Slice 17.1 (pace-expectation R/D
-correction, split from 17) is **dropped**. Slice 21.9 (why retrievability
-reads null for ~95% of reviews) escalated to
-`.planning/notes/memory-tracker-stability-not-persisting.md`; that note's
-2026-08-28 verdict ruled out the scheduler-bug hypothesis — `applyGrade`
-persistence is fine — and traced the null-retrievability gap to a rollout
-timing artifact (memory-state columns only started being written in
-production ~09:56 UTC on 2026-08-28, then backfilled for real on
-2026-08-29). **The reliability gate was re-run on 2026-08-29 against
-production data via the developer's access token, after that fix**:
-`GET /api/user/recall-split-half-reliability` now returns `pairCount: 91`
+15, 16, 17, 18, 19, 20, 21.1–21.9 done. Slice 17.1 (pace-expectation R/D
+correction, split from 17) is **dropped** — see that slice for a correction
+to its original rationale. Slice 21.9 (why retrievability reads null for
+~95% of reviews) found the cause and it resolved cleanly: a rollout timing
+gap (memory-state columns only started being written in production ~09:56
+UTC on 2026-08-28), not a live scheduler bug — `applyGrade` persistence was
+confirmed fine by direct production query, and the backfill on 2026-08-29
+filled the historical gap. **The 22–25 reliability gate was re-run on
+2026-08-29 against complete production data**:
+`GET /api/user/recall-split-half-reliability` returned `pairCount: 91`
 (healthy — nearly the full 90-day window, well past the `MIN_PAIRS_FOR_
 CORRELATION = 10` floor), `rawCorrelation: 0.076`, `spearmanBrownCorrelation:
-0.141`. Both are far below the ~0.6 threshold. **The gate still fails, but
-now on a real, fully-powered measurement rather than a data-availability
-artifact** — the composite morning index remains **dropped**, this time on
-solid footing, and the component readouts (pace, accuracy, consistency,
-lapse count) ship as the plan's final deliverable. Per the gate's own
-rule, weights are not tuned to rescue this number. `recall_stats.feature`'s
-pace scenario stays `@wip` — a second, unrelated E2E race condition was
-found (see Discoveries).
+0.141`. Both are far below the ~0.6 threshold. **The gate fails decisively
+on a real, fully-powered measurement** — the composite morning index
+remains **dropped**, this time on solid footing, and the component readouts
+(pace, accuracy, consistency, lapse count) ship as the plan's final
+deliverable. Per the gate's own rule, weights are not tuned to rescue this
+number. `recall_stats.feature`'s pace scenario stays `@wip` — a second,
+unrelated E2E race condition was found (see Discoveries).
 Slices 26–33 (daily probe, optional tail) were not started; 32–33 reference
 the now-dropped composite index and need re-scoping if picked up later.
 **Type:** ad-hoc plan (`.planning/quick/`)
@@ -189,31 +187,35 @@ probe*, and *cognitive index* are in ADR 0001 / ADR 0003.
 **Before slice 22 — the reliability gate.** **Resolved: gate failed, slices
 22–25 dropped.** The gate said: if slice 21.4 reports split-half reliability
 below ~0.6, slices 22–25 do not ship, and do not tune weights to rescue the
-number. 21.9 found the input feeding both the reliability calculation and the
-accuracy component is null for ~95% of reviews (`memory_tracker.stability`
-reads as New almost everywhere) — the gate cannot be meaningfully evaluated,
-let alone pass, on that basis. Per the gate's own stated fallback, the
-composite is abandoned rather than reworked; the component readouts (pace,
-accuracy, consistency, lapse count) stand on their own and already ship.
-21.9's underlying data-integrity finding is escalated separately — see that
-slice's section and
-`.planning/notes/memory-tracker-stability-not-persisting.md` — rather than
-resolved inside this plan. (Slice 21 was split into 21.1–21.4 — see that
-section for the composite formula and why.)
+number. 21.9 first found the input feeding both the reliability calculation
+and the accuracy component null for ~95% of reviews — traced to a rollout
+timing gap, not a data-integrity defect, and fixed (see 21.9). **Re-run on
+2026-08-29 against complete production data:** `pairCount: 91`,
+`rawCorrelation: 0.076`, `spearmanBrownCorrelation: 0.141` — both far below
+0.6 on a fully-powered measurement, not a data-starved one. Per the gate's
+own stated fallback, the composite is abandoned rather than reworked; the
+component readouts (pace, accuracy, consistency, lapse count) stand on their
+own and already ship. (Slice 21 was split into 21.1–21.4 — see that section
+for the composite formula and why.)
 
 **Before slice 17.1 — pace-expectation correction formula.** **Resolved:
 dropped.** Slice 17's original text asserted R/D would correct the pace
 time-expectation but gave no model. Rather than specify one, the developer
-chose to drop 17.1 outright: 21.9 found retrievability null for ~95% of
-reviews (`memory_tracker.stability` reads as New almost everywhere), and even
-where populated it comes from recently-backfilled data of unproven accuracy —
-correcting a time-expectation baseline against a signal that's mostly absent
-or noisy adds complexity ("keep it simple") for a correction that mostly
-wouldn't fire. The per-item EWMA baseline from slice 9 ships as the permanent
-pace expectation, uncorrected. Cost: an item with genuinely low retrievability
-that takes longer to retrieve will register as "slower than usual" even though
-slowness was expected — accepted as a minor false positive. Confirmed no dead
-code results (slice 17 built nothing speculative for pace — see 17.1 below).
+chose to drop 17.1 outright, citing 21.9's then-current finding that
+retrievability was null for ~95% of reviews and populated values came from
+unproven backfilled data. **That premise is now outdated** (see 21.9 and the
+21.4 re-run above): the gap was a rollout artifact, since fixed, and
+retrievability now has healthy coverage (`pairCount: 91`, near-full 90-day
+window). The drop is not thereby proven wrong, though — the same re-run found
+very low split-half reliability (`r=0.076`) for the composite retrievability
+feeds into, which is at least consistent with a noisy signal, just not the
+"mostly absent" one originally cited. The per-item EWMA baseline from slice 9
+ships as the permanent pace expectation, uncorrected, unless the developer
+wants to revisit 17.1 specifically now that data exists. Cost of staying
+dropped: an item with genuinely low retrievability that takes longer to
+retrieve will register as "slower than usual" even though slowness was
+expected — accepted as a minor false positive. Confirmed no dead code
+results (slice 17 built nothing speculative for pace — see 17.1 below).
 
 ---
 
@@ -772,11 +774,19 @@ specifies the correction model itself (e.g. a multiplicative adjustment to
 the EWMA baseline, a regression term, or something else).
 
 **Dropped, not implemented.** The developer decided against specifying a
-formula at all, given 21.9's finding that retrievability is null for ~95% of
-reviews and even populated values come from recently-backfilled data of
-unproven accuracy — building a correction on top of a mostly-absent, unproven
-signal contradicts "keep it simple." Slice 9's uncorrected per-item EWMA
-baseline is the permanent pace expectation. Verified this leaves no dead code:
+formula at all, given 21.9's then-current finding that retrievability was
+null for ~95% of reviews and even populated values came from
+recently-backfilled data of unproven accuracy — building a correction on top
+of a mostly-absent, unproven signal contradicts "keep it simple." **Update
+(post 21.9/21.4 re-run):** that premise is now outdated — the null-gap was a
+rollout timing artifact, since fixed, and retrievability now has healthy
+coverage. The 21.4 re-run's very low split-half reliability (`r=0.076`) is a
+different, still-live reason for caution (a noisy signal, not an absent
+one), but the "mostly wouldn't fire" argument no longer holds. The drop
+stands as this plan's decision; revisiting it is a fresh call for the
+developer, not a re-opening of this slice. Slice 9's uncorrected per-item
+EWMA baseline is the permanent pace expectation. Verified this leaves no
+dead code:
 `RecallPaceAggregator.java` has zero references to retrievability/difficulty
 and never had a stub or hook anticipating this slice; the `retrievability`
 field slice 17 added to `RecallAnswerRow` is fully consumed by the accuracy
@@ -1098,7 +1108,7 @@ max-iter still counts as success). Numeric tests unchanged.
 
 Not a prerequisite for slice 22.
 
-#### 21.9 Nearly every review's retrievability is null — find why `memory_tracker.stability` reads as New — Structure `[escalated, closed in this plan]`
+#### 21.9 Nearly every review's retrievability is null — find why `memory_tracker.stability` reads as New — Structure `[x]`
 
 Found while finally querying 21.4's endpoint against real production data
 (prod investigation via three rounds of temporary, response-embedded debug
@@ -1116,61 +1126,31 @@ rules out 21.8's Newton-Raphson refactor as the cause.
 `RecallAnswerRow.retrievability` comes from `RecallPromptRepository`'s
 `LEFT JOIN RecallLog rl ON rl.answer = a AND rl.memoryTracker = mt AND
 rl.grade IS NOT NULL`. `MemoryTracker.retrievabilityAt(now)` — the value
-`persistRecallLog` writes on every live-graded answer, present or absent
-alike — returns null for exactly one reason: `isNew()`, i.e. `stability <=
-Fsrs.NEW_STABILITY_HOURS` (`0.0f`), the field's default. So the finding is
-really: as far as `memory_tracker.stability` is concerned, most trackers
-this account reviews are perpetually "New" — never observed to have
-received a prior grade — despite the account having 126,440 total reviews
-and a 200-day streak.
+`persistRecallLog` writes on every live-graded answer — returns null for
+exactly one reason: `isNew()`, i.e. `stability <= Fsrs.NEW_STABILITY_HOURS`
+(`0.0f`), the field's default. Two hypotheses were live: (a) a rollout
+timing/backfill gap, or (b) the more consequential possibility that
+`memory_tracker.stability` updates from `applyGrade` were not persisting —
+which would silently feed the live FSRS *scheduler* wrong stability for most
+items, not just starve this stats readout.
 
-**Developer's hint, not yet verified:** `RecallLog` is a recent addition
-and current data was backfilled from previously-answered questions; that
-backfill may be incomplete. Worth checking, but note one thing already
-established by reading `RecallLogMemoryStateBackfill` (slice 18): it
-replays history onto a **scratch, never-persisted** `MemoryTracker` purely
-to fill in `recall_log.stability_before` / `difficulty_before` /
-`retrievability` retrospectively on old rows — it never writes back to the
-*live* `memory_tracker.stability`/`difficulty` columns, and it's explicitly
-"not wired to run automatically." So even a fully complete backfill would
-not, by itself, explain *today's* live-instrumented answers reading null —
-today's `stability` comes from whatever is currently persisted on the
-`memory_tracker` row itself, updated by `applyGrade` on every graded
-review. That points at a second, more consequential hypothesis worth
-ruling in/out first: `memory_tracker.stability` updates from `applyGrade`
-are not sticking (a transaction/session issue around
-`entityPersister.save`, a stale read elsewhere, or something — a
-migration, a reset — that zeroed `stability` back to `NEW_STABILITY_HOURS`
-for pre-existing trackers without re-deriving it from history). If true,
-this isn't just starving this stats readout — it would silently be
-feeding the live FSRS *scheduler* wrong stability for most items too.
+**Verdict, from a direct read-only production query (2026-08-28):
+hypothesis (a), not (b).** `V300000303` (the memory-state columns) was
+applied 2026-08-28 09:56:43 UTC, but production had kept booting the old jar
+until a startup-script fix rolled the instance group ~09:50–09:57 UTC that
+same morning — so nearly every "today" review measured above was still a
+pre-column row (43 rows had memory state set vs. 126,997 without, at
+investigation time). `RecallLogMemoryStateBackfill` (slice 18) was then run
+for real on 2026-08-29, filling 125,570 of those rows across 14,041 trackers
+via its checksummed replay. **Live `applyGrade` persistence was confirmed
+fine**: zero active, non-deleted trackers with `stability <= 0` have a
+post-cutover graded `recall_log`; the 107 active trackers still genuinely
+New have zero `recall_log` rows each — a normal cold-start population, not
+evidence of a scheduler bug. No `applyGrade` code fix needed.
 
-**Suggested first step:** a direct read-only query (DB console, not the
-stats API) — count `memory_tracker` rows where `stability <= 0` but that
-have more than one `recall_log` row — would directly confirm or rule out
-the "updates aren't sticking" hypothesis before touching production code
-again. If confirmed, check whether `RecallLogMemoryStateBackfill` (or
-whatever ran the historical `RecallLog` backfill in production) was
-supposed to also seed `memory_tracker.stability`/`difficulty` from the
-last-known state and didn't, versus a live persistence bug in `applyGrade`
-itself.
-
-- **Blocked the slice 22–25 gate** (see "This is the gate" at 21.4): the
-  split-half reliability number cannot be trusted, or even meaningfully
-  computed past `pairCount` ≈ 1, until this is resolved — independent of
-  whether the composite formula itself is sound.
-
-**Closed in this plan, escalated separately.** Confirming or ruling out the
-"`memory_tracker.stability` updates aren't sticking" hypothesis needs a
-direct read-only production query the developer runs themselves — outside
-`quick/001`'s scope either way. More importantly, if confirmed, it is a live
-FSRS *scheduler* bug (wrong stability feeding real scheduling for most items),
-not a stats-readout defect — too consequential to leave as a sub-slice of a
-stats-display plan. Escalated in
-`.planning/notes/memory-tracker-stability-not-persisting.md`. This plan
-treats the reliability gate as **failed**, not pending: slices 22–25 are
-dropped, per "This is the gate" — the component readouts (pace, accuracy,
-consistency, lapses) stand on their own; the composite is not built.
+- **Blocked the slice 22–25 gate** until resolved (see "This is the gate" at
+  21.4) — now unblocked; the gate was re-run on real, complete data (see
+  21.4) and still fails, but on solid grounds this time.
 
 #### 22. Recall Stats leads with the morning index — Behavior `[dropped]`
 
