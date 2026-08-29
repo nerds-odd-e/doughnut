@@ -1,6 +1,5 @@
 package com.odde.donut.services;
 
-import com.odde.donut.controllers.dto.RecallSplitHalfReliabilityDTO;
 import com.odde.donut.controllers.dto.RecallStatsDTO;
 import com.odde.donut.controllers.dto.RecallStatsDTO.AccuracyStats;
 import com.odde.donut.controllers.dto.RecallStatsDTO.AmPmResponseTime;
@@ -47,21 +46,6 @@ public class RecallStatsService {
       }
     }
     return aggregateRows(recent, allTime, zoneId, now);
-  }
-
-  /**
-   * Slice 21.4's internal diagnostic: split-half reliability of the (not-yet-shipped) morning
-   * cognitive index across the current user's own trailing history. Same same-user-only projection
-   * query as {@link #compute}; not wired into {@link RecallStatsDTO}.
-   */
-  public RecallSplitHalfReliabilityDTO computeSplitHalfReliability(
-      User user, ZoneId zoneId, Timestamp now) {
-    List<RecallAnswerRow> allTimeReviews = reviewsOnly(findAllTimeAnsweredRows(user, now));
-    LocalDate today = localToday(now, zoneId);
-    RecallSplitHalfReliability.Result result =
-        RecallSplitHalfReliability.compute(allTimeReviews, today, zoneId);
-    return new RecallSplitHalfReliabilityDTO(
-        result.pairCount(), result.rawCorrelation(), result.spearmanBrownCorrelation());
   }
 
   private List<RecallAnswerRow> findAllTimeAnsweredRows(User user, Timestamp now) {
