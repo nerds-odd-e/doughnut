@@ -1,5 +1,7 @@
 import { useRecallData } from "@/composables/useRecallData"
+import { DailyProbeController } from "@generated/donut-backend-api/sdk.gen"
 import makeMe from "donut-test-fixtures/makeMe"
+import { mockSdkService } from "@tests/helpers"
 import { describe, expect, it, vi } from "vitest"
 import { ref } from "vue"
 import {
@@ -42,6 +44,25 @@ describe("RecallPage Daily probe entry", () => {
   it("loads ordinary recall when Daily probe is off", async () => {
     ctx.renderer.withCurrentUserRef(
       ref(makeMe.aUser.dailyProbeEnabled(false).please())
+    )
+    vi.mocked(useRecallData).mockReturnValue(
+      createUseRecallDataMock({
+        toRepeat: [createMemoryTrackerLite(1)],
+      })
+    )
+
+    const wrapper = await ctx.mountPage()
+
+    expect(wrapper.findComponent({ name: "DailyProbe" }).exists()).toBe(false)
+    expect(wrapper.findComponent({ name: "Quiz" }).exists()).toBe(true)
+  })
+
+  it("skips Daily probe when today's run is already completed", async () => {
+    mockSdkService(DailyProbeController, "getDailyProbeToday", {
+      completed: true,
+    })
+    ctx.renderer.withCurrentUserRef(
+      ref(makeMe.aUser.dailyProbeEnabled(true).please())
     )
     vi.mocked(useRecallData).mockReturnValue(
       createUseRecallDataMock({

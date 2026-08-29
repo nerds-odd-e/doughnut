@@ -2956,6 +2956,24 @@ paths:
               schema:
                 type: array
                 items: {}
+  /api/daily-probes/today:
+    get:
+      tags:
+      - daily-probe-controller
+      operationId: getDailyProbeToday
+      parameters:
+      - name: timezone
+        in: query
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/DailyProbeTodayDTO"
   /api/conversation/{conversationId}:
     get:
       tags:
@@ -5568,6 +5586,13 @@ components:
           type: string
         body:
           type: string
+    DailyProbeTodayDTO:
+      type: object
+      properties:
+        completed:
+          type: boolean
+      required:
+      - completed
     ConversationListItem:
       type: object
       properties:

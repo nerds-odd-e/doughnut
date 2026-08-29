@@ -1182,6 +1182,10 @@ export type GithubIssue = {
     body?: string;
 };
 
+export type DailyProbeTodayDto = {
+    completed: boolean;
+};
+
 export type ConversationListItem = {
     id: number;
     subject: string;
@@ -3883,6 +3887,24 @@ export type DataUpgradeResponses = {
 };
 
 export type DataUpgradeResponse = DataUpgradeResponses[keyof DataUpgradeResponses];
+
+export type GetDailyProbeTodayData = {
+    body?: never;
+    path?: never;
+    query: {
+        timezone: string;
+    };
+    url: '/api/daily-probes/today';
+};
+
+export type GetDailyProbeTodayResponses = {
+    /**
+     * OK
+     */
+    200: DailyProbeTodayDto;
+};
+
+export type GetDailyProbeTodayResponse = GetDailyProbeTodayResponses[keyof GetDailyProbeTodayResponses];
 
 export type GetConversationData = {
     body?: never;

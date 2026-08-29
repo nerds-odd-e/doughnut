@@ -1,10 +1,10 @@
 <template>
   <div ref="recallPageRoot" class="recall-page h-full flex flex-col">
     <DailyProbe
-      v-if="currentUser?.dailyProbeEnabled && !dailyProbeFinished"
-      @complete="dailyProbeFinished = true"
+      v-if="showDailyProbe"
+      @complete="markDailyProbeFinished"
     />
-    <template v-else>
+    <template v-else-if="showOrdinaryRecall">
     <GlobalBar
       v-if="isProgressBarVisible"
       :class="[
@@ -103,6 +103,7 @@ import { useRecallData } from "@/composables/useRecallData"
 import { useRecallTrackerNavigation } from "@/composables/useRecallTrackerNavigation"
 import { useRecallAnswerHandling } from "@/composables/useRecallAnswerHandling"
 import { useRecallPageLoading } from "@/composables/useRecallPageLoading"
+import { useDailyProbeOffer } from "@/composables/useDailyProbeOffer"
 import { scheduleFocusAutofocusTargetWithin } from "@/utils/focusTarget"
 
 const {
@@ -130,7 +131,8 @@ defineProps({
 })
 
 const currentUser = inject<Ref<User | undefined>>("currentUser")
-const dailyProbeFinished = ref(false)
+const { showDailyProbe, showOrdinaryRecall, markDailyProbeFinished } =
+  useDailyProbeOffer(currentUser)
 
 const currentIndex = ref(0)
 const previousAnsweredQuestions = ref<(AnsweredQuestion | undefined)[]>([])

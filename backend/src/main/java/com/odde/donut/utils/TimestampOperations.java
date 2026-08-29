@@ -2,7 +2,6 @@ package com.odde.donut.utils;
 
 import java.sql.Timestamp;
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -133,16 +132,18 @@ public abstract class TimestampOperations {
   }
 
   public static Timestamp getStartOfDay(Timestamp timestamp, ZoneId zoneId) {
-    LocalDateTime localDateTime =
+    return Timestamp.from(
+        timestamp.toInstant().atZone(zoneId).toLocalDate().atStartOfDay(zoneId).toInstant());
+  }
+
+  public static Timestamp getStartOfNextDay(Timestamp timestamp, ZoneId zoneId) {
+    return Timestamp.from(
         timestamp
             .toInstant()
             .atZone(zoneId)
-            .toLocalDateTime()
-            .withHour(0)
-            .withMinute(0)
-            .withSecond(0)
-            .withNano(0);
-
-    return Timestamp.from(localDateTime.atZone(zoneId).toInstant());
+            .toLocalDate()
+            .plusDays(1)
+            .atStartOfDay(zoneId)
+            .toInstant());
   }
 }

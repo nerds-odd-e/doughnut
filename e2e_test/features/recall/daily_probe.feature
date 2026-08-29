@@ -24,6 +24,16 @@ Feature: Daily probe
     When I continue from the Daily probe
     Then I should see ordinary recall
 
+  Scenario: A second recall session on the same day skips the probe
+    Given Daily probe is on
+    When I visit recall
+    Then I should see the Daily probe instruction
+    When I complete the Daily probe
+    And I continue from the Daily probe
+    When I visit recall
+    Then I should not see the Daily probe instruction
+    And I should see ordinary recall
+
   Scenario: Learner with Daily probe off enters recall unchanged
     When I visit recall
     Then I should not see the Daily probe instruction

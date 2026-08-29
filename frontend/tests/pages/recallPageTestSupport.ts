@@ -1,4 +1,5 @@
 import {
+  DailyProbeController,
   MemoryTrackerController,
   NoteController,
   RecallsController,
@@ -107,6 +108,9 @@ export function createRecallPageRenderer() {
 
 export function mockRecallPageDefaults() {
   mockSdkService(NoteController, "showNote", makeMe.aNoteRealm.please())
+  mockSdkService(DailyProbeController, "getDailyProbeToday", {
+    completed: false,
+  })
   const recallingSpy = mockSdkService(
     RecallsController,
     "recalling",

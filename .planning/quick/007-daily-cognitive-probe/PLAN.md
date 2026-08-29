@@ -1,7 +1,7 @@
 # Daily probe
 
-**Status:** in progress. Slices 1–9 shipped. Next: slice 10 (same local day
-bypasses the probe).
+**Status:** in progress. Slices 1–10 shipped. Next: slice 11 (next local day
+offers the probe again).
 **Type:** ad-hoc plan (`.planning/quick/`)
 **Extracted from:** `.planning/quick/001-morning-cognitive-index/PLAN.md`
 (unbuilt slices 26–31).
@@ -153,15 +153,13 @@ asserts the saved state before Continue.
 
 **Enables slice 10.**
 
-### 10. A second recall session on the same local day bypasses the probe — Behavior `[ ]`
+### 10. A second recall session on the same local day bypasses the probe — Behavior `[x]`
 
-**Pre-condition:** the Daily probe is enabled and today's offer has been
-consumed according to the approved rule. **Trigger:** the learner starts
-another recall session in the same local day. **Post-condition:** ordinary
-recall opens without another probe prompt.
+Shipped: GET `/api/daily-probes/today?timezone=` returns `{ completed }` for the
+authenticated learner's local day. Recall skips the probe when completed.
+E2E: second `visit recall` on day 1 shows ordinary recall.
 
-- Controller test owns the timezone boundary and same-user lookup.
-- E2E uses the testability clock; no browser sleeps.
+**Enables slice 11.**
 
 ### 11. The next local day offers the same fixed probe again — Behavior `[ ]`
 
