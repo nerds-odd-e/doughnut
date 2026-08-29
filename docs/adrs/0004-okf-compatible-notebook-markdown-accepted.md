@@ -87,10 +87,19 @@ profile. Codec round-trips must be lossless for these rules.
 - `.md` on a **path-shaped** target is optional and ignored (`/folder/File` =
   `/folder/File.md`; `[[folder/File.md]]` = `[[folder/File]]`). Do not strip
   `.md` from unqualified wiki titles (`[[File.md]]` may be a title).
+- A link may target a **property**: note target plus `#prop:` and the
+  authored key. Wiki: `[[Moon#prop:a part of]]`. Path Markdown:
+  `[a part of](/Solar/Moon.md#prop:a%20part%20of)` (percent-encoded key;
+  `.md` still optional **before** the fragment). Product insert writes
+  wiki. `#prop:` is this profile’s property marker, not a heading id.
+  Other fragments are not property links. Bare YAML paths (with or
+  without a fragment) are not links.
 - No active conversion of stored `[[…]]` ↔ `[…](…)`, including save/paste
   round-trip of path Markdown. ZIP export copies stored spelling. 
 - Both spellings share one resolved-link cache `(note, target_note,
-  link_text)`. No style column. No second cache.
+  link_text)`. No style column. No second cache. Strip `#prop:…` to
+  resolve the note; property presence is an extra check on that note.
+  `link_text` includes the `#prop:` suffix.
 
 ### Validation
 
@@ -112,10 +121,11 @@ profile. Codec round-trips must be lossless for these rules.
   is authored YAML; the codec does not wrap `title:` to compensate for a
   basename that is not the display name. Stored notes use the title
   column.
-- Inter-note links are dual-spelling in body and frontmatter: Donut
-  writes wiki; path Markdown is the authored spelling. ZIP does not rewrite wiki
-  to path Markdown. Wiki in Donut-authored YAML is the same profile
-  exception as wiki in the body.
+- Inter-note and property links are dual-spelling in body and frontmatter:
+  Donut writes wiki; path Markdown is the authored spelling. ZIP does not
+  rewrite wiki to path Markdown. Wiki in Donut-authored YAML is the same
+  profile exception as wiki in the body. SPA property URLs are not a
+  stored form (ADR 0005).
 - Obsidian and OKF consumers can open a Donut notebook tree. Public
   identity in the files is the path, except a user-insisted concept
   `index.md` / `log.md`, which OKF tools may treat as a listing/log or reject.
@@ -136,7 +146,8 @@ profile. Codec round-trips must be lossless for these rules.
 ## Related
 
 - Links:
-  - [ADR 0001 — Ubiquitous language](./0001-ubiquitous-language.md) (**Wiki link**)
+  - [ADR 0001 — Ubiquitous language](./0001-ubiquitous-language.md) (**Wiki link**, **Property**)
   - [ADR 0002 — Git-native notebooks](./0002-git-native-notebooks-backed-by-mysql.md)
+  - [ADR 0005 — Web routes](./0005-web-routes.md) (compile to `noteShow` / `noteProperty`)
   - [Open Knowledge Format v0.2](https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/SPEC.md)
   - [Obsidian inline titles](https://obsidian.md/help/settings)

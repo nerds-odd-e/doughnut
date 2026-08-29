@@ -11,7 +11,8 @@ Donut has three URL-shaped languages:
 
 1. **SPA locations** — what the browser shows for a screen
 2. **HTTP API** — JSON/auth/attachments the SPA and other clients call
-3. **Inter-note links in notebook content** — portable wiki / path Markdown
+3. **Wiki / path Markdown in notebook content** — portable note and
+   property links
    ([ADR 0004](./0004-okf-compatible-notebook-markdown-accepted.md))
 
 They look similar (all start with `/`) and are easy to mix. Mixing them
@@ -43,42 +44,53 @@ covers how those links relate to **web** destinations.
   helper that returns one). An HTML `href` is allowed only on rendered
   anchors, and is compiled from a named location against the route table —
   never a second concatenated copy of a path.
-- The URL identifies the **server-side id**, not the portable path (ADR 0004:
-  path is identity in the tree; note id is server-side). Note-show URLs are
-  compact. Retired shapes redirect into the current table; do not keep a
-  second tree of screens.
-- Chrome on the same resource (for example conversation open) is **query on
-  that named route**, not a new path.
+- The URL identifies the **server-side note id**, not the portable path
+  (ADR 0004). A **property** adds the **authored key** (no property
+  surrogate id). Note-show URLs are compact. Nested property path stays
+  under that note. Retired shapes redirect into the current table; do
+  not keep a second tree of screens.
+- Chrome on the current resource (conversation open) is **query on that
+  named route**, not a new path.
+- A **property** is a nested resource, not chrome: named route
+  `noteProperty`, child of `noteShow`, last segment the authored key.
+  Same note page with that property open. Later expansion keeps this
+  path (or a child of it). Opening or closing the property **replaces**
+  within the note family; inbound links **push**. Product surfaces that
+  already know a property (next to assimilate, answered question, memory
+  tracker) navigate to `noteProperty` — not a side channel on `noteShow`.
 
 ### Wiki links as web destinations
 
-- A **live** wiki link in the web app navigates to the **note-show** named
-  route (id). The stored token is unchanged.
+- A live **note** token navigates to `noteShow`. A live **property** token
+  (`#prop:`, ADR 0004) navigates to `noteProperty`. The stored token is
+  unchanged.
 - A path-Markdown href with a leading `/` is **bundle-relative** (ADR 0004),
   not an SPA path. The two languages share a `/` prefix; they are not
   disjoint by string shape. Treat a token by **context**: notebook content
   vs a compiled location. Do not classify a leading `/` as a Vue path.
 - The HTML `href` of a wiki or path-Markdown anchor is compiled from that
-  named location. The concept path stays in the stored token — never as a
-  navigable `href`.
-- Paste or strip of a note-show (or legacy) URL in note content becomes a
-  wiki token. SPA addresses are not the stored form of a wiki link.
-- Unresolved (dead / pending) wiki links do not navigate.
+  named location. The concept path and `#prop:` key stay in the stored
+  token — never as a navigable `href`.
+- Paste or strip of a `noteShow` or `noteProperty` (or legacy) URL in note
+  content becomes a wiki token (property URLs become `#prop:`). SPA
+  addresses are not the stored form of a wiki link.
+- Unresolved (dead / pending) tokens do not navigate.
 
 ## Consequences
 
-- Bookmarks and in-app wiki clicks share one web identity: note id.
+- Bookmarks and in-app clicks share one web identity: note id, or note id
+  plus property key.
 - Exported trees stay portable: no Donut SPA URLs required in the markdown.
-- Agents must not treat a concept path as a Vue location, or a note-show URL
-  as portable identity. Do not put a concept path on an HTML `href` the
-  browser can follow.
+- Agents must not treat a concept path as a Vue location, or a note-show /
+  note-property URL as portable identity. Do not put a concept path on an
+  HTML `href` the browser can follow.
 - Changing a path shape is a route-table (plus redirect) change; callers that
   used names keep working.
 
 ## Related
 
-- [ADR 0001 — Ubiquitous language](./0001-ubiquitous-language.md) (**Wiki link**)
+- [ADR 0001 — Ubiquitous language](./0001-ubiquitous-language.md) (**Wiki link**, **Property**)
 - [ADR 0004 — OKF-compatible notebook Markdown](./0004-okf-compatible-notebook-markdown-accepted.md)
-  (token spelling and tree identity — not web routing)
+  (token spelling, including `#prop:`, and tree identity — not web routing)
 - [`doughnut-routing.json`](../../infra/gcp/path-routing/doughnut-routing.json)
   (backend-owned path hints for the load balancer)
