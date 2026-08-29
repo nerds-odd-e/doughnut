@@ -1,8 +1,7 @@
 # Cognitive probe convergent-validity and latency-modeling analyses
 
-**Status:** slice 1 shipped. Slice 2 is gated on a developer-run precondition
-check (see slice 2) and should not be decomposed further until that
-resolves.
+**Status:** slice 1 shipped. Slice 2's production gate passed on 2026-08-29;
+slices 2–3 below are the EZ-diffusion decomposition (not yet executed).
 **Type:** ad-hoc plan (`.planning/quick/`)
 **Depends on:** `.planning/quick/007-daily-cognitive-probe/PLAN.md` (the probe
 has shipped — slice 1 needs probe history); `.planning/quick/001-morning-cognitive-index/PLAN.md`
@@ -65,37 +64,84 @@ problem):
 | lapse count | lapse count |
 | consistency (`consistencyZScore`) | variability |
 
-### 2. Rolling EZ-diffusion separates caution from capacity — Behavior `[ ]` (gated, not ready)
+### 2. EZ-diffusion recovers drift and boundary from accuracy and RT moments — Structure `[ ]`
 
-**Status:** blocked on a precondition check below. Do not decompose into
-real Behavior/Structure slices until it resolves.
+**Unlocks slice 3.** No user-visible behavior. A package-local pure function
+(Wagenmakers, van der Maas & Grasman 2007 EZ) maps `(P, MRT, VRT, n)` to
+`(v, a, Ter)` so slice 3 does not invent the algebra inside a controller.
 
-**Precondition check (analysis only, not a coded deliverable):** query a
-learner's recent recall history for how often pace (`pctVsUsual`) and
-accuracy (standardized residual) move in opposite directions on the same
-morning (one better-than-usual, one worse). **Not run yet** — the local dev
-database (`doughnut_development`) currently has no tables/data, so this
-needs to be run by the developer against a real (dev-with-data or
-production) instance, or by an agent with access to one.
+**Contract (capability-named, not a GSD number):**
 
-**Trigger threshold (decided in this planning pass):** slice 2 is worth
-decomposing only if opposite-direction mornings occur in **≥15–20%** of
-qualifying morning-pairs. Below that, the divergence is more plausibly noise
-than a caution/capacity signal worth EZ-diffusion's cost.
+- `s = 0.1` (conventional diffusion coefficient).
+- `P` is proportion correct; `MRT` / `VRT` are mean and variance of
+  response times **in seconds**, over the same responded trials (correct and
+  error). Variance uses `n−1` (sample).
+- Edge correction: `P = 0` → `1/(2n)`, `P = 1` → `1 − 1/(2n)`. `P = 0.5`
+  uses the paper's `L = 0` special case (do not divide by `logit(0.5)`).
+- Return `null` parameters when `n < 2` or `VRT ≤ 0` (the equations are
+  undefined). Do not clamp or invent a default fit.
+- Tests are the published-equation contract: crafted `(P, MRT, VRT, n)` at
+  the function boundary (`unit-testing.mdc` pure-contract exception). No
+  Spring, no HTTP.
 
-**Next step once the rate is known:**
-- rate ≥ threshold → run `/slice-planning` again on slice 2 alone to
-  decompose it into real Behavior/Structure slices.
-- rate < threshold → drop slice 2 from this plan.
+### 3. Trailing three-morning MCQ EZ-diffusion is reported — Behavior `[ ]`
 
-**Unchanged from the original — still the model's real preconditions once
-(if) it's triggered:** EZ-diffusion assumes two-choice symmetric boundaries
-and needs 30–50 trials per fit; RT variance is its noisiest input; the
-window is rolling over three mornings, never daily, because of that noise;
-scoped to the MCQ subset only (spelling has no symmetric two-choice
-structure for EZ to fit).
+**Precondition:** current user has MCQ recall answers in the request
+timezone's local dates `[today−2, today]` (three calendar mornings, empty
+days contribute zero trials). Qualifying trial: `QuestionType.MCQ`, counts
+as a review, has on-task RT, and is not implausibly fast — reuse
+`RecallPaceAggregator`'s exclusion set and `RecallAnswerRow.rawElapsedMs`
+(same on-task definition as pace). Spelling is out of scope: no symmetric
+two-choice structure for EZ.
+
+**Trigger:** `GET /api/user/recall-ez-diffusion?timezone=` — internal,
+current-user-only, no frontend page. Same precedent as slice 1.
+
+**Postcondition:** JSON `{ driftRate, boundarySeparation, nondecisionTimeMs,
+trialCount, morningCount }`. `morningCount` is how many of the three local
+dates had ≥1 qualifying MCQ. When `trialCount < 30`, the three fit fields
+are `null` and `trialCount` / `morningCount` still report (EZ needs 30–50
+trials; 30 is the floor to emit a fit). Do not fit a single morning even
+when that morning alone has ≥30 trials — the window is rolling three
+mornings because RT variance is noisy.
+
+MCQ is scored as two-boundary correct-vs-error (not n-choice). That is the
+EZ assumption; 3–4 option stems still collapse to correct vs error.
 
 ---
+
+## Gate result (2026-08-29, production)
+
+Read-only against Cloud SQL `doughnut-db-instance` / database `doughnut`.
+Learner: Terry (`user.id = 1`), timezone `Asia/Shanghai`. Rows fed through
+the shipped `RecallPaceAggregator` / `RecallAccuracyAggregator` (not a SQL
+proxy for those formulas). Trailing 90 local mornings with both
+`pctVsUsual` and accuracy `standardizedResidual` non-null: **91**.
+
+| Definition of “opposite” (one better-than-usual, one worse) | Rate |
+|---|---|
+| Raw sign | **54/91 (59.3%)** |
+| Exclude pace `\|pctVsUsual\| < 1` (UI “about usual”) | **53/86 (61.6%)** |
+| `\|pct\| ≥ 1` and `\|A\| ≥ 0.5` | **28/50 (56.0%)** |
+| `\|pct\| ≥ 1` and `\|A\| ≥ 1.0` | **16/29 (55.2%)** |
+
+Threshold decided in the earlier planning pass: decompose only if
+opposite-direction mornings are **≥15–20%**. All four cuts clear it.
+Of the 54 raw-sign opposites, **48** are faster + worse accuracy and **6**
+are slower + better accuracy (both-better 30, both-worse 7). The signal is
+a speed–accuracy tradeoff, mostly rushing, which is what `v` vs `a` is for.
+
+Yeong Sheng had only 2 recall days in 90d — not a second powered learner.
+
+## Design decisions for slices 2–3
+
+- **Internal diagnostic first**, same as slice 1. This plan is analyses, not
+  Recall Stats tiles. A user-facing caution/capacity readout is a later
+  plan if this diagnostic is worth showing.
+- **Wagenmakers 2007 EZ**, not a numerical diffusion fit. Closed form matches
+  the “is it worth it” bar; RT variance stays the noisy input, hence three
+  mornings never daily.
+- **MCQ only**, correct-vs-error boundaries. Spelling stays out.
 
 ## Permanent artifacts (capability-named)
 
@@ -105,8 +151,8 @@ structure for EZ to fit).
 | `RecallProbeConvergentValidity` | correlates the 4 matched pairs; mirrors the retired split-half diagnostic's shape |
 | `DailyProbeConvergentValidityDTO` | `{ pairs: [{ pair, pairCount, rawCorrelation }] }` |
 | `DailyProbeDaySeries.latestByLocalDay` | shared "latest probe per local day" grouping, extracted during this slice's refactor |
-
-Slice 2 has no permanent artifacts yet — still gated (see above).
+| `UserController` EZ-diffusion GET (slice 3, not shipped) | `GET /api/user/recall-ez-diffusion` |
+| EZ closed-form helper (slice 2, not shipped) | Wagenmakers 2007; consumed only by slice 3 |
 
 ## Per-slice wrap-up
 
@@ -114,8 +160,5 @@ Per `.cursor/rules/planning.mdc`: test first and confirm it fails for the
 right reason → smallest change to green → `post-change-refactor` on the
 uncommitted change → update this plan → commit and push before the next
 slice. Targeted `cypress run --spec` only, never the full suite. Unfinished
-E2E stays `@wip`; never commit on red.
-
-**Before executing slice 2:** run its precondition check first (see above)
-and re-run `/slice-planning` on it once the rate is known — it intentionally
-stays underspecified until then.
+E2E stays `@wip`; never commit on red. Slices 2–3 are internal diagnostics:
+controller/unit tests, no E2E page.
