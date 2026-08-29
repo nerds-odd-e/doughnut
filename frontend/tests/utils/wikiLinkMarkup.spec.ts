@@ -52,6 +52,29 @@ describe("wikiLinkMarkup utils", () => {
     expect(navigated).toEqual(noteShowLocation(42))
   })
 
+  it.each([
+    { href: "#", kind: "hash" },
+    { href: "/Folder/Title.md", kind: "concept-path" },
+  ])(
+    "handleRichContentAnchorClick does not navigate leftover $kind hrefs",
+    ({ href }) => {
+      const anchor = document.createElement("a")
+      anchor.setAttribute("href", href)
+      handleRichContentAnchorClick(
+        anchor,
+        {
+          onDeadWikiLink: () => {
+            throw new Error("should not treat as dead")
+          },
+          navigateInApp: () => {
+            throw new Error("should not navigate")
+          },
+        },
+        { deadWikiLinksEnabled: true }
+      )
+    }
+  )
+
   it("markdownWikiTokenFromDeadWikiLinkPayload matches simple and piped stored tokens", () => {
     expect(
       markdownWikiTokenFromDeadWikiLinkPayload({

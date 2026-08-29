@@ -149,6 +149,7 @@ export function handleRichContentAnchorClick(
     window.open(href, "_blank", "noopener,noreferrer")
     return
   }
+  if (href === "#" || hrefLooksLikeConceptNotePath(href)) return
   handlers.navigateInApp(href)
 }
 
