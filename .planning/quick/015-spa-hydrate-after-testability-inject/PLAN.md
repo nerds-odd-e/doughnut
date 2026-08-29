@@ -1,6 +1,6 @@
 # SPA hydrate after testability inject
 
-**Status:** in progress (slice 1 done; 2–6 remaining). Do not execute remaining slices until the developer says so.
+**Status:** in progress (slices 1–2 done; 3–6 remaining).
 **Type:** ad-hoc plan (`.planning/quick/`)
 **Depends on:** Proposed [ADR 0005](../../../docs/adrs/0005-web-routes.md) E2E intent table; shipped identity-jump interims (`jumpToNotebookPage` for skip-tracking and note creation; tree-view `I route to the note`).
 
@@ -25,8 +25,8 @@ Vue is coherent: **page bodies refetch on mount; layout chrome is session-scoped
 |---|---|
 | Skip Memory Tracking → `jumpToNotebookPage` | **Keep.** Domain is notebook settings, not catalog browsing (ADR 0001). |
 | Note creation under folder → `jumpToNotebookPage` | **Keep.** Same Given-shaped identity jump. |
-| Tree-view Gherkin → `I route to the note` (slice 1) | **Interim wording.** Unique behavior is the sidebar tree. Restore `{notepath}` after the helper jumps by leaf (slice 3). |
-| MainMenu refetch on `route.name` | **Revert in slice 2.** Not a domain invalidation. |
+| Tree-view Gherkin → `I route to the note` (slice 1) | **Interim wording.** Unique behavior is the sidebar tree. Restore `{notepath}` after the helper jumps by leaf (slice 4). |
+| MainMenu refetch on `route.name` | **Revert in slice 3.** Not a domain invalidation. |
 
 ## Design decisions
 
@@ -41,7 +41,7 @@ Vue is coherent: **page bodies refetch on mount; layout chrome is session-scoped
   - `e2e_test/features/note_topology/note_tree_view.feature`
   - `e2e_test/features/assimilation/assimilation_walkthrough.feature`
   - `e2e_test/features/notebooks/notebook_catalog_navigation.feature`
-  - After slice 3: also `e2e_test/features/note_topology/wiki_link.feature` (owned `{notepath}` callers)
+  - After slice 4: also `e2e_test/features/note_topology/wiki_link.feature` (owned `{notepath}` callers)
 - Raw JSON: tee locally (e.g. `/tmp/hydrate-profile/`); **do not commit**.
 - **CI close:** watch GitHub Actions workflow `donut CI` on `main` after the last behavior push until green. Do not run full local `pnpm verify` unless CI is red and needs a local repro.
 - Do not add `@skipOptimizationDueToKnownNecessarySlowness` without developer Jidoka.
@@ -66,13 +66,17 @@ Shipped: `I route to the note` (identity) instead of `{notepath}` catalog walk. 
 
 ---
 
-### 2. Record timing baseline — Structure `[ ]`
+### 2. Record timing baseline — Structure `[x]`
 
 **Timing:** yes (this slice *is* the baseline).
 
-Run the timer command 3× on tree-view, assimilation walkthrough, and catalog navigation. Write medians into this PLAN. No product change.
+Score field: Cypress mocha JSON `stats.duration` (ms → s). Logs under `/tmp/hydrate-profile/` (not committed). All 9 runs green.
 
-**Verify:** three JSON logs exist locally; PLAN table filled.
+| Spec | run1 (s) | run2 (s) | run3 (s) | median (s) |
+|------|----------|----------|----------|------------|
+| note_tree_view | 7.542 | 7.403 | 7.291 | 7.403 |
+| assimilation_walkthrough | 15.321 | 15.093 | 15.100 | 15.100 |
+| notebook_catalog_navigation | 2.845 | 2.854 | 2.891 | 2.854 |
 
 ---
 
@@ -124,9 +128,9 @@ Then watch `donut CI` on `main` for the branch tip until green (lint, backend un
 
 | Metric | Before (slice 2) | After |
 |--------|------------------|-------|
-| note_tree_view median | | |
-| assimilation_walkthrough median | | |
-| notebook_catalog_navigation median | | |
+| note_tree_view median | 7.403s | |
+| assimilation_walkthrough median | 15.100s | |
+| notebook_catalog_navigation median | 2.854s | |
 | wiki_link median (if timed) | | |
 
 ---
