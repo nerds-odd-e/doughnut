@@ -2,6 +2,7 @@ package com.odde.donut.services;
 
 import com.odde.donut.controllers.dto.DailyProbeConvergentValidityDTO;
 import com.odde.donut.controllers.dto.DailyProbeConvergentValidityDTO.PairValidity;
+import com.odde.donut.controllers.dto.RecallEzDiffusionDTO;
 import com.odde.donut.controllers.dto.RecallStatsDTO;
 import com.odde.donut.controllers.dto.RecallStatsDTO.AccuracyStats;
 import com.odde.donut.controllers.dto.RecallStatsDTO.AmPmResponseTime;
@@ -78,6 +79,23 @@ public class RecallStatsService {
             .map(r -> new PairValidity(r.pair().name(), r.pairCount(), r.rawCorrelation()))
             .toList();
     return new DailyProbeConvergentValidityDTO(pairs);
+  }
+
+  /**
+   * Internal diagnostic (plan {@code 008-probe-convergent-analyses}, slice 3): trailing
+   * three-local-morning EZ-diffusion decomposition of the current user's MCQ recall trials. Same
+   * same-user-only projection query as {@link #compute}; not wired into {@link RecallStatsDTO}.
+   */
+  public RecallEzDiffusionDTO computeEzDiffusion(User user, ZoneId zoneId, Timestamp now) {
+    List<RecallAnswerRow> allTimeReviews = reviewsOnly(findAllTimeAnsweredRows(user, now));
+    LocalDate today = localToday(now, zoneId);
+    RecallEzDiffusion.Result result = RecallEzDiffusion.compute(allTimeReviews, today, zoneId);
+    return new RecallEzDiffusionDTO(
+        result.driftRate(),
+        result.boundarySeparation(),
+        result.nondecisionTimeMs(),
+        result.trialCount(),
+        result.morningCount());
   }
 
   private List<RecallAnswerRow> findAllTimeAnsweredRows(User user, Timestamp now) {

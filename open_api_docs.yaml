@@ -2329,6 +2329,24 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/RecallStatsDTO"
+  /api/user/recall-ez-diffusion:
+    get:
+      tags:
+      - user-controller
+      operationId: getRecallEzDiffusion
+      parameters:
+      - name: timezone
+        in: query
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/RecallEzDiffusionDTO"
   /api/user/question-generation-batch-schedule:
     get:
       tags:
@@ -5188,6 +5206,24 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/DailyProbeDay"
+    RecallEzDiffusionDTO:
+      type: object
+      properties:
+        driftRate:
+          type: number
+          format: double
+        boundarySeparation:
+          type: number
+          format: double
+        nondecisionTimeMs:
+          type: number
+          format: double
+        trialCount:
+          type: integer
+          format: int32
+        morningCount:
+          type: integer
+          format: int32
     QuestionGenerationBatchUserScheduleDTO:
       type: object
       properties:

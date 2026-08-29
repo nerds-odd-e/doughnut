@@ -997,6 +997,14 @@ export type RecallStatsDto = {
     dailyProbe?: Array<DailyProbeDay>;
 };
 
+export type RecallEzDiffusionDto = {
+    driftRate?: number;
+    boundarySeparation?: number;
+    nondecisionTimeMs?: number;
+    trialCount?: number;
+    morningCount?: number;
+};
+
 export type QuestionGenerationBatchUserScheduleDto = {
     nextScheduledAt?: string;
     reason?: string;
@@ -3279,6 +3287,24 @@ export type GetRecallStatsResponses = {
 };
 
 export type GetRecallStatsResponse = GetRecallStatsResponses[keyof GetRecallStatsResponses];
+
+export type GetRecallEzDiffusionData = {
+    body?: never;
+    path?: never;
+    query: {
+        timezone: string;
+    };
+    url: '/api/user/recall-ez-diffusion';
+};
+
+export type GetRecallEzDiffusionResponses = {
+    /**
+     * OK
+     */
+    200: RecallEzDiffusionDto;
+};
+
+export type GetRecallEzDiffusionResponse = GetRecallEzDiffusionResponses[keyof GetRecallEzDiffusionResponses];
 
 export type GetQuestionGenerationBatchScheduleData = {
     body?: never;

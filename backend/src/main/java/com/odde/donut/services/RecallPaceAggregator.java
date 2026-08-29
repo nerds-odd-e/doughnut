@@ -22,9 +22,15 @@ import java.util.Set;
  */
 final class RecallPaceAggregator {
   private static final double EWMA_ALPHA = 0.3;
-  private static final double ABSOLUTE_FLOOR_MS = 300;
+
+  /** Package-visible: reused as-is by {@link RecallEzDiffusion}'s simplified exclusion set. */
+  static final double ABSOLUTE_FLOOR_MS = 300;
+
   private static final double BASELINE_FLOOR_FACTOR = 0.25;
-  private static final double HARD_DROP_MS = 300_000;
+
+  /** Package-visible: reused as-is by {@link RecallEzDiffusion}'s simplified exclusion set. */
+  static final double HARD_DROP_MS = 300_000;
+
   private static final double RESIDUAL_CAP = Math.log(8);
   private static final double LAPSE_FACTOR = 2.5;
   private static final int BASELINE_WINDOW_START_DAYS_AGO = 63;

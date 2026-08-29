@@ -4,6 +4,7 @@ import com.odde.donut.controllers.dto.DailyProbeConvergentValidityDTO;
 import com.odde.donut.controllers.dto.GeneratedTokenDTO;
 import com.odde.donut.controllers.dto.MenuDataDTO;
 import com.odde.donut.controllers.dto.QuestionGenerationBatchUserScheduleDTO;
+import com.odde.donut.controllers.dto.RecallEzDiffusionDTO;
 import com.odde.donut.controllers.dto.RecallStatsDTO;
 import com.odde.donut.controllers.dto.TokenConfigDTO;
 import com.odde.donut.controllers.dto.UserDTO;
@@ -230,6 +231,21 @@ class UserController {
     ZoneId timeZone = TimezoneUtils.parseTimezone(timezone);
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
     return recallStatsService.computeConvergentValidity(user, timeZone, currentUTCTimestamp);
+  }
+
+  /**
+   * Internal diagnostic (plan {@code 008-probe-convergent-analyses}, slice 3) — not wired into any
+   * user-facing page. Same same-user auth/scoping as {@link #getRecallStats}.
+   */
+  @GetMapping("/recall-ez-diffusion")
+  @Transactional(readOnly = true)
+  public RecallEzDiffusionDTO getRecallEzDiffusion(
+      @RequestParam(value = "timezone") String timezone) {
+    authorizationService.assertLoggedIn();
+    User user = authorizationService.getCurrentUser();
+    ZoneId timeZone = TimezoneUtils.parseTimezone(timezone);
+    Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
+    return recallStatsService.computeEzDiffusion(user, timeZone, currentUTCTimestamp);
   }
 
   @GetMapping("/question-generation-batch-schedule")
