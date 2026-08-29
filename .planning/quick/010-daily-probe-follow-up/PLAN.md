@@ -1,6 +1,6 @@
 # Daily probe follow-up (bugs, ADR gap, redundant tests)
 
-**Status:** in progress (slices 1–5 done).
+**Status:** in progress (slices 1–6 done).
 **Type:** ad-hoc plan (`.planning/quick/`)
 **Depends on:** shipped `.planning/quick/007-daily-cognitive-probe/PLAN.md`
 **Measurement spec:** [daily-probe-protocol.md](../../notes/daily-probe-protocol.md)
@@ -129,18 +129,11 @@ Neither probe nor ordinary recall until a successful GET. Retry calls
 `checkOffer` again (not only when `enabled` flips). KeepAlive keeps the
 retry UI until the learner retries.
 
-### 6. Turning Daily probe off hides its Recall Stats trend — Behavior `[ ]`
+### 6. Turning Daily probe off hides its Recall Stats trend — Behavior `[x]`
 
-**Pre:** At least one completed Daily probe row; Daily probe is then turned
-off.
-**Trigger:** Open Recall Stats.
-**Post:** No Daily probe trend. Review charts are unchanged if reviews
-exist; probe-only learners see the existing empty stats state.
-
-Tests: `UserRecallStatsControllerTest` — rows exist, flag off, `dailyProbe`
-empty; E2E extend `daily_probe.feature` (complete, turn off, stats has no
-trend). Implementation: `RecallStatsService.compute` omits the series when
-`!user.getDailyProbeEnabled()`.
+`RecallStatsService.compute` omits `dailyProbe` when the flag is off.
+History rows stay. Frontend already hides an empty series. E2E: complete,
+turn off, stats has no trend (probe-only empty state).
 
 ### 7. Remove redundant Daily probe tests and the test-only stats overload — Structure `[ ]`
 

@@ -57,6 +57,7 @@ class UserRecallStatsControllerTest extends ControllerTestBase {
 
   @Test
   void completedDailyProbeDaysAreASparseOldestFirstSeries() {
+    makeMe.theUser(currentUser.getUser()).dailyProbeEnabled(true).please();
     Timestamp older = makeMe.aTimestamp().of(1, 8).fromShanghai().please();
     Timestamp newer = makeMe.aTimestamp().of(2, 8).fromShanghai().please();
     makeMe
@@ -90,7 +91,15 @@ class UserRecallStatsControllerTest extends ControllerTestBase {
   }
 
   @Test
+  void dailyProbeSeriesIsEmptyWhenDailyProbeIsOff() {
+    makeMe.aDailyProbe().by(currentUser.getUser()).please();
+
+    assertThat(controller.getRecallStats("UTC").getDailyProbe(), hasSize(0));
+  }
+
+  @Test
   void dailyProbeOmitsOtherUsersRows() {
+    makeMe.theUser(currentUser.getUser()).dailyProbeEnabled(true).please();
     makeMe.aDailyProbe().please();
 
     assertThat(controller.getRecallStats("UTC").getDailyProbe(), hasSize(0));
@@ -98,6 +107,7 @@ class UserRecallStatsControllerTest extends ControllerTestBase {
 
   @Test
   void dailyProbeGroupsCompletedAtByRequestTimezone() {
+    makeMe.theUser(currentUser.getUser()).dailyProbeEnabled(true).please();
     Timestamp completedAt = makeMe.aTimestamp().of(1, 4).fromShanghai().please();
     makeMe.aDailyProbe().by(currentUser.getUser()).completedAt(completedAt).please();
 
