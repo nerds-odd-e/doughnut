@@ -23,7 +23,7 @@ export function useDailyProbeOffer(
       return
     }
     offerCheckFailed.value = false
-    completedToday.value = data.completed
+    completedToday.value = data!.completed
   }
 
   watch(
