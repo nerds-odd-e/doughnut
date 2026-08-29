@@ -10,6 +10,7 @@ import { notebookCard } from './notebookCard'
 import { notebookList } from './NotebookList'
 import { subscribedNotebooks } from './subscribedNotebooks'
 import router from 'start/router'
+import { namedLocationHref } from '@/routes/namedLocationHref'
 import notebookCreationForm from './forms/notebookCreationForm'
 import notebookGroupPage from './notebookGroupPage'
 import {
@@ -134,7 +135,17 @@ export const notebooksPage = () => {
   }
 }
 
+const leaveNotebookCatalogIfAlreadyOpen = () => {
+  const catalogPath = namedLocationHref({ name: 'notebooks' })
+  cy.location('pathname').then((pathname) => {
+    if (pathname === catalogPath) {
+      router().push('root')
+    }
+  })
+}
+
 export const navigateToNotebooksPage = () => {
+  leaveNotebookCatalogIfAlreadyOpen()
   router().push('notebooks')
   waitUntilAppIsNotBusy()
   return notebooksPage()

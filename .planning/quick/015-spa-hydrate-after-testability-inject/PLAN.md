@@ -1,6 +1,6 @@
 # SPA hydrate after testability inject
 
-**Status:** in progress (slices 1–4 done; 5–6 remaining).
+**Status:** in progress (slices 1–5 done; 6 remaining).
 **Type:** ad-hoc plan (`.planning/quick/`)
 **Depends on:** Proposed [ADR 0005](../../../docs/adrs/0005-web-routes.md) E2E intent table; shipped identity-jump interims (`jumpToNotebookPage` for skip-tracking and note creation).
 
@@ -103,20 +103,13 @@ Shipped: owned `{notepath}` → `jumpToNotePage(last segment)`; Bazaar root stil
 
 ---
 
-### 5. Catalog listing after inject shows current notebooks — Behavior `[ ]`
+### 5. Catalog listing after inject shows current notebooks — Behavior `[x]`
 
-**Pre:** logged in on `/notebooks` (empty hydrate); scenario injects a notebook. **Trigger:** `I open the notebook "…" from the notebook catalog`. **Post:** that notebook page (rename/health/readme flows as today).
+**Pre:** logged in on `/notebooks` (empty hydrate); scenario injects a notebook. **Trigger:** `I open the notebook "…" from the notebook catalog`. **Post:** that notebook page.
 
-This step **is** catalog navigation. Identity jump is the wrong shortcut.
+Shipped: **page re-enter** (not product Notes refetch, not `visitNamed('notebooks')`). If already on the catalog, `leaveNotebookCatalogIfAlreadyOpen` named-`push`es `root`, then `push('notebooks')` so the listing remounts and fetches. Card click still goes through the catalog UI.
 
-Implement the **faster** of:
-
-1. **Page re-enter:** if already on `notebooks`, leave via a named `push` (e.g. jump to an injected notebook’s note, or a cheap named route that is not a full `cy.visit`), then `push('notebooks')` so `NotebooksPage` mounts and fetches; then click the card; or
-2. **Product:** choosing Notes while already on the catalog refetches `myNotebooks`; listing steps go through that UI.
-
-Do **not** ship full-document `visitNamed('notebooks')` unless both (1) and (2) fail the timing gate and Jidoka agrees remount is worth it.
-
-**Verify:** `notebook_catalog_navigation.feature`, and the catalog-open scenarios in `notebook_creation.feature` / `notebook_health.feature` (targeted `--spec`). Timing: catalog navigation vs slice-2 baseline.
+Timing (`stats.duration`): 2.925 / 2.813 / 2.867 → median **2.867s** vs 2.854s (gate ≤ 5.854s) — pass. Also green: `notebook_creation.feature`, `notebook_health.feature`.
 
 ---
 
