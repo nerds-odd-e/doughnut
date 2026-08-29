@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.donut.controllers.dto.DailyProbeRequestDTO;
+import com.odde.donut.controllers.dto.DailyProbeTodayDTO;
 import com.odde.donut.entities.DailyProbe;
 import com.odde.donut.entities.repositories.DailyProbeRepository;
 import java.sql.Timestamp;
@@ -70,5 +71,41 @@ class DailyProbeControllerTest extends ControllerTestBase {
 
     assertThat(exception.getStatusCode(), equalTo(HttpStatus.BAD_REQUEST));
     assertThat(dailyProbeRepository.count(), equalTo(0L));
+  }
+
+  @Test
+  void getTodayCompletedWhenCompletedAtFallsOnShanghaiLocalDayThatDiffersFromUtcDate() {
+    Timestamp now = makeMe.aTimestamp().of(1, 4).fromShanghai().please();
+    testabilitySettings.timeTravelTo(now);
+    makeMe.aDailyProbe().by(currentUser.getUser()).please();
+
+    DailyProbeTodayDTO today = controller.getDailyProbeToday("Asia/Shanghai");
+
+    assertThat(today.completed(), is(true));
+  }
+
+  @Test
+  void getTodayNotCompletedWithoutARow() {
+    assertThat(controller.getDailyProbeToday("Asia/Shanghai").completed(), is(false));
+  }
+
+  @Test
+  void getTodayIgnoresAnotherUsersCompletedRow() {
+    Timestamp now = makeMe.aTimestamp().of(1, 4).fromShanghai().please();
+    testabilitySettings.timeTravelTo(now);
+    makeMe.aDailyProbe().please();
+
+    assertThat(controller.getDailyProbeToday("Asia/Shanghai").completed(), is(false));
+  }
+
+  @Test
+  void getTodayNotLoggedIn() {
+    currentUser.setUser(null);
+
+    ResponseStatusException exception =
+        assertThrows(
+            ResponseStatusException.class, () -> controller.getDailyProbeToday("Asia/Shanghai"));
+
+    assertThat(exception.getStatusCode(), equalTo(HttpStatus.UNAUTHORIZED));
   }
 }

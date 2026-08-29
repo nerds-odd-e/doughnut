@@ -169,6 +169,7 @@ Use this for endpoint lookup; open `sdk.gen.ts` or `types.gen.ts` only for exact
 ## Daily Probe Controller
 
 - `createDailyProbe`: POST `/api/daily-probes` -> `CreateDailyProbeResponse` (request: `CreateDailyProbeData`; body: DailyProbeRequestDto; response body: DailyProbe)
+- `getDailyProbeToday`: GET `/api/daily-probes/today` -> `GetDailyProbeTodayResponse` (request: `GetDailyProbeTodayData`; query: timezone; response body: DailyProbeTodayDto)
 
 ## Conversation Message Controller
 
