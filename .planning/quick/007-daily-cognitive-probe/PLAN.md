@@ -1,7 +1,7 @@
 # Daily probe
 
-**Status:** in progress. Slices 1–7 shipped. Next: slice 8 (`daily_probe`
-table, completed rows only).
+**Status:** in progress. Slices 1–8 shipped. Next: slice 9 (persist on
+completion).
 **Type:** ad-hoc plan (`.planning/quick/`)
 **Extracted from:** `.planning/quick/001-morning-cognitive-index/PLAN.md`
 (unbuilt slices 26–31).
@@ -134,18 +134,15 @@ s⁻¹. E2E all-correct 250 ms asserts 0.00.
 
 **Enables slice 8.**
 
-### 8. Represent Daily probe attempts and results durably — Structure `[ ]`
+### 8. Represent Daily probe attempts and results durably — Structure `[x]`
 
-Create the `daily_probe` table and cohesive backend persistence model.
-Completed rows only: user FK with CASCADE, completion timestamp, all four
-summaries, and `trials_json` with the 20 scored trials exactly. No incomplete
-status column — abandon leaves no row.
+Shipped: `V300000305__create_daily_probe.sql` — completed rows only (`user_id`
+CASCADE, `completed_at`, nullable `speed`/`variability`, `accuracy`,
+`lapse_count`, `trials_json`). Entity `DailyProbe`, `DailyProbeRepository`,
+`MakeMe.aDailyProbe()`. Persistence test round-trips 20 scored trials. ERD
+updated. No endpoint or UI.
 
-- Compute the Flyway version fresh at execution time.
-- Extend `MakeMe` only as needed for concise controller fixtures.
-- Regenerate `docs/database-erd.md` with the `database-erd` skill.
-- No endpoint or UI behavior changes in this slice.
-- **Enables slice 9 only.**
+**Enables slice 9 only.**
 
 ### 9. Completing the probe durably saves the result — Behavior `[ ]`
 

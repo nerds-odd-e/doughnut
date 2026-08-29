@@ -52,6 +52,7 @@ erDiagram
     "user" ||--o{ circle_user : "user_id ON DELETE CASCADE"
     "user" ||--o{ conversation : "conversation_initiator_id ON DELETE NO ACTION"
     "user" ||--o{ conversation_message : "sender ON DELETE CASCADE"
+    "user" ||--o{ daily_probe : "user_id ON DELETE CASCADE"
     "user" ||--o{ image : "user_id ON DELETE CASCADE"
     "user" ||--o{ memory_tracker : "user_id ON DELETE CASCADE"
     "user" ||--o{ note_creator : "user_id ON DELETE CASCADE"
@@ -123,6 +124,10 @@ erDiagram
         int id PK
         int conversation_id FK
         int sender FK
+    }
+    daily_probe {
+        int id PK
+        int user_id FK
     }
     failure_report {
         int id PK
