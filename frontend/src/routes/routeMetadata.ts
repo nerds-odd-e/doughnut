@@ -53,7 +53,7 @@ export const routeMetadata: RouteMetadata[] = [
     redirect: (to) => {
       const raw = to.params.noteId
       const id = Array.isArray(raw) ? raw[0] : raw
-      return `/n${id ?? ""}`
+      return { name: "noteShow", params: { noteId: id } }
     },
   },
   {

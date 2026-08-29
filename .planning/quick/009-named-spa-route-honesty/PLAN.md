@@ -1,6 +1,6 @@
 # Named SPA route table honesty
 
-**Status:** in progress (slice 1 done).
+**Status:** in progress (slices 1–2 done).
 **Type:** ad-hoc plan (`.planning/quick/`)
 **Related ADR:** [0005 — Web routes](../../../docs/adrs/0005-web-routes.md) (**Proposed**, not Accepted). This plan makes production and unit tests match a stricter reading of the Decision at “SPA route convention” so that ADR can be tightened without lying. Agents do not set Status to Accepted.
 
@@ -78,9 +78,9 @@ Verify with `CURSOR_DEV=true nix develop -c pnpm frontend:test` (or the spec pat
 
 **Learning:** `noteShowLocation.ts` now imports `routeMetadata`. Slice 2 must use `{ name: "noteShow", params }` in the redirect — do not import `noteShowLocation` into `routeMetadata` (cycle).
 
-### 2. Legacy `/n/:noteId` redirect is a named location — Structure `[ ]`
+### 2. Legacy `/n/:noteId` redirect is a named location — Structure `[x]`
 
-In `routeMetadata`, redirect `/n/:noteId` with `{ name: "noteShow", params }` (not `noteShowLocation` — that module now imports this file). Do not concatenate `` `/n${id}` ``. Existing `routes.spec.ts` redirect tests stay the URL contract (they still `push("/n/888")`).
+`/n/:noteId` redirect returns `{ name: "noteShow", params: { noteId: id } }`. URL contract in `routes.spec.ts` unchanged (`push("/n/888")` → `/n888`).
 
 ### 3. Live token wiki anchors include `data-note-id` — Structure `[ ]`
 
