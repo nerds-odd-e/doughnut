@@ -10,8 +10,8 @@
 Donut bases its recall schedule on open FSRS-6. This ADR owns
 spaced-repetition domain terms and scheduling policy: which events affect
 memory, which inputs matter, and which invariants those transitions preserve.
-It also owns how a morning's recall is measured for the **Cognitive index**.
-General product recall language remains in
+It also owns the **Daily probe** and how a morning's recall is measured for
+the **Cognitive index**. General product recall language remains in
 [ADR 0001](./0001-ubiquitous-language.md). Source code and tests own FSRS
 mechanics and numeric outcomes.
 
@@ -70,10 +70,15 @@ restatement of what the scheduler scheduled.
 - **Cognitive index** — Daily composite readout comparing a morning's recall
   outcomes, pace, and consistency against expectation and against the
   learner's own baseline. A residual signal, not diagnostic of cause.
-- **Daily probe** — Optional, opt-in standalone task (~60 seconds, identical
-  stimuli every day) offered once per local day before the first recall
-  session, used to validate the Cognitive index independently of recall item
-  content.
+
+### Daily probe
+
+- **Daily probe** — Optional, opt-in (default off) standalone task of about
+  60 seconds, using the same stimuli every day, offered at most once per
+  local day before recall. It reads the learner's speed, accuracy, lapses,
+  and variability independently of recall item content. It is not a
+  scheduling input and does not validate the Cognitive index. Turning it off
+  stops new probes and ends the probe's own trend readout.
 
 ### FSRS profile
 
@@ -161,7 +166,8 @@ Tutor Feedback need not have an Answer.
 ## Related
 
 - [ADR 0001: Ubiquitous language](./0001-ubiquitous-language.md) — general
-  recall, memory tracker, assimilation, and Cognitive index product language
+  recall, memory tracker, assimilation, Cognitive index, and Daily probe
+  product language
 - [Commissioned learning session protocol](../commissioned-learning-session-protocol.md)
   — Request/Report documents and matching by note title
 - [`Fsrs`](../../backend/src/main/java/com/odde/donut/entities/Fsrs.java) —

@@ -157,6 +157,10 @@ concepts, including **Cognitive index** measurement, live in [ADR
   with expectation and with the learner's own baseline. Not diagnostic of
   cause. Measurement:
   [ADR 0003](./0003-spaced-repetition-scheduling-policy-accepted.md).
+- **Daily probe** — Optional opt-in standalone task before recall,
+  independent of recall item content. Not a scheduling input and not a
+  validation of the Cognitive index. Measurement:
+  [ADR 0003](./0003-spaced-repetition-scheduling-policy-accepted.md).
 
 **New**, **Stability**, **Difficulty**, **Retrievability**, **RecallLog**,
 **Thinking time**, **Confusion**, and **Overlap**: **Spaced repetition

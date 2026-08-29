@@ -1,8 +1,8 @@
 # Daily probe
 
-**Status:** in progress. Slice 1 shipped. Stopped before slice 2 for the
-human-owned ADR 0003 resolution (Jidoka). Protocol and daily-consumption
-gates still block slices 3 and 8.
+**Status:** in progress. Slice 1 shipped. ADR 0003 Daily probe amended in
+place (independent of the Cognitive index). Next: slice 2. Protocol and
+daily-consumption gates still block slices 3 and 8.
 **Type:** ad-hoc plan (`.planning/quick/`)
 **Extracted from:** `.planning/quick/001-morning-cognitive-index/PLAN.md`
 (unbuilt slices 26–31).
@@ -29,10 +29,10 @@ most once per local day, and show its history on Recall Stats.
   and [ADR 0003 — Spaced-repetition scheduling policy](../../../docs/adrs/0003-spaced-repetition-scheduling-policy-accepted.md):
   the canonical capability name is **Daily probe**. Permanent artifacts use
   `daily_probe` / `DailyProbe`, not `cognitive_probe` / `CognitiveProbe`.
-- **Human-owned ADR resolution required before slice 2.** ADR 0003 still says
-  the Daily probe validates the Cognitive index, while this plan records that
-  composite as dropped and intentionally avoids that claim in product copy.
-  A human must amend/supersede the ADR or explicitly own this plan's exception.
+- **ADR 0003 Daily probe amended in place (slice 2 unblocked).** The probe
+  does not validate the Cognitive index. Settings help text follows that
+  glossary: turning it off stops new probes and ends the probe's own trend
+  readout. Do not mention Cognitive index in product copy.
 - **Human-owned protocol required before slice 3.** Lock the stimulus set and
   order, response mapping, practice/instruction flow, trial pacing, exact trial
   count, and the formulas/units for mean reciprocal response time, lapse, and
@@ -43,13 +43,13 @@ most once per local day, and show its history on Recall Stats.
   learner starts, or only on completion, and what an abandoned probe does.
   The schema nullability and the same-day eligibility test depend on this.
 
-These are Jidoka gates, not implementation slices or commits.
+These remaining items are Jidoka gates, not implementation slices or commits.
 
 ## Key design decisions
 
 - **Opt-in, default off.** The time cost needs explicit consent. Help text
-  describes losing the probe's own trend readout when disabled; final wording
-  follows the ADR resolution above.
+  follows ADR 0003: turning it off stops new probes and ends the probe's own
+  trend readout. Do not mention Cognitive index.
 - **Fixed protocol every day.** The approved stimulus identifiers and order
   are deterministic. Tests advance a controlled clock; they do not spend a
   real minute waiting.
@@ -84,8 +84,7 @@ false and persist-true. TS `UserBuilder` defaults the field off and has a
 setter for slice 2. Client regenerated. ERD unchanged (key columns only).
 Backend unit suite green (1908 tests).
 
-**Enables slice 2 only.** Slice 2 remains blocked on the ADR 0003 help-text
-resolution below.
+**Enables slice 2 only.**
 
 ### 2. The learner can opt in or out in General settings — Behavior `[ ]`
 
