@@ -116,7 +116,7 @@ Then("I should see {string} in the non-interactive output", (expected: string) =
 
 ## Waiting until the app is not busy
 
-Product loading UI that means unfinished work marks itself with `data-app-busy` (`LoadingThinBar` from `apiCallWithLoading`, `ContentLoader` for pending page data, `LoadingModal` for `blockUi`). See `.cursor/rules/frontend-api.mdc`.
+Product loading UI that means unfinished work marks itself with `data-app-busy` (`LoadingThinBar` from `apiCallWithLoading`, `ContentLoader` for pending page data, `LoadingModal` for `blockUi`). See `.cursor/rules/frontend.mdc`.
 
 E2E waits with `waitUntilAppIsNotBusy()` from `e2e_test/start/pageBase.ts` (also `start.waitUntilAppIsNotBusy()`):
 

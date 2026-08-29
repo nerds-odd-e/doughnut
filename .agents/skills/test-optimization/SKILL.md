@@ -174,8 +174,8 @@ Copy [plan-template.md](plan-template.md) to
 Fill baseline, skip-tag note, top-10% table, grouping choice, one slice per
 group, and a final re-profile slice.
 
-Read sub-project rules when editing tests: `e2e-authoring.mdc`, `frontend-testing.mdc`,
-`backend-testing.mdc`, `cli.mdc`, etc.
+Read sub-project rules when editing tests: `frontend.mdc` / `frontend-testing.mdc`,
+`backend.mdc` / `backend-testing.mdc`, `e2e-authoring.mdc`, `cli.mdc`.
 </step>
 
 <step name="execute_via_execute_plan">

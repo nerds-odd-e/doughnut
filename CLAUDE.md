@@ -8,7 +8,7 @@ Start with `.cursor/agent-map.md` for repo navigation, generated API guidance, f
 
 Run repo tooling with `CURSOR_DEV=true nix develop -c …` unless documented otherwise (e.g. Cloud VM). **Git commands do not need the Nix prefix** — run `git` directly.
 
-Repo conventions live in `.cursor/rules/`. Cursor injects `alwaysApply: true` rules automatically. **Codex / Claude Code:** read these always-applied rules before coding — `general.mdc`, `error-handling.mdc`, `unit-testing.mdc`, `planning.mdc`, `gsd-coexistence.mdc`, `architecture-decisions.mdc` — then the stack rule for the area you touch (backend, frontend, E2E, linting, migrations, MCP, CLI).
+Repo conventions live in `.cursor/rules/`. Cursor injects `alwaysApply: true` rules automatically. **Codex / Claude Code:** read these always-applied rules before coding — `general.mdc`, `error-handling.mdc`, `unit-testing.mdc`, `planning.mdc`, `gsd-coexistence.mdc`, `architecture-decisions.mdc` — then the stack file for the area you touch: frontend → `frontend.mdc`; backend → `backend.mdc`; E2E → `e2e-authoring.mdc`; lint → `linting_formating.mdc`; migrations → `db-migration.mdc`; MCP → `mcp-server.mdc`; CLI → `cli.mdc`. Do not search for other names first. Cursor auto-attaches globbed detail files when matching files are in context.
 
 For local MySQL or Redis failures, inspect `mysql/mysql.log` or `redis/redis.log`; the Nix shell setup is defined by `process-compose.yaml` and `scripts/shell_setup.sh`.
 

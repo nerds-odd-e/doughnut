@@ -1,28 +1,23 @@
 ---
-description: Frontend API integration for files importing @generated/donut-backend-api/sdk.gen, apiCallWithLoading, blockUi loading, data-app-busy / waitUntilAppIsNotBusy E2E pairing, wrapped responses, toOpenApiError
+description: Frontend API integration — generated SDK, apiCallWithLoading, blockUi, wrapped responses, toOpenApiError
+globs: frontend/src/**/*.{vue,ts}
 alwaysApply: false
 ---
 # Frontend API Rules
 
-Use this rule when frontend code imports services from `@generated/donut-backend-api/sdk.gen`, handles wrapped API responses, or maps backend validation errors.
-
 ## API Integration
 
-- Import services directly from `@generated/donut-backend-api/sdk.gen`.
-- Use the wrapped response pattern: `{ data, error, request, response }`.
-- Follow the API types from generated code.
-- Use `apiCallWithLoading` for user-initiated actions that need loading indicators.
-- Wrapped calls show loading state and error toasts automatically.
-- Non-wrapped calls are silent: no loading state and no error toasts.
+- Import services from `@generated/donut-backend-api/sdk.gen`.
+- Wrapped response: `{ data, error, request, response }`.
+- User-initiated actions: `apiCallWithLoading` (loading bar + error toasts).
+- Direct SDK calls are silent: no loading bar and no error toasts.
 
 ```typescript
 import { UserController } from "@generated/donut-backend-api/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 
 const { data: newUser, error } = await apiCallWithLoading(() =>
-  UserController.createUser({
-    body: formData,
-  })
+  UserController.createUser({ body: formData })
 )
 
 const { data: users, error: loadError } = await UserController.getUserProfile()
@@ -30,12 +25,12 @@ const { data: users, error: loadError } = await UserController.getUserProfile()
 
 ## Loading indicators
 
-`apiCallWithLoading` drives two global surfaces mounted from `DonutApp.vue`:
+`apiCallWithLoading` drives two global surfaces from `DonutApp.vue`:
 
-- **Thin loading bar** — shown while any wrapped call is in flight.
-- **Whole-UI blocking modal** — shown when an in-flight call passed `{ blockUi: true }`; its message comes from the latest blocking state. Each call pushes/pops a state by id, so concurrent blockers clean up correctly. The modal is a native `<dialog>` opened with `showModal()`, so it lives in the browser top layer and paints above other top-layer modals (e.g. the Refine note dialog) — `z-index` cannot reach the top layer.
+- **Thin loading bar** — any wrapped call in flight.
+- **Whole-UI blocking modal** — `{ blockUi: true }`. Native `<dialog showModal()>`, so it paints above other top-layer dialogs.
 
-Use `{ blockUi: true, message?: string }` when a user action must finish before the rest of the UI is usable — view transitions that depend on a result, or mutations where partial interaction would confuse state. Show the blocker only after any confirmation step. Do **not** add component-local `LoadingModal` refs; the global modal is the single whole-UI blocker.
+Use `{ blockUi: true, message?: string }` when the rest of the UI must wait (view transition, or a mutation where partial interaction would confuse state). Show the blocker only after any confirmation. Do **not** add component-local `LoadingModal` refs.
 
 ```typescript
 const { data, error } = await apiCallWithLoading(
@@ -44,11 +39,11 @@ const { data, error } = await apiCallWithLoading(
 )
 ```
 
+Keep local loading (inline spinner, disabled control) when the user should still use the rest of the page. Those calls can still use `apiCallWithLoading` without `blockUi`.
+
 ### Cancelable blocking calls
 
-For safe **read-only** blockers where the user may abandon the wait, pass the literal opt-in `{ blockUi: true, cancelable: true, message?: string }`. That overload returns `CancelableApiResult<T>` (`{ status: "completed"; result }` | `{ status: "cancelled" }`). Narrow on `status` before using `result`; do not treat cancel as an API error.
-
-Allowed product opt-ins today (note refinement only): **layout generation** (`AI is generating refinement layout...`) and **extraction-preview generation** (`extractNotePreview` / `AI is generating preview...`). Both use this same overload and status narrowing.
+For safe **read-only** blockers, pass `{ blockUi: true, cancelable: true, message?: string }`. Returns `CancelableApiResult<T>` (`{ status: "completed"; result }` | `{ status: "cancelled" }`). Narrow on `status` before using `result`; do not treat cancel as an API error.
 
 ```typescript
 const outcome = await apiCallWithLoading(
@@ -65,157 +60,49 @@ const outcome = await apiCallWithLoading(
 )
 
 if (outcome.status === "cancelled") {
-  // Domain-local empty/retry UI only — accepted cancel is silent (no toast).
   return
 }
 
 const { data, error } = outcome.result
 ```
 
-```typescript
-const previewOutcome = await apiCallWithLoading(
-  (signal) =>
-    AiController.extractNotePreview({
-      path: { note: noteId },
-      body: layoutSelection,
-      signal,
-    }),
-  {
-    blockUi: true,
-    cancelable: true,
-    message: "AI is generating preview...",
-  }
-)
+Accepted cancel is silent (no toast). Abort is **client-only**. Do **not** opt mutations or irreversible writes into `cancelable: true`. Do not invent AbortError-name matching or a cancelable `runWithBlockingApiLoading`.
 
-if (previewOutcome.status === "cancelled") {
-  return
-}
+`cancelable: true` is allowlisted in `frontend/tests/managedApi/cancelableAllowlist.spec.ts` (`ALLOWED_CANCELABLE_FILES`). Add a site there when introducing a new cancelable call; do not add `cancelable: true` outside that set.
 
-const { data, error } = previewOutcome.result
-```
+For one continuous blocker across multiple calls, wrap them in `runWithBlockingApiLoading(operation, message)` (noncancelable). Inner `apiCallWithLoading` calls keep thin bar + toasts only.
 
-Cancel on the global modal is projected only from the **selected blocker's identity-bound** action; cancelling one state does not clear older concurrent blockers. Accepted cancel is silent (no toast / Cancelling interstitial). Browser abort is **client-only** — it does not promise server work stopped. Do **not** opt mutations or irreversible writes into `cancelable: true` (e.g. create-note / `AI is creating note...` stays noncancelable). Do not invent AbortError-name matching, a cancelable `runWithBlockingApiLoading`, or a parallel helper — use this overload only.
+### Blocking classification
 
-For one continuous blocker across multiple calls, wrap them in `runWithBlockingApiLoading(operation, message)`; inner `apiCallWithLoading` calls keep thin bar + toasts only. That helper remains noncancelable.
+Every new `{ blockUi: true }` or `runWithBlockingApiLoading` site is **cancelable**, **intentionally noncancelable**, or **nonblocking**. Classify it; do not leave it unclassified.
 
-Keep local loading state (inline spinner, disabled control, row-level pending) when the user should stay able to interact with the rest of the page — e.g. search, pagination, single form-field upload, recall prompt internals. These can still call `apiCallWithLoading` without `blockUi`.
+- **Cancelable** — only allowlisted read-only opt-ins (`cancelableAllowlist.spec.ts`).
+- **Intentionally noncancelable** — mutations, view transitions that must finish, AI reads with no defined post-cancel UX.
+- **Nonblocking** — thin-bar `apiCallWithLoading` without `blockUi`, or a direct SDK call.
 
-### Blocking classification inventory
-
-Every whole-UI blocker and long-running note-refinement AI request must be classified as **cancelable**, **intentionally noncancelable**, or **nonblocking**. Persist new sites here when adding `blockUi: true` or `runWithBlockingApiLoading` — do not leave them unclassified.
-
-**Cancelable allowlist** (only these product opt-ins may use `{ blockUi: true, cancelable: true }`; exclusivity is gated by `frontend/tests/managedApi/cancelableAllowlist.spec.ts`):
-
-| Operation | Message | Call site | Notes |
-| --- | --- | --- | --- |
-| Layout generation | `AI is generating refinement layout...` | `NoteRefinement.vue` | Shared cancelable overload |
-| Extraction-preview generation | `AI is generating preview...` | `NoteRefinement.vue` | Shared cancelable overload |
-
-**Intentionally noncancelable** (whole-UI blocker without Cancel — do **not** opt into `cancelable: true` until a safe post-cancel outcome is defined for that site):
-
-| Operation | Message | Call site | Mechanism | Notes |
-| --- | --- | --- | --- | --- |
-| Create extracted note | `AI is creating note...` | `NoteRefinement.vue` | `runWithBlockingApiLoading` | Intentional: client-only abort is unsafe for this transactional write (duplicate note / double original-note update risk). |
-| Remove refinement content | `AI is removing content...` | `NoteRefinement.vue` | `runWithBlockingApiLoading` | Mutation; nested post-remove layout reload is nonblocking (see below) |
-| Assimilate unit | `Assimilating...` | `useAssimilateUnit.ts` | `{ blockUi: true }` | Mutation |
-| Skip from assimilation sequence | `Skipping...` | `useAssimilationSequenceSkip.ts` | `{ blockUi: true }` | Mutation |
-| Return to sequence | `Returning to sequence...` | `useAssimilationSequenceSkip.ts` | `{ blockUi: true }` | Mutation |
-| Load next assimilation note | `Loading next note...` | `useGoToNextAssimilation.ts` | `{ blockUi: true }` | View transition |
-| Book layout mutations | `Updating book layout…` | `useBookLayoutMutations.ts` | `{ blockUi: true }` (2 sites) | Mutation |
-| Book layout AI suggest | `Analyzing book layout…` | `useBookLayoutAiReorganize.ts` | `{ blockUi: true }` | Long-running AI read; leave noncancelable until post-cancel UX is defined |
-| Book layout apply suggestion | `Applying book layout changes…` | `useBookLayoutAiReorganize.ts` | `{ blockUi: true }` | Mutation |
-| Note delete / reduce | `Deleting note...` / `Reducing to source property...` | `useNoteDeleteFlow.ts` | `runWithBlockingApiLoading` | Mutation |
-| Relationship finalize | `Creating relationship note...` | `AddRelationshipFinalize.vue` | `runWithBlockingApiLoading` | Mutation |
-| Attach book upload | `Uploading book…` | `NotebookAttachedBookSection.vue` | `runWithBlockingApiLoading` | Mutation |
-| Commission learning session | `Commissioning learning session…` | `CommissionLearningSessionDialog.vue` | `{ blockUi: true }` | Mutation |
-| Record learning session report | `Recording learning session report…` | `CommissionLearningSessionDialog.vue` | `{ blockUi: true }` | Mutation |
-
-**Nonblocking** (out of Cancel UX — thin-bar or direct SDK; no whole-UI modal):
-
-| Operation | Call site | Notes |
-| --- | --- | --- |
-| Export extract request | `NoteRefinement.vue` `fetchExtractRequestExport` | Direct SDK; no `apiCallWithLoading` |
-| Export refinement layout request | `NoteRefinement.vue` `fetchBreakdownRequestExport` | Direct SDK; no whole-UI block |
-| Post-remove layout reload | `NoteRefinement.vue` `loadRefinementLayout({ blockUi: false })` | Thin-bar nested under remove continuous blocker |
-| Load book after attach | `NotebookAttachedBookSection.vue` `loadBook` | Thin-bar `apiCallWithLoading` without `blockUi` |
-
-| Concern | Mechanism |
-| --- | --- |
-| Thin top loading bar | Any `apiCallWithLoading` call → `LoadingThinBar` with `data-app-busy` |
-| Whole-UI modal | `apiCallWithLoading(..., { blockUi: true, message? })` or `runWithBlockingApiLoading` → `LoadingModal` with `data-app-busy` |
-| Cancelable whole-UI modal | `apiCallWithLoading(..., { blockUi: true, cancelable: true, message? })` → `CancelableApiResult` (status narrowing) |
-| Page / section pending data | `ContentLoader` with `data-app-busy` |
-| Inline / partial progress | Local component state (not part of the busy contract unless it adds `data-app-busy`) |
-| Error toasts | `apiCallWithLoading` (handled in `clientSetup.ts`); accepted cancel is silent |
-| Silent background fetch | Direct SDK call without `apiCallWithLoading` |
-| E2E wait for unfinished work | `waitUntilAppIsNotBusy()` — waits until no `[data-app-busy]` (see below) |
-
-### E2E pairing (`data-app-busy` ↔ `waitUntilAppIsNotBusy`)
-
-Loading UI that means “the app has unfinished work” must mark its root element with `data-app-busy`. Today that is `LoadingThinBar`, `ContentLoader`, and `LoadingModal` (enforced by `frontend/tests/components/commons/AppBusyMarker.contract.spec.ts`). Presentational classes stay presentational.
-
-| Product | E2E |
-| --- | --- |
-| Elements with `data-app-busy` | `waitUntilAppIsNotBusy()` from `e2e_test/start/pageBase.ts` |
-
-After a Cypress action that starts loading work, call `waitUntilAppIsNotBusy()` in the page object before the next assertion that depends on that work finishing. The wait means **busy UI cleared**, not success — prefer a user-visible outcome when the product shows one. Do not use hardcoded sleeps. Network intercepts are optional extras, not the default stand-in. Full E2E notes: `.cursor/rules/e2e-authoring.mdc`.
+Loading UI that means unfinished work marks `data-app-busy` (`LoadingThinBar`, `ContentLoader`, `LoadingModal`; gated by `frontend/tests/components/commons/AppBusyMarker.contract.spec.ts`). E2E: `waitUntilAppIsNotBusy()` from `e2e_test/start/pageBase.ts`. The wait means busy UI cleared, not success.
 
 ## API Return Value Usage
 
-The global client is configured with `responseStyle: "fields"` and `throwOnError: false`, so services return a wrapped response: `{ data, error, request, response }`.
+The global client uses `responseStyle: "fields"` and `throwOnError: false`.
 
-```typescript
-import { getTokens } from "@generated/donut-backend-api/sdk.gen"
-
-const { data: tokens, error } = await getTokens()
-
-if (!error) {
-  tokens.value = tokens.map((token) => ({
-    id: token.id,
-    label: token.label,
-  }))
-}
-```
-
-Key points:
-
-1. Destructure with meaningful variable names: `const { data: updatedUser, error } = await updateUser(...)`.
-2. Check `!error` before using `data`; no separate `data` check is needed.
-3. When `error` is undefined, TypeScript guarantees `data` is the expected type.
+1. Destructure with meaningful names: `const { data: updatedUser, error } = await updateUser(...)`.
+2. Check `!error` before using `data`; no separate `data` check.
+3. When `error` is undefined, TypeScript types `data` as the success shape.
 4. Do not add runtime property checks for required typed properties.
 5. Do not add `else if (data)` after checking `error`.
-6. Use `apiCallWithLoading` for user actions to enable error toasts and loading state.
 
 ## Validation Errors
 
-When handling 400 Bad Request validation errors, use `toOpenApiError` to extract field-level errors. The `error` field in API responses is typed as `string` but can be an object at runtime after JSON parsing.
+For 400 field errors, `toOpenApiError(error)` (`{ errors?: Record<string, string>; message?: string }`). `apiCallWithLoading` already toasts; extract `errors` only for form fields.
 
 ```typescript
-import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import { toOpenApiError } from "@/managedApi/openApiError"
 
-const errors = ref<Record<string, string>>({})
-
-const { data: updatedUser, error } = await apiCallWithLoading(() =>
-  UserController.updateUser({
-    path: { user: id },
-    body: formData,
-  })
-)
-
 if (error) {
-  const openApiError = toOpenApiError(error)
-  errors.value = openApiError.errors || {}
+  errors.value = toOpenApiError(error).errors || {}
 } else {
   errors.value = {}
   user.value = updatedUser
 }
 ```
-
-Key points:
-
-1. Use `toOpenApiError(error)` to convert the runtime error value to `OpenApiError`.
-2. `OpenApiError` shape: `{ errors?: Record<string, string>; message?: string }`.
-3. The helper safely handles both string and object errors.
-4. Extract `errors` for field-level validation errors, usually from 400 responses.
-5. `apiCallWithLoading` already shows error toasts; only extract field-level errors for form validation.

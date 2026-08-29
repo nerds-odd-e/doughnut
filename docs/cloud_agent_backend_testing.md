@@ -163,7 +163,7 @@ whoami  # Should show "ubuntu" or similar non-root user
 ### File Locations
 
 - Setup script: `/workspace/scripts/cloud_agent_setup.sh`
-- Cursor rules: `/workspace/.cursor/rules/backend-code.mdc`, `/workspace/.cursor/rules/backend-testing.mdc`
+- Cursor rules: `/workspace/.cursor/rules/backend.mdc` (detail: `backend-code.mdc`, `backend-testing.mdc`)
 - Init SQL: `/workspace/scripts/sql/init_doughnut_db.sql`
 - This documentation: `/workspace/docs/cloud_agent_backend_testing.md`
 
@@ -178,6 +178,7 @@ Potential enhancements:
 
 ## Related Documentation
 
+- Backend stack: `/workspace/.cursor/rules/backend.mdc`
 - Backend Code Guidelines: `/workspace/.cursor/rules/backend-code.mdc`
 - Backend Testing Guidelines: `/workspace/.cursor/rules/backend-testing.mdc`
 - Database Migration: `/workspace/.cursor/rules/db-migration.mdc`

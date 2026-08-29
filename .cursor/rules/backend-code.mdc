@@ -5,7 +5,7 @@ alwaysApply: false
 ---
 # Backend Code Rules
 
-Use this rule when writing or modifying backend production Java code. For backend tests, use `backend-testing.mdc`; for database migrations, use `db-migration.mdc`.
+Migrations: `db-migration.mdc`.
 
 ## Commands
 

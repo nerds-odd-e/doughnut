@@ -5,8 +5,6 @@ alwaysApply: false
 ---
 # Frontend Testing Rules
 
-Use this rule when creating or updating frontend Vitest tests. For canonical lint and format commands, use `linting_formating.mdc`.
-
 **Style ("small test" practice — stable boundary, data over mocks, focused assertions, concise makeMe):** always-applied `unit-testing.mdc` — follow that first.
 
 ## Test Commands

@@ -5,7 +5,7 @@ alwaysApply: false
 ---
 # Frontend Storybook Rules
 
-Use this rule when creating or updating frontend Storybook stories. Component-level naming, styling, icon, and derived-state conventions live in `frontend-component.mdc`.
+Vue naming, styling, icons, and derived-state also auto-attach from `frontend-component.mdc` (`*.stories.ts` is `*.ts`).
 
 ## Running Storybook
 

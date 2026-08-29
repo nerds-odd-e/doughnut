@@ -1,0 +1,35 @@
+---
+description: Backend Java — Spring Boot controllers/services, JUnit controller tests, MakeMe. Read this first for any backend work.
+alwaysApply: false
+---
+# Backend
+
+Java/Spring in `backend/src/main/java/com/odde/donut/`. Tests under `backend/src/test/`. Schema changes: `db-migration.mdc`.
+
+Cursor auto-attaches `backend-code.mdc` (production Java) and `backend-testing.mdc` (tests) when matching files are in context — do not fetch them up front.
+
+## Commands
+
+```bash
+CURSOR_DEV=true nix develop -c pnpm backend:test_only
+```
+
+When a database migration is involved:
+
+```bash
+CURSOR_DEV=true nix develop -c pnpm backend:verify
+```
+
+Always run all backend unit tests, not a selected file or test case.
+
+## Production
+
+- Controllers: return entities (or existing API body types). Narrow with `@JsonIgnore` / `@JsonView`. Introduce a response DTO only when the wire shape differs.
+- Top-of-file imports. No inline fully qualified class names except when two types share a simple name.
+- After Flyway schema changes, regenerate `docs/database-erd.md` with the `database-erd` skill (`pnpm export:database-erd`).
+
+## Tests
+
+Small-test style (`unit-testing.mdc`): prefer **controller** (HTTP-stable-boundary) tests; cover services/repos via realistic `makeMe` preconditions and the real DB (`@Transactional`). Test a service/algorithm directly only when it is an intentional domain-stable contract.
+
+Mock only external services — `OpenAIClient` via `OpenAiStructuredResponseMock`. Ownership: `notebookOwnedBy(user)` so trackers inherit the owner. Group with `@Nested`.

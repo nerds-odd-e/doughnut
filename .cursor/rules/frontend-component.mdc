@@ -1,11 +1,9 @@
 ---
 description: Vue component structure, styling, derived state, modals, icons, DaisyUI/Tailwind frontend component conventions
-globs: frontend/src/**/*.{vue,scss}, frontend/src/**/*.stories.ts
+globs: frontend/src/**/*.{vue,ts,scss}
 alwaysApply: false
 ---
 # Frontend Component Rules
-
-Use this rule when writing or modifying Vue components, component SCSS, or Storybook stories that need component conventions. For API call patterns see `frontend-api.mdc`; for frontend tests see `frontend-testing.mdc`.
 
 ## File Organization
 
