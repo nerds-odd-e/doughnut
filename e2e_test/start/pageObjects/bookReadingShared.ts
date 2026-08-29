@@ -57,8 +57,19 @@ export const assertPdfCanvasIsRendered = (el: HTMLCanvasElement) => {
   expect(el.height, 'PDF canvas should have height').to.be.greaterThan(0)
 }
 
+export const BOOK_READING_PATHNAME = /^\/notebooks\/(\d+)\/book$/
+
+export function notebookIdFromBookReadingPathname(pathname: string): string {
+  const match = pathname.match(BOOK_READING_PATHNAME)
+  expect(
+    match,
+    `could not parse notebookId from book reading pathname: ${pathname}`
+  ).to.not.be.null
+  return match![1]
+}
+
 export const ensureOnBookReadingPage = () => {
   waitUntilAppIsNotBusy()
-  cy.location('pathname').should('match', /^\/notebooks\/\d+\/book$/)
+  cy.location('pathname').should('match', BOOK_READING_PATHNAME)
   cy.get('[data-testid="book-reading-page"]').should('exist')
 }

@@ -5,6 +5,7 @@
 
 import { Given, Then, When } from '@badeball/cypress-cucumber-preprocessor'
 import start from '../start'
+import router from '../start/router'
 
 function injectCircleWithNotebook(
   circleName: string,
@@ -36,23 +37,19 @@ When(
 
 When('I visit the invitation link', () => {
   cy.get<string>('@circleInvitationCode').then((code) => {
-    cy.get('@savedInvitationCode')
-      .invoke('toString')
-      .then((url) => {
-        cy.visit(url)
-        start.waitUntilAppIsNotBusy()
-        cy.get('#username, #join-circle-invitationCode', {
-          timeout: 15000,
-        }).should('exist')
-        cy.get('body').then(($body) => {
-          if ($body.find('#join-circle-invitationCode').length === 0) {
-            return
-          }
-          cy.get('#join-circle-invitationCode').should(($input) => {
-            expect($input.val()).to.equal(code)
-          })
-        })
+    router().visitNamed('circleJoin', { invitationCode: code })
+    start.waitUntilAppIsNotBusy()
+    cy.get('#username, #join-circle-invitationCode', {
+      timeout: 15000,
+    }).should('exist')
+    cy.get('body').then(($body) => {
+      if ($body.find('#join-circle-invitationCode').length === 0) {
+        return
+      }
+      cy.get('#join-circle-invitationCode').should(($input) => {
+        expect($input.val()).to.equal(code)
       })
+    })
   })
 })
 
@@ -69,7 +66,7 @@ When('I join the saved circle invitation as the logged-in user', () => {
         body: { invitationCode: code },
       }).then((response) => {
         expect(response.status, 'join circle via invitation code').to.equal(200)
-        cy.visit(`/circles/${response.body.id}`)
+        router().visitNamed('circleShow', { circleId: response.body.id })
         start.waitUntilAppIsNotBusy()
       })
     })
