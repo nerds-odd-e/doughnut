@@ -61,6 +61,7 @@ describe("quillHtmlToMarkdown", () => {
     ${"live path markdown with noteShowHref"}         | ${`<p><a href="${noteShowHref(42)}" class="donut-wiki-link" data-wiki-title="/Folder/Title.md" data-wiki-display="label" data-note-id="42">label</a></p>`}   | ${"[label](/Folder/Title.md)"}
     ${"path markdown without .md keeps href"}         | ${'<p><a href="/Folder/Title" class="donut-wiki-link" data-wiki-title="/Folder/Title" data-wiki-display="label">label</a></p>'}                              | ${"[label](/Folder/Title)"}
     ${"path markdown dead-wiki-link keeps markdown"}  | ${'<p><a href="/Folder/Missing.md" class="dead-wiki-link" data-wiki-title="/Folder/Missing.md" data-wiki-display="label">label</a></p>'}                     | ${"[label](/Folder/Missing.md)"}
+    ${"path markdown dead with hash href"}            | ${'<p><a href="#" class="dead-wiki-link" data-wiki-title="/Folder/Missing.md" data-wiki-display="label">label</a></p>'}                                      | ${"[label](/Folder/Missing.md)"}
   `("wiki links: $label", ({ html, expected }) => {
     expect(htmlToMarkdown(html)).toBe(expected)
   })
