@@ -1,7 +1,8 @@
 # Cognitive probe convergent-validity and latency-modeling analyses
 
-**Status:** slice 1 shipped. Slice 2's production gate passed on 2026-08-29;
-slices 2–3 below are the EZ-diffusion decomposition (not yet executed).
+**Status:** slices 1–2 shipped. The production gate passed on 2026-08-29;
+slice 3 below is the remaining EZ-diffusion decomposition work (not yet
+executed).
 **Type:** ad-hoc plan (`.planning/quick/`)
 **Depends on:** `.planning/quick/007-daily-cognitive-probe/PLAN.md` (the probe
 has shipped — slice 1 needs probe history); `.planning/quick/001-morning-cognitive-index/PLAN.md`
@@ -64,7 +65,21 @@ problem):
 | lapse count | lapse count |
 | consistency (`consistencyZScore`) | variability |
 
-### 2. EZ-diffusion recovers drift and boundary from accuracy and RT moments — Structure `[ ]`
+### 2. EZ-diffusion recovers drift and boundary from accuracy and RT moments — Structure `[x]`
+
+**Shipped as:** `EzDiffusion` (package-local pure class, `com.odde.donut.services`)
+with a `Parameters` record `(driftRate, boundarySeparation, nondecisionTime)` and
+static `recover(double p, double meanRtSeconds, double varianceRtSeconds, int n)`.
+Tests in `EzDiffusionTest` (7 cases, JUnit 5 + Hamcrest, no Spring) mirror
+`RecallProbeConvergentValidityTest`'s pure-contract shape. Equations implemented
+directly from the primary source (Wagenmakers, van der Maas & Grasman 2007,
+*Psychonomic Bulletin & Review* 14, 3–22, Appendix R function `get.vaTer`),
+cross-validated against the paper's own worked example
+(`v=0.1, a=0.14, Ter=0.300 → MRT=0.723, VRT=0.112, Pc=.802`). The `P = 0.5`
+(`L = 0`) special case is not a closed form in the paper's main text; it was
+derived from the paper's explicitly-quoted `v=0 ⟹ VRT = a⁴/(24s⁴)` limit and
+cross-checked against the standard driftless-Wiener first-passage-time formula
+— implemented as `EzDiffusion.recoverAtChance`.
 
 **Unlocks slice 3.** No user-visible behavior. A package-local pure function
 (Wagenmakers, van der Maas & Grasman 2007 EZ) maps `(P, MRT, VRT, n)` to
@@ -152,7 +167,7 @@ Yeong Sheng had only 2 recall days in 90d — not a second powered learner.
 | `DailyProbeConvergentValidityDTO` | `{ pairs: [{ pair, pairCount, rawCorrelation }] }` |
 | `DailyProbeDaySeries.latestByLocalDay` | shared "latest probe per local day" grouping, extracted during this slice's refactor |
 | `UserController` EZ-diffusion GET (slice 3, not shipped) | `GET /api/user/recall-ez-diffusion` |
-| EZ closed-form helper (slice 2, not shipped) | Wagenmakers 2007; consumed only by slice 3 |
+| `EzDiffusion` | Wagenmakers 2007 closed-form `(P, MRT, VRT, n) → (v, a, Ter)`; consumed only by slice 3 |
 
 ## Per-slice wrap-up
 
