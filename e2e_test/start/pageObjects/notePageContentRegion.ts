@@ -9,6 +9,13 @@ export const noteContentRegion = {
 export const richNotePropertyRow = (key: string) =>
   `[data-testid="rich-note-property-row"][data-property-key="${key}"]`
 
+export function expectRichNotePropertyRowFocused(key: string) {
+  return cy
+    .get(richNotePropertyRow(key))
+    .should('have.attr', 'data-property-focused', 'true')
+    .and('be.visible')
+}
+
 export function confirmPropertyMemoryTrackerChange() {
   cy.get('dialog', { timeout: 15000 })
     .filter(':visible')

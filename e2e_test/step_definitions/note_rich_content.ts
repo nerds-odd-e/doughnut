@@ -148,6 +148,15 @@ Then(
   }
 )
 
+Then(
+  'the rich note property {string} should be focused showing {string} without a value dialog',
+  (key: string, value: string) => {
+    start
+      .assumeNotePage()
+      .expectFocusedRichNotePropertyValueWithoutDialog(key, value)
+  }
+)
+
 When(
   'I update note {string} content using markdown to become:',
   (noteTopology: string, newContent: string) => {

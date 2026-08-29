@@ -1,6 +1,6 @@
 # Note property canonical path
 
-**Status:** in progress (slices 1–2 done; 3–17 remaining).
+**Status:** in progress (slices 1–3 done; 4–17 remaining).
 **Type:** ad-hoc plan (`.planning/quick/`)
 **Policy:** [ADR 0001](../../../docs/adrs/0001-ubiquitous-language.md) (**Property**, **Wiki link**), [ADR 0004](../../../docs/adrs/0004-okf-compatible-notebook-markdown-accepted.md) (`#prop:`), Proposed [ADR 0005](../../../docs/adrs/0005-web-routes.md) (`noteProperty`).
 **Human-owned exception (2026-08-29):** ADR 0001 / ADR 0004 may depend on
@@ -119,12 +119,12 @@ Named `noteProperty` at `/n:noteId(\\d+)/p/:propertyKey` (sibling of
 `/n/:noteId/p/:propertyKey` redirects with query/hash. `/n123/p/…` is now
 internal. Pending-property dual-ref wiring remains until slice 9.
 
-### 3. Visiting a read-only or specialized property keeps visible focus — **Behavior** — planned
+### 3. Visiting a read-only or specialized property keeps visible focus — **Behavior** — done
 
-**Pre:** readable note whose property is read-only or uses specialized UI.
-**Trigger:** visit `noteProperty`. **Post:** its row/value is visibly focused
-and scrolled into view without offering an invalid editor. Route-derived focus
-is shared by editable and read-only property presentations.
+Read-only list uses `useFocusedNoteProperty`. Specialized (`wikidata_id`)
+and subscribed read-only rows highlight and scroll without a value dialog.
+E2E in `note_property.feature`. Focused-row Cypress assertion:
+`expectRichNotePropertyRowFocused`.
 
 ### 4. A stale property location fails visibly — **Behavior** — planned
 
@@ -262,10 +262,11 @@ invent identity from the label. Extend the internal-URL classifier so
   separate stricter serialization.
 - Sticky realm, drawer, and main-nav consume `isNoteRouteFamily`; do not
   re-append `noteShow` to those lists when adding `noteProperty`.
-- Slice 2: `useFocusedNoteProperty` is the route-neutral focus seam for
+- Slice 2–3: `useFocusedNoteProperty` is the route-neutral focus seam for
   slices 3–4. Editable text-capable rows also open the value dialog from
   `isFocused`. Do not add a second focus source. Pending-property dual-ref
-  stays until slice 9.
+  stays until slice 9. Highlight classes on editable rows still serve
+  pending-assimilation (removed in slice 9) as well as route focus.
 - Next-assimilate already distinguishes property units (settings off, pending
   row). The route replaces both the destination and the pending-property
   memory/selector language.

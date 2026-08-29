@@ -1,5 +1,6 @@
 import {
   confirmPropertyMemoryTrackerChange,
+  expectRichNotePropertyRowFocused,
   findNoteContentRegion,
   richNotePropertyRow,
 } from './notePageContentRegion'
@@ -42,9 +43,7 @@ export const noteRichPropertyMethods = () => ({
   expectFocusedRichNoteProperty(key: string) {
     this.switchToRichContent()
     findNoteContentRegion().within(() => {
-      cy.get(richNotePropertyRow(key))
-        .should('have.attr', 'data-property-focused', 'true')
-        .and('be.visible')
+      expectRichNotePropertyRowFocused(key)
     })
     cy.get('dialog')
       .filter(':visible')
@@ -55,6 +54,20 @@ export const noteRichPropertyMethods = () => ({
           '[data-testid="rich-note-property-value-popup-textarea"]'
         ).should('be.visible')
       })
+    return this
+  },
+  expectFocusedRichNotePropertyValueWithoutDialog(key: string, value: string) {
+    this.switchToRichContent()
+    findNoteContentRegion().within(() => {
+      expectRichNotePropertyRowFocused(key).and(($row) => {
+        const actual = $row.text()
+        expect(
+          actual,
+          `Expected focused property "${key}" to show ${JSON.stringify(value)}, but found ${JSON.stringify(actual.trim())}`
+        ).to.include(value)
+      })
+    })
+    cy.get('dialog').should('not.exist')
     return this
   },
   expectRichNotePropertyDisplayed(key: string, value: string) {
