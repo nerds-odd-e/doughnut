@@ -138,6 +138,10 @@ public class MakeMe extends MakeMeWithoutDB {
     return new FailureReportBuilder(this);
   }
 
+  public DailyProbeBuilder aDailyProbe() {
+    return new DailyProbeBuilder(this);
+  }
+
   public ConversationBuilder aConversation() {
     return new ConversationBuilder(this);
   }
