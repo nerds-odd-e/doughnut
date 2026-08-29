@@ -1,12 +1,13 @@
 import { useRecallData } from "@/composables/useRecallData"
 import { useResumeRecall } from "@/composables/useResumeRecall"
+import { dummyRouteRecordsFromMetadata } from "@/routes/dummyRouteRecords"
 import { mockCoarsePointer } from "@tests/helpers/mockCoarsePointer"
 import {
   expectSoftKeyboardPrimerIsFocused,
   expectSoftKeyboardPrimerIsNotFocused,
   mountSoftKeyboardPrimer,
 } from "@tests/helpers/softKeyboardPrimerTestSupport"
-import { mount } from "@vue/test-utils"
+import { flushPromises, mount } from "@vue/test-utils"
 import { afterEach, beforeEach, describe, expect, it } from "vitest"
 import { defineComponent } from "vue"
 import { createMemoryHistory, createRouter } from "vue-router"
@@ -14,14 +15,7 @@ import { createMemoryHistory, createRouter } from "vue-router"
 function createRecallDataTestRouter() {
   return createRouter({
     history: createMemoryHistory(),
-    routes: [
-      { path: "/", component: { template: "<div />" } },
-      {
-        path: "/recall",
-        name: "recall",
-        component: { template: "<div />" },
-      },
-    ],
+    routes: dummyRouteRecordsFromMetadata,
   })
 }
 
@@ -138,6 +132,16 @@ describe("useResumeRecall", () => {
       wrapper.unmount()
     }
   )
+
+  it("navigates to named recall on resume", async () => {
+    const wrapper = mountResumeHarness()
+
+    await wrapper.find("button").trigger("click")
+    await flushPromises()
+
+    expect(wrapper.vm.$router.currentRoute.value.name).toBe("recall")
+    wrapper.unmount()
+  })
 })
 
 describe("useRecallData potentialLearningSessions", () => {
@@ -147,14 +151,7 @@ describe("useRecallData potentialLearningSessions", () => {
 
   it("groups dueCommissioned by notebookId without affecting toRepeatCount", () => {
     const wrapper = mount(PotentialSessionHarness, {
-      global: {
-        plugins: [
-          createRouter({
-            history: createMemoryHistory(),
-            routes: [{ path: "/", component: { template: "<div />" } }],
-          }),
-        ],
-      },
+      global: { plugins: [createRecallDataTestRouter()] },
     })
     wrapper.vm.setDueCommissioned([
       {
