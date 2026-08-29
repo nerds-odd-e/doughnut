@@ -75,14 +75,21 @@ const fetchMenuData = async () => {
   }
 }
 
+const fetchMenuDataIfLoggedIn = () => {
+  if (props.user) {
+    fetchMenuData()
+  }
+}
+
+watch(() => props.user, fetchMenuDataIfLoggedIn, { immediate: true })
+
 watch(
-  () => props.user,
-  () => {
-    if (props.user) {
-      fetchMenuData()
+  () => route.name,
+  (name, previousName) => {
+    if (previousName && name !== previousName) {
+      fetchMenuDataIfLoggedIn()
     }
-  },
-  { immediate: true }
+  }
 )
 
 const logout = async () => {

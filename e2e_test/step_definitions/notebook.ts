@@ -55,7 +55,7 @@ Then(
 When(
   'I change notebook {string} to skip memory tracking',
   (noteTopology: string) => {
-    start.navigateToNotebookPage(noteTopology).skipMemoryTracking()
+    start.jumpToNotebookPage(noteTopology).skipMemoryTracking()
   }
 )
 
