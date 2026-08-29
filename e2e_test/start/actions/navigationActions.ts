@@ -10,9 +10,11 @@ export const navigationActions = {
     testability()
       .getInjectedNoteIdByTitle(noteTopology)
       .then((noteId: number) => {
-        const url = `/n${noteId}`
-        if (forceLoadPage) cy.visit(url)
-        else router().push(url, 'noteShow', { noteId })
+        if (forceLoadPage) {
+          router().visitNamed('noteShow', { noteId })
+        } else {
+          router().push('noteShow', { noteId })
+        }
       })
 
     return assumeNotePage(noteTopology)
@@ -22,9 +24,7 @@ export const navigationActions = {
     testability()
       .getNotebookIdByName(notebookName)
       .then((notebookId: number) => {
-        router().push(`/notebooks/${notebookId}`, 'notebookPage', {
-          notebookId,
-        })
+        router().push('notebookPage', { notebookId })
       })
     waitUntilAppIsNotBusy()
     return notebookPage()
@@ -34,10 +34,21 @@ export const navigationActions = {
     return testability()
       .getNotebookIdByName(notebookName)
       .then((notebookId: number) => {
-        router().push(`/notebooks/${notebookId}/book`, 'bookReading', {
-          notebookId,
-        })
+        router().push('bookReading', { notebookId })
       })
       .then(() => bookReadingPage())
+  },
+
+  jumpToFolderPage(folderLabel: string, notebookName: string) {
+    testability()
+      .getNotebookIdByName(notebookName)
+      .then((notebookId: number) =>
+        testability()
+          .getFolderIdInNotebook(notebookId, folderLabel)
+          .then((folderId: number) => {
+            router().push('folderPage', { notebookId, folderId })
+          })
+      )
+    waitUntilAppIsNotBusy()
   },
 }

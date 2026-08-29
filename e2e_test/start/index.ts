@@ -8,7 +8,6 @@ import {
   BAZAAR_NOTE_PATH_ROOT,
   navigateAlongNotebookCatalogPath,
 } from './navigateNotePath'
-import router from './router'
 import testability from './testability'
 import mcpApi from './mcpApi'
 
@@ -58,14 +57,6 @@ const start = {
     waitForAppNotBusy()
     return this
   },
-
-  // === Router ===
-  toRoot: () => router().toRoot(),
-  routerPush: (
-    fallback: string,
-    name: string,
-    params: Record<string, string | number>
-  ) => router().push(fallback, name, params),
 
   // === Page Objects ===
   assimilation,
