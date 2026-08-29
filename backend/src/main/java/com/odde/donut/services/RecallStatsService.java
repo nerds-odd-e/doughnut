@@ -50,12 +50,11 @@ public class RecallStatsService {
         recent.add(r);
       }
     }
-    return aggregateRows(
-        recent,
-        allTime,
-        zoneId,
-        now,
-        DailyProbeDaySeries.from(dailyProbeRepository.findByUser(user), zoneId));
+    List<DailyProbeDay> dailyProbe =
+        user.getDailyProbeEnabled()
+            ? DailyProbeDaySeries.from(dailyProbeRepository.findByUser(user), zoneId)
+            : List.of();
+    return aggregateRows(recent, allTime, zoneId, now, dailyProbe);
   }
 
   private List<RecallAnswerRow> findAllTimeAnsweredRows(User user, Timestamp now) {

@@ -66,6 +66,16 @@ Feature: Daily probe
     And I visit my recall stats
     Then I should see the Daily probe trend
 
+  Scenario: Turning Daily probe off hides its Recall Stats trend
+    Given Daily probe is on
+    When I visit recall
+    Then I should see the Daily probe instruction
+    When I complete the Daily probe
+    And I turn Daily probe off
+    And I visit my recall stats
+    Then I should not see the Daily probe trend
+    And I should see empty recall stats
+
   Scenario: The existing window control filters the Daily probe trend
     Given Daily probe is on
     When I visit recall

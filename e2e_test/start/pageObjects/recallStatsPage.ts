@@ -13,6 +13,14 @@ export const recallStatsPage = () => {
       cy.get('[data-testid="daily-probe-trend"]').should('be.visible')
       return this
     },
+    expectNoDailyProbeTrend() {
+      cy.get('[data-testid="daily-probe-trend"]').should('not.exist')
+      return this
+    },
+    expectEmptyRecallStats() {
+      cy.get('[data-testid="recall-stats-empty"]').should('be.visible')
+      return this
+    },
     expectDailyProbeSpeedTrendDays(days: number) {
       cy.window().then((win) => {
         const todayIso = new win.Date().toISOString()

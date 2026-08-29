@@ -33,6 +33,11 @@ public class UserBuilder extends EntityBuilder<User> {
     return this;
   }
 
+  public UserBuilder dailyProbeEnabled(boolean enabled) {
+    entity.setDailyProbeEnabled(enabled);
+    return this;
+  }
+
   @Override
   public void beforeCreate(boolean needPersist) {}
 }
