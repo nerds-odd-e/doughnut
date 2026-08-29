@@ -1,13 +1,12 @@
 import { waitUntilAppIsNotBusy } from '../pageBase'
 import {
+  DAILY_PROBE_INSTRUCTION,
+  DAILY_PROBE_ISI_MS,
   dailyProbePracticeSequence,
   dailyProbeScoredSequence,
 } from '../../../frontend/src/models/dailyProbe'
 
-const DAILY_PROBE_INSTRUCTION =
-  'Each trial shows ← or →. Press F for left, J for right (arrow keys also work). Go as fast as you can without mistakes.'
 const DAILY_PROBE_RESPONSE_MS = 250
-const DAILY_PROBE_ISI_MS = 2000
 const DAILY_PROBE_SIDES = [
   ...dailyProbePracticeSequence,
   ...dailyProbeScoredSequence,

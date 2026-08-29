@@ -63,11 +63,6 @@ public class RecallStatsService {
   }
 
   static RecallStatsDTO aggregateRows(
-      List<RecallAnswerRow> recent, List<RecallAnswerRow> allTime, ZoneId zoneId, Timestamp now) {
-    return aggregateRows(recent, allTime, zoneId, now, List.of());
-  }
-
-  static RecallStatsDTO aggregateRows(
       List<RecallAnswerRow> recent,
       List<RecallAnswerRow> allTime,
       ZoneId zoneId,

@@ -79,11 +79,11 @@ final class RecallStatsTestFixtures {
   }
 
   static RecallStatsDTO aggregate(List<RecallAnswerRow> recent, Timestamp now) {
-    return RecallStatsService.aggregateRows(recent, recent, ZoneId.of("UTC"), now);
+    return RecallStatsService.aggregateRows(recent, recent, ZoneId.of("UTC"), now, List.of());
   }
 
   static RecallStatsDTO aggregateZone(List<RecallAnswerRow> recent, ZoneId zoneId, Timestamp now) {
-    return RecallStatsService.aggregateRows(recent, recent, zoneId, now);
+    return RecallStatsService.aggregateRows(recent, recent, zoneId, now, List.of());
   }
 
   static RecallStatsDTO.DayAvgResponseTime dayAvg(RecallStatsDTO dto, String date) {
