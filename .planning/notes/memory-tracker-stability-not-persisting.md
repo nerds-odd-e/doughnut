@@ -95,6 +95,59 @@ Only after identifying the case should a repair be designed. In particular,
 do not assume that the scratch `RecallLogMemoryStateBackfill` was intended to
 update live tracker state.
 
+## Verdict (production query, 2026-08-28)
+
+Read-only against Cloud SQL `doughnut-db-instance` / database `doughnut`.
+Cutover used: first successful MIG boot that actually ran the writer jar,
+not the git timestamp of `078e4895fa`.
+
+**Live `applyGrade` persistence is fine.** Zero not-deleted trackers with
+`stability <= 0` have a graded `recall_log` whose answer (or, if no answer,
+`recorded_at`) is after cutover. Recent rows show a non-zero
+`stability_before` and a higher `memory_tracker.stability` after the grade.
+
+**The stats-null gap was missing columns, not perpetually-New trackers.**
+
+| Fact | Value |
+|---|---|
+| `V300000303` (add memory-state columns) applied | 2026-08-28 09:56:43 UTC |
+| Last `recall_log` with all three memory-state columns NULL | 2026-08-28 08:43:50 UTC |
+| First row with `stability_before` set | 2026-08-28 10:06:35 UTC |
+| Rows with memory state set vs NULL (before backfill) | 43 vs 126,997 |
+| `RecallLogMemoryStateBackfill` | ran 2026-08-29 00:36–00:49 UTC from `doughnut-app-group-x250`: 14,041 trackers with gaps, **125,570 rows** filled. Remaining NULL rows are the elapsed-hours checksum fail-safe (plus New-tracker first grades, which correctly have null retrievability). |
+
+Writer code (`078e4895fa` / `c5cd9af8`) merged 2026-08-27 ~07:09 UTC, but
+production kept booting the old `doughnut-*.jar` until
+`d24eff0871` / deploy of `581530c485` fixed the startup-script ARTIFACT
+name to `donut` and rolled the MIG (~09:50–09:57 UTC on 2026-08-28).
+Flyway then applied `V300000303`; live snapshots start in the next reviews.
+
+That matches the original readout (`sampleSize = 4` vs `reviewsToday = 61`)
+taken later the same Singapore day: almost every “today” review was still
+a pre-column row.
+
+**Still-New live trackers are a small leftover, not the review stream.**
+
+| Slice | Count |
+|---|---|
+| All trackers | 111,439 |
+| `stability <= 0` | 86,548 |
+| of those, not deleted, `removed_from_tracking=1`, never recalled | 84,323 |
+| Active (`deleted_at` null, not removed) and still New | **107** |
+| of those 107 with any `recall_log` | **0** |
+| of those 107 with `last_recalled_at` set | 54, every one `2026-08-16 00:29:52` (same instant as `V300000261` adding `difficulty` — not an organic review) |
+
+The scheduler is not being fed New stability for items that have been
+graded since the writer jar actually booted. No `applyGrade` code fix.
+
+**Backfill run (2026-08-29):** one-off operator invocation of
+`RecallLogMemoryStateBackfill` from `doughnut-app-group-x250` filled 125,570
+historical `recall_log` rows (14,041 trackers). It does not write live
+`memory_tracker.stability`. Temporary fat jar copies at
+`gs://dough-01/tmp/donut-backfill.jar` and `/tmp/donut-backfill.jar` on that
+VM were deleted after the run. The class is unchanged and still has no
+wired runner.
+
 ## Why this is not being resolved inside `quick/001`
 
 Confirming the hypothesis needs a production read-only query only the

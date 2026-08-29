@@ -33,6 +33,7 @@ Scheduling follows Accepted [ADR 0003](../docs/adrs/0003-spaced-repetition-sched
 
 ## Operator Next Steps
 
+- Memory-tracker stability investigation closed: live `applyGrade` persists; `RecallLogMemoryStateBackfill` ran 2026-08-29 (125,570 rows). See `.planning/notes/memory-tracker-stability-not-persisting.md`
 - Infer pending vs dead wiki links and show a third style via `.planning/quick/006-wiki-link-pending-style/PLAN.md` (planned, not executed)
 - Keep the recall queue across the same half-day via `.planning/quick/004-recall-same-window-queue/PLAN.md`
 - Complete remaining doughnut → donut naming via `.planning/quick/002-complete-donut-naming/PLAN.md`
