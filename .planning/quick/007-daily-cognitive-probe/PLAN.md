@@ -1,7 +1,6 @@
 # Daily probe
 
-**Status:** in progress. Slices 1–4 shipped. Next: slice 5 (accuracy on the
-result).
+**Status:** in progress. Slices 1–5 shipped. Next: slice 6 (lapses).
 **Type:** ad-hoc plan (`.planning/quick/`)
 **Extracted from:** `.planning/quick/001-morning-cognitive-index/PLAN.md`
 (unbuilt slices 26–31).
@@ -112,14 +111,12 @@ only until slice 9. E2E `recall/daily_probe.feature`.
 
 **Enables slice 5.**
 
-### 5. The completed result reports accuracy — Behavior `[ ]`
+### 5. The completed result reports accuracy — Behavior `[x]`
 
-**Pre-condition:** the learner has completed a mix of correct and incorrect
-Daily-probe trials. **Trigger:** the result appears. **Post-condition:** it
-also reports accuracy using the approved unit and rounding.
+Shipped: `dailyProbeAccuracy` = `round(100 × correct / 20)` integer percent
+on scored trials. Result shows `N%`. E2E all-correct path asserts `100%`.
 
-- Extend the mounted test and the existing Daily-probe E2E scenario; do not
-  create another trial runner.
+**Enables slice 6.**
 
 ### 6. The completed result reports lapses — Behavior `[ ]`
 

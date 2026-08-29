@@ -20,11 +20,13 @@ function pressMappedKey(side: "left" | "right") {
   )
 }
 
-async function completeProbeWithMappedKeys() {
+async function completeProbeWithMappedKeys(wrongScoredIndex?: number) {
+  const practiceCount = dailyProbePracticeSequence.length
   const sequence = [...dailyProbePracticeSequence, ...dailyProbeScoredSequence]
-  for (const side of sequence) {
+  for (const [index, side] of sequence.entries()) {
     vi.advanceTimersByTime(250)
-    pressMappedKey(side)
+    const invert = index - practiceCount === wrongScoredIndex
+    pressMappedKey(invert ? (side === "left" ? "right" : "left") : side)
     vi.advanceTimersByTime(DAILY_PROBE_ISI_MS)
   }
   await flushPromises()
@@ -58,5 +60,13 @@ describe("DailyProbe", () => {
     await completeProbeWithMappedKeys()
     expect(view.text()).toContain("4.00")
     expect(view.text()).toContain("Continue")
+  })
+
+  it("shows accuracy 95% after one wrong scored key", async () => {
+    const view = mountProbe()
+    await completeProbeWithMappedKeys(0)
+    expect(view.find('[data-testid="daily-probe-accuracy"]').text()).toContain(
+      "95%"
+    )
   })
 })

@@ -88,3 +88,8 @@ export function dailyProbeSpeed(
     reciprocals.length
   )
 }
+
+export function dailyProbeAccuracy(trials: readonly DailyProbeTrial[]): number {
+  const correctCount = trials.filter((trial) => trial.correct).length
+  return Math.round((100 * correctCount) / dailyProbeScoredSequence.length)
+}
