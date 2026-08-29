@@ -117,24 +117,15 @@ describe("routes", () => {
       })
     }
 
-    it("compile the same failureReport href as production", () => {
-      const location = {
-        name: "failureReport",
-        params: { failureReportId: "1" },
-      }
+    it.each([
+      { name: "failureReport", params: { failureReportId: "1" } },
+      { name: "settingsGeneral" },
+      { name: "settingsRecent" },
+      { name: "settingsAccessTokens" },
+      { name: "settingsRecallStats" },
+    ] as const)("compile the same $name path as production", (location) => {
       expect(dummyRouter().resolve(location).path).toBe(
         router.resolve(location).path
-      )
-    })
-
-    it.each([
-      "settingsGeneral",
-      "settingsRecent",
-      "settingsAccessTokens",
-      "settingsRecallStats",
-    ] as const)("compile the same %s path as production", (name) => {
-      expect(dummyRouter().resolve({ name }).path).toBe(
-        router.resolve({ name }).path
       )
     })
   })

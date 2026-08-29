@@ -1,6 +1,6 @@
 # Named SPA route honesty follow-up
 
-**Status:** in progress — slice 1 done; next is slice 2.
+**Status:** in progress — slices 1–2 done; next is slice 3.
 **Type:** ad-hoc plan (`.planning/quick/`)
 **Depends on:** shipped `.planning/quick/009-named-spa-route-honesty/` (PLAN retired; code and Proposed [ADR 0005](../../../docs/adrs/0005-web-routes.md) remain)
 **Merged from:** this file’s 009 leftovers **and** the former `.planning/quick/011-e2e-named-route-honesty/` (deleted as a duplicate 011).
@@ -17,7 +17,7 @@ Scope: the eight route-honesty commits only (not later Daily probe work). Bar: P
 
 1. **ADR still overclaims test routers.** Decision says test routers use production `routes` or `routeMetadata` stubs, not a hand-copied path dialect. Dummy `/` catch-alls (`questionsRouter`, `modalRouter`, `popButtonRouter`) and `useRoute` mocks of `path: "/"` are not a second screen dialect. `useRecallData.spec.ts` now uses `dummyRouteRecordsFromMetadata` (slice 1).
 
-2. **Live wiki HTML is asserted many times.** `replaceWikiLinksInHtml.spec.ts` repeats the same compiled live tag (href via `noteShowHref` + `data-note-id`) for known `[[MyNote]]`, last-saved + wikiTitles, dead-anchor upgrade, last-saved pending upgrade, and in-flight pending upgrade. The two pending→live cases have the same input HTML and the same post-condition (`upgradeUnresolvedWikiAnchors` runs before `confirmPendingWikiAnchorsAsDead`, so last-saved vs `"Saved."` does not change the outcome). Mounted specs (`NoteTextContent.wikiLinks`, `RichMarkdownEditor`, `RichMarkdownEditor.propertyWikiLinks`) re-pin `data-note-id` / `noteShowHref` after the helper already does. `routes.spec.ts` dummy lockstep is two blocks (failureReport + settings `it.each`) for the same “dummy path equals production path” claim. `propertyValueField.spec.ts` repeats `noteShowHref` on the last-saved-live sibling of “resolves wiki markers”.
+2. **Live wiki HTML is asserted many times.** Canonical live tag lives in `replaceWikiLinksInHtml` “replaces known wikilink text with a note href”. Sibling helper cases and mounted specs now assert only their delta (slice 2). Dummy lockstep is one `it.each` (failureReport + four settings names).
 
 3. **Second live-token `<a>` builder.** `wikiLinkAnchorHtml` already owns href / class / `data-wiki-title` / display / `data-note-id`. `propertyValueField` still concatenates that attribute soup by hand so the body can be `wikiLinkBracketedInnerHtml`. Unresolved token tags in the same function do the same. Slice 3 of 009 kept this on purpose so serialize round-trip stayed `[[N]]`; the missing step is optional inner HTML on the helper, not a second attribute dialect. `parseWikiHtmlFragment` still returns `doc` after the unresolved-upgrade path switched to `outerHTML`; callers only use `wrap`.
 
@@ -149,16 +149,11 @@ Frontend slices: `CURSOR_DEV=true nix develop -c pnpm frontend:test` on the spec
 
 ---
 
-### 2. Live wiki tests pin the compiled HTML shape once — Structure `[ ]`
+### 2. Live wiki tests pin the compiled HTML shape once — Structure `[x]`
 
-**Timing:** no.
+Canonical live HTML stays in the known-`[[MyNote]]` helper spec. Siblings assert class/live-vs-pending/dead only. Dropped duplicate in-flight pending→live. Dummy lockstep is one `it.each`. Mounted wiki specs drop `noteShowHref` / `data-note-id` except path-markdown `data-note-id`. Multi-occurrence asserts both tokens replaced, not the full tag twice.
 
-- `replaceWikiLinksInHtml.spec.ts`: keep the canonical live string; piped and multi-occurrence keep their unique extras. Unresolved-anchor → live: one case; drop the duplicate pending→live spec; last-saved + wikiTitles on `[[MyNote]]` only asserts still live, not the full tag again.
-- `routes.spec.ts`: one dummy-vs-production `it.each` for failureReport + settings names.
-- `propertyValueField.spec.ts`: last-saved-live sibling does not repeat `noteShowHref` / `data-note-id`.
-- `NoteTextContent.wikiLinks.spec.ts`, `RichMarkdownEditor.spec.ts`, `RichMarkdownEditor.propertyWikiLinks.spec.ts`: drop `data-note-id` / `noteShowHref` when the unique claim is display text or “Quill HTML linkified”; keep path-markdown `data-note-id` where that is still the unique live-vs-concept-path signal.
-
-**Verify:** the specs listed above.
+**Verify:** 6 listed specs — 65 passed.
 
 ---
 

@@ -1,4 +1,3 @@
-import { noteShowHref } from "@/routes/noteShowLocation"
 import { wikiTitleFromAuthoredToken } from "@/utils/wikiLinkMarkup"
 import { nextTick } from "vue"
 import { createRichMarkdownEditorTestHarness } from "./richMarkdownEditorTestHarness"
@@ -63,9 +62,8 @@ describe("RichMarkdownEditor", () => {
     await wrapper.setProps({ modelValue: "[[MyNote]]" })
     await nextTick()
 
-    expect(h.quillModelHtml()).toContain(
-      `<a href="${noteShowHref(42)}" class="donut-wiki-link" data-wiki-title="MyNote" data-note-id="42"`
-    )
+    expect(h.quillModelHtml()).toContain('class="donut-wiki-link"')
+    expect(h.quillModelHtml()).toContain('data-wiki-title="MyNote"')
   })
 
   it("keeps canonical dead-wiki-link HTML identical to Quill internal HTML", async () => {
