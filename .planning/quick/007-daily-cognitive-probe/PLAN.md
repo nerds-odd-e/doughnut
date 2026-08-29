@@ -1,7 +1,7 @@
 # Daily probe
 
-**Status:** in progress. Slices 1–2 shipped. Protocol and daily-consumption
-gates locked — see `.planning/notes/daily-probe-protocol.md`. Next: slice 3.
+**Status:** in progress. Slices 1–3 shipped. Next: slice 4 (probe screen +
+speed before recall).
 **Type:** ad-hoc plan (`.planning/quick/`)
 **Extracted from:** `.planning/quick/001-morning-cognitive-index/PLAN.md`
 (unbuilt slices 26–31).
@@ -95,17 +95,14 @@ own trend readout (ADR 0003; no Cognitive index). Mounted
 
 **Enables slice 3 only.**
 
-### 3. Fix the Daily probe trial and scoring contract — Structure `[ ]`
+### 3. Fix the Daily probe trial and scoring contract — Structure `[x]`
 
-Represent the protocol note's fixed stimuli, response keys, trial records,
-injected clock, and **speed** (mean reciprocal RT) in one cohesive, pure
-Daily-probe module. Contract tests prove deterministic stimuli/order and the
-worked 3.00 s⁻¹ speed example. There is no screen or recall-flow change.
+Shipped: `frontend/src/models/dailyProbe.ts` — practice/scored sequences, F/J
+and arrow mapping, trial records from injected timestamps, speed as mean
+reciprocal RT. Contract tests include the protocol sequences and the 3.00 s⁻¹
+example. No screen yet.
 
-- Do not introduce generic experiment/task frameworks.
-- Add lapse and variability calculations only in slices 6 and 7; this slice
-  contains only what the immediate next behavior needs.
-- **Enables slice 4 only.**
+**Enables slice 4 only.**
 
 ### 4. An opted-in learner completes the probe and sees speed before recall — Behavior `[ ]`
 
