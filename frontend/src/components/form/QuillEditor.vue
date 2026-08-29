@@ -170,8 +170,8 @@ onMounted(async () => {
           anchor,
           {
             onDeadWikiLink: (payload) => emits("deadWikiLinkClick", payload),
-            navigateInApp: (href) => {
-              router?.push(href)
+            navigateInApp: (to) => {
+              router?.push(to)
             },
           },
           { deadWikiLinksEnabled: !props.readonly }

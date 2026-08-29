@@ -1,6 +1,6 @@
 # Named SPA route table honesty
 
-**Status:** in progress (slices 1–3 done).
+**Status:** in progress (slices 1–4 done).
 **Type:** ad-hoc plan (`.planning/quick/`)
 **Related ADR:** [0005 — Web routes](../../../docs/adrs/0005-web-routes.md) (**Proposed**, not Accepted). This plan makes production and unit tests match a stricter reading of the Decision at “SPA route convention” so that ADR can be tightened without lying. Agents do not set Status to Accepted.
 
@@ -86,13 +86,9 @@ Verify with `CURSOR_DEV=true nix develop -c pnpm frontend:test` (or the spec pat
 
 Live token wiki `<a>` tags include `data-note-id` (`replaceWikiLinksInHtml` `[[inner]]` + unresolved-upgrade via `wikiLinkAnchorHtml`; property-field live tags keep `[[brackets]]` and add the attribute). Path-markdown already had it. Click handling unchanged.
 
-### 4. Wiki in-app navigation pushes a named location — Structure `[ ]`
+### 4. Wiki in-app navigation pushes a named location — Structure `[x]`
 
-`handleRichContentAnchorClick` calls `navigateInApp(noteShowLocation(id))` when the live wiki has a note id. Callback type is `RouteLocationRaw`. `QuillEditor` / `PropertyValueField` `router.push` that value.
-
-- Red first: `wikiLinkMarkup.spec.ts` expects `noteShowLocation(42)` not `"/n42"`; `QuillEditor.spec.ts` fixture includes `data-note-id` and expects `noteShowLocation(1)`.
-- Leftover non-wiki in-app hrefs still `push` the href string.
-- User URL is unchanged.
+Live wiki clicks with `data-note-id` call `navigateInApp(noteShowLocation(id))` (`RouteLocationRaw`). Leftover in-app hrefs still push the string. User URL unchanged.
 
 ### 5. Wiki HTML unit tests pin `noteShowHref`, not `/n` literals — Structure `[ ]`
 

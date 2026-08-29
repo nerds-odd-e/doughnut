@@ -1,7 +1,8 @@
 import type { WikiTitle } from "@generated/donut-backend-api"
+import type { RouteLocationRaw } from "vue-router"
 import {
   hrefLooksLikeConceptNotePath,
-  noteShowHref,
+  noteShowLocation,
 } from "@/routes/noteShowLocation"
 import {
   DEAD_WIKI_LINK_CLASS,
@@ -123,7 +124,7 @@ export function handleRichContentAnchorClick(
   anchor: HTMLAnchorElement,
   handlers: {
     onDeadWikiLink: (payload: DeadWikiLinkPayload) => void
-    navigateInApp: (href: string) => void
+    navigateInApp: (to: RouteLocationRaw) => void
   },
   options: { deadWikiLinksEnabled: boolean }
 ): void {
@@ -139,7 +140,7 @@ export function handleRichContentAnchorClick(
   }
   const noteId = anchor.getAttribute("data-note-id")
   if (anchor.classList.contains(DONUT_WIKI_LINK_CLASS) && noteId) {
-    handlers.navigateInApp(noteShowHref(Number(noteId)))
+    handlers.navigateInApp(noteShowLocation(Number(noteId)))
     return
   }
   const href = anchor.getAttribute("href")

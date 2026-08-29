@@ -1,4 +1,6 @@
 import { describe, expect, it } from "vitest"
+import type { RouteLocationRaw } from "vue-router"
+import { noteShowLocation } from "@/routes/noteShowLocation"
 import {
   deadWikiLinkPayloadFromAnchor,
   escapeHtmlForWikiLinkDisplay,
@@ -34,20 +36,20 @@ describe("wikiLinkMarkup utils", () => {
     anchor.setAttribute("href", "/Folder/Title.md")
     anchor.setAttribute("data-note-id", "42")
     anchor.textContent = "label"
-    let navigated: string | undefined
+    let navigated: RouteLocationRaw | undefined
     handleRichContentAnchorClick(
       anchor,
       {
         onDeadWikiLink: () => {
           throw new Error("should not treat as dead")
         },
-        navigateInApp: (href) => {
-          navigated = href
+        navigateInApp: (to) => {
+          navigated = to
         },
       },
       { deadWikiLinksEnabled: true }
     )
-    expect(navigated).toBe("/n42")
+    expect(navigated).toEqual(noteShowLocation(42))
   })
 
   it("markdownWikiTokenFromDeadWikiLinkPayload matches simple and piped stored tokens", () => {

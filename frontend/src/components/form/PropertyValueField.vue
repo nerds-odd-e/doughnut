@@ -104,7 +104,7 @@ function onClickCapture(event: MouseEvent) {
     anchor,
     {
       onDeadWikiLink: (payload) => emit("deadWikiLinkClick", payload),
-      navigateInApp: (href) => router.push(href),
+      navigateInApp: (to) => router.push(to),
     },
     { deadWikiLinksEnabled: true }
   )

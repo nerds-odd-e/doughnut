@@ -4,6 +4,7 @@ import { nextTick } from "vue"
 import type Quill from "quill"
 import { describe, it, expect, afterEach } from "vitest"
 import routes from "@/routes/routes"
+import { noteShowLocation } from "@/routes/noteShowLocation"
 import { createRouter, createWebHistory } from "vue-router"
 
 const router = createRouter({ history: createWebHistory(), routes })
@@ -120,7 +121,7 @@ describe("QuillEditor.vue", () => {
 
     await mountEditor({
       modelValue:
-        '<p><a href="https://example.com/path">ext</a> <a href="/n1" class="donut-wiki-link">wiki</a></p>',
+        '<p><a href="https://example.com/path">ext</a> <a href="/n1" class="donut-wiki-link" data-note-id="1">wiki</a></p>',
       readonly: true,
     })
     await clickEditorAnchor(".ql-editor a[href='https://example.com/path']")
@@ -136,7 +137,7 @@ describe("QuillEditor.vue", () => {
 
     await clickEditorAnchor(".ql-editor a.donut-wiki-link")
     expect(openSpy).not.toHaveBeenCalled()
-    expect(pushSpy).toHaveBeenCalledWith("/n1")
+    expect(pushSpy).toHaveBeenCalledWith(noteShowLocation(1))
 
     openSpy.mockRestore()
     pushSpy.mockRestore()
