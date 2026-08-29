@@ -1,10 +1,6 @@
 <template>
   <div ref="recallPageRoot" class="recall-page h-full flex flex-col">
-    <DailyProbe
-      v-if="showDailyProbe"
-      @complete="markDailyProbeFinished"
-    />
-    <template v-else-if="showOrdinaryRecall">
+    <DailyProbeGate>
     <GlobalBar
       v-if="isProgressBarVisible"
       :class="[
@@ -86,24 +82,23 @@
         data-testid="speaking-practice-input"
       />
     </div>
-    </template>
+    </DailyProbeGate>
   </div>
 </template>
 
 <script setup lang="ts">
-import DailyProbe from "@/components/recall/DailyProbe.vue"
+import DailyProbeGate from "@/components/recall/DailyProbeGate.vue"
 import Quiz from "@/components/recall/Quiz.vue"
 import RecallProgressBar from "@/components/recall/RecallProgressBar.vue"
 import AnsweredQuestionComponent from "@/components/recall/AnsweredQuestionComponent.vue"
 import AnsweredSpellingQuestion from "@/components/recall/AnsweredSpellingQuestion.vue"
 import GlobalBar from "@/components/toolbars/GlobalBar.vue"
-import type { AnsweredQuestion, User } from "@generated/donut-backend-api"
-import { computed, inject, ref, watch, type Ref } from "vue"
+import type { AnsweredQuestion } from "@generated/donut-backend-api"
+import { computed, ref, watch } from "vue"
 import { useRecallData } from "@/composables/useRecallData"
 import { useRecallTrackerNavigation } from "@/composables/useRecallTrackerNavigation"
 import { useRecallAnswerHandling } from "@/composables/useRecallAnswerHandling"
 import { useRecallPageLoading } from "@/composables/useRecallPageLoading"
-import { useDailyProbeOffer } from "@/composables/useDailyProbeOffer"
 import { scheduleFocusAutofocusTargetWithin } from "@/utils/focusTarget"
 
 const {
@@ -129,10 +124,6 @@ const {
 defineProps({
   eagerFetchCount: Number,
 })
-
-const currentUser = inject<Ref<User | undefined>>("currentUser")
-const { showDailyProbe, showOrdinaryRecall, markDailyProbeFinished } =
-  useDailyProbeOffer(currentUser)
 
 const currentIndex = ref(0)
 const previousAnsweredQuestions = ref<(AnsweredQuestion | undefined)[]>([])
