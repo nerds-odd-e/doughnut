@@ -39,6 +39,24 @@ export const noteRichPropertyMethods = () => ({
     cy.get(richNotePropertyRow('image'), { timeout: 20000 }).should('exist')
     return this
   },
+  expectFocusedRichNoteProperty(key: string) {
+    this.switchToRichContent()
+    findNoteContentRegion().within(() => {
+      cy.get(richNotePropertyRow(key))
+        .should('have.attr', 'data-property-focused', 'true')
+        .and('be.visible')
+    })
+    cy.get('dialog')
+      .filter(':visible')
+      .should('be.visible')
+      .within(() => {
+        cy.contains('h2', key).should('be.visible')
+        cy.get(
+          '[data-testid="rich-note-property-value-popup-textarea"]'
+        ).should('be.visible')
+      })
+    return this
+  },
   expectRichNotePropertyDisplayed(key: string, value: string) {
     findNoteContentRegion().within(() => {
       cy.contains('h4', 'Properties')

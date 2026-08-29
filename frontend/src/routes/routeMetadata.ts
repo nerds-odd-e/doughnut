@@ -13,6 +13,18 @@ export interface RouteMetadata {
   redirect?: RouteRecordRaw["redirect"]
 }
 
+function firstPathParam(
+  params: RouteLocation["params"],
+  name: string
+): string | undefined {
+  const raw = params[name]
+  return Array.isArray(raw) ? raw[0] : raw
+}
+
+function noteIdFromRoute(route: RouteLocation): Record<string, unknown> {
+  return { noteId: Number(route.params.noteId) }
+}
+
 export const routeMetadata: RouteMetadata[] = [
   { path: "/", name: "root" },
   {
@@ -50,18 +62,33 @@ export const routeMetadata: RouteMetadata[] = [
   },
   {
     path: "/n/:noteId(\\d+)",
-    redirect: (to) => {
-      const raw = to.params.noteId
-      const id = Array.isArray(raw) ? raw[0] : raw
-      return { name: "noteShow", params: { noteId: id } }
-    },
+    redirect: (to) => ({
+      name: "noteShow",
+      params: { noteId: firstPathParam(to.params, "noteId") },
+    }),
+  },
+  {
+    path: "/n/:noteId(\\d+)/p/:propertyKey",
+    redirect: (to) => ({
+      name: "noteProperty",
+      params: {
+        noteId: firstPathParam(to.params, "noteId"),
+        propertyKey: firstPathParam(to.params, "propertyKey"),
+      },
+      query: to.query,
+      hash: to.hash,
+    }),
   },
   {
     path: "/n:noteId(\\d+)",
     name: "noteShow",
-    props: (route: RouteLocation) => ({
-      noteId: Number(route.params.noteId),
-    }),
+    props: noteIdFromRoute,
+    meta: { useNoteStorageAccessor: true },
+  },
+  {
+    path: "/n:noteId(\\d+)/p/:propertyKey",
+    name: "noteProperty",
+    props: noteIdFromRoute,
     meta: { useNoteStorageAccessor: true },
   },
   {

@@ -12,7 +12,8 @@
       :key-input-id="rowKeyInputId(idx)"
       :preset-list-id="rowKeyPresetListId(idx)"
       :is-pending="isPendingProperty(row!.key)"
-      :set-root-ref="(el) => setPropertyRowRef(row!.key, el)"
+      :is-focused="isFocusedProperty(row!.key)"
+      :set-root-ref="(el) => setRootRef(row!.key, el)"
       @row-focus="emit('row-focus', idx)"
       @commit="emit('commit', idx)"
       @remove="emit('remove', idx)"
@@ -25,8 +26,9 @@
 </template>
 
 <script setup lang="ts">
-import { toRef } from "vue"
+import { toRef, type ComponentPublicInstance } from "vue"
 import RichFrontmatterEditablePropertyRow from "@/components/form/RichFrontmatterEditablePropertyRow.vue"
+import { useFocusedNoteProperty } from "@/composables/useFocusedNoteProperty"
 import { usePendingAssimilationProperty } from "@/composables/usePendingAssimilationProperty"
 import { usePropertyRowClientIds } from "@/composables/usePropertyRowClientIds"
 import type { WikiTitle } from "@generated/donut-backend-api"
@@ -53,9 +55,18 @@ const emit = defineEmits<{
 }>()
 
 const rowClientIds = usePropertyRowClientIds(propertyRows)
-const { isPendingProperty, setPropertyRowRef } = usePendingAssimilationProperty(
-  toRef(() => props.noteId ?? 0)
-)
+const { isPendingProperty, setPropertyRowRef: setPendingPropertyRowRef } =
+  usePendingAssimilationProperty(toRef(() => props.noteId ?? 0))
+const { isFocusedProperty, setPropertyRowRef: setFocusedPropertyRowRef } =
+  useFocusedNoteProperty()
+
+function setRootRef(
+  propertyKey: string,
+  element: Element | ComponentPublicInstance | null
+) {
+  setPendingPropertyRowRef(propertyKey, element)
+  setFocusedPropertyRowRef(propertyKey, element)
+}
 
 const rowKeyInputId = (idx: number) => `${props.headingId}-row-${idx}-key`
 const rowKeyPresetListId = (idx: number) =>

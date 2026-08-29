@@ -5,7 +5,10 @@
     :data-row-index="idx"
     :data-property-key="modelValue.key"
     :data-test-pending="isPending ? 'true' : undefined"
-    :class="{ 'rounded bg-primary/10 ring-1 ring-primary/30': isPending }"
+    :data-property-focused="isFocused ? 'true' : undefined"
+    :class="{
+      'rounded bg-primary/10 ring-1 ring-primary/30': isPending || isFocused,
+    }"
     :ref="setRootRef"
   >
     <div
@@ -56,6 +59,7 @@
           :wiki-titles="wikiTitles"
           :last-saved-markdown="lastSavedMarkdown"
           :row-index="idx"
+          :is-focused="isFocused"
           @update:model-value="onValueUpdate"
           @update:property-value="onPropertyValueUpdate"
           @focus="emit('row-focus')"
@@ -172,6 +176,7 @@ const props = defineProps<{
   propertyRows: PropertyRow[]
   noteId?: number
   isPending: boolean
+  isFocused: boolean
   setRootRef: (el: Element | ComponentPublicInstance | null) => void
 }>()
 

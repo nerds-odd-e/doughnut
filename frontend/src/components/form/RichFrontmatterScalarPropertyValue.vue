@@ -37,7 +37,7 @@
       class="daisy-btn daisy-btn-ghost daisy-btn-sm square shrink-0"
       :aria-label="`Edit property value for ${propertyKey} in dialog`"
       data-testid="rich-note-property-value-popup-open"
-      @click="valuePopupOpen = true"
+      @click="localValueDialogOpen = true"
     >
       <SquarePen class="h-4 w-4" aria-hidden="true" />
     </button>
@@ -47,12 +47,12 @@
       :value="scalarValue"
     />
     <RichFrontmatterPropertyValueDialog
-      v-if="valuePopupOpen"
+      v-if="valueDialogOpen"
       :property-key="propertyKey"
       :property-value="propertyRow.value"
       :list-mode-allowed="listModeAllowed"
-      @save="onValuePopupSave"
-      @cancel="valuePopupOpen = false"
+      @save="onValueDialogSave"
+      @cancel="localValueDialogOpen = false"
     />
   </div>
 </template>
@@ -85,6 +85,7 @@ const props = defineProps<{
   wikiTitles: WikiTitle[]
   lastSavedMarkdown?: string
   rowIndex: number
+  isFocused: boolean
 }>()
 
 const emit = defineEmits<{
@@ -95,10 +96,13 @@ const emit = defineEmits<{
   "dead-wiki-link-click": [payload: DeadWikiLinkPayload]
 }>()
 
-const valuePopupOpen = ref(false)
+const localValueDialogOpen = ref(false)
 
 const propertyKey = computed(() => props.propertyRow.key)
 const textCapable = computed(() => isTextCapablePropertyRow(props.propertyRow))
+const valueDialogOpen = computed(
+  () => localValueDialogOpen.value || (props.isFocused && textCapable.value)
+)
 const isListValue = computed(() => isListPropertyValue(props.propertyRow.value))
 const listValue = computed(() =>
   isListPropertyValue(props.propertyRow.value) ? props.propertyRow.value : null
@@ -127,9 +131,9 @@ function onValuePointerDown(event: PointerEvent) {
   primeSoftKeyboard()
 }
 
-function onValuePopupSave(value: PropertyValue) {
+function onValueDialogSave(value: PropertyValue) {
   emit("update:propertyValue", value)
-  valuePopupOpen.value = false
+  localValueDialogOpen.value = false
   emit("commit")
 }
 </script>

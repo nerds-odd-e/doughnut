@@ -4,7 +4,12 @@ import { createMemoryHistory, createRouter, createWebHistory } from "vue-router"
 import type { RouteRecordRaw } from "vue-router"
 import { dummyRouteRecordsFromMetadata } from "@/routes/dummyRouteRecords"
 import { namedLocationHref } from "@/routes/namedLocationHref"
-import { noteShowHref, noteShowLocation } from "@/routes/noteShowLocation"
+import {
+  notePropertyHref,
+  notePropertyLocation,
+  noteShowHref,
+  noteShowLocation,
+} from "@/routes/noteShowLocation"
 import routes from "@/routes/routes"
 
 function findRouteRecordByName(
@@ -25,11 +30,12 @@ function findRouteRecordByName(
   return
 }
 
-function expectNoteShowProps(
+function expectNamedNotePageProps(
+  routeName: "noteShow" | "noteProperty",
   route: { params: Record<string, unknown> },
   noteId: number
 ) {
-  const meta = findRouteRecordByName(routes, "noteShow")
+  const meta = findRouteRecordByName(routes, routeName)
   expect(meta).toBeDefined()
   expect(typeof meta!.props).toBe("function")
   expect((meta!.props as (r: typeof route) => unknown)(route)).toEqual({
@@ -61,7 +67,7 @@ describe("routes", () => {
       const route = router.currentRoute.value
       expect(route.name).toBe("noteShow")
       expect(route.params.noteId).toBe("123")
-      expectNoteShowProps(route, 123)
+      expectNamedNotePageProps("noteShow", route, 123)
     })
 
     it("redirects legacy /d/n/:noteId to /n:noteId", async () => {
@@ -97,7 +103,7 @@ describe("routes", () => {
       const route = router.currentRoute.value
       expect(route.name).toBe("noteShow")
       expect(route.params.noteId).toBe("456")
-      expectNoteShowProps(route, 456)
+      expectNamedNotePageProps("noteShow", route, 456)
     })
 
     it("does not absorb legacy slash paths under notebooks", async () => {
@@ -108,6 +114,65 @@ describe("routes", () => {
         router.currentRoute.value.matched.some((r) => r.name === "noteShow")
       ).toBe(false)
     })
+  })
+
+  describe("noteProperty route", () => {
+    it("matches /n:noteId/p/:propertyKey and passes noteId prop", async () => {
+      await router.push("/n123/p/Due")
+
+      const route = router.currentRoute.value
+      expect(route.name).toBe("noteProperty")
+      expect(route.params.noteId).toBe("123")
+      expect(route.params.propertyKey).toBe("Due")
+      expectNamedNotePageProps("noteProperty", route, 123)
+    })
+
+    it("redirects legacy /n/:noteId/p/:propertyKey preserving query and hash", async () => {
+      await router.push("/n/888/p/Due?conversation=true#section")
+
+      const route = router.currentRoute.value
+      expect(route.name).toBe("noteProperty")
+      expect(route.path).toBe("/n888/p/Due")
+      expect(route.params.noteId).toBe("888")
+      expect(route.params.propertyKey).toBe("Due")
+      expect(route.query).toEqual({ conversation: "true" })
+      expect(route.hash).toBe("#section")
+    })
+
+    it("compiles notePropertyHref from the named location", () => {
+      expect(notePropertyHref(123, "Due")).toBe(
+        router.resolve(notePropertyLocation(123, "Due")).href
+      )
+    })
+
+    it("navigates by name and passes noteId prop", async () => {
+      await router.push(notePropertyLocation(456, "Due"))
+
+      const route = router.currentRoute.value
+      expect(route.name).toBe("noteProperty")
+      expect(route.params.noteId).toBe("456")
+      expectNamedNotePageProps("noteProperty", route, 456)
+    })
+
+    it.each([
+      "Due",
+      "example of",
+      "a/b",
+      "100%",
+      "a|b",
+      "a]b",
+      "a?b",
+      "a#b",
+      "Tópico",
+      "MixedCase",
+    ])(
+      "round-trips property key %s through named params",
+      async (propertyKey) => {
+        await router.push(notePropertyLocation(123, propertyKey))
+        expect(router.currentRoute.value.name).toBe("noteProperty")
+        expect(router.currentRoute.value.params.propertyKey).toBe(propertyKey)
+      }
+    )
   })
 
   describe("namedLocationHref", () => {
@@ -142,6 +207,10 @@ describe("routes", () => {
 
     it.each([
       { name: "noteShow", params: { noteId: "123" } },
+      {
+        name: "noteProperty",
+        params: { noteId: "123", propertyKey: "Due" },
+      },
       { name: "failureReport", params: { failureReportId: "1" } },
       { name: "settingsGeneral" },
       { name: "settingsRecent" },

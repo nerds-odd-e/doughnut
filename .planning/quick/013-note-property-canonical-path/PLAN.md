@@ -1,6 +1,6 @@
 # Note property canonical path
 
-**Status:** in progress (slice 1 done; 2–17 remaining).
+**Status:** in progress (slices 1–2 done; 3–17 remaining).
 **Type:** ad-hoc plan (`.planning/quick/`)
 **Policy:** [ADR 0001](../../../docs/adrs/0001-ubiquitous-language.md) (**Property**, **Wiki link**), [ADR 0004](../../../docs/adrs/0004-okf-compatible-notebook-markdown-accepted.md) (`#prop:`), Proposed [ADR 0005](../../../docs/adrs/0005-web-routes.md) (`noteProperty`).
 **Human-owned exception (2026-08-29):** ADR 0001 / ADR 0004 may depend on
@@ -110,13 +110,14 @@ contract `isNoteRouteFamily` / `noteRouteFamilyNoteId`; classifier
 consume it. `noteProperty` is not registered; `/n123/p/…` is still not
 internal until slice 2 adds the child.
 
-### 2. Visiting `noteProperty` focuses an editable property — **Behavior** — planned
+### 2. Visiting `noteProperty` focuses an editable property — **Behavior** — done
 
-**Pre:** editable note with a text-capable property. **Trigger:** visit the
-named `noteProperty` location. **Post:** the same note page and notebook chrome
-remain mounted; the row is visibly focused and scrolled into view; its value
-dialog is open. Register the route and helpers inside this slice—never expose
-an inert route.
+Named `noteProperty` at `/n:noteId(\\d+)/p/:propertyKey` (sibling of
+`noteShow`). Helpers `notePropertyLocation` / `notePropertyHref`. Focus via
+`useFocusedNoteProperty` + `isFocusedProperty`. E2E:
+`e2e_test/features/note_topology/note_property.feature`. Legacy
+`/n/:noteId/p/:propertyKey` redirects with query/hash. `/n123/p/…` is now
+internal. Pending-property dual-ref wiring remains until slice 9.
 
 ### 3. Visiting a read-only or specialized property keeps visible focus — **Behavior** — planned
 
@@ -251,8 +252,8 @@ invent identity from the label. Extend the internal-URL classifier so
 - Slice 1: `routeRecordsFromMetadata` groups sibling metadata under one
   sidebar parent (`noteShow` / `notebookPage` / `folderPage` paths from
   `routeMetadata`). Family tests live in `noteRouteFamily.spec.ts`.
-  Classifier follows `/d/` and `/n/:id` redirects. `/n123/p/…` joins the
-  family when slice 2 registers the child — do not add a second path parser.
+  Classifier follows `/d/` and `/n/:id` redirects. Do not add a second
+  path parser for property URLs.
 - `NoteShowPage` does not contain a child `RouterView`. Register `noteProperty`
   as a sibling child of the shared `/n:noteId` parent, not a second layout.
 - Vue Router named-param resolution round-trips decoded keys containing spaces,
@@ -261,8 +262,10 @@ invent identity from the label. Extend the internal-URL classifier so
   separate stricter serialization.
 - Sticky realm, drawer, and main-nav consume `isNoteRouteFamily`; do not
   re-append `noteShow` to those lists when adding `noteProperty`.
-- Dummy route records still need a `noteProperty` metadata row (or the
-  mapper grouping) so `notePropertyHref` compiles honestly in slice 2.
+- Slice 2: `useFocusedNoteProperty` is the route-neutral focus seam for
+  slices 3–4. Editable text-capable rows also open the value dialog from
+  `isFocused`. Do not add a second focus source. Pending-property dual-ref
+  stays until slice 9.
 - Next-assimilate already distinguishes property units (settings off, pending
   row). The route replaces both the destination and the pending-property
   memory/selector language.

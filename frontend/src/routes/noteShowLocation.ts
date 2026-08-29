@@ -2,6 +2,7 @@ import {
   createMemoryHistory,
   createRouter,
   type RouteLocationNamedRaw,
+  type RouteLocationNormalizedLoaded,
   type RouteLocationRaw,
   type RouteRecordRaw,
   type Router,
@@ -21,6 +22,36 @@ export function noteShowLocation(noteId: number): RouteLocationNamedRaw {
 
 export function noteShowHref(noteId: number): string {
   return namedLocationHref(noteShowLocation(noteId))
+}
+
+export function notePropertyLocation(
+  noteId: number,
+  propertyKey: string
+): RouteLocationNamedRaw {
+  return {
+    name: "noteProperty",
+    params: {
+      noteId: String(noteId),
+      propertyKey,
+    },
+  }
+}
+
+export function notePropertyHref(noteId: number, propertyKey: string): string {
+  return namedLocationHref(notePropertyLocation(noteId, propertyKey))
+}
+
+export function notePropertyKeyFromRoute(
+  route: Pick<RouteLocationNormalizedLoaded, "name" | "params">
+): string | undefined {
+  if (route.name !== "noteProperty") {
+    return undefined
+  }
+  const raw = route.params.propertyKey
+  if (raw === undefined) {
+    return undefined
+  }
+  return Array.isArray(raw) ? raw[0] : raw
 }
 
 const unmatchedLocation: RouteRecordRaw = {

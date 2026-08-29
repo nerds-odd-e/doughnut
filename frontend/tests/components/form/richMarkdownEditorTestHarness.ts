@@ -1,6 +1,12 @@
 import RichMarkdownEditor from "@/components/form/RichMarkdownEditor.vue"
+import routes from "@/routes/routes"
 import helper from "@tests/helpers"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
+import {
+  createRouter,
+  createWebHistory,
+  type RouteLocationRaw,
+} from "vue-router"
 
 export function createRichMarkdownEditorTestHarness() {
   let wrapper: VueWrapper
@@ -117,12 +123,24 @@ export function createRichMarkdownEditorTestHarness() {
 
   async function mountEditor(
     initialValue: string,
-    options: Record<string, unknown> & { attachToBody?: boolean } = {}
+    options: Record<string, unknown> & {
+      attachToBody?: boolean
+      route?: RouteLocationRaw
+    } = {}
   ) {
-    const { attachToBody = false, ...props } = options
-    wrapper = helper
-      .component(RichMarkdownEditor)
-      .withRouter()
+    const { attachToBody = false, route, ...props } = options
+    const builder = helper.component(RichMarkdownEditor)
+    if (route !== undefined) {
+      const router = createRouter({
+        history: createWebHistory(),
+        routes,
+      })
+      await router.push(route)
+      builder.withRouter(router)
+    } else {
+      builder.withRouter()
+    }
+    wrapper = builder
       .withProps({
         modelValue: initialValue,
         wikiTitles: [],
