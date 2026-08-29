@@ -40,10 +40,21 @@ covers how those links relate to **web** destinations.
 
 ### SPA locations
 
+- SPA path literals for screens live only in `routeMetadata` (plus the `/d/`
+  leftover-path rewrite).
 - In-app navigation (`push` / `replace` / `:to`) is a named location (or a
   helper that returns one). An HTML `href` is allowed only on rendered
-  anchors, and is compiled from a named location against the route table —
+  anchors, and is compiled from a named location against that table —
   never a second concatenated copy of a path.
+- Unit tests: navigation assertions use named locations; rendered-href
+  assertions use `noteShowHref` / `namedLocationHref`; path strings only in
+  `routes.spec.ts` (matching / redirects) and inbound URL classifiers.
+- Test routers that resolve named screen locations use production `routes`
+  or `dummyRouteRecordsFromMetadata` (the `routeMetadata` table with dummy
+  components; no page imports). Catch-all `/` or `/:pathMatch(.*)*` routers
+  and `useRoute` stubs with `path: "/"` are not a second screen dialect.
+- Nested layouts (notebook sidebar, settings) are assembled in `routes.ts`
+  from named metadata entries.
 - The URL identifies the **server-side note id**, not the portable path
   (ADR 0004). A **property** adds the **authored key** (no property
   surrogate id). Note-show URLs are compact. Nested property path stays
@@ -58,6 +69,20 @@ covers how those links relate to **web** destinations.
   within the note family; inbound links **push**. Product surfaces that
   already know a property (next to assimilate, answered question, memory
   tracker) navigate to `noteProperty` — not a side channel on `noteShow`.
+- E2E navigation goes through `e2e_test/start/router.ts` (`visitNamed` /
+  named `push`). Compile hrefs with `namedLocationHref` / `noteShowHref`.
+  Page objects and steps do not call `cy.visit` with SPA path strings
+  (`scripts/check_e2e_spa_visit_gate.sh` in CI).
+
+  | Intent | Mechanism |
+  | --- | --- |
+  | Unique trigger **is** in-app navigation | UI |
+  | Given-shaped shortcut (including Gherkin `When I visit …` when the unique behavior is **on** that screen) | Named `router.push` after first load |
+  | First SPA load, inbound URL, or **explicit remount** | `cy.visit` of href **compiled from the named table** |
+
+- Recall: `visitRecallPage` is remount (`visitNamed('recall')`);
+  `navigateToRecallPage` is sidebar UI. Gherkin `When I visit recall`
+  stays remount — do not convert it to sidebar.
 
 ### Wiki links as web destinations
 

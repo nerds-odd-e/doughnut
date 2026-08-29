@@ -61,8 +61,11 @@ In most situations, run all unit tests instead of a selected file only. Use a si
 Navigation assertions use named locations (or helpers that return them).
 Rendered-href assertions use `noteShowHref`. Path strings belong only in
 `routes.spec.ts` (matching / redirects) and inbound URL classifiers. Test
-routers use production `routes` or stub records from `routeMetadata`, not a
-hand-copied path dialect.
+routers that resolve named screen locations use production `routes` or
+`dummyRouteRecordsFromMetadata` (the `routeMetadata` table with dummy
+components; no page imports). Catch-all `/` or `/:pathMatch(.*)*` routers
+and `useRoute` stubs with `path: "/"` are not a second screen dialect
+(Proposed ADR 0005).
 
 ## Avoid Role Queries
 

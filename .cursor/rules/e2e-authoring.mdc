@@ -92,7 +92,20 @@ When("I start a conversation about the note {string}", (noteTopology: string) =>
 
 Use page objects with a fluent interface: methods perform an action and return the next page object, or `this` when staying on the same screen. This keeps step definitions short and navigation explicit in the types.
 
-- Prefer UI for the scenario trigger. Direct route change is Given/setup only: `e2e_test/start/router.ts` named `push` after first load; `cy.visit` only with an href from the named table (ADR 0005).
+- Navigation (Proposed ADR 0005). E2E navigation goes through `e2e_test/start/router.ts`
+  (`visitNamed` / named `push`). Compile hrefs with `namedLocationHref` /
+  `noteShowHref`. Page objects and steps do not call `cy.visit` with SPA path
+  strings (`scripts/check_e2e_spa_visit_gate.sh` in CI).
+
+  | Intent | Mechanism |
+  | --- | --- |
+  | Unique trigger **is** in-app navigation | UI |
+  | Given-shaped shortcut (including Gherkin `When I visit …` when the unique behavior is **on** that screen) | Named `router.push` after first load |
+  | First SPA load, inbound URL, or **explicit remount** | `cy.visit` of href **compiled from the named table** |
+
+- Recall: `visitRecallPage` is remount (`visitNamed('recall')`);
+  `navigateToRecallPage` is sidebar UI. Gherkin `When I visit recall`
+  stays remount — do not convert it to sidebar.
 - Centralize UI interactions in page objects.
 - Prefer fluent chaining over one-off helpers that do not return a navigable object.
 - Keep page objects focused on a single responsibility.
