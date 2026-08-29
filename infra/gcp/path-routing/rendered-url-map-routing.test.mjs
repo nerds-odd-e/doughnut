@@ -60,7 +60,12 @@ test('rendered URL map: backend-classified paths are not routed to the bucket', 
   const { doc } = renderRepoUrlMap()
   const rr = routingRulesFromUrlMapDoc(doc)
   assert.ok(!('error' in rr))
-  for (const urlPath of ['/api/foo', '/attachments/x', '/logout']) {
+  for (const urlPath of [
+    '/api/foo',
+    '/attachments/x',
+    '/logout',
+    '/login/continue',
+  ]) {
     assert.ok(
       !gcpRoutesToStaticBucket(urlPath, rr.routingRules),
       `${urlPath} should not route to the static bucket`

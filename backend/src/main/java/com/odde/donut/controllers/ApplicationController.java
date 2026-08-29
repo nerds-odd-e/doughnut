@@ -18,7 +18,7 @@ public class ApplicationController {
   // This backend route is to trigger the authentication process to identify the user.
   // In production, we use OAuth2 to identify the user.
   // In non-production, we use frontend to identify the user.
-  @GetMapping("/users/identify")
+  @GetMapping({"/users/identify", "/login/continue"})
   public String identify(
       @RequestParam(name = "from", required = false, defaultValue = "/") String from) {
     return "redirect:" + from;

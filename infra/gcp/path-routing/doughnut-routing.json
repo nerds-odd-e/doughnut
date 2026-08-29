@@ -1,6 +1,6 @@
 {
   "backendPathHints": {
-    "exactPaths": ["/api", "/install", "/login", "/robots.txt"],
+    "exactPaths": ["/api", "/install", "/login", "/login/continue", "/robots.txt"],
     "pathPrefixes": [
       "/api/",
       "/attachments/",
