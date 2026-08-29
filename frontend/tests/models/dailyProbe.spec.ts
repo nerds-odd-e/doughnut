@@ -1,4 +1,5 @@
 import {
+  dailyProbeAccuracy,
   dailyProbePracticeSequence,
   dailyProbeScoredSequence,
   dailyProbeSpeed,
@@ -108,5 +109,13 @@ describe("dailyProbe", () => {
 
   it("omits speed when there are no correct valid RTs", () => {
     expect(dailyProbeSpeed([recordAt("left", 250, "j")])).toBeUndefined()
+  })
+
+  it("accuracy is 95 for 19 correct of 20 scored trials", () => {
+    const trials = [
+      ...Array.from({ length: 19 }, () => recordAt("left", 250, "f")),
+      recordAt("left", 250, "j"),
+    ]
+    expect(dailyProbeAccuracy(trials)).toBe(95)
   })
 })

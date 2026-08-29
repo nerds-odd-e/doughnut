@@ -3,7 +3,7 @@
 Feature: Daily probe
   As a learner who has opted in
   I want to complete the Daily probe before recall
-  So that I can see this run's speed and then continue into ordinary recall
+  So that I can see this run's speed and accuracy and then continue into ordinary recall
 
   Background:
     Given I am logged in as an existing user
@@ -17,6 +17,7 @@ Feature: Daily probe
     Then I should see the Daily probe instruction
     When I complete the Daily probe
     Then I should see Daily probe speed "4.00"
+    And I should see Daily probe accuracy "100%"
     When I continue from the Daily probe
     Then I should see ordinary recall
 

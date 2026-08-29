@@ -21,6 +21,9 @@
       >
         {{ speedText }}
       </p>
+      <p data-testid="daily-probe-accuracy" class="text-2xl font-semibold">
+        {{ accuracyText }}
+      </p>
       <button class="daisy-btn daisy-btn-primary" @click="emit('complete')">
         Continue
       </button>
@@ -33,6 +36,7 @@ import {
   DAILY_PROBE_INSTRUCTION,
   DAILY_PROBE_ISI_MS,
   DAILY_PROBE_TIMEOUT_MS,
+  dailyProbeAccuracy,
   dailyProbePracticeSequence,
   dailyProbeScoredSequence,
   dailyProbeSpeed,
@@ -67,6 +71,9 @@ const finished = ref(false)
 
 const speedText = computed(() =>
   dailyProbeSpeed(scoredTrials.value)?.toFixed(2)
+)
+const accuracyText = computed(
+  () => `${dailyProbeAccuracy(scoredTrials.value)}%`
 )
 
 let stimulusOnsetMs = 0
