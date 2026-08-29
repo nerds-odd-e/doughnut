@@ -16,8 +16,9 @@ Donut has three URL-shaped languages:
 
 They look similar (all start with `/`) and are easy to mix. Mixing them
 breaks portability, bookmarks, or in-app navigation. This ADR is the routing
-policy. Path literals live in the SPA route table, OpenAPI, and the load-
-balancer backend-path list — not here.
+policy. Path literals live in the SPA route table, OpenAPI, and
+[`doughnut-routing.json`](../../infra/gcp/path-routing/doughnut-routing.json)
+— not here.
 
 Wiki **spelling and resolution in the tree** stay in ADR 0004. This ADR only
 covers how those links relate to **web** destinations.
@@ -29,9 +30,11 @@ covers how those links relate to **web** destinations.
 - User screens are a Vue Router SPA (HTML5 history, site root). The load
   balancer rewrites unknown paths to the SPA shell. The backend does not
   serve or whitelist client routes. A new screen is a route-table change.
-- JSON and most backend traffic stay under the API prefix. A small set of
-  backend-owned paths (auth, attachments, install, and the like) is listed
-  with the load balancer, not invented per page.
+- JSON and most backend traffic stay under the API prefix. Other
+  backend-owned paths (auth, attachments, install, and the like) stay at
+  their current URLs. That exception list lives only in
+  [`doughnut-routing.json`](../../infra/gcp/path-routing/doughnut-routing.json)
+  (`backendPathHints`); do not duplicate it here or invent it per page.
 - Notebook content does not store SPA or API URLs as the form of an inter-note
   link. Portable tokens stay wiki or path Markdown (ADR 0004).
 
@@ -55,8 +58,8 @@ covers how those links relate to **web** destinations.
 
 - Add a screen: named metadata entry, wire the page, push/link by **name**.
 - Do not hardcode SPA path literals in components, tests, or stored markdown.
-- Do not add client routes to the backend or to load-balancer backend-path
-  hints.
+- Do not add client routes to the backend or to `backendPathHints` in
+  `doughnut-routing.json`.
 - E2E may `visit` a URL on first load; later in-app moves use named
   `router.push`.
 
@@ -88,3 +91,5 @@ covers how those links relate to **web** destinations.
   (token spelling and tree identity — not web routing)
 - [ADR 0002 — Git-native notebooks](./0002-git-native-notebooks-backed-by-mysql.md)
   (lineage vs server-side id)
+- [`doughnut-routing.json`](../../infra/gcp/path-routing/doughnut-routing.json)
+  (backend-owned path hints for the load balancer)
