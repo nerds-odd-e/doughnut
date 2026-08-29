@@ -2373,6 +2373,24 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/UserToken"
+  /api/user/daily-probe-convergent-validity:
+    get:
+      tags:
+      - user-controller
+      operationId: getDailyProbeConvergentValidity
+      parameters:
+      - name: timezone
+        in: query
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/DailyProbeConvergentValidityDTO"
   /api/user/current-user-info:
     get:
       tags:
@@ -5251,6 +5269,24 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ConversationMessage"
+    DailyProbeConvergentValidityDTO:
+      type: object
+      properties:
+        pairs:
+          type: array
+          items:
+            $ref: "#/components/schemas/PairValidity"
+    PairValidity:
+      type: object
+      properties:
+        pair:
+          type: string
+        pairCount:
+          type: integer
+          format: int32
+        rawCorrelation:
+          type: number
+          format: double
     CurrentUserInfo:
       type: object
       properties:

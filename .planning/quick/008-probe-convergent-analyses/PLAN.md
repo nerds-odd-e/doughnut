@@ -1,8 +1,8 @@
 # Cognitive probe convergent-validity and latency-modeling analyses
 
-**Status:** planned. Slice 1 is scoped and ready to execute. Slice 2 is
-gated on a developer-run precondition check (see slice 2) and should not be
-decomposed further until that resolves.
+**Status:** slice 1 shipped. Slice 2 is gated on a developer-run precondition
+check (see slice 2) and should not be decomposed further until that
+resolves.
 **Type:** ad-hoc plan (`.planning/quick/`)
 **Depends on:** `.planning/quick/007-daily-cognitive-probe/PLAN.md` (the probe
 has shipped — slice 1 needs probe history); `.planning/quick/001-morning-cognitive-index/PLAN.md`
@@ -23,7 +23,14 @@ composite morning index (the original comparison target) was dropped — see
 
 Status legend: `[ ]` planned · `[~]` in progress · `[x]` done
 
-### 1. Convergent validity is reported per component readout — Behavior `[ ]`
+### 1. Convergent validity is reported per component readout — Behavior `[x]`
+
+**Shipped as:** `RecallProbeConvergentValidity` (service),
+`DailyProbeConvergentValidityDTO`, `RecallStatsService.computeConvergentValidity`,
+and `UserController.getDailyProbeConvergentValidity` — see Permanent
+artifacts below. `DailyProbeDaySeries` gained a shared `latestByLocalDay`
+helper during refactor (deduplicated against this slice's own day-grouping
+logic).
 
 **Precondition:** current user has at least one daily probe result and
 qualifying recall data on the same mornings. `RecallPaceAggregator.compute`
@@ -92,10 +99,12 @@ structure for EZ to fit).
 
 ## Permanent artifacts (capability-named)
 
-| Artifact (once slice 1 ships) | Notes |
+| Artifact | Notes |
 |---|---|
-| `UserController` endpoint `GET /api/user/daily-probe-convergent-validity` | internal, current-user-only, no page |
-| convergent-validity service (name TBD at implementation time, e.g. `DailyProbeConvergentValidity`) | mirrors the retired split-half diagnostic's shape |
+| `UserController.getDailyProbeConvergentValidity` — `GET /api/user/daily-probe-convergent-validity` | internal, current-user-only, no page |
+| `RecallProbeConvergentValidity` | correlates the 4 matched pairs; mirrors the retired split-half diagnostic's shape |
+| `DailyProbeConvergentValidityDTO` | `{ pairs: [{ pair, pairCount, rawCorrelation }] }` |
+| `DailyProbeDaySeries.latestByLocalDay` | shared "latest probe per local day" grouping, extracted during this slice's refactor |
 
 Slice 2 has no permanent artifacts yet — still gated (see above).
 

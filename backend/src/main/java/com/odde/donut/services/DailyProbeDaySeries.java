@@ -14,7 +14,12 @@ final class DailyProbeDaySeries {
 
   private DailyProbeDaySeries() {}
 
-  static List<DailyProbeDay> from(Iterable<DailyProbe> probes, ZoneId zoneId) {
+  /**
+   * Latest probe per local calendar day (a day with more than one completed probe keeps only the
+   * one with the latest {@code completedAt}). Shared by {@link #from} and {@code
+   * RecallProbeConvergentValidity}, which applies its own trailing-window filter on top.
+   */
+  static Map<LocalDate, DailyProbe> latestByLocalDay(Iterable<DailyProbe> probes, ZoneId zoneId) {
     Map<LocalDate, DailyProbe> latestByLocalDay = new HashMap<>();
     for (DailyProbe probe : probes) {
       LocalDate localDay = probe.getCompletedAt().toInstant().atZone(zoneId).toLocalDate();
@@ -23,7 +28,11 @@ final class DailyProbeDaySeries {
         latestByLocalDay.put(localDay, probe);
       }
     }
-    return latestByLocalDay.entrySet().stream()
+    return latestByLocalDay;
+  }
+
+  static List<DailyProbeDay> from(Iterable<DailyProbe> probes, ZoneId zoneId) {
+    return latestByLocalDay(probes, zoneId).entrySet().stream()
         .sorted(Map.Entry.comparingByKey())
         .map(entry -> day(entry.getKey(), entry.getValue()))
         .toList();

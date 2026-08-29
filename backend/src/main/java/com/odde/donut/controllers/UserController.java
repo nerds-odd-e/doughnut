@@ -1,5 +1,6 @@
 package com.odde.donut.controllers;
 
+import com.odde.donut.controllers.dto.DailyProbeConvergentValidityDTO;
 import com.odde.donut.controllers.dto.GeneratedTokenDTO;
 import com.odde.donut.controllers.dto.MenuDataDTO;
 import com.odde.donut.controllers.dto.QuestionGenerationBatchUserScheduleDTO;
@@ -213,6 +214,22 @@ class UserController {
     ZoneId timeZone = TimezoneUtils.parseTimezone(timezone);
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
     return recallStatsService.compute(user, timeZone, currentUTCTimestamp);
+  }
+
+  /**
+   * Internal diagnostic (plan {@code 008-probe-convergent-analyses}) — not wired into any
+   * user-facing page. Same same-user auth/scoping as {@link #getRecallStats}, since this is a
+   * per-user convergent-validity check over one learner's own history, not a cross-user admin view.
+   */
+  @GetMapping("/daily-probe-convergent-validity")
+  @Transactional(readOnly = true)
+  public DailyProbeConvergentValidityDTO getDailyProbeConvergentValidity(
+      @RequestParam(value = "timezone") String timezone) {
+    authorizationService.assertLoggedIn();
+    User user = authorizationService.getCurrentUser();
+    ZoneId timeZone = TimezoneUtils.parseTimezone(timezone);
+    Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
+    return recallStatsService.computeConvergentValidity(user, timeZone, currentUTCTimestamp);
   }
 
   @GetMapping("/question-generation-batch-schedule")

@@ -1034,6 +1034,16 @@ export type MenuDataDto = {
     unreadMessages?: Array<ConversationMessage>;
 };
 
+export type DailyProbeConvergentValidityDto = {
+    pairs?: Array<PairValidity>;
+};
+
+export type PairValidity = {
+    pair?: string;
+    pairCount?: number;
+    rawCorrelation?: number;
+};
+
 export type CurrentUserInfo = {
     user?: User;
     externalIdentifier?: string;
@@ -3319,6 +3329,24 @@ export type GetTokensResponses = {
 };
 
 export type GetTokensResponse = GetTokensResponses[keyof GetTokensResponses];
+
+export type GetDailyProbeConvergentValidityData = {
+    body?: never;
+    path?: never;
+    query: {
+        timezone: string;
+    };
+    url: '/api/user/daily-probe-convergent-validity';
+};
+
+export type GetDailyProbeConvergentValidityResponses = {
+    /**
+     * OK
+     */
+    200: DailyProbeConvergentValidityDto;
+};
+
+export type GetDailyProbeConvergentValidityResponse = GetDailyProbeConvergentValidityResponses[keyof GetDailyProbeConvergentValidityResponses];
 
 export type CurrentUserInfoData = {
     body?: never;

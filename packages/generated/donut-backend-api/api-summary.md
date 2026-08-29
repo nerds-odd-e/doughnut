@@ -31,6 +31,7 @@ Use this for endpoint lookup; open `sdk.gen.ts` or `types.gen.ts` only for exact
 - `getQuestionGenerationBatchSchedule`: GET `/api/user/question-generation-batch-schedule` -> `GetQuestionGenerationBatchScheduleResponse` (request: none; response body: QuestionGenerationBatchUserScheduleDto)
 - `getMenuData`: GET `/api/user/menu-data` -> `GetMenuDataResponse` (request: `GetMenuDataData`; query: timezone; response body: MenuDataDto)
 - `getTokens`: GET `/api/user/get-tokens` -> `GetTokensResponse` (request: none; response body: Array<UserToken>)
+- `getDailyProbeConvergentValidity`: GET `/api/user/daily-probe-convergent-validity` -> `GetDailyProbeConvergentValidityResponse` (request: `GetDailyProbeConvergentValidityData`; query: timezone; response body: DailyProbeConvergentValidityDto)
 - `deleteToken`: DELETE `/api/user/token/{tokenId}` -> `DeleteTokenResponse` (request: `DeleteTokenData`; path: tokenId; response body: void)
 
 ## Testability Rest Controller
