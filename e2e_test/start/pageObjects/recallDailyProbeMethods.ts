@@ -54,6 +54,13 @@ export const recallDailyProbeMethods = () => ({
     cy.get('[data-testid="daily-probe-lapses"]').should('contain', lapses)
     return this
   },
+  expectDailyProbeVariability(variability: string) {
+    cy.get('[data-testid="daily-probe-variability"]').should(
+      'contain',
+      variability
+    )
+    return this
+  },
   continueFromDailyProbe() {
     cy.contains('button', 'Continue').click()
     waitUntilAppIsNotBusy()

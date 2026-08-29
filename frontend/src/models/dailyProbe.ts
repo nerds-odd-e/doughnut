@@ -77,17 +77,22 @@ export function recordDailyProbeTrial(input: {
   }
 }
 
+function correctValidReciprocals(trials: readonly DailyProbeTrial[]): number[] {
+  return trials.flatMap((trial) =>
+    trial.correct && trial.rtMs !== undefined ? [1 / (trial.rtMs / 1000)] : []
+  )
+}
+
+function mean(values: readonly number[]): number {
+  return values.reduce((sum, value) => sum + value, 0) / values.length
+}
+
 export function dailyProbeSpeed(
   trials: readonly DailyProbeTrial[]
 ): number | undefined {
-  const reciprocals = trials.flatMap((trial) =>
-    trial.correct && trial.rtMs !== undefined ? [1 / (trial.rtMs / 1000)] : []
-  )
+  const reciprocals = correctValidReciprocals(trials)
   if (reciprocals.length === 0) return
-  return (
-    reciprocals.reduce((sum, reciprocal) => sum + reciprocal, 0) /
-    reciprocals.length
-  )
+  return mean(reciprocals)
 }
 
 export function dailyProbeAccuracy(trials: readonly DailyProbeTrial[]): number {
@@ -103,4 +108,17 @@ export function dailyProbeLapseCount(
       ? trial.rtMs >= LAPSE_MS
       : trial.response === undefined
   ).length
+}
+
+export function dailyProbeVariability(
+  trials: readonly DailyProbeTrial[]
+): number | undefined {
+  const reciprocals = correctValidReciprocals(trials)
+  if (reciprocals.length < 2) return
+  const meanReciprocal = mean(reciprocals)
+  const sumSquaredDiffs = reciprocals.reduce(
+    (sum, reciprocal) => sum + (reciprocal - meanReciprocal) ** 2,
+    0
+  )
+  return Math.sqrt(sumSquaredDiffs / (reciprocals.length - 1))
 }

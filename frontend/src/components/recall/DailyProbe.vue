@@ -27,6 +27,13 @@
       <p data-testid="daily-probe-lapses" class="text-2xl font-semibold">
         {{ lapseCount }}
       </p>
+      <p
+        v-if="variabilityText"
+        data-testid="daily-probe-variability"
+        class="text-2xl font-semibold"
+      >
+        {{ variabilityText }}
+      </p>
       <button class="daisy-btn daisy-btn-primary" @click="emit('complete')">
         Continue
       </button>
@@ -44,6 +51,7 @@ import {
   dailyProbePracticeSequence,
   dailyProbeScoredSequence,
   dailyProbeSpeed,
+  dailyProbeVariability,
   mapDailyProbeKey,
   recordDailyProbeTrial,
   type DailyProbeSide,
@@ -80,6 +88,9 @@ const accuracyText = computed(
   () => `${dailyProbeAccuracy(scoredTrials.value)}%`
 )
 const lapseCount = computed(() => dailyProbeLapseCount(scoredTrials.value))
+const variabilityText = computed(() =>
+  dailyProbeVariability(scoredTrials.value)?.toFixed(2)
+)
 
 let stimulusOnsetMs = 0
 let respondedThisTrial = false
