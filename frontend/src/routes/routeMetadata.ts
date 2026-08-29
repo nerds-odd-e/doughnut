@@ -119,4 +119,8 @@ export const routeMetadata: RouteMetadata[] = [
       memoryTrackerId: Number(route.params.memoryTrackerId),
     }),
   },
+  { path: "/settings", name: "settingsGeneral" },
+  { path: "/settings/recent", name: "settingsRecent" },
+  { path: "/settings/access-tokens", name: "settingsAccessTokens" },
+  { path: "/settings/recall-stats", name: "settingsRecallStats" },
 ]

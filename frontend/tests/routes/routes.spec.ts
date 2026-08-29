@@ -110,17 +110,31 @@ describe("routes", () => {
   })
 
   describe("dummy metadata records", () => {
-    it("compile the same failureReport href as production", () => {
-      const dummyRouter = createRouter({
+    function dummyRouter() {
+      return createRouter({
         history: createMemoryHistory(),
         routes: dummyRouteRecordsFromMetadata,
       })
+    }
+
+    it("compile the same failureReport href as production", () => {
       const location = {
         name: "failureReport",
         params: { failureReportId: "1" },
       }
-      expect(dummyRouter.resolve(location).path).toBe(
+      expect(dummyRouter().resolve(location).path).toBe(
         router.resolve(location).path
+      )
+    })
+
+    it.each([
+      "settingsGeneral",
+      "settingsRecent",
+      "settingsAccessTokens",
+      "settingsRecallStats",
+    ] as const)("compile the same %s path as production", (name) => {
+      expect(dummyRouter().resolve({ name }).path).toBe(
+        router.resolve({ name }).path
       )
     })
   })

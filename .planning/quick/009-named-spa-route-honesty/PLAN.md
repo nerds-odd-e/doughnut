@@ -1,6 +1,6 @@
 # Named SPA route table honesty
 
-**Status:** in progress (slices 1–6 done).
+**Status:** in progress (slices 1–7 done).
 **Type:** ad-hoc plan (`.planning/quick/`)
 **Related ADR:** [0005 — Web routes](../../../docs/adrs/0005-web-routes.md) (**Proposed**, not Accepted). This plan makes production and unit tests match a stricter reading of the Decision at “SPA route convention” so that ADR can be tightened without lying. Agents do not set Status to Accepted.
 
@@ -98,13 +98,9 @@ Renderer specs assert compiled href via `noteShowHref(id)`. `quillHtmlToMarkdown
 
 One helper: `dummyRouteRecordsFromMetadata` in `frontend/src/routes/dummyRouteRecords.ts`. Storybook preview, `all-stories.spec.ts`, `noteShowHref`, and the four listed test routers consume it. Failure-report stub no longer uses `/failure-reports/:id`.
 
-### 7. Settings names and paths live in `routeMetadata` — Structure `[ ]`
+### 7. Settings names and paths live in `routeMetadata` — Structure `[x]`
 
-Add the settings tab records (paths `/settings`, `/settings/recent`, `/settings/access-tokens`, `/settings/recall-stats` and existing names) to `routeMetadata`. `routes.ts` still assembles the nested `SettingsPage` layout (same idea as `notebookSidebarNestedRouteNames`): skip those names in the generic map, read path/name from metadata.
-
-- Settings unit tests that already `push({ name: "settingsRecent" })` stay named.
-- Storybook metadata router can resolve settings names after this slice (dummy pages).
-- **Jidoka:** if nested assembly exceeds the time-box, stop after metadata entries exist and the generic mapper does not double-register them; finish wiring rather than inventing a third table.
+Four settings tab records in `routeMetadata`. `routes.ts` skips those names in the generic map and assembles nested `SettingsPage` from the table (tab components stay in `routes.ts`). Dummy mapper stays flat so Storybook can resolve the names.
 
 ### 8. Tighten Proposed ADR 0005 (and the frontend test rule) — Structure `[ ]`
 

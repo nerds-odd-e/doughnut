@@ -57,39 +57,73 @@ const notebookSidebarNestedRouteNames = new Set([
   "folderPage",
 ])
 
+const settingsTabComponents = {
+  settingsGeneral: GeneralSettingsTab,
+  settingsRecent: RecentSettingsTab,
+  settingsAccessTokens: AccessTokensSettingsTab,
+  settingsRecallStats: RecallStatsSettingsTab,
+}
+
+type SettingsTabName = keyof typeof settingsTabComponents
+
+function isSettingsTabName(name: string | undefined): name is SettingsTabName {
+  return name !== undefined && name in settingsTabComponents
+}
+
+function routeMetadataByName(name: string) {
+  const found = routeMetadata.find((metadata) => metadata.name === name)
+  if (found === undefined) {
+    throw new Error(`routeMetadata is missing named entry "${name}"`)
+  }
+  return found
+}
+
+function relativePathUnder(parentPath: string, childPath: string): string {
+  if (childPath === parentPath) {
+    return ""
+  }
+  const prefix = `${parentPath}/`
+  if (!childPath.startsWith(prefix)) {
+    throw new Error(`Path "${childPath}" is not under "${parentPath}"`)
+  }
+  return childPath.slice(prefix.length)
+}
+
 // Combine route metadata with components
-const routesFromMetadata: RouteRecordRaw[] = routeMetadata.map((metadata) => {
-  if (metadata.redirect !== undefined) {
+const routesFromMetadata: RouteRecordRaw[] = routeMetadata
+  .filter((metadata) => !isSettingsTabName(metadata.name))
+  .map((metadata) => {
+    if (metadata.redirect !== undefined) {
+      return {
+        path: metadata.path,
+        redirect: metadata.redirect,
+      } as RouteRecordRaw
+    }
+    const name = metadata.name!
+    if (notebookSidebarNestedRouteNames.has(name)) {
+      const parent: RouteRecordRaw = {
+        path: metadata.path,
+        component: NotebookSidebarLayout,
+        children: [
+          {
+            path: "",
+            name,
+            component: componentMap[name]!,
+            props: metadata.props,
+            meta: metadata.meta,
+          },
+        ],
+      }
+      if (metadata.alias !== undefined) {
+        parent.alias = metadata.alias
+      }
+      return parent
+    }
     return {
-      path: metadata.path,
-      redirect: metadata.redirect,
-    } as RouteRecordRaw
-  }
-  const name = metadata.name!
-  if (notebookSidebarNestedRouteNames.has(name)) {
-    const parent: RouteRecordRaw = {
-      path: metadata.path,
-      component: NotebookSidebarLayout,
-      children: [
-        {
-          path: "",
-          name,
-          component: componentMap[name]!,
-          props: metadata.props,
-          meta: metadata.meta,
-        },
-      ],
+      ...metadata,
+      component: componentMap[name]!,
     }
-    if (metadata.alias !== undefined) {
-      parent.alias = metadata.alias
-    }
-    return parent
-  }
-  return {
-    ...metadata,
-    component: componentMap[name]!,
-  }
-}) as RouteRecordRaw[]
+  }) as RouteRecordRaw[]
 
 const legacyDeeplinkPrefixRedirect: RouteRecordRaw = {
   path: "/d/:pathMatch(.*)*",
@@ -101,31 +135,21 @@ const legacyDeeplinkPrefixRedirect: RouteRecordRaw = {
   },
 }
 
+const settingsGeneralMetadata = routeMetadataByName("settingsGeneral")
+
 const settingsNestedRoute: RouteRecordRaw = {
-  path: "/settings",
+  path: settingsGeneralMetadata.path,
   component: SettingsPage,
-  children: [
-    {
-      path: "",
-      name: "settingsGeneral",
-      component: GeneralSettingsTab,
-    },
-    {
-      path: "recent",
-      name: "settingsRecent",
-      component: RecentSettingsTab,
-    },
-    {
-      path: "access-tokens",
-      name: "settingsAccessTokens",
-      component: AccessTokensSettingsTab,
-    },
-    {
-      path: "recall-stats",
-      name: "settingsRecallStats",
-      component: RecallStatsSettingsTab,
-    },
-  ],
+  children: (Object.keys(settingsTabComponents) as SettingsTabName[]).map(
+    (name) => {
+      const metadata = routeMetadataByName(name)
+      return {
+        path: relativePathUnder(settingsGeneralMetadata.path, metadata.path),
+        name,
+        component: settingsTabComponents[name],
+      }
+    }
+  ),
 }
 
 const routes: RouteRecordRaw[] = [
