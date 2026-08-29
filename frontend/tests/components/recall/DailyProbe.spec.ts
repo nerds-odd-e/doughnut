@@ -1,6 +1,7 @@
 import DailyProbe from "@/components/recall/DailyProbe.vue"
 import {
   DAILY_PROBE_ISI_MS,
+  DAILY_PROBE_TIMEOUT_MS,
   dailyProbePracticeSequence,
   dailyProbeScoredSequence,
 } from "@/models/dailyProbe"
@@ -8,6 +9,7 @@ import { DailyProbeController } from "@generated/donut-backend-api/sdk.gen"
 import helper, { mockSdkService } from "@tests/helpers"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
+import { defineComponent, KeepAlive, nextTick } from "vue"
 
 const instruction =
   "Each trial shows ← or →. Press F for left, J for right (arrow keys also work). Go as fast as you can without mistakes."
@@ -121,5 +123,42 @@ describe("DailyProbe", () => {
       [{ body: { trials: unknown[] } }],
     ]
     expect(posted[0][0].body.trials).toHaveLength(20)
+  })
+
+  it("does not post and restarts after a KeepAlive detour mid-run", async () => {
+    const WrapperComponent = defineComponent({
+      components: { DailyProbe, KeepAlive },
+      data() {
+        return { show: true }
+      },
+      template: `<KeepAlive><DailyProbe v-if="show" key="daily-probe" /></KeepAlive>`,
+    })
+    wrapper = helper.component(WrapperComponent).mount()
+    await nextTick()
+    expect(wrapper.find('[data-testid="daily-probe-stimulus"]').text()).toBe(
+      "←"
+    )
+
+    vi.advanceTimersByTime(DAILY_PROBE_TIMEOUT_MS + DAILY_PROBE_ISI_MS)
+    await nextTick()
+    expect(wrapper.find('[data-testid="daily-probe-stimulus"]').text()).toBe(
+      "→"
+    )
+
+    await wrapper.setData({ show: false })
+    await nextTick()
+    const trialCount =
+      dailyProbePracticeSequence.length + dailyProbeScoredSequence.length
+    vi.advanceTimersByTime(
+      trialCount * (DAILY_PROBE_TIMEOUT_MS + DAILY_PROBE_ISI_MS)
+    )
+    await flushPromises()
+    expect(createDailyProbe).not.toHaveBeenCalled()
+
+    await wrapper.setData({ show: true })
+    await nextTick()
+    expect(wrapper.find('[data-testid="daily-probe-stimulus"]').text()).toBe(
+      "←"
+    )
   })
 })
