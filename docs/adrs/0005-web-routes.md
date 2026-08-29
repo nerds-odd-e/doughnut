@@ -40,24 +40,32 @@ covers how those links relate to **web** destinations.
 
 ### SPA route convention
 
-- One named route table: path / name / props in metadata; page components
-  wired separately so tests and Storybook can import metadata without pages.
-- **Navigate by route name and params**, not by concatenating path strings.
-  Shared named-location helpers wrap hot destinations (note show). A path
-  string is allowed only where an HTML `href` is required (rendered anchors).
+- SPA path literals for screens live only in `routeMetadata` (plus the `/d/`
+  leftover-path rewrite).
+- In-app `push` / `replace` / `:to` is always a named location (or a helper
+  that returns one).
+- An HTML `href` is allowed only on rendered anchors, and is **compiled** from
+  a named location against that table — never a second concatenated copy of the
+  compact note-show path.
+- Unit tests: navigation assertions use named locations; rendered-href
+  assertions use `noteShowHref`; path strings only in `routes.spec.ts`
+  (matching / redirects) and inbound URL classifiers.
+- Test routers use production `routes` or stub records from `routeMetadata`,
+  not a hand-copied path dialect.
+- Nested layouts (notebook sidebar, settings) are assembled in `routes.ts`
+  from named metadata entries.
 - The URL identifies the **server-side id**, not the portable path (ADR 0004:
   path is identity in the tree; note id is server-side). Note-show URLs are
   compact. Retired shapes (including a former site-wide prefix) redirect into
   the current table; do not keep a second tree of screens.
 - Chrome on the same resource (for example conversation open) is **query on
   that named route**, not a new path.
-- Notebook / note / folder screens share one nested sidebar layout under those
-  named routes.
 
 ### Using the convention
 
-- Add a screen: named metadata entry, wire the page, push/link by **name**.
-- Do not hardcode SPA path literals in components, tests, or stored markdown.
+- Add a screen: named metadata entry, wire the page (nested layouts in
+  `routes.ts` from those entries), push/link by **name**.
+- Do not concatenate SPA path literals in components or stored markdown.
 - Do not add client routes to the backend or to `backendPathHints` in
   `doughnut-routing.json`.
 - The non-production login screen is a named SPA route, production continue is a

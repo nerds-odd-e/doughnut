@@ -56,6 +56,14 @@ In most situations, run all unit tests instead of a selected file only. Use a si
 - Use `data-testid` for test selectors.
 - Use Vitest browser mode and prefer real browser rendering over mocking sibling components or internal modules; stop using jsdom.
 
+## Routing assertions
+
+Navigation assertions use named locations (or helpers that return them).
+Rendered-href assertions use `noteShowHref`. Path strings belong only in
+`routes.spec.ts` (matching / redirects) and inbound URL classifiers. Test
+routers use production `routes` or stub records from `routeMetadata`, not a
+hand-copied path dialect.
+
 ## Avoid Role Queries
 
 - Do not use `getByRole`, `findByRole`, `queryByRole`, `getAllByRole`, and similar queries; they are slow due to expensive visibility checks.
