@@ -5031,6 +5031,20 @@ components:
         nightSamples:
           type: integer
           format: int32
+    DailyProbeDay:
+      type: object
+      properties:
+        date:
+          type: string
+        speed:
+          type: number
+          format: double
+        lapses:
+          type: integer
+          format: int32
+        variability:
+          type: number
+          format: double
     DayAvgResponseTime:
       type: object
       properties:
@@ -5152,6 +5166,10 @@ components:
           $ref: "#/components/schemas/PaceStats"
         accuracy:
           $ref: "#/components/schemas/AccuracyStats"
+        dailyProbe:
+          type: array
+          items:
+            $ref: "#/components/schemas/DailyProbeDay"
     QuestionGenerationBatchUserScheduleDTO:
       type: object
       properties:

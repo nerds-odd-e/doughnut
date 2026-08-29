@@ -3,12 +3,14 @@ package com.odde.donut.services;
 import com.odde.donut.controllers.dto.RecallStatsDTO;
 import com.odde.donut.controllers.dto.RecallStatsDTO.AccuracyStats;
 import com.odde.donut.controllers.dto.RecallStatsDTO.AmPmResponseTime;
+import com.odde.donut.controllers.dto.RecallStatsDTO.DailyProbeDay;
 import com.odde.donut.controllers.dto.RecallStatsDTO.DayAvgResponseTime;
 import com.odde.donut.controllers.dto.RecallStatsDTO.DayCount;
 import com.odde.donut.controllers.dto.RecallStatsDTO.DayRetention;
 import com.odde.donut.controllers.dto.RecallStatsDTO.HeadlineStats;
 import com.odde.donut.controllers.dto.RecallStatsDTO.PaceStats;
 import com.odde.donut.entities.User;
+import com.odde.donut.entities.repositories.DailyProbeRepository;
 import com.odde.donut.entities.repositories.RecallPromptRepository;
 import com.odde.donut.utils.TimestampOperations;
 import java.sql.Timestamp;
@@ -26,10 +28,13 @@ import org.springframework.stereotype.Service;
 @Service
 public class RecallStatsService {
   private final RecallPromptRepository recallPromptRepository;
+  private final DailyProbeRepository dailyProbeRepository;
 
   @Autowired
-  public RecallStatsService(RecallPromptRepository recallPromptRepository) {
+  public RecallStatsService(
+      RecallPromptRepository recallPromptRepository, DailyProbeRepository dailyProbeRepository) {
     this.recallPromptRepository = recallPromptRepository;
+    this.dailyProbeRepository = dailyProbeRepository;
   }
 
   public RecallStatsDTO compute(User user, ZoneId zoneId, Timestamp now) {
@@ -45,7 +50,12 @@ public class RecallStatsService {
         recent.add(r);
       }
     }
-    return aggregateRows(recent, allTime, zoneId, now);
+    return aggregateRows(
+        recent,
+        allTime,
+        zoneId,
+        now,
+        DailyProbeDaySeries.from(dailyProbeRepository.findByUser(user), zoneId));
   }
 
   private List<RecallAnswerRow> findAllTimeAnsweredRows(User user, Timestamp now) {
@@ -55,6 +65,15 @@ public class RecallStatsService {
 
   static RecallStatsDTO aggregateRows(
       List<RecallAnswerRow> recent, List<RecallAnswerRow> allTime, ZoneId zoneId, Timestamp now) {
+    return aggregateRows(recent, allTime, zoneId, now, List.of());
+  }
+
+  static RecallStatsDTO aggregateRows(
+      List<RecallAnswerRow> recent,
+      List<RecallAnswerRow> allTime,
+      ZoneId zoneId,
+      Timestamp now,
+      List<DailyProbeDay> dailyProbe) {
     List<RecallAnswerRow> recentReviews = reviewsOnly(recent);
     List<RecallAnswerRow> allTimeReviews = reviewsOnly(allTime);
     LocalDate today = localToday(now, zoneId);
@@ -146,7 +165,8 @@ public class RecallStatsService {
         weekdayHourCorrect,
         totals,
         pace,
-        accuracy);
+        accuracy,
+        dailyProbe);
   }
 
   private static List<RecallAnswerRow> reviewsOnly(List<RecallAnswerRow> rows) {

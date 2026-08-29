@@ -16,6 +16,7 @@ public class RecallStatsDTO {
   private HeadlineStats totals;
   private PaceStats pace;
   private AccuracyStats accuracy;
+  private List<DailyProbeDay> dailyProbe;
 
   @Data
   @AllArgsConstructor
@@ -37,6 +38,15 @@ public class RecallStatsDTO {
   public static class DayRetention {
     private String date;
     private Double retentionPct;
+  }
+
+  @Data
+  @AllArgsConstructor
+  public static class DailyProbeDay {
+    private String date;
+    private Double speed;
+    private int lapses;
+    private Double variability;
   }
 
   @Data

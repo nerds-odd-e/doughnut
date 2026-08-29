@@ -938,6 +938,13 @@ export type AmPmResponseTime = {
     nightSamples?: number;
 };
 
+export type DailyProbeDay = {
+    date?: string;
+    speed?: number;
+    lapses?: number;
+    variability?: number;
+};
+
 export type DayAvgResponseTime = {
     date?: string;
     avgMs?: number;
@@ -987,6 +994,7 @@ export type RecallStatsDto = {
     totals?: HeadlineStats;
     pace?: PaceStats;
     accuracy?: AccuracyStats;
+    dailyProbe?: Array<DailyProbeDay>;
 };
 
 export type QuestionGenerationBatchUserScheduleDto = {
