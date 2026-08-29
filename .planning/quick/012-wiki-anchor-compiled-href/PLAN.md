@@ -1,6 +1,6 @@
 # Compiled href for wiki / path-Markdown anchors
 
-**Status:** in progress (slices 1–2 done).
+**Status:** in progress (slices 1–3 done).
 **Type:** ad-hoc plan (`.planning/quick/`)
 **Depends on:** Proposed [ADR 0005](../../../docs/adrs/0005-web-routes.md) wiki-destination clause (compiled `href`; concept path is not a Vue location). ADR wording for this policy is already in that draft — this plan is the product change.
 
@@ -10,7 +10,7 @@ Live path-Markdown anchors use the same compiled note-show `href` as live `[[wik
 
 ## Inspection
 
-Live `[[wiki]]` and live path Markdown (body and property field) compile `href` via `noteShowHref`. Unresolved wiki uses `#`; unresolved path Markdown still keeps the concept path. `handleRichContentAnchorClick` still `navigateInApp(href)` for leftover non-http strings. Quill left-click `preventDefault`s; user-visible hole is middle-click / copy-link / open-in-new-tab, plus leftover click that misses `data-note-id`.
+Live `[[wiki]]` and live path Markdown (body and property field) compile `href` via `noteShowHref`. Unresolved wiki and unresolved path Markdown use `href="#"`. `handleRichContentAnchorClick` still `navigateInApp(href)` for leftover non-http strings, so a leftover concept-path or `#` can still be fed to the router. Quill left-click `preventDefault`s; remaining hole is leftover click that misses `data-note-id`.
 
 `WikiLinkToken.vue` already uses named `noteShowLocation` / `href="#"`. Backend token parse is unchanged.
 
@@ -39,7 +39,7 @@ Verify with `CURSOR_DEV=true nix develop -c pnpm frontend:test` on the specs nam
 
 **Done:** `upgradePathMarkdownAnchors` emits `noteShowHref(w.noteId)` and still matches marked concept-path `<a href>` plus leftover live/dead tags whose `href` is the concept path. Serialize still uses `data-wiki-title`.
 
-**Learning:** leftover in-session live tags with a concept-path `href` needed an extra replace (shared `livePathMarkdownAttrs`). Slice 3 still must match `href="#"` after unresolved wrapping.
+**Learning:** leftover in-session live tags with a concept-path `href` needed an extra replace (shared `livePathMarkdownAttrs`).
 
 ### 2. Live path-Markdown in a property field has a note-show href — Behavior `[x]`
 
@@ -47,17 +47,15 @@ Verify with `CURSOR_DEV=true nix develop -c pnpm frontend:test` on the specs nam
 **Trigger:** Render the property value field.
 **Post:** Live anchor `href` is `noteShowHref(id)`. Serialize still `[Moon](/Moon.md)`. No wiki brackets on path Markdown.
 
-**Done:** `propertyValuePlainToDisplayHtml` live path-Markdown uses `noteShowHref(noteId)`; unresolved still uses concept-path `href` until slice 3.
+**Done:** `propertyValuePlainToDisplayHtml` live path-Markdown uses `noteShowHref(noteId)`.
 
-### 3. Unresolved path-Markdown href is `#` — Behavior `[ ]`
+### 3. Unresolved path-Markdown href is `#` — Behavior `[x]`
 
 **Pre:** Path Markdown in body or property field does not resolve (dead or pending).
 **Trigger:** Render rich content / property field.
-**Post:** Unresolved anchor `href` is `#` (same as unresolved `[[wiki]]`). `data-wiki-title` is still the concept path. Serialize still path Markdown. Dead click still opens the dead-wiki flow, not a route.
+**Post:** Unresolved anchor `href` is `#`. `data-wiki-title` is still the concept path. Serialize still path Markdown.
 
-Tests: `NoteTextContent.wikiLinks.spec.ts` unresolved path Markdown (add `href="#"`); `propertyValueField.spec.ts` unresolved `href="/Moon.md"` → `href="#"` (keep `not.toContain("/n")` for unresolved); `replaceWikiLinksInHtml` / `quillHtmlToMarkdown` unresolved path Markdown round-trip after wrap. Dead→live still upgrades when wikiTitles arrive (`upgradePathMarkdownAnchors` must match dead/pending tags with `href="#"` as well as leftover concept-path `href`s).
-
-Production: `markUnresolvedWikiLinks` and property-field unresolved path Markdown pass `href: "#"`.
+**Done:** `markUnresolvedWikiLinks` and property-field unresolved path Markdown emit `href="#"`. `upgradePathMarkdownAnchors` upgrades leftover concept-path and `href="#"` dead/pending tags to live `noteShowHref`.
 
 ### 4. Concept-path and `#` hrefs are not routed — Behavior `[ ]`
 

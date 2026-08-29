@@ -78,6 +78,7 @@ describe("NoteTextContent wiki link display", () => {
       ".ql-editor a.dead-wiki-link"
     ) as HTMLAnchorElement
     expect(dead.textContent).toContain("label")
+    expect(dead.getAttribute("href")).toBe("#")
     expect(dead.getAttribute("data-wiki-title")).toBe("/Folder/Missing.md")
   })
 

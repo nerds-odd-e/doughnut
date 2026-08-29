@@ -48,7 +48,7 @@ export function propertyValuePlainToDisplayHtml(
       const { target, display } = splitAuthoredToken(occ.token)
       const noteId = noteIdForAuthoredToken(occ.token, map)
       out += wikiLinkAnchorHtml({
-        href: noteId !== undefined ? noteShowHref(noteId) : target,
+        href: noteId !== undefined ? noteShowHref(noteId) : "#",
         className:
           noteId === undefined
             ? unresolvedWikiClass(occ.token, lastSavedTokens)

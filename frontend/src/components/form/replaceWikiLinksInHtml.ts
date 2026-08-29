@@ -22,6 +22,11 @@ import {
   wikiTitleParts,
 } from "@/utils/wikiLinkMarkup"
 
+const UNRESOLVED_WIKI_LINK_CLASSES = [
+  DEAD_WIKI_LINK_CLASS,
+  PENDING_WIKI_LINK_CLASS,
+] as const
+
 function authoredTokenFromWikiAnchor(anchor: Element): string {
   const target = anchor.getAttribute("data-wiki-title") ?? ""
   if (hrefLooksLikeConceptNotePath(target)) {
@@ -65,14 +70,13 @@ function upgradeUnresolvedWikiAnchors(
   wikiTitles: WikiTitle[]
 ): string {
   if (wikiTitles.length === 0) return html
-  const unresolvedClasses = [DEAD_WIKI_LINK_CLASS, PENDING_WIKI_LINK_CLASS]
-  if (!unresolvedClasses.some((c) => html.includes(c))) return html
+  if (!UNRESOLVED_WIKI_LINK_CLASSES.some((c) => html.includes(c))) return html
   const parsed = parseWikiHtmlFragment(html)
   if (!parsed) return html
   const { wrap } = parsed
-  const unresolvedAnchorSelector = unresolvedClasses
-    .map((c) => `a.${c}`)
-    .join(", ")
+  const unresolvedAnchorSelector = UNRESOLVED_WIKI_LINK_CLASSES.map(
+    (c) => `a.${c}`
+  ).join(", ")
 
   for (const w of wikiTitles) {
     if (isPathMarkdownWikiTitle(w)) continue
@@ -160,15 +164,20 @@ function upgradePathMarkdownAnchors(
       ...livePathMarkdownAttrs,
     })
     result = result.replaceAll(`<a href="${attrTarget}">${display}</a>`, live)
-    result = result.replaceAll(
-      wikiLinkAnchorHtml({
-        href: target,
-        className: DEAD_WIKI_LINK_CLASS,
-        target,
-        display,
-      }),
-      live
-    )
+    const leftoverUnresolvedHrefs = [target, "#"]
+    for (const leftoverHref of leftoverUnresolvedHrefs) {
+      for (const className of UNRESOLVED_WIKI_LINK_CLASSES) {
+        result = result.replaceAll(
+          wikiLinkAnchorHtml({
+            href: leftoverHref,
+            className,
+            target,
+            display,
+          }),
+          live
+        )
+      }
+    }
     result = result.replaceAll(
       wikiLinkAnchorHtml({ href: target, ...livePathMarkdownAttrs }),
       live
@@ -193,7 +202,7 @@ function markUnresolvedWikiLinks(
       if (!hrefLooksLikeConceptNotePath(href)) return full
       const token = `[${display}](${href})`
       return wikiLinkAnchorHtml({
-        href,
+        href: "#",
         className: unresolvedWikiClass(token, lastSavedTokens),
         target: href,
         display,

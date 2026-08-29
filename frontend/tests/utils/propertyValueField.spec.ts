@@ -67,11 +67,9 @@ describe("propertyValueField utils", () => {
 
   it("renders unresolved path Markdown in a scalar as a dead wiki-style link", () => {
     const html = propertyValuePlainToDisplayHtml("[Moon](/Moon.md)", [])
-    expect(html).toContain('class="dead-wiki-link"')
-    expect(html).toContain('href="/Moon.md"')
-    expect(html).not.toContain("donut-wiki-link")
-    expect(html).not.toContain("wiki-bracket")
-    expect(html).not.toContain("/n")
+    expect(html).toBe(
+      '<a href="#" class="dead-wiki-link" data-wiki-title="/Moon.md" data-wiki-display="Moon">Moon</a>'
+    )
   })
 
   it("round-trips path Markdown from a field root without converting to wiki", () => {
