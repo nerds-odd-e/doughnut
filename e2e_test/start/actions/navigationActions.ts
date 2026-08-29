@@ -30,6 +30,16 @@ export const navigationActions = {
     return assumeNotePage(noteTopology)
   },
 
+  jumpToNoteShowWithConversationQuery(noteTopology: string) {
+    testability()
+      .getInjectedNoteIdByTitle(noteTopology)
+      .then((noteId: number) => {
+        router().push('noteShow', { noteId }, { conversation: 'true' })
+      })
+    waitUntilAppIsNotBusy()
+    return assumeNotePage(noteTopology)
+  },
+
   jumpToNotebookPage(notebookName: string) {
     testability()
       .getNotebookIdByName(notebookName)

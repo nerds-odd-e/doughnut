@@ -34,23 +34,25 @@ const router = () => {
     )
   }
 
-  const push = (name: string, params: RouteParams = {}) => {
+  const push = (name: string, params: RouteParams = {}, query?: RouteQuery) => {
     cy.get('@firstVisited').then((firstVisited) => {
       const isFirstVisited =
         (firstVisited as unknown as { valueOf(): string }).valueOf() === 'yes'
       if (!isFirstVisited) {
-        return visitNamed(name, params)
+        return visitNamed(name, params, query)
       }
       return cy.window().then((win: CustomWindow) => {
         if (!win.router) {
-          return visitNamed(name, params)
+          return visitNamed(name, params, query)
         }
         return cy.wrap(
-          win.router.push(namedLocation(name, params)).catch((error) => {
-            cy.log('router push failed')
-            cy.log(error as string)
-            throw error
-          })
+          win.router
+            .push({ ...namedLocation(name, params), query })
+            .catch((error) => {
+              cy.log('router push failed')
+              cy.log(error as string)
+              throw error
+            })
         )
       })
     })

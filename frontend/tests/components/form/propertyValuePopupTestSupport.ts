@@ -1,5 +1,8 @@
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
-import { openValuePopup } from "./propertyValuePopupTestDom"
+import {
+  openValuePopup,
+  mountEditorOnNoteShow,
+} from "./propertyValuePopupTestDom"
 import {
   mountTopicValuePopup,
   SCALAR_TOPIC_MARKDOWN,
@@ -33,9 +36,7 @@ Body`
 export async function mountImageMaskValuePopup(
   h: Harness
 ): Promise<VueWrapper> {
-  const wrapper = await h.mountEditor(IMAGE_MASK_MARKDOWN, {
-    attachToBody: true,
-  })
+  const wrapper = await mountEditorOnNoteShow(h, IMAGE_MASK_MARKDOWN)
   await openValuePopup(wrapper)
   return wrapper
 }

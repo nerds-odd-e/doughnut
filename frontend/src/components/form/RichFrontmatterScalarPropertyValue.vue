@@ -37,7 +37,7 @@
       class="daisy-btn daisy-btn-ghost daisy-btn-sm square shrink-0"
       :aria-label="`Edit property value for ${propertyKey} in dialog`"
       data-testid="rich-note-property-value-popup-open"
-      @click="localValueDialogOpen = true"
+      @click="openValuePanel"
     >
       <SquarePen class="h-4 w-4" aria-hidden="true" />
     </button>
@@ -52,19 +52,26 @@
       :property-value="propertyRow.value"
       :list-mode-allowed="listModeAllowed"
       @save="onValueDialogSave"
-      @cancel="localValueDialogOpen = false"
+      @cancel="closeValuePanel"
     />
   </div>
 </template>
 
 <script setup lang="ts">
 import { SquarePen } from "@lucide/vue"
-import { computed, ref } from "vue"
+import { computed } from "vue"
+import { useRoute, useRouter, type RouteLocationNamedRaw } from "vue-router"
 import RichFrontmatterListPropertyValue from "@/components/form/RichFrontmatterListPropertyValue.vue"
 import RichFrontmatterPropertyExternalLink from "@/components/form/RichFrontmatterPropertyExternalLink.vue"
 import RichFrontmatterPropertyValueDialog from "@/components/form/RichFrontmatterPropertyValueDialog.vue"
 import PropertyValueField from "@/components/form/PropertyValueField.vue"
 import type { WikiTitle } from "@generated/donut-backend-api"
+import { noteRouteFamilyNoteId } from "@/routes/noteRouteFamily"
+import {
+  notePropertyKeyFromRoute,
+  notePropertyLocation,
+  noteShowLocation,
+} from "@/routes/noteShowLocation"
 import {
   isScalarOnlyStructuralPropertyKey,
   isTextCapablePropertyRow,
@@ -96,13 +103,12 @@ const emit = defineEmits<{
   "dead-wiki-link-click": [payload: DeadWikiLinkPayload]
 }>()
 
-const localValueDialogOpen = ref(false)
+const route = useRoute()
+const router = useRouter()
 
 const propertyKey = computed(() => props.propertyRow.key)
 const textCapable = computed(() => isTextCapablePropertyRow(props.propertyRow))
-const valueDialogOpen = computed(
-  () => localValueDialogOpen.value || (props.isFocused && textCapable.value)
-)
+const valueDialogOpen = computed(() => props.isFocused && textCapable.value)
 const isListValue = computed(() => isListPropertyValue(props.propertyRow.value))
 const listValue = computed(() =>
   isListPropertyValue(props.propertyRow.value) ? props.propertyRow.value : null
@@ -131,9 +137,36 @@ function onValuePointerDown(event: PointerEvent) {
   primeSoftKeyboard()
 }
 
+function currentNoteId(): number {
+  return Number(noteRouteFamilyNoteId(route))
+}
+
+function replaceKeepingQuery(location: RouteLocationNamedRaw) {
+  return router.replace({
+    ...location,
+    query: { ...route.query },
+  })
+}
+
+function openValuePanel() {
+  if (
+    route.name === "noteProperty" &&
+    notePropertyKeyFromRoute(route) === propertyKey.value
+  ) {
+    return
+  }
+  return replaceKeepingQuery(
+    notePropertyLocation(currentNoteId(), propertyKey.value)
+  )
+}
+
+function closeValuePanel() {
+  return replaceKeepingQuery(noteShowLocation(currentNoteId()))
+}
+
 function onValueDialogSave(value: PropertyValue) {
   emit("update:propertyValue", value)
-  localValueDialogOpen.value = false
   emit("commit")
+  return closeValuePanel()
 }
 </script>

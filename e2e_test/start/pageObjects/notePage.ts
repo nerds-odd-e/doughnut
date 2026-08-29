@@ -11,9 +11,10 @@ import {
   findNoteContentRegion,
   noteContentRegion,
 } from './notePageContentRegion'
+import { notePropertyLocationMethods } from './notePropertyLocationMethods'
 import { noteRelationshipMethods } from './noteRelationshipMethods'
-import { noteRichPropertyMethods } from './noteRichPropertyMethods'
 import { noteRichPropertyAssimilationMethods } from './noteRichPropertyAssimilationMethods'
+import { noteRichPropertyMethods } from './noteRichPropertyMethods'
 import { noteWikiLinkMethods } from './noteWikiLinkMethods'
 
 const mainNoteHeadingTitleSelector =
@@ -164,6 +165,7 @@ export const assumeNotePage = (
     ...noteWikiLinkMethods(assumeNotePage),
     ...noteContentEditingMethods(),
     ...noteRichPropertyMethods(),
+    ...notePropertyLocationMethods(),
     ...noteRichPropertyAssimilationMethods(),
     ...noteRelationshipMethods(),
     ...sidebarChildNotePageMethods(),

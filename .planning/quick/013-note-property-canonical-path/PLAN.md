@@ -1,6 +1,6 @@
 # Note property canonical path
 
-**Status:** in progress (slices 1–4 done; 5–17 remaining).
+**Status:** in progress (slices 1–5 done; 6–17 remaining).
 **Type:** ad-hoc plan (`.planning/quick/`)
 **Policy:** [ADR 0001](../../../docs/adrs/0001-ubiquitous-language.md) (**Property**, **Wiki link**), [ADR 0004](../../../docs/adrs/0004-okf-compatible-notebook-markdown-accepted.md) (`#prop:`), Proposed [ADR 0005](../../../docs/adrs/0005-web-routes.md) (`noteProperty`).
 **Human-owned exception (2026-08-29):** ADR 0001 / ADR 0004 may depend on
@@ -132,11 +132,13 @@ Stay on `noteProperty`. Banner `Property "<decoded key>" not found` via
 `RichFrontmatterPropertyNotFound`. No other dialog. E2E in
 `note_property.feature`; steps in `e2e_test/step_definitions/note_property.ts`.
 
-### 5. Property panel transitions update the location — **Behavior** — planned
+### 5. Property panel transitions update the location — **Behavior** — done
 
-**Pre:** on a note-family route with an existing property. **Trigger:** open or
-close its value panel. **Post:** opening replaces to `noteProperty`; closing
-replaces to `noteShow`; unrelated query values are preserved.
+Open `replace`s to `noteProperty`; close `replace`s to `noteShow` via
+`replaceKeepingQuery` on `RichFrontmatterScalarPropertyValue`. Unrelated
+query is preserved. E2E in `note_property.feature`. Panel replace is
+local to the value component — slice 6 still needs a **current-route**
+helper for conversation (toolbar, overflow, `handleCloseConversation`).
 
 ### 6. Conversation preserves the current property location — **Behavior** — planned
 

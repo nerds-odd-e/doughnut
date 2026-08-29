@@ -59,3 +59,22 @@ Feature: Note property location
       | note-title |
       | Vitamins   |
     And the property "example of" should not be found
+
+  Scenario: Opening a property value panel goes to that property location
+    Given I visit note "Vitamins"
+    When I open the value panel for property "topic"
+    Then I should be at property "topic" of note "Vitamins"
+    And the rich note property "topic" should be focused with its value dialog open
+
+  Scenario: Closing a property value panel returns to the note location
+    Given I visit property "topic" of note "Vitamins"
+    When I close the value panel
+    Then I should be at note "Vitamins"
+    And the property value dialog should be closed
+
+  Scenario: Property panel open and close keep an unrelated conversation query
+    Given I visit note "Vitamins" with conversation query
+    When I open the value panel for property "topic"
+    Then I should be at property "topic" of note "Vitamins" with conversation query
+    When I close the value panel
+    Then I should be at note "Vitamins" with conversation query

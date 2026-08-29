@@ -1,7 +1,26 @@
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
+import { noteShowLocation } from "@/routes/noteShowLocation"
 import type { createRichMarkdownEditorTestHarness } from "./richMarkdownEditorTestHarness"
 
 type Harness = ReturnType<typeof createRichMarkdownEditorTestHarness>
+type MountEditorOptions = Parameters<Harness["mountEditor"]>[1]
+
+export const PROPERTY_VALUE_PANEL_NOTE_ID = 42
+
+export async function mountEditorOnNoteShow(
+  h: Harness,
+  markdown: string,
+  options: MountEditorOptions = {}
+) {
+  const noteId =
+    (options.noteId as number | undefined) ?? PROPERTY_VALUE_PANEL_NOTE_ID
+  return h.mountEditor(markdown, {
+    attachToBody: true,
+    ...options,
+    noteId,
+    route: options.route ?? noteShowLocation(noteId),
+  })
+}
 
 export async function openValuePopup(wrapper: VueWrapper) {
   const openBtn = wrapper.find(
@@ -13,7 +32,7 @@ export async function openValuePopup(wrapper: VueWrapper) {
 }
 
 export async function mountPropertyValuePopup(h: Harness, markdown: string) {
-  const wrapper = await h.mountEditor(markdown, { attachToBody: true })
+  const wrapper = await mountEditorOnNoteShow(h, markdown)
   await openValuePopup(wrapper)
   return wrapper
 }

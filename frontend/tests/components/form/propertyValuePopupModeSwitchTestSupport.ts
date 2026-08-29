@@ -2,6 +2,7 @@ import { flushPromises, type VueWrapper } from "@vue/test-utils"
 import {
   clickListAdd,
   clickModeTab,
+  mountEditorOnNoteShow,
   openValuePopup,
   setListItemValue,
 } from "./propertyValuePopupTestDom"
@@ -27,7 +28,7 @@ export async function mountTopicValuePopup(
   h: Harness,
   markdown: string = SCALAR_TOPIC_MARKDOWN
 ): Promise<VueWrapper> {
-  const wrapper = await h.mountEditor(markdown, { attachToBody: true })
+  const wrapper = await mountEditorOnNoteShow(h, markdown)
   await openValuePopup(wrapper)
   return wrapper
 }

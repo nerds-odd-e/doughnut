@@ -2,8 +2,10 @@
 /// <reference types="../support" />
 // @ts-check
 
-import { Then, When } from '@badeball/cypress-cucumber-preprocessor'
+import { Given, Then, When } from '@badeball/cypress-cucumber-preprocessor'
 import start from '../start'
+
+const conversationQuery = { conversation: 'true' }
 
 When(
   'I visit property {string} of note {string}',
@@ -11,6 +13,21 @@ When(
     start.jumpToNoteProperty(noteTopology, propertyKey)
   }
 )
+
+Given(
+  'I visit note {string} with conversation query',
+  (noteTopology: string) => {
+    start.jumpToNoteShowWithConversationQuery(noteTopology)
+  }
+)
+
+When('I open the value panel for property {string}', (key: string) => {
+  start.assumeNotePage().openRichNotePropertyValuePanel(key)
+})
+
+When('I close the value panel', () => {
+  start.assumeNotePage().closePropertyValuePanel()
+})
 
 Then(
   'the rich note property {string} should be focused with its value dialog open',
@@ -30,4 +47,35 @@ Then(
 
 Then('the property {string} should not be found', (key: string) => {
   start.assumeNotePage().expectRichNotePropertyNotFound(key)
+})
+
+Then(
+  'I should be at property {string} of note {string}',
+  (propertyKey: string, noteTopology: string) => {
+    start.assumeNotePage().expectAtNoteProperty(noteTopology, propertyKey)
+  }
+)
+
+Then(
+  'I should be at property {string} of note {string} with conversation query',
+  (propertyKey: string, noteTopology: string) => {
+    start
+      .assumeNotePage()
+      .expectAtNoteProperty(noteTopology, propertyKey, conversationQuery)
+  }
+)
+
+Then('I should be at note {string}', (noteTopology: string) => {
+  start.assumeNotePage().expectAtNoteShow(noteTopology)
+})
+
+Then(
+  'I should be at note {string} with conversation query',
+  (noteTopology: string) => {
+    start.assumeNotePage().expectAtNoteShow(noteTopology, conversationQuery)
+  }
+)
+
+Then('the property value dialog should be closed', () => {
+  start.assumeNotePage().expectPropertyValueDialogClosed()
 })

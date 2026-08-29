@@ -3,6 +3,7 @@ import {
   clickListMoveDown,
   clickListMoveUp,
   clickSave,
+  mountEditorOnNoteShow,
   openValuePopup,
 } from "./propertyValuePopupTestDom"
 import { createRichMarkdownEditorTestHarness } from "./richMarkdownEditorTestHarness"
@@ -23,7 +24,7 @@ tags:
 ---
 
 Body`
-    const wrapper = await h.mountEditor(markdown, { attachToBody: true })
+    const wrapper = await mountEditorOnNoteShow(h, markdown)
     await openValuePopup(wrapper)
 
     const moveUpFirst = document.querySelector(
