@@ -20,8 +20,11 @@ remains **dropped**, this time on solid footing, and the component readouts
 deliverable. Per the gate's own rule, weights are not tuned to rescue this
 number. `recall_stats.feature`'s pace scenario stays `@wip` — a second,
 unrelated E2E race condition was found (see Discoveries).
-Slices 26–33 (daily probe, optional tail) were not started; 32–33 reference
-the now-dropped composite index and need re-scoping if picked up later.
+Slices 26–33 (daily probe, plus dependent analyses) were not started and
+have been extracted to
+`.planning/quick/007-daily-cognitive-probe/PLAN.md` and
+`.planning/quick/008-probe-convergent-analyses/PLAN.md` respectively — see
+"Daily probe and dependent analyses — extracted" below.
 **Type:** ad-hoc plan (`.planning/quick/`)
 **Research memo:** https://claude.ai/code/artifact/9e13f954-fc5e-48e5-868f-f75d03f811c1
 
@@ -1176,11 +1179,11 @@ Dropped with 22 — no hero readout, no thin-morning case needed.
 Signed A / S / L / V bars turn "96" into "accuracy normal, slower and more
 erratic than usual".
 
-Dropped with 22 — no index to explain. **Note for slices 32–33 below**, which
-were written assuming this index exists: 32 compares "index versus probe" and
-33's trigger condition references "slice 24 shows speed and accuracy moving
-against each other" — both need re-scoping if/when the daily-probe slices
-(26+) are picked up, since the composite index they reference won't exist.
+Dropped with 22 — no index to explain. The since-extracted convergent-validity
+and EZ-diffusion slices assumed this index existed ("index versus probe", and
+a trigger condition referencing this slice's contribution bars); both were
+re-scoped during extraction — see
+`.planning/quick/008-probe-convergent-analyses/PLAN.md`.
 
 #### 25. The index gets a trend — Behavior `[dropped]`
 
@@ -1189,70 +1192,23 @@ legend rather than introducing a second control grammar.
 
 Dropped with 22 — no index to trend.
 
-### Daily probe
+### Daily probe and dependent analyses — extracted
 
-#### 26. Probe flag on `user` — Structure `[ ]`
+Slices 26–33 (daily probe, plus the analyses that depend on it and/or on the
+now-dropped composite index) were never started. They are extracted to two
+new plans rather than carried further here:
 
-`V300000304__add_daily_probe_enabled_to_user.sql`:
-`TINYINT(1) NOT NULL DEFAULT '0'`, following `health_remove_empty_folders_default`.
-Plus the DTO field and a regenerated TypeScript client.
-
-- The one deliberate exception to the nullable rule: this is a setting, not an
-  observation, and default-off is the intended behaviour for existing users.
-- **Enables slice 27 only.**
-
-#### 27. The daily probe can be switched on in General settings — Behavior `[ ]`
-
-A checkbox in `GeneralSettingsTab.vue` that persists, default off. Nothing runs
-yet — but the learner opts in before anything is measured.
-
-- E2E: extend `users/user_profile.feature`
-- Help text must state that turning it off closes the convergent-validity route.
-
-#### 28. The probe runs and shows this morning's result — Behavior `[ ]`
-
-~20 trials, about 60 seconds, offered before the first recall of the day when
-enabled. Identical stimuli every day — that is what removes every item confound
-by construction.
-
-- **Interim:** result is not stored — removed by slice 30.
-- E2E: new `recall/daily_cognitive_probe.feature`
-
-#### 29. `cognitive_probe` table — Structure `[ ]`
-
-`V300000305__create_cognitive_probe.sql`: user FK with CASCADE,
-`started_at timestamp(3)`, summary columns, and `trials_json` for the raw
-per-trial array.
-
-- Raw trials as well as summaries, deliberately: summary statistics cannot be
-  un-summarized, and a revised lapse definition or an EZ fit needs them.
-- **Enables slice 30 only.** Regenerate `docs/database-erd.md`.
-
-#### 30. The probe result persists and is offered once a day — Behavior `[ ]`
-
-A second recall session the same morning does not re-prompt.
-
-#### 31. Recall Stats shows the probe trend — Behavior `[ ]`
-
-Mean reciprocal RT, lapses and variability over the same window toggle.
-
-#### 32. Convergent validity is reported against the probe — Behavior `[ ]`
-
-Internal diagnostic: index versus probe on mornings with both, compared against
-the index-versus-raw-accuracy correlation. The probe is an independent speeded
-task with no shared item structure, which is what makes it a usable criterion.
-
-### Optional tail
-
-#### 33. Rolling EZ-diffusion separates caution from capacity — Behavior `[ ]`
-
-Drift rate and boundary separation over a rolling three-morning window, on the
-MCQ subset, fitted on residualized latencies.
-
-- Only worth building if slice 24 shows speed and accuracy moving against each
-  other often enough to matter.
-- EZ assumes two-choice symmetric boundaries and needs 30–50 trials; RT variance
-  is its noisiest input. Rolling, never daily.
+- `.planning/quick/007-daily-cognitive-probe/PLAN.md` — the probe itself
+  (was slices 26–31): opt-in setting, the ~60s probe, its own table, and its
+  trend on Recall Stats. Self-contained; does not depend on the dropped
+  composite index.
+- `.planning/quick/008-probe-convergent-analyses/PLAN.md` — the two analyses
+  that were blocked on things that no longer exist (was slices 32–33):
+  convergent validity (originally probe-versus-index, re-scoped to
+  probe-versus-each-shipped-component) and rolling EZ-diffusion (whose
+  trigger condition referenced the dropped contribution-bars slice 24).
+  Both are re-scoped there but explicitly **not** ready to execute without a
+  fresh planning pass.
 
 ---
 
@@ -1261,11 +1217,14 @@ MCQ subset, fitted on residualized latencies.
 | Artifact | Slices |
 |----------|--------|
 | `e2e_test/features/recall/recall_timing.feature` | 5–7, 14.6 |
-| `e2e_test/features/recall/recall_stats.feature` | 9–14, 14.5, 17, 31 |
-| `e2e_test/features/recall/daily_cognitive_probe.feature` | 28, 30 |
+| `e2e_test/features/recall/recall_stats.feature` | 9–14, 14.5, 17 |
 | `e2e_test/features/recall/browse_answer_and_notes_while_recalling.feature` | 1, 14.7 |
-| `e2e_test/features/users/user_profile.feature` | 27 (extend) |
 | `scripts/` backfill script | 18 |
+
+`recall/daily_cognitive_probe.feature` and the extension to
+`users/user_profile.feature` moved to
+`.planning/quick/007-daily-cognitive-probe/PLAN.md` with the slices that
+create them.
 
 ## Per-slice wrap-up
 

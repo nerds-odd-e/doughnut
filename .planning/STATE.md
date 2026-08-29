@@ -37,4 +37,6 @@ Scheduling follows Accepted [ADR 0003](../docs/adrs/0003-spaced-repetition-sched
 - Infer pending vs dead wiki links and show a third style via `.planning/quick/006-wiki-link-pending-style/PLAN.md` (planned, not executed)
 - Complete remaining doughnut → donut naming via `.planning/quick/002-complete-donut-naming/PLAN.md`
 - Nested Report shape is in `docs/commissioned-learning-session-protocol.md`; implement via `.planning/quick/003-nested-session-item-report/PLAN.md`
+- Opt-in daily cognitive probe, extracted from the closed morning-index plan: `.planning/quick/007-daily-cognitive-probe/PLAN.md` (planned, not started)
+- Probe convergent-validity and EZ-diffusion analyses, extracted and re-scoped but not yet planned: `.planning/quick/008-probe-convergent-analyses/PLAN.md` (needs a `/slice-planning` pass before execution)
 - After deploying the Flyway squash, confirm startup succeeded and `flyway_schema_history` shows the baseline repaired, the collapsed versions marked `DELETE`, and `V300000300` applied
