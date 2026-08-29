@@ -22,7 +22,7 @@ Feature: Path Markdown links in notes
     Then the note content markdown source should contain "<markdown>"
     And the note content markdown source should not contain "[[<display>]]"
     When I view the note content as rich content
-    Then following the wiki link "<display>" should open the note titled "<target_title>"
+    Then the wiki link "<display>" should open the note titled "<target_title>"
     And the note content on the current page should be "<target_content>"
 
     Examples:

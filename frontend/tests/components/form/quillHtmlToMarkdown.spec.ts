@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest"
 import htmlToMarkdown from "@/components/form/quillHtmlToMarkdown"
 import { replaceWikiLinksInHtml } from "@/components/form/replaceWikiLinksInHtml"
+import { noteShowHref } from "@/routes/noteShowLocation"
 import { wikiTitleFromAuthoredToken } from "@/utils/wikiLinkMarkup"
 
 describe("quillHtmlToMarkdown", () => {
@@ -57,6 +58,7 @@ describe("quillHtmlToMarkdown", () => {
     ${"converts pending wiki anchors"}                | ${'<p><a href="#" class="pending-wiki-link" data-wiki-title="Unknown">Unknown</a></p>'}                                                                      | ${"[[Unknown]]"}
     ${"donut-wiki-link with piped wiki attrs"}        | ${'<p><a href="/n1" class="donut-wiki-link" data-wiki-title="A" data-wiki-display="B">B</a></p>'}                                                            | ${"[[A|B]]"}
     ${"path markdown donut-wiki-link keeps markdown"} | ${'<p><a href="/Folder/Title.md" class="donut-wiki-link" data-wiki-title="/Folder/Title.md" data-wiki-display="label" data-note-id="42">label</a></p>'}      | ${"[label](/Folder/Title.md)"}
+    ${"live path markdown with noteShowHref"}         | ${`<p><a href="${noteShowHref(42)}" class="donut-wiki-link" data-wiki-title="/Folder/Title.md" data-wiki-display="label" data-note-id="42">label</a></p>`}   | ${"[label](/Folder/Title.md)"}
     ${"path markdown without .md keeps href"}         | ${'<p><a href="/Folder/Title" class="donut-wiki-link" data-wiki-title="/Folder/Title" data-wiki-display="label">label</a></p>'}                              | ${"[label](/Folder/Title)"}
     ${"path markdown dead-wiki-link keeps markdown"}  | ${'<p><a href="/Folder/Missing.md" class="dead-wiki-link" data-wiki-title="/Folder/Missing.md" data-wiki-display="label">label</a></p>'}                     | ${"[label](/Folder/Missing.md)"}
   `("wiki links: $label", ({ html, expected }) => {
