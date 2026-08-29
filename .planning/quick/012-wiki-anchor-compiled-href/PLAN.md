@@ -1,6 +1,6 @@
 # Compiled href for wiki / path-Markdown anchors
 
-**Status:** in progress (slice 1 done).
+**Status:** in progress (slices 1–2 done).
 **Type:** ad-hoc plan (`.planning/quick/`)
 **Depends on:** Proposed [ADR 0005](../../../docs/adrs/0005-web-routes.md) wiki-destination clause (compiled `href`; concept path is not a Vue location). ADR wording for this policy is already in that draft — this plan is the product change.
 
@@ -10,7 +10,7 @@ Live path-Markdown anchors use the same compiled note-show `href` as live `[[wik
 
 ## Inspection
 
-Live `[[wiki]]` and live **body** path Markdown compile `href` via `noteShowHref`. Property-field path Markdown still uses the concept path as `href`. Unresolved wiki uses `#`; unresolved path Markdown still keeps the concept path. `handleRichContentAnchorClick` still `navigateInApp(href)` for leftover non-http strings. Quill left-click `preventDefault`s; user-visible hole is middle-click / copy-link / open-in-new-tab, plus leftover click that misses `data-note-id`.
+Live `[[wiki]]` and live path Markdown (body and property field) compile `href` via `noteShowHref`. Unresolved wiki uses `#`; unresolved path Markdown still keeps the concept path. `handleRichContentAnchorClick` still `navigateInApp(href)` for leftover non-http strings. Quill left-click `preventDefault`s; user-visible hole is middle-click / copy-link / open-in-new-tab, plus leftover click that misses `data-note-id`.
 
 `WikiLinkToken.vue` already uses named `noteShowLocation` / `href="#"`. Backend token parse is unchanged.
 
@@ -41,15 +41,13 @@ Verify with `CURSOR_DEV=true nix develop -c pnpm frontend:test` on the specs nam
 
 **Learning:** leftover in-session live tags with a concept-path `href` needed an extra replace (shared `livePathMarkdownAttrs`). Slice 3 still must match `href="#"` after unresolved wrapping.
 
-### 2. Live path-Markdown in a property field has a note-show href — Behavior `[ ]`
+### 2. Live path-Markdown in a property field has a note-show href — Behavior `[x]`
 
 **Pre:** A YAML property scalar (e.g. relationship `source`) is resolved path Markdown.
 **Trigger:** Render the property value field.
-**Post:** Live anchor `href` is `noteShowHref(id)`. Serialize still `[Moon](/Moon.md)` (or the authored token). No wiki brackets on path Markdown.
+**Post:** Live anchor `href` is `noteShowHref(id)`. Serialize still `[Moon](/Moon.md)`. No wiki brackets on path Markdown.
 
-Tests: `propertyValueField.spec.ts` live `/Moon.md` → `noteShowHref(42)` (round-trip markdown unchanged); `RichMarkdownEditor.propertyWikiLinks.spec.ts` relationship source live `href`.
-
-Production: `propertyValuePlainToDisplayHtml` path-Markdown live branch uses `noteShowHref(noteId)` instead of `target`. Unresolved in this function still uses the concept-path `href` until slice 3.
+**Done:** `propertyValuePlainToDisplayHtml` live path-Markdown uses `noteShowHref(noteId)`; unresolved still uses concept-path `href` until slice 3.
 
 ### 3. Unresolved path-Markdown href is `#` — Behavior `[ ]`
 

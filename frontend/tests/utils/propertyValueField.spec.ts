@@ -61,7 +61,7 @@ describe("propertyValueField utils", () => {
       wikiTitleFromAuthoredToken("[Moon](/Moon.md)", 42),
     ])
     expect(html).toBe(
-      '<a href="/Moon.md" class="donut-wiki-link" data-wiki-title="/Moon.md" data-wiki-display="Moon" data-note-id="42">Moon</a>'
+      `<a href="${noteShowHref(42)}" class="donut-wiki-link" data-wiki-title="/Moon.md" data-wiki-display="Moon" data-note-id="42">Moon</a>`
     )
   })
 

@@ -78,7 +78,7 @@ Body`
     const live = wrapper
       .find(propertyRowSelector("source"))
       .element.querySelector("a.donut-wiki-link") as HTMLAnchorElement
-    expect(live.getAttribute("href")).toBe("/Moon.md")
+    expect(live.getAttribute("href")).toBe(noteShowHref(42))
     expect(live.textContent).toBe("Moon")
     expect(live.querySelector(".wiki-bracket")).toBeNull()
   })
