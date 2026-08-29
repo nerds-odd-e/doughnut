@@ -1,6 +1,6 @@
 # Daily probe follow-up (bugs, ADR gap, redundant tests)
 
-**Status:** in progress (slices 1–2 done).
+**Status:** in progress (slices 1–3 done).
 **Type:** ad-hoc plan (`.planning/quick/`)
 **Depends on:** shipped `.planning/quick/007-daily-cognitive-probe/PLAN.md`
 **Measurement spec:** [daily-probe-protocol.md](../../notes/daily-probe-protocol.md)
@@ -108,17 +108,11 @@ applies the flag only when non-null. `healthRemoveEmptyFoldersDefault`
 still defaults missing to false. `NotebookHealthPanel` still omits the
 field. Generated TS was already `dailyProbeEnabled?: boolean`.
 
-### 3. Continue into recall only after the result is saved — Behavior `[ ]`
+### 3. Continue into recall only after the result is saved — Behavior `[x]`
 
-**Pre:** All 20 scored trials have an outcome; the result screen is showing.
-**Trigger:** Persist succeeds or fails.
-**Post:** Continue is usable only after Saved; a failed save shows retry and
-does not emit `complete` (ordinary recall is not entered; this session still
-owes a completed row).
-
-Tests: `DailyProbe.spec.ts` — delay/error on `createDailyProbe`; Continue
-disabled until Saved; retry posts again. Existing E2E already waits for
-Saved on the happy path.
+Result screen `saveStatus` is `unsaved` | `saved` | `failed`. Continue is
+disabled until Saved; failed persist shows Retry and does not emit
+`complete`. Retry calls `createDailyProbe` again.
 
 ### 4. Extract the Daily probe offer branch from RecallPage — Structure `[ ]`
 

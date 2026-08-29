@@ -34,8 +34,21 @@
       >
         {{ variabilityText }}
       </p>
-      <p v-if="saved" data-testid="daily-probe-saved">Saved</p>
-      <button class="daisy-btn daisy-btn-primary" @click="emit('complete')">
+      <p v-if="saveStatus === 'saved'" data-testid="daily-probe-saved">Saved</p>
+      <button
+        v-if="saveStatus === 'failed'"
+        data-testid="daily-probe-retry"
+        class="daisy-btn"
+        @click="persistCompletedProbe"
+      >
+        Retry
+      </button>
+      <button
+        data-testid="daily-probe-continue"
+        class="daisy-btn daisy-btn-primary"
+        :disabled="saveStatus !== 'saved'"
+        @click="emit('complete')"
+      >
         Continue
       </button>
     </template>
@@ -83,7 +96,7 @@ const trialIndex = ref(0)
 const stimulus = ref<DailyProbeSide | undefined>()
 const scoredTrials = ref<DailyProbeTrial[]>([])
 const finished = ref(false)
-const saved = ref(false)
+const saveStatus = ref<"unsaved" | "saved" | "failed">("unsaved")
 
 const speed = computed(() => dailyProbeSpeed(scoredTrials.value))
 const accuracy = computed(() => dailyProbeAccuracy(scoredTrials.value))
@@ -139,6 +152,7 @@ function finishTrial(key?: string) {
 }
 
 async function persistCompletedProbe() {
+  saveStatus.value = "unsaved"
   const { error } = await apiCallWithLoading(() =>
     DailyProbeController.createDailyProbe({
       body: {
@@ -150,9 +164,7 @@ async function persistCompletedProbe() {
       },
     })
   )
-  if (!error) {
-    saved.value = true
-  }
+  saveStatus.value = !error ? "saved" : "failed"
 }
 
 function onKeydown(event: KeyboardEvent) {
@@ -176,7 +188,7 @@ function abandonUnfinishedRun() {
   stimulus.value = undefined
   scoredTrials.value = []
   finished.value = false
-  saved.value = false
+  saveStatus.value = "unsaved"
   respondedThisTrial = false
   abandoned = true
 }
