@@ -8,7 +8,6 @@ import static org.hamcrest.Matchers.*;
 import com.odde.donut.controllers.dto.RecallStatsDTO;
 import com.odde.donut.entities.QuestionType;
 import java.sql.Timestamp;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -62,7 +61,7 @@ class RecallStatsServiceAccuracyGuessingFloorTest {
     rows.add(
         answered(utc(200, 11), 5000, true, null, 10_001, lowRetrievability, QuestionType.SPELLING));
 
-    RecallStatsDTO dto = RecallStatsService.aggregateRows(rows, rows, ZoneId.of("UTC"), now);
+    RecallStatsDTO dto = aggregate(rows, now);
     RecallStatsDTO.AccuracyStats accuracy = dto.getAccuracy();
     assertThat(accuracy.getSampleSize(), equalTo(2));
     // MCQ's fitted guessing floor absorbs most of the low-retrievability correct answer's
