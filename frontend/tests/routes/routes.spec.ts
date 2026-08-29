@@ -3,6 +3,7 @@ import { h } from "vue"
 import { createMemoryHistory, createRouter, createWebHistory } from "vue-router"
 import type { RouteRecordRaw } from "vue-router"
 import { dummyRouteRecordsFromMetadata } from "@/routes/dummyRouteRecords"
+import { namedLocationHref } from "@/routes/namedLocationHref"
 import { noteShowHref, noteShowLocation } from "@/routes/noteShowLocation"
 import routes from "@/routes/routes"
 
@@ -106,6 +107,14 @@ describe("routes", () => {
       expect(
         router.currentRoute.value.matched.some((r) => r.name === "noteShow")
       ).toBe(false)
+    })
+  })
+
+  describe("namedLocationHref", () => {
+    it("compiles notebooks from the named location", () => {
+      expect(namedLocationHref({ name: "notebooks" })).toBe(
+        router.resolve({ name: "notebooks" }).href
+      )
     })
   })
 

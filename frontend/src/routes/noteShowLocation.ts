@@ -1,9 +1,5 @@
-import {
-  createMemoryHistory,
-  createRouter,
-  type RouteLocationNamedRaw,
-} from "vue-router"
-import { dummyRouteRecordsFromMetadata } from "./dummyRouteRecords"
+import type { RouteLocationNamedRaw } from "vue-router"
+import { namedLocationHref } from "./namedLocationHref"
 
 export function noteShowLocation(noteId: number): RouteLocationNamedRaw {
   return {
@@ -14,13 +10,8 @@ export function noteShowLocation(noteId: number): RouteLocationNamedRaw {
   }
 }
 
-const noteShowHrefRouter = createRouter({
-  history: createMemoryHistory(),
-  routes: dummyRouteRecordsFromMetadata,
-})
-
 export function noteShowHref(noteId: number): string {
-  return noteShowHrefRouter.resolve(noteShowLocation(noteId)).href
+  return namedLocationHref(noteShowLocation(noteId))
 }
 
 export function pathnameLooksLikeInternalNoteShow(pathname: string): boolean {
