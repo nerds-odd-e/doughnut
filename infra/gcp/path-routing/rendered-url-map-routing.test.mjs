@@ -81,6 +81,15 @@ test('rendered URL map: unknown frontend deep link hits catch-all bucket rewrite
   assert.ok(gcpRoutesToStaticBucket('/notebooks', rr.routingRules))
   assert.ok(gcpRoutesToStaticBucket('/recall', rr.routingRules))
   assert.ok(gcpRoutesToStaticBucket('/circles', rr.routingRules))
+  assert.ok(gcpRoutesToStaticBucket('/users/identify', rr.routingRules))
+})
+
+test('local proxy has no spaShellInsteadOfBackendExactPaths', () => {
+  const { routing } = renderRepoUrlMap()
+  assert.equal(
+    (routing.localProxy?.spaShellInsteadOfBackendExactPaths ?? []).length,
+    0
+  )
 })
 
 test('rendered URL map: defaultService is the backend bucket (backend paths are explicit)', () => {

@@ -33,12 +33,7 @@ public class NonProductConfiguration {
   public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
     http.csrf(AbstractHttpConfigurer::disable);
     http.cors(cors -> cors.configurationSource(corsConfigurationSource()));
-    http.authorizeHttpRequests(
-            auth ->
-                auth.requestMatchers(
-                        "/users/identify", // in non-product env, we use frontend to identify user
-                        "/api/games")
-                    .permitAll())
+    http.authorizeHttpRequests(auth -> auth.requestMatchers("/api/games").permitAll())
         .rememberMe(rememberMe -> rememberMe.alwaysRemember(true));
 
     commonConfiguration.commonConfig(http.httpBasic(Customizer.withDefaults()));

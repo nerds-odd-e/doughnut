@@ -15,11 +15,8 @@ public class ApplicationController {
     response.getWriter().write("User-agent: *\n");
   }
 
-  // This backend route is to trigger the authentication process to identify the user.
-  // In production, we use OAuth2 to identify the user.
-  // In non-production, we use frontend to identify the user.
-  @GetMapping({"/users/identify", "/login/continue"})
-  public String identify(
+  @GetMapping("/login/continue")
+  public String loginContinue(
       @RequestParam(name = "from", required = false, defaultValue = "/") String from) {
     return "redirect:" + from;
   }

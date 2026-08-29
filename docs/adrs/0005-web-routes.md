@@ -60,6 +60,8 @@ covers how those links relate to **web** destinations.
 - Do not hardcode SPA path literals in components, tests, or stored markdown.
 - Do not add client routes to the backend or to `backendPathHints` in
   `doughnut-routing.json`.
+- The non-production login screen is a named SPA route, production continue is a
+  backend path hint, and a `prod` backend must not present the password form.
 - E2E may `visit` a URL on first load; later in-app moves use named
   `router.push`.
 

@@ -4,7 +4,6 @@
     "pathPrefixes": [
       "/api/",
       "/attachments/",
-      "/users/",
       "/oauth2/",
       "/login/oauth2/"
     ],
@@ -15,9 +14,6 @@
     "/index.html",
     "/assets/.doughnut-path-routing-probe"
   ],
-  "localProxy": {
-    "spaShellInsteadOfBackendExactPaths": ["/users/identify"]
-  },
   "gcpUrlMap": {
     "name": "doughnut-app-service-map",
     "backendService": "https://www.googleapis.com/compute/v1/projects/carbon-syntax-298809/global/backendServices/doughnut-app-service",

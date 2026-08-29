@@ -32,4 +32,9 @@ class ApplicationControllerTest {
         .andExpect(status().isFound())
         .andExpect(redirectedUrl("/notebooks"));
   }
+
+  @Test
+  void usersIdentifyIsNotMapped() throws Exception {
+    mockMvc.perform(get("/users/identify")).andExpect(status().isNotFound());
+  }
 }

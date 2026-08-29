@@ -83,7 +83,7 @@ CI writes **immutable** prefixes: `frontend/<GITHUB_SHA>/`. See [Release at a gl
 
 Order **specific** paths **before** the catch-all that sends traffic to GCS.
 
-The **canonical routing** for prod URL-map generation, local LB backend classification, mandatory static probes, and CI validation lives in [`infra/gcp/path-routing/doughnut-routing.json`](../../infra/gcp/path-routing/doughnut-routing.json) (`backendPathHints`, `gcpUrlMap.staticPathRules`, `mandatoryStaticBucketProbes`, `localProxy`). `pnpm validate:path-routing` checks the URL map YAML **generated** from that file (dummy SHA when no `--url-map`). It also ensures root-level static paths implied by [`frontend/index.html`](../../frontend/index.html), [`frontend/public/`](../../frontend/public/), and (when present) `frontend/dist/index.html` are covered by a static pathRule. Unit tests: `pnpm test:path-routing`.
+The **canonical routing** for prod URL-map generation, local LB backend classification, mandatory static probes, and CI validation lives in [`infra/gcp/path-routing/doughnut-routing.json`](../../infra/gcp/path-routing/doughnut-routing.json) (`backendPathHints`, `gcpUrlMap.staticPathRules`, `mandatoryStaticBucketProbes`). `pnpm validate:path-routing` checks the URL map YAML **generated** from that file (dummy SHA when no `--url-map`). It also ensures root-level static paths implied by [`frontend/index.html`](../../frontend/index.html), [`frontend/public/`](../../frontend/public/), and (when present) `frontend/dist/index.html` are covered by a static pathRule. Unit tests: `pnpm test:path-routing`.
 
 Send to the **backend service (MIG)** at least:
 
@@ -92,7 +92,7 @@ Send to the **backend service (MIG)** at least:
 | `/api/*` | REST API |
 | `/attachments/*` | [`AttachmentController`](../../backend/src/main/java/com/odde/donut/controllers/AttachmentController.java) |
 | `/logout` | Spring Security logout ([`CommonConfiguration`](../../backend/src/main/java/com/odde/donut/configs/CommonConfiguration.java)) |
-| `/users/identify` | Prod auth entry ([`ApplicationController`](../../backend/src/main/java/com/odde/donut/controllers/ApplicationController.java)) |
+| `/login/continue` | Prod auth bounce ([`ApplicationController`](../../backend/src/main/java/com/odde/donut/controllers/ApplicationController.java)) |
 | `/install` | CLI install script ([`InstallController`](../../backend/src/main/java/com/odde/donut/controllers/InstallController.java)) |
 | `/oauth2/*`, `/login/oauth2/*` (and any other OAuth paths your Spring Security config uses) | OAuth2 login |
 

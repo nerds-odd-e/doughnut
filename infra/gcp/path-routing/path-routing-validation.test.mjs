@@ -3,7 +3,7 @@ import path from 'node:path'
 import { test } from 'node:test'
 import { fileURLToPath } from 'node:url'
 import YAML from 'yaml'
-import { loadBackendPathHints } from './pathGoesToBackend.mjs'
+import { loadBackendPathHints, pathGoesToBackend } from './pathGoesToBackend.mjs'
 import {
   extractRootAbsolutePathsFromHtml,
   collectRequiredStaticPathsFromFrontend,
@@ -146,4 +146,13 @@ test('fixture: backend path must not match static bucket rule', () => {
 test('URL map rendered from doughnut-routing.json passes validation', () => {
   const { failures } = runRepoPathRoutingValidation({ repoRoot })
   assert.equal(failures.length, 0, failures.join('\n'))
+})
+
+test('identify is SPA-owned; continue stays backend; /users/ is not a prefix', () => {
+  const hints = loadBackendPathHints(
+    path.join(repoRoot, 'infra/gcp/path-routing/doughnut-routing.json')
+  )
+  assert.equal(pathGoesToBackend('/users/identify', hints), false)
+  assert.equal(pathGoesToBackend('/login/continue', hints), true)
+  assert.equal(pathGoesToBackend('/users/settings', hints), false)
 })
