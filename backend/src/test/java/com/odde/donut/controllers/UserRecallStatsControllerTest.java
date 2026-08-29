@@ -11,10 +11,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.donut.controllers.dto.RecallStatsDTO;
+import com.odde.donut.controllers.dto.RecallStatsDTO.DailyProbeDay;
 import com.odde.donut.entities.MemoryTracker;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.User;
 import java.sql.Timestamp;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,6 +52,60 @@ class UserRecallStatsControllerTest extends ControllerTestBase {
     assertThat(dto.getPace(), notNullValue());
     assertThat(dto.getPace().getSampleSize(), equalTo(0));
     assertThat(dto.getPace().getPctVsUsual(), nullValue());
+    assertThat(dto.getDailyProbe(), hasSize(0));
+  }
+
+  @Test
+  void completedDailyProbeDaysAreASparseOldestFirstSeries() {
+    Timestamp older = makeMe.aTimestamp().of(1, 8).fromShanghai().please();
+    Timestamp newer = makeMe.aTimestamp().of(2, 8).fromShanghai().please();
+    makeMe
+        .aDailyProbe()
+        .by(currentUser.getUser())
+        .completedAt(newer)
+        .speed(4.0)
+        .lapseCount(0)
+        .variability(0.0)
+        .please();
+    makeMe
+        .aDailyProbe()
+        .by(currentUser.getUser())
+        .completedAt(older)
+        .speed(3.0)
+        .lapseCount(2)
+        .variability(1.41)
+        .please();
+
+    List<DailyProbeDay> series = controller.getRecallStats("Asia/Shanghai").getDailyProbe();
+
+    assertThat(series, hasSize(2));
+    assertThat(series.get(0).getDate(), equalTo("1989-01-02"));
+    assertThat(series.get(0).getSpeed(), equalTo(3.0));
+    assertThat(series.get(0).getLapses(), equalTo(2));
+    assertThat(series.get(0).getVariability(), equalTo(1.41));
+    assertThat(series.get(1).getDate(), equalTo("1989-01-03"));
+    assertThat(series.get(1).getSpeed(), equalTo(4.0));
+    assertThat(series.get(1).getLapses(), equalTo(0));
+    assertThat(series.get(1).getVariability(), equalTo(0.0));
+  }
+
+  @Test
+  void dailyProbeOmitsOtherUsersRows() {
+    makeMe.aDailyProbe().please();
+
+    assertThat(controller.getRecallStats("UTC").getDailyProbe(), hasSize(0));
+  }
+
+  @Test
+  void dailyProbeGroupsCompletedAtByRequestTimezone() {
+    Timestamp completedAt = makeMe.aTimestamp().of(1, 4).fromShanghai().please();
+    makeMe.aDailyProbe().by(currentUser.getUser()).completedAt(completedAt).please();
+
+    assertThat(
+        controller.getRecallStats("Asia/Shanghai").getDailyProbe().get(0).getDate(),
+        equalTo("1989-01-02"));
+    assertThat(
+        controller.getRecallStats("UTC").getDailyProbe().get(0).getDate(), equalTo("1989-01-01"));
   }
 
   @Test

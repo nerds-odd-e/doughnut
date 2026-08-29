@@ -88,6 +88,7 @@ const fixture: RecallStatsDto = {
     standardizedResidual: 1.8,
     sampleSize: 6,
   },
+  dailyProbe: [],
 }
 
 describe("RecallStatsSettingsTab", () => {

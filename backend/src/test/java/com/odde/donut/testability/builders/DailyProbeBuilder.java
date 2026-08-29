@@ -6,6 +6,7 @@ import com.odde.donut.entities.DailyProbe;
 import com.odde.donut.entities.User;
 import com.odde.donut.testability.EntityBuilder;
 import com.odde.donut.testability.MakeMe;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,6 +24,26 @@ public class DailyProbeBuilder extends EntityBuilder<DailyProbe> {
 
   public DailyProbeBuilder by(User user) {
     entity.setUser(user);
+    return this;
+  }
+
+  public DailyProbeBuilder completedAt(Timestamp completedAt) {
+    entity.setCompletedAt(completedAt);
+    return this;
+  }
+
+  public DailyProbeBuilder speed(Double speed) {
+    entity.setSpeed(speed);
+    return this;
+  }
+
+  public DailyProbeBuilder lapseCount(int lapseCount) {
+    entity.setLapseCount(lapseCount);
+    return this;
+  }
+
+  public DailyProbeBuilder variability(Double variability) {
+    entity.setVariability(variability);
     return this;
   }
 
