@@ -1,7 +1,7 @@
 # Daily probe
 
-**Status:** in progress. Slices 1–8 shipped. Next: slice 9 (persist on
-completion).
+**Status:** in progress. Slices 1–9 shipped. Next: slice 10 (same local day
+bypasses the probe).
 **Type:** ad-hoc plan (`.planning/quick/`)
 **Extracted from:** `.planning/quick/001-morning-cognitive-index/PLAN.md`
 (unbuilt slices 26–31).
@@ -144,19 +144,14 @@ updated. No endpoint or UI.
 
 **Enables slice 9 only.**
 
-### 9. Completing the probe durably saves the result — Behavior `[ ]`
+### 9. Completing the probe durably saves the result — Behavior `[x]`
 
-**Pre-condition:** the learner starts and completes the Daily probe.
-**Trigger:** the final trial is submitted. **Post-condition:** the learner sees
-that today's result was saved, and the backend retains the exact raw trials
-plus their four summaries for that learner.
+Shipped: POST `/api/daily-probes` when scored trial 20 completes. Owner from
+the authenticated learner; `completedAt` from the testability clock; 20
+trials required. Result screen shows **Saved**. Client regenerated. E2E
+asserts the saved state before Continue.
 
-- Drive backend persistence through the controller boundary with the real DB;
-  derive ownership from the authenticated learner instead of accepting a
-  client-supplied user id.
-- Regenerate the TypeScript client, submit through the normal wrapped API, and
-  extend the Daily-probe E2E scenario through the visible saved state.
-- This slice removes the in-memory-only interim from slice 4.
+**Enables slice 10.**
 
 ### 10. A second recall session on the same local day bypasses the probe — Behavior `[ ]`
 

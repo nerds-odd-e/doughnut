@@ -40,6 +40,7 @@ export const recallDailyProbeMethods = () => ({
       runAt(index + 1)
     }
     runAt(0)
+    waitUntilAppIsNotBusy()
     return this
   },
   expectDailyProbeSpeed(speed: string) {
@@ -59,6 +60,10 @@ export const recallDailyProbeMethods = () => ({
       'contain',
       variability
     )
+    return this
+  },
+  expectDailyProbeSaved() {
+    cy.get('[data-testid="daily-probe-saved"]').should('contain', 'Saved')
     return this
   },
   continueFromDailyProbe() {
