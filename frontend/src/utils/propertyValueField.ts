@@ -27,7 +27,7 @@ import {
 /**
  * Renders a YAML property scalar with clickable wiki and path-Markdown links.
  * Well-formed wiki `[[title]]` uses bracket UI; path Markdown uses the same
- * live/dead/pending wiki-link classes as body path links (plain display, path href).
+ * live/dead/pending wiki-link classes as body path links (plain display).
  */
 export function propertyValuePlainToDisplayHtml(
   plain: string,
@@ -48,7 +48,7 @@ export function propertyValuePlainToDisplayHtml(
       const { target, display } = splitAuthoredToken(occ.token)
       const noteId = noteIdForAuthoredToken(occ.token, map)
       out += wikiLinkAnchorHtml({
-        href: target,
+        href: noteId !== undefined ? noteShowHref(noteId) : target,
         className:
           noteId === undefined
             ? unresolvedWikiClass(occ.token, lastSavedTokens)
