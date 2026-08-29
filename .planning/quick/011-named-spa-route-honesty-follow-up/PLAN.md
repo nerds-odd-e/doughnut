@@ -1,6 +1,6 @@
 # Named SPA route honesty follow-up
 
-**Status:** in progress — slices 1–3 done; next is slice 4.
+**Status:** in progress — slices 1–4 done; next is slice 5.
 **Type:** ad-hoc plan (`.planning/quick/`)
 **Depends on:** shipped `.planning/quick/009-named-spa-route-honesty/` (PLAN retired; code and Proposed [ADR 0005](../../../docs/adrs/0005-web-routes.md) remain)
 **Merged from:** this file’s 009 leftovers **and** the former `.planning/quick/011-e2e-named-route-honesty/` (deleted as a duplicate 011).
@@ -165,13 +165,11 @@ Optional already-escaped `innerHtml` on `wikiLinkAnchorHtml`. Property-field liv
 
 ---
 
-### 4. Compile any named location to href — Structure `[ ]`
+### 4. Compile any named location to href — Structure `[x]`
 
-**Timing:** no.
+`namedLocationHref({ name, params, query })` in `frontend/src/routes/namedLocationHref.ts` over `dummyRouteRecordsFromMetadata` (no page imports). `noteShowHref` wraps it. Extra compile example in `routes.spec.ts`: notebooks vs production `router.resolve`.
 
-`namedLocationHref` in `frontend/src/routes/`; `noteShowHref` wraps it. `routes.spec.ts`: one extra compile example (notebooks or recall) besides note-show. Do not lockstep every metadata name (slice 2 already collapsed dummy lockstep).
-
-**Verify:** `pnpm frontend:test tests/routes/routes.spec.ts`
+**Verify:** `pnpm frontend:test tests/routes/routes.spec.ts` — 13 passed.
 
 ---
 
