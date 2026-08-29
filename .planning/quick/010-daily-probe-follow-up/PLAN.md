@@ -1,6 +1,6 @@
 # Daily probe follow-up (bugs, ADR gap, redundant tests)
 
-**Status:** in progress (slices 1–4 done).
+**Status:** in progress (slices 1–5 done).
 **Type:** ad-hoc plan (`.planning/quick/`)
 **Depends on:** shipped `.planning/quick/007-daily-cognitive-probe/PLAN.md`
 **Measurement spec:** [daily-probe-protocol.md](../../notes/daily-probe-protocol.md)
@@ -122,18 +122,12 @@ No new UI. Existing `RecallPage.dailyProbe.spec.ts` still pass.
 
 Justified slice 5.
 
-### 5. A failed offer check shows retry, not a blank recall page — Behavior `[ ]`
+### 5. A failed offer check shows retry, not a blank recall page — Behavior `[x]`
 
-**Pre:** Daily probe is on; `GET /api/daily-probes/today` fails.
-**Trigger:** Learner is on recall (including KeepAlive return to the same
-page).
-**Post:** Visible retry; neither the probe nor ordinary recall until a
-successful GET. Retry then offers or skips as the payload says.
-
-Tests: mounted RecallPage / gate — mock GET error, assert retry CTA, no
-`DailyProbe`, no `Quiz`; retry success with `completed: false` shows the
-probe. `useDailyProbeOffer` must re-fetch on retry (not only when `enabled`
-flips).
+Failed GET `/today` sets offer-check failure; `DailyProbeGate` shows Retry.
+Neither probe nor ordinary recall until a successful GET. Retry calls
+`checkOffer` again (not only when `enabled` flips). KeepAlive keeps the
+retry UI until the learner retries.
 
 ### 6. Turning Daily probe off hides its Recall Stats trend — Behavior `[ ]`
 
