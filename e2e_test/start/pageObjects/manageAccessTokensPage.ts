@@ -3,7 +3,7 @@ import { submittableForm } from 'start/forms'
 import router from '../router'
 
 export const visitManageAccessTokensPage = () => {
-  router().visitNamed('settingsAccessTokens')
+  router().push('settingsAccessTokens')
   waitUntilAppIsNotBusy()
   return manageAccessTokensPage()
 }

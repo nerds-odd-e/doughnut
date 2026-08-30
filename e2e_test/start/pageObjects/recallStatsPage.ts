@@ -46,7 +46,7 @@ export const recallStatsPage = () => {
 }
 
 export const visitRecallStatsPage = () => {
-  router().visitNamed('settingsRecallStats')
+  router().push('settingsRecallStats')
   waitUntilAppIsNotBusy()
   return recallStatsPage()
 }
