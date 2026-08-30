@@ -25,11 +25,17 @@ function pressMappedKey(side: "left" | "right") {
   )
 }
 
-async function completeProbeWithMappedKeys() {
+function tapMappedSide(view: VueWrapper, side: "left" | "right") {
+  return view
+    .find(`[data-testid="daily-probe-response-zone-${side}"]`)
+    .trigger("pointerdown")
+}
+
+async function completeProbe(respond: (side: "left" | "right") => unknown) {
   const sequence = [...dailyProbePracticeSequence, ...dailyProbeScoredSequence]
   for (const side of sequence) {
     vi.advanceTimersByTime(250)
-    pressMappedKey(side)
+    await respond(side)
     vi.advanceTimersByTime(DAILY_PROBE_ISI_MS)
   }
   await flushPromises()
@@ -67,16 +73,50 @@ describe("DailyProbe", () => {
     expect(mountProbe().text()).toContain(DAILY_PROBE_INSTRUCTION)
   })
 
+  it("shows unlabeled side zones while the stimulus uses arrows", async () => {
+    const view = mountProbe()
+    await nextTick()
+    const left = view.find('[data-testid="daily-probe-response-zone-left"]')
+    const right = view.find('[data-testid="daily-probe-response-zone-right"]')
+    expect(left.text()).not.toMatch(/[←→]/)
+    expect(right.text()).not.toMatch(/[←→]/)
+    expect(view.find('[data-testid="daily-probe-stimulus"]').text()).toBe("←")
+  })
+
+  it("records a matching side-zone tap the same as F/J", async () => {
+    const view = mountProbe()
+    await completeProbe((side) => tapMappedSide(view, side))
+    expect(view.text()).toContain("4.00")
+  })
+
+  it("ignores a second tap and taps during the blank ISI", async () => {
+    const view = mountProbe()
+    await tapMappedSide(view, "left")
+    expect(view.find('[data-testid="daily-probe-stimulus"]').exists()).toBe(
+      false
+    )
+
+    await tapMappedSide(view, "left")
+    await tapMappedSide(view, "right")
+    expect(view.find('[data-testid="daily-probe-stimulus"]').exists()).toBe(
+      false
+    )
+
+    vi.advanceTimersByTime(DAILY_PROBE_ISI_MS)
+    await nextTick()
+    expect(view.find('[data-testid="daily-probe-stimulus"]').text()).toBe("→")
+  })
+
   it("shows speed 4.00 after every correct mapped key at 250 ms", async () => {
     const view = mountProbe()
-    await completeProbeWithMappedKeys()
+    await completeProbe(pressMappedKey)
     expect(view.text()).toContain("4.00")
     expect(view.text()).toContain("Continue")
   })
 
   it("shows Saved after posting twenty scored trials", async () => {
     const view = mountProbe()
-    await completeProbeWithMappedKeys()
+    await completeProbe(pressMappedKey)
     expect(view.find('[data-testid="daily-probe-saved"]').text()).toBe("Saved")
     expect(createDailyProbe).toHaveBeenCalledTimes(1)
     const posted = createDailyProbe.mock.calls as [
@@ -94,7 +134,7 @@ describe("DailyProbe", () => {
         })
     )
     const view = mountProbe()
-    await completeProbeWithMappedKeys()
+    await completeProbe(pressMappedKey)
     const continueButton = view.find('[data-testid="daily-probe-continue"]')
     expect(continueButton.attributes("disabled")).toBeDefined()
     expect(view.find('[data-testid="daily-probe-saved"]').exists()).toBe(false)
@@ -107,7 +147,7 @@ describe("DailyProbe", () => {
   it("shows retry after a failed save and does not emit complete", async () => {
     createDailyProbe.mockResolvedValue(wrapSdkError("save failed"))
     const view = mountProbe()
-    await completeProbeWithMappedKeys()
+    await completeProbe(pressMappedKey)
     expect(view.find('[data-testid="daily-probe-retry"]').exists()).toBe(true)
     const continueButton = view.find('[data-testid="daily-probe-continue"]')
     ;(continueButton.element as HTMLButtonElement).click()
@@ -118,7 +158,7 @@ describe("DailyProbe", () => {
   it("posts again when retrying a failed save", async () => {
     createDailyProbe.mockResolvedValueOnce(wrapSdkError("save failed"))
     const view = mountProbe()
-    await completeProbeWithMappedKeys()
+    await completeProbe(pressMappedKey)
     expect(createDailyProbe).toHaveBeenCalledTimes(1)
 
     await view.find('[data-testid="daily-probe-retry"]').trigger("click")

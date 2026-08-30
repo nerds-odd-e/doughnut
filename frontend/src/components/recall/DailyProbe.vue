@@ -1,57 +1,74 @@
 <template>
   <div
     data-testid="daily-probe"
-    class="h-full flex flex-col items-center justify-center gap-6 p-6 text-center"
+    class="h-full flex flex-col text-center"
   >
-    <template v-if="!finished">
-      <p>{{ DAILY_PROBE_INSTRUCTION }}</p>
+    <div class="flex-1 flex flex-col items-center justify-center gap-6 p-6">
+      <template v-if="!finished">
+        <p>{{ DAILY_PROBE_INSTRUCTION }}</p>
+        <div
+          v-if="stimulus"
+          data-testid="daily-probe-stimulus"
+          class="text-7xl leading-none"
+        >
+          {{ stimulus === "left" ? "←" : "→" }}
+        </div>
+      </template>
+      <template v-else>
+        <p
+          v-if="speedText"
+          data-testid="daily-probe-speed"
+          class="text-2xl font-semibold"
+        >
+          {{ speedText }}
+        </p>
+        <p data-testid="daily-probe-accuracy" class="text-2xl font-semibold">
+          {{ accuracyText }}
+        </p>
+        <p data-testid="daily-probe-lapses" class="text-2xl font-semibold">
+          {{ lapseCount }}
+        </p>
+        <p
+          v-if="variabilityText"
+          data-testid="daily-probe-variability"
+          class="text-2xl font-semibold"
+        >
+          {{ variabilityText }}
+        </p>
+        <p v-if="saveStatus === 'saved'" data-testid="daily-probe-saved">Saved</p>
+        <button
+          v-if="saveStatus === 'failed'"
+          data-testid="daily-probe-retry"
+          class="daisy-btn"
+          @click="persistCompletedProbe"
+        >
+          Retry
+        </button>
+        <button
+          data-testid="daily-probe-continue"
+          class="daisy-btn daisy-btn-primary"
+          :disabled="saveStatus !== 'saved'"
+          @click="emit('complete')"
+        >
+          Continue
+        </button>
+      </template>
+    </div>
+    <div
+      v-if="!finished"
+      class="flex w-full min-h-24 pb-[max(0.75rem,env(safe-area-inset-bottom))]"
+    >
       <div
-        v-if="stimulus"
-        data-testid="daily-probe-stimulus"
-        class="text-7xl leading-none"
-      >
-        {{ stimulus === "left" ? "←" : "→" }}
-      </div>
-    </template>
-    <template v-else>
-      <p
-        v-if="speedText"
-        data-testid="daily-probe-speed"
-        class="text-2xl font-semibold"
-      >
-        {{ speedText }}
-      </p>
-      <p data-testid="daily-probe-accuracy" class="text-2xl font-semibold">
-        {{ accuracyText }}
-      </p>
-      <p data-testid="daily-probe-lapses" class="text-2xl font-semibold">
-        {{ lapseCount }}
-      </p>
-      <p
-        v-if="variabilityText"
-        data-testid="daily-probe-variability"
-        class="text-2xl font-semibold"
-      >
-        {{ variabilityText }}
-      </p>
-      <p v-if="saveStatus === 'saved'" data-testid="daily-probe-saved">Saved</p>
-      <button
-        v-if="saveStatus === 'failed'"
-        data-testid="daily-probe-retry"
-        class="daisy-btn"
-        @click="persistCompletedProbe"
-      >
-        Retry
-      </button>
-      <button
-        data-testid="daily-probe-continue"
-        class="daisy-btn daisy-btn-primary"
-        :disabled="saveStatus !== 'saved'"
-        @click="emit('complete')"
-      >
-        Continue
-      </button>
-    </template>
+        data-testid="daily-probe-response-zone-left"
+        class="flex-1 touch-none"
+        @pointerdown="finishTrial('left')"
+      />
+      <div
+        data-testid="daily-probe-response-zone-right"
+        class="flex-1 touch-none"
+        @pointerdown="finishTrial('right')"
+      />
+    </div>
   </div>
 </template>
 

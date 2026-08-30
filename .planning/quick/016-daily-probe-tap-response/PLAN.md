@@ -1,6 +1,6 @@
 # Daily probe side tap
 
-**Status:** in progress (slice 1 done; next: slice 2).
+**Status:** in progress (slice 2 done; next: slice 3).
 **Type:** ad-hoc plan (`.planning/quick/`)
 **Measurement spec:** [daily-probe-protocol.md](../../notes/daily-probe-protocol.md)**
 
@@ -55,18 +55,12 @@ synthesizing keys. Scoring and stored trial shape unchanged.
 
 ---
 
-### 2. Tap a side zone to answer the current trial — Behavior `[ ]`
+### 2. Tap a side zone to answer the current trial — Behavior `[x]`
 
-**Pre:** Daily probe is showing a stimulus; unlabeled left and right response
-zones are on screen (not arrow-labeled). **Trigger:** `pointerdown` on the
-left or right zone. **Post:** that trial ends with that side as the response
-(same scoring as F/J); stimulus blanks for the ISI. Keyboard still answers
-the trial. Taps during the blank ISI do nothing. A second tap on the same
-trial is ignored.
-
-**Verify:** `frontend/tests/components/recall/DailyProbe.spec.ts` — pointerdown
-on a zone records that side; keyboard still works; zones must not contain
-←/→ (stimulus still does).
+Unlabeled bottom zones (`daily-probe-response-zone-left` / `-right`) call
+`finishTrial(side)` on `pointerdown`. Keyboard path unchanged. Zones have no
+←/→ or F/J text. Existing `completeDailyProbe()` keyboard E2E stays; slice 3
+adds a separate tap complete method (not a mode flag).
 
 ---
 
