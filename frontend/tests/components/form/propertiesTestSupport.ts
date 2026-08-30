@@ -1,5 +1,9 @@
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
-import { deadWikiLinkInPropertyValueEl } from "./propertiesTestDom"
+import {
+  deadWikiLinkInPropertyValueEl,
+  expandAndClickPropertyRowRemove,
+  propertyRowSelector,
+} from "./propertiesTestDom"
 import type { createRichMarkdownEditorTestHarness } from "./richMarkdownEditorTestHarness"
 
 type Harness = ReturnType<typeof createRichMarkdownEditorTestHarness>
@@ -49,6 +53,14 @@ export async function attemptRenamePropertyKey(
   await keyInput.trigger("focus")
   await keyInput.setValue(newKey)
   await keyInput.trigger("blur")
+  await flushPromises()
+}
+
+export async function attemptRemovePropertyRow(
+  wrapper: VueWrapper,
+  key: string
+) {
+  await expandAndClickPropertyRowRemove(wrapper, propertyRowSelector(key))
   await flushPromises()
 }
 

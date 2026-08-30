@@ -91,3 +91,10 @@ Feature: Note property location
     When I rename the focused property key from "topic" to "subject"
     Then I should be at property "subject" of note "Vitamins"
     And the rich note property "subject" should be focused with its value dialog open
+
+  Scenario: Deleting the focused property returns to the note location
+    Given the note "Vitamins" has assimilated property "topic"
+    And I visit property "topic" of note "Vitamins"
+    When I remove rich note property "topic" confirming memory tracker change
+    Then I should be at note "Vitamins"
+    And the property value dialog should be closed

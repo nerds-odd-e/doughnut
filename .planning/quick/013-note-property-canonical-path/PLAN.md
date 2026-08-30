@@ -1,6 +1,6 @@
 # Note property canonical path
 
-**Status:** in progress (slices 1–7 done; 8–17 remaining).
+**Status:** in progress (slices 1–8 done; 9–17 remaining).
 **Type:** ad-hoc plan (`.planning/quick/`)
 **Policy:** [ADR 0001](../../../docs/adrs/0001-ubiquitous-language.md) (**Property**, **Wiki link**), [ADR 0004](../../../docs/adrs/0004-okf-compatible-notebook-markdown-accepted.md) (`#prop:`), Proposed [ADR 0005](../../../docs/adrs/0005-web-routes.md) (`noteProperty`).
 **Human-owned exception (2026-08-29):** ADR 0001 / ADR 0004 may depend on
@@ -150,14 +150,14 @@ E2E on specialized `wikidata_id` so the toolbar is reachable.
 Successful rename `replace`s to `noteProperty` with the new exact key via
 `useFollowFocusedPropertyLocation`. Query preserved (`locationKeepingQuery`).
 Property value dialog uses `closeOnRouteChange: false` so the replace does
-not close the dialog. Slice 8 delete should join the same follow-after-save
-seam. Inbound `#prop:` not rewritten.
+not close the dialog. Inbound `#prop:` not rewritten.
 
-### 8. Deleting the focused property returns to the note — **Behavior** — planned
+### 8. Deleting the focused property returns to the note — **Behavior** — done
 
-**Pre:** on `noteProperty` for an editable key. **Trigger:** confirm and save
-that property's removal through the existing tracker guard. **Post:** the route
-replaces to `noteShow`; unrelated query values remain.
+Focused-key removal `replace`s to `noteShow` via
+`useFollowFocusedPropertyLocation` (`replaceWhenFocusedKeyRemoved`). Query
+preserved. Deleting a different key stays on `noteProperty`. E2E in
+`note_property.feature`.
 
 ### 9. Next to assimilate a property uses `noteProperty` — **Behavior** — planned
 

@@ -42,9 +42,8 @@ export function useRichFrontmatterPropertyEditing(options: {
   )
   const { confirmAndApplyRemoval, confirmAndApplyRename } =
     usePropertyMemoryTrackerGuard(options.noteId, reloadNoteInfo)
-  const { followFocusedPropertyRename } = useFollowFocusedPropertyLocation(
-    options.propertyRows
-  )
+  const { followFocusedPropertyRename, followFocusedPropertyDelete } =
+    useFollowFocusedPropertyLocation(options.propertyRows)
 
   function filterForEmit(rows: PropertyRow[]): PropertyRow[] {
     if (!options.isReadmeContext()) return rows
@@ -122,6 +121,7 @@ export function useRichFrontmatterPropertyEditing(options: {
       options.propertyRows.value,
       idx
     )
+    await followFocusedPropertyDelete(key)
     options.clearValidation()
     options.onPropertiesChanged(filterForEmit([...options.propertyRows.value]))
   }

@@ -1,10 +1,11 @@
 import type { Ref } from "vue"
-import { useRoute, useRouter } from "vue-router"
+import { useRoute, useRouter, type RouteLocationNamedRaw } from "vue-router"
 import { noteRouteFamilyNoteId } from "@/routes/noteRouteFamily"
 import {
   locationKeepingQuery,
   notePropertyKeyFromRoute,
   notePropertyLocation,
+  noteShowLocation,
 } from "@/routes/noteShowLocation"
 
 export function useFollowFocusedPropertyLocation(
@@ -13,13 +14,15 @@ export function useFollowFocusedPropertyLocation(
   const route = useRoute()
   const router = useRouter()
 
-  function followFocusedPropertyRename(toKey: string) {
+  function replaceWhenFocusedKeyRemoved(
+    expectedKey: string,
+    nextLocation: (noteId: number) => RouteLocationNamedRaw
+  ) {
     const fromKey = notePropertyKeyFromRoute(route)
-    if (!fromKey || fromKey === toKey || toKey === "") {
+    if (fromKey !== expectedKey) {
       return
     }
-    const keys = propertyRows.value.map((row) => row.key)
-    if (keys.includes(fromKey) || !keys.includes(toKey)) {
+    if (propertyRows.value.some((row) => row.key === fromKey)) {
       return
     }
     const noteId = noteRouteFamilyNoteId(route)
@@ -27,9 +30,26 @@ export function useFollowFocusedPropertyLocation(
       return
     }
     return router.replace(
-      locationKeepingQuery(route, notePropertyLocation(Number(noteId), toKey))
+      locationKeepingQuery(route, nextLocation(Number(noteId)))
     )
   }
 
-  return { followFocusedPropertyRename }
+  function followFocusedPropertyRename(toKey: string) {
+    const fromKey = notePropertyKeyFromRoute(route)
+    if (!fromKey || fromKey === toKey || toKey === "") {
+      return
+    }
+    if (!propertyRows.value.some((row) => row.key === toKey)) {
+      return
+    }
+    return replaceWhenFocusedKeyRemoved(fromKey, (noteId) =>
+      notePropertyLocation(noteId, toKey)
+    )
+  }
+
+  function followFocusedPropertyDelete(removedKey: string) {
+    return replaceWhenFocusedKeyRemoved(removedKey, noteShowLocation)
+  }
+
+  return { followFocusedPropertyRename, followFocusedPropertyDelete }
 }
