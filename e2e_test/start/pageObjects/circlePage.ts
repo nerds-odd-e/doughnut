@@ -66,10 +66,10 @@ export const navigateToCircle = (circleName: string) => {
       | undefined
     if (aliases?.[alias]) {
       return cy.get(`@${alias}`, { log: false }).then((circleId) => {
-        router().visitNamed('circleShow', { circleId: String(circleId) })
+        router().push('circleShow', { circleId: String(circleId) })
       })
     }
-    router().visitNamed('circles')
+    router().push('circles')
     cy.findByText(circleName, { selector: 'a', timeout: 15000 })
       .should('be.visible')
       .click()
