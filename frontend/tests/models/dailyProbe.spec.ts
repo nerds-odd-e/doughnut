@@ -12,14 +12,14 @@ import {
 function recordAt(
   stimulus: "left" | "right",
   rtMs: number,
-  key: string,
+  response: "left" | "right",
   stimulusOnsetMs = 1_000
 ) {
   return recordDailyProbeTrial({
     stimulus,
     stimulusOnsetMs,
     responseMs: stimulusOnsetMs + rtMs,
-    key,
+    response,
   })
 }
 
@@ -72,7 +72,7 @@ describe("dailyProbe", () => {
   })
 
   it("records a correct valid trial with RT", () => {
-    expect(recordAt("left", 250, "f")).toEqual({
+    expect(recordAt("left", 250, "left")).toEqual({
       stimulus: "left",
       response: "left",
       rtMs: 250,
@@ -93,7 +93,7 @@ describe("dailyProbe", () => {
   })
 
   it("records a false start as incorrect with no RT", () => {
-    expect(recordAt("left", 50, "f")).toEqual({
+    expect(recordAt("left", 50, "left")).toEqual({
       stimulus: "left",
       response: "left",
       correct: false,
@@ -102,31 +102,31 @@ describe("dailyProbe", () => {
 
   it("speed is 3.00 s⁻¹ for correct 250 ms and 500 ms, ignoring a wrong 250 ms", () => {
     const trials = [
-      recordAt("left", 250, "f"),
-      recordAt("right", 500, "j"),
-      recordAt("left", 250, "j"),
+      recordAt("left", 250, "left"),
+      recordAt("right", 500, "right"),
+      recordAt("left", 250, "right"),
     ]
     expect(dailyProbeSpeed(trials)?.toFixed(2)).toBe("3.00")
   })
 
   it("omits speed when there are no correct valid RTs", () => {
-    expect(dailyProbeSpeed([recordAt("left", 250, "j")])).toBeUndefined()
+    expect(dailyProbeSpeed([recordAt("left", 250, "right")])).toBeUndefined()
   })
 
   it("accuracy is 95 for 19 correct of 20 scored trials", () => {
     const trials = [
-      ...Array.from({ length: 19 }, () => recordAt("left", 250, "f")),
-      recordAt("left", 250, "j"),
+      ...Array.from({ length: 19 }, () => recordAt("left", 250, "left")),
+      recordAt("left", 250, "right"),
     ]
     expect(dailyProbeAccuracy(trials)).toBe(95)
   })
 
   it("counts a 500 ms trial as a lapse", () => {
-    expect(dailyProbeLapseCount([recordAt("left", 500, "f")])).toBe(1)
+    expect(dailyProbeLapseCount([recordAt("left", 500, "left")])).toBe(1)
   })
 
   it("does not count a 499 ms trial as a lapse", () => {
-    expect(dailyProbeLapseCount([recordAt("left", 499, "f")])).toBe(0)
+    expect(dailyProbeLapseCount([recordAt("left", 499, "left")])).toBe(0)
   })
 
   it("counts a timeout as a lapse", () => {
@@ -141,15 +141,20 @@ describe("dailyProbe", () => {
   })
 
   it("does not count a false start as a lapse", () => {
-    expect(dailyProbeLapseCount([recordAt("left", 50, "f")])).toBe(0)
+    expect(dailyProbeLapseCount([recordAt("left", 50, "left")])).toBe(0)
   })
 
   it("variability is 1.41 s⁻¹ for reciprocal RTs 4.00 and 2.00", () => {
-    const trials = [recordAt("left", 250, "f"), recordAt("right", 500, "j")]
+    const trials = [
+      recordAt("left", 250, "left"),
+      recordAt("right", 500, "right"),
+    ]
     expect(dailyProbeVariability(trials)?.toFixed(2)).toBe("1.41")
   })
 
   it("omits variability when fewer than 2 correct valid RTs", () => {
-    expect(dailyProbeVariability([recordAt("left", 250, "f")])).toBeUndefined()
+    expect(
+      dailyProbeVariability([recordAt("left", 250, "left")])
+    ).toBeUndefined()
   })
 })

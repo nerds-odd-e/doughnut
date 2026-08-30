@@ -54,10 +54,9 @@ export function recordDailyProbeTrial(input: {
   stimulus: DailyProbeSide
   stimulusOnsetMs: number
   responseMs?: number
-  key?: string
+  response?: DailyProbeSide
 }): DailyProbeTrial {
-  const { stimulus, stimulusOnsetMs, responseMs, key } = input
-  const response = key === undefined ? undefined : mapDailyProbeKey(key)
+  const { stimulus, stimulusOnsetMs, responseMs, response } = input
   if (response === undefined || responseMs === undefined) {
     return { stimulus, correct: false }
   }

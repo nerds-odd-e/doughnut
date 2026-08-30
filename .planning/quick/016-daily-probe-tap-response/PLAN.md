@@ -1,9 +1,8 @@
 # Daily probe side tap
 
-**Status:** planned (not started).
+**Status:** in progress (slice 1 done; next: slice 2).
 **Type:** ad-hoc plan (`.planning/quick/`)
-**Measurement spec:** [daily-probe-protocol.md](../../notes/daily-probe-protocol.md)
-**Do not execute until asked.**
+**Measurement spec:** [daily-probe-protocol.md](../../notes/daily-probe-protocol.md)**
 
 ## Goal
 
@@ -47,16 +46,12 @@ and would make phone runs a different task from keyboard runs.
 
 Status legend: `[ ]` planned · `[~]` in progress · `[x]` done
 
-### 1. Score a mapped side, not a key — Structure `[ ]`
+### 1. Score a mapped side, not a key — Structure `[x]`
 
-`recordDailyProbeTrial` takes an optional mapped `response: DailyProbeSide`
-instead of a key string. `mapDailyProbeKey` stays for keyboard. `DailyProbe`
-maps the key, then records the side. Scoring formulas and stored trial shape
-are unchanged.
-
-**Verify:** existing `frontend/tests/models/dailyProbe.spec.ts` and
-`frontend/tests/components/recall/DailyProbe.spec.ts` (keyboard path) still
-pass. No E2E change. No visible UI change.
+`recordDailyProbeTrial` takes optional `response: DailyProbeSide`. Keyboard
+still maps via `mapDailyProbeKey` in `DailyProbe`, then records the side.
+`finishTrial` already takes a side, so slice 2 can pass tap sides without
+synthesizing keys. Scoring and stored trial shape unchanged.
 
 ---
 

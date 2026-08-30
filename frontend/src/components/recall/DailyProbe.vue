@@ -125,7 +125,7 @@ function startTrial() {
   scheduled = setTimeout(() => finishTrial(), DAILY_PROBE_TIMEOUT_MS)
 }
 
-function finishTrial(key?: string) {
+function finishTrial(response?: DailyProbeSide) {
   if (respondedThisTrial || finished.value) return
   respondedThisTrial = true
   clearScheduled()
@@ -135,7 +135,7 @@ function finishTrial(key?: string) {
       recordDailyProbeTrial({
         stimulus: current,
         stimulusOnsetMs,
-        ...(key === undefined ? {} : { key, responseMs: Date.now() }),
+        ...(response === undefined ? {} : { response, responseMs: Date.now() }),
       })
     )
   }
@@ -169,9 +169,10 @@ async function persistCompletedProbe() {
 
 function onKeydown(event: KeyboardEvent) {
   if (finished.value || !stimulus.value) return
-  if (mapDailyProbeKey(event.key) === undefined) return
+  const response = mapDailyProbeKey(event.key)
+  if (response === undefined) return
   event.preventDefault()
-  finishTrial(event.key)
+  finishTrial(response)
 }
 
 function attachKeyListener() {
