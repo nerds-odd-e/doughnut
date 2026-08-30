@@ -1,6 +1,9 @@
 import { describe, expect, it } from "vitest"
 import type { RouteLocationRaw } from "vue-router"
-import { noteShowLocation } from "@/routes/noteShowLocation"
+import {
+  notePropertyLocation,
+  noteShowLocation,
+} from "@/routes/noteShowLocation"
 import {
   deadWikiLinkPayloadFromAnchor,
   escapeHtmlForWikiLinkDisplay,
@@ -52,7 +55,7 @@ describe("wikiLinkMarkup utils", () => {
     expect(navigated).toEqual(noteShowLocation(42))
   })
 
-  it("handleRichContentAnchorClick still uses noteShow when the authored target has a property suffix", () => {
+  it("handleRichContentAnchorClick pushes noteProperty when the authored target has a property suffix", () => {
     const anchor = document.createElement("a")
     anchor.className = "donut-wiki-link"
     anchor.setAttribute("data-wiki-title", "Moon#prop:a%20part%20of")
@@ -70,7 +73,7 @@ describe("wikiLinkMarkup utils", () => {
       },
       { deadWikiLinksEnabled: true }
     )
-    expect(navigated).toEqual(noteShowLocation(42))
+    expect(navigated).toEqual(notePropertyLocation(42, "a part of"))
   })
 
   it.each([

@@ -1,5 +1,6 @@
 import { noteShowHref } from '@/routes/noteShowLocation'
 import { clickPopupConfirmOk } from '../../support/daisyModalHelpers'
+import { waitUntilAppIsNotBusy } from '../pageBase'
 import testability from '../testability'
 import noteCreationForm from './forms/noteCreationForm'
 import { findNoteContentRegion } from './notePageContentRegion'
@@ -38,6 +39,14 @@ function wikiLinkInNoteContentFluent(
       locator().click()
       cy.url({ timeout: 15000 }).should('match', noteShowPathInUrl)
       return assumeNotePage(noteTitle)
+    },
+    followToNoteProperty(noteTitle: string, propertyKey: string) {
+      locator().click()
+      waitUntilAppIsNotBusy()
+      return assumeNotePage(noteTitle).expectAtNoteProperty(
+        noteTitle,
+        propertyKey
+      )
     },
   }
 }

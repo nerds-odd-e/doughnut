@@ -1,14 +1,25 @@
 import type { RouteLocationNamedRaw } from "vue-router"
 import { namedLocationHref } from "@/routes/namedLocationHref"
-import { noteShowLocation } from "@/routes/noteShowLocation"
-import { parseWikiLinkAuthoredTarget } from "@/utils/wikiLinkAuthoredTarget"
+import {
+  notePropertyLocation,
+  noteShowLocation,
+} from "@/routes/noteShowLocation"
+import {
+  decodeWikiLinkPropertyKey,
+  parseWikiLinkAuthoredTarget,
+} from "@/utils/wikiLinkAuthoredTarget"
 
 /** Resolved wiki/path-Markdown click location from the authored target. */
 export function locationForResolvedWikiTarget(
   noteId: number,
   authoredTarget: string
 ): RouteLocationNamedRaw {
-  parseWikiLinkAuthoredTarget(authoredTarget)
+  const propertyKey = decodeWikiLinkPropertyKey(
+    parseWikiLinkAuthoredTarget(authoredTarget).encodedPropertyKey
+  )
+  if (propertyKey !== undefined) {
+    return notePropertyLocation(noteId, propertyKey)
+  }
   return noteShowLocation(noteId)
 }
 

@@ -1,6 +1,6 @@
 # Note property canonical path
 
-**Status:** in progress (slices 1–16 done; 17–20 remaining).
+**Status:** in progress (slices 1–17 done; 18–20 remaining).
 **Type:** ad-hoc plan (`.planning/quick/`)
 **Policy:** [ADR 0001](../../../docs/adrs/0001-ubiquitous-language.md) (**Property**, **Property panel**, **Wiki link**), [ADR 0004](../../../docs/adrs/0004-okf-compatible-notebook-markdown-accepted.md) (`#prop:`), Proposed [ADR 0005](../../../docs/adrs/0005-web-routes.md) (`noteProperty`).
 **Human-owned exception (2026-08-29):** ADR 0001 / ADR 0004 may depend on
@@ -27,11 +27,12 @@ location.
 | Property value dialog | Opens with `noteProperty`; its open/close **replaces** the route | Local on the row; does not change the URL |
 | Next to assimilate (property unit) | `push(noteProperty)`; skip/assimilate only after closing the value dialog | `push(noteProperty)`; skip/assimilate on the open **property panel**; assimilation settings stay closed |
 | Answered question / memory tracker | `NoteTitleWithLink` → `noteProperty` when `focusedPropertyKey` is set | Same route; arrival shows the **property panel** |
-| Wiki / paste | Property tokens not live yet | `#prop:` compiles to `noteProperty` (property panel); paste resolves note id to portable identity and keeps label as display only |
+| Wiki / paste | Live `#prop:` compiles to `noteProperty` | Paste still must resolve note id to portable identity and keep label as display only |
 
-Conversation query, note-route family, missing-key banner, and rename/delete
-location follow already shipped. Wiki resolution / rewrite still needs the
-authored-target codec slices below.
+Conversation query, note-route family, missing-key banner, rename/delete
+location follow, property-panel presentation, and live `#prop:` compile
+already shipped. Remaining: cache freshness after property remove/rename,
+note-identity rewrite of the suffix, and paste.
 
 ## Design decisions
 
@@ -100,8 +101,9 @@ that it does not change the URL.
   and assimilate on the property panel.
 - Tracker / answered-question link: same feature; arrival is `noteProperty`
   with the property panel open.
-- Wiki live/dead, target note rename/move, and cache freshness: extend
-  `e2e_test/features/note_topology/wiki_link.feature` plus backend small tests
+- Wiki live/dead, target note rename/move, and cache freshness:
+  `e2e_test/features/note_topology/property_wiki_link.feature` (property
+  tokens) plus `wiki_link.feature` (note-only) and backend small tests
   through resolver/controller boundaries.
 - Route table / family / helpers / paste / property-key codec: Vitest
   (`routes.spec.ts`, `noteRouteFamily.spec.ts`, mounted property components,
@@ -224,16 +226,15 @@ unchanged.
 `wikiLinkAuthoredTarget` matches Java encode pairs (ADR 0004). Note-only
 render/click still compiles to `noteShow` via `wikiLinkResolvedLocation`.
 Path-Markdown `#prop:` fragments are kept (not discarded by the
-accept-check). Slice 17 branches there for `notePropertyHref`.
+accept-check). Live `#prop:` compiles to `notePropertyHref` there.
 
-### 17. Live `#prop:` wiki goes to `noteProperty` — **Behavior** — planned
+### 17. Live `#prop:` wiki goes to `noteProperty` — **Behavior** — done
 
-**Pre:** the note API returns a resolved wiki or path-Markdown property token.
-**Trigger:** render and click it in note body or a property value. **Post:**
-its HTML `href` is compiled by `notePropertyHref` and click pushes
-`noteProperty` with that **property panel** open; unresolved property tokens
-do not navigate. Note-only wiki rendering remains unchanged. Compile from
-`wikiLinkResolvedLocation` (slice 16 still returns `noteShow` for `#prop:`).
+`wikiLinkResolvedLocation` compiles `#prop:` to `notePropertyHref`.
+Click **push**es `noteProperty` with the **property panel** open.
+Unresolved tokens do not navigate. Location follow on a property value
+runs only on an actual key rename (not on wiki click/blur). E2E:
+`property_wiki_link.feature`.
 
 ### 18. Removing a target property makes cached links unresolved — **Behavior** — planned
 
@@ -241,7 +242,8 @@ do not navigate. Note-only wiki rendering remains unchanged. Compile from
 **Trigger:** remove or rename the target property, then render or lint the
 referring note. **Post:** the old token is dead/unresolved and does not
 navigate; no second cache is introduced. Cover self-links and another-note
-links so property-index/cache refresh order is honest.
+links so property-index/cache refresh order is honest. Extend
+`property_wiki_link.feature` plus backend resolver/controller tests.
 
 ### 19. Note identity changes preserve property-link suffixes — **Behavior** — planned
 
@@ -288,8 +290,9 @@ invent identity from the label. Extend the internal-URL classifier so
   (`#heading`) — documented, not inherited by `#prop:`. Slice 15:
   `WikiLinkPropertyMatch` requires the decoded exact key; `link_text` is
   the full encoded token. TypeScript `wikiLinkAuthoredTarget` shares the
-  Java encode pairs. `wikiLinkResolvedLocation` still compiles to
-  `noteShow`; slice 17 compiles `#prop:` to `notePropertyHref` there.
+  Java encode pairs. `wikiLinkResolvedLocation` compiles `#prop:` to
+  `notePropertyHref` / `notePropertyLocation`. Location follow on a
+  property value runs only on actual key rename, not wiki click/blur.
 - Current paste/strip code converts internal URLs with anchor text as the wiki
   target. A property URL contains only server note id + key, so correct portable
   conversion requires resolving the note's concept identity.

@@ -1,7 +1,13 @@
 import { flushPromises } from "@vue/test-utils"
 import { relationshipNoteContent } from "@tests/notes/relationshipNoteTestContent"
-import { noteShowHref } from "@/routes/noteShowLocation"
+import {
+  notePropertyHref,
+  notePropertyLocation,
+  noteShowHref,
+  noteShowLocation,
+} from "@/routes/noteShowLocation"
 import { wikiTitleFromAuthoredToken } from "@/utils/wikiLinkMarkup"
+import { vi } from "vitest"
 import { propertyRowSelector } from "./propertiesTestDom"
 import {
   clickDeadWikiLinkInPropertyValue,
@@ -14,6 +20,7 @@ describe("RichMarkdownEditor property wiki links", () => {
   const h = createRichMarkdownEditorTestHarness()
 
   afterEach(() => {
+    vi.restoreAllMocks()
     h.cleanup()
   })
 
@@ -52,6 +59,31 @@ Body`
     expect(
       valueField().find("a.dead-wiki-link").attributes("data-wiki-title")
     ).toBe("WikiLinks E2E Nowhere")
+  })
+
+  it("clicking a resolved property wiki in a property value pushes noteProperty and does not rewrite on blur", async () => {
+    const token = "Moon#prop:a%20part%20of"
+    const markdown = propertyWikiLinkMarkdown(token)
+    const wrapper = await h.mountEditor(markdown, {
+      lastSavedMarkdown: markdown,
+      wikiTitles: [wikiTitleFromAuthoredToken(token, 42)],
+      route: noteShowLocation(99),
+      noteId: 99,
+    })
+    const valueField = wrapper.find(
+      '[data-testid="rich-note-property-row-value-input"]'
+    )
+    const live = valueField.find("a.donut-wiki-link")
+    expect(live.attributes("href")).toBe(notePropertyHref(42, "a part of"))
+    await valueField.trigger("focus")
+    await flushPromises()
+    ;(live.element as HTMLAnchorElement).click()
+    await flushPromises()
+    await valueField.trigger("blur")
+    await flushPromises()
+    expect(wrapper.vm.$router.currentRoute.value).toMatchObject(
+      notePropertyLocation(42, "a part of")
+    )
   })
 
   it("shows a property wiki link as live when wikiTitles resolve it", async () => {

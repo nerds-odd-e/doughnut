@@ -156,8 +156,8 @@ export function useRichFrontmatterPropertyEditing(options: {
         }
         return
       }
+      await followFocusedPropertyRename(newKey)
     }
-    await followFocusedPropertyRename(newKey)
 
     options.clearValidation()
     options.onPropertiesChanged(filterForEmit([...options.propertyRows.value]))

@@ -1,5 +1,5 @@
 import { replaceWikiLinksInHtml } from "@/components/form/replaceWikiLinksInHtml"
-import { noteShowHref } from "@/routes/noteShowLocation"
+import { notePropertyHref, noteShowHref } from "@/routes/noteShowLocation"
 import { wikiTitleFromAuthoredToken } from "@/utils/wikiLinkMarkup"
 import { describe, it, expect } from "vitest"
 
@@ -144,25 +144,25 @@ describe("replaceWikiLinksInHtml", () => {
     expect(out).not.toContain("pending-wiki-link")
   })
 
-  it("upgrades leftover path-Markdown with a #prop: fragment to noteShow and keeps the fragment", () => {
+  it("upgrades leftover path-Markdown with a #prop: fragment to noteProperty and keeps the fragment", () => {
     const href = "/Solar/Moon.md#prop:a%20part%20of"
     expect(
       replaceWikiLinksInHtml(`<p><a href="${href}">a part of</a></p>`, [
         wikiTitleFromAuthoredToken(`[a part of](${href})`, 42),
       ])
     ).toBe(
-      `<p><a href="${noteShowHref(42)}" class="donut-wiki-link" data-wiki-title="${href}" data-wiki-display="a part of" data-note-id="42">a part of</a></p>`
+      `<p><a href="${notePropertyHref(42, "a part of")}" class="donut-wiki-link" data-wiki-title="${href}" data-wiki-display="a part of" data-note-id="42">a part of</a></p>`
     )
   })
 
-  it("compiles a resolved property wiki target to noteShow and keeps the authored target", () => {
+  it("compiles a resolved property wiki target to noteProperty and keeps the authored target", () => {
     const token = "Moon#prop:a%20part%20of"
     expect(
       replaceWikiLinksInHtml(`<p>[[${token}]]</p>`, [
         wikiTitleFromAuthoredToken(token, 42),
       ])
     ).toBe(
-      `<p><a href="${noteShowHref(42)}" class="donut-wiki-link" data-wiki-title="${token}" data-note-id="42">${token}</a></p>`
+      `<p><a href="${notePropertyHref(42, "a part of")}" class="donut-wiki-link" data-wiki-title="${token}" data-note-id="42">${token}</a></p>`
     )
   })
 })

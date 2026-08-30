@@ -62,6 +62,20 @@ Then(
 )
 
 Then(
+  'the wiki link {string} should open property {string} of note {string}',
+  (wikiLinkText: string, propertyKey: string, noteTitle: string) => {
+    start
+      .assumeNotePage()
+      .wikiLinkInNoteContent(wikiLinkText)
+      .followToNoteProperty(noteTitle, propertyKey)
+  }
+)
+
+When('I follow the dead wiki link {string}', (wikiLinkText: string) => {
+  start.assumeNotePage().followDeadWikiLink(wikiLinkText)
+})
+
+Then(
   'following the wiki link {string} should open the note titled {string}',
   followWikiLinkToNote
 )
