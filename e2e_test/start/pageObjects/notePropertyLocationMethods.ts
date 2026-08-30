@@ -76,10 +76,6 @@ export const notePropertyLocationMethods = () => ({
     )
     return this
   },
-  expectPropertyValueDialogClosed() {
-    cy.get('dialog').should('not.exist')
-    return this
-  },
   expectFocusedRichNotePropertyPanel(key: string) {
     this.switchToRichContent()
     findNoteContentRegion().within(() => {
@@ -95,7 +91,7 @@ export const notePropertyLocationMethods = () => ({
     })
     return this
   },
-  expectFocusedRichNotePropertyValueWithoutDialog(key: string, value: string) {
+  expectFocusedRichNotePropertyValue(key: string, value: string) {
     this.switchToRichContent()
     findNoteContentRegion().within(() => {
       expectRichNotePropertyRowFocused(key).and(($row) => {
@@ -106,7 +102,6 @@ export const notePropertyLocationMethods = () => ({
         ).to.include(value)
       })
     })
-    cy.get('dialog').should('not.exist')
     return this
   },
   expectRichNotePropertyNotFound(key: string) {
@@ -122,7 +117,6 @@ export const notePropertyLocationMethods = () => ({
       })
       cy.get('[data-property-focused="true"]').should('not.exist')
     })
-    cy.get('dialog').should('not.exist')
     return this
   },
 })

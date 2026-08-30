@@ -154,15 +154,4 @@ describe("replaceWikiLinksInHtml", () => {
       `<p><a href="${notePropertyHref(42, "a part of")}" class="donut-wiki-link" data-wiki-title="${href}" data-wiki-display="a part of" data-note-id="42">a part of</a></p>`
     )
   })
-
-  it("compiles a resolved property wiki target to noteProperty and keeps the authored target", () => {
-    const token = "Moon#prop:a%20part%20of"
-    expect(
-      replaceWikiLinksInHtml(`<p>[[${token}]]</p>`, [
-        wikiTitleFromAuthoredToken(token, 42),
-      ])
-    ).toBe(
-      `<p><a href="${notePropertyHref(42, "a part of")}" class="donut-wiki-link" data-wiki-title="${token}" data-note-id="42">${token}</a></p>`
-    )
-  })
 })

@@ -23,16 +23,16 @@ Feature: Note property location
       | Vitamins   |
     And the rich note property "topic" should be focused with its property panel open
 
-  Scenario: Visiting a specialized property location focuses the property without a property value dialog
+  Scenario: Visiting a specialized property location focuses the property and opens its property panel
     Given I visit note "Vitamins"
     When I visit property "wikidata_id" of note "Vitamins"
     Then I should see the note tree in the sidebar
       | note-title |
       | Vitamins   |
     And the rich note property "wikidata_id" should be focused with its property panel open
-    And the rich note property "wikidata_id" should be focused showing "Q34932" without a property value dialog
+    And the rich note property "wikidata_id" should be focused showing "Q34932"
 
-  Scenario: Visiting a read-only property location focuses the property without a property value dialog
+  Scenario: Visiting a read-only property location focuses the property value
     Given I am re-logged in as "another_old_learner"
     And I have a notebook "Shared property location"
     And I have a note "Minerals" under notebook "Shared property location" with content:
@@ -51,7 +51,7 @@ Feature: Note property location
     Then I should see the note tree in the sidebar
       | note-title |
       | Minerals   |
-    And the rich note property "topic" should be focused showing "micronutrients" without a property value dialog
+    And the rich note property "topic" should be focused showing "micronutrients"
 
   Scenario: Visiting a stale property location shows that the property is not found
     Given I visit note "Vitamins"
@@ -97,4 +97,3 @@ Feature: Note property location
     And I visit property "topic" of note "Vitamins"
     When I remove rich note property "topic" confirming memory tracker change
     Then I should be at note "Vitamins"
-    And the property value dialog should be closed

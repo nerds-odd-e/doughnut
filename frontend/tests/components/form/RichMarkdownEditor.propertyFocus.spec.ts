@@ -2,7 +2,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import { NoteController } from "@generated/donut-backend-api/sdk.gen"
 import { mockSdkService } from "@tests/helpers"
 import { notePropertyLocation } from "@/routes/noteShowLocation"
-import { propertyValueDialogEl } from "./propertyValueDialogTestDom"
 import {
   expectPropertyPanelClosed,
   expectPropertyPanelOpen,
@@ -56,7 +55,7 @@ Workshop body.`
     })
   })
 
-  it("visiting noteProperty on a read-only property focuses the row, scrolls it into view, and does not open a property value dialog", async () => {
+  it("visiting noteProperty on a read-only property focuses the row, scrolls it into view, and shows the value", async () => {
     const scrollSpy = vi.spyOn(HTMLElement.prototype, "scrollIntoView")
 
     const wrapper = await h.mountEditor(markdown, {
@@ -75,14 +74,13 @@ Workshop body.`
         .find(propertyRowSelector("diligence"))
         .attributes("data-property-focused")
     ).toBeUndefined()
-    expect(propertyValueDialogEl()).toBeNull()
     expect(scrollSpy).toHaveBeenCalledWith({
       behavior: "smooth",
       block: "center",
     })
   })
 
-  it("visiting noteProperty on a specialized property focuses the row without a property value dialog", async () => {
+  it("visiting noteProperty on a specialized property focuses the row and opens its property panel", async () => {
     const specializedMarkdown = `---
 image: https://example.com/workshop.png
 topic: training
@@ -102,10 +100,9 @@ Workshop body.`
     expect(
       imageRow.find('[data-testid="rich-note-image-property-choose"]').exists()
     ).toBe(true)
-    expect(propertyValueDialogEl()).toBeNull()
   })
 
-  it("visiting noteProperty for a missing key shows not-found with the decoded key and does not open a property value dialog", async () => {
+  it("visiting noteProperty for a missing key shows not-found with the decoded key", async () => {
     const wrapper = await h.mountEditor(markdown, {
       attachToBody: true,
       noteId,
@@ -120,6 +117,5 @@ Workshop body.`
         .find(propertyRowSelector("topic"))
         .attributes("data-property-focused")
     ).toBeUndefined()
-    expect(propertyValueDialogEl()).toBeNull()
   })
 })

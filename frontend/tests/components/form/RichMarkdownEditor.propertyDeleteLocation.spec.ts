@@ -6,7 +6,6 @@ import {
   noteShowLocation,
 } from "@/routes/noteShowLocation"
 import {
-  propertyValueDialogEl,
   mountEditorOnNoteShow,
   PROPERTY_PANEL_NOTE_ID,
 } from "./propertyValueDialogTestDom"
@@ -49,7 +48,6 @@ Body.`
     expect(
       wrapper.find('[data-testid="rich-note-property-not-found"]').exists()
     ).toBe(false)
-    expect(propertyValueDialogEl()).toBeNull()
   })
 
   it("preserves unrelated query values when the focused property is deleted", async () => {

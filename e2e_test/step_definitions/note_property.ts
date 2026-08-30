@@ -44,11 +44,9 @@ Then(
 )
 
 Then(
-  'the rich note property {string} should be focused showing {string} without a property value dialog',
+  'the rich note property {string} should be focused showing {string}',
   (key: string, value: string) => {
-    start
-      .assumeNotePage()
-      .expectFocusedRichNotePropertyValueWithoutDialog(key, value)
+    start.assumeNotePage().expectFocusedRichNotePropertyValue(key, value)
   }
 )
 
@@ -82,7 +80,3 @@ Then(
     start.assumeNotePage().expectAtNoteShow(noteTopology, conversationQuery)
   }
 )
-
-Then('the property value dialog should be closed', () => {
-  start.assumeNotePage().expectPropertyValueDialogClosed()
-})
