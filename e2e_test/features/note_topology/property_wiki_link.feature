@@ -70,3 +70,77 @@ Feature: Property wiki links
       | dead wiki link | WikiProp Moon#prop:topic |
     When I follow the dead wiki link "WikiProp Moon#prop:topic"
     Then I should be at note "WikiProp Carrier"
+
+  Scenario: Removing the target property makes a cached property wiki unresolved
+    Given I have a notebook "WikiProp Stale Remove NB"
+    And I have a note "WikiProp Moon" under notebook "WikiProp Stale Remove NB" with content:
+      """
+      ---
+      topic: luna
+      ---
+
+      Moon body.
+      """
+    And I have a note "WikiProp Carrier" under notebook "WikiProp Stale Remove NB" with content:
+      """
+      See [[WikiProp Moon#prop:topic]].
+      """
+    When I update note "WikiProp Moon" content using markdown to become:
+      """
+      Moon body.
+      """
+    And I visit note "WikiProp Carrier"
+    Then I should see the note content rendered as:
+      | Kind           | Text                     |
+      | dead wiki link | WikiProp Moon#prop:topic |
+    When I follow the dead wiki link "WikiProp Moon#prop:topic"
+    Then I should be at note "WikiProp Carrier"
+
+  Scenario: Renaming the target property makes a cached property wiki unresolved
+    Given I have a notebook "WikiProp Stale Rename NB"
+    And I have a note "WikiProp Moon" under notebook "WikiProp Stale Rename NB" with content:
+      """
+      ---
+      topic: luna
+      ---
+
+      Moon body.
+      """
+    And I have a note "WikiProp Carrier" under notebook "WikiProp Stale Rename NB" with content:
+      """
+      See [[WikiProp Moon#prop:topic]].
+      """
+    When I update note "WikiProp Moon" content using markdown to become:
+      """
+      ---
+      subject: luna
+      ---
+
+      Moon body.
+      """
+    And I visit note "WikiProp Carrier"
+    Then I should see the note content rendered as:
+      | Kind           | Text                     |
+      | dead wiki link | WikiProp Moon#prop:topic |
+    When I follow the dead wiki link "WikiProp Moon#prop:topic"
+    Then I should be at note "WikiProp Carrier"
+
+  Scenario: Removing a self-targeted property makes a cached property wiki unresolved
+    Given I have a notebook "WikiProp Stale Self NB"
+    And I have a note "WikiProp Moon" under notebook "WikiProp Stale Self NB" with content:
+      """
+      ---
+      topic: luna
+      ---
+
+      See [[WikiProp Moon#prop:topic]].
+      """
+    When I update note "WikiProp Moon" content using markdown to become:
+      """
+      See [[WikiProp Moon#prop:topic]].
+      """
+    Then I should see the note content rendered as:
+      | Kind           | Text                     |
+      | dead wiki link | WikiProp Moon#prop:topic |
+    When I follow the dead wiki link "WikiProp Moon#prop:topic"
+    Then I should be at note "WikiProp Moon"

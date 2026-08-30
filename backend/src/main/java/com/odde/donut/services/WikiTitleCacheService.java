@@ -1,6 +1,7 @@
 package com.odde.donut.services;
 
 import com.odde.donut.algorithms.WikiLinkMarkdown;
+import com.odde.donut.algorithms.WikiLinkPropertyMatch;
 import com.odde.donut.controllers.dto.WikiTitle;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.NoteWikiTitleCache;
@@ -8,7 +9,6 @@ import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.User;
 import com.odde.donut.entities.repositories.NoteWikiTitleCacheRepository;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.LockModeType;
 import jakarta.persistence.PersistenceContext;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -26,11 +26,9 @@ public class WikiTitleCacheService {
 
   @PersistenceContext private EntityManager entityManager;
 
-  private final WikiLinkResolver wikiLinkResolver;
   private final NoteWikiTitleCacheRepository noteWikiTitleCacheRepository;
   private final AuthorizationService authorizationService;
-  private final NotePropertyIndexService notePropertyIndexService;
-  private final NoteAliasIndexService noteAliasIndexService;
+  private final WikiTitleCacheRefresh wikiTitleCacheRefresh;
 
   public WikiTitleCacheService(
       WikiLinkResolver wikiLinkResolver,
@@ -38,11 +36,14 @@ public class WikiTitleCacheService {
       AuthorizationService authorizationService,
       NotePropertyIndexService notePropertyIndexService,
       NoteAliasIndexService noteAliasIndexService) {
-    this.wikiLinkResolver = wikiLinkResolver;
     this.noteWikiTitleCacheRepository = noteWikiTitleCacheRepository;
     this.authorizationService = authorizationService;
-    this.notePropertyIndexService = notePropertyIndexService;
-    this.noteAliasIndexService = noteAliasIndexService;
+    this.wikiTitleCacheRefresh =
+        new WikiTitleCacheRefresh(
+            wikiLinkResolver,
+            noteWikiTitleCacheRepository,
+            notePropertyIndexService,
+            noteAliasIndexService);
   }
 
   public List<WikiTitle> wikiTitlesForViewer(Note focusNote, User viewer) {
@@ -92,7 +93,13 @@ public class WikiTitleCacheService {
     if (!authorizationService.userMayReadNotebook(viewer, notebook)) {
       return null;
     }
-    return entityManager.find(Note.class, target.getId());
+    Note resolved = entityManager.find(Note.class, target.getId());
+    if (resolved == null
+        || !WikiLinkPropertyMatch.matchesTargetNoteContent(
+            row.getLinkText(), resolved.getContent())) {
+      return null;
+    }
+    return resolved;
   }
 
   /**
@@ -213,24 +220,6 @@ public class WikiTitleCacheService {
 
   @Transactional
   public void refreshForNote(Note note, User viewer) {
-    rebuildWikiTitleCache(note, viewer);
-    notePropertyIndexService.refreshForNote(note);
-    noteAliasIndexService.refreshForNote(note);
-  }
-
-  private void rebuildWikiTitleCache(Note note, User viewer) {
-    Integer noteId = note.getId();
-    entityManager.find(Note.class, noteId, LockModeType.PESSIMISTIC_WRITE);
-    noteWikiTitleCacheRepository.deleteByNoteIdInBulk(noteId);
-    entityManager.flush();
-    Note cacheOwner = entityManager.getReference(Note.class, noteId);
-    for (WikiLinkResolver.ResolvedWikiLink link :
-        wikiLinkResolver.resolveWikiLinksForCache(note, viewer)) {
-      NoteWikiTitleCache row = new NoteWikiTitleCache();
-      row.setNote(cacheOwner);
-      row.setTargetNote(entityManager.getReference(Note.class, link.targetNote().getId()));
-      row.setLinkText(link.linkText());
-      noteWikiTitleCacheRepository.save(row);
-    }
+    wikiTitleCacheRefresh.refreshForNote(entityManager, note, viewer);
   }
 }

@@ -7,9 +7,11 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import com.odde.donut.algorithms.Frontmatter;
 import com.odde.donut.controllers.dto.HealthFindingGroup;
 import com.odde.donut.controllers.dto.HealthFindingItem;
+import com.odde.donut.controllers.dto.NoteUpdateContentDTO;
 import com.odde.donut.controllers.dto.NotebookHealthFixRequest;
 import com.odde.donut.controllers.dto.NotebookHealthLintReport;
 import com.odde.donut.entities.Folder;
+import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.repositories.FolderRepository;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
@@ -31,6 +33,7 @@ class NotebookHealthControllerTest extends ControllerTestBase {
 
   @Autowired NotebookHealthController controller;
   @Autowired FolderRepository folderRepository;
+  @Autowired TextContentController textContentController;
 
   @BeforeEach
   void setup() {
@@ -198,5 +201,34 @@ class NotebookHealthControllerTest extends ControllerTestBase {
 
       assertThat(deadWikiLinksGroup(controller.lint(notebook)).getChildren(), empty());
     }
+
+    @Test
+    void reportsPropertyTokenAfterTargetPropertyIsRemoved()
+        throws UnexpectedNoAccessRightException {
+      Notebook notebook = ownedNotebook();
+      Note moon =
+          makeMe
+              .aNote()
+              .title("Moon")
+              .notebook(notebook)
+              .content(Frontmatter.empty().set("a part of", "v").fenced(""))
+              .please();
+      Note linker = makeMe.aNote().title("Linker").notebook(notebook).please();
+      textContentController.updateNoteContent(linker, contentDto("[[Moon#prop:a%20part%20of]]"));
+
+      textContentController.updateNoteContent(moon, contentDto("Moon body."));
+
+      HealthFindingGroup group = deadWikiLinksGroup(controller.lint(notebook));
+      assertThat(group.getChildren(), hasSize(1));
+      assertThat(
+          group.getChildren().getFirst().getItems().getFirst().getWikiLinkToken(),
+          equalTo("Moon#prop:a%20part%20of"));
+    }
+  }
+
+  private NoteUpdateContentDTO contentDto(String content) {
+    NoteUpdateContentDTO dto = new NoteUpdateContentDTO();
+    dto.setContent(content);
+    return dto;
   }
 }

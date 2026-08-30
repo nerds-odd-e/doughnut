@@ -1,6 +1,6 @@
 # Note property canonical path
 
-**Status:** in progress (slices 1–17 done; 18–20 remaining).
+**Status:** in progress (slices 1–18 done; 19–20 remaining).
 **Type:** ad-hoc plan (`.planning/quick/`)
 **Policy:** [ADR 0001](../../../docs/adrs/0001-ubiquitous-language.md) (**Property**, **Property panel**, **Wiki link**), [ADR 0004](../../../docs/adrs/0004-okf-compatible-notebook-markdown-accepted.md) (`#prop:`), Proposed [ADR 0005](../../../docs/adrs/0005-web-routes.md) (`noteProperty`).
 **Human-owned exception (2026-08-29):** ADR 0001 / ADR 0004 may depend on
@@ -31,8 +31,8 @@ location.
 
 Conversation query, note-route family, missing-key banner, rename/delete
 location follow, property-panel presentation, and live `#prop:` compile
-already shipped. Remaining: cache freshness after property remove/rename,
-note-identity rewrite of the suffix, and paste.
+already shipped. Remaining: note-identity rewrite of the `#prop:` suffix,
+and paste.
 
 ## Design decisions
 
@@ -236,14 +236,11 @@ Unresolved tokens do not navigate. Location follow on a property value
 runs only on an actual key rename (not on wiki click/blur). E2E:
 `property_wiki_link.feature`.
 
-### 18. Removing a target property makes cached links unresolved — **Behavior** — planned
+### 18. Removing a target property makes cached links unresolved — **Behavior** — done
 
-**Pre:** a saved live property token and an existing resolved-link cache row.
-**Trigger:** remove or rename the target property, then render or lint the
-referring note. **Post:** the old token is dead/unresolved and does not
-navigate; no second cache is introduced. Cover self-links and another-note
-links so property-index/cache refresh order is honest. Extend
-`property_wiki_link.feature` plus backend resolver/controller tests.
+`WikiTitleCacheRefresh` drops stale inbound rows; self-links rebuild with
+the note. Old `#prop:` tokens are unresolved and do not navigate. Note-only
+links stay live. E2E: `property_wiki_link.feature`.
 
 ### 19. Note identity changes preserve property-link suffixes — **Behavior** — planned
 
@@ -293,6 +290,8 @@ invent identity from the label. Extend the internal-URL classifier so
   Java encode pairs. `wikiLinkResolvedLocation` compiles `#prop:` to
   `notePropertyHref` / `notePropertyLocation`. Location follow on a
   property value runs only on actual key rename, not wiki click/blur.
+  Slice 18: `WikiTitleCacheRefresh` drops inbound rows whose encoded
+  token no longer matches; do not add a second cache.
 - Current paste/strip code converts internal URLs with anchor text as the wiki
   target. A property URL contains only server note id + key, so correct portable
   conversion requires resolving the note's concept identity.

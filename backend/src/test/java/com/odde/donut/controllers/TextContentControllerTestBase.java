@@ -1,5 +1,6 @@
 package com.odde.donut.controllers;
 
+import com.odde.donut.algorithms.Frontmatter;
 import com.odde.donut.controllers.dto.NoteUpdateContentDTO;
 import com.odde.donut.controllers.dto.NoteUpdateTitleDTO;
 import com.odde.donut.entities.Note;
@@ -38,5 +39,14 @@ abstract class TextContentControllerTestBase extends ControllerTestBase {
     Note carrier = makeMe.aNote().underSameNotebookAs(target).please();
     controller.updateNoteContent(carrier, contentDto(carrierContent));
     return new InboundWiki(target, carrier);
+  }
+
+  protected Note noteWithExactProperty(String title, String yamlKey) {
+    return makeMe
+        .aNote()
+        .title(title)
+        .notebookOwnedBy(currentUser.getUser())
+        .content(Frontmatter.empty().set(yamlKey, "v").fenced(""))
+        .please();
   }
 }

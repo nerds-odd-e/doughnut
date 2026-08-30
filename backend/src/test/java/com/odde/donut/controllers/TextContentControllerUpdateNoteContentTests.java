@@ -5,7 +5,6 @@ import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 
-import com.odde.donut.algorithms.Frontmatter;
 import com.odde.donut.controllers.dto.NoteRealm;
 import com.odde.donut.controllers.dto.WikiTitle;
 import com.odde.donut.entities.Image;
@@ -194,14 +193,5 @@ class TextContentControllerUpdateNoteContentTests extends TextContentControllerT
         controller.updateNoteContent(carrier, contentDto("[[Moon#prop:a%20part%20of]]"));
 
     assertThat(response.getWikiTitles(), empty());
-  }
-
-  private Note noteWithExactProperty(String title, String yamlKey) {
-    return makeMe
-        .aNote()
-        .title(title)
-        .notebookOwnedBy(currentUser.getUser())
-        .content(Frontmatter.empty().set(yamlKey, "v").fenced(""))
-        .please();
   }
 }
