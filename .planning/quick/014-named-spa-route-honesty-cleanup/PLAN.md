@@ -1,6 +1,6 @@
 # Named SPA route honesty cleanup
 
-**Status:** in progress (slices 1–3 and 6 done; 4–5 remaining).
+**Status:** in progress (slices 1–4 and 6 done; 5 remaining).
 **Type:** ad-hoc plan (`.planning/quick/`)
 **Depends on:** shipped `.planning/quick/011-named-spa-route-honesty-follow-up/` (PLAN retired; named visit gate, `namedLocationHref`, Proposed [ADR 0005](../../../docs/adrs/0005-web-routes.md) E2E table remain on `main`); shipped `.planning/quick/015-spa-hydrate-after-testability-inject/` (PLAN retired 2026-08-29)
 
@@ -8,7 +8,7 @@
 
 Close leftovers from 011: **dead E2E** and the ADR table’s **later-jump = named `push`** (slice 10 still `visitNamed`s most Given shortcuts). Operator STATE no longer points at the retired 011 PLAN (spent-plan cleanup 2026-08-29). Do not reopen unit-wiki HTML pinning, recall remount, or ADR accept.
 
-**015 already shipped** (do not redo): Given-shaped note/notebook identity jumps; catalog listing **page re-enter** (`leaveNotebookCatalogIfAlreadyOpen` then `push('notebooks')`); assimilate menu Model A (no `route.name` → `getMenuData`). 015 left circles / admin `visitNamed` for this plan. Bazaar and settings Given shortcuts now `push` after login (slices 2–3). Named `push` after login was **not slower** on 015’s timer specs or slices 2–3.
+**015 already shipped** (do not redo): Given-shaped note/notebook identity jumps; catalog listing **page re-enter** (`leaveNotebookCatalogIfAlreadyOpen` then `push('notebooks')`); assimilate menu Model A (no `route.name` → `getMenuData`). 015 left admin `visitNamed` for this plan. Bazaar, settings, and circles Given shortcuts now `push` after login (slices 2–4). Invitation join stays `visitNamed('circleJoin')`. Named `push` after login was **not slower** on 015’s timer specs or slices 2–4.
 
 ## Inspection (011 on `main`)
 
@@ -25,9 +25,9 @@ Scope: 011’s route-honesty commits (unit leftovers + E2E gate + ADR rewrite), 
    | `navigateToBazaar` | `push('bazaar')` (slice 2) | — |
    | `visitManageAccessTokensPage` | `push('settingsAccessTokens')` (slice 3) | — |
    | `visitRecallStatsPage` | `push('settingsRecallStats')` (slice 3) | — |
-   | `navigateToCircle` list/show | `visitNamed('circles'` / `'circleShow')` | `push` |
+   | `navigateToCircle` list/show | `push('circles'` / `'circleShow')` (slice 4) | — |
    | Admin tab | `visitNamed('adminDashboard', {}, { tab })` | `push` with query |
-   | Join flow `circleShow` | `visitNamed` | `push` |
+   | Join flow `circleShow` | `push` (slice 4) | — |
 
    **Stay `visitNamed`:** `loginAs` → notebooks (first load); identify; invitation `circleJoin`; `visitRecallPage`; epub `leaveEpubReadingViewAndReturn`; `visitHomePage` (only `feature_toggle.feature`, first SPA load — `push` would only fall back).
 
@@ -106,13 +106,11 @@ Deleted unused create-and-copy step, `myCirclesPage.ts`, `start.navigateToMyCirc
 
 ---
 
-### 4. Circles list and show after first load use named push — Behavior `[ ]`
+### 4. Circles list and show after first load use named push — Behavior `[x]`
 
-**Timing:** yes — `e2e_test/features/circles/notebooks_in_circles.feature` (list/show after login). 3-run baseline at start, then 3 greens.
+`navigateToCircle` list (`circles`) and show (`circleShow`) use `push`. Post-join saved invitation `circleShow` uses `push`. Invitation **join** URL stays `visitNamed('circleJoin')`. No remount marker.
 
-**Pre:** logged-in SPA. **Trigger:** open a circle (existing `navigateToCircle` / post-join `circleShow`). **Post:** circle UI as today; those jumps `push`. Invitation **join** URL stays `visitNamed('circleJoin')`.
-
-**Verify:** `notebooks_in_circles.feature` (timer). Once: `e2e_test/features/circles/creating_circles.feature` (join stays remount). Record before/after medians in this PLAN.
+**Timing** (`notebooks_in_circles.feature`, `stats.duration` median of 3): 7.274s (7323, 7274, 6818 ms) → 5.726s (5726, 5691, 5742 ms). Threshold 10.274s. **Pass** (faster). `creating_circles.feature` once: 2/2 (join remount still works).
 
 ---
 

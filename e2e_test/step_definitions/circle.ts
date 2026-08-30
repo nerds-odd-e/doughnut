@@ -59,7 +59,7 @@ When('I join the saved circle invitation as the logged-in user', () => {
         body: { invitationCode: code },
       }).then((response) => {
         expect(response.status, 'join circle via invitation code').to.equal(200)
-        router().visitNamed('circleShow', { circleId: response.body.id })
+        router().push('circleShow', { circleId: response.body.id })
         start.waitUntilAppIsNotBusy()
       })
     })
