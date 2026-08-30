@@ -2,11 +2,13 @@
 
 **Status:** in progress (slices 1 and 6 done; 2–5 remaining).
 **Type:** ad-hoc plan (`.planning/quick/`)
-**Depends on:** shipped `.planning/quick/011-named-spa-route-honesty-follow-up/` (PLAN retired; named visit gate, `namedLocationHref`, Proposed [ADR 0005](../../../docs/adrs/0005-web-routes.md) E2E table remain on `main`)
+**Depends on:** shipped `.planning/quick/011-named-spa-route-honesty-follow-up/` (PLAN retired; named visit gate, `namedLocationHref`, Proposed [ADR 0005](../../../docs/adrs/0005-web-routes.md) E2E table remain on `main`); shipped `.planning/quick/015-spa-hydrate-after-testability-inject/` (PLAN retired 2026-08-29)
 
 ## Goal
 
 Close leftovers from 011: **dead E2E** and the ADR table’s **later-jump = named `push`** (slice 10 still `visitNamed`s most Given shortcuts). Operator STATE no longer points at the retired 011 PLAN (spent-plan cleanup 2026-08-29). Do not reopen unit-wiki HTML pinning, recall remount, or ADR accept.
+
+**015 already shipped** (do not redo): Given-shaped note/notebook identity jumps; catalog listing **page re-enter** (`leaveNotebookCatalogIfAlreadyOpen` then `push('notebooks')`); assimilate menu Model A (no `route.name` → `getMenuData`). 015 left `bazaarPage.ts` / settings / circles / admin `visitNamed` for this plan. Named `push` after login was **not slower** on 015’s timer specs.
 
 ## Inspection (011 on `main`)
 
@@ -51,15 +53,26 @@ Scope: 011’s route-honesty commits (unit leftovers + E2E gate + ADR rewrite), 
 | Duplicate ADR vs `e2e-authoring.mdc` intent table | Each artifact stands alone; 011 kept both. |
 | Invitation does not visit a UI-copied URL | 011 slice 11 dropped `@savedInvitationCode` on purpose; inject + `visitNamed('circleJoin')` matches that decision. |
 | Convert `visitHomePage` to `push` | Only first-load `feature_toggle.feature`. |
+| Identity `jumpToNotePage` / `jumpToNotebookPage` / owned `{notepath}` | 015. Bazaar-rooted `{notepath}` still walks the bazaar catalog after `navigateToBazaar`. |
+| Catalog listing after inject | 015 page re-enter. Do **not** make `navigateToNotebooksPage` a `visitNamed`. |
+| Assimilate menu `route.name` refetch | 015 reverted. Do not bring it back. |
 
 ## Design decisions
 
 - **Delete unused my-circles and reload-home E2E**, including `myCirclesPage.ts` if nothing remains. Circles list/show stay on `circlePage.ts`. Keep `visitHomePage`. Do not add “create circle in the UI” or “reload home” scenarios in this plan.
 - **One proving observable for push vs remount:** after `loginAs`, set a marker on `window` in the existing logged-in bazaar step path (do not add a Gherkin phrase about `window`). `cy.visit` remount clears it; named `push` does not. Logged-out `browsing.feature` is first load (`push` → `visitNamed` fallback) — not the proof.
 - **Optional `query` on `push`** only when converting admin tabs in the same slice.
-- **Timing:** only slice 2. Median of 3 Cypress JSON spec scores; pass if after ≤ before + max(15% of before, 3s). Time `e2e_test/features/bazaar/bazaar_subscription.feature` (login then bazaar). Do not use logged-out `browsing.feature` as the push timer.
+- **Speed gate (same as 015 / test-optimization):** every remaining slice that converts a logged-in Given shortcut from `visitNamed` to named `push` (slices 2–5). Navigation wall-clock can change; bazaar proving `push` does not cover settings/circles/admin specs.
+  - Score: Cypress mocha JSON `stats.duration` (ms → s). Median of **3** runs.
+  - Pass if after ≤ before + max(15% of before, 3s). Named `push` should be **faster or equal**.
+  - **Baseline at slice start** (current `visitNamed`), then reuse 3 consecutive greens as the after sample.
+  - Tee JSON locally (e.g. `/tmp/route-honesty-profile/`); **do not commit**.
+  - If a slice fails the gate, **revert that slice**; do not keep a slower remount-everywhere “honesty.”
+  - Timer command: `CURSOR_DEV=true nix develop -c pnpm cypress run --spec <feature> --reporter json`
+  - Do not use logged-out `browsing.feature` as a push timer (`push` → `visitNamed` fallback).
 - **STATE:** 011 pointer already dropped (spent-plan cleanup). Do not add a permanent 011 diary. Mention this cleanup plan only while it is active.
 - **Do not** convert recall remount, epub remount, identify, invitation `circleJoin`, `loginAs` notebooks, or `visitHomePage`.
+- **Do not** redo 015 catalog re-enter, identity jumps, or menu hydrate.
 
 ## Slices
 
@@ -73,37 +86,41 @@ Deleted unused create-and-copy step, `myCirclesPage.ts`, `start.navigateToMyCirc
 
 ### 2. Bazaar after login uses named push — Behavior `[ ]`
 
-**Timing:** yes.
+**Timing:** yes — `e2e_test/features/bazaar/bazaar_subscription.feature` (3-run baseline at start, then 3 greens).
 
-**Pre:** logged-in SPA (`loginAs` already `visitNamed`'d notebooks); `window` marker set. **Trigger:** visit the Bazaar (existing Given/When). **Post:** bazaar UI as today **and** the marker remains (no document remount). `navigateToBazaar` uses `push('bazaar')`. Logged-out bazaar still full-loads via `push` → `visitNamed` fallback.
+**Pre:** logged-in SPA (`loginAs` already `visitNamed`'d notebooks); `window` marker set. **Trigger:** visit the Bazaar (existing Given/When). **Post:** bazaar UI as today **and** the marker remains (no document remount). `navigateToBazaar` uses `push('bazaar')`. Logged-out bazaar still full-loads via `push` → `visitNamed` fallback. Bazaar-rooted `{notepath}` still catalog-walks after this helper (015).
 
-**Verify:** `e2e_test/features/bazaar/bazaar_subscription.feature` (marker + subscribe). Once: `e2e_test/features/bazaar/browsing.feature` for logged-out remount fallback. Timing gate on `bazaar_subscription.feature`.
+**Verify:** `bazaar_subscription.feature` (marker + subscribe). Once: `e2e_test/features/bazaar/browsing.feature` for logged-out remount fallback. Record before/after medians in this PLAN.
 
 ---
 
 ### 3. Settings Given shortcuts use named push — Behavior `[ ]`
 
-**Timing:** no (same mechanism as slice 2; settings specs are not the bazaar timer).
+**Timing:** yes — both verify specs (two helpers; bazaar timer does not cover them). 3-run baseline at start per spec, then 3 greens each.
 
 **Pre:** logged-in SPA. **Trigger:** open access tokens or recall stats (existing Gherkin). **Post:** those screens as today; `visitManageAccessTokensPage` / `visitRecallStatsPage` use `push`.
 
-**Verify:** `e2e_test/features/users/user_access_token.feature` and `e2e_test/features/recall/recall_stats.feature`.
+**Verify:** `e2e_test/features/users/user_access_token.feature` and `e2e_test/features/recall/recall_stats.feature`. Record before/after medians in this PLAN.
 
 ---
 
 ### 4. Circles list and show after first load use named push — Behavior `[ ]`
 
+**Timing:** yes — `e2e_test/features/circles/notebooks_in_circles.feature` (list/show after login). 3-run baseline at start, then 3 greens.
+
 **Pre:** logged-in SPA. **Trigger:** open a circle (existing `navigateToCircle` / post-join `circleShow`). **Post:** circle UI as today; those jumps `push`. Invitation **join** URL stays `visitNamed('circleJoin')`.
 
-**Verify:** `e2e_test/features/circles/creating_circles.feature` and `e2e_test/features/circles/notebooks_in_circles.feature`.
+**Verify:** `notebooks_in_circles.feature` (timer). Once: `e2e_test/features/circles/creating_circles.feature` (join stays remount). Record before/after medians in this PLAN.
 
 ---
 
 ### 5. Admin dashboard tabs use named push with query — Behavior `[ ]`
 
+**Timing:** yes — `e2e_test/features/user_admin/manage_bazaar.feature`. 3-run baseline at start, then 3 greens.
+
 **Pre:** admin session, SPA already loaded. **Trigger:** open an admin tab. **Post:** that tab as today. `push(name, params, query?)`; `visitAdminDashboardTab` passes `{ tab }`. No other `push` caller required to pass query.
 
-**Verify:** `e2e_test/features/user_admin/manage_bazaar.feature`.
+**Verify:** `manage_bazaar.feature`. Record before/after medians in this PLAN.
 
 ---
 
@@ -115,6 +132,8 @@ Done in spent-plan cleanup 2026-08-29: `.planning/STATE.md` no longer links the 
 
 - Do not convert `When I visit recall` to sidebar UI.
 - Do not restore a silent `time` query cache-buster.
-- Timing fail on slice 2 → revert that slice; do not accept slower bazaar for honesty.
+- Timing fail on slices 2–5 → revert **that** slice; do not accept slower E2E for honesty.
 - If a Given shortcut **must** remount (KeepAlive / stale view), keep explicit `visitNamed` and note it next to recall/epub — do not silently remount the rest.
+- Do not “fix” catalog hydrate or identity jumps here (015). Do not overlap 015’s `navigateToNotebooksPage` re-enter.
 - Human owns ADR accept. Do not rewrite ADR 0005 unless a converted call site contradicts the intent table (it should not).
+- Live OpenAI recording E2E can flake on `main` (015); do not treat that as a 014 timing or honesty failure.
