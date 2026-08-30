@@ -4,10 +4,9 @@
     data-testid="rich-note-property-row"
     :data-row-index="idx"
     :data-property-key="modelValue.key"
-    :data-test-pending="isPending ? 'true' : undefined"
     :data-property-focused="isFocused ? 'true' : undefined"
     :class="{
-      'rounded bg-primary/10 ring-1 ring-primary/30': isPending || isFocused,
+      'rounded bg-primary/10 ring-1 ring-primary/30': isFocused,
     }"
     :ref="setRootRef"
   >
@@ -18,11 +17,11 @@
         type="button"
         class="daisy-btn daisy-btn-ghost daisy-btn-sm square shrink-0"
         :aria-label="`Toggle options for note property ${modelValue.key}`"
-        :aria-expanded="expanded"
+        :aria-expanded="optionsExpanded"
         data-testid="rich-note-property-row-options-toggle"
         @click="optionsExpanded = !optionsExpanded"
       >
-        <ChevronRight v-if="!expanded" class="h-4 w-4" aria-hidden="true" />
+        <ChevronRight v-if="!optionsExpanded" class="h-4 w-4" aria-hidden="true" />
         <ChevronDown v-else class="h-4 w-4" aria-hidden="true" />
       </button>
       <div
@@ -130,7 +129,7 @@
       </div>
     </div>
     <RichFrontmatterPropertyRowOptions
-      v-if="expanded"
+      v-if="optionsExpanded"
       :property-key="modelValue.key"
       :note-id="noteId"
       @remove="emit('remove')"
@@ -175,7 +174,6 @@ const props = defineProps<{
   presetListId: string
   propertyRows: PropertyRow[]
   noteId?: number
-  isPending: boolean
   isFocused: boolean
   setRootRef: (el: Element | ComponentPublicInstance | null) => void
 }>()
@@ -194,8 +192,6 @@ const emit = defineEmits<{
 const presetPanelOpen = ref(false)
 const optionsExpanded = ref(false)
 const valueAreaRef = ref<HTMLElement | null>(null)
-
-const expanded = computed(() => optionsExpanded.value || props.isPending)
 
 const scalarValue = computed(
   () => scalarStringFromPropertyValue(props.modelValue.value) ?? ""

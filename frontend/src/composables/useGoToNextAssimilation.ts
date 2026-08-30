@@ -4,7 +4,10 @@ import timezoneParam from "@/managedApi/window/timezoneParam"
 import { useAssimilationCount } from "@/composables/useAssimilationCount"
 import { useAssimilationView } from "@/composables/useAssimilationView"
 import { useToast } from "@/composables/useToast"
-import { noteShowLocation } from "@/routes/noteShowLocation"
+import {
+  notePropertyLocation,
+  noteShowLocation,
+} from "@/routes/noteShowLocation"
 import { useRouter } from "vue-router"
 
 export const DAILY_GOAL_TOAST = "You've achieved your daily assimilation goal"
@@ -43,7 +46,13 @@ export function useGoToNextAssimilation() {
     }
 
     const { noteId, propertyKey } = nextUnit
-    openForNote(noteId, propertyKey)
+    if (propertyKey) {
+      dismiss()
+      await router.push(notePropertyLocation(noteId, propertyKey))
+      return true
+    }
+
+    openForNote(noteId)
     await router.push(noteShowLocation(noteId))
     return true
   }

@@ -8,6 +8,10 @@ import {
 } from "@/composables/useGoToNextAssimilation"
 import { useAssimilationCount } from "@/composables/useAssimilationCount"
 import { useAssimilationView } from "@/composables/useAssimilationView"
+import {
+  notePropertyLocation,
+  noteShowLocation,
+} from "@/routes/noteShowLocation"
 import LoadingModal from "@/components/commons/LoadingModal.vue"
 import {
   currentBlockingApiState,
@@ -83,19 +87,15 @@ describe("useGoToNextAssimilation", () => {
     expect(assimilatedCountOfTheDay.value).toBe(1)
     expect(totalUnassimilatedCount.value).toBe(5)
 
-    const { showAssimilationSettings, targetNoteId, pendingPropertyKey } =
-      useAssimilationView()
+    const { showAssimilationSettings, targetNoteId } = useAssimilationView()
     expect(showAssimilationSettings.value).toBe(true)
     expect(targetNoteId.value).toBe(42)
-    expect(pendingPropertyKey.value).toBeNull()
 
-    expect(routerPush).toHaveBeenCalledWith({
-      name: "noteShow",
-      params: { noteId: "42" },
-    })
+    expect(routerPush).toHaveBeenCalledWith(noteShowLocation(42))
   })
 
-  it("leaves settings off and stores pending property key when nextUnit includes propertyKey", async () => {
+  it("pushes noteProperty and leaves settings off when nextUnit includes propertyKey", async () => {
+    useAssimilationView().openForNote(42)
     mockSdkService(AssimilationController, "next", {
       nextUnit: { noteId: 42, propertyKey: "example of" },
       counts: {
@@ -108,10 +108,11 @@ describe("useGoToNextAssimilation", () => {
     const { goToNextAssimilation } = useGoToNextAssimilation()
     await goToNextAssimilation()
 
-    const { showAssimilationSettings, pendingPropertyKey } =
-      useAssimilationView()
+    const { showAssimilationSettings } = useAssimilationView()
     expect(showAssimilationSettings.value).toBe(false)
-    expect(pendingPropertyKey.value).toBe("example of")
+    expect(routerPush).toHaveBeenCalledWith(
+      notePropertyLocation(42, "example of")
+    )
   })
 
   it("shows daily goal toast when dueCount is zero but next unit exists", async () => {

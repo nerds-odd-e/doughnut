@@ -2,12 +2,6 @@ import { computed, ref } from "vue"
 import { useNoteToolbarPanel } from "./useNoteToolbarPanel"
 
 const targetNoteId = ref<number | null>(null)
-const pendingPropertyKey = ref<string | null>(null)
-
-function clearAssimilationTargets() {
-  targetNoteId.value = null
-  pendingPropertyKey.value = null
-}
 
 export function useAssimilationView() {
   const { activePanel, close: closePanel } = useNoteToolbarPanel()
@@ -25,30 +19,21 @@ export function useAssimilationView() {
     }
   }
 
-  const openSettingsUnlessPropertyPending = () => {
-    if (pendingPropertyKey.value) {
-      closeAssimilationSettingsIfOpen()
-      return
-    }
-    activePanel.value = "assimilation"
-  }
-
-  const openForNote = (noteId: number, propertyKey?: string | null) => {
+  const openForNote = (noteId: number) => {
     targetNoteId.value = noteId
-    pendingPropertyKey.value = propertyKey ?? null
-    openSettingsUnlessPropertyPending()
+    activePanel.value = "assimilation"
   }
 
   const resetForNote = (noteId: number) => {
     if (targetNoteId.value === noteId) {
-      openSettingsUnlessPropertyPending()
+      activePanel.value = "assimilation"
       return
     }
     closeAssimilationSettingsIfOpen()
   }
 
   const dismiss = () => {
-    clearAssimilationTargets()
+    targetNoteId.value = null
     closeAssimilationSettingsIfOpen()
   }
 
@@ -63,7 +48,6 @@ export function useAssimilationView() {
   return {
     showAssimilationSettings,
     targetNoteId,
-    pendingPropertyKey,
     isOpenForNote,
     openForNote,
     resetForNote,

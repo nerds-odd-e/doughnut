@@ -1,6 +1,6 @@
 # Note property canonical path
 
-**Status:** in progress (slices 1–8 done; 9–17 remaining).
+**Status:** in progress (slices 1–9 done; 10–17 remaining).
 **Type:** ad-hoc plan (`.planning/quick/`)
 **Policy:** [ADR 0001](../../../docs/adrs/0001-ubiquitous-language.md) (**Property**, **Wiki link**), [ADR 0004](../../../docs/adrs/0004-okf-compatible-notebook-markdown-accepted.md) (`#prop:`), Proposed [ADR 0005](../../../docs/adrs/0005-web-routes.md) (`noteProperty`).
 **Human-owned exception (2026-08-29):** ADR 0001 / ADR 0004 may depend on
@@ -159,9 +159,13 @@ Focused-key removal `replace`s to `noteShow` via
 preserved. Deleting a different key stays on `noteProperty`. E2E in
 `note_property.feature`.
 
-### 9. Next to assimilate a property uses `noteProperty` — **Behavior** — planned
+### 9. Next to assimilate a property uses `noteProperty` — **Behavior** — done
 
-**Pre:** next unit is a property. **Trigger:** start / continue assimilation from the menu. **Post:** location is `noteProperty` for that key; assimilation settings stay closed; selected-row UX still holds. `useGoToNextAssimilation` pushes `notePropertyLocation` when `propertyKey` is set. Remove `pendingPropertyKey` / `openForNote(…, key)` as a nav side channel. Update `useGoToNextAssimilation` unit tests and property-queue E2E.
+`useGoToNextAssimilation` `push`es `notePropertyLocation` when `propertyKey`
+is set; `dismiss()` keeps settings closed. `pendingPropertyKey`,
+`usePendingAssimilationProperty`, and `data-test-pending` are gone. Skip
+scenarios close the value dialog first so toggle options are reachable.
+E2E: `property_memory_tracker.feature`.
 
 ### 10. Answered question and memory tracker link to `noteProperty` — **Behavior** — planned
 
@@ -265,12 +269,8 @@ invent identity from the label. Extend the internal-URL classifier so
   `noteShow` — do not reuse the not-found banner for that case.
 - `useFocusedNoteProperty` is the route-neutral focus seam. Editable
   text-capable rows also open the value dialog from `isFocused`. Do not add
-  a second focus source. Pending-property dual-ref stays until slice 9.
-  Highlight classes on editable rows still serve pending-assimilation
-  (removed in slice 9) as well as route focus.
-- Next-assimilate already distinguishes property units (settings off, pending
-  row). The route replaces both the destination and the pending-property
-  memory/selector language.
+  a second focus source. Assimilate skip on a property must close the value
+  dialog first (native modal) so toggle options are reachable.
 - `WikiLinkTargetReference` currently resolves and rewrites the whole authored
   target as a note title. Without a property-target codec,
   `Title#prop:key` cannot resolve and title/folder/notebook rewrites can drop

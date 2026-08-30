@@ -7,7 +7,6 @@ import { flushPromises } from "@vue/test-utils"
 import makeMe from "donut-test-fixtures/makeMe"
 import { mockSdkService } from "@tests/helpers"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
-import { useAssimilationView } from "@/composables/useAssimilationView"
 import {
   expandPropertyRowOptions,
   propertyRowSelector,
@@ -57,7 +56,6 @@ Workshop body.`
 
   afterEach(() => {
     vi.restoreAllMocks()
-    useAssimilationView().dismiss()
     h.cleanup()
   })
 
@@ -101,31 +99,5 @@ Workshop body.`
     expect(skipSpy).toHaveBeenCalledWith({
       body: { noteId, propertyKey: "topic" },
     })
-  })
-
-  it("auto-expands and highlights the property pending assimilation", async () => {
-    useAssimilationView().openForNote(noteId, "topic")
-
-    const wrapper = await h.mountEditor(topicMarkdown, { noteId })
-
-    const row = wrapper.find(topicRowSelector)
-    expect(row.attributes("data-test-pending")).toBe("true")
-    expect(row.classes()).toContain("bg-primary/10")
-    expect(
-      wrapper
-        .find(
-          `${topicRowSelector} [data-testid="rich-note-property-row-options"]`
-        )
-        .exists()
-    ).toBe(true)
-  })
-
-  it("does not highlight a property that is not pending assimilation", async () => {
-    useAssimilationView().openForNote(noteId, "other")
-
-    const wrapper = await h.mountEditor(topicMarkdown, { noteId })
-
-    const row = wrapper.find(topicRowSelector)
-    expect(row.attributes("data-test-pending")).toBeUndefined()
   })
 })
