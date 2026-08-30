@@ -1,6 +1,6 @@
 # Named SPA route honesty cleanup
 
-**Status:** in progress (slices 1 and 6 done; 2–5 remaining).
+**Status:** in progress (slices 1, 2, and 6 done; 3–5 remaining).
 **Type:** ad-hoc plan (`.planning/quick/`)
 **Depends on:** shipped `.planning/quick/011-named-spa-route-honesty-follow-up/` (PLAN retired; named visit gate, `namedLocationHref`, Proposed [ADR 0005](../../../docs/adrs/0005-web-routes.md) E2E table remain on `main`); shipped `.planning/quick/015-spa-hydrate-after-testability-inject/` (PLAN retired 2026-08-29)
 
@@ -8,7 +8,7 @@
 
 Close leftovers from 011: **dead E2E** and the ADR table’s **later-jump = named `push`** (slice 10 still `visitNamed`s most Given shortcuts). Operator STATE no longer points at the retired 011 PLAN (spent-plan cleanup 2026-08-29). Do not reopen unit-wiki HTML pinning, recall remount, or ADR accept.
 
-**015 already shipped** (do not redo): Given-shaped note/notebook identity jumps; catalog listing **page re-enter** (`leaveNotebookCatalogIfAlreadyOpen` then `push('notebooks')`); assimilate menu Model A (no `route.name` → `getMenuData`). 015 left `bazaarPage.ts` / settings / circles / admin `visitNamed` for this plan. Named `push` after login was **not slower** on 015’s timer specs.
+**015 already shipped** (do not redo): Given-shaped note/notebook identity jumps; catalog listing **page re-enter** (`leaveNotebookCatalogIfAlreadyOpen` then `push('notebooks')`); assimilate menu Model A (no `route.name` → `getMenuData`). 015 left settings / circles / admin `visitNamed` for this plan. Bazaar after login now `push`es (slice 2). Named `push` after login was **not slower** on 015’s timer specs or slice 2’s bazaar timer.
 
 ## Inspection (011 on `main`)
 
@@ -22,7 +22,7 @@ Scope: 011’s route-honesty commits (unit leftovers + E2E gate + ADR rewrite), 
 
    | Helper | Today | After |
    |---|---|---|
-   | `navigateToBazaar` | `visitNamed('bazaar')` | `push` |
+   | `navigateToBazaar` | `push('bazaar')` (slice 2) | — |
    | `visitManageAccessTokensPage` | `visitNamed('settingsAccessTokens')` | `push` |
    | `visitRecallStatsPage` | `visitNamed('settingsRecallStats')` | `push` |
    | `navigateToCircle` list/show | `visitNamed('circles'` / `'circleShow')` | `push` |
@@ -84,13 +84,13 @@ Deleted unused create-and-copy step, `myCirclesPage.ts`, `start.navigateToMyCirc
 
 ---
 
-### 2. Bazaar after login uses named push — Behavior `[ ]`
+### 2. Bazaar after login uses named push — Behavior `[x]`
 
-**Timing:** yes — `e2e_test/features/bazaar/bazaar_subscription.feature` (3-run baseline at start, then 3 greens).
+`navigateToBazaar` uses `push('bazaar')`. After login, `__donutSpaDocumentMarker` is set on `window` in that helper and asserted to survive (no Gherkin about `window`). First load skips the marker (`push` → `visitNamed` fallback). Logged-out `browsing.feature` passed once.
 
-**Pre:** logged-in SPA (`loginAs` already `visitNamed`'d notebooks); `window` marker set. **Trigger:** visit the Bazaar (existing Given/When). **Post:** bazaar UI as today **and** the marker remains (no document remount). `navigateToBazaar` uses `push('bazaar')`. Logged-out bazaar still full-loads via `push` → `visitNamed` fallback. Bazaar-rooted `{notepath}` still catalog-walks after this helper (015).
+**Timing** (`bazaar_subscription.feature`, `stats.duration` median of 3): before 4.835s (6030, 4835, 4560 ms) → after 4.145s (4313, 3936, 4145 ms). Threshold 7.835s. **Pass** (faster). Marker stays local to bazaar — slices 3–5 do not copy it unless a remount is suspected.
 
-**Verify:** `bazaar_subscription.feature` (marker + subscribe). Once: `e2e_test/features/bazaar/browsing.feature` for logged-out remount fallback. Record before/after medians in this PLAN.
+**Learning:** no KeepAlive remount needed for bazaar; do not extract a shared marker helper for settings/circles/admin.
 
 ---
 
