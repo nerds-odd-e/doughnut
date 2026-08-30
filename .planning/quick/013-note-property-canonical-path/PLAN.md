@@ -1,6 +1,6 @@
 # Note property canonical path
 
-**Status:** in progress (slices 1–10 done; 11–17 remaining).
+**Status:** in progress (slices 1–11 done; 12–17 remaining).
 **Type:** ad-hoc plan (`.planning/quick/`)
 **Policy:** [ADR 0001](../../../docs/adrs/0001-ubiquitous-language.md) (**Property**, **Wiki link**), [ADR 0004](../../../docs/adrs/0004-okf-compatible-notebook-markdown-accepted.md) (`#prop:`), Proposed [ADR 0005](../../../docs/adrs/0005-web-routes.md) (`noteProperty`).
 **Human-owned exception (2026-08-29):** ADR 0001 / ADR 0004 may depend on
@@ -175,28 +175,14 @@ E2E: `property_memory_tracker.feature` (tracker + answered-question).
 Answered-question MCQ under `@mockBrowserTime` flushes the mocked clock
 before click so the click fires.
 
-### 11. Java property-target codec preserves note-link behavior — **Structure** — planned
+### 11. Java property-target codec preserves note-link behavior — **Structure** — done
 
-Introduce one domain-shaped Java authored-target parser/formatter: note target
-plus optional encoded property key. Reuse the existing `PropertyKeyNaming` /
-`NotePropertyIndex.propertyKey` domain concept for key semantics rather than
-reinventing it — property keys are not a new concept, only the `#prop:`
-token-splitting codec on the link-target string is. Refactor **both**
-existing full-token rewrite families to consume its note-target portion:
-`WikiLinkTargetReference` (rename/move: `replaceNoteTitle`,
-`replaceFolderName`, `replaceNotebookName`) and `WikiLinkMarkdownRewrite`
-(regex-level markdown splice). Also cover `WikiLinkResolver.resolveAnyTargetWikiLinkToken`
-(the viewer-unaware path used for cross-notebook-move co-migration matching,
-outside the main `resolveToken`/`resolveWikiLinkToken` path) — easy to miss.
-Before layering the codec on, add a regression test for the existing bug this
-codec must not inherit: `PathShapedTarget.tryParse` already returns
-`Optional.empty()` for any target containing `:`, so `Qualified`
-(`Notebook:Title`) rewrites already silently drop any suffix today — prove
-this is understood, not accidentally relied on, once `#prop:` (which
-contains `:`) is introduced. Prove every existing note-only output unchanged.
-Pure contract tests establish encoded property parsing/formatting, but do not
-make property tokens live or rewrite them yet. This structure exists only to
-enable slice 12.
+`WikiLinkAuthoredTarget` parses/formats note target + optional `#prop:`
+encoded key. Rewrites and `resolveAnyTargetWikiLinkToken` consume the
+note-target portion. Path-shaped `:` trap is documented
+(`WikiLinkTargetReferenceTest`). Encode pairs in
+`WikiLinkAuthoredTargetTest` for TypeScript slice 13. Property tokens are
+not live yet — slice 12 must require the exact existing decoded key.
 
 ### 12. Property wiki resolution requires the exact target property — **Behavior** — planned
 
@@ -275,25 +261,15 @@ invent identity from the label. Extend the internal-URL classifier so
   text-capable rows also open the value dialog from `isFocused`. Do not add
   a second focus source. Assimilate skip on a property must close the value
   dialog first (native modal) so toggle options are reachable.
-- `WikiLinkTargetReference` currently resolves and rewrites the whole authored
-  target as a note title. Without a property-target codec,
-  `Title#prop:key` cannot resolve and title/folder/notebook rewrites can drop
-  or corrupt the suffix. This is sharper than it sounds: `replaceNoteTitle`
-  (qualified case) and `PathShapedTarget.tryParse` (which already returns
-  `Optional.empty()` for any target containing `:`) mean a `Notebook:Title`
-  rewrite can silently drop a suffix **today**, before `#prop:` exists —
-  add a regression test for this pre-existing behavior before layering the
-  codec on top, not as an incidental side effect of slice 11.
-  `NotePropertyIndex.propertyKey` / `PropertyKeyNaming` already model
-  property-key semantics and can be reused rather than reinvented.
+- Slice 11: `WikiLinkAuthoredTarget` splits `#prop:` first so rewrites and
+  `resolveAnyTargetWikiLinkToken` keep the encoded suffix. Path-shaped
+  `:` still drops a non-`#prop:` suffix (`#heading`) — documented, not
+  inherited by `#prop:`. Slice 12 must make tokens live only when the note
+  is readable and the decoded exact key exists; `resolveAnyTarget` today
+  matches the note without requiring the property.
 - Current paste/strip code converts internal URLs with anchor text as the wiki
   target. A property URL contains only server note id + key, so correct portable
   conversion requires resolving the note's concept identity.
-- `WikiLinkResolver.resolveAnyTargetWikiLinkToken` (used by
-  `WikiLinkRewriteSupport.coMovedTargetResolvesFrom` for cross-notebook-move
-  co-migration matching) is a second, viewer-unaware resolution path outside
-  the main `resolveToken` / `resolveWikiLinkToken` path — easy to miss; slice
-  11/12 must confirm it is covered too.
 - A note title that itself contains the literal substring `#prop:` (e.g.
   `Foo#prop:bar`) cannot be the sole unqualified target of a link — the
   parser always splits on the first `#prop:` marker. Accepted as a trade-off

@@ -93,7 +93,9 @@ public final class WikiLinkMarkdownRewrite {
       return storedLinkInner;
     }
     return keepVisibleInner(
-        storedLinkInner, rawTargetToken -> sourceNotebookName + ":" + rawTargetToken);
+        storedLinkInner,
+        rawTargetToken ->
+            WikiLinkTargetReference.replaceNotebookName(rawTargetToken, sourceNotebookName));
   }
 
   private static String newInnerWithHandling(

@@ -14,10 +14,11 @@ public record WikiLinkTargetReference(String notebookName, String noteTitle) {
    */
   public static Optional<WikiLinkTargetReference> forToken(String token, String focusNotebookName) {
     String resolutionKey = WikiLinkMarkdown.splitAuthoredToken(token).target();
-    if (resolutionKey == null || resolutionKey.isBlank()) {
+    String noteTarget = WikiLinkAuthoredTarget.parse(resolutionKey).noteTarget();
+    if (noteTarget.isBlank()) {
       return Optional.empty();
     }
-    Qualified qualified = Qualified.tryParse(resolutionKey);
+    Qualified qualified = Qualified.tryParse(noteTarget);
     if (qualified != null) {
       return Optional.of(
           new WikiLinkTargetReference(qualified.notebookName(), qualified.noteTitle()));
@@ -25,33 +26,50 @@ public record WikiLinkTargetReference(String notebookName, String noteTitle) {
     if (focusNotebookName == null || focusNotebookName.isBlank()) {
       return Optional.empty();
     }
-    return Optional.of(new WikiLinkTargetReference(focusNotebookName, resolutionKey));
+    return Optional.of(new WikiLinkTargetReference(focusNotebookName, noteTarget));
   }
 
   static boolean isQualifiedToken(String targetToken) {
-    return Qualified.tryParse(targetToken) != null;
+    return Qualified.tryParse(WikiLinkAuthoredTarget.parse(targetToken).noteTarget()) != null;
   }
 
   static String replaceNoteTitle(String targetToken, String newTitle) {
-    Qualified qualified = Qualified.tryParse(targetToken);
-    if (qualified != null) {
-      return qualified.notebookName() + ":" + newTitle;
-    }
-    return PathShapedTarget.tryParse(targetToken)
-        .map(path -> path.withNoteTitle(newTitle))
-        .orElse(newTitle);
+    return mapNoteTarget(
+        targetToken,
+        noteTarget -> {
+          Qualified qualified = Qualified.tryParse(noteTarget);
+          if (qualified != null) {
+            return qualified.notebookName() + ":" + newTitle;
+          }
+          return PathShapedTarget.tryParse(noteTarget)
+              .map(path -> path.withNoteTitle(newTitle))
+              .orElse(newTitle);
+        });
   }
 
   static String replaceFolderName(String targetToken, String oldFolderName, String newFolderName) {
-    return PathShapedTarget.tryParse(targetToken)
-        .map(path -> path.withRenamedFolder(oldFolderName, newFolderName))
-        .orElse(targetToken);
+    return mapNoteTarget(
+        targetToken,
+        noteTarget ->
+            PathShapedTarget.tryParse(noteTarget)
+                .map(path -> path.withRenamedFolder(oldFolderName, newFolderName))
+                .orElse(noteTarget));
   }
 
   static String replaceNotebookName(String targetToken, String newNotebookName) {
-    Qualified qualified = Qualified.tryParse(targetToken);
-    String noteTitle = qualified == null ? targetToken : qualified.noteTitle();
-    return newNotebookName + ":" + noteTitle;
+    return mapNoteTarget(
+        targetToken,
+        noteTarget -> {
+          Qualified qualified = Qualified.tryParse(noteTarget);
+          String noteTitle = qualified == null ? noteTarget : qualified.noteTitle();
+          return newNotebookName + ":" + noteTitle;
+        });
+  }
+
+  private static String mapNoteTarget(
+      String targetToken, UnaryOperator<String> noteTargetTransform) {
+    WikiLinkAuthoredTarget authored = WikiLinkAuthoredTarget.parse(targetToken);
+    return authored.withNoteTarget(noteTargetTransform.apply(authored.noteTarget())).format();
   }
 
   /**

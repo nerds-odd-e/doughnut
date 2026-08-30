@@ -134,4 +134,64 @@ class WikiLinkMarkdownTest {
             "see [[  Old  ]] end", "Old", "NewTitle"),
         equalTo("see [[NewTitle]] end"));
   }
+
+  @Test
+  void newInnerForUpdateVisibleText_qualifiedPlainLink() {
+    assertThat(
+        WikiLinkMarkdownRewrite.newInnerForUpdateVisibleText("MyNb:OldTitle", "NewTitle"),
+        equalTo("MyNb:NewTitle"));
+  }
+
+  @Test
+  void newInnerForKeepNotebookMove_qualifiesUnqualifiedAndKeepsVisibleText() {
+    assertThat(
+        WikiLinkMarkdownRewrite.newInnerForKeepNotebookMove("Title", "NewNb"),
+        equalTo("NewNb:Title|Title"));
+  }
+
+  @Test
+  void newInnerForKeepNotebookMove_replacesQualifiedPrefixAndKeepsVisibleText() {
+    assertThat(
+        WikiLinkMarkdownRewrite.newInnerForKeepNotebookMove("OldNb:Title", "NewNb"),
+        equalTo("NewNb:Title|OldNb:Title"));
+  }
+
+  @Test
+  void newInnerForKeepVisibleText_preservesEncodedPropertySuffixAndDisplay() {
+    assertThat(
+        WikiLinkMarkdownRewrite.newInnerForKeepVisibleText(
+            "Moon#prop:a%20part%20of|the moon", "Luna"),
+        equalTo("Luna#prop:a%20part%20of|the moon"));
+  }
+
+  @Test
+  void newInnerForUpdateVisibleText_preservesEncodedPropertySuffixOnPathMarkdown() {
+    assertThat(
+        WikiLinkMarkdownRewrite.newInnerForUpdateVisibleText(
+            "[label](/Solar/Moon.md#prop:a%20part%20of)", "Luna"),
+        equalTo("[label](/Solar/Luna.md#prop:a%20part%20of)"));
+  }
+
+  @Test
+  void newInnerForFolderRename_preservesEncodedPropertySuffix() {
+    assertThat(
+        WikiLinkMarkdownRewrite.newInnerForFolderRename(
+            "Solar/Moon#prop:a%20part%20of", "Solar", "Helios"),
+        equalTo("Helios/Moon#prop:a%20part%20of"));
+  }
+
+  @Test
+  void newInnerForKeepNotebookMove_preservesEncodedPropertySuffixAndDisplay() {
+    assertThat(
+        WikiLinkMarkdownRewrite.newInnerForKeepNotebookMove("Moon#prop:a%20part%20of", "Sky"),
+        equalTo("Sky:Moon#prop:a%20part%20of|Moon#prop:a%20part%20of"));
+  }
+
+  @Test
+  void newInnerForQualifyUnqualifiedOutgoingLink_preservesEncodedPropertySuffix() {
+    assertThat(
+        WikiLinkMarkdownRewrite.newInnerForQualifyUnqualifiedOutgoingLink(
+            "Moon#prop:a%20part%20of", "Sky"),
+        equalTo("Sky:Moon#prop:a%20part%20of|Moon#prop:a%20part%20of"));
+  }
 }
