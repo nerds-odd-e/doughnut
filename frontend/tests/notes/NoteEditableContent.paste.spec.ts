@@ -1,5 +1,10 @@
 import { flushPromises } from "@vue/test-utils"
 import { vi, describe, it, expect, beforeEach, afterEach } from "vitest"
+import makeMe from "donut-test-fixtures/makeMe"
+import { NoteController } from "@generated/donut-backend-api/sdk.gen"
+import { useStorageAccessor } from "@/composables/useStorageAccessor"
+import { notePropertyHref } from "@/routes/noteShowLocation"
+import { mockSdkService, wrapSdkError } from "@tests/helpers"
 import {
   createClipboardEvent,
   emitRichEditorPasteComplete,
@@ -76,6 +81,106 @@ describe("NoteEditableContent paste", () => {
       expect(textarea.value).toContain("new link")
       expect(textarea.value).not.toContain("https://existing.com")
       expect(textarea.value).not.toContain("https://example.com")
+      wrapper.unmount()
+    })
+
+    it("converts a pasted noteProperty URL to a portable property wiki", async () => {
+      const source = makeMe.aNoteRealm
+        .id(1)
+        .title("Carrier")
+        .inNotebook(10, "Sky")
+        .please()
+      const target = makeMe.aNoteRealm
+        .id(99)
+        .title("Moon")
+        .inNotebook(10, "Sky")
+        .please()
+      const wrapper = mountNoteEditableContent(
+        { noteId: 1, noteContent: "See " },
+        { attachTo: document.body }
+      )
+      await flushPromises()
+      useStorageAccessor().value.refreshNoteRealm(source)
+      useStorageAccessor().value.refreshNoteRealm(target)
+
+      const textarea = textareaEl(wrapper)
+      textarea.setSelectionRange(4, 4)
+      const href = notePropertyHref(99, "topic")
+      await textarea.dispatchEvent(
+        createClipboardEvent(`<p><a href="${href}">shown</a></p>`)
+      )
+      await flushPromises()
+
+      expect(textarea.value).toContain("[[Moon#prop:topic|shown]]")
+      expect(textarea.value).not.toContain(href)
+      expect(mockPopupsOptions).not.toHaveBeenCalled()
+      wrapper.unmount()
+    })
+
+    it("qualifies a pasted noteProperty URL when the target notebook differs", async () => {
+      const source = makeMe.aNoteRealm
+        .id(1)
+        .title("Carrier")
+        .inNotebook(10, "Here")
+        .please()
+      const target = makeMe.aNoteRealm
+        .id(99)
+        .title("Moon")
+        .inNotebook(20, "Sky")
+        .please()
+      const wrapper = mountNoteEditableContent(
+        { noteId: 1, noteContent: "See " },
+        { attachTo: document.body }
+      )
+      await flushPromises()
+      useStorageAccessor().value.refreshNoteRealm(source)
+      useStorageAccessor().value.refreshNoteRealm(target)
+
+      const textarea = textareaEl(wrapper)
+      textarea.setSelectionRange(4, 4)
+      await textarea.dispatchEvent(
+        createClipboardEvent(
+          `<p><a href="${notePropertyHref(99, "topic")}">shown</a></p>`
+        )
+      )
+      await flushPromises()
+
+      expect(textarea.value).toContain("[[Sky:Moon#prop:topic|shown]]")
+      wrapper.unmount()
+    })
+
+    it("leaves a normal link and offers the paste choice when note identity cannot be resolved", async () => {
+      mockSdkService(NoteController, "showNote", makeMe.aNoteRealm.please())
+      vi.mocked(NoteController.showNote).mockResolvedValue(
+        wrapSdkError("missing")
+      )
+
+      const source = makeMe.aNoteRealm
+        .id(1)
+        .title("Carrier")
+        .inNotebook(10, "Sky")
+        .please()
+      const wrapper = mountNoteEditableContent(
+        { noteId: 1, noteContent: "See " },
+        { attachTo: document.body }
+      )
+      await flushPromises()
+      useStorageAccessor().value.refreshNoteRealm(source)
+
+      const textarea = textareaEl(wrapper)
+      textarea.setSelectionRange(4, 4)
+      const href = notePropertyHref(99, "topic")
+      await textarea.dispatchEvent(
+        createClipboardEvent(`<p><a href="${href}">shown</a></p>`)
+      )
+      await flushPromises()
+
+      expect(textarea.value).toContain(`[shown](${href})`)
+      expect(textarea.value).not.toContain("[[shown]]")
+      expect(mockPopupsOptions).toHaveBeenCalledWith(
+        "The content contains 1 links.",
+        expect.arrayContaining([{ label: "Remove 1 links", value: "links" }])
+      )
       wrapper.unmount()
     })
   })

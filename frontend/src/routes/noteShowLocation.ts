@@ -9,7 +9,7 @@ import {
 } from "vue-router"
 import { dummyRouteRecordsFromMetadata } from "./dummyRouteRecords"
 import { namedLocationHref } from "./namedLocationHref"
-import { isNoteRouteFamily } from "./noteRouteFamily"
+import { isNoteRouteFamily, noteRouteFamilyNoteId } from "./noteRouteFamily"
 
 export function noteShowLocation(noteId: number): RouteLocationNamedRaw {
   return {
@@ -109,11 +109,72 @@ function resolveFollowingRedirects(router: Router, location: RouteLocationRaw) {
   throw new Error(`Too many redirects resolving ${String(location)}`)
 }
 
+export type InternalNoteFamilyHref = {
+  noteId: number
+  propertyKey: string | undefined
+}
+
+function pathnameFromHref(href: string): string | undefined {
+  try {
+    return new URL(href, "https://example.invalid").pathname
+  } catch {
+    return undefined
+  }
+}
+
+/** Parse a pasted SPA href through the route table (property key decoded once). */
+export function resolveInternalNoteFamilyFromHref(
+  href: string,
+  router: Router = internalNoteRouteClassifierRouter
+): InternalNoteFamilyHref | undefined {
+  const pathname = pathnameFromHref(href)
+  if (pathname === undefined) {
+    return undefined
+  }
+  const resolved = resolveFollowingRedirects(router, pathname)
+  if (!isNoteRouteFamily(resolved)) {
+    return undefined
+  }
+  const noteIdRaw = noteRouteFamilyNoteId(resolved)
+  if (noteIdRaw === undefined) {
+    return undefined
+  }
+  const noteId = Number(noteIdRaw)
+  if (!Number.isFinite(noteId)) {
+    return undefined
+  }
+  return {
+    noteId,
+    propertyKey: notePropertyKeyFromRoute({
+      name: resolved.name ?? undefined,
+      params: resolved.params,
+    }),
+  }
+}
+
+export function hrefLooksLikeNoteShow(
+  href: string | null | undefined
+): boolean {
+  if (!href?.trim()) return false
+  const family = resolveInternalNoteFamilyFromHref(href)
+  return family !== undefined && family.propertyKey === undefined
+}
+
+export function resolveNotePropertyFromHref(
+  href: string
+): { noteId: number; propertyKey: string } | undefined {
+  const family = resolveInternalNoteFamilyFromHref(href)
+  if (!family?.propertyKey) {
+    return undefined
+  }
+  return { noteId: family.noteId, propertyKey: family.propertyKey }
+}
+
 export function pathnameLooksLikeInternalNoteFamily(
   pathname: string,
   router: Router = internalNoteRouteClassifierRouter
 ): boolean {
-  return isNoteRouteFamily(resolveFollowingRedirects(router, pathname))
+  return resolveInternalNoteFamilyFromHref(pathname, router) !== undefined
 }
 
 /** Bundle-relative note path (`/Folder/Title.md`), not a Donut note-family URL. */

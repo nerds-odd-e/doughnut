@@ -1,22 +1,7 @@
 import { marked, type Tokens } from "marked"
 import markdownizer from "@/components/form/markdownizer"
-import { pathnameLooksLikeInternalNoteFamily } from "@/routes/noteShowLocation"
+import { hrefLooksLikeNoteShow } from "@/routes/noteShowLocation"
 import { verbatimFrontmatterPrefixAndBody } from "@/utils/noteContentFrontmatter"
-
-function isInternalNoteFamilyMarkdownHref(
-  href: string | null | undefined
-): boolean {
-  if (!href) return false
-  try {
-    const u = new URL(
-      href,
-      href.startsWith("/") ? "http://local.invalid" : undefined
-    )
-    return pathnameLooksLikeInternalNoteFamily(u.pathname)
-  } catch {
-    return false
-  }
-}
 
 export function countMarkdownLinksAndImages(markdown: string): {
   linkCount: number
@@ -28,7 +13,7 @@ export function countMarkdownLinksAndImages(markdown: string): {
 
   marked.walkTokens(tokens, (token) => {
     if (token.type === "link") {
-      if (!isInternalNoteFamilyMarkdownHref((token as Tokens.Link).href)) {
+      if (!hrefLooksLikeNoteShow((token as Tokens.Link).href)) {
         linkCount++
       }
     } else if (token.type === "image") imageCount++
@@ -60,7 +45,7 @@ function stripMarkdownLinksAndImages(
       delete asRecord.href
       delete asRecord.title
       delete asRecord.tokens
-      if (isInternalNoteFamilyMarkdownHref(href)) {
+      if (hrefLooksLikeNoteShow(href)) {
         const label = linkToken.text || ""
         Object.assign(token, {
           type: "text",

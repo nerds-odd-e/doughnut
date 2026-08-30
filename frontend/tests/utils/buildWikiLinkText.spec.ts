@@ -117,3 +117,34 @@ describe("buildWikiLinkText", () => {
     ).toBe("[[]]")
   })
 })
+
+describe("buildWikiLinkText with a property key", () => {
+  it("appends an encoded #prop: key to the portable note target", () => {
+    expect(
+      buildWikiLinkText(makeTarget("Moon", 1, "Donut"), {
+        notebookId: 1,
+        propertyKey: "topic",
+      })
+    ).toBe("[[Moon#prop:topic]]")
+  })
+
+  it("qualifies the note target across notebooks and keeps custom display", () => {
+    expect(
+      buildWikiLinkText(makeTarget("Moon", 2, "Sky"), {
+        notebookId: 1,
+        displayText: "shown",
+        propertyKey: "a part of",
+      })
+    ).toBe("[[Sky:Moon#prop:a%20part%20of|shown]]")
+  })
+
+  it("omits the pipe when display text equals the authored property target", () => {
+    expect(
+      buildWikiLinkText(makeTarget("Moon", 1, "Donut"), {
+        notebookId: 1,
+        displayText: "Moon#prop:topic",
+        propertyKey: "topic",
+      })
+    ).toBe("[[Moon#prop:topic]]")
+  })
+})

@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest"
 import htmlToMarkdown from "@/components/form/quillHtmlToMarkdown"
 import { replaceWikiLinksInHtml } from "@/components/form/replaceWikiLinksInHtml"
-import { noteShowHref } from "@/routes/noteShowLocation"
+import { notePropertyHref, noteShowHref } from "@/routes/noteShowLocation"
 import { wikiTitleFromAuthoredToken } from "@/utils/wikiLinkMarkup"
 
 describe("quillHtmlToMarkdown", () => {
@@ -64,6 +64,22 @@ describe("quillHtmlToMarkdown", () => {
     ${"path markdown dead with hash href"}            | ${'<p><a href="#" class="dead-wiki-link" data-wiki-title="/Folder/Missing.md" data-wiki-display="label">label</a></p>'}                                      | ${"[label](/Folder/Missing.md)"}
   `("wiki links: $label", ({ html, expected }) => {
     expect(htmlToMarkdown(html)).toBe(expected)
+  })
+
+  it("leaves a pasted noteProperty href as a markdown link, not a wiki from the label", () => {
+    const href = notePropertyHref(42, "topic")
+    expect(htmlToMarkdown(`<p><a href="${href}">shown</a></p>`)).toBe(
+      `[shown](${href})`
+    )
+  })
+
+  it("round-trips a live property wiki anchor through data-wiki-title, not the SPA href", () => {
+    const href = notePropertyHref(42, "topic")
+    expect(
+      htmlToMarkdown(
+        `<p><a href="${href}" class="donut-wiki-link" data-wiki-title="Moon#prop:topic" data-wiki-display="shown" data-note-id="42">shown</a></p>`
+      )
+    ).toBe("[[Moon#prop:topic|shown]]")
   })
 
   const linkifiedTwoNotes = [

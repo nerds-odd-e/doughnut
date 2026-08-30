@@ -1,6 +1,6 @@
 import TurndownService from "turndown"
 import { gfm } from "turndown-plugin-gfm"
-import { pathnameLooksLikeInternalNoteFamily } from "@/routes/noteShowLocation"
+import { hrefLooksLikeNoteShow } from "@/routes/noteShowLocation"
 import {
   mergeConsecutiveHeaders,
   normalizeTableCells,
@@ -178,17 +178,6 @@ turndownService.addRule("donutWikiLink", {
   },
 })
 
-/** Pasted HTML often has plain note-family hrefs without donut-wiki-link class. */
-function hrefIsInternalNoteFamily(href: string | null): boolean {
-  if (!href?.trim()) return false
-  try {
-    const pathname = new URL(href, "https://example.invalid").pathname
-    return pathnameLooksLikeInternalNoteFamily(pathname)
-  } catch {
-    return false
-  }
-}
-
 turndownService.addRule("donutNoteShowHrefWikiLink", {
   filter(node) {
     if (node.nodeName !== "A") return false
@@ -196,7 +185,7 @@ turndownService.addRule("donutNoteShowHrefWikiLink", {
     if (el.classList.contains(DONUT_WIKI_LINK_CLASS)) {
       return false
     }
-    return hrefIsInternalNoteFamily(el.getAttribute("href"))
+    return hrefLooksLikeNoteShow(el.getAttribute("href"))
   },
   replacement(_content, node) {
     const text = (node as HTMLElement).textContent?.trim() ?? ""

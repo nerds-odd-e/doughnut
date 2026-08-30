@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest"
+import { notePropertyHref, noteShowHref } from "@/routes/noteShowLocation"
 import {
   countMarkdownLinksAndImagesInNoteContent,
   stripMarkdownLinksAndImagesInNoteContent,
@@ -48,6 +49,21 @@ describe("stripMarkdownLinksAndImagesInNoteContent", () => {
     const md = "[Same](https://app.example/d/n/3) end"
     expect(stripMarkdownLinksAndImagesInNoteContent(md, true, false)).toBe(
       "[[Same]] end"
+    )
+  })
+
+  it("counts leftover noteProperty hrefs as ordinary links for the paste choice", () => {
+    expect(
+      countMarkdownLinksAndImagesInNoteContent(
+        `[shown](${notePropertyHref(99, "topic")}) [B](https://b) [C](${noteShowHref(2)})`
+      )
+    ).toEqual({ linkCount: 2, imageCount: 0 })
+  })
+
+  it("strips leftover noteProperty hrefs to the label instead of inventing a wiki", () => {
+    const md = `See [shown](${notePropertyHref(99, "topic")}) then [x](https://z.test)`
+    expect(stripMarkdownLinksAndImagesInNoteContent(md, true, false)).toBe(
+      "See shown then x"
     )
   })
 })

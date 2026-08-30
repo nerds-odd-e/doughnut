@@ -7,8 +7,11 @@ import {
   noteRouteFamilyNoteId,
 } from "@/routes/noteRouteFamily"
 import {
+  notePropertyHref,
   notePropertyLocation,
   pathnameLooksLikeInternalNoteFamily,
+  resolveInternalNoteFamilyFromHref,
+  noteShowHref,
   noteShowLocation,
 } from "@/routes/noteShowLocation"
 import { routeMetadata } from "@/routes/routeMetadata"
@@ -88,4 +91,40 @@ describe("internal note-route classifier", () => {
       expect(pathnameLooksLikeInternalNoteFamily(pathname)).toBe(false)
     }
   )
+
+  it("parses noteShow hrefs through the route table", () => {
+    expect(resolveInternalNoteFamilyFromHref(noteShowHref(123))).toEqual({
+      noteId: 123,
+      propertyKey: undefined,
+    })
+    expect(
+      resolveInternalNoteFamilyFromHref("https://app.example/d/n/123")
+    ).toEqual({
+      noteId: 123,
+      propertyKey: undefined,
+    })
+  })
+
+  it("parses noteProperty hrefs through the route table, decoding the key once", () => {
+    expect(
+      resolveInternalNoteFamilyFromHref(notePropertyHref(99, "Due"))
+    ).toEqual({
+      noteId: 99,
+      propertyKey: "Due",
+    })
+    expect(
+      resolveInternalNoteFamilyFromHref(notePropertyHref(42, "a part of"))
+    ).toEqual({
+      noteId: 42,
+      propertyKey: "a part of",
+    })
+    expect(
+      resolveInternalNoteFamilyFromHref(
+        "https://app.example/n/99/p/Due?conversation=true"
+      )
+    ).toEqual({
+      noteId: 99,
+      propertyKey: "Due",
+    })
+  })
 })
