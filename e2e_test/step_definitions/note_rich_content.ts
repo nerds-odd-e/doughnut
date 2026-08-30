@@ -96,37 +96,37 @@ When(
 )
 
 When(
-  'I assimilate rich note property {string} from its toggle options',
+  'I assimilate rich note property {string} from its property panel',
   (key: string) => {
-    start.assumeNotePage().assimilateRichNotePropertyFromToggle(key)
+    start.assumeNotePage().assimilateRichNotePropertyFromPanel(key)
   }
 )
 
 When(
-  'I skip rich note property {string} from its toggle options',
+  'I skip rich note property {string} from its property panel',
   (key: string) => {
-    start.assumeNotePage().skipRichNotePropertyFromToggle(key)
+    start.assumeNotePage().skipRichNotePropertyFromPanel(key)
   }
 )
 
 When(
-  'I revive rich note property {string} from its toggle options',
+  'I revive rich note property {string} from its property panel',
   (key: string) => {
-    start.assumeNotePage().reviveRichNotePropertyFromToggle(key)
+    start.assumeNotePage().reviveRichNotePropertyFromPanel(key)
   }
 )
 
 When(
-  'I return rich note property {string} to the sequence from its toggle options',
+  'I return rich note property {string} to the sequence from its property panel',
   (key: string) => {
-    start.assumeNotePage().returnRichNotePropertyToSequenceFromToggle(key)
+    start.assumeNotePage().returnRichNotePropertyToSequenceFromPanel(key)
   }
 )
 
 When(
-  'I remove rich note property {string} from recall from its toggle options',
+  'I remove rich note property {string} from recall from its property panel',
   (key: string) => {
-    start.assumeNotePage().removeRichNotePropertyFromRecallFromToggle(key)
+    start.assumeNotePage().removeRichNotePropertyFromRecallFromPanel(key)
   }
 )
 

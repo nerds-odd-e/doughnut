@@ -10,46 +10,42 @@ export function propertyRows(root: ParentNode): HTMLElement[] {
   ) as HTMLElement[]
 }
 
-export function propertyRowOptionsToggleEl(row: ParentNode): HTMLButtonElement {
+export function propertyPanelToggleEl(row: ParentNode): HTMLButtonElement {
   const el = row.querySelector(
-    '[data-testid="rich-note-property-row-options-toggle"]'
+    '[data-testid="rich-note-property-panel-toggle"]'
   ) as HTMLButtonElement | null
   expect(el).not.toBeNull()
   return el!
 }
 
-export function propertyRowOptionsPanelEl(row: ParentNode): HTMLElement | null {
-  return row.querySelector('[data-testid="rich-note-property-row-options"]')
+export function propertyPanelEl(row: ParentNode): HTMLElement | null {
+  return row.querySelector('[data-testid="rich-note-property-panel"]')
 }
 
-export function expectPropertyRowPanelOpen(row: ParentNode) {
-  expect(propertyRowOptionsPanelEl(row)).not.toBeNull()
-  expect(propertyRowOptionsToggleEl(row).getAttribute("aria-expanded")).toBe(
-    "true"
-  )
+export function expectPropertyPanelOpen(row: ParentNode) {
+  expect(propertyPanelEl(row)).not.toBeNull()
+  expect(propertyPanelToggleEl(row).getAttribute("aria-expanded")).toBe("true")
 }
 
-export function expectPropertyRowPanelClosed(row: ParentNode) {
-  expect(propertyRowOptionsPanelEl(row)).toBeNull()
-  expect(propertyRowOptionsToggleEl(row).getAttribute("aria-expanded")).toBe(
-    "false"
-  )
+export function expectPropertyPanelClosed(row: ParentNode) {
+  expect(propertyPanelEl(row)).toBeNull()
+  expect(propertyPanelToggleEl(row).getAttribute("aria-expanded")).toBe("false")
 }
 
-type PropertyRowToggleWrapper = {
+type PropertyPanelToggleWrapper = {
   find: (selector: string) => {
     attributes: (name: string) => string | undefined
     trigger: (event: string) => Promise<void>
   }
 }
 
-async function setPropertyRowOptionsExpanded(
-  wrapper: PropertyRowToggleWrapper,
+async function setPropertyPanelExpanded(
+  wrapper: PropertyPanelToggleWrapper,
   rowSelector: string,
   expanded: boolean
 ): Promise<void> {
   const toggle = wrapper.find(
-    `${rowSelector} [data-testid="rich-note-property-row-options-toggle"]`
+    `${rowSelector} [data-testid="rich-note-property-panel-toggle"]`
   )
   if ((toggle.attributes("aria-expanded") === "true") === expanded) {
     return
@@ -58,25 +54,25 @@ async function setPropertyRowOptionsExpanded(
   await flushPromises()
 }
 
-export async function expandPropertyRowOptions(
-  wrapper: PropertyRowToggleWrapper,
+export async function expandPropertyPanel(
+  wrapper: PropertyPanelToggleWrapper,
   rowSelector: string
 ): Promise<void> {
-  await setPropertyRowOptionsExpanded(wrapper, rowSelector, true)
+  await setPropertyPanelExpanded(wrapper, rowSelector, true)
 }
 
-export async function collapsePropertyRowOptions(
-  wrapper: PropertyRowToggleWrapper,
+export async function collapsePropertyPanel(
+  wrapper: PropertyPanelToggleWrapper,
   rowSelector: string
 ): Promise<void> {
-  await setPropertyRowOptionsExpanded(wrapper, rowSelector, false)
+  await setPropertyPanelExpanded(wrapper, rowSelector, false)
 }
 
-export async function expandAndClickPropertyRowRemove(
-  wrapper: PropertyRowToggleWrapper,
+export async function expandPropertyPanelAndClickRemove(
+  wrapper: PropertyPanelToggleWrapper,
   rowSelector: string
 ): Promise<void> {
-  await expandPropertyRowOptions(wrapper, rowSelector)
+  await expandPropertyPanel(wrapper, rowSelector)
   await wrapper
     .find(`${rowSelector} [data-testid="rich-note-property-row-remove"]`)
     .trigger("click")

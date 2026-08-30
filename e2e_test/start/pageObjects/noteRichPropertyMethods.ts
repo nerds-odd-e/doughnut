@@ -2,6 +2,7 @@ import { waitUntilAppIsNotBusy } from '../pageBase'
 import {
   confirmPropertyMemoryTrackerChange,
   findNoteContentRegion,
+  richNotePropertyPanelToggleTestId,
   richNotePropertyRow,
 } from './notePageContentRegion'
 import { assumeAssociateWikidataDialog } from './associateWikidataDialog'
@@ -94,13 +95,11 @@ export const noteRichPropertyMethods = () => ({
     this.switchToRichContent()
     findNoteContentRegion().within(() => {
       cy.get(richNotePropertyRow(key)).within(() => {
-        cy.findByTestId('rich-note-property-row-options-toggle').then(
-          ($toggle) => {
-            if ($toggle.attr('aria-expanded') !== 'true') {
-              cy.wrap($toggle).click({ force: true })
-            }
+        cy.findByTestId(richNotePropertyPanelToggleTestId).then(($toggle) => {
+          if ($toggle.attr('aria-expanded') !== 'true') {
+            cy.wrap($toggle).click({ force: true })
           }
-        )
+        })
         cy.findByTestId('rich-note-property-row-remove').click({ force: true })
       })
     })

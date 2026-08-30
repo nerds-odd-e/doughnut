@@ -8,10 +8,7 @@ import makeMe from "donut-test-fixtures/makeMe"
 import { mockSdkService } from "@tests/helpers"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import { noteShowLocation } from "@/routes/noteShowLocation"
-import {
-  expandPropertyRowOptions,
-  propertyRowSelector,
-} from "./propertiesTestDom"
+import { expandPropertyPanel, propertyRowSelector } from "./propertiesTestDom"
 import { createRichMarkdownEditorTestHarness } from "./richMarkdownEditorTestHarness"
 
 const confirmMock = vi.fn()
@@ -60,7 +57,7 @@ Workshop body.`
     h.cleanup()
   })
 
-  it("assimilates the property from its own toggle-options row", async () => {
+  it("assimilates the property from its own property panel", async () => {
     const assimilateSpy = mockSdkService(AssimilationController, "assimilate", [
       makeMe.aMemoryTracker.id(1).withPropertyKey("topic").please(),
     ])
@@ -69,7 +66,7 @@ Workshop body.`
       noteId,
       route: noteShowLocation(noteId),
     })
-    await expandPropertyRowOptions(wrapper, topicRowSelector)
+    await expandPropertyPanel(wrapper, topicRowSelector)
 
     await wrapper
       .find(`${topicRowSelector} [data-test="assimilate"]`)
@@ -82,7 +79,7 @@ Workshop body.`
     expect(mockedGoToNextAssimilation).toHaveBeenCalled()
   })
 
-  it("skips the property from its own toggle-options row after confirming", async () => {
+  it("skips the property from its own property panel after confirming", async () => {
     const skipSpy = mockSdkService(
       AssimilationSequenceSkipController,
       "create",
@@ -96,7 +93,7 @@ Workshop body.`
       noteId,
       route: noteShowLocation(noteId),
     })
-    await expandPropertyRowOptions(wrapper, topicRowSelector)
+    await expandPropertyPanel(wrapper, topicRowSelector)
 
     await wrapper
       .find(`${topicRowSelector} [data-test="skip"]`)

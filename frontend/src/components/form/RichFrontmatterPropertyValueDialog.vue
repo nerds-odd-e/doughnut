@@ -15,7 +15,7 @@
           :class="{ 'daisy-tab-active': mode === 'text' }"
           role="tab"
           :aria-selected="mode === 'text'"
-          data-testid="rich-note-property-value-popup-mode-text"
+          data-testid="rich-note-property-value-dialog-mode-text"
           @click="mode = 'text'"
         >
           Text
@@ -27,7 +27,7 @@
           :class="{ 'daisy-tab-active': mode === 'list' }"
           role="tab"
           :aria-selected="mode === 'list'"
-          data-testid="rich-note-property-value-popup-mode-list"
+          data-testid="rich-note-property-value-dialog-mode-list"
           @click="mode = 'list'"
         >
           List
@@ -39,7 +39,7 @@
         class="daisy-textarea daisy-textarea-bordered w-full font-mono text-sm"
         rows="6"
         :aria-label="`Property value for ${propertyKey}`"
-        data-testid="rich-note-property-value-popup-textarea"
+        data-testid="rich-note-property-value-dialog-textarea"
       />
       <div v-else class="flex flex-col gap-2">
         <div
@@ -52,13 +52,13 @@
             type="text"
             class="daisy-input daisy-input-bordered daisy-input-sm min-w-0 flex-1 font-mono text-sm"
             :aria-label="`List item ${index + 1} for ${propertyKey}`"
-            :data-testid="`rich-note-property-value-popup-list-item-${index}`"
+            :data-testid="`rich-note-property-value-dialog-list-item-${index}`"
           />
           <button
             type="button"
             class="daisy-btn daisy-btn-ghost daisy-btn-sm square shrink-0"
             :aria-label="`Move list item ${index + 1} up`"
-            :data-testid="`rich-note-property-value-popup-list-move-up-${index}`"
+            :data-testid="`rich-note-property-value-dialog-list-move-up-${index}`"
             :disabled="index === 0"
             @click="moveListItemUp(index)"
           >
@@ -68,7 +68,7 @@
             type="button"
             class="daisy-btn daisy-btn-ghost daisy-btn-sm square shrink-0"
             :aria-label="`Move list item ${index + 1} down`"
-            :data-testid="`rich-note-property-value-popup-list-move-down-${index}`"
+            :data-testid="`rich-note-property-value-dialog-list-move-down-${index}`"
             :disabled="index === draftListItems.length - 1"
             @click="moveListItemDown(index)"
           >
@@ -78,7 +78,7 @@
             type="button"
             class="daisy-btn daisy-btn-ghost daisy-btn-sm square shrink-0"
             :aria-label="`Remove list item ${index + 1}`"
-            :data-testid="`rich-note-property-value-popup-list-remove-${index}`"
+            :data-testid="`rich-note-property-value-dialog-list-remove-${index}`"
             @click="removeListItem(index)"
           >
             <Minus class="h-4 w-4" aria-hidden="true" />
@@ -87,7 +87,7 @@
         <button
           type="button"
           class="daisy-btn daisy-btn-ghost daisy-btn-sm self-start"
-          data-testid="rich-note-property-value-popup-list-add"
+          data-testid="rich-note-property-value-dialog-list-add"
           @click="addListItem"
         >
           Add item
@@ -97,7 +97,7 @@
         v-if="validationMessage"
         role="alert"
         class="text-error text-xs mt-2"
-        data-testid="rich-note-property-value-popup-validation"
+        data-testid="rich-note-property-value-dialog-validation"
       >
         {{ validationMessage }}
       </p>
@@ -105,7 +105,7 @@
         <button
           type="button"
           class="daisy-btn daisy-btn-ghost"
-          data-testid="rich-note-property-value-popup-cancel"
+          data-testid="rich-note-property-value-dialog-cancel"
           @click="onCancel"
         >
           Cancel
@@ -113,7 +113,7 @@
         <button
           type="button"
           class="daisy-btn daisy-btn-primary"
-          data-testid="rich-note-property-value-popup-save"
+          data-testid="rich-note-property-value-dialog-save"
           @click="onSave"
         >
           Save

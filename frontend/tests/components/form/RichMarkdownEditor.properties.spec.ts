@@ -1,9 +1,9 @@
 import { flushPromises } from "@vue/test-utils"
 import { noteShowLocation } from "@/routes/noteShowLocation"
 import {
-  expandPropertyRowOptions,
-  expectPropertyRowPanelClosed,
-  expectPropertyRowPanelOpen,
+  expandPropertyPanel,
+  expectPropertyPanelClosed,
+  expectPropertyPanelOpen,
   propertyRowKeyInputEl,
   propertyRowSelector,
   propertyRows,
@@ -174,13 +174,13 @@ Workshop body.`
     const betaRow = propertyRowSelector("beta")
     const rows = propertyRows(wrapper.element)
 
-    expectPropertyRowPanelClosed(rows[0]!)
-    expectPropertyRowPanelClosed(rows[1]!)
+    expectPropertyPanelClosed(rows[0]!)
+    expectPropertyPanelClosed(rows[1]!)
 
-    await expandPropertyRowOptions(wrapper, alphaRow)
+    await expandPropertyPanel(wrapper, alphaRow)
 
-    expectPropertyRowPanelOpen(wrapper.find(alphaRow).element)
-    expectPropertyRowPanelClosed(wrapper.find(betaRow).element)
+    expectPropertyPanelOpen(wrapper.find(alphaRow).element)
+    expectPropertyPanelClosed(wrapper.find(betaRow).element)
 
     await wrapper
       .find(`${alphaRow} [data-testid="rich-note-property-row-remove"]`)
@@ -191,6 +191,6 @@ Workshop body.`
     expect(last).not.toContain("alpha:")
     expect(last).toContain("beta:")
 
-    expectPropertyRowPanelClosed(wrapper.find(betaRow).element)
+    expectPropertyPanelClosed(wrapper.find(betaRow).element)
   })
 })

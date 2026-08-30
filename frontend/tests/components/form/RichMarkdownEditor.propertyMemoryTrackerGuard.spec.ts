@@ -8,7 +8,7 @@ import { mockSdkService, wrapSdkResponse } from "@tests/helpers"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import { noteShowLocation } from "@/routes/noteShowLocation"
 import {
-  expandAndClickPropertyRowRemove,
+  expandPropertyPanelAndClickRemove,
   propertyRowSelector,
 } from "./propertiesTestDom"
 import { createRichMarkdownEditorTestHarness } from "./richMarkdownEditorTestHarness"
@@ -79,7 +79,7 @@ Workshop body.`
       route: noteShowLocation(noteId),
     })
 
-    await expandAndClickPropertyRowRemove(wrapper, topicRowSelector)
+    await expandPropertyPanelAndClickRemove(wrapper, topicRowSelector)
     await flushPromises()
 
     await vi.waitFor(() => {
@@ -102,7 +102,7 @@ Workshop body.`
     })
     const emitCountBefore = wrapper.emitted("update:modelValue")?.length ?? 0
 
-    await expandAndClickPropertyRowRemove(wrapper, topicRowSelector)
+    await expandPropertyPanelAndClickRemove(wrapper, topicRowSelector)
     await flushPromises()
 
     await vi.waitFor(() => {

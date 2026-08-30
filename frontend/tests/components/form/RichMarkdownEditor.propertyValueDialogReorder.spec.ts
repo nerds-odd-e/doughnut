@@ -3,12 +3,14 @@ import {
   clickListMoveDown,
   clickListMoveUp,
   clickSave,
+  listMoveButtonEl,
   mountEditorOnNoteShow,
-  openValuePopup,
-} from "./propertyValuePopupTestDom"
+  openPropertyValueDialog,
+  propertyValueDialogEl,
+} from "./propertyValueDialogTestDom"
 import { createRichMarkdownEditorTestHarness } from "./richMarkdownEditorTestHarness"
 
-describe("RichMarkdownEditor property value popup reorder", () => {
+describe("RichMarkdownEditor property value dialog reorder", () => {
   const h = createRichMarkdownEditorTestHarness()
 
   afterEach(() => {
@@ -25,16 +27,14 @@ tags:
 
 Body`
     const wrapper = await mountEditorOnNoteShow(h, markdown)
-    await openValuePopup(wrapper)
+    await openPropertyValueDialog(wrapper)
 
-    const moveUpFirst = document.querySelector(
-      '[data-testid="rich-note-property-value-popup-list-move-up-0"]'
-    ) as HTMLButtonElement
-    const moveDownLast = document.querySelector(
-      '[data-testid="rich-note-property-value-popup-list-move-down-2"]'
-    ) as HTMLButtonElement
-    expect(moveUpFirst.disabled).toBe(true)
-    expect(moveDownLast.disabled).toBe(true)
+    const moveUpFirst = listMoveButtonEl("up", 0)
+    const moveDownLast = listMoveButtonEl("down", 2)
+    expect(moveUpFirst).not.toBeNull()
+    expect(moveDownLast).not.toBeNull()
+    expect(moveUpFirst!.disabled).toBe(true)
+    expect(moveDownLast!.disabled).toBe(true)
 
     clickListMoveDown(0)
     await flushPromises()
@@ -47,7 +47,7 @@ Body`
     const gammaIdx = reordered.indexOf("- gamma")
     expect(betaIdx).toBeLessThan(alphaIdx)
     expect(alphaIdx).toBeLessThan(gammaIdx)
-    expect(document.querySelector("dialog")).toBeNull()
+    expect(propertyValueDialogEl()).toBeNull()
 
     await wrapper.setProps({
       modelValue: `---
@@ -60,7 +60,7 @@ tags:
 Body`,
     })
     await flushPromises()
-    await openValuePopup(wrapper)
+    await openPropertyValueDialog(wrapper)
 
     clickListMoveUp(2)
     await flushPromises()

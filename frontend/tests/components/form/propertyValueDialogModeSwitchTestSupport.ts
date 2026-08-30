@@ -3,9 +3,9 @@ import {
   clickListAdd,
   clickModeTab,
   mountEditorOnNoteShow,
-  openValuePopup,
+  openPropertyValueDialog,
   setListItemValue,
-} from "./propertyValuePopupTestDom"
+} from "./propertyValueDialogTestDom"
 import type { createRichMarkdownEditorTestHarness } from "./richMarkdownEditorTestHarness"
 
 export const SCALAR_TOPIC_MARKDOWN = `---
@@ -24,22 +24,22 @@ Body`
 
 type Harness = ReturnType<typeof createRichMarkdownEditorTestHarness>
 
-export async function mountTopicValuePopup(
+export async function mountTopicValueDialog(
   h: Harness,
   markdown: string = SCALAR_TOPIC_MARKDOWN
 ): Promise<VueWrapper> {
   const wrapper = await mountEditorOnNoteShow(h, markdown)
-  await openValuePopup(wrapper)
+  await openPropertyValueDialog(wrapper)
   return wrapper
 }
 
 export async function switchToListMode() {
-  clickModeTab("rich-note-property-value-popup-mode-list")
+  clickModeTab("list")
   await flushPromises()
 }
 
 export async function switchToTextMode() {
-  clickModeTab("rich-note-property-value-popup-mode-text")
+  clickModeTab("text")
   await flushPromises()
 }
 

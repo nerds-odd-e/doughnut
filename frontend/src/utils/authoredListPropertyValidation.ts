@@ -10,7 +10,7 @@ import type { PropertyValue } from "@/utils/noteProperties"
 
 /**
  * Keys that use the shared authored string-list property UX (insert-as-list +
- * list validation). Add further keys here without forking rich-list insert/popup paths.
+ * list validation). Add further keys here without forking rich-list insert/dialog paths.
  */
 export function isAuthoredListPropertyKey(key: string): boolean {
   return isAliasesPropertyKey(key) || isOverlapsPropertyKey(key)

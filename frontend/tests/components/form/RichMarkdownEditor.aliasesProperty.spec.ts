@@ -10,14 +10,17 @@ import {
 } from "./propertiesTestDom"
 import {
   clickListAdd,
-  clickModeTab,
-  dialogEl,
-  mountPropertyValuePopup,
-  popupValidationText,
-  savePopup,
+  propertyValueDialogEl,
+  mountPropertyValueDialog,
+  propertyValueDialogValidationText,
+  savePropertyValueDialog,
   setListItemValue,
   setTextareaValue,
-} from "./propertyValuePopupTestDom"
+} from "./propertyValueDialogTestDom"
+import {
+  switchToListMode,
+  switchToTextMode,
+} from "./propertyValueDialogModeSwitchTestSupport"
 import { createRichMarkdownEditorTestHarness } from "./richMarkdownEditorTestHarness"
 
 const ALIASES_LIST_MARKDOWN = `---
@@ -40,34 +43,32 @@ describe("RichMarkdownEditor aliases property", () => {
     h.cleanup()
   })
 
-  it("rejects invalid aliases in popup then saves a valid list", async () => {
-    const wrapper = await mountPropertyValuePopup(h, ALIASES_LIST_MARKDOWN)
+  it("rejects invalid aliases in the property value dialog then saves a valid list", async () => {
+    const wrapper = await mountPropertyValueDialog(h, ALIASES_LIST_MARKDOWN)
 
-    clickModeTab("rich-note-property-value-popup-mode-text")
-    await flushPromises()
+    await switchToTextMode()
     setTextareaValue("single alias")
-    await savePopup()
-    expect(popupValidationText()).toBe(AUTHORED_ALIASES_MESSAGE)
-    expect(dialogEl()).not.toBeNull()
+    await savePropertyValueDialog()
+    expect(propertyValueDialogValidationText()).toBe(AUTHORED_ALIASES_MESSAGE)
+    expect(propertyValueDialogEl()).not.toBeNull()
     expect(wrapper.emitted("update:modelValue")).toBeUndefined()
 
-    clickModeTab("rich-note-property-value-popup-mode-list")
-    await flushPromises()
+    await switchToListMode()
     setListItemValue(0, "bad|alias")
-    await savePopup()
-    expect(popupValidationText()).toBe(AUTHORED_ALIASES_MESSAGE)
+    await savePropertyValueDialog()
+    expect(propertyValueDialogValidationText()).toBe(AUTHORED_ALIASES_MESSAGE)
     expect(wrapper.emitted("update:modelValue")).toBeUndefined()
 
     setListItemValue(0, "color")
     clickListAdd()
     await flushPromises()
     setListItemValue(1, "hue")
-    await savePopup()
+    await savePropertyValueDialog()
 
     const last = h.lastEmittedMarkdown()
     expect(last).toMatch(/aliases:\s*\n\s*- color/)
     expect(last).toMatch(/- hue/)
-    expect(dialogEl()).toBeNull()
+    expect(propertyValueDialogEl()).toBeNull()
   })
 
   it("inserts aliases as a list and blocks scalar aliases on row commit", async () => {

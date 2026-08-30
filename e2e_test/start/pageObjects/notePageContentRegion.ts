@@ -9,6 +9,12 @@ export const noteContentRegion = {
 export const richNotePropertyRow = (key: string) =>
   `[data-testid="rich-note-property-row"][data-property-key="${key}"]`
 
+export const richNotePropertyPanelTestId = 'rich-note-property-panel'
+export const richNotePropertyPanelToggleTestId =
+  'rich-note-property-panel-toggle'
+export const richNotePropertyPanel = `[data-testid="${richNotePropertyPanelTestId}"]`
+export const richNotePropertyPanelToggle = `[data-testid="${richNotePropertyPanelToggleTestId}"]`
+
 export function expectRichNotePropertyRowFocused(key: string) {
   return cy
     .get(richNotePropertyRow(key))

@@ -8,23 +8,23 @@ import {
 } from "@/routes/noteShowLocation"
 import type { Router } from "vue-router"
 import {
-  dialogEl,
+  propertyValueDialogEl,
   mountEditorOnNoteShow,
-  openValuePopup,
-  PROPERTY_VALUE_PANEL_NOTE_ID,
-} from "./propertyValuePopupTestDom"
+  openPropertyValueDialog,
+  PROPERTY_PANEL_NOTE_ID,
+} from "./propertyValueDialogTestDom"
 import {
-  collapsePropertyRowOptions,
-  expandPropertyRowOptions,
-  expectPropertyRowPanelClosed,
-  expectPropertyRowPanelOpen,
+  collapsePropertyPanel,
+  expandPropertyPanel,
+  expectPropertyPanelClosed,
+  expectPropertyPanelOpen,
   propertyRowSelector,
 } from "./propertiesTestDom"
 import { createRichMarkdownEditorTestHarness } from "./richMarkdownEditorTestHarness"
 
 describe("RichMarkdownEditor property panel location", () => {
   const h = createRichMarkdownEditorTestHarness()
-  const noteId = PROPERTY_VALUE_PANEL_NOTE_ID
+  const noteId = PROPERTY_PANEL_NOTE_ID
   const topicRow = propertyRowSelector("topic")
   const markdown = `---
 topic: training
@@ -51,31 +51,31 @@ Body.`
     const replaceSpy = vi.spyOn(router, "replace")
     const pushSpy = vi.spyOn(router, "push")
 
-    await expandPropertyRowOptions(wrapper, topicRow)
+    await expandPropertyPanel(wrapper, topicRow)
 
     expect(pushSpy).not.toHaveBeenCalled()
     expect(replaceSpy).toHaveBeenCalledTimes(1)
     expect(router.currentRoute.value).toMatchObject(
       notePropertyLocation(noteId, "topic")
     )
-    expectPropertyRowPanelOpen(wrapper.find(topicRow).element)
+    expectPropertyPanelOpen(wrapper.find(topicRow).element)
   })
 
   it("closing the property panel replaces to noteShow", async () => {
     const wrapper = await mountEditorOnNoteShow(h, markdown, {
       route: notePropertyLocation(noteId, "topic"),
     })
-    expectPropertyRowPanelOpen(wrapper.find(topicRow).element)
+    expectPropertyPanelOpen(wrapper.find(topicRow).element)
     const router = editorRouter(wrapper)
     const replaceSpy = vi.spyOn(router, "replace")
     const pushSpy = vi.spyOn(router, "push")
 
-    await collapsePropertyRowOptions(wrapper, topicRow)
+    await collapsePropertyPanel(wrapper, topicRow)
 
     expect(pushSpy).not.toHaveBeenCalled()
     expect(replaceSpy).toHaveBeenCalledTimes(1)
     expect(router.currentRoute.value).toMatchObject(noteShowLocation(noteId))
-    expectPropertyRowPanelClosed(wrapper.find(topicRow).element)
+    expectPropertyPanelClosed(wrapper.find(topicRow).element)
   })
 
   it("preserves unrelated query values when opening and closing the property panel", async () => {
@@ -86,7 +86,7 @@ Body.`
     const router = editorRouter(wrapper)
     const replaceSpy = vi.spyOn(router, "replace")
 
-    await expandPropertyRowOptions(wrapper, topicRow)
+    await expandPropertyPanel(wrapper, topicRow)
 
     expect(replaceSpy).toHaveBeenCalledTimes(1)
     expect(router.currentRoute.value).toMatchObject(
@@ -94,7 +94,7 @@ Body.`
     )
     expect(router.currentRoute.value.query).toEqual(conversationQuery)
 
-    await collapsePropertyRowOptions(wrapper, topicRow)
+    await collapsePropertyPanel(wrapper, topicRow)
 
     expect(replaceSpy).toHaveBeenCalledTimes(2)
     expect(router.currentRoute.value).toMatchObject(noteShowLocation(noteId))
@@ -104,9 +104,9 @@ Body.`
   it("opening the property value dialog from its control leaves the property panel closed", async () => {
     const wrapper = await mountEditorOnNoteShow(h, markdown)
 
-    await openValuePopup(wrapper)
+    await openPropertyValueDialog(wrapper)
 
-    expectPropertyRowPanelClosed(wrapper.find(topicRow).element)
-    expect(dialogEl()).not.toBeNull()
+    expectPropertyPanelClosed(wrapper.find(topicRow).element)
+    expect(propertyValueDialogEl()).not.toBeNull()
   })
 })

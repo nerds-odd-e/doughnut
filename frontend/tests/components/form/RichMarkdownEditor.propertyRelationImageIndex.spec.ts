@@ -9,7 +9,7 @@ import {
   relationTypeButtonText,
 } from "./propertyRelationImageIndexTestDom"
 import {
-  expandAndClickPropertyRowRemove,
+  expandPropertyPanelAndClickRemove,
   propertyRowSelector,
 } from "./propertiesTestDom"
 import {
@@ -78,7 +78,10 @@ Paragraph.\n`
 
     expect(wrapper.text()).toContain("Properties")
 
-    await expandAndClickPropertyRowRemove(wrapper, propertyRowSelector("only"))
+    await expandPropertyPanelAndClickRemove(
+      wrapper,
+      propertyRowSelector("only")
+    )
 
     const last = h.lastEmittedMarkdown()
     expect(last.startsWith("---")).toBe(false)

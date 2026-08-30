@@ -1,88 +1,86 @@
 import { waitUntilAppIsNotBusy } from '../pageBase'
 import {
   findNoteContentRegion,
+  richNotePropertyPanelToggleTestId,
   richNotePropertyRow,
 } from './notePageContentRegion'
 
-const propertyToggleOptionsToggleTestId =
-  'rich-note-property-row-options-toggle'
-
-const openPropertyToggleOptionsIfClosed = () => {
-  cy.findByTestId(propertyToggleOptionsToggleTestId).then(($toggle) => {
+const openPropertyPanelIfClosed = () => {
+  cy.findByTestId(richNotePropertyPanelToggleTestId).then(($toggle) => {
     if ($toggle.attr('aria-expanded') !== 'true') {
       cy.wrap($toggle).click()
     }
   })
 }
 
-const withPropertyToggleOptions = (key: string, fn: () => void) => {
+const withPropertyPanel = (key: string, fn: () => void) => {
   findNoteContentRegion().within(() => {
     cy.get(richNotePropertyRow(key)).within(() => {
-      openPropertyToggleOptionsIfClosed()
+      openPropertyPanelIfClosed()
       fn()
     })
   })
 }
 
-const clickPropertyToggleAction = (key: string, testId: string) => {
-  withPropertyToggleOptions(key, () => {
+const clickPropertyPanelAction = (key: string, testId: string) => {
+  withPropertyPanel(key, () => {
     cy.get(`[data-test="${testId}"]`).click()
   })
 }
 
 export const noteRichPropertyAssimilationMethods = () => ({
-  assimilateRichNotePropertyFromToggle(key: string) {
+  assimilateRichNotePropertyFromPanel(key: string) {
     this.switchToRichContent()
-    clickPropertyToggleAction(key, 'assimilate')
+    clickPropertyPanelAction(key, 'assimilate')
     waitUntilAppIsNotBusy()
     return this
   },
-  skipRichNotePropertyFromToggle(key: string) {
+  skipRichNotePropertyFromPanel(key: string) {
     this.switchToRichContent()
-    clickPropertyToggleAction(key, 'skip')
+    clickPropertyPanelAction(key, 'skip')
     cy.findByRole('button', { name: 'OK' }).click()
     waitUntilAppIsNotBusy()
     return this
   },
-  reviveRichNotePropertyFromToggle(key: string) {
+  reviveRichNotePropertyFromPanel(key: string) {
     this.switchToRichContent()
-    clickPropertyToggleAction(key, 'revive')
+    clickPropertyPanelAction(key, 'revive')
     waitUntilAppIsNotBusy()
     return this
   },
-  returnRichNotePropertyToSequenceFromToggle(key: string) {
+  returnRichNotePropertyToSequenceFromPanel(key: string) {
     this.switchToRichContent()
-    clickPropertyToggleAction(key, 'return-to-sequence')
+    clickPropertyPanelAction(key, 'return-to-sequence')
     waitUntilAppIsNotBusy()
     return this
   },
-  removeRichNotePropertyFromRecallFromToggle(key: string) {
+  removeRichNotePropertyFromRecallFromPanel(key: string) {
     this.switchToRichContent()
-    clickPropertyToggleAction(key, 'remove-from-recall')
+    clickPropertyPanelAction(key, 'remove-from-recall')
     cy.findByRole('button', { name: 'OK' }).click()
     waitUntilAppIsNotBusy()
     return this
   },
   expectRichNotePropertyAssimilateDisabled(key: string) {
     this.switchToRichContent()
-    withPropertyToggleOptions(key, () => {
+    withPropertyPanel(key, () => {
       cy.get('[data-test="assimilate"]').should('be.disabled')
     })
     return this
   },
   expectRichNotePropertyAssimilateEnabled(key: string) {
     this.switchToRichContent()
-    withPropertyToggleOptions(key, () => {
+    withPropertyPanel(key, () => {
       cy.get('[data-test="assimilate"]').should('not.be.disabled')
     })
     return this
   },
-  expectRichNotePropertyToggleAction(
+  expectRichNotePropertyPanelAction(
     key: string,
     action: 'skip' | 'revive' | 'return-to-sequence' | 'remove-from-recall'
   ) {
     this.switchToRichContent()
-    withPropertyToggleOptions(key, () => {
+    withPropertyPanel(key, () => {
       cy.get(`[data-test="${action}"]`).should('exist')
     })
     return this

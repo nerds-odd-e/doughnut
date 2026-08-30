@@ -13,14 +13,17 @@ import {
 } from "./propertiesTestDom"
 import {
   clickListAdd,
-  clickModeTab,
-  dialogEl,
-  mountPropertyValuePopup,
-  popupValidationText,
-  savePopup,
+  propertyValueDialogEl,
+  mountPropertyValueDialog,
+  propertyValueDialogValidationText,
+  savePropertyValueDialog,
   setListItemValue,
   setTextareaValue,
-} from "./propertyValuePopupTestDom"
+} from "./propertyValueDialogTestDom"
+import {
+  switchToListMode,
+  switchToTextMode,
+} from "./propertyValueDialogModeSwitchTestSupport"
 import { createRichMarkdownEditorTestHarness } from "./richMarkdownEditorTestHarness"
 
 const OVERLAPS_LIST_MARKDOWN = `---
@@ -43,34 +46,32 @@ describe("RichMarkdownEditor overlaps property", () => {
     h.cleanup()
   })
 
-  it("rejects invalid overlaps in popup then saves a valid list", async () => {
-    const wrapper = await mountPropertyValuePopup(h, OVERLAPS_LIST_MARKDOWN)
+  it("rejects invalid overlaps in the property value dialog then saves a valid list", async () => {
+    const wrapper = await mountPropertyValueDialog(h, OVERLAPS_LIST_MARKDOWN)
 
-    clickModeTab("rich-note-property-value-popup-mode-text")
-    await flushPromises()
+    await switchToTextMode()
     setTextareaValue("[[Other Note]]")
-    await savePopup()
-    expect(popupValidationText()).toBe(AUTHORED_OVERLAPS_MESSAGE)
-    expect(dialogEl()).not.toBeNull()
+    await savePropertyValueDialog()
+    expect(propertyValueDialogValidationText()).toBe(AUTHORED_OVERLAPS_MESSAGE)
+    expect(propertyValueDialogEl()).not.toBeNull()
     expect(wrapper.emitted("update:modelValue")).toBeUndefined()
 
-    clickModeTab("rich-note-property-value-popup-mode-list")
-    await flushPromises()
+    await switchToListMode()
     setListItemValue(0, "plain alias")
-    await savePopup()
-    expect(popupValidationText()).toBe(AUTHORED_OVERLAPS_MESSAGE)
+    await savePropertyValueDialog()
+    expect(propertyValueDialogValidationText()).toBe(AUTHORED_OVERLAPS_MESSAGE)
     expect(wrapper.emitted("update:modelValue")).toBeUndefined()
 
     setListItemValue(0, "[[Other Note]]")
     clickListAdd()
     await flushPromises()
     setListItemValue(1, "[[Hue Note]]")
-    await savePopup()
+    await savePropertyValueDialog()
 
     const last = h.lastEmittedMarkdown()
     expect(last).toMatch(/overlaps:\s*\n\s*- ["']?\[\[Other Note\]\]/)
     expect(last).toMatch(/\[\[Hue Note\]\]/)
-    expect(dialogEl()).toBeNull()
+    expect(propertyValueDialogEl()).toBeNull()
   })
 
   it("inserts overlaps as a list and blocks scalar overlaps on row commit", async () => {

@@ -1,7 +1,7 @@
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
 import {
   deadWikiLinkInPropertyValueEl,
-  expandAndClickPropertyRowRemove,
+  expandPropertyPanelAndClickRemove,
   propertyRowSelector,
 } from "./propertiesTestDom"
 import type { createRichMarkdownEditorTestHarness } from "./richMarkdownEditorTestHarness"
@@ -60,7 +60,7 @@ export async function attemptRemovePropertyRow(
   wrapper: VueWrapper,
   key: string
 ) {
-  await expandAndClickPropertyRowRemove(wrapper, propertyRowSelector(key))
+  await expandPropertyPanelAndClickRemove(wrapper, propertyRowSelector(key))
   await flushPromises()
 }
 

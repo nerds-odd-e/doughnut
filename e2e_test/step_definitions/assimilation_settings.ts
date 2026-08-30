@@ -55,7 +55,7 @@ Then(
 )
 
 Then('I should see Skip for property {string}', (propertyKey: string) => {
-  start.assumeNotePage().expectRichNotePropertyToggleAction(propertyKey, 'skip')
+  start.assumeNotePage().expectRichNotePropertyPanelAction(propertyKey, 'skip')
 })
 
 Then(
@@ -63,7 +63,7 @@ Then(
   (propertyKey: string) => {
     start
       .assumeNotePage()
-      .expectRichNotePropertyToggleAction(propertyKey, 'return-to-sequence')
+      .expectRichNotePropertyPanelAction(propertyKey, 'return-to-sequence')
   }
 )
 
@@ -72,14 +72,14 @@ Then(
   (propertyKey: string) => {
     start
       .assumeNotePage()
-      .expectRichNotePropertyToggleAction(propertyKey, 'remove-from-recall')
+      .expectRichNotePropertyPanelAction(propertyKey, 'remove-from-recall')
   }
 )
 
 Then('I should see Revive for property {string}', (propertyKey: string) => {
   start
     .assumeNotePage()
-    .expectRichNotePropertyToggleAction(propertyKey, 'revive')
+    .expectRichNotePropertyPanelAction(propertyKey, 'revive')
 })
 
 Then('I should see Skip on the assimilation panel', () => {

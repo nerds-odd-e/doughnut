@@ -176,14 +176,14 @@ export function nextAvailablePropertyKeyForPreset(
   return nextAvailablePropertyKeyFromFamilyKeys(presetKey, familyKeys)
 }
 
-/** True when a property key uses the text/list popup editor (not specialized controls). */
+/** True when a property key uses the text/list property value dialog (not specialized controls). */
 export function isTextCapablePropertyKey(key: string): boolean {
   if (isImagePropertyKey(key)) return false
   if (isWikidataIdPropertyKey(key)) return false
   return key.trim().toLowerCase() !== "relation"
 }
 
-/** True when a property row uses the text/list popup editor (not specialized controls). */
+/** True when a property row uses the text/list property value dialog (not specialized controls). */
 export function isTextCapablePropertyRow(row: PropertyRow): boolean {
   return isTextCapablePropertyKey(row.key)
 }

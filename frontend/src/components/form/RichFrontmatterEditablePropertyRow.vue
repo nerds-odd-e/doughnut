@@ -16,9 +16,9 @@
       <button
         type="button"
         class="daisy-btn daisy-btn-ghost daisy-btn-sm square shrink-0"
-        :aria-label="`Toggle options for note property ${modelValue.key}`"
+        :aria-label="`Toggle property panel for note property ${modelValue.key}`"
         :aria-expanded="isFocused"
-        data-testid="rich-note-property-row-options-toggle"
+        data-testid="rich-note-property-panel-toggle"
         @click="togglePropertyPanel"
       >
         <ChevronRight v-if="!isFocused" class="h-4 w-4" aria-hidden="true" />
@@ -127,7 +127,7 @@
         </div>
       </div>
     </div>
-    <RichFrontmatterPropertyRowOptions
+    <RichFrontmatterPropertyPanel
       v-if="isFocused"
       :property-key="modelValue.key"
       :note-id="noteId"
@@ -140,7 +140,7 @@
 import { ChevronDown, ChevronRight } from "@lucide/vue"
 import { computed, ref, type ComponentPublicInstance } from "vue"
 import { useNotePropertyPanelLocation } from "@/composables/useNotePropertyPanelLocation"
-import RichFrontmatterPropertyRowOptions from "@/components/form/RichFrontmatterPropertyRowOptions.vue"
+import RichFrontmatterPropertyPanel from "@/components/form/RichFrontmatterPropertyPanel.vue"
 import RichFrontmatterImagePropertyValue from "@/components/form/RichFrontmatterImagePropertyValue.vue"
 import RichFrontmatterPropertyExternalLink from "@/components/form/RichFrontmatterPropertyExternalLink.vue"
 import RichFrontmatterPropertyKeyPresets from "@/components/form/RichFrontmatterPropertyKeyPresets.vue"

@@ -1,15 +1,16 @@
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
 import {
-  openValuePopup,
+  openPropertyValueDialog,
   mountEditorOnNoteShow,
-} from "./propertyValuePopupTestDom"
+  PROPERTY_VALUE_DIALOG_OPEN_SELECTOR,
+} from "./propertyValueDialogTestDom"
 import {
-  mountTopicValuePopup,
+  mountTopicValueDialog,
   SCALAR_TOPIC_MARKDOWN,
-} from "./propertyValuePopupModeSwitchTestSupport"
+} from "./propertyValueDialogModeSwitchTestSupport"
 import type { createRichMarkdownEditorTestHarness } from "./richMarkdownEditorTestHarness"
 
-export { mountTopicValuePopup, SCALAR_TOPIC_MARKDOWN }
+export { mountTopicValueDialog, SCALAR_TOPIC_MARKDOWN }
 
 type Harness = ReturnType<typeof createRichMarkdownEditorTestHarness>
 
@@ -33,11 +34,11 @@ wikidata_id: Q42
 
 Body`
 
-export async function mountImageMaskValuePopup(
+export async function mountImageMaskValueDialog(
   h: Harness
 ): Promise<VueWrapper> {
   const wrapper = await mountEditorOnNoteShow(h, IMAGE_MASK_MARKDOWN)
-  await openValuePopup(wrapper)
+  await openPropertyValueDialog(wrapper)
   return wrapper
 }
 
@@ -60,6 +61,5 @@ export async function mountEditorAndCountEditIcons(
 ): Promise<number> {
   const wrapper = await h.mountEditor(markdown)
   await flushPromises()
-  return wrapper.findAll('[data-testid="rich-note-property-value-popup-open"]')
-    .length
+  return wrapper.findAll(PROPERTY_VALUE_DIALOG_OPEN_SELECTOR).length
 }

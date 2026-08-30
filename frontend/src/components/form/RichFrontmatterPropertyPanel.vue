@@ -1,7 +1,7 @@
 <template>
   <div
     class="pl-8 flex flex-wrap items-center gap-2 gap-y-1"
-    data-testid="rich-note-property-row-options"
+    data-testid="rich-note-property-panel"
   >
     <button
       type="button"

@@ -1,45 +1,45 @@
 import { flushPromises } from "@vue/test-utils"
 import {
   clickListRemove,
-  dialogEl,
+  propertyValueDialogEl,
   getTextareaValue,
   isListModeTabActive,
-  openValuePopup,
-  popupValidationText,
-  savePopup,
+  openPropertyValueDialog,
+  propertyValueDialogValidationText,
+  savePropertyValueDialog,
   setListItemValue,
   setTextareaValue,
-} from "./propertyValuePopupTestDom"
+} from "./propertyValueDialogTestDom"
 import {
   LIST_TOPIC_MARKDOWN,
-  mountTopicValuePopup,
+  mountTopicValueDialog,
   switchToListMode,
   switchToTextMode,
   writeListItems,
-} from "./propertyValuePopupModeSwitchTestSupport"
+} from "./propertyValueDialogModeSwitchTestSupport"
 import { createRichMarkdownEditorTestHarness } from "./richMarkdownEditorTestHarness"
 
-describe("RichMarkdownEditor property value popup mode switch", () => {
+describe("RichMarkdownEditor property value dialog mode switch", () => {
   const h = createRichMarkdownEditorTestHarness()
 
   afterEach(() => {
     h.cleanup()
   })
 
-  it("switches scalar↔list in popup, seeds text from list, and saves each mode", async () => {
-    const wrapper = await mountTopicValuePopup(h)
+  it("switches scalar↔list in the property value dialog, seeds text from list, and saves each mode", async () => {
+    const wrapper = await mountTopicValueDialog(h)
     await switchToListMode()
     await writeListItems("workshop", "retreat")
-    await savePopup()
+    await savePropertyValueDialog()
 
     const asList = h.lastEmittedMarkdown()
     expect(asList).toMatch(/topic:\s*\n\s*- workshop/)
     expect(asList).toMatch(/- retreat/)
     expect(asList).toContain("Body")
-    expect(dialogEl()).toBeNull()
+    expect(propertyValueDialogEl()).toBeNull()
 
     await wrapper.setProps({ modelValue: asList })
-    await openValuePopup(wrapper)
+    await openPropertyValueDialog(wrapper)
     expect(isListModeTabActive()).toBe(true)
 
     await switchToTextMode()
@@ -48,39 +48,41 @@ describe("RichMarkdownEditor property value popup mode switch", () => {
     expect(seeded).toContain("retreat")
 
     setTextareaValue("combined value")
-    await savePopup()
+    await savePropertyValueDialog()
 
     const asScalar = h.lastEmittedMarkdown()
     expect(asScalar).toContain("topic: combined value")
     expect(asScalar).not.toMatch(/topic:\s*\n\s*-/)
-    expect(dialogEl()).toBeNull()
+    expect(propertyValueDialogEl()).toBeNull()
   })
 
-  it("allows duplicate list items and saves an emptied list from popup", async () => {
-    const wrapper = await mountTopicValuePopup(h, LIST_TOPIC_MARKDOWN)
+  it("allows duplicate list items and saves an emptied list from the property value dialog", async () => {
+    const wrapper = await mountTopicValueDialog(h, LIST_TOPIC_MARKDOWN)
     setListItemValue(0, "dup")
     setListItemValue(1, "dup")
-    await savePopup()
+    await savePropertyValueDialog()
     expect(h.lastEmittedMarkdown()).toMatch(/- dup\n\s*- dup/)
-    expect(dialogEl()).toBeNull()
+    expect(propertyValueDialogEl()).toBeNull()
 
     await wrapper.setProps({ modelValue: h.lastEmittedMarkdown() })
-    await openValuePopup(wrapper)
+    await openPropertyValueDialog(wrapper)
     clickListRemove(1)
     clickListRemove(0)
     await flushPromises()
-    await savePopup()
+    await savePropertyValueDialog()
     expect(h.lastEmittedMarkdown()).toMatch(/topic:\s*\[\]/)
-    expect(dialogEl()).toBeNull()
+    expect(propertyValueDialogEl()).toBeNull()
   })
 
   it("rejects empty list items on save", async () => {
-    const wrapper = await mountTopicValuePopup(h, LIST_TOPIC_MARKDOWN)
+    const wrapper = await mountTopicValueDialog(h, LIST_TOPIC_MARKDOWN)
     setListItemValue(1, "   ")
-    await savePopup()
+    await savePropertyValueDialog()
 
-    expect(popupValidationText()).toContain("List items cannot be empty.")
-    expect(dialogEl()).not.toBeNull()
+    expect(propertyValueDialogValidationText()).toContain(
+      "List items cannot be empty."
+    )
+    expect(propertyValueDialogEl()).not.toBeNull()
     expect(wrapper.emitted("update:modelValue")).toBeUndefined()
   })
 })

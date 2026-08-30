@@ -6,17 +6,17 @@ import {
   noteShowLocation,
 } from "@/routes/noteShowLocation"
 import {
-  dialogEl,
+  propertyValueDialogEl,
   mountEditorOnNoteShow,
-  PROPERTY_VALUE_PANEL_NOTE_ID,
-} from "./propertyValuePopupTestDom"
+  PROPERTY_PANEL_NOTE_ID,
+} from "./propertyValueDialogTestDom"
 import { attemptRemovePropertyRow } from "./propertiesTestSupport"
 import { propertyRowSelector } from "./propertiesTestDom"
 import { createRichMarkdownEditorTestHarness } from "./richMarkdownEditorTestHarness"
 
 describe("RichMarkdownEditor focused property delete location", () => {
   const h = createRichMarkdownEditorTestHarness()
-  const noteId = PROPERTY_VALUE_PANEL_NOTE_ID
+  const noteId = PROPERTY_PANEL_NOTE_ID
   const markdown = `---
 topic: training
 subject: other
@@ -49,7 +49,7 @@ Body.`
     expect(
       wrapper.find('[data-testid="rich-note-property-not-found"]').exists()
     ).toBe(false)
-    expect(dialogEl()).toBeNull()
+    expect(propertyValueDialogEl()).toBeNull()
   })
 
   it("preserves unrelated query values when the focused property is deleted", async () => {

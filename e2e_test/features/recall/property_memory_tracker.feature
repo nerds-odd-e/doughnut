@@ -54,7 +54,7 @@ Feature: Property memory tracker
     Then I should be at property "topic" of note "Minerals"
     And the rich note property "topic" should be focused with its property panel open
     And I should not see assimilation settings
-    When I skip rich note property "topic" from its toggle options
+    When I skip rich note property "topic" from its property panel
     Then I should see the no more notes to assimilate toast
     When I visit note "Minerals"
     Then I should see Return to sequence for property "topic"
@@ -76,12 +76,12 @@ Feature: Property memory tracker
     When I start assimilation from the menu
     Then I should be at property "topic" of note "Minerals"
     And the rich note property "topic" should be focused with its property panel open
-    When I skip rich note property "topic" from its toggle options
+    When I skip rich note property "topic" from its property panel
     Then I should see the no more notes to assimilate toast
     When I visit note "Minerals"
     And I open assimilation settings
     Then I should see Return to sequence for property "topic"
-    When I return rich note property "topic" to the sequence from its toggle options
+    When I return rich note property "topic" to the sequence from its property panel
     Then I should see Skip for property "topic"
     When I start assimilation from the menu
     Then I should be at property "topic" of note "Minerals"
@@ -104,11 +104,11 @@ Feature: Property memory tracker
     When I start assimilation from the menu
     Then I should be at property "topic" of note "Minerals"
     And the rich note property "topic" should be focused with its property panel open
-    When I skip rich note property "topic" from its toggle options
+    When I skip rich note property "topic" from its property panel
     Then I should see the no more notes to assimilate toast
     When I visit note "Minerals"
     And I open assimilation settings
-    And I assimilate rich note property "topic" from its toggle options
+    And I assimilate rich note property "topic" from its property panel
     Then I should see the no more notes to assimilate toast
     When I visit note "Minerals"
     And I open assimilation settings
@@ -119,7 +119,7 @@ Feature: Property memory tracker
     Given I assimilated one note "Vitamins" at the current time
     And I am viewing assimilation settings for note "Vitamins"
     Then I should see Remove from recall for property "topic"
-    When I remove rich note property "topic" from recall from its toggle options
+    When I remove rich note property "topic" from recall from its property panel
     Then I should see Revive for property "topic"
     And the property memory tracker for "topic" should be absent
     When I start assimilation from the menu
@@ -175,10 +175,10 @@ Feature: Property memory tracker
     Then the property memory tracker for "topic" should be absent
 
   @disableOpenAiService
-  Scenario: Assimilate a property from its own toggle-options row
+  Scenario: Assimilate a property from its own property panel
     Given I am re-logged in as "another_old_learner"
-    And I have a notebook "Property toggle"
-    And I have a note "Iron" under notebook "Property toggle" with content:
+    And I have a notebook "Property panel assimilate"
+    And I have a note "Iron" under notebook "Property panel assimilate" with content:
       """
       ---
       topic: iron
@@ -189,7 +189,7 @@ Feature: Property memory tracker
     And It's day 1, 8 hour
     And I assimilated one note "Iron" at the current time
     When I visit note "Iron"
-    And I assimilate rich note property "topic" from its toggle options
+    And I assimilate rich note property "topic" from its property panel
     Then I should see the no more notes to assimilate toast
     When I visit note "Iron"
     And I open assimilation settings

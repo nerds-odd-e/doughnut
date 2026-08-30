@@ -35,8 +35,8 @@
       v-if="textCapable"
       type="button"
       class="daisy-btn daisy-btn-ghost daisy-btn-sm square shrink-0"
-      :aria-label="`Edit property value for ${propertyKey} in dialog`"
-      data-testid="rich-note-property-value-popup-open"
+      :aria-label="`Edit property value for ${propertyKey} in the property value dialog`"
+      data-testid="rich-note-property-value-dialog-open"
       @click="valueDialogOpen = true"
     >
       <SquarePen class="h-4 w-4" aria-hidden="true" />

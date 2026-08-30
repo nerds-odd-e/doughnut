@@ -7,18 +7,18 @@ import {
 } from "@/routes/noteShowLocation"
 import {
   mountEditorOnNoteShow,
-  PROPERTY_VALUE_PANEL_NOTE_ID,
-} from "./propertyValuePopupTestDom"
+  PROPERTY_PANEL_NOTE_ID,
+} from "./propertyValueDialogTestDom"
 import { attemptRenamePropertyKey } from "./propertiesTestSupport"
 import {
-  expectPropertyRowPanelOpen,
+  expectPropertyPanelOpen,
   propertyRowSelector,
 } from "./propertiesTestDom"
 import { createRichMarkdownEditorTestHarness } from "./richMarkdownEditorTestHarness"
 
 describe("RichMarkdownEditor focused property rename location", () => {
   const h = createRichMarkdownEditorTestHarness()
-  const noteId = PROPERTY_VALUE_PANEL_NOTE_ID
+  const noteId = PROPERTY_PANEL_NOTE_ID
   const markdown = `---
 topic: training
 ---
@@ -54,7 +54,7 @@ Body.`
         .find(propertyRowSelector("Subject Matter"))
         .attributes("data-property-focused")
     ).toBe("true")
-    expectPropertyRowPanelOpen(
+    expectPropertyPanelOpen(
       wrapper.find(propertyRowSelector("Subject Matter")).element
     )
   })

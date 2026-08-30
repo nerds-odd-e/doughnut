@@ -1,4 +1,5 @@
 import { flushPromises } from "@vue/test-utils"
+import { PROPERTY_VALUE_DIALOG_OPEN_SELECTOR } from "./propertyValueDialogTestDom"
 import { createRichMarkdownEditorTestHarness } from "./richMarkdownEditorTestHarness"
 
 const listUrlMarkdown = `---
@@ -49,11 +50,9 @@ example of:
         .find('[data-testid="rich-note-property-row-list-value"]')
         .text()
     ).toContain("one")
-    expect(
-      tagsRow!
-        .find('[data-testid="rich-note-property-value-popup-open"]')
-        .exists()
-    ).toBe(true)
+    expect(tagsRow!.find(PROPERTY_VALUE_DIALOG_OPEN_SELECTOR).exists()).toBe(
+      true
+    )
   })
 
   it("shows per-item external links for list url in readonly mode", async () => {

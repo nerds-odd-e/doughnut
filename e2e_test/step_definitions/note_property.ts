@@ -44,7 +44,7 @@ Then(
 )
 
 Then(
-  'the rich note property {string} should be focused showing {string} without a value dialog',
+  'the rich note property {string} should be focused showing {string} without a property value dialog',
   (key: string, value: string) => {
     start
       .assumeNotePage()

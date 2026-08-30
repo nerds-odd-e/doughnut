@@ -1,6 +1,6 @@
 # Note property canonical path
 
-**Status:** in progress (slices 1–13 done; 14–20 remaining).
+**Status:** in progress (slices 1–14 done; 15–20 remaining).
 **Type:** ad-hoc plan (`.planning/quick/`)
 **Policy:** [ADR 0001](../../../docs/adrs/0001-ubiquitous-language.md) (**Property**, **Property panel**, **Wiki link**), [ADR 0004](../../../docs/adrs/0004-okf-compatible-notebook-markdown-accepted.md) (`#prop:`), Proposed [ADR 0005](../../../docs/adrs/0005-web-routes.md) (`noteProperty`).
 **Human-owned exception (2026-08-29):** ADR 0001 / ADR 0004 may depend on
@@ -207,14 +207,11 @@ return-to-sequence, and remove-from-recall run from it with settings
 closed. The property value dialog opens only from its own control and
 does not replace. E2E: `property_memory_tracker.feature`.
 
-### 14. Names match property panel and property value dialog — **Structure** — planned
+### 14. Names match property panel and property value dialog — **Structure** — done
 
-Rename identifiers and Gherkin to **property panel** (location chrome) and
-**property value dialog** (local editor). Component
-`RichFrontmatterPropertyRowOptions` → `RichFrontmatterPropertyPanel`. Toggle
-label, test ids, page objects, and steps follow. Drop “value panel”,
-“popup”, and “toggle options” as names for these two concepts. Existing
-behavior unchanged; no new tests.
+`RichFrontmatterPropertyRowOptions` → `RichFrontmatterPropertyPanel`. Gherkin,
+test ids, and page objects use **property panel** vs **property value dialog**.
+Unrelated popups unchanged.
 
 ### 15. Property wiki resolution requires the exact target property — **Behavior** — planned
 
@@ -292,8 +289,7 @@ invent identity from the label. Extend the internal-URL classifier so
   present the **property panel** from `isFocused`. Replace lives in
   `useNotePropertyPanelLocation`. The property value dialog is local
   (own control; no route replace). Skip/assimilate/return/remove run on
-  that panel. Slice 14 still renames leftover “value panel” / “popup” /
-  “toggle options” identifiers.
+  that panel.
 - Slice 11: `WikiLinkAuthoredTarget` splits `#prop:` first so rewrites and
   `resolveAnyTargetWikiLinkToken` keep the encoded suffix. Path-shaped
   `:` still drops a non-`#prop:` suffix (`#heading`) — documented, not

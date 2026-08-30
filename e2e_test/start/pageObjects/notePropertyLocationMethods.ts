@@ -8,6 +8,8 @@ import testability from '../testability'
 import {
   expectRichNotePropertyRowFocused,
   findNoteContentRegion,
+  richNotePropertyPanel,
+  richNotePropertyPanelToggle,
   richNotePropertyRow,
 } from './notePageContentRegion'
 
@@ -41,18 +43,16 @@ export const notePropertyLocationMethods = () => ({
   openRichNotePropertyPanel(key: string) {
     this.switchToRichContent()
     findNoteContentRegion().within(() => {
-      cy.get(richNotePropertyRow(key))
-        .find('[data-testid="rich-note-property-row-options-toggle"]')
-        .click()
+      cy.get(richNotePropertyRow(key)).find(richNotePropertyPanelToggle).click()
     })
     return this
   },
   closeRichNotePropertyPanel() {
     this.switchToRichContent()
     findNoteContentRegion().within(() => {
-      cy.get(
-        '[data-testid="rich-note-property-row-options-toggle"][aria-expanded="true"]'
-      ).click({ force: true })
+      cy.get(`${richNotePropertyPanelToggle}[aria-expanded="true"]`).click({
+        force: true,
+      })
     })
     return this
   },
@@ -85,10 +85,8 @@ export const notePropertyLocationMethods = () => ({
     findNoteContentRegion().within(() => {
       expectRichNotePropertyRowFocused(key)
       cy.get(richNotePropertyRow(key)).within(() => {
-        cy.get('[data-testid="rich-note-property-row-options"]').should(
-          'be.visible'
-        )
-        cy.get('[data-testid="rich-note-property-row-options-toggle"]').should(
+        cy.get(richNotePropertyPanel).should('be.visible')
+        cy.get(richNotePropertyPanelToggle).should(
           'have.attr',
           'aria-expanded',
           'true'

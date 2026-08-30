@@ -2,10 +2,10 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import { NoteController } from "@generated/donut-backend-api/sdk.gen"
 import { mockSdkService } from "@tests/helpers"
 import { notePropertyLocation } from "@/routes/noteShowLocation"
-import { dialogEl } from "./propertyValuePopupTestDom"
+import { propertyValueDialogEl } from "./propertyValueDialogTestDom"
 import {
-  expectPropertyRowPanelClosed,
-  expectPropertyRowPanelOpen,
+  expectPropertyPanelClosed,
+  expectPropertyPanelOpen,
   propertyRowSelector,
 } from "./propertiesTestDom"
 import { createRichMarkdownEditorTestHarness } from "./richMarkdownEditorTestHarness"
@@ -41,13 +41,13 @@ Workshop body.`
     const topicRow = wrapper.find(propertyRowSelector("topic"))
     expect(topicRow.attributes("data-property-focused")).toBe("true")
     expect(topicRow.classes()).toContain("bg-primary/10")
-    expectPropertyRowPanelOpen(topicRow.element)
+    expectPropertyPanelOpen(topicRow.element)
     expect(
       wrapper
         .find(propertyRowSelector("diligence"))
         .attributes("data-property-focused")
     ).toBeUndefined()
-    expectPropertyRowPanelClosed(
+    expectPropertyPanelClosed(
       wrapper.find(propertyRowSelector("diligence")).element
     )
     expect(scrollSpy).toHaveBeenCalledWith({
@@ -56,7 +56,7 @@ Workshop body.`
     })
   })
 
-  it("visiting noteProperty on a read-only property focuses the row, scrolls it into view, and does not open a value dialog", async () => {
+  it("visiting noteProperty on a read-only property focuses the row, scrolls it into view, and does not open a property value dialog", async () => {
     const scrollSpy = vi.spyOn(HTMLElement.prototype, "scrollIntoView")
 
     const wrapper = await h.mountEditor(markdown, {
@@ -75,14 +75,14 @@ Workshop body.`
         .find(propertyRowSelector("diligence"))
         .attributes("data-property-focused")
     ).toBeUndefined()
-    expect(dialogEl()).toBeNull()
+    expect(propertyValueDialogEl()).toBeNull()
     expect(scrollSpy).toHaveBeenCalledWith({
       behavior: "smooth",
       block: "center",
     })
   })
 
-  it("visiting noteProperty on a specialized property focuses the row without a value dialog", async () => {
+  it("visiting noteProperty on a specialized property focuses the row without a property value dialog", async () => {
     const specializedMarkdown = `---
 image: https://example.com/workshop.png
 topic: training
@@ -98,14 +98,14 @@ Workshop body.`
 
     const imageRow = wrapper.find(propertyRowSelector("image"))
     expect(imageRow.attributes("data-property-focused")).toBe("true")
-    expectPropertyRowPanelOpen(imageRow.element)
+    expectPropertyPanelOpen(imageRow.element)
     expect(
       imageRow.find('[data-testid="rich-note-image-property-choose"]').exists()
     ).toBe(true)
-    expect(dialogEl()).toBeNull()
+    expect(propertyValueDialogEl()).toBeNull()
   })
 
-  it("visiting noteProperty for a missing key shows not-found with the decoded key and does not open a value dialog", async () => {
+  it("visiting noteProperty for a missing key shows not-found with the decoded key and does not open a property value dialog", async () => {
     const wrapper = await h.mountEditor(markdown, {
       attachToBody: true,
       noteId,
@@ -120,6 +120,6 @@ Workshop body.`
         .find(propertyRowSelector("topic"))
         .attributes("data-property-focused")
     ).toBeUndefined()
-    expect(dialogEl()).toBeNull()
+    expect(propertyValueDialogEl()).toBeNull()
   })
 })
