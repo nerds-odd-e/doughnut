@@ -5,6 +5,7 @@
 import { Then, When } from '@badeball/cypress-cucumber-preprocessor'
 import start from '../start'
 import { assumeMemoryTrackerPage } from '../start/pageObjects/memoryTrackerPage'
+import { followNoteUnderQuestion } from '../start/pageObjects/noteUnderQuestion'
 
 Then(
   'the note memory tracker should have recall count {int}',
@@ -73,6 +74,10 @@ Then(
     assumeMemoryTrackerPage().expectFocusedProperty(propertyKey)
   }
 )
+
+When('I follow the note under question {string}', (noteTitle: string) => {
+  followNoteUnderQuestion(noteTitle)
+})
 
 Then(
   'the spelling verification result for note {string} should be {string}',

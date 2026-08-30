@@ -30,11 +30,20 @@ const assumeQuestionPage = (stem?: string) => {
       return getQuestionSection().find('button').first().click()
     },
     answer(answer: string) {
-      getQuestionSection()
-        .should('be.visible')
-        .within(() => {
-          cy.findByText(answer).should('be.visible').click()
-        })
+      getQuestionSection().should('be.visible')
+      cy.then(() => {
+        // @mockBrowserTime: Vue async mount updates sit on mocked timers;
+        // without a tick, choice clicks do not fire (see mockBrowserTime).
+        const clock = Cypress.state('clock') as
+          | { tick: (ms: number) => void }
+          | undefined
+        if (clock) {
+          clock.tick(1)
+        }
+      })
+      getQuestionSection().within(() => {
+        cy.findByText(answer).should('be.visible').click()
+      })
       waitUntilAppIsNotBusy()
       // Wait for the answered overlay to disappear, indicating it moved to the next stage
       cy.get('[data-test="answered-overlay"]').should('not.exist')

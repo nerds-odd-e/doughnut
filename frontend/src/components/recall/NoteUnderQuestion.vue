@@ -8,7 +8,7 @@
         :breadcrumb-notebook-id="breadcrumbNotebookId"
       >
         <template #additional>
-          <NoteTitleWithLink v-bind="{ noteTopology }" />
+          <NoteTitleWithLink v-bind="{ noteTopology, focusedPropertyKey }" />
         </template>
       </Breadcrumb>
     </div>

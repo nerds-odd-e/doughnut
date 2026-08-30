@@ -198,8 +198,32 @@ Feature: Property memory tracker
     And I open assimilation settings
     Then I should see a property memory tracker for "topic"
 
-  Scenario: Property memory tracker page shows note and focused property
+  Scenario: Property memory tracker note link opens that property
     Given I am viewing assimilation settings for note "Vitamins"
     When I open the property memory tracker for "topic"
     Then I should see note "Vitamins" on the memory tracker page
     And I should see focused property "topic" on the memory tracker page
+    When I follow the note under question "Vitamins"
+    Then I should be at property "topic" of note "Vitamins"
+    And the rich note property "topic" should be focused with its value dialog open
+
+  @disableOpenAiService
+  Scenario: Note-level memory tracker note link opens the note
+    Given I assimilated one note "Vitamins" at the current time
+    When I visit the understanding memory tracker for "Vitamins"
+    And I follow the note under question "Vitamins"
+    Then I should be at note "Vitamins"
+
+  @usingMockedOpenAiService
+  Scenario: Following the note from a property recall answer opens that property
+    And OpenAI generates this question:
+      | Question Stem                      | Correct Choice | Incorrect Choice 1 | Incorrect Choice 2 | Incorrect Choice 3 |
+      | What does the topic property mean? | micronutrients | vitamins           | minerals           | proteins           |
+    And OpenAI evaluates the question as legitimate
+    When I visit recall for a due recall prompt on day 2
+    Then I should be asked "What does the topic property mean?"
+    When I choose answer "vitamins"
+    Then I should see that my MCQ answer "vitamins" is incorrect
+    When I follow the note under question "Vitamins"
+    Then I should be at property "topic" of note "Vitamins"
+    And the rich note property "topic" should be focused with its value dialog open

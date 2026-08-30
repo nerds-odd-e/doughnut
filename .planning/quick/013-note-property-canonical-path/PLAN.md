@@ -1,6 +1,6 @@
 # Note property canonical path
 
-**Status:** in progress (slices 1–9 done; 10–17 remaining).
+**Status:** in progress (slices 1–10 done; 11–17 remaining).
 **Type:** ad-hoc plan (`.planning/quick/`)
 **Policy:** [ADR 0001](../../../docs/adrs/0001-ubiquitous-language.md) (**Property**, **Wiki link**), [ADR 0004](../../../docs/adrs/0004-okf-compatible-notebook-markdown-accepted.md) (`#prop:`), Proposed [ADR 0005](../../../docs/adrs/0005-web-routes.md) (`noteProperty`).
 **Human-owned exception (2026-08-29):** ADR 0001 / ADR 0004 may depend on
@@ -167,9 +167,13 @@ is set; `dismiss()` keeps settings closed. `pendingPropertyKey`,
 scenarios close the value dialog first so toggle options are reachable.
 E2E: `property_memory_tracker.feature`.
 
-### 10. Answered question and memory tracker link to `noteProperty` — **Behavior** — planned
+### 10. Answered question and memory tracker link to `noteProperty` — **Behavior** — done
 
-**Pre:** property-keyed recalled note (`focusedPropertyKey` set). **Trigger:** follow the note link on answered question or memory tracker. **Post:** `noteProperty` with that property open. Note-level trackers still use `noteShow`. One link helper (extend `NoteTitleWithLink` or the breadcrumb additional slot) — do not fork two `:to` dialects. `focusedPropertyKey` already flows from `RecalledNote.propertyKey` through `recalledNoteUnderQuestionProps` into `NoteUnderQuestion.vue`; today it only reaches a static `FocusedPropertyIndicator` text display and is not forwarded to `NoteTitleWithLink`. This slice wires that existing prop into the link — it is not adding a new field.
+`NoteTitleWithLink` compiles `noteProperty` when `focusedPropertyKey` is
+set; otherwise `noteShow`. `NoteUnderQuestion` forwards the existing prop.
+E2E: `property_memory_tracker.feature` (tracker + answered-question).
+Answered-question MCQ under `@mockBrowserTime` flushes the mocked clock
+before click so the click fires.
 
 ### 11. Java property-target codec preserves note-link behavior — **Structure** — planned
 
