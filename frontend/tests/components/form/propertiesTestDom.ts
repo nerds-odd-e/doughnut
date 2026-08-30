@@ -22,33 +22,65 @@ export function propertyRowOptionsPanelEl(row: ParentNode): HTMLElement | null {
   return row.querySelector('[data-testid="rich-note-property-row-options"]')
 }
 
+export function expectPropertyRowPanelOpen(row: ParentNode) {
+  expect(propertyRowOptionsPanelEl(row)).not.toBeNull()
+  expect(propertyRowOptionsToggleEl(row).getAttribute("aria-expanded")).toBe(
+    "true"
+  )
+}
+
+export function expectPropertyRowPanelClosed(row: ParentNode) {
+  expect(propertyRowOptionsPanelEl(row)).toBeNull()
+  expect(propertyRowOptionsToggleEl(row).getAttribute("aria-expanded")).toBe(
+    "false"
+  )
+}
+
+type PropertyRowToggleWrapper = {
+  find: (selector: string) => {
+    attributes: (name: string) => string | undefined
+    trigger: (event: string) => Promise<void>
+  }
+}
+
+async function setPropertyRowOptionsExpanded(
+  wrapper: PropertyRowToggleWrapper,
+  rowSelector: string,
+  expanded: boolean
+): Promise<void> {
+  const toggle = wrapper.find(
+    `${rowSelector} [data-testid="rich-note-property-row-options-toggle"]`
+  )
+  if ((toggle.attributes("aria-expanded") === "true") === expanded) {
+    return
+  }
+  await toggle.trigger("click")
+  await flushPromises()
+}
+
 export async function expandPropertyRowOptions(
-  wrapper: {
-    find: (selector: string) => {
-      trigger: (event: string) => Promise<void>
-    }
-  },
+  wrapper: PropertyRowToggleWrapper,
   rowSelector: string
 ): Promise<void> {
-  await wrapper
-    .find(
-      `${rowSelector} [data-testid="rich-note-property-row-options-toggle"]`
-    )
-    .trigger("click")
+  await setPropertyRowOptionsExpanded(wrapper, rowSelector, true)
+}
+
+export async function collapsePropertyRowOptions(
+  wrapper: PropertyRowToggleWrapper,
+  rowSelector: string
+): Promise<void> {
+  await setPropertyRowOptionsExpanded(wrapper, rowSelector, false)
 }
 
 export async function expandAndClickPropertyRowRemove(
-  wrapper: {
-    find: (selector: string) => {
-      trigger: (event: string) => Promise<void>
-    }
-  },
+  wrapper: PropertyRowToggleWrapper,
   rowSelector: string
 ): Promise<void> {
   await expandPropertyRowOptions(wrapper, rowSelector)
   await wrapper
     .find(`${rowSelector} [data-testid="rich-note-property-row-remove"]`)
     .trigger("click")
+  await flushPromises()
 }
 
 export function propertyRowKeyInputEl(row: ParentNode): HTMLInputElement {

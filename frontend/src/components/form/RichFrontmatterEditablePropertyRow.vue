@@ -17,11 +17,11 @@
         type="button"
         class="daisy-btn daisy-btn-ghost daisy-btn-sm square shrink-0"
         :aria-label="`Toggle options for note property ${modelValue.key}`"
-        :aria-expanded="optionsExpanded"
+        :aria-expanded="isFocused"
         data-testid="rich-note-property-row-options-toggle"
-        @click="optionsExpanded = !optionsExpanded"
+        @click="togglePropertyPanel"
       >
-        <ChevronRight v-if="!optionsExpanded" class="h-4 w-4" aria-hidden="true" />
+        <ChevronRight v-if="!isFocused" class="h-4 w-4" aria-hidden="true" />
         <ChevronDown v-else class="h-4 w-4" aria-hidden="true" />
       </button>
       <div
@@ -129,7 +129,7 @@
       </div>
     </div>
     <RichFrontmatterPropertyRowOptions
-      v-if="optionsExpanded"
+      v-if="isFocused"
       :property-key="modelValue.key"
       :note-id="noteId"
       @remove="emit('remove')"
@@ -140,6 +140,7 @@
 <script setup lang="ts">
 import { ChevronDown, ChevronRight } from "@lucide/vue"
 import { computed, ref, type ComponentPublicInstance } from "vue"
+import { useNotePropertyPanelLocation } from "@/composables/useNotePropertyPanelLocation"
 import RichFrontmatterPropertyRowOptions from "@/components/form/RichFrontmatterPropertyRowOptions.vue"
 import RichFrontmatterImagePropertyValue from "@/components/form/RichFrontmatterImagePropertyValue.vue"
 import RichFrontmatterPropertyExternalLink from "@/components/form/RichFrontmatterPropertyExternalLink.vue"
@@ -190,7 +191,9 @@ const emit = defineEmits<{
 }>()
 
 const presetPanelOpen = ref(false)
-const optionsExpanded = ref(false)
+const { togglePropertyPanel } = useNotePropertyPanelLocation(
+  () => props.modelValue.key
+)
 const valueAreaRef = ref<HTMLElement | null>(null)
 
 const scalarValue = computed(

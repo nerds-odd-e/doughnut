@@ -68,25 +68,20 @@ Body.`
     expect(router.currentRoute.value.query).toEqual(conversationQuery)
   })
 
-  it("does not leave noteProperty when deleting a property that is not focused by the route", async () => {
+  it("does not expose remove for a property that is not focused", async () => {
     const wrapper = await mountEditorOnNoteShow(h, markdown, {
       route: notePropertyLocation(noteId, "topic"),
     })
-    const router = wrapper.vm.$router
-    const replaceSpy = vi.spyOn(router, "replace")
-    const pushSpy = vi.spyOn(router, "push")
 
-    await attemptRemovePropertyRow(wrapper, "subject")
-
-    expect(pushSpy).not.toHaveBeenCalled()
-    expect(replaceSpy).not.toHaveBeenCalled()
-    expect(router.currentRoute.value).toMatchObject(
-      notePropertyLocation(noteId, "topic")
-    )
     expect(
       wrapper
-        .find(propertyRowSelector("topic"))
-        .attributes("data-property-focused")
-    ).toBe("true")
+        .find(
+          `${propertyRowSelector("subject")} [data-testid="rich-note-property-row-remove"]`
+        )
+        .exists()
+    ).toBe(false)
+    expect(wrapper.vm.$router.currentRoute.value).toMatchObject(
+      notePropertyLocation(noteId, "topic")
+    )
   })
 })

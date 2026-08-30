@@ -6,6 +6,7 @@ import { flushPromises } from "@vue/test-utils"
 import makeMe from "donut-test-fixtures/makeMe"
 import { mockSdkService, wrapSdkResponse } from "@tests/helpers"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
+import { noteShowLocation } from "@/routes/noteShowLocation"
 import {
   expandAndClickPropertyRowRemove,
   propertyRowSelector,
@@ -73,7 +74,10 @@ Workshop body.`
     const tracker = mockNoteInfoWithPropertyTracker("topic", 99)
     confirmMock.mockImplementationOnce(() => Promise.resolve(true))
 
-    const wrapper = await h.mountEditor(trackedPropertyMarkdown, { noteId })
+    const wrapper = await h.mountEditor(trackedPropertyMarkdown, {
+      noteId,
+      route: noteShowLocation(noteId),
+    })
 
     await expandAndClickPropertyRowRemove(wrapper, topicRowSelector)
     await flushPromises()
@@ -92,7 +96,10 @@ Workshop body.`
     mockNoteInfoWithPropertyTracker("topic", 99)
     confirmMock.mockImplementationOnce(() => Promise.resolve(false))
 
-    const wrapper = await h.mountEditor(trackedPropertyMarkdown, { noteId })
+    const wrapper = await h.mountEditor(trackedPropertyMarkdown, {
+      noteId,
+      route: noteShowLocation(noteId),
+    })
     const emitCountBefore = wrapper.emitted("update:modelValue")?.length ?? 0
 
     await expandAndClickPropertyRowRemove(wrapper, topicRowSelector)
@@ -113,7 +120,10 @@ Workshop body.`
     const tracker = mockNoteInfoWithPropertyTracker("topic", 99)
     confirmMock.mockImplementationOnce(() => Promise.resolve(true))
 
-    const wrapper = await h.mountEditor(trackedPropertyMarkdown, { noteId })
+    const wrapper = await h.mountEditor(trackedPropertyMarkdown, {
+      noteId,
+      route: noteShowLocation(noteId),
+    })
     const keyInput = wrapper.find(topicRowKeyInputSelector)
 
     await keyInput.trigger("focus")
@@ -138,7 +148,10 @@ Workshop body.`
     mockNoteInfoWithPropertyTracker("topic", 99)
     confirmMock.mockImplementationOnce(() => Promise.resolve(false))
 
-    const wrapper = await h.mountEditor(trackedPropertyMarkdown, { noteId })
+    const wrapper = await h.mountEditor(trackedPropertyMarkdown, {
+      noteId,
+      route: noteShowLocation(noteId),
+    })
     const emitCountBefore = wrapper.emitted("update:modelValue")?.length ?? 0
     const keyInput = wrapper.find(topicRowKeyInputSelector)
 

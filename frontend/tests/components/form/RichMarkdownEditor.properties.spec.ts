@@ -1,9 +1,10 @@
 import { flushPromises } from "@vue/test-utils"
+import { noteShowLocation } from "@/routes/noteShowLocation"
 import {
   expandPropertyRowOptions,
+  expectPropertyRowPanelClosed,
+  expectPropertyRowPanelOpen,
   propertyRowKeyInputEl,
-  propertyRowOptionsPanelEl,
-  propertyRowOptionsToggleEl,
   propertyRowSelector,
   propertyRows,
   propertyValidationText,
@@ -165,40 +166,31 @@ Workshop body.`
     )
   })
 
-  it("expands options independently then removes a row keeping remaining collapsed", async () => {
-    const wrapper = await h.mountEditor(twoPropertyMarkdown)
+  it("opening one property panel then removing that row leaves the other collapsed", async () => {
+    const wrapper = await h.mountEditor(twoPropertyMarkdown, {
+      route: noteShowLocation(42),
+    })
     const alphaRow = propertyRowSelector("alpha")
     const betaRow = propertyRowSelector("beta")
     const rows = propertyRows(wrapper.element)
 
-    expect(propertyRowOptionsPanelEl(rows[0]!)).toBeNull()
-    expect(propertyRowOptionsPanelEl(rows[1]!)).toBeNull()
+    expectPropertyRowPanelClosed(rows[0]!)
+    expectPropertyRowPanelClosed(rows[1]!)
 
     await expandPropertyRowOptions(wrapper, alphaRow)
 
-    expect(
-      propertyRowOptionsPanelEl(wrapper.find(alphaRow).element)
-    ).not.toBeNull()
-    expect(propertyRowOptionsPanelEl(wrapper.find(betaRow).element)).toBeNull()
-    expect(
-      propertyRowOptionsToggleEl(rows[0]!).getAttribute("aria-expanded")
-    ).toBe("true")
-    expect(
-      propertyRowOptionsToggleEl(rows[1]!).getAttribute("aria-expanded")
-    ).toBe("false")
+    expectPropertyRowPanelOpen(wrapper.find(alphaRow).element)
+    expectPropertyRowPanelClosed(wrapper.find(betaRow).element)
 
     await wrapper
       .find(`${alphaRow} [data-testid="rich-note-property-row-remove"]`)
       .trigger("click")
+    await flushPromises()
 
     const last = h.lastEmittedMarkdown()
     expect(last).not.toContain("alpha:")
     expect(last).toContain("beta:")
 
-    const betaEl = wrapper.find(betaRow).element
-    expect(propertyRowOptionsPanelEl(betaEl)).toBeNull()
-    expect(
-      propertyRowOptionsToggleEl(betaEl).getAttribute("aria-expanded")
-    ).toBe("false")
+    expectPropertyRowPanelClosed(wrapper.find(betaRow).element)
   })
 })

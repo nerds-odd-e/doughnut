@@ -1,7 +1,13 @@
-import { afterEach, describe, expect, it, vi } from "vitest"
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
+import { NoteController } from "@generated/donut-backend-api/sdk.gen"
+import { mockSdkService } from "@tests/helpers"
 import { notePropertyLocation } from "@/routes/noteShowLocation"
 import { dialogEl } from "./propertyValuePopupTestDom"
-import { propertyRowSelector } from "./propertiesTestDom"
+import {
+  expectPropertyRowPanelClosed,
+  expectPropertyRowPanelOpen,
+  propertyRowSelector,
+} from "./propertiesTestDom"
 import { createRichMarkdownEditorTestHarness } from "./richMarkdownEditorTestHarness"
 
 describe("RichMarkdownEditor property focus from noteProperty", () => {
@@ -14,12 +20,16 @@ topic: training
 
 Workshop body.`
 
+  beforeEach(() => {
+    mockSdkService(NoteController, "getNoteInfo", { memoryTrackers: [] })
+  })
+
   afterEach(() => {
     vi.restoreAllMocks()
     h.cleanup()
   })
 
-  it("visiting noteProperty focuses the row, scrolls it into view, and opens its value dialog", async () => {
+  it("visiting noteProperty focuses the row, scrolls it into view, and opens its property panel", async () => {
     const scrollSpy = vi.spyOn(HTMLElement.prototype, "scrollIntoView")
 
     const wrapper = await h.mountEditor(markdown, {
@@ -31,13 +41,15 @@ Workshop body.`
     const topicRow = wrapper.find(propertyRowSelector("topic"))
     expect(topicRow.attributes("data-property-focused")).toBe("true")
     expect(topicRow.classes()).toContain("bg-primary/10")
+    expectPropertyRowPanelOpen(topicRow.element)
     expect(
       wrapper
         .find(propertyRowSelector("diligence"))
         .attributes("data-property-focused")
     ).toBeUndefined()
-    expect(dialogEl()).not.toBeNull()
-    expect(document.querySelector("dialog h2")?.textContent).toBe("topic")
+    expectPropertyRowPanelClosed(
+      wrapper.find(propertyRowSelector("diligence")).element
+    )
     expect(scrollSpy).toHaveBeenCalledWith({
       behavior: "smooth",
       block: "center",
@@ -86,6 +98,7 @@ Workshop body.`
 
     const imageRow = wrapper.find(propertyRowSelector("image"))
     expect(imageRow.attributes("data-property-focused")).toBe("true")
+    expectPropertyRowPanelOpen(imageRow.element)
     expect(
       imageRow.find('[data-testid="rich-note-image-property-choose"]').exists()
     ).toBe(true)

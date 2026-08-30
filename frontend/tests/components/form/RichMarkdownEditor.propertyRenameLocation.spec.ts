@@ -6,12 +6,14 @@ import {
   noteShowLocation,
 } from "@/routes/noteShowLocation"
 import {
-  dialogEl,
   mountEditorOnNoteShow,
   PROPERTY_VALUE_PANEL_NOTE_ID,
 } from "./propertyValuePopupTestDom"
 import { attemptRenamePropertyKey } from "./propertiesTestSupport"
-import { propertyRowSelector } from "./propertiesTestDom"
+import {
+  expectPropertyRowPanelOpen,
+  propertyRowSelector,
+} from "./propertiesTestDom"
 import { createRichMarkdownEditorTestHarness } from "./richMarkdownEditorTestHarness"
 
 describe("RichMarkdownEditor focused property rename location", () => {
@@ -52,9 +54,8 @@ Body.`
         .find(propertyRowSelector("Subject Matter"))
         .attributes("data-property-focused")
     ).toBe("true")
-    expect(dialogEl()).not.toBeNull()
-    expect(document.querySelector("dialog h2")?.textContent).toBe(
-      "Subject Matter"
+    expectPropertyRowPanelOpen(
+      wrapper.find(propertyRowSelector("Subject Matter")).element
     )
   })
 

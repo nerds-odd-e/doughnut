@@ -21,12 +21,16 @@ Given(
   }
 )
 
-When('I open the value panel for property {string}', (key: string) => {
-  start.assumeNotePage().openRichNotePropertyValuePanel(key)
+When('I open the property panel for property {string}', (key: string) => {
+  start.assumeNotePage().openRichNotePropertyPanel(key)
 })
 
 When('I close the value panel', () => {
   start.assumeNotePage().closePropertyValuePanel()
+})
+
+When('I close the property panel', () => {
+  start.assumeNotePage().closeRichNotePropertyPanel()
 })
 
 When(
@@ -40,6 +44,13 @@ Then(
   'the rich note property {string} should be focused with its value dialog open',
   (key: string) => {
     start.assumeNotePage().expectFocusedRichNoteProperty(key)
+  }
+)
+
+Then(
+  'the rich note property {string} should be focused with its property panel open',
+  (key: string) => {
+    start.assumeNotePage().expectFocusedRichNotePropertyPanel(key)
   }
 )
 

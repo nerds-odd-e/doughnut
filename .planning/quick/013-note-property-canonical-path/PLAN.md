@@ -1,6 +1,6 @@
 # Note property canonical path
 
-**Status:** in progress (slices 1–11 done; 12–20 remaining).
+**Status:** in progress (slices 1–12 done; 13–20 remaining).
 **Type:** ad-hoc plan (`.planning/quick/`)
 **Policy:** [ADR 0001](../../../docs/adrs/0001-ubiquitous-language.md) (**Property**, **Property panel**, **Wiki link**), [ADR 0004](../../../docs/adrs/0004-okf-compatible-notebook-markdown-accepted.md) (`#prop:`), Proposed [ADR 0005](../../../docs/adrs/0005-web-routes.md) (`noteProperty`).
 **Human-owned exception (2026-08-29):** ADR 0001 / ADR 0004 may depend on
@@ -194,22 +194,12 @@ note-target portion. Path-shaped `:` trap is documented
 `WikiLinkAuthoredTargetTest` for TypeScript slice 13. Property tokens are
 not live yet — slice 12 must require the exact existing decoded key.
 
-### 12. Visiting `noteProperty` opens the property panel — **Behavior** — planned
+### 12. Visiting `noteProperty` opens the property panel — **Behavior** — done
 
-**Pre:** a note with an editable property. **Trigger:** visit that
-`noteProperty`, or open/close the **property panel** on the row. **Post:**
-visit and open show the focused row with the panel open (`noteProperty`);
-close `replace`s to `noteShow`; unrelated query is preserved.
-
-Drive the panel from `isFocused`. The row chevron is open/close (`replace`).
-Update visit, focus, rename, open/close, and conversation-query assertions
-whose unique claim is the location presentation to the **property panel**.
-Do not add assertions that the value dialog is closed. Read-only focus
-stays the existing positive (focused, value visible). The value dialog still
-follows the route until slice 13.
-
-E2E: `note_property.feature`. Vitest: `RichMarkdownEditor.propertyFocus.spec.ts`,
-`RichMarkdownEditor.propertyValuePanelLocation.spec.ts`.
+Editable rows open the **property panel** from `isFocused`. Chevron
+`replace`s via `useNotePropertyPanelLocation` (`noteProperty` / `noteShow`);
+query preserved; already-at-this-property is a no-op. E2E:
+`note_property.feature`. Value dialog still follows the route until slice 13.
 
 ### 13. Next to assimilate a property uses the property panel — **Behavior** — planned
 
@@ -307,8 +297,9 @@ invent identity from the label. Extend the internal-URL classifier so
 - Missing-key stays on `noteProperty` with `RichFrontmatterPropertyNotFound`.
   Intentional deletion of the focused key still replaces to `noteShow`.
 - `useFocusedNoteProperty` is the route-neutral focus seam. Editable rows
-  present the **property panel** from `isFocused`. The property value dialog
-  is local. Next-to-assimilate skip/assimilate run on that panel.
+  present the **property panel** from `isFocused`. Replace lives in
+  `useNotePropertyPanelLocation`. The property value dialog still follows
+  the route until slice 13; skip/assimilate on the panel is that slice.
 - Slice 11: `WikiLinkAuthoredTarget` splits `#prop:` first so rewrites and
   `resolveAnyTargetWikiLinkToken` keep the encoded suffix. Path-shaped
   `:` still drops a non-`#prop:` suffix (`#heading`) — documented, not

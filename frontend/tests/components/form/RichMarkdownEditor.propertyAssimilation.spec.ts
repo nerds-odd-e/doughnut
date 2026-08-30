@@ -7,6 +7,7 @@ import { flushPromises } from "@vue/test-utils"
 import makeMe from "donut-test-fixtures/makeMe"
 import { mockSdkService } from "@tests/helpers"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
+import { noteShowLocation } from "@/routes/noteShowLocation"
 import {
   expandPropertyRowOptions,
   propertyRowSelector,
@@ -64,7 +65,10 @@ Workshop body.`
       makeMe.aMemoryTracker.id(1).withPropertyKey("topic").please(),
     ])
 
-    const wrapper = await h.mountEditor(topicMarkdown, { noteId })
+    const wrapper = await h.mountEditor(topicMarkdown, {
+      noteId,
+      route: noteShowLocation(noteId),
+    })
     await expandPropertyRowOptions(wrapper, topicRowSelector)
 
     await wrapper
@@ -88,7 +92,10 @@ Workshop body.`
     )
     confirmMock.mockImplementationOnce(() => Promise.resolve(true))
 
-    const wrapper = await h.mountEditor(topicMarkdown, { noteId })
+    const wrapper = await h.mountEditor(topicMarkdown, {
+      noteId,
+      route: noteShowLocation(noteId),
+    })
     await expandPropertyRowOptions(wrapper, topicRowSelector)
 
     await wrapper

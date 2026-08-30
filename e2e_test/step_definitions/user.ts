@@ -179,4 +179,3 @@ Given('calling token-info with the Donut Access Token succeeds', () => {
 Then('the token with label {string} is listed', (label: string) => {
   visitManageAccessTokensPage().expectTokenWithLabelListed(label)
 })
-

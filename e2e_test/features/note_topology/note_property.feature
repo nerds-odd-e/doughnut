@@ -15,13 +15,13 @@ Feature: Note property location
       Vitamin notes body.
       """
 
-  Scenario: Visiting a property location focuses the editable property
+  Scenario: Visiting a property location opens the property panel
     Given I visit note "Vitamins"
     When I visit property "topic" of note "Vitamins"
     Then I should see the note tree in the sidebar
       | note-title |
       | Vitamins   |
-    And the rich note property "topic" should be focused with its value dialog open
+    And the rich note property "topic" should be focused with its property panel open
 
   Scenario: Visiting a specialized property location focuses the property without a value dialog
     Given I visit note "Vitamins"
@@ -29,6 +29,7 @@ Feature: Note property location
     Then I should see the note tree in the sidebar
       | note-title |
       | Vitamins   |
+    And the rich note property "wikidata_id" should be focused with its property panel open
     And the rich note property "wikidata_id" should be focused showing "Q34932" without a value dialog
 
   Scenario: Visiting a read-only property location focuses the property without a value dialog
@@ -60,23 +61,22 @@ Feature: Note property location
       | Vitamins   |
     And the property "example of" should not be found
 
-  Scenario: Opening a property value panel goes to that property location
+  Scenario: Opening a property panel goes to that property location
     Given I visit note "Vitamins"
-    When I open the value panel for property "topic"
+    When I open the property panel for property "topic"
     Then I should be at property "topic" of note "Vitamins"
-    And the rich note property "topic" should be focused with its value dialog open
+    And the rich note property "topic" should be focused with its property panel open
 
-  Scenario: Closing a property value panel returns to the note location
+  Scenario: Closing a property panel returns to the note location
     Given I visit property "topic" of note "Vitamins"
-    When I close the value panel
+    When I close the property panel
     Then I should be at note "Vitamins"
-    And the property value dialog should be closed
 
   Scenario: Property panel open and close keep an unrelated conversation query
     Given I visit note "Vitamins" with conversation query
-    When I open the value panel for property "topic"
+    When I open the property panel for property "topic"
     Then I should be at property "topic" of note "Vitamins" with conversation query
-    When I close the value panel
+    When I close the property panel
     Then I should be at note "Vitamins" with conversation query
 
   Scenario: Starting and closing a conversation keeps the property location
@@ -90,7 +90,7 @@ Feature: Note property location
     Given I visit property "topic" of note "Vitamins"
     When I rename the focused property key from "topic" to "subject"
     Then I should be at property "subject" of note "Vitamins"
-    And the rich note property "subject" should be focused with its value dialog open
+    And the rich note property "subject" should be focused with its property panel open
 
   Scenario: Deleting the focused property returns to the note location
     Given the note "Vitamins" has assimilated property "topic"

@@ -1,7 +1,6 @@
 import { waitUntilAppIsNotBusy } from '../pageBase'
 import {
   confirmPropertyMemoryTrackerChange,
-  expectRichNotePropertyRowFocused,
   findNoteContentRegion,
   richNotePropertyRow,
 } from './notePageContentRegion'
@@ -39,52 +38,6 @@ export const noteRichPropertyMethods = () => ({
   setRichNoteImagePropertyUrl(url: string) {
     this.addRichNoteProperty('image', url)
     cy.get(richNotePropertyRow('image'), { timeout: 20000 }).should('exist')
-    return this
-  },
-  expectFocusedRichNoteProperty(key: string) {
-    this.switchToRichContent()
-    findNoteContentRegion().within(() => {
-      expectRichNotePropertyRowFocused(key)
-    })
-    cy.get('dialog')
-      .filter(':visible')
-      .should('be.visible')
-      .within(() => {
-        cy.contains('h2', key).should('be.visible')
-        cy.get(
-          '[data-testid="rich-note-property-value-popup-textarea"]'
-        ).should('be.visible')
-      })
-    return this
-  },
-  expectFocusedRichNotePropertyValueWithoutDialog(key: string, value: string) {
-    this.switchToRichContent()
-    findNoteContentRegion().within(() => {
-      expectRichNotePropertyRowFocused(key).and(($row) => {
-        const actual = $row.text()
-        expect(
-          actual,
-          `Expected focused property "${key}" to show ${JSON.stringify(value)}, but found ${JSON.stringify(actual.trim())}`
-        ).to.include(value)
-      })
-    })
-    cy.get('dialog').should('not.exist')
-    return this
-  },
-  expectRichNotePropertyNotFound(key: string) {
-    this.switchToRichContent()
-    const expected = `Property "${key}" not found`
-    findNoteContentRegion().within(() => {
-      cy.get('[data-testid="rich-note-property-not-found"]').should(($el) => {
-        const actual = $el.text().trim()
-        expect(
-          actual,
-          `Expected property-not-found state ${JSON.stringify(expected)}, but found ${JSON.stringify(actual)}`
-        ).to.equal(expected)
-      })
-      cy.get('[data-property-focused="true"]').should('not.exist')
-    })
-    cy.get('dialog').should('not.exist')
     return this
   },
   expectRichNotePropertyDisplayed(key: string, value: string) {
@@ -141,9 +94,13 @@ export const noteRichPropertyMethods = () => ({
     this.switchToRichContent()
     findNoteContentRegion().within(() => {
       cy.get(richNotePropertyRow(key)).within(() => {
-        cy.findByTestId('rich-note-property-row-options-toggle').click({
-          force: true,
-        })
+        cy.findByTestId('rich-note-property-row-options-toggle').then(
+          ($toggle) => {
+            if ($toggle.attr('aria-expanded') !== 'true') {
+              cy.wrap($toggle).click({ force: true })
+            }
+          }
+        )
         cy.findByTestId('rich-note-property-row-remove').click({ force: true })
       })
     })

@@ -60,19 +60,12 @@
 <script setup lang="ts">
 import { SquarePen } from "@lucide/vue"
 import { computed } from "vue"
-import { useRoute, useRouter } from "vue-router"
+import { useNotePropertyPanelLocation } from "@/composables/useNotePropertyPanelLocation"
 import RichFrontmatterListPropertyValue from "@/components/form/RichFrontmatterListPropertyValue.vue"
 import RichFrontmatterPropertyExternalLink from "@/components/form/RichFrontmatterPropertyExternalLink.vue"
 import RichFrontmatterPropertyValueDialog from "@/components/form/RichFrontmatterPropertyValueDialog.vue"
 import PropertyValueField from "@/components/form/PropertyValueField.vue"
 import type { WikiTitle } from "@generated/donut-backend-api"
-import { noteRouteFamilyNoteId } from "@/routes/noteRouteFamily"
-import {
-  locationKeepingQuery,
-  notePropertyKeyFromRoute,
-  notePropertyLocation,
-  noteShowLocation,
-} from "@/routes/noteShowLocation"
 import {
   isScalarOnlyStructuralPropertyKey,
   isTextCapablePropertyRow,
@@ -104,10 +97,9 @@ const emit = defineEmits<{
   "dead-wiki-link-click": [payload: DeadWikiLinkPayload]
 }>()
 
-const route = useRoute()
-const router = useRouter()
-
 const propertyKey = computed(() => props.propertyRow.key)
+const { replaceToPropertyPanel, replaceToNoteShow } =
+  useNotePropertyPanelLocation(propertyKey)
 const textCapable = computed(() => isTextCapablePropertyRow(props.propertyRow))
 const valueDialogOpen = computed(() => props.isFocused && textCapable.value)
 const isListValue = computed(() => isListPropertyValue(props.propertyRow.value))
@@ -138,29 +130,12 @@ function onValuePointerDown(event: PointerEvent) {
   primeSoftKeyboard()
 }
 
-function currentNoteId(): number {
-  return Number(noteRouteFamilyNoteId(route))
-}
-
 function openValuePanel() {
-  if (
-    route.name === "noteProperty" &&
-    notePropertyKeyFromRoute(route) === propertyKey.value
-  ) {
-    return
-  }
-  return router.replace(
-    locationKeepingQuery(
-      route,
-      notePropertyLocation(currentNoteId(), propertyKey.value)
-    )
-  )
+  return replaceToPropertyPanel()
 }
 
 function closeValuePanel() {
-  return router.replace(
-    locationKeepingQuery(route, noteShowLocation(currentNoteId()))
-  )
+  return replaceToNoteShow()
 }
 
 function onValueDialogSave(value: PropertyValue) {

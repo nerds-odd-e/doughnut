@@ -1,5 +1,6 @@
 import { README_ONLY_PRESET_PROPERTY_KEYS } from "@/utils/noteContentFrontmatter"
 import { flushPromises } from "@vue/test-utils"
+import { noteShowLocation } from "@/routes/noteShowLocation"
 import {
   commitCustomRelationText,
   customRelationRadioLabelEl,
@@ -71,7 +72,9 @@ only: x
 ---
 
 Paragraph.\n`
-    const wrapper = await h.mountEditor(markdown)
+    const wrapper = await h.mountEditor(markdown, {
+      route: noteShowLocation(42),
+    })
 
     expect(wrapper.text()).toContain("Properties")
 
