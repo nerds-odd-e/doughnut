@@ -1,5 +1,6 @@
 package com.odde.donut.validators;
 
+import com.odde.donut.algorithms.WikiLinkAuthoredTarget;
 import com.odde.donut.algorithms.WikiLinkTargetReference;
 import java.util.regex.Pattern;
 
@@ -64,22 +65,28 @@ public final class DisplayNamePathSeparators {
   /**
    * Sanitizes wiki link target tokens. Path-shaped targets ({@code Folder/Title}) keep {@code /}.
    * For {@code Notebook:Title}, the notebook prefix colon stays halfwidth; both the notebook name
-   * and the note-title portion are converted.
+   * and the note-title portion are converted. An encoded {@code #prop:} suffix is left unchanged.
    */
   public static String replaceOsInvalidCharsInWikiLinkTarget(String targetToken) {
     if (targetToken == null) {
       return null;
     }
-    int colon = targetToken.indexOf(':');
-    if (colon > 0 && colon < targetToken.length() - 1) {
-      String notebookName = targetToken.substring(0, colon).trim();
+    return WikiLinkAuthoredTarget.parse(targetToken)
+        .mapNoteTarget(DisplayNamePathSeparators::replaceOsInvalidCharsInNoteTarget)
+        .format();
+  }
+
+  private static String replaceOsInvalidCharsInNoteTarget(String noteTarget) {
+    int colon = noteTarget.indexOf(':');
+    if (colon > 0 && colon < noteTarget.length() - 1) {
+      String notebookName = noteTarget.substring(0, colon).trim();
       if (!notebookName.isEmpty() && !notebookName.contains("\\") && !notebookName.contains("/")) {
-        String noteTitle = targetToken.substring(colon + 1);
+        String noteTitle = noteTarget.substring(colon + 1);
         return replaceOsInvalidChars(notebookName) + ":" + replaceOsInvalidChars(noteTitle);
       }
     }
-    return WikiLinkTargetReference.PathShapedTarget.tryParse(targetToken)
+    return WikiLinkTargetReference.PathShapedTarget.tryParse(noteTarget)
         .map(path -> path.mapSegmentNames(DisplayNamePathSeparators::replaceOsInvalidChars))
-        .orElseGet(() -> replaceOsInvalidChars(targetToken));
+        .orElseGet(() -> replaceOsInvalidChars(noteTarget));
   }
 }

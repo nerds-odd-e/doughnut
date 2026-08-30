@@ -68,8 +68,7 @@ public record WikiLinkTargetReference(String notebookName, String noteTitle) {
 
   private static String mapNoteTarget(
       String targetToken, UnaryOperator<String> noteTargetTransform) {
-    WikiLinkAuthoredTarget authored = WikiLinkAuthoredTarget.parse(targetToken);
-    return authored.withNoteTarget(noteTargetTransform.apply(authored.noteTarget())).format();
+    return WikiLinkAuthoredTarget.parse(targetToken).mapNoteTarget(noteTargetTransform).format();
   }
 
   /**

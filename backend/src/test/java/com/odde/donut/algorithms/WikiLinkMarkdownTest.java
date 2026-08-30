@@ -4,7 +4,11 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
 import java.util.List;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 class WikiLinkMarkdownTest {
 
@@ -193,5 +197,26 @@ class WikiLinkMarkdownTest {
         WikiLinkMarkdownRewrite.newInnerForQualifyUnqualifiedOutgoingLink(
             "Moon#prop:a%20part%20of", "Sky"),
         equalTo("Sky:Moon#prop:a%20part%20of|Moon#prop:a%20part%20of"));
+  }
+
+  static Stream<Arguments> osInvalidSanitizationKeepsEncodedPropertySuffix() {
+    return Stream.of(
+        Arguments.of("[[Moon#prop:a%20part%20of]]", "[[Moon#prop:a%20part%20of]]"),
+        Arguments.of("[[Sky:Moon#prop:a%20part%20of]]", "[[Sky:Moon#prop:a%20part%20of]]"),
+        Arguments.of("[[Folder/Title#prop:a%20part%20of]]", "[[Folder/Title#prop:a%20part%20of]]"),
+        Arguments.of(
+            "[label](/Solar/Moon.md*#prop:a%20part%20of)",
+            "[label](/Solar/Moon.md＊#prop:a%20part%20of)"),
+        Arguments.of("[[Sky:Moon*#prop:a%20part%20of]]", "[[Sky:Moon＊#prop:a%20part%20of]]"),
+        Arguments.of(
+            "[[Folder/Title*#prop:a%20part%20of]]", "[[Folder/Title＊#prop:a%20part%20of]]"));
+  }
+
+  @ParameterizedTest
+  @MethodSource("osInvalidSanitizationKeepsEncodedPropertySuffix")
+  void replaceOsInvalidCharsInAuthoredTokens_preservesEncodedPropertySuffix(
+      String markdown, String expected) {
+    assertThat(
+        WikiLinkMarkdownRewrite.replaceOsInvalidCharsInAuthoredTokens(markdown), equalTo(expected));
   }
 }

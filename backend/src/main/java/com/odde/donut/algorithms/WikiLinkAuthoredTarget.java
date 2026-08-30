@@ -7,6 +7,7 @@ import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CodingErrorAction;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
+import java.util.function.UnaryOperator;
 
 /**
  * Authored wiki or path-Markdown link target: note target plus optional {@code #prop:} encoded
@@ -60,6 +61,10 @@ public record WikiLinkAuthoredTarget(String noteTarget, String encodedPropertyKe
 
   public WikiLinkAuthoredTarget withNoteTarget(String newNoteTarget) {
     return new WikiLinkAuthoredTarget(newNoteTarget, encodedPropertyKey);
+  }
+
+  public WikiLinkAuthoredTarget mapNoteTarget(UnaryOperator<String> noteTargetTransform) {
+    return withNoteTarget(noteTargetTransform.apply(noteTarget));
   }
 
   public Optional<String> decodedPropertyKey() {
