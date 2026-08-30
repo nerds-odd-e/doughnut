@@ -1,6 +1,6 @@
 # Note property canonical path
 
-**Status:** in progress (slices 1–12 done; 13–20 remaining).
+**Status:** in progress (slices 1–13 done; 14–20 remaining).
 **Type:** ad-hoc plan (`.planning/quick/`)
 **Policy:** [ADR 0001](../../../docs/adrs/0001-ubiquitous-language.md) (**Property**, **Property panel**, **Wiki link**), [ADR 0004](../../../docs/adrs/0004-okf-compatible-notebook-markdown-accepted.md) (`#prop:`), Proposed [ADR 0005](../../../docs/adrs/0005-web-routes.md) (`noteProperty`).
 **Human-owned exception (2026-08-29):** ADR 0001 / ADR 0004 may depend on
@@ -173,8 +173,7 @@ preserved. Deleting a different key stays on `noteProperty`. E2E in
 
 `useGoToNextAssimilation` `push`es `notePropertyLocation` when `propertyKey`
 is set; `dismiss()` keeps settings closed. `pendingPropertyKey`,
-`usePendingAssimilationProperty`, and `data-test-pending` are gone. Skip
-scenarios close the value dialog first so toggle options are reachable.
+`usePendingAssimilationProperty`, and `data-test-pending` are gone.
 E2E: `property_memory_tracker.feature`.
 
 ### 10. Answered question and memory tracker link to `noteProperty` — **Behavior** — done
@@ -199,21 +198,14 @@ not live yet — slice 12 must require the exact existing decoded key.
 Editable rows open the **property panel** from `isFocused`. Chevron
 `replace`s via `useNotePropertyPanelLocation` (`noteProperty` / `noteShow`);
 query preserved; already-at-this-property is a no-op. E2E:
-`note_property.feature`. Value dialog still follows the route until slice 13.
+`note_property.feature`.
 
-### 13. Next to assimilate a property uses the property panel — **Behavior** — planned
+### 13. Next to assimilate a property uses the property panel — **Behavior** — done
 
-**Pre:** a property unit is next to assimilate. **Trigger:** start
-assimilation. **Post:** `noteProperty` with that **property panel** open,
-assimilation settings closed; skip, assimilate, return-to-sequence, and
-remove-from-recall run from that panel.
-
-`useGoToNextAssimilation` already `push`es `notePropertyLocation`. This slice
-is the cohesive use of that location: the panel is the place those actions
-live. Stop opening the property value dialog from the route; it opens only
-from its own control and does not replace. Tracker and answered-question
-arrival show the property panel. Extend `property_memory_tracker.feature`;
-drop steps that close the value dialog to reach the actions.
+Arrival at `noteProperty` shows the **property panel**; skip, assimilate,
+return-to-sequence, and remove-from-recall run from it with settings
+closed. The property value dialog opens only from its own control and
+does not replace. E2E: `property_memory_tracker.feature`.
 
 ### 14. Names match property panel and property value dialog — **Structure** — planned
 
@@ -298,8 +290,10 @@ invent identity from the label. Extend the internal-URL classifier so
   Intentional deletion of the focused key still replaces to `noteShow`.
 - `useFocusedNoteProperty` is the route-neutral focus seam. Editable rows
   present the **property panel** from `isFocused`. Replace lives in
-  `useNotePropertyPanelLocation`. The property value dialog still follows
-  the route until slice 13; skip/assimilate on the panel is that slice.
+  `useNotePropertyPanelLocation`. The property value dialog is local
+  (own control; no route replace). Skip/assimilate/return/remove run on
+  that panel. Slice 14 still renames leftover “value panel” / “popup” /
+  “toggle options” identifiers.
 - Slice 11: `WikiLinkAuthoredTarget` splits `#prop:` first so rewrites and
   `resolveAnyTargetWikiLinkToken` keep the encoded suffix. Path-shaped
   `:` still drops a non-`#prop:` suffix (`#heading`) — documented, not

@@ -8,7 +8,9 @@ import {
 } from "@/routes/noteShowLocation"
 import type { Router } from "vue-router"
 import {
+  dialogEl,
   mountEditorOnNoteShow,
+  openValuePopup,
   PROPERTY_VALUE_PANEL_NOTE_ID,
 } from "./propertyValuePopupTestDom"
 import {
@@ -97,5 +99,14 @@ Body.`
     expect(replaceSpy).toHaveBeenCalledTimes(2)
     expect(router.currentRoute.value).toMatchObject(noteShowLocation(noteId))
     expect(router.currentRoute.value.query).toEqual(conversationQuery)
+  })
+
+  it("opening the property value dialog from its control leaves the property panel closed", async () => {
+    const wrapper = await mountEditorOnNoteShow(h, markdown)
+
+    await openValuePopup(wrapper)
+
+    expectPropertyRowPanelClosed(wrapper.find(topicRow).element)
+    expect(dialogEl()).not.toBeNull()
   })
 })

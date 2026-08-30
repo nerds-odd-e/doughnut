@@ -33,7 +33,7 @@ Feature: Property memory tracker
     And I assimilated one note "Kanji" at the current time
     When I start assimilation from the menu
     Then I should be at property "example of" of note "Kanji"
-    And the rich note property "example of" should be focused with its value dialog open
+    And the rich note property "example of" should be focused with its property panel open
     And I should not see assimilation settings
 
   @disableOpenAiService
@@ -52,9 +52,8 @@ Feature: Property memory tracker
     And I assimilated one note "Minerals" at the current time
     When I start assimilation from the menu
     Then I should be at property "topic" of note "Minerals"
-    And the rich note property "topic" should be focused with its value dialog open
+    And the rich note property "topic" should be focused with its property panel open
     And I should not see assimilation settings
-    When I close the value panel
     When I skip rich note property "topic" from its toggle options
     Then I should see the no more notes to assimilate toast
     When I visit note "Minerals"
@@ -76,8 +75,7 @@ Feature: Property memory tracker
     And I assimilated one note "Minerals" at the current time
     When I start assimilation from the menu
     Then I should be at property "topic" of note "Minerals"
-    And the rich note property "topic" should be focused with its value dialog open
-    When I close the value panel
+    And the rich note property "topic" should be focused with its property panel open
     When I skip rich note property "topic" from its toggle options
     Then I should see the no more notes to assimilate toast
     When I visit note "Minerals"
@@ -87,7 +85,7 @@ Feature: Property memory tracker
     Then I should see Skip for property "topic"
     When I start assimilation from the menu
     Then I should be at property "topic" of note "Minerals"
-    And the rich note property "topic" should be focused with its value dialog open
+    And the rich note property "topic" should be focused with its property panel open
 
   @disableOpenAiService
   Scenario: Assimilating a skipped property creates a property understanding tracker
@@ -105,8 +103,7 @@ Feature: Property memory tracker
     And I assimilated one note "Minerals" at the current time
     When I start assimilation from the menu
     Then I should be at property "topic" of note "Minerals"
-    And the rich note property "topic" should be focused with its value dialog open
-    When I close the value panel
+    And the rich note property "topic" should be focused with its property panel open
     When I skip rich note property "topic" from its toggle options
     Then I should see the no more notes to assimilate toast
     When I visit note "Minerals"
@@ -205,7 +202,7 @@ Feature: Property memory tracker
     And I should see focused property "topic" on the memory tracker page
     When I follow the note under question "Vitamins"
     Then I should be at property "topic" of note "Vitamins"
-    And the rich note property "topic" should be focused with its value dialog open
+    And the rich note property "topic" should be focused with its property panel open
 
   @disableOpenAiService
   Scenario: Note-level memory tracker note link opens the note
@@ -226,4 +223,4 @@ Feature: Property memory tracker
     Then I should see that my MCQ answer "vitamins" is incorrect
     When I follow the note under question "Vitamins"
     Then I should be at property "topic" of note "Vitamins"
-    And the rich note property "topic" should be focused with its value dialog open
+    And the rich note property "topic" should be focused with its property panel open

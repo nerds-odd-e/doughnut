@@ -37,7 +37,7 @@
       class="daisy-btn daisy-btn-ghost daisy-btn-sm square shrink-0"
       :aria-label="`Edit property value for ${propertyKey} in dialog`"
       data-testid="rich-note-property-value-popup-open"
-      @click="openValuePanel"
+      @click="valueDialogOpen = true"
     >
       <SquarePen class="h-4 w-4" aria-hidden="true" />
     </button>
@@ -52,15 +52,14 @@
       :property-value="propertyRow.value"
       :list-mode-allowed="listModeAllowed"
       @save="onValueDialogSave"
-      @cancel="closeValuePanel"
+      @cancel="valueDialogOpen = false"
     />
   </div>
 </template>
 
 <script setup lang="ts">
 import { SquarePen } from "@lucide/vue"
-import { computed } from "vue"
-import { useNotePropertyPanelLocation } from "@/composables/useNotePropertyPanelLocation"
+import { computed, ref } from "vue"
 import RichFrontmatterListPropertyValue from "@/components/form/RichFrontmatterListPropertyValue.vue"
 import RichFrontmatterPropertyExternalLink from "@/components/form/RichFrontmatterPropertyExternalLink.vue"
 import RichFrontmatterPropertyValueDialog from "@/components/form/RichFrontmatterPropertyValueDialog.vue"
@@ -86,7 +85,6 @@ const props = defineProps<{
   wikiTitles: WikiTitle[]
   lastSavedMarkdown?: string
   rowIndex: number
-  isFocused: boolean
 }>()
 
 const emit = defineEmits<{
@@ -98,10 +96,8 @@ const emit = defineEmits<{
 }>()
 
 const propertyKey = computed(() => props.propertyRow.key)
-const { replaceToPropertyPanel, replaceToNoteShow } =
-  useNotePropertyPanelLocation(propertyKey)
 const textCapable = computed(() => isTextCapablePropertyRow(props.propertyRow))
-const valueDialogOpen = computed(() => props.isFocused && textCapable.value)
+const valueDialogOpen = ref(false)
 const isListValue = computed(() => isListPropertyValue(props.propertyRow.value))
 const listValue = computed(() =>
   isListPropertyValue(props.propertyRow.value) ? props.propertyRow.value : null
@@ -130,17 +126,9 @@ function onValuePointerDown(event: PointerEvent) {
   primeSoftKeyboard()
 }
 
-function openValuePanel() {
-  return replaceToPropertyPanel()
-}
-
-function closeValuePanel() {
-  return replaceToNoteShow()
-}
-
 function onValueDialogSave(value: PropertyValue) {
   emit("update:propertyValue", value)
   emit("commit")
-  return closeValuePanel()
+  valueDialogOpen.value = false
 }
 </script>

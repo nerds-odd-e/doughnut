@@ -47,5 +47,5 @@ export function useNotePropertyPanelLocation(
     return replaceToPropertyPanel()
   }
 
-  return { togglePropertyPanel, replaceToPropertyPanel, replaceToNoteShow }
+  return { togglePropertyPanel }
 }

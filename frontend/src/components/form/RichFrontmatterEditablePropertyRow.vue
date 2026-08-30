@@ -58,7 +58,6 @@
           :wiki-titles="wikiTitles"
           :last-saved-markdown="lastSavedMarkdown"
           :row-index="idx"
-          :is-focused="isFocused"
           @update:model-value="onValueUpdate"
           @update:property-value="onPropertyValueUpdate"
           @focus="emit('row-focus')"

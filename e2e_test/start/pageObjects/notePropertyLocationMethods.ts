@@ -47,13 +47,6 @@ export const notePropertyLocationMethods = () => ({
     })
     return this
   },
-  closePropertyValuePanel() {
-    cy.get('dialog')
-      .filter(':visible')
-      .find('[data-testid="rich-note-property-value-popup-cancel"]')
-      .click()
-    return this
-  },
   closeRichNotePropertyPanel() {
     this.switchToRichContent()
     findNoteContentRegion().within(() => {
@@ -85,22 +78,6 @@ export const notePropertyLocationMethods = () => ({
   },
   expectPropertyValueDialogClosed() {
     cy.get('dialog').should('not.exist')
-    return this
-  },
-  expectFocusedRichNoteProperty(key: string) {
-    this.switchToRichContent()
-    findNoteContentRegion().within(() => {
-      expectRichNotePropertyRowFocused(key)
-    })
-    cy.get('dialog')
-      .filter(':visible')
-      .should('be.visible')
-      .within(() => {
-        cy.contains('h2', key).should('be.visible')
-        cy.get(
-          '[data-testid="rich-note-property-value-popup-textarea"]'
-        ).should('be.visible')
-      })
     return this
   },
   expectFocusedRichNotePropertyPanel(key: string) {
