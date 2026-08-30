@@ -8,7 +8,7 @@ status: ready
 stopped_at: null
 last_updated: "2026-08-30T02:00:00Z"
 last_activity: 2026-08-30
-last_activity_desc: "014 named SPA push leftovers shipped; 013 noteProperty path still planned"
+last_activity_desc: "013 noteProperty in progress (1–11 done); property panel is the location"
 progress:
   total_phases: 0
   completed_phases: 0
@@ -35,7 +35,7 @@ Daily probe measurement (not an ADR): [daily-probe-protocol.md](notes/daily-prob
 
 ## Operator Next Steps
 
-- Canonical property path (`noteProperty`, `#prop:` wiki): `.planning/quick/013-note-property-canonical-path/PLAN.md` (planned, not started). Policy already in ADR 0001 / ADR 0004 / Proposed 0005.
+- Canonical property path (`noteProperty`, **property panel**, `#prop:` wiki): `.planning/quick/013-note-property-canonical-path/PLAN.md` (slices 1–11 done; 12–20 remaining). Policy in ADR 0001 / ADR 0004 / Proposed 0005.
 - Named SPA route honesty leftovers (Given shortcuts as named `push`) shipped; 011 / 014 / 015 PLANs retired. Recall/epub/identify/`circleJoin`/`loginAs`/`visitHomePage` stay `visitNamed`.
 - After deploying the Flyway squash, confirm startup succeeded and `flyway_schema_history` shows the baseline repaired, the collapsed versions marked `DELETE`, and `V300000300` applied.
 

@@ -1,37 +1,37 @@
 # Note property canonical path
 
-**Status:** in progress (slices 1–11 done; 12–17 remaining).
+**Status:** in progress (slices 1–11 done; 12–20 remaining).
 **Type:** ad-hoc plan (`.planning/quick/`)
-**Policy:** [ADR 0001](../../../docs/adrs/0001-ubiquitous-language.md) (**Property**, **Wiki link**), [ADR 0004](../../../docs/adrs/0004-okf-compatible-notebook-markdown-accepted.md) (`#prop:`), Proposed [ADR 0005](../../../docs/adrs/0005-web-routes.md) (`noteProperty`).
+**Policy:** [ADR 0001](../../../docs/adrs/0001-ubiquitous-language.md) (**Property**, **Property panel**, **Wiki link**), [ADR 0004](../../../docs/adrs/0004-okf-compatible-notebook-markdown-accepted.md) (`#prop:`), Proposed [ADR 0005](../../../docs/adrs/0005-web-routes.md) (`noteProperty`).
 **Human-owned exception (2026-08-29):** ADR 0001 / ADR 0004 may depend on
 Proposed ADR 0005 while this route policy is being refined. Do not change
 ADR 0005 status as part of execution.
 
 ## Goal
 
-A property has one web location: the note page with that property open
-(`noteProperty`). Later expansion stays on that path (or a child). Next to
-assimilate, answered question, and memory tracker use this route — not a
-side channel on `noteShow`. Portable spelling is
-`#prop:<encoded-key>` (ADR 0004).
+A property has one web location: the note page with that **property panel**
+open (`noteProperty`). Later expansion stays on that path (or a child). Next
+to assimilate, answered question, and memory tracker use this route — the
+property panel is how that location looks, so skip/assimilate are on it.
+Portable spelling is `#prop:<encoded-key>` (ADR 0004).
+
+The **property value dialog** edits a text-capable value. It is not a
+location.
 
 ## Requirement (what to replace)
 
-Today a property is not a location. Several parallel tricks exist:
-
 | Surface | Current | Replace with |
 |---|---|---|
-| Next to assimilate (property unit) | `openForNote(id, key)` + `push(noteShow)` + `pendingPropertyKey` (highlight, expand options, scroll; assimilation settings stay closed) | `push(notePropertyLocation(id, key))`; focused property from the route |
-| Property value dialog | Local `valuePopupOpen` on the row | Open iff current location is that key; opening **replaces** to `noteProperty`, closing **replaces** to `noteShow` |
-| Answered question / memory tracker | `NoteTitleWithLink` → always `noteShow` | When `focusedPropertyKey` is set → `noteProperty` |
-| Conversation on a property | Toolbar always `noteShow` + `?conversation=` | Query on the **current** named route |
-| Note-route chrome | Exact `route.name === "noteShow"` checks in sticky realm / drawer plus separate navigation-name lists | One note-route-family predicate or metadata contract covering `noteShow` and `noteProperty` |
-| Read-only and missing properties | Only editable rows participate in pending-property focus; a missing key has no visible result | Route-neutral focus in editable and read-only presentation; explicit unresolved-property state |
-| Wiki resolution / rewrite | Resolver and rewrite code treats the entire target as a note target | One authored-target codec separates note target and encoded property key; cache / health / rename / move use it |
-| Wiki / paste | Note tokens only; `/n{id}/p/…` is not an internal URL; paste uses anchor label as target | `#prop:` compiles to `noteProperty`; paste resolves note id to portable identity and keeps label as display only |
+| `noteProperty` presentation | Focus plus value dialog on text-capable rows | Focus plus **property panel** on editable rows |
+| Property panel | Local expander on the row | Open iff current location is that key; opening **replaces** to `noteProperty`, closing **replaces** to `noteShow` |
+| Property value dialog | Opens with `noteProperty`; its open/close **replaces** the route | Local on the row; does not change the URL |
+| Next to assimilate (property unit) | `push(noteProperty)`; skip/assimilate only after closing the value dialog | `push(noteProperty)`; skip/assimilate on the open **property panel**; assimilation settings stay closed |
+| Answered question / memory tracker | `NoteTitleWithLink` → `noteProperty` when `focusedPropertyKey` is set | Same route; arrival shows the **property panel** |
+| Wiki / paste | Property tokens not live yet | `#prop:` compiles to `noteProperty` (property panel); paste resolves note id to portable identity and keeps label as display only |
 
-Do **not** keep `pendingPropertyKey`, `usePendingAssimilationProperty`, or
-`data-test-pending` once the route is the source of truth.
+Conversation query, note-route family, missing-key banner, and rename/delete
+location follow already shipped. Wiki resolution / rewrite still needs the
+authored-target codec slices below.
 
 ## Design decisions
 
@@ -46,20 +46,22 @@ Do **not** keep `pendingPropertyKey`, `usePendingAssimilationProperty`, or
   open/close does not remount notebook chrome. They share one note-route-family
   predicate / metadata contract used by routing, sticky active realm, drawer,
   and main-navigation state.
-- **Focused property** is a route-neutral presentation state. Editable and
-  read-only rows can be focused and scrolled into view. Editable text-capable
-  rows also open the value dialog; specialized or read-only values remain
-  visibly focused with their value available. Do not reuse assimilation
-  "pending" names or selectors.
+- **Property panel** is the visible presentation of `noteProperty`. `isFocused`
+  from `useFocusedNoteProperty` opens it on an editable row. Read-only rows
+  stay focused and scrolled. Do not reuse assimilation "pending" names or
+  selectors.
+- The **property value dialog** is local editing chrome. Opening it does
+  not replace the route; closing it does not replace to `noteShow`.
 - A readable note with a **missing property** stays on `noteProperty` and
   shows a visible `Property "<key>" not found` state. An intentional deletion
   of the currently focused property replaces to `noteShow`. A successful key
   rename replaces to `noteProperty` with the new key. Existing authored
   `#prop:` links to the old key deliberately become unresolved; automatic
   inbound property-link rewrite is out of scope.
-- **replace** for panel open/close, focused-key rename/delete, and conversation
-  query changes; **push** for inbound navigation (assimilate, recall links,
-  wiki click). Preserve unrelated query values across property transitions.
+- **replace** for property-panel open/close, focused-key rename/delete, and
+  conversation query changes; **push** for inbound navigation (assimilate,
+  recall links, wiki click). Preserve unrelated query values across property
+  transitions.
 - Helpers `notePropertyLocation` / `notePropertyHref` live next to
   `noteShowLocation` / `noteShowHref`. A route-family classifier treats
   `/n{id}/p/…` as internal. Legacy `/n/:noteId/p/:propertyKey` redirects
@@ -78,7 +80,7 @@ Do **not** keep `pendingPropertyKey`, `usePendingAssimilationProperty`, or
   the portable note target, qualify it for a different source notebook, append
   the encoded property key, and use anchor text only as optional display.
 - Conversation stays query on the current note-family route. Opening/closing
-  either conversation or property preserves the other state.
+  either conversation or the property panel preserves the other state.
 
 **Out of scope:** same-note `[[#prop:key]]`; heading fragments; list-item
 indexes; a second `/properties/…` tree; portable property insert UI beyond
@@ -89,10 +91,18 @@ links when a property key is renamed.
 
 Capability-named artifacts only. E2E: Given may `push` a named location; triggers prefer UI. Compile hrefs from helpers — no second path dialect.
 
-- Visit / open-close / read-only / missing: `e2e_test/features/note_topology/note_property.feature` (new).
-- Next assimilate: extend `e2e_test/features/recall/property_memory_tracker.feature`; replace pending-property steps/assertions with route-focused property language.
-- Tracker / answered-question link: same feature (tracker page already has “note under question”) plus a recall answered-question path if one already mounts `NoteUnderQuestion`.
-- Wiki live/dead, target note rename/move, and cache freshness: extend `e2e_test/features/note_topology/wiki_link.feature` plus backend small tests through resolver/controller boundaries.
+Assert the **property panel** (or the location) as the unique claim. Do not
+add tests whose unique claim is that the property value dialog is closed or
+that it does not change the URL.
+
+- Visit / open-close / read-only / missing: `e2e_test/features/note_topology/note_property.feature`.
+- Next assimilate: `e2e_test/features/recall/property_memory_tracker.feature`; skip
+  and assimilate on the property panel.
+- Tracker / answered-question link: same feature; arrival is `noteProperty`
+  with the property panel open.
+- Wiki live/dead, target note rename/move, and cache freshness: extend
+  `e2e_test/features/note_topology/wiki_link.feature` plus backend small tests
+  through resolver/controller boundaries.
 - Route table / family / helpers / paste / property-key codec: Vitest
   (`routes.spec.ts`, `noteRouteFamily.spec.ts`, mounted property components,
   authored-link helpers, strip-paste). Backend changes run the full backend
@@ -184,7 +194,47 @@ note-target portion. Path-shaped `:` trap is documented
 `WikiLinkAuthoredTargetTest` for TypeScript slice 13. Property tokens are
 not live yet — slice 12 must require the exact existing decoded key.
 
-### 12. Property wiki resolution requires the exact target property — **Behavior** — planned
+### 12. Visiting `noteProperty` opens the property panel — **Behavior** — planned
+
+**Pre:** a note with an editable property. **Trigger:** visit that
+`noteProperty`, or open/close the **property panel** on the row. **Post:**
+visit and open show the focused row with the panel open (`noteProperty`);
+close `replace`s to `noteShow`; unrelated query is preserved.
+
+Drive the panel from `isFocused`. The row chevron is open/close (`replace`).
+Update visit, focus, rename, open/close, and conversation-query assertions
+whose unique claim is the location presentation to the **property panel**.
+Do not add assertions that the value dialog is closed. Read-only focus
+stays the existing positive (focused, value visible). The value dialog still
+follows the route until slice 13.
+
+E2E: `note_property.feature`. Vitest: `RichMarkdownEditor.propertyFocus.spec.ts`,
+`RichMarkdownEditor.propertyValuePanelLocation.spec.ts`.
+
+### 13. Next to assimilate a property uses the property panel — **Behavior** — planned
+
+**Pre:** a property unit is next to assimilate. **Trigger:** start
+assimilation. **Post:** `noteProperty` with that **property panel** open,
+assimilation settings closed; skip, assimilate, return-to-sequence, and
+remove-from-recall run from that panel.
+
+`useGoToNextAssimilation` already `push`es `notePropertyLocation`. This slice
+is the cohesive use of that location: the panel is the place those actions
+live. Stop opening the property value dialog from the route; it opens only
+from its own control and does not replace. Tracker and answered-question
+arrival show the property panel. Extend `property_memory_tracker.feature`;
+drop steps that close the value dialog to reach the actions.
+
+### 14. Names match property panel and property value dialog — **Structure** — planned
+
+Rename identifiers and Gherkin to **property panel** (location chrome) and
+**property value dialog** (local editor). Component
+`RichFrontmatterPropertyRowOptions` → `RichFrontmatterPropertyPanel`. Toggle
+label, test ids, page objects, and steps follow. Drop “value panel”,
+“popup”, and “toggle options” as names for these two concepts. Existing
+behavior unchanged; no new tests.
+
+### 15. Property wiki resolution requires the exact target property — **Behavior** — planned
 
 **Pre:** a note contains wiki and path-Markdown property tokens. **Trigger:**
 save/load or lint it. **Post:** the note API resolves a token only when its note
@@ -193,7 +243,7 @@ keys are unresolved in notebook health. The one resolved-link cache stores the
 full encoded token. Drive this through backend controller/resolver boundaries;
 note-only links remain unchanged.
 
-### 13. TypeScript property-target codec preserves note-link behavior — **Structure** — planned
+### 16. TypeScript property-target codec preserves note-link behavior — **Structure** — planned
 
 Introduce the matching TypeScript authored-target codec and refactor current
 note-only render/click helpers to consume the parsed note target with unchanged
@@ -203,17 +253,17 @@ outputs. Share the ADR examples and edge-case fixture table with Java tests.
 intentionally keep what that check throws away, and the two code paths
 (accept-check vs. extract) are coupled through the same regex, so this is an
 easy spot to introduce a regression; add a targeted test. Do not change
-property-link rendering yet. This structure exists only to enable slice 14.
+property-link rendering yet. This structure exists only to enable slice 17.
 
-### 14. Live `#prop:` wiki goes to `noteProperty` — **Behavior** — planned
+### 17. Live `#prop:` wiki goes to `noteProperty` — **Behavior** — planned
 
 **Pre:** the note API returns a resolved wiki or path-Markdown property token.
-**Trigger:** render and click it in note body or a property value. **Post:** its
-HTML `href` is compiled by `notePropertyHref` and click pushes
-`noteProperty`; unresolved property tokens do not navigate. Note-only wiki
-rendering remains unchanged.
+**Trigger:** render and click it in note body or a property value. **Post:**
+its HTML `href` is compiled by `notePropertyHref` and click pushes
+`noteProperty` with that **property panel** open; unresolved property tokens
+do not navigate. Note-only wiki rendering remains unchanged.
 
-### 15. Removing a target property makes cached links unresolved — **Behavior** — planned
+### 18. Removing a target property makes cached links unresolved — **Behavior** — planned
 
 **Pre:** a saved live property token and an existing resolved-link cache row.
 **Trigger:** remove or rename the target property, then render or lint the
@@ -221,7 +271,7 @@ referring note. **Post:** the old token is dead/unresolved and does not
 navigate; no second cache is introduced. Cover self-links and another-note
 links so property-index/cache refresh order is honest.
 
-### 16. Note identity changes preserve property-link suffixes — **Behavior** — planned
+### 19. Note identity changes preserve property-link suffixes — **Behavior** — planned
 
 **Pre:** a live property token targets a note by title/path/qualification.
 **Trigger:** rename the target note or move it across folder/notebook scope
@@ -229,7 +279,7 @@ using existing reference handling. **Post:** the rewritten link still targets
 the same encoded property and retains authored display text. Extend existing
 wiki rename/move scenarios rather than creating parallel rewrite tests.
 
-### 17. Paste of `noteProperty` URL becomes a portable property wiki — **Behavior** — planned
+### 20. Paste of `noteProperty` URL becomes a portable property wiki — **Behavior** — planned
 
 **Pre:** paste a compiled property location into note content. **Trigger:**
 paste/strip with the note id resolvable through storage/API. **Post:** stored
@@ -255,16 +305,14 @@ invent identity from the label. Extend the internal-URL classifier so
 - Sticky realm, drawer, and main-nav consume `isNoteRouteFamily`; do not
   re-append `noteShow` to those lists when adding `noteProperty`.
 - Missing-key stays on `noteProperty` with `RichFrontmatterPropertyNotFound`.
-  Intentional deletion of the focused key (slice 8) still replaces to
-  `noteShow` — do not reuse the not-found banner for that case.
-- `useFocusedNoteProperty` is the route-neutral focus seam. Editable
-  text-capable rows also open the value dialog from `isFocused`. Do not add
-  a second focus source. Assimilate skip on a property must close the value
-  dialog first (native modal) so toggle options are reachable.
+  Intentional deletion of the focused key still replaces to `noteShow`.
+- `useFocusedNoteProperty` is the route-neutral focus seam. Editable rows
+  present the **property panel** from `isFocused`. The property value dialog
+  is local. Next-to-assimilate skip/assimilate run on that panel.
 - Slice 11: `WikiLinkAuthoredTarget` splits `#prop:` first so rewrites and
   `resolveAnyTargetWikiLinkToken` keep the encoded suffix. Path-shaped
   `:` still drops a non-`#prop:` suffix (`#heading`) — documented, not
-  inherited by `#prop:`. Slice 12 must make tokens live only when the note
+  inherited by `#prop:`. Slice 15 must make tokens live only when the note
   is readable and the decoded exact key exists; `resolveAnyTarget` today
   matches the note without requiring the property.
 - Current paste/strip code converts internal URLs with anchor text as the wiki

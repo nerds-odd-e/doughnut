@@ -68,9 +68,9 @@ covers how those links relate to **web** destinations.
   `noteProperty`, nested under the note URL family, last segment the
   authored key. It uses the same note page and shared notebook-layout parent
   as `noteShow`. Later expansion keeps this path (or a child of it). Opening
-  or closing the property **replaces** within the note family; inbound links
-  **push**. Product surfaces that already know a property (next to
-  assimilate, answered question, memory tracker) navigate to
+  or closing the **property panel** **replaces** within the note family;
+  inbound links **push**. Product surfaces that already know a property (next
+  to assimilate, answered question, memory tracker) navigate to
   `noteProperty` — not a side channel on `noteShow`.
 - `noteShow` and `noteProperty` are one **note route family** for notebook
   chrome, sidebar state, active navigation, and conversation query. A
@@ -125,7 +125,7 @@ covers how those links relate to **web** destinations.
 
 ## Related
 
-- [ADR 0001 — Ubiquitous language](./0001-ubiquitous-language.md) (**Wiki link**, **Property**)
+- [ADR 0001 — Ubiquitous language](./0001-ubiquitous-language.md) (**Wiki link**, **Property**, **Property panel**)
 - [ADR 0004 — OKF-compatible notebook Markdown](./0004-okf-compatible-notebook-markdown-accepted.md)
   (token spelling, including `#prop:`, and tree identity — not web routing)
 - [`doughnut-routing.json`](../../infra/gcp/path-routing/doughnut-routing.json)

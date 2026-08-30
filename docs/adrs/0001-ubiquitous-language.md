@@ -57,7 +57,10 @@ concepts, including morning recall residual measurement, live in [ADR
   contain **wiki links**. Relation-like keys (`example of`, `a part of`)
   are still properties. Portable identity is (concept path, exact YAML
   key) via `#prop:<encoded-key>` (ADR 0004). Web canonical location is
-  `noteProperty`, once Proposed ADR 0005 is Accepted (see above).
+  `noteProperty`: the note with that **property panel** open, once
+  Proposed ADR 0005 is Accepted (see above).
+- **Property panel** — Visible presentation of `noteProperty`. Opening or
+  closing it replaces to `noteProperty` / `noteShow`.
 - **Relationship** — Typed association between notes (e.g. “similar to”,
   “a part of”)
 - **Relationship note** — A note that represents a relationship
@@ -253,6 +256,6 @@ introduce a translation type that wraps one as the other.
 (**Spaced repetition glossary**, morning recall residuals); ADR 0004
 [OKF-compatible notebook Markdown](./0004-okf-compatible-notebook-markdown-accepted.md)
 (portable Markdown profile); ADR 0005
-[web routes](./0005-web-routes.md) (`noteShow` / `noteProperty`); [commissioned learning session
+[web routes](./0005-web-routes.md) (`noteShow` / `noteProperty`, **property panel**); [commissioned learning session
 protocol](../commissioned-learning-session-protocol.md) (Request/Report
 documents)
