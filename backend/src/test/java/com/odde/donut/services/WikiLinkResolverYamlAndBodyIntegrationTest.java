@@ -199,26 +199,4 @@ class WikiLinkResolverYamlAndBodyIntegrationTest {
 
     assertThat(wikiLinkResolver.resolveWikiLinksForCache(overlapTitleLinker, owner), empty());
   }
-
-  @Test
-  void resolveAnyTargetWikiLinkToken_matchesNoteTargetPortionOfPropertyToken() {
-    User owner = makeMe.aUser().please();
-    Note moon = makeMe.aNote().title("Moon").notebookOwnedBy(owner).please();
-    Note focus = makeMe.aNote().underSameNotebookAs(moon).please();
-
-    var resolved = wikiLinkResolver.resolveAnyTargetWikiLinkToken("Moon#prop:a%20part%20of", focus);
-
-    assertThat(resolved.orElseThrow().getId(), equalTo(moon.getId()));
-  }
-
-  @Test
-  void resolveAnyTargetWikiLinkToken_matchesNoteOnlyToken() {
-    User owner = makeMe.aUser().please();
-    Note moon = makeMe.aNote().title("Moon").notebookOwnedBy(owner).please();
-    Note focus = makeMe.aNote().underSameNotebookAs(moon).please();
-
-    var resolved = wikiLinkResolver.resolveAnyTargetWikiLinkToken("Moon", focus);
-
-    assertThat(resolved.orElseThrow().getId(), equalTo(moon.getId()));
-  }
 }

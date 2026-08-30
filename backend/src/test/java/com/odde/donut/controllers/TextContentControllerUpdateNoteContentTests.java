@@ -5,6 +5,7 @@ import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 
+import com.odde.donut.algorithms.Frontmatter;
 import com.odde.donut.controllers.dto.NoteRealm;
 import com.odde.donut.controllers.dto.WikiTitle;
 import com.odde.donut.entities.Image;
@@ -145,5 +146,62 @@ class TextContentControllerUpdateNoteContentTests extends TextContentControllerT
 
     assertThat(imageRepository.findById(first.getId()).isPresent(), equalTo(true));
     assertThat(imageRepository.findById(second.getId()).isPresent(), equalTo(true));
+  }
+
+  @Test
+  void storesFullEncodedPropertyWikiTokenWhenExactPropertyExists()
+      throws UnexpectedNoAccessRightException {
+    Note moon = noteWithExactProperty("Moon", "a part of");
+    Note carrier = makeMe.aNote().underSameNotebookAs(moon).please();
+
+    NoteRealm response =
+        controller.updateNoteContent(carrier, contentDto("[[Moon#prop:a%20part%20of]]"));
+
+    assertThat(response.getWikiTitles(), hasSize(1));
+    WikiTitle wt = response.getWikiTitles().getFirst();
+    assertThat(wt.getLinkText(), equalTo("Moon#prop:a%20part%20of"));
+    assertThat(wt.getTargetToken(), equalTo("Moon#prop:a%20part%20of"));
+    assertThat(wt.getNoteId(), equalTo(moon.getId()));
+
+    List<NoteWikiTitleCache> rows =
+        noteWikiTitleCacheRepository.findByNote_IdOrderByIdAsc(carrier.getId());
+    assertThat(rows, hasSize(1));
+    assertThat(rows.getFirst().getLinkText(), equalTo("Moon#prop:a%20part%20of"));
+  }
+
+  @Test
+  void storesFullEncodedPropertyPathMarkdownTokenWhenExactPropertyExists()
+      throws UnexpectedNoAccessRightException {
+    Note moon = noteWithExactProperty("Moon", "a part of");
+    Note carrier = makeMe.aNote().underSameNotebookAs(moon).please();
+    String authored = "[a part of](/Moon.md#prop:a%20part%20of)";
+
+    WikiTitle wt =
+        controller.updateNoteContent(carrier, contentDto(authored)).getWikiTitles().getFirst();
+
+    assertThat(wt.getLinkText(), equalTo(authored));
+    assertThat(wt.getTargetToken(), equalTo("/Moon.md#prop:a%20part%20of"));
+    assertThat(wt.getNoteId(), equalTo(moon.getId()));
+  }
+
+  @Test
+  void omitsPropertyWikiTokenWhenExactPropertyDoesNotExist()
+      throws UnexpectedNoAccessRightException {
+    Note moon = makeMe.aNote().title("Moon").notebookOwnedBy(currentUser.getUser()).please();
+    Note carrier = makeMe.aNote().underSameNotebookAs(moon).please();
+
+    NoteRealm response =
+        controller.updateNoteContent(carrier, contentDto("[[Moon#prop:a%20part%20of]]"));
+
+    assertThat(response.getWikiTitles(), empty());
+  }
+
+  private Note noteWithExactProperty(String title, String yamlKey) {
+    return makeMe
+        .aNote()
+        .title(title)
+        .notebookOwnedBy(currentUser.getUser())
+        .content(Frontmatter.empty().set(yamlKey, "v").fenced(""))
+        .please();
   }
 }

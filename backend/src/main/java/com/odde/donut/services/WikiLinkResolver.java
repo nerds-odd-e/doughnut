@@ -2,6 +2,7 @@ package com.odde.donut.services;
 
 import com.odde.donut.algorithms.FrontmatterAliases;
 import com.odde.donut.algorithms.NoteContentMarkdown;
+import com.odde.donut.algorithms.WikiLinkPropertyMatch;
 import com.odde.donut.algorithms.WikiLinkTargetReference;
 import com.odde.donut.controllers.dto.FolderTrailSegments;
 import com.odde.donut.entities.Note;
@@ -153,9 +154,15 @@ public class WikiLinkResolver {
       String token, Note focusNote, BiFunction<String, String, Note> notebookMatcher) {
     String focusNotebookName =
         focusNote.getNotebook() == null ? null : focusNote.getNotebook().getName();
-    return WikiLinkTargetReference.forToken(token, focusNotebookName)
-        .map(ref -> notebookMatcher.apply(ref.notebookName(), ref.noteTitle()))
-        .orElse(null);
+    Note target =
+        WikiLinkTargetReference.forToken(token, focusNotebookName)
+            .map(ref -> notebookMatcher.apply(ref.notebookName(), ref.noteTitle()))
+            .orElse(null);
+    if (target == null
+        || !WikiLinkPropertyMatch.matchesTargetNoteContent(token, target.getContent())) {
+      return null;
+    }
+    return target;
   }
 
   private Note firstNotebookMatch(String notebookName, String noteTitle) {

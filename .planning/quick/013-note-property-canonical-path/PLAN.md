@@ -1,6 +1,6 @@
 # Note property canonical path
 
-**Status:** in progress (slices 1–14 done; 15–20 remaining).
+**Status:** in progress (slices 1–15 done; 16–20 remaining).
 **Type:** ad-hoc plan (`.planning/quick/`)
 **Policy:** [ADR 0001](../../../docs/adrs/0001-ubiquitous-language.md) (**Property**, **Property panel**, **Wiki link**), [ADR 0004](../../../docs/adrs/0004-okf-compatible-notebook-markdown-accepted.md) (`#prop:`), Proposed [ADR 0005](../../../docs/adrs/0005-web-routes.md) (`noteProperty`).
 **Human-owned exception (2026-08-29):** ADR 0001 / ADR 0004 may depend on
@@ -190,8 +190,7 @@ before click so the click fires.
 encoded key. Rewrites and `resolveAnyTargetWikiLinkToken` consume the
 note-target portion. Path-shaped `:` trap is documented
 (`WikiLinkTargetReferenceTest`). Encode pairs in
-`WikiLinkAuthoredTargetTest` for TypeScript slice 13. Property tokens are
-not live yet — slice 12 must require the exact existing decoded key.
+`WikiLinkAuthoredTargetTest` for TypeScript slice 16.
 
 ### 12. Visiting `noteProperty` opens the property panel — **Behavior** — done
 
@@ -213,14 +212,12 @@ does not replace. E2E: `property_memory_tracker.feature`.
 test ids, and page objects use **property panel** vs **property value dialog**.
 Unrelated popups unchanged.
 
-### 15. Property wiki resolution requires the exact target property — **Behavior** — planned
+### 15. Property wiki resolution requires the exact target property — **Behavior** — done
 
-**Pre:** a note contains wiki and path-Markdown property tokens. **Trigger:**
-save/load or lint it. **Post:** the note API resolves a token only when its note
-is readable and its decoded exact property exists; absent/invalid/mismatched
-keys are unresolved in notebook health. The one resolved-link cache stores the
-full encoded token. Drive this through backend controller/resolver boundaries;
-note-only links remain unchanged.
+`WikiLinkPropertyMatch` requires the decoded exact YAML key. Absent,
+invalid, and case-mismatched `#prop:` tokens stay unresolved in notebook
+health. The one cache stores the full encoded token. Note-only links
+unchanged.
 
 ### 16. TypeScript property-target codec preserves note-link behavior — **Structure** — planned
 
@@ -290,12 +287,13 @@ invent identity from the label. Extend the internal-URL classifier so
   `useNotePropertyPanelLocation`. The property value dialog is local
   (own control; no route replace). Skip/assimilate/return/remove run on
   that panel.
-- Slice 11: `WikiLinkAuthoredTarget` splits `#prop:` first so rewrites and
-  `resolveAnyTargetWikiLinkToken` keep the encoded suffix. Path-shaped
-  `:` still drops a non-`#prop:` suffix (`#heading`) — documented, not
-  inherited by `#prop:`. Slice 15 must make tokens live only when the note
-  is readable and the decoded exact key exists; `resolveAnyTarget` today
-  matches the note without requiring the property.
+- Slice 11: `WikiLinkAuthoredTarget` splits `#prop:` first so rewrites keep
+  the encoded suffix. Path-shaped `:` still drops a non-`#prop:` suffix
+  (`#heading`) — documented, not inherited by `#prop:`. Slice 15:
+  `WikiLinkPropertyMatch` requires the decoded exact key; `link_text` is
+  the full encoded token. TypeScript slice 16 must share the same encode
+  pairs (`WikiLinkAuthoredTargetTest`) and keep path-Markdown `#…`
+  fragments that `isConceptPathHref` currently strips.
 - Current paste/strip code converts internal URLs with anchor text as the wiki
   target. A property URL contains only server note id + key, so correct portable
   conversion requires resolving the note's concept identity.

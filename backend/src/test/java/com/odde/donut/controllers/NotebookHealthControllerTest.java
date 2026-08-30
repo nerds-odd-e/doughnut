@@ -4,6 +4,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import com.odde.donut.algorithms.Frontmatter;
 import com.odde.donut.controllers.dto.HealthFindingGroup;
 import com.odde.donut.controllers.dto.HealthFindingItem;
 import com.odde.donut.controllers.dto.NotebookHealthFixRequest;
@@ -45,8 +46,16 @@ class NotebookHealthControllerTest extends ControllerTestBase {
   }
 
   private HealthFindingGroup emptyFoldersGroup(NotebookHealthLintReport report) {
+    return healthGroup(report, HealthRuleIds.EMPTY_FOLDERS);
+  }
+
+  private HealthFindingGroup deadWikiLinksGroup(NotebookHealthLintReport report) {
+    return healthGroup(report, HealthRuleIds.DEAD_WIKI_LINKS);
+  }
+
+  private HealthFindingGroup healthGroup(NotebookHealthLintReport report, String ruleId) {
     return report.getGroups().stream()
-        .filter(g -> HealthRuleIds.EMPTY_FOLDERS.equals(g.getRuleId()))
+        .filter(g -> ruleId.equals(g.getRuleId()))
         .findFirst()
         .orElseThrow();
   }
@@ -147,6 +156,47 @@ class NotebookHealthControllerTest extends ControllerTestBase {
       currentUser.setUser(null);
       assertThrows(
           UnexpectedNoAccessRightException.class, () -> controller.fix(notebook, fixRequest(true)));
+    }
+  }
+
+  @Nested
+  class DeadPropertyWikiLinks {
+    @ParameterizedTest
+    @ValueSource(strings = {"Moon#prop:a%20part%20of", "Moon#prop:%ZZ", "Moon#prop:wikidata"})
+    void reportsAbsentInvalidOrMismatchedPropertyTokens(String token)
+        throws UnexpectedNoAccessRightException {
+      Notebook notebook = ownedNotebook();
+      makeMe
+          .aNote()
+          .title("Moon")
+          .notebook(notebook)
+          .content(Frontmatter.empty().set("WikiData", "v").fenced(""))
+          .please();
+      makeMe.aNote().title("Linker").notebook(notebook).content("[[" + token + "]]").please();
+
+      HealthFindingGroup group = deadWikiLinksGroup(controller.lint(notebook));
+      assertThat(group.getChildren(), hasSize(1));
+      assertThat(
+          group.getChildren().getFirst().getItems().getFirst().getWikiLinkToken(), equalTo(token));
+    }
+
+    @Test
+    void doesNotReportLivePropertyToken() throws UnexpectedNoAccessRightException {
+      Notebook notebook = ownedNotebook();
+      makeMe
+          .aNote()
+          .title("Moon")
+          .notebook(notebook)
+          .content(Frontmatter.empty().set("a part of", "v").fenced(""))
+          .please();
+      makeMe
+          .aNote()
+          .title("Linker")
+          .notebook(notebook)
+          .content("[[Moon#prop:a%20part%20of]]")
+          .please();
+
+      assertThat(deadWikiLinksGroup(controller.lint(notebook)).getChildren(), empty());
     }
   }
 }
