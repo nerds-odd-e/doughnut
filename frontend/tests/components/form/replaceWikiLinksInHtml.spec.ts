@@ -143,4 +143,26 @@ describe("replaceWikiLinksInHtml", () => {
     expect(out).toContain("donut-wiki-link")
     expect(out).not.toContain("pending-wiki-link")
   })
+
+  it("upgrades leftover path-Markdown with a #prop: fragment to noteShow and keeps the fragment", () => {
+    const href = "/Solar/Moon.md#prop:a%20part%20of"
+    expect(
+      replaceWikiLinksInHtml(`<p><a href="${href}">a part of</a></p>`, [
+        wikiTitleFromAuthoredToken(`[a part of](${href})`, 42),
+      ])
+    ).toBe(
+      `<p><a href="${noteShowHref(42)}" class="donut-wiki-link" data-wiki-title="${href}" data-wiki-display="a part of" data-note-id="42">a part of</a></p>`
+    )
+  })
+
+  it("compiles a resolved property wiki target to noteShow and keeps the authored target", () => {
+    const token = "Moon#prop:a%20part%20of"
+    expect(
+      replaceWikiLinksInHtml(`<p>[[${token}]]</p>`, [
+        wikiTitleFromAuthoredToken(token, 42),
+      ])
+    ).toBe(
+      `<p><a href="${noteShowHref(42)}" class="donut-wiki-link" data-wiki-title="${token}" data-note-id="42">${token}</a></p>`
+    )
+  })
 })

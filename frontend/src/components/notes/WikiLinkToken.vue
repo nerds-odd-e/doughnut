@@ -1,7 +1,7 @@
 <template>
   <router-link
     v-if="resolved?.noteId !== undefined"
-    :to="noteShowLocation(resolved.noteId)"
+    :to="locationForResolvedWikiTarget(resolved.noteId, resolved.target)"
     :class="DONUT_WIKI_LINK_CLASS"
     v-bind="resolved.linkAttrs"
     >{{ resolved.display }}</router-link
@@ -20,7 +20,6 @@
 <script setup lang="ts">
 import { computed, type PropType } from "vue"
 import type { WikiTitle } from "@generated/donut-backend-api"
-import { noteShowLocation } from "@/routes/noteShowLocation"
 import {
   noteIdForAuthoredToken,
   parseWholeWikiLinkItem,
@@ -37,6 +36,7 @@ import {
   wikiTitleNoteIdLookup,
   type DeadWikiLinkPayload,
 } from "@/utils/wikiLinkMarkup"
+import { locationForResolvedWikiTarget } from "@/utils/wikiLinkResolvedLocation"
 
 const props = defineProps({
   token: { type: String, required: true },

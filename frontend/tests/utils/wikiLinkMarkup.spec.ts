@@ -52,9 +52,34 @@ describe("wikiLinkMarkup utils", () => {
     expect(navigated).toEqual(noteShowLocation(42))
   })
 
+  it("handleRichContentAnchorClick still uses noteShow when the authored target has a property suffix", () => {
+    const anchor = document.createElement("a")
+    anchor.className = "donut-wiki-link"
+    anchor.setAttribute("data-wiki-title", "Moon#prop:a%20part%20of")
+    anchor.setAttribute("data-note-id", "42")
+    let navigated: RouteLocationRaw | undefined
+    handleRichContentAnchorClick(
+      anchor,
+      {
+        onDeadWikiLink: () => {
+          throw new Error("should not treat as dead")
+        },
+        navigateInApp: (to) => {
+          navigated = to
+        },
+      },
+      { deadWikiLinksEnabled: true }
+    )
+    expect(navigated).toEqual(noteShowLocation(42))
+  })
+
   it.each([
     { href: "#", kind: "hash" },
     { href: "/Folder/Title.md", kind: "concept-path" },
+    {
+      href: "/Solar/Moon.md#prop:a%20part%20of",
+      kind: "concept-path-with-prop-fragment",
+    },
   ])(
     "handleRichContentAnchorClick does not navigate leftover $kind hrefs",
     ({ href }) => {

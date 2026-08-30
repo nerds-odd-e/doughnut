@@ -1,19 +1,18 @@
 import type { WikiTitle } from "@generated/donut-backend-api"
 import type { RouteLocationRaw } from "vue-router"
 import {
-  hrefLooksLikeConceptNotePath,
-  noteShowLocation,
-} from "@/routes/noteShowLocation"
+  authoredHrefLooksLikeConceptNotePath,
+  splitWikiLinkInner,
+  wikiTitleFromAuthoredToken,
+} from "@/utils/authoredLinkMarkup"
 import {
   DEAD_WIKI_LINK_CLASS,
   DONUT_WIKI_LINK_CLASS,
   PENDING_WIKI_LINK_CLASS,
 } from "@/utils/wikiLinkDomMarkers"
+import { locationForResolvedWikiTarget } from "@/utils/wikiLinkResolvedLocation"
 
-export {
-  splitWikiLinkInner,
-  wikiTitleFromAuthoredToken,
-} from "@/utils/authoredLinkMarkup"
+export { splitWikiLinkInner, wikiTitleFromAuthoredToken }
 
 /** Normalized target, display label, and full inner for a wiki title from the note realm. */
 export function wikiTitleParts(w: WikiTitle): {
@@ -22,11 +21,6 @@ export function wikiTitleParts(w: WikiTitle): {
   inner: string
 } {
   return { target: w.targetToken, display: w.displayText, inner: w.linkText }
-}
-
-/** Path Markdown spelling: {@link WikiTitle.targetToken} is the bundle-relative href. */
-export function isPathMarkdownWikiTitle(w: WikiTitle): boolean {
-  return hrefLooksLikeConceptNotePath(w.targetToken)
 }
 
 export function escapeHtmlForWikiLinkDisplay(s: string): string {
@@ -100,7 +94,7 @@ export function markdownWikiTokenFromDeadWikiLinkPayload(
   p: DeadWikiLinkPayload
 ): string {
   const { targetToken, displayText } = p
-  if (hrefLooksLikeConceptNotePath(targetToken)) {
+  if (authoredHrefLooksLikeConceptNotePath(targetToken)) {
     return pathMarkdownToken(displayText, targetToken)
   }
   if (targetToken === displayText) return `[[${targetToken}]]`
@@ -142,7 +136,12 @@ export function handleRichContentAnchorClick(
   }
   const noteId = anchor.getAttribute("data-note-id")
   if (anchor.classList.contains(DONUT_WIKI_LINK_CLASS) && noteId) {
-    handlers.navigateInApp(noteShowLocation(Number(noteId)))
+    handlers.navigateInApp(
+      locationForResolvedWikiTarget(
+        Number(noteId),
+        anchor.getAttribute("data-wiki-title") ?? ""
+      )
+    )
     return
   }
   const href = anchor.getAttribute("href")
@@ -151,7 +150,7 @@ export function handleRichContentAnchorClick(
     window.open(href, "_blank", "noopener,noreferrer")
     return
   }
-  if (href === "#" || hrefLooksLikeConceptNotePath(href)) return
+  if (href === "#" || authoredHrefLooksLikeConceptNotePath(href)) return
   handlers.navigateInApp(href)
 }
 
@@ -186,12 +185,12 @@ function pathHrefFromWikiAnchor(anchor: HTMLAnchorElement): string | null {
   if (
     fromAttr !== null &&
     fromAttr !== "" &&
-    hrefLooksLikeConceptNotePath(fromAttr)
+    authoredHrefLooksLikeConceptNotePath(fromAttr)
   ) {
     return fromAttr
   }
   const href = anchor.getAttribute("href")
-  if (href && hrefLooksLikeConceptNotePath(href)) {
+  if (href && authoredHrefLooksLikeConceptNotePath(href)) {
     return href
   }
   return null

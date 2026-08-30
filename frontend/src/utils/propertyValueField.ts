@@ -1,5 +1,4 @@
 import type { WikiTitle } from "@generated/donut-backend-api"
-import { noteShowHref } from "@/routes/noteShowLocation"
 import {
   authoredLinkOccurrences,
   noteIdForAuthoredToken,
@@ -22,6 +21,7 @@ import {
   wikiLinkBracketedInnerHtml,
   wikiTitleNoteIdLookup,
 } from "@/utils/wikiLinkMarkup"
+import { hrefForResolvedWikiTarget } from "@/utils/wikiLinkResolvedLocation"
 
 /**
  * Renders a YAML property scalar with clickable wiki and path-Markdown links.
@@ -47,7 +47,10 @@ export function propertyValuePlainToDisplayHtml(
       const { target, display } = splitAuthoredToken(occ.token)
       const noteId = noteIdForAuthoredToken(occ.token, map)
       out += wikiLinkAnchorHtml({
-        href: noteId !== undefined ? noteShowHref(noteId) : "#",
+        href:
+          noteId !== undefined
+            ? hrefForResolvedWikiTarget(noteId, target)
+            : "#",
         className:
           noteId === undefined
             ? unresolvedWikiClass(occ.token, lastSavedTokens)
@@ -66,7 +69,8 @@ export function propertyValuePlainToDisplayHtml(
     const { target, display } = splitWikiLinkInner(occ.token)
     const noteId = noteIdForAuthoredToken(occ.token, map)
     out += wikiLinkAnchorHtml({
-      href: noteId === undefined ? "#" : noteShowHref(noteId),
+      href:
+        noteId === undefined ? "#" : hrefForResolvedWikiTarget(noteId, target),
       className:
         noteId === undefined
           ? unresolvedWikiClass(occ.token, lastSavedTokens)

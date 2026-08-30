@@ -1,6 +1,6 @@
 # Note property canonical path
 
-**Status:** in progress (slices 1–15 done; 16–20 remaining).
+**Status:** in progress (slices 1–16 done; 17–20 remaining).
 **Type:** ad-hoc plan (`.planning/quick/`)
 **Policy:** [ADR 0001](../../../docs/adrs/0001-ubiquitous-language.md) (**Property**, **Property panel**, **Wiki link**), [ADR 0004](../../../docs/adrs/0004-okf-compatible-notebook-markdown-accepted.md) (`#prop:`), Proposed [ADR 0005](../../../docs/adrs/0005-web-routes.md) (`noteProperty`).
 **Human-owned exception (2026-08-29):** ADR 0001 / ADR 0004 may depend on
@@ -219,17 +219,12 @@ invalid, and case-mismatched `#prop:` tokens stay unresolved in notebook
 health. The one cache stores the full encoded token. Note-only links
 unchanged.
 
-### 16. TypeScript property-target codec preserves note-link behavior — **Structure** — planned
+### 16. TypeScript property-target codec preserves note-link behavior — **Structure** — done
 
-Introduce the matching TypeScript authored-target codec and refactor current
-note-only render/click helpers to consume the parsed note target with unchanged
-outputs. Share the ADR examples and edge-case fixture table with Java tests.
-`WikiLinkMarkdown.isConceptPathHref` currently strips and discards a path-Markdown
-`#…` fragment purely to reject it during validation — the new codec must
-intentionally keep what that check throws away, and the two code paths
-(accept-check vs. extract) are coupled through the same regex, so this is an
-easy spot to introduce a regression; add a targeted test. Do not change
-property-link rendering yet. This structure exists only to enable slice 17.
+`wikiLinkAuthoredTarget` matches Java encode pairs (ADR 0004). Note-only
+render/click still compiles to `noteShow` via `wikiLinkResolvedLocation`.
+Path-Markdown `#prop:` fragments are kept (not discarded by the
+accept-check). Slice 17 branches there for `notePropertyHref`.
 
 ### 17. Live `#prop:` wiki goes to `noteProperty` — **Behavior** — planned
 
@@ -237,7 +232,8 @@ property-link rendering yet. This structure exists only to enable slice 17.
 **Trigger:** render and click it in note body or a property value. **Post:**
 its HTML `href` is compiled by `notePropertyHref` and click pushes
 `noteProperty` with that **property panel** open; unresolved property tokens
-do not navigate. Note-only wiki rendering remains unchanged.
+do not navigate. Note-only wiki rendering remains unchanged. Compile from
+`wikiLinkResolvedLocation` (slice 16 still returns `noteShow` for `#prop:`).
 
 ### 18. Removing a target property makes cached links unresolved — **Behavior** — planned
 
@@ -291,9 +287,9 @@ invent identity from the label. Extend the internal-URL classifier so
   the encoded suffix. Path-shaped `:` still drops a non-`#prop:` suffix
   (`#heading`) — documented, not inherited by `#prop:`. Slice 15:
   `WikiLinkPropertyMatch` requires the decoded exact key; `link_text` is
-  the full encoded token. TypeScript slice 16 must share the same encode
-  pairs (`WikiLinkAuthoredTargetTest`) and keep path-Markdown `#…`
-  fragments that `isConceptPathHref` currently strips.
+  the full encoded token. TypeScript `wikiLinkAuthoredTarget` shares the
+  Java encode pairs. `wikiLinkResolvedLocation` still compiles to
+  `noteShow`; slice 17 compiles `#prop:` to `notePropertyHref` there.
 - Current paste/strip code converts internal URLs with anchor text as the wiki
   target. A property URL contains only server note id + key, so correct portable
   conversion requires resolving the note's concept identity.

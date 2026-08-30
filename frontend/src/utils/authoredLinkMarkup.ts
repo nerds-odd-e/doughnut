@@ -1,5 +1,6 @@
 import type { WikiTitle } from "@generated/donut-backend-api"
 import { hrefLooksLikeConceptNotePath } from "@/routes/noteShowLocation"
+import { parseWikiLinkAuthoredTarget } from "@/utils/wikiLinkAuthoredTarget"
 
 /** Splits inner wiki text on the first `|`; empty right-hand side is treated as no pipe. */
 export function splitWikiLinkInner(rawBetweenBrackets: string): {
@@ -30,6 +31,17 @@ export type AuthoredLinkOccurrence = {
   token: string
 }
 
+export function authoredHrefLooksLikeConceptNotePath(href: string): boolean {
+  return hrefLooksLikeConceptNotePath(
+    parseWikiLinkAuthoredTarget(href).noteTarget
+  )
+}
+
+/** Path Markdown spelling: {@link WikiTitle.targetToken} is the bundle-relative href. */
+export function isPathMarkdownWikiTitle(w: WikiTitle): boolean {
+  return authoredHrefLooksLikeConceptNotePath(w.targetToken)
+}
+
 function tryParsePathMarkdownToken(
   authored: string
 ): { display: string; href: string } | undefined {
@@ -37,7 +49,7 @@ function tryParsePathMarkdownToken(
   const m = PATH_MARKDOWN_LINK_PATTERN.exec(trimmed)
   if (!m || m[0] !== trimmed) return undefined
   const href = m[2]!
-  if (!hrefLooksLikeConceptNotePath(href)) return undefined
+  if (!authoredHrefLooksLikeConceptNotePath(href)) return undefined
   return { display: m[1]!, href }
 }
 
@@ -120,7 +132,7 @@ export function authoredLinkOccurrences(
     const start = m.index
     if (start > 0 && markdown[start - 1] === "!") continue
     const href = m[2]!
-    if (!hrefLooksLikeConceptNotePath(href)) continue
+    if (!authoredHrefLooksLikeConceptNotePath(href)) continue
     hits.push({
       kind: "pathMarkdown",
       start,

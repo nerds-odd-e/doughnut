@@ -1,8 +1,8 @@
 import type { WikiTitle } from "@generated/donut-backend-api"
 import {
-  hrefLooksLikeConceptNotePath,
-  noteShowHref,
-} from "@/routes/noteShowLocation"
+  authoredHrefLooksLikeConceptNotePath,
+  isPathMarkdownWikiTitle,
+} from "@/utils/authoredLinkMarkup"
 import {
   DEAD_WIKI_LINK_CLASS,
   DONUT_WIKI_LINK_CLASS,
@@ -15,12 +15,12 @@ import {
 import {
   escapeHtmlAttributeValue,
   escapeHtmlForWikiLinkDisplay,
-  isPathMarkdownWikiTitle,
   isValidWikiLinkInner,
   splitWikiLinkInner,
   wikiLinkAnchorHtml,
   wikiTitleParts,
 } from "@/utils/wikiLinkMarkup"
+import { hrefForResolvedWikiTarget } from "@/utils/wikiLinkResolvedLocation"
 
 const UNRESOLVED_WIKI_LINK_CLASSES = [
   DEAD_WIKI_LINK_CLASS,
@@ -29,7 +29,7 @@ const UNRESOLVED_WIKI_LINK_CLASSES = [
 
 function authoredTokenFromWikiAnchor(anchor: Element): string {
   const target = anchor.getAttribute("data-wiki-title") ?? ""
-  if (hrefLooksLikeConceptNotePath(target)) {
+  if (authoredHrefLooksLikeConceptNotePath(target)) {
     const display =
       anchor.getAttribute("data-wiki-display") ||
       anchor.textContent?.trim() ||
@@ -78,7 +78,7 @@ function upgradeUnresolvedWikiAnchors(
   for (const w of wikiTitles) {
     if (isPathMarkdownWikiTitle(w)) continue
     const { target, display } = wikiTitleParts(w)
-    const href = noteShowHref(w.noteId)
+    const href = hrefForResolvedWikiTarget(w.noteId, target)
     for (const a of [...wrap.querySelectorAll(unresolvedAnchorSelector)]) {
       const dt = a.getAttribute("data-wiki-title")
       if (dt !== null && dt !== "") {
@@ -155,7 +155,7 @@ function upgradePathMarkdownAnchors(
       noteId: w.noteId,
     }
     const live = wikiLinkAnchorHtml({
-      href: noteShowHref(w.noteId),
+      href: hrefForResolvedWikiTarget(w.noteId, target),
       ...livePathMarkdownAttrs,
     })
     result = result.replaceAll(`<a href="${attrTarget}">${display}</a>`, live)
@@ -194,7 +194,7 @@ function markUnresolvedWikiLinks(
   return withWikiTokens.replace(
     /<a href="(\/[^"]+)">([^<]*)<\/a>/g,
     (full, href: string, display: string) => {
-      if (!hrefLooksLikeConceptNotePath(href)) return full
+      if (!authoredHrefLooksLikeConceptNotePath(href)) return full
       const token = `[${display}](${href})`
       return wikiLinkAnchorHtml({
         href: "#",
@@ -219,7 +219,7 @@ export function replaceWikiLinksInHtml(
     result = result.replaceAll(
       `[[${inner}]]`,
       wikiLinkAnchorHtml({
-        href: noteShowHref(w.noteId),
+        href: hrefForResolvedWikiTarget(w.noteId, target),
         className: DONUT_WIKI_LINK_CLASS,
         target,
         display,
