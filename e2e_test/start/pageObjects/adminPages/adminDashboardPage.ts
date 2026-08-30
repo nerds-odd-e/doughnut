@@ -12,7 +12,7 @@ const ADMIN_DASHBOARD_TAB_QUERY: Record<string, string> = {
 }
 
 function visitAdminDashboardTab(tab: string) {
-  router().visitNamed('adminDashboard', {}, { tab })
+  router().push('adminDashboard', {}, { tab })
 }
 
 function removeNotebookFromBazaarTableRow(notebook: string) {
