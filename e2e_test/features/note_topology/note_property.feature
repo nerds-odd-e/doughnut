@@ -85,3 +85,9 @@ Feature: Note property location
     Then I should be at property "wikidata_id" of note "Vitamins" with conversation query
     When I close the conversation
     Then I should be at property "wikidata_id" of note "Vitamins"
+
+  Scenario: Renaming the focused property follows its new location
+    Given I visit property "topic" of note "Vitamins"
+    When I rename the focused property key from "topic" to "subject"
+    Then I should be at property "subject" of note "Vitamins"
+    And the rich note property "subject" should be focused with its value dialog open

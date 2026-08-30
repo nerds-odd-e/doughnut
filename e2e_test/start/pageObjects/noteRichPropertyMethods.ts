@@ -1,3 +1,4 @@
+import { waitUntilAppIsNotBusy } from '../pageBase'
 import {
   confirmPropertyMemoryTrackerChange,
   expectRichNotePropertyRowFocused,
@@ -146,6 +147,21 @@ export const noteRichPropertyMethods = () => ({
     })
     confirmPropertyMemoryTrackerChange()
     return this.flushPendingContentSave()
+  },
+  renameFocusedRichNotePropertyKey(oldKey: string, newKey: string) {
+    this.switchToRichContent()
+    findNoteContentRegion().within(() => {
+      cy.get(richNotePropertyRow(oldKey), { timeout: 15000 }).within(() => {
+        cy.get('[data-testid="rich-note-property-row-key-input"]')
+          .focus({ force: true })
+          .clear({ force: true })
+          .type(newKey, { force: true, parseSpecialCharSequences: false })
+          .blur({ force: true })
+      })
+    })
+    cy.get('.dirty').should('not.exist')
+    waitUntilAppIsNotBusy()
+    return this
   },
   editRichNoteProperty(oldKey: string, newKey: string, newValue: string) {
     // Edit value before key: changing the key updates `data-property-key` on the row,

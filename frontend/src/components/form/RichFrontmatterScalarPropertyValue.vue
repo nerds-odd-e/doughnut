@@ -60,7 +60,7 @@
 <script setup lang="ts">
 import { SquarePen } from "@lucide/vue"
 import { computed } from "vue"
-import { useRoute, useRouter, type RouteLocationNamedRaw } from "vue-router"
+import { useRoute, useRouter } from "vue-router"
 import RichFrontmatterListPropertyValue from "@/components/form/RichFrontmatterListPropertyValue.vue"
 import RichFrontmatterPropertyExternalLink from "@/components/form/RichFrontmatterPropertyExternalLink.vue"
 import RichFrontmatterPropertyValueDialog from "@/components/form/RichFrontmatterPropertyValueDialog.vue"
@@ -68,6 +68,7 @@ import PropertyValueField from "@/components/form/PropertyValueField.vue"
 import type { WikiTitle } from "@generated/donut-backend-api"
 import { noteRouteFamilyNoteId } from "@/routes/noteRouteFamily"
 import {
+  locationKeepingQuery,
   notePropertyKeyFromRoute,
   notePropertyLocation,
   noteShowLocation,
@@ -141,13 +142,6 @@ function currentNoteId(): number {
   return Number(noteRouteFamilyNoteId(route))
 }
 
-function replaceKeepingQuery(location: RouteLocationNamedRaw) {
-  return router.replace({
-    ...location,
-    query: { ...route.query },
-  })
-}
-
 function openValuePanel() {
   if (
     route.name === "noteProperty" &&
@@ -155,13 +149,18 @@ function openValuePanel() {
   ) {
     return
   }
-  return replaceKeepingQuery(
-    notePropertyLocation(currentNoteId(), propertyKey.value)
+  return router.replace(
+    locationKeepingQuery(
+      route,
+      notePropertyLocation(currentNoteId(), propertyKey.value)
+    )
   )
 }
 
 function closeValuePanel() {
-  return replaceKeepingQuery(noteShowLocation(currentNoteId()))
+  return router.replace(
+    locationKeepingQuery(route, noteShowLocation(currentNoteId()))
+  )
 }
 
 function onValueDialogSave(value: PropertyValue) {

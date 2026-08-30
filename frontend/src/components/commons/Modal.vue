@@ -49,9 +49,12 @@ interface Props {
   isPopup?: boolean
   /** When false, the overlay X is omitted (e.g. in-dialog close control). */
   showCloseButton?: boolean
+  /** When false, a route replace does not dismiss (e.g. a dialog bound to the location). */
+  closeOnRouteChange?: boolean
 }
 const props = withDefaults(defineProps<Props>(), {
   showCloseButton: true,
+  closeOnRouteChange: true,
 })
 
 // Emits
@@ -74,6 +77,9 @@ const route = useRoute()
 watch(
   () => route.fullPath,
   () => {
+    if (!props.closeOnRouteChange) {
+      return
+    }
     emit("close_request")
   }
 )

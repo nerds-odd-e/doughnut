@@ -1,4 +1,5 @@
 import { computed, nextTick, toRef, type Ref } from "vue"
+import { useFollowFocusedPropertyLocation } from "@/composables/useFollowFocusedPropertyLocation"
 import { useInjectedMemoryTrackerActions } from "@/composables/useMemoryTrackerActions"
 import { usePropertyMemoryTrackerGuard } from "@/composables/usePropertyMemoryTrackerGuard"
 import { relationKebabFromLabel } from "@/models/relationTypeOptions"
@@ -41,6 +42,9 @@ export function useRichFrontmatterPropertyEditing(options: {
   )
   const { confirmAndApplyRemoval, confirmAndApplyRename } =
     usePropertyMemoryTrackerGuard(options.noteId, reloadNoteInfo)
+  const { followFocusedPropertyRename } = useFollowFocusedPropertyLocation(
+    options.propertyRows
+  )
 
   function filterForEmit(rows: PropertyRow[]): PropertyRow[] {
     if (!options.isReadmeContext()) return rows
@@ -153,6 +157,7 @@ export function useRichFrontmatterPropertyEditing(options: {
         return
       }
     }
+    await followFocusedPropertyRename(newKey)
 
     options.clearValidation()
     options.onPropertiesChanged(filterForEmit([...options.propertyRows.value]))

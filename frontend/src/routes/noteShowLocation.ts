@@ -54,6 +54,16 @@ export function notePropertyKeyFromRoute(
   return Array.isArray(raw) ? raw[0] : raw
 }
 
+export function locationKeepingQuery(
+  route: Pick<RouteLocationNormalizedLoaded, "query">,
+  location: RouteLocationNamedRaw
+): RouteLocationNamedRaw {
+  return {
+    ...location,
+    query: { ...route.query },
+  }
+}
+
 export function currentRouteSettingConversation(
   route: Pick<RouteLocationNormalizedLoaded, "name" | "params" | "query">,
   conversationOpen: boolean

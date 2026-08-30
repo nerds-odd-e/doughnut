@@ -1,5 +1,5 @@
 <template>
-  <Modal @close_request="onCancel">
+  <Modal :close-on-route-change="false" @close_request="onCancel">
     <template #header>
       <h2 class="text-lg font-semibold">{{ propertyKey }}</h2>
     </template>

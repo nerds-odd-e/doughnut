@@ -1,6 +1,6 @@
 # Note property canonical path
 
-**Status:** in progress (slices 1–6 done; 7–17 remaining).
+**Status:** in progress (slices 1–7 done; 8–17 remaining).
 **Type:** ad-hoc plan (`.planning/quick/`)
 **Policy:** [ADR 0001](../../../docs/adrs/0001-ubiquitous-language.md) (**Property**, **Wiki link**), [ADR 0004](../../../docs/adrs/0004-okf-compatible-notebook-markdown-accepted.md) (`#prop:`), Proposed [ADR 0005](../../../docs/adrs/0005-web-routes.md) (`noteProperty`).
 **Human-owned exception (2026-08-29):** ADR 0001 / ADR 0004 may depend on
@@ -145,13 +145,13 @@ local to the value component. Conversation uses `currentRouteSettingConversation
 overflow, and `handleCloseConversation`. Open/close `replace` query only.
 E2E on specialized `wikidata_id` so the toolbar is reachable.
 
-### 7. Renaming the focused property follows its new location — **Behavior** — planned
+### 7. Renaming the focused property follows its new location — **Behavior** — done
 
-**Pre:** on `noteProperty` for an editable key. **Trigger:** successfully
-rename that key through the existing memory-tracker guard/save flow. **Post:**
-the route replaces to the same note with the new exact key and the property
-remains focused. Authored links to the old key become unresolved by the policy
-above; this slice does not rewrite them.
+Successful rename `replace`s to `noteProperty` with the new exact key via
+`useFollowFocusedPropertyLocation`. Query preserved (`locationKeepingQuery`).
+Property value dialog uses `closeOnRouteChange: false` so the replace does
+not close the dialog. Slice 8 delete should join the same follow-after-save
+seam. Inbound `#prop:` not rewritten.
 
 ### 8. Deleting the focused property returns to the note — **Behavior** — planned
 

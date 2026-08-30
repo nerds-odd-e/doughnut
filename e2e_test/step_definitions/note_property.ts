@@ -29,6 +29,13 @@ When('I close the value panel', () => {
   start.assumeNotePage().closePropertyValuePanel()
 })
 
+When(
+  'I rename the focused property key from {string} to {string}',
+  (oldKey: string, newKey: string) => {
+    start.assumeNotePage().renameFocusedRichNotePropertyKey(oldKey, newKey)
+  }
+)
+
 Then(
   'the rich note property {string} should be focused with its value dialog open',
   (key: string) => {
