@@ -2,14 +2,16 @@ package com.odde.donut.algorithms;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
  * Inter-note link tokens in markdown: wiki {@code [[inner]]} titles and path Markdown {@code
- * [display](/folder/File.md)} (occurrence order, no dedupe).
+ * [display](/folder/File.md)} (occurrence order).
  */
 public final class WikiLinkMarkdown {
 
@@ -112,6 +114,34 @@ public final class WikiLinkMarkdown {
     }
     hits.sort(Comparator.comparingInt(Hit::start));
     return hits.stream().map(Hit::token).toList();
+  }
+
+  /**
+   * First-occurrence unique authored tokens. Note-target folding matches alias lookup; encoded
+   * {@code #prop:} keys stay case-sensitive.
+   */
+  public static List<String> uniqueAuthoredTokensPreserveOrder(List<String> titles) {
+    List<String> out = new ArrayList<>();
+    Set<String> seenDedupeKeys = new HashSet<>();
+    for (String t : titles) {
+      if (seenDedupeKeys.add(authoredTokenDedupeKey(t))) {
+        out.add(t);
+      }
+    }
+    return List.copyOf(out);
+  }
+
+  private static String authoredTokenDedupeKey(String token) {
+    WikiInnerSplit split = splitAuthoredToken(token);
+    WikiLinkAuthoredTarget authored = WikiLinkAuthoredTarget.parse(split.target());
+    if (!authored.hasPropertySuffix()) {
+      return FrontmatterAliases.normalizedLookupKey(token);
+    }
+    String folded = authored.mapNoteTarget(FrontmatterAliases::normalizedLookupKey).format();
+    if (split.display().equals(split.target())) {
+      return folded;
+    }
+    return folded + "|" + FrontmatterAliases.normalizedLookupKey(split.display());
   }
 
   static Optional<PathMarkdownToken> tryParsePathMarkdownToken(String authored) {

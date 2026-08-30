@@ -194,4 +194,29 @@ class TextContentControllerUpdateNoteContentTests extends TextContentControllerT
 
     assertThat(response.getWikiTitles(), empty());
   }
+
+  @Test
+  void storesBothCaseDistinctPropertyWikiTokensWhenBothKeysExist()
+      throws UnexpectedNoAccessRightException {
+    Note moon =
+        makeMe
+            .aNote()
+            .title("Moon")
+            .notebookOwnedBy(currentUser.getUser())
+            .content("---\nName: v\nname: w\n---\n")
+            .please();
+    Note carrier = makeMe.aNote().underSameNotebookAs(moon).please();
+
+    NoteRealm response =
+        controller.updateNoteContent(carrier, contentDto("[[Moon#prop:Name]] [[Moon#prop:name]]"));
+
+    assertThat(
+        response.getWikiTitles().stream().map(WikiTitle::getLinkText).toList(),
+        equalTo(List.of("Moon#prop:Name", "Moon#prop:name")));
+    assertThat(
+        noteWikiTitleCacheRepository.findByNote_IdOrderByIdAsc(carrier.getId()).stream()
+            .map(NoteWikiTitleCache::getLinkText)
+            .toList(),
+        equalTo(List.of("Moon#prop:Name", "Moon#prop:name")));
+  }
 }

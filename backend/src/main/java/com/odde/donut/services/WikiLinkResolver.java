@@ -2,6 +2,7 @@ package com.odde.donut.services;
 
 import com.odde.donut.algorithms.FrontmatterAliases;
 import com.odde.donut.algorithms.NoteContentMarkdown;
+import com.odde.donut.algorithms.WikiLinkMarkdown;
 import com.odde.donut.algorithms.WikiLinkPropertyMatch;
 import com.odde.donut.algorithms.WikiLinkTargetReference;
 import com.odde.donut.controllers.dto.FolderTrailSegments;
@@ -108,7 +109,7 @@ public class WikiLinkResolver {
       return List.of();
     }
     List<ResolvedWikiLink> out = new ArrayList<>();
-    for (String token : dedupePreserveOrder(linkTitlesOrdered)) {
+    for (String token : WikiLinkMarkdown.uniqueAuthoredTokensPreserveOrder(linkTitlesOrdered)) {
       Note target = resolveToken(token, viewer, focusNote);
       if (target != null) {
         out.add(new ResolvedWikiLink(token, target));
@@ -131,7 +132,7 @@ public class WikiLinkResolver {
       return List.of();
     }
     List<String> unresolved = new ArrayList<>();
-    for (String token : dedupePreserveOrder(linkTitlesOrdered)) {
+    for (String token : WikiLinkMarkdown.uniqueAuthoredTokensPreserveOrder(linkTitlesOrdered)) {
       if (resolveToken(token, viewer, focusNote) == null) {
         unresolved.add(token);
       }
@@ -229,16 +230,5 @@ public class WikiLinkResolver {
       }
     }
     return distinctNotes;
-  }
-
-  private static List<String> dedupePreserveOrder(List<String> titles) {
-    List<String> out = new ArrayList<>();
-    Set<String> seenNormalized = new HashSet<>();
-    for (String t : titles) {
-      if (seenNormalized.add(FrontmatterAliases.normalizedLookupKey(t))) {
-        out.add(t);
-      }
-    }
-    return out;
   }
 }

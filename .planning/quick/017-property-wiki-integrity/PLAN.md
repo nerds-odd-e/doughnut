@@ -1,6 +1,6 @@
 # Property wiki integrity (013 follow-up)
 
-**Status:** in progress (slice 1 done).
+**Status:** in progress (slices 1–2 done).
 **Type:** ad-hoc plan (`.planning/quick/`)
 **Policy:** [ADR 0004](../../../docs/adrs/0004-okf-compatible-notebook-markdown-accepted.md) (`#prop:` exact key, one cache). [ADR 0001](../../../docs/adrs/0001-ubiquitous-language.md) (**Wiki link**, **Property panel**). Proposed [ADR 0005](../../../docs/adrs/0005-web-routes.md) unchanged.
 
@@ -32,13 +32,9 @@ These looked like issues and are **not** in this plan:
 
 `replaceOsInvalidCharsInWikiLinkTarget` maps the note-target via `WikiLinkAuthoredTarget.mapNoteTarget` (same seam as title/folder/notebook rewrite). Encoded `#prop:` is unchanged; notebook-qualified and path-shaped forms keep `/` and `#prop:`. Unqualified `Moon#prop:…` stays a property token.
 
-### 2. Case-distinct property tokens in one note both stay live — **Behavior** — planned
+### 2. Case-distinct property tokens in one note both stay live — **Behavior** — done
 
-**Pre:** one note contains two `#prop:` tokens whose decoded keys differ only by case, and the target note has both YAML keys. **Trigger:** save/load or lint. **Post:** both tokens resolve; the one cache has two `link_text` rows; notebook health lists neither as dead. A missing-case key stays unresolved.
-
-Today `WikiLinkResolver.dedupePreserveOrder` uses `FrontmatterAliases.normalizedLookupKey` on the **full** token, so the second token is dropped. Keep alias folding for note-only titles.
-
-Drive through resolver/controller (health or note API `wikiTitles`), not a new cache table.
+`WikiLinkMarkdown.uniqueAuthoredTokensPreserveOrder` folds only the note target; encoded `#prop:` keys stay case-sensitive. Save/load keeps two `link_text` rows when both YAML keys exist; notebook health still lists a missing-case key as dead. Note-only titles still fold.
 
 ### 3. Tests assert the property panel, not dialog absence — **Structure** — planned
 
@@ -54,7 +50,7 @@ No new tests. This slice is stop-safe cleanup of the 013 test suite; it does not
 ## Discoveries
 
 - OS-invalid sanitization now shares `WikiLinkAuthoredTarget.mapNoteTarget` with title/folder/notebook rewrite; the colon-split sanitizer runs on the note-target only.
-- `WikiLinkPropertyMatch` is case-sensitive on decoded keys. Dedupe is the layer that collapses case-distinct `#prop:` keys before resolve/cache/health see them.
+- Wiki-token uniqueness lives in `WikiLinkMarkdown.uniqueAuthoredTokensPreserveOrder` (note-target fold, case-sensitive `#prop:`). Health dead-property tests split to `NotebookHealthControllerDeadPropertyWikiLinksTest` so files stay under 250 lines.
 - `inboundReferrerNotesForViewer` does not re-check property liveness; outgoing read does. Slice 18 already drops stale inbound rows on target refresh. Left out unless a user-visible inbound bug shows up.
 
 ```
