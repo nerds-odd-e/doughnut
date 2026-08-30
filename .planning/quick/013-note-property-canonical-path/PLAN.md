@@ -1,6 +1,6 @@
 # Note property canonical path
 
-**Status:** in progress (slices 1–18 done; 19–20 remaining).
+**Status:** in progress (slices 1–19 done; 20 remaining).
 **Type:** ad-hoc plan (`.planning/quick/`)
 **Policy:** [ADR 0001](../../../docs/adrs/0001-ubiquitous-language.md) (**Property**, **Property panel**, **Wiki link**), [ADR 0004](../../../docs/adrs/0004-okf-compatible-notebook-markdown-accepted.md) (`#prop:`), Proposed [ADR 0005](../../../docs/adrs/0005-web-routes.md) (`noteProperty`).
 **Human-owned exception (2026-08-29):** ADR 0001 / ADR 0004 may depend on
@@ -31,8 +31,7 @@ location.
 
 Conversation query, note-route family, missing-key banner, rename/delete
 location follow, property-panel presentation, and live `#prop:` compile
-already shipped. Remaining: note-identity rewrite of the `#prop:` suffix,
-and paste.
+already shipped. Remaining: paste of `noteProperty` URLs.
 
 ## Design decisions
 
@@ -242,13 +241,11 @@ runs only on an actual key rename (not on wiki click/blur). E2E:
 the note. Old `#prop:` tokens are unresolved and do not navigate. Note-only
 links stay live. E2E: `property_wiki_link.feature`.
 
-### 19. Note identity changes preserve property-link suffixes — **Behavior** — planned
+### 19. Note identity changes preserve property-link suffixes — **Behavior** — done
 
-**Pre:** a live property token targets a note by title/path/qualification.
-**Trigger:** rename the target note or move it across folder/notebook scope
-using existing reference handling. **Post:** the rewritten link still targets
-the same encoded property and retains authored display text. Extend existing
-wiki rename/move scenarios rather than creating parallel rewrite tests.
+Title, folder, and notebook rewrites keep the encoded `#prop:` suffix and
+authored display text (`WikiLinkAuthoredTarget`). Tests extend existing
+controller rename/move cases plus `property_wiki_link.feature`.
 
 ### 20. Paste of `noteProperty` URL becomes a portable property wiki — **Behavior** — planned
 

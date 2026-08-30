@@ -156,6 +156,22 @@ class TextContentControllerUpdateNoteTitleInboundWikiReferencesTests
   }
 
   @Test
+  void keepVisibleText_preservesEncodedPropertySuffixAndAuthoredDisplay()
+      throws UnexpectedNoAccessRightException {
+    Note target = noteWithExactProperty("Moon", "a part of");
+    Note carrier = makeMe.aNote().underSameNotebookAs(target).please();
+    controller.updateNoteContent(carrier, contentDto("[[Moon#prop:a%20part%20of|the moon]]"));
+
+    NoteUpdateTitleDTO titleDto = titleDto("Luna");
+    titleDto.setReferenceHandling(TitleRenameReferenceHandling.KEEP_VISIBLE_TEXT);
+
+    controller.updateNoteTitle(target, titleDto);
+
+    makeMe.refresh(carrier);
+    assertThat(carrier.getContent(), containsString("[[Luna#prop:a%20part%20of|the moon]]"));
+  }
+
+  @Test
   void updateVisibleText_keepsFolderPathPrefixOnWikiLink() throws UnexpectedNoAccessRightException {
     InboundWiki inbound = folderPathInboundWiki("[[Folder/Old]]");
 

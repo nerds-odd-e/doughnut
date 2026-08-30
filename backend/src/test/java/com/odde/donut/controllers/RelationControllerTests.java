@@ -6,6 +6,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import com.odde.donut.algorithms.Frontmatter;
 import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
@@ -84,14 +85,20 @@ class RelationControllerTests extends ControllerTestBase {
     @CsvSource({
       "[[MyNote]], [[NewNb:MyNote|MyNote]]",
       "[[OldNb:MyNote]], [[NewNb:MyNote|OldNb:MyNote]]",
-      "[[OldNb:MyNote|custom text]], [[NewNb:MyNote|custom text]]"
+      "[[OldNb:MyNote|custom text]], [[NewNb:MyNote|custom text]]",
+      "[[MyNote#prop:a%20part%20of|shown]], [[NewNb:MyNote#prop:a%20part%20of|shown]]"
     })
     void crossNotebookMove_rewritesInboundReferrerLinks(String before, String after)
         throws UnexpectedNoAccessRightException {
       User u = currentUser.getUser();
       Notebook nb1 = ownedNotebook("OldNb");
       Notebook nb2 = ownedNotebook("NewNb");
-      Note target = makeMe.aNote("MyNote").notebook(nb1).please();
+      Note target =
+          makeMe
+              .aNote("MyNote")
+              .notebook(nb1)
+              .content(Frontmatter.empty().set("a part of", "v").fenced(""))
+              .please();
       Note referrer = makeMe.aNote("Carrier").underSameNotebookAs(target).content(before).please();
       wikiTitleCacheService.refreshForNote(referrer, u);
 

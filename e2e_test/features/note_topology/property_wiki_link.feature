@@ -144,3 +144,45 @@ Feature: Property wiki links
       | dead wiki link | WikiProp Moon#prop:topic |
     When I follow the dead wiki link "WikiProp Moon#prop:topic"
     Then I should be at note "WikiProp Moon"
+
+  Scenario: Renaming a referenced note keeps the property wiki suffix and display text
+    Given I have a notebook "WikiProp Rename NB"
+    And I have a note "WikiProp Moon" under notebook "WikiProp Rename NB" with content:
+      """
+      ---
+      topic: luna
+      ---
+
+      Moon body.
+      """
+    And I have a note "WikiProp Carrier" under notebook "WikiProp Rename NB" with content:
+      """
+      See [[WikiProp Moon#prop:topic|shown]].
+      """
+    When I route to the note "WikiProp Moon"
+    And I set the note title to "WikiProp Luna" keeping visible reference text
+    And I route to the note "WikiProp Carrier"
+    Then the wiki link "shown" should open property "topic" of note "WikiProp Luna"
+    And the rich note property "topic" should be focused with its property panel open
+
+  @mockBrowserTime
+  Scenario: Moving a referenced note across notebooks keeps the property wiki suffix and display text
+    Given I have a notebook "WikiProp Move Old NB"
+    And I have a note "WikiProp Moon" under notebook "WikiProp Move Old NB" with content:
+      """
+      ---
+      topic: luna
+      ---
+
+      Moon body.
+      """
+    And I have a note "WikiProp Carrier" under notebook "WikiProp Move Old NB" with content:
+      """
+      See [[WikiProp Moon#prop:topic|shown]].
+      """
+    And I have a notebook "WikiProp Move New NB"
+    When I route to the note "WikiProp Moon"
+    And I move the current note to notebook "WikiProp Move New NB" root
+    And I route to the note "WikiProp Carrier"
+    Then the wiki link "shown" should open property "topic" of note "WikiProp Moon"
+    And the rich note property "topic" should be focused with its property panel open
