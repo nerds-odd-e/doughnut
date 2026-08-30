@@ -1,6 +1,6 @@
 # Named SPA route honesty cleanup
 
-**Status:** in progress (slices 1, 2, and 6 done; 3–5 remaining).
+**Status:** in progress (slices 1–3 and 6 done; 4–5 remaining).
 **Type:** ad-hoc plan (`.planning/quick/`)
 **Depends on:** shipped `.planning/quick/011-named-spa-route-honesty-follow-up/` (PLAN retired; named visit gate, `namedLocationHref`, Proposed [ADR 0005](../../../docs/adrs/0005-web-routes.md) E2E table remain on `main`); shipped `.planning/quick/015-spa-hydrate-after-testability-inject/` (PLAN retired 2026-08-29)
 
@@ -8,7 +8,7 @@
 
 Close leftovers from 011: **dead E2E** and the ADR table’s **later-jump = named `push`** (slice 10 still `visitNamed`s most Given shortcuts). Operator STATE no longer points at the retired 011 PLAN (spent-plan cleanup 2026-08-29). Do not reopen unit-wiki HTML pinning, recall remount, or ADR accept.
 
-**015 already shipped** (do not redo): Given-shaped note/notebook identity jumps; catalog listing **page re-enter** (`leaveNotebookCatalogIfAlreadyOpen` then `push('notebooks')`); assimilate menu Model A (no `route.name` → `getMenuData`). 015 left settings / circles / admin `visitNamed` for this plan. Bazaar after login now `push`es (slice 2). Named `push` after login was **not slower** on 015’s timer specs or slice 2’s bazaar timer.
+**015 already shipped** (do not redo): Given-shaped note/notebook identity jumps; catalog listing **page re-enter** (`leaveNotebookCatalogIfAlreadyOpen` then `push('notebooks')`); assimilate menu Model A (no `route.name` → `getMenuData`). 015 left circles / admin `visitNamed` for this plan. Bazaar and settings Given shortcuts now `push` after login (slices 2–3). Named `push` after login was **not slower** on 015’s timer specs or slices 2–3.
 
 ## Inspection (011 on `main`)
 
@@ -23,8 +23,8 @@ Scope: 011’s route-honesty commits (unit leftovers + E2E gate + ADR rewrite), 
    | Helper | Today | After |
    |---|---|---|
    | `navigateToBazaar` | `push('bazaar')` (slice 2) | — |
-   | `visitManageAccessTokensPage` | `visitNamed('settingsAccessTokens')` | `push` |
-   | `visitRecallStatsPage` | `visitNamed('settingsRecallStats')` | `push` |
+   | `visitManageAccessTokensPage` | `push('settingsAccessTokens')` (slice 3) | — |
+   | `visitRecallStatsPage` | `push('settingsRecallStats')` (slice 3) | — |
    | `navigateToCircle` list/show | `visitNamed('circles'` / `'circleShow')` | `push` |
    | Admin tab | `visitNamed('adminDashboard', {}, { tab })` | `push` with query |
    | Join flow `circleShow` | `visitNamed` | `push` |
@@ -94,13 +94,15 @@ Deleted unused create-and-copy step, `myCirclesPage.ts`, `start.navigateToMyCirc
 
 ---
 
-### 3. Settings Given shortcuts use named push — Behavior `[ ]`
+### 3. Settings Given shortcuts use named push — Behavior `[x]`
 
-**Timing:** yes — both verify specs (two helpers; bazaar timer does not cover them). 3-run baseline at start per spec, then 3 greens each.
+`visitManageAccessTokensPage` → `push('settingsAccessTokens')`. `visitRecallStatsPage` → `push('settingsRecallStats')`. No remount marker (bazaar’s stays local). Settings tabs are not KeepAlive.
 
-**Pre:** logged-in SPA. **Trigger:** open access tokens or recall stats (existing Gherkin). **Post:** those screens as today; `visitManageAccessTokensPage` / `visitRecallStatsPage` use `push`.
+**Timing** (`stats.duration` median of 3):
+- `user_access_token.feature`: 2.568s → 2.013s (threshold 5.568s). **Pass** (faster).
+- Plan-named `recall_stats.feature` is entirely `@wip` (unrelated SDK sequencing race; out of scope). Live timer: `daily_probe.feature` (same `I visit my recall stats` step): 16.339s → 15.263s (threshold 19.339s). **Pass** (faster).
 
-**Verify:** `e2e_test/features/users/user_access_token.feature` and `e2e_test/features/recall/recall_stats.feature`. Record before/after medians in this PLAN.
+**Learning:** do not un-`@wip` `recall_stats.feature` in this plan. Later slices should pick a CI-runnable spec that actually hits the helper.
 
 ---
 
