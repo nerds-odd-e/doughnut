@@ -30,19 +30,20 @@ Identifiers in stored trials are the strings `left` and `right`.
 
 ### 2. Response mapping
 
-| Stimulus | Keys |
-|----------|------|
-| left | `f`, `F`, `ArrowLeft` |
-| right | `j`, `J`, `ArrowRight` |
+| Stimulus | Mapped responses |
+|----------|------------------|
+| left | tap left; `f`, `F`, `ArrowLeft` |
+| right | tap right; `j`, `J`, `ArrowRight` |
 
-Any other key is ignored. Keys during the blank ISI are ignored. Only the
-first mapped key after stimulus onset counts.
+Any other key is ignored. Keys and taps during the blank ISI are ignored.
+Only the first mapped response after stimulus onset counts. ISI and
+first-response rules apply to tap the same as keys.
 
 ### 3. Practice and instruction
 
 One line before the first practice trial:
 
-> Each trial shows ← or →. Press F for left, J for right (arrow keys also work). Go as fast as you can without mistakes.
+> Each trial shows ← or →. Tap the left or right side, or press F for left, J for right (arrow keys also work). Go as fast as you can without mistakes.
 
 Then the four practice trials, same pacing as scored. No extra “ready”
 screen. After the last practice ISI, scored trials start. The UI may label
@@ -50,17 +51,17 @@ practice vs scored; scoring does not use practice trials.
 
 ### 4. Trial pacing
 
-- Stimulus stays until a mapped key or **2000 ms** timeout.
+- Stimulus stays until a mapped response or **2000 ms** timeout.
 - Then a **2000 ms** blank ISI, then the next stimulus.
 - Clock for a trial starts at stimulus onset and stops at the first mapped
-  key (or timeout). Tests pass timestamps in; they do not wait.
+  response (or timeout). Tests pass timestamps in; they do not wait.
 
 Twenty scored trials plus four practice at this pacing land near one minute.
 
 ### 5. Exact trial count
 
 **4 practice + 20 scored.** A run is complete only when scored trial 20 has
-an outcome (key or timeout).
+an outcome (mapped response or timeout).
 
 ### 6. Formulas and units
 
@@ -69,7 +70,7 @@ an outcome (key or timeout).
 **Valid RT:** 100 ≤ RT < 2000. Faster than 100 ms is a false start (incorrect,
 no RT). Timeout is incorrect, no RT.
 
-**Correct:** mapped key matches the stimulus, and the RT is valid.
+**Correct:** mapped response matches the stimulus, and the RT is valid.
 
 **Speed (mean reciprocal RT):** mean of `1 / (RT / 1000)` over **correct
 valid** scored trials. Unit **s⁻¹**. Display **2 decimal places**. If none,

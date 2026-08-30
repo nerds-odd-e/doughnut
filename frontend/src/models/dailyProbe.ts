@@ -10,7 +10,7 @@ export interface DailyProbeTrial {
 export const DAILY_PROBE_TIMEOUT_MS = 2000
 export const DAILY_PROBE_ISI_MS = 2000
 export const DAILY_PROBE_INSTRUCTION =
-  "Each trial shows ← or →. Press F for left, J for right (arrow keys also work). Go as fast as you can without mistakes."
+  "Each trial shows ← or →. Tap the left or right side, or press F for left, J for right (arrow keys also work). Go as fast as you can without mistakes."
 const FALSE_START_MS = 100
 const LAPSE_MS = 500
 
@@ -42,6 +42,11 @@ export const dailyProbeScoredSequence = [
   "left",
   "right",
   "left",
+] as const satisfies readonly DailyProbeSide[]
+
+export const dailyProbeRunSequence = [
+  ...dailyProbePracticeSequence,
+  ...dailyProbeScoredSequence,
 ] as const satisfies readonly DailyProbeSide[]
 
 export function mapDailyProbeKey(key: string): DailyProbeSide | undefined {

@@ -80,7 +80,7 @@ import {
   dailyProbeAccuracy,
   dailyProbeLapseCount,
   dailyProbePracticeSequence,
-  dailyProbeScoredSequence,
+  dailyProbeRunSequence,
   dailyProbeSpeed,
   dailyProbeVariability,
   mapDailyProbeKey,
@@ -103,10 +103,6 @@ const emit = defineEmits<{
   complete: []
 }>()
 
-const runSequence: readonly DailyProbeSide[] = [
-  ...dailyProbePracticeSequence,
-  ...dailyProbeScoredSequence,
-]
 const practiceCount = dailyProbePracticeSequence.length
 
 const trialIndex = ref(0)
@@ -137,7 +133,7 @@ function clearScheduled() {
 
 function startTrial() {
   respondedThisTrial = false
-  stimulus.value = runSequence[trialIndex.value]
+  stimulus.value = dailyProbeRunSequence[trialIndex.value]
   stimulusOnsetMs = Date.now()
   scheduled = setTimeout(() => finishTrial(), DAILY_PROBE_TIMEOUT_MS)
 }
@@ -146,7 +142,7 @@ function finishTrial(response?: DailyProbeSide) {
   if (respondedThisTrial || finished.value) return
   respondedThisTrial = true
   clearScheduled()
-  const current = runSequence[trialIndex.value]!
+  const current = dailyProbeRunSequence[trialIndex.value]!
   if (trialIndex.value >= practiceCount) {
     scoredTrials.value.push(
       recordDailyProbeTrial({
@@ -157,7 +153,7 @@ function finishTrial(response?: DailyProbeSide) {
     )
   }
   stimulus.value = undefined
-  if (trialIndex.value === runSequence.length - 1) {
+  if (trialIndex.value === dailyProbeRunSequence.length - 1) {
     finished.value = true
     persistCompletedProbe()
     return

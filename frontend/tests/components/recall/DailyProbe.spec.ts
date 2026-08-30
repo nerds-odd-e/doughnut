@@ -3,8 +3,7 @@ import {
   DAILY_PROBE_INSTRUCTION,
   DAILY_PROBE_ISI_MS,
   DAILY_PROBE_TIMEOUT_MS,
-  dailyProbePracticeSequence,
-  dailyProbeScoredSequence,
+  dailyProbeRunSequence,
 } from "@/models/dailyProbe"
 import { DailyProbeController } from "@generated/donut-backend-api/sdk.gen"
 import helper, {
@@ -32,8 +31,7 @@ function tapMappedSide(view: VueWrapper, side: "left" | "right") {
 }
 
 async function completeProbe(respond: (side: "left" | "right") => unknown) {
-  const sequence = [...dailyProbePracticeSequence, ...dailyProbeScoredSequence]
-  for (const side of sequence) {
+  for (const side of dailyProbeRunSequence) {
     vi.advanceTimersByTime(250)
     await respond(side)
     vi.advanceTimersByTime(DAILY_PROBE_ISI_MS)
@@ -189,8 +187,7 @@ describe("DailyProbe", () => {
 
     await wrapper.setData({ show: false })
     await nextTick()
-    const trialCount =
-      dailyProbePracticeSequence.length + dailyProbeScoredSequence.length
+    const trialCount = dailyProbeRunSequence.length
     vi.advanceTimersByTime(
       trialCount * (DAILY_PROBE_TIMEOUT_MS + DAILY_PROBE_ISI_MS)
     )

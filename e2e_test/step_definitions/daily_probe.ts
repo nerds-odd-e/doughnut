@@ -17,6 +17,10 @@ When('I complete the Daily probe', () => {
   start.recall().assumeRecallPage().completeDailyProbe()
 })
 
+When('I complete the Daily probe by tapping', () => {
+  start.recall().assumeRecallPage().completeDailyProbeByTapping()
+})
+
 Then('I should see Daily probe speed {string}', (speed: string) => {
   start.recall().assumeRecallPage().expectDailyProbeSpeed(speed)
 })

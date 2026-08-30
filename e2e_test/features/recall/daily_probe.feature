@@ -24,6 +24,19 @@ Feature: Daily probe
     When I continue from the Daily probe
     Then I should see ordinary recall
 
+  Scenario: Opted-in learner completes the probe by tapping and continues into recall
+    Given Daily probe is on
+    When I visit recall
+    Then I should see the Daily probe instruction
+    When I complete the Daily probe by tapping
+    Then I should see Daily probe speed "4.00"
+    And I should see Daily probe accuracy "100%"
+    And I should see Daily probe lapses "0"
+    And I should see Daily probe variability "0.00"
+    And I should see Daily probe saved
+    When I continue from the Daily probe
+    Then I should see ordinary recall
+
   Scenario: Leaving recall mid-probe does not save a run
     Given Daily probe is on
     When I visit recall

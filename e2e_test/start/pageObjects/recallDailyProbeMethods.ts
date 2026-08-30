@@ -2,15 +2,20 @@ import { waitUntilAppIsNotBusy } from '../pageBase'
 import {
   DAILY_PROBE_INSTRUCTION,
   DAILY_PROBE_ISI_MS,
-  dailyProbePracticeSequence,
-  dailyProbeScoredSequence,
+  dailyProbeRunSequence,
+  type DailyProbeSide,
 } from '../../../frontend/src/models/dailyProbe'
 
 const DAILY_PROBE_RESPONSE_MS = 250
-const DAILY_PROBE_SIDES = [
-  ...dailyProbePracticeSequence,
-  ...dailyProbeScoredSequence,
-]
+
+function respondToEachDailyProbeTrial(respond: (side: DailyProbeSide) => void) {
+  for (const side of dailyProbeRunSequence) {
+    cy.get('[data-testid="daily-probe-stimulus"]').should('be.visible')
+    cy.tick(DAILY_PROBE_RESPONSE_MS)
+    respond(side)
+    cy.tick(DAILY_PROBE_ISI_MS)
+  }
+}
 
 export const recallDailyProbeMethods = () => ({
   expectDailyProbeInstruction() {
@@ -25,20 +30,23 @@ export const recallDailyProbeMethods = () => ({
     return this
   },
   completeDailyProbe() {
-    const runAt = (index: number) => {
-      if (index >= DAILY_PROBE_SIDES.length) return
-      cy.get('[data-testid="daily-probe-stimulus"]').should('be.visible')
-      cy.tick(DAILY_PROBE_RESPONSE_MS)
-      const key = DAILY_PROBE_SIDES[index] === 'left' ? 'f' : 'j'
+    respondToEachDailyProbeTrial((side) => {
+      const key = side === 'left' ? 'f' : 'j'
       cy.window().then((win) => {
         win.dispatchEvent(
           new win.KeyboardEvent('keydown', { key, bubbles: true })
         )
       })
-      cy.tick(DAILY_PROBE_ISI_MS)
-      runAt(index + 1)
-    }
-    runAt(0)
+    })
+    waitUntilAppIsNotBusy()
+    return this
+  },
+  completeDailyProbeByTapping() {
+    respondToEachDailyProbeTrial((side) => {
+      cy.get(`[data-testid="daily-probe-response-zone-${side}"]`).trigger(
+        'pointerdown'
+      )
+    })
     waitUntilAppIsNotBusy()
     return this
   },
