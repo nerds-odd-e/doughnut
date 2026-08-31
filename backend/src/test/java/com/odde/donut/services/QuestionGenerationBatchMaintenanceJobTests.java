@@ -8,6 +8,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 import com.odde.donut.entities.FailureReport;
@@ -118,5 +119,6 @@ class QuestionGenerationBatchMaintenanceJobTests {
     assertThat(thrown.getMessage(), containsString("submit failed"));
     verify(maintenanceRunService).recordError(any(RuntimeException.class));
     verify(maintenanceRunService).recordFinished(any(Timestamp.class));
+    verify(failureReportRepository, never()).save(any());
   }
 }
