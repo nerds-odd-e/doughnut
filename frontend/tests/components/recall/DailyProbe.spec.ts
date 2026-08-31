@@ -76,8 +76,13 @@ describe("DailyProbe", () => {
     await nextTick()
     const left = view.find('[data-testid="daily-probe-response-zone-left"]')
     const right = view.find('[data-testid="daily-probe-response-zone-right"]')
-    expect(left.text()).not.toMatch(/[←→]/)
-    expect(right.text()).not.toMatch(/[←→]/)
+    expect(left.classes()).toContain("bg-base-200")
+    expect(right.classes()).toContain("bg-base-200")
+    expect(left.element.parentElement?.classList.contains("divide-x")).toBe(
+      true
+    )
+    expect(left.text()).not.toMatch(/[←→]|Left|Right|[FfJj]/)
+    expect(right.text()).not.toMatch(/[←→]|Left|Right|[FfJj]/)
     expect(view.find('[data-testid="daily-probe-stimulus"]').text()).toBe("←")
   })
 

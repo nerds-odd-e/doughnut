@@ -1,9 +1,8 @@
 # Daily probe tap affordance
 
-**Status:** planned (not started).
+**Status:** in progress (slice 1 done).
 **Type:** ad-hoc plan (`.planning/quick/`)
 **Measurement spec:** [daily-probe-protocol.md](../../notes/daily-probe-protocol.md)
-**Do not execute until asked.**
 
 ## Goal
 
@@ -47,17 +46,11 @@ immediately, so there is no press feedback.
 
 Status legend: `[ ]` planned · `[~]` in progress · `[x]` done
 
-### 1. See unlabeled tap panels — Behavior `[ ]`
+### 1. See unlabeled tap panels — Behavior `[x]`
 
-**Pre:** Daily probe is showing a trial. **Trigger:** look at the screen.
-**Post:** left and right response zones are visually distinct panels (theme
-neutral fill and a split), still with no ←/→ or F/J text. Tapping a panel
-still records that side. Keyboard path unchanged. Size may still be the
-current bottom strip — this slice only makes the target **visible**.
-
-**Verify:** `frontend/tests/components/recall/DailyProbe.spec.ts` — zones
-have a visible surface (class/background), still unlabeled; existing tap
-and keyboard scoring tests still pass. No E2E change. No protocol change.
+Shipped: zones use `bg-base-200` with `divide-x divide-base-300`; still
+unlabeled; still `min-h-24`. `DailyProbe.spec.ts` covers fill, split, and
+no ←/→ / Left/Right / F/J on the zones.
 
 ---
 
@@ -92,6 +85,11 @@ clock; a timeout does not flash.
 left zone has the press class and the right does not; after ~200ms of fake
 timers the class is gone. Existing complete-by-tap and keyboard tests still
 pass. No E2E scenario for the flash. No protocol change.
+
+## Learnings
+
+Slice 1 did not need a parent height tweak. Slice 2 still owns filling
+height and a reserved stimulus slot.
 
 ## Jidoka
 

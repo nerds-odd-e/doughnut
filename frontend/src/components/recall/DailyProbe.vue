@@ -56,16 +56,16 @@
     </div>
     <div
       v-if="!finished"
-      class="flex w-full min-h-24 pb-[max(0.75rem,env(safe-area-inset-bottom))]"
+      class="flex w-full min-h-24 divide-x divide-base-300 pb-[max(0.75rem,env(safe-area-inset-bottom))]"
     >
       <div
         data-testid="daily-probe-response-zone-left"
-        class="flex-1 touch-none"
+        class="flex-1 bg-base-200 touch-none"
         @pointerdown="finishTrial('left')"
       />
       <div
         data-testid="daily-probe-response-zone-right"
-        class="flex-1 touch-none"
+        class="flex-1 bg-base-200 touch-none"
         @pointerdown="finishTrial('right')"
       />
     </div>
