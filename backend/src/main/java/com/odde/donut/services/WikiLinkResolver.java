@@ -38,7 +38,7 @@ public class WikiLinkResolver {
     this.authorizationService = authorizationService;
   }
 
-  public record ResolvedWikiLink(String linkText, Note targetNote) {}
+  public record WikiLinkResolution(String authoredLink, Note destinationNote) {}
 
   public Optional<Note> resolveWikiLinkToken(String token, Note focusNote, User viewer) {
     return Optional.ofNullable(resolveToken(token, viewer, focusNote));
@@ -99,7 +99,7 @@ public class WikiLinkResolver {
     return Optional.ofNullable(resolveAnyTargetToken(token, focusNote));
   }
 
-  public List<ResolvedWikiLink> resolveWikiLinksForCache(Note focusNote, User viewer) {
+  public List<WikiLinkResolution> resolveWikiLinksForCache(Note focusNote, User viewer) {
     String content = focusNote.getContent();
     if (content == null || content.isBlank()) {
       return List.of();
@@ -108,11 +108,11 @@ public class WikiLinkResolver {
     if (linkTitlesOrdered.isEmpty()) {
       return List.of();
     }
-    List<ResolvedWikiLink> out = new ArrayList<>();
+    List<WikiLinkResolution> out = new ArrayList<>();
     for (String token : WikiLinkMarkdown.uniqueAuthoredTokensPreserveOrder(linkTitlesOrdered)) {
       Note target = resolveToken(token, viewer, focusNote);
       if (target != null) {
-        out.add(new ResolvedWikiLink(token, target));
+        out.add(new WikiLinkResolution(token, target));
       }
     }
     return List.copyOf(out);

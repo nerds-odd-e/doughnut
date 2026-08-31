@@ -62,8 +62,8 @@ class WikiLinkResolverYamlAndBodyIntegrationTest {
 
     var resolved = wikiLinkResolver.resolveWikiLinksForCache(child, owner);
     assertThat(resolved.size(), equalTo(1));
-    assertThat(resolved.getFirst().linkText(), equalTo("Alpha|friendly alias"));
-    assertThat(resolved.getFirst().targetNote().getId(), equalTo(parent.getId()));
+    assertThat(resolved.getFirst().authoredLink(), equalTo("Alpha|friendly alias"));
+    assertThat(resolved.getFirst().destinationNote().getId(), equalTo(parent.getId()));
   }
 
   @Test
@@ -75,7 +75,7 @@ class WikiLinkResolverYamlAndBodyIntegrationTest {
 
     var resolved = wikiLinkResolver.resolveWikiLinksForCache(linker, owner);
     assertThat(resolved.size(), equalTo(1));
-    assertThat(resolved.getFirst().targetNote().getId(), equalTo(aliasTarget.getId()));
+    assertThat(resolved.getFirst().destinationNote().getId(), equalTo(aliasTarget.getId()));
   }
 
   @Test
@@ -86,7 +86,7 @@ class WikiLinkResolverYamlAndBodyIntegrationTest {
 
     var resolved = wikiLinkResolver.resolveWikiLinksForCache(linker, owner);
     assertThat(resolved.size(), equalTo(1));
-    assertThat(resolved.getFirst().targetNote().getId(), equalTo(root.getId()));
+    assertThat(resolved.getFirst().destinationNote().getId(), equalTo(root.getId()));
   }
 
   @Test
@@ -111,8 +111,8 @@ class WikiLinkResolverYamlAndBodyIntegrationTest {
 
     var resolved = wikiLinkResolver.resolveWikiLinksForCache(linker, owner);
     assertThat(resolved.size(), equalTo(1));
-    assertThat(resolved.getFirst().linkText(), equalTo("Other Notebook:LinkedAlias"));
-    assertThat(resolved.getFirst().targetNote().getId(), equalTo(aliasTarget.getId()));
+    assertThat(resolved.getFirst().authoredLink(), equalTo("Other Notebook:LinkedAlias"));
+    assertThat(resolved.getFirst().destinationNote().getId(), equalTo(aliasTarget.getId()));
   }
 
   @Test
@@ -124,7 +124,7 @@ class WikiLinkResolverYamlAndBodyIntegrationTest {
 
     var resolved = wikiLinkResolver.resolveWikiLinksForCache(linker, owner);
     assertThat(resolved.size(), equalTo(1));
-    assertThat(resolved.getFirst().targetNote().getId(), equalTo(byTitle.getId()));
+    assertThat(resolved.getFirst().destinationNote().getId(), equalTo(byTitle.getId()));
   }
 
   @Test
@@ -138,7 +138,7 @@ class WikiLinkResolverYamlAndBodyIntegrationTest {
 
     var resolved = wikiLinkResolver.resolveWikiLinksForCache(linker, owner);
     assertThat(resolved.size(), equalTo(1));
-    assertThat(resolved.getFirst().targetNote().getId(), equalTo(firstTarget.getId()));
+    assertThat(resolved.getFirst().destinationNote().getId(), equalTo(firstTarget.getId()));
     assertThat(firstTarget.getId(), lessThan(secondTarget.getId()));
   }
 
@@ -169,7 +169,7 @@ class WikiLinkResolverYamlAndBodyIntegrationTest {
 
     var resolved = wikiLinkResolver.resolveWikiLinksForCache(linker, viewer);
     assertThat(resolved.size(), equalTo(1));
-    assertThat(resolved.getFirst().targetNote().getId(), equalTo(readableTarget.getId()));
+    assertThat(resolved.getFirst().destinationNote().getId(), equalTo(readableTarget.getId()));
   }
 
   @Test
@@ -206,7 +206,7 @@ class WikiLinkResolverYamlAndBodyIntegrationTest {
 
     var plainResolved = wikiLinkResolver.resolveWikiLinksForCache(plainAliasLinker, owner);
     assertThat(plainResolved.size(), equalTo(1));
-    assertThat(plainResolved.getFirst().targetNote().getId(), equalTo(mixedAliasNote.getId()));
+    assertThat(plainResolved.getFirst().destinationNote().getId(), equalTo(mixedAliasNote.getId()));
 
     assertThat(wikiLinkResolver.resolveWikiLinksForCache(overlapTitleLinker, owner), empty());
   }

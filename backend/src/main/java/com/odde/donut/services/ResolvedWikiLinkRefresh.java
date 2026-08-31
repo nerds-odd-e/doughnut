@@ -69,12 +69,13 @@ final class ResolvedWikiLinkRefresh {
     resolvedWikiLinkRepository.deleteByNoteIdInBulk(noteId);
     entityManager.flush();
     Note sourceNoteRef = entityManager.getReference(Note.class, noteId);
-    for (WikiLinkResolver.ResolvedWikiLink link :
+    for (WikiLinkResolver.WikiLinkResolution link :
         wikiLinkResolver.resolveWikiLinksForCache(note, viewer)) {
       ResolvedWikiLink row = new ResolvedWikiLink();
       row.setSourceNote(sourceNoteRef);
-      row.setDestinationNote(entityManager.getReference(Note.class, link.targetNote().getId()));
-      row.setAuthoredLink(link.linkText());
+      row.setDestinationNote(
+          entityManager.getReference(Note.class, link.destinationNote().getId()));
+      row.setAuthoredLink(link.authoredLink());
       resolvedWikiLinkRepository.save(row);
     }
   }
