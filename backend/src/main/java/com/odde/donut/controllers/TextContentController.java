@@ -79,6 +79,9 @@ class TextContentController {
       note.setTitle(new DisplayName(titleDTO.getNewTitle()));
       entityPersister.save(note);
     }
+    if (titleChanged) {
+      resolvedWikiLinkService.refreshNotebookScope(note.getNotebook(), viewer);
+    }
     return noteRealmService.build(note, viewer);
   }
 

@@ -416,27 +416,17 @@ here — slices 22+ use the existing per-target-id
 
 ### 22. Renaming a note updates shorthand cardinality
 
-**Status:** planned
+**Status:** done
 **Type:** Behavior
 
-**Precondition:** A shorthand is resolved (or already ambiguous).
-**Trigger:** A display-name rename introduces or removes a collision.
-**Postcondition:** Rendering, resolved-link index, inbound references,
-graph, and focus context reflect the current result without editing the
-source note.
-
-Test first: start resolved, rename in a namesake, assert ambiguous
-(no resolved row / `AMBIGUOUS`); rename away, assert resolved. One E2E
-rename collision if it stays inside ~5 minutes with `wiki_link.feature`;
-otherwise controller + one canonical index/graph assertion.
-
-Implementation: invoke slice 21 from the existing rename boundary only.
-Never keep a resolved row because it resolved historically.
-
-Verification: `pnpm backend:test_only`; focused `wiki_link.feature` if
-extended.
-
-Stop-safe: the most common tree edit cannot freeze a stale destination.
+`TextContentController.updateNoteTitle` calls
+`resolvedWikiLinkService.refreshNotebookScope(note.getNotebook(), viewer)`
+once after the if/else, guarded by `titleChanged` — covers both the
+reference-handling rewrite branch and the plain-rename branch, closing the
+gap where an unrelated referrer's shorthand cardinality wouldn't update.
+Pinned by `TextContentControllerUpdateNoteTitleTests
+.shouldReresolveNotebookShorthandsWhenRenameIntroducesOrRemovesACollision`.
+No E2E needed; controller test was fast enough. Full backend suite green.
 
 ### 23. Creating a namesake updates shorthand cardinality
 
