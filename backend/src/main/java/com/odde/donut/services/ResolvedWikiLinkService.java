@@ -7,6 +7,7 @@ import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.ResolvedWikiLink;
 import com.odde.donut.entities.User;
+import com.odde.donut.entities.repositories.NoteRepository;
 import com.odde.donut.entities.repositories.ResolvedWikiLinkRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -37,7 +38,8 @@ public class ResolvedWikiLinkService {
       AuthorizationService authorizationService,
       NotePropertyIndexService notePropertyIndexService,
       NoteAliasIndexService noteAliasIndexService,
-      NoteLevelIndexService noteLevelIndexService) {
+      NoteLevelIndexService noteLevelIndexService,
+      NoteRepository noteRepository) {
     this.ambiguousWikiLinks = new AmbiguousWikiLinks(wikiLinkResolver);
     this.resolvedWikiLinkRepository = resolvedWikiLinkRepository;
     this.authorizationService = authorizationService;
@@ -47,7 +49,8 @@ public class ResolvedWikiLinkService {
             resolvedWikiLinkRepository,
             notePropertyIndexService,
             noteAliasIndexService,
-            noteLevelIndexService);
+            noteLevelIndexService,
+            noteRepository);
   }
 
   public List<WikiLink> wikiLinksForViewer(Note focusNote, User viewer) {
@@ -233,5 +236,10 @@ public class ResolvedWikiLinkService {
   @Transactional
   public void refreshForNote(Note note, User viewer) {
     resolvedWikiLinkRefresh.refreshForNote(entityManager, note, viewer);
+  }
+
+  @Transactional
+  public void refreshNotebookScope(Notebook notebook, User viewer) {
+    resolvedWikiLinkRefresh.refreshNotebookScope(entityManager, notebook, viewer);
   }
 }

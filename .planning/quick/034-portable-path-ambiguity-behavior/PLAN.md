@@ -400,20 +400,19 @@ folder-qualified-path test proving the switch, and a shared
 
 ### 21. Affected-scope re-resolution has one owner
 
-**Status:** planned
+**Status:** done
 **Type:** Structure
 
-Unlocks slice 22. Do not wire new mutation triggers.
-
-- Given an affected Portable notebook tree/scope, re-resolve relevant
-  authored links and rebuild only resolved index rows.
-- Reuse the existing resolved-link index; no second lookup model, queue, or
-  compatibility status.
-- Preserve current external results until slice 22 invokes it.
-
-Verification: `pnpm backend:test_only`.
-
-Stop-safe: one tested operation is ready for the next mutation behavior.
+`ResolvedWikiLinkService.refreshNotebookScope(Notebook, User)` delegates
+to `ResolvedWikiLinkRefresh.refreshNotebookScope`, which loads all live
+notes in the notebook (`noteRepository.findLiveNotesByNotebookIdOrderByIdAsc`,
+same finder `DeadWikiLinkHealthRule` uses) and re-runs `refreshForNote` on
+each. Pinned by `ResolvedWikiLinkServiceTest` proving a *different* note's
+stale resolved row gets corrected (cross-note re-resolution, not just the
+existing single-note refresh). Not wired into any mutation trigger yet.
+Cross-notebook qualified referrers from other notebooks are out of scope
+here — slices 22+ use the existing per-target-id
+`findRowsReferringToNonDeletedNotesForTarget` for that.
 
 ### 22. Renaming a note updates shorthand cardinality
 

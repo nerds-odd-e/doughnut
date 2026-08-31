@@ -2,8 +2,10 @@ package com.odde.donut.services;
 
 import com.odde.donut.algorithms.WikiLinkPropertyMatch;
 import com.odde.donut.entities.Note;
+import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.ResolvedWikiLink;
 import com.odde.donut.entities.User;
+import com.odde.donut.entities.repositories.NoteRepository;
 import com.odde.donut.entities.repositories.ResolvedWikiLinkRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.LockModeType;
@@ -17,18 +19,21 @@ final class ResolvedWikiLinkRefresh {
   private final NotePropertyIndexService notePropertyIndexService;
   private final NoteAliasIndexService noteAliasIndexService;
   private final NoteLevelIndexService noteLevelIndexService;
+  private final NoteRepository noteRepository;
 
   ResolvedWikiLinkRefresh(
       WikiLinkResolver wikiLinkResolver,
       ResolvedWikiLinkRepository resolvedWikiLinkRepository,
       NotePropertyIndexService notePropertyIndexService,
       NoteAliasIndexService noteAliasIndexService,
-      NoteLevelIndexService noteLevelIndexService) {
+      NoteLevelIndexService noteLevelIndexService,
+      NoteRepository noteRepository) {
     this.wikiLinkResolver = wikiLinkResolver;
     this.resolvedWikiLinkRepository = resolvedWikiLinkRepository;
     this.notePropertyIndexService = notePropertyIndexService;
     this.noteAliasIndexService = noteAliasIndexService;
     this.noteLevelIndexService = noteLevelIndexService;
+    this.noteRepository = noteRepository;
   }
 
   void refreshForNote(EntityManager entityManager, Note note, User viewer) {
@@ -37,6 +42,20 @@ final class ResolvedWikiLinkRefresh {
     noteAliasIndexService.refreshForNote(note);
     noteLevelIndexService.refreshForNote(note);
     dropStaleInboundPropertyWikiRows(entityManager, note);
+  }
+
+  /**
+   * Re-resolves every live note's resolved wiki-link rows in {@code notebook}. Portable-path
+   * resolution cardinality (unique / ambiguous / missing) depends on the whole notebook's current
+   * note set, so a note's identity change (title, alias set, location) can change which shorthand
+   * links in OTHER notes of that notebook resolve. This is the affected-scope re-resolution
+   * operation for that broader case; {@link #refreshForNote} alone only rebuilds one note's own
+   * outgoing rows.
+   */
+  void refreshNotebookScope(EntityManager entityManager, Notebook notebook, User viewer) {
+    for (Note note : noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId())) {
+      refreshForNote(entityManager, note, viewer);
+    }
   }
 
   private void dropStaleInboundPropertyWikiRows(EntityManager entityManager, Note target) {
