@@ -66,20 +66,12 @@ public class WikiLinkResolver {
       return List.of();
     }
     String lookupKey = FrontmatterAliases.normalizedLookupKey(trimmed);
-    List<NoteAliasIndex> rows =
-        noteAliasIndexRepository.findByAliasLookupKeyOrderByNoteIdAsc(lookupKey);
-    if (rows.isEmpty()) {
-      return List.of();
+    List<Note> notes = new ArrayList<>();
+    for (NoteAliasIndex row :
+        noteAliasIndexRepository.findByAliasLookupKeyOrderByNoteIdAsc(lookupKey)) {
+      notes.add(row.getNote());
     }
-    List<Note> distinctNotes = new ArrayList<>();
-    Set<Integer> seenNoteIds = new HashSet<>();
-    for (NoteAliasIndex row : rows) {
-      Note note = row.getNote();
-      if (seenNoteIds.add(note.getId())) {
-        distinctNotes.add(note);
-      }
-    }
-    return distinctNotes;
+    return distinctByNoteId(notes);
   }
 
   private void addReadableAccidentalCandidates(
@@ -192,10 +184,32 @@ public class WikiLinkResolver {
   private List<Note> titleOrAliasCandidates(String notebookName, String noteTitle) {
     List<Note> byTitle =
         noteRepository.findByNotebookNameAndNoteTitleOrderByIdAsc(notebookName, noteTitle);
-    if (!byTitle.isEmpty()) {
-      return byTitle.size() == 1 ? byTitle : List.of();
+    List<Note> byAlias = aliasTargetCandidates(notebookName, noteTitle);
+    if (byTitle.isEmpty()) {
+      return byAlias;
     }
-    return aliasTargetCandidates(notebookName, noteTitle);
+    return uniqueIfExactlyOne(unionByNoteId(byTitle, byAlias));
+  }
+
+  private static List<Note> uniqueIfExactlyOne(List<Note> notes) {
+    return notes.size() == 1 ? notes : List.of();
+  }
+
+  private static List<Note> unionByNoteId(List<Note> first, List<Note> second) {
+    List<Note> combined = new ArrayList<>(first);
+    combined.addAll(second);
+    return distinctByNoteId(combined);
+  }
+
+  private static List<Note> distinctByNoteId(List<Note> notes) {
+    List<Note> distinct = new ArrayList<>();
+    Set<Integer> seenNoteIds = new HashSet<>();
+    for (Note note : notes) {
+      if (seenNoteIds.add(note.getId())) {
+        distinct.add(note);
+      }
+    }
+    return distinct;
   }
 
   private List<Note> pathShapedNoteCandidates(String notebookName, PathShapedTarget path) {
@@ -216,20 +230,12 @@ public class WikiLinkResolver {
 
   private List<Note> aliasTargetCandidates(String notebookName, String linkToken) {
     String lookupKey = FrontmatterAliases.normalizedLookupKey(linkToken);
-    List<NoteAliasIndex> rows =
+    List<Note> notes = new ArrayList<>();
+    for (NoteAliasIndex row :
         noteAliasIndexRepository.findByNotebookNameAndAliasLookupKeyOrderByNoteIdAsc(
-            notebookName, lookupKey);
-    if (rows.isEmpty()) {
-      return List.of();
+            notebookName, lookupKey)) {
+      notes.add(row.getNote());
     }
-    List<Note> distinctNotes = new ArrayList<>();
-    Set<Integer> seenNoteIds = new HashSet<>();
-    for (NoteAliasIndex row : rows) {
-      Note note = row.getNote();
-      if (seenNoteIds.add(note.getId())) {
-        distinctNotes.add(note);
-      }
-    }
-    return distinctNotes;
+    return distinctByNoteId(notes);
   }
 }

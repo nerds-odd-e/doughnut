@@ -97,14 +97,12 @@ class NoteControllerShowTests extends ControllerTestBase {
   }
 
   @Test
-  void shouldResolveWikiLinkToExactTitleWhenTitleAndAliasCollide()
+  void shouldNotResolveWikiLinkWhenTitleCollidesWithAlias()
       throws UnexpectedNoAccessRightException {
     Note byTitle = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).title("color").please();
     makeMe.aNote().underSameNotebookAs(byTitle).title("colour").aliases("color").please();
     Note viewer = makeMe.aNote().underSameNotebookAs(byTitle).content("Text [[color]].").please();
-    assertThat(
-        showWithWikiTitles(viewer).getWikiLinks().get(0).getDestinationNoteId(),
-        equalTo(byTitle.getId()));
+    assertThat(showWithWikiTitles(viewer).getWikiLinks(), empty());
   }
 
   @Test

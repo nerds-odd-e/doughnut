@@ -18,13 +18,14 @@ and Donut asks for a longer path.
 
 ## Live system (today)
 
-- `WikiLinkResolver.titleOrAliasCandidates` returns title hits only when
-  exactly one note remains; otherwise empty (no resolved row). Alias fallback
-  still runs when there are no title hits. `firstReadableNotebookMatch` /
-  `firstNotebookMatch` still take the first remaining alias row (ordered by
-  note id) — slices 2–5.
+- `WikiLinkResolver.titleOrAliasCandidates` unions title and alias (dedupe by
+  note id) and keeps a candidate only when cardinality is 1. Empty title list
+  still returns alias candidates without that cardinality — slice 3.
+  `firstReadableNotebookMatch` / `firstNotebookMatch` still take the first
+  remaining alias row (ordered by note id) — slices 3–5.
 - Characterization:
   `ResolvedWikiLinkTitleResolutionTest.unqualified_link_does_not_resolve_when_same_title_in_different_folders`,
+  `WikiLinkResolverYamlAndBodyIntegrationTest.wikiLinkResolver_doesNotResolveWhenTitleCollidesWithAlias`,
   `WikiLinkResolverYamlAndBodyIntegrationTest.wikiLinkResolver_resolvesAmbiguousAliasToLowestNoteId`.
 - `NoteRealm.wikiLinks` is built only from resolved-index rows
   (`destinationNoteId` required). Dead links are inferred from markup.
@@ -132,26 +133,12 @@ unchanged. Do not extract a cardinality helper until slice 2 unions aliases.
 
 ### 2. A title and an alias collision is unresolved
 
-**Status:** planned
+**Status:** done
 **Type:** Behavior
 
-**Precondition:** In one notebook, note A's display name equals note B's
-recognized alias.
-**Trigger:** Donut resolves that shorthand.
-**Postcondition:** No resolved-link row (not "title wins").
-
-Test first: one cache/resolver case at the existing
-`ResolvedWikiLinkTitleResolutionTest` /
-`WikiLinkResolverYamlAndBodyIntegrationTest` boundary (today title wins for
-`[[color]]` vs alias `color`). No new E2E; slice 1 already covers
-"shorthand does not navigate."
-
-Implementation: union title and alias candidates, then apply cardinality.
-Do not add alias/alias or same-note duplicate-alias cases here.
-
-Verification: `pnpm backend:test_only`.
-
-Stop-safe: a title match cannot hide an alias namesake.
+Title∪alias then `uniqueIfExactlyOne`. `[[color]]` vs alias `color` has no
+resolved row (resolver + `NoteControllerShowTests`). Alias-only first-match
+unchanged. Shared `distinctByNoteId` for alias index and union.
 
 ### 3. Two notes sharing an alias make the shorthand ambiguous
 

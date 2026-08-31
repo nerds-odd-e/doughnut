@@ -116,15 +116,13 @@ class WikiLinkResolverYamlAndBodyIntegrationTest {
   }
 
   @Test
-  void wikiLinkResolver_exactTitleWinsOverFrontmatterAlias() {
+  void wikiLinkResolver_doesNotResolveWhenTitleCollidesWithAlias() {
     User owner = makeMe.aUser().please();
     Note byTitle = makeMe.aNote().title("color").notebookOwnedBy(owner).please();
     makeMe.aNote().title("colour").underSameNotebookAs(byTitle).aliases("color").please();
     Note linker = makeMe.aNote().underSameNotebookAs(byTitle).content("See [[color]]").please();
 
-    var resolved = wikiLinkResolver.resolveWikiLinksForCache(linker, owner);
-    assertThat(resolved.size(), equalTo(1));
-    assertThat(resolved.getFirst().destinationNote().getId(), equalTo(byTitle.getId()));
+    assertThat(wikiLinkResolver.resolveWikiLinksForCache(linker, owner), empty());
   }
 
   @Test
