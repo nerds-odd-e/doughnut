@@ -87,12 +87,46 @@ async function closeDialogThen(run: () => void | Promise<void>) {
   await run()
 }
 
+async function authoredPortablePathFor(
+  destinationNoteId: number,
+  originalPortablePath?: string
+): Promise<string | undefined> {
+  if (!note) return
+  const { data, error } = await apiCallWithLoading(() =>
+    NoteController.authoredPortablePath({
+      path: { note: note.id },
+      query: {
+        destinationNote: destinationNoteId,
+        ...(originalPortablePath === undefined
+          ? {}
+          : { portablePath: originalPortablePath }),
+      },
+    })
+  )
+  if (error || !data) return
+  return data.portablePath
+}
+
 async function onInsertWikiLink() {
-  if (!selectedSearchResult.value) return
-  const linkText = buildWikiLinkText(selectedSearchResult.value, {
-    notebookId: notebookId.value,
-  })
-  await closeDialogThen(() => insert(linkText))
+  if (!selectedSearchResult.value || !note) return
+  const destination = selectedSearchResult.value
+  const sourceNotebookId = notebookId.value
+  const otherNotebook =
+    sourceNotebookId !== undefined &&
+    destination.notebookId !== sourceNotebookId &&
+    Boolean(destination.notebookName)
+  if (otherNotebook) {
+    const linkText = buildWikiLinkText(destination, {
+      notebookId: sourceNotebookId,
+    })
+    await closeDialogThen(() => insert(linkText))
+    return
+  }
+  const portablePath = await authoredPortablePathFor(
+    destination.noteTopology.id
+  )
+  if (portablePath === undefined) return
+  await closeDialogThen(() => insert(`[[${portablePath}]]`))
 }
 
 async function onInsertWikiLinkAsProperty() {
@@ -112,18 +146,13 @@ async function wikiLinkSpellingForDestination(): Promise<string | undefined> {
   const destination = selectedSearchResult.value
   if (!destination || !note || !deadWikiLinkPayload) return
   if (deadWikiLinkPayload.resolution === "AMBIGUOUS") {
-    const { data, error } = await apiCallWithLoading(() =>
-      NoteController.authoredPortablePath({
-        path: { note: note.id },
-        query: {
-          destinationNote: destination.noteTopology.id,
-          portablePath: deadWikiLinkPayload.portablePath,
-        },
-      })
+    const portablePath = await authoredPortablePathFor(
+      destination.noteTopology.id,
+      deadWikiLinkPayload.portablePath
     )
-    if (error || !data) return
+    if (portablePath === undefined) return
     return markdownWikiTokenFromDeadWikiLinkPayload({
-      portablePath: data.portablePath,
+      portablePath,
       displayText: deadWikiLinkPayload.displayText,
     })
   }

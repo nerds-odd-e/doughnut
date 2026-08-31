@@ -175,15 +175,6 @@ Feature: Wiki links in notes
     When I view the note content as markdown
     Then the note content markdown source should contain "[[WikiLinks E2E Tech|original text]]"
 
-  @mockBrowserTime
-  Scenario: Insert a wiki link to a note in the same notebook
-    When I navigate to "WikiLinks E2E NB/WikiLinks E2E Root/WikiLinks E2E Tech" note
-    And I insert a wiki link to "WikiLinks E2E CI"
-    Then I should see the note content rendered as:
-      | Kind      | Text             |
-      | wiki link | WikiLinks E2E CI |
-    And the wiki link "WikiLinks E2E CI" should link to the note with the same title
-
   Scenario: Renaming a referenced note while keeping visible reference text
     When I update note "WikiLinks E2E Tech" content using markdown to become:
       """
@@ -226,13 +217,3 @@ Feature: Wiki links in notes
     Then the note content markdown source should contain "[[WikiPath Rename Recipes/WikiPath Rename New]]"
     When I view the note content as rich content
     Then the wiki link "WikiPath Rename Recipes/WikiPath Rename New" should open the note titled "WikiPath Rename New"
-
-  @mockBrowserTime
-  Scenario: Insert a qualified wiki link to a note in another notebook
-    Given I have a notebook "WikiCross Tgt NB" with notes:
-      | Title          | Folder             |
-      | WikiCross Deep | WikiCross Tgt Root |
-    When I navigate to "WikiLinks E2E NB/WikiLinks E2E Root/WikiLinks E2E Tech" note
-    And I insert a wiki link to "WikiCross Deep"
-    And I view the note content as markdown
-    Then the note content markdown source should contain "[[WikiCross Tgt NB:WikiCross Deep]]"

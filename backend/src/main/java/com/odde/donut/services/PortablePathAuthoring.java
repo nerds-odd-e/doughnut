@@ -10,8 +10,14 @@ import org.springframework.stereotype.Service;
 @Service
 public class PortablePathAuthoring {
 
+  private final WikiLinkResolver wikiLinkResolver;
+
+  public PortablePathAuthoring(WikiLinkResolver wikiLinkResolver) {
+    this.wikiLinkResolver = wikiLinkResolver;
+  }
+
   public String authoredPortablePath(Note destinationNote, String originalPortablePath) {
-    String notePortion = normalizedNotePortion(destinationNote);
+    String notePortion = shortestUnambiguousNotePortion(destinationNote);
     if (originalPortablePath == null || originalPortablePath.isBlank()) {
       return notePortion;
     }
@@ -19,7 +25,21 @@ public class PortablePathAuthoring {
     return new PortablePath(Optional.empty(), notePortion, original.encodedPropertyKey()).format();
   }
 
-  private static String normalizedNotePortion(Note note) {
+  private String shortestUnambiguousNotePortion(Note destinationNote) {
+    if (displayNameUniquelyIdentifies(destinationNote)) {
+      return destinationNote.getTitle();
+    }
+    return lengthenedNotePortion(destinationNote);
+  }
+
+  private boolean displayNameUniquelyIdentifies(Note destinationNote) {
+    return wikiLinkResolver
+        .resolveAnyTargetWikiLinkToken(destinationNote.getTitle(), destinationNote)
+        .filter(match -> match.getId().equals(destinationNote.getId()))
+        .isPresent();
+  }
+
+  private static String lengthenedNotePortion(Note note) {
     List<String> folders = FolderTrailSegments.namesFromRootToContainingFolder(note);
     String title = note.getTitle();
     if (folders.isEmpty()) {

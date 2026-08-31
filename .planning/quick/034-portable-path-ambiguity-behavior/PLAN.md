@@ -36,8 +36,10 @@ and Donut asks for a longer path.
   create-note). Confirming a destination calls
   `GET /api/notes/{note}/authored-portable-path` and replaces the shorthand
   with the returned full folder path, or `/Title` for a notebook-root
-  destination (display text and `#prop:` preserved). Insert/paste still use
-  `buildWikiLinkText`.
+  destination (display text and `#prop:` preserved). Same-notebook body
+  insert uses that authoring operation (unique → shorthand; colliding →
+  lengthened path). Cross-notebook, property, overlap, accidental-match, and
+  paste still use `buildWikiLinkText`.
 - Exact path-shaped Portable paths already match folder trail plus display
   name (`ResolvedWikiLinkTitleResolutionTest` path-markdown / folder-path
   cases). Property validity is already checked after note resolution.
@@ -115,8 +117,9 @@ Gone: `WikiLinkTargetReference`, `WikiTitleCacheTitleResolutionTest`,
   phrases.
 - Do not run the full frontend suite for a backend-only slice, or the full
   backend suite for a frontend-only slice. Focused E2E is
-  `wiki_link.feature` / `property_wiki_link.feature` /
-  `path_markdown_link.feature` as listed per slice.
+  `wiki_link.feature` / `wiki_link_insert.feature` /
+  `property_wiki_link.feature` / `path_markdown_link.feature` as listed per
+  slice.
 - When `WikiLink` (or another controller/DTO signature) changes, run
   `generate-api-client` before commit. No old-field adapters.
 - `pnpm sut:healthcheck` can pass TCP while 9081 serves
@@ -214,28 +217,12 @@ the exact-root fallback. Controller test for colliding root display name.
 
 ### 10. Inserting a same-notebook Wiki link uses the shortest unambiguous path
 
-**Status:** planned
+**Status:** done
 **Type:** Behavior
 
-**Precondition:** The user inserts a Wiki link to a note in the source
-notebook from search (body, not property).
-**Trigger:** Donut inserts it.
-**Postcondition:** Unique display name → shorthand; colliding display
-name/alias → full normalized path from slice 8's operation.
-
-Test first: extend `wiki_link.feature` insert; frontend tests must not
-re-implement uniqueness (they assert the backend-returned `portablePath`).
-
-Implementation: SearchForm body insert consumes
-`GET /api/notes/{note}/authored-portable-path` /
-`PortablePathAuthoring`. Unique display name → shorthand; colliding →
-lengthened path (`Folder/Title` or `/Title`). Do not convert overlap,
-accidental-match, paste, or property insert yet. Remove title-only
-fallback on this path. Frontend tests must not re-implement uniqueness.
-
-Verification: focused frontend insert specs; `wiki_link.feature`.
-
-Stop-safe: the common insert path cannot add a known-ambiguous shorthand.
+`PortablePathAuthoring` returns shortest unambiguous path. SearchForm body
+insert uses `authoredPortablePathFor`. Insert E2E lives in
+`wiki_link_insert.feature`. Cross-notebook still `buildWikiLinkText`.
 
 ### 11. Inserting a cross-notebook Wiki link qualifies that path
 
@@ -248,9 +235,11 @@ notebook.
 **Postcondition:** The stored path is notebook-qualified; the note portion
 is shorthand or normalized under the same uniqueness rule.
 
-Test first: extend the existing qualified-insert E2E in `wiki_link.feature`.
+Test first: extend the existing qualified-insert E2E in
+`wiki_link_insert.feature`. Reuse `authoredPortablePath` so the note portion
+follows the same uniqueness rule; qualify with the notebook name.
 
-Verification: `wiki_link.feature`; focused frontend specs if the payload
+Verification: `wiki_link_insert.feature`; focused frontend specs if the payload
 shape is asserted there.
 
 Stop-safe: cross-notebook insert agrees with same-notebook uniqueness.

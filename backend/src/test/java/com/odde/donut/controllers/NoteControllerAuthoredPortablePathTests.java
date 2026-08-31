@@ -20,7 +20,7 @@ class NoteControllerAuthoredPortablePathTests extends ControllerTestBase {
   }
 
   @Test
-  void shouldReturnFullNormalizedFolderPathForSelectedDestination()
+  void shouldAuthorDisplayNameShorthandWhenDisplayNameIsUnique()
       throws UnexpectedNoAccessRightException {
     Folder pantry =
         makeMe.aFolder().notebookOwnedBy(currentUser.getUser()).name("WikiDup Pantry").please();
@@ -30,7 +30,7 @@ class NoteControllerAuthoredPortablePathTests extends ControllerTestBase {
     AuthoredPortablePath authored =
         controller.authoredPortablePath(source, destination, "WikiDup Shared");
 
-    assertThat(authored.portablePath(), equalTo("WikiDup Pantry/WikiDup Shared"));
+    assertThat(authored.portablePath(), equalTo("WikiDup Shared"));
   }
 
   @Test
@@ -43,7 +43,38 @@ class NoteControllerAuthoredPortablePathTests extends ControllerTestBase {
     AuthoredPortablePath authored =
         controller.authoredPortablePath(source, destination, "Moon#prop:topic");
 
-    assertThat(authored.portablePath(), equalTo("Solar/Moon#prop:topic"));
+    assertThat(authored.portablePath(), equalTo("Moon#prop:topic"));
+  }
+
+  @Test
+  void shouldAuthorFullNormalizedFolderPathWhenDisplayNameIsAmbiguous()
+      throws UnexpectedNoAccessRightException {
+    Folder pantry =
+        makeMe.aFolder().notebookOwnedBy(currentUser.getUser()).name("WikiDup Pantry").please();
+    Note destination = makeMe.aNote().title("WikiDup Shared").folder(pantry).please();
+    Folder recipes =
+        makeMe.aFolder().notebook(pantry.getNotebook()).name("WikiDup Recipes").please();
+    makeMe.aNote().title("WikiDup Shared").folder(recipes).please();
+    Note source = makeMe.aNote().notebook(pantry.getNotebook()).please();
+
+    AuthoredPortablePath authored =
+        controller.authoredPortablePath(source, destination, "WikiDup Shared");
+
+    assertThat(authored.portablePath(), equalTo("WikiDup Pantry/WikiDup Shared"));
+  }
+
+  @Test
+  void shouldAuthorFullNormalizedFolderPathWhenDisplayNameCollidesWithAlias()
+      throws UnexpectedNoAccessRightException {
+    Folder pantry =
+        makeMe.aFolder().notebookOwnedBy(currentUser.getUser()).name("WikiDup Pantry").please();
+    Note destination = makeMe.aNote().title("color").folder(pantry).please();
+    makeMe.aNote().title("colour").notebook(pantry.getNotebook()).aliases("color").please();
+    Note source = makeMe.aNote().notebook(pantry.getNotebook()).please();
+
+    AuthoredPortablePath authored = controller.authoredPortablePath(source, destination, "color");
+
+    assertThat(authored.portablePath(), equalTo("WikiDup Pantry/color"));
   }
 
   @Test
