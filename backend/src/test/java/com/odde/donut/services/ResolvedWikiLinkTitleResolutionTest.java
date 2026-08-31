@@ -8,10 +8,10 @@ import static org.hamcrest.Matchers.hasSize;
 
 import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Note;
-import com.odde.donut.entities.NoteWikiTitleCache;
 import com.odde.donut.entities.Notebook;
+import com.odde.donut.entities.ResolvedWikiLink;
 import com.odde.donut.entities.User;
-import com.odde.donut.entities.repositories.NoteWikiTitleCacheRepository;
+import com.odde.donut.entities.repositories.ResolvedWikiLinkRepository;
 import com.odde.donut.testability.MakeMe;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -25,14 +25,14 @@ import org.springframework.transaction.annotation.Transactional;
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
-class WikiTitleCacheTitleResolutionTest {
+class ResolvedWikiLinkTitleResolutionTest {
 
   @Autowired MakeMe makeMe;
-  @Autowired WikiTitleCacheService wikiTitleCacheService;
-  @Autowired NoteWikiTitleCacheRepository noteWikiTitleCacheRepository;
+  @Autowired ResolvedWikiLinkService resolvedWikiLinkService;
+  @Autowired ResolvedWikiLinkRepository resolvedWikiLinkRepository;
 
-  private List<NoteWikiTitleCache> cacheRows(Note carrier) {
-    return noteWikiTitleCacheRepository.findByNote_IdOrderByIdAsc(carrier.getId());
+  private List<ResolvedWikiLink> cacheRows(Note carrier) {
+    return resolvedWikiLinkRepository.findBySourceNote_IdOrderByIdAsc(carrier.getId());
   }
 
   @Test
@@ -45,15 +45,15 @@ class WikiTitleCacheTitleResolutionTest {
     Note katakanaTarget = makeMe.aNote().title("ゴロ").folder(folderB).please();
     Note carrier = makeMe.aNote().notebook(notebook).content("[[ごろ]] [[ゴロ]]").please();
 
-    wikiTitleCacheService.refreshForNote(carrier, user);
+    resolvedWikiLinkService.refreshForNote(carrier, user);
 
-    List<NoteWikiTitleCache> rows = cacheRows(carrier);
+    List<ResolvedWikiLink> rows = cacheRows(carrier);
     assertThat(rows, hasSize(2));
     assertThat(
-        rows.stream().map(NoteWikiTitleCache::getLinkText).toList(),
+        rows.stream().map(ResolvedWikiLink::getAuthoredLink).toList(),
         containsInAnyOrder("ごろ", "ゴロ"));
     assertThat(
-        rows.stream().map(r -> r.getTargetNote().getId()).toList(),
+        rows.stream().map(r -> r.getDestinationNote().getId()).toList(),
         containsInAnyOrder(hiraganaTarget.getId(), katakanaTarget.getId()));
   }
 
@@ -67,11 +67,11 @@ class WikiTitleCacheTitleResolutionTest {
     makeMe.aNote().title("Dup").folder(folderB).please();
     Note carrier = makeMe.aNote().notebook(notebook).content("[[Dup]]").please();
 
-    wikiTitleCacheService.refreshForNote(carrier, user);
+    resolvedWikiLinkService.refreshForNote(carrier, user);
 
-    List<NoteWikiTitleCache> rows = cacheRows(carrier);
+    List<ResolvedWikiLink> rows = cacheRows(carrier);
     assertThat(rows, hasSize(1));
-    assertThat(rows.get(0).getTargetNote().getId(), equalTo(firstCreated.getId()));
+    assertThat(rows.get(0).getDestinationNote().getId(), equalTo(firstCreated.getId()));
   }
 
   @ParameterizedTest
@@ -85,12 +85,12 @@ class WikiTitleCacheTitleResolutionTest {
     Note pantryDup = makeMe.aNote().title("Dup").folder(pantry).please();
     Note carrier = makeMe.aNote().notebook(notebook).content(content).please();
 
-    wikiTitleCacheService.refreshForNote(carrier, user);
+    resolvedWikiLinkService.refreshForNote(carrier, user);
 
-    List<NoteWikiTitleCache> rows = cacheRows(carrier);
+    List<ResolvedWikiLink> rows = cacheRows(carrier);
     assertThat(rows, hasSize(1));
-    assertThat(rows.get(0).getLinkText(), equalTo(content));
-    assertThat(rows.get(0).getTargetNote().getId(), equalTo(pantryDup.getId()));
+    assertThat(rows.get(0).getAuthoredLink(), equalTo(content));
+    assertThat(rows.get(0).getDestinationNote().getId(), equalTo(pantryDup.getId()));
   }
 
   @Test
@@ -102,12 +102,12 @@ class WikiTitleCacheTitleResolutionTest {
     Note carrier =
         makeMe.aNote().notebook(folder.getNotebook()).content("[label](/Title.md)").please();
 
-    wikiTitleCacheService.refreshForNote(carrier, user);
+    resolvedWikiLinkService.refreshForNote(carrier, user);
 
-    List<NoteWikiTitleCache> rows = cacheRows(carrier);
+    List<ResolvedWikiLink> rows = cacheRows(carrier);
     assertThat(rows, hasSize(1));
-    assertThat(rows.get(0).getLinkText(), equalTo("[label](/Title.md)"));
-    assertThat(rows.get(0).getTargetNote().getId(), equalTo(root.getId()));
+    assertThat(rows.get(0).getAuthoredLink(), equalTo("[label](/Title.md)"));
+    assertThat(rows.get(0).getDestinationNote().getId(), equalTo(root.getId()));
   }
 
   @ParameterizedTest
@@ -121,11 +121,11 @@ class WikiTitleCacheTitleResolutionTest {
     Note pantryDup = makeMe.aNote().title("Dup").folder(pantry).please();
     Note carrier = makeMe.aNote().notebook(notebook).content(content).please();
 
-    wikiTitleCacheService.refreshForNote(carrier, user);
+    resolvedWikiLinkService.refreshForNote(carrier, user);
 
-    List<NoteWikiTitleCache> rows = cacheRows(carrier);
+    List<ResolvedWikiLink> rows = cacheRows(carrier);
     assertThat(rows, hasSize(1));
-    assertThat(rows.get(0).getTargetNote().getId(), equalTo(pantryDup.getId()));
+    assertThat(rows.get(0).getDestinationNote().getId(), equalTo(pantryDup.getId()));
   }
 
   @Test
@@ -138,11 +138,11 @@ class WikiTitleCacheTitleResolutionTest {
     Note nested = makeMe.aNote().title("Title").folder(child).please();
     Note carrier = makeMe.aNote().notebook(notebook).content("[[Parent/Child/Title]]").please();
 
-    wikiTitleCacheService.refreshForNote(carrier, user);
+    resolvedWikiLinkService.refreshForNote(carrier, user);
 
-    List<NoteWikiTitleCache> rows = cacheRows(carrier);
+    List<ResolvedWikiLink> rows = cacheRows(carrier);
     assertThat(rows, hasSize(1));
-    assertThat(rows.get(0).getTargetNote().getId(), equalTo(nested.getId()));
+    assertThat(rows.get(0).getDestinationNote().getId(), equalTo(nested.getId()));
   }
 
   @Test
@@ -153,7 +153,7 @@ class WikiTitleCacheTitleResolutionTest {
     makeMe.aNote().title("Dup").folder(folderA).please();
     Note carrier = makeMe.aNote().notebook(notebook).content("[[Dup.md]]").please();
 
-    wikiTitleCacheService.refreshForNote(carrier, user);
+    resolvedWikiLinkService.refreshForNote(carrier, user);
 
     assertThat(cacheRows(carrier), empty());
   }
@@ -168,9 +168,9 @@ class WikiTitleCacheTitleResolutionTest {
     Note voiced = makeMe.aNote().title("ごろ").folder(folderB).please();
     Note carrier = makeMe.aNote().notebook(notebook).content("[[ごろ]]").please();
 
-    wikiTitleCacheService.refreshForNote(carrier, user);
+    resolvedWikiLinkService.refreshForNote(carrier, user);
 
-    assertThat(cacheRows(carrier).get(0).getTargetNote().getId(), equalTo(voiced.getId()));
+    assertThat(cacheRows(carrier).get(0).getDestinationNote().getId(), equalTo(voiced.getId()));
   }
 
   @Test
@@ -179,7 +179,7 @@ class WikiTitleCacheTitleResolutionTest {
     Note unvoiced = makeMe.aNote().title("ころ").notebookOwnedBy(user).please();
     Note carrier = makeMe.aNote().underSameNotebookAs(unvoiced).content("[[ごろ]]").please();
 
-    wikiTitleCacheService.refreshForNote(carrier, user);
+    resolvedWikiLinkService.refreshForNote(carrier, user);
 
     assertThat(cacheRows(carrier), empty());
   }

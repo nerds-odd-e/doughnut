@@ -148,7 +148,7 @@ const relationTypeSelected = async (relationType: string | undefined) => {
         { newTitle: metaTitle, content: markdown },
         {
           folderId: folderId ?? undefined,
-          refreshWikiTitleCacheForNoteIds: [
+          refreshWikiLinkCacheForNoteIds: [
             props.note.id,
             props.targetSearchResult.noteTopology.id,
           ],

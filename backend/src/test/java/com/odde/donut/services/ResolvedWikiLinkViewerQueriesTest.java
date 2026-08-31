@@ -8,9 +8,9 @@ import static org.hamcrest.Matchers.hasSize;
 import com.odde.donut.controllers.dto.WikiLink;
 import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Note;
-import com.odde.donut.entities.NoteWikiTitleCache;
+import com.odde.donut.entities.ResolvedWikiLink;
 import com.odde.donut.entities.User;
-import com.odde.donut.entities.repositories.NoteWikiTitleCacheRepository;
+import com.odde.donut.entities.repositories.ResolvedWikiLinkRepository;
 import com.odde.donut.testability.MakeMe;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -22,14 +22,14 @@ import org.springframework.transaction.annotation.Transactional;
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
-class WikiTitleCacheViewerQueriesTest {
+class ResolvedWikiLinkViewerQueriesTest {
 
   @Autowired MakeMe makeMe;
-  @Autowired WikiTitleCacheService wikiTitleCacheService;
-  @Autowired NoteWikiTitleCacheRepository noteWikiTitleCacheRepository;
+  @Autowired ResolvedWikiLinkService resolvedWikiLinkService;
+  @Autowired ResolvedWikiLinkRepository resolvedWikiLinkRepository;
 
-  private List<NoteWikiTitleCache> cacheRows(Note carrier) {
-    return noteWikiTitleCacheRepository.findByNote_IdOrderByIdAsc(carrier.getId());
+  private List<ResolvedWikiLink> cacheRows(Note carrier) {
+    return resolvedWikiLinkRepository.findBySourceNote_IdOrderByIdAsc(carrier.getId());
   }
 
   @Test
@@ -43,16 +43,16 @@ class WikiTitleCacheViewerQueriesTest {
             .content("[[Same|first label]] and [[Same|second label]]")
             .please();
 
-    wikiTitleCacheService.refreshForNote(carrier, user);
+    resolvedWikiLinkService.refreshForNote(carrier, user);
 
-    List<NoteWikiTitleCache> rows = cacheRows(carrier);
+    List<ResolvedWikiLink> rows = cacheRows(carrier);
     assertThat(rows, hasSize(2));
-    assertThat(rows.get(0).getLinkText(), equalTo("Same|first label"));
-    assertThat(rows.get(0).getTargetNote().getId(), equalTo(shared.getId()));
-    assertThat(rows.get(1).getLinkText(), equalTo("Same|second label"));
-    assertThat(rows.get(1).getTargetNote().getId(), equalTo(shared.getId()));
+    assertThat(rows.get(0).getAuthoredLink(), equalTo("Same|first label"));
+    assertThat(rows.get(0).getDestinationNote().getId(), equalTo(shared.getId()));
+    assertThat(rows.get(1).getAuthoredLink(), equalTo("Same|second label"));
+    assertThat(rows.get(1).getDestinationNote().getId(), equalTo(shared.getId()));
 
-    List<WikiLink> titles = wikiTitleCacheService.wikiTitlesForViewer(carrier, user);
+    List<WikiLink> titles = resolvedWikiLinkService.wikiLinksForViewer(carrier, user);
     assertThat(titles, hasSize(2));
     assertThat(titles.get(0).getDisplayText(), equalTo("first label"));
     assertThat(titles.get(1).getDisplayText(), equalTo("second label"));
@@ -66,9 +66,9 @@ class WikiTitleCacheViewerQueriesTest {
     Note carrier =
         makeMe.aNote().notebook(folder.getNotebook()).content("[label](/Folder/Title.md)").please();
 
-    wikiTitleCacheService.refreshForNote(carrier, user);
+    resolvedWikiLinkService.refreshForNote(carrier, user);
 
-    List<WikiLink> titles = wikiTitleCacheService.wikiTitlesForViewer(carrier, user);
+    List<WikiLink> titles = resolvedWikiLinkService.wikiLinksForViewer(carrier, user);
     assertThat(titles, hasSize(1));
     assertThat(titles.get(0).getAuthoredLink(), equalTo("[label](/Folder/Title.md)"));
     assertThat(titles.get(0).getPortablePath(), equalTo("/Folder/Title.md"));
@@ -83,9 +83,10 @@ class WikiTitleCacheViewerQueriesTest {
     Note carrier =
         makeMe.aNote().underSameNotebookAs(shared).content("[[Same|a]] [[Same|b]]").please();
 
-    wikiTitleCacheService.refreshForNote(carrier, user);
+    resolvedWikiLinkService.refreshForNote(carrier, user);
 
-    List<Note> outgoing = wikiTitleCacheService.outgoingWikiLinkTargetNotesForViewer(carrier, user);
+    List<Note> outgoing =
+        resolvedWikiLinkService.outgoingWikiLinkTargetNotesForViewer(carrier, user);
     assertThat(outgoing, hasSize(1));
     assertThat(outgoing.get(0).getTitle(), equalTo("Same"));
   }
@@ -96,10 +97,10 @@ class WikiTitleCacheViewerQueriesTest {
     Note focal = makeMe.aNote().title("Focal").notebookOwnedBy(user).please();
     Note second = makeMe.aNote().underSameNotebookAs(focal).content("[[Focal]]").please();
     Note first = makeMe.aNote().underSameNotebookAs(focal).content("[[Focal]]").please();
-    wikiTitleCacheService.refreshForNote(first, user);
-    wikiTitleCacheService.refreshForNote(second, user);
+    resolvedWikiLinkService.refreshForNote(first, user);
+    resolvedWikiLinkService.refreshForNote(second, user);
 
-    List<Note> refs = wikiTitleCacheService.referencesNotesForViewer(focal, user);
+    List<Note> refs = resolvedWikiLinkService.referencesNotesForViewer(focal, user);
 
     assertThat(refs, hasSize(2));
     assertThat(refs.get(0).getId(), equalTo(Math.min(first.getId(), second.getId())));
@@ -112,10 +113,10 @@ class WikiTitleCacheViewerQueriesTest {
     Note focal = makeMe.aNote().title("Focal").notebookOwnedBy(user).please();
     Note referrerAtNotebookRoot =
         makeMe.aNote().underSameNotebookAs(focal).content("[[Focal]]").please();
-    wikiTitleCacheService.refreshForNote(referrerAtNotebookRoot, user);
+    resolvedWikiLinkService.refreshForNote(referrerAtNotebookRoot, user);
 
     assertThat(
-        wikiTitleCacheService.referencesNotesForViewer(focal, user),
+        resolvedWikiLinkService.referencesNotesForViewer(focal, user),
         hasItem(referrerAtNotebookRoot));
   }
 }

@@ -82,7 +82,7 @@ export interface StoredApi {
     data: NoteCreationDto,
     options?: {
       folderId?: number | null
-      refreshWikiTitleCacheForNoteIds?: number[]
+      refreshWikiLinkCacheForNoteIds?: number[]
       skipNavigation?: boolean
     }
   ): Promise<NoteRealm>
@@ -110,7 +110,7 @@ export interface StoredApi {
     value?: NoteContentCompletion
   ): Promise<void>
 
-  /** PATCH note content with current stored body so the backend rebuilds wiki title cache. */
+  /** PATCH note content with current stored body so the backend rebuilds the resolved wiki-link index. */
   refreshWikiLinkCacheForNote(noteId: Donut.ID): Promise<void>
 
   undo(router: Router): Promise<NoteRealm | undefined>
@@ -249,13 +249,13 @@ export default class StoredApiCollection implements StoredApi {
     data: NoteCreationDto,
     options?: {
       folderId?: number | null
-      refreshWikiTitleCacheForNoteIds?: number[]
+      refreshWikiLinkCacheForNoteIds?: number[]
       skipNavigation?: boolean
     }
   ) {
     const folderId = options?.folderId
-    const refreshWikiTitleCacheForNoteIds =
-      options?.refreshWikiTitleCacheForNoteIds
+    const refreshWikiLinkCacheForNoteIds =
+      options?.refreshWikiLinkCacheForNoteIds
     const body: NoteCreationDto =
       folderId != null ? { ...data, folderId } : { ...data }
     const result = await apiCallWithLoading(() =>
@@ -272,8 +272,8 @@ export default class StoredApiCollection implements StoredApi {
     }
     const focus = this.storage.refreshNoteRealm(nrwp)
     this.noteEditingHistory.createNote(focus.id)
-    if (refreshWikiTitleCacheForNoteIds) {
-      for (const id of refreshWikiTitleCacheForNoteIds) {
+    if (refreshWikiLinkCacheForNoteIds) {
+      for (const id of refreshWikiLinkCacheForNoteIds) {
         await this.refreshWikiLinkCacheForNote(id)
       }
     }

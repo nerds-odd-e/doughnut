@@ -12,7 +12,7 @@ Donut gathers **bounded context around one focus note** for AI features (questio
 Related notes come from three inclusion sources (retrieval mechanics only — not labelled on the payload):
 
 1. **Outgoing wiki links** — Targets of `[[wiki link]]` from note content or YAML front matter.
-2. **Inbound wiki references** — Other notes in scope that link to this title (wiki title cache).
+2. **Inbound wiki references** — Other notes in scope that link to this title (resolved wiki-link index).
 3. **Sampled folder peers** — Peers in the same folder or notebook root; not used as an expansion frontier.
 
 Notes dedupe by internal id within each wiki depth: first proposal wins when the same note is proposed more than once.

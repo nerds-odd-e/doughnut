@@ -1,32 +1,32 @@
 package com.odde.donut.entities.repositories;
 
 import com.odde.donut.entities.Note;
-import com.odde.donut.entities.NoteWikiTitleCache;
+import com.odde.donut.entities.ResolvedWikiLink;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-public interface NoteWikiTitleCacheRepository extends JpaRepository<NoteWikiTitleCache, Integer> {
+public interface ResolvedWikiLinkRepository extends JpaRepository<ResolvedWikiLink, Integer> {
 
-  void deleteByNote_Id(Integer noteId);
+  void deleteBySourceNote_Id(Integer noteId);
 
   @Modifying
-  @Query("DELETE FROM NoteWikiTitleCache c WHERE c.note.id = :noteId")
+  @Query("DELETE FROM ResolvedWikiLink c WHERE c.sourceNote.id = :noteId")
   void deleteByNoteIdInBulk(@Param("noteId") Integer noteId);
 
-  List<NoteWikiTitleCache> findByNote_IdOrderByIdAsc(Integer noteId);
+  List<ResolvedWikiLink> findBySourceNote_IdOrderByIdAsc(Integer noteId);
 
   @Query(
-      "SELECT c FROM NoteWikiTitleCache c JOIN c.note n JOIN c.targetNote t WHERE n.deletedAt IS"
-          + " NULL AND t.deletedAt IS NULL ORDER BY n.id ASC, c.id ASC")
-  List<NoteWikiTitleCache> findAllRowsBetweenNonDeletedNotes();
+      "SELECT c FROM ResolvedWikiLink c JOIN c.sourceNote n JOIN c.destinationNote t WHERE"
+          + " n.deletedAt IS NULL AND t.deletedAt IS NULL ORDER BY n.id ASC, c.id ASC")
+  List<ResolvedWikiLink> findAllRowsBetweenNonDeletedNotes();
 
   @Query(
-      "SELECT c FROM NoteWikiTitleCache c JOIN c.note n WHERE c.targetNote.id = :targetNoteId AND"
-          + " n.deletedAt IS NULL ORDER BY n.id ASC, c.id ASC")
-  List<NoteWikiTitleCache> findRowsReferringToNonDeletedNotesForTarget(
+      "SELECT c FROM ResolvedWikiLink c JOIN c.sourceNote n WHERE c.destinationNote.id ="
+          + " :targetNoteId AND n.deletedAt IS NULL ORDER BY n.id ASC, c.id ASC")
+  List<ResolvedWikiLink> findRowsReferringToNonDeletedNotesForTarget(
       @Param("targetNoteId") Integer targetNoteId);
 
   /**
@@ -37,10 +37,10 @@ public interface NoteWikiTitleCacheRepository extends JpaRepository<NoteWikiTitl
   @Query(
       value =
           "SELECT r.* FROM note r INNER JOIN ("
-              + "SELECT c.note_id FROM note_wiki_title_cache c "
-              + "INNER JOIN note r2 ON r2.id = c.note_id AND r2.deleted_at IS NULL "
-              + "WHERE c.target_note_id = :targetNoteId GROUP BY c.note_id) dedup "
-              + "ON dedup.note_id = r.id "
+              + "SELECT c.source_note_id FROM resolved_wiki_link c "
+              + "INNER JOIN note r2 ON r2.id = c.source_note_id AND r2.deleted_at IS NULL "
+              + "WHERE c.destination_note_id = :targetNoteId GROUP BY c.source_note_id) dedup "
+              + "ON dedup.source_note_id = r.id "
               + "WHERE r.deleted_at IS NULL AND r.id NOT IN (:excludeIds) AND ("
               + "(:focalNotebookId IS NOT NULL AND r.notebook_id = :focalNotebookId) OR "
               + "(:viewerId IS NOT NULL AND ("
@@ -60,10 +60,10 @@ public interface NoteWikiTitleCacheRepository extends JpaRepository<NoteWikiTitl
   @Query(
       value =
           "SELECT r.* FROM note r INNER JOIN ("
-              + "SELECT c.note_id FROM note_wiki_title_cache c "
-              + "INNER JOIN note r2 ON r2.id = c.note_id AND r2.deleted_at IS NULL "
-              + "WHERE c.target_note_id = :targetNoteId GROUP BY c.note_id) dedup "
-              + "ON dedup.note_id = r.id "
+              + "SELECT c.source_note_id FROM resolved_wiki_link c "
+              + "INNER JOIN note r2 ON r2.id = c.source_note_id AND r2.deleted_at IS NULL "
+              + "WHERE c.destination_note_id = :targetNoteId GROUP BY c.source_note_id) dedup "
+              + "ON dedup.source_note_id = r.id "
               + "WHERE r.deleted_at IS NULL AND r.id NOT IN (:excludeIds) AND ("
               + "(:focalNotebookId IS NOT NULL AND r.notebook_id = :focalNotebookId) OR "
               + "(:viewerId IS NOT NULL AND ("

@@ -43,9 +43,9 @@
 - Impact: Merge conflicts, unclear ownership, slow discovery of the right helper.
 - Fix approach: Continue splitting by feature (search/link-target step modules already split); keep page objects feature-scoped.
 
-**Derived index coherence (wiki title / property / alias):**
-- Issue: Note content properties live as YAML frontmatter; discoverability depends on derived tables refreshed via `WikiTitleCacheService.refreshForNote` and related backfills. Missed refresh sites recreate assimilation/search bugs.
-- Files: `backend/src/main/java/com/odde/donut/services/WikiTitleCacheService.java` (and call sites in `NoteService`, `NoteConstructionService`, `TextContentController`, wiki-link rewrite), `backend/src/main/java/com/odde/donut/services/NotePropertyIndex*.java`
+**Derived index coherence (resolved wiki-link / property / alias):**
+- Issue: Note content properties live as YAML frontmatter; discoverability depends on derived tables refreshed via `ResolvedWikiLinkService.refreshForNote` and related backfills. Missed refresh sites recreate assimilation/search bugs.
+- Files: `backend/src/main/java/com/odde/donut/services/ResolvedWikiLinkService.java` (and call sites in `NoteService`, `NoteConstructionService`, `TextContentController`, wiki-link rewrite), `backend/src/main/java/com/odde/donut/services/NotePropertyIndex*.java`
 - Impact: Stale assimilation queues, wrong wiki resolution, skipped property trackers after content edits if a write path skips refresh.
 - Fix approach: Keep one refresh boundary for content saves; when adding a write path, always call the same refresh seam; prefer a controller-level unit test that asserts index rows after content PATCH ("small test" style: `unit-testing.mdc`).
 

@@ -9,9 +9,9 @@ import com.odde.donut.controllers.dto.NoteRealm;
 import com.odde.donut.controllers.dto.WikiLink;
 import com.odde.donut.entities.Image;
 import com.odde.donut.entities.Note;
-import com.odde.donut.entities.NoteWikiTitleCache;
+import com.odde.donut.entities.ResolvedWikiLink;
 import com.odde.donut.entities.repositories.ImageRepository;
-import com.odde.donut.entities.repositories.NoteWikiTitleCacheRepository;
+import com.odde.donut.entities.repositories.ResolvedWikiLinkRepository;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -20,7 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 class TextContentControllerUpdateNoteContentTests extends TextContentControllerTestBase {
   private static final String ORDINARY_NOTE_FENCE = "---\ntype: Note\n---\n";
 
-  @Autowired NoteWikiTitleCacheRepository noteWikiTitleCacheRepository;
+  @Autowired ResolvedWikiLinkRepository resolvedWikiLinkRepository;
   @Autowired ImageRepository imageRepository;
 
   @Test
@@ -53,7 +53,7 @@ class TextContentControllerUpdateNoteContentTests extends TextContentControllerT
   }
 
   @Test
-  void refreshesWikiTitleCacheWhenContentContainResolvedWikiLink()
+  void refreshesResolvedWikiLinkWhenContentContainResolvedWikiLink()
       throws UnexpectedNoAccessRightException {
     Note onlyA = makeMe.aNote().title("OnlyA").notebookOwnedBy(currentUser.getUser()).please();
     Note onlyB = makeMe.aNote().title("OnlyB").underSameNotebookAs(onlyA).please();
@@ -69,15 +69,15 @@ class TextContentControllerUpdateNoteContentTests extends TextContentControllerT
     assertThat(wt.getDisplayText(), equalTo("OnlyB"));
     assertThat(wt.getDestinationNoteId(), equalTo(onlyB.getId()));
 
-    List<NoteWikiTitleCache> rows =
-        noteWikiTitleCacheRepository.findByNote_IdOrderByIdAsc(carrier.getId());
+    List<ResolvedWikiLink> rows =
+        resolvedWikiLinkRepository.findBySourceNote_IdOrderByIdAsc(carrier.getId());
     assertThat(rows, hasSize(1));
-    assertThat(rows.getFirst().getLinkText(), equalTo("OnlyB"));
-    assertThat(rows.getFirst().getTargetNote().getId(), equalTo(onlyB.getId()));
+    assertThat(rows.getFirst().getAuthoredLink(), equalTo("OnlyB"));
+    assertThat(rows.getFirst().getDestinationNote().getId(), equalTo(onlyB.getId()));
   }
 
   @Test
-  void refreshesWikiTitleCacheWhenContentHasResolvedWikiLinkWithDisplayText()
+  void refreshesResolvedWikiLinkWhenContentHasResolvedWikiLinkWithDisplayText()
       throws UnexpectedNoAccessRightException {
     Note onlyA = makeMe.aNote().title("OnlyA").notebookOwnedBy(currentUser.getUser()).please();
     Note carrier = makeMe.aNote().underSameNotebookAs(onlyA).please();
@@ -91,7 +91,7 @@ class TextContentControllerUpdateNoteContentTests extends TextContentControllerT
   }
 
   @Test
-  void clearsWikiTitleCacheWhenContentBecomeBlank() throws UnexpectedNoAccessRightException {
+  void clearsResolvedWikiLinkWhenContentBecomeBlank() throws UnexpectedNoAccessRightException {
     Note onlyA = makeMe.aNote().title("OnlyA").notebookOwnedBy(currentUser.getUser()).please();
     Note carrier = makeMe.aNote().underSameNotebookAs(onlyA).please();
 
@@ -100,7 +100,8 @@ class TextContentControllerUpdateNoteContentTests extends TextContentControllerT
     NoteRealm response = controller.updateNoteContent(carrier, contentDto(""));
 
     assertThat(response.getWikiLinks(), empty());
-    assertThat(noteWikiTitleCacheRepository.findByNote_IdOrderByIdAsc(carrier.getId()), empty());
+    assertThat(
+        resolvedWikiLinkRepository.findBySourceNote_IdOrderByIdAsc(carrier.getId()), empty());
   }
 
   @Test
@@ -162,10 +163,10 @@ class TextContentControllerUpdateNoteContentTests extends TextContentControllerT
     assertThat(wt.getPortablePath(), equalTo("Moon#prop:a%20part%20of"));
     assertThat(wt.getDestinationNoteId(), equalTo(moon.getId()));
 
-    List<NoteWikiTitleCache> rows =
-        noteWikiTitleCacheRepository.findByNote_IdOrderByIdAsc(carrier.getId());
+    List<ResolvedWikiLink> rows =
+        resolvedWikiLinkRepository.findBySourceNote_IdOrderByIdAsc(carrier.getId());
     assertThat(rows, hasSize(1));
-    assertThat(rows.getFirst().getLinkText(), equalTo("Moon#prop:a%20part%20of"));
+    assertThat(rows.getFirst().getAuthoredLink(), equalTo("Moon#prop:a%20part%20of"));
   }
 
   @Test
@@ -214,8 +215,8 @@ class TextContentControllerUpdateNoteContentTests extends TextContentControllerT
         response.getWikiLinks().stream().map(WikiLink::getAuthoredLink).toList(),
         equalTo(List.of("Moon#prop:Name", "Moon#prop:name")));
     assertThat(
-        noteWikiTitleCacheRepository.findByNote_IdOrderByIdAsc(carrier.getId()).stream()
-            .map(NoteWikiTitleCache::getLinkText)
+        resolvedWikiLinkRepository.findBySourceNote_IdOrderByIdAsc(carrier.getId()).stream()
+            .map(ResolvedWikiLink::getAuthoredLink)
             .toList(),
         equalTo(List.of("Moon#prop:Name", "Moon#prop:name")));
   }

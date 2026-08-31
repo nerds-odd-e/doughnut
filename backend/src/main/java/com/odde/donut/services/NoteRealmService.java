@@ -24,25 +24,25 @@ public class NoteRealmService {
   /** Canonical `title_pattern` first; legacy camelCase supported for existing notes. */
   private static final List<String> TITLE_PATTERN_KEYS = List.of("title_pattern", "titlePattern");
 
-  private final WikiTitleCacheService wikiTitleCacheService;
+  private final ResolvedWikiLinkService resolvedWikiLinkService;
   private final NoteRepository noteRepository;
   private final NotebookCatalogService notebookCatalogService;
 
   public NoteRealmService(
-      WikiTitleCacheService wikiTitleCacheService,
+      ResolvedWikiLinkService resolvedWikiLinkService,
       NoteRepository noteRepository,
       NotebookCatalogService notebookCatalogService) {
-    this.wikiTitleCacheService = wikiTitleCacheService;
+    this.resolvedWikiLinkService = resolvedWikiLinkService;
     this.noteRepository = noteRepository;
     this.notebookCatalogService = notebookCatalogService;
   }
 
   public NoteRealm build(Note note, User viewer) {
     Note focus = hydrateNote(note);
-    var wikiLinks = wikiTitleCacheService.wikiTitlesForViewer(focus, viewer);
+    var wikiLinks = resolvedWikiLinkService.wikiLinksForViewer(focus, viewer);
     NoteRealm realm = new NoteRealm(focus, wikiLinks);
     List<Note> refNotes =
-        hydrateNoteList(wikiTitleCacheService.referencesNotesForViewer(focus, viewer));
+        hydrateNoteList(resolvedWikiLinkService.referencesNotesForViewer(focus, viewer));
     realm.setReferences(refNotes.stream().map(Note::getNoteTopology).toList());
     realm.setNotebookRealm(notebookCatalogService.notebookRealmFor(focus.getNotebook(), viewer));
     realm.setAncestorFolders(FolderTrailSegments.fromRootToContainingFolder(focus));

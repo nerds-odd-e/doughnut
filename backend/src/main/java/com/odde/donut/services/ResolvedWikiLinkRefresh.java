@@ -2,34 +2,34 @@ package com.odde.donut.services;
 
 import com.odde.donut.algorithms.WikiLinkPropertyMatch;
 import com.odde.donut.entities.Note;
-import com.odde.donut.entities.NoteWikiTitleCache;
+import com.odde.donut.entities.ResolvedWikiLink;
 import com.odde.donut.entities.User;
-import com.odde.donut.entities.repositories.NoteWikiTitleCacheRepository;
+import com.odde.donut.entities.repositories.ResolvedWikiLinkRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.LockModeType;
 import java.util.LinkedHashSet;
 
-/** Rebuilds wiki-title cache rows and drops inbound property wiki rows that no longer match. */
-final class WikiTitleCacheRefresh {
+/** Rebuilds resolved wiki-link rows and drops inbound property wiki rows that no longer match. */
+final class ResolvedWikiLinkRefresh {
 
   private final WikiLinkResolver wikiLinkResolver;
-  private final NoteWikiTitleCacheRepository noteWikiTitleCacheRepository;
+  private final ResolvedWikiLinkRepository resolvedWikiLinkRepository;
   private final NotePropertyIndexService notePropertyIndexService;
   private final NoteAliasIndexService noteAliasIndexService;
 
-  WikiTitleCacheRefresh(
+  ResolvedWikiLinkRefresh(
       WikiLinkResolver wikiLinkResolver,
-      NoteWikiTitleCacheRepository noteWikiTitleCacheRepository,
+      ResolvedWikiLinkRepository resolvedWikiLinkRepository,
       NotePropertyIndexService notePropertyIndexService,
       NoteAliasIndexService noteAliasIndexService) {
     this.wikiLinkResolver = wikiLinkResolver;
-    this.noteWikiTitleCacheRepository = noteWikiTitleCacheRepository;
+    this.resolvedWikiLinkRepository = resolvedWikiLinkRepository;
     this.notePropertyIndexService = notePropertyIndexService;
     this.noteAliasIndexService = noteAliasIndexService;
   }
 
   void refreshForNote(EntityManager entityManager, Note note, User viewer) {
-    rebuildWikiTitleCache(entityManager, note, viewer);
+    rebuildResolvedWikiLinkRows(entityManager, note, viewer);
     notePropertyIndexService.refreshForNote(note);
     noteAliasIndexService.refreshForNote(note);
     dropStaleInboundPropertyWikiRows(entityManager, note);
@@ -39,16 +39,16 @@ final class WikiTitleCacheRefresh {
     Integer targetId = target.getId();
     String targetContent = target.getContent();
     LinkedHashSet<Integer> referrerIdsToReindex = new LinkedHashSet<>();
-    for (NoteWikiTitleCache row :
-        noteWikiTitleCacheRepository.findRowsReferringToNonDeletedNotesForTarget(targetId)) {
-      Integer referrerId = row.getNote().getId();
+    for (ResolvedWikiLink row :
+        resolvedWikiLinkRepository.findRowsReferringToNonDeletedNotesForTarget(targetId)) {
+      Integer referrerId = row.getSourceNote().getId();
       if (referrerId.equals(targetId)) {
         continue;
       }
-      if (WikiLinkPropertyMatch.matchesTargetNoteContent(row.getLinkText(), targetContent)) {
+      if (WikiLinkPropertyMatch.matchesTargetNoteContent(row.getAuthoredLink(), targetContent)) {
         continue;
       }
-      noteWikiTitleCacheRepository.delete(row);
+      resolvedWikiLinkRepository.delete(row);
       referrerIdsToReindex.add(referrerId);
     }
     if (referrerIdsToReindex.isEmpty()) {
@@ -63,19 +63,19 @@ final class WikiTitleCacheRefresh {
     }
   }
 
-  private void rebuildWikiTitleCache(EntityManager entityManager, Note note, User viewer) {
+  private void rebuildResolvedWikiLinkRows(EntityManager entityManager, Note note, User viewer) {
     Integer noteId = note.getId();
     entityManager.find(Note.class, noteId, LockModeType.PESSIMISTIC_WRITE);
-    noteWikiTitleCacheRepository.deleteByNoteIdInBulk(noteId);
+    resolvedWikiLinkRepository.deleteByNoteIdInBulk(noteId);
     entityManager.flush();
-    Note cacheOwner = entityManager.getReference(Note.class, noteId);
+    Note sourceNoteRef = entityManager.getReference(Note.class, noteId);
     for (WikiLinkResolver.ResolvedWikiLink link :
         wikiLinkResolver.resolveWikiLinksForCache(note, viewer)) {
-      NoteWikiTitleCache row = new NoteWikiTitleCache();
-      row.setNote(cacheOwner);
-      row.setTargetNote(entityManager.getReference(Note.class, link.targetNote().getId()));
-      row.setLinkText(link.linkText());
-      noteWikiTitleCacheRepository.save(row);
+      ResolvedWikiLink row = new ResolvedWikiLink();
+      row.setSourceNote(sourceNoteRef);
+      row.setDestinationNote(entityManager.getReference(Note.class, link.targetNote().getId()));
+      row.setAuthoredLink(link.linkText());
+      resolvedWikiLinkRepository.save(row);
     }
   }
 }

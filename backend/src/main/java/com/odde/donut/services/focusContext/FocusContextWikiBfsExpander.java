@@ -3,7 +3,7 @@ package com.odde.donut.services.focusContext;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.User;
 import com.odde.donut.entities.repositories.NoteRepository;
-import com.odde.donut.services.WikiTitleCacheService;
+import com.odde.donut.services.ResolvedWikiLinkService;
 import com.odde.donut.services.focusContext.FocusContextFolderPeerAppender.SiblingAnchor;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,12 +15,12 @@ import java.util.Optional;
 import java.util.Set;
 
 final class FocusContextWikiBfsExpander {
-  private final WikiTitleCacheService wikiTitleCacheService;
+  private final ResolvedWikiLinkService resolvedWikiLinkService;
   private final NoteRepository noteRepository;
 
   FocusContextWikiBfsExpander(
-      WikiTitleCacheService wikiTitleCacheService, NoteRepository noteRepository) {
-    this.wikiTitleCacheService = wikiTitleCacheService;
+      ResolvedWikiLinkService resolvedWikiLinkService, NoteRepository noteRepository) {
+    this.resolvedWikiLinkService = resolvedWikiLinkService;
     this.noteRepository = noteRepository;
   }
 
@@ -112,7 +112,7 @@ final class FocusContextWikiBfsExpander {
       }
 
       List<Note> outgoing =
-          wikiTitleCacheService.outgoingWikiLinkTargetNotesForViewer(parent, viewer);
+          resolvedWikiLinkService.outgoingWikiLinkTargetNotesForViewer(parent, viewer);
 
       Set<Integer> inboundExclude = new HashSet<>();
       if (focusId != null) {
@@ -124,7 +124,7 @@ final class FocusContextWikiBfsExpander {
         }
       }
       List<Note> sampledInbound =
-          wikiTitleCacheService.sampledReferencesNotesForFocusContext(
+          resolvedWikiLinkService.sampledReferencesNotesForFocusContext(
               parent,
               viewer,
               inboundExclude,

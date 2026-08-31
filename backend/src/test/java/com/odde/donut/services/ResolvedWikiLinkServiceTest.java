@@ -7,11 +7,11 @@ import static org.hamcrest.Matchers.hasSize;
 
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.NoteAliasIndex;
-import com.odde.donut.entities.NoteWikiTitleCache;
 import com.odde.donut.entities.Notebook;
+import com.odde.donut.entities.ResolvedWikiLink;
 import com.odde.donut.entities.User;
 import com.odde.donut.entities.repositories.NoteAliasIndexRepository;
-import com.odde.donut.entities.repositories.NoteWikiTitleCacheRepository;
+import com.odde.donut.entities.repositories.ResolvedWikiLinkRepository;
 import com.odde.donut.testability.MakeMe;
 import java.util.List;
 import org.junit.jupiter.api.Nested;
@@ -24,15 +24,15 @@ import org.springframework.transaction.annotation.Transactional;
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
-class WikiTitleCacheServiceTest {
+class ResolvedWikiLinkServiceTest {
 
   @Autowired MakeMe makeMe;
-  @Autowired WikiTitleCacheService wikiTitleCacheService;
-  @Autowired NoteWikiTitleCacheRepository noteWikiTitleCacheRepository;
+  @Autowired ResolvedWikiLinkService resolvedWikiLinkService;
+  @Autowired ResolvedWikiLinkRepository resolvedWikiLinkRepository;
   @Autowired NoteAliasIndexRepository noteAliasIndexRepository;
 
-  private List<NoteWikiTitleCache> cacheRows(Note carrier) {
-    return noteWikiTitleCacheRepository.findByNote_IdOrderByIdAsc(carrier.getId());
+  private List<ResolvedWikiLink> cacheRows(Note carrier) {
+    return resolvedWikiLinkRepository.findBySourceNote_IdOrderByIdAsc(carrier.getId());
   }
 
   @Nested
@@ -50,14 +50,14 @@ class WikiTitleCacheServiceTest {
               .withWikiLinksInFrontmatter(source, target)
               .please();
 
-      wikiTitleCacheService.refreshForNote(carrier, user);
+      resolvedWikiLinkService.refreshForNote(carrier, user);
 
-      List<NoteWikiTitleCache> rows = cacheRows(carrier);
+      List<ResolvedWikiLink> rows = cacheRows(carrier);
       assertThat(rows, hasSize(2));
-      assertThat(rows.get(0).getLinkText(), equalTo("Alpha"));
-      assertThat(rows.get(0).getTargetNote().getId(), equalTo(source.getId()));
-      assertThat(rows.get(1).getLinkText(), equalTo("Beta"));
-      assertThat(rows.get(1).getTargetNote().getId(), equalTo(target.getId()));
+      assertThat(rows.get(0).getAuthoredLink(), equalTo("Alpha"));
+      assertThat(rows.get(0).getDestinationNote().getId(), equalTo(source.getId()));
+      assertThat(rows.get(1).getAuthoredLink(), equalTo("Beta"));
+      assertThat(rows.get(1).getDestinationNote().getId(), equalTo(target.getId()));
     }
 
     @Test
@@ -67,17 +67,17 @@ class WikiTitleCacheServiceTest {
       Note onlyB = makeMe.aNote().title("OnlyB").underSameNotebookAs(onlyA).please();
       Note carrier = makeMe.aNote().underSameNotebookAs(onlyA).content("[[OnlyA]]").please();
 
-      wikiTitleCacheService.refreshForNote(carrier, user);
+      resolvedWikiLinkService.refreshForNote(carrier, user);
       assertThat(cacheRows(carrier), hasSize(1));
 
       carrier.setContent("[[OnlyB]]");
       makeMe.entityPersister.merge(carrier);
-      wikiTitleCacheService.refreshForNote(carrier, user);
+      resolvedWikiLinkService.refreshForNote(carrier, user);
 
-      List<NoteWikiTitleCache> rows = cacheRows(carrier);
+      List<ResolvedWikiLink> rows = cacheRows(carrier);
       assertThat(rows, hasSize(1));
-      assertThat(rows.get(0).getLinkText(), equalTo("OnlyB"));
-      assertThat(rows.get(0).getTargetNote().getId(), equalTo(onlyB.getId()));
+      assertThat(rows.get(0).getAuthoredLink(), equalTo("OnlyB"));
+      assertThat(rows.get(0).getDestinationNote().getId(), equalTo(onlyB.getId()));
     }
 
     @Test
@@ -91,11 +91,11 @@ class WikiTitleCacheServiceTest {
               .content("[[Same]] and again [[Same]]")
               .please();
 
-      wikiTitleCacheService.refreshForNote(carrier, user);
+      resolvedWikiLinkService.refreshForNote(carrier, user);
 
-      List<NoteWikiTitleCache> rows = cacheRows(carrier);
+      List<ResolvedWikiLink> rows = cacheRows(carrier);
       assertThat(rows, hasSize(1));
-      assertThat(rows.get(0).getTargetNote().getId(), equalTo(shared.getId()));
+      assertThat(rows.get(0).getDestinationNote().getId(), equalTo(shared.getId()));
     }
 
     @Test
@@ -104,12 +104,12 @@ class WikiTitleCacheServiceTest {
       Note target = makeMe.aNote().title("MixedCase").notebookOwnedBy(user).please();
       Note carrier = makeMe.aNote().underSameNotebookAs(target).content("[[mixedcase]]").please();
 
-      wikiTitleCacheService.refreshForNote(carrier, user);
+      resolvedWikiLinkService.refreshForNote(carrier, user);
 
-      List<NoteWikiTitleCache> rows = cacheRows(carrier);
+      List<ResolvedWikiLink> rows = cacheRows(carrier);
       assertThat(rows, hasSize(1));
-      assertThat(rows.get(0).getLinkText(), equalTo("mixedcase"));
-      assertThat(rows.get(0).getTargetNote().getId(), equalTo(target.getId()));
+      assertThat(rows.get(0).getAuthoredLink(), equalTo("mixedcase"));
+      assertThat(rows.get(0).getDestinationNote().getId(), equalTo(target.getId()));
     }
 
     @Test
@@ -121,12 +121,12 @@ class WikiTitleCacheServiceTest {
       Note carrier =
           makeMe.aNote().notebook(sourceNotebook).content("[[mybook:MIXEDCASE]]").please();
 
-      wikiTitleCacheService.refreshForNote(carrier, user);
+      resolvedWikiLinkService.refreshForNote(carrier, user);
 
-      List<NoteWikiTitleCache> rows = cacheRows(carrier);
+      List<ResolvedWikiLink> rows = cacheRows(carrier);
       assertThat(rows, hasSize(1));
-      assertThat(rows.get(0).getLinkText(), equalTo("mybook:MIXEDCASE"));
-      assertThat(rows.get(0).getTargetNote().getId(), equalTo(target.getId()));
+      assertThat(rows.get(0).getAuthoredLink(), equalTo("mybook:MIXEDCASE"));
+      assertThat(rows.get(0).getDestinationNote().getId(), equalTo(target.getId()));
     }
 
     @Test
@@ -140,12 +140,12 @@ class WikiTitleCacheServiceTest {
               .content("[[Same]] and again [[same]]")
               .please();
 
-      wikiTitleCacheService.refreshForNote(carrier, user);
+      resolvedWikiLinkService.refreshForNote(carrier, user);
 
-      List<NoteWikiTitleCache> rows = cacheRows(carrier);
+      List<ResolvedWikiLink> rows = cacheRows(carrier);
       assertThat(rows, hasSize(1));
-      assertThat(rows.get(0).getLinkText(), equalTo("Same"));
-      assertThat(rows.get(0).getTargetNote().getId(), equalTo(shared.getId()));
+      assertThat(rows.get(0).getAuthoredLink(), equalTo("Same"));
+      assertThat(rows.get(0).getDestinationNote().getId(), equalTo(shared.getId()));
     }
 
     @Test
@@ -164,7 +164,7 @@ class WikiTitleCacheServiceTest {
               .content("Try [[Secret Notebook:Hidden Note]].")
               .please();
 
-      wikiTitleCacheService.refreshForNote(carrier, viewer);
+      resolvedWikiLinkService.refreshForNote(carrier, viewer);
 
       assertThat(cacheRows(carrier), empty());
     }
@@ -175,17 +175,17 @@ class WikiTitleCacheServiceTest {
       Note target = makeMe.aNote().title("colour").notebookOwnedBy(user).aliases("color").please();
       Note carrier = makeMe.aNote().underSameNotebookAs(target).content("see [[color]]").please();
 
-      wikiTitleCacheService.refreshForNote(target, user);
-      wikiTitleCacheService.refreshForNote(carrier, user);
+      resolvedWikiLinkService.refreshForNote(target, user);
+      resolvedWikiLinkService.refreshForNote(carrier, user);
 
       List<NoteAliasIndex> aliasRows =
           noteAliasIndexRepository.findByNote_IdOrderByIdAsc(target.getId());
       assertThat(aliasRows, hasSize(1));
       assertThat(aliasRows.get(0).getAliasDisplay(), equalTo("color"));
 
-      List<NoteWikiTitleCache> rows = cacheRows(carrier);
+      List<ResolvedWikiLink> rows = cacheRows(carrier);
       assertThat(rows, hasSize(1));
-      assertThat(rows.get(0).getTargetNote().getId(), equalTo(target.getId()));
+      assertThat(rows.get(0).getDestinationNote().getId(), equalTo(target.getId()));
     }
 
     @Test
@@ -194,12 +194,12 @@ class WikiTitleCacheServiceTest {
       Note target = makeMe.aNote().title("A").notebookOwnedBy(user).please();
       Note carrier = makeMe.aNote().underSameNotebookAs(target).content("[[A]]").please();
 
-      wikiTitleCacheService.refreshForNote(carrier, user);
+      resolvedWikiLinkService.refreshForNote(carrier, user);
       assertThat(cacheRows(carrier), hasSize(1));
 
       carrier.setContent("   ");
       makeMe.entityPersister.merge(carrier);
-      wikiTitleCacheService.refreshForNote(carrier, user);
+      resolvedWikiLinkService.refreshForNote(carrier, user);
 
       assertThat(cacheRows(carrier), empty());
     }

@@ -6,10 +6,10 @@ import com.odde.donut.algorithms.PropertyKeyNaming;
 import com.odde.donut.algorithms.WikiLinkMarkdown;
 import com.odde.donut.entities.MemoryTracker;
 import com.odde.donut.entities.Note;
-import com.odde.donut.entities.NoteWikiTitleCache;
+import com.odde.donut.entities.ResolvedWikiLink;
 import com.odde.donut.entities.User;
 import com.odde.donut.entities.repositories.MemoryTrackerRepository;
-import com.odde.donut.entities.repositories.NoteWikiTitleCacheRepository;
+import com.odde.donut.entities.repositories.ResolvedWikiLinkRepository;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.factoryServices.EntityPersister;
 import java.sql.Timestamp;
@@ -28,8 +28,8 @@ final class NoteReferenceHandling {
   private static final String RELATIONSHIP_NOTE_TYPE = "relationship";
 
   private final MemoryTrackerRepository memoryTrackerRepository;
-  private final NoteWikiTitleCacheRepository noteWikiTitleCacheRepository;
-  private final WikiTitleCacheService wikiTitleCacheService;
+  private final ResolvedWikiLinkRepository resolvedWikiLinkRepository;
+  private final ResolvedWikiLinkService resolvedWikiLinkService;
   private final WikiLinkResolver wikiLinkResolver;
   private final AuthorizationService authorizationService;
   private final EntityPersister entityPersister;
@@ -37,15 +37,15 @@ final class NoteReferenceHandling {
 
   NoteReferenceHandling(
       MemoryTrackerRepository memoryTrackerRepository,
-      NoteWikiTitleCacheRepository noteWikiTitleCacheRepository,
-      WikiTitleCacheService wikiTitleCacheService,
+      ResolvedWikiLinkRepository resolvedWikiLinkRepository,
+      ResolvedWikiLinkService resolvedWikiLinkService,
       WikiLinkResolver wikiLinkResolver,
       AuthorizationService authorizationService,
       EntityPersister entityPersister,
       Consumer<Note> deleteOrphanImages) {
     this.memoryTrackerRepository = memoryTrackerRepository;
-    this.noteWikiTitleCacheRepository = noteWikiTitleCacheRepository;
-    this.wikiTitleCacheService = wikiTitleCacheService;
+    this.resolvedWikiLinkRepository = resolvedWikiLinkRepository;
+    this.resolvedWikiLinkService = resolvedWikiLinkService;
     this.wikiLinkResolver = wikiLinkResolver;
     this.authorizationService = authorizationService;
     this.entityPersister = entityPersister;
@@ -84,18 +84,18 @@ final class NoteReferenceHandling {
     sourceNote.setUpdatedAt(updatedAt);
     entityPersister.merge(sourceNote);
     deleteOrphanImages.accept(sourceNote);
-    wikiTitleCacheService.refreshForNote(sourceNote, viewer);
+    resolvedWikiLinkService.refreshForNote(sourceNote, viewer);
     rehomeNoteLevelMemoryTrackerToSourceProperty(
         relationNote, sourceNote, addResult.resolvedKey(), viewer);
   }
 
   void removeNoteLinksFromReferrerProperties(Note target, User viewer, Timestamp updatedAt) {
     Map<Note, Set<String>> referrersByLinkTexts = new LinkedHashMap<>();
-    for (NoteWikiTitleCache row :
-        noteWikiTitleCacheRepository.findRowsReferringToNonDeletedNotesForTarget(target.getId())) {
+    for (ResolvedWikiLink row :
+        resolvedWikiLinkRepository.findRowsReferringToNonDeletedNotesForTarget(target.getId())) {
       referrersByLinkTexts
-          .computeIfAbsent(row.getNote(), ignored -> new LinkedHashSet<>())
-          .add(row.getLinkText());
+          .computeIfAbsent(row.getSourceNote(), ignored -> new LinkedHashSet<>())
+          .add(row.getAuthoredLink());
     }
     for (Map.Entry<Note, Set<String>> entry : referrersByLinkTexts.entrySet()) {
       Note referrer = entry.getKey();
@@ -107,7 +107,7 @@ final class NoteReferenceHandling {
                 referrer.setUpdatedAt(updatedAt);
                 entityPersister.merge(referrer);
                 deleteOrphanImages.accept(referrer);
-                wikiTitleCacheService.refreshForNote(referrer, viewer);
+                resolvedWikiLinkService.refreshForNote(referrer, viewer);
               });
     }
   }

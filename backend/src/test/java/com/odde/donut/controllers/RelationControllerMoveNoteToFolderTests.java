@@ -13,7 +13,7 @@ import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.User;
 import com.odde.donut.entities.repositories.NoteRepository;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.donut.services.WikiTitleCacheService;
+import com.odde.donut.services.ResolvedWikiLinkService;
 import java.sql.Timestamp;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,7 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 class RelationControllerMoveNoteToFolderTests extends ControllerTestBase {
   @Autowired NoteRepository noteRepository;
   @Autowired RelationController controller;
-  @Autowired WikiTitleCacheService wikiTitleCacheService;
+  @Autowired ResolvedWikiLinkService resolvedWikiLinkService;
 
   @BeforeEach
   void setup() {
@@ -95,8 +95,8 @@ class RelationControllerMoveNoteToFolderTests extends ControllerTestBase {
     Note mover = makeMe.aNote("Mover").notebook(notebook).content("See [[X]].").please();
     Note referrer =
         makeMe.aNote("Carrier").underSameNotebookAs(mover).content("[[Mover]]").please();
-    wikiTitleCacheService.refreshForNote(referrer, u);
-    wikiTitleCacheService.refreshForNote(mover, u);
+    resolvedWikiLinkService.refreshForNote(referrer, u);
+    resolvedWikiLinkService.refreshForNote(mover, u);
 
     controller.moveNoteToFolder(mover, folder);
 

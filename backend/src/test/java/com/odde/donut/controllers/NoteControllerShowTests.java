@@ -10,7 +10,7 @@ import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.User;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.donut.services.WikiTitleCacheService;
+import com.odde.donut.services.ResolvedWikiLinkService;
 import com.odde.donut.services.httpQuery.HttpClientAdapter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,7 +19,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 class NoteControllerShowTests extends ControllerTestBase {
   @Autowired NoteController controller;
-  @Autowired WikiTitleCacheService wikiTitleCacheService;
+  @Autowired ResolvedWikiLinkService resolvedWikiLinkService;
   @MockitoBean HttpClientAdapter httpClientAdapter;
 
   @BeforeEach
@@ -28,7 +28,7 @@ class NoteControllerShowTests extends ControllerTestBase {
   }
 
   private NoteRealm showWithWikiTitles(Note viewer) throws UnexpectedNoAccessRightException {
-    wikiTitleCacheService.refreshForNote(viewer, currentUser.getUser());
+    resolvedWikiLinkService.refreshForNote(viewer, currentUser.getUser());
     return controller.showNote(viewer);
   }
 

@@ -289,8 +289,27 @@ user's perspective.
 
 ### 5. The resolved Wiki-link index uses direct domain names
 
-**Status:** planned  
+**Status:** done  
 **Type:** Structure
+
+**Learnings:**
+- New migration `V300000306` renamed `note_wiki_title_cache` →
+  `resolved_wiki_link` with columns `source_note_id`/`destination_note_id`/
+  `authored_link`; entity/repository/service renamed to `ResolvedWikiLink`/
+  `ResolvedWikiLinkRepository`/`ResolvedWikiLinkService`.
+- Post-change-refactor deleted `NotePropertyIndexTargetNoteBackfill` — a
+  genuinely dead class (zero callers) whose raw SQL referenced the
+  now-dropped table; its confusingly-named test file was actually testing
+  two other backfill classes and was renamed to
+  `NotePropertyIndexTargetNoteResolutionBackfillTest` to match.
+- Refactor also caught a real bug from the mechanical rename: a Vue
+  kebab-case prop binding (`wiki-title-cache-refresh-source-note-id`)
+  in `NoteDeadWikiLinkCreateModal.vue` was left stale after `NoteNewForm`'s
+  prop was renamed to `wikiLinkCacheRefreshSourceNoteId`, silently dropping
+  `sourceNoteId` and breaking cache refresh after creating a note from a
+  dead wiki link. Fixed and confirmed via the E2E scenario that exercises
+  it. Worth double-checking prop bindings specifically (not just
+  declarations) on any future kebab-case rename.
 
 Rename the derived persistence/index subsystem in place without changing which
 rows are stored or when they refresh. The next slice verifies all current index

@@ -13,9 +13,9 @@ import com.odde.donut.controllers.dto.NoteUpdateTitleDTO;
 import com.odde.donut.controllers.dto.TitleRenameReferenceHandling;
 import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Note;
-import com.odde.donut.entities.NoteWikiTitleCache;
 import com.odde.donut.entities.Notebook;
-import com.odde.donut.entities.repositories.NoteWikiTitleCacheRepository;
+import com.odde.donut.entities.ResolvedWikiLink;
+import com.odde.donut.entities.repositories.ResolvedWikiLinkRepository;
 import com.odde.donut.exceptions.ApiException;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import org.junit.jupiter.api.Test;
@@ -23,7 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 class TextContentControllerUpdateNoteTitleInboundWikiReferencesTests
     extends TextContentControllerTestBase {
-  @Autowired NoteWikiTitleCacheRepository noteWikiTitleCacheRepository;
+  @Autowired ResolvedWikiLinkRepository resolvedWikiLinkRepository;
 
   @Test
   void rejectsRenameWithoutReferenceHandlingWhenInboundWikiLinksExist()
@@ -79,12 +79,12 @@ class TextContentControllerUpdateNoteTitleInboundWikiReferencesTests
     makeMe.refresh(inbound.carrier());
     assertThat(inbound.carrier().getContent(), containsString("[[RenamedTarget|custom label]]"));
 
-    NoteWikiTitleCache row =
-        noteWikiTitleCacheRepository
-            .findByNote_IdOrderByIdAsc(inbound.carrier().getId())
+    ResolvedWikiLink row =
+        resolvedWikiLinkRepository
+            .findBySourceNote_IdOrderByIdAsc(inbound.carrier().getId())
             .getFirst();
-    assertThat(row.getLinkText(), equalTo("RenamedTarget|custom label"));
-    assertThat(row.getTargetNote().getId(), equalTo(inbound.target().getId()));
+    assertThat(row.getAuthoredLink(), equalTo("RenamedTarget|custom label"));
+    assertThat(row.getDestinationNote().getId(), equalTo(inbound.target().getId()));
   }
 
   @Test
@@ -133,12 +133,12 @@ class TextContentControllerUpdateNoteTitleInboundWikiReferencesTests
 
     makeMe.refresh(inbound.carrier());
     assertThat(inbound.carrier().getContent(), containsString("[[RenamedTarget|TargetTitle]]"));
-    NoteWikiTitleCache row =
-        noteWikiTitleCacheRepository
-            .findByNote_IdOrderByIdAsc(inbound.carrier().getId())
+    ResolvedWikiLink row =
+        resolvedWikiLinkRepository
+            .findBySourceNote_IdOrderByIdAsc(inbound.carrier().getId())
             .getFirst();
-    assertThat(row.getLinkText(), equalTo("RenamedTarget|TargetTitle"));
-    assertThat(row.getTargetNote().getId(), equalTo(inbound.target().getId()));
+    assertThat(row.getAuthoredLink(), equalTo("RenamedTarget|TargetTitle"));
+    assertThat(row.getDestinationNote().getId(), equalTo(inbound.target().getId()));
   }
 
   @Test

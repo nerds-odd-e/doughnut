@@ -10,14 +10,14 @@ import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.User;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.donut.services.WikiTitleCacheService;
+import com.odde.donut.services.ResolvedWikiLinkService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 class NotebookFolderMoveWikiLinkRewriteControllerTest
     extends NotebookFolderManagementControllerTestBase {
 
-  @Autowired WikiTitleCacheService wikiTitleCacheServiceBean;
+  @Autowired ResolvedWikiLinkService resolvedWikiLinkServiceBean;
 
   @Test
   void crossNotebookFolderMove_rewritesInboundLinksFromOutsideReferrerOnly()
@@ -29,8 +29,8 @@ class NotebookFolderMoveWikiLinkRewriteControllerTest
     makeMe.aNote("Target").folder(folderF).please();
     Note insideReferrer = makeMe.aNote("Inside").folder(folderF).content("[[Target]]").please();
     Note outsideReferrer = makeMe.aNote("Outside").notebook(nbA).content("[[Target]]").please();
-    wikiTitleCacheServiceBean.refreshForNote(insideReferrer, owner);
-    wikiTitleCacheServiceBean.refreshForNote(outsideReferrer, owner);
+    resolvedWikiLinkServiceBean.refreshForNote(insideReferrer, owner);
+    resolvedWikiLinkServiceBean.refreshForNote(outsideReferrer, owner);
 
     controller.moveFolder(nbA, folderF, folderMoveTo(nbB, null));
 
@@ -52,7 +52,7 @@ class NotebookFolderMoveWikiLinkRewriteControllerTest
         makeMe.aNote("Inside").folder(folderF).content("[[Outside]] and [[Peer]].").please();
     makeMe.aNote("Peer").folder(folderF).please();
     makeMe.aNote("Outside").notebook(nbA).please();
-    wikiTitleCacheServiceBean.refreshForNote(insideNote, owner);
+    resolvedWikiLinkServiceBean.refreshForNote(insideNote, owner);
 
     controller.moveFolder(nbA, folderF, folderMoveTo(nbB, null));
 
@@ -69,14 +69,14 @@ class NotebookFolderMoveWikiLinkRewriteControllerTest
     Folder folderF = ownedFolder(oldNb, "F");
     Note noteA = makeMe.aNote("A").folder(folderF).please();
     Note noteB = makeMe.aNote("B").folder(folderF).content("[[F/A]] and [label](/F/A.md)").please();
-    wikiTitleCacheServiceBean.refreshForNote(noteB, owner);
+    resolvedWikiLinkServiceBean.refreshForNote(noteB, owner);
 
     controller.moveFolder(oldNb, folderF, folderMoveTo(newNb, null));
 
     makeMe.refresh(noteB);
     assertThat(noteB.getContent(), equalTo("[[F/A]] and [label](/F/A.md)"));
     assertThat(
-        wikiTitleCacheServiceBean.wikiTitlesForViewer(noteB, owner).stream()
+        resolvedWikiLinkServiceBean.wikiLinksForViewer(noteB, owner).stream()
             .map(WikiLink::getDestinationNoteId)
             .toList(),
         containsInAnyOrder(noteA.getId(), noteA.getId()));

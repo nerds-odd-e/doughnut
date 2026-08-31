@@ -11,7 +11,7 @@ import com.odde.donut.entities.User;
 import com.odde.donut.entities.repositories.ImageRepository;
 import com.odde.donut.entities.repositories.MemoryTrackerRepository;
 import com.odde.donut.entities.repositories.NoteRepository;
-import com.odde.donut.entities.repositories.NoteWikiTitleCacheRepository;
+import com.odde.donut.entities.repositories.ResolvedWikiLinkRepository;
 import com.odde.donut.factoryServices.EntityPersister;
 import com.odde.donut.testability.TestabilitySettings;
 import com.odde.donut.utils.ImageBuilder;
@@ -35,8 +35,8 @@ public class NoteService {
   public NoteService(
       NoteRepository noteRepository,
       MemoryTrackerRepository memoryTrackerRepository,
-      NoteWikiTitleCacheRepository noteWikiTitleCacheRepository,
-      WikiTitleCacheService wikiTitleCacheService,
+      ResolvedWikiLinkRepository resolvedWikiLinkRepository,
+      ResolvedWikiLinkService resolvedWikiLinkService,
       WikiLinkResolver wikiLinkResolver,
       AuthorizationService authorizationService,
       ImageRepository imageRepository,
@@ -50,8 +50,8 @@ public class NoteService {
     this.noteReferenceHandling =
         new NoteReferenceHandling(
             memoryTrackerRepository,
-            noteWikiTitleCacheRepository,
-            wikiTitleCacheService,
+            resolvedWikiLinkRepository,
+            resolvedWikiLinkService,
             wikiLinkResolver,
             authorizationService,
             entityPersister,

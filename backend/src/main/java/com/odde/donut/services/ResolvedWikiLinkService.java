@@ -4,10 +4,10 @@ import com.odde.donut.algorithms.WikiLinkMarkdown;
 import com.odde.donut.algorithms.WikiLinkPropertyMatch;
 import com.odde.donut.controllers.dto.WikiLink;
 import com.odde.donut.entities.Note;
-import com.odde.donut.entities.NoteWikiTitleCache;
 import com.odde.donut.entities.Notebook;
+import com.odde.donut.entities.ResolvedWikiLink;
 import com.odde.donut.entities.User;
-import com.odde.donut.entities.repositories.NoteWikiTitleCacheRepository;
+import com.odde.donut.entities.repositories.ResolvedWikiLinkRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import java.util.ArrayList;
@@ -22,41 +22,41 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-public class WikiTitleCacheService {
+public class ResolvedWikiLinkService {
 
   @PersistenceContext private EntityManager entityManager;
 
-  private final NoteWikiTitleCacheRepository noteWikiTitleCacheRepository;
+  private final ResolvedWikiLinkRepository resolvedWikiLinkRepository;
   private final AuthorizationService authorizationService;
-  private final WikiTitleCacheRefresh wikiTitleCacheRefresh;
+  private final ResolvedWikiLinkRefresh resolvedWikiLinkRefresh;
 
-  public WikiTitleCacheService(
+  public ResolvedWikiLinkService(
       WikiLinkResolver wikiLinkResolver,
-      NoteWikiTitleCacheRepository noteWikiTitleCacheRepository,
+      ResolvedWikiLinkRepository resolvedWikiLinkRepository,
       AuthorizationService authorizationService,
       NotePropertyIndexService notePropertyIndexService,
       NoteAliasIndexService noteAliasIndexService) {
-    this.noteWikiTitleCacheRepository = noteWikiTitleCacheRepository;
+    this.resolvedWikiLinkRepository = resolvedWikiLinkRepository;
     this.authorizationService = authorizationService;
-    this.wikiTitleCacheRefresh =
-        new WikiTitleCacheRefresh(
+    this.resolvedWikiLinkRefresh =
+        new ResolvedWikiLinkRefresh(
             wikiLinkResolver,
-            noteWikiTitleCacheRepository,
+            resolvedWikiLinkRepository,
             notePropertyIndexService,
             noteAliasIndexService);
   }
 
-  public List<WikiLink> wikiTitlesForViewer(Note focusNote, User viewer) {
+  public List<WikiLink> wikiLinksForViewer(Note focusNote, User viewer) {
     List<WikiLink> out = new ArrayList<>();
-    for (NoteWikiTitleCache row :
-        noteWikiTitleCacheRepository.findByNote_IdOrderByIdAsc(focusNote.getId())) {
+    for (ResolvedWikiLink row :
+        resolvedWikiLinkRepository.findBySourceNote_IdOrderByIdAsc(focusNote.getId())) {
       Note resolved = authorizedOutgoingTargetNote(focusNote, row, viewer);
       if (resolved != null) {
         WikiLinkMarkdown.WikiInnerSplit parts =
-            WikiLinkMarkdown.splitAuthoredToken(row.getLinkText());
+            WikiLinkMarkdown.splitAuthoredToken(row.getAuthoredLink());
         out.add(
             new WikiLink(
-                row.getLinkText(),
+                row.getAuthoredLink(),
                 parts.portablePath().format(),
                 parts.displayText(),
                 resolved.getId()));
@@ -67,14 +67,14 @@ public class WikiTitleCacheService {
 
   /**
    * Authorized outgoing wiki-link target notes for viewer (same authorization as {@link
-   * #wikiTitlesForViewer}). Each target note appears once: multiple resolved links that share the
+   * #wikiLinksForViewer}). Each target note appears once: multiple resolved links that share the
    * same target token (with different display text) still yield one outgoing note for graph-style
-   * consumers; {@link #wikiTitlesForViewer} retains one entry per distinct stored link text.
+   * consumers; {@link #wikiLinksForViewer} retains one entry per distinct stored link text.
    */
   public List<Note> outgoingWikiLinkTargetNotesForViewer(Note focusNote, User viewer) {
     List<Note> notes = new ArrayList<>();
     Set<Integer> seenTargetIds = new LinkedHashSet<>();
-    for (WikiLink wt : wikiTitlesForViewer(focusNote, viewer)) {
+    for (WikiLink wt : wikiLinksForViewer(focusNote, viewer)) {
       Integer id = wt.getDestinationNoteId();
       if (id == null || !seenTargetIds.add(id)) {
         continue;
@@ -87,20 +87,20 @@ public class WikiTitleCacheService {
     return List.copyOf(notes);
   }
 
-  private Note authorizedOutgoingTargetNote(Note cacheOwner, NoteWikiTitleCache row, User viewer) {
-    Note target = row.getTargetNote();
+  private Note authorizedOutgoingTargetNote(Note sourceNoteRef, ResolvedWikiLink row, User viewer) {
+    Note target = row.getDestinationNote();
     if (target.getDeletedAt() != null) {
       return null;
     }
     Notebook notebook =
-        target.getNotebook() != null ? target.getNotebook() : cacheOwner.getNotebook();
+        target.getNotebook() != null ? target.getNotebook() : sourceNoteRef.getNotebook();
     if (!authorizationService.userMayReadNotebook(viewer, notebook)) {
       return null;
     }
     Note resolved = entityManager.find(Note.class, target.getId());
     if (resolved == null
         || !WikiLinkPropertyMatch.matchesTargetNoteContent(
-            row.getLinkText(), resolved.getContent())) {
+            row.getAuthoredLink(), resolved.getContent())) {
       return null;
     }
     return resolved;
@@ -116,16 +116,16 @@ public class WikiTitleCacheService {
   }
 
   /**
-   * Walks wiki cache rows targeting {@code focalNote}, dedupes by referring note id, applies {@code
-   * rowMatches} before visibility.
+   * Walks resolved wiki-link rows targeting {@code focalNote}, dedupes by referring note id,
+   * applies {@code rowMatches} before visibility.
    */
   private List<Note> distinctReferrersFromTargetRows(
-      Note focalNote, User viewer, BiPredicate<NoteWikiTitleCache, Note> rowMatches) {
-    List<NoteWikiTitleCache> rows =
-        noteWikiTitleCacheRepository.findRowsReferringToNonDeletedNotesForTarget(focalNote.getId());
+      Note focalNote, User viewer, BiPredicate<ResolvedWikiLink, Note> rowMatches) {
+    List<ResolvedWikiLink> rows =
+        resolvedWikiLinkRepository.findRowsReferringToNonDeletedNotesForTarget(focalNote.getId());
     LinkedHashMap<Integer, Note> distinctOrder = new LinkedHashMap<>();
-    for (NoteWikiTitleCache row : rows) {
-      Integer referrerId = row.getNote().getId();
+    for (ResolvedWikiLink row : rows) {
+      Integer referrerId = row.getSourceNote().getId();
       if (distinctOrder.containsKey(referrerId)) {
         continue;
       }
@@ -141,7 +141,7 @@ public class WikiTitleCacheService {
   }
 
   /**
-   * Referrer notes for {@code focalNote} and {@code viewer}: all wiki-title cache inbound links
+   * Referrer notes for {@code focalNote} and {@code viewer}: all resolved wiki-link inbound links
    * ({@link #inboundReferrerNotesForViewer}), ordered by note id for {@link
    * com.odde.donut.controllers.dto.NoteRealm#getReferences()} (as topologies) and focus context
    * retrieval.
@@ -153,11 +153,11 @@ public class WikiTitleCacheService {
   }
 
   /**
-   * True when at least one non-deleted note has a wiki-title cache row pointing at {@code
+   * True when at least one non-deleted note has a resolved wiki-link row pointing at {@code
    * targetNoteId}. Used to require an explicit reference-handling choice on title rename.
    */
-  public boolean hasInboundWikiTitleCacheRowsFromNonDeletedReferrers(Integer targetNoteId) {
-    return !noteWikiTitleCacheRepository
+  public boolean hasInboundResolvedWikiLinkRowsFromNonDeletedReferrers(Integer targetNoteId) {
+    return !resolvedWikiLinkRepository
         .findRowsReferringToNonDeletedNotesForTarget(targetNoteId)
         .isEmpty();
   }
@@ -182,7 +182,7 @@ public class WikiTitleCacheService {
     return sampleSeed
         .map(
             seed ->
-                noteWikiTitleCacheRepository.findInboundReferrersForTargetBySeedLimited(
+                resolvedWikiLinkRepository.findInboundReferrersForTargetBySeedLimited(
                     focalNote.getId(),
                     focalNotebookId,
                     viewerId,
@@ -191,7 +191,7 @@ public class WikiTitleCacheService {
                     cap))
         .orElseGet(
             () ->
-                noteWikiTitleCacheRepository.findInboundReferrersForTargetByIdAscLimited(
+                resolvedWikiLinkRepository.findInboundReferrersForTargetByIdAscLimited(
                     focalNote.getId(), focalNotebookId, viewerId, excludeIds, cap));
   }
 
@@ -224,6 +224,6 @@ public class WikiTitleCacheService {
 
   @Transactional
   public void refreshForNote(Note note, User viewer) {
-    wikiTitleCacheRefresh.refreshForNote(entityManager, note, viewer);
+    resolvedWikiLinkRefresh.refreshForNote(entityManager, note, viewer);
   }
 }

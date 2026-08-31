@@ -8,27 +8,27 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Table(name = "note_wiki_title_cache")
-public class NoteWikiTitleCache extends EntityIdentifiedByIdOnly {
+@Table(name = "resolved_wiki_link")
+public class ResolvedWikiLink extends EntityIdentifiedByIdOnly {
 
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
-  @JoinColumn(name = "note_id", referencedColumnName = "id", nullable = false)
+  @JoinColumn(name = "source_note_id", referencedColumnName = "id", nullable = false)
   @JsonIgnore
   @Getter
   @Setter
-  private Note note;
+  private Note sourceNote;
 
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
-  @JoinColumn(name = "target_note_id", referencedColumnName = "id", nullable = false)
+  @JoinColumn(name = "destination_note_id", referencedColumnName = "id", nullable = false)
   @JsonIgnore
   @Getter
   @Setter
-  private Note targetNote;
+  private Note destinationNote;
 
-  @Column(name = "link_text", nullable = false, length = 767)
+  @Column(name = "authored_link", nullable = false, length = 767)
   @NotNull
   @Size(max = 767)
   @Getter
   @Setter
-  private String linkText;
+  private String authoredLink;
 }

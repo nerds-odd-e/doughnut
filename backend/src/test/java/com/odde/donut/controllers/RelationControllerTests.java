@@ -12,7 +12,7 @@ import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.User;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.donut.services.WikiTitleCacheService;
+import com.odde.donut.services.ResolvedWikiLinkService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -22,7 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 class RelationControllerTests extends ControllerTestBase {
   @Autowired RelationController controller;
-  @Autowired WikiTitleCacheService wikiTitleCacheService;
+  @Autowired ResolvedWikiLinkService resolvedWikiLinkService;
 
   @BeforeEach
   void setup() {
@@ -100,7 +100,7 @@ class RelationControllerTests extends ControllerTestBase {
               .content(Frontmatter.empty().set("a part of", "v").fenced(""))
               .please();
       Note referrer = makeMe.aNote("Carrier").underSameNotebookAs(target).content(before).please();
-      wikiTitleCacheService.refreshForNote(referrer, u);
+      resolvedWikiLinkService.refreshForNote(referrer, u);
 
       controller.moveNoteToNotebookRootInNotebook(target, nb2);
 
@@ -120,14 +120,14 @@ class RelationControllerTests extends ControllerTestBase {
       Note qualifiedTarget = makeMe.aNote("Y").notebook(nb3).please();
       Note mover =
           makeMe.aNote("Mover").notebook(nb1).content("See [[X]] and [[OtherNb:Y]].").please();
-      wikiTitleCacheService.refreshForNote(mover, u);
+      resolvedWikiLinkService.refreshForNote(mover, u);
 
       controller.moveNoteToNotebookRootInNotebook(mover, nb2);
 
       makeMe.refresh(mover);
       assertThat(mover.getContent(), equalTo("See [[OldNb:X|X]] and [[OtherNb:Y]]."));
       assertThat(
-          wikiTitleCacheService.wikiTitlesForViewer(mover, u).stream()
+          resolvedWikiLinkService.wikiLinksForViewer(mover, u).stream()
               .map(wt -> wt.getDestinationNoteId())
               .toList(),
           containsInAnyOrder(oldTarget.getId(), qualifiedTarget.getId()));
@@ -141,7 +141,7 @@ class RelationControllerTests extends ControllerTestBase {
       Note target = makeMe.aNote("MyNote").notebook(nb1).please();
       Note referrer =
           makeMe.aNote("Carrier").underSameNotebookAs(target).content("[[MyNote]]").please();
-      wikiTitleCacheService.refreshForNote(referrer, u);
+      resolvedWikiLinkService.refreshForNote(referrer, u);
 
       controller.moveNoteToNotebookRootInNotebook(target, nb1);
 
@@ -158,7 +158,7 @@ class RelationControllerTests extends ControllerTestBase {
       Note referrer =
           makeMe.aNote("Carrier").underSameNotebookAs(target).content("[[MyNote]]").please();
       controller.moveNoteToFolder(target, folder);
-      wikiTitleCacheService.refreshForNote(referrer, u);
+      resolvedWikiLinkService.refreshForNote(referrer, u);
 
       controller.moveNoteToNotebookRoot(target);
 

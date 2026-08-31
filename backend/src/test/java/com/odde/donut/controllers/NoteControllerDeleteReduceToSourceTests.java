@@ -10,7 +10,7 @@ import com.odde.donut.entities.MemoryTrackerType;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.repositories.MemoryTrackerRepository;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.donut.services.WikiTitleCacheService;
+import com.odde.donut.services.ResolvedWikiLinkService;
 import com.odde.donut.services.httpQuery.HttpClientAdapter;
 import java.sql.Timestamp;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,7 +21,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 class NoteControllerDeleteReduceToSourceTests extends ControllerTestBase {
   @Autowired MemoryTrackerRepository memoryTrackerRepository;
   @Autowired NoteController controller;
-  @Autowired WikiTitleCacheService wikiTitleCacheService;
+  @Autowired ResolvedWikiLinkService resolvedWikiLinkService;
   @MockitoBean HttpClientAdapter httpClientAdapter;
 
   @BeforeEach
@@ -43,7 +43,7 @@ class NoteControllerDeleteReduceToSourceTests extends ControllerTestBase {
             .underSameNotebookAs(source)
             .asRelationship(relationLabel, source, target)
             .please();
-    wikiTitleCacheService.refreshForNote(relation, currentUser.getUser());
+    resolvedWikiLinkService.refreshForNote(relation, currentUser.getUser());
     return relation;
   }
 

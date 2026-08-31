@@ -19,7 +19,7 @@ class NoteRealmJsonSerializationTest {
 
   @Autowired com.odde.donut.testability.MakeMe makeMe;
   @Autowired NoteRealmService noteRealmService;
-  @Autowired WikiTitleCacheService wikiTitleCacheService;
+  @Autowired ResolvedWikiLinkService resolvedWikiLinkService;
   @Autowired EntityManager entityManager;
 
   @Test
@@ -47,7 +47,7 @@ class NoteRealmJsonSerializationTest {
             .underSameNotebookAs(focal)
             .withWikiLinksInFrontmatter(subject, focal)
             .please();
-    wikiTitleCacheService.refreshForNote(relation, user);
+    resolvedWikiLinkService.refreshForNote(relation, user);
 
     NoteRealm realm = noteRealmService.build(subject, user);
 

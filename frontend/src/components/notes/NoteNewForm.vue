@@ -97,7 +97,7 @@ const props = withDefaults(
     initialTitle?: string
     /** When set, title search is scoped under this note. */
     titleSearchAnchorNote?: Note
-    wikiTitleCacheRefreshSourceNoteId?: number
+    wikiLinkCacheRefreshSourceNoteId?: number
     ancestorFolders?: Folder[]
   }>(),
   { ancestorFolders: () => [] }
@@ -188,9 +188,9 @@ const processForm = async () => {
       notebookId: props.notebookId,
       body,
       folderId: selectedFolder.value?.id ?? undefined,
-      refreshWikiTitleCacheForNoteIds:
-        props.wikiTitleCacheRefreshSourceNoteId != null
-          ? [props.wikiTitleCacheRefreshSourceNoteId]
+      refreshWikiLinkCacheForNoteIds:
+        props.wikiLinkCacheRefreshSourceNoteId != null
+          ? [props.wikiLinkCacheRefreshSourceNoteId]
           : undefined,
       onFieldErrors: (errors) => {
         noteFormErrors.value = errors

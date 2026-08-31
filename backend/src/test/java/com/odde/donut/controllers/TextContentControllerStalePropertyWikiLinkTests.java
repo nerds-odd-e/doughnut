@@ -8,8 +8,8 @@ import static org.hamcrest.Matchers.hasSize;
 import com.odde.donut.algorithms.Frontmatter;
 import com.odde.donut.controllers.dto.NoteRealm;
 import com.odde.donut.entities.Note;
-import com.odde.donut.entities.NoteWikiTitleCache;
-import com.odde.donut.entities.repositories.NoteWikiTitleCacheRepository;
+import com.odde.donut.entities.ResolvedWikiLink;
+import com.odde.donut.entities.repositories.ResolvedWikiLinkRepository;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -18,7 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 class TextContentControllerStalePropertyWikiLinkTests extends TextContentControllerTestBase {
 
   @Autowired NoteController noteController;
-  @Autowired NoteWikiTitleCacheRepository noteWikiTitleCacheRepository;
+  @Autowired ResolvedWikiLinkRepository resolvedWikiLinkRepository;
 
   @Test
   void removingTargetPropertyLeavesReferringPropertyWikiUnresolved()
@@ -60,9 +60,9 @@ class TextContentControllerStalePropertyWikiLinkTests extends TextContentControl
     NoteRealm shown = noteController.showNote(carrier);
     assertThat(shown.getWikiLinks(), hasSize(1));
     assertThat(shown.getWikiLinks().getFirst().getAuthoredLink(), equalTo("Moon"));
-    List<NoteWikiTitleCache> rows = cacheRows(carrier);
+    List<ResolvedWikiLink> rows = cacheRows(carrier);
     assertThat(rows, hasSize(1));
-    assertThat(rows.getFirst().getLinkText(), equalTo("Moon"));
+    assertThat(rows.getFirst().getAuthoredLink(), equalTo("Moon"));
   }
 
   private void assertReferringPropertyWikiUnresolvedAfterMoonContent(String moonContent)
@@ -78,7 +78,7 @@ class TextContentControllerStalePropertyWikiLinkTests extends TextContentControl
     assertThat(cacheRows(carrier), empty());
   }
 
-  private List<NoteWikiTitleCache> cacheRows(Note carrier) {
-    return noteWikiTitleCacheRepository.findByNote_IdOrderByIdAsc(carrier.getId());
+  private List<ResolvedWikiLink> cacheRows(Note carrier) {
+    return resolvedWikiLinkRepository.findBySourceNote_IdOrderByIdAsc(carrier.getId());
   }
 }

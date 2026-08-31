@@ -25,7 +25,7 @@
         :notebookId="notebookId"
         :initial-folder="realmLeafFolder(noteRealm)"
         :initial-title="modelValue.portablePath"
-        :wiki-title-cache-refresh-source-note-id="sourceNoteId"
+        :wiki-link-cache-refresh-source-note-id="sourceNoteId"
         :ancestor-folders="noteRealm.ancestorFolders ?? []"
         @close-dialog="close"
       />

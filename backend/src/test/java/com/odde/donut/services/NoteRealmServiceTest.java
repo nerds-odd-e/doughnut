@@ -7,10 +7,10 @@ import static org.hamcrest.Matchers.hasSize;
 
 import com.odde.donut.controllers.dto.NoteRealm;
 import com.odde.donut.entities.Note;
-import com.odde.donut.entities.NoteWikiTitleCache;
 import com.odde.donut.entities.Notebook;
+import com.odde.donut.entities.ResolvedWikiLink;
 import com.odde.donut.entities.User;
-import com.odde.donut.entities.repositories.NoteWikiTitleCacheRepository;
+import com.odde.donut.entities.repositories.ResolvedWikiLinkRepository;
 import com.odde.donut.testability.MakeMe;
 import java.sql.Timestamp;
 import java.util.stream.Stream;
@@ -31,8 +31,8 @@ class NoteRealmServiceTest {
 
   @Autowired MakeMe makeMe;
   @Autowired NoteRealmService noteRealmService;
-  @Autowired NoteWikiTitleCacheRepository noteWikiTitleCacheRepository;
-  @Autowired WikiTitleCacheService wikiTitleCacheService;
+  @Autowired ResolvedWikiLinkRepository resolvedWikiLinkRepository;
+  @Autowired ResolvedWikiLinkService resolvedWikiLinkService;
 
   User user;
   Notebook notebook;
@@ -69,7 +69,7 @@ class NoteRealmServiceTest {
   void omits_cached_target_when_target_note_is_soft_deleted() {
     Note target = makeMe.aNote().title("Target").notebook(notebook).please();
     Note carrier = makeMe.aNote().notebook(notebook).content("[[Target]]").please();
-    wikiTitleCacheService.refreshForNote(carrier, user);
+    resolvedWikiLinkService.refreshForNote(carrier, user);
 
     softDelete(target);
 
@@ -82,7 +82,7 @@ class NoteRealmServiceTest {
     Note subject = makeMe.aNote().notebook(notebook).please();
     Note relation =
         makeMe.aNote().notebook(notebook).withWikiLinksInFrontmatter(subject, focal).please();
-    noteWikiTitleCacheRepository.deleteByNote_Id(relation.getId());
+    resolvedWikiLinkRepository.deleteBySourceNote_Id(relation.getId());
 
     assertThat(noteRealmService.build(focal, user).getReferences(), empty());
   }
@@ -91,7 +91,7 @@ class NoteRealmServiceTest {
   void body_wikilink_carrier_in_references() {
     Note focal = makeMe.aNote().title("Focal").notebook(notebook).please();
     Note carrier = makeMe.aNote().notebook(notebook).content("[[Focal]]").please();
-    wikiTitleCacheService.refreshForNote(carrier, user);
+    resolvedWikiLinkService.refreshForNote(carrier, user);
 
     NoteRealm realm = noteRealmService.build(focal, user);
 
@@ -109,7 +109,7 @@ class NoteRealmServiceTest {
             .notebook(notebook)
             .content("---\nparent: \"[[Focal]]\"\n---\n\nBody.")
             .please();
-    wikiTitleCacheService.refreshForNote(carrier, user);
+    resolvedWikiLinkService.refreshForNote(carrier, user);
 
     NoteRealm realm = noteRealmService.build(focal, user);
 
@@ -123,7 +123,7 @@ class NoteRealmServiceTest {
     Note subject = makeMe.aNote().notebook(notebook).please();
     Note relation =
         makeMe.aNote().notebook(notebook).withWikiLinksInFrontmatter(subject, focal).please();
-    wikiTitleCacheService.refreshForNote(relation, user);
+    resolvedWikiLinkService.refreshForNote(relation, user);
 
     softDelete(relation);
 
@@ -159,7 +159,7 @@ class NoteRealmServiceTest {
   void references_omit_soft_deleted_carrier_even_if_cache_row_remains() {
     Note focal = makeMe.aNote().title("Focal").notebook(notebook).please();
     Note carrier = makeMe.aNote().notebook(notebook).content("[[Focal]]").please();
-    wikiTitleCacheService.refreshForNote(carrier, user);
+    resolvedWikiLinkService.refreshForNote(carrier, user);
 
     softDelete(carrier);
 
@@ -178,11 +178,11 @@ class NoteRealmServiceTest {
   }
 
   private void persistWikiLink(Note carrier, Note target, String linkText) {
-    NoteWikiTitleCache row = new NoteWikiTitleCache();
-    row.setNote(carrier);
-    row.setTargetNote(target);
-    row.setLinkText(linkText);
-    noteWikiTitleCacheRepository.save(row);
+    ResolvedWikiLink row = new ResolvedWikiLink();
+    row.setSourceNote(carrier);
+    row.setDestinationNote(target);
+    row.setAuthoredLink(linkText);
+    resolvedWikiLinkRepository.save(row);
   }
 
   private void softDelete(Note note) {

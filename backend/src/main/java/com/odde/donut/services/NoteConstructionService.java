@@ -33,7 +33,7 @@ public class NoteConstructionService {
   private final FolderRepository folderRepository;
   private final EntityPersister entityPersister;
   private final NoteRealmService noteRealmService;
-  private final WikiTitleCacheService wikiTitleCacheService;
+  private final ResolvedWikiLinkService resolvedWikiLinkService;
   private final NoteService noteService;
   private final NoteTitlePlacementRules noteTitlePlacementRules;
 
@@ -44,7 +44,7 @@ public class NoteConstructionService {
       FolderRepository folderRepository,
       EntityPersister entityPersister,
       NoteRealmService noteRealmService,
-      WikiTitleCacheService wikiTitleCacheService,
+      ResolvedWikiLinkService resolvedWikiLinkService,
       NoteService noteService,
       NoteTitlePlacementRules noteTitlePlacementRules) {
     this.authorizationService = authorizationService;
@@ -52,7 +52,7 @@ public class NoteConstructionService {
     this.folderRepository = folderRepository;
     this.entityPersister = entityPersister;
     this.noteRealmService = noteRealmService;
-    this.wikiTitleCacheService = wikiTitleCacheService;
+    this.resolvedWikiLinkService = resolvedWikiLinkService;
     this.noteService = noteService;
     this.noteTitlePlacementRules = noteTitlePlacementRules;
   }
@@ -113,7 +113,7 @@ public class NoteConstructionService {
     note = attachWikidataAndRefresh(note, wikidataIdWithApi);
     noteService.deleteOrphanImagesForPersistedContent(note);
     if (noteCreation.getContent() != null || wikidataIdWithApi != null) {
-      wikiTitleCacheService.refreshForNote(note, user);
+      resolvedWikiLinkService.refreshForNote(note, user);
     }
     return noteRealmService.build(note, user);
   }
@@ -142,8 +142,8 @@ public class NoteConstructionService {
 
     noteService.deleteOrphanImagesForPersistedContent(newNote);
     noteService.deleteOrphanImagesForPersistedContent(originalNote);
-    wikiTitleCacheService.refreshForNote(newNote, user);
-    wikiTitleCacheService.refreshForNote(originalNote, user);
+    resolvedWikiLinkService.refreshForNote(newNote, user);
+    resolvedWikiLinkService.refreshForNote(originalNote, user);
 
     return noteRealmService.build(newNote, user);
   }

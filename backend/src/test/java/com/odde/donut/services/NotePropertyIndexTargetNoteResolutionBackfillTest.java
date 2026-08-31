@@ -24,7 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
-class NotePropertyIndexTargetNoteBackfillTest {
+class NotePropertyIndexTargetNoteResolutionBackfillTest {
 
   @Autowired MakeMe makeMe;
   @Autowired EntityManager entityManager;

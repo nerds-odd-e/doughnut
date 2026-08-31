@@ -14,8 +14,8 @@ import com.odde.donut.factoryServices.EntityPersister;
 import com.odde.donut.services.AuthorizationService;
 import com.odde.donut.services.NoteRealmService;
 import com.odde.donut.services.NoteService;
+import com.odde.donut.services.ResolvedWikiLinkService;
 import com.odde.donut.services.WikiLinkRewriteService;
-import com.odde.donut.services.WikiTitleCacheService;
 import com.odde.donut.testability.TestabilitySettings;
 import com.odde.donut.validators.AuthoredNoteContent;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -35,7 +35,7 @@ class TextContentController {
 
   private final AuthorizationService authorizationService;
   private final NoteRealmService noteRealmService;
-  private final WikiTitleCacheService wikiTitleCacheService;
+  private final ResolvedWikiLinkService resolvedWikiLinkService;
   private final WikiLinkRewriteService wikiLinkRewriteService;
   private final NoteService noteService;
 
@@ -44,14 +44,14 @@ class TextContentController {
       TestabilitySettings testabilitySettings,
       AuthorizationService authorizationService,
       NoteRealmService noteRealmService,
-      WikiTitleCacheService wikiTitleCacheService,
+      ResolvedWikiLinkService resolvedWikiLinkService,
       WikiLinkRewriteService wikiLinkRewriteService,
       NoteService noteService) {
     this.entityPersister = entityPersister;
     this.testabilitySettings = testabilitySettings;
     this.authorizationService = authorizationService;
     this.noteRealmService = noteRealmService;
-    this.wikiTitleCacheService = wikiTitleCacheService;
+    this.resolvedWikiLinkService = resolvedWikiLinkService;
     this.wikiLinkRewriteService = wikiLinkRewriteService;
     this.noteService = noteService;
   }
@@ -86,7 +86,8 @@ class TextContentController {
     if (Objects.equals(note.getTitle(), titleDTO.getNewTitle())) {
       return;
     }
-    if (!wikiTitleCacheService.hasInboundWikiTitleCacheRowsFromNonDeletedReferrers(note.getId())) {
+    if (!resolvedWikiLinkService.hasInboundResolvedWikiLinkRowsFromNonDeletedReferrers(
+        note.getId())) {
       return;
     }
     if (titleDTO.getReferenceHandling() != null) {
@@ -114,7 +115,7 @@ class TextContentController {
   private NoteRealm updateNote(
       Note note,
       Consumer<Note> updateFunction,
-      boolean refreshWikiTitleCache,
+      boolean refreshWikiLinks,
       boolean deleteOrphanImagesAfterSave)
       throws UnexpectedNoAccessRightException {
     authorizationService.assertAuthorization(note);
@@ -125,8 +126,8 @@ class TextContentController {
     if (deleteOrphanImagesAfterSave) {
       noteService.deleteOrphanImagesForPersistedContent(note);
     }
-    if (refreshWikiTitleCache) {
-      wikiTitleCacheService.refreshForNote(note, authorizationService.getCurrentUser());
+    if (refreshWikiLinks) {
+      resolvedWikiLinkService.refreshForNote(note, authorizationService.getCurrentUser());
     }
     return noteRealmService.build(note, authorizationService.getCurrentUser());
   }

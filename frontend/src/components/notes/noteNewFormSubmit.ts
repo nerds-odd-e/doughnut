@@ -13,7 +13,7 @@ type NoteCreateApi = {
     body: NoteCreationDto,
     options?: {
       folderId?: number
-      refreshWikiTitleCacheForNoteIds?: number[]
+      refreshWikiLinkCacheForNoteIds?: number[]
     }
   ) => Promise<NoteRealm>
   restoreDeletedNote: (router: Router, noteId: number) => Promise<NoteRealm>
@@ -71,7 +71,7 @@ export async function createNoteFromForm(input: {
   notebookId: number
   body: NoteCreationDto
   folderId?: number
-  refreshWikiTitleCacheForNoteIds?: number[]
+  refreshWikiLinkCacheForNoteIds?: number[]
   onFieldErrors: (errors: { newTitle?: string; wikidataId?: string }) => void
   onSuccess: () => void
 }): Promise<void> {
@@ -82,7 +82,7 @@ export async function createNoteFromForm(input: {
       input.body,
       {
         folderId: input.folderId,
-        refreshWikiTitleCacheForNoteIds: input.refreshWikiTitleCacheForNoteIds,
+        refreshWikiLinkCacheForNoteIds: input.refreshWikiLinkCacheForNoteIds,
       }
     )
     input.onSuccess()

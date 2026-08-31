@@ -32,8 +32,8 @@ erDiagram
     "note" ||--o{ note_creator : "note_id ON DELETE CASCADE"
     "note" ||--o{ note_property_index : "note_id ON DELETE CASCADE"
     "note" ||--o{ note_property_index : "target_note_id ON DELETE SET NULL"
-    "note" ||--o{ note_wiki_title_cache : "note_id ON DELETE CASCADE"
-    "note" ||--o{ note_wiki_title_cache : "target_note_id ON DELETE CASCADE"
+    "note" ||--o{ resolved_wiki_link : "destination_note_id ON DELETE CASCADE"
+    "note" ||--o{ resolved_wiki_link : "source_note_id ON DELETE CASCADE"
     notebook ||--o{ bazaar_notebook : "notebook_id ON DELETE NO ACTION"
     notebook ||--o{ book : "notebook_id ON DELETE CASCADE"
     notebook ||--o{ folder : "notebook_id ON DELETE CASCADE"
@@ -177,11 +177,6 @@ erDiagram
         int note_id FK
         int target_note_id FK
     }
-    note_wiki_title_cache {
-        int id PK
-        int note_id FK
-        int target_note_id FK
-    }
     notebook {
         int id PK
         int ownership_id FK
@@ -220,6 +215,11 @@ erDiagram
         int memory_tracker_id FK
         int mcq_id FK
         int answer_id FK
+    }
+    resolved_wiki_link {
+        int id PK
+        int source_note_id FK
+        int destination_note_id FK
     }
     shedlock {
         string name PK

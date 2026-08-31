@@ -2,7 +2,7 @@ package com.odde.donut.services.focusContext;
 
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.User;
-import com.odde.donut.services.WikiTitleCacheService;
+import com.odde.donut.services.ResolvedWikiLinkService;
 import com.odde.donut.testability.MakeMe;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,10 +25,10 @@ abstract class FocusContextRetrievalTestBase {
 
   @Autowired MakeMe makeMe;
   @Autowired FocusContextRetrievalService service;
-  @Autowired WikiTitleCacheService wikiTitleCacheService;
+  @Autowired ResolvedWikiLinkService resolvedWikiLinkService;
 
   void refreshWikiCache(Note note, User viewer) {
-    wikiTitleCacheService.refreshForNote(note, viewer);
+    resolvedWikiLinkService.refreshForNote(note, viewer);
   }
 
   /** Folder peer: retrieval path ends at the anchor ({@code size == depth}). */

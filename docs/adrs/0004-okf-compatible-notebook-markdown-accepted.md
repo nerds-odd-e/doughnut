@@ -126,12 +126,12 @@ profile. Codec round-trips must be lossless for these rules.
   in titles; this profile does not add escaping for it.
 - No active conversion of stored `[[…]]` ↔ `[…](…)`, including save/paste
   round-trip of path Markdown. ZIP export copies stored spelling. 
-- Both spellings share one resolved-link cache `(note, target_note,
-  link_text)`. No style column. No second cache. Strip `#prop:…` to
-  resolve the note; decode the suffix and require that exact property on
-  the resolved note. `link_text` includes the encoded `#prop:` suffix.
-  A cached row must not keep a property link live after the target
-  property is removed or renamed.
+- Both spellings share one resolved wiki-link index `(source_note,
+  destination_note, authored_link)`. No style column. No second index.
+  Strip `#prop:…` to resolve the note; decode the suffix and require that
+  exact property on the resolved note. `authored_link` includes the
+  encoded `#prop:` suffix. A resolved row must not keep a property link
+  live after the target property is removed or renamed.
 
 ### Validation
 

@@ -9,8 +9,8 @@ import com.odde.donut.entities.*;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.services.MemoryTrackerService;
 import com.odde.donut.services.RecallService;
+import com.odde.donut.services.ResolvedWikiLinkService;
 import com.odde.donut.services.UserService;
-import com.odde.donut.services.WikiTitleCacheService;
 import com.odde.donut.services.httpQuery.HttpClientAdapter;
 import java.sql.Timestamp;
 import java.time.ZoneId;
@@ -25,7 +25,7 @@ class NoteControllerDeleteTests extends ControllerTestBase {
   @Autowired RecallService recallService;
   @Autowired MemoryTrackerService memoryTrackerService;
   @Autowired UserService userService;
-  @Autowired WikiTitleCacheService wikiTitleCacheService;
+  @Autowired ResolvedWikiLinkService resolvedWikiLinkService;
   @MockitoBean HttpClientAdapter httpClientAdapter;
 
   @BeforeEach
@@ -55,7 +55,7 @@ class NoteControllerDeleteTests extends ControllerTestBase {
             .underSameNotebookAs(target)
             .content("---\nsource: \"[[Referrer]]\"\ntarget: \"[[Target]]\"\n---\nBody [[Target]]")
             .please();
-    wikiTitleCacheService.refreshForNote(referrer, currentUser.getUser());
+    resolvedWikiLinkService.refreshForNote(referrer, currentUser.getUser());
 
     controller.deleteNote(target, removeFromPropertiesDeleteRequest());
 

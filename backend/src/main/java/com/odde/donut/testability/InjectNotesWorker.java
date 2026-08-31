@@ -12,7 +12,7 @@ import com.odde.donut.entities.repositories.FolderRepository;
 import com.odde.donut.entities.repositories.NotebookRepository;
 import com.odde.donut.factoryServices.EntityPersister;
 import com.odde.donut.services.NotebookService;
-import com.odde.donut.services.WikiTitleCacheService;
+import com.odde.donut.services.ResolvedWikiLinkService;
 import com.odde.donut.testability.model.NotesTestData;
 import com.odde.donut.testability.model.NotesTestData.NoteTestData;
 import java.sql.Timestamp;
@@ -36,7 +36,7 @@ class InjectNotesWorker {
   @Autowired TestabilitySettings testabilitySettings;
   @Autowired NotebookService notebookService;
   @Autowired FolderRepository folderRepository;
-  @Autowired WikiTitleCacheService wikiTitleCacheService;
+  @Autowired ResolvedWikiLinkService resolvedWikiLinkService;
 
   Map<String, Integer> inject(NotesTestData notesTestData, User user) {
     if (Strings.isEmpty(notesTestData.getNotebookName())) {
@@ -58,7 +58,7 @@ class InjectNotesWorker {
     applyExplicitFolderPlacements(injections, titleNoteMap, currentUTCTimestamp);
     notesTestData.saveByOriginalOrder(titleNoteMap, this.entityPersister);
     for (Note note : titleNoteMap.values()) {
-      wikiTitleCacheService.refreshForNote(note, user);
+      resolvedWikiLinkService.refreshForNote(note, user);
     }
     return titleNoteMap.values().stream()
         .collect(Collectors.toMap(note -> note.getTitle(), Note::getId));

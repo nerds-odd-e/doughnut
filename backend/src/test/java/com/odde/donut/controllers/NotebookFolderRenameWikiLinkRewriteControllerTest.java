@@ -10,7 +10,7 @@ import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.User;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.donut.services.WikiTitleCacheService;
+import com.odde.donut.services.ResolvedWikiLinkService;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 class NotebookFolderRenameWikiLinkRewriteControllerTest
     extends NotebookFolderManagementControllerTestBase {
 
-  @Autowired WikiTitleCacheService wikiTitleCacheServiceBean;
+  @Autowired ResolvedWikiLinkService resolvedWikiLinkServiceBean;
 
   @ParameterizedTest
   @CsvSource({
@@ -36,7 +36,7 @@ class NotebookFolderRenameWikiLinkRewriteControllerTest
         .content(Frontmatter.empty().set("a part of", "v").fenced(""))
         .please();
     Note carrier = makeMe.aNote("Carrier").notebook(nb).content(before).please();
-    wikiTitleCacheServiceBean.refreshForNote(carrier, owner);
+    resolvedWikiLinkServiceBean.refreshForNote(carrier, owner);
 
     FolderRenameRequest req = new FolderRenameRequest();
     req.setName("NewFolder");

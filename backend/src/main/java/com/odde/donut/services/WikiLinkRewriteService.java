@@ -6,7 +6,7 @@ import com.odde.donut.entities.DisplayName;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.User;
-import com.odde.donut.entities.repositories.NoteWikiTitleCacheRepository;
+import com.odde.donut.entities.repositories.ResolvedWikiLinkRepository;
 import com.odde.donut.factoryServices.EntityPersister;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -21,22 +21,22 @@ import org.springframework.transaction.annotation.Transactional;
 public class WikiLinkRewriteService {
   @PersistenceContext private EntityManager entityManager;
 
-  private final NoteWikiTitleCacheRepository noteWikiTitleCacheRepository;
+  private final ResolvedWikiLinkRepository resolvedWikiLinkRepository;
   private final EntityPersister entityPersister;
-  private final WikiTitleCacheService wikiTitleCacheService;
+  private final ResolvedWikiLinkService resolvedWikiLinkService;
 
   public WikiLinkRewriteService(
-      NoteWikiTitleCacheRepository noteWikiTitleCacheRepository,
+      ResolvedWikiLinkRepository resolvedWikiLinkRepository,
       EntityPersister entityPersister,
-      WikiTitleCacheService wikiTitleCacheService) {
-    this.noteWikiTitleCacheRepository = noteWikiTitleCacheRepository;
+      ResolvedWikiLinkService resolvedWikiLinkService) {
+    this.resolvedWikiLinkRepository = resolvedWikiLinkRepository;
     this.entityPersister = entityPersister;
-    this.wikiTitleCacheService = wikiTitleCacheService;
+    this.resolvedWikiLinkService = resolvedWikiLinkService;
   }
 
   /**
-   * Rewrites inbound wiki links and rebuilds each changed referrer's wiki-title cache. Persists the
-   * renamed note's new title first so updated referrer tokens resolve.
+   * Rewrites inbound wiki links and rebuilds each changed referrer's resolved wiki-link index.
+   * Persists the renamed note's new title first so updated referrer tokens resolve.
    */
   @Transactional
   public void rewriteInboundWikiLinksForTitleRename(
@@ -170,7 +170,7 @@ public class WikiLinkRewriteService {
     WikiLinkRewriteSupport.applyOutgoingNotebookMoveRewrite(
         entityManager,
         entityPersister,
-        wikiTitleCacheService,
+        resolvedWikiLinkService,
         movedNote,
         sourceNotebookName,
         updatedAt,
@@ -186,9 +186,9 @@ public class WikiLinkRewriteService {
       Set<Integer> excludedReferrerIds) {
     WikiLinkRewriteSupport.applyInboundReferrerRewrite(
         entityManager,
-        noteWikiTitleCacheRepository,
+        resolvedWikiLinkRepository,
         entityPersister,
-        wikiTitleCacheService,
+        resolvedWikiLinkService,
         targetNote,
         updatedAt,
         viewer,

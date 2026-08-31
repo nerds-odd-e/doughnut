@@ -7,9 +7,9 @@ import com.odde.donut.algorithms.WikiLinkMarkdown;
 import com.odde.donut.algorithms.WikiLinkMarkdownRewrite;
 import com.odde.donut.controllers.dto.FolderTrailSegments;
 import com.odde.donut.entities.Note;
-import com.odde.donut.entities.NoteWikiTitleCache;
+import com.odde.donut.entities.ResolvedWikiLink;
 import com.odde.donut.entities.User;
-import com.odde.donut.entities.repositories.NoteWikiTitleCacheRepository;
+import com.odde.donut.entities.repositories.ResolvedWikiLinkRepository;
 import com.odde.donut.factoryServices.EntityPersister;
 import jakarta.persistence.EntityManager;
 import java.sql.Timestamp;
@@ -46,23 +46,23 @@ final class WikiLinkRewriteSupport {
 
   static void applyInboundReferrerRewrite(
       EntityManager entityManager,
-      NoteWikiTitleCacheRepository noteWikiTitleCacheRepository,
+      ResolvedWikiLinkRepository resolvedWikiLinkRepository,
       EntityPersister entityPersister,
-      WikiTitleCacheService wikiTitleCacheService,
+      ResolvedWikiLinkService resolvedWikiLinkService,
       Note targetNote,
       Timestamp updatedAt,
       User viewer,
       UnaryOperator<String> newInnerFromLinkText,
       Set<Integer> excludedReferrerIds) {
     Integer targetId = targetNote.getId();
-    List<NoteWikiTitleCache> rows =
-        noteWikiTitleCacheRepository.findRowsReferringToNonDeletedNotesForTarget(targetId);
+    List<ResolvedWikiLink> rows =
+        resolvedWikiLinkRepository.findRowsReferringToNonDeletedNotesForTarget(targetId);
 
     Map<Integer, LinkedHashSet<String>> linkTextsByReferrer = new LinkedHashMap<>();
-    for (NoteWikiTitleCache row : rows) {
+    for (ResolvedWikiLink row : rows) {
       linkTextsByReferrer
-          .computeIfAbsent(row.getNote().getId(), _ -> new LinkedHashSet<>())
-          .add(row.getLinkText());
+          .computeIfAbsent(row.getSourceNote().getId(), _ -> new LinkedHashSet<>())
+          .add(row.getAuthoredLink());
     }
     List<Integer> referrerIds = new ArrayList<>(linkTextsByReferrer.keySet());
     Collections.sort(referrerIds);
@@ -84,14 +84,14 @@ final class WikiLinkRewriteSupport {
       referrer.setContent(content);
       referrer.setUpdatedAt(updatedAt);
       entityPersister.save(referrer);
-      wikiTitleCacheService.refreshForNote(referrer, viewer);
+      resolvedWikiLinkService.refreshForNote(referrer, viewer);
     }
   }
 
   static void applyOutgoingNotebookMoveRewrite(
       EntityManager entityManager,
       EntityPersister entityPersister,
-      WikiTitleCacheService wikiTitleCacheService,
+      ResolvedWikiLinkService resolvedWikiLinkService,
       Note movedNote,
       String sourceNotebookName,
       Timestamp updatedAt,
@@ -123,7 +123,7 @@ final class WikiLinkRewriteSupport {
     movedNote.setContent(content);
     movedNote.setUpdatedAt(updatedAt);
     entityPersister.save(movedNote);
-    wikiTitleCacheService.refreshForNote(movedNote, viewer);
+    resolvedWikiLinkService.refreshForNote(movedNote, viewer);
   }
 
   private static boolean coMovedTargetResolvesFrom(

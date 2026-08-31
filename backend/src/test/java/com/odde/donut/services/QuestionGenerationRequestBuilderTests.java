@@ -28,7 +28,7 @@ class QuestionGenerationRequestBuilderTests {
   @Autowired MakeMe makeMe;
   @Autowired NoteQuestionGenerationService noteQuestionGenerationService;
   @Autowired QuestionGenerationRequestBuilder questionGenerationRequestBuilder;
-  @Autowired WikiTitleCacheService wikiTitleCacheService;
+  @Autowired ResolvedWikiLinkService resolvedWikiLinkService;
   @TestBean CurrentUser currentUser;
 
   private User user;
@@ -59,7 +59,7 @@ class QuestionGenerationRequestBuilderTests {
             + "---\n"
             + "The human body overview.\n";
     Note focus = makeMe.aNote().notebook(target.getNotebook()).content(markdown).please();
-    wikiTitleCacheService.refreshForNote(focus, user);
+    resolvedWikiLinkService.refreshForNote(focus, user);
     return focus;
   }
 
@@ -96,7 +96,7 @@ class QuestionGenerationRequestBuilderTests {
             + "---\n"
             + "The human body overview.\n";
     Note focus = makeMe.aNote().notebook(target.getNotebook()).content(markdown).please();
-    wikiTitleCacheService.refreshForNote(focus, viewer);
+    resolvedWikiLinkService.refreshForNote(focus, viewer);
 
     StructuredResponseCreateParams<GeneratedMcq> request =
         questionGenerationRequestBuilder.buildQuestionGenerationResponseRequest(
