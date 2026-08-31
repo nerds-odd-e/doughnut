@@ -83,5 +83,6 @@ Number sequentially from `0000`. Prefer capability-named titles, not phase numbe
 | [0003](./0003-spaced-repetition-scheduling-policy-accepted.md) | Accepted | Spaced-repetition scheduling policy |
 | [0004](./0004-okf-compatible-notebook-markdown-accepted.md) | Accepted | OKF-compatible notebook Markdown profile |
 | [0005](./0005-web-routes.md) | Proposed | Web routes (SPA, API boundary, wiki-link destinations) |
+| [0006](./0006-consecutive-similar-failure-reports.md) | Proposed | Consecutive similar Failure reports |
 
 Keep this table current when you accept, reject, or supersede an ADR.
