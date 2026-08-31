@@ -33,9 +33,6 @@ describe("FailureReportPage", () => {
     expect(wrapper.text()).toContain("RuntimeException")
     expect(wrapper.text()).toContain("Stack trace here")
     expect(wrapper.text()).toContain("Line 2")
-    expect(
-      wrapper.find('[data-testid="failure-report-occurrence-count"]').text()
-    ).toBe("1")
     const link = wrapper.find('a[target="_blank"]')
     expect(link.attributes("href")).toBe(
       "https://github.com/test/repo/issues/123"

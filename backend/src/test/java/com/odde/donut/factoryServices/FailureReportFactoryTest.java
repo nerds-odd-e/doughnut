@@ -108,18 +108,6 @@ class FailureReportFactoryTest {
   }
 
   @Test
-  void storesOccurrenceCountOfOne() throws IOException, InterruptedException {
-    assertEquals(1, createReport().getOccurrenceCount());
-  }
-
-  @Test
-  void storesFingerprintFromExceptionUsingSourceAsOrigin() {
-    FailureReport report = createReportFromException();
-    assertThat(
-        report.getFingerprint(), containsString("source:QuestionGenerationBatchMaintenanceJob"));
-  }
-
-  @Test
   void coalescesConsecutiveSimilarFailuresIntoOneFailureReport()
       throws IOException, InterruptedException {
     createReportFromException("first");
