@@ -55,6 +55,20 @@ class WikidataControllerTests extends ControllerTestBase {
     }
 
     @Test
+    void encodesWikidataIdThatLooksLikeUriTemplate()
+        throws IOException, InterruptedException, BindException {
+      Mockito.when(httpClientAdapter.getResponseString(any()))
+          .thenReturn(wikidataJson.wikidataEntityJson().entityId("{wikidataId}").please());
+
+      controller.fetchWikidataEntityDataByID("{wikidataId}");
+
+      Mockito.verify(httpClientAdapter)
+          .getResponseString(
+              URI.create(
+                  "https://www.wikidata.org/wiki/Special:EntityData/%7BwikidataId%7D.json"));
+    }
+
+    @Test
     void retrievesEnglishWikipediaLinkWhenPresent()
         throws IOException, InterruptedException, BindException {
       Mockito.when(httpClientAdapter.getResponseString(any()))

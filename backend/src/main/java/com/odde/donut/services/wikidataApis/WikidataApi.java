@@ -56,8 +56,8 @@ public record WikidataApi(QueryBuilder queryBuilder) {
   @SneakyThrows
   public Optional<WikidataEntityData> getWikidataEntityData(String wikidataId) {
     return queryBuilder
-        .path("/wiki/Special:EntityData/" + wikidataId + ".json")
-        .queryResult()
+        .path("/wiki/Special:EntityData/{wikidataId}.json")
+        .queryResult(wikidataId)
         .mapToOptional(WikidataEntityDataHash.class)
         .map(hash -> hash.getWikidataEntity(wikidataId));
   }
