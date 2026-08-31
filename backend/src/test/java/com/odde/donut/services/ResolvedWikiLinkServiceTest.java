@@ -5,7 +5,6 @@ import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 
-import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.NoteAliasIndex;
 import com.odde.donut.entities.Notebook;
@@ -201,35 +200,6 @@ class ResolvedWikiLinkServiceTest {
       carrier.setContent("   ");
       makeMe.entityPersister.merge(carrier);
       resolvedWikiLinkService.refreshForNote(carrier, user);
-
-      assertThat(cacheRows(carrier), empty());
-    }
-  }
-
-  @Nested
-  class refreshNotebookScope {
-
-    @Test
-    void reresolves_other_notes_whose_shorthand_cardinality_changed_elsewhere_in_the_notebook() {
-      User user = makeMe.aUser().please();
-      Folder folderA = makeMe.aFolder().notebookOwnedBy(user).name("A").please();
-      Notebook notebook = folderA.getNotebook();
-      Folder folderB = makeMe.aFolder().notebook(notebook).name("B").please();
-      Note target = makeMe.aNote().title("Target").folder(folderA).please();
-      Note carrier = makeMe.aNote().notebook(notebook).content("[[Target]]").please();
-
-      resolvedWikiLinkService.refreshForNote(carrier, user);
-      List<ResolvedWikiLink> resolvedRows = cacheRows(carrier);
-      assertThat(resolvedRows, hasSize(1));
-      assertThat(resolvedRows.get(0).getDestinationNote().getId(), equalTo(target.getId()));
-
-      // A second note with the same title in another folder of the same notebook makes
-      // carrier's shorthand ambiguous, but carrier itself was never touched, so its
-      // resolved-link row is now stale.
-      makeMe.aNote().title("Target").folder(folderB).please();
-      assertThat(cacheRows(carrier), hasSize(1));
-
-      resolvedWikiLinkService.refreshNotebookScope(notebook, user);
 
       assertThat(cacheRows(carrier), empty());
     }

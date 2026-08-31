@@ -149,6 +149,9 @@ describe("AnsweredSpellingQuestion accidental match", () => {
   it("builds a link as a same-Modal step and returns to the match list after success", async () => {
     const { answeredQuestion, reviewedRealm, matched } =
       accidentalMatchWithOneMatchedNote()
+    mockSdkService(NoteController, "authoredPortablePath", {
+      portablePath: "Matched A",
+    })
     mockSdkService(TextContentController, "updateNoteContent", reviewedRealm)
 
     wrapper = mountAnsweredSpellingQuestion(answeredQuestion, {

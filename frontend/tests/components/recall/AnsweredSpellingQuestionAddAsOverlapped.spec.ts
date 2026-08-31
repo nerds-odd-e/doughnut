@@ -28,6 +28,9 @@ describe("AnsweredSpellingQuestion add as overlapped note", () => {
   it("adds as overlapped note via wiki-link content update without try-again", async () => {
     const { answeredQuestion, reviewedRealm, matchedA, matchedB } =
       accidentalMatchWithTwoMatchedNotes()
+    mockSdkService(NoteController, "authoredPortablePath", {
+      portablePath: "Matched A",
+    })
     const updateSpy = mockSdkService(
       TextContentController,
       "updateNoteContent",

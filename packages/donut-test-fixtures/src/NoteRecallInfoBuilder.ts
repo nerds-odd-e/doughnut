@@ -1,4 +1,7 @@
-import type { MemoryTracker, NoteRecallInfo } from '@generated/donut-backend-api'
+import type {
+  MemoryTracker,
+  NoteRecallInfo,
+} from '@generated/donut-backend-api'
 import Builder from './Builder'
 
 class NoteRecallInfoBuilder extends Builder<NoteRecallInfo> {
