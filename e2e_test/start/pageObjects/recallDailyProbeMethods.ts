@@ -38,7 +38,7 @@ export const recallDailyProbeMethods = () => ({
         )
       })
     })
-    waitUntilAppIsNotBusy()
+    this.expectDailyProbeSaved()
     return this
   },
   completeDailyProbeByTapping() {
@@ -47,7 +47,7 @@ export const recallDailyProbeMethods = () => ({
         'pointerdown'
       )
     })
-    waitUntilAppIsNotBusy()
+    this.expectDailyProbeSaved()
     return this
   },
   expectDailyProbeSpeed(speed: string) {

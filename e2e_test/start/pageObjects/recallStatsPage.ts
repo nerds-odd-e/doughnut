@@ -26,13 +26,11 @@ export const recallStatsPage = () => {
       cy.window().then((win) => {
         const todayIso = new win.Date().toISOString()
         cy.get('[data-testid="daily-probe-speed-polyline"]').should(($el) => {
-          const points = ($el.attr('points') ?? '')
-            .trim()
-            .split(/\s+/)
-            .filter(Boolean)
+          const pointsAttr = ($el.attr('points') ?? '').trim()
+          const points = pointsAttr.split(/\s+/).filter(Boolean)
           expect(
             points.length,
-            `Expected Daily probe speed trend to show ${days} day(s), but found ${points.length} (browser ${todayIso})`
+            `Expected Daily probe speed trend to show ${days} day(s), but found ${points.length} (browser ${todayIso}; points="${pointsAttr}")`
           ).to.equal(days)
         })
       })
