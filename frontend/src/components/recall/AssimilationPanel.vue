@@ -3,7 +3,6 @@
     :note="note"
     :note-info-loaded="noteInfoLoaded"
     :assimilate-disabled="assimilateDisabled"
-    @level-changed="emit('reloadNeeded')"
     @assimilate="onAssimilate"
     @skip="onSkip"
     @revive="onRevive"

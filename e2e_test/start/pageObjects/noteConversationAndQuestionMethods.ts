@@ -4,7 +4,6 @@ import {
   assimilateButtonSelector,
 } from './assimilationPage'
 import { assumeConversationAboutNotePage } from './conversationAboutNotePage'
-import { form } from '../forms'
 import { addQuestionPage } from './addQuestionPage'
 import { questionListPage } from './questionListPage'
 import { toolbarButton } from './toolbarButton'
@@ -71,11 +70,7 @@ export const noteConversationAndQuestionMethods = () => ({
     return assumeAssimilationPage()
   },
   setLevel(level: number) {
-    this.openAssimilationSettings()
-    form.getField('Level').within(() => {
-      cy.findByRole('button', { name: `${level}` }).click()
-    })
-    waitUntilAppIsNotBusy()
+    this.addRichNoteProperty('note_level', `${level}`)
     return this
   },
   expectWithoutAssimilationPanel() {

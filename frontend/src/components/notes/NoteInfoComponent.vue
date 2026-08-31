@@ -1,11 +1,4 @@
 <template>
-  <NoteRecallSettingForm
-    v-bind="{
-      noteId: note.id,
-      noteRecallSetting: recallSetting,
-    }"
-    @level-changed="$emit('levelChanged', $event)"
-  />
   <h6 v-if="listedMemoryTrackers.length">Memory Trackers</h6>
   <table v-if="listedMemoryTrackers.length" class="daisy-table daisy-table-bordered">
     <thead>
@@ -32,22 +25,15 @@
 <script setup lang="ts">
 import type {
   MemoryTracker,
-  Note,
   NoteRecallInfo,
 } from "@generated/donut-backend-api"
 import { computed, ref, watch } from "vue"
 import { useRouter } from "vue-router"
 import { isNoteLevelMemoryTracker } from "../recall/assimilationMemoryTrackers"
-import NoteRecallSettingForm from "../recall/NoteRecallSettingForm.vue"
 import NoteInfoMemoryTracker from "./NoteInfoMemoryTracker.vue"
 
 const props = defineProps<{
-  note: Note
   noteRecallInfo: NoteRecallInfo
-}>()
-
-defineEmits<{
-  (e: "levelChanged", value: unknown): void
 }>()
 
 const router = useRouter()
@@ -58,7 +44,6 @@ const listedMemoryTrackers = computed(() =>
     (mt) => isNoteLevelMemoryTracker(mt) || mt.removedFromTracking !== true
   )
 )
-const recallSetting = computed(() => props.noteRecallInfo.recallSetting)
 
 watch(
   () => props.noteRecallInfo.memoryTrackers,

@@ -10,9 +10,7 @@
     </h2>
     <NoteInfoComponent
       v-if="noteRecallInfo"
-      :note="note"
       :note-recall-info="noteRecallInfo"
-      @level-changed="emit('levelChanged', $event)"
     />
     <div class="daisy-divider my-4" />
     <div
@@ -89,7 +87,6 @@ const { note, noteInfoLoaded, assimilateDisabled } = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  (e: "levelChanged", value: unknown): void
   (e: "assimilate", request: AssimilateEvent): void
   (e: "skip", request: { propertyKey?: string }): void
   (e: "revive", request: { propertyKey?: string }): void

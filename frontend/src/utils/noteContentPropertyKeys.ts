@@ -116,6 +116,8 @@ export function propertyKeyMatchesPresetFamily(
       return propertyKeyBaseMatches(key, "aliases")
     case "overlaps":
       return propertyKeyBaseMatches(key, "overlaps")
+    case "note_level":
+      return isNoteLevelPropertyKey(key)
     case "image":
       return isImagePropertyKey(key)
     case "wikidata_id":
@@ -167,12 +169,12 @@ export function nextAvailablePropertyKeyForBase(
   return nextAvailablePropertyKeyFromFamilyKeys(baseKey, familyKeys)
 }
 
-/** Next free key for a preset family, using `key 2`, `key 3`, … when the base is taken. */
-export function nextAvailablePropertyKeyForPreset(
+/** Row keys that already occupy `presetKey`'s family, optionally skipping one row. */
+export function keysInPresetFamily(
   presetKey: string,
   rows: readonly PropertyRow[],
   options?: { excludeRowIndex?: number }
-): string {
+): string[] {
   const familyKeys: string[] = []
   for (let i = 0; i < rows.length; i++) {
     if (options?.excludeRowIndex === i) continue
@@ -181,7 +183,19 @@ export function nextAvailablePropertyKeyForPreset(
     if (!propertyKeyMatchesPresetFamily(k, presetKey)) continue
     familyKeys.push(k)
   }
-  return nextAvailablePropertyKeyFromFamilyKeys(presetKey, familyKeys)
+  return familyKeys
+}
+
+/** Next free key for a preset family, using `key 2`, `key 3`, … when the base is taken. */
+export function nextAvailablePropertyKeyForPreset(
+  presetKey: string,
+  rows: readonly PropertyRow[],
+  options?: { excludeRowIndex?: number }
+): string {
+  return nextAvailablePropertyKeyFromFamilyKeys(
+    presetKey,
+    keysInPresetFamily(presetKey, rows, options)
+  )
 }
 
 /** True when a property key uses the text/list property value dialog (not specialized controls). */

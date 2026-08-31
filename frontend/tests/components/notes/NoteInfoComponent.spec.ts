@@ -13,7 +13,6 @@ describe("NoteInfoComponent", () => {
   })
 
   it("should display skipped note-level memory trackers in the table", () => {
-    const noteRealm = makeMe.aNoteRealm.please()
     const noteRecallInfo = makeMe.aNoteRecallInfo
       .memoryTrackers([
         makeMe.aMemoryTracker
@@ -27,7 +26,6 @@ describe("NoteInfoComponent", () => {
     wrapper = helper
       .component(NoteInfoComponent)
       .withProps({
-        note: noteRealm.note,
         noteRecallInfo,
       })
       .withRouter()
@@ -38,7 +36,6 @@ describe("NoteInfoComponent", () => {
   })
 
   it("should omit skipped property memory trackers from the table", () => {
-    const noteRealm = makeMe.aNoteRealm.please()
     const noteRecallInfo = makeMe.aNoteRecallInfo
       .memoryTrackers([
         makeMe.aMemoryTracker
@@ -51,7 +48,6 @@ describe("NoteInfoComponent", () => {
     wrapper = helper
       .component(NoteInfoComponent)
       .withProps({
-        note: noteRealm.note,
         noteRecallInfo,
       })
       .withRouter()
@@ -61,7 +57,6 @@ describe("NoteInfoComponent", () => {
   })
 
   it("should show ordinary and commissioned memory trackers together", () => {
-    const noteRealm = makeMe.aNoteRealm.please()
     const noteRecallInfo = makeMe.aNoteRecallInfo
       .memoryTrackers([
         makeMe.aMemoryTracker.please(),
@@ -72,7 +67,6 @@ describe("NoteInfoComponent", () => {
     wrapper = helper
       .component(NoteInfoComponent)
       .withProps({
-        note: noteRealm.note,
         noteRecallInfo,
       })
       .withRouter()
@@ -87,7 +81,6 @@ describe("NoteInfoComponent", () => {
       .id(123)
       .removedFromTracking(true)
       .please()
-    const noteRealm = makeMe.aNoteRealm.please()
     const noteRecallInfo = makeMe.aNoteRecallInfo
       .memoryTrackers([skippedMemoryTracker])
       .please()
@@ -95,7 +88,6 @@ describe("NoteInfoComponent", () => {
     wrapper = helper
       .component(NoteInfoComponent)
       .withProps({
-        note: noteRealm.note,
         noteRecallInfo,
       })
       .withRouter()
@@ -116,7 +108,6 @@ describe("NoteInfoComponent", () => {
   })
 
   it("should display memory trackers table when there are memory trackers", () => {
-    const noteRealm = makeMe.aNoteRealm.please()
     const noteRecallInfo = makeMe.aNoteRecallInfo
       .memoryTrackers([makeMe.aMemoryTracker.please()])
       .please()
@@ -124,7 +115,6 @@ describe("NoteInfoComponent", () => {
     wrapper = helper
       .component(NoteInfoComponent)
       .withProps({
-        note: noteRealm.note,
         noteRecallInfo,
       })
       .withRouter()
@@ -139,13 +129,11 @@ describe("NoteInfoComponent", () => {
   })
 
   it("should not display memory trackers table when there are no memory trackers", () => {
-    const noteRealm = makeMe.aNoteRealm.please()
     const noteRecallInfo = makeMe.aNoteRecallInfo.please()
 
     wrapper = helper
       .component(NoteInfoComponent)
       .withProps({
-        note: noteRealm.note,
         noteRecallInfo,
       })
       .withRouter()

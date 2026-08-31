@@ -42,7 +42,7 @@ describe("richModeKeyDropdownPresetKeysForPropertyRows", () => {
     ).toEqual(defaults.map((k) => (k === "example of" ? "example of 3" : k)))
   })
 
-  it("omits occupied aliases and overlaps instead of suggesting a suffixed key", () => {
+  it("omits occupied aliases, overlaps, and note_level instead of suggesting a suffixed key", () => {
     const defaults = richModeKeyDropdownPresetKeys(false)
     expect(
       richModeKeyDropdownPresetKeysForPropertyRows(false, [
@@ -54,6 +54,11 @@ describe("richModeKeyDropdownPresetKeysForPropertyRows", () => {
         propertyRowWithScalar("overlaps", "[[Other]]"),
       ])
     ).toEqual(defaults.filter((k) => k !== "overlaps"))
+    expect(
+      richModeKeyDropdownPresetKeysForPropertyRows(false, [
+        propertyRowWithScalar("note_level", "2"),
+      ])
+    ).toEqual(defaults.filter((k) => k !== "note_level"))
   })
 
   it("ignores rows with empty keys", () => {
@@ -71,6 +76,7 @@ describe("richModeKeyDropdownPresetKeys", () => {
     expect(richModeKeyDropdownPresetKeys(false)).toEqual([
       "aliases",
       "overlaps",
+      "note_level",
       "image",
       "wikidata_id",
       "url",

@@ -1,6 +1,6 @@
 # Note level as frontmatter `note_level`
 
-**Status:** in progress (slices 1–5 done)
+**Status:** in progress (slices 1–6 done)
 
 ## Goal
 
@@ -8,10 +8,10 @@
 
 ## Live system (today)
 
-- `note.level` is a `tinyint NOT NULL DEFAULT 0` column, mapped as embedded `NoteRecallSetting` on `Note`.
-- Assimilation order (SQL and in-memory `AssimilationUnit.ORDER`) is cached `note_level` (`COALESCE` missing = 0), then `createdAt`, then `id` (then property grain). Radios still dual-write YAML + cache.
-- Users set it with radios **0–6** labeled “Level” inside Assimilation settings (`NoteRecallSettingForm` → `POST /api/notes/{note}/recall-setting`).
-- E2E: `e2e_test/features/assimilation/edit_when_assimilating.feature` (“Update recall level while assimilating”) opens those radios.
+- `note.level` / `NoteRecallSetting` / `updateNoteRecallSetting` remain until slice 7; the UI no longer uses them.
+- Assimilation order is cached `note_level` (`COALESCE` missing = 0), then `createdAt`, then `id` (then property grain).
+- Users set level via note-only preset `note_level` (typed scalar, no picker).
+- E2E `edit_when_assimilating` uses the property editor (`addRichNoteProperty('note_level', …)`).
 - Other frontmatter caches already refresh on content save/create via `ResolvedWikiLinkRefresh` (`note_property_index`, `note_alias_index`).
 - Structural / passthrough keys (including `note_level`) are excluded from `note_property_index` and automatic property trackers. `note_level_index` refreshes on content save; queue reads the cache.
 
@@ -86,18 +86,9 @@ Unassimilated JPQL `LEFT JOIN` + `COALESCE`; `AssimilationUnit` carries cached l
 
 Whole content write rejected (`AuthoredNoteContent` + rich row validation). Message on field `note_level`. Absence still saves (level 0). Valid 1–6 and `"1"`–`"6"` persist. `note_level` is scalar-only.
 
-### 6. Level control leaves Assimilation settings — Behavior — planned
+### 6. Level control leaves Assimilation settings — Behavior — done
 
-**Pre:** user is on Assimilation settings.  
-**Trigger:** look for Level radios / set level while assimilating.  
-**Post:** no Level radios; memory trackers and assimilate/skip remain. Level is set by adding/editing `note_level` on the note (preset in the property key dropdown).
-
-- Remove `NoteRecallSettingForm` from `NoteInfoComponent` / settings.
-- Add `note_level` to `NOTE_ONLY_PRESET_PROPERTY_KEYS`.
-- Retarget E2E `edit_when_assimilating` (and `setLevel` page object) to the property editor; drop `form.getField('Level')`.
-- Frontend tests for settings (no radios) and preset list. No specialized picker.
-
-**Done when:** that E2E passes without Assimilation settings radios; preset offers `note_level` on notes, not readme.
+Radios gone. `note_level` is a note-only preset (omitted when occupied; not on readme). E2E `setLevel` uses `addRichNoteProperty`. `updateNoteRecallSetting` unused in UI, still present for slice 7.
 
 ### 7. Drop `note.level` and recall-setting API — Structure — planned
 
@@ -112,10 +103,10 @@ Enables nothing user-facing; removes the leftover column after 4–6.
 ## Testing notes
 
 - Queue and save: backend unit tests at AssimilationService / TextContentController (small-test style).
-- Main E2E: `e2e_test/features/assimilation/edit_when_assimilating.feature` (slice 6). Keep it green via dual-write until then.
+- Main E2E: `e2e_test/features/assimilation/edit_when_assimilating.feature` (property editor).
 - Backfill: JDBC tests on the backfill class, not only empty-schema migrate.
 - Do not name product files after this plan number.
 
 ## Resume
 
-Next slice: **6**. Preset can reuse `isNoteLevelPropertyKey`. Dual-write and radios still exist until this slice removes them. E2E `edit_when_assimilating` must move to the property editor.
+Next slice: **7**. Drop leftover `note.level` column, `NoteRecallSetting`, `updateNoteRecallSetting`, and `recallSetting` on `NoteRecallInfo`. Must `pnpm generateTypeScript` and regenerate ERD. Dual-write in `NoteController` becomes dead.

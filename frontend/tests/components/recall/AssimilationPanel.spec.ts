@@ -41,6 +41,16 @@ vi.mock("@/composables/useGoToNextAssimilation", () => ({
 setupAssimilationPanelTests()
 
 describe("AssimilationPanel", () => {
+  it("does not show Level radios in assimilation settings", async () => {
+    const wrapper = await mountAssimilationPanelReady()
+
+    expect(
+      wrapper
+        .find('[data-testid="assimilation-settings"] [role="radiogroup"]')
+        .exists()
+    ).toBe(false)
+  })
+
   it("advances via next assimilation and increments counts when assimilating", async () => {
     assimilateSpy.mockResolvedValue(
       wrapSdkResponse([makeMe.aMemoryTracker.id(1).please()])
