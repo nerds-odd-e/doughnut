@@ -15,14 +15,11 @@ Donut has three URL-shaped languages:
    property links
    ([ADR 0004](./0004-okf-compatible-notebook-markdown-accepted.md))
 
-They look similar (all start with `/`) and are easy to mix. Mixing them
-breaks portability, bookmarks, or in-app navigation. This ADR is the routing
-policy. Path literals live in the SPA route table, OpenAPI, and
+The three languages share a leading `/` and have distinct sources of truth:
+the SPA route table, OpenAPI,
 [`doughnut-routing.json`](../../infra/gcp/path-routing/doughnut-routing.json)
-— not here.
-
-Wiki **spelling and resolution in the tree** stay in ADR 0004. This ADR only
-covers how those links relate to **web** destinations.
+for backend routing exceptions, and ADR 0004 for portable link spelling and
+tree resolution. This ADR defines their web relationships.
 
 ## Decision
 
