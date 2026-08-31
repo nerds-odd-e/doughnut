@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest"
 import { AUTHORED_ALIASES_MESSAGE } from "@/utils/authoredAliasesValidation"
+import { AUTHORED_NOTE_LEVEL_MESSAGE } from "@/utils/authoredNoteLevelValidation"
 import {
   listPropertyValue,
   propertyRowWithScalar,
@@ -84,5 +85,41 @@ describe("validatePropertyRowsForRichEdit", () => {
         { key: "aliases", value: listPropertyValue(["color", "hue"]) },
       ])
     ).toEqual({ ok: true })
+  })
+
+  it("accepts valid note_level scalar rows", () => {
+    expect(
+      validatePropertyRowsForRichEdit([
+        propertyRowWithScalar("note_level", "2"),
+      ])
+    ).toEqual({ ok: true })
+  })
+
+  it("rejects invalid note_level rows", () => {
+    expect(
+      validatePropertyRowsForRichEdit([
+        propertyRowWithScalar("note_level", "0"),
+      ])
+    ).toEqual({ ok: false, message: AUTHORED_NOTE_LEVEL_MESSAGE })
+    expect(
+      validatePropertyRowsForRichEdit([
+        propertyRowWithScalar("note_level", "7"),
+      ])
+    ).toEqual({ ok: false, message: AUTHORED_NOTE_LEVEL_MESSAGE })
+    expect(
+      validatePropertyRowsForRichEdit([
+        propertyRowWithScalar("note_level", "hard"),
+      ])
+    ).toEqual({ ok: false, message: AUTHORED_NOTE_LEVEL_MESSAGE })
+    expect(
+      validatePropertyRowsForRichEdit([
+        { key: "note_level", value: listPropertyValue(["2"]) },
+      ])
+    ).toEqual({ ok: false, message: AUTHORED_NOTE_LEVEL_MESSAGE })
+    expect(
+      validatePropertyRowsForRichEdit([
+        propertyRowWithScalar("note_level 2", "3"),
+      ])
+    ).toEqual({ ok: false, message: AUTHORED_NOTE_LEVEL_MESSAGE })
   })
 })

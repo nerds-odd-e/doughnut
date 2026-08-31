@@ -5,6 +5,7 @@ import {
   authoredListPropertyValidationErrorForPropertyRow,
   isAuthoredListPropertyKey,
 } from "@/utils/authoredListPropertyValidation"
+import { authoredNoteLevelValidationErrorForPropertyRow } from "@/utils/authoredNoteLevelValidation"
 import {
   type NoteProperties,
   type PropertyValue,
@@ -117,9 +118,11 @@ export function validatePropertyRowsForRichEdit(
     seen.add(k)
   }
   for (const row of trimmed) {
-    const listError = authoredListPropertyValidationErrorForPropertyRow(row)
-    if (listError) {
-      return { ok: false, message: listError }
+    const rowError =
+      authoredListPropertyValidationErrorForPropertyRow(row) ??
+      authoredNoteLevelValidationErrorForPropertyRow(row)
+    if (rowError) {
+      return { ok: false, message: rowError }
     }
   }
   return { ok: true }

@@ -1,6 +1,6 @@
 # Note level as frontmatter `note_level`
 
-**Status:** in progress (slices 1–4 done)
+**Status:** in progress (slices 1–5 done)
 
 ## Goal
 
@@ -82,18 +82,9 @@ None. Resolved: no picker; zeros dropped (not stored).
 
 Unassimilated JPQL `LEFT JOIN` + `COALESCE`; `AssimilationUnit` carries cached level. `makeMe.level` writes YAML + refresh. `updateNoteRecallSetting` dual-writes until slice 6.
 
-### 5. Invalid `note_level` cannot be saved — Behavior — planned
+### 5. Invalid `note_level` cannot be saved — Behavior — done
 
-**Pre:** user (or API) sets `note_level` to 0, 7, `"hard"`, a list, etc.  
-**Trigger:** save note content.  
-**Post:** save fails; markdown and cache unchanged. Absent key still saves and means 0.
-
-- `FrontmatterNoteLevel` (read + `authoredValidationError`) wired in `AuthoredNoteContent`.
-- Rich `validatePropertyRowsForRichEdit` / insert commit.
-- Controller-level tests on `TextContentController` content patch; frontend row-validation tests.
-- Loud DB CHECK remains a backstop for cache writes, not the user-facing message.
-
-**Done when:** invalid YAML cannot persist; valid 1–6 still can.
+Whole content write rejected (`AuthoredNoteContent` + rich row validation). Message on field `note_level`. Absence still saves (level 0). Valid 1–6 and `"1"`–`"6"` persist. `note_level` is scalar-only.
 
 ### 6. Level control leaves Assimilation settings — Behavior — planned
 
@@ -127,4 +118,4 @@ Enables nothing user-facing; removes the leftover column after 4–6.
 
 ## Resume
 
-Next slice: **5**. `FrontmatterNoteLevel` parses valid 1–6; `isValidLevel` is private — re-expose what `authoredValidationError` needs. Dual-write stays until radios leave in slice 6. Queue no longer reads `note.level`.
+Next slice: **6**. Preset can reuse `isNoteLevelPropertyKey`. Dual-write and radios still exist until this slice removes them. E2E `edit_when_assimilating` must move to the property editor.

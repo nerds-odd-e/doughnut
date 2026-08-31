@@ -10,12 +10,40 @@ public final class FrontmatterNoteLevel {
 
   private static final String KEY = "note_level";
 
+  public static final String AUTHORED_NOTE_LEVEL_MESSAGE =
+      "note_level must be an integer from 1 to 6.";
+
   private FrontmatterNoteLevel() {}
 
   public static Optional<Integer> fromNoteContent(String content) {
     return NoteContentMarkdown.splitLeadingFrontmatter(content == null ? "" : content)
         .map(NoteContentMarkdown.LeadingFrontmatter::frontmatter)
         .flatMap(FrontmatterNoteLevel::fromFrontmatter);
+  }
+
+  /**
+   * Returns a validation error when {@code content} has an authored {@code note_level} that is not
+   * an integer from 1 to 6. Empty when the key is absent or valid. Suffixed keys ({@code note_level
+   * 2}) are invalid.
+   */
+  public static Optional<String> authoredValidationErrorForNoteContent(String content) {
+    return NoteContentMarkdown.splitLeadingFrontmatter(content == null ? "" : content)
+        .flatMap(lf -> authoredValidationErrorForFrontmatter(lf.frontmatter()));
+  }
+
+  private static Optional<String> authoredValidationErrorForFrontmatter(Frontmatter frontmatter) {
+    for (String key : frontmatter.keys()) {
+      if (!PropertyKeyNaming.isNoteLevelPropertyKey(key)) {
+        continue;
+      }
+      if (PropertyKeyNaming.propertyKeyBaseAndSuffix(key).suffix() != null) {
+        return Optional.of(AUTHORED_NOTE_LEVEL_MESSAGE);
+      }
+      if (frontmatter.getString(key).flatMap(FrontmatterNoteLevel::parseValidLevel).isEmpty()) {
+        return Optional.of(AUTHORED_NOTE_LEVEL_MESSAGE);
+      }
+    }
+    return Optional.empty();
   }
 
   private static Optional<Integer> fromFrontmatter(Frontmatter frontmatter) {

@@ -13,6 +13,7 @@ export function isScalarOnlyStructuralPropertyKey(key: string): boolean {
   if (isWikidataIdPropertyKey(key)) return true
   if (isTitlePatternPropertyKey(key)) return true
   if (isQuestionGenerationInstructionPropertyKey(key)) return true
+  if (isNoteLevelPropertyKey(key)) return true
   return propertyKeyBaseMatches(key, ["type", "relation", "source", "target"])
 }
 
