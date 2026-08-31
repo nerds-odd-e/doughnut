@@ -374,21 +374,17 @@ UI action itself; `property_wiki_link.feature` only covers rendering.
 
 ### 19. Overlap "build a link" uses that path
 
-**Status:** planned
+**Status:** done
 **Type:** Behavior
 
-**Precondition:** The user adds an overlap wiki link from the overlap
-flow.
-**Trigger:** Donut appends the link.
-**Postcondition:** Stored spelling comes from the authoring operation, not
-`buildWikiLinkText` title fallback.
-
-Test first: existing overlap unit/E2E at that flow's boundary.
-
-Verification: the tests that already cover
-`appendOverlapWikiLinkToNoteContent`.
-
-Stop-safe: overlap insert agrees with search insert.
+`appendOverlapWikiLinkToNoteContent` is now async, taking
+`sourceNoteId`/`destinationNoteId` and calling `authoredWikiLinkTokenForInsert`
+instead of `buildWikiLinkText`. `AccidentalMatchResolveDialog.vue`'s
+`addAsOverlappedNote` awaits it. Spec rewritten with a folder-qualified
+colliding-path case proving the switch. `isOverlapAlreadyDeclared`
+deliberately still uses `buildWikiLinkText` for its search-token check
+(converting it would need N concurrent API calls or a batched API — a
+separate design decision, not this slice's scope).
 
 ### 20. Accidental-match "build a link" uses that path
 

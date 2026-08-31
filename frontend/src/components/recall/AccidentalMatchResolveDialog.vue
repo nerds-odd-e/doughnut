@@ -115,10 +115,10 @@ async function addAsOverlappedNote(matchedNoteId: number) {
   const ctx = overlapAppendContext(matchedNoteId)
   if (!ctx) return
 
-  const composed = appendOverlapWikiLinkToNoteContent(
+  const composed = await appendOverlapWikiLinkToNoteContent(
     ctx.content,
-    ctx.target,
-    ctx.source
+    props.reviewedNoteId,
+    ctx.target.noteTopology.id
   )
   if (composed === null) return
 

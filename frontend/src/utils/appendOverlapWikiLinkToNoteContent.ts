@@ -1,15 +1,16 @@
-import { buildWikiLinkText } from "./buildWikiLinkText"
+import { authoredWikiLinkTokenForInsert } from "./sameNotebookWikiLinkAuthoring"
 import { appendItemToFrontmatterStringList } from "./frontmatterStringList"
 
-export function appendOverlapWikiLinkToNoteContent(
+/** Appends a backend-authored Portable-path wiki-link token to the note's `overlaps` frontmatter list. */
+export async function appendOverlapWikiLinkToNoteContent(
   contentMarkdown: string,
-  target: {
-    noteTopology: { title: string }
-    notebookId: number
-    notebookName?: string
-  },
-  source: { notebookId?: number }
-): string | null {
-  const token = buildWikiLinkText(target, { notebookId: source.notebookId })
+  sourceNoteId: number,
+  destinationNoteId: number
+): Promise<string | null> {
+  const token = await authoredWikiLinkTokenForInsert(
+    sourceNoteId,
+    destinationNoteId
+  )
+  if (token === undefined) return null
   return appendItemToFrontmatterStringList(contentMarkdown, "overlaps", token)
 }

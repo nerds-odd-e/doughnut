@@ -1,12 +1,10 @@
-import { describe, it, expect } from "vitest"
+import { describe, it, expect, vi, beforeEach } from "vitest"
+import { NoteController } from "@generated/donut-backend-api/sdk.gen"
+import { mockSdkService } from "@tests/helpers"
 import { appendOverlapWikiLinkToNoteContent } from "@/utils/appendOverlapWikiLinkToNoteContent"
 import { authoredOverlapsValidationErrorForPropertyValue } from "@/utils/authoredOverlapsValidation"
 import { isListPropertyValue, listPropertyValue } from "@/utils/noteProperties"
 import { parseNoteContentMarkdown } from "@/utils/noteContentFrontmatter"
-
-function makeTarget(title: string, notebookId: number, notebookName?: string) {
-  return { noteTopology: { title }, notebookId, notebookName }
-}
 
 function overlapListItems(markdown: string): string[] {
   const parsed = parseNoteContentMarkdown(markdown)
@@ -20,12 +18,16 @@ function overlapListItems(markdown: string): string[] {
 }
 
 describe("appendOverlapWikiLinkToNoteContent", () => {
-  it("appends a whole-item wiki-link under overlaps when content has none", () => {
-    const result = appendOverlapWikiLinkToNoteContent(
-      "## Body\n",
-      makeTarget("Sedation", 1, "NB"),
-      { notebookId: 1 }
-    )
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
+  it("appends the backend-authored wiki-link under overlaps when content has none", async () => {
+    mockSdkService(NoteController, "authoredPortablePath", {
+      portablePath: "Sedation",
+    })
+
+    const result = await appendOverlapWikiLinkToNoteContent("## Body\n", 1, 2)
 
     expect(result).not.toBeNull()
     expect(result).toContain("[[Sedation]]")
@@ -39,45 +41,59 @@ describe("appendOverlapWikiLinkToNoteContent", () => {
     ).toBeUndefined()
   })
 
-  it("appends a qualified wiki-link for cross-notebook targets", () => {
-    const result = appendOverlapWikiLinkToNoteContent(
-      "## Body\n",
-      makeTarget("Deep Note", 2, "Other NB"),
-      { notebookId: 1 }
-    )
+  it("stores the backend-authored folder-qualified path for a colliding target, not a client-reconstructed spelling", async () => {
+    // A shorter client-side reconstruction (e.g. `buildWikiLinkText`) can only ever
+    // produce `Title` or `Notebook:Title`; a folder-qualified path proves the stored
+    // token came from the authoring operation, not that fallback.
+    mockSdkService(NoteController, "authoredPortablePath", {
+      portablePath: "Other NB/Nested/Deep Note",
+    })
 
-    expect(result).toContain("[[Other NB:Deep Note]]")
-    expect(overlapListItems(result!)).toContain("[[Other NB:Deep Note]]")
+    const result = await appendOverlapWikiLinkToNoteContent("## Body\n", 1, 2)
+
+    expect(result).toContain("[[Other NB/Nested/Deep Note]]")
+    expect(overlapListItems(result!)).toContain("[[Other NB/Nested/Deep Note]]")
   })
 
-  it("merges a wiki-link into an existing overlaps list", () => {
+  it("calls the authoring operation with the source and destination note ids", async () => {
+    const spy = mockSdkService(NoteController, "authoredPortablePath", {
+      portablePath: "Sedation",
+    })
+
+    await appendOverlapWikiLinkToNoteContent("## Body\n", 7, 42)
+
+    expect(spy).toHaveBeenCalledWith({
+      path: { note: 7 },
+      query: { destinationNote: 42 },
+    })
+  })
+
+  it("merges a wiki-link into an existing overlaps list", async () => {
+    mockSdkService(NoteController, "authoredPortablePath", {
+      portablePath: "Canine",
+    })
     const markdown = `---
 overlaps:
   - "[[Existing]]"
 ---
 
 # Body`
-    const result = appendOverlapWikiLinkToNoteContent(
-      markdown,
-      makeTarget("Canine", 1, "NB"),
-      { notebookId: 1 }
-    )
+    const result = await appendOverlapWikiLinkToNoteContent(markdown, 1, 2)
 
     expect(overlapListItems(result!)).toEqual(["[[Existing]]", "[[Canine]]"])
   })
 
-  it("leaves aliases untouched when appending an overlap", () => {
+  it("leaves aliases untouched when appending an overlap", async () => {
+    mockSdkService(NoteController, "authoredPortablePath", {
+      portablePath: "Canine",
+    })
     const markdown = `---
 aliases:
   - puppy
 ---
 
 # Body`
-    const result = appendOverlapWikiLinkToNoteContent(
-      markdown,
-      makeTarget("Canine", 1, "NB"),
-      { notebookId: 1 }
-    )
+    const result = await appendOverlapWikiLinkToNoteContent(markdown, 1, 2)
 
     expect(overlapListItems(result!)).toEqual(["[[Canine]]"])
     const parsed = parseNoteContentMarkdown(result!)
@@ -86,34 +102,28 @@ aliases:
     expect(parsed.properties.aliases).toEqual(listPropertyValue(["puppy"]))
   })
 
-  it("returns null when the same wiki-link is already in overlaps", () => {
+  it("returns null when the same wiki-link is already in overlaps", async () => {
+    mockSdkService(NoteController, "authoredPortablePath", {
+      portablePath: "Sedation",
+    })
     const markdown = `---
 overlaps:
   - "[[Sedation]]"
 ---
 
 # Body`
-    expect(
-      appendOverlapWikiLinkToNoteContent(
-        markdown,
-        makeTarget("Sedation", 1, "NB"),
-        { notebookId: 1 }
-      )
-    ).toBeNull()
+    expect(await appendOverlapWikiLinkToNoteContent(markdown, 1, 2)).toBeNull()
   })
 
-  it("returns null when overlaps is not a YAML list", () => {
+  it("returns null when overlaps is not a YAML list", async () => {
+    mockSdkService(NoteController, "authoredPortablePath", {
+      portablePath: "Canine",
+    })
     const markdown = `---
 overlaps: "[[Sedation]]"
 ---
 
 # Body`
-    expect(
-      appendOverlapWikiLinkToNoteContent(
-        markdown,
-        makeTarget("Canine", 1, "NB"),
-        { notebookId: 1 }
-      )
-    ).toBeNull()
+    expect(await appendOverlapWikiLinkToNoteContent(markdown, 1, 2)).toBeNull()
   })
 })
