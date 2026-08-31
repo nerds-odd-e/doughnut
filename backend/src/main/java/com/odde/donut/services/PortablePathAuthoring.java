@@ -23,7 +23,7 @@ public class PortablePathAuthoring {
     List<String> folders = FolderTrailSegments.namesFromRootToContainingFolder(note);
     String title = note.getTitle();
     if (folders.isEmpty()) {
-      return title;
+      return "/" + title;
     }
     return String.join("/", folders) + "/" + title;
   }

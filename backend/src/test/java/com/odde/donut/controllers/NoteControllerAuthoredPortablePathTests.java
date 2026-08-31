@@ -45,4 +45,20 @@ class NoteControllerAuthoredPortablePathTests extends ControllerTestBase {
 
     assertThat(authored.portablePath(), equalTo("Solar/Moon#prop:topic"));
   }
+
+  @Test
+  void shouldAuthorExactRootPathWhenRootDisplayNameIsAmbiguousAsShorthand()
+      throws UnexpectedNoAccessRightException {
+    Note destination =
+        makeMe.aNote().notebookOwnedBy(currentUser.getUser()).title("WikiDup Shared").please();
+    Folder pantry =
+        makeMe.aFolder().notebook(destination.getNotebook()).name("WikiDup Pantry").please();
+    makeMe.aNote().title("WikiDup Shared").folder(pantry).please();
+    Note source = makeMe.aNote().notebook(destination.getNotebook()).please();
+
+    AuthoredPortablePath authored =
+        controller.authoredPortablePath(source, destination, "WikiDup Shared");
+
+    assertThat(authored.portablePath(), equalTo("/WikiDup Shared"));
+  }
 }

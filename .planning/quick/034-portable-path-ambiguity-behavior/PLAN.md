@@ -35,8 +35,9 @@ and Donut asks for a longer path.
   `NoteUnresolvedWikiLinkModal` (guidance + “Point at an existing note”; no
   create-note). Confirming a destination calls
   `GET /api/notes/{note}/authored-portable-path` and replaces the shorthand
-  with the returned full folder path (display text and `#prop:` preserved).
-  `/Title` and insert/paste still use `buildWikiLinkText`.
+  with the returned full folder path, or `/Title` for a notebook-root
+  destination (display text and `#prop:` preserved). Insert/paste still use
+  `buildWikiLinkText`.
 - Exact path-shaped Portable paths already match folder trail plus display
   name (`ResolvedWikiLinkTitleResolutionTest` path-markdown / folder-path
   cases). Property validity is already checked after note resolution.
@@ -204,25 +205,12 @@ Display text and `#prop:` preserved. Insert still uses `buildWikiLinkText`.
 
 ### 9. A root-note collision is authored as `/Title`
 
-**Status:** planned
+**Status:** done
 **Type:** Behavior
 
-**Precondition:** The selected destination is a notebook-root note whose
-display name is ambiguous as shorthand.
-**Trigger:** Donut authors the Portable path for that note.
-**Postcondition:** The stored path is `/Title` (wiki `[[/Title]]`), not
-another shorthand.
-
-Test first: one authoring/controller case; extend E2E only if slice 8's
-scenario cannot reuse the same flow. Extend
-`PortablePathAuthoring.authoredPortablePath` (do not add a second authoring
-API).
-
-Update ADR 0004's exact-root fallback wording only after this passes.
-
-Verification: `pnpm backend:test_only`; focused E2E if added.
-
-Stop-safe: the otherwise unlengthenable root collision has a product spelling.
+Empty folder trail → `/Title` from `PortablePathAuthoring` (lengthened
+exact-root spelling). Uniqueness/shorthand is slice 10. ADR 0004 records
+the exact-root fallback. Controller test for colliding root display name.
 
 ### 10. Inserting a same-notebook Wiki link uses the shortest unambiguous path
 
@@ -238,9 +226,12 @@ name/alias → full normalized path from slice 8's operation.
 Test first: extend `wiki_link.feature` insert; frontend tests must not
 re-implement uniqueness (they assert the backend-returned `portablePath`).
 
-Implementation: SearchForm body insert consumes the authoring operation.
-Do not convert overlap, accidental-match, paste, or property insert yet.
-Remove title-only fallback on this path.
+Implementation: SearchForm body insert consumes
+`GET /api/notes/{note}/authored-portable-path` /
+`PortablePathAuthoring`. Unique display name → shorthand; colliding →
+lengthened path (`Folder/Title` or `/Title`). Do not convert overlap,
+accidental-match, paste, or property insert yet. Remove title-only
+fallback on this path. Frontend tests must not re-implement uniqueness.
 
 Verification: focused frontend insert specs; `wiki_link.feature`.
 

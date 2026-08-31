@@ -94,10 +94,12 @@ profile. Codec round-trips must be lossless for these rules.
 - Path Markdown `[display-text](/folder/File.md)` is the same link as
   `[[folder/File|display-text]]`. Leading `/` on Markdown destinations is
   bundle-relative (notebook root). Donut-authored wiki bundle-root path form
-  has no leading `/`; the reader also accepts a leading `/` on a path-shaped
-  wiki destination (`[[/Title]]`) as the same bundle-root spelling. Source-relative
-  destinations fit the Portable path model where supported; this profile does
-  not yet require Donut to author or resolve them.
+  has no leading `/`, except the exact-root fallback `/Title` when that
+  display name is an ambiguous shorthand. The reader also accepts a leading
+  `/` on a path-shaped wiki destination (`[[/Title]]`) as the same
+  bundle-root spelling. Source-relative destinations fit the Portable path
+  model where supported; this profile does not yet require Donut to author
+  or resolve them.
 - `.md` on a path-shaped **Portable path** is optional and ignored
   (`/folder/File` = `/folder/File.md`; `[[folder/File.md]]` =
   `[[folder/File]]`). Do not strip `.md` from unqualified wiki titles
