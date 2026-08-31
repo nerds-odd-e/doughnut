@@ -1,6 +1,6 @@
 # Portable path review fix-up
 
-**Status:** in progress — slices 1–3 done
+**Status:** done
 
 ## Goal
 
@@ -124,39 +124,15 @@ still spells "concept path".
 
 ### 4. `PortablePath.resolve` has direct unit coverage
 
-**Status:** planned
+**Status:** done
 **Type:** Behavior
 
-**Precondition:** `PortablePath.resolve(focusNotebookName)` already
-implements the focus-notebook fallback merged from
-`WikiLinkTargetReference.forToken` during the original plan (qualified
-tokens use their own qualifier; unqualified tokens fall back to a supplied
-focus notebook; unqualified tokens with no focus notebook resolve to
-nothing) — this behavior is currently exercised only indirectly through
-full-Spring-context integration tests.
-**Trigger:** A "small test"-style unit test calls `resolve` directly with a
-qualified token, an unqualified token with a focus notebook, and an
-unqualified token with no focus notebook.
-**Postcondition:** Each case returns the same effective notebook-name result
-the old `WikiLinkTargetReference.forToken` produced, now pinned by a fast,
-isolated unit test independent of Spring context startup.
-
-Test work:
-
-- Add three cases to `PortablePathTest.java` (or a focused nested class if
-  that fits the file's existing structure) covering: qualified token
-  (qualifier used as-is, focus notebook ignored), unqualified token with a
-  focus notebook present (fallback applied), unqualified token with no focus
-  notebook (empty/no-resolution result).
-- Do not change `PortablePath.resolve`'s implementation — this slice adds
-  coverage for existing, already-verified-correct behavior only.
-
-Verification:
-
-- Run `CURSOR_DEV=true nix develop -c pnpm backend:test_only`.
+Three cases in `PortablePathTest.ResolveFocusNotebookFallback`: qualified
+token ignores focus; unqualified falls back to focus notebook; unqualified
+with no focus resolves empty. Implementation unchanged.
 
 Stop-safe outcome: `PortablePath.resolve`'s three documented behaviors are
-each pinned by a direct, fast unit test.
+each pinned by a direct unit test.
 
 ## Slice wrap-up contract
 

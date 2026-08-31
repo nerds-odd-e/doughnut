@@ -84,6 +84,29 @@ class PortablePathTest {
     assertThat(parsed.decodedPropertyKey(), equalTo(Optional.empty()));
   }
 
+  @Nested
+  class ResolveFocusNotebookFallback {
+
+    @Test
+    void resolve_qualifiedTokenUsesItsQualifierIgnoringFocusNotebook() {
+      assertThat(
+          PortablePath.parse("Sky:Moon").resolve("FocusNb"),
+          equalTo(Optional.of(new PortablePath.Resolved("Sky", "Moon"))));
+    }
+
+    @Test
+    void resolve_unqualifiedTokenFallsBackToFocusNotebook() {
+      assertThat(
+          PortablePath.parse("Moon").resolve("FocusNb"),
+          equalTo(Optional.of(new PortablePath.Resolved("FocusNb", "Moon"))));
+    }
+
+    @Test
+    void resolve_unqualifiedTokenWithNoFocusNotebookResolvesToNothing() {
+      assertThat(PortablePath.parse("Moon").resolve(null), equalTo(Optional.empty()));
+    }
+  }
+
   /**
    * {@link PathShapedTarget#tryParse} rejects any target containing {@code :}. Qualified {@code
    * Notebook:Title} rewrites therefore never go through path-shaped parsing, and they replace the
