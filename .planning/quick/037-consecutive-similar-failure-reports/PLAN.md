@@ -1,20 +1,22 @@
 # Consecutive similar Failure reports
 
-**Status:** planned (not started).
+**Status:** in progress (slice 1 done).
 **Type:** ad-hoc plan (`.planning/quick/`)
-**Do not execute until asked.**
 
-Follow-up to shipped scheduled-job Failure reports (`feat(failure-report):`
-persist without HTTP / resume / uncaught scheduled). Independent of
-`.planning/quick/036-scheduled-job-failure-report-followup/` (scheduler pool
-size / test cleanup). Do not mix those files into this plan.
+Follow-up to shipped scheduled-job Failure reports. Independent of
+`.planning/quick/036-scheduled-job-failure-report-followup/` (scheduler pool).
+Do not mix those files into this plan.
+
+Each slice is one commit (~5 min including targeted tests). Grammar:
+Behavior or Structure, one observable (or one Structure for the immediate
+next Behavior), stop-safe (`planning.mdc`).
 
 ## Goal
 
 A looping similar failure becomes **one** admin Failure report and **one**
-GitHub issue, with an occurrence count. Repeats comment on that issue with
-the count only (no details), at most once per 6 hours. A dissimilar failure
-in between starts a new Failure report / issue.
+GitHub issue, with an occurrence count. Repeats update that issue with the
+latest count (details stay in Donut), at most once per 6 hours. A dissimilar
+failure in between starts a new Failure report / issue.
 
 ## Jidoka — before any code slice
 
@@ -22,12 +24,17 @@ in between starts a new Failure report / issue.
 **Accepted**. Glossary: **Failure report** in
 [ADR 0001](../../../docs/adrs/0001-ubiquitous-language.md).
 
+Grouping is a business requirement (coalescing Failure reports), so factory
+tests of grouping are in scope. Loud uncaught failures themselves stay
+untested per ADR 0006 Usage.
+
 ## Design decisions (implementation of ADR 0006)
 
 - **Similar** = same fingerprint: exception class + origin (scheduled
-  `source:` label, or HTTP method + URI with query stripped and digit runs
-  replaced by `#`) + first `com.odde.donut` `Class.method` (else first frame).
-  Not message, user, query, line numbers, or full stack.
+  `source:` label, or HTTP method + request URI with digit runs replaced by
+  `#`; request URI already excludes the query) + first `com.odde.donut`
+  `Class.method` (else first frame). Independent of message, user, query,
+  line numbers, full stack.
 - **Consecutive** = compare only to the **latest** Failure report (HTTP and
   scheduled share one stream). Match → increment; else new row + new issue.
 - **One row per run.** No child occurrence table. First `error_detail` kept.
@@ -47,16 +54,15 @@ in between starts a new Failure report / issue.
 
 Status legend: `[ ]` planned · `[~]` in progress · `[x]` done
 
-### 1. Failure report stores fingerprint and occurrence count — Structure `[ ]`
+### 1. Failure report stores fingerprint and occurrence count — Structure `[x]`
 
-Enables slice 2. No grouping yet: every failure still inserts a row.
+`fingerprint` (JsonIgnore) and `occurrence_count` (default 1, on OpenAPI).
+Factory writes `class|origin|Class.method` on HTTP and `fromException`.
+Every failure still inserts a row; count stays 1.
 
-Add `fingerprint` and `occurrence_count` (default 1) on `failure_report`.
-Factory writes the 0006 fingerprint on create. Existing tests still pass.
-
-**Verify:** `FailureReportFactoryTest` — `fromException` and HTTP paths store
-a fingerprint that includes class, origin, and a Donut `Class.method`.
-`ControllerSetupTest` still passes. Count stays 1.
+**Learnings:** HTTP origin uses `getRequestURI()` (query already excluded);
+digit runs → `#`. `applicationSite` = first Donut `Class.method`. Fixture
+builder defaults `occurrenceCount` to 1 after API regen.
 
 ---
 
@@ -64,62 +70,81 @@ a fingerprint that includes class, origin, and a Donut `Class.method`.
 
 **Pre:** a Failure report exists for failure A. **Trigger:** a similar
 failure (same fingerprint) with no dissimilar failure in between. **Post:**
-still one list entry; occurrence count is 2; `createGithubIssue` was not
-called again; first `error_detail` unchanged.
+one Failure report remains; occurrence count is 2; `createGithubIssue` was
+not called again; first `error_detail` unchanged.
 
-**Verify:** factory/controller tests: two similar `fromException` (or two
-HTTP 500s) → one row, count 2, `createGithubIssue` once. Admin list (and
-detail) show the count. E2E on `show_failure_report.feature`: trigger the
-test exception twice → one RuntimeException row with count 2 (`@wip` until
-green). Existing “exception appears” / “admin clears” scenarios still pass.
+Admin list already renders one card per row, so the list shows one entry
+without a frontend change.
+
+**Verify:** factory test — two similar `fromException` (or two HTTP 500s)
+→ one row, count 2, `createGithubIssue` once. E2E
+`show_failure_report.feature`: trigger the test exception twice → one
+RuntimeException entry (`@wip` until green). Existing “exception appears” /
+“admin clears” scenarios still pass. No occurrence-count UI yet.
 
 ---
 
-### 3. A dissimilar failure starts a new Failure report — Behavior `[ ]`
+### 3. Admin sees the occurrence count — Behavior `[ ]`
+
+**Pre:** a Failure report has occurrence count 2 (slice 2). **Trigger:**
+admin opens Failure Reports (list and detail). **Post:** the count is
+visible on the list entry and the detail page.
+
+**Verify:** `FailureReportList` / `FailureReportPage` unit tests via
+`makeMe` (default count 1; a count-2 fixture shows `2`). E2E: after two
+triggers, the single entry shows count 2. Remove `@wip` from any scenario
+that now includes the count.
+
+---
+
+### 4. A dissimilar failure starts a new Failure report — Behavior `[ ]`
 
 **Pre:** latest Failure report is fingerprint A. **Trigger:** fingerprint B,
 then A again. **Post:** three Failure reports (A, B, A); three GitHub issue
-creates; the first A is not incremented.
+creates; the first A’s count stays 1.
 
 **Verify:** factory test with two sources or two exception types. No E2E
-(testability trigger is one fingerprint). Slice 2 tests stay.
+(testability trigger is one fingerprint). Slice 2–3 tests stay.
 
 ---
 
-### 4. A repeat comments the GitHub issue with the count only — Behavior `[ ]`
+### 5. A repeat comments the GitHub issue with the count — Behavior `[ ]`
 
 **Pre:** a Failure report with a GitHub issue and count 1. **Trigger:**
 similar failure (first increment). **Post:** GitHub receives one comment
-whose body is the occurrence count (e.g. `Occurred 2 times.`) and does not
-contain stack, exception message, URI, user, or source.
+that is the occurrence count only (investigation detail stays in Donut).
 
-**Verify:** `GithubService` comment method; factory test captures comment
-body. `NullGithubService` no-ops. List/count behavior from slices 2–3
-unchanged.
+**Verify:** `GithubService` gains a comment method; factory test captures
+the body. `NullGithubService` no-ops. Real client posts a comment on the
+existing issue. Count/list behavior from slices 2–4 unchanged.
 
 ---
 
-### 5. GitHub count comments are at most once per 6 hours — Behavior `[ ]`
+### 6. GitHub count comments are at most once per 6 hours — Behavior `[ ]`
 
 **Pre:** a Failure report whose last GitHub comment was less than 6 hours
-ago (use `TestabilitySettings` time travel). **Trigger:** further similar
+ago (`TestabilitySettings` time travel). **Trigger:** further similar
 failures. **Post:** Donut count updates; no new GitHub comment. After time
 travel ≥ 6 hours, the next similar failure comments with the **current**
 count.
 
-**Verify:** factory tests with time travel. No E2E for the 6-hour window.
+**Verify:** factory tests with time travel. Store last-comment time on the
+Failure report in this slice (needed for this behavior). No E2E for the
+window.
 
 ---
 
 ## Discoveries
 
 - GitHub issue create already omits the stack (title = class, body = Donut
-  URL). Comments must stay equally detail-free.
+  URL). Comments stay equally detail-free.
 - **Failure report** is in ADR 0001; policy is Accepted ADR 0006.
-- Latest-row rule is global: an HTTP 500 can split a scheduled loop. That
-  matches “separated by other failure”.
+- Latest-row rule is global: an HTTP 500 can split a scheduled loop.
 - `findAll()` has no order today; “latest” needs an explicit query (max id
   or `created_datetime`).
 - Factory uses `System.currentTimeMillis()` for `created_datetime`; debounce
   must use the same clock as `TestabilitySettings` (inject current time in
-  slice 5, not earlier).
+  slice 6, not earlier).
+- Slice 2 is user-visible without frontend work (one list card). Slice 3
+  only adds the count readout.
+- Query-string strip on HTTP origin was dead (`getRequestURI()` has no query).

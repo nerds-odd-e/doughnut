@@ -69,18 +69,38 @@ class FailureReportFactoryTest {
 
   @Test
   void recordsFailureReportFromExceptionAndSourceWithoutHttpRequest() {
-    FailureReportFactory.fromException(
-            new RuntimeException(),
-            "QuestionGenerationBatchMaintenanceJob",
-            githubService,
-            failureReportRepository)
-        .createUnlessAllowed();
-
-    FailureReport report = failureReportRepository.findAll().iterator().next();
+    FailureReport report = createReportFromException();
     assertThat(
         report.getErrorDetail(), containsString("# source: QuestionGenerationBatchMaintenanceJob"));
     assertThat(report.getErrorDetail(), not(containsString("# request:")));
     assertThat(report.getErrorDetail(), not(containsString("# user external Id:")));
+  }
+
+  @Test
+  void storesFingerprintWithClassOriginAndApplicationSite()
+      throws IOException, InterruptedException {
+    request.setMethod("POST");
+    request.setRequestURI("/api/notes/123");
+    request.setQueryString("user=99");
+
+    FailureReport report = createReport();
+
+    assertThat(report.getFingerprint(), containsString("java.lang.RuntimeException"));
+    assertThat(report.getFingerprint(), containsString("POST /api/notes/#"));
+    assertThat(report.getFingerprint(), containsString("FailureReportFactoryTest.createReport"));
+    assertThat(report.getFingerprint(), not(containsString("user=99")));
+  }
+
+  @Test
+  void storesOccurrenceCountOfOne() throws IOException, InterruptedException {
+    assertEquals(1, createReport().getOccurrenceCount());
+  }
+
+  @Test
+  void storesFingerprintFromExceptionUsingSourceAsOrigin() {
+    FailureReport report = createReportFromException();
+    assertThat(
+        report.getFingerprint(), containsString("source:QuestionGenerationBatchMaintenanceJob"));
   }
 
   private FailureReport createReport() throws IOException, InterruptedException {
@@ -91,6 +111,16 @@ class FailureReportFactoryTest {
             request, new RuntimeException(), fetcher, githubService, failureReportRepository)
         .createUnlessAllowed();
 
+    return failureReportRepository.findAll().iterator().next();
+  }
+
+  private FailureReport createReportFromException() {
+    FailureReportFactory.fromException(
+            new RuntimeException(),
+            "QuestionGenerationBatchMaintenanceJob",
+            githubService,
+            failureReportRepository)
+        .createUnlessAllowed();
     return failureReportRepository.findAll().iterator().next();
   }
 }

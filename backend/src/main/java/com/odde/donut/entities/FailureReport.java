@@ -1,5 +1,6 @@
 package com.odde.donut.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -42,6 +43,18 @@ public class FailureReport {
   @Getter
   @Setter
   private Timestamp createDatetime = new Timestamp(System.currentTimeMillis());
+
+  @JsonIgnore
+  @Column(name = "fingerprint")
+  @Getter
+  @Setter
+  private String fingerprint;
+
+  @NotNull
+  @Column(name = "occurrence_count")
+  @Getter
+  @Setter
+  private Integer occurrenceCount = 1;
 
   public GithubIssue getGithubIssue() {
     return new GithubIssue(

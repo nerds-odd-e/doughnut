@@ -17,6 +17,7 @@ class FailureReportBuilder extends Builder<FailureReport> {
         'Error occurred at com.example.service.Service.process(Service.java:42)\nCaused by: NullPointerException',
       issueNumber: 123,
       createDatetime: new Date().toISOString(),
+      occurrenceCount: 1,
     }
   }
 

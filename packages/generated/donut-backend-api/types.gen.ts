@@ -1190,6 +1190,7 @@ export type FailureReport = {
     errorDetail: string;
     issueNumber?: number;
     createDatetime: string;
+    occurrenceCount: number;
     githubIssue?: GithubIssue;
 };
 

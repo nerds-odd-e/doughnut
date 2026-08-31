@@ -15,7 +15,8 @@ public record FailureReportFactory(
     Exception exception,
     GithubService githubService,
     FailureReportRepository failureReportRepository,
-    String contextPrefix) {
+    String contextPrefix,
+    String origin) {
 
   public FailureReportFactory(
       HttpServletRequest req,
@@ -27,7 +28,8 @@ public record FailureReportFactory(
         exception,
         githubService,
         failureReportRepository,
-        userInfo(currentUserFetcher) + requestInfo(req));
+        userInfo(currentUserFetcher) + requestInfo(req),
+        httpOrigin(req));
   }
 
   public static FailureReportFactory fromException(
@@ -36,7 +38,11 @@ public record FailureReportFactory(
       GithubService githubService,
       FailureReportRepository failureReportRepository) {
     return new FailureReportFactory(
-        exception, githubService, failureReportRepository, "# source: " + source + "\n");
+        exception,
+        githubService,
+        failureReportRepository,
+        "# source: " + source + "\n",
+        "source:" + source);
   }
 
   public void createUnlessAllowed() {
@@ -64,6 +70,7 @@ public record FailureReportFactory(
   private FailureReport createFailureReport() {
     FailureReport failureReport = new FailureReport();
     failureReport.setErrorName(exception.getClass().getName());
+    failureReport.setFingerprint(fingerprint());
     StringWriter sw = new StringWriter();
     PrintWriter pw = new PrintWriter(sw);
     exception.printStackTrace(pw);
@@ -71,6 +78,31 @@ public record FailureReportFactory(
     saveFailureReport(failureReport);
 
     return failureReport;
+  }
+
+  private String fingerprint() {
+    return exception.getClass().getName() + "|" + origin + "|" + applicationSite();
+  }
+
+  private String applicationSite() {
+    StackTraceElement[] frames = exception.getStackTrace();
+    for (StackTraceElement frame : frames) {
+      if (frame.getClassName().startsWith("com.odde.donut")) {
+        return classMethod(frame);
+      }
+    }
+    return classMethod(frames[0]);
+  }
+
+  private static String classMethod(StackTraceElement frame) {
+    String className = frame.getClassName();
+    int lastDot = className.lastIndexOf('.');
+    String simpleName = lastDot >= 0 ? className.substring(lastDot + 1) : className;
+    return simpleName + "." + frame.getMethodName();
+  }
+
+  private static String httpOrigin(HttpServletRequest req) {
+    return req.getMethod() + " " + req.getRequestURI().replaceAll("\\d+", "#");
   }
 
   private static String requestInfo(HttpServletRequest req) {

@@ -5636,12 +5636,16 @@ components:
         createDatetime:
           type: string
           format: date-time
+        occurrenceCount:
+          type: integer
+          format: int32
         githubIssue:
           $ref: "#/components/schemas/GithubIssue"
       required:
       - createDatetime
       - errorDetail
       - errorName
+      - occurrenceCount
     FailureReportForView:
       type: object
       properties:
