@@ -89,7 +89,7 @@ async function closeDialogThen(run: () => void | Promise<void>) {
   await run()
 }
 
-async function onInsertWikiLink() {
+async function insertAuthoredWikiLink(insertFn: (linkText: string) => void) {
   if (!selectedSearchResult.value || !note) return
   const destination = selectedSearchResult.value
   const linkText = await authoredWikiLinkTokenForInsert(
@@ -97,15 +97,15 @@ async function onInsertWikiLink() {
     destination.noteTopology.id
   )
   if (linkText === undefined) return
-  await closeDialogThen(() => insert(linkText))
+  await closeDialogThen(() => insertFn(linkText))
+}
+
+async function onInsertWikiLink() {
+  await insertAuthoredWikiLink(insert)
 }
 
 async function onInsertWikiLinkAsProperty() {
-  if (!selectedSearchResult.value) return
-  const linkText = buildWikiLinkText(selectedSearchResult.value, {
-    notebookId: notebookId.value,
-  })
-  await closeDialogThen(() => insertWikiLinkAsProperty(linkText))
+  await insertAuthoredWikiLink(insertWikiLinkAsProperty)
 }
 
 async function folderNamesForNote(noteId: number): Promise<string[]> {

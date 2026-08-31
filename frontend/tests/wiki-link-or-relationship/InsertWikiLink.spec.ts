@@ -55,7 +55,10 @@ describe("InsertWikiLink", () => {
     expect(screen.getByText("Complete relationship")).toBeInTheDocument()
   })
 
-  it("calls the insert-wiki-link-as-property inserter when Add wiki link as a new property is clicked", async () => {
+  it("calls the insert-wiki-link-as-property inserter with the backend-authored Portable path", async () => {
+    mockSdkService(NoteController, "authoredPortablePath", {
+      portablePath: "Folder/PropTarget",
+    })
     const note = MakeMe.aNote.please()
     const targetResult = MakeMe.aNoteSearchResult.title("PropTarget").please()
     await openWikiLinkOrRelationshipChoice(note, {
@@ -67,7 +70,7 @@ describe("InsertWikiLink", () => {
     fireEvent.click(screen.getByText("Add wiki link as a new property"))
     await flushPromises()
 
-    expect(insertedWikiLinkAsProperty).toContain("[[PropTarget]]")
+    expect(insertedWikiLinkAsProperty).toContain("[[Folder/PropTarget]]")
     expect(insertedTexts).toHaveLength(0)
   })
 })

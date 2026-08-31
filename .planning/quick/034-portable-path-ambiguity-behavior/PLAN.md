@@ -361,21 +361,16 @@ reflect it now authors both same- and cross-notebook inserts.
 
 ### 18. Inserting a Wiki link as a property uses that path
 
-**Status:** planned
+**Status:** done
 **Type:** Behavior
 
-**Precondition:** The user inserts a Wiki link as a property value.
-**Trigger:** Donut inserts it.
-**Postcondition:** The property value stores the same backend-authored
-Portable path (plus `#prop:` when that is the product spelling for this
-insert).
-
-Test first: `property_wiki_link.feature` and/or existing property insert
-specs.
-
-Verification: focused frontend specs; `property_wiki_link.feature`.
-
-Stop-safe: property insert cannot add a known-ambiguous shorthand.
+`onInsertWikiLinkAsProperty` calls `authoredWikiLinkTokenForInsert` instead
+of `buildWikiLinkText`. Post-change-refactor extracted a shared
+`insertAuthoredWikiLink(insertFn)` helper since it and `onInsertWikiLink`
+had become structurally identical. `InsertWikiLink.spec.ts`'s property-insert
+case now proves the backend-authored (folder-qualified) path is used, not
+client-side title reconstruction. No E2E existed for the insert-as-property
+UI action itself; `property_wiki_link.feature` only covers rendering.
 
 ### 19. Overlap "build a link" uses that path
 
