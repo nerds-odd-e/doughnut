@@ -14,9 +14,7 @@ share those terms.
 This ADR is the **canonical ubiquitous language**. The glossary below is
 the source of truth; prefer these meanings in UI copy, APIs, tests, and
 code identifiers. This glossary is amended in place. Add or change domain
-terms here; do not supersede this ADR with a new one. Spaced-repetition domain
-concepts, including morning recall residual measurement, live in [ADR
-0003](./0003-spaced-repetition-scheduling-policy-accepted.md).
+terms here; do not supersede this ADR with a new one.
 
 ## Notebook / note structure
 
@@ -114,8 +112,7 @@ concepts, including morning recall residual measurement, live in [ADR
 - **Subscription** — Following a shared notebook (from the Bazaar or a
   Circle) with a daily assimilation quota. The action is **subscribe**.
 - **Assimilation** — First-pass intake of a note into the learner’s
-  memory schedule. Creates a **New** memory tracker
-  ([ADR 0003](./0003-spaced-repetition-scheduling-policy-accepted.md)).
+  memory schedule. Creates a **New** memory tracker.
 - **Assimilation sequence** — Ordered units offered as next-to-assimilate
   (menu walkthrough, `/next`). Distinct from assimilating on a note. A
   unit is in the sequence iff it has not been skipped from the sequence
@@ -139,6 +136,9 @@ concepts, including morning recall residual measurement, live in [ADR
   trackers do not consume this count.
 
 ## Recall
+
+More detailed **Spaced repetition glossary** is in
+[ADR 0003](./0003-spaced-repetition-scheduling-policy-accepted.md).
 
 - **Memory tracker** — One learner's scheduled memory for a note (or
   **property**). Types (how it is created): **understanding**,
@@ -164,13 +164,11 @@ concepts, including morning recall residual measurement, live in [ADR
 - **Grade** — The single scheduling evaluation concept: Again (1),
   Hard (2), Good (3), Easy (4). The numeric value **is** FSRS `G`.
   Used by recall prompts, **just review**, and Tutor **Feedback**.
-  **Confusion** and **Overlap** are not grades. Scheduling detail:
-  [ADR 0003](./0003-spaced-repetition-scheduling-policy-accepted.md).
+  **Confusion** and **Overlap** are not grades.
 - **Answer** — The learner's response to a **recall prompt**. Prompt
   grades and **confusion** link a RecallLog row to this answer.
 - **Accidental match** — Spelling answer that fails the note under recall
-  but names another accessible note by title or plain alias. Transitions:
-  [ADR 0003](./0003-spaced-repetition-scheduling-policy-accepted.md).
+  but names another accessible note by title or plain alias.
 - **Remove from recall** — Stop an existing memory tracker from appearing
   in recall; the unit does not re-enter the assimilation sequence. Short
   UI: **Remove** / **Remove from recall**. Not a grade.
@@ -179,16 +177,10 @@ concepts, including morning recall residual measurement, live in [ADR
 - **Pace**, **Accuracy**, **Consistency**, and **Retrieval lapse** —
   Separate residual readouts of a morning's recall against expectation
   and the learner's own baseline. Not diagnostic of cause. There is no
-  composite index of them. Measurement:
-  [ADR 0003](./0003-spaced-repetition-scheduling-policy-accepted.md).
+  composite index of them.
 - **Daily probe** — Optional opt-in standalone task before recall,
   independent of recall item content. Not a scheduling input and not a
-  check on Pace, Accuracy, or Consistency. Measurement:
-  [ADR 0003](./0003-spaced-repetition-scheduling-policy-accepted.md).
-
-**New**, **Stability**, **Difficulty**, **Retrievability**, **RecallLog**,
-**Thinking time**, **Confusion**, and **Overlap**: **Spaced repetition
-glossary** in [ADR 0003](./0003-spaced-repetition-scheduling-policy-accepted.md).
+  check on Pace, Accuracy, or Consistency.
 
 ## Focus context
 
@@ -234,11 +226,6 @@ commission from Donut:
 - **Feedback** — A Tutor's evaluation of a Session Item: a **Grade** and
   descriptive text. Recommendations of what to study next are not Feedback.
 
-Request/Report documents:
-[commissioned learning session protocol](../commissioned-learning-session-protocol.md).
-Scheduling of recorded Grades:
-[ADR 0003](./0003-spaced-repetition-scheduling-policy-accepted.md).
-
 ## Alignment policy
 
 - Product and internal names use **Donut** / `donut`. For now, `doughnut` is
@@ -248,28 +235,10 @@ Scheduling of recorded Grades:
   databases, Gitpod image, names under `infra/gcp/**`) — not in product
   prose, UI, or new identifiers.
 - Features, tests, OpenAPI names, and packages follow this glossary.
-  Spaced-repetition domain concepts follow the **Spaced repetition glossary** in
-  [ADR 0003](./0003-spaced-repetition-scheduling-policy-accepted.md).
 - Same nouns in UI, API, and schema, with **minimum DTO**. Do not
 introduce a translation type that wraps one as the other.
 - Agents treat this ADR as binding for naming choices. Spaced-repetition domain
   concepts follow ADR 0003. Humans and agents share an explicit dictionary
   instead of inferring synonyms.
 
-## Prerequisites / Assumptions
-
-- Spaced-repetition domain concepts are constrained by the **Spaced repetition
-  glossary** in
-  [ADR 0003](./0003-spaced-repetition-scheduling-policy-accepted.md).
-
 ## Related
-
-- Links: playbook [README.md](./README.md); ADR-0000
-[use-adrs-accepted.md](./0000-use-adrs-accepted.md); ADR 0003
-[spaced-repetition scheduling policy](./0003-spaced-repetition-scheduling-policy-accepted.md)
-(**Spaced repetition glossary**, morning recall residuals); ADR 0004
-[OKF-compatible notebook Markdown](./0004-okf-compatible-notebook-markdown-accepted.md)
-(portable Markdown profile); ADR 0005
-[web routes](./0005-web-routes.md) (`noteShow` / `noteProperty`); [commissioned learning session
-protocol](../commissioned-learning-session-protocol.md) (Request/Report
-documents)
