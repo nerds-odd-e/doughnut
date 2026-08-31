@@ -7,7 +7,6 @@ import com.odde.donut.entities.Note;
 import com.odde.donut.entities.NotePropertyIndex;
 import com.odde.donut.entities.repositories.NotePropertyIndexRepository;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.LockModeType;
 import jakarta.persistence.PersistenceContext;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -34,7 +33,6 @@ public class NotePropertyIndexService {
   @Transactional
   public void refreshForNote(Note note) {
     Integer noteId = note.getId();
-    entityManager.find(Note.class, noteId, LockModeType.PESSIMISTIC_WRITE);
     notePropertyIndexRepository.deleteByNoteIdInBulk(noteId);
     entityManager.flush();
     Note indexOwner = entityManager.getReference(Note.class, noteId);

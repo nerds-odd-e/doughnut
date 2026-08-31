@@ -8,7 +8,6 @@ import com.odde.donut.entities.User;
 import com.odde.donut.entities.repositories.NoteRepository;
 import com.odde.donut.entities.repositories.ResolvedWikiLinkRepository;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.LockModeType;
 import java.util.LinkedHashSet;
 import java.util.List;
 
@@ -104,7 +103,6 @@ final class ResolvedWikiLinkRefresh {
 
   private void rebuildResolvedWikiLinkRows(EntityManager entityManager, Note note, User viewer) {
     Integer noteId = note.getId();
-    entityManager.find(Note.class, noteId, LockModeType.PESSIMISTIC_WRITE);
     resolvedWikiLinkRepository.deleteByNoteIdInBulk(noteId);
     entityManager.flush();
     Note sourceNoteRef = entityManager.getReference(Note.class, noteId);
