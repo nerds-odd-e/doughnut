@@ -66,6 +66,21 @@ class FailureReportFactoryTest {
     assertThat(report.getErrorDetail(), containsString(user.getName()));
   }
 
+  @Test
+  void recordsFailureReportFromExceptionAndSourceWithoutHttpRequest() {
+    FailureReportFactory.fromException(
+            new RuntimeException(),
+            "QuestionGenerationBatchMaintenanceJob",
+            githubService,
+            failureReportRepository)
+        .createUnlessAllowed();
+
+    FailureReport report = failureReportRepository.findAll().iterator().next();
+    assertEquals("java.lang.RuntimeException", report.getErrorName());
+    assertThat(report.getErrorDetail(), containsString("QuestionGenerationBatchMaintenanceJob"));
+    assertThat(report.getErrorDetail(), containsString("FailureReportFactoryTest.java"));
+  }
+
   private FailureReport createReport() throws IOException, InterruptedException {
     CurrentUserFetcherFromRequest fetcher =
         new CurrentUserFetcherFromRequest(request, userRepository, userService, Optional.empty());

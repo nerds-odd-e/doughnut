@@ -1,8 +1,7 @@
 # Scheduled job failure reports
 
-**Status:** planned (not started).
+**Status:** in progress (slice 1 done).
 **Type:** ad-hoc plan (`.planning/quick/`)
-**Do not execute until asked.**
 
 ## Goal
 
@@ -57,19 +56,12 @@ scheduler-only error handler would **miss** the failure we actually saw.
 
 Status legend: `[ ]` planned · `[~]` in progress · `[x]` done
 
-### 1. Record a failure report without an HTTP request — Structure `[ ]`
+### 1. Record a failure report without an HTTP request — Structure `[x]`
 
-Enable slice 2. No change to HTTP 500 reports.
-
-`FailureReportFactory` (or a small collaborator it uses) can persist a
-report from an exception plus a **source label** (job name), with stack
-in `error_detail` and no request/user block. Existing request-based
-creation still writes user + URI as today.
-
-**Verify:** existing `FailureReportFactoryTest` and `ControllerSetupTest`
-still pass. Add a factory/unit test: given a `RuntimeException` and source
-`QuestionGenerationBatchMaintenanceJob`, a `failure_report` row exists
-with that class as `error_name` and source + stack in `error_detail`.
+`FailureReportFactory.fromException(exception, source, githubService, failureReportRepository)`
+persists with exception class as `error_name` and `# source: …` plus stack
+in `error_detail`. HTTP constructor still writes user + URI (shared
+`contextPrefix` built at construction). Same skip list and GitHub attempt.
 
 ---
 
@@ -112,3 +104,6 @@ Embedding job needs no per-method catch.
 - Manual admin **Resume** already rethrows into `ControllerSetup`, so it
   can already create a Failure report. This plan is for **scheduled**
   execution.
+- Slice 1: HTTP and background share `contextPrefix` on the factory
+  record. Remaining slices call `fromException`; do not add nullable
+  request/source fields.

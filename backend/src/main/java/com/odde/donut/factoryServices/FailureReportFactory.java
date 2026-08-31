@@ -12,11 +12,32 @@ import java.io.StringWriter;
 import org.springframework.web.server.ResponseStatusException;
 
 public record FailureReportFactory(
-    HttpServletRequest req,
     Exception exception,
-    CurrentUserFetcher currentUserFetcher,
     GithubService githubService,
-    FailureReportRepository failureReportRepository) {
+    FailureReportRepository failureReportRepository,
+    String contextPrefix) {
+
+  public FailureReportFactory(
+      HttpServletRequest req,
+      Exception exception,
+      CurrentUserFetcher currentUserFetcher,
+      GithubService githubService,
+      FailureReportRepository failureReportRepository) {
+    this(
+        exception,
+        githubService,
+        failureReportRepository,
+        userInfo(currentUserFetcher) + requestInfo(req));
+  }
+
+  public static FailureReportFactory fromException(
+      Exception exception,
+      String source,
+      GithubService githubService,
+      FailureReportRepository failureReportRepository) {
+    return new FailureReportFactory(
+        exception, githubService, failureReportRepository, "# source: " + source + "\n");
+  }
 
   public void createUnlessAllowed() {
     if (exception instanceof ResponseStatusException) return;
@@ -46,13 +67,13 @@ public record FailureReportFactory(
     StringWriter sw = new StringWriter();
     PrintWriter pw = new PrintWriter(sw);
     exception.printStackTrace(pw);
-    failureReport.setErrorDetail(getUserInfo() + getRequestInfo() + "# Stack trace\n" + sw);
+    failureReport.setErrorDetail(contextPrefix + "# Stack trace\n" + sw);
     saveFailureReport(failureReport);
 
     return failureReport;
   }
 
-  private String getRequestInfo() {
+  private static String requestInfo(HttpServletRequest req) {
     return "# request:\n"
         + "  Request URI:"
         + req.getRequestURI()
@@ -62,7 +83,7 @@ public record FailureReportFactory(
         + "\n";
   }
 
-  private String getUserInfo() {
+  private static String userInfo(CurrentUserFetcher currentUserFetcher) {
     String result = "# user external Id: " + currentUserFetcher.getExternalIdentifier() + "\n";
     if (currentUserFetcher.getUser() != null) {
       result += "# user name: " + currentUserFetcher.getUser().getName() + "\n";
