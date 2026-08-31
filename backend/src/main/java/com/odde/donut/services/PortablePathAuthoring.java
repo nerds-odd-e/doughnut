@@ -16,13 +16,18 @@ public class PortablePathAuthoring {
     this.wikiLinkResolver = wikiLinkResolver;
   }
 
-  public String authoredPortablePath(Note destinationNote, String originalPortablePath) {
+  public String authoredPortablePath(
+      Note sourceNote, Note destinationNote, String originalPortablePath) {
     String notePortion = shortestUnambiguousNotePortion(destinationNote);
-    if (originalPortablePath == null || originalPortablePath.isBlank()) {
-      return notePortion;
+    Optional<String> encodedPropertyKey =
+        (originalPortablePath == null || originalPortablePath.isBlank())
+            ? Optional.empty()
+            : PortablePath.parse(originalPortablePath).encodedPropertyKey();
+    PortablePath authored = new PortablePath(Optional.empty(), notePortion, encodedPropertyKey);
+    if (!sourceNote.getNotebook().getId().equals(destinationNote.getNotebook().getId())) {
+      authored = authored.withNotebookName(destinationNote.getNotebook().getName());
     }
-    PortablePath original = PortablePath.parse(originalPortablePath);
-    return new PortablePath(Optional.empty(), notePortion, original.encodedPropertyKey()).format();
+    return authored.format();
   }
 
   private String shortestUnambiguousNotePortion(Note destinationNote) {

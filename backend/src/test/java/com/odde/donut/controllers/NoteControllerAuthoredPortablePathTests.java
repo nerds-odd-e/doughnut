@@ -6,6 +6,7 @@ import static org.hamcrest.Matchers.equalTo;
 import com.odde.donut.controllers.dto.AuthoredPortablePath;
 import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Note;
+import com.odde.donut.entities.Notebook;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -91,5 +92,18 @@ class NoteControllerAuthoredPortablePathTests extends ControllerTestBase {
         controller.authoredPortablePath(source, destination, "WikiDup Shared");
 
     assertThat(authored.portablePath(), equalTo("/WikiDup Shared"));
+  }
+
+  @Test
+  void shouldQualifyPortablePathWithNotebookNameWhenDestinationNotebookDiffersFromSource()
+      throws UnexpectedNoAccessRightException {
+    Notebook solarNotebook =
+        makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).name("Solar").please();
+    Note destination = makeMe.aNote().notebook(solarNotebook).title("Moon").please();
+    Note source = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
+
+    AuthoredPortablePath authored = controller.authoredPortablePath(source, destination, "Moon");
+
+    assertThat(authored.portablePath(), equalTo("Solar:Moon"));
   }
 }

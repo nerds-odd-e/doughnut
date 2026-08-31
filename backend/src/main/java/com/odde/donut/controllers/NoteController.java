@@ -222,6 +222,6 @@ class NoteController {
     authorizationService.assertReadAuthorization(note);
     authorizationService.assertReadAuthorization(destinationNote);
     return new AuthoredPortablePath(
-        portablePathAuthoring.authoredPortablePath(destinationNote, portablePath));
+        portablePathAuthoring.authoredPortablePath(note, destinationNote, portablePath));
   }
 }

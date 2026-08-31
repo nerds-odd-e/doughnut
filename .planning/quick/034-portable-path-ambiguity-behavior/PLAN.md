@@ -261,28 +261,17 @@ insert uses `authoredPortablePathFor`. Insert E2E lives in
 
 ### 11. Repairing an ambiguous link across notebooks qualifies the path
 
-**Status:** planned
+**Status:** done
 **Type:** Behavior
 
-**Precondition:** A rendered Wiki link is `AMBIGUOUS`. The user points at a
-note whose notebook differs from the source note.
-**Trigger:** They confirm that destination.
-**Postcondition:** The stored Portable path is notebook-qualified; the note
-portion is the same shortest unambiguous spelling as same-notebook repair.
-Same-notebook repair is unchanged.
-
-Test first: `NoteControllerAuthoredPortablePathTests` with source and
-destination in different notebooks; extend the slice 7 E2E only if it stays
-inside ~5 minutes.
-
-Implementation: pass the path `{note}` (source) into
-`PortablePathAuthoring`. Qualify when notebook ids differ. Do not change
-viewer filtering yet (slice 12). Do not switch insert callers.
-
-Verification: `pnpm backend:test_only`; focused frontend/E2E if extended.
-
-Stop-safe: shipped repair no longer writes a path that resolves in the
-wrong notebook.
+`PortablePathAuthoring.authoredPortablePath` takes the source note; when
+`sourceNote.getNotebook().getId()` differs from the destination's, the
+result is qualified via `PortablePath.withNotebookName(destinationNotebook)`.
+Note-portion selection (`shortestUnambiguousNotePortion`) is unchanged.
+Pinned by `NoteControllerAuthoredPortablePathTests
+.shouldQualifyPortablePathWithNotebookNameWhenDestinationNotebookDiffersFromSource`.
+No other caller of `authoredPortablePath` existed. Viewer filtering
+(unreadable namesakes) is still slice 12.
 
 ### 12. Authoring uniqueness skips unreadable namesakes
 
