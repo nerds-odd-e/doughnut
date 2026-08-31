@@ -136,6 +136,18 @@ class WikiLinkResolverYamlAndBodyIntegrationTest {
   }
 
   @Test
+  void wikiLinkResolver_resolvesWhenOneNoteMatchesAsBothTitleAndAlias() {
+    User owner = makeMe.aUser().please();
+    Note destination =
+        makeMe.aNote().title("color").notebookOwnedBy(owner).aliases("color").please();
+    Note linker = makeMe.aNote().underSameNotebookAs(destination).content("See [[color]]").please();
+
+    var resolved = wikiLinkResolver.resolveWikiLinksForCache(linker, owner);
+    assertThat(resolved.size(), equalTo(1));
+    assertThat(resolved.getFirst().destinationNote().getId(), equalTo(destination.getId()));
+  }
+
+  @Test
   void wikiLinkResolver_skipsUnreadableLowestIdAliasCandidateForReadableTarget() {
     User secretOwner = makeMe.aUser().please();
     User viewer = makeMe.aUser().please();

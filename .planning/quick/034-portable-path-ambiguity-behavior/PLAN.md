@@ -26,7 +26,8 @@ and Donut asks for a longer path.
 - Characterization:
   `ResolvedWikiLinkTitleResolutionTest.unqualified_link_does_not_resolve_when_same_title_in_different_folders`,
   `WikiLinkResolverYamlAndBodyIntegrationTest.wikiLinkResolver_doesNotResolveWhenTitleCollidesWithAlias`,
-  `WikiLinkResolverYamlAndBodyIntegrationTest.wikiLinkResolver_doesNotResolveWhenTwoNotesShareAnAlias`.
+  `WikiLinkResolverYamlAndBodyIntegrationTest.wikiLinkResolver_doesNotResolveWhenTwoNotesShareAnAlias`,
+  `WikiLinkResolverYamlAndBodyIntegrationTest.wikiLinkResolver_resolvesWhenOneNoteMatchesAsBothTitleAndAlias`.
 - `NoteRealm.wikiLinks` is built only from resolved-index rows
   (`destinationNoteId` required). Dead links are inferred from markup.
 - Donut-authored insert/paste/overlap/accidental-match spelling still uses
@@ -151,20 +152,12 @@ qualified alias still resolves when one readable remains.
 
 ### 4. Two aliases on one note still identify one destination
 
-**Status:** planned
+**Status:** done
 **Type:** Behavior
 
-**Precondition:** One note lists the same alias twice (or equivalent
-duplicate alias rows).
-**Trigger:** Donut resolves that alias shorthand.
-**Postcondition:** It still resolves to that note.
-
-Test first: one resolver/cache case; do not re-assert slices 2–3.
-
-Verification: `pnpm backend:test_only`.
-
-Stop-safe: dedupe-by-note-id is pinned so union cannot treat one note as
-ambiguous with itself.
+Pinned via title∪alias of the same token on one note (reachable equivalent
+of duplicate alias rows). `distinctByNoteId` already kept cardinality at 1;
+no production change.
 
 ### 5. Notebook-qualified shorthand does not break ties by note id
 
