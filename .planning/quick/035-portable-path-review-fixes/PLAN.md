@@ -1,6 +1,6 @@
 # Portable path review fix-up
 
-**Status:** in progress — slices 1–2 done
+**Status:** in progress — slices 1–3 done
 
 ## Goal
 
@@ -107,47 +107,20 @@ Stop-safe outcome: no `wiki-title` / `wiki-display` DOM attributes remain.
 
 ### 3. No camelCase "concept path" survivors remain
 
-**Status:** planned
+**Status:** done
 **Type:** Structure
 
-Rename the camelCase survivors of "concept path" vocabulary that the
-original plan's literal-phrase completion-gate search missed, plus one
-adjacent stale javadoc noticed in the same review. This unblocks the
-immediate next behavior: existing path-Markdown href classification and
-dead-link/leftover-markup detection tests passing unchanged under the new
-names.
+`isPortablePathHref` / `hrefLooksLikePortablePath` /
+`authoredHrefLooksLikePortablePath`; WikiLink `displayText` javadoc uses
+Portable path. Test descriptions no longer say "concept-path href".
 
-- Backend: rename `WikiLinkMarkdown.isConceptPathHref` to
-  `isPortablePathHref` (private method, update its 3 call sites in the same
-  file).
-- Frontend: rename `routes/noteShowLocation.ts`'s
-  `hrefLooksLikeConceptNotePath` to `hrefLooksLikePortablePath`, and
-  `frontend/src/utils/authoredLinkMarkup.ts`'s
-  `authoredHrefLooksLikeConceptNotePath` to
-  `authoredHrefLooksLikePortablePath`. Update call sites in
-  `wikiLinkMarkup.ts`, `authoredLinkMarkup.ts`, `replaceWikiLinksInHtml.ts`,
-  `SearchForm.vue`, and the 3 test files that reference these functions —
-  including rewording the test-description strings in
-  `replaceWikiLinksInHtml.spec.ts` that literally read "leftover ... with
-  concept-path href".
-- Fix the stale javadoc in
-  `backend/src/main/java/com/odde/donut/controllers/dto/WikiLink.java`: the
-  `displayText` field's javadoc says "...or same as target when absent" —
-  reword to "...or same as the link's Portable path when absent."
-- No behavior change: same href classification, same leftover-markup
-  detection — only names and one doc comment change.
+**Learning:** remaining case-insensitive "concept" hits are `NoteConceptType`
+and AI "Main concept" / "related concepts" fixtures — unrelated to wiki-link
+paths. Java and TS href classifiers stay in their own subsystems (collapsing
+them would be cross-subsystem; slice 4 does not justify it).
 
-Verification:
-
-- Run `CURSOR_DEV=true nix develop -c pnpm backend:test_only`.
-- Run `CURSOR_DEV=true nix develop -c pnpm frontend:test`.
-- Confirm zero remaining case-insensitive "concept" hits:
-  `grep -rin "concept" backend/src frontend/src frontend/tests` (expect no
-  output, or only genuinely unrelated matches).
-
-Stop-safe outcome: no production identifier, test description, or doc
-comment in the wiki-link/portable-path code paths still spells "concept
-path" in any casing.
+Stop-safe outcome: no wiki-link/portable-path identifier or test description
+still spells "concept path".
 
 ### 4. `PortablePath.resolve` has direct unit coverage
 

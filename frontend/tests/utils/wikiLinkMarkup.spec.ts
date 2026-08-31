@@ -78,10 +78,10 @@ describe("wikiLinkMarkup utils", () => {
 
   it.each([
     { href: "#", kind: "hash" },
-    { href: "/Folder/Title.md", kind: "concept-path" },
+    { href: "/Folder/Title.md", kind: "portable-path" },
     {
       href: "/Solar/Moon.md#prop:a%20part%20of",
-      kind: "concept-path-with-prop-fragment",
+      kind: "portable-path-with-prop-fragment",
     },
   ])(
     "handleRichContentAnchorClick does not navigate leftover $kind hrefs",

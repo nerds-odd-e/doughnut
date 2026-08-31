@@ -19,7 +19,10 @@ public class WikiLink {
   @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
   private String portablePath;
 
-  /** Visible label in rich mode (part after {@code |}, or same as target when absent). */
+  /**
+   * Visible label in rich mode (part after {@code |}, or same as the link's Portable path when
+   * absent).
+   */
   @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
   private String displayText;
 

@@ -178,7 +178,7 @@ export function pathnameLooksLikeInternalNoteFamily(
 }
 
 /** Bundle-relative note path (`/Folder/Title.md`), not a Donut note-family URL. */
-export function hrefLooksLikeConceptNotePath(href: string): boolean {
+export function hrefLooksLikePortablePath(href: string): boolean {
   if (!href.startsWith("/") || href.startsWith("//")) return false
   const pathname = href.split(/[?#]/, 1)[0] ?? href
   return !pathnameLooksLikeInternalNoteFamily(pathname)

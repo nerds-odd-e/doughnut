@@ -41,7 +41,7 @@ import usePopups from "../commons/Popups/usePopups"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import { buildWikiLinkText } from "@/utils/buildWikiLinkText"
 import { useContentCursorInserter } from "@/composables/useContentCursorInserter"
-import { authoredHrefLooksLikeConceptNotePath } from "@/utils/authoredLinkMarkup"
+import { authoredHrefLooksLikePortablePath } from "@/utils/authoredLinkMarkup"
 import {
   type DeadWikiLinkPayload,
   markdownWikiTokenFromDeadWikiLinkPayload,
@@ -110,7 +110,7 @@ async function onDeadWikiLinkToNote() {
   if (!selectedSearchResult.value || !note || !deadWikiLinkPayload) return
   const originalToken =
     markdownWikiTokenFromDeadWikiLinkPayload(deadWikiLinkPayload)
-  const newLinkText = authoredHrefLooksLikeConceptNotePath(
+  const newLinkText = authoredHrefLooksLikePortablePath(
     deadWikiLinkPayload.portablePath
   )
     ? pathMarkdownTokenForNote({

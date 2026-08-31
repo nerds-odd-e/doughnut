@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest"
-import { hrefLooksLikeConceptNotePath } from "@/routes/noteShowLocation"
+import { hrefLooksLikePortablePath } from "@/routes/noteShowLocation"
 import {
   authoredLinkOccurrences,
   splitAuthoredToken,
@@ -41,10 +41,10 @@ describe("authoredLinkMarkup", () => {
     })
   })
 
-  it("keeps a path-Markdown #prop: fragment that the concept-path accept-check strips", () => {
+  it("keeps a path-Markdown #prop: fragment that the portable-path accept-check strips", () => {
     const href = "/Solar/Moon.md#prop:a%20part%20of"
     const token = `[a part of](${href})`
-    expect(hrefLooksLikeConceptNotePath(href)).toBe(true)
+    expect(hrefLooksLikePortablePath(href)).toBe(true)
     expect(splitAuthoredToken(token)).toEqual({
       target: href,
       display: "a part of",

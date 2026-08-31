@@ -1,7 +1,7 @@
 import type { WikiLink } from "@generated/donut-backend-api"
 import type { RouteLocationRaw } from "vue-router"
 import {
-  authoredHrefLooksLikeConceptNotePath,
+  authoredHrefLooksLikePortablePath,
   splitWikiLinkInner,
   wikiLinkFromAuthoredToken,
 } from "@/utils/authoredLinkMarkup"
@@ -100,7 +100,7 @@ export function markdownWikiTokenFromDeadWikiLinkPayload(
   p: DeadWikiLinkPayload
 ): string {
   const { portablePath, displayText } = p
-  if (authoredHrefLooksLikeConceptNotePath(portablePath)) {
+  if (authoredHrefLooksLikePortablePath(portablePath)) {
     return pathMarkdownToken(displayText, portablePath)
   }
   if (portablePath === displayText) return `[[${portablePath}]]`
@@ -156,7 +156,7 @@ export function handleRichContentAnchorClick(
     window.open(href, "_blank", "noopener,noreferrer")
     return
   }
-  if (href === "#" || authoredHrefLooksLikeConceptNotePath(href)) return
+  if (href === "#" || authoredHrefLooksLikePortablePath(href)) return
   handlers.navigateInApp(href)
 }
 
@@ -191,12 +191,12 @@ function pathHrefFromWikiAnchor(anchor: HTMLAnchorElement): string | null {
   if (
     fromAttr !== null &&
     fromAttr !== "" &&
-    authoredHrefLooksLikeConceptNotePath(fromAttr)
+    authoredHrefLooksLikePortablePath(fromAttr)
   ) {
     return fromAttr
   }
   const href = anchor.getAttribute("href")
-  if (href && authoredHrefLooksLikeConceptNotePath(href)) {
+  if (href && authoredHrefLooksLikePortablePath(href)) {
     return href
   }
   return null

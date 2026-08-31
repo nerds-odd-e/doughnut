@@ -1,5 +1,5 @@
 import type { WikiLink } from "@generated/donut-backend-api"
-import { hrefLooksLikeConceptNotePath } from "@/routes/noteShowLocation"
+import { hrefLooksLikePortablePath } from "@/routes/noteShowLocation"
 import { parsePortablePath } from "@/utils/portablePath"
 
 /** Splits inner wiki text on the first `|`; empty right-hand side is treated as no pipe. */
@@ -31,15 +31,13 @@ export type AuthoredLinkOccurrence = {
   token: string
 }
 
-export function authoredHrefLooksLikeConceptNotePath(href: string): boolean {
-  return hrefLooksLikeConceptNotePath(
-    parsePortablePath(href).qualifiedNotePortion
-  )
+export function authoredHrefLooksLikePortablePath(href: string): boolean {
+  return hrefLooksLikePortablePath(parsePortablePath(href).qualifiedNotePortion)
 }
 
 /** Path Markdown spelling: {@link WikiLink.portablePath} is the bundle-relative href. */
 export function isPathMarkdownWikiLink(w: WikiLink): boolean {
-  return authoredHrefLooksLikeConceptNotePath(w.portablePath)
+  return authoredHrefLooksLikePortablePath(w.portablePath)
 }
 
 function tryParsePathMarkdownToken(
@@ -49,7 +47,7 @@ function tryParsePathMarkdownToken(
   const m = PATH_MARKDOWN_LINK_PATTERN.exec(trimmed)
   if (!m || m[0] !== trimmed) return undefined
   const href = m[2]!
-  if (!authoredHrefLooksLikeConceptNotePath(href)) return undefined
+  if (!authoredHrefLooksLikePortablePath(href)) return undefined
   return { display: m[1]!, href }
 }
 
@@ -132,7 +130,7 @@ export function authoredLinkOccurrences(
     const start = m.index
     if (start > 0 && markdown[start - 1] === "!") continue
     const href = m[2]!
-    if (!authoredHrefLooksLikeConceptNotePath(href)) continue
+    if (!authoredHrefLooksLikePortablePath(href)) continue
     hits.push({
       kind: "pathMarkdown",
       start,

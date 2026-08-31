@@ -1,6 +1,6 @@
 import type { WikiLink } from "@generated/donut-backend-api"
 import {
-  authoredHrefLooksLikeConceptNotePath,
+  authoredHrefLooksLikePortablePath,
   isPathMarkdownWikiLink,
 } from "@/utils/authoredLinkMarkup"
 import {
@@ -31,7 +31,7 @@ const UNRESOLVED_WIKI_LINK_CLASSES = [
 
 function authoredTokenFromWikiAnchor(anchor: Element): string {
   const target = anchor.getAttribute(WIKI_LINK_PORTABLE_PATH_ATTR) ?? ""
-  if (authoredHrefLooksLikeConceptNotePath(target)) {
+  if (authoredHrefLooksLikePortablePath(target)) {
     const display =
       anchor.getAttribute(WIKI_LINK_DISPLAY_TEXT_ATTR) ||
       anchor.textContent?.trim() ||
@@ -184,7 +184,7 @@ function upgradePathMarkdownAnchors(
   return result
 }
 
-/** Leftover `[[…]]` and leftover concept-path hrefs get pending or dead wiki-link UI. */
+/** Leftover `[[…]]` and leftover portable-path hrefs get pending or dead wiki-link UI. */
 function markUnresolvedWikiLinks(
   html: string,
   lastSavedTokens: Set<string> | undefined
@@ -197,7 +197,7 @@ function markUnresolvedWikiLinks(
   return withWikiTokens.replace(
     /<a href="(\/[^"]+)">([^<]*)<\/a>/g,
     (full, href: string, display: string) => {
-      if (!authoredHrefLooksLikeConceptNotePath(href)) return full
+      if (!authoredHrefLooksLikePortablePath(href)) return full
       const token = `[${display}](${href})`
       return wikiLinkAnchorHtml({
         href: "#",

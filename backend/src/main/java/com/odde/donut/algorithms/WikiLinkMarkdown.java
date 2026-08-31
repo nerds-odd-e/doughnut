@@ -150,7 +150,7 @@ public final class WikiLinkMarkdown {
       return Optional.empty();
     }
     Matcher markdown = PATH_MARKDOWN_LINK_PATTERN.matcher(authored.trim());
-    if (!markdown.matches() || !isConceptPathHref(markdown.group(2))) {
+    if (!markdown.matches() || !isPortablePathHref(markdown.group(2))) {
       return Optional.empty();
     }
     return Optional.of(new PathMarkdownToken(markdown.group(1), markdown.group(2)));
@@ -166,7 +166,7 @@ public final class WikiLinkMarkdown {
       if (pathMarkdown.start() > 0 && markdown.charAt(pathMarkdown.start() - 1) == '!') {
         continue;
       }
-      if (!isConceptPathHref(pathMarkdown.group(2))) {
+      if (!isPortablePathHref(pathMarkdown.group(2))) {
         continue;
       }
       occurrences.add(
@@ -176,7 +176,7 @@ public final class WikiLinkMarkdown {
     return occurrences;
   }
 
-  private static boolean isConceptPathHref(String href) {
+  private static boolean isPortablePathHref(String href) {
     if (href == null || !href.startsWith("/") || href.startsWith("//")) {
       return false;
     }
