@@ -708,30 +708,6 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/RelationshipLiteralSearchHit"
-  /api/notes/{note}/recall-setting:
-    post:
-      tags:
-      - note-controller
-      operationId: updateNoteRecallSetting
-      parameters:
-      - name: note
-        in: path
-        required: true
-        schema:
-          type: integer
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/NoteRecallSetting"
-        required: true
-      responses:
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/RedirectToNoteResponse"
   /api/notes/{note}/images:
     post:
       tags:
@@ -4057,21 +4033,6 @@ components:
             \ partial)"
       required:
       - hitKind
-    NoteRecallSetting:
-      type: object
-      properties:
-        level:
-          type: integer
-          format: int32
-    RedirectToNoteResponse:
-      type: object
-      properties:
-        noteId:
-          type: integer
-          format: int32
-        notebookId:
-          type: integer
-          format: int32
     NoteImageUploadDTO:
       type: object
       properties:
@@ -5352,8 +5313,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/MemoryTracker"
-        recallSetting:
-          $ref: "#/components/schemas/NoteRecallSetting"
         skippedPropertyKeys:
           type: array
           items:

@@ -1,6 +1,5 @@
 package com.odde.donut.controllers;
 
-import com.odde.donut.algorithms.FrontmatterNoteLevel;
 import com.odde.donut.controllers.dto.*;
 import com.odde.donut.entities.*;
 import com.odde.donut.entities.repositories.AssimilationSequenceSkipRepository;
@@ -8,7 +7,6 @@ import com.odde.donut.entities.repositories.RecallLogRepository;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.factoryServices.EntityPersister;
 import com.odde.donut.services.AuthorizationService;
-import com.odde.donut.services.NoteLevelIndexService;
 import com.odde.donut.services.NoteRealmService;
 import com.odde.donut.services.NoteService;
 import com.odde.donut.services.PortablePathAuthoring;
@@ -22,7 +20,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import java.io.IOException;
 import java.util.List;
-import org.springframework.beans.BeanUtils;
 import org.springframework.http.*;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -43,7 +40,6 @@ class NoteController {
   private final RecallLogRepository recallLogRepository;
   private final AssimilationSequenceSkipRepository skipRepository;
   private final PortablePathAuthoring portablePathAuthoring;
-  private final NoteLevelIndexService noteLevelIndexService;
 
   public NoteController(
       EntityPersister entityPersister,
@@ -55,8 +51,7 @@ class NoteController {
       NoteRealmService noteRealmService,
       RecallLogRepository recallLogRepository,
       AssimilationSequenceSkipRepository skipRepository,
-      PortablePathAuthoring portablePathAuthoring,
-      NoteLevelIndexService noteLevelIndexService) {
+      PortablePathAuthoring portablePathAuthoring) {
     this.entityPersister = entityPersister;
     this.noteService = noteService;
     this.authorizationService = authorizationService;
@@ -67,7 +62,6 @@ class NoteController {
     this.recallLogRepository = recallLogRepository;
     this.skipRepository = skipRepository;
     this.portablePathAuthoring = portablePathAuthoring;
-    this.noteLevelIndexService = noteLevelIndexService;
   }
 
   @GetMapping("/{note}")
@@ -106,7 +100,6 @@ class NoteController {
       }
     }
     noteRecallInfo.setMemoryTrackers(memoryTrackers);
-    noteRecallInfo.setRecallSetting(note.getRecallSetting());
     noteRecallInfo.setSkippedPropertyKeys(
         skipRepository.findByUserAndNote(user, note).stream()
             .map(AssimilationSequenceSkip::getPropertyKey)
@@ -139,21 +132,6 @@ class NoteController {
     entityPersister.flush();
 
     return noteRealmService.build(note, authorizationService.getCurrentUser());
-  }
-
-  @PostMapping(value = "/{note}/recall-setting")
-  @Transactional
-  public RedirectToNoteResponse updateNoteRecallSetting(
-      @PathVariable("note") @Schema(type = "integer") Note note,
-      @Valid @RequestBody NoteRecallSetting noteRecallSetting)
-      throws UnexpectedNoAccessRightException {
-    authorizationService.assertAuthorization(note);
-    BeanUtils.copyProperties(noteRecallSetting, note.getRecallSetting());
-    note.setContent(
-        FrontmatterNoteLevel.withVerbatimLevel(note.getContent(), noteRecallSetting.getLevel()));
-    entityPersister.save(note);
-    noteLevelIndexService.refreshForNote(note);
-    return RedirectToNoteResponse.forNote(note.getId());
   }
 
   @GetMapping("/recent")

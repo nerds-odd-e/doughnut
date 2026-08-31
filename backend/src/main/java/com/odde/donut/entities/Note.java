@@ -94,8 +94,6 @@ public class Note extends EntityIdentifiedByIdOnly {
   @JsonIgnore
   private List<Mcq> mcqs = new ArrayList<>();
 
-  @Embedded @JsonIgnore @Getter private NoteRecallSetting recallSetting = new NoteRecallSetting();
-
   public static <T extends Note> List<T> filterDeletedUnmodifiableNoteList(List<T> notes) {
     return notes.stream().filter(n -> n.getDeletedAt() == null).toList();
   }

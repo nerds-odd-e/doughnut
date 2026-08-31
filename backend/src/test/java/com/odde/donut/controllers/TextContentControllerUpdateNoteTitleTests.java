@@ -31,17 +31,6 @@ class TextContentControllerUpdateNoteTitleTests extends TextContentControllerTes
   }
 
   @Test
-  void shouldPreserveRecallSettingsWhenUpdatingTitle() throws UnexpectedNoAccessRightException {
-    note.getRecallSetting().setLevel(3);
-    makeMe.refresh(note);
-
-    controller.updateNoteTitle(note, noteUpdateTitleDTO);
-
-    makeMe.refresh(note);
-    assertThat(note.getRecallSetting().getLevel(), equalTo(3));
-  }
-
-  @Test
   void shouldNotAllowOthersToChange() {
     Note other = makeMe.aNote("another").notebookOwnedBy(makeMe.aUser().please()).please();
     assertThrows(

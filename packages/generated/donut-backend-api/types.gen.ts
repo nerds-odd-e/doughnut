@@ -374,15 +374,6 @@ export type RelationshipLiteralSearchHit = {
     distance?: number;
 };
 
-export type NoteRecallSetting = {
-    level?: number;
-};
-
-export type RedirectToNoteResponse = {
-    noteId?: number;
-    notebookId?: number;
-};
-
 export type NoteImageUploadDto = {
     uploadImage: Blob | File;
 };
@@ -1058,7 +1049,6 @@ export type CurrentUserInfo = {
 
 export type NoteRecallInfo = {
     memoryTrackers?: Array<MemoryTracker>;
-    recallSetting?: NoteRecallSetting;
     skippedPropertyKeys?: Array<string>;
 };
 
@@ -1338,7 +1328,6 @@ export type ConversationSubjectWritable = {
 
 export type NoteRecallInfoWritable = {
     memoryTrackers?: Array<MemoryTrackerWritable>;
-    recallSetting?: NoteRecallSetting;
     skippedPropertyKeys?: Array<string>;
 };
 
@@ -1945,24 +1934,6 @@ export type SearchForRelationshipTargetWithinResponses = {
 };
 
 export type SearchForRelationshipTargetWithinResponse = SearchForRelationshipTargetWithinResponses[keyof SearchForRelationshipTargetWithinResponses];
-
-export type UpdateNoteRecallSettingData = {
-    body: NoteRecallSetting;
-    path: {
-        note: number;
-    };
-    query?: never;
-    url: '/api/notes/{note}/recall-setting';
-};
-
-export type UpdateNoteRecallSettingResponses = {
-    /**
-     * OK
-     */
-    200: RedirectToNoteResponse;
-};
-
-export type UpdateNoteRecallSettingResponse = UpdateNoteRecallSettingResponses[keyof UpdateNoteRecallSettingResponses];
 
 export type UploadNoteImageData = {
     body?: NoteImageUploadDto;

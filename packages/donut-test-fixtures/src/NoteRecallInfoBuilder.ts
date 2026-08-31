@@ -1,8 +1,4 @@
-import type {
-  MemoryTracker,
-  NoteRecallInfo,
-  NoteRecallSetting,
-} from '@generated/donut-backend-api'
+import type { MemoryTracker, NoteRecallInfo } from '@generated/donut-backend-api'
 import Builder from './Builder'
 
 class NoteRecallInfoBuilder extends Builder<NoteRecallInfo> {
@@ -18,11 +14,6 @@ class NoteRecallInfoBuilder extends Builder<NoteRecallInfo> {
 
   memoryTrackers(value: MemoryTracker[]): NoteRecallInfoBuilder {
     this.data.memoryTrackers = value
-    return this
-  }
-
-  recallSetting(value: NoteRecallSetting): NoteRecallInfoBuilder {
-    this.data.recallSetting = value
     return this
   }
 
