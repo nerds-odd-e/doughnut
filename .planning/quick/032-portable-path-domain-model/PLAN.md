@@ -251,8 +251,17 @@ and tests use the domain vocabulary directly, with no old/new adapter.
 
 ### 4. Existing live and dead Wiki links behave unchanged
 
-**Status:** planned  
+**Status:** done (no code change needed)  
 **Type:** Behavior
+
+**Learnings:**
+- Slice 3 had already updated every E2E scenario and frontend test boundary
+  to the new vocabulary; the three focused E2E features and the full
+  frontend suite passed unchanged, confirming no coverage gap. This slice
+  was pure verification with a clean `git status` result.
+- The `data-wiki-title` DOM attribute and `refreshWikiTitleCacheForNoteIds`/
+  cache-refresh names remain intentionally unrenamed (persistence/index
+  layer, slice 5's scope).
 
 **Precondition:** Rich content contains a currently resolved or unresolved wiki
 or path-Markdown link.  
