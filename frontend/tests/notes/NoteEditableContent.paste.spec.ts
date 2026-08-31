@@ -85,6 +85,9 @@ describe("NoteEditableContent paste", () => {
     })
 
     it("converts a pasted noteProperty URL to a portable property wiki", async () => {
+      mockSdkService(NoteController, "authoredPortablePath", {
+        portablePath: "Moon#prop:topic",
+      })
       const source = makeMe.aNoteRealm
         .id(1)
         .title("Carrier")

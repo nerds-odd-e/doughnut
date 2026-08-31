@@ -49,7 +49,7 @@ import {
 } from "@/utils/wikiLinkMarkup"
 import {
   authoredWikiLinkTokenForInsert,
-  authoredWikiLinkTokenForAmbiguousRepair,
+  authoredWikiLinkTokenFromOriginalPath,
 } from "@/utils/sameNotebookWikiLinkAuthoring"
 import {
   moveBlockedBySoftDeletedTitleMessage,
@@ -117,7 +117,7 @@ async function wikiLinkSpellingForDestination(): Promise<string | undefined> {
   const destination = selectedSearchResult.value
   if (!destination || !note || !deadWikiLinkPayload) return
   if (deadWikiLinkPayload.resolution === "AMBIGUOUS") {
-    return authoredWikiLinkTokenForAmbiguousRepair(
+    return authoredWikiLinkTokenFromOriginalPath(
       note.id,
       destination.noteTopology.id,
       deadWikiLinkPayload.portablePath,

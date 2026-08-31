@@ -45,10 +45,12 @@ export function useNoteContentPaste(options: {
   }
 
   function convertPastedPropertyLinks(content: string): Promise<string> {
+    const sourceNoteId = options.noteId()
     const sourceNotebookId = storageAccessor.value
       .storedApi()
-      .getNoteRealmRef(options.noteId()).value?.notebookRealm.notebook.id
+      .getNoteRealmRef(sourceNoteId).value?.notebookRealm.notebook.id
     return convertPastedNotePropertyLinksInNoteContent(content, {
+      sourceNoteId,
       sourceNotebookId,
       resolveNote: resolvePastedNoteIdentity,
     })

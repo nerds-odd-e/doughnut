@@ -598,16 +598,24 @@ touched files already under the 250-line cap).
 
 ### 31. Pasting a note URL uses backend-authored unique paths
 
-**Status:** planned
+**Status:** done
 **Type:** Structure
 
-Unlocks slice 32. Replace frontend note-identity reconstruction in
-`convertPastedNotePropertyLinks` with the source-aware authoring operation
-for **unique** same-notebook pastes so the stored Wiki link is unchanged
-for that case. Keep one unresolved URL → ordinary Markdown.
-
-Verification: existing paste specs still green; `pnpm frontend:test` for
-the paste files (and backend if a new endpoint is added).
+Same-notebook branch of `convertPastedNotePropertyLinks` now calls the
+existing `authored-portable-path` seam (renamed
+`authoredWikiLinkTokenFromOriginalPath` in `sameNotebookWikiLinkAuthoring.ts`
+during refactor, since it's now shared by both ambiguous-shorthand repair
+and paste conversion — its `displayText` param is optional, defaulting to
+the bare authored path) instead of client-side `buildWikiLinkText`
+reconstruction. A synthetic `originalPortablePath` of
+`#prop:<encoded property key>` preserves the property suffix. Token
+replacement is now a collect-then-apply two-phase walk
+(`collectPendingLinkReplacements` / `applyWikiLinkTokenReplacement`) since
+the backend call is async but `marked.walkTokens` is synchronous.
+`ConvertPastedNotePropertyLinksContext` gained `sourceNoteId`, threaded
+from `useNoteContentPaste.ts`. Cross-notebook branch still uses
+`buildWikiLinkText` (slice 32). No backend change; reused the existing
+endpoint. Focused paste specs and `vue-tsc --noEmit` green.
 
 Stop-safe: paste shares the authoring seam; collision spelling is slice 32.
 

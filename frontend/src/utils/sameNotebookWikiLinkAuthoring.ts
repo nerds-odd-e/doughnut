@@ -36,12 +36,16 @@ export async function authoredWikiLinkTokenForInsert(
   return `[[${portablePath}]]`
 }
 
-/** Ambiguous-shorthand repair: backend-authored path preserving the original display text. */
-export async function authoredWikiLinkTokenForAmbiguousRepair(
+/**
+ * Backend-authored path for a known original reference (an ambiguous shorthand being
+ * repaired, or a pasted link being converted), preserving its display text — or the
+ * destination's own `#prop:` suffix when there was no display text to preserve.
+ */
+export async function authoredWikiLinkTokenFromOriginalPath(
   sourceNoteId: number,
   destinationNoteId: number,
   originalPortablePath: string,
-  displayText: string
+  displayText?: string
 ): Promise<string | undefined> {
   const portablePath = await authoredPortablePathFor(
     sourceNoteId,
@@ -49,5 +53,8 @@ export async function authoredWikiLinkTokenForAmbiguousRepair(
     originalPortablePath
   )
   if (portablePath === undefined) return
-  return markdownWikiTokenFromDeadWikiLinkPayload({ portablePath, displayText })
+  return markdownWikiTokenFromDeadWikiLinkPayload({
+    portablePath,
+    displayText: displayText ?? portablePath,
+  })
 }
