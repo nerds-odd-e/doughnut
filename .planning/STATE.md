@@ -6,9 +6,9 @@ current_phase: null
 current_phase_name: null
 status: ready
 stopped_at: null
-last_updated: "2026-08-31T04:06:00Z"
+last_updated: "2026-08-31T07:20:00Z"
 last_activity: 2026-08-31
-last_activity_desc: "033 daily probe tap affordance planned (not started)"
+last_activity_desc: "034 portable path ambiguity plan refined (deferred); SEED-009 absorbed"
 progress:
   total_phases: 0
   completed_phases: 0
@@ -37,6 +37,7 @@ Daily probe measurement (not an ADR): [daily-probe-protocol.md](notes/daily-prob
 
 - After deploying the Flyway squash, confirm startup succeeded and `flyway_schema_history` shows the baseline repaired, the collapsed versions marked `DELETE`, and `V300000300` applied.
 - Daily probe tap affordance (visible panels, stable board, press flash): `.planning/quick/033-daily-probe-tap-affordance/PLAN.md` — planned, do not execute until asked.
+- Portable path ambiguity (ADR 0001/0004): `.planning/quick/034-portable-path-ambiguity-behavior/PLAN.md` — deferred, do not execute until asked. Absorbs retired SEED-009.
 - Start the next milestone with `/gsd-new-milestone` when ready.
 
 Parked work: SEED-001, SEED-002, SEED-005, SEED-006, SEED-007, SEED-008; ADR 0002 Level 1. See [ROADMAP.md](ROADMAP.md).

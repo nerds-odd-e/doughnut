@@ -84,10 +84,6 @@ profile. Codec round-trips must be lossless for these rules.
   when it identifies one destination under that scope. With no match it is
   unresolved; with multiple matches it is ambiguous and therefore unresolved,
   and Donut asks for a longer path. The authored destination remains unchanged.
-  Implementation status: this ambiguity rejection is not yet enforced; that
-  work is deferred under `SEED-009`. The live resolver still applies its
-  existing deterministic first-match behavior (title before alias, then
-  repository order) instead of rejecting ambiguous matches.
 - These rules apply to the **body and to YAML frontmatter values** (scalars
   and one-level list items), including relationship `source` / `target` and
   `overlaps` items. Donut-authored frontmatter is wiki. Path Markdown
