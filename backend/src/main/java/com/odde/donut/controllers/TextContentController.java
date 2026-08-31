@@ -1,5 +1,6 @@
 package com.odde.donut.controllers;
 
+import com.odde.donut.algorithms.FrontmatterAliases;
 import com.odde.donut.algorithms.NoteConceptType;
 import com.odde.donut.controllers.dto.ApiError;
 import com.odde.donut.controllers.dto.NoteRealm;
@@ -22,7 +23,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import java.sql.Timestamp;
 import java.util.Objects;
+import java.util.Set;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
@@ -123,6 +126,7 @@ class TextContentController {
       throws UnexpectedNoAccessRightException {
     authorizationService.assertAuthorization(note);
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
+    Set<String> aliasesBefore = aliasLookupKeys(note.getContent());
     note.setUpdatedAt(currentUTCTimestamp);
     updateFunction.accept(note);
     entityPersister.save(note);
@@ -130,8 +134,19 @@ class TextContentController {
       noteService.deleteOrphanImagesForPersistedContent(note);
     }
     if (refreshWikiLinks) {
-      resolvedWikiLinkService.refreshForNote(note, authorizationService.getCurrentUser());
+      User viewer = authorizationService.getCurrentUser();
+      if (!aliasesBefore.equals(aliasLookupKeys(note.getContent()))) {
+        resolvedWikiLinkService.refreshNotebookScope(note.getNotebook(), viewer);
+      } else {
+        resolvedWikiLinkService.refreshForNote(note, viewer);
+      }
     }
     return noteRealmService.build(note, authorizationService.getCurrentUser());
+  }
+
+  private static Set<String> aliasLookupKeys(String content) {
+    return FrontmatterAliases.fromNoteContent(content).stream()
+        .map(FrontmatterAliases::normalizedLookupKey)
+        .collect(Collectors.toSet());
   }
 }

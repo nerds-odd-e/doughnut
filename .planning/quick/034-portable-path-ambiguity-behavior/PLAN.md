@@ -167,8 +167,12 @@ Gone: `WikiLinkTargetReference`, `WikiTitleCacheTitleResolutionTest`,
   on note id: title collisions are immune (title lives on `Note` itself,
   already persisted before the loop), alias collisions are not (a separate
   `NoteAliasIndex` table, rebuilt only on that note's own turn). Slice 26
-  fixes this with a two-pass split; do not reintroduce a single-pass walk in
-  later mutation-consistency slices without checking this ordering.
+  already split that walk into two passes; do not reintroduce a single-pass
+  walk in later mutation-consistency slices without checking this ordering.
+- Content-update tests live in `TextContentControllerUpdateNoteContentTests`
+  plus a dedicated alias-cardinality file (250-line split). Reuse
+  `noteWithInboundWiki`; do not seed via `ResolvedWikiLinkService`. The
+  named alias-collision test did not exist until slice 27 wrote it.
 
 ## Slices
 
@@ -527,31 +531,15 @@ slice's remaining new test file is committed separately to finish it.
 
 ### 27. Changing aliases updates shorthand cardinality
 
-**Status:** planned
+**Status:** done
 **Type:** Behavior
 
-**Precondition:** Alias candidates make a shorthand unique or ambiguous.
-**Trigger:** Authored aliases are added, removed, or changed.
-**Postcondition:** Link rendering and graph/index consumers reflect the
-new cardinality without editing the source note.
-
-Test first: add/remove a title-colliding alias at the text-content
-controller boundary (the test already written while diagnosing slice 26's
-Structure fix — `TextContentControllerUpdateNoteContentTests
-.reresolvesNotebookShorthandsWhenAnAliasIntroducesOrRemovesACollision` —
-should pass unchanged once slice 26 above lands). Do not duplicate slice
-22's graph assertions.
-
-Implementation: in `TextContentController.updateNote`, capture the note's
-normalized alias-lookup-key set before and after the content update
-(`FrontmatterAliases.fromNoteContent` + `normalizedLookupKey`, matching
-`NoteAliasIndexService`'s own normalization); call
-`resolvedWikiLinkService.refreshNotebookScope(note.getNotebook(), viewer)`
-only when the sets differ, so an ordinary body-text edit still takes the
-cheaper single-note `refreshForNote` path.
-
-Verification: `pnpm backend:test_only`.
-
+`TextContentController.updateNote` compares normalized alias lookup keys
+(`FrontmatterAliases.fromNoteContent` + `normalizedLookupKey`) before and
+after the content update. Alias set change → `refreshNotebookScope`;
+ordinary body-text edit still uses `refreshForNote`. Pinned by
+`TextContentControllerUpdateNoteContentAliasCardinalityTests
+.reresolvesNotebookShorthandsWhenAnAliasIntroducesOrRemovesACollision`.
 Stop-safe: aliases participate in uniqueness over time.
 
 ### 28. Rename rewrite lengthens the Portable path when needed
