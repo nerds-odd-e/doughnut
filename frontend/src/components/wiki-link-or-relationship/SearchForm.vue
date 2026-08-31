@@ -92,18 +92,6 @@ async function closeDialogThen(run: () => void | Promise<void>) {
 async function onInsertWikiLink() {
   if (!selectedSearchResult.value || !note) return
   const destination = selectedSearchResult.value
-  const sourceNotebookId = notebookId.value
-  const otherNotebook =
-    sourceNotebookId !== undefined &&
-    destination.notebookId !== sourceNotebookId &&
-    Boolean(destination.notebookName)
-  if (otherNotebook) {
-    const linkText = buildWikiLinkText(destination, {
-      notebookId: sourceNotebookId,
-    })
-    await closeDialogThen(() => insert(linkText))
-    return
-  }
   const linkText = await authoredWikiLinkTokenForInsert(
     note.id,
     destination.noteTopology.id

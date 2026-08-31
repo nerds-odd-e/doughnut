@@ -345,24 +345,19 @@ and backend `target*` names untouched, as scoped. `wikiLinkMarkup.spec.ts`
 
 ### 17. Inserting a cross-notebook Wiki link qualifies that path
 
-**Status:** planned
+**Status:** done
 **Type:** Behavior
 
-**Precondition:** The user inserts a Wiki link to a note in another
-notebook.
-**Trigger:** Donut inserts it.
-**Postcondition:** The stored path is notebook-qualified; the note portion
-is shorthand or normalized under the same uniqueness rule.
-
-Test first: extend the existing qualified-insert E2E in
-`wiki_link_insert.feature`. Reuse slice 11’s authoring. Tighten the
-colliding same-notebook insert assertion to a full `[[Folder/Title]]` if
-that scenario is touched.
-
-Verification: `wiki_link_insert.feature`; focused frontend specs if the
-payload shape is asserted there.
-
-Stop-safe: cross-notebook insert agrees with repair qualification.
+`SearchForm.vue`'s `onInsertWikiLink` dropped the `otherNotebook` /
+`buildWikiLinkText` special case; it always calls
+`authoredWikiLinkTokenForInsert` (slice 15), which already qualifies
+cross-notebook via slice 11's backend authoring. `wiki_link_insert.feature`
+"Insert a qualified wiki link to a note in another notebook" and
+`InsertWikiLink.spec.ts` green, no assertion changes needed (unique title,
+same output via the new path). Same-notebook colliding scenario untouched.
+`sameNotebookWikiLinkAuthoring.ts` kept its name (exported function names
+don't claim same-notebook-only scope); its JSDoc comments updated to
+reflect it now authors both same- and cross-notebook inserts.
 
 ### 18. Inserting a Wiki link as a property uses that path
 
