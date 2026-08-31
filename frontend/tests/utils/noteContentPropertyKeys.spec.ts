@@ -3,6 +3,7 @@ import { propertyRowWithScalar } from "@/utils/noteContentPropertyRows"
 import {
   isExampleOfPropertyKey,
   isImagePropertyKey,
+  isNoteLevelPropertyKey,
   isUrlPropertyKey,
   isWikidataIdPropertyKey,
   nextAvailablePropertyKeyForBase,
@@ -44,6 +45,12 @@ describe("nextAvailablePropertyKeyForBase", () => {
   it("treats existing keys case-insensitively", () => {
     expect(nextAvailablePropertyKeyForBase("a part of", ["A part of"])).toBe(
       "a part of 2"
+    )
+  })
+
+  it("does not offer a suffixed note_level when the key is occupied", () => {
+    expect(nextAvailablePropertyKeyForBase("note_level", ["note_level"])).toBe(
+      "note_level"
     )
   })
 })
@@ -121,5 +128,15 @@ describe("isExampleOfPropertyKey", () => {
     expect(isExampleOfPropertyKey("example of")).toBe(true)
     expect(isExampleOfPropertyKey("Example Of 2")).toBe(true)
     expect(isExampleOfPropertyKey("example")).toBe(false)
+  })
+})
+
+describe("isNoteLevelPropertyKey", () => {
+  it("matches note_level including aliases and suffix", () => {
+    expect(isNoteLevelPropertyKey("note_level")).toBe(true)
+    expect(isNoteLevelPropertyKey("Note_Level")).toBe(true)
+    expect(isNoteLevelPropertyKey("noteLevel")).toBe(true)
+    expect(isNoteLevelPropertyKey("note_level 2")).toBe(true)
+    expect(isNoteLevelPropertyKey("topic")).toBe(false)
   })
 })

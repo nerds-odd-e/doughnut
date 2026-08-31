@@ -89,6 +89,11 @@ public final class PropertyKeyNaming {
     return "questiongenerationinstruction".equals(normalizedBaseWithoutUnderscores(key));
   }
 
+  /** Frontmatter key for assimilation queue order ({@code note_level}). */
+  public static boolean isNoteLevelPropertyKey(String key) {
+    return "notelevel".equals(normalizedBaseWithoutUnderscores(key));
+  }
+
   /**
    * Frontmatter keys that define relationship note structure ({@code type: Relationship},
    * endpoints).
@@ -108,6 +113,7 @@ public final class PropertyKeyNaming {
         || isUrlPropertyKey(key)
         || isTitlePatternPropertyKey(key)
         || isQuestionGenerationInstructionPropertyKey(key)
+        || isNoteLevelPropertyKey(key)
         || isRelationshipNoteStructuralPropertyKey(key);
   }
 
@@ -143,6 +149,9 @@ public final class PropertyKeyNaming {
       occupied.add(parts.suffix() == null ? 1 : parts.suffix());
     }
     if (!occupied.contains(1)) {
+      return baseKey;
+    }
+    if (isNoteLevelPropertyKey(baseKey)) {
       return baseKey;
     }
     int n = 2;

@@ -13,7 +13,7 @@
       <Minus class="h-4 w-4" aria-hidden="true" />
     </button>
     <AssimilationButtons
-      v-if="noteId"
+      v-if="noteId && !isNoteLevelPropertyKey(propertyKey)"
       size="sm"
       :disabled="assimilatingPropertyKey === propertyKey"
       :assimilate-disabled="
@@ -44,6 +44,7 @@ import {
 import { useInjectedMemoryTrackerActions } from "@/composables/useMemoryTrackerActions"
 import { isSkippedForRecall } from "@/composables/useReviveMemoryTracker"
 import { isSkippedFromAssimilationSequence } from "@/composables/useAssimilationSequenceSkip"
+import { isNoteLevelPropertyKey } from "@/utils/noteContentPropertyKeys"
 
 const props = defineProps<{
   propertyKey: string

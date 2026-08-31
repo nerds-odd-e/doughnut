@@ -13,6 +13,7 @@ export {
   isExampleOfPropertyKey,
   isImagePropertyKey,
   isListCapablePropertyKey,
+  isNoteLevelPropertyKey,
   isQuestionGenerationInstructionPropertyKey,
   isReservedReadmeOnlyPropertyKey,
   isScalarOnlyStructuralPropertyKey,

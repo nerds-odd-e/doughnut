@@ -79,6 +79,28 @@ Workshop body.`
     expect(mockedGoToNextAssimilation).toHaveBeenCalled()
   })
 
+  it("hides assimilation buttons on the note_level property row", async () => {
+    const markdown = `---
+note_level: 2
+---
+
+Workshop body.`
+    const noteLevelRowSelector = propertyRowSelector("note_level")
+
+    const wrapper = await h.mountEditor(markdown, {
+      noteId,
+      route: noteShowLocation(noteId),
+    })
+    await expandPropertyPanel(wrapper, noteLevelRowSelector)
+
+    expect(
+      wrapper.find(`${noteLevelRowSelector} [data-test="assimilate"]`).exists()
+    ).toBe(false)
+    expect(
+      wrapper.find(`${noteLevelRowSelector} [data-test="skip"]`).exists()
+    ).toBe(false)
+  })
+
   it("skips the property from its own property panel after confirming", async () => {
     const skipSpy = mockSdkService(
       AssimilationSequenceSkipController,

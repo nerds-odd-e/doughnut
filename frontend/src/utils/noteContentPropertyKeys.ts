@@ -79,6 +79,12 @@ export function isQuestionGenerationInstructionPropertyKey(
   return t === "questiongenerationinstruction"
 }
 
+/** True when `key` is the assimilation queue-order slot (`note_level`). */
+export function isNoteLevelPropertyKey(key: string): boolean {
+  const { base } = propertyKeyBaseAndSuffix(key)
+  return base.trim().toLowerCase().replace(/_/g, "") === "notelevel"
+}
+
 /** True when `key` is any readme-only predefined slot, including legacy camelCase aliases. */
 export function isReservedReadmeOnlyPropertyKey(key: string): boolean {
   return (
@@ -143,6 +149,7 @@ function nextAvailablePropertyKeyFromFamilyKeys(
     occupied.add(suffix ?? 1)
   }
   if (!occupied.has(1)) return baseKey
+  if (isNoteLevelPropertyKey(baseKey)) return baseKey
   let n = 2
   while (occupied.has(n)) n++
   return `${baseKey} ${n}`

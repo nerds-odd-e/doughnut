@@ -142,6 +142,7 @@ class NotePropertyIndexServiceTest {
               + "topic: physics\n"
               + "image: /attachments/1\n"
               + "url: https://example.com\n"
+              + "note_level: 2\n"
               + "---\n\nbody";
       Note note = makeMe.aNote().notebookOwnedBy(user).content(markdown).please();
 

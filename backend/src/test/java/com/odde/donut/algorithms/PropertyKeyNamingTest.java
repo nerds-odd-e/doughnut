@@ -49,6 +49,13 @@ class PropertyKeyNamingTest {
         equalTo("a part of 2"));
   }
 
+  @Test
+  void nextAvailablePropertyKeyForBase_does_not_offer_suffixed_note_level() {
+    assertThat(
+        PropertyKeyNaming.nextAvailablePropertyKeyForBase("note_level", List.of("note_level")),
+        equalTo("note_level"));
+  }
+
   @ParameterizedTest
   @CsvSource({
     "image, true",
@@ -69,6 +76,10 @@ class PropertyKeyNamingTest {
     "relation 2, true",
     "source, true",
     "target, true",
+    "note_level, true",
+    "Note_Level, true",
+    "noteLevel, true",
+    "note_level 2, true",
     "example of, false",
     "example of 2, false",
     "topic, false",
