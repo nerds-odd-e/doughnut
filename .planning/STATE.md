@@ -6,9 +6,9 @@ current_phase: null
 current_phase_name: null
 status: ready
 stopped_at: null
-last_updated: "2026-08-31T02:19:00Z"
+last_updated: "2026-08-31T04:06:00Z"
 last_activity: 2026-08-31
-last_activity_desc: "Retired all shipped quick plans (013–017); product + ADRs are the record"
+last_activity_desc: "033 daily probe tap affordance planned (not started)"
 progress:
   total_phases: 0
   completed_phases: 0
@@ -36,6 +36,7 @@ Daily probe measurement (not an ADR): [daily-probe-protocol.md](notes/daily-prob
 ## Operator Next Steps
 
 - After deploying the Flyway squash, confirm startup succeeded and `flyway_schema_history` shows the baseline repaired, the collapsed versions marked `DELETE`, and `V300000300` applied.
+- Daily probe tap affordance (visible panels, stable board, press flash): `.planning/quick/033-daily-probe-tap-affordance/PLAN.md` — planned, do not execute until asked.
 - Start the next milestone with `/gsd-new-milestone` when ready.
 
 Parked work: SEED-001, SEED-002, SEED-005, SEED-006, SEED-007, SEED-008; ADR 0002 Level 1. See [ROADMAP.md](ROADMAP.md).
