@@ -11,8 +11,8 @@ Donut has three URL-shaped languages:
 
 1. **SPA locations** — what the browser shows for a screen
 2. **HTTP API** — JSON/auth/attachments the SPA and other clients call
-3. **Wiki / path Markdown in notebook content** — portable note and
-   property links
+3. **Wiki / path Markdown in notebook content** — note and property links
+   whose destinations are **Portable paths**
    ([ADR 0004](./0004-okf-compatible-notebook-markdown-accepted.md))
 
 The three languages share a leading `/`; this ADR defines their relationships
@@ -29,8 +29,8 @@ at the web boundary.
 - The HTTP API uses `/api` and is described by OpenAPI.
   [`doughnut-routing.json`](../../infra/gcp/path-routing/doughnut-routing.json)
   defines the load balancer's backend-owned route set.
-- ADR 0004 defines portable link spelling and tree resolution. Notebook
-  content stores inter-note links as wiki or path Markdown.
+- ADR 0004 defines **Portable path** spelling and resolution. Notebook content
+  stores inter-note links as wiki or path Markdown.
 
 ### SPA locations
 
@@ -38,7 +38,7 @@ at the web boundary.
   helper that returns one). An HTML `href` is allowed only on rendered
   anchors, and is compiled from a named location against that table —
   never a second concatenated copy of a path.
-- The URL identifies the **server-side note id**, not the portable path
+- The URL identifies the **server-side note id**, not the **Portable path**
   (ADR 0004). A **property** adds the **authored key** (no property
   surrogate id). Named route helpers receive the exact decoded key and
   Vue Router serializes it as one path parameter; callers do not pre-encode
@@ -61,39 +61,42 @@ at the web boundary.
   look like `noteShow`.
 ### Wiki links as web destinations
 
-- A live **note** token navigates to `noteShow`. A live **property** token
-  (`#prop:`, ADR 0004) navigates to `noteProperty`. The stored token is
-  unchanged.
-- A path-Markdown href with a leading `/` is **bundle-relative** (ADR 0004),
-  not an SPA path. The two languages share a `/` prefix; they are not
-  disjoint by string shape. Treat a token by **context**: notebook content
+- A resolved Portable path to a **note** navigates to `noteShow`. A resolved
+  Portable path with a **property** selector (`#prop:`, ADR 0004) navigates to
+  `noteProperty`. The stored Portable path is unchanged.
+- A path-Markdown link destination with a leading `/` is **bundle-relative**
+  (ADR 0004), not an SPA path. The two languages share a `/` prefix; they are
+  not disjoint by string shape. Treat a value by **context**: notebook content
   vs a compiled location. Do not classify a leading `/` as a Vue path.
 - The HTML `href` of a wiki or path-Markdown anchor is compiled from that
-  named location. The concept path and `#prop:` key stay in the stored
-  token — never as a navigable `href`.
+  named location. The Portable path, including any `#prop:` selector, stays in
+  the stored link destination — never as a navigable `href`.
 - Paste or strip of a `noteShow` or `noteProperty` (or legacy) URL in note
-  content becomes a wiki token only after the note id is resolved to its
-  portable target (and cross-notebook qualification when needed).
+  content becomes a wiki link only after the note id is resolved to its
+  Portable path (including cross-notebook qualification when needed).
   Property URLs add the encoded `#prop:` component. Anchor text is display
-  text, never portable identity. SPA addresses are not the stored form of
-  a wiki link.
-- Unresolved (dead / pending) tokens do not navigate.
+  text, never part of the Portable path. SPA addresses are not the stored form
+  of a wiki link.
+- Unresolved (dead / pending) Portable paths do not navigate.
 
 ## Consequences
 
 - Bookmarks and in-app clicks share one web identity: note id, or note id
   plus property key.
-- Exported trees stay portable: no Donut SPA URLs required in the markdown.
-- Agents must not treat a concept path as a Vue location, or a note-show /
-  note-property URL as portable identity. Do not put a concept path on an
-  HTML `href` the browser can follow.
+- A **Portable notebook tree** requires no Donut SPA URLs for note or property
+  links; Donut-authored notebook links store Portable paths.
+- Agents must not treat a Portable path as a Vue location, or a note-show /
+  note-property URL as a Portable path. Do not put a Portable path directly on
+  an HTML `href` the browser can follow.
 - Changing a path shape is a route-table (plus redirect) change; callers that
   used names keep working.
 
 ## Related
 
-- [ADR 0001 — Ubiquitous language](./0001-ubiquitous-language.md) (**Wiki link**, **Property**, **Property panel**)
+- [ADR 0001 — Ubiquitous language](./0001-ubiquitous-language.md)
+  (**Portable notebook tree**, **Portable path**, **Wiki link**, **Property**,
+  **Property panel**)
 - [ADR 0004 — OKF-compatible notebook Markdown](./0004-okf-compatible-notebook-markdown-accepted.md)
-  (token spelling, including `#prop:`, and tree identity — not web routing)
+  (Portable path spelling and resolution, including `#prop:` — not web routing)
 - [`doughnut-routing.json`](../../infra/gcp/path-routing/doughnut-routing.json)
   (backend-owned path hints for the load balancer)

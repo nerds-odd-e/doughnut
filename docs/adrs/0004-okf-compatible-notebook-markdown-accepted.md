@@ -7,7 +7,7 @@
 
 ## Context
 
-Donut exports and syncs notebooks as Markdown trees. Portable knowledge
+Donut exports and syncs notebooks as a **Portable notebook tree**. That tree
 should follow the
 [Open Knowledge Format (OKF) v0.2](https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/SPEC.md)
 so local copies work with OKF tooling, Obsidian-style editing, and (with
@@ -20,13 +20,14 @@ the profile this ADR records.
 
 ## Decision
 
-Donut’s canonical portable notebook tree conforms to OKF v0.2 plus this
+Donut’s **Portable notebook tree** conforms to OKF v0.2 plus this
 profile. Codec round-trips must be lossless for these rules.
 
 ### Bundle and concepts
 
 - One notebook ↔ one OKF bundle (directory of `.md` files).
-- Public concept ID = path without `.md` (OKF).
+- OKF calls a concept's bundle path without `.md` its **Concept ID**. For a
+  Donut note, this is the normalized note portion of its **Portable path**.
 - Stored note markdown carries `type` and valid YAML frontmatter.
   Ordinary notes use `type: Note`. Relationship notes are concepts in
   the bundle (`type: Relationship`). OKF unknown types are allowed.
@@ -35,10 +36,10 @@ profile. Codec round-trips must be lossless for these rules.
 - Container **Readme** is a notebook/folder column, not a note row.
   Non-blank readme maps to that directory’s `README.md`, a bundle concept
   with `type: Readme`. Blank readme omits the file.
-- Codec wrap (export / portable tree): insert `type: Readme` if missing;
-  canonicalize `readme` → `Readme`; any other non-empty `type` is left
-  as authored. Preserve author YAML. `type: Readme` is export-only;
-  stored readme columns are the authored text.
+- When exporting a **Portable notebook tree**, the codec inserts
+  `type: Readme` if missing; canonicalizes `readme` → `Readme`; and leaves any
+  other non-empty `type` as authored. Preserve author YAML. `type: Readme` is
+  export-only; stored readme columns are the authored text.
 - `readme` / `readme.md` are the only hard-reserved note titles.
 - Donut does not generate OKF `index.md` listings; omitting them is
   conformant. Donut does not emit `okf_version`; OKF allows that
@@ -65,15 +66,24 @@ profile. Codec round-trips must be lossless for these rules.
 - Author H1s in the body are ordinary body content. Ordinary save
   preserves author headings, including a leading heading that matches
   the title.
-- Public identity in the tree is the path,  **folder path + display name**.
-  Donut note ID is server-side.
+- A note's normalized **Portable path** is its **folder path + display name**.
+  It addresses the note within that Portable notebook tree revision and
+  changes when the note is renamed or moved. Donut note ID is server-side.
 
 ### Links and attachments
 
-- Donut-authored inter-note links are wiki `[[target]]` /
-  `[[target|display]]`. Product insert writes wiki. Unqualified `[[Title]]`
-  resolves by title (lowest note id when titles collide across folders).
-  `Notebook:Title` is a valid wiki target.
+- A notebook link has conventional markup parts: display text and a link
+  destination. Its destination is a **Portable path**; wiki and path Markdown
+  are authored spellings of that same domain value.
+- Donut-authored inter-note links are wiki `[[portable-path]]` /
+  `[[portable-path|display-text]]`. Product insert writes wiki. Unqualified
+  `[[Title-or-Alias]]` is a shorthand Portable path whose resolution scope is
+  the source notebook's Portable notebook tree. `Notebook:Title-or-Alias`
+  qualifies that scope with another notebook. Candidate matching includes note
+  display names and recognized aliases. A shorthand Portable path resolves only
+  when it identifies one destination under that scope. With no match it is
+  unresolved; with multiple matches it is ambiguous and therefore unresolved,
+  and Donut asks for a longer path. The authored destination remains unchanged.
 - These rules apply to the **body and to YAML frontmatter values** (scalars
   and one-level list items), including relationship `source` / `target` and
   `overlaps` items. Donut-authored frontmatter is wiki. Path Markdown
@@ -81,13 +91,16 @@ profile. Codec round-trips must be lossless for these rules.
   (`source: /folder/File.md`) is not a link. OKF §6.2 path-valued fields
   (`resource`, `sources[].resource`, …) are a different key family;
   Donut relationship endpoints are not those fields.
-- Path Markdown `[display](/folder/File.md)` is the same link as
-  `[[folder/File|display]]`. Leading `/` on Markdown hrefs is bundle-relative
-  (notebook root). Wiki path form has no leading `/`.
-- `.md` on a **path-shaped** target is optional and ignored (`/folder/File` =
-  `/folder/File.md`; `[[folder/File.md]]` = `[[folder/File]]`). Do not strip
-  `.md` from unqualified wiki titles (`[[File.md]]` may be a title).
-- A link may target a **property**: note target plus the reserved
+- Path Markdown `[display-text](/folder/File.md)` is the same link as
+  `[[folder/File|display-text]]`. Leading `/` on Markdown destinations is
+  bundle-relative (notebook root). Wiki bundle-root path form has no leading
+  `/`. Source-relative destinations fit the Portable path model where
+  supported; this profile does not yet require Donut to author or resolve them.
+- `.md` on a path-shaped **Portable path** is optional and ignored
+  (`/folder/File` = `/folder/File.md`; `[[folder/File.md]]` =
+  `[[folder/File]]`). Do not strip `.md` from unqualified wiki titles
+  (`[[File.md]]` may be a title).
+- A **Portable path** may select a **property**: note path plus the reserved
   `#prop:` separator and one non-empty encoded property-key component.
   The component is the exact authored YAML key encoded from UTF-8 bytes:
   RFC 3986 unreserved characters (`A-Z a-z 0-9 - . _ ~`) stay literal;
@@ -102,7 +115,7 @@ profile. Codec round-trips must be lossless for these rules.
   id; other fragments are not property links. Bare YAML paths (with or
   without a fragment) are not links. A note title that itself contains the
   literal substring `#prop:` cannot be the sole (unqualified, no-property)
-  target of a wiki or path-Markdown link — the parser always splits on the
+  destination of a wiki or path-Markdown link — the parser always splits on the
   first `#prop:` marker. Accepted trade-off: title authors avoid `#prop:`
   in titles; this profile does not add escaping for it.
 - No active conversion of stored `[[…]]` ↔ `[…](…)`, including save/paste
@@ -130,20 +143,19 @@ profile. Codec round-trips must be lossless for these rules.
 - Export, lint, import, and durable write share one codec contract.
 - Title changes are filename changes; identity preservation across
   renames is ADR 0002 lineage.
-- Filename is the display name on the portable tree. Author-owned `title:`
-  is authored YAML; the codec does not wrap `title:` to compensate for a
-  basename that is not the display name. Stored notes use the title
-  column.
+- Filename is the display name on the **Portable notebook tree**. Author-owned
+  `title:` is authored YAML; the codec does not wrap `title:` to compensate for
+  a basename that is not the display name. Stored notes use the title column.
 - Inter-note and property links are dual-spelling in body and frontmatter:
   Donut writes wiki; path Markdown is the authored spelling. ZIP does not
   rewrite wiki to path Markdown. Wiki in Donut-authored YAML is the same
   profile exception as wiki in the body. SPA property URLs are not a
   stored form (ADR 0005).
-- Obsidian and OKF consumers can open a Donut notebook tree. Public
-  identity in the files is the path, except a user-insisted concept
-  `index.md` / `log.md`, which OKF tools may treat as a listing/log or reject.
-  Tools that do not resolve wiki links will not follow Donut-authored
-  `[[…]]` until they support both spellings.
+- Obsidian and OKF consumers can open a Donut Portable notebook tree. A note is
+  addressed in the files by its normalized Portable path. A user-insisted
+  concept `index.md` / `log.md` still has that path, but OKF tools may treat it
+  as a listing/log or reject it. Tools that do not resolve wiki links will not
+  follow Donut-authored `[[…]]` until they support both spellings.
 
 ## Pros
 
@@ -159,7 +171,8 @@ profile. Codec round-trips must be lossless for these rules.
 ## Related
 
 - Links:
-  - [ADR 0001 — Ubiquitous language](./0001-ubiquitous-language.md) (**Wiki link**, **Property**)
+  - [ADR 0001 — Ubiquitous language](./0001-ubiquitous-language.md)
+    (**Portable notebook tree**, **Portable path**, **Wiki link**, **Property**)
   - [ADR 0002 — Git-native notebooks](./0002-git-native-notebooks-backed-by-mysql.md)
   - [ADR 0005 — Web routes](./0005-web-routes.md) (compile to `noteShow` / `noteProperty`)
   - [Open Knowledge Format v0.2](https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/SPEC.md)

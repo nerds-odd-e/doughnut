@@ -10,17 +10,17 @@
 Donut stores notes, folders, and readmes as mutable MySQL rows. Local
 export is a ZIP of Markdown.
 
-We want Git revisions stored by Donut to be authoritative for portable
-notebook content (notes, folders, readmes). Relational note/folder *content*
-becomes a rebuildable projection of the accepted Git head. Permissions,
-subscriptions, memory trackers, questions, and other Donut-specific
-behavior stay authoritative relational data.
+We want Git revisions stored by Donut to be authoritative for notebook content
+represented in the **Portable notebook tree** (notes, folders, readmes).
+Relational note/folder *content* becomes a rebuildable projection of the
+accepted Git head. Permissions, subscriptions, memory trackers, questions, and
+other Donut-specific behavior stay authoritative relational data.
 
-Local copies should be OKF-compatible Markdown trees (see
-[ADR 0004](./0004-okf-compatible-notebook-markdown-accepted.md)), real Git
-repositories, free of Donut note IDs in the working tree, and syncable
-with Donut. Donut keeps stable internal identities privately so
-learning data stays attached across renames.
+Local copies should use the **Portable notebook tree** profile (see
+[ADR 0004](./0004-okf-compatible-notebook-markdown-accepted.md)), be real Git
+repositories, remain free of Donut note IDs in the working tree, and sync with
+Donut. Donut keeps stable internal identities privately so learning data stays
+attached across renames.
 
 Git objects and refs live in MySQL so accepting a ref, recording identity
 lineage, and updating the projection share one transactional boundary.
@@ -31,18 +31,21 @@ lineage, and updating the projection share one transactional boundary.
 
 Authority and representation:
 
-1. **Git is authoritative for portable content.** Store blobs, trees, commits,
-   and the accepted `main` ref in MySQL. Projected note/folder rows carry the
-   commit they represent and must be rebuildable from that commit plus identity
-   lineage. Do not mutate projected content outside an accepted revision.
+1. **Git is authoritative for Portable notebook tree content.** Store blobs,
+   trees, commits, and the accepted `main` ref in MySQL. Projected note/folder
+   rows carry the commit they represent and must be rebuildable from that
+   commit plus identity lineage. Do not mutate projected content outside an
+   accepted revision.
 2. **OKF working tree, no internal IDs.** Canonical tree follows
-   [ADR 0004](./0004-okf-compatible-notebook-markdown-accepted.md). No note ID, UUID,
-   or sync manifest identity in the tree.
-3. **Private identity lineage.** Same path → same identity; unambiguous
-   rename/folder-move → preserve; delete → tombstone (keep DB-only history);
-   ambiguous delete/add/rename/copy → reject for explicit resolution (CLI asks
-   the user). Collision paths use human suffixes like `Recipe (2).md`, never
-   DB keys. Projection rebuild must not reallocate surviving note IDs.
+   the **Portable notebook tree** profile in
+   [ADR 0004](./0004-okf-compatible-notebook-markdown-accepted.md). No note ID,
+   UUID, or sync manifest identity in the tree.
+3. **Private identity lineage.** Same normalized Portable path → same private
+   identity; unambiguous rename/folder-move → preserve; delete → tombstone
+   (keep DB-only history); ambiguous delete/add/rename/copy → reject for
+   explicit resolution (CLI asks the user). Collision paths use human suffixes
+   like `Recipe (2).md`, never DB keys. Projection rebuild must not reallocate
+   surviving note IDs.
 4. **One acceptance boundary.** Every durable content change (CLI push or web
    edit) must: authorize → require parent = current `main` → validate OKF →
    resolve lineage → atomically advance `main`, lineage, and projection — or
@@ -98,6 +101,8 @@ Does not change Level 1 authority. Deferred until needed:
 
 - Links:
   - ADR-0000 [Use Architectural Decision Records](./0000-use-adrs-accepted.md)
+  - [ADR 0001 — Ubiquitous language](./0001-ubiquitous-language.md)
+    (**Portable notebook tree**, **Portable path**)
   - [ADR 0004 — OKF-compatible notebook Markdown](./0004-okf-compatible-notebook-markdown-accepted.md)
   - [ADR playbook](./README.md)
   - [Open Knowledge Format v0.2](https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/SPEC.md)

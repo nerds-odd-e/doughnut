@@ -28,6 +28,23 @@ concepts, including morning recall residual measurement, live in [ADR
   of a notebook. Shown in the **notebook catalog**. Distinct from the
   **Readme**.
 - **Folder** — Hierarchical path segment inside a notebook
+- **Portable notebook tree** — Canonical OKF-compatible Markdown
+  representation of one **notebook** as files and folders. It does not use
+  Donut server note IDs or SPA locations as notebook addresses and round-trips
+  under the profile in
+  [ADR 0004](./0004-okf-compatible-notebook-markdown-accepted.md). Portable
+  means decoupled from Donut's private and web identities; it does not mean
+  that paths survive rename or that every Markdown tool understands every
+  Donut profile extension.
+- **Portable path** — Address of a **note** in a **portable notebook tree**,
+  optionally qualified by **notebook** and optionally extended with a
+  **property** selector. It may have a bundle-root or shorthand form;
+  source-relative forms fit the same model where supported. Its resolution
+  scope is one portable notebook tree: the source notebook unless explicitly
+  notebook-qualified. A shorthand Portable path resolves only when it
+  identifies one destination under the documented resolution scope. Otherwise
+  it is unresolved/ambiguous, and Donut asks for a longer path. A Portable path
+  is not a Donut note ID, SPA location, or stable identity across rename.
 - **Readme** — Markdown body on a notebook or folder (landing content).
   Also bears YAML frontmatter for that notebook or folder. In the
   portable tree, maps to that directory’s `README.md` with
@@ -51,16 +68,13 @@ concepts, including morning recall residual measurement, live in [ADR
   [ADR 0004](./0004-okf-compatible-notebook-markdown-accepted.md). Web
   destination: `noteProperty`, once Proposed
   [ADR 0005](./0005-web-routes.md) is Accepted — human-owned exception
-  until route policy is Accepted.
+  trailed in `.planning/quick/013-note-property-canonical-path/PLAN.md`.
 - **Property** — YAML frontmatter key–value on a note (scalar or
   one-level list). Distinct from a **relationship note**. A value may
   contain **wiki links**. Relation-like keys (`example of`, `a part of`)
   are still properties. Portable identity is (concept path, exact YAML
   key) via `#prop:<encoded-key>` (ADR 0004). Web canonical location is
-  `noteProperty`: the note with that **property panel** open, once
-  Proposed ADR 0005 is Accepted (see above).
-- **Property panel** — Visible presentation of `noteProperty`. Opening or
-  closing it replaces to `noteProperty` / `noteShow`.
+  `noteProperty`, once Proposed ADR 0005 is Accepted (see above).
 - **Relationship** — Typed association between notes (e.g. “similar to”,
   “a part of”)
 - **Relationship note** — A note that represents a relationship
@@ -256,6 +270,6 @@ introduce a translation type that wraps one as the other.
 (**Spaced repetition glossary**, morning recall residuals); ADR 0004
 [OKF-compatible notebook Markdown](./0004-okf-compatible-notebook-markdown-accepted.md)
 (portable Markdown profile); ADR 0005
-[web routes](./0005-web-routes.md) (`noteShow` / `noteProperty`, **property panel**); [commissioned learning session
+[web routes](./0005-web-routes.md) (`noteShow` / `noteProperty`); [commissioned learning session
 protocol](../commissioned-learning-session-protocol.md) (Request/Report
 documents)
