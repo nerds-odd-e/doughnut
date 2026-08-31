@@ -133,14 +133,14 @@ public class WikiLinkResolver {
   }
 
   private Note resolveAnyTargetToken(String token, Note focusNote) {
-    return resolveParsedLink(token, focusNote, this::firstNotebookMatch);
+    return resolveParsedLink(token, focusNote, this::uniqueNotebookMatch);
   }
 
   private Note resolveToken(String token, User viewer, Note focusNote) {
     return resolveParsedLink(
         token,
         focusNote,
-        (notebookName, noteTitle) -> firstReadableNotebookMatch(notebookName, noteTitle, viewer));
+        (notebookName, noteTitle) -> uniqueReadableNotebookMatch(notebookName, noteTitle, viewer));
   }
 
   private Note resolveParsedLink(
@@ -160,19 +160,19 @@ public class WikiLinkResolver {
     return target;
   }
 
-  private Note firstNotebookMatch(String notebookName, String noteTitle) {
-    List<Note> candidates = noteCandidates(notebookName, noteTitle);
-    return candidates.isEmpty() ? null : candidates.getFirst();
+  private Note uniqueNotebookMatch(String notebookName, String noteTitle) {
+    return uniqueIfExactlyOne(noteCandidates(notebookName, noteTitle));
   }
 
-  private Note firstReadableNotebookMatch(String notebookName, String noteTitle, User viewer) {
+  private Note uniqueReadableNotebookMatch(String notebookName, String noteTitle, User viewer) {
+    List<Note> readable = new ArrayList<>();
     for (Note candidate : noteCandidates(notebookName, noteTitle)) {
       Notebook notebook = candidate.getNotebook();
       if (notebook != null && authorizationService.userMayReadNotebook(viewer, notebook)) {
-        return candidate;
+        readable.add(candidate);
       }
     }
-    return null;
+    return uniqueIfExactlyOne(readable);
   }
 
   private List<Note> noteCandidates(String notebookName, String noteTitle) {
@@ -184,15 +184,11 @@ public class WikiLinkResolver {
   private List<Note> titleOrAliasCandidates(String notebookName, String noteTitle) {
     List<Note> byTitle =
         noteRepository.findByNotebookNameAndNoteTitleOrderByIdAsc(notebookName, noteTitle);
-    List<Note> byAlias = aliasTargetCandidates(notebookName, noteTitle);
-    if (byTitle.isEmpty()) {
-      return byAlias;
-    }
-    return uniqueIfExactlyOne(unionByNoteId(byTitle, byAlias));
+    return unionByNoteId(byTitle, aliasTargetCandidates(notebookName, noteTitle));
   }
 
-  private static List<Note> uniqueIfExactlyOne(List<Note> notes) {
-    return notes.size() == 1 ? notes : List.of();
+  private static Note uniqueIfExactlyOne(List<Note> notes) {
+    return notes.size() == 1 ? notes.getFirst() : null;
   }
 
   private static List<Note> unionByNoteId(List<Note> first, List<Note> second) {

@@ -106,20 +106,17 @@ class NoteControllerShowTests extends ControllerTestBase {
   }
 
   @Test
-  void shouldResolveAmbiguousAliasToLowestNoteId() throws UnexpectedNoAccessRightException {
-    Note firstTarget =
+  void shouldNotResolveWikiLinkWhenTwoNotesShareAnAlias() throws UnexpectedNoAccessRightException {
+    Note first =
         makeMe
             .aNote()
             .notebookOwnedBy(currentUser.getUser())
             .title("first")
             .aliases("color")
             .please();
-    makeMe.aNote().underSameNotebookAs(firstTarget).title("second").aliases("color").please();
-    Note viewer =
-        makeMe.aNote().underSameNotebookAs(firstTarget).content("Text [[color]].").please();
-    assertThat(
-        showWithWikiTitles(viewer).getWikiLinks().get(0).getDestinationNoteId(),
-        equalTo(firstTarget.getId()));
+    makeMe.aNote().underSameNotebookAs(first).title("second").aliases("color").please();
+    Note viewer = makeMe.aNote().underSameNotebookAs(first).content("Text [[color]].").please();
+    assertThat(showWithWikiTitles(viewer).getWikiLinks(), empty());
   }
 
   @Test

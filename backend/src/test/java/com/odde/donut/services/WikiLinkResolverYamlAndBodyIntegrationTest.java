@@ -126,18 +126,13 @@ class WikiLinkResolverYamlAndBodyIntegrationTest {
   }
 
   @Test
-  void wikiLinkResolver_resolvesAmbiguousAliasToLowestNoteId() {
+  void wikiLinkResolver_doesNotResolveWhenTwoNotesShareAnAlias() {
     User owner = makeMe.aUser().please();
-    Note firstTarget =
-        makeMe.aNote().title("first").notebookOwnedBy(owner).aliases("color").please();
-    Note secondTarget =
-        makeMe.aNote().title("second").underSameNotebookAs(firstTarget).aliases("color").please();
-    Note linker = makeMe.aNote().underSameNotebookAs(firstTarget).content("See [[color]]").please();
+    Note first = makeMe.aNote().title("first").notebookOwnedBy(owner).aliases("color").please();
+    makeMe.aNote().title("second").underSameNotebookAs(first).aliases("color").please();
+    Note linker = makeMe.aNote().underSameNotebookAs(first).content("See [[color]]").please();
 
-    var resolved = wikiLinkResolver.resolveWikiLinksForCache(linker, owner);
-    assertThat(resolved.size(), equalTo(1));
-    assertThat(resolved.getFirst().destinationNote().getId(), equalTo(firstTarget.getId()));
-    assertThat(firstTarget.getId(), lessThan(secondTarget.getId()));
+    assertThat(wikiLinkResolver.resolveWikiLinksForCache(linker, owner), empty());
   }
 
   @Test

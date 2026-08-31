@@ -18,15 +18,15 @@ and Donut asks for a longer path.
 
 ## Live system (today)
 
-- `WikiLinkResolver.titleOrAliasCandidates` unions title and alias (dedupe by
-  note id) and keeps a candidate only when cardinality is 1. Empty title list
-  still returns alias candidates without that cardinality — slice 3.
-  `firstReadableNotebookMatch` / `firstNotebookMatch` still take the first
-  remaining alias row (ordered by note id) — slices 3–5.
+- `WikiLinkResolver.titleOrAliasCandidates` returns the title∪alias union
+  (dedupe by note id). `uniqueReadableNotebookMatch` skips unreadable then
+  keeps a candidate only when cardinality is 1. `uniqueNotebookMatch` applies
+  the same cardinality without a viewer. Two notes sharing an alias do not
+  resolve. One remaining readable alias still does.
 - Characterization:
   `ResolvedWikiLinkTitleResolutionTest.unqualified_link_does_not_resolve_when_same_title_in_different_folders`,
   `WikiLinkResolverYamlAndBodyIntegrationTest.wikiLinkResolver_doesNotResolveWhenTitleCollidesWithAlias`,
-  `WikiLinkResolverYamlAndBodyIntegrationTest.wikiLinkResolver_resolvesAmbiguousAliasToLowestNoteId`.
+  `WikiLinkResolverYamlAndBodyIntegrationTest.wikiLinkResolver_doesNotResolveWhenTwoNotesShareAnAlias`.
 - `NoteRealm.wikiLinks` is built only from resolved-index rows
   (`destinationNoteId` required). Dead links are inferred from markup.
 - Donut-authored insert/paste/overlap/accidental-match spelling still uses
@@ -142,20 +142,12 @@ unchanged. Shared `distinctByNoteId` for alias index and union.
 
 ### 3. Two notes sharing an alias make the shorthand ambiguous
 
-**Status:** planned
+**Status:** done
 **Type:** Behavior
 
-**Precondition:** Two distinct notes in scope share the same recognized
-alias and neither display name is that token.
-**Trigger:** Donut resolves that shorthand.
-**Postcondition:** No resolved-link row.
-
-Test first: replace
-`wikiLinkResolver_resolvesAmbiguousAliasToLowestNoteId` with zero rows.
-
-Verification: `pnpm backend:test_only`.
-
-Stop-safe: alias-only collisions follow the same cardinality rule.
+Alias-only collisions follow the same cardinality rule. Uniqueness runs
+after skipping unreadable (`uniqueReadableNotebookMatch`). Skip-unreadable
+qualified alias still resolves when one readable remains.
 
 ### 4. Two aliases on one note still identify one destination
 
@@ -183,9 +175,10 @@ ambiguous with itself.
 readable candidates in notebooks of that name.
 **Trigger:** Donut resolves it.
 **Postcondition:** One readable candidate resolves; several readable
-candidates do not; unreadable rows are skipped before cardinality (existing
+candidates do not. Unreadable rows are already skipped before cardinality
+(slice 3); keep
 `wikiLinkResolver_skipsUnreadableLowestIdAliasCandidateForReadableTarget`
-still holds when one readable remains).
+green. Extend qualified cases for several *readable* candidates.
 
 Test first: extend the qualified cases in
 `WikiLinkResolverYamlAndBodyIntegrationTest`. No E2E.
