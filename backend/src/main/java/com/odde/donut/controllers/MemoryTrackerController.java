@@ -60,6 +60,10 @@ class MemoryTrackerController {
     } else {
       recallPrompt = recallQuestionService.generateAQuestion(memoryTracker);
     }
+    if (recallPrompt == null) {
+      throw new ResponseStatusException(
+          HttpStatus.SERVICE_UNAVAILABLE, "AI failed to generate recall prompt");
+    }
     return com.odde.donut.controllers.dto.RecallPrompt.from(recallPrompt);
   }
 

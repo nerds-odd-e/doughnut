@@ -16,6 +16,7 @@ import com.openai.client.OpenAIClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -120,5 +121,14 @@ class MemoryTrackerRecallPromptControllerTest extends MemoryTrackerControllerTes
     testabilitySettings.setOpenAiTokenOverride("");
     assertThrows(
         OpenAiNotAvailableException.class, () -> controller.getRecallPrompt(memoryTracker));
+  }
+
+  @Test
+  void shouldThrowWhenAiFailsToGenerateQuestion() {
+    openAiStructuredResponseMock.stubStructuredResponse(null);
+    ResponseStatusException exception =
+        assertThrows(
+            ResponseStatusException.class, () -> controller.getRecallPrompt(ownedTracker()));
+    assertThat(exception.getStatusCode(), equalTo(HttpStatus.SERVICE_UNAVAILABLE));
   }
 }
