@@ -193,7 +193,7 @@ public class WikiLinkResolver {
     List<Note> byTitle =
         noteRepository.findByNotebookNameAndNoteTitleOrderByIdAsc(notebookName, noteTitle);
     if (!byTitle.isEmpty()) {
-      return byTitle;
+      return byTitle.size() == 1 ? byTitle : List.of();
     }
     return aliasTargetCandidates(notebookName, noteTitle);
   }

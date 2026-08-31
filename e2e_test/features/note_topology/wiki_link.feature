@@ -46,6 +46,20 @@ Feature: Wiki links in notes
     And the wiki link "WikiPath Nested Parent/WikiPath Nested Child/WikiPath Nested Shared" should open the note titled "WikiPath Nested Shared"
     And the note content on the current page should be "nested namesake"
 
+  Scenario: An unqualified shorthand does not open the earlier-created note when two notes share that display name
+    Given I have a notebook "WikiDup Title NB" with notes:
+      | Title           | Content       | Folder          |
+      | WikiDup Shared  | first created | WikiDup Recipes |
+      | WikiDup Carrier | origin        | WikiDup Root    |
+    And I have a notebook "WikiDup Title NB" with notes:
+      | Title          | Content        | Folder         |
+      | WikiDup Shared | second created | WikiDup Pantry |
+    When I update note "WikiDup Carrier" content using markdown to become:
+      """
+      See [[WikiDup Shared]].
+      """
+    Then I should see wiki link "WikiDup Shared" as a dead wiki link
+
   Scenario: A wiki link points to the note with the same title
     When I update note "WikiLinks E2E Tech" content using markdown to become:
       """

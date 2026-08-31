@@ -1,6 +1,6 @@
 # Portable path ambiguity behavior
 
-**Status:** deferred — not authorized for execution
+**Status:** in progress (authorized via execute-plan)
 
 Absorbs retired `.planning/seeds/SEED-009-portable-path-ambiguity-resolution.md`.
 Prerequisite on `main`: Portable-path / Wiki-link vocabulary from retired
@@ -16,15 +16,15 @@ and Donut asks for a longer path.
 ([ADR 0001](../../../docs/adrs/0001-ubiquitous-language.md),
 [ADR 0004](../../../docs/adrs/0004-okf-compatible-notebook-markdown-accepted.md).)
 
-This plan owns the behavior change. Do not execute until separately authorized.
-
 ## Live system (today)
 
-- `WikiLinkResolver.titleOrAliasCandidates` returns title hits if any, else
-  aliases. `firstReadableNotebookMatch` / `firstNotebookMatch` then take the
-  first remaining row (`NoteRepository` / alias index ordered by note id).
+- `WikiLinkResolver.titleOrAliasCandidates` returns title hits only when
+  exactly one note remains; otherwise empty (no resolved row). Alias fallback
+  still runs when there are no title hits. `firstReadableNotebookMatch` /
+  `firstNotebookMatch` still take the first remaining alias row (ordered by
+  note id) — slices 2–5.
 - Characterization:
-  `ResolvedWikiLinkTitleResolutionTest.unqualified_link_picks_lowest_note_id_when_same_title_in_different_folders`,
+  `ResolvedWikiLinkTitleResolutionTest.unqualified_link_does_not_resolve_when_same_title_in_different_folders`,
   `WikiLinkResolverYamlAndBodyIntegrationTest.wikiLinkResolver_resolvesAmbiguousAliasToLowestNoteId`.
 - `NoteRealm.wikiLinks` is built only from resolved-index rows
   (`destinationNoteId` required). Dead links are inferred from markup.
@@ -122,35 +122,13 @@ Gone: `WikiLinkTargetReference`, `WikiTitleCacheTitleResolutionTest`,
 
 ### 1. Duplicate display-name shorthand does not resolve
 
-**Status:** planned
+**Status:** done
 **Type:** Behavior
 
-**Precondition:** Two notes in the source notebook share a display name in
-different folders.
-**Trigger:** Donut resolves the unqualified shorthand from body or
-frontmatter.
-**Postcondition:** There is no resolved-link row and the shorthand does not
-navigate to the earlier-created note. Missing-style unresolved UI is
-acceptable until slice 7.
-
-Test first:
-
-- Replace
-  `unqualified_link_picks_lowest_note_id_when_same_title_in_different_folders`
-  so the cache has zero rows.
-- One `@wip` E2E in `wiki_link.feature`: following that shorthand no longer
-  opens the first-created note.
-- Keep existing exact path-shaped / folder-path cases green (no shorthand
-  fallback). One property-selector assertion only if the same unique-note
-  path still applies; do not add title/alias cases here.
-
-Implementation: shorthand title candidates resolve only when exactly one
-distinct note remains. Do not union aliases yet. Do not add a public
-resolution enum yet.
-
-Verification: `pnpm backend:test_only`; focused `wiki_link.feature`.
-
-Stop-safe: database order no longer chooses a duplicate-title destination.
+Title-candidate cardinality `== 1` only. Duplicate display-name shorthand
+has no resolved-link row; E2E `wiki_link.feature` treats `[[WikiDup Shared]]`
+as a dead wiki link (missing-style UI until slice 7). Path-shaped cases
+unchanged. Do not extract a cardinality helper until slice 2 unions aliases.
 
 ### 2. A title and an alias collision is unresolved
 
@@ -641,7 +619,7 @@ spelling.
 
 ## Slice wrap-up contract
 
-This plan stays deferred until separately authorized. Once executing: one
-slice per commit, ~5 minute fuzzy budget, red-to-green, `post-change-refactor`,
-update this plan, listed verification, then commit and push. Unfinished E2E
-stays `@wip`. After the last slice, delete this directory (`planning.mdc`).
+One slice per commit, ~5 minute fuzzy budget, red-to-green,
+`post-change-refactor`, update this plan, listed verification, then commit
+and push. Unfinished E2E stays `@wip`. After the last slice, delete this
+directory (`planning.mdc`).

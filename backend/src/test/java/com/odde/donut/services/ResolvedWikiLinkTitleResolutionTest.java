@@ -58,20 +58,18 @@ class ResolvedWikiLinkTitleResolutionTest {
   }
 
   @Test
-  void unqualified_link_picks_lowest_note_id_when_same_title_in_different_folders() {
+  void unqualified_link_does_not_resolve_when_same_title_in_different_folders() {
     User user = makeMe.aUser().please();
     Folder folderA = makeMe.aFolder().notebookOwnedBy(user).name("A").please();
     Notebook notebook = folderA.getNotebook();
     Folder folderB = makeMe.aFolder().notebook(notebook).name("B").please();
-    Note firstCreated = makeMe.aNote().title("Dup").folder(folderA).please();
+    makeMe.aNote().title("Dup").folder(folderA).please();
     makeMe.aNote().title("Dup").folder(folderB).please();
     Note carrier = makeMe.aNote().notebook(notebook).content("[[Dup]]").please();
 
     resolvedWikiLinkService.refreshForNote(carrier, user);
 
-    List<ResolvedWikiLink> rows = cacheRows(carrier);
-    assertThat(rows, hasSize(1));
-    assertThat(rows.get(0).getDestinationNote().getId(), equalTo(firstCreated.getId()));
+    assertThat(cacheRows(carrier), empty());
   }
 
   @ParameterizedTest
