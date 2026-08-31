@@ -76,6 +76,21 @@ When('I follow the dead wiki link {string}', (wikiLinkText: string) => {
 })
 
 Then(
+  'I should see that several notes match and I can choose one for a longer Portable path',
+  () => {
+    start.assumeNotePage().expectAmbiguousWikiLinkAsksForLongerPath()
+  }
+)
+
+Then('I should not be offered to create a note from the wiki link', () => {
+  start.assumeNotePage().expectWikiLinkCreateNoteNotOffered()
+})
+
+Then('I should still see the note titled {string}', (noteTitle: string) => {
+  start.assumeNotePage().expectNoteTitleDisplayed(noteTitle)
+})
+
+Then(
   'following the wiki link {string} should open the note titled {string}',
   followWikiLinkToNote
 )

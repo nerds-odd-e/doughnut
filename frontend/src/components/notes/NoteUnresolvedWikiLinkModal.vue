@@ -3,10 +3,17 @@
     <template #body>
       <div v-if="!showCreateForm && !pointingAtExisting" class="flex flex-col gap-3">
         <p class="text-sm opacity-70">
-          Dead wiki link: <strong>{{ modelValue.displayText }}</strong>
+          <template v-if="isAmbiguous">
+            Several notes match. Choose one so Donut can write a longer Portable
+            path.
+          </template>
+          <template v-else>
+            Dead wiki link: <strong>{{ modelValue.displayText }}</strong>
+          </template>
         </p>
         <div class="flex flex-col gap-2">
           <button
+            v-if="!isAmbiguous"
             class="daisy-btn daisy-btn-primary"
             @click="onCreateNewNoteClick"
           >
@@ -41,7 +48,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from "vue"
+import { computed, ref, watch } from "vue"
 import type { NoteRealm } from "@generated/donut-backend-api"
 import Modal from "@/components/commons/Modal.vue"
 import usePopups from "@/components/commons/Popups/usePopups"
@@ -67,6 +74,7 @@ const emit = defineEmits<{
 const { popups } = usePopups()
 const pointingAtExisting = ref(false)
 const showCreateForm = ref(false)
+const isAmbiguous = computed(() => props.modelValue?.resolution === "AMBIGUOUS")
 
 watch(
   () => props.modelValue,

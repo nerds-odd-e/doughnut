@@ -56,6 +56,27 @@ export const noteWikiLinkMethods = (assumeNotePage: AssumeNotePage) => ({
     findWikiLinkInNoteContent('dead-wiki-link', wikiLinkText)
     return this
   },
+  expectAmbiguousWikiLinkAsksForLongerPath() {
+    cy.get('dialog')
+      .filter(':visible')
+      .should(($dialog) => {
+        const text = $dialog.text()
+        expect(text, 'ambiguous wiki link guidance').to.match(
+          /several notes match/i
+        )
+        expect(text, 'asks for a longer Portable path').to.match(
+          /longer Portable path/i
+        )
+      })
+    cy.findByRole('button', { name: pointAtExistingNoteOffer }).should(
+      'be.visible'
+    )
+    return this
+  },
+  expectWikiLinkCreateNoteNotOffered() {
+    cy.findByRole('button', { name: /Create a new note/ }).should('not.exist')
+    return this
+  },
   expectCannotCreateNoteFromPath() {
     cy.get('dialog')
       .filter(':visible')

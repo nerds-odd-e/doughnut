@@ -51,6 +51,34 @@ describe("wikiLinkMarkup utils", () => {
     expect(payload).toEqual({ portablePath: "Ghost", displayText: "Ghost" })
   })
 
+  it("handleRichContentAnchorClick carries AMBIGUOUS from the anchor onto the payload", () => {
+    const anchor = document.createElement("a")
+    anchor.className = "dead-wiki-link"
+    anchor.setAttribute("data-portable-path", "Shared")
+    anchor.setAttribute("data-resolution", "AMBIGUOUS")
+    anchor.textContent = "Shared"
+    let payload:
+      | { portablePath: string; displayText: string; resolution?: string }
+      | undefined
+    handleRichContentAnchorClick(
+      anchor,
+      {
+        onDeadWikiLink: (p) => {
+          payload = p
+        },
+        navigateInApp: () => {
+          throw new Error("should not navigate")
+        },
+      },
+      { deadWikiLinksEnabled: true }
+    )
+    expect(payload).toEqual({
+      portablePath: "Shared",
+      displayText: "Shared",
+      resolution: "AMBIGUOUS",
+    })
+  })
+
   it("handleRichContentAnchorClick navigates path markdown wiki links via data-note-id", () => {
     const anchor = document.createElement("a")
     anchor.className = "donut-wiki-link"

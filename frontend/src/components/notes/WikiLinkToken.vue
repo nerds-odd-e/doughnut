@@ -33,8 +33,10 @@ import {
   DONUT_WIKI_LINK_CLASS,
   WIKI_LINK_DISPLAY_TEXT_ATTR,
   WIKI_LINK_PORTABLE_PATH_ATTR,
+  WIKI_LINK_RESOLUTION_ATTR,
 } from "@/utils/wikiLinkDomMarkers"
 import {
+  wikiLinkAmbiguousResolution,
   wikiLinkNoteIdLookup,
   type DeadWikiLinkPayload,
 } from "@/utils/wikiLinkMarkup"
@@ -64,12 +66,21 @@ const resolved = computed(() => {
   if (parsed.display !== parsed.target) {
     linkAttrs[WIKI_LINK_DISPLAY_TEXT_ATTR] = parsed.display
   }
+  const resolution = wikiLinkAmbiguousResolution(
+    props.wikiLinks,
+    parsed.target,
+    parsed.inner
+  )
+  if (resolution !== undefined) {
+    linkAttrs[WIKI_LINK_RESOLUTION_ATTR] = resolution
+  }
   return {
     inner: parsed.inner,
     target: parsed.target,
     display: parsed.display,
     noteId,
     linkAttrs,
+    resolution,
   }
 })
 
@@ -82,10 +93,14 @@ const unresolvedClass = computed(() => {
 })
 
 function onUnresolvedClick() {
-  if (!resolved.value || unresolvedClass.value !== DEAD_WIKI_LINK_CLASS) return
+  const clicked = resolved.value
+  if (!clicked || unresolvedClass.value !== DEAD_WIKI_LINK_CLASS) return
   emit("deadWikiLinkClick", {
-    portablePath: resolved.value.target,
-    displayText: resolved.value.display,
+    portablePath: clicked.target,
+    displayText: clicked.display,
+    ...(clicked.resolution === undefined
+      ? {}
+      : { resolution: clicked.resolution }),
   })
 }
 </script>

@@ -1,20 +1,26 @@
 import type { WikiLink } from "@generated/donut-backend-api"
-import type { RouteLocationRaw } from "vue-router"
 import {
   authoredHrefLooksLikePortablePath,
   splitWikiLinkInner,
   wikiLinkFromAuthoredToken,
 } from "@/utils/authoredLinkMarkup"
 import {
-  DEAD_WIKI_LINK_CLASS,
-  DONUT_WIKI_LINK_CLASS,
-  PENDING_WIKI_LINK_CLASS,
   WIKI_LINK_DISPLAY_TEXT_ATTR,
   WIKI_LINK_PORTABLE_PATH_ATTR,
+  WIKI_LINK_RESOLUTION_ATTR,
 } from "@/utils/wikiLinkDomMarkers"
-import { locationForResolvedWikiTarget } from "@/utils/wikiLinkResolvedLocation"
+import {
+  deadWikiLinkPayloadFromAnchor,
+  handleRichContentAnchorClick,
+  type DeadWikiLinkPayload,
+} from "@/utils/wikiLinkClick"
 
 export { splitWikiLinkInner, wikiLinkFromAuthoredToken }
+export {
+  deadWikiLinkPayloadFromAnchor,
+  handleRichContentAnchorClick,
+  type DeadWikiLinkPayload,
+}
 
 export function escapeHtmlForWikiLinkDisplay(s: string): string {
   return s
@@ -36,6 +42,7 @@ export function wikiLinkAnchorHtml(attrs: {
   display: string
   noteId?: number
   innerHtml?: string
+  resolution?: "AMBIGUOUS"
 }): string {
   const attrHref = escapeHtmlAttributeValue(attrs.href)
   const attrTarget = escapeHtmlAttributeValue(attrs.target)
@@ -45,8 +52,12 @@ export function wikiLinkAnchorHtml(attrs: {
       : ""
   const noteIdAttr =
     attrs.noteId === undefined ? "" : ` data-note-id="${attrs.noteId}"`
+  const resolutionAttr =
+    attrs.resolution === undefined
+      ? ""
+      : ` ${WIKI_LINK_RESOLUTION_ATTR}="${attrs.resolution}"`
   const body = attrs.innerHtml ?? escapeHtmlForWikiLinkDisplay(attrs.display)
-  return `<a href="${attrHref}" class="${attrs.className}" ${WIKI_LINK_PORTABLE_PATH_ATTR}="${attrTarget}"${displayAttr}${noteIdAttr}>${body}</a>`
+  return `<a href="${attrHref}" class="${attrs.className}" ${WIKI_LINK_PORTABLE_PATH_ATTR}="${attrTarget}"${displayAttr}${noteIdAttr}${resolutionAttr}>${body}</a>`
 }
 
 /** `[[` / `]]` shown literally; title text escaped (same visible shape as plain wiki syntax). */
@@ -69,6 +80,28 @@ export function isResolvedWikiLink(
   return w.resolution === "RESOLVED" && w.destinationNoteId !== undefined
 }
 
+function isAmbiguousWikiLink(w: WikiLink): boolean {
+  return w.resolution === "AMBIGUOUS"
+}
+
+export function wikiLinkAmbiguousResolution(
+  wikiLinks: readonly WikiLink[],
+  portablePath: string,
+  authored: string
+): "AMBIGUOUS" | undefined {
+  for (const w of wikiLinks) {
+    if (!isAmbiguousWikiLink(w)) continue
+    if (
+      w.portablePath === portablePath ||
+      w.portablePath.trim() === portablePath.trim() ||
+      w.authoredLink === authored
+    ) {
+      return "AMBIGUOUS"
+    }
+  }
+  return undefined
+}
+
 /** Lookup keys: trimmed Portable path and full authored link from the note realm. */
 export function wikiLinkNoteIdLookup(
   wikiLinks: readonly WikiLink[]
@@ -81,9 +114,6 @@ export function wikiLinkNoteIdLookup(
   }
   return map
 }
-
-/** Dead wiki link click payload containing the target token and visible display text. */
-export type DeadWikiLinkPayload = { portablePath: string; displayText: string }
 
 function pathMarkdownToken(displayText: string, href: string): string {
   return `[${displayText}](${href})`
@@ -113,71 +143,6 @@ export function pathMarkdownTokenForNote(args: {
     folders.length > 0 ? `${folders.join("/")}/${args.title}` : args.title
   const suffix = args.authoredHref.toLowerCase().endsWith(".md") ? ".md" : ""
   return pathMarkdownToken(args.displayText, `/${path}${suffix}`)
-}
-
-/** Handles click on a rich-content anchor: dead wiki links, external URLs, in-app routes. */
-export function handleRichContentAnchorClick(
-  anchor: HTMLAnchorElement,
-  handlers: {
-    onDeadWikiLink: (payload: DeadWikiLinkPayload) => void
-    navigateInApp: (to: RouteLocationRaw) => void
-  },
-  options: { deadWikiLinksEnabled: boolean }
-): void {
-  if (
-    options.deadWikiLinksEnabled &&
-    anchor.classList.contains(DEAD_WIKI_LINK_CLASS)
-  ) {
-    handlers.onDeadWikiLink(deadWikiLinkPayloadFromAnchor(anchor))
-    return
-  }
-  if (anchor.classList.contains(PENDING_WIKI_LINK_CLASS)) {
-    return
-  }
-  const noteId = anchor.getAttribute("data-note-id")
-  if (anchor.classList.contains(DONUT_WIKI_LINK_CLASS) && noteId) {
-    handlers.navigateInApp(
-      locationForResolvedWikiTarget(
-        Number(noteId),
-        anchor.getAttribute(WIKI_LINK_PORTABLE_PATH_ATTR) ?? ""
-      )
-    )
-    return
-  }
-  const href = anchor.getAttribute("href")
-  if (!href) return
-  if (/^https?:\/\//i.test(href) || href.startsWith("//")) {
-    window.open(href, "_blank", "noopener,noreferrer")
-    return
-  }
-  if (href === "#" || authoredHrefLooksLikePortablePath(href)) return
-  handlers.navigateInApp(href)
-}
-
-/** Extracts target token and display text from a dead-wiki-link anchor element. */
-export function deadWikiLinkPayloadFromAnchor(
-  anchor: HTMLElement
-): DeadWikiLinkPayload {
-  const raw = anchor.textContent?.trim() ?? ""
-  let portablePath: string
-  const fromAttr = anchor.getAttribute(WIKI_LINK_PORTABLE_PATH_ATTR)
-  if (fromAttr !== null && fromAttr !== "") {
-    portablePath = fromAttr
-  } else {
-    const closed = /^\[\[([^\[\]\r\n]*)\]\]$/.exec(raw)
-    if (closed?.[1] !== undefined) {
-      portablePath = closed[1].trim()
-    } else {
-      const open = /^\[\[([^\[\]\r\n]*)$/.exec(raw)
-      portablePath = open?.[1]?.trim() ?? raw
-    }
-  }
-
-  const displayAttr = anchor.getAttribute(WIKI_LINK_DISPLAY_TEXT_ATTR)
-  if (displayAttr !== null && displayAttr !== "") {
-    return { portablePath, displayText: displayAttr }
-  }
-  return { portablePath, displayText: portablePath }
 }
 
 function pathHrefFromWikiAnchor(anchor: HTMLAnchorElement): string | null {

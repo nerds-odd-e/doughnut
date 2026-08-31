@@ -29,10 +29,11 @@ and Donut asks for a longer path.
   `WikiLinkResolverYamlAndBodyIntegrationTest.wikiLinkResolver_doesNotResolveWhenTwoNotesShareAnAlias`,
   `WikiLinkResolverYamlAndBodyIntegrationTest.wikiLinkResolver_resolvesWhenOneNoteMatchesAsBothTitleAndAlias`,
   `WikiLinkResolverYamlAndBodyIntegrationTest.wikiLinkResolver_doesNotResolveWhenSeveralReadableNotesMatchQualifiedShorthand`.
-- `NoteRealm.wikiLinks` is built only from resolved-index rows, each
-  `resolution: RESOLVED` with `destinationNoteId`. Dead links are inferred
-  from markup. Frontend matching uses `isResolvedWikiLink`. `wikiLinkMarkup.ts`
-  is ~247 lines — slice 7 must not push it over 250 without a cohesive split.
+- `NoteRealm.wikiLinks` includes resolved-index `RESOLVED` rows and
+  `AMBIGUOUS` rows (`destinationNoteId` null) for cardinality `> 1`. Missing
+  stays inferred from markup. Clicking ambiguous reuses
+  `NoteUnresolvedWikiLinkModal` (guidance + “Point at an existing note”; no
+  create-note). Click handling is in `wikiLinkClick.ts`.
 - Donut-authored insert/paste/overlap/accidental-match spelling still uses
   frontend `buildWikiLinkText` (title, plus notebook prefix when the source
   notebook differs).
@@ -183,32 +184,14 @@ resolved-index `RESOLVED`. Frontend uses DTO fields directly (`isResolvedWikiLin
 
 ### 7. Following an ambiguous link asks for a longer Portable path
 
-**Status:** planned
+**Status:** done
 **Type:** Behavior
 
-**Precondition:** A rendered Wiki link is `resolution: AMBIGUOUS`.
-**Trigger:** The user follows it.
-**Postcondition:** Donut explains that several notes match and asks the user
-to choose one so it can write a longer Portable path. It does not navigate
-and does not offer to create a note.
-
-Test first:
-
-- Promote the slice 1 E2E through the click; assert guidance and the choose
-  action; no create-note.
-- At a mounted component boundary, distinguish ambiguous from unresolved;
-  keep create-note for missing.
-
-Implementation: emit `AMBIGUOUS` (null `destinationNoteId`) for cardinality
-`> 1`. Suppress create-new-note on that path. Do not expose unreadable
-notebook candidates. Do not write the longer path yet. Keep `wikiLinkMarkup.ts`
-under 250 lines (it is ~247 after slice 6); split along a cohesive seam if
-click UX would overflow. Promote the existing
-`An unqualified shorthand does not open the earlier-created note…` scenario.
-
-Verification: focused frontend specs; `wiki_link.feature`.
-
-Stop-safe: ambiguity is understandable; repair spelling is slice 8.
+`AMBIGUOUS` rows emitted for cardinality `> 1`. Click stays on the source
+note, explains several notes match, offers “Point at an existing note”
+(`NoteUnresolvedWikiLinkModal`); create-note only for missing. E2E
+`wiki_link.feature` duplicate-title scenario follows through the click.
+`AmbiguousWikiLinks` owns listing; `wikiLinkClick.ts` owns click handling.
 
 ### 8. Choosing a destination writes the full normalized Portable path
 
@@ -229,7 +212,10 @@ preserved `#prop:` selector.
 Implementation: add the backend source-scoped Portable-path authoring
 operation. This slice returns the full path for the selected note (do not
 yet special-case `/Title`, do not yet switch insert/paste callers).
-Frontend only formats the surrounding Wiki-link spelling.
+Frontend only formats the surrounding Wiki-link spelling. Slice 7's choose
+action is the existing “Point at an existing note” search in
+`NoteUnresolvedWikiLinkModal` — hook that confirmation for an AMBIGUOUS
+link; do not invent a second picker.
 
 Verification: `pnpm backend:test_only`; focused frontend specs;
 `wiki_link.feature` (and `property_wiki_link.feature` if the property case

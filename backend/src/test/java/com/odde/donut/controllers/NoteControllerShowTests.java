@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.donut.controllers.dto.NoteRealm;
 import com.odde.donut.controllers.dto.WikiLink;
+import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.User;
@@ -98,16 +99,38 @@ class NoteControllerShowTests extends ControllerTestBase {
   }
 
   @Test
-  void shouldNotResolveWikiLinkWhenTitleCollidesWithAlias()
+  void shouldEmitAmbiguousWhenSeveralReadableNotesShareDisplayName()
       throws UnexpectedNoAccessRightException {
-    Note byTitle = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).title("color").please();
-    makeMe.aNote().underSameNotebookAs(byTitle).title("colour").aliases("color").please();
-    Note viewer = makeMe.aNote().underSameNotebookAs(byTitle).content("Text [[color]].").please();
-    assertThat(showWithWikiTitles(viewer).getWikiLinks(), empty());
+    Folder recipes =
+        makeMe.aFolder().notebookOwnedBy(currentUser.getUser()).name("WikiDup Recipes").please();
+    Folder pantry =
+        makeMe.aFolder().notebook(recipes.getNotebook()).name("WikiDup Pantry").please();
+    makeMe.aNote().title("WikiDup Shared").folder(recipes).please();
+    makeMe.aNote().title("WikiDup Shared").folder(pantry).please();
+    Note viewer =
+        makeMe.aNote().notebook(recipes.getNotebook()).content("See [[WikiDup Shared]].").please();
+    NoteRealm realm = showWithWikiTitles(viewer);
+    assertThat(realm.getWikiLinks(), hasSize(1));
+    WikiLink wt = realm.getWikiLinks().get(0);
+    assertThat(wt.getAuthoredLink(), equalTo("WikiDup Shared"));
+    assertThat(wt.getPortablePath(), equalTo("WikiDup Shared"));
+    assertThat(wt.getDisplayText(), equalTo("WikiDup Shared"));
+    assertThat(wt.getResolution(), equalTo(WikiLink.Resolution.AMBIGUOUS));
+    assertThat(wt.getDestinationNoteId(), nullValue());
   }
 
   @Test
-  void shouldNotResolveWikiLinkWhenTwoNotesShareAnAlias() throws UnexpectedNoAccessRightException {
+  void shouldEmitAmbiguousWhenTitleCollidesWithAlias() throws UnexpectedNoAccessRightException {
+    Note byTitle = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).title("color").please();
+    makeMe.aNote().underSameNotebookAs(byTitle).title("colour").aliases("color").please();
+    Note viewer = makeMe.aNote().underSameNotebookAs(byTitle).content("Text [[color]].").please();
+    assertThat(
+        showWithWikiTitles(viewer).getWikiLinks().get(0).getResolution(),
+        equalTo(WikiLink.Resolution.AMBIGUOUS));
+  }
+
+  @Test
+  void shouldEmitAmbiguousWhenTwoNotesShareAnAlias() throws UnexpectedNoAccessRightException {
     Note first =
         makeMe
             .aNote()
@@ -117,7 +140,9 @@ class NoteControllerShowTests extends ControllerTestBase {
             .please();
     makeMe.aNote().underSameNotebookAs(first).title("second").aliases("color").please();
     Note viewer = makeMe.aNote().underSameNotebookAs(first).content("Text [[color]].").please();
-    assertThat(showWithWikiTitles(viewer).getWikiLinks(), empty());
+    assertThat(
+        showWithWikiTitles(viewer).getWikiLinks().get(0).getResolution(),
+        equalTo(WikiLink.Resolution.AMBIGUOUS));
   }
 
   @Test

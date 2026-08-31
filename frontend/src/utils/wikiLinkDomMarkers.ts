@@ -13,6 +13,9 @@ export const WIKI_LINK_PORTABLE_PATH_ATTR = "data-portable-path"
 /** Transient in-editor marker: display text when it differs from the Portable path. */
 export const WIKI_LINK_DISPLAY_TEXT_ATTR = "data-display-text"
 
+/** Transient in-editor marker: wiki-link resolution when it is not a live destination. */
+export const WIKI_LINK_RESOLUTION_ATTR = "data-resolution"
+
 /** True when the element carries a live, dead, or pending wiki-link class. */
 export function isWikiLinkAnchor(el: Element): boolean {
   return (

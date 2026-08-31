@@ -165,6 +165,10 @@ public class WikiLinkResolver {
   }
 
   private Note uniqueReadableNotebookMatch(String notebookName, String noteTitle, User viewer) {
+    return uniqueIfExactlyOne(readableNotebookMatches(notebookName, noteTitle, viewer));
+  }
+
+  List<Note> readableNotebookMatches(String notebookName, String noteTitle, User viewer) {
     List<Note> readable = new ArrayList<>();
     for (Note candidate : noteCandidates(notebookName, noteTitle)) {
       Notebook notebook = candidate.getNotebook();
@@ -172,7 +176,7 @@ public class WikiLinkResolver {
         readable.add(candidate);
       }
     }
-    return uniqueIfExactlyOne(readable);
+    return readable;
   }
 
   private List<Note> noteCandidates(String notebookName, String noteTitle) {

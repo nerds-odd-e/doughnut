@@ -26,6 +26,7 @@ public class ResolvedWikiLinkService {
 
   @PersistenceContext private EntityManager entityManager;
 
+  private final AmbiguousWikiLinks ambiguousWikiLinks;
   private final ResolvedWikiLinkRepository resolvedWikiLinkRepository;
   private final AuthorizationService authorizationService;
   private final ResolvedWikiLinkRefresh resolvedWikiLinkRefresh;
@@ -36,6 +37,7 @@ public class ResolvedWikiLinkService {
       AuthorizationService authorizationService,
       NotePropertyIndexService notePropertyIndexService,
       NoteAliasIndexService noteAliasIndexService) {
+    this.ambiguousWikiLinks = new AmbiguousWikiLinks(wikiLinkResolver);
     this.resolvedWikiLinkRepository = resolvedWikiLinkRepository;
     this.authorizationService = authorizationService;
     this.resolvedWikiLinkRefresh =
@@ -48,6 +50,7 @@ public class ResolvedWikiLinkService {
 
   public List<WikiLink> wikiLinksForViewer(Note focusNote, User viewer) {
     List<WikiLink> out = new ArrayList<>();
+    Set<String> emittedAuthored = new LinkedHashSet<>();
     for (ResolvedWikiLink row :
         resolvedWikiLinkRepository.findBySourceNote_IdOrderByIdAsc(focusNote.getId())) {
       Note resolved = authorizedOutgoingTargetNote(focusNote, row, viewer);
@@ -61,8 +64,10 @@ public class ResolvedWikiLinkService {
                 parts.displayText(),
                 WikiLink.Resolution.RESOLVED,
                 resolved.getId()));
+        emittedAuthored.add(row.getAuthoredLink());
       }
     }
+    out.addAll(ambiguousWikiLinks.forAuthoredTokensNotIn(focusNote, viewer, emittedAuthored));
     return List.copyOf(out);
   }
 

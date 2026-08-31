@@ -3,7 +3,8 @@ import {
   NotebookController,
   SearchController,
 } from "@generated/donut-backend-api/sdk.gen"
-import NoteDeadWikiLinkCreateModal from "@/components/notes/NoteDeadWikiLinkCreateModal.vue"
+import NoteUnresolvedWikiLinkModal from "@/components/notes/NoteUnresolvedWikiLinkModal.vue"
+import type { DeadWikiLinkPayload } from "@/utils/wikiLinkMarkup"
 import { mockCoarsePointer } from "@tests/helpers/mockCoarsePointer"
 import {
   focusDirective,
@@ -47,7 +48,7 @@ const router = createRouter({
 const createNoteLabel = /Create a new note named/
 const pointAtExistingNoteLabel = "Point at an existing note"
 
-describe("NoteDeadWikiLinkCreateModal", () => {
+describe("NoteUnresolvedWikiLinkModal", () => {
   const noteRealm = makeMe.aNoteRealm.title("Ghost Page").please()
   const deadWikiLinkPayload = {
     portablePath: "Ghost Page",
@@ -90,10 +91,10 @@ describe("NoteDeadWikiLinkCreateModal", () => {
   })
 
   const mountModal = (
-    modelValue: typeof deadWikiLinkPayload = deadWikiLinkPayload
+    modelValue: DeadWikiLinkPayload = deadWikiLinkPayload
   ) => {
     mountSoftKeyboardPrimer()
-    wrapper = mount(NoteDeadWikiLinkCreateModal, {
+    wrapper = mount(NoteUnresolvedWikiLinkModal, {
       props: { ...commonProps, modelValue },
       attachTo: document.body,
       global: {
@@ -125,6 +126,20 @@ describe("NoteDeadWikiLinkCreateModal", () => {
     await waitForChooser()
     expect(screen.getByText(/Dead wiki link:/)).toBeTruthy()
     expect(screen.getByText(pointAtExistingNoteLabel)).toBeTruthy()
+  })
+
+  it("asks to choose a longer Portable path and hides create-note when the link is ambiguous", async () => {
+    mountModal({
+      portablePath: "WikiDup Shared",
+      displayText: "WikiDup Shared",
+      resolution: "AMBIGUOUS",
+    })
+    await flushPromises()
+    expect(screen.getByText(/Several notes match/i).textContent).toMatch(
+      /longer Portable path/i
+    )
+    expect(screen.getByText(pointAtExistingNoteLabel)).toBeTruthy()
+    expect(screen.queryByText(createNoteLabel)).toBeNull()
   })
 
   it("uses the wiki target as the new note name when display text differs", async () => {

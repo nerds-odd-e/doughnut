@@ -59,6 +59,10 @@ Feature: Wiki links in notes
       See [[WikiDup Shared]].
       """
     Then I should see wiki link "WikiDup Shared" as a dead wiki link
+    When I follow the dead wiki link "WikiDup Shared"
+    Then I should see that several notes match and I can choose one for a longer Portable path
+    And I should not be offered to create a note from the wiki link
+    And I should still see the note titled "WikiDup Carrier"
 
   Scenario: A wiki link points to the note with the same title
     When I update note "WikiLinks E2E Tech" content using markdown to become:

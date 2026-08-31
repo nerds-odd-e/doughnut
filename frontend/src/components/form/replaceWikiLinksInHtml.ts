@@ -20,6 +20,7 @@ import {
   isResolvedWikiLink,
   isValidWikiLinkInner,
   splitWikiLinkInner,
+  wikiLinkAmbiguousResolution,
   wikiLinkAnchorHtml,
 } from "@/utils/wikiLinkMarkup"
 import { hrefForResolvedWikiTarget } from "@/utils/wikiLinkResolvedLocation"
@@ -130,7 +131,8 @@ function confirmPendingWikiAnchorsAsDead(
 
 function unresolvedWikiAnchorHtmlFromInner(
   innerRaw: string,
-  lastSavedTokens: Set<string> | undefined
+  lastSavedTokens: Set<string> | undefined,
+  wikiLinks: WikiLink[]
 ): string {
   if (!isValidWikiLinkInner(innerRaw)) {
     return escapeHtmlForWikiLinkDisplay(`[[${innerRaw}]]`)
@@ -141,6 +143,7 @@ function unresolvedWikiAnchorHtmlFromInner(
     className: unresolvedWikiClass(innerRaw, lastSavedTokens),
     target,
     display,
+    resolution: wikiLinkAmbiguousResolution(wikiLinks, target, innerRaw),
   })
 }
 
@@ -191,12 +194,13 @@ function upgradePathMarkdownAnchors(
 /** Leftover `[[…]]` and leftover portable-path hrefs get pending or dead wiki-link UI. */
 function markUnresolvedWikiLinks(
   html: string,
+  wikiLinks: WikiLink[],
   lastSavedTokens: Set<string> | undefined
 ): string {
   const withWikiTokens = html.replace(
     /\[\[([^\[\]\r\n]*)\]\]/g,
     (_fullMatch, inner: string) =>
-      unresolvedWikiAnchorHtmlFromInner(inner, lastSavedTokens)
+      unresolvedWikiAnchorHtmlFromInner(inner, lastSavedTokens, wikiLinks)
   )
   return withWikiTokens.replace(
     /<a href="(\/[^"]+)">([^<]*)<\/a>/g,
@@ -208,6 +212,7 @@ function markUnresolvedWikiLinks(
         className: unresolvedWikiClass(token, lastSavedTokens),
         target: href,
         display,
+        resolution: wikiLinkAmbiguousResolution(wikiLinks, href, token),
       })
     }
   )
@@ -236,5 +241,5 @@ export function replaceWikiLinksInHtml(
   result = upgradePathMarkdownAnchors(result, wikiLinks)
   result = upgradeUnresolvedWikiAnchors(result, wikiLinks)
   result = confirmPendingWikiAnchorsAsDead(result, lastSavedTokens)
-  return markUnresolvedWikiLinks(result, lastSavedTokens)
+  return markUnresolvedWikiLinks(result, wikiLinks, lastSavedTokens)
 }

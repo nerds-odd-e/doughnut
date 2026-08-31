@@ -42,7 +42,7 @@ describe("replaceWikiLinksInHtml", () => {
       resolution: "AMBIGUOUS",
     }
     expect(replaceWikiLinksInHtml("<p>[[Shared]]</p>", [ambiguous])).toBe(
-      '<p><a href="#" class="dead-wiki-link" data-portable-path="Shared">Shared</a></p>'
+      '<p><a href="#" class="dead-wiki-link" data-portable-path="Shared" data-resolution="AMBIGUOUS">Shared</a></p>'
     )
   })
 

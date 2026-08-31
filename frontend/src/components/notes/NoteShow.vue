@@ -83,7 +83,7 @@
             :note-realm="noteRealm"
           />
 
-          <NoteDeadWikiLinkCreateModal
+          <NoteUnresolvedWikiLinkModal
             v-model="pendingDeadWikiLink"
             :notebook-id="noteRealm.notebookRealm.notebook.id"
             :note-realm="noteRealm"
@@ -107,7 +107,7 @@ import ShowImage from "./widgets/ShowImage.vue"
 import { noteImageScalarsFromMarkdown } from "@/utils/noteContentFrontmatter"
 import NoteToolbar from "./core/NoteToolbar.vue"
 import NoteRecentUpdateIndicator from "./NoteRecentUpdateIndicator.vue"
-import NoteDeadWikiLinkCreateModal from "./NoteDeadWikiLinkCreateModal.vue"
+import NoteUnresolvedWikiLinkModal from "./NoteUnresolvedWikiLinkModal.vue"
 import type { DeadWikiLinkPayload } from "@/utils/wikiLinkMarkup"
 import { provideNoteShortcutScope } from "@/composables/noteShortcutScope"
 import { provideMemoryTrackerActions } from "@/composables/useMemoryTrackerActions"
