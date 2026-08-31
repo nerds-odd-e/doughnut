@@ -23,8 +23,9 @@ at the web boundary.
 ### Namespaces
 
 - User screens use Vue Router with HTML5 history at the site root.
-  `routeMetadata` is the canonical registry of screen paths, and the load
-  balancer serves unmatched browser paths with the SPA shell.
+  `routeMetadata` is the canonical registry of screen names and absolute
+  paths; route assembly groups those entries under shared layout parents.
+  The load balancer serves unmatched browser paths with the SPA shell.
 - The HTTP API uses `/api` and is described by OpenAPI.
   [`doughnut-routing.json`](../../infra/gcp/path-routing/doughnut-routing.json)
   defines the load balancer's backend-owned route set.
@@ -37,8 +38,6 @@ at the web boundary.
   helper that returns one). An HTML `href` is allowed only on rendered
   anchors, and is compiled from a named location against that table —
   never a second concatenated copy of a path.
-- Shared layouts are assembled from named metadata entries rather than
-  duplicating paths.
 - The URL identifies the **server-side note id**, not the portable path
   (ADR 0004). A **property** adds the **authored key** (no property
   surrogate id). Named route helpers receive the exact decoded key and
