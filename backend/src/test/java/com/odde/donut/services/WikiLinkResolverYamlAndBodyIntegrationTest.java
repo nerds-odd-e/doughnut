@@ -3,7 +3,6 @@ package com.odde.donut.services;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.lessThan;
 
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
@@ -116,26 +115,6 @@ class WikiLinkResolverYamlAndBodyIntegrationTest {
   }
 
   @Test
-  void wikiLinkResolver_doesNotResolveWhenTitleCollidesWithAlias() {
-    User owner = makeMe.aUser().please();
-    Note byTitle = makeMe.aNote().title("color").notebookOwnedBy(owner).please();
-    makeMe.aNote().title("colour").underSameNotebookAs(byTitle).aliases("color").please();
-    Note linker = makeMe.aNote().underSameNotebookAs(byTitle).content("See [[color]]").please();
-
-    assertThat(wikiLinkResolver.resolveWikiLinksForCache(linker, owner), empty());
-  }
-
-  @Test
-  void wikiLinkResolver_doesNotResolveWhenTwoNotesShareAnAlias() {
-    User owner = makeMe.aUser().please();
-    Note first = makeMe.aNote().title("first").notebookOwnedBy(owner).aliases("color").please();
-    makeMe.aNote().title("second").underSameNotebookAs(first).aliases("color").please();
-    Note linker = makeMe.aNote().underSameNotebookAs(first).content("See [[color]]").please();
-
-    assertThat(wikiLinkResolver.resolveWikiLinksForCache(linker, owner), empty());
-  }
-
-  @Test
   void wikiLinkResolver_resolvesWhenOneNoteMatchesAsBothTitleAndAlias() {
     User owner = makeMe.aUser().please();
     Note destination =
@@ -158,36 +137,6 @@ class WikiLinkResolverYamlAndBodyIntegrationTest {
         makeMe.aNote().notebookOwnedBy(owner).content("See [[Other Notebook:term]]").please();
 
     assertThat(wikiLinkResolver.resolveWikiLinksForCache(linker, owner), empty());
-  }
-
-  @Test
-  void wikiLinkResolver_skipsUnreadableLowestIdAliasCandidateForReadableTarget() {
-    User secretOwner = makeMe.aUser().please();
-    User viewer = makeMe.aUser().please();
-    String sharedNotebookName = "Shared Notebook";
-    Notebook secretNotebook =
-        makeMe.aNotebook().creatorAndOwner(secretOwner).name(sharedNotebookName).please();
-    Note unreadableTarget =
-        makeMe.aNote().title("hidden").notebook(secretNotebook).aliases("term").please();
-
-    Notebook readableNotebook =
-        makeMe.aNotebook().creatorAndOwner(viewer).name(sharedNotebookName).please();
-    makeMe.aBazaarNotebook(readableNotebook).please();
-    Note readableTarget =
-        makeMe.aNote().title("visible").notebook(readableNotebook).aliases("term").please();
-    assertThat(unreadableTarget.getId(), lessThan(readableTarget.getId()));
-
-    Notebook viewerNotebook = makeMe.aNotebook().creatorAndOwner(viewer).name("Main").please();
-    Note linker =
-        makeMe
-            .aNote()
-            .notebook(viewerNotebook)
-            .content("See [[" + sharedNotebookName + ":term]]")
-            .please();
-
-    var resolved = wikiLinkResolver.resolveWikiLinksForCache(linker, viewer);
-    assertThat(resolved.size(), equalTo(1));
-    assertThat(resolved.getFirst().destinationNote().getId(), equalTo(readableTarget.getId()));
   }
 
   @Test

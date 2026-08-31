@@ -307,27 +307,15 @@ the 250-line file cap.
 
 ### 14. Collision tests live at the wikiLinks HTTP boundary
 
-**Status:** planned
+**Status:** done
 **Type:** Structure
 
-Unlocks remaining slices not copying a second empty-cache test.
-
-Delete resolver empty-cache copies that `NoteControllerShowTests` already
-covers as `AMBIGUOUS`:
-
-- `wikiLinkResolver_doesNotResolveWhenTitleCollidesWithAlias`
-- `wikiLinkResolver_doesNotResolveWhenTwoNotesShareAnAlias`
-- `wikiLinkResolver_skipsUnreadableLowestIdAliasCandidateForReadableTarget`
-
-Keep one resolved-index empty-row pin
-(`unqualified_link_does_not_resolve_when_same_title_in_different_folders`),
-the same-note title∪alias pin, and the qualified several-readable pin.
-Do not add controller tests that only repeat those kept pins.
-
-Verification: `pnpm backend:test_only`.
-
-Stop-safe: same collision coverage, one HTTP surface plus the pins that
-are not on `wikiLinks`.
+Deleted the three resolver-level empty-cache copies from
+`WikiLinkResolverYamlAndBodyIntegrationTest`; `NoteControllerShowTests`
+already pins the same scenarios as `AMBIGUOUS`. Kept the resolved-index
+empty-row pin, the same-note title∪alias pin, and the qualified
+several-readable pin untouched. No production code changed; no new
+controller tests added.
 
 ### 15. SearchForm wiki-link spelling has one owner
 
