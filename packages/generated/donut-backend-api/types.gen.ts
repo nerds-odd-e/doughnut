@@ -1091,6 +1091,10 @@ export type FocusContextResult = {
     relatedNotes?: Array<FocusContextNote>;
 };
 
+export type AuthoredPortablePath = {
+    portablePath: string;
+};
+
 export type NoteAiContextMarkdown = {
     markdown?: string;
 };
@@ -3487,6 +3491,27 @@ export type GetGraphResponses = {
 };
 
 export type GetGraphResponse = GetGraphResponses[keyof GetGraphResponses];
+
+export type AuthoredPortablePathData = {
+    body?: never;
+    path: {
+        note: number;
+    };
+    query: {
+        destinationNote: number;
+        portablePath?: string;
+    };
+    url: '/api/notes/{note}/authored-portable-path';
+};
+
+export type AuthoredPortablePathResponses = {
+    /**
+     * OK
+     */
+    200: AuthoredPortablePath;
+};
+
+export type AuthoredPortablePathResponse = AuthoredPortablePathResponses[keyof AuthoredPortablePathResponses];
 
 export type GetAiContextMarkdownData = {
     body?: never;

@@ -135,3 +135,12 @@ When(
       .pointAtExistingNote(existingNoteTitle, deadWikiLinkText)
   }
 )
+
+When(
+  'I point the wiki link at existing note {string}',
+  (destinationTitle: string) => {
+    start
+      .assumeNotePage()
+      .pointOpenUnresolvedWikiLinkAtDestination(destinationTitle)
+  }
+)

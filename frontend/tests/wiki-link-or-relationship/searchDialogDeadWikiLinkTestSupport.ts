@@ -5,6 +5,7 @@ import {
 } from "@generated/donut-backend-api/sdk.gen"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import createNoteStorage from "@/store/createNoteStorage"
+import type { DeadWikiLinkPayload } from "@/utils/wikiLinkClick"
 import { fireEvent, screen } from "@testing-library/vue"
 import { flushPromises } from "@vue/test-utils"
 import MakeMe from "donut-test-fixtures/makeMe"
@@ -22,10 +23,10 @@ export const deadWikiLinkPayload = {
 
 export async function pointDeadWikiLinkAndCaptureUpdate(args: {
   content: string
-  payload: { portablePath: string; displayText: string }
+  payload: DeadWikiLinkPayload
   typeIn: string
   searchHits: ReturnType<typeof makeNoteHit>[]
-  targetRealm?: ReturnType<typeof MakeMe.aNoteRealm.please>
+  destinationRealm?: ReturnType<typeof MakeMe.aNoteRealm.please>
 }) {
   const noteRealm = MakeMe.aNoteRealm.content(args.content).please()
   mockSdkService(
@@ -33,8 +34,8 @@ export async function pointDeadWikiLinkAndCaptureUpdate(args: {
     "searchForRelationshipTargetWithin",
     args.searchHits
   )
-  if (args.targetRealm) {
-    mockSdkService(NoteController, "showNote", args.targetRealm)
+  if (args.destinationRealm) {
+    mockSdkService(NoteController, "showNote", args.destinationRealm)
   }
   const updateSpy = mockSdkService(
     TextContentController,
@@ -65,7 +66,7 @@ export async function pointPathMarkdownDeadLinkAndCaptureUpdate(args: {
   deadHref: string
   content: string
 }) {
-  const targetRealm = MakeMe.aNoteRealm
+  const destinationRealm = MakeMe.aNoteRealm
     .title("Title")
     .inFolder(10, "ChosenFolder")
     .please()
@@ -78,11 +79,11 @@ export async function pointPathMarkdownDeadLinkAndCaptureUpdate(args: {
         hitKind: "NOTE" as const,
         noteSearchResult: MakeMe.aNoteSearchResult
           .title("Title")
-          .id(targetRealm.id)
-          .notebookId(targetRealm.notebookRealm.notebook.id)
+          .id(destinationRealm.id)
+          .notebookId(destinationRealm.notebookRealm.notebook.id)
           .please(),
       },
     ],
-    targetRealm,
+    destinationRealm,
   })
 }

@@ -65,6 +65,7 @@ function clickUseThisNoteOnTargetNote(toNoteTopic: string) {
       )
       return a?.textContent?.trim() === toNoteTopic
     })
+    .first()
     .findByRole('button', { name: 'Use this note' })
     .click()
 }

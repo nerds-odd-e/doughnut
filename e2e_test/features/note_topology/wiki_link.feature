@@ -46,6 +46,7 @@ Feature: Wiki links in notes
     And the wiki link "WikiPath Nested Parent/WikiPath Nested Child/WikiPath Nested Shared" should open the note titled "WikiPath Nested Shared"
     And the note content on the current page should be "nested namesake"
 
+  @mockBrowserTime
   Scenario: An unqualified shorthand does not open the earlier-created note when two notes share that display name
     Given I have a notebook "WikiDup Title NB" with notes:
       | Title           | Content       | Folder          |
@@ -63,6 +64,15 @@ Feature: Wiki links in notes
     Then I should see that several notes match and I can choose one for a longer Portable path
     And I should not be offered to create a note from the wiki link
     And I should still see the note titled "WikiDup Carrier"
+    When I point the wiki link at existing note "WikiDup Shared"
+    Then I should see the note content rendered as:
+      | Kind           | Text           |
+      | live wiki link | WikiDup Shared |
+    When I view the note content as markdown
+    Then the note content markdown source should contain "[[WikiDup Recipes/WikiDup Shared|WikiDup Shared]]"
+    When I view the note content as rich content
+    Then the wiki link "WikiDup Shared" should open the note titled "WikiDup Shared"
+    And the note content on the current page should be "first created"
 
   Scenario: A wiki link points to the note with the same title
     When I update note "WikiLinks E2E Tech" content using markdown to become:

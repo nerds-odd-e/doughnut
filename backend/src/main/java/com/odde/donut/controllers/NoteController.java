@@ -9,6 +9,7 @@ import com.odde.donut.factoryServices.EntityPersister;
 import com.odde.donut.services.AuthorizationService;
 import com.odde.donut.services.NoteRealmService;
 import com.odde.donut.services.NoteService;
+import com.odde.donut.services.PortablePathAuthoring;
 import com.odde.donut.services.UserService;
 import com.odde.donut.services.focusContext.FocusContextMarkdownRenderer;
 import com.odde.donut.services.focusContext.FocusContextResult;
@@ -39,6 +40,7 @@ class NoteController {
   private final NoteRealmService noteRealmService;
   private final RecallLogRepository recallLogRepository;
   private final AssimilationSequenceSkipRepository skipRepository;
+  private final PortablePathAuthoring portablePathAuthoring;
 
   public NoteController(
       EntityPersister entityPersister,
@@ -49,7 +51,8 @@ class NoteController {
       FocusContextMarkdownRenderer focusContextMarkdownRenderer,
       NoteRealmService noteRealmService,
       RecallLogRepository recallLogRepository,
-      AssimilationSequenceSkipRepository skipRepository) {
+      AssimilationSequenceSkipRepository skipRepository,
+      PortablePathAuthoring portablePathAuthoring) {
     this.entityPersister = entityPersister;
     this.noteService = noteService;
     this.authorizationService = authorizationService;
@@ -59,6 +62,7 @@ class NoteController {
     this.noteRealmService = noteRealmService;
     this.recallLogRepository = recallLogRepository;
     this.skipRepository = skipRepository;
+    this.portablePathAuthoring = portablePathAuthoring;
   }
 
   @GetMapping("/{note}")
@@ -199,5 +203,17 @@ class NoteController {
       throws UnexpectedNoAccessRightException {
     authorizationService.assertReadAuthorization(note);
     return new SpellingVerificationResult(note.matchAnswer(dto.getSpellingAnswer()));
+  }
+
+  @GetMapping("/{note}/authored-portable-path")
+  public AuthoredPortablePath authoredPortablePath(
+      @PathVariable("note") @Schema(type = "integer") Note note,
+      @RequestParam @Schema(type = "integer") Note destinationNote,
+      @RequestParam(required = false) String portablePath)
+      throws UnexpectedNoAccessRightException {
+    authorizationService.assertReadAuthorization(note);
+    authorizationService.assertReadAuthorization(destinationNote);
+    return new AuthoredPortablePath(
+        portablePathAuthoring.authoredPortablePath(destinationNote, portablePath));
   }
 }

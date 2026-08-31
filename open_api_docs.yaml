@@ -2530,6 +2530,34 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/FocusContextResult"
+  /api/notes/{note}/authored-portable-path:
+    get:
+      tags:
+      - note-controller
+      operationId: authoredPortablePath
+      parameters:
+      - name: note
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: destinationNote
+        in: query
+        required: true
+        schema:
+          type: integer
+      - name: portablePath
+        in: query
+        required: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/AuthoredPortablePath"
   /api/notes/{note}/ai-context-markdown:
     get:
       tags:
@@ -5393,6 +5421,13 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/FocusContextNote"
+    AuthoredPortablePath:
+      type: object
+      properties:
+        portablePath:
+          type: string
+      required:
+      - portablePath
     NoteAiContextMarkdown:
       type: object
       properties:

@@ -18,6 +18,16 @@ function findWikiLinkInNoteContent(linkClass: string, wikiLinkText: string) {
   return findNoteContentRegion().find(`a.${linkClass}`).contains(wikiLinkText)
 }
 
+function pointUnresolvedWikiLinkAtDestination(
+  destinationTitle: string,
+  displayText: string
+) {
+  cy.findByRole('button', { name: pointAtExistingNoteOffer }).click()
+  assumeNoteTargetSearchDialog()
+    .findTarget(destinationTitle)
+    .pointWikiLinkAtTarget(destinationTitle, displayText)
+}
+
 function wikiLinkInNoteContentFluent(
   wikiLinkText: string,
   assumeNotePage: AssumeNotePage
@@ -103,13 +113,14 @@ export const noteWikiLinkMethods = (assumeNotePage: AssumeNotePage) => ({
         chooseCreateNewNote()
         noteCreationForm.submit()
       },
-      pointAtExistingNote: (existingNoteTitle: string, displayText: string) => {
-        cy.findByRole('button', { name: pointAtExistingNoteOffer }).click()
-        assumeNoteTargetSearchDialog()
-          .findTarget(existingNoteTitle)
-          .pointWikiLinkAtTarget(existingNoteTitle, displayText)
+      pointAtExistingNote: (destinationTitle: string, displayText: string) => {
+        pointUnresolvedWikiLinkAtDestination(destinationTitle, displayText)
       },
     }
+  },
+  pointOpenUnresolvedWikiLinkAtDestination(destinationTitle: string) {
+    pointUnresolvedWikiLinkAtDestination(destinationTitle, destinationTitle)
+    return this
   },
   wikiLinkInNoteContent(wikiLinkText: string) {
     return wikiLinkInNoteContentFluent(wikiLinkText, assumeNotePage)

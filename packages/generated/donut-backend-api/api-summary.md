@@ -88,6 +88,7 @@ Use this for endpoint lookup; open `sdk.gen.ts` or `types.gen.ts` only for exact
 - `showNote`: GET `/api/notes/{note}` -> `ShowNoteResponse` (request: `ShowNoteData`; path: note; response body: NoteRealm)
 - `getNoteInfo`: GET `/api/notes/{note}/note-info` -> `GetNoteInfoResponse` (request: `GetNoteInfoData`; path: note; response body: NoteRecallInfo)
 - `getGraph`: GET `/api/notes/{note}/graph` -> `GetGraphResponse` (request: `GetGraphData`; path: note; query: tokenLimit; response body: FocusContextResult)
+- `authoredPortablePath`: GET `/api/notes/{note}/authored-portable-path` -> `AuthoredPortablePathResponse` (request: `AuthoredPortablePathData`; path: note; query: destinationNote, portablePath; response body: AuthoredPortablePath)
 - `getAiContextMarkdown`: GET `/api/notes/{note}/ai-context-markdown` -> `GetAiContextMarkdownResponse` (request: `GetAiContextMarkdownData`; path: note; query: tokenLimit; response body: NoteAiContextMarkdown)
 - `getRecentNotes`: GET `/api/notes/recent` -> `GetRecentNotesResponse` (request: none; response body: Array<NoteSearchResult>)
 

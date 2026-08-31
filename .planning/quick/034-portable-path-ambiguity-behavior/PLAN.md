@@ -33,10 +33,10 @@ and Donut asks for a longer path.
   `AMBIGUOUS` rows (`destinationNoteId` null) for cardinality `> 1`. Missing
   stays inferred from markup. Clicking ambiguous reuses
   `NoteUnresolvedWikiLinkModal` (guidance + “Point at an existing note”; no
-  create-note). Click handling is in `wikiLinkClick.ts`.
-- Donut-authored insert/paste/overlap/accidental-match spelling still uses
-  frontend `buildWikiLinkText` (title, plus notebook prefix when the source
-  notebook differs).
+  create-note). Confirming a destination calls
+  `GET /api/notes/{note}/authored-portable-path` and replaces the shorthand
+  with the returned full folder path (display text and `#prop:` preserved).
+  `/Title` and insert/paste still use `buildWikiLinkText`.
 - Exact path-shaped Portable paths already match folder trail plus display
   name (`ResolvedWikiLinkTitleResolutionTest` path-markdown / folder-path
   cases). Property validity is already checked after note resolution.
@@ -195,33 +195,12 @@ note, explains several notes match, offers “Point at an existing note”
 
 ### 8. Choosing a destination writes the full normalized Portable path
 
-**Status:** planned
+**Status:** done
 **Type:** Behavior
 
-**Precondition:** The user is choosing a candidate for an ambiguous
-shorthand (folder collision, not a notebook-root-only namesake).
-**Trigger:** The user confirms the destination.
-**Postcondition:** Donut replaces the shorthand with that note's full
-normalized Portable path, preserving display text and a property selector
-when present.
-
-Test first: extend the E2E to assert `[[Folder/Title|display]]` (or the
-stored equivalent) and successful navigation. One controller/unit case for a
-preserved `#prop:` selector.
-
-Implementation: add the backend source-scoped Portable-path authoring
-operation. This slice returns the full path for the selected note (do not
-yet special-case `/Title`, do not yet switch insert/paste callers).
-Frontend only formats the surrounding Wiki-link spelling. Slice 7's choose
-action is the existing “Point at an existing note” search in
-`NoteUnresolvedWikiLinkModal` — hook that confirmation for an AMBIGUOUS
-link; do not invent a second picker.
-
-Verification: `pnpm backend:test_only`; focused frontend specs;
-`wiki_link.feature` (and `property_wiki_link.feature` if the property case
-is E2E).
-
-Stop-safe: an offered repair has an exact folder-path spelling.
+`PortablePathAuthoring.authoredPortablePath` / `GET …/authored-portable-path`
+returns the full folder path. SearchForm uses it only for AMBIGUOUS repair.
+Display text and `#prop:` preserved. Insert still uses `buildWikiLinkText`.
 
 ### 9. A root-note collision is authored as `/Title`
 
@@ -235,7 +214,9 @@ display name is ambiguous as shorthand.
 another shorthand.
 
 Test first: one authoring/controller case; extend E2E only if slice 8's
-scenario cannot reuse the same flow.
+scenario cannot reuse the same flow. Extend
+`PortablePathAuthoring.authoredPortablePath` (do not add a second authoring
+API).
 
 Update ADR 0004's exact-root fallback wording only after this passes.
 
