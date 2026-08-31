@@ -86,6 +86,9 @@ public record FailureReportFactory(
   }
 
   private void commentGithubIssueIfDue(FailureReport report) {
+    if (report.getIssueNumber() == null) {
+      return;
+    }
     if (!githubCountCommentIsDue(report)) {
       return;
     }

@@ -7,6 +7,7 @@ import static org.hamcrest.Matchers.not;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -140,6 +141,15 @@ class FailureReportFactoryTest {
     assertEquals(fingerprintA, recurringA.getFingerprint());
     assertEquals(1, firstA.getOccurrenceCount());
     verify(githubService, times(3)).createGithubIssue(any());
+  }
+
+  @Test
+  void doesNotCommentGithubWhenFailureReportHasNoIssueNumber()
+      throws IOException, InterruptedException {
+    createReportFromException("first");
+    createReportFromException("second");
+
+    verify(githubService, never()).commentOnGithubIssue(any(), any());
   }
 
   @Test
