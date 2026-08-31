@@ -12,6 +12,7 @@ import com.odde.donut.controllers.dto.HealthFindingGroup;
 import com.odde.donut.controllers.dto.HealthFindingItem;
 import com.odde.donut.controllers.dto.HealthSeverity;
 import com.odde.donut.controllers.dto.NotebookHealthLintReport;
+import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.User;
@@ -141,6 +142,21 @@ class DeadWikiLinkHealthRuleTest {
             .map(HealthFindingItem::getWikiLinkToken)
             .toList(),
         equalTo(List.of("SoftTarget", "NeverExisted")));
+  }
+
+  @Test
+  void doesNotReportAmbiguousShorthandAsDeadButStillReportsMissingElsewhere() {
+    Folder folderA = makeMe.aFolder().notebook(notebook).name("A").please();
+    Folder folderB = makeMe.aFolder().notebook(notebook).name("B").please();
+    makeMe.aNote().title("Dup").folder(folderA).please();
+    makeMe.aNote().title("Dup").folder(folderB).please();
+    makeMe.aNote().title("Linker").notebook(notebook).content("See [[Dup]]").please();
+    makeMe.aNote().title("Other").notebook(notebook).content("See [[Missing]]").please();
+
+    HealthFindingGroup child = soleChild(deadWikiLinksGroup());
+
+    assertThat(child.getTitle(), equalTo("Other"));
+    assertThat(child.getItems().getFirst().getWikiLinkToken(), equalTo("Missing"));
   }
 
   @Test

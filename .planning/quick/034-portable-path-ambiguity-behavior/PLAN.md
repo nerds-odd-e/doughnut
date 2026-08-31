@@ -290,25 +290,20 @@ Stop-safe: authoring agrees with resolution’s readable cardinality.
 
 ### 13. Notebook health does not report ambiguous shorthands as dead
 
-**Status:** planned
+**Status:** done
 **Type:** Behavior
 
-**Precondition:** A note’s only unresolved Wiki links are `AMBIGUOUS`
-shorthands (several readable matches).
-**Trigger:** Notebook health evaluates dead wiki links.
-**Postcondition:** Those tokens are not listed under “Dead wiki links”.
-A truly missing shorthand on another note is still listed.
-
-Test first: extend `DeadWikiLinkHealthRuleTest`; do not re-assert missing
-tokens.
-
-Implementation: `unresolvedWikiLinkTokens` / the health rule must not treat
-cardinality `> 1` as missing. Do not add a second health rule.
-
-Verification: `pnpm backend:test_only`.
-
-Stop-safe: ambiguous vs missing is distinct in user guidance, not only in
-the click modal.
+`unresolvedWikiLinkTokens` renamed to `missingWikiLinkTokens`; a token is
+reported only when unresolved and not ambiguous (`isAmbiguousToken`,
+readable cardinality `> 1`). `DeadWikiLinkHealthRule` calls the renamed
+method. Pinned by `DeadWikiLinkHealthRuleTest
+.doesNotReportAmbiguousShorthandAsDeadButStillReportsMissingElsewhere`.
+Post-change-refactor consolidated ambiguity detection with the existing
+`AmbiguousWikiLinks` check (deleted its duplicate
+`severalReadableDestinations`, both now call `WikiLinkResolver
+.isAmbiguousToken`) and split the unrelated accidental-match lookup out of
+`WikiLinkResolver.java` into `AccidentalWikiLinkMatches.java` to stay under
+the 250-line file cap.
 
 ### 14. Collision tests live at the wikiLinks HTTP boundary
 

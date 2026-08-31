@@ -28,7 +28,7 @@ final class AmbiguousWikiLinks {
       if (skipAuthored.contains(token)) {
         continue;
       }
-      if (!severalReadableDestinations(token, focusNote, viewer)) {
+      if (!wikiLinkResolver.isAmbiguousToken(token, focusNote, viewer)) {
         continue;
       }
       WikiLinkMarkdown.WikiInnerSplit parts = WikiLinkMarkdown.splitAuthoredToken(token);
@@ -41,20 +41,5 @@ final class AmbiguousWikiLinks {
               null));
     }
     return List.copyOf(out);
-  }
-
-  private boolean severalReadableDestinations(String token, Note focusNote, User viewer) {
-    String focusNotebookName =
-        focusNote.getNotebook() == null ? null : focusNote.getNotebook().getName();
-    return WikiLinkMarkdown.splitAuthoredToken(token)
-        .portablePath()
-        .resolve(focusNotebookName)
-        .map(
-            ref ->
-                wikiLinkResolver
-                        .readableNotebookMatches(ref.notebookName(), ref.noteTitle(), viewer)
-                        .size()
-                    > 1)
-        .orElse(false);
   }
 }

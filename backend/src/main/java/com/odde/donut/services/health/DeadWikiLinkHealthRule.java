@@ -46,7 +46,7 @@ public class DeadWikiLinkHealthRule implements HealthRule {
     List<Note> liveNotes = noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId());
     List<HealthFindingGroup> children = new ArrayList<>();
     for (Note note : liveNotes) {
-      List<String> deadTokens = wikiLinkResolver.unresolvedWikiLinkTokens(note, context.viewer());
+      List<String> deadTokens = wikiLinkResolver.missingWikiLinkTokens(note, context.viewer());
       if (deadTokens.isEmpty()) {
         continue;
       }

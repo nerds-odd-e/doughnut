@@ -3,6 +3,7 @@ package com.odde.donut.services;
 import com.odde.donut.algorithms.FrontmatterAliases;
 import com.odde.donut.algorithms.NoteContentMarkdown;
 import com.odde.donut.algorithms.PathShapedTarget;
+import com.odde.donut.algorithms.PortablePath;
 import com.odde.donut.algorithms.WikiLinkMarkdown;
 import com.odde.donut.algorithms.WikiLinkPropertyMatch;
 import com.odde.donut.controllers.dto.FolderTrailSegments;
@@ -12,13 +13,11 @@ import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.User;
 import com.odde.donut.entities.repositories.NoteAliasIndexRepository;
 import com.odde.donut.entities.repositories.NoteRepository;
-import com.odde.donut.validators.DisplayNamePathSeparators;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.function.BiFunction;
 import org.springframework.stereotype.Service;
 
@@ -28,6 +27,7 @@ public class WikiLinkResolver {
   private final NoteRepository noteRepository;
   private final NoteAliasIndexRepository noteAliasIndexRepository;
   private final AuthorizationService authorizationService;
+  private final AccidentalWikiLinkMatches accidentalWikiLinkMatches;
 
   public WikiLinkResolver(
       NoteRepository noteRepository,
@@ -36,6 +36,9 @@ public class WikiLinkResolver {
     this.noteRepository = noteRepository;
     this.noteAliasIndexRepository = noteAliasIndexRepository;
     this.authorizationService = authorizationService;
+    this.accidentalWikiLinkMatches =
+        new AccidentalWikiLinkMatches(
+            noteRepository, noteAliasIndexRepository, authorizationService);
   }
 
   public record WikiLinkResolution(String authoredLink, Note destinationNote) {}
@@ -49,41 +52,7 @@ public class WikiLinkResolver {
   }
 
   public List<Note> findAllAccidentalMatches(String answer, Note reviewedNote, User viewer) {
-    if (answer == null || answer.isBlank()) {
-      return List.of();
-    }
-    TreeMap<Integer, Note> matchesById = new TreeMap<>();
-    addReadableAccidentalCandidates(
-        noteRepository.findByNoteTitleOrderByIdAsc(answer), reviewedNote, viewer, matchesById);
-    addReadableAccidentalCandidates(
-        aliasAccidentalCandidates(answer), reviewedNote, viewer, matchesById);
-    return List.copyOf(matchesById.values());
-  }
-
-  private List<Note> aliasAccidentalCandidates(String answer) {
-    String trimmed = DisplayNamePathSeparators.trimSurroundingWhitespace(answer);
-    if (trimmed == null || trimmed.isBlank()) {
-      return List.of();
-    }
-    String lookupKey = FrontmatterAliases.normalizedLookupKey(trimmed);
-    List<Note> notes = new ArrayList<>();
-    for (NoteAliasIndex row :
-        noteAliasIndexRepository.findByAliasLookupKeyOrderByNoteIdAsc(lookupKey)) {
-      notes.add(row.getNote());
-    }
-    return distinctByNoteId(notes);
-  }
-
-  private void addReadableAccidentalCandidates(
-      List<Note> candidates, Note reviewedNote, User viewer, TreeMap<Integer, Note> matchesById) {
-    for (Note candidate : candidates) {
-      Notebook notebook = candidate.getNotebook();
-      if (notebook != null
-          && authorizationService.userMayReadNotebook(viewer, notebook)
-          && !candidate.getId().equals(reviewedNote.getId())) {
-        matchesById.putIfAbsent(candidate.getId(), candidate);
-      }
-    }
+    return accidentalWikiLinkMatches.findAll(answer, reviewedNote, viewer);
   }
 
   /** Resolves a wiki-link token to any matching note, regardless of viewer readability. */
@@ -111,10 +80,10 @@ public class WikiLinkResolver {
   }
 
   /**
-   * Unresolved wiki-link inners for the viewer, in first-occurrence order (same
-   * extract/dedupe/resolve as cache).
+   * Missing wiki-link inners for the viewer, in first-occurrence order (same extract/dedupe/resolve
+   * as cache). A token with several readable matches is ambiguous, not missing, and is excluded.
    */
-  public List<String> unresolvedWikiLinkTokens(Note focusNote, User viewer) {
+  public List<String> missingWikiLinkTokens(Note focusNote, User viewer) {
     String content = focusNote.getContent();
     if (content == null || content.isBlank()) {
       return List.of();
@@ -123,13 +92,21 @@ public class WikiLinkResolver {
     if (linkTitlesOrdered.isEmpty()) {
       return List.of();
     }
-    List<String> unresolved = new ArrayList<>();
+    List<String> missing = new ArrayList<>();
     for (String token : WikiLinkMarkdown.uniqueAuthoredTokensPreserveOrder(linkTitlesOrdered)) {
-      if (resolveToken(token, viewer, focusNote) == null) {
-        unresolved.add(token);
+      if (resolveToken(token, viewer, focusNote) == null
+          && !isAmbiguousToken(token, focusNote, viewer)) {
+        missing.add(token);
       }
     }
-    return List.copyOf(unresolved);
+    return List.copyOf(missing);
+  }
+
+  /** True when, among the viewer's readable candidates for this token, more than one matches. */
+  boolean isAmbiguousToken(String token, Note focusNote, User viewer) {
+    return resolveRef(token, focusNote)
+        .map(ref -> readableNotebookMatches(ref.notebookName(), ref.noteTitle(), viewer).size() > 1)
+        .orElse(false);
   }
 
   private Note resolveAnyTargetToken(String token, Note focusNote) {
@@ -145,12 +122,8 @@ public class WikiLinkResolver {
 
   private Note resolveParsedLink(
       String token, Note focusNote, BiFunction<String, String, Note> notebookMatcher) {
-    String focusNotebookName =
-        focusNote.getNotebook() == null ? null : focusNote.getNotebook().getName();
     Note target =
-        WikiLinkMarkdown.splitAuthoredToken(token)
-            .portablePath()
-            .resolve(focusNotebookName)
+        resolveRef(token, focusNote)
             .map(ref -> notebookMatcher.apply(ref.notebookName(), ref.noteTitle()))
             .orElse(null);
     if (target == null
@@ -158,6 +131,13 @@ public class WikiLinkResolver {
       return null;
     }
     return target;
+  }
+
+  /** Parses {@code token} into a notebook/title ref, applying the focus-notebook fallback. */
+  private Optional<PortablePath.Resolved> resolveRef(String token, Note focusNote) {
+    String focusNotebookName =
+        focusNote.getNotebook() == null ? null : focusNote.getNotebook().getName();
+    return WikiLinkMarkdown.splitAuthoredToken(token).portablePath().resolve(focusNotebookName);
   }
 
   private Note uniqueNotebookMatch(String notebookName, String noteTitle) {
@@ -211,7 +191,7 @@ public class WikiLinkResolver {
     return distinctByNoteId(combined);
   }
 
-  private static List<Note> distinctByNoteId(List<Note> notes) {
+  static List<Note> distinctByNoteId(List<Note> notes) {
     List<Note> distinct = new ArrayList<>();
     Set<Integer> seenNoteIds = new HashSet<>();
     for (Note note : notes) {
