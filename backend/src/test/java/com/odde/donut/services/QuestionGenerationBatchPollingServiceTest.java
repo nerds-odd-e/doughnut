@@ -1,8 +1,10 @@
 package com.odde.donut.services;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -162,6 +164,21 @@ class QuestionGenerationBatchPollingServiceTest {
       assertThat(request.getStatus(), is(QuestionGenerationBatchRequestStatus.FAILED));
       assertThat(
           request.getErrorDetail(), is(QuestionGenerationBatchRequest.ERROR_OPENAI_BATCH_EXPIRED));
+    }
+  }
+
+  @Nested
+  class OpenAiRetrieveFailure {
+    @Test
+    void surfacesTheOpenAiErrorInsteadOfSwallowingIt() {
+      when(openAiApiHandler.retrieveBatch("batch-openai-1"))
+          .thenThrow(new RuntimeException("cannot access valid purpose=batch input file_id"));
+
+      RuntimeException thrown =
+          assertThrows(RuntimeException.class, () -> pollingService.pollSubmittedBatches());
+
+      assertThat(
+          thrown.getMessage(), containsString("cannot access valid purpose=batch input file_id"));
     }
   }
 

@@ -57,7 +57,8 @@ public class QuestionGenerationBatchSubmissionService {
     } catch (RuntimeException e) {
       batch.setStatus(QuestionGenerationBatchStatus.FAILED);
       batchRequestRepository.markPendingAsFailedForBatch(
-          batch.getId(), QuestionGenerationBatchRequest.ERROR_BATCH_SUBMISSION_FAILED);
+          batch.getId(),
+          QuestionGenerationBatchRequest.ERROR_BATCH_SUBMISSION_FAILED + ": " + e.getMessage());
       batchRepository.saveAndFlush(batch);
       batchMetrics.recordFailedBatch();
       return false;

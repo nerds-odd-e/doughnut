@@ -29,6 +29,8 @@ import org.springframework.transaction.support.TransactionTemplate;
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 abstract class QuestionGenerationBatchSubmitDueUsersTestBase {
 
+  static final String COMMITTED_USER_PREFIX = "batch-due-";
+
   @MockitoBean OpenAiApiHandler openAiApiHandler;
 
   @Autowired MakeMe makeMe;
@@ -42,7 +44,7 @@ abstract class QuestionGenerationBatchSubmitDueUsersTestBase {
 
   User uniqueUser() {
     User user = new User();
-    String identifier = "batch-due-" + UUID.randomUUID();
+    String identifier = COMMITTED_USER_PREFIX + UUID.randomUUID();
     user.setExternalIdentifier(identifier);
     user.setName(identifier);
     makeMe.entityPersister.save(user);
@@ -55,59 +57,19 @@ abstract class QuestionGenerationBatchSubmitDueUsersTestBase {
     template.executeWithoutResult(status -> action.run());
   }
 
-  void deleteCommittedBatchWorkForBatchDueUsers() {
-    entityManager
-        .createNativeQuery(
-            "DELETE qgr FROM question_generation_batch_request qgr "
-                + "INNER JOIN question_generation_batch qgb ON qgr.batch_id = qgb.id "
-                + "INNER JOIN user u ON qgb.user_id = u.id "
-                + "WHERE u.external_identifier LIKE 'batch-due-%'")
-        .executeUpdate();
-    entityManager
-        .createNativeQuery(
-            "DELETE qgb FROM question_generation_batch qgb "
-                + "INNER JOIN user u ON qgb.user_id = u.id "
-                + "WHERE u.external_identifier LIKE 'batch-due-%'")
-        .executeUpdate();
-    entityManager
-        .createNativeQuery(
-            "DELETE rp FROM recall_prompt rp "
-                + "INNER JOIN memory_tracker mt ON rp.memory_tracker_id = mt.id "
-                + "INNER JOIN user u ON mt.user_id = u.id "
-                + "WHERE u.external_identifier LIKE 'batch-due-%'")
-        .executeUpdate();
-    entityManager
-        .createNativeQuery(
-            "DELETE mt FROM memory_tracker mt "
-                + "INNER JOIN user u ON mt.user_id = u.id "
-                + "WHERE u.external_identifier LIKE 'batch-due-%'")
-        .executeUpdate();
-    entityManager
-        .createNativeQuery(
-            "DELETE n FROM note n "
-                + "INNER JOIN notebook nb ON n.notebook_id = nb.id "
-                + "INNER JOIN user u ON nb.creator_id = u.id "
-                + "WHERE u.external_identifier LIKE 'batch-due-%'")
-        .executeUpdate();
-    entityManager
-        .createNativeQuery(
-            "DELETE nb FROM notebook nb "
-                + "INNER JOIN user u ON nb.creator_id = u.id "
-                + "WHERE u.external_identifier LIKE 'batch-due-%'")
-        .executeUpdate();
-    entityManager
-        .createNativeQuery("DELETE FROM user WHERE external_identifier LIKE 'batch-due-%'")
-        .executeUpdate();
-  }
-
   @BeforeEach
   void cleanupStaleCommittedFixtures() {
-    inCommittedTransaction(this::deleteCommittedBatchWorkForBatchDueUsers);
+    inCommittedTransaction(this::deleteCommittedDueUserFixtures);
   }
 
   @AfterEach
   void cleanupCommittedState() {
     reset(planningService);
-    inCommittedTransaction(this::deleteCommittedBatchWorkForBatchDueUsers);
+    inCommittedTransaction(this::deleteCommittedDueUserFixtures);
+  }
+
+  private void deleteCommittedDueUserFixtures() {
+    QuestionGenerationBatchCommittedUserCleanup.deleteByUserExternalIdentifierLike(
+        entityManager, COMMITTED_USER_PREFIX + "%");
   }
 }

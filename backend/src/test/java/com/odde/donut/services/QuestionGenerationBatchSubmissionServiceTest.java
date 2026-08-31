@@ -1,6 +1,7 @@
 package com.odde.donut.services;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
@@ -146,7 +147,8 @@ class QuestionGenerationBatchSubmissionServiceTest {
       assertThat(requests.get(0).getStatus(), is(QuestionGenerationBatchRequestStatus.FAILED));
       assertThat(
           requests.get(0).getErrorDetail(),
-          is(QuestionGenerationBatchRequest.ERROR_BATCH_SUBMISSION_FAILED));
+          containsString(QuestionGenerationBatchRequest.ERROR_BATCH_SUBMISSION_FAILED));
+      assertThat(requests.get(0).getErrorDetail(), containsString("upload failed"));
       assertThat(
           batchRepository.findLatestSubmittedAtByUser_Id(user.getId()).orElseThrow(),
           equalTo(previousSubmission));

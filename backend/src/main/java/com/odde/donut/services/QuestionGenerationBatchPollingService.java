@@ -44,6 +44,7 @@ public class QuestionGenerationBatchPollingService {
     int updatedCount = 0;
     int unchangedCount = 0;
     int failedCount = 0;
+    RuntimeException firstFailure = null;
 
     for (QuestionGenerationBatch batch : submittedBatches) {
       try {
@@ -56,6 +57,12 @@ public class QuestionGenerationBatchPollingService {
         failedCount++;
         logger.warn(
             "Failed to poll OpenAI status for question generation batch {}", batch.getId(), e);
+        if (firstFailure == null) {
+          firstFailure =
+              new RuntimeException(
+                  "Failed to poll OpenAI batch " + batch.getOpenaiBatchId() + ": " + e.getMessage(),
+                  e);
+        }
       }
     }
 
@@ -64,6 +71,9 @@ public class QuestionGenerationBatchPollingService {
         updatedCount,
         unchangedCount,
         failedCount);
+    if (firstFailure != null) {
+      throw firstFailure;
+    }
   }
 
   private boolean updateBatchFromOpenAi(QuestionGenerationBatch batch) {

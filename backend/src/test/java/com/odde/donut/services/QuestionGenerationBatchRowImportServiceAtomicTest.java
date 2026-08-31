@@ -1,8 +1,8 @@
 package com.odde.donut.services;
 
+import static com.odde.donut.services.QuestionGenerationBatchCommittedUserCleanup.deleteByUserExternalIdentifierLike;
 import static com.odde.donut.services.QuestionGenerationBatchImportPayloadSupport.batchSuccessLine;
 import static com.odde.donut.services.QuestionGenerationBatchRowImportAtomicTestSupport.FAIL_ON_RECALL_PROMPT_SAVE;
-import static com.odde.donut.services.QuestionGenerationBatchRowImportAtomicTestSupport.deleteCommittedAtomicImportFixtures;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -53,7 +53,8 @@ class QuestionGenerationBatchRowImportServiceAtomicTest {
   @AfterEach
   void cleanupCommittedState() {
     FAIL_ON_RECALL_PROMPT_SAVE.set(false);
-    inCommittedTransaction(() -> deleteCommittedAtomicImportFixtures(entityManager));
+    inCommittedTransaction(
+        () -> deleteByUserExternalIdentifierLike(entityManager, "batch-import-atomic-%"));
   }
 
   @Test
