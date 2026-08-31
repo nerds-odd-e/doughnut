@@ -20,7 +20,6 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
@@ -90,9 +89,10 @@ final class WikiLinkRewriteSupport {
   }
 
   static void applyOutgoingNotebookMoveRewrite(
-      EntityManager entityManager,
+      ResolvedWikiLinkRepository resolvedWikiLinkRepository,
       EntityPersister entityPersister,
       ResolvedWikiLinkService resolvedWikiLinkService,
+      PortablePathAuthoring portablePathAuthoring,
       Note movedNote,
       String sourceNotebookName,
       Timestamp updatedAt,
@@ -103,16 +103,31 @@ final class WikiLinkRewriteSupport {
       return;
     }
     String content = originalContent;
+    Map<String, Note> coMovedTargetsByAuthoredLink =
+        coMovedTargetsByAuthoredLink(resolvedWikiLinkRepository, movedNote, coMovedTargetNoteIds);
     LinkedHashSet<String> linkTexts =
         new LinkedHashSet<>(NoteContentMarkdown.authoredTokensInOccurrenceOrder(content));
     for (String linkText : linkTexts) {
-      String newInner =
-          WikiLinkMarkdownRewrite.newInnerForQualifyUnqualifiedOutgoingLink(
-              linkText, sourceNotebookName);
-      if (newInner.equals(linkText)) {
-        continue;
+      Note coMovedTarget = coMovedTargetsByAuthoredLink.get(linkText);
+      String newInner;
+      if (coMovedTarget != null) {
+        String originalPortablePath =
+            WikiLinkMarkdown.splitAuthoredToken(linkText).portablePath().format();
+        String authoredPortablePath =
+            portablePathAuthoring.authoredPortablePath(
+                movedNote, coMovedTarget, originalPortablePath);
+        newInner =
+            authoredPortablePath.equals(originalPortablePath)
+                    || existingPathStillAddresses(movedNote, coMovedTarget, originalPortablePath)
+                ? linkText
+                : WikiLinkMarkdownRewrite.newInnerForAuthoredPortablePath(
+                    linkText, authoredPortablePath, true);
+      } else {
+        newInner =
+            WikiLinkMarkdownRewrite.newInnerForQualifyUnqualifiedOutgoingLink(
+                linkText, sourceNotebookName);
       }
-      if (coMovedTargetResolvesFrom(entityManager, movedNote, linkText, coMovedTargetNoteIds)) {
+      if (newInner.equals(linkText)) {
         continue;
       }
       content =
@@ -128,48 +143,43 @@ final class WikiLinkRewriteSupport {
     resolvedWikiLinkService.refreshForNote(movedNote, viewer);
   }
 
-  private static boolean coMovedTargetResolvesFrom(
-      EntityManager entityManager,
+  private static Map<String, Note> coMovedTargetsByAuthoredLink(
+      ResolvedWikiLinkRepository resolvedWikiLinkRepository,
       Note movedNote,
-      String linkText,
       Set<Integer> coMovedTargetNoteIds) {
-    if (coMovedTargetNoteIds.isEmpty()) {
-      return false;
-    }
-    String focusNotebookName =
-        movedNote.getNotebook() == null ? null : movedNote.getNotebook().getName();
-    Optional<PortablePath.Resolved> reference =
-        WikiLinkMarkdown.splitAuthoredToken(linkText).portablePath().resolve(focusNotebookName);
-    if (reference.isEmpty()) {
-      return false;
-    }
-    PortablePath.Resolved ref = reference.get();
-    List<Integer> noteIds = new ArrayList<>(coMovedTargetNoteIds);
-    Collections.sort(noteIds);
-    // When several co-moved notes share a title, lowest note id wins (same as global resolution).
-    for (Integer noteId : noteIds) {
-      Note candidate = entityManager.find(Note.class, noteId);
-      if (candidate != null
-          && candidate.getDeletedAt() == null
-          && noteMatchesWikiLinkTarget(candidate, ref)) {
-        return true;
+    Map<String, Note> targets = new LinkedHashMap<>();
+    for (ResolvedWikiLink resolvedLink :
+        resolvedWikiLinkRepository.findBySourceNote_IdOrderByIdAsc(movedNote.getId())) {
+      Note destination = resolvedLink.getDestinationNote();
+      if (coMovedTargetNoteIds.contains(destination.getId())) {
+        targets.put(resolvedLink.getAuthoredLink(), destination);
       }
     }
-    return false;
+    return targets;
   }
 
-  private static boolean noteMatchesWikiLinkTarget(Note note, PortablePath.Resolved ref) {
-    if (note.getNotebook() == null) {
-      return false;
-    }
-    if (!note.getNotebook().getName().equalsIgnoreCase(ref.notebookName())) {
-      return false;
-    }
-    return PathShapedTarget.tryParse(ref.noteTitle())
-        .map(
-            path ->
-                path.matchesTitleAndFolderTrail(
-                    note.getTitle(), FolderTrailSegments.namesFromRootToContainingFolder(note)))
-        .orElseGet(() -> note.getTitle().equalsIgnoreCase(ref.noteTitle()));
+  private static boolean existingPathStillAddresses(
+      Note sourceNote, Note destinationNote, String portablePath) {
+    String sourceNotebookName =
+        sourceNote.getNotebook() == null ? null : sourceNote.getNotebook().getName();
+    return PortablePath.parse(portablePath)
+        .resolve(sourceNotebookName)
+        .filter(
+            resolved ->
+                destinationNote.getNotebook() != null
+                    && destinationNote
+                        .getNotebook()
+                        .getName()
+                        .equalsIgnoreCase(resolved.notebookName()))
+        .flatMap(
+            resolved ->
+                PathShapedTarget.tryParse(resolved.noteTitle())
+                    .filter(
+                        path ->
+                            path.matchesTitleAndFolderTrail(
+                                destinationNote.getTitle(),
+                                FolderTrailSegments.namesFromRootToContainingFolder(
+                                    destinationNote))))
+        .isPresent();
   }
 }

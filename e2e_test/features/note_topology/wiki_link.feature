@@ -117,14 +117,15 @@ Feature: Wiki links in notes
 
   @mockBrowserTime
   Scenario: Moving a note into a folder across notebooks keeps inbound and outgoing wiki links correct
-    Given I have a notebook "WikiFolderMove Old NB" with notes:
+    Given I have a notebook "WikiFolderMove New NB" with notes:
+      | Title                  | Content              | Folder                    |
+      | WikiFolderMove Target  | new notebook target  | WikiFolderMove Folder     |
+      | WikiFolderMove Carrier | destination namesake | WikiFolderMove Other Root |
+    And I have a notebook "WikiFolderMove Old NB" with notes:
       | Title                  | Content                         | Folder                  |
       | WikiFolderMove Target  | old notebook target             | WikiFolderMove Old Root |
       | WikiFolderMove Carrier | Read [[WikiFolderMove Target]]. | WikiFolderMove Old Root |
       | WikiFolderMove Ref     | See [[WikiFolderMove Carrier]]. | WikiFolderMove Old Root |
-    And I have a notebook "WikiFolderMove New NB" with notes:
-      | Title                 | Content             | Folder                |
-      | WikiFolderMove Target | new notebook target | WikiFolderMove Folder |
     When I route to the note "WikiFolderMove Carrier"
     And I move the current note under folder "WikiFolderMove Folder" in notebook "WikiFolderMove New NB"
     And I view the note content as markdown
@@ -134,7 +135,7 @@ Feature: Wiki links in notes
     And the note content on the current page should be "old notebook target"
     When I route to the note "WikiFolderMove Ref"
     And I view the note content as markdown
-    Then the note content markdown source should contain "[[WikiFolderMove New NB:WikiFolderMove Carrier|WikiFolderMove Carrier]]"
+    Then the note content markdown source should contain "[[WikiFolderMove New NB:WikiFolderMove Folder/WikiFolderMove Carrier|WikiFolderMove Carrier]]"
     When I view the note content as rich content
     Then the wiki link "WikiFolderMove Carrier" should open the note titled "WikiFolderMove Carrier"
 

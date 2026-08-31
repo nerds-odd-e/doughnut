@@ -41,7 +41,26 @@ class NotebookFolderMoveWikiLinkRewriteControllerTest
   }
 
   @Test
-  void crossNotebookFolderMove_keepsCoMovedPeerLinkRelativeWhenDestinationHasSameTitleNote()
+  void crossNotebookFolderMove_qualifiesAndLengthensInboundLinkForDestinationNamesake()
+      throws UnexpectedNoAccessRightException {
+    User owner = currentUser.getUser();
+    Notebook sourceNotebook = ownedNotebook("Source");
+    Notebook destinationNotebook = ownedNotebook("Destination");
+    makeMe.aNote("Target").notebook(destinationNotebook).please();
+    Folder movedFolder = ownedFolder(sourceNotebook, "Moved");
+    makeMe.aNote("Target").folder(movedFolder).please();
+    Note referrer =
+        makeMe.aNote("Referrer").notebook(sourceNotebook).content("[[Target]]").please();
+    resolvedWikiLinkServiceBean.refreshForNote(referrer, owner);
+
+    controller.moveFolder(sourceNotebook, movedFolder, folderMoveTo(destinationNotebook, null));
+
+    makeMe.refresh(referrer);
+    assertThat(referrer.getContent(), equalTo("[[Destination:Moved/Target|Target]]"));
+  }
+
+  @Test
+  void crossNotebookFolderMove_lengthensCoMovedPeerLinkWhenDestinationHasSameTitleNote()
       throws UnexpectedNoAccessRightException {
     User owner = currentUser.getUser();
     Notebook nbA = ownedNotebook("NbA");
@@ -57,7 +76,7 @@ class NotebookFolderMoveWikiLinkRewriteControllerTest
     controller.moveFolder(nbA, folderF, folderMoveTo(nbB, null));
 
     makeMe.refresh(insideNote);
-    assertThat(insideNote.getContent(), equalTo("[[NbA:Outside|Outside]] and [[Peer]]."));
+    assertThat(insideNote.getContent(), equalTo("[[NbA:Outside|Outside]] and [[F/Peer|Peer]]."));
   }
 
   @Test

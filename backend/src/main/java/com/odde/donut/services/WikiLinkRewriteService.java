@@ -63,12 +63,18 @@ public class WikiLinkRewriteService {
 
   private String rewrittenTitleReference(
       Note referrer, Note targetNote, String linkText, TitleRenameReferenceHandling handling) {
+    return rewrittenReference(
+        referrer, targetNote, linkText, handling == TitleRenameReferenceHandling.KEEP_VISIBLE_TEXT);
+  }
+
+  private String rewrittenReference(
+      Note referrer, Note targetNote, String linkText, boolean keepVisibleText) {
     String originalPortablePath =
         WikiLinkMarkdown.splitAuthoredToken(linkText).portablePath().format();
     String authoredPortablePath =
         portablePathAuthoring.authoredPortablePath(referrer, targetNote, originalPortablePath);
     return WikiLinkMarkdownRewrite.newInnerForAuthoredPortablePath(
-        linkText, authoredPortablePath, handling == TitleRenameReferenceHandling.KEEP_VISIBLE_TEXT);
+        linkText, authoredPortablePath, keepVisibleText);
   }
 
   /**
@@ -93,7 +99,7 @@ public class WikiLinkRewriteService {
 
   /**
    * Rewrites inbound wiki links for a note that has moved to a different notebook. Preserves
-   * visible display text while qualifying all tokens with the new notebook name.
+   * visible display text while authoring an unambiguous Portable path from each referrer.
    */
   @Transactional
   public void rewriteInboundWikiLinksForNotebookMove(
@@ -113,9 +119,19 @@ public class WikiLinkRewriteService {
         targetNote,
         updatedAt,
         viewer,
-        (_, linkText) ->
-            WikiLinkMarkdownRewrite.newInnerForKeepNotebookMove(linkText, newNotebookName),
+        (referrer, linkText) ->
+            rewrittenMoveReference(referrer, targetNote, linkText, newNotebookName),
         excludedReferrerIds);
+  }
+
+  private String rewrittenMoveReference(
+      Note referrer, Note targetNote, String linkText, String newNotebookName) {
+    String notebookMoveRewrite =
+        WikiLinkMarkdownRewrite.newInnerForKeepNotebookMove(linkText, newNotebookName);
+    if (notebookMoveRewrite.equals(linkText)) {
+      return linkText;
+    }
+    return rewrittenReference(referrer, targetNote, linkText, true);
   }
 
   /**
@@ -193,9 +209,10 @@ public class WikiLinkRewriteService {
       User viewer,
       Set<Integer> coMovedTargetNoteIds) {
     WikiLinkRewriteSupport.applyOutgoingNotebookMoveRewrite(
-        entityManager,
+        resolvedWikiLinkRepository,
         entityPersister,
         resolvedWikiLinkService,
+        portablePathAuthoring,
         movedNote,
         sourceNotebookName,
         updatedAt,

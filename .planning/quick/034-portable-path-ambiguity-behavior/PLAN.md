@@ -560,22 +560,17 @@ rewrite entry points. Full backend tests plus focused `wiki_link.feature` and
 
 ### 29. Move rewrite lengthens or qualifies when needed
 
-**Status:** planned
+**Status:** done
 **Type:** Behavior
 
-**Precondition:** A resolved link points at a note that is being moved
-across folder or notebook.
-**Trigger:** Existing reference-preserving move rewrite runs.
-**Postcondition:** The rewritten path is still unique, qualified when the
-source scope differs.
-
-Test first: extend existing move E2E with a namesake. Replace
-`WikiLinkRewriteSupport`'s "lowest note id wins" co-move comment/behavior
-when that path would pick by id.
-
-Verification: focused link E2E; `pnpm backend:test_only`.
-
-Stop-safe: move maintenance agrees with uniqueness.
+Move rewrites now author a Portable path from each referrer's scope and use the
+previously resolved destination for co-moved links instead of choosing a note
+by database id. Inbound links qualify and lengthen when the destination scope
+contains a namesake; co-moved peer links lengthen while existing exact paths
+stay unchanged. Controller tests and `wiki_link.feature` pin both paths.
+Post-change-refactor consolidated the shared authoring rewrite seam and
+clarified move-rewrite naming/documentation. Full backend tests and the focused
+wiki-link E2E are green.
 
 ### 30. Already-ambiguous markup is not rewritten
 
