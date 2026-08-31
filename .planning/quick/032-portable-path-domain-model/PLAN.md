@@ -145,8 +145,17 @@ behavior remains green.
 
 ### 2. Existing Portable path spellings still resolve and rewrite
 
-**Status:** planned  
+**Status:** done  
 **Type:** Behavior
+
+**Learnings:**
+- The `[[/Title]]` leading-slash bundle-root form was already resolvable via
+  `PathShapedTarget`'s existing `leadingSlash` handling; the new regression
+  test in `WikiLinkResolverYamlAndBodyIntegrationTest` just documents it —
+  no production code change was needed.
+- No regressions surfaced from slice 1's `PortablePath` merge across backend
+  tests or the three focused E2E features (wiki_link, path_markdown_link,
+  property_wiki_link).
 
 **Precondition:** A note contains a currently supported shorthand, qualified,
 folder-path, root-path, path-Markdown, or property Portable path.  

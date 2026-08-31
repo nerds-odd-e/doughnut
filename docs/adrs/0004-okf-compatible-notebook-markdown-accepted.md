@@ -84,6 +84,10 @@ profile. Codec round-trips must be lossless for these rules.
   when it identifies one destination under that scope. With no match it is
   unresolved; with multiple matches it is ambiguous and therefore unresolved,
   and Donut asks for a longer path. The authored destination remains unchanged.
+  Implementation status: this ambiguity rejection is not yet enforced; that
+  work is deferred under `SEED-009`. The live resolver still applies its
+  existing deterministic first-match behavior (title before alias, then
+  repository order) instead of rejecting ambiguous matches.
 - These rules apply to the **body and to YAML frontmatter values** (scalars
   and one-level list items), including relationship `source` / `target` and
   `overlaps` items. Donut-authored frontmatter is wiki. Path Markdown
@@ -93,9 +97,11 @@ profile. Codec round-trips must be lossless for these rules.
   Donut relationship endpoints are not those fields.
 - Path Markdown `[display-text](/folder/File.md)` is the same link as
   `[[folder/File|display-text]]`. Leading `/` on Markdown destinations is
-  bundle-relative (notebook root). Wiki bundle-root path form has no leading
-  `/`. Source-relative destinations fit the Portable path model where
-  supported; this profile does not yet require Donut to author or resolve them.
+  bundle-relative (notebook root). Donut-authored wiki bundle-root path form
+  has no leading `/`; the reader also accepts a leading `/` on a path-shaped
+  wiki destination (`[[/Title]]`) as the same bundle-root spelling. Source-relative
+  destinations fit the Portable path model where supported; this profile does
+  not yet require Donut to author or resolve them.
 - `.md` on a path-shaped **Portable path** is optional and ignored
   (`/folder/File` = `/folder/File.md`; `[[folder/File.md]]` =
   `[[folder/File]]`). Do not strip `.md` from unqualified wiki titles

@@ -64,8 +64,7 @@ class WikidataControllerTests extends ControllerTestBase {
 
       Mockito.verify(httpClientAdapter)
           .getResponseString(
-              URI.create(
-                  "https://www.wikidata.org/wiki/Special:EntityData/%7BwikidataId%7D.json"));
+              URI.create("https://www.wikidata.org/wiki/Special:EntityData/%7BwikidataId%7D.json"));
     }
 
     @Test

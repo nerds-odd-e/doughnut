@@ -79,6 +79,17 @@ class WikiLinkResolverYamlAndBodyIntegrationTest {
   }
 
   @Test
+  void wikiLinkResolver_resolvesLeadingSlashBundleRootPathTarget() {
+    User owner = makeMe.aUser().please();
+    Note root = makeMe.aNote().title("Alpha").notebookOwnedBy(owner).please();
+    Note linker = makeMe.aNote().underSameNotebookAs(root).content("See [[/Alpha]]").please();
+
+    var resolved = wikiLinkResolver.resolveWikiLinksForCache(linker, owner);
+    assertThat(resolved.size(), equalTo(1));
+    assertThat(resolved.getFirst().targetNote().getId(), equalTo(root.getId()));
+  }
+
+  @Test
   void wikiLinkResolver_resolvesQualifiedNotebookAliasLink() {
     User owner = makeMe.aUser().please();
     Notebook otherNotebook =
