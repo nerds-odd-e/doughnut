@@ -30,6 +30,7 @@ erDiagram
     "note" ||--o{ memory_tracker : "note_id ON DELETE CASCADE"
     "note" ||--o{ note_alias_index : "note_id ON DELETE CASCADE"
     "note" ||--o{ note_creator : "note_id ON DELETE CASCADE"
+    "note" ||--o{ note_level_index : "note_id ON DELETE CASCADE"
     "note" ||--o{ note_property_index : "note_id ON DELETE CASCADE"
     "note" ||--o{ note_property_index : "target_note_id ON DELETE SET NULL"
     "note" ||--o{ resolved_wiki_link : "destination_note_id ON DELETE CASCADE"
@@ -171,6 +172,9 @@ erDiagram
     }
     note_embeddings {
         bigint id PK
+    }
+    note_level_index {
+        int note_id PK FK
     }
     note_property_index {
         int id PK

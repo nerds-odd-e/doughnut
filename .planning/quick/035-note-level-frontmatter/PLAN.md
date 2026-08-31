@@ -1,6 +1,6 @@
 # Note level as frontmatter `note_level`
 
-**Status:** in progress (slice 1 done)
+**Status:** in progress (slices 1–2 done)
 
 ## Goal
 
@@ -13,7 +13,7 @@
 - Users set it with radios **0–6** labeled “Level” inside Assimilation settings (`NoteRecallSettingForm` → `POST /api/notes/{note}/recall-setting`).
 - E2E: `e2e_test/features/assimilation/edit_when_assimilating.feature` (“Update recall level while assimilating”) opens those radios.
 - Other frontmatter caches already refresh on content save/create via `ResolvedWikiLinkRefresh` (`note_property_index`, `note_alias_index`).
-- Structural / passthrough keys are excluded from `note_property_index` and automatic property trackers (`PropertyKeyNaming.isExcludedFromPropertyIndexing`). `note_level` is **not** excluded yet — putting it in YAML would otherwise create assimilable property units.
+- Structural / passthrough keys (including `note_level`) are excluded from `note_property_index` and automatic property trackers. `note_level_index` already refreshes on content save; queue still reads `note.level` until slice 4.
 
 ## Requirements
 
@@ -70,17 +70,9 @@ None. Resolved: no picker; zeros dropped (not stored).
 
 `note_level` is a reserved structural key: not in `note_property_index`, no property tracker, no Assimilation buttons, no `note_level 2` suffix. Frontend hide/singleton uses `isNoteLevelPropertyKey` (generic reserved helper was unused and dropped).
 
-### 2. Cache table and refresh-from-frontmatter — Structure — planned
+### 2. Cache table and refresh-from-frontmatter — Structure — done
 
-Enables slice 4 (queue reads cache).
-
-- Flyway SQL `V300000310__create_note_level_index.sql` (name/version as in `db-migration.mdc`; greater than current tip).
-- Entity + repository. `NoteLevelIndexService.refreshForNote` (alias-index style: lock, replace rows).
-- Call it from `ResolvedWikiLinkRefresh.refreshForNote` so create/save already keep cache aligned.
-- Tests: `NoteLevelIndexServiceTest` — valid 1–6 upserts; absent/removed deletes; does not persist invalid (invalid save comes in slice 5; refresh may no-op or only see persisted content).
-- Regenerate ERD when the table exists (`database-erd` skill).
-
-**Done when:** saving a note with valid `note_level` writes a cache row; removing the key clears it; queue still uses `note.level` (no user-visible order change).
+`V300000310__create_note_level_index.sql`; `NoteLevelIndexService.refreshForNote` from `ResolvedWikiLinkRefresh`. Parse via `FrontmatterNoteLevel`. 1:1 upsert/delete (not bulk-replace — Hibernate would keep the old entity). Invalid YAML leaves no cache row. ERD regenerated.
 
 ### 3. Backfill cache and frontmatter from legacy `note.level` — Behavior — planned
 
@@ -154,4 +146,4 @@ Enables nothing user-facing; removes the leftover column after 4–6.
 
 ## Resume
 
-Next slice: **2**. Learning: indexing exclusion lives on the backend; frontend only needs `isNoteLevelPropertyKey` for panel/singleton (slice 6 preset can reuse that).
+Next slice: **3**. Learnings: cache refresh is 1:1 upsert/delete keyed by `note_id` (not alias-style bulk replace). `FrontmatterNoteLevel` already parses valid 1–6; slice 5 only needs to add save rejection. Backfill should reuse that parse helper and write cache via the same service.

@@ -36,7 +36,8 @@ public class ResolvedWikiLinkService {
       ResolvedWikiLinkRepository resolvedWikiLinkRepository,
       AuthorizationService authorizationService,
       NotePropertyIndexService notePropertyIndexService,
-      NoteAliasIndexService noteAliasIndexService) {
+      NoteAliasIndexService noteAliasIndexService,
+      NoteLevelIndexService noteLevelIndexService) {
     this.ambiguousWikiLinks = new AmbiguousWikiLinks(wikiLinkResolver);
     this.resolvedWikiLinkRepository = resolvedWikiLinkRepository;
     this.authorizationService = authorizationService;
@@ -45,7 +46,8 @@ public class ResolvedWikiLinkService {
             wikiLinkResolver,
             resolvedWikiLinkRepository,
             notePropertyIndexService,
-            noteAliasIndexService);
+            noteAliasIndexService,
+            noteLevelIndexService);
   }
 
   public List<WikiLink> wikiLinksForViewer(Note focusNote, User viewer) {

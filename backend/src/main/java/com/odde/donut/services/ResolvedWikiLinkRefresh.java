@@ -16,22 +16,26 @@ final class ResolvedWikiLinkRefresh {
   private final ResolvedWikiLinkRepository resolvedWikiLinkRepository;
   private final NotePropertyIndexService notePropertyIndexService;
   private final NoteAliasIndexService noteAliasIndexService;
+  private final NoteLevelIndexService noteLevelIndexService;
 
   ResolvedWikiLinkRefresh(
       WikiLinkResolver wikiLinkResolver,
       ResolvedWikiLinkRepository resolvedWikiLinkRepository,
       NotePropertyIndexService notePropertyIndexService,
-      NoteAliasIndexService noteAliasIndexService) {
+      NoteAliasIndexService noteAliasIndexService,
+      NoteLevelIndexService noteLevelIndexService) {
     this.wikiLinkResolver = wikiLinkResolver;
     this.resolvedWikiLinkRepository = resolvedWikiLinkRepository;
     this.notePropertyIndexService = notePropertyIndexService;
     this.noteAliasIndexService = noteAliasIndexService;
+    this.noteLevelIndexService = noteLevelIndexService;
   }
 
   void refreshForNote(EntityManager entityManager, Note note, User viewer) {
     rebuildResolvedWikiLinkRows(entityManager, note, viewer);
     notePropertyIndexService.refreshForNote(note);
     noteAliasIndexService.refreshForNote(note);
+    noteLevelIndexService.refreshForNote(note);
     dropStaleInboundPropertyWikiRows(entityManager, note);
   }
 
