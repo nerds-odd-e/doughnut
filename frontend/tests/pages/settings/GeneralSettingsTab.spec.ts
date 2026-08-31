@@ -25,16 +25,8 @@ describe("GeneralSettingsTab", () => {
     document.body.innerHTML = ""
   })
 
-  const mountTab = async (
-    user = makeMe.aUser.please(),
-    batchSchedule: { nextScheduledAt?: string } = {}
-  ) => {
+  const mountTab = async (user = makeMe.aUser.please()) => {
     mockSdkService(UserController, "getUserProfile", user)
-    mockSdkService(
-      UserController,
-      "getQuestionGenerationBatchSchedule",
-      batchSchedule
-    )
     wrapper = helper
       .component(GeneralSettingsTab)
       .withRouter()
@@ -47,28 +39,6 @@ describe("GeneralSettingsTab", () => {
   const submitButton = () =>
     wrapper.get('[data-testid="user-settings-submit"]')
       .element as HTMLButtonElement
-
-  it("shows the next batch question generation time", async () => {
-    const nextScheduledAt = "2024-06-15T09:00:00.000Z"
-    await mountTab(makeMe.aUser.please(), { nextScheduledAt })
-
-    expect(wrapper.text()).toContain("Next batch question generation:")
-    expect(wrapper.text()).toContain(new Date(nextScheduledAt).toLocaleString())
-  })
-
-  it("shows the fallback when no batch question generation is scheduled", async () => {
-    await mountTab()
-
-    expect(wrapper.text()).toContain(
-      "No batch question generation is scheduled yet"
-    )
-  })
-
-  it("does not show a spaced-repetition day list", async () => {
-    await mountTab()
-
-    expect(wrapper.find("#user-spaceIntervals").exists()).toBe(false)
-  })
 
   it("updates the injected currentUser ref after saving profile changes", async () => {
     const user = makeMe.aUser.please()

@@ -1005,11 +1005,6 @@ export type RecallEzDiffusionDto = {
     morningCount?: number;
 };
 
-export type QuestionGenerationBatchUserScheduleDto = {
-    nextScheduledAt?: string;
-    reason?: string;
-};
-
 export type AssimilationCountDto = {
     dueCount?: number;
     assimilatedCountOfTheDay?: number;
@@ -3305,22 +3300,6 @@ export type GetRecallEzDiffusionResponses = {
 };
 
 export type GetRecallEzDiffusionResponse = GetRecallEzDiffusionResponses[keyof GetRecallEzDiffusionResponses];
-
-export type GetQuestionGenerationBatchScheduleData = {
-    body?: never;
-    path?: never;
-    query?: never;
-    url: '/api/user/question-generation-batch-schedule';
-};
-
-export type GetQuestionGenerationBatchScheduleResponses = {
-    /**
-     * OK
-     */
-    200: QuestionGenerationBatchUserScheduleDto;
-};
-
-export type GetQuestionGenerationBatchScheduleResponse = GetQuestionGenerationBatchScheduleResponses[keyof GetQuestionGenerationBatchScheduleResponses];
 
 export type GetMenuDataData = {
     body?: never;

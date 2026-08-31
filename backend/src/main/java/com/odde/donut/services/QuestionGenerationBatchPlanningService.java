@@ -2,7 +2,6 @@ package com.odde.donut.services;
 
 import com.odde.donut.algorithms.RecallSilentPeriodTargetSelector;
 import com.odde.donut.algorithms.RecallSilentWindowDueInstant;
-import com.odde.donut.controllers.dto.QuestionGenerationBatchUserScheduleDTO;
 import com.odde.donut.entities.MemoryTracker;
 import com.odde.donut.entities.QuestionGenerationBatch;
 import com.odde.donut.entities.QuestionGenerationBatchRequest;
@@ -28,12 +27,6 @@ import org.springframework.stereotype.Service;
 public class QuestionGenerationBatchPlanningService {
   private static final long RECENT_RECALL_WINDOW_MILLIS = TimeUnit.DAYS.toMillis(7);
   private static final long CANDIDATE_TRACKER_WINDOW_MILLIS = TimeUnit.HOURS.toMillis(48);
-  private static final int MAX_SCHEDULE_SCAN_HOURS = 7 * 24;
-
-  public static final String REASON_BATCH_IN_PROGRESS = "BATCH_IN_PROGRESS";
-  public static final String REASON_NO_RECENT_RECALLS = "NO_RECENT_RECALLS";
-  public static final String REASON_NO_CANDIDATE_TRACKERS = "NO_CANDIDATE_TRACKERS";
-  public static final String REASON_NO_SCHEDULED_TIME = "NO_SCHEDULED_TIME";
 
   private final QuestionGenerationBatchRepository batchRepository;
   private final QuestionGenerationBatchRequestRepository batchRequestRepository;
@@ -118,38 +111,6 @@ public class QuestionGenerationBatchPlanningService {
     return Optional.of(savedBatch);
   }
 
-  public QuestionGenerationBatchUserScheduleDTO getNextBatchQuestionSchedule(
-      User user, Timestamp currentTime) {
-    QuestionGenerationBatchUserScheduleDTO dto = new QuestionGenerationBatchUserScheduleDTO();
-    if (batchRepository.existsByUser_IdAndStatus(
-        user.getId(), QuestionGenerationBatchStatus.SUBMITTED)) {
-      dto.setReason(REASON_BATCH_IN_PROGRESS);
-      return dto;
-    }
-
-    if (!hasRecentRecallActivity(user, currentTime)) {
-      dto.setReason(REASON_NO_RECENT_RECALLS);
-      return dto;
-    }
-
-    boolean sawEligibleTimeWithoutCandidate = false;
-    Timestamp candidateTime = nextSchedulerTimeAtOrAfter(currentTime);
-    for (int hours = 0; hours <= MAX_SCHEDULE_SCAN_HOURS; hours++) {
-      if (isUserEligibleForBatchSchedulingAt(user, candidateTime)) {
-        if (!findCandidateMemoryTrackersForBatchGeneration(user, candidateTime).isEmpty()) {
-          dto.setNextScheduledAt(candidateTime);
-          return dto;
-        }
-        sawEligibleTimeWithoutCandidate = true;
-      }
-      candidateTime = new Timestamp(candidateTime.getTime() + TimeUnit.HOURS.toMillis(1));
-    }
-
-    dto.setReason(
-        sawEligibleTimeWithoutCandidate ? REASON_NO_CANDIDATE_TRACKERS : REASON_NO_SCHEDULED_TIME);
-    return dto;
-  }
-
   private boolean isUserOverdueForBatch(User user, Timestamp currentTime, Timestamp windowStart) {
     return dueInstantForUser(user, currentTime, windowStart)
         .flatMap(
@@ -183,27 +144,6 @@ public class QuestionGenerationBatchPlanningService {
     return batchRepository.findLatestSubmittedAtByUser_Id(user.getId());
   }
 
-  private boolean hasRecentRecallActivity(User user, Timestamp currentTime) {
-    Timestamp windowStart = new Timestamp(currentTime.getTime() - RECENT_RECALL_WINDOW_MILLIS);
-    return !recallPromptRepository
-        .findAnsweredRecallPromptsInTimeRange(user.getId(), windowStart, currentTime)
-        .isEmpty();
-  }
-
-  private boolean isUserEligibleForBatchSchedulingAt(User user, Timestamp candidateTime) {
-    Timestamp windowStart = new Timestamp(candidateTime.getTime() - RECENT_RECALL_WINDOW_MILLIS);
-    if (recallPromptRepository
-        .findAnsweredRecallPromptsInTimeRange(user.getId(), windowStart, candidateTime)
-        .isEmpty()) {
-      return false;
-    }
-    if (!isUserEligibleForNewBatchSubmission(user)) {
-      return false;
-    }
-    return isUserOverdueForBatch(user, candidateTime, windowStart)
-        || isUserEligibleViaOpenAiFailureRetryPath(user, candidateTime, windowStart);
-  }
-
   public boolean isUserEligibleForNewBatchSubmission(User user) {
     return !batchRepository.existsByUser_IdAndStatus(
         user.getId(), QuestionGenerationBatchStatus.SUBMITTED);
@@ -227,12 +167,5 @@ public class QuestionGenerationBatchPlanningService {
     }
     return batchRepository.existsByUser_IdAndOpenaiBatchIdIsNotNullAndStatusIn(
         user.getId(), QuestionGenerationBatchStatus.openAiFailureRetryStatuses());
-  }
-
-  private Timestamp nextSchedulerTimeAtOrAfter(Timestamp currentTime) {
-    long millis = currentTime.getTime();
-    long hourMillis = TimeUnit.HOURS.toMillis(1);
-    long nextHourMillis = ((millis + hourMillis - 1) / hourMillis) * hourMillis;
-    return new Timestamp(nextHourMillis);
   }
 }

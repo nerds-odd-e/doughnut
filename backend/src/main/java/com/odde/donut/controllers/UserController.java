@@ -3,7 +3,6 @@ package com.odde.donut.controllers;
 import com.odde.donut.controllers.dto.DailyProbeConvergentValidityDTO;
 import com.odde.donut.controllers.dto.GeneratedTokenDTO;
 import com.odde.donut.controllers.dto.MenuDataDTO;
-import com.odde.donut.controllers.dto.QuestionGenerationBatchUserScheduleDTO;
 import com.odde.donut.controllers.dto.RecallEzDiffusionDTO;
 import com.odde.donut.controllers.dto.RecallStatsDTO;
 import com.odde.donut.controllers.dto.TokenConfigDTO;
@@ -15,7 +14,6 @@ import com.odde.donut.factoryServices.EntityPersister;
 import com.odde.donut.services.AssimilationServiceFactory;
 import com.odde.donut.services.AuthorizationService;
 import com.odde.donut.services.ConversationService;
-import com.odde.donut.services.QuestionGenerationBatchPlanningService;
 import com.odde.donut.services.RecallService;
 import com.odde.donut.services.RecallStatsService;
 import com.odde.donut.services.UserService;
@@ -47,7 +45,6 @@ class UserController {
   private final RecallService recallService;
   private final RecallStatsService recallStatsService;
   private final ConversationService conversationService;
-  private final QuestionGenerationBatchPlanningService questionGenerationBatchPlanningService;
   private final TestabilitySettings testabilitySettings;
   private final Optional<TestAccessTokenResolver> testAccessTokenResolver;
 
@@ -60,7 +57,6 @@ class UserController {
       RecallService recallService,
       RecallStatsService recallStatsService,
       ConversationService conversationService,
-      QuestionGenerationBatchPlanningService questionGenerationBatchPlanningService,
       TestabilitySettings testabilitySettings,
       Optional<TestAccessTokenResolver> testAccessTokenResolver) {
     this.entityPersister = entityPersister;
@@ -70,7 +66,6 @@ class UserController {
     this.recallService = recallService;
     this.recallStatsService = recallStatsService;
     this.conversationService = conversationService;
-    this.questionGenerationBatchPlanningService = questionGenerationBatchPlanningService;
     this.testabilitySettings = testabilitySettings;
     this.testAccessTokenResolver = testAccessTokenResolver;
   }
@@ -246,16 +241,5 @@ class UserController {
     ZoneId timeZone = TimezoneUtils.parseTimezone(timezone);
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
     return recallStatsService.computeEzDiffusion(user, timeZone, currentUTCTimestamp);
-  }
-
-  @GetMapping("/question-generation-batch-schedule")
-  @Transactional(readOnly = true)
-  public QuestionGenerationBatchUserScheduleDTO getQuestionGenerationBatchSchedule() {
-    authorizationService.assertLoggedIn();
-    User user = authorizationService.getCurrentUser();
-    Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
-
-    return questionGenerationBatchPlanningService.getNextBatchQuestionSchedule(
-        user, currentUTCTimestamp);
   }
 }

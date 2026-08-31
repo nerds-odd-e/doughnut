@@ -29,7 +29,6 @@ Use this for endpoint lookup; open `sdk.gen.ts` or `types.gen.ts` only for exact
 - `revokeToken`: DELETE `/api/user/token-info` -> `RevokeTokenResponse` (request: none; response body: void)
 - `getRecallStats`: GET `/api/user/recall-stats` -> `GetRecallStatsResponse` (request: `GetRecallStatsData`; query: timezone; response body: RecallStatsDto)
 - `getRecallEzDiffusion`: GET `/api/user/recall-ez-diffusion` -> `GetRecallEzDiffusionResponse` (request: `GetRecallEzDiffusionData`; query: timezone; response body: RecallEzDiffusionDto)
-- `getQuestionGenerationBatchSchedule`: GET `/api/user/question-generation-batch-schedule` -> `GetQuestionGenerationBatchScheduleResponse` (request: none; response body: QuestionGenerationBatchUserScheduleDto)
 - `getMenuData`: GET `/api/user/menu-data` -> `GetMenuDataResponse` (request: `GetMenuDataData`; query: timezone; response body: MenuDataDto)
 - `getTokens`: GET `/api/user/get-tokens` -> `GetTokensResponse` (request: none; response body: Array<UserToken>)
 - `getDailyProbeConvergentValidity`: GET `/api/user/daily-probe-convergent-validity` -> `GetDailyProbeConvergentValidityResponse` (request: `GetDailyProbeConvergentValidityData`; query: timezone; response body: DailyProbeConvergentValidityDto)
