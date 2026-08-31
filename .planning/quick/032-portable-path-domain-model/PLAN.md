@@ -1,6 +1,6 @@
 # Portable path domain vocabulary alignment
 
-**Status:** planned
+**Status:** done — all 6 slices executed; completion gates passed
 
 ## Goal
 
@@ -344,8 +344,33 @@ directly while preserving existing rows and behavior.
 
 ### 6. Existing resolved-link consumers survive the index rename
 
-**Status:** planned  
+**Status:** done (no code change needed)  
 **Type:** Behavior
+
+**Learnings:**
+- Slice 5 had already updated every consumer/test to the new
+  `ResolvedWikiLink` names; `backend:verify`, the two focused E2E features,
+  `lint:all`, and whitespace checks all passed unchanged. No coverage gap
+  was exposed.
+- Completion-gate sweep found one remaining leftover: the exact identifier
+  `targetToken` (pre-Portable-path vocabulary) in `PortablePath.java`,
+  `WikiLinkMarkdownRewrite.java`, and `DisplayNamePathSeparators.java` —
+  renamed to `authoredToken` (parameter/local-variable names only, no
+  behavior change). Repo-wide search now finds zero occurrences of
+  `WikiTitle`, `wikiTitles`, `targetToken`, `WikiLinkTargetReference`,
+  `WikiLinkAuthoredTarget`, `NoteWikiTitleCache`, or "concept path" in
+  production code, tests, generated API, or the ADRs (only the historical
+  Flyway rename SQL and the SEED-009 implementation-gap note in ADR 0004
+  mention old names, as expected). Remaining generic `target`-named
+  variables/methods (e.g. `targetNoteId` JPQL params, local `Note target`)
+  are ordinary English usage, not link-destination vocabulary, and were
+  left as-is per the plan's explicit scope boundary.
+- Local dev note: mid-plan concurrent commits on `main` added a Flyway
+  migration also numbered `V300000306`; slice 5's migration was renumbered
+  to `V300000307` to avoid a version collision. Renumbering after a
+  migration has already run against the local test DB requires dropping
+  and recreating that database before re-running tests, since Flyway's
+  schema-history table ties applied state to the old filename/version.
 
 **Precondition:** A note has currently resolved outbound Wiki links and inbound
 referrers, including a property link.  

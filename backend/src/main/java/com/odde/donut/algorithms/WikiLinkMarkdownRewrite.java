@@ -88,8 +88,8 @@ public final class WikiLinkMarkdownRewrite {
       String storedLinkInner, String sourceNotebookName) {
     int pipeIdx = storedLinkInner.indexOf('|');
     String rawTargetPart = pipeIdx == -1 ? storedLinkInner : storedLinkInner.substring(0, pipeIdx);
-    String targetToken = rawTargetPart.trim();
-    if (targetToken.isEmpty() || PortablePath.isQualifiedToken(targetToken)) {
+    String authoredToken = rawTargetPart.trim();
+    if (authoredToken.isEmpty() || PortablePath.isQualifiedToken(authoredToken)) {
       return storedLinkInner;
     }
     return keepVisibleInner(

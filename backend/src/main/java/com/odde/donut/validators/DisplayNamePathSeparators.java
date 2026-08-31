@@ -67,12 +67,12 @@ public final class DisplayNamePathSeparators {
    * For {@code Notebook:Title}, the notebook prefix colon stays halfwidth; both the notebook name
    * and the note-title portion are converted. An encoded {@code #prop:} suffix is left unchanged.
    */
-  public static String replaceOsInvalidCharsInWikiLinkTarget(String targetToken) {
-    if (targetToken == null) {
+  public static String replaceOsInvalidCharsInWikiLinkTarget(String authoredToken) {
+    if (authoredToken == null) {
       return null;
     }
     return PortablePath.mapBeforePropertySuffix(
-        targetToken, DisplayNamePathSeparators::replaceOsInvalidCharsInNoteTarget);
+        authoredToken, DisplayNamePathSeparators::replaceOsInvalidCharsInNoteTarget);
   }
 
   private static String replaceOsInvalidCharsInNoteTarget(String noteTarget) {

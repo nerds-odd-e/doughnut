@@ -134,20 +134,21 @@ public record PortablePath(
     return new PortablePath(Optional.of(newNotebookName), notePortion, encodedPropertyKey);
   }
 
-  static String replaceNoteTitle(String targetToken, String newTitle) {
-    return parse(targetToken).withNoteTitle(newTitle).format();
+  static String replaceNoteTitle(String authoredToken, String newTitle) {
+    return parse(authoredToken).withNoteTitle(newTitle).format();
   }
 
-  static String replaceFolderName(String targetToken, String oldFolderName, String newFolderName) {
-    return parse(targetToken).withRenamedFolder(oldFolderName, newFolderName).format();
+  static String replaceFolderName(
+      String authoredToken, String oldFolderName, String newFolderName) {
+    return parse(authoredToken).withRenamedFolder(oldFolderName, newFolderName).format();
   }
 
-  static String replaceNotebookName(String targetToken, String newNotebookName) {
-    return parse(targetToken).withNotebookName(newNotebookName).format();
+  static String replaceNotebookName(String authoredToken, String newNotebookName) {
+    return parse(authoredToken).withNotebookName(newNotebookName).format();
   }
 
-  static boolean isQualifiedToken(String targetToken) {
-    return parse(targetToken).hasNotebookQualifier();
+  static boolean isQualifiedToken(String authoredToken) {
+    return parse(authoredToken).hasNotebookQualifier();
   }
 
   private record Qualified(String notebookName, String noteTitle) {
