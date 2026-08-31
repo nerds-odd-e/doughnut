@@ -1,6 +1,6 @@
 # Note level as frontmatter `note_level`
 
-**Status:** in progress (slices 1–3 done)
+**Status:** in progress (slices 1–4 done)
 
 ## Goal
 
@@ -9,11 +9,11 @@
 ## Live system (today)
 
 - `note.level` is a `tinyint NOT NULL DEFAULT 0` column, mapped as embedded `NoteRecallSetting` on `Note`.
-- Assimilation order (SQL and in-memory `AssimilationUnit.ORDER`) is `level`, then `createdAt`, then `id` (then property grain).
+- Assimilation order (SQL and in-memory `AssimilationUnit.ORDER`) is cached `note_level` (`COALESCE` missing = 0), then `createdAt`, then `id` (then property grain). Radios still dual-write YAML + cache.
 - Users set it with radios **0–6** labeled “Level” inside Assimilation settings (`NoteRecallSettingForm` → `POST /api/notes/{note}/recall-setting`).
 - E2E: `e2e_test/features/assimilation/edit_when_assimilating.feature` (“Update recall level while assimilating”) opens those radios.
 - Other frontmatter caches already refresh on content save/create via `ResolvedWikiLinkRefresh` (`note_property_index`, `note_alias_index`).
-- Structural / passthrough keys (including `note_level`) are excluded from `note_property_index` and automatic property trackers. `note_level_index` already refreshes on content save; queue still reads `note.level` until slice 4.
+- Structural / passthrough keys (including `note_level`) are excluded from `note_property_index` and automatic property trackers. `note_level_index` refreshes on content save; queue reads the cache.
 
 ## Requirements
 
@@ -78,20 +78,9 @@ None. Resolved: no picker; zeros dropped (not stored).
 
 `V300000311` JDBC: column 1–6 → verbatim `note_level: N` + cache row; 0 / out-of-range / soft-deleted omitted; valid YAML wins (no fence re-dump). `FrontmatterNoteLevel.withVerbatimLevel` / `isValidLevel`.
 
-### 4. Assimilation order follows the cache (missing = 0) — Behavior — planned
+### 4. Assimilation order follows the cache (missing = 0) — Behavior — done
 
-**Pre:** two unassimilated notes; one has `note_level: 2` (or migrated level 2), the other has no key.  
-**Trigger:** ask for next to assimilate.  
-**Post:** the undefined (0) note is offered first; then lower levels before higher. Equal levels still use `createdAt`, then id.
-
-- Unassimilated JPQL only: `LEFT JOIN` cache, `ORDER BY COALESCE(level, 0), createdAt, id`.
-- Put the cached level on `AssimilationUnit` (constructor from those queries). Comparator uses that field, not `Note`.
-- `makeMe.level` writes frontmatter + refresh.
-- Dual-write `updateNoteRecallSetting` → YAML + cache (keeps radios/E2E working).
-- Extend `AssimilationServiceQueueOrderingTest` so the unique claim is frontmatter/cache (canonical order already covered).
-- E2E `edit_when_assimilating` still uses radios (interim dual-write). Do not remove `@wip` needs — scenario should stay green.
-
-**Done when:** queue tests pass without reading `note.level`; production migrated rows still order correctly via cache.
+Unassimilated JPQL `LEFT JOIN` + `COALESCE`; `AssimilationUnit` carries cached level. `makeMe.level` writes YAML + refresh. `updateNoteRecallSetting` dual-writes until slice 6.
 
 ### 5. Invalid `note_level` cannot be saved — Behavior — planned
 
@@ -138,4 +127,4 @@ Enables nothing user-facing; removes the leftover column after 4–6.
 
 ## Resume
 
-Next slice: **4**. Backfill is JDBC (outside Spring) — queue work should still use `NoteLevelIndexService.refreshForNote` for runtime writes. `FrontmatterNoteLevel.withVerbatimLevel` can insert the key for `makeMe.level` / dual-write.
+Next slice: **5**. `FrontmatterNoteLevel` parses valid 1–6; `isValidLevel` is private — re-expose what `authoredValidationError` needs. Dual-write stays until radios leave in slice 6. Queue no longer reads `note.level`.

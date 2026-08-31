@@ -1,5 +1,6 @@
 package com.odde.donut.testability.builders;
 
+import com.odde.donut.algorithms.FrontmatterNoteLevel;
 import com.odde.donut.entities.*;
 import com.odde.donut.testability.EntityBuilder;
 import com.odde.donut.testability.MakeMe;
@@ -19,6 +20,8 @@ public class NoteBuilder extends EntityBuilder<Note> {
   private List<NoteBuilder> childrenBuilders = new ArrayList<>();
   private Folder folder;
   private final NoteFrontmatterLists frontmatterLists = new NoteFrontmatterLists();
+
+  private Integer pendingLevel;
 
   public NoteBuilder(Note note, MakeMe makeMe) {
     super(makeMe, note);
@@ -92,6 +95,7 @@ public class NoteBuilder extends EntityBuilder<Note> {
       entity.setFolder(folder);
     }
     applyPendingFrontmatterLists();
+    applyPendingNoteLevel();
   }
 
   @Override
@@ -102,6 +106,9 @@ public class NoteBuilder extends EntityBuilder<Note> {
         && frontmatterLists.shouldRefreshAliasIndex()
         && makeMe.noteAliasIndexService != null) {
       makeMe.noteAliasIndexService.refreshForNote(entity);
+    }
+    if (needPersist && pendingLevel != null && makeMe.noteLevelIndexService != null) {
+      makeMe.noteLevelIndexService.refreshForNote(entity);
     }
   }
 
@@ -187,6 +194,13 @@ public class NoteBuilder extends EntityBuilder<Note> {
     }
   }
 
+  private void applyPendingNoteLevel() {
+    if (pendingLevel == null) {
+      return;
+    }
+    entity.setContent(FrontmatterNoteLevel.withVerbatimLevel(entity.getContent(), pendingLevel));
+  }
+
   public NoteBuilder updatedAt(Timestamp timestamp) {
     entity.setUpdatedAt(timestamp);
     return this;
@@ -204,7 +218,7 @@ public class NoteBuilder extends EntityBuilder<Note> {
   }
 
   public NoteBuilder level(int i) {
-    entity.getRecallSetting().setLevel(i);
+    pendingLevel = i;
     return this;
   }
 

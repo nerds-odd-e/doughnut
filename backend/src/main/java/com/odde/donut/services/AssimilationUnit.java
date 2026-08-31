@@ -4,10 +4,10 @@ import com.odde.donut.entities.Note;
 import java.util.Comparator;
 
 /** A note-level or property-level item in the assimilation queue. */
-public record AssimilationUnit(Note note, String propertyKey) {
+public record AssimilationUnit(Note note, String propertyKey, int level) {
 
   public static final Comparator<AssimilationUnit> ORDER =
-      Comparator.comparing((AssimilationUnit unit) -> unit.note().getRecallSetting().getLevel())
+      Comparator.comparingInt(AssimilationUnit::level)
           .thenComparing(unit -> unit.note().getCreatedAt())
           .thenComparing(unit -> unit.note().getId())
           .thenComparing(AssimilationUnit::isPropertyLevel)
@@ -15,12 +15,14 @@ public record AssimilationUnit(Note note, String propertyKey) {
               unit -> unit.propertyKey() == null ? "" : unit.propertyKey(),
               String.CASE_INSENSITIVE_ORDER);
 
-  public static AssimilationUnit forNote(Note note) {
-    return new AssimilationUnit(note, null);
+  /** JPQL: note unit; missing cache row is 0. */
+  public AssimilationUnit(Note note, Number cachedLevel) {
+    this(note, null, cachedLevel);
   }
 
-  public static AssimilationUnit forProperty(Note note, String propertyKey) {
-    return new AssimilationUnit(note, propertyKey);
+  /** JPQL: property unit; missing cache row is 0. */
+  public AssimilationUnit(Note note, String propertyKey, Number cachedLevel) {
+    this(note, propertyKey, cachedLevel == null ? 0 : cachedLevel.intValue());
   }
 
   public boolean isPropertyLevel() {

@@ -44,7 +44,8 @@ class NoteLevelIndexBackfillTest {
   @ParameterizedTest
   @ValueSource(ints = {1, 2, 3, 4, 5, 6})
   void inserts_note_level_and_cache_from_legacy_column(int level) throws Exception {
-    Note note = makeMe.aNote().content(FENCED_WITHOUT_LEVEL).level(level).please();
+    Note note = makeMe.aNote().content(FENCED_WITHOUT_LEVEL).please();
+    setLegacyColumnLevel(note, level);
 
     runBackfill();
 
@@ -54,7 +55,8 @@ class NoteLevelIndexBackfillTest {
 
   @Test
   void leaves_level_zero_notes_without_key_or_cache() throws Exception {
-    Note note = makeMe.aNote().content(FENCED_WITHOUT_LEVEL).level(0).please();
+    Note note = makeMe.aNote().content(FENCED_WITHOUT_LEVEL).please();
+    setLegacyColumnLevel(note, 0);
 
     runBackfill();
 
@@ -65,7 +67,8 @@ class NoteLevelIndexBackfillTest {
   @ParameterizedTest
   @ValueSource(ints = {-1, 7})
   void omits_out_of_range_legacy_level(int level) throws Exception {
-    Note note = makeMe.aNote().content(FENCED_WITHOUT_LEVEL).level(level).please();
+    Note note = makeMe.aNote().content(FENCED_WITHOUT_LEVEL).please();
+    setLegacyColumnLevel(note, level);
 
     runBackfill();
 
@@ -84,7 +87,8 @@ class NoteLevelIndexBackfillTest {
 
         body
         """;
-    Note note = makeMe.aNote().content(yamlWins).level(5).please();
+    Note note = makeMe.aNote().content(yamlWins).please();
+    setLegacyColumnLevel(note, 5);
 
     runBackfill();
 
@@ -94,7 +98,8 @@ class NoteLevelIndexBackfillTest {
 
   @Test
   void skips_soft_deleted_notes() throws Exception {
-    Note note = makeMe.aNote().content(FENCED_WITHOUT_LEVEL).level(3).softDeleted().please();
+    Note note = makeMe.aNote().content(FENCED_WITHOUT_LEVEL).softDeleted().please();
+    setLegacyColumnLevel(note, 3);
 
     runBackfill();
 
@@ -113,7 +118,8 @@ class NoteLevelIndexBackfillTest {
 
         body
         """;
-    Note note = makeMe.aNote().content(invalid).level(3).please();
+    Note note = makeMe.aNote().content(invalid).please();
+    setLegacyColumnLevel(note, 3);
 
     runBackfill();
 
@@ -132,7 +138,8 @@ class NoteLevelIndexBackfillTest {
 
         body
         """;
-    Note note = makeMe.aNote().content(authored).level(4).please();
+    Note note = makeMe.aNote().content(authored).please();
+    setLegacyColumnLevel(note, 4);
 
     runBackfill();
 
@@ -150,6 +157,11 @@ class NoteLevelIndexBackfillTest {
     } finally {
       DataSourceUtils.releaseConnection(connection, dataSource);
     }
+  }
+
+  private void setLegacyColumnLevel(Note note, int level) {
+    entityManager.flush();
+    jdbcTemplate.update("UPDATE note SET level = ? WHERE id = ?", level, note.getId());
   }
 
   private String noteContent(Note note) {

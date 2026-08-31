@@ -4,6 +4,7 @@ import com.odde.donut.entities.*;
 import com.odde.donut.factoryServices.EntityPersister;
 import com.odde.donut.services.NoteAliasIndexService;
 import com.odde.donut.services.NoteEmbeddingService;
+import com.odde.donut.services.NoteLevelIndexService;
 import com.odde.donut.services.book.BookStorage;
 import com.odde.donut.testability.builders.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,7 @@ public class MakeMe extends MakeMeWithoutDB {
   @Autowired public EntityPersister entityPersister;
   @Autowired public NoteEmbeddingService noteEmbeddingService;
   @Autowired public NoteAliasIndexService noteAliasIndexService;
+  @Autowired public NoteLevelIndexService noteLevelIndexService;
   @Autowired public BookStorage bookStorage;
   @Autowired public TestabilitySettings testabilitySettings;
 

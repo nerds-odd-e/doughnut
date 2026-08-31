@@ -48,6 +48,12 @@ class AssimilationServiceQueueOrderingTest extends AssimilationServiceTestBase {
       assertThat(getNextNoteToAssimilate(assimilationService), equalTo(note2));
     }
 
+    @Test
+    void missing_note_level_is_offered_before_frontmatter_level() {
+      makeMe.theNote(note1).level(2).please();
+      assertThat(getNextNoteToAssimilate(assimilationService), equalTo(note2));
+    }
+
     @Nested
     class WithAdditionalOwnedNote {
       Note anotherNote;

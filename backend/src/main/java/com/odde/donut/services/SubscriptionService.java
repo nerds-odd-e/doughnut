@@ -1,6 +1,5 @@
 package com.odde.donut.services;
 
-import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Subscription;
 import com.odde.donut.entities.repositories.NoteRepository;
 import java.util.List;
@@ -20,7 +19,7 @@ public class SubscriptionService {
         subscription.getUser().getId(), subscription.getNotebook().getId());
   }
 
-  public Stream<Note> getUnassimilatedNotes(Subscription subscription) {
+  public Stream<AssimilationUnit> getUnassimilatedNotes(Subscription subscription) {
     return noteRepository.findUnassimilatedByAncestor(
         subscription.getUser().getId(), subscription.getNotebook().getId());
   }

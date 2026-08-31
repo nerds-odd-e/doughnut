@@ -35,4 +35,10 @@ public class NoteLevelIndex {
   @Getter
   @Setter
   private Integer level;
+
+  /** JPQL fragment for unassimilated queries: join alias {@code nli} on note {@code n}. */
+  public static final String JPA_LEFT_JOIN = " LEFT JOIN NoteLevelIndex nli ON nli.note = n";
+
+  /** JPQL: missing cache row is level 0. */
+  public static final String JPA_LEVEL = "COALESCE(nli.level, 0)";
 }

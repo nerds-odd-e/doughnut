@@ -19,7 +19,8 @@ class AssimilationServiceSubscriptionQueueTest extends AssimilationServiceTestBa
       makeMe.aMemoryTrackerFor(note).propertyKey("topic").assimilatedAt(day1).please();
 
       assertThat(
-          userService.getUnassimilatedNotes(user).map(Note::getId).toList(), hasItem(note.getId()));
+          userService.getUnassimilatedNotes(user).map(unit -> unit.note().getId()).toList(),
+          hasItem(note.getId()));
     }
   }
 
@@ -52,7 +53,7 @@ class AssimilationServiceSubscriptionQueueTest extends AssimilationServiceTestBa
       makeMe.refresh(user);
       Subscription sub = user.getSubscriptions().stream().findFirst().orElseThrow();
       List<Integer> dueInSubscribedNotebook =
-          subscriptionService.getUnassimilatedNotes(sub).map(Note::getId).toList();
+          subscriptionService.getUnassimilatedNotes(sub).map(unit -> unit.note().getId()).toList();
       assertThat(dueInSubscribedNotebook, hasItem(link.getId()));
     }
 

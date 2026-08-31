@@ -1,7 +1,6 @@
 package com.odde.donut.services;
 
 import com.odde.donut.algorithms.PropertyKeyNaming;
-import com.odde.donut.entities.NotePropertyIndex;
 import com.odde.donut.entities.Subscription;
 import com.odde.donut.entities.User;
 import com.odde.donut.entities.repositories.NotePropertyIndexRepository;
@@ -31,31 +30,25 @@ public class UnassimilatedPropertyService {
 
   public Stream<AssimilationUnit> streamUnassimilatedPropertiesForUser(User user) {
     return streamAssimilable(
-            notePropertyIndexRepository.streamUnassimilatedPropertiesForOwnership(
-                user.getId(), user.getOwnership().getId()))
-        .map(UnassimilatedPropertyService::toPropertyUnit);
+        notePropertyIndexRepository.streamUnassimilatedPropertiesForOwnership(
+            user.getId(), user.getOwnership().getId()));
   }
 
   public Stream<AssimilationUnit> streamUnassimilatedPropertiesForSubscription(
       Subscription subscription) {
     return streamAssimilable(
-            notePropertyIndexRepository.streamUnassimilatedPropertiesForNotebook(
-                subscription.getUser().getId(), subscription.getNotebook().getId()))
-        .map(UnassimilatedPropertyService::toPropertyUnit);
+        notePropertyIndexRepository.streamUnassimilatedPropertiesForNotebook(
+            subscription.getUser().getId(), subscription.getNotebook().getId()));
   }
 
-  private static int countAssimilable(Stream<NotePropertyIndex> unfiltered) {
-    try (Stream<NotePropertyIndex> stream = streamAssimilable(unfiltered)) {
+  private static int countAssimilable(Stream<AssimilationUnit> unfiltered) {
+    try (Stream<AssimilationUnit> stream = streamAssimilable(unfiltered)) {
       return (int) stream.count();
     }
   }
 
-  private static Stream<NotePropertyIndex> streamAssimilable(Stream<NotePropertyIndex> unfiltered) {
+  private static Stream<AssimilationUnit> streamAssimilable(Stream<AssimilationUnit> unfiltered) {
     return unfiltered.filter(
-        index -> !PropertyKeyNaming.isReservedStructuralKey(index.getPropertyKey()));
-  }
-
-  private static AssimilationUnit toPropertyUnit(NotePropertyIndex index) {
-    return AssimilationUnit.forProperty(index.getNote(), index.getPropertyKey());
+        unit -> !PropertyKeyNaming.isReservedStructuralKey(unit.propertyKey()));
   }
 }

@@ -23,7 +23,7 @@ public class UnassimilatedNoteUnitSource implements AssimilationUnitSource {
 
   @Override
   public Stream<AssimilationUnit> streamForUser(User user) {
-    return userService.getUnassimilatedNotes(user).map(AssimilationUnit::forNote);
+    return userService.getUnassimilatedNotes(user);
   }
 
   @Override
@@ -33,6 +33,6 @@ public class UnassimilatedNoteUnitSource implements AssimilationUnitSource {
 
   @Override
   public Stream<AssimilationUnit> streamForSubscription(Subscription subscription) {
-    return subscriptionService.getUnassimilatedNotes(subscription).map(AssimilationUnit::forNote);
+    return subscriptionService.getUnassimilatedNotes(subscription);
   }
 }

@@ -3,7 +3,9 @@ package com.odde.donut.entities.repositories;
 import com.odde.donut.entities.AssimilationSequenceSkip;
 import com.odde.donut.entities.MemoryTrackerQueryFragments;
 import com.odde.donut.entities.Note;
+import com.odde.donut.entities.NoteLevelIndex;
 import com.odde.donut.entities.NotebookSettings;
+import com.odde.donut.services.AssimilationUnit;
 import com.odde.donut.utils.SearchTitleNormalizer;
 import java.util.List;
 import java.util.stream.Stream;
@@ -164,19 +166,25 @@ public interface NoteRepository extends CrudRepository<Note, Integer>, NoteStruc
           + " AND "
           + MemoryTrackerQueryFragments.JPA_WHERE_UNDERSTANDING_TRACKER;
 
-  String unassimilatedOrderBy = " ORDER BY n.recallSetting.level, n.createdAt, n.id";
+  String unassimilatedOrderBy = " ORDER BY " + NoteLevelIndex.JPA_LEVEL + ", n.createdAt, n.id";
+
+  String selectUnassimilatedNoteUnit =
+      "SELECT NEW com.odde.donut.services.AssimilationUnit(n, "
+          + NoteLevelIndex.JPA_LEVEL
+          + ") FROM Note n";
 
   String selectFromNoteWithOwnership =
       " JOIN n.notebook nb " + " ON nb.ownership.id = :ownershipId ";
 
   @Query(
       value =
-          selectFromNote
+          selectUnassimilatedNoteUnit
               + selectFromNoteWithOwnership
               + joinMemoryTracker
+              + NoteLevelIndex.JPA_LEFT_JOIN
               + unassimilatedWhereClause
               + unassimilatedOrderBy)
-  Stream<Note> findUnassimilatedByOwnership(Integer userId, Integer ownershipId);
+  Stream<AssimilationUnit> findUnassimilatedByOwnership(Integer userId, Integer ownershipId);
 
   @Query(
       value =
@@ -190,12 +198,13 @@ public interface NoteRepository extends CrudRepository<Note, Integer>, NoteStruc
 
   @Query(
       value =
-          selectFromNote
+          selectUnassimilatedNoteUnit
               + joinMemoryTracker
+              + NoteLevelIndex.JPA_LEFT_JOIN
               + unassimilatedWhereClause
               + fromNotebook
               + unassimilatedOrderBy)
-  Stream<Note> findUnassimilatedByAncestor(Integer userId, Integer notebookId);
+  Stream<AssimilationUnit> findUnassimilatedByAncestor(Integer userId, Integer notebookId);
 
   @Query(
       value =

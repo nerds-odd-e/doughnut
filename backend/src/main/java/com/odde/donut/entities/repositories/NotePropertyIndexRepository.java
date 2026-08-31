@@ -2,8 +2,10 @@ package com.odde.donut.entities.repositories;
 
 import com.odde.donut.entities.AssimilationSequenceSkip;
 import com.odde.donut.entities.MemoryTrackerQueryFragments;
+import com.odde.donut.entities.NoteLevelIndex;
 import com.odde.donut.entities.NotePropertyIndex;
 import com.odde.donut.entities.NotebookSettings;
+import com.odde.donut.services.AssimilationUnit;
 import java.util.List;
 import java.util.stream.Stream;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -46,7 +48,13 @@ public interface NotePropertyIndexRepository extends JpaRepository<NotePropertyI
       " AND i.itemIndex = (SELECT MIN(i2.itemIndex) FROM NotePropertyIndex i2"
           + " WHERE i2.note = n AND i2.propertyKey = i.propertyKey)";
 
-  String unassimilatedOrderBy = " ORDER BY n.recallSetting.level, n.createdAt, n.id, i.propertyKey";
+  String unassimilatedOrderBy =
+      " ORDER BY " + NoteLevelIndex.JPA_LEVEL + ", n.createdAt, n.id, i.propertyKey";
+
+  String selectUnassimilatedPropertyUnit =
+      "SELECT NEW com.odde.donut.services.AssimilationUnit(n, i.propertyKey, "
+          + NoteLevelIndex.JPA_LEVEL
+          + ") FROM NotePropertyIndex i";
 
   @Modifying
   @Query("DELETE FROM NotePropertyIndex i WHERE i.note.id = :noteId")
@@ -56,28 +64,30 @@ public interface NotePropertyIndexRepository extends JpaRepository<NotePropertyI
 
   @Query(
       value =
-          "SELECT i FROM NotePropertyIndex i"
-              + " JOIN FETCH i.note n"
+          selectUnassimilatedPropertyUnit
+              + " JOIN i.note n"
               + " JOIN n.notebook nb ON nb.ownership.id = :ownershipId"
               + unassimilatedJoinPropertyTracker
+              + NoteLevelIndex.JPA_LEFT_JOIN
               + unassimilatedWhereClause
               + targetNoteKeyGateWhere
               + unassimilatedDedupeByExactKey
               + unassimilatedOrderBy)
-  Stream<NotePropertyIndex> streamUnassimilatedPropertiesForOwnership(
+  Stream<AssimilationUnit> streamUnassimilatedPropertiesForOwnership(
       @Param("userId") Integer userId, @Param("ownershipId") Integer ownershipId);
 
   @Query(
       value =
-          "SELECT i FROM NotePropertyIndex i"
-              + " JOIN FETCH i.note n"
+          selectUnassimilatedPropertyUnit
+              + " JOIN i.note n"
               + " JOIN n.notebook nb"
               + unassimilatedJoinPropertyTracker
+              + NoteLevelIndex.JPA_LEFT_JOIN
               + unassimilatedWhereClause
               + targetNoteKeyGateWhere
               + " AND nb.id = :notebookId"
               + unassimilatedDedupeByExactKey
               + unassimilatedOrderBy)
-  Stream<NotePropertyIndex> streamUnassimilatedPropertiesForNotebook(
+  Stream<AssimilationUnit> streamUnassimilatedPropertiesForNotebook(
       @Param("userId") Integer userId, @Param("notebookId") Integer notebookId);
 }

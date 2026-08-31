@@ -1,5 +1,6 @@
 package com.odde.donut.controllers;
 
+import com.odde.donut.algorithms.FrontmatterNoteLevel;
 import com.odde.donut.controllers.dto.*;
 import com.odde.donut.entities.*;
 import com.odde.donut.entities.repositories.AssimilationSequenceSkipRepository;
@@ -7,6 +8,7 @@ import com.odde.donut.entities.repositories.RecallLogRepository;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.factoryServices.EntityPersister;
 import com.odde.donut.services.AuthorizationService;
+import com.odde.donut.services.NoteLevelIndexService;
 import com.odde.donut.services.NoteRealmService;
 import com.odde.donut.services.NoteService;
 import com.odde.donut.services.PortablePathAuthoring;
@@ -41,6 +43,7 @@ class NoteController {
   private final RecallLogRepository recallLogRepository;
   private final AssimilationSequenceSkipRepository skipRepository;
   private final PortablePathAuthoring portablePathAuthoring;
+  private final NoteLevelIndexService noteLevelIndexService;
 
   public NoteController(
       EntityPersister entityPersister,
@@ -52,7 +55,8 @@ class NoteController {
       NoteRealmService noteRealmService,
       RecallLogRepository recallLogRepository,
       AssimilationSequenceSkipRepository skipRepository,
-      PortablePathAuthoring portablePathAuthoring) {
+      PortablePathAuthoring portablePathAuthoring,
+      NoteLevelIndexService noteLevelIndexService) {
     this.entityPersister = entityPersister;
     this.noteService = noteService;
     this.authorizationService = authorizationService;
@@ -63,6 +67,7 @@ class NoteController {
     this.recallLogRepository = recallLogRepository;
     this.skipRepository = skipRepository;
     this.portablePathAuthoring = portablePathAuthoring;
+    this.noteLevelIndexService = noteLevelIndexService;
   }
 
   @GetMapping("/{note}")
@@ -144,7 +149,10 @@ class NoteController {
       throws UnexpectedNoAccessRightException {
     authorizationService.assertAuthorization(note);
     BeanUtils.copyProperties(noteRecallSetting, note.getRecallSetting());
+    note.setContent(
+        FrontmatterNoteLevel.withVerbatimLevel(note.getContent(), noteRecallSetting.getLevel()));
     entityPersister.save(note);
+    noteLevelIndexService.refreshForNote(note);
     return RedirectToNoteResponse.forNote(note.getId());
   }
 

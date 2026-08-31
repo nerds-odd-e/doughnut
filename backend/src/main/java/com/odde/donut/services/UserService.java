@@ -47,7 +47,7 @@ public class UserService {
     return noteRepository.countUnassimilatedByOwnership(user.getId(), user.getOwnership().getId());
   }
 
-  public Stream<Note> getUnassimilatedNotes(User user) {
+  public Stream<AssimilationUnit> getUnassimilatedNotes(User user) {
     return noteRepository.findUnassimilatedByOwnership(user.getId(), user.getOwnership().getId());
   }
 
