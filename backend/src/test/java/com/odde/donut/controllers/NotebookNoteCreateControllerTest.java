@@ -7,20 +7,26 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import com.odde.donut.controllers.dto.ApiError;
 import com.odde.donut.controllers.dto.NoteCreationDTO;
 import com.odde.donut.controllers.dto.NoteRealm;
+import com.odde.donut.controllers.dto.WikiLink;
 import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.exceptions.ApiException;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
+import com.odde.donut.services.ResolvedWikiLinkService;
 import org.hibernate.exception.ConstraintViolationException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
 class NotebookNoteCreateControllerTest extends NotebookControllerTestBase {
+
+  @Autowired NoteController noteController;
+  @Autowired ResolvedWikiLinkService resolvedWikiLinkService;
 
   private NoteCreationDTO noteCreate(String title) {
     NoteCreationDTO dto = new NoteCreationDTO();
@@ -119,6 +125,24 @@ class NotebookNoteCreateControllerTest extends NotebookControllerTestBase {
     assertThrows(
         ConstraintViolationException.class,
         () -> controller.createNoteAtNotebookRoot(nb, noteCreateInFolder("InFolder", folder)));
+  }
+
+  @Test
+  void creatingANamesakeMakesAnExistingUniqueShorthandAmbiguous() throws Exception {
+    Notebook nb = ownedNotebook();
+    Note target = makeMe.aNote().notebook(nb).title("Target").please();
+    Note referrer = makeMe.aNote().underSameNotebookAs(target).content("See [[Target]].").please();
+    Folder otherFolder = ownedFolder(nb, "Other Folder");
+    resolvedWikiLinkService.refreshForNote(referrer, currentUser.getUser());
+    assertThat(
+        noteController.showNote(referrer).getWikiLinks().get(0).getResolution(),
+        equalTo(WikiLink.Resolution.RESOLVED));
+
+    controller.createNoteAtNotebookRoot(nb, noteCreateInFolder("Target", otherFolder));
+
+    assertThat(
+        noteController.showNote(referrer).getWikiLinks().get(0).getResolution(),
+        equalTo(WikiLink.Resolution.AMBIGUOUS));
   }
 
   @ParameterizedTest

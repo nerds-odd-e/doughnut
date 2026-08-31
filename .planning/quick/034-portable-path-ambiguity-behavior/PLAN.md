@@ -430,19 +430,17 @@ No E2E needed; controller test was fast enough. Full backend suite green.
 
 ### 23. Creating a namesake updates shorthand cardinality
 
-**Status:** planned
+**Status:** done
 **Type:** Behavior
 
-**Precondition:** A shorthand currently resolves uniquely.
-**Trigger:** A new note is created that collides on display name or alias.
-**Postcondition:** The existing shorthand becomes ambiguous without editing
-its source.
-
-Test first: controller/cache; do not repeat slice 22's graph assertions.
-
-Verification: `pnpm backend:test_only`.
-
-Stop-safe: creation is a cardinality change, not only rename.
+Both `NoteConstructionService` creation entry points
+(`createRootNoteWithWikidataService`, `createNoteFromExtractedSuggestion`)
+now call `resolvedWikiLinkService.refreshNotebookScope(notebook, user)`
+unconditionally after creation, replacing the narrower individual
+`refreshForNote` calls (strictly broader, still covers the created note
+itself). Pinned by `NotebookNoteCreateControllerTest
+.creatingANamesakeMakesAnExistingUniqueShorthandAmbiguous`. Full backend
+suite green.
 
 ### 24. Moving a note updates shorthand cardinality
 
