@@ -1,6 +1,6 @@
 # Scheduled job failure reports
 
-**Status:** in progress (slice 1 done).
+**Status:** in progress (slices 1–2 done).
 **Type:** ad-hoc plan (`.planning/quick/`)
 
 ## Goal
@@ -65,18 +65,11 @@ in `error_detail`. HTTP constructor still writes user + URI (shared
 
 ---
 
-### 2. Hourly question-generation resume failure appears as a failure report — Behavior `[ ]`
+### 2. Hourly question-generation resume failure appears as a failure report — Behavior `[x]`
 
-**Pre:** production hourly maintenance is running. **Trigger:**
-`resumeExistingBatches` throws (the EntityManager prune case). **Post:**
-a Failure report exists (admin list / `failure_report` row) for that
-exception. Maintenance-run `error` is still recorded. Due-user submission
-still runs that hour.
-
-**Verify:** extend `QuestionGenerationBatchMaintenanceJobTests` (or a
-small Spring test with real `FailureReportRepository` and mocked resume)
-so a thrown resume exception produces a persisted report. Existing
-“still submits due users” assertion stays.
+Resume catch calls `fromException` with `getClass().getSimpleName()`, then
+continues to due-user submit. Maintenance-run `error` still recorded.
+Submit catch still only `recordError` + rethrow (no second report).
 
 ---
 
@@ -107,3 +100,5 @@ Embedding job needs no per-method catch.
 - Slice 1: HTTP and background share `contextPrefix` on the factory
   record. Remaining slices call `fromException`; do not add nullable
   request/source fields.
+- Slice 2: job tests stay Mockito-only (verify repository `save`); real-row
+  persist is the factory test. Source label is `getClass().getSimpleName()`.

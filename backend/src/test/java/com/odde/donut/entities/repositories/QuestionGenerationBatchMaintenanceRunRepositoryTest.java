@@ -5,6 +5,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
 
 import com.odde.donut.entities.QuestionGenerationBatchMaintenanceTriggerSource;
+import com.odde.donut.services.GithubService;
 import com.odde.donut.services.QuestionGenerationBatchMaintenanceJob;
 import com.odde.donut.services.QuestionGenerationBatchMaintenanceRunService;
 import com.odde.donut.services.QuestionGenerationBatchMaintenanceService;
@@ -27,6 +28,8 @@ class QuestionGenerationBatchMaintenanceRunRepositoryTest {
   @Autowired QuestionGenerationBatchMaintenanceRunService maintenanceRunService;
   @Autowired QuestionGenerationBatchMaintenanceService maintenanceService;
   @Autowired QuestionGenerationBatchSubmitDueUsersService submitDueUsersService;
+  @Autowired GithubService githubService;
+  @Autowired FailureReportRepository failureReportRepository;
 
   @Test
   void persistsManualResumeMaintenanceRunWhenRecorded() {
@@ -54,7 +57,11 @@ class QuestionGenerationBatchMaintenanceRunRepositoryTest {
   void persistsScheduledMaintenanceRunWhenHourlyJobRuns() {
     QuestionGenerationBatchMaintenanceJob job =
         new QuestionGenerationBatchMaintenanceJob(
-            maintenanceService, submitDueUsersService, maintenanceRunService);
+            maintenanceService,
+            submitDueUsersService,
+            maintenanceRunService,
+            githubService,
+            failureReportRepository);
 
     job.runHourlyMaintenance();
 

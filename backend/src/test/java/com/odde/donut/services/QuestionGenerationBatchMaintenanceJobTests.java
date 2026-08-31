@@ -5,16 +5,20 @@ import static org.hamcrest.Matchers.containsString;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.verify;
 
+import com.odde.donut.entities.FailureReport;
 import com.odde.donut.entities.QuestionGenerationBatchMaintenanceTriggerSource;
+import com.odde.donut.entities.repositories.FailureReportRepository;
 import java.sql.Timestamp;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -25,6 +29,8 @@ class QuestionGenerationBatchMaintenanceJobTests {
   @Mock QuestionGenerationBatchMaintenanceService maintenanceService;
   @Mock QuestionGenerationBatchSubmitDueUsersService submitDueUsersService;
   @Mock QuestionGenerationBatchMaintenanceRunService maintenanceRunService;
+  @Mock GithubService githubService;
+  @Mock FailureReportRepository failureReportRepository;
 
   QuestionGenerationBatchMaintenanceJob job;
 
@@ -32,7 +38,11 @@ class QuestionGenerationBatchMaintenanceJobTests {
   void setup() {
     job =
         new QuestionGenerationBatchMaintenanceJob(
-            maintenanceService, submitDueUsersService, maintenanceRunService);
+            maintenanceService,
+            submitDueUsersService,
+            maintenanceRunService,
+            githubService,
+            failureReportRepository);
   }
 
   @Nested
@@ -88,6 +98,12 @@ class QuestionGenerationBatchMaintenanceJobTests {
 
     verify(maintenanceRunService).recordError(any(RuntimeException.class));
     verify(submitDueUsersService).submitDueUsers(any(Timestamp.class));
+
+    ArgumentCaptor<FailureReport> reportCaptor = ArgumentCaptor.forClass(FailureReport.class);
+    verify(failureReportRepository, atLeastOnce()).save(reportCaptor.capture());
+    assertThat(
+        reportCaptor.getValue().getErrorDetail(),
+        containsString("QuestionGenerationBatchMaintenanceJob"));
   }
 
   @Test
