@@ -113,7 +113,10 @@ describe("GeneralSettingsTab", () => {
     const updateSpy = mockSdkServiceWithImplementation(
       UserController,
       "updateUser",
-      () => new Promise<User>(() => {})
+      () =>
+        new Promise<User>(() => {
+          // never resolve — keep the save in flight
+        })
     )
     await mountTab(user)
 
