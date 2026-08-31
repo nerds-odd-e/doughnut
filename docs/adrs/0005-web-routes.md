@@ -15,30 +15,24 @@ Donut has three URL-shaped languages:
    property links
    ([ADR 0004](./0004-okf-compatible-notebook-markdown-accepted.md))
 
-The three languages share a leading `/` and have distinct sources of truth:
-the SPA route table, OpenAPI,
-[`doughnut-routing.json`](../../infra/gcp/path-routing/doughnut-routing.json)
-for backend routing exceptions, and ADR 0004 for portable link spelling and
-tree resolution. This ADR defines their web relationships.
+The three languages share a leading `/`; this ADR defines their relationships
+at the web boundary.
 
 ## Decision
 
 ### Namespaces
 
-- User screens are a Vue Router SPA (HTML5 history, site root). The load
-  balancer rewrites unknown paths to the SPA shell. The backend does not
-  serve or whitelist client routes. A new screen is a route-table change.
-- JSON and most backend traffic stay under the API prefix. Other
-  backend-owned paths (auth, attachments, install, and the like) stay at
-  their current URLs. That exception list lives only with the load balancer;
-  do not invent it per page.
-- Notebook content does not store SPA or API URLs as the form of an inter-note
-  link. Portable tokens stay wiki or path Markdown (ADR 0004).
+- User screens use Vue Router with HTML5 history at the site root.
+  `routeMetadata` is the canonical registry of screen paths, and the load
+  balancer serves unmatched browser paths with the SPA shell.
+- The HTTP API uses `/api` and is described by OpenAPI.
+  [`doughnut-routing.json`](../../infra/gcp/path-routing/doughnut-routing.json)
+  defines the load balancer's backend-owned route set.
+- ADR 0004 defines portable link spelling and tree resolution. Notebook
+  content stores inter-note links as wiki or path Markdown.
 
 ### SPA locations
 
-- SPA path literals for screens live only in `routeMetadata`. Legacy rewrites
-  are explicit exceptions to the canonical table.
 - In-app navigation (`push` / `replace` / `:to`) is a named location (or a
   helper that returns one). An HTML `href` is allowed only on rendered
   anchors, and is compiled from a named location against that table —
