@@ -31,19 +31,19 @@ const UNRESOLVED_WIKI_LINK_CLASSES = [
 ] as const
 
 function authoredTokenFromWikiAnchor(anchor: Element): string {
-  const target = anchor.getAttribute(WIKI_LINK_PORTABLE_PATH_ATTR) ?? ""
-  if (authoredHrefLooksLikePortablePath(target)) {
+  const portablePath = anchor.getAttribute(WIKI_LINK_PORTABLE_PATH_ATTR) ?? ""
+  if (authoredHrefLooksLikePortablePath(portablePath)) {
     const display =
       anchor.getAttribute(WIKI_LINK_DISPLAY_TEXT_ATTR) ||
       anchor.textContent?.trim() ||
       ""
-    return `[${display}](${target})`
+    return `[${display}](${portablePath})`
   }
   const display = anchor.getAttribute(WIKI_LINK_DISPLAY_TEXT_ATTR)
-  if (display !== null && display !== "" && display !== target) {
-    return `${target}|${display}`
+  if (display !== null && display !== "" && display !== portablePath) {
+    return `${portablePath}|${display}`
   }
-  return target
+  return portablePath
 }
 
 /** Visible inner text of a wiki-link anchor (bracket UI or plain). */
@@ -96,7 +96,7 @@ function upgradeUnresolvedWikiAnchors(
       a.outerHTML = wikiLinkAnchorHtml({
         href,
         className: DONUT_WIKI_LINK_CLASS,
-        target: w.portablePath,
+        portablePath: w.portablePath,
         display: w.displayText,
         noteId: w.destinationNoteId,
       })
@@ -141,7 +141,7 @@ function unresolvedWikiAnchorHtmlFromInner(
   return wikiLinkAnchorHtml({
     href: "#",
     className: unresolvedWikiClass(innerRaw, lastSavedTokens),
-    target,
+    portablePath: target,
     display,
     resolution: wikiLinkAmbiguousResolution(wikiLinks, target, innerRaw),
   })
@@ -154,10 +154,10 @@ function upgradePathMarkdownAnchors(
   let result = html
   for (const w of wikiLinks) {
     if (!isResolvedWikiLink(w) || !isPathMarkdownWikiLink(w)) continue
-    const attrTarget = escapeHtmlAttributeValue(w.portablePath)
+    const attrPortablePath = escapeHtmlAttributeValue(w.portablePath)
     const livePathMarkdownAttrs = {
       className: DONUT_WIKI_LINK_CLASS,
-      target: w.portablePath,
+      portablePath: w.portablePath,
       display: w.displayText,
       noteId: w.destinationNoteId,
     }
@@ -166,7 +166,7 @@ function upgradePathMarkdownAnchors(
       ...livePathMarkdownAttrs,
     })
     result = result.replaceAll(
-      `<a href="${attrTarget}">${w.displayText}</a>`,
+      `<a href="${attrPortablePath}">${w.displayText}</a>`,
       live
     )
     const leftoverUnresolvedHrefs = [w.portablePath, "#"]
@@ -176,7 +176,7 @@ function upgradePathMarkdownAnchors(
           wikiLinkAnchorHtml({
             href: leftoverHref,
             className,
-            target: w.portablePath,
+            portablePath: w.portablePath,
             display: w.displayText,
           }),
           live
@@ -210,7 +210,7 @@ function markUnresolvedWikiLinks(
       return wikiLinkAnchorHtml({
         href: "#",
         className: unresolvedWikiClass(token, lastSavedTokens),
-        target: href,
+        portablePath: href,
         display,
         resolution: wikiLinkAmbiguousResolution(wikiLinks, href, token),
       })
@@ -232,7 +232,7 @@ export function replaceWikiLinksInHtml(
       wikiLinkAnchorHtml({
         href: hrefForResolvedWikiTarget(w.destinationNoteId, w.portablePath),
         className: DONUT_WIKI_LINK_CLASS,
-        target: w.portablePath,
+        portablePath: w.portablePath,
         display: w.displayText,
         noteId: w.destinationNoteId,
       })

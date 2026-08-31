@@ -38,16 +38,16 @@ export function escapeHtmlAttributeValue(s: string): string {
 export function wikiLinkAnchorHtml(attrs: {
   href: string
   className: string
-  target: string
+  portablePath: string
   display: string
   noteId?: number
   innerHtml?: string
   resolution?: "AMBIGUOUS"
 }): string {
   const attrHref = escapeHtmlAttributeValue(attrs.href)
-  const attrTarget = escapeHtmlAttributeValue(attrs.target)
+  const attrPortablePath = escapeHtmlAttributeValue(attrs.portablePath)
   const displayAttr =
-    attrs.display !== attrs.target
+    attrs.display !== attrs.portablePath
       ? ` ${WIKI_LINK_DISPLAY_TEXT_ATTR}="${escapeHtmlAttributeValue(attrs.display)}"`
       : ""
   const noteIdAttr =
@@ -57,7 +57,7 @@ export function wikiLinkAnchorHtml(attrs: {
       ? ""
       : ` ${WIKI_LINK_RESOLUTION_ATTR}="${attrs.resolution}"`
   const body = attrs.innerHtml ?? escapeHtmlForWikiLinkDisplay(attrs.display)
-  return `<a href="${attrHref}" class="${attrs.className}" ${WIKI_LINK_PORTABLE_PATH_ATTR}="${attrTarget}"${displayAttr}${noteIdAttr}${resolutionAttr}>${body}</a>`
+  return `<a href="${attrHref}" class="${attrs.className}" ${WIKI_LINK_PORTABLE_PATH_ATTR}="${attrPortablePath}"${displayAttr}${noteIdAttr}${resolutionAttr}>${body}</a>`
 }
 
 /** `[[` / `]]` shown literally; title text escaped (same visible shape as plain wiki syntax). */
@@ -173,8 +173,8 @@ export function wikiAnchorToMarkdownToken(anchor: HTMLAnchorElement): string {
   }
 
   const raw = anchor.textContent?.trim() ?? ""
-  const target = anchor.getAttribute(WIKI_LINK_PORTABLE_PATH_ATTR)
-  if (target === null || target === "") {
+  const portablePath = anchor.getAttribute(WIKI_LINK_PORTABLE_PATH_ATTR)
+  if (portablePath === null || portablePath === "") {
     const bracketed = /^\[\[([\s\S]*)\]\]$/.exec(raw)
     if (bracketed?.[1] !== undefined) {
       return `[[${bracketed[1]}]]`
@@ -187,26 +187,26 @@ export function wikiAnchorToMarkdownToken(anchor: HTMLAnchorElement): string {
 
   if (fromDisplayAttr !== null && fromDisplayAttr !== "") {
     const displayPart = fromDisplayAttr
-    if (displayPart === target) {
-      return `[[${target}]]`
+    if (displayPart === portablePath) {
+      return `[[${portablePath}]]`
     }
-    return `[[${target}|${displayPart}]]`
+    return `[[${portablePath}|${displayPart}]]`
   }
 
   if (innerM !== null) {
     const visibleInner = innerM[1]!
-    if (visibleInner === target) {
-      return `[[${target}]]`
+    if (visibleInner === portablePath) {
+      return `[[${portablePath}]]`
     }
-    return `[[${target}|${visibleInner}]]`
+    return `[[${portablePath}|${visibleInner}]]`
   }
 
   if (raw.startsWith("[[") && !raw.endsWith("]]")) {
     return raw
   }
 
-  if (raw === target) {
-    return `[[${target}]]`
+  if (raw === portablePath) {
+    return `[[${portablePath}]]`
   }
-  return `[[${target}|${raw}]]`
+  return `[[${portablePath}|${raw}]]`
 }

@@ -55,7 +55,7 @@ export function propertyValuePlainToDisplayHtml(
           noteId === undefined
             ? unresolvedWikiClass(occ.token, lastSavedTokens)
             : DONUT_WIKI_LINK_CLASS,
-        target,
+        portablePath: target,
         display,
         noteId,
       })
@@ -75,7 +75,7 @@ export function propertyValuePlainToDisplayHtml(
         noteId === undefined
           ? unresolvedWikiClass(occ.token, lastSavedTokens)
           : DONUT_WIKI_LINK_CLASS,
-      target,
+      portablePath: target,
       display,
       noteId,
       innerHtml: wikiLinkBracketedInnerHtml(display),

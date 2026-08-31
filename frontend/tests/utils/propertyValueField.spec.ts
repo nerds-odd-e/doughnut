@@ -51,7 +51,7 @@ describe("propertyValueField utils", () => {
       `See ${wikiLinkAnchorHtml({
         href: "#",
         className: "dead-wiki-link",
-        target: "X",
+        portablePath: "X",
         display: "X",
         innerHtml,
       })} here`

@@ -332,21 +332,16 @@ green, no behavior change.
 
 ### 16. Edited wiki-link markup uses destination names
 
-**Status:** planned
+**Status:** done
 **Type:** Structure
 
-Unlocks nothing user-facing. On surfaces this plan already edited, finish
-destination vocabulary so old and new names do not coexist in one method:
-`wikiLinkAnchorHtml` `target`, `WikiLinkToken` `parsed.target` /
-`clicked.target`. Do not rename `authoredLinkMarkup.splitWikiLinkInner`,
-`resolveAnyTargetWikiLinkToken`, `aliasTargetCandidates`, or relationship
-`targetSearchResult`.
-
-Verification: focused `wikiLinkMarkup.spec.ts` / `WikiLinkToken` specs if
-present.
-
-Stop-safe: leftover `target` on edited markup is gone; ADR 0001
-relationship `target` stays.
+Renamed `target` → `portablePath` in `wikiLinkAnchorHtml`,
+`wikiAnchorToMarkdownToken`, `WikiLinkToken.vue`'s `resolved` computed, and
+`replaceWikiLinksInHtml.ts` (including `authoredTokenFromWikiAnchor`, found
+by post-change-refactor). `authoredLinkMarkup.ts`'s own `target` return
+field (`splitWikiLinkInner`/`splitAuthoredToken`/`parseWholeWikiLinkItem`)
+and backend `target*` names untouched, as scoped. `wikiLinkMarkup.spec.ts`
+/ `propertyValueField.spec.ts` / `replaceWikiLinksInHtml.spec.ts` green.
 
 ### 17. Inserting a cross-notebook Wiki link qualifies that path
 

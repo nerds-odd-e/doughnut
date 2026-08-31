@@ -1,7 +1,7 @@
 <template>
   <router-link
     v-if="resolved?.noteId !== undefined"
-    :to="locationForResolvedWikiTarget(resolved.noteId, resolved.target)"
+    :to="locationForResolvedWikiTarget(resolved.noteId, resolved.portablePath)"
     :class="DONUT_WIKI_LINK_CLASS"
     v-bind="resolved.linkAttrs"
     >{{ resolved.display }}</router-link
@@ -76,7 +76,7 @@ const resolved = computed(() => {
   }
   return {
     inner: parsed.inner,
-    target: parsed.target,
+    portablePath: parsed.target,
     display: parsed.display,
     noteId,
     linkAttrs,
@@ -96,7 +96,7 @@ function onUnresolvedClick() {
   const clicked = resolved.value
   if (!clicked || unresolvedClass.value !== DEAD_WIKI_LINK_CLASS) return
   emit("deadWikiLinkClick", {
-    portablePath: clicked.target,
+    portablePath: clicked.portablePath,
     displayText: clicked.display,
     ...(clicked.resolution === undefined
       ? {}
