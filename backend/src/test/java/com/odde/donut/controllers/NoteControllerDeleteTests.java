@@ -62,6 +62,49 @@ class NoteControllerDeleteTests extends ControllerTestBase {
     assertThat(referrer.getContent(), equalTo("---\nsource: '[[Referrer]]'\n---\nBody [[Target]]"));
   }
 
+  @Test
+  void shouldReresolveNotebookShorthandsWhenDeleteRemovesACollision()
+      throws UnexpectedNoAccessRightException {
+    Note target1 = makeMe.aNote("Target").notebookOwnedBy(currentUser.getUser()).please();
+    Folder otherFolder =
+        makeMe.aFolder().notebook(target1.getNotebook()).name("Other Folder").please();
+    Note target2 = makeMe.aNote("Target").folder(otherFolder).please();
+    Note referrer =
+        makeMe.aNote("Referrer").underSameNotebookAs(target1).content("See [[Target]].").please();
+    resolvedWikiLinkService.refreshForNote(referrer, currentUser.getUser());
+    assertThat(
+        controller.showNote(referrer).getWikiLinks().get(0).getResolution(),
+        equalTo(WikiLink.Resolution.AMBIGUOUS));
+
+    controller.deleteNote(target2, leaveDeadLinksDeleteRequest());
+
+    assertThat(
+        controller.showNote(referrer).getWikiLinks().get(0).getResolution(),
+        equalTo(WikiLink.Resolution.RESOLVED));
+  }
+
+  @Test
+  void shouldReresolveNotebookShorthandsWhenRestoreReintroducesACollision()
+      throws UnexpectedNoAccessRightException {
+    Note target1 = makeMe.aNote("Target").notebookOwnedBy(currentUser.getUser()).please();
+    Folder otherFolder =
+        makeMe.aFolder().notebook(target1.getNotebook()).name("Other Folder").please();
+    Note target2 = makeMe.aNote("Target").folder(otherFolder).please();
+    Note referrer =
+        makeMe.aNote("Referrer").underSameNotebookAs(target1).content("See [[Target]].").please();
+    controller.deleteNote(target2, leaveDeadLinksDeleteRequest());
+    resolvedWikiLinkService.refreshForNote(referrer, currentUser.getUser());
+    assertThat(
+        controller.showNote(referrer).getWikiLinks().get(0).getResolution(),
+        equalTo(WikiLink.Resolution.RESOLVED));
+
+    controller.undoDeleteNote(target2);
+
+    assertThat(
+        controller.showNote(referrer).getWikiLinks().get(0).getResolution(),
+        equalTo(WikiLink.Resolution.AMBIGUOUS));
+  }
+
   @Nested
   class SoftDeleteNote {
     Note subject;

@@ -128,7 +128,7 @@ class NoteController {
   public NoteRealm undoDeleteNote(@PathVariable("note") @Schema(type = "integer") Note note)
       throws UnexpectedNoAccessRightException {
     authorizationService.assertAuthorization(note);
-    noteService.restore(note);
+    noteService.restore(note, authorizationService.getCurrentUser());
     entityPersister.flush();
 
     return noteRealmService.build(note, authorizationService.getCurrentUser());

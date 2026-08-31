@@ -31,6 +31,7 @@ public class NoteService {
   private final EntityPersister entityPersister;
   private final TestabilitySettings testabilitySettings;
   private final NoteReferenceHandling noteReferenceHandling;
+  private final ResolvedWikiLinkService resolvedWikiLinkService;
 
   public NoteService(
       NoteRepository noteRepository,
@@ -47,6 +48,7 @@ public class NoteService {
     this.imageRepository = imageRepository;
     this.entityPersister = entityPersister;
     this.testabilitySettings = testabilitySettings;
+    this.resolvedWikiLinkService = resolvedWikiLinkService;
     this.noteReferenceHandling =
         new NoteReferenceHandling(
             memoryTrackerRepository,
@@ -161,6 +163,7 @@ public class NoteService {
       mt.setDeletedAt(currentUTCTimestamp);
       entityPersister.merge(mt);
     }
+    resolvedWikiLinkService.refreshNotebookScope(note.getNotebook(), viewer);
   }
 
   /**
@@ -189,7 +192,7 @@ public class NoteService {
     }
   }
 
-  public void restore(Note note) {
+  public void restore(Note note, User viewer) {
     Timestamp deletedAt = note.getDeletedAt();
     if (deletedAt != null) {
       for (MemoryTracker mt : memoryTrackerRepository.findByNote_IdIn(List.of(note.getId()))) {
@@ -201,6 +204,7 @@ public class NoteService {
     }
     note.setDeletedAt(null);
     entityPersister.merge(note);
+    resolvedWikiLinkService.refreshNotebookScope(note.getNotebook(), viewer);
   }
 
   private boolean sameTimestamp(Timestamp a, Timestamp b) {

@@ -42,7 +42,7 @@ class NoteServiceTest {
     makeMe.entityPersister.merge(note);
     makeMe.entityPersister.merge(mtDeletedAtT2);
 
-    noteService.restore(note);
+    noteService.restore(note, owner);
 
     assertThat(
         makeMe.entityPersister.find(MemoryTracker.class, mtDeletedAtT1.getId()).getDeletedAt(),

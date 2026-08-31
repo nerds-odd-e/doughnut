@@ -460,21 +460,17 @@ backend suite green.
 
 ### 25. Deleting or restoring a note updates shorthand cardinality
 
-**Status:** planned
+**Status:** done
 **Type:** Behavior
 
-**Precondition:** Delete or restore changes candidate cardinality.
-**Trigger:** Existing delete/restore runs.
-**Postcondition:** A previously ambiguous shorthand can resolve again
-after the extra candidate is gone; a unique shorthand becomes unresolved
-if its destination is deleted.
-
-Test first: one delete and one restore at that boundary; fixture
-completeness for delete FKs (`unit-testing.mdc`).
-
-Verification: `pnpm backend:test_only`.
-
-Stop-safe: presence in the tree, not cache history, decides uniqueness.
+`NoteService.destroy` calls `refreshNotebookScope` after soft-delete and
+reference-handling. `restore` gained a `User viewer` parameter (both call
+sites updated: `NoteController.undoDeleteNote`,
+`NoteServiceTest`) and calls `refreshNotebookScope` after un-deleting.
+Pinned by `NoteControllerDeleteTests
+.shouldReresolveNotebookShorthandsWhenDeleteRemovesACollision` and
+`.shouldReresolveNotebookShorthandsWhenRestoreReintroducesACollision`.
+Full backend suite green.
 
 ### 26. Changing aliases updates shorthand cardinality
 
