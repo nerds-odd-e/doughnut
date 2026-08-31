@@ -27,7 +27,8 @@ and Donut asks for a longer path.
   `ResolvedWikiLinkTitleResolutionTest.unqualified_link_does_not_resolve_when_same_title_in_different_folders`,
   `WikiLinkResolverYamlAndBodyIntegrationTest.wikiLinkResolver_doesNotResolveWhenTitleCollidesWithAlias`,
   `WikiLinkResolverYamlAndBodyIntegrationTest.wikiLinkResolver_doesNotResolveWhenTwoNotesShareAnAlias`,
-  `WikiLinkResolverYamlAndBodyIntegrationTest.wikiLinkResolver_resolvesWhenOneNoteMatchesAsBothTitleAndAlias`.
+  `WikiLinkResolverYamlAndBodyIntegrationTest.wikiLinkResolver_resolvesWhenOneNoteMatchesAsBothTitleAndAlias`,
+  `WikiLinkResolverYamlAndBodyIntegrationTest.wikiLinkResolver_doesNotResolveWhenSeveralReadableNotesMatchQualifiedShorthand`.
 - `NoteRealm.wikiLinks` is built only from resolved-index rows
   (`destinationNoteId` required). Dead links are inferred from markup.
 - Donut-authored insert/paste/overlap/accidental-match spelling still uses
@@ -161,24 +162,12 @@ no production change.
 
 ### 5. Notebook-qualified shorthand does not break ties by note id
 
-**Status:** planned
+**Status:** done
 **Type:** Behavior
 
-**Precondition:** A `Notebook:shorthand` token has zero, one, or several
-readable candidates in notebooks of that name.
-**Trigger:** Donut resolves it.
-**Postcondition:** One readable candidate resolves; several readable
-candidates do not. Unreadable rows are already skipped before cardinality
-(slice 3); keep
-`wikiLinkResolver_skipsUnreadableLowestIdAliasCandidateForReadableTarget`
-green. Extend qualified cases for several *readable* candidates.
-
-Test first: extend the qualified cases in
-`WikiLinkResolverYamlAndBodyIntegrationTest`. No E2E.
-
-Verification: `pnpm backend:test_only`.
-
-Stop-safe: qualification changes scope only; it is not an id tie-break.
+`Notebook:shorthand` with several readable candidates has no resolved row.
+Production already did this via `uniqueReadableNotebookMatch`; pinned in
+`WikiLinkResolverYamlAndBodyIntegrationTest`. Skip-unreadable still green.
 
 ### 6. Wiki-link contract can name resolution states
 

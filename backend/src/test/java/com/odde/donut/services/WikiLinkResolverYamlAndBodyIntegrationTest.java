@@ -148,6 +148,19 @@ class WikiLinkResolverYamlAndBodyIntegrationTest {
   }
 
   @Test
+  void wikiLinkResolver_doesNotResolveWhenSeveralReadableNotesMatchQualifiedShorthand() {
+    User owner = makeMe.aUser().please();
+    Notebook otherNotebook =
+        makeMe.aNotebook().creatorAndOwner(owner).name("Other Notebook").please();
+    Note first = makeMe.aNote().title("first").notebook(otherNotebook).aliases("term").please();
+    makeMe.aNote().title("second").underSameNotebookAs(first).aliases("term").please();
+    Note linker =
+        makeMe.aNote().notebookOwnedBy(owner).content("See [[Other Notebook:term]]").please();
+
+    assertThat(wikiLinkResolver.resolveWikiLinksForCache(linker, owner), empty());
+  }
+
+  @Test
   void wikiLinkResolver_skipsUnreadableLowestIdAliasCandidateForReadableTarget() {
     User secretOwner = makeMe.aUser().please();
     User viewer = makeMe.aUser().please();
