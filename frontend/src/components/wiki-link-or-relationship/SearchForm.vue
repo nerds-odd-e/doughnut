@@ -111,7 +111,7 @@ async function onDeadWikiLinkToNote() {
   const originalToken =
     markdownWikiTokenFromDeadWikiLinkPayload(deadWikiLinkPayload)
   const newLinkText = authoredHrefLooksLikeConceptNotePath(
-    deadWikiLinkPayload.targetToken
+    deadWikiLinkPayload.portablePath
   )
     ? pathMarkdownTokenForNote({
         displayText: deadWikiLinkPayload.displayText,
@@ -119,7 +119,7 @@ async function onDeadWikiLinkToNote() {
           selectedSearchResult.value.noteTopology.id
         ),
         title: selectedSearchResult.value.noteTopology.title,
-        authoredHref: deadWikiLinkPayload.targetToken,
+        authoredHref: deadWikiLinkPayload.portablePath,
       })
     : buildWikiLinkText(selectedSearchResult.value, {
         notebookId: notebookId.value,

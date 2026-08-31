@@ -15,7 +15,7 @@ import { vi } from "vitest"
 export const markdownTextareaDefaults = {
   readonly: false,
   asMarkdown: true,
-  wikiTitles: [] as string[],
+  wikiLinks: [] as string[],
 }
 
 export const trackedPropertyNoteId = 42
@@ -31,7 +31,7 @@ export function mountNoteEditableContent(
     noteContent?: string
     readonly?: boolean
     asMarkdown?: boolean
-    wikiTitles?: string[]
+    wikiLinks?: string[]
   },
   options?: { attachTo?: HTMLElement }
 ) {

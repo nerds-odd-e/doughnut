@@ -10,19 +10,19 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class WikiTitle {
+public class WikiLink {
   /** Full wiki link inner text as stored in markdown (between {@code [[} and {@code ]]}}). */
   @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
-  private String linkText;
+  private String authoredLink;
 
-  /** Target token used for resolution (part before {@code |}). */
+  /** Portable path used for resolution (part before {@code |}). */
   @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
-  private String targetToken;
+  private String portablePath;
 
   /** Visible label in rich mode (part after {@code |}, or same as target when absent). */
   @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
   private String displayText;
 
   @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
-  private Integer noteId;
+  private Integer destinationNoteId;
 }

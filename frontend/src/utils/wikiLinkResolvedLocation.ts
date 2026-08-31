@@ -6,8 +6,8 @@ import {
 } from "@/routes/noteShowLocation"
 import {
   decodeWikiLinkPropertyKey,
-  parseWikiLinkAuthoredTarget,
-} from "@/utils/wikiLinkAuthoredTarget"
+  parsePortablePath,
+} from "@/utils/portablePath"
 
 /** Resolved wiki/path-Markdown click location from the authored target. */
 export function locationForResolvedWikiTarget(
@@ -15,7 +15,7 @@ export function locationForResolvedWikiTarget(
   authoredTarget: string
 ): RouteLocationNamedRaw {
   const propertyKey = decodeWikiLinkPropertyKey(
-    parseWikiLinkAuthoredTarget(authoredTarget).encodedPropertyKey
+    parsePortablePath(authoredTarget).encodedPropertyKey
   )
   if (propertyKey !== undefined) {
     return notePropertyLocation(noteId, propertyKey)

@@ -143,7 +143,7 @@ export function createRichMarkdownEditorTestHarness() {
     wrapper = builder
       .withProps({
         modelValue: initialValue,
-        wikiTitles: [],
+        wikiLinks: [],
         ...props,
       })
       .mount(attachToBody ? { attachTo: document.body } : undefined)

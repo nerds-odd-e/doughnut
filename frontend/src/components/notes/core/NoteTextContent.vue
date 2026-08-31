@@ -21,7 +21,7 @@
         noteId: note.id,
         noteContent: note.content,
         asMarkdown,
-        wikiTitles,
+        wikiLinks,
         noteTitleForWikidataSearch: note.noteTopology.title,
         isReadmeContext,
       }"
@@ -32,7 +32,7 @@
 
 <script setup lang="ts">
 import { type PropType } from "vue"
-import type { Note, WikiTitle } from "@generated/donut-backend-api"
+import type { Note, WikiLink } from "@generated/donut-backend-api"
 import NoteEditableTitle from "./NoteEditableTitle.vue"
 import NoteEditableContent from "./NoteEditableContent.vue"
 import type { DeadWikiLinkPayload } from "@/utils/wikiLinkMarkup"
@@ -41,7 +41,7 @@ defineProps({
   note: { type: Object as PropType<Note>, required: true },
   readonly: { type: Boolean, default: true },
   asMarkdown: Boolean,
-  wikiTitles: { type: Array as PropType<WikiTitle[]>, required: true },
+  wikiLinks: { type: Array as PropType<WikiLink[]>, required: true },
   isReadmeContext: { type: Boolean, default: false },
   hasInboundReferences: { type: Boolean, default: false },
 })

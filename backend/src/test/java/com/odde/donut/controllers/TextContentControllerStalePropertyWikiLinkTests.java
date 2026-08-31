@@ -45,7 +45,7 @@ class TextContentControllerStalePropertyWikiLinkTests extends TextContentControl
 
     controller.updateNoteContent(moon, contentDto("[[Moon#prop:a%20part%20of]]"));
 
-    assertThat(noteController.showNote(moon).getWikiTitles(), empty());
+    assertThat(noteController.showNote(moon).getWikiLinks(), empty());
     assertThat(cacheRows(moon), empty());
   }
 
@@ -58,8 +58,8 @@ class TextContentControllerStalePropertyWikiLinkTests extends TextContentControl
     controller.updateNoteContent(moon, contentDto("Moon body."));
 
     NoteRealm shown = noteController.showNote(carrier);
-    assertThat(shown.getWikiTitles(), hasSize(1));
-    assertThat(shown.getWikiTitles().getFirst().getLinkText(), equalTo("Moon"));
+    assertThat(shown.getWikiLinks(), hasSize(1));
+    assertThat(shown.getWikiLinks().getFirst().getAuthoredLink(), equalTo("Moon"));
     List<NoteWikiTitleCache> rows = cacheRows(carrier);
     assertThat(rows, hasSize(1));
     assertThat(rows.getFirst().getLinkText(), equalTo("Moon"));
@@ -74,7 +74,7 @@ class TextContentControllerStalePropertyWikiLinkTests extends TextContentControl
 
     controller.updateNoteContent(moon, contentDto(moonContent));
 
-    assertThat(noteController.showNote(carrier).getWikiTitles(), empty());
+    assertThat(noteController.showNote(carrier).getWikiLinks(), empty());
     assertThat(cacheRows(carrier), empty());
   }
 

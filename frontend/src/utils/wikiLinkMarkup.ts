@@ -1,9 +1,9 @@
-import type { WikiTitle } from "@generated/donut-backend-api"
+import type { WikiLink } from "@generated/donut-backend-api"
 import type { RouteLocationRaw } from "vue-router"
 import {
   authoredHrefLooksLikeConceptNotePath,
   splitWikiLinkInner,
-  wikiTitleFromAuthoredToken,
+  wikiLinkFromAuthoredToken,
 } from "@/utils/authoredLinkMarkup"
 import {
   DEAD_WIKI_LINK_CLASS,
@@ -12,15 +12,19 @@ import {
 } from "@/utils/wikiLinkDomMarkers"
 import { locationForResolvedWikiTarget } from "@/utils/wikiLinkResolvedLocation"
 
-export { splitWikiLinkInner, wikiTitleFromAuthoredToken }
+export { splitWikiLinkInner, wikiLinkFromAuthoredToken }
 
 /** Normalized target, display label, and full inner for a wiki title from the note realm. */
-export function wikiTitleParts(w: WikiTitle): {
+export function wikiLinkParts(w: WikiLink): {
   target: string
   display: string
   inner: string
 } {
-  return { target: w.targetToken, display: w.displayText, inner: w.linkText }
+  return {
+    target: w.portablePath,
+    display: w.displayText,
+    inner: w.authoredLink,
+  }
 }
 
 export function escapeHtmlForWikiLinkDisplay(s: string): string {
@@ -70,20 +74,20 @@ export function isValidWikiLinkInner(rawBetweenBrackets: string): boolean {
 }
 
 /** Lookup keys: trimmed wiki target token and full `linkText` from the note realm. */
-export function wikiTitleNoteIdLookup(
-  wikiTitles: readonly WikiTitle[]
+export function wikiLinkNoteIdLookup(
+  wikiLinks: readonly WikiLink[]
 ): Map<string, number> {
   const map = new Map<string, number>()
-  for (const w of wikiTitles) {
-    const { target } = wikiTitleParts(w)
-    map.set(target.trim(), w.noteId)
-    map.set(w.linkText.trim(), w.noteId)
+  for (const w of wikiLinks) {
+    const { target } = wikiLinkParts(w)
+    map.set(target.trim(), w.destinationNoteId)
+    map.set(w.authoredLink.trim(), w.destinationNoteId)
   }
   return map
 }
 
 /** Dead wiki link click payload containing the target token and visible display text. */
-export type DeadWikiLinkPayload = { targetToken: string; displayText: string }
+export type DeadWikiLinkPayload = { portablePath: string; displayText: string }
 
 function pathMarkdownToken(displayText: string, href: string): string {
   return `[${displayText}](${href})`
@@ -93,12 +97,12 @@ function pathMarkdownToken(displayText: string, href: string): string {
 export function markdownWikiTokenFromDeadWikiLinkPayload(
   p: DeadWikiLinkPayload
 ): string {
-  const { targetToken, displayText } = p
-  if (authoredHrefLooksLikeConceptNotePath(targetToken)) {
-    return pathMarkdownToken(displayText, targetToken)
+  const { portablePath, displayText } = p
+  if (authoredHrefLooksLikeConceptNotePath(portablePath)) {
+    return pathMarkdownToken(displayText, portablePath)
   }
-  if (targetToken === displayText) return `[[${targetToken}]]`
-  return `[[${targetToken}|${displayText}]]`
+  if (portablePath === displayText) return `[[${portablePath}]]`
+  return `[[${portablePath}|${displayText}]]`
 }
 
 /** Path-Markdown token pointing at a note, keeping the authored `.md` / no-`.md` suffix. */
@@ -159,25 +163,25 @@ export function deadWikiLinkPayloadFromAnchor(
   anchor: HTMLElement
 ): DeadWikiLinkPayload {
   const raw = anchor.textContent?.trim() ?? ""
-  let targetToken: string
+  let portablePath: string
   const fromAttr = anchor.getAttribute("data-wiki-title")
   if (fromAttr !== null && fromAttr !== "") {
-    targetToken = fromAttr
+    portablePath = fromAttr
   } else {
     const closed = /^\[\[([^\[\]\r\n]*)\]\]$/.exec(raw)
     if (closed?.[1] !== undefined) {
-      targetToken = closed[1].trim()
+      portablePath = closed[1].trim()
     } else {
       const open = /^\[\[([^\[\]\r\n]*)$/.exec(raw)
-      targetToken = open?.[1]?.trim() ?? raw
+      portablePath = open?.[1]?.trim() ?? raw
     }
   }
 
   const displayAttr = anchor.getAttribute("data-wiki-display")
   if (displayAttr !== null && displayAttr !== "") {
-    return { targetToken, displayText: displayAttr }
+    return { portablePath, displayText: displayAttr }
   }
-  return { targetToken, displayText: targetToken }
+  return { portablePath, displayText: portablePath }
 }
 
 function pathHrefFromWikiAnchor(anchor: HTMLAnchorElement): string | null {

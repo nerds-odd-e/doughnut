@@ -1,6 +1,6 @@
-import type { WikiTitle } from "@generated/donut-backend-api"
+import type { WikiLink } from "@generated/donut-backend-api"
 import { hrefLooksLikeConceptNotePath } from "@/routes/noteShowLocation"
-import { parseWikiLinkAuthoredTarget } from "@/utils/wikiLinkAuthoredTarget"
+import { parsePortablePath } from "@/utils/portablePath"
 
 /** Splits inner wiki text on the first `|`; empty right-hand side is treated as no pipe. */
 export function splitWikiLinkInner(rawBetweenBrackets: string): {
@@ -33,13 +33,13 @@ export type AuthoredLinkOccurrence = {
 
 export function authoredHrefLooksLikeConceptNotePath(href: string): boolean {
   return hrefLooksLikeConceptNotePath(
-    parseWikiLinkAuthoredTarget(href).noteTarget
+    parsePortablePath(href).qualifiedNotePortion
   )
 }
 
-/** Path Markdown spelling: {@link WikiTitle.targetToken} is the bundle-relative href. */
-export function isPathMarkdownWikiTitle(w: WikiTitle): boolean {
-  return authoredHrefLooksLikeConceptNotePath(w.targetToken)
+/** Path Markdown spelling: {@link WikiLink.portablePath} is the bundle-relative href. */
+export function isPathMarkdownWikiLink(w: WikiLink): boolean {
+  return authoredHrefLooksLikeConceptNotePath(w.portablePath)
 }
 
 function tryParsePathMarkdownToken(
@@ -91,17 +91,17 @@ export function isWellFormedWholeWikiLinkItem(trimmed: string): boolean {
   return parseWholeWikiLinkItem(trimmed) !== undefined
 }
 
-/** Builds API-shaped {@link WikiTitle} for tests and local fixtures from an authored token + note id. */
-export function wikiTitleFromAuthoredToken(
+/** Builds API-shaped {@link WikiLink} for tests and local fixtures from an authored token + note id. */
+export function wikiLinkFromAuthoredToken(
   authored: string,
   noteId: number
-): WikiTitle {
+): WikiLink {
   const { target, display } = splitAuthoredToken(authored)
   return {
-    linkText: authored,
-    targetToken: target,
+    authoredLink: authored,
+    portablePath: target,
     displayText: display,
-    noteId,
+    destinationNoteId: noteId,
   }
 }
 

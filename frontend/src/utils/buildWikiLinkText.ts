@@ -1,7 +1,7 @@
 import {
   encodeWikiLinkPropertyKey,
-  formatWikiLinkAuthoredTarget,
-} from "@/utils/wikiLinkAuthoredTarget"
+  formatPortablePath,
+} from "@/utils/portablePath"
 
 export type WikiLinkNoteIdentity = {
   noteTopology: { title: string }
@@ -45,8 +45,8 @@ export function buildWikiLinkText(
 ): string {
   const noteTarget = defaultWikiNoteTarget(target, source.notebookId)
   const defaultInner = source.propertyKey
-    ? formatWikiLinkAuthoredTarget({
-        noteTarget,
+    ? formatPortablePath({
+        qualifiedNotePortion: noteTarget,
         encodedPropertyKey: encodeWikiLinkPropertyKey(source.propertyKey),
       })
     : noteTarget

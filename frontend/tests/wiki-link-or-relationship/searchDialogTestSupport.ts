@@ -83,7 +83,7 @@ export async function renderSearchForm(
   props: {
     note?: Note | null
     deadWikiLinkPayload?: {
-      targetToken: string
+      portablePath: string
       displayText: string
     }
   },

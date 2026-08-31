@@ -1,7 +1,7 @@
 package com.odde.donut.services.focusContext;
 
 import com.odde.donut.algorithms.NoteContentMarkdown;
-import com.odde.donut.controllers.dto.WikiTitle;
+import com.odde.donut.controllers.dto.WikiLink;
 import com.odde.donut.entities.Note;
 import java.util.ArrayList;
 import java.util.List;
@@ -43,15 +43,15 @@ public final class FocusContextMarkdownAugmenter {
     return focusContextMarkdown + "\n\n" + propertyFocusBlock;
   }
 
-  public static String ensureWikiTitles(String focusContextMarkdown, List<WikiTitle> wikiTitles) {
-    if (wikiTitles.isEmpty()) {
+  public static String ensureWikiLinks(String focusContextMarkdown, List<WikiLink> wikiLinks) {
+    if (wikiLinks.isEmpty()) {
       return focusContextMarkdown;
     }
-    List<WikiTitle> missing = new ArrayList<>();
-    for (WikiTitle wikiTitle : wikiTitles) {
-      String linkText = wikiTitle.getLinkText();
+    List<WikiLink> missing = new ArrayList<>();
+    for (WikiLink wikiLink : wikiLinks) {
+      String linkText = wikiLink.getAuthoredLink();
       if (linkText != null && !linkText.isBlank() && !focusContextMarkdown.contains(linkText)) {
-        missing.add(wikiTitle);
+        missing.add(wikiLink);
       }
     }
     if (missing.isEmpty()) {
@@ -59,10 +59,10 @@ public final class FocusContextMarkdownAugmenter {
     }
     StringBuilder extended = new StringBuilder(focusContextMarkdown);
     extended.append("\n\n## Link targets (focus note)\n\n");
-    for (WikiTitle wikiTitle : missing) {
-      extended.append("- ").append(wikiTitle.getLinkText());
-      if (wikiTitle.getNoteId() != null) {
-        extended.append(" (resolved note id: ").append(wikiTitle.getNoteId()).append(")");
+    for (WikiLink wikiLink : missing) {
+      extended.append("- ").append(wikiLink.getAuthoredLink());
+      if (wikiLink.getDestinationNoteId() != null) {
+        extended.append(" (resolved note id: ").append(wikiLink.getDestinationNoteId()).append(")");
       }
       extended.append("\n");
     }

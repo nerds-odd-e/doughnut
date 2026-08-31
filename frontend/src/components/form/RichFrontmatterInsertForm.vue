@@ -88,7 +88,7 @@
           >
             <PropertyValueField
               :model-value="draftValue"
-              :wiki-titles="wikiTitles"
+              :wiki-links="wikiLinks"
               :last-saved-markdown="lastSavedMarkdown"
               aria-label="Property value"
               data-testid="rich-note-property-value"
@@ -114,7 +114,7 @@ import RichFrontmatterImagePropertyValue from "@/components/form/RichFrontmatter
 import RichFrontmatterPropertyExternalLink from "@/components/form/RichFrontmatterPropertyExternalLink.vue"
 import RichFrontmatterPropertyKeyPresets from "@/components/form/RichFrontmatterPropertyKeyPresets.vue"
 import PropertyValueField from "@/components/form/PropertyValueField.vue"
-import type { WikiTitle } from "@generated/donut-backend-api"
+import type { WikiLink } from "@generated/donut-backend-api"
 import {
   isImagePropertyKey,
   isUrlPropertyKey,
@@ -128,7 +128,7 @@ defineProps<{
   insertOpen: boolean
   draftKey: string
   draftValue: string
-  wikiTitles: WikiTitle[]
+  wikiLinks: WikiLink[]
   lastSavedMarkdown?: string
   insertKeyInputId: string
   insertKeyPresetListId: string

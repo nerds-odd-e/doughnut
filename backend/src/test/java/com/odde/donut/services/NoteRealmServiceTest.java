@@ -48,7 +48,7 @@ class NoteRealmServiceTest {
     makeMe.aNote().title("LinkedPage").notebook(notebook).please();
     Note carrier = makeMe.aNote().notebook(notebook).content("[[LinkedPage]]").please();
 
-    assertThat(noteRealmService.build(carrier, user).getWikiTitles(), empty());
+    assertThat(noteRealmService.build(carrier, user).getWikiLinks(), empty());
   }
 
   @Test
@@ -62,7 +62,7 @@ class NoteRealmServiceTest {
 
     persistWikiLink(carrier, hidden, "SecretNb:Hidden");
 
-    assertThat(noteRealmService.build(carrier, viewer).getWikiTitles(), empty());
+    assertThat(noteRealmService.build(carrier, viewer).getWikiLinks(), empty());
   }
 
   @Test
@@ -73,7 +73,7 @@ class NoteRealmServiceTest {
 
     softDelete(target);
 
-    assertThat(noteRealmService.build(carrier, user).getWikiTitles(), empty());
+    assertThat(noteRealmService.build(carrier, user).getWikiLinks(), empty());
   }
 
   @Test

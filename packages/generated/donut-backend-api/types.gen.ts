@@ -219,7 +219,7 @@ export type NoteRealm = {
      */
     ancestorFolders?: Array<Folder>;
     references?: Array<NoteTopology>;
-    wikiTitles?: Array<WikiTitle>;
+    wikiLinks?: Array<WikiLink>;
     /**
      * Full markdown of the container readme that supplies the nearest non-blank title_pattern (inner scope toward notebook root). Omitted when none applies.
      */
@@ -246,11 +246,11 @@ export type NotebookRealm = {
     readmeContent?: string;
 };
 
-export type WikiTitle = {
-    linkText: string;
-    targetToken: string;
+export type WikiLink = {
+    authoredLink: string;
+    portablePath: string;
     displayText: string;
-    noteId: number;
+    destinationNoteId: number;
 };
 
 export type QuestionContestResult = {
@@ -1289,7 +1289,7 @@ export type NoteRealmWritable = {
      */
     ancestorFolders?: Array<Folder>;
     references?: Array<NoteTopology>;
-    wikiTitles?: Array<WikiTitle>;
+    wikiLinks?: Array<WikiLink>;
     /**
      * Full markdown of the container readme that supplies the nearest non-blank title_pattern (inner scope toward notebook root). Omitted when none applies.
      */

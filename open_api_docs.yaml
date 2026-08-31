@@ -3727,10 +3727,10 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/NoteTopology"
-        wikiTitles:
+        wikiLinks:
           type: array
           items:
-            $ref: "#/components/schemas/WikiTitle"
+            $ref: "#/components/schemas/WikiLink"
         scopedReadmeContent:
           type: string
           description: Full markdown of the container readme that supplies the nearest
@@ -3775,23 +3775,23 @@ components:
             from legacy container note). Omitted when absent.
       required:
       - notebook
-    WikiTitle:
+    WikiLink:
       type: object
       properties:
-        linkText:
+        authoredLink:
           type: string
-        targetToken:
+        portablePath:
           type: string
         displayText:
           type: string
-        noteId:
+        destinationNoteId:
           type: integer
           format: int32
       required:
+      - authoredLink
+      - destinationNoteId
       - displayText
-      - linkText
-      - noteId
-      - targetToken
+      - portablePath
     QuestionContestResult:
       type: object
       properties:

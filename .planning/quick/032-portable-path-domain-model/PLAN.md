@@ -195,8 +195,29 @@ backed by unchanged external behavior.
 
 ### 3. One resolved Wiki-link contract from backend to frontend
 
-**Status:** planned  
+**Status:** done  
 **Type:** Structure
+
+**Learnings:**
+- Backend `WikiTitle` DTO → `WikiLink` (`authoredLink`, `portablePath`,
+  `displayText`, `destinationNoteId`); `NoteRealm.wikiTitles` → `wikiLinks`.
+  OpenAPI/generated TS client regenerated accordingly.
+- Frontend `wikiLinkAuthoredTarget.ts` → `portablePath.ts`
+  (`WikiLinkAuthoredTarget`→`PortablePath`, `noteTarget`→
+  `qualifiedNotePortion`), plus ~35 files renaming `WikiTitle`/`wikiTitles`/
+  `targetToken` to Wiki-link/Portable-path nouns across components, utils,
+  tests, and the `NoteRealmBuilder` fixture.
+- Deliberately left untouched (persistence layer, slice 5's scope):
+  `data-wiki-title` DOM attribute, `refreshWikiTitleCacheForNoteIds`/
+  `wikiTitleCacheRefreshSourceNoteId`, `NoteWikiTitleCache` entity,
+  `WikiTitleCacheService`/`wikiTitlesForViewer` method name.
+- No ADR reconciliation needed — no ADR referenced `wikiTitles`/`WikiTitle`.
+- Backend full-suite run showed 4 unrelated flaky failures from MySQL
+  connection-pool exhaustion under parallel test load
+  (`StructuredResponseCreateParamsSerializerTest`,
+  `QuestionGenerationRequestBuilderTests`); both independently reproduced
+  passing in isolation — an environmental flake, not a regression from this
+  slice.
 
 Cut the public/rendering vocabulary over in one compile-safe change. The
 following slice verifies that the existing resolved/dead rendering behavior did

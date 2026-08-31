@@ -4,8 +4,8 @@
  * a property target. Product encode uses uppercase hex; readers accept either
  * hex case.
  */
-export type WikiLinkAuthoredTarget = {
-  noteTarget: string
+export type PortablePath = {
+  qualifiedNotePortion: string
   encodedPropertyKey: string | undefined
 }
 
@@ -25,33 +25,33 @@ function isRfc3986Unreserved(byte: number): boolean {
   )
 }
 
-export function parseWikiLinkAuthoredTarget(
-  target: string
-): WikiLinkAuthoredTarget {
+export function parsePortablePath(target: string): PortablePath {
   const separator = target.indexOf(PROPERTY_SEPARATOR)
   if (separator < 0) {
-    return { noteTarget: target, encodedPropertyKey: undefined }
+    return { qualifiedNotePortion: target, encodedPropertyKey: undefined }
   }
   return {
-    noteTarget: target.slice(0, separator),
+    qualifiedNotePortion: target.slice(0, separator),
     encodedPropertyKey: target.slice(separator + PROPERTY_SEPARATOR.length),
   }
 }
 
-export function formatWikiLinkAuthoredTarget(
-  authored: WikiLinkAuthoredTarget
-): string {
-  if (authored.encodedPropertyKey === undefined) {
-    return authored.noteTarget
+export function formatPortablePath(portablePath: PortablePath): string {
+  if (portablePath.encodedPropertyKey === undefined) {
+    return portablePath.qualifiedNotePortion
   }
-  return authored.noteTarget + PROPERTY_SEPARATOR + authored.encodedPropertyKey
+  return (
+    portablePath.qualifiedNotePortion +
+    PROPERTY_SEPARATOR +
+    portablePath.encodedPropertyKey
+  )
 }
 
-export function withWikiLinkAuthoredNoteTarget(
-  authored: WikiLinkAuthoredTarget,
-  newNoteTarget: string
-): WikiLinkAuthoredTarget {
-  return { ...authored, noteTarget: newNoteTarget }
+export function withPortablePathQualifiedNotePortion(
+  portablePath: PortablePath,
+  newQualifiedNotePortion: string
+): PortablePath {
+  return { ...portablePath, qualifiedNotePortion: newQualifiedNotePortion }
 }
 
 /**

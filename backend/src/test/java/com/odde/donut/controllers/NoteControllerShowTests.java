@@ -5,7 +5,7 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.donut.controllers.dto.NoteRealm;
-import com.odde.donut.controllers.dto.WikiTitle;
+import com.odde.donut.controllers.dto.WikiLink;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.User;
@@ -67,12 +67,12 @@ class NoteControllerShowTests extends ControllerTestBase {
             .content("Text [[LinkedPage]] and [[NoSuch]].")
             .please();
     NoteRealm realm = showWithWikiTitles(viewer);
-    assertThat(realm.getWikiTitles(), hasSize(1));
-    WikiTitle wt = realm.getWikiTitles().get(0);
-    assertThat(wt.getLinkText(), equalTo("LinkedPage"));
-    assertThat(wt.getTargetToken(), equalTo("LinkedPage"));
+    assertThat(realm.getWikiLinks(), hasSize(1));
+    WikiLink wt = realm.getWikiLinks().get(0);
+    assertThat(wt.getAuthoredLink(), equalTo("LinkedPage"));
+    assertThat(wt.getPortablePath(), equalTo("LinkedPage"));
     assertThat(wt.getDisplayText(), equalTo("LinkedPage"));
-    assertThat(wt.getNoteId(), equalTo(matched.getId()));
+    assertThat(wt.getDestinationNoteId(), equalTo(matched.getId()));
   }
 
   @Test
@@ -92,7 +92,7 @@ class NoteControllerShowTests extends ControllerTestBase {
             .content("Text [[color]] and [[NoSuch]].")
             .please();
     assertThat(
-        showWithWikiTitles(viewer).getWikiTitles().get(0).getNoteId(),
+        showWithWikiTitles(viewer).getWikiLinks().get(0).getDestinationNoteId(),
         equalTo(aliasTarget.getId()));
   }
 
@@ -103,7 +103,8 @@ class NoteControllerShowTests extends ControllerTestBase {
     makeMe.aNote().underSameNotebookAs(byTitle).title("colour").aliases("color").please();
     Note viewer = makeMe.aNote().underSameNotebookAs(byTitle).content("Text [[color]].").please();
     assertThat(
-        showWithWikiTitles(viewer).getWikiTitles().get(0).getNoteId(), equalTo(byTitle.getId()));
+        showWithWikiTitles(viewer).getWikiLinks().get(0).getDestinationNoteId(),
+        equalTo(byTitle.getId()));
   }
 
   @Test
@@ -119,7 +120,7 @@ class NoteControllerShowTests extends ControllerTestBase {
     Note viewer =
         makeMe.aNote().underSameNotebookAs(firstTarget).content("Text [[color]].").please();
     assertThat(
-        showWithWikiTitles(viewer).getWikiTitles().get(0).getNoteId(),
+        showWithWikiTitles(viewer).getWikiLinks().get(0).getDestinationNoteId(),
         equalTo(firstTarget.getId()));
   }
 
@@ -145,7 +146,7 @@ class NoteControllerShowTests extends ControllerTestBase {
             .content("Text [[" + sharedNotebookName + ":term]].")
             .please();
     assertThat(
-        showWithWikiTitles(viewerNote).getWikiTitles().get(0).getNoteId(),
+        showWithWikiTitles(viewerNote).getWikiLinks().get(0).getDestinationNoteId(),
         equalTo(readableTarget.getId()));
   }
 
@@ -160,11 +161,11 @@ class NoteControllerShowTests extends ControllerTestBase {
             .underSameNotebookAs(matched)
             .content("Text [[Target Title|friendly label]] end.")
             .please();
-    WikiTitle wt = showWithWikiTitles(viewer).getWikiTitles().get(0);
-    assertThat(wt.getLinkText(), equalTo("Target Title|friendly label"));
-    assertThat(wt.getTargetToken(), equalTo("Target Title"));
+    WikiLink wt = showWithWikiTitles(viewer).getWikiLinks().get(0);
+    assertThat(wt.getAuthoredLink(), equalTo("Target Title|friendly label"));
+    assertThat(wt.getPortablePath(), equalTo("Target Title"));
     assertThat(wt.getDisplayText(), equalTo("friendly label"));
-    assertThat(wt.getNoteId(), equalTo(matched.getId()));
+    assertThat(wt.getDestinationNoteId(), equalTo(matched.getId()));
   }
 
   @Test
@@ -181,9 +182,9 @@ class NoteControllerShowTests extends ControllerTestBase {
             .notebook(mainNotebook)
             .content("See [[Other Notebook:LinkedPage]] for more.")
             .please();
-    WikiTitle wt = showWithWikiTitles(viewer).getWikiTitles().get(0);
-    assertThat(wt.getTargetToken(), equalTo("Other Notebook:LinkedPage"));
-    assertThat(wt.getNoteId(), equalTo(targetInOther.getId()));
+    WikiLink wt = showWithWikiTitles(viewer).getWikiLinks().get(0);
+    assertThat(wt.getPortablePath(), equalTo("Other Notebook:LinkedPage"));
+    assertThat(wt.getDestinationNoteId(), equalTo(targetInOther.getId()));
   }
 
   @Test
@@ -203,6 +204,7 @@ class NoteControllerShowTests extends ControllerTestBase {
                 """)
             .please();
     assertThat(
-        showWithWikiTitles(viewer).getWikiTitles().get(0).getNoteId(), equalTo(fromFm.getId()));
+        showWithWikiTitles(viewer).getWikiLinks().get(0).getDestinationNoteId(),
+        equalTo(fromFm.getId()));
   }
 }

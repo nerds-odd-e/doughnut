@@ -10,7 +10,7 @@
             class="daisy-btn daisy-btn-primary"
             @click="onCreateNewNoteClick"
           >
-            Create a new note named "{{ modelValue.targetToken }}"
+            Create a new note named "{{ modelValue.portablePath }}"
           </button>
           <button
             class="daisy-btn daisy-btn-secondary"
@@ -24,7 +24,7 @@
         v-else-if="showCreateForm && modelValue !== null"
         :notebookId="notebookId"
         :initial-folder="realmLeafFolder(noteRealm)"
-        :initial-title="modelValue.targetToken"
+        :initial-title="modelValue.portablePath"
         :wiki-title-cache-refresh-source-note-id="sourceNoteId"
         :ancestor-folders="noteRealm.ancestorFolders ?? []"
         @close-dialog="close"
@@ -79,7 +79,7 @@ watch(
 )
 
 const onCreateNewNoteClick = async () => {
-  if (props.modelValue?.targetToken.includes("/")) {
+  if (props.modelValue?.portablePath.includes("/")) {
     await popups.alert(
       "Cannot create a note from a path. You can point at an existing note instead."
     )

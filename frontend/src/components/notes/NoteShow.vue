@@ -39,7 +39,7 @@
                     note: noteRealm.note,
                     asMarkdown,
                     readonly: readonly(noteRealm),
-                    wikiTitles: noteRealm.wikiTitles ?? [],
+                    wikiLinks: noteRealm.wikiLinks ?? [],
                     isReadmeContext: isReadmeTitle(noteRealm),
                     hasInboundReferences: noteHasInboundWikiReferences(noteRealm),
                   }"

@@ -50,7 +50,7 @@ const pointAtExistingNoteLabel = "Point at an existing note"
 describe("NoteDeadWikiLinkCreateModal", () => {
   const noteRealm = makeMe.aNoteRealm.title("Ghost Page").please()
   const deadWikiLinkPayload = {
-    targetToken: "Ghost Page",
+    portablePath: "Ghost Page",
     displayText: "Ghost Page",
   }
   const commonProps = {
@@ -128,7 +128,7 @@ describe("NoteDeadWikiLinkCreateModal", () => {
   })
 
   it("uses the wiki target as the new note name when display text differs", async () => {
-    mountModal({ targetToken: "Ghost Page", displayText: "shown text" })
+    mountModal({ portablePath: "Ghost Page", displayText: "shown text" })
     await waitForChooser()
     expect(screen.getByText("shown text")).toBeTruthy()
 
@@ -142,7 +142,7 @@ describe("NoteDeadWikiLinkCreateModal", () => {
 
   it("warns and does not show the create form when the target contains a slash", async () => {
     mountModal({
-      targetToken: "/WikiPathMdDeadFolder/WikiPathMdDeadMissing.md",
+      portablePath: "/WikiPathMdDeadFolder/WikiPathMdDeadMissing.md",
       displayText: "label",
     })
     await waitForChooser()

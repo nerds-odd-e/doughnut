@@ -4,7 +4,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.equalTo;
 
-import com.odde.donut.controllers.dto.WikiTitle;
+import com.odde.donut.controllers.dto.WikiLink;
 import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
@@ -77,7 +77,7 @@ class NotebookFolderMoveWikiLinkRewriteControllerTest
     assertThat(noteB.getContent(), equalTo("[[F/A]] and [label](/F/A.md)"));
     assertThat(
         wikiTitleCacheServiceBean.wikiTitlesForViewer(noteB, owner).stream()
-            .map(WikiTitle::getNoteId)
+            .map(WikiLink::getDestinationNoteId)
             .toList(),
         containsInAnyOrder(noteA.getId(), noteA.getId()));
   }

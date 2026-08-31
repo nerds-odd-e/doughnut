@@ -2,7 +2,7 @@ import type {
   Folder,
   NoteRealm,
   NotebookRealm,
-  WikiTitle,
+  WikiLink,
 } from '@generated/donut-backend-api'
 import Builder from './Builder'
 import FolderBuilder from './FolderBuilder'
@@ -35,7 +35,7 @@ class NoteRealmBuilder extends Builder<NoteRealm> {
       id: noteData.id,
       note: noteData,
       references: [],
-      wikiTitles: [],
+      wikiLinks: [],
       notebookRealm,
       ancestorFolders: [],
     }
@@ -71,8 +71,8 @@ class NoteRealmBuilder extends Builder<NoteRealm> {
     return this
   }
 
-  wikiTitles(value: WikiTitle[]): NoteRealmBuilder {
-    this.data.wikiTitles = value
+  wikiLinks(value: WikiLink[]): NoteRealmBuilder {
+    this.data.wikiLinks = value
     return this
   }
 
@@ -124,7 +124,7 @@ class NoteRealmBuilder extends Builder<NoteRealm> {
       nb.id = this.noteBuilder.realmNotebookId
       nb.name = this.notebookNameOverride ?? this.data.note.noteTopology.title
     }
-    this.data.wikiTitles ??= []
+    this.data.wikiLinks ??= []
     return this.data
   }
 }

@@ -1,6 +1,6 @@
 import { TextContentController } from "@generated/donut-backend-api/sdk.gen"
 import NoteTextContent from "@/components/notes/core/NoteTextContent.vue"
-import type { Note, NoteRealm, WikiTitle } from "@generated/donut-backend-api"
+import type { Note, NoteRealm, WikiLink } from "@generated/donut-backend-api"
 import makeMe from "donut-test-fixtures/makeMe"
 import helper, { mockSdkServiceWithImplementation } from "@tests/helpers"
 import { type VueWrapper, flushPromises } from "@vue/test-utils"
@@ -42,7 +42,7 @@ export function mountNoteTextContent(
   note: Note,
   options?: {
     readonly?: boolean
-    wikiTitles?: WikiTitle[]
+    wikiLinks?: WikiLink[]
   }
 ): VueWrapper<ComponentPublicInstance> {
   return helper
@@ -52,7 +52,7 @@ export function mountNoteTextContent(
     .withProps({
       readonly: options?.readonly ?? false,
       note,
-      wikiTitles: options?.wikiTitles ?? [],
+      wikiLinks: options?.wikiLinks ?? [],
     })
     .mount({ attachTo: document.body })
 }

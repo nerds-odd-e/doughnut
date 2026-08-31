@@ -27,13 +27,13 @@
     <RichFrontmatterReadOnlyList
       v-if="propertyRows.length > 0 && isReadOnly"
       :property-rows="propertyRows"
-      :wiki-titles="wikiTitles"
+      :wiki-links="wikiLinks"
       :last-saved-markdown="lastSavedMarkdown"
     />
     <RichFrontmatterEditablePropertyList
       v-else-if="propertyRows.length > 0"
       v-model="propertyRows"
-      :wiki-titles="wikiTitles"
+      :wiki-links="wikiLinks"
       :last-saved-markdown="lastSavedMarkdown"
       :note-id="noteId"
       :heading-id="headingId"
@@ -68,7 +68,7 @@
       :insert-open="insertOpen"
       :draft-key="draftKey"
       :draft-value="draftValue"
-      :wiki-titles="wikiTitles"
+      :wiki-links="wikiLinks"
       :last-saved-markdown="lastSavedMarkdown"
       :note-id="noteId"
       :property-rows="propertyRows"
@@ -107,7 +107,7 @@ import RichFrontmatterInsertForm from "@/components/form/RichFrontmatterInsertFo
 import RichFrontmatterPropertyNotFound from "@/components/form/RichFrontmatterPropertyNotFound.vue"
 import { richFrontmatterIsReadmeContextKey } from "@/components/form/richFrontmatterProvide"
 import WikidataAssociationDialog from "@/components/notes/WikidataAssociationDialog.vue"
-import type { WikiTitle } from "@generated/donut-backend-api"
+import type { WikiLink } from "@generated/donut-backend-api"
 import { useRichFrontmatterPropertyEditing } from "@/composables/useRichFrontmatterPropertyEditing"
 import { useWikidataPropertyDialog } from "@/composables/useWikidataPropertyDialog"
 import {
@@ -120,7 +120,7 @@ import type { DeadWikiLinkPayload } from "@/utils/wikiLinkMarkup"
 const props = defineProps<{
   contentMarkdown: string
   readOnly?: boolean
-  wikiTitles: WikiTitle[]
+  wikiLinks: WikiLink[]
   lastSavedMarkdown?: string
   noteTitleForWikidataSearch?: string
   noteId?: number

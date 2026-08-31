@@ -1,13 +1,13 @@
 import { replaceWikiLinksInHtml } from "@/components/form/replaceWikiLinksInHtml"
 import { notePropertyHref, noteShowHref } from "@/routes/noteShowLocation"
-import { wikiTitleFromAuthoredToken } from "@/utils/wikiLinkMarkup"
+import { wikiLinkFromAuthoredToken } from "@/utils/wikiLinkMarkup"
 import { describe, it, expect } from "vitest"
 
 describe("replaceWikiLinksInHtml", () => {
   it("replaces known wikilink text with a note href", () => {
     expect(
       replaceWikiLinksInHtml("<p>[[MyNote]]</p>", [
-        wikiTitleFromAuthoredToken("MyNote", 42),
+        wikiLinkFromAuthoredToken("MyNote", 42),
       ])
     ).toBe(
       `<p><a href="${noteShowHref(42)}" class="donut-wiki-link" data-wiki-title="MyNote" data-note-id="42">MyNote</a></p>`
@@ -17,7 +17,7 @@ describe("replaceWikiLinksInHtml", () => {
   it("replaces piped wikilink with display text as anchor body", () => {
     expect(
       replaceWikiLinksInHtml("<p>[[Target|label]]</p>", [
-        wikiTitleFromAuthoredToken("Target|label", 7),
+        wikiLinkFromAuthoredToken("Target|label", 7),
       ])
     ).toBe(
       `<p><a href="${noteShowHref(7)}" class="donut-wiki-link" data-wiki-title="Target" data-wiki-display="label" data-note-id="7">label</a></p>`
@@ -27,7 +27,7 @@ describe("replaceWikiLinksInHtml", () => {
   it("replaces every occurrence when the same wikilink appears multiple times", () => {
     const html = "<p>[[MyNote]] then [[MyNote]]</p>"
     const out = replaceWikiLinksInHtml(html, [
-      wikiTitleFromAuthoredToken("MyNote", 42),
+      wikiLinkFromAuthoredToken("MyNote", 42),
     ])
     expect(out).not.toContain("[[MyNote]]")
     expect(out).toMatch(/donut-wiki-link[\s\S]* then [\s\S]*donut-wiki-link/)
@@ -58,11 +58,11 @@ describe("replaceWikiLinksInHtml", () => {
     ${"pending with hash href"}                  | ${'<p><a href="#" class="pending-wiki-link" data-wiki-title="/Folder/Title.md" data-wiki-display="label">label</a></p>'}
     ${"leftover live with concept-path href"}    | ${'<p><a href="/Folder/Title.md" class="donut-wiki-link" data-wiki-title="/Folder/Title.md" data-wiki-display="label" data-note-id="42">label</a></p>'}
   `(
-    "upgrades $label path markdown anchors to a note-show href when wikiTitles resolve",
+    "upgrades $label path markdown anchors to a note-show href when wikiLinks resolve",
     ({ html }) => {
       expect(
         replaceWikiLinksInHtml(html, [
-          wikiTitleFromAuthoredToken("[label](/Folder/Title.md)", 42),
+          wikiLinkFromAuthoredToken("[label](/Folder/Title.md)", 42),
         ])
       ).toBe(
         `<p><a href="${noteShowHref(42)}" class="donut-wiki-link" data-wiki-title="/Folder/Title.md" data-wiki-display="label" data-note-id="42">label</a></p>`
@@ -82,10 +82,10 @@ describe("replaceWikiLinksInHtml", () => {
     expect(twice).toBe(once)
   })
 
-  it("upgrades rich-editor dead-wiki-link anchors when wikiTitles resolve", () => {
+  it("upgrades rich-editor dead-wiki-link anchors when wikiLinks resolve", () => {
     const out = replaceWikiLinksInHtml(
       '<p><a href="#" class="dead-wiki-link">MyNote</a></p>',
-      [wikiTitleFromAuthoredToken("MyNote", 42)]
+      [wikiLinkFromAuthoredToken("MyNote", 42)]
     )
     expect(out).toContain("donut-wiki-link")
     expect(out).not.toContain("dead-wiki-link")
@@ -111,10 +111,10 @@ describe("replaceWikiLinksInHtml", () => {
     )
   })
 
-  it("keeps a wikiTitles hit live even when last-saved markdown is provided", () => {
+  it("keeps a wikiLinks hit live even when last-saved markdown is provided", () => {
     const out = replaceWikiLinksInHtml(
       "<p>[[MyNote]]</p>",
-      [wikiTitleFromAuthoredToken("MyNote", 42)],
+      [wikiLinkFromAuthoredToken("MyNote", 42)],
       "[[MyNote]]"
     )
     expect(out).toContain("donut-wiki-link")
@@ -134,10 +134,10 @@ describe("replaceWikiLinksInHtml", () => {
     )
   })
 
-  it("upgrades a last-saved pending anchor to live when wikiTitles resolve", () => {
+  it("upgrades a last-saved pending anchor to live when wikiLinks resolve", () => {
     const out = replaceWikiLinksInHtml(
       '<p><a href="#" class="pending-wiki-link" data-wiki-title="MyNote">MyNote</a></p>',
-      [wikiTitleFromAuthoredToken("MyNote", 42)],
+      [wikiLinkFromAuthoredToken("MyNote", 42)],
       "[[MyNote]]"
     )
     expect(out).toContain("donut-wiki-link")
@@ -148,7 +148,7 @@ describe("replaceWikiLinksInHtml", () => {
     const href = "/Solar/Moon.md#prop:a%20part%20of"
     expect(
       replaceWikiLinksInHtml(`<p><a href="${href}">a part of</a></p>`, [
-        wikiTitleFromAuthoredToken(`[a part of](${href})`, 42),
+        wikiLinkFromAuthoredToken(`[a part of](${href})`, 42),
       ])
     ).toBe(
       `<p><a href="${notePropertyHref(42, "a part of")}" class="donut-wiki-link" data-wiki-title="${href}" data-wiki-display="a part of" data-note-id="42">a part of</a></p>`

@@ -1,7 +1,7 @@
-import type { WikiTitle } from "@generated/donut-backend-api"
+import type { WikiLink } from "@generated/donut-backend-api"
 import {
   authoredHrefLooksLikeConceptNotePath,
-  isPathMarkdownWikiTitle,
+  isPathMarkdownWikiLink,
 } from "@/utils/authoredLinkMarkup"
 import {
   DEAD_WIKI_LINK_CLASS,
@@ -18,7 +18,7 @@ import {
   isValidWikiLinkInner,
   splitWikiLinkInner,
   wikiLinkAnchorHtml,
-  wikiTitleParts,
+  wikiLinkParts,
 } from "@/utils/wikiLinkMarkup"
 import { hrefForResolvedWikiTarget } from "@/utils/wikiLinkResolvedLocation"
 
@@ -65,9 +65,9 @@ function parseWikiHtmlFragment(html: string): HTMLElement | undefined {
 /** Rich editor HTML uses dead/pending wiki-link anchors, not [[ ]] literals; upgrade when titles resolve. */
 function upgradeUnresolvedWikiAnchors(
   html: string,
-  wikiTitles: WikiTitle[]
+  wikiLinks: WikiLink[]
 ): string {
-  if (wikiTitles.length === 0) return html
+  if (wikiLinks.length === 0) return html
   if (!UNRESOLVED_WIKI_LINK_CLASSES.some((c) => html.includes(c))) return html
   const wrap = parseWikiHtmlFragment(html)
   if (!wrap) return html
@@ -75,10 +75,10 @@ function upgradeUnresolvedWikiAnchors(
     (c) => `a.${c}`
   ).join(", ")
 
-  for (const w of wikiTitles) {
-    if (isPathMarkdownWikiTitle(w)) continue
-    const { target, display } = wikiTitleParts(w)
-    const href = hrefForResolvedWikiTarget(w.noteId, target)
+  for (const w of wikiLinks) {
+    if (isPathMarkdownWikiLink(w)) continue
+    const { target, display } = wikiLinkParts(w)
+    const href = hrefForResolvedWikiTarget(w.destinationNoteId, target)
     for (const a of [...wrap.querySelectorAll(unresolvedAnchorSelector)]) {
       const dt = a.getAttribute("data-wiki-title")
       if (dt !== null && dt !== "") {
@@ -92,7 +92,7 @@ function upgradeUnresolvedWikiAnchors(
         className: DONUT_WIKI_LINK_CLASS,
         target,
         display,
-        noteId: w.noteId,
+        noteId: w.destinationNoteId,
       })
     }
   }
@@ -141,21 +141,21 @@ function unresolvedWikiAnchorHtmlFromInner(
 
 function upgradePathMarkdownAnchors(
   html: string,
-  wikiTitles: WikiTitle[]
+  wikiLinks: WikiLink[]
 ): string {
   let result = html
-  for (const w of wikiTitles) {
-    if (!isPathMarkdownWikiTitle(w)) continue
-    const { target, display } = wikiTitleParts(w)
+  for (const w of wikiLinks) {
+    if (!isPathMarkdownWikiLink(w)) continue
+    const { target, display } = wikiLinkParts(w)
     const attrTarget = escapeHtmlAttributeValue(target)
     const livePathMarkdownAttrs = {
       className: DONUT_WIKI_LINK_CLASS,
       target,
       display,
-      noteId: w.noteId,
+      noteId: w.destinationNoteId,
     }
     const live = wikiLinkAnchorHtml({
-      href: hrefForResolvedWikiTarget(w.noteId, target),
+      href: hrefForResolvedWikiTarget(w.destinationNoteId, target),
       ...livePathMarkdownAttrs,
     })
     result = result.replaceAll(`<a href="${attrTarget}">${display}</a>`, live)
@@ -208,27 +208,27 @@ function markUnresolvedWikiLinks(
 
 export function replaceWikiLinksInHtml(
   html: string,
-  wikiTitles: WikiTitle[],
+  wikiLinks: WikiLink[],
   lastSavedMarkdown?: string
 ): string {
   const lastSavedTokens = lastSavedAuthoredTokens(lastSavedMarkdown)
   let result = html
-  wikiTitles.forEach((w) => {
-    if (isPathMarkdownWikiTitle(w)) return
-    const { target, display, inner } = wikiTitleParts(w)
+  wikiLinks.forEach((w) => {
+    if (isPathMarkdownWikiLink(w)) return
+    const { target, display, inner } = wikiLinkParts(w)
     result = result.replaceAll(
       `[[${inner}]]`,
       wikiLinkAnchorHtml({
-        href: hrefForResolvedWikiTarget(w.noteId, target),
+        href: hrefForResolvedWikiTarget(w.destinationNoteId, target),
         className: DONUT_WIKI_LINK_CLASS,
         target,
         display,
-        noteId: w.noteId,
+        noteId: w.destinationNoteId,
       })
     )
   })
-  result = upgradePathMarkdownAnchors(result, wikiTitles)
-  result = upgradeUnresolvedWikiAnchors(result, wikiTitles)
+  result = upgradePathMarkdownAnchors(result, wikiLinks)
+  result = upgradeUnresolvedWikiAnchors(result, wikiLinks)
   result = confirmPendingWikiAnchorsAsDead(result, lastSavedTokens)
   return markUnresolvedWikiLinks(result, lastSavedTokens)
 }

@@ -17,7 +17,7 @@ describe("wikiLinkMarkup utils", () => {
     anchor.className = "dead-wiki-link"
     anchor.setAttribute("data-wiki-title", "Ghost")
     anchor.textContent = "Ghost"
-    let payload: { targetToken: string; displayText: string } | undefined
+    let payload: { portablePath: string; displayText: string } | undefined
     handleRichContentAnchorClick(
       anchor,
       {
@@ -30,7 +30,7 @@ describe("wikiLinkMarkup utils", () => {
       },
       { deadWikiLinksEnabled: true }
     )
-    expect(payload).toEqual({ targetToken: "Ghost", displayText: "Ghost" })
+    expect(payload).toEqual({ portablePath: "Ghost", displayText: "Ghost" })
   })
 
   it("handleRichContentAnchorClick navigates path markdown wiki links via data-note-id", () => {
@@ -106,13 +106,13 @@ describe("wikiLinkMarkup utils", () => {
   it("markdownWikiTokenFromDeadWikiLinkPayload matches simple and piped stored tokens", () => {
     expect(
       markdownWikiTokenFromDeadWikiLinkPayload({
-        targetToken: "a",
+        portablePath: "a",
         displayText: "a",
       })
     ).toBe("[[a]]")
     expect(
       markdownWikiTokenFromDeadWikiLinkPayload({
-        targetToken: "Target",
+        portablePath: "Target",
         displayText: "label",
       })
     ).toBe("[[Target|label]]")
@@ -126,6 +126,6 @@ describe("wikiLinkMarkup utils", () => {
     const a = document.createElement("a")
     a.className = "dead-wiki-link"
     a.textContent = "[[Eng"
-    expect(deadWikiLinkPayloadFromAnchor(a).targetToken).toBe("Eng")
+    expect(deadWikiLinkPayloadFromAnchor(a).portablePath).toBe("Eng")
   })
 })

@@ -1,4 +1,4 @@
-import { wikiTitleFromAuthoredToken } from "@/utils/wikiLinkMarkup"
+import { wikiLinkFromAuthoredToken } from "@/utils/wikiLinkMarkup"
 import { nextTick } from "vue"
 import { createRichMarkdownEditorTestHarness } from "./richMarkdownEditorTestHarness"
 
@@ -56,8 +56,8 @@ describe("RichMarkdownEditor", () => {
   })
 
   it("linkifies wikilinks in Quill HTML while model matches the interval", async () => {
-    const wikiTitles = [wikiTitleFromAuthoredToken("MyNote", 42)]
-    const wrapper = await h.mountEditor("", { wikiTitles })
+    const wikiLinks = [wikiLinkFromAuthoredToken("MyNote", 42)]
+    const wrapper = await h.mountEditor("", { wikiLinks })
     h.emitQuillModelValue("<p>[[MyNote]]</p>")
     await wrapper.setProps({ modelValue: "[[MyNote]]" })
     await nextTick()

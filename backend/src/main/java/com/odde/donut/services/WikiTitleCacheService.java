@@ -2,7 +2,7 @@ package com.odde.donut.services;
 
 import com.odde.donut.algorithms.WikiLinkMarkdown;
 import com.odde.donut.algorithms.WikiLinkPropertyMatch;
-import com.odde.donut.controllers.dto.WikiTitle;
+import com.odde.donut.controllers.dto.WikiLink;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.NoteWikiTitleCache;
 import com.odde.donut.entities.Notebook;
@@ -46,8 +46,8 @@ public class WikiTitleCacheService {
             noteAliasIndexService);
   }
 
-  public List<WikiTitle> wikiTitlesForViewer(Note focusNote, User viewer) {
-    List<WikiTitle> out = new ArrayList<>();
+  public List<WikiLink> wikiTitlesForViewer(Note focusNote, User viewer) {
+    List<WikiLink> out = new ArrayList<>();
     for (NoteWikiTitleCache row :
         noteWikiTitleCacheRepository.findByNote_IdOrderByIdAsc(focusNote.getId())) {
       Note resolved = authorizedOutgoingTargetNote(focusNote, row, viewer);
@@ -55,7 +55,7 @@ public class WikiTitleCacheService {
         WikiLinkMarkdown.WikiInnerSplit parts =
             WikiLinkMarkdown.splitAuthoredToken(row.getLinkText());
         out.add(
-            new WikiTitle(
+            new WikiLink(
                 row.getLinkText(),
                 parts.portablePath().format(),
                 parts.displayText(),
@@ -74,8 +74,8 @@ public class WikiTitleCacheService {
   public List<Note> outgoingWikiLinkTargetNotesForViewer(Note focusNote, User viewer) {
     List<Note> notes = new ArrayList<>();
     Set<Integer> seenTargetIds = new LinkedHashSet<>();
-    for (WikiTitle wt : wikiTitlesForViewer(focusNote, viewer)) {
-      Integer id = wt.getNoteId();
+    for (WikiLink wt : wikiTitlesForViewer(focusNote, viewer)) {
+      Integer id = wt.getDestinationNoteId();
       if (id == null || !seenTargetIds.add(id)) {
         continue;
       }

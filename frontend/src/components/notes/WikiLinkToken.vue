@@ -19,7 +19,7 @@
 
 <script setup lang="ts">
 import { computed, type PropType } from "vue"
-import type { WikiTitle } from "@generated/donut-backend-api"
+import type { WikiLink } from "@generated/donut-backend-api"
 import {
   noteIdForAuthoredToken,
   parseWholeWikiLinkItem,
@@ -33,15 +33,15 @@ import {
   DONUT_WIKI_LINK_CLASS,
 } from "@/utils/wikiLinkDomMarkers"
 import {
-  wikiTitleNoteIdLookup,
+  wikiLinkNoteIdLookup,
   type DeadWikiLinkPayload,
 } from "@/utils/wikiLinkMarkup"
 import { locationForResolvedWikiTarget } from "@/utils/wikiLinkResolvedLocation"
 
 const props = defineProps({
   token: { type: String, required: true },
-  wikiTitles: {
-    type: Array as PropType<WikiTitle[]>,
+  wikiLinks: {
+    type: Array as PropType<WikiLink[]>,
     default: () => [],
   },
   lastSavedMarkdown: { type: String, default: undefined },
@@ -54,7 +54,7 @@ const emit = defineEmits<{
 const resolved = computed(() => {
   const parsed = parseWholeWikiLinkItem(props.token.trim())
   if (!parsed) return undefined
-  const map = wikiTitleNoteIdLookup(props.wikiTitles)
+  const map = wikiLinkNoteIdLookup(props.wikiLinks)
   const noteId = noteIdForAuthoredToken(parsed.inner, map)
   const linkAttrs: Record<string, string> = {
     "data-wiki-title": parsed.target,
@@ -82,7 +82,7 @@ const unresolvedClass = computed(() => {
 function onUnresolvedClick() {
   if (!resolved.value || unresolvedClass.value !== DEAD_WIKI_LINK_CLASS) return
   emit("deadWikiLinkClick", {
-    targetToken: resolved.value.target,
+    portablePath: resolved.value.target,
     displayText: resolved.value.display,
   })
 }

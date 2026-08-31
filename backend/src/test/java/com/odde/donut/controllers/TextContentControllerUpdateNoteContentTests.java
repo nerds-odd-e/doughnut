@@ -6,7 +6,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 
 import com.odde.donut.controllers.dto.NoteRealm;
-import com.odde.donut.controllers.dto.WikiTitle;
+import com.odde.donut.controllers.dto.WikiLink;
 import com.odde.donut.entities.Image;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.NoteWikiTitleCache;
@@ -62,12 +62,12 @@ class TextContentControllerUpdateNoteContentTests extends TextContentControllerT
     controller.updateNoteContent(carrier, contentDto("[[OnlyA]]"));
     NoteRealm response = controller.updateNoteContent(carrier, contentDto("[[OnlyB]]"));
 
-    assertThat(response.getWikiTitles(), hasSize(1));
-    WikiTitle wt = response.getWikiTitles().getFirst();
-    assertThat(wt.getLinkText(), equalTo("OnlyB"));
-    assertThat(wt.getTargetToken(), equalTo("OnlyB"));
+    assertThat(response.getWikiLinks(), hasSize(1));
+    WikiLink wt = response.getWikiLinks().getFirst();
+    assertThat(wt.getAuthoredLink(), equalTo("OnlyB"));
+    assertThat(wt.getPortablePath(), equalTo("OnlyB"));
     assertThat(wt.getDisplayText(), equalTo("OnlyB"));
-    assertThat(wt.getNoteId(), equalTo(onlyB.getId()));
+    assertThat(wt.getDestinationNoteId(), equalTo(onlyB.getId()));
 
     List<NoteWikiTitleCache> rows =
         noteWikiTitleCacheRepository.findByNote_IdOrderByIdAsc(carrier.getId());
@@ -84,10 +84,10 @@ class TextContentControllerUpdateNoteContentTests extends TextContentControllerT
 
     NoteRealm response = controller.updateNoteContent(carrier, contentDto("[[OnlyA|alias label]]"));
 
-    WikiTitle wt = response.getWikiTitles().getFirst();
-    assertThat(wt.getLinkText(), equalTo("OnlyA|alias label"));
+    WikiLink wt = response.getWikiLinks().getFirst();
+    assertThat(wt.getAuthoredLink(), equalTo("OnlyA|alias label"));
     assertThat(wt.getDisplayText(), equalTo("alias label"));
-    assertThat(wt.getNoteId(), equalTo(onlyA.getId()));
+    assertThat(wt.getDestinationNoteId(), equalTo(onlyA.getId()));
   }
 
   @Test
@@ -99,7 +99,7 @@ class TextContentControllerUpdateNoteContentTests extends TextContentControllerT
 
     NoteRealm response = controller.updateNoteContent(carrier, contentDto(""));
 
-    assertThat(response.getWikiTitles(), empty());
+    assertThat(response.getWikiLinks(), empty());
     assertThat(noteWikiTitleCacheRepository.findByNote_IdOrderByIdAsc(carrier.getId()), empty());
   }
 
@@ -156,11 +156,11 @@ class TextContentControllerUpdateNoteContentTests extends TextContentControllerT
     NoteRealm response =
         controller.updateNoteContent(carrier, contentDto("[[Moon#prop:a%20part%20of]]"));
 
-    assertThat(response.getWikiTitles(), hasSize(1));
-    WikiTitle wt = response.getWikiTitles().getFirst();
-    assertThat(wt.getLinkText(), equalTo("Moon#prop:a%20part%20of"));
-    assertThat(wt.getTargetToken(), equalTo("Moon#prop:a%20part%20of"));
-    assertThat(wt.getNoteId(), equalTo(moon.getId()));
+    assertThat(response.getWikiLinks(), hasSize(1));
+    WikiLink wt = response.getWikiLinks().getFirst();
+    assertThat(wt.getAuthoredLink(), equalTo("Moon#prop:a%20part%20of"));
+    assertThat(wt.getPortablePath(), equalTo("Moon#prop:a%20part%20of"));
+    assertThat(wt.getDestinationNoteId(), equalTo(moon.getId()));
 
     List<NoteWikiTitleCache> rows =
         noteWikiTitleCacheRepository.findByNote_IdOrderByIdAsc(carrier.getId());
@@ -175,12 +175,12 @@ class TextContentControllerUpdateNoteContentTests extends TextContentControllerT
     Note carrier = makeMe.aNote().underSameNotebookAs(moon).please();
     String authored = "[a part of](/Moon.md#prop:a%20part%20of)";
 
-    WikiTitle wt =
-        controller.updateNoteContent(carrier, contentDto(authored)).getWikiTitles().getFirst();
+    WikiLink wt =
+        controller.updateNoteContent(carrier, contentDto(authored)).getWikiLinks().getFirst();
 
-    assertThat(wt.getLinkText(), equalTo(authored));
-    assertThat(wt.getTargetToken(), equalTo("/Moon.md#prop:a%20part%20of"));
-    assertThat(wt.getNoteId(), equalTo(moon.getId()));
+    assertThat(wt.getAuthoredLink(), equalTo(authored));
+    assertThat(wt.getPortablePath(), equalTo("/Moon.md#prop:a%20part%20of"));
+    assertThat(wt.getDestinationNoteId(), equalTo(moon.getId()));
   }
 
   @Test
@@ -192,7 +192,7 @@ class TextContentControllerUpdateNoteContentTests extends TextContentControllerT
     NoteRealm response =
         controller.updateNoteContent(carrier, contentDto("[[Moon#prop:a%20part%20of]]"));
 
-    assertThat(response.getWikiTitles(), empty());
+    assertThat(response.getWikiLinks(), empty());
   }
 
   @Test
@@ -211,7 +211,7 @@ class TextContentControllerUpdateNoteContentTests extends TextContentControllerT
         controller.updateNoteContent(carrier, contentDto("[[Moon#prop:Name]] [[Moon#prop:name]]"));
 
     assertThat(
-        response.getWikiTitles().stream().map(WikiTitle::getLinkText).toList(),
+        response.getWikiLinks().stream().map(WikiLink::getAuthoredLink).toList(),
         equalTo(List.of("Moon#prop:Name", "Moon#prop:name")));
     assertThat(
         noteWikiTitleCacheRepository.findByNote_IdOrderByIdAsc(carrier.getId()).stream()

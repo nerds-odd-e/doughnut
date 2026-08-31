@@ -2,13 +2,13 @@ import { describe, expect, it } from "vitest"
 import {
   decodeWikiLinkPropertyKey,
   encodeWikiLinkPropertyKey,
-  formatWikiLinkAuthoredTarget,
-  parseWikiLinkAuthoredTarget,
-  withWikiLinkAuthoredNoteTarget,
-} from "@/utils/wikiLinkAuthoredTarget"
+  formatPortablePath,
+  parsePortablePath,
+  withPortablePathQualifiedNotePortion,
+} from "@/utils/portablePath"
 
 /**
- * Shared fixture table with WikiLinkAuthoredTargetTest (spaces, Unicode, `/`,
+ * Shared fixture table with PortablePathTest (spaces, Unicode, `/`,
  * `%`, `|`, `]`, `?`, `#`, mixed-case, unreserved). ADR 0004: UTF-8 `%HH`,
  * unreserved literal, product uppercase hex.
  */
@@ -25,7 +25,7 @@ const encodedPropertyKeyPairs: ReadonlyArray<readonly [string, string]> = [
   ["Az09-._~", "Az09-._~"],
 ]
 
-describe("wikiLinkAuthoredTarget", () => {
+describe("portablePath", () => {
   it.each(encodedPropertyKeyPairs)(
     "encodePropertyKey uses RFC 3986 unreserved and uppercase hex: %s → %s",
     (yamlKey, encoded) => {
@@ -60,57 +60,55 @@ describe("wikiLinkAuthoredTarget", () => {
   })
 
   it("parse of a note-only target has no property suffix", () => {
-    const parsed = parseWikiLinkAuthoredTarget("Moon")
-    expect(parsed.noteTarget).toBe("Moon")
+    const parsed = parsePortablePath("Moon")
+    expect(parsed.qualifiedNotePortion).toBe("Moon")
     expect(parsed.encodedPropertyKey).toBeUndefined()
-    expect(formatWikiLinkAuthoredTarget(parsed)).toBe("Moon")
+    expect(formatPortablePath(parsed)).toBe("Moon")
   })
 
   it("parse splits on the first #prop: separator", () => {
-    const parsed = parseWikiLinkAuthoredTarget("Moon#prop:a%20part%20of")
-    expect(parsed.noteTarget).toBe("Moon")
+    const parsed = parsePortablePath("Moon#prop:a%20part%20of")
+    expect(parsed.qualifiedNotePortion).toBe("Moon")
     expect(parsed.encodedPropertyKey).toBe("a%20part%20of")
-    expect(formatWikiLinkAuthoredTarget(parsed)).toBe("Moon#prop:a%20part%20of")
+    expect(formatPortablePath(parsed)).toBe("Moon#prop:a%20part%20of")
   })
 
   it("parse keeps qualified and path-shaped note targets before the separator", () => {
     expect(
-      parseWikiLinkAuthoredTarget("Sky:Moon#prop:a%20part%20of").noteTarget
+      parsePortablePath("Sky:Moon#prop:a%20part%20of").qualifiedNotePortion
     ).toBe("Sky:Moon")
     expect(
-      parseWikiLinkAuthoredTarget("/Solar/Moon.md#prop:a%20part%20of")
-        .noteTarget
+      parsePortablePath("/Solar/Moon.md#prop:a%20part%20of")
+        .qualifiedNotePortion
     ).toBe("/Solar/Moon.md")
   })
 
   it("parse of a title containing literal #prop: cannot be the sole unqualified target", () => {
-    const parsed = parseWikiLinkAuthoredTarget("Foo#prop:bar")
-    expect(parsed.noteTarget).toBe("Foo")
+    const parsed = parsePortablePath("Foo#prop:bar")
+    expect(parsed.qualifiedNotePortion).toBe("Foo")
     expect(parsed.encodedPropertyKey).toBe("bar")
   })
 
   it("parse splits on the first marker when the encoded component contains another", () => {
-    const parsed = parseWikiLinkAuthoredTarget("Foo#prop:bar#prop:baz")
-    expect(parsed.noteTarget).toBe("Foo")
+    const parsed = parsePortablePath("Foo#prop:bar#prop:baz")
+    expect(parsed.qualifiedNotePortion).toBe("Foo")
     expect(parsed.encodedPropertyKey).toBe("bar#prop:baz")
   })
 
-  it("withNoteTarget preserves the encoded property suffix", () => {
-    const rewritten = withWikiLinkAuthoredNoteTarget(
-      parseWikiLinkAuthoredTarget("Moon#prop:a%20part%20of"),
+  it("withQualifiedNotePortion preserves the encoded property suffix", () => {
+    const rewritten = withPortablePathQualifiedNotePortion(
+      parsePortablePath("Moon#prop:a%20part%20of"),
       "Luna"
     )
-    expect(formatWikiLinkAuthoredTarget(rewritten)).toBe(
-      "Luna#prop:a%20part%20of"
-    )
+    expect(formatPortablePath(rewritten)).toBe("Luna#prop:a%20part%20of")
   })
 
   it("format from a decoded key uses product encoding", () => {
     const target = {
-      noteTarget: "Moon",
+      qualifiedNotePortion: "Moon",
       encodedPropertyKey: encodeWikiLinkPropertyKey("a part of"),
     }
-    expect(formatWikiLinkAuthoredTarget(target)).toBe("Moon#prop:a%20part%20of")
+    expect(formatPortablePath(target)).toBe("Moon#prop:a%20part%20of")
     expect(decodeWikiLinkPropertyKey(target.encodedPropertyKey)).toBe(
       "a part of"
     )
@@ -119,13 +117,13 @@ describe("wikiLinkAuthoredTarget", () => {
   it("decoded property key is empty when the encoded component is invalid", () => {
     expect(
       decodeWikiLinkPropertyKey(
-        parseWikiLinkAuthoredTarget("Moon#prop:%ZZ").encodedPropertyKey
+        parsePortablePath("Moon#prop:%ZZ").encodedPropertyKey
       )
     ).toBeUndefined()
   })
 
   it("has a property suffix when the separator is present even if the encoded key is empty", () => {
-    const parsed = parseWikiLinkAuthoredTarget("Moon#prop:")
+    const parsed = parsePortablePath("Moon#prop:")
     expect(parsed.encodedPropertyKey).toBe("")
     expect(parsed.encodedPropertyKey).not.toBeUndefined()
     expect(decodeWikiLinkPropertyKey(parsed.encodedPropertyKey)).toBeUndefined()

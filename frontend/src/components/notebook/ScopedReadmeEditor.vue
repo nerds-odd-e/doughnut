@@ -14,7 +14,7 @@
         :scope-name="richEditorScopeName"
         field="content"
         :readonly="false"
-        :wiki-titles="[]"
+        :wiki-links="[]"
         :is-readme-context="true"
         @update:model-value="propose"
         @blur="flushAutosave"

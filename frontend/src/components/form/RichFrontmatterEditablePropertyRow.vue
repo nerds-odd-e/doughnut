@@ -55,7 +55,7 @@
           v-if="isTextCapablePropertyRow(modelValue)"
           :model-value="scalarValue"
           :property-row="modelValue"
-          :wiki-titles="wikiTitles"
+          :wiki-links="wikiLinks"
           :last-saved-markdown="lastSavedMarkdown"
           :row-index="idx"
           @update:model-value="onValueUpdate"
@@ -146,7 +146,7 @@ import RichFrontmatterPropertyExternalLink from "@/components/form/RichFrontmatt
 import RichFrontmatterPropertyKeyPresets from "@/components/form/RichFrontmatterPropertyKeyPresets.vue"
 import RichFrontmatterScalarPropertyValue from "@/components/form/RichFrontmatterScalarPropertyValue.vue"
 import RelationTypeSelectCompact from "@/components/wiki-link-or-relationship/RelationTypeSelectCompact.vue"
-import type { WikiTitle } from "@generated/donut-backend-api"
+import type { WikiLink } from "@generated/donut-backend-api"
 import {
   isImagePropertyKey,
   isRelationPropertyKey,
@@ -168,7 +168,7 @@ import {
 const props = defineProps<{
   modelValue: PropertyRow
   idx: number
-  wikiTitles: WikiTitle[]
+  wikiLinks: WikiLink[]
   lastSavedMarkdown?: string
   keyInputId: string
   presetListId: string

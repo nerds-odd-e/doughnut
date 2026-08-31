@@ -8,7 +8,7 @@ import {
   frontmatterScalar,
   parseNoteContentMarkdown,
 } from "@/utils/noteContentFrontmatter"
-import { wikiTitleNoteIdLookup } from "@/utils/wikiLinkMarkup"
+import { wikiLinkNoteIdLookup } from "@/utils/wikiLinkMarkup"
 
 const RELATIONSHIP_NOTE_TYPE = "relationship"
 
@@ -40,7 +40,7 @@ export function qualifyRelationNoteForReduceOnDelete(
 
   const sourceNoteId = noteIdForAuthoredToken(
     sourceToken,
-    wikiTitleNoteIdLookup(noteRealm.wikiTitles ?? [])
+    wikiLinkNoteIdLookup(noteRealm.wikiLinks ?? [])
   )
   if (sourceNoteId === undefined) return
 

@@ -5,7 +5,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
 
-import com.odde.donut.controllers.dto.WikiTitle;
+import com.odde.donut.controllers.dto.WikiLink;
 import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.NoteWikiTitleCache;
@@ -52,7 +52,7 @@ class WikiTitleCacheViewerQueriesTest {
     assertThat(rows.get(1).getLinkText(), equalTo("Same|second label"));
     assertThat(rows.get(1).getTargetNote().getId(), equalTo(shared.getId()));
 
-    List<WikiTitle> titles = wikiTitleCacheService.wikiTitlesForViewer(carrier, user);
+    List<WikiLink> titles = wikiTitleCacheService.wikiTitlesForViewer(carrier, user);
     assertThat(titles, hasSize(2));
     assertThat(titles.get(0).getDisplayText(), equalTo("first label"));
     assertThat(titles.get(1).getDisplayText(), equalTo("second label"));
@@ -68,12 +68,12 @@ class WikiTitleCacheViewerQueriesTest {
 
     wikiTitleCacheService.refreshForNote(carrier, user);
 
-    List<WikiTitle> titles = wikiTitleCacheService.wikiTitlesForViewer(carrier, user);
+    List<WikiLink> titles = wikiTitleCacheService.wikiTitlesForViewer(carrier, user);
     assertThat(titles, hasSize(1));
-    assertThat(titles.get(0).getLinkText(), equalTo("[label](/Folder/Title.md)"));
-    assertThat(titles.get(0).getTargetToken(), equalTo("/Folder/Title.md"));
+    assertThat(titles.get(0).getAuthoredLink(), equalTo("[label](/Folder/Title.md)"));
+    assertThat(titles.get(0).getPortablePath(), equalTo("/Folder/Title.md"));
     assertThat(titles.get(0).getDisplayText(), equalTo("label"));
-    assertThat(titles.get(0).getNoteId(), equalTo(target.getId()));
+    assertThat(titles.get(0).getDestinationNoteId(), equalTo(target.getId()));
   }
 
   @Test

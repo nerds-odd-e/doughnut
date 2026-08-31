@@ -5,7 +5,7 @@
       :key="rowClientIds[idx]"
       v-model="propertyRows[idx]!"
       :idx="idx"
-      :wiki-titles="wikiTitles"
+      :wiki-links="wikiLinks"
       :last-saved-markdown="lastSavedMarkdown"
       :note-id="noteId"
       :property-rows="propertyRows"
@@ -28,14 +28,14 @@
 import RichFrontmatterEditablePropertyRow from "@/components/form/RichFrontmatterEditablePropertyRow.vue"
 import { useFocusedNoteProperty } from "@/composables/useFocusedNoteProperty"
 import { usePropertyRowClientIds } from "@/composables/usePropertyRowClientIds"
-import type { WikiTitle } from "@generated/donut-backend-api"
+import type { WikiLink } from "@generated/donut-backend-api"
 import type { PropertyRow } from "@/utils/noteContentFrontmatter"
 import type { DeadWikiLinkPayload } from "@/utils/wikiLinkMarkup"
 
 const propertyRows = defineModel<PropertyRow[]>({ required: true })
 
 const props = defineProps<{
-  wikiTitles: WikiTitle[]
+  wikiLinks: WikiLink[]
   lastSavedMarkdown?: string
   noteId?: number
   headingId: string

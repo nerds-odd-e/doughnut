@@ -6,7 +6,7 @@ import {
   noteShowHref,
   noteShowLocation,
 } from "@/routes/noteShowLocation"
-import { wikiTitleFromAuthoredToken } from "@/utils/wikiLinkMarkup"
+import { wikiLinkFromAuthoredToken } from "@/utils/wikiLinkMarkup"
 import { vi } from "vitest"
 import { propertyRowSelector } from "./propertiesTestDom"
 import {
@@ -42,7 +42,7 @@ Body`
     const inFlight = propertyWikiLinkMarkdown("WikiLinks E2E Nowhere")
     const wrapper = await h.mountEditor(inFlight, {
       lastSavedMarkdown: saved,
-      wikiTitles: [],
+      wikiLinks: [],
     })
     const valueField = () =>
       wrapper.find('[data-testid="rich-note-property-row-value-input"]')
@@ -52,7 +52,7 @@ Body`
       valueField().find("a.pending-wiki-link").attributes("data-wiki-title")
     ).toBe("WikiLinks E2E Nowhere")
 
-    await wrapper.setProps({ lastSavedMarkdown: inFlight, wikiTitles: [] })
+    await wrapper.setProps({ lastSavedMarkdown: inFlight, wikiLinks: [] })
     await flushPromises()
 
     expect(valueField().find("a.pending-wiki-link").exists()).toBe(false)
@@ -66,7 +66,7 @@ Body`
     const markdown = propertyWikiLinkMarkdown(token)
     const wrapper = await h.mountEditor(markdown, {
       lastSavedMarkdown: markdown,
-      wikiTitles: [wikiTitleFromAuthoredToken(token, 42)],
+      wikiLinks: [wikiLinkFromAuthoredToken(token, 42)],
       route: noteShowLocation(99),
       noteId: 99,
     })
@@ -86,11 +86,11 @@ Body`
     )
   })
 
-  it("shows a property wiki link as live when wikiTitles resolve it", async () => {
+  it("shows a property wiki link as live when wikiLinks resolve it", async () => {
     const markdown = propertyWikiLinkMarkdown("My Note")
     const wrapper = await h.mountEditor(markdown, {
       lastSavedMarkdown: markdown,
-      wikiTitles: [wikiTitleFromAuthoredToken("My Note", 42)],
+      wikiLinks: [wikiLinkFromAuthoredToken("My Note", 42)],
     })
     const live = wrapper.find(
       '[data-testid="rich-note-property-row-value-input"] a.donut-wiki-link'
@@ -102,7 +102,7 @@ Body`
     const wrapper = await h.mountEditor(
       relationshipNoteContent("a-part-of", "[Moon](/Moon.md)", "[[Earth]]"),
       {
-        wikiTitles: [wikiTitleFromAuthoredToken("[Moon](/Moon.md)", 42)],
+        wikiLinks: [wikiLinkFromAuthoredToken("[Moon](/Moon.md)", 42)],
       }
     )
     const live = wrapper

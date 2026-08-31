@@ -19,7 +19,7 @@
 <script setup lang="ts">
 import { ref, watch, onMounted, type PropType } from "vue"
 import { useRouter } from "vue-router"
-import type { WikiTitle } from "@generated/donut-backend-api"
+import type { WikiLink } from "@generated/donut-backend-api"
 import {
   handleRichContentAnchorClick,
   type DeadWikiLinkPayload,
@@ -31,8 +31,8 @@ import {
 
 const props = defineProps({
   modelValue: { type: String, required: true },
-  wikiTitles: {
-    type: Array as PropType<WikiTitle[]>,
+  wikiLinks: {
+    type: Array as PropType<WikiLink[]>,
     required: true,
   },
   lastSavedMarkdown: { type: String, default: undefined },
@@ -57,7 +57,7 @@ function pushDisplayHtml(plain: string) {
   if (!root.value) return
   root.value.innerHTML = propertyValuePlainToDisplayHtml(
     plain,
-    props.wikiTitles,
+    props.wikiLinks,
     props.lastSavedMarkdown
   )
 }
@@ -77,7 +77,7 @@ watch(
 )
 
 watch(
-  () => [props.wikiTitles, props.lastSavedMarkdown] as const,
+  () => [props.wikiLinks, props.lastSavedMarkdown] as const,
   () => {
     restyleFromPlain(props.modelValue ?? "")
   },

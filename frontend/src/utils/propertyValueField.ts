@@ -1,4 +1,4 @@
-import type { WikiTitle } from "@generated/donut-backend-api"
+import type { WikiLink } from "@generated/donut-backend-api"
 import {
   authoredLinkOccurrences,
   noteIdForAuthoredToken,
@@ -19,7 +19,7 @@ import {
   wikiAnchorToMarkdownToken,
   wikiLinkAnchorHtml,
   wikiLinkBracketedInnerHtml,
-  wikiTitleNoteIdLookup,
+  wikiLinkNoteIdLookup,
 } from "@/utils/wikiLinkMarkup"
 import { hrefForResolvedWikiTarget } from "@/utils/wikiLinkResolvedLocation"
 
@@ -30,10 +30,10 @@ import { hrefForResolvedWikiTarget } from "@/utils/wikiLinkResolvedLocation"
  */
 export function propertyValuePlainToDisplayHtml(
   plain: string,
-  wikiTitles: WikiTitle[],
+  wikiLinks: WikiLink[],
   lastSavedMarkdown?: string
 ): string {
-  const map = wikiTitleNoteIdLookup(wikiTitles)
+  const map = wikiLinkNoteIdLookup(wikiLinks)
   const lastSavedTokens = lastSavedAuthoredTokens(lastSavedMarkdown)
 
   let out = ""

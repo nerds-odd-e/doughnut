@@ -9,7 +9,7 @@
         v-if="listValue"
         :value="listValue"
         :property-key="propertyKey"
-        :wiki-titles="wikiTitles"
+        :wiki-links="wikiLinks"
         :last-saved-markdown="lastSavedMarkdown"
         @dead-wiki-link-click="emit('dead-wiki-link-click', $event)"
       />
@@ -21,7 +21,7 @@
     >
       <PropertyValueField
         :model-value="scalarValue"
-        :wiki-titles="wikiTitles"
+        :wiki-links="wikiLinks"
         :last-saved-markdown="lastSavedMarkdown"
         :aria-label="valueAriaLabel"
         data-testid="rich-note-property-row-value-input"
@@ -64,7 +64,7 @@ import RichFrontmatterListPropertyValue from "@/components/form/RichFrontmatterL
 import RichFrontmatterPropertyExternalLink from "@/components/form/RichFrontmatterPropertyExternalLink.vue"
 import RichFrontmatterPropertyValueDialog from "@/components/form/RichFrontmatterPropertyValueDialog.vue"
 import PropertyValueField from "@/components/form/PropertyValueField.vue"
-import type { WikiTitle } from "@generated/donut-backend-api"
+import type { WikiLink } from "@generated/donut-backend-api"
 import {
   isScalarOnlyStructuralPropertyKey,
   isTextCapablePropertyRow,
@@ -82,7 +82,7 @@ import { primeSoftKeyboard } from "@/utils/focusTarget"
 const props = defineProps<{
   modelValue: string
   propertyRow: PropertyRow
-  wikiTitles: WikiTitle[]
+  wikiLinks: WikiLink[]
   lastSavedMarkdown?: string
   rowIndex: number
 }>()

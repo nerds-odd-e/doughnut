@@ -16,13 +16,13 @@ import {
 } from "./searchDialogTestSupport"
 
 export const deadWikiLinkPayload = {
-  targetToken: "original text",
+  portablePath: "original text",
   displayText: "original text",
 } as const
 
 export async function pointDeadWikiLinkAndCaptureUpdate(args: {
   content: string
-  payload: { targetToken: string; displayText: string }
+  payload: { portablePath: string; displayText: string }
   typeIn: string
   searchHits: ReturnType<typeof makeNoteHit>[]
   targetRealm?: ReturnType<typeof MakeMe.aNoteRealm.please>
@@ -71,7 +71,7 @@ export async function pointPathMarkdownDeadLinkAndCaptureUpdate(args: {
     .please()
   return pointDeadWikiLinkAndCaptureUpdate({
     content: args.content,
-    payload: { targetToken: args.deadHref, displayText: "label" },
+    payload: { portablePath: args.deadHref, displayText: "label" },
     typeIn: "Title",
     searchHits: [
       {

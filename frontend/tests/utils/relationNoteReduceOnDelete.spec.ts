@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest"
 import makeMe from "donut-test-fixtures/makeMe"
 import { qualifyRelationNoteForReduceOnDelete } from "@/utils/relationNoteReduceOnDelete"
-import { wikiTitleFromAuthoredToken } from "@/utils/wikiLinkMarkup"
+import { wikiLinkFromAuthoredToken } from "@/utils/wikiLinkMarkup"
 import { relationshipNoteContent } from "@tests/notes/relationshipNoteTestContent"
 
 describe("qualifyRelationNoteForReduceOnDelete", () => {
@@ -11,9 +11,9 @@ describe("qualifyRelationNoteForReduceOnDelete", () => {
   it("qualifies when type, relation, resolvable source, and target are present", () => {
     const realm = makeMe.aNoteRealm
       .content(relationshipNoteContent("a-part-of", "[[Moon]]", "[[Earth]]"))
-      .wikiTitles([
-        wikiTitleFromAuthoredToken("Moon", moonId),
-        wikiTitleFromAuthoredToken("Earth", earthId),
+      .wikiLinks([
+        wikiLinkFromAuthoredToken("Moon", moonId),
+        wikiLinkFromAuthoredToken("Earth", earthId),
       ])
       .please()
 
@@ -28,7 +28,7 @@ describe("qualifyRelationNoteForReduceOnDelete", () => {
       .content(
         relationshipNoteContent("a-part-of", "[Moon](/Moon.md)", "[[Earth]]")
       )
-      .wikiTitles([wikiTitleFromAuthoredToken("[Moon](/Moon.md)", moonId)])
+      .wikiLinks([wikiLinkFromAuthoredToken("[Moon](/Moon.md)", moonId)])
       .please()
 
     expect(qualifyRelationNoteForReduceOnDelete(realm)?.sourceNoteId).toBe(
@@ -47,7 +47,7 @@ describe("qualifyRelationNoteForReduceOnDelete", () => {
   it("returns undefined when source wiki link does not resolve", () => {
     const realm = makeMe.aNoteRealm
       .content(relationshipNoteContent("a-part-of", "[[Moon]]", "[[Earth]]"))
-      .wikiTitles([wikiTitleFromAuthoredToken("Earth", earthId)])
+      .wikiLinks([wikiLinkFromAuthoredToken("Earth", earthId)])
       .please()
 
     expect(qualifyRelationNoteForReduceOnDelete(realm)).toBeUndefined()
@@ -61,7 +61,7 @@ source: "[[Moon]]"
 target: "[[Earth]]"
 ---
 `)
-      .wikiTitles([wikiTitleFromAuthoredToken("Moon", moonId)])
+      .wikiLinks([wikiLinkFromAuthoredToken("Moon", moonId)])
       .please()
 
     expect(qualifyRelationNoteForReduceOnDelete(realm)).toBeUndefined()

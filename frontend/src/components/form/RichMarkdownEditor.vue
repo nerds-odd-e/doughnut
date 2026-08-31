@@ -4,7 +4,7 @@
       ref="frontmatterPropertiesRef"
       :content-markdown="modelValue ?? ''"
       :read-only="readonly"
-      :wiki-titles="wikiTitles"
+      :wiki-links="wikiLinks"
       :last-saved-markdown="lastSavedMarkdown"
       :note-title-for-wikidata-search="noteTitleForWikidataSearch"
       :note-id="noteId"
@@ -47,7 +47,7 @@ import { computed, nextTick, ref, type PropType } from "vue"
 import QuillEditor from "./QuillEditor.vue"
 import RichFrontmatterProperties from "./RichFrontmatterProperties.vue"
 import markdownizer from "./markdownizer"
-import type { WikiTitle } from "@generated/donut-backend-api"
+import type { WikiLink } from "@generated/donut-backend-api"
 import { replaceWikiLinksInHtml } from "./replaceWikiLinksInHtml"
 import {
   composeNoteContentFromPropertyRows,
@@ -66,7 +66,7 @@ const props = defineProps({
   title: String,
   errors: Object,
   readonly: Boolean,
-  wikiTitles: { type: Array as PropType<WikiTitle[]>, required: true },
+  wikiLinks: { type: Array as PropType<WikiLink[]>, required: true },
   lastSavedMarkdown: { type: String, default: undefined },
   noteTitleForWikidataSearch: { type: String, default: "" },
   noteId: { type: Number as PropType<number | undefined>, default: undefined },
@@ -113,7 +113,7 @@ const markdownForRichDisplay = computed(() => {
 })
 
 const htmlWithWikiLinks = (html: string) =>
-  replaceWikiLinksInHtml(html, props.wikiTitles, props.lastSavedMarkdown)
+  replaceWikiLinksInHtml(html, props.wikiLinks, props.lastSavedMarkdown)
 
 const htmlValue = computed(() => {
   const p = parsedContent.value

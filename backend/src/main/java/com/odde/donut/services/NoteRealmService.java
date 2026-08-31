@@ -39,8 +39,8 @@ public class NoteRealmService {
 
   public NoteRealm build(Note note, User viewer) {
     Note focus = hydrateNote(note);
-    var wikiTitles = wikiTitleCacheService.wikiTitlesForViewer(focus, viewer);
-    NoteRealm realm = new NoteRealm(focus, wikiTitles);
+    var wikiLinks = wikiTitleCacheService.wikiTitlesForViewer(focus, viewer);
+    NoteRealm realm = new NoteRealm(focus, wikiLinks);
     List<Note> refNotes =
         hydrateNoteList(wikiTitleCacheService.referencesNotesForViewer(focus, viewer));
     realm.setReferences(refNotes.stream().map(Note::getNoteTopology).toList());

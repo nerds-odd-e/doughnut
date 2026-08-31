@@ -9,7 +9,7 @@ import {
   escapeHtmlForWikiLinkDisplay,
   wikiLinkAnchorHtml,
   wikiLinkBracketedInnerHtml,
-  wikiTitleFromAuthoredToken,
+  wikiLinkFromAuthoredToken,
 } from "@/utils/wikiLinkMarkup"
 
 describe("propertyValueField utils", () => {
@@ -40,7 +40,7 @@ describe("propertyValueField utils", () => {
     const wrap = document.createElement("div")
     wrap.innerHTML = propertyValuePlainToDisplayHtml("[[Missing|Shown]]", [])
     const a = wrap.querySelector("a.dead-wiki-link") as HTMLAnchorElement
-    expect(deadWikiLinkPayloadFromAnchor(a).targetToken).toBe("Missing")
+    expect(deadWikiLinkPayloadFromAnchor(a).portablePath).toBe("Missing")
   })
 
   it("turns only well-formed wiki markers into dead-wiki-link anchors with visible brackets", () => {
@@ -66,7 +66,7 @@ describe("propertyValueField utils", () => {
 
   it("renders resolved path Markdown in a scalar as a live wiki-style link", () => {
     const html = propertyValuePlainToDisplayHtml("[Moon](/Moon.md)", [
-      wikiTitleFromAuthoredToken("[Moon](/Moon.md)", 42),
+      wikiLinkFromAuthoredToken("[Moon](/Moon.md)", 42),
     ])
     expect(html).toBe(
       `<a href="${noteShowHref(42)}" class="donut-wiki-link" data-wiki-title="/Moon.md" data-wiki-display="Moon" data-note-id="42">Moon</a>`
@@ -83,7 +83,7 @@ describe("propertyValueField utils", () => {
   it("round-trips path Markdown from a field root without converting to wiki", () => {
     const root = document.createElement("div")
     root.innerHTML = propertyValuePlainToDisplayHtml("[Moon](/Moon.md)", [
-      wikiTitleFromAuthoredToken("[Moon](/Moon.md)", 42),
+      wikiLinkFromAuthoredToken("[Moon](/Moon.md)", 42),
     ])
     expect(root.querySelector("a.donut-wiki-link")).not.toBeNull()
     expect(serializePropertyValueFieldRoot(root)).toBe("[Moon](/Moon.md)")
@@ -133,10 +133,10 @@ describe("propertyValueField utils", () => {
     expect(html).not.toContain("pending-wiki-link")
   })
 
-  it("keeps a wikiTitles hit live even when last-saved markdown is provided", () => {
+  it("keeps a wikiLinks hit live even when last-saved markdown is provided", () => {
     const html = propertyValuePlainToDisplayHtml(
       "[[My Note]]",
-      [wikiTitleFromAuthoredToken("My Note", 42)],
+      [wikiLinkFromAuthoredToken("My Note", 42)],
       "topic: old"
     )
     expect(html).toContain("donut-wiki-link")
@@ -153,7 +153,7 @@ describe("propertyValueField utils", () => {
 
   it("resolves wiki markers when title is known", () => {
     const html = propertyValuePlainToDisplayHtml("[[My Note]]", [
-      wikiTitleFromAuthoredToken("My Note", 42),
+      wikiLinkFromAuthoredToken("My Note", 42),
     ])
     expect(html).toContain("donut-wiki-link")
     expect(html).toContain(noteShowHref(42))
@@ -162,7 +162,7 @@ describe("propertyValueField utils", () => {
 
   it("resolves piped wiki marker using target and shows display as visible link", () => {
     const html = propertyValuePlainToDisplayHtml("[[Target Page|friendly]]", [
-      wikiTitleFromAuthoredToken("Target Page|friendly", 99),
+      wikiLinkFromAuthoredToken("Target Page|friendly", 99),
     ])
     expect(html).toContain("donut-wiki-link")
     expect(html).toContain(noteShowHref(99))
@@ -179,7 +179,7 @@ describe("propertyValueField utils", () => {
   it("serializes live link anchors from visible text (textContent)", () => {
     const root = document.createElement("div")
     root.innerHTML = propertyValuePlainToDisplayHtml("[[N]]", [
-      wikiTitleFromAuthoredToken("N", 1),
+      wikiLinkFromAuthoredToken("N", 1),
     ])
     expect(serializePropertyValueFieldRoot(root)).toBe("[[N]]")
   })
@@ -187,7 +187,7 @@ describe("propertyValueField utils", () => {
   it("serializes a wiki anchor as plain text when the user replaced inner content (broken link)", () => {
     const root = document.createElement("div")
     root.innerHTML = propertyValuePlainToDisplayHtml("[[English]]", [
-      wikiTitleFromAuthoredToken("English", 1),
+      wikiLinkFromAuthoredToken("English", 1),
     ])
     const a = root.querySelector("a.donut-wiki-link") as HTMLAnchorElement
     a.textContent = "[[Eng]"
@@ -198,6 +198,6 @@ describe("propertyValueField utils", () => {
     const wrap = document.createElement("div")
     wrap.innerHTML = propertyValuePlainToDisplayHtml("see [[X]]", [])
     const a = wrap.querySelector("a.dead-wiki-link") as HTMLAnchorElement
-    expect(deadWikiLinkPayloadFromAnchor(a).targetToken).toBe("X")
+    expect(deadWikiLinkPayloadFromAnchor(a).portablePath).toBe("X")
   })
 })

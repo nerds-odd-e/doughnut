@@ -27,12 +27,12 @@ export const DEAD_LINK_CLICK_CASES = [
   {
     case: "plain wiki token",
     wikiToken: "Missing Note",
-    expected: { targetToken: "Missing Note", displayText: "Missing Note" },
+    expected: { portablePath: "Missing Note", displayText: "Missing Note" },
   },
   {
     case: "display text",
     wikiToken: "Ghost Page|shown text",
-    expected: { targetToken: "Ghost Page", displayText: "shown text" },
+    expected: { portablePath: "Ghost Page", displayText: "shown text" },
   },
 ] as const
 

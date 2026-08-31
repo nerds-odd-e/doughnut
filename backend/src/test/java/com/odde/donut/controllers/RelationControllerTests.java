@@ -128,7 +128,7 @@ class RelationControllerTests extends ControllerTestBase {
       assertThat(mover.getContent(), equalTo("See [[OldNb:X|X]] and [[OtherNb:Y]]."));
       assertThat(
           wikiTitleCacheService.wikiTitlesForViewer(mover, u).stream()
-              .map(wt -> wt.getNoteId())
+              .map(wt -> wt.getDestinationNoteId())
               .toList(),
           containsInAnyOrder(oldTarget.getId(), qualifiedTarget.getId()));
     }

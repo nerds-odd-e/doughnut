@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest"
 import htmlToMarkdown from "@/components/form/quillHtmlToMarkdown"
 import { replaceWikiLinksInHtml } from "@/components/form/replaceWikiLinksInHtml"
 import { notePropertyHref, noteShowHref } from "@/routes/noteShowLocation"
-import { wikiTitleFromAuthoredToken } from "@/utils/wikiLinkMarkup"
+import { wikiLinkFromAuthoredToken } from "@/utils/wikiLinkMarkup"
 
 describe("quillHtmlToMarkdown", () => {
   it("preserves escaped HTML entities in markdown output", () => {
@@ -83,12 +83,12 @@ describe("quillHtmlToMarkdown", () => {
   })
 
   const linkifiedTwoNotes = [
-    wikiTitleFromAuthoredToken("LeSS in Action", 101),
-    wikiTitleFromAuthoredToken("Odd-e CSD", 202),
+    wikiLinkFromAuthoredToken("LeSS in Action", 101),
+    wikiLinkFromAuthoredToken("Odd-e CSD", 202),
   ]
-  const linkifiedWikiLink99 = [wikiTitleFromAuthoredToken("WikiLink", 9901)]
+  const linkifiedWikiLink99 = [wikiLinkFromAuthoredToken("WikiLink", 9901)]
   const linkifiedPipedResolved = [
-    wikiTitleFromAuthoredToken("MyTarget|shown text", 44),
+    wikiLinkFromAuthoredToken("MyTarget|shown text", 44),
   ]
 
   it.each`

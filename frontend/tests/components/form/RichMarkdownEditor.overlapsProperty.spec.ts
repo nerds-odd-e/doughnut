@@ -5,7 +5,7 @@ import {
   parseNoteContentMarkdown,
 } from "@/utils/noteContentFrontmatter"
 import { noteShowLocation } from "@/routes/noteShowLocation"
-import { wikiTitleFromAuthoredToken } from "@/utils/wikiLinkMarkup"
+import { wikiLinkFromAuthoredToken } from "@/utils/wikiLinkMarkup"
 import {
   propertyRowListValue,
   propertyValidationText,
@@ -108,7 +108,7 @@ describe("RichMarkdownEditor overlaps property", () => {
   it("renders overlaps list items as wiki links (resolved, path live, path dead)", async () => {
     const pathItem = "[Title](/Folder/Title.md)"
     const wrapper = await h.mountEditor(OVERLAPS_LIST_MARKDOWN, {
-      wikiTitles: [wikiTitleFromAuthoredToken("Other Note", 42)],
+      wikiLinks: [wikiLinkFromAuthoredToken("Other Note", 42)],
     })
     await flushPromises()
 
@@ -128,7 +128,7 @@ overlaps:
 ---
 
 Body`,
-      wikiTitles: [wikiTitleFromAuthoredToken(pathItem, 42)],
+      wikiLinks: [wikiLinkFromAuthoredToken(pathItem, 42)],
     })
     await flushPromises()
 
@@ -150,7 +150,7 @@ overlaps:
 ---
 
 Body`,
-      wikiTitles: [],
+      wikiLinks: [],
     })
     await flushPromises()
 
@@ -170,7 +170,7 @@ overlaps:
 Body`
     const wrapper = await h.mountEditor(inFlight, {
       lastSavedMarkdown: OVERLAPS_LIST_MARKDOWN,
-      wikiTitles: [],
+      wikiLinks: [],
     })
     await flushPromises()
 
@@ -180,7 +180,7 @@ Body`
     )
     expect(list.find("a.dead-wiki-link").text()).toBe("Other Note")
 
-    await wrapper.setProps({ lastSavedMarkdown: inFlight, wikiTitles: [] })
+    await wrapper.setProps({ lastSavedMarkdown: inFlight, wikiLinks: [] })
     await flushPromises()
 
     expect(list.find("a.pending-wiki-link").exists()).toBe(false)

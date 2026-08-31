@@ -20,7 +20,7 @@
           v-if="isListPropertyValue(row.value)"
           :value="row.value"
           :property-key="row.key"
-          :wiki-titles="wikiTitles"
+          :wiki-links="wikiLinks"
           :last-saved-markdown="lastSavedMarkdown"
           compact
         />
@@ -61,7 +61,7 @@
 import RichFrontmatterListPropertyValue from "@/components/form/RichFrontmatterListPropertyValue.vue"
 import RichFrontmatterPropertyExternalLink from "@/components/form/RichFrontmatterPropertyExternalLink.vue"
 import { useFocusedNoteProperty } from "@/composables/useFocusedNoteProperty"
-import type { WikiTitle } from "@generated/donut-backend-api"
+import type { WikiLink } from "@generated/donut-backend-api"
 import { relationLabelFromKebab } from "@/models/relationTypeOptions"
 import {
   isRelationPropertyKey,
@@ -73,7 +73,7 @@ import { isListPropertyValue } from "@/utils/noteProperties"
 
 defineProps<{
   propertyRows: PropertyRow[]
-  wikiTitles: WikiTitle[]
+  wikiLinks: WikiLink[]
   lastSavedMarkdown?: string
 }>()
 

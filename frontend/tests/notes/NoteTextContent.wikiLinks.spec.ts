@@ -1,6 +1,6 @@
 import makeMe from "donut-test-fixtures/makeMe"
 import { noteShowHref } from "@/routes/noteShowLocation"
-import { wikiTitleFromAuthoredToken } from "@/utils/wikiLinkMarkup"
+import { wikiLinkFromAuthoredToken } from "@/utils/wikiLinkMarkup"
 import { type VueWrapper, flushPromises } from "@vue/test-utils"
 import { afterEach, describe, expect, it, vi } from "vitest"
 import type { ComponentPublicInstance } from "vue"
@@ -43,8 +43,8 @@ describe("NoteTextContent wiki link display", () => {
       makeMe.aNote.content("Go [[Target Title|friendly label]] ok.").please(),
       {
         readonly: true,
-        wikiTitles: [
-          wikiTitleFromAuthoredToken(
+        wikiLinks: [
+          wikiLinkFromAuthoredToken(
             "Target Title|friendly label",
             targetNote.id!
           ),
@@ -86,8 +86,8 @@ describe("NoteTextContent wiki link display", () => {
       makeMe.aNote.content("See [label](/Folder/Title.md).").please(),
       {
         readonly: true,
-        wikiTitles: [
-          wikiTitleFromAuthoredToken(
+        wikiLinks: [
+          wikiLinkFromAuthoredToken(
             "[label](/Folder/Title.md)",
             targetNote.id!
           ),
@@ -115,10 +115,10 @@ describe("NoteTextContent wiki link display", () => {
     const inFlightContent = `${savedContent} See [[WikiLinks E2E Nowhere]].`
 
     const releaseSave = holdNoteContentSave((content) =>
-      makeMe.aNoteRealm.id(note.id!).content(content).wikiTitles([]).please()
+      makeMe.aNoteRealm.id(note.id!).content(content).wikiLinks([]).please()
     )
 
-    wrapper = mountNoteTextContent(note, { readonly: false, wikiTitles: [] })
+    wrapper = mountNoteTextContent(note, { readonly: false, wikiLinks: [] })
     await flushPromises()
     await vi.waitUntil(() =>
       document.querySelector(".ql-editor a.dead-wiki-link")
@@ -151,7 +151,7 @@ describe("NoteTextContent wiki link display", () => {
         .title("Wiki carrier")
         .content(inFlightContent)
         .please(),
-      wikiTitles: [],
+      wikiLinks: [],
     })
     await flushPromises()
     await vi.waitUntil(
@@ -174,8 +174,8 @@ describe("NoteTextContent wiki link display", () => {
       .content(savedContent)
       .please()
     const targetNote = makeMe.aNote.title("WikiLinks E2E CI").please()
-    const liveWikiTitles = [
-      wikiTitleFromAuthoredToken("WikiLinks E2E CI", targetNote.id!),
+    const liveWikiLinks = [
+      wikiLinkFromAuthoredToken("WikiLinks E2E CI", targetNote.id!),
     ]
     const inFlightContent = `${savedContent} See [[WikiLinks E2E CI]].`
 
@@ -183,11 +183,11 @@ describe("NoteTextContent wiki link display", () => {
       makeMe.aNoteRealm
         .id(note.id!)
         .content(content)
-        .wikiTitles(liveWikiTitles)
+        .wikiLinks(liveWikiLinks)
         .please()
     )
 
-    wrapper = mountNoteTextContent(note, { readonly: false, wikiTitles: [] })
+    wrapper = mountNoteTextContent(note, { readonly: false, wikiLinks: [] })
     await flushPromises()
 
     wrapper
@@ -206,7 +206,7 @@ describe("NoteTextContent wiki link display", () => {
         .title("Wiki carrier")
         .content(inFlightContent)
         .please(),
-      wikiTitles: liveWikiTitles,
+      wikiLinks: liveWikiLinks,
     })
     await flushPromises()
     await vi.waitUntil(() =>

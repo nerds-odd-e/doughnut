@@ -16,7 +16,7 @@
       <span v-if="index > 0" aria-hidden="true">, </span>
       <WikiLinkToken
         :token="item"
-        :wiki-titles="wikiTitles ?? []"
+        :wiki-links="wikiLinks ?? []"
         :last-saved-markdown="lastSavedMarkdown"
         @dead-wiki-link-click="emit('deadWikiLinkClick', $event)"
       />
@@ -47,7 +47,7 @@
 import { computed } from "vue"
 import RichFrontmatterPropertyExternalLink from "@/components/form/RichFrontmatterPropertyExternalLink.vue"
 import WikiLinkToken from "@/components/notes/WikiLinkToken.vue"
-import type { WikiTitle } from "@generated/donut-backend-api"
+import type { WikiLink } from "@generated/donut-backend-api"
 import { isOverlapsPropertyKey } from "@/utils/authoredOverlapsValidation"
 import { isUrlPropertyKey } from "@/utils/noteContentPropertyKeys"
 import {
@@ -59,7 +59,7 @@ import type { DeadWikiLinkPayload } from "@/utils/wikiLinkMarkup"
 const props = defineProps<{
   value: Extract<PropertyValue, { kind: "list" }>
   propertyKey?: string
-  wikiTitles?: WikiTitle[]
+  wikiLinks?: WikiLink[]
   lastSavedMarkdown?: string
   compact?: boolean
 }>()

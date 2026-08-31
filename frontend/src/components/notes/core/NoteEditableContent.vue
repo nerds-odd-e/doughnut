@@ -28,7 +28,7 @@
         scope-name="note"
         :model-value="value"
         :readonly="readonly"
-        :wiki-titles="wikiTitles"
+        :wiki-links="wikiLinks"
         :last-saved-markdown="noteContent ?? ''"
         :note-title-for-wikidata-search="noteTitleForWikidataSearch"
         :note-id="noteId"
@@ -47,7 +47,7 @@ import { nextTick, onMounted, onUnmounted, ref, type PropType } from "vue"
 import RichMarkdownEditor from "../../form/RichMarkdownEditor.vue"
 import TextContentWrapper from "./TextContentWrapper.vue"
 import TextArea from "@/components/form/TextArea.vue"
-import type { WikiTitle } from "@generated/donut-backend-api"
+import type { WikiLink } from "@generated/donut-backend-api"
 import { useContentCursorInserter } from "@/composables/useContentCursorInserter"
 import { useNoteContentPaste } from "@/composables/useNoteContentPaste"
 import { usePropertyMemoryTrackerGuard } from "@/composables/usePropertyMemoryTrackerGuard"
@@ -67,7 +67,7 @@ const props = defineProps({
   noteContent: { type: String, required: false },
   readonly: { type: Boolean, default: true },
   asMarkdown: Boolean,
-  wikiTitles: { type: Array as PropType<WikiTitle[]>, required: true },
+  wikiLinks: { type: Array as PropType<WikiLink[]>, required: true },
   noteTitleForWikidataSearch: { type: String, default: "" },
   isReadmeContext: { type: Boolean, default: false },
 })

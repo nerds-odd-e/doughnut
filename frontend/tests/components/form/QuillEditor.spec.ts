@@ -156,7 +156,7 @@ describe("QuillEditor.vue", () => {
       await clickEditorAnchor(".ql-editor a.dead-wiki-link")
 
       expect(wrapper.emitted("deadWikiLinkClick")?.[0]).toEqual([
-        { targetToken: "Ghost", displayText: "Ghost" },
+        { portablePath: "Ghost", displayText: "Ghost" },
       ])
     }
   )

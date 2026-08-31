@@ -198,7 +198,7 @@ public class QuestionGenerationRequestBuilder {
           FocusContextMarkdownAugmenter.embedPropertyFocus(
               focusContextMarkdown, propertyFocusBlock);
       focusContextMarkdown =
-          FocusContextMarkdownAugmenter.ensureWikiTitles(
+          FocusContextMarkdownAugmenter.ensureWikiLinks(
               focusContextMarkdown, wikiTitleCacheService.wikiTitlesForViewer(focus, viewer));
     }
 

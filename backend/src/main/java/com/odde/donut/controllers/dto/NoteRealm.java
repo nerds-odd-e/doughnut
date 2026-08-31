@@ -15,7 +15,7 @@ import lombok.Setter;
   "notebookRealm",
   "ancestorFolders",
   "references",
-  "wikiTitles",
+  "wikiLinks",
   "scopedReadmeContent"
 })
 public class NoteRealm {
@@ -30,11 +30,11 @@ public class NoteRealm {
 
   @JsonUnwrapped private final RealmNotebookSidebar sidebar = new RealmNotebookSidebar();
 
-  @Getter private final List<WikiTitle> wikiTitles;
+  @Getter private final List<WikiLink> wikiLinks;
 
-  public NoteRealm(Note note, List<WikiTitle> wikiTitles) {
+  public NoteRealm(Note note, List<WikiLink> wikiLinks) {
     this.note = note;
-    this.wikiTitles = List.copyOf(wikiTitles);
+    this.wikiLinks = List.copyOf(wikiLinks);
   }
 
   @NotNull
