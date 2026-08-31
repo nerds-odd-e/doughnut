@@ -26,16 +26,19 @@ public class WikiLinkRewriteService {
   private final EntityPersister entityPersister;
   private final ResolvedWikiLinkService resolvedWikiLinkService;
   private final PortablePathAuthoring portablePathAuthoring;
+  private final WikiLinkResolver wikiLinkResolver;
 
   public WikiLinkRewriteService(
       ResolvedWikiLinkRepository resolvedWikiLinkRepository,
       EntityPersister entityPersister,
       ResolvedWikiLinkService resolvedWikiLinkService,
-      PortablePathAuthoring portablePathAuthoring) {
+      PortablePathAuthoring portablePathAuthoring,
+      WikiLinkResolver wikiLinkResolver) {
     this.resolvedWikiLinkRepository = resolvedWikiLinkRepository;
     this.entityPersister = entityPersister;
     this.resolvedWikiLinkService = resolvedWikiLinkService;
     this.portablePathAuthoring = portablePathAuthoring;
+    this.wikiLinkResolver = wikiLinkResolver;
   }
 
   /**
@@ -213,6 +216,7 @@ public class WikiLinkRewriteService {
         entityPersister,
         resolvedWikiLinkService,
         portablePathAuthoring,
+        wikiLinkResolver,
         movedNote,
         sourceNotebookName,
         updatedAt,

@@ -574,21 +574,27 @@ wiki-link E2E are green.
 
 ### 30. Already-ambiguous markup is not rewritten
 
-**Status:** planned
+**Status:** done
 **Type:** Behavior
 
-**Precondition:** Authored markup is already an ambiguous shorthand.
-**Trigger:** A rename or move rewrite that would otherwise touch links
-runs.
-**Postcondition:** Donut does not guess a destination or rewrite that
-shorthand.
-
-Test first: one controller case; do not re-assert successful unique
-rewrites.
-
-Verification: `pnpm backend:test_only`.
-
-Stop-safe: maintenance does not invent a destination for ambiguous source.
+`WikiLinkRewriteSupport.applyOutgoingNotebookMoveRewrite` (a moved note's
+own outgoing unqualified links) unconditionally qualified any non-co-moved
+token, assuming it had uniquely resolved in the old notebook. It now checks
+`WikiLinkResolver.isAmbiguousToken(linkText, sourceNotebookName, viewer)`
+first and leaves an already-ambiguous token untouched. Added a
+`String`-notebook-name overload of `isAmbiguousToken`/`resolveRef` on
+`WikiLinkResolver`: the moved note's own `notebook` field is already the
+*new* notebook by rewrite time (`RelationController` moves the note before
+rewriting), so ambiguity must be checked against the explicit old notebook
+name, not `focusNote.getNotebook()`. `WikiLinkRewriteService` now injects
+`WikiLinkResolver` and threads it to the support call. Pinned by
+`RelationControllerTests
+.crossNotebookMove_doesNotQualifyAlreadyAmbiguousOutgoingLink`
+(`MoveNoteToNotebookRootInNotebookTest`), confirmed to fail against the old
+unconditional-qualify code. Rename-rewrite path (slice 28) already guards
+per-referrer via authored-path selection and was not touched. Focused
+backend suite green; post-change-refactor found nothing to change (all
+touched files already under the 250-line cap).
 
 ### 31. Pasting a note URL uses backend-authored unique paths
 

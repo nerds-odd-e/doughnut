@@ -93,6 +93,7 @@ final class WikiLinkRewriteSupport {
       EntityPersister entityPersister,
       ResolvedWikiLinkService resolvedWikiLinkService,
       PortablePathAuthoring portablePathAuthoring,
+      WikiLinkResolver wikiLinkResolver,
       Note movedNote,
       String sourceNotebookName,
       Timestamp updatedAt,
@@ -122,6 +123,9 @@ final class WikiLinkRewriteSupport {
                 ? linkText
                 : WikiLinkMarkdownRewrite.newInnerForAuthoredPortablePath(
                     linkText, authoredPortablePath, true);
+      } else if (wikiLinkResolver.isAmbiguousToken(linkText, sourceNotebookName, viewer)) {
+        // Already ambiguous before the move: don't guess which candidate it meant.
+        newInner = linkText;
       } else {
         newInner =
             WikiLinkMarkdownRewrite.newInnerForQualifyUnqualifiedOutgoingLink(

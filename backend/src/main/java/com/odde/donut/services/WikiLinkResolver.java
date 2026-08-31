@@ -104,7 +104,18 @@ public class WikiLinkResolver {
 
   /** True when, among the viewer's readable candidates for this token, more than one matches. */
   boolean isAmbiguousToken(String token, Note focusNote, User viewer) {
-    return resolveRef(token, focusNote)
+    String focusNotebookName =
+        focusNote.getNotebook() == null ? null : focusNote.getNotebook().getName();
+    return isAmbiguousToken(token, focusNotebookName, viewer);
+  }
+
+  /**
+   * True when, among the viewer's readable candidates for this token resolved against {@code
+   * notebookFallbackName}, more than one matches. Used to check a token's ambiguity in a notebook
+   * scope other than its current note's (e.g. before a cross-notebook move rewrites content).
+   */
+  boolean isAmbiguousToken(String token, String notebookFallbackName, User viewer) {
+    return resolveRef(token, notebookFallbackName)
         .map(ref -> readableNotebookMatches(ref.notebookName(), ref.noteTitle(), viewer).size() > 1)
         .orElse(false);
   }
@@ -137,7 +148,12 @@ public class WikiLinkResolver {
   private Optional<PortablePath.Resolved> resolveRef(String token, Note focusNote) {
     String focusNotebookName =
         focusNote.getNotebook() == null ? null : focusNote.getNotebook().getName();
-    return WikiLinkMarkdown.splitAuthoredToken(token).portablePath().resolve(focusNotebookName);
+    return resolveRef(token, focusNotebookName);
+  }
+
+  /** Parses {@code token} into a notebook/title ref, applying the given notebook-name fallback. */
+  private Optional<PortablePath.Resolved> resolveRef(String token, String notebookFallbackName) {
+    return WikiLinkMarkdown.splitAuthoredToken(token).portablePath().resolve(notebookFallbackName);
   }
 
   private Note uniqueNotebookMatch(String notebookName, String noteTitle) {

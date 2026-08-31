@@ -134,6 +134,25 @@ class RelationControllerTests extends ControllerTestBase {
     }
 
     @Test
+    void crossNotebookMove_doesNotQualifyAlreadyAmbiguousOutgoingLink()
+        throws UnexpectedNoAccessRightException {
+      User u = currentUser.getUser();
+      Notebook nb1 = ownedNotebook("OldNb");
+      Notebook nb2 = ownedNotebook("NewNb");
+      Folder folderA = makeMe.aFolder().notebook(nb1).name("A").please();
+      Folder folderB = makeMe.aFolder().notebook(nb1).name("B").please();
+      makeMe.aNote("X").folder(folderA).please();
+      makeMe.aNote("X").folder(folderB).please();
+      Note mover = makeMe.aNote("Mover").notebook(nb1).content("See [[X]].").please();
+      resolvedWikiLinkService.refreshForNote(mover, u);
+
+      controller.moveNoteToNotebookRootInNotebook(mover, nb2);
+
+      makeMe.refresh(mover);
+      assertThat(mover.getContent(), equalTo("See [[X]]."));
+    }
+
+    @Test
     void crossNotebookMove_doesNotRewriteWhenNotebookUnchanged()
         throws UnexpectedNoAccessRightException {
       User u = currentUser.getUser();
