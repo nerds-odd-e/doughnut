@@ -7,6 +7,7 @@ import com.odde.donut.controllers.dto.AuthoredPortablePath;
 import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
+import com.odde.donut.entities.User;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -92,6 +93,25 @@ class NoteControllerAuthoredPortablePathTests extends ControllerTestBase {
         controller.authoredPortablePath(source, destination, "WikiDup Shared");
 
     assertThat(authored.portablePath(), equalTo("/WikiDup Shared"));
+  }
+
+  @Test
+  void shouldAuthorDisplayNameShorthandWhenOnlyUnreadableNamesakeShares()
+      throws UnexpectedNoAccessRightException {
+    User secretOwner = makeMe.aUser().please();
+    Notebook secretNotebook =
+        makeMe.aNotebook().creatorAndOwner(secretOwner).name("WikiDup Pantry").please();
+    makeMe.aNote().title("WikiDup Shared").notebook(secretNotebook).please();
+
+    Folder pantry =
+        makeMe.aFolder().notebookOwnedBy(currentUser.getUser()).name("WikiDup Pantry").please();
+    Note destination = makeMe.aNote().title("WikiDup Shared").folder(pantry).please();
+    Note source = makeMe.aNote().notebook(pantry.getNotebook()).please();
+
+    AuthoredPortablePath authored =
+        controller.authoredPortablePath(source, destination, "WikiDup Shared");
+
+    assertThat(authored.portablePath(), equalTo("WikiDup Shared"));
   }
 
   @Test

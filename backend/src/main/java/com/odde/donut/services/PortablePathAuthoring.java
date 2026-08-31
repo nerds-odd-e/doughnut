@@ -11,9 +11,12 @@ import org.springframework.stereotype.Service;
 public class PortablePathAuthoring {
 
   private final WikiLinkResolver wikiLinkResolver;
+  private final AuthorizationService authorizationService;
 
-  public PortablePathAuthoring(WikiLinkResolver wikiLinkResolver) {
+  public PortablePathAuthoring(
+      WikiLinkResolver wikiLinkResolver, AuthorizationService authorizationService) {
     this.wikiLinkResolver = wikiLinkResolver;
+    this.authorizationService = authorizationService;
   }
 
   public String authoredPortablePath(
@@ -38,10 +41,11 @@ public class PortablePathAuthoring {
   }
 
   private boolean displayNameUniquelyIdentifies(Note destinationNote) {
-    return wikiLinkResolver
-        .resolveAnyTargetWikiLinkToken(destinationNote.getTitle(), destinationNote)
-        .filter(match -> match.getId().equals(destinationNote.getId()))
-        .isPresent();
+    return wikiLinkResolver.readableNotebookMatchUniquelyIdentifies(
+        destinationNote.getNotebook().getName(),
+        destinationNote.getTitle(),
+        authorizationService.getCurrentUser(),
+        destinationNote);
   }
 
   private static String lengthenedNotePortion(Note note) {

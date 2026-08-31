@@ -275,24 +275,16 @@ No other caller of `authoredPortablePath` existed. Viewer filtering
 
 ### 12. Authoring uniqueness skips unreadable namesakes
 
-**Status:** planned
+**Status:** done
 **Type:** Behavior
 
-**Precondition:** The current user can read only one of several notes that
-share a display name or alias in notebooks of that name.
-**Trigger:** Donut authors a Portable path for that readable note.
-**Postcondition:** The path is shorthand when that note is unique among
-readable candidates; an unreadable namesake does not force `Folder/Title`
-or `/Title`.
-
-Test first: one `NoteControllerAuthoredPortablePathTests` case mirroring
-`shouldSkipUnreadableLowestIdAliasCandidateForReadableTarget`. No new E2E.
-
-Implementation: uniqueness via `uniqueReadableNotebookMatch` (or
-`readableNotebookMatches` cardinality) with the current user. Do not use
-`resolveAnyTargetWikiLinkToken` for this decision.
-
-Verification: `pnpm backend:test_only`.
+`PortablePathAuthoring` injects `AuthorizationService` and
+`displayNameUniquelyIdentifies` now calls the current user through
+`WikiLinkResolver.readableNotebookMatchUniquelyIdentifies` (new public
+wrapper around the existing private `uniqueReadableNotebookMatch`), instead
+of the viewer-blind `resolveAnyTargetWikiLinkToken`. Pinned by
+`NoteControllerAuthoredPortablePathTests
+.shouldAuthorDisplayNameShorthandWhenOnlyUnreadableNamesakeShares`.
 
 Stop-safe: authoring agrees with resolution’s readable cardinality.
 

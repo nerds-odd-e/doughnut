@@ -168,6 +168,16 @@ public class WikiLinkResolver {
     return uniqueIfExactlyOne(readableNotebookMatches(notebookName, noteTitle, viewer));
   }
 
+  /**
+   * True when, among the viewer's readable candidates for this notebook/title combination, the
+   * given note is the sole match.
+   */
+  public boolean readableNotebookMatchUniquelyIdentifies(
+      String notebookName, String noteTitle, User viewer, Note note) {
+    Note match = uniqueReadableNotebookMatch(notebookName, noteTitle, viewer);
+    return match != null && match.getId().equals(note.getId());
+  }
+
   List<Note> readableNotebookMatches(String notebookName, String noteTitle, User viewer) {
     List<Note> readable = new ArrayList<>();
     for (Note candidate : noteCandidates(notebookName, noteTitle)) {
