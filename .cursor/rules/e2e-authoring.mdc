@@ -223,5 +223,5 @@ A scenario describes one fixed path. Prefer dumb automation: the path is visible
 - Do not rely on test order.
 - Do not use hardcoded waits.
 - Do not fire a user action that starts app-busy loading and then assert domain state without `waitUntilAppIsNotBusy()` (or a clearer user-visible success signal) first.
-- Do not silently swallow failures in steps or page objects (`error-handling.mdc`).
+- Failure handling in steps and page objects: ADR 0006.
 - Do not mix different levels of abstraction in scenarios.

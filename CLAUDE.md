@@ -8,7 +8,7 @@ Start with `.cursor/agent-map.md` for repo navigation, generated API guidance, f
 
 Run repo tooling with `CURSOR_DEV=true nix develop -c …` unless documented otherwise (e.g. Cloud VM). **Git commands do not need the Nix prefix** — run `git` directly.
 
-Repo conventions live in `.cursor/rules/`. Cursor injects `alwaysApply: true` rules automatically. **Codex / Claude Code:** read these always-applied rules before coding — `general.mdc`, `error-handling.mdc`, `unit-testing.mdc`, `planning.mdc`, `gsd-coexistence.mdc`, `architecture-decisions.mdc` — then the stack file for the area you touch: frontend → `frontend.mdc`; backend → `backend.mdc`; E2E → `e2e-authoring.mdc`; lint → `linting_formating.mdc`; migrations → `db-migration.mdc`; MCP → `mcp-server.mdc`; CLI → `cli.mdc`. Do not search for other names first. Cursor auto-attaches globbed detail files when matching files are in context.
+Repo conventions live in `.cursor/rules/`. Cursor injects `alwaysApply: true` rules automatically. **Codex / Claude Code:** read these always-applied rules before coding — `general.mdc`, `unit-testing.mdc`, `planning.mdc`, `gsd-coexistence.mdc`, `architecture-decisions.mdc` — then the stack file for the area you touch: frontend → `frontend.mdc`; backend → `backend.mdc`; E2E → `e2e-authoring.mdc`; lint → `linting_formating.mdc`; migrations → `db-migration.mdc`; MCP → `mcp-server.mdc`; CLI → `cli.mdc`. Do not search for other names first. Cursor auto-attaches globbed detail files when matching files are in context.
 
 For local MySQL or Redis failures, inspect `mysql/mysql.log` or `redis/redis.log`; the Nix shell setup is defined by `process-compose.yaml` and `scripts/shell_setup.sh`.
 
@@ -24,7 +24,7 @@ Portable digest (details live in the cited always-applied rules — keep `AGENTS
 2. Keep it simple — minimum code; no defensive programming (`general.mdc`)
 3. Capability naming — no GSD phase numbers in product artifacts (`general.mdc`, `planning.mdc`)
 4. Test observables via high-level entry points (`unit-testing.mdc`)
-5. Never silently swallow failures — prevent → propagate → enrich → deliberate catch (`error-handling.mdc`)
+5. Failure handling — fail loudly is legitimate; catch for a business outcome or a clearer message (ADR 0006)
 
 ## Planning and slice delivery
 

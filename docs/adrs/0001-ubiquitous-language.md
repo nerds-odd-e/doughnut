@@ -226,6 +226,13 @@ commission from Donut:
 - **Feedback** — A Tutor's evaluation of a Session Item: a **Grade** and
   descriptive text. Recommendations of what to study next are not Feedback.
 
+## Operations
+
+- **Failure report** — Consecutive run of similar failures. One admin
+  list entry and one GitHub issue. Short UI: **Failure Reports**.
+  Similarity, consecutive-run, GitHub count updates, and fail-loud usage:
+  [ADR 0006](./0006-failure-handling-accepted.md).
+
 ## Alignment policy
 
 - Product and internal names use **Donut** / `donut`. For now, `doughnut` is
@@ -237,8 +244,11 @@ commission from Donut:
 - Features, tests, OpenAPI names, and packages follow this glossary.
 - Same nouns in UI, API, and schema, with **minimum DTO**. Do not
 introduce a translation type that wraps one as the other.
-- Agents treat this ADR as binding for naming choices. Spaced-repetition domain
-  concepts follow ADR 0003. Humans and agents share an explicit dictionary
-  instead of inferring synonyms.
+- Agents treat this ADR as binding for naming choices. Spaced-repetition
+  domain concepts follow ADR 0003. Failure handling follows ADR 0006.
+  Humans and agents share an explicit dictionary instead of inferring
+  synonyms.
 
 ## Related
+
+- [ADR 0006](./0006-failure-handling-accepted.md) — Failure handling

@@ -15,6 +15,7 @@ A **"small test"** means: a fast, in-process unit test (JUnit, Vitest, Bach, …
 - **Cover lower layers with data, not with more test surfaces.** Craft realistic, scenario-specific preconditions and fixtures so one boundary test exercises the real lower-level production routines. Prefer that over isolating each collaborator behind mocks or thin wrapper tests.
 - **Build those fixtures with `makeMe`** — keep construction concise (see below).
 - **Do not mock unless external or exceptional.** Mock only true external dependencies (third-party APIs, network services, and the like) or extremely rare special cases. Package rules name the allowed exceptions (`OpenAIClient`, frontend `mockSdkService` for the backend HTTP API, CLI spies on `donut-api`, etc.). Prefer the real database, real in-process collaborators, and real browser rendering inside the system under test.
+- **Loud failures** — Code that is allowed to fail loudly is not a unit-test subject for that failure. Policy: ADR 0006 Usage.
 
 ## Focused assertions
 

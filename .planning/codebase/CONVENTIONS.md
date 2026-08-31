@@ -66,8 +66,7 @@
 
 ## Error Handling
 
-**Policy:** `.cursor/rules/error-handling.mdc` (prevent → propagate → enrich →
-deliberate catch; never swallow).
+**Policy:** ADR 0006 (Failure handling).
 
 **Stack patterns:**
 - **Backend HTTP:** `@ControllerAdvice` in `CustomRestExceptionHandler.java` and `ControllerSetup.java` map exceptions to `ApiError` / status codes (validation, integrity, OpenAI auth, multipart, etc.). Domain access failures throw `UnexpectedNoAccessRightException` (asserted in controller tests with `assertThrows`).
