@@ -65,13 +65,6 @@ class WikiLinkMarkdownTest {
   }
 
   @Test
-  void newInnerForKeepVisibleText_qualifiedPlainLink() {
-    assertThat(
-        WikiLinkMarkdownRewrite.newInnerForKeepVisibleText("MyNb:OldTitle", "NewTitle"),
-        equalTo("MyNb:NewTitle|MyNb:OldTitle"));
-  }
-
-  @Test
   void newInnerForFolderRename_rewritesOneFolderSegmentNotTitle() {
     assertThat(
         WikiLinkMarkdownRewrite.newInnerForFolderRename(
@@ -84,20 +77,6 @@ class WikiLinkMarkdownTest {
     assertThat(
         WikiLinkMarkdownRewrite.newInnerForFolderRename("Title", "OldFolder", "NewFolder"),
         equalTo("Title"));
-  }
-
-  @Test
-  void newInnerForKeepVisibleText_keepsPathMarkdownLabel() {
-    assertThat(
-        WikiLinkMarkdownRewrite.newInnerForKeepVisibleText("[label](/Folder/Old.md)", "New"),
-        equalTo("[label](/Folder/New.md)"));
-  }
-
-  @Test
-  void newInnerForKeepVisibleText_emptyPipeUsesTargetAsDisplay() {
-    assertThat(
-        WikiLinkMarkdownRewrite.newInnerForKeepVisibleText("Alpha|", "Beta"),
-        equalTo("Beta|Alpha"));
   }
 
   @Test
@@ -134,16 +113,9 @@ class WikiLinkMarkdownTest {
   @Test
   void replaceWikiLinksMatchingTrimmedInner_matchesWhitespaceInsideBrackets() {
     assertThat(
-        WikiLinkMarkdownRewrite.replaceWikiLinksMatchingTrimmedInner(
+        WikiLinkMarkdownDocumentRewrite.replaceWikiLinksMatchingTrimmedInner(
             "see [[  Old  ]] end", "Old", "NewTitle"),
         equalTo("see [[NewTitle]] end"));
-  }
-
-  @Test
-  void newInnerForUpdateVisibleText_qualifiedPlainLink() {
-    assertThat(
-        WikiLinkMarkdownRewrite.newInnerForUpdateVisibleText("MyNb:OldTitle", "NewTitle"),
-        equalTo("MyNb:NewTitle"));
   }
 
   @Test
@@ -158,22 +130,6 @@ class WikiLinkMarkdownTest {
     assertThat(
         WikiLinkMarkdownRewrite.newInnerForKeepNotebookMove("OldNb:Title", "NewNb"),
         equalTo("NewNb:Title|OldNb:Title"));
-  }
-
-  @Test
-  void newInnerForKeepVisibleText_preservesEncodedPropertySuffixAndDisplay() {
-    assertThat(
-        WikiLinkMarkdownRewrite.newInnerForKeepVisibleText(
-            "Moon#prop:a%20part%20of|the moon", "Luna"),
-        equalTo("Luna#prop:a%20part%20of|the moon"));
-  }
-
-  @Test
-  void newInnerForUpdateVisibleText_preservesEncodedPropertySuffixOnPathMarkdown() {
-    assertThat(
-        WikiLinkMarkdownRewrite.newInnerForUpdateVisibleText(
-            "[label](/Solar/Moon.md#prop:a%20part%20of)", "Luna"),
-        equalTo("[label](/Solar/Luna.md#prop:a%20part%20of)"));
   }
 
   @Test
@@ -217,6 +173,7 @@ class WikiLinkMarkdownTest {
   void replaceOsInvalidCharsInAuthoredTokens_preservesEncodedPropertySuffix(
       String markdown, String expected) {
     assertThat(
-        WikiLinkMarkdownRewrite.replaceOsInvalidCharsInAuthoredTokens(markdown), equalTo(expected));
+        WikiLinkMarkdownDocumentRewrite.replaceOsInvalidCharsInAuthoredTokens(markdown),
+        equalTo(expected));
   }
 }

@@ -2,7 +2,7 @@ package com.odde.donut.services.ai;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.donut.algorithms.NoteContentTitleHeading;
-import com.odde.donut.algorithms.WikiLinkMarkdownRewrite;
+import com.odde.donut.algorithms.WikiLinkMarkdownDocumentRewrite;
 import com.odde.donut.controllers.dto.NoteRefinementQuestionContextDTO;
 import com.odde.donut.entities.Note;
 import com.odde.donut.services.GlobalSettingsService;
@@ -91,9 +91,10 @@ public class AiNoteAutomationService {
     result.newNoteContent =
         NoteContentTitleHeading.withoutRepeatedTitleHeading(
             result.newNoteTitle,
-            WikiLinkMarkdownRewrite.replaceOsInvalidCharsInAuthoredTokens(result.newNoteContent));
+            WikiLinkMarkdownDocumentRewrite.replaceOsInvalidCharsInAuthoredTokens(
+                result.newNoteContent));
     result.updatedOriginalNoteContent =
-        WikiLinkMarkdownRewrite.replaceOsInvalidCharsInAuthoredTokens(
+        WikiLinkMarkdownDocumentRewrite.replaceOsInvalidCharsInAuthoredTokens(
             result.updatedOriginalNoteContent);
     return result;
   }

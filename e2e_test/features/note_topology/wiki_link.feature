@@ -189,6 +189,9 @@ Feature: Wiki links in notes
     And the wiki link "WikiLinks E2E CI" should open the note titled "WikiLinks E2E CI Renamed"
 
   Scenario: Renaming a referenced note while updating visible reference text
+    Given I have a notebook "WikiLinks E2E NB" with notes:
+      | Title                     | Folder                 |
+      | WikiLinks E2E CI Renamed | WikiLinks E2E Namesake |
     When I update note "WikiLinks E2E Tech" content using markdown to become:
       """
       See [[WikiLinks E2E CI]] for process.
@@ -196,6 +199,9 @@ Feature: Wiki links in notes
     And I route to the note "WikiLinks E2E CI"
     And I set the note title to "WikiLinks E2E CI Renamed" updating visible reference text
     And I route to the note "WikiLinks E2E Tech"
+    And I view the note content as markdown
+    Then the note content markdown source should contain "[[WikiLinks E2E Root/WikiLinks E2E CI Renamed]]"
+    When I view the note content as rich content
     Then I should see the note content rendered as:
       | Kind      | Text                     |
       | wiki link | WikiLinks E2E CI Renamed |

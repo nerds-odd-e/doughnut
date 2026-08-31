@@ -4,14 +4,12 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.not;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.donut.controllers.dto.ApiError;
 import com.odde.donut.controllers.dto.NoteRealm;
 import com.odde.donut.controllers.dto.NoteUpdateTitleDTO;
 import com.odde.donut.controllers.dto.TitleRenameReferenceHandling;
-import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.ResolvedWikiLink;
@@ -195,31 +193,5 @@ class TextContentControllerUpdateNoteTitleInboundWikiReferencesTests
 
     makeMe.refresh(inbound.carrier());
     assertThat(inbound.carrier().getContent(), containsString("[[Folder/New|Folder/Old]]"));
-  }
-
-  @Test
-  void updateVisibleText_rewritesPathMarkdownHrefLastSegmentAndKeepsMarkdown()
-      throws UnexpectedNoAccessRightException {
-    InboundWiki inbound =
-        folderPathInboundWiki("See [one](/Folder/Old.md) and [two](/Folder/Old).");
-
-    NoteUpdateTitleDTO titleDto = titleDto("New");
-    titleDto.setReferenceHandling(TitleRenameReferenceHandling.UPDATE_VISIBLE_TEXT);
-
-    controller.updateNoteTitle(inbound.target(), titleDto);
-
-    makeMe.refresh(inbound.carrier());
-    assertThat(inbound.carrier().getContent(), containsString("[one](/Folder/New.md)"));
-    assertThat(inbound.carrier().getContent(), containsString("[two](/Folder/New)"));
-    assertThat(inbound.carrier().getContent(), not(containsString("[[")));
-  }
-
-  private InboundWiki folderPathInboundWiki(String carrierContent)
-      throws UnexpectedNoAccessRightException {
-    Folder folder = makeMe.aFolder().notebookOwnedBy(currentUser.getUser()).name("Folder").please();
-    Note target = makeMe.aNote().title("Old").folder(folder).please();
-    Note carrier = makeMe.aNote().notebook(folder.getNotebook()).please();
-    controller.updateNoteContent(carrier, contentDto(carrierContent));
-    return new InboundWiki(target, carrier);
   }
 }

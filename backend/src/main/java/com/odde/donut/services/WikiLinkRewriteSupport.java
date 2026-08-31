@@ -4,6 +4,7 @@ import com.odde.donut.algorithms.NoteContentMarkdown;
 import com.odde.donut.algorithms.PathShapedTarget;
 import com.odde.donut.algorithms.PortablePath;
 import com.odde.donut.algorithms.WikiLinkMarkdown;
+import com.odde.donut.algorithms.WikiLinkMarkdownDocumentRewrite;
 import com.odde.donut.algorithms.WikiLinkMarkdownRewrite;
 import com.odde.donut.controllers.dto.FolderTrailSegments;
 import com.odde.donut.entities.Note;
@@ -21,8 +22,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
-import java.util.function.UnaryOperator;
 
 /** Persistence helpers for {@link WikiLinkRewriteService}. */
 final class WikiLinkRewriteSupport {
@@ -52,7 +53,7 @@ final class WikiLinkRewriteSupport {
       Note targetNote,
       Timestamp updatedAt,
       User viewer,
-      UnaryOperator<String> newInnerFromLinkText,
+      BiFunction<Note, String, String> linkRewrite,
       Set<Integer> excludedReferrerIds) {
     Integer targetId = targetNote.getId();
     List<ResolvedWikiLink> rows =
@@ -76,9 +77,9 @@ final class WikiLinkRewriteSupport {
       }
       String content = referrer.getContent() != null ? referrer.getContent() : "";
       for (String linkText : linkTextsByReferrer.get(referrerId)) {
-        String newInner = newInnerFromLinkText.apply(linkText);
+        String newInner = linkRewrite.apply(referrer, linkText);
         content =
-            WikiLinkMarkdownRewrite.replaceWikiLinksMatchingTrimmedInner(
+            WikiLinkMarkdownDocumentRewrite.replaceWikiLinksMatchingTrimmedInner(
                 content, linkText, newInner);
       }
       referrer.setContent(content);
@@ -115,7 +116,8 @@ final class WikiLinkRewriteSupport {
         continue;
       }
       content =
-          WikiLinkMarkdownRewrite.replaceWikiLinksMatchingTrimmedInner(content, linkText, newInner);
+          WikiLinkMarkdownDocumentRewrite.replaceWikiLinksMatchingTrimmedInner(
+              content, linkText, newInner);
     }
     if (content.equals(originalContent)) {
       return;

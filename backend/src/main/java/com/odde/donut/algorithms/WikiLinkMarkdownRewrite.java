@@ -1,24 +1,47 @@
 package com.odde.donut.algorithms;
 
 import com.odde.donut.validators.DisplayNamePathSeparators;
-import java.util.LinkedHashSet;
+import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
-import java.util.regex.Matcher;
 
-/**
- * Rewrites stored inter-note tokens (wiki inner or path Markdown) and matching spans in markdown.
- */
+/** Rewrites one stored inter-note token (wiki inner or path Markdown). */
 public final class WikiLinkMarkdownRewrite {
 
   private WikiLinkMarkdownRewrite() {}
 
-  public static String newInnerForUpdateVisibleText(String storedLinkInner, String newNoteTitle) {
-    return newInnerWithHandling(storedLinkInner, newNoteTitle, false);
+  public static String newInnerForAuthoredPortablePath(
+      String storedLinkInner, String authoredPortablePath, boolean keepVisibleText) {
+    if (authoredPortablePath == null) {
+      throw new IllegalArgumentException("authoredPortablePath");
+    }
+    PortablePath authored = PortablePath.parse(authoredPortablePath);
+    if (!authored.hasNotebookQualifier()
+        && PathShapedTarget.tryParse(authored.notePortion()).isEmpty()) {
+      return newInnerWithHandling(storedLinkInner, authored.notePortion(), keepVisibleText);
+    }
+    return WikiLinkMarkdown.tryParsePathMarkdownToken(storedLinkInner)
+        .map(
+            token ->
+                token.withHref(
+                    pathMarkdownHref(
+                        authoredPortablePath,
+                        PortablePath.parse(token.href()).notePortion().endsWith(".md"))))
+        .orElseGet(
+            () ->
+                keepVisibleText
+                    ? keepVisibleInner(storedLinkInner, _ -> authoredPortablePath)
+                    : rewriteWikiInnerTarget(storedLinkInner, _ -> authoredPortablePath));
   }
 
-  public static String newInnerForKeepVisibleText(String storedLinkInner, String newNoteTitle) {
-    return newInnerWithHandling(storedLinkInner, newNoteTitle, true);
+  private static String pathMarkdownHref(String authoredPortablePath, boolean keepMarkdownSuffix) {
+    PortablePath path = PortablePath.parse(authoredPortablePath);
+    String notePortion = path.notePortion();
+    String href = notePortion.startsWith("/") ? notePortion : "/" + notePortion;
+    if (keepMarkdownSuffix && !href.endsWith(".md")) {
+      href += ".md";
+    }
+    return new PortablePath(Optional.empty(), href, path.encodedPropertyKey()).format();
   }
 
   /**
@@ -174,7 +197,7 @@ public final class WikiLinkMarkdownRewrite {
   }
 
   /** Converts OS-invalid characters in one wiki inner or path-Markdown token. */
-  public static String replaceOsInvalidCharsInStoredLinkInner(String storedLinkInner) {
+  static String replaceOsInvalidCharsInStoredLinkInner(String storedLinkInner) {
     if (storedLinkInner == null || storedLinkInner.isEmpty()) {
       return storedLinkInner;
     }
@@ -182,61 +205,5 @@ public final class WikiLinkMarkdownRewrite {
         DisplayNamePathSeparators::replaceOsInvalidCharsInWikiLinkTarget;
     return rewriteAuthoredTarget(
         storedLinkInner, convert, () -> rewriteWikiInnerTarget(storedLinkInner, convert));
-  }
-
-  /** Converts OS-invalid characters in wiki and path-Markdown tokens. */
-  public static String replaceOsInvalidCharsInAuthoredTokens(String markdown) {
-    if (markdown == null || markdown.isEmpty()) {
-      return markdown;
-    }
-    String content = markdown;
-    for (String token :
-        new LinkedHashSet<>(WikiLinkMarkdown.authoredTokensInOccurrenceOrder(markdown))) {
-      String converted = replaceOsInvalidCharsInStoredLinkInner(token);
-      if (!converted.equals(token)) {
-        content = replaceWikiLinksMatchingTrimmedInner(content, token, converted);
-      }
-    }
-    return content;
-  }
-
-  public static String replaceWikiLinksMatchingTrimmedInner(
-      String markdown, String oldInnerTrimmed, String newInner) {
-    if (markdown == null || markdown.isEmpty()) {
-      return markdown;
-    }
-    if (WikiLinkMarkdown.tryParsePathMarkdownToken(oldInnerTrimmed).isPresent()
-        && WikiLinkMarkdown.tryParsePathMarkdownToken(newInner).isPresent()) {
-      return replacePathMarkdownMatching(markdown, oldInnerTrimmed, newInner);
-    }
-    Matcher matcher = WikiLinkMarkdown.INNER_LINK_PATTERN.matcher(markdown);
-    StringBuilder out = new StringBuilder();
-    int last = 0;
-    while (matcher.find()) {
-      out.append(markdown, last, matcher.start());
-      String innerTrimmed = matcher.group(1).trim();
-      if (innerTrimmed.equals(oldInnerTrimmed)) {
-        out.append("[[").append(newInner).append("]]");
-      } else {
-        out.append(matcher.group(0));
-      }
-      last = matcher.end();
-    }
-    out.append(markdown.substring(last));
-    return out.toString();
-  }
-
-  private static String replacePathMarkdownMatching(
-      String markdown, String oldTokenTrimmed, String newToken) {
-    StringBuilder out = new StringBuilder();
-    int last = 0;
-    for (WikiLinkMarkdown.PathMarkdownOccurrence occurrence :
-        WikiLinkMarkdown.pathMarkdownOccurrences(markdown)) {
-      out.append(markdown, last, occurrence.start());
-      out.append(occurrence.token().equals(oldTokenTrimmed) ? newToken : occurrence.token());
-      last = occurrence.end();
-    }
-    out.append(markdown.substring(last));
-    return out.toString();
   }
 }

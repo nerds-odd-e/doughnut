@@ -3,6 +3,7 @@ package com.odde.donut.controllers;
 import com.odde.donut.algorithms.Frontmatter;
 import com.odde.donut.controllers.dto.NoteUpdateContentDTO;
 import com.odde.donut.controllers.dto.NoteUpdateTitleDTO;
+import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Note;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import org.junit.jupiter.api.BeforeEach;
@@ -37,6 +38,15 @@ abstract class TextContentControllerTestBase extends ControllerTestBase {
       throws UnexpectedNoAccessRightException {
     Note target = makeMe.aNote().title(targetTitle).notebookOwnedBy(currentUser.getUser()).please();
     Note carrier = makeMe.aNote().underSameNotebookAs(target).please();
+    controller.updateNoteContent(carrier, contentDto(carrierContent));
+    return new InboundWiki(target, carrier);
+  }
+
+  protected InboundWiki folderPathInboundWiki(String carrierContent)
+      throws UnexpectedNoAccessRightException {
+    Folder folder = makeMe.aFolder().notebookOwnedBy(currentUser.getUser()).name("Folder").please();
+    Note target = makeMe.aNote().title("Old").folder(folder).please();
+    Note carrier = makeMe.aNote().notebook(folder.getNotebook()).please();
     controller.updateNoteContent(carrier, contentDto(carrierContent));
     return new InboundWiki(target, carrier);
   }

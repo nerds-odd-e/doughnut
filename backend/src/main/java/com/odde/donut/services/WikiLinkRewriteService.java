@@ -1,5 +1,6 @@
 package com.odde.donut.services;
 
+import com.odde.donut.algorithms.WikiLinkMarkdown;
 import com.odde.donut.algorithms.WikiLinkMarkdownRewrite;
 import com.odde.donut.controllers.dto.TitleRenameReferenceHandling;
 import com.odde.donut.entities.DisplayName;
@@ -13,7 +14,7 @@ import jakarta.persistence.PersistenceContext;
 import java.sql.Timestamp;
 import java.util.Objects;
 import java.util.Set;
-import java.util.function.UnaryOperator;
+import java.util.function.BiFunction;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,14 +25,17 @@ public class WikiLinkRewriteService {
   private final ResolvedWikiLinkRepository resolvedWikiLinkRepository;
   private final EntityPersister entityPersister;
   private final ResolvedWikiLinkService resolvedWikiLinkService;
+  private final PortablePathAuthoring portablePathAuthoring;
 
   public WikiLinkRewriteService(
       ResolvedWikiLinkRepository resolvedWikiLinkRepository,
       EntityPersister entityPersister,
-      ResolvedWikiLinkService resolvedWikiLinkService) {
+      ResolvedWikiLinkService resolvedWikiLinkService,
+      PortablePathAuthoring portablePathAuthoring) {
     this.resolvedWikiLinkRepository = resolvedWikiLinkRepository;
     this.entityPersister = entityPersister;
     this.resolvedWikiLinkService = resolvedWikiLinkService;
+    this.portablePathAuthoring = portablePathAuthoring;
   }
 
   /**
@@ -45,15 +49,26 @@ public class WikiLinkRewriteService {
       Timestamp updatedAt,
       User viewer,
       TitleRenameReferenceHandling handling) {
-    UnaryOperator<String> fn =
-        handling == TitleRenameReferenceHandling.KEEP_VISIBLE_TEXT
-            ? lt -> WikiLinkMarkdownRewrite.newInnerForKeepVisibleText(lt, newTitle)
-            : lt -> WikiLinkMarkdownRewrite.newInnerForUpdateVisibleText(lt, newTitle);
     targetNote.setTitle(new DisplayName(newTitle));
     targetNote.setUpdatedAt(updatedAt);
     entityPersister.save(targetNote);
     entityManager.flush();
-    rewriteInboundWikiLinks(targetNote, updatedAt, viewer, fn, Set.of());
+    rewriteInboundWikiLinks(
+        targetNote,
+        updatedAt,
+        viewer,
+        (referrer, linkText) -> rewrittenTitleReference(referrer, targetNote, linkText, handling),
+        Set.of());
+  }
+
+  private String rewrittenTitleReference(
+      Note referrer, Note targetNote, String linkText, TitleRenameReferenceHandling handling) {
+    String originalPortablePath =
+        WikiLinkMarkdown.splitAuthoredToken(linkText).portablePath().format();
+    String authoredPortablePath =
+        portablePathAuthoring.authoredPortablePath(referrer, targetNote, originalPortablePath);
+    return WikiLinkMarkdownRewrite.newInnerForAuthoredPortablePath(
+        linkText, authoredPortablePath, handling == TitleRenameReferenceHandling.KEEP_VISIBLE_TEXT);
   }
 
   /**
@@ -94,9 +109,13 @@ public class WikiLinkRewriteService {
       Timestamp updatedAt,
       User viewer,
       Set<Integer> excludedReferrerIds) {
-    UnaryOperator<String> fn =
-        lt -> WikiLinkMarkdownRewrite.newInnerForKeepNotebookMove(lt, newNotebookName);
-    rewriteInboundWikiLinks(targetNote, updatedAt, viewer, fn, excludedReferrerIds);
+    rewriteInboundWikiLinks(
+        targetNote,
+        updatedAt,
+        viewer,
+        (_, linkText) ->
+            WikiLinkMarkdownRewrite.newInnerForKeepNotebookMove(linkText, newNotebookName),
+        excludedReferrerIds);
   }
 
   /**
@@ -110,12 +129,18 @@ public class WikiLinkRewriteService {
       String newFolderName,
       Timestamp updatedAt,
       User viewer) {
-    UnaryOperator<String> fn =
-        lt -> WikiLinkMarkdownRewrite.newInnerForFolderRename(lt, oldFolderName, newFolderName);
     WikiLinkRewriteSupport.forEachNonDeletedNoteInMoveSet(
         entityManager,
         noteIdsInSubtree,
-        note -> rewriteInboundWikiLinks(note, updatedAt, viewer, fn, Set.of()));
+        note ->
+            rewriteInboundWikiLinks(
+                note,
+                updatedAt,
+                viewer,
+                (_, linkText) ->
+                    WikiLinkMarkdownRewrite.newInnerForFolderRename(
+                        linkText, oldFolderName, newFolderName),
+                Set.of()));
   }
 
   /**
@@ -182,7 +207,7 @@ public class WikiLinkRewriteService {
       Note targetNote,
       Timestamp updatedAt,
       User viewer,
-      UnaryOperator<String> newInnerFromLinkText,
+      BiFunction<Note, String, String> linkRewrite,
       Set<Integer> excludedReferrerIds) {
     WikiLinkRewriteSupport.applyInboundReferrerRewrite(
         entityManager,
@@ -192,7 +217,7 @@ public class WikiLinkRewriteService {
         targetNote,
         updatedAt,
         viewer,
-        newInnerFromLinkText,
+        linkRewrite,
         excludedReferrerIds);
   }
 }

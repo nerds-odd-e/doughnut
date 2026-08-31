@@ -544,29 +544,19 @@ Stop-safe: aliases participate in uniqueness over time.
 
 ### 28. Rename rewrite lengthens the Portable path when needed
 
-**Status:** planned
+**Status:** done
 **Type:** Behavior
 
-**Precondition:** A resolved link points at a note that is being renamed,
-and the new display name would be an ambiguous shorthand.
-**Trigger:** Existing reference-preserving rename rewrite runs.
-**Postcondition:** The rewritten path still identifies that note uniquely
-(full normalized path), preserving display text, property selector, and
-wiki/path-Markdown spelling.
-
-Test first: extend existing rename E2E with a destination namesake; one
-property or path-Markdown case at the controller boundary if not already
-covered.
-
-Implementation: call the authoring operation after the new title is known.
-Do not rewrite a title string in isolation. Do not handle move in this
-slice.
-
-Verification: `pnpm backend:test_only`; focused wiki/path-markdown E2E as
-touched.
-
-Stop-safe: rename maintenance cannot rewrite a good link into an ambiguous
-shorthand.
+Rename now persists the destination's new display name before rewriting, then
+authors a Portable path for each inbound referrer. Ambiguous shorthand is
+lengthened to the full normalized path while display text, property selector,
+and wiki/path-Markdown spelling are preserved. The controller boundary pins an
+ambiguous property link and a path-Markdown namesake; `wiki_link.feature` pins
+the user-visible full-path rewrite. Post-change-refactor split token rewriting
+from whole-document replacement (`WikiLinkMarkdownDocumentRewrite`), split the
+oversized rename controller test by ambiguity behavior, and removed dead
+rewrite entry points. Full backend tests plus focused `wiki_link.feature` and
+`path_markdown_link.feature` are green.
 
 ### 29. Move rewrite lengthens or qualifies when needed
 
