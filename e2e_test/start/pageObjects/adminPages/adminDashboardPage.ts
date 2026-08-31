@@ -59,6 +59,18 @@ function failureReportList() {
       )
       return this.shouldContain(content)
     },
+    shouldHaveOccurrenceCount(count: number) {
+      cy.get('[data-testid="failure-report-occurrence-count"]').should(
+        ($el) => {
+          const actual = $el.text().trim()
+          expect(
+            actual,
+            `Expected occurrence count ${count}, but found ${actual}`
+          ).to.equal(String(count))
+        }
+      )
+      return this
+    },
     clearSelected(index = 0) {
       cy.get('.daisy-card').eq(index).find('input[type="checkbox"]').check()
       cy.get('button').contains('Delete Selected').click()

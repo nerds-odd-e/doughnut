@@ -33,11 +33,30 @@ describe("FailureReportPage", () => {
     expect(wrapper.text()).toContain("RuntimeException")
     expect(wrapper.text()).toContain("Stack trace here")
     expect(wrapper.text()).toContain("Line 2")
+    expect(
+      wrapper.find('[data-testid="failure-report-occurrence-count"]').text()
+    ).toBe("1")
     const link = wrapper.find('a[target="_blank"]')
     expect(link.attributes("href")).toBe(
       "https://github.com/test/repo/issues/123"
     )
     expect(link.text()).toContain("View GitHub Issue")
+  })
+
+  it("shows occurrence count 2 for a repeated failure report", async () => {
+    const report = makeMe.aFailureReport.withOccurrenceCount(2).please()
+    mockSdkService(
+      FailureReportController,
+      "showFailureReport",
+      makeMe.aFailureReportForView.withFailureReport(report).please()
+    )
+
+    const wrapper = mountFailureReport(1)
+    await flushPromises()
+
+    expect(
+      wrapper.find('[data-testid="failure-report-occurrence-count"]').text()
+    ).toBe("2")
   })
 
   it("fetches data with the failure report id from the route", async () => {

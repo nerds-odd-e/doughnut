@@ -1,6 +1,6 @@
 # Consecutive similar Failure reports
 
-**Status:** in progress (slices 1–2 done).
+**Status:** in progress (slices 1–3 done).
 **Type:** ad-hoc plan (`.planning/quick/`)
 
 Follow-up to shipped scheduled-job Failure reports. Independent of
@@ -70,20 +70,14 @@ builder defaults `occurrenceCount` to 1 after API regen.
 
 Match latest row fingerprint (`findTopByOrderByIdDesc`) → increment count,
 keep first `error_detail`, skip `createGithubIssue`. E2E two-trigger
-scenario is green without `@wip`. No count UI yet.
+scenario is green without `@wip`.
 
 ---
 
-### 3. Admin sees the occurrence count — Behavior `[ ]`
+### 3. Admin sees the occurrence count — Behavior `[x]`
 
-**Pre:** a Failure report has occurrence count 2 (slice 2). **Trigger:**
-admin opens Failure Reports (list and detail). **Post:** the count is
-visible on the list entry and the detail page.
-
-**Verify:** `FailureReportList` / `FailureReportPage` unit tests via
-`makeMe` (default count 1; a count-2 fixture shows `2`). E2E: after two
-triggers, the single entry shows count 2. Remove `@wip` from any scenario
-that now includes the count.
+List and detail show occurrence count via `FailureReportOccurrenceCount`
+(ADR 0006 term). E2E two-trigger scenario asserts count 2.
 
 ---
 
@@ -136,5 +130,5 @@ window.
   must use the same clock as `TestabilitySettings` (inject current time in
   slice 6, not earlier).
 - Slice 2 is user-visible without frontend work (one list card). Slice 3
-  only adds the count readout.
+  added the count readout (`FailureReportOccurrenceCount`).
 - Query-string strip on HTTP origin was dead (`getRequestURI()` has no query).

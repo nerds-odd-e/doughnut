@@ -79,6 +79,14 @@
               <span class="font-medium">Created:</span>
               {{ formatDateTime(failureReport.createDatetime) }}
             </div>
+            <div class="flex items-center gap-2 text-base-content/70">
+              <FailureReportOccurrenceCount
+                :count="failureReport.occurrenceCount"
+                :size="20"
+              >
+                <span class="font-medium">Occurrence count:</span>
+              </FailureReportOccurrenceCount>
+            </div>
             <div
               v-if="githubIssueUrl"
               class="flex items-center gap-2"
@@ -156,6 +164,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from "vue"
 import { FailureReportController } from "@generated/donut-backend-api/sdk.gen"
+import FailureReportOccurrenceCount from "@/components/admin/FailureReportOccurrenceCount.vue"
 import ContainerPage from "./commons/ContainerPage.vue"
 import type { FailureReport } from "@generated/donut-backend-api"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"

@@ -8,7 +8,7 @@ Feature: Failure report
   Scenario: Consecutive similar failures are one Failure report
     When Someone triggered an exception
     And Someone triggered an exception
-    Then an admin should see one "RuntimeException" in the failure report
+    Then an admin should see one "RuntimeException" in the failure report with occurrence count 2
 
   Scenario: Admin clears a failure report item
     Given Someone triggered an exception

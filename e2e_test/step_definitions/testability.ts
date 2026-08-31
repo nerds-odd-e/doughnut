@@ -21,12 +21,13 @@ Then(
 )
 
 Then(
-  'an admin should see one {string} in the failure report',
-  (content: string) => {
+  'an admin should see one {string} in the failure report with occurrence count {int}',
+  (content: string, count: number) => {
     start
       .loginAsAdminAndGoToAdminDashboard()
       .goToFailureReportList()
       .shouldHaveOneEntryContaining(content)
+      .shouldHaveOccurrenceCount(count)
   }
 )
 

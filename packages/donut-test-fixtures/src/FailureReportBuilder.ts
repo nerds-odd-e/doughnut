@@ -51,6 +51,11 @@ class FailureReportBuilder extends Builder<FailureReport> {
     return this
   }
 
+  withOccurrenceCount(occurrenceCount: number): this {
+    this.report.occurrenceCount = occurrenceCount
+    return this
+  }
+
   do(): FailureReport {
     return { ...this.report }
   }

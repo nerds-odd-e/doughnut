@@ -34,6 +34,15 @@ describe("FailureReportList", () => {
       expect(wrapper.text()).toContain("#2")
     })
 
+    it("shows occurrence count 2 for a repeated failure report", async () => {
+      const report = makeMe.aFailureReport.withOccurrenceCount(2).please()
+      const wrapper = await mountFailureReportList([report])
+
+      expect(
+        wrapper.find('[data-testid="failure-report-occurrence-count"]').text()
+      ).toBe("2")
+    })
+
     it("shows empty state when no failure reports exist", async () => {
       const wrapper = await mountFailureReportList([])
 
