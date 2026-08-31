@@ -11,6 +11,12 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class WikiLink {
+  public enum Resolution {
+    RESOLVED,
+    UNRESOLVED,
+    AMBIGUOUS
+  }
+
   /** Full wiki link inner text as stored in markdown (between {@code [[} and {@code ]]}}). */
   @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
   private String authoredLink;
@@ -27,5 +33,11 @@ public class WikiLink {
   private String displayText;
 
   @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
+  private Resolution resolution;
+
+  /** Present when resolution is RESOLVED. */
+  @Schema(
+      description = "Present when resolution is RESOLVED",
+      requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   private Integer destinationNoteId;
 }

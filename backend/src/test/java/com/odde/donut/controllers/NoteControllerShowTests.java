@@ -72,6 +72,7 @@ class NoteControllerShowTests extends ControllerTestBase {
     assertThat(wt.getAuthoredLink(), equalTo("LinkedPage"));
     assertThat(wt.getPortablePath(), equalTo("LinkedPage"));
     assertThat(wt.getDisplayText(), equalTo("LinkedPage"));
+    assertThat(wt.getResolution(), equalTo(WikiLink.Resolution.RESOLVED));
     assertThat(wt.getDestinationNoteId(), equalTo(matched.getId()));
   }
 

@@ -3,9 +3,20 @@ import { hrefLooksLikePortablePath } from "@/routes/noteShowLocation"
 import {
   authoredLinkOccurrences,
   splitAuthoredToken,
+  wikiLinkFromAuthoredToken,
 } from "@/utils/authoredLinkMarkup"
 
 describe("authoredLinkMarkup", () => {
+  it("wikiLinkFromAuthoredToken names RESOLVED with destinationNoteId", () => {
+    expect(wikiLinkFromAuthoredToken("MyNote", 42)).toEqual({
+      authoredLink: "MyNote",
+      portablePath: "MyNote",
+      displayText: "MyNote",
+      resolution: "RESOLVED",
+      destinationNoteId: 42,
+    })
+  })
+
   it("authoredLinkOccurrences lists wiki and path Markdown in document order", () => {
     const source = "See [[Folder/Title|wiki]] and [label](/Folder/Title.md)."
     const occ = authoredLinkOccurrences(source)

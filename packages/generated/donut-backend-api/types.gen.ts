@@ -250,7 +250,11 @@ export type WikiLink = {
     authoredLink: string;
     portablePath: string;
     displayText: string;
-    destinationNoteId: number;
+    resolution: 'RESOLVED' | 'UNRESOLVED' | 'AMBIGUOUS';
+    /**
+     * Present when resolution is RESOLVED
+     */
+    destinationNoteId?: number;
 };
 
 export type QuestionContestResult = {

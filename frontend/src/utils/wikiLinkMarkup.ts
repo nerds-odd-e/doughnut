@@ -16,19 +16,6 @@ import { locationForResolvedWikiTarget } from "@/utils/wikiLinkResolvedLocation"
 
 export { splitWikiLinkInner, wikiLinkFromAuthoredToken }
 
-/** Normalized target, display label, and full inner for a wiki title from the note realm. */
-export function wikiLinkParts(w: WikiLink): {
-  target: string
-  display: string
-  inner: string
-} {
-  return {
-    target: w.portablePath,
-    display: w.displayText,
-    inner: w.authoredLink,
-  }
-}
-
 export function escapeHtmlForWikiLinkDisplay(s: string): string {
   return s
     .replace(/&/g, "&amp;")
@@ -75,14 +62,21 @@ export function isValidWikiLinkInner(rawBetweenBrackets: string): boolean {
   )
 }
 
-/** Lookup keys: trimmed wiki target token and full `linkText` from the note realm. */
+/** True when the payload names a single destination note. */
+export function isResolvedWikiLink(
+  w: WikiLink
+): w is WikiLink & { destinationNoteId: number } {
+  return w.resolution === "RESOLVED" && w.destinationNoteId !== undefined
+}
+
+/** Lookup keys: trimmed Portable path and full authored link from the note realm. */
 export function wikiLinkNoteIdLookup(
   wikiLinks: readonly WikiLink[]
 ): Map<string, number> {
   const map = new Map<string, number>()
   for (const w of wikiLinks) {
-    const { target } = wikiLinkParts(w)
-    map.set(target.trim(), w.destinationNoteId)
+    if (!isResolvedWikiLink(w)) continue
+    map.set(w.portablePath.trim(), w.destinationNoteId)
     map.set(w.authoredLink.trim(), w.destinationNoteId)
   }
   return map

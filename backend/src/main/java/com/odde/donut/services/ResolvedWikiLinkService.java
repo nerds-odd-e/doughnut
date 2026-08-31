@@ -59,6 +59,7 @@ public class ResolvedWikiLinkService {
                 row.getAuthoredLink(),
                 parts.portablePath().format(),
                 parts.displayText(),
+                WikiLink.Resolution.RESOLVED,
                 resolved.getId()));
       }
     }

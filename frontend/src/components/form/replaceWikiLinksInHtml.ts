@@ -17,10 +17,10 @@ import {
 import {
   escapeHtmlAttributeValue,
   escapeHtmlForWikiLinkDisplay,
+  isResolvedWikiLink,
   isValidWikiLinkInner,
   splitWikiLinkInner,
   wikiLinkAnchorHtml,
-  wikiLinkParts,
 } from "@/utils/wikiLinkMarkup"
 import { hrefForResolvedWikiTarget } from "@/utils/wikiLinkResolvedLocation"
 
@@ -78,23 +78,25 @@ function upgradeUnresolvedWikiAnchors(
   ).join(", ")
 
   for (const w of wikiLinks) {
-    if (isPathMarkdownWikiLink(w)) continue
-    const { target, display } = wikiLinkParts(w)
-    const href = hrefForResolvedWikiTarget(w.destinationNoteId, target)
+    if (!isResolvedWikiLink(w) || isPathMarkdownWikiLink(w)) continue
+    const href = hrefForResolvedWikiTarget(w.destinationNoteId, w.portablePath)
     for (const a of [...wrap.querySelectorAll(unresolvedAnchorSelector)]) {
       const portablePath = a.getAttribute(WIKI_LINK_PORTABLE_PATH_ATTR)
       if (portablePath !== null && portablePath !== "") {
-        if (portablePath !== target && portablePath.trim() !== target.trim())
+        if (
+          portablePath !== w.portablePath &&
+          portablePath.trim() !== w.portablePath.trim()
+        )
           continue
-        if (!wikiAnchorDisplayMatches(a, display)) continue
-      } else if (!wikiAnchorDisplayMatches(a, display)) {
+        if (!wikiAnchorDisplayMatches(a, w.displayText)) continue
+      } else if (!wikiAnchorDisplayMatches(a, w.displayText)) {
         continue
       }
       a.outerHTML = wikiLinkAnchorHtml({
         href,
         className: DONUT_WIKI_LINK_CLASS,
-        target,
-        display,
+        target: w.portablePath,
+        display: w.displayText,
         noteId: w.destinationNoteId,
       })
     }
@@ -148,36 +150,38 @@ function upgradePathMarkdownAnchors(
 ): string {
   let result = html
   for (const w of wikiLinks) {
-    if (!isPathMarkdownWikiLink(w)) continue
-    const { target, display } = wikiLinkParts(w)
-    const attrTarget = escapeHtmlAttributeValue(target)
+    if (!isResolvedWikiLink(w) || !isPathMarkdownWikiLink(w)) continue
+    const attrTarget = escapeHtmlAttributeValue(w.portablePath)
     const livePathMarkdownAttrs = {
       className: DONUT_WIKI_LINK_CLASS,
-      target,
-      display,
+      target: w.portablePath,
+      display: w.displayText,
       noteId: w.destinationNoteId,
     }
     const live = wikiLinkAnchorHtml({
-      href: hrefForResolvedWikiTarget(w.destinationNoteId, target),
+      href: hrefForResolvedWikiTarget(w.destinationNoteId, w.portablePath),
       ...livePathMarkdownAttrs,
     })
-    result = result.replaceAll(`<a href="${attrTarget}">${display}</a>`, live)
-    const leftoverUnresolvedHrefs = [target, "#"]
+    result = result.replaceAll(
+      `<a href="${attrTarget}">${w.displayText}</a>`,
+      live
+    )
+    const leftoverUnresolvedHrefs = [w.portablePath, "#"]
     for (const leftoverHref of leftoverUnresolvedHrefs) {
       for (const className of UNRESOLVED_WIKI_LINK_CLASSES) {
         result = result.replaceAll(
           wikiLinkAnchorHtml({
             href: leftoverHref,
             className,
-            target,
-            display,
+            target: w.portablePath,
+            display: w.displayText,
           }),
           live
         )
       }
     }
     result = result.replaceAll(
-      wikiLinkAnchorHtml({ href: target, ...livePathMarkdownAttrs }),
+      wikiLinkAnchorHtml({ href: w.portablePath, ...livePathMarkdownAttrs }),
       live
     )
   }
@@ -217,15 +221,14 @@ export function replaceWikiLinksInHtml(
   const lastSavedTokens = lastSavedAuthoredTokens(lastSavedMarkdown)
   let result = html
   wikiLinks.forEach((w) => {
-    if (isPathMarkdownWikiLink(w)) return
-    const { target, display, inner } = wikiLinkParts(w)
+    if (!isResolvedWikiLink(w) || isPathMarkdownWikiLink(w)) return
     result = result.replaceAll(
-      `[[${inner}]]`,
+      `[[${w.authoredLink}]]`,
       wikiLinkAnchorHtml({
-        href: hrefForResolvedWikiTarget(w.destinationNoteId, target),
+        href: hrefForResolvedWikiTarget(w.destinationNoteId, w.portablePath),
         className: DONUT_WIKI_LINK_CLASS,
-        target,
-        display,
+        target: w.portablePath,
+        display: w.displayText,
         noteId: w.destinationNoteId,
       })
     )

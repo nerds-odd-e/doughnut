@@ -94,11 +94,12 @@ export function wikiLinkFromAuthoredToken(
   authored: string,
   noteId: number
 ): WikiLink {
-  const { target, display } = splitAuthoredToken(authored)
+  const { target: portablePath, display } = splitAuthoredToken(authored)
   return {
     authoredLink: authored,
-    portablePath: target,
+    portablePath,
     displayText: display,
+    resolution: "RESOLVED",
     destinationNoteId: noteId,
   }
 }

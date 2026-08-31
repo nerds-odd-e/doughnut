@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest"
 import type { RouteLocationRaw } from "vue-router"
+import type { WikiLink } from "@generated/donut-backend-api"
 import {
   notePropertyLocation,
   noteShowLocation,
@@ -9,9 +10,26 @@ import {
   escapeHtmlForWikiLinkDisplay,
   handleRichContentAnchorClick,
   markdownWikiTokenFromDeadWikiLinkPayload,
+  wikiLinkFromAuthoredToken,
+  wikiLinkNoteIdLookup,
 } from "@/utils/wikiLinkMarkup"
 
 describe("wikiLinkMarkup utils", () => {
+  it("wikiLinkNoteIdLookup maps only RESOLVED destination ids", () => {
+    const ambiguous: WikiLink = {
+      authoredLink: "Shared",
+      portablePath: "Shared",
+      displayText: "Shared",
+      resolution: "AMBIGUOUS",
+    }
+    const map = wikiLinkNoteIdLookup([
+      wikiLinkFromAuthoredToken("Live", 7),
+      ambiguous,
+    ])
+    expect(map.get("Live")).toBe(7)
+    expect(map.has("Shared")).toBe(false)
+  })
+
   it("handleRichContentAnchorClick emits dead link before checking href", () => {
     const anchor = document.createElement("a")
     anchor.className = "dead-wiki-link"

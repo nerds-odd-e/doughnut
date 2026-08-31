@@ -3784,14 +3784,21 @@ components:
           type: string
         displayText:
           type: string
+        resolution:
+          type: string
+          enum:
+          - RESOLVED
+          - UNRESOLVED
+          - AMBIGUOUS
         destinationNoteId:
           type: integer
           format: int32
+          description: Present when resolution is RESOLVED
       required:
       - authoredLink
-      - destinationNoteId
       - displayText
       - portablePath
+      - resolution
     QuestionContestResult:
       type: object
       properties:

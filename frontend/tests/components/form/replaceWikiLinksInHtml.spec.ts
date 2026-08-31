@@ -1,6 +1,7 @@
 import { replaceWikiLinksInHtml } from "@/components/form/replaceWikiLinksInHtml"
 import { notePropertyHref, noteShowHref } from "@/routes/noteShowLocation"
 import { wikiLinkFromAuthoredToken } from "@/utils/wikiLinkMarkup"
+import type { WikiLink } from "@generated/donut-backend-api"
 import { describe, it, expect } from "vitest"
 
 describe("replaceWikiLinksInHtml", () => {
@@ -31,6 +32,18 @@ describe("replaceWikiLinksInHtml", () => {
     ])
     expect(out).not.toContain("[[MyNote]]")
     expect(out).toMatch(/donut-wiki-link[\s\S]* then [\s\S]*donut-wiki-link/)
+  })
+
+  it("does not treat AMBIGUOUS wikiLinks as live destinations", () => {
+    const ambiguous: WikiLink = {
+      authoredLink: "Shared",
+      portablePath: "Shared",
+      displayText: "Shared",
+      resolution: "AMBIGUOUS",
+    }
+    expect(replaceWikiLinksInHtml("<p>[[Shared]]</p>", [ambiguous])).toBe(
+      '<p><a href="#" class="dead-wiki-link" data-portable-path="Shared">Shared</a></p>'
+    )
   })
 
   it("marks unknown wikilinks as dead links", () => {

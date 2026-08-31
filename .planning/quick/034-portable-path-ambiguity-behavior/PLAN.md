@@ -29,8 +29,10 @@ and Donut asks for a longer path.
   `WikiLinkResolverYamlAndBodyIntegrationTest.wikiLinkResolver_doesNotResolveWhenTwoNotesShareAnAlias`,
   `WikiLinkResolverYamlAndBodyIntegrationTest.wikiLinkResolver_resolvesWhenOneNoteMatchesAsBothTitleAndAlias`,
   `WikiLinkResolverYamlAndBodyIntegrationTest.wikiLinkResolver_doesNotResolveWhenSeveralReadableNotesMatchQualifiedShorthand`.
-- `NoteRealm.wikiLinks` is built only from resolved-index rows
-  (`destinationNoteId` required). Dead links are inferred from markup.
+- `NoteRealm.wikiLinks` is built only from resolved-index rows, each
+  `resolution: RESOLVED` with `destinationNoteId`. Dead links are inferred
+  from markup. Frontend matching uses `isResolvedWikiLink`. `wikiLinkMarkup.ts`
+  is ~247 lines — slice 7 must not push it over 250 without a cohesive split.
 - Donut-authored insert/paste/overlap/accidental-match spelling still uses
   frontend `buildWikiLinkText` (title, plus notebook prefix when the source
   notebook differs).
@@ -171,26 +173,13 @@ Production already did this via `uniqueReadableNotebookMatch`; pinned in
 
 ### 6. Wiki-link contract can name resolution states
 
-**Status:** planned
+**Status:** done
 **Type:** Structure
 
-Unlocks slice 7. No presentation change.
-
-- Add `resolution: RESOLVED | UNRESOLVED | AMBIGUOUS` on `WikiLink`.
-- Make `destinationNoteId` optional (present iff `RESOLVED`).
-- Existing payloads stay `RESOLVED` with an id; still emit only resolved-index
-  rows.
-- Regenerate OpenAPI / TypeScript via `generate-api-client`. Update frontend
-  matching to the direct fields. No old-field adapters.
-- Do not add "every authored link including missing" to `NoteRealm.wikiLinks`
-  here — slice 7 only needs to *emit* `AMBIGUOUS` rows. Missing may stay
-  inferred from markup.
-
-Verification: `pnpm backend:test_only`; focused frontend specs that construct
-`WikiLink`; generated-client / whitespace checks if the hook does not already
-cover them.
-
-Stop-safe: the UI can be told `AMBIGUOUS` without inferring it.
+`WikiLink.resolution` is `RESOLVED | UNRESOLVED | AMBIGUOUS`;
+`destinationNoteId` optional iff `RESOLVED`. Emitted rows are still only
+resolved-index `RESOLVED`. Frontend uses DTO fields directly (`isResolvedWikiLink`);
+`wikiLinkParts` adapter removed. OpenAPI/TS regenerated.
 
 ### 7. Following an ambiguous link asks for a longer Portable path
 
@@ -212,7 +201,10 @@ Test first:
 
 Implementation: emit `AMBIGUOUS` (null `destinationNoteId`) for cardinality
 `> 1`. Suppress create-new-note on that path. Do not expose unreadable
-notebook candidates. Do not write the longer path yet.
+notebook candidates. Do not write the longer path yet. Keep `wikiLinkMarkup.ts`
+under 250 lines (it is ~247 after slice 6); split along a cohesive seam if
+click UX would overflow. Promote the existing
+`An unqualified shorthand does not open the earlier-created note…` scenario.
 
 Verification: focused frontend specs; `wiki_link.feature`.
 
