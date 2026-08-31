@@ -481,7 +481,7 @@ Full backend suite green.
 
 ### 26. Notebook-scope re-resolution rebuilds every note's alias index before resolving any note's links
 
-**Status:** planned
+**Status:** done
 **Type:** Structure
 
 Unlocks slice 27 (alias cardinality). Discovered while implementing the
@@ -510,15 +510,20 @@ callers) keeps its current one-pass behavior — this split only changes the
 notebook-wide walk's internal ordering, not the single-note API's
 contract or its callers.
 
-Test first: a `ResolvedWikiLinkServiceTest` case with two notes in id
-order such that the lower-id note's shorthand link only becomes ambiguous
-if the higher-id note's alias index is rebuilt before the lower-id note's
-links are resolved — i.e. the exact scenario slice 27's test needs.
+`refreshDerivedIndexesForNote` extracted and reused by both `refreshForNote`
+and the two-pass `refreshNotebookScope`. Notebook-scope tests split into
+their own file, `ResolvedWikiLinkServiceRefreshNotebookScopeTest`, to keep
+`ResolvedWikiLinkServiceTest` under 250 lines. Pinned by
+`.rebuilds_every_notes_alias_index_before_resolving_any_notes_links`,
+verified to genuinely fail against the old single-pass loop (order-swap
+test). Full backend suite green.
 
-Verification: `pnpm backend:test_only`.
-
-Stop-safe: notebook-wide re-resolution order does not hide a same-pass
-alias collision regardless of note id order.
+Note on git history: the pre-commit format hook re-stages all modified
+files, not just the ones explicitly `git add`ed — this slice's backend
+changes landed bundled into commit `9a473a7e37` (an unrelated frontend
+test-regression fix), discovered via `git status`/`git show --stat` after
+the fact. Not re-split (would need rewriting a pushed commit); this
+slice's remaining new test file is committed separately to finish it.
 
 ### 27. Changing aliases updates shorthand cardinality
 
