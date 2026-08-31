@@ -24,10 +24,23 @@ function pressMappedKey(side: "left" | "right") {
   )
 }
 
+function responseZone(view: VueWrapper, side: "left" | "right") {
+  return view.find(`[data-testid="daily-probe-response-zone-${side}"]`)
+}
+
 function tapMappedSide(view: VueWrapper, side: "left" | "right") {
-  return view
-    .find(`[data-testid="daily-probe-response-zone-${side}"]`)
-    .trigger("pointerdown")
+  return responseZone(view, side).trigger("pointerdown")
+}
+
+function stimulusSlot(view: VueWrapper) {
+  return view.find('[data-testid="daily-probe-stimulus"]')
+}
+
+function expectBlankStimulusSlot(view: VueWrapper) {
+  const slot = stimulusSlot(view)
+  expect(slot.exists()).toBe(true)
+  expect(slot.classes()).toContain("invisible")
+  expect(slot.text()).not.toMatch(/[←→]/)
 }
 
 async function completeProbe(respond: (side: "left" | "right") => unknown) {
@@ -71,11 +84,11 @@ describe("DailyProbe", () => {
     expect(mountProbe().text()).toContain(DAILY_PROBE_INSTRUCTION)
   })
 
-  it("shows unlabeled side zones while the stimulus uses arrows", async () => {
+  it("shows unlabeled side zones", async () => {
     const view = mountProbe()
     await nextTick()
-    const left = view.find('[data-testid="daily-probe-response-zone-left"]')
-    const right = view.find('[data-testid="daily-probe-response-zone-right"]')
+    const left = responseZone(view, "left")
+    const right = responseZone(view, "right")
     expect(left.classes()).toContain("bg-base-200")
     expect(right.classes()).toContain("bg-base-200")
     expect(left.element.parentElement?.classList.contains("divide-x")).toBe(
@@ -83,7 +96,40 @@ describe("DailyProbe", () => {
     )
     expect(left.text()).not.toMatch(/[←→]|Left|Right|[FfJj]/)
     expect(right.text()).not.toMatch(/[←→]|Left|Right|[FfJj]/)
-    expect(view.find('[data-testid="daily-probe-stimulus"]').text()).toBe("←")
+  })
+
+  it("keeps the instruction still and fills remaining height with tap panels", async () => {
+    const Host = defineComponent({
+      components: { DailyProbe },
+      template: `<div style="height: 640px; width: 360px; display: flex; flex-direction: column"><DailyProbe /></div>`,
+    })
+    wrapper = helper.component(Host).mount({ attachTo: document.body })
+    await nextTick()
+
+    const instruction = wrapper.find(
+      '[data-testid="daily-probe-instruction"]'
+    ).element
+    const slot = stimulusSlot(wrapper)
+    const instructionTop = instruction.getBoundingClientRect().top
+    const slotHeight = slot.element.getBoundingClientRect().height
+    expect(slot.text()).toMatch(/[←→]/)
+
+    const zoneHeight = responseZone(
+      wrapper,
+      "left"
+    ).element.getBoundingClientRect().height
+    const remaining =
+      wrapper.element.getBoundingClientRect().bottom -
+      slot.element.getBoundingClientRect().bottom
+    expect(zoneHeight).toBeGreaterThan(96)
+    expect(zoneHeight).toBeGreaterThan(remaining * 0.5)
+
+    await tapMappedSide(wrapper, "left")
+    await nextTick()
+
+    expect(instruction.getBoundingClientRect().top).toBe(instructionTop)
+    expectBlankStimulusSlot(wrapper)
+    expect(slot.element.getBoundingClientRect().height).toBe(slotHeight)
   })
 
   it("records a matching side-zone tap the same as F/J", async () => {
@@ -95,19 +141,15 @@ describe("DailyProbe", () => {
   it("ignores a second tap and taps during the blank ISI", async () => {
     const view = mountProbe()
     await tapMappedSide(view, "left")
-    expect(view.find('[data-testid="daily-probe-stimulus"]').exists()).toBe(
-      false
-    )
+    expectBlankStimulusSlot(view)
 
     await tapMappedSide(view, "left")
     await tapMappedSide(view, "right")
-    expect(view.find('[data-testid="daily-probe-stimulus"]').exists()).toBe(
-      false
-    )
+    expectBlankStimulusSlot(view)
 
     vi.advanceTimersByTime(DAILY_PROBE_ISI_MS)
     await nextTick()
-    expect(view.find('[data-testid="daily-probe-stimulus"]').text()).toBe("→")
+    expect(stimulusSlot(view).text()).toBe("→")
   })
 
   it("shows speed 4.00 after every correct mapped key at 250 ms", async () => {
@@ -180,15 +222,11 @@ describe("DailyProbe", () => {
     })
     wrapper = helper.component(WrapperComponent).mount()
     await nextTick()
-    expect(wrapper.find('[data-testid="daily-probe-stimulus"]').text()).toBe(
-      "←"
-    )
+    expect(stimulusSlot(wrapper).text()).toBe("←")
 
     vi.advanceTimersByTime(DAILY_PROBE_TIMEOUT_MS + DAILY_PROBE_ISI_MS)
     await nextTick()
-    expect(wrapper.find('[data-testid="daily-probe-stimulus"]').text()).toBe(
-      "→"
-    )
+    expect(stimulusSlot(wrapper).text()).toBe("→")
 
     await wrapper.setData({ show: false })
     await nextTick()
@@ -201,8 +239,6 @@ describe("DailyProbe", () => {
 
     await wrapper.setData({ show: true })
     await nextTick()
-    expect(wrapper.find('[data-testid="daily-probe-stimulus"]').text()).toBe(
-      "←"
-    )
+    expect(stimulusSlot(wrapper).text()).toBe("←")
   })
 })

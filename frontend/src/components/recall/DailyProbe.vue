@@ -1,73 +1,74 @@
 <template>
   <div
     data-testid="daily-probe"
-    class="h-full flex flex-col text-center"
+    class="h-full min-h-0 flex-1 flex flex-col text-center"
   >
-    <div class="flex-1 flex flex-col items-center justify-center gap-6 p-6">
-      <template v-if="!finished">
-        <p>{{ DAILY_PROBE_INSTRUCTION }}</p>
+    <template v-if="!finished">
+      <div class="shrink-0 flex flex-col items-center gap-6 p-6">
+        <p data-testid="daily-probe-instruction">
+          {{ DAILY_PROBE_INSTRUCTION }}
+        </p>
         <div
-          v-if="stimulus"
           data-testid="daily-probe-stimulus"
-          class="text-7xl leading-none"
+          class="text-7xl leading-none h-[1em]"
+          :class="{ invisible: !stimulus }"
         >
-          {{ stimulus === "left" ? "←" : "→" }}
+          {{ stimulusArrow }}
         </div>
-      </template>
-      <template v-else>
-        <p
-          v-if="speedText"
-          data-testid="daily-probe-speed"
-          class="text-2xl font-semibold"
-        >
-          {{ speedText }}
-        </p>
-        <p data-testid="daily-probe-accuracy" class="text-2xl font-semibold">
-          {{ accuracyText }}
-        </p>
-        <p data-testid="daily-probe-lapses" class="text-2xl font-semibold">
-          {{ lapseCount }}
-        </p>
-        <p
-          v-if="variabilityText"
-          data-testid="daily-probe-variability"
-          class="text-2xl font-semibold"
-        >
-          {{ variabilityText }}
-        </p>
-        <p v-if="saveStatus === 'saved'" data-testid="daily-probe-saved">Saved</p>
-        <button
-          v-if="saveStatus === 'failed'"
-          data-testid="daily-probe-retry"
-          class="daisy-btn"
-          @click="persistCompletedProbe"
-        >
-          Retry
-        </button>
-        <button
-          data-testid="daily-probe-continue"
-          class="daisy-btn daisy-btn-primary"
-          :disabled="saveStatus !== 'saved'"
-          @click="emit('complete')"
-        >
-          Continue
-        </button>
-      </template>
-    </div>
+      </div>
+      <div
+        class="flex flex-1 min-h-24 w-full divide-x divide-base-300 pb-[max(0.75rem,env(safe-area-inset-bottom))]"
+      >
+        <div
+          v-for="side in responseSides"
+          :key="side"
+          :data-testid="`daily-probe-response-zone-${side}`"
+          class="flex-1 bg-base-200 touch-none"
+          @pointerdown="finishTrial(side)"
+        />
+      </div>
+    </template>
     <div
-      v-if="!finished"
-      class="flex w-full min-h-24 divide-x divide-base-300 pb-[max(0.75rem,env(safe-area-inset-bottom))]"
+      v-else
+      class="flex-1 flex flex-col items-center justify-center gap-6 p-6"
     >
-      <div
-        data-testid="daily-probe-response-zone-left"
-        class="flex-1 bg-base-200 touch-none"
-        @pointerdown="finishTrial('left')"
-      />
-      <div
-        data-testid="daily-probe-response-zone-right"
-        class="flex-1 bg-base-200 touch-none"
-        @pointerdown="finishTrial('right')"
-      />
+      <p
+        v-if="speedText"
+        data-testid="daily-probe-speed"
+        class="text-2xl font-semibold"
+      >
+        {{ speedText }}
+      </p>
+      <p data-testid="daily-probe-accuracy" class="text-2xl font-semibold">
+        {{ accuracyText }}
+      </p>
+      <p data-testid="daily-probe-lapses" class="text-2xl font-semibold">
+        {{ lapseCount }}
+      </p>
+      <p
+        v-if="variabilityText"
+        data-testid="daily-probe-variability"
+        class="text-2xl font-semibold"
+      >
+        {{ variabilityText }}
+      </p>
+      <p v-if="saveStatus === 'saved'" data-testid="daily-probe-saved">Saved</p>
+      <button
+        v-if="saveStatus === 'failed'"
+        data-testid="daily-probe-retry"
+        class="daisy-btn"
+        @click="persistCompletedProbe"
+      >
+        Retry
+      </button>
+      <button
+        data-testid="daily-probe-continue"
+        class="daisy-btn daisy-btn-primary"
+        :disabled="saveStatus !== 'saved'"
+        @click="emit('complete')"
+      >
+        Continue
+      </button>
     </div>
   </div>
 </template>
@@ -104,12 +105,21 @@ const emit = defineEmits<{
 }>()
 
 const practiceCount = dailyProbePracticeSequence.length
+const responseSides = [
+  "left",
+  "right",
+] as const satisfies readonly DailyProbeSide[]
 
 const trialIndex = ref(0)
 const stimulus = ref<DailyProbeSide | undefined>()
 const scoredTrials = ref<DailyProbeTrial[]>([])
 const finished = ref(false)
 const saveStatus = ref<"unsaved" | "saved" | "failed">("unsaved")
+const stimulusArrow = computed(() => {
+  if (stimulus.value === "left") return "←"
+  if (stimulus.value === "right") return "→"
+  return ""
+})
 
 const speed = computed(() => dailyProbeSpeed(scoredTrials.value))
 const accuracy = computed(() => dailyProbeAccuracy(scoredTrials.value))

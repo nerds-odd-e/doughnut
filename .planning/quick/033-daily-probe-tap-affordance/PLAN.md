@@ -1,6 +1,6 @@
 # Daily probe tap affordance
 
-**Status:** in progress (slice 1 done).
+**Status:** in progress (slices 1–2 done).
 **Type:** ad-hoc plan (`.planning/quick/`)
 **Measurement spec:** [daily-probe-protocol.md](../../notes/daily-probe-protocol.md)
 
@@ -54,23 +54,14 @@ no ←/→ / Left/Right / F/J on the zones.
 
 ---
 
-### 2. Keep the board still; tap panels fill the rest — Behavior `[ ]`
+### 2. Keep the board still; tap panels fill the rest — Behavior `[x]`
 
-**Pre:** instruction is on screen. **Trigger:** the arrow appears, then
-blanks for the ISI. **Post:** instruction does not move; the arrow occupies
-a reserved slot (empty, same height, during ISI); the two tap panels fill
-the remaining height below that board (large enough that each is more than
-the old ~96px sliver in a full-height probe). Scoring, ISI, and unlabeled
-rule unchanged.
-
-**Verify:** `DailyProbe.spec.ts` mounted in a known-height wrapper — instruction
-vertical position is unchanged across stimulus-on and ISI; stimulus slot
-stays in the DOM during ISI without arrow text; each zone height is a large
-share of the remaining space. Update the existing ISI assertion that the
-stimulus **element** is gone — the slot stays, the arrow does not.
-Run `e2e_test/features/recall/daily_probe.feature` if selectors or
-`pointerdown` wiring change; otherwise unit tests are enough for this
-layout. No protocol change.
+Shipped: fixed upper board (instruction + reserved `h-[1em]` stimulus slot);
+slot stays in the DOM during ISI (`invisible` + empty, so Cypress still
+waits on a visible arrow); tap panels `flex-1` (keep `min-h-24`). Probe
+root `h-full min-h-0 flex-1`. No DailyProbeGate change. `DailyProbe.spec.ts`
+covers still instruction, slot height, and zone height >96px; daily_probe
+E2E still 9 passing.
 
 ---
 
@@ -88,8 +79,9 @@ pass. No E2E scenario for the flash. No protocol change.
 
 ## Learnings
 
-Slice 1 did not need a parent height tweak. Slice 2 still owns filling
-height and a reserved stimulus slot.
+Slice 1 did not need a parent height tweak. Slice 2 filled height from
+the probe root (`flex-1 min-h-0`) without DailyProbeGate. Keep the ISI
+slot `invisible` so E2E `should('be.visible')` still waits for the arrow.
 
 ## Jidoka
 
