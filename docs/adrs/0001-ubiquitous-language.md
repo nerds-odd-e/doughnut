@@ -59,8 +59,8 @@ terms here; do not supersede this ADR with a new one.
 - **Bazaar** — Marketplace where notebooks are shared for others to
   browse and subscribe
 - **Wiki link** — In-content reference to a **note** or a **property**
-  on a note. Donut-authored form is wiki `[[target]]` /
-  `[[target|display]]` (optionally `Notebook:Title`; a property appends
+  on a note. Donut-authored form is wiki `[[portable-path]]` /
+  `[[portable-path|display]]` (optionally `Notebook:Title`; a property appends
   `#prop:<encoded-key>`). Path Markdown is the same link. Spelling and
   property-key encoding:
   [ADR 0004](./0004-okf-compatible-notebook-markdown-accepted.md). Web
@@ -70,7 +70,7 @@ terms here; do not supersede this ADR with a new one.
 - **Property** — YAML frontmatter key–value on a note (scalar or
   one-level list). Distinct from a **relationship note**. A value may
   contain **wiki links**. Relation-like keys (`example of`, `a part of`)
-  are still properties. Portable identity is (concept path, exact YAML
+  are still properties. Portable identity is (Portable path, exact YAML
   key) via `#prop:<encoded-key>` (ADR 0004). Web canonical location is
   `noteProperty`, once Proposed ADR 0005 is Accepted (see above).
 - **Relationship** — Typed association between notes (e.g. “similar to”,

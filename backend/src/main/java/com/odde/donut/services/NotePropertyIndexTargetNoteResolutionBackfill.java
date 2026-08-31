@@ -1,8 +1,8 @@
 package com.odde.donut.services;
 
 import com.odde.donut.algorithms.NoteContentMarkdown;
+import com.odde.donut.algorithms.PortablePath;
 import com.odde.donut.algorithms.WikiLinkMarkdown;
-import com.odde.donut.algorithms.WikiLinkTargetReference;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -81,12 +81,14 @@ public final class NotePropertyIndexTargetNoteResolutionBackfill {
     if (linkTokens.isEmpty()) {
       return Optional.empty();
     }
-    Optional<WikiLinkTargetReference> reference =
-        WikiLinkTargetReference.forToken(linkTokens.getFirst(), focusNotebookName);
+    Optional<PortablePath.Resolved> reference =
+        WikiLinkMarkdown.splitAuthoredToken(linkTokens.getFirst())
+            .portablePath()
+            .resolve(focusNotebookName);
     if (reference.isEmpty()) {
       return Optional.empty();
     }
-    WikiLinkTargetReference ref = reference.get();
+    PortablePath.Resolved ref = reference.get();
     return lookupTargetNoteId(ref.notebookName(), ref.noteTitle(), lookupStmt);
   }
 

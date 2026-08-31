@@ -1,7 +1,7 @@
 package com.odde.donut.validators;
 
-import com.odde.donut.algorithms.WikiLinkAuthoredTarget;
-import com.odde.donut.algorithms.WikiLinkTargetReference;
+import com.odde.donut.algorithms.PathShapedTarget;
+import com.odde.donut.algorithms.PortablePath;
 import java.util.regex.Pattern;
 
 public final class DisplayNamePathSeparators {
@@ -71,9 +71,8 @@ public final class DisplayNamePathSeparators {
     if (targetToken == null) {
       return null;
     }
-    return WikiLinkAuthoredTarget.parse(targetToken)
-        .mapNoteTarget(DisplayNamePathSeparators::replaceOsInvalidCharsInNoteTarget)
-        .format();
+    return PortablePath.mapBeforePropertySuffix(
+        targetToken, DisplayNamePathSeparators::replaceOsInvalidCharsInNoteTarget);
   }
 
   private static String replaceOsInvalidCharsInNoteTarget(String noteTarget) {
@@ -85,7 +84,7 @@ public final class DisplayNamePathSeparators {
         return replaceOsInvalidChars(notebookName) + ":" + replaceOsInvalidChars(noteTitle);
       }
     }
-    return WikiLinkTargetReference.PathShapedTarget.tryParse(noteTarget)
+    return PathShapedTarget.tryParse(noteTarget)
         .map(path -> path.mapSegmentNames(DisplayNamePathSeparators::replaceOsInvalidChars))
         .orElseGet(() -> replaceOsInvalidChars(noteTarget));
   }

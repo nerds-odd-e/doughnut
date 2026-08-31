@@ -46,22 +46,22 @@ class WikiLinkMarkdownTest {
   void splitAuthoredToken_readsPathMarkdownHrefAsTarget() {
     WikiLinkMarkdown.WikiInnerSplit s =
         WikiLinkMarkdown.splitAuthoredToken("[label](/Folder/Title.md)");
-    assertThat(s.target(), equalTo("/Folder/Title.md"));
-    assertThat(s.display(), equalTo("label"));
+    assertThat(s.portablePath().format(), equalTo("/Folder/Title.md"));
+    assertThat(s.displayText(), equalTo("label"));
   }
 
   @Test
   void splitInner_treatsPipeAsSeparator() {
     WikiLinkMarkdown.WikiInnerSplit s = WikiLinkMarkdown.splitInner("Target Note|friendly label");
-    assertThat(s.target(), equalTo("Target Note"));
-    assertThat(s.display(), equalTo("friendly label"));
+    assertThat(s.portablePath().format(), equalTo("Target Note"));
+    assertThat(s.displayText(), equalTo("friendly label"));
   }
 
   @Test
   void splitInner_emptyRightSideActsAsNoPipe() {
     WikiLinkMarkdown.WikiInnerSplit s = WikiLinkMarkdown.splitInner("Alpha|");
-    assertThat(s.target(), equalTo("Alpha"));
-    assertThat(s.display(), equalTo("Alpha"));
+    assertThat(s.portablePath().format(), equalTo("Alpha"));
+    assertThat(s.displayText(), equalTo("Alpha"));
   }
 
   @Test

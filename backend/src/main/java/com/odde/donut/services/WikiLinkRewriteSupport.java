@@ -1,8 +1,10 @@
 package com.odde.donut.services;
 
 import com.odde.donut.algorithms.NoteContentMarkdown;
+import com.odde.donut.algorithms.PathShapedTarget;
+import com.odde.donut.algorithms.PortablePath;
+import com.odde.donut.algorithms.WikiLinkMarkdown;
 import com.odde.donut.algorithms.WikiLinkMarkdownRewrite;
-import com.odde.donut.algorithms.WikiLinkTargetReference;
 import com.odde.donut.controllers.dto.FolderTrailSegments;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.NoteWikiTitleCache;
@@ -134,12 +136,12 @@ final class WikiLinkRewriteSupport {
     }
     String focusNotebookName =
         movedNote.getNotebook() == null ? null : movedNote.getNotebook().getName();
-    Optional<WikiLinkTargetReference> reference =
-        WikiLinkTargetReference.forToken(linkText, focusNotebookName);
+    Optional<PortablePath.Resolved> reference =
+        WikiLinkMarkdown.splitAuthoredToken(linkText).portablePath().resolve(focusNotebookName);
     if (reference.isEmpty()) {
       return false;
     }
-    WikiLinkTargetReference ref = reference.get();
+    PortablePath.Resolved ref = reference.get();
     List<Integer> noteIds = new ArrayList<>(coMovedTargetNoteIds);
     Collections.sort(noteIds);
     // When several co-moved notes share a title, lowest note id wins (same as global resolution).
@@ -154,14 +156,14 @@ final class WikiLinkRewriteSupport {
     return false;
   }
 
-  private static boolean noteMatchesWikiLinkTarget(Note note, WikiLinkTargetReference ref) {
+  private static boolean noteMatchesWikiLinkTarget(Note note, PortablePath.Resolved ref) {
     if (note.getNotebook() == null) {
       return false;
     }
     if (!note.getNotebook().getName().equalsIgnoreCase(ref.notebookName())) {
       return false;
     }
-    return WikiLinkTargetReference.PathShapedTarget.tryParse(ref.noteTitle())
+    return PathShapedTarget.tryParse(ref.noteTitle())
         .map(
             path ->
                 path.matchesTitleAndFolderTrail(

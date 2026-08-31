@@ -92,12 +92,34 @@ plan.
 
 ### 1. One backend Portable path value
 
-**Status:** planned  
+**Status:** done  
 **Type:** Structure
 
 Replace the two overlapping backend path types with one `PortablePath` value
 without changing parsing, resolution, or rewrite results. This structure is
 verified by the existing-behavior slice immediately following it.
+
+**Learnings:**
+- `PortablePath` is a record with three parts, eagerly parsed:
+  `Optional<String> notebookQualifier` (present only when literally written in
+  the authored text), `String notePortion`, and
+  `Optional<String> encodedPropertyKey`. The focus-notebook fallback (applying
+  the current notebook when the token is unqualified) stays a separate
+  resolution-time step via `PortablePath.resolve(focusNotebookName)`, called
+  only where resolution already happened — it is not part of parsing.
+- `DisplayNamePathSeparators.replaceOsInvalidCharsInWikiLinkTarget` has its
+  own bespoke qualifier heuristic that differs from `PortablePath`'s canonical
+  parser (rejects qualifiers containing `/`/`\`, doesn't trim). Routing it
+  through the canonical parser silently changed behavior on inputs like
+  `"foo/bar: baz"`. Fixed with a lossless
+  `PortablePath.mapBeforePropertySuffix(raw, transform)` that only splits off
+  `#prop:` and hands the untouched prefix to the caller's own logic — a
+  pattern worth reusing if another caller needs the old split without the new
+  parser's semantics.
+- Post-change-refactor split the merged file for size:
+  `PathShapedTarget` and the RFC 3986 percent-encoding codec
+  (`PropertyKeyPercentEncoding`) are now separate top-level types alongside
+  `PortablePath`.
 
 - Merge `WikiLinkAuthoredTarget` and `WikiLinkTargetReference` into
   `PortablePath` under `backend/.../algorithms/`.

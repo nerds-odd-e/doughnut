@@ -9,12 +9,11 @@ public final class WikiLinkPropertyMatch {
   private WikiLinkPropertyMatch() {}
 
   public static boolean matchesTargetNoteContent(String token, String targetNoteContent) {
-    WikiLinkAuthoredTarget authored =
-        WikiLinkAuthoredTarget.parse(WikiLinkMarkdown.splitAuthoredToken(token).target());
-    if (!authored.hasPropertySuffix()) {
+    PortablePath portablePath = WikiLinkMarkdown.splitAuthoredToken(token).portablePath();
+    if (!portablePath.hasPropertySuffix()) {
       return true;
     }
-    return authored
+    return portablePath
         .decodedPropertyKey()
         .filter(key -> noteHasExactPropertyKey(targetNoteContent, key))
         .isPresent();

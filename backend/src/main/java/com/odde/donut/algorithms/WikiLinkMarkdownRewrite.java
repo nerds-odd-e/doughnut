@@ -37,7 +37,7 @@ public final class WikiLinkMarkdownRewrite {
       return storedLinkInner;
     }
     UnaryOperator<String> transform =
-        token -> WikiLinkTargetReference.replaceFolderName(token, oldFolderName, newFolderName);
+        token -> PortablePath.replaceFolderName(token, oldFolderName, newFolderName);
     return rewriteAuthoredTarget(
         storedLinkInner, transform, () -> rewriteWikiInnerTarget(storedLinkInner, transform));
   }
@@ -65,7 +65,7 @@ public final class WikiLinkMarkdownRewrite {
             keepVisibleInner(
                 storedLinkInner,
                 rawTargetToken ->
-                    WikiLinkTargetReference.replaceNotebookName(rawTargetToken, newNotebookName)));
+                    PortablePath.replaceNotebookName(rawTargetToken, newNotebookName)));
   }
 
   /**
@@ -89,13 +89,12 @@ public final class WikiLinkMarkdownRewrite {
     int pipeIdx = storedLinkInner.indexOf('|');
     String rawTargetPart = pipeIdx == -1 ? storedLinkInner : storedLinkInner.substring(0, pipeIdx);
     String targetToken = rawTargetPart.trim();
-    if (targetToken.isEmpty() || WikiLinkTargetReference.isQualifiedToken(targetToken)) {
+    if (targetToken.isEmpty() || PortablePath.isQualifiedToken(targetToken)) {
       return storedLinkInner;
     }
     return keepVisibleInner(
         storedLinkInner,
-        rawTargetToken ->
-            WikiLinkTargetReference.replaceNotebookName(rawTargetToken, sourceNotebookName));
+        rawTargetToken -> PortablePath.replaceNotebookName(rawTargetToken, sourceNotebookName));
   }
 
   private static String newInnerWithHandling(
@@ -108,7 +107,7 @@ public final class WikiLinkMarkdownRewrite {
     }
     return rewriteAuthoredTarget(
         storedLinkInner,
-        token -> WikiLinkTargetReference.replaceNoteTitle(token, newNoteTitle.trim()),
+        token -> PortablePath.replaceNoteTitle(token, newNoteTitle.trim()),
         () -> rewriteWikiInnerNoteTitle(storedLinkInner, newNoteTitle, keepVisibleText));
   }
 
@@ -144,7 +143,7 @@ public final class WikiLinkMarkdownRewrite {
     int pipeIdx = storedLinkInner.indexOf('|');
     String rawTargetPart = pipeIdx == -1 ? storedLinkInner : storedLinkInner.substring(0, pipeIdx);
     String newTargetToken =
-        WikiLinkTargetReference.replaceNoteTitle(rawTargetPart.trim(), newNoteTitle.trim());
+        PortablePath.replaceNoteTitle(rawTargetPart.trim(), newNoteTitle.trim());
     if (pipeIdx == -1) {
       return keepVisibleText ? newTargetToken + "|" + storedLinkInner.trim() : newTargetToken;
     }

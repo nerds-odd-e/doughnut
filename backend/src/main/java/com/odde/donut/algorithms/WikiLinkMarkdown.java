@@ -25,10 +25,10 @@ public final class WikiLinkMarkdown {
       Pattern.compile("\\[([^\\[\\]]*)\\]\\((/[^)\\s]+)\\)");
 
   /**
-   * Target and display segments of an authored inter-note token (first {@code |} separates wiki
-   * inners; Markdown path links use display text and href).
+   * Portable path and display segments of an authored inter-note token (first {@code |} separates
+   * wiki inners; Markdown path links use display text and href).
    */
-  public record WikiInnerSplit(String target, String display) {}
+  public record WikiInnerSplit(PortablePath portablePath, String displayText) {}
 
   record PathMarkdownToken(String display, String href) {
     String withHref(String newHref) {
@@ -41,18 +41,18 @@ public final class WikiLinkMarkdown {
   private WikiLinkMarkdown() {}
 
   /**
-   * Target and display of an authored inter-note token: Markdown path link {@code [display](/href)}
-   * or wiki inner ({@link #splitInner}).
+   * Portable path and display of an authored inter-note token: Markdown path link {@code
+   * [display](/href)} or wiki inner ({@link #splitInner}).
    */
   public static WikiInnerSplit splitAuthoredToken(String authored) {
     if (authored == null || authored.isEmpty()) {
-      return new WikiInnerSplit("", "");
+      return new WikiInnerSplit(PortablePath.parse(""), "");
     }
     Optional<PathMarkdownToken> path = tryParsePathMarkdownToken(authored);
     if (path.isPresent()) {
       PathMarkdownToken token = path.get();
       String display = token.display().trim().isEmpty() ? token.href() : token.display();
-      return new WikiInnerSplit(token.href(), display);
+      return new WikiInnerSplit(PortablePath.parse(token.href()), display);
     }
     return splitInner(authored);
   }
@@ -63,18 +63,18 @@ public final class WikiLinkMarkdown {
    */
   public static WikiInnerSplit splitInner(String rawBetweenBrackets) {
     if (rawBetweenBrackets == null || rawBetweenBrackets.isEmpty()) {
-      return new WikiInnerSplit("", "");
+      return new WikiInnerSplit(PortablePath.parse(""), "");
     }
     int i = rawBetweenBrackets.indexOf('|');
     if (i == -1) {
-      return new WikiInnerSplit(rawBetweenBrackets, rawBetweenBrackets);
+      return new WikiInnerSplit(PortablePath.parse(rawBetweenBrackets), rawBetweenBrackets);
     }
     String target = rawBetweenBrackets.substring(0, i);
     String display = rawBetweenBrackets.substring(i + 1);
     if (display.trim().isEmpty()) {
-      return new WikiInnerSplit(target, target);
+      return new WikiInnerSplit(PortablePath.parse(target), target);
     }
-    return new WikiInnerSplit(target, display);
+    return new WikiInnerSplit(PortablePath.parse(target), display);
   }
 
   /**
@@ -93,7 +93,7 @@ public final class WikiLinkMarkdown {
     if (inner.isEmpty()) {
       return false;
     }
-    return !splitInner(inner).target().trim().isEmpty();
+    return !splitInner(inner).portablePath().format().trim().isEmpty();
   }
 
   public static List<String> authoredTokensInOccurrenceOrder(String markdown) {
@@ -133,15 +133,16 @@ public final class WikiLinkMarkdown {
 
   private static String authoredTokenDedupeKey(String token) {
     WikiInnerSplit split = splitAuthoredToken(token);
-    WikiLinkAuthoredTarget authored = WikiLinkAuthoredTarget.parse(split.target());
-    if (!authored.hasPropertySuffix()) {
+    PortablePath portablePath = split.portablePath();
+    if (!portablePath.hasPropertySuffix()) {
       return FrontmatterAliases.normalizedLookupKey(token);
     }
-    String folded = authored.mapNoteTarget(FrontmatterAliases::normalizedLookupKey).format();
-    if (split.display().equals(split.target())) {
+    String folded =
+        portablePath.mapQualifiedNotePortion(FrontmatterAliases::normalizedLookupKey).format();
+    if (split.displayText().equals(portablePath.format())) {
       return folded;
     }
-    return folded + "|" + FrontmatterAliases.normalizedLookupKey(split.display());
+    return folded + "|" + FrontmatterAliases.normalizedLookupKey(split.displayText());
   }
 
   static Optional<PathMarkdownToken> tryParsePathMarkdownToken(String authored) {

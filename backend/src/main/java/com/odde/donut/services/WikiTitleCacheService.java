@@ -55,7 +55,11 @@ public class WikiTitleCacheService {
         WikiLinkMarkdown.WikiInnerSplit parts =
             WikiLinkMarkdown.splitAuthoredToken(row.getLinkText());
         out.add(
-            new WikiTitle(row.getLinkText(), parts.target(), parts.display(), resolved.getId()));
+            new WikiTitle(
+                row.getLinkText(),
+                parts.portablePath().format(),
+                parts.displayText(),
+                resolved.getId()));
       }
     }
     return List.copyOf(out);

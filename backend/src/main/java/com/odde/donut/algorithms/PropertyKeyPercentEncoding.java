@@ -7,16 +7,13 @@ import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CodingErrorAction;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
-import java.util.function.UnaryOperator;
 
 /**
- * Authored wiki or path-Markdown link target: note target plus optional {@code #prop:} encoded
- * property key (ADR 0004). The decoded key is the same YAML property-key string used by {@link
- * PropertyKeyNaming} and {@code note_property_index.property_key}.
+ * RFC 3986 percent-encoding for the YAML property key carried in a {@link PortablePath}'s {@code
+ * #prop:} suffix (ADR 0004). Unreserved characters stay literal; every other UTF-8 byte becomes
+ * uppercase {@code %HH}.
  */
-public record WikiLinkAuthoredTarget(String noteTarget, String encodedPropertyKey) {
-
-  private static final String PROPERTY_SEPARATOR = "#prop:";
+final class PropertyKeyPercentEncoding {
 
   private static final boolean[] UNRESERVED = new boolean[128];
 
@@ -36,46 +33,9 @@ public record WikiLinkAuthoredTarget(String noteTarget, String encodedPropertyKe
     UNRESERVED['~'] = true;
   }
 
-  public static WikiLinkAuthoredTarget parse(String target) {
-    if (target == null) {
-      return new WikiLinkAuthoredTarget("", null);
-    }
-    int separator = target.indexOf(PROPERTY_SEPARATOR);
-    if (separator < 0) {
-      return new WikiLinkAuthoredTarget(target, null);
-    }
-    return new WikiLinkAuthoredTarget(
-        target.substring(0, separator), target.substring(separator + PROPERTY_SEPARATOR.length()));
-  }
+  private PropertyKeyPercentEncoding() {}
 
-  public String format() {
-    if (encodedPropertyKey == null) {
-      return noteTarget;
-    }
-    return noteTarget + PROPERTY_SEPARATOR + encodedPropertyKey;
-  }
-
-  public boolean hasPropertySuffix() {
-    return encodedPropertyKey != null;
-  }
-
-  public WikiLinkAuthoredTarget withNoteTarget(String newNoteTarget) {
-    return new WikiLinkAuthoredTarget(newNoteTarget, encodedPropertyKey);
-  }
-
-  public WikiLinkAuthoredTarget mapNoteTarget(UnaryOperator<String> noteTargetTransform) {
-    return withNoteTarget(noteTargetTransform.apply(noteTarget));
-  }
-
-  public Optional<String> decodedPropertyKey() {
-    return decodePropertyKey(encodedPropertyKey);
-  }
-
-  /**
-   * Encodes a YAML property key as one {@code #prop:} component: RFC 3986 unreserved characters
-   * stay literal; every other UTF-8 byte is uppercase {@code %HH}.
-   */
-  public static String encodePropertyKey(String yamlKey) {
+  static String encode(String yamlKey) {
     byte[] bytes = yamlKey.getBytes(StandardCharsets.UTF_8);
     StringBuilder out = new StringBuilder(bytes.length);
     for (byte raw : bytes) {
@@ -95,7 +55,7 @@ public record WikiLinkAuthoredTarget(String noteTarget, String encodedPropertyKe
    * Decodes one {@code #prop:} component. Product output uses uppercase hex; either hex case is
    * accepted. Invalid escape, empty component, or invalid UTF-8 yields empty.
    */
-  public static Optional<String> decodePropertyKey(String encoded) {
+  static Optional<String> decode(String encoded) {
     if (encoded == null || encoded.isEmpty()) {
       return Optional.empty();
     }
