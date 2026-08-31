@@ -23,7 +23,8 @@
           v-for="side in responseSides"
           :key="side"
           :data-testid="`daily-probe-response-zone-${side}`"
-          class="flex-1 bg-base-200 touch-none"
+          class="flex-1 touch-none"
+          :class="pressedSide === side ? 'bg-base-300' : 'bg-base-200'"
           @pointerdown="finishTrial(side)"
         />
       </div>
@@ -99,6 +100,7 @@ import {
   onUnmounted,
   ref,
 } from "vue"
+import { useDailyProbePressFlash } from "./useDailyProbePressFlash"
 
 const emit = defineEmits<{
   complete: []
@@ -112,6 +114,8 @@ const responseSides = [
 
 const trialIndex = ref(0)
 const stimulus = ref<DailyProbeSide | undefined>()
+const { pressedSide, startPressFlash, clearPressFlash } =
+  useDailyProbePressFlash()
 const scoredTrials = ref<DailyProbeTrial[]>([])
 const finished = ref(false)
 const saveStatus = ref<"unsaved" | "saved" | "failed">("unsaved")
@@ -152,6 +156,7 @@ function finishTrial(response?: DailyProbeSide) {
   if (respondedThisTrial || finished.value) return
   respondedThisTrial = true
   clearScheduled()
+  if (response !== undefined) startPressFlash(response)
   const current = dailyProbeRunSequence[trialIndex.value]!
   if (trialIndex.value >= practiceCount) {
     scoredTrials.value.push(
@@ -208,6 +213,7 @@ function detachKeyListener() {
 
 function abandonUnfinishedRun() {
   clearScheduled()
+  clearPressFlash()
   trialIndex.value = 0
   stimulus.value = undefined
   scoredTrials.value = []
@@ -224,6 +230,7 @@ onMounted(() => {
 onUnmounted(() => {
   detachKeyListener()
   clearScheduled()
+  clearPressFlash()
 })
 onActivated(() => {
   attachKeyListener()

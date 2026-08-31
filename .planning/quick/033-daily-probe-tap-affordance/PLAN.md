@@ -1,6 +1,6 @@
 # Daily probe tap affordance
 
-**Status:** in progress (slices 1–2 done).
+**Status:** complete (all slices done).
 **Type:** ad-hoc plan (`.planning/quick/`)
 **Measurement spec:** [daily-probe-protocol.md](../../notes/daily-probe-protocol.md)
 
@@ -65,17 +65,11 @@ E2E still 9 passing.
 
 ---
 
-### 3. Flash the recorded side — Behavior `[ ]`
+### 3. Flash the recorded side — Behavior `[x]`
 
-**Pre:** a stimulus is showing. **Trigger:** `pointerdown` on a zone, or a
-mapped key. **Post:** that side panel shows a brief press highlight; the
-other side does not; the trial still ends and ISI still runs on the same
-clock; a timeout does not flash.
-
-**Verify:** `DailyProbe.spec.ts` — after a left tap (and after `f`), the
-left zone has the press class and the right does not; after ~200ms of fake
-timers the class is gone. Existing complete-by-tap and keyboard tests still
-pass. No E2E scenario for the flash. No protocol change.
+Shipped: mapped tap or F/J flashes that zone `bg-base-300` for 200ms on a
+timer separate from ISI/RT. Timeout does not flash. Chrome lives in
+`useDailyProbePressFlash`. `DailyProbe.spec.ts` covers tap, F, and timeout.
 
 ## Learnings
 

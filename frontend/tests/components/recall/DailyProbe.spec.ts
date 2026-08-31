@@ -14,43 +14,15 @@ import helper, {
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import { defineComponent, KeepAlive, nextTick } from "vue"
-
-function pressMappedKey(side: "left" | "right") {
-  window.dispatchEvent(
-    new KeyboardEvent("keydown", {
-      key: side === "left" ? "f" : "j",
-      bubbles: true,
-    })
-  )
-}
-
-function responseZone(view: VueWrapper, side: "left" | "right") {
-  return view.find(`[data-testid="daily-probe-response-zone-${side}"]`)
-}
-
-function tapMappedSide(view: VueWrapper, side: "left" | "right") {
-  return responseZone(view, side).trigger("pointerdown")
-}
-
-function stimulusSlot(view: VueWrapper) {
-  return view.find('[data-testid="daily-probe-stimulus"]')
-}
-
-function expectBlankStimulusSlot(view: VueWrapper) {
-  const slot = stimulusSlot(view)
-  expect(slot.exists()).toBe(true)
-  expect(slot.classes()).toContain("invisible")
-  expect(slot.text()).not.toMatch(/[←→]/)
-}
-
-async function completeProbe(respond: (side: "left" | "right") => unknown) {
-  for (const side of dailyProbeRunSequence) {
-    vi.advanceTimersByTime(250)
-    await respond(side)
-    vi.advanceTimersByTime(DAILY_PROBE_ISI_MS)
-  }
-  await flushPromises()
-}
+import {
+  completeProbe,
+  expectBlankStimulusSlot,
+  mountDailyProbe,
+  pressMappedKey,
+  responseZone,
+  stimulusSlot,
+  tapMappedSide,
+} from "./dailyProbeTestSupport"
 
 describe("DailyProbe", () => {
   let wrapper: VueWrapper | undefined
@@ -76,7 +48,7 @@ describe("DailyProbe", () => {
   })
 
   const mountProbe = () => {
-    wrapper = helper.component(DailyProbe).mount()
+    wrapper = mountDailyProbe()
     return wrapper
   }
 
@@ -130,6 +102,34 @@ describe("DailyProbe", () => {
     expect(instruction.getBoundingClientRect().top).toBe(instructionTop)
     expectBlankStimulusSlot(wrapper)
     expect(slot.element.getBoundingClientRect().height).toBe(slotHeight)
+  })
+
+  it("flashes the left zone after a left tap and clears after 200ms", async () => {
+    const view = mountProbe()
+    await tapMappedSide(view, "left")
+    await nextTick()
+    expect(responseZone(view, "left").classes()).toContain("bg-base-300")
+    expect(responseZone(view, "right").classes()).not.toContain("bg-base-300")
+    expectBlankStimulusSlot(view)
+
+    vi.advanceTimersByTime(200)
+    await nextTick()
+    expect(responseZone(view, "left").classes()).not.toContain("bg-base-300")
+  })
+
+  it("flashes the left zone after F", async () => {
+    const view = mountProbe()
+    pressMappedKey("left")
+    await nextTick()
+    expect(responseZone(view, "left").classes()).toContain("bg-base-300")
+  })
+
+  it("does not flash when a trial times out", async () => {
+    const view = mountProbe()
+    vi.advanceTimersByTime(DAILY_PROBE_TIMEOUT_MS)
+    await nextTick()
+    expect(responseZone(view, "left").classes()).not.toContain("bg-base-300")
+    expect(responseZone(view, "right").classes()).not.toContain("bg-base-300")
   })
 
   it("records a matching side-zone tap the same as F/J", async () => {
