@@ -319,19 +319,16 @@ controller tests added.
 
 ### 15. SearchForm wiki-link spelling has one owner
 
-**Status:** planned
+**Status:** done
 **Type:** Structure
 
-Unlocks slice 17. Move same-notebook insert and ambiguous-repair spelling
-(the `authoredPortablePathFor` + `[[…]]` wrap) out of `SearchForm.vue` so
-that file stays under 250 lines when insert callers switch. No insert
-behavior change. Do not convert property / overlap / paste / cross-notebook
-insert here.
-
-Verification: focused `InsertWikiLink.spec.ts` and
-`SearchDialog.deadWikiLink.spec.ts`.
-
-Stop-safe: the next insert slice can call one helper.
+Extracted `frontend/src/utils/sameNotebookWikiLinkAuthoring.ts`
+(`authoredWikiLinkTokenForInsert`, `authoredWikiLinkTokenForAmbiguousRepair`)
+owning the `authoredPortablePathFor` API call and `[[…]]` wrap.
+`SearchForm.vue` 224→204 lines. Cross-notebook branch (`buildWikiLinkText`)
+and the path-shaped/fallback branches of `wikiLinkSpellingForDestination`
+unchanged. `InsertWikiLink.spec.ts` / `SearchDialog.deadWikiLink.spec.ts`
+green, no behavior change.
 
 ### 16. Edited wiki-link markup uses destination names
 

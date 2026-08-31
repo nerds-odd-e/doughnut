@@ -34,7 +34,6 @@
 <script setup lang="ts">
 import { ref, computed, nextTick } from "vue"
 import type { Note, NoteSearchResult } from "@generated/donut-backend-api"
-import { NoteController } from "@generated/donut-backend-api/sdk.gen"
 import AddRelationshipFinalize from "./AddRelationshipFinalize.vue"
 import WikiLinkOrRelationshipChoice from "./WikiLinkOrRelationshipChoice.vue"
 import SearchForNoteAndFolder from "../search/SearchForNoteAndFolder.vue"
@@ -49,10 +48,13 @@ import {
   pathMarkdownTokenForNote,
 } from "@/utils/wikiLinkMarkup"
 import {
+  authoredWikiLinkTokenForInsert,
+  authoredWikiLinkTokenForAmbiguousRepair,
+} from "@/utils/sameNotebookWikiLinkAuthoring"
+import {
   moveBlockedBySoftDeletedTitleMessage,
   parseSoftDeletedTitleConflict,
 } from "@/managedApi/softDeletedTitleConflict"
-import { apiCallWithLoading } from "@/managedApi/clientSetup"
 
 const { popups } = usePopups()
 const storageAccessor = useStorageAccessor()
@@ -87,26 +89,6 @@ async function closeDialogThen(run: () => void | Promise<void>) {
   await run()
 }
 
-async function authoredPortablePathFor(
-  destinationNoteId: number,
-  originalPortablePath?: string
-): Promise<string | undefined> {
-  if (!note) return
-  const { data, error } = await apiCallWithLoading(() =>
-    NoteController.authoredPortablePath({
-      path: { note: note.id },
-      query: {
-        destinationNote: destinationNoteId,
-        ...(originalPortablePath === undefined
-          ? {}
-          : { portablePath: originalPortablePath }),
-      },
-    })
-  )
-  if (error || !data) return
-  return data.portablePath
-}
-
 async function onInsertWikiLink() {
   if (!selectedSearchResult.value || !note) return
   const destination = selectedSearchResult.value
@@ -122,11 +104,12 @@ async function onInsertWikiLink() {
     await closeDialogThen(() => insert(linkText))
     return
   }
-  const portablePath = await authoredPortablePathFor(
+  const linkText = await authoredWikiLinkTokenForInsert(
+    note.id,
     destination.noteTopology.id
   )
-  if (portablePath === undefined) return
-  await closeDialogThen(() => insert(`[[${portablePath}]]`))
+  if (linkText === undefined) return
+  await closeDialogThen(() => insert(linkText))
 }
 
 async function onInsertWikiLinkAsProperty() {
@@ -146,15 +129,12 @@ async function wikiLinkSpellingForDestination(): Promise<string | undefined> {
   const destination = selectedSearchResult.value
   if (!destination || !note || !deadWikiLinkPayload) return
   if (deadWikiLinkPayload.resolution === "AMBIGUOUS") {
-    const portablePath = await authoredPortablePathFor(
+    return authoredWikiLinkTokenForAmbiguousRepair(
+      note.id,
       destination.noteTopology.id,
-      deadWikiLinkPayload.portablePath
+      deadWikiLinkPayload.portablePath,
+      deadWikiLinkPayload.displayText
     )
-    if (portablePath === undefined) return
-    return markdownWikiTokenFromDeadWikiLinkPayload({
-      portablePath,
-      displayText: deadWikiLinkPayload.displayText,
-    })
   }
   if (authoredHrefLooksLikePortablePath(deadWikiLinkPayload.portablePath)) {
     return pathMarkdownTokenForNote({
