@@ -2,6 +2,7 @@ package com.odde.donut.factoryServices;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.not;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
@@ -76,9 +77,10 @@ class FailureReportFactoryTest {
         .createUnlessAllowed();
 
     FailureReport report = failureReportRepository.findAll().iterator().next();
-    assertEquals("java.lang.RuntimeException", report.getErrorName());
-    assertThat(report.getErrorDetail(), containsString("QuestionGenerationBatchMaintenanceJob"));
-    assertThat(report.getErrorDetail(), containsString("FailureReportFactoryTest.java"));
+    assertThat(
+        report.getErrorDetail(), containsString("# source: QuestionGenerationBatchMaintenanceJob"));
+    assertThat(report.getErrorDetail(), not(containsString("# request:")));
+    assertThat(report.getErrorDetail(), not(containsString("# user external Id:")));
   }
 
   private FailureReport createReport() throws IOException, InterruptedException {

@@ -3,6 +3,7 @@ package com.odde.donut.entities.repositories;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.mockito.Mockito.mock;
 
 import com.odde.donut.entities.QuestionGenerationBatchMaintenanceTriggerSource;
 import com.odde.donut.services.GithubService;
@@ -28,8 +29,6 @@ class QuestionGenerationBatchMaintenanceRunRepositoryTest {
   @Autowired QuestionGenerationBatchMaintenanceRunService maintenanceRunService;
   @Autowired QuestionGenerationBatchMaintenanceService maintenanceService;
   @Autowired QuestionGenerationBatchSubmitDueUsersService submitDueUsersService;
-  @Autowired GithubService githubService;
-  @Autowired FailureReportRepository failureReportRepository;
 
   @Test
   void persistsManualResumeMaintenanceRunWhenRecorded() {
@@ -60,8 +59,8 @@ class QuestionGenerationBatchMaintenanceRunRepositoryTest {
             maintenanceService,
             submitDueUsersService,
             maintenanceRunService,
-            githubService,
-            failureReportRepository);
+            mock(GithubService.class),
+            mock(FailureReportRepository.class));
 
     job.runHourlyMaintenance();
 
