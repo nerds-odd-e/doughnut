@@ -20,6 +20,16 @@ Then(
   }
 )
 
+Then(
+  'an admin should see one {string} in the failure report',
+  (content: string) => {
+    start
+      .loginAsAdminAndGoToAdminDashboard()
+      .goToFailureReportList()
+      .shouldHaveOneEntryContaining(content)
+  }
+)
+
 Given('an admin is viewing the failure report', () => {
   return start.establishSessionAs('admin').then(() => {
     start

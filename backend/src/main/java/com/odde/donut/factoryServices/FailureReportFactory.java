@@ -9,6 +9,7 @@ import com.odde.donut.services.GithubService;
 import jakarta.servlet.http.HttpServletRequest;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.Optional;
 import org.springframework.web.server.ResponseStatusException;
 
 public record FailureReportFactory(
@@ -50,6 +51,8 @@ public record FailureReportFactory(
     if (exception instanceof ApiException) return;
     if (exception instanceof UnexpectedNoAccessRightException) return;
 
+    if (incrementIfConsecutiveSimilar()) return;
+
     FailureReport failureReport = createFailureReport();
     try {
       Integer issueNumber = githubService.createGithubIssue(failureReport);
@@ -59,6 +62,17 @@ public record FailureReportFactory(
           failureReport.getErrorDetail() + "\n# GitHub issue creation failed\n" + e.getMessage());
     }
     saveFailureReport(failureReport);
+  }
+
+  private boolean incrementIfConsecutiveSimilar() {
+    Optional<FailureReport> latest = failureReportRepository.findTopByOrderByIdDesc();
+    if (latest.isEmpty() || !fingerprint().equals(latest.get().getFingerprint())) {
+      return false;
+    }
+    FailureReport report = latest.get();
+    report.setOccurrenceCount(report.getOccurrenceCount() + 1);
+    saveFailureReport(report);
+    return true;
   }
 
   private FailureReport saveFailureReport(FailureReport failureReport) {

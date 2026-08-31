@@ -52,6 +52,13 @@ function failureReportList() {
       })
       return this
     },
+    shouldHaveOneEntryContaining(content: string) {
+      cy.get('[data-testid="failure-report-row-select"]').should(
+        'have.length',
+        1
+      )
+      return this.shouldContain(content)
+    },
     clearSelected(index = 0) {
       cy.get('.daisy-card').eq(index).find('input[type="checkbox"]').check()
       cy.get('button').contains('Delete Selected').click()

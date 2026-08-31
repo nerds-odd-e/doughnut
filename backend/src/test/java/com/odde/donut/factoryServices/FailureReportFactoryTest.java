@@ -2,10 +2,13 @@ package com.odde.donut.factoryServices;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.not;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 import com.odde.donut.controllers.currentUser.CurrentUserFetcherFromRequest;
 import com.odde.donut.entities.FailureReport;
@@ -16,7 +19,9 @@ import com.odde.donut.services.GithubService;
 import com.odde.donut.services.UserService;
 import com.odde.donut.testability.MakeMe;
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.StreamSupport;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -103,6 +108,21 @@ class FailureReportFactoryTest {
         report.getFingerprint(), containsString("source:QuestionGenerationBatchMaintenanceJob"));
   }
 
+  @Test
+  void coalescesConsecutiveSimilarFailuresIntoOneFailureReport()
+      throws IOException, InterruptedException {
+    createReportFromException("first");
+    String firstDetail = failureReports().getFirst().getErrorDetail();
+
+    createReportFromException("second");
+
+    List<FailureReport> failureReports = failureReports();
+    assertThat(failureReports, hasSize(1));
+    assertEquals(2, failureReports.getFirst().getOccurrenceCount());
+    assertEquals(firstDetail, failureReports.getFirst().getErrorDetail());
+    verify(githubService, times(1)).createGithubIssue(any());
+  }
+
   private FailureReport createReport() throws IOException, InterruptedException {
     CurrentUserFetcherFromRequest fetcher =
         new CurrentUserFetcherFromRequest(request, userRepository, userService, Optional.empty());
@@ -111,16 +131,24 @@ class FailureReportFactoryTest {
             request, new RuntimeException(), fetcher, githubService, failureReportRepository)
         .createUnlessAllowed();
 
-    return failureReportRepository.findAll().iterator().next();
+    return failureReports().getFirst();
   }
 
   private FailureReport createReportFromException() {
+    createReportFromException("for failure report");
+    return failureReports().getFirst();
+  }
+
+  private void createReportFromException(String message) {
     FailureReportFactory.fromException(
-            new RuntimeException(),
+            new RuntimeException(message),
             "QuestionGenerationBatchMaintenanceJob",
             githubService,
             failureReportRepository)
         .createUnlessAllowed();
-    return failureReportRepository.findAll().iterator().next();
+  }
+
+  private List<FailureReport> failureReports() {
+    return StreamSupport.stream(failureReportRepository.findAll().spliterator(), false).toList();
   }
 }

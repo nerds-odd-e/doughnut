@@ -1,6 +1,6 @@
 # Consecutive similar Failure reports
 
-**Status:** in progress (slice 1 done).
+**Status:** in progress (slices 1–2 done).
 **Type:** ad-hoc plan (`.planning/quick/`)
 
 Follow-up to shipped scheduled-job Failure reports. Independent of
@@ -66,21 +66,11 @@ builder defaults `occurrenceCount` to 1 after API regen.
 
 ---
 
-### 2. Consecutive similar failures are one Failure report — Behavior `[ ]`
+### 2. Consecutive similar failures are one Failure report — Behavior `[x]`
 
-**Pre:** a Failure report exists for failure A. **Trigger:** a similar
-failure (same fingerprint) with no dissimilar failure in between. **Post:**
-one Failure report remains; occurrence count is 2; `createGithubIssue` was
-not called again; first `error_detail` unchanged.
-
-Admin list already renders one card per row, so the list shows one entry
-without a frontend change.
-
-**Verify:** factory test — two similar `fromException` (or two HTTP 500s)
-→ one row, count 2, `createGithubIssue` once. E2E
-`show_failure_report.feature`: trigger the test exception twice → one
-RuntimeException entry (`@wip` until green). Existing “exception appears” /
-“admin clears” scenarios still pass. No occurrence-count UI yet.
+Match latest row fingerprint (`findTopByOrderByIdDesc`) → increment count,
+keep first `error_detail`, skip `createGithubIssue`. E2E two-trigger
+scenario is green without `@wip`. No count UI yet.
 
 ---
 
@@ -140,8 +130,8 @@ window.
   URL). Comments stay equally detail-free.
 - **Failure report** is in ADR 0001; policy is Accepted ADR 0006.
 - Latest-row rule is global: an HTTP 500 can split a scheduled loop.
-- `findAll()` has no order today; “latest” needs an explicit query (max id
-  or `created_datetime`).
+- Latest row is `findTopByOrderByIdDesc()` (HTTP and scheduled share one
+  stream).
 - Factory uses `System.currentTimeMillis()` for `created_datetime`; debounce
   must use the same clock as `TestabilitySettings` (inject current time in
   slice 6, not earlier).
