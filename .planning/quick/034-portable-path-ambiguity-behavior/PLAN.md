@@ -161,7 +161,14 @@ Gone: `WikiLinkTargetReference`, `WikiTitleCacheTitleResolutionTest`,
 - Finish destination vocabulary on methods this plan already edits
   (`wikiLinkAnchorHtml` / `WikiLinkToken` still use leftover `target`). Do not
   sweep `authoredLinkMarkup.splitWikiLinkInner` or relationship `target*` in
-  the same slice. `WikiLinkRewriteSupport` first-match stays slice 28.
+  the same slice. `WikiLinkRewriteSupport` first-match stays slice 29.
+- `refreshNotebookScope` (slice 21) rebuilding one note's alias index and
+  resolving another note's links in the same per-note pass is order-dependent
+  on note id: title collisions are immune (title lives on `Note` itself,
+  already persisted before the loop), alias collisions are not (a separate
+  `NoteAliasIndex` table, rebuilt only on that note's own turn). Slice 26
+  fixes this with a two-pass split; do not reintroduce a single-pass walk in
+  later mutation-consistency slices without checking this ordering.
 
 ## Slices
 
@@ -472,7 +479,48 @@ Pinned by `NoteControllerDeleteTests
 `.shouldReresolveNotebookShorthandsWhenRestoreReintroducesACollision`.
 Full backend suite green.
 
-### 26. Changing aliases updates shorthand cardinality
+### 26. Notebook-scope re-resolution rebuilds every note's alias index before resolving any note's links
+
+**Status:** planned
+**Type:** Structure
+
+Unlocks slice 27 (alias cardinality). Discovered while implementing the
+old slice 26 (see Learnings): `ResolvedWikiLinkRefresh.refreshNotebookScope`
+loops live notes in id order and calls `refreshForNote` on each, which
+*interleaves*, per note, rebuilding that note's own resolved-link rows
+with rebuilding that note's own alias index. Title-based collisions
+(slices 22–25) are unaffected because title lives on `Note` itself,
+already persisted before the loop starts — but alias candidates come from
+the separate `NoteAliasIndex` table, not rebuilt for a note until that
+note's own turn. A lower-id referrer resolved earlier in the loop sees a
+higher-id note's *stale* (pre-change) alias index, so an alias collision
+introduced on the higher-id note is invisible to earlier-processed
+referrers.
+
+Implementation: split `refreshNotebookScope` into two passes over the
+notebook's live notes — first rebuild every note's own alias/property/level
+index (not its resolved wiki-link rows), then in a second pass resolve
+every note's outgoing links (and drop stale inbound property-wiki rows)
+now that every note's indexes are current. Reuse the existing per-note
+index-rebuild and link-resolution logic already inside
+`ResolvedWikiLinkRefresh.refreshForNote`; split it into two callable steps
+rather than adding a second lookup model. `refreshForNote` (the single-note
+entry point used by slices 22–25's title/rename/create/move/delete
+callers) keeps its current one-pass behavior — this split only changes the
+notebook-wide walk's internal ordering, not the single-note API's
+contract or its callers.
+
+Test first: a `ResolvedWikiLinkServiceTest` case with two notes in id
+order such that the lower-id note's shorthand link only becomes ambiguous
+if the higher-id note's alias index is rebuilt before the lower-id note's
+links are resolved — i.e. the exact scenario slice 27's test needs.
+
+Verification: `pnpm backend:test_only`.
+
+Stop-safe: notebook-wide re-resolution order does not hide a same-pass
+alias collision regardless of note id order.
+
+### 27. Changing aliases updates shorthand cardinality
 
 **Status:** planned
 **Type:** Behavior
@@ -483,16 +531,25 @@ Full backend suite green.
 new cardinality without editing the source note.
 
 Test first: add/remove a title-colliding alias at the text-content
-controller boundary. Do not duplicate slice 22's graph assertions.
+controller boundary (the test already written while diagnosing slice 26's
+Structure fix — `TextContentControllerUpdateNoteContentTests
+.reresolvesNotebookShorthandsWhenAnAliasIntroducesOrRemovesACollision` —
+should pass unchanged once slice 26 above lands). Do not duplicate slice
+22's graph assertions.
 
-Implementation: feed affected old/new alias lookup keys into slice 21's
-owner.
+Implementation: in `TextContentController.updateNote`, capture the note's
+normalized alias-lookup-key set before and after the content update
+(`FrontmatterAliases.fromNoteContent` + `normalizedLookupKey`, matching
+`NoteAliasIndexService`'s own normalization); call
+`resolvedWikiLinkService.refreshNotebookScope(note.getNotebook(), viewer)`
+only when the sets differ, so an ordinary body-text edit still takes the
+cheaper single-note `refreshForNote` path.
 
 Verification: `pnpm backend:test_only`.
 
 Stop-safe: aliases participate in uniqueness over time.
 
-### 27. Rename rewrite lengthens the Portable path when needed
+### 28. Rename rewrite lengthens the Portable path when needed
 
 **Status:** planned
 **Type:** Behavior
@@ -518,7 +575,7 @@ touched.
 Stop-safe: rename maintenance cannot rewrite a good link into an ambiguous
 shorthand.
 
-### 28. Move rewrite lengthens or qualifies when needed
+### 29. Move rewrite lengthens or qualifies when needed
 
 **Status:** planned
 **Type:** Behavior
@@ -537,7 +594,7 @@ Verification: focused link E2E; `pnpm backend:test_only`.
 
 Stop-safe: move maintenance agrees with uniqueness.
 
-### 29. Already-ambiguous markup is not rewritten
+### 30. Already-ambiguous markup is not rewritten
 
 **Status:** planned
 **Type:** Behavior
@@ -555,12 +612,12 @@ Verification: `pnpm backend:test_only`.
 
 Stop-safe: maintenance does not invent a destination for ambiguous source.
 
-### 30. Pasting a note URL uses backend-authored unique paths
+### 31. Pasting a note URL uses backend-authored unique paths
 
 **Status:** planned
 **Type:** Structure
 
-Unlocks slice 31. Replace frontend note-identity reconstruction in
+Unlocks slice 32. Replace frontend note-identity reconstruction in
 `convertPastedNotePropertyLinks` with the source-aware authoring operation
 for **unique** same-notebook pastes so the stored Wiki link is unchanged
 for that case. Keep one unresolved URL → ordinary Markdown.
@@ -568,9 +625,9 @@ for that case. Keep one unresolved URL → ordinary Markdown.
 Verification: existing paste specs still green; `pnpm frontend:test` for
 the paste files (and backend if a new endpoint is added).
 
-Stop-safe: paste shares the authoring seam; collision spelling is slice 31.
+Stop-safe: paste shares the authoring seam; collision spelling is slice 32.
 
-### 31. Pasting a colliding note URL stores the full Portable path
+### 32. Pasting a colliding note URL stores the full Portable path
 
 **Status:** planned
 **Type:** Behavior
