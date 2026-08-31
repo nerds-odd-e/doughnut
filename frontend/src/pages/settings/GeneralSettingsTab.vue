@@ -1,6 +1,6 @@
 <template>
   <div v-if="formData">
-    <form @submit.prevent.once="processForm">
+    <form @submit.prevent="processForm">
       <TextInput
         scope-name="user"
         field="name"
@@ -40,7 +40,14 @@
           <span v-else>Loading...</span>
         </div>
       </section>
-      <input type="submit" value="Submit" class="daisy-btn daisy-btn-primary" />
+      <button
+        type="submit"
+        class="daisy-btn daisy-btn-primary"
+        data-testid="user-settings-submit"
+        :disabled="!canSubmit"
+      >
+        Submit
+      </button>
     </form>
   </div>
   <ContentLoader v-else />
@@ -61,19 +68,49 @@ import { toOpenApiError } from "@/managedApi/openApiError"
 
 const currentUser = inject<Ref<User | undefined>>("currentUser")
 
+type SavedProfile = Pick<
+  User,
+  "name" | "dailyAssimilationCount" | "dailyProbeEnabled"
+>
+
+const snapshotProfile = (user: User): SavedProfile => ({
+  name: user.name,
+  dailyAssimilationCount: user.dailyAssimilationCount,
+  dailyProbeEnabled: user.dailyProbeEnabled,
+})
+
 const formData = ref<User | undefined>()
+const savedProfile = ref<SavedProfile | undefined>()
+const isSubmitting = ref(false)
 const batchSchedule = ref<QuestionGenerationBatchUserScheduleDto | undefined>()
 const errors = ref<Record<string, string>>({})
+
+const setForm = (user: User) => {
+  formData.value = user
+  savedProfile.value = snapshotProfile(user)
+}
 
 const formattedNextScheduledAt = computed(() => {
   if (!batchSchedule.value?.nextScheduledAt) return undefined
   return new Date(batchSchedule.value.nextScheduledAt).toLocaleString()
 })
 
+const isDirty = computed(() => {
+  if (!formData.value || !savedProfile.value) return false
+  return (
+    formData.value.name !== savedProfile.value.name ||
+    String(formData.value.dailyAssimilationCount) !==
+      String(savedProfile.value.dailyAssimilationCount) ||
+    formData.value.dailyProbeEnabled !== savedProfile.value.dailyProbeEnabled
+  )
+})
+
+const canSubmit = computed(() => isDirty.value && !isSubmitting.value)
+
 const fetchData = async () => {
   const { data, error } = await UserController.getUserProfile({})
   if (!error && data) {
-    formData.value = data
+    setForm(data)
   }
 }
 
@@ -86,24 +123,30 @@ const fetchBatchSchedule = async () => {
 }
 
 const processForm = async () => {
-  if (!formData.value) return
+  if (!formData.value || !canSubmit.value) return
+  isSubmitting.value = true
   const userData = formData.value
-  const { data: updatedUser, error } = await apiCallWithLoading(() =>
-    UserController.updateUser({
-      path: { user: userData.id },
-      body: userData,
-    })
-  )
-  if (error) {
-    // Error is handled by global interceptor (toast notification)
-    // Extract field-level errors if available (for 400 validation errors)
-    const errorObj = toOpenApiError(error)
-    errors.value = errorObj.errors || {}
-  } else {
-    errors.value = {}
-    if (currentUser) {
-      currentUser.value = updatedUser
+  try {
+    const { data: updatedUser, error } = await apiCallWithLoading(() =>
+      UserController.updateUser({
+        path: { user: userData.id },
+        body: userData,
+      })
+    )
+    if (error) {
+      // Error is handled by global interceptor (toast notification)
+      // Extract field-level errors if available (for 400 validation errors)
+      const errorObj = toOpenApiError(error)
+      errors.value = errorObj.errors || {}
+    } else {
+      errors.value = {}
+      setForm(updatedUser ?? userData)
+      if (currentUser) {
+        currentUser.value = updatedUser ?? userData
+      }
     }
+  } finally {
+    isSubmitting.value = false
   }
 }
 
