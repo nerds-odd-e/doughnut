@@ -1,6 +1,6 @@
 # Consecutive similar Failure reports
 
-**Status:** in progress (slices 1–3 done).
+**Status:** in progress (slices 1–4 done).
 **Type:** ad-hoc plan (`.planning/quick/`)
 
 Follow-up to shipped scheduled-job Failure reports. Independent of
@@ -81,14 +81,11 @@ List and detail show occurrence count via `FailureReportOccurrenceCount`
 
 ---
 
-### 4. A dissimilar failure starts a new Failure report — Behavior `[ ]`
+### 4. A dissimilar failure starts a new Failure report — Behavior `[x]`
 
-**Pre:** latest Failure report is fingerprint A. **Trigger:** fingerprint B,
-then A again. **Post:** three Failure reports (A, B, A); three GitHub issue
-creates; the first A’s count stays 1.
-
-**Verify:** factory test with two sources or two exception types. No E2E
-(testability trigger is one fingerprint). Slice 2–3 tests stay.
+A → B → A (two `fromException` sources) yields three reports; first A’s
+count stays 1; three GitHub creates. Production already compared only the
+latest row; this slice locked it with a factory test.
 
 ---
 

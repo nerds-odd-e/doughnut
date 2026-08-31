@@ -19,6 +19,7 @@ import com.odde.donut.services.GithubService;
 import com.odde.donut.services.UserService;
 import com.odde.donut.testability.MakeMe;
 import java.io.IOException;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.StreamSupport;
@@ -123,6 +124,26 @@ class FailureReportFactoryTest {
     verify(githubService, times(1)).createGithubIssue(any());
   }
 
+  @Test
+  void startsANewFailureReportWhenASimilarFailureRecursAfterADissimilarOne()
+      throws IOException, InterruptedException {
+    createReportFromException("first A");
+    String fingerprintA = failureReports().getFirst().getFingerprint();
+
+    createReportFromException("B", "scheduled-job");
+    createReportFromException("second A");
+
+    List<FailureReport> failureReports = failureReports();
+    assertThat(failureReports, hasSize(3));
+    FailureReport firstA = failureReports.getFirst();
+    FailureReport dissimilar = failureReports.get(1);
+    FailureReport recurringA = failureReports.getLast();
+    assertThat(dissimilar.getFingerprint(), not(fingerprintA));
+    assertEquals(fingerprintA, recurringA.getFingerprint());
+    assertEquals(1, firstA.getOccurrenceCount());
+    verify(githubService, times(3)).createGithubIssue(any());
+  }
+
   private FailureReport createReport() throws IOException, InterruptedException {
     CurrentUserFetcherFromRequest fetcher =
         new CurrentUserFetcherFromRequest(request, userRepository, userService, Optional.empty());
@@ -140,15 +161,18 @@ class FailureReportFactoryTest {
   }
 
   private void createReportFromException(String message) {
+    createReportFromException(message, "QuestionGenerationBatchMaintenanceJob");
+  }
+
+  private void createReportFromException(String message, String source) {
     FailureReportFactory.fromException(
-            new RuntimeException(message),
-            "QuestionGenerationBatchMaintenanceJob",
-            githubService,
-            failureReportRepository)
+            new RuntimeException(message), source, githubService, failureReportRepository)
         .createUnlessAllowed();
   }
 
   private List<FailureReport> failureReports() {
-    return StreamSupport.stream(failureReportRepository.findAll().spliterator(), false).toList();
+    return StreamSupport.stream(failureReportRepository.findAll().spliterator(), false)
+        .sorted(Comparator.comparing(FailureReport::getId))
+        .toList();
   }
 }
