@@ -40,21 +40,14 @@ covers how those links relate to **web** destinations.
 
 ### SPA locations
 
-- SPA path literals for screens live only in `routeMetadata` (plus the `/d/`
-  leftover-path rewrite).
+- SPA path literals for screens live only in `routeMetadata`. Legacy rewrites
+  are explicit exceptions to the canonical table.
 - In-app navigation (`push` / `replace` / `:to`) is a named location (or a
   helper that returns one). An HTML `href` is allowed only on rendered
   anchors, and is compiled from a named location against that table —
   never a second concatenated copy of a path.
-- Unit tests: navigation assertions use named locations; rendered-href
-  assertions use `noteShowHref` / `namedLocationHref`; path strings only in
-  `routes.spec.ts` (matching / redirects) and inbound URL classifiers.
-- Test routers that resolve named screen locations use production `routes`
-  or `dummyRouteRecordsFromMetadata` (the `routeMetadata` table with dummy
-  components; no page imports). Catch-all `/` or `/:pathMatch(.*)*` routers
-  and `useRoute` stubs with `path: "/"` are not a second screen dialect.
-- Nested layouts (notebook sidebar, settings) are assembled in `routes.ts`
-  from named metadata entries.
+- Shared layouts are assembled from named metadata entries rather than
+  duplicating paths.
 - The URL identifies the **server-side note id**, not the portable path
   (ADR 0004). A **property** adds the **authored key** (no property
   surrogate id). Named route helpers receive the exact decoded key and
@@ -67,31 +60,15 @@ covers how those links relate to **web** destinations.
 - A **property** is a nested resource, not chrome: named route
   `noteProperty`, nested under the note URL family, last segment the
   authored key. It uses the same note page and shared notebook-layout parent
-  as `noteShow`. Later expansion keeps this path (or a child of it). Opening
-  or closing the **property panel** **replaces** within the note family;
-  inbound links **push**. Product surfaces that already know a property (next
-  to assimilate, answered question, memory tracker) navigate to
-  `noteProperty` — not a side channel on `noteShow`.
+  as `noteShow`. Opening or closing the **property panel** **replaces** within
+  the note family; inbound links **push**. A surface that already identifies a
+  property navigates directly to `noteProperty` — not a side channel on
+  `noteShow`.
 - `noteShow` and `noteProperty` are one **note route family** for notebook
   chrome, sidebar state, active navigation, and conversation query. A
   route to a readable note with a missing property keeps the note visible
   but shows an explicit unresolved-property state; it must not silently
   look like `noteShow`.
-- E2E navigation goes through `e2e_test/start/router.ts` (`visitNamed` /
-  named `push`). Compile hrefs with `namedLocationHref` / `noteShowHref`.
-  Page objects and steps do not call `cy.visit` with SPA path strings
-  (`scripts/check_e2e_spa_visit_gate.sh` in CI).
-
-  | Intent | Mechanism |
-  | --- | --- |
-  | Unique trigger **is** in-app navigation | UI |
-  | Given-shaped shortcut (including Gherkin `When I visit …` when the unique behavior is **on** that screen) | Named `router.push` after first load |
-  | First SPA load, inbound URL, or **explicit remount** | `cy.visit` of href **compiled from the named table** |
-
-- Recall: `visitRecallPage` is remount (`visitNamed('recall')`);
-  `navigateToRecallPage` is sidebar UI. Gherkin `When I visit recall`
-  stays remount — do not convert it to sidebar.
-
 ### Wiki links as web destinations
 
 - A live **note** token navigates to `noteShow`. A live **property** token
