@@ -1,6 +1,6 @@
 # Note level as frontmatter `note_level`
 
-**Status:** in progress (slices 1–2 done)
+**Status:** in progress (slices 1–3 done)
 
 ## Goal
 
@@ -74,17 +74,9 @@ None. Resolved: no picker; zeros dropped (not stored).
 
 `V300000310__create_note_level_index.sql`; `NoteLevelIndexService.refreshForNote` from `ResolvedWikiLinkRefresh`. Parse via `FrontmatterNoteLevel`. 1:1 upsert/delete (not bulk-replace — Hibernate would keep the old entity). Invalid YAML leaves no cache row. ERD regenerated.
 
-### 3. Backfill cache and frontmatter from legacy `note.level` — Behavior — planned
+### 3. Backfill cache and frontmatter from legacy `note.level` — Behavior — done
 
-**Pre:** notes exist with `note.level` in 1–6 (production) and no / invalid YAML key.  
-**Trigger:** migrate.  
-**Post:** those notes’ markdown contains `note_level: N`; cache has `(note_id, N)`. Level 0 notes unchanged (no key).
-
-- JDBC backfill class (same shape as `NotePropertyTrackingBackfill`) + Flyway Java or SQL+Java after 310.
-- Verbatim YAML insert; frontmatter wins when already valid.
-- Tests: backfill against seeded JDBC rows (not empty migrateTestDB alone).
-
-**Done when:** backfill tests prove YAML + cache for 1–6 and omit 0 / out-of-range.
+`V300000311` JDBC: column 1–6 → verbatim `note_level: N` + cache row; 0 / out-of-range / soft-deleted omitted; valid YAML wins (no fence re-dump). `FrontmatterNoteLevel.withVerbatimLevel` / `isValidLevel`.
 
 ### 4. Assimilation order follows the cache (missing = 0) — Behavior — planned
 
@@ -146,4 +138,4 @@ Enables nothing user-facing; removes the leftover column after 4–6.
 
 ## Resume
 
-Next slice: **3**. Learnings: cache refresh is 1:1 upsert/delete keyed by `note_id` (not alias-style bulk replace). `FrontmatterNoteLevel` already parses valid 1–6; slice 5 only needs to add save rejection. Backfill should reuse that parse helper and write cache via the same service.
+Next slice: **4**. Backfill is JDBC (outside Spring) — queue work should still use `NoteLevelIndexService.refreshForNote` for runtime writes. `FrontmatterNoteLevel.withVerbatimLevel` can insert the key for `makeMe.level` / dual-write.
