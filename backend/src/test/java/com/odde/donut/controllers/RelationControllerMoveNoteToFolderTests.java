@@ -2,6 +2,7 @@ package com.odde.donut.controllers;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.nullValue;
@@ -12,6 +13,7 @@ import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.User;
 import com.odde.donut.entities.repositories.NoteRepository;
+import com.odde.donut.entities.repositories.ResolvedWikiLinkRepository;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.services.ResolvedWikiLinkService;
 import java.sql.Timestamp;
@@ -24,6 +26,7 @@ class RelationControllerMoveNoteToFolderTests extends ControllerTestBase {
   @Autowired NoteRepository noteRepository;
   @Autowired RelationController controller;
   @Autowired ResolvedWikiLinkService resolvedWikiLinkService;
+  @Autowired ResolvedWikiLinkRepository resolvedWikiLinkRepository;
 
   @BeforeEach
   void setup() {
@@ -120,5 +123,27 @@ class RelationControllerMoveNoteToFolderTests extends ControllerTestBase {
     makeMe.refresh(mover);
     assertThat(mover.getContent(), nullValue());
     assertThat(mover.getUpdatedAt(), equalTo(originalUpdatedAt));
+  }
+
+  @Test
+  void crossNotebookMoveToFolder_reresolvesDestinationNotebookCardinality()
+      throws UnexpectedNoAccessRightException {
+    User u = currentUser.getUser();
+    Notebook destNotebook = ownedNotebook("Dest NB");
+    Note destTarget = makeMe.aNote("Target").notebook(destNotebook).please();
+    Note destReferrer =
+        makeMe.aNote("DestReferrer").underSameNotebookAs(destTarget).content("[[Target]]").please();
+    resolvedWikiLinkService.refreshForNote(destReferrer, u);
+    assertThat(
+        resolvedWikiLinkRepository.findBySourceNote_IdOrderByIdAsc(destReferrer.getId()),
+        hasSize(1));
+
+    Note movedTarget = makeMe.aNote("Target").notebookOwnedBy(u).please();
+    Folder destFolder = makeMe.aFolder().notebook(destNotebook).name("F").please();
+
+    controller.moveNoteToFolder(movedTarget, destFolder);
+
+    assertThat(
+        resolvedWikiLinkRepository.findBySourceNote_IdOrderByIdAsc(destReferrer.getId()), empty());
   }
 }

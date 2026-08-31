@@ -444,19 +444,19 @@ suite green.
 
 ### 24. Moving a note updates shorthand cardinality
 
-**Status:** planned
+**Status:** done
 **Type:** Behavior
 
-**Precondition:** A move changes whether a shorthand is unique in its
-scope (folder or notebook).
-**Trigger:** Existing move runs.
-**Postcondition:** Index/rendering follow the new tree.
-
-Test first: one move collision at the move controller/cache boundary.
-
-Verification: `pnpm backend:test_only`.
-
-Stop-safe: location changes participate in uniqueness.
+Shorthand cardinality is notebook-scoped, not folder-scoped
+(`WikiLinkResolver` candidate queries are by notebook name), so only
+cross-notebook moves matter. `RelationController.moveNoteToFolder` and
+`moveNoteToNotebookRootInNotebook` now call a
+`refreshCardinalityAcrossMovedNotebooks` helper after the existing
+`rewriteWikiLinksForCrossNotebookMove`, re-resolving both the old and new
+notebook when they differ. Single-arg `moveNoteToNotebookRoot` (same
+notebook) untouched. Pinned by `RelationControllerMoveNoteToFolderTests
+.crossNotebookMoveToFolder_reresolvesDestinationNotebookCardinality`. Full
+backend suite green.
 
 ### 25. Deleting or restoring a note updates shorthand cardinality
 
