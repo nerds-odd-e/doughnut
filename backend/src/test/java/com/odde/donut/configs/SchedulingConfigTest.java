@@ -9,6 +9,7 @@ import static org.mockito.Mockito.verify;
 import com.odde.donut.entities.FailureReport;
 import com.odde.donut.entities.repositories.FailureReportRepository;
 import com.odde.donut.services.GithubService;
+import com.odde.donut.testability.TestabilitySettings;
 import java.time.Instant;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -28,7 +29,8 @@ class SchedulingConfigTest {
     ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
     scheduler.setPoolSize(3);
     new SchedulingConfig()
-        .threadPoolTaskSchedulerCustomizer(githubService, failureReportRepository)
+        .threadPoolTaskSchedulerCustomizer(
+            githubService, failureReportRepository, new TestabilitySettings())
         .customize(scheduler);
     scheduler.initialize();
     try {

@@ -3,6 +3,7 @@ package com.odde.donut.services;
 import com.odde.donut.entities.QuestionGenerationBatchMaintenanceTriggerSource;
 import com.odde.donut.entities.repositories.FailureReportRepository;
 import com.odde.donut.factoryServices.FailureReportFactory;
+import com.odde.donut.testability.TestabilitySettings;
 import java.sql.Timestamp;
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 import org.slf4j.Logger;
@@ -22,18 +23,21 @@ public class QuestionGenerationBatchMaintenanceJob {
   private final QuestionGenerationBatchMaintenanceRunService maintenanceRunService;
   private final GithubService githubService;
   private final FailureReportRepository failureReportRepository;
+  private final TestabilitySettings testabilitySettings;
 
   public QuestionGenerationBatchMaintenanceJob(
       QuestionGenerationBatchMaintenanceService maintenanceService,
       QuestionGenerationBatchSubmitDueUsersService submitDueUsersService,
       QuestionGenerationBatchMaintenanceRunService maintenanceRunService,
       GithubService githubService,
-      FailureReportRepository failureReportRepository) {
+      FailureReportRepository failureReportRepository,
+      TestabilitySettings testabilitySettings) {
     this.maintenanceService = maintenanceService;
     this.submitDueUsersService = submitDueUsersService;
     this.maintenanceRunService = maintenanceRunService;
     this.githubService = githubService;
     this.failureReportRepository = failureReportRepository;
+    this.testabilitySettings = testabilitySettings;
   }
 
   @Scheduled(cron = "0 0 * * * *")
@@ -51,7 +55,11 @@ public class QuestionGenerationBatchMaintenanceJob {
     } catch (RuntimeException e) {
       maintenanceRunService.recordError(e);
       FailureReportFactory.fromException(
-              e, getClass().getSimpleName(), githubService, failureReportRepository)
+              e,
+              getClass().getSimpleName(),
+              githubService,
+              failureReportRepository,
+              testabilitySettings.getCurrentUTCTimestamp())
           .createUnlessAllowed();
       logger.warn("Question generation batch resume step failed; continuing to due submissions", e);
     }

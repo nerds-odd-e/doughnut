@@ -56,6 +56,12 @@ public class FailureReport {
   @Setter
   private Integer occurrenceCount = 1;
 
+  @JsonIgnore
+  @Column(name = "last_github_comment_datetime")
+  @Getter
+  @Setter
+  private Timestamp lastGithubCommentDatetime;
+
   public GithubIssue getGithubIssue() {
     return new GithubIssue(
         getErrorName(),

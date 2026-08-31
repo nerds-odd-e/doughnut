@@ -12,6 +12,7 @@ import com.odde.donut.services.QuestionGenerationBatchMaintenanceRunService;
 import com.odde.donut.services.QuestionGenerationBatchMaintenanceService;
 import com.odde.donut.services.QuestionGenerationBatchSubmitDueUsersService;
 import com.odde.donut.testability.MakeMe;
+import com.odde.donut.testability.TestabilitySettings;
 import java.sql.Timestamp;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,7 +61,8 @@ class QuestionGenerationBatchMaintenanceRunRepositoryTest {
             submitDueUsersService,
             maintenanceRunService,
             mock(GithubService.class),
-            mock(FailureReportRepository.class));
+            mock(FailureReportRepository.class),
+            new TestabilitySettings());
 
     job.runHourlyMaintenance();
 

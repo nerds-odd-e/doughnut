@@ -43,7 +43,8 @@ public class ControllerSetup {
             exception,
             currentUserFetcher,
             testabilitySettings.getGithubService(),
-            failureReportRepository);
+            failureReportRepository,
+            testabilitySettings.getCurrentUTCTimestamp());
     failureReportFactory.createUnlessAllowed();
 
     throw exception;

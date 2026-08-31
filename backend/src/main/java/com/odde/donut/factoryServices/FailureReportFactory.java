@@ -6,9 +6,11 @@ import com.odde.donut.entities.repositories.FailureReportRepository;
 import com.odde.donut.exceptions.ApiException;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.services.GithubService;
+import com.odde.donut.utils.TimestampOperations;
 import jakarta.servlet.http.HttpServletRequest;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.sql.Timestamp;
 import java.util.Optional;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -17,33 +19,40 @@ public record FailureReportFactory(
     GithubService githubService,
     FailureReportRepository failureReportRepository,
     String contextPrefix,
-    String origin) {
+    String origin,
+    Timestamp currentUTCTimestamp) {
+
+  static final int GITHUB_COUNT_COMMENT_DEBOUNCE_HOURS = 6;
 
   public FailureReportFactory(
       HttpServletRequest req,
       Exception exception,
       CurrentUserFetcher currentUserFetcher,
       GithubService githubService,
-      FailureReportRepository failureReportRepository) {
+      FailureReportRepository failureReportRepository,
+      Timestamp currentUTCTimestamp) {
     this(
         exception,
         githubService,
         failureReportRepository,
         userInfo(currentUserFetcher) + requestInfo(req),
-        httpOrigin(req));
+        httpOrigin(req),
+        currentUTCTimestamp);
   }
 
   public static FailureReportFactory fromException(
       Exception exception,
       String source,
       GithubService githubService,
-      FailureReportRepository failureReportRepository) {
+      FailureReportRepository failureReportRepository,
+      Timestamp currentUTCTimestamp) {
     return new FailureReportFactory(
         exception,
         githubService,
         failureReportRepository,
         "# source: " + source + "\n",
-        "source:" + source);
+        "source:" + source,
+        currentUTCTimestamp);
   }
 
   public void createUnlessAllowed() {
@@ -72,13 +81,31 @@ public record FailureReportFactory(
     FailureReport report = latest.get();
     report.setOccurrenceCount(report.getOccurrenceCount() + 1);
     saveFailureReport(report);
+    commentGithubIssueIfDue(report);
+    return true;
+  }
+
+  private void commentGithubIssueIfDue(FailureReport report) {
+    if (!githubCountCommentIsDue(report)) {
+      return;
+    }
     try {
       githubService.commentOnGithubIssue(
           report.getIssueNumber(), String.valueOf(report.getOccurrenceCount()));
+      report.setLastGithubCommentDatetime(currentUTCTimestamp);
+      saveFailureReport(report);
     } catch (Exception ignored) {
       // GitHub comment is best-effort; the Failure report already has the count
     }
-    return true;
+  }
+
+  private boolean githubCountCommentIsDue(FailureReport report) {
+    Timestamp lastComment = report.getLastGithubCommentDatetime();
+    if (lastComment == null) {
+      return true;
+    }
+    return !currentUTCTimestamp.before(
+        TimestampOperations.addHoursToTimestamp(lastComment, GITHUB_COUNT_COMMENT_DEBOUNCE_HOURS));
   }
 
   private FailureReport saveFailureReport(FailureReport failureReport) {

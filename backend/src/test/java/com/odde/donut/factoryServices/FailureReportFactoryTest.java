@@ -18,11 +18,15 @@ import com.odde.donut.entities.repositories.UserRepository;
 import com.odde.donut.services.GithubService;
 import com.odde.donut.services.UserService;
 import com.odde.donut.testability.MakeMe;
+import com.odde.donut.testability.TestabilitySettings;
+import com.odde.donut.utils.TimestampOperations;
 import java.io.IOException;
+import java.sql.Timestamp;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.StreamSupport;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -44,6 +48,7 @@ class FailureReportFactoryTest {
   @Autowired UserRepository userRepository;
   @Autowired UserService userService;
   @Autowired MakeMe makeMe;
+  @Autowired TestabilitySettings testabilitySettings;
   @Mock GithubService githubService;
 
   MockHttpServletRequest request = new MockHttpServletRequest();
@@ -51,6 +56,11 @@ class FailureReportFactoryTest {
   @BeforeEach
   void setUp() throws IOException, InterruptedException {
     doReturn(null).when(githubService).createGithubIssue(any());
+  }
+
+  @AfterEach
+  void resetTimeTravel() {
+    testabilitySettings.timeTravelTo(null);
   }
 
   @Test
@@ -147,14 +157,42 @@ class FailureReportFactoryTest {
   @Test
   void commentsTheGithubIssueWithOccurrenceCountOnSimilarFailure()
       throws IOException, InterruptedException {
-    createReportFromException("first");
-    FailureReport report = failureReports().getFirst();
-    report.setIssueNumber(42);
-    failureReportRepository.save(report);
+    seedSimilarFailureReportWithIssueNumber(42);
 
     createReportFromException("second");
 
     verify(githubService).commentOnGithubIssue(42, "2");
+  }
+
+  @Test
+  void doesNotCommentAgainWithinSixHoursOfLastGithubComment()
+      throws IOException, InterruptedException {
+    Timestamp now = makeMe.aTimestamp().of(1, 0).please();
+    testabilitySettings.timeTravelTo(now);
+    seedSimilarFailureReportWithIssueNumber(42);
+
+    createReportFromException("second");
+    createReportFromException("third");
+
+    assertEquals(3, failureReports().getFirst().getOccurrenceCount());
+    verify(githubService, times(1)).commentOnGithubIssue(any(), any());
+  }
+
+  @Test
+  void commentsCurrentOccurrenceCountAfterSixHours() throws IOException, InterruptedException {
+    Timestamp now = makeMe.aTimestamp().of(1, 0).please();
+    testabilitySettings.timeTravelTo(now);
+    seedSimilarFailureReportWithIssueNumber(42);
+
+    createReportFromException("second");
+    createReportFromException("third");
+    testabilitySettings.timeTravelTo(
+        TimestampOperations.addHoursToTimestamp(
+            now, FailureReportFactory.GITHUB_COUNT_COMMENT_DEBOUNCE_HOURS));
+    createReportFromException("fourth");
+
+    verify(githubService, times(2)).commentOnGithubIssue(any(), any());
+    verify(githubService).commentOnGithubIssue(42, "4");
   }
 
   private FailureReport createReport() throws IOException, InterruptedException {
@@ -162,10 +200,22 @@ class FailureReportFactoryTest {
         new CurrentUserFetcherFromRequest(request, userRepository, userService, Optional.empty());
 
     new FailureReportFactory(
-            request, new RuntimeException(), fetcher, githubService, failureReportRepository)
+            request,
+            new RuntimeException(),
+            fetcher,
+            githubService,
+            failureReportRepository,
+            testabilitySettings.getCurrentUTCTimestamp())
         .createUnlessAllowed();
 
     return failureReports().getFirst();
+  }
+
+  private void seedSimilarFailureReportWithIssueNumber(int issueNumber) {
+    createReportFromException("first");
+    FailureReport report = failureReports().getFirst();
+    report.setIssueNumber(issueNumber);
+    failureReportRepository.save(report);
   }
 
   private FailureReport createReportFromException() {
@@ -179,7 +229,11 @@ class FailureReportFactoryTest {
 
   private void createReportFromException(String message, String source) {
     FailureReportFactory.fromException(
-            new RuntimeException(message), source, githubService, failureReportRepository)
+            new RuntimeException(message),
+            source,
+            githubService,
+            failureReportRepository,
+            testabilitySettings.getCurrentUTCTimestamp())
         .createUnlessAllowed();
   }
 

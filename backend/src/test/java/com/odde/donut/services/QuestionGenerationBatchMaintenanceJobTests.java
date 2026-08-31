@@ -14,6 +14,7 @@ import static org.mockito.Mockito.verify;
 import com.odde.donut.entities.FailureReport;
 import com.odde.donut.entities.QuestionGenerationBatchMaintenanceTriggerSource;
 import com.odde.donut.entities.repositories.FailureReportRepository;
+import com.odde.donut.testability.TestabilitySettings;
 import java.sql.Timestamp;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -43,7 +44,8 @@ class QuestionGenerationBatchMaintenanceJobTests {
             submitDueUsersService,
             maintenanceRunService,
             githubService,
-            failureReportRepository);
+            failureReportRepository,
+            new TestabilitySettings());
   }
 
   @Nested
