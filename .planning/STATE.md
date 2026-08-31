@@ -6,9 +6,9 @@ current_phase: null
 current_phase_name: null
 status: ready
 stopped_at: null
-last_updated: "2026-08-30T13:34:00Z"
-last_activity: 2026-08-30
-last_activity_desc: "013 noteProperty shipped; 017 property wiki integrity planned (not started)"
+last_updated: "2026-08-31T02:19:00Z"
+last_activity: 2026-08-31
+last_activity_desc: "Retired all shipped quick plans (013–017); product + ADRs are the record"
 progress:
   total_phases: 0
   completed_phases: 0
@@ -35,8 +35,9 @@ Daily probe measurement (not an ADR): [daily-probe-protocol.md](notes/daily-prob
 
 ## Operator Next Steps
 
-- Canonical property path (`noteProperty`, **property panel**, `#prop:` wiki) shipped: `.planning/quick/013-note-property-canonical-path/PLAN.md`. Follow-up (OS-invalid `#prop:` suffix, case-distinct keys, dialog-closed test leftover): `.planning/quick/017-property-wiki-integrity/PLAN.md` — planned, do not execute until asked. Policy in ADR 0001 / ADR 0004 / Proposed 0005.
-- Named SPA route honesty leftovers (Given shortcuts as named `push`) shipped; 011 / 014 / 015 PLANs retired. Recall/epub/identify/`circleJoin`/`loginAs`/`visitHomePage` stay `visitNamed`.
 - After deploying the Flyway squash, confirm startup succeeded and `flyway_schema_history` shows the baseline repaired, the collapsed versions marked `DELETE`, and `V300000300` applied.
+- Start the next milestone with `/gsd-new-milestone` when ready.
 
 Parked work: SEED-001, SEED-002, SEED-005, SEED-006, SEED-007, SEED-008; ADR 0002 Level 1. See [ROADMAP.md](ROADMAP.md).
+
+Recent ad-hoc work (no active plans): `noteProperty` / **property panel** / `#prop:` wiki (ADR 0001 / ADR 0004 / Proposed ADR 0005); E2E named-route honesty and SPA hydrate protocol (E2E helpers, `MainMenu.vue`); daily probe side tap ([daily-probe-protocol.md](notes/daily-probe-protocol.md)).

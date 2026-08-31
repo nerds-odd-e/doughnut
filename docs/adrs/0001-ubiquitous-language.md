@@ -51,7 +51,7 @@ concepts, including morning recall residual measurement, live in [ADR
   [ADR 0004](./0004-okf-compatible-notebook-markdown-accepted.md). Web
   destination: `noteProperty`, once Proposed
   [ADR 0005](./0005-web-routes.md) is Accepted — human-owned exception
-  trailed in `.planning/quick/013-note-property-canonical-path/PLAN.md`.
+  until route policy is Accepted.
 - **Property** — YAML frontmatter key–value on a note (scalar or
   one-level list). Distinct from a **relationship note**. A value may
   contain **wiki links**. Relation-like keys (`example of`, `a part of`)
