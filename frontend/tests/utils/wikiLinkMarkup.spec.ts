@@ -15,7 +15,7 @@ describe("wikiLinkMarkup utils", () => {
   it("handleRichContentAnchorClick emits dead link before checking href", () => {
     const anchor = document.createElement("a")
     anchor.className = "dead-wiki-link"
-    anchor.setAttribute("data-wiki-title", "Ghost")
+    anchor.setAttribute("data-portable-path", "Ghost")
     anchor.textContent = "Ghost"
     let payload: { portablePath: string; displayText: string } | undefined
     handleRichContentAnchorClick(
@@ -58,7 +58,7 @@ describe("wikiLinkMarkup utils", () => {
   it("handleRichContentAnchorClick pushes noteProperty when the authored target has a property suffix", () => {
     const anchor = document.createElement("a")
     anchor.className = "donut-wiki-link"
-    anchor.setAttribute("data-wiki-title", "Moon#prop:a%20part%20of")
+    anchor.setAttribute("data-portable-path", "Moon#prop:a%20part%20of")
     anchor.setAttribute("data-note-id", "42")
     let navigated: RouteLocationRaw | undefined
     handleRichContentAnchorClick(

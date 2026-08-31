@@ -9,6 +9,8 @@ import {
   DEAD_WIKI_LINK_CLASS,
   DONUT_WIKI_LINK_CLASS,
   PENDING_WIKI_LINK_CLASS,
+  WIKI_LINK_DISPLAY_TEXT_ATTR,
+  WIKI_LINK_PORTABLE_PATH_ATTR,
 } from "@/utils/wikiLinkDomMarkers"
 import { locationForResolvedWikiTarget } from "@/utils/wikiLinkResolvedLocation"
 
@@ -39,7 +41,7 @@ export function escapeHtmlAttributeValue(s: string): string {
   return s.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;")
 }
 
-/** Wiki-style `<a>`: live/dead class, `data-wiki-title`, optional display, note id, and already-escaped inner HTML. */
+/** Wiki-style `<a>`: live/dead class, `data-portable-path`, optional display, note id, and already-escaped inner HTML. */
 export function wikiLinkAnchorHtml(attrs: {
   href: string
   className: string
@@ -52,12 +54,12 @@ export function wikiLinkAnchorHtml(attrs: {
   const attrTarget = escapeHtmlAttributeValue(attrs.target)
   const displayAttr =
     attrs.display !== attrs.target
-      ? ` data-wiki-display="${escapeHtmlAttributeValue(attrs.display)}"`
+      ? ` ${WIKI_LINK_DISPLAY_TEXT_ATTR}="${escapeHtmlAttributeValue(attrs.display)}"`
       : ""
   const noteIdAttr =
     attrs.noteId === undefined ? "" : ` data-note-id="${attrs.noteId}"`
   const body = attrs.innerHtml ?? escapeHtmlForWikiLinkDisplay(attrs.display)
-  return `<a href="${attrHref}" class="${attrs.className}" data-wiki-title="${attrTarget}"${displayAttr}${noteIdAttr}>${body}</a>`
+  return `<a href="${attrHref}" class="${attrs.className}" ${WIKI_LINK_PORTABLE_PATH_ATTR}="${attrTarget}"${displayAttr}${noteIdAttr}>${body}</a>`
 }
 
 /** `[[` / `]]` shown literally; title text escaped (same visible shape as plain wiki syntax). */
@@ -143,7 +145,7 @@ export function handleRichContentAnchorClick(
     handlers.navigateInApp(
       locationForResolvedWikiTarget(
         Number(noteId),
-        anchor.getAttribute("data-wiki-title") ?? ""
+        anchor.getAttribute(WIKI_LINK_PORTABLE_PATH_ATTR) ?? ""
       )
     )
     return
@@ -164,7 +166,7 @@ export function deadWikiLinkPayloadFromAnchor(
 ): DeadWikiLinkPayload {
   const raw = anchor.textContent?.trim() ?? ""
   let portablePath: string
-  const fromAttr = anchor.getAttribute("data-wiki-title")
+  const fromAttr = anchor.getAttribute(WIKI_LINK_PORTABLE_PATH_ATTR)
   if (fromAttr !== null && fromAttr !== "") {
     portablePath = fromAttr
   } else {
@@ -177,7 +179,7 @@ export function deadWikiLinkPayloadFromAnchor(
     }
   }
 
-  const displayAttr = anchor.getAttribute("data-wiki-display")
+  const displayAttr = anchor.getAttribute(WIKI_LINK_DISPLAY_TEXT_ATTR)
   if (displayAttr !== null && displayAttr !== "") {
     return { portablePath, displayText: displayAttr }
   }
@@ -185,7 +187,7 @@ export function deadWikiLinkPayloadFromAnchor(
 }
 
 function pathHrefFromWikiAnchor(anchor: HTMLAnchorElement): string | null {
-  const fromAttr = anchor.getAttribute("data-wiki-title")
+  const fromAttr = anchor.getAttribute(WIKI_LINK_PORTABLE_PATH_ATTR)
   if (
     fromAttr !== null &&
     fromAttr !== "" &&
@@ -200,19 +202,19 @@ function pathHrefFromWikiAnchor(anchor: HTMLAnchorElement): string | null {
   return null
 }
 
-/** Markdown token for a wiki anchor (dead or live) from DOM; prefers `data-wiki-title` / bracketed display. */
+/** Markdown token for a wiki anchor (dead or live) from DOM; prefers `data-portable-path` / bracketed display. */
 export function wikiAnchorToMarkdownToken(anchor: HTMLAnchorElement): string {
   const pathHref = pathHrefFromWikiAnchor(anchor)
   if (pathHref !== null) {
     const display =
-      anchor.getAttribute("data-wiki-display") ||
+      anchor.getAttribute(WIKI_LINK_DISPLAY_TEXT_ATTR) ||
       anchor.textContent?.trim() ||
       ""
     return pathMarkdownToken(display, pathHref)
   }
 
   const raw = anchor.textContent?.trim() ?? ""
-  const target = anchor.getAttribute("data-wiki-title")
+  const target = anchor.getAttribute(WIKI_LINK_PORTABLE_PATH_ATTR)
   if (target === null || target === "") {
     const bracketed = /^\[\[([\s\S]*)\]\]$/.exec(raw)
     if (bracketed?.[1] !== undefined) {
@@ -221,7 +223,7 @@ export function wikiAnchorToMarkdownToken(anchor: HTMLAnchorElement): string {
     return `[[${raw}]]`
   }
 
-  const fromDisplayAttr = anchor.getAttribute("data-wiki-display")
+  const fromDisplayAttr = anchor.getAttribute(WIKI_LINK_DISPLAY_TEXT_ATTR)
   const innerM = /^\[\[([\s\S]*)\]\]$/.exec(raw)
 
   if (fromDisplayAttr !== null && fromDisplayAttr !== "") {

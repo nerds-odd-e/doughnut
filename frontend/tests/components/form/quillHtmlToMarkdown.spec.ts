@@ -47,21 +47,21 @@ describe("quillHtmlToMarkdown", () => {
   })
 
   it.each`
-    label                                             | html                                                                                                                                                         | expected
-    ${"preserves complete double brackets"}           | ${"<p>[[WikiLink]]</p>"}                                                                                                                                     | ${"[[WikiLink]]"}
-    ${"converts donut-wiki-link anchors"}             | ${'<p><a href="/n701" class="donut-wiki-link">MyNote</a></p>'}                                                                                               | ${"[[MyNote]]"}
-    ${"note show href without donut-wiki-link"}       | ${'<p><a href="/n701">MyNote</a></p>'}                                                                                                                       | ${"[[MyNote]]"}
-    ${"absolute URL to note show"}                    | ${'<p><a href="https://app.test/n42">T</a></p>'}                                                                                                             | ${"[[T]]"}
-    ${"note href without donut-wiki-link"}            | ${'<p><a href="/n123">looks internal</a></p>'}                                                                                                               | ${"[[looks internal]]"}
-    ${"converts dead wiki anchors"}                   | ${'<p><a href="#" class="dead-wiki-link" data-wiki-title="Unknown"><span class="wiki-bracket">[[</span>Unknown<span class="wiki-bracket">]]</span></a></p>'} | ${"[[Unknown]]"}
-    ${"converts plain dead wiki anchors"}             | ${'<p><a href="#" class="dead-wiki-link" data-wiki-title="Unknown">Unknown</a></p>'}                                                                         | ${"[[Unknown]]"}
-    ${"converts pending wiki anchors"}                | ${'<p><a href="#" class="pending-wiki-link" data-wiki-title="Unknown">Unknown</a></p>'}                                                                      | ${"[[Unknown]]"}
-    ${"donut-wiki-link with piped wiki attrs"}        | ${'<p><a href="/n1" class="donut-wiki-link" data-wiki-title="A" data-wiki-display="B">B</a></p>'}                                                            | ${"[[A|B]]"}
-    ${"path markdown donut-wiki-link keeps markdown"} | ${'<p><a href="/Folder/Title.md" class="donut-wiki-link" data-wiki-title="/Folder/Title.md" data-wiki-display="label" data-note-id="42">label</a></p>'}      | ${"[label](/Folder/Title.md)"}
-    ${"live path markdown with noteShowHref"}         | ${`<p><a href="${noteShowHref(42)}" class="donut-wiki-link" data-wiki-title="/Folder/Title.md" data-wiki-display="label" data-note-id="42">label</a></p>`}   | ${"[label](/Folder/Title.md)"}
-    ${"path markdown without .md keeps href"}         | ${'<p><a href="/Folder/Title" class="donut-wiki-link" data-wiki-title="/Folder/Title" data-wiki-display="label">label</a></p>'}                              | ${"[label](/Folder/Title)"}
-    ${"path markdown dead-wiki-link keeps markdown"}  | ${'<p><a href="/Folder/Missing.md" class="dead-wiki-link" data-wiki-title="/Folder/Missing.md" data-wiki-display="label">label</a></p>'}                     | ${"[label](/Folder/Missing.md)"}
-    ${"path markdown dead with hash href"}            | ${'<p><a href="#" class="dead-wiki-link" data-wiki-title="/Folder/Missing.md" data-wiki-display="label">label</a></p>'}                                      | ${"[label](/Folder/Missing.md)"}
+    label                                             | html                                                                                                                                                            | expected
+    ${"preserves complete double brackets"}           | ${"<p>[[WikiLink]]</p>"}                                                                                                                                        | ${"[[WikiLink]]"}
+    ${"converts donut-wiki-link anchors"}             | ${'<p><a href="/n701" class="donut-wiki-link">MyNote</a></p>'}                                                                                                  | ${"[[MyNote]]"}
+    ${"note show href without donut-wiki-link"}       | ${'<p><a href="/n701">MyNote</a></p>'}                                                                                                                          | ${"[[MyNote]]"}
+    ${"absolute URL to note show"}                    | ${'<p><a href="https://app.test/n42">T</a></p>'}                                                                                                                | ${"[[T]]"}
+    ${"note href without donut-wiki-link"}            | ${'<p><a href="/n123">looks internal</a></p>'}                                                                                                                  | ${"[[looks internal]]"}
+    ${"converts dead wiki anchors"}                   | ${'<p><a href="#" class="dead-wiki-link" data-portable-path="Unknown"><span class="wiki-bracket">[[</span>Unknown<span class="wiki-bracket">]]</span></a></p>'} | ${"[[Unknown]]"}
+    ${"converts plain dead wiki anchors"}             | ${'<p><a href="#" class="dead-wiki-link" data-portable-path="Unknown">Unknown</a></p>'}                                                                         | ${"[[Unknown]]"}
+    ${"converts pending wiki anchors"}                | ${'<p><a href="#" class="pending-wiki-link" data-portable-path="Unknown">Unknown</a></p>'}                                                                      | ${"[[Unknown]]"}
+    ${"donut-wiki-link with piped wiki attrs"}        | ${'<p><a href="/n1" class="donut-wiki-link" data-portable-path="A" data-display-text="B">B</a></p>'}                                                            | ${"[[A|B]]"}
+    ${"path markdown donut-wiki-link keeps markdown"} | ${'<p><a href="/Folder/Title.md" class="donut-wiki-link" data-portable-path="/Folder/Title.md" data-display-text="label" data-note-id="42">label</a></p>'}      | ${"[label](/Folder/Title.md)"}
+    ${"live path markdown with noteShowHref"}         | ${`<p><a href="${noteShowHref(42)}" class="donut-wiki-link" data-portable-path="/Folder/Title.md" data-display-text="label" data-note-id="42">label</a></p>`}   | ${"[label](/Folder/Title.md)"}
+    ${"path markdown without .md keeps href"}         | ${'<p><a href="/Folder/Title" class="donut-wiki-link" data-portable-path="/Folder/Title" data-display-text="label">label</a></p>'}                              | ${"[label](/Folder/Title)"}
+    ${"path markdown dead-wiki-link keeps markdown"}  | ${'<p><a href="/Folder/Missing.md" class="dead-wiki-link" data-portable-path="/Folder/Missing.md" data-display-text="label">label</a></p>'}                     | ${"[label](/Folder/Missing.md)"}
+    ${"path markdown dead with hash href"}            | ${'<p><a href="#" class="dead-wiki-link" data-portable-path="/Folder/Missing.md" data-display-text="label">label</a></p>'}                                      | ${"[label](/Folder/Missing.md)"}
   `("wiki links: $label", ({ html, expected }) => {
     expect(htmlToMarkdown(html)).toBe(expected)
   })
@@ -73,11 +73,11 @@ describe("quillHtmlToMarkdown", () => {
     )
   })
 
-  it("round-trips a live property wiki anchor through data-wiki-title, not the SPA href", () => {
+  it("round-trips a live property wiki anchor through data-portable-path, not the SPA href", () => {
     const href = notePropertyHref(42, "topic")
     expect(
       htmlToMarkdown(
-        `<p><a href="${href}" class="donut-wiki-link" data-wiki-title="Moon#prop:topic" data-wiki-display="shown" data-note-id="42">shown</a></p>`
+        `<p><a href="${href}" class="donut-wiki-link" data-portable-path="Moon#prop:topic" data-display-text="shown" data-note-id="42">shown</a></p>`
       )
     ).toBe("[[Moon#prop:topic|shown]]")
   })

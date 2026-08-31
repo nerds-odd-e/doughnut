@@ -19,8 +19,8 @@ describe("propertyValueField utils", () => {
       []
     )
     expect(html).toContain('class="dead-wiki-link"')
-    expect(html).toContain('data-wiki-title="Unknown Topic"')
-    expect(html).toContain('data-wiki-display="friendly label"')
+    expect(html).toContain('data-portable-path="Unknown Topic"')
+    expect(html).toContain('data-display-text="friendly label"')
     expect(html).toContain("friendly label")
     expect(html).not.toContain("Unknown Topic|friendly label")
   })
@@ -36,7 +36,7 @@ describe("propertyValueField utils", () => {
     )
   })
 
-  it("deadWikiLinkPayloadFromAnchor prefers data-wiki-title for piped links", () => {
+  it("deadWikiLinkPayloadFromAnchor prefers data-portable-path for piped links", () => {
     const wrap = document.createElement("div")
     wrap.innerHTML = propertyValuePlainToDisplayHtml("[[Missing|Shown]]", [])
     const a = wrap.querySelector("a.dead-wiki-link") as HTMLAnchorElement
@@ -69,14 +69,14 @@ describe("propertyValueField utils", () => {
       wikiLinkFromAuthoredToken("[Moon](/Moon.md)", 42),
     ])
     expect(html).toBe(
-      `<a href="${noteShowHref(42)}" class="donut-wiki-link" data-wiki-title="/Moon.md" data-wiki-display="Moon" data-note-id="42">Moon</a>`
+      `<a href="${noteShowHref(42)}" class="donut-wiki-link" data-portable-path="/Moon.md" data-display-text="Moon" data-note-id="42">Moon</a>`
     )
   })
 
   it("renders unresolved path Markdown in a scalar as a dead wiki-style link", () => {
     const html = propertyValuePlainToDisplayHtml("[Moon](/Moon.md)", [])
     expect(html).toBe(
-      '<a href="#" class="dead-wiki-link" data-wiki-title="/Moon.md" data-wiki-display="Moon">Moon</a>'
+      '<a href="#" class="dead-wiki-link" data-portable-path="/Moon.md" data-display-text="Moon">Moon</a>'
     )
   })
 

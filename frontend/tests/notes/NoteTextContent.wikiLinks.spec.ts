@@ -34,7 +34,7 @@ describe("NoteTextContent wiki link display", () => {
     ) as HTMLAnchorElement
     expect(dead.textContent).toContain("friendly label")
     expect(dead.textContent).not.toContain("Unknown Topic|")
-    expect(dead.getAttribute("data-wiki-title")).toBe("Unknown Topic")
+    expect(dead.getAttribute("data-portable-path")).toBe("Unknown Topic")
   })
 
   it("shows display text for resolved body wiki link", async () => {
@@ -60,7 +60,7 @@ describe("NoteTextContent wiki link display", () => {
     ) as HTMLAnchorElement
     expect(live.textContent).toContain("friendly label")
     expect(live.textContent).not.toContain("Target Title|")
-    expect(live.getAttribute("data-wiki-title")).toBe("Target Title")
+    expect(live.getAttribute("data-portable-path")).toBe("Target Title")
   })
 
   it("shows unresolved path markdown as a dead wiki link", async () => {
@@ -77,7 +77,7 @@ describe("NoteTextContent wiki link display", () => {
     ) as HTMLAnchorElement
     expect(dead.textContent).toContain("label")
     expect(dead.getAttribute("href")).toBe("#")
-    expect(dead.getAttribute("data-wiki-title")).toBe("/Folder/Missing.md")
+    expect(dead.getAttribute("data-portable-path")).toBe("/Folder/Missing.md")
   })
 
   it("shows a path markdown link as a live wiki-style link to the note", async () => {
@@ -128,7 +128,7 @@ describe("NoteTextContent wiki link display", () => {
       .findComponent({ name: "QuillEditor" })
       .vm.$emit(
         "update:modelValue",
-        `<p>Saved <a href="#" class="dead-wiki-link" data-wiki-title="WikiLinks E2E Already Missing">WikiLinks E2E Already Missing</a>. See [[WikiLinks E2E Nowhere]].</p>`
+        `<p>Saved <a href="#" class="dead-wiki-link" data-portable-path="WikiLinks E2E Already Missing">WikiLinks E2E Already Missing</a>. See [[WikiLinks E2E Nowhere]].</p>`
       )
     await flushPromises()
     await vi.waitUntil(() =>
@@ -162,7 +162,7 @@ describe("NoteTextContent wiki link display", () => {
     expect(document.querySelector(".ql-editor a.pending-wiki-link")).toBeNull()
     const deadTitles = [
       ...document.querySelectorAll(".ql-editor a.dead-wiki-link"),
-    ].map((a) => a.getAttribute("data-wiki-title"))
+    ].map((a) => a.getAttribute("data-portable-path"))
     expect(deadTitles).toContain("WikiLinks E2E Already Missing")
     expect(deadTitles).toContain("WikiLinks E2E Nowhere")
   })
@@ -216,6 +216,6 @@ describe("NoteTextContent wiki link display", () => {
     const live = document.querySelector(
       ".ql-editor a.donut-wiki-link"
     ) as HTMLAnchorElement
-    expect(live.getAttribute("data-wiki-title")).toBe("WikiLinks E2E CI")
+    expect(live.getAttribute("data-portable-path")).toBe("WikiLinks E2E CI")
   })
 })

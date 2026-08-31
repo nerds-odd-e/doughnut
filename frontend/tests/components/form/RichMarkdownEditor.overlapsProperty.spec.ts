@@ -136,7 +136,7 @@ Body`,
     const liveLink = livePath.find("a.router-link")
     expect(liveLink.exists()).toBe(true)
     expect(liveLink.text()).toBe("Title")
-    expect(liveLink.attributes("data-wiki-title")).toBe("/Folder/Title.md")
+    expect(liveLink.attributes("data-portable-path")).toBe("/Folder/Title.md")
     expect(JSON.parse(liveLink.attributes("to") ?? "{}")).toEqual(
       noteShowLocation(42)
     )

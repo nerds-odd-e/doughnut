@@ -63,7 +63,7 @@ describe("RichMarkdownEditor", () => {
     await nextTick()
 
     expect(h.quillModelHtml()).toContain('class="donut-wiki-link"')
-    expect(h.quillModelHtml()).toContain('data-wiki-title="MyNote"')
+    expect(h.quillModelHtml()).toContain('data-portable-path="MyNote"')
   })
 
   it("keeps canonical dead-wiki-link HTML identical to Quill internal HTML", async () => {

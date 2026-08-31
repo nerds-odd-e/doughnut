@@ -1,6 +1,6 @@
 # Portable path review fix-up
 
-**Status:** in progress — slice 1 done
+**Status:** in progress — slices 1–2 done
 
 ## Goal
 
@@ -89,42 +89,21 @@ Stop-safe outcome: resolver result and persistence entity have distinct names.
 
 ### 2. Wiki-link DOM markers use Portable-path vocabulary
 
-**Status:** planned
+**Status:** done
 **Type:** Structure
 
-Rename the transient in-editor DOM attributes `data-wiki-title` and
-`data-wiki-display` to `data-portable-path` and `data-display-text`,
-completing the DOM-attribute rename slice 3 of the original plan specified
-but missed. These attributes are regenerated from Markdown on every render
-(never persisted in HTML form), so this is a pure rename with no
-data-migration concern. This unblocks the immediate next behavior: existing
-rich-editor round-trip and dead/live wiki-link rendering tests passing
-unchanged under the new attribute names.
+In-editor DOM attributes are `data-portable-path` / `data-display-text`.
+Production strings live in `wikiLinkDomMarkers.ts`
+(`WIKI_LINK_PORTABLE_PATH_ATTR` / `WIKI_LINK_DISPLAY_TEXT_ATTR`); specs still
+assert the literal DOM names. `e2e_test/` had no hits. `wikiLinkMarkup.ts`
+left unsplit (plan scope).
 
-- Rename both attributes and every read/write site in
-  `frontend/src/utils/wikiLinkMarkup.ts` and
-  `frontend/src/components/form/replaceWikiLinksInHtml.ts`.
-- Update `frontend/src/components/notes/WikiLinkToken.vue` if it reads either
-  attribute directly.
-- Update the ~10 spec files asserting on these attributes:
-  `wikiLinkMarkup.spec.ts`, `propertyValueField.spec.ts`,
-  `replaceWikiLinksInHtml.spec.ts`, `quillHtmlToMarkdown.spec.ts`,
-  `RichMarkdownEditor*.spec.ts`, `NoteTextContent.wikiLinks.spec.ts`,
-  `QuillEditor.spec.ts` (confirm exact list via
-  `grep -rl "data-wiki-title\|data-wiki-display" frontend/src frontend/tests`
-  before starting — the review's list may not be exhaustive).
-- No behavior change: same live/dead rendering, same round-trip to Markdown,
-  same click/navigation behavior — only the attribute names change.
+**Learning:** first wiki_link.feature run failed 4 scenarios because the SUT
+backend on 9081 was serving "No static resource" for API routes (stale Java
+after a DevTools port clash). TCP healthcheck still passed. `pnpm sut:restart`
+restored real API mapping; feature then 14/14. Not caused by the rename.
 
-Verification:
-
-- Run `CURSOR_DEV=true nix develop -c pnpm frontend:test`.
-- Run the focused wiki-link E2E feature:
-  `CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/note_topology/wiki_link.feature`.
-
-Stop-safe outcome: no DOM attribute in the rich-editor wiki-link rendering
-path still spells "wiki-title" or "wiki-display"; rendering and round-trip
-behavior is unchanged.
+Stop-safe outcome: no `wiki-title` / `wiki-display` DOM attributes remain.
 
 ### 3. No camelCase "concept path" survivors remain
 

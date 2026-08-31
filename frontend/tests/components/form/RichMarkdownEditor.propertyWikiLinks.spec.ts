@@ -49,7 +49,7 @@ Body`
 
     expect(valueField().find("a.pending-wiki-link").exists()).toBe(true)
     expect(
-      valueField().find("a.pending-wiki-link").attributes("data-wiki-title")
+      valueField().find("a.pending-wiki-link").attributes("data-portable-path")
     ).toBe("WikiLinks E2E Nowhere")
 
     await wrapper.setProps({ lastSavedMarkdown: inFlight, wikiLinks: [] })
@@ -57,7 +57,7 @@ Body`
 
     expect(valueField().find("a.pending-wiki-link").exists()).toBe(false)
     expect(
-      valueField().find("a.dead-wiki-link").attributes("data-wiki-title")
+      valueField().find("a.dead-wiki-link").attributes("data-portable-path")
     ).toBe("WikiLinks E2E Nowhere")
   })
 

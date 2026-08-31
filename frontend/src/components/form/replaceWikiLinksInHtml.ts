@@ -7,6 +7,8 @@ import {
   DEAD_WIKI_LINK_CLASS,
   DONUT_WIKI_LINK_CLASS,
   PENDING_WIKI_LINK_CLASS,
+  WIKI_LINK_DISPLAY_TEXT_ATTR,
+  WIKI_LINK_PORTABLE_PATH_ATTR,
 } from "@/utils/wikiLinkDomMarkers"
 import {
   lastSavedAuthoredTokens,
@@ -28,15 +30,15 @@ const UNRESOLVED_WIKI_LINK_CLASSES = [
 ] as const
 
 function authoredTokenFromWikiAnchor(anchor: Element): string {
-  const target = anchor.getAttribute("data-wiki-title") ?? ""
+  const target = anchor.getAttribute(WIKI_LINK_PORTABLE_PATH_ATTR) ?? ""
   if (authoredHrefLooksLikeConceptNotePath(target)) {
     const display =
-      anchor.getAttribute("data-wiki-display") ||
+      anchor.getAttribute(WIKI_LINK_DISPLAY_TEXT_ATTR) ||
       anchor.textContent?.trim() ||
       ""
     return `[${display}](${target})`
   }
-  const display = anchor.getAttribute("data-wiki-display")
+  const display = anchor.getAttribute(WIKI_LINK_DISPLAY_TEXT_ATTR)
   if (display !== null && display !== "" && display !== target) {
     return `${target}|${display}`
   }
@@ -80,9 +82,10 @@ function upgradeUnresolvedWikiAnchors(
     const { target, display } = wikiLinkParts(w)
     const href = hrefForResolvedWikiTarget(w.destinationNoteId, target)
     for (const a of [...wrap.querySelectorAll(unresolvedAnchorSelector)]) {
-      const dt = a.getAttribute("data-wiki-title")
-      if (dt !== null && dt !== "") {
-        if (dt !== target && dt.trim() !== target.trim()) continue
+      const portablePath = a.getAttribute(WIKI_LINK_PORTABLE_PATH_ATTR)
+      if (portablePath !== null && portablePath !== "") {
+        if (portablePath !== target && portablePath.trim() !== target.trim())
+          continue
         if (!wikiAnchorDisplayMatches(a, display)) continue
       } else if (!wikiAnchorDisplayMatches(a, display)) {
         continue

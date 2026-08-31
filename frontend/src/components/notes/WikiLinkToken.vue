@@ -31,6 +31,8 @@ import {
 import {
   DEAD_WIKI_LINK_CLASS,
   DONUT_WIKI_LINK_CLASS,
+  WIKI_LINK_DISPLAY_TEXT_ATTR,
+  WIKI_LINK_PORTABLE_PATH_ATTR,
 } from "@/utils/wikiLinkDomMarkers"
 import {
   wikiLinkNoteIdLookup,
@@ -57,10 +59,10 @@ const resolved = computed(() => {
   const map = wikiLinkNoteIdLookup(props.wikiLinks)
   const noteId = noteIdForAuthoredToken(parsed.inner, map)
   const linkAttrs: Record<string, string> = {
-    "data-wiki-title": parsed.target,
+    [WIKI_LINK_PORTABLE_PATH_ATTR]: parsed.target,
   }
   if (parsed.display !== parsed.target) {
-    linkAttrs["data-wiki-display"] = parsed.display
+    linkAttrs[WIKI_LINK_DISPLAY_TEXT_ATTR] = parsed.display
   }
   return {
     inner: parsed.inner,

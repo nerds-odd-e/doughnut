@@ -10,7 +10,7 @@ describe("replaceWikiLinksInHtml", () => {
         wikiLinkFromAuthoredToken("MyNote", 42),
       ])
     ).toBe(
-      `<p><a href="${noteShowHref(42)}" class="donut-wiki-link" data-wiki-title="MyNote" data-note-id="42">MyNote</a></p>`
+      `<p><a href="${noteShowHref(42)}" class="donut-wiki-link" data-portable-path="MyNote" data-note-id="42">MyNote</a></p>`
     )
   })
 
@@ -20,7 +20,7 @@ describe("replaceWikiLinksInHtml", () => {
         wikiLinkFromAuthoredToken("Target|label", 7),
       ])
     ).toBe(
-      `<p><a href="${noteShowHref(7)}" class="donut-wiki-link" data-wiki-title="Target" data-wiki-display="label" data-note-id="7">label</a></p>`
+      `<p><a href="${noteShowHref(7)}" class="donut-wiki-link" data-portable-path="Target" data-display-text="label" data-note-id="7">label</a></p>`
     )
   })
 
@@ -35,7 +35,7 @@ describe("replaceWikiLinksInHtml", () => {
 
   it("marks unknown wikilinks as dead links", () => {
     expect(replaceWikiLinksInHtml("<p>[[Unknown]]</p>", [])).toBe(
-      '<p><a href="#" class="dead-wiki-link" data-wiki-title="Unknown">Unknown</a></p>'
+      '<p><a href="#" class="dead-wiki-link" data-portable-path="Unknown">Unknown</a></p>'
     )
   })
 
@@ -46,17 +46,17 @@ describe("replaceWikiLinksInHtml", () => {
         []
       )
     ).toBe(
-      '<p><a href="#" class="dead-wiki-link" data-wiki-title="/Folder/Missing.md" data-wiki-display="label">label</a></p>'
+      '<p><a href="#" class="dead-wiki-link" data-portable-path="/Folder/Missing.md" data-display-text="label">label</a></p>'
     )
   })
 
   it.each`
     label                                        | html
-    ${"leftover dead with concept-path href"}    | ${'<p><a href="/Folder/Title.md" class="dead-wiki-link" data-wiki-title="/Folder/Title.md" data-wiki-display="label">label</a></p>'}
-    ${"leftover pending with concept-path href"} | ${'<p><a href="/Folder/Title.md" class="pending-wiki-link" data-wiki-title="/Folder/Title.md" data-wiki-display="label">label</a></p>'}
-    ${"dead with hash href"}                     | ${'<p><a href="#" class="dead-wiki-link" data-wiki-title="/Folder/Title.md" data-wiki-display="label">label</a></p>'}
-    ${"pending with hash href"}                  | ${'<p><a href="#" class="pending-wiki-link" data-wiki-title="/Folder/Title.md" data-wiki-display="label">label</a></p>'}
-    ${"leftover live with concept-path href"}    | ${'<p><a href="/Folder/Title.md" class="donut-wiki-link" data-wiki-title="/Folder/Title.md" data-wiki-display="label" data-note-id="42">label</a></p>'}
+    ${"leftover dead with concept-path href"}    | ${'<p><a href="/Folder/Title.md" class="dead-wiki-link" data-portable-path="/Folder/Title.md" data-display-text="label">label</a></p>'}
+    ${"leftover pending with concept-path href"} | ${'<p><a href="/Folder/Title.md" class="pending-wiki-link" data-portable-path="/Folder/Title.md" data-display-text="label">label</a></p>'}
+    ${"dead with hash href"}                     | ${'<p><a href="#" class="dead-wiki-link" data-portable-path="/Folder/Title.md" data-display-text="label">label</a></p>'}
+    ${"pending with hash href"}                  | ${'<p><a href="#" class="pending-wiki-link" data-portable-path="/Folder/Title.md" data-display-text="label">label</a></p>'}
+    ${"leftover live with concept-path href"}    | ${'<p><a href="/Folder/Title.md" class="donut-wiki-link" data-portable-path="/Folder/Title.md" data-display-text="label" data-note-id="42">label</a></p>'}
   `(
     "upgrades $label path markdown anchors to a note-show href when wikiLinks resolve",
     ({ html }) => {
@@ -65,7 +65,7 @@ describe("replaceWikiLinksInHtml", () => {
           wikiLinkFromAuthoredToken("[label](/Folder/Title.md)", 42),
         ])
       ).toBe(
-        `<p><a href="${noteShowHref(42)}" class="donut-wiki-link" data-wiki-title="/Folder/Title.md" data-wiki-display="label" data-note-id="42">label</a></p>`
+        `<p><a href="${noteShowHref(42)}" class="donut-wiki-link" data-portable-path="/Folder/Title.md" data-display-text="label" data-note-id="42">label</a></p>`
       )
     }
   )
@@ -95,7 +95,7 @@ describe("replaceWikiLinksInHtml", () => {
     expect(
       replaceWikiLinksInHtml("<p>[[WikiLinks E2E Nowhere]]</p>", [], "Saved.")
     ).toBe(
-      '<p><a href="#" class="pending-wiki-link" data-wiki-title="WikiLinks E2E Nowhere">WikiLinks E2E Nowhere</a></p>'
+      '<p><a href="#" class="pending-wiki-link" data-portable-path="WikiLinks E2E Nowhere">WikiLinks E2E Nowhere</a></p>'
     )
   })
 
@@ -107,7 +107,7 @@ describe("replaceWikiLinksInHtml", () => {
         "Saved [[WikiLinks E2E Already Missing]]."
       )
     ).toBe(
-      '<p><a href="#" class="dead-wiki-link" data-wiki-title="WikiLinks E2E Already Missing">WikiLinks E2E Already Missing</a></p>'
+      '<p><a href="#" class="dead-wiki-link" data-portable-path="WikiLinks E2E Already Missing">WikiLinks E2E Already Missing</a></p>'
     )
   })
 
@@ -125,18 +125,18 @@ describe("replaceWikiLinksInHtml", () => {
   it("turns a pending anchor dead once the token is in last-saved markdown", () => {
     expect(
       replaceWikiLinksInHtml(
-        '<p><a href="#" class="pending-wiki-link" data-wiki-title="WikiLinks E2E Nowhere">WikiLinks E2E Nowhere</a></p>',
+        '<p><a href="#" class="pending-wiki-link" data-portable-path="WikiLinks E2E Nowhere">WikiLinks E2E Nowhere</a></p>',
         [],
         "See [[WikiLinks E2E Nowhere]]."
       )
     ).toBe(
-      '<p><a href="#" class="dead-wiki-link" data-wiki-title="WikiLinks E2E Nowhere">WikiLinks E2E Nowhere</a></p>'
+      '<p><a href="#" class="dead-wiki-link" data-portable-path="WikiLinks E2E Nowhere">WikiLinks E2E Nowhere</a></p>'
     )
   })
 
   it("upgrades a last-saved pending anchor to live when wikiLinks resolve", () => {
     const out = replaceWikiLinksInHtml(
-      '<p><a href="#" class="pending-wiki-link" data-wiki-title="MyNote">MyNote</a></p>',
+      '<p><a href="#" class="pending-wiki-link" data-portable-path="MyNote">MyNote</a></p>',
       [wikiLinkFromAuthoredToken("MyNote", 42)],
       "[[MyNote]]"
     )
@@ -151,7 +151,7 @@ describe("replaceWikiLinksInHtml", () => {
         wikiLinkFromAuthoredToken(`[a part of](${href})`, 42),
       ])
     ).toBe(
-      `<p><a href="${notePropertyHref(42, "a part of")}" class="donut-wiki-link" data-wiki-title="${href}" data-wiki-display="a part of" data-note-id="42">a part of</a></p>`
+      `<p><a href="${notePropertyHref(42, "a part of")}" class="donut-wiki-link" data-portable-path="${href}" data-display-text="a part of" data-note-id="42">a part of</a></p>`
     )
   })
 })

@@ -150,7 +150,7 @@ describe("QuillEditor.vue", () => {
     "emits deadWikiLinkClick when a dead wiki link with $case is clicked",
     async ({ href }) => {
       await mountEditor({
-        modelValue: `<p><a href="${href}" class="dead-wiki-link" data-wiki-title="Ghost">Ghost</a></p>`,
+        modelValue: `<p><a href="${href}" class="dead-wiki-link" data-portable-path="Ghost">Ghost</a></p>`,
         readonly: false,
       })
       await clickEditorAnchor(".ql-editor a.dead-wiki-link")
@@ -165,7 +165,7 @@ describe("QuillEditor.vue", () => {
     const pushSpy = vi.spyOn(router, "push").mockResolvedValue(undefined)
 
     await mountEditor({
-      modelValue: `<p><a href="#" class="pending-wiki-link" data-wiki-title="Ghost">Ghost</a></p>`,
+      modelValue: `<p><a href="#" class="pending-wiki-link" data-portable-path="Ghost">Ghost</a></p>`,
       readonly: false,
     })
     await clickEditorAnchor(".ql-editor a.pending-wiki-link")
