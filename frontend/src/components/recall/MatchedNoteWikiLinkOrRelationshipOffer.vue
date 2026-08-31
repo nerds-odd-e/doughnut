@@ -24,9 +24,9 @@ import type { Note, NoteSearchResult } from "@generated/donut-backend-api"
 import AddRelationshipFinalize from "@/components/wiki-link-or-relationship/AddRelationshipFinalize.vue"
 import WikiLinkOrRelationshipChoice from "@/components/wiki-link-or-relationship/WikiLinkOrRelationshipChoice.vue"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
-import { buildWikiLinkText } from "@/utils/buildWikiLinkText"
 import { parseNoteContentMarkdown } from "@/utils/noteContentFrontmatterParse"
 import { appendWikiLinkPropertyRow } from "@/utils/noteContentPropertyRows"
+import { authoredWikiLinkTokenForInsert } from "@/utils/sameNotebookWikiLinkAuthoring"
 
 const props = defineProps<{
   reviewedNoteId: number
@@ -66,10 +66,6 @@ const insertWikiLinkAsPropertyAvailable = computed(
   () => parseNoteContentMarkdown(sourceNote.value?.content ?? "").ok
 )
 
-const sourceNotebookId = computed(
-  () => reviewedRealmRef.value?.notebookRealm.notebook.id
-)
-
 function chooseAddRelationship() {
   targetSearchResult.value = selectedSearchResult.value
 }
@@ -84,9 +80,11 @@ async function onInsertWikiLinkAsProperty() {
   const source = sourceNote.value
   const target = selectedSearchResult.value
   if (!source || !target) return
-  const linkText = buildWikiLinkText(target, {
-    notebookId: sourceNotebookId.value,
-  })
+  const linkText = await authoredWikiLinkTokenForInsert(
+    source.id,
+    target.noteTopology.id
+  )
+  if (linkText === undefined) return
   const composed = appendWikiLinkPropertyRow(source.content ?? "", linkText)
   if (composed === undefined) return
   await closeDialogThen(() =>

@@ -388,20 +388,15 @@ separate design decision, not this slice's scope).
 
 ### 20. Accidental-match "build a link" uses that path
 
-**Status:** planned
+**Status:** done
 **Type:** Behavior
 
-**Precondition:** The user builds a wiki link from accidental-match
-resolve.
-**Trigger:** Donut inserts it.
-**Postcondition:** Same authoring operation as insert. Accidental-match
-*candidate ordering* is unchanged (out of scope).
-
-Test first: `AccidentalMatchResolveDialog` / spelling-link specs.
-
-Verification: focused frontend specs for that dialog.
-
-Stop-safe: that CTA cannot author a known-ambiguous shorthand.
+`MatchedNoteWikiLinkOrRelationshipOffer.vue`'s `onInsertWikiLinkAsProperty`
+calls `authoredWikiLinkTokenForInsert` instead of `buildWikiLinkText`;
+removed now-dead `buildWikiLinkText` import and `sourceNotebookId`
+computed. `MatchedNoteWikiLinkOrRelationshipOffer.spec.ts` extended with a
+folder-qualified-path test proving the switch, and a shared
+`clickInsertWikiLinkAsProperty` test helper. Candidate ordering untouched.
 
 ### 21. Affected-scope re-resolution has one owner
 
