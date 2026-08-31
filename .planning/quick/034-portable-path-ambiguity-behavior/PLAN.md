@@ -40,6 +40,13 @@ and Donut asks for a longer path.
   insert uses that authoring operation (unique → shorthand; colliding →
   lengthened path). Cross-notebook, property, overlap, accidental-match, and
   paste still use `buildWikiLinkText`.
+- `GET /api/notes/{note}/authored-portable-path` authorizes `{note}` (source)
+  but `PortablePathAuthoring` uniqueness uses the destination note as focus
+  and `resolveAnyTargetWikiLinkToken` (no viewer). Cross-notebook repair
+  therefore omits notebook qualification. Unreadable namesakes can force a
+  longer path.
+- Notebook health “Dead wiki links” uses `unresolvedWikiLinkTokens`, which
+  treats ambiguous shorthands as missing.
 - Exact path-shaped Portable paths already match folder trail plus display
   name (`ResolvedWikiLinkTitleResolutionTest` path-markdown / folder-path
   cases). Property validity is already checked after note resolution.
@@ -103,7 +110,7 @@ Gone: `WikiLinkTargetReference`, `WikiTitleCacheTitleResolutionTest`,
 | First honesty | Cardinality `!= 1` means no resolved row (dead-looking until slice 7) | Stopping after slice 1 already ends database-order navigation. Distinguishing ambiguous from missing waits until the click UX needs it. |
 | Named three-state | Not until the public `WikiLink` contract (slice 6) | A `PortablePathResolution` type before any caller needs `AMBIGUOUS` is speculative structure. |
 | Candidate set | Union title and alias, dedupe by note id | A title match must not hide an alias collision; two aliases on one note are one destination. |
-| Authoring | Backend owns source-scoped Portable-path selection | Uniqueness depends on current notebook data; frontend `buildWikiLinkText` cannot apply the domain rule. |
+| Authoring | Backend owns source-scoped Portable-path selection for the viewer | Uniqueness is readable cardinality in the notebook where the unqualified note portion would resolve; qualify when the source notebook differs. Slices 8–10 shipped destination-focus uniqueness without qualification — fix in slices 11–12. |
 | Longer path | Full normalized folder path; exact root is `/Title` | Smallest already-readable exact form for the otherwise unlengthenable root collision. |
 | Mutation consistency | One affected-scope re-resolution updates the derived resolved-link index | Cache history must not decide current Portable notebook tree semantics. |
 | ADR closeout | Do not add execution-status notes to ADR 0001/0004 | The ADRs already state the live rule; a short window of code inconsistency until this plan ships is accepted. |
@@ -127,6 +134,34 @@ Gone: `WikiLinkTargetReference`, `WikiTitleCacheTitleResolutionTest`,
   do not treat that as a product failure.
 - Touch-set overlap (`wikiLinkMarkup.ts`, `replaceWikiLinksInHtml.ts`,
   `SearchForm.vue`, `WikiLinkResolver.java`) forces sequential wrap-up.
+
+## Learnings from slices 1–10 (apply to remaining work)
+
+- Cardinality belongs after skipping unreadable (`uniqueReadableNotebookMatch`).
+  Applying `uniqueIfExactlyOne` at candidate construction zeros mixed-readability
+  qualified aliases. Authoring still uses `resolveAnyTargetWikiLinkToken` — fix
+  in slice 12, do not regress slice 3.
+- `GET …/authored-portable-path` already has the source note in the path.
+  Passing only `destinationNote` into `PortablePathAuthoring` is how repair
+  dropped notebook qualification. Use the path variable.
+- Reuse the existing dead-link modal + search for “choose”; do not add a
+  candidate-list API. Relationship `targetSearchResult` stays (ADR 0001).
+- `WikiLink.UNRESOLVED` is reserved; missing still inferred from markup. Do
+  not emit `UNRESOLVED` rows until a slice needs them. Do not remove the enum.
+- Collision cardinality is visible on `NoteRealm.wikiLinks` (`AMBIGUOUS` /
+  empty `destinationNoteId`). Do not add a second empty-cache resolver test
+  for the same scenario. Slice 14 deletes the copies already added.
+- `SearchForm.vue` is ~224 lines; `replaceWikiLinksInHtml.ts` ~245. Extract
+  spelling before more insert callers (slice 15). Do not grow either past 250.
+- Vue `data` after `if (error) return` is still possibly undefined — narrow
+  with `if (error || !data) return` in the same change, not a later fixup.
+- `wiki_link_insert.feature` colliding insert asserts a `/Title]]` suffix, not
+  a specific folder path. Tighten when that scenario is touched; do not treat
+  the suffix as proof of exact-root authoring.
+- Finish destination vocabulary on methods this plan already edits
+  (`wikiLinkAnchorHtml` / `WikiLinkToken` still use leftover `target`). Do not
+  sweep `authoredLinkMarkup.splitWikiLinkInner` or relationship `target*` in
+  the same slice. `WikiLinkRewriteSupport` first-match stays slice 28.
 
 ## Slices
 
@@ -224,7 +259,135 @@ the exact-root fallback. Controller test for colliding root display name.
 insert uses `authoredPortablePathFor`. Insert E2E lives in
 `wiki_link_insert.feature`. Cross-notebook still `buildWikiLinkText`.
 
-### 11. Inserting a cross-notebook Wiki link qualifies that path
+### 11. Repairing an ambiguous link across notebooks qualifies the path
+
+**Status:** planned
+**Type:** Behavior
+
+**Precondition:** A rendered Wiki link is `AMBIGUOUS`. The user points at a
+note whose notebook differs from the source note.
+**Trigger:** They confirm that destination.
+**Postcondition:** The stored Portable path is notebook-qualified; the note
+portion is the same shortest unambiguous spelling as same-notebook repair.
+Same-notebook repair is unchanged.
+
+Test first: `NoteControllerAuthoredPortablePathTests` with source and
+destination in different notebooks; extend the slice 7 E2E only if it stays
+inside ~5 minutes.
+
+Implementation: pass the path `{note}` (source) into
+`PortablePathAuthoring`. Qualify when notebook ids differ. Do not change
+viewer filtering yet (slice 12). Do not switch insert callers.
+
+Verification: `pnpm backend:test_only`; focused frontend/E2E if extended.
+
+Stop-safe: shipped repair no longer writes a path that resolves in the
+wrong notebook.
+
+### 12. Authoring uniqueness skips unreadable namesakes
+
+**Status:** planned
+**Type:** Behavior
+
+**Precondition:** The current user can read only one of several notes that
+share a display name or alias in notebooks of that name.
+**Trigger:** Donut authors a Portable path for that readable note.
+**Postcondition:** The path is shorthand when that note is unique among
+readable candidates; an unreadable namesake does not force `Folder/Title`
+or `/Title`.
+
+Test first: one `NoteControllerAuthoredPortablePathTests` case mirroring
+`shouldSkipUnreadableLowestIdAliasCandidateForReadableTarget`. No new E2E.
+
+Implementation: uniqueness via `uniqueReadableNotebookMatch` (or
+`readableNotebookMatches` cardinality) with the current user. Do not use
+`resolveAnyTargetWikiLinkToken` for this decision.
+
+Verification: `pnpm backend:test_only`.
+
+Stop-safe: authoring agrees with resolution’s readable cardinality.
+
+### 13. Notebook health does not report ambiguous shorthands as dead
+
+**Status:** planned
+**Type:** Behavior
+
+**Precondition:** A note’s only unresolved Wiki links are `AMBIGUOUS`
+shorthands (several readable matches).
+**Trigger:** Notebook health evaluates dead wiki links.
+**Postcondition:** Those tokens are not listed under “Dead wiki links”.
+A truly missing shorthand on another note is still listed.
+
+Test first: extend `DeadWikiLinkHealthRuleTest`; do not re-assert missing
+tokens.
+
+Implementation: `unresolvedWikiLinkTokens` / the health rule must not treat
+cardinality `> 1` as missing. Do not add a second health rule.
+
+Verification: `pnpm backend:test_only`.
+
+Stop-safe: ambiguous vs missing is distinct in user guidance, not only in
+the click modal.
+
+### 14. Collision tests live at the wikiLinks HTTP boundary
+
+**Status:** planned
+**Type:** Structure
+
+Unlocks remaining slices not copying a second empty-cache test.
+
+Delete resolver empty-cache copies that `NoteControllerShowTests` already
+covers as `AMBIGUOUS`:
+
+- `wikiLinkResolver_doesNotResolveWhenTitleCollidesWithAlias`
+- `wikiLinkResolver_doesNotResolveWhenTwoNotesShareAnAlias`
+- `wikiLinkResolver_skipsUnreadableLowestIdAliasCandidateForReadableTarget`
+
+Keep one resolved-index empty-row pin
+(`unqualified_link_does_not_resolve_when_same_title_in_different_folders`),
+the same-note title∪alias pin, and the qualified several-readable pin.
+Do not add controller tests that only repeat those kept pins.
+
+Verification: `pnpm backend:test_only`.
+
+Stop-safe: same collision coverage, one HTTP surface plus the pins that
+are not on `wikiLinks`.
+
+### 15. SearchForm wiki-link spelling has one owner
+
+**Status:** planned
+**Type:** Structure
+
+Unlocks slice 17. Move same-notebook insert and ambiguous-repair spelling
+(the `authoredPortablePathFor` + `[[…]]` wrap) out of `SearchForm.vue` so
+that file stays under 250 lines when insert callers switch. No insert
+behavior change. Do not convert property / overlap / paste / cross-notebook
+insert here.
+
+Verification: focused `InsertWikiLink.spec.ts` and
+`SearchDialog.deadWikiLink.spec.ts`.
+
+Stop-safe: the next insert slice can call one helper.
+
+### 16. Edited wiki-link markup uses destination names
+
+**Status:** planned
+**Type:** Structure
+
+Unlocks nothing user-facing. On surfaces this plan already edited, finish
+destination vocabulary so old and new names do not coexist in one method:
+`wikiLinkAnchorHtml` `target`, `WikiLinkToken` `parsed.target` /
+`clicked.target`. Do not rename `authoredLinkMarkup.splitWikiLinkInner`,
+`resolveAnyTargetWikiLinkToken`, `aliasTargetCandidates`, or relationship
+`targetSearchResult`.
+
+Verification: focused `wikiLinkMarkup.spec.ts` / `WikiLinkToken` specs if
+present.
+
+Stop-safe: leftover `target` on edited markup is gone; ADR 0001
+relationship `target` stays.
+
+### 17. Inserting a cross-notebook Wiki link qualifies that path
 
 **Status:** planned
 **Type:** Behavior
@@ -236,15 +399,16 @@ notebook.
 is shorthand or normalized under the same uniqueness rule.
 
 Test first: extend the existing qualified-insert E2E in
-`wiki_link_insert.feature`. Reuse `authoredPortablePath` so the note portion
-follows the same uniqueness rule; qualify with the notebook name.
+`wiki_link_insert.feature`. Reuse slice 11’s authoring. Tighten the
+colliding same-notebook insert assertion to a full `[[Folder/Title]]` if
+that scenario is touched.
 
-Verification: `wiki_link_insert.feature`; focused frontend specs if the payload
-shape is asserted there.
+Verification: `wiki_link_insert.feature`; focused frontend specs if the
+payload shape is asserted there.
 
-Stop-safe: cross-notebook insert agrees with same-notebook uniqueness.
+Stop-safe: cross-notebook insert agrees with repair qualification.
 
-### 12. Inserting a Wiki link as a property uses that path
+### 18. Inserting a Wiki link as a property uses that path
 
 **Status:** planned
 **Type:** Behavior
@@ -262,7 +426,7 @@ Verification: focused frontend specs; `property_wiki_link.feature`.
 
 Stop-safe: property insert cannot add a known-ambiguous shorthand.
 
-### 13. Overlap "build a link" uses that path
+### 19. Overlap "build a link" uses that path
 
 **Status:** planned
 **Type:** Behavior
@@ -280,7 +444,7 @@ Verification: the tests that already cover
 
 Stop-safe: overlap insert agrees with search insert.
 
-### 14. Accidental-match "build a link" uses that path
+### 20. Accidental-match "build a link" uses that path
 
 **Status:** planned
 **Type:** Behavior
@@ -297,24 +461,24 @@ Verification: focused frontend specs for that dialog.
 
 Stop-safe: that CTA cannot author a known-ambiguous shorthand.
 
-### 15. Affected-scope re-resolution has one owner
+### 21. Affected-scope re-resolution has one owner
 
 **Status:** planned
 **Type:** Structure
 
-Unlocks slice 16. Do not wire new mutation triggers.
+Unlocks slice 22. Do not wire new mutation triggers.
 
 - Given an affected Portable notebook tree/scope, re-resolve relevant
   authored links and rebuild only resolved index rows.
 - Reuse the existing resolved-link index; no second lookup model, queue, or
   compatibility status.
-- Preserve current external results until slice 16 invokes it.
+- Preserve current external results until slice 22 invokes it.
 
 Verification: `pnpm backend:test_only`.
 
 Stop-safe: one tested operation is ready for the next mutation behavior.
 
-### 16. Renaming a note updates shorthand cardinality
+### 22. Renaming a note updates shorthand cardinality
 
 **Status:** planned
 **Type:** Behavior
@@ -330,7 +494,7 @@ Test first: start resolved, rename in a namesake, assert ambiguous
 rename collision if it stays inside ~5 minutes with `wiki_link.feature`;
 otherwise controller + one canonical index/graph assertion.
 
-Implementation: invoke slice 15 from the existing rename boundary only.
+Implementation: invoke slice 21 from the existing rename boundary only.
 Never keep a resolved row because it resolved historically.
 
 Verification: `pnpm backend:test_only`; focused `wiki_link.feature` if
@@ -338,7 +502,7 @@ extended.
 
 Stop-safe: the most common tree edit cannot freeze a stale destination.
 
-### 17. Creating a namesake updates shorthand cardinality
+### 23. Creating a namesake updates shorthand cardinality
 
 **Status:** planned
 **Type:** Behavior
@@ -348,13 +512,13 @@ Stop-safe: the most common tree edit cannot freeze a stale destination.
 **Postcondition:** The existing shorthand becomes ambiguous without editing
 its source.
 
-Test first: controller/cache; do not repeat slice 16's graph assertions.
+Test first: controller/cache; do not repeat slice 22's graph assertions.
 
 Verification: `pnpm backend:test_only`.
 
 Stop-safe: creation is a cardinality change, not only rename.
 
-### 18. Moving a note updates shorthand cardinality
+### 24. Moving a note updates shorthand cardinality
 
 **Status:** planned
 **Type:** Behavior
@@ -370,7 +534,7 @@ Verification: `pnpm backend:test_only`.
 
 Stop-safe: location changes participate in uniqueness.
 
-### 19. Deleting or restoring a note updates shorthand cardinality
+### 25. Deleting or restoring a note updates shorthand cardinality
 
 **Status:** planned
 **Type:** Behavior
@@ -388,7 +552,7 @@ Verification: `pnpm backend:test_only`.
 
 Stop-safe: presence in the tree, not cache history, decides uniqueness.
 
-### 20. Changing aliases updates shorthand cardinality
+### 26. Changing aliases updates shorthand cardinality
 
 **Status:** planned
 **Type:** Behavior
@@ -399,16 +563,16 @@ Stop-safe: presence in the tree, not cache history, decides uniqueness.
 new cardinality without editing the source note.
 
 Test first: add/remove a title-colliding alias at the text-content
-controller boundary. Do not duplicate slice 16's graph assertions.
+controller boundary. Do not duplicate slice 22's graph assertions.
 
-Implementation: feed affected old/new alias lookup keys into slice 15's
+Implementation: feed affected old/new alias lookup keys into slice 21's
 owner.
 
 Verification: `pnpm backend:test_only`.
 
 Stop-safe: aliases participate in uniqueness over time.
 
-### 21. Rename rewrite lengthens the Portable path when needed
+### 27. Rename rewrite lengthens the Portable path when needed
 
 **Status:** planned
 **Type:** Behavior
@@ -434,7 +598,7 @@ touched.
 Stop-safe: rename maintenance cannot rewrite a good link into an ambiguous
 shorthand.
 
-### 22. Move rewrite lengthens or qualifies when needed
+### 28. Move rewrite lengthens or qualifies when needed
 
 **Status:** planned
 **Type:** Behavior
@@ -453,7 +617,7 @@ Verification: focused link E2E; `pnpm backend:test_only`.
 
 Stop-safe: move maintenance agrees with uniqueness.
 
-### 23. Already-ambiguous markup is not rewritten
+### 29. Already-ambiguous markup is not rewritten
 
 **Status:** planned
 **Type:** Behavior
@@ -471,12 +635,12 @@ Verification: `pnpm backend:test_only`.
 
 Stop-safe: maintenance does not invent a destination for ambiguous source.
 
-### 24. Pasting a note URL uses backend-authored unique paths
+### 30. Pasting a note URL uses backend-authored unique paths
 
 **Status:** planned
 **Type:** Structure
 
-Unlocks slice 25. Replace frontend note-identity reconstruction in
+Unlocks slice 31. Replace frontend note-identity reconstruction in
 `convertPastedNotePropertyLinks` with the source-aware authoring operation
 for **unique** same-notebook pastes so the stored Wiki link is unchanged
 for that case. Keep one unresolved URL → ordinary Markdown.
@@ -484,9 +648,9 @@ for that case. Keep one unresolved URL → ordinary Markdown.
 Verification: existing paste specs still green; `pnpm frontend:test` for
 the paste files (and backend if a new endpoint is added).
 
-Stop-safe: paste shares the authoring seam; collision spelling is slice 25.
+Stop-safe: paste shares the authoring seam; collision spelling is slice 31.
 
-### 25. Pasting a colliding note URL stores the full Portable path
+### 31. Pasting a colliding note URL stores the full Portable path
 
 **Status:** planned
 **Type:** Behavior
@@ -515,8 +679,10 @@ spelling.
 - Grep wiki-link resolution (not accidental-match) for leftover first-match
   characterizations (`lowest_note_id`, `getFirst()` on title/alias candidate
   lists used as the destination).
-- Run backend verify, frontend tests, the three focused note-topology E2E
-  features, then retire this plan directory (no seed to update).
+- Run backend verify, frontend tests, `wiki_link.feature` /
+  `wiki_link_insert.feature` / `property_wiki_link.feature` /
+  `path_markdown_link.feature`, then retire this plan directory (no seed to
+  update).
 
 ## Slice wrap-up contract
 
