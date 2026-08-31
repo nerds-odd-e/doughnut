@@ -2,6 +2,7 @@ package com.odde.donut.services;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.ArgumentMatchers.any;
@@ -9,13 +10,17 @@ import static org.mockito.Mockito.when;
 
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.QuestionGenerationBatch;
+import com.odde.donut.entities.QuestionGenerationBatchRequest;
+import com.odde.donut.entities.QuestionGenerationBatchRequestStatus;
 import com.odde.donut.entities.QuestionGenerationBatchStatus;
 import com.odde.donut.entities.User;
 import com.odde.donut.entities.repositories.QuestionGenerationBatchRepository;
+import com.odde.donut.entities.repositories.QuestionGenerationBatchRequestRepository;
 import com.odde.donut.services.openAiApis.OpenAiApiHandler;
 import com.odde.donut.testability.MakeMe;
 import io.micrometer.core.instrument.MeterRegistry;
 import java.sql.Timestamp;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -38,6 +43,7 @@ class QuestionGenerationBatchSubmissionServiceTest {
   @Autowired QuestionGenerationBatchPlanningService planningService;
   @Autowired QuestionGenerationBatchSubmissionService submissionService;
   @Autowired QuestionGenerationBatchRepository batchRepository;
+  @Autowired QuestionGenerationBatchRequestRepository batchRequestRepository;
   @Autowired GlobalSettingsService globalSettingsService;
 
   User user;
@@ -134,6 +140,13 @@ class QuestionGenerationBatchSubmissionServiceTest {
       assertThat(batch.getOpenaiInputFileId(), is(nullValue()));
       assertThat(batch.getOpenaiBatchId(), is(nullValue()));
       assertThat(batch.getSubmittedAt(), is(nullValue()));
+      List<QuestionGenerationBatchRequest> requests =
+          batchRequestRepository.findByBatch_Id(batch.getId());
+      assertThat(requests, hasSize(1));
+      assertThat(requests.get(0).getStatus(), is(QuestionGenerationBatchRequestStatus.FAILED));
+      assertThat(
+          requests.get(0).getErrorDetail(),
+          is(QuestionGenerationBatchRequest.ERROR_BATCH_SUBMISSION_FAILED));
       assertThat(
           batchRepository.findLatestSubmittedAtByUser_Id(user.getId()).orElseThrow(),
           equalTo(previousSubmission));

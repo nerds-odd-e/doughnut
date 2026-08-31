@@ -16,6 +16,10 @@ import lombok.Setter;
 @Setter
 public class QuestionGenerationBatchRequest extends EntityIdentifiedByIdOnly {
 
+  public static final String ERROR_OPENAI_BATCH_FAILED = "openai batch failed";
+  public static final String ERROR_OPENAI_BATCH_EXPIRED = "openai batch expired";
+  public static final String ERROR_BATCH_SUBMISSION_FAILED = "batch submission failed";
+
   @ManyToOne(optional = false)
   @JoinColumn(name = "batch_id", nullable = false)
   private QuestionGenerationBatch batch;

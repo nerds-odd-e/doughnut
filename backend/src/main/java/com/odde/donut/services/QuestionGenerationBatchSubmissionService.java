@@ -1,8 +1,10 @@
 package com.odde.donut.services;
 
 import com.odde.donut.entities.QuestionGenerationBatch;
+import com.odde.donut.entities.QuestionGenerationBatchRequest;
 import com.odde.donut.entities.QuestionGenerationBatchStatus;
 import com.odde.donut.entities.repositories.QuestionGenerationBatchRepository;
+import com.odde.donut.entities.repositories.QuestionGenerationBatchRequestRepository;
 import com.odde.donut.services.openAiApis.OpenAiApiHandler;
 import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
@@ -13,16 +15,19 @@ public class QuestionGenerationBatchSubmissionService {
   private final QuestionGenerationBatchJsonlRenderer jsonlRenderer;
   private final OpenAiApiHandler openAiApiHandler;
   private final QuestionGenerationBatchRepository batchRepository;
+  private final QuestionGenerationBatchRequestRepository batchRequestRepository;
   private final QuestionGenerationBatchMetrics batchMetrics;
 
   public QuestionGenerationBatchSubmissionService(
       QuestionGenerationBatchJsonlRenderer jsonlRenderer,
       OpenAiApiHandler openAiApiHandler,
       QuestionGenerationBatchRepository batchRepository,
+      QuestionGenerationBatchRequestRepository batchRequestRepository,
       QuestionGenerationBatchMetrics batchMetrics) {
     this.jsonlRenderer = jsonlRenderer;
     this.openAiApiHandler = openAiApiHandler;
     this.batchRepository = batchRepository;
+    this.batchRequestRepository = batchRequestRepository;
     this.batchMetrics = batchMetrics;
   }
 
@@ -51,6 +56,8 @@ public class QuestionGenerationBatchSubmissionService {
       return true;
     } catch (RuntimeException e) {
       batch.setStatus(QuestionGenerationBatchStatus.FAILED);
+      batchRequestRepository.markPendingAsFailedForBatch(
+          batch.getId(), QuestionGenerationBatchRequest.ERROR_BATCH_SUBMISSION_FAILED);
       batchRepository.saveAndFlush(batch);
       batchMetrics.recordFailedBatch();
       return false;

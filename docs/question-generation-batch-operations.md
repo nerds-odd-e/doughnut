@@ -49,10 +49,13 @@ Batch-level terminal states are `COMPLETED`, `FAILED`, and `EXPIRED`. A complete
 ## Retry Behavior
 
 - **23-hour gate:** A user gets at most one *accepted* OpenAI submission per 23 hours. The gate is derived from the latest `question_generation_batch.submitted_at` for that user, not batch terminal status.
-- **Failed local submission** (`PLANNED` → `FAILED` before OpenAI acceptance): gate is **not** updated; user can retry on the next **target cron hour** (same once-per-day gate as first-time submissions).
-- **OpenAI `FAILED` / `EXPIRED`:** Gate **was** updated at acceptance. User is blocked until 23 hours pass **unless** they have a batch with `openai_batch_id` set and status `FAILED` or `EXPIRED` — then they may submit again even inside the gate on the **next hourly cron**, bypassing the target cron-hour gate (retry path in `QuestionGenerationBatchPlanningService`).
+- **Failed local submission** (`PLANNED` → `FAILED` before OpenAI acceptance): gate is **not** updated; pending request rows are marked `FAILED` (`error_detail`: `batch submission failed`). The user can retry on the next **target cron hour** (same once-per-day gate as first-time submissions).
+- **OpenAI `FAILED` / `EXPIRED`:** Gate **was** updated at acceptance. Pending request rows are marked `FAILED` (`error_detail`: `openai batch failed` / `openai batch expired`). User is blocked until 23 hours pass **unless** they have a batch with `openai_batch_id` set and status `FAILED` or `EXPIRED` — then they may submit again even inside the gate on the **next hourly cron**, bypassing the target cron-hour gate (retry path in `QuestionGenerationBatchPlanningService`).
+- **One retry per tracker per generation cycle:** A tracker is not queued again while it has a `PENDING` or `OUTPUT_READY` request, regardless of parent batch status. After a `FAILED` request, the tracker may be queued **once more**. A second `FAILED` request in the same cycle (no later `IMPORTED` request) excludes it. This prevents hourly OpenAI failures from accumulating duplicate rows for the same tracker.
 - **In-flight work:** User is not eligible for a new submission while any batch has status `SUBMITTED`.
 - **Row import:** Failed rows stay `FAILED`; other rows in the same batch can still import. Re-running maintenance is safe: already `IMPORTED` rows are skipped.
+
+`V300000306` is a gated one-time purge of incomplete batches (`status <> COMPLETED` or `imported_at IS NULL`). Test/dev/e2e leave it as a no-op (`1=0`). Production defaults to `1=1` so the OpenAI Batch outage backlog is dropped on deploy; imported `COMPLETED` batches are kept. After Flyway has applied that version, revert the production placeholder to `1=0`.
 
 ## Restart Behavior
 

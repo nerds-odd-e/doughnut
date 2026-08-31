@@ -1,8 +1,10 @@
 package com.odde.donut.services;
 
 import com.odde.donut.entities.QuestionGenerationBatch;
+import com.odde.donut.entities.QuestionGenerationBatchRequest;
 import com.odde.donut.entities.QuestionGenerationBatchStatus;
 import com.odde.donut.entities.repositories.QuestionGenerationBatchRepository;
+import com.odde.donut.entities.repositories.QuestionGenerationBatchRequestRepository;
 import com.odde.donut.services.openAiApis.OpenAiApiHandler;
 import com.openai.models.batches.Batch;
 import java.util.List;
@@ -17,14 +19,17 @@ public class QuestionGenerationBatchPollingService {
       LoggerFactory.getLogger(QuestionGenerationBatchPollingService.class);
 
   private final QuestionGenerationBatchRepository batchRepository;
+  private final QuestionGenerationBatchRequestRepository batchRequestRepository;
   private final OpenAiApiHandler openAiApiHandler;
   private final QuestionGenerationBatchMetrics batchMetrics;
 
   public QuestionGenerationBatchPollingService(
       QuestionGenerationBatchRepository batchRepository,
+      QuestionGenerationBatchRequestRepository batchRequestRepository,
       OpenAiApiHandler openAiApiHandler,
       QuestionGenerationBatchMetrics batchMetrics) {
     this.batchRepository = batchRepository;
+    this.batchRequestRepository = batchRequestRepository;
     this.openAiApiHandler = openAiApiHandler;
     this.batchMetrics = batchMetrics;
   }
@@ -73,6 +78,13 @@ public class QuestionGenerationBatchPollingService {
     if (newStatus == QuestionGenerationBatchStatus.COMPLETED) {
       batch.setOpenaiOutputFileId(openAiBatch.outputFileId().orElse(null));
       batch.setOpenaiErrorFileId(openAiBatch.errorFileId().orElse(null));
+    }
+    if (QuestionGenerationBatchStatus.openAiFailureRetryStatuses().contains(newStatus)) {
+      String errorDetail =
+          newStatus == QuestionGenerationBatchStatus.EXPIRED
+              ? QuestionGenerationBatchRequest.ERROR_OPENAI_BATCH_EXPIRED
+              : QuestionGenerationBatchRequest.ERROR_OPENAI_BATCH_FAILED;
+      batchRequestRepository.markPendingAsFailedForBatch(batch.getId(), errorDetail);
     }
     batchRepository.saveAndFlush(batch);
     recordBatchStatusMetric(newStatus);

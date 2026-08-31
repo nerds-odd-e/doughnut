@@ -40,6 +40,8 @@ spring:
       leak-detection-threshold: 60000
   flyway:
     clean-disabled: true
+    placeholders:
+      question_generation_batch_incomplete_purge: "${QUESTION_GENERATION_BATCH_INCOMPLETE_PURGE:1=1}"
   jpa:
     generate-ddl: false
     show-sql: false

@@ -63,8 +63,44 @@ class QuestionGenerationBatchQueuedRequestCandidateTest {
   }
 
   @Test
-  void includesTrackerWhenOnlyQueuedBatchFailed() {
+  void excludesTrackerWhileFailedBatchStillHasPendingRequest() {
     saveBatchRequest(QuestionGenerationBatchStatus.FAILED);
+
+    assertThat(
+        planningService.findCandidateMemoryTrackersForBatchGeneration(user, currentTime), empty());
+  }
+
+  @Test
+  void includesTrackerOnceAfterPreviousRequestFailed() {
+    saveBatchRequest(
+        QuestionGenerationBatchStatus.FAILED, QuestionGenerationBatchRequestStatus.FAILED);
+
+    List<MemoryTracker> candidates =
+        planningService.findCandidateMemoryTrackersForBatchGeneration(user, currentTime);
+
+    assertThat(
+        candidates.stream().map(MemoryTracker::getId).toList(), contains(dueTracker.getId()));
+  }
+
+  @Test
+  void excludesTrackerAfterFailedRequestWasAlreadyRetried() {
+    saveBatchRequest(
+        QuestionGenerationBatchStatus.FAILED, QuestionGenerationBatchRequestStatus.FAILED);
+    saveBatchRequest(
+        QuestionGenerationBatchStatus.FAILED, QuestionGenerationBatchRequestStatus.FAILED);
+
+    assertThat(
+        planningService.findCandidateMemoryTrackersForBatchGeneration(user, currentTime), empty());
+  }
+
+  @Test
+  void includesTrackerAfterImportedRequestFollowedEarlierFailures() {
+    saveBatchRequest(
+        QuestionGenerationBatchStatus.FAILED, QuestionGenerationBatchRequestStatus.FAILED);
+    saveBatchRequest(
+        QuestionGenerationBatchStatus.FAILED, QuestionGenerationBatchRequestStatus.FAILED);
+    saveBatchRequest(
+        QuestionGenerationBatchStatus.COMPLETED, QuestionGenerationBatchRequestStatus.IMPORTED);
 
     List<MemoryTracker> candidates =
         planningService.findCandidateMemoryTrackersForBatchGeneration(user, currentTime);

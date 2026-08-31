@@ -1,6 +1,7 @@
 package com.odde.donut.services;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -11,14 +12,18 @@ import static org.mockito.Mockito.when;
 
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.QuestionGenerationBatch;
+import com.odde.donut.entities.QuestionGenerationBatchRequest;
+import com.odde.donut.entities.QuestionGenerationBatchRequestStatus;
 import com.odde.donut.entities.QuestionGenerationBatchStatus;
 import com.odde.donut.entities.User;
 import com.odde.donut.entities.repositories.QuestionGenerationBatchRepository;
+import com.odde.donut.entities.repositories.QuestionGenerationBatchRequestRepository;
 import com.odde.donut.services.openAiApis.OpenAiApiHandler;
 import com.odde.donut.testability.MakeMe;
 import com.openai.models.batches.Batch;
 import io.micrometer.core.instrument.MeterRegistry;
 import java.sql.Timestamp;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -43,6 +48,7 @@ class QuestionGenerationBatchPollingServiceTest {
   @Autowired QuestionGenerationBatchSubmissionService submissionService;
   @Autowired QuestionGenerationBatchPollingService pollingService;
   @Autowired QuestionGenerationBatchRepository batchRepository;
+  @Autowired QuestionGenerationBatchRequestRepository batchRequestRepository;
   @Autowired GlobalSettingsService globalSettingsService;
   @Autowired MeterRegistry meterRegistry;
 
@@ -135,6 +141,10 @@ class QuestionGenerationBatchPollingServiceTest {
           batchRepository.findById(submittedBatch.getId()).orElseThrow();
       assertThat(batch.getStatus(), is(QuestionGenerationBatchStatus.FAILED));
       assertThat(counter("question_generation_batch.failed") - failedBaseline, is(1.0));
+      QuestionGenerationBatchRequest request = onlyRequest(batch);
+      assertThat(request.getStatus(), is(QuestionGenerationBatchRequestStatus.FAILED));
+      assertThat(
+          request.getErrorDetail(), is(QuestionGenerationBatchRequest.ERROR_OPENAI_BATCH_FAILED));
     }
 
     @Test
@@ -148,6 +158,10 @@ class QuestionGenerationBatchPollingServiceTest {
           batchRepository.findById(submittedBatch.getId()).orElseThrow();
       assertThat(batch.getStatus(), is(QuestionGenerationBatchStatus.EXPIRED));
       assertThat(counter("question_generation_batch.expired") - expiredBaseline, is(1.0));
+      QuestionGenerationBatchRequest request = onlyRequest(batch);
+      assertThat(request.getStatus(), is(QuestionGenerationBatchRequestStatus.FAILED));
+      assertThat(
+          request.getErrorDetail(), is(QuestionGenerationBatchRequest.ERROR_OPENAI_BATCH_EXPIRED));
     }
   }
 
@@ -188,5 +202,12 @@ class QuestionGenerationBatchPollingServiceTest {
       verify(openAiApiHandler).retrieveBatch("batch-openai-1");
       verify(openAiApiHandler, never()).retrieveBatch(eq("batch-completed"));
     }
+  }
+
+  private QuestionGenerationBatchRequest onlyRequest(QuestionGenerationBatch batch) {
+    List<QuestionGenerationBatchRequest> requests =
+        batchRequestRepository.findByBatch_Id(batch.getId());
+    assertThat(requests, hasSize(1));
+    return requests.get(0);
   }
 }
