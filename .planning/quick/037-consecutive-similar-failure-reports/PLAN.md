@@ -1,6 +1,6 @@
 # Consecutive similar Failure reports
 
-**Status:** in progress (slices 1–4 done).
+**Status:** in progress (slices 1–5 done).
 **Type:** ad-hoc plan (`.planning/quick/`)
 
 Follow-up to shipped scheduled-job Failure reports. Independent of
@@ -89,15 +89,11 @@ latest row; this slice locked it with a factory test.
 
 ---
 
-### 5. A repeat comments the GitHub issue with the count — Behavior `[ ]`
+### 5. A repeat comments the GitHub issue with the count — Behavior `[x]`
 
-**Pre:** a Failure report with a GitHub issue and count 1. **Trigger:**
-similar failure (first increment). **Post:** GitHub receives one comment
-that is the occurrence count only (investigation detail stays in Donut).
-
-**Verify:** `GithubService` gains a comment method; factory test captures
-the body. `NullGithubService` no-ops. Real client posts a comment on the
-existing issue. Count/list behavior from slices 2–4 unchanged.
+On increment, `commentOnGithubIssue(issueNumber, body)` with body = the
+count only (`"2"`). `NullGithubService` no-ops. Comment failure is
+best-effort (count already saved; first `error_detail` unchanged).
 
 ---
 
@@ -118,7 +114,7 @@ window.
 ## Discoveries
 
 - GitHub issue create already omits the stack (title = class, body = Donut
-  URL). Comments stay equally detail-free.
+  URL). Comments stay equally detail-free (body is the count digits only).
 - **Failure report** is in ADR 0001; policy is Accepted ADR 0006.
 - Latest-row rule is global: an HTTP 500 can split a scheduled loop.
 - Latest row is `findTopByOrderByIdDesc()` (HTTP and scheduled share one

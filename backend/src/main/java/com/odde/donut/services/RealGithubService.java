@@ -43,6 +43,15 @@ public class RealGithubService implements GithubService {
   }
 
   @Override
+  public void commentOnGithubIssue(Integer issueNumber, String body)
+      throws IOException, InterruptedException {
+    String json = new ObjectMapperConfig().objectMapper().writeValueAsString(Map.of("body", body));
+    apiRequest(
+        "issues/" + issueNumber + "/comments",
+        builder -> builder.POST(BodyPublishers.ofString(json)));
+  }
+
+  @Override
   public List<Map<String, Object>> getOpenIssues() throws IOException, InterruptedException {
     return apiRequestWithArrayAsResult("issues?state=open", HttpRequest.Builder::GET);
   }

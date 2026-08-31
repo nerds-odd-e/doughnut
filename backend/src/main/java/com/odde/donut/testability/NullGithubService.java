@@ -19,6 +19,10 @@ public class NullGithubService implements GithubService {
   }
 
   @Override
+  public void commentOnGithubIssue(Integer issueNumber, String body)
+      throws IOException, InterruptedException {}
+
+  @Override
   public List<Map<String, Object>> getOpenIssues() throws IOException, InterruptedException {
     return null;
   }

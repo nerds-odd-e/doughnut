@@ -72,6 +72,12 @@ public record FailureReportFactory(
     FailureReport report = latest.get();
     report.setOccurrenceCount(report.getOccurrenceCount() + 1);
     saveFailureReport(report);
+    try {
+      githubService.commentOnGithubIssue(
+          report.getIssueNumber(), String.valueOf(report.getOccurrenceCount()));
+    } catch (Exception ignored) {
+      // GitHub comment is best-effort; the Failure report already has the count
+    }
     return true;
   }
 

@@ -10,6 +10,9 @@ public interface GithubService {
 
   Integer createGithubIssue(FailureReport failureReport) throws IOException, InterruptedException;
 
+  void commentOnGithubIssue(Integer issueNumber, String body)
+      throws IOException, InterruptedException;
+
   List<Map<String, Object>> getOpenIssues() throws IOException, InterruptedException;
 
   void closeAllOpenIssues() throws IOException, InterruptedException;

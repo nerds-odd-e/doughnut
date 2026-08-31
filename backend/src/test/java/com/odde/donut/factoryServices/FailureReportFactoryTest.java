@@ -144,6 +144,19 @@ class FailureReportFactoryTest {
     verify(githubService, times(3)).createGithubIssue(any());
   }
 
+  @Test
+  void commentsTheGithubIssueWithOccurrenceCountOnSimilarFailure()
+      throws IOException, InterruptedException {
+    createReportFromException("first");
+    FailureReport report = failureReports().getFirst();
+    report.setIssueNumber(42);
+    failureReportRepository.save(report);
+
+    createReportFromException("second");
+
+    verify(githubService).commentOnGithubIssue(42, "2");
+  }
+
   private FailureReport createReport() throws IOException, InterruptedException {
     CurrentUserFetcherFromRequest fetcher =
         new CurrentUserFetcherFromRequest(request, userRepository, userService, Optional.empty());
