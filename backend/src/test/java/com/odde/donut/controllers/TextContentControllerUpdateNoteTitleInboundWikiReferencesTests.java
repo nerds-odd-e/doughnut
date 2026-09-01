@@ -1,6 +1,8 @@
 package com.odde.donut.controllers;
 
+import static com.odde.donut.entities.repositories.AuthoredNoteReferenceRowTestSupport.rowsFor;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
@@ -10,18 +12,21 @@ import com.odde.donut.controllers.dto.ApiError;
 import com.odde.donut.controllers.dto.NoteRealm;
 import com.odde.donut.controllers.dto.NoteUpdateTitleDTO;
 import com.odde.donut.controllers.dto.TitleRenameReferenceHandling;
+import com.odde.donut.entities.AuthoredNoteReferenceRow;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
-import com.odde.donut.entities.ResolvedWikiLink;
-import com.odde.donut.entities.repositories.ResolvedWikiLinkRepository;
+import com.odde.donut.entities.repositories.AuthoredNoteReferenceInboundFacade;
 import com.odde.donut.exceptions.ApiException;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
+import jakarta.persistence.EntityManager;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 class TextContentControllerUpdateNoteTitleInboundWikiReferencesTests
     extends TextContentControllerTestBase {
-  @Autowired ResolvedWikiLinkRepository resolvedWikiLinkRepository;
+  @Autowired EntityManager entityManager;
+  @Autowired AuthoredNoteReferenceInboundFacade authoredNoteReferenceInboundFacade;
 
   @Test
   void rejectsRenameWithoutReferenceHandlingWhenInboundWikiLinksExist()
@@ -77,12 +82,16 @@ class TextContentControllerUpdateNoteTitleInboundWikiReferencesTests
     makeMe.refresh(inbound.carrier());
     assertThat(inbound.carrier().getContent(), containsString("[[RenamedTarget|custom label]]"));
 
-    ResolvedWikiLink row =
-        resolvedWikiLinkRepository
-            .findBySourceNote_IdOrderByIdAsc(inbound.carrier().getId())
-            .getFirst();
-    assertThat(row.getAuthoredLink(), equalTo("RenamedTarget|custom label"));
-    assertThat(row.getDestinationNote().getId(), equalTo(inbound.target().getId()));
+    List<AuthoredNoteReferenceRow> rows = rowsFor(entityManager, inbound.carrier());
+    assertThat(rows, hasSize(1));
+    assertThat(rows.getFirst().getAuthoredLink(), equalTo("RenamedTarget|custom label"));
+    assertThat(
+        authoredNoteReferenceInboundFacade
+            .distinctReferrerNotesForViewer(inbound.target(), currentUser.getUser())
+            .stream()
+            .map(Note::getId)
+            .toList(),
+        contains(inbound.carrier().getId()));
   }
 
   @Test
@@ -131,12 +140,16 @@ class TextContentControllerUpdateNoteTitleInboundWikiReferencesTests
 
     makeMe.refresh(inbound.carrier());
     assertThat(inbound.carrier().getContent(), containsString("[[RenamedTarget|TargetTitle]]"));
-    ResolvedWikiLink row =
-        resolvedWikiLinkRepository
-            .findBySourceNote_IdOrderByIdAsc(inbound.carrier().getId())
-            .getFirst();
-    assertThat(row.getAuthoredLink(), equalTo("RenamedTarget|TargetTitle"));
-    assertThat(row.getDestinationNote().getId(), equalTo(inbound.target().getId()));
+    List<AuthoredNoteReferenceRow> rows = rowsFor(entityManager, inbound.carrier());
+    assertThat(rows, hasSize(1));
+    assertThat(rows.getFirst().getAuthoredLink(), equalTo("RenamedTarget|TargetTitle"));
+    assertThat(
+        authoredNoteReferenceInboundFacade
+            .distinctReferrerNotesForViewer(inbound.target(), currentUser.getUser())
+            .stream()
+            .map(Note::getId)
+            .toList(),
+        contains(inbound.carrier().getId()));
   }
 
   @Test

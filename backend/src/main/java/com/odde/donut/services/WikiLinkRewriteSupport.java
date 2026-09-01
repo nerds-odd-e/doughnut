@@ -24,6 +24,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
@@ -50,6 +51,32 @@ final class WikiLinkRewriteSupport {
     }
   }
 
+  /**
+   * Authored portable path for {@code targetNote} as referred to by {@code referrer}, preserving
+   * the original visible text only when {@code keepVisibleText}. Shared by title rename and
+   * notebook move, the two rewrite paths where a referrer's authored path to a note can change.
+   */
+  static String rewrittenReference(
+      PortablePathAuthoring portablePathAuthoring,
+      Note referrer,
+      Note targetNote,
+      String linkText,
+      boolean keepVisibleText) {
+    String originalPortablePath = WikiLinkMarkdown.splitInner(linkText).portablePath().format();
+    String authoredPortablePath =
+        portablePathAuthoring.authoredPortablePath(referrer, targetNote, originalPortablePath);
+    return WikiLinkMarkdownRewrite.newInnerForAuthoredPortablePath(
+        linkText, authoredPortablePath, keepVisibleText);
+  }
+
+  /**
+   * Rewrites each live, non-excluded referrer's inbound wiki link(s) to {@code targetNote}. When
+   * {@code liveResolvedReferrerIds} is present, a referrer whose cached inbound row(s) survive but
+   * whose authored reference no longer live-resolves to {@code targetNote} (per {@link
+   * com.odde.donut.entities.repositories.AuthoredNoteReferenceInboundFacade}) is skipped rather
+   * than rewritten from a stale cache row. {@link Optional#empty()} keeps every cache-discovered
+   * referrer, the historical behavior every rewrite path but title rename relies on.
+   */
   static void applyInboundReferrerRewrite(
       EntityManager entityManager,
       ResolvedWikiLinkRepository resolvedWikiLinkRepository,
@@ -60,7 +87,8 @@ final class WikiLinkRewriteSupport {
       Timestamp updatedAt,
       User viewer,
       BiFunction<Note, String, String> linkRewrite,
-      Set<Integer> excludedReferrerIds) {
+      Set<Integer> excludedReferrerIds,
+      Optional<Set<Integer>> liveResolvedReferrerIds) {
     Integer targetId = targetNote.getId();
     List<ResolvedWikiLink> rows =
         resolvedWikiLinkRepository.findRowsReferringToNonDeletedNotesForTarget(targetId);
@@ -75,6 +103,10 @@ final class WikiLinkRewriteSupport {
     Collections.sort(referrerIds);
     for (Integer referrerId : referrerIds) {
       if (excludedReferrerIds.contains(referrerId)) {
+        continue;
+      }
+      if (liveResolvedReferrerIds.isPresent()
+          && !liveResolvedReferrerIds.get().contains(referrerId)) {
         continue;
       }
       Note referrer = entityManager.find(Note.class, referrerId);

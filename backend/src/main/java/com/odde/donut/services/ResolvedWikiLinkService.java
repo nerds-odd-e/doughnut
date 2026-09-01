@@ -112,14 +112,6 @@ public class ResolvedWikiLinkService {
   }
 
   /**
-   * True when at least one non-deleted note has a resolved wiki-link row pointing at {@code
-   * targetNoteId}. Used to require an explicit reference-handling choice on title rename.
-   */
-  public boolean hasInboundResolvedWikiLinkRowsFromNonDeletedReferrers(Integer targetNoteId) {
-    return inbound().hasRowsFromNonDeletedReferrers(targetNoteId);
-  }
-
-  /**
    * Inbound referrers for focus-context only, with resolved-wiki-link visibility (referrer's
    * notebook vs the focal notebook and {@link User#canReferTo}), distinct by referrer id, excluding
    * {@code excludeNoteIds}, capped in the database.

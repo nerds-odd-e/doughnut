@@ -17,12 +17,6 @@ final class InboundResolvedWikiLinks {
     this.resolvedWikiLinkRepository = resolvedWikiLinkRepository;
   }
 
-  boolean hasRowsFromNonDeletedReferrers(Integer targetNoteId) {
-    return !resolvedWikiLinkRepository
-        .findRowsReferringToNonDeletedNotesForTarget(targetNoteId)
-        .isEmpty();
-  }
-
   List<Note> sampledReferencesNotesForFocusContext(
       Note focalNote,
       User viewer,

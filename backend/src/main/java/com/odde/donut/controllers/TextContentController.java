@@ -10,6 +10,7 @@ import com.odde.donut.controllers.dto.NoteUpdateTitleDTO;
 import com.odde.donut.entities.DisplayName;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.User;
+import com.odde.donut.entities.repositories.AuthoredNoteReferenceInboundFacade;
 import com.odde.donut.exceptions.ApiException;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.factoryServices.EntityPersister;
@@ -43,6 +44,7 @@ class TextContentController {
   private final WikiLinkRewriteService wikiLinkRewriteService;
   private final NoteService noteService;
   private final CanonicalDonutOrigin canonicalDonutOrigin;
+  private final AuthoredNoteReferenceInboundFacade authoredNoteReferenceInboundFacade;
 
   public TextContentController(
       EntityPersister entityPersister,
@@ -52,7 +54,8 @@ class TextContentController {
       ResolvedWikiLinkService resolvedWikiLinkService,
       WikiLinkRewriteService wikiLinkRewriteService,
       NoteService noteService,
-      CanonicalDonutOrigin canonicalDonutOrigin) {
+      CanonicalDonutOrigin canonicalDonutOrigin,
+      AuthoredNoteReferenceInboundFacade authoredNoteReferenceInboundFacade) {
     this.entityPersister = entityPersister;
     this.testabilitySettings = testabilitySettings;
     this.authorizationService = authorizationService;
@@ -61,6 +64,7 @@ class TextContentController {
     this.wikiLinkRewriteService = wikiLinkRewriteService;
     this.noteService = noteService;
     this.canonicalDonutOrigin = canonicalDonutOrigin;
+    this.authoredNoteReferenceInboundFacade = authoredNoteReferenceInboundFacade;
   }
 
   @PatchMapping(path = "/{note}/title")
@@ -93,8 +97,8 @@ class TextContentController {
     if (Objects.equals(note.getTitle(), titleDTO.getNewTitle())) {
       return;
     }
-    if (!resolvedWikiLinkService.hasInboundResolvedWikiLinkRowsFromNonDeletedReferrers(
-        note.getId())) {
+    User viewer = authorizationService.getCurrentUser();
+    if (authoredNoteReferenceInboundFacade.distinctReferrerNotesForViewer(note, viewer).isEmpty()) {
       return;
     }
     if (titleDTO.getReferenceHandling() != null) {

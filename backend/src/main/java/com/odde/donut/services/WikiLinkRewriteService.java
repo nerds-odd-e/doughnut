@@ -1,13 +1,12 @@
 package com.odde.donut.services;
 
-import com.odde.donut.algorithms.WikiLinkMarkdown;
 import com.odde.donut.algorithms.WikiLinkMarkdownRewrite;
 import com.odde.donut.controllers.dto.FolderTrailSegments;
 import com.odde.donut.controllers.dto.TitleRenameReferenceHandling;
-import com.odde.donut.entities.DisplayName;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.User;
+import com.odde.donut.entities.repositories.AuthoredNoteReferenceInboundFacade;
 import com.odde.donut.entities.repositories.ResolvedWikiLinkRepository;
 import com.odde.donut.factoryServices.EntityPersister;
 import jakarta.persistence.EntityManager;
@@ -15,6 +14,7 @@ import jakarta.persistence.PersistenceContext;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiFunction;
 import org.springframework.stereotype.Service;
@@ -30,18 +30,21 @@ public class WikiLinkRewriteService {
   private final ResolvedWikiLinkService resolvedWikiLinkService;
   private final PortablePathAuthoring portablePathAuthoring;
   private final WikiLinkResolver wikiLinkResolver;
+  private final AuthoredNoteReferenceInboundFacade authoredNoteReferenceInboundFacade;
 
   public WikiLinkRewriteService(
       ResolvedWikiLinkRepository resolvedWikiLinkRepository,
       EntityPersister entityPersister,
       ResolvedWikiLinkService resolvedWikiLinkService,
       PortablePathAuthoring portablePathAuthoring,
-      WikiLinkResolver wikiLinkResolver) {
+      WikiLinkResolver wikiLinkResolver,
+      AuthoredNoteReferenceInboundFacade authoredNoteReferenceInboundFacade) {
     this.resolvedWikiLinkRepository = resolvedWikiLinkRepository;
     this.entityPersister = entityPersister;
     this.resolvedWikiLinkService = resolvedWikiLinkService;
     this.portablePathAuthoring = portablePathAuthoring;
     this.wikiLinkResolver = wikiLinkResolver;
+    this.authoredNoteReferenceInboundFacade = authoredNoteReferenceInboundFacade;
   }
 
   /** Persists the new title, then rewrites inbound wiki links and rebuilds referrer indexes. */
@@ -52,26 +55,21 @@ public class WikiLinkRewriteService {
       Timestamp updatedAt,
       User viewer,
       TitleRenameReferenceHandling handling) {
-    targetNote.setTitle(new DisplayName(newTitle));
-    targetNote.setUpdatedAt(updatedAt);
-    entityPersister.save(targetNote);
-    entityManager.flush();
     boolean keepVisible = handling == TitleRenameReferenceHandling.KEEP_VISIBLE_TEXT;
-    rewriteInboundWikiLinks(
+    TitleRenameWikiLinkRewrite.rewrite(
+        entityManager,
+        resolvedWikiLinkRepository,
+        entityPersister,
+        resolvedWikiLinkService,
+        authoredNoteReferenceInboundFacade,
+        wikiLinkResolver.canonicalDonutOrigin(),
         targetNote,
+        newTitle,
         updatedAt,
         viewer,
-        (referrer, linkText) -> rewrittenReference(referrer, targetNote, linkText, keepVisible),
-        Set.of());
-  }
-
-  private String rewrittenReference(
-      Note referrer, Note targetNote, String linkText, boolean keepVisibleText) {
-    String originalPortablePath = WikiLinkMarkdown.splitInner(linkText).portablePath().format();
-    String authoredPortablePath =
-        portablePathAuthoring.authoredPortablePath(referrer, targetNote, originalPortablePath);
-    return WikiLinkMarkdownRewrite.newInnerForAuthoredPortablePath(
-        linkText, authoredPortablePath, keepVisibleText);
+        (referrer, linkText) ->
+            WikiLinkRewriteSupport.rewrittenReference(
+                portablePathAuthoring, referrer, targetNote, linkText, keepVisible));
   }
 
   /**
@@ -149,7 +147,8 @@ public class WikiLinkRewriteService {
     if (notebookMoveRewrite.equals(linkText)) {
       return linkText;
     }
-    return rewrittenReference(referrer, targetNote, linkText, true);
+    return WikiLinkRewriteSupport.rewrittenReference(
+        portablePathAuthoring, referrer, targetNote, linkText, true);
   }
 
   /** Folder rename: update one matching folder-name segment in inbound path-shaped wiki links. */
@@ -243,6 +242,7 @@ public class WikiLinkRewriteService {
         updatedAt,
         viewer,
         linkRewrite,
-        excludedReferrerIds);
+        excludedReferrerIds,
+        Optional.empty());
   }
 }
