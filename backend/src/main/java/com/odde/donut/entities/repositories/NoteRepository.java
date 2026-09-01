@@ -82,6 +82,9 @@ public interface NoteRepository extends CrudRepository<Note, Integer>, NoteStruc
   @Query(value = selectFromNote + searchForTitleExact + " AND n.notebook.id = :notebookId")
   List<Note> searchExactInNotebook(Integer notebookId, @Param("key") String key);
 
+  /** Next bounded page of live notes after {@code id}, for the authored-reference backfill. */
+  List<Note> findByIdGreaterThanAndDeletedAtIsNullOrderByIdAsc(Integer id, Pageable pageable);
+
   @Query(
       value =
           selectFromNote
