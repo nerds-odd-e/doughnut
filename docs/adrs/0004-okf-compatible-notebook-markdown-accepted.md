@@ -111,12 +111,18 @@ profile. Codec round-trips must be lossless for these rules.
   avoid `#prop:` in titles; this profile does not add escaping for it.
 - Markdown links `[display-text](href)` use ordinary URL semantics. ADR 0005
   defines when a Donut URL also contributes a semantic note reference.
-- Resolved wiki links and semantic Donut URL references defined by ADR 0005
-  share one index `(source_note, destination_note, authored_link)`. No style
-  column. No second index. For a wiki property link, strip `#prop:…` to resolve
-  the note, decode the suffix, and require that exact property on the resolved
-  note. A resolved row must not keep a property link live after the target
-  property is removed or renamed.
+- Wiki Portable-path references and semantic Donut note-URL references defined
+  by ADR 0005 share one code domain type, `AuthoredNoteReference`. Stored note
+  Markdown is authoritative. One source-owned derived index mirrors every
+  distinct authored reference, including wiki references that are currently
+  unresolved or ambiguous; a resolved destination is not a second source of
+  truth.
+- Resolve an `AuthoredNoteReference` from its authored target, source scope,
+  current notebook state, and current viewer. A semantic Donut note URL carries
+  its authoritative destination note ID. A wiki Portable path does not persist
+  an authoritative destination. Its optional property selector is part of the
+  authored reference and resolves only while the current destination contains
+  that exact property key.
 
 ### Validation
 

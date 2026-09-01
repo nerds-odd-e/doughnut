@@ -1,0 +1,251 @@
+# Authoritative authored note references
+
+**Status:** planned  
+**Source:** `.planning/notes/notebook-scope-wiki-refresh-on-title-and-create.md`  
+**Architecture:** ADR 0004, “Links and attachments”  
+**Goal:** Make authored semantic note references a domain-owned representation derived from note Markdown, and make every consumer resolve those references against current state without notebook-wide cache refreshes.
+
+## Outcome
+
+When this plan is complete:
+
+- `AuthoredNoteReference` is the one domain type for wiki Portable-path targets and semantic Donut note-ID URLs.
+- Stored note Markdown remains authoritative. A source-owned `authored_note_reference` index mirrors every distinct authored reference, including missing and ambiguous wiki targets.
+- A wiki reference never stores an authoritative destination note. A note-ID URL stores its authored note ID, not a cached resolution result.
+- Resolution has one sealed result (`Resolved`, `Missing`, or `Ambiguous`) computed from the authored reference, source scope, current notebook state, and current viewer.
+- Outgoing links, inbound references, rename/delete/move rewriting, focus context, and property assimilation all use one note-reference facade. They cannot query a resolved-link repository directly.
+- Every production content mutation updates Markdown and its authored-reference children through one domain boundary; raw `Note.setContent(String)` is unavailable to production callers.
+- `resolved_wiki_link`, `ResolvedWikiLink*`, `NotePropertyIndex.targetNote`, and notebook-scope resolution refreshes are gone.
+
+## Design contract
+
+### Domain authority
+
+- Keep and strengthen `algorithms/AuthoredNoteReference` rather than introduce another link model.
+- Give each reference a stable source-local key and its parsed locator:
+  - wiki: optional authored notebook qualifier, note portion, optional encoded property key, and display text;
+  - note URL: authored note ID, href, and display text.
+- Add a top-level sealed `NoteReferenceResolution` with `Resolved(Note)`, `Missing`, and `Ambiguous`. Remove `WikiLinkResolver.CandidateCardinality` after adapters have migrated.
+- Add one resolver entry point accepting `AuthoredNoteReference`, source note, and viewer. Consumers must not switch on stored destination state.
+
+### Aggregate and persistence mapping
+
+- Introduce an `AuthoredNoteDocument` value that carries the validated Markdown plus `AuthoredNoteReferences.uniquePreserveOrder(...)` from the same parse.
+- `Note.replaceContent(AuthoredNoteDocument)` changes the Markdown and replaces its source-owned authored-reference children in the same aggregate operation. During migration, keep the raw setter only until every production caller uses this boundary; then remove it.
+- Map those children to `authored_note_reference`. Persist authored kind and parsed locator fields needed for candidate lookup, plus document order. Do not map a destination `Note` relation for wiki references. Persist a note-ID URL's numeric ID as authored data even when no live note currently has that ID.
+- Keep the repository internal to the note-reference package. Expose domain references and resolutions, never persistence rows, to consumers.
+
+### Query model
+
+- Outgoing queries may read the aggregate's authored references directly, then resolve them live.
+- Inbound queries use the derived index only to select possible authored references:
+  - note-ID URLs by authored note ID;
+  - wiki paths by current target keys (notebook, display name/aliases, and Portable path), with source-notebook fallback for unqualified paths.
+- Candidate rows are always resolved again through the domain resolver for the current viewer. Candidate lookup is an optimization, not a resolution verdict.
+- `note_property_index` may point to an authored-reference row when a property value contains a semantic reference. It must not store its own resolved target note.
+
+### Migration and operations
+
+- Creating the new table and backfilling it are separate, restart-safe steps. Backfill parses each existing note with the configured canonical Donut origin, in bounded transactions, outside a user write request. Readiness must not report complete until the one-time backfill succeeds.
+- Keep `resolved_wiki_link` only while consumers are being moved. Do not dual-write new resolved destinations. Drop it after the last consumer moves.
+- Regenerate `docs/database-erd.md` after each final schema shape change, following the `database-erd` skill.
+
+## Non-goals
+
+- Do not change Markdown or wiki-link syntax, candidate matching rules, visibility rules, or API response shapes.
+- Do not introduce async eventual resolution or a notebook-wide invalidation job.
+- Do not add a new ADR. ADR 0004 now carries the durable constraint; this plan owns implementation detail.
+- Do not revert the working quick fix while the old cache exists. The completed design makes that fix obsolete by removing the refresh API and remaining callers.
+
+## Slices
+
+### 1. Promote reference resolution to a domain contract
+
+- **Type:** Structure
+- **Status:** pending
+- **Enables:** Slice 2 only.
+- Add `NoteReferenceResolution` and one resolver entry point for both `AuthoredNoteReference` variants.
+- Move the dedupe/source-local key onto the authored-reference model so persistence and property indexing cannot invent their own identity rules.
+- Keep the existing `WikiLinkResolver` public methods as thin adapters until their consumers migrate; this slice must not change observable resolution.
+- Add focused algorithm tests only where the new domain-stable contract is not already exercised through a controller.
+- **Verify:** full backend tests.
+
+### 2. Resolve outgoing references from authored Markdown, not cached rows
+
+- **Type:** Behavior
+- **Status:** pending
+- **Scenario:** A note contains `[[Future]]` while no target exists. After a target named `Future` is created, showing the original note returns that resolved wiki link without refreshing or rewriting the original note.
+- Add the scenario at `NoteController`'s show boundary. A sibling scenario may assert only the delta when a previously unique target becomes ambiguous.
+- Make outgoing note-realm links and graph traversal iterate authoritative authored references and resolve each for the current viewer.
+- Stop reading `resolved_wiki_link` for outgoing references; preserve document order, dedupe, ambiguous-link shape, note-ID URL behavior, and authorization.
+- **Verify:** full backend tests.
+
+### 3. Add the source-owned authored-reference aggregate mapping
+
+- **Type:** Structure
+- **Status:** pending
+- **Enables:** Slice 4 only.
+- Add one Flyway migration above the current migration tip to create `authored_note_reference` and its source/candidate indexes.
+- Add `AuthoredNoteDocument`, the JPA child mapping, and `Note.replaceContent(AuthoredNoteDocument)` alongside the temporary raw content setter.
+- The row must reconstruct the domain type without a wiki destination relation. Its constraints must make invalid kind/locator combinations fail loudly.
+- Keep the table unused by readers until Slice 4; do not alter `resolved_wiki_link` yet.
+- **Verify:** `backend:verify`, full backend tests, and regenerated database ERD.
+
+### 4. Content save records every authored reference note-locally
+
+- **Type:** Behavior
+- **Status:** pending
+- **Scenario:** Saving content containing one resolved wiki path, one missing wiki path, one ambiguous wiki path, and one semantic note-ID URL leaves one source-owned entry for every distinct authored reference; changing the content replaces only that source note's entries.
+- Exercise the HTTP content-save boundary with realistic notes and the real database.
+- Make validation produce `AuthoredNoteDocument`, and persist Markdown plus its child entries through `Note.replaceContent(...)` in the same transaction.
+- Keep alias/property/level refresh behavior for the changed note. Do not resolve a destination while projecting the authored-reference index and do not accept a viewer parameter.
+- **Verify:** full backend tests.
+
+### 5. Note creation and extraction establish the same invariant
+
+- **Type:** Behavior
+- **Status:** pending
+- **Scenario:** Creating a note with authored references, including creation from an extracted suggestion, persists the same reference entries as a later content save would.
+- Drive the existing construction/controller boundaries. Assert only the source-index delta not already covered in Slice 4.
+- Route initial content through the same `AuthoredNoteDocument` / `Note.replaceContent(...)` boundary; remove construction-specific reference refresh.
+- **Verify:** full backend tests.
+
+### 6. Rewrites cannot bypass authored-reference maintenance
+
+- **Type:** Behavior
+- **Status:** pending
+- **Scenario:** A title/folder rewrite or delete-policy property edit changes both the stored Markdown and the source note's authored-reference entries atomically.
+- Migrate `WikiLinkRewriteSupport`, `NoteReferenceHandling`, `Note.prependContent`, and any remaining production content mutation to the aggregate boundary.
+- When the last production caller is migrated, remove the raw String content setter. Keep any fixture-only hydration explicit and outside production code paths.
+- Preserve existing rewrite observables and timestamp/orphan-image behavior.
+- **Verify:** full backend tests and `rg '\.setContent\(' backend/src/main/java/com/odde/donut` shows no production note-content write.
+
+### 7. Backfill existing notes before indexed reads are enabled
+
+- **Type:** Behavior
+- **Status:** pending
+- **Scenario:** Starting the upgraded application with pre-existing notes produces authored-reference entries for resolved, missing, ambiguous, and semantic URL references before the application becomes ready; a restart is a no-op.
+- Add a one-time, restart-safe backfill that uses the configured canonical origin and bounded transactions. Record completion separately from reference rows so notes with zero references are not repeatedly scanned.
+- A failed batch must fail readiness loudly and be safely resumable; do not perform this scan inside an HTTP write transaction.
+- Test the backfill through its application/migration boundary with real database rows, including a zero-reference note.
+- **Verify:** full backend tests and `backend:verify`.
+
+### 8. Introduce indexed inbound candidate selection behind the facade
+
+- **Type:** Structure
+- **Status:** pending
+- **Enables:** Slice 9 only.
+- Add internal repository queries that select possible authored references for a target by authored note ID or current wiki destination keys.
+- Add the inbound facade that live-resolves candidates for the viewer and returns distinct referrer notes or authored references in deterministic order.
+- Keep existing inbound consumers on `ResolvedWikiLinkService` until Slice 9. No consumer may receive persistence rows from the new facade.
+- **Verify:** full backend tests.
+
+### 9. A newly created target immediately gains current inbound references
+
+- **Type:** Behavior
+- **Status:** pending
+- **Scenario:** A source note authors `[[Future]]` while it is missing. Creating `Future` and showing it immediately lists the source as an inbound reference, without refreshing the source note.
+- Add the scenario at the note-show boundary and migrate `NoteRealmService` inbound references to the new facade.
+- Live-resolve each indexed candidate for the current viewer; preserve visibility, dedupe, and note-ID ordering.
+- **Verify:** full backend tests.
+
+### 10. Inbound references disappear when current resolution becomes ambiguous
+
+- **Type:** Behavior
+- **Status:** pending
+- **Scenario:** A source's `[[Target]]` resolves uniquely and appears inbound; creating a namesake makes it ambiguous and removes it from both targets' inbound lists without changing the source entry.
+- Add only the ambiguity delta at the note-show boundary. The production path should already be the facade from Slice 9; fix any candidate-key or validation gap revealed by the test.
+- Include a viewer-visibility variant only if current readable-candidate behavior is not already covered by existing tests.
+- **Verify:** full backend tests.
+
+### 11. Rename decisions and preservation use current authored references
+
+- **Type:** Behavior
+- **Status:** pending
+- **Scenario:** Title rename requires a reference-handling choice exactly when a currently resolved authored reference points at the target; choosing preservation rewrites that authored wiki reference and leaves semantic note-ID URLs unchanged.
+- Migrate the inbound guard and `WikiLinkRewriteService` title-rename path to the facade's live-resolved authored references.
+- Keep all existing display-text, frontmatter, property-selector, alias, and folder-path rewrite cases passing; replace assertions on cache rows with assertions on the authored-reference aggregate.
+- **Verify:** full backend tests.
+
+### 12. Delete policies use current authored property references
+
+- **Type:** Behavior
+- **Status:** pending
+- **Scenario:** Removing a target from referrer properties edits only property values whose authored references currently resolve to that target; missing, ambiguous, unauthorized, and note-ID URL cases retain their defined behavior.
+- Migrate `NoteReferenceHandling` from resolved rows to the facade and keep source content/index updates inside the aggregate boundary from Slice 6.
+- Preserve memory-tracker rehoming and orphan-image cleanup.
+- **Verify:** full backend tests.
+
+### 13. Relocation rewriting uses current authored references
+
+- **Type:** Behavior
+- **Status:** pending
+- **Scenario:** Moving a note or folder rewrites the currently resolved inbound/outgoing wiki paths needed to preserve identity, without rewriting already ambiguous paths or semantic note-ID URLs.
+- Migrate note move, folder move/reparent/rename/dissolve, and cross-notebook rewrite candidate discovery to the note-reference facade.
+- Remove direct `ResolvedWikiLinkRepository` dependencies from relocation and rewrite code.
+- **Verify:** full backend tests.
+
+### 14. Focus context samples only currently resolved inbound references
+
+- **Type:** Behavior
+- **Status:** pending
+- **Scenario:** When an indexed candidate has become ambiguous, missing, deleted, or unreadable, focus-context retrieval excludes it and continues through ordered/seeded candidates until it fills the requested cap or exhausts valid candidates.
+- Migrate both focus-context inbound entry points and BFS expansion to the facade.
+- Preserve exclusion sets, deterministic seeded ordering, dedupe, and visibility. Candidate limiting must not treat an invalid candidate as consuming the result cap.
+- **Verify:** full backend tests.
+
+### 15. Property tracking points to authored references, not cached targets
+
+- **Type:** Structure
+- **Status:** pending
+- **Enables:** Slice 16 only.
+- Add a Flyway migration replacing `note_property_index.target_note_id` with a nullable authored-reference relation for the semantic reference selected from that property value.
+- Rebuild the derived property index from note Markdown after the authored-reference backfill; do not translate old target pointers into new authority.
+- Make `NotePropertyIndexPlanner` identify the domain reference key while `NotePropertyIndexService` links to the source-owned entry. Remove viewer-blind `resolveAnyTargetWikiLinkToken` from indexing.
+- **Verify:** `backend:verify`, full backend tests, and regenerated database ERD.
+
+### 16. Assimilation gates on current reference resolution
+
+- **Type:** Behavior
+- **Status:** pending
+- **Scenario:** A property pointing at another note blocks assimilation only while that authored reference currently resolves for the learner to a target whose required tracker is incomplete; rename, ambiguity, deletion, property removal, and viewer visibility take effect without rebuilding the property's stored target.
+- Drive `AssimilationController` with real notes, trackers, and database rows.
+- Replace JPQL that joins `NotePropertyIndex.targetNote` with candidate retrieval plus domain resolution at the assimilation boundary. Preserve exact-key dedupe and result ordering.
+- **Verify:** full backend tests.
+
+### 17. Retire resolved-link state and notebook-wide refreshes
+
+- **Type:** Behavior
+- **Status:** pending
+- **Scenario:** Title, alias, creation, deletion/restoration, and cross-notebook location changes immediately affect outgoing, inbound, rewrite, focus-context, and assimilation results while touching no unrelated source-note reference rows.
+- Add one controller-level regression that changes target identity while retaining an unrelated source entry and observes the current result. Existing scenario tests supply the other deltas; do not duplicate them.
+- Remove every `refreshNotebookScope` / `refreshCardinalityAcrossMovedNotebooks` caller and implementation, then delete `ResolvedWikiLink`, its repository/refresh/inbound services, and the old table with a new Flyway migration.
+- Rename the surviving facade and DTO comments from “resolved wiki link” to the domain term “note reference”. Make its raw repository internal so future consumers cannot reintroduce persisted wiki destinations.
+- Regenerate the ERD. Update or remove the temporary diagnosis note when execution is fully shipped; keep ADR 0004 as the only permanent documentation change.
+- **Verify:** `rg 'ResolvedWikiLink|resolved_wiki_link|refreshNotebookScope|refreshCardinalityAcrossMovedNotebooks|targetNote' backend/src/main backend/src/test` has no obsolete reference-cache usage, then run `backend:verify` and the full backend tests.
+
+## Execution rules
+
+- Execute slices in order. A Structure slice may be committed only with its named immediate Behavior slice ready to follow.
+- Each slice begins with the failing scenario or compile-time migration pressure it is intended to satisfy. If a slice exceeds about ten focused minutes, stop, split it by consumer or migration boundary, and update this plan before continuing.
+- After each slice: apply Jidoka, run `post-change-refactor` over the implicated concept, run the full backend suite, update this status, commit atomically, and push as required by `execute-plan`.
+- Schema slices also run `backend:verify` and the `database-erd` skill. Do not add E2E coverage unless an API observable changes; the expected change is backend semantics with a stable response shape.
+
+## Key decisions
+
+- Amend Accepted ADR 0004 instead of creating a new ADR.
+- Treat Markdown as authority and the authored-reference table as a rebuildable source-owned index.
+- Persist authored addresses, never a wiki resolution verdict.
+- Use live resolution after indexed candidate selection rather than async cache invalidation.
+- Enforce index maintenance through the `Note` content aggregate boundary, not documentation or caller convention.
+- Retain the quick fix until the old refresh mechanism is deleted; no revert is needed during this plan.
+
+## Discoveries
+
+- `AuthoredNoteReference` and `AuthoredNoteReferences` already distinguish wiki Portable paths from semantic note-ID URLs and are the correct seed for the domain model.
+- `WikiLinkResolver.CandidateCardinality` already models the needed tri-state, but being nested under a wiki-specific service makes it easy for other consumers to bypass.
+- `resolved_wiki_link` contains only successful resolutions, so it cannot discover a missing/ambiguous reference that becomes resolved after target identity changes.
+- Note show partly reclassifies stored rows live, but it cannot synthesize a newly resolved link when no row exists.
+- `NotePropertyIndex.targetNote` is a second independently resolved destination cache and currently resolves without a viewer.
+- Production content writes occur in `TextContentController`, `NoteConstructionService`, `NoteReferenceHandling`, and `WikiLinkRewriteSupport`; the public raw setter allows future paths to omit derived-index maintenance.
+- The quick fix in `76f0482bdbeb61564facb9638369b507cd22cead` removed title/create notebook refreshes and has been confirmed in production. Other alias/delete/restore/move callers still perform the same notebook walk.
