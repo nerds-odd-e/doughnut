@@ -1,4 +1,4 @@
-import { authoredWikiLinkTokenForInsert } from "./sameNotebookWikiLinkAuthoring"
+import { authoredWikiLinkTokenForInsert } from "./wikiLinkAuthoring"
 import { appendItemToFrontmatterStringList } from "./frontmatterStringList"
 
 /** Appends a backend-authored Portable-path wiki-link token to the note's `overlaps` frontmatter list. */

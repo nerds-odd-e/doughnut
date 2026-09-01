@@ -14,30 +14,25 @@ import { describe, expect, it } from "vitest"
 describe("InsertWikiLink", () => {
   setupInsertWikiLinkTests()
 
-  it.each([
-    { portablePath: "Target CI" },
-    { portablePath: "Folder/Target CI" },
-  ])(
-    "inserts the backend-authored Portable path $portablePath",
-    async ({ portablePath }) => {
-      mockSdkService(NoteController, "authoredPortablePath", { portablePath })
-      const note = MakeMe.aNote.please()
-      const targetResult = MakeMe.aNoteSearchResult.title("Target CI").please()
-      await openWikiLinkOrRelationshipChoice(note, {
-        searchKey: "CI",
-        targetResult,
-      })
+  it("inserts the backend-authored Portable path", async () => {
+    const portablePath = "Folder/Target CI"
+    mockSdkService(NoteController, "authoredPortablePath", { portablePath })
+    const note = MakeMe.aNote.please()
+    const targetResult = MakeMe.aNoteSearchResult.title("Target CI").please()
+    await openWikiLinkOrRelationshipChoice(note, {
+      searchKey: "CI",
+      targetResult,
+    })
 
-      expect(
-        screen.queryByText("Add wiki link as a new property")
-      ).not.toBeInTheDocument()
+    expect(
+      screen.queryByText("Add wiki link as a new property")
+    ).not.toBeInTheDocument()
 
-      fireEvent.click(screen.getByText("Insert as a wiki link"))
-      await flushPromises()
+    fireEvent.click(screen.getByText("Insert as a wiki link"))
+    await flushPromises()
 
-      expect(insertedTexts).toContain(`[[${portablePath}]]`)
-    }
-  )
+    expect(insertedTexts).toContain(`[[${portablePath}]]`)
+  })
 
   it("does not call the inserter when Add a new relationship note is clicked", async () => {
     const note = MakeMe.aNote.please()

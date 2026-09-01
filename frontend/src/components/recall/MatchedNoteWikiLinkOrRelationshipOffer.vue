@@ -26,7 +26,7 @@ import WikiLinkOrRelationshipChoice from "@/components/wiki-link-or-relationship
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import { parseNoteContentMarkdown } from "@/utils/noteContentFrontmatterParse"
 import { appendWikiLinkPropertyRow } from "@/utils/noteContentPropertyRows"
-import { authoredWikiLinkTokenForInsert } from "@/utils/sameNotebookWikiLinkAuthoring"
+import { authoredWikiLinkTokenForInsert } from "@/utils/wikiLinkAuthoring"
 
 const props = defineProps<{
   reviewedNoteId: number

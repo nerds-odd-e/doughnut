@@ -1,6 +1,6 @@
 # Wiki-link ambiguity and Markdown URL conformance
 
-**Status:** in progress (slices 1–3 done; next: slice 4)
+**Status:** in progress (slices 1–4 done; next: slice 5)
 
 ## Goal
 
@@ -169,14 +169,11 @@ reject them. Boundary regression
 
 ### 4. Frontend Portable-path authoring has a capability name
 
-**Status:** planned
+**Status:** done
 **Type:** Structure
 
-Rename `sameNotebookWikiLinkAuthoring.ts` to `wikiLinkAuthoring.ts` and update
-imports without changing behavior. Consolidate the repeated authoring-path
-examples in `InsertWikiLink.spec.ts`. This directly prepares slice 5.
-
-Verification: full frontend unit suite.
+Renamed `sameNotebookWikiLinkAuthoring.ts` → `wikiLinkAuthoring.ts`;
+consolidated InsertWikiLink authoring-path examples. Prepares slice 5.
 
 ### 5. Pointing a dead wiki link at a colliding note is unambiguous
 

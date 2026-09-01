@@ -48,7 +48,7 @@ import {
 import {
   authoredWikiLinkTokenForInsert,
   authoredWikiLinkTokenFromOriginalPath,
-} from "@/utils/sameNotebookWikiLinkAuthoring"
+} from "@/utils/wikiLinkAuthoring"
 import {
   moveBlockedBySoftDeletedTitleMessage,
   parseSoftDeletedTitleConflict,
