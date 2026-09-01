@@ -3,6 +3,7 @@ package com.odde.donut.algorithms;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.not;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -121,6 +122,26 @@ class AuthoredNoteReferencesTest {
     assertThat(
         AuthoredNoteReferences.uniquePreserveOrder(List.of(wiki, url, wiki)),
         equalTo(List.of(wiki, url)));
+  }
+
+  @Test
+  void sourceLocalKey_foldsWikiTargetsThatDifferOnlyByCase() {
+    AuthoredNoteReference.WikiPortablePathTarget lower =
+        AuthoredNoteReference.WikiPortablePathTarget.fromAuthoredInner("target");
+    AuthoredNoteReference.WikiPortablePathTarget upper =
+        AuthoredNoteReference.WikiPortablePathTarget.fromAuthoredInner("Target");
+
+    assertThat(lower.sourceLocalKey(), equalTo(upper.sourceLocalKey()));
+  }
+
+  @Test
+  void sourceLocalKey_distinguishesNoteIdUrlTargetsByNoteId() {
+    AuthoredNoteReference.NoteIdUrlTarget seven =
+        new AuthoredNoteReference.NoteIdUrlTarget("[Target](/n7)", 7, "/n7", "Target");
+    AuthoredNoteReference.NoteIdUrlTarget eight =
+        new AuthoredNoteReference.NoteIdUrlTarget("[Target](/n8)", 8, "/n8", "Target");
+
+    assertThat(seven.sourceLocalKey(), not(equalTo(eight.sourceLocalKey())));
   }
 
   @Test

@@ -38,14 +38,13 @@ public final class AuthoredNoteReferences {
   }
 
   /**
-   * First-occurrence unique references. Wiki targets use {@link
-   * WikiLinkMarkdown#authoredTokenDedupeKey(String)} for note-target folding.
+   * First-occurrence unique references, keyed by {@link AuthoredNoteReference#sourceLocalKey()}.
    */
   public static List<AuthoredNoteReference> uniquePreserveOrder(List<AuthoredNoteReference> refs) {
     List<AuthoredNoteReference> out = new ArrayList<>();
     Set<String> seen = new HashSet<>();
     for (AuthoredNoteReference ref : refs) {
-      if (seen.add(dedupeKey(ref))) {
+      if (seen.add(ref.sourceLocalKey())) {
         out.add(ref);
       }
     }
@@ -102,13 +101,5 @@ public final class AuthoredNoteReferences {
         .map(AuthoredNoteReference.class::cast)
         .orElseGet(
             () -> AuthoredNoteReference.WikiPortablePathTarget.fromAuthoredInner(authoredLink));
-  }
-
-  private static String dedupeKey(AuthoredNoteReference ref) {
-    return switch (ref) {
-      case AuthoredNoteReference.WikiPortablePathTarget wiki ->
-          WikiLinkMarkdown.authoredTokenDedupeKey(wiki.authoredLink());
-      case AuthoredNoteReference.NoteIdUrlTarget url -> "noteIdUrl:" + url.noteId();
-    };
   }
 }

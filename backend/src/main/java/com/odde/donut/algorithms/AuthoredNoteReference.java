@@ -17,6 +17,19 @@ public sealed interface AuthoredNoteReference
   String displayText();
 
   /**
+   * Identity key for first-occurrence de-duplication within one source note's authored references.
+   * Wiki targets fold on {@link WikiLinkMarkdown#authoredTokenDedupeKey(String)}; note-ID URL
+   * targets fold on the authored note ID.
+   */
+  default String sourceLocalKey() {
+    return switch (this) {
+      case WikiPortablePathTarget wiki ->
+          WikiLinkMarkdown.authoredTokenDedupeKey(wiki.authoredLink());
+      case NoteIdUrlTarget url -> "noteIdUrl:" + url.noteId();
+    };
+  }
+
+  /**
    * Wiki {@code [[portable-path]]} / {@code [[portable-path|display]]} target. {@link
    * #authoredLink()} is the inner text between brackets (no {@code [[]]}).
    */

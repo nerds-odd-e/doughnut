@@ -62,7 +62,7 @@ When this plan is complete:
 ### 1. Promote reference resolution to a domain contract
 
 - **Type:** Structure
-- **Status:** pending
+- **Status:** done
 - **Enables:** Slice 2 only.
 - Add `NoteReferenceResolution` and one resolver entry point for both `AuthoredNoteReference` variants.
 - Move the dedupe/source-local key onto the authored-reference model so persistence and property indexing cannot invent their own identity rules.
@@ -249,3 +249,4 @@ When this plan is complete:
 - `NotePropertyIndex.targetNote` is a second independently resolved destination cache and currently resolves without a viewer.
 - Production content writes occur in `TextContentController`, `NoteConstructionService`, `NoteReferenceHandling`, and `WikiLinkRewriteSupport`; the public raw setter allows future paths to omit derived-index maintenance.
 - The quick fix in `76f0482bdbeb61564facb9638369b507cd22cead` removed title/create notebook refreshes and has been confirmed in production. Other alias/delete/restore/move callers still perform the same notebook walk.
+- Slice 1: `WikiLinkResolver.resolveReference(AuthoredNoteReference, sourceNote, viewer)` is now the one entry point returning `NoteReferenceResolution` for both wiki and note-ID-URL variants; it duplicates `ResolvedWikiLinkService.authorizedNoteIdUrlTarget`'s note-ID-URL authorization logic by design until Slice 2 migrates outgoing resolution onto it. `AuthoredNoteReference.sourceLocalKey()` now owns dedupe identity. `WikiLinkResolver` was split to extract `WikiLinkCandidateClassifier` (notebook/title candidate matching) to stay under the file-size limit; `CandidateCardinality` still lives on `WikiLinkResolver` pending removal after adapters migrate.
