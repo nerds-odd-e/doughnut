@@ -26,6 +26,7 @@ public class OpenAiStructuredResponseMock {
   private final ObjectMapperConfig objectMapperConfig = new ObjectMapperConfig();
   private final Map<Class<?>, Queue<Object>> structuredResults = new HashMap<>();
   private final Queue<Object> fallbackStructuredResults = new LinkedList<>();
+  private Runnable beforeCreate;
 
   private record MalformedStructuredContent(String content) {}
 
@@ -35,6 +36,9 @@ public class OpenAiStructuredResponseMock {
     Mockito.when(responseService.create(ArgumentMatchers.any(StructuredResponseCreateParams.class)))
         .thenAnswer(
             invocation -> {
+              if (beforeCreate != null) {
+                beforeCreate.run();
+              }
               StructuredResponseCreateParams<?> params = invocation.getArgument(0);
               Object result = pollStructuredResult(params.responseType());
               if (result == null) {
@@ -51,6 +55,11 @@ public class OpenAiStructuredResponseMock {
 
   public ResponseService responseService() {
     return responseService;
+  }
+
+  /** Invoked synchronously right before each stubbed {@code responses().create(...)} call. */
+  public void onBeforeCreate(Runnable callback) {
+    this.beforeCreate = callback;
   }
 
   /**

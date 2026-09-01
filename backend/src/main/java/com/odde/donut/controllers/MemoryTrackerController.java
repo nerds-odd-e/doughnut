@@ -48,7 +48,6 @@ class MemoryTrackerController {
   }
 
   @GetMapping("/{memoryTracker}/recall-prompt")
-  @Transactional
   public com.odde.donut.controllers.dto.RecallPrompt getRecallPrompt(
       @PathVariable("memoryTracker") @Schema(type = "integer") MemoryTracker memoryTracker)
       throws UnexpectedNoAccessRightException {

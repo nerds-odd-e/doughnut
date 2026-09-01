@@ -4,6 +4,7 @@ import com.odde.donut.entities.EntityIdentifiedByIdOnly;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class EntityPersister {
@@ -13,6 +14,7 @@ public class EntityPersister {
     this.entityManager = entityManager;
   }
 
+  @Transactional
   public <T> T save(T entity) {
     if (entity instanceof EntityIdentifiedByIdOnly instance) {
       if (instance.getId() != null) {

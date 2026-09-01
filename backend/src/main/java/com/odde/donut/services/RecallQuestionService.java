@@ -19,6 +19,7 @@ public class RecallQuestionService {
   private final AiQuestionGenerator aiQuestionGenerator;
   private final AnswerService answerService;
   private final MemoryTrackerService memoryTrackerService;
+  private final RecallPromptPersister recallPromptPersister;
 
   @Autowired
   public RecallQuestionService(
@@ -27,13 +28,15 @@ public class RecallQuestionService {
       AnswerService answerService,
       MemoryTrackerService memoryTrackerService,
       McqService mcqService,
-      AiQuestionGenerator aiQuestionGenerator) {
+      AiQuestionGenerator aiQuestionGenerator,
+      RecallPromptPersister recallPromptPersister) {
     this.recallPromptRepository = recallPromptRepository;
     this.entityPersister = entityPersister;
     this.answerService = answerService;
     this.memoryTrackerService = memoryTrackerService;
     this.mcqService = mcqService;
     this.aiQuestionGenerator = aiQuestionGenerator;
+    this.recallPromptPersister = recallPromptPersister;
   }
 
   public RecallPrompt generateAQuestion(MemoryTracker memoryTracker) {
@@ -61,7 +64,7 @@ public class RecallQuestionService {
     if (mcq == null) {
       return null;
     }
-    return createARecallPromptFromMcq(mcq, memoryTracker);
+    return recallPromptPersister.persistRecallPromptForMcq(mcq, memoryTracker);
   }
 
   public RecallPrompt regenerateAQuestion(
@@ -83,11 +86,7 @@ public class RecallQuestionService {
   }
 
   private RecallPrompt createARecallPromptFromMcq(Mcq mcq, MemoryTracker memoryTracker) {
-    RecallPrompt recallPrompt = new RecallPrompt();
-    recallPrompt.setMcq(mcq);
-    recallPrompt.setMemoryTracker(memoryTracker);
-    recallPrompt.setQuestionType(QuestionType.MCQ);
-    return entityPersister.save(recallPrompt);
+    return entityPersister.save(RecallPrompt.forMcq(mcq, memoryTracker));
   }
 
   public QuestionContestResult contest(RecallPrompt recallPrompt) {

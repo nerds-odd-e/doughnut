@@ -6,9 +6,9 @@ current_phase: null
 current_phase_name: null
 status: ready
 stopped_at: null
-last_updated: "2026-08-31T07:20:00Z"
-last_activity: 2026-08-31
-last_activity_desc: "034 portable path ambiguity plan refined (deferred); SEED-009 absorbed"
+last_updated: "2026-09-01T00:20:00Z"
+last_activity: 2026-09-01
+last_activity_desc: "035 recall-prompt lock-timeout plan: cause, why tests missed it, prevention ratchet"
 progress:
   total_phases: 0
   completed_phases: 0
@@ -37,6 +37,7 @@ Daily probe measurement (not an ADR): [daily-probe-protocol.md](notes/daily-prob
 
 - After deploying the Flyway squash, confirm startup succeeded and `flyway_schema_history` shows the baseline repaired, the collapsed versions marked `DELETE`, and `V300000300` applied.
 - Daily probe tap affordance (visible panels, stable board, press flash): `.planning/quick/033-daily-probe-tap-affordance/PLAN.md` — planned, do not execute until asked.
+- Recall-prompt MCQ insert lock timeout: `.planning/quick/035-recall-prompt-lock-timeout/PLAN.md` — planned, do not execute until asked.
 - Start the next milestone with `/gsd-new-milestone` when ready.
 
 Parked work: SEED-001, SEED-002, SEED-005, SEED-006, SEED-007, SEED-008; ADR 0002 Level 1. See [ROADMAP.md](ROADMAP.md).

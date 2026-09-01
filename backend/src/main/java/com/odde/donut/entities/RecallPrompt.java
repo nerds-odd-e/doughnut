@@ -46,6 +46,14 @@ public class RecallPrompt extends EntityIdentifiedByIdOnly {
   @Column(name = "created_at")
   private Timestamp createdAt = new Timestamp(System.currentTimeMillis());
 
+  public static RecallPrompt forMcq(Mcq mcq, MemoryTracker memoryTracker) {
+    RecallPrompt recallPrompt = new RecallPrompt();
+    recallPrompt.setMcq(mcq);
+    recallPrompt.setMemoryTracker(memoryTracker);
+    recallPrompt.setQuestionType(QuestionType.MCQ);
+    return recallPrompt;
+  }
+
   public MemoryTracker requireMemoryTracker() {
     return Objects.requireNonNull(memoryTracker, "recall prompt requires a memory tracker");
   }

@@ -23,6 +23,7 @@ import java.util.Objects;
 import java.util.Optional;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 @Service
@@ -212,6 +213,7 @@ public class MemoryTrackerService {
     unansweredPrompts.forEach(entityPersister::remove);
   }
 
+  @Transactional
   public RecallPrompt getSpellingQuestion(MemoryTracker memoryTracker) {
     return spellingRecallGrading.getSpellingQuestion(memoryTracker);
   }

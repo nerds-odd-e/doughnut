@@ -19,6 +19,7 @@ import com.openai.models.responses.StructuredResponseCreateParams;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class QuestionGenerationRequestBuilder {
@@ -55,6 +56,7 @@ public class QuestionGenerationRequestBuilder {
     return buildQuestionGenerationResponseRequest(note, additionalMessage, contextSeed, null);
   }
 
+  @Transactional(readOnly = true)
   public StructuredResponseCreateParams<GeneratedMcq> buildQuestionGenerationResponseRequest(
       Note note, String additionalMessage, Long contextSeed, String propertyKey) {
     return buildQuestionGenerationResponseRequest(
