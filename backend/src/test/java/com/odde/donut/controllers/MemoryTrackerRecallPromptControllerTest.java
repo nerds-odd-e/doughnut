@@ -99,21 +99,19 @@ class MemoryTrackerRecallPromptControllerTest extends MemoryTrackerControllerTes
   class OpenAiCallDoesNotHoldTransaction {
     private static final String FIXTURE_PREFIX = "recall-prompt-openai-tx-";
 
-    private String setupUserExternalId;
-
     @BeforeEach
-    void captureSetupUserToCleanUp() {
-      setupUserExternalId = currentUser.getUser().getExternalIdentifier();
+    void deleteLeakedSetupUser() {
+      String leakedSetupUser = currentUser.getUser().getExternalIdentifier();
+      inCommittedTransaction(
+          transactionManager,
+          () -> deleteByUserExternalIdentifierLike(entityManager, leakedSetupUser));
     }
 
     @AfterEach
     void cleanupCommittedState() {
       inCommittedTransaction(
           transactionManager,
-          () -> {
-            deleteByUserExternalIdentifierLike(entityManager, FIXTURE_PREFIX + "%");
-            deleteByUserExternalIdentifierLike(entityManager, setupUserExternalId);
-          });
+          () -> deleteByUserExternalIdentifierLike(entityManager, FIXTURE_PREFIX + "%"));
     }
 
     private MemoryTracker trackerTrackingTransactionActivityDuringOpenAiCalls(

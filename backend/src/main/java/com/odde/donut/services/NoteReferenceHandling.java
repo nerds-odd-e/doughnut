@@ -81,13 +81,7 @@ final class NoteReferenceHandling {
     NoteContentMarkdown.AddPropertyWithAvailableKeyResult addResult =
         NoteContentMarkdown.addPropertyWithAvailableKeyToLeadingFrontmatter(
             sourceNote.getContent(), canonicalPropertyKey, relationship.targetScalar());
-    sourceNote.replaceContent(
-        AuthoredNoteContent.prepareDocumentForSave(
-            addResult.content(), wikiLinkResolver.canonicalDonutOrigin()));
-    sourceNote.setUpdatedAt(updatedAt);
-    entityPersister.merge(sourceNote);
-    deleteOrphanImages.accept(sourceNote);
-    resolvedWikiLinkService.refreshForNote(sourceNote, viewer);
+    persistReplacedAuthoredContent(sourceNote, addResult.content(), updatedAt, viewer);
     rehomeNoteLevelMemoryTrackerToSourceProperty(
         relationNote, sourceNote, addResult.resolvedKey(), viewer);
   }
@@ -105,16 +99,20 @@ final class NoteReferenceHandling {
       NoteContentMarkdown.removeWikiLinksFromLeadingFrontmatterProperties(
               referrer.getContent(), entry.getValue())
           .ifPresent(
-              updatedContent -> {
-                referrer.replaceContent(
-                    AuthoredNoteContent.prepareDocumentForSave(
-                        updatedContent, wikiLinkResolver.canonicalDonutOrigin()));
-                referrer.setUpdatedAt(updatedAt);
-                entityPersister.merge(referrer);
-                deleteOrphanImages.accept(referrer);
-                resolvedWikiLinkService.refreshForNote(referrer, viewer);
-              });
+              updatedContent ->
+                  persistReplacedAuthoredContent(referrer, updatedContent, updatedAt, viewer));
     }
+  }
+
+  private void persistReplacedAuthoredContent(
+      Note note, String markdown, Timestamp updatedAt, User viewer) {
+    note.replaceContent(
+        AuthoredNoteContent.prepareDocumentForSave(
+            markdown, wikiLinkResolver.canonicalDonutOrigin()));
+    note.setUpdatedAt(updatedAt);
+    entityPersister.merge(note);
+    deleteOrphanImages.accept(note);
+    resolvedWikiLinkService.refreshForNote(note, viewer);
   }
 
   private void rehomeNoteLevelMemoryTrackerToSourceProperty(

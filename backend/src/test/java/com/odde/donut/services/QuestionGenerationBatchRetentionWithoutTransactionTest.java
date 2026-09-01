@@ -58,11 +58,7 @@ class QuestionGenerationBatchRetentionWithoutTransactionTest {
     Integer batchId =
         inCommittedTransaction(
             () -> {
-              User user = new User();
-              String identifier = FIXTURE_PREFIX + UUID.randomUUID();
-              user.setExternalIdentifier(identifier);
-              user.setName(identifier);
-              makeMe.entityPersister.save(user);
+              User user = makeMe.aUser(FIXTURE_PREFIX + UUID.randomUUID()).please();
               Note note = makeMe.aNote().notebookOwnedBy(user).please();
               MemoryTracker tracker = makeMe.aMemoryTrackerFor(note).please();
               QuestionGenerationBatch batch =

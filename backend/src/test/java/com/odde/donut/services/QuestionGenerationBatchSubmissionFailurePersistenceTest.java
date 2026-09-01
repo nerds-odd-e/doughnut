@@ -190,12 +190,7 @@ class QuestionGenerationBatchSubmissionFailurePersistenceTest {
   }
 
   private User uniqueCommittedUser() {
-    User committed = new User();
-    String identifier = COMMITTED_USER_PREFIX + UUID.randomUUID();
-    committed.setExternalIdentifier(identifier);
-    committed.setName(identifier);
-    makeMe.entityPersister.save(committed);
-    return committed;
+    return makeMe.aUser(COMMITTED_USER_PREFIX + UUID.randomUUID()).please();
   }
 
   private void inCommittedTransaction(Runnable action) {

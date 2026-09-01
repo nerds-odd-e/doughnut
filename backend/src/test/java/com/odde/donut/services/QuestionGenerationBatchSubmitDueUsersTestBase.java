@@ -44,12 +44,7 @@ abstract class QuestionGenerationBatchSubmitDueUsersTestBase {
   final Timestamp cronTime = Timestamp.valueOf(LocalDateTime.of(2024, 8, 3, 16, 45));
 
   User uniqueUser() {
-    User user = new User();
-    String identifier = COMMITTED_USER_PREFIX + UUID.randomUUID();
-    user.setExternalIdentifier(identifier);
-    user.setName(identifier);
-    makeMe.entityPersister.save(user);
-    return user;
+    return makeMe.aUser(COMMITTED_USER_PREFIX + UUID.randomUUID()).please();
   }
 
   void inCommittedTransaction(Runnable action) {

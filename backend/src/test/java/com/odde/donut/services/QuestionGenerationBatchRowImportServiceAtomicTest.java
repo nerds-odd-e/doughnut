@@ -103,11 +103,8 @@ class QuestionGenerationBatchRowImportServiceAtomicTest {
         transactionManager,
         () -> {
           try {
-            String identifier = "batch-import-atomic-" + UUID.randomUUID();
-            User committedUser = new User();
-            committedUser.setExternalIdentifier(identifier);
-            committedUser.setName(identifier);
-            makeMe.entityPersister.save(committedUser);
+            User committedUser =
+                makeMe.aUser("batch-import-atomic-" + UUID.randomUUID()).please();
             Timestamp committedTime = makeMe.aTimestamp().please();
             Note note = makeMe.aNote().notebookOwnedBy(committedUser).please();
             MemoryTracker committedMemoryTracker =

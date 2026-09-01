@@ -59,11 +59,7 @@ class NoteLevelIndexServiceConcurrencyTest {
         inCommittedTransaction(
             transactionManager,
             () -> {
-              String identifier = FIXTURE_PREFIX + UUID.randomUUID();
-              User user = new User();
-              user.setExternalIdentifier(identifier);
-              user.setName(identifier);
-              makeMe.entityPersister.save(user);
+              User user = makeMe.aUser(FIXTURE_PREFIX + UUID.randomUUID()).please();
               return makeMe
                   .aNote()
                   .notebookOwnedBy(user)
