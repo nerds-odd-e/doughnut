@@ -37,6 +37,11 @@ class NoteSearchResultBuilder extends Builder<NoteSearchResult> {
     return this
   }
 
+  folderName(value: string): NoteSearchResultBuilder {
+    this.data.folderName = value
+    return this
+  }
+
   title(value: string): NoteSearchResultBuilder {
     if (!this.data.noteTopology) {
       const id = generateId()
@@ -67,6 +72,7 @@ class NoteSearchResultBuilder extends Builder<NoteSearchResult> {
       },
       notebookId,
       notebookName: this.data.notebookName,
+      folderName: this.data.folderName,
       distance: this.data.distance,
     }
   }

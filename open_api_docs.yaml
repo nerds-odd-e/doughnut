@@ -3994,6 +3994,10 @@ components:
         notebookName:
           type: string
           description: Name of the notebook this result belongs to
+        folderName:
+          type: string
+          description: Containing folder name; omitted when the note is at notebook
+            root
         distance:
           type: number
           format: float

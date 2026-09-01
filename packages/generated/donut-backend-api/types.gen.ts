@@ -343,6 +343,10 @@ export type NoteSearchResult = {
      * Name of the notebook this result belongs to
      */
     notebookName?: string;
+    /**
+     * Containing folder name; omitted when the note is at notebook root
+     */
+    folderName?: string;
     distance?: number;
 };
 

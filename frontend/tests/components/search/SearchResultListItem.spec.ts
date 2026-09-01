@@ -94,19 +94,27 @@ describe("SearchResultListItem", () => {
     })
   })
 
-  it("does not display notebook name element when notebookName is not provided", async () => {
-    const searchResult = makeMe.aNoteSearchResult
-      .id(1)
-      .title("Test Note")
-      .notebookId(10)
-      .please()
-
+  it("does not display notebook or folder name elements when not provided", async () => {
     const wrapper = helper
       .component(SearchResultListItem)
-      .withProps({ searchHit: noteHit(searchResult) })
+      .withProps({ searchHit: noteHit(makeMe.aNoteSearchResult.please()) })
       .mount()
 
     expect(wrapper.find(".notebook-name-label").exists()).toBe(false)
+    expect(wrapper.find(".folder-name-label").exists()).toBe(false)
+  })
+
+  it("displays containing folder name when provided", async () => {
+    helper
+      .component(SearchResultListItem)
+      .withProps({
+        searchHit: noteHit(
+          makeMe.aNoteSearchResult.folderName("Recipes").please()
+        ),
+      })
+      .render()
+
+    await screen.findByText("Recipes", { selector: ".folder-name-label" })
   })
 
   it("renders folder hit as router-link to folder page", async () => {

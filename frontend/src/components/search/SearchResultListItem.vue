@@ -45,9 +45,12 @@
         >{{ searchHit.notebookName }}</router-link>
       </div>
       <div
-        v-if="displayNotebookName || displayDistance != null"
+        v-if="displayNotebookName || displayFolderName || displayDistance != null"
         class="search-hit-meta flex flex-row flex-wrap items-baseline gap-1"
       >
+        <span v-if="displayFolderName" class="folder-name-label">{{
+          displayFolderName
+        }}</span>
         <span v-if="displayNotebookName" class="notebook-name-label">{{
           displayNotebookName
         }}</span>
@@ -107,6 +110,13 @@ const displayNotebookName = computed(() => {
   }
   if (props.searchHit.hitKind === "FOLDER") {
     return props.searchHit.notebookName
+  }
+  return undefined
+})
+
+const displayFolderName = computed(() => {
+  if (props.searchHit.hitKind === "NOTE" && props.searchHit.noteSearchResult) {
+    return props.searchHit.noteSearchResult.folderName
   }
   return undefined
 })

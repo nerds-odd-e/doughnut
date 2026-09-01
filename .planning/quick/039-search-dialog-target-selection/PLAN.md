@@ -1,6 +1,6 @@
 # Search-dialog target selection that cannot silently pick the wrong note
 
-**Status:** in progress (slices 1 done; next: slice 2)
+**Status:** in progress (slices 1–2 done; next: slice 3)
 
 ## Goal
 
@@ -23,15 +23,12 @@ until slice 3.
 
 ### 2. A note search hit shows its containing folder
 
-**Status:** planned
+**Status:** done
 **Type:** Behavior
 
-**Pre-condition:** Two notes share a title in different folders of one notebook.
-
-**Trigger:** The learner searches for that title.
-
-**Post-condition:** Each note row shows its containing folder name (omit when
-the note is at notebook root). Notebook name stays as today.
+`NoteSearchResult.folderName` comes from the note's folder; the list item
+shows `.folder-name-label` (omitted at notebook root). TypeScript client
+regenerated.
 
 ### 3. E2E note pick is unique or names the folder
 

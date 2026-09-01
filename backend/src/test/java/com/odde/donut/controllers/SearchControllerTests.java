@@ -4,10 +4,12 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
 
+import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.testability.RelationshipLiteralSearchHits;
+import java.util.Objects;
 import org.junit.jupiter.api.Test;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -34,6 +36,25 @@ class SearchControllerTests extends SearchControllerTestBase {
     assertThat(
         notes.stream().allMatch(r -> r.getNotebookName() != null && !r.getNotebookName().isEmpty()),
         is(true));
+  }
+
+  @Test
+  void noteSearchHitShowsContainingFolderNameAndOmitsItAtNotebookRoot()
+      throws UnexpectedNoAccessRightException {
+    Folder recipes =
+        makeMe.aFolder().notebookOwnedBy(currentUser.getUser()).name("Recipes").please();
+    makeMe.aNote().title("Shared").folder(recipes).please();
+    makeMe.aNote().title("Shared").notebook(recipes.getNotebook()).please();
+
+    var notes =
+        RelationshipLiteralSearchHits.noteMatches(
+            controller.searchForRelationshipTarget(searchTerm("Shared")));
+
+    assertThat(
+        notes.stream().map(r -> r.getFolderName()).filter(name -> "Recipes".equals(name)).toList(),
+        hasSize(1));
+    assertThat(
+        notes.stream().map(r -> r.getFolderName()).filter(Objects::isNull).toList(), hasSize(1));
   }
 
   @Test

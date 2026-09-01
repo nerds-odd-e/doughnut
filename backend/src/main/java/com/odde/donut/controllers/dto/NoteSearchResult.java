@@ -22,6 +22,9 @@ public class NoteSearchResult {
   @Schema(description = "Name of the notebook this result belongs to")
   private String notebookName;
 
+  @Schema(description = "Containing folder name; omitted when the note is at notebook root")
+  private String folderName;
+
   private Float distance;
 
   public NoteSearchResult(Note note, Float distance) {
@@ -31,6 +34,7 @@ public class NoteSearchResult {
         note != null && note.getNotebook() != null ? note.getNotebook().getId() : null;
     this.notebookName =
         note != null && note.getNotebook() != null ? note.getNotebook().getName() : null;
+    this.folderName = note != null && note.getFolder() != null ? note.getFolder().getName() : null;
     this.distance = distance;
   }
 
@@ -44,6 +48,10 @@ public class NoteSearchResult {
 
   public String getNotebookName() {
     return this.notebookName;
+  }
+
+  public String getFolderName() {
+    return this.folderName;
   }
 
   public Float getDistance() {
