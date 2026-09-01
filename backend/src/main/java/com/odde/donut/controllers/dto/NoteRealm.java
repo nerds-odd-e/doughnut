@@ -20,9 +20,9 @@ import lombok.Setter;
 })
 public class NoteRealm {
   /**
-   * Referring notes (resolved wiki-link inbound links), as {@link NoteTopology}, deduplicated by
-   * referring note id and ordered by id, with the same visibility rules as {@link
-   * com.odde.donut.services.ResolvedWikiLinkService#referencesNotesForViewer}.
+   * Referring notes (live-resolved authored note references), as {@link NoteTopology}, deduplicated
+   * by referring note id and ordered by id, per {@link
+   * com.odde.donut.entities.repositories.AuthoredNoteReferenceInboundFacade#distinctReferrerNotesForViewer}.
    */
   @Getter @Setter private List<NoteTopology> references;
 

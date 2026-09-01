@@ -9,6 +9,7 @@ import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.User;
+import com.odde.donut.entities.repositories.AuthoredNoteReferenceInboundFacade;
 import com.odde.donut.entities.repositories.NoteRepository;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -25,14 +26,17 @@ public class NoteRealmService {
   private static final List<String> TITLE_PATTERN_KEYS = List.of("title_pattern", "titlePattern");
 
   private final ResolvedWikiLinkService resolvedWikiLinkService;
+  private final AuthoredNoteReferenceInboundFacade authoredNoteReferenceInboundFacade;
   private final NoteRepository noteRepository;
   private final NotebookCatalogService notebookCatalogService;
 
   public NoteRealmService(
       ResolvedWikiLinkService resolvedWikiLinkService,
+      AuthoredNoteReferenceInboundFacade authoredNoteReferenceInboundFacade,
       NoteRepository noteRepository,
       NotebookCatalogService notebookCatalogService) {
     this.resolvedWikiLinkService = resolvedWikiLinkService;
+    this.authoredNoteReferenceInboundFacade = authoredNoteReferenceInboundFacade;
     this.noteRepository = noteRepository;
     this.notebookCatalogService = notebookCatalogService;
   }
@@ -42,7 +46,8 @@ public class NoteRealmService {
     var wikiLinks = resolvedWikiLinkService.wikiLinksForViewer(focus, viewer);
     NoteRealm realm = new NoteRealm(focus, wikiLinks);
     List<Note> refNotes =
-        hydrateNoteList(resolvedWikiLinkService.referencesNotesForViewer(focus, viewer));
+        hydrateNoteList(
+            authoredNoteReferenceInboundFacade.distinctReferrerNotesForViewer(focus, viewer));
     realm.setReferences(refNotes.stream().map(Note::getNoteTopology).toList());
     realm.setNotebookRealm(notebookCatalogService.notebookRealmFor(focus.getNotebook(), viewer));
     realm.setAncestorFolders(FolderTrailSegments.fromRootToContainingFolder(focus));

@@ -7,6 +7,7 @@ import com.odde.donut.algorithms.PathShapedTarget;
 import com.odde.donut.controllers.dto.FolderTrailSegments;
 import com.odde.donut.entities.AuthoredNoteReferenceRow;
 import com.odde.donut.entities.Note;
+import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.User;
 import com.odde.donut.services.WikiLinkResolver;
 import java.util.ArrayList;
@@ -57,11 +58,35 @@ public class AuthoredNoteReferenceInboundFacade {
       if (distinctReferrersInOrder.containsKey(sourceNoteId)) {
         continue;
       }
-      if (resolvesToTarget(candidate, sourceNote, target, viewer)) {
+      if (resolvesToTarget(candidate, sourceNote, target, viewer)
+          && referrerVisibleToViewer(sourceNote, target, viewer)) {
         distinctReferrersInOrder.put(sourceNoteId, sourceNote);
       }
     }
     return List.copyOf(distinctReferrersInOrder.values());
+  }
+
+  /**
+   * A soft-deleted referrer is never inbound, regardless of viewer. Otherwise, checks the
+   * referrer's own visibility (distinct from {@link #resolvesToTarget}'s target-side readability
+   * check): same notebook as {@code target} is always visible; a different notebook requires {@code
+   * viewer} to own or subscribe to the referrer's own notebook ({@link User#canReferTo}).
+   */
+  private boolean referrerVisibleToViewer(Note sourceNote, Note target, User viewer) {
+    if (sourceNote.getDeletedAt() != null) {
+      return false;
+    }
+    Notebook referrerNotebook = sourceNote.getNotebook();
+    Notebook targetNotebook = target.getNotebook();
+    if (referrerNotebook != null
+        && targetNotebook != null
+        && referrerNotebook.getId().equals(targetNotebook.getId())) {
+      return true;
+    }
+    if (viewer == null || referrerNotebook == null) {
+      return false;
+    }
+    return viewer.canReferTo(referrerNotebook);
   }
 
   private boolean resolvesToTarget(

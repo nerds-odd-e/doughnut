@@ -3,7 +3,6 @@ package com.odde.donut.services;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
 
 import com.odde.donut.controllers.dto.WikiLink;
@@ -85,34 +84,5 @@ class ResolvedWikiLinkViewerQueriesTest {
         resolvedWikiLinkService.outgoingWikiLinkTargetNotesForViewer(carrier, user);
     assertThat(outgoing, hasSize(1));
     assertThat(outgoing.get(0).getTitle(), equalTo("Same"));
-  }
-
-  @Test
-  void references_notes_for_viewer_orders_referrers_by_note_id() {
-    User user = makeMe.aUser().please();
-    Note focal = makeMe.aNote().title("Focal").notebookOwnedBy(user).please();
-    Note second = makeMe.aNote().underSameNotebookAs(focal).content("[[Focal]]").please();
-    Note first = makeMe.aNote().underSameNotebookAs(focal).content("[[Focal]]").please();
-    resolvedWikiLinkService.refreshForNote(first, user);
-    resolvedWikiLinkService.refreshForNote(second, user);
-
-    List<Note> refs = resolvedWikiLinkService.referencesNotesForViewer(focal, user);
-
-    assertThat(refs, hasSize(2));
-    assertThat(refs.get(0).getId(), equalTo(Math.min(first.getId(), second.getId())));
-    assertThat(refs.get(1).getId(), equalTo(Math.max(first.getId(), second.getId())));
-  }
-
-  @Test
-  void references_notes_for_viewer_includes_notebook_root_referrer_linking_to_descendant() {
-    User user = makeMe.aUser().please();
-    Note focal = makeMe.aNote().title("Focal").notebookOwnedBy(user).please();
-    Note referrerAtNotebookRoot =
-        makeMe.aNote().underSameNotebookAs(focal).content("[[Focal]]").please();
-    resolvedWikiLinkService.refreshForNote(referrerAtNotebookRoot, user);
-
-    assertThat(
-        resolvedWikiLinkService.referencesNotesForViewer(focal, user),
-        hasItem(referrerAtNotebookRoot));
   }
 }

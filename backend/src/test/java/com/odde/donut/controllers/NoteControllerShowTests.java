@@ -5,9 +5,9 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.donut.controllers.dto.NoteRealm;
+import com.odde.donut.controllers.dto.NoteUpdateContentDTO;
 import com.odde.donut.entities.Note;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.donut.services.ResolvedWikiLinkService;
 import com.odde.donut.services.httpQuery.HttpClientAdapter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,7 +16,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 class NoteControllerShowTests extends ControllerTestBase {
   @Autowired NoteController controller;
-  @Autowired ResolvedWikiLinkService resolvedWikiLinkService;
+  @Autowired TextContentController textContentController;
   @MockitoBean HttpClientAdapter httpClientAdapter;
 
   @BeforeEach
@@ -52,16 +52,32 @@ class NoteControllerShowTests extends ControllerTestBase {
       throws UnexpectedNoAccessRightException {
     Note target =
         makeMe.aNote().notebookOwnedBy(currentUser.getUser()).title("Url Target").please();
-    Note source =
-        makeMe
-            .aNote()
-            .underSameNotebookAs(target)
-            .content("[any display](/n" + target.getId() + ")")
-            .please();
-    resolvedWikiLinkService.refreshForNote(source, currentUser.getUser());
+    Note source = makeMe.aNote().underSameNotebookAs(target).please();
+    NoteUpdateContentDTO contentDto = new NoteUpdateContentDTO();
+    contentDto.setContent("[any display](/n" + target.getId() + ")");
+    textContentController.updateNoteContent(source, contentDto);
 
     NoteRealm targetRealm = controller.showNote(target);
     assertThat(targetRealm.getReferences(), hasSize(1));
     assertThat(targetRealm.getReferences().getFirst().getId(), equalTo(source.getId()));
+  }
+
+  @Test
+  void newlyCreatedTargetImmediatelyGainsCurrentInboundReferencesWithoutRefreshingSource()
+      throws UnexpectedNoAccessRightException {
+    Note source = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
+    NoteUpdateContentDTO contentDto = new NoteUpdateContentDTO();
+    contentDto.setContent("See [[Future]].");
+    textContentController.updateNoteContent(source, contentDto);
+
+    // "Future" does not exist yet: the authored wiki link is missing, so it resolves to nothing.
+    assertThat(controller.showNote(source).getWikiLinks(), hasSize(0));
+
+    Note future = makeMe.aNote().underSameNotebookAs(source).title("Future").please();
+
+    // Showing "Future" — without any refresh/re-save of "source" — already lists it as inbound.
+    NoteRealm futureRealm = controller.showNote(future);
+    assertThat(futureRealm.getReferences(), hasSize(1));
+    assertThat(futureRealm.getReferences().getFirst().getId(), equalTo(source.getId()));
   }
 }

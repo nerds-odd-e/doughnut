@@ -5,13 +5,15 @@ import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 
+import com.odde.donut.algorithms.AuthoredNoteDocument;
+import com.odde.donut.algorithms.AuthoredNoteReferences;
+import com.odde.donut.algorithms.CanonicalDonutOrigin;
 import com.odde.donut.controllers.dto.NoteRealm;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
-import com.odde.donut.entities.ResolvedWikiLink;
 import com.odde.donut.entities.User;
-import com.odde.donut.entities.repositories.ResolvedWikiLinkRepository;
 import com.odde.donut.testability.MakeMe;
+import com.odde.donut.testability.RelationshipNoteMarkdown;
 import java.sql.Timestamp;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,8 +33,6 @@ class NoteRealmServiceTest {
 
   @Autowired MakeMe makeMe;
   @Autowired NoteRealmService noteRealmService;
-  @Autowired ResolvedWikiLinkRepository resolvedWikiLinkRepository;
-  @Autowired ResolvedWikiLinkService resolvedWikiLinkService;
 
   User user;
   Notebook notebook;
@@ -77,21 +77,10 @@ class NoteRealmServiceTest {
   }
 
   @Test
-  void references_empty_when_cache_rows_deleted_for_relation_carrier() {
-    Note focal = makeMe.aNote().title("Focal").notebook(notebook).please();
-    Note subject = makeMe.aNote().notebook(notebook).please();
-    Note relation =
-        makeMe.aNote().notebook(notebook).withWikiLinksInFrontmatter(subject, focal).please();
-    resolvedWikiLinkRepository.deleteBySourceNote_Id(relation.getId());
-
-    assertThat(noteRealmService.build(focal, user).getReferences(), empty());
-  }
-
-  @Test
   void body_wikilink_carrier_in_references() {
     Note focal = makeMe.aNote().title("Focal").notebook(notebook).please();
-    Note carrier = makeMe.aNote().notebook(notebook).content("[[Focal]]").please();
-    resolvedWikiLinkService.refreshForNote(carrier, user);
+    Note carrier = makeMe.aNote().notebook(notebook).please();
+    authorReferencingContent(carrier, "[[Focal]]");
 
     NoteRealm realm = noteRealmService.build(focal, user);
 
@@ -102,14 +91,8 @@ class NoteRealmServiceTest {
   @Test
   void parent_yaml_carrier_appears_in_references() {
     Note focal = makeMe.aNote().title("Focal").notebook(notebook).please();
-    Note carrier =
-        makeMe
-            .aNote()
-            .title("Child")
-            .notebook(notebook)
-            .content("---\nparent: \"[[Focal]]\"\n---\n\nBody.")
-            .please();
-    resolvedWikiLinkService.refreshForNote(carrier, user);
+    Note carrier = makeMe.aNote().title("Child").notebook(notebook).please();
+    authorReferencingContent(carrier, "---\nparent: \"[[Focal]]\"\n---\n\nBody.");
 
     NoteRealm realm = noteRealmService.build(focal, user);
 
@@ -118,12 +101,14 @@ class NoteRealmServiceTest {
   }
 
   @Test
-  void references_omit_soft_deleted_relation_even_if_cache_row_remains() {
+  void references_omit_soft_deleted_relation() {
     Note focal = makeMe.aNote().title("Focal").notebook(notebook).please();
     Note subject = makeMe.aNote().notebook(notebook).please();
-    Note relation =
-        makeMe.aNote().notebook(notebook).withWikiLinksInFrontmatter(subject, focal).please();
-    resolvedWikiLinkService.refreshForNote(relation, user);
+    Note relation = makeMe.aNote().notebook(notebook).please();
+    authorReferencingContent(
+        relation,
+        RelationshipNoteMarkdown.forEndpoints(
+            relation, "a specialization of", subject, focal, null));
 
     softDelete(relation);
 
@@ -145,7 +130,7 @@ class NoteRealmServiceTest {
     Notebook otherNb = makeMe.aNotebook().creatorAndOwner(carrierOwner).name("OtherNb").please();
     Note carrier = makeMe.aNote().notebook(otherNb).please();
 
-    persistWikiLink(carrier, focal, "MainNb:Focal");
+    authorReferencingContent(carrier, "[[MainNb:Focal]]");
 
     NoteRealm realm = noteRealmService.build(focal, focalOwner);
 
@@ -156,10 +141,10 @@ class NoteRealmServiceTest {
   }
 
   @Test
-  void references_omit_soft_deleted_carrier_even_if_cache_row_remains() {
+  void references_omit_soft_deleted_carrier() {
     Note focal = makeMe.aNote().title("Focal").notebook(notebook).please();
-    Note carrier = makeMe.aNote().notebook(notebook).content("[[Focal]]").please();
-    resolvedWikiLinkService.refreshForNote(carrier, user);
+    Note carrier = makeMe.aNote().notebook(notebook).please();
+    authorReferencingContent(carrier, "[[Focal]]");
 
     softDelete(carrier);
 
@@ -167,22 +152,28 @@ class NoteRealmServiceTest {
   }
 
   @Test
-  void references_dedupe_multiple_cache_rows_for_same_carrier_note() {
+  void references_dedupe_multiple_authored_references_for_same_carrier_note() {
     Note focal = makeMe.aNote().title("Focal").notebook(notebook).please();
     Note carrier = makeMe.aNote().notebook(notebook).please();
-
-    persistWikiLink(carrier, focal, "one");
-    persistWikiLink(carrier, focal, "two");
+    authorReferencingContent(carrier, "[[Focal]] and [[Focal|again]]");
 
     assertThat(noteRealmService.build(focal, user).getReferences(), hasSize(1));
   }
 
-  private void persistWikiLink(Note carrier, Note target, String linkText) {
-    ResolvedWikiLink row = new ResolvedWikiLink();
-    row.setSourceNote(carrier);
-    row.setDestinationNote(target);
-    row.setAuthoredLink(linkText);
-    resolvedWikiLinkRepository.save(row);
+  /**
+   * Authors {@code content} on {@code note} through {@link Note#replaceContent}, the aggregate
+   * method that also populates {@code authored_note_reference} rows consumed by {@link
+   * com.odde.donut.entities.repositories.AuthoredNoteReferenceInboundFacade} — the same parse
+   * production content saves use, minus validation.
+   */
+  private void authorReferencingContent(Note note, String content) {
+    note.replaceContent(
+        new AuthoredNoteDocument(
+            content,
+            AuthoredNoteReferences.uniquePreserveOrder(
+                AuthoredNoteReferences.inOccurrenceOrder(
+                    content, CanonicalDonutOrigin.production()))));
+    makeMe.entityPersister.flush();
   }
 
   private void softDelete(Note note) {

@@ -20,8 +20,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * {@link AuthoredNoteReferenceInboundFacade}: live inbound-candidate selection and resolution
- * against {@code authored_note_reference} rows, not yet wired to any consumer (see the facade's
- * javadoc).
+ * against {@code authored_note_reference} rows. Consumed by {@code
+ * com.odde.donut.services.NoteRealmService} for {@link
+ * com.odde.donut.controllers.dto.NoteRealm#getReferences()}.
  */
 @SpringBootTest
 @ActiveProfiles("test")

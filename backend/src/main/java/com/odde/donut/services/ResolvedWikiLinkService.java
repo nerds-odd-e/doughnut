@@ -54,7 +54,7 @@ public class ResolvedWikiLinkService {
   }
 
   private InboundResolvedWikiLinks inbound() {
-    return new InboundResolvedWikiLinks(resolvedWikiLinkRepository, entityManager);
+    return new InboundResolvedWikiLinks(resolvedWikiLinkRepository);
   }
 
   public List<WikiLink> wikiLinksForViewer(Note focusNote, User viewer) {
@@ -112,25 +112,6 @@ public class ResolvedWikiLinkService {
   }
 
   /**
-   * Notes whose resolved wiki links point at {@code focalNote}, for {@link
-   * com.odde.donut.controllers.dto.NoteRealm} inbound references. Visibility uses the referrer's
-   * notebook vs the focal notebook and {@link User#canReferTo}.
-   */
-  public List<Note> inboundReferrerNotesForViewer(Note focalNote, User viewer) {
-    return inbound().referrerNotesForViewer(focalNote, viewer);
-  }
-
-  /**
-   * Referrer notes for {@code focalNote} and {@code viewer}: all resolved wiki-link inbound links
-   * ({@link #inboundReferrerNotesForViewer}), ordered by note id for {@link
-   * com.odde.donut.controllers.dto.NoteRealm#getReferences()} (as topologies) and focus context
-   * retrieval.
-   */
-  public List<Note> referencesNotesForViewer(Note focalNote, User viewer) {
-    return inbound().referencesNotesForViewer(focalNote, viewer);
-  }
-
-  /**
    * True when at least one non-deleted note has a resolved wiki-link row pointing at {@code
    * targetNoteId}. Used to require an explicit reference-handling choice on title rename.
    */
@@ -139,8 +120,9 @@ public class ResolvedWikiLinkService {
   }
 
   /**
-   * Inbound referrers for focus-context only: same visibility as {@link #referencesNotesForViewer},
-   * distinct by referrer id, excluding {@code excludeNoteIds}, capped in the database.
+   * Inbound referrers for focus-context only, with resolved-wiki-link visibility (referrer's
+   * notebook vs the focal notebook and {@link User#canReferTo}), distinct by referrer id, excluding
+   * {@code excludeNoteIds}, capped in the database.
    */
   public List<Note> sampledReferencesNotesForFocusContext(
       Note focalNote,
