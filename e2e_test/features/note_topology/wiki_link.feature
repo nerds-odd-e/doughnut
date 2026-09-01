@@ -64,7 +64,7 @@ Feature: Wiki links in notes
     Then I should see that several notes match and I can choose one for a longer Portable path
     And I should not be offered to create a note from the wiki link
     And I should still see the note titled "WikiDup Carrier"
-    When I point the wiki link at existing note "WikiDup Shared"
+    When I point the wiki link at existing note "WikiDup Shared" in folder "WikiDup Recipes"
     Then I should see the note content rendered as:
       | Kind           | Text           |
       | live wiki link | WikiDup Shared |
@@ -135,7 +135,7 @@ Feature: Wiki links in notes
     Then I should see the note content rendered as:
       | Kind           | Text          |
       | dead wiki link | original text |
-    When I point dead wiki link "original text" at existing note "WikiLinks E2E Tech"
+    When I point dead wiki link "original text" at existing note "WikiLinks E2E Tech" in folder "WikiLinks E2E Root"
     Then I should see the note content rendered as:
       | Kind           | Text          |
       | live wiki link | original text |

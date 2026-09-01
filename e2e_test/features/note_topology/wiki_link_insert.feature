@@ -30,9 +30,9 @@ Feature: Insert wiki links in notes
       | Title          | Folder         |
       | WikiDup Shared | WikiDup Pantry |
     When I navigate to "WikiDup Insert NB/WikiDup Root/WikiDup Carrier" note
-    And I insert a wiki link to "WikiDup Shared"
+    And I insert a wiki link to "WikiDup Shared" in folder "WikiDup Recipes"
     And I view the note content as markdown
-    Then the note content markdown source should contain "/WikiDup Shared]]"
+    Then the note content markdown source should contain "[[WikiDup Recipes/WikiDup Shared]]"
 
   @mockBrowserTime
   Scenario: Insert a qualified wiki link to a note in another notebook

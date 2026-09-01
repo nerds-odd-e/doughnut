@@ -1,5 +1,11 @@
 import { waitUntilAppIsNotBusy } from '../pageBase'
 import { form } from '../forms'
+import {
+  clickUseThisNoteOnTargetNote,
+  clickUseThisNoteOnTargetNoteInFolder,
+  expectSearchResultHeading,
+  searchResultSection,
+} from './noteTargetSearchResult'
 
 const relationshipTargetListMaxAttempts = 5
 const relationshipTargetListRetryMs = 400
@@ -46,26 +52,6 @@ function ensureSemanticSearchOn() {
   })
 }
 
-const searchResultHeadingSelector = '.result-section-info'
-
-function expectSearchResultHeading() {
-  cy.get(searchResultHeadingSelector).should(($el) => {
-    const actual = $el.text().trim()
-    expect(
-      actual,
-      'search dialog must show Search result before using a note (not Recently updated notes)'
-    ).to.equal('Search result')
-  })
-}
-
-function searchResultSection() {
-  expectSearchResultHeading()
-  return cy
-    .get(searchResultHeadingSelector)
-    .contains('Search result')
-    .closest('.result-section, .dropdown-section')
-}
-
 function searchNote(searchKey: string, allNotebooks: boolean) {
   if (allNotebooks) {
     ensureAllNotebooksScopeOn()
@@ -78,18 +64,9 @@ function searchNote(searchKey: string, allNotebooks: boolean) {
   expectSearchResultHeading()
 }
 
-function clickUseThisNoteOnTargetNote(toNoteTopic: string) {
-  searchResultSection()
-    .find('.search-result [role=listitem]')
-    .filter((_, el) => {
-      const a = el.querySelector(
-        '.search-result-item-title a:not(.notebook-hit-title)'
-      )
-      return a?.textContent?.trim() === toNoteTopic
-    })
-    .first()
-    .findByRole('button', { name: 'Use this note' })
-    .click()
+function confirmChosenNoteAction(buttonName: string) {
+  cy.findByRole('button', { name: buttonName }).click()
+  waitUntilAppIsNotBusy()
 }
 
 export const assumeNoteTargetSearchDialog = () => {
@@ -166,15 +143,19 @@ export const assumeNoteTargetSearchDialog = () => {
     },
     insertWikiLinkToTarget(toNoteTopic: string) {
       clickUseThisNoteOnTargetNote(toNoteTopic)
-      cy.findByRole('button', { name: 'Insert as a wiki link' }).click()
-      waitUntilAppIsNotBusy()
+      confirmChosenNoteAction('Insert as a wiki link')
     },
-    pointWikiLinkAtTarget(toNoteTopic: string, displayText: string) {
-      clickUseThisNoteOnTargetNote(toNoteTopic)
-      cy.findByRole('button', {
-        name: `Point wiki link "${displayText}" at this note`,
-      }).click()
-      waitUntilAppIsNotBusy()
+    insertWikiLinkToTargetInFolder(toNoteTopic: string, folderName: string) {
+      clickUseThisNoteOnTargetNoteInFolder(toNoteTopic, folderName)
+      confirmChosenNoteAction('Insert as a wiki link')
+    },
+    pointWikiLinkAtTargetInFolder(
+      toNoteTopic: string,
+      folderName: string,
+      displayText: string
+    ) {
+      clickUseThisNoteOnTargetNoteInFolder(toNoteTopic, folderName)
+      confirmChosenNoteAction(`Point wiki link "${displayText}" at this note`)
     },
     expectNoteInRecentlyUpdatedSection(noteTitle: string) {
       cy.findByText('Recently updated notes', {

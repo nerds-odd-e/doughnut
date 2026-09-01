@@ -7,10 +7,6 @@ import { Then, When } from '@badeball/cypress-cucumber-preprocessor'
 import { PRODUCTION_CANONICAL_DONUT_ORIGIN } from '@/utils/noteIdUrl'
 import start from '../start'
 
-When('I insert a wiki link to {string}', (targetNoteTitle: string) => {
-  start.assumeNotePage().insertWikiLinkToNote(targetNoteTitle)
-})
-
 When(
   'I move the current note to notebook {string} root',
   (notebookName: string) => {
@@ -126,25 +122,6 @@ When(
 Then('I should see a warning that a note cannot be created from a path', () => {
   start.assumeNotePage().expectCannotCreateNoteFromPath()
 })
-
-When(
-  'I point dead wiki link {string} at existing note {string}',
-  (deadWikiLinkText: string, existingNoteTitle: string) => {
-    start
-      .assumeNotePage()
-      .followDeadWikiLink(deadWikiLinkText)
-      .pointAtExistingNote(existingNoteTitle, deadWikiLinkText)
-  }
-)
-
-When(
-  'I point the wiki link at existing note {string}',
-  (destinationTitle: string) => {
-    start
-      .assumeNotePage()
-      .pointOpenUnresolvedWikiLinkAtDestination(destinationTitle)
-  }
-)
 
 Then('I should not see the References section', () => {
   cy.findByRole('heading', { name: 'References' }).should('not.exist')
