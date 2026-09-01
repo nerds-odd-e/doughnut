@@ -79,3 +79,19 @@ Feature: Markdown links in notes
     When I navigate to "MdNoteUrlNB/MdUrlTarget" note
     Then I should see the References section
     And I should see "MdUrlSource" in the References section
+
+  Scenario: A full Donut note URL contributes a semantic reference
+    Given I have a notebook "MdAbsNoteUrlNB" with notes:
+      | Title            |
+      | MdAbsUrlTarget   |
+      | MdAbsUrlSource   |
+    When I update note "MdAbsUrlSource" content using markdown to become a full Donut note URL to "MdAbsUrlTarget" with display "wrong title"
+    Then I should see the note content rendered as:
+      | Kind          | Text         |
+      | markdown link | wrong title  |
+    When I view the note content as markdown
+    Then the note content markdown source should contain a full Donut note URL to "MdAbsUrlTarget" with display "wrong title"
+    And the note content markdown source should not contain "[["
+    When I navigate to "MdAbsNoteUrlNB/MdAbsUrlTarget" note
+    Then I should see the References section
+    And I should see "MdAbsUrlSource" in the References section

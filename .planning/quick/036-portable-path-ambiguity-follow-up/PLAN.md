@@ -1,6 +1,6 @@
 # Wiki-link ambiguity and Markdown URL conformance
 
-**Status:** in progress (slices 1–8 done; next: slice 9)
+**Status:** in progress (slices 1–9 done; next: slice 10)
 
 ## Goal
 
@@ -214,31 +214,12 @@ Editor keeps ordinary URL anchors.
 
 ### 9. A full Donut note URL contributes the same semantic reference
 
-**Status:** planned
+**Status:** done
 **Type:** Behavior
 
-**Pre-condition:** A source note contains
-`[any display](https://doughnut.odd-e.com/n19921)` and that deployment's note
-exists.
-
-**Trigger:** The source is saved/indexed or a reference/graph consumer opens
-either note.
-
-**Post-condition:** The href's note ID supplies the semantic destination and
-the absolute href remains unchanged and usable outside its authoring host.
-
-- Introduce one configured canonical Donut origin, with production default
-  `https://doughnut.odd-e.com`; tests override it rather than accepting every
-  host whose path looks local.
-- Accept exact HTTP(S) origin + canonical note path. A foreign-origin
-  `/n<ID>` remains an ordinary external link.
-- Apply the same reference behavior as slice 8 without duplicating the note-ID
-  resolution path.
-- Cover recognized vs foreign origins at the parser/controller boundary and
-  the main inbound-reference behavior in `markdown_link.feature`.
-
-Verification: full backend/frontend unit suites; focused
-`markdown_link.feature`.
+Absolute note URLs on configured `donut.canonical-origin` (default
+`https://doughnut.odd-e.com`) reuse the same note-ID resolution path; foreign
+origins stay ordinary links.
 
 ### 10. Notebook resolution refresh excludes unrelated derived indexes
 

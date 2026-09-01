@@ -49,6 +49,9 @@ spring:
     token: ${OPENAI_API_TOKEN:}
 # Book PDF storage: any non-`prod` profile → DbBookStorage (AttachmentBlob). Profile `prod` → GcsBookStorage only
 # (`donut.book-pdf.gcs.bucket` required; optional `object-prefix`). Max PDF part size: `spring.servlet.multipart.max-file-size` (100MB). Ops: docs/gcp/prod_env.md §7.
+donut:
+  # Absolute note URLs on this origin contribute semantic references (ADR 0005). Override in tests.
+  canonical-origin: https://doughnut.odd-e.com
 question:
   regeneration:
     times: 0

@@ -2,7 +2,7 @@ import {
   authoredLinkOccurrences,
   splitWikiLinkInner,
 } from "@/utils/authoredLinkMarkup"
-import { MARKDOWN_LINK, noteIdFromRootRelativeHref } from "@/utils/noteIdUrl"
+import { MARKDOWN_LINK, noteIdFromHref } from "@/utils/noteIdUrl"
 
 /**
  * Authored semantic note reference in note content (ADR 0001 Wiki link). Distinguishes wiki
@@ -39,16 +39,17 @@ export function wikiPortablePathTargetFromInner(
   }
 }
 
-export { noteIdFromRootRelativeHref } from "@/utils/noteIdUrl"
+export { noteIdFromHref, noteIdFromRootRelativeHref } from "@/utils/noteIdUrl"
 
 type Hit = { start: number; ref: AuthoredNoteReference }
 
 /**
  * Authored note references in document order: wiki Portable-path targets and recognized
- * root-relative note-ID URLs.
+ * note-ID URLs (root-relative or absolute on the configured canonical origin).
  */
 export function authoredNoteReferencesInOccurrenceOrder(
-  markdown: string
+  markdown: string,
+  canonicalOrigin?: string
 ): AuthoredNoteReference[] {
   if (markdown.length === 0) return []
   const hits: Hit[] = []
@@ -60,7 +61,7 @@ export function authoredNoteReferencesInOccurrenceOrder(
   }
   for (const m of markdown.matchAll(MARKDOWN_LINK)) {
     const href = m[2]!
-    const noteId = noteIdFromRootRelativeHref(href)
+    const noteId = noteIdFromHref(href, canonicalOrigin)
     if (noteId === undefined) continue
     hits.push({
       start: m.index,

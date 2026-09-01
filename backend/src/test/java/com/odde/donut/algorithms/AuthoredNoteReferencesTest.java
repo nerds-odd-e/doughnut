@@ -9,11 +9,13 @@ import org.junit.jupiter.api.Test;
 
 class AuthoredNoteReferencesTest {
 
+  private static final CanonicalDonutOrigin ORIGIN = CanonicalDonutOrigin.production();
+
   @Test
   void inOccurrenceOrder_emitsWikiAndRootRelativeNoteIdUrlsInDocumentOrder() {
     List<AuthoredNoteReference> refs =
         AuthoredNoteReferences.inOccurrenceOrder(
-            "See [[Folder/Title|wiki]] and [label](/n42) plus [path](/Folder/Title.md).");
+            "See [[Folder/Title|wiki]] and [label](/n42) plus [path](/Folder/Title.md).", ORIGIN);
 
     assertThat(refs.size(), equalTo(2));
     assertThat(refs.getFirst(), instanceOf(AuthoredNoteReference.WikiPortablePathTarget.class));
@@ -32,10 +34,27 @@ class AuthoredNoteReferencesTest {
   }
 
   @Test
+  void inOccurrenceOrder_emitsAbsoluteCanonicalNoteIdUrls() {
+    List<AuthoredNoteReference> refs =
+        AuthoredNoteReferences.inOccurrenceOrder(
+            "[abs](https://doughnut.odd-e.com/n99) [foreign](https://evil.example/n99)", ORIGIN);
+
+    assertThat(
+        refs,
+        equalTo(
+            List.of(
+                new AuthoredNoteReference.NoteIdUrlTarget(
+                    "[abs](https://doughnut.odd-e.com/n99)",
+                    99,
+                    "https://doughnut.odd-e.com/n99",
+                    "abs"))));
+  }
+
+  @Test
   void inOccurrenceOrder_skipsRetiredRedirectAndPropertyNoteUrls() {
     assertThat(
         AuthoredNoteReferences.inOccurrenceOrder(
-            "[a](/n/9) [b](/n9/p/topic) [c](/n9?x=1) [ok](/n9)"),
+            "[a](/n/9) [b](/n9/p/topic) [c](/n9?x=1) [ok](/n9)", ORIGIN),
         equalTo(List.of(new AuthoredNoteReference.NoteIdUrlTarget("[ok](/n9)", 9, "/n9", "ok"))));
   }
 
@@ -112,7 +131,7 @@ class AuthoredNoteReferencesTest {
   }
 
   private static List<String> wikiAuthoredLinks(String content) {
-    return AuthoredNoteReferences.inOccurrenceOrder(content).stream()
+    return AuthoredNoteReferences.inOccurrenceOrder(content, ORIGIN).stream()
         .filter(AuthoredNoteReference.WikiPortablePathTarget.class::isInstance)
         .map(AuthoredNoteReference.WikiPortablePathTarget.class::cast)
         .map(AuthoredNoteReference.WikiPortablePathTarget::authoredLink)

@@ -2,6 +2,7 @@ package com.odde.donut.services;
 
 import com.odde.donut.algorithms.AuthoredNoteReference;
 import com.odde.donut.algorithms.AuthoredNoteReferences;
+import com.odde.donut.algorithms.CanonicalDonutOrigin;
 import com.odde.donut.algorithms.WikiLinkPropertyMatch;
 import com.odde.donut.controllers.dto.WikiLink;
 import com.odde.donut.entities.Note;
@@ -29,6 +30,7 @@ public class ResolvedWikiLinkService {
   private final ResolvedWikiLinkRepository resolvedWikiLinkRepository;
   private final AuthorizationService authorizationService;
   private final ResolvedWikiLinkRefresh resolvedWikiLinkRefresh;
+  private final CanonicalDonutOrigin canonicalDonutOrigin;
 
   public ResolvedWikiLinkService(
       WikiLinkResolver wikiLinkResolver,
@@ -37,10 +39,12 @@ public class ResolvedWikiLinkService {
       NotePropertyIndexService notePropertyIndexService,
       NoteAliasIndexService noteAliasIndexService,
       NoteLevelIndexService noteLevelIndexService,
-      NoteRepository noteRepository) {
+      NoteRepository noteRepository,
+      CanonicalDonutOrigin canonicalDonutOrigin) {
     this.ambiguousWikiLinks = new AmbiguousWikiLinks(wikiLinkResolver);
     this.resolvedWikiLinkRepository = resolvedWikiLinkRepository;
     this.authorizationService = authorizationService;
+    this.canonicalDonutOrigin = canonicalDonutOrigin;
     this.resolvedWikiLinkRefresh =
         new ResolvedWikiLinkRefresh(
             wikiLinkResolver,
@@ -62,7 +66,9 @@ public class ResolvedWikiLinkService {
         resolvedWikiLinkRepository.findBySourceNote_IdOrderByIdAsc(focusNote.getId())) {
       Note resolved = authorizedOutgoingTargetNote(focusNote, row, viewer);
       if (resolved != null) {
-        out.add(WikiLinks.resolvedFromStoredAuthoredLink(row.getAuthoredLink(), resolved.getId()));
+        out.add(
+            WikiLinks.resolvedFromStoredAuthoredLink(
+                row.getAuthoredLink(), resolved.getId(), canonicalDonutOrigin));
         emittedAuthored.add(row.getAuthoredLink());
       }
     }
@@ -106,7 +112,8 @@ public class ResolvedWikiLinkService {
     if (resolved == null) {
       return null;
     }
-    return switch (AuthoredNoteReferences.fromStoredAuthoredLink(row.getAuthoredLink())) {
+    return switch (AuthoredNoteReferences.fromStoredAuthoredLink(
+        row.getAuthoredLink(), canonicalDonutOrigin)) {
       case AuthoredNoteReference.NoteIdUrlTarget ignored -> resolved;
       case AuthoredNoteReference.WikiPortablePathTarget ignored ->
           WikiLinkPropertyMatch.matchesTargetNoteContent(

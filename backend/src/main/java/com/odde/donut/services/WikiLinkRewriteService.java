@@ -235,6 +235,7 @@ public class WikiLinkRewriteService {
         resolvedWikiLinkRepository,
         entityPersister,
         resolvedWikiLinkService,
+        wikiLinkResolver.canonicalDonutOrigin(),
         targetNote,
         updatedAt,
         viewer,

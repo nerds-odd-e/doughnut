@@ -1,6 +1,7 @@
 package com.odde.donut.services;
 
 import com.odde.donut.algorithms.AuthoredNoteReferences;
+import com.odde.donut.algorithms.CanonicalDonutOrigin;
 import com.odde.donut.algorithms.NoteIdUrl;
 import com.odde.donut.algorithms.PathShapedTarget;
 import com.odde.donut.algorithms.PortablePath;
@@ -52,6 +53,7 @@ final class WikiLinkRewriteSupport {
       ResolvedWikiLinkRepository resolvedWikiLinkRepository,
       EntityPersister entityPersister,
       ResolvedWikiLinkService resolvedWikiLinkService,
+      CanonicalDonutOrigin canonicalDonutOrigin,
       Note targetNote,
       Timestamp updatedAt,
       User viewer,
@@ -79,7 +81,7 @@ final class WikiLinkRewriteSupport {
       }
       String content = referrer.getContent() != null ? referrer.getContent() : "";
       for (String linkText : linkTextsByReferrer.get(referrerId)) {
-        if (NoteIdUrl.isAuthoredMarkdownNoteIdUrl(linkText)) {
+        if (NoteIdUrl.isAuthoredMarkdownNoteIdUrl(linkText, canonicalDonutOrigin)) {
           continue;
         }
         String newInner = linkRewrite.apply(referrer, linkText);

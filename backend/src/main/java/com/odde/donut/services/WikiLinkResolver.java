@@ -2,6 +2,7 @@ package com.odde.donut.services;
 
 import com.odde.donut.algorithms.AuthoredNoteReference;
 import com.odde.donut.algorithms.AuthoredNoteReferences;
+import com.odde.donut.algorithms.CanonicalDonutOrigin;
 import com.odde.donut.algorithms.PortablePath;
 import com.odde.donut.algorithms.WikiLinkMarkdown;
 import com.odde.donut.algorithms.WikiLinkPropertyMatch;
@@ -23,17 +24,24 @@ public class WikiLinkResolver {
   private final AuthorizationService authorizationService;
   private final AccidentalWikiLinkMatches accidentalWikiLinkMatches;
   private final WikiLinkNoteCandidates noteCandidates;
+  private final CanonicalDonutOrigin canonicalDonutOrigin;
 
   public WikiLinkResolver(
       NoteRepository noteRepository,
       NoteAliasIndexRepository noteAliasIndexRepository,
-      AuthorizationService authorizationService) {
+      AuthorizationService authorizationService,
+      CanonicalDonutOrigin canonicalDonutOrigin) {
     this.noteRepository = noteRepository;
     this.authorizationService = authorizationService;
+    this.canonicalDonutOrigin = canonicalDonutOrigin;
     this.noteCandidates = new WikiLinkNoteCandidates(noteRepository, noteAliasIndexRepository);
     this.accidentalWikiLinkMatches =
         new AccidentalWikiLinkMatches(
             noteRepository, noteAliasIndexRepository, authorizationService);
+  }
+
+  CanonicalDonutOrigin canonicalDonutOrigin() {
+    return canonicalDonutOrigin;
   }
 
   public record WikiLinkResolution(String authoredLink, Note destinationNote) {}
@@ -63,7 +71,7 @@ public class WikiLinkResolver {
     List<WikiLinkResolution> out = new ArrayList<>();
     for (AuthoredNoteReference ref :
         AuthoredNoteReferences.uniquePreserveOrder(
-            AuthoredNoteReferences.inOccurrenceOrder(content))) {
+            AuthoredNoteReferences.inOccurrenceOrder(content, canonicalDonutOrigin))) {
       switch (ref) {
         case AuthoredNoteReference.WikiPortablePathTarget wiki -> {
           Note target = resolveToken(wiki.authoredLink(), viewer, focusNote);

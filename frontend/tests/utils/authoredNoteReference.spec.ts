@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest"
 import {
   authoredNoteReferencesInOccurrenceOrder,
+  noteIdFromHref,
   noteIdFromRootRelativeHref,
   wikiPortablePathTargetFromInner,
   wikiPortablePathTargetsInOccurrenceOrder,
@@ -25,6 +26,23 @@ describe("authoredNoteReference", () => {
         noteId: 42,
         href: "/n42",
         displayText: "label",
+      },
+    ])
+  })
+
+  it("emits absolute URLs on the configured origin and skips foreign origins", () => {
+    expect(
+      authoredNoteReferencesInOccurrenceOrder(
+        "[abs](https://donut.test/n99) [foreign](https://evil.example/n99)",
+        "https://donut.test"
+      )
+    ).toEqual([
+      {
+        kind: "noteIdUrl",
+        authoredLink: "[abs](https://donut.test/n99)",
+        noteId: 99,
+        href: "https://donut.test/n99",
+        displayText: "abs",
       },
     ])
   })
@@ -55,5 +73,15 @@ describe("authoredNoteReference", () => {
     expect(noteIdFromRootRelativeHref("/n1234")).toBe(1234)
     expect(noteIdFromRootRelativeHref("/n/1234")).toBeUndefined()
     expect(noteIdFromRootRelativeHref("/n1234/p/x")).toBeUndefined()
+  })
+
+  it("noteIdFromHref accepts absolute URLs only on the given origin", () => {
+    expect(noteIdFromHref("https://donut.test/n42", "https://donut.test")).toBe(
+      42
+    )
+    expect(
+      noteIdFromHref("https://evil.example/n42", "https://donut.test")
+    ).toBeUndefined()
+    expect(noteIdFromHref("/n42", "https://donut.test")).toBe(42)
   })
 })

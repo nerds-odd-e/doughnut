@@ -80,7 +80,8 @@ final class ResolvedWikiLinkRefresh {
     LinkedHashSet<Integer> referrerIdsToReindex = new LinkedHashSet<>();
     for (ResolvedWikiLink row :
         resolvedWikiLinkRepository.findRowsReferringToNonDeletedNotesForTarget(targetId)) {
-      if (NoteIdUrl.isAuthoredMarkdownNoteIdUrl(row.getAuthoredLink())) {
+      if (NoteIdUrl.isAuthoredMarkdownNoteIdUrl(
+          row.getAuthoredLink(), wikiLinkResolver.canonicalDonutOrigin())) {
         continue;
       }
       Integer referrerId = row.getSourceNote().getId();

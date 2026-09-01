@@ -4,6 +4,7 @@
 // @ts-check
 
 import { Then, When } from '@badeball/cypress-cucumber-preprocessor'
+import { PRODUCTION_CANONICAL_DONUT_ORIGIN } from '@/utils/noteIdUrl'
 import start from '../start'
 
 When('I insert a wiki link to {string}', (targetNoteTitle: string) => {
@@ -173,6 +174,22 @@ When(
   }
 )
 
+When(
+  'I update note {string} content using markdown to become a full Donut note URL to {string} with display {string}',
+  (sourceTitle: string, targetTitle: string, display: string) => {
+    start
+      .testability()
+      .getInjectedNoteIdByTitle(targetTitle)
+      .then((noteId: number) => {
+        start
+          .jumpToNotePage(sourceTitle)
+          .updateContentAsMarkdown(
+            `[${display}](${PRODUCTION_CANONICAL_DONUT_ORIGIN}/n${noteId})`
+          )
+      })
+  }
+)
+
 Then(
   'the note content markdown source should contain a note URL to {string} with display {string}',
   (targetTitle: string, display: string) => {
@@ -183,6 +200,22 @@ Then(
         start
           .assumeNotePage()
           .expectMarkdownContentSourceContains(`[${display}](/n${noteId})`)
+      })
+  }
+)
+
+Then(
+  'the note content markdown source should contain a full Donut note URL to {string} with display {string}',
+  (targetTitle: string, display: string) => {
+    start
+      .testability()
+      .getInjectedNoteIdByTitle(targetTitle)
+      .then((noteId: number) => {
+        start
+          .assumeNotePage()
+          .expectMarkdownContentSourceContains(
+            `[${display}](${PRODUCTION_CANONICAL_DONUT_ORIGIN}/n${noteId})`
+          )
       })
   }
 )

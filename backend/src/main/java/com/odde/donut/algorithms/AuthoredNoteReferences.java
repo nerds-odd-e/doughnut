@@ -9,7 +9,7 @@ import java.util.regex.Matcher;
 
 /**
  * Extracts {@link AuthoredNoteReference} values from note content: wiki Portable-path targets and
- * recognized root-relative note-ID URLs.
+ * recognized note-ID URLs (root-relative or absolute on the configured canonical origin).
  */
 public final class AuthoredNoteReferences {
 
@@ -19,7 +19,8 @@ public final class AuthoredNoteReferences {
    * Authored note references in document order: frontmatter scalar and list-item strings first,
    * then the body.
    */
-  public static List<AuthoredNoteReference> inOccurrenceOrder(String content) {
+  public static List<AuthoredNoteReference> inOccurrenceOrder(
+      String content, CanonicalDonutOrigin canonicalOrigin) {
     if (content == null || content.isEmpty()) {
       return List.of();
     }
@@ -28,12 +29,12 @@ public final class AuthoredNoteReferences {
             lf -> {
               List<AuthoredNoteReference> refs = new ArrayList<>();
               for (String value : lf.frontmatter().supportedValueStringsInInsertionOrder()) {
-                refs.addAll(fromMarkdownFragment(value));
+                refs.addAll(fromMarkdownFragment(value, canonicalOrigin));
               }
-              refs.addAll(fromMarkdownFragment(lf.body()));
+              refs.addAll(fromMarkdownFragment(lf.body(), canonicalOrigin));
               return List.copyOf(refs);
             })
-        .orElseGet(() -> fromMarkdownFragment(content));
+        .orElseGet(() -> fromMarkdownFragment(content, canonicalOrigin));
   }
 
   /**
@@ -55,7 +56,8 @@ public final class AuthoredNoteReferences {
   public static List<AuthoredNoteReference.WikiPortablePathTarget> uniqueWikiPortablePathTargets(
       String content) {
     List<AuthoredNoteReference.WikiPortablePathTarget> out = new ArrayList<>();
-    for (AuthoredNoteReference ref : uniquePreserveOrder(inOccurrenceOrder(content))) {
+    for (AuthoredNoteReference ref :
+        uniquePreserveOrder(inOccurrenceOrder(content, CanonicalDonutOrigin.production()))) {
       if (ref instanceof AuthoredNoteReference.WikiPortablePathTarget wiki) {
         out.add(wiki);
       }
@@ -63,7 +65,8 @@ public final class AuthoredNoteReferences {
     return List.copyOf(out);
   }
 
-  static List<AuthoredNoteReference> fromMarkdownFragment(String markdown) {
+  static List<AuthoredNoteReference> fromMarkdownFragment(
+      String markdown, CanonicalDonutOrigin canonicalOrigin) {
     if (markdown == null || markdown.isEmpty()) {
       return List.of();
     }
@@ -81,7 +84,7 @@ public final class AuthoredNoteReferences {
     }
     Matcher md = NoteIdUrl.MARKDOWN_LINK.matcher(markdown);
     while (md.find()) {
-      NoteIdUrl.fromMarkdownLinkMatch(md.group(), md.group(1), md.group(2))
+      NoteIdUrl.fromMarkdownLinkMatch(md.group(), md.group(1), md.group(2), canonicalOrigin)
           .ifPresent(url -> hits.add(new Hit(md.start(), url)));
     }
     hits.sort(Comparator.comparingInt(Hit::start));
@@ -93,8 +96,9 @@ public final class AuthoredNoteReferences {
   }
 
   /** Rebuilds a reference from a resolved-row {@code authored_link} value. */
-  public static AuthoredNoteReference fromStoredAuthoredLink(String authoredLink) {
-    return NoteIdUrl.tryParseAuthoredMarkdownLink(authoredLink)
+  public static AuthoredNoteReference fromStoredAuthoredLink(
+      String authoredLink, CanonicalDonutOrigin canonicalOrigin) {
+    return NoteIdUrl.tryParseAuthoredMarkdownLink(authoredLink, canonicalOrigin)
         .map(AuthoredNoteReference.class::cast)
         .orElseGet(
             () -> AuthoredNoteReference.WikiPortablePathTarget.fromAuthoredInner(authoredLink));
