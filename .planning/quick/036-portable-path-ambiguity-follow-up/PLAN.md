@@ -1,6 +1,6 @@
 # Wiki-link ambiguity and Markdown URL conformance
 
-**Status:** in progress (slices 1–12 done; next: slice 13)
+**Status:** in progress (slices 1–13 done; next: slice 14)
 
 ## Goal
 
@@ -251,21 +251,19 @@ unique shorthand and note-ID URLs unchanged). E2E in
 
 ### 13. Reparenting a folder preserves exact descendant wiki links
 
-**Status:** planned
+**Status:** done
 **Type:** Behavior
 
-**Pre-condition:** A note links by exact wiki Portable path to a descendant of
-a folder.
+Same-notebook folder reparent now collects the moved subtree's note IDs
+(`FolderSubtree.collectNoteIdsInSubtree`, shared with `renameFolder`) and
+calls `WikiLinkRewriteService.rewriteInboundWikiLinksForFolderReparent`, which
+reuses the slice-12 `rewriteInboundWikiLinksForLocationChange` seam per note.
+Covered by `NotebookFolderReparentWikiLinkRewriteControllerTest` (inside- and
+outside-subtree referrers) plus focused `folder_organization.feature` (11/11).
 
-**Trigger:** The learner reparents the folder inside the notebook.
-
-**Post-condition:** Inbound wiki paths reflect the new folder trail and resolve
-after rebuilding the index; note-ID URLs remain unchanged.
-
-Reuse the location-rewrite seam from slice 12 for every live note in the moved
-subtree, including referrers inside and outside it.
-
-Verification: full backend unit suite; focused `folder_organization.feature`.
+**Learning:** the same reparent seam is reused as-is for slice 14
+(dissolve/merge); `FolderSubtree.collectNoteIdsInSubtree` is now the shared
+helper for gathering a moved subtree's note IDs.
 
 ### 14. Dissolving or merging a folder preserves descendant wiki links
 

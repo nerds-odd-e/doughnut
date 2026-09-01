@@ -44,6 +44,10 @@ final class FolderSubtree {
     return noteIds;
   }
 
+  Set<Integer> collectNoteIdsInSubtree(Folder root) {
+    return collectNoteIds(collectFolders(root));
+  }
+
   void requireNoSoftDeletedTitles(Notebook destinationNotebook, List<Folder> subtreeFolders) {
     for (Folder subtreeFolder : subtreeFolders) {
       for (Note note : noteRepository.findNotesInFolderOrderByIdAsc(subtreeFolder.getId())) {

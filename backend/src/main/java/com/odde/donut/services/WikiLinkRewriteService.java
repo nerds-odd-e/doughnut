@@ -106,6 +106,19 @@ public class WikiLinkRewriteService {
         Set.of());
   }
 
+  /**
+   * Same-notebook folder reparent: rewrite inbound exact wiki paths for every live note in the
+   * moved subtree, from referrers inside and outside the subtree.
+   */
+  @Transactional
+  public void rewriteInboundWikiLinksForFolderReparent(
+      Set<Integer> movedNoteIds, Timestamp updatedAt, User viewer) {
+    WikiLinkRewriteSupport.forEachNonDeletedNoteInMoveSet(
+        entityManager,
+        movedNoteIds,
+        note -> rewriteInboundWikiLinksForLocationChange(note, updatedAt, viewer));
+  }
+
   @Transactional
   public void rewriteInboundWikiLinksForNotebookMove(
       Note targetNote, String newNotebookName, Timestamp updatedAt, User viewer) {

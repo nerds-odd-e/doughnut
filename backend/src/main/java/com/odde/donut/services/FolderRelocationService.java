@@ -66,11 +66,11 @@ public class FolderRelocationService {
     if (destinationNotebook != null && !destinationNotebook.getId().equals(notebook.getId())) {
       return moveFolderToAnotherNotebook(folder, request, destinationNotebook, viewer);
     }
-    return moveFolderWithinNotebook(notebook, folder, request);
+    return moveFolderWithinNotebook(notebook, folder, request, viewer);
   }
 
   private Folder moveFolderWithinNotebook(
-      Notebook notebook, Folder folder, FolderMoveRequest request) {
+      Notebook notebook, Folder folder, FolderMoveRequest request, User viewer) {
     Folder newParent = resolveNewParentFolder(request);
     if (newParent != null) {
       requireNewParentInNotebook(newParent, notebook);
@@ -87,11 +87,13 @@ public class FolderRelocationService {
       return mergeTarget.get();
     }
 
+    Set<Integer> movedNoteIds = subtree.collectNoteIdsInSubtree(folder);
     folder.setParentFolder(newParent);
     folder.setUpdatedAt(now);
     entityPersister.flush();
     entityPersister.merge(folder);
     entityPersister.flush();
+    wikiLinkRewriteService.rewriteInboundWikiLinksForFolderReparent(movedNoteIds, now, viewer);
     return folder;
   }
 
@@ -187,11 +189,7 @@ public class FolderRelocationService {
     entityPersister.merge(folder);
     entityPersister.flush();
     wikiLinkRewriteService.rewriteInboundWikiLinksForFolderRename(
-        subtree.collectNoteIds(subtree.collectFolders(folder)),
-        oldName,
-        displayName.value(),
-        now,
-        viewer);
+        subtree.collectNoteIdsInSubtree(folder), oldName, displayName.value(), now, viewer);
     return folder;
   }
 
