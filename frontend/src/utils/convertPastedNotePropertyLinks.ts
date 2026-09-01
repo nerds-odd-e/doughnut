@@ -1,10 +1,7 @@
 import { marked, type Tokens } from "marked"
 import markdownizer from "@/components/form/markdownizer"
 import { resolveNotePropertyFromHref } from "@/routes/noteShowLocation"
-import {
-  buildWikiLinkText,
-  type WikiLinkNoteIdentity,
-} from "@/utils/buildWikiLinkText"
+import type { WikiLinkNoteIdentity } from "@/utils/buildWikiLinkText"
 import { verbatimFrontmatterPrefixAndBody } from "@/utils/noteContentFrontmatter"
 import {
   encodeWikiLinkPropertyKey,
@@ -37,19 +34,15 @@ function pastedAnchorDisplay(label: string, href: string): string | undefined {
   return trimmed
 }
 
-type PendingLinkReplacement =
-  | { token: Tokens.Link; wiki: string }
-  | {
-      token: Tokens.Link
-      authorFromSameNotebook: {
-        sourceNoteId: number
-        destinationNoteId: number
-        originalPortablePath: string
-        displayText: string | undefined
-      }
-    }
+type PendingLinkReplacement = {
+  token: Tokens.Link
+  sourceNoteId: number
+  destinationNoteId: number
+  originalPortablePath: string
+  displayText: string | undefined
+}
 
-/** Same-notebook pastes are spelled by the backend authoring operation; cross-notebook keeps the client-built spelling. */
+/** Every resolved paste is spelled by the backend authoring operation — same-notebook, colliding, and cross-notebook alike. */
 function collectPendingLinkReplacements(
   tokens: ReturnType<typeof marked.lexer>,
   context: ConvertPastedNotePropertyLinksContext,
@@ -65,36 +58,22 @@ function collectPendingLinkReplacements(
     if (property === undefined) {
       return
     }
-    const identity = identities.get(property.noteId)
-    if (identity === undefined) {
+    if (identities.get(property.noteId) === undefined) {
       return
     }
     const displayText = pastedAnchorDisplay(
       linkToken.text || "",
       linkToken.href
     )
-    if (identity.notebookId === context.sourceNotebookId) {
-      pending.push({
-        token: linkToken,
-        authorFromSameNotebook: {
-          sourceNoteId: context.sourceNoteId,
-          destinationNoteId: property.noteId,
-          originalPortablePath: formatPortablePath({
-            qualifiedNotePortion: "",
-            encodedPropertyKey: encodeWikiLinkPropertyKey(property.propertyKey),
-          }),
-          displayText,
-        },
-      })
-      return
-    }
     pending.push({
       token: linkToken,
-      wiki: buildWikiLinkText(identity, {
-        notebookId: context.sourceNotebookId,
-        displayText,
-        propertyKey: property.propertyKey,
+      sourceNoteId: context.sourceNoteId,
+      destinationNoteId: property.noteId,
+      originalPortablePath: formatPortablePath({
+        qualifiedNotePortion: "",
+        encodedPropertyKey: encodeWikiLinkPropertyKey(property.propertyKey),
       }),
+      displayText,
     })
   })
   return pending
@@ -120,17 +99,13 @@ async function replaceResolvedPropertyLinkTokens(
 ): Promise<string> {
   const tokens = marked.lexer(markdown)
   const pending = collectPendingLinkReplacements(tokens, context, identities)
-  for (const replacement of pending) {
-    if ("wiki" in replacement) {
-      applyWikiLinkTokenReplacement(replacement.token, replacement.wiki)
-      continue
-    }
-    const {
-      sourceNoteId,
-      destinationNoteId,
-      originalPortablePath,
-      displayText,
-    } = replacement.authorFromSameNotebook
+  for (const {
+    token,
+    sourceNoteId,
+    destinationNoteId,
+    originalPortablePath,
+    displayText,
+  } of pending) {
     const wiki = await authoredWikiLinkTokenFromOriginalPath(
       sourceNoteId,
       destinationNoteId,
@@ -140,7 +115,7 @@ async function replaceResolvedPropertyLinkTokens(
     if (wiki === undefined) {
       continue
     }
-    applyWikiLinkTokenReplacement(replacement.token, wiki)
+    applyWikiLinkTokenReplacement(token, wiki)
   }
   const html = marked.parser(tokens)
   return markdownizer.htmlToMarkdown(html).trim()

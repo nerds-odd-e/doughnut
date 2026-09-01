@@ -621,22 +621,25 @@ Stop-safe: paste shares the authoring seam; collision spelling is slice 32.
 
 ### 32. Pasting a colliding note URL stores the full Portable path
 
-**Status:** planned
+**Status:** done
 **Type:** Behavior
 
-**Precondition:** The user pastes a `noteShow` or `noteProperty` URL whose
-note collides in the source scope (same-notebook, root `/Title`, or
-cross-notebook).
-**Trigger:** Donut converts the internal URL to notebook markup.
-**Postcondition:** The stored Wiki link uses the same shortest unambiguous
-Portable path as insertion, with separate display text and one encoded
-property selector when present.
-
-Test first: extend mounted paste specs; do not re-assert unique paste.
-
-Reconcile Proposed ADR 0005 paste wording; preserve Proposed status.
-
-Verification: focused paste specs; whitespace/lint via pre-commit.
+`convertPastedNotePropertyLinks.ts` no longer branches same-notebook vs.
+cross-notebook: every resolved property-link paste now calls the shared
+backend authoring seam (`authoredWikiLinkTokenFromOriginalPath`, slice 31),
+passing an `originalPortablePath` of just the encoded `#prop:` suffix —
+same-notebook unique, same-notebook colliding, root-collision `/Title`,
+and cross-notebook qualification are all handled uniformly by the backend,
+matching insertion/repair/rewrite. Dropped the now-dead client-side
+`buildWikiLinkText` value import from this file (the function itself
+remains used by `SearchForm.vue` and `AccidentalMatchResolveDialog.vue`).
+`PendingLinkReplacement` collapsed from a two-shape union to one flat
+shape. Pinned by `NoteEditableContent.paste.spec.ts`: the existing
+cross-notebook test now mocks a destination-notebook-collision spelling
+(provably only the backend seam can produce), and a new same-notebook-colliding test. ADR 0005's paste wording was already
+accurate for backend-authored collision/cross-notebook spelling; left
+unedited, status still Proposed. Focused paste specs and `vue-tsc --noEmit`
+green.
 
 Stop-safe: paste, insertion, repair, and rewrite agree on colliding
 spelling.

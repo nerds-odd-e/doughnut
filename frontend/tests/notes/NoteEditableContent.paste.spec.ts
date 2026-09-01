@@ -121,6 +121,12 @@ describe("NoteEditableContent paste", () => {
     })
 
     it("qualifies a pasted noteProperty URL when the target notebook differs", async () => {
+      // Backend-only spelling (destination-notebook collision resolved to a full path):
+      // a client-side buildWikiLinkText reconstruction has no collision awareness and
+      // could only ever produce the naive "Sky:Moon#prop:topic" default.
+      mockSdkService(NoteController, "authoredPortablePath", {
+        portablePath: "Sky:Folder/Moon#prop:topic",
+      })
       const source = makeMe.aNoteRealm
         .id(1)
         .title("Carrier")
@@ -148,7 +154,42 @@ describe("NoteEditableContent paste", () => {
       )
       await flushPromises()
 
-      expect(textarea.value).toContain("[[Sky:Moon#prop:topic|shown]]")
+      expect(textarea.value).toContain("[[Sky:Folder/Moon#prop:topic|shown]]")
+      wrapper.unmount()
+    })
+
+    it("uses the full path when a pasted noteProperty URL's title collides in the same notebook", async () => {
+      mockSdkService(NoteController, "authoredPortablePath", {
+        portablePath: "Folder/Moon#prop:topic",
+      })
+      const source = makeMe.aNoteRealm
+        .id(1)
+        .title("Carrier")
+        .inNotebook(10, "Sky")
+        .please()
+      const target = makeMe.aNoteRealm
+        .id(99)
+        .title("Moon")
+        .inNotebook(10, "Sky")
+        .please()
+      const wrapper = mountNoteEditableContent(
+        { noteId: 1, noteContent: "See " },
+        { attachTo: document.body }
+      )
+      await flushPromises()
+      useStorageAccessor().value.refreshNoteRealm(source)
+      useStorageAccessor().value.refreshNoteRealm(target)
+
+      const textarea = textareaEl(wrapper)
+      textarea.setSelectionRange(4, 4)
+      await textarea.dispatchEvent(
+        createClipboardEvent(
+          `<p><a href="${notePropertyHref(99, "topic")}">shown</a></p>`
+        )
+      )
+      await flushPromises()
+
+      expect(textarea.value).toContain("[[Folder/Moon#prop:topic|shown]]")
       wrapper.unmount()
     })
 
