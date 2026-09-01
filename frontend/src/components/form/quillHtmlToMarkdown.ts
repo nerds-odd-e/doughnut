@@ -1,15 +1,11 @@
 import TurndownService from "turndown"
 import { gfm } from "turndown-plugin-gfm"
-import { hrefLooksLikeNoteShow } from "@/routes/noteShowLocation"
 import {
   mergeConsecutiveHeaders,
   normalizeTableCells,
   preserveCodeBlockContent,
 } from "@/components/form/quillHtmlPreprocess"
-import {
-  DONUT_WIKI_LINK_CLASS,
-  isWikiLinkAnchor,
-} from "@/utils/wikiLinkDomMarkers"
+import { isWikiLinkAnchor } from "@/utils/wikiLinkDomMarkers"
 import { wikiAnchorToMarkdownToken } from "@/utils/wikiLinkMarkup"
 
 export const turndownService = new TurndownService({
@@ -175,21 +171,6 @@ turndownService.addRule("donutWikiLink", {
   },
   replacement(_content, node) {
     return wikiAnchorToMarkdownToken(node as HTMLAnchorElement)
-  },
-})
-
-turndownService.addRule("donutNoteShowHrefWikiLink", {
-  filter(node) {
-    if (node.nodeName !== "A") return false
-    const el = node as HTMLAnchorElement
-    if (el.classList.contains(DONUT_WIKI_LINK_CLASS)) {
-      return false
-    }
-    return hrefLooksLikeNoteShow(el.getAttribute("href"))
-  },
-  replacement(_content, node) {
-    const text = (node as HTMLElement).textContent?.trim() ?? ""
-    return `[[${text}]]`
   },
 })
 

@@ -1,6 +1,5 @@
 import { marked, type Tokens } from "marked"
 import markdownizer from "@/components/form/markdownizer"
-import { hrefLooksLikeNoteShow } from "@/routes/noteShowLocation"
 import { verbatimFrontmatterPrefixAndBody } from "@/utils/noteContentFrontmatter"
 
 export function countMarkdownLinksAndImages(markdown: string): {
@@ -13,9 +12,7 @@ export function countMarkdownLinksAndImages(markdown: string): {
 
   marked.walkTokens(tokens, (token) => {
     if (token.type === "link") {
-      if (!hrefLooksLikeNoteShow((token as Tokens.Link).href)) {
-        linkCount++
-      }
+      linkCount++
     } else if (token.type === "image") imageCount++
   })
 
@@ -40,21 +37,10 @@ function stripMarkdownLinksAndImages(
   marked.walkTokens(tokens, (token) => {
     if (token.type === "link" && removeLinks) {
       const linkToken = token as Tokens.Link
-      const href = linkToken.href
       const asRecord = token as Record<string, unknown>
       delete asRecord.href
       delete asRecord.title
       delete asRecord.tokens
-      if (hrefLooksLikeNoteShow(href)) {
-        const label = linkToken.text || ""
-        Object.assign(token, {
-          type: "text",
-          raw: `[[${label}]]`,
-          text: `[[${label}]]`,
-          escaped: false,
-        } as Tokens.Text)
-        return
-      }
       Object.assign(token, {
         type: "text",
         raw: linkToken.text || "",

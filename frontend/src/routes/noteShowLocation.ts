@@ -122,7 +122,7 @@ function pathnameFromHref(href: string): string | undefined {
   }
 }
 
-/** Parse a pasted SPA href through the route table (property key decoded once). */
+/** Parse an SPA href through the route table (property key decoded once). */
 export function resolveInternalNoteFamilyFromHref(
   href: string,
   router: Router = internalNoteRouteClassifierRouter
@@ -150,24 +150,6 @@ export function resolveInternalNoteFamilyFromHref(
       params: resolved.params,
     }),
   }
-}
-
-export function hrefLooksLikeNoteShow(
-  href: string | null | undefined
-): boolean {
-  if (!href?.trim()) return false
-  const family = resolveInternalNoteFamilyFromHref(href)
-  return family !== undefined && family.propertyKey === undefined
-}
-
-export function resolveNotePropertyFromHref(
-  href: string
-): { noteId: number; propertyKey: string } | undefined {
-  const family = resolveInternalNoteFamilyFromHref(href)
-  if (!family?.propertyKey) {
-    return undefined
-  }
-  return { noteId: family.noteId, propertyKey: family.propertyKey }
 }
 
 export function pathnameLooksLikeInternalNoteFamily(

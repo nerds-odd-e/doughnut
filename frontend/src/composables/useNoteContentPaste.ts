@@ -1,60 +1,16 @@
 import { nextTick, type Ref } from "vue"
-import type { NoteRealm } from "@generated/donut-backend-api"
-import { NoteController } from "@generated/donut-backend-api/sdk.gen"
 import type TextArea from "@/components/form/TextArea.vue"
 import { usePasteWithLinkImageOptions } from "@/composables/usePasteWithLinkImageOptions"
-import { useStorageAccessor } from "@/composables/useStorageAccessor"
-import type { WikiLinkNoteIdentity } from "@/utils/buildWikiLinkText"
-import { convertPastedNotePropertyLinksInNoteContent } from "@/utils/convertPastedNotePropertyLinks"
 
 type NoteContentUpdate = (noteId: number, newValue: string) => void
-
-function wikiLinkNoteIdentityFromRealm(realm: NoteRealm): WikiLinkNoteIdentity {
-  return {
-    noteTopology: { title: realm.note.noteTopology.title },
-    notebookId: realm.notebookRealm.notebook.id,
-    notebookName: realm.notebookRealm.notebook.name,
-  }
-}
 
 export function useNoteContentPaste(options: {
   noteId: () => number
   asMarkdown: () => boolean
   textareaRef: Ref<InstanceType<typeof TextArea> | null>
 }) {
-  const storageAccessor = useStorageAccessor()
   const { htmlToMarkdown, processContentAfterPaste } =
     usePasteWithLinkImageOptions()
-
-  async function resolvePastedNoteIdentity(
-    noteId: number
-  ): Promise<WikiLinkNoteIdentity | undefined> {
-    const cached = storageAccessor.value
-      .storedApi()
-      .getNoteRealmRef(noteId).value
-    if (cached) {
-      return wikiLinkNoteIdentityFromRealm(cached)
-    }
-    const { data, error } = await NoteController.showNote({
-      path: { note: noteId },
-    })
-    if (error || !data) {
-      return undefined
-    }
-    return wikiLinkNoteIdentityFromRealm(data)
-  }
-
-  function convertPastedPropertyLinks(content: string): Promise<string> {
-    const sourceNoteId = options.noteId()
-    const sourceNotebookId = storageAccessor.value
-      .storedApi()
-      .getNoteRealmRef(sourceNoteId).value?.notebookRealm.notebook.id
-    return convertPastedNotePropertyLinksInNoteContent(content, {
-      sourceNoteId,
-      sourceNotebookId,
-      resolveNote: resolvePastedNoteIdentity,
-    })
-  }
 
   const offerToRemoveLinksAndImages = async (
     content: string,
@@ -86,11 +42,10 @@ export function useNoteContentPaste(options: {
     const start = textarea.selectionStart
     const end = textarea.selectionEnd
     const markdown = htmlToMarkdown(htmlData)
-    const spliced =
+    const newValue =
       (currentValue || "").slice(0, start) +
       markdown +
       (currentValue || "").slice(end)
-    const newValue = await convertPastedPropertyLinks(spliced)
 
     update(options.noteId(), newValue)
     nextTick(() => {
@@ -109,11 +64,7 @@ export function useNoteContentPaste(options: {
     update: NoteContentUpdate
   ) => {
     if (!currentValue) return
-    const converted = await convertPastedPropertyLinks(currentValue)
-    if (converted !== currentValue) {
-      update(options.noteId(), converted)
-    }
-    await offerToRemoveLinksAndImages(converted, update)
+    await offerToRemoveLinksAndImages(currentValue, update)
   }
 
   return { handleTextareaPaste, handlePasteComplete }

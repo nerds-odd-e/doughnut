@@ -1,6 +1,6 @@
 # Wiki-link ambiguity and Markdown URL conformance
 
-**Status:** planned (audit and ADR decisions complete; do not execute until asked)
+**Status:** in progress (slice 1 done; next: slice 2)
 
 ## Goal
 
@@ -133,28 +133,15 @@ This plan follows:
 
 ### 1. Markdown links round-trip as URLs
 
-**Status:** planned
+**Status:** done
 **Type:** Behavior
 
-**Pre-condition:** Note content contains or receives a Markdown link, including
-a root-relative, absolute Donut, or note-property URL.
+Markdown links (relative, absolute Donut, note-property) paste/edit/serialize
+as ordinary `[text](href)` — Turndown no longer wiki-ifies note-show anchors;
+paste-to-wiki conversion and its `sourceNotebookId` plumbing removed.
+`markdown_link.feature` covers the round-trip.
 
-**Trigger:** The learner pastes, edits, saves, and reopens the content.
-
-**Post-condition:** The stored Markdown retains the authored href and display
-text exactly; no editor conversion changes it into wiki syntax.
-
-- Remove the Turndown rule that converts note-show anchors to `[[display]]`.
-- Delete the note-property paste-to-wiki conversion pipeline and its identity /
-  `sourceNotebookId` plumbing.
-- Paste link-removal treats these as ordinary Markdown links and never performs
-  title-based wiki conversion.
-- Replace redundant mounted paste cases with one exact relative/absolute URL
-  round-trip case and keep `NoteEditableContent.paste.spec.ts` below 250 lines.
-- Create/extend capability-named `markdown_link.feature`; do not reuse
-  `path_markdown_link.feature`.
-
-Verification: focused frontend unit tests; focused `markdown_link.feature`.
+**Learning:** path-Markdown wiki-DOM upgrade paths remain for slice 2.
 
 ### 2. File-looking Markdown URLs keep ordinary link UI
 
