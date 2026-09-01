@@ -1,7 +1,8 @@
 package com.odde.donut.controllers;
 
+import com.odde.donut.algorithms.AuthoredNoteDocument;
+import com.odde.donut.algorithms.CanonicalDonutOrigin;
 import com.odde.donut.algorithms.FrontmatterAliases;
-import com.odde.donut.algorithms.NoteConceptType;
 import com.odde.donut.controllers.dto.ApiError;
 import com.odde.donut.controllers.dto.NoteRealm;
 import com.odde.donut.controllers.dto.NoteUpdateContentDTO;
@@ -41,6 +42,7 @@ class TextContentController {
   private final ResolvedWikiLinkService resolvedWikiLinkService;
   private final WikiLinkRewriteService wikiLinkRewriteService;
   private final NoteService noteService;
+  private final CanonicalDonutOrigin canonicalDonutOrigin;
 
   public TextContentController(
       EntityPersister entityPersister,
@@ -49,7 +51,8 @@ class TextContentController {
       NoteRealmService noteRealmService,
       ResolvedWikiLinkService resolvedWikiLinkService,
       WikiLinkRewriteService wikiLinkRewriteService,
-      NoteService noteService) {
+      NoteService noteService,
+      CanonicalDonutOrigin canonicalDonutOrigin) {
     this.entityPersister = entityPersister;
     this.testabilitySettings = testabilitySettings;
     this.authorizationService = authorizationService;
@@ -57,6 +60,7 @@ class TextContentController {
     this.resolvedWikiLinkService = resolvedWikiLinkService;
     this.wikiLinkRewriteService = wikiLinkRewriteService;
     this.noteService = noteService;
+    this.canonicalDonutOrigin = canonicalDonutOrigin;
   }
 
   @PatchMapping(path = "/{note}/title")
@@ -110,9 +114,9 @@ class TextContentController {
       @PathVariable(name = "note") @Schema(type = "integer") Note note,
       @Valid @RequestBody NoteUpdateContentDTO contentDTO)
       throws UnexpectedNoAccessRightException {
-    String prepared = AuthoredNoteContent.prepareContentForSave(contentDTO.getContent());
-    return updateNote(
-        note, n -> n.setContent(NoteConceptType.ensureStoredType(prepared)), true, true);
+    AuthoredNoteDocument document =
+        AuthoredNoteContent.prepareDocumentForSave(contentDTO.getContent(), canonicalDonutOrigin);
+    return updateNote(note, n -> n.replaceContent(document), true, true);
   }
 
   private NoteRealm updateNote(
