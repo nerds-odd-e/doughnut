@@ -1,7 +1,7 @@
 # 0004 — OKF-compatible notebook Markdown profile
 
 **Status:** Accepted  
-**Date:** 2026-08-05  
+**Date:** 2026-09-01
 **Decision makers:** Terry Yin  
 **Consulted:** None 
 
@@ -72,10 +72,7 @@ profile. Codec round-trips must be lossless for these rules.
 
 ### Links and attachments
 
-- A notebook link has conventional markup parts: display text and a link
-  destination. Its destination is a **Portable path**; wiki and path Markdown
-  are authored spellings of that same domain value.
-- Donut-authored inter-note links are wiki `[[portable-path]]` /
+- Portable inter-note links use wiki `[[portable-path]]` /
   `[[portable-path|display-text]]`. Product insert writes wiki. Unqualified
   `[[Title-or-Alias]]` is a shorthand Portable path whose resolution scope is
   the source notebook's Portable notebook tree. `Notebook:Title-or-Alias`
@@ -84,25 +81,19 @@ profile. Codec round-trips must be lossless for these rules.
   when it identifies one destination under that scope. With no match it is
   unresolved; with multiple matches it is ambiguous and therefore unresolved,
   and Donut asks for a longer path. The authored destination remains unchanged.
-- These rules apply to the **body and to YAML frontmatter values** (scalars
+  Donut-authored wiki bundle-root path form has no leading `/`, except the
+  exact-root fallback `/Title` when that display name is an ambiguous
+  shorthand. The reader accepts a leading `/` on a path-shaped wiki
+  destination (`[[/Title]]`) as the same bundle-root spelling.
+- Wiki-link rules apply to the **body and to YAML frontmatter values** (scalars
   and one-level list items), including relationship `source` / `target` and
-  `overlaps` items. Donut-authored frontmatter is wiki. Path Markdown
-  in those values is the same link. No conversion. A bare YAML path
+  `overlaps` items. Donut-authored frontmatter uses wiki links. A bare YAML path
   (`source: /folder/File.md`) is not a link. OKF §6.2 path-valued fields
-  (`resource`, `sources[].resource`, …) are a different key family;
-  Donut relationship endpoints are not those fields.
-- Path Markdown `[display-text](/folder/File.md)` is the same link as
-  `[[folder/File|display-text]]`. Leading `/` on Markdown destinations is
-  bundle-relative (notebook root). Donut-authored wiki bundle-root path form
-  has no leading `/`, except the exact-root fallback `/Title` when that
-  display name is an ambiguous shorthand. The reader also accepts a leading
-  `/` on a path-shaped wiki destination (`[[/Title]]`) as the same
-  bundle-root spelling. Source-relative destinations fit the Portable path
-  model where supported; this profile does not yet require Donut to author
-  or resolve them.
+  (`resource`, `sources[].resource`, …) are a different key family; Donut
+  relationship endpoints are not those fields.
 - `.md` on a path-shaped **Portable path** is optional and ignored
-  (`/folder/File` = `/folder/File.md`; `[[folder/File.md]]` =
-  `[[folder/File]]`). Do not strip `.md` from unqualified wiki titles
+  (`[[folder/File.md]]` = `[[folder/File]]`). Do not strip `.md` from
+  unqualified wiki titles
   (`[[File.md]]` may be a title).
 - A **Portable path** may select a **property**: note path plus the reserved
   `#prop:` separator and one non-empty encoded property-key component.
@@ -111,25 +102,21 @@ profile. Codec round-trips must be lossless for these rules.
   every other byte is `%HH`. Product output uses uppercase hex; readers
   accept either hex case. Decode exactly once; an invalid escape or invalid
   UTF-8 makes the property target unresolved. Compare the resulting key
-  case-sensitively. Wiki:
-  `[[Moon#prop:a%20part%20of]]`. Path Markdown:
-  `[a part of](/Solar/Moon.md#prop:a%20part%20of)` (`.md` remains
-  optional **before** the fragment). Product insert writes wiki. A
-  literal `#prop:` is reserved for this property separator, not a heading
-  id; other fragments are not property links. Bare YAML paths (with or
-  without a fragment) are not links. A note title that itself contains the
-  literal substring `#prop:` cannot be the sole (unqualified, no-property)
-  destination of a wiki or path-Markdown link — the parser always splits on the
-  first `#prop:` marker. Accepted trade-off: title authors avoid `#prop:`
-  in titles; this profile does not add escaping for it.
-- No active conversion of stored `[[…]]` ↔ `[…](…)`, including save/paste
-  round-trip of path Markdown. ZIP export copies stored spelling. 
-- Both spellings share one resolved wiki-link index `(source_note,
-  destination_note, authored_link)`. No style column. No second index.
-  Strip `#prop:…` to resolve the note; decode the suffix and require that
-  exact property on the resolved note. `authored_link` includes the
-  encoded `#prop:` suffix. A resolved row must not keep a property link
-  live after the target property is removed or renamed.
+  case-sensitively. Example: `[[Moon#prop:a%20part%20of]]`. Product insert
+  writes wiki. A literal `#prop:` is reserved for this property separator, not
+  a heading id; other fragments are not property links. Bare YAML paths (with
+  or without a fragment) are not links. A note title containing the literal
+  substring `#prop:` cannot be the sole unqualified destination of a wiki link;
+  the parser splits on the first marker. Accepted trade-off: title authors
+  avoid `#prop:` in titles; this profile does not add escaping for it.
+- Markdown links `[display-text](href)` use ordinary URL semantics. ADR 0005
+  defines when a Donut URL also contributes a semantic note reference.
+- Resolved wiki links and semantic Donut URL references defined by ADR 0005
+  share one index `(source_note, destination_note, authored_link)`. No style
+  column. No second index. For a wiki property link, strip `#prop:…` to resolve
+  the note, decode the suffix, and require that exact property on the resolved
+  note. A resolved row must not keep a property link live after the target
+  property is removed or renamed.
 
 ### Validation
 
@@ -150,16 +137,14 @@ profile. Codec round-trips must be lossless for these rules.
 - Filename is the display name on the **Portable notebook tree**. Author-owned
   `title:` is authored YAML; the codec does not wrap `title:` to compensate for
   a basename that is not the display name. Stored notes use the title column.
-- Inter-note and property links are dual-spelling in body and frontmatter:
-  Donut writes wiki; path Markdown is the authored spelling. ZIP does not
-  rewrite wiki to path Markdown. Wiki in Donut-authored YAML is the same
-  profile exception as wiki in the body. SPA property URLs are not a
-  stored form (ADR 0005).
+- Portable inter-note and property links use wiki syntax. Markdown URL handling
+  follows ADR 0005. Wiki in Donut-authored YAML is the same profile exception
+  as wiki in the body.
 - Obsidian and OKF consumers can open a Donut Portable notebook tree. A note is
   addressed in the files by its normalized Portable path. A user-insisted
   concept `index.md` / `log.md` still has that path, but OKF tools may treat it
   as a listing/log or reject it. Tools that do not resolve wiki links will not
-  follow Donut-authored `[[…]]` until they support both spellings.
+  follow Donut-authored `[[…]]`.
 
 ## Pros
 

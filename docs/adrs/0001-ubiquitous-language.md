@@ -1,7 +1,7 @@
 # 0001 — Ubiquitous language for Donut domain concepts
 
 **Status:** Accepted  
-**Date:** 2026-08-15  
+**Date:** 2026-09-01
 **Decision makers:** Terry
 **Consulted:** (people / teams asked for advice)
 
@@ -58,11 +58,12 @@ terms here; do not supersede this ADR with a new one.
 - **Circle** — Multi-user shared space with members and notebooks
 - **Bazaar** — Marketplace where notebooks are shared for others to
   browse and subscribe
-- **Wiki link** — In-content reference to a **note** or a **property**
-  on a note. Donut-authored form is wiki `[[portable-path]]` /
+- **Wiki link** — Semantic in-content reference to a **note** or a **property**
+  on a note. Its portable form is wiki `[[portable-path]]` /
   `[[portable-path|display]]` (optionally `Notebook:Title`; a property appends
-  `#prop:<encoded-key>`). Path Markdown is the same link. Spelling and
-  property-key encoding:
+  `#prop:<encoded-key>`). A Markdown link whose href is a canonical Donut note
+  URL also participates as a Wiki link by note ID; its label is display only.
+  Spelling and property-key encoding:
   [ADR 0004](./0004-okf-compatible-notebook-markdown-accepted.md). Web
   destination: `noteProperty`, once Proposed
   [ADR 0005](./0005-web-routes.md) is Accepted — human-owned exception
@@ -77,9 +78,8 @@ terms here; do not supersede this ADR with a new one.
   “a part of”)
 - **Relationship note** — A note that represents a relationship
   (`type: Relationship` in frontmatter), with source, target, and
-  relation. Source and target are **wiki links** (same dual-spelling as
-  the body;
-  [ADR 0004](./0004-okf-compatible-notebook-markdown-accepted.md)).
+  relation. Source and target are **wiki links**
+  ([ADR 0004](./0004-okf-compatible-notebook-markdown-accepted.md)).
 - **Wikidata association** — Binding a note to a Wikidata entity. The
   action is **Associate Wikidata**. Distinct from **Wikidata ID** (the
   Q-id).
