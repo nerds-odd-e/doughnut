@@ -11,6 +11,7 @@ import com.odde.donut.entities.QuestionGenerationBatchRequestStatus;
 import com.odde.donut.entities.QuestionGenerationBatchStatus;
 import com.odde.donut.entities.User;
 import com.odde.donut.entities.repositories.QuestionGenerationBatchRepository;
+import com.odde.donut.testability.CommittedUserCleanup;
 import com.odde.donut.testability.MakeMe;
 import jakarta.persistence.EntityManager;
 import java.sql.Timestamp;
@@ -99,7 +100,7 @@ class QuestionGenerationBatchRetentionWithoutTransactionTest {
   private void deleteCommittedPruneFixtures() {
     inCommittedTransaction(
         () ->
-            QuestionGenerationBatchCommittedUserCleanup.deleteByUserExternalIdentifierLike(
+            CommittedUserCleanup.deleteByUserExternalIdentifierLike(
                 entityManager, FIXTURE_PREFIX + "%"));
   }
 

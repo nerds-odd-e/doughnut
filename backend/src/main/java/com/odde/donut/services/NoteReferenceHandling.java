@@ -106,7 +106,9 @@ final class NoteReferenceHandling {
               referrer.getContent(), entry.getValue())
           .ifPresent(
               updatedContent -> {
-                referrer.setContent(updatedContent);
+                referrer.replaceContent(
+                    AuthoredNoteContent.prepareDocumentForSave(
+                        updatedContent, wikiLinkResolver.canonicalDonutOrigin()));
                 referrer.setUpdatedAt(updatedAt);
                 entityPersister.merge(referrer);
                 deleteOrphanImages.accept(referrer);

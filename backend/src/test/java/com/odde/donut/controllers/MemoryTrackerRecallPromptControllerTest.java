@@ -1,6 +1,7 @@
 package com.odde.donut.controllers;
 
 import static com.odde.donut.testability.CommittedTransactionTestSupport.inCommittedTransaction;
+import static com.odde.donut.testability.CommittedUserCleanup.deleteByUserExternalIdentifierLike;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -15,9 +16,13 @@ import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.services.ai.QuestionEvaluation;
 import com.odde.donut.testability.OpenAiStructuredResponseMock;
 import com.openai.client.OpenAIClient;
+import jakarta.persistence.EntityManager;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -31,6 +36,7 @@ import org.springframework.web.server.ResponseStatusException;
 class MemoryTrackerRecallPromptControllerTest extends MemoryTrackerControllerTestBase {
   @Autowired ObjectMapper objectMapper;
   @Autowired PlatformTransactionManager transactionManager;
+  @Autowired EntityManager entityManager;
 
   @MockitoBean(name = "officialOpenAiClient")
   OpenAIClient officialClient;
@@ -50,22 +56,6 @@ class MemoryTrackerRecallPromptControllerTest extends MemoryTrackerControllerTes
             .notebookOwnedBy(currentUser.getUser())
             .please();
     return makeMe.aMemoryTrackerFor(note).spelling().please();
-  }
-
-  private MemoryTracker trackerTrackingTransactionActivityDuringOpenAiCalls(
-      List<Boolean> transactionActiveDuringOpenAiCalls) {
-    MemoryTracker tracker =
-        inCommittedTransaction(
-            transactionManager,
-            () -> {
-              currentUser.setUser(makeMe.aUser().please());
-              return ownedTracker();
-            });
-    openAiStructuredResponseMock.onBeforeCreate(
-        () ->
-            transactionActiveDuringOpenAiCalls.add(
-                TransactionSynchronizationManager.isActualTransactionActive()));
-    return tracker;
   }
 
   @Test
@@ -104,46 +94,85 @@ class MemoryTrackerRecallPromptControllerTest extends MemoryTrackerControllerTes
     assertThat(controller.getRecallPrompt(ownedTracker()).getMcq(), notNullValue());
   }
 
-  @Test
+  @Nested
   @Transactional(propagation = Propagation.NOT_SUPPORTED)
-  void shouldGenerateMcqWithoutHoldingATransactionDuringOpenAiCall()
-      throws UnexpectedNoAccessRightException {
-    List<Boolean> transactionActiveDuringOpenAiCalls = new ArrayList<>();
-    MemoryTracker tracker =
-        trackerTrackingTransactionActivityDuringOpenAiCalls(transactionActiveDuringOpenAiCalls);
-    openAiStructuredResponseMock.stubStructuredResponse(makeMe.aGeneratedMcq().please());
+  class OpenAiCallDoesNotHoldTransaction {
+    private static final String FIXTURE_PREFIX = "recall-prompt-openai-tx-";
 
-    com.odde.donut.controllers.dto.RecallPrompt recallPrompt = controller.getRecallPrompt(tracker);
+    private String setupUserExternalId;
 
-    assertThat(transactionActiveDuringOpenAiCalls, is(not(empty())));
-    assertThat(transactionActiveDuringOpenAiCalls, everyItem(is(false)));
-    assertThat(recallPrompt.getMcq(), notNullValue());
-  }
+    @BeforeEach
+    void captureSetupUserToCleanUp() {
+      setupUserExternalId = currentUser.getUser().getExternalIdentifier();
+    }
 
-  @Test
-  @Transactional(propagation = Propagation.NOT_SUPPORTED)
-  void shouldGenerateMcqWithoutHoldingATransactionDuringContestAndRegenerateOpenAiCalls()
-      throws UnexpectedNoAccessRightException {
-    List<Boolean> transactionActiveDuringOpenAiCalls = new ArrayList<>();
-    MemoryTracker tracker =
-        trackerTrackingTransactionActivityDuringOpenAiCalls(transactionActiveDuringOpenAiCalls);
+    @AfterEach
+    void cleanupCommittedState() {
+      inCommittedTransaction(
+          transactionManager,
+          () -> {
+            deleteByUserExternalIdentifierLike(entityManager, FIXTURE_PREFIX + "%");
+            deleteByUserExternalIdentifierLike(entityManager, setupUserExternalId);
+          });
+    }
 
-    QuestionEvaluation notLegitimateEvaluation = new QuestionEvaluation();
-    notLegitimateEvaluation.feasibleQuestion = false;
-    notLegitimateEvaluation.correctChoices = new int[] {1};
-    notLegitimateEvaluation.improvementAdvices = "the answer is disputable";
+    private MemoryTracker trackerTrackingTransactionActivityDuringOpenAiCalls(
+        List<Boolean> transactionActiveDuringOpenAiCalls) {
+      MemoryTracker tracker =
+          inCommittedTransaction(
+              transactionManager,
+              () -> {
+                currentUser.setUser(makeMe.aUser(FIXTURE_PREFIX + UUID.randomUUID()).please());
+                return ownedTracker();
+              });
+      openAiStructuredResponseMock.onBeforeCreate(
+          () ->
+              transactionActiveDuringOpenAiCalls.add(
+                  TransactionSynchronizationManager.isActualTransactionActive()));
+      return tracker;
+    }
 
-    openAiStructuredResponseMock.enqueueStructuredResponse(makeMe.aGeneratedMcq().please());
-    openAiStructuredResponseMock.enqueueStructuredResponse(notLegitimateEvaluation);
-    openAiStructuredResponseMock.enqueueStructuredResponse(
-        makeMe.aGeneratedMcq().stem("regenerated stem").please());
+    @Test
+    void shouldGenerateMcqWithoutHoldingATransactionDuringOpenAiCall()
+        throws UnexpectedNoAccessRightException {
+      List<Boolean> transactionActiveDuringOpenAiCalls = new ArrayList<>();
+      MemoryTracker tracker =
+          trackerTrackingTransactionActivityDuringOpenAiCalls(transactionActiveDuringOpenAiCalls);
+      openAiStructuredResponseMock.stubStructuredResponse(makeMe.aGeneratedMcq().please());
 
-    com.odde.donut.controllers.dto.RecallPrompt recallPrompt = controller.getRecallPrompt(tracker);
+      com.odde.donut.controllers.dto.RecallPrompt recallPrompt =
+          controller.getRecallPrompt(tracker);
 
-    assertThat(transactionActiveDuringOpenAiCalls, is(not(empty())));
-    assertThat(transactionActiveDuringOpenAiCalls, everyItem(is(false)));
-    assertThat(recallPrompt.getMcq(), notNullValue());
-    assertThat(recallPrompt.getMcq().getQuestionStem(), equalTo("regenerated stem"));
+      assertThat(transactionActiveDuringOpenAiCalls, is(not(empty())));
+      assertThat(transactionActiveDuringOpenAiCalls, everyItem(is(false)));
+      assertThat(recallPrompt.getMcq(), notNullValue());
+    }
+
+    @Test
+    void shouldGenerateMcqWithoutHoldingATransactionDuringContestAndRegenerateOpenAiCalls()
+        throws UnexpectedNoAccessRightException {
+      List<Boolean> transactionActiveDuringOpenAiCalls = new ArrayList<>();
+      MemoryTracker tracker =
+          trackerTrackingTransactionActivityDuringOpenAiCalls(transactionActiveDuringOpenAiCalls);
+
+      QuestionEvaluation notLegitimateEvaluation = new QuestionEvaluation();
+      notLegitimateEvaluation.feasibleQuestion = false;
+      notLegitimateEvaluation.correctChoices = new int[] {1};
+      notLegitimateEvaluation.improvementAdvices = "the answer is disputable";
+
+      openAiStructuredResponseMock.enqueueStructuredResponse(makeMe.aGeneratedMcq().please());
+      openAiStructuredResponseMock.enqueueStructuredResponse(notLegitimateEvaluation);
+      openAiStructuredResponseMock.enqueueStructuredResponse(
+          makeMe.aGeneratedMcq().stem("regenerated stem").please());
+
+      com.odde.donut.controllers.dto.RecallPrompt recallPrompt =
+          controller.getRecallPrompt(tracker);
+
+      assertThat(transactionActiveDuringOpenAiCalls, is(not(empty())));
+      assertThat(transactionActiveDuringOpenAiCalls, everyItem(is(false)));
+      assertThat(recallPrompt.getMcq(), notNullValue());
+      assertThat(recallPrompt.getMcq().getQuestionStem(), equalTo("regenerated stem"));
+    }
   }
 
   @Test

@@ -1,6 +1,6 @@
 package com.odde.donut.services;
 
-import static com.odde.donut.services.QuestionGenerationBatchCommittedUserCleanup.deleteByUserExternalIdentifierLike;
+import static com.odde.donut.testability.CommittedUserCleanup.deleteByUserExternalIdentifierLike;
 import static com.odde.donut.services.QuestionGenerationBatchImportPayloadSupport.batchSuccessLine;
 import static com.odde.donut.services.QuestionGenerationBatchRowImportAtomicTestSupport.FAIL_ON_RECALL_PROMPT_SAVE;
 import static com.odde.donut.testability.CommittedTransactionTestSupport.inCommittedTransaction;

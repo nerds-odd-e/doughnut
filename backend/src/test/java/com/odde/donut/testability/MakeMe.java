@@ -29,6 +29,10 @@ public class MakeMe extends MakeMeWithoutDB {
     return new UserBuilder(this);
   }
 
+  public UserBuilder aUser(String userName) {
+    return new UserBuilder(this, userName);
+  }
+
   public UserBuilder theUser(User user) {
     return new UserBuilder(this, user);
   }

@@ -1,5 +1,6 @@
 package com.odde.donut.controllers;
 
+import static com.odde.donut.entities.repositories.AuthoredNoteReferenceRowTestSupport.rowsFor;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -12,6 +13,7 @@ import com.odde.donut.services.RecallService;
 import com.odde.donut.services.ResolvedWikiLinkService;
 import com.odde.donut.services.UserService;
 import com.odde.donut.services.httpQuery.HttpClientAdapter;
+import jakarta.persistence.EntityManager;
 import java.sql.Timestamp;
 import java.time.ZoneId;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,6 +24,8 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 class NoteControllerDeleteTests extends ControllerTestBase {
   @Autowired NoteController controller;
+  @Autowired TextContentController textContentController;
+  @Autowired EntityManager entityManager;
   @Autowired RecallService recallService;
   @Autowired MemoryTrackerService memoryTrackerService;
   @Autowired UserService userService;
@@ -49,17 +53,25 @@ class NoteControllerDeleteTests extends ControllerTestBase {
   void shouldRemoveDeletedNoteLinksFromReferrerPropertiesOnly()
       throws UnexpectedNoAccessRightException {
     Note target = makeMe.aNote("Target").notebookOwnedBy(currentUser.getUser()).please();
-    Note referrer =
-        makeMe
-            .aNote("Referrer")
-            .underSameNotebookAs(target)
-            .content("---\nsource: \"[[Referrer]]\"\ntarget: \"[[Target]]\"\n---\nBody [[Target]]")
-            .please();
-    resolvedWikiLinkService.refreshForNote(referrer, currentUser.getUser());
+    Note unrelated = makeMe.aNote("Unrelated").underSameNotebookAs(target).please();
+    Note referrer = makeMe.aNote("Referrer").underSameNotebookAs(target).please();
+    NoteUpdateContentDTO content = new NoteUpdateContentDTO();
+    content.setContent("---\ntarget: \"[[Target]]\"\n---\nBody [[Unrelated]]");
+    textContentController.updateNoteContent(referrer, content);
 
     controller.deleteNote(target, removeFromPropertiesDeleteRequest());
 
-    assertThat(referrer.getContent(), equalTo("---\nsource: '[[Referrer]]'\n---\nBody [[Target]]"));
+    assertThat(referrer.getContent(), equalTo("---\ntype: Note\n---\nBody [[Unrelated]]"));
+    assertThat(
+        rowsFor(entityManager, referrer).stream()
+            .map(AuthoredNoteReferenceRow::getAuthoredLink)
+            .toList(),
+        contains("Unrelated"));
+    assertThat(
+        controller.showNote(referrer).getWikiLinks().stream()
+            .map(WikiLink::getDestinationNoteId)
+            .toList(),
+        contains(unrelated.getId()));
   }
 
   @Test

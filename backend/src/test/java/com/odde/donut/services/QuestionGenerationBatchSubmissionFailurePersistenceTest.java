@@ -19,6 +19,7 @@ import com.odde.donut.entities.User;
 import com.odde.donut.entities.repositories.QuestionGenerationBatchRepository;
 import com.odde.donut.entities.repositories.QuestionGenerationBatchRequestRepository;
 import com.odde.donut.services.openAiApis.OpenAiApiHandler;
+import com.odde.donut.testability.CommittedUserCleanup;
 import com.odde.donut.testability.MakeMe;
 import io.micrometer.core.instrument.MeterRegistry;
 import jakarta.persistence.EntityManager;
@@ -79,7 +80,7 @@ class QuestionGenerationBatchSubmissionFailurePersistenceTest {
   void cleanupCommittedState() {
     inCommittedTransaction(
         () ->
-            QuestionGenerationBatchCommittedUserCleanup.deleteByUserExternalIdentifierLike(
+            CommittedUserCleanup.deleteByUserExternalIdentifierLike(
                 entityManager, COMMITTED_USER_PREFIX + "%"));
   }
 

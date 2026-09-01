@@ -76,10 +76,17 @@ class AdminUserControllerTest extends ControllerTestBase {
     }
 
     private UserForListing listingFor(User user) throws UnexpectedNoAccessRightException {
-      return controller.listUsers(0, 10).getUsers().stream()
+      UserListingPage page = controller.listUsers(0, 10);
+      return page.getUsers().stream()
           .filter(u -> u.getId().equals(user.getId()))
           .findFirst()
-          .orElseThrow();
+          .orElseThrow(
+              () ->
+                  new AssertionError(
+                      ("Expected user id %s on listing page 0 (page size 10, totalCount %s). "
+                              + "This test assumes the database has no leftover users; "
+                              + "another test may have committed without cleaning up.")
+                          .formatted(user.getId(), page.getTotalCount())));
     }
   }
 }

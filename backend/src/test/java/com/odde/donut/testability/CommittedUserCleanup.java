@@ -1,12 +1,13 @@
-package com.odde.donut.services;
+package com.odde.donut.testability;
 
 import jakarta.persistence.EntityManager;
 
-final class QuestionGenerationBatchCommittedUserCleanup {
+/** Deletes a committed user and the fixture graph hanging off that user. */
+public final class CommittedUserCleanup {
 
-  private QuestionGenerationBatchCommittedUserCleanup() {}
+  private CommittedUserCleanup() {}
 
-  static void deleteByUserExternalIdentifierLike(
+  public static void deleteByUserExternalIdentifierLike(
       EntityManager entityManager, String externalIdentifierLike) {
     entityManager
         .createNativeQuery(

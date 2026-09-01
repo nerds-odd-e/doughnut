@@ -5,6 +5,7 @@ import static org.mockito.Mockito.reset;
 import com.odde.donut.entities.User;
 import com.odde.donut.entities.repositories.QuestionGenerationBatchRepository;
 import com.odde.donut.services.openAiApis.OpenAiApiHandler;
+import com.odde.donut.testability.CommittedUserCleanup;
 import com.odde.donut.testability.MakeMe;
 import jakarta.persistence.EntityManager;
 import java.sql.Timestamp;
@@ -69,7 +70,7 @@ abstract class QuestionGenerationBatchSubmitDueUsersTestBase {
   }
 
   private void deleteCommittedDueUserFixtures() {
-    QuestionGenerationBatchCommittedUserCleanup.deleteByUserExternalIdentifierLike(
+    CommittedUserCleanup.deleteByUserExternalIdentifierLike(
         entityManager, COMMITTED_USER_PREFIX + "%");
   }
 }
