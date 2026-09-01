@@ -29,6 +29,7 @@ public class FolderRelocationService {
   private final TestabilitySettings testabilitySettings;
   private final NoteTitlePlacementRules noteTitlePlacementRules;
   private final WikiLinkRewriteService wikiLinkRewriteService;
+  private final ResolvedWikiLinkService resolvedWikiLinkService;
   private final FolderSubtree subtree;
 
   public FolderRelocationService(
@@ -38,7 +39,8 @@ public class FolderRelocationService {
       EntityPersister entityPersister,
       TestabilitySettings testabilitySettings,
       NoteTitlePlacementRules noteTitlePlacementRules,
-      WikiLinkRewriteService wikiLinkRewriteService) {
+      WikiLinkRewriteService wikiLinkRewriteService,
+      ResolvedWikiLinkService resolvedWikiLinkService) {
     this.folderRepository = folderRepository;
     this.noteRepository = noteRepository;
     this.folderSiblingNameValidation = folderSiblingNameValidation;
@@ -46,6 +48,7 @@ public class FolderRelocationService {
     this.testabilitySettings = testabilitySettings;
     this.noteTitlePlacementRules = noteTitlePlacementRules;
     this.wikiLinkRewriteService = wikiLinkRewriteService;
+    this.resolvedWikiLinkService = resolvedWikiLinkService;
     this.subtree =
         new FolderSubtree(
             folderRepository, noteRepository, entityPersister, noteTitlePlacementRules);
@@ -114,7 +117,8 @@ public class FolderRelocationService {
             request != null && request.isMerge());
     if (mergeTarget.isPresent()) {
       subtree.mergeInto(folder, mergeTarget.get(), now);
-      rewriteWikiLinksForFolderMove(movedNoteIds, sourceNotebook, destinationNotebook, now, viewer);
+      rewriteAndRefreshWikiLinksForFolderNotebookMove(
+          movedNoteIds, sourceNotebook, destinationNotebook, now, viewer);
       return mergeTarget.get();
     }
 
@@ -126,11 +130,12 @@ public class FolderRelocationService {
     entityPersister.flush();
     entityPersister.merge(folder);
     entityPersister.flush();
-    rewriteWikiLinksForFolderMove(movedNoteIds, sourceNotebook, destinationNotebook, now, viewer);
+    rewriteAndRefreshWikiLinksForFolderNotebookMove(
+        movedNoteIds, sourceNotebook, destinationNotebook, now, viewer);
     return folder;
   }
 
-  private void rewriteWikiLinksForFolderMove(
+  private void rewriteAndRefreshWikiLinksForFolderNotebookMove(
       Set<Integer> movedNoteIds,
       Notebook sourceNotebook,
       Notebook destinationNotebook,
@@ -140,6 +145,8 @@ public class FolderRelocationService {
         movedNoteIds, destinationNotebook.getName(), now, viewer);
     wikiLinkRewriteService.rewriteOutgoingWikiLinksForFolderNotebookMove(
         movedNoteIds, sourceNotebook.getName(), now, viewer);
+    resolvedWikiLinkService.refreshCardinalityAcrossMovedNotebooks(
+        sourceNotebook, destinationNotebook, viewer);
   }
 
   private Folder resolveNewParentFolder(FolderMoveRequest request) {

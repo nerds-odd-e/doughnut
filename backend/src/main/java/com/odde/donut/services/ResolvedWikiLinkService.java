@@ -16,6 +16,7 @@ import jakarta.persistence.PersistenceContext;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import org.springframework.stereotype.Service;
@@ -178,5 +179,23 @@ public class ResolvedWikiLinkService {
   @Transactional
   public void refreshNotebookScope(Notebook notebook, User viewer) {
     resolvedWikiLinkRefresh.refreshNotebookScope(entityManager, notebook, viewer);
+  }
+
+  /**
+   * Content changing notebooks can add or remove a title/alias candidate from either notebook's
+   * Portable-path resolution scope. Re-resolve both. No-op when the move stayed in the same
+   * notebook.
+   */
+  @Transactional
+  public void refreshCardinalityAcrossMovedNotebooks(
+      Notebook sourceNotebook, Notebook destinationNotebook, User viewer) {
+    Integer sourceNotebookId = sourceNotebook != null ? sourceNotebook.getId() : null;
+    if (Objects.equals(sourceNotebookId, destinationNotebook.getId())) {
+      return;
+    }
+    if (sourceNotebook != null) {
+      refreshNotebookScope(sourceNotebook, viewer);
+    }
+    refreshNotebookScope(destinationNotebook, viewer);
   }
 }

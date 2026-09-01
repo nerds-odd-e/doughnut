@@ -126,3 +126,35 @@ Feature: Folder organization
     And I move the current folder to notebook "FolderXMerge New NB" folder "FolderXMerge Dest" and confirm merge
     Then I should see note "Root note" under open folder "Shared"
     And I should see note "Inner note" under open folder "Shared"
+
+  @mockBrowserTime
+  Scenario: Moving a folder across notebooks updates unrelated shorthand ambiguity
+    Given I have a notebook "FolderXAmb Old NB" with notes:
+      | Title             | Content                    | Folder                    |
+      | FolderXAmb Shared | stays in source            | FolderXAmb Old Root       |
+      | FolderXAmb Anchor | moves with folder          | FolderXAmb Old Root/Moved |
+      | FolderXAmb SrcRef | See [[FolderXAmb Shared]]. | FolderXAmb Old Root       |
+    And I have a notebook "FolderXAmb Old NB" with notes:
+      | Title             | Content    | Folder                    |
+      | FolderXAmb Shared | also moves | FolderXAmb Old Root/Moved |
+    And I have a notebook "FolderXAmb New NB" with notes:
+      | Title              | Content                    | Folder              |
+      | FolderXAmb Shared  | already in dest            | FolderXAmb New Root |
+      | FolderXAmb DestRef | See [[FolderXAmb Shared]]. | FolderXAmb New Root |
+    When I view note "FolderXAmb DestRef"
+    And I view the note content as rich content
+    Then the wiki link "FolderXAmb Shared" should open the note titled "FolderXAmb Shared"
+    And the note content on the current page should be "already in dest"
+    When I view note "FolderXAmb Anchor"
+    And I activate folder "Moved" under the open folder "FolderXAmb Old Root" in the sidebar
+    And I move folder "Moved" under "FolderXAmb Old Root" to notebook "FolderXAmb New NB" root
+    Then I should see sidebar folder "Moved"
+    When I route to the note "FolderXAmb DestRef"
+    And I view the note content as rich content
+    Then I should see wiki link "FolderXAmb Shared" as a dead wiki link
+    When I follow the dead wiki link "FolderXAmb Shared"
+    Then I should see that several notes match and I can choose one for a longer Portable path
+    When I route to the note "FolderXAmb SrcRef"
+    And I view the note content as rich content
+    Then the wiki link "FolderXAmb Shared" should open the note titled "FolderXAmb Shared"
+    And the note content on the current page should be "stays in source"

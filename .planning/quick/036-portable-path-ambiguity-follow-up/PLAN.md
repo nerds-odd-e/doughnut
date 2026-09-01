@@ -1,6 +1,6 @@
 # Wiki-link ambiguity and Markdown URL conformance
 
-**Status:** in progress (slices 1–10 done; next: slice 11)
+**Status:** in progress (slices 1–11 done; next: slice 12)
 
 ## Goal
 
@@ -232,23 +232,12 @@ restore: scope only. Prepares slice 11.
 
 ### 11. Cross-notebook folder moves refresh both shorthand scopes
 
-**Status:** planned
+**Status:** done
 **Type:** Behavior
 
-**Pre-condition:** A folder subtree contains a title or alias that is unique in
-the source notebook and collides—or resolves a collision—in the destination.
-
-**Trigger:** The learner moves or merges the subtree into another notebook.
-
-**Post-condition:** Unrelated shorthand referrers in both notebooks immediately
-change between `RESOLVED` and `AMBIGUOUS` as appropriate.
-
-Use the narrowed scope operation from slice 10 after existing inbound/outgoing
-wiki rewrite. Cover removal from the source and addition to the destination at
-the controller boundary, with the main transition in
-`folder_organization.feature`.
-
-Verification: full backend unit suite; focused `folder_organization.feature`.
+Cross-notebook folder move/merge refreshes shorthand cardinality on source and
+destination via `refreshCardinalityAcrossMovedNotebooks` after wiki rewrite.
+Covered at controller + `folder_organization.feature`.
 
 ### 12. Moving a note preserves exact wiki Portable paths
 

@@ -14,7 +14,6 @@ import com.odde.donut.services.WikiLinkRewriteService;
 import com.odde.donut.testability.TestabilitySettings;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
-import java.util.Objects;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -64,7 +63,8 @@ class RelationController {
         targetNotebook,
         testabilitySettings.getCurrentUTCTimestamp(),
         user);
-    refreshCardinalityAcrossMovedNotebooks(oldNotebook, targetNotebook, user);
+    resolvedWikiLinkService.refreshCardinalityAcrossMovedNotebooks(
+        oldNotebook, targetNotebook, user);
     return List.of(noteRealmService.build(sourceNote, user));
   }
 
@@ -97,25 +97,8 @@ class RelationController {
         targetNotebook,
         testabilitySettings.getCurrentUTCTimestamp(),
         user);
-    refreshCardinalityAcrossMovedNotebooks(oldNotebook, targetNotebook, user);
+    resolvedWikiLinkService.refreshCardinalityAcrossMovedNotebooks(
+        oldNotebook, targetNotebook, user);
     return List.of(noteRealmService.build(sourceNote, user));
-  }
-
-  /**
-   * A note changing notebooks can add or remove a title/alias candidate from either notebook's
-   * Portable-path resolution scope. Re-resolve both, unrelated to the specific referrer rewrite
-   * {@link WikiLinkRewriteService#rewriteWikiLinksForCrossNotebookMove} already performed. No-op
-   * when the note stayed in the same notebook.
-   */
-  private void refreshCardinalityAcrossMovedNotebooks(
-      Notebook oldNotebook, Notebook targetNotebook, User user) {
-    Integer oldNotebookId = oldNotebook != null ? oldNotebook.getId() : null;
-    if (Objects.equals(oldNotebookId, targetNotebook.getId())) {
-      return;
-    }
-    if (oldNotebook != null) {
-      resolvedWikiLinkService.refreshNotebookScope(oldNotebook, user);
-    }
-    resolvedWikiLinkService.refreshNotebookScope(targetNotebook, user);
   }
 }

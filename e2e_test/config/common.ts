@@ -43,6 +43,7 @@ const commonConfig = {
         'donut-backend-api'
       )
       const frontendRoutesPath = join(repoRoot, 'frontend', 'src', 'routes')
+      const frontendUtilsPath = join(repoRoot, 'frontend', 'src', 'utils')
       on(
         'file:preprocessor',
         createBundler({
@@ -50,6 +51,7 @@ const commonConfig = {
           alias: {
             '@generated/donut-backend-api': generatedBackendPath,
             '@/routes': frontendRoutesPath,
+            '@/utils': frontendUtilsPath,
           },
         })
       )
