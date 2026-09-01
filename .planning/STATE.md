@@ -6,9 +6,9 @@ current_phase: null
 current_phase_name: null
 status: ready
 stopped_at: null
-last_updated: "2026-09-01T07:22:00Z"
+last_updated: "2026-09-01T07:28:00Z"
 last_activity: 2026-09-01
-last_activity_desc: "Planned probe: skip notebook-scope wiki refresh on title/create"
+last_activity_desc: "Captured title/create wiki-refresh slowness note"
 progress:
   total_phases: 0
   completed_phases: 0
@@ -31,12 +31,12 @@ Scheduling follows Accepted [ADR 0003](../docs/adrs/0003-spaced-repetition-sched
 
 **Flyway:** every applied migration is squashed into `V100000000__baseline.sql`; `V300000300__db_migration_placeholder.sql` is the tip. New migrations use a greater version.
 
-Daily probe measurement (not an ADR): [daily-probe-protocol.md](notes/daily-probe-protocol.md).
+Daily probe measurement (not an ADR): [daily-probe-protocol.md](notes/daily-probe-protocol.md). Title/create slowness (notebook-scope wiki refresh): [notebook-scope-wiki-refresh-on-title-and-create.md](notes/notebook-scope-wiki-refresh-on-title-and-create.md).
 
 ## Operator Next Steps
 
 - After deploying the Flyway squash, confirm startup succeeded and `flyway_schema_history` shows the baseline repaired, the collapsed versions marked `DELETE`, and `V300000300` applied.
-- Title/create slowness probe (skip in-request `refreshNotebookScope`): `.planning/quick/038-skip-notebook-scope-refresh-on-title-and-create/PLAN.md` — planned, do not execute until asked.
+- Title/create slowness probe (skip in-request `refreshNotebookScope`): [issue note](notes/notebook-scope-wiki-refresh-on-title-and-create.md), plan `.planning/quick/038-skip-notebook-scope-refresh-on-title-and-create/PLAN.md` — planned, do not execute until asked.
 - Daily probe tap affordance (visible panels, stable board, press flash): `.planning/quick/033-daily-probe-tap-affordance/PLAN.md` — planned, do not execute until asked.
 - OpenAI transaction-boundary follow-up cleanup (test coverage gap, duplicated test helper, comment trim, dead code): `.planning/quick/037-openai-transaction-boundary-followup/PLAN.md` — planned, do not execute until asked.
 - Start the next milestone with `/gsd-new-milestone` when ready.
