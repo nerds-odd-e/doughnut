@@ -181,6 +181,14 @@ Implemented as:
 - Added a bare `@Transactional` to `EntityPersister.save(T)` (joins an existing
   TX or opens a short one) so `McqService`'s own `entityPersister.save(mcq)`,
   which now runs right after OpenAI returns with no ambient TX, still works.
+  Follow-up fix (same reasoning): `EntityPersister.merge(T)` and `.remove(T)`
+  needed the same `@Transactional` — CI caught a real regression on
+  `question_contest.feature` example #2 (`No EntityManager with actual
+  transaction available ... cannot reliably process 'merge' call`), because
+  `McqService.generateAFeasibleQuestion`'s internal regeneration loop calls
+  `contest()` → `entityPersister.merge(mcq)` during the same no-ambient-TX
+  OpenAI phase. `remove(T)` was fixed alongside it for the same reason,
+  pre-emptively.
 - New collaborator `RecallPromptPersister` (mirrors `EntityPersister` naming)
   with one `@Transactional` method `persistRecallPromptForMcq(Mcq,
   MemoryTracker)`: rechecks for a concurrently-created unanswered prompt and

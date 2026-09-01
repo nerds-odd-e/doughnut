@@ -25,10 +25,12 @@ public class EntityPersister {
     return entity;
   }
 
+  @Transactional
   public <T extends EntityIdentifiedByIdOnly> T merge(T entity) {
     return entityManager.merge(entity);
   }
 
+  @Transactional
   public <T extends EntityIdentifiedByIdOnly> T remove(T entity) {
     T merged = entityManager.merge(entity);
     entityManager.remove(merged);
