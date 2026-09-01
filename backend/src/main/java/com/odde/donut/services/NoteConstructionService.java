@@ -1,5 +1,7 @@
 package com.odde.donut.services;
 
+import com.odde.donut.algorithms.AuthoredNoteDocument;
+import com.odde.donut.algorithms.CanonicalDonutOrigin;
 import com.odde.donut.algorithms.NoteConceptType;
 import com.odde.donut.algorithms.NoteContentTitleHeading;
 import com.odde.donut.controllers.dto.ApiError;
@@ -36,6 +38,7 @@ public class NoteConstructionService {
   private final ResolvedWikiLinkService resolvedWikiLinkService;
   private final NoteService noteService;
   private final NoteTitlePlacementRules noteTitlePlacementRules;
+  private final CanonicalDonutOrigin canonicalDonutOrigin;
 
   @Autowired
   public NoteConstructionService(
@@ -46,7 +49,8 @@ public class NoteConstructionService {
       NoteRealmService noteRealmService,
       ResolvedWikiLinkService resolvedWikiLinkService,
       NoteService noteService,
-      NoteTitlePlacementRules noteTitlePlacementRules) {
+      NoteTitlePlacementRules noteTitlePlacementRules,
+      CanonicalDonutOrigin canonicalDonutOrigin) {
     this.authorizationService = authorizationService;
     this.testabilitySettings = testabilitySettings;
     this.folderRepository = folderRepository;
@@ -55,6 +59,7 @@ public class NoteConstructionService {
     this.resolvedWikiLinkService = resolvedWikiLinkService;
     this.noteService = noteService;
     this.noteTitlePlacementRules = noteTitlePlacementRules;
+    this.canonicalDonutOrigin = canonicalDonutOrigin;
   }
 
   private Note createNote(Notebook notebook, Folder folderOrNull, String title) {
@@ -73,8 +78,9 @@ public class NoteConstructionService {
 
   private void persistNoteContent(Note note, String content) {
     Timestamp ts = testabilitySettings.getCurrentUTCTimestamp();
-    note.setContent(
-        NoteConceptType.ensureStoredType(AuthoredNoteContent.prepareContentForSave(content)));
+    AuthoredNoteDocument document =
+        AuthoredNoteContent.prepareDocumentForSave(content, canonicalDonutOrigin);
+    note.replaceContent(document);
     note.setUpdatedAt(ts);
     entityPersister.save(note);
   }

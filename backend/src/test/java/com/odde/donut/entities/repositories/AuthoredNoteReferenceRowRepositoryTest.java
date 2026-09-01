@@ -1,5 +1,6 @@
 package com.odde.donut.entities.repositories;
 
+import static com.odde.donut.entities.repositories.AuthoredNoteReferenceRowTestSupport.rowsFor;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
@@ -24,10 +25,6 @@ class AuthoredNoteReferenceRowRepositoryTest {
   @Autowired MakeMe makeMe;
   @Autowired AuthoredNoteReferenceRowRepository authoredNoteReferenceRowRepository;
 
-  private List<AuthoredNoteReferenceRow> rowsFor(Note note) {
-    return authoredNoteReferenceRowRepository.findByNote_IdOrderByDocumentOrderAsc(note.getId());
-  }
-
   @Test
   void replaceContentPersistsOneRowPerReferenceInDocumentOrderAndReconstructsBothVariants() {
     Note note = makeMe.aNote().please();
@@ -39,7 +36,7 @@ class AuthoredNoteReferenceRowRepositoryTest {
     note.replaceContent(new AuthoredNoteDocument("updated body", List.of(wiki, noteIdUrl)));
     makeMe.entityPersister.flush();
 
-    List<AuthoredNoteReferenceRow> rows = rowsFor(note);
+    List<AuthoredNoteReferenceRow> rows = rowsFor(authoredNoteReferenceRowRepository, note);
     assertThat(rows, hasSize(2));
     assertThat(rows.get(0).getDocumentOrder(), equalTo(0));
     assertThat(rows.get(1).getDocumentOrder(), equalTo(1));
@@ -63,7 +60,7 @@ class AuthoredNoteReferenceRowRepositoryTest {
             List.of(new AuthoredNoteReference.NoteIdUrlTarget("[B](/n2)", 2, "/n2", "B"))));
     makeMe.entityPersister.flush();
 
-    List<AuthoredNoteReferenceRow> rows = rowsFor(note);
+    List<AuthoredNoteReferenceRow> rows = rowsFor(authoredNoteReferenceRowRepository, note);
     assertThat(rows, hasSize(1));
     assertThat(rows.getFirst().getAuthoredLink(), equalTo("[B](/n2)"));
   }

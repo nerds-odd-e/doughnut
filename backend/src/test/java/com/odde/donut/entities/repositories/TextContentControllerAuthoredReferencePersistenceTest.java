@@ -1,5 +1,6 @@
 package com.odde.donut.entities.repositories;
 
+import static com.odde.donut.entities.repositories.AuthoredNoteReferenceRowTestSupport.rowsFor;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
@@ -38,10 +39,6 @@ class TextContentControllerAuthoredReferencePersistenceTest extends ControllerTe
   @Autowired private ObjectMapper objectMapper;
   @Autowired private AuthoredNoteReferenceRowRepository authoredNoteReferenceRowRepository;
 
-  private List<AuthoredNoteReferenceRow> rowsFor(Note note) {
-    return authoredNoteReferenceRowRepository.findByNote_IdOrderByDocumentOrderAsc(note.getId());
-  }
-
   private void saveContent(Note note, String content) throws Exception {
     NoteUpdateContentDTO dto = new NoteUpdateContentDTO();
     dto.setContent(content);
@@ -72,7 +69,7 @@ class TextContentControllerAuthoredReferencePersistenceTest extends ControllerTe
 
     saveContent(carrier, content);
 
-    List<AuthoredNoteReferenceRow> rows = rowsFor(carrier);
+    List<AuthoredNoteReferenceRow> rows = rowsFor(authoredNoteReferenceRowRepository, carrier);
     assertThat(rows, hasSize(4));
     List<AuthoredNoteReference> references =
         rows.stream().map(AuthoredNoteReferenceRow::toDomainReference).toList();
@@ -91,9 +88,10 @@ class TextContentControllerAuthoredReferencePersistenceTest extends ControllerTe
 
     saveContent(carrier, "[[Resolved]]");
 
-    List<AuthoredNoteReferenceRow> rowsAfterChange = rowsFor(carrier);
+    List<AuthoredNoteReferenceRow> rowsAfterChange =
+        rowsFor(authoredNoteReferenceRowRepository, carrier);
     assertThat(rowsAfterChange, hasSize(1));
     assertThat(rowsAfterChange.getFirst().getAuthoredLink(), equalTo("Resolved"));
-    assertThat(rowsFor(resolved), hasSize(0));
+    assertThat(rowsFor(authoredNoteReferenceRowRepository, resolved), hasSize(0));
   }
 }
