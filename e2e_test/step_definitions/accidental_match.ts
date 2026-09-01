@@ -103,6 +103,19 @@ When(
   }
 )
 
+When('I open the accidental match resolve dialog', () => {
+  start.assumeAnsweredQuestionPage().openResolveDialog()
+})
+
+Then(
+  'add as overlapped for matched note {string} should be disabled',
+  (matchedNoteTitle: string) => {
+    start
+      .assumeAnsweredQuestionPage()
+      .expectAddAsOverlappedDisabledForMatchedNote(matchedNoteTitle)
+  }
+)
+
 When('I go back to the recall result', () => {
   start.assumeAnsweredQuestionPage().goBackToRecallResult()
 })

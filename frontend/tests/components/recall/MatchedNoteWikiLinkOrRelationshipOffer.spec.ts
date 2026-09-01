@@ -119,33 +119,7 @@ describe("MatchedNoteWikiLinkOrRelationshipOffer", () => {
     expect(wrapper.find("input").exists()).toBe(false)
   })
 
-  it("writes a wiki-link property via updateNoteContent and emits closeDialog", async () => {
-    const { reviewedRealm, matchedRealm } = buildReviewedAndMatched()
-    mockSdkService(NoteController, "authoredPortablePath", {
-      portablePath: "Matched Target",
-    })
-    const updateSpy = mockSdkService(
-      TextContentController,
-      "updateNoteContent",
-      reviewedRealm
-    )
-
-    const wrapper = mountOffer(reviewedRealm, matchedRealm)
-    await flushPromises()
-
-    await clickInsertWikiLinkAsProperty(wrapper)
-
-    expect(updateSpy).toHaveBeenCalledTimes(1)
-    const callArgs = updateSpy.mock.calls[0]![0] as {
-      path: { note: number }
-      body: { content?: string }
-    }
-    expect(callArgs.path.note).toBe(reviewedRealm.id)
-    expect(callArgs.body.content).toContain("[[Matched Target]]")
-    expect(wrapper.emitted("closeDialog")).toHaveLength(1)
-  })
-
-  it("writes the backend-authored (folder-qualified) Portable path, not a client-reconstructed title", async () => {
+  it("writes the backend-authored Portable path as a wiki-link property and closes", async () => {
     const { reviewedRealm, matchedRealm } = buildReviewedAndMatched()
     const authoredPortablePathSpy = mockSdkService(
       NoteController,
@@ -165,9 +139,12 @@ describe("MatchedNoteWikiLinkOrRelationshipOffer", () => {
 
     expect(authoredPortablePathSpy).toHaveBeenCalledTimes(1)
     const callArgs = updateSpy.mock.calls[0]![0] as {
+      path: { note: number }
       body: { content?: string }
     }
+    expect(callArgs.path.note).toBe(reviewedRealm.id)
     expect(callArgs.body.content).toContain("[[Folder/Matched Target]]")
+    expect(wrapper.emitted("closeDialog")).toHaveLength(1)
   })
 
   it("does not create a relationship note until the user confirms relation type", async () => {

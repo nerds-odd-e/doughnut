@@ -5,7 +5,7 @@ import type {
   User,
 } from "@generated/donut-backend-api"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
-import { buildWikiLinkText } from "@/utils/buildWikiLinkText"
+import { wikiLinkFromAuthoredToken } from "@/utils/authoredLinkMarkup"
 import helper from "@tests/helpers"
 import makeMe from "donut-test-fixtures/makeMe"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
@@ -95,17 +95,13 @@ export function accidentalMatchWithTwoMatchedNotes(
 export function reviewedRealmDeclaringMatch(
   reviewedRealm: NoteRealm,
   matchedRealm: NoteRealm,
-  property: "overlaps" | "aliases"
+  property: "overlaps" | "aliases",
+  options?: { portablePath?: string }
 ) {
-  const token = buildWikiLinkText(
-    {
-      noteTopology: matchedRealm.note.noteTopology,
-      notebookId: matchedRealm.notebookRealm.notebook.id,
-      notebookName: matchedRealm.notebookRealm.notebook.name,
-    },
-    { notebookId: reviewedRealm.notebookRealm.notebook.id }
-  )
-  return makeMe.aNoteRealm
+  const portablePath =
+    options?.portablePath ?? matchedRealm.note.noteTopology.title
+  const token = `[[${portablePath}]]`
+  let builder = makeMe.aNoteRealm
     .id(reviewedRealm.id)
     .title(reviewedRealm.note.noteTopology.title)
     .content(
@@ -121,5 +117,10 @@ ${property}:
       reviewedRealm.notebookRealm.notebook.id,
       reviewedRealm.notebookRealm.notebook.name
     )
-    .please()
+  if (property === "overlaps") {
+    builder = builder.wikiLinks([
+      wikiLinkFromAuthoredToken(portablePath, matchedRealm.id),
+    ])
+  }
+  return builder.please()
 }

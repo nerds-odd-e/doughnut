@@ -79,13 +79,14 @@ describe("AnsweredSpellingQuestion add as overlapped note", () => {
     expect(wrapper.emitted("retry")).toBeUndefined()
   })
 
-  it("disables add as overlapped when the match is already in overlaps", async () => {
+  it("disables add as overlapped when overlaps already names the destination via a folder-qualified wiki link", async () => {
     const { answeredQuestion, reviewedRealm, matchedA, matchedB } =
       accidentalMatchWithTwoMatchedNotes()
     const reviewedWithOverlap = reviewedRealmDeclaringMatch(
       reviewedRealm,
       matchedA,
-      "overlaps"
+      "overlaps",
+      { portablePath: "Folder/Matched A" }
     )
 
     wrapper = mountAnsweredSpellingQuestion(answeredQuestion, {

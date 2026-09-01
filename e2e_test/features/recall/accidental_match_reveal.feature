@@ -8,10 +8,10 @@ Feature: Accidental match reveal
   Background:
     Given I am logged in as an existing user
     And I have a notebook "English practice" with notes:
-      | Title    | Content                        |
-      | English  |                                |
-      | sedition | Sedition means incite violence |
-      | sedation | Put to sleep is sedation       |
+      | Title    | Content                        | Folder |
+      | English  |                                |        |
+      | sedition | Sedition means incite violence |        |
+      | sedation | Put to sleep is sedation       | Meds   |
     And the notes "English" are skipped from the assimilation sequence
     And It's day 1
     And the note "sedition" was assimilated as spelling on day 1
@@ -55,3 +55,19 @@ Feature: Accidental match reveal
     When I open resolve and navigate to matched note "sedation"
     And I go back to the recall result
     Then I should see resolve available again for spelling answer "sedation" with matched note "sedation"
+
+  Scenario: Existing folder-qualified overlap disables add as overlapped for that destination
+    Given note "sedition" has content:
+      """
+      ---
+      overlaps:
+        - "[[Meds/sedation]]"
+      ---
+      Sedition means incite violence
+      """
+    When I visit recall for a due recall prompt on day 2
+    Then I should be asked spelling question "means incite violence" from notebook "English practice"
+    When I type my answer "sedation"
+    Then I should see an accidental match reveal for spelling answer "sedation" with reviewed note "sedition" and matched note "sedation"
+    When I open the accidental match resolve dialog
+    Then add as overlapped for matched note "sedation" should be disabled

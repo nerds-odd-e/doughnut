@@ -1,3 +1,9 @@
+import type { WikiLink } from "@generated/donut-backend-api"
+import {
+  noteIdForAuthoredToken,
+  parseWholeWikiLinkItem,
+  isWellFormedWholeWikiLinkItem,
+} from "@/utils/authoredLinkMarkup"
 import {
   findStringListPropertyKey,
   normalizedLookupKey,
@@ -7,7 +13,7 @@ import {
   isListPropertyValue,
   type NoteProperties,
 } from "@/utils/noteProperties"
-import { isWellFormedWholeWikiLinkItem } from "@/utils/authoredLinkMarkup"
+import { wikiLinkNoteIdLookup } from "@/utils/wikiLinkMarkup"
 
 function overlapWikiLinkTokensFromProperties(
   properties: NoteProperties
@@ -35,7 +41,7 @@ function overlapWikiLinkTokensFromProperties(
  * Wiki-link items under `aliases` do not contribute. Mirrors backend
  * `FrontmatterOverlaps.overlapWikiLinkTokensFromNoteContent`.
  */
-export function overlapWikiLinkTokensFromNoteContent(
+function overlapWikiLinkTokensFromNoteContent(
   contentMarkdown: string
 ): string[] {
   const parsed = parseNoteContentMarkdown(contentMarkdown)
@@ -43,15 +49,19 @@ export function overlapWikiLinkTokensFromNoteContent(
   return overlapWikiLinkTokensFromProperties(parsed.properties)
 }
 
-/** True when `wikiLinkToken` is already among authored `overlaps` tokens. */
-export function noteContentDeclaresOverlapWikiLink(
+/**
+ * True when authored `overlaps` already names `destinationNoteId` via a
+ * resolved wiki link — compared by destination id, not reconstructed spelling.
+ */
+export function noteContentDeclaresOverlapToDestination(
   contentMarkdown: string,
-  wikiLinkToken: string
+  wikiLinks: readonly WikiLink[],
+  destinationNoteId: number
 ): boolean {
-  const trimmed = wikiLinkToken.trim()
-  if (!trimmed) return false
-  const targetKey = normalizedLookupKey(trimmed)
-  return overlapWikiLinkTokensFromNoteContent(contentMarkdown).some(
-    (existing) => normalizedLookupKey(existing) === targetKey
-  )
+  const lookup = wikiLinkNoteIdLookup(wikiLinks)
+  return overlapWikiLinkTokensFromNoteContent(contentMarkdown).some((token) => {
+    const parsed = parseWholeWikiLinkItem(token)
+    if (!parsed) return false
+    return noteIdForAuthoredToken(parsed.inner, lookup) === destinationNoteId
+  })
 }

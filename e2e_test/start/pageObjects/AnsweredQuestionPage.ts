@@ -128,6 +128,17 @@ const assumeAnsweredQuestionPage = () => {
       cy.findByTestId('accidental-match-resolve-dialog').should('be.visible')
       return self
     },
+    expectAddAsOverlappedDisabledForMatchedNote(matchedNoteTitle: string) {
+      cy.findByTestId('accidental-match-resolve-dialog')
+        .should('be.visible')
+        .and('contain.text', matchedNoteTitle)
+        .within(() => {
+          cy.get('[data-testid^="add-as-overlapped-note-"]').should(
+            'be.disabled'
+          )
+        })
+      return self
+    },
     clickMatchedNoteTitle(title: string) {
       cy.findByTestId('accidental-match-resolve-dialog').within(() => {
         cy.contains('a', title).should('be.visible').click()

@@ -1,6 +1,6 @@
 # Wiki-link ambiguity and Markdown URL conformance
 
-**Status:** in progress (slices 1–5 done; next: slice 6)
+**Status:** in progress (slices 1–6 done; next: slice 7)
 
 ## Goal
 
@@ -186,28 +186,12 @@ Missing and ambiguous “point at existing note” repairs use backend
 
 ### 6. An authored overlap is recognized by destination
 
-**Status:** planned
+**Status:** done
 **Type:** Behavior
 
-**Pre-condition:** The reviewed note already declares a folder- or
-notebook-qualified `overlaps` wiki link to the matched note.
-
-**Trigger:** The accidental-match resolution dialog opens.
-
-**Post-condition:** “Add as overlapped note” is disabled for that destination
-and no duplicate spelling can be appended.
-
-- Correlate `overlaps` tokens with resolved `wikiLinks` and compare
-  `destinationNoteId`; do not reconstruct a shorthand.
-- Keep `aliases` excluded from overlap detection.
-- Delete `buildWikiLinkText.ts` and its direct test after its final production
-  caller is gone.
-- Consolidate the redundant matched-property and append-overlap pairs from
-  finding 18.
-- Extend `accidental_match_reveal.feature` with an existing qualified overlap.
-
-Verification: full frontend unit suite; focused
-`accidental_match_reveal.feature`.
+Overlap detection uses resolved `wikiLinks` + `destinationNoteId` (not
+reconstructed shorthand). `buildWikiLinkText` deleted. Finding-18 pairs
+consolidated; E2E covers existing qualified overlap.
 
 ### 7. Authored note references have a syntax-neutral model
 
