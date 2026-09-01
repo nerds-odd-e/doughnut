@@ -1,6 +1,6 @@
 # Question generation: OpenAI FAILED is loud
 
-**Status:** in progress (slice 1 done)
+**Status:** in progress (slices 1–2 done)
 
 ## Goal
 
@@ -36,9 +36,9 @@ Intended sequence for that status:
 
 ## Remaining gap
 
-- Submit-time OpenAI exceptions save `FAILED` then **return false** inside
-  `REQUIRES_NEW` (`QuestionGenerationBatchUserSubmissionTx`). Throwing from
-  that same transaction would **roll back** the `FAILED` row (slices 2–3).
+- Submit-time OpenAI exceptions still **return false** after the committed
+  `FAILED` row. Slice 3 throws instead so the hourly job writes a Failure
+  report. The nested persist from slice 2 keeps that row.
 
 ## Design
 
@@ -65,15 +65,15 @@ persists without throwing.
 tests that grew past 250 lines were split into
 `QuestionGenerationBatchPollingScopeTest`.
 
-### 2. Commit submit-time FAILED outside the user tx — Structure — planned
+### 2. Commit submit-time FAILED outside the user tx — Structure — done
 
-**What it changes:** Local `FAILED` from upload/create exceptions is
-committed in a nested transaction that **survives** a later throw from
-`processDueUser` / `submitPlannedBatch`. No new user-visible throw yet.
+Submit-time `FAILED` is persisted in `QuestionGenerationBatchSubmissionFailureTx`
+(`REQUIRES_NEW`). Planning is committed first via
+`planAndCommitLocalBatchForUser` so the nested failure persist can update
+those rows (MySQL lock). `submitPlannedBatch` still returns `false`.
 
-**What it enables:** Slice 3.
-
-Existing submission tests stay green (still `FAILED` + `return false`).
+**Learning:** Nested `REQUIRES_NEW` cannot update rows still held by the
+user tx; the planned insert must commit before upload/create.
 
 ### 3. Submit-time OpenAI exception throws after FAILED is committed — Behavior — planned
 
