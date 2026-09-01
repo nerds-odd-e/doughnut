@@ -68,7 +68,7 @@ describe("propertyValueField utils", () => {
     const html = propertyValuePlainToDisplayHtml("[Moon](/Moon.md)", [
       {
         authoredLink: "[Moon](/Moon.md)",
-        portablePath: "/Moon.md",
+        target: "/Moon.md",
         displayText: "Moon",
         resolution: "RESOLVED",
         destinationNoteId: 42,

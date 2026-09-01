@@ -1,5 +1,6 @@
 package com.odde.donut.services;
 
+import com.odde.donut.algorithms.NoteIdUrl;
 import com.odde.donut.algorithms.WikiLinkPropertyMatch;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
@@ -79,6 +80,9 @@ final class ResolvedWikiLinkRefresh {
     LinkedHashSet<Integer> referrerIdsToReindex = new LinkedHashSet<>();
     for (ResolvedWikiLink row :
         resolvedWikiLinkRepository.findRowsReferringToNonDeletedNotesForTarget(targetId)) {
+      if (NoteIdUrl.isAuthoredMarkdownNoteIdUrl(row.getAuthoredLink())) {
+        continue;
+      }
       Integer referrerId = row.getSourceNote().getId();
       if (referrerId.equals(targetId)) {
         continue;

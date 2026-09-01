@@ -55,7 +55,7 @@ final class AccidentalWikiLinkMatches {
         noteAliasIndexRepository.findByAliasLookupKeyOrderByNoteIdAsc(lookupKey)) {
       notes.add(row.getNote());
     }
-    return WikiLinkResolver.distinctByNoteId(notes);
+    return WikiLinkNoteCandidates.distinctByNoteId(notes);
   }
 
   private void addReadableAccidentalCandidates(

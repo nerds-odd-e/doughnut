@@ -1,6 +1,6 @@
 # Wiki-link ambiguity and Markdown URL conformance
 
-**Status:** in progress (slices 1–7 done; next: slice 8)
+**Status:** in progress (slices 1–8 done; next: slice 9)
 
 ## Goal
 
@@ -205,34 +205,12 @@ Prepares slice 8.
 
 ### 8. A root-relative Donut note URL contributes one semantic reference
 
-**Status:** planned
+**Status:** done
 **Type:** Behavior
 
-**Pre-condition:** A source note contains `[any display](/n1234)` and note 1234
-exists; the display text need not match its title.
-
-**Trigger:** The source is saved/indexed or a reference/graph consumer opens
-either note.
-
-**Post-condition:** Note 1234 is the deterministic outgoing destination and the
-source appears as its inbound reference, while stored/rendered Markdown remains
-`[any display](/n1234)`.
-
-- Recognize only the canonical compact path, not retired redirects, query/hash
-  variants, or a label-derived destination.
-- Resolve by note ID, keep missing/deleted IDs as ordinary Markdown, and apply
-  normal authorization when references are read.
-- Generalize the public `WikiLink` target field/name only as required so one
-  DTO can describe wiki Portable paths and recognized URLs without calling a
-  URL a Portable path; regenerate the TypeScript client.
-- Keep URL anchors as ordinary Markdown DOM anchors—semantic indexing must not
-  make editor serialization convert them.
-- Cover wrong display text, missing ID, and exact route grammar at controller /
-  pure parser boundaries; drive the main reference behavior through
-  `markdown_link.feature`.
-
-Verification: full backend/frontend unit suites; focused
-`markdown_link.feature`; regenerate TypeScript API.
+Exact `[display](/nID)` indexes by note ID (missing IDs stay ordinary Markdown).
+Public `WikiLink.portablePath` → `target`; TypeScript client regenerated.
+Editor keeps ordinary URL anchors.
 
 ### 9. A full Donut note URL contributes the same semantic reference
 

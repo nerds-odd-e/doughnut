@@ -248,7 +248,7 @@ export type NotebookRealm = {
 
 export type WikiLink = {
     authoredLink: string;
-    portablePath: string;
+    target: string;
     displayText: string;
     resolution: 'RESOLVED' | 'UNRESOLVED' | 'AMBIGUOUS';
     /**

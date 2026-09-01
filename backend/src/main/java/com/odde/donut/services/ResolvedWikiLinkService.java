@@ -1,6 +1,7 @@
 package com.odde.donut.services;
 
 import com.odde.donut.algorithms.AuthoredNoteReference;
+import com.odde.donut.algorithms.AuthoredNoteReferences;
 import com.odde.donut.algorithms.WikiLinkPropertyMatch;
 import com.odde.donut.controllers.dto.WikiLink;
 import com.odde.donut.entities.Note;
@@ -12,13 +13,10 @@ import com.odde.donut.entities.repositories.ResolvedWikiLinkRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.BiPredicate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -53,6 +51,10 @@ public class ResolvedWikiLinkService {
             noteRepository);
   }
 
+  private InboundResolvedWikiLinks inbound() {
+    return new InboundResolvedWikiLinks(resolvedWikiLinkRepository, entityManager);
+  }
+
   public List<WikiLink> wikiLinksForViewer(Note focusNote, User viewer) {
     List<WikiLink> out = new ArrayList<>();
     Set<String> emittedAuthored = new LinkedHashSet<>();
@@ -60,15 +62,7 @@ public class ResolvedWikiLinkService {
         resolvedWikiLinkRepository.findBySourceNote_IdOrderByIdAsc(focusNote.getId())) {
       Note resolved = authorizedOutgoingTargetNote(focusNote, row, viewer);
       if (resolved != null) {
-        AuthoredNoteReference.WikiPortablePathTarget wiki =
-            AuthoredNoteReference.WikiPortablePathTarget.fromAuthoredInner(row.getAuthoredLink());
-        out.add(
-            new WikiLink(
-                row.getAuthoredLink(),
-                wiki.portablePath().format(),
-                wiki.displayText(),
-                WikiLink.Resolution.RESOLVED,
-                resolved.getId()));
+        out.add(WikiLinks.resolvedFromStoredAuthoredLink(row.getAuthoredLink(), resolved.getId()));
         emittedAuthored.add(row.getAuthoredLink());
       }
     }
@@ -109,12 +103,17 @@ public class ResolvedWikiLinkService {
       return null;
     }
     Note resolved = entityManager.find(Note.class, target.getId());
-    if (resolved == null
-        || !WikiLinkPropertyMatch.matchesTargetNoteContent(
-            row.getAuthoredLink(), resolved.getContent())) {
+    if (resolved == null) {
       return null;
     }
-    return resolved;
+    return switch (AuthoredNoteReferences.fromStoredAuthoredLink(row.getAuthoredLink())) {
+      case AuthoredNoteReference.NoteIdUrlTarget ignored -> resolved;
+      case AuthoredNoteReference.WikiPortablePathTarget ignored ->
+          WikiLinkPropertyMatch.matchesTargetNoteContent(
+                  row.getAuthoredLink(), resolved.getContent())
+              ? resolved
+              : null;
+    };
   }
 
   /**
@@ -123,32 +122,7 @@ public class ResolvedWikiLinkService {
    * notebook vs the focal notebook and {@link User#canReferTo}.
    */
   public List<Note> inboundReferrerNotesForViewer(Note focalNote, User viewer) {
-    return distinctReferrersFromTargetRows(focalNote, viewer, (row, referrer) -> true);
-  }
-
-  /**
-   * Walks resolved wiki-link rows targeting {@code focalNote}, dedupes by referring note id,
-   * applies {@code rowMatches} before visibility.
-   */
-  private List<Note> distinctReferrersFromTargetRows(
-      Note focalNote, User viewer, BiPredicate<ResolvedWikiLink, Note> rowMatches) {
-    List<ResolvedWikiLink> rows =
-        resolvedWikiLinkRepository.findRowsReferringToNonDeletedNotesForTarget(focalNote.getId());
-    LinkedHashMap<Integer, Note> distinctOrder = new LinkedHashMap<>();
-    for (ResolvedWikiLink row : rows) {
-      Integer referrerId = row.getSourceNote().getId();
-      if (distinctOrder.containsKey(referrerId)) {
-        continue;
-      }
-      Note referrer = entityManager.find(Note.class, referrerId);
-      if (referrer == null || !rowMatches.test(row, referrer)) {
-        continue;
-      }
-      if (inboundReferrerVisible(referrer, focalNote, viewer)) {
-        distinctOrder.put(referrerId, referrer);
-      }
-    }
-    return List.copyOf(distinctOrder.values());
+    return inbound().referrerNotesForViewer(focalNote, viewer);
   }
 
   /**
@@ -158,9 +132,7 @@ public class ResolvedWikiLinkService {
    * retrieval.
    */
   public List<Note> referencesNotesForViewer(Note focalNote, User viewer) {
-    return inboundReferrerNotesForViewer(focalNote, viewer).stream()
-        .sorted(Comparator.comparing(Note::getId))
-        .toList();
+    return inbound().referencesNotesForViewer(focalNote, viewer);
   }
 
   /**
@@ -168,9 +140,7 @@ public class ResolvedWikiLinkService {
    * targetNoteId}. Used to require an explicit reference-handling choice on title rename.
    */
   public boolean hasInboundResolvedWikiLinkRowsFromNonDeletedReferrers(Integer targetNoteId) {
-    return !resolvedWikiLinkRepository
-        .findRowsReferringToNonDeletedNotesForTarget(targetNoteId)
-        .isEmpty();
+    return inbound().hasRowsFromNonDeletedReferrers(targetNoteId);
   }
 
   /**
@@ -183,54 +153,8 @@ public class ResolvedWikiLinkService {
       Set<Integer> excludeNoteIds,
       int cap,
       Optional<Long> sampleSeed) {
-    if (cap <= 0 || focalNote.getId() == null) {
-      return List.of();
-    }
-    Integer focalNotebookId =
-        focalNote.getNotebook() != null ? focalNote.getNotebook().getId() : null;
-    Integer viewerId = viewer != null ? viewer.getId() : null;
-    List<Integer> excludeIds = excludeIdsForNativeIn(excludeNoteIds);
-    return sampleSeed
-        .map(
-            seed ->
-                resolvedWikiLinkRepository.findInboundReferrersForTargetBySeedLimited(
-                    focalNote.getId(),
-                    focalNotebookId,
-                    viewerId,
-                    excludeIds,
-                    Long.toString(seed),
-                    cap))
-        .orElseGet(
-            () ->
-                resolvedWikiLinkRepository.findInboundReferrersForTargetByIdAscLimited(
-                    focalNote.getId(), focalNotebookId, viewerId, excludeIds, cap));
-  }
-
-  private static List<Integer> excludeIdsForNativeIn(Set<Integer> excludeNoteIds) {
-    LinkedHashSet<Integer> ids = new LinkedHashSet<>();
-    for (Integer id : excludeNoteIds) {
-      if (id != null) {
-        ids.add(id);
-      }
-    }
-    if (ids.isEmpty()) {
-      return List.of(-1);
-    }
-    return List.copyOf(ids);
-  }
-
-  private static boolean inboundReferrerVisible(Note referrer, Note focalNote, User viewer) {
-    Notebook referrerNotebook = referrer.getNotebook();
-    Notebook focalNotebook = focalNote.getNotebook();
-    if (referrerNotebook != null
-        && focalNotebook != null
-        && referrerNotebook.getId().equals(focalNotebook.getId())) {
-      return true;
-    }
-    if (viewer == null || referrerNotebook == null) {
-      return false;
-    }
-    return viewer.canReferTo(referrerNotebook);
+    return inbound()
+        .sampledReferencesNotesForFocusContext(focalNote, viewer, excludeNoteIds, cap, sampleSeed);
   }
 
   @Transactional

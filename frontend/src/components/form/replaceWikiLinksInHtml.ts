@@ -68,13 +68,13 @@ function upgradeUnresolvedWikiAnchors(
 
   for (const w of wikiLinks) {
     if (!isResolvedWikiLink(w)) continue
-    const href = hrefForResolvedWikiTarget(w.destinationNoteId, w.portablePath)
+    const href = hrefForResolvedWikiTarget(w.destinationNoteId, w.target)
     for (const a of [...wrap.querySelectorAll(unresolvedAnchorSelector)]) {
       const portablePath = a.getAttribute(WIKI_LINK_PORTABLE_PATH_ATTR)
       if (portablePath !== null && portablePath !== "") {
         if (
-          portablePath !== w.portablePath &&
-          portablePath.trim() !== w.portablePath.trim()
+          portablePath !== w.target &&
+          portablePath.trim() !== w.target.trim()
         )
           continue
         if (!wikiAnchorDisplayMatches(a, w.displayText)) continue
@@ -84,7 +84,7 @@ function upgradeUnresolvedWikiAnchors(
       a.outerHTML = wikiLinkAnchorHtml({
         href,
         className: DONUT_WIKI_LINK_CLASS,
-        portablePath: w.portablePath,
+        portablePath: w.target,
         display: w.displayText,
         noteId: w.destinationNoteId,
       })
@@ -158,9 +158,9 @@ export function replaceWikiLinksInHtml(
     result = result.replaceAll(
       `[[${w.authoredLink}]]`,
       wikiLinkAnchorHtml({
-        href: hrefForResolvedWikiTarget(w.destinationNoteId, w.portablePath),
+        href: hrefForResolvedWikiTarget(w.destinationNoteId, w.target),
         className: DONUT_WIKI_LINK_CLASS,
-        portablePath: w.portablePath,
+        portablePath: w.target,
         display: w.displayText,
         noteId: w.destinationNoteId,
       })

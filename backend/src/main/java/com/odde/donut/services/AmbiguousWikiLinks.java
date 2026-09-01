@@ -32,13 +32,7 @@ final class AmbiguousWikiLinks {
       if (!wikiLinkResolver.isAmbiguousToken(token, focusNote, viewer)) {
         continue;
       }
-      out.add(
-          new WikiLink(
-              token,
-              wiki.portablePath().format(),
-              wiki.displayText(),
-              WikiLink.Resolution.AMBIGUOUS,
-              null));
+      out.add(WikiLinks.ambiguous(wiki));
     }
     return List.copyOf(out);
   }

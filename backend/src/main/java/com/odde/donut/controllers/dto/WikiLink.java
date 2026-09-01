@@ -17,18 +17,18 @@ public class WikiLink {
     AMBIGUOUS
   }
 
-  /** Full wiki link inner text as stored in markdown (between {@code [[} and {@code ]]}}). */
+  /** Full authored link spelling as stored (wiki inner, or Markdown {@code [display](href)}). */
   @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
   private String authoredLink;
 
-  /** Portable path used for resolution (part before {@code |}). */
-  @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
-  private String portablePath;
-
   /**
-   * Visible label in rich mode (part after {@code |}, or same as the link's Portable path when
-   * absent).
+   * Resolution target spelling: wiki Portable path (part before {@code |}), or recognized note URL
+   * href (e.g. {@code /n1234}). Not every value is a Portable path.
    */
+  @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
+  private String target;
+
+  /** Visible label in rich mode (wiki part after {@code |}, or Markdown link display text). */
   @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
   private String displayText;
 

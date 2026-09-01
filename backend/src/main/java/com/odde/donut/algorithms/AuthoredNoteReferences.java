@@ -1,13 +1,15 @@
 package com.odde.donut.algorithms;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Matcher;
 
 /**
- * Extracts {@link AuthoredNoteReference} values from note content. Currently emits only {@link
- * AuthoredNoteReference.WikiPortablePathTarget}; note-ID URL recognition is not wired yet.
+ * Extracts {@link AuthoredNoteReference} values from note content: wiki Portable-path targets and
+ * recognized root-relative note-ID URLs.
  */
 public final class AuthoredNoteReferences {
 
@@ -15,7 +17,7 @@ public final class AuthoredNoteReferences {
 
   /**
    * Authored note references in document order: frontmatter scalar and list-item strings first,
-   * then the body. Today only wiki Portable-path targets are emitted.
+   * then the body.
    */
   public static List<AuthoredNoteReference> inOccurrenceOrder(String content) {
     if (content == null || content.isEmpty()) {
@@ -62,11 +64,40 @@ public final class AuthoredNoteReferences {
   }
 
   static List<AuthoredNoteReference> fromMarkdownFragment(String markdown) {
-    List<AuthoredNoteReference> refs = new ArrayList<>();
-    for (String inner : WikiLinkMarkdown.authoredTokensInOccurrenceOrder(markdown)) {
-      refs.add(AuthoredNoteReference.WikiPortablePathTarget.fromAuthoredInner(inner));
+    if (markdown == null || markdown.isEmpty()) {
+      return List.of();
+    }
+    record Hit(int start, AuthoredNoteReference ref) {}
+    List<Hit> hits = new ArrayList<>();
+    Matcher wiki = WikiLinkMarkdown.INNER_LINK_PATTERN.matcher(markdown);
+    while (wiki.find()) {
+      String inner = wiki.group(1).trim();
+      if (!inner.isEmpty()) {
+        hits.add(
+            new Hit(
+                wiki.start(),
+                AuthoredNoteReference.WikiPortablePathTarget.fromAuthoredInner(inner)));
+      }
+    }
+    Matcher md = NoteIdUrl.MARKDOWN_LINK.matcher(markdown);
+    while (md.find()) {
+      NoteIdUrl.fromMarkdownLinkMatch(md.group(), md.group(1), md.group(2))
+          .ifPresent(url -> hits.add(new Hit(md.start(), url)));
+    }
+    hits.sort(Comparator.comparingInt(Hit::start));
+    List<AuthoredNoteReference> refs = new ArrayList<>(hits.size());
+    for (Hit hit : hits) {
+      refs.add(hit.ref());
     }
     return refs;
+  }
+
+  /** Rebuilds a reference from a resolved-row {@code authored_link} value. */
+  public static AuthoredNoteReference fromStoredAuthoredLink(String authoredLink) {
+    return NoteIdUrl.tryParseAuthoredMarkdownLink(authoredLink)
+        .map(AuthoredNoteReference.class::cast)
+        .orElseGet(
+            () -> AuthoredNoteReference.WikiPortablePathTarget.fromAuthoredInner(authoredLink));
   }
 
   private static String dedupeKey(AuthoredNoteReference ref) {

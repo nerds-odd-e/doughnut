@@ -9,7 +9,7 @@ describe("authoredLinkMarkup", () => {
   it("wikiLinkFromAuthoredToken names RESOLVED with destinationNoteId", () => {
     expect(wikiLinkFromAuthoredToken("MyNote", 42)).toEqual({
       authoredLink: "MyNote",
-      portablePath: "MyNote",
+      target: "MyNote",
       displayText: "MyNote",
       resolution: "RESOLVED",
       destinationNoteId: 42,

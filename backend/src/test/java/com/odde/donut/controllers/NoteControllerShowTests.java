@@ -71,7 +71,7 @@ class NoteControllerShowTests extends ControllerTestBase {
     assertThat(realm.getWikiLinks(), hasSize(1));
     WikiLink wt = realm.getWikiLinks().get(0);
     assertThat(wt.getAuthoredLink(), equalTo("LinkedPage"));
-    assertThat(wt.getPortablePath(), equalTo("LinkedPage"));
+    assertThat(wt.getTarget(), equalTo("LinkedPage"));
     assertThat(wt.getDisplayText(), equalTo("LinkedPage"));
     assertThat(wt.getResolution(), equalTo(WikiLink.Resolution.RESOLVED));
     assertThat(wt.getDestinationNoteId(), equalTo(matched.getId()));
@@ -113,7 +113,7 @@ class NoteControllerShowTests extends ControllerTestBase {
     assertThat(realm.getWikiLinks(), hasSize(1));
     WikiLink wt = realm.getWikiLinks().get(0);
     assertThat(wt.getAuthoredLink(), equalTo("WikiDup Shared"));
-    assertThat(wt.getPortablePath(), equalTo("WikiDup Shared"));
+    assertThat(wt.getTarget(), equalTo("WikiDup Shared"));
     assertThat(wt.getDisplayText(), equalTo("WikiDup Shared"));
     assertThat(wt.getResolution(), equalTo(WikiLink.Resolution.AMBIGUOUS));
     assertThat(wt.getDestinationNoteId(), nullValue());
@@ -184,7 +184,7 @@ class NoteControllerShowTests extends ControllerTestBase {
             .please();
     WikiLink wt = showWithWikiTitles(viewer).getWikiLinks().get(0);
     assertThat(wt.getAuthoredLink(), equalTo("Target Title|friendly label"));
-    assertThat(wt.getPortablePath(), equalTo("Target Title"));
+    assertThat(wt.getTarget(), equalTo("Target Title"));
     assertThat(wt.getDisplayText(), equalTo("friendly label"));
     assertThat(wt.getDestinationNoteId(), equalTo(matched.getId()));
   }
@@ -204,8 +204,26 @@ class NoteControllerShowTests extends ControllerTestBase {
             .content("See [[Other Notebook:LinkedPage]] for more.")
             .please();
     WikiLink wt = showWithWikiTitles(viewer).getWikiLinks().get(0);
-    assertThat(wt.getPortablePath(), equalTo("Other Notebook:LinkedPage"));
+    assertThat(wt.getTarget(), equalTo("Other Notebook:LinkedPage"));
     assertThat(wt.getDestinationNoteId(), equalTo(targetInOther.getId()));
+  }
+
+  @Test
+  void rootRelativeNoteUrl_appearsAsInboundReferenceOnTarget()
+      throws UnexpectedNoAccessRightException {
+    Note target =
+        makeMe.aNote().notebookOwnedBy(currentUser.getUser()).title("Url Target").please();
+    Note source =
+        makeMe
+            .aNote()
+            .underSameNotebookAs(target)
+            .content("[any display](/n" + target.getId() + ")")
+            .please();
+    resolvedWikiLinkService.refreshForNote(source, currentUser.getUser());
+
+    NoteRealm targetRealm = controller.showNote(target);
+    assertThat(targetRealm.getReferences(), hasSize(1));
+    assertThat(targetRealm.getReferences().getFirst().getId(), equalTo(source.getId()));
   }
 
   @Test

@@ -148,3 +148,41 @@ When(
 Then('I should not see the References section', () => {
   cy.findByRole('heading', { name: 'References' }).should('not.exist')
 })
+
+Then('I should see the References section', () => {
+  cy.findByRole('heading', { name: 'References' }).should('be.visible')
+})
+
+Then('I should see {string} in the References section', (noteTitle: string) => {
+  cy.findByRole('heading', { name: 'References' })
+    .parent()
+    .should('contain.text', noteTitle)
+})
+
+When(
+  'I update note {string} content using markdown to become a note URL to {string} with display {string}',
+  (sourceTitle: string, targetTitle: string, display: string) => {
+    start
+      .testability()
+      .getInjectedNoteIdByTitle(targetTitle)
+      .then((noteId: number) => {
+        start
+          .jumpToNotePage(sourceTitle)
+          .updateContentAsMarkdown(`[${display}](/n${noteId})`)
+      })
+  }
+)
+
+Then(
+  'the note content markdown source should contain a note URL to {string} with display {string}',
+  (targetTitle: string, display: string) => {
+    start
+      .testability()
+      .getInjectedNoteIdByTitle(targetTitle)
+      .then((noteId: number) => {
+        start
+          .assumeNotePage()
+          .expectMarkdownContentSourceContains(`[${display}](/n${noteId})`)
+      })
+  }
+)

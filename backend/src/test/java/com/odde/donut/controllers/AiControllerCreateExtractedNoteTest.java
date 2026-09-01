@@ -131,7 +131,7 @@ class AiControllerCreateExtractedNoteTest extends ControllerTestBase {
       assertThat(response.getWikiLinks())
           .anyMatch(
               wikiLink ->
-                  wikiLink.getPortablePath().equals("sample")
+                  wikiLink.getTarget().equals("sample")
                       && wikiLink.getDisplayText().equals("the original note")
                       && wikiLink.getDestinationNoteId().equals(sourceNote.getId()));
     }

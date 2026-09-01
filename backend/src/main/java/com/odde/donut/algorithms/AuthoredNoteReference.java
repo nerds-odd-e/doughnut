@@ -30,8 +30,8 @@ public sealed interface AuthoredNoteReference
   }
 
   /**
-   * Markdown {@code [display](/nID)} or absolute Donut-origin note URL. The kind exists so
-   * extraction and rewrite can stay syntax-aware; emission is not wired yet.
+   * Markdown {@code [display](/nID)} or absolute Donut-origin note URL. The href's note ID is
+   * authoritative; display text is label only.
    */
   record NoteIdUrlTarget(String authoredLink, int noteId, String href, String displayText)
       implements AuthoredNoteReference {}

@@ -71,7 +71,7 @@ describe("NoteTextContent wiki link display", () => {
         wikiLinks: [
           {
             authoredLink: "[Target](/folder/Target.md)",
-            portablePath: "/folder/Target.md",
+            target: "/folder/Target.md",
             displayText: "Target",
             resolution: "RESOLVED",
             destinationNoteId: 99,

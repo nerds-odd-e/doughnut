@@ -85,14 +85,14 @@ function isAmbiguousWikiLink(w: WikiLink): boolean {
 
 export function wikiLinkAmbiguousResolution(
   wikiLinks: readonly WikiLink[],
-  portablePath: string,
+  target: string,
   authored: string
 ): "AMBIGUOUS" | undefined {
   for (const w of wikiLinks) {
     if (!isAmbiguousWikiLink(w)) continue
     if (
-      w.portablePath === portablePath ||
-      w.portablePath.trim() === portablePath.trim() ||
+      w.target === target ||
+      w.target.trim() === target.trim() ||
       w.authoredLink === authored
     ) {
       return "AMBIGUOUS"
@@ -101,14 +101,14 @@ export function wikiLinkAmbiguousResolution(
   return undefined
 }
 
-/** Lookup keys: trimmed Portable path and full authored link from the note realm. */
+/** Lookup keys: trimmed target and full authored link from the note realm. */
 export function wikiLinkNoteIdLookup(
   wikiLinks: readonly WikiLink[]
 ): Map<string, number> {
   const map = new Map<string, number>()
   for (const w of wikiLinks) {
     if (!isResolvedWikiLink(w)) continue
-    map.set(w.portablePath.trim(), w.destinationNoteId)
+    map.set(w.target.trim(), w.destinationNoteId)
     map.set(w.authoredLink.trim(), w.destinationNoteId)
   }
   return map

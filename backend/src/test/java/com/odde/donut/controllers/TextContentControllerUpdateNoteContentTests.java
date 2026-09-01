@@ -65,7 +65,7 @@ class TextContentControllerUpdateNoteContentTests extends TextContentControllerT
     assertThat(response.getWikiLinks(), hasSize(1));
     WikiLink wt = response.getWikiLinks().getFirst();
     assertThat(wt.getAuthoredLink(), equalTo("OnlyB"));
-    assertThat(wt.getPortablePath(), equalTo("OnlyB"));
+    assertThat(wt.getTarget(), equalTo("OnlyB"));
     assertThat(wt.getDisplayText(), equalTo("OnlyB"));
     assertThat(wt.getDestinationNoteId(), equalTo(onlyB.getId()));
 
@@ -160,7 +160,7 @@ class TextContentControllerUpdateNoteContentTests extends TextContentControllerT
     assertThat(response.getWikiLinks(), hasSize(1));
     WikiLink wt = response.getWikiLinks().getFirst();
     assertThat(wt.getAuthoredLink(), equalTo("Moon#prop:a%20part%20of"));
-    assertThat(wt.getPortablePath(), equalTo("Moon#prop:a%20part%20of"));
+    assertThat(wt.getTarget(), equalTo("Moon#prop:a%20part%20of"));
     assertThat(wt.getDestinationNoteId(), equalTo(moon.getId()));
 
     List<ResolvedWikiLink> rows =

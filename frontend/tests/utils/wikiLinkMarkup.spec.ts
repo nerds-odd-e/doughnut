@@ -18,7 +18,7 @@ describe("wikiLinkMarkup utils", () => {
   it("wikiLinkNoteIdLookup maps only RESOLVED destination ids", () => {
     const ambiguous: WikiLink = {
       authoredLink: "Shared",
-      portablePath: "Shared",
+      target: "Shared",
       displayText: "Shared",
       resolution: "AMBIGUOUS",
     }

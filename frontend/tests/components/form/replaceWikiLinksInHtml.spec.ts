@@ -37,7 +37,7 @@ describe("replaceWikiLinksInHtml", () => {
   it("does not treat AMBIGUOUS wikiLinks as live destinations", () => {
     const ambiguous: WikiLink = {
       authoredLink: "Shared",
-      portablePath: "Shared",
+      target: "Shared",
       displayText: "Shared",
       resolution: "AMBIGUOUS",
     }
@@ -57,7 +57,7 @@ describe("replaceWikiLinksInHtml", () => {
       replaceWikiLinksInHtml('<p><a href="/Folder/Missing.md">label</a></p>', [
         {
           authoredLink: "[label](/Folder/Missing.md)",
-          portablePath: "/Folder/Missing.md",
+          target: "/Folder/Missing.md",
           displayText: "label",
           resolution: "RESOLVED",
           destinationNoteId: 42,

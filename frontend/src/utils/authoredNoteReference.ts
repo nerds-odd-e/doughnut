@@ -2,6 +2,7 @@ import {
   authoredLinkOccurrences,
   splitWikiLinkInner,
 } from "@/utils/authoredLinkMarkup"
+import { MARKDOWN_LINK, noteIdFromRootRelativeHref } from "@/utils/noteIdUrl"
 
 /**
  * Authored semantic note reference in note content (ADR 0001 Wiki link). Distinguishes wiki
@@ -38,16 +39,42 @@ export function wikiPortablePathTargetFromInner(
   }
 }
 
+export { noteIdFromRootRelativeHref } from "@/utils/noteIdUrl"
+
+type Hit = { start: number; ref: AuthoredNoteReference }
+
 /**
- * Authored note references in document order. Currently emits only wiki Portable-path
- * targets; note-ID URL recognition is not wired yet.
+ * Authored note references in document order: wiki Portable-path targets and recognized
+ * root-relative note-ID URLs.
  */
 export function authoredNoteReferencesInOccurrenceOrder(
   markdown: string
 ): AuthoredNoteReference[] {
-  return authoredLinkOccurrences(markdown).map((occ) =>
-    wikiPortablePathTargetFromInner(occ.token)
-  )
+  if (markdown.length === 0) return []
+  const hits: Hit[] = []
+  for (const occ of authoredLinkOccurrences(markdown)) {
+    hits.push({
+      start: occ.start,
+      ref: wikiPortablePathTargetFromInner(occ.token),
+    })
+  }
+  for (const m of markdown.matchAll(MARKDOWN_LINK)) {
+    const href = m[2]!
+    const noteId = noteIdFromRootRelativeHref(href)
+    if (noteId === undefined) continue
+    hits.push({
+      start: m.index,
+      ref: {
+        kind: "noteIdUrl",
+        authoredLink: m[0],
+        noteId,
+        href,
+        displayText: m[1]!,
+      },
+    })
+  }
+  hits.sort((a, b) => a.start - b.start)
+  return hits.map((h) => h.ref)
 }
 
 /** Wiki Portable-path targets only (skips note-ID URL kind when present). */

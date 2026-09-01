@@ -63,3 +63,19 @@ Feature: Markdown links in notes
       | markdown                         |
       | [Target](/MdRefFolder/Target.md) |
       | [Target](MdRefFolder/Target.md)  |
+
+  Scenario: A root-relative Donut note URL contributes a semantic reference
+    Given I have a notebook "MdNoteUrlNB" with notes:
+      | Title         |
+      | MdUrlTarget   |
+      | MdUrlSource   |
+    When I update note "MdUrlSource" content using markdown to become a note URL to "MdUrlTarget" with display "wrong title"
+    Then I should see the note content rendered as:
+      | Kind          | Text         |
+      | markdown link | wrong title  |
+    When I view the note content as markdown
+    Then the note content markdown source should contain a note URL to "MdUrlTarget" with display "wrong title"
+    And the note content markdown source should not contain "[["
+    When I navigate to "MdNoteUrlNB/MdUrlTarget" note
+    Then I should see the References section
+    And I should see "MdUrlSource" in the References section

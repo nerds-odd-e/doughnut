@@ -10,18 +10,33 @@ import org.junit.jupiter.api.Test;
 class AuthoredNoteReferencesTest {
 
   @Test
-  void inOccurrenceOrder_emitsOnlyWikiPortablePathTargets() {
+  void inOccurrenceOrder_emitsWikiAndRootRelativeNoteIdUrlsInDocumentOrder() {
     List<AuthoredNoteReference> refs =
         AuthoredNoteReferences.inOccurrenceOrder(
             "See [[Folder/Title|wiki]] and [label](/n42) plus [path](/Folder/Title.md).");
 
-    assertThat(refs.size(), equalTo(1));
+    assertThat(refs.size(), equalTo(2));
     assertThat(refs.getFirst(), instanceOf(AuthoredNoteReference.WikiPortablePathTarget.class));
     AuthoredNoteReference.WikiPortablePathTarget wiki =
         (AuthoredNoteReference.WikiPortablePathTarget) refs.getFirst();
     assertThat(wiki.authoredLink(), equalTo("Folder/Title|wiki"));
     assertThat(wiki.portablePath().format(), equalTo("Folder/Title"));
     assertThat(wiki.displayText(), equalTo("wiki"));
+
+    assertThat(refs.get(1), instanceOf(AuthoredNoteReference.NoteIdUrlTarget.class));
+    AuthoredNoteReference.NoteIdUrlTarget url = (AuthoredNoteReference.NoteIdUrlTarget) refs.get(1);
+    assertThat(url.authoredLink(), equalTo("[label](/n42)"));
+    assertThat(url.noteId(), equalTo(42));
+    assertThat(url.href(), equalTo("/n42"));
+    assertThat(url.displayText(), equalTo("label"));
+  }
+
+  @Test
+  void inOccurrenceOrder_skipsRetiredRedirectAndPropertyNoteUrls() {
+    assertThat(
+        AuthoredNoteReferences.inOccurrenceOrder(
+            "[a](/n/9) [b](/n9/p/topic) [c](/n9?x=1) [ok](/n9)"),
+        equalTo(List.of(new AuthoredNoteReference.NoteIdUrlTarget("[ok](/n9)", 9, "/n9", "ok"))));
   }
 
   @Test

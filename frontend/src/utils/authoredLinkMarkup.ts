@@ -52,10 +52,10 @@ export function wikiLinkFromAuthoredToken(
   authored: string,
   noteId: number
 ): WikiLink {
-  const { target: portablePath, display } = splitWikiLinkInner(authored)
+  const { target, display } = splitWikiLinkInner(authored)
   return {
     authoredLink: authored,
-    portablePath,
+    target,
     displayText: display,
     resolution: "RESOLVED",
     destinationNoteId: noteId,

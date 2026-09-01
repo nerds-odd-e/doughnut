@@ -3784,7 +3784,7 @@ components:
       properties:
         authoredLink:
           type: string
-        portablePath:
+        target:
           type: string
         displayText:
           type: string
@@ -3801,8 +3801,8 @@ components:
       required:
       - authoredLink
       - displayText
-      - portablePath
       - resolution
+      - target
     QuestionContestResult:
       type: object
       properties:
