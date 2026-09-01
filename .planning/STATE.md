@@ -38,7 +38,6 @@ Daily probe measurement (not an ADR): [daily-probe-protocol.md](notes/daily-prob
 - After deploying the Flyway squash, confirm startup succeeded and `flyway_schema_history` shows the baseline repaired, the collapsed versions marked `DELETE`, and `V300000300` applied.
 - Daily probe tap affordance (visible panels, stable board, press flash): `.planning/quick/033-daily-probe-tap-affordance/PLAN.md` — planned, do not execute until asked.
 - OpenAI transaction-boundary follow-up cleanup (test coverage gap, duplicated test helper, comment trim, dead code): `.planning/quick/037-openai-transaction-boundary-followup/PLAN.md` — planned, do not execute until asked.
-- OpenAI question-generation batch `FAILED` persist-then-throw (Failure report): `.planning/quick/038-question-generation-batch-failed-loud/PLAN.md` — planned, do not execute until asked.
 - Start the next milestone with `/gsd-new-milestone` when ready.
 
 Parked work: SEED-001, SEED-002, SEED-005, SEED-006, SEED-007, SEED-008; ADR 0002 Level 1. See [ROADMAP.md](ROADMAP.md).
