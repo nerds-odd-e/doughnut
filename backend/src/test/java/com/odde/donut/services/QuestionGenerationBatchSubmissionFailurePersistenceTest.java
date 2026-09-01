@@ -94,7 +94,9 @@ class QuestionGenerationBatchSubmissionFailurePersistenceTest {
 
     @Test
     void batchCreationFailureLeavesNoLatestSubmittedAt() {
-      submissionService.submitPlannedBatch(plannedBatch, currentTime);
+      assertThrows(
+          RuntimeException.class,
+          () -> submissionService.submitPlannedBatch(plannedBatch, currentTime));
 
       inCommittedTransaction(
           () ->
@@ -104,22 +106,15 @@ class QuestionGenerationBatchSubmissionFailurePersistenceTest {
     }
 
     @Test
-    void localFailedRemainsIfTheCallingTransactionRollsBack() {
+    void localFailedRemainsAfterOpenAiExceptionIsThrown() {
       TransactionTemplate callingTx = new TransactionTemplate(transactionManager);
       callingTx.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
-      RuntimeException thrown =
-          assertThrows(
-              RuntimeException.class,
-              () ->
-                  callingTx.executeWithoutResult(
-                      status -> {
-                        assertThat(
-                            submissionService.submitPlannedBatch(plannedBatch, currentTime),
-                            is(false));
-                        throw new RuntimeException("calling transaction rolls back");
-                      }));
+      assertThrows(
+          RuntimeException.class,
+          () ->
+              callingTx.executeWithoutResult(
+                  status -> submissionService.submitPlannedBatch(plannedBatch, currentTime)));
 
-      assertThat(thrown.getMessage(), is("calling transaction rolls back"));
       inCommittedTransaction(
           () ->
               assertThat(
@@ -149,9 +144,10 @@ class QuestionGenerationBatchSubmissionFailurePersistenceTest {
       when(openAiApiHandler.uploadBatchInputFile(any()))
           .thenThrow(new RuntimeException("upload failed"));
 
-      boolean submitted = submissionService.submitPlannedBatch(plannedBatch, currentTime);
+      assertThrows(
+          RuntimeException.class,
+          () -> submissionService.submitPlannedBatch(plannedBatch, currentTime));
 
-      assertThat(submitted, is(false));
       assertThat(counter("question_generation_batch.failed") - failedBaseline, is(1.0));
       assertThat(counter("question_generation_batch.submitted") - submittedBaseline, is(0.0));
 
