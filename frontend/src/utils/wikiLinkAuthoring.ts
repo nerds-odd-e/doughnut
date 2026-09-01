@@ -2,7 +2,7 @@ import { NoteController } from "@generated/donut-backend-api/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import { markdownWikiTokenFromDeadWikiLinkPayload } from "@/utils/wikiLinkMarkup"
 
-/** Owns the backend-authored Portable-path spelling for an insert (same- or cross-notebook, qualified by the backend) or ambiguous-shorthand repair. */
+/** Owns the backend-authored Portable-path spelling for an insert (same- or cross-notebook, qualified by the backend) or wiki-link repair. */
 async function authoredPortablePathFor(
   sourceNoteId: number,
   destinationNoteId: number,
@@ -37,9 +37,10 @@ export async function authoredWikiLinkTokenForInsert(
 }
 
 /**
- * Backend-authored path for a known original reference (an ambiguous shorthand being
- * repaired, or a pasted link being converted), preserving its display text — or the
- * destination's own `#prop:` suffix when there was no display text to preserve.
+ * Backend-authored path for a known original reference (a missing or ambiguous wiki
+ * link being repaired, or a pasted link being converted), preserving its display
+ * text — or the destination's own `#prop:` suffix when there was no display text to
+ * preserve.
  */
 export async function authoredWikiLinkTokenFromOriginalPath(
   sourceNoteId: number,

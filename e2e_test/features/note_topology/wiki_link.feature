@@ -162,6 +162,13 @@ Feature: Wiki links in notes
 
   @mockBrowserTime
   Scenario: A dead wiki link can be pointed at an existing note
+    When I update note "WikiLinks E2E Tech" content using markdown to become:
+      """
+      root namesake
+      """
+    And I have a notebook "WikiLinks E2E NB" with notes:
+      | Title              | Content       | Folder                  |
+      | WikiLinks E2E Tech | twin namesake | WikiLinks E2E Tech Twin |
     When I update note "WikiLinks E2E CI" content using markdown to become:
       """
       Continuous integration relies on [[original text]].
@@ -174,7 +181,10 @@ Feature: Wiki links in notes
       | Kind           | Text          |
       | live wiki link | original text |
     When I view the note content as markdown
-    Then the note content markdown source should contain "[[WikiLinks E2E Tech|original text]]"
+    Then the note content markdown source should contain "[[WikiLinks E2E Root/WikiLinks E2E Tech|original text]]"
+    When I view the note content as rich content
+    Then the wiki link "original text" should open the note titled "WikiLinks E2E Tech"
+    And the note content on the current page should be "root namesake"
 
   Scenario: Renaming a referenced note while keeping visible reference text
     When I update note "WikiLinks E2E Tech" content using markdown to become:

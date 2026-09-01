@@ -1,6 +1,6 @@
 # Wiki-link ambiguity and Markdown URL conformance
 
-**Status:** in progress (slices 1–4 done; next: slice 5)
+**Status:** in progress (slices 1–5 done; next: slice 6)
 
 ## Goal
 
@@ -177,26 +177,12 @@ consolidated InsertWikiLink authoring-path examples. Prepares slice 5.
 
 ### 5. Pointing a dead wiki link at a colliding note is unambiguous
 
-**Status:** planned
+**Status:** done
 **Type:** Behavior
 
-**Pre-condition:** A note contains an unresolved wiki shorthand and the user
-chooses a destination whose display name is not unique in its notebook.
-
-**Trigger:** The user chooses “Point at an existing note.”
-
-**Post-condition:** Stored content uses the backend-authored full/qualified
-Portable path, preserves display text and any `#prop:` suffix, and opens the
-chosen destination.
-
-- Route both missing and ambiguous wiki repairs through
-  `authoredWikiLinkTokenFromOriginalPath`.
-- Remove `SearchForm.vue` client reconstruction and unused source-notebook
-  state.
-- Extend the mounted search dialog boundary and the existing dead-link scenario
-  in `wiki_link.feature` with a colliding destination.
-
-Verification: full frontend unit suite; focused `wiki_link.feature`.
+Missing and ambiguous “point at existing note” repairs use backend
+`authoredWikiLinkTokenFromOriginalPath` (folder-qualified when colliding).
+`buildWikiLinkText` remains only for AccidentalMatchResolveDialog (slice 6).
 
 ### 6. An authored overlap is recognized by destination
 

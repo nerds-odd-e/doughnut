@@ -39,7 +39,6 @@ import WikiLinkOrRelationshipChoice from "./WikiLinkOrRelationshipChoice.vue"
 import SearchForNoteAndFolder from "../search/SearchForNoteAndFolder.vue"
 import usePopups from "../commons/Popups/usePopups"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
-import { buildWikiLinkText } from "@/utils/buildWikiLinkText"
 import { useContentCursorInserter } from "@/composables/useContentCursorInserter"
 import {
   type DeadWikiLinkPayload,
@@ -106,28 +105,17 @@ async function onInsertWikiLinkAsProperty() {
   await insertAuthoredWikiLink(insertWikiLinkAsProperty)
 }
 
-async function wikiLinkSpellingForDestination(): Promise<string | undefined> {
-  const destination = selectedSearchResult.value
-  if (!destination || !note || !deadWikiLinkPayload) return
-  if (deadWikiLinkPayload.resolution === "AMBIGUOUS") {
-    return authoredWikiLinkTokenFromOriginalPath(
-      note.id,
-      destination.noteTopology.id,
-      deadWikiLinkPayload.portablePath,
-      deadWikiLinkPayload.displayText
-    )
-  }
-  return buildWikiLinkText(destination, {
-    notebookId: notebookId.value,
-    displayText: deadWikiLinkPayload.displayText,
-  })
-}
-
 async function onDeadWikiLinkToNote() {
   if (!selectedSearchResult.value || !note || !deadWikiLinkPayload) return
+  const destination = selectedSearchResult.value
   const originalToken =
     markdownWikiTokenFromDeadWikiLinkPayload(deadWikiLinkPayload)
-  const newLinkText = await wikiLinkSpellingForDestination()
+  const newLinkText = await authoredWikiLinkTokenFromOriginalPath(
+    note.id,
+    destination.noteTopology.id,
+    deadWikiLinkPayload.portablePath,
+    deadWikiLinkPayload.displayText
+  )
   if (newLinkText === undefined) return
   const currentContent =
     storageAccessor.value.refOfNoteRealm(note.id).value?.note.content ?? ""
