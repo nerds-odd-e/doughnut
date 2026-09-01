@@ -1,6 +1,6 @@
 # Wiki-link ambiguity and Markdown URL conformance
 
-**Status:** in progress (slices 1–13 done; next: slice 14)
+**Status:** in progress (slices 1–14 done; next: slice 15)
 
 ## Goal
 
@@ -267,22 +267,23 @@ helper for gathering a moved subtree's note IDs.
 
 ### 14. Dissolving or merging a folder preserves descendant wiki links
 
-**Status:** planned
+**Status:** done
 **Type:** Behavior
 
-**Pre-condition:** Exact wiki links point to notes whose folder trail will
-change because a folder is dissolved or merged.
+`FolderRelocationService.dissolveFolder` now captures the subtree's note IDs
+via `collectNoteIdsInSubtree` before promoting/merging subfolders and notes,
+then reuses the same `rewriteInboundWikiLinksForFolderReparent` seam from
+slice 13 for both plain dissolve and dissolve-with-merge — no separate
+algorithm. `NotebookController.dissolveFolder`'s HTTP-facing signature is
+unchanged (viewer resolved internally). Covered by
+`NotebookFolderDissolveWikiLinkRewriteControllerTest` (inside/outside
+referrers, plain dissolve and merge) plus focused
+`folder_organization.feature` (11/11).
 
-**Trigger:** The learner confirms dissolve or merge.
-
-**Post-condition:** Every affected wiki target uses the promoted/merged trail
-and continues resolving; unrelated wiki links and note-ID URLs are unchanged.
-
-Capture affected notes before structural rows are removed, then reuse the
-location-rewrite seam. Treat dissolve and merge as examples of the same
-observable rather than separate algorithms.
-
-Verification: full backend unit suite; focused `folder_organization.feature`.
+**Learning:** the reparent seam generalizes to dissolve/merge without any
+rename or pre-deletion "old path" capture — only note-ID capture before
+structural mutation was needed, since the seam derives the new trail from
+post-change state.
 
 ### 15. Wiki candidate cardinality has one tri-state result
 

@@ -229,7 +229,8 @@ class NotebookController {
       @RequestParam(name = "merge", defaultValue = "false") boolean merge)
       throws UnexpectedNoAccessRightException {
     authorizationService.assertAuthorization(notebook);
-    folderRelocationService.dissolveFolder(notebook, folder, merge);
+    User user = authorizationService.getCurrentUser();
+    folderRelocationService.dissolveFolder(notebook, folder, merge, user);
   }
 
   @PostMapping(value = "/{notebook}")

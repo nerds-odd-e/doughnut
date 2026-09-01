@@ -193,7 +193,7 @@ public class FolderRelocationService {
     return folder;
   }
 
-  public void dissolveFolder(Notebook notebook, Folder folder, boolean merge) {
+  public void dissolveFolder(Notebook notebook, Folder folder, boolean merge, User viewer) {
     if (!folder.getNotebook().getId().equals(notebook.getId())) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Folder not in notebook.");
     }
@@ -201,6 +201,7 @@ public class FolderRelocationService {
     Folder destination = folder.getParentFolder();
     Integer destinationId = destination == null ? null : destination.getId();
     Timestamp now = testabilitySettings.getCurrentUTCTimestamp();
+    Set<Integer> affectedNoteIds = subtree.collectNoteIdsInSubtree(folder);
 
     List<Folder> directSubfolders =
         folderRepository.findChildFoldersByParentFolderIdOrderByIdAsc(folder.getId());
@@ -237,5 +238,7 @@ public class FolderRelocationService {
 
     entityPersister.flush();
     entityPersister.remove(folder);
+    entityPersister.flush();
+    wikiLinkRewriteService.rewriteInboundWikiLinksForFolderReparent(affectedNoteIds, now, viewer);
   }
 }

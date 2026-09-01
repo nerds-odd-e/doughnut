@@ -1,0 +1,64 @@
+package com.odde.donut.controllers;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+
+import com.odde.donut.entities.Folder;
+import com.odde.donut.entities.Note;
+import com.odde.donut.entities.Notebook;
+import com.odde.donut.entities.User;
+import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
+import com.odde.donut.services.ResolvedWikiLinkService;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+
+class NotebookFolderDissolveWikiLinkRewriteControllerTest
+    extends NotebookFolderManagementControllerTestBase {
+
+  @Autowired ResolvedWikiLinkService resolvedWikiLinkServiceBean;
+
+  @Test
+  void dissolvingFolder_rewritesInboundLinksToDescendantFromInsideAndOutside()
+      throws UnexpectedNoAccessRightException {
+    User owner = currentUser.getUser();
+    Notebook nb = ownedNotebook("Nb");
+    Folder outer = ownedFolder(nb, "Outer");
+    Folder mid = makeMe.aFolder().parentFolder(outer).name("Mid").please();
+    makeMe.aNote("Target").folder(mid).please();
+    Note insideReferrer =
+        makeMe.aNote("Inside").folder(mid).content("[[/Outer/Mid/Target]]").please();
+    Note outsideReferrer =
+        makeMe.aNote("Outside").notebook(nb).content("[[/Outer/Mid/Target]]").please();
+    resolvedWikiLinkServiceBean.refreshForNote(insideReferrer, owner);
+    resolvedWikiLinkServiceBean.refreshForNote(outsideReferrer, owner);
+
+    controller.dissolveFolder(nb, mid, false);
+
+    makeMe.refresh(insideReferrer);
+    makeMe.refresh(outsideReferrer);
+    assertThat(insideReferrer.getContent(), equalTo("[[Outer/Target]]"));
+    assertThat(outsideReferrer.getContent(), equalTo("[[Outer/Target]]"));
+  }
+
+  @Test
+  void dissolveMerge_rewritesInboundLinksToPromotedSubfolderDescendant()
+      throws UnexpectedNoAccessRightException {
+    User owner = currentUser.getUser();
+    Notebook nb = ownedNotebook("Nb");
+    Folder outer = ownedFolder(nb, "Outer");
+    Folder outerInner = makeMe.aFolder().parentFolder(outer).name("Inner").please();
+    Folder mid = makeMe.aFolder().parentFolder(outer).name("Mid").please();
+    Folder midInner = makeMe.aFolder().parentFolder(mid).name("Inner").please();
+    Note target = makeMe.aNote("Target").folder(midInner).please();
+    Note outsideReferrer =
+        makeMe.aNote("Outside").notebook(nb).content("[[/Outer/Mid/Inner/Target]]").please();
+    resolvedWikiLinkServiceBean.refreshForNote(outsideReferrer, owner);
+
+    controller.dissolveFolder(nb, mid, true);
+
+    makeMe.refresh(outsideReferrer);
+    makeMe.refresh(target);
+    assertThat(target.getFolder().getId(), equalTo(outerInner.getId()));
+    assertThat(outsideReferrer.getContent(), equalTo("[[Outer/Inner/Target]]"));
+  }
+}
