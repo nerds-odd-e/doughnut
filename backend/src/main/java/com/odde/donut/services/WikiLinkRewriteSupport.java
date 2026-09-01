@@ -1,5 +1,7 @@
 package com.odde.donut.services;
 
+import com.odde.donut.algorithms.AuthoredNoteDocument;
+import com.odde.donut.algorithms.AuthoredNoteReference;
 import com.odde.donut.algorithms.AuthoredNoteReferences;
 import com.odde.donut.algorithms.CanonicalDonutOrigin;
 import com.odde.donut.algorithms.NoteIdUrl;
@@ -89,7 +91,7 @@ final class WikiLinkRewriteSupport {
             WikiLinkMarkdownDocumentRewrite.replaceWikiLinksMatchingTrimmedInner(
                 content, linkText, newInner);
       }
-      referrer.setContent(content);
+      referrer.replaceContent(documentFromRewrittenContent(content, canonicalDonutOrigin));
       referrer.setUpdatedAt(updatedAt);
       entityPersister.save(referrer);
       resolvedWikiLinkService.refreshForNote(referrer, viewer);
@@ -102,6 +104,7 @@ final class WikiLinkRewriteSupport {
       ResolvedWikiLinkService resolvedWikiLinkService,
       PortablePathAuthoring portablePathAuthoring,
       WikiLinkResolver wikiLinkResolver,
+      CanonicalDonutOrigin canonicalDonutOrigin,
       Note movedNote,
       String sourceNotebookName,
       Timestamp updatedAt,
@@ -151,10 +154,25 @@ final class WikiLinkRewriteSupport {
     if (content.equals(originalContent)) {
       return;
     }
-    movedNote.setContent(content);
+    movedNote.replaceContent(documentFromRewrittenContent(content, canonicalDonutOrigin));
     movedNote.setUpdatedAt(updatedAt);
     entityPersister.save(movedNote);
     resolvedWikiLinkService.refreshForNote(movedNote, viewer);
+  }
+
+  /**
+   * Builds the {@link AuthoredNoteDocument} for content already valid and stored, whose wiki links
+   * were mechanically rewritten in place (title/location change). Unlike {@code
+   * AuthoredNoteContent#prepareDocumentForSave}, this does not re-validate or re-normalize the
+   * stored type — a rewrite must not change the established visible content beyond the link text
+   * itself.
+   */
+  private static AuthoredNoteDocument documentFromRewrittenContent(
+      String content, CanonicalDonutOrigin canonicalDonutOrigin) {
+    List<AuthoredNoteReference> references =
+        AuthoredNoteReferences.uniquePreserveOrder(
+            AuthoredNoteReferences.inOccurrenceOrder(content, canonicalDonutOrigin));
+    return new AuthoredNoteDocument(content, references);
   }
 
   private static Map<String, Note> coMovedTargetsByAuthoredLink(

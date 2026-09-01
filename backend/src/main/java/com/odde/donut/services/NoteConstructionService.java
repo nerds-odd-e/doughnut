@@ -2,8 +2,8 @@ package com.odde.donut.services;
 
 import com.odde.donut.algorithms.AuthoredNoteDocument;
 import com.odde.donut.algorithms.CanonicalDonutOrigin;
-import com.odde.donut.algorithms.NoteConceptType;
 import com.odde.donut.algorithms.NoteContentTitleHeading;
+import com.odde.donut.algorithms.NoteLeadingFrontmatter;
 import com.odde.donut.controllers.dto.ApiError;
 import com.odde.donut.controllers.dto.NoteCreationDTO;
 import com.odde.donut.controllers.dto.NoteRealm;
@@ -69,7 +69,7 @@ public class NoteConstructionService {
     Timestamp ts = testabilitySettings.getCurrentUTCTimestamp();
     note.initializeNewNote(notebook, ts, title);
     note.setFolder(folderOrNull);
-    note.setContent(NoteConceptType.ensureStoredType(null));
+    applyContent(note, null);
     User user = authorizationService.getCurrentUser();
     entityPersister.save(note);
     entityPersister.save(NoteCreator.forNoteAndUser(note, user));
@@ -77,22 +77,33 @@ public class NoteConstructionService {
   }
 
   private void persistNoteContent(Note note, String content) {
-    Timestamp ts = testabilitySettings.getCurrentUTCTimestamp();
+    applyContent(note, content);
+    note.setUpdatedAt(testabilitySettings.getCurrentUTCTimestamp());
+    entityPersister.save(note);
+  }
+
+  /** Prepares {@code content} for save and replaces the note's Markdown and references from it. */
+  private void applyContent(Note note, String content) {
     AuthoredNoteDocument document =
         AuthoredNoteContent.prepareDocumentForSave(content, canonicalDonutOrigin);
     note.replaceContent(document);
-    note.setUpdatedAt(ts);
-    entityPersister.save(note);
   }
 
   private Note attachWikidataAndRefresh(Note note, WikidataIdWithApi wikidataIdWithApi)
       throws IOException, InterruptedException {
     if (wikidataIdWithApi != null) {
-      wikidataIdWithApi.associateNoteToWikidata(note);
+      wikidataIdWithApi
+          .fetchWikidataDescription()
+          .ifPresent(description -> prependAndPersistWikidataDescription(note, description));
     }
     entityPersister.flush();
     entityPersister.refresh(note);
     return note;
+  }
+
+  private void prependAndPersistWikidataDescription(Note note, String description) {
+    applyContent(note, NoteLeadingFrontmatter.prependToBody(note.getContent(), description));
+    entityPersister.save(note);
   }
 
   public NoteRealm createRootNoteWithWikidataService(

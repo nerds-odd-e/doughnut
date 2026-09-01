@@ -219,6 +219,7 @@ public class WikiLinkRewriteService {
         resolvedWikiLinkService,
         portablePathAuthoring,
         wikiLinkResolver,
+        wikiLinkResolver.canonicalDonutOrigin(),
         movedNote,
         sourceNotebookName,
         updatedAt,

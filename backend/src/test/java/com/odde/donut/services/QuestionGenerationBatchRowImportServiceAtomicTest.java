@@ -1,9 +1,9 @@
 package com.odde.donut.services;
 
-import static com.odde.donut.testability.CommittedUserCleanup.deleteByUserExternalIdentifierLike;
 import static com.odde.donut.services.QuestionGenerationBatchImportPayloadSupport.batchSuccessLine;
 import static com.odde.donut.services.QuestionGenerationBatchRowImportAtomicTestSupport.FAIL_ON_RECALL_PROMPT_SAVE;
 import static com.odde.donut.testability.CommittedTransactionTestSupport.inCommittedTransaction;
+import static com.odde.donut.testability.CommittedUserCleanup.deleteByUserExternalIdentifierLike;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -103,8 +103,7 @@ class QuestionGenerationBatchRowImportServiceAtomicTest {
         transactionManager,
         () -> {
           try {
-            User committedUser =
-                makeMe.aUser("batch-import-atomic-" + UUID.randomUUID()).please();
+            User committedUser = makeMe.aUser("batch-import-atomic-" + UUID.randomUUID()).please();
             Timestamp committedTime = makeMe.aTimestamp().please();
             Note note = makeMe.aNote().notebookOwnedBy(committedUser).please();
             MemoryTracker committedMemoryTracker =

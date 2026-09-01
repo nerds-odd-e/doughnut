@@ -1,7 +1,6 @@
 package com.odde.donut.services.wikidataApis;
 
 import com.odde.donut.controllers.dto.WikidataEntityData;
-import com.odde.donut.entities.Note;
 import com.odde.donut.services.wikidataApis.thirdPartyEntities.WikidataEntityHash;
 import java.io.IOException;
 import java.util.Objects;
@@ -37,13 +36,8 @@ public final class WikidataIdWithApi {
     return entityHash.getEntityModel(wikidataId);
   }
 
-  public void extractWikidataInfoToNote(Note note) throws IOException, InterruptedException {
-    Optional<WikidataEntityModel> model = getWikidataEntityModel();
-    model.map(entity -> entity.wikidataDescription(wikidataApi)).ifPresent(note::prependContent);
-  }
-
-  public void associateNoteToWikidata(Note note) throws IOException, InterruptedException {
-    extractWikidataInfoToNote(note);
+  public Optional<String> fetchWikidataDescription() throws IOException, InterruptedException {
+    return getWikidataEntityModel().map(entity -> entity.wikidataDescription(wikidataApi));
   }
 
   public String wikidataId() {

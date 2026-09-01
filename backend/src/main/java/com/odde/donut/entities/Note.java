@@ -9,7 +9,6 @@ import com.odde.donut.algorithms.AuthoredNoteReference;
 import com.odde.donut.algorithms.ClozedString;
 import com.odde.donut.algorithms.FrontmatterAliases;
 import com.odde.donut.algorithms.NoteContentMarkdown;
-import com.odde.donut.algorithms.NoteLeadingFrontmatter;
 import com.odde.donut.algorithms.NoteTitle;
 import com.odde.donut.configs.ObjectMapperConfig;
 import com.odde.donut.controllers.dto.NoteTopology;
@@ -144,14 +143,12 @@ public class Note extends EntityIdentifiedByIdOnly {
     this.notebook = notebook;
   }
 
-  public void prependContent(String addition) {
-    setContent(NoteLeadingFrontmatter.prependToBody(getContent(), addition));
-  }
-
   /**
    * Changes this note's Markdown and replaces its authored-reference children in the same aggregate
-   * operation, from the same parse that produced {@code document}. Temporary boundary: {@link
-   * #setContent} still exists for callers not yet migrated to this method.
+   * operation, from the same parse that produced {@code document}. Every production content write
+   * goes through this method; the raw {@link #setContent} remains only for explicit fixture
+   * hydration (e.g. {@code NotesTestData}, test builders) that bypasses validation and reference
+   * parsing on purpose.
    */
   public void replaceContent(AuthoredNoteDocument document) {
     setContent(document.validatedMarkdown());

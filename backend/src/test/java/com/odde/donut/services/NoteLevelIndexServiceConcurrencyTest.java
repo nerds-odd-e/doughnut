@@ -1,7 +1,7 @@
 package com.odde.donut.services;
 
-import static com.odde.donut.testability.CommittedUserCleanup.deleteByUserExternalIdentifierLike;
 import static com.odde.donut.testability.CommittedTransactionTestSupport.inCommittedTransaction;
+import static com.odde.donut.testability.CommittedUserCleanup.deleteByUserExternalIdentifierLike;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
