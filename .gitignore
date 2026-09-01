@@ -154,3 +154,5 @@ tt/
 sut.log
 sut.log.*
 sut.pid
+# CocoIndex Code (ccc)
+/.cocoindex_code/
