@@ -3,6 +3,7 @@ package com.odde.donut.services;
 import static com.odde.donut.services.QuestionGenerationBatchCommittedUserCleanup.deleteByUserExternalIdentifierLike;
 import static com.odde.donut.services.QuestionGenerationBatchImportPayloadSupport.batchSuccessLine;
 import static com.odde.donut.services.QuestionGenerationBatchRowImportAtomicTestSupport.FAIL_ON_RECALL_PROMPT_SAVE;
+import static com.odde.donut.testability.CommittedTransactionTestSupport.inCommittedTransaction;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -31,10 +32,8 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.support.TransactionTemplate;
 
 @SpringBootTest
 @ActiveProfiles({"test", "batch-row-import-atomic-test"})
@@ -54,6 +53,7 @@ class QuestionGenerationBatchRowImportServiceAtomicTest {
   void cleanupCommittedState() {
     FAIL_ON_RECALL_PROMPT_SAVE.set(false);
     inCommittedTransaction(
+        transactionManager,
         () -> deleteByUserExternalIdentifierLike(entityManager, "batch-import-atomic-%"));
   }
 
@@ -68,6 +68,7 @@ class QuestionGenerationBatchRowImportServiceAtomicTest {
     assertThrows(RuntimeException.class, () -> rowImportService.importRow(request));
 
     inCommittedTransaction(
+        transactionManager,
         () -> {
           QuestionGenerationBatchRequest reloadedRequest =
               batchRequestRepository.findById(fixture.requestId()).orElseThrow();
@@ -86,6 +87,7 @@ class QuestionGenerationBatchRowImportServiceAtomicTest {
     assertThat(rowImportService.importRow(request), is(true));
 
     inCommittedTransaction(
+        transactionManager,
         () -> {
           assertThat(
               recallPromptRepository
@@ -98,6 +100,7 @@ class QuestionGenerationBatchRowImportServiceAtomicTest {
 
   private CommittedImportFixture createCommittedImportFixture() {
     return inCommittedTransaction(
+        transactionManager,
         () -> {
           try {
             String identifier = "batch-import-atomic-" + UUID.randomUUID();
@@ -148,20 +151,6 @@ class QuestionGenerationBatchRowImportServiceAtomicTest {
         .createQuery("SELECT COUNT(mcq) FROM Mcq mcq WHERE mcq.note.id = :noteId", Long.class)
         .setParameter("noteId", noteId)
         .getSingleResult();
-  }
-
-  private <T> T inCommittedTransaction(java.util.function.Supplier<T> action) {
-    TransactionTemplate template = new TransactionTemplate(transactionManager);
-    template.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
-    return template.execute(status -> action.get());
-  }
-
-  private void inCommittedTransaction(Runnable action) {
-    inCommittedTransaction(
-        () -> {
-          action.run();
-          return null;
-        });
   }
 
   private record CommittedImportFixture(int requestId, int memoryTrackerId, int noteId) {}

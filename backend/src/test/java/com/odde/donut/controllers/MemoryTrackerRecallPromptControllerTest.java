@@ -1,5 +1,6 @@
 package com.odde.donut.controllers;
 
+import static com.odde.donut.testability.CommittedTransactionTestSupport.inCommittedTransaction;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -21,11 +22,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
-import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.web.server.ResponseStatusException;
 
 class MemoryTrackerRecallPromptControllerTest extends MemoryTrackerControllerTestBase {
@@ -40,12 +39,6 @@ class MemoryTrackerRecallPromptControllerTest extends MemoryTrackerControllerTes
   @BeforeEach
   void setupOpenAiMock() {
     openAiStructuredResponseMock = new OpenAiStructuredResponseMock(officialClient);
-  }
-
-  private <T> T inCommittedTransaction(java.util.function.Supplier<T> action) {
-    TransactionTemplate template = new TransactionTemplate(transactionManager);
-    template.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
-    return template.execute(status -> action.get());
   }
 
   private MemoryTracker spellingTracker() {
@@ -100,6 +93,7 @@ class MemoryTrackerRecallPromptControllerTest extends MemoryTrackerControllerTes
       throws UnexpectedNoAccessRightException {
     MemoryTracker tracker =
         inCommittedTransaction(
+            transactionManager,
             () -> {
               currentUser.setUser(makeMe.aUser().please());
               return ownedTracker();

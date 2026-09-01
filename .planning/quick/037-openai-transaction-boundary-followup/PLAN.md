@@ -66,7 +66,7 @@ miss, and adjacent dead code.
 
 ## Slices
 
-### 1. Shared transaction test helper — Structure — planned
+### 1. Shared transaction test helper — Structure — done
 
 **What it changes:** Extract `inCommittedTransaction` (both the
 `Supplier<T>` and `Runnable` overloads) out of
