@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.donut.controllers.dto.NoteRealm;
 import com.odde.donut.controllers.dto.NoteUpdateContentDTO;
+import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Note;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.services.httpQuery.HttpClientAdapter;
@@ -22,6 +23,13 @@ class NoteControllerShowTests extends ControllerTestBase {
   @BeforeEach
   void setup() {
     currentUser.setUser(makeMe.aUser().please());
+  }
+
+  private void authorWikiLinkTo(Note carrier, String targetTitle)
+      throws UnexpectedNoAccessRightException {
+    NoteUpdateContentDTO contentDto = new NoteUpdateContentDTO();
+    contentDto.setContent("See [[" + targetTitle + "]].");
+    textContentController.updateNoteContent(carrier, contentDto);
   }
 
   @Test
@@ -66,9 +74,7 @@ class NoteControllerShowTests extends ControllerTestBase {
   void newlyCreatedTargetImmediatelyGainsCurrentInboundReferencesWithoutRefreshingSource()
       throws UnexpectedNoAccessRightException {
     Note source = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
-    NoteUpdateContentDTO contentDto = new NoteUpdateContentDTO();
-    contentDto.setContent("See [[Future]].");
-    textContentController.updateNoteContent(source, contentDto);
+    authorWikiLinkTo(source, "Future");
 
     // "Future" does not exist yet: the authored wiki link is missing, so it resolves to nothing.
     assertThat(controller.showNote(source).getWikiLinks(), hasSize(0));
@@ -79,5 +85,32 @@ class NoteControllerShowTests extends ControllerTestBase {
     NoteRealm futureRealm = controller.showNote(future);
     assertThat(futureRealm.getReferences(), hasSize(1));
     assertThat(futureRealm.getReferences().getFirst().getId(), equalTo(source.getId()));
+  }
+
+  @Test
+  void namesakeCreationRemovesNowAmbiguousInboundReferenceFromBothTargets()
+      throws UnexpectedNoAccessRightException {
+    Folder homeFolder = makeMe.aFolder().notebookOwnedBy(currentUser.getUser()).please();
+    Note target = makeMe.aNote().title("Target").folder(homeFolder).please();
+    Note source = makeMe.aNote().underSameNotebookAs(target).please();
+    authorWikiLinkTo(source, "Target");
+
+    // Unique "Target" resolves: source appears inbound.
+    assertThat(controller.showNote(target).getReferences(), hasSize(1));
+    assertThat(
+        controller.showNote(target).getReferences().getFirst().getId(), equalTo(source.getId()));
+
+    // A namesake in a different folder of the same notebook makes "[[Target]]" ambiguous between
+    // the two same-titled notes (a plain, non-path-shaped token doesn't pin a folder).
+    Folder otherFolder = makeMe.aFolder().notebook(homeFolder.getNotebook()).please();
+    Note namesake = makeMe.aNote().title("Target").folder(otherFolder).please();
+
+    // Neither same-named note lists source as inbound any more.
+    assertThat(controller.showNote(target).getReferences(), hasSize(0));
+    assertThat(controller.showNote(namesake).getReferences(), hasSize(0));
+
+    // The source's own authored content/entry is unchanged (still the same authored token).
+    NoteRealm sourceRealm = controller.showNote(source);
+    assertThat(sourceRealm.getId(), equalTo(source.getId()));
   }
 }
