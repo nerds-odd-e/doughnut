@@ -1,6 +1,6 @@
 # Question generation: OpenAI FAILED is loud
 
-**Status:** planned (do not execute until asked)
+**Status:** in progress (slice 1 done)
 
 ## Goal
 
@@ -21,8 +21,9 @@ says catch only for a deliberate outcome, then prefer persist/prevent,
 then propagate, and wrap when the raw failure would be unclear.
 
 This outage is not an HTTP/SDK exception. `createResponsesBatch` succeeds;
-the next hourly poll gets OpenAI status `FAILED` (file-access). Today that
-path saves `FAILED` and **returns normally**, so no Failure report.
+the next hourly poll gets OpenAI status `FAILED` (file-access). Slice 1
+persists that `FAILED` then throws so the hourly job writes a Failure
+report.
 
 Intended sequence for that status:
 
@@ -33,15 +34,11 @@ Intended sequence for that status:
    `QuestionGenerationBatchMaintenanceJob`). Consecutive similar hourly
    throws stay one report with a count (ADR 0006).
 
-## Current gap (do not implement in planning)
+## Remaining gap
 
-- `QuestionGenerationBatchPollingService`: OpenAI `FAILED` / `CANCELLED` →
-  persist, no throw.
-- Throw today only if `retrieveBatch` **throws** (`57f1849c24`).
 - Submit-time OpenAI exceptions save `FAILED` then **return false** inside
   `REQUIRES_NEW` (`QuestionGenerationBatchUserSubmissionTx`). Throwing from
-  that same transaction would **roll back** the `FAILED` row. Out of this
-  plan’s first slice (this outage never hits that path).
+  that same transaction would **roll back** the `FAILED` row (slices 2–3).
 
 ## Design
 
@@ -57,36 +54,16 @@ Intended sequence for that status:
 
 ## Slices
 
-### 1. Persist OpenAI FAILED then throw from poll — Behavior — planned
+### 1. Persist OpenAI FAILED then throw from poll — Behavior — done
 
-**Pre-condition:** A local batch is `SUBMITTED`. OpenAI retrieve returns
-status `FAILED` (optional `errors` with a human message, as in the file
-access outage).
+Poller persists OpenAI `FAILED`/`CANCELLED` as local `FAILED`, then throws
+one exception (process-all-then-throw). Message uses OpenAI `errors` text
+when present, else `openai batch failed`, plus batch id. `EXPIRED` still
+persists without throwing.
 
-**Trigger:** Hourly resume polls submitted batches
-(`QuestionGenerationBatchPollingService.pollSubmittedBatches`).
-
-**Post-condition:**
-
-- Local batch is `FAILED`; pending requests are `FAILED` (still saved if
-  the poller then throws).
-- `pollSubmittedBatches` throws; message contains the OpenAI error text
-  when provided (otherwise the existing `openai batch failed` wording).
-- Hourly job therefore writes a Failure report on resume (existing
-  behavior; do not re-assert the job in a second test). Due-user submit
-  still runs after resume error.
-
-**Test:** Extend `QuestionGenerationBatchPollingServiceTest`
-`failedUpdatesLocalBatch` (and add OpenAI `errors` on the stubbed `Batch`
-when asserting the message). Drive the poller; mock only `OpenAiApiHandler`.
-Existing retrieve-throw test stays.
-
-**Docs:** One line in `docs/question-generation-batch-operations.md` that
-OpenAI `FAILED` persists then fails loudly.
-
-Stop-safe: this is the outage signal. Collect/import/prune in the **same**
-resume call stay skipped when poll throws — same as today’s retrieve-throw
-path. Next hour with no new `FAILED` continues collect.
+**Learning:** `Batch.errors()` stayed a small helper on the poller. Status
+tests that grew past 250 lines were split into
+`QuestionGenerationBatchPollingScopeTest`.
 
 ### 2. Commit submit-time FAILED outside the user tx — Structure — planned
 
@@ -121,8 +98,3 @@ survives the throw). Only then stop returning `false` as the sole outcome.
   retrieve-throw).
 - New E2E (no OpenAI Batch in Cypress).
 
-## Jidoka
-
-If extracting `Batch.errors()` needs more than a small helper on the
-existing poller/test stub, stop and split that helper as Structure before
-retrying slice 1.
