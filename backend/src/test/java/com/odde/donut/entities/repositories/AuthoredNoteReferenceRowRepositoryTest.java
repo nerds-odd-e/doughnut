@@ -10,6 +10,7 @@ import com.odde.donut.algorithms.AuthoredNoteReference;
 import com.odde.donut.entities.AuthoredNoteReferenceRow;
 import com.odde.donut.entities.Note;
 import com.odde.donut.testability.MakeMe;
+import jakarta.persistence.EntityManager;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 class AuthoredNoteReferenceRowRepositoryTest {
 
   @Autowired MakeMe makeMe;
-  @Autowired AuthoredNoteReferenceRowRepository authoredNoteReferenceRowRepository;
+  @Autowired EntityManager entityManager;
 
   @Test
   void replaceContentPersistsOneRowPerReferenceInDocumentOrderAndReconstructsBothVariants() {
@@ -34,9 +35,8 @@ class AuthoredNoteReferenceRowRepositoryTest {
         new AuthoredNoteReference.NoteIdUrlTarget("[Some Note](/n42)", 42, "/n42", "Some Note");
 
     note.replaceContent(new AuthoredNoteDocument("updated body", List.of(wiki, noteIdUrl)));
-    makeMe.entityPersister.flush();
 
-    List<AuthoredNoteReferenceRow> rows = rowsFor(authoredNoteReferenceRowRepository, note);
+    List<AuthoredNoteReferenceRow> rows = rowsFor(entityManager, note);
     assertThat(rows, hasSize(2));
     assertThat(rows.get(0).getDocumentOrder(), equalTo(0));
     assertThat(rows.get(1).getDocumentOrder(), equalTo(1));
@@ -58,9 +58,8 @@ class AuthoredNoteReferenceRowRepositoryTest {
         new AuthoredNoteDocument(
             "second",
             List.of(new AuthoredNoteReference.NoteIdUrlTarget("[B](/n2)", 2, "/n2", "B"))));
-    makeMe.entityPersister.flush();
 
-    List<AuthoredNoteReferenceRow> rows = rowsFor(authoredNoteReferenceRowRepository, note);
+    List<AuthoredNoteReferenceRow> rows = rowsFor(entityManager, note);
     assertThat(rows, hasSize(1));
     assertThat(rows.getFirst().getAuthoredLink(), equalTo("[B](/n2)"));
   }

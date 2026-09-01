@@ -1,6 +1,7 @@
 package com.odde.donut.controllers;
 
 import static com.odde.donut.controllers.AiControllerExtractNoteTestSupport.*;
+import static com.odde.donut.entities.repositories.AuthoredNoteReferenceRowTestSupport.rowsFor;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -12,6 +13,7 @@ import com.odde.donut.entities.Note;
 import com.odde.donut.entities.repositories.NoteRepository;
 import com.odde.donut.exceptions.ApiException;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
+import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -20,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 class AiControllerCreateExtractedNoteTest extends ControllerTestBase {
   @Autowired AiController controller;
   @Autowired NoteRepository noteRepository;
+  @Autowired EntityManager entityManager;
 
   @BeforeEach
   void setup() {
@@ -109,6 +112,30 @@ class AiControllerCreateExtractedNoteTest extends ControllerTestBase {
       makeMe.entityPersister.refresh(sourceNote);
       assertThat(sourceNote.getContent())
           .isEqualTo("---\ntype: Note\n---\nUpdated parent with summary.");
+    }
+
+    @Test
+    void creatingNoteFromExtractedSuggestionPersistsAuthoredReferenceRowsForBothNewAndOriginalNote()
+        throws UnexpectedNoAccessRightException {
+      Note source =
+          makeMe
+              .aNote()
+              .notebookOwnedBy(currentUser.getUser())
+              .content("Content to extract.")
+              .please();
+      Note urlTarget = makeMe.aNote().underSameNotebookAs(source).please();
+
+      NoteRealm response =
+          controller.createExtractedNote(
+              source,
+              extractionResult(
+                  "Extracted",
+                  "[[Missing]]",
+                  "See [Some Label](/n" + urlTarget.getId() + ")"));
+
+      Note created = noteRepository.findById(response.getNote().getId()).orElseThrow();
+      assertThat(rowsFor(entityManager, created)).hasSize(1);
+      assertThat(rowsFor(entityManager, source)).hasSize(1);
     }
 
     @Test

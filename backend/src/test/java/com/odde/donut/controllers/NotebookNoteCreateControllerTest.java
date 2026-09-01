@@ -1,5 +1,6 @@
 package com.odde.donut.controllers;
 
+import static com.odde.donut.entities.repositories.AuthoredNoteReferenceRowTestSupport.rowsFor;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -14,6 +15,7 @@ import com.odde.donut.entities.Notebook;
 import com.odde.donut.exceptions.ApiException;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.services.ResolvedWikiLinkService;
+import jakarta.persistence.EntityManager;
 import org.hibernate.exception.ConstraintViolationException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -27,6 +29,7 @@ class NotebookNoteCreateControllerTest extends NotebookControllerTestBase {
 
   @Autowired NoteController noteController;
   @Autowired ResolvedWikiLinkService resolvedWikiLinkService;
+  @Autowired EntityManager entityManager;
 
   private NoteCreationDTO noteCreate(String title) {
     NoteCreationDTO dto = new NoteCreationDTO();
@@ -68,6 +71,16 @@ class NotebookNoteCreateControllerTest extends NotebookControllerTestBase {
 
     Note created = noteRepository.findById(result.getId()).orElseThrow();
     assertThat(created.getContent(), equalTo("---\ntype: Note\n---\n# Hello\n\n[[Link]]"));
+  }
+
+  @Test
+  void creatingRootNoteWithAuthoredReferencePersistsItsSourceIndexRow() throws Exception {
+    NoteCreationDTO noteCreation = noteCreate("Carrier");
+    noteCreation.setContent("[[Missing]]");
+    NoteRealm result = controller.createNoteAtNotebookRoot(ownedNotebook(), noteCreation);
+
+    Note created = noteRepository.findById(result.getId()).orElseThrow();
+    assertThat(rowsFor(entityManager, created), hasSize(1));
   }
 
   @Test
