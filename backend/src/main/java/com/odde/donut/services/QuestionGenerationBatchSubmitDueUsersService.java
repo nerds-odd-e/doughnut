@@ -42,6 +42,7 @@ public class QuestionGenerationBatchSubmitDueUsersService {
     int submittedCount = 0;
     int failedCount = 0;
     int skippedCount = 0;
+    RuntimeException firstFailure = null;
 
     for (User user : users) {
       try {
@@ -61,20 +62,19 @@ public class QuestionGenerationBatchSubmitDueUsersService {
                 outcome.userId(),
                 outcome.openAiBatchId());
           }
-          case FAILED -> {
-            failedCount++;
-            logger.info(
-                "Failed question generation batch {} for user {}",
-                outcome.localBatchId(),
-                outcome.userId());
-          }
         }
       } catch (RuntimeException e) {
         failedCount++;
-        logger.warn(
-            "Unexpected failure while submitting question generation batch for user {}",
-            user.getId(),
-            e);
+        logger.warn("Failed to submit question generation batch for user {}", user.getId(), e);
+        if (firstFailure == null) {
+          firstFailure =
+              new RuntimeException(
+                  "Failed to submit question generation batch for user "
+                      + user.getId()
+                      + ": "
+                      + e.getMessage(),
+                  e);
+        }
       }
     }
 
@@ -83,6 +83,9 @@ public class QuestionGenerationBatchSubmitDueUsersService {
         submittedCount,
         failedCount,
         skippedCount);
+    if (firstFailure != null) {
+      throw firstFailure;
+    }
     return new QuestionGenerationBatchSubmissionSummaryDTO(
         users.size(), submittedCount, failedCount, skippedCount);
   }

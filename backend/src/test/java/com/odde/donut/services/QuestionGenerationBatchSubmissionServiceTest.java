@@ -65,9 +65,7 @@ class QuestionGenerationBatchSubmissionServiceTest {
       when(openAiApiHandler.uploadBatchInputFile(any())).thenReturn("file-abc");
       when(openAiApiHandler.createResponsesBatch("file-abc")).thenReturn("batch-xyz");
 
-      boolean submitted = submissionService.submitPlannedBatch(plannedBatch, currentTime);
-
-      assertThat(submitted, is(true));
+      submissionService.submitPlannedBatch(plannedBatch, currentTime);
 
       QuestionGenerationBatch batch = batchRepository.findById(plannedBatch.getId()).orElseThrow();
       assertThat(batch.getStatus(), is(QuestionGenerationBatchStatus.SUBMITTED));

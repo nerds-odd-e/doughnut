@@ -1,7 +1,9 @@
 package com.odde.donut.services;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -32,43 +34,22 @@ class QuestionGenerationBatchSubmitDueUsersServiceLoopTest {
   }
 
   @Test
-  void continuesAfterPerUserFailureAndReturnsSummaryCounts() {
-    User successfulUser = new User();
+  void processesAllUsersThenThrowsFirstFailure() {
     User failingUser = new User();
+    User successfulUser = new User();
     when(planningService.findUsersEligibleForBatchSubmission(cronTime))
-        .thenReturn(List.of(successfulUser, failingUser));
-    when(userSubmissionTx.processDueUser(argThat(u -> u == successfulUser), eq(cronTime)))
-        .thenReturn(DueUserSubmissionOutcome.submitted(1, 10, "batch-ok"));
+        .thenReturn(List.of(failingUser, successfulUser));
     when(userSubmissionTx.processDueUser(argThat(u -> u == failingUser), eq(cronTime)))
-        .thenReturn(DueUserSubmissionOutcome.failed(2, 11));
+        .thenThrow(new RuntimeException("upload failed"));
+    when(userSubmissionTx.processDueUser(argThat(u -> u == successfulUser), eq(cronTime)))
+        .thenReturn(DueUserSubmissionOutcome.submitted(2, 20, "batch-ok"));
 
-    var summary = service.submitDueUsers(cronTime);
+    RuntimeException thrown =
+        assertThrows(RuntimeException.class, () -> service.submitDueUsers(cronTime));
 
-    assertThat(summary.getConsideredUserCount(), equalTo(2));
-    assertThat(summary.getSubmittedCount(), equalTo(1));
-    assertThat(summary.getFailedCount(), equalTo(1));
-    assertThat(summary.getSkippedCount(), equalTo(0));
-
-    verify(userSubmissionTx).processDueUser(argThat(u -> u == successfulUser), eq(cronTime));
+    assertThat(thrown.getMessage(), containsString("upload failed"));
+    assertThat(thrown.getCause().getMessage(), equalTo("upload failed"));
     verify(userSubmissionTx).processDueUser(argThat(u -> u == failingUser), eq(cronTime));
-  }
-
-  @Test
-  void continuesAfterUnexpectedPerUserException() {
-    User firstUser = new User();
-    User secondUser = new User();
-    when(planningService.findUsersEligibleForBatchSubmission(cronTime))
-        .thenReturn(List.of(firstUser, secondUser));
-    when(userSubmissionTx.processDueUser(argThat(u -> u == firstUser), eq(cronTime)))
-        .thenThrow(new RuntimeException("unexpected"));
-    when(userSubmissionTx.processDueUser(argThat(u -> u == secondUser), eq(cronTime)))
-        .thenReturn(DueUserSubmissionOutcome.submitted(2, 20, "batch-2"));
-
-    var summary = service.submitDueUsers(cronTime);
-
-    assertThat(summary.getConsideredUserCount(), equalTo(2));
-    assertThat(summary.getSubmittedCount(), equalTo(1));
-    assertThat(summary.getFailedCount(), equalTo(1));
-    assertThat(summary.getSkippedCount(), equalTo(0));
+    verify(userSubmissionTx).processDueUser(argThat(u -> u == successfulUser), eq(cronTime));
   }
 }

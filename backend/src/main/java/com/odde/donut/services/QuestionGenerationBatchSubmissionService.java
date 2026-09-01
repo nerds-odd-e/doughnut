@@ -29,7 +29,7 @@ public class QuestionGenerationBatchSubmissionService {
     this.submissionFailureTx = submissionFailureTx;
   }
 
-  public boolean submitPlannedBatch(QuestionGenerationBatch batch, Timestamp submissionTime) {
+  public void submitPlannedBatch(QuestionGenerationBatch batch, Timestamp submissionTime) {
     if (batch.getStatus() != QuestionGenerationBatchStatus.PLANNED) {
       throw new IllegalStateException(
           "Only planned batches can be submitted, but batch "
@@ -51,11 +51,10 @@ public class QuestionGenerationBatchSubmissionService {
       batchRepository.saveAndFlush(batch);
 
       batchMetrics.recordSubmittedBatch();
-      return true;
     } catch (RuntimeException e) {
       submissionFailureTx.persistFailedSubmission(batch, e.getMessage());
       batchMetrics.recordFailedBatch();
-      return false;
+      throw e;
     }
   }
 }

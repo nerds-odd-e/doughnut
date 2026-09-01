@@ -33,12 +33,9 @@ public class QuestionGenerationBatchUserSubmissionTx {
     }
 
     QuestionGenerationBatch batch = plannedBatch.get();
-    boolean submitted = submissionService.submitPlannedBatch(batch, currentTime);
-    if (submitted) {
-      return DueUserSubmissionOutcome.submitted(
-          user.getId(), batch.getId(), batch.getOpenaiBatchId());
-    }
-    return DueUserSubmissionOutcome.failed(user.getId(), batch.getId());
+    submissionService.submitPlannedBatch(batch, currentTime);
+    return DueUserSubmissionOutcome.submitted(
+        user.getId(), batch.getId(), batch.getOpenaiBatchId());
   }
 
   @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -49,8 +46,7 @@ public class QuestionGenerationBatchUserSubmissionTx {
 
   public enum OutcomeKind {
     SKIPPED,
-    SUBMITTED,
-    FAILED
+    SUBMITTED
   }
 
   public record DueUserSubmissionOutcome(
@@ -64,10 +60,6 @@ public class QuestionGenerationBatchUserSubmissionTx {
         Integer userId, Integer localBatchId, String openAiBatchId) {
       return new DueUserSubmissionOutcome(
           OutcomeKind.SUBMITTED, userId, localBatchId, openAiBatchId);
-    }
-
-    static DueUserSubmissionOutcome failed(Integer userId, Integer localBatchId) {
-      return new DueUserSubmissionOutcome(OutcomeKind.FAILED, userId, localBatchId, null);
     }
   }
 }
