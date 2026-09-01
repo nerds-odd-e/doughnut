@@ -3,7 +3,10 @@ package com.odde.donut.algorithms;
 import java.util.LinkedHashSet;
 import java.util.regex.Matcher;
 
-/** Rewrites wiki-link tokens inside a Markdown document. */
+/**
+ * Rewrites wiki Portable-path tokens inside a Markdown document. Ordinary Markdown links, including
+ * note-ID URLs, are left unchanged.
+ */
 public final class WikiLinkMarkdownDocumentRewrite {
 
   private WikiLinkMarkdownDocumentRewrite() {}

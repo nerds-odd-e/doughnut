@@ -1,9 +1,7 @@
 package com.odde.donut.algorithms;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -72,21 +70,9 @@ public final class WikiLinkMarkdown {
   }
 
   /**
-   * First-occurrence unique authored tokens. Note-target folding matches alias lookup; encoded
-   * {@code #prop:} keys stay case-sensitive.
+   * Note-target folding for wiki-token uniqueness; encoded {@code #prop:} keys stay case-sensitive.
    */
-  public static List<String> uniqueAuthoredTokensPreserveOrder(List<String> titles) {
-    List<String> out = new ArrayList<>();
-    Set<String> seenDedupeKeys = new HashSet<>();
-    for (String t : titles) {
-      if (seenDedupeKeys.add(authoredTokenDedupeKey(t))) {
-        out.add(t);
-      }
-    }
-    return List.copyOf(out);
-  }
-
-  private static String authoredTokenDedupeKey(String token) {
+  static String authoredTokenDedupeKey(String token) {
     WikiInnerSplit split = splitInner(token);
     PortablePath portablePath = split.portablePath();
     if (!portablePath.hasPropertySuffix()) {

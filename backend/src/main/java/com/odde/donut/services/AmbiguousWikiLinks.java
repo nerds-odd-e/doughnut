@@ -1,7 +1,7 @@
 package com.odde.donut.services;
 
-import com.odde.donut.algorithms.NoteContentMarkdown;
-import com.odde.donut.algorithms.WikiLinkMarkdown;
+import com.odde.donut.algorithms.AuthoredNoteReference;
+import com.odde.donut.algorithms.AuthoredNoteReferences;
 import com.odde.donut.controllers.dto.WikiLink;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.User;
@@ -23,20 +23,20 @@ final class AmbiguousWikiLinks {
       return List.of();
     }
     List<WikiLink> out = new ArrayList<>();
-    List<String> tokens = NoteContentMarkdown.authoredTokensInOccurrenceOrder(content);
-    for (String token : WikiLinkMarkdown.uniqueAuthoredTokensPreserveOrder(tokens)) {
+    for (AuthoredNoteReference.WikiPortablePathTarget wiki :
+        AuthoredNoteReferences.uniqueWikiPortablePathTargets(content)) {
+      String token = wiki.authoredLink();
       if (skipAuthored.contains(token)) {
         continue;
       }
       if (!wikiLinkResolver.isAmbiguousToken(token, focusNote, viewer)) {
         continue;
       }
-      WikiLinkMarkdown.WikiInnerSplit parts = WikiLinkMarkdown.splitInner(token);
       out.add(
           new WikiLink(
               token,
-              parts.portablePath().format(),
-              parts.displayText(),
+              wiki.portablePath().format(),
+              wiki.displayText(),
               WikiLink.Resolution.AMBIGUOUS,
               null));
     }

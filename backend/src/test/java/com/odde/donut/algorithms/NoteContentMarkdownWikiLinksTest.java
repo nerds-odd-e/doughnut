@@ -3,7 +3,6 @@ package com.odde.donut.algorithms;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
@@ -17,57 +16,6 @@ class NoteContentMarkdownWikiLinksTest {
       listed:
         - "[[Listed]]"
       """;
-
-  @Test
-  void authoredTokensInOccurrenceOrder_readsWikiLinkFromParsedFrontmatterScalar() {
-    String title = "In volitional (\"let's\" or \"I shall\") statements";
-    String content = Frontmatter.empty().set("example of", "[[" + title + "]]").fenced("");
-
-    assertThat(
-        NoteContentMarkdown.authoredTokensInOccurrenceOrder(content), equalTo(List.of(title)));
-  }
-
-  @Test
-  void authoredTokensInOccurrenceOrder_readsWikiLinksFromListItemsInYamlOrder() {
-    String content =
-        Frontmatter.parse(
-                """
-                example of:
-                  - "[[First]]"
-                  - plain
-                  - "[[Second]]"
-                """)
-            .fenced("");
-
-    assertThat(
-        NoteContentMarkdown.authoredTokensInOccurrenceOrder(content),
-        equalTo(List.of("First", "Second")));
-  }
-
-  @Test
-  void authoredTokensInOccurrenceOrder_scansScalarsThenListItemsInPropertyOrder() {
-    String content =
-        Frontmatter.parse(
-                """
-                scalar: "[[Scalar]]"
-                listed:
-                  - "[[One]]"
-                  - "[[Two]]"
-                """)
-            .fenced("Body [[Body]]");
-
-    assertThat(
-        NoteContentMarkdown.authoredTokensInOccurrenceOrder(content),
-        equalTo(List.of("Scalar", "One", "Two", "Body")));
-  }
-
-  @Test
-  void authoredTokensInOccurrenceOrder_skipsUnsupportedNestedValues() {
-    String content = Frontmatter.parse(NESTED_AND_LISTED_FRONTMATTER).fenced("");
-
-    assertThat(
-        NoteContentMarkdown.authoredTokensInOccurrenceOrder(content), equalTo(List.of("Listed")));
-  }
 
   @Test
   void

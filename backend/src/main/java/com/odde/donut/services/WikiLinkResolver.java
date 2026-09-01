@@ -1,7 +1,8 @@
 package com.odde.donut.services;
 
+import com.odde.donut.algorithms.AuthoredNoteReference;
+import com.odde.donut.algorithms.AuthoredNoteReferences;
 import com.odde.donut.algorithms.FrontmatterAliases;
-import com.odde.donut.algorithms.NoteContentMarkdown;
 import com.odde.donut.algorithms.PathShapedTarget;
 import com.odde.donut.algorithms.PortablePath;
 import com.odde.donut.algorithms.WikiLinkMarkdown;
@@ -65,15 +66,12 @@ public class WikiLinkResolver {
     if (content == null || content.isBlank()) {
       return List.of();
     }
-    List<String> linkTitlesOrdered = NoteContentMarkdown.authoredTokensInOccurrenceOrder(content);
-    if (linkTitlesOrdered.isEmpty()) {
-      return List.of();
-    }
     List<WikiLinkResolution> out = new ArrayList<>();
-    for (String token : WikiLinkMarkdown.uniqueAuthoredTokensPreserveOrder(linkTitlesOrdered)) {
-      Note target = resolveToken(token, viewer, focusNote);
+    for (AuthoredNoteReference.WikiPortablePathTarget wiki :
+        AuthoredNoteReferences.uniqueWikiPortablePathTargets(content)) {
+      Note target = resolveToken(wiki.authoredLink(), viewer, focusNote);
       if (target != null) {
-        out.add(new WikiLinkResolution(token, target));
+        out.add(new WikiLinkResolution(wiki.authoredLink(), target));
       }
     }
     return List.copyOf(out);
@@ -82,18 +80,17 @@ public class WikiLinkResolver {
   /**
    * Missing wiki-link inners for the viewer, in first-occurrence order (same extract/dedupe/resolve
    * as cache). A token with several readable matches is ambiguous, not missing, and is excluded.
+   * Note-ID URL references are not wiki tokens and are excluded.
    */
   public List<String> missingWikiLinkTokens(Note focusNote, User viewer) {
     String content = focusNote.getContent();
     if (content == null || content.isBlank()) {
       return List.of();
     }
-    List<String> linkTitlesOrdered = NoteContentMarkdown.authoredTokensInOccurrenceOrder(content);
-    if (linkTitlesOrdered.isEmpty()) {
-      return List.of();
-    }
     List<String> missing = new ArrayList<>();
-    for (String token : WikiLinkMarkdown.uniqueAuthoredTokensPreserveOrder(linkTitlesOrdered)) {
+    for (AuthoredNoteReference.WikiPortablePathTarget wiki :
+        AuthoredNoteReferences.uniqueWikiPortablePathTargets(content)) {
+      String token = wiki.authoredLink();
       if (resolveToken(token, viewer, focusNote) == null
           && !isAmbiguousToken(token, focusNote, viewer)) {
         missing.add(token);

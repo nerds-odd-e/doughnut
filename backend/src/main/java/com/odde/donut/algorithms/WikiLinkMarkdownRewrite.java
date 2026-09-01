@@ -3,7 +3,10 @@ package com.odde.donut.algorithms;
 import com.odde.donut.validators.DisplayNamePathSeparators;
 import java.util.function.UnaryOperator;
 
-/** Rewrites one stored wiki-link inner token. */
+/**
+ * Rewrites one stored wiki Portable-path inner token. Note-ID URL Markdown links are never
+ * rewritten here.
+ */
 public final class WikiLinkMarkdownRewrite {
 
   private WikiLinkMarkdownRewrite() {}

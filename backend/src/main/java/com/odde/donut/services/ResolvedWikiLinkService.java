@@ -1,6 +1,6 @@
 package com.odde.donut.services;
 
-import com.odde.donut.algorithms.WikiLinkMarkdown;
+import com.odde.donut.algorithms.AuthoredNoteReference;
 import com.odde.donut.algorithms.WikiLinkPropertyMatch;
 import com.odde.donut.controllers.dto.WikiLink;
 import com.odde.donut.entities.Note;
@@ -60,12 +60,13 @@ public class ResolvedWikiLinkService {
         resolvedWikiLinkRepository.findBySourceNote_IdOrderByIdAsc(focusNote.getId())) {
       Note resolved = authorizedOutgoingTargetNote(focusNote, row, viewer);
       if (resolved != null) {
-        WikiLinkMarkdown.WikiInnerSplit parts = WikiLinkMarkdown.splitInner(row.getAuthoredLink());
+        AuthoredNoteReference.WikiPortablePathTarget wiki =
+            AuthoredNoteReference.WikiPortablePathTarget.fromAuthoredInner(row.getAuthoredLink());
         out.add(
             new WikiLink(
                 row.getAuthoredLink(),
-                parts.portablePath().format(),
-                parts.displayText(),
+                wiki.portablePath().format(),
+                wiki.displayText(),
                 WikiLink.Resolution.RESOLVED,
                 resolved.getId()));
         emittedAuthored.add(row.getAuthoredLink());

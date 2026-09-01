@@ -1,6 +1,6 @@
 package com.odde.donut.services;
 
-import com.odde.donut.algorithms.NoteContentMarkdown;
+import com.odde.donut.algorithms.AuthoredNoteReferences;
 import com.odde.donut.algorithms.PathShapedTarget;
 import com.odde.donut.algorithms.PortablePath;
 import com.odde.donut.algorithms.WikiLinkMarkdown;
@@ -24,7 +24,9 @@ import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
-/** Persistence helpers for {@link WikiLinkRewriteService}. */
+/**
+ * Wiki Portable-path rewrite helpers for {@link WikiLinkRewriteService}. Note-ID URLs are skipped.
+ */
 final class WikiLinkRewriteSupport {
 
   private WikiLinkRewriteSupport() {}
@@ -106,8 +108,10 @@ final class WikiLinkRewriteSupport {
     String content = originalContent;
     Map<String, Note> coMovedTargetsByAuthoredLink =
         coMovedTargetsByAuthoredLink(resolvedWikiLinkRepository, movedNote, coMovedTargetNoteIds);
-    LinkedHashSet<String> linkTexts =
-        new LinkedHashSet<>(NoteContentMarkdown.authoredTokensInOccurrenceOrder(content));
+    LinkedHashSet<String> linkTexts = new LinkedHashSet<>();
+    for (var wiki : AuthoredNoteReferences.uniqueWikiPortablePathTargets(content)) {
+      linkTexts.add(wiki.authoredLink());
+    }
     for (String linkText : linkTexts) {
       Note coMovedTarget = coMovedTargetsByAuthoredLink.get(linkText);
       String newInner;

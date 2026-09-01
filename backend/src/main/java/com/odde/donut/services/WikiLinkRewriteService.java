@@ -18,6 +18,7 @@ import java.util.function.BiFunction;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+/** Rewrites wiki Portable-path links when notes move or rename. Note-ID URL links are unchanged. */
 @Service
 public class WikiLinkRewriteService {
   @PersistenceContext private EntityManager entityManager;

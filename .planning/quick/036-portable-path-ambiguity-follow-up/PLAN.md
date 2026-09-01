@@ -1,6 +1,6 @@
 # Wiki-link ambiguity and Markdown URL conformance
 
-**Status:** in progress (slices 1–6 done; next: slice 7)
+**Status:** in progress (slices 1–7 done; next: slice 8)
 
 ## Goal
 
@@ -195,16 +195,13 @@ consolidated; E2E covers existing qualified overlap.
 
 ### 7. Authored note references have a syntax-neutral model
 
-**Status:** planned
+**Status:** done
 **Type:** Structure
 
-Introduce cohesive backend and frontend authored-reference models that
-distinguish a wiki Portable-path target from a note-ID URL target. Initially
-emit only the existing wiki kind, so external behavior and API output remain
-unchanged. Keep rewrite operations explicitly wiki-only. This directly
-prepares slice 8 without retaining the retired path-Markdown abstraction.
-
-Verification: full backend unit suite.
+`AuthoredNoteReference` / `AuthoredNoteReferences` (backend) and
+`authoredNoteReference.ts` (frontend) distinguish wiki Portable-path vs
+note-ID URL kinds; extraction emits wiki only; public `WikiLink` unchanged.
+Prepares slice 8.
 
 ### 8. A root-relative Donut note URL contributes one semantic reference
 
