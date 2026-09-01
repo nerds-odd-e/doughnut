@@ -68,6 +68,15 @@ public record PathShapedTarget(
     return formatPath(updated, title);
   }
 
+  /**
+   * Formats this title (and optional {@code .md}) at a new folder trail. Empty trail uses
+   * exact-root {@code /Title} spelling.
+   */
+  String atFolderTrail(List<String> newFolderNames) {
+    List<String> folders = newFolderNames == null ? List.of() : List.copyOf(newFolderNames);
+    return formatPath(folders, title, folders.isEmpty());
+  }
+
   public boolean matchesTitleAndFolderTrail(String noteTitle, List<String> folderTrailNames) {
     if (!noteTitle.equalsIgnoreCase(title)) {
       return false;
@@ -84,8 +93,12 @@ public record PathShapedTarget(
   }
 
   private String formatPath(List<String> folders, String noteTitle) {
+    return formatPath(folders, noteTitle, leadingSlash);
+  }
+
+  private String formatPath(List<String> folders, String noteTitle, boolean useLeadingSlash) {
     StringBuilder out = new StringBuilder();
-    if (leadingSlash) {
+    if (useLeadingSlash) {
       out.append('/');
     }
     if (!folders.isEmpty()) {

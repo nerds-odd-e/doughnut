@@ -1,6 +1,6 @@
 # Wiki-link ambiguity and Markdown URL conformance
 
-**Status:** in progress (slices 1–11 done; next: slice 12)
+**Status:** in progress (slices 1–12 done; next: slice 13)
 
 ## Goal
 
@@ -241,24 +241,13 @@ Covered at controller + `folder_organization.feature`.
 
 ### 12. Moving a note preserves exact wiki Portable paths
 
-**Status:** planned
+**Status:** done
 **Type:** Behavior
 
-**Pre-condition:** Another note contains an exact folder/root wiki link to the
-note being moved.
-
-**Trigger:** The learner moves the destination into a folder or back to the
-notebook root.
-
-**Post-condition:** Stored wiki syntax contains the new Portable path, keeps
-display text, property selector, and optional `.md`, and resolves after a fresh
-index rebuild. Canonical Donut note URLs remain unchanged.
-
-Do not rewrite an unqualified shorthand whose destination remains unique. Add
-controller cases for folder and root directions and extend the location-change
-scenario in `wiki_link.feature`.
-
-Verification: full backend unit suite; focused `wiki_link.feature`.
+Same-notebook note moves rewrite exact folder/root wiki Portable paths via
+`rewriteInboundWikiLinksForLocationChange` (display/`#prop:`/`.md` kept;
+unique shorthand and note-ID URLs unchanged). E2E in
+`wiki_link_move.feature`. Seam ready for slices 13–14.
 
 ### 13. Reparenting a folder preserves exact descendant wiki links
 

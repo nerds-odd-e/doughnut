@@ -106,11 +106,7 @@ public class QuestionGenerationBatchPollingService {
   }
 
   private static String openAiBatchFailureMessage(Batch openAiBatch) {
-    return openAiBatch
-        .errors()
-        .flatMap(Batch.Errors::data)
-        .orElse(List.of())
-        .stream()
+    return openAiBatch.errors().flatMap(Batch.Errors::data).orElse(List.of()).stream()
         .map(BatchError::message)
         .flatMap(Optional::stream)
         .findFirst()

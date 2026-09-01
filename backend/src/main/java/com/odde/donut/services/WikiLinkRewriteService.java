@@ -2,6 +2,7 @@ package com.odde.donut.services;
 
 import com.odde.donut.algorithms.WikiLinkMarkdown;
 import com.odde.donut.algorithms.WikiLinkMarkdownRewrite;
+import com.odde.donut.controllers.dto.FolderTrailSegments;
 import com.odde.donut.controllers.dto.TitleRenameReferenceHandling;
 import com.odde.donut.entities.DisplayName;
 import com.odde.donut.entities.Note;
@@ -12,6 +13,7 @@ import com.odde.donut.factoryServices.EntityPersister;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import java.sql.Timestamp;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.BiFunction;
@@ -42,10 +44,7 @@ public class WikiLinkRewriteService {
     this.wikiLinkResolver = wikiLinkResolver;
   }
 
-  /**
-   * Rewrites inbound wiki links and rebuilds each changed referrer's resolved wiki-link index.
-   * Persists the renamed note's new title first so updated referrer tokens resolve.
-   */
+  /** Persists the new title, then rewrites inbound wiki links and rebuilds referrer indexes. */
   @Transactional
   public void rewriteInboundWikiLinksForTitleRename(
       Note targetNote,
@@ -57,18 +56,13 @@ public class WikiLinkRewriteService {
     targetNote.setUpdatedAt(updatedAt);
     entityPersister.save(targetNote);
     entityManager.flush();
+    boolean keepVisible = handling == TitleRenameReferenceHandling.KEEP_VISIBLE_TEXT;
     rewriteInboundWikiLinks(
         targetNote,
         updatedAt,
         viewer,
-        (referrer, linkText) -> rewrittenTitleReference(referrer, targetNote, linkText, handling),
+        (referrer, linkText) -> rewrittenReference(referrer, targetNote, linkText, keepVisible),
         Set.of());
-  }
-
-  private String rewrittenTitleReference(
-      Note referrer, Note targetNote, String linkText, TitleRenameReferenceHandling handling) {
-    return rewrittenReference(
-        referrer, targetNote, linkText, handling == TitleRenameReferenceHandling.KEEP_VISIBLE_TEXT);
   }
 
   private String rewrittenReference(
@@ -81,8 +75,7 @@ public class WikiLinkRewriteService {
   }
 
   /**
-   * Rewrites inbound and outgoing wiki links when a note moves to a different notebook. No-op when
-   * the source and target notebooks are the same.
+   * Cross-notebook note move: rewrite inbound and outgoing wiki links. No-op when notebooks match.
    */
   @Transactional
   public void rewriteWikiLinksForCrossNotebookMove(
@@ -100,10 +93,19 @@ public class WikiLinkRewriteService {
     }
   }
 
-  /**
-   * Rewrites inbound wiki links for a note that has moved to a different notebook. Preserves
-   * visible display text while authoring an unambiguous Portable path from each referrer.
-   */
+  /** Same-notebook location change: rewrite inbound exact folder/root wiki paths. */
+  @Transactional
+  public void rewriteInboundWikiLinksForLocationChange(
+      Note targetNote, Timestamp updatedAt, User viewer) {
+    List<String> folderTrail = FolderTrailSegments.namesFromRootToContainingFolder(targetNote);
+    rewriteInboundWikiLinks(
+        targetNote,
+        updatedAt,
+        viewer,
+        (_, linkText) -> WikiLinkMarkdownRewrite.newInnerForLocationChange(linkText, folderTrail),
+        Set.of());
+  }
+
   @Transactional
   public void rewriteInboundWikiLinksForNotebookMove(
       Note targetNote, String newNotebookName, Timestamp updatedAt, User viewer) {
@@ -137,10 +139,7 @@ public class WikiLinkRewriteService {
     return rewrittenReference(referrer, targetNote, linkText, true);
   }
 
-  /**
-   * Rewrites inbound path-shaped wiki and Markdown links when a folder is renamed. One matching
-   * folder-name segment in the prefix is updated; spelling is preserved.
-   */
+  /** Folder rename: update one matching folder-name segment in inbound path-shaped wiki links. */
   @Transactional
   public void rewriteInboundWikiLinksForFolderRename(
       Set<Integer> noteIdsInSubtree,
@@ -162,10 +161,7 @@ public class WikiLinkRewriteService {
                 Set.of()));
   }
 
-  /**
-   * Rewrites inbound wiki links for every note in a folder subtree that moved to another notebook.
-   * Referrers inside the moved set are skipped because their relative links still resolve.
-   */
+  /** Cross-notebook folder move: rewrite inbound links; skip referrers inside the moved set. */
   @Transactional
   public void rewriteInboundWikiLinksForFolderNotebookMove(
       Set<Integer> movedNoteIds, String newNotebookName, Timestamp updatedAt, User viewer) {
@@ -177,11 +173,7 @@ public class WikiLinkRewriteService {
                 note, newNotebookName, updatedAt, viewer, movedNoteIds));
   }
 
-  /**
-   * Rewrites outgoing wiki links for every note in a folder subtree that moved to another notebook.
-   * Unqualified links to co-moved targets stay relative; links to notes that stayed behind qualify
-   * to the source notebook.
-   */
+  /** Cross-notebook folder move: rewrite outgoing links for each note in the moved set. */
   @Transactional
   public void rewriteOutgoingWikiLinksForFolderNotebookMove(
       Set<Integer> movedNoteIds, String sourceNotebookName, Timestamp updatedAt, User viewer) {
@@ -193,10 +185,7 @@ public class WikiLinkRewriteService {
                 note, sourceNotebookName, updatedAt, viewer, movedNoteIds));
   }
 
-  /**
-   * Rewrites a moved note's own unqualified outgoing wiki links so they keep pointing at its source
-   * notebook after the note moves to another notebook.
-   */
+  /** Qualify a moved note's unqualified outgoing wiki links to the source notebook. */
   @Transactional
   public void rewriteOutgoingWikiLinksForNotebookMove(
       Note movedNote, String sourceNotebookName, Timestamp updatedAt, User viewer) {

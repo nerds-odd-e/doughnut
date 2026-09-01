@@ -1,5 +1,6 @@
 package com.odde.donut.algorithms;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.function.UnaryOperator;
 
@@ -130,6 +131,19 @@ public record PortablePath(
     return new PortablePath(Optional.empty(), newPortion, encodedPropertyKey);
   }
 
+  /**
+   * Rewrites a path-shaped note portion to {@code newFolderNames}; unqualified shorthand is
+   * unchanged. Notebook qualifier and {@code #prop:} suffix are preserved.
+   */
+  public PortablePath withFolderTrail(List<String> newFolderNames) {
+    return PathShapedTarget.tryParse(notePortion)
+        .map(
+            path ->
+                new PortablePath(
+                    notebookQualifier, path.atFolderTrail(newFolderNames), encodedPropertyKey))
+        .orElse(this);
+  }
+
   public PortablePath withNotebookName(String newNotebookName) {
     return new PortablePath(Optional.of(newNotebookName), notePortion, encodedPropertyKey);
   }
@@ -141,6 +155,10 @@ public record PortablePath(
   static String replaceFolderName(
       String authoredToken, String oldFolderName, String newFolderName) {
     return parse(authoredToken).withRenamedFolder(oldFolderName, newFolderName).format();
+  }
+
+  static String replaceFolderTrail(String authoredToken, List<String> newFolderNames) {
+    return parse(authoredToken).withFolderTrail(newFolderNames).format();
   }
 
   static String replaceNotebookName(String authoredToken, String newNotebookName) {

@@ -13,7 +13,9 @@ import com.odde.donut.services.ResolvedWikiLinkService;
 import com.odde.donut.services.WikiLinkRewriteService;
 import com.odde.donut.testability.TestabilitySettings;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.sql.Timestamp;
 import java.util.List;
+import java.util.Objects;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -57,14 +59,7 @@ class RelationController {
     Notebook targetNotebook = targetFolder.getNotebook();
     noteMotionService.executeMoveIntoFolder(sourceNote, targetFolder);
     User user = authorizationService.getCurrentUser();
-    wikiLinkRewriteService.rewriteWikiLinksForCrossNotebookMove(
-        sourceNote,
-        oldNotebook,
-        targetNotebook,
-        testabilitySettings.getCurrentUTCTimestamp(),
-        user);
-    resolvedWikiLinkService.refreshCardinalityAcrossMovedNotebooks(
-        oldNotebook, targetNotebook, user);
+    rewriteWikiLinksAfterNoteMove(sourceNote, oldNotebook, targetNotebook, user);
     return List.of(noteRealmService.build(sourceNote, user));
   }
 
@@ -75,8 +70,10 @@ class RelationController {
       throws UnexpectedNoAccessRightException {
     authorizationService.assertAuthorization(sourceNote);
     authorizationService.assertAuthorization(sourceNote.getNotebook());
-    noteMotionService.executeMoveToNotebookRoot(sourceNote, sourceNote.getNotebook());
+    Notebook notebook = sourceNote.getNotebook();
+    noteMotionService.executeMoveToNotebookRoot(sourceNote, notebook);
     User user = authorizationService.getCurrentUser();
+    rewriteWikiLinksAfterNoteMove(sourceNote, notebook, notebook, user);
     return List.of(noteRealmService.build(sourceNote, user));
   }
 
@@ -91,14 +88,20 @@ class RelationController {
     Notebook oldNotebook = sourceNote.getNotebook();
     noteMotionService.executeMoveToNotebookRoot(sourceNote, targetNotebook);
     User user = authorizationService.getCurrentUser();
-    wikiLinkRewriteService.rewriteWikiLinksForCrossNotebookMove(
-        sourceNote,
-        oldNotebook,
-        targetNotebook,
-        testabilitySettings.getCurrentUTCTimestamp(),
-        user);
-    resolvedWikiLinkService.refreshCardinalityAcrossMovedNotebooks(
-        oldNotebook, targetNotebook, user);
+    rewriteWikiLinksAfterNoteMove(sourceNote, oldNotebook, targetNotebook, user);
     return List.of(noteRealmService.build(sourceNote, user));
+  }
+
+  private void rewriteWikiLinksAfterNoteMove(
+      Note movedNote, Notebook oldNotebook, Notebook targetNotebook, User user) {
+    Timestamp now = testabilitySettings.getCurrentUTCTimestamp();
+    if (Objects.equals(oldNotebook.getId(), targetNotebook.getId())) {
+      wikiLinkRewriteService.rewriteInboundWikiLinksForLocationChange(movedNote, now, user);
+    } else {
+      wikiLinkRewriteService.rewriteWikiLinksForCrossNotebookMove(
+          movedNote, oldNotebook, targetNotebook, now, user);
+      resolvedWikiLinkService.refreshCardinalityAcrossMovedNotebooks(
+          oldNotebook, targetNotebook, user);
+    }
   }
 }

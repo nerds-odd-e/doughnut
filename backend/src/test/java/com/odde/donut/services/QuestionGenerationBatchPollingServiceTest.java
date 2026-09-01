@@ -1,11 +1,11 @@
 package com.odde.donut.services;
 
+import static com.odde.donut.services.QuestionGenerationBatchPollingTestSupport.openAiBatchWithStatus;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static com.odde.donut.services.QuestionGenerationBatchPollingTestSupport.openAiBatchWithStatus;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;

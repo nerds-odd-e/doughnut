@@ -1,6 +1,7 @@
 package com.odde.donut.algorithms;
 
 import com.odde.donut.validators.DisplayNamePathSeparators;
+import java.util.List;
 import java.util.function.UnaryOperator;
 
 /**
@@ -44,6 +45,20 @@ public final class WikiLinkMarkdownRewrite {
     return rewriteWikiInnerTarget(
         storedLinkInner,
         token -> PortablePath.replaceFolderName(token, oldFolderName, newFolderName));
+  }
+
+  /**
+   * Rewrites a path-shaped wiki inner to a new folder trail (empty trail → exact-root {@code
+   * /Title}). Unqualified shorthand is unchanged. Display text, property selector, and optional
+   * {@code .md} are preserved.
+   */
+  public static String newInnerForLocationChange(
+      String storedLinkInner, List<String> newFolderNames) {
+    if (storedLinkInner == null || storedLinkInner.isEmpty()) {
+      return storedLinkInner;
+    }
+    return rewriteWikiInnerTarget(
+        storedLinkInner, token -> PortablePath.replaceFolderTrail(token, newFolderNames));
   }
 
   /**
