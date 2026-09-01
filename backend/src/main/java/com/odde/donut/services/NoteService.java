@@ -8,6 +8,7 @@ import com.odde.donut.entities.Image;
 import com.odde.donut.entities.MemoryTracker;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.User;
+import com.odde.donut.entities.repositories.AuthoredNoteReferenceInboundFacade;
 import com.odde.donut.entities.repositories.ImageRepository;
 import com.odde.donut.entities.repositories.MemoryTrackerRepository;
 import com.odde.donut.entities.repositories.NoteRepository;
@@ -42,7 +43,8 @@ public class NoteService {
       AuthorizationService authorizationService,
       ImageRepository imageRepository,
       EntityPersister entityPersister,
-      TestabilitySettings testabilitySettings) {
+      TestabilitySettings testabilitySettings,
+      AuthoredNoteReferenceInboundFacade authoredNoteReferenceInboundFacade) {
     this.noteRepository = noteRepository;
     this.memoryTrackerRepository = memoryTrackerRepository;
     this.imageRepository = imageRepository;
@@ -57,7 +59,8 @@ public class NoteService {
             wikiLinkResolver,
             authorizationService,
             entityPersister,
-            this::deleteOrphanImagesForPersistedContent);
+            this::deleteOrphanImagesForPersistedContent,
+            authoredNoteReferenceInboundFacade);
   }
 
   public List<Note> findRecentNotesByUser(Integer userId) {

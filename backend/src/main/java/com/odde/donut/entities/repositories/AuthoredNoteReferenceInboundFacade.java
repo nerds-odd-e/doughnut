@@ -12,8 +12,10 @@ import com.odde.donut.entities.User;
 import com.odde.donut.services.WikiLinkResolver;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Set;
 import org.springframework.stereotype.Service;
 
 /**
@@ -64,6 +66,18 @@ public class AuthoredNoteReferenceInboundFacade {
       }
     }
     return List.copyOf(distinctReferrersInOrder.values());
+  }
+
+  /**
+   * Note ids from {@link #distinctReferrerNotesForViewer}, for callers that only need identity
+   * (e.g. to filter a separate cached-row query down to currently live-resolved referrers).
+   */
+  public Set<Integer> distinctReferrerIdsForViewer(Note target, User viewer) {
+    Set<Integer> ids = new HashSet<>();
+    for (Note referrer : distinctReferrerNotesForViewer(target, viewer)) {
+      ids.add(referrer.getId());
+    }
+    return ids;
   }
 
   /**

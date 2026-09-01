@@ -8,6 +8,7 @@ import com.odde.donut.entities.MemoryTracker;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.ResolvedWikiLink;
 import com.odde.donut.entities.User;
+import com.odde.donut.entities.repositories.AuthoredNoteReferenceInboundFacade;
 import com.odde.donut.entities.repositories.MemoryTrackerRepository;
 import com.odde.donut.entities.repositories.ResolvedWikiLinkRepository;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
@@ -35,6 +36,7 @@ final class NoteReferenceHandling {
   private final AuthorizationService authorizationService;
   private final EntityPersister entityPersister;
   private final Consumer<Note> deleteOrphanImages;
+  private final AuthoredNoteReferenceInboundFacade authoredNoteReferenceInboundFacade;
 
   NoteReferenceHandling(
       MemoryTrackerRepository memoryTrackerRepository,
@@ -43,7 +45,8 @@ final class NoteReferenceHandling {
       WikiLinkResolver wikiLinkResolver,
       AuthorizationService authorizationService,
       EntityPersister entityPersister,
-      Consumer<Note> deleteOrphanImages) {
+      Consumer<Note> deleteOrphanImages,
+      AuthoredNoteReferenceInboundFacade authoredNoteReferenceInboundFacade) {
     this.memoryTrackerRepository = memoryTrackerRepository;
     this.resolvedWikiLinkRepository = resolvedWikiLinkRepository;
     this.resolvedWikiLinkService = resolvedWikiLinkService;
@@ -51,6 +54,7 @@ final class NoteReferenceHandling {
     this.authorizationService = authorizationService;
     this.entityPersister = entityPersister;
     this.deleteOrphanImages = deleteOrphanImages;
+    this.authoredNoteReferenceInboundFacade = authoredNoteReferenceInboundFacade;
   }
 
   void reduceRelationNoteToSourceProperty(
@@ -87,11 +91,17 @@ final class NoteReferenceHandling {
   }
 
   void removeNoteLinksFromReferrerProperties(Note target, User viewer, Timestamp updatedAt) {
+    Set<Integer> liveResolvedReferrerIds =
+        authoredNoteReferenceInboundFacade.distinctReferrerIdsForViewer(target, viewer);
     Map<Note, Set<String>> referrersByLinkTexts = new LinkedHashMap<>();
     for (ResolvedWikiLink row :
         resolvedWikiLinkRepository.findRowsReferringToNonDeletedNotesForTarget(target.getId())) {
+      Note sourceNote = row.getSourceNote();
+      if (!liveResolvedReferrerIds.contains(sourceNote.getId())) {
+        continue;
+      }
       referrersByLinkTexts
-          .computeIfAbsent(row.getSourceNote(), ignored -> new LinkedHashSet<>())
+          .computeIfAbsent(sourceNote, ignored -> new LinkedHashSet<>())
           .add(row.getAuthoredLink());
     }
     for (Map.Entry<Note, Set<String>> entry : referrersByLinkTexts.entrySet()) {
