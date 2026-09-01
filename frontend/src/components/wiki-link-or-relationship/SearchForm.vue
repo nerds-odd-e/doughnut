@@ -41,11 +41,9 @@ import usePopups from "../commons/Popups/usePopups"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import { buildWikiLinkText } from "@/utils/buildWikiLinkText"
 import { useContentCursorInserter } from "@/composables/useContentCursorInserter"
-import { authoredHrefLooksLikePortablePath } from "@/utils/authoredLinkMarkup"
 import {
   type DeadWikiLinkPayload,
   markdownWikiTokenFromDeadWikiLinkPayload,
-  pathMarkdownTokenForNote,
 } from "@/utils/wikiLinkMarkup"
 import {
   authoredWikiLinkTokenForInsert,
@@ -108,11 +106,6 @@ async function onInsertWikiLinkAsProperty() {
   await insertAuthoredWikiLink(insertWikiLinkAsProperty)
 }
 
-async function folderNamesForNote(noteId: number): Promise<string[]> {
-  const realm = await storageAccessor.value.storedApi().loadNoteRealm(noteId)
-  return (realm.ancestorFolders ?? []).map((folder) => folder.name)
-}
-
 async function wikiLinkSpellingForDestination(): Promise<string | undefined> {
   const destination = selectedSearchResult.value
   if (!destination || !note || !deadWikiLinkPayload) return
@@ -123,14 +116,6 @@ async function wikiLinkSpellingForDestination(): Promise<string | undefined> {
       deadWikiLinkPayload.portablePath,
       deadWikiLinkPayload.displayText
     )
-  }
-  if (authoredHrefLooksLikePortablePath(deadWikiLinkPayload.portablePath)) {
-    return pathMarkdownTokenForNote({
-      displayText: deadWikiLinkPayload.displayText,
-      folderNames: await folderNamesForNote(destination.noteTopology.id),
-      title: destination.noteTopology.title,
-      authoredHref: deadWikiLinkPayload.portablePath,
-    })
   }
   return buildWikiLinkText(destination, {
     notebookId: notebookId.value,

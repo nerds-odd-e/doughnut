@@ -66,6 +66,8 @@ export const noteContentEditingMethods = () => ({
       'wiki link': 'a',
       'dead wiki link': 'a.dead-wiki-link',
       'live wiki link': 'a.donut-wiki-link',
+      'markdown link':
+        'a:not(.donut-wiki-link):not(.dead-wiki-link):not(.pending-wiki-link)',
     }
     for (const element of elements) {
       const kind = (element.Kind ?? '').trim()

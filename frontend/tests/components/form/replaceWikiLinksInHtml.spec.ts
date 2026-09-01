@@ -1,5 +1,5 @@
 import { replaceWikiLinksInHtml } from "@/components/form/replaceWikiLinksInHtml"
-import { notePropertyHref, noteShowHref } from "@/routes/noteShowLocation"
+import { noteShowHref } from "@/routes/noteShowLocation"
 import { wikiLinkFromAuthoredToken } from "@/utils/wikiLinkMarkup"
 import type { WikiLink } from "@generated/donut-backend-api"
 import { describe, it, expect } from "vitest"
@@ -52,36 +52,19 @@ describe("replaceWikiLinksInHtml", () => {
     )
   })
 
-  it("marks leftover portable-path anchors as unresolved wiki links with hash href", () => {
+  it("leaves ordinary file-looking Markdown anchors unchanged", () => {
     expect(
-      replaceWikiLinksInHtml(
-        '<p><a href="/Folder/Missing.md">label</a></p>',
-        []
-      )
-    ).toBe(
-      '<p><a href="#" class="dead-wiki-link" data-portable-path="/Folder/Missing.md" data-display-text="label">label</a></p>'
-    )
+      replaceWikiLinksInHtml('<p><a href="/Folder/Missing.md">label</a></p>', [
+        {
+          authoredLink: "[label](/Folder/Missing.md)",
+          portablePath: "/Folder/Missing.md",
+          displayText: "label",
+          resolution: "RESOLVED",
+          destinationNoteId: 42,
+        },
+      ])
+    ).toBe('<p><a href="/Folder/Missing.md">label</a></p>')
   })
-
-  it.each`
-    label                                         | html
-    ${"leftover dead with portable-path href"}    | ${'<p><a href="/Folder/Title.md" class="dead-wiki-link" data-portable-path="/Folder/Title.md" data-display-text="label">label</a></p>'}
-    ${"leftover pending with portable-path href"} | ${'<p><a href="/Folder/Title.md" class="pending-wiki-link" data-portable-path="/Folder/Title.md" data-display-text="label">label</a></p>'}
-    ${"dead with hash href"}                      | ${'<p><a href="#" class="dead-wiki-link" data-portable-path="/Folder/Title.md" data-display-text="label">label</a></p>'}
-    ${"pending with hash href"}                   | ${'<p><a href="#" class="pending-wiki-link" data-portable-path="/Folder/Title.md" data-display-text="label">label</a></p>'}
-    ${"leftover live with portable-path href"}    | ${'<p><a href="/Folder/Title.md" class="donut-wiki-link" data-portable-path="/Folder/Title.md" data-display-text="label" data-note-id="42">label</a></p>'}
-  `(
-    "upgrades $label path markdown anchors to a note-show href when wikiLinks resolve",
-    ({ html }) => {
-      expect(
-        replaceWikiLinksInHtml(html, [
-          wikiLinkFromAuthoredToken("[label](/Folder/Title.md)", 42),
-        ])
-      ).toBe(
-        `<p><a href="${noteShowHref(42)}" class="donut-wiki-link" data-portable-path="/Folder/Title.md" data-display-text="label" data-note-id="42">label</a></p>`
-      )
-    }
-  )
 
   it("preserves Quill hr markup without rewriting through DOMParser", () => {
     const quillHr = "<p><hr></p>"
@@ -155,16 +138,5 @@ describe("replaceWikiLinksInHtml", () => {
     )
     expect(out).toContain("donut-wiki-link")
     expect(out).not.toContain("pending-wiki-link")
-  })
-
-  it("upgrades leftover path-Markdown with a #prop: fragment to noteProperty and keeps the fragment", () => {
-    const href = "/Solar/Moon.md#prop:a%20part%20of"
-    expect(
-      replaceWikiLinksInHtml(`<p><a href="${href}">a part of</a></p>`, [
-        wikiLinkFromAuthoredToken(`[a part of](${href})`, 42),
-      ])
-    ).toBe(
-      `<p><a href="${notePropertyHref(42, "a part of")}" class="donut-wiki-link" data-portable-path="${href}" data-display-text="a part of" data-note-id="42">a part of</a></p>`
-    )
   })
 })

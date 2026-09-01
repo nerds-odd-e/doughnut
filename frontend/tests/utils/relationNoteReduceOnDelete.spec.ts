@@ -23,19 +23,6 @@ describe("qualifyRelationNoteForReduceOnDelete", () => {
     })
   })
 
-  it("qualifies when source is a resolvable path Markdown token", () => {
-    const realm = makeMe.aNoteRealm
-      .content(
-        relationshipNoteContent("a-part-of", "[Moon](/Moon.md)", "[[Earth]]")
-      )
-      .wikiLinks([wikiLinkFromAuthoredToken("[Moon](/Moon.md)", moonId)])
-      .please()
-
-    expect(qualifyRelationNoteForReduceOnDelete(realm)?.sourceNoteId).toBe(
-      moonId
-    )
-  })
-
   it("returns undefined for a normal note", () => {
     expect(
       qualifyRelationNoteForReduceOnDelete(

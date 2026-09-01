@@ -1,6 +1,6 @@
 # Wiki-link ambiguity and Markdown URL conformance
 
-**Status:** in progress (slice 1 done; next: slice 2)
+**Status:** in progress (slices 1–2 done; next: slice 3)
 
 ## Goal
 
@@ -145,27 +145,17 @@ paste-to-wiki conversion and its `sourceNotebookId` plumbing removed.
 
 ### 2. File-looking Markdown URLs keep ordinary link UI
 
-**Status:** planned
+**Status:** done
 **Type:** Behavior
 
-**Pre-condition:** Note content contains `[Target](/folder/Target.md)`,
-`[Target](folder/Target.md)`, or another URL that is not a canonical Donut note
-route.
+File-looking Markdown URLs render as ordinary anchors (no wiki styling/repair)
+and serialize unchanged. Frontend path-Markdown extraction/DOM upgrades and
+related tests removed; visible behavior in `markdown_link.feature`.
+`path_markdown_link.feature` and obsolete relationship path-Markdown scenarios
+deleted early (frontend no longer matches them).
 
-**Trigger:** The learner views or edits the note in rich mode.
-
-**Post-condition:** The content renders as a normal Markdown anchor using the
-authored href; it has no wiki live/dead/pending styling or repair interaction
-and serializes back unchanged.
-
-- Remove frontend path-Markdown extraction, wiki DOM upgrades, dead-link
-  payload/repair branches, property-field special rendering, and relation
-  reduction branches.
-- Delete frontend path-Markdown parser/render tests, retaining one mounted
-  ordinary-anchor round-trip regression.
-- Add the visible behavior to capability-named `markdown_link.feature`.
-
-Verification: focused frontend unit tests; focused `markdown_link.feature`.
+**Learning for slice 3:** backend path-Markdown extraction still remains; E2E
+feature file is already gone.
 
 ### 3. File-looking Markdown URLs do not create wiki references
 

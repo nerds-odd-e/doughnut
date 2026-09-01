@@ -5,7 +5,6 @@ import { mockSdkService } from "@tests/helpers"
 import {
   deadWikiLinkPayload,
   pointDeadWikiLinkAndCaptureUpdate,
-  pointPathMarkdownDeadLinkAndCaptureUpdate,
 } from "./searchDialogDeadWikiLinkTestSupport"
 import {
   makeNoteHit,
@@ -61,33 +60,5 @@ describe("SearchForm dead wiki link actions", () => {
         })
       )
     })
-
-    it.each([
-      {
-        deadHref: "/Folder/Missing.md",
-        content: "[label](/Folder/Missing.md) [label](/Folder/Missing.md)",
-        expected:
-          "[label](/ChosenFolder/Title.md) [label](/ChosenFolder/Title.md)",
-      },
-      {
-        deadHref: "/Folder/Missing",
-        content: "See [label](/Folder/Missing) here.",
-        expected: "See [label](/ChosenFolder/Title) here.",
-      },
-    ])(
-      "rewrites path Markdown dead link $deadHref keeping Markdown spelling",
-      async ({ deadHref, content, expected }) => {
-        const updateSpy = await pointPathMarkdownDeadLinkAndCaptureUpdate({
-          deadHref,
-          content,
-        })
-
-        expect(updateSpy).toHaveBeenCalledWith(
-          expect.objectContaining({
-            body: expect.objectContaining({ content: expected }),
-          })
-        )
-      }
-    )
   })
 })

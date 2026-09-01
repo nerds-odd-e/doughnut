@@ -61,29 +61,3 @@ export async function pointDeadWikiLinkAndCaptureUpdate(args: {
   await flushPromises()
   return updateSpy
 }
-
-export async function pointPathMarkdownDeadLinkAndCaptureUpdate(args: {
-  deadHref: string
-  content: string
-}) {
-  const destinationRealm = MakeMe.aNoteRealm
-    .title("Title")
-    .inFolder(10, "ChosenFolder")
-    .please()
-  return pointDeadWikiLinkAndCaptureUpdate({
-    content: args.content,
-    payload: { portablePath: args.deadHref, displayText: "label" },
-    typeIn: "Title",
-    searchHits: [
-      {
-        hitKind: "NOTE" as const,
-        noteSearchResult: MakeMe.aNoteSearchResult
-          .title("Title")
-          .id(destinationRealm.id)
-          .notebookId(destinationRealm.notebookRealm.notebook.id)
-          .please(),
-      },
-    ],
-    destinationRealm,
-  })
-}

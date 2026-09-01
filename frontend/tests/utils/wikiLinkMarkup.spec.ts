@@ -79,11 +79,12 @@ describe("wikiLinkMarkup utils", () => {
     })
   })
 
-  it("handleRichContentAnchorClick navigates path markdown wiki links via data-note-id", () => {
+  it("handleRichContentAnchorClick navigates live wiki links via data-note-id", () => {
     const anchor = document.createElement("a")
     anchor.className = "donut-wiki-link"
-    anchor.setAttribute("href", "/Folder/Title.md")
+    anchor.setAttribute("href", "/n42")
     anchor.setAttribute("data-note-id", "42")
+    anchor.setAttribute("data-portable-path", "Title")
     anchor.textContent = "label"
     let navigated: RouteLocationRaw | undefined
     handleRichContentAnchorClick(
@@ -124,13 +125,13 @@ describe("wikiLinkMarkup utils", () => {
 
   it.each([
     { href: "#", kind: "hash" },
-    { href: "/Folder/Title.md", kind: "portable-path" },
+    { href: "/Folder/Title.md", kind: "file-looking" },
     {
       href: "/Solar/Moon.md#prop:a%20part%20of",
-      kind: "portable-path-with-prop-fragment",
+      kind: "file-looking-with-prop-fragment",
     },
   ])(
-    "handleRichContentAnchorClick does not navigate leftover $kind hrefs",
+    "handleRichContentAnchorClick does not navigate $kind hrefs",
     ({ href }) => {
       const anchor = document.createElement("a")
       anchor.setAttribute("href", href)

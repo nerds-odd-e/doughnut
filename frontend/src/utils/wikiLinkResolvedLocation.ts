@@ -9,7 +9,7 @@ import {
   parsePortablePath,
 } from "@/utils/portablePath"
 
-/** Resolved wiki/path-Markdown click location from the authored target. */
+/** Resolved wiki click location from the authored target. */
 export function locationForResolvedWikiTarget(
   noteId: number,
   authoredTarget: string

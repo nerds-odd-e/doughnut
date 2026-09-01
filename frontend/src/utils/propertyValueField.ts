@@ -2,7 +2,6 @@ import type { WikiLink } from "@generated/donut-backend-api"
 import {
   authoredLinkOccurrences,
   noteIdForAuthoredToken,
-  splitAuthoredToken,
   splitWikiLinkInner,
 } from "@/utils/authoredLinkMarkup"
 import {
@@ -24,9 +23,8 @@ import {
 import { hrefForResolvedWikiTarget } from "@/utils/wikiLinkResolvedLocation"
 
 /**
- * Renders a YAML property scalar with clickable wiki and path-Markdown links.
- * Well-formed wiki `[[title]]` uses bracket UI; path Markdown uses the same
- * live/dead/pending wiki-link classes as body path links (plain display).
+ * Renders a YAML property scalar with clickable wiki links.
+ * Well-formed wiki `[[title]]` uses bracket UI; ordinary Markdown stays plain text.
  */
 export function propertyValuePlainToDisplayHtml(
   plain: string,
@@ -43,25 +41,7 @@ export function propertyValuePlainToDisplayHtml(
     out += escapeHtmlForWikiLinkDisplay(plain.slice(lastIndex, occ.start))
     lastIndex = occ.end
     const fullMatch = plain.slice(occ.start, occ.end)
-    if (occ.kind === "pathMarkdown") {
-      const { target, display } = splitAuthoredToken(occ.token)
-      const noteId = noteIdForAuthoredToken(occ.token, map)
-      out += wikiLinkAnchorHtml({
-        href:
-          noteId !== undefined
-            ? hrefForResolvedWikiTarget(noteId, target)
-            : "#",
-        className:
-          noteId === undefined
-            ? unresolvedWikiClass(occ.token, lastSavedTokens)
-            : DONUT_WIKI_LINK_CLASS,
-        portablePath: target,
-        display,
-        noteId,
-      })
-      continue
-    }
-    if (occ.kind !== "wiki" || !isValidWikiLinkInner(occ.token)) {
+    if (!isValidWikiLinkInner(occ.token)) {
       out += escapeHtmlForWikiLinkDisplay(fullMatch)
       continue
     }

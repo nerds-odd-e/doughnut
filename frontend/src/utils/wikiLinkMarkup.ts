@@ -1,6 +1,5 @@
 import type { WikiLink } from "@generated/donut-backend-api"
 import {
-  authoredHrefLooksLikePortablePath,
   splitWikiLinkInner,
   wikiLinkFromAuthoredToken,
 } from "@/utils/authoredLinkMarkup"
@@ -115,63 +114,17 @@ export function wikiLinkNoteIdLookup(
   return map
 }
 
-function pathMarkdownToken(displayText: string, href: string): string {
-  return `[${displayText}](${href})`
-}
-
-/** Stored token for the clicked dead wiki link (wiki `[[…]]` or path `[label](href)`), for replace. */
+/** Stored wiki token for the clicked dead wiki link, for replace. */
 export function markdownWikiTokenFromDeadWikiLinkPayload(
   p: DeadWikiLinkPayload
 ): string {
   const { portablePath, displayText } = p
-  if (authoredHrefLooksLikePortablePath(portablePath)) {
-    return pathMarkdownToken(displayText, portablePath)
-  }
   if (portablePath === displayText) return `[[${portablePath}]]`
   return `[[${portablePath}|${displayText}]]`
 }
 
-/** Path-Markdown token pointing at a note, keeping the authored `.md` / no-`.md` suffix. */
-export function pathMarkdownTokenForNote(args: {
-  displayText: string
-  folderNames: readonly string[]
-  title: string
-  authoredHref: string
-}): string {
-  const folders = args.folderNames.filter((name) => name.length > 0)
-  const path =
-    folders.length > 0 ? `${folders.join("/")}/${args.title}` : args.title
-  const suffix = args.authoredHref.toLowerCase().endsWith(".md") ? ".md" : ""
-  return pathMarkdownToken(args.displayText, `/${path}${suffix}`)
-}
-
-function pathHrefFromWikiAnchor(anchor: HTMLAnchorElement): string | null {
-  const fromAttr = anchor.getAttribute(WIKI_LINK_PORTABLE_PATH_ATTR)
-  if (
-    fromAttr !== null &&
-    fromAttr !== "" &&
-    authoredHrefLooksLikePortablePath(fromAttr)
-  ) {
-    return fromAttr
-  }
-  const href = anchor.getAttribute("href")
-  if (href && authoredHrefLooksLikePortablePath(href)) {
-    return href
-  }
-  return null
-}
-
 /** Markdown token for a wiki anchor (dead or live) from DOM; prefers `data-portable-path` / bracketed display. */
 export function wikiAnchorToMarkdownToken(anchor: HTMLAnchorElement): string {
-  const pathHref = pathHrefFromWikiAnchor(anchor)
-  if (pathHref !== null) {
-    const display =
-      anchor.getAttribute(WIKI_LINK_DISPLAY_TEXT_ATTR) ||
-      anchor.textContent?.trim() ||
-      ""
-    return pathMarkdownToken(display, pathHref)
-  }
-
   const raw = anchor.textContent?.trim() ?? ""
   const portablePath = anchor.getAttribute(WIKI_LINK_PORTABLE_PATH_ATTR)
   if (portablePath === null || portablePath === "") {

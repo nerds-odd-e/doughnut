@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest"
 import htmlToMarkdown from "@/components/form/quillHtmlToMarkdown"
 import { replaceWikiLinksInHtml } from "@/components/form/replaceWikiLinksInHtml"
-import { notePropertyHref, noteShowHref } from "@/routes/noteShowLocation"
+import { notePropertyHref } from "@/routes/noteShowLocation"
 import { wikiLinkFromAuthoredToken } from "@/utils/wikiLinkMarkup"
 
 describe("quillHtmlToMarkdown", () => {
@@ -47,20 +47,16 @@ describe("quillHtmlToMarkdown", () => {
   })
 
   it.each`
-    label                                             | html                                                                                                                                                            | expected
-    ${"preserves complete double brackets"}           | ${"<p>[[WikiLink]]</p>"}                                                                                                                                        | ${"[[WikiLink]]"}
-    ${"converts donut-wiki-link anchors"}             | ${'<p><a href="/n701" class="donut-wiki-link">MyNote</a></p>'}                                                                                                  | ${"[[MyNote]]"}
-    ${"ordinary note-show href stays markdown"}       | ${'<p><a href="/n701">MyNote</a></p>'}                                                                                                                          | ${"[MyNote](/n701)"}
-    ${"absolute note-show URL stays markdown"}        | ${'<p><a href="https://app.test/n42">T</a></p>'}                                                                                                                | ${"[T](https://app.test/n42)"}
-    ${"converts dead wiki anchors"}                   | ${'<p><a href="#" class="dead-wiki-link" data-portable-path="Unknown"><span class="wiki-bracket">[[</span>Unknown<span class="wiki-bracket">]]</span></a></p>'} | ${"[[Unknown]]"}
-    ${"converts plain dead wiki anchors"}             | ${'<p><a href="#" class="dead-wiki-link" data-portable-path="Unknown">Unknown</a></p>'}                                                                         | ${"[[Unknown]]"}
-    ${"converts pending wiki anchors"}                | ${'<p><a href="#" class="pending-wiki-link" data-portable-path="Unknown">Unknown</a></p>'}                                                                      | ${"[[Unknown]]"}
-    ${"donut-wiki-link with piped wiki attrs"}        | ${'<p><a href="/n1" class="donut-wiki-link" data-portable-path="A" data-display-text="B">B</a></p>'}                                                            | ${"[[A|B]]"}
-    ${"path markdown donut-wiki-link keeps markdown"} | ${'<p><a href="/Folder/Title.md" class="donut-wiki-link" data-portable-path="/Folder/Title.md" data-display-text="label" data-note-id="42">label</a></p>'}      | ${"[label](/Folder/Title.md)"}
-    ${"live path markdown with noteShowHref"}         | ${`<p><a href="${noteShowHref(42)}" class="donut-wiki-link" data-portable-path="/Folder/Title.md" data-display-text="label" data-note-id="42">label</a></p>`}   | ${"[label](/Folder/Title.md)"}
-    ${"path markdown without .md keeps href"}         | ${'<p><a href="/Folder/Title" class="donut-wiki-link" data-portable-path="/Folder/Title" data-display-text="label">label</a></p>'}                              | ${"[label](/Folder/Title)"}
-    ${"path markdown dead-wiki-link keeps markdown"}  | ${'<p><a href="/Folder/Missing.md" class="dead-wiki-link" data-portable-path="/Folder/Missing.md" data-display-text="label">label</a></p>'}                     | ${"[label](/Folder/Missing.md)"}
-    ${"path markdown dead with hash href"}            | ${'<p><a href="#" class="dead-wiki-link" data-portable-path="/Folder/Missing.md" data-display-text="label">label</a></p>'}                                      | ${"[label](/Folder/Missing.md)"}
+    label                                       | html                                                                                                                                                            | expected
+    ${"preserves complete double brackets"}     | ${"<p>[[WikiLink]]</p>"}                                                                                                                                        | ${"[[WikiLink]]"}
+    ${"converts donut-wiki-link anchors"}       | ${'<p><a href="/n701" class="donut-wiki-link">MyNote</a></p>'}                                                                                                  | ${"[[MyNote]]"}
+    ${"ordinary note-show href stays markdown"} | ${'<p><a href="/n701">MyNote</a></p>'}                                                                                                                          | ${"[MyNote](/n701)"}
+    ${"absolute note-show URL stays markdown"}  | ${'<p><a href="https://app.test/n42">T</a></p>'}                                                                                                                | ${"[T](https://app.test/n42)"}
+    ${"file-looking href stays markdown"}       | ${'<p><a href="/Folder/Title.md">label</a></p>'}                                                                                                                | ${"[label](/Folder/Title.md)"}
+    ${"converts dead wiki anchors"}             | ${'<p><a href="#" class="dead-wiki-link" data-portable-path="Unknown"><span class="wiki-bracket">[[</span>Unknown<span class="wiki-bracket">]]</span></a></p>'} | ${"[[Unknown]]"}
+    ${"converts plain dead wiki anchors"}       | ${'<p><a href="#" class="dead-wiki-link" data-portable-path="Unknown">Unknown</a></p>'}                                                                         | ${"[[Unknown]]"}
+    ${"converts pending wiki anchors"}          | ${'<p><a href="#" class="pending-wiki-link" data-portable-path="Unknown">Unknown</a></p>'}                                                                      | ${"[[Unknown]]"}
+    ${"donut-wiki-link with piped wiki attrs"}  | ${'<p><a href="/n1" class="donut-wiki-link" data-portable-path="A" data-display-text="B">B</a></p>'}                                                            | ${"[[A|B]]"}
   `("wiki links: $label", ({ html, expected }) => {
     expect(htmlToMarkdown(html)).toBe(expected)
   })
@@ -98,7 +94,7 @@ describe("quillHtmlToMarkdown", () => {
     ${"extra [ before and ] after"}     | ${"<p>[[[WikiLink]]]</p>"}                         | ${linkifiedWikiLink99}    | ${String.raw`\[[[WikiLink]]\]`}
     ${"piped resolved round-trip"}      | ${"<p>[[MyTarget|shown text]]</p>"}                | ${linkifiedPipedResolved} | ${"[[MyTarget|shown text]]"}
     ${"piped unresolved stays piped"}   | ${"<p>[[Unknown Topic|friendly label]]</p>"}       | ${[]}                     | ${"[[Unknown Topic|friendly label]]"}
-    ${"unresolved path markdown stays"} | ${'<p><a href="/Folder/Missing.md">label</a></p>'} | ${[]}                     | ${"[label](/Folder/Missing.md)"}
+    ${"file-looking markdown stays"}    | ${'<p><a href="/Folder/Missing.md">label</a></p>'} | ${[]}                     | ${"[label](/Folder/Missing.md)"}
   `("linkified wiki links: $label", ({ raw, resolves, expected }) => {
     const html = replaceWikiLinksInHtml(raw, [...resolves])
     expect(htmlToMarkdown(html)).toBe(expected)

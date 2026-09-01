@@ -1,5 +1,5 @@
 /**
- * Authored wiki or path-Markdown link target: note target plus optional `#prop:`
+ * Authored wiki link target: note target plus optional `#prop:`
  * encoded property key (ADR 0004). Decode once; invalid escape or UTF-8 is not
  * a property target. Product encode uses uppercase hex; readers accept either
  * hex case.

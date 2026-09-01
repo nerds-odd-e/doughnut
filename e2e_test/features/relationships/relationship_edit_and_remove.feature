@@ -45,26 +45,6 @@ Feature: Relationship edit and remove
     Then the note content markdown source should contain "a part of 2: '[[Earth]]'"
     And I should see "Moon" has no relationship to "Earth"
 
-  Scenario: Reducing a relationship whose source is path Markdown
-    Given I have a notebook "Path reduce space" with notes:
-      | Title  | Content    |
-      | Phobos | Lunar body |
-      | Deimos | Moon       |
-    And I have a note "Phobos a part of Deimos" under notebook "Path reduce space" with content:
-      """
-      ---
-      type: Relationship
-      relation: a-part-of
-      source: "[Phobos](/Phobos.md)"
-      target: "[[Deimos]]"
-      ---
-
-      """
-    When I delete the relationship from "Phobos" to "Deimos" and reduce it to a property of the source
-    And I open the note content markdown editor on note "Phobos"
-    Then the note content markdown source should contain "a part of: '[[Deimos]]'"
-    And I should see "Phobos" has no relationship to "Deimos"
-
   Scenario: Tracked relationship reduced keeps property memory tracker on source
     Given the note "Moon a part of Earth" was assimilated on day 1
     When I delete the relationship from "Moon" to "Earth" and reduce it to a property of the source

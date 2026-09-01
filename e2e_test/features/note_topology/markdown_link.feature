@@ -23,3 +23,23 @@ Feature: Markdown links in notes
       | [label](/n1234)                               |
       | [label](https://doughnut.odd-e.com/n19921)    |
       | [shown](/n99/p/topic)                         |
+
+  Scenario Outline: File-looking Markdown URLs keep ordinary link UI
+    Given I have a notebook "MdFileLinkNB" with notes:
+      | Title          | Folder         |
+      | MdFileLinkNote | MdFileLinkFold |
+    When I update note "MdFileLinkNote" content using markdown to become:
+      """
+      See <markdown>.
+      """
+    Then I should see the note content rendered as:
+      | Kind           | Text      |
+      | markdown link  | <display> |
+    When I view the note content as markdown
+    Then the note content markdown source should contain "<markdown>"
+    And the note content markdown source should not contain "[["
+
+    Examples:
+      | markdown                          | display |
+      | [Target](/MdFileLinkFold/Target.md) | Target  |
+      | [Target](folder/Target.md)          | Target  |

@@ -36,14 +36,6 @@ describe("authoredOverlapsValidationErrorForPropertyValue", () => {
     ).toBeUndefined()
   })
 
-  it("accepts a path-Markdown whole list item", () => {
-    expect(
-      authoredOverlapsValidationErrorForPropertyValue(
-        listPropertyValue(["[Title](/Folder/Title.md)"])
-      )
-    ).toBeUndefined()
-  })
-
   it("accepts an empty overlaps list", () => {
     expect(
       authoredOverlapsValidationErrorForPropertyValue(listPropertyValue([]))
@@ -60,6 +52,7 @@ describe("authoredOverlapsValidationErrorForPropertyValue", () => {
       "[[]]",
       "   ",
       "/Folder/Title.md",
+      "[Title](/Folder/Title.md)",
       "[Title](/Folder/Title.md) extra",
     ]) {
       expect(

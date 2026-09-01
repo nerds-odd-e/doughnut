@@ -1,5 +1,5 @@
 import type { RouteLocationRaw } from "vue-router"
-import { authoredHrefLooksLikePortablePath } from "@/utils/authoredLinkMarkup"
+import { hrefLooksLikePortablePath } from "@/routes/noteShowLocation"
 import {
   DEAD_WIKI_LINK_CLASS,
   DONUT_WIKI_LINK_CLASS,
@@ -52,7 +52,7 @@ export function handleRichContentAnchorClick(
     window.open(href, "_blank", "noopener,noreferrer")
     return
   }
-  if (href === "#" || authoredHrefLooksLikePortablePath(href)) return
+  if (href === "#" || hrefLooksLikePortablePath(href)) return
   handlers.navigateInApp(href)
 }
 

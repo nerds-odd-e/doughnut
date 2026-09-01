@@ -18,20 +18,8 @@ describe("hasNewWikiLinkTexts", () => {
     expect(hasNewWikiLinkTexts("[[Old]]", "[[New]]")).toBe(true)
   })
 
-  it("is true when next introduces a path-Markdown link", () => {
-    expect(hasNewWikiLinkTexts("", "[Moon](/Moon.md)")).toBe(true)
-  })
-
-  it("is false when only the same path-Markdown token appears", () => {
-    expect(
-      hasNewWikiLinkTexts("[Moon](/Moon.md)", "[Moon](/Moon.md) more")
-    ).toBe(false)
-  })
-
-  it("is true when a path-Markdown token appears next to an existing wiki token", () => {
-    expect(hasNewWikiLinkTexts("[[Moon]]", "[[Moon]] [Moon](/Moon.md)")).toBe(
-      true
-    )
+  it("is false when next introduces only a Markdown URL", () => {
+    expect(hasNewWikiLinkTexts("", "[Moon](/Moon.md)")).toBe(false)
   })
 
   it("is false for a bare path that is not a Markdown token", () => {

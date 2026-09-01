@@ -1,14 +1,11 @@
 import { flushPromises } from "@vue/test-utils"
-import { relationshipNoteContent } from "@tests/notes/relationshipNoteTestContent"
 import {
   notePropertyHref,
   notePropertyLocation,
-  noteShowHref,
   noteShowLocation,
 } from "@/routes/noteShowLocation"
 import { wikiLinkFromAuthoredToken } from "@/utils/wikiLinkMarkup"
 import { vi } from "vitest"
-import { propertyRowSelector } from "./propertiesTestDom"
 import {
   clickDeadWikiLinkInPropertyValue,
   DEAD_LINK_CLICK_CASES,
@@ -96,20 +93,5 @@ Body`
       '[data-testid="rich-note-property-row-value-input"] a.donut-wiki-link'
     )
     expect(live.exists()).toBe(true)
-  })
-
-  it("shows path Markdown in a relationship source as a live wiki-style link", async () => {
-    const wrapper = await h.mountEditor(
-      relationshipNoteContent("a-part-of", "[Moon](/Moon.md)", "[[Earth]]"),
-      {
-        wikiLinks: [wikiLinkFromAuthoredToken("[Moon](/Moon.md)", 42)],
-      }
-    )
-    const live = wrapper
-      .find(propertyRowSelector("source"))
-      .element.querySelector("a.donut-wiki-link") as HTMLAnchorElement
-    expect(live.getAttribute("href")).toBe(noteShowHref(42))
-    expect(live.textContent).toBe("Moon")
-    expect(live.querySelector(".wiki-bracket")).toBeNull()
   })
 })

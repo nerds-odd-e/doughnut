@@ -1,5 +1,5 @@
 import makeMe from "donut-test-fixtures/makeMe"
-import { noteShowHref } from "@/routes/noteShowLocation"
+import htmlToMarkdown from "@/components/form/quillHtmlToMarkdown"
 import { wikiLinkFromAuthoredToken } from "@/utils/wikiLinkMarkup"
 import { type VueWrapper, flushPromises } from "@vue/test-utils"
 import { afterEach, describe, expect, it, vi } from "vitest"
@@ -63,47 +63,33 @@ describe("NoteTextContent wiki link display", () => {
     expect(live.getAttribute("data-portable-path")).toBe("Target Title")
   })
 
-  it("shows unresolved path markdown as a dead wiki link", async () => {
+  it("keeps file-looking Markdown URLs as ordinary anchors through render and serialize", async () => {
     wrapper = mountNoteTextContent(
-      makeMe.aNote.content("See [label](/Folder/Missing.md).").please(),
-      { readonly: true }
-    )
-    await flushPromises()
-    await vi.waitUntil(() =>
-      document.querySelector(".ql-editor a.dead-wiki-link")
-    )
-    const dead = document.querySelector(
-      ".ql-editor a.dead-wiki-link"
-    ) as HTMLAnchorElement
-    expect(dead.textContent).toContain("label")
-    expect(dead.getAttribute("href")).toBe("#")
-    expect(dead.getAttribute("data-portable-path")).toBe("/Folder/Missing.md")
-  })
-
-  it("shows a path markdown link as a live wiki-style link to the note", async () => {
-    const targetNote = makeMe.aNote.title("Title").please()
-    wrapper = mountNoteTextContent(
-      makeMe.aNote.content("See [label](/Folder/Title.md).").please(),
+      makeMe.aNote.content("See [Target](/folder/Target.md).").please(),
       {
         readonly: true,
         wikiLinks: [
-          wikiLinkFromAuthoredToken(
-            "[label](/Folder/Title.md)",
-            targetNote.id!
-          ),
+          {
+            authoredLink: "[Target](/folder/Target.md)",
+            portablePath: "/folder/Target.md",
+            displayText: "Target",
+            resolution: "RESOLVED",
+            destinationNoteId: 99,
+          },
         ],
       }
     )
     await flushPromises()
-    await vi.waitUntil(() =>
-      document.querySelector(".ql-editor a.donut-wiki-link")
-    )
-    const live = document.querySelector(
-      ".ql-editor a.donut-wiki-link"
-    ) as HTMLAnchorElement
-    expect(live.textContent).toContain("label")
-    expect(live.getAttribute("href")).toBe(noteShowHref(targetNote.id!))
-    expect(live.getAttribute("data-note-id")).toBe(String(targetNote.id))
+    await vi.waitUntil(() => document.querySelector(".ql-editor a"))
+    const anchor = document.querySelector(".ql-editor a") as HTMLAnchorElement
+    expect(anchor.classList.contains("donut-wiki-link")).toBe(false)
+    expect(anchor.classList.contains("dead-wiki-link")).toBe(false)
+    expect(anchor.classList.contains("pending-wiki-link")).toBe(false)
+    expect(anchor.getAttribute("href")).toBe("/folder/Target.md")
+    expect(anchor.textContent).toContain("Target")
+    expect(
+      htmlToMarkdown(document.querySelector(".ql-editor")!.innerHTML)
+    ).toContain("[Target](/folder/Target.md)")
   })
 
   it("shows a new wiki link as pending until content save confirms it is missing", async () => {

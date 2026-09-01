@@ -1,9 +1,5 @@
 import type { WikiLink } from "@generated/donut-backend-api"
 import {
-  authoredHrefLooksLikePortablePath,
-  isPathMarkdownWikiLink,
-} from "@/utils/authoredLinkMarkup"
-import {
   DEAD_WIKI_LINK_CLASS,
   DONUT_WIKI_LINK_CLASS,
   PENDING_WIKI_LINK_CLASS,
@@ -15,7 +11,6 @@ import {
   unresolvedWikiClass,
 } from "@/utils/unresolvedWikiLinkStyle"
 import {
-  escapeHtmlAttributeValue,
   escapeHtmlForWikiLinkDisplay,
   isResolvedWikiLink,
   isValidWikiLinkInner,
@@ -32,13 +27,6 @@ const UNRESOLVED_WIKI_LINK_CLASSES = [
 
 function authoredTokenFromWikiAnchor(anchor: Element): string {
   const portablePath = anchor.getAttribute(WIKI_LINK_PORTABLE_PATH_ATTR) ?? ""
-  if (authoredHrefLooksLikePortablePath(portablePath)) {
-    const display =
-      anchor.getAttribute(WIKI_LINK_DISPLAY_TEXT_ATTR) ||
-      anchor.textContent?.trim() ||
-      ""
-    return `[${display}](${portablePath})`
-  }
   const display = anchor.getAttribute(WIKI_LINK_DISPLAY_TEXT_ATTR)
   if (display !== null && display !== "" && display !== portablePath) {
     return `${portablePath}|${display}`
@@ -79,7 +67,7 @@ function upgradeUnresolvedWikiAnchors(
   ).join(", ")
 
   for (const w of wikiLinks) {
-    if (!isResolvedWikiLink(w) || isPathMarkdownWikiLink(w)) continue
+    if (!isResolvedWikiLink(w)) continue
     const href = hrefForResolvedWikiTarget(w.destinationNoteId, w.portablePath)
     for (const a of [...wrap.querySelectorAll(unresolvedAnchorSelector)]) {
       const portablePath = a.getAttribute(WIKI_LINK_PORTABLE_PATH_ATTR)
@@ -147,74 +135,14 @@ function unresolvedWikiAnchorHtmlFromInner(
   })
 }
 
-function upgradePathMarkdownAnchors(
-  html: string,
-  wikiLinks: WikiLink[]
-): string {
-  let result = html
-  for (const w of wikiLinks) {
-    if (!isResolvedWikiLink(w) || !isPathMarkdownWikiLink(w)) continue
-    const attrPortablePath = escapeHtmlAttributeValue(w.portablePath)
-    const livePathMarkdownAttrs = {
-      className: DONUT_WIKI_LINK_CLASS,
-      portablePath: w.portablePath,
-      display: w.displayText,
-      noteId: w.destinationNoteId,
-    }
-    const live = wikiLinkAnchorHtml({
-      href: hrefForResolvedWikiTarget(w.destinationNoteId, w.portablePath),
-      ...livePathMarkdownAttrs,
-    })
-    result = result.replaceAll(
-      `<a href="${attrPortablePath}">${w.displayText}</a>`,
-      live
-    )
-    const leftoverUnresolvedHrefs = [w.portablePath, "#"]
-    for (const leftoverHref of leftoverUnresolvedHrefs) {
-      for (const className of UNRESOLVED_WIKI_LINK_CLASSES) {
-        result = result.replaceAll(
-          wikiLinkAnchorHtml({
-            href: leftoverHref,
-            className,
-            portablePath: w.portablePath,
-            display: w.displayText,
-          }),
-          live
-        )
-      }
-    }
-    result = result.replaceAll(
-      wikiLinkAnchorHtml({ href: w.portablePath, ...livePathMarkdownAttrs }),
-      live
-    )
-  }
-  return result
-}
-
-/** Leftover `[[…]]` and leftover portable-path hrefs get pending or dead wiki-link UI. */
+/** Leftover `[[…]]` get pending or dead wiki-link UI. Ordinary Markdown anchors stay ordinary. */
 function markUnresolvedWikiLinks(
   html: string,
   wikiLinks: WikiLink[],
   lastSavedTokens: Set<string> | undefined
 ): string {
-  const withWikiTokens = html.replace(
-    /\[\[([^\[\]\r\n]*)\]\]/g,
-    (_fullMatch, inner: string) =>
-      unresolvedWikiAnchorHtmlFromInner(inner, lastSavedTokens, wikiLinks)
-  )
-  return withWikiTokens.replace(
-    /<a href="(\/[^"]+)">([^<]*)<\/a>/g,
-    (full, href: string, display: string) => {
-      if (!authoredHrefLooksLikePortablePath(href)) return full
-      const token = `[${display}](${href})`
-      return wikiLinkAnchorHtml({
-        href: "#",
-        className: unresolvedWikiClass(token, lastSavedTokens),
-        portablePath: href,
-        display,
-        resolution: wikiLinkAmbiguousResolution(wikiLinks, href, token),
-      })
-    }
+  return html.replace(/\[\[([^\[\]\r\n]*)\]\]/g, (_fullMatch, inner: string) =>
+    unresolvedWikiAnchorHtmlFromInner(inner, lastSavedTokens, wikiLinks)
   )
 }
 
@@ -226,7 +154,7 @@ export function replaceWikiLinksInHtml(
   const lastSavedTokens = lastSavedAuthoredTokens(lastSavedMarkdown)
   let result = html
   wikiLinks.forEach((w) => {
-    if (!isResolvedWikiLink(w) || isPathMarkdownWikiLink(w)) return
+    if (!isResolvedWikiLink(w)) return
     result = result.replaceAll(
       `[[${w.authoredLink}]]`,
       wikiLinkAnchorHtml({
@@ -238,7 +166,6 @@ export function replaceWikiLinksInHtml(
       })
     )
   })
-  result = upgradePathMarkdownAnchors(result, wikiLinks)
   result = upgradeUnresolvedWikiAnchors(result, wikiLinks)
   result = confirmPendingWikiAnchorsAsDead(result, lastSavedTokens)
   return markUnresolvedWikiLinks(result, wikiLinks, lastSavedTokens)

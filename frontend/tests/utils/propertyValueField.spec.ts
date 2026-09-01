@@ -64,29 +64,19 @@ describe("propertyValueField utils", () => {
     expect(html).toContain("[[ ]]")
   })
 
-  it("renders resolved path Markdown in a scalar as a live wiki-style link", () => {
+  it("leaves path-shaped Markdown as plain text in a scalar", () => {
     const html = propertyValuePlainToDisplayHtml("[Moon](/Moon.md)", [
-      wikiLinkFromAuthoredToken("[Moon](/Moon.md)", 42),
+      {
+        authoredLink: "[Moon](/Moon.md)",
+        portablePath: "/Moon.md",
+        displayText: "Moon",
+        resolution: "RESOLVED",
+        destinationNoteId: 42,
+      },
     ])
-    expect(html).toBe(
-      `<a href="${noteShowHref(42)}" class="donut-wiki-link" data-portable-path="/Moon.md" data-display-text="Moon" data-note-id="42">Moon</a>`
-    )
-  })
-
-  it("renders unresolved path Markdown in a scalar as a dead wiki-style link", () => {
-    const html = propertyValuePlainToDisplayHtml("[Moon](/Moon.md)", [])
-    expect(html).toBe(
-      '<a href="#" class="dead-wiki-link" data-portable-path="/Moon.md" data-display-text="Moon">Moon</a>'
-    )
-  })
-
-  it("round-trips path Markdown from a field root without converting to wiki", () => {
-    const root = document.createElement("div")
-    root.innerHTML = propertyValuePlainToDisplayHtml("[Moon](/Moon.md)", [
-      wikiLinkFromAuthoredToken("[Moon](/Moon.md)", 42),
-    ])
-    expect(root.querySelector("a.donut-wiki-link")).not.toBeNull()
-    expect(serializePropertyValueFieldRoot(root)).toBe("[Moon](/Moon.md)")
+    expect(html).toBe(escapeHtmlForWikiLinkDisplay("[Moon](/Moon.md)"))
+    expect(html).not.toContain("donut-wiki-link")
+    expect(html).not.toContain("dead-wiki-link")
   })
 
   it("does not treat a bare YAML path as a link", () => {
@@ -106,16 +96,6 @@ describe("propertyValueField utils", () => {
   it("renders a token only in current text as pending when last-saved markdown is provided", () => {
     const html = propertyValuePlainToDisplayHtml(
       "[[WikiLinks E2E Nowhere]]",
-      [],
-      "topic: old"
-    )
-    expect(html).toContain('class="pending-wiki-link"')
-    expect(html).not.toContain("dead-wiki-link")
-  })
-
-  it("renders unresolved path Markdown as pending when it is only in current text", () => {
-    const html = propertyValuePlainToDisplayHtml(
-      "[Moon](/Moon.md)",
       [],
       "topic: old"
     )
