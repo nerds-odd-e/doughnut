@@ -60,8 +60,7 @@ public class ResolvedWikiLinkService {
         resolvedWikiLinkRepository.findBySourceNote_IdOrderByIdAsc(focusNote.getId())) {
       Note resolved = authorizedOutgoingTargetNote(focusNote, row, viewer);
       if (resolved != null) {
-        WikiLinkMarkdown.WikiInnerSplit parts =
-            WikiLinkMarkdown.splitAuthoredToken(row.getAuthoredLink());
+        WikiLinkMarkdown.WikiInnerSplit parts = WikiLinkMarkdown.splitInner(row.getAuthoredLink());
         out.add(
             new WikiLink(
                 row.getAuthoredLink(),

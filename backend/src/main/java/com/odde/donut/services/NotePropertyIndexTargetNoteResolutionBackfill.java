@@ -82,7 +82,7 @@ public final class NotePropertyIndexTargetNoteResolutionBackfill {
       return Optional.empty();
     }
     Optional<PortablePath.Resolved> reference =
-        WikiLinkMarkdown.splitAuthoredToken(linkTokens.getFirst())
+        WikiLinkMarkdown.splitInner(linkTokens.getFirst())
             .portablePath()
             .resolve(focusNotebookName);
     if (reference.isEmpty()) {

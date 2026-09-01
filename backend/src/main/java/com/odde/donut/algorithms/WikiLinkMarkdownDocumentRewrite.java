@@ -3,12 +3,12 @@ package com.odde.donut.algorithms;
 import java.util.LinkedHashSet;
 import java.util.regex.Matcher;
 
-/** Rewrites inter-note tokens inside a Markdown document. */
+/** Rewrites wiki-link tokens inside a Markdown document. */
 public final class WikiLinkMarkdownDocumentRewrite {
 
   private WikiLinkMarkdownDocumentRewrite() {}
 
-  /** Converts OS-invalid characters in wiki and path-Markdown tokens. */
+  /** Converts OS-invalid characters in wiki tokens. */
   public static String replaceOsInvalidCharsInAuthoredTokens(String markdown) {
     if (markdown == null || markdown.isEmpty()) {
       return markdown;
@@ -29,10 +29,6 @@ public final class WikiLinkMarkdownDocumentRewrite {
     if (markdown == null || markdown.isEmpty()) {
       return markdown;
     }
-    if (WikiLinkMarkdown.tryParsePathMarkdownToken(oldInnerTrimmed).isPresent()
-        && WikiLinkMarkdown.tryParsePathMarkdownToken(newInner).isPresent()) {
-      return replacePathMarkdownMatching(markdown, oldInnerTrimmed, newInner);
-    }
     Matcher matcher = WikiLinkMarkdown.INNER_LINK_PATTERN.matcher(markdown);
     StringBuilder out = new StringBuilder();
     int last = 0;
@@ -45,20 +41,6 @@ public final class WikiLinkMarkdownDocumentRewrite {
         out.append(matcher.group(0));
       }
       last = matcher.end();
-    }
-    out.append(markdown.substring(last));
-    return out.toString();
-  }
-
-  private static String replacePathMarkdownMatching(
-      String markdown, String oldTokenTrimmed, String newToken) {
-    StringBuilder out = new StringBuilder();
-    int last = 0;
-    for (WikiLinkMarkdown.PathMarkdownOccurrence occurrence :
-        WikiLinkMarkdown.pathMarkdownOccurrences(markdown)) {
-      out.append(markdown, last, occurrence.start());
-      out.append(occurrence.token().equals(oldTokenTrimmed) ? newToken : occurrence.token());
-      last = occurrence.end();
     }
     out.append(markdown.substring(last));
     return out.toString();

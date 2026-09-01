@@ -43,3 +43,23 @@ Feature: Markdown links in notes
       | markdown                          | display |
       | [Target](/MdFileLinkFold/Target.md) | Target  |
       | [Target](folder/Target.md)          | Target  |
+
+  Scenario Outline: File-looking Markdown URLs do not create wiki references
+    Given I have a notebook "MdNoWikiRefNB" with notes:
+      | Title  | Folder      |
+      | Target | MdRefFolder |
+      | Source |             |
+    When I update note "Source" content using markdown to become:
+      """
+      See <markdown>.
+      """
+    Then I should see the note content rendered as:
+      | Kind          | Text   |
+      | markdown link | Target |
+    When I navigate to "MdNoWikiRefNB/MdRefFolder/Target" note
+    Then I should not see the References section
+
+    Examples:
+      | markdown                         |
+      | [Target](/MdRefFolder/Target.md) |
+      | [Target](MdRefFolder/Target.md)  |

@@ -22,7 +22,7 @@ class NotebookFolderRenameWikiLinkRewriteControllerTest
 
   @ParameterizedTest
   @CsvSource({
-    "See [[OldFolder/Title]] and [label](/OldFolder/Title.md)., See [[NewFolder/Title]] and [label](/NewFolder/Title.md).",
+    "See [[OldFolder/Title]] and [label](/OldFolder/Title.md)., See [[NewFolder/Title]] and [label](/OldFolder/Title.md).",
     "See [[OldFolder/Title#prop:a%20part%20of|shown]]., See [[NewFolder/Title#prop:a%20part%20of|shown]]."
   })
   void folderRename_rewritesInboundReferrerLinks(String before, String after)

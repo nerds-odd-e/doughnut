@@ -9,7 +9,7 @@ public final class WikiLinkPropertyMatch {
   private WikiLinkPropertyMatch() {}
 
   public static boolean matchesTargetNoteContent(String token, String targetNoteContent) {
-    PortablePath portablePath = WikiLinkMarkdown.splitAuthoredToken(token).portablePath();
+    PortablePath portablePath = WikiLinkMarkdown.splitInner(token).portablePath();
     if (!portablePath.hasPropertySuffix()) {
       return true;
     }

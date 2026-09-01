@@ -4,11 +4,11 @@ import java.util.Optional;
 import java.util.function.UnaryOperator;
 
 /**
- * Authored wiki or path-Markdown link target, eagerly split into its three parts: an optional
- * notebook qualifier (present only when literally written, e.g. {@code Notebook:Title}), the note
- * portion (shorthand title or path-shaped spelling, optionally with a trailing {@code .md}), and an
- * optional encoded {@code #prop:} property selector (ADR 0004). The decoded property key is the
- * same YAML property-key string used by {@link PropertyKeyNaming} and {@code
+ * Authored wiki-link target, eagerly split into its three parts: an optional notebook qualifier
+ * (present only when literally written, e.g. {@code Notebook:Title}), the note portion (shorthand
+ * title or path-shaped spelling, optionally with a trailing {@code .md}), and an optional encoded
+ * {@code #prop:} property selector (ADR 0004). The decoded property key is the same YAML
+ * property-key string used by {@link PropertyKeyNaming} and {@code
  * note_property_index.property_key}.
  *
  * <p>The notebook qualifier here is a purely syntactic split of the authored text, not the

@@ -1,6 +1,6 @@
 # Wiki-link ambiguity and Markdown URL conformance
 
-**Status:** in progress (slices 1–2 done; next: slice 3)
+**Status:** in progress (slices 1–3 done; next: slice 4)
 
 ## Goal
 
@@ -154,34 +154,18 @@ related tests removed; visible behavior in `markdown_link.feature`.
 `path_markdown_link.feature` and obsolete relationship path-Markdown scenarios
 deleted early (frontend no longer matches them).
 
-**Learning for slice 3:** backend path-Markdown extraction still remains; E2E
-feature file is already gone.
+**Learning:** frontend path-Markdown UI removed; backend extraction removed in
+slice 3; `path_markdown_link.feature` deleted.
 
 ### 3. File-looking Markdown URLs do not create wiki references
 
-**Status:** planned
+**Status:** done
 **Type:** Behavior
 
-**Pre-condition:** A source note contains `[Target](/folder/Target.md)` or
-`[Target](folder/Target.md)` while a note happens to have the matching Portable
-path.
-
-**Trigger:** The source is saved/indexed and either note is opened.
-
-**Post-condition:** The anchor keeps normal URL behavior and neither note shows
-a semantic outgoing/inbound wiki reference caused by that Markdown link.
-
-- Remove backend path-Markdown extraction, splitting, resolution, rewriting,
-  overlap, property-index, and relation branches.
-- Delete `path_markdown_link.feature` and obsolete path-Markdown scenarios from
-  relationship feature files; retain relationship behavior through wiki-link
-  examples.
-- Delete or rewrite parser/rewrite/UI tests that asserted the retired semantic
-  behavior. Keep one boundary regression proving a file-looking href is ignored
-  by wiki indexing.
-
-Verification: focused backend tests; focused `markdown_link.feature` and
-changed relationship feature specs.
+Backend no longer extracts/rewrites file-looking Markdown as wiki; overlaps
+reject them. Boundary regression
+`file_looking_markdown_href_is_not_indexed_as_wiki_link`; E2E coverage in
+`markdown_link.feature`.
 
 ### 4. Frontend Portable-path authoring has a capability name
 

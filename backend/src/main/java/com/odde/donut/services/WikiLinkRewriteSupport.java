@@ -112,8 +112,7 @@ final class WikiLinkRewriteSupport {
       Note coMovedTarget = coMovedTargetsByAuthoredLink.get(linkText);
       String newInner;
       if (coMovedTarget != null) {
-        String originalPortablePath =
-            WikiLinkMarkdown.splitAuthoredToken(linkText).portablePath().format();
+        String originalPortablePath = WikiLinkMarkdown.splitInner(linkText).portablePath().format();
         String authoredPortablePath =
             portablePathAuthoring.authoredPortablePath(
                 movedNote, coMovedTarget, originalPortablePath);

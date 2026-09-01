@@ -1,11 +1,9 @@
 package com.odde.donut.algorithms;
 
 import com.odde.donut.validators.DisplayNamePathSeparators;
-import java.util.Optional;
-import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 
-/** Rewrites one stored inter-note token (wiki inner or path Markdown). */
+/** Rewrites one stored wiki-link inner token. */
 public final class WikiLinkMarkdownRewrite {
 
   private WikiLinkMarkdownRewrite() {}
@@ -20,33 +18,14 @@ public final class WikiLinkMarkdownRewrite {
         && PathShapedTarget.tryParse(authored.notePortion()).isEmpty()) {
       return newInnerWithHandling(storedLinkInner, authored.notePortion(), keepVisibleText);
     }
-    return WikiLinkMarkdown.tryParsePathMarkdownToken(storedLinkInner)
-        .map(
-            token ->
-                token.withHref(
-                    pathMarkdownHref(
-                        authoredPortablePath,
-                        PortablePath.parse(token.href()).notePortion().endsWith(".md"))))
-        .orElseGet(
-            () ->
-                keepVisibleText
-                    ? keepVisibleInner(storedLinkInner, _ -> authoredPortablePath)
-                    : rewriteWikiInnerTarget(storedLinkInner, _ -> authoredPortablePath));
-  }
-
-  private static String pathMarkdownHref(String authoredPortablePath, boolean keepMarkdownSuffix) {
-    PortablePath path = PortablePath.parse(authoredPortablePath);
-    String notePortion = path.notePortion();
-    String href = notePortion.startsWith("/") ? notePortion : "/" + notePortion;
-    if (keepMarkdownSuffix && !href.endsWith(".md")) {
-      href += ".md";
-    }
-    return new PortablePath(Optional.empty(), href, path.encodedPropertyKey()).format();
+    return keepVisibleText
+        ? keepVisibleInner(storedLinkInner, _ -> authoredPortablePath)
+        : rewriteWikiInnerTarget(storedLinkInner, _ -> authoredPortablePath);
   }
 
   /**
-   * Rewrites one matching folder-name segment in a path-shaped wiki inner or path Markdown href.
-   * Unqualified titles and the note-title segment are left unchanged. Spelling is preserved.
+   * Rewrites one matching folder-name segment in a path-shaped wiki inner. Unqualified titles and
+   * the note-title segment are left unchanged. Spelling is preserved.
    */
   public static String newInnerForFolderRename(
       String storedLinkInner, String oldFolderName, String newFolderName) {
@@ -59,10 +38,9 @@ public final class WikiLinkMarkdownRewrite {
     if (storedLinkInner == null || storedLinkInner.isEmpty()) {
       return storedLinkInner;
     }
-    UnaryOperator<String> transform =
-        token -> PortablePath.replaceFolderName(token, oldFolderName, newFolderName);
-    return rewriteAuthoredTarget(
-        storedLinkInner, transform, () -> rewriteWikiInnerTarget(storedLinkInner, transform));
+    return rewriteWikiInnerTarget(
+        storedLinkInner,
+        token -> PortablePath.replaceFolderName(token, oldFolderName, newFolderName));
   }
 
   /**
@@ -82,13 +60,9 @@ public final class WikiLinkMarkdownRewrite {
     if (storedLinkInner == null || storedLinkInner.isEmpty()) {
       return storedLinkInner;
     }
-    return rewriteWikiInnerLeavingPathMarkdown(
+    return keepVisibleInner(
         storedLinkInner,
-        () ->
-            keepVisibleInner(
-                storedLinkInner,
-                rawTargetToken ->
-                    PortablePath.replaceNotebookName(rawTargetToken, newNotebookName)));
+        rawTargetToken -> PortablePath.replaceNotebookName(rawTargetToken, newNotebookName));
   }
 
   /**
@@ -103,8 +77,7 @@ public final class WikiLinkMarkdownRewrite {
     if (storedLinkInner == null || storedLinkInner.isEmpty()) {
       return storedLinkInner;
     }
-    return rewriteWikiInnerLeavingPathMarkdown(
-        storedLinkInner, () -> qualifyUnqualifiedWikiInner(storedLinkInner, sourceNotebookName));
+    return qualifyUnqualifiedWikiInner(storedLinkInner, sourceNotebookName);
   }
 
   private static String qualifyUnqualifiedWikiInner(
@@ -128,26 +101,7 @@ public final class WikiLinkMarkdownRewrite {
     if (storedLinkInner == null || storedLinkInner.isEmpty()) {
       return newNoteTitle;
     }
-    return rewriteAuthoredTarget(
-        storedLinkInner,
-        token -> PortablePath.replaceNoteTitle(token, newNoteTitle.trim()),
-        () -> rewriteWikiInnerNoteTitle(storedLinkInner, newNoteTitle, keepVisibleText));
-  }
-
-  private static String rewriteAuthoredTarget(
-      String storedLinkInner,
-      UnaryOperator<String> targetTransform,
-      Supplier<String> wikiFallback) {
-    return WikiLinkMarkdown.tryParsePathMarkdownToken(storedLinkInner)
-        .map(token -> token.withHref(targetTransform.apply(token.href())))
-        .orElseGet(wikiFallback);
-  }
-
-  private static String rewriteWikiInnerLeavingPathMarkdown(
-      String storedLinkInner, Supplier<String> wikiRewrite) {
-    return WikiLinkMarkdown.tryParsePathMarkdownToken(storedLinkInner)
-        .map(_ -> storedLinkInner)
-        .orElseGet(wikiRewrite);
+    return rewriteWikiInnerNoteTitle(storedLinkInner, newNoteTitle, keepVisibleText);
   }
 
   private static String rewriteWikiInnerTarget(
@@ -196,14 +150,13 @@ public final class WikiLinkMarkdownRewrite {
     return newTargetToken + "|" + rawDisplay;
   }
 
-  /** Converts OS-invalid characters in one wiki inner or path-Markdown token. */
+  /** Converts OS-invalid characters in one wiki inner token. */
   static String replaceOsInvalidCharsInStoredLinkInner(String storedLinkInner) {
     if (storedLinkInner == null || storedLinkInner.isEmpty()) {
       return storedLinkInner;
     }
     UnaryOperator<String> convert =
         DisplayNamePathSeparators::replaceOsInvalidCharsInWikiLinkTarget;
-    return rewriteAuthoredTarget(
-        storedLinkInner, convert, () -> rewriteWikiInnerTarget(storedLinkInner, convert));
+    return rewriteWikiInnerTarget(storedLinkInner, convert);
   }
 }

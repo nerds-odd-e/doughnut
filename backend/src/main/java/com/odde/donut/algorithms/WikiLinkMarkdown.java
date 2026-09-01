@@ -1,61 +1,24 @@
 package com.odde.donut.algorithms;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/**
- * Inter-note link tokens in markdown: wiki {@code [[inner]]} titles and path Markdown {@code
- * [display](/folder/File.md)} (occurrence order).
- */
+/** Wiki-link tokens in markdown: {@code [[inner]]} titles in occurrence order. */
 public final class WikiLinkMarkdown {
 
   public static final Pattern INNER_LINK_PATTERN = Pattern.compile("\\[\\[([^\\]]+)]]");
 
   /**
-   * Notebook-relative Markdown path link {@code [display](/folder/File.md)} (leading {@code /},
-   * optional {@code .md}).
-   */
-  private static final Pattern PATH_MARKDOWN_LINK_PATTERN =
-      Pattern.compile("\\[([^\\[\\]]*)\\]\\((/[^)\\s]+)\\)");
-
-  /**
-   * Portable path and display segments of an authored inter-note token (first {@code |} separates
-   * wiki inners; Markdown path links use display text and href).
+   * Portable path and display segments of a wiki-link inner (first {@code |} separates target from
+   * display).
    */
   public record WikiInnerSplit(PortablePath portablePath, String displayText) {}
 
-  record PathMarkdownToken(String display, String href) {
-    String withHref(String newHref) {
-      return "[" + display + "](" + newHref + ")";
-    }
-  }
-
-  record PathMarkdownOccurrence(int start, int end, String token) {}
-
   private WikiLinkMarkdown() {}
-
-  /**
-   * Portable path and display of an authored inter-note token: Markdown path link {@code
-   * [display](/href)} or wiki inner ({@link #splitInner}).
-   */
-  public static WikiInnerSplit splitAuthoredToken(String authored) {
-    if (authored == null || authored.isEmpty()) {
-      return new WikiInnerSplit(PortablePath.parse(""), "");
-    }
-    Optional<PathMarkdownToken> path = tryParsePathMarkdownToken(authored);
-    if (path.isPresent()) {
-      PathMarkdownToken token = path.get();
-      String display = token.display().trim().isEmpty() ? token.href() : token.display();
-      return new WikiInnerSplit(PortablePath.parse(token.href()), display);
-    }
-    return splitInner(authored);
-  }
 
   /**
    * Splits wiki link inner text on the first {@code |}. Empty right-hand side is treated as no pipe
@@ -78,13 +41,10 @@ public final class WikiLinkMarkdown {
   }
 
   /**
-   * True when {@code trimmed} is exactly one well-formed {@code [[target]]}, {@code
-   * [[target|display]]}, or path Markdown {@code [display](/href)} token with a non-empty target.
+   * True when {@code trimmed} is exactly one well-formed {@code [[target]]} or {@code
+   * [[target|display]]} token with a non-empty target.
    */
   public static boolean isWellFormedWholeLinkToken(String trimmed) {
-    if (tryParsePathMarkdownToken(trimmed).isPresent()) {
-      return true;
-    }
     Matcher matcher = INNER_LINK_PATTERN.matcher(trimmed);
     if (!matcher.matches()) {
       return false;
@@ -100,20 +60,15 @@ public final class WikiLinkMarkdown {
     if (markdown == null || markdown.isEmpty()) {
       return List.of();
     }
-    record Hit(int start, String token) {}
-    List<Hit> hits = new ArrayList<>();
+    List<String> tokens = new ArrayList<>();
     Matcher wiki = INNER_LINK_PATTERN.matcher(markdown);
     while (wiki.find()) {
       String t = wiki.group(1).trim();
       if (!t.isEmpty()) {
-        hits.add(new Hit(wiki.start(), t));
+        tokens.add(t);
       }
     }
-    for (PathMarkdownOccurrence occurrence : pathMarkdownOccurrences(markdown)) {
-      hits.add(new Hit(occurrence.start(), occurrence.token()));
-    }
-    hits.sort(Comparator.comparingInt(Hit::start));
-    return hits.stream().map(Hit::token).toList();
+    return tokens;
   }
 
   /**
@@ -132,7 +87,7 @@ public final class WikiLinkMarkdown {
   }
 
   private static String authoredTokenDedupeKey(String token) {
-    WikiInnerSplit split = splitAuthoredToken(token);
+    WikiInnerSplit split = splitInner(token);
     PortablePath portablePath = split.portablePath();
     if (!portablePath.hasPropertySuffix()) {
       return FrontmatterAliases.normalizedLookupKey(token);
@@ -143,54 +98,5 @@ public final class WikiLinkMarkdown {
       return folded;
     }
     return folded + "|" + FrontmatterAliases.normalizedLookupKey(split.displayText());
-  }
-
-  static Optional<PathMarkdownToken> tryParsePathMarkdownToken(String authored) {
-    if (authored == null || authored.isEmpty()) {
-      return Optional.empty();
-    }
-    Matcher markdown = PATH_MARKDOWN_LINK_PATTERN.matcher(authored.trim());
-    if (!markdown.matches() || !isPortablePathHref(markdown.group(2))) {
-      return Optional.empty();
-    }
-    return Optional.of(new PathMarkdownToken(markdown.group(1), markdown.group(2)));
-  }
-
-  static List<PathMarkdownOccurrence> pathMarkdownOccurrences(String markdown) {
-    if (markdown == null || markdown.isEmpty()) {
-      return List.of();
-    }
-    List<PathMarkdownOccurrence> occurrences = new ArrayList<>();
-    Matcher pathMarkdown = PATH_MARKDOWN_LINK_PATTERN.matcher(markdown);
-    while (pathMarkdown.find()) {
-      if (pathMarkdown.start() > 0 && markdown.charAt(pathMarkdown.start() - 1) == '!') {
-        continue;
-      }
-      if (!isPortablePathHref(pathMarkdown.group(2))) {
-        continue;
-      }
-      occurrences.add(
-          new PathMarkdownOccurrence(
-              pathMarkdown.start(), pathMarkdown.end(), pathMarkdown.group(0)));
-    }
-    return occurrences;
-  }
-
-  private static boolean isPortablePathHref(String href) {
-    if (href == null || !href.startsWith("/") || href.startsWith("//")) {
-      return false;
-    }
-    String path = href;
-    int query = path.indexOf('?');
-    if (query >= 0) {
-      path = path.substring(0, query);
-    }
-    int hash = path.indexOf('#');
-    if (hash >= 0) {
-      path = path.substring(0, hash);
-    }
-    return !path.matches("/d/n/\\d+(/.*)?")
-        && !path.matches("/n/\\d+(/.*)?")
-        && !path.matches("/n\\d+");
   }
 }

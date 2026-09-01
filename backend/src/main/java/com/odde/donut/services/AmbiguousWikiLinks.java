@@ -31,7 +31,7 @@ final class AmbiguousWikiLinks {
       if (!wikiLinkResolver.isAmbiguousToken(token, focusNote, viewer)) {
         continue;
       }
-      WikiLinkMarkdown.WikiInnerSplit parts = WikiLinkMarkdown.splitAuthoredToken(token);
+      WikiLinkMarkdown.WikiInnerSplit parts = WikiLinkMarkdown.splitInner(token);
       out.add(
           new WikiLink(
               token,

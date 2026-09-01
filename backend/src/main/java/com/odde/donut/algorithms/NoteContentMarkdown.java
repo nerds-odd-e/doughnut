@@ -140,9 +140,9 @@ public final class NoteContentMarkdown {
   }
 
   /**
-   * Authored inter-note tokens in document order: wiki inners and path Markdown links from parsed
-   * frontmatter scalar and list-item strings first, then the body. Raw YAML escapes (e.g. {@code
-   * \"} inside double-quoted scalars) must not leak into link tokens.
+   * Authored wiki-link inners in document order: from parsed frontmatter scalar and list-item
+   * strings first, then the body. Raw YAML escapes (e.g. {@code \"} inside double-quoted scalars)
+   * must not leak into link tokens.
    */
   public static List<String> authoredTokensInOccurrenceOrder(String content) {
     if (content == null || content.isEmpty()) {

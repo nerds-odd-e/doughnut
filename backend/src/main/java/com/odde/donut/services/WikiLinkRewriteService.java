@@ -72,8 +72,7 @@ public class WikiLinkRewriteService {
 
   private String rewrittenReference(
       Note referrer, Note targetNote, String linkText, boolean keepVisibleText) {
-    String originalPortablePath =
-        WikiLinkMarkdown.splitAuthoredToken(linkText).portablePath().format();
+    String originalPortablePath = WikiLinkMarkdown.splitInner(linkText).portablePath().format();
     String authoredPortablePath =
         portablePathAuthoring.authoredPortablePath(referrer, targetNote, originalPortablePath);
     return WikiLinkMarkdownRewrite.newInnerForAuthoredPortablePath(

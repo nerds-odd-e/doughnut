@@ -1,6 +1,7 @@
 package com.odde.donut.services;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
@@ -59,21 +60,16 @@ class ResolvedWikiLinkViewerQueriesTest {
   }
 
   @Test
-  void path_markdown_wiki_title_keeps_authored_token_and_href_target() {
+  void file_looking_markdown_href_does_not_appear_in_viewer_wiki_links() {
     User user = makeMe.aUser().please();
     Folder folder = makeMe.aFolder().notebookOwnedBy(user).name("Folder").please();
-    Note target = makeMe.aNote().title("Title").folder(folder).please();
+    makeMe.aNote().title("Title").folder(folder).please();
     Note carrier =
         makeMe.aNote().notebook(folder.getNotebook()).content("[label](/Folder/Title.md)").please();
 
     resolvedWikiLinkService.refreshForNote(carrier, user);
 
-    List<WikiLink> titles = resolvedWikiLinkService.wikiLinksForViewer(carrier, user);
-    assertThat(titles, hasSize(1));
-    assertThat(titles.get(0).getAuthoredLink(), equalTo("[label](/Folder/Title.md)"));
-    assertThat(titles.get(0).getPortablePath(), equalTo("/Folder/Title.md"));
-    assertThat(titles.get(0).getDisplayText(), equalTo("label"));
-    assertThat(titles.get(0).getDestinationNoteId(), equalTo(target.getId()));
+    assertThat(resolvedWikiLinkService.wikiLinksForViewer(carrier, user), empty());
   }
 
   @Test

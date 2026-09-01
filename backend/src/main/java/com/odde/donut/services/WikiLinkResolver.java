@@ -153,7 +153,7 @@ public class WikiLinkResolver {
 
   /** Parses {@code token} into a notebook/title ref, applying the given notebook-name fallback. */
   private Optional<PortablePath.Resolved> resolveRef(String token, String notebookFallbackName) {
-    return WikiLinkMarkdown.splitAuthoredToken(token).portablePath().resolve(notebookFallbackName);
+    return WikiLinkMarkdown.splitInner(token).portablePath().resolve(notebookFallbackName);
   }
 
   private Note uniqueNotebookMatch(String notebookName, String noteTitle) {

@@ -170,18 +170,16 @@ class TextContentControllerUpdateNoteContentTests extends TextContentControllerT
   }
 
   @Test
-  void storesFullEncodedPropertyPathMarkdownTokenWhenExactPropertyExists()
+  void ignoresFileLookingPropertyMarkdownHrefWhenExactPropertyExists()
       throws UnexpectedNoAccessRightException {
     Note moon = noteWithExactProperty("Moon", "a part of");
     Note carrier = makeMe.aNote().underSameNotebookAs(moon).please();
-    String authored = "[a part of](/Moon.md#prop:a%20part%20of)";
 
-    WikiLink wt =
-        controller.updateNoteContent(carrier, contentDto(authored)).getWikiLinks().getFirst();
+    NoteRealm response =
+        controller.updateNoteContent(
+            carrier, contentDto("[a part of](/Moon.md#prop:a%20part%20of)"));
 
-    assertThat(wt.getAuthoredLink(), equalTo(authored));
-    assertThat(wt.getPortablePath(), equalTo("/Moon.md#prop:a%20part%20of"));
-    assertThat(wt.getDestinationNoteId(), equalTo(moon.getId()));
+    assertThat(response.getWikiLinks(), empty());
   }
 
   @Test

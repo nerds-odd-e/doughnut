@@ -13,41 +13,29 @@ import org.junit.jupiter.params.provider.MethodSource;
 class WikiLinkMarkdownTest {
 
   @Test
-  void authoredTokensInOccurrenceOrder_includesPathMarkdownInDocumentOrderWithWiki() {
+  void authoredTokensInOccurrenceOrder_ignoresFileLookingMarkdownHrefs() {
     assertThat(
         WikiLinkMarkdown.authoredTokensInOccurrenceOrder(
             "See [[Folder/Title|wiki]] and [label](/Folder/Title.md)."),
-        equalTo(List.of("Folder/Title|wiki", "[label](/Folder/Title.md)")));
+        equalTo(List.of("Folder/Title|wiki")));
   }
 
   @Test
-  void authoredTokensInOccurrenceOrder_skipsImageMarkdownAndNoteShowHrefs() {
+  void authoredTokensInOccurrenceOrder_skipsImageAndOrdinaryMarkdownHrefs() {
     assertThat(
         WikiLinkMarkdown.authoredTokensInOccurrenceOrder(
-            "![alt](/Folder/Title.md) [stay](/n42) [ok](/Folder/Title)"),
-        equalTo(List.of("[ok](/Folder/Title)")));
+            "![alt](/Folder/Title.md) [stay](/n42) [ok](/Folder/Title) [[Wiki]]"),
+        equalTo(List.of("Wiki")));
   }
 
   @Test
-  void isWellFormedWholeLinkToken_acceptsPathMarkdown() {
+  void isWellFormedWholeLinkToken_rejectsFileLookingMarkdownAndBarePath() {
     assertThat(
-        WikiLinkMarkdown.isWellFormedWholeLinkToken("[Title](/Folder/Title.md)"), equalTo(true));
-  }
-
-  @Test
-  void isWellFormedWholeLinkToken_rejectsBarePathAndMixedJunk() {
+        WikiLinkMarkdown.isWellFormedWholeLinkToken("[Title](/Folder/Title.md)"), equalTo(false));
     assertThat(WikiLinkMarkdown.isWellFormedWholeLinkToken("/Folder/Title.md"), equalTo(false));
     assertThat(
         WikiLinkMarkdown.isWellFormedWholeLinkToken("[Title](/Folder/Title.md) extra"),
         equalTo(false));
-  }
-
-  @Test
-  void splitAuthoredToken_readsPathMarkdownHrefAsTarget() {
-    WikiLinkMarkdown.WikiInnerSplit s =
-        WikiLinkMarkdown.splitAuthoredToken("[label](/Folder/Title.md)");
-    assertThat(s.portablePath().format(), equalTo("/Folder/Title.md"));
-    assertThat(s.displayText(), equalTo("label"));
   }
 
   @Test
@@ -160,9 +148,6 @@ class WikiLinkMarkdownTest {
         Arguments.of("[[Moon#prop:a%20part%20of]]", "[[Moon#prop:a%20part%20of]]"),
         Arguments.of("[[Sky:Moon#prop:a%20part%20of]]", "[[Sky:Moon#prop:a%20part%20of]]"),
         Arguments.of("[[Folder/Title#prop:a%20part%20of]]", "[[Folder/Title#prop:a%20part%20of]]"),
-        Arguments.of(
-            "[label](/Solar/Moon.md*#prop:a%20part%20of)",
-            "[label](/Solar/Moon.md＊#prop:a%20part%20of)"),
         Arguments.of("[[Sky:Moon*#prop:a%20part%20of]]", "[[Sky:Moon＊#prop:a%20part%20of]]"),
         Arguments.of(
             "[[Folder/Title*#prop:a%20part%20of]]", "[[Folder/Title＊#prop:a%20part%20of]]"));

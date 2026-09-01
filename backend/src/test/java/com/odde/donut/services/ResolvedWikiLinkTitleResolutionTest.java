@@ -73,39 +73,26 @@ class ResolvedWikiLinkTitleResolutionTest {
   }
 
   @ParameterizedTest
-  @ValueSource(strings = {"[label](/Pantry/Dup.md)", "[label](/Pantry/Dup)"})
-  void path_markdown_link_resolves_to_the_note_in_that_folder(String content) {
+  @ValueSource(
+      strings = {
+        "[label](/Pantry/Dup.md)",
+        "[label](/Pantry/Dup)",
+        "[label](folder/Target.md)",
+        "[label](/Title.md)"
+      })
+  void file_looking_markdown_href_is_not_indexed_as_wiki_link(String content) {
     User user = makeMe.aUser().please();
     Folder recipes = makeMe.aFolder().notebookOwnedBy(user).name("Recipes").please();
     Notebook notebook = recipes.getNotebook();
     Folder pantry = makeMe.aFolder().notebook(notebook).name("Pantry").please();
     makeMe.aNote().title("Dup").folder(recipes).please();
-    Note pantryDup = makeMe.aNote().title("Dup").folder(pantry).please();
+    makeMe.aNote().title("Dup").folder(pantry).please();
+    makeMe.aNote().title("Title").notebook(notebook).please();
     Note carrier = makeMe.aNote().notebook(notebook).content(content).please();
 
     resolvedWikiLinkService.refreshForNote(carrier, user);
 
-    List<ResolvedWikiLink> rows = cacheRows(carrier);
-    assertThat(rows, hasSize(1));
-    assertThat(rows.get(0).getAuthoredLink(), equalTo(content));
-    assertThat(rows.get(0).getDestinationNote().getId(), equalTo(pantryDup.getId()));
-  }
-
-  @Test
-  void root_path_markdown_link_resolves_to_the_notebook_root_note() {
-    User user = makeMe.aUser().please();
-    Folder folder = makeMe.aFolder().notebookOwnedBy(user).name("Pantry").please();
-    makeMe.aNote().title("Title").folder(folder).please();
-    Note root = makeMe.aNote().title("Title").notebook(folder.getNotebook()).please();
-    Note carrier =
-        makeMe.aNote().notebook(folder.getNotebook()).content("[label](/Title.md)").please();
-
-    resolvedWikiLinkService.refreshForNote(carrier, user);
-
-    List<ResolvedWikiLink> rows = cacheRows(carrier);
-    assertThat(rows, hasSize(1));
-    assertThat(rows.get(0).getAuthoredLink(), equalTo("[label](/Title.md)"));
-    assertThat(rows.get(0).getDestinationNote().getId(), equalTo(root.getId()));
+    assertThat(cacheRows(carrier), empty());
   }
 
   @ParameterizedTest

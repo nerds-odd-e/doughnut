@@ -98,6 +98,6 @@ class NotebookFolderMoveWikiLinkRewriteControllerTest
         resolvedWikiLinkServiceBean.wikiLinksForViewer(noteB, owner).stream()
             .map(WikiLink::getDestinationNoteId)
             .toList(),
-        containsInAnyOrder(noteA.getId(), noteA.getId()));
+        containsInAnyOrder(noteA.getId()));
   }
 }

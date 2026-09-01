@@ -144,3 +144,7 @@ When(
       .pointOpenUnresolvedWikiLinkAtDestination(destinationTitle)
   }
 )
+
+Then('I should not see the References section', () => {
+  cy.findByRole('heading', { name: 'References' }).should('not.exist')
+})
