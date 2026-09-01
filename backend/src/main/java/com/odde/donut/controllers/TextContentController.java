@@ -135,10 +135,9 @@ class TextContentController {
     }
     if (refreshWikiLinks) {
       User viewer = authorizationService.getCurrentUser();
+      resolvedWikiLinkService.refreshForNote(note, viewer);
       if (!aliasesBefore.equals(aliasLookupKeys(note.getContent()))) {
         resolvedWikiLinkService.refreshNotebookScope(note.getNotebook(), viewer);
-      } else {
-        resolvedWikiLinkService.refreshForNote(note, viewer);
       }
     }
     return noteRealmService.build(note, authorizationService.getCurrentUser());

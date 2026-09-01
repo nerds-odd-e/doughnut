@@ -164,11 +164,17 @@ public class ResolvedWikiLinkService {
         .sampledReferencesNotesForFocusContext(focalNote, viewer, excludeNoteIds, cap, sampleSeed);
   }
 
+  /** Note-local: property/alias/level indexes, outgoing resolution rows, property-link validity. */
   @Transactional
   public void refreshForNote(Note note, User viewer) {
     resolvedWikiLinkRefresh.refreshForNote(entityManager, note, viewer);
   }
 
+  /**
+   * Notebook resolution scope only: outgoing resolution rows and property-link validity for live
+   * notes. Does not rebuild derived indexes; call {@link #refreshForNote} first when the changed
+   * note's indexes must be current before other notes re-resolve.
+   */
   @Transactional
   public void refreshNotebookScope(Notebook notebook, User viewer) {
     resolvedWikiLinkRefresh.refreshNotebookScope(entityManager, notebook, viewer);

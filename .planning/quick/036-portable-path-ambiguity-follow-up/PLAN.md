@@ -1,6 +1,6 @@
 # Wiki-link ambiguity and Markdown URL conformance
 
-**Status:** in progress (slices 1–9 done; next: slice 10)
+**Status:** in progress (slices 1–10 done; next: slice 11)
 
 ## Goal
 
@@ -223,23 +223,12 @@ origins stay ordinary links.
 
 ### 10. Notebook resolution refresh excludes unrelated derived indexes
 
-**Status:** planned
+**Status:** done
 **Type:** Structure
 
-Split the operations currently conflated by `refreshNotebookScope`:
-
-- note-local refresh rebuilds that note's property/alias/level indexes and
-  outgoing semantic-link rows;
-- notebook resolution-scope refresh rebuilds only outgoing resolution rows and
-  existing property-link validity for live notes in that notebook.
-
-Creation and alias-content updates refresh the changed note locally before the
-notebook resolution pass. Title, move, delete, and restore mutations perform
-only the affected resolution-scope pass. Remove the internal test that expects
-notebook scope to repair an alias index created by bypassing production
-boundaries. This directly prepares slice 11.
-
-Verification: full backend unit suite.
+`refreshForNote` (local indexes + outgoing) vs `refreshNotebookScope`
+(resolution-scope only). Creation/alias: local then scope; title/move/delete/
+restore: scope only. Prepares slice 11.
 
 ### 11. Cross-notebook folder moves refresh both shorthand scopes
 

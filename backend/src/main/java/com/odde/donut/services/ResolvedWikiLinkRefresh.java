@@ -12,7 +12,10 @@ import jakarta.persistence.EntityManager;
 import java.util.LinkedHashSet;
 import java.util.List;
 
-/** Rebuilds resolved wiki-link rows and drops inbound property wiki rows that no longer match. */
+/**
+ * Note-local derived-index refresh plus notebook-scoped resolution refresh for resolved wiki-link
+ * rows and inbound property wiki validity.
+ */
 final class ResolvedWikiLinkRefresh {
 
   private final WikiLinkResolver wikiLinkResolver;
@@ -37,34 +40,30 @@ final class ResolvedWikiLinkRefresh {
     this.noteRepository = noteRepository;
   }
 
+  /**
+   * Note-local refresh: rebuilds this note's property/alias/level indexes, its outgoing
+   * resolved-wiki-link rows, and drops inbound property wiki rows that no longer match this note.
+   */
   void refreshForNote(EntityManager entityManager, Note note, User viewer) {
-    rebuildResolvedWikiLinkRows(entityManager, note, viewer);
     refreshDerivedIndexesForNote(note);
-    dropStaleInboundPropertyWikiRows(entityManager, note);
+    refreshResolutionForNote(entityManager, note, viewer);
   }
 
   /**
-   * Re-resolves every live note's resolved wiki-link rows in {@code notebook}. Portable-path
-   * resolution cardinality (unique / ambiguous / missing) depends on the whole notebook's current
-   * note set, so a note's identity change (title, alias set, location) can change which shorthand
-   * links in OTHER notes of that notebook resolve. This is the affected-scope re-resolution
-   * operation for that broader case; {@link #refreshForNote} alone only rebuilds one note's own
-   * outgoing rows.
+   * Notebook resolution-scope refresh: re-resolves every live note's outgoing resolved-wiki-link
+   * rows in {@code notebook} and drops inbound property wiki rows that no longer match, without
+   * rebuilding property/alias/level indexes.
    *
-   * <p>Runs in two passes over the notebook's live notes rather than one interleaved per-note pass:
-   * pass 1 rebuilds every note's own derived indexes (property/alias/level) first, then pass 2
-   * resolves every note's outgoing links. A note's alias candidates live in a separate index table,
-   * not on the note itself, so a single interleaved pass would resolve earlier-processed notes
-   * against later notes' stale (pre-refresh) alias indexes.
+   * <p>Portable-path resolution cardinality (unique / ambiguous / missing) depends on the whole
+   * notebook's current note set, so a note's identity change (title, alias set, location) can
+   * change which shorthand links in OTHER notes of that notebook resolve. Callers that change a
+   * note's content-derived indexes (creation, alias frontmatter) must {@link #refreshForNote} that
+   * note first so alias candidates exist before this scope re-resolves other notes.
    */
   void refreshNotebookScope(EntityManager entityManager, Notebook notebook, User viewer) {
     List<Note> liveNotes = noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId());
     for (Note note : liveNotes) {
-      refreshDerivedIndexesForNote(note);
-    }
-    for (Note note : liveNotes) {
-      rebuildResolvedWikiLinkRows(entityManager, note, viewer);
-      dropStaleInboundPropertyWikiRows(entityManager, note);
+      refreshResolutionForNote(entityManager, note, viewer);
     }
   }
 
@@ -72,6 +71,11 @@ final class ResolvedWikiLinkRefresh {
     notePropertyIndexService.refreshForNote(note);
     noteAliasIndexService.refreshForNote(note);
     noteLevelIndexService.refreshForNote(note);
+  }
+
+  private void refreshResolutionForNote(EntityManager entityManager, Note note, User viewer) {
+    rebuildResolvedWikiLinkRows(entityManager, note, viewer);
+    dropStaleInboundPropertyWikiRows(entityManager, note);
   }
 
   private void dropStaleInboundPropertyWikiRows(EntityManager entityManager, Note target) {

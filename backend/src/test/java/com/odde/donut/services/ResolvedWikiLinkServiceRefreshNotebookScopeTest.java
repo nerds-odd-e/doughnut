@@ -56,28 +56,4 @@ class ResolvedWikiLinkServiceRefreshNotebookScopeTest {
 
     assertThat(cacheRows(carrier), empty());
   }
-
-  @Test
-  void rebuilds_every_notes_alias_index_before_resolving_any_notes_links() {
-    User user = makeMe.aUser().please();
-    Note target = makeMe.aNote().title("Target").notebookOwnedBy(user).please();
-    Note referrer = makeMe.aNote().underSameNotebookAs(target).content("[[Target]]").please();
-    Notebook notebook = target.getNotebook();
-
-    resolvedWikiLinkService.refreshForNote(referrer, user);
-    assertThat(cacheRows(referrer), hasSize(1));
-
-    // Higher id than referrer; its alias frontmatter is persisted directly (bypassing the
-    // controller) so its NoteAliasIndex row does not exist yet when refreshNotebookScope runs.
-    makeMe
-        .aNote()
-        .underSameNotebookAs(target)
-        .title("C")
-        .content("---\naliases:\n  - Target\n---\n\nBody text")
-        .please();
-
-    resolvedWikiLinkService.refreshNotebookScope(notebook, user);
-
-    assertThat(cacheRows(referrer), empty());
-  }
 }
