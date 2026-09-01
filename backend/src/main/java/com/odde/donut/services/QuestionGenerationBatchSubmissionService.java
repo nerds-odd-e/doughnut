@@ -1,10 +1,8 @@
 package com.odde.donut.services;
 
 import com.odde.donut.entities.QuestionGenerationBatch;
-import com.odde.donut.entities.QuestionGenerationBatchRequest;
 import com.odde.donut.entities.QuestionGenerationBatchStatus;
 import com.odde.donut.entities.repositories.QuestionGenerationBatchRepository;
-import com.odde.donut.entities.repositories.QuestionGenerationBatchRequestRepository;
 import com.odde.donut.services.openAiApis.OpenAiApiHandler;
 import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
@@ -15,20 +13,20 @@ public class QuestionGenerationBatchSubmissionService {
   private final QuestionGenerationBatchJsonlRenderer jsonlRenderer;
   private final OpenAiApiHandler openAiApiHandler;
   private final QuestionGenerationBatchRepository batchRepository;
-  private final QuestionGenerationBatchRequestRepository batchRequestRepository;
   private final QuestionGenerationBatchMetrics batchMetrics;
+  private final QuestionGenerationBatchSubmissionFailureTx submissionFailureTx;
 
   public QuestionGenerationBatchSubmissionService(
       QuestionGenerationBatchJsonlRenderer jsonlRenderer,
       OpenAiApiHandler openAiApiHandler,
       QuestionGenerationBatchRepository batchRepository,
-      QuestionGenerationBatchRequestRepository batchRequestRepository,
-      QuestionGenerationBatchMetrics batchMetrics) {
+      QuestionGenerationBatchMetrics batchMetrics,
+      QuestionGenerationBatchSubmissionFailureTx submissionFailureTx) {
     this.jsonlRenderer = jsonlRenderer;
     this.openAiApiHandler = openAiApiHandler;
     this.batchRepository = batchRepository;
-    this.batchRequestRepository = batchRequestRepository;
     this.batchMetrics = batchMetrics;
+    this.submissionFailureTx = submissionFailureTx;
   }
 
   public boolean submitPlannedBatch(QuestionGenerationBatch batch, Timestamp submissionTime) {
@@ -55,11 +53,7 @@ public class QuestionGenerationBatchSubmissionService {
       batchMetrics.recordSubmittedBatch();
       return true;
     } catch (RuntimeException e) {
-      batch.setStatus(QuestionGenerationBatchStatus.FAILED);
-      batchRequestRepository.markPendingAsFailedForBatch(
-          batch.getId(),
-          QuestionGenerationBatchRequest.ERROR_BATCH_SUBMISSION_FAILED + ": " + e.getMessage());
-      batchRepository.saveAndFlush(batch);
+      submissionFailureTx.persistFailedSubmission(batch, e.getMessage());
       batchMetrics.recordFailedBatch();
       return false;
     }
