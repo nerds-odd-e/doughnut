@@ -39,10 +39,6 @@ public class NoteLevelIndexService {
       return;
     }
 
-    Note indexOwner = entityManager.getReference(Note.class, noteId);
-    NoteLevelIndex row = new NoteLevelIndex();
-    row.setNote(indexOwner);
-    row.setLevel(level.get());
-    noteLevelIndexRepository.save(row);
+    noteLevelIndexRepository.upsertLevel(noteId, level.get());
   }
 }

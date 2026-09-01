@@ -1,6 +1,6 @@
 # Wiki-link ambiguity and Markdown URL conformance
 
-**Status:** in progress (slices 1–16 done; next: slice 17)
+**Status:** all 17 slices done
 
 ## Goal
 
@@ -335,22 +335,23 @@ staleness) — each keeps its own Spring test context and helpers.
 
 ### 17. Concurrent first note-level refreshes do not fail
 
-**Status:** planned
+**Status:** done
 **Type:** Behavior
 
-**Pre-condition:** No `note_level_index` row exists for a note with a valid
-`note_level`.
+`NoteLevelIndexRepository.upsertLevel` replaces the create branch's
+read-then-insert with a native `INSERT ... ON DUPLICATE KEY UPDATE`, so two
+concurrent first refreshes for the same note can no longer both observe "no
+row" and race on the primary key. Whole-notebook locking was not restored.
+Proven by `NoteLevelIndexServiceConcurrencyTest`, which races two real
+threads (each its own transaction/connection via a `CyclicBarrier`) against
+`refreshForNote` for a note with no existing index row — failed with
+`DataIntegrityViolationException` before the fix, passes reliably after.
 
-**Trigger:** Two transactions refresh that note concurrently.
-
-**Post-condition:** Both operations complete and one correct index row remains;
-no duplicate-key, lock-timeout, or deadlock escapes.
-
-Use an atomic database operation or a narrowly scoped lock for the single row.
-Do not restore whole-notebook note locking. Prove the behavior with two real
-transactions/connections at the service boundary.
-
-Verification: full backend unit suite.
+**Learning:** `NoteLevelIndexBackfill` already had an equivalent upsert for
+the same table via raw JDBC; not consolidated with the new JPA `@Query`
+version since the two run through incompatible mechanisms (positional JDBC
+placeholders in a batched migration utility vs. named-parameter `@Query` in a
+managed transaction).
 
 ## Remaining Jidoka decision
 
