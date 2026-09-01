@@ -35,12 +35,16 @@
 
 <script setup lang="ts">
 import type { PropType } from "vue"
-import { computed, ref, toRef } from "vue"
+import { computed, onUnmounted, ref, toRef } from "vue"
 import type { TitleRenameReferenceHandling } from "@/store/StoredApiCollection"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import { useDebouncedTextAutosave } from "@/composables/useDebouncedTextAutosave"
 import { normalizeNoteContent } from "@/utils/normalizeNoteContent"
 import { hasNewWikiLinkTexts } from "@/utils/noteContentWikiLinks"
+import {
+  noteContentMutationAdmissionIsOpen,
+  registerNoteContentAutosave,
+} from "@/composables/noteContentMutationBarrier"
 
 const storageAccessor = useStorageAccessor()
 
@@ -140,10 +144,27 @@ const {
   hasUnsavedChanges,
   propose,
   flush,
+  flushAndWait,
   cancel,
   discardDraft,
   markSaved,
 } = autosave
+
+let unregisterContentAutosave: (() => void) | undefined
+let registeredContentNoteId: number | undefined
+
+const registerContentAutosave = (noteId: number) => {
+  if (props.field !== "edit content" || registeredContentNoteId === noteId) {
+    return
+  }
+  unregisterContentAutosave?.()
+  registeredContentNoteId = noteId
+  unregisterContentAutosave = registerNoteContentAutosave(noteId, {
+    flushAndWait,
+  })
+}
+
+onUnmounted(() => unregisterContentAutosave?.())
 
 const showReferencedTitleSavePanel = computed(
   () => needsExplicitReferencedTitleSave() && hasUnsavedChanges()
@@ -153,6 +174,14 @@ const wrapperClass = computed(() => (isDirty.value ? "dirty" : ""))
 
 const onUpdate = (noteId: number, newValue: string) => {
   if (props.field === "edit title" && !newValue.trim()) {
+    return
+  }
+
+  registerContentAutosave(noteId)
+  if (
+    props.field === "edit content" &&
+    !noteContentMutationAdmissionIsOpen(noteId)
+  ) {
     return
   }
 

@@ -46,14 +46,17 @@ export function useDebouncedTextAutosave(
 
   const isDirty = computed(() => hasUnsavedChanges())
 
-  let persistChain: Promise<void> = Promise.resolve()
+  let persistChain: Promise<boolean> = Promise.resolve(true)
 
   const isCurrentProposal = (nextVersion: number) =>
     nextVersion === version.value
 
-  const persistOne = async (newValue: string, nextVersion: number) => {
+  const persistOne = async (
+    newValue: string,
+    nextVersion: number
+  ): Promise<boolean> => {
     if (!isCurrentProposal(nextVersion)) {
-      return
+      return true
     }
     if (options.beforePersist) {
       const proceed = await options.beforePersist(
@@ -61,7 +64,7 @@ export function useDebouncedTextAutosave(
         newValue
       )
       if (!proceed || !isCurrentProposal(nextVersion)) {
-        return
+        return false
       }
     }
     pendingSaveValues.add(newValue)
@@ -75,8 +78,10 @@ export function useDebouncedTextAutosave(
       } else if (nextVersion < version.value) {
         lastSavedValue.value = newValue
       }
+      return true
     } catch (errs: unknown) {
       options.onError?.(errs)
+      return false
     } finally {
       pendingSaveValues.delete(newValue)
     }
@@ -110,6 +115,12 @@ export function useDebouncedTextAutosave(
 
   const flush = () => {
     debouncedPersist.flush()
+  }
+
+  const flushAndWait = async (): Promise<boolean> => {
+    flush()
+    const saved = await persistChain
+    return saved && !hasUnsavedChanges()
   }
 
   const cancel = () => {
@@ -171,6 +182,7 @@ export function useDebouncedTextAutosave(
     hasUnsavedChanges,
     propose,
     flush,
+    flushAndWait,
     cancel,
     discardDraft,
     markSaved: (value: string) => {

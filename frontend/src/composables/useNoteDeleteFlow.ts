@@ -9,6 +9,10 @@ import { qualifyRelationNoteForReduceOnDelete } from "@/utils/relationNoteReduce
 import { quotedNoteLabel } from "@/utils/quotedNoteLabel"
 import { toValue, type MaybeRefOrGetter } from "vue"
 import { useRouter } from "vue-router"
+import {
+  closeAndFlushNoteContentMutations,
+  reopenNoteContentMutations,
+} from "@/composables/noteContentMutationBarrier"
 
 const REDUCE_DELETE_LOADING_MESSAGE = "Reducing to source property..."
 const DELETE_LOADING_MESSAGE = "Deleting note..."
@@ -94,9 +98,16 @@ export function useNoteDeleteFlow(
     if (!deleteChoice) return
 
     await runWithBlockingApiLoading(async () => {
-      await storageAccessor.value
-        .storedApi()
-        .deleteNote(router, toValue(noteId), deleteChoice)
+      const id = toValue(noteId)
+      if (!(await closeAndFlushNoteContentMutations(id))) return
+      const storage = storageAccessor.value
+      try {
+        await storage.storedApi().deleteNote(router, id, deleteChoice)
+      } finally {
+        if (storage.refOfNoteRealm(id).value) {
+          reopenNoteContentMutations(id)
+        }
+      }
     }, deleteLoadingMessageFor(deleteChoice.referenceHandling))
   }
 
