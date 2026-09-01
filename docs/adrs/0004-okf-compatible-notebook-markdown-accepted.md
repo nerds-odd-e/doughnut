@@ -163,6 +163,6 @@ profile. Codec round-trips must be lossless for these rules.
   - [ADR 0001 — Ubiquitous language](./0001-ubiquitous-language.md)
     (**Portable notebook tree**, **Portable path**, **Wiki link**, **Property**)
   - [ADR 0002 — Git-native notebooks](./0002-git-native-notebooks-backed-by-mysql.md)
-  - [ADR 0005 — Web routes](./0005-web-routes.md) (compile to `noteShow` / `noteProperty`)
+  - [ADR 0005 — Web routes](./0005-web-routes-accepted.md) (compile to `noteShow` / `noteProperty`)
   - [Open Knowledge Format v0.2](https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/SPEC.md)
   - [Obsidian inline titles](https://obsidian.md/help/settings)

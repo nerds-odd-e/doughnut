@@ -92,7 +92,7 @@ When("I start a conversation about the note {string}", (noteTopology: string) =>
 
 Use page objects with a fluent interface: methods perform an action and return the next page object, or `this` when staying on the same screen. This keeps step definitions short and navigation explicit in the types.
 
-- Navigation (Proposed ADR 0005). E2E navigation goes through `e2e_test/start/router.ts`
+- Navigation (ADR 0005). E2E navigation goes through `e2e_test/start/router.ts`
   (`visitNamed` / named `push`). Compile hrefs with `namedLocationHref` /
   `noteShowHref`. Page objects and steps do not call `cy.visit` with SPA path
   strings (`scripts/check_e2e_spa_visit_gate.sh` in CI).

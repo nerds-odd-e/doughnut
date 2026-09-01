@@ -82,7 +82,7 @@ Number sequentially from `0000`. Prefer capability-named titles, not phase numbe
 | [0002](./0002-git-native-notebooks-backed-by-mysql.md) | Proposed | Host Git-native notebooks backed by MySQL |
 | [0003](./0003-spaced-repetition-scheduling-policy-accepted.md) | Accepted | Spaced-repetition scheduling policy |
 | [0004](./0004-okf-compatible-notebook-markdown-accepted.md) | Accepted | OKF-compatible notebook Markdown profile |
-| [0005](./0005-web-routes.md) | Proposed | Web routes (SPA, API boundary, wiki-link destinations) |
+| [0005](./0005-web-routes-accepted.md) | Accepted | Web routes (SPA, API boundary, wiki-link destinations) |
 | [0006](./0006-failure-handling-accepted.md) | Accepted | Failure handling |
 
 Keep this table current when you accept, reject, or supersede an ADR.

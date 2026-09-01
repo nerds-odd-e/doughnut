@@ -113,7 +113,6 @@ public class NoteConstructionService {
     note = attachWikidataAndRefresh(note, wikidataIdWithApi);
     noteService.deleteOrphanImagesForPersistedContent(note);
     resolvedWikiLinkService.refreshForNote(note, user);
-    resolvedWikiLinkService.refreshNotebookScope(notebook, user);
     return noteRealmService.build(note, user);
   }
 
@@ -143,7 +142,6 @@ public class NoteConstructionService {
     noteService.deleteOrphanImagesForPersistedContent(originalNote);
     resolvedWikiLinkService.refreshForNote(newNote, user);
     resolvedWikiLinkService.refreshForNote(originalNote, user);
-    resolvedWikiLinkService.refreshNotebookScope(originalNote.getNotebook(), user);
 
     return noteRealmService.build(newNote, user);
   }

@@ -65,7 +65,7 @@ routers that resolve named screen locations use production `routes` or
 `dummyRouteRecordsFromMetadata` (the `routeMetadata` table with dummy
 components; no page imports). Catch-all `/` or `/:pathMatch(.*)*` routers
 and `useRoute` stubs with `path: "/"` are not a second screen dialect
-(Proposed ADR 0005).
+(ADR 0005).
 
 ## Avoid Role Queries
 

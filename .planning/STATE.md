@@ -6,9 +6,9 @@ current_phase: null
 current_phase_name: null
 status: ready
 stopped_at: null
-last_updated: "2026-09-01T01:54:00Z"
+last_updated: "2026-09-01T07:22:00Z"
 last_activity: 2026-09-01
-last_activity_desc: "038 OpenAI batch FAILED persist-then-throw plan (ADR 0006, no ADR change)"
+last_activity_desc: "Planned probe: skip notebook-scope wiki refresh on title/create"
 progress:
   total_phases: 0
   completed_phases: 0
@@ -36,10 +36,11 @@ Daily probe measurement (not an ADR): [daily-probe-protocol.md](notes/daily-prob
 ## Operator Next Steps
 
 - After deploying the Flyway squash, confirm startup succeeded and `flyway_schema_history` shows the baseline repaired, the collapsed versions marked `DELETE`, and `V300000300` applied.
+- Title/create slowness probe (skip in-request `refreshNotebookScope`): `.planning/quick/038-skip-notebook-scope-refresh-on-title-and-create/PLAN.md` — planned, do not execute until asked.
 - Daily probe tap affordance (visible panels, stable board, press flash): `.planning/quick/033-daily-probe-tap-affordance/PLAN.md` — planned, do not execute until asked.
 - OpenAI transaction-boundary follow-up cleanup (test coverage gap, duplicated test helper, comment trim, dead code): `.planning/quick/037-openai-transaction-boundary-followup/PLAN.md` — planned, do not execute until asked.
 - Start the next milestone with `/gsd-new-milestone` when ready.
 
 Parked work: SEED-001, SEED-002, SEED-005, SEED-006, SEED-007, SEED-008; ADR 0002 Level 1. See [ROADMAP.md](ROADMAP.md).
 
-Recent ad-hoc work (no active plans): `noteProperty` / **property panel** / `#prop:` wiki (ADR 0001 / ADR 0004 / Proposed ADR 0005); E2E named-route honesty and SPA hydrate protocol (E2E helpers, `MainMenu.vue`); daily probe side tap ([daily-probe-protocol.md](notes/daily-probe-protocol.md)).
+Recent ad-hoc work (no active plans): `noteProperty` / **property panel** / `#prop:` wiki (ADR 0001 / ADR 0004 / ADR 0005); E2E named-route honesty and SPA hydrate protocol (E2E helpers, `MainMenu.vue`); daily probe side tap ([daily-probe-protocol.md](notes/daily-probe-protocol.md)).

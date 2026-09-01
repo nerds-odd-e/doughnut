@@ -65,15 +65,14 @@ terms here; do not supersede this ADR with a new one.
   URL also participates as a Wiki link by note ID; its label is display only.
   Spelling and property-key encoding:
   [ADR 0004](./0004-okf-compatible-notebook-markdown-accepted.md). Web
-  destination: `noteProperty`, once Proposed
-  [ADR 0005](./0005-web-routes.md) is Accepted — human-owned exception
-  trailed in `.planning/quick/013-note-property-canonical-path/PLAN.md`.
+  destination:
+  [ADR 0005](./0005-web-routes-accepted.md) (`noteProperty`).
 - **Property** — YAML frontmatter key–value on a note (scalar or
   one-level list). Distinct from a **relationship note**. A value may
   contain **wiki links**. Relation-like keys (`example of`, `a part of`)
   are still properties. Portable identity is (Portable path, exact YAML
   key) via `#prop:<encoded-key>` (ADR 0004). Web canonical location is
-  `noteProperty`, once Proposed ADR 0005 is Accepted (see above).
+  `noteProperty` ([ADR 0005](./0005-web-routes-accepted.md)).
 - **Relationship** — Typed association between notes (e.g. “similar to”,
   “a part of”)
 - **Relationship note** — A note that represents a relationship

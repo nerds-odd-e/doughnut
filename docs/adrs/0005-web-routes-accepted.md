@@ -1,7 +1,7 @@
 # 0005 — Web routes
 
-**Status:** Proposed  
-**Date:** 2026-08-29  
+**Status:** Accepted  
+**Date:** 2026-09-01  
 **Decision makers:** Terry Yin  
 **Consulted:** None
 
@@ -70,7 +70,7 @@ at the web boundary.
   export. Donut recognizes it as a semantic note reference when the href is
   either a root-relative canonical note URL (`/n1234`) or an absolute HTTP(S)
   URL on a recognized Donut deployment origin
-  (`https://doughnut.odd-e.com/n19921`). The href's note ID is authoritative;
+  (`https://doughnut.odd-e.com/n1234`). The href's note ID is authoritative;
   anchor text is display only. Absolute Donut note URLs are preferred for links
   intended to work outside their authoring host. Root-relative note URLs have
   their normal host-relative portability limitation.
