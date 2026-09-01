@@ -1,10 +1,12 @@
 package com.odde.donut.controllers;
 
+import static com.odde.donut.entities.repositories.AuthoredNoteReferenceRowTestSupport.rowsFor;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
 import com.odde.donut.controllers.dto.NoteDeleteDTO;
 import com.odde.donut.controllers.dto.NoteDeleteReferenceHandling;
+import com.odde.donut.controllers.dto.NoteRealm;
 import com.odde.donut.entities.MemoryTracker;
 import com.odde.donut.entities.MemoryTrackerType;
 import com.odde.donut.entities.Note;
@@ -12,6 +14,7 @@ import com.odde.donut.entities.repositories.MemoryTrackerRepository;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.services.ResolvedWikiLinkService;
 import com.odde.donut.services.httpQuery.HttpClientAdapter;
+import jakarta.persistence.EntityManager;
 import java.sql.Timestamp;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 class NoteControllerDeleteReduceToSourceTests extends ControllerTestBase {
+  @Autowired EntityManager entityManager;
   @Autowired MemoryTrackerRepository memoryTrackerRepository;
   @Autowired NoteController controller;
   @Autowired ResolvedWikiLinkService resolvedWikiLinkService;
@@ -60,6 +64,11 @@ class NoteControllerDeleteReduceToSourceTests extends ControllerTestBase {
     assertThat(moon.getContent(), containsString("a part of"));
     assertThat(moon.getContent(), containsString("[[Earth]]"));
     assertThat(earth.getContent(), not(containsString("a part of")));
+    assertThat(rowsFor(entityManager, moon), hasSize(1));
+    NoteRealm sourceRealm = controller.showNote(moon);
+    assertThat(sourceRealm.getWikiLinks(), hasSize(1));
+    assertThat(
+        sourceRealm.getWikiLinks().getFirst().getDestinationNoteId(), equalTo(earth.getId()));
   }
 
   @Test

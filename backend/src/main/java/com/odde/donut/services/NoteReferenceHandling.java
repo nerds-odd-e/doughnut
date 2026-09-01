@@ -12,6 +12,7 @@ import com.odde.donut.entities.repositories.MemoryTrackerRepository;
 import com.odde.donut.entities.repositories.ResolvedWikiLinkRepository;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.factoryServices.EntityPersister;
+import com.odde.donut.validators.AuthoredNoteContent;
 import java.sql.Timestamp;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -80,7 +81,9 @@ final class NoteReferenceHandling {
     NoteContentMarkdown.AddPropertyWithAvailableKeyResult addResult =
         NoteContentMarkdown.addPropertyWithAvailableKeyToLeadingFrontmatter(
             sourceNote.getContent(), canonicalPropertyKey, relationship.targetScalar());
-    sourceNote.setContent(addResult.content());
+    sourceNote.replaceContent(
+        AuthoredNoteContent.prepareDocumentForSave(
+            addResult.content(), wikiLinkResolver.canonicalDonutOrigin()));
     sourceNote.setUpdatedAt(updatedAt);
     entityPersister.merge(sourceNote);
     deleteOrphanImages.accept(sourceNote);
