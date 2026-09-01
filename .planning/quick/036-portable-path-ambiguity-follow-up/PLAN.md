@@ -1,6 +1,6 @@
 # Wiki-link ambiguity and Markdown URL conformance
 
-**Status:** in progress (slices 1–15 done; next: slice 16)
+**Status:** in progress (slices 1–16 done; next: slice 17)
 
 ## Goal
 
@@ -309,27 +309,29 @@ directly on `classifyToken`.
 
 ### 16. Showing a note uses current viewer-specific wiki resolution
 
-**Status:** planned
+**Status:** done
 **Type:** Behavior
 
-**Pre-condition:** A source note's cached wiki row predates target-cardinality
-change or was produced by a user with a different readable candidate set.
+`ResolvedWikiLinkService.authorizedOutgoingTargetNote` split by reference
+kind: `authorizedNoteIdUrlTarget` keeps the unchanged deterministic `/nID`
+authorization filter; `liveResolvedWikiPortablePathTarget` now calls
+`WikiLinkResolver.classifyToken` live against current content instead of
+trusting the persisted row's `destinationNote`, returning a note only on
+`Resolved`. `wikiLinksForViewer`/`outgoingWikiLinkTargetNotesForViewer`
+(consumed by `NoteController.showNote` and outgoing focus-context traversal)
+pick this up automatically — no separate traversal fix needed. No persistent
+indexing was broadened.
 
-**Trigger:** The current user opens the source or an outgoing graph consumer
-asks for targets.
+Covered by `NoteControllerShowWikiLinkAmbiguityTests` (stale-cache-becomes-
+ambiguous and different-viewer-candidate-set regressions, both driven through
+`NoteController.showNote`) plus the split-out
+`NoteControllerShowWikiLinkTests`; focused `wiki_link.feature` (11/11).
 
-**Post-condition:** Every wiki token is reported from current content as
-`RESOLVED`, `AMBIGUOUS`, or omitted-as-missing for that viewer; stale cached
-state cannot navigate to the wrong note. Deterministic note-ID URL references
-remain filtered by the current viewer's authorization.
-
-- Drive the regression through `NoteController.showNote` with a qualified
-  cross-notebook source, first unique then colliding.
-- Add the different-viewer example at the same stable boundary.
-- Keep outgoing focus-context traversal consuming this corrected boundary.
-- Do not broaden persistent indexing in this slice.
-
-Verification: full backend unit suite; focused `wiki_link.feature`.
+**Learning:** the oversized `NoteControllerShowTests.java` (317 lines after
+this slice's additions) was split into `NoteControllerShowTests` (access/
+authorization + note-ID URL), `NoteControllerShowWikiLinkTests` (resolution
+mechanics), and `NoteControllerShowWikiLinkAmbiguityTests` (cardinality/
+staleness) — each keeps its own Spring test context and helpers.
 
 ### 17. Concurrent first note-level refreshes do not fail
 

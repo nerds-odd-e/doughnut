@@ -3,7 +3,6 @@ package com.odde.donut.services;
 import com.odde.donut.algorithms.AuthoredNoteReference;
 import com.odde.donut.algorithms.AuthoredNoteReferences;
 import com.odde.donut.algorithms.CanonicalDonutOrigin;
-import com.odde.donut.algorithms.WikiLinkPropertyMatch;
 import com.odde.donut.controllers.dto.WikiLink;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
@@ -124,7 +123,24 @@ public class ResolvedWikiLinkService {
     return List.copyOf(notes);
   }
 
+  /**
+   * Authorized outgoing target note for {@code row}, for {@code viewer} right now. A Note-ID URL
+   * target is deterministic (row's destination note, filtered by the viewer's read authorization).
+   * A wiki Portable-path target is re-classified live via {@link WikiLinkResolver#classifyToken} so
+   * a cardinality change since the row was cached (or a different viewer's readable-candidate set)
+   * cannot resolve to a stale or wrong note.
+   */
   private Note authorizedOutgoingTargetNote(Note sourceNoteRef, ResolvedWikiLink row, User viewer) {
+    return switch (AuthoredNoteReferences.fromStoredAuthoredLink(
+        row.getAuthoredLink(), canonicalDonutOrigin)) {
+      case AuthoredNoteReference.NoteIdUrlTarget ignored ->
+          authorizedNoteIdUrlTarget(sourceNoteRef, row, viewer);
+      case AuthoredNoteReference.WikiPortablePathTarget ignored ->
+          liveResolvedWikiPortablePathTarget(sourceNoteRef, row, viewer);
+    };
+  }
+
+  private Note authorizedNoteIdUrlTarget(Note sourceNoteRef, ResolvedWikiLink row, User viewer) {
     Note target = row.getDestinationNote();
     if (target.getDeletedAt() != null) {
       return null;
@@ -134,18 +150,15 @@ public class ResolvedWikiLinkService {
     if (!authorizationService.userMayReadNotebook(viewer, notebook)) {
       return null;
     }
-    Note resolved = entityManager.find(Note.class, target.getId());
-    if (resolved == null) {
-      return null;
-    }
-    return switch (AuthoredNoteReferences.fromStoredAuthoredLink(
-        row.getAuthoredLink(), canonicalDonutOrigin)) {
-      case AuthoredNoteReference.NoteIdUrlTarget ignored -> resolved;
-      case AuthoredNoteReference.WikiPortablePathTarget ignored ->
-          WikiLinkPropertyMatch.matchesTargetNoteContent(
-                  row.getAuthoredLink(), resolved.getContent())
-              ? resolved
-              : null;
+    return entityManager.find(Note.class, target.getId());
+  }
+
+  private Note liveResolvedWikiPortablePathTarget(
+      Note sourceNoteRef, ResolvedWikiLink row, User viewer) {
+    return switch (wikiLinkResolver.classifyToken(row.getAuthoredLink(), sourceNoteRef, viewer)) {
+      case WikiLinkResolver.CandidateCardinality.Resolved resolved -> resolved.destinationNote();
+      case WikiLinkResolver.CandidateCardinality.Unresolved ignored -> null;
+      case WikiLinkResolver.CandidateCardinality.Ambiguous ignored -> null;
     };
   }
 
