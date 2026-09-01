@@ -129,9 +129,7 @@ class AiControllerCreateExtractedNoteTest extends ControllerTestBase {
           controller.createExtractedNote(
               source,
               extractionResult(
-                  "Extracted",
-                  "[[Missing]]",
-                  "See [Some Label](/n" + urlTarget.getId() + ")"));
+                  "Extracted", "[[Missing]]", "See [Some Label](/n" + urlTarget.getId() + ")"));
 
       Note created = noteRepository.findById(response.getNote().getId()).orElseThrow();
       assertThat(rowsFor(entityManager, created)).hasSize(1);
