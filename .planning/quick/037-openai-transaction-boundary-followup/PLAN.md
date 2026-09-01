@@ -122,7 +122,7 @@ Stop-safe: if stubbing a rejection + regeneration through
 beyond a small stub call, that infrastructure work is its own Structure
 slice — do not silently expand this slice's scope past ~5–10 minutes.
 
-### 3. Trim RecallPromptPersister's comment — Structure — planned
+### 3. Trim RecallPromptPersister's comment — Structure — done
 
 **What it changes:** `RecallPromptPersister`'s 4-line Javadoc class comment
 is trimmed to at most one short line (or removed, if the class/method names

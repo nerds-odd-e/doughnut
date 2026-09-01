@@ -9,12 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-/**
- * Persists a recall prompt for an already AI-generated {@link Mcq} in one short write transaction,
- * invoked only after the OpenAI call has returned. Re-checks for an unanswered recall prompt inside
- * that same transaction so a concurrent request that already created one is reused instead of
- * inserting a duplicate.
- */
+// Re-checks for an unanswered prompt inside the write transaction to avoid a concurrent duplicate.
 @Service
 public class RecallPromptPersister {
   private final RecallPromptRepository recallPromptRepository;
