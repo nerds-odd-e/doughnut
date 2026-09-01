@@ -129,7 +129,7 @@ Hikari `leak-detection-threshold: 60000` can log a held connection after 60s; lo
 
 ## Slices
 
-### 0. Ratchet: no new OpenAI-inside-`@Transactional` controller methods — Structure — planned
+### 0. Ratchet: no new OpenAI-inside-`@Transactional` controller methods — Structure — done
 
 **What it changes:** CI, not user-visible behavior. Existing tests still pass.
 
@@ -140,6 +140,23 @@ Test: one characterization test that lists current controller (and any service) 
 Do not start a new library for this unless the enumeration is unmaintainable. Prefer method-literal allowlist next to the test.
 
 Stop-safe: if we never execute slice 1, the ratchet still blocks **new** copies of the bug.
+
+Implemented as `OpenAiTransactionalRatchetTest` (new file, no production code
+touched): traces the call graph from `OpenAiApiHandler`'s HTTP methods
+(`requestAndGetStructuredResponseResult`, `streamResponseAsLegacyChatChunks`,
+`getTranscription`) up to every controller/service method that reaches them
+(`CANDIDATES`), and asserts by reflection that the subset currently
+`@Transactional` exactly equals a hand-maintained `ALLOWLIST`. Method-literal
+reflection was used instead of ArchUnit (no such dependency in the repo).
+Confirmed `MemoryTrackerController.getRecallPrompt` (fixed by slice 1) is off
+the allowlist. Ten confirmed violators are on the allowlist as known,
+out-of-scope sites: `AiController` (`suggestTitle`,
+`generateRefinementSuggestions`, `removeRefinementSuggestion`,
+`extractNotePreview`), `AiAudioController.audioToText`,
+`ConversationMessageController.getAiReply`, `McqController.refine`,
+`RecallPromptController.regenerate`/`.contest`,
+`BookService.suggestLayoutReorganization`. Verified the ratchet actually
+fails on drift (temporarily removed one candidate, reran, reverted).
 
 ### 1. Recall-prompt GET does not hold a DB transaction during OpenAI — Behavior — done
 
