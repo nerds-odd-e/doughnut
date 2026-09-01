@@ -27,7 +27,7 @@ public class ResolvedWikiLinkService {
 
   @PersistenceContext private EntityManager entityManager;
 
-  private final AmbiguousWikiLinks ambiguousWikiLinks;
+  private final WikiLinkResolver wikiLinkResolver;
   private final ResolvedWikiLinkRepository resolvedWikiLinkRepository;
   private final AuthorizationService authorizationService;
   private final ResolvedWikiLinkRefresh resolvedWikiLinkRefresh;
@@ -42,7 +42,7 @@ public class ResolvedWikiLinkService {
       NoteLevelIndexService noteLevelIndexService,
       NoteRepository noteRepository,
       CanonicalDonutOrigin canonicalDonutOrigin) {
-    this.ambiguousWikiLinks = new AmbiguousWikiLinks(wikiLinkResolver);
+    this.wikiLinkResolver = wikiLinkResolver;
     this.resolvedWikiLinkRepository = resolvedWikiLinkRepository;
     this.authorizationService = authorizationService;
     this.canonicalDonutOrigin = canonicalDonutOrigin;
@@ -73,7 +73,32 @@ public class ResolvedWikiLinkService {
         emittedAuthored.add(row.getAuthoredLink());
       }
     }
-    out.addAll(ambiguousWikiLinks.forAuthoredTokensNotIn(focusNote, viewer, emittedAuthored));
+    out.addAll(ambiguousWikiLinksNotIn(focusNote, viewer, emittedAuthored));
+    return List.copyOf(out);
+  }
+
+  /**
+   * Wiki tokens in {@code focusNote} that classify as ambiguous for {@code viewer}, excluding
+   * {@code skipAuthored} (tokens already emitted from a resolved-wiki-link row).
+   */
+  private List<WikiLink> ambiguousWikiLinksNotIn(
+      Note focusNote, User viewer, Set<String> skipAuthored) {
+    String content = focusNote.getContent();
+    if (content == null || content.isBlank()) {
+      return List.of();
+    }
+    List<WikiLink> out = new ArrayList<>();
+    for (AuthoredNoteReference.WikiPortablePathTarget wiki :
+        AuthoredNoteReferences.uniqueWikiPortablePathTargets(content)) {
+      String token = wiki.authoredLink();
+      if (skipAuthored.contains(token)) {
+        continue;
+      }
+      if (wikiLinkResolver.classifyToken(token, focusNote, viewer)
+          instanceof WikiLinkResolver.CandidateCardinality.Ambiguous) {
+        out.add(WikiLinks.ambiguous(wiki));
+      }
+    }
     return List.copyOf(out);
   }
 

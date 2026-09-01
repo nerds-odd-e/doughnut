@@ -46,8 +46,25 @@ public class WikiLinkResolver {
 
   public record WikiLinkResolution(String authoredLink, Note destinationNote) {}
 
+  /**
+   * Cardinality of a wiki Portable-path token's readable candidates in a notebook scope: exactly
+   * one match ({@link Resolved}), no match ({@link Unresolved}), or more than one ({@link
+   * Ambiguous}).
+   */
+  public sealed interface CandidateCardinality {
+    record Resolved(Note destinationNote) implements CandidateCardinality {}
+
+    record Unresolved() implements CandidateCardinality {}
+
+    record Ambiguous() implements CandidateCardinality {}
+  }
+
   public Optional<Note> resolveWikiLinkToken(String token, Note focusNote, User viewer) {
-    return Optional.ofNullable(resolveToken(token, viewer, focusNote));
+    return switch (classifyToken(token, focusNote, viewer)) {
+      case CandidateCardinality.Resolved resolved -> Optional.of(resolved.destinationNote());
+      case CandidateCardinality.Unresolved ignored -> Optional.empty();
+      case CandidateCardinality.Ambiguous ignored -> Optional.empty();
+    };
   }
 
   public Optional<Note> findAccidentalMatch(String answer, Note reviewedNote, User viewer) {
@@ -74,9 +91,9 @@ public class WikiLinkResolver {
             AuthoredNoteReferences.inOccurrenceOrder(content, canonicalDonutOrigin))) {
       switch (ref) {
         case AuthoredNoteReference.WikiPortablePathTarget wiki -> {
-          Note target = resolveToken(wiki.authoredLink(), viewer, focusNote);
-          if (target != null) {
-            out.add(new WikiLinkResolution(wiki.authoredLink(), target));
+          if (classifyToken(wiki.authoredLink(), focusNote, viewer)
+              instanceof CandidateCardinality.Resolved resolved) {
+            out.add(new WikiLinkResolution(wiki.authoredLink(), resolved.destinationNote()));
           }
         }
         case AuthoredNoteReference.NoteIdUrlTarget url -> {
@@ -104,41 +121,52 @@ public class WikiLinkResolver {
     for (AuthoredNoteReference.WikiPortablePathTarget wiki :
         AuthoredNoteReferences.uniqueWikiPortablePathTargets(content)) {
       String token = wiki.authoredLink();
-      if (resolveToken(token, viewer, focusNote) == null
-          && !isAmbiguousToken(token, focusNote, viewer)) {
+      if (classifyToken(token, focusNote, viewer) instanceof CandidateCardinality.Unresolved) {
         missing.add(token);
       }
     }
     return List.copyOf(missing);
   }
 
-  /** True when, among the viewer's readable candidates for this token, more than one matches. */
-  boolean isAmbiguousToken(String token, Note focusNote, User viewer) {
+  /**
+   * Classifies {@code token}'s readable-candidate cardinality for {@code viewer} in {@code
+   * focusNote}'s notebook scope (with Portable-path notebook fallback).
+   */
+  public CandidateCardinality classifyToken(String token, Note focusNote, User viewer) {
     String focusNotebookName =
         focusNote.getNotebook() == null ? null : focusNote.getNotebook().getName();
-    return isAmbiguousToken(token, focusNotebookName, viewer);
+    return classifyToken(token, focusNotebookName, viewer);
   }
 
   /**
-   * True when, among the viewer's readable candidates for this token resolved against {@code
-   * notebookFallbackName}, more than one matches. Used to check a token's ambiguity in a notebook
-   * scope other than its current note's (e.g. before a cross-notebook move rewrites content).
+   * Classifies {@code token}'s readable-candidate cardinality for {@code viewer} resolved against
+   * {@code notebookFallbackName}. Used to classify a token in a notebook scope other than its
+   * current note's (e.g. before a cross-notebook move rewrites content).
    */
-  boolean isAmbiguousToken(String token, String notebookFallbackName, User viewer) {
+  CandidateCardinality classifyToken(String token, String notebookFallbackName, User viewer) {
     return resolveRef(token, notebookFallbackName)
-        .map(ref -> readableNotebookMatches(ref.notebookName(), ref.noteTitle(), viewer).size() > 1)
-        .orElse(false);
+        .map(
+            ref ->
+                classifyCandidates(
+                    token, readableNotebookMatches(ref.notebookName(), ref.noteTitle(), viewer)))
+        .orElseGet(CandidateCardinality.Unresolved::new);
+  }
+
+  private static CandidateCardinality classifyCandidates(String token, List<Note> readable) {
+    if (readable.size() > 1) {
+      return new CandidateCardinality.Ambiguous();
+    }
+    if (readable.size() == 1) {
+      Note candidate = readable.getFirst();
+      if (WikiLinkPropertyMatch.matchesTargetNoteContent(token, candidate.getContent())) {
+        return new CandidateCardinality.Resolved(candidate);
+      }
+    }
+    return new CandidateCardinality.Unresolved();
   }
 
   private Note resolveAnyTargetToken(String token, Note focusNote) {
     return resolveParsedLink(token, focusNote, this::uniqueNotebookMatch);
-  }
-
-  private Note resolveToken(String token, User viewer, Note focusNote) {
-    return resolveParsedLink(
-        token,
-        focusNote,
-        (notebookName, noteTitle) -> uniqueReadableNotebookMatch(notebookName, noteTitle, viewer));
   }
 
   private Note resolveParsedLink(

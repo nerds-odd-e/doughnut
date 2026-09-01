@@ -132,7 +132,8 @@ final class WikiLinkRewriteSupport {
                 ? linkText
                 : WikiLinkMarkdownRewrite.newInnerForAuthoredPortablePath(
                     linkText, authoredPortablePath, true);
-      } else if (wikiLinkResolver.isAmbiguousToken(linkText, sourceNotebookName, viewer)) {
+      } else if (wikiLinkResolver.classifyToken(linkText, sourceNotebookName, viewer)
+          instanceof WikiLinkResolver.CandidateCardinality.Ambiguous) {
         // Already ambiguous before the move: don't guess which candidate it meant.
         newInner = linkText;
       } else {

@@ -1,6 +1,6 @@
 # Wiki-link ambiguity and Markdown URL conformance
 
-**Status:** in progress (slices 1–14 done; next: slice 15)
+**Status:** in progress (slices 1–15 done; next: slice 16)
 
 ## Goal
 
@@ -287,21 +287,25 @@ post-change state.
 
 ### 15. Wiki candidate cardinality has one tri-state result
 
-**Status:** planned
+**Status:** done
 **Type:** Structure
 
-Make one resolver operation classify a wiki Portable-path reference for a
-scope/viewer as `RESOLVED(destination)`, `UNRESOLVED`, or `AMBIGUOUS`. Use it
-for row rebuild, notebook health, and viewer DTO mapping; remove
-`AmbiguousWikiLinks` and the duplicate candidate query from
-`missingWikiLinkTokens`. Note-ID URL references bypass candidate cardinality
-and retain their deterministic target.
+`WikiLinkResolver.classifyToken` now returns one sealed
+`CandidateCardinality` (`Resolved(destinationNote)` / `Unresolved` /
+`Ambiguous`) backed by a single candidate query, replacing the old
+`resolveToken` + `isAmbiguousToken` double-query pair. Row rebuild
+(`resolveWikiLinksForCache`), notebook health (`missingWikiLinkTokens`), and
+viewer DTO mapping (`ResolvedWikiLinkService.wikiLinksForViewer`) all consume
+it; `AmbiguousWikiLinks` deleted. Note-ID URL references still bypass
+candidate cardinality entirely (unchanged `AuthoredNoteReference` switch).
+`WikiLinkResolver.java` = 229 lines, `ResolvedWikiLinkService.java` = 226
+lines.
 
-Keep `WikiLinkResolver.java` and `ResolvedWikiLinkService.java` below 250
-lines; extract only a cohesive candidate-query concept if needed. This directly
-prepares slice 16.
-
-Verification: full backend unit suite.
+**Learning:** `resolveAnyTargetWikiLinkToken` (viewer-agnostic) and
+`readableNotebookMatchUniquelyIdentifies` (identity check, no content-match
+gate) are distinct concepts from candidate cardinality and were deliberately
+left unconsolidated. Slice 16 can now build viewer-specific display state
+directly on `classifyToken`.
 
 ### 16. Showing a note uses current viewer-specific wiki resolution
 
