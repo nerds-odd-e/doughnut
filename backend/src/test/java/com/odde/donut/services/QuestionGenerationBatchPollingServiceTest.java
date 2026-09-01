@@ -5,10 +5,8 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static com.odde.donut.services.QuestionGenerationBatchPollingTestSupport.openAiBatchWithStatus;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -23,6 +21,7 @@ import com.odde.donut.entities.repositories.QuestionGenerationBatchRequestReposi
 import com.odde.donut.services.openAiApis.OpenAiApiHandler;
 import com.odde.donut.testability.MakeMe;
 import com.openai.models.batches.Batch;
+import com.openai.models.batches.BatchError;
 import io.micrometer.core.instrument.MeterRegistry;
 import java.sql.Timestamp;
 import java.util.List;
@@ -30,8 +29,6 @@ import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.EnumSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -88,17 +85,6 @@ class QuestionGenerationBatchPollingServiceTest {
     return meterRegistry.get(name).counter().count();
   }
 
-  private Batch openAiBatchWithStatus(Batch.Status status) {
-    return Batch.builder()
-        .id("batch-openai-1")
-        .completionWindow("24h")
-        .createdAt(1L)
-        .endpoint("/v1/responses")
-        .inputFileId("file-abc")
-        .status(status)
-        .build();
-  }
-
   @Nested
   class OpenAiStatusUpdates {
     @Test
@@ -135,9 +121,20 @@ class QuestionGenerationBatchPollingServiceTest {
     @Test
     void failedUpdatesLocalBatch() {
       when(openAiApiHandler.retrieveBatch("batch-openai-1"))
-          .thenReturn(openAiBatchWithStatus(Batch.Status.FAILED));
+          .thenReturn(
+              openAiBatchWithStatus(Batch.Status.FAILED).toBuilder()
+                  .errors(
+                      Batch.Errors.builder()
+                          .data(
+                              List.of(
+                                  BatchError.builder()
+                                      .message("Cannot find file file-abc")
+                                      .build()))
+                          .build())
+                  .build());
 
-      pollingService.pollSubmittedBatches();
+      RuntimeException thrown =
+          assertThrows(RuntimeException.class, () -> pollingService.pollSubmittedBatches());
 
       QuestionGenerationBatch batch =
           batchRepository.findById(submittedBatch.getId()).orElseThrow();
@@ -147,6 +144,20 @@ class QuestionGenerationBatchPollingServiceTest {
       assertThat(request.getStatus(), is(QuestionGenerationBatchRequestStatus.FAILED));
       assertThat(
           request.getErrorDetail(), is(QuestionGenerationBatchRequest.ERROR_OPENAI_BATCH_FAILED));
+      assertThat(thrown.getMessage(), containsString("Cannot find file file-abc"));
+    }
+
+    @Test
+    void failedWithoutOpenAiErrorsUsesGenericMessage() {
+      when(openAiApiHandler.retrieveBatch("batch-openai-1"))
+          .thenReturn(openAiBatchWithStatus(Batch.Status.FAILED));
+
+      RuntimeException thrown =
+          assertThrows(RuntimeException.class, () -> pollingService.pollSubmittedBatches());
+
+      assertThat(
+          thrown.getMessage(),
+          containsString(QuestionGenerationBatchRequest.ERROR_OPENAI_BATCH_FAILED));
     }
 
     @Test
@@ -179,45 +190,6 @@ class QuestionGenerationBatchPollingServiceTest {
 
       assertThat(
           thrown.getMessage(), containsString("cannot access valid purpose=batch input file_id"));
-    }
-  }
-
-  @Nested
-  class TerminalBatchesAreNotPolled {
-    @ParameterizedTest
-    @EnumSource(
-        value = QuestionGenerationBatchStatus.class,
-        names = {"COMPLETED", "FAILED", "EXPIRED"})
-    void terminalBatchIsNotPolledAgain(QuestionGenerationBatchStatus terminalStatus) {
-      submittedBatch.setStatus(terminalStatus);
-      batchRepository.saveAndFlush(submittedBatch);
-
-      pollingService.pollSubmittedBatches();
-
-      verify(openAiApiHandler, never()).retrieveBatch(anyString());
-    }
-  }
-
-  @Nested
-  class PollingIsolation {
-    @Test
-    void onlyPollsSubmittedBatchesAmongMixedStatuses() {
-      makeMe
-          .aQuestionGenerationBatch()
-          .forUser(user)
-          .status(QuestionGenerationBatchStatus.COMPLETED)
-          .plannedAt(currentTime)
-          .openaiBatchId("batch-completed")
-          .please();
-      makeMe.entityPersister.flush();
-
-      when(openAiApiHandler.retrieveBatch("batch-openai-1"))
-          .thenReturn(openAiBatchWithStatus(Batch.Status.IN_PROGRESS));
-
-      pollingService.pollSubmittedBatches();
-
-      verify(openAiApiHandler).retrieveBatch("batch-openai-1");
-      verify(openAiApiHandler, never()).retrieveBatch(eq("batch-completed"));
     }
   }
 

@@ -7,6 +7,7 @@ import com.odde.donut.entities.repositories.QuestionGenerationBatchRepository;
 import com.odde.donut.entities.repositories.QuestionGenerationBatchRequestRepository;
 import com.odde.donut.services.openAiApis.OpenAiApiHandler;
 import com.openai.models.batches.Batch;
+import com.openai.models.batches.BatchError;
 import java.util.List;
 import java.util.Optional;
 import org.slf4j.Logger;
@@ -98,7 +99,22 @@ public class QuestionGenerationBatchPollingService {
     }
     batchRepository.saveAndFlush(batch);
     recordBatchStatusMetric(newStatus);
+    if (newStatus == QuestionGenerationBatchStatus.FAILED) {
+      throw new RuntimeException(openAiBatchFailureMessage(openAiBatch));
+    }
     return true;
+  }
+
+  private static String openAiBatchFailureMessage(Batch openAiBatch) {
+    return openAiBatch
+        .errors()
+        .flatMap(Batch.Errors::data)
+        .orElse(List.of())
+        .stream()
+        .map(BatchError::message)
+        .flatMap(Optional::stream)
+        .findFirst()
+        .orElse(QuestionGenerationBatchRequest.ERROR_OPENAI_BATCH_FAILED);
   }
 
   private void recordBatchStatusMetric(QuestionGenerationBatchStatus status) {
