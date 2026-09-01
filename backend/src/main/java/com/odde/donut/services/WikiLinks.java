@@ -1,8 +1,6 @@
 package com.odde.donut.services;
 
 import com.odde.donut.algorithms.AuthoredNoteReference;
-import com.odde.donut.algorithms.AuthoredNoteReferences;
-import com.odde.donut.algorithms.CanonicalDonutOrigin;
 import com.odde.donut.controllers.dto.WikiLink;
 
 /** Builds {@link WikiLink} DTOs from authored note references. */
@@ -10,16 +8,12 @@ final class WikiLinks {
 
   private WikiLinks() {}
 
-  static WikiLink resolvedFromStoredAuthoredLink(
-      String authoredLink, Integer destinationId, CanonicalDonutOrigin canonicalOrigin) {
-    return fromReference(
-        AuthoredNoteReferences.fromStoredAuthoredLink(authoredLink, canonicalOrigin),
-        WikiLink.Resolution.RESOLVED,
-        destinationId);
+  static WikiLink resolved(AuthoredNoteReference ref, Integer destinationId) {
+    return fromReference(ref, WikiLink.Resolution.RESOLVED, destinationId);
   }
 
-  static WikiLink ambiguous(AuthoredNoteReference.WikiPortablePathTarget wiki) {
-    return fromReference(wiki, WikiLink.Resolution.AMBIGUOUS, null);
+  static WikiLink ambiguous(AuthoredNoteReference ref) {
+    return fromReference(ref, WikiLink.Resolution.AMBIGUOUS, null);
   }
 
   private static WikiLink fromReference(

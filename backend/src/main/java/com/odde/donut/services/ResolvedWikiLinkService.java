@@ -3,6 +3,7 @@ package com.odde.donut.services;
 import com.odde.donut.algorithms.AuthoredNoteReference;
 import com.odde.donut.algorithms.AuthoredNoteReferences;
 import com.odde.donut.algorithms.CanonicalDonutOrigin;
+import com.odde.donut.algorithms.NoteReferenceResolution;
 import com.odde.donut.controllers.dto.WikiLink;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
@@ -28,14 +29,12 @@ public class ResolvedWikiLinkService {
 
   private final WikiLinkResolver wikiLinkResolver;
   private final ResolvedWikiLinkRepository resolvedWikiLinkRepository;
-  private final AuthorizationService authorizationService;
   private final ResolvedWikiLinkRefresh resolvedWikiLinkRefresh;
   private final CanonicalDonutOrigin canonicalDonutOrigin;
 
   public ResolvedWikiLinkService(
       WikiLinkResolver wikiLinkResolver,
       ResolvedWikiLinkRepository resolvedWikiLinkRepository,
-      AuthorizationService authorizationService,
       NotePropertyIndexService notePropertyIndexService,
       NoteAliasIndexService noteAliasIndexService,
       NoteLevelIndexService noteLevelIndexService,
@@ -43,7 +42,6 @@ public class ResolvedWikiLinkService {
       CanonicalDonutOrigin canonicalDonutOrigin) {
     this.wikiLinkResolver = wikiLinkResolver;
     this.resolvedWikiLinkRepository = resolvedWikiLinkRepository;
-    this.authorizationService = authorizationService;
     this.canonicalDonutOrigin = canonicalDonutOrigin;
     this.resolvedWikiLinkRefresh =
         new ResolvedWikiLinkRefresh(
@@ -60,45 +58,35 @@ public class ResolvedWikiLinkService {
   }
 
   public List<WikiLink> wikiLinksForViewer(Note focusNote, User viewer) {
-    List<WikiLink> out = new ArrayList<>();
-    Set<String> emittedAuthored = new LinkedHashSet<>();
-    for (ResolvedWikiLink row :
-        resolvedWikiLinkRepository.findBySourceNote_IdOrderByIdAsc(focusNote.getId())) {
-      Note resolved = authorizedOutgoingTargetNote(focusNote, row, viewer);
-      if (resolved != null) {
-        out.add(
-            WikiLinks.resolvedFromStoredAuthoredLink(
-                row.getAuthoredLink(), resolved.getId(), canonicalDonutOrigin));
-        emittedAuthored.add(row.getAuthoredLink());
-      }
-    }
-    out.addAll(ambiguousWikiLinksNotIn(focusNote, viewer, emittedAuthored));
-    return List.copyOf(out);
-  }
-
-  /**
-   * Wiki tokens in {@code focusNote} that classify as ambiguous for {@code viewer}, excluding
-   * {@code skipAuthored} (tokens already emitted from a resolved-wiki-link row).
-   */
-  private List<WikiLink> ambiguousWikiLinksNotIn(
-      Note focusNote, User viewer, Set<String> skipAuthored) {
     String content = focusNote.getContent();
     if (content == null || content.isBlank()) {
       return List.of();
     }
     List<WikiLink> out = new ArrayList<>();
-    for (AuthoredNoteReference.WikiPortablePathTarget wiki :
-        AuthoredNoteReferences.uniqueWikiPortablePathTargets(content)) {
-      String token = wiki.authoredLink();
-      if (skipAuthored.contains(token)) {
-        continue;
-      }
-      if (wikiLinkResolver.classifyToken(token, focusNote, viewer)
-          instanceof WikiLinkResolver.CandidateCardinality.Ambiguous) {
-        out.add(WikiLinks.ambiguous(wiki));
+    for (AuthoredNoteReference ref :
+        AuthoredNoteReferences.uniquePreserveOrder(
+            AuthoredNoteReferences.inOccurrenceOrder(content, canonicalDonutOrigin))) {
+      WikiLink wikiLink = wikiLinkFor(ref, focusNote, viewer);
+      if (wikiLink != null) {
+        out.add(wikiLink);
       }
     }
     return List.copyOf(out);
+  }
+
+  /**
+   * Resolves {@code ref} against {@code focusNote}'s scope and {@code viewer}'s current
+   * readability, live (not from a cached {@link ResolvedWikiLink} row): {@code null} when missing
+   * (excluded from output), a resolved {@link WikiLink} when there's exactly one readable match, an
+   * ambiguous {@link WikiLink} when there's more than one.
+   */
+  private WikiLink wikiLinkFor(AuthoredNoteReference ref, Note focusNote, User viewer) {
+    return switch (wikiLinkResolver.resolveReference(ref, focusNote, viewer)) {
+      case NoteReferenceResolution.Resolved resolved ->
+          WikiLinks.resolved(ref, resolved.destinationNote().getId());
+      case NoteReferenceResolution.Missing ignored -> null;
+      case NoteReferenceResolution.Ambiguous ignored -> WikiLinks.ambiguous(ref);
+    };
   }
 
   /**
@@ -121,45 +109,6 @@ public class ResolvedWikiLinkService {
       }
     }
     return List.copyOf(notes);
-  }
-
-  /**
-   * Authorized outgoing target note for {@code row}, for {@code viewer} right now. A Note-ID URL
-   * target is deterministic (row's destination note, filtered by the viewer's read authorization).
-   * A wiki Portable-path target is re-classified live via {@link WikiLinkResolver#classifyToken} so
-   * a cardinality change since the row was cached (or a different viewer's readable-candidate set)
-   * cannot resolve to a stale or wrong note.
-   */
-  private Note authorizedOutgoingTargetNote(Note sourceNoteRef, ResolvedWikiLink row, User viewer) {
-    return switch (AuthoredNoteReferences.fromStoredAuthoredLink(
-        row.getAuthoredLink(), canonicalDonutOrigin)) {
-      case AuthoredNoteReference.NoteIdUrlTarget ignored ->
-          authorizedNoteIdUrlTarget(sourceNoteRef, row, viewer);
-      case AuthoredNoteReference.WikiPortablePathTarget ignored ->
-          liveResolvedWikiPortablePathTarget(sourceNoteRef, row, viewer);
-    };
-  }
-
-  private Note authorizedNoteIdUrlTarget(Note sourceNoteRef, ResolvedWikiLink row, User viewer) {
-    Note target = row.getDestinationNote();
-    if (target.getDeletedAt() != null) {
-      return null;
-    }
-    Notebook notebook =
-        target.getNotebook() != null ? target.getNotebook() : sourceNoteRef.getNotebook();
-    if (!authorizationService.userMayReadNotebook(viewer, notebook)) {
-      return null;
-    }
-    return entityManager.find(Note.class, target.getId());
-  }
-
-  private Note liveResolvedWikiPortablePathTarget(
-      Note sourceNoteRef, ResolvedWikiLink row, User viewer) {
-    return switch (wikiLinkResolver.classifyToken(row.getAuthoredLink(), sourceNoteRef, viewer)) {
-      case WikiLinkResolver.CandidateCardinality.Resolved resolved -> resolved.destinationNote();
-      case WikiLinkResolver.CandidateCardinality.Unresolved ignored -> null;
-      case WikiLinkResolver.CandidateCardinality.Ambiguous ignored -> null;
-    };
   }
 
   /**

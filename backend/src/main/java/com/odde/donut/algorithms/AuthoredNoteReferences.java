@@ -93,13 +93,4 @@ public final class AuthoredNoteReferences {
     }
     return refs;
   }
-
-  /** Rebuilds a reference from a resolved-row {@code authored_link} value. */
-  public static AuthoredNoteReference fromStoredAuthoredLink(
-      String authoredLink, CanonicalDonutOrigin canonicalOrigin) {
-    return NoteIdUrl.tryParseAuthoredMarkdownLink(authoredLink, canonicalOrigin)
-        .map(AuthoredNoteReference.class::cast)
-        .orElseGet(
-            () -> AuthoredNoteReference.WikiPortablePathTarget.fromAuthoredInner(authoredLink));
-  }
 }

@@ -137,6 +137,24 @@ class NoteControllerShowWikiLinkTests extends ControllerTestBase {
   }
 
   @Test
+  void shouldResolveWikiLinkCreatedAfterOriginalNoteWithoutRefreshingOriginalNote()
+      throws UnexpectedNoAccessRightException {
+    Note viewer =
+        makeMe.aNote().notebookOwnedBy(currentUser.getUser()).content("See [[Future]].").please();
+    resolvedWikiLinkService.refreshForNote(viewer, currentUser.getUser());
+    NoteRealm before = controller.showNote(viewer);
+    assertThat(before.getWikiLinks(), hasSize(0));
+
+    Note future = makeMe.aNote().underSameNotebookAs(viewer).title("Future").please();
+
+    NoteRealm after = controller.showNote(viewer);
+    assertThat(after.getWikiLinks(), hasSize(1));
+    WikiLink wt = after.getWikiLinks().get(0);
+    assertThat(wt.getResolution(), equalTo(WikiLink.Resolution.RESOLVED));
+    assertThat(wt.getDestinationNoteId(), equalTo(future.getId()));
+  }
+
+  @Test
   void shouldReturnWikiTitlesFromFrontmatterBlocks() throws UnexpectedNoAccessRightException {
     Note fromFm =
         makeMe.aNote().notebookOwnedBy(currentUser.getUser()).title("FrontmatterTarget").please();

@@ -44,32 +44,32 @@ class NoteRealmServiceTest {
   }
 
   @Test
-  void wiki_titles_empty_when_content_has_links_but_cache_not_refreshed() {
-    makeMe.aNote().title("LinkedPage").notebook(notebook).please();
+  void wiki_titles_resolve_live_even_when_cache_not_refreshed() {
+    Note target = makeMe.aNote().title("LinkedPage").notebook(notebook).please();
     Note carrier = makeMe.aNote().notebook(notebook).content("[[LinkedPage]]").please();
 
-    assertThat(noteRealmService.build(carrier, user).getWikiLinks(), empty());
+    NoteRealm realm = noteRealmService.build(carrier, user);
+
+    assertThat(realm.getWikiLinks(), hasSize(1));
+    assertThat(realm.getWikiLinks().get(0).getDestinationNoteId(), equalTo(target.getId()));
   }
 
   @Test
-  void omits_cached_target_when_viewer_cannot_read_target_notebook() {
+  void omits_unreadable_target_notebook_from_outgoing_wiki_links() {
     User otherUser = makeMe.aUser().please();
     Notebook secretNb = makeMe.aNotebook().creatorAndOwner(otherUser).name("SecretNb").please();
-    Note hidden = makeMe.aNote().title("Hidden").notebook(secretNb).please();
+    makeMe.aNote().title("Hidden").notebook(secretNb).please();
 
     User viewer = makeMe.aUser().please();
-    Note carrier = makeMe.aNote().notebookOwnedBy(viewer).content("plain").please();
-
-    persistWikiLink(carrier, hidden, "SecretNb:Hidden");
+    Note carrier = makeMe.aNote().notebookOwnedBy(viewer).content("[[SecretNb:Hidden]]").please();
 
     assertThat(noteRealmService.build(carrier, viewer).getWikiLinks(), empty());
   }
 
   @Test
-  void omits_cached_target_when_target_note_is_soft_deleted() {
+  void omits_target_when_target_note_is_soft_deleted() {
     Note target = makeMe.aNote().title("Target").notebook(notebook).please();
     Note carrier = makeMe.aNote().notebook(notebook).content("[[Target]]").please();
-    resolvedWikiLinkService.refreshForNote(carrier, user);
 
     softDelete(target);
 

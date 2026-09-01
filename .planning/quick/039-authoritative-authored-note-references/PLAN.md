@@ -73,7 +73,7 @@ When this plan is complete:
 ### 2. Resolve outgoing references from authored Markdown, not cached rows
 
 - **Type:** Behavior
-- **Status:** pending
+- **Status:** done
 - **Scenario:** A note contains `[[Future]]` while no target exists. After a target named `Future` is created, showing the original note returns that resolved wiki link without refreshing or rewriting the original note.
 - Add the scenario at `NoteController`'s show boundary. A sibling scenario may assert only the delta when a previously unique target becomes ambiguous.
 - Make outgoing note-realm links and graph traversal iterate authoritative authored references and resolve each for the current viewer.
@@ -250,3 +250,4 @@ When this plan is complete:
 - Production content writes occur in `TextContentController`, `NoteConstructionService`, `NoteReferenceHandling`, and `WikiLinkRewriteSupport`; the public raw setter allows future paths to omit derived-index maintenance.
 - The quick fix in `76f0482bdbeb61564facb9638369b507cd22cead` removed title/create notebook refreshes and has been confirmed in production. Other alias/delete/restore/move callers still perform the same notebook walk.
 - Slice 1: `WikiLinkResolver.resolveReference(AuthoredNoteReference, sourceNote, viewer)` is now the one entry point returning `NoteReferenceResolution` for both wiki and note-ID-URL variants; it duplicates `ResolvedWikiLinkService.authorizedNoteIdUrlTarget`'s note-ID-URL authorization logic by design until Slice 2 migrates outgoing resolution onto it. `AuthoredNoteReference.sourceLocalKey()` now owns dedupe identity. `WikiLinkResolver` was split to extract `WikiLinkCandidateClassifier` (notebook/title candidate matching) to stay under the file-size limit; `CandidateCardinality` still lives on `WikiLinkResolver` pending removal after adapters migrate.
+- Slice 2: `ResolvedWikiLinkService.wikiLinksForViewer` (outgoing) now parses the note's live content into authored references and resolves each via `resolveReference`, no longer reading `resolved_wiki_link` rows at all for outgoing; the old duplicated authorization helpers and `AuthoredNoteReferences.fromStoredAuthoredLink` were deleted as dead code. `outgoingWikiLinkTargetNotesForViewer` and `FocusContextWikiBfsExpander` graph traversal needed no changes — they were already built on `wikiLinksForViewer`. `resolved_wiki_link` rows/repository/refresh machinery remain in place for inbound and other not-yet-migrated consumers.
