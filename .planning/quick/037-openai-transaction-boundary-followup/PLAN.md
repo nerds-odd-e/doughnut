@@ -84,7 +84,7 @@ sharing it now avoids a third copy.
 
 No behavior change; existing tests must stay green.
 
-### 2. Regression test for the contest/regenerate transaction boundary — Behavior — planned
+### 2. Regression test for the contest/regenerate transaction boundary — Behavior — done
 
 **Pre-condition:** Logged-in user has a due understanding tracker with no
 unanswered recall prompt.
