@@ -24,6 +24,7 @@ erDiagram
     memory_tracker ||--o{ recall_prompt : "memory_tracker_id ON DELETE CASCADE"
     "note" ||--o{ admin_data_migration_progress : "last_processed_note_id ON DELETE SET NULL"
     "note" ||--o{ assimilation_sequence_skip : "note_id ON DELETE CASCADE"
+    "note" ||--o{ authored_note_reference : "source_note_id ON DELETE CASCADE"
     "note" ||--o{ conversation : "note_id ON DELETE NO ACTION"
     "note" ||--o{ image : "note_id ON DELETE SET NULL"
     "note" ||--o{ mcq : "note_id ON DELETE CASCADE"
@@ -77,6 +78,10 @@ erDiagram
     }
     attachment_blob {
         int id PK
+    }
+    authored_note_reference {
+        int id PK
+        int source_note_id FK
     }
     bazaar_notebook {
         int id PK

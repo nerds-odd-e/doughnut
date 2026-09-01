@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.odde.donut.algorithms.AuthoredNoteDocument;
+import com.odde.donut.algorithms.AuthoredNoteReference;
 import com.odde.donut.algorithms.ClozedString;
 import com.odde.donut.algorithms.FrontmatterAliases;
 import com.odde.donut.algorithms.NoteContentMarkdown;
@@ -94,6 +96,16 @@ public class Note extends EntityIdentifiedByIdOnly {
   @JsonIgnore
   private List<Mcq> mcqs = new ArrayList<>();
 
+  /**
+   * Source-owned authored-reference children (ADR 0001 Wiki link), replaced wholesale by {@link
+   * #replaceContent}. Persistence rows only — never exposed outside the note-reference boundary;
+   * see {@code AuthoredNoteReferenceRow}.
+   */
+  @OneToMany(mappedBy = "note", cascade = CascadeType.ALL, orphanRemoval = true)
+  @OrderBy("documentOrder ASC")
+  @JsonIgnore
+  private List<AuthoredNoteReferenceRow> authoredNoteReferenceRows = new ArrayList<>();
+
   public static <T extends Note> List<T> filterDeletedUnmodifiableNoteList(List<T> notes) {
     return notes.stream().filter(n -> n.getDeletedAt() == null).toList();
   }
@@ -134,6 +146,21 @@ public class Note extends EntityIdentifiedByIdOnly {
 
   public void prependContent(String addition) {
     setContent(NoteLeadingFrontmatter.prependToBody(getContent(), addition));
+  }
+
+  /**
+   * Changes this note's Markdown and replaces its authored-reference children in the same aggregate
+   * operation, from the same parse that produced {@code document}. Temporary boundary: {@link
+   * #setContent} still exists for callers not yet migrated to this method.
+   */
+  public void replaceContent(AuthoredNoteDocument document) {
+    setContent(document.validatedMarkdown());
+    authoredNoteReferenceRows.clear();
+    List<AuthoredNoteReference> references = document.references();
+    for (int order = 0; order < references.size(); order++) {
+      authoredNoteReferenceRows.add(
+          AuthoredNoteReferenceRow.forSource(this, references.get(order), order));
+    }
   }
 
   @JsonIgnore
