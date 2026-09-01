@@ -5,6 +5,7 @@ import com.odde.donut.algorithms.AuthoredNoteReference;
 import com.odde.donut.algorithms.AuthoredNoteReferences;
 import com.odde.donut.algorithms.CanonicalDonutOrigin;
 import com.odde.donut.algorithms.NoteIdUrl;
+import com.odde.donut.algorithms.NoteReferenceResolution;
 import com.odde.donut.algorithms.PathShapedTarget;
 import com.odde.donut.algorithms.PortablePath;
 import com.odde.donut.algorithms.WikiLinkMarkdown;
@@ -12,9 +13,7 @@ import com.odde.donut.algorithms.WikiLinkMarkdownDocumentRewrite;
 import com.odde.donut.algorithms.WikiLinkMarkdownRewrite;
 import com.odde.donut.controllers.dto.FolderTrailSegments;
 import com.odde.donut.entities.Note;
-import com.odde.donut.entities.ResolvedWikiLink;
 import com.odde.donut.entities.User;
-import com.odde.donut.entities.repositories.ResolvedWikiLinkRepository;
 import com.odde.donut.factoryServices.EntityPersister;
 import jakarta.persistence.EntityManager;
 import java.sql.Timestamp;
@@ -24,7 +23,6 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
@@ -70,16 +68,15 @@ final class WikiLinkRewriteSupport {
   }
 
   /**
-   * Rewrites each live, non-excluded referrer's inbound wiki link(s) to {@code targetNote}. When
-   * {@code liveResolvedReferrerIds} is present, a referrer whose cached inbound row(s) survive but
-   * whose authored reference no longer live-resolves to {@code targetNote} (per {@link
-   * com.odde.donut.entities.repositories.AuthoredNoteReferenceInboundFacade}) is skipped rather
-   * than rewritten from a stale cache row. {@link Optional#empty()} keeps every cache-discovered
-   * referrer, the historical behavior every rewrite path but title rename relies on.
+   * Rewrites each live, non-excluded referrer's inbound wiki link(s) to {@code targetNote}. {@code
+   * authoredLinkTextsByReferrerId} is the candidate set itself — every referrer id it carries has
+   * already been confirmed to live-resolve to {@code targetNote} (per {@link
+   * com.odde.donut.entities.repositories.AuthoredNoteReferenceInboundFacade}), captured by the
+   * caller before {@code targetNote} (or its containing folder/notebook) was relocated, since
+   * resolution is authored against the pre-move identity.
    */
   static void applyInboundReferrerRewrite(
       EntityManager entityManager,
-      ResolvedWikiLinkRepository resolvedWikiLinkRepository,
       EntityPersister entityPersister,
       ResolvedWikiLinkService resolvedWikiLinkService,
       CanonicalDonutOrigin canonicalDonutOrigin,
@@ -88,25 +85,11 @@ final class WikiLinkRewriteSupport {
       User viewer,
       BiFunction<Note, String, String> linkRewrite,
       Set<Integer> excludedReferrerIds,
-      Optional<Set<Integer>> liveResolvedReferrerIds) {
-    Integer targetId = targetNote.getId();
-    List<ResolvedWikiLink> rows =
-        resolvedWikiLinkRepository.findRowsReferringToNonDeletedNotesForTarget(targetId);
-
-    Map<Integer, LinkedHashSet<String>> linkTextsByReferrer = new LinkedHashMap<>();
-    for (ResolvedWikiLink row : rows) {
-      linkTextsByReferrer
-          .computeIfAbsent(row.getSourceNote().getId(), _ -> new LinkedHashSet<>())
-          .add(row.getAuthoredLink());
-    }
-    List<Integer> referrerIds = new ArrayList<>(linkTextsByReferrer.keySet());
+      Map<Integer, List<String>> authoredLinkTextsByReferrerId) {
+    List<Integer> referrerIds = new ArrayList<>(authoredLinkTextsByReferrerId.keySet());
     Collections.sort(referrerIds);
     for (Integer referrerId : referrerIds) {
       if (excludedReferrerIds.contains(referrerId)) {
-        continue;
-      }
-      if (liveResolvedReferrerIds.isPresent()
-          && !liveResolvedReferrerIds.get().contains(referrerId)) {
         continue;
       }
       Note referrer = entityManager.find(Note.class, referrerId);
@@ -114,7 +97,7 @@ final class WikiLinkRewriteSupport {
         continue;
       }
       String content = referrer.getContent() != null ? referrer.getContent() : "";
-      for (String linkText : linkTextsByReferrer.get(referrerId)) {
+      for (String linkText : authoredLinkTextsByReferrerId.get(referrerId)) {
         if (NoteIdUrl.isAuthoredMarkdownNoteIdUrl(linkText, canonicalDonutOrigin)) {
           continue;
         }
@@ -131,7 +114,6 @@ final class WikiLinkRewriteSupport {
   }
 
   static void applyOutgoingNotebookMoveRewrite(
-      ResolvedWikiLinkRepository resolvedWikiLinkRepository,
       EntityPersister entityPersister,
       ResolvedWikiLinkService resolvedWikiLinkService,
       PortablePathAuthoring portablePathAuthoring,
@@ -141,14 +123,12 @@ final class WikiLinkRewriteSupport {
       String sourceNotebookName,
       Timestamp updatedAt,
       User viewer,
-      Set<Integer> coMovedTargetNoteIds) {
+      Map<String, Note> coMovedTargetsByAuthoredLink) {
     String originalContent = movedNote.getContent();
     if (originalContent == null || originalContent.isEmpty()) {
       return;
     }
     String content = originalContent;
-    Map<String, Note> coMovedTargetsByAuthoredLink =
-        coMovedTargetsByAuthoredLink(resolvedWikiLinkRepository, movedNote, coMovedTargetNoteIds);
     LinkedHashSet<String> linkTexts = new LinkedHashSet<>();
     for (var wiki : AuthoredNoteReferences.uniqueWikiPortablePathTargets(content)) {
       linkTexts.add(wiki.authoredLink());
@@ -207,19 +187,33 @@ final class WikiLinkRewriteSupport {
     return new AuthoredNoteDocument(content, references);
   }
 
-  private static Map<String, Note> coMovedTargetsByAuthoredLink(
-      ResolvedWikiLinkRepository resolvedWikiLinkRepository,
-      Note movedNote,
-      Set<Integer> coMovedTargetNoteIds) {
-    Map<String, Note> targets = new LinkedHashMap<>();
-    for (ResolvedWikiLink resolvedLink :
-        resolvedWikiLinkRepository.findBySourceNote_IdOrderByIdAsc(movedNote.getId())) {
-      Note destination = resolvedLink.getDestinationNote();
-      if (coMovedTargetNoteIds.contains(destination.getId())) {
-        targets.put(resolvedLink.getAuthoredLink(), destination);
+  /**
+   * {@code sourceNote}'s own outgoing wiki Portable-path targets, live-resolved against {@code
+   * sourceNote}'s current notebook scope, restricted to references that resolve to another note
+   * within {@code candidateTargetNoteIds}. Must be captured before {@code sourceNote} (or the notes
+   * it may target) is relocated: resolution is scoped to the notebook as it stood at capture time,
+   * mirroring inbound capture ({@link
+   * com.odde.donut.entities.repositories.AuthoredNoteReferenceInboundFacade}).
+   */
+  static Map<String, Note> liveResolvedOutgoingWikiLinksToNotes(
+      WikiLinkResolver wikiLinkResolver,
+      Note sourceNote,
+      User viewer,
+      Set<Integer> candidateTargetNoteIds) {
+    String content = sourceNote.getContent();
+    if (content == null || content.isEmpty()) {
+      return Map.of();
+    }
+    Map<String, Note> byLinkText = new LinkedHashMap<>();
+    for (var wiki : AuthoredNoteReferences.uniqueWikiPortablePathTargets(content)) {
+      NoteReferenceResolution resolution =
+          wikiLinkResolver.resolveReference(wiki, sourceNote, viewer);
+      if (resolution instanceof NoteReferenceResolution.Resolved resolved
+          && candidateTargetNoteIds.contains(resolved.destinationNote().getId())) {
+        byLinkText.put(wiki.authoredLink(), resolved.destinationNote());
       }
     }
-    return targets;
+    return byLinkText;
   }
 
   private static boolean existingPathStillAddresses(

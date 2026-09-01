@@ -25,10 +25,10 @@ class NotebookFolderDissolveWikiLinkRewriteControllerTest
     Folder outer = ownedFolder(nb, "Outer");
     Folder mid = makeMe.aFolder().parentFolder(outer).name("Mid").please();
     makeMe.aNote("Target").folder(mid).please();
-    Note insideReferrer =
-        makeMe.aNote("Inside").folder(mid).content("[[/Outer/Mid/Target]]").please();
-    Note outsideReferrer =
-        makeMe.aNote("Outside").notebook(nb).content("[[/Outer/Mid/Target]]").please();
+    Note insideReferrer = makeMe.aNote("Inside").folder(mid).please();
+    authorReferencingContent(insideReferrer, "[[/Outer/Mid/Target]]");
+    Note outsideReferrer = makeMe.aNote("Outside").notebook(nb).please();
+    authorReferencingContent(outsideReferrer, "[[/Outer/Mid/Target]]");
     resolvedWikiLinkServiceBean.refreshForNote(insideReferrer, owner);
     resolvedWikiLinkServiceBean.refreshForNote(outsideReferrer, owner);
 
@@ -50,8 +50,8 @@ class NotebookFolderDissolveWikiLinkRewriteControllerTest
     Folder mid = makeMe.aFolder().parentFolder(outer).name("Mid").please();
     Folder midInner = makeMe.aFolder().parentFolder(mid).name("Inner").please();
     Note target = makeMe.aNote("Target").folder(midInner).please();
-    Note outsideReferrer =
-        makeMe.aNote("Outside").notebook(nb).content("[[/Outer/Mid/Inner/Target]]").please();
+    Note outsideReferrer = makeMe.aNote("Outside").notebook(nb).please();
+    authorReferencingContent(outsideReferrer, "[[/Outer/Mid/Inner/Target]]");
     resolvedWikiLinkServiceBean.refreshForNote(outsideReferrer, owner);
 
     controller.dissolveFolder(nb, mid, true);

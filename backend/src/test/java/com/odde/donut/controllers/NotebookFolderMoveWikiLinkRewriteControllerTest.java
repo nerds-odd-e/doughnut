@@ -27,8 +27,10 @@ class NotebookFolderMoveWikiLinkRewriteControllerTest
     Notebook nbB = ownedNotebook("NbB");
     Folder folderF = ownedFolder(nbA, "F");
     makeMe.aNote("Target").folder(folderF).please();
-    Note insideReferrer = makeMe.aNote("Inside").folder(folderF).content("[[Target]]").please();
-    Note outsideReferrer = makeMe.aNote("Outside").notebook(nbA).content("[[Target]]").please();
+    Note insideReferrer = makeMe.aNote("Inside").folder(folderF).please();
+    authorReferencingContent(insideReferrer, "[[Target]]");
+    Note outsideReferrer = makeMe.aNote("Outside").notebook(nbA).please();
+    authorReferencingContent(outsideReferrer, "[[Target]]");
     resolvedWikiLinkServiceBean.refreshForNote(insideReferrer, owner);
     resolvedWikiLinkServiceBean.refreshForNote(outsideReferrer, owner);
 
@@ -49,8 +51,8 @@ class NotebookFolderMoveWikiLinkRewriteControllerTest
     makeMe.aNote("Target").notebook(destinationNotebook).please();
     Folder movedFolder = ownedFolder(sourceNotebook, "Moved");
     makeMe.aNote("Target").folder(movedFolder).please();
-    Note referrer =
-        makeMe.aNote("Referrer").notebook(sourceNotebook).content("[[Target]]").please();
+    Note referrer = makeMe.aNote("Referrer").notebook(sourceNotebook).please();
+    authorReferencingContent(referrer, "[[Target]]");
     resolvedWikiLinkServiceBean.refreshForNote(referrer, owner);
 
     controller.moveFolder(sourceNotebook, movedFolder, folderMoveTo(destinationNotebook, null));

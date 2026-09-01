@@ -44,7 +44,8 @@ class RelationControllerLocationChangeWikiLinkRewriteControllerTest extends Cont
             .notebook(notebook)
             .content(Frontmatter.empty().set("a part of", "v").fenced(""))
             .please();
-    Note referrer = makeMe.aNote("Carrier").underSameNotebookAs(target).content(before).please();
+    Note referrer = makeMe.aNote("Carrier").underSameNotebookAs(target).please();
+    authorReferencingContent(referrer, before);
     resolvedWikiLinkService.refreshForNote(referrer, u);
 
     controller.moveNoteToFolder(target, dest);
@@ -63,12 +64,9 @@ class RelationControllerLocationChangeWikiLinkRewriteControllerTest extends Cont
     Notebook notebook = ownedNotebook("LocNb");
     Folder source = makeMe.aFolder().notebook(notebook).name("Src").please();
     Note target = makeMe.aNote("Title").folder(source).please();
-    Note referrer =
-        makeMe
-            .aNote("Carrier")
-            .notebook(notebook)
-            .content("See [[Src/Title.md|shown]] and [stay](/n" + target.getId() + ").")
-            .please();
+    Note referrer = makeMe.aNote("Carrier").notebook(notebook).please();
+    authorReferencingContent(
+        referrer, "See [[Src/Title.md|shown]] and [stay](/n" + target.getId() + ").");
     resolvedWikiLinkService.refreshForNote(referrer, u);
 
     controller.moveNoteToNotebookRoot(target);

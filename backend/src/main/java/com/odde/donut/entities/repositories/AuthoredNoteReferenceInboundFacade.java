@@ -14,7 +14,9 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import org.springframework.stereotype.Service;
 
@@ -53,19 +55,11 @@ public class AuthoredNoteReferenceInboundFacade {
    * ResolvedWikiLinkService}'s inbound methods guarantee today.
    */
   public List<Note> distinctReferrerNotesForViewer(Note target, User viewer) {
-    LinkedHashMap<Integer, Note> distinctReferrersInOrder = new LinkedHashMap<>();
-    for (AuthoredNoteReferenceRow candidate : candidateRowsForTarget(target)) {
-      Note sourceNote = candidate.getNote();
-      Integer sourceNoteId = sourceNote.getId();
-      if (distinctReferrersInOrder.containsKey(sourceNoteId)) {
-        continue;
-      }
-      if (resolvesToTarget(candidate, sourceNote, target, viewer)
-          && referrerVisibleToViewer(sourceNote, target, viewer)) {
-        distinctReferrersInOrder.put(sourceNoteId, sourceNote);
-      }
+    List<Note> referrers = new ArrayList<>();
+    for (InboundReference inboundReference : distinctInboundReferencesForViewer(target, viewer)) {
+      referrers.add(inboundReference.referrer());
     }
-    return List.copyOf(distinctReferrersInOrder.values());
+    return referrers;
   }
 
   /**
@@ -78,6 +72,43 @@ public class AuthoredNoteReferenceInboundFacade {
       ids.add(referrer.getId());
     }
     return ids;
+  }
+
+  /**
+   * One referrer note plus the distinct authored link text(s) (in document order) it uses to refer
+   * to the queried target. A referrer can carry more than one text when it authors several distinct
+   * references (wiki and/or note-ID URL) that all resolve to the same target.
+   */
+  public record InboundReference(Note referrer, List<String> authoredLinkTexts) {}
+
+  /**
+   * {@link #distinctReferrerNotesForViewer}, generalized to also carry each surviving candidate
+   * row's authored link text — the data a rewrite consumer ({@code WikiLinkRewriteService}) needs
+   * to locate and rewrite each referrer's inbound reference(s) to {@code target}, without a
+   * separate lookup into cached rows. Ordered by referrer note id ascending.
+   */
+  public List<InboundReference> distinctInboundReferencesForViewer(Note target, User viewer) {
+    LinkedHashMap<Integer, Note> referrersInOrder = new LinkedHashMap<>();
+    Map<Integer, LinkedHashSet<String>> linkTextsByReferrerId = new LinkedHashMap<>();
+    for (AuthoredNoteReferenceRow candidate : candidateRowsForTarget(target)) {
+      Note sourceNote = candidate.getNote();
+      Integer sourceNoteId = sourceNote.getId();
+      if (!resolvesToTarget(candidate, sourceNote, target, viewer)
+          || !referrerVisibleToViewer(sourceNote, target, viewer)) {
+        continue;
+      }
+      referrersInOrder.putIfAbsent(sourceNoteId, sourceNote);
+      linkTextsByReferrerId
+          .computeIfAbsent(sourceNoteId, _ -> new LinkedHashSet<>())
+          .add(candidate.toDomainReference().authoredLink());
+    }
+    List<InboundReference> results = new ArrayList<>();
+    for (var entry : referrersInOrder.entrySet()) {
+      results.add(
+          new InboundReference(
+              entry.getValue(), List.copyOf(linkTextsByReferrerId.get(entry.getKey()))));
+    }
+    return results;
   }
 
   /**

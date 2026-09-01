@@ -35,7 +35,8 @@ class NotebookFolderRenameWikiLinkRewriteControllerTest
         .folder(oldFolder)
         .content(Frontmatter.empty().set("a part of", "v").fenced(""))
         .please();
-    Note carrier = makeMe.aNote("Carrier").notebook(nb).content(before).please();
+    Note carrier = makeMe.aNote("Carrier").notebook(nb).please();
+    authorReferencingContent(carrier, before);
     resolvedWikiLinkServiceBean.refreshForNote(carrier, owner);
 
     FolderRenameRequest req = new FolderRenameRequest();

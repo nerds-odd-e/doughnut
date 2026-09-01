@@ -1,5 +1,8 @@
 package com.odde.donut.testability;
 
+import com.odde.donut.algorithms.AuthoredNoteDocument;
+import com.odde.donut.algorithms.AuthoredNoteReferences;
+import com.odde.donut.algorithms.CanonicalDonutOrigin;
 import com.odde.donut.entities.*;
 import com.odde.donut.factoryServices.EntityPersister;
 import com.odde.donut.services.NoteAliasIndexService;
@@ -93,6 +96,24 @@ public class MakeMe extends MakeMeWithoutDB {
     entityPersister.flush();
     entityPersister.refresh(object);
     return object;
+  }
+
+  /**
+   * Authors {@code content} on {@code note} through {@link Note#replaceContent}, the aggregate
+   * method that also populates {@code authored_note_reference} rows consumed by {@link
+   * com.odde.donut.entities.repositories.AuthoredNoteReferenceInboundFacade} — the same parse
+   * production content saves use, minus validation. Test builders' {@code .content(...)} sets raw
+   * content only, on purpose bypassing reference parsing — use this instead whenever a test needs
+   * the note to be discoverable as an inbound referrer.
+   */
+  public void authorReferencingContent(Note note, String content) {
+    note.replaceContent(
+        new AuthoredNoteDocument(
+            content,
+            AuthoredNoteReferences.uniquePreserveOrder(
+                AuthoredNoteReferences.inOccurrenceOrder(
+                    content, CanonicalDonutOrigin.production()))));
+    entityPersister.flush();
   }
 
   public MemoryTrackerBuilder aMemoryTrackerFor(Note note) {

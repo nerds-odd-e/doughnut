@@ -25,10 +25,10 @@ class NotebookFolderReparentWikiLinkRewriteControllerTest
     Folder newHome = ownedFolder(nb, "NewHome");
     Folder movedFolder = ownedFolder(nb, "Moved");
     Note target = makeMe.aNote("Target").folder(movedFolder).please();
-    Note insideReferrer =
-        makeMe.aNote("Inside").folder(movedFolder).content("[[/Moved/Target]]").please();
-    Note outsideReferrer =
-        makeMe.aNote("Outside").notebook(nb).content("[[/Moved/Target]]").please();
+    Note insideReferrer = makeMe.aNote("Inside").folder(movedFolder).please();
+    authorReferencingContent(insideReferrer, "[[/Moved/Target]]");
+    Note outsideReferrer = makeMe.aNote("Outside").notebook(nb).please();
+    authorReferencingContent(outsideReferrer, "[[/Moved/Target]]");
     resolvedWikiLinkServiceBean.refreshForNote(insideReferrer, owner);
     resolvedWikiLinkServiceBean.refreshForNote(outsideReferrer, owner);
 

@@ -15,6 +15,7 @@ import com.odde.donut.testability.TestabilitySettings;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -57,9 +58,11 @@ class RelationController {
     authorizationService.assertAuthorization(targetFolder.getNotebook());
     Notebook oldNotebook = sourceNote.getNotebook();
     Notebook targetNotebook = targetFolder.getNotebook();
-    noteMotionService.executeMoveIntoFolder(sourceNote, targetFolder);
     User user = authorizationService.getCurrentUser();
-    rewriteWikiLinksAfterNoteMove(sourceNote, oldNotebook, targetNotebook, user);
+    Map<Integer, List<String>> inboundReferences =
+        wikiLinkRewriteService.captureLiveResolvedInboundReferences(sourceNote, user);
+    noteMotionService.executeMoveIntoFolder(sourceNote, targetFolder);
+    rewriteWikiLinksAfterNoteMove(sourceNote, oldNotebook, targetNotebook, user, inboundReferences);
     return List.of(noteRealmService.build(sourceNote, user));
   }
 
@@ -71,9 +74,11 @@ class RelationController {
     authorizationService.assertAuthorization(sourceNote);
     authorizationService.assertAuthorization(sourceNote.getNotebook());
     Notebook notebook = sourceNote.getNotebook();
-    noteMotionService.executeMoveToNotebookRoot(sourceNote, notebook);
     User user = authorizationService.getCurrentUser();
-    rewriteWikiLinksAfterNoteMove(sourceNote, notebook, notebook, user);
+    Map<Integer, List<String>> inboundReferences =
+        wikiLinkRewriteService.captureLiveResolvedInboundReferences(sourceNote, user);
+    noteMotionService.executeMoveToNotebookRoot(sourceNote, notebook);
+    rewriteWikiLinksAfterNoteMove(sourceNote, notebook, notebook, user, inboundReferences);
     return List.of(noteRealmService.build(sourceNote, user));
   }
 
@@ -86,20 +91,27 @@ class RelationController {
     authorizationService.assertAuthorization(sourceNote);
     authorizationService.assertAuthorization(targetNotebook);
     Notebook oldNotebook = sourceNote.getNotebook();
-    noteMotionService.executeMoveToNotebookRoot(sourceNote, targetNotebook);
     User user = authorizationService.getCurrentUser();
-    rewriteWikiLinksAfterNoteMove(sourceNote, oldNotebook, targetNotebook, user);
+    Map<Integer, List<String>> inboundReferences =
+        wikiLinkRewriteService.captureLiveResolvedInboundReferences(sourceNote, user);
+    noteMotionService.executeMoveToNotebookRoot(sourceNote, targetNotebook);
+    rewriteWikiLinksAfterNoteMove(sourceNote, oldNotebook, targetNotebook, user, inboundReferences);
     return List.of(noteRealmService.build(sourceNote, user));
   }
 
   private void rewriteWikiLinksAfterNoteMove(
-      Note movedNote, Notebook oldNotebook, Notebook targetNotebook, User user) {
+      Note movedNote,
+      Notebook oldNotebook,
+      Notebook targetNotebook,
+      User user,
+      Map<Integer, List<String>> inboundReferences) {
     Timestamp now = testabilitySettings.getCurrentUTCTimestamp();
     if (Objects.equals(oldNotebook.getId(), targetNotebook.getId())) {
-      wikiLinkRewriteService.rewriteInboundWikiLinksForLocationChange(movedNote, now, user);
+      wikiLinkRewriteService.rewriteInboundWikiLinksForLocationChange(
+          movedNote, now, user, inboundReferences);
     } else {
       wikiLinkRewriteService.rewriteWikiLinksForCrossNotebookMove(
-          movedNote, oldNotebook, targetNotebook, now, user);
+          movedNote, oldNotebook, targetNotebook, now, user, inboundReferences);
       resolvedWikiLinkService.refreshCardinalityAcrossMovedNotebooks(
           oldNotebook, targetNotebook, user);
     }

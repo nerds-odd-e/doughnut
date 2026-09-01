@@ -1,6 +1,7 @@
 package com.odde.donut.controllers;
 
 import com.odde.donut.controllers.currentUser.CurrentUser;
+import com.odde.donut.entities.Note;
 import com.odde.donut.services.AuthorizationService;
 import com.odde.donut.testability.MakeMe;
 import com.odde.donut.testability.TestabilitySettings;
@@ -29,5 +30,10 @@ public abstract class ControllerTestBase {
   void cleanupTestabilitySettings() {
     testabilitySettings.timeTravelTo(null);
     testabilitySettings.setOpenAiTokenOverride(null);
+  }
+
+  /** See {@link MakeMe#authorReferencingContent(Note, String)}. */
+  protected void authorReferencingContent(Note note, String content) {
+    makeMe.authorReferencingContent(note, content);
   }
 }

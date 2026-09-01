@@ -99,7 +99,8 @@ class RelationControllerTests extends ControllerTestBase {
               .notebook(nb1)
               .content(Frontmatter.empty().set("a part of", "v").fenced(""))
               .please();
-      Note referrer = makeMe.aNote("Carrier").underSameNotebookAs(target).content(before).please();
+      Note referrer = makeMe.aNote("Carrier").underSameNotebookAs(target).please();
+      authorReferencingContent(referrer, before);
       resolvedWikiLinkService.refreshForNote(referrer, u);
 
       controller.moveNoteToNotebookRootInNotebook(target, nb2);

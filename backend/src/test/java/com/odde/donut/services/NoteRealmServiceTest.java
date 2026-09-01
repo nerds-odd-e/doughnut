@@ -5,9 +5,6 @@ import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 
-import com.odde.donut.algorithms.AuthoredNoteDocument;
-import com.odde.donut.algorithms.AuthoredNoteReferences;
-import com.odde.donut.algorithms.CanonicalDonutOrigin;
 import com.odde.donut.controllers.dto.NoteRealm;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
@@ -80,7 +77,7 @@ class NoteRealmServiceTest {
   void body_wikilink_carrier_in_references() {
     Note focal = makeMe.aNote().title("Focal").notebook(notebook).please();
     Note carrier = makeMe.aNote().notebook(notebook).please();
-    authorReferencingContent(carrier, "[[Focal]]");
+    makeMe.authorReferencingContent(carrier, "[[Focal]]");
 
     NoteRealm realm = noteRealmService.build(focal, user);
 
@@ -92,7 +89,7 @@ class NoteRealmServiceTest {
   void parent_yaml_carrier_appears_in_references() {
     Note focal = makeMe.aNote().title("Focal").notebook(notebook).please();
     Note carrier = makeMe.aNote().title("Child").notebook(notebook).please();
-    authorReferencingContent(carrier, "---\nparent: \"[[Focal]]\"\n---\n\nBody.");
+    makeMe.authorReferencingContent(carrier, "---\nparent: \"[[Focal]]\"\n---\n\nBody.");
 
     NoteRealm realm = noteRealmService.build(focal, user);
 
@@ -105,7 +102,7 @@ class NoteRealmServiceTest {
     Note focal = makeMe.aNote().title("Focal").notebook(notebook).please();
     Note subject = makeMe.aNote().notebook(notebook).please();
     Note relation = makeMe.aNote().notebook(notebook).please();
-    authorReferencingContent(
+    makeMe.authorReferencingContent(
         relation,
         RelationshipNoteMarkdown.forEndpoints(
             relation, "a specialization of", subject, focal, null));
@@ -130,7 +127,7 @@ class NoteRealmServiceTest {
     Notebook otherNb = makeMe.aNotebook().creatorAndOwner(carrierOwner).name("OtherNb").please();
     Note carrier = makeMe.aNote().notebook(otherNb).please();
 
-    authorReferencingContent(carrier, "[[MainNb:Focal]]");
+    makeMe.authorReferencingContent(carrier, "[[MainNb:Focal]]");
 
     NoteRealm realm = noteRealmService.build(focal, focalOwner);
 
@@ -144,7 +141,7 @@ class NoteRealmServiceTest {
   void references_omit_soft_deleted_carrier() {
     Note focal = makeMe.aNote().title("Focal").notebook(notebook).please();
     Note carrier = makeMe.aNote().notebook(notebook).please();
-    authorReferencingContent(carrier, "[[Focal]]");
+    makeMe.authorReferencingContent(carrier, "[[Focal]]");
 
     softDelete(carrier);
 
@@ -155,25 +152,9 @@ class NoteRealmServiceTest {
   void references_dedupe_multiple_authored_references_for_same_carrier_note() {
     Note focal = makeMe.aNote().title("Focal").notebook(notebook).please();
     Note carrier = makeMe.aNote().notebook(notebook).please();
-    authorReferencingContent(carrier, "[[Focal]] and [[Focal|again]]");
+    makeMe.authorReferencingContent(carrier, "[[Focal]] and [[Focal|again]]");
 
     assertThat(noteRealmService.build(focal, user).getReferences(), hasSize(1));
-  }
-
-  /**
-   * Authors {@code content} on {@code note} through {@link Note#replaceContent}, the aggregate
-   * method that also populates {@code authored_note_reference} rows consumed by {@link
-   * com.odde.donut.entities.repositories.AuthoredNoteReferenceInboundFacade} — the same parse
-   * production content saves use, minus validation.
-   */
-  private void authorReferencingContent(Note note, String content) {
-    note.replaceContent(
-        new AuthoredNoteDocument(
-            content,
-            AuthoredNoteReferences.uniquePreserveOrder(
-                AuthoredNoteReferences.inOccurrenceOrder(
-                    content, CanonicalDonutOrigin.production()))));
-    makeMe.entityPersister.flush();
   }
 
   private void softDelete(Note note) {
