@@ -12,6 +12,10 @@ import {
   mockSdkServiceWithImplementation,
   wrapSdkError,
 } from "@tests/helpers"
+import {
+  installMockResizeObserver,
+  restoreNoteToolbarWidthMocks,
+} from "@tests/helpers/mockNoteToolbarNavWidth"
 import makeMe from "donut-test-fixtures/makeMe"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import {
@@ -57,6 +61,7 @@ async function startDelete(choice: boolean | string) {
 describe("note show autosave before deletion", () => {
   beforeEach(() => {
     vi.useFakeTimers()
+    installMockResizeObserver()
   })
 
   afterEach(() => {
@@ -64,6 +69,7 @@ describe("note show autosave before deletion", () => {
     document.body.innerHTML = ""
     vi.useRealTimers()
     vi.restoreAllMocks()
+    restoreNoteToolbarWidthMocks()
     teardownGlobalClientForTesting()
   })
 
