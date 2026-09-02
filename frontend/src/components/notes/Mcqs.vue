@@ -7,7 +7,7 @@
             v-bind="{ note }"
             @close-dialog="
               closer();
-              questionAdded($event);
+              mcqAdded($event);
             "
           />
         </template>
@@ -21,7 +21,7 @@
         <Upload class="w-6 h-6" />
       </button>
     </div>
-    <table class="question-table mt-2" v-if="questions.length">
+    <table class="mcq-table mt-2" v-if="questions.length">
       <thead>
         <tr>
           <th>Question Text</th>
@@ -83,7 +83,7 @@ const props = defineProps({
 const questions = ref<Mcq[]>([])
 const showExportDialog = ref(false)
 
-const fetchQuestions = async () => {
+const fetchMcqs = async () => {
   const { data: allQuestions, error } = await McqController.list({
     path: { note: props.note.id },
   })
@@ -91,31 +91,31 @@ const fetchQuestions = async () => {
     questions.value = allQuestions
   }
 }
-const questionAdded = (newQuestion: Mcq) => {
+const mcqAdded = (newQuestion: Mcq) => {
   if (newQuestion == null) {
     return
   }
   questions.value.push(newQuestion)
 }
 onMounted(() => {
-  fetchQuestions()
+  fetchMcqs()
 })
 </script>
 
 <style scoped>
-.question-table {
+.mcq-table {
   border-collapse: collapse;
   width: 100%;
 }
 
-.question-table th,
-.question-table td {
+.mcq-table th,
+.mcq-table td {
   border: 1px solid #dddddd;
   text-align: left;
   padding: 8px;
 }
 
-.question-table th {
+.mcq-table th {
   background-color: #f2f2f2;
 }
 

@@ -63,9 +63,7 @@ describe("NoteMoreOptionsForm", () => {
         wrapper.find(`button[title="${noteMoreOptionsTitles.export}"]`).exists()
       ).toBe(true)
       expect(
-        wrapper
-          .find(`button[title="${noteMoreOptionsTitles.questions}"]`)
-          .exists()
+        wrapper.find(`button[title="${noteMoreOptionsTitles.mcqs}"]`).exists()
       ).toBe(true)
       expect(
         wrapper.find(`button[title="${noteMoreOptionsTitles.audio}"]`).exists()
