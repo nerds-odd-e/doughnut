@@ -6,9 +6,9 @@ current_phase: null
 current_phase_name: null
 status: ready
 stopped_at: null
-last_updated: "2026-09-01T07:28:00Z"
-last_activity: 2026-09-01
-last_activity_desc: "Captured title/create wiki-refresh slowness note"
+last_updated: "2026-09-02T00:31:00Z"
+last_activity: 2026-09-02
+last_activity_desc: "039: pruned spent plan history; next slice 17 (inject / E2E green)"
 progress:
   total_phases: 0
   completed_phases: 0
@@ -31,10 +31,11 @@ Scheduling follows Accepted [ADR 0003](../docs/adrs/0003-spaced-repetition-sched
 
 **Flyway:** every applied migration is squashed into `V100000000__baseline.sql`; `V300000300__db_migration_placeholder.sql` is the tip. New migrations use a greater version.
 
-Daily probe measurement (not an ADR): [daily-probe-protocol.md](notes/daily-probe-protocol.md). Title/create slowness (notebook-scope wiki refresh): [notebook-scope-wiki-refresh-on-title-and-create.md](notes/notebook-scope-wiki-refresh-on-title-and-create.md).
+Daily probe measurement (not an ADR): [daily-probe-protocol.md](notes/daily-probe-protocol.md). Title/create slowness (notebook-scope wiki refresh): [notebook-scope-wiki-refresh-on-title-and-create.md](notes/notebook-scope-wiki-refresh-on-title-and-create.md). Authoritative authored note references: `.planning/quick/039-authoritative-authored-note-references/PLAN.md` — in progress, slices 1–16 done; next is 17 (inject indexes authored references; unblocks `note_deletion.feature`).
 
 ## Operator Next Steps
 
+- `.planning/quick/039-authoritative-authored-note-references/PLAN.md` — in progress. Next: slice 17 (inject indexes authored references; unblocks `note_deletion.feature` / CI green), then 18 (delete/restore without notebook-scope wiki refresh), then 19 (property-removal uses live link text). Do not execute until asked.
 - After deploying the Flyway squash, confirm startup succeeded and `flyway_schema_history` shows the baseline repaired, the collapsed versions marked `DELETE`, and `V300000300` applied.
 - Title/create slowness probe (skip in-request `refreshNotebookScope`): [issue note](notes/notebook-scope-wiki-refresh-on-title-and-create.md), plan `.planning/quick/038-skip-notebook-scope-refresh-on-title-and-create/PLAN.md` — planned, do not execute until asked.
 - Daily probe tap affordance (visible panels, stable board, press flash): `.planning/quick/033-daily-probe-tap-affordance/PLAN.md` — planned, do not execute until asked.
@@ -43,4 +44,4 @@ Daily probe measurement (not an ADR): [daily-probe-protocol.md](notes/daily-prob
 
 Parked work: SEED-001, SEED-002, SEED-005, SEED-006, SEED-007, SEED-008; ADR 0002 Level 1. See [ROADMAP.md](ROADMAP.md).
 
-Recent ad-hoc work (no active plans): `noteProperty` / **property panel** / `#prop:` wiki (ADR 0001 / ADR 0004 / ADR 0005); E2E named-route honesty and SPA hydrate protocol (E2E helpers, `MainMenu.vue`); daily probe side tap ([daily-probe-protocol.md](notes/daily-probe-protocol.md)).
+Recent ad-hoc work: `noteProperty` / **property panel** / `#prop:` wiki (ADR 0001 / ADR 0004 / ADR 0005); E2E named-route honesty and SPA hydrate protocol (E2E helpers, `MainMenu.vue`); daily probe side tap ([daily-probe-protocol.md](notes/daily-probe-protocol.md)). Active plan: [039](quick/039-authoritative-authored-note-references/PLAN.md).
