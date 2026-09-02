@@ -11,7 +11,7 @@ scope: small
 
 ## Why This Matters
 
-The shipped glossary is Proposed [ADR 0001](../../docs/adrs/0001-ubiquitous-language.md): **recall prompt** HAS_A **MCQ**. Public API, OpenAPI `Mcq`, tables `mcq`/`answer`, and nested `/api/mcqs` routes already match. A few internal names and the note **Questions** UI still say question.
+The shipped glossary is Accepted [ADR 0001](../../docs/adrs/0001-ubiquitous-language.md): **recall prompt** HAS_A **MCQ**. Public API, OpenAPI `Mcq`, tables `mcq`/`answer`, and nested `/api/mcqs` routes already match. A few internal names and the note **Questions** UI still say question.
 
 ## When to Surface
 
