@@ -71,14 +71,14 @@ final class WikiLinkRewriteSupport {
    * Rewrites each live, non-excluded referrer's inbound wiki link(s) to {@code targetNote}. {@code
    * authoredLinkTextsByReferrerId} is the candidate set itself — every referrer id it carries has
    * already been confirmed to live-resolve to {@code targetNote} (per {@link
-   * com.odde.donut.entities.repositories.AuthoredNoteReferenceInboundFacade}), captured by the
-   * caller before {@code targetNote} (or its containing folder/notebook) was relocated, since
-   * resolution is authored against the pre-move identity.
+   * com.odde.donut.services.NoteReferenceService}), captured by the caller before {@code
+   * targetNote} (or its containing folder/notebook) was relocated, since resolution is authored
+   * against the pre-move identity.
    */
   static void applyInboundReferrerRewrite(
       EntityManager entityManager,
       EntityPersister entityPersister,
-      ResolvedWikiLinkService resolvedWikiLinkService,
+      NoteReferenceService noteReferenceService,
       CanonicalDonutOrigin canonicalDonutOrigin,
       Note targetNote,
       Timestamp updatedAt,
@@ -109,13 +109,13 @@ final class WikiLinkRewriteSupport {
       referrer.replaceContent(documentFromRewrittenContent(content, canonicalDonutOrigin));
       referrer.setUpdatedAt(updatedAt);
       entityPersister.save(referrer);
-      resolvedWikiLinkService.refreshForNote(referrer, viewer);
+      noteReferenceService.refreshDerivedIndexesForNote(referrer);
     }
   }
 
   static void applyOutgoingNotebookMoveRewrite(
       EntityPersister entityPersister,
-      ResolvedWikiLinkService resolvedWikiLinkService,
+      NoteReferenceService noteReferenceService,
       PortablePathAuthoring portablePathAuthoring,
       WikiLinkResolver wikiLinkResolver,
       CanonicalDonutOrigin canonicalDonutOrigin,
@@ -169,7 +169,7 @@ final class WikiLinkRewriteSupport {
     movedNote.replaceContent(documentFromRewrittenContent(content, canonicalDonutOrigin));
     movedNote.setUpdatedAt(updatedAt);
     entityPersister.save(movedNote);
-    resolvedWikiLinkService.refreshForNote(movedNote, viewer);
+    noteReferenceService.refreshDerivedIndexesForNote(movedNote);
   }
 
   /**
@@ -192,8 +192,7 @@ final class WikiLinkRewriteSupport {
    * sourceNote}'s current notebook scope, restricted to references that resolve to another note
    * within {@code candidateTargetNoteIds}. Must be captured before {@code sourceNote} (or the notes
    * it may target) is relocated: resolution is scoped to the notebook as it stood at capture time,
-   * mirroring inbound capture ({@link
-   * com.odde.donut.entities.repositories.AuthoredNoteReferenceInboundFacade}).
+   * mirroring inbound capture ({@link com.odde.donut.services.NoteReferenceService}).
    */
   static Map<String, Note> liveResolvedOutgoingWikiLinksToNotes(
       WikiLinkResolver wikiLinkResolver,

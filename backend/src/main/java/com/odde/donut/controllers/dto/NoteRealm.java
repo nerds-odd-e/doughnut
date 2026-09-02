@@ -22,7 +22,7 @@ public class NoteRealm {
   /**
    * Referring notes (live-resolved authored note references), as {@link NoteTopology}, deduplicated
    * by referring note id and ordered by id, per {@link
-   * com.odde.donut.entities.repositories.AuthoredNoteReferenceInboundFacade#distinctReferrerNotesForViewer}.
+   * com.odde.donut.services.NoteReferenceService#distinctReferrerNotesForViewer}.
    */
   @Getter @Setter private List<NoteTopology> references;
 

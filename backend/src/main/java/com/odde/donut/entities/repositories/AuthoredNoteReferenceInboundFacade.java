@@ -28,8 +28,10 @@ import org.springframework.stereotype.Service;
  * can go stale as content, titles, or aliases change elsewhere, so every candidate is re-verified
  * live.
  *
- * <p>Exposes only domain-shaped results ({@link Note}) to callers, never the internal {@link
- * AuthoredNoteReferenceRow} persistence rows — see {@link AuthoredNoteReferenceRowRepository}.
+ * <p>Application consumers use {@link com.odde.donut.services.NoteReferenceService} rather than
+ * injecting this type. Exposes only domain-shaped results ({@link Note}) to callers, never the
+ * internal {@link AuthoredNoteReferenceRow} persistence rows — see {@link
+ * AuthoredNoteReferenceRowRepository}.
  */
 @Service
 public class AuthoredNoteReferenceInboundFacade {
@@ -49,8 +51,7 @@ public class AuthoredNoteReferenceInboundFacade {
 
   /**
    * Distinct referrer notes whose authored reference live-resolves to {@code target} for {@code
-   * viewer}, ordered by referrer note id ascending — the same deterministic order {@code
-   * ResolvedWikiLinkService}'s inbound methods guarantee today.
+   * viewer}, ordered by referrer note id ascending.
    */
   public List<Note> distinctReferrerNotesForViewer(Note target, User viewer) {
     List<Note> referrers = new ArrayList<>();

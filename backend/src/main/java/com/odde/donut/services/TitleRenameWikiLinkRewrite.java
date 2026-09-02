@@ -14,9 +14,7 @@ import java.util.function.BiFunction;
 
 /**
  * Title-rename wiki-link rewrite for {@link WikiLinkRewriteService}. Rewrites inbound references
- * restricted to the live-resolved set the caller captured before the rename took effect: a referrer
- * whose cached inbound row survives but no longer live-resolves is a stale cache row and must not
- * be rewritten.
+ * restricted to the live-resolved set the caller captured before the rename took effect.
  */
 final class TitleRenameWikiLinkRewrite {
 
@@ -25,7 +23,7 @@ final class TitleRenameWikiLinkRewrite {
   static void rewrite(
       EntityManager entityManager,
       EntityPersister entityPersister,
-      ResolvedWikiLinkService resolvedWikiLinkService,
+      NoteReferenceService noteReferenceService,
       CanonicalDonutOrigin canonicalDonutOrigin,
       Note targetNote,
       String newTitle,
@@ -40,7 +38,7 @@ final class TitleRenameWikiLinkRewrite {
     WikiLinkRewriteSupport.applyInboundReferrerRewrite(
         entityManager,
         entityPersister,
-        resolvedWikiLinkService,
+        noteReferenceService,
         canonicalDonutOrigin,
         targetNote,
         updatedAt,

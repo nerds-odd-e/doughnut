@@ -2,7 +2,6 @@ package com.odde.donut.controllers;
 
 import com.odde.donut.algorithms.AuthoredNoteDocument;
 import com.odde.donut.algorithms.CanonicalDonutOrigin;
-import com.odde.donut.algorithms.FrontmatterAliases;
 import com.odde.donut.controllers.dto.ApiError;
 import com.odde.donut.controllers.dto.NoteRealm;
 import com.odde.donut.controllers.dto.NoteUpdateContentDTO;
@@ -10,14 +9,13 @@ import com.odde.donut.controllers.dto.NoteUpdateTitleDTO;
 import com.odde.donut.entities.DisplayName;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.User;
-import com.odde.donut.entities.repositories.AuthoredNoteReferenceInboundFacade;
 import com.odde.donut.exceptions.ApiException;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.factoryServices.EntityPersister;
 import com.odde.donut.services.AuthorizationService;
 import com.odde.donut.services.NoteRealmService;
+import com.odde.donut.services.NoteReferenceService;
 import com.odde.donut.services.NoteService;
-import com.odde.donut.services.ResolvedWikiLinkService;
 import com.odde.donut.services.WikiLinkRewriteService;
 import com.odde.donut.testability.TestabilitySettings;
 import com.odde.donut.validators.AuthoredNoteContent;
@@ -25,9 +23,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import java.sql.Timestamp;
 import java.util.Objects;
-import java.util.Set;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
@@ -40,31 +36,28 @@ class TextContentController {
 
   private final AuthorizationService authorizationService;
   private final NoteRealmService noteRealmService;
-  private final ResolvedWikiLinkService resolvedWikiLinkService;
+  private final NoteReferenceService noteReferenceService;
   private final WikiLinkRewriteService wikiLinkRewriteService;
   private final NoteService noteService;
   private final CanonicalDonutOrigin canonicalDonutOrigin;
-  private final AuthoredNoteReferenceInboundFacade authoredNoteReferenceInboundFacade;
 
   public TextContentController(
       EntityPersister entityPersister,
       TestabilitySettings testabilitySettings,
       AuthorizationService authorizationService,
       NoteRealmService noteRealmService,
-      ResolvedWikiLinkService resolvedWikiLinkService,
+      NoteReferenceService noteReferenceService,
       WikiLinkRewriteService wikiLinkRewriteService,
       NoteService noteService,
-      CanonicalDonutOrigin canonicalDonutOrigin,
-      AuthoredNoteReferenceInboundFacade authoredNoteReferenceInboundFacade) {
+      CanonicalDonutOrigin canonicalDonutOrigin) {
     this.entityPersister = entityPersister;
     this.testabilitySettings = testabilitySettings;
     this.authorizationService = authorizationService;
     this.noteRealmService = noteRealmService;
-    this.resolvedWikiLinkService = resolvedWikiLinkService;
+    this.noteReferenceService = noteReferenceService;
     this.wikiLinkRewriteService = wikiLinkRewriteService;
     this.noteService = noteService;
     this.canonicalDonutOrigin = canonicalDonutOrigin;
-    this.authoredNoteReferenceInboundFacade = authoredNoteReferenceInboundFacade;
   }
 
   @PatchMapping(path = "/{note}/title")
@@ -98,7 +91,7 @@ class TextContentController {
       return;
     }
     User viewer = authorizationService.getCurrentUser();
-    if (authoredNoteReferenceInboundFacade.distinctReferrerNotesForViewer(note, viewer).isEmpty()) {
+    if (noteReferenceService.distinctReferrerNotesForViewer(note, viewer).isEmpty()) {
       return;
     }
     if (titleDTO.getReferenceHandling() != null) {
@@ -120,37 +113,18 @@ class TextContentController {
       throws UnexpectedNoAccessRightException {
     AuthoredNoteDocument document =
         AuthoredNoteContent.prepareDocumentForSave(contentDTO.getContent(), canonicalDonutOrigin);
-    return updateNote(note, n -> n.replaceContent(document), true, true);
+    return updateNote(note, n -> n.replaceContent(document));
   }
 
-  private NoteRealm updateNote(
-      Note note,
-      Consumer<Note> updateFunction,
-      boolean refreshWikiLinks,
-      boolean deleteOrphanImagesAfterSave)
+  private NoteRealm updateNote(Note note, Consumer<Note> updateFunction)
       throws UnexpectedNoAccessRightException {
     authorizationService.assertAuthorization(note);
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
-    Set<String> aliasesBefore = aliasLookupKeys(note.getContent());
     note.setUpdatedAt(currentUTCTimestamp);
     updateFunction.accept(note);
     entityPersister.save(note);
-    if (deleteOrphanImagesAfterSave) {
-      noteService.deleteOrphanImagesForPersistedContent(note);
-    }
-    if (refreshWikiLinks) {
-      User viewer = authorizationService.getCurrentUser();
-      resolvedWikiLinkService.refreshForNote(note, viewer);
-      if (!aliasesBefore.equals(aliasLookupKeys(note.getContent()))) {
-        resolvedWikiLinkService.refreshNotebookScope(note.getNotebook(), viewer);
-      }
-    }
+    noteService.deleteOrphanImagesForPersistedContent(note);
+    noteReferenceService.refreshDerivedIndexesForNote(note);
     return noteRealmService.build(note, authorizationService.getCurrentUser());
-  }
-
-  private static Set<String> aliasLookupKeys(String content) {
-    return FrontmatterAliases.fromNoteContent(content).stream()
-        .map(FrontmatterAliases::normalizedLookupKey)
-        .collect(Collectors.toSet());
   }
 }

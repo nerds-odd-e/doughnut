@@ -30,7 +30,7 @@ public class QuestionGenerationRequestBuilder {
   private final FocusContextMarkdownRenderer focusContextMarkdownRenderer;
   private final NoteRealmService noteRealmService;
   private final NoteRepository noteRepository;
-  private final ResolvedWikiLinkService resolvedWikiLinkService;
+  private final NoteReferenceService noteReferenceService;
   private final AuthorizationService authorizationService;
 
   @Autowired
@@ -40,14 +40,14 @@ public class QuestionGenerationRequestBuilder {
       FocusContextMarkdownRenderer focusContextMarkdownRenderer,
       NoteRealmService noteRealmService,
       NoteRepository noteRepository,
-      ResolvedWikiLinkService resolvedWikiLinkService,
+      NoteReferenceService noteReferenceService,
       AuthorizationService authorizationService) {
     this.globalSettingsService = globalSettingsService;
     this.focusContextRetrievalService = focusContextRetrievalService;
     this.focusContextMarkdownRenderer = focusContextMarkdownRenderer;
     this.noteRealmService = noteRealmService;
     this.noteRepository = noteRepository;
-    this.resolvedWikiLinkService = resolvedWikiLinkService;
+    this.noteReferenceService = noteReferenceService;
     this.authorizationService = authorizationService;
   }
 
@@ -201,7 +201,7 @@ public class QuestionGenerationRequestBuilder {
               focusContextMarkdown, propertyFocusBlock);
       focusContextMarkdown =
           FocusContextMarkdownAugmenter.ensureWikiLinks(
-              focusContextMarkdown, resolvedWikiLinkService.wikiLinksForViewer(focus, viewer));
+              focusContextMarkdown, noteReferenceService.wikiLinksForViewer(focus, viewer));
     }
 
     OpenAIResponseRequestBuilder<T> builder =

@@ -2,20 +2,17 @@ package com.odde.donut.controllers;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import com.odde.donut.controllers.dto.WikiLink;
 import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
-import com.odde.donut.entities.User;
 import com.odde.donut.entities.repositories.NoteRepository;
-import com.odde.donut.entities.repositories.ResolvedWikiLinkRepository;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.donut.services.ResolvedWikiLinkService;
 import java.sql.Timestamp;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,9 +21,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 class RelationControllerMoveNoteToFolderTests extends ControllerTestBase {
   @Autowired NoteRepository noteRepository;
+  @Autowired NoteController noteController;
   @Autowired RelationController controller;
-  @Autowired ResolvedWikiLinkService resolvedWikiLinkService;
-  @Autowired ResolvedWikiLinkRepository resolvedWikiLinkRepository;
 
   @BeforeEach
   void setup() {
@@ -91,15 +87,12 @@ class RelationControllerMoveNoteToFolderTests extends ControllerTestBase {
 
   @Test
   void sameNotebookMoveToFolder_doesNotRewriteLinks() throws UnexpectedNoAccessRightException {
-    User u = currentUser.getUser();
     Notebook notebook = ownedNotebook("SameNb");
     Folder folder = makeMe.aFolder().notebook(notebook).name("F").please();
     makeMe.aNote("X").notebook(notebook).please();
     Note mover = makeMe.aNote("Mover").notebook(notebook).content("See [[X]].").please();
     Note referrer =
         makeMe.aNote("Carrier").underSameNotebookAs(mover).content("[[Mover]]").please();
-    resolvedWikiLinkService.refreshForNote(referrer, u);
-    resolvedWikiLinkService.refreshForNote(mover, u);
 
     controller.moveNoteToFolder(mover, folder);
 
@@ -126,24 +119,23 @@ class RelationControllerMoveNoteToFolderTests extends ControllerTestBase {
   }
 
   @Test
-  void crossNotebookMoveToFolder_reresolvesDestinationNotebookCardinality()
+  void crossNotebookMoveToFolder_reresolvesDestinationNotebookCardinalityLive()
       throws UnexpectedNoAccessRightException {
-    User u = currentUser.getUser();
     Notebook destNotebook = ownedNotebook("Dest NB");
     Note destTarget = makeMe.aNote("Target").notebook(destNotebook).please();
     Note destReferrer =
         makeMe.aNote("DestReferrer").underSameNotebookAs(destTarget).content("[[Target]]").please();
-    resolvedWikiLinkService.refreshForNote(destReferrer, u);
     assertThat(
-        resolvedWikiLinkRepository.findBySourceNote_IdOrderByIdAsc(destReferrer.getId()),
-        hasSize(1));
+        noteController.showNote(destReferrer).getWikiLinks().get(0).getResolution(),
+        equalTo(WikiLink.Resolution.RESOLVED));
 
-    Note movedTarget = makeMe.aNote("Target").notebookOwnedBy(u).please();
+    Note movedTarget = makeMe.aNote("Target").notebookOwnedBy(currentUser.getUser()).please();
     Folder destFolder = makeMe.aFolder().notebook(destNotebook).name("F").please();
 
     controller.moveNoteToFolder(movedTarget, destFolder);
 
     assertThat(
-        resolvedWikiLinkRepository.findBySourceNote_IdOrderByIdAsc(destReferrer.getId()), empty());
+        noteController.showNote(destReferrer).getWikiLinks().get(0).getResolution(),
+        equalTo(WikiLink.Resolution.AMBIGUOUS));
   }
 }

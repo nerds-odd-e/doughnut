@@ -12,13 +12,11 @@ import com.odde.donut.controllers.dto.WikiLink;
 import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Note;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.donut.services.ResolvedWikiLinkService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 class TextContentControllerUpdateNoteTitleTests extends TextContentControllerTestBase {
   @Autowired NoteController noteController;
-  @Autowired ResolvedWikiLinkService resolvedWikiLinkService;
 
   NoteUpdateTitleDTO noteUpdateTitleDTO = titleDto("new title");
 
@@ -53,7 +51,6 @@ class TextContentControllerUpdateNoteTitleTests extends TextContentControllerTes
         makeMe.aFolder().notebook(target.getNotebook()).name("Other Folder").please();
     Note referrer = makeMe.aNote().underSameNotebookAs(target).content("See [[Target]].").please();
     Note namesake = makeMe.aNote().folder(otherFolder).title("Other").please();
-    resolvedWikiLinkService.refreshForNote(referrer, currentUser.getUser());
     assertThat(
         noteController.showNote(referrer).getWikiLinks().get(0).getResolution(),
         equalTo(WikiLink.Resolution.RESOLVED));

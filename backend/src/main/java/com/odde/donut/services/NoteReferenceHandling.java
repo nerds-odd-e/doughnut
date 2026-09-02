@@ -25,28 +25,25 @@ final class NoteReferenceHandling {
   private static final String RELATIONSHIP_NOTE_TYPE = "relationship";
 
   private final MemoryTrackerRepository memoryTrackerRepository;
-  private final ResolvedWikiLinkService resolvedWikiLinkService;
+  private final NoteReferenceService noteReferenceService;
   private final WikiLinkResolver wikiLinkResolver;
   private final AuthorizationService authorizationService;
   private final EntityPersister entityPersister;
   private final Consumer<Note> deleteOrphanImages;
-  private final AuthoredNoteReferenceInboundFacade authoredNoteReferenceInboundFacade;
 
   NoteReferenceHandling(
       MemoryTrackerRepository memoryTrackerRepository,
-      ResolvedWikiLinkService resolvedWikiLinkService,
+      NoteReferenceService noteReferenceService,
       WikiLinkResolver wikiLinkResolver,
       AuthorizationService authorizationService,
       EntityPersister entityPersister,
-      Consumer<Note> deleteOrphanImages,
-      AuthoredNoteReferenceInboundFacade authoredNoteReferenceInboundFacade) {
+      Consumer<Note> deleteOrphanImages) {
     this.memoryTrackerRepository = memoryTrackerRepository;
-    this.resolvedWikiLinkService = resolvedWikiLinkService;
+    this.noteReferenceService = noteReferenceService;
     this.wikiLinkResolver = wikiLinkResolver;
     this.authorizationService = authorizationService;
     this.entityPersister = entityPersister;
     this.deleteOrphanImages = deleteOrphanImages;
-    this.authoredNoteReferenceInboundFacade = authoredNoteReferenceInboundFacade;
   }
 
   void reduceRelationNoteToSourceProperty(
@@ -84,7 +81,7 @@ final class NoteReferenceHandling {
 
   void removeNoteLinksFromReferrerProperties(Note target, User viewer, Timestamp updatedAt) {
     for (AuthoredNoteReferenceInboundFacade.InboundReference inboundReference :
-        authoredNoteReferenceInboundFacade.distinctInboundReferencesForViewer(target, viewer)) {
+        noteReferenceService.distinctInboundReferencesForViewer(target, viewer)) {
       Note referrer = inboundReference.referrer();
       NoteContentMarkdown.removeWikiLinksFromLeadingFrontmatterProperties(
               referrer.getContent(), Set.copyOf(inboundReference.authoredLinkTexts()))
@@ -102,7 +99,7 @@ final class NoteReferenceHandling {
     note.setUpdatedAt(updatedAt);
     entityPersister.merge(note);
     deleteOrphanImages.accept(note);
-    resolvedWikiLinkService.refreshForNote(note, viewer);
+    noteReferenceService.refreshDerivedIndexesForNote(note);
   }
 
   private void rehomeNoteLevelMemoryTrackerToSourceProperty(

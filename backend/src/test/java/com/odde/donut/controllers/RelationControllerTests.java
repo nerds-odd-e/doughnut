@@ -12,7 +12,7 @@ import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.User;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.donut.services.ResolvedWikiLinkService;
+import com.odde.donut.services.NoteReferenceService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -22,7 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 class RelationControllerTests extends ControllerTestBase {
   @Autowired RelationController controller;
-  @Autowired ResolvedWikiLinkService resolvedWikiLinkService;
+  @Autowired NoteReferenceService noteReferenceService;
 
   @BeforeEach
   void setup() {
@@ -101,7 +101,6 @@ class RelationControllerTests extends ControllerTestBase {
               .please();
       Note referrer = makeMe.aNote("Carrier").underSameNotebookAs(target).please();
       authorReferencingContent(referrer, before);
-      resolvedWikiLinkService.refreshForNote(referrer, u);
 
       controller.moveNoteToNotebookRootInNotebook(target, nb2);
 
@@ -121,14 +120,13 @@ class RelationControllerTests extends ControllerTestBase {
       Note qualifiedTarget = makeMe.aNote("Y").notebook(nb3).please();
       Note mover =
           makeMe.aNote("Mover").notebook(nb1).content("See [[X]] and [[OtherNb:Y]].").please();
-      resolvedWikiLinkService.refreshForNote(mover, u);
 
       controller.moveNoteToNotebookRootInNotebook(mover, nb2);
 
       makeMe.refresh(mover);
       assertThat(mover.getContent(), equalTo("See [[OldNb:X|X]] and [[OtherNb:Y]]."));
       assertThat(
-          resolvedWikiLinkService.wikiLinksForViewer(mover, u).stream()
+          noteReferenceService.wikiLinksForViewer(mover, u).stream()
               .map(wt -> wt.getDestinationNoteId())
               .toList(),
           containsInAnyOrder(oldTarget.getId(), qualifiedTarget.getId()));
@@ -145,7 +143,6 @@ class RelationControllerTests extends ControllerTestBase {
       makeMe.aNote("X").folder(folderA).please();
       makeMe.aNote("X").folder(folderB).please();
       Note mover = makeMe.aNote("Mover").notebook(nb1).content("See [[X]].").please();
-      resolvedWikiLinkService.refreshForNote(mover, u);
 
       controller.moveNoteToNotebookRootInNotebook(mover, nb2);
 
@@ -161,7 +158,6 @@ class RelationControllerTests extends ControllerTestBase {
       Note target = makeMe.aNote("MyNote").notebook(nb1).please();
       Note referrer =
           makeMe.aNote("Carrier").underSameNotebookAs(target).content("[[MyNote]]").please();
-      resolvedWikiLinkService.refreshForNote(referrer, u);
 
       controller.moveNoteToNotebookRootInNotebook(target, nb1);
 
@@ -178,7 +174,6 @@ class RelationControllerTests extends ControllerTestBase {
       Note referrer =
           makeMe.aNote("Carrier").underSameNotebookAs(target).content("[[MyNote]]").please();
       controller.moveNoteToFolder(target, folder);
-      resolvedWikiLinkService.refreshForNote(referrer, u);
 
       controller.moveNoteToNotebookRoot(target);
 

@@ -10,14 +10,14 @@ import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.User;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.donut.services.ResolvedWikiLinkService;
+import com.odde.donut.services.NoteReferenceService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 class NotebookFolderMoveWikiLinkRewriteControllerTest
     extends NotebookFolderManagementControllerTestBase {
 
-  @Autowired ResolvedWikiLinkService resolvedWikiLinkServiceBean;
+  @Autowired NoteReferenceService noteReferenceService;
 
   @Test
   void crossNotebookFolderMove_rewritesInboundLinksFromOutsideReferrerOnly()
@@ -31,8 +31,6 @@ class NotebookFolderMoveWikiLinkRewriteControllerTest
     authorReferencingContent(insideReferrer, "[[Target]]");
     Note outsideReferrer = makeMe.aNote("Outside").notebook(nbA).please();
     authorReferencingContent(outsideReferrer, "[[Target]]");
-    resolvedWikiLinkServiceBean.refreshForNote(insideReferrer, owner);
-    resolvedWikiLinkServiceBean.refreshForNote(outsideReferrer, owner);
 
     controller.moveFolder(nbA, folderF, folderMoveTo(nbB, null));
 
@@ -53,7 +51,6 @@ class NotebookFolderMoveWikiLinkRewriteControllerTest
     makeMe.aNote("Target").folder(movedFolder).please();
     Note referrer = makeMe.aNote("Referrer").notebook(sourceNotebook).please();
     authorReferencingContent(referrer, "[[Target]]");
-    resolvedWikiLinkServiceBean.refreshForNote(referrer, owner);
 
     controller.moveFolder(sourceNotebook, movedFolder, folderMoveTo(destinationNotebook, null));
 
@@ -73,7 +70,6 @@ class NotebookFolderMoveWikiLinkRewriteControllerTest
         makeMe.aNote("Inside").folder(folderF).content("[[Outside]] and [[Peer]].").please();
     makeMe.aNote("Peer").folder(folderF).please();
     makeMe.aNote("Outside").notebook(nbA).please();
-    resolvedWikiLinkServiceBean.refreshForNote(insideNote, owner);
 
     controller.moveFolder(nbA, folderF, folderMoveTo(nbB, null));
 
@@ -90,14 +86,13 @@ class NotebookFolderMoveWikiLinkRewriteControllerTest
     Folder folderF = ownedFolder(oldNb, "F");
     Note noteA = makeMe.aNote("A").folder(folderF).please();
     Note noteB = makeMe.aNote("B").folder(folderF).content("[[F/A]] and [label](/F/A.md)").please();
-    resolvedWikiLinkServiceBean.refreshForNote(noteB, owner);
 
     controller.moveFolder(oldNb, folderF, folderMoveTo(newNb, null));
 
     makeMe.refresh(noteB);
     assertThat(noteB.getContent(), equalTo("[[F/A]] and [label](/F/A.md)"));
     assertThat(
-        resolvedWikiLinkServiceBean.wikiLinksForViewer(noteB, owner).stream()
+        noteReferenceService.wikiLinksForViewer(noteB, owner).stream()
             .map(WikiLink::getDestinationNoteId)
             .toList(),
         containsInAnyOrder(noteA.getId()));

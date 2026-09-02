@@ -27,17 +27,17 @@ class WikiLinkRelocationRewrite {
   @PersistenceContext private EntityManager entityManager;
 
   private final EntityPersister entityPersister;
-  private final ResolvedWikiLinkService resolvedWikiLinkService;
+  private final NoteReferenceService noteReferenceService;
   private final PortablePathAuthoring portablePathAuthoring;
   private final WikiLinkResolver wikiLinkResolver;
 
   WikiLinkRelocationRewrite(
       EntityPersister entityPersister,
-      ResolvedWikiLinkService resolvedWikiLinkService,
+      NoteReferenceService noteReferenceService,
       PortablePathAuthoring portablePathAuthoring,
       WikiLinkResolver wikiLinkResolver) {
     this.entityPersister = entityPersister;
-    this.resolvedWikiLinkService = resolvedWikiLinkService;
+    this.noteReferenceService = noteReferenceService;
     this.portablePathAuthoring = portablePathAuthoring;
     this.wikiLinkResolver = wikiLinkResolver;
   }
@@ -202,7 +202,7 @@ class WikiLinkRelocationRewrite {
       Map<String, Note> coMovedTargetsByAuthoredLink) {
     WikiLinkRewriteSupport.applyOutgoingNotebookMoveRewrite(
         entityPersister,
-        resolvedWikiLinkService,
+        noteReferenceService,
         portablePathAuthoring,
         wikiLinkResolver,
         wikiLinkResolver.canonicalDonutOrigin(),
@@ -223,7 +223,7 @@ class WikiLinkRelocationRewrite {
     WikiLinkRewriteSupport.applyInboundReferrerRewrite(
         entityManager,
         entityPersister,
-        resolvedWikiLinkService,
+        noteReferenceService,
         wikiLinkResolver.canonicalDonutOrigin(),
         targetNote,
         updatedAt,

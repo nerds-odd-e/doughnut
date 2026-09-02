@@ -12,7 +12,6 @@ import com.odde.donut.entities.AuthoredNoteReferenceRow;
 import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Note;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.donut.services.ResolvedWikiLinkService;
 import com.odde.donut.services.httpQuery.HttpClientAdapter;
 import jakarta.persistence.EntityManager;
 import java.util.List;
@@ -26,7 +25,6 @@ class NoteControllerDeleteReferenceHandlingTests extends ControllerTestBase {
   @Autowired NoteController controller;
   @Autowired TextContentController textContentController;
   @Autowired EntityManager entityManager;
-  @Autowired ResolvedWikiLinkService resolvedWikiLinkService;
   @MockitoBean HttpClientAdapter httpClientAdapter;
 
   @BeforeEach
@@ -135,7 +133,6 @@ class NoteControllerDeleteReferenceHandlingTests extends ControllerTestBase {
     Note target2 = makeMe.aNote("Target").folder(otherFolder).please();
     Note referrer =
         makeMe.aNote("Referrer").underSameNotebookAs(target1).content("See [[Target]].").please();
-    resolvedWikiLinkService.refreshForNote(referrer, currentUser.getUser());
     assertThat(
         controller.showNote(referrer).getWikiLinks().get(0).getResolution(),
         equalTo(WikiLink.Resolution.AMBIGUOUS));
@@ -157,7 +154,6 @@ class NoteControllerDeleteReferenceHandlingTests extends ControllerTestBase {
     Note referrer =
         makeMe.aNote("Referrer").underSameNotebookAs(target1).content("See [[Target]].").please();
     controller.deleteNote(target2, leaveDeadLinksDeleteRequest());
-    resolvedWikiLinkService.refreshForNote(referrer, currentUser.getUser());
     assertThat(
         controller.showNote(referrer).getWikiLinks().get(0).getResolution(),
         equalTo(WikiLink.Resolution.RESOLVED));

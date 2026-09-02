@@ -14,7 +14,6 @@ import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.exceptions.ApiException;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.donut.services.ResolvedWikiLinkService;
 import jakarta.persistence.EntityManager;
 import org.hibernate.exception.ConstraintViolationException;
 import org.junit.jupiter.api.Test;
@@ -28,7 +27,6 @@ import org.springframework.web.server.ResponseStatusException;
 class NotebookNoteCreateControllerTest extends NotebookControllerTestBase {
 
   @Autowired NoteController noteController;
-  @Autowired ResolvedWikiLinkService resolvedWikiLinkService;
   @Autowired EntityManager entityManager;
 
   private NoteCreationDTO noteCreate(String title) {
@@ -146,7 +144,6 @@ class NotebookNoteCreateControllerTest extends NotebookControllerTestBase {
     Note target = makeMe.aNote().notebook(nb).title("Target").please();
     Note referrer = makeMe.aNote().underSameNotebookAs(target).content("See [[Target]].").please();
     Folder otherFolder = ownedFolder(nb, "Other Folder");
-    resolvedWikiLinkService.refreshForNote(referrer, currentUser.getUser());
     assertThat(
         noteController.showNote(referrer).getWikiLinks().get(0).getResolution(),
         equalTo(WikiLink.Resolution.RESOLVED));

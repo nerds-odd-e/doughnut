@@ -12,7 +12,7 @@ import com.odde.donut.entities.MemoryTrackerType;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.repositories.MemoryTrackerRepository;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.donut.services.ResolvedWikiLinkService;
+import com.odde.donut.services.NoteReferenceService;
 import com.odde.donut.services.httpQuery.HttpClientAdapter;
 import jakarta.persistence.EntityManager;
 import java.sql.Timestamp;
@@ -25,7 +25,7 @@ class NoteControllerDeleteReduceToSourceTests extends ControllerTestBase {
   @Autowired EntityManager entityManager;
   @Autowired MemoryTrackerRepository memoryTrackerRepository;
   @Autowired NoteController controller;
-  @Autowired ResolvedWikiLinkService resolvedWikiLinkService;
+  @Autowired NoteReferenceService noteReferenceService;
   @MockitoBean HttpClientAdapter httpClientAdapter;
 
   @BeforeEach
@@ -47,7 +47,7 @@ class NoteControllerDeleteReduceToSourceTests extends ControllerTestBase {
             .underSameNotebookAs(source)
             .asRelationship(relationLabel, source, target)
             .please();
-    resolvedWikiLinkService.refreshForNote(relation, currentUser.getUser());
+    noteReferenceService.refreshDerivedIndexesForNote(relation);
     return relation;
   }
 

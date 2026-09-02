@@ -8,14 +8,10 @@ import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.User;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.donut.services.ResolvedWikiLinkService;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 
 class NotebookFolderReparentWikiLinkRewriteControllerTest
     extends NotebookFolderManagementControllerTestBase {
-
-  @Autowired ResolvedWikiLinkService resolvedWikiLinkServiceBean;
 
   @Test
   void sameNotebookFolderReparent_rewritesInboundLinksToDescendantFromInsideAndOutside()
@@ -29,8 +25,6 @@ class NotebookFolderReparentWikiLinkRewriteControllerTest
     authorReferencingContent(insideReferrer, "[[/Moved/Target]]");
     Note outsideReferrer = makeMe.aNote("Outside").notebook(nb).please();
     authorReferencingContent(outsideReferrer, "[[/Moved/Target]]");
-    resolvedWikiLinkServiceBean.refreshForNote(insideReferrer, owner);
-    resolvedWikiLinkServiceBean.refreshForNote(outsideReferrer, owner);
 
     controller.moveFolder(nb, movedFolder, folderMove(newHome.getId()));
 

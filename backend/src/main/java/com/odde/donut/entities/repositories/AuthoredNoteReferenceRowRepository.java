@@ -23,8 +23,7 @@ interface AuthoredNoteReferenceRowRepository
    * currently resolve to it (the deleted/unreadable/retargeted target still authors a candidate
    * row) — resolution is verified again by {@link
    * com.odde.donut.services.WikiLinkResolver#resolveReference}. Ordered by referrer note id then
-   * document order, the same deterministic order {@code ResolvedWikiLinkService}'s inbound methods
-   * guarantee.
+   * document order, the same deterministic order inbound note-reference queries guarantee.
    */
   @Query(
       "SELECT r FROM AuthoredNoteReferenceRow r JOIN FETCH r.note n "

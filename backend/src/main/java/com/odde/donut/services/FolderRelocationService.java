@@ -40,8 +40,7 @@ public class FolderRelocationService {
       EntityPersister entityPersister,
       TestabilitySettings testabilitySettings,
       NoteTitlePlacementRules noteTitlePlacementRules,
-      WikiLinkRewriteService wikiLinkRewriteService,
-      ResolvedWikiLinkService resolvedWikiLinkService) {
+      WikiLinkRewriteService wikiLinkRewriteService) {
     this.folderRepository = folderRepository;
     this.noteRepository = noteRepository;
     this.folderSiblingNameValidation = folderSiblingNameValidation;
@@ -59,7 +58,6 @@ public class FolderRelocationService {
             entityPersister,
             testabilitySettings,
             wikiLinkRewriteService,
-            resolvedWikiLinkService,
             subtree);
   }
 

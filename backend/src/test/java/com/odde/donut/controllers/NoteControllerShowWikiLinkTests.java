@@ -9,8 +9,8 @@ import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.User;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.donut.services.ResolvedWikiLinkService;
 import com.odde.donut.services.httpQuery.HttpClientAdapter;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +18,6 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 class NoteControllerShowWikiLinkTests extends ControllerTestBase {
   @Autowired NoteController controller;
-  @Autowired ResolvedWikiLinkService resolvedWikiLinkService;
   @MockitoBean HttpClientAdapter httpClientAdapter;
 
   @BeforeEach
@@ -27,7 +26,6 @@ class NoteControllerShowWikiLinkTests extends ControllerTestBase {
   }
 
   private NoteRealm showWithWikiTitles(Note viewer) throws UnexpectedNoAccessRightException {
-    resolvedWikiLinkService.refreshForNote(viewer, currentUser.getUser());
     return controller.showNote(viewer);
   }
 
@@ -141,7 +139,6 @@ class NoteControllerShowWikiLinkTests extends ControllerTestBase {
       throws UnexpectedNoAccessRightException {
     Note viewer =
         makeMe.aNote().notebookOwnedBy(currentUser.getUser()).content("See [[Future]].").please();
-    resolvedWikiLinkService.refreshForNote(viewer, currentUser.getUser());
     NoteRealm before = controller.showNote(viewer);
     assertThat(before.getWikiLinks(), hasSize(0));
 
@@ -173,5 +170,32 @@ class NoteControllerShowWikiLinkTests extends ControllerTestBase {
     assertThat(
         showWithWikiTitles(viewer).getWikiLinks().get(0).getDestinationNoteId(),
         equalTo(fromFm.getId()));
+  }
+
+  @Test
+  void shouldKeepSeparateWikiLinksForMultipleDisplayLabelsToSameTarget()
+      throws UnexpectedNoAccessRightException {
+    Note shared = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).title("Same").please();
+    Note viewer =
+        makeMe
+            .aNote()
+            .underSameNotebookAs(shared)
+            .content("[[Same|first label]] and [[Same|second label]]")
+            .please();
+
+    List<WikiLink> wikiLinks = showWithWikiTitles(viewer).getWikiLinks();
+    assertThat(wikiLinks, hasSize(2));
+    assertThat(wikiLinks.get(0).getDisplayText(), equalTo("first label"));
+    assertThat(wikiLinks.get(1).getDisplayText(), equalTo("second label"));
+  }
+
+  @Test
+  void shouldOmitFileLookingMarkdownHrefFromWikiLinks() throws UnexpectedNoAccessRightException {
+    var folder = makeMe.aFolder().notebookOwnedBy(currentUser.getUser()).name("Folder").please();
+    makeMe.aNote().title("Title").folder(folder).please();
+    Note viewer =
+        makeMe.aNote().notebook(folder.getNotebook()).content("[label](/Folder/Title.md)").please();
+
+    assertThat(showWithWikiTitles(viewer).getWikiLinks(), empty());
   }
 }

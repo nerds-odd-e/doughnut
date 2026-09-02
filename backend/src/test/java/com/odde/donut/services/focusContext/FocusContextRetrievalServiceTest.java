@@ -68,7 +68,6 @@ class FocusContextRetrievalServiceTest extends FocusContextRetrievalTestBase {
           .title("Linked")
           .content("Linked content")
           .please();
-      refreshWikiCache(focusNote, viewer);
     }
 
     @Test

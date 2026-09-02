@@ -9,7 +9,6 @@ import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.User;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.donut.services.ResolvedWikiLinkService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -17,7 +16,6 @@ class NotebookFolderCrossNotebookMoveShorthandCardinalityControllerTest
     extends NotebookFolderManagementControllerTestBase {
 
   @Autowired NoteController noteController;
-  @Autowired ResolvedWikiLinkService resolvedWikiLinkService;
 
   @Test
   void crossNotebookFolderMove_reresolvesShorthandCardinalityInSourceAndDestination()
@@ -36,8 +34,6 @@ class NotebookFolderCrossNotebookMoveShorthandCardinalityControllerTest
     Note destReferrer =
         makeMe.aNote("DestReferrer").notebook(destination).content("See [[Target]].").please();
 
-    resolvedWikiLinkService.refreshForNote(sourceReferrer, owner);
-    resolvedWikiLinkService.refreshForNote(destReferrer, owner);
     assertThat(
         noteController.showNote(sourceReferrer).getWikiLinks().get(0).getResolution(),
         equalTo(WikiLink.Resolution.AMBIGUOUS));

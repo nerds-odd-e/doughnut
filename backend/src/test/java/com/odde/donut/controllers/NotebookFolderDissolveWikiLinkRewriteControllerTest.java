@@ -8,14 +8,10 @@ import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.User;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.donut.services.ResolvedWikiLinkService;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 
 class NotebookFolderDissolveWikiLinkRewriteControllerTest
     extends NotebookFolderManagementControllerTestBase {
-
-  @Autowired ResolvedWikiLinkService resolvedWikiLinkServiceBean;
 
   @Test
   void dissolvingFolder_rewritesInboundLinksToDescendantFromInsideAndOutside()
@@ -29,8 +25,6 @@ class NotebookFolderDissolveWikiLinkRewriteControllerTest
     authorReferencingContent(insideReferrer, "[[/Outer/Mid/Target]]");
     Note outsideReferrer = makeMe.aNote("Outside").notebook(nb).please();
     authorReferencingContent(outsideReferrer, "[[/Outer/Mid/Target]]");
-    resolvedWikiLinkServiceBean.refreshForNote(insideReferrer, owner);
-    resolvedWikiLinkServiceBean.refreshForNote(outsideReferrer, owner);
 
     controller.dissolveFolder(nb, mid, false);
 
@@ -52,7 +46,6 @@ class NotebookFolderDissolveWikiLinkRewriteControllerTest
     Note target = makeMe.aNote("Target").folder(midInner).please();
     Note outsideReferrer = makeMe.aNote("Outside").notebook(nb).please();
     authorReferencingContent(outsideReferrer, "[[/Outer/Mid/Inner/Target]]");
-    resolvedWikiLinkServiceBean.refreshForNote(outsideReferrer, owner);
 
     controller.dissolveFolder(nb, mid, true);
 

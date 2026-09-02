@@ -10,7 +10,6 @@ import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.User;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.donut.services.ResolvedWikiLinkService;
 import com.odde.donut.services.httpQuery.HttpClientAdapter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,7 +18,6 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 class NoteControllerShowWikiLinkAmbiguityTests extends ControllerTestBase {
   @Autowired NoteController controller;
-  @Autowired ResolvedWikiLinkService resolvedWikiLinkService;
   @MockitoBean HttpClientAdapter httpClientAdapter;
 
   @BeforeEach
@@ -28,7 +26,6 @@ class NoteControllerShowWikiLinkAmbiguityTests extends ControllerTestBase {
   }
 
   private NoteRealm showWithWikiTitles(Note viewer) throws UnexpectedNoAccessRightException {
-    resolvedWikiLinkService.refreshForNote(viewer, currentUser.getUser());
     return controller.showNote(viewer);
   }
 
@@ -94,12 +91,11 @@ class NoteControllerShowWikiLinkAmbiguityTests extends ControllerTestBase {
             .content("See [[Other Notebook:LinkedPage]] for more.")
             .please();
 
-    resolvedWikiLinkService.refreshForNote(viewer, currentUser.getUser());
-    WikiLink cachedResolved = controller.showNote(viewer).getWikiLinks().get(0);
-    assertThat(cachedResolved.getResolution(), equalTo(WikiLink.Resolution.RESOLVED));
-    assertThat(cachedResolved.getDestinationNoteId(), equalTo(targetInOther.getId()));
+    WikiLink beforeCollision = controller.showNote(viewer).getWikiLinks().get(0);
+    assertThat(beforeCollision.getResolution(), equalTo(WikiLink.Resolution.RESOLVED));
+    assertThat(beforeCollision.getDestinationNoteId(), equalTo(targetInOther.getId()));
 
-    // A colliding note is added after the row was cached, without a re-refresh.
+    // A colliding note is added without re-saving the referrer.
     Folder anotherFolder = makeMe.aFolder().notebook(otherNotebook).name("Another").please();
     makeMe.aNote().title("LinkedPage").folder(anotherFolder).please();
 
@@ -109,7 +105,7 @@ class NoteControllerShowWikiLinkAmbiguityTests extends ControllerTestBase {
   }
 
   @Test
-  void shouldReflectCurrentViewerCandidateSetRatherThanCachedRefresherViewer()
+  void shouldReflectCurrentViewerCandidateSetRatherThanStaleResolution()
       throws UnexpectedNoAccessRightException {
     Notebook otherNotebookA =
         makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).name("Other Notebook").please();
@@ -131,11 +127,10 @@ class NoteControllerShowWikiLinkAmbiguityTests extends ControllerTestBase {
         makeMe.aNotebook().creatorAndOwner(otherOwner).name("Other Notebook").please();
     makeMe.aNote().title("LinkedPage").notebook(otherNotebookB).please();
 
-    // Refresh runs while otherNotebookB is not yet readable: unique candidate is targetA.
-    resolvedWikiLinkService.refreshForNote(viewer, currentUser.getUser());
-    WikiLink cachedResolved = controller.showNote(viewer).getWikiLinks().get(0);
-    assertThat(cachedResolved.getResolution(), equalTo(WikiLink.Resolution.RESOLVED));
-    assertThat(cachedResolved.getDestinationNoteId(), equalTo(targetA.getId()));
+    // Before the second readable notebook exists, resolution is unique.
+    WikiLink beforeSecondNotebook = controller.showNote(viewer).getWikiLinks().get(0);
+    assertThat(beforeSecondNotebook.getResolution(), equalTo(WikiLink.Resolution.RESOLVED));
+    assertThat(beforeSecondNotebook.getDestinationNoteId(), equalTo(targetA.getId()));
 
     // otherNotebookB becomes readable, and a different viewer (a wider readable candidate set)
     // opens the note.

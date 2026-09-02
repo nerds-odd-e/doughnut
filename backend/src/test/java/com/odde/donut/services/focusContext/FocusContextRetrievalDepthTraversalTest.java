@@ -33,8 +33,6 @@ class FocusContextRetrievalDepthTraversalTest extends FocusContextRetrievalTestB
         .title("LeafDepth2")
         .content("Only at depth 2")
         .please();
-    refreshWikiCache(focus, viewer);
-    refreshWikiCache(mid, viewer);
 
     FocusContextResult result = service.retrieve(focus, viewer, RetrievalConfig.defaultMaxDepth());
 
@@ -64,8 +62,6 @@ class FocusContextRetrievalDepthTraversalTest extends FocusContextRetrievalTestB
             .content("[[LeafShallow]].")
             .please();
     makeMe.aNote().underSameNotebookAs(focus).title("LeafShallow").content("deep").please();
-    refreshWikiCache(focus, viewer);
-    refreshWikiCache(mid, viewer);
 
     FocusContextResult result =
         service.retrieve(
@@ -82,8 +78,6 @@ class FocusContextRetrievalDepthTraversalTest extends FocusContextRetrievalTestB
         makeMe.aNote().notebookOwnedBy(viewer).title("CycleA").content("To [[CycleB]].").please();
     Note b =
         makeMe.aNote().underSameNotebookAs(a).title("CycleB").content("Back [[CycleA]].").please();
-    refreshWikiCache(a, viewer);
-    refreshWikiCache(b, viewer);
 
     FocusContextResult result = service.retrieve(a, viewer, RetrievalConfig.defaultMaxDepth());
 
@@ -109,8 +103,6 @@ class FocusContextRetrievalDepthTraversalTest extends FocusContextRetrievalTestB
             .title("ViaBridge")
             .content("[[DirectShort]]")
             .please();
-    refreshWikiCache(focus, viewer);
-    refreshWikiCache(bridge, viewer);
 
     FocusContextResult result = service.retrieve(focus, viewer, RetrievalConfig.defaultMaxDepth());
 
@@ -166,8 +158,6 @@ class FocusContextRetrievalDepthTraversalTest extends FocusContextRetrievalTestB
         .title("LeafAfterBudget")
         .content("never reached")
         .please();
-    refreshWikiCache(focus, viewer);
-    refreshWikiCache(bridge, viewer);
 
     FocusContextResult result =
         service.retrieve(

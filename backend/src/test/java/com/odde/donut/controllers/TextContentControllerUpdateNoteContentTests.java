@@ -1,5 +1,6 @@
 package com.odde.donut.controllers;
 
+import static com.odde.donut.entities.repositories.AuthoredNoteReferenceRowTestSupport.rowsFor;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
@@ -9,10 +10,9 @@ import com.odde.donut.controllers.dto.NoteRealm;
 import com.odde.donut.controllers.dto.WikiLink;
 import com.odde.donut.entities.Image;
 import com.odde.donut.entities.Note;
-import com.odde.donut.entities.ResolvedWikiLink;
 import com.odde.donut.entities.repositories.ImageRepository;
-import com.odde.donut.entities.repositories.ResolvedWikiLinkRepository;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
+import jakarta.persistence.EntityManager;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 class TextContentControllerUpdateNoteContentTests extends TextContentControllerTestBase {
   private static final String ORDINARY_NOTE_FENCE = "---\ntype: Note\n---\n";
 
-  @Autowired ResolvedWikiLinkRepository resolvedWikiLinkRepository;
+  @Autowired EntityManager entityManager;
   @Autowired ImageRepository imageRepository;
 
   @Test
@@ -53,8 +53,7 @@ class TextContentControllerUpdateNoteContentTests extends TextContentControllerT
   }
 
   @Test
-  void refreshesResolvedWikiLinkWhenContentContainResolvedWikiLink()
-      throws UnexpectedNoAccessRightException {
+  void liveResolvesWikiLinkWhenContentChangesTarget() throws UnexpectedNoAccessRightException {
     Note onlyA = makeMe.aNote().title("OnlyA").notebookOwnedBy(currentUser.getUser()).please();
     Note onlyB = makeMe.aNote().title("OnlyB").underSameNotebookAs(onlyA).please();
     Note carrier = makeMe.aNote().underSameNotebookAs(onlyA).please();
@@ -69,16 +68,12 @@ class TextContentControllerUpdateNoteContentTests extends TextContentControllerT
     assertThat(wt.getDisplayText(), equalTo("OnlyB"));
     assertThat(wt.getDestinationNoteId(), equalTo(onlyB.getId()));
 
-    List<ResolvedWikiLink> rows =
-        resolvedWikiLinkRepository.findBySourceNote_IdOrderByIdAsc(carrier.getId());
-    assertThat(rows, hasSize(1));
-    assertThat(rows.getFirst().getAuthoredLink(), equalTo("OnlyB"));
-    assertThat(rows.getFirst().getDestinationNote().getId(), equalTo(onlyB.getId()));
+    assertThat(rowsFor(entityManager, carrier), hasSize(1));
+    assertThat(rowsFor(entityManager, carrier).getFirst().getAuthoredLink(), equalTo("OnlyB"));
   }
 
   @Test
-  void refreshesResolvedWikiLinkWhenContentHasResolvedWikiLinkWithDisplayText()
-      throws UnexpectedNoAccessRightException {
+  void liveResolvesWikiLinkWithDisplayText() throws UnexpectedNoAccessRightException {
     Note onlyA = makeMe.aNote().title("OnlyA").notebookOwnedBy(currentUser.getUser()).please();
     Note carrier = makeMe.aNote().underSameNotebookAs(onlyA).please();
 
@@ -91,7 +86,7 @@ class TextContentControllerUpdateNoteContentTests extends TextContentControllerT
   }
 
   @Test
-  void clearsResolvedWikiLinkWhenContentBecomeBlank() throws UnexpectedNoAccessRightException {
+  void clearsWikiLinksWhenContentBecomeBlank() throws UnexpectedNoAccessRightException {
     Note onlyA = makeMe.aNote().title("OnlyA").notebookOwnedBy(currentUser.getUser()).please();
     Note carrier = makeMe.aNote().underSameNotebookAs(onlyA).please();
 
@@ -100,8 +95,7 @@ class TextContentControllerUpdateNoteContentTests extends TextContentControllerT
     NoteRealm response = controller.updateNoteContent(carrier, contentDto(""));
 
     assertThat(response.getWikiLinks(), empty());
-    assertThat(
-        resolvedWikiLinkRepository.findBySourceNote_IdOrderByIdAsc(carrier.getId()), empty());
+    assertThat(rowsFor(entityManager, carrier), empty());
   }
 
   @Test
@@ -163,10 +157,10 @@ class TextContentControllerUpdateNoteContentTests extends TextContentControllerT
     assertThat(wt.getTarget(), equalTo("Moon#prop:a%20part%20of"));
     assertThat(wt.getDestinationNoteId(), equalTo(moon.getId()));
 
-    List<ResolvedWikiLink> rows =
-        resolvedWikiLinkRepository.findBySourceNote_IdOrderByIdAsc(carrier.getId());
-    assertThat(rows, hasSize(1));
-    assertThat(rows.getFirst().getAuthoredLink(), equalTo("Moon#prop:a%20part%20of"));
+    assertThat(rowsFor(entityManager, carrier), hasSize(1));
+    assertThat(
+        rowsFor(entityManager, carrier).getFirst().getAuthoredLink(),
+        equalTo("Moon#prop:a%20part%20of"));
   }
 
   @Test
@@ -213,9 +207,7 @@ class TextContentControllerUpdateNoteContentTests extends TextContentControllerT
         response.getWikiLinks().stream().map(WikiLink::getAuthoredLink).toList(),
         equalTo(List.of("Moon#prop:Name", "Moon#prop:name")));
     assertThat(
-        resolvedWikiLinkRepository.findBySourceNote_IdOrderByIdAsc(carrier.getId()).stream()
-            .map(ResolvedWikiLink::getAuthoredLink)
-            .toList(),
+        rowsFor(entityManager, carrier).stream().map(row -> row.getAuthoredLink()).toList(),
         equalTo(List.of("Moon#prop:Name", "Moon#prop:name")));
   }
 }

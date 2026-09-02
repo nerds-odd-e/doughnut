@@ -41,7 +41,7 @@ class NoteRealmServiceTest {
   }
 
   @Test
-  void wiki_titles_resolve_live_even_when_cache_not_refreshed() {
+  void wiki_links_resolve_from_authored_content() {
     Note target = makeMe.aNote().title("LinkedPage").notebook(notebook).please();
     Note carrier = makeMe.aNote().notebook(notebook).content("[[LinkedPage]]").please();
 

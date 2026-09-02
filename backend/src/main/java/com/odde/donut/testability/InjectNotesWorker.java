@@ -15,8 +15,8 @@ import com.odde.donut.entities.repositories.CircleRepository;
 import com.odde.donut.entities.repositories.FolderRepository;
 import com.odde.donut.entities.repositories.NotebookRepository;
 import com.odde.donut.factoryServices.EntityPersister;
+import com.odde.donut.services.NoteReferenceService;
 import com.odde.donut.services.NotebookService;
-import com.odde.donut.services.ResolvedWikiLinkService;
 import com.odde.donut.testability.model.NotesTestData;
 import com.odde.donut.testability.model.NotesTestData.NoteTestData;
 import java.sql.Timestamp;
@@ -40,7 +40,7 @@ class InjectNotesWorker {
   @Autowired TestabilitySettings testabilitySettings;
   @Autowired NotebookService notebookService;
   @Autowired FolderRepository folderRepository;
-  @Autowired ResolvedWikiLinkService resolvedWikiLinkService;
+  @Autowired NoteReferenceService noteReferenceService;
   @Autowired CanonicalDonutOrigin canonicalDonutOrigin;
 
   Map<String, Integer> inject(NotesTestData notesTestData, User user) {
@@ -67,7 +67,7 @@ class InjectNotesWorker {
           AuthoredNoteReferences.uniquePreserveOrder(
               AuthoredNoteReferences.inOccurrenceOrder(note.getContent(), canonicalDonutOrigin));
       note.replaceContent(new AuthoredNoteDocument(note.getContent(), references));
-      resolvedWikiLinkService.refreshForNote(note, user);
+      noteReferenceService.refreshDerivedIndexesForNote(note);
     }
     return titleNoteMap.values().stream()
         .collect(Collectors.toMap(note -> note.getTitle(), Note::getId));

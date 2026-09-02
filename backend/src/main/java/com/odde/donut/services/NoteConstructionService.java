@@ -35,7 +35,7 @@ public class NoteConstructionService {
   private final FolderRepository folderRepository;
   private final EntityPersister entityPersister;
   private final NoteRealmService noteRealmService;
-  private final ResolvedWikiLinkService resolvedWikiLinkService;
+  private final NoteReferenceService noteReferenceService;
   private final NoteService noteService;
   private final NoteTitlePlacementRules noteTitlePlacementRules;
   private final CanonicalDonutOrigin canonicalDonutOrigin;
@@ -47,7 +47,7 @@ public class NoteConstructionService {
       FolderRepository folderRepository,
       EntityPersister entityPersister,
       NoteRealmService noteRealmService,
-      ResolvedWikiLinkService resolvedWikiLinkService,
+      NoteReferenceService noteReferenceService,
       NoteService noteService,
       NoteTitlePlacementRules noteTitlePlacementRules,
       CanonicalDonutOrigin canonicalDonutOrigin) {
@@ -56,7 +56,7 @@ public class NoteConstructionService {
     this.folderRepository = folderRepository;
     this.entityPersister = entityPersister;
     this.noteRealmService = noteRealmService;
-    this.resolvedWikiLinkService = resolvedWikiLinkService;
+    this.noteReferenceService = noteReferenceService;
     this.noteService = noteService;
     this.noteTitlePlacementRules = noteTitlePlacementRules;
     this.canonicalDonutOrigin = canonicalDonutOrigin;
@@ -129,7 +129,7 @@ public class NoteConstructionService {
     }
     note = attachWikidataAndRefresh(note, wikidataIdWithApi);
     noteService.deleteOrphanImagesForPersistedContent(note);
-    resolvedWikiLinkService.refreshForNote(note, user);
+    noteReferenceService.refreshDerivedIndexesForNote(note);
     return noteRealmService.build(note, user);
   }
 
@@ -157,8 +157,8 @@ public class NoteConstructionService {
 
     noteService.deleteOrphanImagesForPersistedContent(newNote);
     noteService.deleteOrphanImagesForPersistedContent(originalNote);
-    resolvedWikiLinkService.refreshForNote(newNote, user);
-    resolvedWikiLinkService.refreshForNote(originalNote, user);
+    noteReferenceService.refreshDerivedIndexesForNote(newNote);
+    noteReferenceService.refreshDerivedIndexesForNote(originalNote);
 
     return noteRealmService.build(newNote, user);
   }

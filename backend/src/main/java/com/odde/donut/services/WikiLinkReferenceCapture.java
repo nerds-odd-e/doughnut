@@ -22,13 +22,12 @@ class WikiLinkReferenceCapture {
   @PersistenceContext private EntityManager entityManager;
 
   private final WikiLinkResolver wikiLinkResolver;
-  private final AuthoredNoteReferenceInboundFacade authoredNoteReferenceInboundFacade;
+  private final NoteReferenceService noteReferenceService;
 
   WikiLinkReferenceCapture(
-      WikiLinkResolver wikiLinkResolver,
-      AuthoredNoteReferenceInboundFacade authoredNoteReferenceInboundFacade) {
+      WikiLinkResolver wikiLinkResolver, NoteReferenceService noteReferenceService) {
     this.wikiLinkResolver = wikiLinkResolver;
-    this.authoredNoteReferenceInboundFacade = authoredNoteReferenceInboundFacade;
+    this.noteReferenceService = noteReferenceService;
   }
 
   /**
@@ -38,7 +37,7 @@ class WikiLinkReferenceCapture {
   Map<Integer, List<String>> liveResolvedInboundReferences(Note targetNote, User viewer) {
     Map<Integer, List<String>> byReferrerId = new LinkedHashMap<>();
     for (AuthoredNoteReferenceInboundFacade.InboundReference inboundReference :
-        authoredNoteReferenceInboundFacade.distinctInboundReferencesForViewer(targetNote, viewer)) {
+        noteReferenceService.distinctInboundReferencesForViewer(targetNote, viewer)) {
       byReferrerId.put(inboundReference.referrer().getId(), inboundReference.authoredLinkTexts());
     }
     return byReferrerId;

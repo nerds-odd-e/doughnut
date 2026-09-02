@@ -24,7 +24,6 @@ final class FolderMoveRelocation {
   private final EntityPersister entityPersister;
   private final TestabilitySettings testabilitySettings;
   private final WikiLinkRewriteService wikiLinkRewriteService;
-  private final ResolvedWikiLinkService resolvedWikiLinkService;
   private final FolderSubtree subtree;
 
   FolderMoveRelocation(
@@ -33,14 +32,12 @@ final class FolderMoveRelocation {
       EntityPersister entityPersister,
       TestabilitySettings testabilitySettings,
       WikiLinkRewriteService wikiLinkRewriteService,
-      ResolvedWikiLinkService resolvedWikiLinkService,
       FolderSubtree subtree) {
     this.folderRepository = folderRepository;
     this.folderSiblingNameValidation = folderSiblingNameValidation;
     this.entityPersister = entityPersister;
     this.testabilitySettings = testabilitySettings;
     this.wikiLinkRewriteService = wikiLinkRewriteService;
-    this.resolvedWikiLinkService = resolvedWikiLinkService;
     this.subtree = subtree;
   }
 
@@ -159,8 +156,6 @@ final class FolderMoveRelocation {
         movedNoteIds, destinationNotebook.getName(), now, viewer, inboundReferencesByNoteId);
     wikiLinkRewriteService.rewriteOutgoingWikiLinksForFolderNotebookMove(
         movedNoteIds, sourceNotebook.getName(), now, viewer, coMovedTargetsByAuthoredLinkByNoteId);
-    resolvedWikiLinkService.refreshCardinalityAcrossMovedNotebooks(
-        sourceNotebook, destinationNotebook, viewer);
   }
 
   private Folder resolveNewParentFolder(FolderMoveRequest request) {

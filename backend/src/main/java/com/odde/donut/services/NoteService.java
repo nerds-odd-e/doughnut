@@ -8,7 +8,6 @@ import com.odde.donut.entities.Image;
 import com.odde.donut.entities.MemoryTracker;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.User;
-import com.odde.donut.entities.repositories.AuthoredNoteReferenceInboundFacade;
 import com.odde.donut.entities.repositories.ImageRepository;
 import com.odde.donut.entities.repositories.MemoryTrackerRepository;
 import com.odde.donut.entities.repositories.NoteRepository;
@@ -31,33 +30,31 @@ public class NoteService {
   private final EntityPersister entityPersister;
   private final TestabilitySettings testabilitySettings;
   private final NoteReferenceHandling noteReferenceHandling;
-  private final ResolvedWikiLinkService resolvedWikiLinkService;
+  private final NoteReferenceService noteReferenceService;
 
   public NoteService(
       NoteRepository noteRepository,
       MemoryTrackerRepository memoryTrackerRepository,
-      ResolvedWikiLinkService resolvedWikiLinkService,
+      NoteReferenceService noteReferenceService,
       WikiLinkResolver wikiLinkResolver,
       AuthorizationService authorizationService,
       ImageRepository imageRepository,
       EntityPersister entityPersister,
-      TestabilitySettings testabilitySettings,
-      AuthoredNoteReferenceInboundFacade authoredNoteReferenceInboundFacade) {
+      TestabilitySettings testabilitySettings) {
     this.noteRepository = noteRepository;
     this.memoryTrackerRepository = memoryTrackerRepository;
     this.imageRepository = imageRepository;
     this.entityPersister = entityPersister;
     this.testabilitySettings = testabilitySettings;
-    this.resolvedWikiLinkService = resolvedWikiLinkService;
+    this.noteReferenceService = noteReferenceService;
     this.noteReferenceHandling =
         new NoteReferenceHandling(
             memoryTrackerRepository,
-            resolvedWikiLinkService,
+            noteReferenceService,
             wikiLinkResolver,
             authorizationService,
             entityPersister,
-            this::deleteOrphanImagesForPersistedContent,
-            authoredNoteReferenceInboundFacade);
+            this::deleteOrphanImagesForPersistedContent);
   }
 
   public List<Note> findRecentNotesByUser(Integer userId) {

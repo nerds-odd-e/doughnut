@@ -63,7 +63,7 @@ public class WikiLinkResolver {
    * The one domain-stable resolution entry point for an {@link AuthoredNoteReference}: resolves
    * either a wiki Portable-path target (reusing {@link #classifyToken}) or a note-ID URL target
    * (looked up by ID, excluding soft-deleted notes, with the same viewer-readability check applied
-   * to note-ID URL targets elsewhere, e.g. {@code ResolvedWikiLinkService}) against {@code
+   * to note-ID URL targets elsewhere, e.g. {@code NoteReferenceService}) against {@code
    * sourceNote}'s scope and {@code viewer}'s current readability.
    */
   public NoteReferenceResolution resolveReference(

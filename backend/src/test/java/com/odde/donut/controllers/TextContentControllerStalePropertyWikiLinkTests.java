@@ -8,17 +8,13 @@ import static org.hamcrest.Matchers.hasSize;
 import com.odde.donut.algorithms.Frontmatter;
 import com.odde.donut.controllers.dto.NoteRealm;
 import com.odde.donut.entities.Note;
-import com.odde.donut.entities.ResolvedWikiLink;
-import com.odde.donut.entities.repositories.ResolvedWikiLinkRepository;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
-import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 class TextContentControllerStalePropertyWikiLinkTests extends TextContentControllerTestBase {
 
   @Autowired NoteController noteController;
-  @Autowired ResolvedWikiLinkRepository resolvedWikiLinkRepository;
 
   @Test
   void removingTargetPropertyLeavesReferringPropertyWikiUnresolved()
@@ -41,12 +37,10 @@ class TextContentControllerStalePropertyWikiLinkTests extends TextContentControl
         moon,
         contentDto(
             Frontmatter.empty().set("a part of", "v").fenced("[[Moon#prop:a%20part%20of]]")));
-    assertThat(cacheRows(moon), hasSize(1));
 
     controller.updateNoteContent(moon, contentDto("[[Moon#prop:a%20part%20of]]"));
 
     assertThat(noteController.showNote(moon).getWikiLinks(), empty());
-    assertThat(cacheRows(moon), empty());
   }
 
   @Test
@@ -60,9 +54,6 @@ class TextContentControllerStalePropertyWikiLinkTests extends TextContentControl
     NoteRealm shown = noteController.showNote(carrier);
     assertThat(shown.getWikiLinks(), hasSize(1));
     assertThat(shown.getWikiLinks().getFirst().getAuthoredLink(), equalTo("Moon"));
-    List<ResolvedWikiLink> rows = cacheRows(carrier);
-    assertThat(rows, hasSize(1));
-    assertThat(rows.getFirst().getAuthoredLink(), equalTo("Moon"));
   }
 
   private void assertReferringPropertyWikiUnresolvedAfterMoonContent(String moonContent)
@@ -70,15 +61,9 @@ class TextContentControllerStalePropertyWikiLinkTests extends TextContentControl
     Note moon = noteWithExactProperty("Moon", "a part of");
     Note carrier = makeMe.aNote().underSameNotebookAs(moon).please();
     controller.updateNoteContent(carrier, contentDto("[[Moon#prop:a%20part%20of]]"));
-    assertThat(cacheRows(carrier), hasSize(1));
 
     controller.updateNoteContent(moon, contentDto(moonContent));
 
     assertThat(noteController.showNote(carrier).getWikiLinks(), empty());
-    assertThat(cacheRows(carrier), empty());
-  }
-
-  private List<ResolvedWikiLink> cacheRows(Note carrier) {
-    return resolvedWikiLinkRepository.findBySourceNote_IdOrderByIdAsc(carrier.getId());
   }
 }

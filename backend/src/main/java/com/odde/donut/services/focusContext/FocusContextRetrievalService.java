@@ -6,8 +6,8 @@ import com.odde.donut.entities.User;
 import com.odde.donut.entities.repositories.NoteRepository;
 import com.odde.donut.services.ApproximateUtf8TokenBudget;
 import com.odde.donut.services.AuthorizationService;
+import com.odde.donut.services.NoteReferenceService;
 import com.odde.donut.services.NoteService;
-import com.odde.donut.services.ResolvedWikiLinkService;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -18,7 +18,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class FocusContextRetrievalService {
 
-  private final ResolvedWikiLinkService resolvedWikiLinkService;
+  private final NoteReferenceService noteReferenceService;
   private final NoteRepository noteRepository;
   private final AuthorizationService authorizationService;
   private final NoteService noteService;
@@ -27,15 +27,15 @@ public class FocusContextRetrievalService {
 
   @Autowired
   public FocusContextRetrievalService(
-      ResolvedWikiLinkService resolvedWikiLinkService,
+      NoteReferenceService noteReferenceService,
       NoteRepository noteRepository,
       AuthorizationService authorizationService,
       NoteService noteService) {
-    this.resolvedWikiLinkService = resolvedWikiLinkService;
+    this.noteReferenceService = noteReferenceService;
     this.noteRepository = noteRepository;
     this.authorizationService = authorizationService;
     this.noteService = noteService;
-    this.wikiBfsExpander = new FocusContextWikiBfsExpander(resolvedWikiLinkService, noteRepository);
+    this.wikiBfsExpander = new FocusContextWikiBfsExpander(noteReferenceService, noteRepository);
     this.folderPeerAppender = new FocusContextFolderPeerAppender(noteRepository, noteService);
   }
 
@@ -70,7 +70,7 @@ public class FocusContextRetrievalService {
     Integer focusId = hydrated.getId();
 
     List<String> outgoingLinkUris =
-        resolvedWikiLinkService.outgoingWikiLinkTargetNotesForViewer(hydrated, viewer).stream()
+        noteReferenceService.outgoingWikiLinkTargetNotesForViewer(hydrated, viewer).stream()
             .map(FocusContextWikiUri::of)
             .toList();
     Set<Integer> focusInboundExclude = new HashSet<>();
@@ -78,7 +78,7 @@ public class FocusContextRetrievalService {
       focusInboundExclude.add(focusId);
     }
     List<String> inboundRefUris =
-        resolvedWikiLinkService
+        noteReferenceService
             .sampledReferencesNotesForFocusContext(
                 hydrated,
                 viewer,

@@ -19,7 +19,6 @@ class NoteRealmJsonSerializationTest {
 
   @Autowired com.odde.donut.testability.MakeMe makeMe;
   @Autowired NoteRealmService noteRealmService;
-  @Autowired ResolvedWikiLinkService resolvedWikiLinkService;
   @Autowired EntityManager entityManager;
 
   @Test
@@ -37,7 +36,7 @@ class NoteRealmJsonSerializationTest {
   }
 
   @Test
-  void serializes_realm_with_wiki_cache_references() throws Exception {
+  void serializes_realm_with_live_note_references() throws Exception {
     User user = makeMe.aUser().please();
     Note focal = makeMe.aNote().title("Focal").notebookOwnedBy(user).please();
     Note subject = makeMe.aNote().title("Subject").underSameNotebookAs(focal).please();
@@ -47,7 +46,6 @@ class NoteRealmJsonSerializationTest {
             .underSameNotebookAs(focal)
             .withWikiLinksInFrontmatter(subject, focal)
             .please();
-    resolvedWikiLinkService.refreshForNote(relation, user);
 
     NoteRealm realm = noteRealmService.build(subject, user);
 

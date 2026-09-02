@@ -134,8 +134,6 @@ class FocusContextRetrievalFolderPeerTest extends FocusContextRetrievalTestBase 
         .title("OtherFolderPeer")
         .content("from same folder as link target")
         .please();
-    refreshWikiCache(focus, viewer);
-    refreshWikiCache(linkT, viewer);
 
     FocusContextResult result =
         service.retrieve(focus, viewer, RetrievalConfig.forQuestionGeneration(null));
@@ -157,9 +155,6 @@ class FocusContextRetrievalFolderPeerTest extends FocusContextRetrievalTestBase 
         makeMe.aNote().folder(folderB).title("SideSib").content("[[DeepOnly]].").please();
     Folder folderDeep = makeMe.aFolder().notebook(nb).please();
     makeMe.aNote().folder(folderDeep).title("DeepOnly").content("deep body").please();
-    refreshWikiCache(focus, viewer);
-    refreshWikiCache(mid, viewer);
-    refreshWikiCache(sideSib, viewer);
 
     FocusContextResult result = service.retrieve(focus, viewer, RetrievalConfig.defaultMaxDepth());
 

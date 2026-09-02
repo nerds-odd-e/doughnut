@@ -25,7 +25,7 @@ public class WikiLinkRewriteService {
   @PersistenceContext private EntityManager entityManager;
 
   private final EntityPersister entityPersister;
-  private final ResolvedWikiLinkService resolvedWikiLinkService;
+  private final NoteReferenceService noteReferenceService;
   private final PortablePathAuthoring portablePathAuthoring;
   private final WikiLinkResolver wikiLinkResolver;
   private final WikiLinkReferenceCapture wikiLinkReferenceCapture;
@@ -33,13 +33,13 @@ public class WikiLinkRewriteService {
 
   public WikiLinkRewriteService(
       EntityPersister entityPersister,
-      ResolvedWikiLinkService resolvedWikiLinkService,
+      NoteReferenceService noteReferenceService,
       PortablePathAuthoring portablePathAuthoring,
       WikiLinkResolver wikiLinkResolver,
       WikiLinkReferenceCapture wikiLinkReferenceCapture,
       WikiLinkRelocationRewrite wikiLinkRelocationRewrite) {
     this.entityPersister = entityPersister;
-    this.resolvedWikiLinkService = resolvedWikiLinkService;
+    this.noteReferenceService = noteReferenceService;
     this.portablePathAuthoring = portablePathAuthoring;
     this.wikiLinkResolver = wikiLinkResolver;
     this.wikiLinkReferenceCapture = wikiLinkReferenceCapture;
@@ -62,7 +62,7 @@ public class WikiLinkRewriteService {
     TitleRenameWikiLinkRewrite.rewrite(
         entityManager,
         entityPersister,
-        resolvedWikiLinkService,
+        noteReferenceService,
         wikiLinkResolver.canonicalDonutOrigin(),
         targetNote,
         newTitle,

@@ -9,7 +9,6 @@ import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.services.AuthorizationService;
 import com.odde.donut.services.NoteMotionService;
 import com.odde.donut.services.NoteRealmService;
-import com.odde.donut.services.ResolvedWikiLinkService;
 import com.odde.donut.services.WikiLinkRewriteService;
 import com.odde.donut.testability.TestabilitySettings;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -30,7 +29,6 @@ class RelationController {
   private final AuthorizationService authorizationService;
   private final NoteRealmService noteRealmService;
   private final WikiLinkRewriteService wikiLinkRewriteService;
-  private final ResolvedWikiLinkService resolvedWikiLinkService;
   private final TestabilitySettings testabilitySettings;
 
   public RelationController(
@@ -38,13 +36,11 @@ class RelationController {
       AuthorizationService authorizationService,
       NoteRealmService noteRealmService,
       WikiLinkRewriteService wikiLinkRewriteService,
-      ResolvedWikiLinkService resolvedWikiLinkService,
       TestabilitySettings testabilitySettings) {
     this.noteMotionService = noteMotionService;
     this.authorizationService = authorizationService;
     this.noteRealmService = noteRealmService;
     this.wikiLinkRewriteService = wikiLinkRewriteService;
-    this.resolvedWikiLinkService = resolvedWikiLinkService;
     this.testabilitySettings = testabilitySettings;
   }
 
@@ -112,8 +108,6 @@ class RelationController {
     } else {
       wikiLinkRewriteService.rewriteWikiLinksForCrossNotebookMove(
           movedNote, oldNotebook, targetNotebook, now, user, inboundReferences);
-      resolvedWikiLinkService.refreshCardinalityAcrossMovedNotebooks(
-          oldNotebook, targetNotebook, user);
     }
   }
 }
