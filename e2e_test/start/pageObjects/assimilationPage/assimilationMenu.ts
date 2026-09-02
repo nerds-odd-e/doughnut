@@ -21,7 +21,9 @@ export const assimilation = () => {
   return {
     expectCount(numberOfNotes: number) {
       getAssimilateListItemInSidebar(($el) => {
-        $el.findByText(`${numberOfNotes}`, { selector: '.due-count' })
+        $el.findByText((content) => content.startsWith(`${numberOfNotes}/`), {
+          selector: '.due-count',
+        })
       })
       return this
     },
