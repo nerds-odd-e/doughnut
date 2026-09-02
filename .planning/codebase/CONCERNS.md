@@ -43,11 +43,11 @@
 - Impact: Merge conflicts, unclear ownership, slow discovery of the right helper.
 - Fix approach: Continue splitting by feature (search/link-target step modules already split); keep page objects feature-scoped.
 
-**Derived index coherence (resolved wiki-link / property / alias):**
-- Issue: Note content properties live as YAML frontmatter; discoverability depends on derived tables refreshed via `ResolvedWikiLinkService.refreshForNote` and related backfills. Missed refresh sites recreate assimilation/search bugs.
-- Files: `backend/src/main/java/com/odde/donut/services/ResolvedWikiLinkService.java` (and call sites in `NoteService`, `NoteConstructionService`, `TextContentController`, wiki-link rewrite), `backend/src/main/java/com/odde/donut/services/NotePropertyIndex*.java`
-- Impact: Stale assimilation queues, wrong wiki resolution, skipped property trackers after content edits if a write path skips refresh.
-- Fix approach: Keep one refresh boundary for content saves; when adding a write path, always call the same refresh seam; prefer a controller-level unit test that asserts index rows after content PATCH ("small test" style: `unit-testing.mdc`).
+**Derived index coherence (property / alias / level indexes):**
+- Issue: Wiki-link resolution is always live (no persisted resolved-link cache), but note content properties still live as YAML frontmatter, so discoverability depends on derived tables (`note_property_index` and related alias/level indexes) refreshed via `NoteReferenceService.refreshDerivedIndexesForNote`, called after every content mutation goes through `Note.replaceContent`. Missed refresh sites recreate assimilation/search bugs.
+- Files: `backend/src/main/java/com/odde/donut/entities/Note.java` (`replaceContent`), `backend/src/main/java/com/odde/donut/services/NoteReferenceService.java` (`refreshDerivedIndexesForNote`, and call sites in `NoteConstructionService`, `TextContentController`, `WikiLinkRewriteSupport`, `NoteReferenceHandling`), `backend/src/main/java/com/odde/donut/services/NotePropertyIndex*.java`
+- Impact: Stale assimilation queues, skipped property trackers after content edits if a write path calls `Note.replaceContent` without following with `refreshDerivedIndexesForNote`.
+- Fix approach: Keep one refresh boundary for content saves; when adding a write path, always pair `Note.replaceContent` with the same `refreshDerivedIndexesForNote` call; prefer a controller-level unit test that asserts index rows after content PATCH ("small test" style: `unit-testing.mdc`).
 
 ## Known Bugs
 

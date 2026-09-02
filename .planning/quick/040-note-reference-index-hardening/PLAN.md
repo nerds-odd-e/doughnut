@@ -99,12 +99,12 @@ Focused tests green; full backend suite not re-run (not required by wrap-up).
 ### 10. Planning and codebase map reflect the shipped design
 
 - **Type:** Structure
-- **Status:** planned
+- **Status:** done
 
-- `.planning/STATE.md`: keep 040 as the active plan; fix the Flyway tip (`V300000316`, not `V300000300`); remove remaining links to the deleted `notes/notebook-scope-wiki-refresh-on-title-and-create.md`; remove the dangling `quick/037-openai-transaction-boundary-followup` pointer or recreate that plan; reconcile 038 (its own PLAN says done, STATE still lists it as planned).
-- `.planning/quick/038-.../PLAN.md`: drop the dead diagnosis link; point the deploy check at the live-resolution design instead.
-- `.planning/codebase/CONCERNS.md`: rewrite the derived-index-coherence concern around `Note.replaceContent` and `NoteReferenceService.refreshDerivedIndexesForNote`; delete the `ResolvedWikiLinkService` paths.
-- Leave 039's PLAN as the short complete outcome it already is. Do not prune this plan yet — slice 11 is still ahead.
+- `.planning/STATE.md`: Flyway tip fixed to `V300000316`; dead links to the deleted `notes/notebook-scope-wiki-refresh-on-title-and-create.md` removed; dangling `quick/037-openai-transaction-boundary-followup` pointer removed (no plan file existed to recreate from); 038 reconciled to done; 040 references updated from "planned" to "in progress".
+- `.planning/quick/038-.../PLAN.md`: dead diagnosis link dropped; deploy check now points at the live-resolution design (039's PLAN).
+- `.planning/codebase/CONCERNS.md`: derived-index-coherence concern rewritten around `Note.replaceContent` and `NoteReferenceService.refreshDerivedIndexesForNote`; `ResolvedWikiLinkService` paths removed.
+- 039's PLAN left untouched. This plan (040) not pruned yet — slice 11 is still ahead, gated on developer confirmation.
 
 ### STOP — confirm the one-time backfill finished
 
