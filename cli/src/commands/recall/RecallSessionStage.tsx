@@ -17,7 +17,7 @@ import { RECALL_SESSION_STOPPED_LINE } from './leaveRecallSessionCopy.js'
 import { RECALL_LOADING_NEXT_QUESTION_LABEL } from './recallBusyInputCopy.js'
 import { recallSessionSummaryLine } from './recallSessionSummary.js'
 import { recallAnsweredScrollbackItem } from './recallAnsweredScrollback.js'
-import type { RecallQuestionAnswerOutcome } from './recallQuestionAnswerOutcome.js'
+import type { RecallPromptAnswerOutcome } from './recallPromptAnswerOutcome.js'
 import { useSessionScrollbackAppend } from '../../sessionScrollback/sessionScrollbackAppendContext.js'
 
 const RECALL_NOTEBOOK_LINE_EMOJI = '📓'
@@ -180,7 +180,7 @@ export function RecallSessionStage({
   }, [onSettled])
 
   const onRecallQuestionAnswered = useCallback(
-    (outcome: RecallQuestionAnswerOutcome) => {
+    (outcome: RecallPromptAnswerOutcome) => {
       sessionAnsweredCardsRef.current += 1
 
       for (const row of outcome.answeredRows) {

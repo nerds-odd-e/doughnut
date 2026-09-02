@@ -22,7 +22,7 @@ import { LeaveRecallConfirmPrompt } from './LeaveRecallConfirmPrompt.js'
 import { RECALL_BUSY_SUBMIT_ANSWER_LABEL } from './recallBusyInputCopy.js'
 import { normalizeSpellingLineForSubmit } from './spellingAnswerLine.js'
 import type { SpellingRecallSessionPayload } from './nextRecallCardLoad.js'
-import type { RecallQuestionAnswerOutcome } from './recallQuestionAnswerOutcome.js'
+import type { RecallPromptAnswerOutcome } from './recallPromptAnswerOutcome.js'
 import {
   recallAnsweredSpellingInk,
   submitSpellingAnswer,
@@ -41,7 +41,7 @@ export function SpellingRecallStage({
   readonly payload: SpellingRecallSessionPayload
   readonly inputBlockedRef: MutableRefObject<boolean>
   readonly onRecallQuestionAnswered: (
-    outcome: RecallQuestionAnswerOutcome
+    outcome: RecallPromptAnswerOutcome
   ) => void | Promise<void>
   readonly onRecallFatalError: (message: string) => void
   readonly onConfirmLeaveRecall: () => void

@@ -28,7 +28,7 @@ import {
 import { numberedMcqMarkdownLinesForTerminal } from './numberedMcqMarkdownLines.js'
 import type { RecallCard, RecallMcqCardPayload } from './nextRecallCardLoad.js'
 import { recallAnsweredMarkdownToDisplayLines } from './recallAnsweredInkShared.js'
-import type { RecallQuestionAnswerOutcome } from './recallQuestionAnswerOutcome.js'
+import type { RecallPromptAnswerOutcome } from './recallPromptAnswerOutcome.js'
 import {
   recallAnsweredPlainInk,
   recallAnsweredScrollbackItem,
@@ -57,7 +57,7 @@ export function RecallMcqStage({
   readonly choicesGuidanceRowBudget: number
   readonly inputBlockedRef: MutableRefObject<boolean>
   readonly onRecallQuestionAnswered: (
-    outcome: RecallQuestionAnswerOutcome
+    outcome: RecallPromptAnswerOutcome
   ) => void | Promise<void>
   readonly onReplaceCurrentRecallCard: (card: RecallCard) => void
   readonly onRecallFatalError: (message: string) => void
