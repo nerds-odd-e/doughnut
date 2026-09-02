@@ -9,6 +9,7 @@ import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.services.AuthorizationService;
 import com.odde.donut.services.NoteMotionService;
 import com.odde.donut.services.NoteRealmService;
+import com.odde.donut.services.WikiLinkRelocationRewrite;
 import com.odde.donut.services.WikiLinkRewriteService;
 import com.odde.donut.testability.TestabilitySettings;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -29,6 +30,7 @@ class RelationController {
   private final AuthorizationService authorizationService;
   private final NoteRealmService noteRealmService;
   private final WikiLinkRewriteService wikiLinkRewriteService;
+  private final WikiLinkRelocationRewrite wikiLinkRelocationRewrite;
   private final TestabilitySettings testabilitySettings;
 
   public RelationController(
@@ -36,11 +38,13 @@ class RelationController {
       AuthorizationService authorizationService,
       NoteRealmService noteRealmService,
       WikiLinkRewriteService wikiLinkRewriteService,
+      WikiLinkRelocationRewrite wikiLinkRelocationRewrite,
       TestabilitySettings testabilitySettings) {
     this.noteMotionService = noteMotionService;
     this.authorizationService = authorizationService;
     this.noteRealmService = noteRealmService;
     this.wikiLinkRewriteService = wikiLinkRewriteService;
+    this.wikiLinkRelocationRewrite = wikiLinkRelocationRewrite;
     this.testabilitySettings = testabilitySettings;
   }
 
@@ -103,10 +107,10 @@ class RelationController {
       Map<Integer, List<String>> inboundReferences) {
     Timestamp now = testabilitySettings.getCurrentUTCTimestamp();
     if (Objects.equals(oldNotebook.getId(), targetNotebook.getId())) {
-      wikiLinkRewriteService.rewriteInboundWikiLinksForLocationChange(
+      wikiLinkRelocationRewrite.rewriteInboundWikiLinksForLocationChange(
           movedNote, now, inboundReferences);
     } else {
-      wikiLinkRewriteService.rewriteWikiLinksForCrossNotebookMove(
+      wikiLinkRelocationRewrite.rewriteWikiLinksForCrossNotebookMove(
           movedNote, oldNotebook, targetNotebook, now, user, inboundReferences);
     }
   }

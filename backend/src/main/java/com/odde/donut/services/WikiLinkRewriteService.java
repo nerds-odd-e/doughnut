@@ -2,7 +2,6 @@ package com.odde.donut.services;
 
 import com.odde.donut.controllers.dto.TitleRenameReferenceHandling;
 import com.odde.donut.entities.Note;
-import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.User;
 import com.odde.donut.factoryServices.EntityPersister;
 import jakarta.persistence.EntityManager;
@@ -16,9 +15,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Rewrites wiki Portable-path links when notes move or rename. Note-ID URL links are unchanged.
- * Public facade over {@link WikiLinkReferenceCapture} (pre-mutation capture) and {@link
- * WikiLinkRelocationRewrite} (relocation rewrite mechanics); title rename is orchestrated here
- * directly via {@link TitleRenameWikiLinkRewrite}.
+ * Title rename is orchestrated here directly via {@link TitleRenameWikiLinkRewrite}; it also
+ * exposes {@link WikiLinkReferenceCapture}'s pre-mutation capture. Relocation rewrite mechanics
+ * live on {@link WikiLinkRelocationRewrite}, called directly by relocation callers.
  */
 @Service
 public class WikiLinkRewriteService {
@@ -29,21 +28,18 @@ public class WikiLinkRewriteService {
   private final PortablePathAuthoring portablePathAuthoring;
   private final WikiLinkResolver wikiLinkResolver;
   private final WikiLinkReferenceCapture wikiLinkReferenceCapture;
-  private final WikiLinkRelocationRewrite wikiLinkRelocationRewrite;
 
   public WikiLinkRewriteService(
       EntityPersister entityPersister,
       NoteReferenceService noteReferenceService,
       PortablePathAuthoring portablePathAuthoring,
       WikiLinkResolver wikiLinkResolver,
-      WikiLinkReferenceCapture wikiLinkReferenceCapture,
-      WikiLinkRelocationRewrite wikiLinkRelocationRewrite) {
+      WikiLinkReferenceCapture wikiLinkReferenceCapture) {
     this.entityPersister = entityPersister;
     this.noteReferenceService = noteReferenceService;
     this.portablePathAuthoring = portablePathAuthoring;
     this.wikiLinkResolver = wikiLinkResolver;
     this.wikiLinkReferenceCapture = wikiLinkReferenceCapture;
-    this.wikiLinkRelocationRewrite = wikiLinkRelocationRewrite;
   }
 
   /** Persists the new title, then rewrites inbound wiki links and rebuilds referrer indexes. */
@@ -104,76 +100,5 @@ public class WikiLinkRewriteService {
       Set<Integer> movedNoteIds, User viewer) {
     return wikiLinkReferenceCapture.liveResolvedOutgoingWikiLinksToCoMovedNotes(
         movedNoteIds, viewer);
-  }
-
-  /**
-   * Cross-notebook note move: rewrite inbound and outgoing wiki links. No-op when notebooks match.
-   */
-  @Transactional
-  public void rewriteWikiLinksForCrossNotebookMove(
-      Note movedNote,
-      Notebook oldNotebook,
-      Notebook targetNotebook,
-      Timestamp updatedAt,
-      User viewer,
-      Map<Integer, List<String>> inboundReferences) {
-    wikiLinkRelocationRewrite.rewriteWikiLinksForCrossNotebookMove(
-        movedNote, oldNotebook, targetNotebook, updatedAt, viewer, inboundReferences);
-  }
-
-  /** Same-notebook location change: rewrite inbound exact folder/root wiki paths. */
-  @Transactional
-  public void rewriteInboundWikiLinksForLocationChange(
-      Note targetNote, Timestamp updatedAt, Map<Integer, List<String>> inboundReferences) {
-    wikiLinkRelocationRewrite.rewriteInboundWikiLinksForLocationChange(
-        targetNote, updatedAt, inboundReferences);
-  }
-
-  /**
-   * Same-notebook folder reparent: rewrite inbound exact wiki paths for every live note in the
-   * moved subtree, from referrers inside and outside the subtree.
-   */
-  @Transactional
-  public void rewriteInboundWikiLinksForFolderReparent(
-      Set<Integer> movedNoteIds,
-      Timestamp updatedAt,
-      Map<Integer, Map<Integer, List<String>>> inboundReferencesByNoteId) {
-    wikiLinkRelocationRewrite.rewriteInboundWikiLinksForFolderReparent(
-        movedNoteIds, updatedAt, inboundReferencesByNoteId);
-  }
-
-  /** Folder rename: update one matching folder-name segment in inbound path-shaped wiki links. */
-  @Transactional
-  public void rewriteInboundWikiLinksForFolderRename(
-      Set<Integer> noteIdsInSubtree,
-      String oldFolderName,
-      String newFolderName,
-      Timestamp updatedAt,
-      Map<Integer, Map<Integer, List<String>>> inboundReferencesByNoteId) {
-    wikiLinkRelocationRewrite.rewriteInboundWikiLinksForFolderRename(
-        noteIdsInSubtree, oldFolderName, newFolderName, updatedAt, inboundReferencesByNoteId);
-  }
-
-  /** Cross-notebook folder move: rewrite inbound links; skip referrers inside the moved set. */
-  @Transactional
-  public void rewriteInboundWikiLinksForFolderNotebookMove(
-      Set<Integer> movedNoteIds,
-      String newNotebookName,
-      Timestamp updatedAt,
-      Map<Integer, Map<Integer, List<String>>> inboundReferencesByNoteId) {
-    wikiLinkRelocationRewrite.rewriteInboundWikiLinksForFolderNotebookMove(
-        movedNoteIds, newNotebookName, updatedAt, inboundReferencesByNoteId);
-  }
-
-  /** Cross-notebook folder move: rewrite outgoing links for each note in the moved set. */
-  @Transactional
-  public void rewriteOutgoingWikiLinksForFolderNotebookMove(
-      Set<Integer> movedNoteIds,
-      String sourceNotebookName,
-      Timestamp updatedAt,
-      User viewer,
-      Map<Integer, Map<String, Note>> coMovedTargetsByAuthoredLinkByNoteId) {
-    wikiLinkRelocationRewrite.rewriteOutgoingWikiLinksForFolderNotebookMove(
-        movedNoteIds, sourceNotebookName, updatedAt, viewer, coMovedTargetsByAuthoredLinkByNoteId);
   }
 }

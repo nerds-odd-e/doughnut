@@ -8,7 +8,7 @@ status: ready
 stopped_at: null
 last_updated: "2026-09-02T03:31:00Z"
 last_activity: 2026-09-02
-last_activity_desc: "040: note-reference index hardening in progress; 039 complete"
+last_activity_desc: "040: note-reference index hardening complete; 039 complete"
 progress:
   total_phases: 0
   completed_phases: 0
@@ -31,15 +31,14 @@ Scheduling follows Accepted [ADR 0003](../docs/adrs/0003-spaced-repetition-sched
 
 **Flyway:** every applied migration is squashed into `V100000000__baseline.sql`; `V300000316__drop_resolved_wiki_link.sql` is the tip. New migrations use a greater version.
 
-Daily probe measurement (not an ADR): [daily-probe-protocol.md](notes/daily-probe-protocol.md). Authoritative authored note references: `.planning/quick/039-authoritative-authored-note-references/PLAN.md` — complete. Follow-up: `.planning/quick/040-note-reference-index-hardening/PLAN.md`.
+Daily probe measurement (not an ADR): [daily-probe-protocol.md](notes/daily-probe-protocol.md). Authoritative authored note references: `.planning/quick/039-authoritative-authored-note-references/PLAN.md` — complete. Follow-up: `.planning/quick/040-note-reference-index-hardening/PLAN.md` — complete.
 
 ## Operator Next Steps
 
-- `.planning/quick/040-note-reference-index-hardening/PLAN.md` — in progress. Slice 11 (drop the one-time backfill) is gated: stop after slice 10 and confirm `authored_note_reference_backfill_progress.completed_at` on production before continuing. Do not execute until asked.
 - Title/create slowness probe (skip in-request `refreshNotebookScope`): plan `.planning/quick/038-skip-notebook-scope-refresh-on-title-and-create/PLAN.md` — done.
 - Daily probe tap affordance (visible panels, stable board, press flash): `.planning/quick/033-daily-probe-tap-affordance/PLAN.md` — planned, do not execute until asked.
 - Start the next milestone with `/gsd-new-milestone` when ready.
 
 Parked work: SEED-001, SEED-002, SEED-005, SEED-006, SEED-007, SEED-008; ADR 0002 Level 1. See [ROADMAP.md](ROADMAP.md).
 
-Recent ad-hoc work: `noteProperty` / **property panel** / `#prop:` wiki (ADR 0001 / ADR 0004 / ADR 0005); E2E named-route honesty and SPA hydrate protocol (E2E helpers, `MainMenu.vue`); daily probe side tap ([daily-probe-protocol.md](notes/daily-probe-protocol.md)). Active plan: [040](quick/040-note-reference-index-hardening/PLAN.md) (in progress).
+Recent ad-hoc work: `noteProperty` / **property panel** / `#prop:` wiki (ADR 0001 / ADR 0004 / ADR 0005); E2E named-route honesty and SPA hydrate protocol (E2E helpers, `MainMenu.vue`); daily probe side tap ([daily-probe-protocol.md](notes/daily-probe-protocol.md)); note reference index hardening ([040](quick/040-note-reference-index-hardening/PLAN.md) — complete).

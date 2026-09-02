@@ -15,15 +15,18 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.function.BiFunction;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Wiki-link rewrite mechanics for note and folder relocation (location change, notebook move,
- * folder reparent/rename/notebook-move) for {@link WikiLinkRewriteService}, which exposes these as
- * its public API. Title rename has its own rewrite ({@link TitleRenameWikiLinkRewrite}) since it
- * discovers referrers before mutating the note rather than accepting a pre-captured set.
+ * folder reparent/rename/notebook-move), called directly by relocation callers ({@link
+ * FolderRelocationService}, {@link FolderMoveRelocation}, {@link
+ * com.odde.donut.controllers.RelationController}). Title rename has its own rewrite ({@link
+ * TitleRenameWikiLinkRewrite}) since it discovers referrers before mutating the note rather than
+ * accepting a pre-captured set.
  */
 @Service
-class WikiLinkRelocationRewrite {
+public class WikiLinkRelocationRewrite {
   @PersistenceContext private EntityManager entityManager;
 
   private final EntityPersister entityPersister;
@@ -45,7 +48,8 @@ class WikiLinkRelocationRewrite {
   /**
    * Cross-notebook note move: rewrite inbound and outgoing wiki links. No-op when notebooks match.
    */
-  void rewriteWikiLinksForCrossNotebookMove(
+  @Transactional
+  public void rewriteWikiLinksForCrossNotebookMove(
       Note movedNote,
       Notebook oldNotebook,
       Notebook targetNotebook,
@@ -62,7 +66,8 @@ class WikiLinkRelocationRewrite {
   }
 
   /** Same-notebook location change: rewrite inbound exact folder/root wiki paths. */
-  void rewriteInboundWikiLinksForLocationChange(
+  @Transactional
+  public void rewriteInboundWikiLinksForLocationChange(
       Note targetNote, Timestamp updatedAt, Map<Integer, List<String>> inboundReferences) {
     List<String> folderTrail = FolderTrailSegments.namesFromRootToContainingFolder(targetNote);
     rewriteInboundWikiLinks(
@@ -77,6 +82,7 @@ class WikiLinkRelocationRewrite {
    * Same-notebook folder reparent: rewrite inbound exact wiki paths for every live note in the
    * moved subtree, from referrers inside and outside the subtree.
    */
+  @Transactional
   void rewriteInboundWikiLinksForFolderReparent(
       Set<Integer> movedNoteIds,
       Timestamp updatedAt,
@@ -116,6 +122,7 @@ class WikiLinkRelocationRewrite {
   }
 
   /** Folder rename: update one matching folder-name segment in inbound path-shaped wiki links. */
+  @Transactional
   void rewriteInboundWikiLinksForFolderRename(
       Set<Integer> noteIdsInSubtree,
       String oldFolderName,
@@ -137,6 +144,7 @@ class WikiLinkRelocationRewrite {
   }
 
   /** Cross-notebook folder move: rewrite inbound links; skip referrers inside the moved set. */
+  @Transactional
   void rewriteInboundWikiLinksForFolderNotebookMove(
       Set<Integer> movedNoteIds,
       String newNotebookName,
@@ -155,6 +163,7 @@ class WikiLinkRelocationRewrite {
   }
 
   /** Cross-notebook folder move: rewrite outgoing links for each note in the moved set. */
+  @Transactional
   void rewriteOutgoingWikiLinksForFolderNotebookMove(
       Set<Integer> movedNoteIds,
       String sourceNotebookName,

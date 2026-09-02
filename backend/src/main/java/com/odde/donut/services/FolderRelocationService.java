@@ -30,6 +30,7 @@ public class FolderRelocationService {
   private final TestabilitySettings testabilitySettings;
   private final NoteTitlePlacementRules noteTitlePlacementRules;
   private final WikiLinkRewriteService wikiLinkRewriteService;
+  private final WikiLinkRelocationRewrite wikiLinkRelocationRewrite;
   private final FolderSubtree subtree;
   private final FolderMoveRelocation folderMoveRelocation;
 
@@ -40,7 +41,8 @@ public class FolderRelocationService {
       EntityPersister entityPersister,
       TestabilitySettings testabilitySettings,
       NoteTitlePlacementRules noteTitlePlacementRules,
-      WikiLinkRewriteService wikiLinkRewriteService) {
+      WikiLinkRewriteService wikiLinkRewriteService,
+      WikiLinkRelocationRewrite wikiLinkRelocationRewrite) {
     this.folderRepository = folderRepository;
     this.noteRepository = noteRepository;
     this.folderSiblingNameValidation = folderSiblingNameValidation;
@@ -48,6 +50,7 @@ public class FolderRelocationService {
     this.testabilitySettings = testabilitySettings;
     this.noteTitlePlacementRules = noteTitlePlacementRules;
     this.wikiLinkRewriteService = wikiLinkRewriteService;
+    this.wikiLinkRelocationRewrite = wikiLinkRelocationRewrite;
     this.subtree =
         new FolderSubtree(
             folderRepository, noteRepository, entityPersister, noteTitlePlacementRules);
@@ -58,6 +61,7 @@ public class FolderRelocationService {
             entityPersister,
             testabilitySettings,
             wikiLinkRewriteService,
+            wikiLinkRelocationRewrite,
             subtree);
   }
 
@@ -94,7 +98,7 @@ public class FolderRelocationService {
     entityPersister.flush();
     entityPersister.merge(folder);
     entityPersister.flush();
-    wikiLinkRewriteService.rewriteInboundWikiLinksForFolderRename(
+    wikiLinkRelocationRewrite.rewriteInboundWikiLinksForFolderRename(
         noteIdsInSubtree, oldName, displayName.value(), now, inboundReferencesByNoteId);
     return folder;
   }
@@ -148,7 +152,7 @@ public class FolderRelocationService {
     entityPersister.flush();
     entityPersister.remove(folder);
     entityPersister.flush();
-    wikiLinkRewriteService.rewriteInboundWikiLinksForFolderReparent(
+    wikiLinkRelocationRewrite.rewriteInboundWikiLinksForFolderReparent(
         affectedNoteIds, now, inboundReferencesByNoteId);
   }
 }

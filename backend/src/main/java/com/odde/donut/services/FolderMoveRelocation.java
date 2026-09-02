@@ -24,6 +24,7 @@ final class FolderMoveRelocation {
   private final EntityPersister entityPersister;
   private final TestabilitySettings testabilitySettings;
   private final WikiLinkRewriteService wikiLinkRewriteService;
+  private final WikiLinkRelocationRewrite wikiLinkRelocationRewrite;
   private final FolderSubtree subtree;
 
   FolderMoveRelocation(
@@ -32,12 +33,14 @@ final class FolderMoveRelocation {
       EntityPersister entityPersister,
       TestabilitySettings testabilitySettings,
       WikiLinkRewriteService wikiLinkRewriteService,
+      WikiLinkRelocationRewrite wikiLinkRelocationRewrite,
       FolderSubtree subtree) {
     this.folderRepository = folderRepository;
     this.folderSiblingNameValidation = folderSiblingNameValidation;
     this.entityPersister = entityPersister;
     this.testabilitySettings = testabilitySettings;
     this.wikiLinkRewriteService = wikiLinkRewriteService;
+    this.wikiLinkRelocationRewrite = wikiLinkRelocationRewrite;
     this.subtree = subtree;
   }
 
@@ -82,7 +85,7 @@ final class FolderMoveRelocation {
     entityPersister.flush();
     entityPersister.merge(folder);
     entityPersister.flush();
-    wikiLinkRewriteService.rewriteInboundWikiLinksForFolderReparent(
+    wikiLinkRelocationRewrite.rewriteInboundWikiLinksForFolderReparent(
         movedNoteIds, now, inboundReferencesByNoteId);
     return folder;
   }
@@ -152,9 +155,9 @@ final class FolderMoveRelocation {
       User viewer,
       Map<Integer, Map<Integer, List<String>>> inboundReferencesByNoteId,
       Map<Integer, Map<String, Note>> coMovedTargetsByAuthoredLinkByNoteId) {
-    wikiLinkRewriteService.rewriteInboundWikiLinksForFolderNotebookMove(
+    wikiLinkRelocationRewrite.rewriteInboundWikiLinksForFolderNotebookMove(
         movedNoteIds, destinationNotebook.getName(), now, inboundReferencesByNoteId);
-    wikiLinkRewriteService.rewriteOutgoingWikiLinksForFolderNotebookMove(
+    wikiLinkRelocationRewrite.rewriteOutgoingWikiLinksForFolderNotebookMove(
         movedNoteIds, sourceNotebook.getName(), now, viewer, coMovedTargetsByAuthoredLinkByNoteId);
   }
 
