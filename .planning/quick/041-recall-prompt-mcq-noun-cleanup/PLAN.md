@@ -19,9 +19,11 @@ downstream Behavior slice.
 ## Slices
 
 ### 1. Structure — rename CLI `RecallQuestionAnswerOutcome` type
+Status: done
 - `cli/src/commands/recall/recallQuestionAnswerOutcome.ts` → `recallPromptAnswerOutcome.ts`, type `RecallQuestionAnswerOutcome` → `RecallPromptAnswerOutcome`.
 - Update importers: `SpellingRecallStage.tsx`, `JustReviewRecallStage.tsx`, `RecallSessionStage.tsx`, `RecallMcqStage.tsx`.
 - Verify: `cli` typecheck/build + its existing tests (pure type, no runtime change).
+- Verified: `pnpm cli:test` 299/299 passed; no remaining references to the old name anywhere in the repo.
 
 ### 2. Structure — rename backend `RecallQuestionService`
 - `backend/.../services/RecallQuestionService.java` → `RecallPromptService.java`, class renamed to match.

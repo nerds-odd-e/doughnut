@@ -17,7 +17,7 @@ import { userVisibleSlashCommandError } from '../../userVisibleSlashCommandError
 import { LeaveRecallConfirmPrompt } from './LeaveRecallConfirmPrompt.js'
 import { RECALL_BUSY_RECORD_REVIEW_LABEL } from './recallBusyInputCopy.js'
 import type { RecallJustReviewPayload } from './nextRecallCardLoad.js'
-import type { RecallQuestionAnswerOutcome } from './recallQuestionAnswerOutcome.js'
+import type { RecallPromptAnswerOutcome } from './recallPromptAnswerOutcome.js'
 import {
   RecallAnsweredBlockShell,
   recallAnsweredBreadcrumbText,
@@ -67,7 +67,7 @@ export function JustReviewRecallStage({
   readonly inputBlockedRef: MutableRefObject<boolean>
   readonly activeOperationAbortRef: MutableRefObject<AbortController | null>
   readonly onRecallQuestionAnswered: (
-    outcome: RecallQuestionAnswerOutcome
+    outcome: RecallPromptAnswerOutcome
   ) => void | Promise<void>
   readonly onRecallFatalError: (message: string) => void
   readonly onConfirmLeaveRecall: () => void
