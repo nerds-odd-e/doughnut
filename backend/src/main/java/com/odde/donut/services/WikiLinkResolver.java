@@ -44,8 +44,6 @@ public class WikiLinkResolver {
     return canonicalDonutOrigin;
   }
 
-  public record WikiLinkResolution(String authoredLink, Note destinationNote) {}
-
   /**
    * Cardinality of a wiki Portable-path token's readable candidates in a notebook scope: exactly
    * one match ({@link Resolved}), no match ({@link Unresolved}), or more than one ({@link
@@ -115,37 +113,10 @@ public class WikiLinkResolver {
     return accidentalWikiLinkMatches.findAll(answer, reviewedNote, viewer);
   }
 
-  public List<WikiLinkResolution> resolveWikiLinksForCache(Note focusNote, User viewer) {
-    String content = focusNote.getContent();
-    if (content == null || content.isBlank()) {
-      return List.of();
-    }
-    List<WikiLinkResolution> out = new ArrayList<>();
-    for (AuthoredNoteReference ref :
-        AuthoredNoteReferences.uniquePreserveOrder(
-            AuthoredNoteReferences.inOccurrenceOrder(content, canonicalDonutOrigin))) {
-      switch (ref) {
-        case AuthoredNoteReference.WikiPortablePathTarget wiki -> {
-          if (classifyToken(wiki.authoredLink(), focusNote, viewer)
-              instanceof CandidateCardinality.Resolved resolved) {
-            out.add(new WikiLinkResolution(wiki.authoredLink(), resolved.destinationNote()));
-          }
-        }
-        case AuthoredNoteReference.NoteIdUrlTarget url -> {
-          Note target = noteRepository.findById(url.noteId()).orElse(null);
-          if (target != null && target.getDeletedAt() == null) {
-            out.add(new WikiLinkResolution(url.authoredLink(), target));
-          }
-        }
-      }
-    }
-    return List.copyOf(out);
-  }
-
   /**
-   * Missing wiki-link inners for the viewer, in first-occurrence order (same extract/dedupe/resolve
-   * as cache). A token with several readable matches is ambiguous, not missing, and is excluded.
-   * Note-ID URL references are not wiki tokens and are excluded.
+   * Missing wiki-link inners for the viewer, in first-occurrence order. A token with several
+   * readable matches is ambiguous, not missing, and is excluded. Note-ID URL references are not
+   * wiki tokens and are excluded.
    */
   public List<String> missingWikiLinkTokens(Note focusNote, User viewer) {
     String content = focusNote.getContent();

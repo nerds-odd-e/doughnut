@@ -60,12 +60,9 @@ Deleted `WikiLinkCandidateClassifier.resolveAnyTarget` and its private-only pars
 ### 5. Retire the cache-era outgoing resolution API
 
 - **Type:** Structure
-- **Status:** planned
+- **Status:** done
 
-`resolveWikiLinksForCache` survived the cache it was named for. Its only remaining exerciser is `WikiLinkResolverYamlAndBodyIntegrationTest`.
-
-- Point that test file at `resolveReference`, and drop the scenarios already covered by `NoteControllerShowWikiLinkTests` (alias resolution, pipe display text, qualified links) and `AuthoredNoteReferencesTest` (parsing). What is worth keeping is the YAML-frontmatter-vs-body reach that no controller test exercises; rename the file to what it then tests.
-- Delete `WikiLinkResolver.resolveWikiLinksForCache` and the now-unused `WikiLinkResolution` record.
+Deleted `resolveWikiLinksForCache`, `WikiLinkResolution`, and cache-era wording. The duplicate 180-line integration suite became one focused `WikiLinkResolverFrontmatterAndBodyResolutionTest` against `resolveReference`, retaining the unique YAML/frontmatter-versus-body reach. The full backend suite passes.
 
 ### 6. Drop the unread viewer from inbound referrer rewriting
 
