@@ -53,9 +53,9 @@ Title rename now asks `NoteReferenceService.isReferencedForViewer`, which short-
 ### 4. Retire `resolveAnyTarget`
 
 - **Type:** Structure
-- **Status:** planned
+- **Status:** done
 
-Delete `WikiLinkCandidateClassifier.resolveAnyTarget` and the private chain that exists only for it (`resolveParsedLink`, `uniqueNotebookMatch`, the `Note`-overload of `resolveRef`, the `BiFunction` import). Zero callers in production or tests; nothing else changes.
+Deleted `WikiLinkCandidateClassifier.resolveAnyTarget` and its private-only parsing/matching chain and import. No callers remain; the full backend suite and focused reference-resolution test pass.
 
 ### 5. Retire the cache-era outgoing resolution API
 

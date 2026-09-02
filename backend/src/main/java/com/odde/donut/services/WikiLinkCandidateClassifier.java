@@ -9,10 +9,9 @@ import com.odde.donut.entities.User;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.BiFunction;
 
 /**
- * Cardinality classification and viewer-blind resolution of a wiki Portable-path token against
+ * Readable-candidate cardinality classification of a wiki Portable-path token against
  * notebook-scoped note candidates. Backs {@link WikiLinkResolver}'s public token-resolution
  * methods.
  */
@@ -55,41 +54,9 @@ final class WikiLinkCandidateClassifier {
     return new WikiLinkResolver.CandidateCardinality.Unresolved();
   }
 
-  /**
-   * Resolves {@code token} to any matching note in {@code focusNote}'s scope, regardless of viewer
-   * readability.
-   */
-  Note resolveAnyTarget(String token, Note focusNote) {
-    return resolveParsedLink(token, focusNote, this::uniqueNotebookMatch);
-  }
-
-  private Note resolveParsedLink(
-      String token, Note focusNote, BiFunction<String, String, Note> notebookMatcher) {
-    Note target =
-        resolveRef(token, focusNote)
-            .map(ref -> notebookMatcher.apply(ref.notebookName(), ref.noteTitle()))
-            .orElse(null);
-    if (target == null
-        || !WikiLinkPropertyMatch.matchesTargetNoteContent(token, target.getContent())) {
-      return null;
-    }
-    return target;
-  }
-
-  /** Parses {@code token} into a notebook/title ref, applying the focus-notebook fallback. */
-  private Optional<PortablePath.Resolved> resolveRef(String token, Note focusNote) {
-    String focusNotebookName =
-        focusNote.getNotebook() == null ? null : focusNote.getNotebook().getName();
-    return resolveRef(token, focusNotebookName);
-  }
-
   /** Parses {@code token} into a notebook/title ref, applying the given notebook-name fallback. */
   private Optional<PortablePath.Resolved> resolveRef(String token, String notebookFallbackName) {
     return WikiLinkMarkdown.splitInner(token).portablePath().resolve(notebookFallbackName);
-  }
-
-  private Note uniqueNotebookMatch(String notebookName, String noteTitle) {
-    return uniqueIfExactlyOne(noteCandidates.forNotebookAndTitle(notebookName, noteTitle));
   }
 
   private Note uniqueReadableNotebookMatch(String notebookName, String noteTitle, User viewer) {
