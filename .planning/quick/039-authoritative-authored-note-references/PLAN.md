@@ -1,7 +1,7 @@
 # Authoritative authored note references
 
 **Status:** in progress  
-**Resume:** next slice is 17 (inject indexes authored references; unblocks `note_deletion.feature`). Slices 1–16 done.  
+**Resume:** next slice is 18 (delete does not rebuild the notebook wiki cache). Slices 1–17 done.  
 **Source:** `.planning/notes/notebook-scope-wiki-refresh-on-title-and-create.md`  
 **Architecture:** ADR 0004, “Links and attachments”  
 **Goal:** Make authored semantic note references a domain-owned representation derived from note Markdown, and make every consumer resolve those references against current state without notebook-wide cache refreshes.
@@ -21,7 +21,7 @@ When this plan is complete:
 ## Current code (remaining slices)
 
 - **Index writes:** production create/save/rewrite go through `Note.replaceContent`. `AuthoredNoteContent.prepareDocumentForSave` also injects `type` via `NoteConceptType.ensureStoredType` — rewrites use `WikiLinkRewriteSupport.documentFromRewrittenContent` instead. Tests that need inbound discovery use `MakeMe.authorReferencingContent` (same parse, no type injection). Raw `Note.setContent` / builder `.content(...)` bypass the index.
-- **Inject (Slice 17):** `InjectNotesWorker` still hydrates with `setContent` then `refreshForNote` (fills `resolved_wiki_link`, not `authored_note_reference`).
+- **Inject:** done (Slice 17) — `InjectNotesWorker` now also calls `Note.replaceContent(AuthoredNoteDocument)` per note after save, before the existing `refreshForNote` cache refresh.
 - **Inbound facade:** `AuthoredNoteReferenceInboundFacade` in `entities.repositories` (must share the package-private `AuthoredNoteReferenceRowRepository`). Live-resolves candidates; exposes `distinctReferrerNotesForViewer`, `distinctReferrerIdsForViewer`, `distinctInboundReferencesForViewer` (referrer + authored link texts). `NoteRealmService` already uses it. Read rows in tests with `AuthoredNoteReferenceRowTestSupport.rowsFor(EntityManager, Note)` — do not open a new MockMvc context for the package-private repo.
 - **Delete policies:** `removeNoteLinksFromReferrerProperties` live-filters referrer ids via the facade, then still reads `resolved_wiki_link` for link text (Slice 19).
 - **Notebook walks still in a write transaction:** alias-changing content save; `NoteService.destroy` / `restore`; cross-notebook move (`refreshCardinalityAcrossMovedNotebooks`). Plan 038 already skipped title/create.
@@ -37,7 +37,7 @@ When this plan is complete:
 - Candidate lookup is an optimization, not a resolution verdict. Always live-resolve for the current viewer.
 - Do not change Markdown/wiki syntax, candidate matching, visibility, or API response shapes. Do not add a new ADR.
 
-## Done (1–16)
+## Done (1–17)
 
 | # | Type | Capability |
 |---|---|---|
@@ -57,18 +57,9 @@ When this plan is complete:
 | 14 | Behavior | Title-rename guard/rewrite via facade |
 | 15 | Behavior | Delete referrer ids via facade; cache still supplies link text |
 | 16 | Behavior | Relocation via facade; facade now returns authored link texts |
+| 17 | Behavior | Injected notes index authored references like product saves |
 
 ## Remaining slices
-
-### 17. Injected notes index authored references like product saves
-
-- **Type:** Behavior
-- **Status:** pending
-- **Scenario:** After injecting a relationship note whose markdown wiki-links the endpoints, showing the source lists that relationship as an inbound reference, and deleting a referenced note offers “leave as dead wiki links” / “remove from properties” rather than a bare OK confirm.
-- Route `InjectNotesWorker` through `Note.replaceContent(AuthoredNoteDocument)` after save (same parse as `MakeMe.authorReferencingContent`, not `AuthoredNoteContent.prepareDocumentForSave`). Keep `refreshForNote` for remaining cache consumers. Leave builder `.content(...)` / `Note.setContent` as the explicit bypass.
-- Drive the already-failing scenarios in `e2e_test/features/note_creation_and_update/note_deletion.feature`; add a focused testability/controller assertion that injected wiki content produces `authored_note_reference` rows. Do not add duplicate E2E scenarios.
-- **Why the four E2E failures:** empty `NoteRealm.references` (facade finds no authored-reference rows) → no relationship cards and `useNoteDeleteFlow` takes the bare OK confirm. Passing scenarios never inject a wiki referrer.
-- **Verify:** that feature file (4 previously failing scenarios pass; `@ignore` parent-undo stays skipped) and the inject-row assertion.
 
 ### 18. Deleting a note does not rebuild the notebook wiki cache
 

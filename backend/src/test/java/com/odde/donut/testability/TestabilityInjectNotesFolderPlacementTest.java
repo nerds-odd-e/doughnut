@@ -5,14 +5,17 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
 
 import com.odde.donut.controllers.dto.NoteRealm;
+import com.odde.donut.entities.AuthoredNoteReferenceRow;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.User;
+import com.odde.donut.entities.repositories.AuthoredNoteReferenceRowTestSupport;
 import com.odde.donut.entities.repositories.NoteRepository;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.services.AuthorizationService;
 import com.odde.donut.services.NoteRealmService;
 import com.odde.donut.testability.model.NotesTestData;
 import com.odde.donut.testability.model.NotesTestData.NoteTestData;
+import jakarta.persistence.EntityManager;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -32,6 +35,7 @@ class TestabilityInjectNotesFolderPlacementTest {
   @Autowired MakeMe makeMe;
   @Autowired AuthorizationService authorizationService;
   @Autowired NoteRealmService noteRealmService;
+  @Autowired EntityManager entityManager;
 
   @Test
   void injectNotes_assignsExplicitFolderPathsForNestedNotes() {
@@ -101,6 +105,28 @@ class TestabilityInjectNotesFolderPlacementTest {
     authorizationService.assertReadAuthorization(user, note);
     NoteRealm realm = noteRealmService.build(note, user);
     assertThat(realm.getId(), equalTo(note.getId()));
+  }
+
+  @Test
+  void injectNotes_wikiLinkedContentProducesAuthoredNoteReferenceRows() {
+    var user = makeMe.aUser().please();
+    var data = new NotesTestData();
+    data.setNotebookName("Wiki reference inject nb");
+    data.setExternalIdentifier(user.getExternalIdentifier());
+
+    List<NoteTestData> rows = new ArrayList<>();
+    rows.add(row("Target", null));
+    NoteTestData referrer = row("Referrer", null);
+    referrer.setContent("Refers to [[Target]]");
+    rows.add(referrer);
+    data.setNoteTestData(rows);
+
+    Map<String, Integer> ids = testabilityRestController.injectNotes(data);
+
+    Note referrerNote = noteRepository.findById(ids.get("Referrer")).orElseThrow();
+    List<AuthoredNoteReferenceRow> referenceRows =
+        AuthoredNoteReferenceRowTestSupport.rowsFor(entityManager, referrerNote);
+    assertThat(referenceRows.isEmpty(), equalTo(false));
   }
 
   private static NoteTestData row(String title, String folder) {

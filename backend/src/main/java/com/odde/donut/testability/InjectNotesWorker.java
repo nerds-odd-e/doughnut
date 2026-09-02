@@ -1,5 +1,9 @@
 package com.odde.donut.testability;
 
+import com.odde.donut.algorithms.AuthoredNoteDocument;
+import com.odde.donut.algorithms.AuthoredNoteReference;
+import com.odde.donut.algorithms.AuthoredNoteReferences;
+import com.odde.donut.algorithms.CanonicalDonutOrigin;
 import com.odde.donut.entities.Circle;
 import com.odde.donut.entities.DisplayName;
 import com.odde.donut.entities.Folder;
@@ -37,6 +41,7 @@ class InjectNotesWorker {
   @Autowired NotebookService notebookService;
   @Autowired FolderRepository folderRepository;
   @Autowired ResolvedWikiLinkService resolvedWikiLinkService;
+  @Autowired CanonicalDonutOrigin canonicalDonutOrigin;
 
   Map<String, Integer> inject(NotesTestData notesTestData, User user) {
     if (Strings.isEmpty(notesTestData.getNotebookName())) {
@@ -58,6 +63,10 @@ class InjectNotesWorker {
     applyExplicitFolderPlacements(injections, titleNoteMap, currentUTCTimestamp);
     notesTestData.saveByOriginalOrder(titleNoteMap, this.entityPersister);
     for (Note note : titleNoteMap.values()) {
+      List<AuthoredNoteReference> references =
+          AuthoredNoteReferences.uniquePreserveOrder(
+              AuthoredNoteReferences.inOccurrenceOrder(note.getContent(), canonicalDonutOrigin));
+      note.replaceContent(new AuthoredNoteDocument(note.getContent(), references));
       resolvedWikiLinkService.refreshForNote(note, user);
     }
     return titleNoteMap.values().stream()
