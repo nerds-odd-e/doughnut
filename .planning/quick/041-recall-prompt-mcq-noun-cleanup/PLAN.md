@@ -26,9 +26,11 @@ Status: done
 - Verified: `pnpm cli:test` 299/299 passed; no remaining references to the old name anywhere in the repo.
 
 ### 2. Structure — rename backend `RecallQuestionService`
+Status: done
 - `backend/.../services/RecallQuestionService.java` → `RecallPromptService.java`, class renamed to match.
 - Update the two callers: `MemoryTrackerController.java`, `RecallPromptController.java`.
 - No test file exists for this class today (behavior stays covered through the two controllers' existing tests) — run those targeted tests.
+- Verified: `MemoryTrackerControllerTest` + `RecallPromptControllerTest` pass; no remaining references to the old name in code.
 
 ### 3. Structure — rename `Quiz.vue`
 - `frontend/src/components/recall/Quiz.vue` → `RecallPromptCard.vue` (component name + `QuizProps` interface renamed to match).

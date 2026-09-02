@@ -9,7 +9,7 @@ import com.odde.donut.entities.RecallPrompt;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.services.AuthorizationService;
 import com.odde.donut.services.MemoryTrackerService;
-import com.odde.donut.services.RecallQuestionService;
+import com.odde.donut.services.RecallPromptService;
 import com.odde.donut.testability.TestabilitySettings;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
@@ -23,19 +23,19 @@ class RecallPromptController {
 
   private final TestabilitySettings testabilitySettings;
 
-  private final RecallQuestionService recallQuestionService;
+  private final RecallPromptService recallPromptService;
   private final AuthorizationService authorizationService;
   private final MemoryTrackerService memoryTrackerService;
 
   @Autowired
   public RecallPromptController(
-      RecallQuestionService recallQuestionService,
+      RecallPromptService recallPromptService,
       TestabilitySettings testabilitySettings,
       AuthorizationService authorizationService,
       MemoryTrackerService memoryTrackerService) {
     this.testabilitySettings = testabilitySettings;
     this.authorizationService = authorizationService;
-    this.recallQuestionService = recallQuestionService;
+    this.recallPromptService = recallPromptService;
     this.memoryTrackerService = memoryTrackerService;
   }
 
@@ -47,7 +47,7 @@ class RecallPromptController {
       throws JsonProcessingException, UnexpectedNoAccessRightException {
     assertCanMutateRecallPrompt(recallPrompt);
     RecallPrompt regenerated =
-        recallQuestionService.regenerateAQuestion(
+        recallPromptService.regenerateAQuestion(
             contestResult, recallPrompt.getMcq().getNote(), recallPrompt.getMcq(), recallPrompt);
     return com.odde.donut.controllers.dto.RecallPrompt.from(regenerated);
   }
@@ -58,7 +58,7 @@ class RecallPromptController {
       @PathVariable("recallPrompt") @Schema(type = "integer") RecallPrompt recallPrompt)
       throws UnexpectedNoAccessRightException {
     assertCanMutateRecallPrompt(recallPrompt);
-    return recallQuestionService.contest(recallPrompt);
+    return recallPromptService.contest(recallPrompt);
   }
 
   @PostMapping("/{recallPrompt}/answer")
@@ -69,7 +69,7 @@ class RecallPromptController {
       throws UnexpectedNoAccessRightException {
     assertCanMutateRecallPrompt(recallPrompt);
     RecallPrompt answered =
-        recallQuestionService.answer(
+        recallPromptService.answer(
             recallPrompt, answerDTO, testabilitySettings.getCurrentUTCTimestamp());
     return AnsweredQuestion.from(answered);
   }
