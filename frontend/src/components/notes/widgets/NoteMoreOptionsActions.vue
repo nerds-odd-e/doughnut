@@ -25,14 +25,14 @@
       </PopButton>
     </DropdownMenuItem>
 
-    <DropdownMenuItem v-if="showMenuAction('questions')">
-      <PopButton :btn-class="dropdownMenuButtonClass" :title="titles.questions">
+    <DropdownMenuItem v-if="showMenuAction('mcqs')">
+      <PopButton :btn-class="dropdownMenuButtonClass" :title="titles.mcqs">
         <template #button_face>
           <MessageCircleQuestion class="shrink-0" :size="20" aria-hidden="true" />
-          <span>{{ titles.questions }}</span>
+          <span>{{ titles.mcqs }}</span>
         </template>
         <template #default>
-          <Questions v-bind="{ note }" />
+          <Mcqs v-bind="{ note }" />
         </template>
       </PopButton>
     </DropdownMenuItem>
@@ -78,15 +78,15 @@
     </PopButton>
 
     <PopButton
-      v-if="showToolbarAction('questions')"
-      :title="titles.questions"
-      :aria-label="titles.questions"
+      v-if="showToolbarAction('mcqs')"
+      :title="titles.mcqs"
+      :aria-label="titles.mcqs"
     >
       <template #button_face>
         <MessageCircleQuestion class="w-6 h-6" aria-hidden="true" />
       </template>
       <template #default>
-        <Questions v-bind="{ note }" />
+        <Mcqs v-bind="{ note }" />
       </template>
     </PopButton>
 
@@ -136,7 +136,7 @@
 <script setup lang="ts">
 import type { Note } from "@generated/donut-backend-api"
 import PopButton from "@/components/commons/Popups/PopButton.vue"
-import Questions from "@/components/notes/Questions.vue"
+import Mcqs from "@/components/notes/Mcqs.vue"
 import {
   CircleCheck,
   MessageCircleQuestion,

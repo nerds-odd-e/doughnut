@@ -4,17 +4,17 @@ import { mockSdkService } from "@tests/helpers"
 import {
   clickExportQuestionGeneration,
   exportTextarea,
-  mountQuestionsReady,
-  questionsNote,
-  sampleQuestionExportData,
-  setupQuestionsTests,
-} from "./questionsTestSupport"
+  mountMcqsReady,
+  mcqsNote,
+  sampleMcqExportData,
+  setupMcqsTests,
+} from "./mcqsTestSupport"
 
-setupQuestionsTests()
+setupMcqsTests()
 
-describe("Questions", () => {
+describe("Mcqs", () => {
   it("renders questions table when questions exist", async () => {
-    const wrapper = await mountQuestionsReady()
+    const wrapper = await mountMcqsReady()
 
     expect(wrapper.text()).toContain("What is 2+2?")
   })
@@ -23,15 +23,15 @@ describe("Questions", () => {
     const exportSpy = mockSdkService(
       McqController,
       "export",
-      sampleQuestionExportData
+      sampleMcqExportData
     )
 
-    await mountQuestionsReady({ attachToBody: true })
+    await mountMcqsReady({ attachToBody: true })
     await clickExportQuestionGeneration()
 
     expect(exportTextarea()).toBeTruthy()
     expect(exportSpy).toHaveBeenCalledWith({
-      path: { note: questionsNote.id },
+      path: { note: mcqsNote.id },
     })
   })
 })

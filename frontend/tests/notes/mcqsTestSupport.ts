@@ -1,5 +1,5 @@
 import { McqController } from "@generated/donut-backend-api/sdk.gen"
-import Questions from "@/components/notes/Questions.vue"
+import Mcqs from "@/components/notes/Mcqs.vue"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
 import makeMe from "donut-test-fixtures/makeMe"
 import helper, { mockSdkService } from "@tests/helpers"
@@ -9,9 +9,9 @@ import { createMemoryHistory, createRouter } from "vue-router"
 export const exportQuestionGenerationButtonTitle =
   "Export question generation request for ChatGPT"
 
-export const questionsNote = makeMe.aNote.please()
+export const mcqsNote = makeMe.aNote.please()
 
-export const questionsFixture = [
+export const mcqsFixture = [
   makeMe.anMcq
     .withQuestionStem("What is 2+2?")
     .withChoices(["3", "4", "5", "6"])
@@ -19,7 +19,7 @@ export const questionsFixture = [
     .please(),
 ]
 
-export const sampleQuestionExportData = {
+export const sampleMcqExportData = {
   request: {
     model: "gpt-4",
     messages: [],
@@ -27,17 +27,17 @@ export const sampleQuestionExportData = {
   title: "Test Note",
 } as never
 
-export const questionsRouter = createRouter({
+export const mcqsRouter = createRouter({
   history: createMemoryHistory(),
   routes: [{ path: "/", component: { template: "<div />" } }],
 })
 
 export let wrapper: VueWrapper
 
-export function setupQuestionsTests() {
+export function setupMcqsTests() {
   beforeEach(() => {
     vi.clearAllMocks()
-    mockSdkService(McqController, "list", questionsFixture)
+    mockSdkService(McqController, "list", mcqsFixture)
   })
 
   afterEach(() => {
@@ -46,19 +46,17 @@ export function setupQuestionsTests() {
   })
 }
 
-export function mountQuestions(options?: { attachToBody?: boolean }) {
+export function mountMcqs(options?: { attachToBody?: boolean }) {
   wrapper = helper
-    .component(Questions)
-    .withProps({ note: questionsNote })
-    .withRouter(questionsRouter)
+    .component(Mcqs)
+    .withProps({ note: mcqsNote })
+    .withRouter(mcqsRouter)
     .mount(options?.attachToBody ? { attachTo: document.body } : undefined)
   return wrapper
 }
 
-export async function mountQuestionsReady(options?: {
-  attachToBody?: boolean
-}) {
-  mountQuestions(options)
+export async function mountMcqsReady(options?: { attachToBody?: boolean }) {
+  mountMcqs(options)
   await flushPromises()
   return wrapper
 }

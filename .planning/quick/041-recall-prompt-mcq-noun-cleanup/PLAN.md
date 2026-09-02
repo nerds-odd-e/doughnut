@@ -41,11 +41,13 @@ Status: done
 - Learning: 4 more spec files (`RecallPageOverlap.spec.ts`, `RecallPage.dailyProbe.spec.ts`, `RecallPage.speakingPractice.spec.ts`, `RecallPage.threshold.spec.ts`) located the component via Vue Test Utils' `findComponent({ name: "Quiz" })`, which relies on the `<script setup>` SFC's filename-inferred name — the rename silently broke that string lookup. Fixed alongside this slice (mechanical `"Quiz"` → `"RecallPromptCard"`). All 5 affected spec files verified green (18/18).
 
 ### 4. Structure — rename the note "Questions" surface's internal identifiers
+Status: done
 - `frontend/src/components/notes/Questions.vue` → `Mcqs.vue`; internal names `questionAdded` → `mcqAdded`, `fetchQuestions` → `fetchMcqs`, CSS class `.question-table` → `.mcq-table`.
 - Action id `'questions'` → `'mcqs'` in `NoteMoreOptionsActions.vue`, `noteToolbarOverflow.ts`, and the `noteMoreOptionsTitles.ts` key (confirmed not persisted anywhere — driven only by the `only`/`omit` props each caller passes inline, so nothing needs a migration).
 - **Keep visible copy unchanged** ("Add Question", "Question Text", "No questions", "Questions for the note" tooltip) — that's a product-copy call, not a naming-cohesion one; out of scope here.
 - Rename its tests: `frontend/tests/notes/Questions.spec.ts` → `Mcqs.spec.ts`, `frontend/tests/notes/questionsTestSupport.ts` → `mcqsTestSupport.ts`.
 - Verify: targeted vitest run for the renamed spec.
+- Learning: action-id string fallout also required fixing `noteToolbarOverflow.spec.ts`, `NoteToolbar.moreOptionsOverflow.spec.ts`, `NoteMoreOptionsForm.spec.ts`. All 20 affected tests verified green; `vue-tsc --noEmit` clean. `Mcqs.vue`'s own remaining internal `question`-flavored names (`allQuestions`, `newQuestion`, etc.) were left as-is — out of scope per the "Discovered: wider question naming surface" note below.
 
 Slices are independent (disjoint files) and can run in any order; listed smallest/lowest-risk first.
 

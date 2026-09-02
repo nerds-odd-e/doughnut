@@ -49,7 +49,7 @@ describe("NoteToolbar more-options overflow", () => {
 
     expect(noteToolbarAction(wrapper, titles.overflowMenu).exists()).toBe(false)
     expect(noteToolbarAction(wrapper, titles.export).exists()).toBe(true)
-    expect(noteToolbarAction(wrapper, titles.questions).exists()).toBe(true)
+    expect(noteToolbarAction(wrapper, titles.mcqs).exists()).toBe(true)
     expect(noteToolbarAction(wrapper, titles.audio).exists()).toBe(true)
     expect(noteToolbarAction(wrapper, titles.assimilation).exists()).toBe(true)
     expect(noteToolbarAction(wrapper, titles.delete).exists()).toBe(true)
@@ -62,7 +62,7 @@ describe("NoteToolbar more-options overflow", () => {
     expect(noteToolbarAction(wrapper, titles.overflowMenu).exists()).toBe(true)
     expect(noteToolbarAction(wrapper, titles.delete).exists()).toBe(false)
     expect(noteToolbarAction(wrapper, titles.export).exists()).toBe(true)
-    expect(noteToolbarAction(wrapper, titles.questions).exists()).toBe(true)
+    expect(noteToolbarAction(wrapper, titles.mcqs).exists()).toBe(true)
     expect(noteToolbarAction(wrapper, titles.audio).exists()).toBe(true)
     expect(noteToolbarAction(wrapper, titles.assimilation).exists()).toBe(true)
     expect(
@@ -74,7 +74,7 @@ describe("NoteToolbar more-options overflow", () => {
     expect(overflowMenuItem(titles.delete)).not.toBeNull()
     expect(overflowMenuItem(noteToolbarEditTitles.markdown)).toBeNull()
     expect(overflowMenuItem(titles.export)).toBeNull()
-    expect(overflowMenuItem(titles.questions)).toBeNull()
+    expect(overflowMenuItem(titles.mcqs)).toBeNull()
     expect(overflowMenuItem(titles.audio)).toBeNull()
     expect(overflowMenuItem(titles.assimilation)).toBeNull()
   })
@@ -86,7 +86,7 @@ describe("NoteToolbar more-options overflow", () => {
     expect(noteToolbarAction(wrapper, titles.delete).exists()).toBe(false)
     expect(noteToolbarAction(wrapper, titles.assimilation).exists()).toBe(false)
     expect(noteToolbarAction(wrapper, titles.audio).exists()).toBe(false)
-    expect(noteToolbarAction(wrapper, titles.questions).exists()).toBe(true)
+    expect(noteToolbarAction(wrapper, titles.mcqs).exists()).toBe(true)
     expect(noteToolbarAction(wrapper, titles.export).exists()).toBe(true)
   })
 
