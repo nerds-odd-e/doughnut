@@ -1,10 +1,11 @@
 ---
 id: SEED-005
-status: dormant
+status: planned
 planted: 2026-08-18
 planted_during: spent-plan cleanup after recall-prompt / MCQ translation shipped
 trigger_when: when renaming recall-prompt or MCQ product nouns
 scope: small
+plan: .planning/quick/041-recall-prompt-mcq-noun-cleanup/PLAN.md
 ---
 
 # SEED-005: Finish leftover recall-prompt / MCQ nouns
@@ -37,3 +38,5 @@ The shipped glossary is Accepted [ADR 0001](../../docs/adrs/0001-ubiquitous-lang
 ## Notes
 
 Parked from the spent recall-prompt / MCQ translation plan (done 2026-08-15). Nested `/api/mcqs` routes are already shipped.
+
+Converted into `.planning/quick/041-recall-prompt-mcq-noun-cleanup/PLAN.md` on 2026-09-02: item 1 (the four breadcrumb renames) became 4 Structure slices; item 2 (`MultipleChoicesQuestion`) was decided — kept as-is, not folded; item 3 (optional MCQ-list recall source) stayed out of scope as a future seed candidate.
