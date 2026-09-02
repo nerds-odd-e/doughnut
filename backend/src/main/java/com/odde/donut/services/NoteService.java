@@ -166,7 +166,6 @@ public class NoteService {
       mt.setDeletedAt(currentUTCTimestamp);
       entityPersister.merge(mt);
     }
-    resolvedWikiLinkService.refreshNotebookScope(note.getNotebook(), viewer);
   }
 
   /**
@@ -207,7 +206,6 @@ public class NoteService {
     }
     note.setDeletedAt(null);
     entityPersister.merge(note);
-    resolvedWikiLinkService.refreshNotebookScope(note.getNotebook(), viewer);
   }
 
   private boolean sameTimestamp(Timestamp a, Timestamp b) {

@@ -1,7 +1,7 @@
 # Authoritative authored note references
 
 **Status:** in progress  
-**Resume:** next slice is 18 (delete does not rebuild the notebook wiki cache). Slices 1–17 done.  
+**Resume:** next slice is 19 (property-removal deletion rewrites from live authored link text). Slices 1–18 done.  
 **Source:** `.planning/notes/notebook-scope-wiki-refresh-on-title-and-create.md`  
 **Architecture:** ADR 0004, “Links and attachments”  
 **Goal:** Make authored semantic note references a domain-owned representation derived from note Markdown, and make every consumer resolve those references against current state without notebook-wide cache refreshes.
@@ -24,7 +24,7 @@ When this plan is complete:
 - **Inject:** done (Slice 17) — `InjectNotesWorker` now also calls `Note.replaceContent(AuthoredNoteDocument)` per note after save, before the existing `refreshForNote` cache refresh.
 - **Inbound facade:** `AuthoredNoteReferenceInboundFacade` in `entities.repositories` (must share the package-private `AuthoredNoteReferenceRowRepository`). Live-resolves candidates; exposes `distinctReferrerNotesForViewer`, `distinctReferrerIdsForViewer`, `distinctInboundReferencesForViewer` (referrer + authored link texts). `NoteRealmService` already uses it. Read rows in tests with `AuthoredNoteReferenceRowTestSupport.rowsFor(EntityManager, Note)` — do not open a new MockMvc context for the package-private repo.
 - **Delete policies:** `removeNoteLinksFromReferrerProperties` live-filters referrer ids via the facade, then still reads `resolved_wiki_link` for link text (Slice 19).
-- **Notebook walks still in a write transaction:** alias-changing content save; `NoteService.destroy` / `restore`; cross-notebook move (`refreshCardinalityAcrossMovedNotebooks`). Plan 038 already skipped title/create.
+- **Notebook walks still in a write transaction:** alias-changing content save; cross-notebook move (`refreshCardinalityAcrossMovedNotebooks`). Plan 038 already skipped title/create; Slice 18 stopped `NoteService.destroy` / `restore`.
 - **Frontend barrier (Slice 6, keep):** `noteContentMutationBarrier` flushes body autosave before delete. Do not extend it (no title autosave, no retries).
 - **Still on the cache:** focus-context sampling (`InboundResolvedWikiLinks.sampledReferencesNotesForFocusContext`); `NotePropertyIndex.targetNote`; remaining `refreshForNote` / `refreshNotebookScope` callers.
 
@@ -37,7 +37,7 @@ When this plan is complete:
 - Candidate lookup is an optimization, not a resolution verdict. Always live-resolve for the current viewer.
 - Do not change Markdown/wiki syntax, candidate matching, visibility, or API response shapes. Do not add a new ADR.
 
-## Done (1–17)
+## Done (1–18)
 
 | # | Type | Capability |
 |---|---|---|
@@ -58,18 +58,9 @@ When this plan is complete:
 | 15 | Behavior | Delete referrer ids via facade; cache still supplies link text |
 | 16 | Behavior | Relocation via facade; facade now returns authored link texts |
 | 17 | Behavior | Injected notes index authored references like product saves |
+| 18 | Behavior | Delete/restore stop calling `refreshNotebookScope` |
 
 ## Remaining slices
-
-### 18. Deleting a note does not rebuild the notebook wiki cache
-
-- **Type:** Behavior
-- **Status:** pending
-- **Scenario:** Deleting a note soft-deletes it and applies the chosen reference policy without walking other notes in the notebook. A referrer's live outgoing wiki link to the deleted note is missing, and an unrelated note's authored-reference rows are unchanged.
-- Stop `NoteService.destroy` from calling `refreshNotebookScope`. Keep referrer-aggregate rewrites and note-local `refreshForNote` on those rewritten notes only. Same stop on `restore` (assert only that restore still undeletes).
-- Do not extend the frontend mutation barrier. Do not catch or retry `CannotAcquireLockException`.
-- **Why the lock:** `deleteNote` `@Transactional` dirties `deleted_at`, then `refreshNotebookScope` → `findLiveNotesByNotebookIdOrderByIdAsc` auto-flushes the pending `UPDATE note` while another session may hold the row. Slice 6 cannot shorten this transaction.
-- **Verify:** existing delete-controller tests plus a sibling that an unrelated note's authored-reference rows are untouched. Re-run `note_deletion.feature` — all non-`@ignore` scenarios must stay green.
 
 ### 19. Property-removal deletion rewrites from live authored link text
 

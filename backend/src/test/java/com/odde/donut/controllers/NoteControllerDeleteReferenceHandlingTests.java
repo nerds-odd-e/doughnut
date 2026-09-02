@@ -15,6 +15,7 @@ import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.services.ResolvedWikiLinkService;
 import com.odde.donut.services.httpQuery.HttpClientAdapter;
 import jakarta.persistence.EntityManager;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,6 +69,27 @@ class NoteControllerDeleteReferenceHandlingTests extends ControllerTestBase {
             .map(WikiLink::getDestinationNoteId)
             .toList(),
         contains(unrelated.getId()));
+  }
+
+  @Test
+  void shouldNotTouchUnrelatedNotesAuthoredReferenceRowsOnDelete()
+      throws UnexpectedNoAccessRightException {
+    Note target = makeMe.aNote("Target").notebookOwnedBy(currentUser.getUser()).please();
+    makeMe.aNote("Elsewhere").underSameNotebookAs(target).please();
+    Note unrelatedReferrer = makeMe.aNote("UnrelatedReferrer").underSameNotebookAs(target).please();
+    NoteUpdateContentDTO content = new NoteUpdateContentDTO();
+    content.setContent("Body [[Elsewhere]]");
+    textContentController.updateNoteContent(unrelatedReferrer, content);
+    List<AuthoredNoteReferenceRow> rowsBeforeDelete = rowsFor(entityManager, unrelatedReferrer);
+
+    controller.deleteNote(target, leaveDeadLinksDeleteRequest());
+
+    assertThat(rowsFor(entityManager, unrelatedReferrer), equalTo(rowsBeforeDelete));
+    assertThat(
+        rowsFor(entityManager, unrelatedReferrer).stream()
+            .map(AuthoredNoteReferenceRow::getAuthoredLink)
+            .toList(),
+        contains("Elsewhere"));
   }
 
   @Test
