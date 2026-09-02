@@ -1,7 +1,4 @@
-import type {
-  MemoryTracker,
-  NoteRecallInfo,
-} from "@generated/donut-backend-api"
+import type { MemoryTracker } from "@generated/donut-backend-api"
 
 export type MemoryTrackerType = NonNullable<MemoryTracker["type"]>
 
@@ -17,20 +14,6 @@ function matchesTrackerGrain(mt: MemoryTracker, propertyKey?: string) {
   return propertyKey
     ? mt.propertyKey === propertyKey
     : isNoteLevelMemoryTracker(mt)
-}
-
-export function activeUnderstandingTrackers(
-  noteRecallInfo: NoteRecallInfo | null | undefined,
-  propertyKey?: string
-): MemoryTracker[] {
-  return (
-    noteRecallInfo?.memoryTrackers?.filter(
-      (mt) =>
-        matchesTrackerGrain(mt, propertyKey) &&
-        isUnderstandingMemoryTracker(mt) &&
-        mt.removedFromTracking !== true
-    ) ?? []
-  )
 }
 
 function matchesTrackerType(mt: MemoryTracker, type: MemoryTrackerType) {

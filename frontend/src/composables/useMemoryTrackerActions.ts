@@ -29,13 +29,7 @@ export type MemoryTrackerActions = {
   skip: (
     request?: MemoryTrackerActionRequest
   ) => Promise<MemoryTrackerActionResult>
-  revive: (
-    request: MemoryTrackerActionRequest
-  ) => Promise<MemoryTrackerActionResult>
   returnToSequence: (
-    request?: MemoryTrackerActionRequest
-  ) => Promise<MemoryTrackerActionResult>
-  removeFromRecall: (
     request?: MemoryTrackerActionRequest
   ) => Promise<MemoryTrackerActionResult>
   handleSpellingVerified: () => Promise<MemoryTrackerActionResult>
@@ -48,8 +42,8 @@ export const memoryTrackerActionsKey: InjectionKey<MemoryTrackerActions> =
 /**
  * Owns the noteRecallInfo fetch/reload for a single note and composes it
  * with the memory-tracker action handlers (assimilate incl.
- * spelling-verification flow, skip, revive, return-to-sequence,
- * remove-from-recall) from `useMemoryTrackerActionHandlers`.
+ * spelling-verification flow, skip, return-to-sequence) from
+ * `useMemoryTrackerActionHandlers`.
  */
 export function useMemoryTrackerActions(
   noteId: Ref<number>
@@ -76,11 +70,7 @@ export function useMemoryTrackerActions(
     { immediate: true }
   )
 
-  const handlers = useMemoryTrackerActionHandlers(
-    noteId,
-    noteRecallInfo,
-    reloadNoteInfo
-  )
+  const handlers = useMemoryTrackerActionHandlers(noteId, reloadNoteInfo)
 
   return {
     noteInfoLoaded,
