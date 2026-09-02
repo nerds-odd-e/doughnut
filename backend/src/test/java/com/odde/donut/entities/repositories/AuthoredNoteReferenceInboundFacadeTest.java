@@ -3,8 +3,6 @@ package com.odde.donut.entities.repositories;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasSize;
 
 import com.odde.donut.algorithms.AuthoredNoteDocument;
 import com.odde.donut.algorithms.AuthoredNoteReference;
@@ -81,30 +79,9 @@ class AuthoredNoteReferenceInboundFacadeTest {
     assertThat(referrers, empty());
   }
 
-  @Test
-  void deduplicatesOneReferrerAuthoringSeveralReferencesToTheSameTarget() {
-    User owner = makeMe.aUser().please();
-    Note target = makeMe.aNote().title("Alpha").notebookOwnedBy(owner).please();
-    Note source = makeMe.aNote().underSameNotebookAs(target).please();
-    source.replaceContent(
-        new AuthoredNoteDocument(
-            "wiki and id both point at Alpha",
-            List.of(
-                AuthoredNoteReference.WikiPortablePathTarget.fromAuthoredInner("Alpha"),
-                new AuthoredNoteReference.NoteIdUrlTarget(
-                    "[Alpha](/n" + target.getId() + ")",
-                    target.getId(),
-                    "/n" + target.getId(),
-                    "Alpha"))));
-    makeMe.entityPersister.flush();
-
-    List<Note> referrers =
-        authoredNoteReferenceInboundFacade.distinctReferrerNotesForViewer(target, owner);
-
-    assertThat(referrers, hasSize(1));
-    assertThat(referrers.getFirst().getId(), equalTo(source.getId()));
-  }
-
+  // Only test covering the alias branch of wikiCandidateRowsForTarget (the alias lookup
+  // keys fed into findWikiCandidatesForNotebookScope) — keep even though it isn't one of
+  // the two behaviors this class otherwise focuses on.
   @Test
   void matchesAWikiReferenceAuthoredAgainstTheTargetsCurrentAlias() {
     User owner = makeMe.aUser().please();
@@ -120,23 +97,5 @@ class AuthoredNoteReferenceInboundFacadeTest {
         authoredNoteReferenceInboundFacade.distinctReferrerNotesForViewer(target, owner);
 
     assertThat(referrers.stream().map(Note::getId).toList(), contains(source.getId()));
-  }
-
-  @Test
-  void excludesAReferenceThatIsUnreadableToTheViewer() {
-    User owner = makeMe.aUser().please();
-    Note target = makeMe.aNote().title("Alpha").notebookOwnedBy(owner).please();
-    Note source = makeMe.aNote().underSameNotebookAs(target).please();
-    source.replaceContent(
-        new AuthoredNoteDocument(
-            "references [[Alpha]]",
-            List.of(AuthoredNoteReference.WikiPortablePathTarget.fromAuthoredInner("Alpha"))));
-    makeMe.entityPersister.flush();
-    User unrelatedViewer = makeMe.aUser().please();
-
-    List<Note> referrers =
-        authoredNoteReferenceInboundFacade.distinctReferrerNotesForViewer(target, unrelatedViewer);
-
-    assertThat(referrers, empty());
   }
 }

@@ -88,11 +88,13 @@ Regression coverage for behavior that exists but lost its tests when the `Resolv
 ### 9. Remove authored-reference tests that re-prove the controller
 
 - **Type:** Structure
-- **Status:** planned
+- **Status:** done
 
-- Delete `AuthoredNoteReferenceRowRepositoryTest`. Both of its cases (one row per reference in document order, both reference variants reconstructed, previous rows cleared on re-save) are asserted through `TextContentControllerAuthoredReferencePersistenceTest`.
-- Trim `AuthoredNoteReferenceInboundFacadeTest` to the two behaviors that need controlled note ids and cannot be reached through a controller: referrer ordering, and excluding a candidate row that resolves to a different note. Its dedupe, alias, and viewer-readability cases are already covered by `NoteRealmServiceTest` and `NoteControllerShowWikiLinkTests`.
-- Drop the duplicate facade assertion at the tail of `TextContentControllerUpdateNoteTitleInboundWikiReferencesTests`, which re-checks inbound through the facade after the response already asserted it.
+- Deleted `AuthoredNoteReferenceRowRepositoryTest`. Both of its cases were already asserted through `TextContentControllerAuthoredReferencePersistenceTest`.
+- Trimmed `AuthoredNoteReferenceInboundFacadeTest` to three tests: referrer ordering, excluding a candidate row that resolves to a different note, and the alias-match case. **Deviation from plan:** the alias case was kept, not dropped — it is the only coverage in the repo for the alias-key branch of `findWikiCandidatesForNotebookScope`; `NoteRealmServiceTest`/`NoteControllerShowWikiLinkTests` only exercise alias resolution for outgoing links, never inbound. A short inline comment on the test explains why it stays.
+- Dropped the duplicate facade-recheck tail block from two tests in `TextContentControllerUpdateNoteTitleInboundWikiReferencesTests`.
+
+Focused tests green; full backend suite not re-run (not required by wrap-up).
 
 ### 10. Planning and codebase map reflect the shipped design
 
