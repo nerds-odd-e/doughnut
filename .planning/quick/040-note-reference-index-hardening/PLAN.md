@@ -123,16 +123,11 @@ WHERE id = 1;
 ### 11. Drop the one-time authored-reference backfill
 
 - **Type:** Structure
-- **Status:** planned — blocked on the stop above
-- **Gated:** yes
+- **Status:** done
 
-Externally identical once `completed_at` is set: live saves already write `authored_note_reference` through `Note.replaceContent`; the startup scan is a no-op.
+Developer confirmed `authored_note_reference_backfill_progress.completed_at` was set on production before this slice ran.
 
-- Delete `AuthoredNoteReferenceBackfillStartup`, `AuthoredNoteReferenceBackfillTx`, `AuthoredNoteReferenceBackfillProgress`, its repository, and `AuthoredNoteReferenceBackfillTxTest`.
-- Drop `@Order(1)` / backfill comments from `FlyWayFreeVersionRealMigration`.
-- New Flyway migration: `DROP TABLE authored_note_reference_backfill_progress`.
-- Regenerate `docs/database-erd.md`.
-- After this slice, this plan is spent — prune per `planning.mdc`.
+Deleted `AuthoredNoteReferenceBackfillStartup`, `AuthoredNoteReferenceBackfillTx`, `AuthoredNoteReferenceBackfillProgress`, `AuthoredNoteReferenceBackfillProgressRepository`, and `AuthoredNoteReferenceBackfillTxTest`. Dropped the now-meaningless `@Order(0)` and its comment from `FlyWayFreeVersionRealMigration`. Added `V300000317__drop_authored_note_reference_backfill_progress.sql` and regenerated `docs/database-erd.md`. `migrateTestDB` applies cleanly; full recompile and focused authored-reference tests pass. One comment reference to `AuthoredNoteReferenceBackfillTx` remains inside the immutable `V300000315` migration, left untouched per the never-edit-committed-migrations rule.
 
 ### 12. Collapse the wiki-link rewrite pass-through facade (optional)
 

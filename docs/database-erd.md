@@ -81,9 +81,6 @@ erDiagram
         int id PK
         int source_note_id FK
     }
-    authored_note_reference_backfill_progress {
-        int id PK
-    }
     bazaar_notebook {
         int id PK
         int notebook_id FK
