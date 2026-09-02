@@ -3,6 +3,8 @@ import type {
   NoteRecallInfo,
 } from "@generated/donut-backend-api"
 
+export type MemoryTrackerType = NonNullable<MemoryTracker["type"]>
+
 export function isNoteLevelMemoryTracker(mt: MemoryTracker) {
   return !mt.propertyKey
 }
@@ -59,6 +61,25 @@ export function assimilateDisabledForProperty(
     noteRecallInfo?.memoryTrackers?.some(
       (mt) => mt.propertyKey === propertyKey
     ) ?? false
+  )
+}
+
+function matchesTrackerType(mt: MemoryTracker, type: MemoryTrackerType) {
+  return type === "UNDERSTANDING"
+    ? isUnderstandingMemoryTracker(mt)
+    : mt.type === type
+}
+
+export function noteLevelTrackerOfType(
+  trackers: MemoryTracker[] | undefined,
+  type: MemoryTrackerType,
+  propertyKey?: string
+): MemoryTracker | undefined {
+  return trackers?.find(
+    (mt) =>
+      matchesTrackerGrain(mt, propertyKey) &&
+      matchesTrackerType(mt, type) &&
+      mt.removedFromTracking !== true
   )
 }
 

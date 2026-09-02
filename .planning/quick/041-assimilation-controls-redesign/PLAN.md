@@ -68,7 +68,7 @@
 ### 5. Build `AssimilationModes.vue` — full component, not yet wired into any page
 
 - **Type:** Structure
-- **Status:** planned
+- **Status:** done
 - **Pre-condition:** slices 1-4 shipped; `AssimilationButtons.vue` and its current callers (`AssimilationSettings.vue`, `RichFrontmatterPropertyPanel.vue`) are untouched.
 - **Trigger:** none externally — new file only, not referenced by any production page yet.
 - **Post-condition:** `frontend/src/components/recall/AssimilationModes.vue` exists with full component-test coverage for all four row states, but nothing renders it — existing test suite and app behavior are unchanged (verified: existing suite stays green).
@@ -76,6 +76,7 @@
 - **Tests:** component tests covering: no tracker for a mode → Assimilate button (per mode, direct trigger, no dropdown); active tracker for a mode → whole-row link "In recall · next {date}" to `memoryTrackerShow`, recall count in `title` only, no stability shown; MCQ (COMMISSIONED) row → Skip/Return-to-sequence secondary affordance (falls back to the Comprehension/UNDERSTANDING row when COMMISSIONED isn't in `allowedModes`, i.e. property-level reuse in slice 8); mode-label mapping (COMMISSIONED→"MCQ", SPELLING→"Spelling", UNDERSTANDING→"Comprehension").
 - **Design resolution (settled, do not re-open):** "tracker exists for that mode" means an *active* note-level tracker of that type (`removedFromTracking !== true`) — a previously-removed tracker is treated the same as "no tracker," matching the existing `activeUnderstandingTrackers`/`showRemoveFromRecall` precedent. No "Remove from recall"/"Revive" anywhere in this component — those stay tracker-page-only per the scope decision above.
 - **Sizing note:** if this still runs long, split by row state (assimilate-only first, then linked-status, then MCQ skip/return-to-sequence) — same technique as before, now scoped to a single unwired file so any split point is trivially safe to stop at.
+- **Learning:** no existing i18n/label table was found for "MCQ"/"Spelling"/"Comprehension" — followed the existing convention of hardcoding labels inline (matches `NoteInfoMemoryTracker.vue`'s precedent). The pre-existing `hasNoteLevelTrackerOfType`/`hasUnderstandingNoteLevelTracker` predicates in `assimilationMemoryTrackers.ts` are conceptually adjacent to the new `noteLevelTrackerOfType` but serve different active callers (`AssimilationSettings.vue`, `useMemoryTrackerActions.ts`) that stay out of scope until slices 6-9 — left as legitimate interim duplication per the staged-migration design decision, not consolidated here.
 
 ### 6. Note-level panel cuts over its trigger/skip controls to `AssimilationModes`
 
