@@ -115,6 +115,11 @@ public class NoteReferenceService {
     return authoredNoteReferenceInboundFacade.distinctReferrerNotesForViewer(target, viewer);
   }
 
+  /** Whether any authored reference live-resolves to {@code target} for {@code viewer}. */
+  public boolean isReferencedForViewer(Note target, User viewer) {
+    return authoredNoteReferenceInboundFacade.isReferencedForViewer(target, viewer);
+  }
+
   /**
    * One referrer note plus the distinct authored link text(s) it uses to refer to {@code target}.
    *

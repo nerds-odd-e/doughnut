@@ -91,7 +91,7 @@ class TextContentController {
       return;
     }
     User viewer = authorizationService.getCurrentUser();
-    if (noteReferenceService.distinctReferrerNotesForViewer(note, viewer).isEmpty()) {
+    if (!noteReferenceService.isReferencedForViewer(note, viewer)) {
       return;
     }
     if (titleDTO.getReferenceHandling() != null) {

@@ -46,13 +46,9 @@ The backfill now routes stored content through `Note.replaceContent`, replacing 
 ### 3. Title rename asks whether the note is referenced, not for every referrer
 
 - **Type:** Structure
-- **Status:** planned
+- **Status:** done
 
-`TextContentController.assertReferencedTitleRenameIsUnambiguous` materializes and hydrates every inbound referrer only to call `.isEmpty()`, and it does so before `assertAuthorization`. Replace it with an existence query on the same live-resolution path (`NoteReferenceService`), so the gate expresses "is this note referenced?".
-
-Behavior is unchanged from the API's perspective — `TextContentControllerUpdateNoteTitleTests` and `TextContentControllerUpdateNoteTitleInboundWikiReferencesTests` must stay green with no edits.
-
-Note for the record: the gate became viewer-scoped in this migration (it was viewer-blind against the cache). Keep viewer-scoped — the rewrite it guards was always viewer-scoped, so a rename can no longer be blocked by a referrer the user cannot see or fix.
+Title rename now asks `NoteReferenceService.isReferencedForViewer`, which short-circuits on the first visible candidate that live-resolves to the target instead of hydrating every referrer. The shared inbound predicate preserves viewer-scoped behavior; the full backend suite passes without controller-test changes.
 
 ### 4. Retire `resolveAnyTarget`
 

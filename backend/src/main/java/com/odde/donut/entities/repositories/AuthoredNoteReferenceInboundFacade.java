@@ -60,6 +60,17 @@ public class AuthoredNoteReferenceInboundFacade {
     return referrers;
   }
 
+  /** Whether any referrer has an authored reference that live-resolves to {@code target}. */
+  public boolean isReferencedForViewer(Note target, User viewer) {
+    for (AuthoredNoteReferenceRow candidate : candidateRowsForTarget(target)) {
+      Note sourceNote = candidate.getNote();
+      if (isInboundReference(candidate, sourceNote, target, viewer)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   /**
    * One referrer note plus the distinct authored link text(s) (in document order) it uses to refer
    * to the queried target. A referrer can carry more than one text when it authors several distinct
@@ -79,8 +90,7 @@ public class AuthoredNoteReferenceInboundFacade {
     for (AuthoredNoteReferenceRow candidate : candidateRowsForTarget(target)) {
       Note sourceNote = candidate.getNote();
       Integer sourceNoteId = sourceNote.getId();
-      if (!resolvesToTarget(candidate, sourceNote, target, viewer)
-          || !referrerVisibleToViewer(sourceNote, target, viewer)) {
+      if (!isInboundReference(candidate, sourceNote, target, viewer)) {
         continue;
       }
       referrersInOrder.putIfAbsent(sourceNoteId, sourceNote);
@@ -95,6 +105,12 @@ public class AuthoredNoteReferenceInboundFacade {
               entry.getValue(), List.copyOf(linkTextsByReferrerId.get(entry.getKey()))));
     }
     return results;
+  }
+
+  private boolean isInboundReference(
+      AuthoredNoteReferenceRow candidate, Note sourceNote, Note target, User viewer) {
+    return resolvesToTarget(candidate, sourceNote, target, viewer)
+        && referrerVisibleToViewer(sourceNote, target, viewer);
   }
 
   /**
