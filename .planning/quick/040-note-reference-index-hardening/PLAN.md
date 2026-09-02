@@ -67,9 +67,9 @@ Deleted `resolveWikiLinksForCache`, `WikiLinkResolution`, and cache-era wording.
 ### 6. Drop the unread viewer from inbound referrer rewriting
 
 - **Type:** Structure
-- **Status:** planned
+- **Status:** done
 
-Remove the `User viewer` parameter from `WikiLinkRewriteSupport.applyInboundReferrerRewrite` and from its two call sites (`TitleRenameWikiLinkRewrite`, `WikiLinkRelocationRewrite`). The referrer set was already viewer-filtered at capture time; carrying the viewer into the rewrite implies a second authorization decision that does not happen.
+Removed the unread `viewer` parameter from `applyInboundReferrerRewrite` and the inbound-only forwarding call chain. Capture and outgoing classification retain `viewer` where authorization is real. The full backend suite passes.
 
 ### 7. One factory for the authored references of a note's content
 

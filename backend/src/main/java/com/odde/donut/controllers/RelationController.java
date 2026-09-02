@@ -104,7 +104,7 @@ class RelationController {
     Timestamp now = testabilitySettings.getCurrentUTCTimestamp();
     if (Objects.equals(oldNotebook.getId(), targetNotebook.getId())) {
       wikiLinkRewriteService.rewriteInboundWikiLinksForLocationChange(
-          movedNote, now, user, inboundReferences);
+          movedNote, now, inboundReferences);
     } else {
       wikiLinkRewriteService.rewriteWikiLinksForCrossNotebookMove(
           movedNote, oldNotebook, targetNotebook, now, user, inboundReferences);

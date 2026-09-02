@@ -3,7 +3,6 @@ package com.odde.donut.services;
 import com.odde.donut.algorithms.CanonicalDonutOrigin;
 import com.odde.donut.entities.DisplayName;
 import com.odde.donut.entities.Note;
-import com.odde.donut.entities.User;
 import com.odde.donut.factoryServices.EntityPersister;
 import jakarta.persistence.EntityManager;
 import java.sql.Timestamp;
@@ -28,7 +27,6 @@ final class TitleRenameWikiLinkRewrite {
       Note targetNote,
       String newTitle,
       Timestamp updatedAt,
-      User viewer,
       Map<Integer, List<String>> inboundReferences,
       BiFunction<Note, String, String> linkRewrite) {
     targetNote.setTitle(new DisplayName(newTitle));
@@ -42,7 +40,6 @@ final class TitleRenameWikiLinkRewrite {
         canonicalDonutOrigin,
         targetNote,
         updatedAt,
-        viewer,
         linkRewrite,
         Set.of(),
         inboundReferences);

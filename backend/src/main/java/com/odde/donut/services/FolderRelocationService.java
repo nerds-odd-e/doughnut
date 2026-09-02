@@ -95,7 +95,7 @@ public class FolderRelocationService {
     entityPersister.merge(folder);
     entityPersister.flush();
     wikiLinkRewriteService.rewriteInboundWikiLinksForFolderRename(
-        noteIdsInSubtree, oldName, displayName.value(), now, viewer, inboundReferencesByNoteId);
+        noteIdsInSubtree, oldName, displayName.value(), now, inboundReferencesByNoteId);
     return folder;
   }
 
@@ -149,6 +149,6 @@ public class FolderRelocationService {
     entityPersister.remove(folder);
     entityPersister.flush();
     wikiLinkRewriteService.rewriteInboundWikiLinksForFolderReparent(
-        affectedNoteIds, now, viewer, inboundReferencesByNoteId);
+        affectedNoteIds, now, inboundReferencesByNoteId);
   }
 }

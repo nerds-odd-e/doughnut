@@ -83,7 +83,7 @@ final class FolderMoveRelocation {
     entityPersister.merge(folder);
     entityPersister.flush();
     wikiLinkRewriteService.rewriteInboundWikiLinksForFolderReparent(
-        movedNoteIds, now, viewer, inboundReferencesByNoteId);
+        movedNoteIds, now, inboundReferencesByNoteId);
     return folder;
   }
 
@@ -153,7 +153,7 @@ final class FolderMoveRelocation {
       Map<Integer, Map<Integer, List<String>>> inboundReferencesByNoteId,
       Map<Integer, Map<String, Note>> coMovedTargetsByAuthoredLinkByNoteId) {
     wikiLinkRewriteService.rewriteInboundWikiLinksForFolderNotebookMove(
-        movedNoteIds, destinationNotebook.getName(), now, viewer, inboundReferencesByNoteId);
+        movedNoteIds, destinationNotebook.getName(), now, inboundReferencesByNoteId);
     wikiLinkRewriteService.rewriteOutgoingWikiLinksForFolderNotebookMove(
         movedNoteIds, sourceNotebook.getName(), now, viewer, coMovedTargetsByAuthoredLinkByNoteId);
   }

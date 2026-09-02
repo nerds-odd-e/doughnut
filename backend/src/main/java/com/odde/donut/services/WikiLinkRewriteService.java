@@ -67,7 +67,6 @@ public class WikiLinkRewriteService {
         targetNote,
         newTitle,
         updatedAt,
-        viewer,
         inboundReferences,
         (referrer, linkText) ->
             WikiLinkRewriteSupport.rewrittenReference(
@@ -125,12 +124,9 @@ public class WikiLinkRewriteService {
   /** Same-notebook location change: rewrite inbound exact folder/root wiki paths. */
   @Transactional
   public void rewriteInboundWikiLinksForLocationChange(
-      Note targetNote,
-      Timestamp updatedAt,
-      User viewer,
-      Map<Integer, List<String>> inboundReferences) {
+      Note targetNote, Timestamp updatedAt, Map<Integer, List<String>> inboundReferences) {
     wikiLinkRelocationRewrite.rewriteInboundWikiLinksForLocationChange(
-        targetNote, updatedAt, viewer, inboundReferences);
+        targetNote, updatedAt, inboundReferences);
   }
 
   /**
@@ -141,10 +137,9 @@ public class WikiLinkRewriteService {
   public void rewriteInboundWikiLinksForFolderReparent(
       Set<Integer> movedNoteIds,
       Timestamp updatedAt,
-      User viewer,
       Map<Integer, Map<Integer, List<String>>> inboundReferencesByNoteId) {
     wikiLinkRelocationRewrite.rewriteInboundWikiLinksForFolderReparent(
-        movedNoteIds, updatedAt, viewer, inboundReferencesByNoteId);
+        movedNoteIds, updatedAt, inboundReferencesByNoteId);
   }
 
   /** Folder rename: update one matching folder-name segment in inbound path-shaped wiki links. */
@@ -154,15 +149,9 @@ public class WikiLinkRewriteService {
       String oldFolderName,
       String newFolderName,
       Timestamp updatedAt,
-      User viewer,
       Map<Integer, Map<Integer, List<String>>> inboundReferencesByNoteId) {
     wikiLinkRelocationRewrite.rewriteInboundWikiLinksForFolderRename(
-        noteIdsInSubtree,
-        oldFolderName,
-        newFolderName,
-        updatedAt,
-        viewer,
-        inboundReferencesByNoteId);
+        noteIdsInSubtree, oldFolderName, newFolderName, updatedAt, inboundReferencesByNoteId);
   }
 
   /** Cross-notebook folder move: rewrite inbound links; skip referrers inside the moved set. */
@@ -171,10 +160,9 @@ public class WikiLinkRewriteService {
       Set<Integer> movedNoteIds,
       String newNotebookName,
       Timestamp updatedAt,
-      User viewer,
       Map<Integer, Map<Integer, List<String>>> inboundReferencesByNoteId) {
     wikiLinkRelocationRewrite.rewriteInboundWikiLinksForFolderNotebookMove(
-        movedNoteIds, newNotebookName, updatedAt, viewer, inboundReferencesByNoteId);
+        movedNoteIds, newNotebookName, updatedAt, inboundReferencesByNoteId);
   }
 
   /** Cross-notebook folder move: rewrite outgoing links for each note in the moved set. */

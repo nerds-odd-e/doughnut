@@ -55,7 +55,7 @@ class WikiLinkRelocationRewrite {
     Integer oldNotebookId = oldNotebook != null ? oldNotebook.getId() : null;
     if (!Objects.equals(oldNotebookId, targetNotebook.getId())) {
       rewriteInboundWikiLinksForNotebookMove(
-          movedNote, targetNotebook.getName(), updatedAt, viewer, Set.of(), inboundReferences);
+          movedNote, targetNotebook.getName(), updatedAt, Set.of(), inboundReferences);
       String oldNotebookName = oldNotebook != null ? oldNotebook.getName() : null;
       rewriteOutgoingWikiLinksForNotebookMove(movedNote, oldNotebookName, updatedAt, viewer);
     }
@@ -63,15 +63,11 @@ class WikiLinkRelocationRewrite {
 
   /** Same-notebook location change: rewrite inbound exact folder/root wiki paths. */
   void rewriteInboundWikiLinksForLocationChange(
-      Note targetNote,
-      Timestamp updatedAt,
-      User viewer,
-      Map<Integer, List<String>> inboundReferences) {
+      Note targetNote, Timestamp updatedAt, Map<Integer, List<String>> inboundReferences) {
     List<String> folderTrail = FolderTrailSegments.namesFromRootToContainingFolder(targetNote);
     rewriteInboundWikiLinks(
         targetNote,
         updatedAt,
-        viewer,
         (_, linkText) -> WikiLinkMarkdownRewrite.newInnerForLocationChange(linkText, folderTrail),
         Set.of(),
         inboundReferences);
@@ -84,30 +80,24 @@ class WikiLinkRelocationRewrite {
   void rewriteInboundWikiLinksForFolderReparent(
       Set<Integer> movedNoteIds,
       Timestamp updatedAt,
-      User viewer,
       Map<Integer, Map<Integer, List<String>>> inboundReferencesByNoteId) {
     WikiLinkRewriteSupport.forEachNonDeletedNoteInMoveSet(
         entityManager,
         movedNoteIds,
         note ->
             rewriteInboundWikiLinksForLocationChange(
-                note,
-                updatedAt,
-                viewer,
-                inboundReferencesByNoteId.getOrDefault(note.getId(), Map.of())));
+                note, updatedAt, inboundReferencesByNoteId.getOrDefault(note.getId(), Map.of())));
   }
 
   void rewriteInboundWikiLinksForNotebookMove(
       Note targetNote,
       String newNotebookName,
       Timestamp updatedAt,
-      User viewer,
       Set<Integer> excludedReferrerIds,
       Map<Integer, List<String>> inboundReferences) {
     rewriteInboundWikiLinks(
         targetNote,
         updatedAt,
-        viewer,
         (referrer, linkText) ->
             rewrittenMoveReference(referrer, targetNote, linkText, newNotebookName),
         excludedReferrerIds,
@@ -131,7 +121,6 @@ class WikiLinkRelocationRewrite {
       String oldFolderName,
       String newFolderName,
       Timestamp updatedAt,
-      User viewer,
       Map<Integer, Map<Integer, List<String>>> inboundReferencesByNoteId) {
     WikiLinkRewriteSupport.forEachNonDeletedNoteInMoveSet(
         entityManager,
@@ -140,7 +129,6 @@ class WikiLinkRelocationRewrite {
             rewriteInboundWikiLinks(
                 note,
                 updatedAt,
-                viewer,
                 (_, linkText) ->
                     WikiLinkMarkdownRewrite.newInnerForFolderRename(
                         linkText, oldFolderName, newFolderName),
@@ -153,7 +141,6 @@ class WikiLinkRelocationRewrite {
       Set<Integer> movedNoteIds,
       String newNotebookName,
       Timestamp updatedAt,
-      User viewer,
       Map<Integer, Map<Integer, List<String>>> inboundReferencesByNoteId) {
     WikiLinkRewriteSupport.forEachNonDeletedNoteInMoveSet(
         entityManager,
@@ -163,7 +150,6 @@ class WikiLinkRelocationRewrite {
                 note,
                 newNotebookName,
                 updatedAt,
-                viewer,
                 movedNoteIds,
                 inboundReferencesByNoteId.getOrDefault(note.getId(), Map.of())));
   }
@@ -216,7 +202,6 @@ class WikiLinkRelocationRewrite {
   private void rewriteInboundWikiLinks(
       Note targetNote,
       Timestamp updatedAt,
-      User viewer,
       BiFunction<Note, String, String> linkRewrite,
       Set<Integer> excludedReferrerIds,
       Map<Integer, List<String>> inboundReferences) {
@@ -227,7 +212,6 @@ class WikiLinkRelocationRewrite {
         wikiLinkResolver.canonicalDonutOrigin(),
         targetNote,
         updatedAt,
-        viewer,
         linkRewrite,
         excludedReferrerIds,
         inboundReferences);

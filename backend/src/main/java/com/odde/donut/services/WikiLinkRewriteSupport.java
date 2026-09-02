@@ -82,7 +82,6 @@ final class WikiLinkRewriteSupport {
       CanonicalDonutOrigin canonicalDonutOrigin,
       Note targetNote,
       Timestamp updatedAt,
-      User viewer,
       BiFunction<Note, String, String> linkRewrite,
       Set<Integer> excludedReferrerIds,
       Map<Integer, List<String>> authoredLinkTextsByReferrerId) {
