@@ -123,22 +123,25 @@ export function expectSuccessToast(message: string) {
   }).should('be.visible')
 }
 
-export function propertyMemoryTrackerRowLabel(propertyKey: string) {
-  return `property: ${propertyKey}`
-}
-
-// Assimilation table labels from NoteInfoMemoryTracker.vue trackerTypeLabel:
-// understanding → 'normal', commissioned → 'Commissioned'.
+// Note-level tracker rows now come from `AssimilationModes.vue`
+// (`[data-test="assimilation-mode-row-<MODE>"]`, `[data-test="assimilation-status-<MODE>"]`)
+// instead of the removed Memory Trackers table.
 export type NoteLevelTrackerKind = 'understanding' | 'spelling' | 'commissioned'
 
-const noteLevelTrackerRowLabels: Record<NoteLevelTrackerKind, string> = {
-  understanding: 'normal',
-  spelling: 'spelling',
-  commissioned: 'Commissioned',
+const noteLevelTrackerKindToMode: Record<NoteLevelTrackerKind, string> = {
+  understanding: 'UNDERSTANDING',
+  spelling: 'SPELLING',
+  commissioned: 'COMMISSIONED',
 }
 
-export function noteLevelTrackerRowLabel(kind: NoteLevelTrackerKind): string {
-  return noteLevelTrackerRowLabels[kind]
+export function assimilationStatusSelector(kind: NoteLevelTrackerKind): string {
+  return `[data-test="assimilation-status-${noteLevelTrackerKindToMode[kind]}"]`
+}
+
+export function noteLevelTrackerStatusElement(kind: NoteLevelTrackerKind) {
+  return cy
+    .get(assimilationStatusSelector(kind))
+    .filter((_, el) => isNoteLevelAssimilationControl(el))
 }
 
 export function waitForAssimilationNoteTitle(expectedTitle?: string) {

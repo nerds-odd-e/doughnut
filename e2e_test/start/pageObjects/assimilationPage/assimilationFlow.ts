@@ -11,12 +11,17 @@ import {
   mainNoteHeadingTitleSelector,
   expectOtherNoteLevelSecondaryActionsAbsent,
   noteLevelControlElements,
+  noteLevelTrackerStatusElement,
   openRefineNoteModalIfNeeded,
   skipButton,
   returnToSequenceButton,
   waitForAssimilationNoteTitle,
-  noteLevelTrackerRowLabel,
+  type NoteLevelTrackerKind,
 } from './shared'
+
+function expectNoteLevelTrackerStatus(kind: NoteLevelTrackerKind) {
+  noteLevelTrackerStatusElement(kind).should('exist')
+}
 
 export const assumeAssimilationPage = () => ({
   ...assimilationPropertyMemoryTrackerExpectations(),
@@ -56,16 +61,12 @@ export const assumeAssimilationPage = () => ({
     return this
   },
   expectOrdinaryAndCommissionedMemoryTrackers() {
-    this.expectMemoryTrackerInfo([
-      { type: noteLevelTrackerRowLabel('understanding') },
-      { type: noteLevelTrackerRowLabel('commissioned') },
-    ])
+    expectNoteLevelTrackerStatus('understanding')
+    expectNoteLevelTrackerStatus('commissioned')
     return this
   },
   expectSpellingMemoryTracker() {
-    this.expectMemoryTrackerInfo([
-      { type: noteLevelTrackerRowLabel('spelling') },
-    ])
+    expectNoteLevelTrackerStatus('spelling')
     return this
   },
   skipOnPanel() {

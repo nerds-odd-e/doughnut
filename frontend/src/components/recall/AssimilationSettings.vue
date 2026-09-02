@@ -4,11 +4,6 @@
     data-testid="assimilation-settings"
     class="flex flex-col gap-0"
   >
-    <NoteInfoComponent
-      v-if="noteRecallInfo"
-      :note-recall-info="noteRecallInfo"
-    />
-    <div class="daisy-divider my-4" />
     <div
       class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
     >
@@ -31,7 +26,6 @@
 
 <script setup lang="ts">
 import type { Note } from "@generated/donut-backend-api"
-import NoteInfoComponent from "../notes/NoteInfoComponent.vue"
 import AssimilationModes from "./AssimilationModes.vue"
 import type { AssimilateEvent } from "@/composables/useAssimilateUnit"
 import { isSkippedFromAssimilationSequence } from "@/composables/useAssimilationSequenceSkip"

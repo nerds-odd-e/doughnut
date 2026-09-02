@@ -21,6 +21,7 @@ import {
   TextContentController,
 } from '@generated/donut-backend-api/sdk.gen'
 import { circleIdAlias } from './pageObjects/circlePage'
+import { noteIdFromUrl } from './noteIdFromUrl'
 import { assimilateTestabilityMethods } from './testabilityAssimilate'
 import { bazaarTestabilityMethods } from './testabilityBazaar'
 import { recallTestabilityMethods } from './testabilityRecall'
@@ -57,18 +58,6 @@ const injectedNoteIdMapAliasName = 'injectedNoteIdMap'
 
 const conversationIdAlias = (noteTitle: string) =>
   `conversationId_${noteTitle.replace(/\s+/g, '_')}`
-
-function noteIdFromUrl(url: string): number {
-  const match =
-    url.match(/\/n(\d+)/) ??
-    url.match(/\/n\/(\d+)/) ??
-    url.match(/\/d\/n\/(\d+)/)
-  expect(
-    match,
-    `could not parse note id from URL (expected /n<id>, /n/<id>, or legacy /d/n/<id>): ${url}`
-  ).to.not.be.null
-  return Number(match![1])
-}
 
 /** Same kebab-case rule as relation type options / app compose. */
 function relationKebabFromLabel(label: string): string {

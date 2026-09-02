@@ -11,6 +11,7 @@ import {
   RecallPromptController,
   RecallsController,
 } from '@generated/donut-backend-api/sdk.gen'
+import { noteIdFromUrl } from './noteIdFromUrl'
 import { unwrapData } from './unwrapApi'
 
 type InjectedNoteIds = {
@@ -84,6 +85,33 @@ export const recallTestabilityMethods = {
           return tracker as MemoryTracker
         })
     )
+  },
+
+  /**
+   * Property-scoped memory tracker for the note currently on screen — the
+   * property panel doesn't expose a status link to the tracker page until
+   * the AssimilationModes migration reaches it, so callers read the tracker
+   * straight from the backend instead of a table row. Resolves to `null`
+   * (never `undefined`) when there's no match: a `.then()` callback that
+   * returns `undefined` makes Cypress keep the *previous* subject instead of
+   * `undefined`, which would silently resurrect the whole NoteRecallInfo.
+   */
+  propertyMemoryTrackerForCurrentNote(
+    propertyKey: string
+  ): Cypress.Chainable<MemoryTracker | null> {
+    return cy.url().then((url) => {
+      const noteId = noteIdFromUrl(url)
+      return cy
+        .wrap(NoteController.getNoteInfo({ path: { note: noteId } }), {
+          log: false,
+        })
+        .then(
+          (response) =>
+            unwrapData<NoteRecallInfo>(response).memoryTrackers?.find(
+              (candidate) => candidate.propertyKey === propertyKey
+            ) ?? null
+        )
+    })
   },
 
   dueRecallPrompt() {

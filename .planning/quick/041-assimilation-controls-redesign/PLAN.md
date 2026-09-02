@@ -93,7 +93,7 @@
 ### 7. Remove the old Memory Trackers table; redirect the E2E it was carrying
 
 - **Type:** Behavior
-- **Status:** planned
+- **Status:** done
 - **Pre-condition:** slice 6 shipped — assimilate/status/skip are fully covered by `AssimilationModes` rows.
 - **Trigger:** panel renders.
 - **Post-condition:** `AssimilationSettings.vue` no longer renders `NoteInfoComponent`/`NoteInfoMemoryTracker` — only the compact per-mode rows show. The 4 E2E features that read tracker info from that table (note-level and property-level *existence*/*recall-count* checks only — not the property panel's own Remove-from-recall button, which is slice 8's concern) are redirected to equivalent new sources and stay green.
@@ -101,6 +101,7 @@
 - **Known recipe (already solved once during the reverted attempt — redo directly, don't rediscover):** existence/absence of a tracker for a mode → check `[data-test="assimilation-row-<mode>"]` for a nested `[data-test="assimilation-status"]` (exists) vs. an Assimilate button (doesn't). Recall-count assertions → click the row's status link to the tracker page, assert via `assumeMemoryTrackerPage().expectRecallCount(count)`, then `cy.go('back')` if the scenario has more steps after.
 - **Tests:** `cypress run --spec` each of: `e2e_test/features/relationships/relationship_edit_and_remove.feature`, `e2e_test/features/recall/property_memory_tracker.feature` (its non-remove scenarios only — see slice 8), `e2e_test/features/assimilation/assimilate_with_remembering_spelling.feature`, `e2e_test/features/learning_session/commissioned_learning_session.feature`; also re-run `assimilation_walkthrough.feature` as a regression check (should already be green from slice 6).
 - **Sizing note:** the one slice in this breakdown that legitimately touches many files at once, because the table removal and its readers must move together to stay CI-green — but the recipe above is already known from the reverted attempt, so treat any further exploration/rediscovery time as the signal to stop and re-read this note rather than re-deriving it from scratch.
+- **Learning:** actual `AssimilationModes.vue` selector attributes are `assimilation-mode-row-<MODE>`/`assimilation-status-<MODE>`, not the plan-prose placeholder `assimilation-row-<mode>` — use the real markup, not the prose name, when redoing this recipe elsewhere. Property-level existence/recall-count checks read via a new backend testability method (`propertyMemoryTrackerForCurrentNote`, `e2e_test/start/testabilityRecall.ts`) rather than a UI status link, since the property panel has no status link until slice 8 replaces `AssimilationButtons` there — this testability path becomes redundant once slice 8 lands and can be reconsidered then. Found and fixed a real Cypress bug along the way: `.then()` treats a callback returning `undefined` as "keep the previous subject" rather than yielding `undefined`, so a `.find()`-based lookup that can legitimately not find anything must coalesce to `?? null`. `NoteInfoComponent.vue`/`NoteInfoMemoryTracker.vue` have zero remaining production callers now but are deliberately left in place for slice 9 to delete alongside `AssimilationButtons.vue`.
 
 ### 8. Note-property panel reuses `AssimilationModes` instead of its own wiring
 
