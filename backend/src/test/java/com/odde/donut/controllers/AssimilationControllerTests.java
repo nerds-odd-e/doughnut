@@ -204,6 +204,27 @@ class AssimilationControllerTests extends ControllerTestBase {
     }
 
     @Test
+    void returnsPropertyWhenWikiReferenceIsAmbiguous() {
+      Timestamp day1 = makeMe.aTimestamp().of(1, 8).fromShanghai().please();
+      testabilitySettings.timeTravelTo(day1);
+      Folder folderA =
+          makeMe.aFolder().notebookOwnedBy(currentUser.getUser()).name("Recipes").please();
+      Folder folderB = makeMe.aFolder().notebook(folderA.getNotebook()).name("Pantry").please();
+      Note sharedA = makeMe.aNote().title("Shared").folder(folderA).please();
+      Note sharedB = makeMe.aNote().title("Shared").folder(folderB).please();
+      makeMe.aMemoryTrackerFor(sharedA).assimilatedAt(day1).please();
+      makeMe.aMemoryTrackerFor(sharedB).assimilatedAt(day1).please();
+      Note carrier = makeMe.aNote().notebook(folderA.getNotebook()).please();
+      authorReferencingContent(carrier, "---\nexample of: \"[[Shared]]\"\n---\n\nbody");
+      notePropertyIndexService.refreshForNote(carrier);
+      makeMe.aMemoryTrackerFor(carrier).assimilatedAt(day1).please();
+
+      AssimilationNextDTO result = controller.next("Asia/Shanghai");
+      assertThat(result.getNextUnit().getNoteId(), equalTo(carrier.getId()));
+      assertThat(result.getNextUnit().getPropertyKey(), equalTo("example of"));
+    }
+
+    @Test
     void returns_next_property_key_for_untracked_example_of() {
       Timestamp day1 = makeMe.aTimestamp().of(1, 8).fromShanghai().please();
       testabilitySettings.timeTravelTo(day1);

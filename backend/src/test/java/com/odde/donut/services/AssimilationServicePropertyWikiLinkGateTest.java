@@ -1,16 +1,23 @@
 package com.odde.donut.services;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.nullValue;
 
+import com.odde.donut.entities.DisplayName;
+import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
+import com.odde.donut.entities.Subscription;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 class AssimilationServicePropertyWikiLinkGateTest extends AssimilationServiceTestBase {
   @Autowired NotePropertyIndexService notePropertyIndexService;
+  @Autowired UnassimilatedPropertyService unassimilatedPropertyService;
 
   private Note carrierWithExampleOf(Note sibling, String content) {
     return carrierOnNotebook(sibling.getNotebook(), content);
@@ -26,6 +33,10 @@ class AssimilationServicePropertyWikiLinkGateTest extends AssimilationServiceTes
     notePropertyIndexService.refreshForNote(carrier);
     makeMe.aMemoryTrackerFor(carrier).assimilatedAt(day1).please();
     return carrier;
+  }
+
+  private List<AssimilationUnit> pendingPropertiesForUser() {
+    return unassimilatedPropertyService.streamUnassimilatedPropertiesForUser(user).toList();
   }
 
   @Test
@@ -118,5 +129,54 @@ class AssimilationServicePropertyWikiLinkGateTest extends AssimilationServiceTes
     AssimilationUnit next = assimilationService.getNextAssimilationUnit().orElseThrow();
     assertThat(next.note(), equalTo(carrier));
     assertThat(next.propertyKey(), equalTo("example of"));
+  }
+
+  @Test
+  void stops_gating_property_when_namesake_makes_reference_ambiguous_without_reindex() {
+    Folder folderA = makeMe.aFolder().notebookOwnedBy(user).name("Recipes").please();
+    makeMe.aNote().title("Shared").folder(folderA).please();
+    carrierWithExampleOf(folderA.getNotebook(), "---\nexample of: \"[[Shared]]\"\n---\n\nbody");
+
+    assertThat(pendingPropertiesForUser(), empty());
+
+    Folder folderB = makeMe.aFolder().notebook(folderA.getNotebook()).name("Pantry").please();
+    makeMe.aNote().title("Shared").folder(folderB).please();
+
+    List<AssimilationUnit> pending = pendingPropertiesForUser();
+    assertThat(pending, hasSize(1));
+    assertThat(pending.get(0).propertyKey(), equalTo("example of"));
+  }
+
+  @Test
+  void offers_property_when_target_rename_breaks_resolution_without_reindex() {
+    Note target = makeMe.aNote().title("Word").notebookOwnedBy(user).please();
+    carrierWithExampleOf(target, "---\nexample of: \"[[Word]]\"\n---\n\nbody");
+
+    assertThat(pendingPropertiesForUser(), empty());
+
+    target.setTitle(new DisplayName("Renamed"));
+    makeMe.entityPersister.merge(target);
+
+    List<AssimilationUnit> pending = pendingPropertiesForUser();
+    assertThat(pending, hasSize(1));
+    assertThat(pending.get(0).propertyKey(), equalTo("example of"));
+  }
+
+  @Test
+  void does_not_gate_property_when_viewer_cannot_read_target_notebook() {
+    Notebook privateNotebook = makeMe.aNotebook().creatorAndOwner(user).name("PrivateNb").please();
+    Notebook publicNotebook = makeMe.aNotebook().creatorAndOwner(user).name("PublicNb").please();
+    makeMe.aSubscription().forNotebook(publicNotebook).forUser(anotherUser).please();
+    makeMe.aNote().title("Secret").notebook(privateNotebook).please();
+    carrierWithExampleOf(publicNotebook, "---\nexample of: \"[[PrivateNb:Secret]]\"\n---\n\nbody");
+    makeMe.refresh(anotherUser);
+
+    Subscription subscription = anotherUser.getSubscriptions().stream().findFirst().orElseThrow();
+    List<AssimilationUnit> pending =
+        unassimilatedPropertyService
+            .streamUnassimilatedPropertiesForSubscription(subscription)
+            .toList();
+    assertThat(pending, hasSize(1));
+    assertThat(pending.get(0).propertyKey(), equalTo("example of"));
   }
 }

@@ -1,7 +1,7 @@
 # Authoritative authored note references
 
 **Status:** in progress  
-**Resume:** next slice is 22 (assimilation gates on current reference resolution). Slices 1–21 done.  
+**Resume:** next slice is 23 (retire resolved-link state and notebook-wide refreshes). Slices 1–22 done.  
 **Source:** `.planning/notes/notebook-scope-wiki-refresh-on-title-and-create.md`  
 **Architecture:** ADR 0004, “Links and attachments”  
 **Goal:** Make authored semantic note references a domain-owned representation derived from note Markdown, and make every consumer resolve those references against current state without notebook-wide cache refreshes.
@@ -63,17 +63,9 @@ When this plan is complete:
 | 19 | Behavior | Property-removal deletion rewrites from live authored link text |
 | 20 | Behavior | Focus context samples only currently resolved inbound references |
 | 21 | Structure | Property index points to authored references, not cached targets |
+| 22 | Behavior | Assimilation gates on current reference resolution |
 
 ## Remaining slices
-
-### 22. Assimilation gates on current reference resolution
-
-- **Type:** Behavior
-- **Status:** pending
-- **Scenario:** A property pointing at another note blocks assimilation only while that authored reference currently resolves for the learner to a target whose required tracker is incomplete; rename, ambiguity, deletion, property removal, and viewer visibility take effect without rebuilding the property's stored target.
-- Drive `AssimilationController` with real notes, trackers, and database rows.
-- Replace JPQL that joins `NotePropertyIndex.targetNote` with candidate retrieval plus domain resolution at the assimilation boundary. Preserve exact-key dedupe and result ordering.
-- **Verify:** full backend tests.
 
 ### 23. Retire resolved-link state and notebook-wide refreshes
 
