@@ -22,7 +22,7 @@ const withPropertyPanel = (key: string, fn: () => void) => {
   })
 }
 
-const clickPropertyPanelAction = (key: string, testId: string) => {
+export const clickPropertyPanelAction = (key: string, testId: string) => {
   withPropertyPanel(key, () => {
     cy.get(`[data-test="${testId}"]`).click()
   })

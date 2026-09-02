@@ -1,8 +1,8 @@
 import { waitUntilAppIsNotBusy } from '../../pageBase'
-import router from '../../router'
 import testability from '../../testability'
 import { assumeMemoryTrackerPage } from '../memoryTrackerPage'
 import {
+  clickPropertyTrackerStatusLink,
   noteLevelTrackerStatusElement,
   type NoteLevelTrackerKind,
 } from './shared'
@@ -49,10 +49,8 @@ export function assimilationPropertyMemoryTrackerExpectations() {
             tracker,
             `expected a property memory tracker for "${propertyKey}"`
           ).to.exist
-          router().push('memoryTrackerShow', {
-            memoryTrackerId: tracker!.id,
-          })
         })
+      clickPropertyTrackerStatusLink(propertyKey)
       return openMemoryTrackerPage()
     },
     openNoteLevelMemoryTracker(kind: NoteLevelTrackerKind) {

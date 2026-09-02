@@ -1,5 +1,6 @@
 import { waitUntilAppIsNotBusy } from '../../pageBase'
 import { clickToolbarOverflowAction } from '../noteToolbarOverflow'
+import { clickPropertyPanelAction } from '../noteRichPropertyAssimilationMethods'
 
 // Note-level trigger row markup: `AssimilationModes.vue` (`data-testid`
 // "assimilation-modes"). Each mode gets its own direct trigger — no more
@@ -145,6 +146,18 @@ export function noteLevelTrackerStatusElement(kind: NoteLevelTrackerKind) {
   return cy
     .get(assimilationStatusSelector(kind))
     .filter((_, el) => isNoteLevelAssimilationControl(el))
+}
+
+// Property-level tracker status link: `AssimilationModes.vue`'s row for a
+// note property lives inside that property's own collapsible panel, so it
+// is scoped with `clickPropertyPanelAction` (the same scoping convention
+// `noteRichPropertyAssimilationMethods.ts` uses for its other property-row
+// actions) rather than filtered out of the note-level selector the way
+// `noteLevelTrackerStatusElement` is. Properties only ever offer the
+// UNDERSTANDING mode (see `RichFrontmatterPropertyPanel.vue`), so there is
+// no per-mode parameter to take.
+export function clickPropertyTrackerStatusLink(propertyKey: string) {
+  clickPropertyPanelAction(propertyKey, 'assimilation-status-UNDERSTANDING')
 }
 
 export function waitForAssimilationNoteTitle(expectedTitle?: string) {
