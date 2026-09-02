@@ -94,7 +94,7 @@
 
 <script setup lang="ts">
 import type { User } from "@generated/donut-backend-api"
-import type { PropType, Component, Ref } from "vue"
+import type { PropType, Ref } from "vue"
 import { ref, computed, onMounted, onUnmounted, watch } from "vue"
 import { useRoute } from "vue-router"
 import LoginButton from "@/components/toolbars/LoginButton.vue"
@@ -105,25 +105,16 @@ import { isWithinAutoCollapseDropdownTree } from "@/composables/dropdownPortalCo
 import { useResumeRecall } from "@/composables/useResumeRecall"
 import { useGoToNextAssimilation } from "@/composables/useGoToNextAssimilation"
 import { isNavigationActionItem } from "@/components/navigation/navigationActionItems"
-
-type NavigationItemType = {
-  name?: string
-  label: string
-  icon: Component
-  isActive: boolean
-  badge?: number
-  badgeClass?: string
-  hasDropdown?: boolean
-}
+import type { NavigationItemProps } from "@/components/navigation/navigationItem"
 
 const props = defineProps({
   user: { type: Object as PropType<User>, required: false },
   upperNavItems: {
-    type: Array as PropType<NavigationItemType[]>,
+    type: Array as PropType<NavigationItemProps[]>,
     required: true,
   },
   lowerNavItems: {
-    type: Array as PropType<NavigationItemType[]>,
+    type: Array as PropType<NavigationItemProps[]>,
     required: true,
   },
   isHomePage: { type: Boolean, required: true },

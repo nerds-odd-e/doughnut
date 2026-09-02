@@ -15,7 +15,7 @@
     >
       <div class="icon-container">
         <component :is="icon" :size="24" />
-        <div v-if="badge" :class="badgeClass">
+        <div v-if="badge" :class="badgeClass" :title="badgeTitle">
           {{ badge }}
         </div>
       </div>
@@ -30,7 +30,7 @@
     >
       <div class="icon-container">
         <component :is="icon" :size="24" />
-        <div v-if="badge" :class="badgeClass">
+        <div v-if="badge" :class="badgeClass" :title="badgeTitle">
           {{ badge }}
         </div>
       </div>
@@ -45,7 +45,7 @@
     >
       <div class="icon-container">
         <component :is="icon" :size="24" />
-        <div v-if="badge" :class="badgeClass">
+        <div v-if="badge" :class="badgeClass" :title="badgeTitle">
           {{ badge }}
         </div>
       </div>
@@ -66,7 +66,7 @@
       >
         <div class="icon-container">
           <component :is="icon" :size="24" />
-          <div v-if="badge" :class="badgeClass">
+          <div v-if="badge" :class="badgeClass" :title="badgeTitle">
             {{ badge }}
           </div>
         </div>
@@ -80,21 +80,12 @@
 </template>
 
 <script setup lang="ts">
-import type { Component } from "vue"
 import AutoCollapseDropdown from "@/components/commons/AutoCollapseDropdown.vue"
 import AssimilationMenuProgress from "@/components/navigation/AssimilationMenuProgress.vue"
 import { isNavigationActionItem } from "@/components/navigation/navigationActionItems"
+import type { NavigationItemProps } from "@/components/navigation/navigationItem"
 
-const { name } = defineProps<{
-  name?: string
-  label: string
-  icon: Component
-  isActive: boolean
-  badge?: number
-  badgeClass?: string
-  hasDropdown?: boolean
-  nonClickable?: boolean
-}>()
+const { name } = defineProps<NavigationItemProps>()
 
 const emit = defineEmits<{
   (e: "resumeRecall"): void

@@ -23,7 +23,7 @@ setupMainMenuTests()
 
 describe("MainMenu assimilate", () => {
   describe("due count", () => {
-    it("shows due count when there are due items", async () => {
+    it("shows a combined due/total badge when there are due items", async () => {
       mockSdkService(
         UserController,
         "getMenuData",
@@ -31,7 +31,7 @@ describe("MainMenu assimilate", () => {
           assimilationCount: {
             dueCount: 5,
             assimilatedCountOfTheDay: 0,
-            totalUnassimilatedCount: 0,
+            totalUnassimilatedCount: 128,
           },
         })
       )
@@ -39,18 +39,22 @@ describe("MainMenu assimilate", () => {
       const { getByText } = mountMainMenu()
       await flushPromises()
 
-      const dueCount = getByText("5")
-      expect(dueCount).toHaveClass("due-count")
+      const badge = getByText("5/128")
+      expect(badge).toHaveClass("due-count")
+      expect(badge).toHaveAttribute(
+        "title",
+        "5 due today, 128 total unassimilated"
+      )
       expect(
         screen.queryByTestId("assimilation-menu-progress")
       ).not.toBeInTheDocument()
     })
 
-    it("does not show due count when there are no due items", async () => {
+    it("does not show the badge when there is nothing due or backlogged", async () => {
       const { queryByText } = mountMainMenu()
       await flushPromises()
 
-      expect(queryByText("0")).not.toBeInTheDocument()
+      expect(queryByText("0/0")).not.toBeInTheDocument()
     })
 
     it("calls getMenuData with timezone and refetches when user changes", async () => {

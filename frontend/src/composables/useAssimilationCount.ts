@@ -7,6 +7,30 @@ export type AssimilationProgressCounts = {
   total: number
 }
 
+const ABBREVIATION_UNITS: [number, string][] = [
+  [1_000_000_000, "b"],
+  [1_000_000, "m"],
+  [1_000, "k"],
+]
+
+export function abbreviateCount(count: number): string {
+  const unit = ABBREVIATION_UNITS.find(([threshold]) => count >= threshold)
+  if (!unit) {
+    return String(count)
+  }
+  const [divisor, suffix] = unit
+  const rounded = Math.round((count / divisor) * 10) / 10
+  return `${rounded}${suffix}`
+}
+
+export function formatAssimilationBadge(due: number, total: number): string {
+  return `${abbreviateCount(due)}/${abbreviateCount(total)}`
+}
+
+export function assimilationBadgeTitle(due: number, total: number): string {
+  return `${due} due today, ${total} total unassimilated`
+}
+
 export function assimilationProgressFromCounts(
   assimilatedCountOfTheDay: number | undefined,
   dueCount: number | undefined,

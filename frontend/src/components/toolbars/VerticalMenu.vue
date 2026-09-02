@@ -46,31 +46,22 @@
 
 <script setup lang="ts">
 import type { User } from "@generated/donut-backend-api"
-import type { PropType, Component } from "vue"
+import type { PropType } from "vue"
 import LoginButton from "@/components/toolbars/LoginButton.vue"
 import NavigationItem from "@/components/navigation/NavigationItem.vue"
 import AccountMenuItem from "@/components/toolbars/AccountMenuItem.vue"
 import { useResumeRecall } from "@/composables/useResumeRecall"
 import { useGoToNextAssimilation } from "@/composables/useGoToNextAssimilation"
-
-type NavigationItemType = {
-  name?: string
-  label: string
-  icon: Component
-  isActive: boolean
-  badge?: number
-  badgeClass?: string
-  hasDropdown?: boolean
-}
+import type { NavigationItemProps } from "@/components/navigation/navigationItem"
 
 defineProps({
   user: { type: Object as PropType<User>, required: false },
   upperNavItems: {
-    type: Array as PropType<NavigationItemType[]>,
+    type: Array as PropType<NavigationItemProps[]>,
     required: true,
   },
   lowerNavItems: {
-    type: Array as PropType<NavigationItemType[]>,
+    type: Array as PropType<NavigationItemProps[]>,
     required: true,
   },
   isHomePage: { type: Boolean, required: true },

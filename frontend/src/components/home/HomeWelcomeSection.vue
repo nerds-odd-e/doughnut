@@ -46,23 +46,14 @@
 import NavigationItem from "@/components/navigation/NavigationItem.vue"
 import { useGoToNextAssimilation } from "@/composables/useGoToNextAssimilation"
 import { useHomeWelcomePath } from "@/composables/useHomeWelcomePath"
-import type { Component } from "vue"
 import { ref } from "vue"
+import type { NavigationItemProps } from "@/components/navigation/navigationItem"
 
 const { goToNextAssimilation } = useGoToNextAssimilation()
 
 defineProps<{
   userName: string
-  navItems: Array<{
-    name?: string
-    label: string
-    icon: Component
-    isActive: boolean
-    badge?: number
-    badgeClass?: string
-    hasDropdown?: boolean
-    nonClickable?: boolean
-  }>
+  navItems: Array<NavigationItemProps>
 }>()
 
 const upperHalf = ref<HTMLElement>()

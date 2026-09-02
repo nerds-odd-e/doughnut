@@ -1,6 +1,10 @@
 import { computed } from "vue"
 import { useRoute } from "vue-router"
-import { useAssimilationCount } from "@/composables/useAssimilationCount"
+import {
+  assimilationBadgeTitle,
+  formatAssimilationBadge,
+  useAssimilationCount,
+} from "@/composables/useAssimilationCount"
 import { useRecallData } from "@/composables/useRecallData"
 import { isNoteRouteFamily } from "@/routes/noteRouteFamily"
 import {
@@ -16,7 +20,7 @@ import { messageCenter } from "@/store/messageCenter"
 
 export function useNavigationItems() {
   const route = useRoute()
-  const { dueCount } = useAssimilationCount()
+  const { dueCount, totalUnassimilatedCount } = useAssimilationCount()
   const {
     toRepeatCount,
     toRepeat,
@@ -26,6 +30,8 @@ export function useNavigationItems() {
   } = useRecallData()
 
   const upperNavItems = computed(() => {
+    const due = dueCount.value ?? 0
+    const totalUnassimilated = totalUnassimilatedCount.value ?? 0
     const baseItems = [
       {
         name: "notebooks",
@@ -40,7 +46,11 @@ export function useNavigationItems() {
         name: "assimilate",
         label: "Assimilate",
         icon: CircleCheck,
-        badge: dueCount.value,
+        badge:
+          due > 0 || totalUnassimilated > 0
+            ? formatAssimilationBadge(due, totalUnassimilated)
+            : undefined,
+        badgeTitle: assimilationBadgeTitle(due, totalUnassimilated),
         badgeClass: "due-count",
         isActive: false,
       },

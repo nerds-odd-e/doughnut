@@ -19,12 +19,13 @@
 ### 1. Assimilate nav item shows due and total as one combined, abbreviated badge
 
 - **Type:** Behavior
-- **Status:** planned
+- **Status:** done
 - **Pre-condition:** user has both a due-today count and a total-unassimilated backlog (already computed server-side).
 - **Trigger:** nav renders.
 - **Post-condition:** the `assimilate` nav item shows one badge `"{due}/{total}"` (each side abbreviated above 3 digits) instead of the bare due-count badge; no second competing badge appears.
 - **Touches:** `frontend/src/composables/useNavigationItems.ts` (badge value), a new small `abbreviateCount`/`formatAssimilationBadge` helper (co-located with `useAssimilationCount.ts`), `frontend/src/components/navigation/NavigationItem.vue` only if the badge markup needs more width for the combined string.
 - **Tests:** unit test for the abbreviation/format helper (small-test style: 0, 3-digit boundary, 1000, large value); a component/composable test asserting the nav badge string for a given due/total pair.
+- **Learning:** the combined badge stays hidden when both due and total are 0 (matches prior single-badge behavior). `NavigationItem.vue`'s badge prop widened to `number | string` plus a new `badgeTitle` prop for the "N due today, M total unassimilated" tooltip; post-change-refactor extracted a shared `NavigationItemProps` type (`frontend/src/components/navigation/navigationItem.ts`) so badge/badgeTitle no longer need four parallel edits across `NavigationItem.vue`, `HorizontalMenu.vue`, `VerticalMenu.vue`, `HomeWelcomeSection.vue`.
 
 ### 2. "Refine note" moves from the assimilation panel into the note toolbar
 
