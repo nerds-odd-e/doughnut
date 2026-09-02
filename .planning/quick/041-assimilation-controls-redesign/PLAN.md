@@ -56,13 +56,14 @@
 ### 4. Fix pre-existing E2E regression: assimilation-progress assertions read a deleted element
 
 - **Type:** Behavior
-- **Status:** planned
+- **Status:** done
 - **Pre-condition:** `assimilation_walkthrough.feature` currently fails 4 of 9 scenarios on `main` — slice 3 deleted `AssimilationProgressSummary.vue` (`[data-test="assimilation-progress-summary"]`) but nothing updated the E2E step that reads it.
 - **Trigger:** the 5 occurrences of `Then I should see assimilation progress "X/Y/Z"` across 4 scenarios in `e2e_test/features/assimilation/assimilation_walkthrough.feature` (lines 21, 27, 30, 94, 105).
 - **Post-condition:** those assertions read the nav badge (`due/total`, already shipped in slice 1) instead of the removed element; all 9 scenarios in the feature pass.
 - **Touches:** `e2e_test/features/assimilation/assimilation_walkthrough.feature`, `e2e_test/step_definitions/assimilation.ts` (`I should see assimilation progress` step), `e2e_test/start/pageObjects/assimilationPage/assimilationFlow.ts` (delete `expectAssimilationProgressSummary`; add a nav-badge reader following the existing `expectCount`/`expectAssimilationMenuProgress` convention in `assimilationMenu.ts`, e.g. `expectAssimilationNavBadge(dueOverTotal)` asserting `.due-count` text on the assimilate nav item).
 - **Tests:** `cypress run --spec e2e_test/features/assimilation/assimilation_walkthrough.feature` green (9/9). This is a standalone regression fix, not new product scope — commit it separately from the redesign slices.
 - **Known values (already derived once — re-derive only if fixture setup changes):** with `dailyLimit=2` and 5 total notes, old triple `0/2/5` → new badge `2/5`; old triple `1/2/5` → new badge `1/4` (`totalUnassimilatedCount` decrements as notes are assimilated, unlike the old triple's static third number). Backend logic for reference: `AssimilationCounter.getDueCount() = min(dailyLimit - assimilatedToday, totalUnassimilated)`, `getTotalUnassimilated() = subscribedUnitCount + ownedUnitCount`.
+- **Learning:** this slice's fix had already landed on `main` in commit `4dc4a72c77` before execution reached this slice (folded in alongside an unrelated toolbar-overflow refactor). No new code change was needed — verified the commit's content matches this slice's spec exactly and confirmed all 10 scenarios in `assimilation_walkthrough.feature` pass (feature has 10 scenarios, not 9 as originally estimated).
 
 ### 5. Build `AssimilationModes.vue` — full component, not yet wired into any page
 
