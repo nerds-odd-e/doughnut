@@ -15,14 +15,8 @@ class FocusContextRetrievalInboundSamplingTest extends FocusContextRetrievalTest
 
   private void addInboundReferrers(Note focus, User viewer, int count, String titlePrefix) {
     for (int i = 0; i < count; i++) {
-      Note r =
-          makeMe
-              .aNote()
-              .underSameNotebookAs(focus)
-              .title(titlePrefix + i)
-              .content("Links to [[" + focus.getTitle() + "]].")
-              .please();
-      refreshWikiCache(r, viewer);
+      Note r = makeMe.aNote().underSameNotebookAs(focus).title(titlePrefix + i).please();
+      makeMe.authorReferencingContent(r, "Links to [[" + focus.getTitle() + "]].");
     }
   }
 
@@ -94,18 +88,11 @@ class FocusContextRetrievalInboundSamplingTest extends FocusContextRetrievalTest
     void depth1InboundExcludesOutgoingTargetsBeforeCap() {
       User viewer = makeMe.aUser().please();
       Note hub = makeMe.aNote().notebookOwnedBy(viewer).title("XHub").please();
-      Note shared =
-          makeMe
-              .aNote()
-              .underSameNotebookAs(hub)
-              .title("XShared")
-              .content("Links to [[XHub]].")
-              .please();
+      Note shared = makeMe.aNote().underSameNotebookAs(hub).title("XShared").please();
+      makeMe.authorReferencingContent(shared, "Links to [[XHub]].");
       hub.setContent("[[XShared]].");
       makeMe.entityPersister.merge(hub);
       addInboundReferrers(hub, viewer, 7, "XRef");
-      refreshWikiCache(hub, viewer);
-      refreshWikiCache(shared, viewer);
 
       FocusContextResult result =
           service.retrieve(hub, viewer, RetrievalConfig.forQuestionGeneration(null));
@@ -120,14 +107,8 @@ class FocusContextRetrievalInboundSamplingTest extends FocusContextRetrievalTest
     void depth2InboundCappedAtTwo() {
       User viewer = makeMe.aUser().please();
       Note focusNote = makeMe.aNote().notebookOwnedBy(viewer).title("HubFocus").please();
-      Note depth1Ref =
-          makeMe
-              .aNote()
-              .underSameNotebookAs(focusNote)
-              .title("Depth1Hub")
-              .content("Links to [[HubFocus]].")
-              .please();
-      refreshWikiCache(depth1Ref, viewer);
+      Note depth1Ref = makeMe.aNote().underSameNotebookAs(focusNote).title("Depth1Hub").please();
+      makeMe.authorReferencingContent(depth1Ref, "Links to [[HubFocus]].");
       addInboundReferrers(depth1Ref, viewer, 3, "D2Ref");
 
       FocusContextResult result =

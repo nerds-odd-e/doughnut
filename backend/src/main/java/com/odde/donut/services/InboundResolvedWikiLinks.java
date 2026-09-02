@@ -2,19 +2,22 @@ package com.odde.donut.services;
 
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.User;
-import com.odde.donut.entities.repositories.ResolvedWikiLinkRepository;
-import java.util.LinkedHashSet;
+import com.odde.donut.entities.repositories.AuthoredNoteReferenceInboundFacade;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.zip.CRC32;
 
-/** Inbound resolved-wiki-link focus-context sampling for a focal note. */
+/** Inbound authored-note-reference focus-context sampling for a focal note. */
 final class InboundResolvedWikiLinks {
 
-  private final ResolvedWikiLinkRepository resolvedWikiLinkRepository;
+  private final AuthoredNoteReferenceInboundFacade authoredNoteReferenceInboundFacade;
 
-  InboundResolvedWikiLinks(ResolvedWikiLinkRepository resolvedWikiLinkRepository) {
-    this.resolvedWikiLinkRepository = resolvedWikiLinkRepository;
+  InboundResolvedWikiLinks(AuthoredNoteReferenceInboundFacade authoredNoteReferenceInboundFacade) {
+    this.authoredNoteReferenceInboundFacade = authoredNoteReferenceInboundFacade;
   }
 
   List<Note> sampledReferencesNotesForFocusContext(
@@ -26,36 +29,24 @@ final class InboundResolvedWikiLinks {
     if (cap <= 0 || focalNote.getId() == null) {
       return List.of();
     }
-    Integer focalNotebookId =
-        focalNote.getNotebook() != null ? focalNote.getNotebook().getId() : null;
-    Integer viewerId = viewer != null ? viewer.getId() : null;
-    List<Integer> excludeIds = excludeIdsForNativeIn(excludeNoteIds);
-    return sampleSeed
-        .map(
-            seed ->
-                resolvedWikiLinkRepository.findInboundReferrersForTargetBySeedLimited(
-                    focalNote.getId(),
-                    focalNotebookId,
-                    viewerId,
-                    excludeIds,
-                    Long.toString(seed),
-                    cap))
-        .orElseGet(
-            () ->
-                resolvedWikiLinkRepository.findInboundReferrersForTargetByIdAscLimited(
-                    focalNote.getId(), focalNotebookId, viewerId, excludeIds, cap));
-  }
-
-  private static List<Integer> excludeIdsForNativeIn(Set<Integer> excludeNoteIds) {
-    LinkedHashSet<Integer> ids = new LinkedHashSet<>();
-    for (Integer id : excludeNoteIds) {
-      if (id != null) {
-        ids.add(id);
+    List<Note> candidates = new ArrayList<>();
+    for (Note referrer :
+        authoredNoteReferenceInboundFacade.distinctReferrerNotesForViewer(focalNote, viewer)) {
+      if (!excludeNoteIds.contains(referrer.getId())) {
+        candidates.add(referrer);
       }
     }
-    if (ids.isEmpty()) {
-      return List.of(-1);
-    }
-    return List.copyOf(ids);
+    sampleSeed.ifPresent(
+        seed -> candidates.sort(Comparator.comparingLong(note -> crc32(note.getId(), seed))));
+    return candidates.size() <= cap
+        ? List.copyOf(candidates)
+        : List.copyOf(candidates.subList(0, cap));
+  }
+
+  /** Replicates MySQL's {@code CRC32(CONCAT(CAST(id AS CHAR), CAST(seed AS CHAR)))}. */
+  private static long crc32(int noteId, long seed) {
+    CRC32 crc32 = new CRC32();
+    crc32.update((Integer.toString(noteId) + Long.toString(seed)).getBytes(StandardCharsets.UTF_8));
+    return crc32.getValue();
   }
 }

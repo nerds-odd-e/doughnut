@@ -95,19 +95,18 @@ class FocusContextRetrievalServiceTest extends FocusContextRetrievalTestBase {
     void setup() {
       viewer = makeMe.aUser().please();
       focusNote = makeMe.aNote().notebookOwnedBy(viewer).title("Focus").please();
-      Note referrer =
-          makeMe
-              .aNote()
-              .underSameNotebookAs(focusNote)
-              .title("Referrer")
-              .content("Links to [[Focus]].")
-              .please();
-      refreshWikiCache(referrer, viewer);
+      Note referrer = makeMe.aNote().underSameNotebookAs(focusNote).title("Referrer").please();
+      makeMe.authorReferencingContent(referrer, "Links to [[Focus]].");
     }
 
     @Test
     void inboundReferrerIsEmitted() {
-      FocusContextResult result = service.retrieve(focusNote, viewer, RetrievalConfig.depth1());
+      // Folder peers disabled: focusNote and referrer are notebook-root structural siblings, so a
+      // budget that allows folder-peer sampling would let "Referrer" appear via that unrelated path
+      // and mask a regression in inbound wiki-reference discovery.
+      FocusContextResult result =
+          service.retrieve(
+              focusNote, viewer, new RetrievalConfig(1, null, CONTENT_BUDGET_WITHOUT_FOLDER_PEERS));
 
       assertThat(result.getRelatedNotes(), hasSize(1));
       assertThat(result.getRelatedNotes().get(0).getTitle(), equalTo("Referrer"));
@@ -121,15 +120,8 @@ class FocusContextRetrievalServiceTest extends FocusContextRetrievalTestBase {
       User viewer = makeMe.aUser().please();
       Note focusNote =
           makeMe.aNote().notebookOwnedBy(viewer).title("Focus").content("See [[Both]].").please();
-      Note both =
-          makeMe
-              .aNote()
-              .underSameNotebookAs(focusNote)
-              .title("Both")
-              .content("Links back to [[Focus]].")
-              .please();
-      refreshWikiCache(focusNote, viewer);
-      refreshWikiCache(both, viewer);
+      Note both = makeMe.aNote().underSameNotebookAs(focusNote).title("Both").please();
+      makeMe.authorReferencingContent(both, "Links back to [[Focus]].");
 
       FocusContextResult result = service.retrieve(focusNote, viewer, RetrievalConfig.depth1());
 

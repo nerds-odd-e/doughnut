@@ -9,6 +9,7 @@ import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.ResolvedWikiLink;
 import com.odde.donut.entities.User;
+import com.odde.donut.entities.repositories.AuthoredNoteReferenceInboundFacade;
 import com.odde.donut.entities.repositories.NoteRepository;
 import com.odde.donut.entities.repositories.ResolvedWikiLinkRepository;
 import jakarta.persistence.EntityManager;
@@ -31,6 +32,7 @@ public class ResolvedWikiLinkService {
   private final ResolvedWikiLinkRepository resolvedWikiLinkRepository;
   private final ResolvedWikiLinkRefresh resolvedWikiLinkRefresh;
   private final CanonicalDonutOrigin canonicalDonutOrigin;
+  private final AuthoredNoteReferenceInboundFacade authoredNoteReferenceInboundFacade;
 
   public ResolvedWikiLinkService(
       WikiLinkResolver wikiLinkResolver,
@@ -39,10 +41,12 @@ public class ResolvedWikiLinkService {
       NoteAliasIndexService noteAliasIndexService,
       NoteLevelIndexService noteLevelIndexService,
       NoteRepository noteRepository,
-      CanonicalDonutOrigin canonicalDonutOrigin) {
+      CanonicalDonutOrigin canonicalDonutOrigin,
+      AuthoredNoteReferenceInboundFacade authoredNoteReferenceInboundFacade) {
     this.wikiLinkResolver = wikiLinkResolver;
     this.resolvedWikiLinkRepository = resolvedWikiLinkRepository;
     this.canonicalDonutOrigin = canonicalDonutOrigin;
+    this.authoredNoteReferenceInboundFacade = authoredNoteReferenceInboundFacade;
     this.resolvedWikiLinkRefresh =
         new ResolvedWikiLinkRefresh(
             wikiLinkResolver,
@@ -54,7 +58,7 @@ public class ResolvedWikiLinkService {
   }
 
   private InboundResolvedWikiLinks inbound() {
-    return new InboundResolvedWikiLinks(resolvedWikiLinkRepository);
+    return new InboundResolvedWikiLinks(authoredNoteReferenceInboundFacade);
   }
 
   public List<WikiLink> wikiLinksForViewer(Note focusNote, User viewer) {
@@ -112,9 +116,9 @@ public class ResolvedWikiLinkService {
   }
 
   /**
-   * Inbound referrers for focus-context only, with resolved-wiki-link visibility (referrer's
+   * Inbound referrers for focus-context only, with authored-note-reference visibility (referrer's
    * notebook vs the focal notebook and {@link User#canReferTo}), distinct by referrer id, excluding
-   * {@code excludeNoteIds}, capped in the database.
+   * {@code excludeNoteIds}, capped in memory after sampling.
    */
   public List<Note> sampledReferencesNotesForFocusContext(
       Note focalNote,

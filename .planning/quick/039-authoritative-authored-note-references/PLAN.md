@@ -1,7 +1,7 @@
 # Authoritative authored note references
 
 **Status:** in progress  
-**Resume:** next slice is 20 (focus context samples only currently resolved inbound references). Slices 1–19 done.  
+**Resume:** next slice is 21 (property tracking points to authored references, not cached targets). Slices 1–20 done.  
 **Source:** `.planning/notes/notebook-scope-wiki-refresh-on-title-and-create.md`  
 **Architecture:** ADR 0004, “Links and attachments”  
 **Goal:** Make authored semantic note references a domain-owned representation derived from note Markdown, and make every consumer resolve those references against current state without notebook-wide cache refreshes.
@@ -26,7 +26,7 @@ When this plan is complete:
 - **Delete policies:** done (Slice 19) — `removeNoteLinksFromReferrerProperties` now reads referrer + link text from `AuthoredNoteReferenceInboundFacade.distinctInboundReferencesForViewer` alone; no more `ResolvedWikiLinkRepository` dependency in `NoteReferenceHandling`/`NoteService`. The now-unused `AuthoredNoteReferenceInboundFacade.distinctReferrerIdsForViewer` was removed too.
 - **Notebook walks still in a write transaction:** alias-changing content save; cross-notebook move (`refreshCardinalityAcrossMovedNotebooks`). Plan 038 already skipped title/create; Slice 18 stopped `NoteService.destroy` / `restore`.
 - **Frontend barrier (Slice 6, keep):** `noteContentMutationBarrier` flushes body autosave before delete. Do not extend it (no title autosave, no retries).
-- **Still on the cache:** focus-context sampling (`InboundResolvedWikiLinks.sampledReferencesNotesForFocusContext`); `NotePropertyIndex.targetNote`; remaining `refreshForNote` / `refreshNotebookScope` callers.
+- **Still on the cache:** `NotePropertyIndex.targetNote`; remaining `refreshForNote` / `refreshNotebookScope` callers. Focus-context sampling (`InboundResolvedWikiLinks`) moved off the cache in Slice 20 — it now live-resolves via `AuthoredNoteReferenceInboundFacade`, with cap/exclusion/seeded-order applied in memory (Java-side CRC32 replicates the old MySQL ordering).
 
 ## Constraints for remaining work
 
@@ -37,7 +37,7 @@ When this plan is complete:
 - Candidate lookup is an optimization, not a resolution verdict. Always live-resolve for the current viewer.
 - Do not change Markdown/wiki syntax, candidate matching, visibility, or API response shapes. Do not add a new ADR.
 
-## Done (1–19)
+## Done (1–20)
 
 | # | Type | Capability |
 |---|---|---|
@@ -60,17 +60,9 @@ When this plan is complete:
 | 17 | Behavior | Injected notes index authored references like product saves |
 | 18 | Behavior | Delete/restore stop calling `refreshNotebookScope` |
 | 19 | Behavior | Property-removal deletion rewrites from live authored link text |
+| 20 | Behavior | Focus context samples only currently resolved inbound references |
 
 ## Remaining slices
-
-### 20. Focus context samples only currently resolved inbound references
-
-- **Type:** Behavior
-- **Status:** pending
-- **Scenario:** When an indexed candidate has become ambiguous, missing, deleted, or unreadable, focus-context retrieval excludes it and continues through ordered/seeded candidates until it fills the requested cap or exhausts valid candidates.
-- Migrate both focus-context inbound entry points and BFS expansion to the facade.
-- Preserve exclusion sets, deterministic seeded ordering, dedupe, and visibility. Candidate limiting must not treat an invalid candidate as consuming the result cap.
-- **Verify:** full backend tests.
 
 ### 21. Property tracking points to authored references, not cached targets
 

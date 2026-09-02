@@ -123,22 +123,10 @@ class FocusContextRetrievalDepthTraversalTest extends FocusContextRetrievalTestB
   void depthTwoInboundFromExpandedNote() {
     User viewer = makeMe.aUser().please();
     Note focus = makeMe.aNote().notebookOwnedBy(viewer).title("InboundRoot").please();
-    Note hub =
-        makeMe
-            .aNote()
-            .underSameNotebookAs(focus)
-            .title("HubInbound")
-            .content("Link [[InboundRoot]].")
-            .please();
-    Note depth2Referrer =
-        makeMe
-            .aNote()
-            .underSameNotebookAs(focus)
-            .title("RefersToHub")
-            .content("Hub is [[HubInbound]].")
-            .please();
-    refreshWikiCache(hub, viewer);
-    refreshWikiCache(depth2Referrer, viewer);
+    Note hub = makeMe.aNote().underSameNotebookAs(focus).title("HubInbound").please();
+    makeMe.authorReferencingContent(hub, "Link [[InboundRoot]].");
+    Note depth2Referrer = makeMe.aNote().underSameNotebookAs(focus).title("RefersToHub").please();
+    makeMe.authorReferencingContent(depth2Referrer, "Hub is [[HubInbound]].");
 
     FocusContextResult result = service.retrieve(focus, viewer, RetrievalConfig.defaultMaxDepth());
 
