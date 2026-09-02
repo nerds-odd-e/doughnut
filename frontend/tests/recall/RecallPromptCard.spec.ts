@@ -11,19 +11,19 @@ import {
   justReviewVisible,
   mockAnswerSpelling,
   mockSpellingRecallServices,
-  mountQuiz,
-  mountQuizReady,
-  setupQuizTests,
+  mountRecallPromptCard,
+  mountRecallPromptCardReady,
+  setupRecallPromptCardTests,
   spellingQuestionVisible,
-  submitSpellingAnswerFromQuiz,
+  submitSpellingAnswerFromRecallPromptCard,
   wrapSdkError,
   wrapSdkResponse,
-} from "./quizTestSupport"
+} from "./recallPromptCardTestSupport"
 
 describe("repeat page", () => {
-  setupQuizTests()
+  setupRecallPromptCardTests()
 
-  describe('repeat page with "just review" quiz', () => {
+  describe('repeat page with "just review" recall prompt card', () => {
     it.each([
       {
         memoryTrackerIds: [1, 2, 3],
@@ -38,7 +38,7 @@ describe("repeat page", () => {
     ])(
       "prefetches $eagerFetchCount question(s) on mount",
       async ({ memoryTrackerIds, eagerFetchCount, expectedTrackerIds }) => {
-        await mountQuizReady(memoryTrackerIds, eagerFetchCount)
+        await mountRecallPromptCardReady(memoryTrackerIds, eagerFetchCount)
         for (const [index, memoryTrackerId] of expectedTrackerIds.entries()) {
           expect(getRecallPromptSpy).toHaveBeenNthCalledWith(
             index + 1,
@@ -61,10 +61,10 @@ describe("repeat page", () => {
         return wrapSdkResponse(getRecallPrompt())
       })
 
-      const quizWrapper = mountQuiz([1, 2, 3, 4, 5], 5)
-      await quizWrapper.vm.$nextTick()
+      const recallPromptCardWrapper = mountRecallPromptCard([1, 2, 3, 4, 5], 5)
+      await recallPromptCardWrapper.vm.$nextTick()
 
-      await quizWrapper.setProps({
+      await recallPromptCardWrapper.setProps({
         memoryTrackers: [6, 7, 8, 9, 10].map((id) =>
           createMemoryTrackerLite(id)
         ),
@@ -78,13 +78,16 @@ describe("repeat page", () => {
           path: { memoryTracker: 6 },
         })
       )
-      expect(contestableQuestionVisible(quizWrapper)).toBe(true)
+      expect(contestableQuestionVisible(recallPromptCardWrapper)).toBe(true)
     })
 
     it("does not fetch question 2 again after prefetched", async () => {
-      const quizWrapper = await mountQuizReady([1, 2, 3, 4], 2)
+      const recallPromptCardWrapper = await mountRecallPromptCardReady(
+        [1, 2, 3, 4],
+        2
+      )
       expect(getRecallPromptSpy).toBeCalledTimes(2)
-      await quizWrapper.setProps({ currentIndex: 1 })
+      await recallPromptCardWrapper.setProps({ currentIndex: 1 })
       expect(getRecallPromptSpy).toHaveBeenCalledWith(
         expect.objectContaining({
           path: { memoryTracker: 3 },
@@ -97,10 +100,14 @@ describe("repeat page", () => {
     it("shows spelling question input when question has no choices", async () => {
       mockSpellingRecallServices()
 
-      const quizWrapper = await mountQuizReady([1], 1, true)
+      const recallPromptCardWrapper = await mountRecallPromptCardReady(
+        [1],
+        1,
+        true
+      )
 
-      expect(spellingQuestionVisible(quizWrapper)).toBe(true)
-      expect(contestableQuestionVisible(quizWrapper)).toBe(false)
+      expect(spellingQuestionVisible(recallPromptCardWrapper)).toBe(true)
+      expect(contestableQuestionVisible(recallPromptCardWrapper)).toBe(false)
     })
 
     it("submits spelling answer correctly", async () => {
@@ -111,8 +118,12 @@ describe("repeat page", () => {
         .please()
       const mockedAnswerSpelling = mockAnswerSpelling(answerResult)
 
-      const quizWrapper = await mountQuizReady([1], 1, true)
-      await submitSpellingAnswerFromQuiz(quizWrapper)
+      const recallPromptCardWrapper = await mountRecallPromptCardReady(
+        [1],
+        1,
+        true
+      )
+      await submitSpellingAnswerFromRecallPromptCard(recallPromptCardWrapper)
 
       expect(mockedAnswerSpelling).toHaveBeenCalledWith({
         path: { recallPrompt: spellingRecallPrompt.id },
@@ -128,7 +139,7 @@ describe("repeat page", () => {
         },
       })
 
-      const emitted = quizWrapper.emitted()
+      const emitted = recallPromptCardWrapper.emitted()
       expect(emitted.answered).toBeTruthy()
       expect(emitted.answered![0]).toEqual([answerResult])
     })
@@ -153,16 +164,19 @@ describe("repeat page", () => {
         return wrapSdkResponse(recallPrompt)
       })
 
-      const quizWrapper = await mountQuizReady([1, 2], 1)
+      const recallPromptCardWrapper = await mountRecallPromptCardReady(
+        [1, 2],
+        1
+      )
 
-      expect(justReviewVisible(quizWrapper)).toBe(true)
+      expect(justReviewVisible(recallPromptCardWrapper)).toBe(true)
 
-      await quizWrapper.setProps({ currentIndex: 1 })
+      await recallPromptCardWrapper.setProps({ currentIndex: 1 })
       await flushPromises()
-      await quizWrapper.setProps({ currentIndex: 0 })
+      await recallPromptCardWrapper.setProps({ currentIndex: 0 })
 
-      expect(justReviewVisible(quizWrapper)).toBe(false)
-      expect(contentLoaderVisible(quizWrapper)).toBe(true)
+      expect(justReviewVisible(recallPromptCardWrapper)).toBe(false)
+      expect(contentLoaderVisible(recallPromptCardWrapper)).toBe(true)
 
       resolve()
       await flushPromises()

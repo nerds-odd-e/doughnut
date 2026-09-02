@@ -65,7 +65,9 @@ describe("overlap try-again stay and retry", () => {
 
     type ExposedVM = { currentIndex: number }
     const vm = wrapper.vm as unknown as ExposedVM
-    wrapper.findComponent({ name: "Quiz" }).vm.$emit("answered", overlapResult)
+    wrapper
+      .findComponent({ name: "RecallPromptCard" })
+      .vm.$emit("answered", overlapResult)
     await flushPromises()
 
     expect(vm.currentIndex).toBe(0)
@@ -80,7 +82,9 @@ describe("overlap try-again stay and retry", () => {
     ).toBe(false)
     expect(vm.currentIndex).toBe(0)
     expect(
-      wrapper.findComponent({ name: "Quiz" }).props("spellingRetryNonce")
+      wrapper
+        .findComponent({ name: "RecallPromptCard" })
+        .props("spellingRetryNonce")
     ).toBe(1)
     expect(getRecallPromptSpy.mock.calls.length).toBeGreaterThan(
       getRecallPromptCallsBeforeRetry

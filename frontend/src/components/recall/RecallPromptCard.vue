@@ -57,7 +57,7 @@ import NotebookLink from "../notes/NotebookLink.vue"
 import { useRecallPromptFetching } from "./useRecallPromptFetching"
 
 // Interface definitions for better type safety
-interface QuizProps {
+interface RecallPromptCardProps {
   memoryTrackers: MemoryTrackerLite[]
   currentIndex: number
   eagerFetchCount: number
@@ -65,7 +65,7 @@ interface QuizProps {
   spellingRetryNonce?: number
 }
 
-const props = defineProps<QuizProps>()
+const props = defineProps<RecallPromptCardProps>()
 
 // Emits definition
 const emit = defineEmits<{

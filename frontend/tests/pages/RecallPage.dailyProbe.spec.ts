@@ -42,14 +42,18 @@ describe("RecallPage Daily probe entry", () => {
     const wrapper = await mountRecall(true)
 
     expect(wrapper.findComponent({ name: "DailyProbe" }).exists()).toBe(true)
-    expect(wrapper.findComponent({ name: "Quiz" }).exists()).toBe(false)
+    expect(wrapper.findComponent({ name: "RecallPromptCard" }).exists()).toBe(
+      false
+    )
   })
 
   it("loads ordinary recall when Daily probe is off", async () => {
     const wrapper = await mountRecall(false)
 
     expect(wrapper.findComponent({ name: "DailyProbe" }).exists()).toBe(false)
-    expect(wrapper.findComponent({ name: "Quiz" }).exists()).toBe(true)
+    expect(wrapper.findComponent({ name: "RecallPromptCard" }).exists()).toBe(
+      true
+    )
   })
 
   it("skips Daily probe when today's run is already completed", async () => {
@@ -59,7 +63,9 @@ describe("RecallPage Daily probe entry", () => {
     const wrapper = await mountRecall(true)
 
     expect(wrapper.findComponent({ name: "DailyProbe" }).exists()).toBe(false)
-    expect(wrapper.findComponent({ name: "Quiz" }).exists()).toBe(true)
+    expect(wrapper.findComponent({ name: "RecallPromptCard" }).exists()).toBe(
+      true
+    )
   })
 
   it("shows retry when today's Daily probe check fails", async () => {
@@ -72,7 +78,9 @@ describe("RecallPage Daily probe entry", () => {
       wrapper.find('[data-testid="daily-probe-offer-retry"]').exists()
     ).toBe(true)
     expect(wrapper.findComponent({ name: "DailyProbe" }).exists()).toBe(false)
-    expect(wrapper.findComponent({ name: "Quiz" }).exists()).toBe(false)
+    expect(wrapper.findComponent({ name: "RecallPromptCard" }).exists()).toBe(
+      false
+    )
   })
 
   it("offers Daily probe after retry succeeds with today's run still due", async () => {

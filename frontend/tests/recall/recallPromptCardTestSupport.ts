@@ -3,7 +3,7 @@ import {
   NoteController,
   RecallPromptController,
 } from "@generated/donut-backend-api/sdk.gen"
-import Quiz from "@/components/recall/Quiz.vue"
+import RecallPromptCard from "@/components/recall/RecallPromptCard.vue"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
 import makeMe from "donut-test-fixtures/makeMe"
 import helper, {
@@ -35,7 +35,7 @@ export function getRecallPrompt() {
   return recallPrompt
 }
 
-export function setupQuizTests() {
+export function setupRecallPromptCardTests() {
   beforeEach(() => {
     vi.resetAllMocks()
     vi.useFakeTimers()
@@ -67,7 +67,7 @@ export function createMemoryTrackerLite(
   return { memoryTrackerId: id, spelling }
 }
 
-export function mountQuiz(
+export function mountRecallPromptCard(
   memoryTrackerIds: number[],
   eagerFetchCount: number,
   spelling = false
@@ -76,7 +76,7 @@ export function mountQuiz(
     createMemoryTrackerLite(id, spelling)
   )
   wrapper = helper
-    .component(Quiz)
+    .component(RecallPromptCard)
     .withRouter()
     .withCleanStorage()
     .withProps({
@@ -88,38 +88,46 @@ export function mountQuiz(
   return wrapper
 }
 
-export async function mountQuizReady(
+export async function mountRecallPromptCardReady(
   memoryTrackerIds: number[],
   eagerFetchCount: number,
   spelling = false
 ) {
-  const mounted = mountQuiz(memoryTrackerIds, eagerFetchCount, spelling)
+  const mounted = mountRecallPromptCard(
+    memoryTrackerIds,
+    eagerFetchCount,
+    spelling
+  )
   await flushPromises()
   return mounted
 }
 
-export function contentLoaderVisible(quizWrapper: VueWrapper) {
-  return quizWrapper.find(contentLoaderSelector).exists()
+export function contentLoaderVisible(recallPromptCardWrapper: VueWrapper) {
+  return recallPromptCardWrapper.find(contentLoaderSelector).exists()
 }
 
-export function justReviewVisible(quizWrapper: VueWrapper) {
-  return quizWrapper.text().includes(justReviewButtonText)
+export function justReviewVisible(recallPromptCardWrapper: VueWrapper) {
+  return recallPromptCardWrapper.text().includes(justReviewButtonText)
 }
 
-export function spellingQuestionVisible(quizWrapper: VueWrapper) {
-  return quizWrapper.find(spellingAnswerInputSelector).exists()
+export function spellingQuestionVisible(recallPromptCardWrapper: VueWrapper) {
+  return recallPromptCardWrapper.find(spellingAnswerInputSelector).exists()
 }
 
-export function contestableQuestionVisible(quizWrapper: VueWrapper) {
-  return quizWrapper.find(recallPromptSelector).exists()
+export function contestableQuestionVisible(
+  recallPromptCardWrapper: VueWrapper
+) {
+  return recallPromptCardWrapper.find(recallPromptSelector).exists()
 }
 
-export async function submitSpellingAnswerFromQuiz(
-  quizWrapper: VueWrapper,
+export async function submitSpellingAnswerFromRecallPromptCard(
+  recallPromptCardWrapper: VueWrapper,
   answer = "cat"
 ) {
-  await quizWrapper.find(spellingAnswerInputSelector).setValue(answer)
-  await quizWrapper.find("form").trigger("submit")
+  await recallPromptCardWrapper
+    .find(spellingAnswerInputSelector)
+    .setValue(answer)
+  await recallPromptCardWrapper.find("form").trigger("submit")
   await flushPromises()
 }
 
