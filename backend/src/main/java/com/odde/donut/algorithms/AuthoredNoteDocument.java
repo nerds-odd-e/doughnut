@@ -3,10 +3,18 @@ package com.odde.donut.algorithms;
 import java.util.List;
 
 /**
- * Validated Markdown ready to persist as a note's content, paired with the authored note references
- * parsed from that same content ({@link AuthoredNoteReferences#uniquePreserveOrder}). Produced once
- * per save so the Markdown and its references never drift apart; consumed by {@code
- * Note.replaceContent} to update both in the same aggregate operation.
+ * A note's Markdown content paired with its distinct authored references in first-occurrence order.
+ * Consumed by {@code Note.replaceContent} to update both in the same aggregate operation.
+ * Validation and normalization belong to the content's originating write path.
  */
-public record AuthoredNoteDocument(
-    String validatedMarkdown, List<AuthoredNoteReference> references) {}
+public record AuthoredNoteDocument(String content, List<AuthoredNoteReference> references) {
+
+  /** Parses authored references without validating or normalizing {@code content}. */
+  public static AuthoredNoteDocument fromContent(
+      String content, CanonicalDonutOrigin canonicalOrigin) {
+    List<AuthoredNoteReference> references =
+        AuthoredNoteReferences.uniquePreserveOrder(
+            AuthoredNoteReferences.inOccurrenceOrder(content, canonicalOrigin));
+    return new AuthoredNoteDocument(content, references);
+  }
+}

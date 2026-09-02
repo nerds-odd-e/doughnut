@@ -151,7 +151,7 @@ public class Note extends EntityIdentifiedByIdOnly {
    * parsing on purpose.
    */
   public void replaceContent(AuthoredNoteDocument document) {
-    setContent(document.validatedMarkdown());
+    setContent(document.content());
     authoredNoteReferenceRows.clear();
     List<AuthoredNoteReference> references = document.references();
     for (int order = 0; order < references.size(); order++) {

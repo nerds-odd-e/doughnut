@@ -1,8 +1,6 @@
 package com.odde.donut.services;
 
 import com.odde.donut.algorithms.AuthoredNoteDocument;
-import com.odde.donut.algorithms.AuthoredNoteReference;
-import com.odde.donut.algorithms.AuthoredNoteReferences;
 import com.odde.donut.algorithms.CanonicalDonutOrigin;
 import com.odde.donut.entities.AuthoredNoteReferenceBackfillProgress;
 import com.odde.donut.entities.Note;
@@ -74,10 +72,7 @@ public class AuthoredNoteReferenceBackfillTx {
   }
 
   private void backfillNote(Note note) {
-    List<AuthoredNoteReference> references =
-        AuthoredNoteReferences.uniquePreserveOrder(
-            AuthoredNoteReferences.inOccurrenceOrder(note.getContent(), canonicalOrigin));
-    note.replaceContent(new AuthoredNoteDocument(note.getContent(), references));
+    note.replaceContent(AuthoredNoteDocument.fromContent(note.getContent(), canonicalOrigin));
     notePropertyIndexService.refreshForNote(note);
   }
 

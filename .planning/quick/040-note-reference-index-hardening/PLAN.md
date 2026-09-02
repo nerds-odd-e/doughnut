@@ -74,11 +74,9 @@ Removed the unread `viewer` parameter from `applyInboundReferrerRewrite` and the
 ### 7. One factory for the authored references of a note's content
 
 - **Type:** Structure
-- **Status:** planned
+- **Status:** done
 
-`uniquePreserveOrder(inOccurrenceOrder(content, origin))` is written out in `AuthoredNoteContent`, `NoteReferenceService`, `WikiLinkRewriteSupport`, `AuthoredNoteReferenceBackfillTx`, and `InjectNotesWorker` (slice 5 removes the sixth copy). Give it one named home — an `AuthoredNoteDocument` factory reads best, since four of the five sites immediately build that record — and route every site through it.
-
-Constraint: the factory must not validate or normalize. `AuthoredNoteContent.prepareDocumentForSave` keeps owning validation and stored-type normalization for user saves; rewrite and backfill paths deliberately skip both.
+`AuthoredNoteDocument.fromContent` now owns parsing and ordered deduplication for all five production paths without validating or normalizing. `AuthoredNoteContent.prepareDocumentForSave` still owns user-save validation/type normalization, and the record component is now accurately named `content`. The full backend suite passes.
 
 ### 8. Wiki links resolve by the collation's title identity
 

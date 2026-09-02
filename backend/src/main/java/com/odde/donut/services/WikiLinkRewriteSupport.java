@@ -1,7 +1,6 @@
 package com.odde.donut.services;
 
 import com.odde.donut.algorithms.AuthoredNoteDocument;
-import com.odde.donut.algorithms.AuthoredNoteReference;
 import com.odde.donut.algorithms.AuthoredNoteReferences;
 import com.odde.donut.algorithms.CanonicalDonutOrigin;
 import com.odde.donut.algorithms.NoteIdUrl;
@@ -105,7 +104,7 @@ final class WikiLinkRewriteSupport {
             WikiLinkMarkdownDocumentRewrite.replaceWikiLinksMatchingTrimmedInner(
                 content, linkText, newInner);
       }
-      referrer.replaceContent(documentFromRewrittenContent(content, canonicalDonutOrigin));
+      referrer.replaceContent(AuthoredNoteDocument.fromContent(content, canonicalDonutOrigin));
       referrer.setUpdatedAt(updatedAt);
       entityPersister.save(referrer);
       noteReferenceService.refreshDerivedIndexesForNote(referrer);
@@ -165,25 +164,10 @@ final class WikiLinkRewriteSupport {
     if (content.equals(originalContent)) {
       return;
     }
-    movedNote.replaceContent(documentFromRewrittenContent(content, canonicalDonutOrigin));
+    movedNote.replaceContent(AuthoredNoteDocument.fromContent(content, canonicalDonutOrigin));
     movedNote.setUpdatedAt(updatedAt);
     entityPersister.save(movedNote);
     noteReferenceService.refreshDerivedIndexesForNote(movedNote);
-  }
-
-  /**
-   * Builds the {@link AuthoredNoteDocument} for content already valid and stored, whose wiki links
-   * were mechanically rewritten in place (title/location change). Unlike {@code
-   * AuthoredNoteContent#prepareDocumentForSave}, this does not re-validate or re-normalize the
-   * stored type — a rewrite must not change the established visible content beyond the link text
-   * itself.
-   */
-  private static AuthoredNoteDocument documentFromRewrittenContent(
-      String content, CanonicalDonutOrigin canonicalDonutOrigin) {
-    List<AuthoredNoteReference> references =
-        AuthoredNoteReferences.uniquePreserveOrder(
-            AuthoredNoteReferences.inOccurrenceOrder(content, canonicalDonutOrigin));
-    return new AuthoredNoteDocument(content, references);
   }
 
   /**

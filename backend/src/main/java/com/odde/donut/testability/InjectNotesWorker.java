@@ -1,8 +1,6 @@
 package com.odde.donut.testability;
 
 import com.odde.donut.algorithms.AuthoredNoteDocument;
-import com.odde.donut.algorithms.AuthoredNoteReference;
-import com.odde.donut.algorithms.AuthoredNoteReferences;
 import com.odde.donut.algorithms.CanonicalDonutOrigin;
 import com.odde.donut.entities.Circle;
 import com.odde.donut.entities.DisplayName;
@@ -63,10 +61,8 @@ class InjectNotesWorker {
     applyExplicitFolderPlacements(injections, titleNoteMap, currentUTCTimestamp);
     notesTestData.saveByOriginalOrder(titleNoteMap, this.entityPersister);
     for (Note note : titleNoteMap.values()) {
-      List<AuthoredNoteReference> references =
-          AuthoredNoteReferences.uniquePreserveOrder(
-              AuthoredNoteReferences.inOccurrenceOrder(note.getContent(), canonicalDonutOrigin));
-      note.replaceContent(new AuthoredNoteDocument(note.getContent(), references));
+      note.replaceContent(
+          AuthoredNoteDocument.fromContent(note.getContent(), canonicalDonutOrigin));
       noteReferenceService.refreshDerivedIndexesForNote(note);
     }
     return titleNoteMap.values().stream()

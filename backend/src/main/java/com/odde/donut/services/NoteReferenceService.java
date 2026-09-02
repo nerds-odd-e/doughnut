@@ -1,7 +1,7 @@
 package com.odde.donut.services;
 
+import com.odde.donut.algorithms.AuthoredNoteDocument;
 import com.odde.donut.algorithms.AuthoredNoteReference;
-import com.odde.donut.algorithms.AuthoredNoteReferences;
 import com.odde.donut.algorithms.CanonicalDonutOrigin;
 import com.odde.donut.algorithms.NoteReferenceResolution;
 import com.odde.donut.controllers.dto.WikiLink;
@@ -60,8 +60,7 @@ public class NoteReferenceService {
     }
     List<WikiLink> out = new ArrayList<>();
     for (AuthoredNoteReference ref :
-        AuthoredNoteReferences.uniquePreserveOrder(
-            AuthoredNoteReferences.inOccurrenceOrder(content, canonicalDonutOrigin))) {
+        AuthoredNoteDocument.fromContent(content, canonicalDonutOrigin).references()) {
       WikiLink wikiLink = wikiLinkFor(ref, focusNote, viewer);
       if (wikiLink != null) {
         out.add(wikiLink);
