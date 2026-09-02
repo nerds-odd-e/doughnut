@@ -39,13 +39,9 @@ The backfill now routes stored content through `Note.replaceContent`, replacing 
 ### 2. Inbound candidate rows are selected by the target's addressable keys
 
 - **Type:** Structure
-- **Status:** planned
+- **Status:** done
 
-Externally identical inbound results; the notebook-wide row scan stops.
-
-- `AuthoredNoteReferenceInboundFacade.wikiCandidateRowsForTarget` already computes the target's addressable keys (current title, alias lookup keys) and then discards most rows in Java. Push that filter into `findWikiCandidatesForNotebookScope`: match `wiki_note_portion` against the title/alias key set, plus the path-shaped spellings that end in the target's title (`…/Title`, `…/Title.md`), keeping the notebook-scope predicate. Every surviving row is still re-verified by `WikiLinkResolver.resolveReference` — candidate lookup stays an optimization, never a verdict.
-- Verification is the existing suites, unchanged: `NoteControllerShowTests`, `NoteControllerShowWikiLinkAmbiguityTests`, `TextContentControllerUpdateNoteTitleInboundWikiReferencesTests`, the four `NotebookFolder*WikiLinkRewriteControllerTest` files, `NoteControllerDeleteReferenceHandlingTests`, and `FocusContextRetrieval*`. If any of them go red, the reverse matcher and the forward matcher disagree — that is the finding, not a test to adjust.
-- **If this overruns the time box:** revert and split — first narrow only non-path-shaped rows by the title/alias key set (path-shaped rows still fetched by notebook scope), then narrow path-shaped rows in a second slice.
+`findWikiCandidatesForNotebookScope` now selects notebook-scoped rows by the target's normalized title/alias keys or a path suffix ending in `Title` / `Title.md`. The redundant Java reverse matcher was removed; every candidate still goes through `WikiLinkResolver.resolveReference`, so the query remains an optimization rather than a resolution verdict. The full backend suite and focused inbound/rewrite/delete/focus-context coverage pass unchanged.
 
 ### 3. Title rename asks whether the note is referenced, not for every referrer
 

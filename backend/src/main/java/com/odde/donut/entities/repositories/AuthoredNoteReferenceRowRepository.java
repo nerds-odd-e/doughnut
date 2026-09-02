@@ -37,19 +37,24 @@ interface AuthoredNoteReferenceRowRepository
    * Wiki candidate rows notebook-scoped to a target's current notebook identity: either explicitly
    * qualified with {@code notebookName}, or unqualified and authored from a source note within
    * {@code notebookId} (the source-notebook fallback unqualified wiki links resolve against). Note-
-   * portion (title/alias/Portable-path) matching against the target's current keys happens
-   * afterward in {@link AuthoredNoteReferenceInboundFacade} — this query only narrows by notebook
-   * to avoid a full-table scan; candidate rows are always re-verified by the domain resolver, never
-   * treated as a resolution verdict.
+   * portion matching is narrowed to the target's current title/alias lookup keys, plus
+   * Portable-path spellings ending in its current title. Candidate rows are always re-verified by
+   * the domain resolver, never treated as a resolution verdict.
    */
   @Query(
       "SELECT r FROM AuthoredNoteReferenceRow r JOIN FETCH r.note n "
           + "WHERE r.kind = :kind "
           + "AND ((r.wikiNotebookQualifier IS NOT NULL AND r.wikiNotebookQualifier = :notebookName) "
           + "OR (r.wikiNotebookQualifier IS NULL AND n.notebook.id = :notebookId)) "
+          + "AND (LOWER(r.wikiNotePortion) IN :titleAndAliasLookupKeys "
+          + "OR LOWER(r.wikiNotePortion) LIKE :pathTitleSuffix "
+          + "OR LOWER(r.wikiNotePortion) LIKE :pathMarkdownTitleSuffix) "
           + "ORDER BY n.id ASC, r.documentOrder ASC")
   List<AuthoredNoteReferenceRow> findWikiCandidatesForNotebookScope(
       @Param("kind") AuthoredNoteReferenceRow.Kind kind,
       @Param("notebookName") String notebookName,
-      @Param("notebookId") Integer notebookId);
+      @Param("notebookId") Integer notebookId,
+      @Param("titleAndAliasLookupKeys") List<String> titleAndAliasLookupKeys,
+      @Param("pathTitleSuffix") String pathTitleSuffix,
+      @Param("pathMarkdownTitleSuffix") String pathMarkdownTitleSuffix);
 }

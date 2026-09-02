@@ -3,8 +3,6 @@ package com.odde.donut.entities.repositories;
 import com.odde.donut.algorithms.AuthoredNoteReference;
 import com.odde.donut.algorithms.FrontmatterAliases;
 import com.odde.donut.algorithms.NoteReferenceResolution;
-import com.odde.donut.algorithms.PathShapedTarget;
-import com.odde.donut.controllers.dto.FolderTrailSegments;
 import com.odde.donut.entities.AuthoredNoteReferenceRow;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
@@ -15,6 +13,7 @@ import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import org.springframework.stereotype.Service;
 
@@ -148,49 +147,18 @@ public class AuthoredNoteReferenceInboundFacade {
     }
     Integer notebookId = target.getNotebook().getId();
     String notebookName = target.getNotebook().getName();
-    List<String> aliasLookupKeys = aliasLookupKeysFor(target);
-    List<AuthoredNoteReferenceRow> matches = new ArrayList<>();
-    for (AuthoredNoteReferenceRow row :
-        authoredNoteReferenceRowRepository.findWikiCandidatesForNotebookScope(
-            AuthoredNoteReferenceRow.Kind.WIKI_PORTABLE_PATH, notebookName, notebookId)) {
-      if (wikiNotePortionMatchesTarget(row.getWikiNotePortion(), target, aliasLookupKeys)) {
-        matches.add(row);
-      }
-    }
-    return matches;
-  }
-
-  private List<String> aliasLookupKeysFor(Note target) {
-    List<String> keys = new ArrayList<>();
+    String lowerCaseTitle = target.getTitle().toLowerCase(Locale.ROOT);
+    List<String> titleAndAliasLookupKeys = new ArrayList<>();
+    titleAndAliasLookupKeys.add(FrontmatterAliases.normalizedLookupKey(target.getTitle()));
     for (var aliasRow : noteAliasIndexRepository.findByNote_IdOrderByIdAsc(target.getId())) {
-      keys.add(aliasRow.getAliasLookupKey());
+      titleAndAliasLookupKeys.add(aliasRow.getAliasLookupKey());
     }
-    return keys;
-  }
-
-  /**
-   * Mirrors the forward wiki-link note-candidate matching concept in reverse: a path-shaped note
-   * portion matches by title and folder trail (never alias, same as forward path-shaped matching);
-   * a non-path-shaped note portion matches the target's title or one of its current aliases.
-   */
-  private boolean wikiNotePortionMatchesTarget(
-      String notePortion, Note target, List<String> aliasLookupKeys) {
-    if (notePortion == null) {
-      return false;
-    }
-    return PathShapedTarget.tryParse(notePortion)
-        .map(
-            path ->
-                path.matchesTitleAndFolderTrail(
-                    target.getTitle(), FolderTrailSegments.namesFromRootToContainingFolder(target)))
-        .orElseGet(() -> titleOrAliasMatches(notePortion, target, aliasLookupKeys));
-  }
-
-  private boolean titleOrAliasMatches(
-      String notePortion, Note target, List<String> aliasLookupKeys) {
-    if (notePortion.equalsIgnoreCase(target.getTitle())) {
-      return true;
-    }
-    return aliasLookupKeys.contains(FrontmatterAliases.normalizedLookupKey(notePortion));
+    return authoredNoteReferenceRowRepository.findWikiCandidatesForNotebookScope(
+        AuthoredNoteReferenceRow.Kind.WIKI_PORTABLE_PATH,
+        notebookName,
+        notebookId,
+        titleAndAliasLookupKeys,
+        "%/" + lowerCaseTitle,
+        "%/" + lowerCaseTitle + ".md");
   }
 }
