@@ -13,7 +13,7 @@ No active milestone. Start the next one with `/gsd-new-milestone`.
 
 ## Backlog
 
-Parked elsewhere: SEED-001, SEED-002, SEED-005, SEED-006, ADR 0002 Level 1.
+Parked elsewhere: SEED-001, SEED-002, SEED-006, ADR 0002 Level 1.
 
 ---
 *Last updated: 2026-08-21*
