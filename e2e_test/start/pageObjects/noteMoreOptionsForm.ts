@@ -2,6 +2,8 @@ import { waitUntilAppIsNotBusy } from '../pageBase'
 import {
   assumeAssimilationPage,
   assimilationModesSelector,
+  noteLevelAssimilationModesPanel,
+  noteLevelControlElements,
 } from './assimilationPage'
 import { clickToolbarOverflowAction, noteToolbar } from './noteToolbarOverflow'
 import { questionListPage } from './questionListPage'
@@ -57,14 +59,18 @@ export const noteMoreOptions = () => {
       waitUntilAppIsNotBusy()
     },
     openAssimilationSettings() {
+      // `assimilationModesSelector` also matches a note property's own
+      // AssimilationModes row (RichFrontmatterPropertyPanel) when its
+      // property panel is open — scope both the "already open" probe and
+      // the visibility wait to the note-level panel only.
       cy.document().then((doc) => {
         const hasAssimilationPanel =
-          doc.querySelector(assimilationModesSelector) !== null
+          noteLevelControlElements(doc, assimilationModesSelector).length > 0
         if (!hasAssimilationPanel) {
           clickMoreOption(titles.assimilation)
         }
       })
-      cy.get(assimilationModesSelector, { timeout: 15000 }).should('be.visible')
+      noteLevelAssimilationModesPanel({ timeout: 15000 }).should('be.visible')
       waitUntilAppIsNotBusy()
       return assumeAssimilationPage()
     },

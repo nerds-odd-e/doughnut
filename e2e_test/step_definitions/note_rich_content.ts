@@ -110,23 +110,9 @@ When(
 )
 
 When(
-  'I revive rich note property {string} from its property panel',
-  (key: string) => {
-    start.assumeNotePage().reviveRichNotePropertyFromPanel(key)
-  }
-)
-
-When(
   'I return rich note property {string} to the sequence from its property panel',
   (key: string) => {
     start.assumeNotePage().returnRichNotePropertyToSequenceFromPanel(key)
-  }
-)
-
-When(
-  'I remove rich note property {string} from recall from its property panel',
-  (key: string) => {
-    start.assumeNotePage().removeRichNotePropertyFromRecallFromPanel(key)
   }
 )
 

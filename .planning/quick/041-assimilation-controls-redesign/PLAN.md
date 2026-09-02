@@ -106,12 +106,13 @@
 ### 8. Note-property panel reuses `AssimilationModes` instead of its own wiring
 
 - **Type:** Behavior
-- **Status:** planned
+- **Status:** done
 - **Pre-condition:** user is editing a note's frontmatter property that supports assimilation; slice 7 shipped.
 - **Trigger:** the property row renders (and user can start assimilation, or follow an existing tracker's status).
 - **Post-condition:** `RichFrontmatterPropertyPanel.vue` renders `<AssimilationModes :allowed-modes="[UNDERSTANDING]" .../>` instead of `<AssimilationButtons size="sm">`; "Remove from recall"/"Revive" are gone from this panel too (tracker-page-only); assimilate/status behavior matches slices 6-7's rows.
 - **Touches:** `frontend/src/components/form/RichFrontmatterPropertyPanel.vue` and its own tests.
 - **Tests:** component test for the property row's two states (assimilate / linked status), reusing the same assertions as slice 5/6's tests rather than duplicating them. E2E: `property_memory_tracker.feature`'s "Remove from recall on assimilation settings for a property" scenario — its assertion source (the property panel's own `AssimilationButtons` remove/revive button) only breaks here, not in slice 7. Rewrite it to remove-from-recall via the tracker page instead, reusing existing step definitions (`I open the property memory tracker for`, `I remove the memory tracker from recall`, `the memory tracker should be skipped`) — same pattern already used in `spaced_repetition.feature`; no new step definitions needed.
+- **Learning:** found and fixed a real bug along the way — `openAssimilationSettings()`'s "already open" probe used an unscoped `[data-testid="assimilation-modes"]` selector, which after this slice also matches the property panel's own `AssimilationModes` instance (previously only the note-level panel had one); scoped it via `isNoteLevelAssimilationControl`/`noteLevelControlElements`. Kept the slice-7 interim `propertyMemoryTrackerForCurrentNote` testability method rather than replacing it with a UI-based check — property recall count still isn't shown anywhere in the row UI (only the tracker page shows it), and distinguishing "removed from tracking" vs. "truly deleted" for absence checks needs the raw backend object; only its stale doc comment was updated. `AssimilationButtons.vue` is now unreferenced in production (this was its last caller) — left in place for slice 9 to delete, along with `assimilateDisabledForProperty`/`showRemoveFromRecall` in `assimilationMemoryTrackers.ts` (now only used by it).
 
 ### 9. Delete the dead memory-tracker-table code
 

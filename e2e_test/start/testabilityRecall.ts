@@ -88,12 +88,14 @@ export const recallTestabilityMethods = {
   },
 
   /**
-   * Property-scoped memory tracker for the note currently on screen — the
-   * property panel doesn't expose a status link to the tracker page until
-   * the AssimilationModes migration reaches it, so callers read the tracker
-   * straight from the backend instead of a table row. Resolves to `null`
-   * (never `undefined`) when there's no match: a `.then()` callback that
-   * returns `undefined` makes Cypress keep the *previous* subject instead of
+   * Property-scoped memory tracker for the note currently on screen. The
+   * property panel's status link (via AssimilationModes) only ever shows
+   * navigation, not recall count or whether a tracker was truly deleted vs.
+   * merely removed-from-tracking — so callers that need that backend truth
+   * (recall count assertions, absent-vs-removed) read the tracker straight
+   * from the backend instead of scraping the UI. Resolves to `null` (never
+   * `undefined`) when there's no match: a `.then()` callback that returns
+   * `undefined` makes Cypress keep the *previous* subject instead of
    * `undefined`, which would silently resurrect the whole NoteRecallInfo.
    */
   propertyMemoryTrackerForCurrentNote(

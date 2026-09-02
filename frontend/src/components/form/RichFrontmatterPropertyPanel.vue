@@ -12,23 +12,19 @@
     >
       <Minus class="h-4 w-4" aria-hidden="true" />
     </button>
-    <AssimilationButtons
+    <AssimilationModes
       v-if="noteId && !isNoteLevelPropertyKey(propertyKey)"
       size="sm"
+      :allowed-modes="allowedModes"
+      :trackers="noteRecallInfo?.memoryTrackers"
+      :property-key="propertyKey"
       :disabled="assimilatingPropertyKey === propertyKey"
-      :assimilate-disabled="
-        assimilateDisabledForProperty(noteRecallInfo, propertyKey)
-      "
-      :skipped-for-recall="isSkippedForRecall(noteRecallInfo, propertyKey)"
       :skipped-from-assimilation-sequence="
         isSkippedFromAssimilationSequence(noteRecallInfo, propertyKey)
       "
-      :show-remove-from-recall="showRemoveFromRecall(noteRecallInfo, propertyKey)"
-      @assimilate="assimilate({ propertyKey })"
+      @assimilate="assimilate"
       @skip="skip({ propertyKey })"
-      @revive="revive({ propertyKey })"
       @return-to-sequence="returnToSequence({ propertyKey })"
-      @remove-from-recall="removeFromRecall({ propertyKey })"
     />
   </div>
 </template>
@@ -36,13 +32,9 @@
 <script setup lang="ts">
 import { Minus } from "@lucide/vue"
 import { toRef } from "vue"
-import AssimilationButtons from "@/components/recall/AssimilationButtons.vue"
-import {
-  assimilateDisabledForProperty,
-  showRemoveFromRecall,
-} from "@/components/recall/assimilationMemoryTrackers"
+import AssimilationModes from "@/components/recall/AssimilationModes.vue"
+import type { MemoryTrackerType } from "@/components/recall/assimilationMemoryTrackers"
 import { useInjectedMemoryTrackerActions } from "@/composables/useMemoryTrackerActions"
-import { isSkippedForRecall } from "@/composables/useReviveMemoryTracker"
 import { isSkippedFromAssimilationSequence } from "@/composables/useAssimilationSequenceSkip"
 import { isNoteLevelPropertyKey } from "@/utils/noteContentPropertyKeys"
 
@@ -60,8 +52,8 @@ const {
   assimilatingPropertyKey,
   assimilate,
   skip,
-  revive,
   returnToSequence,
-  removeFromRecall,
 } = useInjectedMemoryTrackerActions(toRef(() => props.noteId ?? 0))
+
+const allowedModes: MemoryTrackerType[] = ["UNDERSTANDING"]
 </script>

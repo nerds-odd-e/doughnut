@@ -67,21 +67,6 @@ Then(
   }
 )
 
-Then(
-  'I should see Remove from recall for property {string}',
-  (propertyKey: string) => {
-    start
-      .assumeNotePage()
-      .expectRichNotePropertyPanelAction(propertyKey, 'remove-from-recall')
-  }
-)
-
-Then('I should see Revive for property {string}', (propertyKey: string) => {
-  start
-    .assumeNotePage()
-    .expectRichNotePropertyPanelAction(propertyKey, 'revive')
-})
-
 Then('I should see Skip on the assimilation panel', () => {
   start.assumeAssimilationPage().expectSkipOnPanel()
 })

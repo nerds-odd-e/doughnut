@@ -69,7 +69,7 @@ Workshop body.`
     await expandPropertyPanel(wrapper, topicRowSelector)
 
     await wrapper
-      .find(`${topicRowSelector} [data-test="assimilate"]`)
+      .find(`${topicRowSelector} [data-test="assimilate-UNDERSTANDING"]`)
       .trigger("click")
     await flushPromises()
 
@@ -94,10 +94,46 @@ Workshop body.`
     await expandPropertyPanel(wrapper, noteLevelRowSelector)
 
     expect(
-      wrapper.find(`${noteLevelRowSelector} [data-test="assimilate"]`).exists()
+      wrapper
+        .find(`${noteLevelRowSelector} [data-test="assimilate-UNDERSTANDING"]`)
+        .exists()
     ).toBe(false)
     expect(
       wrapper.find(`${noteLevelRowSelector} [data-test="skip"]`).exists()
+    ).toBe(false)
+  })
+
+  it("shows a linked status instead of assimilate/skip when the property has an active tracker", async () => {
+    mockSdkService(NoteController, "getNoteInfo", {
+      memoryTrackers: [
+        makeMe.aMemoryTracker
+          .id(7)
+          .withPropertyKey("topic")
+          .nextRecallAt("2026-09-12T10:00:00.000Z")
+          .please(),
+      ],
+    })
+
+    const wrapper = await h.mountEditor(topicMarkdown, {
+      noteId,
+      route: noteShowLocation(noteId),
+    })
+    await expandPropertyPanel(wrapper, topicRowSelector)
+
+    expect(
+      wrapper
+        .find(
+          `${topicRowSelector} [data-test="assimilation-status-UNDERSTANDING"]`
+        )
+        .exists()
+    ).toBe(true)
+    expect(
+      wrapper
+        .find(`${topicRowSelector} [data-test="assimilate-UNDERSTANDING"]`)
+        .exists()
+    ).toBe(false)
+    expect(
+      wrapper.find(`${topicRowSelector} [data-test="skip"]`).exists()
     ).toBe(false)
   })
 

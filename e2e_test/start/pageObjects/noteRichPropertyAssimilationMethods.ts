@@ -31,7 +31,7 @@ const clickPropertyPanelAction = (key: string, testId: string) => {
 export const noteRichPropertyAssimilationMethods = () => ({
   assimilateRichNotePropertyFromPanel(key: string) {
     this.switchToRichContent()
-    clickPropertyPanelAction(key, 'assimilate')
+    clickPropertyPanelAction(key, 'assimilate-UNDERSTANDING')
     waitUntilAppIsNotBusy()
     return this
   },
@@ -42,42 +42,30 @@ export const noteRichPropertyAssimilationMethods = () => ({
     waitUntilAppIsNotBusy()
     return this
   },
-  reviveRichNotePropertyFromPanel(key: string) {
-    this.switchToRichContent()
-    clickPropertyPanelAction(key, 'revive')
-    waitUntilAppIsNotBusy()
-    return this
-  },
   returnRichNotePropertyToSequenceFromPanel(key: string) {
     this.switchToRichContent()
     clickPropertyPanelAction(key, 'return-to-sequence')
     waitUntilAppIsNotBusy()
     return this
   },
-  removeRichNotePropertyFromRecallFromPanel(key: string) {
-    this.switchToRichContent()
-    clickPropertyPanelAction(key, 'remove-from-recall')
-    cy.findByRole('button', { name: 'OK' }).click()
-    waitUntilAppIsNotBusy()
-    return this
-  },
   expectRichNotePropertyAssimilateDisabled(key: string) {
     this.switchToRichContent()
     withPropertyPanel(key, () => {
-      cy.get('[data-test="assimilate"]').should('be.disabled')
+      cy.get('[data-test="assimilate-UNDERSTANDING"]').should('not.exist')
+      cy.get('[data-test="assimilation-status-UNDERSTANDING"]').should('exist')
     })
     return this
   },
   expectRichNotePropertyAssimilateEnabled(key: string) {
     this.switchToRichContent()
     withPropertyPanel(key, () => {
-      cy.get('[data-test="assimilate"]').should('not.be.disabled')
+      cy.get('[data-test="assimilate-UNDERSTANDING"]').should('not.be.disabled')
     })
     return this
   },
   expectRichNotePropertyPanelAction(
     key: string,
-    action: 'skip' | 'revive' | 'return-to-sequence' | 'remove-from-recall'
+    action: 'skip' | 'return-to-sequence'
   ) {
     this.switchToRichContent()
     withPropertyPanel(key, () => {

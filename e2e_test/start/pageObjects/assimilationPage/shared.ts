@@ -22,6 +22,9 @@ const noteLevelControl =
       .get(selector, options ?? {})
       .filter((_, el) => isNoteLevelAssimilationControl(el))
 
+export const noteLevelAssimilationModesPanel = noteLevelControl(
+  assimilationModesSelector
+)
 export const assimilateButton = noteLevelControl(assimilateButtonSelector)
 export const assimilateCommissionedButton = noteLevelControl(
   assimilateCommissionedSelector

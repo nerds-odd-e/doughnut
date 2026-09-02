@@ -118,10 +118,9 @@ Feature: Property memory tracker
   Scenario: Remove from recall on assimilation settings for a property
     Given I assimilated one note "Vitamins" at the current time
     And I am viewing assimilation settings for note "Vitamins"
-    Then I should see Remove from recall for property "topic"
-    When I remove rich note property "topic" from recall from its property panel
-    Then I should see Revive for property "topic"
-    And the property memory tracker for "topic" should be absent
+    When I open the property memory tracker for "topic"
+    And I remove the memory tracker from recall
+    Then the memory tracker should be skipped
     When I start assimilation from the menu
     Then I should see the no more notes to assimilate toast
 
