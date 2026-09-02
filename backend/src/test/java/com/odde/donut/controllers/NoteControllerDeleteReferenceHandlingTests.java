@@ -72,6 +72,20 @@ class NoteControllerDeleteReferenceHandlingTests extends ControllerTestBase {
   }
 
   @Test
+  void shouldRemovePropertyReferenceAuthoredBeforeTheTargetNoteExisted()
+      throws UnexpectedNoAccessRightException {
+    Note referrer = makeMe.aNote("Referrer").notebookOwnedBy(currentUser.getUser()).please();
+    NoteUpdateContentDTO content = new NoteUpdateContentDTO();
+    content.setContent("---\ntarget: \"[[Future]]\"\n---\nBody");
+    textContentController.updateNoteContent(referrer, content);
+    Note target = makeMe.aNote("Future").underSameNotebookAs(referrer).please();
+
+    controller.deleteNote(target, removeFromPropertiesDeleteRequest());
+
+    assertThat(referrer.getContent(), equalTo("---\ntype: Note\n---\nBody"));
+  }
+
+  @Test
   void shouldNotTouchUnrelatedNotesAuthoredReferenceRowsOnDelete()
       throws UnexpectedNoAccessRightException {
     Note target = makeMe.aNote("Target").notebookOwnedBy(currentUser.getUser()).please();

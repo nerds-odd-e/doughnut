@@ -1,7 +1,7 @@
 # Authoritative authored note references
 
 **Status:** in progress  
-**Resume:** next slice is 19 (property-removal deletion rewrites from live authored link text). Slices 1–18 done.  
+**Resume:** next slice is 20 (focus context samples only currently resolved inbound references). Slices 1–19 done.  
 **Source:** `.planning/notes/notebook-scope-wiki-refresh-on-title-and-create.md`  
 **Architecture:** ADR 0004, “Links and attachments”  
 **Goal:** Make authored semantic note references a domain-owned representation derived from note Markdown, and make every consumer resolve those references against current state without notebook-wide cache refreshes.
@@ -23,7 +23,7 @@ When this plan is complete:
 - **Index writes:** production create/save/rewrite go through `Note.replaceContent`. `AuthoredNoteContent.prepareDocumentForSave` also injects `type` via `NoteConceptType.ensureStoredType` — rewrites use `WikiLinkRewriteSupport.documentFromRewrittenContent` instead. Tests that need inbound discovery use `MakeMe.authorReferencingContent` (same parse, no type injection). Raw `Note.setContent` / builder `.content(...)` bypass the index.
 - **Inject:** done (Slice 17) — `InjectNotesWorker` now also calls `Note.replaceContent(AuthoredNoteDocument)` per note after save, before the existing `refreshForNote` cache refresh.
 - **Inbound facade:** `AuthoredNoteReferenceInboundFacade` in `entities.repositories` (must share the package-private `AuthoredNoteReferenceRowRepository`). Live-resolves candidates; exposes `distinctReferrerNotesForViewer`, `distinctReferrerIdsForViewer`, `distinctInboundReferencesForViewer` (referrer + authored link texts). `NoteRealmService` already uses it. Read rows in tests with `AuthoredNoteReferenceRowTestSupport.rowsFor(EntityManager, Note)` — do not open a new MockMvc context for the package-private repo.
-- **Delete policies:** `removeNoteLinksFromReferrerProperties` live-filters referrer ids via the facade, then still reads `resolved_wiki_link` for link text (Slice 19).
+- **Delete policies:** done (Slice 19) — `removeNoteLinksFromReferrerProperties` now reads referrer + link text from `AuthoredNoteReferenceInboundFacade.distinctInboundReferencesForViewer` alone; no more `ResolvedWikiLinkRepository` dependency in `NoteReferenceHandling`/`NoteService`. The now-unused `AuthoredNoteReferenceInboundFacade.distinctReferrerIdsForViewer` was removed too.
 - **Notebook walks still in a write transaction:** alias-changing content save; cross-notebook move (`refreshCardinalityAcrossMovedNotebooks`). Plan 038 already skipped title/create; Slice 18 stopped `NoteService.destroy` / `restore`.
 - **Frontend barrier (Slice 6, keep):** `noteContentMutationBarrier` flushes body autosave before delete. Do not extend it (no title autosave, no retries).
 - **Still on the cache:** focus-context sampling (`InboundResolvedWikiLinks.sampledReferencesNotesForFocusContext`); `NotePropertyIndex.targetNote`; remaining `refreshForNote` / `refreshNotebookScope` callers.
@@ -37,7 +37,7 @@ When this plan is complete:
 - Candidate lookup is an optimization, not a resolution verdict. Always live-resolve for the current viewer.
 - Do not change Markdown/wiki syntax, candidate matching, visibility, or API response shapes. Do not add a new ADR.
 
-## Done (1–18)
+## Done (1–19)
 
 | # | Type | Capability |
 |---|---|---|
@@ -59,17 +59,9 @@ When this plan is complete:
 | 16 | Behavior | Relocation via facade; facade now returns authored link texts |
 | 17 | Behavior | Injected notes index authored references like product saves |
 | 18 | Behavior | Delete/restore stop calling `refreshNotebookScope` |
+| 19 | Behavior | Property-removal deletion rewrites from live authored link text |
 
 ## Remaining slices
-
-### 19. Property-removal deletion rewrites from live authored link text
-
-- **Type:** Behavior
-- **Status:** pending
-- **Scenario:** A source authors a property wiki link to a missing target. After that target is created, deleting it with “remove from properties” clears the property even when `resolved_wiki_link` has no row for that link.
-- Replace `NoteReferenceHandling.removeNoteLinksFromReferrerProperties`'s `ResolvedWikiLinkRepository` intersection with `AuthoredNoteReferenceInboundFacade.distinctInboundReferencesForViewer`. Drop the repository from this class if unused.
-- `resolved_wiki_link` stores only successful resolutions, so a missing-then-created `[[Future]]` has authored-reference rows but often no cache row. Show/inbound already work; remove-from-properties can no-op.
-- **Verify:** extend the existing delete-controller property-removal tests with this missing-then-created delta; the last `note_deletion.feature` scenario remains the both-exist-at-inject case.
 
 ### 20. Focus context samples only currently resolved inbound references
 
