@@ -12,7 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class RecallQuestionService {
+public class RecallPromptService {
   private final McqService mcqService;
   private final RecallPromptRepository recallPromptRepository;
   private final EntityPersister entityPersister;
@@ -22,7 +22,7 @@ public class RecallQuestionService {
   private final RecallPromptPersister recallPromptPersister;
 
   @Autowired
-  public RecallQuestionService(
+  public RecallPromptService(
       RecallPromptRepository recallPromptRepository,
       EntityPersister entityPersister,
       AnswerService answerService,

@@ -12,7 +12,7 @@ import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.factoryServices.EntityPersister;
 import com.odde.donut.services.AuthorizationService;
 import com.odde.donut.services.MemoryTrackerService;
-import com.odde.donut.services.RecallQuestionService;
+import com.odde.donut.services.RecallPromptService;
 import com.odde.donut.testability.TestabilitySettings;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -32,19 +32,19 @@ class MemoryTrackerController {
   private final TestabilitySettings testabilitySettings;
 
   private final AuthorizationService authorizationService;
-  private final RecallQuestionService recallQuestionService;
+  private final RecallPromptService recallPromptService;
 
   public MemoryTrackerController(
       EntityPersister entityPersister,
       TestabilitySettings testabilitySettings,
       AuthorizationService authorizationService,
       MemoryTrackerService memoryTrackerService,
-      RecallQuestionService recallQuestionService) {
+      RecallPromptService recallPromptService) {
     this.entityPersister = entityPersister;
     this.testabilitySettings = testabilitySettings;
     this.authorizationService = authorizationService;
     this.memoryTrackerService = memoryTrackerService;
-    this.recallQuestionService = recallQuestionService;
+    this.recallPromptService = recallPromptService;
   }
 
   @GetMapping("/{memoryTracker}/recall-prompt")
@@ -57,7 +57,7 @@ class MemoryTrackerController {
     if (memoryTracker.isSpelling()) {
       recallPrompt = memoryTrackerService.getSpellingQuestion(memoryTracker);
     } else {
-      recallPrompt = recallQuestionService.generateAQuestion(memoryTracker);
+      recallPrompt = recallPromptService.generateAQuestion(memoryTracker);
     }
     if (recallPrompt == null) {
       throw new ResponseStatusException(
