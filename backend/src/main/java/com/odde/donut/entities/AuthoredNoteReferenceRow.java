@@ -97,12 +97,10 @@ public class AuthoredNoteReferenceRow extends EntityIdentifiedByIdOnly {
 
   /**
    * Builds the row for one authored reference, owned by {@code note}, at {@code documentOrder}.
-   * Public so both {@link Note#replaceContent} (the aggregate content-save boundary) and the
-   * one-time pre-existing-notes backfill ({@code AuthoredNoteReferenceBackfillTx}) share this
-   * kind/locator mapping instead of duplicating it; only row construction is shared — the two
-   * callers persist differently (aggregate collection vs. direct {@code EntityManager.persist}).
+   * Used by {@link Note#replaceContent}, the aggregate content-save boundary, to keep reference-row
+   * construction with the persistence type that owns the mapping.
    */
-  public static AuthoredNoteReferenceRow forSource(
+  static AuthoredNoteReferenceRow forSource(
       Note note, AuthoredNoteReference reference, int documentOrder) {
     AuthoredNoteReferenceRow row = new AuthoredNoteReferenceRow();
     row.setNote(note);

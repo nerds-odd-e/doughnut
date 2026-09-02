@@ -29,7 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * Exercises {@link AuthoredNoteReferenceBackfillTx} through its own committed-transaction boundary
  * (each batch is {@code REQUIRES_NEW}, like production), not the test's rollback transaction — see
- * {@code CommittedTransactionTestSupport}. Fixtures are notes with pre-existing content but no
+ * {@code CommittedTransactionTestSupport}. Most fixtures are notes with pre-existing content but no
  * {@code authored_note_reference} rows yet (built via {@code content(...)}, which sets raw content
  * without going through {@code Note.replaceContent}), mirroring notes that existed before this
  * feature shipped.
@@ -99,6 +99,26 @@ class AuthoredNoteReferenceBackfillTxTest {
             transactionManager,
             () -> AuthoredNoteReferenceRowTestSupport.rowsFor(entityManager, holder[1]));
     assertThat(zeroReferenceRows, hasSize(0));
+  }
+
+  @Test
+  void backfillReplacesReferencesAlreadyIndexedByALiveSave() {
+    Note[] holder = new Note[1];
+    inCommittedTransaction(
+        transactionManager,
+        () -> {
+          User owner = makeMe.aUser(USER_PREFIX + UUID.randomUUID()).please();
+          holder[0] = makeMe.aNote().notebookOwnedBy(owner).please();
+          makeMe.authorReferencingContent(holder[0], "[[Target]] [Some Note](/n42)");
+        });
+
+    runBackfillToCompletion();
+
+    List<AuthoredNoteReferenceRow> rows =
+        inCommittedTransaction(
+            transactionManager,
+            () -> AuthoredNoteReferenceRowTestSupport.rowsFor(entityManager, holder[0]));
+    assertThat(rows, hasSize(2));
   }
 
   @Test

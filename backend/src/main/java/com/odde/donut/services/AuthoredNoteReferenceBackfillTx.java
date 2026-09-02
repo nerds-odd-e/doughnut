@@ -1,14 +1,13 @@
 package com.odde.donut.services;
 
+import com.odde.donut.algorithms.AuthoredNoteDocument;
 import com.odde.donut.algorithms.AuthoredNoteReference;
 import com.odde.donut.algorithms.AuthoredNoteReferences;
 import com.odde.donut.algorithms.CanonicalDonutOrigin;
 import com.odde.donut.entities.AuthoredNoteReferenceBackfillProgress;
-import com.odde.donut.entities.AuthoredNoteReferenceRow;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.repositories.AuthoredNoteReferenceBackfillProgressRepository;
 import com.odde.donut.entities.repositories.NoteRepository;
-import jakarta.persistence.EntityManager;
 import java.sql.Timestamp;
 import java.util.List;
 import org.springframework.data.domain.PageRequest;
@@ -17,12 +16,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * One-time startup backfill of {@code authored_note_reference} rows for pre-existing notes.
- * Deliberately bypasses {@link Note#replaceContent}: that aggregate method is the user-content-save
- * boundary (timestamp/refresh bookkeeping is the caller's job there), which this batch backfill
- * must not trigger for notes nobody touched. Row construction itself is shared with {@link
- * Note#replaceContent} via {@link AuthoredNoteReferenceRow#forSource}; only the persistence path
- * differs (direct {@link EntityManager#persist} here vs. the aggregate's managed collection). Each
+ * One-time startup backfill of {@code authored_note_reference} rows for pre-existing notes. Each
  * batch is its own transaction ({@link Propagation#REQUIRES_NEW}), committed together with the
  * progress watermark, so a mid-run failure loses at most the in-flight batch and a restart resumes
  * from the last committed watermark.
@@ -35,19 +29,16 @@ public class AuthoredNoteReferenceBackfillTx {
 
   private final NoteRepository noteRepository;
   private final AuthoredNoteReferenceBackfillProgressRepository progressRepository;
-  private final EntityManager entityManager;
   private final CanonicalDonutOrigin canonicalOrigin;
   private final NotePropertyIndexService notePropertyIndexService;
 
   public AuthoredNoteReferenceBackfillTx(
       NoteRepository noteRepository,
       AuthoredNoteReferenceBackfillProgressRepository progressRepository,
-      EntityManager entityManager,
       CanonicalDonutOrigin canonicalOrigin,
       NotePropertyIndexService notePropertyIndexService) {
     this.noteRepository = noteRepository;
     this.progressRepository = progressRepository;
-    this.entityManager = entityManager;
     this.canonicalOrigin = canonicalOrigin;
     this.notePropertyIndexService = notePropertyIndexService;
   }
@@ -86,9 +77,7 @@ public class AuthoredNoteReferenceBackfillTx {
     List<AuthoredNoteReference> references =
         AuthoredNoteReferences.uniquePreserveOrder(
             AuthoredNoteReferences.inOccurrenceOrder(note.getContent(), canonicalOrigin));
-    for (int order = 0; order < references.size(); order++) {
-      entityManager.persist(AuthoredNoteReferenceRow.forSource(note, references.get(order), order));
-    }
+    note.replaceContent(new AuthoredNoteDocument(note.getContent(), references));
     notePropertyIndexService.refreshForNote(note);
   }
 
