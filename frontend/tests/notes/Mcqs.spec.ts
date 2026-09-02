@@ -16,7 +16,7 @@ describe("Mcqs", () => {
   it("renders questions table when questions exist", async () => {
     const wrapper = await mountMcqsReady()
 
-    expect(wrapper.text()).toContain("What is 2+2?")
+    expect(wrapper.find(".mcq-table").text()).toContain("What is 2+2?")
   })
 
   it("shows export dialog when export button is clicked", async () => {

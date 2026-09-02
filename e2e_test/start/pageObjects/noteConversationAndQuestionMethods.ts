@@ -40,7 +40,7 @@ export const noteConversationAndQuestionMethods = () => ({
   },
   expectQuestionsInList(expectedQuestions: Record<string, string>[]) {
     cy.get('body').then(($body) => {
-      if ($body.find('.question-table').length > 0) {
+      if ($body.find('.mcq-table').length > 0) {
         questionListPage().expectQuestions(expectedQuestions)
       } else {
         this.openQuestionList().expectQuestions(expectedQuestions)

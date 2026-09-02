@@ -30,7 +30,7 @@ export const addQuestionPage = () => {
       cy.wait('@add').then(({ response }) => {
         expect(response?.statusCode, 'add').to.equal(200)
       })
-      cy.get('.question-table').should('contain.text', row.Stem!)
+      cy.get('.mcq-table').should('contain.text', row.Stem!)
       return this
     },
     generateQuestionWithAI() {
