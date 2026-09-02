@@ -4,10 +4,6 @@
     data-testid="assimilation-settings"
     class="flex flex-col gap-0"
   >
-    <h2 class="text-base font-semibold gap-2 mb-3 flex items-center">
-      Assimilation settings
-      <AssimilationProgressSummary />
-    </h2>
     <NoteInfoComponent
       v-if="noteRecallInfo"
       :note-recall-info="noteRecallInfo"
@@ -53,7 +49,6 @@ import type { Note } from "@generated/donut-backend-api"
 import { hasNoteContent } from "@/utils/hasNoteContent"
 import NoteInfoComponent from "../notes/NoteInfoComponent.vue"
 import AssimilationButtons from "./AssimilationButtons.vue"
-import AssimilationProgressSummary from "./AssimilationProgressSummary.vue"
 import type { AssimilateEvent } from "@/composables/useAssimilateUnit"
 import { isSkippedFromAssimilationSequence } from "@/composables/useAssimilationSequenceSkip"
 import { isSkippedForRecall } from "@/composables/useReviveMemoryTracker"

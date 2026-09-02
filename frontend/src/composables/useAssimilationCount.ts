@@ -1,12 +1,6 @@
 import type { AssimilationCountDto } from "@generated/donut-backend-api"
 import { ref } from "vue"
 
-export type AssimilationProgressCounts = {
-  assimilated: number
-  planned: number
-  total: number
-}
-
 const ABBREVIATION_UNITS: [number, string][] = [
   [1_000_000_000, "b"],
   [1_000_000, "m"],
@@ -29,25 +23,6 @@ export function formatAssimilationBadge(due: number, total: number): string {
 
 export function assimilationBadgeTitle(due: number, total: number): string {
   return `${due} due today, ${total} total unassimilated`
-}
-
-export function assimilationProgressFromCounts(
-  assimilatedCountOfTheDay: number | undefined,
-  dueCount: number | undefined,
-  totalUnassimilatedCount: number | undefined
-): AssimilationProgressCounts | null {
-  if (
-    assimilatedCountOfTheDay === undefined ||
-    totalUnassimilatedCount === undefined
-  ) {
-    return null
-  }
-  const assimilated = assimilatedCountOfTheDay
-  return {
-    assimilated,
-    planned: assimilated + (dueCount ?? 0),
-    total: assimilated + totalUnassimilatedCount,
-  }
 }
 
 const dueCount = ref<number | undefined>(undefined)

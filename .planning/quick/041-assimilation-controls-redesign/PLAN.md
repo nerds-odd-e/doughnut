@@ -41,13 +41,14 @@
 ### 3. Assimilation panel drops its title and the three-number progress summary
 
 - **Type:** Behavior
-- **Status:** planned
+- **Status:** done
 - **Pre-condition:** user opens the assimilation panel from the note toolbar.
 - **Trigger:** panel renders.
 - **Post-condition:** no "Assimilation settings" heading and no assimilated/planned/total summary line; whatever the panel now contains (still the old table at this point) is otherwise unchanged.
 - **Touches:** `frontend/src/components/recall/AssimilationSettings.vue` (remove the `<h2>` and `<AssimilationProgressSummary>` usage).
 - **Tests:** component test asserting the heading/summary are absent from the rendered panel.
 - **Note:** deliberately split from slice 4 — this is a pure deletion with zero risk to the mode-control rebuild, so it can land and be reverted independently of the bigger change.
+- **Learning:** post-change-refactor found `AssimilationProgressSummary.vue` had zero remaining production callers after this slice's edit, so it (and its test, and the now-orphaned `assimilationProgressFromCounts`/`AssimilationProgressCounts` in `useAssimilationCount.ts`) were deleted here rather than left dead until slice 6 — slice 6's pre-condition/touches below is updated to match.
 
 ### 4. Note-level panel replaces the Memory Trackers table with compact per-mode controls
 
@@ -74,7 +75,7 @@
 
 - **Type:** Structure
 - **Status:** planned
-- **Pre-condition:** slices 1–5 shipped; nothing renders `NoteInfoComponent.vue`, `NoteInfoMemoryTracker.vue`, `AssimilationProgressSummary.vue`, or the old dropdown/remove/revive branches of the pre-rebuild `AssimilationButtons.vue`.
+- **Pre-condition:** slices 1–5 shipped; nothing renders `NoteInfoComponent.vue`, `NoteInfoMemoryTracker.vue`, or the old dropdown/remove/revive branches of the pre-rebuild `AssimilationButtons.vue`. (`AssimilationProgressSummary.vue` was already deleted during slice 3's post-change-refactor.)
 - **Trigger:** none (no external behavior change — verified by existing test suite staying green).
 - **Post-condition:** those files and their now-unreachable tests are deleted; `assimilationMemoryTrackers.ts` predicates trimmed to whatever `AssimilationModes.vue` actually still uses (e.g. `showRemoveFromRecall` likely drops out entirely).
 - **Touches:** deletions only, plus a grep pass for stale imports/routes.

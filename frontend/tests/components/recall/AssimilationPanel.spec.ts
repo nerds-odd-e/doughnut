@@ -41,6 +41,16 @@ vi.mock("@/composables/useGoToNextAssimilation", () => ({
 setupAssimilationPanelTests()
 
 describe("AssimilationPanel", () => {
+  it("does not show a heading or the assimilated/planned/total summary", async () => {
+    const wrapper = await mountAssimilationPanelReady()
+
+    const settings = wrapper.find('[data-testid="assimilation-settings"]')
+    expect(settings.find("h2").exists()).toBe(false)
+    expect(
+      settings.find('[data-test="assimilation-progress-summary"]').exists()
+    ).toBe(false)
+  })
+
   it("does not show Level radios in assimilation settings", async () => {
     const wrapper = await mountAssimilationPanelReady()
 
