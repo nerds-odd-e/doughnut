@@ -40,13 +40,13 @@ class NotePropertyIndexServiceTest {
   class refreshForNote {
 
     @Test
-    void indexes_list_property_with_one_row_per_resolved_target_preserving_yaml_order() {
+    void indexes_list_property_with_one_row_per_authored_reference_preserving_yaml_order() {
       User user = makeMe.aUser().please();
       Note targetA = makeMe.aNote().title("A").notebookOwnedBy(user).please();
-      Note targetB = makeMe.aNote().title("B").underSameNotebookAs(targetA).please();
       String markdown =
           "---\n" + "example of:\n" + "  - \"[[A]]\"\n" + "  - \"[[B]]\"\n" + "---\n\nbody";
-      Note note = makeMe.aNote().underSameNotebookAs(targetA).content(markdown).please();
+      Note note = makeMe.aNote().underSameNotebookAs(targetA).please();
+      makeMe.authorReferencingContent(note, markdown);
 
       notePropertyIndexService.refreshForNote(note);
 
@@ -54,10 +54,10 @@ class NotePropertyIndexServiceTest {
       assertThat(rows, hasSize(2));
       assertThat(rows.get(0).getPropertyKey(), equalTo("example of"));
       assertThat(rows.get(0).getItemIndex(), equalTo(0));
-      assertThat(rows.get(0).getTargetNote().getId(), equalTo(targetA.getId()));
+      assertThat(rows.get(0).getAuthoredNoteReference().getAuthoredLink(), equalTo("A"));
       assertThat(rows.get(1).getPropertyKey(), equalTo("example of"));
       assertThat(rows.get(1).getItemIndex(), equalTo(1));
-      assertThat(rows.get(1).getTargetNote().getId(), equalTo(targetB.getId()));
+      assertThat(rows.get(1).getAuthoredNoteReference().getAuthoredLink(), equalTo("B"));
     }
 
     @Test
@@ -96,8 +96,6 @@ class NotePropertyIndexServiceTest {
     void keeps_exact_suffix_keys_independent() {
       User user = makeMe.aUser().please();
       Note targetA = makeMe.aNote().title("A").notebookOwnedBy(user).please();
-      Note targetB = makeMe.aNote().title("B").underSameNotebookAs(targetA).please();
-      Note targetC = makeMe.aNote().title("C").underSameNotebookAs(targetA).please();
       String markdown =
           "---\n"
               + "example of:\n"
@@ -105,7 +103,8 @@ class NotePropertyIndexServiceTest {
               + "  - \"[[B]]\"\n"
               + "example of 2: \"[[C]]\"\n"
               + "---\n\nbody";
-      Note note = makeMe.aNote().underSameNotebookAs(targetA).content(markdown).please();
+      Note note = makeMe.aNote().underSameNotebookAs(targetA).please();
+      makeMe.authorReferencingContent(note, markdown);
 
       notePropertyIndexService.refreshForNote(note);
 
@@ -119,7 +118,7 @@ class NotePropertyIndexServiceTest {
       NotePropertyIndex suffixRow =
           rows.stream().filter(r -> "example of 2".equals(r.getPropertyKey())).findFirst().get();
       assertThat(suffixRow.getItemIndex(), equalTo(0));
-      assertThat(suffixRow.getTargetNote().getId(), equalTo(targetC.getId()));
+      assertThat(suffixRow.getAuthoredNoteReference().getAuthoredLink(), equalTo("C"));
     }
 
     @Test

@@ -7,6 +7,7 @@ erDiagram
     answer ||--o{ recall_log : "answer_id ON DELETE SET NULL"
     answer ||--o{ recall_prompt : "answer_id ON DELETE NO ACTION"
     attachment_blob ||--o{ image : "attachment_blob_id ON DELETE CASCADE"
+    authored_note_reference ||--o{ note_property_index : "authored_note_reference_id ON DELETE SET NULL"
     book ||--o{ book_block : "book_id ON DELETE CASCADE"
     book ||--o{ book_user_last_read_position : "book_id ON DELETE CASCADE"
     book_block ||--o{ book_block_reading_record : "book_block_id ON DELETE CASCADE"
@@ -33,7 +34,6 @@ erDiagram
     "note" ||--o{ note_creator : "note_id ON DELETE CASCADE"
     "note" ||--o{ note_level_index : "note_id ON DELETE CASCADE"
     "note" ||--o{ note_property_index : "note_id ON DELETE CASCADE"
-    "note" ||--o{ note_property_index : "target_note_id ON DELETE SET NULL"
     "note" ||--o{ resolved_wiki_link : "destination_note_id ON DELETE CASCADE"
     "note" ||--o{ resolved_wiki_link : "source_note_id ON DELETE CASCADE"
     notebook ||--o{ bazaar_notebook : "notebook_id ON DELETE NO ACTION"
@@ -187,7 +187,7 @@ erDiagram
     note_property_index {
         int id PK
         int note_id FK
-        int target_note_id FK
+        int authored_note_reference_id FK
     }
     notebook {
         int id PK

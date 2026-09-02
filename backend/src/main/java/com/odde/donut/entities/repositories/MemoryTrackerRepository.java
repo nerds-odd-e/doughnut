@@ -1,6 +1,7 @@
 package com.odde.donut.entities.repositories;
 
 import com.odde.donut.entities.MemoryTracker;
+import com.odde.donut.entities.MemoryTrackerQueryFragments;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.stream.Stream;
@@ -9,6 +10,25 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 
 public interface MemoryTrackerRepository extends CrudRepository<MemoryTracker, Integer> {
+  /**
+   * True when {@code noteId} has a non-deleted, note-level (no property key), UNDERSTANDING-type
+   * tracker for {@code userId} — the "target note is handled" condition for the property wiki-link
+   * assimilation gate. Mirrors {@link MemoryTracker#isNoteLevelTracker()} and {@link
+   * com.odde.donut.entities.MemoryTrackerType#UNDERSTANDING} via {@link
+   * MemoryTrackerQueryFragments}.
+   */
+  @Query(
+      "SELECT CASE WHEN COUNT(rp) > 0 THEN true ELSE false END FROM MemoryTracker rp"
+          + " WHERE rp.note.id = :noteId"
+          + " AND rp.user.id = :userId"
+          + " AND rp.deletedAt IS NULL"
+          + " AND "
+          + MemoryTrackerQueryFragments.JPA_WHERE_NOTE_LEVEL_TRACKER
+          + " AND "
+          + MemoryTrackerQueryFragments.JPA_WHERE_UNDERSTANDING_TRACKER)
+  boolean existsCompletedNoteLevelUnderstandingTracker(
+      @Param("noteId") Integer noteId, @Param("userId") Integer userId);
+
   @Query(
       value =
           "SELECT rp.* FROM memory_tracker rp "

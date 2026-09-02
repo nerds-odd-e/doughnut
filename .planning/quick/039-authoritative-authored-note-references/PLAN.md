@@ -1,7 +1,7 @@
 # Authoritative authored note references
 
 **Status:** in progress  
-**Resume:** next slice is 21 (property tracking points to authored references, not cached targets). Slices 1–20 done.  
+**Resume:** next slice is 22 (assimilation gates on current reference resolution). Slices 1–21 done.  
 **Source:** `.planning/notes/notebook-scope-wiki-refresh-on-title-and-create.md`  
 **Architecture:** ADR 0004, “Links and attachments”  
 **Goal:** Make authored semantic note references a domain-owned representation derived from note Markdown, and make every consumer resolve those references against current state without notebook-wide cache refreshes.
@@ -26,7 +26,8 @@ When this plan is complete:
 - **Delete policies:** done (Slice 19) — `removeNoteLinksFromReferrerProperties` now reads referrer + link text from `AuthoredNoteReferenceInboundFacade.distinctInboundReferencesForViewer` alone; no more `ResolvedWikiLinkRepository` dependency in `NoteReferenceHandling`/`NoteService`. The now-unused `AuthoredNoteReferenceInboundFacade.distinctReferrerIdsForViewer` was removed too.
 - **Notebook walks still in a write transaction:** alias-changing content save; cross-notebook move (`refreshCardinalityAcrossMovedNotebooks`). Plan 038 already skipped title/create; Slice 18 stopped `NoteService.destroy` / `restore`.
 - **Frontend barrier (Slice 6, keep):** `noteContentMutationBarrier` flushes body autosave before delete. Do not extend it (no title autosave, no retries).
-- **Still on the cache:** `NotePropertyIndex.targetNote`; remaining `refreshForNote` / `refreshNotebookScope` callers. Focus-context sampling (`InboundResolvedWikiLinks`) moved off the cache in Slice 20 — it now live-resolves via `AuthoredNoteReferenceInboundFacade`, with cap/exclusion/seeded-order applied in memory (Java-side CRC32 replicates the old MySQL ordering).
+- **Property index:** `note_property_index.authored_note_reference_id` replaces `target_note_id` (Slice 21). Planner uses `sourceLocalKey`; service links to source-owned rows; backfill rebuilds property index after authored-reference backfill. `refreshForNote` breaks FK links before flush when `replaceContent` leaves new authored-reference children transient.
+- **Still on the cache:** remaining `refreshForNote` / `refreshNotebookScope` callers. Focus-context sampling moved off the cache in Slice 20.
 
 ## Constraints for remaining work
 
@@ -61,18 +62,9 @@ When this plan is complete:
 | 18 | Behavior | Delete/restore stop calling `refreshNotebookScope` |
 | 19 | Behavior | Property-removal deletion rewrites from live authored link text |
 | 20 | Behavior | Focus context samples only currently resolved inbound references |
+| 21 | Structure | Property index points to authored references, not cached targets |
 
 ## Remaining slices
-
-### 21. Property tracking points to authored references, not cached targets
-
-- **Type:** Structure
-- **Status:** pending
-- **Enables:** Slice 22 only.
-- Add a Flyway migration replacing `note_property_index.target_note_id` with a nullable authored-reference relation for the semantic reference selected from that property value.
-- Rebuild the derived property index from note Markdown after the authored-reference backfill; do not translate old target pointers into new authority.
-- Make `NotePropertyIndexPlanner` identify the domain reference key while `NotePropertyIndexService` links to the source-owned entry. Remove viewer-blind `resolveAnyTargetWikiLinkToken` from indexing.
-- **Verify:** `backend:verify`, full backend tests, and regenerated database ERD.
 
 ### 22. Assimilation gates on current reference resolution
 

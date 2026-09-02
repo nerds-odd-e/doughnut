@@ -11,15 +11,7 @@ public final class MemoryTrackerQueryFragments {
   public static final String JPA_WHERE_NOTE_LEVEL_TRACKER =
       "(rp.propertyKey IS NULL OR rp.propertyKey = '')";
 
-  /** JPQL fragment for joined alias {@code tmtBlock}. */
-  public static final String JPA_WHERE_NOTE_LEVEL_TARGET_TRACKER =
-      "(tmtBlock.propertyKey IS NULL OR tmtBlock.propertyKey = '')";
-
   /** JPQL fragment for joined alias {@code rp}. */
   public static final String JPA_WHERE_UNDERSTANDING_TRACKER =
       "rp.type = com.odde.donut.entities.MemoryTrackerType.UNDERSTANDING";
-
-  /** JPQL fragment for joined alias {@code tmtBlock}. */
-  public static final String JPA_WHERE_UNDERSTANDING_TARGET_TRACKER =
-      "tmtBlock.type = com.odde.donut.entities.MemoryTrackerType.UNDERSTANDING";
 }

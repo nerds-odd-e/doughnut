@@ -7,7 +7,11 @@ import java.util.List;
 public final class NotePropertyIndexPlanner {
 
   public record PlannedRow(
-      String propertyKey, int itemIndex, String valueText, boolean listProperty) {}
+      String propertyKey,
+      int itemIndex,
+      String valueText,
+      boolean listProperty,
+      String sourceLocalKey) {}
 
   private NotePropertyIndexPlanner() {}
 
@@ -26,7 +30,8 @@ public final class NotePropertyIndexPlanner {
       List<PlannedRow> rows, String key, FrontmatterPropertyValue propertyValue) {
     switch (propertyValue) {
       case FrontmatterPropertyValue.Scalar scalar ->
-          rows.add(new PlannedRow(key, 0, scalar.value(), false));
+          rows.add(
+              new PlannedRow(key, 0, scalar.value(), false, sourceLocalKeyFor(scalar.value())));
       case FrontmatterPropertyValue.ListItems listItems -> {
         if (listItems.items().isEmpty()) {
           return;
@@ -35,15 +40,20 @@ public final class NotePropertyIndexPlanner {
         for (int i = 0; i < listItems.items().size(); i++) {
           String item = listItems.items().get(i);
           if (!WikiLinkMarkdown.authoredTokensInOccurrenceOrder(item).isEmpty()) {
-            linkRows.add(new PlannedRow(key, i, item, true));
+            linkRows.add(new PlannedRow(key, i, item, true, sourceLocalKeyFor(item)));
           }
         }
         if (linkRows.isEmpty()) {
-          rows.add(new PlannedRow(key, 0, "", true));
+          rows.add(new PlannedRow(key, 0, "", true, null));
         } else {
           rows.addAll(linkRows);
         }
       }
     }
+  }
+
+  private static String sourceLocalKeyFor(String valueText) {
+    List<String> tokens = WikiLinkMarkdown.authoredTokensInOccurrenceOrder(valueText);
+    return tokens.isEmpty() ? null : WikiLinkMarkdown.authoredTokenDedupeKey(tokens.getFirst());
   }
 }

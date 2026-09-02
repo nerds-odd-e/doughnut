@@ -37,16 +37,19 @@ public class AuthoredNoteReferenceBackfillTx {
   private final AuthoredNoteReferenceBackfillProgressRepository progressRepository;
   private final EntityManager entityManager;
   private final CanonicalDonutOrigin canonicalOrigin;
+  private final NotePropertyIndexService notePropertyIndexService;
 
   public AuthoredNoteReferenceBackfillTx(
       NoteRepository noteRepository,
       AuthoredNoteReferenceBackfillProgressRepository progressRepository,
       EntityManager entityManager,
-      CanonicalDonutOrigin canonicalOrigin) {
+      CanonicalDonutOrigin canonicalOrigin,
+      NotePropertyIndexService notePropertyIndexService) {
     this.noteRepository = noteRepository;
     this.progressRepository = progressRepository;
     this.entityManager = entityManager;
     this.canonicalOrigin = canonicalOrigin;
+    this.notePropertyIndexService = notePropertyIndexService;
   }
 
   /** True once the backfill has fully completed — a single-row read, no note scanning. */
@@ -86,6 +89,7 @@ public class AuthoredNoteReferenceBackfillTx {
     for (int order = 0; order < references.size(); order++) {
       entityManager.persist(AuthoredNoteReferenceRow.forSource(note, references.get(order), order));
     }
+    notePropertyIndexService.refreshForNote(note);
   }
 
   private AuthoredNoteReferenceBackfillProgress progress() {

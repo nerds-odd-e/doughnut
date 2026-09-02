@@ -115,11 +115,6 @@ public class WikiLinkResolver {
     return accidentalWikiLinkMatches.findAll(answer, reviewedNote, viewer);
   }
 
-  /** Resolves a wiki-link token to any matching note, regardless of viewer readability. */
-  public Optional<Note> resolveAnyTargetWikiLinkToken(String token, Note focusNote) {
-    return Optional.ofNullable(candidateClassifier.resolveAnyTarget(token, focusNote));
-  }
-
   public List<WikiLinkResolution> resolveWikiLinksForCache(Note focusNote, User viewer) {
     String content = focusNote.getContent();
     if (content == null || content.isBlank()) {

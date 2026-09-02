@@ -21,7 +21,8 @@ class AssimilationServicePropertyWikiLinkGateTest extends AssimilationServiceTes
   }
 
   private Note carrierOnNotebook(Notebook notebook, String content) {
-    Note carrier = makeMe.aNote().notebook(notebook).content(content).please();
+    Note carrier = makeMe.aNote().notebook(notebook).please();
+    makeMe.authorReferencingContent(carrier, content);
     notePropertyIndexService.refreshForNote(carrier);
     makeMe.aMemoryTrackerFor(carrier).assimilatedAt(day1).please();
     return carrier;
@@ -107,12 +108,8 @@ class AssimilationServicePropertyWikiLinkGateTest extends AssimilationServiceTes
   @Test
   void offers_property_when_target_note_is_deleted() {
     Note target = makeMe.aNote().title("Word").notebookOwnedBy(user).please();
-    Note carrier =
-        makeMe
-            .aNote()
-            .underSameNotebookAs(target)
-            .content("---\nexample of: \"[[Word]]\"\n---\n\nbody")
-            .please();
+    Note carrier = makeMe.aNote().underSameNotebookAs(target).please();
+    makeMe.authorReferencingContent(carrier, "---\nexample of: \"[[Word]]\"\n---\n\nbody");
     notePropertyIndexService.refreshForNote(carrier);
     target.setDeletedAt(makeMe.aTimestamp().please());
     makeMe.entityPersister.merge(target);

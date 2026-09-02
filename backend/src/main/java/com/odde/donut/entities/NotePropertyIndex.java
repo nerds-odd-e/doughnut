@@ -32,9 +32,9 @@ public class NotePropertyIndex extends EntityIdentifiedByIdOnly {
   private int itemIndex;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "target_note_id", referencedColumnName = "id")
+  @JoinColumn(name = "authored_note_reference_id", referencedColumnName = "id")
   @JsonIgnore
   @Getter
   @Setter
-  private Note targetNote;
+  private AuthoredNoteReferenceRow authoredNoteReference;
 }
