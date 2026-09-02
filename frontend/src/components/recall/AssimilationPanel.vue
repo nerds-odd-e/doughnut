@@ -2,12 +2,9 @@
   <AssimilationSettings
     :note="note"
     :note-info-loaded="noteInfoLoaded"
-    :assimilate-disabled="assimilateDisabled"
     @assimilate="onAssimilate"
     @skip="onSkip"
-    @revive="onRevive"
     @return-to-sequence="onReturnToSequence"
-    @remove-from-recall="onRemoveFromRecall"
   />
   <Teleport to="body">
     <div
@@ -55,12 +52,8 @@ const memoryTrackerActions = useInjectedMemoryTrackerActions(
 )
 provide(memoryTrackerActionsKey, memoryTrackerActions)
 
-const {
-  noteInfoLoaded,
-  assimilateDisabled,
-  showSpellingPopup,
-  handleSpellingCancel,
-} = memoryTrackerActions
+const { noteInfoLoaded, showSpellingPopup, handleSpellingCancel } =
+  memoryTrackerActions
 
 const afterAction = (
   result: MemoryTrackerActionResult,
@@ -90,18 +83,8 @@ const onSkip = async (request: MemoryTrackerActionRequest = {}) => {
   afterAction(result, { emitReloadOnStay: true })
 }
 
-const onRevive = async (request: MemoryTrackerActionRequest) => {
-  const result = await memoryTrackerActions.revive(request)
-  afterAction(result)
-}
-
 const onReturnToSequence = async (request: MemoryTrackerActionRequest = {}) => {
   const result = await memoryTrackerActions.returnToSequence(request)
-  afterAction(result)
-}
-
-const onRemoveFromRecall = async (request: MemoryTrackerActionRequest = {}) => {
-  const result = await memoryTrackerActions.removeFromRecall(request)
   afterAction(result)
 }
 </script>

@@ -1,7 +1,7 @@
 import { waitUntilAppIsNotBusy } from '../pageBase'
 import {
   assumeAssimilationPage,
-  assimilateButtonSelector,
+  assimilationModesSelector,
 } from './assimilationPage'
 import { assumeConversationAboutNotePage } from './conversationAboutNotePage'
 import { addQuestionPage } from './addQuestionPage'
@@ -75,7 +75,7 @@ export const noteConversationAndQuestionMethods = () => ({
   },
   expectWithoutAssimilationPanel() {
     cy.url({ timeout: 15000 }).should('match', /\/d\/n\/\d+|\/n\/\d+|\/n\d+/)
-    cy.get(assimilateButtonSelector).should('not.exist')
+    cy.get(assimilationModesSelector).should('not.exist')
     return this
   },
 })

@@ -21,25 +21,25 @@ import { refinementLayoutItems } from "./noteRefinementTestSupport"
 
 export {
   assimilateAsCommissionedButtonEl,
+  assimilateAsCommissionedButtonSelector,
   assimilateButtonEl,
   assimilateButtonSelector,
-  assimilateOptionsCaretEl,
-  assimilateOptionsCaretSelector,
   clickAssimilate,
   clickAssimilateAsCommissioned,
   clickRememberSpelling,
-  clickRemoveFromRecallAndConfirm,
   clickReturnToSequence,
   clickSkipAndConfirm,
-  openAssimilateOptions,
+  commissionedStatusEl,
+  commissionedStatusSelector,
   rememberSpellingButtonEl,
-  removeFromRecallButtonEl,
-  removeFromRecallButtonSelector,
+  rememberSpellingButtonSelector,
   returnToSequenceButtonEl,
   returnToSequenceButtonSelector,
-  reviveButtonSelector,
   skipButtonEl,
   skipButtonSelector,
+  spellingStatusEl,
+  spellingStatusSelector,
+  understandingStatusSelector,
 } from "./assimilationPanelControlTestSupport"
 
 export const noteRealm = makeMe.aNoteRealm.please()

@@ -6,15 +6,14 @@ import { mockedGoToNextAssimilation } from "./assimilationPanelMocks"
 import {
   assimilateAsCommissionedButtonEl,
   assimilateButtonEl,
-  assimilateOptionsCaretEl,
   assimilateSpy,
   assimilatedCountOfTheDay,
   clickAssimilateAsCommissioned,
+  commissionedStatusEl,
   mockedRequestDueRecallsRefresh,
   mockedTotalAssimilatedCount,
   mountAssimilationPanelReady,
   note,
-  openAssimilateOptions,
   setupAssimilationPanelTests,
   spellingVerificationPopupEl,
 } from "./assimilationPanelTestSupport"
@@ -56,7 +55,7 @@ describe("AssimilationPanel commissioned assimilation", () => {
     expect(assimilateButtonEl(wrapper)?.hasAttribute("disabled")).toBe(false)
   })
 
-  it("hides commissioned option when note already has a commissioned tracker", async () => {
+  it("shows the tracker status instead of the commissioned assimilate action when a commissioned tracker already exists", async () => {
     mockSdkService(NoteController, "getNoteInfo", {
       memoryTrackers: [
         makeMe.aMemoryTracker.id(1).spelling(false).please(),
@@ -65,12 +64,11 @@ describe("AssimilationPanel commissioned assimilation", () => {
     })
     const wrapper = await mountAssimilationPanelReady()
 
-    expect(assimilateOptionsCaretEl(wrapper)).not.toBeNull()
-    await openAssimilateOptions(wrapper)
-    expect(assimilateAsCommissionedButtonEl()).toBeNull()
+    expect(assimilateAsCommissionedButtonEl(wrapper)).toBeNull()
+    expect(commissionedStatusEl(wrapper)).not.toBeNull()
   })
 
-  it("keeps commissioned option usable when ordinary trackers already exist", async () => {
+  it("keeps commissioned assimilate usable when an understanding tracker already exists", async () => {
     mockSdkService(NoteController, "getNoteInfo", {
       memoryTrackers: [makeMe.aMemoryTracker.id(1).spelling(false).please()],
     })
@@ -79,8 +77,8 @@ describe("AssimilationPanel commissioned assimilation", () => {
     )
     const wrapper = await mountAssimilationPanelReady()
 
-    expect(assimilateButtonEl(wrapper)?.hasAttribute("disabled")).toBe(true)
-    expect(assimilateOptionsCaretEl(wrapper)).not.toBeNull()
+    expect(assimilateButtonEl(wrapper)).toBeNull()
+    expect(assimilateAsCommissionedButtonEl(wrapper)).not.toBeNull()
     await clickAssimilateAsCommissioned(wrapper)
     expect(assimilateSpy).toHaveBeenCalled()
   })

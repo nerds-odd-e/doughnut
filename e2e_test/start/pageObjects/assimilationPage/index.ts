@@ -1,7 +1,3 @@
 export { assimilation } from './assimilationMenu'
 export { assumeAssimilationPage } from './assimilationFlow'
-export {
-  assimilateButton,
-  assimilateButtonSelector,
-  isNoteLevelAssimilationControl,
-} from './shared'
+export { assimilationModesSelector } from './shared'

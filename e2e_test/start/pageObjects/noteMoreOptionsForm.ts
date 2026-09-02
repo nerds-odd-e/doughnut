@@ -1,9 +1,7 @@
 import { waitUntilAppIsNotBusy } from '../pageBase'
 import {
   assumeAssimilationPage,
-  assimilateButton,
-  assimilateButtonSelector,
-  isNoteLevelAssimilationControl,
+  assimilationModesSelector,
 } from './assimilationPage'
 import { clickToolbarOverflowAction, noteToolbar } from './noteToolbarOverflow'
 import { questionListPage } from './questionListPage'
@@ -60,14 +58,13 @@ export const noteMoreOptions = () => {
     },
     openAssimilationSettings() {
       cy.document().then((doc) => {
-        const hasNoteLevelAssimilateButton = [
-          ...doc.querySelectorAll(assimilateButtonSelector),
-        ].some(isNoteLevelAssimilationControl)
-        if (!hasNoteLevelAssimilateButton) {
+        const hasAssimilationPanel =
+          doc.querySelector(assimilationModesSelector) !== null
+        if (!hasAssimilationPanel) {
           clickMoreOption(titles.assimilation)
         }
       })
-      assimilateButton({ timeout: 15000 }).should('be.visible')
+      cy.get(assimilationModesSelector, { timeout: 15000 }).should('be.visible')
       waitUntilAppIsNotBusy()
       return assumeAssimilationPage()
     },

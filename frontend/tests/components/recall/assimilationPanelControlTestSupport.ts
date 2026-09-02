@@ -1,31 +1,31 @@
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
 import usePopups from "@/components/commons/Popups/usePopups"
 
-export const assimilateButtonSelector = '[data-test="assimilate"]' as const
+export const assimilateButtonSelector =
+  '[data-test="assimilate-UNDERSTANDING"]' as const
+export const assimilateAsCommissionedButtonSelector =
+  '[data-test="assimilate-COMMISSIONED"]' as const
+export const rememberSpellingButtonSelector =
+  '[data-test="assimilate-SPELLING"]' as const
 export const skipButtonSelector = '[data-test="skip"]' as const
 export const returnToSequenceButtonSelector =
   '[data-test="return-to-sequence"]' as const
-export const reviveButtonSelector = '[data-test="revive"]' as const
-export const removeFromRecallButtonSelector =
-  '[data-test="remove-from-recall"]' as const
-export const assimilateOptionsCaretSelector =
-  '[data-test="assimilate-options-caret"]' as const
+export const commissionedStatusSelector =
+  '[data-test="assimilation-status-COMMISSIONED"]' as const
+export const spellingStatusSelector =
+  '[data-test="assimilation-status-SPELLING"]' as const
+export const understandingStatusSelector =
+  '[data-test="assimilation-status-UNDERSTANDING"]' as const
 
 export function assimilateButtonEl(wrapper: VueWrapper) {
   return wrapper.element.querySelector(
     assimilateButtonSelector
-  ) as HTMLButtonElement | null
+  ) as HTMLInputElement | null
 }
 
 export function skipButtonEl(wrapper: VueWrapper) {
   return wrapper.element.querySelector(
     skipButtonSelector
-  ) as HTMLInputElement | null
-}
-
-export function removeFromRecallButtonEl(wrapper: VueWrapper) {
-  return wrapper.element.querySelector(
-    removeFromRecallButtonSelector
   ) as HTMLInputElement | null
 }
 
@@ -35,32 +35,32 @@ export function returnToSequenceButtonEl(wrapper: VueWrapper) {
   ) as HTMLInputElement | null
 }
 
-export function assimilateOptionsCaretEl(wrapper: VueWrapper) {
+export function assimilateAsCommissionedButtonEl(wrapper: VueWrapper) {
   return wrapper.element.querySelector(
-    assimilateOptionsCaretSelector
-  ) as HTMLElement | null
+    assimilateAsCommissionedButtonSelector
+  ) as HTMLInputElement | null
 }
 
-export function assimilateAsCommissionedButtonEl() {
-  return document.body.querySelector(
-    '[data-test="assimilate-as-commissioned"]'
-  ) as HTMLButtonElement | null
+export function rememberSpellingButtonEl(wrapper: VueWrapper) {
+  return wrapper.element.querySelector(
+    rememberSpellingButtonSelector
+  ) as HTMLInputElement | null
 }
 
-export function rememberSpellingButtonEl() {
-  return document.body.querySelector(
-    '[data-test="remember-spelling"]'
-  ) as HTMLButtonElement | null
+export function commissionedStatusEl(wrapper: VueWrapper) {
+  return wrapper.element.querySelector(
+    commissionedStatusSelector
+  ) as HTMLAnchorElement | null
+}
+
+export function spellingStatusEl(wrapper: VueWrapper) {
+  return wrapper.element.querySelector(
+    spellingStatusSelector
+  ) as HTMLAnchorElement | null
 }
 
 export async function clickAssimilate(wrapper: VueWrapper) {
   assimilateButtonEl(wrapper)!.click()
-  await flushPromises()
-}
-
-export async function clickRemoveFromRecallAndConfirm(wrapper: VueWrapper) {
-  removeFromRecallButtonEl(wrapper)!.click()
-  usePopups().popups.done(true)
   await flushPromises()
 }
 
@@ -75,19 +75,12 @@ export async function clickReturnToSequence(wrapper: VueWrapper) {
   await flushPromises()
 }
 
-export async function openAssimilateOptions(wrapper: VueWrapper) {
-  assimilateOptionsCaretEl(wrapper)!.click()
-  await flushPromises()
-}
-
 export async function clickAssimilateAsCommissioned(wrapper: VueWrapper) {
-  await openAssimilateOptions(wrapper)
-  assimilateAsCommissionedButtonEl()!.click()
+  assimilateAsCommissionedButtonEl(wrapper)!.click()
   await flushPromises()
 }
 
 export async function clickRememberSpelling(wrapper: VueWrapper) {
-  await openAssimilateOptions(wrapper)
-  rememberSpellingButtonEl()!.click()
+  rememberSpellingButtonEl(wrapper)!.click()
   await flushPromises()
 }

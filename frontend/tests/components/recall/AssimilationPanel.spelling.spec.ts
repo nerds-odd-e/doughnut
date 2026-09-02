@@ -5,7 +5,6 @@ import { mockSdkService, wrapSdkResponse } from "@tests/helpers"
 import { mockedGoToNextAssimilation } from "./assimilationPanelMocks"
 import {
   assimilateButtonEl,
-  assimilateOptionsCaretEl,
   assimilateSpy,
   assimilatedCountOfTheDay,
   clickRememberSpelling,
@@ -16,9 +15,9 @@ import {
   mountAssimilationPanelReady,
   note,
   opaqueContentBlockerEl,
-  openAssimilateOptions,
   rememberSpellingButtonEl,
   setupAssimilationPanelTests,
+  spellingStatusEl,
   spellingVerificationPopupEl,
 } from "./assimilationPanelTestSupport"
 
@@ -83,15 +82,14 @@ describe("AssimilationPanel remember spelling", () => {
     expect(assimilateButtonEl(wrapper)?.hasAttribute("disabled")).toBe(false)
   })
 
-  it("hides remember spelling when a spelling tracker already exists", async () => {
+  it("shows the tracker status instead of remember spelling when a spelling tracker already exists", async () => {
     mockSdkService(NoteController, "getNoteInfo", {
       memoryTrackers: [makeMe.aMemoryTracker.id(1).spelling().please()],
     })
     const wrapper = await mountAssimilationPanelReady()
 
-    expect(assimilateOptionsCaretEl(wrapper)).not.toBeNull()
-    await openAssimilateOptions(wrapper)
-    expect(rememberSpellingButtonEl()).toBeNull()
+    expect(rememberSpellingButtonEl(wrapper)).toBeNull()
+    expect(spellingStatusEl(wrapper)).not.toBeNull()
   })
 
   it("offers remember spelling when a commissioned tracker already exists", async () => {
@@ -100,9 +98,7 @@ describe("AssimilationPanel remember spelling", () => {
     })
     const wrapper = await mountAssimilationPanelReady()
 
-    expect(assimilateOptionsCaretEl(wrapper)).not.toBeNull()
-    await openAssimilateOptions(wrapper)
-    expect(rememberSpellingButtonEl()).not.toBeNull()
+    expect(rememberSpellingButtonEl(wrapper)).not.toBeNull()
   })
 
   it("offers remember spelling when ordinary trackers already exist", async () => {
@@ -111,51 +107,7 @@ describe("AssimilationPanel remember spelling", () => {
     })
     const wrapper = await mountAssimilationPanelReady()
 
-    expect(assimilateButtonEl(wrapper)?.hasAttribute("disabled")).toBe(true)
-    expect(assimilateOptionsCaretEl(wrapper)).not.toBeNull()
-    await openAssimilateOptions(wrapper)
-    expect(rememberSpellingButtonEl()).not.toBeNull()
-  })
-
-  it("offers remember spelling on the note-level menu when the note has properties", async () => {
-    const noteWithProperty = makeMe.aNote
-      .id(note.id)
-      .content("---\ntopic: Spanish\n---\n")
-      .please()
-    mockSdkService(NoteController, "getNoteInfo", {
-      memoryTrackers: [],
-    })
-    const wrapper = await mountAssimilationPanelReady({
-      note: noteWithProperty,
-    })
-
-    expect(assimilateOptionsCaretEl(wrapper)).not.toBeNull()
-    await openAssimilateOptions(wrapper)
-    expect(rememberSpellingButtonEl()).not.toBeNull()
-  })
-
-  it("hides remember spelling when the note has no content", async () => {
-    const noteWithoutContent = makeMe.aNote.id(note.id).content("").please()
-    const wrapper = await mountAssimilationPanelReady({
-      note: noteWithoutContent,
-    })
-
-    expect(assimilateOptionsCaretEl(wrapper)).not.toBeNull()
-    await openAssimilateOptions(wrapper)
-    expect(rememberSpellingButtonEl()).toBeNull()
-  })
-
-  it("hides remember spelling for a relationship note", async () => {
-    const relationshipNote = makeMe.aNote
-      .id(note.id)
-      .relationType("similar to")
-      .please()
-    const wrapper = await mountAssimilationPanelReady({
-      note: relationshipNote,
-    })
-
-    expect(assimilateOptionsCaretEl(wrapper)).not.toBeNull()
-    await openAssimilateOptions(wrapper)
-    expect(rememberSpellingButtonEl()).toBeNull()
+    expect(assimilateButtonEl(wrapper)).toBeNull()
+    expect(rememberSpellingButtonEl(wrapper)).not.toBeNull()
   })
 })

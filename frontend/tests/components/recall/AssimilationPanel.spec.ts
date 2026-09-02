@@ -1,6 +1,5 @@
 import {
   AssimilationSequenceSkipController,
-  MemoryTrackerController,
   NoteController,
 } from "@generated/donut-backend-api/sdk.gen"
 import { describe, expect, it, vi } from "vitest"
@@ -16,19 +15,17 @@ import {
   assimilateSpy,
   assimilatedCountOfTheDay,
   clickAssimilate,
-  clickRemoveFromRecallAndConfirm,
   clickReturnToSequence,
   clickSkipAndConfirm,
   mockedRequestDueRecallsRefresh,
   mockedTotalAssimilatedCount,
   mountAssimilationPanelReady,
   note,
-  removeFromRecallButtonEl,
   returnToSequenceButtonEl,
-  reviveButtonSelector,
   setupAssimilationPanelTests,
   skipButtonEl,
   skipSequenceSpy,
+  understandingStatusSelector,
 } from "./assimilationPanelTestSupport"
 
 vi.mock("@/composables/useRecallData")
@@ -93,7 +90,7 @@ describe("AssimilationPanel", () => {
     expect(mockedRequestDueRecallsRefresh).not.toHaveBeenCalled()
   })
 
-  it("shows Return to sequence instead of Skip or Revive when the note is sequence-skipped", async () => {
+  it("shows Return to sequence instead of Skip when the note is sequence-skipped", async () => {
     mockSdkService(
       NoteController,
       "getNoteInfo",
@@ -103,10 +100,9 @@ describe("AssimilationPanel", () => {
 
     expect(returnToSequenceButtonEl(wrapper)).not.toBeNull()
     expect(skipButtonEl(wrapper)).toBeNull()
-    expect(wrapper.find(reviveButtonSelector).exists()).toBe(false)
   })
 
-  it("returns the note to the sequence without creating a tracker or reviving", async () => {
+  it("returns the note to the sequence without creating a tracker", async () => {
     let skippedKeys = [""]
     mockSdkServiceWithImplementation(NoteController, "getNoteInfo", () =>
       makeMe.aNoteRecallInfo.skippedPropertyKeys(skippedKeys).please()
@@ -131,44 +127,6 @@ describe("AssimilationPanel", () => {
     expect(mockedGoToNextAssimilation).not.toHaveBeenCalled()
     expect(skipButtonEl(wrapper)).not.toBeNull()
     expect(returnToSequenceButtonEl(wrapper)).toBeNull()
-  })
-
-  it("removes the understanding tracker from recall and shows Revive", async () => {
-    let removedFromTracking = false
-    mockSdkServiceWithImplementation(NoteController, "getNoteInfo", () =>
-      makeMe.aNoteRecallInfo
-        .memoryTrackers([
-          makeMe.aMemoryTracker
-            .id(7)
-            .spelling(false)
-            .removedFromTracking(removedFromTracking)
-            .please(),
-        ])
-        .please()
-    )
-    const removeSpy = mockSdkService(
-      MemoryTrackerController,
-      "removeFromRepeating",
-      makeMe.aMemoryTracker.id(7).removedFromTracking(true).please()
-    )
-    removeSpy.mockImplementation(async () => {
-      removedFromTracking = true
-      return wrapSdkResponse(
-        makeMe.aMemoryTracker.id(7).removedFromTracking(true).please()
-      )
-    })
-    const wrapper = await mountAssimilationPanelReady()
-
-    await clickRemoveFromRecallAndConfirm(wrapper)
-
-    expect(removeSpy).toHaveBeenCalledWith({
-      path: { memoryTracker: 7 },
-    })
-    expect(skipSequenceSpy).not.toHaveBeenCalled()
-    expect(mockedGoToNextAssimilation).not.toHaveBeenCalled()
-    expect(wrapper.find(reviveButtonSelector).exists()).toBe(true)
-    expect(skipButtonEl(wrapper)).toBeNull()
-    expect(removeFromRecallButtonEl(wrapper)).toBeNull()
   })
 
   it("no longer renders a Refine note trigger in assimilation settings", async () => {
@@ -196,7 +154,7 @@ describe("AssimilationPanel", () => {
       expect(assimilateButtonEl(wrapper)?.hasAttribute("disabled")).toBe(false)
     })
 
-    it("disables assimilate after note-level assimilate when next unit stays on the same note", async () => {
+    it("shows the tracker status instead of Assimilate after a note-level assimilate creates an understanding tracker", async () => {
       let getNoteInfoCallCount = 0
       mockSdkServiceWithImplementation(NoteController, "getNoteInfo", () => {
         getNoteInfoCallCount += 1
@@ -220,16 +178,22 @@ describe("AssimilationPanel", () => {
       await clickAssimilate(wrapper)
 
       expect(mockedGoToNextAssimilation).toHaveBeenCalled()
-      expect(assimilateButtonEl(wrapper)?.hasAttribute("disabled")).toBe(true)
+      expect(assimilateButtonEl(wrapper)).toBeNull()
+      expect(
+        wrapper.element.querySelector(understandingStatusSelector)
+      ).not.toBeNull()
     })
 
-    it("disables assimilate when note has memory trackers", async () => {
+    it("shows the tracker status instead of Assimilate when note has an understanding memory tracker", async () => {
       mockSdkService(NoteController, "getNoteInfo", {
         memoryTrackers: [makeMe.aMemoryTracker.id(1).spelling(false).please()],
       })
       const wrapper = await mountAssimilationPanelReady()
 
-      expect(assimilateButtonEl(wrapper)?.hasAttribute("disabled")).toBe(true)
+      expect(assimilateButtonEl(wrapper)).toBeNull()
+      expect(
+        wrapper.element.querySelector(understandingStatusSelector)
+      ).not.toBeNull()
     })
   })
 })

@@ -3,34 +3,20 @@ import { waitUntilAppIsNotBusy } from '../../pageBase'
 import { assimilationPropertyMemoryTrackerExpectations } from './propertyMemoryTrackerExpectations'
 import { assimilationRefinementLayoutExpectations } from './refinementLayoutExpectations'
 import {
-  assimilateAsCommissionedButton,
-  assimilateOptionsCaret,
   assimilateButton,
+  assimilateButtonSelector,
+  assimilateCommissionedButton,
+  assimilateSpellingButton,
+  assimilationModesSelector,
   mainNoteHeadingTitleSelector,
   expectOtherNoteLevelSecondaryActionsAbsent,
+  noteLevelControlElements,
   openRefineNoteModalIfNeeded,
-  rememberSpellingButton,
-  reviveButton,
   skipButton,
   returnToSequenceButton,
-  removeFromRecallButton,
   waitForAssimilationNoteTitle,
   noteLevelTrackerRowLabel,
 } from './shared'
-
-const openAssimilateOption = (
-  optionButton: typeof assimilateAsCommissionedButton
-) => {
-  assimilateOptionsCaret().click()
-  optionButton().click()
-}
-
-const chooseAssimilateOption = (
-  optionButton: typeof assimilateAsCommissionedButton
-) => {
-  openAssimilateOption(optionButton)
-  waitUntilAppIsNotBusy()
-}
 
 export const assumeAssimilationPage = () => ({
   ...assimilationPropertyMemoryTrackerExpectations(),
@@ -44,7 +30,9 @@ export const assumeAssimilationPage = () => ({
     return this
   },
   waitForAssimilationReady() {
-    assimilateButton({ timeout: 10000 }).scrollIntoView().should('be.visible')
+    cy.get(assimilationModesSelector, { timeout: 10000 })
+      .scrollIntoView()
+      .should('be.visible')
     return this
   },
   expectAssimilatingNote(title: string) {
@@ -58,11 +46,12 @@ export const assumeAssimilationPage = () => ({
     return this
   },
   assimilateAsCommissioned() {
-    chooseAssimilateOption(assimilateAsCommissionedButton)
+    assimilateCommissionedButton().click()
+    waitUntilAppIsNotBusy()
     return this
   },
   rememberSpelling() {
-    openAssimilateOption(rememberSpellingButton)
+    assimilateSpellingButton().click()
     cy.get('[data-test="spelling-verification-popup"]').should('be.visible')
     return this
   },
@@ -101,26 +90,6 @@ export const assumeAssimilationPage = () => ({
     returnToSequenceButton().should('exist')
     cy.document().then((doc) => {
       expectOtherNoteLevelSecondaryActionsAbsent(doc, 'returnToSequence')
-    })
-    return this
-  },
-  removeFromRecallOnPanel() {
-    removeFromRecallButton().click()
-    cy.findByRole('button', { name: 'OK' }).click()
-    waitUntilAppIsNotBusy()
-    return this
-  },
-  expectRemoveFromRecallOnPanel() {
-    removeFromRecallButton().should('exist')
-    cy.document().then((doc) => {
-      expectOtherNoteLevelSecondaryActionsAbsent(doc, 'removeFromRecall')
-    })
-    return this
-  },
-  expectReviveOnPanel() {
-    reviveButton().should('exist')
-    cy.document().then((doc) => {
-      expectOtherNoteLevelSecondaryActionsAbsent(doc, 'revive')
     })
     return this
   },
@@ -215,11 +184,20 @@ export const assumeAssimilationPage = () => ({
     )
   },
   expectAssimilateDisabled() {
-    assimilateButton().should('be.disabled')
+    // An understanding tracker already exists: the row shows a status link
+    // instead of the Assimilate action, so the button is absent rather than
+    // merely disabled. `cy.get(selector).filter(...)` throws instead of
+    // resolving to an empty set once the raw selector matches nothing
+    // anywhere in the DOM, so check element count via the document instead.
+    cy.document().then((doc) => {
+      expect(
+        noteLevelControlElements(doc, assimilateButtonSelector)
+      ).to.have.length(0)
+    })
     return this
   },
   expectAssimilateEnabled() {
-    assimilateButton().should('not.be.disabled')
+    assimilateButton().should('be.visible').and('not.be.disabled')
     return this
   },
 })

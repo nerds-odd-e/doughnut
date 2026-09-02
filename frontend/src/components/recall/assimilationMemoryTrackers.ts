@@ -19,26 +19,6 @@ function matchesTrackerGrain(mt: MemoryTracker, propertyKey?: string) {
     : isNoteLevelMemoryTracker(mt)
 }
 
-export function hasNoteLevelTrackerOfType(
-  trackers: MemoryTracker[] | undefined,
-  type: NonNullable<MemoryTracker["type"]>
-) {
-  return (
-    trackers?.some((mt) => isNoteLevelMemoryTracker(mt) && mt.type === type) ??
-    false
-  )
-}
-
-export function hasUnderstandingNoteLevelTracker(
-  trackers: MemoryTracker[] | undefined
-) {
-  return (
-    trackers?.some(
-      (mt) => isNoteLevelMemoryTracker(mt) && isUnderstandingMemoryTracker(mt)
-    ) ?? false
-  )
-}
-
 export function activeUnderstandingTrackers(
   noteRecallInfo: NoteRecallInfo | null | undefined,
   propertyKey?: string

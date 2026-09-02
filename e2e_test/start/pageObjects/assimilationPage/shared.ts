@@ -1,16 +1,17 @@
 import { waitUntilAppIsNotBusy } from '../../pageBase'
 import { clickToolbarOverflowAction } from '../noteToolbarOverflow'
 
-export const assimilateButtonSelector = '[data-test="assimilate"]'
-export const reviveButtonSelector = '[data-test="revive"]'
+// Note-level trigger row markup: `AssimilationModes.vue` (`data-testid`
+// "assimilation-modes"). Each mode gets its own direct trigger — no more
+// dropdown/caret. `assimilateButtonSelector` targets the UNDERSTANDING row,
+// the "plain" assimilate action historically referred to by that name.
+export const assimilationModesSelector = '[data-testid="assimilation-modes"]'
+export const assimilateButtonSelector = '[data-test="assimilate-UNDERSTANDING"]'
+export const assimilateCommissionedSelector =
+  '[data-test="assimilate-COMMISSIONED"]'
+export const assimilateSpellingSelector = '[data-test="assimilate-SPELLING"]'
 export const skipButtonSelector = '[data-test="skip"]'
 export const returnToSequenceButtonSelector = '[data-test="return-to-sequence"]'
-export const removeFromRecallButtonSelector = '[data-test="remove-from-recall"]'
-export const assimilateOptionsCaretSelector =
-  '[data-test="assimilate-options-caret"]'
-export const assimilateAsCommissionedSelector =
-  '[data-test="assimilate-as-commissioned"]'
-export const rememberSpellingSelector = '[data-test="remember-spelling"]'
 
 export const isNoteLevelAssimilationControl = (el: Element) =>
   el.closest('[data-testid="rich-note-property-row"]') === null
@@ -22,23 +23,18 @@ const noteLevelControl =
       .filter((_, el) => isNoteLevelAssimilationControl(el))
 
 export const assimilateButton = noteLevelControl(assimilateButtonSelector)
-export const assimilateOptionsCaret = noteLevelControl(
-  assimilateOptionsCaretSelector
+export const assimilateCommissionedButton = noteLevelControl(
+  assimilateCommissionedSelector
 )
-export const assimilateAsCommissionedButton = noteLevelControl(
-  assimilateAsCommissionedSelector
+export const assimilateSpellingButton = noteLevelControl(
+  assimilateSpellingSelector
 )
-export const rememberSpellingButton = noteLevelControl(rememberSpellingSelector)
-export const reviveButton = noteLevelControl(reviveButtonSelector)
 export const skipButton = noteLevelControl(skipButtonSelector)
 export const returnToSequenceButton = noteLevelControl(
   returnToSequenceButtonSelector
 )
-export const removeFromRecallButton = noteLevelControl(
-  removeFromRecallButtonSelector
-)
 
-function noteLevelControlElements(
+export function noteLevelControlElements(
   doc: Document | ParentNode,
   selector: string
 ): Element[] {
@@ -48,10 +44,8 @@ function noteLevelControlElements(
 }
 
 export const secondaryActionSelectors = {
-  revive: reviveButtonSelector,
   skip: skipButtonSelector,
   returnToSequence: returnToSequenceButtonSelector,
-  removeFromRecall: removeFromRecallButtonSelector,
 } as const
 
 export type AssimilationSecondaryAction = keyof typeof secondaryActionSelectors

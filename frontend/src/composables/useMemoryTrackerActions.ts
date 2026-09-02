@@ -1,7 +1,6 @@
 import type { NoteRecallInfo } from "@generated/donut-backend-api"
 import { NoteController } from "@generated/donut-backend-api/sdk.gen"
 import {
-  computed,
   inject,
   provide,
   ref,
@@ -11,7 +10,6 @@ import {
   type Ref,
 } from "vue"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
-import { hasUnderstandingNoteLevelTracker } from "@/components/recall/assimilationMemoryTrackers"
 import type { AssimilateEvent } from "@/composables/useAssimilateUnit"
 import {
   useMemoryTrackerActionHandlers,
@@ -24,7 +22,6 @@ export type { MemoryTrackerActionRequest, MemoryTrackerActionResult }
 export type MemoryTrackerActions = {
   noteInfoLoaded: Ref<boolean>
   noteRecallInfo: Ref<NoteRecallInfo | null>
-  assimilateDisabled: ComputedRef<boolean>
   assimilatingPropertyKey: Ref<string | null>
   showSpellingPopup: ComputedRef<boolean>
   reloadNoteInfo: () => Promise<void>
@@ -60,10 +57,6 @@ export function useMemoryTrackerActions(
   const noteInfoLoaded = ref(false)
   const noteRecallInfo = ref<NoteRecallInfo | null>(null)
 
-  const assimilateDisabled = computed(() =>
-    hasUnderstandingNoteLevelTracker(noteRecallInfo.value?.memoryTrackers)
-  )
-
   const reloadNoteInfo = async () => {
     if (!noteId.value) return
     const { data, error } = await apiCallWithLoading(() =>
@@ -92,7 +85,6 @@ export function useMemoryTrackerActions(
   return {
     noteInfoLoaded,
     noteRecallInfo,
-    assimilateDisabled,
     reloadNoteInfo,
     ...handlers,
   }

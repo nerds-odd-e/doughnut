@@ -13,31 +13,16 @@
       class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
     >
       <div class="flex flex-wrap items-stretch justify-end gap-2 sm:flex-1">
-        <AssimilationButtons
+        <AssimilationModes
+          :allowed-modes="allowedModes"
+          :trackers="noteRecallInfo?.memoryTrackers"
           :disabled="!noteInfoLoaded"
-          :assimilate-disabled="assimilateDisabled"
-          :skipped-for-recall="isSkippedForRecall(noteRecallInfo)"
           :skipped-from-assimilation-sequence="
             isSkippedFromAssimilationSequence(noteRecallInfo)
           "
-          :show-remove-from-recall="showRemoveFromRecall(noteRecallInfo)"
-          :show-commissioned-option="showCommissionedOption"
-          :show-spelling-option="showSpellingOption"
-          @assimilate="emit('assimilate', {})"
+          @assimilate="emit('assimilate', $event)"
           @skip="emit('skip', {})"
-          @assimilate-as-commissioned="
-            emit('assimilate', {
-              assimilateAsCommissioned: true,
-            })
-          "
-          @remember-spelling="
-            emit('assimilate', {
-              assimilateAsSpelling: true,
-            })
-          "
-          @revive="emit('revive', {})"
           @return-to-sequence="emit('returnToSequence', {})"
-          @remove-from-recall="emit('removeFromRecall', {})"
         />
       </div>
     </div>
@@ -46,53 +31,30 @@
 
 <script setup lang="ts">
 import type { Note } from "@generated/donut-backend-api"
-import { hasNoteContent } from "@/utils/hasNoteContent"
 import NoteInfoComponent from "../notes/NoteInfoComponent.vue"
-import AssimilationButtons from "./AssimilationButtons.vue"
+import AssimilationModes from "./AssimilationModes.vue"
 import type { AssimilateEvent } from "@/composables/useAssimilateUnit"
 import { isSkippedFromAssimilationSequence } from "@/composables/useAssimilationSequenceSkip"
-import { isSkippedForRecall } from "@/composables/useReviveMemoryTracker"
-import { relationTypeLabelFromNoteContent } from "@/models/relationTypeOptions"
 import { useInjectedMemoryTrackerActions } from "@/composables/useMemoryTrackerActions"
-import { computed, toRef } from "vue"
-import {
-  hasNoteLevelTrackerOfType,
-  showRemoveFromRecall,
-} from "./assimilationMemoryTrackers"
+import { toRef } from "vue"
+import type { MemoryTrackerType } from "./assimilationMemoryTrackers"
 
-const { note, noteInfoLoaded, assimilateDisabled } = defineProps<{
+const { note, noteInfoLoaded } = defineProps<{
   note: Note
   noteInfoLoaded: boolean
-  assimilateDisabled: boolean
 }>()
 
 const emit = defineEmits<{
   (e: "assimilate", request: AssimilateEvent): void
   (e: "skip", request: { propertyKey?: string }): void
-  (e: "revive", request: { propertyKey?: string }): void
   (e: "returnToSequence", request: { propertyKey?: string }): void
-  (e: "removeFromRecall", request: { propertyKey?: string }): void
 }>()
 
 const { noteRecallInfo } = useInjectedMemoryTrackerActions(toRef(() => note.id))
 
-const noteHasContent = computed(() => hasNoteContent(note.content))
-const isLinkNote = computed(
-  () => relationTypeLabelFromNoteContent(note.content) !== undefined
-)
-
-const showCommissionedOption = computed(
-  () =>
-    !hasNoteLevelTrackerOfType(
-      noteRecallInfo.value?.memoryTrackers,
-      "COMMISSIONED"
-    )
-)
-
-const showSpellingOption = computed(
-  () =>
-    noteHasContent.value &&
-    !isLinkNote.value &&
-    !hasNoteLevelTrackerOfType(noteRecallInfo.value?.memoryTrackers, "SPELLING")
-)
+const allowedModes: MemoryTrackerType[] = [
+  "COMMISSIONED",
+  "SPELLING",
+  "UNDERSTANDING",
+]
 </script>
