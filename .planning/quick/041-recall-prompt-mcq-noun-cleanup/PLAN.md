@@ -33,10 +33,12 @@ Status: done
 - Verified: `MemoryTrackerControllerTest` + `RecallPromptControllerTest` pass; no remaining references to the old name in code.
 
 ### 3. Structure — rename `Quiz.vue`
+Status: done
 - `frontend/src/components/recall/Quiz.vue` → `RecallPromptCard.vue` (component name + `QuizProps` interface renamed to match).
 - Update the one import site: `frontend/src/pages/RecallPage.vue`.
 - Rename its tests: `frontend/tests/recall/Quiz.spec.ts` → `RecallPromptCard.spec.ts`, `frontend/tests/recall/quizTestSupport.ts` → `recallPromptCardTestSupport.ts`.
 - Verify: targeted vitest run for the renamed spec.
+- Learning: 4 more spec files (`RecallPageOverlap.spec.ts`, `RecallPage.dailyProbe.spec.ts`, `RecallPage.speakingPractice.spec.ts`, `RecallPage.threshold.spec.ts`) located the component via Vue Test Utils' `findComponent({ name: "Quiz" })`, which relies on the `<script setup>` SFC's filename-inferred name — the rename silently broke that string lookup. Fixed alongside this slice (mechanical `"Quiz"` → `"RecallPromptCard"`). All 5 affected spec files verified green (18/18).
 
 ### 4. Structure — rename the note "Questions" surface's internal identifiers
 - `frontend/src/components/notes/Questions.vue` → `Mcqs.vue`; internal names `questionAdded` → `mcqAdded`, `fetchQuestions` → `fetchMcqs`, CSS class `.question-table` → `.mcq-table`.

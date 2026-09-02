@@ -29,7 +29,7 @@
 
     <div class="flex-1 min-h-0 overflow-y-auto">
     <template v-if="toRepeat != undefined">
-      <Quiz
+      <RecallPromptCard
         v-if="toRepeatCount !== 0 && getCurrentMemoryTracker() && (!treadmillMode || !getCurrentMemoryTracker()?.spelling)"
         v-show="!currentAnsweredQuestion && !currentAnsweredSpelling"
         :memory-trackers="memoryTrackers"
@@ -88,7 +88,7 @@
 
 <script setup lang="ts">
 import DailyProbeGate from "@/components/recall/DailyProbeGate.vue"
-import Quiz from "@/components/recall/Quiz.vue"
+import RecallPromptCard from "@/components/recall/RecallPromptCard.vue"
 import RecallProgressBar from "@/components/recall/RecallProgressBar.vue"
 import AnsweredQuestionComponent from "@/components/recall/AnsweredQuestionComponent.vue"
 import AnsweredSpellingQuestion from "@/components/recall/AnsweredSpellingQuestion.vue"

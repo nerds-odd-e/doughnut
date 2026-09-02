@@ -59,7 +59,9 @@ describe("RecallPage speaking practice input", () => {
       .withAnswer({ id: 1, correct: false, choiceIndex: 1 })
       .withMemoryTrackerId(memoryTrackerId)
       .please()
-    wrapper.findComponent({ name: "Quiz" }).vm.$emit("answered", wrongAnswer)
+    wrapper
+      .findComponent({ name: "RecallPromptCard" })
+      .vm.$emit("answered", wrongAnswer)
     await flushPromises()
 
     expect(wrapper.find(speakingPracticeInputSelector).exists()).toBe(true)

@@ -75,7 +75,7 @@ describe("RecallPage frequent failure warning", () => {
       .please()
     const wrapper = await ctx.mountPage()
     wrapper
-      .findComponent({ name: "Quiz" })
+      .findComponent({ name: "RecallPromptCard" })
       .vm.$emit("answered", correctAnswerResult)
     await flushPromises()
     expect(getThresholdExceededSpy).not.toHaveBeenCalled()
@@ -90,7 +90,7 @@ describe("RecallPage frequent failure warning", () => {
       .please()
     const wrapper = await ctx.mountPage()
     wrapper
-      .findComponent({ name: "Quiz" })
+      .findComponent({ name: "RecallPromptCard" })
       .vm.$emit("answered", wrongAnswerResult)
     await flushPromises()
     expect(getThresholdExceededSpy).toHaveBeenCalledWith(
@@ -116,7 +116,7 @@ describe("RecallPage frequent failure warning", () => {
       .please()
     const wrapper = await ctx.mountPage()
     wrapper
-      .findComponent({ name: "Quiz" })
+      .findComponent({ name: "RecallPromptCard" })
       .vm.$emit("answered", wrongAnswerResult)
     await flushPromises()
     expect(alertMock).toHaveBeenCalledWith(
@@ -141,7 +141,7 @@ describe("RecallPage frequent failure warning", () => {
       .please()
     const wrapper = await ctx.mountPage()
     wrapper
-      .findComponent({ name: "Quiz" })
+      .findComponent({ name: "RecallPromptCard" })
       .vm.$emit("answered", wrongAnswerResult)
     await flushPromises()
     expect(alertMock).toHaveBeenCalledWith(
