@@ -161,6 +161,15 @@ describe("AssimilationPanel", () => {
     expect(removeFromRecallButtonEl(wrapper)).toBeNull()
   })
 
+  it("no longer renders a Refine note trigger in assimilation settings", async () => {
+    const wrapper = await mountAssimilationPanelReady()
+
+    expect(wrapper.find('[data-test="open-refine-note-modal"]').exists()).toBe(
+      false
+    )
+    expect(document.querySelector('[data-test="refine-note-modal"]')).toBeNull()
+  })
+
   describe("assimilate when note has memory trackers", () => {
     it("enables assimilate when note has only a property memory tracker", async () => {
       mockSdkService(NoteController, "getNoteInfo", {

@@ -30,12 +30,13 @@
 ### 2. "Refine note" moves from the assimilation panel into the note toolbar
 
 - **Type:** Behavior
-- **Status:** planned
+- **Status:** done
 - **Pre-condition:** user is viewing a note.
 - **Trigger:** user opens the note's toolbar / more-options.
 - **Post-condition:** "Refine note" appears as a toolbar action next to "Questions for the note" (same overflow/collapse behavior as other toolbar actions) and opening it still opens `RefineNoteModal`; it no longer appears anywhere inside the assimilation panel.
 - **Touches:** `frontend/src/components/notes/widgets/noteMoreOptionsTitles.ts` (add a `refine` entry), `frontend/src/components/notes/widgets/NoteMoreOptionsActions.vue`, `frontend/src/components/notes/widgets/NoteToolbarMoreOptions.vue`, `frontend/src/composables/noteToolbarOverflow.ts` (`NOTE_TOOLBAR_MORE_OPTIONS_ORDER`), `frontend/src/components/recall/AssimilationSettings.vue` (delete the button + its trigger wiring — `RefineNoteModal` mount moves with it).
 - **Tests:** component test that the toolbar/more-options renders a refine action that opens the modal; assert `AssimilationSettings` no longer renders it.
+- **Learning:** the `refinementContentUpdated → reloadNeeded` listener in `AssimilationPanel.vue` was removed as dangling — it only refreshed assimilation-panel recall info, and note content already updates via the shared store independent of that event. Post-change-refactor extracted a shared `hasNoteContent()` util (`frontend/src/utils/hasNoteContent.ts`) to collapse three copies of the same "does this note have content" check (`NoteMoreOptionsActions.vue`, `AssimilationSettings.vue`, `AnsweredQuestionComponent.vue`).
 
 ### 3. Assimilation panel drops its title and the three-number progress summary
 

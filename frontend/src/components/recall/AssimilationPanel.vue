@@ -8,7 +8,6 @@
     @revive="onRevive"
     @return-to-sequence="onReturnToSequence"
     @remove-from-recall="onRemoveFromRecall"
-    @refinement-content-updated="emit('reloadNeeded')"
   />
   <Teleport to="body">
     <div

@@ -8,7 +8,7 @@
         :memory-tracker-id="answeredQuestion.memoryTrackerId"
       />
       <button
-        v-if="hasNoteContent"
+        v-if="noteHasContent"
         type="button"
         data-test="open-refine-note-modal"
         class="daisy-btn daisy-btn-neutral mt-4"
@@ -34,7 +34,7 @@
     :recall-prompt-id="answeredQuestion.id"
   />
   <RefineNoteModal
-    v-if="hasNoteContent && note"
+    v-if="noteHasContent && note"
     v-model:open="showRefineNoteModal"
     :note="note"
     :question-context="questionContext"
@@ -56,6 +56,7 @@ import ViewMemoryTrackerLink from "./ViewMemoryTrackerLink.vue"
 import RefineNoteModal from "./RefineNoteModal.vue"
 import { recalledNoteUnderQuestionProps } from "./recalledNoteUnderQuestionProps"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
+import { hasNoteContent } from "@/utils/hasNoteContent"
 
 const props = defineProps({
   answeredQuestion: {
@@ -79,7 +80,7 @@ const note = computed<Note | undefined>(() => {
     .getNoteRealmRefAndLoadWhenNeeded(recalled.noteTopology.id).value?.note
 })
 
-const hasNoteContent = computed(() => !!(note.value?.content ?? "").trim())
+const noteHasContent = computed(() => hasNoteContent(note.value?.content))
 
 const questionContext = computed<NoteRefinementQuestionContextDto | undefined>(
   () => {

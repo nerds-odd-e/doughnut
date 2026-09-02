@@ -37,6 +37,14 @@
       </PopButton>
     </DropdownMenuItem>
 
+    <DropdownMenuItem v-if="showMenuAction('refine') && noteHasContent">
+      <DropdownMenuActionButton
+        :title="titles.refine"
+        :icon="Wand2"
+        @click="onRefineOpen"
+      />
+    </DropdownMenuItem>
+
     <DropdownMenuItem v-if="showMenuAction('audio') && !isAudioOpen">
       <DropdownMenuActionButton
         :title="titles.audio"
@@ -91,6 +99,17 @@
     </PopButton>
 
     <button
+      v-if="showToolbarAction('refine') && noteHasContent"
+      type="button"
+      :class="toolbarGhostBtnClass"
+      :title="titles.refine"
+      :aria-label="titles.refine"
+      @click="onRefineOpen"
+    >
+      <Wand2 class="w-6 h-6" aria-hidden="true" />
+    </button>
+
+    <button
       v-if="showToolbarAction('audio')"
       type="button"
       :class="[
@@ -131,10 +150,17 @@
       <Trash2 class="w-6 h-6" aria-hidden="true" />
     </button>
   </template>
+
+  <RefineNoteModal
+    v-if="noteHasContent && showRefineNoteModal"
+    v-model:open="showRefineNoteModal"
+    :note="note"
+  />
 </template>
 
 <script setup lang="ts">
 import type { Note } from "@generated/donut-backend-api"
+import { hasNoteContent } from "@/utils/hasNoteContent"
 import PopButton from "@/components/commons/Popups/PopButton.vue"
 import Mcqs from "@/components/notes/Mcqs.vue"
 import {
@@ -143,8 +169,10 @@ import {
   Mic,
   Trash2,
   Upload,
+  Wand2,
 } from "@lucide/vue"
 import NoteExportForm from "@/components/notes/core/NoteExportForm.vue"
+import RefineNoteModal from "@/components/recall/RefineNoteModal.vue"
 import { useAssimilationView } from "@/composables/useAssimilationView"
 import { useNoteToolbarPanel } from "@/composables/useNoteToolbarPanel"
 import { useNoteDeleteFlow } from "@/composables/useNoteDeleteFlow"
@@ -205,6 +233,9 @@ useKeyboardShortcut(
 
 useKeyboardShortcut("note-delete", deleteNote, shortcutsEnabled)
 
+const noteHasContent = computed(() => hasNoteContent(props.note.content))
+const showRefineNoteModal = ref(false)
+
 const isAssimilationOpen = computed(() => isOpenForNote(props.note.id))
 const showToolbarAction = (id: NoteMoreOptionsActionId) =>
   props.layout === "toolbar" && !props.omit.includes(id)
@@ -224,6 +255,11 @@ const onAudioToggle = () => {
 
 const onAssimilationToggle = () => {
   toggle(props.note.id)
+  closeDialogIfMenu()
+}
+
+const onRefineOpen = () => {
+  showRefineNoteModal.value = true
   closeDialogIfMenu()
 }
 </script>

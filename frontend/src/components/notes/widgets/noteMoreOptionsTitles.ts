@@ -12,6 +12,7 @@ export const noteMoreOptionsTitles = {
   conversation: "Start a conversation about this note",
   export: "Export... (e)",
   mcqs: "Questions for the note",
+  refine: "Refine note",
   audio: "Audio tools",
   assimilation: "Assimilation settings",
   delete: "Delete note (d)",

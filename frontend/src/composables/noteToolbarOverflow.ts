@@ -7,6 +7,7 @@ export const NOTE_TOOLBAR_MORE_OPTIONS_ORDER = [
   "edit",
   "export",
   "mcqs",
+  "refine",
   "audio",
   "assimilation",
   "delete",

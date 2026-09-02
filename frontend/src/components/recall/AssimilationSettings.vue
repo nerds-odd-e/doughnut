@@ -16,15 +16,6 @@
     <div
       class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
     >
-      <button
-        v-if="hasNoteContent"
-        type="button"
-        data-test="open-refine-note-modal"
-        class="daisy-btn daisy-btn-neutral shrink-0"
-        @click="showRefineNoteModal = true"
-      >
-        Refine note
-      </button>
       <div class="flex flex-wrap items-stretch justify-end gap-2 sm:flex-1">
         <AssimilationButtons
           :disabled="!noteInfoLoaded"
@@ -55,26 +46,20 @@
       </div>
     </div>
   </section>
-  <RefineNoteModal
-    v-if="hasNoteContent"
-    v-model:open="showRefineNoteModal"
-    :note="note"
-    @content-updated="emit('refinementContentUpdated')"
-  />
 </template>
 
 <script setup lang="ts">
 import type { Note } from "@generated/donut-backend-api"
+import { hasNoteContent } from "@/utils/hasNoteContent"
 import NoteInfoComponent from "../notes/NoteInfoComponent.vue"
 import AssimilationButtons from "./AssimilationButtons.vue"
 import AssimilationProgressSummary from "./AssimilationProgressSummary.vue"
-import RefineNoteModal from "./RefineNoteModal.vue"
 import type { AssimilateEvent } from "@/composables/useAssimilateUnit"
 import { isSkippedFromAssimilationSequence } from "@/composables/useAssimilationSequenceSkip"
 import { isSkippedForRecall } from "@/composables/useReviveMemoryTracker"
 import { relationTypeLabelFromNoteContent } from "@/models/relationTypeOptions"
 import { useInjectedMemoryTrackerActions } from "@/composables/useMemoryTrackerActions"
-import { computed, ref, toRef } from "vue"
+import { computed, toRef } from "vue"
 import {
   hasNoteLevelTrackerOfType,
   showRemoveFromRecall,
@@ -92,13 +77,11 @@ const emit = defineEmits<{
   (e: "revive", request: { propertyKey?: string }): void
   (e: "returnToSequence", request: { propertyKey?: string }): void
   (e: "removeFromRecall", request: { propertyKey?: string }): void
-  (e: "refinementContentUpdated"): void
 }>()
 
-const showRefineNoteModal = ref(false)
 const { noteRecallInfo } = useInjectedMemoryTrackerActions(toRef(() => note.id))
 
-const hasNoteContent = computed(() => !!(note.content ?? "").trim())
+const noteHasContent = computed(() => hasNoteContent(note.content))
 const isLinkNote = computed(
   () => relationTypeLabelFromNoteContent(note.content) !== undefined
 )
@@ -113,7 +96,7 @@ const showCommissionedOption = computed(
 
 const showSpellingOption = computed(
   () =>
-    hasNoteContent.value &&
+    noteHasContent.value &&
     !isLinkNote.value &&
     !hasNoteLevelTrackerOfType(noteRecallInfo.value?.memoryTrackers, "SPELLING")
 )
