@@ -1,4 +1,5 @@
 import { waitUntilAppIsNotBusy } from '../../pageBase'
+import { clickToolbarOverflowAction } from '../noteToolbarOverflow'
 
 export const assimilateButtonSelector = '[data-test="assimilate"]'
 export const reviveButtonSelector = '[data-test="revive"]'
@@ -65,13 +66,17 @@ export function expectOtherNoteLevelSecondaryActionsAbsent(
   }
 }
 
+const refineNoteButtonTitle = 'Refine note'
+
 export function openRefineNoteModalIfNeeded() {
-  cy.get('[data-test="refine-note-modal"]').then(($modal) => {
-    if ($modal.hasClass('daisy-modal-open')) {
+  cy.get('body').then(($body) => {
+    if (
+      $body.find('[data-test="refine-note-modal"].daisy-modal-open').length > 0
+    ) {
       waitUntilAppIsNotBusy()
       return
     }
-    cy.get('[data-test="open-refine-note-modal"]').scrollIntoView().click()
+    clickToolbarOverflowAction(refineNoteButtonTitle)
     cy.get('[data-test="refine-note-modal"].daisy-modal-open').should('exist')
     waitUntilAppIsNotBusy()
   })

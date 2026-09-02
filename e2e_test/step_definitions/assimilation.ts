@@ -108,8 +108,8 @@ Then('I should be assimilating the note {string}', (noteTitle: string) => {
   start.assumeAssimilationPage().expectAssimilatingNote(noteTitle)
 })
 
-Then('I should see assimilation progress {string}', (triple: string) => {
-  start.assumeAssimilationPage().expectAssimilationProgressSummary(triple)
+Then('I should see assimilation progress {string}', (dueOverTotal: string) => {
+  start.assimilation().expectAssimilationNavBadge(dueOverTotal)
 })
 
 Then('I should not see assimilation settings', () => {

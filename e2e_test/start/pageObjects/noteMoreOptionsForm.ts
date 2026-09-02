@@ -5,6 +5,7 @@ import {
   assimilateButtonSelector,
   isNoteLevelAssimilationControl,
 } from './assimilationPage'
+import { clickToolbarOverflowAction, noteToolbar } from './noteToolbarOverflow'
 import { questionListPage } from './questionListPage'
 
 const titles = {
@@ -12,33 +13,9 @@ const titles = {
   assimilation: 'Assimilation settings',
   delete: 'Delete note (d)',
   questions: 'Questions for the note',
-  overflowMenu: 'more options',
 } as const
 
-const noteShowToolbar = () => cy.get('[data-note-toolbar]', { timeout: 15000 })
-
-const visibleMoreOptionsButton = (title: string) =>
-  cy.get(`button[title="${title}"]:visible`, { timeout: 15000 }).first()
-
-const openOverflowMenuIfNeeded = (title: string) => {
-  noteShowToolbar()
-    .should('exist')
-    .then(() => {
-      if (Cypress.$(`button[title="${title}"]:visible`).length > 0) {
-        return
-      }
-
-      noteShowToolbar()
-        .find(`summary[title="${titles.overflowMenu}"]`)
-        .should('be.visible')
-        .click()
-    })
-}
-
-const clickMoreOption = (title: string) => {
-  openOverflowMenuIfNeeded(title)
-  visibleMoreOptionsButton(title).scrollIntoView().click()
-}
+const clickMoreOption = clickToolbarOverflowAction
 
 const deleteNoteWithConfirmation = (confirmButtonName: string | RegExp) => {
   clickMoreOption(titles.delete)
@@ -51,7 +28,7 @@ const deleteNoteWithConfirmation = (confirmButtonName: string | RegExp) => {
  * inside the overflow menu.
  */
 export const noteMoreOptions = () => {
-  noteShowToolbar().should('exist')
+  noteToolbar().should('exist')
 
   return {
     deleteNote() {

@@ -18,16 +18,16 @@ Feature: Assimilation walkthrough
     Given It's day 1
     When I start assimilation from the menu while the next note loads slowly
     Then I should be assimilating the note "Note 1"
-    And I should see assimilation progress "0/2/5"
+    And I should see assimilation progress "2/5"
 
   Scenario: Assimilating advances through notes with progress and daily goal toast
     Given It's day 1
     When I start assimilation from the menu
     Then I should be assimilating the note "Note 1"
-    And I should see assimilation progress "0/2/5"
+    And I should see assimilation progress "2/5"
     When I assimilate on the assimilation panel
     Then I should be assimilating the note "Note 2"
-    And I should see assimilation progress "1/2/5"
+    And I should see assimilation progress "1/4"
     When I assimilate on the assimilation panel
     Then I should see the daily assimilation goal toast
     And I should be assimilating the note "Note 3"
@@ -102,7 +102,7 @@ Feature: Assimilation walkthrough
     Then assimilate should be enabled
     When I assimilate on the assimilation panel
     Then I should be assimilating the note "Note 2"
-    And I should see assimilation progress "1/2/5"
+    And I should see assimilation progress "1/4"
     When I jump to the note page of "Note 1"
     And I open assimilation settings
     Then assimilate should be disabled
@@ -113,4 +113,4 @@ Feature: Assimilation walkthrough
     And I change notebook "Private archive" to skip memory tracking
     When I start assimilation from the menu
     Then I should be assimilating the note "Note 1"
-    And I should see assimilation progress "0/2/5"
+    And I should see assimilation progress "2/5"

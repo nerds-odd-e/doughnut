@@ -35,12 +35,6 @@ const chooseAssimilateOption = (
 export const assumeAssimilationPage = () => ({
   ...assimilationPropertyMemoryTrackerExpectations(),
   ...assimilationRefinementLayoutExpectations(),
-  expectAssimilationProgressSummary(triple: string) {
-    cy.get('[data-test="assimilation-progress-summary"]')
-      .should('be.visible')
-      .and('contain', triple.trim())
-    return this
-  },
   clickAssimilate() {
     assimilateButton().click()
     return this

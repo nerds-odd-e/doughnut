@@ -25,6 +25,12 @@ export const assimilation = () => {
       })
       return this
     },
+    expectAssimilationNavBadge(dueOverTotal: string) {
+      getAssimilateListItemInSidebar(($el) => {
+        $el.findByText(dueOverTotal, { selector: '.due-count' })
+      })
+      return this
+    },
     expectAssimilationDueFromTriple(toAssimilateAndTotal: string) {
       const expectedDue = assimilationDueFromTriple(toAssimilateAndTotal)
       const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
