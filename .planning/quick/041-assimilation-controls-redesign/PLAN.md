@@ -1,6 +1,6 @@
 # Assimilation controls redesign
 
-**Status:** planned
+**Status:** done
 **Goal:** Simplify the note-level Assimilation settings panel down to compact, mobile-friendly per-mode controls; move the two things that don't belong there (refine-note, progress numbers) to where they're actually used (toolbar, nav); and make the note-property panel share the same control instead of a parallel implementation.
 
 ## Design decisions
@@ -117,12 +117,17 @@
 ### 9. Delete the dead memory-tracker-table code
 
 - **Type:** Structure
-- **Status:** planned
+- **Status:** done
 - **Pre-condition:** slices 1-8 shipped; nothing renders `NoteInfoComponent.vue`, `NoteInfoMemoryTracker.vue`, or `AssimilationButtons.vue`.
 - **Trigger:** none (no external behavior change — verified by existing test suite staying green).
 - **Post-condition:** those files and their now-unreachable tests are deleted; `assimilationMemoryTrackers.ts` predicates trimmed to whatever `AssimilationModes.vue` actually still uses (`showRemoveFromRecall`, `assimilateDisabledForProperty` likely drop out entirely); any e2e helpers left unused after slice 7 (old table row-label helpers, if not already removed there) are removed too.
 - **Touches:** deletions only, plus a grep pass for stale imports/routes.
 - **Tests:** run the full frontend unit suite for the touched directories to confirm nothing else referenced the deleted files.
+- **Learning:** the plan's shorthand paths for `NoteInfoComponent.vue`/`NoteInfoMemoryTracker.vue` were slightly off — they actually live under `frontend/src/components/notes/`, not `.../recall/` (`AssimilationButtons.vue` was correctly under `.../recall/`). `assimilateDisabledForProperty` and `showRemoveFromRecall` in `assimilationMemoryTrackers.ts` dropped out entirely as predicted; `isNoteLevelMemoryTracker` stayed but was un-exported (still used internally by `matchesTrackerGrain` in the same file). A broader dead-code sweep of the rest of `frontend/src/components/recall/` (43 files) at the end of the plan found no further orphans. Full frontend suite (1881 tests) and both regression E2E features (23/23) stayed green.
+
+## Plan complete
+
+All 9 slices shipped. `AssimilationModes.vue` is the single shared control for both note-level and note-property assimilation; the old Memory Trackers table and `AssimilationButtons.vue` are deleted. Tracker inspection, Remove-from-recall, and Revive now live exclusively on the tracker detail page, per the plan's scope decision.
 
 ## Not planned (considered and rejected)
 

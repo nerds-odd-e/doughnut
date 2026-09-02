@@ -5,7 +5,7 @@ import type {
 
 export type MemoryTrackerType = NonNullable<MemoryTracker["type"]>
 
-export function isNoteLevelMemoryTracker(mt: MemoryTracker) {
+function isNoteLevelMemoryTracker(mt: MemoryTracker) {
   return !mt.propertyKey
 }
 
@@ -33,17 +33,6 @@ export function activeUnderstandingTrackers(
   )
 }
 
-export function assimilateDisabledForProperty(
-  noteRecallInfo: NoteRecallInfo | null | undefined,
-  propertyKey: string
-): boolean {
-  return (
-    noteRecallInfo?.memoryTrackers?.some(
-      (mt) => mt.propertyKey === propertyKey
-    ) ?? false
-  )
-}
-
 function matchesTrackerType(mt: MemoryTracker, type: MemoryTrackerType) {
   return type === "UNDERSTANDING"
     ? isUnderstandingMemoryTracker(mt)
@@ -61,11 +50,4 @@ export function noteLevelTrackerOfType(
       matchesTrackerType(mt, type) &&
       mt.removedFromTracking !== true
   )
-}
-
-export function showRemoveFromRecall(
-  noteRecallInfo: NoteRecallInfo | null | undefined,
-  propertyKey?: string
-): boolean {
-  return activeUnderstandingTrackers(noteRecallInfo, propertyKey).length > 0
 }
