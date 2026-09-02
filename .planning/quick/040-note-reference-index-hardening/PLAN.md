@@ -81,14 +81,9 @@ Removed the unread `viewer` parameter from `applyInboundReferrerRewrite` and the
 ### 8. Wiki links resolve by the collation's title identity
 
 - **Type:** Behavior
-- **Status:** planned
+- **Status:** done
 
-Regression coverage for behavior that exists but lost its tests when the `ResolvedWikiLink*` suites were deleted. Both assertions belong at the `showNote` boundary, in `NoteControllerShowWikiLinkTests`.
-
-- A link whose spelling differs from the target title only by case resolves to it — the `LOWER()` matching in `NoteRepository.findByNotebookNameAndNoteTitleOrderByIdAsc` is currently unpinned.
-- `[[ごろ]]` and `[[ゴロ]]` in one note resolve to the `ごろ` note and the `ゴロ` note respectively, not to each other. This is the guard that `utf8mb4_0900_ai_ci` does not fold kana together; it is the highest-value of the deleted assertions because a collation change would silently cross-link notes.
-
-Write these first and watch them pass for the right reason (make one of them fail by hand before trusting it) — they assert existing behavior, so a green-on-arrival test proves nothing on its own.
+Regression coverage for behavior that exists but lost its tests when the `ResolvedWikiLink*` suites were deleted. Both assertions live at the `showNote` boundary, in `NoteControllerShowWikiLinkTests`: `shouldResolveWikiLinkTitleIgnoringCase` and `shouldResolveHiraganaAndKatakanaTitlesToTheirDistinctNotes`. The kana test was hand-verified to fail for the right reason (swapped expected destination order) before being reverted to the correct assertion. No production code changed; the full test class passes.
 
 ### 9. Remove authored-reference tests that re-prove the controller
 

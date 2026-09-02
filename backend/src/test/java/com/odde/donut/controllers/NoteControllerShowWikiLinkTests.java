@@ -72,6 +72,32 @@ class NoteControllerShowWikiLinkTests extends ControllerTestBase {
   }
 
   @Test
+  void shouldResolveWikiLinkTitleIgnoringCase() throws UnexpectedNoAccessRightException {
+    Note target =
+        makeMe.aNote().notebookOwnedBy(currentUser.getUser()).title("LinkedPage").please();
+    Note viewer =
+        makeMe.aNote().underSameNotebookAs(target).content("Text [[linkedpage]].").please();
+
+    assertThat(
+        showWithWikiTitles(viewer).getWikiLinks().getFirst().getDestinationNoteId(),
+        equalTo(target.getId()));
+  }
+
+  @Test
+  void shouldResolveHiraganaAndKatakanaTitlesToTheirDistinctNotes()
+      throws UnexpectedNoAccessRightException {
+    Note hiragana = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).title("ごろ").please();
+    Note katakana = makeMe.aNote().underSameNotebookAs(hiragana).title("ゴロ").please();
+    Note viewer =
+        makeMe.aNote().underSameNotebookAs(hiragana).content("Text [[ごろ]] and [[ゴロ]].").please();
+
+    List<WikiLink> wikiLinks = showWithWikiTitles(viewer).getWikiLinks();
+    assertThat(
+        wikiLinks.stream().map(WikiLink::getDestinationNoteId).toList(),
+        contains(hiragana.getId(), katakana.getId()));
+  }
+
+  @Test
   void shouldSkipUnreadableLowestIdAliasCandidateForReadableTarget()
       throws UnexpectedNoAccessRightException {
     User secretOwner = makeMe.aUser().please();
