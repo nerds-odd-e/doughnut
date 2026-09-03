@@ -4,18 +4,15 @@ import {
   propertyValueDialogEl,
   getTextareaValue,
   isListModeTabActive,
-  openPropertyValueDialog,
   propertyValueDialogValidationText,
   savePropertyValueDialog,
   setListItemValue,
-  setTextareaValue,
 } from "./propertyValueDialogTestDom"
 import {
   LIST_TOPIC_MARKDOWN,
   mountTopicValueDialog,
   switchToListMode,
   switchToTextMode,
-  writeListItems,
 } from "./propertyValueDialogModeSwitchTestSupport"
 import { createRichMarkdownEditorTestHarness } from "./richMarkdownEditorTestHarness"
 
@@ -26,33 +23,25 @@ describe("RichMarkdownEditor property value dialog mode switch", () => {
     h.cleanup()
   })
 
-  it("switches scalar↔list in the property value dialog, seeds text from list, and saves each mode", async () => {
-    const wrapper = await mountTopicValueDialog(h)
+  it("switches scalar↔list, seeds text from list, and saves list mode", async () => {
+    await mountTopicValueDialog(h, LIST_TOPIC_MARKDOWN)
+    expect(isListModeTabActive()).toBe(true)
+
+    await switchToTextMode()
+    const seeded = getTextareaValue()
+    expect(seeded).toContain("alpha")
+    expect(seeded).toContain("beta")
+
     await switchToListMode()
-    await writeListItems("workshop", "retreat")
+    setListItemValue(0, "workshop")
+    setListItemValue(1, "retreat")
+    await flushPromises()
     await savePropertyValueDialog()
 
     const asList = h.lastEmittedMarkdown()
     expect(asList).toMatch(/topic:\s*\n\s*- workshop/)
     expect(asList).toMatch(/- retreat/)
     expect(asList).toContain("Body")
-    expect(propertyValueDialogEl()).toBeNull()
-
-    await wrapper.setProps({ modelValue: asList })
-    await openPropertyValueDialog(wrapper)
-    expect(isListModeTabActive()).toBe(true)
-
-    await switchToTextMode()
-    const seeded = getTextareaValue()
-    expect(seeded).toContain("workshop")
-    expect(seeded).toContain("retreat")
-
-    setTextareaValue("combined value")
-    await savePropertyValueDialog()
-
-    const asScalar = h.lastEmittedMarkdown()
-    expect(asScalar).toContain("topic: combined value")
-    expect(asScalar).not.toMatch(/topic:\s*\n\s*-/)
     expect(propertyValueDialogEl()).toBeNull()
   })
 

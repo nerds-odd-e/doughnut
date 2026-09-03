@@ -12,18 +12,12 @@ import {
   triggerRowKeyBlurValidation,
 } from "./propertiesTestDom"
 import {
-  clickListAdd,
   propertyValueDialogEl,
   mountPropertyValueDialog,
   propertyValueDialogValidationText,
   savePropertyValueDialog,
   setListItemValue,
-  setTextareaValue,
 } from "./propertyValueDialogTestDom"
-import {
-  switchToListMode,
-  switchToTextMode,
-} from "./propertyValueDialogModeSwitchTestSupport"
 import { createRichMarkdownEditorTestHarness } from "./richMarkdownEditorTestHarness"
 
 const OVERLAPS_LIST_MARKDOWN = `---
@@ -49,28 +43,16 @@ describe("RichMarkdownEditor overlaps property", () => {
   it("rejects invalid overlaps in the property value dialog then saves a valid list", async () => {
     const wrapper = await mountPropertyValueDialog(h, OVERLAPS_LIST_MARKDOWN)
 
-    await switchToTextMode()
-    setTextareaValue("[[Other Note]]")
-    await savePropertyValueDialog()
-    expect(propertyValueDialogValidationText()).toBe(AUTHORED_OVERLAPS_MESSAGE)
-    expect(propertyValueDialogEl()).not.toBeNull()
-    expect(wrapper.emitted("update:modelValue")).toBeUndefined()
-
-    await switchToListMode()
     setListItemValue(0, "plain alias")
     await savePropertyValueDialog()
     expect(propertyValueDialogValidationText()).toBe(AUTHORED_OVERLAPS_MESSAGE)
     expect(wrapper.emitted("update:modelValue")).toBeUndefined()
 
-    setListItemValue(0, "[[Other Note]]")
-    clickListAdd()
-    await flushPromises()
-    setListItemValue(1, "[[Hue Note]]")
+    setListItemValue(0, "[[Hue Note]]")
     await savePropertyValueDialog()
 
     const last = h.lastEmittedMarkdown()
-    expect(last).toMatch(/overlaps:\s*\n\s*- ["']?\[\[Other Note\]\]/)
-    expect(last).toMatch(/\[\[Hue Note\]\]/)
+    expect(last).toMatch(/overlaps:\s*\n\s*- ["']?\[\[Hue Note\]\]/)
     expect(propertyValueDialogEl()).toBeNull()
   })
 

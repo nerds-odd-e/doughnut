@@ -380,7 +380,9 @@ CURSOR_DEV=true nix develop -c pnpm frontend:test tests/components/recall/NoteRe
 
 ### 7. Optimize ranked tests 19–21
 Type: Structure
-Status: planned
+Status: done
+
+Outcome: Removed redundant validation/item journeys, reduced mode switching to one mount, and combined edge-state, duplicate, reorder, and YAML checks into one save. Ranked cases measured about 32.5% faster; focused Chromium passed twice.
 
 **Tests:**
 - #19 `tests/components/form/RichMarkdownEditor.overlapsProperty.spec.ts` — RichMarkdownEditor overlaps property > rejects invalid overlaps in the property value dialog then saves a valid list (~30.3ms)

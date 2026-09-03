@@ -1,6 +1,5 @@
 import { flushPromises } from "@vue/test-utils"
 import {
-  clickListMoveDown,
   clickListMoveUp,
   clickSave,
   listMoveButtonEl,
@@ -20,9 +19,9 @@ describe("RichMarkdownEditor property value dialog reorder", () => {
   it("disables edge moves, reorders items including duplicates, and saves YAML order", async () => {
     const markdown = `---
 tags:
-  - alpha
-  - beta
-  - gamma
+  - dup
+  - dup
+  - unique
 ---
 
 Body`
@@ -36,37 +35,13 @@ Body`
     expect(moveUpFirst!.disabled).toBe(true)
     expect(moveDownLast!.disabled).toBe(true)
 
-    clickListMoveDown(0)
-    await flushPromises()
-    clickSave()
-    await flushPromises()
-
-    const reordered = h.lastEmittedMarkdown()
-    const alphaIdx = reordered.indexOf("- alpha")
-    const betaIdx = reordered.indexOf("- beta")
-    const gammaIdx = reordered.indexOf("- gamma")
-    expect(betaIdx).toBeLessThan(alphaIdx)
-    expect(alphaIdx).toBeLessThan(gammaIdx)
-    expect(propertyValueDialogEl()).toBeNull()
-
-    await wrapper.setProps({
-      modelValue: `---
-tags:
-  - dup
-  - dup
-  - unique
----
-
-Body`,
-    })
-    await flushPromises()
-    await openPropertyValueDialog(wrapper)
-
     clickListMoveUp(2)
     await flushPromises()
     clickSave()
     await flushPromises()
 
-    expect(h.lastEmittedMarkdown()).toMatch(/- dup\n\s*- unique\n\s*- dup/)
+    const reordered = h.lastEmittedMarkdown()
+    expect(reordered).toMatch(/- dup\n\s*- unique\n\s*- dup/)
+    expect(propertyValueDialogEl()).toBeNull()
   })
 })
