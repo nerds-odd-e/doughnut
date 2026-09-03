@@ -23,6 +23,10 @@ Feature: Property memory tracker
     Then I should see a property memory tracker for "topic"
     When It's day 2, 9 hour
     Then I should see that I have 1 notes to recall
+    # Backdate the clock before re-assimilating the whole note: this pushes the
+    # note-level tracker's next-due time later than the property tracker's, so
+    # the due-count check above stays unambiguous (only the property tracker
+    # is due) instead of counting both trackers.
     Given It's day 1, 20 hour
     And I assimilated one note "Vitamins" at the current time
     And OpenAI generates this question:

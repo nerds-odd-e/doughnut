@@ -77,7 +77,7 @@ CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/assimil
 
 ### 3. Document the backdating step in the property-tracker scenario
 Type: Structure
-Status: planned
+Status: done
 
 **Issue:** `e2e_test/features/recall/property_memory_tracker.feature`'s scenario
 "Answering a property recall question updates only the property tracker" has
