@@ -23,8 +23,8 @@ public interface QuestionGenerationBatchRepository
 
   boolean existsByUser_IdAndStatus(Integer userId, QuestionGenerationBatchStatus status);
 
-  boolean existsByUser_IdAndOpenaiBatchIdIsNotNullAndStatusIn(
-      Integer userId, Collection<QuestionGenerationBatchStatus> statuses);
+  Optional<QuestionGenerationBatch>
+      findFirstByUser_IdAndSubmittedAtIsNotNullOrderBySubmittedAtDescIdDesc(Integer userId);
 
   @Query(
       """

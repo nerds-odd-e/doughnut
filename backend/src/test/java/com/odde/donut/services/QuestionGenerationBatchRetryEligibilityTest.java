@@ -56,15 +56,42 @@ class QuestionGenerationBatchRetryEligibilityTest {
   @EnumSource(
       value = QuestionGenerationBatchStatus.class,
       names = {"FAILED", "EXPIRED"})
-  void includesUserWithOpenAiTerminalBatchWhenSubmittedSinceDueInstant(
+  void excludesUserWhenOlderOpenAiTerminalBatchIsFollowedByLatestAcceptedSuccess(
       QuestionGenerationBatchStatus terminalStatus) {
-    makeMe.aQuestionGenerationBatch().forUser(user).completedAt(hoursBefore(cronTime, 1)).please();
     makeMe
         .aQuestionGenerationBatch()
         .forUser(user)
         .status(terminalStatus)
         .openaiBatchId("batch-" + terminalStatus.name().toLowerCase())
-        .plannedAt(hoursBefore(cronTime, 2))
+        .submittedAt(Timestamp.valueOf(LocalDateTime.of(2024, 6, 15, 9, 0)))
+        .please();
+    makeMe
+        .aQuestionGenerationBatch()
+        .forUser(user)
+        .completedAt(Timestamp.valueOf(LocalDateTime.of(2024, 6, 15, 10, 45)))
+        .please();
+    makeMe.entityPersister.flush();
+
+    assertThat(planningService.findUsersEligibleForBatchSubmission(cronTime), empty());
+  }
+
+  @ParameterizedTest
+  @EnumSource(
+      value = QuestionGenerationBatchStatus.class,
+      names = {"FAILED", "EXPIRED"})
+  void includesUserWhenLatestAcceptedBatchItselfIsOpenAiTerminal(
+      QuestionGenerationBatchStatus terminalStatus) {
+    makeMe
+        .aQuestionGenerationBatch()
+        .forUser(user)
+        .completedAt(Timestamp.valueOf(LocalDateTime.of(2024, 6, 15, 9, 0)))
+        .please();
+    makeMe
+        .aQuestionGenerationBatch()
+        .forUser(user)
+        .status(terminalStatus)
+        .openaiBatchId("batch-" + terminalStatus.name().toLowerCase())
+        .submittedAt(Timestamp.valueOf(LocalDateTime.of(2024, 6, 15, 10, 45)))
         .please();
     makeMe.entityPersister.flush();
 

@@ -115,8 +115,11 @@ public class QuestionGenerationBatchPlanningService {
     return dueInstantForUser(user, currentTime, windowStart)
         .flatMap(
             dueInstant ->
-                latestSubmittedAtForUser(user)
-                    .map(lastSubmission -> isSubmissionBeforeDueInstant(lastSubmission, dueInstant))
+                latestAcceptedBatchForUser(user)
+                    .map(
+                        latestAccepted ->
+                            isSubmissionBeforeDueInstant(
+                                latestAccepted.getSubmittedAt(), dueInstant))
                     .or(() -> Optional.of(true)))
         .orElse(false);
   }
@@ -140,10 +143,6 @@ public class QuestionGenerationBatchPlanningService {
             targetTimeOfDay, currentTime.toLocalDateTime()));
   }
 
-  private Optional<Timestamp> latestSubmittedAtForUser(User user) {
-    return batchRepository.findLatestSubmittedAtByUser_Id(user.getId());
-  }
-
   public boolean isUserEligibleForNewBatchSubmission(User user) {
     return !batchRepository.existsByUser_IdAndStatus(
         user.getId(), QuestionGenerationBatchStatus.SUBMITTED);
@@ -160,12 +159,17 @@ public class QuestionGenerationBatchPlanningService {
     if (dueInstant.isEmpty()) {
       return false;
     }
-    Optional<Timestamp> lastSubmission = latestSubmittedAtForUser(user);
-    if (lastSubmission.isEmpty()
-        || isSubmissionBeforeDueInstant(lastSubmission.get(), dueInstant.get())) {
+    Optional<QuestionGenerationBatch> latestAccepted = latestAcceptedBatchForUser(user);
+    if (latestAccepted.isEmpty()
+        || isSubmissionBeforeDueInstant(latestAccepted.get().getSubmittedAt(), dueInstant.get())) {
       return false;
     }
-    return batchRepository.existsByUser_IdAndOpenaiBatchIdIsNotNullAndStatusIn(
-        user.getId(), QuestionGenerationBatchStatus.openAiFailureRetryStatuses());
+    return QuestionGenerationBatchStatus.openAiFailureRetryStatuses()
+        .contains(latestAccepted.get().getStatus());
+  }
+
+  private Optional<QuestionGenerationBatch> latestAcceptedBatchForUser(User user) {
+    return batchRepository.findFirstByUser_IdAndSubmittedAtIsNotNullOrderBySubmittedAtDescIdDesc(
+        user.getId());
   }
 }
