@@ -22,7 +22,6 @@ import {
   mountNoteRefinementWithLayoutReady,
   note,
   refinementLayoutSelectionApiCall,
-  sampleExtractionPreview,
   selectRefinementLayoutItem,
   setupNoteRefinementTests,
   threePointLayout,
@@ -110,46 +109,7 @@ describe("NoteRefinement extract note preview", () => {
     expect(usePopups().popups.peek()).toHaveLength(0)
   })
 
-  it("extracts multiple selected refinement layout items into one preview", async () => {
-    const extractNotePreviewSpy = mockSdkService(
-      AiController,
-      "extractNotePreview",
-      sampleExtractionPreview()
-    )
-    const layout = threePointLayout()
-    const wrapper = await mountNoteRefinementWithLayoutReady(layout)
-
-    await selectRefinementLayoutItem(wrapper, "p1")
-    await selectRefinementLayoutItem(wrapper, "p3")
-    await clickExtractRefinementLayout(wrapper)
-    await flushPromises()
-
-    expect(extractNotePreviewSpy).toHaveBeenCalledWith(
-      refinementLayoutSelectionApiCall(note.id, layout, ["p1", "p3"], {
-        signal: true,
-      })
-    )
-    expectExtractionPreviewVisible(wrapper)
-  })
-
-  it("returns to the layout when Back is clicked", async () => {
-    mockSdkService(
-      AiController,
-      "extractNotePreview",
-      sampleExtractionPreview()
-    )
-    const wrapper = await mountNoteRefinementReady(["Test Point"])
-
-    await openExtractionPreview(wrapper, "p1")
-    await clickExtractionPreviewBack(wrapper)
-    await flushPromises()
-
-    expectExtractionPreviewVisible(wrapper, false)
-    expect(wrapper.findAll("li")).toHaveLength(1)
-    expect(wrapper.text()).toContain("Test Point")
-  })
-
-  it("shows inline error when extract preview API fails", async () => {
+  it("shows inline error when extract preview API fails and returns to the layout", async () => {
     mockSdkService(
       AiController,
       "extractNotePreview",
@@ -164,5 +124,10 @@ describe("NoteRefinement extract note preview", () => {
     expectExtractionPreviewVisible(wrapper)
     expectExtractionPreviewError(wrapper, "API Error")
     expect(usePopups().popups.peek()).toHaveLength(0)
+
+    await clickExtractionPreviewBack(wrapper)
+
+    expectExtractionPreviewVisible(wrapper, false)
+    expect(wrapper.text()).toContain("Test Point")
   })
 })

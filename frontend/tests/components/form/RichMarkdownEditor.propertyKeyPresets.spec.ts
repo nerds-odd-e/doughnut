@@ -1,13 +1,16 @@
 import { afterEach, beforeEach, vi } from "vitest"
 import {
   advanceAnimationFrame,
+  assertPresetOptionsVisible,
+  focusKeyInput,
+  INSERT_KEY_INPUT,
   keyInputValue,
+  ROW_KEY_INPUT,
   selectPresetKey,
 } from "./propertyKeyPresetsTestDom"
-import {
-  PRESET_DROPDOWN_CASES,
-  preparePropertyKeyPresetDropdown,
-} from "./propertyKeyPresetsTestSupport"
+import { richModeKeyDropdownPresetKeysForPropertyRows } from "@/utils/noteContentFrontmatter"
+import { propertyRowWithScalar } from "@/utils/noteContentPropertyRows"
+import { preparePropertyKeyPresetDropdown } from "./propertyKeyPresetsTestSupport"
 import { expectElementFocused } from "./propertyTouchFocusTestSupport"
 import { createRichMarkdownEditorTestHarness } from "./richMarkdownEditorTestHarness"
 
@@ -44,23 +47,48 @@ describe("RichMarkdownEditor property key presets", () => {
     expect(last).toContain("Hello Body")
   })
 
-  it.each(PRESET_DROPDOWN_CASES)(
-    "preset dropdown for $case shows options and sets key on selection",
-    async ({
-      markdown,
-      keyInputTestId,
-      existingRows,
-      selectPreset,
-      expectedKeyValue,
-      expectedFocusTestId,
-    }) => {
-      await preparePropertyKeyPresetDropdown(h, markdown, {
-        keyInputTestId,
-        existingRows,
-      })
-      await selectPresetKey(selectPreset)
-      expect(keyInputValue(keyInputTestId)).toBe(expectedKeyValue)
-      expectElementFocused(`[data-testid="${expectedFocusTestId}"]`)
-    }
-  )
+  it("offers available presets and sets keys for existing and inserted rows", async () => {
+    const existingRows = [
+      propertyRowWithScalar("custom", "workshop"),
+      propertyRowWithScalar("image", "/x.png"),
+    ]
+    await preparePropertyKeyPresetDropdown(
+      h,
+      `---
+custom: workshop
+image: /x.png
+---
+
+# Body`,
+      { keyInputTestId: ROW_KEY_INPUT, existingRows }
+    )
+
+    const existingKeyInput = h
+      .getWrapper()
+      .find(`[data-testid="${ROW_KEY_INPUT}"]`)
+    await selectPresetKey("url")
+    expect((existingKeyInput.element as HTMLInputElement).value).toBe("url")
+    expectElementFocused(
+      '[data-property-key="url"] [data-testid="rich-note-property-row-value-input"]'
+    )
+
+    await h.openAddProperty()
+    await advanceAnimationFrame()
+    assertPresetOptionsVisible(
+      richModeKeyDropdownPresetKeysForPropertyRows(false, [
+        propertyRowWithScalar("image", "/x.png"),
+        propertyRowWithScalar("url", "workshop"),
+      ])
+    )
+    await selectPresetKey("wikidata_id")
+    expect(keyInputValue(INSERT_KEY_INPUT)).toBe("wikidata_id")
+    expectElementFocused(
+      '[data-testid="rich-note-wikidata-property-insert-edit"]'
+    )
+
+    await focusKeyInput(INSERT_KEY_INPUT)
+    await selectPresetKey("image 2")
+    expect(keyInputValue(INSERT_KEY_INPUT)).toBe("image 2")
+    expectElementFocused('[data-testid="rich-note-property-value"]')
+  })
 })

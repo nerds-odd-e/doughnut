@@ -580,7 +580,9 @@ CURSOR_DEV=true nix develop -c pnpm frontend:test tests/components/recall/Answer
 
 ### 15. Optimize ranked tests 43–45
 Type: Structure
-Status: planned
+Status: done
+
+Outcome: Removed redundant extraction and preset mounts, consolidated preset variants into one journey, and deleted now-dead support data/imports. Focused tests fell from nine to five and passed three consecutive Chromium runs.
 
 **Tests:**
 - #43 `tests/components/recall/NoteRefinement.extractNote.spec.ts` — NoteRefinement extract note preview > extracts multiple selected refinement layout items into one preview (~21.6ms)
