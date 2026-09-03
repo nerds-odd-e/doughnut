@@ -85,10 +85,8 @@ describe("WikidataAssociationDialog title actions and save", () => {
     await clickWikidataSearchResult("Q11399")
     expect(dialog.emitted("selected")).toBeFalsy()
     expect(dialog.emitted("update:modelValue")?.[0]).toEqual(["Q11399"])
-    expect(wikidataSaveButton()).toBeTruthy()
 
     wikidataSaveButton().click()
-    await flushPromises()
     expect(dialog.emitted("save")?.[0]).toEqual(["Q11399"])
   })
 

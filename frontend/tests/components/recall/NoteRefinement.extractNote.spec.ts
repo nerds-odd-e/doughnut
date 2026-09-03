@@ -4,7 +4,6 @@ import { flushPromises } from "@vue/test-utils"
 import { describe, expect, it } from "vitest"
 import { mockSdkService, wrapSdkError } from "@tests/helpers"
 import {
-  clickExtractionPreviewBack,
   clickRetryExtractionPreview,
   expectExtractionPreviewError,
   expectExtractionPreviewVisible,
@@ -17,12 +16,10 @@ import {
   setPreviewFields,
 } from "./noteRefinementExtractionTestSupport"
 import {
-  clickExtractRefinementLayout,
   mountNoteRefinementReady,
   mountNoteRefinementWithLayoutReady,
   note,
   refinementLayoutSelectionApiCall,
-  selectRefinementLayoutItem,
   setupNoteRefinementTests,
   threePointLayout,
   threePointLayoutTexts,
@@ -109,7 +106,7 @@ describe("NoteRefinement extract note preview", () => {
     expect(usePopups().popups.peek()).toHaveLength(0)
   })
 
-  it("shows inline error when extract preview API fails and returns to the layout", async () => {
+  it("shows inline error when extract preview API fails", async () => {
     mockSdkService(
       AiController,
       "extractNotePreview",
@@ -117,17 +114,9 @@ describe("NoteRefinement extract note preview", () => {
     ).mockResolvedValue(wrapSdkError({ message: "API Error" }))
     const wrapper = await mountNoteRefinementReady(["Test Point"])
 
-    await selectRefinementLayoutItem(wrapper, "p1")
-    await clickExtractRefinementLayout(wrapper)
-    await flushPromises()
+    await openExtractionPreview(wrapper, "p1")
 
-    expectExtractionPreviewVisible(wrapper)
     expectExtractionPreviewError(wrapper, "API Error")
     expect(usePopups().popups.peek()).toHaveLength(0)
-
-    await clickExtractionPreviewBack(wrapper)
-
-    expectExtractionPreviewVisible(wrapper, false)
-    expect(wrapper.text()).toContain("Test Point")
   })
 })

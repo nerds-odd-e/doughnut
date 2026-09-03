@@ -730,7 +730,9 @@ CURSOR_DEV=true nix develop -c pnpm frontend:test tests/components/recall/Assimi
 
 ### 21. Optimize ranked tests 61–63
 Type: Structure
-Status: planned
+Status: done
+
+Outcome: Removed unrelated Back/preview work, redundant Save queries/flushes, and unobserved modal teardown while preserving inline error, deferred selection, and inner-first/outer-second ESC handling. Focused Chromium passed three consecutive runs.
 
 **Tests:**
 - #61 `tests/components/recall/NoteRefinement.extractNote.spec.ts` — NoteRefinement extract note preview > shows inline error when extract preview API fails (~16.9ms)

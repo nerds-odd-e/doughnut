@@ -1,7 +1,6 @@
 import { useStableModalTop } from "@/composables/modalTopAnchor"
-import { flushPromises, mount, type VueWrapper } from "@vue/test-utils"
+import { mount, type VueWrapper } from "@vue/test-utils"
 import { afterEach, describe, expect, it, vi } from "vitest"
-import { reactive } from "vue"
 import {
   ModalComp,
   closeButtonEl,
@@ -11,7 +10,6 @@ import {
   mountModal,
   settleModalAutofocus,
   waitForDialog,
-  waitForDialogCount,
   waitForTopAlignedDialog,
 } from "./modalTestSupport"
 
@@ -118,34 +116,23 @@ describe("Modal", () => {
     expect(wrapper.emitted().close_request).toHaveLength(1)
   })
 
-  it("closes only topmost modal when ESC is pressed with stacked modals", async () => {
+  it("closes only topmost modal when ESC is pressed with stacked modals", () => {
     const outerClosed = vi.fn()
     const innerClosed = vi.fn()
-    const state = reactive({ showOuter: true, showInner: true })
     const StackedModalsComponent = {
       template: `
         <div>
-          <Modal v-if="state.showOuter" @close_request="onOuterClose">
+          <Modal @close_request="outerClosed">
             <template #body>Outer modal</template>
           </Modal>
-          <Modal v-if="state.showInner" @close_request="onInnerClose">
+          <Modal @close_request="innerClosed">
             <template #body>Inner modal</template>
           </Modal>
         </div>
       `,
       components: { Modal: ModalComp },
       setup() {
-        return {
-          state,
-          onOuterClose: () => {
-            state.showOuter = false
-            outerClosed()
-          },
-          onInnerClose: () => {
-            state.showInner = false
-            innerClosed()
-          },
-        }
+        return { outerClosed, innerClosed }
       },
     }
 
@@ -154,16 +141,12 @@ describe("Modal", () => {
       attachTo: document.body,
     })
 
-    await waitForDialogCount(2)
-
     document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" }))
-    await flushPromises()
 
     expect(innerClosed).toHaveBeenCalledTimes(1)
     expect(outerClosed).not.toHaveBeenCalled()
 
     document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" }))
-    await flushPromises()
 
     expect(outerClosed).toHaveBeenCalledTimes(1)
   })
