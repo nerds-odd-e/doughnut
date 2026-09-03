@@ -26,7 +26,7 @@
 ### 2. Skip / Return-to-sequence only ever appears on the Understanding row
 
 - **Type:** Behavior
-- **Status:** planned
+- **Status:** done
 - **Pre-condition:** `skipAffordanceMode` puts the Skip/Return-to-sequence affordance on the `COMMISSIONED` row whenever Commissioned is offered (note-level panel today), falling back to `UNDERSTANDING` only for scopes that never offer Commissioned (property-level panel). Per ADR 0001 the assimilation sequence's membership rule is about the Understanding tracker specifically ("no live understanding memory tracker") — Commissioned assimilation is a separate, optional path with nothing to do with sequence membership, so Skip does not belong on that row at all, with or without a fallback.
 - **Trigger:** the assimilation panel renders with `UNDERSTANDING` in `allowedModes` (true for every current caller: note-level `AssimilationSettings.vue` and property-level `RichFrontmatterPropertyPanel.vue`).
 - **Post-condition:** the Skip / Return-to-sequence affordance renders on the `UNDERSTANDING` row only, regardless of whether `COMMISSIONED` is also allowed. The Commissioned row never shows Skip or Return-to-sequence.

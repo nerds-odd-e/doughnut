@@ -93,17 +93,6 @@ const modeLabels: Record<MemoryTrackerType, string> = {
 
 const sizeClass = computed(() => (props.size === "sm" ? "daisy-btn-sm" : ""))
 
-// The skip / return-to-sequence affordance is about the assimilation
-// sequence, not about a tracker. It lives on the Commissioned (COMMISSIONED)
-// row when that mode is offered, falling back to the Understanding
-// (UNDERSTANDING) row for scopes (e.g. note properties) that never offer
-// COMMISSIONED.
-const skipAffordanceMode = computed<MemoryTrackerType | undefined>(() => {
-  if (props.allowedModes.includes("COMMISSIONED")) return "COMMISSIONED"
-  if (props.allowedModes.includes("UNDERSTANDING")) return "UNDERSTANDING"
-  return undefined
-})
-
 function formatNextRecallAt(nextRecallAt: string): string {
   return new Date(nextRecallAt).toLocaleDateString(undefined, {
     day: "numeric",
@@ -142,7 +131,7 @@ const rows = computed(() =>
       statusTitle: tracker
         ? `Recalled ${tracker.recallCount ?? 0} times`
         : undefined,
-      showSkipAffordance: mode === skipAffordanceMode.value,
+      showSkipAffordance: mode === "UNDERSTANDING",
     }
   })
 )

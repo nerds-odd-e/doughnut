@@ -127,7 +127,7 @@ describe("AssimilationModes", () => {
     expect(assimilateButton(wrapper, "COMMISSIONED")).not.toBeNull()
   })
 
-  it("puts the Skip / Return-to-sequence affordance on the MCQ row when allowed", () => {
+  it("puts the Skip / Return-to-sequence affordance on the Understanding row only", () => {
     const wrapper = mountModes({
       allowedModes: ["UNDERSTANDING", "COMMISSIONED"],
     })
@@ -139,24 +139,13 @@ describe("AssimilationModes", () => {
       '[data-test="assimilation-mode-row-UNDERSTANDING"]'
     )
 
-    expect(commissionedRow?.querySelector('[data-test="skip"]')).not.toBeNull()
-    expect(understandingRow?.querySelector('[data-test="skip"]')).toBeNull()
-  })
-
-  it("falls back the Skip / Return-to-sequence affordance to the Comprehension row when MCQ isn't allowed", () => {
-    const wrapper = mountModes({
-      allowedModes: ["UNDERSTANDING"],
-    })
-
-    const understandingRow = wrapper.element.querySelector(
-      '[data-test="assimilation-mode-row-UNDERSTANDING"]'
-    )
+    expect(commissionedRow?.querySelector('[data-test="skip"]')).toBeNull()
     expect(understandingRow?.querySelector('[data-test="skip"]')).not.toBeNull()
   })
 
   it("shows Return to sequence instead of Skip when already skipped from the sequence", () => {
     const wrapper = mountModes({
-      allowedModes: ["COMMISSIONED"],
+      allowedModes: ["UNDERSTANDING"],
       skippedFromAssimilationSequence: true,
     })
 
@@ -167,7 +156,7 @@ describe("AssimilationModes", () => {
   })
 
   it("emits skip and returnToSequence", () => {
-    const skipWrapper = mountModes({ allowedModes: ["COMMISSIONED"] })
+    const skipWrapper = mountModes({ allowedModes: ["UNDERSTANDING"] })
     const skipEl = skipWrapper.element.querySelector(
       '[data-test="skip"]'
     ) as HTMLInputElement
@@ -175,7 +164,7 @@ describe("AssimilationModes", () => {
     expect(skipWrapper.emitted("skip")).toEqual([[]])
 
     const returnWrapper = mountModes({
-      allowedModes: ["COMMISSIONED"],
+      allowedModes: ["UNDERSTANDING"],
       skippedFromAssimilationSequence: true,
     })
     const returnEl = returnWrapper.element.querySelector(
