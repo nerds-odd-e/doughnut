@@ -8,7 +8,7 @@ status: ready
 stopped_at: null
 last_updated: "2026-09-03T02:55:00Z"
 last_activity: 2026-09-03
-last_activity_desc: "042: recall E2E test optimization shipped (59 -> 12 scenarios, ~78% faster)"
+last_activity_desc: "043: recall E2E optimization cleanup planned; not executing"
 progress:
   total_phases: 0
   completed_phases: 0
@@ -35,6 +35,7 @@ Daily probe measurement (not an ADR): [daily-probe-protocol.md](notes/daily-prob
 
 ## Operator Next Steps
 
+- Dead-code/readability cleanup from plan-042 review (recall.ts orphaned steps, assimilation.ts orphaned step, property-tracker scenario comment): `.planning/quick/043-recall-e2e-optimization-cleanup/PLAN.md` — planned, do not execute until asked.
 - Start the next milestone with `/gsd-new-milestone` when ready.
 
 Parked work: SEED-001, SEED-002, SEED-006, SEED-007, SEED-008; ADR 0002 Level 1. See [ROADMAP.md](ROADMAP.md).
