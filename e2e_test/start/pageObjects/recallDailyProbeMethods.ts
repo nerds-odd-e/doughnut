@@ -41,15 +41,6 @@ export const recallDailyProbeMethods = () => ({
     this.expectDailyProbeSaved()
     return this
   },
-  completeDailyProbeByTapping() {
-    respondToEachDailyProbeTrial((side) => {
-      cy.get(`[data-testid="daily-probe-response-zone-${side}"]`).trigger(
-        'pointerdown'
-      )
-    })
-    this.expectDailyProbeSaved()
-    return this
-  },
   expectDailyProbeSpeed(speed: string) {
     cy.get('[data-testid="daily-probe-speed"]').should('contain', speed)
     return this

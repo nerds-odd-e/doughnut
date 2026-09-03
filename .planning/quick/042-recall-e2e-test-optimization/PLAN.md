@@ -169,7 +169,7 @@ CURSOR_DEV=true nix develop -c pnpm frontend:test tests/components/recall/Answer
 
 ### 4. Collapse Daily probe to one complete-and-continue journey
 Type: Structure
-Status: planned
+Status: done
 
 **Tests:**
 - `daily_probe.feature` — 9 scenarios (~54s)

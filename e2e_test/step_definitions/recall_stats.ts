@@ -38,26 +38,3 @@ When('I visit my recall stats', () => {
 Then("I should see today's pace is slower than usual", () => {
   start.recallStatsPage().expectPaceTileContains('slower than usual')
 })
-
-Then('I should see the Daily probe trend', () => {
-  start.recallStatsPage().expectDailyProbeTrend()
-})
-
-Then('I should not see the Daily probe trend', () => {
-  start.recallStatsPage().expectNoDailyProbeTrend()
-})
-
-Then('I should see empty recall stats', () => {
-  start.recallStatsPage().expectEmptyRecallStats()
-})
-
-Then(
-  'I should see {int} day(s) on the Daily probe speed trend',
-  (days: number) => {
-    start.recallStatsPage().expectDailyProbeSpeedTrendDays(days)
-  }
-)
-
-When('I view the last 30 days of trends', () => {
-  start.recallStatsPage().viewTrendWindow(30)
-})

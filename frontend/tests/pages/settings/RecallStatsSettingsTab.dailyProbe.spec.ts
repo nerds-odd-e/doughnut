@@ -104,4 +104,21 @@ describe("RecallStatsSettingsTab Daily probe", () => {
     await flushPromises()
     expect(dailyProbeSpeedTrendDayCount(wrapper)).toBe(3)
   })
+
+  it("hides the Daily probe trend when the series is empty", async () => {
+    mockSdkService(UserController, "getRecallStats", {
+      totals: { totalReviewsAllTime: 0 },
+      dailyProbe: [],
+    })
+
+    const wrapper = helper
+      .component(RecallStatsSettingsTab)
+      .withRouter()
+      .mount()
+    await flushPromises()
+
+    expect(wrapper.find('[data-testid="daily-probe-trend"]').exists()).toBe(
+      false
+    )
+  })
 })
