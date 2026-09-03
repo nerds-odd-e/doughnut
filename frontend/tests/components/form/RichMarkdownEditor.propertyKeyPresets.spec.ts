@@ -2,7 +2,6 @@ import { afterEach, beforeEach, vi } from "vitest"
 import {
   advanceAnimationFrame,
   assertPresetOptionsVisible,
-  focusKeyInput,
   INSERT_KEY_INPUT,
   keyInputValue,
   ROW_KEY_INPUT,
@@ -85,10 +84,5 @@ image: /x.png
     expectElementFocused(
       '[data-testid="rich-note-wikidata-property-insert-edit"]'
     )
-
-    await focusKeyInput(INSERT_KEY_INPUT)
-    await selectPresetKey("image 2")
-    expect(keyInputValue(INSERT_KEY_INPUT)).toBe("image 2")
-    expectElementFocused('[data-testid="rich-note-property-value"]')
   })
 })

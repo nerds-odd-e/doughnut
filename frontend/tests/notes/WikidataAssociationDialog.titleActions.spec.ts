@@ -92,49 +92,27 @@ describe("WikidataAssociationDialog title actions and save", () => {
     expect(dialog.emitted("save")?.[0]).toEqual(["Q11399"])
   })
 
-  it.each([
-    {
-      case: "unchanged saved value",
-      options: {
-        showSaveButton: true,
-        modelValue: "Q123",
-        savedValue: "Q123",
-      },
-      expectDisabled: true,
-    },
-    {
-      case: "both empty",
-      options: {
-        showSaveButton: true,
-        canSaveEmptyToClear: true,
-        modelValue: "",
-        savedValue: "",
-      },
-      expectDisabled: true,
-    },
-  ])("disables Save when $case", async ({ options, expectDisabled }) => {
-    mountDialog("dog", options)
-    await flushPromises()
-    expect(wikidataSaveButton().disabled).toBe(expectDisabled)
-  })
-
-  it("enables Save and emits empty string when clearing with canSaveEmptyToClear", async () => {
+  it("enables saving a cleared value only while it differs from the saved value", async () => {
     const dialog = mountDialog("dog", {
       showSaveButton: true,
       canSaveEmptyToClear: true,
       savedValue: "Q123",
       modelValue: "Q123",
     })
-    await flushPromises()
+    const saveButton = wikidataSaveButton()
+    expect(saveButton.disabled).toBe(true)
+
     const input = wikidataInput()
     input.value = ""
     input.dispatchEvent(new Event("input", { bubbles: true }))
     await flushPromises()
-    const saveButton = wikidataSaveButton()
     expect(saveButton.disabled).toBe(false)
+
     saveButton.click()
-    await flushPromises()
     expect(dialog.emitted("save")?.[0]).toEqual([""])
+
+    await dialog.setProps({ modelValue: "", savedValue: "" })
+    expect(saveButton.disabled).toBe(true)
   })
 
   describe("soft keyboard primer", () => {

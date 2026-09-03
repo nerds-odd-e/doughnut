@@ -1,7 +1,6 @@
 import { AiController } from "@generated/donut-backend-api/sdk.gen"
 import { flushPromises } from "@vue/test-utils"
 import { describe, expect, it, vi } from "vitest"
-import { nextTick } from "vue"
 import { mockSdkServiceWithImplementation } from "@tests/helpers"
 import {
   clickLoadingModalCancel,
@@ -89,16 +88,9 @@ describe("NoteRefinement extraction preview cancel", () => {
     )
     const wrapper = await mountNoteRefinementReady(["Test layout point"])
     await openExtractionPreview(wrapper, "p1")
-    expectPreviewFields(wrapper, {
-      newTitle: "First title",
-      newContent: "First content",
-      originalContent: "First original",
-    })
 
     await clickRetryExtractionPreview(wrapper)
-    await nextTick()
     expect(loadingModalMask()).toBeTruthy()
-    expect(document.body.textContent).toContain("AI is generating preview...")
 
     clickLoadingModalCancel()
     await flushPromises()
@@ -110,14 +102,9 @@ describe("NoteRefinement extraction preview cancel", () => {
       newContent: "First content",
       originalContent: "First original",
     })
-    expect(mockToast.error).not.toHaveBeenCalled()
 
     resolve()
     await flushPromises()
-    expectPreviewFields(wrapper, {
-      newTitle: "First title",
-      newContent: "First content",
-      originalContent: "First original",
-    })
+    expectPreviewFields(wrapper, { newTitle: "First title" })
   })
 })

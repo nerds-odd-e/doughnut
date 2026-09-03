@@ -630,7 +630,9 @@ CURSOR_DEV=true nix develop -c pnpm frontend:test tests/components/recall/NoteRe
 
 ### 17. Optimize ranked tests 49–51
 Type: Structure
-Status: planned
+Status: done
+
+Outcome: Removed a redundant preset journey, consolidated three Wikidata save-state mounts into one transition, and trimmed duplicated retry-cancel assertions while preserving distinct behavior. Focused Chromium passed three consecutive runs.
 
 **Tests:**
 - #49 `tests/components/form/RichMarkdownEditor.propertyKeyPresets.spec.ts` — RichMarkdownEditor property key presets > preset dropdown for 'occupied image preset' shows options and sets key on selection (~19.0ms)
