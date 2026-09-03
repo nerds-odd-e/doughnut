@@ -18,11 +18,18 @@
       >
         {{ row.statusText }}
       </router-link>
-      <template v-else>
+      <div
+        v-else
+        :class="row.showSkipAffordance ? 'daisy-join' : undefined"
+      >
         <input
           type="submit"
           value="Assimilate"
-          :class="['daisy-btn daisy-btn-primary', sizeClass]"
+          :class="[
+            'daisy-btn daisy-btn-primary',
+            row.showSkipAffordance ? 'daisy-join-item' : '',
+            sizeClass,
+          ]"
           :data-test="`assimilate-${row.mode}`"
           :disabled="disabled"
           @click="$emit('assimilate', assimilatePayloadFor(row.mode))"
@@ -32,7 +39,7 @@
             v-if="skippedFromAssimilationSequence"
             type="submit"
             value="Return to sequence"
-            :class="['daisy-btn daisy-btn-secondary', sizeClass]"
+            :class="['daisy-btn daisy-btn-secondary daisy-join-item', sizeClass]"
             data-test="return-to-sequence"
             :disabled="disabled"
             @click="$emit('returnToSequence')"
@@ -41,13 +48,13 @@
             v-else
             type="submit"
             value="Skip"
-            :class="['daisy-btn daisy-btn-secondary', sizeClass]"
+            :class="['daisy-btn daisy-btn-secondary daisy-join-item', sizeClass]"
             data-test="skip"
             :disabled="disabled"
             @click="$emit('skip')"
           />
         </template>
-      </template>
+      </div>
     </div>
   </div>
 </template>

@@ -46,7 +46,7 @@
 ### 4. Skip / Return-to-sequence is visually grouped with its Assimilate button
 
 - **Type:** Behavior
-- **Status:** planned
+- **Status:** done
 - **Pre-condition:** on a row with the skip affordance, "Assimilate" and "Skip" (or "Return to sequence") render as two separately-spaced buttons with no shared visual container — nothing ties the skip action to the specific mode/button it skips, which is confusing once a row can show both.
 - **Trigger:** a mode row shows both its Assimilate button and the Skip/Return-to-sequence affordance (i.e. the Understanding row, per slice 2).
 - **Post-condition:** Assimilate and Skip/Return-to-sequence render as one joined button group (using this codebase's existing `daisy-join`/`daisy-join-item` convention, already used for grouped controls in `RelationTypeSelect.vue` and `InputWithType.vue`) so the pairing reads as one unit. Rows without the skip affordance are visually unchanged (a lone Assimilate button, not wrapped in a join).

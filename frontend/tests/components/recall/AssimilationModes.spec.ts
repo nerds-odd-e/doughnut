@@ -143,6 +143,27 @@ describe("AssimilationModes", () => {
     expect(understandingRow?.querySelector('[data-test="skip"]')).not.toBeNull()
   })
 
+  it("groups Assimilate and Skip in a shared daisy-join container when the skip affordance is shown", () => {
+    const wrapper = mountModes({
+      allowedModes: ["UNDERSTANDING", "COMMISSIONED"],
+    })
+
+    const understandingRow = wrapper.element.querySelector(
+      '[data-test="assimilation-mode-row-UNDERSTANDING"]'
+    )
+    const join = understandingRow?.querySelector(".daisy-join")
+    expect(join).not.toBeNull()
+    expect(
+      join?.querySelector('[data-test="assimilate-UNDERSTANDING"]')
+    ).not.toBeNull()
+    expect(join?.querySelector('[data-test="skip"]')).not.toBeNull()
+
+    const commissionedRow = wrapper.element.querySelector(
+      '[data-test="assimilation-mode-row-COMMISSIONED"]'
+    )
+    expect(commissionedRow?.querySelector(".daisy-join")).toBeNull()
+  })
+
   it("shows Return to sequence instead of Skip when already skipped from the sequence", () => {
     const wrapper = mountModes({
       allowedModes: ["UNDERSTANDING"],
