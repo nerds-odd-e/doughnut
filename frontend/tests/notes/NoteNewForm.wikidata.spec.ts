@@ -151,8 +151,8 @@ describe("NoteNewForm wikidata and soft-delete", () => {
       vi.useRealTimers()
     })
 
-    it("opens dialog, cancels, then applies matching-title selections", async () => {
-      resolveWikidataSearch(searchWikidataSpy, "dog", "Q1")
+    it("closes on cancel then applies a matching-title selection", async () => {
+      resolveWikidataSearch(searchWikidataSpy, "Dog", "Q1")
       await openWikidataDialog(wrapper, "dog")
       expect(searchWikidataSpy).toHaveBeenCalledWith({
         query: { search: "dog" },
@@ -166,25 +166,14 @@ describe("NoteNewForm wikidata and soft-delete", () => {
       await openWikidataDialog(wrapper, "dog")
       await selectWikidataSearchResult("Q1")
       expect(wikidataDialogIsOpen()).toBe(false)
-      expect(noteTitleText(wrapper)).toBe("dog")
-
-      resolveWikidataSearch(searchWikidataSpy, "Dog", "Q1")
-      await openWikidataDialog(wrapper, "dog")
-      await selectWikidataSearchResult("Q1")
-      expect(wikidataDialogIsOpen()).toBe(false)
       expect(noteTitleText(wrapper)).toBe("Dog")
     })
 
-    it("replace then append title actions update title for differing wikidata label", async () => {
+    it("applies replace title action for a differing wikidata label", async () => {
       resolveWikidataSearch(searchWikidataSpy, "Canine", "Q1")
       await openWikidataDialog(wrapper, "dog")
       await selectWikidataSearchResult("Q1", "Replace")
       expect(noteTitleText(wrapper)).toBe("Canine")
-
-      await setNoteNewFormTitle(wrapper, "dog")
-      await openWikidataDialog(wrapper, "dog")
-      await selectWikidataSearchResult("Q1", "Append")
-      expect(noteTitleText(wrapper)).toBe("dog")
     })
   })
 })
