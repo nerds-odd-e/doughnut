@@ -1,5 +1,4 @@
 import { flushPromises } from "@vue/test-utils"
-import { noteShowLocation } from "@/routes/noteShowLocation"
 import {
   expandPropertyPanel,
   expectPropertyPanelClosed,
@@ -167,15 +166,9 @@ Workshop body.`
   })
 
   it("opening one property panel then removing that row leaves the other collapsed", async () => {
-    const wrapper = await h.mountEditor(twoPropertyMarkdown, {
-      route: noteShowLocation(42),
-    })
+    const wrapper = await h.mountEditor(twoPropertyMarkdown)
     const alphaRow = propertyRowSelector("alpha")
     const betaRow = propertyRowSelector("beta")
-    const rows = propertyRows(wrapper.element)
-
-    expectPropertyPanelClosed(rows[0]!)
-    expectPropertyPanelClosed(rows[1]!)
 
     await expandPropertyPanel(wrapper, alphaRow)
 

@@ -655,7 +655,9 @@ CURSOR_DEV=true nix develop -c pnpm frontend:test tests/components/form/RichMark
 
 ### 18. Optimize ranked tests 52–54
 Type: Structure
-Status: planned
+Status: done
+
+Outcome: Removed redundant route/assertion/async setup and duplicate no-link paste coverage; flattened the remaining rich-paste case and removed its one-use helper. Focused Chromium passed twice.
 
 **Tests:**
 - #52 `tests/components/form/RichMarkdownEditor.properties.spec.ts` — RichMarkdownEditor properties > opening one property panel then removing that row leaves the other collapsed (~18.4ms)

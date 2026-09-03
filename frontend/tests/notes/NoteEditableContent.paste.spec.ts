@@ -111,33 +111,23 @@ describe("NoteEditableContent paste", () => {
     })
   })
 
-  describe("quill editor", () => {
-    function mountRichEditor(noteContent: string) {
-      return mountNoteEditableContent(
-        { noteId: 1, noteContent, asMarkdown: false },
-        { attachTo: document.body }
-      )
-    }
+  it("shows options popup based on content after rich editor paste", async () => {
+    const wrapper = mountNoteEditableContent(
+      { noteId: 1, noteContent: "plain text", asMarkdown: false },
+      { attachTo: document.body }
+    )
+    await flushPromises()
 
-    it("shows options popup based on content after paste, and skips when no links", async () => {
-      const wrapper = mountRichEditor("plain text")
-      await flushPromises()
+    emitRichEditorPasteComplete(
+      wrapper,
+      "plain text [new link](https://example.com)"
+    )
+    await flushPromises()
 
-      emitRichEditorPasteComplete(wrapper, "plain text with more plain text")
-      await flushPromises()
-      expect(mockPopupsOptions).not.toHaveBeenCalled()
-
-      emitRichEditorPasteComplete(
-        wrapper,
-        "plain text [new link](https://example.com)"
-      )
-      await flushPromises()
-
-      expect(mockPopupsOptions).toHaveBeenCalledWith(
-        "The content contains 1 links.",
-        expect.arrayContaining([{ label: "Remove 1 links", value: "links" }])
-      )
-      wrapper.unmount()
-    })
+    expect(mockPopupsOptions).toHaveBeenCalledWith(
+      "The content contains 1 links.",
+      expect.arrayContaining([{ label: "Remove 1 links", value: "links" }])
+    )
+    wrapper.unmount()
   })
 })

@@ -98,17 +98,12 @@ Workshop body.`
 
     const wrapper = await h.mountEditor(trackedPropertyMarkdown, {
       noteId,
-      route: noteShowLocation(noteId),
     })
     const emitCountBefore = wrapper.emitted("update:modelValue")?.length ?? 0
 
     await expandPropertyPanelAndClickRemove(wrapper, topicRowSelector)
-    await flushPromises()
 
-    await vi.waitFor(() => {
-      expect(confirmMock).toHaveBeenCalledOnce()
-    })
-
+    expect(confirmMock).toHaveBeenCalledOnce()
     expect(deleteSpy).not.toHaveBeenCalled()
     expect(wrapper.emitted("update:modelValue")?.length ?? 0).toBe(
       emitCountBefore
