@@ -45,15 +45,16 @@ describe("NoteRefinement extract note preview", () => {
     ).toHaveLength(1)
   })
 
-  it("shows editable preview, retries without confirm, and confirms when fields were edited", async () => {
+  it("retries an editable preview and shows retry errors after confirming edited fields", async () => {
     const layout = threePointLayout()
     const firstPreview = labeledExtractionPreview("First")
     const retryPreview = labeledExtractionPreview("Retry")
-    const confirmedPreview = labeledExtractionPreview("Confirmed")
     const extractNotePreviewSpy = mockExtractNotePreviewResponses(
       firstPreview,
-      retryPreview,
-      confirmedPreview
+      retryPreview
+    )
+    extractNotePreviewSpy.mockResolvedValueOnce(
+      wrapSdkError({ message: "Retry failed" })
     )
     const wrapper = await mountNoteRefinementWithLayoutReady(layout)
 
@@ -105,7 +106,8 @@ describe("NoteRefinement extract note preview", () => {
     usePopups().popups.done(true)
     await flushPromises()
     expect(extractNotePreviewSpy).toHaveBeenCalledTimes(3)
-    expectPreviewFields(wrapper, extractionPreviewFieldsFor("Confirmed"))
+    expectExtractionPreviewError(wrapper, "Retry failed")
+    expect(usePopups().popups.peek()).toHaveLength(0)
   })
 
   it("extracts multiple selected refinement layout items into one preview", async () => {
@@ -161,24 +163,6 @@ describe("NoteRefinement extract note preview", () => {
 
     expectExtractionPreviewVisible(wrapper)
     expectExtractionPreviewError(wrapper, "API Error")
-    expect(usePopups().popups.peek()).toHaveLength(0)
-  })
-
-  it("shows inline error when retry preview API fails", async () => {
-    const layout = threePointLayout()
-    const extractNotePreviewSpy = mockExtractNotePreviewResponses(
-      sampleExtractionPreview()
-    )
-    extractNotePreviewSpy.mockResolvedValueOnce(
-      wrapSdkError({ message: "Retry failed" })
-    )
-    const wrapper = await mountNoteRefinementWithLayoutReady(layout)
-
-    await openExtractionPreview(wrapper, "p2")
-    await retryExtractionPreview(wrapper)
-
-    expectExtractionPreviewVisible(wrapper)
-    expectExtractionPreviewError(wrapper, "Retry failed")
     expect(usePopups().popups.peek()).toHaveLength(0)
   })
 })

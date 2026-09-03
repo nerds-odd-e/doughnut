@@ -72,14 +72,17 @@ Body`
     )
     const live = valueField.find("a.donut-wiki-link")
     expect(live.attributes("href")).toBe(notePropertyHref(42, "a part of"))
-    await valueField.trigger("focus")
-    await flushPromises()
+    const updateCountBefore = wrapper.emitted("update:modelValue")?.length ?? 0
+
     ;(live.element as HTMLAnchorElement).click()
     await flushPromises()
     await valueField.trigger("blur")
-    await flushPromises()
+
     expect(wrapper.vm.$router.currentRoute.value).toMatchObject(
       notePropertyLocation(42, "a part of")
+    )
+    expect(wrapper.emitted("update:modelValue")?.length ?? 0).toBe(
+      updateCountBefore
     )
   })
 

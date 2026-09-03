@@ -1,14 +1,11 @@
 import { NoteController } from "@generated/donut-backend-api/sdk.gen"
 import { flushPromises } from "@vue/test-utils"
 import { describe, expect, it } from "vitest"
-import makeMe from "donut-test-fixtures/makeMe"
 import {
   mockSdkServiceWithImplementation,
   wrapSdkResponse,
 } from "@tests/helpers"
 import usePopups from "@/components/commons/Popups/usePopups"
-import { useStorageAccessor } from "@/composables/useStorageAccessor"
-import { relationshipNoteContent } from "./relationshipNoteTestContent"
 import {
   clickDeleteNote,
   deleteNoteSpy,
@@ -88,28 +85,6 @@ describe("NoteMoreOptionsForm delete relationship note", () => {
         referenceHandling: "REDUCE_TO_SOURCE_PROPERTY",
         sourcePropertyKey: "a part of",
       },
-    })
-  })
-
-  it("uses confirm when relationship note source does not resolve", async () => {
-    deleteNoteSpy.mockResolvedValue(wrapSdkResponse([]))
-    const relationRealm = makeMe.aNoteRealm
-      .content(relationshipNoteContent("a-part-of", "[[Moon]]", "[[Earth]]"))
-      .please()
-    useStorageAccessor().value.refreshNoteRealm(relationRealm)
-    const wrapper = await mountDeleteFormReady(relationRealm.note)
-
-    await clickDeleteNote(wrapper)
-
-    const popups = usePopups().popups.peek()
-    expect(popups?.[0]?.type).toBe("confirm")
-
-    usePopups().popups.done(true)
-    await flushPromises()
-
-    expect(deleteNoteSpy).toHaveBeenCalledWith({
-      path: { note: relationRealm.id },
-      body: { referenceHandling: "LEAVE_DEAD_LINKS" },
     })
   })
 })

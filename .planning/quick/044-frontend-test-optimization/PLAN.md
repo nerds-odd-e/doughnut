@@ -503,7 +503,9 @@ CURSOR_DEV=true nix develop -c pnpm frontend:test tests/notes/NoteUnresolvedWiki
 
 ### 12. Optimize ranked tests 34–36
 Type: Structure
-Status: planned
+Status: done
+
+Outcome: Removed a redundant relationship-delete UI case, folded retry failure into the edited-preview journey, and dropped unnecessary focus/flush work while asserting blur does not rewrite. Focused browser verification passed three consecutive runs.
 
 **Tests:**
 - #34 `tests/notes/NoteMoreOptionsForm.deleteNote.relationship.spec.ts` — NoteMoreOptionsForm delete relationship note > uses confirm when relationship note source does not resolve (~23.6ms)
