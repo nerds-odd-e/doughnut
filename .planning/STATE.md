@@ -8,7 +8,7 @@ status: ready
 stopped_at: null
 last_updated: "2026-09-03T02:55:00Z"
 last_activity: 2026-09-03
-last_activity_desc: "042: recall E2E test optimization planned; not executing"
+last_activity_desc: "042: recall E2E test optimization shipped (59 -> 12 scenarios, ~78% faster)"
 progress:
   total_phases: 0
   completed_phases: 0
@@ -35,9 +35,8 @@ Daily probe measurement (not an ADR): [daily-probe-protocol.md](notes/daily-prob
 
 ## Operator Next Steps
 
-- Recall E2E redundancy/excess (test optimization, `e2e_test/features/recall/` only): `.planning/quick/042-recall-e2e-test-optimization/PLAN.md` — planned, do not execute until asked.
 - Start the next milestone with `/gsd-new-milestone` when ready.
 
 Parked work: SEED-001, SEED-002, SEED-006, SEED-007, SEED-008; ADR 0002 Level 1. See [ROADMAP.md](ROADMAP.md).
 
-Recent ad-hoc work: `noteProperty` / **property panel** / `#prop:` wiki (ADR 0001 / ADR 0004 / ADR 0005); E2E named-route honesty and SPA hydrate protocol (E2E helpers, `MainMenu.vue`); daily probe side tap ([daily-probe-protocol.md](notes/daily-probe-protocol.md)); note reference index hardening ([040](quick/040-note-reference-index-hardening/PLAN.md)); question generation batch retry + failed-request purge ([041](quick/041-question-generation-batch-retry-and-failed-request-purge/PLAN.md)).
+Recent ad-hoc work: `noteProperty` / **property panel** / `#prop:` wiki (ADR 0001 / ADR 0004 / ADR 0005); E2E named-route honesty and SPA hydrate protocol (E2E helpers, `MainMenu.vue`); daily probe side tap ([daily-probe-protocol.md](notes/daily-probe-protocol.md)); note reference index hardening ([040](quick/040-note-reference-index-hardening/PLAN.md)); question generation batch retry + failed-request purge ([041](quick/041-question-generation-batch-retry-and-failed-request-purge/PLAN.md)); recall E2E test optimization ([042](quick/042-recall-e2e-test-optimization/PLAN.md)).
