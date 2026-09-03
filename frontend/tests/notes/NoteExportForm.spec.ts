@@ -11,12 +11,6 @@ vi.mock("file-saver", () => ({ saveAs: vi.fn() }))
 
 const aiMarkdownStub = { markdown: "# AI context\n\nHello **world**." }
 
-const minimalGraph = (noteId: number) =>
-  ({
-    focusNote: { id: noteId },
-    relatedNotes: [],
-  }) as never
-
 describe("NoteExportForm", () => {
   let wrapper: VueWrapper
 
@@ -37,19 +31,6 @@ describe("NoteExportForm", () => {
       .mount({ attachTo: document.body })
     return note
   }
-
-  const graphSummary = () =>
-    document.querySelector("details summary") as HTMLElement | null
-
-  const expandGraphSection = async () => {
-    graphSummary()?.click()
-    await flushPromises()
-  }
-
-  const graphTextarea = () =>
-    document.querySelector(
-      '[data-testid="graph-json-textarea"]'
-    ) as HTMLTextAreaElement | null
 
   const aiMarkdownTextarea = () =>
     document.querySelector(
@@ -82,69 +63,6 @@ describe("NoteExportForm", () => {
     expect(saveAs).toHaveBeenCalled()
     const blobArg = vi.mocked(saveAs).mock.calls[0][0] as Blob
     expect(blobArg.type).toContain("markdown")
-  })
-
-  it("labels JSON export as focus context", async () => {
-    mountForm()
-    await flushPromises()
-    expect(graphSummary()?.textContent).toContain("Export focus context (JSON)")
-  })
-
-  it("fetches graph JSON once, downloads, and keeps cache when toggling", async () => {
-    const note = mountForm()
-    await flushPromises()
-    const getGraphMock = mockSdkService(
-      NoteController,
-      "getGraph",
-      minimalGraph(note.id)
-    )
-
-    expect(graphTextarea()).toBeNull()
-
-    await expandGraphSection()
-
-    expect(getGraphMock).toHaveBeenCalledWith({
-      path: { note: note.id },
-      query: { tokenLimit: 2000 },
-    })
-    expect(graphTextarea()?.value).toContain('"focusNote"')
-
-    await clickTestId("download-json-btn-graph")
-    expect(saveAs).toHaveBeenCalled()
-
-    getGraphMock.mockClear()
-
-    graphSummary()?.click()
-    graphSummary()?.click()
-    await flushPromises()
-
-    expect(graphTextarea()).toBeTruthy()
-    expect(getGraphMock).toHaveBeenCalledTimes(0)
-  })
-
-  it("allows customizing token limit and refreshes graph", async () => {
-    const note = mountForm()
-    const graphData1 = minimalGraph(note.id)
-    const graphData2 = {
-      focusNote: { id: note.id, token: 1234 },
-      relatedNotes: [],
-    } as never
-    const getGraphMock = mockSdkService(NoteController, "getGraph", graphData1)
-    getGraphMock
-      .mockResolvedValueOnce(wrapSdkResponse(graphData1))
-      .mockResolvedValueOnce(wrapSdkResponse(graphData2))
-
-    await expandGraphSection()
-    expect(graphTextarea()).toBeTruthy()
-
-    await setTokenLimit("1234")
-    await clickTestId("refresh-graph-btn")
-
-    expect(graphTextarea()?.value).toContain('"token": 1234')
-    expect(getGraphMock).toHaveBeenLastCalledWith({
-      path: { note: note.id },
-      query: { tokenLimit: 1234 },
-    })
   })
 
   it("refresh markdown refetches with current token budget", async () => {

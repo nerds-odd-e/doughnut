@@ -4,7 +4,7 @@
       <h3 class="daisy-card-title">Export Note Data</h3>
       <p class="text-sm text-base-content/70 mb-2">
         Focus context markdown. The token budget limits approximate size of the focus note body plus
-        all included related note bodies combined (same value for focus context JSON below).
+        all included related note bodies combined.
       </p>
       <div class="flex items-center gap-2 mb-2">
         <label for="context-token-limit" class="daisy-label-text">Token budget:</label>
@@ -42,47 +42,12 @@
         copy-aria-label="Copy markdown"
         download-aria-label="Download markdown"
       />
-      <details :open="expandedGraph" class="daisy-collapse bg-base-200 rounded-box mt-4">
-        <summary
-          class="flex items-center gap-2 underline cursor-pointer py-2 px-1"
-          @click="toggleGraphExpanded($event)"
-        >
-          <svg :class="['transition-transform', 'duration-200', expandedGraph ? 'rotate-90' : '']" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-          Export focus context (JSON)
-        </summary>
-        <div v-if="expandedGraph" class="mt-4">
-          <p class="text-xs text-base-content/60 mb-2">
-            Uses the same combined token budget as above.
-          </p>
-          <div class="flex items-center gap-2 mb-2">
-            <button
-              class="daisy-btn daisy-btn-ghost daisy-btn-xs"
-              type="button"
-              @click="refreshGraph"
-              :disabled="loadingGraph"
-              data-testid="refresh-graph-btn"
-              aria-label="Refresh focus context JSON"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="2" d="M4 4v5h.582M20 20v-5h-.581M19.418 9A7.994 7.994 0 0 0 12 4a8 8 0 1 0 7.418 5"/></svg>
-            </button>
-            <span v-if="loadingGraph" class="daisy-loading daisy-loading-spinner daisy-loading-xs"></span>
-          </div>
-          <JsonExportSection
-            :json-data="jsonGraph"
-            :filename="`note-${note.id}-focus-context`"
-            :loading="loadingGraph"
-            textarea-test-id="graph-json-textarea"
-            copy-button-test-id="copy-json-btn-graph"
-            download-button-test-id="download-json-btn-graph"
-          />
-        </div>
-      </details>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, watch } from "vue"
+import { onMounted, ref } from "vue"
 import type { Note } from "@generated/donut-backend-api"
 import { NoteController } from "@generated/donut-backend-api/sdk.gen"
 import {} from "@/managedApi/clientSetup"
@@ -90,10 +55,7 @@ import JsonExportSection from "../../commons/JsonExportSection.vue"
 
 const props = defineProps<{ note: Note }>()
 
-const expandedGraph = ref(false)
-const jsonGraph = ref("")
 const tokenLimit = ref(2000)
-const loadingGraph = ref(false)
 
 const aiMarkdown = ref("")
 const loadingMarkdown = ref(false)
@@ -116,35 +78,5 @@ async function fetchAiMarkdown() {
 
 function refreshMarkdown() {
   fetchAiMarkdown()
-}
-
-watch(
-  () => expandedGraph.value,
-  async (val) => {
-    if (val && !jsonGraph.value) {
-      await fetchGraph()
-    }
-  }
-)
-
-async function fetchGraph() {
-  loadingGraph.value = true
-  const { data: graph, error } = await NoteController.getGraph({
-    path: { note: props.note.id },
-    query: { tokenLimit: tokenLimit.value },
-  })
-  if (!error && graph) {
-    jsonGraph.value = JSON.stringify(graph, null, 2)
-  }
-  loadingGraph.value = false
-}
-
-function refreshGraph() {
-  fetchGraph()
-}
-
-function toggleGraphExpanded(event: Event) {
-  event.preventDefault()
-  expandedGraph.value = !expandedGraph.value
 }
 </script>
