@@ -780,7 +780,9 @@ CURSOR_DEV=true nix develop -c pnpm frontend:test tests/notes/NoteEditableConten
 
 ### 23. Optimize ranked tests 67–69
 Type: Structure
-Status: planned
+Status: done
+
+Outcome: Removed unnecessary promise draining, merged two redundant refine-action mounts, and simplified submit-error setup/timer cleanup while preserving property-panel, modal, and binding-error behavior. Focused Chromium passed twice.
 
 **Tests:**
 - #67 `tests/components/form/RichMarkdownEditor.propertyPanelLocation.spec.ts` — RichMarkdownEditor property panel location > opening the property value dialog from its control leaves the property panel closed (~16.2ms)

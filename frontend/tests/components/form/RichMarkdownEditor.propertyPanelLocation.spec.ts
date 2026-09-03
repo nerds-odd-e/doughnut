@@ -8,9 +8,9 @@ import {
 } from "@/routes/noteShowLocation"
 import type { Router } from "vue-router"
 import {
+  PROPERTY_VALUE_DIALOG_OPEN_SELECTOR,
   propertyValueDialogEl,
   mountEditorOnNoteShow,
-  openPropertyValueDialog,
   PROPERTY_PANEL_NOTE_ID,
 } from "./propertyValueDialogTestDom"
 import {
@@ -103,8 +103,10 @@ Body.`
 
   it("opening the property value dialog from its control leaves the property panel closed", async () => {
     const wrapper = await mountEditorOnNoteShow(h, markdown)
+    const openButton = wrapper.find(PROPERTY_VALUE_DIALOG_OPEN_SELECTOR)
+    expect(openButton.exists()).toBe(true)
 
-    await openPropertyValueDialog(wrapper)
+    await openButton.trigger("click")
 
     expectPropertyPanelClosed(wrapper.find(topicRow).element)
     expect(propertyValueDialogEl()).not.toBeNull()

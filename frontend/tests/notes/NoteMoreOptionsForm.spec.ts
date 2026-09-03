@@ -120,17 +120,7 @@ describe("NoteMoreOptionsForm", () => {
   })
 
   describe("refine note action", () => {
-    it("displays the refine note action button", async () => {
-      const wrapper = renderer.withProps({ note }).mount()
-
-      await flushPromises()
-
-      expect(
-        wrapper.find(`button[title="${noteMoreOptionsTitles.refine}"]`).exists()
-      ).toBe(true)
-    })
-
-    it("opens the refine note modal when clicked", async () => {
+    it("opens the refine note modal and closes the menu when clicked", async () => {
       const wrapper = renderer.withProps({ note }).mount()
 
       await flushPromises()
@@ -143,18 +133,6 @@ describe("NoteMoreOptionsForm", () => {
 
       const modalEl = document.querySelector('[data-test="refine-note-modal"]')
       expect(modalEl?.classList.contains("daisy-modal-open")).toBe(true)
-    })
-
-    it("emits close-dialog when refine note button is clicked", async () => {
-      const wrapper = renderer.withProps({ note }).mount()
-
-      await flushPromises()
-
-      const refineButton = wrapper.find(
-        `button[title="${noteMoreOptionsTitles.refine}"]`
-      )
-      await refineButton.trigger("click")
-
       expect(wrapper.emitted()).toHaveProperty("close-dialog")
     })
   })

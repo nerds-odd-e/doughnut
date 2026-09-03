@@ -63,20 +63,17 @@ describe("NoteNewForm wikidata and soft-delete", () => {
   })
 
   describe("submit errors", () => {
-    beforeEach(async () => {
+    beforeEach(() => {
       vi.useFakeTimers()
-      wrapper = mountNoteNewForm(notebookRootProps, {
-        attachTo: document.body,
-      })
-      await setNoteNewFormTitle(wrapper, "note title")
     })
 
     afterEach(() => {
-      vi.runOnlyPendingTimers()
+      vi.clearAllTimers()
       vi.useRealTimers()
     })
 
     it("displays reserved title error when api returns binding error for newTitle", async () => {
+      wrapper = mountNoteNewForm(notebookRootProps)
       await setNoteNewFormTitle(wrapper, "readme")
 
       sdkSpies.mockedCreateNoteAtRoot.mockResolvedValueOnce({
@@ -100,6 +97,8 @@ describe("NoteNewForm wikidata and soft-delete", () => {
     })
 
     it("asks confirmation on soft-deleted title conflict and calls undo delete when confirmed", async () => {
+      wrapper = mountNoteNewForm(notebookRootProps)
+      await setNoteNewFormTitle(wrapper, "note title")
       popupsMock.confirm.mockResolvedValueOnce(true)
       const restoredRealm = makeMe.aNoteRealm.please()
       const undoSpy = mockSdkService(
@@ -147,7 +146,7 @@ describe("NoteNewForm wikidata and soft-delete", () => {
     })
 
     afterEach(() => {
-      vi.runOnlyPendingTimers()
+      vi.clearAllTimers()
       vi.useRealTimers()
     })
 
