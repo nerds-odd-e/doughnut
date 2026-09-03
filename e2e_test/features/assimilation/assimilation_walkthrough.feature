@@ -49,7 +49,7 @@ Feature: Assimilation walkthrough
   Scenario: Already assimilated note cannot be assimilated again
     Given the note "Note 1" was assimilated on day 1
     When I jump to the note page of "Note 1"
-    And I open assimilation settings
+    And I open the assimilation panel
     Then assimilate should be disabled
 
   Scenario: Skip does not create a dummy understanding tracker
@@ -61,7 +61,7 @@ Feature: Assimilation walkthrough
     When I skip on the assimilation panel
     Then I should be assimilating the note "Note 4"
     When I jump to the note page of "Note 3"
-    And I open assimilation settings
+    And I open the assimilation panel
     Then I should see Return to sequence on the assimilation panel
 
   Scenario: Return to sequence restores next-eligibility
@@ -73,7 +73,7 @@ Feature: Assimilation walkthrough
     When I skip on the assimilation panel
     Then I should be assimilating the note "Note 4"
     When I jump to the note page of "Note 3"
-    And I open assimilation settings
+    And I open the assimilation panel
     When I return to sequence on the assimilation panel
     Then I should see Skip on the assimilation panel
     And assimilate should be enabled
@@ -87,13 +87,13 @@ Feature: Assimilation walkthrough
     When I skip on the assimilation panel
     Then I should be assimilating the note "Note 2"
     When I jump to the note page of "Note 1"
-    And I open assimilation settings
+    And I open the assimilation panel
     Then assimilate should be enabled
     When I assimilate on the assimilation panel
     Then I should be assimilating the note "Note 2"
     And I should see assimilation progress "1/4"
     When I jump to the note page of "Note 1"
-    And I open assimilation settings
+    And I open the assimilation panel
     Then assimilate should be disabled
 
   Scenario: Walkthrough does not offer notes from a Skip Memory Tracking notebook

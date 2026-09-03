@@ -64,8 +64,8 @@ export const noteConversationAndQuestionMethods = () => ({
     )
   },
 
-  openAssimilationSettings() {
-    this.moreOptions().openAssimilationSettings()
+  openAssimilationPanel() {
+    this.moreOptions().openAssimilationPanel()
     waitUntilAppIsNotBusy()
     return assumeAssimilationPage()
   },

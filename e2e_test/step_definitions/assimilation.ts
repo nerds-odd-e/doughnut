@@ -112,8 +112,8 @@ Then('I should see assimilation progress {string}', (dueOverTotal: string) => {
   start.assimilation().expectAssimilationNavBadge(dueOverTotal)
 })
 
-Then('I should not see assimilation settings', () => {
-  start.assumeNotePage().expectAssimilationSettingsAbsent()
+Then('I should not see the assimilation panel', () => {
+  start.assumeNotePage().expectAssimilationPanelAbsent()
 })
 
 Then('I should see the daily assimilation goal toast', () => {
@@ -139,7 +139,7 @@ When('I assimilate the note {string}', (noteTitle: string) => {
 Given(
   'I assimilate the note {string} with the option of remembering spelling',
   (noteTitle: string) => {
-    start.jumpToNotePage(noteTitle).moreOptions().openAssimilationSettings()
+    start.jumpToNotePage(noteTitle).moreOptions().openAssimilationPanel()
     start.assumeAssimilationPage().waitForAssimilationReady().rememberSpelling()
     start.assumeAssimilationPage().verifySpellingWith(noteTitle)
     start.assumeAssimilationPage().expectPopupClosed()

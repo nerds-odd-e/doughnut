@@ -10,7 +10,7 @@ import type { NoteLevelTrackerKind } from '../start/pageObjects/assimilationPage
 function openNoteLevelTracker(noteTitle: string, kind: NoteLevelTrackerKind) {
   return start
     .jumpToNotePage(noteTitle)
-    .openAssimilationSettings()
+    .openAssimilationPanel()
     .openNoteLevelMemoryTracker(kind)
 }
 

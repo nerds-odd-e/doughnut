@@ -58,7 +58,7 @@ export const noteMoreOptions = () => {
       cy.findByRole('button', { name: 'Record Audio' }).should('be.visible')
       waitUntilAppIsNotBusy()
     },
-    openAssimilationSettings() {
+    openAssimilationPanel() {
       // `assimilationModesSelector` also matches a note property's own
       // AssimilationModes row (RichFrontmatterPropertyPanel) when its
       // property panel is open — scope both the "already open" probe and
@@ -75,7 +75,7 @@ export const noteMoreOptions = () => {
       return assumeAssimilationPage()
     },
     assimilateNote() {
-      this.openAssimilationSettings().clickAssimilate()
+      this.openAssimilationPanel().clickAssimilate()
       waitUntilAppIsNotBusy()
     },
   }

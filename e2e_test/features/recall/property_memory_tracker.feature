@@ -34,7 +34,7 @@ Feature: Property memory tracker
     When I start assimilation from the menu
     Then I should be at property "example of" of note "Kanji"
     And the rich note property "example of" should be focused with its property panel open
-    And I should not see assimilation settings
+    And I should not see the assimilation panel
 
   @disableOpenAiService
   Scenario: Skip a property does not create a dummy understanding tracker
@@ -53,7 +53,7 @@ Feature: Property memory tracker
     When I start assimilation from the menu
     Then I should be at property "topic" of note "Minerals"
     And the rich note property "topic" should be focused with its property panel open
-    And I should not see assimilation settings
+    And I should not see the assimilation panel
     When I skip rich note property "topic" from its property panel
     Then I should see the no more notes to assimilate toast
     When I visit note "Minerals"
@@ -79,7 +79,7 @@ Feature: Property memory tracker
     When I skip rich note property "topic" from its property panel
     Then I should see the no more notes to assimilate toast
     When I visit note "Minerals"
-    And I open assimilation settings
+    And I open the assimilation panel
     Then I should see Return to sequence for property "topic"
     When I return rich note property "topic" to the sequence from its property panel
     Then I should see Skip for property "topic"
@@ -107,17 +107,17 @@ Feature: Property memory tracker
     When I skip rich note property "topic" from its property panel
     Then I should see the no more notes to assimilate toast
     When I visit note "Minerals"
-    And I open assimilation settings
+    And I open the assimilation panel
     And I assimilate rich note property "topic" from its property panel
     Then I should see the no more notes to assimilate toast
     When I visit note "Minerals"
-    And I open assimilation settings
+    And I open the assimilation panel
     Then I should see a property memory tracker for "topic"
 
   @disableOpenAiService
-  Scenario: Remove from recall on assimilation settings for a property
+  Scenario: Remove from recall on the assimilation panel for a property
     Given I assimilated one note "Vitamins" at the current time
-    And I am viewing assimilation settings for note "Vitamins"
+    And I am viewing the assimilation panel for note "Vitamins"
     When I open the property memory tracker for "topic"
     And I remove the memory tracker from recall
     Then the memory tracker should be skipped
@@ -126,17 +126,17 @@ Feature: Property memory tracker
 
   @disableOpenAiService
   Scenario: Note-level assimilation stays available after property-only assimilation
-    Given I am viewing assimilation settings for note "Vitamins"
+    Given I am viewing the assimilation panel for note "Vitamins"
     Then assimilate for property "topic" should be disabled
     And assimilate should be enabled
     When I assimilate on the assimilation panel
-    And I open assimilation settings
+    And I open the assimilation panel
     Then the note memory tracker should have recall count 0
     And I should see a property memory tracker for "topic"
 
   @disableOpenAiService
   Scenario: Assimilated property appears as a labeled tracker and becomes due for recall
-    Given I am viewing assimilation settings for note "Vitamins"
+    Given I am viewing the assimilation panel for note "Vitamins"
     Then I should see a property memory tracker for "topic"
     When It's day 2, 9 hour
     Then I should see that I have 1 notes to recall
@@ -153,7 +153,7 @@ Feature: Property memory tracker
     Then I should be asked "What does the topic property mean?"
     When I choose answer "micronutrients"
     And I visit note "Vitamins"
-    And I open assimilation settings
+    And I open the assimilation panel
     Then the note memory tracker should have recall count 0
     And the property memory tracker for "topic" should have recall count 1
 
@@ -170,7 +170,7 @@ Feature: Property memory tracker
   Scenario: Removing tracked property deletes property memory tracker
     When I visit note "Vitamins"
     And I remove rich note property "topic" confirming memory tracker change
-    And I open assimilation settings
+    And I open the assimilation panel
     Then the property memory tracker for "topic" should be absent
 
   @disableOpenAiService
@@ -191,11 +191,11 @@ Feature: Property memory tracker
     And I assimilate rich note property "topic" from its property panel
     Then I should see the no more notes to assimilate toast
     When I visit note "Iron"
-    And I open assimilation settings
+    And I open the assimilation panel
     Then I should see a property memory tracker for "topic"
 
   Scenario: Property memory tracker note link opens that property
-    Given I am viewing assimilation settings for note "Vitamins"
+    Given I am viewing the assimilation panel for note "Vitamins"
     When I open the property memory tracker for "topic"
     Then I should see note "Vitamins" on the memory tracker page
     And I should see focused property "topic" on the memory tracker page

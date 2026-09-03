@@ -16,7 +16,7 @@ Feature: Commissioned learning session
     Given the note "Hola" was assimilated on day 1
     When I am assimilating the note "Hola"
     And I assimilate it as commissioned
-    And I open assimilation settings
+    And I open the assimilation panel
     Then I should see ordinary and commissioned memory trackers for "Hola"
 
   Scenario: Due commissioned trackers await a Tutor rather than ordinary recall

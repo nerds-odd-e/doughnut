@@ -81,7 +81,7 @@ export const noteRichPropertyAssimilationMethods = () => ({
     })
     return this
   },
-  expectAssimilationSettingsAbsent() {
+  expectAssimilationPanelAbsent() {
     cy.get('[data-testid="note-assimilation-modes"]').should('not.exist')
     return this
   },

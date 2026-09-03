@@ -6,18 +6,18 @@ import { Given, Then, When } from '@badeball/cypress-cucumber-preprocessor'
 import start from '../start'
 
 Given(
-  'I am viewing assimilation settings for note {string}',
+  'I am viewing the assimilation panel for note {string}',
   (noteTitle: string) => {
-    start.jumpToNotePage(noteTitle).moreOptions().openAssimilationSettings()
+    start.jumpToNotePage(noteTitle).moreOptions().openAssimilationPanel()
   }
 )
 
 When('I am assimilating the note {string}', (noteTitle: string) => {
-  start.jumpToNotePage(noteTitle).moreOptions().openAssimilationSettings()
+  start.jumpToNotePage(noteTitle).moreOptions().openAssimilationPanel()
 })
 
-When('I open assimilation settings', () => {
-  start.assumeNotePage().moreOptions().openAssimilationSettings()
+When('I open the assimilation panel', () => {
+  start.assumeNotePage().moreOptions().openAssimilationPanel()
 })
 
 When('I assimilate on the assimilation panel', () => {

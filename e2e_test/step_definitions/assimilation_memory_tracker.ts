@@ -84,7 +84,7 @@ Then(
       start.assumeAssimilationPage().expectPopupClosed()
       start
         .jumpToNotePage(noteTitle, true)
-        .openAssimilationSettings()
+        .openAssimilationPanel()
         .openNoteLevelMemoryTracker('spelling')
         .expectRecallCount(0)
     } else {
