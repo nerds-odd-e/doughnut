@@ -34,24 +34,18 @@ describe("NoteTextContent title edit", () => {
     vi.useRealTimers()
   })
 
-  it("is editable by default and not editable when readonly", async () => {
-    mountWith(makeMe.aNote.title("Dummy Title").please())
-    await flushPromises()
+  it("prompts for empty content only when the note is editable", () => {
+    const emptyNote = makeMe.aNote.title("Dummy Title").content("").please()
+
+    mountWith(emptyNote)
     expect(titleEditorEl(wrapper).getAttribute("contenteditable")).toBe("true")
-
-    await wrapper.setProps({ readonly: true })
-    await flushPromises()
-    expect(titleEditorEl(wrapper).getAttribute("contenteditable")).toBe("false")
-  })
-
-  it("prompts for content when empty only when editable", async () => {
-    mountWith(makeMe.aNote.title("Dummy Title").content("").please())
     expect(
       wrapper.get("[data-placeholder]").attributes("data-placeholder")
     ).toBe("Enter note content here...")
     wrapper.unmount()
 
-    mountWith(makeMe.aNote.title("Dummy Title").content("").please(), true)
+    mountWith(emptyNote, true)
+    expect(titleEditorEl(wrapper).getAttribute("contenteditable")).toBe("false")
     expect(wrapper.find("[data-placeholder]").exists()).toBe(false)
   })
 

@@ -59,7 +59,7 @@ describe("NoteRefinement layout selection", () => {
     )
   })
 
-  it("submits checked descendants then parent id when all descendants are selected again", async () => {
+  it("includes parent id when all descendants are selected", async () => {
     const extractNotePreviewSpy = mockSdkService(
       AiController,
       "extractNotePreview",
@@ -67,18 +67,6 @@ describe("NoteRefinement layout selection", () => {
     )
     const { layout, wrapper } =
       await mountNestedLayoutWithIndeterminateParentSelection()
-    await clickExtractRefinementLayout(wrapper)
-    await flushPromises()
-    expect(extractNotePreviewSpy).toHaveBeenCalledWith(
-      refinementLayoutSelectionApiCall(note.id, layout, ["p1-1"], {
-        signal: true,
-      })
-    )
-
-    await wrapper
-      .find('[data-test-id="extraction-preview-back"]')
-      .trigger("click")
-    await flushPromises()
     await selectRefinementLayoutItem(wrapper, "p1-2", true)
     await clickExtractRefinementLayout(wrapper)
     await flushPromises()

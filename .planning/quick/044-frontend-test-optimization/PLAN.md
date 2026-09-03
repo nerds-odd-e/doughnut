@@ -353,7 +353,9 @@ CURSOR_DEV=true nix develop -c pnpm frontend:test tests/notes/NoteToolbar.conver
 
 ### 6. Optimize ranked tests 16–18
 Type: Structure
-Status: planned
+Status: done
+
+Outcome: Removed redundant refinement and title-edit journeys, consolidated autosave deletion barriers onto one mount, and refactored repeated textarea mutation. Focused Chromium tests passed three consecutive runs.
 
 **Tests:**
 - #16 `tests/components/recall/NoteRefinement.layoutSelection.spec.ts` — NoteRefinement layout selection > submits checked descendants then parent id when all descendants are selected again (~32.7ms)

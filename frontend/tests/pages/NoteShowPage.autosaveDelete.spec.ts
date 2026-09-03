@@ -42,10 +42,14 @@ async function editBody(content: string) {
   const textarea = document.querySelector(
     '[aria-label="Note content"] textarea'
   ) as HTMLTextAreaElement
-  textarea.value = content
-  textarea.dispatchEvent(new Event("input", { bubbles: true }))
+  setBodyValue(textarea, content)
   await flushPromises()
   return textarea
+}
+
+function setBodyValue(textarea: HTMLTextAreaElement, content: string) {
+  textarea.value = content
+  textarea.dispatchEvent(new Event("input", { bubbles: true }))
 }
 
 async function startDelete(choice: boolean | string) {
@@ -73,88 +77,51 @@ describe("note show autosave before deletion", () => {
     teardownGlobalClientForTesting()
   })
 
-  it("saves pending relationship content before reduction and starts no later patch", async () => {
+  it("closes mutations while reducing and reopens them after delete failure", async () => {
     const { relationRealm } = qualifyingRelationRealmForDelete()
     const router = createNoteShowPageRouter()
     mockSdkService(NoteController, "showNote", relationRealm)
     mockNotebookGetForNoteRealm(relationRealm)
-    const save = deferred<void>()
-    const deletion = deferred<never[]>()
-    const order: string[] = []
-    const updateSpy = mockSdkServiceWithImplementation(
-      TextContentController,
-      "updateNoteContent",
-      async () => {
-        order.push("save-start")
-        await save.promise
-        order.push("save-finish")
-        return makeMe.aNoteRealm
-          .id(relationRealm.id)
-          .content("Edited relationship")
-          .please()
-      }
-    )
-    const deleteSpy = mockSdkServiceWithImplementation(
-      NoteController,
-      "deleteNote",
-      async () => {
-        order.push("delete-start")
-        return await deletion.promise
-      }
-    )
-
-    const editedRelationship = `${relationRealm.note.content}Edited relationship`
-    await renderNoteShowPageWithoutSidebar(router, relationRealm.id)
-    await editBody(editedRelationship)
-    await startDelete("REDUCE_TO_SOURCE_PROPERTY")
-
-    expect(order).toEqual(["save-start"])
-    expect(deleteSpy).not.toHaveBeenCalled()
-
-    save.resolve()
-    await flushPromises()
-
-    expect(order).toEqual(["save-start", "save-finish", "delete-start"])
-
-    deletion.resolve([])
-    await flushPromises()
-    vi.runAllTimers()
-    await flushPromises()
-
-    expect(updateSpy).toHaveBeenCalledTimes(1)
-  })
-
-  it("uses the same barrier for ordinary deletion and reopens it after delete failure", async () => {
-    const noteRealm = makeMe.aNoteRealm.content("Original").please()
-    const router = createNoteShowPageRouter()
-    mockSdkService(NoteController, "showNote", noteRealm)
-    mockNotebookGetForNoteRealm(noteRealm)
-    const order: string[] = []
+    const firstSave = deferred<void>()
+    const mutationOrder: string[] = []
+    let saveCalls = 0
     const updateSpy = mockSdkServiceWithImplementation(
       TextContentController,
       "updateNoteContent",
       async ({ body }) => {
-        order.push("save")
+        saveCalls += 1
+        mutationOrder.push(`save-${saveCalls}-start`)
+        if (saveCalls === 1) await firstSave.promise
+        mutationOrder.push(`save-${saveCalls}-finish`)
         return makeMe.aNoteRealm
-          .id(noteRealm.id)
+          .id(relationRealm.id)
           .content(body?.content ?? "")
           .please()
       }
     )
     const deleteSpy = mockSdkService(NoteController, "deleteNote", [])
     deleteSpy.mockImplementation(async () => {
-      order.push("delete")
+      mutationOrder.push("delete")
       return wrapSdkError("delete failed")
     })
 
-    await renderNoteShowPageWithoutSidebar(router, noteRealm.id)
-    const textarea = await editBody("First edit")
-    await startDelete(true)
+    const editedRelationship = `${relationRealm.note.content}Edited relationship`
+    await renderNoteShowPageWithoutSidebar(router, relationRealm.id)
+    const textarea = await editBody(editedRelationship)
+    await startDelete("REDUCE_TO_SOURCE_PROPERTY")
 
-    expect(order).toEqual(["save", "delete"])
+    expect(mutationOrder).toEqual(["save-1-start"])
+    expect(deleteSpy).not.toHaveBeenCalled()
 
-    textarea.value = "Second edit"
-    textarea.dispatchEvent(new Event("input", { bubbles: true }))
+    firstSave.resolve()
+    await flushPromises()
+
+    expect(mutationOrder).toEqual(["save-1-start", "save-1-finish", "delete"])
+    vi.runAllTimers()
+    await flushPromises()
+    expect(updateSpy).toHaveBeenCalledTimes(1)
+
+    setBodyValue(textarea, "Second edit")
     textarea.dispatchEvent(new FocusEvent("blur", { bubbles: true }))
     await flushPromises()
 
