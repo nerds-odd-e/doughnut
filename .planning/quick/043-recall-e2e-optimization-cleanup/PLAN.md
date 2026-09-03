@@ -33,7 +33,7 @@ exercised is still covered — no gap, no extra slice needed here.
 
 ### 1. Remove step definitions orphaned by slices 2 and 3 in recall.ts
 Type: Structure
-Status: planned
+Status: done
 
 **Dead code (each confirmed via repo-wide grep against every `.feature` file — zero callers):**
 - `e2e_test/step_definitions/recall.ts:30` — `Then('I recall {string}', ...)`. Distinct from the still-live `'On day {int} I recall {string} and assimilate new {string}'`. Its only caller was `accidental_match_scheduling.feature`'s "Unique matched understanding tracker is brought forward when spelling is absent" scenario, deleted in plan 042 slice 3.

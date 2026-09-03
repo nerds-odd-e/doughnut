@@ -27,10 +27,6 @@ Given('I ask to do more recall', () => {
   start.recall().navigateToRecallPage().repeatMore()
 })
 
-Then('I recall {string}', (repeatNotes: string) => {
-  start.recall().navigateToRecallPage().recallNotes(repeatNotes)
-})
-
 When('I repeat more old {string}', (repeatNotes: string) => {
   start.recall().assumeRecallPage().recallNotes(repeatNotes)
 })
@@ -86,12 +82,6 @@ Then(
   }
 )
 
-When('I am recalling my note on day {int}', (day: number) => {
-  start.testability().backendTimeTravelTo(day, 8)
-  cy.reload()
-  start.recall().visitRecallPage()
-})
-
 Given('a due recall prompt is ready on day {int}', (day: number) => {
   start.testability().backendTimeTravelTo(day, 8)
   start.testability().dueRecallPrompt()
@@ -104,10 +94,6 @@ When('I visit recall for a due recall prompt on day {int}', (day: number) => {
 
 When('I visit recall', () => {
   start.recall().visitRecallPage()
-})
-
-When('I choose Good', () => {
-  start.recall().assumeRecallPage().chooseGood()
 })
 
 Then('I skip one question', () => {
