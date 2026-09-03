@@ -880,7 +880,9 @@ CURSOR_DEV=true nix develop -c pnpm frontend:test tests/pages/NotebookCatalogExp
 
 ### 27. Optimize ranked tests 79–81
 Type: Structure
-Status: planned
+Status: done
+
+Outcome: Removed two redundant full-component mounts while retaining the unique notebook-root confirmation/API journey, which was added as a Candidate. Focused assertion CPU fell about 26%; Chromium passed twice.
 
 **Tests:**
 - #79 `tests/notes/NoteEditableContent.memoryTracker.spec.ts` — NoteEditableContent property memory tracker guard on markdown > does not save when the user cancels (~15.3ms)

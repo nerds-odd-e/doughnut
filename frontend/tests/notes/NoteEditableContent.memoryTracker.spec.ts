@@ -102,28 +102,4 @@ Workshop body.`
     })
     wrapper.unmount()
   })
-
-  it("does not save when the user cancels", async () => {
-    mockNoteInfoWithPropertyTracker(getNoteInfoSpy, "topic", 99)
-    confirmMock.mockImplementationOnce(() => Promise.resolve(false))
-
-    const wrapper = await mountMarkdownTextarea({
-      noteId: trackedPropertyNoteId,
-      noteContent: trackedPropertyMarkdown,
-    })
-
-    await setTextareaValue(
-      wrapper,
-      `---
----
-
-Workshop body.`
-    )
-    await advanceNoteContentSaveDebounce()
-
-    expect(confirmMock).toHaveBeenCalledOnce()
-    expect(deleteSpy).not.toHaveBeenCalled()
-    expect(updateNoteContentSpy).not.toHaveBeenCalled()
-    wrapper.unmount()
-  })
 })

@@ -119,25 +119,6 @@ describe("NoteEditableContent", () => {
     wrapper.unmount()
   })
 
-  it("should save edited content to the correct note on blur before navigation", async () => {
-    const firstNoteId = 1
-
-    const wrapper = mountNoteEditableContent(
-      { noteId: firstNoteId, noteContent: "First note content" },
-      { attachTo: document.body }
-    )
-    await flushPromises()
-
-    await setTextareaValue(wrapper, "Edited content")
-    await blurTextarea(wrapper)
-
-    expect(updateNoteContentSpy).toHaveBeenCalledWith({
-      path: { note: firstNoteId },
-      body: { content: "Edited content" },
-    })
-    wrapper.unmount()
-  })
-
   it("should preserve second edit when first save response arrives after second edit", async () => {
     const noteId = 1
     const resolveFirstSave = mockDelayedFirstSave(updateNoteContentSpy, noteId)
