@@ -8,7 +8,7 @@ status: ready
 stopped_at: null
 last_updated: "2026-09-03T01:52:00Z"
 last_activity: 2026-09-03
-last_activity_desc: "041: batch retry + failed-request purge planned; not executing"
+last_activity_desc: "041: batch retry + failed-request purge shipped; spent plan history pruned"
 progress:
   total_phases: 0
   completed_phases: 0
@@ -31,15 +31,12 @@ Scheduling follows Accepted [ADR 0003](../docs/adrs/0003-spaced-repetition-sched
 
 **Flyway:** every applied migration is squashed into `V100000000__baseline.sql`; `V300000317__drop_authored_note_reference_backfill_progress.sql` is the tip. New migrations use a greater version.
 
-Daily probe measurement (not an ADR): [daily-probe-protocol.md](notes/daily-probe-protocol.md). Authoritative authored note references: `.planning/quick/039-authoritative-authored-note-references/PLAN.md` — complete. Follow-up: `.planning/quick/040-note-reference-index-hardening/PLAN.md` — complete.
+Daily probe measurement (not an ADR): [daily-probe-protocol.md](notes/daily-probe-protocol.md). Authoritative authored note references and their index-hardening follow-up are shipped ([039](quick/039-authoritative-authored-note-references/PLAN.md), [040](quick/040-note-reference-index-hardening/PLAN.md)).
 
 ## Operator Next Steps
 
-- Question generation batch latest-only OpenAI retry + gated `FAILED` request purge: `.planning/quick/041-question-generation-batch-retry-and-failed-request-purge/PLAN.md` — planned, do not execute until asked.
-- Title/create slowness probe (skip in-request `refreshNotebookScope`): plan `.planning/quick/038-skip-notebook-scope-refresh-on-title-and-create/PLAN.md` — done.
-- Daily probe tap affordance (visible panels, stable board, press flash): `.planning/quick/033-daily-probe-tap-affordance/PLAN.md` — planned, do not execute until asked.
 - Start the next milestone with `/gsd-new-milestone` when ready.
 
 Parked work: SEED-001, SEED-002, SEED-006, SEED-007, SEED-008; ADR 0002 Level 1. See [ROADMAP.md](ROADMAP.md).
 
-Recent ad-hoc work: `noteProperty` / **property panel** / `#prop:` wiki (ADR 0001 / ADR 0004 / ADR 0005); E2E named-route honesty and SPA hydrate protocol (E2E helpers, `MainMenu.vue`); daily probe side tap ([daily-probe-protocol.md](notes/daily-probe-protocol.md)); note reference index hardening ([040](quick/040-note-reference-index-hardening/PLAN.md) — complete).
+Recent ad-hoc work: `noteProperty` / **property panel** / `#prop:` wiki (ADR 0001 / ADR 0004 / ADR 0005); E2E named-route honesty and SPA hydrate protocol (E2E helpers, `MainMenu.vue`); daily probe side tap ([daily-probe-protocol.md](notes/daily-probe-protocol.md)); note reference index hardening ([040](quick/040-note-reference-index-hardening/PLAN.md)); question generation batch retry + failed-request purge ([041](quick/041-question-generation-batch-retry-and-failed-request-purge/PLAN.md)).
