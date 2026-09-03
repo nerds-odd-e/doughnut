@@ -61,9 +61,3 @@ export function expectOverlapTryAgainAlert() {
     )
   cy.findByTestId('overlap-try-again').scrollIntoView().should('be.visible')
 }
-
-export function expectNoMatchedNotesOrAccidentalMatch() {
-  cy.findByTestId('matched-notes-section').should('not.exist')
-  cy.findByTestId('accidental-match-alert').should('not.exist')
-  cy.findByTestId('resolve-accidental-match').should('not.exist')
-}

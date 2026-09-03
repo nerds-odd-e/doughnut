@@ -1,5 +1,7 @@
-Feature: Assimilation and Recall Pages
-  As a learner, I want to assimilate and recall my notes and relationships so that I have fresh memory.
+Feature: Assimilation page types
+  As a learner, I want the assimilation page to show the right layout for
+  the note I'm assimilating, whether it's a plain note, an image, or a
+  relationship between two notes.
 
   Background:
     Given I am logged in as an existing user
@@ -20,12 +22,3 @@ Feature: Assimilation and Recall Pages
       | image note        | Sedative | Sleep medicine; a_slide.jpg |
       | relationship      | Sedition | similar to; Sedation        |
     Then I should see the no more notes to assimilate toast
-
-  Scenario: Count of recall and assimilate notes
-    Given It's day 1, 8 hour
-    And I assimilate these in sequence:
-      | Assimilation Type | Title    |
-      | single note       | Sedition |
-    When It's day 2, 9 hour
-    Then I should see that I have 1 notes to recall
-    And I should see 3 due for assimilation

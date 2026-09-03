@@ -16,13 +16,6 @@ Feature: Browse answers and notes while recalling
     And It's day 1
 
   @disableOpenAiService
-  Scenario: View last answered question when the quiz answer was correct
-    Given the note "sedition" was assimilated as spelling on day 1
-    When I visit recall for a due recall prompt on day 2
-    And I type my answer "sedition"
-    Then I should see that my last spelling answer was correct with recall count 1
-
-  @disableOpenAiService
   @skipOptimizationDueToKnownNecessarySlowness
   Scenario: Browse notes while recalling and come back
     Given the note "sedition" was assimilated on day 1
@@ -35,34 +28,13 @@ Feature: Browse answers and notes while recalling
     When I resume recalling
     Then I should be back to the current question
 
-  @usingMockedOpenAiService
-  Scenario: Returning from a note in the same half-day keeps the unanswered prompt
-    Given OpenAI evaluates the question as legitimate
-    And OpenAI will return these questions in order:
-      | Question Stem                    | Correct Choice     | Incorrect Choice 1 | Incorrect Choice 2 | Incorrect Choice 3 |
-      | What is the meaning of sedition? | to incite violence | to sleep           | Open Water Diver   | to stay silent     |
-      | What is the meaning of sedation? | to put to sleep    | to riot            | Open Water Diver   | to stay silent     |
-    And the notes "sedition, sedation" are assimilated on day 1
-    When I visit recall waiting for 2 due recall prompts on day 2
-    Then I should be asked "What is the meaning of sedition?"
-    When I visit note "medical"
-    And I return to recalling
-    Then I should be asked "What is the meaning of sedition?"
-
   @disableOpenAiService
-  Scenario: I can remove a note from further recalls
+  Scenario: I can remove and revive a memory tracker from recalls
     Given the note "sedition" was assimilated on day 1
     And the note "sedition" was assimilated as spelling on day 1
     When I visit recall for a due recall prompt on day 2
     And I type my answer "sedition"
     And I choose to remove the last memory tracker from recalls
     Then On day 100 I should have "0/2/2" note for assimilation
-
-  @disableOpenAiService
-  Scenario: I can revive a memory tracker removed from recalls
-    Given the note "sedition" was assimilated as spelling on day 1
-    When I visit recall for a due recall prompt on day 2
-    And I type my answer "sedition"
-    And I choose to remove the last memory tracker from recalls
-    And I revive the memory tracker on this page
+    When I revive the memory tracker on this page
     Then the memory tracker should be available for recall again

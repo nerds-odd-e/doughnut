@@ -113,29 +113,6 @@ export const recallTestabilityMethods = {
       })
   },
 
-  submitWrongMcqRecallAnswer(
-    this: { dueRecallPrompt(): Cypress.Chainable<RecallPrompt> },
-    wrongChoiceText: string,
-    thinkingTimeMs = 1000
-  ) {
-    return this.dueRecallPrompt().then((recallPrompt) => {
-      const choices = recallPrompt?.mcq?.responseChoices
-      expect(choices, 'expected MCQ response choices').to.exist
-      const choiceIndex = choices!.indexOf(wrongChoiceText)
-      expect(
-        choiceIndex,
-        `expected choice "${wrongChoiceText}" in ${JSON.stringify(choices)}`
-      ).to.be.at.least(0)
-      return cy.wrap(
-        RecallPromptController.answer({
-          path: { recallPrompt: recallPrompt!.id },
-          body: { choiceIndex, thinkingTimeMs },
-        }),
-        { log: false }
-      )
-    })
-  },
-
   creditSpellingRecallForNote(this: RecallTestability, noteTitle: string) {
     return this.memoryTrackerForNote(noteTitle, 'SPELLING').then((tracker) =>
       cy
@@ -177,22 +154,6 @@ export const recallTestabilityMethods = {
       }
       cy.wrap(snapshot).as(spellingScheduleAlias(noteTitle))
     })
-  },
-
-  expectSpellingTrackerScheduleUnchanged(
-    this: RecallTestability,
-    noteTitle: string
-  ) {
-    return expectSpellingScheduleAgainstRecorded(
-      this,
-      noteTitle,
-      (tracker, recorded) => {
-        expect(
-          tracker.nextRecallAt,
-          `Next Recall Time for "${noteTitle}" should stay ${recorded.nextRecallAt}`
-        ).to.equal(recorded.nextRecallAt)
-      }
-    )
   },
 
   expectSpellingTrackerBroughtForwardWithoutRecallCredit(

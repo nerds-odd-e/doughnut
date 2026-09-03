@@ -2,7 +2,6 @@ import { FlexiPredicate, HttpMethod, Operator } from '@anev/ts-mountebank'
 import ServiceMocker from '../../support/ServiceMocker'
 import testability from '../testability'
 import createOpenAiResponsesMock from './createOpenAiResponsesMock'
-import { assertFocusContextRetrievalPromptShapesMatch } from './openAiFocusContextRecallAssertions'
 import {
   cyFetchOpenAiImposterRequests,
   OPEN_AI_IMPOSTER_PORT,
@@ -122,10 +121,6 @@ const openAiService = () => {
         ).to.be.greaterThan(0)
         expect(postBodies.join('\n')).to.include(marker)
       })
-    },
-
-    expectResponsesPostBodiesIncludeFocusContextRetrievalPromptShapes() {
-      assertFocusContextRetrievalPromptShapesMatch()
     },
 
     stubConversationAiReplyStream(messages: Record<string, string>[]) {

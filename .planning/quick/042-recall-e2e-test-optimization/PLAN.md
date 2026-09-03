@@ -214,7 +214,7 @@ CURSOR_DEV=true nix develop -c pnpm backend:test_only
 
 ### 6. Merge remaining quiz, pages, browse, overlap, and dead stats
 Type: Structure
-Status: planned
+Status: done
 
 **Tests:**
 - `frequent_failure_warning.feature` (~8.1s)

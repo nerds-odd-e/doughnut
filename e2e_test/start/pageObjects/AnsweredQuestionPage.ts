@@ -1,7 +1,6 @@
 import { waitUntilAppIsNotBusy } from '../pageBase'
 import {
   expectAccidentalMatchRevealForNotes,
-  expectNoMatchedNotesOrAccidentalMatch,
   expectOverlapTryAgainAlert,
 } from './answeredQuestionAccidentalMatch'
 import { assumeMemoryTrackerPage } from './memoryTrackerPage'
@@ -49,10 +48,6 @@ const assumeAnsweredQuestionPage = () => {
       expectOverlapTryAgainAlert()
       return self
     },
-    expectNoMatchedNotesOrAccidentalMatchOnOverlap() {
-      expectNoMatchedNotesOrAccidentalMatch()
-      return self
-    },
     trySpellingQuestionAgain() {
       cy.findByTestId('overlap-try-again').scrollIntoView().click()
       waitUntilAppIsNotBusy()
@@ -84,19 +79,6 @@ const assumeAnsweredQuestionPage = () => {
       waitUntilAppIsNotBusy()
       cy.findByText('Note under question').should('be.visible')
       return assumeAnsweredQuestionPage()
-    },
-    expectFrequentFailureWarningForNote(
-      wrongCount: number,
-      periodDays: number
-    ) {
-      waitUntilAppIsNotBusy()
-      cy.get('dialog')
-        .filter(':visible')
-        .should(
-          'contain.text',
-          `You've answered incorrectly ${wrongCount} times within the last ${periodDays} days.`
-        )
-      return self
     },
   }
   return self

@@ -18,15 +18,6 @@ Then('I should see an overlap try-again alert for spelling', () => {
   start.assumeAnsweredQuestionPage().expectOverlapTryAgainForSpelling()
 })
 
-Then(
-  'I should not see matched notes or accidental match on the overlap result',
-  () => {
-    start
-      .assumeAnsweredQuestionPage()
-      .expectNoMatchedNotesOrAccidentalMatchOnOverlap()
-  }
-)
-
 When('I try the spelling question again', () => {
   start.assumeAnsweredQuestionPage().trySpellingQuestionAgain()
 })

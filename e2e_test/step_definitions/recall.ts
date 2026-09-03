@@ -102,50 +102,9 @@ When('I visit recall for a due recall prompt on day {int}', (day: number) => {
   start.recall().visitRecallPageAndWaitForQuestions(1)
 })
 
-When(
-  'I visit recall waiting for {int} due recall prompts on day {int}',
-  (promptCount: number, day: number) => {
-    start.testability().backendTimeTravelTo(day, 8)
-    start.recall().visitRecallPageAndWaitForQuestions(promptCount)
-  }
-)
-
 When('I visit recall', () => {
   start.recall().visitRecallPage()
 })
-
-When(
-  'I make {int} wrong answers over {int} days since day {int}, answering {string} to {string}',
-  (
-    _numWrongAnswers: number,
-    numDays: number,
-    startDay: number,
-    wrongAnswer: string,
-    questionStem: string
-  ) => {
-    const days = Array.from({ length: numDays }, (_, i) => startDay + i)
-
-    const submitWrongAnswerForDay = (index: number) => {
-      if (index >= days.length) {
-        return
-      }
-      const day = days[index]!
-      const isLast = index === days.length - 1
-      start.testability().backendTimeTravelTo(day, 8)
-      if (isLast) {
-        start.recall().visitRecallPage()
-        start.assumeQuestionPage(questionStem).answer(wrongAnswer)
-        start
-          .assumeAnsweredQuestionPage()
-          .expectMCQAnswerToBeIncorrect(wrongAnswer)
-      } else {
-        start.testability().submitWrongMcqRecallAnswer(wrongAnswer)
-      }
-      cy.then(() => submitWrongAnswerForDay(index + 1))
-    }
-    submitWrongAnswerForDay(0)
-  }
-)
 
 When('I choose Good', () => {
   start.recall().assumeRecallPage().chooseGood()
@@ -199,12 +158,6 @@ When('I resume recalling', () => {
   start.recall().resumeRecall()
 })
 
-When('I return to recalling', () => {
-  start.recall().returnToRecallFromDetour()
-  // Flush Vue remount timeouts under cy.clock() so the restored question is visible.
-  cy.tick(1)
-})
-
 Then('I should be back to the current question', () => {
   start.recall().assumeRecallPage().expectCurrentQuestion()
 })
@@ -212,12 +165,3 @@ Then('I should be back to the current question', () => {
 Then('I should be asked {string}', (expectedQuestionStem: string) => {
   start.assumeQuestionPage(expectedQuestionStem)
 })
-
-Then(
-  'I should see a frequent failure warning for the note with {int} wrong answers in {int} days',
-  (wrongCount: number, periodDays: number) => {
-    start
-      .assumeAnsweredQuestionPage()
-      .expectFrequentFailureWarningForNote(wrongCount, periodDays)
-  }
-)

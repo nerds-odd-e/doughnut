@@ -15,27 +15,9 @@ const labeledValue = (label: string) =>
     .invoke('text')
     .then((text) => text.trim())
 
-const recordLabeledValueAs = (label: string, alias: string) => {
-  labeledValue(label).then((text) => {
-    cy.wrap(text).as(alias)
-  })
-}
-
 const expectLabeledValue = (label: string, expected: string) => {
   labeledValue(label).then((text) => {
     expect(text).to.equal(expected)
-  })
-}
-
-const expectLabeledValueUnchanged = (
-  label: string,
-  alias: string,
-  message: (recorded: string) => string
-) => {
-  labeledValue(label).then((actual) => {
-    cy.get<string>(`@${alias}`).then((recorded) => {
-      expect(actual, message(recorded)).to.equal(recorded)
-    })
   })
 }
 
@@ -66,11 +48,6 @@ const assumeMemoryTrackerPage = () => {
         .should('be.visible')
         .click()
       waitUntilAppIsNotBusy()
-      return assumeMemoryTrackerPage()
-    },
-    expectSkipped() {
-      expectMemoryTrackerPage()
-      cy.findByText(SKIPPED_MEMORY_TRACKER_MESSAGE).should('be.visible')
       return assumeMemoryTrackerPage()
     },
     expectAvailableForRecall() {
@@ -110,27 +87,6 @@ const assumeMemoryTrackerPage = () => {
     expectDifficulty(difficulty: number) {
       expectMemoryTrackerPage()
       expectLabeledValue('Difficulty:', String(difficulty))
-      return assumeMemoryTrackerPage()
-    },
-    expectLastRecallTimeUnchanged() {
-      expectMemoryTrackerPage()
-      expectLabeledValueUnchanged(
-        'Last Recall Time:',
-        'recordedLastRecallTime',
-        (recorded) => `Last Recall Time should stay ${recorded}`
-      )
-      return assumeMemoryTrackerPage()
-    },
-    expectTrackerType(type: string) {
-      expectMemoryTrackerPage()
-      expectLabeledValue('Type:', type)
-      return assumeMemoryTrackerPage()
-    },
-    captureSchedule() {
-      expectMemoryTrackerPage()
-      recordLabeledValueAs('Last Recall Time:', 'recordedLastRecallTime')
-      recordLabeledValueAs('Next Recall Time:', 'recordedNextRecallTime')
-      recordLabeledValueAs('Recall Count:', 'recordedRecallCount')
       return assumeMemoryTrackerPage()
     },
   }

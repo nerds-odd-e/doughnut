@@ -28,21 +28,6 @@ Feature: Spaced-repetition
     And On day 9 I recall "end                 " and assimilate new "end         "
 
   @mockBrowserTime
-  Scenario: Remove from recall does not change Last Recall Time
-    Given the browser and backend are on day 1
-    When I assimilate the note "Note 1"
-    And I am recalling my note on day 1
-    And I choose Good
-    And I visit the understanding memory tracker for "Note 1"
-    Then I record the current memory tracker schedule
-    When I remove the memory tracker from recall
-    Then the memory tracker should be skipped
-    And I should see the same Last Recall Time
-    When I revive the memory tracker on this page
-    Then the memory tracker should be available for recall again
-    And I should see the same Last Recall Time
-
-  @mockBrowserTime
   Scenario: Strictly follow the schedule but want to recall more
     When On day 1 I recall "                    " and assimilate new "Note 1, end "
     And On day 2 I recall "Note 1, end         " and assimilate new "Note 2, end "

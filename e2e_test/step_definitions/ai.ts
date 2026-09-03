@@ -65,23 +65,6 @@ Given(
   }
 )
 
-Given(
-  'OpenAI generates these MCQs when focus context matches depth-two wiki path, folder siblings, and wiki-linked Bahamas note:',
-  (questionTable: DataTable) => {
-    const rows = questionTable.hashes()
-    start.questionGenerationService().stubMcqForFocusContextRetrievalCases(rows)
-  }
-)
-
-Then(
-  'OpenAI Responses POST bodies include wiki-linked, depth-two wiki path, and folder-sibling focus context prompts',
-  () => {
-    mock_services
-      .openAi()
-      .expectResponsesPostBodiesIncludeFocusContextRetrievalPromptShapes()
-  }
-)
-
 const defaultReplacementMcq = {
   'Question Stem': 'Second question',
   'Correct Choice': 'Rescue Diver',

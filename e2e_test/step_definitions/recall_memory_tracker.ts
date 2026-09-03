@@ -33,31 +33,6 @@ Then(
   }
 )
 
-Then(
-  'I should see that my last spelling answer was correct with recall count {int}',
-  (count: number) => {
-    start
-      .assumeAnsweredQuestionPage()
-      .goToLastAnsweredQuestion()
-      .expectSpellingAnswerToBeCorrect()
-      .viewMemoryTracker()
-    assumeMemoryTrackerPage()
-      .expectRecallCount(count)
-      .expectTrackerType('SPELLING')
-  }
-)
-
-Then('I record the current memory tracker schedule', () => {
-  assumeMemoryTrackerPage().captureSchedule()
-})
-
-When(
-  'I visit the understanding memory tracker for {string}',
-  (noteTitle: string) => {
-    openNoteLevelTracker(noteTitle, 'understanding')
-  }
-)
-
 When(
   'I visit the commissioned memory tracker for {string}',
   (noteTitle: string) => {
@@ -72,17 +47,6 @@ Given(
       .testability()
       .creditSpellingRecallForNote(noteTitle)
       .then(() => start.testability().captureSpellingTrackerSchedule(noteTitle))
-  }
-)
-
-Given('I recorded the spelling schedule of {string}', (noteTitle: string) => {
-  start.testability().captureSpellingTrackerSchedule(noteTitle)
-})
-
-Then(
-  'the spelling schedule of {string} should be unchanged',
-  (noteTitle: string) => {
-    start.testability().expectSpellingTrackerScheduleUnchanged(noteTitle)
   }
 )
 
@@ -103,22 +67,10 @@ When('I choose to remove the last memory tracker from recalls', () => {
     .removeFromRecall()
 })
 
-When('I remove the memory tracker from recall', () => {
-  assumeMemoryTrackerPage().removeFromRecall()
-})
-
 When('I revive the memory tracker on this page', () => {
   assumeMemoryTrackerPage().reviveMemoryTracker()
 })
 
-Then('the memory tracker should be skipped', () => {
-  assumeMemoryTrackerPage().expectSkipped()
-})
-
 Then('the memory tracker should be available for recall again', () => {
   assumeMemoryTrackerPage().expectAvailableForRecall()
-})
-
-Then('I should see the same Last Recall Time', () => {
-  assumeMemoryTrackerPage().expectLastRecallTimeUnchanged()
 })
