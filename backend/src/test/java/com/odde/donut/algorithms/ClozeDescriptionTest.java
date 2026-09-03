@@ -156,6 +156,15 @@ class ClozeDescriptionTest {
   }
 
   @Test
+  void clozeShouldNotTreatWikiPathSlashesAsPronunciation() {
+    assertThat(
+        new ClozedString(clozeReplacement, "[[漢字/全/全く]]")
+            .hide(new NoteTitle("moon"))
+            .maskedContentAsMarkdown(),
+        is("[[漢字/全/全く]]"));
+  }
+
+  @Test
   void clozeShouldMaskPronunciationFollowedByJapaneseParticle() {
     String markdown = "/あしかが よしみつ/は、室町時代前期の室町幕府第3代将軍（在職：1369年 - 1395年）である。";
     String result =

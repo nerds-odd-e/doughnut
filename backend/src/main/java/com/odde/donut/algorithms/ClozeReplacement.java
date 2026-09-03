@@ -70,6 +70,11 @@ record ClozeReplacement(
     StringBuffer pronunciationsReplaced = new StringBuffer();
     List<TitleFragment> pronunciationSpellings = new ArrayList<>();
     while (matcher.find()) {
+      if (overlapsWikiLink(contentToProcess, matcher.start(), matcher.end())) {
+        matcher.appendReplacement(
+            pronunciationsReplaced, Matcher.quoteReplacement(matcher.group(0)));
+        continue;
+      }
       pronunciationSpellings.add(TitleFragment.from(matcher.group(1)));
       matcher.appendReplacement(
           pronunciationsReplaced, Matcher.quoteReplacement(internalPronunciationReplacement));
@@ -89,5 +94,15 @@ record ClozeReplacement(
         .replace(internalPronunciationReplacement, pronunciationReplacement)
         .replace(internalPronunciationSpellingReplacement, fullMatchReplacement)
         .replace(HtmlOrMarkdown.NON_WHITESPACE_CONTEXT_MARKER, "");
+  }
+
+  private static boolean overlapsWikiLink(String content, int start, int end) {
+    Matcher wiki = WikiLinkMarkdown.INNER_LINK_PATTERN.matcher(content);
+    while (wiki.find()) {
+      if (start < wiki.end() && end > wiki.start()) {
+        return true;
+      }
+    }
+    return false;
   }
 }
