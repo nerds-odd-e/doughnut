@@ -1,5 +1,5 @@
 <template>
-  <AssimilationSettings
+  <NoteAssimilationModes
     :note="note"
     :note-info-loaded="noteInfoLoaded"
     @assimilate="onAssimilate"
@@ -25,7 +25,7 @@
 
 <script setup lang="ts">
 import type { Note } from "@generated/donut-backend-api"
-import AssimilationSettings from "./AssimilationSettings.vue"
+import NoteAssimilationModes from "./NoteAssimilationModes.vue"
 import SpellingVerificationPopup from "./SpellingVerificationPopup.vue"
 import { provide, toRef } from "vue"
 import type { AssimilateEvent } from "@/composables/useAssimilateUnit"
@@ -44,7 +44,7 @@ const emit = defineEmits<{
   (e: "reloadNeeded"): void
 }>()
 
-// Re-provide the resolved instance so `AssimilationSettings.vue` (our own
+// Re-provide the resolved instance so `NoteAssimilationModes.vue` (our own
 // child) always shares it, even in isolated mounts (tests) that render
 // this panel without `NoteShow.vue`'s ancestor provider.
 const memoryTrackerActions = useInjectedMemoryTrackerActions(

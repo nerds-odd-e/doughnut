@@ -39,12 +39,12 @@ describe("NoteToolbar assimilation panel", () => {
 
     const panelShell = wrapper.find('[data-testid="note-toolbar-panel-shell"]')
     expect(panelShell.exists()).toBe(true)
-    const assimilationSettings = panelShell.find(
-      '[data-testid="assimilation-settings"]'
+    const assimilationModes = panelShell.find(
+      '[data-testid="note-assimilation-modes"]'
     )
-    expect(assimilationSettings.exists()).toBe(true)
+    expect(assimilationModes.exists()).toBe(true)
     expect(
-      assimilationSettings.find(".max-h-\\[min\\(40vh\\,22rem\\)\\]").exists()
+      assimilationModes.find(".max-h-\\[min\\(40vh\\,22rem\\)\\]").exists()
     ).toBe(false)
 
     useAssimilationView().dismiss()
@@ -63,18 +63,18 @@ describe("NoteToolbar assimilation panel", () => {
     useAssimilationView().openForNote(noteRealm.note.id)
     await flushPromises()
 
-    expect(wrapper.find('[data-testid="assimilation-settings"]').exists()).toBe(
-      true
-    )
+    expect(
+      wrapper.find('[data-testid="note-assimilation-modes"]').exists()
+    ).toBe(true)
 
     await wrapper
       .find(`button[title="${noteMoreOptionsTitles.audio}"]`)
       .trigger("click")
     await flushPromises()
 
-    expect(wrapper.find('[data-testid="assimilation-settings"]').exists()).toBe(
-      false
-    )
+    expect(
+      wrapper.find('[data-testid="note-assimilation-modes"]').exists()
+    ).toBe(false)
     expect(
       wrapper.find('[data-testid="note-toolbar-panel-shell"]').exists()
     ).toBe(true)
@@ -82,9 +82,9 @@ describe("NoteToolbar assimilation panel", () => {
     useAssimilationView().openForNote(noteRealm.note.id)
     await flushPromises()
 
-    expect(wrapper.find('[data-testid="assimilation-settings"]').exists()).toBe(
-      true
-    )
+    expect(
+      wrapper.find('[data-testid="note-assimilation-modes"]').exists()
+    ).toBe(true)
     expect(wrapper.find('button[title="Record Audio"]').exists()).toBe(false)
   })
 })

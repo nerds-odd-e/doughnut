@@ -6,15 +6,15 @@ const targetNoteId = ref<number | null>(null)
 export function useAssimilationView() {
   const { activePanel, close: closePanel } = useNoteToolbarPanel()
 
-  const showAssimilationSettings = computed(
+  const showAssimilationPanel = computed(
     () => activePanel.value === "assimilation"
   )
 
   const isOpenForNote = (noteId: number) =>
-    showAssimilationSettings.value && targetNoteId.value === noteId
+    showAssimilationPanel.value && targetNoteId.value === noteId
 
-  const closeAssimilationSettingsIfOpen = () => {
-    if (showAssimilationSettings.value) {
+  const closeAssimilationPanelIfOpen = () => {
+    if (showAssimilationPanel.value) {
       closePanel()
     }
   }
@@ -29,12 +29,12 @@ export function useAssimilationView() {
       activePanel.value = "assimilation"
       return
     }
-    closeAssimilationSettingsIfOpen()
+    closeAssimilationPanelIfOpen()
   }
 
   const dismiss = () => {
     targetNoteId.value = null
-    closeAssimilationSettingsIfOpen()
+    closeAssimilationPanelIfOpen()
   }
 
   const toggle = (noteId: number) => {
@@ -46,7 +46,7 @@ export function useAssimilationView() {
   }
 
   return {
-    showAssimilationSettings,
+    showAssimilationPanel,
     targetNoteId,
     isOpenForNote,
     openForNote,

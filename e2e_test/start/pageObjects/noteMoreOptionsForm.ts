@@ -10,7 +10,7 @@ import { questionListPage } from './questionListPage'
 
 const titles = {
   audio: 'Audio tools',
-  assimilation: 'Assimilation settings',
+  assimilation: 'Assimilate',
   delete: 'Delete note (d)',
   questions: 'Questions for the note',
 } as const

@@ -56,7 +56,7 @@
 ### 5. Note-level assimilation entry point no longer calls itself "settings"
 
 - **Type:** Behavior
-- **Status:** planned
+- **Status:** done
 - **Pre-condition:** `AssimilationSettings.vue` (the note-level wrapper around `<AssimilationModes>`) contains no settings — its only job, since the redesign, is supplying `allowedModes: [COMMISSIONED, SPELLING, UNDERSTANDING]` and wiring events — yet its filename, `data-testid`, `aria-label`, the composable that gates its visibility (`useAssimilationView.ts`'s `showAssimilationSettings`/`closeAssimilationSettingsIfOpen`), and the note's "more options" menu item that opens it (`noteMoreOptionsTitles.assimilation`, visible text `"Assimilation settings"`) all still say "settings".
 - **Trigger:** a developer reads the component/composable names, or a user opens a note's "more options" menu.
 - **Post-condition:** the component file is `NoteAssimilationModes.vue` (`data-testid="note-assimilation-modes"`, `aria-label="Assimilation modes"`); `useAssimilationView.ts` exports `showAssimilationPanel`/`closeAssimilationPanelIfOpen` in place of the `...Settings` names (other exports — `isOpenForNote`, `openForNote`, `resetForNote`, `dismiss`, `toggle` — are unaffected, they never had "settings" in the name); the "more options" menu item reads **"Assimilate"** (ADR 0001's own verb for this feature area, already used by the left-nav item) instead of "Assimilation settings". No production code or test contains the string `"assimilation-settings"` or `"Assimilation settings"` afterward.

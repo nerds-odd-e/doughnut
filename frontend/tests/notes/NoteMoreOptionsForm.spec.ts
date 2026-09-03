@@ -174,8 +174,8 @@ describe("NoteMoreOptionsForm", () => {
       await flushPromises()
 
       expect(router.currentRoute.value.path).toBe("/")
-      const { showAssimilationSettings, targetNoteId } = useAssimilationView()
-      expect(showAssimilationSettings.value).toBe(true)
+      const { showAssimilationPanel, targetNoteId } = useAssimilationView()
+      expect(showAssimilationPanel.value).toBe(true)
       expect(targetNoteId.value).toBe(note.id)
     })
 

@@ -1,7 +1,7 @@
 <template>
   <section
-    aria-label="Assimilation settings"
-    data-testid="assimilation-settings"
+    aria-label="Assimilation modes"
+    data-testid="note-assimilation-modes"
     class="flex flex-wrap items-center gap-2"
   >
     <AssimilationModes

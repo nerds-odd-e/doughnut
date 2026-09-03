@@ -82,7 +82,7 @@ export const noteRichPropertyAssimilationMethods = () => ({
     return this
   },
   expectAssimilationSettingsAbsent() {
-    cy.get('[data-testid="assimilation-settings"]').should('not.exist')
+    cy.get('[data-testid="note-assimilation-modes"]').should('not.exist')
     return this
   },
 })

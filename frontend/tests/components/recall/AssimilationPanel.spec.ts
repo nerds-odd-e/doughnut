@@ -41,19 +41,19 @@ describe("AssimilationPanel", () => {
   it("does not show a heading or the assimilated/planned/total summary", async () => {
     const wrapper = await mountAssimilationPanelReady()
 
-    const settings = wrapper.find('[data-testid="assimilation-settings"]')
-    expect(settings.find("h2").exists()).toBe(false)
+    const modes = wrapper.find('[data-testid="note-assimilation-modes"]')
+    expect(modes.find("h2").exists()).toBe(false)
     expect(
-      settings.find('[data-test="assimilation-progress-summary"]').exists()
+      modes.find('[data-test="assimilation-progress-summary"]').exists()
     ).toBe(false)
   })
 
-  it("does not show Level radios in assimilation settings", async () => {
+  it("does not show Level radios in assimilation modes", async () => {
     const wrapper = await mountAssimilationPanelReady()
 
     expect(
       wrapper
-        .find('[data-testid="assimilation-settings"] [role="radiogroup"]')
+        .find('[data-testid="note-assimilation-modes"] [role="radiogroup"]')
         .exists()
     ).toBe(false)
   })

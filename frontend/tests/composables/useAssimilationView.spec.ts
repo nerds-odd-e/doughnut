@@ -7,52 +7,52 @@ describe("useAssimilationView", () => {
   })
 
   it("openForNote turns settings on for the given note", () => {
-    const { openForNote, showAssimilationSettings, targetNoteId } =
+    const { openForNote, showAssimilationPanel, targetNoteId } =
       useAssimilationView()
 
     openForNote(5)
 
-    expect(showAssimilationSettings.value).toBe(true)
+    expect(showAssimilationPanel.value).toBe(true)
     expect(targetNoteId.value).toBe(5)
   })
 
   it("resetForNote shows settings only for the target note", () => {
-    const { openForNote, resetForNote, showAssimilationSettings } =
+    const { openForNote, resetForNote, showAssimilationPanel } =
       useAssimilationView()
 
     openForNote(5)
     resetForNote(5)
-    expect(showAssimilationSettings.value).toBe(true)
+    expect(showAssimilationPanel.value).toBe(true)
 
     resetForNote(7)
-    expect(showAssimilationSettings.value).toBe(false)
+    expect(showAssimilationPanel.value).toBe(false)
   })
 
   it("resetForNote hides settings when there is no target note", () => {
-    const { resetForNote, showAssimilationSettings } = useAssimilationView()
+    const { resetForNote, showAssimilationPanel } = useAssimilationView()
 
     resetForNote(5)
-    expect(showAssimilationSettings.value).toBe(false)
+    expect(showAssimilationPanel.value).toBe(false)
   })
 
   it("toggle turns settings on for a note when off", () => {
-    const { toggle, showAssimilationSettings, targetNoteId } =
+    const { toggle, showAssimilationPanel, targetNoteId } =
       useAssimilationView()
 
     toggle(3)
 
-    expect(showAssimilationSettings.value).toBe(true)
+    expect(showAssimilationPanel.value).toBe(true)
     expect(targetNoteId.value).toBe(3)
   })
 
   it("toggle turns settings off when already on for the same note", () => {
-    const { openForNote, toggle, showAssimilationSettings, targetNoteId } =
+    const { openForNote, toggle, showAssimilationPanel, targetNoteId } =
       useAssimilationView()
 
     openForNote(3)
     toggle(3)
 
-    expect(showAssimilationSettings.value).toBe(false)
+    expect(showAssimilationPanel.value).toBe(false)
     expect(targetNoteId.value).toBe(null)
   })
 

@@ -87,8 +87,8 @@ describe("useGoToNextAssimilation", () => {
     expect(assimilatedCountOfTheDay.value).toBe(1)
     expect(totalUnassimilatedCount.value).toBe(5)
 
-    const { showAssimilationSettings, targetNoteId } = useAssimilationView()
-    expect(showAssimilationSettings.value).toBe(true)
+    const { showAssimilationPanel, targetNoteId } = useAssimilationView()
+    expect(showAssimilationPanel.value).toBe(true)
     expect(targetNoteId.value).toBe(42)
 
     expect(routerPush).toHaveBeenCalledWith(noteShowLocation(42))
@@ -108,8 +108,8 @@ describe("useGoToNextAssimilation", () => {
     const { goToNextAssimilation } = useGoToNextAssimilation()
     await goToNextAssimilation()
 
-    const { showAssimilationSettings } = useAssimilationView()
-    expect(showAssimilationSettings.value).toBe(false)
+    const { showAssimilationPanel } = useAssimilationView()
+    expect(showAssimilationPanel.value).toBe(false)
     expect(routerPush).toHaveBeenCalledWith(
       notePropertyLocation(42, "example of")
     )

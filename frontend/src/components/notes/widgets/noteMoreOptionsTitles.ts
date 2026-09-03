@@ -14,7 +14,7 @@ export const noteMoreOptionsTitles = {
   mcqs: "Questions for the note",
   refine: "Refine note",
   audio: "Audio tools",
-  assimilation: "Assimilation settings",
+  assimilation: "Assimilate",
   delete: "Delete note (d)",
   overflowMenu: "more options",
 } as const
