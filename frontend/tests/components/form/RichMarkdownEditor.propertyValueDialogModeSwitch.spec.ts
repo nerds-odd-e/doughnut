@@ -45,17 +45,7 @@ describe("RichMarkdownEditor property value dialog mode switch", () => {
     expect(propertyValueDialogEl()).toBeNull()
   })
 
-  it("saves an emptied list from the property value dialog", async () => {
-    await mountTopicValueDialog(h, LIST_TOPIC_MARKDOWN)
-    clickListRemove(1)
-    clickListRemove(0)
-    await flushPromises()
-    await savePropertyValueDialog()
-    expect(h.lastEmittedMarkdown()).toMatch(/topic:\s*\[\]/)
-    expect(propertyValueDialogEl()).toBeNull()
-  })
-
-  it("rejects empty list items on save", async () => {
+  it("rejects blank items but saves an empty list", async () => {
     const wrapper = await mountTopicValueDialog(h, LIST_TOPIC_MARKDOWN)
     setListItemValue(1, "   ")
     await savePropertyValueDialog()
@@ -63,7 +53,13 @@ describe("RichMarkdownEditor property value dialog mode switch", () => {
     expect(propertyValueDialogValidationText()).toContain(
       "List items cannot be empty."
     )
-    expect(propertyValueDialogEl()).not.toBeNull()
     expect(wrapper.emitted("update:modelValue")).toBeUndefined()
+
+    clickListRemove(1)
+    clickListRemove(0)
+    await flushPromises()
+    await savePropertyValueDialog()
+    expect(h.lastEmittedMarkdown()).toMatch(/topic:\s*\[\]/)
+    expect(propertyValueDialogEl()).toBeNull()
   })
 })

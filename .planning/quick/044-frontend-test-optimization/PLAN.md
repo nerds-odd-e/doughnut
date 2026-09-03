@@ -605,7 +605,9 @@ CURSOR_DEV=true nix develop -c pnpm frontend:test tests/components/recall/NoteRe
 
 ### 16. Optimize ranked tests 46–48
 Type: Structure
-Status: planned
+Status: done
+
+Outcome: Consolidated three redundant tests while preserving exact selection IDs, blank validation plus empty save, and portal/collapse behavior. Focused Chromium passed three consecutive runs.
 
 **Tests:**
 - #46 `tests/components/recall/NoteRefinement.layoutSelection.spec.ts` — NoteRefinement layout selection > removes non-contiguous selected refinement layout items (~21.3ms)

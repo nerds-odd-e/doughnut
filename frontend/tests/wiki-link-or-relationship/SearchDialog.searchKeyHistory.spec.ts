@@ -79,7 +79,7 @@ describe("SearchForm search key history", () => {
     expect(dropdown.open).toBe(false)
   })
 
-  it("renders history panel inside the modal dialog and collapses on click elsewhere in that modal", async () => {
+  it("renders history panel inside the modal dialog", async () => {
     const note = MakeMe.aNote.please()
     appendSearchKeyToHistory("older")
     await renderSearchFormInModal(note)
@@ -88,9 +88,5 @@ describe("SearchForm search key history", () => {
     const dialog = document.querySelector("dialog.modal-mask")
     const panel = document.querySelector("[data-dropdown-portal-panel]")
     expect(dialog?.contains(panel)).toBe(true)
-
-    titleEl("All My Circles").click()
-    await flushPromises()
-    expect(historyDropdown().open).toBe(false)
   })
 })

@@ -46,16 +46,17 @@ describe("NoteRefinement layout selection", () => {
     expect(layoutCheckbox(wrapper, "p1-2").checked).toBe(false)
   })
 
-  it("submits only checked descendants when parent is indeterminate for remove", async () => {
+  it("submits checked non-contiguous items when parent is indeterminate for remove", async () => {
     const spy = mockSdkService(AiController, "removeRefinementSuggestion", {
       content: "Updated content",
     })
     const { layout, wrapper } =
       await mountNestedLayoutWithIndeterminateParentSelection()
+    await selectRefinementLayoutItem(wrapper, "p2")
     await clickRemoveRefinementLayout(wrapper)
 
     expect(spy).toHaveBeenCalledWith(
-      refinementLayoutSelectionApiCall(note.id, layout, ["p1-1"])
+      refinementLayoutSelectionApiCall(note.id, layout, ["p1-1", "p2"])
     )
   })
 
@@ -80,25 +81,6 @@ describe("NoteRefinement layout selection", () => {
           signal: true,
         }
       )
-    )
-  })
-
-  it("removes non-contiguous selected refinement layout items", async () => {
-    const layout = sampleNestedLayout()
-    const removeLayoutSpy = mockSdkService(
-      AiController,
-      "removeRefinementSuggestion",
-      {
-        content: "Updated content",
-      }
-    )
-    const wrapper = await mountNoteRefinementWithLayoutReady(layout)
-    await selectRefinementLayoutItem(wrapper, "p1-1")
-    await selectRefinementLayoutItem(wrapper, "p2")
-    await clickRemoveRefinementLayout(wrapper)
-
-    expect(removeLayoutSpy).toHaveBeenCalledWith(
-      refinementLayoutSelectionApiCall(note.id, layout, ["p1-1", "p2"])
     )
   })
 
