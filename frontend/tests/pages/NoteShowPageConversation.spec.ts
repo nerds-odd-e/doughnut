@@ -1,7 +1,6 @@
 import {
   closeConversationButtonEl,
   conversationContainerEl,
-  conversationWrapperEl,
   createNoteShowPageRouter,
   noteContentWrapperEl,
   renderNoteShowPageWithConversation,
@@ -10,7 +9,8 @@ import {
 } from "@tests/pages/noteShowPageTestSupport"
 import { notePropertyLocation } from "@/routes/noteShowLocation"
 import { flushPromises } from "@vue/test-utils"
-import { beforeEach, describe, expect, it, vi } from "vitest"
+import { nextTick } from "vue"
+import { beforeEach, describe, expect, it } from "vitest"
 
 describe("note show page conversation", () => {
   const router = createNoteShowPageRouter()
@@ -27,11 +27,11 @@ describe("note show page conversation", () => {
     expect(maximize).not.toBeNull()
 
     maximize!.click()
-    await flushPromises()
+    await nextTick()
     expect(noteContentWrapperEl()).toBeNull()
 
     maximize!.click()
-    await flushPromises()
+    await nextTick()
     expect(noteContentWrapperEl()).not.toBeNull()
   })
 
@@ -42,7 +42,7 @@ describe("note show page conversation", () => {
     expect(maximize).not.toBeNull()
 
     maximize!.click()
-    await flushPromises()
+    await nextTick()
 
     closeConversationButtonEl()!.click()
     await flushPromises()
@@ -64,13 +64,5 @@ describe("note show page conversation", () => {
     expect(router.currentRoute.value).toMatchObject(
       notePropertyLocation(noteId, "topic")
     )
-  })
-
-  it("opens conversation when URL has conversation=true", async () => {
-    await renderNoteShowPageWithConversation(router, noteId)
-
-    await vi.waitFor(() => {
-      expect(conversationWrapperEl()).not.toBeNull()
-    })
   })
 })

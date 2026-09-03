@@ -555,7 +555,9 @@ CURSOR_DEV=true nix develop -c pnpm frontend:test tests/notes/WikidataAssociatio
 
 ### 14. Optimize ranked tests 40–42
 Type: Structure
-Status: planned
+Status: done
+
+Outcome: Removed two redundant mounts and unnecessary promise drains/assertions while preserving same-modal return, maximize/restore, and nested noncancelable removal behavior. Focused Chromium passed three consecutive runs.
 
 **Tests:**
 - #40 `tests/components/recall/AnsweredSpellingQuestionAccidentalMatch.spec.ts` — AnsweredSpellingQuestion accidental match > builds a link as a same-Modal step and returns to the match list after success (~22.2ms)

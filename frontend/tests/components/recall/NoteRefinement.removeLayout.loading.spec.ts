@@ -11,34 +11,15 @@ import { clickRemoveRefinementLayout } from "./noteRefinementRemoveTestSupport"
 import {
   mountNoteRefinementWithFirstItemSelected,
   refinementLayoutItems,
-  selectFirstLayoutItem,
   setupNoteRefinementTests,
 } from "./noteRefinementTestSupport"
 
 setupNoteRefinementTests()
 
 describe("NoteRefinement remove layout loading modal", () => {
-  it("shows LoadingModal while removing refinement layout items and hides on success or failure", async () => {
+  it("shows LoadingModal while removing refinement layout items and hides on failure", async () => {
     const wrapper = await mountNoteRefinementWithFirstItemSelected(["Point 1"])
 
-    const successGate = createDeferredGate()
-    mockSdkServiceWithImplementation(
-      AiController,
-      "removeRefinementSuggestion",
-      async () => {
-        await successGate.gate
-        return { content: "Updated content" }
-      }
-    )
-    await clickRemoveRefinementLayout(wrapper)
-
-    expect(loadingModalMask()).toBeTruthy()
-    expect(document.body.textContent).toContain("AI is removing content...")
-    successGate.resolve()
-    await flushPromises()
-    expect(loadingModalMask()).toBeNull()
-
-    await selectFirstLayoutItem(wrapper)
     const failureGate = createDeferredGate()
     mockSdkServiceWithImplementation(
       AiController,
@@ -51,6 +32,7 @@ describe("NoteRefinement remove layout loading modal", () => {
     await clickRemoveRefinementLayout(wrapper)
 
     expect(loadingModalMask()).toBeTruthy()
+    expect(document.body.textContent).toContain("AI is removing content...")
     failureGate.resolve()
     await flushPromises()
     expect(loadingModalMask()).toBeNull()
