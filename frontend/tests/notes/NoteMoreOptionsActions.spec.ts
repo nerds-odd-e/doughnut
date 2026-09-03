@@ -6,7 +6,6 @@ import helper, { mockSdkService } from "@tests/helpers"
 import { wrapWithNoteShortcutScope } from "@tests/helpers/noteShortcutScopeTestHelpers"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
 import { afterEach, beforeEach, describe, expect, it } from "vitest"
-import { screen } from "@testing-library/vue"
 
 const aiMarkdownStub = { markdown: "# AI context\n\nHello **world**." }
 
@@ -69,17 +68,22 @@ describe("NoteMoreOptionsActions keyboard shortcut", () => {
   }
 
   it.each(["toolbar", "menu"] as const)(
-    "opens the export dialog when e is pressed (layout=%s)",
+    "opens the export dialog with e and ignores d while it is open (layout=%s)",
     async (layout) => {
-      mountActions(layout)
-
+      mountActionsWithStorage(layout)
       await flushPromises()
-      expect(document.querySelector("dialog")).toBeNull()
 
       dispatchNoteExportShortcut()
       await flushPromises()
 
-      expect(await screen.findByText("Export Note Data")).toBeInTheDocument()
+      expect(
+        (document.querySelector("dialog") as HTMLDialogElement)?.open
+      ).toBe(true)
+
+      dispatchNoteDeleteShortcut()
+      await flushPromises()
+
+      expect(usePopups().popups.peek()).toHaveLength(0)
       expect(
         (document.querySelector("dialog") as HTMLDialogElement)?.open
       ).toBe(true)
@@ -101,26 +105,6 @@ describe("NoteMoreOptionsActions keyboard shortcut", () => {
       expect(popups?.length).toBe(1)
       expect(popups?.[0]?.type).toBe("confirm")
       expect(popups?.[0]?.message).toBe('Confirm to delete "Note1.1.1"?')
-    }
-  )
-
-  it.each(["toolbar", "menu"] as const)(
-    "ignores d while the export dialog is open (layout=%s)",
-    async (layout) => {
-      mountActionsWithStorage(layout)
-
-      await flushPromises()
-      dispatchNoteExportShortcut()
-      await flushPromises()
-      expect(await screen.findByText("Export Note Data")).toBeInTheDocument()
-
-      dispatchNoteDeleteShortcut()
-      await flushPromises()
-
-      expect(usePopups().popups.peek()).toHaveLength(0)
-      expect(
-        (document.querySelector("dialog") as HTMLDialogElement)?.open
-      ).toBe(true)
     }
   )
 

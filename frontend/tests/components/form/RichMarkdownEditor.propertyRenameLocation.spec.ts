@@ -34,9 +34,13 @@ Body.`
     h.cleanup()
   })
 
-  it("replaces to noteProperty with the new exact key and keeps the property focused", async () => {
+  it("replaces to noteProperty with the new exact key, preserves query values, and keeps the property focused", async () => {
+    const conversationQuery = { conversation: "true" }
     const wrapper = await mountEditorOnNoteShow(h, markdown, {
-      route: notePropertyLocation(noteId, "topic"),
+      route: {
+        ...notePropertyLocation(noteId, "topic"),
+        query: conversationQuery,
+      },
     })
     const router = wrapper.vm.$router
     const replaceSpy = vi.spyOn(router, "replace")
@@ -49,6 +53,7 @@ Body.`
     expect(router.currentRoute.value).toMatchObject(
       notePropertyLocation(noteId, "Subject Matter")
     )
+    expect(router.currentRoute.value.query).toEqual(conversationQuery)
     expect(
       wrapper
         .find(propertyRowSelector("Subject Matter"))
@@ -57,24 +62,6 @@ Body.`
     expectPropertyPanelOpen(
       wrapper.find(propertyRowSelector("Subject Matter")).element
     )
-  })
-
-  it("preserves unrelated query values when the focused property key is renamed", async () => {
-    const conversationQuery = { conversation: "true" }
-    const wrapper = await mountEditorOnNoteShow(h, markdown, {
-      route: {
-        ...notePropertyLocation(noteId, "topic"),
-        query: conversationQuery,
-      },
-    })
-    const router = wrapper.vm.$router
-
-    await attemptRenamePropertyKey(wrapper, 0, "subject")
-
-    expect(router.currentRoute.value).toMatchObject(
-      notePropertyLocation(noteId, "subject")
-    )
-    expect(router.currentRoute.value.query).toEqual(conversationQuery)
   })
 
   it("does not leave noteShow when renaming a property that is not focused by the route", async () => {

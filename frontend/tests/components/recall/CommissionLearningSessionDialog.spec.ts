@@ -143,7 +143,6 @@ describe("CommissionLearningSessionDialog", () => {
       document.body.querySelector('[data-test="learning-session-report"]')
     ).toBeTruthy()
 
-    document.body.querySelectorAll("dialog").forEach((el) => el.remove())
     mockSdkService(LearningSessionController, "record", {
       recordedAt: "1989-01-02T09:00:00Z",
       recordedItems: [{ noteTitle: "Hola", grade: 4, memoryTrackerId: 11 }],
@@ -154,7 +153,6 @@ describe("CommissionLearningSessionDialog", () => {
         },
       ],
     })
-    await openRequestMode()
     await clickRecordReportSubmit()
 
     expect(

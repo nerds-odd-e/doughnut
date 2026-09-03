@@ -978,7 +978,9 @@ CURSOR_DEV=true nix develop -c pnpm frontend:test tests/notes/NoteEditableConten
 
 ### 31. Optimize ranked tests 91–93
 Type: Structure
-Status: planned
+Status: done
+
+Outcome: Reused one dialog after record failure, consolidated toolbar/menu action journeys, and folded exact-key/query/focus rename behavior into one editor mount. Focused Chromium passed three consecutive runs.
 
 **Tests:**
 - #91 `tests/components/recall/CommissionLearningSessionDialog.spec.ts` — CommissionLearningSessionDialog > keeps report textarea when record fails and shows rejection warning on partial success (~14.0ms)
