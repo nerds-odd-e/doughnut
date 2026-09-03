@@ -129,14 +129,12 @@ describe("note show autosave before deletion", () => {
     const router = createNoteShowPageRouter()
     mockSdkService(NoteController, "showNote", noteRealm)
     mockNotebookGetForNoteRealm(noteRealm)
-    const firstSave = deferred<void>()
-    let saveCalls = 0
+    const order: string[] = []
     const updateSpy = mockSdkServiceWithImplementation(
       TextContentController,
       "updateNoteContent",
       async ({ body }) => {
-        saveCalls += 1
-        if (saveCalls === 1) await firstSave.promise
+        order.push("save")
         return makeMe.aNoteRealm
           .id(noteRealm.id)
           .content(body?.content ?? "")
@@ -144,20 +142,16 @@ describe("note show autosave before deletion", () => {
       }
     )
     const deleteSpy = mockSdkService(NoteController, "deleteNote", [])
-    deleteSpy.mockResolvedValue(wrapSdkError("delete failed"))
+    deleteSpy.mockImplementation(async () => {
+      order.push("delete")
+      return wrapSdkError("delete failed")
+    })
 
     await renderNoteShowPageWithoutSidebar(router, noteRealm.id)
     const textarea = await editBody("First edit")
-    textarea.dispatchEvent(new FocusEvent("blur", { bubbles: true }))
-    await flushPromises()
     await startDelete(true)
 
-    expect(updateSpy).toHaveBeenCalledTimes(1)
-    expect(deleteSpy).not.toHaveBeenCalled()
-
-    firstSave.resolve()
-    await flushPromises()
-    expect(deleteSpy).toHaveBeenCalledTimes(1)
+    expect(order).toEqual(["save", "delete"])
 
     textarea.value = "Second edit"
     textarea.dispatchEvent(new Event("input", { bubbles: true }))

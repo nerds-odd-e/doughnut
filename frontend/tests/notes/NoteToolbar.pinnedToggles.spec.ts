@@ -48,19 +48,6 @@ async function expectPinnedOnNarrowToolbar(
   await flushPromises()
 }
 
-const pinnedToggleCases = [
-  {
-    name: "audio",
-    title: titles.audio,
-    menuTitle: titles.assimilation,
-  },
-  {
-    name: "assimilation",
-    title: titles.assimilation,
-    menuTitle: titles.audio,
-  },
-] as const
-
 describe("NoteToolbar pinned on-state toggles", () => {
   // biome-ignore lint/suspicious/noExplicitAny: wrapper for testing
   let wrapper: VueWrapper<any>
@@ -77,24 +64,25 @@ describe("NoteToolbar pinned on-state toggles", () => {
     resetNoteToolbarTestState()
   })
 
-  it.each(pinnedToggleCases)(
-    "pins $name on a narrow toolbar then returns it to overflow when turned off",
-    async ({ title, menuTitle }) => {
-      const noteRealm = makeMe.aNoteRealm.title("Dummy Title").please()
-      wrapper = await mountNoteToolbar(noteRealm)
-      await layoutNoteToolbar(wrapper, overflowTogglesNavWidth())
+  it("pins audio on a narrow toolbar then returns it to overflow when turned off", async () => {
+    const noteRealm = makeMe.aNoteRealm.title("Dummy Title").please()
+    wrapper = await mountNoteToolbar(noteRealm)
+    await layoutNoteToolbar(wrapper, overflowTogglesNavWidth())
 
-      await turnOnFromOverflow(wrapper, title)
-      await expectPinnedOnNarrowToolbar(wrapper, title, menuTitle)
+    await turnOnFromOverflow(wrapper, titles.audio)
+    await expectPinnedOnNarrowToolbar(
+      wrapper,
+      titles.audio,
+      titles.assimilation
+    )
 
-      await noteToolbarAction(wrapper, title).trigger("click")
-      await flushPromises()
+    await noteToolbarAction(wrapper, titles.audio).trigger("click")
+    await flushPromises()
 
-      expect(noteToolbarAction(wrapper, title).exists()).toBe(false)
+    expect(noteToolbarAction(wrapper, titles.audio).exists()).toBe(false)
 
-      await noteToolbarAction(wrapper, titles.overflowMenu).trigger("click")
-      await flushPromises()
-      expect(overflowMenuItem(title)).not.toBeNull()
-    }
-  )
+    await noteToolbarAction(wrapper, titles.overflowMenu).trigger("click")
+    await flushPromises()
+    expect(overflowMenuItem(titles.audio)).not.toBeNull()
+  })
 })

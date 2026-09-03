@@ -255,7 +255,9 @@ CURSOR_DEV=true nix develop -c pnpm frontend:test tests/notes/NoteNewForm.wikida
 
 ### 2. Optimize ranked tests 4–6
 Type: Structure
-Status: planned
+Status: done
+
+Outcome: Replaced a day-scale fake-timer advance with one watchdog tick, simplified duplicated deferred-save setup, and removed a redundant assimilation pinning journey. Focused browser tests passed four consecutive runs.
 
 **Tests:**
 - #4 `tests/pages/NoteShowPage.autosaveDelete.spec.ts` — note show autosave before deletion > uses the same barrier for ordinary deletion and reopens it after delete failure (~45.1ms)
@@ -1694,4 +1696,3 @@ Run the same full-suite JSON profile, record the after metrics and new top-10% t
 **Candidates proposed this run:** pending
 
 **Commits:** pending
-

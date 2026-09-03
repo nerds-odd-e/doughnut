@@ -114,11 +114,11 @@ describe("useThinkingTimeTracker", () => {
     setTime(1000)
 
     // Device suspends without firing any pause/resume event. The clock
-    // jumps forward by hours in a single tick — this is what a watchdog
-    // tick observes once the interval fires again after wake.
-    setTime(1000 + 6 * 60 * 60 * 1000)
+    // jumps forward by hours, then one watchdog tick fires after wake.
+    mockNow(1000 + 6 * 60 * 60 * 1000)
+    vi.advanceTimersByTime(250)
 
-    setTime(1000 + 6 * 60 * 60 * 1000 + 500)
+    mockNow(1000 + 6 * 60 * 60 * 1000 + 500)
     await stopAndExpect(wrapper, "1500")
   })
 
