@@ -84,7 +84,7 @@ describe("adding new note", () => {
     wrapper.unmount()
   })
 
-  it("searches when user edits title back to 'Untitled'", async () => {
+  it("searches for duplicate titles, including after returning to the default title", async () => {
     sdkSpies.searchForRelationshipTargetWithinSpy.mockResolvedValue(
       wrapSdkResponse([
         {
@@ -101,37 +101,6 @@ describe("adding new note", () => {
       attachTo: document.body,
     })
 
-    await setNoteNewFormTitle(wrapper, "myth")
-    vi.runOnlyPendingTimers()
-    await flushPromises()
-    sdkSpies.searchForRelationshipTargetWithinSpy.mockClear()
-    await setNoteNewFormTitle(wrapper, "Untitled")
-    vi.runOnlyPendingTimers()
-    await flushPromises()
-
-    expect(sdkSpies.searchForRelationshipTargetWithinSpy).toHaveBeenCalledWith({
-      path: { note: noteNewFormNote.id },
-      body: expect.objectContaining({ searchKey: "Untitled" }),
-    })
-    wrapper.unmount()
-  })
-
-  it("search for duplicate", async () => {
-    sdkSpies.searchForRelationshipTargetWithinSpy.mockResolvedValue(
-      wrapSdkResponse([
-        {
-          hitKind: "NOTE",
-          noteSearchResult: {
-            noteTopology: noteNewFormNote.noteTopology,
-            notebookId: 1,
-            distance: 0.9,
-          },
-        },
-      ])
-    )
-    const wrapper = mountNoteNewForm(notebookRootProps, {
-      attachTo: document.body,
-    })
     await setNoteNewFormTitle(wrapper, "myth")
     vi.runOnlyPendingTimers()
     await flushPromises()
@@ -142,6 +111,16 @@ describe("adding new note", () => {
       body: expect.objectContaining({ searchKey: "myth" }),
     })
     expect(sdkSpies.semanticSearchWithinSpy).not.toHaveBeenCalled()
+
+    sdkSpies.searchForRelationshipTargetWithinSpy.mockClear()
+    await setNoteNewFormTitle(wrapper, "Untitled")
+    vi.runOnlyPendingTimers()
+    await flushPromises()
+
+    expect(sdkSpies.searchForRelationshipTargetWithinSpy).toHaveBeenCalledWith({
+      path: { note: noteNewFormNote.id },
+      body: expect.objectContaining({ searchKey: "Untitled" }),
+    })
     wrapper.unmount()
   })
 

@@ -2,8 +2,10 @@ import {
   NoteController,
   TextContentController,
 } from "@generated/donut-backend-api/sdk.gen"
+import AccidentalMatchResolveDialog from "@/components/recall/AccidentalMatchResolveDialog.vue"
+import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
-import {
+import helper, {
   mockSdkService,
   mockSdkServiceWithImplementation,
 } from "@tests/helpers"
@@ -17,6 +19,17 @@ import {
   mountAnsweredSpellingQuestion,
   openResolveAccidentalMatch,
 } from "./answeredSpellingQuestionTestSupport"
+
+const expectNoMutatingCtas = (root: ParentNode) => {
+  expect(
+    root.querySelectorAll(
+      '[data-testid^="wiki-link-or-relationship-to-matched-note-"]'
+    )
+  ).toHaveLength(0)
+  expect(
+    root.querySelectorAll('[data-testid^="add-as-overlapped-note-"]')
+  ).toHaveLength(0)
+}
 
 describe("AnsweredSpellingQuestion accidental match", () => {
   let wrapper: VueWrapper
@@ -182,24 +195,24 @@ describe("AnsweredSpellingQuestion accidental match", () => {
   })
 
   it("omits mutating CTAs when reviewed notebook is readonly", async () => {
-    const { answeredQuestion, reviewedRealm, matchedA, matchedB } =
-      accidentalMatchWithTwoMatchedNotes({ reviewedReadonly: true })
+    const reviewedRealm = makeMe.aNoteRealm.readonly().please()
+    const matched = makeMe.aNoteRealm.id(10).please()
+    const renderer = helper
+      .component(AccidentalMatchResolveDialog)
+      .withCleanStorage()
+      .withCurrentUser(makeMe.aUser.please())
+    useStorageAccessor().value.refreshNoteRealm(reviewedRealm)
+    useStorageAccessor().value.refreshNoteRealm(matched)
 
-    wrapper = mountAnsweredSpellingQuestion(answeredQuestion, {
-      currentUser: makeMe.aUser.please(),
-      seedRealms: [reviewedRealm, matchedA, matchedB],
-    })
+    wrapper = renderer
+      .withProps({
+        reviewedNoteId: reviewedRealm.id,
+        matchedNotes: [matched.note.noteTopology],
+      })
+      .mount()
     await flushPromises()
-    await openResolveAccidentalMatch(wrapper)
 
-    expect(
-      document.body.querySelectorAll(
-        '[data-testid^="wiki-link-or-relationship-to-matched-note-"]'
-      )
-    ).toHaveLength(0)
-    expect(
-      document.body.querySelectorAll('[data-testid^="add-as-overlapped-note-"]')
-    ).toHaveLength(0)
+    expectNoMutatingCtas(wrapper.element)
   })
 
   it("omits mutating CTAs when note realms are not loaded", async () => {
@@ -219,13 +232,6 @@ describe("AnsweredSpellingQuestion accidental match", () => {
     await flushPromises()
     await openResolveAccidentalMatch(wrapper)
 
-    expect(
-      document.body.querySelectorAll(
-        '[data-testid^="wiki-link-or-relationship-to-matched-note-"]'
-      )
-    ).toHaveLength(0)
-    expect(
-      document.body.querySelectorAll('[data-testid^="add-as-overlapped-note-"]')
-    ).toHaveLength(0)
+    expectNoMutatingCtas(document.body)
   })
 })

@@ -1130,7 +1130,9 @@ CURSOR_DEV=true nix develop -c pnpm frontend:test tests/notes/NoteTextContent.ti
 
 ### 37. Optimize ranked tests 109–111
 Type: Structure
-Status: planned
+Status: done
+
+Outcome: Narrowed readonly CTA coverage to the resolve dialog, merged duplicate-title searches into one workflow, and confirmed the newlines-only rank was already subsumed. Focused Chromium remained green.
 
 **Tests:**
 - #109 `tests/components/recall/AnsweredSpellingQuestionAccidentalMatch.spec.ts` — AnsweredSpellingQuestion accidental match > omits mutating CTAs when reviewed notebook is readonly (~12.6ms)
