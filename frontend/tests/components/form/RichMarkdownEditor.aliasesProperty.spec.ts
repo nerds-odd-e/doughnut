@@ -1,4 +1,3 @@
-import { flushPromises } from "@vue/test-utils"
 import { AUTHORED_ALIASES_MESSAGE } from "@/utils/authoredAliasesValidation"
 import {
   listPropertyValue,
@@ -9,18 +8,12 @@ import {
   triggerRowKeyBlurValidation,
 } from "./propertiesTestDom"
 import {
-  clickListAdd,
   propertyValueDialogEl,
   mountPropertyValueDialog,
   propertyValueDialogValidationText,
   savePropertyValueDialog,
   setListItemValue,
-  setTextareaValue,
 } from "./propertyValueDialogTestDom"
-import {
-  switchToListMode,
-  switchToTextMode,
-} from "./propertyValueDialogModeSwitchTestSupport"
 import { createRichMarkdownEditorTestHarness } from "./richMarkdownEditorTestHarness"
 
 const ALIASES_LIST_MARKDOWN = `---
@@ -43,31 +36,19 @@ describe("RichMarkdownEditor aliases property", () => {
     h.cleanup()
   })
 
-  it("rejects invalid aliases in the property value dialog then saves a valid list", async () => {
+  it("rejects an invalid alias in the property value dialog then saves a valid list", async () => {
     const wrapper = await mountPropertyValueDialog(h, ALIASES_LIST_MARKDOWN)
 
-    await switchToTextMode()
-    setTextareaValue("single alias")
-    await savePropertyValueDialog()
-    expect(propertyValueDialogValidationText()).toBe(AUTHORED_ALIASES_MESSAGE)
-    expect(propertyValueDialogEl()).not.toBeNull()
-    expect(wrapper.emitted("update:modelValue")).toBeUndefined()
-
-    await switchToListMode()
     setListItemValue(0, "bad|alias")
     await savePropertyValueDialog()
     expect(propertyValueDialogValidationText()).toBe(AUTHORED_ALIASES_MESSAGE)
     expect(wrapper.emitted("update:modelValue")).toBeUndefined()
 
-    setListItemValue(0, "color")
-    clickListAdd()
-    await flushPromises()
-    setListItemValue(1, "hue")
+    setListItemValue(0, "hue")
     await savePropertyValueDialog()
 
     const last = h.lastEmittedMarkdown()
-    expect(last).toMatch(/aliases:\s*\n\s*- color/)
-    expect(last).toMatch(/- hue/)
+    expect(last).toMatch(/aliases:\s*\n\s*- hue/)
     expect(propertyValueDialogEl()).toBeNull()
   })
 

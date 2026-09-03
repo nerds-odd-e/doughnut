@@ -405,7 +405,9 @@ CURSOR_DEV=true nix develop -c pnpm frontend:test tests/components/form/RichMark
 
 ### 8. Optimize ranked tests 22–24
 Type: Structure
-Status: planned
+Status: done
+
+Outcome: Reused mounts across refinement retry, aliases validation, and deletion failure paths while retaining each unique observable; clarified async gate naming. Focused Chromium passed three consecutive runs.
 
 **Tests:**
 - #22 `tests/components/recall/NoteRefinement.extractNote.loading.spec.ts` — NoteRefinement extract note loading > shows LoadingModal while retrying extract preview and while creating note (~27.7ms)

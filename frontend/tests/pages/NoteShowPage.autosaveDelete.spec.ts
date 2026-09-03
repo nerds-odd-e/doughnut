@@ -77,7 +77,7 @@ describe("note show autosave before deletion", () => {
     teardownGlobalClientForTesting()
   })
 
-  it("closes mutations while reducing and reopens them after delete failure", async () => {
+  it("reopens mutations after delete failure and skips deletion after save failure", async () => {
     const { relationRealm } = qualifyingRelationRealmForDelete()
     const router = createNoteShowPageRouter()
     mockSdkService(NoteController, "showNote", relationRealm)
@@ -121,31 +121,11 @@ describe("note show autosave before deletion", () => {
     await flushPromises()
     expect(updateSpy).toHaveBeenCalledTimes(1)
 
+    updateSpy.mockResolvedValueOnce(wrapSdkError("save failed"))
     setBodyValue(textarea, "Second edit")
-    textarea.dispatchEvent(new FocusEvent("blur", { bubbles: true }))
-    await flushPromises()
+    await startDelete("REDUCE_TO_SOURCE_PROPERTY")
 
     expect(updateSpy).toHaveBeenCalledTimes(2)
-  })
-
-  it("does not delete when flushing the content save fails", async () => {
-    const noteRealm = makeMe.aNoteRealm.content("Original").please()
-    const router = createNoteShowPageRouter()
-    mockSdkService(NoteController, "showNote", noteRealm)
-    mockNotebookGetForNoteRealm(noteRealm)
-    const updateSpy = mockSdkService(
-      TextContentController,
-      "updateNoteContent",
-      noteRealm
-    )
-    updateSpy.mockResolvedValue(wrapSdkError("save failed"))
-    const deleteSpy = mockSdkService(NoteController, "deleteNote", [])
-
-    await renderNoteShowPageWithoutSidebar(router, noteRealm.id)
-    await editBody("Unsaved edit")
-    await startDelete(true)
-
-    expect(updateSpy).toHaveBeenCalledTimes(1)
-    expect(deleteSpy).not.toHaveBeenCalled()
+    expect(deleteSpy).toHaveBeenCalledTimes(1)
   })
 })
