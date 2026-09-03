@@ -1,27 +1,11 @@
 import { describe, expect, it } from "vitest"
 import makeMe from "donut-test-fixtures/makeMe"
-import helper from "@tests/helpers"
-import AssimilationModes from "@/components/recall/AssimilationModes.vue"
 import type { MemoryTracker } from "@generated/donut-backend-api"
-
-function mountModes(props: Record<string, unknown>) {
-  return helper.component(AssimilationModes).withProps(props).mount()
-}
-
-function assimilateButton(
-  wrapper: ReturnType<typeof mountModes>,
-  mode: string
-) {
-  return wrapper.element.querySelector(
-    `[data-test="assimilate-${mode}"]`
-  ) as HTMLInputElement | null
-}
-
-function statusLink(wrapper: ReturnType<typeof mountModes>, mode: string) {
-  return wrapper.element.querySelector(
-    `[data-test="assimilation-status-${mode}"]`
-  ) as HTMLAnchorElement | null
-}
+import {
+  assimilateButton,
+  mountModes,
+  statusLink,
+} from "./assimilationModesTestSupport"
 
 describe("AssimilationModes", () => {
   it("shows a direct Assimilate trigger (no dropdown) when a mode has no tracker", async () => {
@@ -61,38 +45,6 @@ describe("AssimilationModes", () => {
         assimilateAsSpelling: undefined,
       },
     ])
-  })
-
-  it("shows a link-styled status navigating to the tracker page when an active tracker exists", () => {
-    const nextRecallAt = "2026-09-12T10:00:00.000Z"
-    const expectedDate = new Date(nextRecallAt).toLocaleDateString(undefined, {
-      day: "numeric",
-      month: "short",
-    })
-    const tracker = makeMe.aMemoryTracker
-      .id(42)
-      .nextRecallAt(nextRecallAt)
-      .recallCount(7)
-      .commissioned()
-      .please()
-
-    const wrapper = mountModes({
-      allowedModes: ["COMMISSIONED"],
-      trackers: [tracker],
-    })
-
-    const link = statusLink(wrapper, "COMMISSIONED")
-    expect(link).not.toBeNull()
-    expect(link!.textContent?.trim()).toBe(`In recall · next ${expectedDate}`)
-    expect(link!.textContent).not.toContain("7")
-    expect(link!.getAttribute("title")).toBe("Recalled 7 times")
-    expect(link!.getAttribute("to")).toBe(
-      JSON.stringify({
-        name: "memoryTrackerShow",
-        params: { memoryTrackerId: 42 },
-      })
-    )
-    expect(assimilateButton(wrapper, "COMMISSIONED")).toBeNull()
   })
 
   it("does not show stability anywhere on the row", () => {

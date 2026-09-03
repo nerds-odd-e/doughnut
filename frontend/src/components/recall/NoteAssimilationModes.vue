@@ -2,8 +2,9 @@
   <section
     aria-label="Assimilation modes"
     data-testid="note-assimilation-modes"
-    class="flex flex-wrap items-center gap-2"
+    class="flex flex-col items-start gap-2"
   >
+    <h2 class="text-sm font-semibold">Recall modes</h2>
     <AssimilationModes
       :allowed-modes="allowedModes"
       :trackers="noteRecallInfo?.memoryTrackers"
