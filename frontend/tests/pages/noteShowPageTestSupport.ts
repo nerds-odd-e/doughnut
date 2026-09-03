@@ -1,11 +1,8 @@
 import {
-  AiController,
-  AssimilationController,
   ConversationMessageController,
   NoteController,
 } from "@generated/donut-backend-api/sdk.gen"
 import type { Circle } from "@generated/donut-backend-api"
-import { useAssimilationView } from "@/composables/useAssimilationView"
 import { noteShowLocation } from "@/routes/noteShowLocation"
 import NoteShowPage from "@/pages/NoteShowPage.vue"
 import NoteShowPageWithNotebookSidebarLayout from "@tests/fixtures/NoteShowPageWithNotebookSidebarLayout.vue"
@@ -21,7 +18,6 @@ import helper, {
   mockNotebookGetForNoteRealm,
   mockSdkService,
 } from "@tests/helpers"
-import { refinementLayoutItems } from "../components/recall/noteRefinementTestSupport"
 import { flushPromises } from "@vue/test-utils"
 
 export function createNoteShowPageRouter() {
@@ -46,20 +42,6 @@ export function setupNoteShowPageMocks(
 ) {
   mockSdkService(NoteController, "showNote", noteRealm)
   mockNotebookGetForNoteRealm(noteRealm, circle)
-  return noteRealm
-}
-
-export function setupNoteShowPageAssimilationPanelMocks() {
-  useAssimilationView().dismiss()
-  const noteRealm = setupNoteShowPageMocks(makeMe.aNoteRealm.please(), {
-    id: 101,
-    name: "a circle",
-  })
-  mockSdkService(NoteController, "getNoteInfo", {})
-  mockSdkService(AiController, "generateRefinementSuggestions", {
-    items: refinementLayoutItems([]),
-  })
-  mockSdkService(AssimilationController, "assimilate", [])
   return noteRealm
 }
 

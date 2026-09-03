@@ -905,7 +905,9 @@ CURSOR_DEV=true nix develop -c pnpm frontend:test tests/notes/NoteEditableConten
 
 ### 28. Optimize ranked tests 82–84
 Type: Structure
-Status: planned
+Status: done
+
+Outcome: Trimmed unsaved-edit coverage, removed a redundant pending-wiki journey, and deleted duplicate page-level assimilation coverage plus its dead support helper after verifying canonical component seams. Widened Chromium checks passed.
 
 **Tests:**
 - #82 `tests/notes/NoteEditableContent.spec.ts` — NoteEditableContent > should preserve unsaved edits if the noteContent prop doesn't actually change (~15.0ms)

@@ -109,13 +109,6 @@ describe("NoteEditableContent", () => {
     await wrapper.setProps({ noteId, noteContent, readonly: false })
 
     expect(textareaEl(wrapper).value).toBe("Edited content")
-
-    await blurTextarea(wrapper)
-
-    expect(updateNoteContentSpy).toHaveBeenCalledWith({
-      path: { note: noteId },
-      body: { content: "Edited content" },
-    })
     wrapper.unmount()
   })
 

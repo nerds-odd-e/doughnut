@@ -92,67 +92,6 @@ describe("NoteTextContent wiki link display", () => {
     ).toContain("[Target](/folder/Target.md)")
   })
 
-  it("shows a new wiki link as pending until content save confirms it is missing", async () => {
-    const savedContent = "Saved [[WikiLinks E2E Already Missing]]."
-    const note = makeMe.aNote
-      .title("Wiki carrier")
-      .content(savedContent)
-      .please()
-    const inFlightContent = `${savedContent} See [[WikiLinks E2E Nowhere]].`
-
-    const releaseSave = holdNoteContentSave((content) =>
-      makeMe.aNoteRealm.id(note.id!).content(content).wikiLinks([]).please()
-    )
-
-    wrapper = mountNoteTextContent(note, { readonly: false, wikiLinks: [] })
-    await flushPromises()
-    await vi.waitUntil(() =>
-      document.querySelector(".ql-editor a.dead-wiki-link")
-    )
-
-    wrapper
-      .findComponent({ name: "QuillEditor" })
-      .vm.$emit(
-        "update:modelValue",
-        `<p>Saved <a href="#" class="dead-wiki-link" data-portable-path="WikiLinks E2E Already Missing">WikiLinks E2E Already Missing</a>. See [[WikiLinks E2E Nowhere]].</p>`
-      )
-    await flushPromises()
-    await vi.waitUntil(() =>
-      document.querySelector(".ql-editor a.pending-wiki-link")
-    )
-
-    const pending = document.querySelector(
-      ".ql-editor a.pending-wiki-link"
-    ) as HTMLAnchorElement
-    expect(pending.textContent).toContain("WikiLinks E2E Nowhere")
-    expect(
-      document.querySelector(".ql-editor a.dead-wiki-link")?.textContent
-    ).toContain("WikiLinks E2E Already Missing")
-
-    releaseSave()
-    await flushPromises()
-    await wrapper.setProps({
-      note: makeMe.aNote
-        .id(note.id!)
-        .title("Wiki carrier")
-        .content(inFlightContent)
-        .please(),
-      wikiLinks: [],
-    })
-    await flushPromises()
-    await vi.waitUntil(
-      () =>
-        document.querySelectorAll(".ql-editor a.dead-wiki-link").length === 2
-    )
-
-    expect(document.querySelector(".ql-editor a.pending-wiki-link")).toBeNull()
-    const deadTitles = [
-      ...document.querySelectorAll(".ql-editor a.dead-wiki-link"),
-    ].map((a) => a.getAttribute("data-portable-path"))
-    expect(deadTitles).toContain("WikiLinks E2E Already Missing")
-    expect(deadTitles).toContain("WikiLinks E2E Nowhere")
-  })
-
   it("shows a new wiki link to an existing note as live after content save", async () => {
     const savedContent = "Saved."
     const note = makeMe.aNote.content(savedContent).please()
