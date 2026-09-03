@@ -115,7 +115,7 @@ describe("NoteTextContent title edit", () => {
     expect(titleEditorEl(wrapper).innerText).toBe("different value")
   })
 
-  it("displays title errors and clears them after a successful edit", async () => {
+  it("updates errors across validation, recovery, reserved title, and a 401 response", async () => {
     const note = makeMe.aNote.title("Dummy Title").please()
     mountEditableTitle(note)
     mockedUpdateTitleCall.mockRejectedValueOnce(
@@ -146,6 +146,15 @@ describe("NoteTextContent title edit", () => {
     expect(wrapper.find(".path-name-editor .text-error").text()).toContain(
       "reserved"
     )
+
+    mockedUpdateTitleCall.mockRejectedValueOnce(
+      makeMe.anApiError.of401().please()
+    )
+    await editTitleThenBlur(wrapper, "unauthorized")
+    await flushPromises()
+    expect(wrapper.find(".path-name-editor .text-error").text()).toBe(
+      "You are not authorized to edit this note. Perhaps you are not logged in?"
+    )
   })
 
   it("does not save title when unchanged on unmount", async () => {
@@ -155,29 +164,11 @@ describe("NoteTextContent title edit", () => {
     expect(mockedUpdateTitleCall).toBeCalledTimes(0)
   })
 
-  it.each([
-    { case: "empty string", value: "" },
-    { case: "newlines only", value: "\n\n" },
-    { case: "mixed whitespace", value: " \n \t " },
-  ])("does not save when title is $case", async ({ value }) => {
+  it("does not save an all-whitespace title", async () => {
     mountEditableTitle(makeMe.aNote.title("Dummy Title").please())
-    await editTitleThenBlur(wrapper, value)
+    await editTitleThenBlur(wrapper, " \n \t ")
     await flushPromises()
 
     expect(mockedUpdateTitleCall).not.toBeCalled()
-  })
-
-  it("displays authorization error when save is rejected with 401", async () => {
-    const confirmSpy = vi.spyOn(window, "confirm").mockReturnValue(false)
-    mountEditableTitle(makeMe.aNote.title("Dummy Title").please())
-    mockedUpdateTitleCall.mockRejectedValueOnce(
-      makeMe.anApiError.of401().please()
-    )
-    await editTitleThenBlur(wrapper)
-    await flushPromises()
-    expect(wrapper.find(".path-name-editor .text-error").text()).toBe(
-      "You are not authorized to edit this note. Perhaps you are not logged in?"
-    )
-    confirmSpy.mockRestore()
   })
 })

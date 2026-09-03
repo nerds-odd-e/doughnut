@@ -1105,7 +1105,9 @@ CURSOR_DEV=true nix develop -c pnpm frontend:test tests/notes/NoteTextContent.ti
 
 ### 36. Optimize ranked tests 106–108
 Type: Structure
-Status: planned
+Status: done
+
+Outcome: Consolidated equivalent blank-title/401 cases and folder conflict variants into stronger lifecycle journeys, reducing fourteen tests to nine. Focused Chromium passed three consecutive runs. This also subsumes ranks #111, #116, and #121 in later slices.
 
 **Tests:**
 - #106 `tests/notes/NoteTextContent.titleEdit.spec.ts` — NoteTextContent title edit > does not save when title is 'mixed whitespace' (~12.7ms)

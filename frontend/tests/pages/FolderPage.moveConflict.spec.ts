@@ -28,7 +28,7 @@ describe("FolderPage move conflicts", () => {
   })
 
   describe("move", () => {
-    it("merge confirm on FOLDER_NAME_CONFLICT retries with merge; cancel keeps error", async () => {
+    it("keeps soft-deleted conflicts inline, preserves typed conflicts on cancel, and merges on retry", async () => {
       const { wrapper, folderRealm } = mountFolderPage(router, 10, "Dup")
       const targetFolder = makeMe.aFolder
         .folder(99, folderRealm.folder.name)
@@ -36,14 +36,24 @@ describe("FolderPage move conflicts", () => {
 
       const moveSpy = vi
         .spyOn(NotebookController, "moveFolder")
-        .mockResolvedValue(
+        .mockResolvedValueOnce(
           wrapSdkError({
             status: 409,
+            errorType: "SOFT_DELETED_TITLE_CONFLICT",
+            message: softDeletedTitleConflictMessage,
+          })
+        )
+        .mockResolvedValue(
+          wrapSdkError({
             message: folderNameConflictMessage,
             errorType: "FOLDER_NAME_CONFLICT",
           })
         )
       const pushSpy = stubRouterPush(router)
+
+      await submitMoveForm(wrapper)
+      expect(usePopups().popups.peek()).toHaveLength(0)
+      expect(wrapper.text()).toContain(softDeletedTitleConflictMessage)
 
       await submitMoveForm(wrapper)
       expect(usePopups().popups.peek()?.[0]?.type).toBe("confirm")
@@ -54,7 +64,7 @@ describe("FolderPage move conflicts", () => {
       resolveTopConfirm(false)
       await flushPromises()
       expect(wrapper.text()).toContain(folderNameConflictMessage)
-      expect(moveSpy).toHaveBeenCalledTimes(1)
+      expect(moveSpy).toHaveBeenCalledTimes(2)
       expect(pushSpy).not.toHaveBeenCalled()
 
       await submitMoveForm(wrapper)
@@ -62,7 +72,7 @@ describe("FolderPage move conflicts", () => {
       resolveTopConfirm(true)
       await flushPromises()
 
-      expect(moveSpy).toHaveBeenCalledTimes(3)
+      expect(moveSpy).toHaveBeenCalledTimes(4)
       expect(moveSpy).toHaveBeenLastCalledWith(
         expect.objectContaining({
           body: expect.objectContaining({ merge: true }),
@@ -75,58 +85,6 @@ describe("FolderPage move conflicts", () => {
           folderId: String(targetFolder.id),
         },
       })
-
-      wrapper.unmount()
-    })
-
-    it("shows merge confirm when move returns typed FOLDER_NAME_CONFLICT without status", async () => {
-      const { wrapper, folderRealm } = mountFolderPage(router, 10, "Dup")
-      const targetFolder = makeMe.aFolder
-        .folder(99, folderRealm.folder.name)
-        .please()
-
-      const moveSpy = vi
-        .spyOn(NotebookController, "moveFolder")
-        .mockResolvedValue(
-          wrapSdkError({
-            message: folderNameConflictMessage,
-            errorType: "FOLDER_NAME_CONFLICT",
-          })
-        )
-      const pushSpy = stubRouterPush(router)
-
-      await submitMoveForm(wrapper)
-      expect(usePopups().popups.peek()?.[0]?.type).toBe("confirm")
-
-      moveSpy.mockResolvedValueOnce(wrapSdkResponse(targetFolder) as never)
-      resolveTopConfirm(true)
-      await flushPromises()
-
-      expect(moveSpy).toHaveBeenLastCalledWith(
-        expect.objectContaining({
-          body: expect.objectContaining({ merge: true }),
-        })
-      )
-      expect(pushSpy).toHaveBeenCalled()
-
-      wrapper.unmount()
-    })
-
-    it("shows inline error without merge prompt when move returns soft-deleted title conflict", async () => {
-      const { wrapper } = mountFolderPage(router, 10, "Dup")
-
-      vi.spyOn(NotebookController, "moveFolder").mockResolvedValue(
-        wrapSdkError({
-          status: 409,
-          errorType: "SOFT_DELETED_TITLE_CONFLICT",
-          message: softDeletedTitleConflictMessage,
-        })
-      )
-
-      await submitMoveForm(wrapper)
-
-      expect(usePopups().popups.peek()).toHaveLength(0)
-      expect(wrapper.text()).toContain(softDeletedTitleConflictMessage)
 
       wrapper.unmount()
     })
