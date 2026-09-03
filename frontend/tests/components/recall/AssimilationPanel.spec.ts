@@ -38,11 +38,11 @@ vi.mock("@/composables/useGoToNextAssimilation", () => ({
 setupAssimilationPanelTests()
 
 describe("AssimilationPanel", () => {
-  it("does not show a heading or the assimilated/planned/total summary", async () => {
+  it("labels the choices as Recall modes without a progress summary", async () => {
     const wrapper = await mountAssimilationPanelReady()
 
     const modes = wrapper.find('[data-testid="note-assimilation-modes"]')
-    expect(modes.find("h2").exists()).toBe(false)
+    expect(modes.find("h2").text()).toBe("Recall modes")
     expect(
       modes.find('[data-test="assimilation-progress-summary"]').exists()
     ).toBe(false)

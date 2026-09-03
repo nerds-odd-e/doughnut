@@ -1,59 +1,82 @@
 <template>
-  <div class="flex flex-col gap-2" data-testid="assimilation-modes">
+  <div
+    class="grid grid-cols-[max-content_minmax(0,1fr)] items-center gap-x-2 gap-y-2"
+    data-testid="assimilation-modes"
+  >
     <div
       v-for="row in rows"
       :key="row.mode"
-      class="flex flex-wrap items-center gap-2"
+      class="col-span-2 grid grid-cols-subgrid items-center"
+      :class="rowHeightClass"
       :data-test="`assimilation-mode-row-${row.mode}`"
     >
-      <span class="text-sm font-medium" :data-test="`mode-label-${row.mode}`">
+      <span
+        class="text-right text-sm font-medium"
+        :data-test="`mode-label-${row.mode}`"
+      >
         {{ row.label }}
       </span>
-      <router-link
-        v-if="row.tracker"
-        :to="row.trackerLocation!"
-        class="daisy-link daisy-link-primary"
-        :data-test="`assimilation-status-${row.mode}`"
-        :title="row.statusTitle"
-      >
-        {{ row.statusText }}
-      </router-link>
       <div
-        v-else
-        :class="row.showSkipAffordance ? 'daisy-join' : undefined"
+        class="flex min-w-0 items-center gap-2"
+        :class="rowHeightClass"
+        :data-test="`assimilation-action-${row.mode}`"
       >
-        <input
-          type="submit"
-          value="Assimilate"
-          :class="[
-            'daisy-btn daisy-btn-primary',
-            row.showSkipAffordance ? 'daisy-join-item' : '',
-            sizeClass,
-          ]"
-          :data-test="`assimilate-${row.mode}`"
-          :disabled="disabled"
-          @click="$emit('assimilate', assimilatePayloadFor(row.mode))"
-        />
-        <template v-if="row.showSkipAffordance">
-          <input
-            v-if="skippedFromAssimilationSequence"
-            type="submit"
-            value="Return to sequence"
-            :class="['daisy-btn daisy-btn-secondary daisy-join-item', sizeClass]"
-            data-test="return-to-sequence"
-            :disabled="disabled"
-            @click="$emit('returnToSequence')"
-          />
-          <input
-            v-else
-            type="submit"
-            value="Skip"
-            :class="['daisy-btn daisy-btn-secondary daisy-join-item', sizeClass]"
-            data-test="skip"
-            :disabled="disabled"
-            @click="$emit('skip')"
-          />
+        <template v-if="row.tracker">
+          <router-link
+            :to="row.trackerLocation!"
+            class="daisy-link daisy-link-primary shrink-0 text-sm font-medium focus-visible:outline-2 focus-visible:outline-offset-2"
+            :data-test="`assimilation-status-${row.mode}`"
+            :title="row.statusTitle"
+          >
+            View tracker
+          </router-link>
+          <span class="text-base-content/60 shrink-0 text-xs">
+            Next {{ row.nextRecallAtText }}
+          </span>
         </template>
+        <div
+          v-else
+          :class="row.showSkipAffordance ? 'daisy-join' : undefined"
+        >
+          <button
+            type="button"
+            :class="[
+              'daisy-btn daisy-btn-primary',
+              row.showSkipAffordance ? 'daisy-join-item' : '',
+              sizeClass,
+            ]"
+            :data-test="`assimilate-${row.mode}`"
+            :aria-label="`Assimilate as ${row.label}`"
+            :disabled="disabled"
+            @click="$emit('assimilate', assimilatePayloadFor(row.mode))"
+          >
+            Assimilate
+          </button>
+          <template v-if="row.showSkipAffordance">
+            <button
+              v-if="skippedFromAssimilationSequence"
+              type="button"
+              :class="['daisy-btn daisy-btn-ghost daisy-join-item', sizeClass]"
+              data-test="return-to-sequence"
+              aria-label="Return Understanding to sequence"
+              :disabled="disabled"
+              @click="$emit('returnToSequence')"
+            >
+              Return to sequence
+            </button>
+            <button
+              v-else
+              type="button"
+              :class="['daisy-btn daisy-btn-ghost daisy-join-item', sizeClass]"
+              data-test="skip"
+              aria-label="Skip Understanding"
+              :disabled="disabled"
+              @click="$emit('skip')"
+            >
+              Skip
+            </button>
+          </template>
+        </div>
       </div>
     </div>
   </div>
@@ -99,6 +122,9 @@ const modeLabels: Record<MemoryTrackerType, string> = {
 }
 
 const sizeClass = computed(() => (props.size === "sm" ? "daisy-btn-sm" : ""))
+const rowHeightClass = computed(() =>
+  props.size === "sm" ? "min-h-8" : "min-h-12"
+)
 
 function formatNextRecallAt(nextRecallAt: string): string {
   return new Date(nextRecallAt).toLocaleDateString(undefined, {
@@ -132,8 +158,8 @@ const rows = computed(() =>
             params: { memoryTrackerId: tracker.id },
           }
         : undefined,
-      statusText: tracker
-        ? `In recall · next ${formatNextRecallAt(tracker.nextRecallAt)}`
+      nextRecallAtText: tracker
+        ? formatNextRecallAt(tracker.nextRecallAt)
         : undefined,
       statusTitle: tracker
         ? `Recalled ${tracker.recallCount ?? 0} times`
