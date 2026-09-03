@@ -109,12 +109,14 @@ describe("NoteEditableContent debounced save", () => {
       noteContent: "Before",
     })
 
-    await setTextareaValue(wrapper, "After save")
-    await wrapper.find("textarea").trigger("blur")
+    const textarea = textareaEl(wrapper)
+    textarea.value = "After save"
+    textarea.dispatchEvent(new Event("input"))
+    textarea.dispatchEvent(new Event("blur"))
     await flushPromises()
 
     expect(wrapper.find(".dirty").exists()).toBe(false)
-    expect(textareaEl(wrapper).value).toBe(wrapped)
+    expect(textarea.value).toBe(wrapped)
 
     wrapper.unmount()
   })

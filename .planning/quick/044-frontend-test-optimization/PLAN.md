@@ -755,7 +755,9 @@ CURSOR_DEV=true nix develop -c pnpm frontend:test tests/components/recall/NoteRe
 
 ### 22. Optimize ranked tests 64–66
 Type: Structure
-Status: planned
+Status: done
+
+Outcome: Replaced broad save/cancel setup with direct DOM events and retained the unique retry-after-cancel path. The route-dependent property-assimilation journey resisted safe narrowing and was added as a Candidate. Focused Chromium passed twice.
 
 **Tests:**
 - #64 `tests/notes/NoteEditableContent.debouncedSave.spec.ts` — NoteEditableContent debounced save > clears dirty when save returns wrapped ordinary-note content (~16.3ms)
