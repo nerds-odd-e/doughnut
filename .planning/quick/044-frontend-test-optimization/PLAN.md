@@ -680,7 +680,9 @@ CURSOR_DEV=true nix develop -c pnpm frontend:test tests/components/form/RichMark
 
 ### 19. Optimize ranked tests 55–57
 Type: Structure
-Status: planned
+Status: done
+
+Outcome: Merged overlap-link states into one mount and removed redundant dialog assertions/drains while preserving resolved, dead, pending-to-dead, cancel/reopen, and scalar-save behavior. Focused timings improved about 15%.
 
 **Tests:**
 - #55 `tests/components/form/RichMarkdownEditor.overlapsProperty.spec.ts` — RichMarkdownEditor overlaps property > shows a new overlaps wiki link as pending until last-saved includes it (~17.8ms)

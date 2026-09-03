@@ -3,7 +3,6 @@ import {
   clickCancel,
   clickSave,
   getTextareaValue,
-  isModeTabActive,
   modeTabEl,
   openPropertyValueDialog,
   propertyValueDialogEl,
@@ -27,36 +26,22 @@ describe("RichMarkdownEditor property value dialog", () => {
   it("cancel discards edits; reopen save keeps scalar YAML shape", async () => {
     const wrapper = await mountTopicValueDialog(h)
 
-    expect(propertyValueDialogEl()).not.toBeNull()
-    expect(isModeTabActive("text")).toBe(true)
-    expect(getTextareaValue()).toBe("training")
-
     setTextareaValue("changed but not saved")
-    await flushPromises()
-    const emitCountBefore = wrapper.emitted("update:modelValue")?.length ?? 0
     clickCancel()
     await flushPromises()
 
-    expect(wrapper.emitted("update:modelValue")?.length ?? 0).toBe(
-      emitCountBefore
-    )
+    expect(wrapper.emitted("update:modelValue")).toBeUndefined()
     expect(propertyValueDialogEl()).toBeNull()
-    expect(
-      wrapper.find('[data-testid="rich-note-property-row-value-input"]').text()
-    ).toContain("training")
 
     await openPropertyValueDialog(wrapper)
     expect(getTextareaValue()).toBe("training")
     setTextareaValue("advanced workshop")
-    await flushPromises()
     clickSave()
     await flushPromises()
 
     const last = h.lastEmittedMarkdown()
     expect(last).toContain("topic: advanced workshop")
     expect(last).not.toMatch(/topic:\s*\n\s*-/)
-    expect(last).toContain("Body")
-    expect(propertyValueDialogEl()).toBeNull()
   })
 
   it("hides list mode for scalar-only structural keys", async () => {

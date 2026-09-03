@@ -23,6 +23,7 @@ import { createRichMarkdownEditorTestHarness } from "./richMarkdownEditorTestHar
 const OVERLAPS_LIST_MARKDOWN = `---
 overlaps:
   - "[[Other Note]]"
+  - "[[Missing Note]]"
 ---
 
 Body`
@@ -81,63 +82,37 @@ describe("RichMarkdownEditor overlaps property", () => {
     )
   })
 
-  it("renders overlaps list items as wiki links (resolved and dead)", async () => {
-    const wrapper = await h.mountEditor(OVERLAPS_LIST_MARKDOWN, {
-      wikiLinks: [wikiLinkFromAuthoredToken("Other Note", 42)],
-    })
-    await flushPromises()
-
-    const resolved = propertyRowListValue(wrapper, "overlaps")
-    const resolvedLink = resolved.find("a.router-link")
-    expect(resolvedLink.exists()).toBe(true)
-    expect(resolvedLink.text()).toBe("Other Note")
-    expect(resolved.text()).not.toContain("[[")
-    expect(JSON.parse(resolvedLink.attributes("to") ?? "{}")).toEqual(
-      noteShowLocation(42)
-    )
-
-    await wrapper.setProps({
-      modelValue: `---
-overlaps:
-  - "[[Missing Note]]"
----
-
-Body`,
-      wikiLinks: [],
-    })
-    await flushPromises()
-
-    const dead = propertyRowListValue(wrapper, "overlaps")
-    const deadLink = dead.find("a.dead-wiki-link")
-    expect(deadLink.exists()).toBe(true)
-    expect(deadLink.text()).toContain("Missing Note")
-  })
-
-  it("shows a new overlaps wiki link as pending until last-saved includes it", async () => {
+  it("renders resolved and dead overlaps, marking new links pending until saved", async () => {
     const inFlight = `---
 overlaps:
   - "[[Other Note]]"
+  - "[[Missing Note]]"
   - "[[WikiLinks E2E Nowhere]]"
 ---
 
 Body`
     const wrapper = await h.mountEditor(inFlight, {
       lastSavedMarkdown: OVERLAPS_LIST_MARKDOWN,
-      wikiLinks: [],
+      wikiLinks: [wikiLinkFromAuthoredToken("Other Note", 42)],
     })
-    await flushPromises()
 
     const list = propertyRowListValue(wrapper, "overlaps")
+    const resolvedLink = list.find("a.router-link")
+    expect(resolvedLink.text()).toBe("Other Note")
+    expect(JSON.parse(resolvedLink.attributes("to") ?? "{}")).toEqual(
+      noteShowLocation(42)
+    )
+    expect(list.text()).not.toContain("[[")
+    expect(list.find("a.dead-wiki-link").text()).toBe("Missing Note")
     expect(list.find("a.pending-wiki-link").text()).toBe(
       "WikiLinks E2E Nowhere"
     )
-    expect(list.find("a.dead-wiki-link").text()).toBe("Other Note")
 
-    await wrapper.setProps({ lastSavedMarkdown: inFlight, wikiLinks: [] })
+    await wrapper.setProps({ lastSavedMarkdown: inFlight })
     await flushPromises()
 
     expect(list.find("a.pending-wiki-link").exists()).toBe(false)
     const deadTitles = list.findAll("a.dead-wiki-link").map((a) => a.text())
-    expect(deadTitles).toEqual(["Other Note", "WikiLinks E2E Nowhere"])
+    expect(deadTitles).toEqual(["Missing Note", "WikiLinks E2E Nowhere"])
   })
 })
