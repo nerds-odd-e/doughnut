@@ -1,5 +1,8 @@
 import type { Notebook } from "@generated/donut-backend-api"
-import { NOTEBOOK_EXPORT_BUTTON_LABEL } from "@/utils/notebookExport"
+import {
+  downloadNotebookExport,
+  NOTEBOOK_EXPORT_BUTTON_LABEL,
+} from "@/utils/notebookExport"
 import { beforeEach, describe, expect, it, vi } from "vitest"
 import makeMe from "donut-test-fixtures/makeMe"
 import { fireEvent, screen } from "@testing-library/vue"
@@ -31,8 +34,27 @@ describe("Notebook catalog export", () => {
       wrapper.get('[data-cy="notebook-catalog-overflow"]').element
     )
     await flushPromises()
-    return wrapper
   }
+
+  it("downloads a catalog zip using the backend filename", async () => {
+    const nb = makeMe.aNotebook.title("Q&A Notes").please()
+    fetchMock.mockResponseOnce("zip-file-bytes", {
+      headers: {
+        "content-disposition": 'attachment; filename="Q&A Notes.zip"',
+      },
+    })
+    await openCatalogOverflowFor(nb)
+
+    const exportButtons = screen.getAllByTitle(NOTEBOOK_EXPORT_BUTTON_LABEL)
+    await fireEvent.click(exportButtons[exportButtons.length - 1]!)
+    await flushPromises()
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      `/api/notebooks/${nb.id}/export`,
+      expect.objectContaining({ credentials: "same-origin" })
+    )
+    expect(vi.mocked(saveAs).mock.calls.at(-1)?.[1]).toBe("Q&A Notes.zip")
+  })
 
   it.each([
     {
@@ -42,14 +64,6 @@ describe("Notebook catalog export", () => {
       expectedFilename: "Owned Catalog.zip",
     },
     {
-      label: "Content-Disposition filename",
-      title: "Q&A Notes",
-      headers: {
-        "content-disposition": 'attachment; filename="Q&A Notes.zip"',
-      },
-      expectedFilename: "Q&A Notes.zip",
-    },
-    {
       label: "notebook title when Content-Disposition is not printable ASCII",
       title: "筆記本",
       headers: {
@@ -57,26 +71,19 @@ describe("Notebook catalog export", () => {
       },
       expectedFilename: "筆記本.zip",
     },
-  ])(
-    "downloads a zip using $label",
-    async ({ title, headers, expectedFilename }) => {
-      const nb = makeMe.aNotebook.title(title).please()
-      if (headers) {
-        fetchMock.mockResponseOnce("zip-file-bytes", { headers })
-      } else {
-        fetchMock.mockResponseOnce("zip-file-bytes")
-      }
-      await openCatalogOverflowFor(nb)
-
-      const exportButtons = screen.getAllByTitle(NOTEBOOK_EXPORT_BUTTON_LABEL)
-      await fireEvent.click(exportButtons[exportButtons.length - 1]!)
-      await flushPromises()
-
-      expect(fetchMock).toHaveBeenCalledWith(
-        `/api/notebooks/${nb.id}/export`,
-        expect.objectContaining({ credentials: "same-origin" })
-      )
-      expect(vi.mocked(saveAs).mock.calls.at(-1)?.[1]).toBe(expectedFilename)
+  ])("falls back to $label", async ({ title, headers, expectedFilename }) => {
+    const nb = makeMe.aNotebook.title(title).please()
+    if (headers) {
+      fetchMock.mockResponseOnce("zip-file-bytes", { headers })
+    } else {
+      fetchMock.mockResponseOnce("zip-file-bytes")
     }
-  )
+    await downloadNotebookExport(nb.id, nb.name)
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      `/api/notebooks/${nb.id}/export`,
+      expect.objectContaining({ credentials: "same-origin" })
+    )
+    expect(vi.mocked(saveAs).mock.calls.at(-1)?.[1]).toBe(expectedFilename)
+  })
 })

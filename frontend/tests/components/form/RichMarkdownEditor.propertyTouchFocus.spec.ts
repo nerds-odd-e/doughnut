@@ -5,13 +5,19 @@ import { createRichMarkdownEditorTestHarness } from "./richMarkdownEditorTestHar
 import { advanceAnimationFrame } from "./propertyKeyPresetsTestDom"
 import {
   addPropertyTapCases,
-  deadWikiLinkPropertyMarkdown,
   existingPropertyValueMarkdown,
   expectElementFocused,
   mountTouchFocusEditor,
   PROPERTY_KEY_INPUT,
   PROPERTY_VALUE_INPUT,
 } from "./propertyTouchFocusTestSupport"
+
+const existingTextAndDeadWikiLinkMarkdown = `---
+plain: training
+wiki: "[[Missing Note]]"
+---
+
+Workshop body.`
 
 describe("RichMarkdownEditor property touch focus", () => {
   const h = createRichMarkdownEditorTestHarness()
@@ -65,7 +71,7 @@ describe("RichMarkdownEditor property touch focus", () => {
     it("focuses primer then value field on touch; skips primer for dead wiki link", async () => {
       const { matchMediaSpy: spy, primer } = await mountTouchFocusEditor(
         h,
-        existingPropertyValueMarkdown,
+        existingTextAndDeadWikiLinkMarkdown,
         true
       )
       matchMediaSpy = spy
@@ -77,14 +83,11 @@ describe("RichMarkdownEditor property touch focus", () => {
       h.completePropertyValueFieldTap()
       expectElementFocused(PROPERTY_VALUE_INPUT)
 
-      await h.getWrapper().setProps({
-        modelValue: deadWikiLinkPropertyMarkdown,
-      })
-      await flushPromises()
-
       const deadLink = h
-        .propertyValueFieldElement()
-        .querySelector("a.dead-wiki-link")
+        .getWrapper()
+        .element.querySelector(
+          '[data-testid="rich-note-property-row-value-input"] a.dead-wiki-link'
+        )
       expect(deadLink).toBeTruthy()
       deadLink!.dispatchEvent(
         new PointerEvent("pointerdown", { bubbles: true })

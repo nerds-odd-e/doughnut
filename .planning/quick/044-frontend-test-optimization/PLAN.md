@@ -855,7 +855,9 @@ CURSOR_DEV=true nix develop -c pnpm frontend:test tests/components/recall/NoteRe
 
 ### 26. Optimize ranked tests 76–78
 Type: Structure
-Status: planned
+Status: done
+
+Outcome: Moved fallback filename branches to the public download boundary, reused one touch fixture, removed synthetic toolbar layout work, and deleted an obsolete support fixture. Ranked targets improved substantially; focused Chromium passed.
 
 **Tests:**
 - #76 `tests/pages/NotebookCatalogExport.spec.ts` — Notebook catalog export > downloads a zip using 'notebook title when Content-Dispositi…' (~15.5ms)

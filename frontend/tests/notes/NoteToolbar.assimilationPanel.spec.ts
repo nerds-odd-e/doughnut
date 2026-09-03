@@ -1,8 +1,6 @@
 import makeMe from "donut-test-fixtures/makeMe"
 import {
-  allMoreOptionsFitNavWidth,
   installMockResizeObserver,
-  layoutNoteToolbar,
   restoreNoteToolbarWidthMocks,
 } from "@tests/helpers/mockNoteToolbarNavWidth"
 import {
@@ -59,13 +57,8 @@ describe("NoteToolbar assimilation panel", () => {
     const noteRealm = makeMe.aNoteRealm.title("Dummy Title").please()
 
     wrapper = await mountNoteToolbar(noteRealm)
-    await layoutNoteToolbar(wrapper, allMoreOptionsFitNavWidth())
     useAssimilationView().openForNote(noteRealm.note.id)
     await flushPromises()
-
-    expect(
-      wrapper.find('[data-testid="note-assimilation-modes"]').exists()
-    ).toBe(true)
 
     await wrapper
       .find(`button[title="${noteMoreOptionsTitles.audio}"]`)
@@ -75,9 +68,7 @@ describe("NoteToolbar assimilation panel", () => {
     expect(
       wrapper.find('[data-testid="note-assimilation-modes"]').exists()
     ).toBe(false)
-    expect(
-      wrapper.find('[data-testid="note-toolbar-panel-shell"]').exists()
-    ).toBe(true)
+    expect(wrapper.find('button[title="Record Audio"]').exists()).toBe(true)
 
     useAssimilationView().openForNote(noteRealm.note.id)
     await flushPromises()

@@ -33,12 +33,6 @@ topic: training
 
 Workshop body.`
 
-export const deadWikiLinkPropertyMarkdown = `---
-topic: "[[Missing Note]]"
----
-
-Body`
-
 export function expectElementFocused(selector: string) {
   const element = document.querySelector(selector) as HTMLElement | null
   expect(element).toBeTruthy()
