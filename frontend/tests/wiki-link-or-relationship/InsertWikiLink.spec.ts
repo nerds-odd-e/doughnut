@@ -1,13 +1,16 @@
 import MakeMe from "donut-test-fixtures/makeMe"
 import { NoteController } from "@generated/donut-backend-api/sdk.gen"
+import SearchForNoteAndFolder from "@/components/search/SearchForNoteAndFolder.vue"
+import SearchForm from "@/components/wiki-link-or-relationship/SearchForm.vue"
 import { fireEvent, screen } from "@testing-library/vue"
 import { flushPromises } from "@vue/test-utils"
-import { mockSdkService } from "@tests/helpers"
+import helper, { mockSdkService } from "@tests/helpers"
 import {
   insertedTexts,
   openWikiLinkOrRelationshipChoice,
   setupInsertWikiLinkTests,
   insertedWikiLinkAsProperty,
+  setupInserters,
 } from "@tests/wiki-link-or-relationship/insertWikiLinkTestSupport"
 import { describe, expect, it } from "vitest"
 
@@ -56,16 +59,29 @@ describe("InsertWikiLink", () => {
     })
     const note = MakeMe.aNote.please()
     const targetResult = MakeMe.aNoteSearchResult.title("PropTarget").please()
-    await openWikiLinkOrRelationshipChoice(note, {
-      searchKey: "Prop",
-      targetResult,
-      canInsertWikiLinkAsProperty: true,
-    })
+    setupInserters(true)
+    const wrapper = helper
+      .component(SearchForm)
+      .withCleanStorage()
+      .withProps({ note })
+      .mount()
+    await flushPromises()
+    wrapper
+      .findComponent(SearchForNoteAndFolder)
+      .vm.$emit("selected", targetResult)
+    await flushPromises()
 
-    fireEvent.click(screen.getByText("Add wiki link as a new property"))
+    const propertyButton = wrapper
+      .findAll("button")
+      .find((button) =>
+        button.text().includes("Add wiki link as a new property")
+      )
+    expect(propertyButton).toBeDefined()
+    await propertyButton!.trigger("click")
     await flushPromises()
 
     expect(insertedWikiLinkAsProperty).toContain("[[Folder/PropTarget]]")
     expect(insertedTexts).toHaveLength(0)
+    wrapper.unmount()
   })
 })

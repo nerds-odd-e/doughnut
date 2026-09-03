@@ -528,7 +528,9 @@ CURSOR_DEV=true nix develop -c pnpm frontend:test tests/notes/NoteMoreOptionsFor
 
 ### 13. Optimize ranked tests 37–39
 Type: Structure
-Status: planned
+Status: done
+
+Outcome: Removed a duplicate Wikidata mount, drove property insertion at the selected-note boundary, and replaced full toolbar layout setup with the real overflow menu while preserving property-route behavior. Focused Chromium passed.
 
 **Tests:**
 - #37 `tests/notes/WikidataAssociationDialog.titleActions.spec.ts` — WikidataAssociationDialog title actions and save > emits replace then append when showSaveButton is true (~22.6ms)

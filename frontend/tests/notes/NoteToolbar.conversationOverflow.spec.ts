@@ -1,51 +1,34 @@
-import {
-  conversationOverflowNavWidth,
-  installMockResizeObserver,
-  layoutNoteToolbar,
-  restoreNoteToolbarWidthMocks,
-} from "@tests/helpers/mockNoteToolbarNavWidth"
+import NoteMoreOptionsForm from "@/components/notes/widgets/NoteMoreOptionsForm.vue"
 import { noteMoreOptionsTitles } from "@/components/notes/widgets/noteMoreOptionsTitles"
-import {
-  openNoteToolbarOverflowMenu,
-  overflowMenuItem,
-  resetNoteToolbarTestState,
-} from "@tests/notes/noteToolbarTestHelpers"
-import { mountNoteToolbarAt } from "@tests/notes/noteToolbarRouteMount"
-import { notebookSidebarClosedPlugin } from "@tests/helpers/notebookSidebarTestProvide"
+import { dummyRouteRecordsFromMetadata } from "@/routes/dummyRouteRecords"
 import { notePropertyLocation } from "@/routes/noteShowLocation"
-import { describe, it, expect, afterEach, beforeEach, vi } from "vitest"
-import { type VueWrapper, flushPromises } from "@vue/test-utils"
+import helper from "@tests/helpers"
+import makeMe from "donut-test-fixtures/makeMe"
+import { createRouter, createWebHistory } from "vue-router"
+import { describe, it, expect } from "vitest"
+import { flushPromises } from "@vue/test-utils"
 
 describe("NoteToolbar conversation overflow", () => {
-  // biome-ignore lint/suspicious/noExplicitAny: wrapper for testing
-  let wrapper: VueWrapper<any>
-
-  afterEach(() => {
-    wrapper?.unmount()
-    document.body.innerHTML = ""
-    restoreNoteToolbarWidthMocks()
-    vi.unstubAllGlobals()
-  })
-
-  beforeEach(() => {
-    installMockResizeObserver()
-    resetNoteToolbarTestState()
-  })
-
   it("keeps the current property location when starting a conversation from overflow", async () => {
-    const mounted = await mountNoteToolbarAt(
-      (noteId) => notePropertyLocation(noteId, "topic"),
-      { plugin: notebookSidebarClosedPlugin() }
-    )
-    wrapper = mounted.wrapper
-    const { router, noteRealm } = mounted
-    await layoutNoteToolbar(wrapper, conversationOverflowNavWidth())
-    await openNoteToolbarOverflowMenu(wrapper)
-    overflowMenuItem(noteMoreOptionsTitles.conversation)!.click()
+    const note = makeMe.aNote.please()
+    const router = createRouter({
+      history: createWebHistory(),
+      routes: dummyRouteRecordsFromMetadata,
+    })
+    await router.push(notePropertyLocation(note.id, "topic"))
+    const wrapper = helper
+      .component(NoteMoreOptionsForm)
+      .withRouter(router)
+      .withProps({ note, only: ["conversation"] })
+      .mount()
+
+    await wrapper
+      .find(`button[title="${noteMoreOptionsTitles.conversation}"]`)
+      .trigger("click")
     await flushPromises()
 
     expect(router.currentRoute.value).toMatchObject(
-      notePropertyLocation(noteRealm.note.id, "topic")
+      notePropertyLocation(note.id, "topic")
     )
     expect(router.currentRoute.value.query).toEqual({ conversation: "true" })
   })

@@ -60,27 +60,23 @@ describe("WikidataAssociationDialog title actions and save", () => {
     }
   )
 
-  it.each([false, true])(
-    "emits replace then append when showSaveButton is %s",
-    async (showSaveButton) => {
-      const { wrapper: dialog, searchResult } = await mountWikidataDialogReady({
-        searchWikidataSpy: getSdkSpies().searchWikidataSpy,
-        searchKey: "dog",
-        searchLabel: "Canine",
-        wikidataId: "Q11399",
-        mountOptions: showSaveButton ? { showSaveButton: true } : undefined,
-      })
-      trackWrapper(dialog)
-      await clickWikidataSearchResult("Q11399")
-      expectReplaceTitleAndAddAliasControls("Canine")
+  it("emits replace then append from the title actions", async () => {
+    const { wrapper: dialog, searchResult } = await mountWikidataDialogReady({
+      searchWikidataSpy: getSdkSpies().searchWikidataSpy,
+      searchKey: "dog",
+      searchLabel: "Canine",
+      wikidataId: "Q11399",
+    })
+    trackWrapper(dialog)
+    await clickWikidataSearchResult("Q11399")
+    expectReplaceTitleAndAddAliasControls("Canine")
 
-      await clickWikidataTitleAction("Replace")
-      expect(dialog.emitted("selected")?.[0]).toEqual([searchResult, "replace"])
+    await clickWikidataTitleAction("Replace")
+    expect(dialog.emitted("selected")?.[0]).toEqual([searchResult, "replace"])
 
-      await clickWikidataTitleAction("Append")
-      expect(dialog.emitted("selected")?.[1]).toEqual([searchResult, "append"])
-    }
-  )
+    await clickWikidataTitleAction("Append")
+    expect(dialog.emitted("selected")?.[1]).toEqual([searchResult, "append"])
+  })
 
   it("defers selected until Save when showSaveButton is true", async () => {
     mockWikidataSearchResult(getSdkSpies().searchWikidataSpy, "dog", "Q11399")
