@@ -13,7 +13,9 @@ No active milestone. Start the next one with `/gsd-new-milestone`.
 
 ## Backlog
 
-Parked elsewhere: SEED-001, SEED-002, SEED-006, ADR 0002 Level 1.
+Remaining issues (from spent quick plans plus parked/deferred work): [041](quick/041-question-generation-batch-retry-and-failed-request-purge/PLAN.md).
+
+Parked seeds: SEED-001, SEED-002, SEED-006, SEED-007, SEED-008. Also deferred: ADR 0002 Level 1.
 
 ---
-*Last updated: 2026-08-21*
+*Last updated: 2026-09-03*

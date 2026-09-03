@@ -6,9 +6,9 @@ current_phase: null
 current_phase_name: null
 status: ready
 stopped_at: null
-last_updated: "2026-09-03T02:55:00Z"
+last_updated: "2026-09-03T09:27:00Z"
 last_activity: 2026-09-03
-last_activity_desc: "043: recall E2E optimization cleanup planned; not executing"
+last_activity_desc: "spent quick plans 038-043 deleted; remaining issues collected in 041"
 progress:
   total_phases: 0
   completed_phases: 0
@@ -29,15 +29,15 @@ See: `.planning/PROJECT.md`
 
 Scheduling follows Accepted [ADR 0003](../docs/adrs/0003-spaced-repetition-scheduling-policy-accepted.md). Difficulty is shown on the Memory Tracker Information card. `last_recalled_at` / `next_recall_at` are DATETIME; remaining TIMESTAMP columns are [SEED-006](seeds/SEED-006-remove-mysql-timestamp-2038.md).
 
-**Flyway:** every applied migration is squashed into `V100000000__baseline.sql`; `V300000317__drop_authored_note_reference_backfill_progress.sql` is the tip. New migrations use a greater version.
+**Flyway:** every applied migration is squashed into `V100000000__baseline.sql`; `V300000318__purge_failed_question_generation_batch_requests.sql` is the tip. New migrations use a greater version.
 
-Daily probe measurement (not an ADR): [daily-probe-protocol.md](notes/daily-probe-protocol.md). Authoritative authored note references and their index-hardening follow-up are shipped ([039](quick/039-authoritative-authored-note-references/PLAN.md), [040](quick/040-note-reference-index-hardening/PLAN.md)).
+Daily probe measurement (not an ADR): [daily-probe-protocol.md](notes/daily-probe-protocol.md). Authoritative authored note references (live resolution, no notebook-wide cache) and question-generation batch latest-only retry + `FAILED` request purge are shipped.
 
 ## Operator Next Steps
 
-- Dead-code/readability cleanup from plan-042 review (recall.ts orphaned steps, assimilation.ts orphaned step, property-tracker scenario comment): `.planning/quick/043-recall-e2e-optimization-cleanup/PLAN.md` — planned, do not execute until asked.
+- Remaining issues: [041](quick/041-question-generation-batch-retry-and-failed-request-purge/PLAN.md)
 - Start the next milestone with `/gsd-new-milestone` when ready.
 
-Parked work: SEED-001, SEED-002, SEED-006, SEED-007, SEED-008; ADR 0002 Level 1. See [ROADMAP.md](ROADMAP.md).
+Parked work: SEED-001, SEED-002, SEED-006, SEED-007, SEED-008; ADR 0002 Level 1. See [ROADMAP.md](ROADMAP.md) or [041](quick/041-question-generation-batch-retry-and-failed-request-purge/PLAN.md).
 
-Recent ad-hoc work: `noteProperty` / **property panel** / `#prop:` wiki (ADR 0001 / ADR 0004 / ADR 0005); E2E named-route honesty and SPA hydrate protocol (E2E helpers, `MainMenu.vue`); daily probe side tap ([daily-probe-protocol.md](notes/daily-probe-protocol.md)); note reference index hardening ([040](quick/040-note-reference-index-hardening/PLAN.md)); question generation batch retry + failed-request purge ([041](quick/041-question-generation-batch-retry-and-failed-request-purge/PLAN.md)); recall E2E test optimization ([042](quick/042-recall-e2e-test-optimization/PLAN.md)).
+Recent ad-hoc work: `noteProperty` / **property panel** / `#prop:` wiki (ADR 0001 / ADR 0004 / ADR 0005); E2E named-route honesty and SPA hydrate protocol (E2E helpers, `MainMenu.vue`); daily probe side tap ([daily-probe-protocol.md](notes/daily-probe-protocol.md)); live authored-note-reference resolution; question-generation batch latest-only retry + failed-request purge; recall E2E suite cut (~78% wall time).
