@@ -75,14 +75,9 @@ describe("RichMarkdownEditor overlaps property", () => {
   })
 
   it("inserts overlaps as a list and blocks scalar overlaps on row commit", async () => {
-    await h.mountAndCommitInsertProperty("overlaps", "[[Other Note]]")
+    await h.mountEditor("# Body")
+    await h.commitInsertProperty("overlaps", "[[Other Note]]")
 
-    expect(
-      h
-        .getWrapper()
-        .find('[data-testid="rich-note-property-validation"]')
-        .exists()
-    ).toBe(false)
     const parsed = parseNoteContentMarkdown(h.lastEmittedMarkdown())
     expect(parsed.ok).toBe(true)
     if (!parsed.ok) return
@@ -92,7 +87,6 @@ describe("RichMarkdownEditor overlaps property", () => {
 
     const wrapper = h.getWrapper()
     await wrapper.setProps({ modelValue: OVERLAPS_SCALAR_MARKDOWN })
-    await flushPromises()
     const emissionsBeforeBlur =
       wrapper.emitted("update:modelValue")?.length ?? 0
     await triggerRowKeyBlurValidation(wrapper)

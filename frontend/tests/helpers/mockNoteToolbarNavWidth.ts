@@ -177,11 +177,6 @@ export function overflowOnlyNavWidth() {
   return remainingMoreOptionsNavWidth(0)
 }
 
-/** On-toggle and `…` only. */
-export function pinnedToggleOnlyNavWidth() {
-  return remainingMoreOptionsNavWidth(1)
-}
-
 /** Full set does not fit; remaining actions plus overflow button do. */
 export function deleteOverflowNavWidth() {
   return allMoreOptionsWidth - 1

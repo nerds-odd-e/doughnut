@@ -116,11 +116,6 @@ export function createRichMarkdownEditorTestHarness() {
     await flushPromises()
   }
 
-  async function mountAndCommitInsertProperty(key: string, value: string) {
-    await mountEditor("# Body", { attachToBody: true })
-    await commitInsertProperty(key, value)
-  }
-
   async function mountEditor(
     initialValue: string,
     options: Record<string, unknown> & {
@@ -176,6 +171,5 @@ export function createRichMarkdownEditorTestHarness() {
     propertyValueFieldElement,
     openAddProperty,
     commitInsertProperty,
-    mountAndCommitInsertProperty,
   }
 }

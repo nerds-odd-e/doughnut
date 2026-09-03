@@ -1,4 +1,3 @@
-import makeMe from "donut-test-fixtures/makeMe"
 import { beforeEach, describe, expect, it } from "vitest"
 import {
   answeredRecallPrompt,
@@ -53,47 +52,28 @@ describe("MemoryTrackerPageView delete unanswered", () => {
   it("confirmation messages and deletes when confirmed", async () => {
     const deleteSpy = mockDeleteUnansweredRecallPrompts()
     const wrapper = await mountMemoryTrackerPageViewReady({
-      recallHistory: historyFromPrompts([unansweredRecallPrompt()]),
+      recallHistory: historyFromPrompts([
+        unansweredRecallPrompt(),
+        contestedRecallPrompt(),
+      ]),
     })
 
     await clickDeleteUnanswered(wrapper)
     expect(peekConfirmPopup()?.[0]?.message).toBe(
       "Are you sure you want to delete 1 unanswered recall prompt?"
-    )
-    await resolveConfirmPopup(false)
-
-    await wrapper.setProps({
-      recallHistory: historyFromPrompts([
-        makeMe.aRecallPromptHistoryItem
-          .withQuestionStem("Unanswered question 1")
-          .please(),
-        makeMe.aRecallPromptHistoryItem
-          .withQuestionStem("Unanswered question 2")
-          .please(),
-      ]),
-    })
-    await clickDeleteUnanswered(wrapper)
-    expect(peekConfirmPopup()?.[0]?.message).toBe(
-      "Are you sure you want to delete 2 unanswered recall prompts?"
     )
     await resolveConfirmPopup(false)
 
     await wrapper.setProps({
       recallHistory: historyFromPrompts([
         unansweredRecallPrompt(),
-        contestedRecallPrompt(),
+        unansweredRecallPrompt(),
       ]),
     })
     await clickDeleteUnanswered(wrapper)
     expect(peekConfirmPopup()?.[0]?.message).toBe(
-      "Are you sure you want to delete 1 unanswered recall prompt?"
+      "Are you sure you want to delete 2 unanswered recall prompts?"
     )
-    await resolveConfirmPopup(false)
-
-    await wrapper.setProps({
-      recallHistory: historyFromPrompts([unansweredRecallPrompt()]),
-    })
-    await clickDeleteUnanswered(wrapper)
     await resolveConfirmPopup(true)
 
     expect(deleteSpy).toHaveBeenCalledWith({

@@ -3,8 +3,6 @@ import {
   installMockResizeObserver,
   layoutNoteToolbar,
   overflowOnlyNavWidth,
-  overflowTogglesNavWidth,
-  pinnedToggleOnlyNavWidth,
   restoreNoteToolbarWidthMocks,
   wikiOverflowNavWidth,
 } from "@tests/helpers/mockNoteToolbarNavWidth"
@@ -82,7 +80,14 @@ describe("NoteToolbar Conversation, Wiki, and New overflow", () => {
     expect(document.querySelector('input[placeholder="Search"]')).toBeNull()
 
     await layoutNoteToolbar(wrapper, overflowOnlyNavWidth())
+    expect(noteToolbarAction(wrapper, titles.overflowMenu).exists()).toBe(true)
+    expect(noteToolbarAction(wrapper, titles.conversation).exists()).toBe(false)
+    expect(noteToolbarWikiHidden(wrapper)).toBe(true)
     expect(noteToolbarNewDisplayed(wrapper)).toBe(false)
+    expect(noteToolbarAction(wrapper, titles.audio).exists()).toBe(false)
+    expect(
+      noteToolbarAction(wrapper, noteToolbarEditTitles.markdown).exists()
+    ).toBe(false)
     expect(document.querySelector('[data-testid="note-new-form"]')).toBeNull()
 
     dispatchDocumentKey({ key: "n", code: "KeyN" })
@@ -90,34 +95,6 @@ describe("NoteToolbar Conversation, Wiki, and New overflow", () => {
     expect(
       document.querySelector('[data-testid="note-new-form"]')
     ).not.toBeNull()
-  })
-
-  it("keeps a pinned on-toggle then only more options when nothing is pinned", async () => {
-    wrapper = await mountOverflowToolbar()
-    await layoutNoteToolbar(wrapper, overflowTogglesNavWidth())
-    await openNoteToolbarOverflowMenu(wrapper)
-    overflowMenuItem(titles.audio)?.click()
-    await flushPromises()
-    await layoutNoteToolbar(wrapper, pinnedToggleOnlyNavWidth())
-
-    expect(noteToolbarAction(wrapper, titles.audio).exists()).toBe(true)
-    expect(noteToolbarAction(wrapper, titles.overflowMenu).exists()).toBe(true)
-    expect(noteToolbarAction(wrapper, titles.conversation).exists()).toBe(false)
-    expect(noteToolbarWikiHidden(wrapper)).toBe(true)
-    expect(noteToolbarNewDisplayed(wrapper)).toBe(false)
-    expect(
-      noteToolbarAction(wrapper, noteToolbarEditTitles.markdown).exists()
-    ).toBe(false)
-
-    await noteToolbarAction(wrapper, titles.audio).trigger("click")
-    await flushPromises()
-    await layoutNoteToolbar(wrapper, overflowOnlyNavWidth())
-
-    expect(noteToolbarAction(wrapper, titles.overflowMenu).exists()).toBe(true)
-    expect(noteToolbarAction(wrapper, titles.conversation).exists()).toBe(false)
-    expect(noteToolbarWikiHidden(wrapper)).toBe(true)
-    expect(noteToolbarNewDisplayed(wrapper)).toBe(false)
-    expect(noteToolbarAction(wrapper, titles.audio).exists()).toBe(false)
   })
 
   it("keeps the current property location when starting a conversation from overflow", async () => {

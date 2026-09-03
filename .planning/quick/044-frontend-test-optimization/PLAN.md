@@ -305,7 +305,9 @@ CURSOR_DEV=true nix develop -c pnpm frontend:test tests/components/form/RichMark
 
 ### 4. Optimize ranked tests 10–12
 Type: Structure
-Status: planned
+Status: done
+
+Outcome: Halved the delete-unanswered journey, removed redundant overlaps setup/assertions, folded overflow assertions into the progressive case, and deleted the duplicate pinned-toggle journey plus two helpers it orphaned. Focused browser coverage passed repeatedly.
 
 **Tests:**
 - #10 `tests/pages/MemoryTrackerPageView.deleteUnanswered.spec.ts` — MemoryTrackerPageView delete unanswered > confirmation messages and deletes when confirmed (~37.7ms)
