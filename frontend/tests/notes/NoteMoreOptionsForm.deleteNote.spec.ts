@@ -67,7 +67,7 @@ describe("NoteMoreOptionsForm delete note", () => {
     )
 
     usePopups().popups.done("REMOVE_FROM_PROPERTIES")
-    await awaitDeleteSideEffects()
+    await flushPromises()
 
     expect(deleteNoteSpy).toHaveBeenCalledWith({
       path: { note: noteRealm.id },

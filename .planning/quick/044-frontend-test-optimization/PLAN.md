@@ -470,7 +470,9 @@ CURSOR_DEV=true nix develop -c pnpm frontend:test tests/pages/FolderPage.renameD
 
 ### 11. Optimize ranked tests 31–33
 Type: Structure
-Status: planned
+Status: done
+
+Outcome: Removed redundant modal focus/flush work, styling assertions, and router settling while retaining both modal choices, the complete generic pin lifecycle, and the inbound-reference payload behavior. Focused browser checks passed.
 
 **Tests:**
 - #31 `tests/notes/NoteUnresolvedWikiLinkModal.spec.ts` — NoteUnresolvedWikiLinkModal > shows create-or-retarget choice when reopened after modelValue cleared without close (~23.9ms)

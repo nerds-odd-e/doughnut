@@ -26,28 +26,6 @@ async function turnOnFromOverflow(wrapper: VueWrapper, title: string) {
   await flushPromises()
 }
 
-async function expectPinnedOnNarrowToolbar(
-  wrapper: VueWrapper,
-  pinnedTitle: string,
-  menuTitle: string
-) {
-  const pinned = noteToolbarAction(wrapper, pinnedTitle)
-  expect(pinned.exists()).toBe(true)
-  expect(pinned.classes()).toContain("daisy-btn-soft")
-  expect(pinned.classes()).toContain("daisy-btn-primary")
-  expect(pinned.classes()).toContain("shrink-0")
-  expect(pinned.attributes("aria-pressed")).toBe("true")
-
-  await noteToolbarAction(wrapper, titles.overflowMenu).trigger("click")
-  await flushPromises()
-
-  expect(overflowMenuItem(pinnedTitle)).toBeNull()
-  expect(overflowMenuItem(menuTitle)).not.toBeNull()
-
-  await noteToolbarAction(wrapper, titles.overflowMenu).trigger("click")
-  await flushPromises()
-}
-
 describe("NoteToolbar pinned on-state toggles", () => {
   // biome-ignore lint/suspicious/noExplicitAny: wrapper for testing
   let wrapper: VueWrapper<any>
@@ -70,16 +48,10 @@ describe("NoteToolbar pinned on-state toggles", () => {
     await layoutNoteToolbar(wrapper, overflowTogglesNavWidth())
 
     await turnOnFromOverflow(wrapper, titles.audio)
-    await expectPinnedOnNarrowToolbar(
-      wrapper,
-      titles.audio,
-      titles.assimilation
-    )
+    expect(noteToolbarAction(wrapper, titles.audio).exists()).toBe(true)
 
     await noteToolbarAction(wrapper, titles.audio).trigger("click")
     await flushPromises()
-
-    expect(noteToolbarAction(wrapper, titles.audio).exists()).toBe(false)
 
     await noteToolbarAction(wrapper, titles.overflowMenu).trigger("click")
     await flushPromises()

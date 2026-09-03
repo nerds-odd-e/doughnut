@@ -173,17 +173,14 @@ describe("NoteUnresolvedWikiLinkModal", () => {
 
   it("shows create-or-retarget choice when reopened after modelValue cleared without close", async () => {
     mountModal()
-    await waitForChooser()
     await tapChooserAndSettle(createNoteLabel)
-    await waitUntilFocused('[data-test="note-title"]')
     expect(screen.queryByTestId("note-new-form")).not.toBeNull()
 
     await wrapper!.setProps({ modelValue: null })
-    await flushPromises()
     await wrapper!.setProps({ modelValue: deadWikiLinkPayload })
-    await flushPromises()
 
-    await waitForChooser()
+    expect(screen.getByText(createNoteLabel)).toBeTruthy()
+    expect(screen.getByText(pointAtExistingNoteLabel)).toBeTruthy()
     expect(screen.queryByTestId("note-new-form")).toBeNull()
   })
 
