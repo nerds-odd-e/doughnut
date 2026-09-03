@@ -6,7 +6,6 @@ import {
   mountNoteNewForm,
   noteNewFormNote,
   noteNewFormRealm,
-  notebookRootProps,
   setNoteNewFormTitle,
   setupNoteNewFormSdkMocks,
   type NoteNewFormSdkSpies,
@@ -53,34 +52,12 @@ describe("NoteNewForm parent relationship", () => {
     vi.useRealTimers()
   })
 
-  it("submits parent frontmatter for Under current and Same parent choices", async () => {
-    const wrapper = mountNoteNewForm(notebookRootProps, {
-      attachTo: document.body,
-    })
-    await flushPromises()
-    expect(
-      wrapper.find('[data-testid="note-creation-parent-relationship"]').text()
-    ).not.toContain("Same parent")
-    await wrapper
-      .find('label[for="note-creation-under_current"]')
-      .trigger("click")
-    await setNoteNewFormTitle(wrapper, "Child topic")
-    await wrapper.find('[data-testid="note-new-form"]').trigger("submit")
-    await flushPromises()
-    expect(sdkSpies.mockedCreateNoteAtRoot).toHaveBeenCalledWith({
-      path: { notebook: noteNewFormRealm.notebookRealm.notebook.id },
-      body: expect.objectContaining({
-        newTitle: "Child topic",
-        content: expect.stringContaining('parent: "[[mythical]]"'),
-      }),
-    })
-    wrapper.unmount()
-
+  it("submits inherited parent frontmatter for the Same parent choice", async () => {
     const noteWithParent = makeMe.aNoteRealm
       .title("team")
       .content('---\nparent: "[[Course intro]]"\n---\n')
       .please().note
-    const siblingWrapper = mountNoteNewForm(
+    const wrapper = mountNoteNewForm(
       {
         notebookId: noteNewFormRealm.notebookRealm.notebook.id,
         titleSearchAnchorNote: noteWithParent,
@@ -90,15 +67,13 @@ describe("NoteNewForm parent relationship", () => {
     )
     await flushPromises()
     expect(
-      siblingWrapper
-        .find('[data-testid="note-creation-parent-relationship"]')
-        .text()
+      wrapper.find('[data-testid="note-creation-parent-relationship"]').text()
     ).toContain("Same parent")
-    await siblingWrapper
+    await wrapper
       .find('label[for="note-creation-same_parent"]')
       .trigger("click")
-    await setNoteNewFormTitle(siblingWrapper, "Sibling")
-    await siblingWrapper.find('[data-testid="note-new-form"]').trigger("submit")
+    await setNoteNewFormTitle(wrapper, "Sibling")
+    await wrapper.find('[data-testid="note-new-form"]').trigger("submit")
     await flushPromises()
     expect(sdkSpies.mockedCreateNoteAtRoot).toHaveBeenCalledWith({
       path: { notebook: noteNewFormRealm.notebookRealm.notebook.id },
@@ -107,7 +82,7 @@ describe("NoteNewForm parent relationship", () => {
         content: expect.stringContaining('parent: "[[Course intro]]"'),
       }),
     })
-    siblingWrapper.unmount()
+    wrapper.unmount()
   })
 
   it("hides relationship options without a context note", async () => {

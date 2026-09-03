@@ -53,11 +53,9 @@ describe("Sidebar peer sort", () => {
     }
   }
 
-  async function flushUntilTwoRootFolderLabels() {
+  async function flushRootFolderLabels() {
     await flushPromises()
-    await vi.waitUntil(
-      () => wrapper.findAll(".sidebar-folder-label").length >= 2
-    )
+    expect(wrapper.findAll(".sidebar-folder-label")).toHaveLength(2)
   }
 
   async function mountZebraAppleRootSidebar() {
@@ -70,7 +68,7 @@ describe("Sidebar peer sort", () => {
       realmA,
     })
     wrapper = mountSidebarSignedIn(helper, activeA, nbId)
-    await flushUntilTwoRootFolderLabels()
+    await flushRootFolderLabels()
     return { activeA, nbId }
   }
 
@@ -83,8 +81,8 @@ describe("Sidebar peer sort", () => {
     await flushPromises()
   }
 
-  it("lists folders above notes (A–Z) and reorders root peers when Title (Z–A) is chosen", async () => {
-    await mountZebraAppleRootSidebar()
+  it("sorts folders above notes and persists Title (Z–A) across visits", async () => {
+    const { activeA, nbId } = await mountZebraAppleRootSidebar()
 
     expect(wrapper.find("[data-note-sidebar-sort]").exists()).toBe(true)
     expect(rootRowLabels(wrapper)).toEqual([...DEFAULT_ROOT_PEER_ORDER])
@@ -92,17 +90,12 @@ describe("Sidebar peer sort", () => {
     await chooseTitleZa()
 
     expect(rootRowLabels(wrapper)).toEqual(titleZaRootOrder)
-  })
-
-  it("keeps Title (Z–A) on a later visit after the tab session is gone", async () => {
-    const { activeA, nbId } = await mountZebraAppleRootSidebar()
-    await chooseTitleZa()
 
     wrapper.unmount()
     sessionStorage.removeItem(PEER_SORT_STORAGE_KEY)
 
     wrapper = mountSidebarSignedIn(helper, activeA, nbId)
-    await flushUntilTwoRootFolderLabels()
+    await flushRootFolderLabels()
 
     expect(rootRowLabels(wrapper)).toEqual(titleZaRootOrder)
   })

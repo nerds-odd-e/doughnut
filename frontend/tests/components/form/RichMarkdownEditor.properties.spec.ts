@@ -123,32 +123,7 @@ Hello`
     expect(payload).toMatch(/^---\n/)
   })
 
-  it("editing an existing property row emits renamed keys and updated values", async () => {
-    const markdown = `---
-topic: training
----
-
-Workshop body.`
-    const wrapper = await h.mountEditor(markdown)
-
-    const keyInput = wrapper.find(
-      '[data-testid="rich-note-property-row-key-input"]'
-    )
-    const valInput = wrapper.find(
-      '[data-testid="rich-note-property-row-value-input"]'
-    )
-    await keyInput.setValue("domain")
-    await keyInput.trigger("blur")
-    await h.setPropertyValueField(valInput, "wiki")
-    await valInput.trigger("blur")
-
-    const last = h.lastEmittedMarkdown()
-    expect(last).toContain("domain:")
-    expect(last).toContain("wiki")
-    expect(last).not.toContain("topic:")
-  })
-
-  it("shows validation and does not emit corrupt duplicate keys when renaming a row", async () => {
+  it("rejects duplicate keys before emitting valid renamed keys and values", async () => {
     const wrapper = await mountDuplicateKeysEditor(h)
     const emitCountBefore = wrapper.emitted("update:modelValue")?.length ?? 0
 
@@ -161,6 +136,18 @@ Workshop body.`
     expect(propertyRowKeyInputEl(propertyRows(wrapper.element)[1]!).value).toBe(
       "beta"
     )
+
+    await attemptRenamePropertyKey(wrapper, 0, "domain")
+    const domainValue = wrapper.find(
+      `${propertyRowSelector("domain")} [data-testid="rich-note-property-row-value-input"]`
+    )
+    await h.setPropertyValueField(domainValue, "wiki")
+    await domainValue.trigger("blur")
+
+    const last = h.lastEmittedMarkdown()
+    expect(last).toContain("domain:")
+    expect(last).toContain("wiki")
+    expect(last).not.toContain("alpha:")
   })
 
   it("opening one property panel then removing that row leaves the other collapsed", async () => {

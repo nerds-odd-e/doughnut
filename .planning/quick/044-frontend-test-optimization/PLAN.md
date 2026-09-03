@@ -1030,7 +1030,9 @@ CURSOR_DEV=true nix develop -c pnpm frontend:test tests/components/form/RichMark
 
 ### 33. Optimize ranked tests 97–99
 Type: Structure
-Status: planned
+Status: done
+
+Outcome: Merged sort persistence, removed a redundant parent-choice mount, and combined duplicate-key rejection with successful rename/value behavior. Focused Chromium passed three consecutive runs.
 
 **Tests:**
 - #97 `tests/notes/sidebar/SidebarPeerSort.spec.ts` — Sidebar peer sort > lists folders above notes (A–Z) and reorders root peers when Title (Z–A) is chosen (~13.4ms)
