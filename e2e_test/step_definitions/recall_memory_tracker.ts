@@ -25,27 +25,6 @@ Then('I should see an AGAIN RecallLog', () => {
   assumeMemoryTrackerPage().expectAgainRecallLog()
 })
 
-Then(
-  'the recall history should show away time and count beside thinking time',
-  () => {
-    assumeMemoryTrackerPage().expectAwayTimeAndCount()
-  }
-)
-
-Then(
-  'the recall history should show detour time and count distinct from away time',
-  () => {
-    assumeMemoryTrackerPage().expectDetourTimeAndCount()
-  }
-)
-
-Then(
-  'the recall history should show a thinking time under {int} seconds for that answer',
-  (seconds: number) => {
-    assumeMemoryTrackerPage().expectThinkingTimeUnderSeconds(seconds)
-  }
-)
-
 Then("I should see the tutor's feedback {string}", (feedback: string) => {
   assumeMemoryTrackerPage().expectTutorFeedback(feedback)
 })

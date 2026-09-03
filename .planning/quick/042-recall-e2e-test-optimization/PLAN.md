@@ -105,7 +105,7 @@ Target remaining in `recall/`: **~12 scenarios** (from 59). `recall_timing.featu
 
 ### 1. Drop recall timing E2E and thinking-time linger
 Type: Structure
-Status: planned
+Status: done
 
 **Tests:**
 - `recall_timing.feature` — both scenarios (~9.4s + ~6.5s)

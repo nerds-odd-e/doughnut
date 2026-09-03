@@ -22,24 +22,6 @@ Feature: Browse answers and notes while recalling
     And I type my answer "sedition"
     Then I should see that my last spelling answer was correct with recall count 1
 
-  @usingMockedOpenAiService
-  Scenario: Viewing a previous answer does not count toward the current question's thinking time
-    Given OpenAI evaluates the question as legitimate
-    And OpenAI generates this question:
-      | Question Stem                    | Correct Choice     | Incorrect Choice 1 | Incorrect Choice 2 | Incorrect Choice 3 |
-      | What is the meaning of sedition? | to incite violence | to sleep           | Open Water Diver   | to stay silent     |
-    And the note "sedition" was assimilated as spelling on day 1
-    And the note "sedition" was assimilated on day 1
-    When I visit recall waiting for 2 due recall prompts on day 2
-    And I type my answer "sedition"
-    Then I should be asked "What is the meaning of sedition?"
-    When I view the last answered question for 5 seconds
-    And I resume recalling
-    Then I should be asked "What is the meaning of sedition?"
-    When I choose answer "to incite violence"
-    And I visit the understanding memory tracker for "sedition"
-    Then the recall history should show a thinking time under 2 seconds for that answer
-
   @disableOpenAiService
   @skipOptimizationDueToKnownNecessarySlowness
   Scenario: Browse notes while recalling and come back

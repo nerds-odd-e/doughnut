@@ -142,22 +142,6 @@ const recallPage = () => {
         }
       })
     },
-    viewLastAnsweredQuestionFor(seconds: number) {
-      // Linger on real wall-clock so performance.now() thinking time advances
-      // without ticking cy.clock().
-      cy.get('button[title="view last answered question"]')
-        .should('be.visible')
-        .and('not.be.disabled')
-        .click()
-      waitUntilAppIsNotBusy()
-      cy.then(
-        () =>
-          new Promise<void>((resolve) => {
-            setTimeout(resolve, seconds * 1000)
-          })
-      )
-      return this
-    },
     expectCurrentQuestion() {
       waitUntilAppIsNotBusy()
       assumeQuestionPage().getQuestionSection().should('be.visible')

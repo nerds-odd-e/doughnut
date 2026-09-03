@@ -174,26 +174,6 @@ When('I choose answer {string}', (answer: string) => {
   start.assumeQuestionPage().answer(answer)
 })
 
-When('I switch away from the tab for {int} seconds', (seconds: number) => {
-  start.assumeQuestionPage().switchAwayFromTabFor(seconds)
-})
-
-When(
-  'I view the last answered question for {int} seconds',
-  (seconds: number) => {
-    start.recall().assumeRecallPage().viewLastAnsweredQuestionFor(seconds)
-  }
-)
-
-When(
-  'I take a detour into the notebook for {int} seconds',
-  (seconds: number) => {
-    start.assumeQuestionPage().openNotebookLink()
-    cy.wait(seconds * 1000)
-    start.recall().returnToRecallFromDetour()
-  }
-)
-
 Then(
   'I should see that my MCQ answer {string} is incorrect',
   (answer: string) => {
