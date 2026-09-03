@@ -151,10 +151,6 @@ When('I choose Good', () => {
   start.recall().assumeRecallPage().chooseGood()
 })
 
-When('I choose Again', () => {
-  start.recall().assumeRecallPage().chooseAgain()
-})
-
 Then('I skip one question', () => {
   start.assumeQuestionPage().skipQuestion()
 })

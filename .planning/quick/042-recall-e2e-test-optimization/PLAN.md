@@ -127,7 +127,7 @@ CURSOR_DEV=true nix develop -c pnpm frontend:test tests/pages/RecallPage.viewHis
 
 ### 2. Drop FSRS-number Memory Tracker E2E from spaced repetition
 Type: Structure
-Status: planned
+Status: done
 
 **Tests:**
 - `spaced_repetition.feature` — Last Recall N/A; GOOD RecallLog; first Again Stability 5; on-time Good Stability 21; incorrect just-review Stability 15; same-hour Good 55; same-hour Again 18 (~top 10% #3 and #5)

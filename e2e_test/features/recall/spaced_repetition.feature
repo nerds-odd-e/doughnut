@@ -28,16 +28,6 @@ Feature: Spaced-repetition
     And On day 9 I recall "end                 " and assimilate new "end         "
 
   @mockBrowserTime
-  Scenario: Memory Tracker after assimilate has no last recall
-    Given the browser and backend are on day 1
-    When I assimilate the note "Note 1"
-    And I visit the understanding memory tracker for "Note 1"
-    Then I should see Last Recall Time "N/A"
-    And I should see Next Recall Time equal to Assimilated Time
-    And I should see Stability 0
-    And I should see Difficulty "N/A"
-
-  @mockBrowserTime
   Scenario: Remove from recall does not change Last Recall Time
     Given the browser and backend are on day 1
     When I assimilate the note "Note 1"
@@ -51,78 +41,6 @@ Feature: Spaced-repetition
     When I revive the memory tracker on this page
     Then the memory tracker should be available for recall again
     And I should see the same Last Recall Time
-
-  @mockBrowserTime
-  Scenario: Memory Tracker shows a GOOD RecallLog after just-review Good
-    Given the browser and backend are on day 1
-    When I assimilate the note "Note 1"
-    And I am recalling my note on day 1
-    And I choose Good
-    And I visit the understanding memory tracker for "Note 1"
-    Then I should see a GOOD RecallLog with elapsed hours and no answer id
-
-  @mockBrowserTime
-  Scenario: Memory Tracker shows first Again after just-review Again on New
-    Given the browser and backend are on day 1
-    When I assimilate the note "Note 1"
-    And I am recalling my note on day 1
-    And I choose Again
-    And I visit the understanding memory tracker for "Note 1"
-    Then I should see Stability 5
-    And I should see Difficulty 6.4133
-    And I should see 5 hours between last and next recall
-
-  @mockBrowserTime
-  Scenario: On-time Good after first Again uses long-term Stability 21
-    Given the browser and backend are on day 1
-    When I assimilate the note "Note 1"
-    And I am recalling my note on day 1
-    And I choose Again
-    And It's day 1, 13 hour
-    And I visit recall
-    And I choose Good
-    And I visit the understanding memory tracker for "Note 1"
-    Then I should see Stability 21
-    And I should see 21 hours between last and next recall
-
-  @mockBrowserTime
-  Scenario: Memory Tracker shows Stability and Again Difficulty after incorrect just-review
-    Given the browser and backend are on day 1
-    When I assimilate the note "Note 1"
-    And I am recalling my note on day 1
-    And I choose Good
-    And It's day 3, 15 hour
-    And I visit recall
-    And I choose Again
-    And I visit the understanding memory tracker for "Note 1"
-    Then I should see Stability 15
-    And I should see 15 hours between last and next recall
-    And I should see Difficulty 7.3945
-    And I should see an AGAIN RecallLog
-
-  @mockBrowserTime
-  Scenario: Same-hour Good after first Good stays Stability 55
-    Given the browser and backend are on day 1
-    When I assimilate the note "Note 1"
-    And I am recalling my note on day 1
-    And I choose Good
-    And I ask to do more recall
-    And I choose Good
-    And I visit the understanding memory tracker for "Note 1"
-    Then I should see Stability 55
-    And I should see 55 hours between last and next recall
-
-  @mockBrowserTime
-  Scenario: Same-hour Again after first Good uses short-term Stability 18
-    Given the browser and backend are on day 1
-    When I assimilate the note "Note 1"
-    And I am recalling my note on day 1
-    And I choose Good
-    And I ask to do more recall
-    And I choose Again
-    And I visit the understanding memory tracker for "Note 1"
-    Then I should see Stability 18
-    And I should see 18 hours between last and next recall
 
   @mockBrowserTime
   Scenario: Strictly follow the schedule but want to recall more

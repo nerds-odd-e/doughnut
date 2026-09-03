@@ -107,14 +107,9 @@ const assumeMemoryTrackerPage = () => {
       expectLabeledValue('Stability:', String(stability))
       return assumeMemoryTrackerPage()
     },
-    expectDifficulty(difficulty: number | string) {
+    expectDifficulty(difficulty: number) {
       expectMemoryTrackerPage()
       expectLabeledValue('Difficulty:', String(difficulty))
-      return assumeMemoryTrackerPage()
-    },
-    expectLastRecallTime(value: string) {
-      expectMemoryTrackerPage()
-      expectLabeledValue('Last Recall Time:', value)
       return assumeMemoryTrackerPage()
     },
     expectLastRecallTimeUnchanged() {
@@ -123,18 +118,6 @@ const assumeMemoryTrackerPage = () => {
         'Last Recall Time:',
         'recordedLastRecallTime',
         (recorded) => `Last Recall Time should stay ${recorded}`
-      )
-      return assumeMemoryTrackerPage()
-    },
-    expectNextRecallTimeEqualsAssimilatedTime() {
-      expectMemoryTrackerPage()
-      labeledPair('Assimilated Time:', 'Next Recall Time:').then(
-        ({ first: assimilatedTime, second: nextRecallTime }) => {
-          expect(
-            nextRecallTime,
-            `Next Recall Time (${nextRecallTime}) should equal Assimilated Time (${assimilatedTime})`
-          ).to.equal(assimilatedTime)
-        }
       )
       return assumeMemoryTrackerPage()
     },

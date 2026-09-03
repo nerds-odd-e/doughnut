@@ -54,10 +54,6 @@ const recallPage = () => {
       })
       waitUntilAppIsNotBusy()
     },
-    chooseAgain() {
-      cy.findByRole('button', { name: 'Again' }).should('be.visible').click()
-      waitUntilAppIsNotBusy()
-    },
     typeSpellingAnswer(answer: string) {
       waitUntilAppIsNotBusy()
       cy.get('[data-test="question-section"]:visible', { timeout: 15000 })

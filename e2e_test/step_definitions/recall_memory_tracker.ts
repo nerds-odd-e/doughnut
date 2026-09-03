@@ -14,17 +14,6 @@ function openNoteLevelTracker(noteTitle: string, kind: NoteLevelTrackerKind) {
     .openNoteLevelMemoryTracker(kind)
 }
 
-Then(
-  'I should see a GOOD RecallLog with elapsed hours and no answer id',
-  () => {
-    assumeMemoryTrackerPage().expectGoodRecallLogWithoutAnswer()
-  }
-)
-
-Then('I should see an AGAIN RecallLog', () => {
-  assumeMemoryTrackerPage().expectAgainRecallLog()
-})
-
 Then("I should see the tutor's feedback {string}", (feedback: string) => {
   assumeMemoryTrackerPage().expectTutorFeedback(feedback)
 })
@@ -35,18 +24,6 @@ Then('I should see Stability {int}', (stability: number) => {
 
 Then('I should see Difficulty {float}', (difficulty: number) => {
   assumeMemoryTrackerPage().expectDifficulty(difficulty)
-})
-
-Then('I should see Last Recall Time {string}', (value: string) => {
-  assumeMemoryTrackerPage().expectLastRecallTime(value)
-})
-
-Then('I should see Difficulty {string}', (value: string) => {
-  assumeMemoryTrackerPage().expectDifficulty(value)
-})
-
-Then('I should see Next Recall Time equal to Assimilated Time', () => {
-  assumeMemoryTrackerPage().expectNextRecallTimeEqualsAssimilatedTime()
 })
 
 Then(
