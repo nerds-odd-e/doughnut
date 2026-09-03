@@ -55,7 +55,7 @@ Batch-level terminal states are `COMPLETED`, `FAILED`, and `EXPIRED`. A complete
 - **In-flight work:** User is not eligible for a new submission while any batch has status `SUBMITTED`.
 - **Row import:** Failed rows stay `FAILED`; other rows in the same batch can still import. Re-running maintenance is safe: already `IMPORTED` rows are skipped.
 
-`V300000306` is a gated one-time purge of incomplete batches (`status <> COMPLETED` or `imported_at IS NULL`). Test/dev/e2e leave it as a no-op (`1=0`). Production defaults to `1=1` so the OpenAI Batch outage backlog is dropped on deploy; imported `COMPLETED` batches are kept. After Flyway has applied that version, revert the production placeholder to `1=0`.
+`V300000306` is a one-time purge of incomplete batches (`status <> COMPLETED` or `imported_at IS NULL`); imported `COMPLETED` batches are kept. `V300000318` is a one-time purge of `FAILED` `question_generation_batch_request` rows (parent batch rows and non-`FAILED` request rows untouched), unblocking twice-failed trackers for regeneration without waiting on the 30-day retention window. Both run unconditionally and only ever affect rows present the first time each migration applies to a given database.
 
 ## Restart Behavior
 
