@@ -3,7 +3,9 @@ import makeMe from "donut-test-fixtures/makeMe"
 import { type VueWrapper, flushPromises } from "@vue/test-utils"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import type { ComponentPublicInstance } from "vue"
+import NoteEditableTitle from "@/components/notes/core/NoteEditableTitle.vue"
 import { RESERVED_README_TITLE_MESSAGE } from "@/utils/reservedReadmeTitles"
+import helper from "@tests/helpers"
 import {
   editTitle,
   editTitleThenBlur,
@@ -16,8 +18,21 @@ import {
 describe("NoteTextContent title edit", () => {
   let wrapper: VueWrapper<ComponentPublicInstance>
 
-  const mountWith = (note: Note, readonly = false) => {
+  const mountTextContentWith = (note: Note, readonly = false) => {
     wrapper = mountNoteTextContent(note, { readonly })
+    return wrapper
+  }
+
+  const mountEditableTitle = (note: Note) => {
+    wrapper = helper
+      .component(NoteEditableTitle)
+      .withCleanStorage()
+      .withProps({
+        noteTopology: note.noteTopology,
+        noteId: note.id,
+        readonly: false,
+      })
+      .mount({ attachTo: document.body })
     return wrapper
   }
 
@@ -36,21 +51,21 @@ describe("NoteTextContent title edit", () => {
   it("prompts for empty content only when the note is editable", () => {
     const emptyNote = makeMe.aNote.title("Dummy Title").content("").please()
 
-    mountWith(emptyNote)
+    mountTextContentWith(emptyNote)
     expect(titleEditorEl(wrapper).getAttribute("contenteditable")).toBe("true")
     expect(
       wrapper.get("[data-placeholder]").attributes("data-placeholder")
     ).toBe("Enter note content here...")
     wrapper.unmount()
 
-    mountWith(emptyNote, true)
+    mountTextContentWith(emptyNote, true)
     expect(titleEditorEl(wrapper).getAttribute("contenteditable")).toBe("false")
     expect(wrapper.find("[data-placeholder]").exists()).toBe(false)
   })
 
   it("saves title change on unmount", async () => {
     const note = makeMe.aNote.title("Dummy Title").please()
-    mountWith(note)
+    mountEditableTitle(note)
     await editTitle(wrapper, "updated")
     wrapper.unmount()
     await flushPromises()
@@ -62,7 +77,7 @@ describe("NoteTextContent title edit", () => {
 
   it("saves title change on blur", async () => {
     const note = makeMe.aNote.title("Dummy Title").please()
-    mountWith(note)
+    mountEditableTitle(note)
     await editTitleThenBlur(wrapper)
     await flushPromises()
     expect(mockedUpdateTitleCall).toBeCalledWith({
@@ -73,7 +88,7 @@ describe("NoteTextContent title edit", () => {
 
   it("keeps newer local edits when API returns an older title", async () => {
     const note = makeMe.aNote.title("Dummy Title").please()
-    mountWith(note)
+    mountEditableTitle(note)
     await editTitleThenBlur(wrapper, "ABC")
     await flushPromises()
 
@@ -85,12 +100,9 @@ describe("NoteTextContent title edit", () => {
     await editTitle(wrapper, "ABCDEF")
 
     await wrapper.setProps({
-      note: {
-        ...note,
-        noteTopology: {
-          ...note.noteTopology,
-          title: "ABC",
-        },
+      noteTopology: {
+        ...note.noteTopology,
+        title: "ABC",
       },
     })
     await flushPromises()
@@ -100,28 +112,19 @@ describe("NoteTextContent title edit", () => {
 
   it("updates title from props when there are no unsaved edits", async () => {
     const note = makeMe.aNote.title("Dummy Title").please()
-    mountWith(note)
+    mountEditableTitle(note)
     await wrapper.setProps({
-      note: {
-        ...note,
-        noteTopology: {
-          ...note.noteTopology,
-          title: "different value",
-        },
+      noteTopology: {
+        ...note.noteTopology,
+        title: "different value",
       },
     })
     expect(titleEditorEl(wrapper).innerText).toBe("different value")
   })
 
-  it("displays a binding error then clears it after a successful edit", async () => {
+  it("displays title errors and clears them after a successful edit", async () => {
     const note = makeMe.aNote.title("Dummy Title").please()
-    mountWith(note)
-    const titleEditor = titleEditorEl(wrapper)
-    const editAndBlurTitle = (value: string) => {
-      titleEditor.innerText = value
-      titleEditor.dispatchEvent(new Event("input"))
-      titleEditor.dispatchEvent(new Event("blur"))
-    }
+    mountEditableTitle(note)
     mockedUpdateTitleCall.mockRejectedValueOnce(
       makeMe.anApiError
         .ofBindingError({
@@ -129,26 +132,23 @@ describe("NoteTextContent title edit", () => {
         })
         .please()
     )
-    editAndBlurTitle("invalid")
+    await editTitleThenBlur(wrapper, "invalid")
     await flushPromises()
 
     expect(wrapper.find(".path-name-editor .text-error").text()).toBe(
       "size must be between 1 and 100"
     )
 
-    editAndBlurTitle("corrected")
+    await editTitleThenBlur(wrapper, "corrected")
     await flushPromises()
     expect(wrapper.findAll(".path-name-editor .text-error")).toHaveLength(0)
     expect(mockedUpdateTitleCall).toBeCalledTimes(2)
-  })
 
-  it("displays reserved title error in the title field", async () => {
-    mountWith(makeMe.aNote.title("Dummy Title").please())
     mockedUpdateTitleCall.mockRejectedValueOnce({
       title: RESERVED_README_TITLE_MESSAGE,
       status: 400,
     })
-    await editTitleThenBlur(wrapper)
+    await editTitleThenBlur(wrapper, "readme")
     await flushPromises()
     expect(wrapper.find(".path-name-editor .text-error").text()).toContain(
       "reserved"
@@ -156,7 +156,7 @@ describe("NoteTextContent title edit", () => {
   })
 
   it("does not save title when unchanged on unmount", async () => {
-    mountWith(makeMe.aNote.title("Dummy Title").please())
+    mountEditableTitle(makeMe.aNote.title("Dummy Title").please())
     await flushPromises()
     wrapper.unmount()
     expect(mockedUpdateTitleCall).toBeCalledTimes(0)
@@ -168,7 +168,7 @@ describe("NoteTextContent title edit", () => {
     { case: "newlines only", value: "\n\n" },
     { case: "mixed whitespace", value: " \n \t " },
   ])("does not save when title is $case", async ({ value }) => {
-    mountWith(makeMe.aNote.title("Dummy Title").please())
+    mountEditableTitle(makeMe.aNote.title("Dummy Title").please())
     await editTitleThenBlur(wrapper, value)
     await flushPromises()
 
@@ -177,7 +177,7 @@ describe("NoteTextContent title edit", () => {
 
   it("displays authorization error when save is rejected with 401", async () => {
     const confirmSpy = vi.spyOn(window, "confirm").mockReturnValue(false)
-    mountWith(makeMe.aNote.title("Dummy Title").please())
+    mountEditableTitle(makeMe.aNote.title("Dummy Title").please())
     mockedUpdateTitleCall.mockRejectedValueOnce(
       makeMe.anApiError.of401().please()
     )

@@ -47,35 +47,20 @@ describe("NoteEditableContent HTML content normalization", () => {
     wrapper.unmount()
   })
 
-  it.each([
-    {
-      name: "should not save when only addition is empty lines and <p><br></p> at the end",
-      editedValue: "Original content\n\n<p><br></p>",
-    },
-    {
-      name: "should not save when only addition is trailing br tags",
-      editedValue: "Original content\n<br>\n<br>",
-    },
-  ])("$name", async ({ editedValue }) => {
+  it("normalizes trailing blank HTML before deciding whether to save", async () => {
     const noteId = 1
     const wrapper = await mountMarkdownTextarea({
       noteId,
       noteContent: "Original content",
     })
 
-    await setTextareaValue(wrapper, editedValue)
+    await setTextareaValue(wrapper, "Original content\n\n<p><br></p>")
     await advanceNoteContentSaveDebounce()
-
     expect(updateNoteContentSpy).not.toHaveBeenCalled()
-    wrapper.unmount()
-  })
 
-  it("should save with trailing empty lines and <p><br></p> removed when change is not only at the end", async () => {
-    const noteId = 1
-    const wrapper = await mountMarkdownTextarea({
-      noteId,
-      noteContent: "Original content",
-    })
+    await setTextareaValue(wrapper, "Original content\n<br>\n<br>")
+    await advanceNoteContentSaveDebounce()
+    expect(updateNoteContentSpy).not.toHaveBeenCalled()
 
     await setTextareaValue(wrapper, "Modified content\n\n<p><br></p>")
     await advanceNoteContentSaveDebounce()

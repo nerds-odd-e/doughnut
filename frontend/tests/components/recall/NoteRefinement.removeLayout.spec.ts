@@ -19,7 +19,6 @@ import {
   layoutCheckbox,
   mountNoteRefinementReady,
   mountNoteRefinementWithFirstItemSelected,
-  note,
   refinementActionButton,
   refinementLayoutItems,
   refinementLayoutPanel,
@@ -75,7 +74,8 @@ describe("NoteRefinement remove refinement layout items", () => {
       expect(wrapper.emitted()).not.toHaveProperty("contentUpdated")
     })
 
-    it("calls API, emits contentUpdated, clears selection, and reloads layout when removal is confirmed", async () => {
+    it("skips unchanged removal content, then saves and reloads changed content", async () => {
+      const noteWithContent = makeMe.aNote.content("Original content").please()
       const initialLayout = refinementLayoutItems(["Point 1", "Point 2"])
       const postRemovalLayout = refinementLayoutItems(["Point 1"])
       const generateLayoutSpy = mockSdkServiceWithImplementation(
@@ -86,30 +86,43 @@ describe("NoteRefinement remove refinement layout items", () => {
           .mockResolvedValueOnce({ items: initialLayout })
           .mockResolvedValueOnce({ items: postRemovalLayout })
       )
-      const removeLayoutSpy = mockSdkService(
+      const removeLayoutSpy = mockSdkServiceWithImplementation(
         AiController,
         "removeRefinementSuggestion",
-        {
-          content: "Updated content",
-        }
+        vi
+          .fn()
+          .mockResolvedValueOnce({ content: "Original content" })
+          .mockResolvedValueOnce({ content: "Updated content" })
       )
       const updateDetailsSpy = mockSdkService(
         TextContentController,
         "updateNoteContent",
         makeMe.aNoteRealm.please()
       )
-      const wrapper = renderer.withCleanStorage().withProps({ note }).mount()
+      const wrapper = renderer
+        .withCleanStorage()
+        .withProps({ note: noteWithContent })
+        .mount()
       await flushPromises()
       expect(generateLayoutSpy).toHaveBeenCalledTimes(1)
 
       await selectFirstLayoutItem(wrapper)
       await clickRemoveRefinementLayout(wrapper)
 
+      expect(updateDetailsSpy).not.toHaveBeenCalled()
+      expect(wrapper.emitted()).not.toHaveProperty("contentUpdated")
+      expect(generateLayoutSpy).toHaveBeenCalledTimes(1)
+
+      await clickRemoveRefinementLayout(wrapper)
+
       expect(removeLayoutSpy).toHaveBeenCalledWith(
-        refinementLayoutSelectionApiCall(note.id, initialLayout, ["p1"])
+        refinementLayoutSelectionApiCall(noteWithContent.id, initialLayout, [
+          "p1",
+        ])
       )
+      expect(removeLayoutSpy).toHaveBeenCalledTimes(2)
       expect(updateDetailsSpy).toHaveBeenCalledWith({
-        path: { note: note.id },
+        path: { note: noteWithContent.id },
         body: { content: "Updated content" },
       })
       expect(wrapper.emitted()).toHaveProperty("contentUpdated")
@@ -122,31 +135,6 @@ describe("NoteRefinement remove refinement layout items", () => {
       expect(
         refinementLayoutPanel(wrapper).findAll('input[type="checkbox"]')
       ).toHaveLength(1)
-    })
-
-    it("does not save or emit contentUpdated when removal returns unchanged content", async () => {
-      const noteWithContent = makeMe.aNote.content("Original content").please()
-      const removeLayoutSpy = mockSdkService(
-        AiController,
-        "removeRefinementSuggestion",
-        {
-          content: "Original content",
-        }
-      )
-      const updateDetailsSpy = mockSdkService(
-        TextContentController,
-        "updateNoteContent",
-        makeMe.aNoteRealm.please()
-      )
-      const wrapper = await mountNoteRefinementWithFirstItemSelected(
-        ["Point 1", "Point 2"],
-        { note: noteWithContent }
-      )
-      await clickRemoveRefinementLayout(wrapper)
-
-      expect(removeLayoutSpy).toHaveBeenCalled()
-      expect(updateDetailsSpy).not.toHaveBeenCalled()
-      expect(wrapper.emitted()).not.toHaveProperty("contentUpdated")
     })
   })
 })

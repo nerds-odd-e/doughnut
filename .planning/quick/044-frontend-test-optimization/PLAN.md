@@ -830,7 +830,9 @@ CURSOR_DEV=true nix develop -c pnpm frontend:test tests/pages/BookReadingPage.re
 
 ### 25. Optimize ranked tests 73–75
 Type: Structure
-Status: planned
+Status: done
+
+Outcome: Removed four redundant mounts by combining refinement retries, HTML normalization variants, and title-error lifecycle coverage; reused the existing title edit helper. Focused Chromium passed three consecutive runs.
 
 **Tests:**
 - #73 `tests/components/recall/NoteRefinement.removeLayout.spec.ts` — NoteRefinement remove refinement layout items > selection and confirmation > does not save or emit contentUpdated when removal returns unchanged content (~15.6ms)
