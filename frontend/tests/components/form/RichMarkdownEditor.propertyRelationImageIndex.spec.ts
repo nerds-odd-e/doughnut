@@ -1,5 +1,4 @@
 import { README_ONLY_PRESET_PROPERTY_KEYS } from "@/utils/noteContentFrontmatter"
-import { flushPromises } from "@vue/test-utils"
 import { noteShowLocation } from "@/routes/noteShowLocation"
 import {
   commitCustomRelationText,
@@ -95,16 +94,6 @@ Paragraph.\n`
   })
 
   describe("readme-only predefined properties", () => {
-    it("does not show readme-only predefined rows when isReadmeContext is false", async () => {
-      await h.mountEditor("# Body")
-      await flushPromises()
-
-      const keyValues = propertyRowKeyValues(editorRoot(h))
-      for (const key of README_ONLY_PRESET_PROPERTY_KEYS) {
-        expect(keyValues).not.toContain(key)
-      }
-    })
-
     it("empty readme-only fields are not included in emitted YAML", async () => {
       const wrapper = await h.mountEditor("# Body", { isReadmeContext: true })
       await emitQuillBodyHtml(wrapper, "<h1>Updated Body</h1>")
@@ -114,7 +103,7 @@ Paragraph.\n`
       expect(last).toContain("Updated Body")
     })
 
-    it("readme-only fields are shown when note already has those keys in frontmatter", async () => {
+    it("shows existing readme-only fields but does not add them outside readme context", async () => {
       const markdown = `---
 title_pattern: "{{date}}"
 question_generation_instruction: Focus on facts.
@@ -122,13 +111,19 @@ question_generation_instruction: Focus on facts.
 
 # Body`
       const wrapper = await h.mountEditor(markdown, { isReadmeContext: true })
-      await flushPromises()
 
       const keyValues = propertyRowKeyValues(editorRoot(h))
       expect(keyValues).toContain("title_pattern")
       expect(keyValues).toContain("question_generation_instruction")
       expect(wrapper.text()).toContain("{{date}}")
       expect(wrapper.text()).toContain("Focus on facts.")
+
+      await wrapper.setProps({ modelValue: "# Body", isReadmeContext: false })
+
+      const nonReadmeKeyValues = propertyRowKeyValues(editorRoot(h))
+      for (const key of README_ONLY_PRESET_PROPERTY_KEYS) {
+        expect(nonReadmeKeyValues).not.toContain(key)
+      }
     })
   })
 })

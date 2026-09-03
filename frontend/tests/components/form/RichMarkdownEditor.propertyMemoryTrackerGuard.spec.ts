@@ -92,28 +92,9 @@ Workshop body.`
     expect(wrapper.find(topicRowSelector).exists()).toBe(false)
   })
 
-  it("keeps the property row and does not emit when the user cancels", async () => {
+  it("reverts a canceled rename, then keeps the property after a canceled removal without emitting", async () => {
     mockNoteInfoWithPropertyTracker("topic", 99)
-    confirmMock.mockImplementationOnce(() => Promise.resolve(false))
-
-    const wrapper = await h.mountEditor(trackedPropertyMarkdown, {
-      noteId,
-    })
-    const emitCountBefore = wrapper.emitted("update:modelValue")?.length ?? 0
-
-    await expandPropertyPanelAndClickRemove(wrapper, topicRowSelector)
-
-    expect(confirmMock).toHaveBeenCalledOnce()
-    expect(deleteSpy).not.toHaveBeenCalled()
-    expect(wrapper.emitted("update:modelValue")?.length ?? 0).toBe(
-      emitCountBefore
-    )
-    expect(wrapper.find(topicRowSelector).exists()).toBe(true)
-  })
-
-  it("reverts the property key and does not emit when the user cancels a rename", async () => {
-    mockNoteInfoWithPropertyTracker("topic", 99)
-    confirmMock.mockImplementationOnce(() => Promise.resolve(false))
+    confirmMock.mockResolvedValue(false)
 
     const wrapper = await h.mountEditor(trackedPropertyMarkdown, {
       noteId,
@@ -127,14 +108,20 @@ Workshop body.`
     await keyInput.trigger("blur")
     await flushPromises()
 
-    await vi.waitFor(() => {
-      expect(confirmMock).toHaveBeenCalledOnce()
-    })
-
+    expect(confirmMock).toHaveBeenCalledOnce()
     expect(updatePropertyKeySpy).not.toHaveBeenCalled()
     expect(wrapper.emitted("update:modelValue")?.length ?? 0).toBe(
       emitCountBefore
     )
     expect(keyInput.element).toHaveValue("topic")
+
+    await expandPropertyPanelAndClickRemove(wrapper, topicRowSelector)
+
+    expect(confirmMock).toHaveBeenCalledTimes(2)
+    expect(deleteSpy).not.toHaveBeenCalled()
+    expect(wrapper.emitted("update:modelValue")?.length ?? 0).toBe(
+      emitCountBefore
+    )
+    expect(wrapper.find(topicRowSelector).exists()).toBe(true)
   })
 })

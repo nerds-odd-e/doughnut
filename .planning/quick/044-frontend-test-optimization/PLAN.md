@@ -1055,7 +1055,9 @@ CURSOR_DEV=true nix develop -c pnpm frontend:test tests/notes/sidebar/SidebarPee
 
 ### 34. Optimize ranked tests 100–102
 Type: Structure
-Status: planned
+Status: done
+
+Outcome: Merged three editor mounts and removed redundant drains while preserving delete route/query, README-mode transition, and sequential canceled rename/removal behavior. Focused Chromium passed twice.
 
 **Tests:**
 - #100 `tests/components/form/RichMarkdownEditor.propertyDeleteLocation.spec.ts` — RichMarkdownEditor focused property delete location > replaces to noteShow and does not show that the property is not found (~13.0ms)

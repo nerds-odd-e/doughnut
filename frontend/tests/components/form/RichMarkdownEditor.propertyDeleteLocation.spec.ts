@@ -32,9 +32,13 @@ Body.`
     h.cleanup()
   })
 
-  it("replaces to noteShow and does not show that the property is not found", async () => {
+  it("replaces to noteShow, preserves query, and does not show property-not-found after deleting the focused property", async () => {
+    const conversationQuery = { conversation: "true" }
     const wrapper = await mountEditorOnNoteShow(h, markdown, {
-      route: notePropertyLocation(noteId, "topic"),
+      route: {
+        ...notePropertyLocation(noteId, "topic"),
+        query: conversationQuery,
+      },
     })
     const router = wrapper.vm.$router
     const replaceSpy = vi.spyOn(router, "replace")
@@ -45,25 +49,10 @@ Body.`
     expect(pushSpy).not.toHaveBeenCalled()
     expect(replaceSpy).toHaveBeenCalled()
     expect(router.currentRoute.value).toMatchObject(noteShowLocation(noteId))
+    expect(router.currentRoute.value.query).toEqual(conversationQuery)
     expect(
       wrapper.find('[data-testid="rich-note-property-not-found"]').exists()
     ).toBe(false)
-  })
-
-  it("preserves unrelated query values when the focused property is deleted", async () => {
-    const conversationQuery = { conversation: "true" }
-    const wrapper = await mountEditorOnNoteShow(h, markdown, {
-      route: {
-        ...notePropertyLocation(noteId, "topic"),
-        query: conversationQuery,
-      },
-    })
-    const router = wrapper.vm.$router
-
-    await attemptRemovePropertyRow(wrapper, "topic")
-
-    expect(router.currentRoute.value).toMatchObject(noteShowLocation(noteId))
-    expect(router.currentRoute.value.query).toEqual(conversationQuery)
   })
 
   it("does not expose remove for a property that is not focused", async () => {
