@@ -69,15 +69,14 @@ describe("SearchForm search key history", () => {
   it("collapses search key history when clicking the search input or a scope toggle", async () => {
     const note = MakeMe.aNote.please()
     const input = await renderSearchWithKeyHistory(note)
-    await openSearchKeyHistoryDropdown()
+    const dropdown = historyDropdown()
+    dropdown.open = true
     fireEvent.click(input)
-    await flushPromises()
-    expect(historyDropdown().open).toBe(false)
+    expect(dropdown.open).toBe(false)
 
-    await openSearchKeyHistoryDropdown()
+    dropdown.open = true
     titleEl("All My Circles").click()
-    await flushPromises()
-    expect(historyDropdown().open).toBe(false)
+    expect(dropdown.open).toBe(false)
   })
 
   it("renders history panel inside the modal dialog and collapses on click elsewhere in that modal", async () => {

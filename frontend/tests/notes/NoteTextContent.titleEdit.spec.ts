@@ -129,6 +129,12 @@ describe("NoteTextContent title edit", () => {
   it("displays a binding error then clears it after a successful edit", async () => {
     const note = makeMe.aNote.title("Dummy Title").please()
     mountWith(note)
+    const titleEditor = titleEditorEl(wrapper)
+    const editAndBlurTitle = (value: string) => {
+      titleEditor.innerText = value
+      titleEditor.dispatchEvent(new Event("input"))
+      titleEditor.dispatchEvent(new Event("blur"))
+    }
     mockedUpdateTitleCall.mockRejectedValueOnce(
       makeMe.anApiError
         .ofBindingError({
@@ -136,14 +142,14 @@ describe("NoteTextContent title edit", () => {
         })
         .please()
     )
-    await editTitleThenBlur(wrapper)
+    editAndBlurTitle("invalid")
     await flushPromises()
 
     expect(wrapper.find(".path-name-editor .text-error").text()).toBe(
       "size must be between 1 and 100"
     )
 
-    await editTitleThenBlur(wrapper)
+    editAndBlurTitle("corrected")
     await flushPromises()
     expect(wrapper.findAll(".path-name-editor .text-error")).toHaveLength(0)
     expect(mockedUpdateTitleCall).toBeCalledTimes(2)

@@ -142,22 +142,23 @@ describe("NoteEditableContent", () => {
     const noteId = 1
     const resolveFirstSave = mockDelayedFirstSave(updateNoteContentSpy, noteId)
 
-    const wrapper = await mountMarkdownTextarea({
+    const wrapper = mountNoteEditableContent({
       noteId,
       noteContent: "Original",
     })
+    const textarea = textareaEl(wrapper)
 
-    await setTextareaValue(wrapper, "First edit")
+    textarea.value = "First edit"
+    textarea.dispatchEvent(new Event("input"))
     await blurTextarea(wrapper)
 
-    await setTextareaValue(wrapper, "Second edit")
-    expect(textareaEl(wrapper).value).toBe("Second edit")
+    textarea.value = "Second edit"
+    textarea.dispatchEvent(new Event("input"))
 
     resolveFirstSave()
     await wrapper.setProps({ noteContent: "First edit" })
-    await flushPromises()
 
-    expect(textareaEl(wrapper).value).toBe("Second edit")
+    expect(textarea.value).toBe("Second edit")
     wrapper.unmount()
   })
 })

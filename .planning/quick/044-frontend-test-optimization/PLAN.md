@@ -430,7 +430,9 @@ CURSOR_DEV=true nix develop -c pnpm frontend:test tests/components/recall/NoteRe
 
 ### 9. Optimize ranked tests 25–27
 Type: Structure
-Status: planned
+Status: done
+
+Outcome: Removed broad flush/setup paths while preserving edit-race, search-history collapse, and binding-error recovery behavior. Ranked cases fell from 84.0ms to 26.6ms; focused Chromium passed three consecutive runs.
 
 **Tests:**
 - #25 `tests/notes/NoteEditableContent.spec.ts` — NoteEditableContent > should preserve second edit when first save response arrives after second edit (~26.9ms)
