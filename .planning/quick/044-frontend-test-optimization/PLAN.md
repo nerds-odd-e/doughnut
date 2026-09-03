@@ -280,7 +280,9 @@ CURSOR_DEV=true nix develop -c pnpm frontend:test tests/pages/NoteShowPage.autos
 
 ### 3. Optimize ranked tests 7–9
 Type: Structure
-Status: planned
+Status: done
+
+Outcome: Removed redundant mount/flush/assertion work, replaced a huge suspend timer jump with one watchdog tick, and retained only the unique empty-list dialog behavior. Focused browser tests passed twice.
 
 **Tests:**
 - #7 `tests/components/form/RichMarkdownEditor.aliasesProperty.spec.ts` — RichMarkdownEditor aliases property > inserts aliases as a list and blocks scalar aliases on row commit (~39.3ms)

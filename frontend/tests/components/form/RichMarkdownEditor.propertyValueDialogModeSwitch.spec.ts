@@ -56,16 +56,8 @@ describe("RichMarkdownEditor property value dialog mode switch", () => {
     expect(propertyValueDialogEl()).toBeNull()
   })
 
-  it("allows duplicate list items and saves an emptied list from the property value dialog", async () => {
-    const wrapper = await mountTopicValueDialog(h, LIST_TOPIC_MARKDOWN)
-    setListItemValue(0, "dup")
-    setListItemValue(1, "dup")
-    await savePropertyValueDialog()
-    expect(h.lastEmittedMarkdown()).toMatch(/- dup\n\s*- dup/)
-    expect(propertyValueDialogEl()).toBeNull()
-
-    await wrapper.setProps({ modelValue: h.lastEmittedMarkdown() })
-    await openPropertyValueDialog(wrapper)
+  it("saves an emptied list from the property value dialog", async () => {
+    await mountTopicValueDialog(h, LIST_TOPIC_MARKDOWN)
     clickListRemove(1)
     clickListRemove(0)
     await flushPromises()

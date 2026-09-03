@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest"
+import { describe, it, expect, vi } from "vitest"
 import { defineComponent, ref, nextTick } from "vue"
 import { useThinkingTimeTracker } from "@/composables/useThinkingTimeTracker"
 import {
@@ -90,12 +90,14 @@ describe("useThinkingTimeTracker idle detection", () => {
     // recorded activity beforehand. If the idle detector's activity
     // baseline weren't rebased when reconcileGap() drops this gap, the next
     // watchdog tick would attribute the whole sleep duration to idle time.
-    setTime(1000 + 6 * 60 * 60 * 1000)
+    const afterSuspend = 1000 + 6 * 60 * 60 * 1000
+    mockNow(afterSuspend)
+    vi.advanceTimersByTime(250)
     await nextTick()
 
     expect(wrapper.get('[data-testid="idle-ms"]').text()).toBe("0")
 
-    setTime(1000 + 6 * 60 * 60 * 1000 + 500)
+    mockNow(afterSuspend + 500)
     await stopAndExpect(wrapper, "1500")
     expect(wrapper.get('[data-testid="idle-ms"]').text()).toBe("0")
   })

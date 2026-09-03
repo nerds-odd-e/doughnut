@@ -72,14 +72,9 @@ describe("RichMarkdownEditor aliases property", () => {
   })
 
   it("inserts aliases as a list and blocks scalar aliases on row commit", async () => {
-    await h.mountAndCommitInsertProperty("aliases", "color")
+    await h.mountEditor("# Body")
+    await h.commitInsertProperty("aliases", "color")
 
-    expect(
-      h
-        .getWrapper()
-        .find('[data-testid="rich-note-property-validation"]')
-        .exists()
-    ).toBe(false)
     const parsed = parseNoteContentMarkdown(h.lastEmittedMarkdown())
     expect(parsed.ok).toBe(true)
     if (!parsed.ok) return
@@ -87,7 +82,6 @@ describe("RichMarkdownEditor aliases property", () => {
 
     const wrapper = h.getWrapper()
     await wrapper.setProps({ modelValue: ALIASES_SCALAR_MARKDOWN })
-    await flushPromises()
     const emissionsBeforeBlur =
       wrapper.emitted("update:modelValue")?.length ?? 0
     await triggerRowKeyBlurValidation(wrapper)
