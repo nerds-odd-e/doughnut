@@ -29,7 +29,9 @@ When(
   'I reply to the conversation {string}:',
   (conversation: string, data: DataTable) => {
     const messages = data.raw().map((row) => row[0]!.trim())
-    start.testability().replyToConversationAboutNote(conversation, messages)
+    return start
+      .testability()
+      .replyToConversationAboutNote(conversation, messages)
   }
 )
 
