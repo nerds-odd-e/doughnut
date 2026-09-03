@@ -55,7 +55,7 @@ CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/recall/
 
 ### 2. Remove the dead assimilation-count step and its page-object method
 Type: Structure
-Status: planned
+Status: done
 
 **Dead code (confirmed via repo-wide grep — zero callers in any `.feature` file):**
 - `e2e_test/step_definitions/assimilation.ts:15` — `Then('I should see {int} due for assimilation', ...)`.

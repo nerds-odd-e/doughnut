@@ -12,10 +12,6 @@ When('I assimilate these in sequence:', (data: DataTable) => {
   start.assumeAssimilationPage().assimilate(data.hashes())
 })
 
-Then('I should see {int} due for assimilation', (numberOfNotes: number) => {
-  start.assimilation().expectCount(numberOfNotes)
-})
-
 Then(
   'I assimilated one note {string} at the current time',
   (noteTitle: string) => {

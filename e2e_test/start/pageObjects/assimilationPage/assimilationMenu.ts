@@ -19,14 +19,6 @@ export const assimilation = () => {
   }
 
   return {
-    expectCount(numberOfNotes: number) {
-      getAssimilateListItemInSidebar(($el) => {
-        $el.findByText((content) => content.startsWith(`${numberOfNotes}/`), {
-          selector: '.due-count',
-        })
-      })
-      return this
-    },
     expectAssimilationNavBadge(dueOverTotal: string) {
       getAssimilateListItemInSidebar(($el) => {
         $el.findByText(dueOverTotal, { selector: '.due-count' })
