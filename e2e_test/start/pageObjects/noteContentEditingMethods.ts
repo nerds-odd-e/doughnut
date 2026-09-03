@@ -5,14 +5,18 @@ import {
 } from './notePageContentRegion'
 import { toolbarButton } from './toolbarButton'
 
+export function switchToRichContentIfNeeded() {
+  cy.get('body').then(($body) => {
+    const toRich = $body.find('button[aria-label^="Edit as rich content"]')
+    if (toRich.length > 0) {
+      cy.wrap(toRich.first()).click()
+    }
+  })
+}
+
 export const noteContentEditingMethods = () => ({
   switchToRichContent() {
-    cy.get('body').then(($body) => {
-      const toRich = $body.find('button[aria-label^="Edit as rich content"]')
-      if (toRich.length > 0) {
-        cy.wrap(toRich.first()).click()
-      }
-    })
+    switchToRichContentIfNeeded()
     return this
   },
   flushPendingContentSave() {

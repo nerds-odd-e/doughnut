@@ -1,4 +1,5 @@
 import { waitUntilAppIsNotBusy } from '../pageBase'
+import { switchToRichContentIfNeeded } from './noteContentEditingMethods'
 import {
   findNoteContentRegion,
   richNotePropertyPanelToggleTestId,
@@ -13,7 +14,14 @@ const openPropertyPanelIfClosed = () => {
   })
 }
 
+// The property row markup (and its status link) only exists in rich content
+// view, so callers that reach a property panel through this helper no
+// longer need to remember `switchToRichContent()` themselves — including
+// `clickPropertyTrackerStatusLink`, whose test-only callers scrape the
+// panel from wherever the previous step left the note (e.g. the markdown
+// editor).
 const withPropertyPanel = (key: string, fn: () => void) => {
+  switchToRichContentIfNeeded()
   findNoteContentRegion().within(() => {
     cy.get(richNotePropertyRow(key)).within(() => {
       openPropertyPanelIfClosed()

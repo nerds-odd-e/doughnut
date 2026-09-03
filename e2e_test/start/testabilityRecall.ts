@@ -88,12 +88,15 @@ export const recallTestabilityMethods = {
   },
 
   /**
-   * Property-scoped memory tracker for the note currently on screen. The
-   * property panel's status link (via AssimilationModes) only ever shows
-   * navigation, not recall count or whether a tracker was truly deleted vs.
-   * merely removed-from-tracking — so callers that need that backend truth
-   * (recall count assertions, absent-vs-removed) read the tracker straight
-   * from the backend instead of scraping the UI. Resolves to `null` (never
+   * Property-scoped memory tracker for the note currently on screen. Recall
+   * count assertions now click through the property panel's status link to
+   * the tracker page and read it there (the `title` attribute on the status
+   * link puts recall count in the UI on both scopes identically, same as
+   * note-level trackers) — this backend read stays only for the one thing
+   * the UI genuinely can't provide: `expectPropertyMemoryTrackerAbsent`
+   * needs to tell "tracker never existed" apart from "tracker exists but
+   * `removedFromTracking`", both of which collapse to "no status link, show
+   * Assimilate button" in `AssimilationModes.vue`. Resolves to `null` (never
    * `undefined`) when there's no match: a `.then()` callback that returns
    * `undefined` makes Cypress keep the *previous* subject instead of
    * `undefined`, which would silently resurrect the whole NoteRecallInfo.

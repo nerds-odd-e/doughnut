@@ -37,7 +37,7 @@
 ### 3. Simplify the property tracker's interim testability read now that the UI status link is click-verified
 
 - **Type:** Structure
-- **Status:** planned
+- **Status:** done
 - **Pre-condition:** slice 2 shipped — `openPropertyMemoryTracker` now navigates via the real status link, and (per slice 2) recall-count assertions on the reached tracker page can use `assumeMemoryTrackerPage().expectRecallCount(count)`, the same pattern `readNoteLevelRecallCountAndReturn` already uses for note-level trackers.
 - **Trigger:** none externally — this only touches E2E page-object internals and a stale comment; user-visible test outcomes are unchanged (still green).
 - **Post-condition:** `propertyMemoryTrackerForCurrentNote`'s doc comment no longer claims the property status link "only ever shows navigation, not recall count" (false since `AssimilationModes.vue` puts recall count in the `title` attribute on both scopes identically). If the property recall-count assertions (`expectPropertyMemoryTracker`'s count check) can now be rewritten to click through to the tracker page and read `expectRecallCount` instead of reading the backend directly — matching the note-level pattern exactly — do so. Keep `propertyMemoryTrackerForCurrentNote`'s backend read only for the role the UI genuinely cannot provide: distinguishing "tracker never existed" from "tracker exists but `removedFromTracking`" for `expectPropertyMemoryTrackerAbsent` (the UI collapses both to "no status link, show Assimilate button" — matching `AssimilationModes.vue`'s deliberate "removed treated as no tracker" design decision from the original plan, so this is not fixable from the UI and should stay backend-based).

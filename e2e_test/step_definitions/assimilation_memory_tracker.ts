@@ -4,38 +4,15 @@
 
 import { Then, When } from '@badeball/cypress-cucumber-preprocessor'
 import start from '../start'
-import { waitUntilAppIsNotBusy } from '../start/pageBase'
-import { noteIdFromUrl } from '../start/noteIdFromUrl'
 import { assumeMemoryTrackerPage } from '../start/pageObjects/memoryTrackerPage'
 import { followNoteUnderQuestion } from '../start/pageObjects/noteUnderQuestion'
-import router from '../start/router'
-
-/**
- * Reads a note-level tracker's recall count on its own tracker page, then
- * returns to the note the caller came from (by note id, not `cy.go('back')`
- * — the click into the tracker page is a same-origin router-link, but
- * navigating back deterministically by named route is more robust for
- * subsequent steps that read state from the current note's URL).
- */
-function readNoteLevelRecallCountAndReturn(
-  kind: 'understanding' | 'spelling',
-  count: number
-) {
-  cy.url().then((url) => {
-    const noteId = noteIdFromUrl(url)
-    start
-      .assumeAssimilationPage()
-      .openNoteLevelMemoryTracker(kind)
-      .expectRecallCount(count)
-    router().push('noteShow', { noteId })
-    waitUntilAppIsNotBusy()
-  })
-}
 
 Then(
   'the note memory tracker should have recall count {int}',
   (count: number) => {
-    readNoteLevelRecallCountAndReturn('understanding', count)
+    start
+      .assumeAssimilationPage()
+      .expectNoteLevelMemoryTrackerRecallCount('understanding', count)
   }
 )
 
