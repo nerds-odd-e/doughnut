@@ -13,7 +13,6 @@ import {
   failureReportListRouter,
   mockFailureReportsList,
   mountFailureReportList,
-  openDeleteModalForFirstReports,
   rowSelectEls,
   triggerTestExceptionButton,
 } from "./failureReportListTestSupport"
@@ -62,7 +61,7 @@ describe("FailureReportList", () => {
   })
 
   describe("selecting and deleting reports", () => {
-    it("shows selected count and deletes selected reports when confirmed", async () => {
+    it("cancels or confirms deletion of selected reports", async () => {
       const deleteSpy = mockSdkService(
         FailureReportController,
         "deleteFailureReports",
@@ -89,26 +88,20 @@ describe("FailureReportList", () => {
       )
 
       await deleteSelectedButton(wrapper).trigger("click")
+      expect(deleteModalIsOpen(wrapper)).toBe(true)
+      expect(wrapper.text()).toContain("Confirm Deletion")
+      expect(wrapper.text()).toContain("This action cannot be undone")
+
+      await deleteCancelButton(wrapper).trigger("click")
+      expect(deleteModalIsOpen(wrapper)).toBe(false)
+
+      await deleteSelectedButton(wrapper).trigger("click")
       await deleteConfirmButton(wrapper).trigger("click")
       await flushPromises()
 
       expect(deleteSpy).toHaveBeenCalledWith({
         body: [1, 2],
       })
-    })
-
-    it("closes delete confirmation modal when cancel is clicked", async () => {
-      const wrapper = await mountFailureReportList([aFailureReport(1)])
-      await openDeleteModalForFirstReports(wrapper, 1)
-
-      expect(deleteModalIsOpen(wrapper)).toBe(true)
-      expect(wrapper.text()).toContain("Confirm Deletion")
-      expect(wrapper.text()).toContain("This action cannot be undone")
-
-      await deleteCancelButton(wrapper).trigger("click")
-      await flushPromises()
-
-      expect(deleteModalIsOpen(wrapper)).toBe(false)
     })
   })
 

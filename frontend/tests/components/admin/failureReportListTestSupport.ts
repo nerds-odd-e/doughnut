@@ -65,15 +65,3 @@ export function triggerTestExceptionButton(wrapper: VueWrapper) {
     .findAll("button")
     .find((btn) => btn.text().includes("Trigger Test Exception"))
 }
-
-export async function openDeleteModalForFirstReports(
-  wrapper: VueWrapper,
-  count: number
-) {
-  const rowChecks = rowSelectEls(wrapper)
-  for (let i = 0; i < count; i++) {
-    await rowChecks[i]!.setValue(true)
-  }
-  await deleteSelectedButton(wrapper).trigger("click")
-  await flushPromises()
-}

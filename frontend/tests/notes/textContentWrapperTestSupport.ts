@@ -60,12 +60,6 @@ export function referencedTitleSaveKeepVisibleTextButton() {
   ) as HTMLButtonElement
 }
 
-export function contentSlotTextarea() {
-  return document.querySelector(
-    contentSlotTextareaSelector
-  ) as HTMLTextAreaElement
-}
-
 /** Matches `scheduleReferencedTitleBlurDiscardCheck` double-rAF timing. */
 export async function flushReferencedTitleBlurDiscardCheck() {
   if (vi.isFakeTimers()) {

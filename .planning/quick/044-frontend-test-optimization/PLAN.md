@@ -955,7 +955,9 @@ CURSOR_DEV=true nix develop -c pnpm frontend:test tests/components/form/RichMark
 
 ### 30. Optimize ranked tests 88–90
 Type: Structure
-Status: planned
+Status: done
+
+Outcome: Prior work already covered the normalization target; this slice merged delete cancel/confirm behavior, simplified the save-veto journey, and removed two orphaned support helpers. Focused Chromium passed three consecutive runs.
 
 **Tests:**
 - #88 `tests/notes/NoteEditableContent.htmlNormalization.spec.ts` — NoteEditableContent HTML content normalization > 'should not save when only addition is…' (~14.5ms)

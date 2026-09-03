@@ -2,7 +2,7 @@ import { TextContentController } from "@generated/donut-backend-api/sdk.gen"
 import { advanceNoteContentSaveDebounce } from "@tests/helpers/noteContentDebounceTestSupport"
 import { mockSdkService } from "@tests/helpers"
 import {
-  contentSlotTextarea,
+  contentSlotTextareaSelector,
   editReferencedTitle,
   flushReferencedTitleBlurDiscardCheck,
   mockUpdateNoteTitleSuccess,
@@ -105,19 +105,15 @@ describe("TextContentWrapper beforeSaveContent", () => {
       makeMe.aNoteRealm.please()
     )
 
-    mountContentWrapper(
-      {
-        value: "Original content",
-        beforeSaveContent,
-      },
-      { attachTo: document.body }
-    )
-    await flushPromises()
+    const contentWrapper = mountContentWrapper({
+      value: "Original content",
+      beforeSaveContent,
+    })
 
-    const textarea = contentSlotTextarea()
+    const textarea = contentWrapper.get(contentSlotTextareaSelector)
+      .element as HTMLTextAreaElement
     textarea.value = "Edited content"
     textarea.dispatchEvent(new Event("input", { bubbles: true }))
-    await flushPromises()
     await advanceNoteContentSaveDebounce()
 
     expect(beforeSaveContent).toHaveBeenCalledWith(
