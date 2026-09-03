@@ -1076,7 +1076,9 @@ CURSOR_DEV=true nix develop -c pnpm frontend:test tests/components/form/RichMark
 
 ### 35. Optimize ranked tests 103–105
 Type: Structure
-Status: planned
+Status: done
+
+Outcome: Removed redundant settling/payload coverage and a duplicate whitespace case while retaining the saved-then-unsaved title setup. The unique cross-notebook root-move journey was added as a Candidate. Focused Chromium passed three consecutive runs.
 
 **Tests:**
 - #103 `tests/notes/NoteTextContent.titleEdit.spec.ts` — NoteTextContent title edit > keeps unsaved title edits when props change (~12.8ms)

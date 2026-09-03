@@ -86,17 +86,10 @@ describe("NoteTextContent title edit", () => {
     })
   })
 
-  it("keeps newer local edits when API returns an older title", async () => {
+  it("keeps unsaved title edits when props change", async () => {
     const note = makeMe.aNote.title("Dummy Title").please()
     mountEditableTitle(note)
     await editTitleThenBlur(wrapper, "ABC")
-    await flushPromises()
-
-    expect(mockedUpdateTitleCall).toHaveBeenCalledWith({
-      path: { note: note.id },
-      body: { newTitle: "ABC" },
-    })
-
     await editTitle(wrapper, "ABCDEF")
 
     await wrapper.setProps({
@@ -164,7 +157,6 @@ describe("NoteTextContent title edit", () => {
 
   it.each([
     { case: "empty string", value: "" },
-    { case: "spaces only", value: "   " },
     { case: "newlines only", value: "\n\n" },
     { case: "mixed whitespace", value: " \n \t " },
   ])("does not save when title is $case", async ({ value }) => {
