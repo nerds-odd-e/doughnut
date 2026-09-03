@@ -330,7 +330,9 @@ CURSOR_DEV=true nix develop -c pnpm frontend:test tests/pages/MemoryTrackerPageV
 
 ### 5. Optimize ranked tests 13–15
 Type: Structure
-Status: planned
+Status: done
+
+Outcome: Removed redundant toolbar ordering and shortcut journeys, renamed the remaining conversation-overflow spec, and deleted three orphaned helpers. The cross-notebook 409 retry remained uniquely valuable and was recorded as a Candidate. Focused browser tests passed three consecutive runs.
 
 **Tests:**
 - #13 `tests/notes/NoteToolbar.conversationWikiNewOverflow.spec.ts` — NoteToolbar Conversation, Wiki, and New overflow > overflows Conversation before Wiki/New, and shortcuts still open them (~34.2ms)

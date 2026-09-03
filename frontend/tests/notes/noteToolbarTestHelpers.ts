@@ -27,35 +27,6 @@ export async function openNoteToolbarOverflowMenu(wrapper: VueWrapper) {
   await flushPromises()
 }
 
-export function dispatchDocumentKey(init: KeyboardEventInit) {
-  document.dispatchEvent(
-    new KeyboardEvent("keydown", {
-      bubbles: true,
-      cancelable: true,
-      ...init,
-    })
-  )
-}
-
-/** Wiki uses `hidden` when overflowed (still in DOM). */
-export function noteToolbarWikiHidden(wrapper: VueWrapper) {
-  return (
-    noteToolbarAction(wrapper, noteMoreOptionsTitles.wiki).attributes(
-      "hidden"
-    ) !== undefined
-  )
-}
-
-/** New uses `v-show` on a `display:contents` host (still in DOM when overflowed). */
-export function noteToolbarNewDisplayed(wrapper: VueWrapper) {
-  const el = noteToolbarAction(wrapper, noteMoreOptionsTitles.new)
-    .element as HTMLElement
-  const host = el.closest(
-    '[data-testid="note-creation-new-button"]'
-  ) as HTMLElement | null
-  return host?.style.display !== "none"
-}
-
 export function resetNoteToolbarTestState() {
   useAssimilationView().dismiss()
   useNoteToolbarPanel().close()

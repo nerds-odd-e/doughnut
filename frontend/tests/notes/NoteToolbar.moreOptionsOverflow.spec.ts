@@ -13,11 +13,8 @@ import {
   noteToolbarEditTitles,
 } from "@/components/notes/widgets/noteMoreOptionsTitles"
 import {
-  dispatchDocumentKey,
   mountOverflowToolbar,
   noteToolbarAction,
-  noteToolbarNewDisplayed,
-  noteToolbarWikiHidden,
   openNoteToolbarOverflowMenu,
   overflowMenuItem,
   resetNoteToolbarTestState,
@@ -90,7 +87,7 @@ describe("NoteToolbar more-options overflow", () => {
     expect(noteToolbarAction(wrapper, titles.export).exists()).toBe(true)
   })
 
-  it("overflows Export then Edit, and Edit still works from menu and m", async () => {
+  it("overflows Export then Edit, and Edit still works from the menu", async () => {
     wrapper = await mountOverflowToolbar()
     await layoutNoteToolbar(wrapper, exportOverflowNavWidth())
 
@@ -104,13 +101,6 @@ describe("NoteToolbar more-options overflow", () => {
     expect(
       noteToolbarAction(wrapper, noteToolbarEditTitles.markdown).exists()
     ).toBe(false)
-    expect(noteToolbarAction(wrapper, titles.conversation).exists()).toBe(true)
-    expect(noteToolbarWikiHidden(wrapper)).toBe(false)
-    expect(noteToolbarNewDisplayed(wrapper)).toBe(true)
-
-    dispatchDocumentKey({ key: "m", code: "KeyM" })
-    await flushPromises()
-    expect(wrapper.emitted("edit-as-markdown")).toEqual([[true]])
 
     await openNoteToolbarOverflowMenu(wrapper)
 
@@ -122,6 +112,6 @@ describe("NoteToolbar more-options overflow", () => {
     editItem?.click()
     await flushPromises()
 
-    expect(wrapper.emitted("edit-as-markdown")).toEqual([[true], [true]])
+    expect(wrapper.emitted("edit-as-markdown")).toEqual([[true]])
   })
 })
