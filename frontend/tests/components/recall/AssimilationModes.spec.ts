@@ -186,9 +186,9 @@ describe("AssimilationModes", () => {
   })
 
   it.each([
-    ["COMMISSIONED", "MCQ"],
+    ["COMMISSIONED", "Commissioned"],
     ["SPELLING", "Spelling"],
-    ["UNDERSTANDING", "Comprehension"],
+    ["UNDERSTANDING", "Understanding"],
   ])("maps %s to the label %s", (mode, label) => {
     const wrapper = mountModes({ allowedModes: [mode] })
     expect(

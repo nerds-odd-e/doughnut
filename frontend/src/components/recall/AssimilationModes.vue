@@ -86,17 +86,18 @@ defineEmits<{
 }>()
 
 const modeLabels: Record<MemoryTrackerType, string> = {
-  COMMISSIONED: "MCQ",
+  COMMISSIONED: "Commissioned",
   SPELLING: "Spelling",
-  UNDERSTANDING: "Comprehension",
+  UNDERSTANDING: "Understanding",
 }
 
 const sizeClass = computed(() => (props.size === "sm" ? "daisy-btn-sm" : ""))
 
-// The skip / return-to-sequence affordance is about the MCQ assimilation
-// sequence, not about a tracker. It lives on the MCQ (COMMISSIONED) row when
-// that mode is offered, falling back to the Comprehension (UNDERSTANDING)
-// row for scopes (e.g. note properties) that never offer COMMISSIONED.
+// The skip / return-to-sequence affordance is about the assimilation
+// sequence, not about a tracker. It lives on the Commissioned (COMMISSIONED)
+// row when that mode is offered, falling back to the Understanding
+// (UNDERSTANDING) row for scopes (e.g. note properties) that never offer
+// COMMISSIONED.
 const skipAffordanceMode = computed<MemoryTrackerType | undefined>(() => {
   if (props.allowedModes.includes("COMMISSIONED")) return "COMMISSIONED"
   if (props.allowedModes.includes("UNDERSTANDING")) return "UNDERSTANDING"

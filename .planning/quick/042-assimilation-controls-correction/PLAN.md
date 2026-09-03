@@ -16,7 +16,7 @@
 ### 1. Mode row labels are ADR 0001's own domain nouns, not invented UI words
 
 - **Type:** Behavior
-- **Status:** planned
+- **Status:** done
 - **Pre-condition:** `AssimilationModes.vue`'s `modeLabels` map renders `"MCQ"` for a Commissioned-tracker row and `"Comprehension"` for an Understanding-tracker row — neither word appears anywhere in ADR 0001's glossary; `"MCQ"` is actively misleading because ADR 0001 already defines MCQ as a different concept (multiple-choice recall-prompt content).
 - **Trigger:** the assimilation panel renders a mode row for `COMMISSIONED` or `UNDERSTANDING`.
 - **Post-condition:** the row label reads exactly `"Commissioned"` for `COMMISSIONED` and `"Understanding"` for `UNDERSTANDING` (Title Case of ADR 0001's "Commissioned memory tracker" / "Understanding memory tracker"); `"Spelling"` for `SPELLING` is unchanged. No occurrence of `"MCQ"` or `"Comprehension"` remains anywhere in `AssimilationModes.vue` (code or comments).
