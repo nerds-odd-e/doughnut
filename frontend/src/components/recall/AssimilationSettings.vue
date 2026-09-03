@@ -2,25 +2,19 @@
   <section
     aria-label="Assimilation settings"
     data-testid="assimilation-settings"
-    class="flex flex-col gap-0"
+    class="flex flex-wrap items-center gap-2"
   >
-    <div
-      class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
-    >
-      <div class="flex flex-wrap items-stretch justify-end gap-2 sm:flex-1">
-        <AssimilationModes
-          :allowed-modes="allowedModes"
-          :trackers="noteRecallInfo?.memoryTrackers"
-          :disabled="!noteInfoLoaded"
-          :skipped-from-assimilation-sequence="
-            isSkippedFromAssimilationSequence(noteRecallInfo)
-          "
-          @assimilate="emit('assimilate', $event)"
-          @skip="emit('skip', {})"
-          @return-to-sequence="emit('returnToSequence', {})"
-        />
-      </div>
-    </div>
+    <AssimilationModes
+      :allowed-modes="allowedModes"
+      :trackers="noteRecallInfo?.memoryTrackers"
+      :disabled="!noteInfoLoaded"
+      :skipped-from-assimilation-sequence="
+        isSkippedFromAssimilationSequence(noteRecallInfo)
+      "
+      @assimilate="emit('assimilate', $event)"
+      @skip="emit('skip', {})"
+      @return-to-sequence="emit('returnToSequence', {})"
+    />
   </section>
 </template>
 

@@ -36,7 +36,7 @@
 ### 3. Assimilation panel rows stay left-aligned and wrap instead of drifting right
 
 - **Type:** Behavior
-- **Status:** planned
+- **Status:** done
 - **Pre-condition:** confirmed live at 1456px and 700px viewport widths (dev server, note "Earth" in "Space topics") — the three mode rows sit flush against the panel's right edge with a large empty gap to their left, and do not reflow onto more lines as the window narrows. Root cause: `AssimilationSettings.vue`'s two-column wrapper (`flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between` outer, `flex flex-wrap items-stretch justify-end gap-2 sm:flex-1` inner) was built for a left/right split (modes vs. a settings toggle) that no longer exists — the sole remaining child (`<AssimilationModes>`) gets pushed to the trailing edge of its `flex-1` slot by `justify-end`.
 - **Trigger:** the note-level assimilation panel renders, at any viewport width.
 - **Post-condition:** the panel's rows start flush left, and individual rows wrap onto additional lines (rather than overflowing or staying pinned right) when the window is too narrow to fit them on one line — matching `RichFrontmatterPropertyPanel.vue`'s existing wrapper pattern (`flex flex-wrap items-center gap-2`), the already-correct sibling implementation for the same `<AssimilationModes>` component at property scope.
