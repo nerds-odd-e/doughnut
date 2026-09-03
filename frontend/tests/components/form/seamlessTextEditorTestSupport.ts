@@ -46,9 +46,15 @@ export async function focusEditor(editor: HTMLElement) {
   await nextTick()
 }
 
+type PasteClipboardOptions = {
+  plain?: string
+  html?: string
+  clearSelection?: boolean
+}
+
 export async function pasteClipboard(
   editor: HTMLElement,
-  options: { plain?: string; html?: string; clearSelection?: boolean }
+  options: PasteClipboardOptions
 ) {
   if (options.clearSelection) {
     window.getSelection()?.removeAllRanges()
@@ -71,12 +77,6 @@ export async function pasteClipboard(
   await flushPromises()
 }
 
-type PasteClipboardOptions = {
-  plain?: string
-  html?: string
-  clearSelection?: boolean
-}
-
 type PasteSuccessCase = {
   case: string
   initialValue: string
@@ -84,6 +84,7 @@ type PasteSuccessCase = {
   paste: PasteClipboardOptions
   expected?: string
   expectedContains?: readonly string[]
+  pasteAfterClearingSelection?: string
 }
 
 type PasteNoUpdateCase = {
@@ -121,16 +122,11 @@ export const PASTE_SUCCESS_CASES: PasteSuccessCase[] = [
     expected: "Bold text",
   },
   {
-    case: "at cursor position",
+    case: "at cursor position, then appends when selection is cleared",
     initialValue: "existing text",
     caretOffset: 8,
     paste: { plain: " inserted" },
     expectedContains: ["existing", "inserted", "text"] as const,
-  },
-  {
-    case: "append when no selection",
-    initialValue: "existing",
-    paste: { plain: " appended", clearSelection: true },
-    expected: "existing appended",
+    pasteAfterClearingSelection: " appended",
   },
 ]

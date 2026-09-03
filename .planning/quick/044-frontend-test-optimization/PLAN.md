@@ -1203,7 +1203,9 @@ CURSOR_DEV=true nix develop -c pnpm frontend:test tests/components/form/RichMark
 
 ### 40. Optimize ranked tests 118–120
 Type: Structure
-Status: planned
+Status: done
+
+Outcome: Replaced duplicated extraction/API/router setup with the child extraction event contract, folded no-selection append into the existing paste journey, and reused the clipboard options type. Focused Chromium passed twice.
 
 **Tests:**
 - #118 `tests/components/recall/RefineNoteModal.extractNote.close.spec.ts` — RefineNoteModal extract note close > closes the refine note modal after creating a note from extraction preview (~12.4ms)

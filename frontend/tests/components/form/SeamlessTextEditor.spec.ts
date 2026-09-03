@@ -58,6 +58,7 @@ describe("SeamlessTextEditor", () => {
       paste,
       expected,
       expectedContains,
+      pasteAfterClearingSelection,
     }) => {
       wrapper = await mountSeamlessTextEditor(initialValue)
       const editor = editorEl(wrapper)
@@ -79,6 +80,18 @@ describe("SeamlessTextEditor", () => {
           expect(finalText).toContain(part)
           expect(editor.innerText).toContain(part)
         }
+      }
+
+      if (pasteAfterClearingSelection !== undefined) {
+        const expectedAppendedText = `${editor.innerText}${pasteAfterClearingSelection}`
+        await pasteClipboard(editor, {
+          plain: pasteAfterClearingSelection,
+          clearSelection: true,
+        })
+        expect(wrapper.emitted()["update:modelValue"]?.at(-1)?.[0]).toBe(
+          expectedAppendedText
+        )
+        expect(editor.innerText).toBe(expectedAppendedText)
       }
     }
   )
