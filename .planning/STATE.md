@@ -6,9 +6,9 @@ current_phase: null
 current_phase_name: null
 status: ready
 stopped_at: null
-last_updated: "2026-09-03T01:52:00Z"
+last_updated: "2026-09-03T02:55:00Z"
 last_activity: 2026-09-03
-last_activity_desc: "041: batch retry + failed-request purge shipped; spent plan history pruned"
+last_activity_desc: "042: recall E2E test optimization planned; not executing"
 progress:
   total_phases: 0
   completed_phases: 0
@@ -35,6 +35,7 @@ Daily probe measurement (not an ADR): [daily-probe-protocol.md](notes/daily-prob
 
 ## Operator Next Steps
 
+- Recall E2E redundancy/excess (test optimization, `e2e_test/features/recall/` only): `.planning/quick/042-recall-e2e-test-optimization/PLAN.md` — planned, do not execute until asked.
 - Start the next milestone with `/gsd-new-milestone` when ready.
 
 Parked work: SEED-001, SEED-002, SEED-006, SEED-007, SEED-008; ADR 0002 Level 1. See [ROADMAP.md](ROADMAP.md).
