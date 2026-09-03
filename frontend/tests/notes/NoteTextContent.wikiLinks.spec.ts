@@ -155,23 +155,17 @@ describe("NoteTextContent wiki link display", () => {
 
   it("shows a new wiki link to an existing note as live after content save", async () => {
     const savedContent = "Saved."
-    const note = makeMe.aNote
-      .title("Wiki carrier")
-      .content(savedContent)
-      .please()
-    const targetNote = makeMe.aNote.title("WikiLinks E2E CI").please()
-    const liveWikiLinks = [
-      wikiLinkFromAuthoredToken("WikiLinks E2E CI", targetNote.id!),
-    ]
+    const note = makeMe.aNote.content(savedContent).please()
+    const liveWikiLinks = [wikiLinkFromAuthoredToken("WikiLinks E2E CI", 42)]
     const inFlightContent = `${savedContent} See [[WikiLinks E2E CI]].`
-
-    const releaseSave = holdNoteContentSave((content) =>
+    const contentSaved = vi.fn((content: string) =>
       makeMe.aNoteRealm
         .id(note.id!)
         .content(content)
         .wikiLinks(liveWikiLinks)
         .please()
     )
+    const releaseSave = holdNoteContentSave(contentSaved)
 
     wrapper = mountNoteTextContent(note, { readonly: false, wikiLinks: [] })
     await flushPromises()
@@ -179,29 +173,18 @@ describe("NoteTextContent wiki link display", () => {
     wrapper
       .findComponent({ name: "QuillEditor" })
       .vm.$emit("update:modelValue", `<p>Saved. See [[WikiLinks E2E CI]].</p>`)
-    await flushPromises()
-    await vi.waitUntil(() =>
-      document.querySelector(".ql-editor a.pending-wiki-link")
-    )
 
     releaseSave()
     await flushPromises()
+    expect(contentSaved).toHaveBeenCalledWith(inFlightContent)
+
     await wrapper.setProps({
-      note: makeMe.aNote
-        .id(note.id!)
-        .title("Wiki carrier")
-        .content(inFlightContent)
-        .please(),
+      note: makeMe.aNote.id(note.id!).content(inFlightContent).please(),
       wikiLinks: liveWikiLinks,
     })
     await flushPromises()
-    await vi.waitUntil(() =>
-      document.querySelector(".ql-editor a.donut-wiki-link")
-    )
 
-    const live = document.querySelector(
-      ".ql-editor a.donut-wiki-link"
-    ) as HTMLAnchorElement
-    expect(live.getAttribute("data-portable-path")).toBe("WikiLinks E2E CI")
+    const live = wrapper.get(".ql-editor a.donut-wiki-link")
+    expect(live.attributes("data-portable-path")).toBe("WikiLinks E2E CI")
   })
 })

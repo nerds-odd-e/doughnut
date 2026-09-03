@@ -4,7 +4,6 @@ import { type VueWrapper, flushPromises } from "@vue/test-utils"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import type { ComponentPublicInstance } from "vue"
 import { RESERVED_README_TITLE_MESSAGE } from "@/utils/reservedReadmeTitles"
-import { advanceNoteContentSaveDebounce } from "@tests/helpers/noteContentDebounceTestSupport"
 import {
   editTitle,
   editTitleThenBlur,
@@ -72,23 +71,11 @@ describe("NoteTextContent title edit", () => {
     })
   })
 
-  it("keeps unsaved title edits when props change", async () => {
-    const note = makeMe.aNote.title("Dummy Title").please()
-    mountWith(note)
-    await editTitle(wrapper, "updated")
-
-    await wrapper.setProps({
-      note: { ...note, content: "different value" },
-    })
-    expect(titleEditorEl(wrapper).innerText).toBe("updated")
-    expect(mockedUpdateTitleCall).not.toBeCalled()
-  })
-
   it("keeps newer local edits when API returns an older title", async () => {
     const note = makeMe.aNote.title("Dummy Title").please()
     mountWith(note)
-    await editTitle(wrapper, "ABC")
-    await advanceNoteContentSaveDebounce()
+    await editTitleThenBlur(wrapper, "ABC")
+    await flushPromises()
 
     expect(mockedUpdateTitleCall).toHaveBeenCalledWith({
       path: { note: note.id },

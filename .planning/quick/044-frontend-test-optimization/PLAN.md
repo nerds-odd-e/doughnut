@@ -455,7 +455,9 @@ CURSOR_DEV=true nix develop -c pnpm frontend:test tests/notes/NoteEditableConten
 
 ### 10. Optimize ranked tests 28–30
 Type: Structure
-Status: planned
+Status: done
+
+Outcome: Removed redundant settling and a weaker title-sync case while preserving dissolve conflicts, post-save live wiki links, and title-save races; deleted the orphaned dissolve helper. Focused Chromium passed repeatedly.
 
 **Tests:**
 - #28 `tests/pages/FolderPage.renameDissolve.spec.ts` — FolderPage rename and dissolve > dissolve > soft-deleted shows inline error; name conflict confirms merge and retries (~25.2ms)

@@ -5,7 +5,6 @@ import { wrapSdkError, wrapSdkResponse } from "@tests/helpers"
 import usePopups from "@/components/commons/Popups/usePopups"
 import {
   createFolderPageRouter,
-  dissolveWithInitialConfirm,
   editFolderPageName,
   folderPageNameEditor,
   folderNameConflictMessage,
@@ -137,7 +136,7 @@ describe("FolderPage rename and dissolve", () => {
   })
 
   describe("dissolve", () => {
-    it("soft-deleted shows inline error; name conflict confirms merge and retries", async () => {
+    it("shows soft-deleted error; confirms merge on name conflict and retries", async () => {
       const { wrapper } = mountFolderPage(router, 20, "Mid")
 
       const dissolveSpy = vi
@@ -150,18 +149,28 @@ describe("FolderPage rename and dissolve", () => {
           })
         )
 
-      await dissolveWithInitialConfirm(wrapper)
+      await wrapper.get('[data-testid="folder-tab-settings"]').trigger("click")
+      const dissolveButton = wrapper.get(
+        '[data-testid="folder-dissolve-button"]'
+      )
+      await dissolveButton.trigger("click")
+      resolveTopConfirm(true)
+      await flushPromises()
+
       expect(wrapper.text()).toContain(softDeletedTitleConflictMessage)
 
       dissolveSpy.mockResolvedValue(
         wrapSdkError({
           status: 409,
+          errorType: "FOLDER_NAME_CONFLICT",
           message:
             "A folder with this name already exists at the destination: Inner",
-          errorType: "FOLDER_NAME_CONFLICT",
         })
       )
-      await dissolveWithInitialConfirm(wrapper)
+
+      await dissolveButton.trigger("click")
+      resolveTopConfirm(true)
+      await flushPromises()
 
       const mergePopup = usePopups().popups.peek()?.[0]
       expect(mergePopup?.type).toBe("confirm")

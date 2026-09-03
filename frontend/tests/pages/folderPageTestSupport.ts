@@ -169,14 +169,6 @@ export async function selectDestinationParentFolder(
   await flushPromises()
 }
 
-export async function dissolveWithInitialConfirm(wrapper: VueWrapper) {
-  await openFolderSettingsTab(wrapper)
-  await wrapper.find('[data-testid="folder-dissolve-button"]').trigger("click")
-  await flushPromises()
-  usePopups().popups.done(true)
-  await flushPromises()
-}
-
 export function resolveTopConfirm(confirmed: boolean) {
   usePopups().popups.done(confirmed)
 }
