@@ -1155,7 +1155,9 @@ CURSOR_DEV=true nix develop -c pnpm frontend:test tests/components/recall/Answer
 
 ### 38. Optimize ranked tests 112–114
 Type: Structure
-Status: planned
+Status: done
+
+Outcome: Merged README-property and assimilation activation lifecycles, removing two mounts. A keyed-remount modal alternative regressed, so the stronger autofocus tests were retained and added as a Candidate. Focused Chromium passed twice.
 
 **Tests:**
 - #112 `tests/components/form/RichMarkdownEditor.propertyRelationImageIndex.spec.ts` — RichMarkdownEditor property relation and index > readme-only predefined properties > empty readme-only fields are not included in emitted YAML (~12.6ms)

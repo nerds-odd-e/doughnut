@@ -138,7 +138,7 @@ describe("NoteMoreOptionsForm", () => {
   })
 
   describe("assimilation settings toggle", () => {
-    it("turns assimilation settings on without changing route", async () => {
+    it("turns assimilation settings on without changing route and closes the menu", async () => {
       await router.push("/")
       const wrapper = renderer.withProps({ note }).mount()
 
@@ -155,18 +155,6 @@ describe("NoteMoreOptionsForm", () => {
       const { showAssimilationPanel, targetNoteId } = useAssimilationView()
       expect(showAssimilationPanel.value).toBe(true)
       expect(targetNoteId.value).toBe(note.id)
-    })
-
-    it("emits close-dialog when assimilation settings button is clicked", async () => {
-      const wrapper = renderer.withProps({ note }).mount()
-
-      await flushPromises()
-
-      const assimilateButton = wrapper.find(
-        `button[title="${noteMoreOptionsTitles.assimilation}"]`
-      )
-      await assimilateButton.trigger("click")
-
       expect(wrapper.emitted()).toHaveProperty("close-dialog")
     })
 

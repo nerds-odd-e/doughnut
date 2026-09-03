@@ -94,23 +94,21 @@ Paragraph.\n`
   })
 
   describe("readme-only predefined properties", () => {
-    it("empty readme-only fields are not included in emitted YAML", async () => {
+    it("keeps readme-only fields scoped to populated readme frontmatter", async () => {
       const wrapper = await h.mountEditor("# Body", { isReadmeContext: true })
       await emitQuillBodyHtml(wrapper, "<h1>Updated Body</h1>")
 
       const last = h.lastEmittedMarkdown()
       expect(last).not.toContain("title_pattern")
       expect(last).toContain("Updated Body")
-    })
 
-    it("shows existing readme-only fields but does not add them outside readme context", async () => {
       const markdown = `---
 title_pattern: "{{date}}"
 question_generation_instruction: Focus on facts.
 ---
 
 # Body`
-      const wrapper = await h.mountEditor(markdown, { isReadmeContext: true })
+      await wrapper.setProps({ modelValue: markdown, isReadmeContext: true })
 
       const keyValues = propertyRowKeyValues(editorRoot(h))
       expect(keyValues).toContain("title_pattern")
