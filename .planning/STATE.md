@@ -6,9 +6,9 @@ current_phase: null
 current_phase_name: null
 status: ready
 stopped_at: null
-last_updated: "2026-09-03T09:27:00Z"
+last_updated: "2026-09-03T09:43:00Z"
 last_activity: 2026-09-03
-last_activity_desc: "spent quick plans 038-043 deleted; remaining issues collected in 041"
+last_activity_desc: "spent quick plans 038-043 deleted; remaining-issues 041 dropped"
 progress:
   total_phases: 0
   completed_phases: 0
@@ -35,9 +35,8 @@ Daily probe measurement (not an ADR): [daily-probe-protocol.md](notes/daily-prob
 
 ## Operator Next Steps
 
-- Remaining issues: [041](quick/041-question-generation-batch-retry-and-failed-request-purge/PLAN.md)
 - Start the next milestone with `/gsd-new-milestone` when ready.
 
-Parked work: SEED-001, SEED-002, SEED-006, SEED-007, SEED-008; ADR 0002 Level 1. See [ROADMAP.md](ROADMAP.md) or [041](quick/041-question-generation-batch-retry-and-failed-request-purge/PLAN.md).
+Parked work: SEED-001, SEED-002, SEED-006, SEED-007, SEED-008; ADR 0002 Level 1. See [ROADMAP.md](ROADMAP.md).
 
 Recent ad-hoc work: `noteProperty` / **property panel** / `#prop:` wiki (ADR 0001 / ADR 0004 / ADR 0005); E2E named-route honesty and SPA hydrate protocol (E2E helpers, `MainMenu.vue`); daily probe side tap ([daily-probe-protocol.md](notes/daily-probe-protocol.md)); live authored-note-reference resolution; question-generation batch latest-only retry + failed-request purge; recall E2E suite cut (~78% wall time).
