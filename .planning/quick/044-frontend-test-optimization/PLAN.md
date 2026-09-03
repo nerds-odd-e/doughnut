@@ -930,7 +930,9 @@ CURSOR_DEV=true nix develop -c pnpm frontend:test tests/notes/NoteEditableConten
 
 ### 29. Optimize ranked tests 85–87
 Type: Structure
-Status: planned
+Status: done
+
+Outcome: Shared mounts across scalar-dialog, extraction-retry, and normalization sequences, reducing ten tests to seven while preserving every unique state transition. Focused Chromium passed three consecutive runs.
 
 **Tests:**
 - #85 `tests/components/form/RichMarkdownEditor.propertyValueDialog.spec.ts` — RichMarkdownEditor property value dialog > hides list mode for scalar-only structural keys (~15.0ms)

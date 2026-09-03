@@ -12,7 +12,6 @@ import {
   EDIT_ICON_VISIBILITY_CASES,
   mountEditorAndCountEditIcons,
   mountImageMaskValueDialog,
-  mountTopicValueDialog,
 } from "./propertyValueDialogTestSupport"
 import { createRichMarkdownEditorTestHarness } from "./richMarkdownEditorTestHarness"
 
@@ -23,8 +22,11 @@ describe("RichMarkdownEditor property value dialog", () => {
     h.cleanup()
   })
 
-  it("cancel discards edits; reopen save keeps scalar YAML shape", async () => {
-    const wrapper = await mountTopicValueDialog(h)
+  it("cancel discards edits; reopen scalar-only key saves scalar YAML", async () => {
+    const wrapper = await mountImageMaskValueDialog(h)
+
+    expect(modeTabEl("list")).toBeNull()
+    expect(modeTabEl("text")).not.toBeNull()
 
     setTextareaValue("changed but not saved")
     clickCancel()
@@ -34,21 +36,14 @@ describe("RichMarkdownEditor property value dialog", () => {
     expect(propertyValueDialogEl()).toBeNull()
 
     await openPropertyValueDialog(wrapper)
-    expect(getTextareaValue()).toBe("training")
-    setTextareaValue("advanced workshop")
+    expect(getTextareaValue()).toBe("region-a")
+    setTextareaValue("region-b")
     clickSave()
     await flushPromises()
 
     const last = h.lastEmittedMarkdown()
-    expect(last).toContain("topic: advanced workshop")
-    expect(last).not.toMatch(/topic:\s*\n\s*-/)
-  })
-
-  it("hides list mode for scalar-only structural keys", async () => {
-    await mountImageMaskValueDialog(h)
-
-    expect(modeTabEl("list")).toBeNull()
-    expect(modeTabEl("text")).not.toBeNull()
+    expect(last).toContain("image_mask: region-b")
+    expect(last).not.toMatch(/image_mask:\s*\n\s*-/)
   })
 
   it.each(EDIT_ICON_VISIBILITY_CASES)(

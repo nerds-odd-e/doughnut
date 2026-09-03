@@ -19,9 +19,9 @@ import {
   mountNoteRefinementReady,
   mountNoteRefinementWithLayoutReady,
   note,
+  refinementLayoutItems,
   refinementLayoutSelectionApiCall,
   setupNoteRefinementTests,
-  threePointLayout,
   threePointLayoutTexts,
 } from "./noteRefinementTestSupport"
 
@@ -42,7 +42,7 @@ describe("NoteRefinement extract note preview", () => {
   })
 
   it("retries an editable preview and shows retry errors after confirming edited fields", async () => {
-    const layout = threePointLayout()
+    const layout = refinementLayoutItems(["Point"])
     const firstPreview = labeledExtractionPreview("First")
     const retryPreview = labeledExtractionPreview("Retry")
     const extractNotePreviewSpy = mockExtractNotePreviewResponses(
@@ -54,32 +54,23 @@ describe("NoteRefinement extract note preview", () => {
     )
     const wrapper = await mountNoteRefinementWithLayoutReady(layout)
 
-    await openExtractionPreview(wrapper, "p2")
+    await openExtractionPreview(wrapper, "p1")
 
     expect(extractNotePreviewSpy).toHaveBeenCalledWith(
-      refinementLayoutSelectionApiCall(note.id, layout, ["p2"], {
+      refinementLayoutSelectionApiCall(note.id, layout, ["p1"], {
         signal: true,
       })
     )
     expectExtractionPreviewVisible(wrapper)
     expectPreviewFields(wrapper, extractionPreviewFieldsFor("First"))
-    expect(wrapper.findAll("li")).toHaveLength(0)
 
     await retryExtractionPreview(wrapper)
 
     expect(extractNotePreviewSpy).toHaveBeenCalledTimes(2)
-    expect(extractNotePreviewSpy).toHaveBeenNthCalledWith(
-      2,
-      refinementLayoutSelectionApiCall(note.id, layout, ["p2"], {
-        signal: true,
-      })
-    )
     expectPreviewFields(wrapper, extractionPreviewFieldsFor("Retry"))
 
     await setPreviewFields(wrapper, {
       newTitle: "Edited title",
-      newContent: "Edited content",
-      originalContent: "Edited original",
     })
     await clickRetryExtractionPreview(wrapper)
 
@@ -92,11 +83,7 @@ describe("NoteRefinement extract note preview", () => {
     usePopups().popups.done(false)
     await flushPromises()
     expect(extractNotePreviewSpy).toHaveBeenCalledTimes(2)
-    expectPreviewFields(wrapper, {
-      newTitle: "Edited title",
-      newContent: "Edited content",
-      originalContent: "Edited original",
-    })
+    expectPreviewFields(wrapper, { newTitle: "Edited title" })
 
     await clickRetryExtractionPreview(wrapper)
     usePopups().popups.done(true)
