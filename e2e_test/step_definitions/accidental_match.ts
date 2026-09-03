@@ -14,68 +14,6 @@ Then(
   }
 )
 
-Then(
-  'I should see an accidental match reveal for spelling answer {string} with reviewed note {string} and matched notes {string} and {string}',
-  (
-    answer: string,
-    reviewedNoteTitle: string,
-    firstMatchedNoteTitle: string,
-    secondMatchedNoteTitle: string
-  ) => {
-    start
-      .assumeAnsweredQuestionPage()
-      .expectAccidentalMatchReveal(
-        answer,
-        reviewedNoteTitle,
-        firstMatchedNoteTitle,
-        secondMatchedNoteTitle
-      )
-  }
-)
-
-When(
-  'I add the matched note {string} as a wiki link in a new property from the accidental match result',
-  (matchedNoteTitle: string) => {
-    start
-      .assumeAnsweredQuestionPage()
-      .linkMatchedNoteAsProperty(matchedNoteTitle)
-  }
-)
-
-When(
-  'I add the matched note {string} as relationship {string} from the accidental match result',
-  (matchedNoteTitle: string, relationType: string) => {
-    start
-      .assumeAnsweredQuestionPage()
-      .linkMatchedNoteAsRelationship(matchedNoteTitle, relationType)
-  }
-)
-
-When(
-  'I add the matched note {string} as overlapped from the accidental match result',
-  (matchedNoteTitle: string) => {
-    start.assumeAnsweredQuestionPage().openAddAsOverlappedNote(matchedNoteTitle)
-  }
-)
-
-Then(
-  'I should still be on the accidental match result for spelling answer {string} with matched note {string}',
-  (answer: string, matchedNoteTitle: string) => {
-    start
-      .assumeAnsweredQuestionPage()
-      .expectStillOnAccidentalMatchResult(answer, matchedNoteTitle)
-  }
-)
-
-Then(
-  'I should not see overlap try-again on the accidental match result',
-  () => {
-    start
-      .assumeAnsweredQuestionPage()
-      .expectNoOverlapTryAgainOnAccidentalMatchResult()
-  }
-)
-
 Then('I should see an overlap try-again alert for spelling', () => {
   start.assumeAnsweredQuestionPage().expectOverlapTryAgainForSpelling()
 })
@@ -92,39 +30,3 @@ Then(
 When('I try the spelling question again', () => {
   start.assumeAnsweredQuestionPage().trySpellingQuestionAgain()
 })
-
-When(
-  'I open resolve and navigate to matched note {string}',
-  (matchedNoteTitle: string) => {
-    start
-      .assumeAnsweredQuestionPage()
-      .openResolveDialog()
-      .clickMatchedNoteTitle(matchedNoteTitle)
-  }
-)
-
-When('I open the accidental match resolve dialog', () => {
-  start.assumeAnsweredQuestionPage().openResolveDialog()
-})
-
-Then(
-  'add as overlapped for matched note {string} should be disabled',
-  (matchedNoteTitle: string) => {
-    start
-      .assumeAnsweredQuestionPage()
-      .expectAddAsOverlappedDisabledForMatchedNote(matchedNoteTitle)
-  }
-)
-
-When('I go back to the recall result', () => {
-  start.assumeAnsweredQuestionPage().goBackToRecallResult()
-})
-
-Then(
-  'I should see resolve available again for spelling answer {string} with matched note {string}',
-  (answer: string, matchedNoteTitle: string) => {
-    start
-      .assumeAnsweredQuestionPage()
-      .expectResolveAvailableAgainWithMatch(answer, matchedNoteTitle)
-  }
-)

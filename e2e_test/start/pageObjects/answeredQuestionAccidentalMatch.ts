@@ -1,6 +1,6 @@
 import { waitUntilAppIsNotBusy } from '../pageBase'
 
-export function expectAccidentalMatchAlert(answer: string) {
+function expectAccidentalMatchAlert(answer: string) {
   cy.findByTestId('accidental-match-alert')
     .scrollIntoView()
     .should('be.visible')
@@ -13,18 +13,14 @@ export function expectAccidentalMatchAlert(answer: string) {
 export function expectAccidentalMatchRevealForNotes(
   answer: string,
   reviewedNoteTitle: string,
-  matchedNoteTitles: string[]
+  matchedNoteTitle: string
 ) {
   expectAccidentalMatchAlert(answer)
-  if (matchedNoteTitles.length === 1) {
-    cy.findByTestId('accidental-match-answer-link')
-      .should('be.visible')
-      .and('have.text', answer)
-      .and('have.attr', 'href')
-      .and('match', /\/n\d+/)
-  } else {
-    cy.findByTestId('accidental-match-answer-link').should('not.exist')
-  }
+  cy.findByTestId('accidental-match-answer-link')
+    .should('be.visible')
+    .and('have.text', answer)
+    .and('have.attr', 'href')
+    .and('match', /\/n\d+/)
   cy.findByText(`Your answer \`${answer}\` is incorrect.`).should('not.exist')
   cy.findByTestId('resolve-accidental-match')
     .scrollIntoView()
@@ -43,9 +39,7 @@ export function expectAccidentalMatchRevealForNotes(
     .and('contain.text', 'English practice')
     .and('contain.text', 'largely overlaps with the current note')
     .within(() => {
-      for (const matchedNoteTitle of matchedNoteTitles) {
-        cy.contains('a', matchedNoteTitle).should('be.visible')
-      }
+      cy.contains('a', matchedNoteTitle).should('be.visible')
       cy.findByTestId('resolve-overlap-explanation').should('be.visible')
     })
   cy.get('.close-button').filter(':visible').first().click()
@@ -72,25 +66,4 @@ export function expectNoMatchedNotesOrAccidentalMatch() {
   cy.findByTestId('matched-notes-section').should('not.exist')
   cy.findByTestId('accidental-match-alert').should('not.exist')
   cy.findByTestId('resolve-accidental-match').should('not.exist')
-}
-
-export function openResolveAndClickMatchedNoteCta(
-  matchedNoteTitle: string,
-  testIdPrefix: string,
-  buttonLabel: string
-) {
-  cy.findByTestId('resolve-accidental-match')
-    .scrollIntoView()
-    .should('be.visible')
-    .click()
-  waitUntilAppIsNotBusy()
-  cy.findByTestId('accidental-match-resolve-dialog')
-    .should('be.visible')
-    .and('contain.text', matchedNoteTitle)
-    .within(() => {
-      cy.get(`[data-testid^="${testIdPrefix}"]`)
-        .should('be.visible')
-        .and('contain.text', buttonLabel)
-        .click()
-    })
 }

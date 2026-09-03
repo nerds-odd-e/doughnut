@@ -146,32 +146,6 @@ const assumeMemoryTrackerPage = () => {
       recordLabeledValueAs('Recall Count:', 'recordedRecallCount')
       return assumeMemoryTrackerPage()
     },
-    expectBroughtForwardWithoutRecallCredit() {
-      expectMemoryTrackerPage()
-      expectLabeledValueUnchanged(
-        'Last Recall Time:',
-        'recordedLastRecallTime',
-        (recorded) =>
-          `Last Recall Time should stay ${recorded} without recall credit`
-      )
-      expectLabeledValueUnchanged(
-        'Recall Count:',
-        'recordedRecallCount',
-        (recorded) =>
-          `Recall Count should stay ${recorded} without recall credit`
-      )
-      labeledValue('Next Recall Time:').then((nextRecallTime) => {
-        cy.get<string>('@recordedNextRecallTime').then((recorded) => {
-          const next = new Date(nextRecallTime).getTime()
-          const before = new Date(recorded).getTime()
-          expect(
-            next,
-            `Next Recall Time (${nextRecallTime}) should be earlier than recorded ${recorded}`
-          ).to.be.lessThan(before)
-        })
-      })
-      return assumeMemoryTrackerPage()
-    },
   }
 }
 

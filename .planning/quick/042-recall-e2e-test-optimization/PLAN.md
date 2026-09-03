@@ -147,7 +147,7 @@ CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/recall/
 
 ### 3. Collapse accidental match to one scheduling journey
 Type: Structure
-Status: planned
+Status: done
 
 **Tests:**
 - `accidental_match_reveal.feature` — all six (~38s file)

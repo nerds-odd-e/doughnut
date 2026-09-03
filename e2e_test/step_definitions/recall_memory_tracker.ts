@@ -47,15 +47,6 @@ Then(
   }
 )
 
-Then(
-  'I should see the understanding memory tracker with recall count {int}',
-  (count: number) => {
-    assumeMemoryTrackerPage()
-      .expectRecallCount(count)
-      .expectTrackerType('UNDERSTANDING')
-  }
-)
-
 Then('I record the current memory tracker schedule', () => {
   assumeMemoryTrackerPage().captureSchedule()
 })
@@ -101,16 +92,6 @@ Then(
     start
       .testability()
       .expectSpellingTrackerBroughtForwardWithoutRecallCredit(noteTitle)
-  }
-)
-
-Then(
-  'the understanding memory tracker for {string} should be brought forward without recall credit',
-  (noteTitle: string) => {
-    openNoteLevelTracker(
-      noteTitle,
-      'understanding'
-    ).expectBroughtForwardWithoutRecallCredit()
   }
 )
 
