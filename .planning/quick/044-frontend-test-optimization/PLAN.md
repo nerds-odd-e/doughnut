@@ -805,7 +805,9 @@ CURSOR_DEV=true nix develop -c pnpm frontend:test tests/components/form/RichMark
 
 ### 24. Optimize ranked tests 70–72
 Type: Structure
-Status: planned
+Status: done
+
+Outcome: Merged selected-block PATCH, selected-report deletion, and conversation-close restoration into existing journeys, removing three mounts and a dead support re-export. Focused Chromium passed twice.
 
 **Tests:**
 - #70 `tests/pages/BookReadingPage.readingPosition.spec.ts` — BookReadingPage reading position > PATCH reading position includes selectedBookBlockId after layout click (~15.7ms)

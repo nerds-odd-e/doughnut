@@ -31,7 +31,7 @@ describe("BookReadingPage reading position", () => {
     mockBookReadingPageDefaults()
   })
 
-  it("debounces PATCH reading position; keeps last top; skips null viewport", async () => {
+  it("debounces PATCH reading position; keeps last top and selected block; skips null viewport", async () => {
     const { wrapper, patchSpy } = await mountPatchDebounceScenario()
     const pdf = wrapper.findComponent(PdfBookViewer)
     const viewport = { top: 200, mid: 500, bottom: 1000 }
@@ -62,6 +62,13 @@ describe("BookReadingPage reading position", () => {
       },
     })
 
+    const row = wrapper
+      .findAll('[data-testid="book-reading-book-block"]')
+      .find((candidate) => candidate.text() === "Section 3")
+    expect(row).toBeDefined()
+    await row!.trigger("click")
+    await flushPromises()
+
     patchSpy.mockClear()
     await withFakeTimers(async () => {
       pdf.vm.$emit("viewportAnchorPage", {
@@ -87,7 +94,7 @@ describe("BookReadingPage reading position", () => {
           pageIndex: 0,
           bbox: [0, 150, 0, 150],
         },
-        selectedBookBlockId: 101,
+        selectedBookBlockId: 103,
       },
     })
 
@@ -150,40 +157,5 @@ describe("BookReadingPage reading position", () => {
     expect(wrapper.find('[data-current-selection="true"]').text()).toBe(
       "Section 2"
     )
-  })
-
-  it("PATCH reading position includes selectedBookBlockId after layout click", async () => {
-    const { wrapper, patchSpy } = await mountPatchDebounceScenario()
-    const row = wrapper
-      .findAll('[data-testid="book-reading-book-block"]')
-      .find((w) => w.text() === "Section 3")
-    expect(row).toBeDefined()
-    await row!.trigger("click")
-    await flushPromises()
-
-    const pdf = wrapper.findComponent(PdfBookViewer)
-    await withFakeTimers(async () => {
-      pdf.vm.$emit("viewportAnchorPage", {
-        anchorPageIndexZeroBased: 1,
-        viewport: { top: 100, mid: 200, bottom: 300 },
-        pagesCount: 10,
-      })
-      vi.advanceTimersByTime(LAST_READ_POSITION_PATCH_DEBOUNCE_MS)
-      await flushPromises()
-    })
-
-    expect(patchSpy).toHaveBeenCalled()
-    const lastCall = patchSpy.mock.calls[patchSpy.mock.calls.length - 1]?.[0]
-    expect(lastCall).toEqual({
-      path: { notebook: notebookId },
-      body: {
-        locator: {
-          type: "PdfLocator_Full",
-          pageIndex: 1,
-          bbox: [0, 100, 0, 100],
-        },
-        selectedBookBlockId: 103,
-      },
-    })
   })
 })

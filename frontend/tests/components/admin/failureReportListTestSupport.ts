@@ -8,7 +8,7 @@ import { flushPromises, type VueWrapper } from "@vue/test-utils"
 import { dummyRouteRecordsFromMetadata } from "@/routes/dummyRouteRecords"
 import { createMemoryHistory, createRouter } from "vue-router"
 import makeMe from "donut-test-fixtures/makeMe"
-import helper, { mockSdkService, wrapSdkResponse } from "@tests/helpers"
+import helper, { mockSdkService } from "@tests/helpers"
 
 export const failureReportListRouter = createRouter({
   history: createMemoryHistory(),
@@ -77,5 +77,3 @@ export async function openDeleteModalForFirstReports(
   await deleteSelectedButton(wrapper).trigger("click")
   await flushPromises()
 }
-
-export { wrapSdkResponse }

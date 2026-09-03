@@ -20,7 +20,7 @@ describe("note show page conversation", () => {
     noteId = setupNoteShowPageConversationMocks().id
   })
 
-  it("maximizes and restores note content when maximize is toggled", async () => {
+  it("maximizes, restores, and closes the conversation", async () => {
     await renderNoteShowPageWithConversation(router, noteId)
 
     const maximize = toggleMaximizeButtonEl()
@@ -33,13 +33,6 @@ describe("note show page conversation", () => {
     maximize!.click()
     await nextTick()
     expect(noteContentWrapperEl()).not.toBeNull()
-  })
-
-  it("restores note content and clears conversation query on close", async () => {
-    await renderNoteShowPageWithConversation(router, noteId)
-
-    const maximize = toggleMaximizeButtonEl()
-    expect(maximize).not.toBeNull()
 
     maximize!.click()
     await nextTick()

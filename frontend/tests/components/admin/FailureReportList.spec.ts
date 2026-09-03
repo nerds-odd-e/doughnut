@@ -16,7 +16,6 @@ import {
   openDeleteModalForFirstReports,
   rowSelectEls,
   triggerTestExceptionButton,
-  wrapSdkResponse,
 } from "./failureReportListTestSupport"
 
 describe("FailureReportList", () => {
@@ -63,7 +62,12 @@ describe("FailureReportList", () => {
   })
 
   describe("selecting and deleting reports", () => {
-    it("shows delete button with selected count as selection grows", async () => {
+    it("shows selected count and deletes selected reports when confirmed", async () => {
+      const deleteSpy = mockSdkService(
+        FailureReportController,
+        "deleteFailureReports",
+        undefined
+      )
       const wrapper = await mountFailureReportList([
         aFailureReport(1),
         aFailureReport(2),
@@ -83,6 +87,14 @@ describe("FailureReportList", () => {
       expect(deleteSelectedButton(wrapper).text()).toContain(
         "Delete Selected (2)"
       )
+
+      await deleteSelectedButton(wrapper).trigger("click")
+      await deleteConfirmButton(wrapper).trigger("click")
+      await flushPromises()
+
+      expect(deleteSpy).toHaveBeenCalledWith({
+        body: [1, 2],
+      })
     })
 
     it("closes delete confirmation modal when cancel is clicked", async () => {
@@ -97,28 +109,6 @@ describe("FailureReportList", () => {
       await flushPromises()
 
       expect(deleteModalIsOpen(wrapper)).toBe(false)
-    })
-
-    it("deletes selected reports when confirmed", async () => {
-      const report = aFailureReport(1)
-      const failureReportsSpy = mockFailureReportsList([report])
-      const deleteSpy = mockSdkService(
-        FailureReportController,
-        "deleteFailureReports",
-        undefined
-      )
-
-      const wrapper = await mountFailureReportList([report])
-      await openDeleteModalForFirstReports(wrapper, 1)
-
-      failureReportsSpy.mockResolvedValue(wrapSdkResponse([]))
-
-      await deleteConfirmButton(wrapper).trigger("click")
-      await flushPromises()
-
-      expect(deleteSpy).toHaveBeenCalledWith({
-        body: [1],
-      })
     })
   })
 
