@@ -7,7 +7,7 @@ import {
 } from "@tests/helpers"
 import usePopups from "@/components/commons/Popups/usePopups"
 import {
-  clickDeleteNote,
+  deleteNoteButton,
   deleteNoteSpy,
   loadingModalMask,
   mountDeleteFormReady,
@@ -36,7 +36,7 @@ describe("NoteMoreOptionsForm delete relationship note", () => {
     seedRelationRealmWithInboundReferences(relationRealm)
     const wrapper = await mountDeleteFormReady(relationRealm.note)
 
-    await clickDeleteNote(wrapper)
+    ;(deleteNoteButton(wrapper).element as HTMLButtonElement).click()
 
     usePopups().popups.done("REDUCE_TO_SOURCE_PROPERTY")
     await flushPromises()
@@ -61,7 +61,7 @@ describe("NoteMoreOptionsForm delete relationship note", () => {
       relationNote
     )
 
-    await clickDeleteNote(wrapper)
+    ;(deleteNoteButton(wrapper).element as HTMLButtonElement).click()
 
     const popups = usePopups().popups.peek()
     expect(popups?.length).toBe(1)

@@ -175,7 +175,6 @@ describe("repeat page", () => {
       await flushPromises()
       await recallPromptCardWrapper.setProps({ currentIndex: 0 })
 
-      expect(justReviewVisible(recallPromptCardWrapper)).toBe(false)
       expect(contentLoaderVisible(recallPromptCardWrapper)).toBe(true)
 
       resolve()

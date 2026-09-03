@@ -705,7 +705,9 @@ CURSOR_DEV=true nix develop -c pnpm frontend:test tests/components/form/RichMark
 
 ### 20. Optimize ranked tests 58–60
 Type: Structure
-Status: planned
+Status: done
+
+Outcome: Reused the shared loading-modal harness, replaced wrapper-trigger overhead with direct DOM clicks, and removed a redundant negative query while preserving the positive loading and current-prop behaviors. Focused Chromium passed.
 
 **Tests:**
 - #58 `tests/components/recall/AssimilationPanel.loadingModal.spec.ts` — AssimilationPanel loading modal > keeps the global modal open from skip through loading the next unit (~17.5ms)

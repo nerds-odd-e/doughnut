@@ -1,26 +1,19 @@
 import { flushPromises } from "@vue/test-utils"
 import type { AssimilationNextDto } from "@generated/donut-backend-api"
 import { AssimilationController } from "@generated/donut-backend-api/sdk.gen"
-import LoadingModal from "@/components/commons/LoadingModal.vue"
 import AssimilationPanel from "@/components/recall/AssimilationPanel.vue"
 import usePopups from "@/components/commons/Popups/usePopups"
-import {
-  currentBlockingApiState,
-  type ApiStatus,
-} from "@/managedApi/ApiStatusHandler"
-import {
-  setupGlobalClient,
-  teardownGlobalClientForTesting,
-} from "@/managedApi/clientSetup"
+import { teardownGlobalClientForTesting } from "@/managedApi/clientSetup"
 import helper, { wrapSdkError, wrapSdkResponse } from "@tests/helpers"
+import GlobalApiLoadingModal from "@tests/helpers/GlobalApiLoadingModal"
 import { afterEach, describe, expect, it, vi } from "vitest"
-import { computed, defineComponent, ref } from "vue"
+import { defineComponent } from "vue"
 import {
   assimilateSpy,
-  assimilateButtonSelector,
+  assimilateButtonEl,
   note,
   setupAssimilationPanelTests,
-  skipButtonSelector,
+  skipButtonEl,
   skipSequenceSpy,
 } from "./assimilationPanelTestSupport"
 
@@ -35,21 +28,11 @@ describe("AssimilationPanel loading modal", () => {
 
   const mountPanelWithGlobalLoadingModal = () => {
     const Host = defineComponent({
-      components: { AssimilationPanel, LoadingModal },
-      setup() {
-        const apiStatus = ref<ApiStatus>({ states: [] })
-        setupGlobalClient(apiStatus.value)
-        const blockingApiState = computed(() =>
-          currentBlockingApiState(apiStatus.value)
-        )
-        return { blockingApiState, note }
-      },
+      components: { AssimilationPanel, GlobalApiLoadingModal },
+      setup: () => ({ note }),
       template: `
         <AssimilationPanel :note="note" />
-        <LoadingModal
-          :show="!!blockingApiState"
-          :message="blockingApiState?.message"
-        />
+        <GlobalApiLoadingModal />
       `,
     })
 
@@ -144,7 +127,8 @@ describe("AssimilationPanel loading modal", () => {
   it("keeps the global modal open from assimilate through next unit and hides on assimilate error", async () => {
     await expectGlobalModalThroughNextUnit(
       async (wrapper) => {
-        await wrapper.find(assimilateButtonSelector).trigger("click")
+        assimilateButtonEl(wrapper)!.click()
+        await wrapper.vm.$nextTick()
       },
       delaySuccessfulAssimilation,
       "Assimilating..."
@@ -163,7 +147,8 @@ describe("AssimilationPanel loading modal", () => {
     const wrapper = mountPanelWithGlobalLoadingModal()
     await flushPromises()
 
-    await wrapper.find(assimilateButtonSelector).trigger("click")
+    assimilateButtonEl(wrapper)!.click()
+    await wrapper.vm.$nextTick()
 
     expect(loadingModal()).toBeTruthy()
     resolveApi()
@@ -175,7 +160,7 @@ describe("AssimilationPanel loading modal", () => {
   it("keeps the global modal open from skip through loading the next unit", async () => {
     await expectGlobalModalThroughNextUnit(
       async (wrapper) => {
-        await wrapper.find(skipButtonSelector).trigger("click")
+        skipButtonEl(wrapper)!.click()
         usePopups().popups.done(true)
         await flushPromises()
       },
