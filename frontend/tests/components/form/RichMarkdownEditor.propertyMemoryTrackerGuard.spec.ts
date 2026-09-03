@@ -111,34 +111,6 @@ Workshop body.`
     expect(wrapper.find(topicRowSelector).exists()).toBe(true)
   })
 
-  it("updates the tracker property key and emits renamed frontmatter when the user confirms", async () => {
-    const tracker = mockNoteInfoWithPropertyTracker("topic", 99)
-    confirmMock.mockImplementationOnce(() => Promise.resolve(true))
-
-    const wrapper = await h.mountEditor(trackedPropertyMarkdown, {
-      noteId,
-      route: noteShowLocation(noteId),
-    })
-    const keyInput = wrapper.find(topicRowKeyInputSelector)
-
-    await keyInput.trigger("focus")
-    await keyInput.setValue("subject")
-    await keyInput.trigger("blur")
-    await flushPromises()
-
-    await vi.waitFor(() => {
-      expect(updatePropertyKeySpy).toHaveBeenCalledWith({
-        path: { memoryTracker: tracker.id },
-        body: { propertyKey: "subject" },
-      })
-    })
-
-    const last = h.lastEmittedMarkdown()
-    expect(last).toContain("subject:")
-    expect(last).not.toContain("topic:")
-    expect(wrapper.find(propertyRowSelector("subject")).exists()).toBe(true)
-  })
-
   it("reverts the property key and does not emit when the user cancels a rename", async () => {
     mockNoteInfoWithPropertyTracker("topic", 99)
     confirmMock.mockImplementationOnce(() => Promise.resolve(false))

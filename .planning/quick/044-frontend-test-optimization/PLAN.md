@@ -1005,7 +1005,9 @@ CURSOR_DEV=true nix develop -c pnpm frontend:test tests/components/recall/Commis
 
 ### 32. Optimize ranked tests 94–96
 Type: Structure
-Status: planned
+Status: done
+
+Outcome: Removed redundant editor-level tracker rename coverage and unnecessary invalid-YAML drains. A narrower relationship-transition setup showed no speedup, so the stronger mounted journey was restored and added as a Candidate. Focused Chromium passed three consecutive runs.
 
 **Tests:**
 - #94 `tests/components/form/RichMarkdownEditor.propertyMemoryTrackerGuard.spec.ts` — RichMarkdownEditor property memory tracker guard > updates the tracker property key and emits renamed frontmatter when the user confirms (~13.5ms)

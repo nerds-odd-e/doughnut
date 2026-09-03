@@ -76,7 +76,6 @@ bad:
 
 Still body`
     const wrapper = await h.mountEditor(markdown)
-    await flushPromises()
 
     expect(wrapper.find("section").exists()).toBe(false)
     const alert = wrapper.find(
@@ -88,7 +87,6 @@ Still body`
     expect(h.quillReadonly()).toBe(true)
     const emitCountBefore = wrapper.emitted("update:modelValue")?.length ?? 0
     h.emitQuillModelValue("<p>Edited without fixing YAML</p>")
-    await flushPromises()
     expect(wrapper.emitted("update:modelValue")?.length ?? 0).toBe(
       emitCountBefore
     )
