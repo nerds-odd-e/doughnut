@@ -95,27 +95,6 @@ When(
   }
 )
 
-When(
-  'I assimilate rich note property {string} from its property panel',
-  (key: string) => {
-    start.assumeNotePage().assimilateRichNotePropertyFromPanel(key)
-  }
-)
-
-When(
-  'I skip rich note property {string} from its property panel',
-  (key: string) => {
-    start.assumeNotePage().skipRichNotePropertyFromPanel(key)
-  }
-)
-
-When(
-  'I return rich note property {string} to the sequence from its property panel',
-  (key: string) => {
-    start.assumeNotePage().returnRichNotePropertyToSequenceFromPanel(key)
-  }
-)
-
 When('I visit note {string}', (noteTopology: string) => {
   start.jumpToNotePage(noteTopology)
 })

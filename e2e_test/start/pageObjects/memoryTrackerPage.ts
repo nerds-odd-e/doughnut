@@ -126,19 +126,6 @@ const assumeMemoryTrackerPage = () => {
       expectLabeledValue('Type:', type)
       return assumeMemoryTrackerPage()
     },
-    expectNoteTitle(noteTitle: string) {
-      expectMemoryTrackerPage()
-      cy.findByText('Note under question').should('be.visible')
-      cy.contains('.note-under-question', noteTitle).should('be.visible')
-      return assumeMemoryTrackerPage()
-    },
-    expectFocusedProperty(propertyKey: string) {
-      expectMemoryTrackerPage()
-      cy.findByTestId('focused-property-indicator')
-        .should('be.visible')
-        .and('contain.text', `Focused property: ${propertyKey}`)
-      return assumeMemoryTrackerPage()
-    },
     captureSchedule() {
       expectMemoryTrackerPage()
       recordLabeledValueAs('Last Recall Time:', 'recordedLastRecallTime')

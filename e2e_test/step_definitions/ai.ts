@@ -82,18 +82,6 @@ Then(
   }
 )
 
-Then(
-  'OpenAI Responses POST bodies include property focus for {string} with value {string}',
-  (propertyKey: string, propertyValue: string) => {
-    mock_services
-      .openAi()
-      .expectResponsesPostBodiesIncludePropertyFocusInFocusContext(
-        propertyKey,
-        propertyValue
-      )
-  }
-)
-
 const defaultReplacementMcq = {
   'Question Stem': 'Second question',
   'Correct Choice': 'Rescue Diver',

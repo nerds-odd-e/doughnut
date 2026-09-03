@@ -17,133 +17,13 @@ Feature: Property memory tracker
     And It's day 1, 8 hour
     And the note "Vitamins" has assimilated property "topic"
 
-  @disableOpenAiService
-  Scenario: Untracked example of property appears in assimilation queue
-    Given I am re-logged in as "another_old_learner"
-    And I have a notebook "Property queue"
-    And I have a note "Kanji" under notebook "Property queue" with content:
-      """
-      ---
-      example of: "[[Sentence]]"
-      ---
-
-      Body.
-      """
-    And It's day 1, 8 hour
-    And I assimilated one note "Kanji" at the current time
-    When I start assimilation from the menu
-    Then I should be at property "example of" of note "Kanji"
-    And the rich note property "example of" should be focused with its property panel open
-    And I should not see the assimilation panel
-
-  @disableOpenAiService
-  Scenario: Skip a property does not create a dummy understanding tracker
-    Given I am re-logged in as "another_old_learner"
-    And I have a notebook "Property skip"
-    And I have a note "Minerals" under notebook "Property skip" with content:
-      """
-      ---
-      topic: calcium
-      ---
-
-      Body.
-      """
-    And It's day 1, 8 hour
-    And I assimilated one note "Minerals" at the current time
-    When I start assimilation from the menu
-    Then I should be at property "topic" of note "Minerals"
-    And the rich note property "topic" should be focused with its property panel open
-    And I should not see the assimilation panel
-    When I skip rich note property "topic" from its property panel
-    Then I should see the no more notes to assimilate toast
-    When I visit note "Minerals"
-    Then I should see Return to sequence for property "topic"
-
-  @disableOpenAiService
-  Scenario: Return to sequence restores a skipped property to the sequence
-    Given I am re-logged in as "another_old_learner"
-    And I have a notebook "Property return"
-    And I have a note "Minerals" under notebook "Property return" with content:
-      """
-      ---
-      topic: calcium
-      ---
-
-      Body.
-      """
-    And It's day 1, 8 hour
-    And I assimilated one note "Minerals" at the current time
-    When I start assimilation from the menu
-    Then I should be at property "topic" of note "Minerals"
-    And the rich note property "topic" should be focused with its property panel open
-    When I skip rich note property "topic" from its property panel
-    Then I should see the no more notes to assimilate toast
-    When I visit note "Minerals"
-    And I open the assimilation panel
-    Then I should see Return to sequence for property "topic"
-    When I return rich note property "topic" to the sequence from its property panel
-    Then I should see Skip for property "topic"
-    When I start assimilation from the menu
-    Then I should be at property "topic" of note "Minerals"
-    And the rich note property "topic" should be focused with its property panel open
-
-  @disableOpenAiService
-  Scenario: Assimilating a skipped property creates a property understanding tracker
-    Given I am re-logged in as "another_old_learner"
-    And I have a notebook "Property skip assimilate"
-    And I have a note "Minerals" under notebook "Property skip assimilate" with content:
-      """
-      ---
-      topic: calcium
-      ---
-
-      Body.
-      """
-    And It's day 1, 8 hour
-    And I assimilated one note "Minerals" at the current time
-    When I start assimilation from the menu
-    Then I should be at property "topic" of note "Minerals"
-    And the rich note property "topic" should be focused with its property panel open
-    When I skip rich note property "topic" from its property panel
-    Then I should see the no more notes to assimilate toast
-    When I visit note "Minerals"
-    And I open the assimilation panel
-    And I assimilate rich note property "topic" from its property panel
-    Then I should see the no more notes to assimilate toast
-    When I visit note "Minerals"
-    And I open the assimilation panel
-    Then I should see a property memory tracker for "topic"
-
-  @disableOpenAiService
-  Scenario: Remove from recall on the assimilation panel for a property
-    Given I assimilated one note "Vitamins" at the current time
-    And I am viewing the assimilation panel for note "Vitamins"
-    When I open the property memory tracker for "topic"
-    And I remove the memory tracker from recall
-    Then the memory tracker should be skipped
-    When I start assimilation from the menu
-    Then I should see the no more notes to assimilate toast
-
-  @disableOpenAiService
-  Scenario: Note-level assimilation stays available after property-only assimilation
-    Given I am viewing the assimilation panel for note "Vitamins"
-    Then assimilate for property "topic" should be disabled
-    And assimilate should be enabled
-    When I assimilate on the assimilation panel
-    And I open the assimilation panel
-    Then the note memory tracker should have recall count 0
-    And I should see a property memory tracker for "topic"
-
-  @disableOpenAiService
-  Scenario: Assimilated property appears as a labeled tracker and becomes due for recall
+  @usingMockedOpenAiService
+  Scenario: Answering a property recall question updates only the property tracker
     Given I am viewing the assimilation panel for note "Vitamins"
     Then I should see a property memory tracker for "topic"
     When It's day 2, 9 hour
     Then I should see that I have 1 notes to recall
-
-  @usingMockedOpenAiService
-  Scenario: Answering a property recall question updates only the property tracker
-    And It's day 1, 20 hour
+    Given It's day 1, 20 hour
     And I assimilated one note "Vitamins" at the current time
     And OpenAI generates this question:
       | Question Stem                      | Correct Choice | Incorrect Choice 1 | Incorrect Choice 2 | Incorrect Choice 3 |
@@ -156,59 +36,6 @@ Feature: Property memory tracker
     And I open the assimilation panel
     Then the note memory tracker should have recall count 0
     And the property memory tracker for "topic" should have recall count 1
-
-  @usingMockedOpenAiService
-  Scenario: Recalling a property tracker sends property focus to OpenAI
-    And OpenAI generates this question:
-      | Question Stem                      | Correct Choice | Incorrect Choice 1 | Incorrect Choice 2 | Incorrect Choice 3 |
-      | What does the topic property mean? | micronutrients | vitamins           | minerals           | proteins           |
-    And OpenAI evaluates the question as legitimate
-    When I visit recall for a due recall prompt on day 2
-    Then I should be asked "What does the topic property mean?"
-    And OpenAI Responses POST bodies include property focus for "topic" with value "micronutrients"
-
-  Scenario: Removing tracked property deletes property memory tracker
-    When I visit note "Vitamins"
-    And I remove rich note property "topic" confirming memory tracker change
-    And I open the assimilation panel
-    Then the property memory tracker for "topic" should be absent
-
-  @disableOpenAiService
-  Scenario: Assimilate a property from its own property panel
-    Given I am re-logged in as "another_old_learner"
-    And I have a notebook "Property panel assimilate"
-    And I have a note "Iron" under notebook "Property panel assimilate" with content:
-      """
-      ---
-      topic: iron
-      ---
-
-      Body.
-      """
-    And It's day 1, 8 hour
-    And I assimilated one note "Iron" at the current time
-    When I visit note "Iron"
-    And I assimilate rich note property "topic" from its property panel
-    Then I should see the no more notes to assimilate toast
-    When I visit note "Iron"
-    And I open the assimilation panel
-    Then I should see a property memory tracker for "topic"
-
-  Scenario: Property memory tracker note link opens that property
-    Given I am viewing the assimilation panel for note "Vitamins"
-    When I open the property memory tracker for "topic"
-    Then I should see note "Vitamins" on the memory tracker page
-    And I should see focused property "topic" on the memory tracker page
-    When I follow the note under question "Vitamins"
-    Then I should be at property "topic" of note "Vitamins"
-    And the rich note property "topic" should be focused with its property panel open
-
-  @disableOpenAiService
-  Scenario: Note-level memory tracker note link opens the note
-    Given I assimilated one note "Vitamins" at the current time
-    When I visit the understanding memory tracker for "Vitamins"
-    And I follow the note under question "Vitamins"
-    Then I should be at note "Vitamins"
 
   @usingMockedOpenAiService
   Scenario: Following the note from a property recall answer opens that property

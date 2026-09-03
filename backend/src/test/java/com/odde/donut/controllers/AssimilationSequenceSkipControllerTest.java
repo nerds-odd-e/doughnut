@@ -53,6 +53,21 @@ class AssimilationSequenceSkipControllerTest extends ControllerTestBase {
   }
 
   @Test
+  void insertsPropertySkipRowWithoutCreatingATracker() throws UnexpectedNoAccessRightException {
+    Note note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
+    AssimilationSequenceSkipRequestDTO request = new AssimilationSequenceSkipRequestDTO();
+    request.noteId = note.getId();
+    request.propertyKey = "topic";
+
+    AssimilationSequenceSkip skip = controller.create(request);
+
+    assertThat(skip.getPropertyKey(), equalTo("topic"));
+    assertThat(
+        memoryTrackerRepository.findByUserAndNote(currentUser.getUser().getId(), note.getId()),
+        empty());
+  }
+
+  @Test
   void duplicateSkipIsIdempotent() throws UnexpectedNoAccessRightException {
     Note note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
     AssimilationSequenceSkipRequestDTO request = new AssimilationSequenceSkipRequestDTO();

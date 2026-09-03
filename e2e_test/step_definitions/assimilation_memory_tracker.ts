@@ -4,7 +4,6 @@
 
 import { Then, When } from '@badeball/cypress-cucumber-preprocessor'
 import start from '../start'
-import { assumeMemoryTrackerPage } from '../start/pageObjects/memoryTrackerPage'
 import { followNoteUnderQuestion } from '../start/pageObjects/noteUnderQuestion'
 
 Then(
@@ -42,36 +41,6 @@ Then(
 Then('I should see a spelling memory tracker', () => {
   start.assumeAssimilationPage().expectSpellingMemoryTracker()
 })
-
-Then(
-  'the property memory tracker for {string} should be absent',
-  (propertyKey: string) => {
-    start
-      .assumeAssimilationPage()
-      .expectPropertyMemoryTrackerAbsent(propertyKey)
-  }
-)
-
-When(
-  'I open the property memory tracker for {string}',
-  (propertyKey: string) => {
-    start.assumeAssimilationPage().openPropertyMemoryTracker(propertyKey)
-  }
-)
-
-Then(
-  'I should see note {string} on the memory tracker page',
-  (noteTitle: string) => {
-    assumeMemoryTrackerPage().expectNoteTitle(noteTitle)
-  }
-)
-
-Then(
-  'I should see focused property {string} on the memory tracker page',
-  (propertyKey: string) => {
-    assumeMemoryTrackerPage().expectFocusedProperty(propertyKey)
-  }
-)
 
 When('I follow the note under question {string}', (noteTitle: string) => {
   followNoteUnderQuestion(noteTitle)

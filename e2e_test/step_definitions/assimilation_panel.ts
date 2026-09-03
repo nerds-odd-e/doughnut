@@ -41,29 +41,9 @@ When('I return to sequence on the assimilation panel', () => {
 })
 
 Then(
-  'assimilate for property {string} should be disabled',
-  (propertyKey: string) => {
-    start.assumeNotePage().expectRichNotePropertyAssimilateDisabled(propertyKey)
-  }
-)
-
-Then(
   'assimilate for property {string} should be enabled',
   (propertyKey: string) => {
     start.assumeNotePage().expectRichNotePropertyAssimilateEnabled(propertyKey)
-  }
-)
-
-Then('I should see Skip for property {string}', (propertyKey: string) => {
-  start.assumeNotePage().expectRichNotePropertyPanelAction(propertyKey, 'skip')
-})
-
-Then(
-  'I should see Return to sequence for property {string}',
-  (propertyKey: string) => {
-    start
-      .assumeNotePage()
-      .expectRichNotePropertyPanelAction(propertyKey, 'return-to-sequence')
   }
 )
 

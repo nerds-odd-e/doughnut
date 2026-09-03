@@ -11,7 +11,6 @@ import {
   RecallPromptController,
   RecallsController,
 } from '@generated/donut-backend-api/sdk.gen'
-import { noteIdFromUrl } from './noteIdFromUrl'
 import { unwrapData } from './unwrapApi'
 
 type InjectedNoteIds = {
@@ -85,38 +84,6 @@ export const recallTestabilityMethods = {
           return tracker as MemoryTracker
         })
     )
-  },
-
-  /**
-   * Property-scoped memory tracker for the note currently on screen. Recall
-   * count assertions now click through the property panel's status link to
-   * the tracker page and read it there (the `title` attribute on the status
-   * link puts recall count in the UI on both scopes identically, same as
-   * note-level trackers) — this backend read stays only for the one thing
-   * the UI genuinely can't provide: `expectPropertyMemoryTrackerAbsent`
-   * needs to tell "tracker never existed" apart from "tracker exists but
-   * `removedFromTracking`", both of which collapse to "no status link, show
-   * Assimilate button" in `AssimilationModes.vue`. Resolves to `null` (never
-   * `undefined`) when there's no match: a `.then()` callback that returns
-   * `undefined` makes Cypress keep the *previous* subject instead of
-   * `undefined`, which would silently resurrect the whole NoteRecallInfo.
-   */
-  propertyMemoryTrackerForCurrentNote(
-    propertyKey: string
-  ): Cypress.Chainable<MemoryTracker | null> {
-    return cy.url().then((url) => {
-      const noteId = noteIdFromUrl(url)
-      return cy
-        .wrap(NoteController.getNoteInfo({ path: { note: noteId } }), {
-          log: false,
-        })
-        .then(
-          (response) =>
-            unwrapData<NoteRecallInfo>(response).memoryTrackers?.find(
-              (candidate) => candidate.propertyKey === propertyKey
-            ) ?? null
-        )
-    })
   },
 
   dueRecallPrompt() {

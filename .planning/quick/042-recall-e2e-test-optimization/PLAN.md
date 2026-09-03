@@ -190,7 +190,7 @@ CURSOR_DEV=true nix develop -c pnpm frontend:test tests/pages/RecallPage.dailyPr
 
 ### 5. Collapse property memory tracker to property-recall journeys
 Type: Structure
-Status: planned
+Status: done
 
 **Tests:**
 - `property_memory_tracker.feature` — 14 scenarios (~60s)

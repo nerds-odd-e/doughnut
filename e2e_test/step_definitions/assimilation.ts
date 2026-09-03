@@ -112,10 +112,6 @@ Then('I should see assimilation progress {string}', (dueOverTotal: string) => {
   start.assimilation().expectAssimilationNavBadge(dueOverTotal)
 })
 
-Then('I should not see the assimilation panel', () => {
-  start.assumeNotePage().expectAssimilationPanelAbsent()
-})
-
 Then('I should see the daily assimilation goal toast', () => {
   start.assimilation().expectDailyAssimilationGoalToast()
 })

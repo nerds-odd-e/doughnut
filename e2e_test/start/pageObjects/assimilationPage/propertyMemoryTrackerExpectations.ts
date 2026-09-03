@@ -1,7 +1,6 @@
 import { noteIdFromUrl } from '../../noteIdFromUrl'
 import { waitUntilAppIsNotBusy } from '../../pageBase'
 import router from '../../router'
-import testability from '../../testability'
 import { assumeMemoryTrackerPage } from '../memoryTrackerPage'
 import {
   clickPropertyTrackerStatusLink,
@@ -66,29 +65,6 @@ export function assimilationPropertyMemoryTrackerExpectations() {
         count
       )
       return this
-    },
-    expectPropertyMemoryTrackerAbsent(propertyKey: string) {
-      testability()
-        .propertyMemoryTrackerForCurrentNote(propertyKey)
-        .then((tracker) => {
-          expect(
-            !tracker || tracker.removedFromTracking === true,
-            `expected no active property memory tracker for "${propertyKey}"`
-          ).to.equal(true)
-        })
-      return this
-    },
-    openPropertyMemoryTracker(propertyKey: string) {
-      testability()
-        .propertyMemoryTrackerForCurrentNote(propertyKey)
-        .then((tracker) => {
-          expect(
-            tracker,
-            `expected a property memory tracker for "${propertyKey}"`
-          ).to.exist
-        })
-      clickPropertyTrackerStatusLink(propertyKey)
-      return openMemoryTrackerPage()
     },
     openNoteLevelMemoryTracker(kind: NoteLevelTrackerKind) {
       noteLevelTrackerStatusElement(kind).click()
