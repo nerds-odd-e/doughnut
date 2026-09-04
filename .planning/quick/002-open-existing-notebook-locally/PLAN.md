@@ -175,7 +175,7 @@ Execution notes:
 
 ### 8. CLI acquisition stages changes outside the destination
 Type: Structure
-Status: planned
+Status: done
 Proof: Existing `run` and backend-client tests remain green; focused tests of the new private acquisition boundary use a temporary directory to show binary download and Git subprocess failures clean only command-owned staging and never touch an existing requested destination.
 
 Internal change: Add the authenticated binary download, system-Git subprocess, and temporary staging primitives used only by the immediately following clone Behavior. Keep access-token lookup in the existing CLI configuration and keep Git invocation behind one cohesive command boundary rather than spreading subprocess calls through argument routing.
@@ -356,6 +356,21 @@ Behavior: Given acquisition cannot safely complete, when the owner invokes the c
   API client regenerated (`downloadNotebookGitBundle` in
   `packages/generated/donut-backend-api/api-summary.md`). CLI slices should
   use this endpoint via the CLI's authenticated binary-fetch helper (Slice 8).
+- Slice 8 landed the private acquisition boundary as
+  `cli/src/commands/notebook/notebookAcquisition.ts`, exporting only
+  `acquireNotebookGitCheckout(notebookId, destinationPath): Promise<void>`
+  (per `cli.mdc`'s small-public-surface rule). It downloads the bundle via
+  `GET /api/notebooks/{id}/git-bundle` (reusing the new
+  `loadAuthenticatedFetchContext()` helper extracted into
+  `cli/src/backendApi/donutBackendClient.ts`, shared with
+  `attachNotebookBookFile`), clones it with the system `git` executable
+  (`git clone <bundleFile> <targetDir>`), and only touches the caller's
+  `destinationPath` in a final atomic `renameSync` move — refusing if the
+  destination already exists. Everything else happens inside an
+  `fs.mkdtempSync` staging directory that is always removed in a `finally`.
+  Not yet wired into `nonInteractiveCli.ts` or any real `notebook clone`
+  command — that is Slice 9's job, which should call
+  `acquireNotebookGitCheckout` directly rather than re-deriving any of this.
 
 ## Refinement history
 

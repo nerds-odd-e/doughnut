@@ -70,6 +70,23 @@ export async function runWithDefaultBackendClient<T>(
 }
 
 /**
+ * Resolves the stored access token and API base URL needed for a raw, manually authenticated
+ * `fetch` call to the backend (as opposed to a generated SDK call, which uses
+ * {@link runWithDefaultBackendClient} instead). Throws when no token is stored.
+ */
+export function loadAuthenticatedFetchContext(): {
+  token: string
+  apiBaseUrl: string
+} {
+  const stored = loadStoredAccessToken()
+  if (!stored) {
+    throw new Error(authenticatedBackendCallFailureAdvice.noAccessTokenInConfig)
+  }
+  const { apiBaseUrl } = getApiConfig()
+  return { token: stored.token, apiBaseUrl }
+}
+
+/**
  * Parses the JSON `data` field from a successful SDK response. Use only with calls that pass
  * {@link donutSdkOptions} (so failures throw instead of returning an error envelope).
  */
@@ -92,12 +109,7 @@ export async function attachNotebookBookFile(
   absolutePath: string,
   signal?: AbortSignal
 ): Promise<BookFull> {
-  const stored = loadStoredAccessToken()
-  if (!stored) {
-    throw new Error(authenticatedBackendCallFailureAdvice.noAccessTokenInConfig)
-  }
-
-  const { apiBaseUrl } = getApiConfig()
+  const { token, apiBaseUrl } = loadAuthenticatedFetchContext()
   const fileBytes = await readFile(absolutePath)
   const form = new FormData()
   form.append(
@@ -110,12 +122,12 @@ export async function attachNotebookBookFile(
     basename(absolutePath)
   )
 
-  return withBackendClient(stored.token, async () => {
+  return withBackendClient(token, async () => {
     const res = await fetch(
       `${apiBaseUrl}/api/notebooks/${notebookId}/attach-book`,
       {
         method: 'POST',
-        headers: { Authorization: `Bearer ${stored.token}` },
+        headers: { Authorization: `Bearer ${token}` },
         body: form,
         signal,
       }
