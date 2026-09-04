@@ -9,6 +9,12 @@ set -e
 cd /workspace
 echo "==> Setting up Cursor Cloud Agent environment..."
 
+# Keep .claude/skills/ symlinked to .agents/skills/ so Claude Code picks up this
+# repo's skills here too (mirrors the sync nix_shell_hook.sh does for local dev;
+# .claude/ is gitignored so it can't just be committed there directly).
+source /workspace/scripts/shell_setup.sh
+setup_claude_skills
+
 # Install Java 25 if not already installed
 if [ ! -d "/tmp/java25/zulu25.30.17-ca-jdk25.0.1-linux_x64" ]; then
     echo "==> Installing Java 25..."
