@@ -253,25 +253,72 @@ Execution notes:
 - The scenario stays `@wip` and unexecuted-by-CI through this slice; Slice 12
   is the only slice allowed to remove `@wip`.
 
-### 12. CLI clone records local binding, explains the publish limitation, and the full E2E goes green
+### 12. CLI clone records local binding and explains the publish limitation
 Type: Behavior
-Status: in-progress — CLI-side behavior done and unit-proven; E2E scenario
-still `@wip` pending a developer decision (see Learnings)
-Proof: CLI `run(args)` tests extend Slice 10's checkout to assert the recorded local Git-config binding and printed message. Slice 11's `@wip` E2E scenario now runs the bundled CLI against the real backend and verifies the complete filesystem, commit, copy, authorization, and no-remote-mutation outcome; the scenario drops `@wip` once green.
+Status: done
+Proof: CLI `run(args)` tests extend Slice 10's checkout to assert the recorded local Git-config binding and printed message.
 
-Behavior: Given the clean checkout produced by Slice 10 and the E2E scaffolding from Slice 11, when the clone command finishes, the CLI additionally records only untracked local Git-config binding data (`donut.notebook-id` and API origin — no tracked Donut file in the checkout) and reports that the files can be opened in ordinary local tools while publishing to Donut is not yet available; the bundled CLI E2E scenario passes end to end.
+Behavior: Given the clean checkout produced by Slice 10, when the clone command finishes, the CLI additionally records only untracked local Git-config binding data (`donut.notebook-id` and API origin — no tracked Donut file in the checkout) and reports that the files can be opened in ordinary local tools while publishing to Donut is not yet available.
 
 Execution notes:
 
-- Implement only the local-binding + message Behavior here; Slice 11 already
-  supplied the scaffolding this slice's proof runs against.
-- Remove `@wip` from Slice 11's scenario only once it is green under this
-  slice's change.
+- This slice originally also claimed "the full E2E goes green," but turning
+  Slice 11's `@wip` scenario green needs a fixture fix this slice's CLI-side
+  code cannot provide (see Learnings: the backend never refreshes a
+  notebook's binding after creation, so Slice 11's seed-then-edit fixture
+  tests a precondition Story 1 excludes). That work is split out to Slices
+  13-14 below; this slice's own CLI behavior is complete and committed
+  independently.
 
-### 13. Failed acquisition leaves local and remote state intact
+### 13. Testability can snapshot a notebook's current content into its Git binding
+Type: Structure
+Status: planned
+Proof: A focused testability-layer test (or, if none of this repo's existing testability coverage is backend-unit-testable in isolation, a focused E2E-support check) seeds a notebook with a readme, folder, and note through ordinary means, calls the new testability hook, and confirms the notebook's `NotebookGitBinding` now reflects that content (root commit tree matches the canonical snapshot) rather than the empty tree recorded at creation.
+
+Internal change: Add a testability-only capability — reachable the same way other E2E testability seeding already reaches the backend (check the existing testability controller/endpoint pattern used by `injectNotes` and similar) — that takes an existing notebook, builds a fresh canonical-tree snapshot from its *current* content (reusing Slice 1-2's `PortableTreeSnapshot`/`NotebookGitBundleBuilder`), and *replaces* that notebook's `NotebookGitBinding` row with a new binding capturing it. This is deliberately named and scoped as a one-off "simulate pre-cutover state" tool for tests, not a general "refresh binding" utility — it must not be reachable from any production/user-facing path.
+
+Execution notes:
+
+- **Transitional, test-only code — flagged for removal.** Story 3 (SEED-009,
+  "Receive a Donut web edit in a clean local repository") will make Donut web
+  edits keep a notebook's binding in sync automatically, which is exactly
+  what this hook manually substitutes for in the meantime. Once Story 3
+  lands, ordinary fixtures (seed via production endpoints, no manual
+  snapshot step) will work unaided, making this hook and any scenario built
+  on it obsolete. A reminder to remove it and rewrite dependent scenarios has
+  been added to SEED-009's Story 3 entry.
+- `NotebookGitBindingRepository`'s unique-per-notebook constraint (Slice 3)
+  means this needs a genuine replace (update-or-insert), not another insert;
+  do not weaken or remove that constraint for production callers.
+- Reuse `NotebookGitCutoverService`/`NotebookGitBundleWriter`'s existing
+  snapshot-and-persist logic rather than re-deriving bundle construction; the
+  only new part is allowing a *replace* for one already-bound notebook and
+  restricting the entry point to testability use.
+- Keep this out of any path reachable in production; scope it under the
+  repo's existing testability boundary (check how `injectNotes` and similar
+  testability-only endpoints are already gated).
+
+### 14. Slice 11's E2E fixture reflects genuinely existing content, and the full E2E goes green
 Type: Behavior
 Status: planned
-Proof: CLI `run(args)` tests cover an existing destination, missing Git, denied/failed download, and invalid bundle. Each case reports one actionable error, preserves any pre-existing destination sentinel, removes command-owned staging, and performs no remote mutation; the successful behavior from Slices 10-12 remains green.
+Proof: The Outside-in CLI E2E scenario (`e2e_test/features/cli/cli_notebook_clone.feature`) runs the bundled CLI against the real backend and verifies the complete filesystem, commit, copy, authorization, and no-remote-mutation outcome; the scenario drops `@wip` once green.
+
+Behavior: Given Slice 11's scenario, when its Background seeds the notebook's readme/folder/note content and then calls Slice 13's testability snapshot hook before invoking the CLI clone command (instead of seeding via a plain creation call whose binding is never refreshed), the resulting checkout matches the seeded canonical tree exactly, and the bundled CLI E2E scenario passes end to end.
+
+Execution notes:
+
+- Edit only `cli_notebook_clone.feature`'s Background (add one step calling
+  Slice 13's hook after the existing content-seeding steps) and its step
+  definitions/page objects as needed; no further CLI-side product code
+  should be required — Slice 12 already implemented the local-binding and
+  publish-limitation behavior this scenario asserts.
+- Remove `@wip` from the scenario only once it is genuinely green under the
+  real backend.
+
+### 15. Failed acquisition leaves local and remote state intact
+Type: Behavior
+Status: planned
+Proof: CLI `run(args)` tests cover an existing destination, missing Git, denied/failed download, and invalid bundle. Each case reports one actionable error, preserves any pre-existing destination sentinel, removes command-owned staging, and performs no remote mutation; the successful behavior from Slices 10-14 remains green.
 
 Behavior: Given acquisition cannot safely complete, when the owner invokes the clone command, the CLI fails before installing a destination, preserves all pre-existing local files, cleans only its own temporary data, and leaves the accepted remote notebook/head unchanged.
 
@@ -479,11 +526,11 @@ Behavior: Given acquisition cannot safely complete, when the owner invokes the c
   runs `run(['notebook','clone', id, destination])`, and asserts against the
   real destination via `git` subprocess calls (branch, root-commit count,
   tree SHA match) — this is the pattern later CLI Git-behavior tests should
-  follow rather than mocking `git` itself. Slices 11-12 (E2E scaffolding,
-  then local Git-config binding + publish-limitation message + dropping the
-  E2E `@wip` tag) and Slice 13 (destination-exists/missing-Git/download-
-  failure/invalid-bundle error coverage) remain untouched by this slice, as
-  planned.
+  follow rather than mocking `git` itself. Slices 11-14 (E2E scaffolding,
+  local Git-config binding + publish-limitation message, the transitional
+  testability snapshot hook, and dropping the E2E `@wip` tag) and Slice 15
+  (destination-exists/missing-Git/download-failure/invalid-bundle error
+  coverage) remain untouched by this slice, as planned.
 - Slice 11 added the `@wip`-tagged E2E scaffolding for notebook clone:
   `e2e_test/features/cli/cli_notebook_clone.feature` (scenario following the
   Outside-in proof shape), thin step glue in
@@ -523,11 +570,11 @@ Behavior: Given acquisition cannot safely complete, when the owner invokes the c
   message containing the literal substring "publishing is not available"
   after a successful clone. `cli/tests/notebookAcquisition.test.ts` and
   `cli/tests/notebookClone.test.ts` assert both. This part is committed.
-- **Blocked, needs a developer decision:** Slice 11's `@wip` E2E scenario
-  cannot be turned green yet, for a reason unrelated to Slice 12's CLI code.
-  The backend only ever creates a notebook's accepted `NotebookGitBinding`
-  once, as an empty-tree commit, at notebook-creation time
-  (`NotebookService.createNotebookForOwnership` →
+- **Decided (developer, 2026-09-04):** Slice 11's `@wip` E2E scenario could
+  not be turned green by Slice 12's CLI-side code alone, for a reason
+  unrelated to that code. The backend only ever creates a notebook's accepted
+  `NotebookGitBinding` once, as an empty-tree commit, at notebook-creation
+  time (`NotebookService.createNotebookForOwnership` →
   `NotebookGitCutoverService.createBindingForNotebook`); nothing in the
   codebase refreshes an existing binding afterward (confirmed: no other
   caller of `NotebookGitBindingRepository`/`NotebookGitCutoverService` exists
@@ -545,19 +592,22 @@ Behavior: Given acquisition cannot safely complete, when the owner invokes the c
   `NotebookGitBinding` is a single empty-tree commit even though the notebook
   has a readme, a folder, and notes in the database, and cloning it produces
   a checkout with zero files.
-  Two directions to resolve this, needing a developer choice before Slice 12
-  can finish:
-  (a) add a testability-only capability to simulate "notebook existing
-  before cutover" — e.g. a way to defer/replace a notebook's binding so a
-  fixture can seed full content first and then trigger the per-notebook
-  cutover step (`NotebookGitCutoverService.createBindingForNotebook`) against
-  it, capturing that content — noting this needs a *replace*, not just
-  insert, since Slice 3's binding table is unique-per-notebook; or
-  (b) reorder/rewrite Slice 11's scenario so it does not rely on a
-  post-creation edit at all, accepting a plainer fixture (e.g. content
-  supplied at CLI-testability-notebook-creation time, if such a path exists,
-  or otherwise a narrower canonical-tree check).
-  Until resolved, `cli_notebook_clone.feature` keeps its `@wip` tag.
+
+  Chose the transitional testability-hook direction over rewriting the
+  scenario to a plainer fixture, because the plan's own outside-in proof
+  already calls for seeding "an owned **existing** notebook" whose content is
+  captured **at cutover time** — exactly how pre-cutover notebooks behave in
+  production (Slices 4-5) — so simulating that precondition is more faithful
+  than narrowing the scenario's assertions to dodge the gap, which would
+  weaken exactly the canonical-tree coverage this story exists to prove.
+  Split the remaining work into new Slice 13 (the transitional
+  testability-only snapshot hook, explicitly named and scoped as such, not a
+  general "refresh binding" utility) and Slice 14 (point Slice 11's fixture
+  at it, turn the scenario green, drop `@wip`) — see those slices above. A
+  reminder to remove the hook and rewrite scenarios depending on it once
+  Story 3 lands has been added to `SEED-009`'s Story 3 entry, since Story 3
+  is what will make this hook unnecessary (production will keep bindings in
+  sync with web edits automatically).
 - **Separately found and fixed (outside slice execution, developer-requested
   "run and fix cli unit test" after a CI failure):** `NotebookGitBundleWriter`
   (`backend/src/main/java/com/odde/donut/services/notebookGit/`) never
@@ -617,5 +667,21 @@ the original Slice 9, renumbering it and the two slices after it to 10-12.
   turn Slice 11's scenario green, drop `@wip`). The original Slice 12 (failed
   acquisition) renumbered to Slice 13.
 
+- Former Slice 12 (local Git-config binding + publish-limitation message +
+  full E2E goes green) → Slices 12-14 (`slice-plan-refinement`-equivalent
+  split, 2026-09-04, after the implementer completed the CLI-side behavior
+  but found the E2E half blocked on a backend gap outside this slice's
+  scope — see Slice 12's Learnings entry above for the discovered gap and
+  the developer's decision): the backend never refreshes a notebook's
+  `NotebookGitBinding` after creation, so Slice 11's seed-then-edit fixture
+  tested a precondition ("clean fetch of a later web edit") this story's own
+  boundary excludes. The developer chose a transitional testability-only
+  fixture fix over narrowing the scenario. Slice 12 now covers only the
+  already-completed and committed CLI-side behavior (local binding +
+  message), Slice 13 adds the transitional testability snapshot hook
+  (flagged for removal once SEED-009 Story 3 lands), and Slice 14 points
+  Slice 11's fixture at it and turns the scenario green. The original
+  Slice 13 (failed acquisition) renumbered to Slice 15.
+
 Every remaining slice now has one Behavior/Structure gate and one proof loop.
-Execution can resume directly from Slice 11.
+Execution can resume directly from Slice 13.

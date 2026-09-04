@@ -143,6 +143,16 @@ handled by `slice-planning` and, when necessary, `slice-plan-refinement`.
 - **Safe stopping point:** Uncommitted or unpublished local work is never
   overwritten; this story may stop and instruct the user to resolve their local
   state rather than attempting divergence.
+- **Cleanup reminder:** Story 1's CLI-clone E2E coverage relies on a
+  transitional testability-only hook (added because nothing before this story
+  keeps a notebook's Git binding in sync with a later web edit) that manually
+  snapshots a notebook's current content into a fresh binding, simulating a
+  pre-cutover notebook, so its fixture can seed content and then edit it
+  before cloning. Once this story makes a Donut web edit produce a commit
+  automatically, that manual snapshot step becomes unnecessary — remove the
+  hook and rewrite the Story 1 E2E scenario(s) built on it to seed content
+  through ordinary web edits before cloning/synchronizing, the way this
+  story's own workflow does.
 
 ### 4. Create a new note locally
 
