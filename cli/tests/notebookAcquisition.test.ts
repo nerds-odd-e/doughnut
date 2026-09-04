@@ -10,6 +10,11 @@ vi.mock('node:child_process', () => ({
   spawnSync: vi.fn(),
 }))
 
+vi.mock('node:fs', async () => {
+  const actual = await vi.importActual<typeof fs>('node:fs')
+  return { ...actual, renameSync: vi.fn(actual.renameSync) }
+})
+
 const STAGING_PREFIX = 'donut-notebook-clone-'
 
 function stagingDirsUnderTmp(): string[] {
@@ -39,6 +44,7 @@ describe('acquireNotebookGitCheckout', () => {
     fs.rmSync(destinationParent, { recursive: true, force: true })
     vi.unstubAllGlobals()
     vi.mocked(childProcess.spawnSync).mockReset()
+    vi.mocked(fs.renameSync).mockClear()
   })
 
   test('binary download failure (non-OK response) leaves destination untouched and cleans staging', async () => {
@@ -159,6 +165,44 @@ describe('acquireNotebookGitCheckout', () => {
     await acquireNotebookGitCheckout(6, destinationPath)
 
     expect(fs.existsSync(join(destinationPath, 'README.md'))).toBe(true)
+    expect(stagingDirsUnderTmp()).toEqual(before)
+  })
+
+  test('falls back to copy+remove when rename fails with EXDEV (cross-device destination)', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({
+        ok: true,
+        arrayBuffer: () =>
+          Promise.resolve(new TextEncoder().encode('bundle-bytes').buffer),
+      })
+    )
+    vi.mocked(childProcess.spawnSync).mockImplementation(((
+      _cmd: string,
+      args?: readonly string[]
+    ) => {
+      const targetDir = args?.[3] as string
+      fs.mkdirSync(targetDir, { recursive: true })
+      fs.writeFileSync(join(targetDir, 'README.md'), '# notebook')
+      fs.mkdirSync(join(targetDir, 'nested'))
+      fs.writeFileSync(join(targetDir, 'nested', 'note.md'), 'nested content')
+      return { stdout: '', stderr: '', status: 0, error: undefined }
+    }) as typeof childProcess.spawnSync)
+    vi.mocked(fs.renameSync).mockImplementationOnce(() => {
+      throw Object.assign(new Error('EXDEV: cross-device link not permitted'), {
+        code: 'EXDEV',
+      })
+    })
+    const before = stagingDirsUnderTmp()
+
+    await acquireNotebookGitCheckout(8, destinationPath)
+
+    expect(fs.readFileSync(join(destinationPath, 'README.md'), 'utf8')).toBe(
+      '# notebook'
+    )
+    expect(
+      fs.readFileSync(join(destinationPath, 'nested', 'note.md'), 'utf8')
+    ).toBe('nested content')
     expect(stagingDirsUnderTmp()).toEqual(before)
   })
 

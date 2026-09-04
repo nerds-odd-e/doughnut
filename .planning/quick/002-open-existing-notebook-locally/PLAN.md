@@ -195,7 +195,7 @@ Execution notes:
 
 ### 9. CLI acquisition staging survives cross-device destinations
 Type: Structure
-Status: planned
+Status: done
 Proof: A focused test forces `moveCheckoutIntoDestination`'s `fs.renameSync` to fail with `EXDEV` (mock `node:fs`'s `renameSync`) and confirms the staged checkout still lands intact, byte-for-byte, at the destination via a fallback path; all of Slice 8's existing `notebookAcquisition.test.ts` cases remain green.
 
 Internal change: `notebookAcquisition.ts`'s `moveCheckoutIntoDestination` currently calls only `fs.renameSync(stagedCheckoutDir, destinationPath)`. `renameSync` throws `EXDEV: cross-device link not permitted` whenever its source and destination are on different filesystems/mounts — a routine situation, not an edge case: on Linux, `os.tmpdir()` (where Slice 8 stages its checkout) is frequently a separate `tmpfs` mount from wherever a user actually wants their notebook checked out (their home or project directory), and the same split is common in CI/Docker. Slice 8's own tests never caught this because their "destination" fixture is itself created under `os.tmpdir()`, so source and destination always share a device in the test — the real-world failure mode was never exercised. Add a same-semantics fallback (recursive copy of the staged directory's contents into the destination, then remove the staged source) when `renameSync` fails with `code === 'EXDEV'`, so the acquisition boundary from Slice 8 works on the filesystem layouts it will actually be run against. While in this file, also remove the `exceptionText` helper's exact duplicate of `commands/update.ts`'s copy (missed by Slice 8's refactor pass) by extracting one shared implementation.
@@ -426,6 +426,24 @@ Behavior: Given acquisition cannot safely complete, when the owner invokes the c
     already acted on mid-plan (`execute-plan`'s `wrap-up.md`/`delegation.md`
     were revised between Slices 8 and this retrospective), so it is not
     repeated here.
+- Slice 9 landed the EXDEV fallback in `moveCheckoutIntoDestination`
+  (`cli/src/commands/notebook/notebookAcquisition.ts`): on `fs.renameSync`
+  failure with code `EXDEV`, it falls back to
+  `fs.cpSync(stagedCheckoutDir, destinationPath, { recursive: true })` then
+  `fs.rmSync(stagedCheckoutDir, ...)`, preserving the existing
+  "destination already exists" refusal and error-wrapping for every other
+  failure. It also extracted the shared `exceptionText` helper (previously
+  duplicated in `notebookAcquisition.ts` and `commands/update.ts`) into new
+  `cli/src/exceptionText.ts`, imported by both. Post-change-refactor found a
+  same-subsystem duplicate this diff had just reinvented —
+  `commands/mineruOutline/mineruOutlineSpawn.ts` already had a private
+  `errnoCode(err)` helper for extracting a Node `.code` from an unknown catch
+  value, plus its own inline `exceptionText`-shaped logic — and consolidated
+  both into new `cli/src/errnoCode.ts` plus the existing
+  `cli/src/exceptionText.ts`, updating `mineruOutlineSpawn.ts` to use both
+  shared helpers. Later CLI slices needing exception-message or Node
+  errno-code extraction should import `exceptionText`/`errnoCode` from these
+  two files rather than reintroducing local copies.
 
 ## Refinement history
 

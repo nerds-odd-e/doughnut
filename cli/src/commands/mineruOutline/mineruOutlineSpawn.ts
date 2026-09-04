@@ -1,5 +1,7 @@
 import { spawn } from 'node:child_process'
 import type { MineruOutlineErr } from './mineruOutlineTypes.js'
+import { exceptionText } from '../../exceptionText.js'
+import { errnoCode } from '../../errnoCode.js'
 
 /** Cap stderr bytes included in user-visible errors (tracebacks are usually < this). */
 const MINERU_STDERR_EXCERPT_CHARS = 12_000
@@ -70,20 +72,12 @@ function spawnWithTimeout(
   })
 }
 
-function errnoCode(err: unknown): string | undefined {
-  if (err !== null && typeof err === 'object' && 'code' in err) {
-    const c = (err as { code: unknown }).code
-    return typeof c === 'string' ? c : undefined
-  }
-  return
-}
-
 function messageForPythonSpawnFailure(
   err: unknown,
   pythonExecutable: string
 ): string {
   const code = errnoCode(err)
-  const msg = err instanceof Error ? err.message : String(err)
+  const msg = exceptionText(err)
   if (code === 'ENOENT') {
     return `Could not run "${pythonExecutable}" (not found on PATH or missing interpreter). Install Python 3 and ensure it is on PATH, or set DONUT_MINERU_PYTHON to the full path of your python3 binary.`
   }

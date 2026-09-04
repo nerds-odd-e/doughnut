@@ -3,6 +3,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { spawnSync } from 'node:child_process'
 import { exitCliError } from '../cliExit.js'
+import { exceptionText } from '../exceptionText.js'
 import {
   getVersion,
   formatVersionOutput,
@@ -13,10 +14,6 @@ import {
 const BASE_URL =
   process.env.BASE_URL ?? 'https://storage.googleapis.com/dough-frontend-01'
 const DOWNLOAD_PATH = `${BASE_URL}/doughnut-cli-latest/doughnut`
-
-function exceptionText(e: unknown): string {
-  return e instanceof Error ? e.message : String(e)
-}
 
 export async function runUpdate(): Promise<void> {
   const currentVersion = getVersion()

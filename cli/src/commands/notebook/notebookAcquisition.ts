@@ -6,10 +6,8 @@ import {
   loadAuthenticatedFetchContext,
   withBackendClient,
 } from '../../backendApi/donutBackendClient.js'
-
-function exceptionText(e: unknown): string {
-  return e instanceof Error ? e.message : String(e)
-}
+import { exceptionText } from '../../exceptionText.js'
+import { errnoCode } from '../../errnoCode.js'
 
 /**
  * Authenticated GET of the notebook's accepted Git bundle, written to `destinationFile`.
@@ -66,6 +64,11 @@ function moveCheckoutIntoDestination(
   try {
     fs.renameSync(stagedCheckoutDir, destinationPath)
   } catch (e) {
+    if (errnoCode(e) === 'EXDEV') {
+      fs.cpSync(stagedCheckoutDir, destinationPath, { recursive: true })
+      fs.rmSync(stagedCheckoutDir, { recursive: true, force: true })
+      return
+    }
     throw new Error(
       `failed to move checkout into destination: ${exceptionText(e)}`
     )
