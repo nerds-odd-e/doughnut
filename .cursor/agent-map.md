@@ -46,6 +46,8 @@ Useful focused checks:
 - E2E single feature: `CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/path/to.feature`
 - Log inspection: `CURSOR_DEV=true nix develop -c pnpm logs:tail backend-e2e` (targets: `sut`, `backend-e2e`, `mountebank`)
 - Diff whitespace: `scripts/check_diff_whitespace.sh` or `scripts/check_diff_whitespace.sh --cached`
+- Format changed working-tree components: `./scripts/run.sh pnpm format:changed`
+- Lint changed staged components: `./scripts/run.sh pnpm lint:changed`
 - Lint all: `CURSOR_DEV=true nix develop -c pnpm lint:all`
 - Format all: `CURSOR_DEV=true nix develop -c pnpm format:all`
 
@@ -76,4 +78,8 @@ use slice-planning. **Hard decomposition quality:** one evaluable outcome at the
 current resolution; 3V stories; Behavior/Structure execution leaves —
 `problem-decomposition.mdc`. Plan artifact and lifecycle rules: `planning.mdc`.
 Do not write new flat `.planning/<name>.md` when `phases/` or `quick/` fits.
-**Per-slice wrap-up:** Jidoka → post-change-refactor → update plan → commit → push (**execute-plan**). Skills emit completion markers (e.g. `## REFACTOR COMPLETE`) for handoff.
+**Per-slice wrap-up:** Jidoka → post-change-refactor → API generation when
+needed → fresh **format-changed** agent → update plan → commit → push
+(**execute-plan**). The pre-commit hook lints staged components without
+mutation. Skills emit completion markers (e.g. `## REFACTOR COMPLETE`) for
+handoff.

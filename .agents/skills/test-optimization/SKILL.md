@@ -27,7 +27,8 @@ Output: Optimized tests with per-slice commits + summary ending with
 | `/test-optimization --resolve` | **Resolve-only** | Run **only** the `resolve_candidates` step against `.planning/test-optimization-blacklist.md`. **No profiling, no top-10% selection, no optimization.** |
 
 When `--resolve` is given, skip every other step and go straight to
-`resolve_candidates`.
+`resolve_candidates`. Read
+[resolving-candidates.md](references/resolving-candidates.md) in full first.
 </modes>
 
 <context>
@@ -48,8 +49,8 @@ When `--resolve` is given, skip every other step and go straight to
 
 **Execution model:** After writing the plan, **always** use **execute-plan**
 (`.agents/skills/execute-plan/SKILL.md`). Coordinator delegates each group to a
-fresh sub-agent; each slice runs post-change-refactor, then commits and pushes.
-Do not accumulate context across slices in one agent.
+fresh sub-agent and applies execute-plan's coordinator-owned wrap-up. Do not
+accumulate context across slices in one agent.
 
 **E2E skip tag:** `@skipOptimizationDueToKnownNecessarySlowness` on a Scenario
 or Feature marks known-necessary slowness. Profile runs exclude it via
@@ -66,54 +67,9 @@ Skip list there.
 </context>
 
 <process>
-
 <step name="resolve_candidates">
-**Only runs in `--resolve` mode** (see `<modes>`). Triage every entry under
-**Candidates** in `.planning/test-optimization-blacklist.md`. Do **not** profile,
-select a top 10%, or optimize any test here.
-
-**Goal:** for each Candidate, decide whether the slow test earns its cost, or
-whether a cheaper test gives the same protection.
-
-For **each** Candidate:
-
-1. **Read the actual test** (feature/scenario or unit test) plus the sibling
-   scenarios in the same file and any backend/frontend unit tests the blacklist
-   note references. Confirm what unique behavior it actually protects.
-2. **Weigh the slow test against alternatives.** Ask whether one or more **unit
-   tests** (or a **mocked** E2E scenario) could give the **same coverage,
-   behavioral protection, and external user-value clarity**. Remember: unit tests
-   usually **cannot** reproduce the external user-value clarity of a genuine
-   multi-step UI/PTY journey — so inherent-cost journeys stay as E2E.
-3. **Distinguish inherent vs avoidable slowness.** Cost from genuine product
-   behavior (full page load, PDF/canvas render, PTY/Ink startup, frontend session
-   state not replicable via API) is *inherent*. Cost from a live network call,
-   redundant setup, or coverage duplicated elsewhere is *avoidable* — do not label
-   avoidable cost as "necessary".
-
-**Resolve each Candidate with exactly one of:**
-
-| Option | When | Action |
-|--------|------|--------|
-| **1. Tag** | Slowness is inherent to the behavior under test and no cheaper test matches its coverage + user-value clarity. | Add `@skipOptimizationDueToKnownNecessarySlowness` to that Scenario / Scenario Outline / Feature (tag the specific slow scenario, not the whole feature unless all of it is slow). |
-| **2. Plan** | A unit test (or mocked scenario) can give the same coverage + behavioral protection + user-value clarity, so the slow test should be replaced/removed. | Add it to a plan via the **slice-planning** skill (`.planning/quick/NNN-slug/`) to remove the test and replace with the cheaper test(s). |
-| **3. Ask** | No obviously logical decision (e.g. a genuine product / network / value trade-off). | Use `AskQuestion` to let the developer decide; then apply their choice. |
-
-**Constraints:**
-
-- **Zero or one plan total** across the whole resolve pass — batch replacements
-  into a single plan if more than one Candidate needs option 2.
-- Tagging is a **developer decision (Jidoka)** normally proposed, not auto-applied;
-  in `--resolve` mode the developer has invoked resolve explicitly, so you **may
-  apply option-1 tags directly** when the decision is obviously logical, and fall
-  back to option 3 (ask) whenever it is not.
-
-**After resolving:** for every Candidate you tag (option 1) or fold into a plan
-(option 2), **delete its entry** from the Candidates list — do **not** keep a
-"Resolved" archive in the blacklist file. Leave the Candidates header and the
-`_(none)_` placeholder when the list is empty.
-
-**Then stop** — report per the resolve output below; do not continue to `profile`.
+Follow [resolving-candidates.md](references/resolving-candidates.md), then stop;
+do not continue to `profile`.
 </step>
 
 <step name="profile">
@@ -185,10 +141,8 @@ Each group slice (sub-agent):
 
 1. Optimize only tests in that group (see `optimize_tactics`).
 2. Verify with focused commands (see `verify`).
-3. Run **post-change-refactor** (no commit from refactor sub-agent).
-4. Lint/format per execute-plan wrap-up.
-5. Mark slice **done** in plan.
-6. **Commit** (`perf(<scope>): …`) and **push**.
+3. Return control for execute-plan's required refactor, formatting, plan update,
+   `perf(<scope>): …` commit, and push sequence.
 
 **Hard-to-improve → Candidates / skip tag:** If no meaningful speedup after serious
 attempt, or would need product/design trade-off:
@@ -204,58 +158,11 @@ propose tagging the Scenario or Feature with
 </step>
 
 <step name="optimize_tactics">
-Work **only** tests in the current group. Prefer first applicable tactic.
-
-### All layers
-
-- Delete or merge redundant tests; hoist shared setup to `beforeEach` / Background.
-- Replace a broad boundary fixture with a narrower entry (pure helper, slimmer fixture).
-- Parameterize (`it.each` / `@ParameterizedTest`) instead of copy-paste cases.
-
-### Unit / component (Vitest, JUnit)
-
-- **Frontend:** avoid `getByRole` / `findByRole`; use `data-testid`, `getByText`,
-  `querySelector`. Replace `vi.waitUntil` / long `vi.waitFor` with `flushPromises`,
-  `nextTick`, fake timers.
-- **CLI:** share Ink helpers (`inkTestHelpers`, `recallInteractiveShared`-style);
-  observable frame waits, not `frames.join` polls; `test.each` for variants.
-- **Backend:** slimmer `makeMe` / fixtures; lighter multipart/OpenAPI setup;
-  merge redundant `@Test` methods; avoid full-stack when controller slice suffices.
-
-### E2E (Cypress + Cucumber)
-
-- **Testability inject** instead of UI flows covered elsewhere.
-- **API setup** for recall/assimilation loops.
-- **Direct routes** vs catalog navigation.
-- **Intercept waits** (`GET **/api/...`) vs `cy.reload()` or extra relogin.
-- **Drop redundant steps** (extra reloads, duplicate rich-content checks, OCR when unnecessary).
-- **Cache expensive prep** (e.g. skip MCP rebundle if artifact exists).
-- **`invoke('val')` + `input`** instead of `cy.type()` on long markdown.
-
-Never add `@focus` / `@only` in committed code.
-Never add `@skipOptimizationDueToKnownNecessarySlowness` without developer Jidoka.
+Read and follow [optimization-tactics.md](references/optimization-tactics.md).
 </step>
 
-<step name="verify">
-Run **focused** tests for the current group first; widen if shared helpers changed.
-
-```bash
-# E2E (example)
-CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/a.feature,e2e_test/features/b.feature
-
-# Frontend (example)
-CURSOR_DEV=true nix develop -c pnpm frontend:test tests/pages/SomePage.spec.ts
-
-# CLI
-CURSOR_DEV=true nix develop -c pnpm cli:test
-
-# Backend class
-CURSOR_DEV=true nix develop -c backend/gradlew -p backend test -Dspring.profiles.active=test --tests "com.odde.donut....ClassName"
-```
-
-E2E groups: **3+ consecutive green runs** on touched specs before closing a slice.
-
-**Pre-commit scope:** ensure unrelated WIP is not staged (hooks may `git add -u`).
+<step name="verify">Read and follow
+[verification.md](references/verification.md).
 </step>
 
 <step name="reprofile_and_close">
@@ -287,18 +194,7 @@ blacklist or unrelated GSD dirs in progress.
 </step>
 
 <step name="parse_e2e_profile">
-JSON reporter prints one `{ "stats": …, "tests": [ { "title", "duration" } ] }`
-block per spec to stdout. After `tee /tmp/e2e-profile.log`, parse in Node:
-
-- Track current spec from `Running:  <name>.feature` lines.
-- For each lone `{`, accumulate until braces balance and buffer contains `"stats"`,
-  then `JSON.parse`.
-- Collect `tests[].title` + `tests[].duration`, tag with current spec, sort
-  descending, slice top 10%. (Skip-tagged scenarios should already be absent
-  when profile used the tag filter.)
-
-Write reusable `scripts/` helper only if team will run repeatedly; otherwise
-one-off inline Node script is enough.
+For E2E, follow [e2e-profile-parsing.md](references/e2e-profile-parsing.md).
 </step>
 
 </process>

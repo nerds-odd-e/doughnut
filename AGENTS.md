@@ -27,6 +27,7 @@ Portable digest (details live in the cited always-applied rules — keep `AGENTS
 3. Capability naming — no GSD phase numbers in product artifacts (`general.mdc`, `planning.mdc`)
 4. Test observables via high-level entry points (`unit-testing.mdc`)
 5. Failure handling — fail loudly is legitimate; catch for a business outcome or a clearer message (ADR 0006)
+6. Prefer committing all changes and leaving none local; partial commits are deliberate exceptions, not forbidden
 
 ## Planning and slice delivery
 
@@ -34,7 +35,7 @@ Portable digest (details live in the cited always-applied rules — keep `AGENTS
 - **Hard decomposition grammar:** problem → 3V story → Behavior/Structure execution leaf; stop-safe, one evaluable outcome at the current resolution (`problem-decomposition.mdc`) — applies to GSD PLANs too.
 - **Time budget (self-enforced):** story hypotheses are roughly 30 minutes to a few hours; execution leaves target ~5 min including tests; >5 min → scrutinize; >10 min → hard finer-decompose unless a stated good reason (`problem-decomposition.mdc`).
 - **History:** keep resume-useful planning artifacts while a plan is in progress; **clean up** spent history when the plan is fully executed into code/permanent docs.
-- **Execution wrap-up (required):** Jidoka → post-change-refactor → update plan → commit → push (**execute-plan**; also `/gsd-execute-phase`). Skills emit completion markers for handoff.
+- **Execution wrap-up (required):** Jidoka → post-change-refactor → API generation when needed → fresh format-changed agent → update plan → commit → push (**execute-plan**; also `/gsd-execute-phase`). Skills emit completion markers for handoff.
 - **Story shaping:** use **story-decomposition** for broad or unclear requirements; one non-executable decomposition seed contains ordered candidate stories.
 - **GSD** for milestones (`/gsd-onboard`, `/gsd-plan-phase`, `/gsd-execute-phase`, …); **slice-planning** + **execute-plan** for one selected story under `.planning/quick/`.
 - **Test optimization:** `test-optimization` skill — plans under `.planning/phases/` or `quick/`, run via execute-plan.

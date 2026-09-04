@@ -23,7 +23,9 @@ This project uses multiple linting tools to ensure code quality:
 
 ## Linting Philosophy
 
-**IMPORTANT**: Linting is primarily for CI/CD validation. Developers should use `format:all` instead of `lint:all` during development, as formatting also fixes most linting issues automatically.
+**IMPORTANT**: Linting is primarily for CI/CD validation. During development,
+format changed components explicitly before staging; the pre-commit hook only
+validates staged components and never formats or stages files.
 
 ## Running Linting
 
@@ -54,7 +56,15 @@ This runs:
 
 ## Format vs Lint
 
-- **Use `CURSOR_DEV=true nix develop -c pnpm format:all`** during development — it lints and auto-fixes (Biome `check --write`, Spotless apply, `vue-tsc`). Do not also run `lint:all`. Slice wrap-up does **not** run `format:all` before the first commit; `scripts/git-hooks/pre-commit` runs `format:changed`. Run format only if that commit fails.
+- **Use `./scripts/run.sh pnpm format:changed`** before staging — it selects
+  affected components from staged, unstaged, and nonignored untracked paths,
+  then applies their formatter commands. Agent slice wrap-up delegates this to
+  a fresh agent using the **format-changed** skill.
+- Use `CURSOR_DEV=true nix develop -c pnpm format:all` only when intentionally
+  formatting the entire repository.
+- The pre-commit hook runs `pnpm lint:changed` against affected staged
+  components. It is check-only: it does not format files or mutate the Git
+  index.
 - **Use `CURSOR_DEV=true nix develop -c pnpm lint:all`** for CI/CD validation only — it checks without fixing (plus a few script unit tests that format does not run).
 
 ## OpenAPI Linting

@@ -36,102 +36,25 @@ donut
 
 ## Getting started
 
-### 1. Quick Start - Donut development environment setup
+### 1. [Development environment setup](./docs/development-setup.md)
 
-:checkered_flag: From the root of doughnut directory, in a terminal, run:
+### 2. Git Pre-commit Hook
 
-Please ensure your git configuration is appropriate for your OS to respect the correct line endings:
-
-```bash
-git config --global core.autocrlf input
-git add --renormalize .
-```
-
-Install Nix package manager if you haven't already with
+Format changed components explicitly before staging:
 
 ```bash
-./setup-donut-dev.sh
+./scripts/run.sh pnpm format:changed
+git add <intended-paths>
+git commit -m "..."
 ```
 
-For developers on macOS 15 Sequoia, please run the below if you face issue installing or starting up `nix` ([see here for full details](https://github.com/NixOS/nix/issues/10892))
+`format:changed` considers staged, unstaged, and nonignored untracked paths,
+then formats only the affected repository components. Review those changes
+before staging the intended commit.
 
-``` bash
-curl --proto '=https' --tlsv1.2 -sSf -L https://github.com/NixOS/nix/raw/master/scripts/sequoia-nixbld-user-migration.sh | bash -
-```
-
-Install `direnv` and activate `direnv`
-**macOS:** `brew install direnv`
-**Ubuntu/Debian (includes WSL2 with Ubuntu):** `sudo apt-get install -y direnv`
-**Fedora:** `sudo dnf install direnv`
-Change directory to your cloned `doughnut` folder path and run the below:
-
-```bash
-echo 'eval "$(direnv hook bash)"' >> ~/.bashrc
-echo 'eval "$(direnv hook zsh)"' >> ~/.zshrc
-direnv allow
-```
-
-Subsequently, each time your change directory into your `doughnut` cloned folder, `nix` flakes will be auto loaded. Each time you change directory away from `doughnut` directory, the `nix` environment will be auto unloaded.
-
-Ensure your OS (WSL2/Ubuntu/Fedora, etc) has `/bin/sh` point to `bash`.
-If you are using Ubuntu where `/bin/sh` is symlinked to `dash`, please
-run `sudo dpkg-reconfigure dash` and answer "No" to reconfigure to `bash` as default.
-
-:window: 🚨 **WSL2 with WSLg**:
-#### [Additional things to note for Microsoft Windows10/Windows11 developers using WSL2g with Ubuntu-24.04.](./docs/wsl2.md)
-
-#### 🚨 **DO NOT CLONE doughnut source to a MS Windows directory (e.g. `/mnt/c/`)!!!** Instead, in your WSL2 session, `cd ~` then `git clone git@github.com:nerds-odd-e/doughnut.git`
-
-:warning: Nix and [sdkman](https://sdkman.io/) don't play very well together. A simple way around is to move or rename `~/.sdkman` dir and comment out sdkman related config in `~/.<SHELL>rc`.
-
-:vertical_traffic_light: :construction: 🚨 **ONLY** if you hit problems with the above quick-start setup, you should manually walk through
-the [local development environment nix setup](./docs/nix.md).
-
-### 2. Setup and run Donut with migrations in 'E2E' profile (backend app started on port 9081)
-
-From the root of your doughnut directory, start your Donut nix development environment with
-
-If you have `direnv` installed & configured right, just `cd` to the path where you cloned `doughnut` Github source code and the `nix` develop environment will autoload, **OTHERWISE** run:
-
-```bash
-nix develop
-```
-
-Start the complete development environment (RECOMMENDED)
-
-```bash
-pnpm sut
-```
-
-This single command starts everything you need for local development:
-- **Backend** (with auto-reload on Java code changes)
-- **Frontend** (with hot module replacement on Vue code changes)  
-- **Mountebank** (mock external services)
-
-All services will automatically restart when you make code changes, so you can focus on development without manual restarts.
-
-##### Alternative: Start only the backend
-
-If you only need the backend for testing or development:
-
-```bash
-pnpm backend:sut
-```
-
-- The backend will automatically restart when you change backend Java code (powered by Spring Boot DevTools + Gradle continuous build).
-- You only need to rerun it manually if you reset the database.
-
-#### 2.1 Run full backend unit tests suite from terminal/CLI
-
-- From doughnut source root directory:
-
-```bash
-pnpm backend:verify
-```
-
-### 3. Git Pre-commit Hook
-
-A pre-commit hook is configured to automatically format code before each commit. The hook runs `./scripts/run.sh pnpm format:all` to ensure all code is properly formatted.
+A pre-commit hook then validates affected staged components with
+`pnpm lint:changed`. It is check-only: it does not format files or mutate the
+working tree or Git index.
 
 **Setup:**
 The git hooks are version-controlled in `scripts/git-hooks/`. To install them, run:
@@ -144,75 +67,17 @@ This will copy the hooks from `scripts/git-hooks/` to `.git/hooks/` and make the
 
 **Behavior:**
 - The hook runs automatically on every `git commit`
-- It formats all code (backend, frontend, MCP server, Cypress, and OpenAPI)
-- Any files modified by the formatter are automatically staged for commit
-- If formatting succeeds, the commit proceeds
-- If formatting fails, the commit is blocked
+- It lints only the components affected by staged paths
+- If linting succeeds, the commit proceeds
+- If linting fails, the commit is blocked without staging or rewriting files
 
 **Note:** The hook uses `./scripts/run.sh` which automatically handles the nix environment, so it works whether you're in a nix shell or not.
 
-### 4. [IntelliJ IDEA settings](./docs/idea.md)
+### 3. [IntelliJ IDEA settings](./docs/idea.md)
 
-### 5. End-to-End Test / Features / Cucumber / SbE / ATDD
+### 4. [End-to-end testing](./docs/end-to-end-testing.md)
 
-We use cucumber [Gherkin](https://cucumber.io/docs/gherkin/) + cypress (test driver)
-Javascript/Typescript framework to drive the end-to-end test suite.
-
-- [Cucumber](https://cucumber.io/)
-
-The Cypress+Cucumber tests are in JavaScript/TypeScript.
-
-[cypress](https://docs.cypress.io/guides/getting-started/writing-your-first-test#Add-a-test-file)
-
-- [cypress-cucumber-preprocessor](https://github.com/TheBrainFamily/cypress-cucumber-preprocessor)
-
-- We use [mountebank](https://github.com/mountebank-testing/mountebank) to mock external backend services.
-  - To run mountebank in debug mode, run `pnpm mb --loglevel debug`.
- 
-#### Commands
-
-**Typical E2E Testing Workflow:**
-1. Start all services: `pnpm sut` (backend, frontend, mountebank)
-2. For **interactive test development/debugging**: Open Cypress IDE with `pnpm cy:open` in a separate terminal
-3. For **headless execution**: Use `pnpm cypress run --spec <feature-path>`
-
-**Note:** The Cypress IDE is useful for:
-- Developing new test scenarios
-- Debugging failing tests with visual feedback
-- Step-by-step test execution
-- Seeing real-time DOM changes
-
-For MS Windows WSL2 users:
-
-1. you need to ensure your WSL2 Linux has `xvfb` installed manually before you can run cypress. This
-   is not managed by Nix!
-2. `export NODE_OPTIONS="--max-old-space-size=4096"` before running any cypress related commands (
-   e.g. `cy:open` or `cypress run`).
-
-| Purpose                               | Command (run from `doughnut` source root directory)                                                                                             |
-| ------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------  |
-| **🌟 Start full dev environment (RECOMMENDED)** | **`pnpm sut`** — backend, mountebank, proxy + frontend; app **http://localhost:5173** ([ports / topology](docs/gcp/prod_env.md)) |
-| Install needed e2e tooling            | `pnpm --frozen-lockfile recursive install`                                                                                                      |                               |                                       |                                                                                                                                                 |
-| Start backend only                    | `pnpm backend:sut` (starts backend SUT with auto-reload)                                                                                        |
-| Start Mock for external backend       | `pnpm start:mb` (starts mocked external backend ONLY)                                                                                           |
-| Open Cypress IDE for interactive testing | `pnpm cy:open` (for test development/debugging - requires services running via `pnpm sut`)                                                   |
-| Run one feature headlessly            | `pnpm cypress run --spec **/name.feature` (expect services are already running, run the matched feature files only in headless mode)           |
-| Run all e2e test                      | `pnpm verify` (compile frontend assets, start backend SUT, mountebank virtual service provider & cypress headless e2e testing)                  |
-| Generate TypeScript Interfaces        | `pnpm generateTypeScript` (Generate TypeScript Interfaces from backend JSON classes. Should run manually every time backend service changes)    |
-
-#### Structure
-
-| Purpose          | Location                                   |
-| ---------------- |--------------------------------------------|
-| feature files    | `e2e_test/features/*.feature`              |
-| step definitions | `e2e_test/step_definitions/*.ts`           |
-| custom DSL       | `e2e_test/support/*.ts`                    |
-| cucumber hooks   | `e2e_test/step_definitions/common/hook.ts` |
-| test fixtures    | `e2e_test/fixtures/*.*`                    |
-| cypress config   | `e2e_test/config/*.json`                   |
-| cypress plugins  | `e2e_test/plugins/index.ts`                |
-
-### 6. Database migrations
+### 5. Database migrations
 
 You can find the database migrations in `backend/src/main/resources/db/migration/`.
 The migrations are run automatically when the backend app starts up.
@@ -220,7 +85,7 @@ It will also run the migrations for test when you run `pnpm backend:test`.
 To trigger the test DB migration manually, run `backend/gradlew migrateTestDB`.
 To connect to the local DB: `mysql -S $MYSQL_HOME/mysql.sock -u doughnut -p` (password=doughnut).
 
-### 7. Vue3 web-app frontend
+### 6. Vue3 web-app frontend
 
 We chose Vue3 + Vite to build our frontend.
 
@@ -262,21 +127,21 @@ pnpm backend:sut
 
 Expect the Vue production build under `frontend/dist`. The CLI install URL is served from GCS in prod; locally, `pnpm cli:bundle` produces `cli/dist/donut-cli.bundle.mjs`, and the local LB (`scripts/local-lb.mjs` via `pnpm sut` / `pnpm test`) serves `/doughnut-cli-latest/doughnut` from that file — not Spring on 9081.
 
-### 8. [Integrating MCP server for IDE](./\.cursor/rules/mcp-server.mdc#how-to-use-this-mcp-server)
+### 7. [Integrating MCP server for IDE](./\.cursor/rules/mcp-server.mdc#how-to-use-this-mcp-server)
 
-### 9. Manual testing locally — see `.agents/skills/manual-testing/SKILL.md`
+### 8. Manual testing locally — see `.agents/skills/manual-testing/SKILL.md`
 
-### 10. [Style Guide & Code linting/formating](./docs/linting_formating.md)
+### 9. [Style Guide & Code linting/formating](./docs/linting_formating.md)
 
-### 11. Production environment
+### 10. Production environment
 
 - [GCP production notes](./docs/gcp/prod_env.md) — includes **conditional backend deploy** (when CI skips GCS/MIG on unchanged jar) and how to **force a full deploy** with `force-deployment: true` in the deploy commit message; details in [conditional-backend-deploy.md](./docs/gcp/conditional-backend-deploy.md).
 
-### 12. [Donut source code secrets management](./docs/secrets_management.md)
+### 11. [Donut source code secrets management](./docs/secrets_management.md)
 
-### 13. Architecture and Design documentation
+### 12. Architecture and Design documentation
 
-### 14. Teardown and cleanup
+### 13. Teardown and cleanup
 
 - pnpm: To clean up packages installed by pnpm, you can run pnpm store prune to remove unused packages from the store. To remove all packages for a specific project, navigate to the project directory and run pnpm recursive uninstall to uninstall all dependencies in the project and its subdirectories.
 - direnv: To stop direnv from automatically loading the environment, you can simply delete the .envrc/ file in the project directory or run direnv deny in the project directory. To uninstall direnv, use the package manager you installed it with (e.g., brew uninstall direnv for macOS).
