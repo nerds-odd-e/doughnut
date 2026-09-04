@@ -3,11 +3,18 @@
  * `e2e_test/start/pageObjects/cli`. Behavior and assertions belong in page objects, not here.
  */
 import {
+  Given,
   Then,
   When,
   type DataTable,
 } from '@badeball/cypress-cucumber-preprocessor'
 import { cli } from '../start/pageObjects/cli'
+
+Given(
+  "the notebook {string}'s Git binding reflects its current content",
+  (notebookName: string) =>
+    cli.notebookClone().resnapshotGitBinding(notebookName)
+)
 
 When(
   'I clone the notebook {string} into a temporary destination using the installed CLI',

@@ -300,7 +300,7 @@ Execution notes:
 
 ### 14. Slice 11's E2E fixture reflects genuinely existing content, and the full E2E goes green
 Type: Behavior
-Status: planned
+Status: done
 Proof: The Outside-in CLI E2E scenario (`e2e_test/features/cli/cli_notebook_clone.feature`) runs the bundled CLI against the real backend and verifies the complete filesystem, commit, copy, authorization, and no-remote-mutation outcome; the scenario drops `@wip` once green.
 
 Behavior: Given Slice 11's scenario, when its Background seeds the notebook's readme/folder/note content and then calls Slice 13's testability snapshot hook before invoking the CLI clone command (instead of seeding via a plain creation call whose binding is never refreshed), the resulting checkout matches the seeded canonical tree exactly, and the bundled CLI E2E scenario passes end to end.
@@ -655,6 +655,30 @@ Behavior: Given acquisition cannot safely complete, when the owner invokes the c
   TypeScript API client was regenerated for the new controller/endpoint
   (`pnpm generateTypeScript`); no frontend/CLI/e2e code referenced it yet, so
   no call sites needed updating.
+- Slice 14 turned Slice 11's `@wip` scenario green and dropped `@wip`. It added
+  one Background step, `And the notebook "CLI Clone Notebook"'s Git binding
+  reflects its current content`, placed after the note/readme/folder seeding
+  steps and before the access-token step, calling Slice 13's testability hook.
+  The step's glue lives in `e2e_test/step_definitions/cli_notebook_clone.ts`
+  (`Given` delegating to `cli.notebookClone().resnapshotGitBinding(notebookName)`),
+  the page-object method in `e2e_test/start/pageObjects/cli/notebookClone.ts`,
+  and the actual SDK call in new sibling file
+  `e2e_test/start/testabilityNotebookGit.ts` (`notebookGitTestabilityMethods.
+  resnapshotNotebookGitBindingForTestability`, calling
+  `NotebookGitTestabilityController.resnapshotNotebookGitBindingForTestability({
+  body: { notebookName } })`), following `testabilityBazaar.ts`'s existing
+  sibling-file pattern and spread into `testability()` in
+  `e2e_test/start/testability.ts`. No CLI or backend product code changed —
+  confirming the plan's own claim that Slice 12's local-binding/message
+  behavior was already sufficient. Full scenario verified green twice via
+  `pnpm cypress run --spec e2e_test/features/cli/cli_notebook_clone.feature`.
+  Unrelated to product code: a stale local `cli/dist/e2e-install-donut-cli-*.bundle.mjs`
+  cache (keyed only by `cli/package.json` version, no source-mtime check, per
+  `e2e_test/config/cliE2eRepo.ts`'s `bundleCliE2eInstall`) predated the
+  `notebook clone` subcommand and caused early run confusion; deleting the
+  gitignored cache file was enough, no code change needed. Any future slice
+  that changes CLI behavior without bumping `cli/package.json`'s version should
+  expect the same stale-bundle risk locally.
 
 ## Refinement history
 

@@ -24,6 +24,7 @@ import { circleIdAlias } from './pageObjects/circlePage'
 import { noteIdFromUrl } from './noteIdFromUrl'
 import { assimilateTestabilityMethods } from './testabilityAssimilate'
 import { bazaarTestabilityMethods } from './testabilityBazaar'
+import { notebookGitTestabilityMethods } from './testabilityNotebookGit'
 import { recallTestabilityMethods } from './testabilityRecall'
 import { timeTravelTestabilityMethods } from './testabilityTimeTravel'
 import { unwrapData } from './unwrapApi'
@@ -543,6 +544,7 @@ const testability = () => {
 
     ...assimilateTestabilityMethods,
     ...bazaarTestabilityMethods,
+    ...notebookGitTestabilityMethods,
     ...recallTestabilityMethods,
     ...timeTravelTestabilityMethods,
 

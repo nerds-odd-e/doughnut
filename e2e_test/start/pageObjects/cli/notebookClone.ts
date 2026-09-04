@@ -8,6 +8,19 @@ import testability from '../../testability'
 function notebookClone() {
   return {
     /**
+     * Transitional, test-only (plan Slice 13/14): rebuilds the notebook's `NotebookGitBinding`
+     * from its current database content, simulating a genuinely pre-cutover notebook. Needed
+     * because ordinary content-seeding (readme/folder/note) after notebook creation never
+     * refreshes the binding recorded at creation time. Remove once Story 3 keeps bindings in
+     * sync with web edits automatically.
+     */
+    resnapshotGitBinding(notebookName: string) {
+      return testability().resnapshotNotebookGitBindingForTestability(
+        notebookName
+      )
+    },
+
+    /**
      * Resolves the notebook's numeric id, writes the owner's saved access token into the
      * isolated `@cliConfigDir`, then runs the installed CLI's non-interactive clone command
      * into a fresh test-owned destination (aliased `@cliCloneDestination`).

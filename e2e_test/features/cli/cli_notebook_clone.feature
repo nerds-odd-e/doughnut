@@ -1,4 +1,3 @@
-@wip
 @bundleCliE2eInstall
 @withCliConfig
 Feature: CLI notebook clone
@@ -20,6 +19,7 @@ Feature: CLI notebook clone
       ---
       Boil water
       """
+    And the notebook "CLI Clone Notebook"'s Git binding reflects its current content
     And I have a valid Donut Access Token with label "E2E CLI Clone Token"
 
   Scenario: Cloning an owned notebook produces a clean canonical Git checkout
