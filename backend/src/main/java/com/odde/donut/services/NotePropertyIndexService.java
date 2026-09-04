@@ -1,5 +1,6 @@
 package com.odde.donut.services;
 
+import com.odde.donut.algorithms.CanonicalDonutOrigin;
 import com.odde.donut.algorithms.NoteContentMarkdown;
 import com.odde.donut.algorithms.NotePropertyIndexPlanner;
 import com.odde.donut.entities.AuthoredNoteReferenceRow;
@@ -24,9 +25,13 @@ public class NotePropertyIndexService {
   @PersistenceContext private EntityManager entityManager;
 
   private final NotePropertyIndexRepository notePropertyIndexRepository;
+  private final CanonicalDonutOrigin canonicalDonutOrigin;
 
-  public NotePropertyIndexService(NotePropertyIndexRepository notePropertyIndexRepository) {
+  public NotePropertyIndexService(
+      NotePropertyIndexRepository notePropertyIndexRepository,
+      CanonicalDonutOrigin canonicalDonutOrigin) {
     this.notePropertyIndexRepository = notePropertyIndexRepository;
+    this.canonicalDonutOrigin = canonicalDonutOrigin;
   }
 
   @Transactional
@@ -55,7 +60,7 @@ public class NotePropertyIndexService {
               Map<String, List<NotePropertyIndexPlanner.PlannedRow>> rowsByKey =
                   new LinkedHashMap<>();
               for (NotePropertyIndexPlanner.PlannedRow planned :
-                  NotePropertyIndexPlanner.plannedRows(lf.frontmatter())) {
+                  NotePropertyIndexPlanner.plannedRows(lf.frontmatter(), canonicalDonutOrigin)) {
                 rowsByKey
                     .computeIfAbsent(planned.propertyKey(), k -> new ArrayList<>())
                     .add(planned);

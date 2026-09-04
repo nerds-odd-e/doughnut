@@ -15,7 +15,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-class AssimilationServicePropertyWikiLinkGateTest extends AssimilationServiceTestBase {
+class AssimilationServicePropertyReferenceGateTest extends AssimilationServiceTestBase {
   @Autowired NotePropertyIndexService notePropertyIndexService;
   @Autowired UnassimilatedPropertyService unassimilatedPropertyService;
 
@@ -66,9 +66,25 @@ class AssimilationServicePropertyWikiLinkGateTest extends AssimilationServiceTes
   }
 
   @Test
-  void gates_property_while_target_note_is_still_pending() {
-    Note target = makeMe.aNote().title("Word").notebookOwnedBy(user).please();
-    Note carrier = carrierWithExampleOf(target, "---\nexample of: \"[[Word]]\"\n---\n\nbody");
+  void gates_suffixed_note_url_property_while_target_note_is_still_pending() {
+    Notebook notebook = makeMe.aNotebook().creatorAndOwner(user).please();
+    Note carrier = makeMe.aNote().notebook(notebook).please();
+    Note assimilatedTarget = makeMe.aNote().title("Example").notebook(notebook).please();
+    makeMe.aMemoryTrackerFor(assimilatedTarget).assimilatedAt(day1).please();
+    Note target = makeMe.aNote().title("歓迎").notebook(notebook).please();
+    makeMe.authorReferencingContent(
+        carrier,
+        "---\n"
+            + "example of: \"[Example](/n"
+            + assimilatedTarget.getId()
+            + ")\"\n"
+            + "example of 2: \"[歓迎](/n"
+            + target.getId()
+            + ")\"\n"
+            + "---\n\nbody");
+    notePropertyIndexService.refreshForNote(carrier);
+    makeMe.aMemoryTrackerFor(carrier).assimilatedAt(day1).please();
+    makeMe.aMemoryTrackerFor(carrier).propertyKey("example of").assimilatedAt(day1).please();
 
     AssimilationUnit next = assimilationService.getNextAssimilationUnit().orElseThrow();
     assertThat(next.note(), equalTo(target));
@@ -78,7 +94,7 @@ class AssimilationServicePropertyWikiLinkGateTest extends AssimilationServiceTes
 
     AssimilationUnit property = assimilationService.getNextAssimilationUnit().orElseThrow();
     assertThat(property.note(), equalTo(carrier));
-    assertThat(property.propertyKey(), equalTo("example of"));
+    assertThat(property.propertyKey(), equalTo("example of 2"));
   }
 
   @Test
