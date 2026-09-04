@@ -15,10 +15,11 @@ The implementer prompt must include:
    proof, no commit on red, no deliberately broken CI, and capability naming.
 4. A hard stop before wrap-up: do not commit, push, mark the plan done, or run
    post-change-refactor. Leave relevant tests green and the tree uncommitted.
-5. `revert_and_split` when the slice is too big.
+5. `revert_and_refine` when the slice is too big; the coordinator will invoke
+   **slice-plan-refinement** on the existing PLAN.
 6. `CURSOR_DEV=true nix develop -c <command>` except on Cloud VM; Git needs no
    Nix prefix.
 7. A short return: ready for wrap-up with tests, Jidoka stop, or reverted and
-   split. Do not claim the slice is done in Git terms.
+   ready for refinement. Do not claim the slice is done in Git terms.
 
 Resume context remains in the plan on disk.

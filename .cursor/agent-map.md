@@ -71,10 +71,13 @@ Assume `pnpm sut` is already running. If unsure, check `CURSOR_DEV=true nix deve
 | Story shaping | `.planning/seeds/SEED-NNN-slug.md` containing ordered candidate stories | **story-decomposition** |
 | Formal milestone | `.planning/phases/NN-slug/*-PLAN.md`, STATE, ROADMAP | `/gsd-plan-phase` → `/gsd-execute-phase` → `/gsd-ship` (+ local wrap-up) |
 | Ad-hoc | `.planning/quick/NNN-slug/PLAN.md` | **slice-planning** + **execute-plan** |
+| Optional refinement | Existing phase/quick PLAN; no new artifact | **slice-plan-refinement** |
 | Legacy | `ongoing/*.md` | **execute-plan** only; do not migrate |
 
 Story-decomposition seeds are not executable: select one contained story, then
-use slice-planning. **Hard decomposition quality:** one evaluable outcome at the
+use slice-planning. Run slice-plan-refinement only when the resulting PLAN is
+complex, sizing confidence is low, or execution overruns; straightforward plans
+may execute directly. **Hard decomposition quality:** one evaluable outcome at the
 current resolution; 3V stories; Behavior/Structure execution leaves —
 `problem-decomposition.mdc`. Plan artifact and lifecycle rules: `planning.mdc`.
 Do not write new flat `.planning/<name>.md` when `phases/` or `quick/` fits.
