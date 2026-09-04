@@ -3,6 +3,7 @@ import { installation } from './execution'
 import { backend } from './backend'
 import { interactiveCli } from './interactiveCli'
 import { useNotebook } from './notebookInteractiveCliSession'
+import { notebookClone, notebookCloneCheckout } from './notebookClone'
 import { ttyAssertTerminal } from './ttyAssertTerminal'
 
 /**
@@ -19,6 +20,8 @@ export const cli = {
   ttyAssertTerminal,
   interactiveCli,
   useNotebook,
+  notebookClone,
+  notebookCloneCheckout,
   installation,
   backend,
 }

@@ -19,5 +19,20 @@ export function createCliE2ePluginConfigDirTasks() {
       )
       return configDir
     },
+    /** Same `access-tokens.json` shape as `saveStoredAccessToken` (cli/src/backendApi/accessTokenStorage.ts). */
+    writeCliAccessToken({
+      configDir,
+      token,
+    }: {
+      configDir: string
+      token: string
+    }): null {
+      writeFileSync(
+        join(configDir, 'access-tokens.json'),
+        JSON.stringify({ token }, null, 2),
+        'utf-8'
+      )
+      return null
+    },
   }
 }

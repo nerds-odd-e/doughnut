@@ -233,7 +233,7 @@ Execution notes:
 
 ### 11. CLI E2E scaffolding for notebook clone exists, tagged `@wip`
 Type: Structure
-Status: planned
+Status: done
 Proof: A new feature file (e.g. `e2e_test/features/cli/cli_notebook_clone.feature`), tagged `@wip`, contains a scenario following the Outside-in proof steps (seed an owned existing notebook, run the bundled CLI clone command, inspect the resulting checkout with real `git`, assert canonical tree/absence of Donut metadata, assert the publish-unavailable message, assert the remote notebook is unchanged). Matching step definitions exist (in `e2e_test/step_definitions/cli.ts` or a new sibling file) delegating as one-line glue to new page-object/task support under `e2e_test/start/pageObjects/cli/`, following the existing domain-object shape (`cli.installation()`, `cli.backend()`, etc. in `e2e_test/start/pageObjects/cli/index.ts`). Because the scenario is `@wip`, it is excluded from CI (`e2e_test/config/ci.ts`'s `not @wip` tag filter) and is not required to pass yet; the proof is that the scenario, steps, and page objects exist, are wired together, and Cypress can collect/parse the spec without error.
 
 Internal change: Add the CLI-clone E2E scaffolding (feature scenario + step definitions + page-object/task glue) beside the existing CLI execution helpers (`e2e_test/start/pageObjects/cli/execution.ts`, `backend.ts`, `outputAssertions.ts`), reusing `cli.installation()`'s installed-binary pattern (`cy.task('runInstalledCli', ...)`) rather than inventing a second CLI-invocation mechanism. This adds no passing behavior yet — it only gives Slice 12 a concrete scenario to turn green.
@@ -478,10 +478,39 @@ Behavior: Given acquisition cannot safely complete, when the owner invokes the c
   runs `run(['notebook','clone', id, destination])`, and asserts against the
   real destination via `git` subprocess calls (branch, root-commit count,
   tree SHA match) — this is the pattern later CLI Git-behavior tests should
-  follow rather than mocking `git` itself. Slice 11 (local Git-config binding
-  + publish-limitation message + dropping the E2E `@wip` tag) and Slice 12
-  (destination-exists/missing-Git/download-failure/invalid-bundle error
-  coverage) remain untouched by this slice, as planned.
+  follow rather than mocking `git` itself. Slices 11-12 (E2E scaffolding,
+  then local Git-config binding + publish-limitation message + dropping the
+  E2E `@wip` tag) and Slice 13 (destination-exists/missing-Git/download-
+  failure/invalid-bundle error coverage) remain untouched by this slice, as
+  planned.
+- Slice 11 added the `@wip`-tagged E2E scaffolding for notebook clone:
+  `e2e_test/features/cli/cli_notebook_clone.feature` (scenario following the
+  Outside-in proof shape), thin step glue in
+  `e2e_test/step_definitions/cli_notebook_clone.ts`, and new page objects
+  `notebookClone()` / `notebookCloneCheckout()` in
+  `e2e_test/start/pageObjects/cli/notebookClone.ts` (registered in that
+  directory's `index.ts`). `notebookClone()` resolves the seeded notebook's
+  numeric id, writes a real access token via a new
+  `writeCliAccessToken({configDir, token})` testability task (added to
+  `e2e_test/config/cliE2ePluginConfigDirTasks.ts` — writes the same
+  `access-tokens.json` shape as `cli/src/backendApi/accessTokenStorage.ts`'s
+  `saveStoredAccessToken`, since no non-interactive token-seeding precedent
+  existed before this slice), and runs `donut notebook clone <id> <dest>`
+  through the existing `cy.task('runInstalledCli', ...)` mechanism from
+  `execution.ts`. `notebookCloneCheckout()` asserts git/tree state via
+  `cy.exec('git ...')` and a new `listNotebookCheckoutEntries` task (in new
+  `e2e_test/config/cliE2eNotebookCloneTasks.ts`, registered through
+  `cliE2ePluginTasks.ts`). The scenario is `@wip` and not required to pass yet
+  (confirmed: Cypress collects/parses the spec — all steps resolve, no
+  compile errors — and the only observed failure, an unrelated shared-hook
+  "Bad Gateway", was independently reproduced on a pre-existing unrelated CLI
+  feature and traced to the local backend/SUT service being down, not this
+  scaffolding). Gap for Slice 12: the CLI has no "publishing is not
+  available" message yet (confirmed via grep of `cli/src`); the scenario's
+  step for it is wired but needs that product string once Slice 12 adds it.
+  The `donut notebook clone <id> <destination>` command itself already exists
+  from Slice 10, so Slice 12 is about the local-binding/message behavior and
+  turning this scenario green, not adding new CLI plumbing.
 
 ## Refinement history
 
