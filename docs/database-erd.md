@@ -38,6 +38,7 @@ erDiagram
     notebook ||--o{ book : "notebook_id ON DELETE CASCADE"
     notebook ||--o{ folder : "notebook_id ON DELETE CASCADE"
     notebook ||--o{ "note" : "notebook_id ON DELETE NO ACTION"
+    notebook ||--o{ notebook_git_binding : "notebook_id ON DELETE CASCADE"
     notebook ||--o{ subscription : "notebook_id ON DELETE NO ACTION"
     notebook_group ||--o{ notebook : "notebook_group_id ON DELETE SET NULL"
     notebook_group ||--o{ subscription : "notebook_group_id ON DELETE SET NULL"
@@ -189,6 +190,10 @@ erDiagram
         int ownership_id FK
         int creator_id FK
         int notebook_group_id FK
+    }
+    notebook_git_binding {
+        int id PK
+        int notebook_id UK FK
     }
     notebook_group {
         int id PK

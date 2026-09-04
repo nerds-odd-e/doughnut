@@ -101,7 +101,7 @@ Execution notes:
 
 ### 3. A notebook's accepted Git bundle can be persisted and re-read
 Type: Structure
-Status: planned
+Status: done
 Proof: A focused persistence test builds a bundle (Slice 2), persists it as one notebook's binding (accepted head + bundle bytes), reloads it by notebook ID, and confirms the same head and bytes come back; the unique-notebook constraint rejects a second binding for the same notebook.
 
 Internal change: Add the next Flyway migration (`V300000319__...`) and a persistence boundary/entity for one unique notebook-to-Git-binding row containing its accepted Git object ID and bundle bytes. This changes no user-visible behavior and immediately enables Slice 4's cutover to create and store the first binding per notebook.
@@ -290,6 +290,17 @@ Behavior: Given acquisition cannot safely complete, when the owner invokes the c
   with one parentless commit on `refs/heads/main`. Slice 3's persistence and
   Slices 4/6's cutover/creation callers should call this function directly
   rather than duplicating bundle construction.
+- Slice 3 added migration `V300000319__create_notebook_git_binding.sql`
+  (table `notebook_git_binding`: unique `notebook_id` FK to `notebook` ON
+  DELETE CASCADE, `accepted_git_object_id varchar(40) NOT NULL`,
+  `bundle_bytes longblob NOT NULL`, timestamps — mirrors the `book` table's
+  shape), entity `com.odde.donut.entities.NotebookGitBinding`, repository
+  `NotebookGitBindingRepository.findByNotebook_Id(Integer)`, and
+  `com.odde.donut.services.notebookGit.NotebookGitBundleWriter.write(Repository)`
+  → `BundleWriteResult(String headObjectId, byte[] bundleBytes)` for
+  extracting bundle bytes/head from a `NotebookGitBundleBuilder.build(...)`
+  result. Later cutover/creation slices persist through
+  `NotebookGitBindingRepository` using this writer's output.
 
 ## Refinement history
 
