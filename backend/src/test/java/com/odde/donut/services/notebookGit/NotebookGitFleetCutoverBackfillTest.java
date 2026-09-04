@@ -9,8 +9,8 @@ import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookGitBinding;
 import com.odde.donut.entities.User;
 import com.odde.donut.entities.repositories.NotebookGitBindingRepository;
+import com.odde.donut.testability.GitBundleTestReader;
 import com.odde.donut.testability.MakeMe;
-import java.io.ByteArrayInputStream;
 import java.sql.Connection;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -18,14 +18,9 @@ import java.util.List;
 import javax.sql.DataSource;
 import org.eclipse.jgit.internal.storage.dfs.DfsRepositoryDescription;
 import org.eclipse.jgit.internal.storage.dfs.InMemoryRepository;
-import org.eclipse.jgit.lib.NullProgressMonitor;
 import org.eclipse.jgit.lib.ObjectId;
-import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevWalk;
-import org.eclipse.jgit.transport.FetchConnection;
-import org.eclipse.jgit.transport.TransportBundleStream;
-import org.eclipse.jgit.transport.URIish;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -130,7 +125,7 @@ class NotebookGitFleetCutoverBackfillTest {
     assertThat(binding, notNullValue());
 
     try (InMemoryRepository readBack = new InMemoryRepository(new DfsRepositoryDescription())) {
-      ObjectId headObjectId = fetchBundleInto(readBack, binding.getBundleBytes());
+      ObjectId headObjectId = GitBundleTestReader.fetchHead(readBack, binding.getBundleBytes());
       assertThat(headObjectId.getName(), equalTo(binding.getAcceptedGitObjectId()));
 
       try (RevWalk revWalk = new RevWalk(readBack)) {
@@ -149,17 +144,5 @@ class NotebookGitFleetCutoverBackfillTest {
       }
     }
     return binding;
-  }
-
-  private static ObjectId fetchBundleInto(InMemoryRepository target, byte[] bundleBytes)
-      throws Exception {
-    try (TransportBundleStream transport =
-            new TransportBundleStream(
-                target, new URIish("in-memory:bundle"), new ByteArrayInputStream(bundleBytes));
-        FetchConnection fetchConnection = transport.openFetch()) {
-      Ref mainRef = fetchConnection.getRef("refs/heads/main");
-      fetchConnection.fetch(NullProgressMonitor.INSTANCE, List.of(mainRef), java.util.Set.of());
-      return mainRef.getObjectId();
-    }
   }
 }

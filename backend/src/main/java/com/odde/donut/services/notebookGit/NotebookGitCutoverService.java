@@ -18,12 +18,14 @@ import org.eclipse.jgit.lib.Repository;
 import org.springframework.stereotype.Service;
 
 /**
- * Backfills the accepted Git binding for one notebook that predates Git backing: builds the
- * notebook's canonical Portable-tree snapshot at a given cutover time, commits it as a single
- * parentless root commit under a stable Donut system identity, and persists the accepted binding.
+ * Gives one notebook its accepted Git binding: builds the notebook's canonical Portable-tree
+ * snapshot as of a given commit time, commits it as a single parentless root commit under a stable
+ * Donut system identity, and persists the accepted binding.
  *
- * <p>No owner opt-in and no fabricated earlier history: the caller supplies the cutover time (the
- * real migration's execution time, once wired in), and any failure to build a valid tree/bundle
+ * <p>Two callers rely on this: the fleet cutover wiring backfills a notebook that predates Git
+ * backing, and {@code NotebookService} calls it at creation time so every post-cutover notebook
+ * starts Git-backed from an empty tree. Neither path fabricates earlier history or lets an owner
+ * opt out: the caller supplies the commit time, and any failure to build a valid tree/bundle
  * propagates rather than persisting a partial binding.
  */
 @Service

@@ -41,6 +41,13 @@ class NotebookCrudControllerTest extends NotebookControllerTestBase {
     }
 
     @Test
+    void startsWithAnEmptyTreeRootCommitBinding() throws Exception {
+      NotebookRealm response = controller.createNotebook(notebookCreate("Git Backed Notebook"));
+      NotebookGitBindingAssertions.assertEmptyTreeRootCommitBinding(
+          notebookGitBindingRepository, response.notebook().getId());
+    }
+
+    @Test
     void persistsDescriptionOnCreate() throws UnexpectedNoAccessRightException {
       NotebookCreationRequest noteCreation = notebookCreate("Notebook With Blurb");
       noteCreation.setDescription("  Catalog blurb  ");

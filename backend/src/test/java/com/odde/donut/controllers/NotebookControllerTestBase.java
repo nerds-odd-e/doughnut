@@ -12,6 +12,7 @@ import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookSettings;
 import com.odde.donut.entities.repositories.NoteRepository;
+import com.odde.donut.entities.repositories.NotebookGitBindingRepository;
 import com.odde.donut.entities.repositories.NotebookRepository;
 import com.odde.donut.services.EmbeddingService;
 import com.odde.donut.services.NoteService;
@@ -30,6 +31,7 @@ abstract class NotebookControllerTestBase extends ControllerTestBase {
   @Autowired NotebookController controller;
   @Autowired NoteRepository noteRepository;
   @Autowired NotebookRepository notebookRepository;
+  @Autowired NotebookGitBindingRepository notebookGitBindingRepository;
   @Autowired NoteService noteService;
   @Autowired NotebookGroupService notebookGroupService;
   @Autowired ObjectMapper objectMapper;

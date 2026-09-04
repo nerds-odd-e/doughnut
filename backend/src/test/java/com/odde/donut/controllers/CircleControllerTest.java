@@ -18,6 +18,7 @@ import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookGroup;
 import com.odde.donut.entities.User;
 import com.odde.donut.entities.repositories.NoteRepository;
+import com.odde.donut.entities.repositories.NotebookGitBindingRepository;
 import com.odde.donut.entities.repositories.NotebookRepository;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.services.NotebookGroupService;
@@ -34,6 +35,7 @@ class CircleControllerTest extends ControllerTestBase {
   @Autowired NotebookGroupService notebookGroupService;
   @Autowired NoteRepository noteRepository;
   @Autowired NotebookRepository notebookRepository;
+  @Autowired NotebookGitBindingRepository notebookGitBindingRepository;
 
   @BeforeEach
   void setup() {
@@ -94,6 +96,19 @@ class CircleControllerTest extends ControllerTestBase {
 
       Notebook nb = notebookRepository.findById(response.notebook().getId()).orElseThrow();
       assertThat(nb.getNotebookGroup().getId(), equalTo(group.getId()));
+    }
+
+    @Test
+    void startsWithAnEmptyTreeRootCommitBinding() throws Exception {
+      User user = currentUser.getUser();
+      Circle circle = makeMe.aCircle().hasMember(user).please();
+      NotebookCreationRequest noteCreation = new NotebookCreationRequest();
+      noteCreation.setNewTitle("Circle Git Backed Nb");
+
+      NotebookRealm response = controller.createNotebookInCircle(circle, noteCreation);
+
+      NotebookGitBindingAssertions.assertEmptyTreeRootCommitBinding(
+          notebookGitBindingRepository, response.notebook().getId());
     }
   }
 

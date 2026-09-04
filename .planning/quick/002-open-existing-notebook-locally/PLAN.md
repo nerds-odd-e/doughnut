@@ -144,7 +144,7 @@ Execution notes:
 
 ### 6. Notebooks created after cutover start with their root commit
 Type: Behavior
-Status: planned
+Status: done
 Proof: Existing personal- and circle-notebook controller creation tests inspect the persisted Git binding after the public create call and find one empty-tree root commit on `main`; a MakeMe-owned notebook fixture can opt into the same invariant without bypassing the production service.
 
 Behavior: Given the fleet cutover has established that every notebook is Git-backed, when a user creates a personal or circle notebook through Donut, the notebook and its one-root-commit Git binding are persisted atomically, so it cannot become a post-cutover exception that later requires clone-triggered activation.
@@ -331,6 +331,19 @@ Behavior: Given acquisition cannot safely complete, when the owner invokes the c
   migration chain. Any later slice that needs another Flyway migration to see
   JPA-managed data should follow this same raw-JDBC precedent rather than
   Spring-bean JavaMigrations.
+- Slice 6 wired `NotebookService.createNotebookForOwnership` (the shared
+  personal/circle creation seam) to call
+  `NotebookGitCutoverService.createBindingForNotebook(notebook,
+  currentUTCTimestamp.toInstant())` right after `entityPersister.save(notebook)`
+  assigns the ID, and added `@Transactional` to
+  `createNotebookForOwnership` itself so the notebook save and its binding
+  commit atomically regardless of caller. `NotebookGitCutoverService` is now
+  used for both fleet cutover and new-notebook creation; its Javadoc was
+  updated accordingly but the class/constant names were kept (a rename would
+  ripple into `NotebookGitFleetCutoverBackfill` without a clear win). A shared
+  test helper `com.odde.donut.testability.GitBundleTestReader.fetchHead(...)`
+  now backs every test that opens a persisted bundle's `refs/heads/main` head
+  via JGit — reuse it instead of re-deriving that inspection.
 
 ## Refinement history
 
