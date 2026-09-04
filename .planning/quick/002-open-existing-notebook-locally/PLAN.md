@@ -193,10 +193,32 @@ Execution notes:
   analog is `commands/update.ts`'s one-off `fetch`/`arrayBuffer` download. Add
   a reusable download helper here rather than duplicating that pattern.
 
-### 9. CLI clone produces a clean local Git checkout of an existing notebook
+### 9. CLI acquisition staging survives cross-device destinations
+Type: Structure
+Status: planned
+Proof: A focused test forces `moveCheckoutIntoDestination`'s `fs.renameSync` to fail with `EXDEV` (mock `node:fs`'s `renameSync`) and confirms the staged checkout still lands intact, byte-for-byte, at the destination via a fallback path; all of Slice 8's existing `notebookAcquisition.test.ts` cases remain green.
+
+Internal change: `notebookAcquisition.ts`'s `moveCheckoutIntoDestination` currently calls only `fs.renameSync(stagedCheckoutDir, destinationPath)`. `renameSync` throws `EXDEV: cross-device link not permitted` whenever its source and destination are on different filesystems/mounts — a routine situation, not an edge case: on Linux, `os.tmpdir()` (where Slice 8 stages its checkout) is frequently a separate `tmpfs` mount from wherever a user actually wants their notebook checked out (their home or project directory), and the same split is common in CI/Docker. Slice 8's own tests never caught this because their "destination" fixture is itself created under `os.tmpdir()`, so source and destination always share a device in the test — the real-world failure mode was never exercised. Add a same-semantics fallback (recursive copy of the staged directory's contents into the destination, then remove the staged source) when `renameSync` fails with `code === 'EXDEV'`, so the acquisition boundary from Slice 8 works on the filesystem layouts it will actually be run against. While in this file, also remove the `exceptionText` helper's exact duplicate of `commands/update.ts`'s copy (missed by Slice 8's refactor pass) by extracting one shared implementation.
+
+Execution notes:
+
+- Keep the "destination already exists" refusal and the temp-staging
+  cleanup behavior exactly as Slice 8 left them; only the final move step
+  gains the fallback.
+- A minimal correct fallback: `fs.cpSync(stagedCheckoutDir, destinationPath, { recursive: true })`
+  (available on this CLI's minimum supported Node, `>=26.7`) followed by
+  `fs.rmSync(stagedCheckoutDir, { recursive: true, force: true })` only after
+  the copy fully succeeds.
+- Extract `exceptionText` into one small shared module imported by both
+  `commands/update.ts` and `commands/notebook/notebookAcquisition.ts`
+  rather than duplicating the 3-line helper a second time.
+- Found via `execution-retrospective` review of Slices 1-8 (2026-09-04); see
+  Learnings below for the exact defect and evidence.
+
+### 10. CLI clone produces a clean local Git checkout of an existing notebook
 Type: Behavior
 Status: planned
-Proof: CLI `run(args)` tests mock only the external Donut HTTP call (via Slice 8's download primitive) and use real Git to assert the resulting checkout: `main` branch, exactly one root commit, same canonical tree as the source notebook.
+Proof: CLI `run(args)` tests mock only the external Donut HTTP call (via Slice 8/9's download primitive) and use real Git to assert the resulting checkout: `main` branch, exactly one root commit, same canonical tree as the source notebook.
 
 Behavior: Given a configured owner access token, Git, an automatically backed existing notebook, and a nonexistent destination, when the owner runs `donut notebook clone <notebook-id> <destination>`, the CLI downloads the accepted bundle (Slice 7's endpoint), checks it out at the destination as a clean `main` branch with exactly one root commit, and removes the temporary bundle origin.
 
@@ -204,29 +226,29 @@ Execution notes:
 
 - Extend the existing non-interactive routing (`nonInteractiveCli.ts`) rather
   than entering Ink for this command.
-- Reuse Slice 8's download/subprocess/staging primitives; this slice is the
+- Reuse Slice 8/9's download/subprocess/staging primitives; this slice is the
   wiring, not new transport or Git mechanics.
 - Malformed/missing arguments use the existing CLI error style; destination-
-  exists and other failure cases belong to Slice 11.
+  exists and other failure cases belong to Slice 12.
 
-### 10. CLI clone records local binding, explains the publish limitation, and the full E2E goes green
+### 11. CLI clone records local binding, explains the publish limitation, and the full E2E goes green
 Type: Behavior
 Status: planned
-Proof: CLI `run(args)` tests extend Slice 9's checkout to assert the recorded local Git-config binding and printed message. The active CLI E2E scenario in the Outside-in proof runs the bundled CLI against the real backend and verifies the complete filesystem, commit, copy, authorization, and no-remote-mutation outcome; the scenario drops `@wip` once this slice is green.
+Proof: CLI `run(args)` tests extend Slice 10's checkout to assert the recorded local Git-config binding and printed message. The active CLI E2E scenario in the Outside-in proof runs the bundled CLI against the real backend and verifies the complete filesystem, commit, copy, authorization, and no-remote-mutation outcome; the scenario drops `@wip` once this slice is green.
 
-Behavior: Given the clean checkout produced by Slice 9, when the clone command finishes, the CLI additionally records only untracked local Git-config binding data (`donut.notebook-id` and API origin — no tracked Donut file in the checkout) and reports that the files can be opened in ordinary local tools while publishing to Donut is not yet available; the bundled CLI E2E scenario passes end to end.
+Behavior: Given the clean checkout produced by Slice 10, when the clone command finishes, the CLI additionally records only untracked local Git-config binding data (`donut.notebook-id` and API origin — no tracked Donut file in the checkout) and reports that the files can be opened in ordinary local tools while publishing to Donut is not yet available; the bundled CLI E2E scenario passes end to end.
 
 Execution notes:
 
 - Add the E2E page-object/task support beside the existing CLI execution
   helpers; step definitions remain thin.
-- Keep the outside-in scenario `@wip` through Slice 9; remove `@wip` only once
+- Keep the outside-in scenario `@wip` through Slice 10; remove `@wip` only once
   this slice's proof passes.
 
-### 11. Failed acquisition leaves local and remote state intact
+### 12. Failed acquisition leaves local and remote state intact
 Type: Behavior
 Status: planned
-Proof: CLI `run(args)` tests cover an existing destination, missing Git, denied/failed download, and invalid bundle. Each case reports one actionable error, preserves any pre-existing destination sentinel, removes command-owned staging, and performs no remote mutation; the successful behavior from Slices 9 and 10 remains green.
+Proof: CLI `run(args)` tests cover an existing destination, missing Git, denied/failed download, and invalid bundle. Each case reports one actionable error, preserves any pre-existing destination sentinel, removes command-owned staging, and performs no remote mutation; the successful behavior from Slices 10 and 11 remains green.
 
 Behavior: Given acquisition cannot safely complete, when the owner invokes the clone command, the CLI fails before installing a destination, preserves all pre-existing local files, cleans only its own temporary data, and leaves the accepted remote notebook/head unchanged.
 
@@ -369,8 +391,41 @@ Behavior: Given acquisition cannot safely complete, when the owner invokes the c
   destination already exists. Everything else happens inside an
   `fs.mkdtempSync` staging directory that is always removed in a `finally`.
   Not yet wired into `nonInteractiveCli.ts` or any real `notebook clone`
-  command — that is Slice 9's job, which should call
+  command — that is Slice 10's job, which should call
   `acquireNotebookGitCheckout` directly rather than re-deriving any of this.
+- **`execution-retrospective` review of Slices 1-8 (2026-09-04)** found one
+  concrete bug and one minor missed-refactoring smell in Slice 8's otherwise
+  clean result, both folded into new Slice 9 above rather than reopening
+  Slice 8's already-pushed commit:
+  - **Bug:** `notebookAcquisition.ts`'s final move step
+    (`fs.renameSync(stagedCheckoutDir, destinationPath)`) throws
+    `EXDEV: cross-device link not permitted` whenever the OS temp directory
+    (source) and the caller's destination are on different filesystems —
+    common on Linux (`/tmp` as a separate `tmpfs` mount from the user's home
+    or project directory) and in CI/Docker. Slice 8's own test suite stages
+    its "destination" fixture under `os.tmpdir()` too, so source and
+    destination always share a device in tests, masking the failure; the
+    happy path would break on the exact real-world layouts it's meant to
+    support.
+  - **Minor duplication:** `notebookAcquisition.ts`'s `exceptionText` helper
+    is a verbatim copy of `commands/update.ts`'s existing one — small (3
+    lines) but a genuine miss by Slice 8's `post-change-refactor` pass, which
+    reported only the `loadAuthenticatedFetchContext` extraction.
+  - No other bugs, story drift, or refactor smells found across Slices 1-8's
+    combined diff; backend Git-binding code, the fleet-cutover raw-JDBC
+    design, and the owner-only download endpoint all held up under review.
+  - Process observations (not actioned as plan slices): the coordinator's own
+    upfront investigation into the Flyway-vs-JPA bootstrap-ordering hazard
+    (which shaped Slice 5) was done inline rather than via a `fork`
+    sub-agent, keeping its raw research trace in the coordinator's context
+    for the rest of the session even though only the distilled conclusion was
+    ever reused — worth trying a `fork` for this kind of one-off deep-dive on
+    a future multi-slice run. Separately, this session's earlier
+    `SEED-010-execute-plan-wrap-up-token-efficiency.md` retrospective (token
+    cost of `post-change-refactor`/`format-changed` across Slices 1-8) was
+    already acted on mid-plan (`execute-plan`'s `wrap-up.md`/`delegation.md`
+    were revised between Slices 8 and this retrospective), so it is not
+    repeated here.
 
 ## Refinement history
 
@@ -384,8 +439,13 @@ proof loops (`slice-plan-refinement`, confirmed against the actual
 - Former Slice 2 (fleet cutover + idempotency/retry) → Slices 4-5: single-
   notebook cutover step, then fleet-wide idempotent/atomic backfill.
 - Former Slice 6 (routing + transport + checkout + local binding + E2E) →
-  Slices 9-10: clean checkout first, then local binding/messaging plus the
+  Slices 10-11: clean checkout first, then local binding/messaging plus the
   full E2E going green.
 
+Slices 1-8 executed and reviewed via `execution-retrospective` (2026-09-04);
+that review inserted Slice 9 (a Structure fix for a cross-device-move bug and
+a minor duplication found in Slice 8's result — see Learnings above) ahead of
+the original Slice 9, renumbering it and the two slices after it to 10-12.
+
 Every remaining slice now has one Behavior/Structure gate and one proof loop.
-Execution can resume directly from Slice 1.
+Execution can resume directly from Slice 9.
