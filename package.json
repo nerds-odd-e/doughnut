@@ -16,6 +16,7 @@
     "mcp-server:bundle": "pnpm --frozen-lockfile --silent recursive install && pnpm -C mcp-server bundle",
     "mcp-server:test": "pnpm --frozen-lockfile --silent recursive install && pnpm -C mcp-server test",
     "mcp-server:format": "pnpm --frozen-lockfile --silent recursive install && pnpm -C mcp-server format",
+    "mcp-server:lint": "pnpm --frozen-lockfile --silent recursive install && pnpm -C mcp-server lint",
     "test-fixtures:format": "pnpm --frozen-lockfile --silent recursive install && pnpm -C packages/donut-test-fixtures format",
     "test-fixtures:lint": "pnpm --frozen-lockfile --silent recursive install && pnpm -C packages/donut-test-fixtures lint",
     "cli": "pnpm --frozen-lockfile --silent recursive install && DONUT_API_BASE_URL=http://localhost:9081 DONUT_CONFIG_DIR=$HOME/.config/donut-dev pnpm -C cli exec tsx src/index.ts",
@@ -72,6 +73,7 @@
     "lint:all": "pnpm --frozen-lockfile --silent recursive install && pnpm backend:lint && pnpm frontend:lint && pnpm cli:lint && pnpm test-fixtures:lint && pnpm cy:lint && pnpm test:path-routing && pnpm test:api-summary && pnpm test:log-utils && pnpm test:sut-healthcheck && pnpm test:sut-restart && pnpm test:sut-start && pnpm validate:path-routing && pnpm openapi:lint",
     "format:all": "pnpm --frozen-lockfile --silent recursive install && pnpm backend:format && pnpm frontend:format && pnpm mcp-server:format && pnpm test-fixtures:format && pnpm cli:format && pnpm cy:format && pnpm openapi:lint",
     "format:changed": "scripts/format_changed.sh",
+    "lint:changed": "scripts/lint_changed.sh",
     "bundle:all": "pnpm mcp-server:bundle && pnpm cli:bundle && pnpm frontend:build",
     "sound": "github_action_sound https://github.com/nerds-odd-e/doughnut/actions"
   },

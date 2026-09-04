@@ -1,0 +1,128 @@
+#!/usr/bin/env bash
+
+DONUT_TEST_REAL_PATH="$PATH"
+DONUT_TEST_REAL_BASH="$(command -v bash)"
+DONUT_TEST_REPO_ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
+
+source "$(dirname "$0")/vendor/bach.sh"
+
+run-in-temporary-repository() {
+  local mode="$1"
+  local scenario="$2"
+
+  @real env -i \
+    "PATH=${DONUT_TEST_REAL_PATH}" \
+    "DONUT_TEST_REPO_ROOT=${DONUT_TEST_REPO_ROOT}" \
+    "DONUT_TEST_MODE=${mode}" \
+    "DONUT_TEST_SCENARIO=${scenario}" \
+    "${DONUT_TEST_REAL_BASH}" <<'EOF'
+set -euo pipefail
+
+work="$(mktemp -d)"
+trap 'rm -rf "$work"' EXIT
+
+git -C "$work" init -q
+git -C "$work" config user.email test@example.com
+git -C "$work" config user.name "Test User"
+mkdir -p "$work/fake-bin"
+cat >"$work/fake-bin/pnpm" <<'PNPM'
+#!/usr/bin/env bash
+printf 'pnpm %s\n' "$*"
+PNPM
+chmod +x "$work/fake-bin/pnpm"
+
+case "$DONUT_TEST_SCENARIO" in
+  working-tree)
+    mkdir -p "$work/backend" "$work/frontend" "$work/cli" "$work/e2e_test" \
+      "$work/packages/donut-test-fixtures"
+    printf 'class Example {}\n' >"$work/backend/Example.java"
+    printf 'const original = true\n' >"$work/frontend/example.ts"
+    printf 'const ignored = true\n' >"$work/cli/ignored.ts"
+    printf 'cli/ignored.ts\n' >"$work/.gitignore"
+    git -C "$work" add .
+    git -C "$work" commit -qm initial
+
+    printf 'class Example { int changed; }\n' >"$work/backend/Example.java"
+    git -C "$work" add backend/Example.java
+    printf 'const changed = true\n' >"$work/frontend/example.ts"
+    printf 'export const fixture = true\n' \
+      >"$work/packages/donut-test-fixtures/new-fixture.ts"
+    printf 'export const e2e = true\n' >"$work/e2e_test/new-step.ts"
+    printf 'const ignoredChanged = true\n' >"$work/cli/ignored.ts"
+    ;;
+  staged)
+    mkdir -p "$work/frontend" "$work/mcp-server" \
+      "$work/packages/donut-test-fixtures"
+    printf 'const original = true\n' >"$work/frontend/example.ts"
+    printf 'const original = true\n' >"$work/mcp-server/example.ts"
+    printf 'const original = true\n' \
+      >"$work/packages/donut-test-fixtures/example.ts"
+    git -C "$work" add .
+    git -C "$work" commit -qm initial
+
+    printf 'const unstaged = true\n' >"$work/frontend/example.ts"
+    printf 'const staged = true\n' >"$work/mcp-server/example.ts"
+    printf 'const fixture = true\n' \
+      >"$work/packages/donut-test-fixtures/example.ts"
+    git -C "$work" add mcp-server/example.ts \
+      packages/donut-test-fixtures/example.ts
+    ;;
+  shared-biome-config)
+    printf '{}\n' >"$work/biome.json"
+    git -C "$work" add biome.json
+    git -C "$work" commit -qm initial
+    printf '{ "formatter": { "enabled": true } }\n' >"$work/biome.json"
+    git -C "$work" add biome.json
+    ;;
+  openapi-config)
+    printf 'extends: []\n' >"$work/redocly.yaml"
+    git -C "$work" add redocly.yaml
+    git -C "$work" commit -qm initial
+    printf 'extends: [recommended]\n' >"$work/redocly.yaml"
+    git -C "$work" add redocly.yaml
+    ;;
+  *)
+    printf 'Unknown scenario: %s\n' "$DONUT_TEST_SCENARIO" >&2
+    exit 1
+    ;;
+esac
+
+cd "$work"
+PATH="$work/fake-bin:$PATH" \
+  "$DONUT_TEST_REPO_ROOT/scripts/${DONUT_TEST_MODE}_changed.sh"
+EOF
+}
+
+test-format-selects-staged-unstaged-and-untracked-components() {
+  local output
+  output="$(run-in-temporary-repository format working-tree)"
+
+  @assert-equals \
+    $'pnpm backend:format\npnpm frontend:format\npnpm test-fixtures:format\npnpm cy:format' \
+    "$output"
+}
+
+test-lint-selects-only-staged-components() {
+  local output
+  output="$(run-in-temporary-repository lint staged)"
+
+  @assert-equals \
+    $'pnpm mcp-server:lint\npnpm test-fixtures:lint' \
+    "$output"
+}
+
+test-shared-biome-config-selects-every-affected-component() {
+  local output
+  output="$(run-in-temporary-repository lint shared-biome-config)"
+
+  @assert-equals \
+    $'pnpm frontend:lint\npnpm mcp-server:lint\npnpm cli:lint\npnpm test-fixtures:lint\npnpm cy:lint' \
+    "$output"
+}
+
+test-openapi-config-selects-openapi-lint() {
+  local output
+  output="$(run-in-temporary-repository lint openapi-config)"
+
+  @assert-equals 'pnpm openapi:lint' "$output"
+}
