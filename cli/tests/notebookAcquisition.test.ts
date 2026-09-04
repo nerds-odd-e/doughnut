@@ -3,6 +3,7 @@ import * as childProcess from 'node:child_process'
 import * as fs from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
+import { getApiConfig } from 'donut-api'
 import { acquireNotebookGitCheckout } from '../src/commands/notebook/notebookAcquisition.js'
 import { tempConfigWithToken } from './tempConfigTestHelpers.js'
 
@@ -155,9 +156,11 @@ describe('acquireNotebookGitCheckout', () => {
       _cmd: string,
       args?: readonly string[]
     ) => {
-      const targetDir = args?.[3] as string
-      fs.mkdirSync(targetDir, { recursive: true })
-      fs.writeFileSync(join(targetDir, 'README.md'), '# notebook')
+      if (args?.[0] === 'clone') {
+        const targetDir = args[3] as string
+        fs.mkdirSync(targetDir, { recursive: true })
+        fs.writeFileSync(join(targetDir, 'README.md'), '# notebook')
+      }
       return { stdout: '', stderr: '', status: 0, error: undefined }
     }) as typeof childProcess.spawnSync)
     const before = stagingDirsUnderTmp()
@@ -166,6 +169,57 @@ describe('acquireNotebookGitCheckout', () => {
 
     expect(fs.existsSync(join(destinationPath, 'README.md'))).toBe(true)
     expect(stagingDirsUnderTmp()).toEqual(before)
+
+    const { apiBaseUrl } = getApiConfig()
+    expect(childProcess.spawnSync).toHaveBeenCalledWith(
+      'git',
+      ['-C', destinationPath, 'config', '--local', 'donut.notebook-id', '6'],
+      { encoding: 'utf8' }
+    )
+    expect(childProcess.spawnSync).toHaveBeenCalledWith(
+      'git',
+      [
+        '-C',
+        destinationPath,
+        'config',
+        '--local',
+        'donut.api-origin',
+        apiBaseUrl,
+      ],
+      { encoding: 'utf8' }
+    )
+  })
+
+  test('git config recording failure surfaces an error', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({
+        ok: true,
+        arrayBuffer: () =>
+          Promise.resolve(new TextEncoder().encode('bundle-bytes').buffer),
+      })
+    )
+    vi.mocked(childProcess.spawnSync).mockImplementation(((
+      _cmd: string,
+      args?: readonly string[]
+    ) => {
+      if (args?.[0] === 'clone') {
+        const targetDir = args[3] as string
+        fs.mkdirSync(targetDir, { recursive: true })
+        fs.writeFileSync(join(targetDir, 'README.md'), '# notebook')
+        return { stdout: '', stderr: '', status: 0, error: undefined }
+      }
+      return {
+        stdout: '',
+        stderr: 'fatal: could not lock config file',
+        status: 1,
+        error: undefined,
+      }
+    }) as typeof childProcess.spawnSync)
+
+    await expect(
+      acquireNotebookGitCheckout(9, destinationPath)
+    ).rejects.toThrow(/failed to record local Git config/)
   })
 
   test('falls back to copy+remove when rename fails with EXDEV (cross-device destination)', async () => {
@@ -181,11 +235,13 @@ describe('acquireNotebookGitCheckout', () => {
       _cmd: string,
       args?: readonly string[]
     ) => {
-      const targetDir = args?.[3] as string
-      fs.mkdirSync(targetDir, { recursive: true })
-      fs.writeFileSync(join(targetDir, 'README.md'), '# notebook')
-      fs.mkdirSync(join(targetDir, 'nested'))
-      fs.writeFileSync(join(targetDir, 'nested', 'note.md'), 'nested content')
+      if (args?.[0] === 'clone') {
+        const targetDir = args[3] as string
+        fs.mkdirSync(targetDir, { recursive: true })
+        fs.writeFileSync(join(targetDir, 'README.md'), '# notebook')
+        fs.mkdirSync(join(targetDir, 'nested'))
+        fs.writeFileSync(join(targetDir, 'nested', 'note.md'), 'nested content')
+      }
       return { stdout: '', stderr: '', status: 0, error: undefined }
     }) as typeof childProcess.spawnSync)
     vi.mocked(fs.renameSync).mockImplementationOnce(() => {

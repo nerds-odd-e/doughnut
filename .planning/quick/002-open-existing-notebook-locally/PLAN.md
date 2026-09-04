@@ -255,7 +255,8 @@ Execution notes:
 
 ### 12. CLI clone records local binding, explains the publish limitation, and the full E2E goes green
 Type: Behavior
-Status: planned
+Status: in-progress — CLI-side behavior done and unit-proven; E2E scenario
+still `@wip` pending a developer decision (see Learnings)
 Proof: CLI `run(args)` tests extend Slice 10's checkout to assert the recorded local Git-config binding and printed message. Slice 11's `@wip` E2E scenario now runs the bundled CLI against the real backend and verifies the complete filesystem, commit, copy, authorization, and no-remote-mutation outcome; the scenario drops `@wip` once green.
 
 Behavior: Given the clean checkout produced by Slice 10 and the E2E scaffolding from Slice 11, when the clone command finishes, the CLI additionally records only untracked local Git-config binding data (`donut.notebook-id` and API origin — no tracked Donut file in the checkout) and reports that the files can be opened in ordinary local tools while publishing to Donut is not yet available; the bundled CLI E2E scenario passes end to end.
@@ -511,6 +512,52 @@ Behavior: Given acquisition cannot safely complete, when the owner invokes the c
   The `donut notebook clone <id> <destination>` command itself already exists
   from Slice 10, so Slice 12 is about the local-binding/message behavior and
   turning this scenario green, not adding new CLI plumbing.
+- Slice 12's CLI-side change landed and is unit-proven: `acquireNotebookGitCheckout`
+  (`cli/src/commands/notebook/notebookAcquisition.ts`) now records local-only
+  Git config (`donut.notebook-id`, `donut.api-origin`, reusing the same
+  `apiBaseUrl` already resolved for the download) via a new
+  `recordLocalNotebookBinding` step after the atomic move, sharing a new
+  `runSystemGitOrThrow(args, describeFailure)` helper with
+  `cloneBundleWithSystemGit` (post-change-refactor dedup) instead of
+  duplicating spawn/status-check/throw logic. `nonInteractiveCli.ts` prints a
+  message containing the literal substring "publishing is not available"
+  after a successful clone. `cli/tests/notebookAcquisition.test.ts` and
+  `cli/tests/notebookClone.test.ts` assert both. This part is committed.
+- **Blocked, needs a developer decision:** Slice 11's `@wip` E2E scenario
+  cannot be turned green yet, for a reason unrelated to Slice 12's CLI code.
+  The backend only ever creates a notebook's accepted `NotebookGitBinding`
+  once, as an empty-tree commit, at notebook-creation time
+  (`NotebookService.createNotebookForOwnership` →
+  `NotebookGitCutoverService.createBindingForNotebook`); nothing in the
+  codebase refreshes an existing binding afterward (confirmed: no other
+  caller of `NotebookGitBindingRepository`/`NotebookGitCutoverService` exists
+  besides creation, fleet cutover, and the read-only download endpoint).
+  Slice 11's Background seeds the notebook via `injectNotes` (which creates
+  the notebook, and thus its empty binding, through that same production
+  path), then adds a readme, folder, and note via ordinary production
+  controllers afterward — none of which touch the binding. That is exactly
+  the "clean fetch of a later web edit" this plan's own boundaries explicitly
+  exclude ("No clean fetch of a later web edit; that belongs to Story 3"), so
+  the scenario as scaffolded tests a precondition the story does not support:
+  a genuinely pre-cutover notebook whose binding was frozen capturing content
+  that already existed at cutover time, not a post-creation edit. Manually
+  confirmed against the live SUT: the leftover "CLI Clone Notebook" fixture's
+  `NotebookGitBinding` is a single empty-tree commit even though the notebook
+  has a readme, a folder, and notes in the database, and cloning it produces
+  a checkout with zero files.
+  Two directions to resolve this, needing a developer choice before Slice 12
+  can finish:
+  (a) add a testability-only capability to simulate "notebook existing
+  before cutover" — e.g. a way to defer/replace a notebook's binding so a
+  fixture can seed full content first and then trigger the per-notebook
+  cutover step (`NotebookGitCutoverService.createBindingForNotebook`) against
+  it, capturing that content — noting this needs a *replace*, not just
+  insert, since Slice 3's binding table is unique-per-notebook; or
+  (b) reorder/rewrite Slice 11's scenario so it does not rely on a
+  post-creation edit at all, accepting a plainer fixture (e.g. content
+  supplied at CLI-testability-notebook-creation time, if such a path exists,
+  or otherwise a narrower canonical-tree check).
+  Until resolved, `cli_notebook_clone.feature` keeps its `@wip` tag.
 
 ## Refinement history
 

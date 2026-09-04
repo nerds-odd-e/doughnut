@@ -3,6 +3,7 @@ import { execFileSync } from 'node:child_process'
 import * as fs from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
+import { getApiConfig } from 'donut-api'
 import { run } from '../src/run.js'
 import { tempConfigWithToken } from './tempConfigTestHelpers.js'
 
@@ -26,6 +27,7 @@ describe('notebook clone (CLI routing, real Git checkout)', () => {
   let sourceRepoDir: string
   let destinationPath: string
   let errorSpy: ReturnType<typeof vi.spyOn>
+  let logSpy: ReturnType<typeof vi.spyOn>
   let exitSpy: ReturnType<typeof vi.spyOn>
 
   beforeEach(() => {
@@ -49,6 +51,7 @@ describe('notebook clone (CLI routing, real Git checkout)', () => {
     )
 
     errorSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined)
+    logSpy = vi.spyOn(console, 'log').mockImplementation(() => undefined)
     exitSpy = vi.spyOn(process, 'exit').mockImplementation(((code?: number) => {
       throw new ProcessExitForTest(code)
     }) as typeof process.exit)
@@ -61,6 +64,7 @@ describe('notebook clone (CLI routing, real Git checkout)', () => {
     fs.rmSync(workDir, { recursive: true, force: true })
     vi.unstubAllGlobals()
     errorSpy.mockRestore()
+    logSpy.mockRestore()
     exitSpy.mockRestore()
   })
 
@@ -105,6 +109,17 @@ describe('notebook clone (CLI routing, real Git checkout)', () => {
       destinationPath
     )
     expect(destinationTree).toBe(sourceTree)
+
+    expect(
+      runGit(['config', '--local', 'donut.notebook-id'], destinationPath)
+    ).toBe('42')
+    expect(
+      runGit(['config', '--local', 'donut.api-origin'], destinationPath)
+    ).toBe(getApiConfig().apiBaseUrl)
+
+    expect(logSpy).toHaveBeenCalledWith(
+      expect.stringContaining('publishing is not available')
+    )
   })
 
   test('missing destination argument is rejected with the existing CLI error style', async () => {

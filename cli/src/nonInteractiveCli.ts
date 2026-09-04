@@ -59,4 +59,7 @@ async function completeNotebookSubcommand(
   }
 
   await acquireNotebookGitCheckout(notebookId, destination)
+  console.log(
+    `Cloned notebook ${notebookId} into ${destination}. Open and edit the files there with any ordinary local Git tool (Obsidian, an IDE, plain git); publishing is not available yet — commits stay local.`
+  )
 }

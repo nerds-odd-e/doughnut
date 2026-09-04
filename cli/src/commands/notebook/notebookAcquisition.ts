@@ -18,7 +18,7 @@ import { errnoCode } from '../../errnoCode.js'
 async function downloadNotebookGitBundle(
   notebookId: number,
   destinationFile: string
-): Promise<void> {
+): Promise<{ apiBaseUrl: string }> {
   const { token, apiBaseUrl } = loadAuthenticatedFetchContext()
 
   const buffer = await withBackendClient(token, async () => {
@@ -33,22 +33,56 @@ async function downloadNotebookGitBundle(
   })
 
   fs.writeFileSync(destinationFile, Buffer.from(buffer))
+  return { apiBaseUrl }
 }
 
-/** Runs the system `git` executable to produce a clean checkout from a local bundle file. */
-function cloneBundleWithSystemGit(bundleFile: string, targetDir: string): void {
-  const result = spawnSync('git', ['clone', '--quiet', bundleFile, targetDir], {
-    encoding: 'utf8',
-  })
+/**
+ * Runs the system `git` executable with `args`, throwing `describeFailure`'s message (given the
+ * trimmed stderr, when any, and the exit code) if it exits non-zero, or a "git is required"
+ * error if the executable itself could not be spawned.
+ */
+function runSystemGitOrThrow(
+  args: readonly string[],
+  describeFailure: (detail: string | undefined, status: number | null) => string
+): void {
+  const result = spawnSync('git', args, { encoding: 'utf8' })
   if (result.error) {
     throw new Error(
       `git is required but could not be run: ${exceptionText(result.error)}`
     )
   }
   if (result.status !== 0) {
-    const detail = result.stderr?.trim()
-    throw new Error(
-      `git clone of the notebook bundle failed${detail ? `: ${detail}` : ` (exit code ${result.status})`}`
+    throw new Error(describeFailure(result.stderr?.trim(), result.status))
+  }
+}
+
+/** Runs the system `git` executable to produce a clean checkout from a local bundle file. */
+function cloneBundleWithSystemGit(bundleFile: string, targetDir: string): void {
+  runSystemGitOrThrow(
+    ['clone', '--quiet', bundleFile, targetDir],
+    (detail, status) =>
+      `git clone of the notebook bundle failed${detail ? `: ${detail}` : ` (exit code ${status})`}`
+  )
+}
+
+/**
+ * Records a local-only Git config binding (never a tracked file) marking which Donut notebook
+ * and API origin this checkout came from, so a future publish command can find its way back.
+ */
+function recordLocalNotebookBinding(
+  destinationPath: string,
+  notebookId: number,
+  apiBaseUrl: string
+): void {
+  const bindings: [string, string][] = [
+    ['donut.notebook-id', String(notebookId)],
+    ['donut.api-origin', apiBaseUrl],
+  ]
+  for (const [key, value] of bindings) {
+    runSystemGitOrThrow(
+      ['-C', destinationPath, 'config', '--local', key, value],
+      (detail, status) =>
+        `failed to record local Git config ${key}${detail ? `: ${detail}` : ` (exit code ${status})`}`
     )
   }
 }
@@ -77,9 +111,11 @@ function moveCheckoutIntoDestination(
 
 /**
  * Downloads the notebook's accepted Git bundle and produces a clean local checkout at
- * `destinationPath`. All download/clone work happens in command-owned temporary staging;
- * `destinationPath` is only ever touched by the final atomic move, and only once staging
- * fully succeeds. Staging is always removed afterward, success or failure.
+ * `destinationPath`, with a local-only (untracked) Git config binding
+ * ({@link recordLocalNotebookBinding}) recording the source notebook id and API origin. All
+ * download/clone work happens in command-owned temporary staging; `destinationPath` is only
+ * ever touched by the final atomic move, and only once staging fully succeeds. Staging is
+ * always removed afterward, success or failure.
  */
 export async function acquireNotebookGitCheckout(
   notebookId: number,
@@ -94,12 +130,16 @@ export async function acquireNotebookGitCheckout(
   )
   try {
     const bundleFile = path.join(stagingDir, 'notebook.bundle')
-    await downloadNotebookGitBundle(notebookId, bundleFile)
+    const { apiBaseUrl } = await downloadNotebookGitBundle(
+      notebookId,
+      bundleFile
+    )
 
     const checkoutDir = path.join(stagingDir, 'checkout')
     cloneBundleWithSystemGit(bundleFile, checkoutDir)
 
     moveCheckoutIntoDestination(checkoutDir, destinationPath)
+    recordLocalNotebookBinding(destinationPath, notebookId, apiBaseUrl)
   } finally {
     fs.rmSync(stagingDir, { recursive: true, force: true })
   }
