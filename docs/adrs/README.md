@@ -79,7 +79,7 @@ Number sequentially from `0000`. Prefer capability-named titles, not phase numbe
 |-----|--------|-------|
 | [0000](./0000-use-adrs-accepted.md) | Accepted | Use ADRs for architectural decisions |
 | [0001](./0001-ubiquitous-language.md) | Accepted | Ubiquitous language for Donut domain concepts |
-| [0002](./0002-revisioned-portable-notebook-synchronization.md) | Proposed | Synchronize Portable notebook trees with revisioned three-way merge |
+| [0002](./0002-git-native-portable-notebook-synchronization.md) | Proposed | Git-native Portable notebook tree synchronization |
 | [0003](./0003-spaced-repetition-scheduling-policy-accepted.md) | Accepted | Spaced-repetition scheduling policy |
 | [0004](./0004-okf-compatible-notebook-markdown-accepted.md) | Accepted | OKF-compatible notebook Markdown profile |
 | [0005](./0005-web-routes-accepted.md) | Accepted | Web routes (SPA, API boundary, wiki-link destinations) |

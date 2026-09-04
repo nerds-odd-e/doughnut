@@ -18,9 +18,9 @@ Healthy mainline for learning and knowledge work.
 
 **Shipped v1.0 (2026-07-23):** Notebook Health lint + Health tab + gated empty-folder purge.
 
-Portable content format follows Accepted ADR 0004. Two-way synchronization is
-being reconsidered in Proposed
-[ADR 0002](../docs/adrs/0002-revisioned-portable-notebook-synchronization.md);
+Portable content format follows Accepted ADR 0004. Git-native two-way
+synchronization is proposed in
+[ADR 0002](../docs/adrs/0002-git-native-portable-notebook-synchronization.md);
 catalog ZIP download remains (`notebook_export.feature`).
 
 ## Requirements
@@ -75,7 +75,7 @@ Accepted ADRs under `docs/adrs/`. Planning history for completed milestones is n
 
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
-| Proposed ADR 0002 portable notebook synchronization | Linear content revisions, external sync envelope, logical identity resolution, and three-way merge | Proposed 2026-09-04; not binding |
+| Proposed ADR 0002 Git-native Portable notebook synchronization | Standard Git remote and linear `main`, no Donut-specific local state, conservative identity projection, and future repository-subtree binding | Proposed 2026-09-04; not binding |
 | Keep catalog ZIP only | One-way portability still useful; E2E `notebook_export.feature` | ✓ Retained |
 | Accidental-match resolve via dialog (not stacked notes) | Full-height reviewed note stays primary; resolution is optional and compact | ✓ Shipped v1.2 |
 | Overlap from dialog skips try-again / credit reclaim | Declaring overlap is the action; no secondary retry/credit flow | ✓ Shipped v1.2 |

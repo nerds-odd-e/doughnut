@@ -195,11 +195,12 @@
 ## Missing Critical Features
 
 **Portable notebook tree sync (proposal ahead of implementation):**
-- Problem: Proposed ADR 0002 now defines revisioned three-way synchronization,
-  identity resolution, and conflict behavior, but the client/server product
-  contract is not implemented.
-- Blocks: Reliable bidirectional local editing workflows (merge preview,
-  deletion rules, identity-preserving rename/move, and conflict resolution).
+- Problem: Proposed ADR 0002 now defines Git-native synchronization with a
+  linear accepted `main`, standard Git clients, no Donut-specific local state,
+  and conservative identity projection, but the Git remote and projection
+  boundary are not implemented.
+- Blocks: Reliable bidirectional local editing workflows (fetch/rebase/push,
+  identity-preserving rename/move, web-authored commits, and conflicts).
 
 **Semantic search maturity:**
 - Problem: Embedding maintenance exists, but product search UX/quality may still lag a full vector/relevance design (`docs/tech_stack.md`).
