@@ -1,74 +1,22 @@
-import { describe, test, expect, vi, beforeEach, afterEach } from 'vitest'
-import { execFileSync } from 'node:child_process'
+import { describe, test, expect, vi } from 'vitest'
 import * as fs from 'node:fs'
-import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { getApiConfig } from 'donut-api'
 import { run } from '../src/run.js'
-import { tempConfigWithToken } from './tempConfigTestHelpers.js'
-
-class ProcessExitForTest extends Error {
-  readonly code: number | undefined
-  constructor(code?: number) {
-    super(`process.exit(${code})`)
-    this.name = 'ProcessExitForTest'
-    this.code = code
-  }
-}
-
-function runGit(args: string[], cwd: string): string {
-  return execFileSync('git', args, { cwd, encoding: 'utf8' }).trim()
-}
+import {
+  ProcessExitForTest,
+  runGit,
+  installNotebookCloneCliTest,
+} from './notebookClone.testHelpers.js'
 
 describe('notebook clone (CLI routing, real Git checkout)', () => {
-  let savedConfigDir: string | undefined
-  let configDir: string
-  let workDir: string
-  let sourceRepoDir: string
-  let destinationPath: string
-  let errorSpy: ReturnType<typeof vi.spyOn>
-  let logSpy: ReturnType<typeof vi.spyOn>
-  let exitSpy: ReturnType<typeof vi.spyOn>
-
-  beforeEach(() => {
-    savedConfigDir = process.env.DONUT_CONFIG_DIR
-    configDir = tempConfigWithToken()
-    process.env.DONUT_CONFIG_DIR = configDir
-
-    workDir = fs.mkdtempSync(join(tmpdir(), 'donut-notebook-clone-cli-'))
-    sourceRepoDir = join(workDir, 'source')
-    destinationPath = join(workDir, 'destination')
-
-    fs.mkdirSync(sourceRepoDir)
-    runGit(['init', '--quiet', '-b', 'main'], sourceRepoDir)
-    runGit(['config', 'user.email', 'test@example.com'], sourceRepoDir)
-    runGit(['config', 'user.name', 'Test'], sourceRepoDir)
-    fs.writeFileSync(join(sourceRepoDir, 'note.md'), '# hello notebook\n')
-    runGit(['add', 'note.md'], sourceRepoDir)
-    runGit(
-      ['commit', '--quiet', '-m', 'initial notebook commit'],
-      sourceRepoDir
-    )
-
-    errorSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined)
-    logSpy = vi.spyOn(console, 'log').mockImplementation(() => undefined)
-    exitSpy = vi.spyOn(process, 'exit').mockImplementation(((code?: number) => {
-      throw new ProcessExitForTest(code)
-    }) as typeof process.exit)
-  })
-
-  afterEach(() => {
-    if (savedConfigDir === undefined) delete process.env.DONUT_CONFIG_DIR
-    else process.env.DONUT_CONFIG_DIR = savedConfigDir
-    fs.rmSync(configDir, { recursive: true, force: true })
-    fs.rmSync(workDir, { recursive: true, force: true })
-    vi.unstubAllGlobals()
-    errorSpy.mockRestore()
-    logSpy.mockRestore()
-    exitSpy.mockRestore()
-  })
+  const ctx = installNotebookCloneCliTest()
 
   test('clone downloads the accepted bundle and checks it out as a clean single-commit main branch', async () => {
+    const workDir = ctx.getWorkDir()
+    const sourceRepoDir = ctx.getSourceRepoDir()
+    const destinationPath = ctx.getDestinationPath()
+
     const bundleFile = join(workDir, 'notebook.bundle')
     // Include HEAD so the clone checks out "main" regardless of the machine's own
     // `init.defaultBranch` setting, matching how the real backend bundle is built
@@ -120,12 +68,16 @@ describe('notebook clone (CLI routing, real Git checkout)', () => {
       runGit(['config', '--local', 'donut.api-origin'], destinationPath)
     ).toBe(getApiConfig().apiBaseUrl)
 
-    expect(logSpy).toHaveBeenCalledWith(
+    expect(ctx.getLogSpy()).toHaveBeenCalledWith(
       expect.stringContaining('publishing is not available')
     )
   })
 
   test('clone checks out "main" even when the machine defaults to a different branch name', async () => {
+    const workDir = ctx.getWorkDir()
+    const sourceRepoDir = ctx.getSourceRepoDir()
+    const destinationPath = ctx.getDestinationPath()
+
     const bundleFile = join(workDir, 'notebook.bundle')
     runGit(['bundle', 'create', bundleFile, 'HEAD', 'main'], sourceRepoDir)
     const bundleBytes = fs.readFileSync(bundleFile)
@@ -169,29 +121,29 @@ describe('notebook clone (CLI routing, real Git checkout)', () => {
     await expect(run(['notebook', 'clone', '42'])).rejects.toThrow(
       ProcessExitForTest
     )
-    expect(errorSpy).toHaveBeenCalledWith(
+    expect(ctx.getErrorSpy()).toHaveBeenCalledWith(
       expect.stringContaining('usage: donut notebook clone')
     )
-    expect(exitSpy).toHaveBeenCalledWith(1)
+    expect(ctx.getExitSpy()).toHaveBeenCalledWith(1)
   })
 
   test('non-numeric notebook id is rejected with the existing CLI error style', async () => {
     await expect(
-      run(['notebook', 'clone', 'not-a-number', destinationPath])
+      run(['notebook', 'clone', 'not-a-number', ctx.getDestinationPath()])
     ).rejects.toThrow(ProcessExitForTest)
-    expect(errorSpy).toHaveBeenCalledWith(
+    expect(ctx.getErrorSpy()).toHaveBeenCalledWith(
       expect.stringContaining('usage: donut notebook clone')
     )
-    expect(exitSpy).toHaveBeenCalledWith(1)
+    expect(ctx.getExitSpy()).toHaveBeenCalledWith(1)
   })
 
   test('unknown notebook action is rejected with the existing CLI error style', async () => {
     await expect(
-      run(['notebook', 'frobnicate', '42', destinationPath])
+      run(['notebook', 'frobnicate', '42', ctx.getDestinationPath()])
     ).rejects.toThrow(ProcessExitForTest)
-    expect(errorSpy).toHaveBeenCalledWith(
+    expect(ctx.getErrorSpy()).toHaveBeenCalledWith(
       expect.stringContaining('usage: donut notebook clone')
     )
-    expect(exitSpy).toHaveBeenCalledWith(1)
+    expect(ctx.getExitSpy()).toHaveBeenCalledWith(1)
   })
 })

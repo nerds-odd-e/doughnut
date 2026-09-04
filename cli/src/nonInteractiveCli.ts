@@ -1,4 +1,5 @@
 import { exitCliError } from './cliExit.js'
+import { exceptionText } from './exceptionText.js'
 import { runUpdate } from './commands/update.js'
 import { formatVersionOutput } from './commands/version.js'
 import { acquireNotebookGitCheckout } from './commands/notebook/notebookAcquisition.js'
@@ -58,7 +59,11 @@ async function completeNotebookSubcommand(
     exitCliError(NOTEBOOK_CLONE_USAGE)
   }
 
-  await acquireNotebookGitCheckout(notebookId, destination)
+  try {
+    await acquireNotebookGitCheckout(notebookId, destination)
+  } catch (e) {
+    exitCliError(exceptionText(e))
+  }
   console.log(
     `Cloned notebook ${notebookId} into ${destination}. Open and edit the files there with any ordinary local Git tool (Obsidian, an IDE, plain git); publishing is not available yet — commits stay local.`
   )

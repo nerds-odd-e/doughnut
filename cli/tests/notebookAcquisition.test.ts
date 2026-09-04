@@ -57,7 +57,7 @@ describe('acquireNotebookGitCheckout', () => {
 
     await expect(
       acquireNotebookGitCheckout(1, destinationPath)
-    ).rejects.toThrow()
+    ).rejects.toThrow(/resource was not found/i)
 
     expect(fs.existsSync(destinationPath)).toBe(false)
     expect(stagingDirsUnderTmp()).toEqual(before)

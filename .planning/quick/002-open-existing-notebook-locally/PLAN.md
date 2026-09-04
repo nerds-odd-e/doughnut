@@ -317,7 +317,7 @@ Execution notes:
 
 ### 15. Failed acquisition leaves local and remote state intact
 Type: Behavior
-Status: planned
+Status: done
 Proof: CLI `run(args)` tests cover an existing destination, missing Git, denied/failed download, and invalid bundle. Each case reports one actionable error, preserves any pre-existing destination sentinel, removes command-owned staging, and performs no remote mutation; the successful behavior from Slices 10-14 remains green.
 
 Behavior: Given acquisition cannot safely complete, when the owner invokes the clone command, the CLI fails before installing a destination, preserves all pre-existing local files, cleans only its own temporary data, and leaves the accepted remote notebook/head unchanged.
@@ -679,6 +679,38 @@ Behavior: Given acquisition cannot safely complete, when the owner invokes the c
   gitignored cache file was enough, no code change needed. Any future slice
   that changes CLI behavior without bumping `cli/package.json`'s version should
   expect the same stale-bundle risk locally.
+- Slice 15 (final slice) closed the acquisition error-surfacing gap: nothing
+  in `nonInteractiveCli.ts`/`run.ts` previously caught
+  `acquireNotebookGitCheckout` failures, so they escaped as uncaught promise
+  rejections instead of this CLI's `donut: <message>` / exit-1 style.
+  `completeNotebookSubcommand` now wraps the call in try/catch and calls
+  `exitCliError(exceptionText(e))`. Investigated and confirmed
+  `downloadNotebookGitBundle`'s `throw { status: res.status }` is *not* a bug:
+  `withBackendClient` (`cli/src/backendApi/donutBackendClient.ts`) already
+  classifies it into a proper actionable `Error` via
+  `userVisibleMessageForSdkThrowable`; do not "fix" this again. All four
+  required failure cases (existing destination, missing git, denied/failed
+  download, invalid bundle) are covered via real CLI `run(args)` calls with
+  real `git` subprocesses (no `spawnSync` mocking), each asserting the
+  `donut: `/exit-1 style, an untouched destination, and no leftover
+  `donut-notebook-clone-*` staging directories. Post-change-refactor split the
+  resulting oversized `notebookClone.test.ts` into `notebookClone.test.ts`
+  (happy path/arg validation), new `notebookClone.failures.test.ts` (the 5
+  failure cases, deduped via a shared `expectCloneFailure` helper), and new
+  `notebookClone.testHelpers.ts` (shared fixture/spy/staging-dir helpers) —
+  future CLI notebook-clone tests should extend these three files rather than
+  regrowing a single large one. That split exposed a real, previously-latent
+  test-isolation race (multiple test files scanning `os.tmpdir()` for the
+  shared `donut-notebook-clone-` prefix used by real production code, tripped
+  by a snapshot-equality check that failed whenever another file's
+  concurrently-running test created/removed its own staging dir mid-test);
+  fixed by making the staging-dir assertion one-directional
+  (`expectNoNewStagingDirsSince`: fails only if this run's own staging dir
+  survives, ignores unrelated dirs appearing/disappearing from other files) —
+  the correct invariant, verified stable across 5 consecutive full-suite runs.
+  Any future CLI test that scans `os.tmpdir()` for this or a similar shared
+  prefix should follow this one-directional pattern rather than snapshot
+  equality.
 
 ## Refinement history
 
