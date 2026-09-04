@@ -272,7 +272,7 @@ Execution notes:
 
 ### 13. Testability can snapshot a notebook's current content into its Git binding
 Type: Structure
-Status: planned
+Status: done
 Proof: A focused testability-layer test (or, if none of this repo's existing testability coverage is backend-unit-testable in isolation, a focused E2E-support check) seeds a notebook with a readme, folder, and note through ordinary means, calls the new testability hook, and confirms the notebook's `NotebookGitBinding` now reflects that content (root commit tree matches the canonical snapshot) rather than the empty tree recorded at creation.
 
 Internal change: Add a testability-only capability — reachable the same way other E2E testability seeding already reaches the backend (check the existing testability controller/endpoint pattern used by `injectNotes` and similar) — that takes an existing notebook, builds a fresh canonical-tree snapshot from its *current* content (reusing Slice 1-2's `PortableTreeSnapshot`/`NotebookGitBundleBuilder`), and *replaces* that notebook's `NotebookGitBinding` row with a new binding capturing it. This is deliberately named and scoped as a one-off "simulate pre-cutover state" tool for tests, not a general "refresh binding" utility — it must not be reachable from any production/user-facing path.
@@ -630,6 +630,31 @@ Behavior: Given acquisition cannot safely complete, when the owner invokes the c
   This also unblocks part of the Slice 12 E2E gap above: once the fixture-
   ordering decision is resolved, a real Slice-11 bundle download will now
   correctly check out `main` regardless of the CI machine's git defaults.
+
+- Slice 13 landed the testability-only re-snapshot capability as
+  `NotebookGitCutoverService.resnapshotForTestability(Notebook notebook,
+  Instant snapshotTime)`, sharing new private helpers `buildBundle(Notebook,
+  Instant)` and `applyBundle(NotebookGitBinding, BundleWriteResult, Instant)`
+  with the existing `createBindingForNotebook` so both the production
+  creation path and the testability path build bundles identically. It finds
+  the notebook's existing `NotebookGitBinding` (or creates one if absent) and
+  performs a genuine update-or-insert, respecting the unique-per-notebook
+  constraint (never a duplicate row). The HTTP entry point is
+  `POST /api/testability/resnapshot_notebook_git_binding_for_testability`
+  (request DTO `ResnapshotNotebookGitBindingRequest{notebookName}`), resolving
+  the notebook by name like `share_to_bazaar` and using
+  `testabilitySettings.getCurrentUTCTimestamp()` for snapshot time. Post-change-
+  refactor moved this endpoint out of the already-large
+  `TestabilityRestController` into a new sibling
+  `com.odde.donut.testability.NotebookGitTestabilityController`, keeping the
+  same `@Profile({"e2e", "test"})` gating and `/api/testability` base path —
+  `TestabilityRestController.java` itself is unchanged from `main`. Slice 14
+  should call this endpoint (via a new e2e_test testability task, following the
+  pattern of Slice 11's `writeCliAccessToken`) from `cli_notebook_clone.feature`'s
+  Background rather than adding a second snapshot-triggering path. The
+  TypeScript API client was regenerated for the new controller/endpoint
+  (`pnpm generateTypeScript`); no frontend/CLI/e2e code referenced it yet, so
+  no call sites needed updating.
 
 ## Refinement history
 

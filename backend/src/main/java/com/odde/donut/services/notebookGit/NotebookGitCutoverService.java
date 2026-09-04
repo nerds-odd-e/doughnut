@@ -53,26 +53,54 @@ public class NotebookGitCutoverService {
   }
 
   public NotebookGitBinding createBindingForNotebook(Notebook notebook, Instant cutoverTime) {
-    List<PortableTreeEntry> entries = buildPortableTreeEntries(notebook);
+    BundleWriteResult written = buildBundle(notebook, cutoverTime);
 
+    NotebookGitBinding binding = new NotebookGitBinding();
+    binding.setNotebook(notebook);
+    applyBundle(binding, written, cutoverTime);
+    return notebookGitBindingRepository.save(binding);
+  }
+
+  /**
+   * Testability-only: replaces {@code notebook}'s existing accepted Git binding with a fresh
+   * snapshot of its current content, as though cutover had just been re-run. Simulates content
+   * changes that happened after the notebook's real cutover, which nothing in production keeps in
+   * sync yet. Transitional — remove once SEED-009 Story 3 keeps bindings current automatically, and
+   * never call this from a production/user-facing path.
+   */
+  public NotebookGitBinding resnapshotForTestability(Notebook notebook, Instant snapshotTime) {
+    BundleWriteResult written = buildBundle(notebook, snapshotTime);
+
+    NotebookGitBinding binding =
+        notebookGitBindingRepository
+            .findByNotebook_Id(notebook.getId())
+            .orElseGet(
+                () -> {
+                  NotebookGitBinding created = new NotebookGitBinding();
+                  created.setNotebook(notebook);
+                  return created;
+                });
+    applyBundle(binding, written, snapshotTime);
+    return notebookGitBindingRepository.save(binding);
+  }
+
+  private BundleWriteResult buildBundle(Notebook notebook, Instant commitTime) {
+    List<PortableTreeEntry> entries = buildPortableTreeEntries(notebook);
     try (Repository gitRepository =
         NotebookGitBundleBuilder.build(
-            entries,
-            SYSTEM_AUTHOR_NAME,
-            SYSTEM_AUTHOR_EMAIL,
-            CUTOVER_COMMIT_MESSAGE,
-            cutoverTime)) {
-      BundleWriteResult written = NotebookGitBundleWriter.write(gitRepository);
-
-      NotebookGitBinding binding = new NotebookGitBinding();
-      binding.setNotebook(notebook);
-      binding.setAcceptedGitObjectId(written.headObjectId());
-      binding.setBundleBytes(written.bundleBytes());
-      Timestamp cutoverTimestamp = Timestamp.from(cutoverTime);
-      binding.setCreatedAt(cutoverTimestamp);
-      binding.setUpdatedAt(cutoverTimestamp);
-      return notebookGitBindingRepository.save(binding);
+            entries, SYSTEM_AUTHOR_NAME, SYSTEM_AUTHOR_EMAIL, CUTOVER_COMMIT_MESSAGE, commitTime)) {
+      return NotebookGitBundleWriter.write(gitRepository);
     }
+  }
+
+  private void applyBundle(NotebookGitBinding binding, BundleWriteResult written, Instant time) {
+    binding.setAcceptedGitObjectId(written.headObjectId());
+    binding.setBundleBytes(written.bundleBytes());
+    Timestamp timestamp = Timestamp.from(time);
+    if (binding.getCreatedAt() == null) {
+      binding.setCreatedAt(timestamp);
+    }
+    binding.setUpdatedAt(timestamp);
   }
 
   private List<PortableTreeEntry> buildPortableTreeEntries(Notebook notebook) {

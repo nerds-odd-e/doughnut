@@ -3,6 +3,7 @@ package com.odde.donut.services.notebookGit;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.not;
 
 import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Notebook;
@@ -100,6 +101,69 @@ class NotebookGitCutoverServiceTest {
           commitCount++;
         }
         assertThat(commitCount, equalTo(1));
+      }
+    }
+  }
+
+  @Test
+  void resnapshotForTestabilityReplacesTheExistingBindingWithTheNotebooksCurrentContent()
+      throws Exception {
+    Notebook notebook = makeMe.aNotebook().please();
+    makeMe.entityPersister.flush();
+    NotebookGitBinding initialBinding =
+        notebookGitCutoverService.createBindingForNotebook(
+            notebook, Instant.parse("2026-09-01T00:00:00Z"));
+    Integer initialBindingId = initialBinding.getId();
+    String initialGitObjectId = initialBinding.getAcceptedGitObjectId();
+
+    notebook.setReadmeContent("# Notebook readme");
+    Folder folder =
+        makeMe
+            .aFolder()
+            .notebook(notebook)
+            .name("Recipes")
+            .readmeContent("# Recipes readme")
+            .please();
+    makeMe.aNote("Pasta").folder(folder).content("Boil water").please();
+    makeMe.entityPersister.flush();
+
+    Instant snapshotTime = Instant.parse("2026-09-04T10:15:30Z");
+    notebookGitCutoverService.resnapshotForTestability(notebook, snapshotTime);
+    makeMe.entityPersister.flushAndClear();
+
+    NotebookGitBinding binding =
+        notebookGitBindingRepository.findByNotebook_Id(notebook.getId()).orElseThrow();
+    assertThat(binding.getId(), equalTo(initialBindingId));
+    assertThat(binding.getAcceptedGitObjectId(), not(equalTo(initialGitObjectId)));
+
+    List<PortableTreeEntry> expectedEntries =
+        PortableTreeSnapshot.build(
+            "# Notebook readme",
+            List.of(new ExportFolderRow(folder.getId(), null, "Recipes", "# Recipes readme")),
+            List.of(new ExportNoteRow(folder.getId(), "Pasta", "Boil water")));
+
+    try (InMemoryRepository readBack = new InMemoryRepository(new DfsRepositoryDescription())) {
+      ObjectId headObjectId = GitBundleTestReader.fetchHead(readBack, binding.getBundleBytes());
+      assertThat(headObjectId.getName(), equalTo(binding.getAcceptedGitObjectId()));
+
+      try (RevWalk revWalk = new RevWalk(readBack)) {
+        RevCommit commit = revWalk.parseCommit(headObjectId);
+
+        List<PortableTreeEntry> foundEntries = new ArrayList<>();
+        try (TreeWalk treeWalk = new TreeWalk(readBack)) {
+          treeWalk.addTree(commit.getTree());
+          treeWalk.setRecursive(true);
+          while (treeWalk.next()) {
+            ObjectId blobId = treeWalk.getObjectId(0);
+            ObjectLoader loader = readBack.open(blobId);
+            String content = new String(loader.getBytes(), StandardCharsets.UTF_8);
+            foundEntries.add(new PortableTreeEntry(treeWalk.getPathString(), content));
+          }
+        }
+
+        List<PortableTreeEntry> sortedExpected =
+            expectedEntries.stream().sorted((a, b) -> a.path().compareTo(b.path())).toList();
+        assertThat(foundEntries, contains(sortedExpected.toArray(new PortableTreeEntry[0])));
       }
     }
   }

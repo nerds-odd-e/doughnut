@@ -53,6 +53,10 @@ Use this for endpoint lookup; open `sdk.gen.ts` or `types.gen.ts` only for exact
 - `resetDBAndTestabilitySettings`: POST `/api/testability/clean_db_and_reset_testability_settings` -> `ResetDbAndTestabilitySettingsResponse` (request: none; response body: string)
 - `githubIssues`: GET `/api/testability/github_issues` -> `GithubIssuesResponse` (request: none; response body: Array<Record<string, unknown>>)
 
+## Notebook Git Testability Controller
+
+- `resnapshotNotebookGitBindingForTestability`: POST `/api/testability/resnapshot_notebook_git_binding_for_testability` -> `ResnapshotNotebookGitBindingForTestabilityResponse` (request: `ResnapshotNotebookGitBindingForTestabilityData`; body: ResnapshotNotebookGitBindingRequest; response body: string)
+
 ## Subscription Controller
 
 - `updateSubscription`: POST `/api/subscriptions/{subscription}` -> `UpdateSubscriptionResponse` (request: `UpdateSubscriptionData`; path: subscription; body: SubscriptionDto; response body: Subscription)

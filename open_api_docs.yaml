@@ -219,6 +219,24 @@ paths:
             '*/*':
               schema:
                 type: string
+  /api/testability/resnapshot_notebook_git_binding_for_testability:
+    post:
+      tags:
+      - notebook-git-testability-controller
+      operationId: resnapshotNotebookGitBindingForTestability
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ResnapshotNotebookGitBindingRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: string
   /api/testability/replace_service_url:
     post:
       tags:
@@ -3520,6 +3538,13 @@ components:
         travel_to:
           type: string
     ShareToBazaarRequest:
+      type: object
+      properties:
+        notebookName:
+          type: string
+      required:
+      - notebookName
+    ResnapshotNotebookGitBindingRequest:
       type: object
       properties:
         notebookName:

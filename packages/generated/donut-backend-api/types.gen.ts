@@ -109,6 +109,10 @@ export type ShareToBazaarRequest = {
     notebookName: string;
 };
 
+export type ResnapshotNotebookGitBindingRequest = {
+    notebookName: string;
+};
+
 export type Randomization = {
     choose?: 'first' | 'last' | 'seed';
     seed?: number;
@@ -1520,6 +1524,22 @@ export type ShareToBazaarResponses = {
 };
 
 export type ShareToBazaarResponse = ShareToBazaarResponses[keyof ShareToBazaarResponses];
+
+export type ResnapshotNotebookGitBindingForTestabilityData = {
+    body: ResnapshotNotebookGitBindingRequest;
+    path?: never;
+    query?: never;
+    url: '/api/testability/resnapshot_notebook_git_binding_for_testability';
+};
+
+export type ResnapshotNotebookGitBindingForTestabilityResponses = {
+    /**
+     * OK
+     */
+    200: string;
+};
+
+export type ResnapshotNotebookGitBindingForTestabilityResponse = ResnapshotNotebookGitBindingForTestabilityResponses[keyof ResnapshotNotebookGitBindingForTestabilityResponses];
 
 export type ReplaceServiceUrlData = {
     body: {
