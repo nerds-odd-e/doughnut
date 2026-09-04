@@ -70,42 +70,79 @@ repository for success and filesystem-safety cases.
 
 ## Ordered slices
 
-### 1. Canonical Portable trees can be committed and stored as Git
+### 1. Canonical Portable-tree snapshot is extracted from notebook export
 Type: Structure
 Status: planned
-Proof: Existing notebook ZIP/export tests remain green; focused repository-codec tests inspect a generated bundle with JGit and find `refs/heads/main`, one parentless commit, and exactly the same ordered Portable paths and bytes as the export projection.
+Proof: Existing `NotebookExportService`/ZIP export tests remain green; a focused test builds the new snapshot for a fixture notebook and asserts its ordered folder/note entries and bytes exactly match what `NotebookZipBuilder` currently writes.
 
-Internal change: Extract one reusable canonical Portable-tree snapshot from `NotebookExportService` / `notebookExport` instead of teaching Git a second folder/note renderer. Add the JGit dependency and a cohesive notebook-Git package that can create/read a bundle with an explicit `main` and root commit. Add the next Flyway schema migration and persistence boundary for one unique notebook binding containing its accepted head and Git bundle bytes. This changes no user-visible behavior and immediately enables Slice 2's automatic cutover.
+Internal change: Extract one reusable in-memory canonical Portable-tree snapshot (ordered folder/note records with paths and content) out of `NotebookZipBuilder`'s combined traversal/`ZipOutputStream`-writing pass, so the ZIP builder consumes the snapshot instead of computing structure inline. This changes no user-visible behavior and gives Slice 2 a structure to build a Git commit from instead of re-deriving traversal itself.
 
 Execution notes:
 
-- Preserve ADR-0004 filename/content rules and existing ZIP output by making ZIP
-  and Git consume the same snapshot representation.
-- Keep Donut identity out of paths and blobs. The notebook ID is only the
-  server-side binding key.
-- Store Git objects/history in the bundle and store the accepted Git object ID
-  separately for compare-and-set use by later stories; do not introduce a
-  parallel revision number or tree digest.
-- Regenerate `docs/database-erd.md` after the schema migration.
+- Reuse `ExportFolderRow`/`ExportNoteRow` (or an equivalent ordered snapshot
+  type) as the shared representation; do not introduce a second parallel
+  folder/note model.
+- Preserve ADR-0004 filename/content rules and byte-identical ZIP output.
 
-### 2. Fleet cutover bootstraps every existing notebook once
+### 2. A canonical snapshot can be committed into a Git bundle
+Type: Structure
+Status: planned
+Proof: A focused repository-codec test takes a canonical snapshot (Slice 1) and calls the new bundle-building function; inspecting the result with JGit finds `refs/heads/main`, exactly one parentless commit, and the same ordered Portable paths and bytes as the snapshot.
+
+Internal change: Add the JGit dependency and one cohesive notebook-Git package with a pure function that turns a canonical Portable-tree snapshot into an in-memory Git repository/bundle with an explicit `main` branch and root commit, taking author/message/commit-time as parameters. No persistence yet — this proves snapshot-to-bundle construction only and immediately enables Slice 3 to persist the result.
+
+Execution notes:
+
+- Keep Donut identity out of paths and blobs; the notebook ID stays a
+  caller-supplied concern, not embedded in the tree.
+- Parameterizing author/message/time lets Slice 4's system identity and
+  Slice 6's request-timestamp identity both reuse this function without
+  duplicating bundle-construction logic.
+
+### 3. A notebook's accepted Git bundle can be persisted and re-read
+Type: Structure
+Status: planned
+Proof: A focused persistence test builds a bundle (Slice 2), persists it as one notebook's binding (accepted head + bundle bytes), reloads it by notebook ID, and confirms the same head and bytes come back; the unique-notebook constraint rejects a second binding for the same notebook.
+
+Internal change: Add the next Flyway migration (`V300000319__...`) and a persistence boundary/entity for one unique notebook-to-Git-binding row containing its accepted Git object ID and bundle bytes. This changes no user-visible behavior and immediately enables Slice 4's cutover to create and store the first binding per notebook.
+
+Execution notes:
+
+- Store only the accepted Git object ID for compare-and-set use by later
+  stories; do not add a parallel revision number or tree digest.
+- Regenerate `docs/database-erd.md` after the migration.
+
+### 4. Cutover creates one Git binding for a single existing notebook
 Type: Behavior
 Status: planned
-Proof: A focused backend migration/backfill test starts with multiple pre-cutover notebooks, runs the cutover, and inspects each persisted bundle: one `main`, one root commit, exact canonical tree, no earlier commits. Re-running the idempotent backfill creates no second binding or commit. `CURSOR_DEV=true nix develop -c pnpm backend:verify` proves the real migration chain.
+Proof: A focused backend backfill test starts with one pre-cutover notebook, runs the per-notebook cutover step against it, and inspects the persisted binding (Slice 3): one `main`, one root commit, exact canonical tree (Slices 1-2), no earlier commits.
 
-Behavior: Given notebooks that predate Git backing, when the one fleet migration runs while the application is unavailable for writes, every live compatible notebook receives one persisted dedicated repository whose root commit captures its canonical tree at cutover; no owner opts in, no acquisition triggers persistence, and no earlier history is fabricated.
+Behavior: Given one notebook that predates Git backing, when the cutover backfill step processes it, the notebook receives a persisted Git binding whose root commit captures its canonical tree at cutover; no owner opts in and no earlier history is fabricated.
 
 Execution notes:
 
-- Use the migration timestamp as commit time and a stable Donut system identity
-  and message; commit IDs need to remain stable after creation, not match across
-  separate databases.
-- Fail the migration loudly if a notebook cannot produce a valid ADR-0004 tree;
-  do not mark a partial binding accepted.
-- Keep the root commit and binding insert in one per-notebook transaction, with
-  the unique notebook key making retry safe.
+- Use the migration timestamp as commit time and a stable Donut system
+  identity and message.
+- Fail loudly if the notebook cannot produce a valid ADR-0004 tree; do not
+  mark a partial binding accepted.
+- This slice may implement the per-notebook step as a plain, directly tested
+  function; wiring it into the real Flyway migration chain is Slice 5.
 
-### 3. Notebooks created after cutover start with their root commit
+### 5. Fleet cutover backfills every notebook exactly once, safely
+Type: Behavior
+Status: planned
+Proof: A focused backend migration/backfill test starts with multiple pre-cutover notebooks, runs the fleet cutover, and confirms every live compatible notebook has exactly one binding with no duplicate or second commit; re-running the idempotent backfill creates no second binding. `CURSOR_DEV=true nix develop -c pnpm backend:verify` proves the real migration chain.
+
+Behavior: Given the fleet cutover runs once while the application is unavailable for writes, when it processes every existing notebook via the per-notebook step from Slice 4, each notebook ends up with exactly one accepted binding, retrying the migration creates no second binding or commit, and no owner opts in or acquisition-triggers persistence.
+
+Execution notes:
+
+- Keep the root commit and binding insert in one per-notebook transaction,
+  with the unique notebook key (Slice 3) making retry safe.
+- Commit IDs need to remain stable after creation, not match across separate
+  databases.
+
+### 6. Notebooks created after cutover start with their root commit
 Type: Behavior
 Status: planned
 Proof: Existing personal- and circle-notebook controller creation tests inspect the persisted Git binding after the public create call and find one empty-tree root commit on `main`; a MakeMe-owned notebook fixture can opt into the same invariant without bypassing the production service.
@@ -119,7 +156,7 @@ Execution notes:
 - Use the existing request timestamp for the root commit and the empty Portable
   tree; later accepted web content commits are outside this story.
 
-### 4. An owner can obtain the accepted Git bundle without changing Donut
+### 7. An owner can obtain the accepted Git bundle without changing Donut
 Type: Behavior
 Status: planned
 Proof: `NotebookController` tests call the binary endpoint as the owner, inspect the returned bundle and accepted `main`, and verify the notebook/tree/head are unchanged; a different user and a read-only subscriber are denied. Regenerated OpenAPI/client artifacts contain the endpoint.
@@ -136,7 +173,7 @@ Execution notes:
 - Regenerate the TypeScript API client after the controller signature change,
   even if the CLI uses its authenticated binary-fetch helper for the response.
 
-### 5. CLI acquisition stages changes outside the destination
+### 8. CLI acquisition stages changes outside the destination
 Type: Structure
 Status: planned
 Proof: Existing `run` and backend-client tests remain green; focused tests of the new private acquisition boundary use a temporary directory to show binary download and Git subprocess failures clean only command-owned staging and never touch an existing requested destination.
@@ -152,27 +189,44 @@ Execution notes:
 - Do not add a Donut file to the checkout. Minimal future binding information
   may use local Git config (`donut.notebook-id` and API origin), never tracked
   files.
+- No binary-download helper exists yet in `donutBackendClient.ts`; the closest
+  analog is `commands/update.ts`'s one-off `fetch`/`arrayBuffer` download. Add
+  a reusable download helper here rather than duplicating that pattern.
 
-### 6. The CLI clones an existing notebook for ordinary local tools
+### 9. CLI clone produces a clean local Git checkout of an existing notebook
 Type: Behavior
 Status: planned
-Proof: CLI `run(args)` tests mock only the external Donut HTTP call and use real Git to assert the resulting repository. The active CLI E2E scenario in the Outside-in proof runs the bundled CLI against the real backend and verifies the complete filesystem, commit, copy, authorization, and no-remote-mutation outcome. Keep the scenario `@wip` until this slice makes the whole path green.
+Proof: CLI `run(args)` tests mock only the external Donut HTTP call (via Slice 8's download primitive) and use real Git to assert the resulting checkout: `main` branch, exactly one root commit, same canonical tree as the source notebook.
 
-Behavior: Given a configured owner access token, Git, an automatically backed existing notebook, and a nonexistent destination, when the owner runs `donut notebook clone <notebook-id> <destination>`, the CLI materializes the accepted bundle as a clean `main` checkout with exactly one root commit, removes any temporary bundle origin, records only untracked local Git-config binding data, and reports that the files can be opened in ordinary local tools while publishing to Donut is not yet available.
+Behavior: Given a configured owner access token, Git, an automatically backed existing notebook, and a nonexistent destination, when the owner runs `donut notebook clone <notebook-id> <destination>`, the CLI downloads the accepted bundle (Slice 7's endpoint), checks it out at the destination as a clean `main` branch with exactly one root commit, and removes the temporary bundle origin.
 
 Execution notes:
 
-- Extend the existing non-interactive routing rather than entering Ink for this
-  command; malformed/missing arguments use the existing CLI error style.
-- Keep `main` checked out and leave no bogus origin pointing at the deleted
-  temporary bundle. Direct standard-Git remote configuration is later scope.
-- Add the E2E page-object/task support beside the existing CLI execution
-  helpers; step definitions remain thin.
+- Extend the existing non-interactive routing (`nonInteractiveCli.ts`) rather
+  than entering Ink for this command.
+- Reuse Slice 8's download/subprocess/staging primitives; this slice is the
+  wiring, not new transport or Git mechanics.
+- Malformed/missing arguments use the existing CLI error style; destination-
+  exists and other failure cases belong to Slice 11.
 
-### 7. Failed acquisition leaves local and remote state intact
+### 10. CLI clone records local binding, explains the publish limitation, and the full E2E goes green
 Type: Behavior
 Status: planned
-Proof: CLI `run(args)` tests cover an existing destination, missing Git, denied/failed download, and invalid bundle. Each case reports one actionable error, preserves any pre-existing destination sentinel, removes command-owned staging, and performs no remote mutation; the successful behavior from Slice 6 remains green.
+Proof: CLI `run(args)` tests extend Slice 9's checkout to assert the recorded local Git-config binding and printed message. The active CLI E2E scenario in the Outside-in proof runs the bundled CLI against the real backend and verifies the complete filesystem, commit, copy, authorization, and no-remote-mutation outcome; the scenario drops `@wip` once this slice is green.
+
+Behavior: Given the clean checkout produced by Slice 9, when the clone command finishes, the CLI additionally records only untracked local Git-config binding data (`donut.notebook-id` and API origin — no tracked Donut file in the checkout) and reports that the files can be opened in ordinary local tools while publishing to Donut is not yet available; the bundled CLI E2E scenario passes end to end.
+
+Execution notes:
+
+- Add the E2E page-object/task support beside the existing CLI execution
+  helpers; step definitions remain thin.
+- Keep the outside-in scenario `@wip` through Slice 9; remove `@wip` only once
+  this slice's proof passes.
+
+### 11. Failed acquisition leaves local and remote state intact
+Type: Behavior
+Status: planned
+Proof: CLI `run(args)` tests cover an existing destination, missing Git, denied/failed download, and invalid bundle. Each case reports one actionable error, preserves any pre-existing destination sentinel, removes command-owned staging, and performs no remote mutation; the successful behavior from Slices 9 and 10 remains green.
 
 Behavior: Given acquisition cannot safely complete, when the owner invokes the clone command, the CLI fails before installing a destination, preserves all pre-existing local files, cleans only its own temporary data, and leaves the accepted remote notebook/head unchanged.
 
@@ -214,19 +268,29 @@ Behavior: Given acquisition cannot safely complete, when the owner invokes the c
   creation seam. Existing tests and MakeMe often persist notebooks directly,
   so fixtures that exercise Git behavior must establish the new binding
   explicitly rather than hiding product gaps.
+- `NotebookZipBuilder` computes folder/note traversal and writes
+  `ZipOutputStream` entries in the same recursive pass; there is no existing
+  intermediate tree model to reuse as-is, so Slice 1 introduces one.
+- The latest Flyway migration is `V300000318__...`, so the new migration in
+  Slice 3 is `V300000319__...`.
+- No binary-download helper exists in the CLI yet; `commands/update.ts` has a
+  one-off `fetch`/`arrayBuffer` download used only for self-update. Slice 8
+  adds a reusable helper rather than copying that one-off.
 
-## Refinement assessment
+## Refinement history
 
-**Refinement recommended before execution: Slices 1, 2, and 6.**
+Slices 1, 2, and 6 were each split for low sizing confidence and multiple
+proof loops (`slice-plan-refinement`, confirmed against the actual
+`NotebookExportService`/`NotebookZipBuilder`, migration directory, controller,
+`NotebookService`, and CLI `run`/backend-client code):
 
-- Slice 1 crosses canonical rendering, JGit bundle construction, and durable
-  schema/storage before the first green external result.
-- Slice 2's application-aware Flyway cutover path and retry/atomicity proof are
-  low-confidence until the exact migration test seam is exercised.
-- Slice 6 combines argument routing, binary transport, real Git checkout, local
-  binding, user copy, and a bundled-CLI/backend E2E proof; it will likely need
-  several separable beats before the full scenario is green.
+- Former Slice 1 (canonical tree + JGit bundle + persistence) → Slices 1-3:
+  extract snapshot, build bundle from snapshot, persist bundle.
+- Former Slice 2 (fleet cutover + idempotency/retry) → Slices 4-5: single-
+  notebook cutover step, then fleet-wide idempotent/atomic backfill.
+- Former Slice 6 (routing + transport + checkout + local binding + E2E) →
+  Slices 9-10: clean checkout first, then local binding/messaging plus the
+  full E2E going green.
 
-The other slices have one cohesive proof loop and can be planned directly. Run
-`slice-plan-refinement` on this PLAN before execution; do not create a second
-plan.
+Every remaining slice now has one Behavior/Structure gate and one proof loop.
+Execution can resume directly from Slice 1.
