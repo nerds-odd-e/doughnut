@@ -156,6 +156,15 @@ class ClozeDescriptionTest {
   }
 
   @Test
+  void clozeShouldKeepMarkdownBoldAroundMaskedTitle() {
+    assertThat(
+        new ClozedString(clozeReplacement, "**moon**")
+            .hide(new NoteTitle("moon"))
+            .maskedContentAsMarkdown(),
+        is("**[...]**"));
+  }
+
+  @Test
   void clozeShouldNotTreatWikiPathSlashesAsPronunciation() {
     assertThat(
         new ClozedString(clozeReplacement, "[[漢字/全/全く]]")

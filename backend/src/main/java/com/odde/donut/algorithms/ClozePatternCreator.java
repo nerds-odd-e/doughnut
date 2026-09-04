@@ -29,13 +29,13 @@ public class ClozePatternCreator {
             .toArray(String[]::new);
     if (words.length == 0) return "";
     String between = "([\\s-]+)((and\\s+)|(the\\s+)|(a\\s+)|(an\\s+))?";
-    StringBuilder sb = new StringBuilder("(?:[_*])?");
+    StringBuilder sb = new StringBuilder();
     for (int i = 0; i < words.length; i++) {
       if (i > 0) sb.append(between);
       String word = words[i];
       if (i == words.length - 1) {
-        sb.append(withOptionalEnglishInflection(word)).append("(?:[_*])?");
-        if (!isCjkOnly(word)) sb.append("(?!\\w)");
+        sb.append(withOptionalEnglishInflection(word));
+        if (!isCjkOnly(word)) sb.append("(?!\\p{Alnum})");
       } else {
         sb.append(Pattern.quote(word));
       }
