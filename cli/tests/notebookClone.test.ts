@@ -68,6 +68,8 @@ describe('notebook clone (CLI routing, real Git checkout)', () => {
       runGit(['config', '--local', 'donut.api-origin'], destinationPath)
     ).toBe(getApiConfig().apiBaseUrl)
 
+    expect(runGit(['remote'], destinationPath)).toBe('')
+
     expect(ctx.getLogSpy()).toHaveBeenCalledWith(
       expect.stringContaining('publishing is not available')
     )

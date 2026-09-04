@@ -70,7 +70,7 @@ function cloneBundleWithSystemGit(bundleFile: string, targetDir: string): void {
  * and API origin this checkout came from, so a future publish command can find its way back.
  */
 function recordLocalNotebookBinding(
-  destinationPath: string,
+  checkoutDir: string,
   notebookId: number,
   apiBaseUrl: string
 ): void {
@@ -80,11 +80,23 @@ function recordLocalNotebookBinding(
   ]
   for (const [key, value] of bindings) {
     runSystemGitOrThrow(
-      ['-C', destinationPath, 'config', '--local', key, value],
+      ['-C', checkoutDir, 'config', '--local', key, value],
       (detail, status) =>
         `failed to record local Git config ${key}${detail ? `: ${detail}` : ` (exit code ${status})`}`
     )
   }
+}
+
+/**
+ * Removes the `origin` remote that `git clone <bundle-file> <target>` points at the (deleted)
+ * temporary local bundle file, so a finished checkout has no dangling remote.
+ */
+function removeOriginRemote(checkoutDir: string): void {
+  runSystemGitOrThrow(
+    ['-C', checkoutDir, 'remote', 'remove', 'origin'],
+    (detail, status) =>
+      `failed to remove origin remote${detail ? `: ${detail}` : ` (exit code ${status})`}`
+  )
 }
 
 /** Atomically installs a staged checkout at `destinationPath`, which must not already exist. */
@@ -112,10 +124,11 @@ function moveCheckoutIntoDestination(
 /**
  * Downloads the notebook's accepted Git bundle and produces a clean local checkout at
  * `destinationPath`, with a local-only (untracked) Git config binding
- * ({@link recordLocalNotebookBinding}) recording the source notebook id and API origin. All
- * download/clone work happens in command-owned temporary staging; `destinationPath` is only
- * ever touched by the final atomic move, and only once staging fully succeeds. Staging is
- * always removed afterward, success or failure.
+ * ({@link recordLocalNotebookBinding}) recording the source notebook id and API origin, and
+ * with the bundle-pointing `origin` remote removed ({@link removeOriginRemote}). Both happen
+ * while the checkout is still in command-owned temporary staging, before the final atomic move;
+ * `destinationPath` is only ever touched by that move, and only once staging fully succeeds.
+ * Staging is always removed afterward, success or failure.
  */
 export async function acquireNotebookGitCheckout(
   notebookId: number,
@@ -138,8 +151,9 @@ export async function acquireNotebookGitCheckout(
     const checkoutDir = path.join(stagingDir, 'checkout')
     cloneBundleWithSystemGit(bundleFile, checkoutDir)
 
+    recordLocalNotebookBinding(checkoutDir, notebookId, apiBaseUrl)
+    removeOriginRemote(checkoutDir)
     moveCheckoutIntoDestination(checkoutDir, destinationPath)
-    recordLocalNotebookBinding(destinationPath, notebookId, apiBaseUrl)
   } finally {
     fs.rmSync(stagingDir, { recursive: true, force: true })
   }

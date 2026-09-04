@@ -152,14 +152,15 @@ describe('acquireNotebookGitCheckout', () => {
           Promise.resolve(new TextEncoder().encode('bundle-bytes').buffer),
       })
     )
+    let checkoutDir = ''
     vi.mocked(childProcess.spawnSync).mockImplementation(((
       _cmd: string,
       args?: readonly string[]
     ) => {
       if (args?.[0] === 'clone') {
-        const targetDir = args[3] as string
-        fs.mkdirSync(targetDir, { recursive: true })
-        fs.writeFileSync(join(targetDir, 'README.md'), '# notebook')
+        checkoutDir = args[3] as string
+        fs.mkdirSync(checkoutDir, { recursive: true })
+        fs.writeFileSync(join(checkoutDir, 'README.md'), '# notebook')
       }
       return { stdout: '', stderr: '', status: 0, error: undefined }
     }) as typeof childProcess.spawnSync)
@@ -173,19 +174,17 @@ describe('acquireNotebookGitCheckout', () => {
     const { apiBaseUrl } = getApiConfig()
     expect(childProcess.spawnSync).toHaveBeenCalledWith(
       'git',
-      ['-C', destinationPath, 'config', '--local', 'donut.notebook-id', '6'],
+      ['-C', checkoutDir, 'config', '--local', 'donut.notebook-id', '6'],
       { encoding: 'utf8' }
     )
     expect(childProcess.spawnSync).toHaveBeenCalledWith(
       'git',
-      [
-        '-C',
-        destinationPath,
-        'config',
-        '--local',
-        'donut.api-origin',
-        apiBaseUrl,
-      ],
+      ['-C', checkoutDir, 'config', '--local', 'donut.api-origin', apiBaseUrl],
+      { encoding: 'utf8' }
+    )
+    expect(childProcess.spawnSync).toHaveBeenCalledWith(
+      'git',
+      ['-C', checkoutDir, 'remote', 'remove', 'origin'],
       { encoding: 'utf8' }
     )
   })
@@ -220,6 +219,8 @@ describe('acquireNotebookGitCheckout', () => {
     await expect(
       acquireNotebookGitCheckout(9, destinationPath)
     ).rejects.toThrow(/failed to record local Git config/)
+
+    expect(fs.existsSync(destinationPath)).toBe(false)
   })
 
   test('falls back to copy+remove when rename fails with EXDEV (cross-device destination)', async () => {
