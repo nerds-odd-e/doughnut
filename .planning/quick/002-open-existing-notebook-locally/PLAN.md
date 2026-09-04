@@ -86,7 +86,7 @@ Execution notes:
 
 ### 2. A canonical snapshot can be committed into a Git bundle
 Type: Structure
-Status: planned
+Status: done
 Proof: A focused repository-codec test takes a canonical snapshot (Slice 1) and calls the new bundle-building function; inspecting the result with JGit finds `refs/heads/main`, exactly one parentless commit, and the same ordered Portable paths and bytes as the snapshot.
 
 Internal change: Add the JGit dependency and one cohesive notebook-Git package with a pure function that turns a canonical Portable-tree snapshot into an in-memory Git repository/bundle with an explicit `main` branch and root commit, taking author/message/commit-time as parameters. No persistence yet — this proves snapshot-to-bundle construction only and immediately enables Slice 3 to persist the result.
@@ -282,6 +282,14 @@ Behavior: Given acquisition cannot safely complete, when the owner invokes the c
   holding the final relative path and exact file bytes. Slice 2's bundle-building
   function should consume `PortableTreeSnapshot`/`PortableTreeEntry` directly
   rather than re-deriving structure from `ExportFolderRow`/`ExportNoteRow`.
+- Slice 2 added JGit as `org.eclipse.jgit:org.eclipse.jgit:7.7.1.202607240634-r`
+  in `backend/build.gradle` and landed the bundle-building function as
+  `com.odde.donut.services.notebookGit.NotebookGitBundleBuilder.build(List<PortableTreeEntry>
+  entries, String authorName, String authorEmail, String message, Instant
+  commitTime)`, returning an in-memory JGit `Repository` (via `InMemoryRepository`)
+  with one parentless commit on `refs/heads/main`. Slice 3's persistence and
+  Slices 4/6's cutover/creation callers should call this function directly
+  rather than duplicating bundle construction.
 
 ## Refinement history
 
