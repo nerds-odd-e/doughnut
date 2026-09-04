@@ -558,6 +558,28 @@ Behavior: Given acquisition cannot safely complete, when the owner invokes the c
   supplied at CLI-testability-notebook-creation time, if such a path exists,
   or otherwise a narrower canonical-tree check).
   Until resolved, `cli_notebook_clone.feature` keeps its `@wip` tag.
+- **Separately found and fixed (outside slice execution, developer-requested
+  "run and fix cli unit test" after a CI failure):** `NotebookGitBundleWriter`
+  (`backend/src/main/java/com/odde/donut/services/notebookGit/`) never
+  advertised a `HEAD` ref in the bundles it writes — only
+  `refs/heads/main`. A system `git clone` of such a bundle names the checked-
+  out branch after the *cloning machine's own* `init.defaultBranch` config,
+  not `main`, whenever the bundle carries no HEAD (confirmed by direct
+  repro: `git bundle create` without `HEAD` clones as `master` under
+  `-c init.defaultBranch=master`, `main` once `HEAD` is included). This was a
+  real production bug affecting every real acquisition, not just a CI
+  artifact — it slipped through prior backend tests because
+  `GitBundleTestReader.fetchHead`/JGit resolve `refs/heads/main` directly and
+  never depend on HEAD the way system git's clone does. Fixed by including
+  `Constants.HEAD` in the bundle writer's `BundleWriter`, with regression
+  coverage added in both `GitBundleTestReader.fetchAdvertisedHead` (asserts
+  the bundle advertises HEAD) and a new CLI test that forces a different
+  `init.defaultBranch` via `GIT_CONFIG_*` env vars and confirms the clone
+  still lands on `main`. Verified the new backend assertion actually catches
+  the regression (fails without the fix, passes with it) before committing.
+  This also unblocks part of the Slice 12 E2E gap above: once the fixture-
+  ordering decision is resolved, a real Slice-11 bundle download will now
+  correctly check out `main` regardless of the CI machine's git defaults.
 
 ## Refinement history
 
