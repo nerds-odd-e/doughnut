@@ -30,12 +30,15 @@ The synchronization requirements are:
    entity when that identity conclusion is sound, so non-portable data remains
    attached to the correct entity.
 
-The local usability constraint is equally important: synchronization must not
-require a Donut client, a `.donut` directory, a manifest, a local database,
-extended attributes, or any other Donut-specific state beside the Portable
-notebook tree. A standard Git client managing that tree must be sufficient.
-Ordinary Git repository metadata and commit history are allowed because Git,
-not a Donut-specific client, owns them.
+The local usability constraint is equally important: the working tree must not
+require a `.donut` directory, a manifest, a local database, extended attributes,
+or any other Donut-specific state beside the Portable notebook tree. Standard
+Git manages local commits, history, rebases, and conflicts. V1 may require the
+Donut CLI to acquire and synchronize the repository; direct `git clone`,
+`git fetch`, and `git push` against Donut are a later capability. Ordinary Git
+repository metadata and minimal binding/authentication data in Git
+configuration or the normal credential store are allowed because none of that
+state belongs to the Portable tree.
 
 There is an information limit. Git commits contain snapshots, not durable file
 identities or rename operations. After an ID-free file disappears at one path
@@ -56,10 +59,11 @@ the whole repository; Donut projects only the configured notebook directory.
 
 The accepted commit at the notebook binding's Git ref is authoritative for the
 accepted Portable notebook tree. Git object IDs are the revision identifiers;
-the commit graph is the retained content history; fetch and push are the
-transport; and Git rebase is the v1 accumulated-change integration mechanism.
-Donut exposes a standard Git remote. A Donut CLI may later offer convenience,
-but it must never be required for synchronization correctness.
+the commit graph is the retained content history; Git object and ref exchange
+is the transport model; and Git rebase is the v1 accumulated-change integration
+mechanism. V1 may use the Donut CLI to mediate repository acquisition and
+synchronization. Direct standard-Git remote access is a later transport surface;
+adding it must not introduce a second revision, history, or merge model.
 
 Donut does not create a parallel notebook revision number, tree digest
 protocol, sync envelope, delta format, or custom three-way merge protocol.
@@ -106,6 +110,19 @@ subdirectory into an independent Git repository. Serving an arbitrary subtree
 as if it had independent commit IDs would require filtered or synthetic
 history and is a separate adapter, not part of this decision.
 
+### Bootstrap every notebook at cutover
+
+One fleet migration creates the dedicated Git repository and accepted `main`
+for every existing notebook. Each repository receives exactly one root commit
+whose tree is the notebook's canonical ADR-0004 Portable notebook tree at
+cutover. Donut does not fabricate commits for earlier MySQL history, require
+owner opt-in, or wait for a first local acquisition before persisting the Git
+repository. New notebooks are Git-backed from creation.
+
+After this cutover, the accepted Git `main` is authoritative for Portable
+content. MySQL remains its current application projection and the authority for
+Donut-only identity-bound data.
+
 ### Keep one linear, append-only accepted mainline in v1
 
 The remote accepts only fast-forward updates to `refs/heads/main`. Each
@@ -118,8 +135,9 @@ V1 rejects:
 - creation or update of any other remote branch or tag.
 
 Users may create any local branches they want. To publish accumulated local
-work after remote changes, a client fetches, rebases its unpublished commits
-onto the advertised remote `main`, resolves any Git conflicts, and pushes the
+work after remote changes, the supported synchronization flow obtains the
+advertised remote `main`, rebases unpublished commits onto it with ordinary Git,
+allows the user to resolve ordinary Git conflicts, and proposes the
 fast-forward result. Only unpublished commits are rebased. Donut never rebases
 or amends an already accepted and advertised commit.
 
@@ -185,10 +203,12 @@ using ordinary Git history:
 - split multiple moves into smaller commits until each correspondence is
   unambiguous.
 
-The user can rewrite these unpublished commits with standard Git tools and push
-again. No Donut-specific metadata, commit trailer, filesystem watcher, or CLI
-command is required. This makes commit boundaries meaningful for private
-identity while keeping the Portable tree ID-free.
+The user can rewrite these unpublished commits with standard Git tools and
+synchronize again. No Donut-specific metadata, commit trailer, or filesystem
+watcher is required. V1 may require the Donut CLI for transport, but the CLI
+does not own the working tree or replace Git history. This makes commit
+boundaries meaningful for private identity while keeping the Portable tree
+ID-free.
 
 Once a move is accepted, Donut updates the existing Note or Folder entity.
 Identity-bound learning data stays attached. When a delete-and-create is
@@ -221,8 +241,9 @@ client.
 
 ### Retain Git history without adding a history UI in v1
 
-The remote retains objects reachable from accepted `main` because ordinary
-clone, fetch, rebase, conflict resolution, and audit depend on that history.
+The remote retains objects reachable from accepted `main` because local
+acquisition, synchronization, rebase, conflict resolution, and audit depend on
+that history.
 V1 does not need a Donut UI for checking out an old revision, a remote-history
 browser, or a Donut revert endpoint. A user may inspect or check out history in
 a local Git client. A future Donut revert operation must create a new forward
@@ -249,8 +270,9 @@ Detailed implementation slices and their delivery order belong in
 
 - Git is a required product boundary for two-way Portable notebook
   synchronization, not merely an optional storage implementation.
-- A local repository managed by any standard Git client can synchronize with
-  Donut without a Donut-specific local agent.
+- A local repository is managed with standard Git. V1 synchronization may be
+  mediated by the Donut CLI without adding Donut metadata to the Portable tree;
+  direct standard-Git remote access can be added later over the same history.
 - Accepted portable content has one authority: the accepted Git tree. MySQL
   supplies the transactional current projection and private Donut identity.
 - Local conflicts are resolved with rebase and ordinary Git tools. The remote
@@ -271,8 +293,9 @@ Detailed implementation slices and their delivery order belong in
 
 - Uses a mature standard for snapshots, history, common ancestors, transport,
   rebasing, conflict presentation, integrity, and local tooling.
-- Removes the proposed custom revision service, sync envelope, Donut client,
-  and custom merge protocol.
+- Removes the proposed custom revision service, sync envelope, local database,
+  and custom merge protocol. A v1 CLI transport remains thin over Git objects,
+  refs, and rebase.
 - Keeps the local Portable notebook tree clean and usable by ordinary Markdown
   and OKF tools.
 - Gives users and developers one revision and conflict model to understand.
@@ -283,8 +306,9 @@ Detailed implementation slices and their delivery order belong in
 
 ## Cons
 
-- Donut must host or integrate a Git remote and make accepted ref updates
-  consistent with the MySQL projection.
+- Donut must persist Git repositories, provide the v1 CLI transport, and make
+  accepted ref updates consistent with the MySQL projection. A standard Git
+  remote remains later scope.
 - Git's snapshot model does not eliminate Donut's private identity ambiguity.
 - The linear v1 policy excludes remote branches, tags, merge commits, and force
   pushes.
@@ -312,8 +336,9 @@ Detailed implementation slices and their delivery order belong in
 
 A linear notebook revision, local sync envelope, custom tree transport, and
 three-way merge could satisfy the functional requirements. It would duplicate
-Git concepts and would require Donut-specific local state or a Donut client,
-contradicting the local usability constraint. Not selected.
+Git concepts and require Donut-specific local state or make a Donut client own
+the working tree and merge model. A thin v1 CLI that transports Git objects and
+refs does neither. The bespoke protocol is not selected.
 
 ### Make one notebook equal one repository permanently
 
