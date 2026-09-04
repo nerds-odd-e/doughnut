@@ -17,6 +17,7 @@ import com.odde.donut.controllers.dto.NotebooksViewedByUser;
 import com.odde.donut.controllers.dto.UpdateNotebookGroupRequest;
 import com.odde.donut.entities.*;
 import com.odde.donut.entities.repositories.FolderRepository;
+import com.odde.donut.entities.repositories.NotebookGitBindingRepository;
 import com.odde.donut.entities.repositories.NotebookGroupRepository;
 import com.odde.donut.entities.repositories.NotebookRepository;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
@@ -72,6 +73,7 @@ class NotebookController {
   private final FolderConstructionService folderConstructionService;
   private final FolderRelocationService folderRelocationService;
   private final NotebookExportService notebookExportService;
+  private final NotebookGitBindingRepository notebookGitBindingRepository;
 
   public NotebookController(
       EntityPersister entityPersister,
@@ -90,7 +92,8 @@ class NotebookController {
       WikidataService wikidataService,
       FolderConstructionService folderConstructionService,
       FolderRelocationService folderRelocationService,
-      NotebookExportService notebookExportService) {
+      NotebookExportService notebookExportService,
+      NotebookGitBindingRepository notebookGitBindingRepository) {
     this.entityPersister = entityPersister;
     this.testabilitySettings = testabilitySettings;
     this.notebookIndexingService = notebookIndexingService;
@@ -108,6 +111,7 @@ class NotebookController {
     this.folderConstructionService = folderConstructionService;
     this.folderRelocationService = folderRelocationService;
     this.notebookExportService = notebookExportService;
+    this.notebookGitBindingRepository = notebookGitBindingRepository;
   }
 
   @GetMapping("")
@@ -445,6 +449,29 @@ class NotebookController {
         .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"")
         .contentType(MediaType.valueOf("application/zip"))
         .body(zipBytes);
+  }
+
+  @Operation(
+      operationId = "downloadNotebookGitBundle",
+      summary = "Download the notebook's accepted Git bundle")
+  @GetMapping(value = "/{notebook}/git-bundle", produces = "application/x-git-bundle")
+  @Transactional(readOnly = true)
+  public ResponseEntity<byte[]> downloadNotebookGitBundle(
+      @PathVariable("notebook") @Schema(type = "integer") Notebook notebook)
+      throws UnexpectedNoAccessRightException {
+    authorizationService.assertAuthorization(notebook);
+    NotebookGitBinding binding =
+        notebookGitBindingRepository
+            .findByNotebook_Id(notebook.getId())
+            .orElseThrow(
+                () ->
+                    new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Notebook has no Git binding."));
+    String filename = "notebook-" + notebook.getId() + ".bundle";
+    return ResponseEntity.ok()
+        .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"")
+        .contentType(MediaType.valueOf("application/x-git-bundle"))
+        .body(binding.getBundleBytes());
   }
 
   private Notebook resolveDestinationNotebookForFolderMove(FolderMoveRequest request)

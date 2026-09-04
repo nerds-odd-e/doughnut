@@ -117,6 +117,7 @@ Use this for endpoint lookup; open `sdk.gen.ts` or `types.gen.ts` only for exact
 - `renameFolder`: PATCH `/api/notebooks/{notebook}/folders/{folder}` -> `RenameFolderResponse` (request: `RenameFolderData`; path: notebook, folder; body: FolderRenameRequest; response body: Folder)
 - `updateFolderReadmeContent`: PATCH `/api/notebooks/{notebook}/folders/{folder}/readme-content` -> `UpdateFolderReadmeContentResponse` (request: `UpdateFolderReadmeContentData`; path: notebook, folder; body: NoteUpdateContentDto; response body: FolderRealm)
 - `myNotebooks`: GET `/api/notebooks` -> `MyNotebooksResponse` (request: none; response body: NotebooksViewedByUser)
+- `downloadNotebookGitBundle`: GET `/api/notebooks/{notebook}/git-bundle` -> `DownloadNotebookGitBundleResponse` (request: `DownloadNotebookGitBundleData`; path: notebook; response body: string)
 - `listNotebookFolderIndex`: GET `/api/notebooks/{notebook}/folders/index` -> `ListNotebookFolderIndexResponse` (request: `ListNotebookFolderIndexData`; path: notebook; response body: Array<Folder>)
 - `listNotebookFolderListing`: GET `/api/notebooks/{notebook}/folder-listing` -> `ListNotebookFolderListingResponse` (request: `ListNotebookFolderListingData`; path: notebook; query: parent; response body: FolderListing)
 - `exportNotebook`: GET `/api/notebooks/{notebook}/export` -> `ExportNotebookResponse` (request: `ExportNotebookData`; path: notebook; response body: string)

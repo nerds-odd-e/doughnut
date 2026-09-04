@@ -158,7 +158,7 @@ Execution notes:
 
 ### 7. An owner can obtain the accepted Git bundle without changing Donut
 Type: Behavior
-Status: planned
+Status: done
 Proof: `NotebookController` tests call the binary endpoint as the owner, inspect the returned bundle and accepted `main`, and verify the notebook/tree/head are unchanged; a different user and a read-only subscriber are denied. Regenerated OpenAPI/client artifacts contain the endpoint.
 
 Behavior: Given an automatically Git-backed notebook and its owner, when the owner requests the notebook's acquisition bundle, Donut returns the persisted accepted Git repository artifact with an attachment filename and does not create a commit or mutate Portable content; callers without full notebook authority receive the existing authorization failure.
@@ -344,6 +344,18 @@ Behavior: Given acquisition cannot safely complete, when the owner invokes the c
   test helper `com.odde.donut.testability.GitBundleTestReader.fetchHead(...)`
   now backs every test that opens a persisted bundle's `refs/heads/main` head
   via JGit — reuse it instead of re-deriving that inspection.
+- Slice 7 added `GET /api/notebooks/{notebook}/git-bundle`
+  (`NotebookController.downloadNotebookGitBundle`), owner-only via
+  `authorizationService.assertAuthorization(notebook)` (not
+  `assertReadAuthorization` — a read-only subscriber is denied here even
+  though it passes the export endpoint's check). Media type
+  `application/x-git-bundle`, filename `notebook-{id}.bundle`, body is the
+  persisted `NotebookGitBinding.bundleBytes` fetched via
+  `NotebookGitBindingRepository.findByNotebook_Id`, 404 via
+  `ResponseStatusException` if absent; never builds a new commit. TypeScript
+  API client regenerated (`downloadNotebookGitBundle` in
+  `packages/generated/donut-backend-api/api-summary.md`). CLI slices should
+  use this endpoint via the CLI's authenticated binary-fetch helper (Slice 8).
 
 ## Refinement history
 

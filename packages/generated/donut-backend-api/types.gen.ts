@@ -3543,6 +3543,24 @@ export type MyNotebooksResponses = {
 
 export type MyNotebooksResponse = MyNotebooksResponses[keyof MyNotebooksResponses];
 
+export type DownloadNotebookGitBundleData = {
+    body?: never;
+    path: {
+        notebook: number;
+    };
+    query?: never;
+    url: '/api/notebooks/{notebook}/git-bundle';
+};
+
+export type DownloadNotebookGitBundleResponses = {
+    /**
+     * OK
+     */
+    200: string;
+};
+
+export type DownloadNotebookGitBundleResponse = DownloadNotebookGitBundleResponses[keyof DownloadNotebookGitBundleResponses];
+
 export type ListNotebookFolderIndexData = {
     body?: never;
     path: {
