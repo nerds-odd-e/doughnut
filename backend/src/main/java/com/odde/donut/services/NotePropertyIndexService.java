@@ -1,5 +1,6 @@
 package com.odde.donut.services;
 
+import com.odde.donut.algorithms.AuthoredNoteReference;
 import com.odde.donut.algorithms.CanonicalDonutOrigin;
 import com.odde.donut.algorithms.NoteContentMarkdown;
 import com.odde.donut.algorithms.NotePropertyIndexPlanner;
@@ -15,6 +16,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -70,6 +72,48 @@ public class NotePropertyIndexService {
                       persistRowsForPropertyKey(
                           indexOwner, propertyKey, plannedRows, bySourceLocalKey));
             });
+  }
+
+  public List<AuthoredNoteReference> authoredReferencesForProperty(
+      Note note, String propertyKey, List<NotePropertyIndex> indexRows) {
+    List<String> plannedSourceLocalKeys = plannedSourceLocalKeys(note, propertyKey);
+    if (plannedSourceLocalKeys.isEmpty()) {
+      return List.of();
+    }
+
+    Map<String, AuthoredNoteReference> indexedReferences = new HashMap<>();
+    for (NotePropertyIndex indexRow : indexRows) {
+      if (indexRow.getAuthoredNoteReference() != null) {
+        AuthoredNoteReference reference = indexRow.getAuthoredNoteReference().toDomainReference();
+        indexedReferences.putIfAbsent(reference.sourceLocalKey(), reference);
+      }
+    }
+    if (indexedReferences.keySet().containsAll(plannedSourceLocalKeys)) {
+      return plannedSourceLocalKeys.stream().map(indexedReferences::get).toList();
+    }
+
+    Map<String, AuthoredNoteReferenceRow> authoredRows = ownRowsBySourceLocalKey(note.getId());
+    return plannedSourceLocalKeys.stream()
+        .map(authoredRows::get)
+        .filter(Objects::nonNull)
+        .map(AuthoredNoteReferenceRow::toDomainReference)
+        .toList();
+  }
+
+  private List<String> plannedSourceLocalKeys(Note note, String propertyKey) {
+    return NoteContentMarkdown.splitLeadingFrontmatter(
+            note.getContent() == null ? "" : note.getContent())
+        .map(
+            leadingFrontmatter ->
+                NotePropertyIndexPlanner.plannedRows(
+                        leadingFrontmatter.frontmatter(), canonicalDonutOrigin)
+                    .stream()
+                    .filter(planned -> planned.propertyKey().equals(propertyKey))
+                    .map(NotePropertyIndexPlanner.PlannedRow::sourceLocalKey)
+                    .filter(Objects::nonNull)
+                    .distinct()
+                    .toList())
+        .orElseGet(List::of);
   }
 
   private Map<String, AuthoredNoteReferenceRow> ownRowsBySourceLocalKey(Integer noteId) {

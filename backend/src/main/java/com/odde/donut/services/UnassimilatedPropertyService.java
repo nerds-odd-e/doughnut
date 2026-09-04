@@ -2,7 +2,6 @@ package com.odde.donut.services;
 
 import com.odde.donut.algorithms.NoteReferenceResolution;
 import com.odde.donut.algorithms.PropertyKeyNaming;
-import com.odde.donut.entities.AuthoredNoteReferenceRow;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.NotePropertyIndex;
 import com.odde.donut.entities.Subscription;
@@ -19,14 +18,17 @@ public class UnassimilatedPropertyService {
   private final NotePropertyIndexRepository notePropertyIndexRepository;
   private final MemoryTrackerRepository memoryTrackerRepository;
   private final WikiLinkResolver wikiLinkResolver;
+  private final NotePropertyIndexService notePropertyIndexService;
 
   public UnassimilatedPropertyService(
       NotePropertyIndexRepository notePropertyIndexRepository,
       MemoryTrackerRepository memoryTrackerRepository,
-      WikiLinkResolver wikiLinkResolver) {
+      WikiLinkResolver wikiLinkResolver,
+      NotePropertyIndexService notePropertyIndexService) {
     this.notePropertyIndexRepository = notePropertyIndexRepository;
     this.memoryTrackerRepository = memoryTrackerRepository;
     this.wikiLinkResolver = wikiLinkResolver;
+    this.notePropertyIndexService = notePropertyIndexService;
   }
 
   public int countUnassimilatedPropertiesForUser(User user) {
@@ -84,13 +86,11 @@ public class UnassimilatedPropertyService {
     List<NotePropertyIndex> siblings =
         notePropertyIndexRepository.findByNote_IdAndPropertyKey(
             unit.note().getId(), unit.propertyKey());
-    for (NotePropertyIndex sibling : siblings) {
-      AuthoredNoteReferenceRow referenceRow = sibling.getAuthoredNoteReference();
-      if (referenceRow == null) {
-        continue;
-      }
+    for (var reference :
+        notePropertyIndexService.authoredReferencesForProperty(
+            unit.note(), unit.propertyKey(), siblings)) {
       NoteReferenceResolution resolution =
-          wikiLinkResolver.resolveReference(referenceRow.toDomainReference(), unit.note(), viewer);
+          wikiLinkResolver.resolveReference(reference, unit.note(), viewer);
       if (resolution instanceof NoteReferenceResolution.Resolved resolved
           && !isHandled(resolved.destinationNote(), viewer)) {
         return true;

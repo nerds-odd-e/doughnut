@@ -11,12 +11,14 @@ import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.Subscription;
+import com.odde.donut.entities.repositories.NotePropertyIndexRepository;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 class AssimilationServicePropertyReferenceGateTest extends AssimilationServiceTestBase {
   @Autowired NotePropertyIndexService notePropertyIndexService;
+  @Autowired NotePropertyIndexRepository notePropertyIndexRepository;
   @Autowired UnassimilatedPropertyService unassimilatedPropertyService;
 
   private Note carrierWithExampleOf(Note sibling, String content) {
@@ -66,7 +68,7 @@ class AssimilationServicePropertyReferenceGateTest extends AssimilationServiceTe
   }
 
   @Test
-  void gates_suffixed_note_url_property_while_target_note_is_still_pending() {
+  void gates_suffixed_note_url_property_when_existing_index_row_predates_url_support() {
     Notebook notebook = makeMe.aNotebook().creatorAndOwner(user).please();
     Note carrier = makeMe.aNote().notebook(notebook).please();
     Note assimilatedTarget = makeMe.aNote().title("Example").notebook(notebook).please();
@@ -83,6 +85,12 @@ class AssimilationServicePropertyReferenceGateTest extends AssimilationServiceTe
             + ")\"\n"
             + "---\n\nbody");
     notePropertyIndexService.refreshForNote(carrier);
+    var staleRow =
+        notePropertyIndexRepository
+            .findByNote_IdAndPropertyKey(carrier.getId(), "example of 2")
+            .getFirst();
+    staleRow.setAuthoredNoteReference(null);
+    makeMe.entityPersister.flush();
     makeMe.aMemoryTrackerFor(carrier).assimilatedAt(day1).please();
     makeMe.aMemoryTrackerFor(carrier).propertyKey("example of").assimilatedAt(day1).please();
 
