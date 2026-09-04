@@ -231,24 +231,46 @@ Execution notes:
 - Malformed/missing arguments use the existing CLI error style; destination-
   exists and other failure cases belong to Slice 12.
 
-### 11. CLI clone records local binding, explains the publish limitation, and the full E2E goes green
-Type: Behavior
+### 11. CLI E2E scaffolding for notebook clone exists, tagged `@wip`
+Type: Structure
 Status: planned
-Proof: CLI `run(args)` tests extend Slice 10's checkout to assert the recorded local Git-config binding and printed message. The active CLI E2E scenario in the Outside-in proof runs the bundled CLI against the real backend and verifies the complete filesystem, commit, copy, authorization, and no-remote-mutation outcome; the scenario drops `@wip` once this slice is green.
+Proof: A new feature file (e.g. `e2e_test/features/cli/cli_notebook_clone.feature`), tagged `@wip`, contains a scenario following the Outside-in proof steps (seed an owned existing notebook, run the bundled CLI clone command, inspect the resulting checkout with real `git`, assert canonical tree/absence of Donut metadata, assert the publish-unavailable message, assert the remote notebook is unchanged). Matching step definitions exist (in `e2e_test/step_definitions/cli.ts` or a new sibling file) delegating as one-line glue to new page-object/task support under `e2e_test/start/pageObjects/cli/`, following the existing domain-object shape (`cli.installation()`, `cli.backend()`, etc. in `e2e_test/start/pageObjects/cli/index.ts`). Because the scenario is `@wip`, it is excluded from CI (`e2e_test/config/ci.ts`'s `not @wip` tag filter) and is not required to pass yet; the proof is that the scenario, steps, and page objects exist, are wired together, and Cypress can collect/parse the spec without error.
 
-Behavior: Given the clean checkout produced by Slice 10, when the clone command finishes, the CLI additionally records only untracked local Git-config binding data (`donut.notebook-id` and API origin — no tracked Donut file in the checkout) and reports that the files can be opened in ordinary local tools while publishing to Donut is not yet available; the bundled CLI E2E scenario passes end to end.
+Internal change: Add the CLI-clone E2E scaffolding (feature scenario + step definitions + page-object/task glue) beside the existing CLI execution helpers (`e2e_test/start/pageObjects/cli/execution.ts`, `backend.ts`, `outputAssertions.ts`), reusing `cli.installation()`'s installed-binary pattern (`cy.task('runInstalledCli', ...)`) rather than inventing a second CLI-invocation mechanism. This adds no passing behavior yet — it only gives Slice 12 a concrete scenario to turn green.
 
 Execution notes:
 
-- Add the E2E page-object/task support beside the existing CLI execution
-  helpers; step definitions remain thin.
-- Keep the outside-in scenario `@wip` through Slice 10; remove `@wip` only once
-  this slice's proof passes.
+- Reuse existing notebook-seeding/testability step definitions for "an owner
+  has an existing notebook with notebook/folder Readmes and notes in nested
+  folders" rather than inventing new fixture machinery; check
+  `e2e_test/step_definitions/` and `e2e_test/start/testabilityTimeTravel.ts`
+  for the closest existing analog.
+- Reuse the existing "I have a valid Donut Access Token" step
+  (`cli_access_token.feature`) for obtaining the owner's CLI access token
+  rather than adding a second token-acquisition path.
+- Keep step definitions thin (one-line glue); behavior and assertions belong
+  in the new page objects, matching this file's existing convention.
+- The scenario stays `@wip` and unexecuted-by-CI through this slice; Slice 12
+  is the only slice allowed to remove `@wip`.
 
-### 12. Failed acquisition leaves local and remote state intact
+### 12. CLI clone records local binding, explains the publish limitation, and the full E2E goes green
 Type: Behavior
 Status: planned
-Proof: CLI `run(args)` tests cover an existing destination, missing Git, denied/failed download, and invalid bundle. Each case reports one actionable error, preserves any pre-existing destination sentinel, removes command-owned staging, and performs no remote mutation; the successful behavior from Slices 10 and 11 remains green.
+Proof: CLI `run(args)` tests extend Slice 10's checkout to assert the recorded local Git-config binding and printed message. Slice 11's `@wip` E2E scenario now runs the bundled CLI against the real backend and verifies the complete filesystem, commit, copy, authorization, and no-remote-mutation outcome; the scenario drops `@wip` once green.
+
+Behavior: Given the clean checkout produced by Slice 10 and the E2E scaffolding from Slice 11, when the clone command finishes, the CLI additionally records only untracked local Git-config binding data (`donut.notebook-id` and API origin — no tracked Donut file in the checkout) and reports that the files can be opened in ordinary local tools while publishing to Donut is not yet available; the bundled CLI E2E scenario passes end to end.
+
+Execution notes:
+
+- Implement only the local-binding + message Behavior here; Slice 11 already
+  supplied the scaffolding this slice's proof runs against.
+- Remove `@wip` from Slice 11's scenario only once it is green under this
+  slice's change.
+
+### 13. Failed acquisition leaves local and remote state intact
+Type: Behavior
+Status: planned
+Proof: CLI `run(args)` tests cover an existing destination, missing Git, denied/failed download, and invalid bundle. Each case reports one actionable error, preserves any pre-existing destination sentinel, removes command-owned staging, and performs no remote mutation; the successful behavior from Slices 10-12 remains green.
 
 Behavior: Given acquisition cannot safely complete, when the owner invokes the clone command, the CLI fails before installing a destination, preserves all pre-existing local files, cleans only its own temporary data, and leaves the accepted remote notebook/head unchanged.
 
@@ -481,5 +503,21 @@ that review inserted Slice 9 (a Structure fix for a cross-device-move bug and
 a minor duplication found in Slice 8's result — see Learnings above) ahead of
 the original Slice 9, renumbering it and the two slices after it to 10-12.
 
+- Former Slice 11 (CLI clone records local binding + explains publish
+  limitation + full E2E goes green) → Slices 11-12 (`slice-plan-refinement`,
+  2026-09-04, during execution before implementation started): the
+  coordinator found, ahead of delegating, that no CLI-clone E2E feature file,
+  step definitions, or page-object support exist anywhere in the repo yet
+  (checked `e2e_test/features/cli/*.feature`,
+  `e2e_test/step_definitions/*.ts`, `e2e_test/start/pageObjects/cli/*.ts`), so
+  the original slice bundled net-new E2E scaffolding creation together with
+  the local-binding Behavior — low sizing confidence and two separable
+  concerns. Split into Slice 11 (Structure: add the `@wip`-tagged scenario,
+  step definitions, and page-object/task glue, reusing existing CLI
+  execution/access-token patterns; nothing needs to pass yet) and Slice 12
+  (Behavior: implement local Git-config binding + publish-limitation message,
+  turn Slice 11's scenario green, drop `@wip`). The original Slice 12 (failed
+  acquisition) renumbered to Slice 13.
+
 Every remaining slice now has one Behavior/Structure gate and one proof loop.
-Execution can resume directly from Slice 9.
+Execution can resume directly from Slice 11.
