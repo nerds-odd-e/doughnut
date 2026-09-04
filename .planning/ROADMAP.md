@@ -13,7 +13,8 @@ No active milestone. Start the next one with `/gsd-new-milestone`.
 
 ## Backlog
 
-Parked seeds: SEED-001, SEED-002, SEED-006, SEED-007, SEED-008. Also deferred: ADR 0002 Level 1.
+Parked seeds: SEED-001, SEED-002, SEED-006, SEED-007, SEED-008. Also deferred:
+full Portable notebook tree synchronization proposed in ADR 0002.
 
 ---
-*Last updated: 2026-09-03*
+*Last updated: 2026-09-04*

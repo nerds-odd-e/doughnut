@@ -6,7 +6,7 @@ Donut is a Personal Knowledge Management tool combining zettelkasten-style note 
 
 ## Core Value
 
-Healthy mainline for learning and knowledge work. Approved [ADR 0002](../docs/adrs/0002-git-native-notebooks-backed-by-mysql.md) sets git-native notebooks (MySQL-backed) as the direction for portable content; one-way catalog ZIP export remains.
+Healthy mainline for learning and knowledge work.
 
 ## Current State
 
@@ -18,7 +18,10 @@ Healthy mainline for learning and knowledge work. Approved [ADR 0002](../docs/ad
 
 **Shipped v1.0 (2026-07-23):** Notebook Health lint + Health tab + gated empty-folder purge.
 
-Portable content direction is ADR 0002 (git-native notebooks). Catalog ZIP download remains (`notebook_export.feature`); path-keyed CLI sync / `.doughnut-sync` is not part of the product.
+Portable content format follows Accepted ADR 0004. Two-way synchronization is
+being reconsidered in Proposed
+[ADR 0002](../docs/adrs/0002-revisioned-portable-notebook-synchronization.md);
+catalog ZIP download remains (`notebook_export.feature`).
 
 ## Requirements
 
@@ -46,9 +49,9 @@ Portable content direction is ADR 0002 (git-native notebooks). Catalog ZIP downl
 
 ### Out of Scope
 
-- Reintroducing `.doughnut-sync` / path-keyed CLI sync — superseded by ADR 0002
+- Portable notebook two-way synchronization — deferred pending advice and a
+  human decision on Proposed ADR 0002
 - Spelling follow-ons (MCQ / fuzzy / `Notebook:Title`) — parked as SEED-001
-- ADR 0002 Level 1 (git-native notebooks) — deferred to a later milestone
 - Broad unrelated refactors not required by the current milestone
 - Stacked matched `NoteShow` bodies on accidental-match result — replaced by dialog
 - Content peek in resolve dialog — identity only
@@ -72,7 +75,7 @@ Accepted ADRs under `docs/adrs/`. Planning history for completed milestones is n
 
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
-| ADR 0002 git-native notebooks | Git authoritative for portable content; retire `.doughnut-sync` | ✓ Approved 2026-08-04 |
+| Proposed ADR 0002 portable notebook synchronization | Linear content revisions, external sync envelope, logical identity resolution, and three-way merge | Proposed 2026-09-04; not binding |
 | Keep catalog ZIP only | One-way portability still useful; E2E `notebook_export.feature` | ✓ Retained |
 | Accidental-match resolve via dialog (not stacked notes) | Full-height reviewed note stays primary; resolution is optional and compact | ✓ Shipped v1.2 |
 | Overlap from dialog skips try-again / credit reclaim | Declaring overlap is the action; no secondary retry/credit flow | ✓ Shipped v1.2 |
@@ -87,4 +90,4 @@ Accepted ADRs under `docs/adrs/`. Planning history for completed milestones is n
 This document evolves at phase transitions and milestone boundaries.
 
 ---
-*Last updated: 2026-08-22*
+*Last updated: 2026-09-04*

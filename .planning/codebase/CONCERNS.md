@@ -194,9 +194,12 @@
 
 ## Missing Critical Features
 
-**Obsidian ↔ Donut sync (user stories ahead of implementation):**
-- Problem: Bidirectional Obsidian sync is not a complete CLI product contract (ADR 0002 points at git-native notebooks instead of `.doughnut-sync`).
-- Blocks: Reliable bidirectional Obsidian workflows (dry-run sync, deletion rules, parent property sync).
+**Portable notebook tree sync (proposal ahead of implementation):**
+- Problem: Proposed ADR 0002 now defines revisioned three-way synchronization,
+  identity resolution, and conflict behavior, but the client/server product
+  contract is not implemented.
+- Blocks: Reliable bidirectional local editing workflows (merge preview,
+  deletion rules, identity-preserving rename/move, and conflict resolution).
 
 **Semantic search maturity:**
 - Problem: Embedding maintenance exists, but product search UX/quality may still lag a full vector/relevance design (`docs/tech_stack.md`).

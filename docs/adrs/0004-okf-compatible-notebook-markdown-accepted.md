@@ -10,8 +10,11 @@
 Donut exports and syncs notebooks as a **Portable notebook tree**. That tree
 should follow the
 [Open Knowledge Format (OKF) v0.2](https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/SPEC.md)
-so local copies work with OKF tooling, Obsidian-style editing, and (with
-[ADR 0002](./0002-git-native-notebooks-backed-by-mysql.md)) Git-native sync.
+so local copies work with OKF tooling, Obsidian-style editing, and future
+two-way synchronization. Synchronization, identity, and merge behavior are
+outside this format decision; Proposed
+[ADR 0002](./0002-revisioned-portable-notebook-synchronization.md)
+addresses them.
 
 OKF standardizes a small structural floor (concepts as files, path as ID,
 required `type`). Filename-as-title, wiki-link spelling, and what Donut
@@ -126,8 +129,8 @@ profile. Codec round-trips must be lossless for these rules.
 
 ### Validation
 
-- Durable writes (CLI push, web commit — ADR 0002 acceptance) and lint
-  reject trees that break OKF requirements or this profile
+- Durable tree imports/synchronization writes and lint reject trees that break
+  OKF requirements or this profile
   (missing/invalid `type`, reserved-name misuse of `readme` /
   `readme.md`, unsafe paths, etc.).
 - Missing listing `index.md` is conformant. Concept files named
@@ -139,7 +142,7 @@ profile. Codec round-trips must be lossless for these rules.
 
 - Export, lint, import, and durable write share one codec contract.
 - Title changes are filename changes; identity preservation across
-  renames is ADR 0002 lineage.
+  renames is outside this format decision.
 - Filename is the display name on the **Portable notebook tree**. Author-owned
   `title:` is authored YAML; the codec does not wrap `title:` to compensate for
   a basename that is not the display name. Stored notes use the title column.
@@ -155,7 +158,8 @@ profile. Codec round-trips must be lossless for these rules.
 ## Pros
 
 - Portable, diffable, tool-friendly notebooks.
-- Separates format (this ADR) from Git authority/transport (ADR 0002).
+- Separates format (this ADR) from synchronization, identity, and merge
+  behavior.
 
 ## Cons
 
@@ -168,7 +172,7 @@ profile. Codec round-trips must be lossless for these rules.
 - Links:
   - [ADR 0001 — Ubiquitous language](./0001-ubiquitous-language.md)
     (**Portable notebook tree**, **Portable path**, **Wiki link**, **Property**)
-  - [ADR 0002 — Git-native notebooks](./0002-git-native-notebooks-backed-by-mysql.md)
+  - [ADR 0002 — Portable notebook synchronization](./0002-revisioned-portable-notebook-synchronization.md)
   - [ADR 0005 — Web routes](./0005-web-routes-accepted.md) (compile to `noteShow` / `noteProperty`)
   - [Open Knowledge Format v0.2](https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/SPEC.md)
   - [Obsidian inline titles](https://obsidian.md/help/settings)
