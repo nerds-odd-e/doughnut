@@ -70,7 +70,10 @@ describe('notebook clone (CLI routing, real Git checkout)', () => {
 
   test('clone downloads the accepted bundle and checks it out as a clean single-commit main branch', async () => {
     const bundleFile = join(workDir, 'notebook.bundle')
-    runGit(['bundle', 'create', bundleFile, 'main'], sourceRepoDir)
+    // Include HEAD so the clone checks out "main" regardless of the machine's own
+    // `init.defaultBranch` setting, matching how the real backend bundle is built
+    // (NotebookGitBundleWriter).
+    runGit(['bundle', 'create', bundleFile, 'HEAD', 'main'], sourceRepoDir)
     const bundleBytes = fs.readFileSync(bundleFile)
 
     const fetchMock = vi.fn().mockResolvedValue({
@@ -120,6 +123,46 @@ describe('notebook clone (CLI routing, real Git checkout)', () => {
     expect(logSpy).toHaveBeenCalledWith(
       expect.stringContaining('publishing is not available')
     )
+  })
+
+  test('clone checks out "main" even when the machine defaults to a different branch name', async () => {
+    const bundleFile = join(workDir, 'notebook.bundle')
+    runGit(['bundle', 'create', bundleFile, 'HEAD', 'main'], sourceRepoDir)
+    const bundleBytes = fs.readFileSync(bundleFile)
+
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({
+        ok: true,
+        arrayBuffer: () =>
+          Promise.resolve(
+            bundleBytes.buffer.slice(
+              bundleBytes.byteOffset,
+              bundleBytes.byteOffset + bundleBytes.byteLength
+            )
+          ),
+      })
+    )
+
+    const savedGitConfigCount = process.env.GIT_CONFIG_COUNT
+    const savedGitConfigKey0 = process.env.GIT_CONFIG_KEY_0
+    const savedGitConfigValue0 = process.env.GIT_CONFIG_VALUE_0
+    process.env.GIT_CONFIG_COUNT = '1'
+    process.env.GIT_CONFIG_KEY_0 = 'init.defaultBranch'
+    process.env.GIT_CONFIG_VALUE_0 = 'totally-different-default'
+    try {
+      await run(['notebook', 'clone', '42', destinationPath])
+    } finally {
+      if (savedGitConfigCount === undefined) delete process.env.GIT_CONFIG_COUNT
+      else process.env.GIT_CONFIG_COUNT = savedGitConfigCount
+      if (savedGitConfigKey0 === undefined) delete process.env.GIT_CONFIG_KEY_0
+      else process.env.GIT_CONFIG_KEY_0 = savedGitConfigKey0
+      if (savedGitConfigValue0 === undefined)
+        delete process.env.GIT_CONFIG_VALUE_0
+      else process.env.GIT_CONFIG_VALUE_0 = savedGitConfigValue0
+    }
+
+    expect(runGit(['branch', '--show-current'], destinationPath)).toBe('main')
   })
 
   test('missing destination argument is rejected with the existing CLI error style', async () => {

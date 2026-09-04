@@ -51,6 +51,12 @@ class NotebookGitBundleControllerTest extends NotebookControllerTestBase {
       assertThat(headObjectId.getName(), equalTo(before.getAcceptedGitObjectId()));
     }
 
+    // A system `git clone` of this bundle must check out "main" regardless of the cloning
+    // machine's own `init.defaultBranch`, which only happens if the bundle advertises HEAD.
+    ObjectId advertisedHead = GitBundleTestReader.fetchAdvertisedHead(response.getBody());
+    assertThat(advertisedHead, notNullValue());
+    assertThat(advertisedHead.getName(), equalTo(before.getAcceptedGitObjectId()));
+
     NotebookGitBinding after =
         notebookGitBindingRepository.findByNotebook_Id(notebook.getId()).orElseThrow();
     assertThat(after.getId(), equalTo(before.getId()));

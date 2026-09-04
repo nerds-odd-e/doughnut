@@ -27,6 +27,9 @@ public final class NotebookGitBundleWriter {
 
       BundleWriter bundleWriter = new BundleWriter(repository);
       bundleWriter.include(Constants.R_HEADS + "main", headObjectId);
+      // Without an included HEAD, a system `git clone` of this bundle names the checked-out
+      // branch after the cloning machine's own `init.defaultBranch` (e.g. "master"), not "main".
+      bundleWriter.include(Constants.HEAD, headObjectId);
 
       ByteArrayOutputStream out = new ByteArrayOutputStream();
       bundleWriter.writeBundle(NullProgressMonitor.INSTANCE, out);
