@@ -114,7 +114,7 @@ Execution notes:
 
 ### 4. Cutover creates one Git binding for a single existing notebook
 Type: Behavior
-Status: planned
+Status: done
 Proof: A focused backend backfill test starts with one pre-cutover notebook, runs the per-notebook cutover step against it, and inspects the persisted binding (Slice 3): one `main`, one root commit, exact canonical tree (Slices 1-2), no earlier commits.
 
 Behavior: Given one notebook that predates Git backing, when the cutover backfill step processes it, the notebook receives a persisted Git binding whose root commit captures its canonical tree at cutover; no owner opts in and no earlier history is fabricated.
@@ -301,6 +301,18 @@ Behavior: Given acquisition cannot safely complete, when the owner invokes the c
   extracting bundle bytes/head from a `NotebookGitBundleBuilder.build(...)`
   result. Later cutover/creation slices persist through
   `NotebookGitBindingRepository` using this writer's output.
+- Slice 4 landed the per-notebook step as
+  `com.odde.donut.services.notebookGit.NotebookGitCutoverService.createBindingForNotebook(Notebook,
+  Instant cutoverTime)`, a plain Spring service (no Flyway wiring yet — that
+  is Slice 5's job). It fails loudly (no catch) on any snapshot/bundle
+  failure before persisting, so no partial binding is ever saved. The system
+  identity constants `SYSTEM_AUTHOR_NAME = "Donut System"` and
+  `SYSTEM_AUTHOR_EMAIL = "system@donut.local"` live on this class; Slice 6
+  (post-cutover notebook creation) should reuse them rather than inventing a
+  second identity. Post-change-refactor also extracted shared folder/note
+  fetching into `notebookExport.NotebookExportRows` (used by both
+  `NotebookExportService` and `NotebookGitCutoverService`), so callers no
+  longer duplicate that mapping.
 
 ## Refinement history
 
