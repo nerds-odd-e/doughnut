@@ -35,7 +35,7 @@ from one shared component mapping without duplicating detection logic.
 
 ### 2. Pre-commit validates without mutation
 Type: Behavior
-Status: planned
+Status: done
 Proof: A focused hook test demonstrates that a commit attempt invokes
 `lint:changed`, never invokes formatting, and never stages files.
 

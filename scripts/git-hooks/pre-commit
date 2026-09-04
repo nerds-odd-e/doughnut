@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
 # Git pre-commit hook
-# Runs code formatting before allowing commit
+# Validates the staged changes before allowing commit
 #
 # This hook is installed from scripts/git-hooks/pre-commit to .git/hooks/pre-commit
 # Run: ./scripts/setup-git-hooks.sh to install
@@ -15,13 +15,6 @@ REPO_ROOT="$(git rev-parse --show-toplevel)"
 
 cd "$REPO_ROOT"
 
-# Run formatter for changed subprojects only
-./scripts/run.sh pnpm format:changed
-
-# Stage any files that were modified by the formatter
-# This ensures formatted changes are included in the commit
-git add -u
-
-# If formatting succeeded, allow the commit
-exit 0
-
+# Lint only the components affected by staged changes. The hook intentionally
+# leaves both the working tree and index unchanged.
+exec ./scripts/run.sh pnpm lint:changed

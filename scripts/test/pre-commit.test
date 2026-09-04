@@ -1,0 +1,100 @@
+#!/usr/bin/env bash
+
+DONUT_TEST_REAL_PATH="$PATH"
+DONUT_TEST_REAL_BASH="$(command -v bash)"
+DONUT_TEST_PRE_COMMIT="$(cd "$(dirname "$0")/../git-hooks" && pwd)/pre-commit"
+
+source "$(dirname "$0")/vendor/bach.sh"
+
+run-in-temporary-repository() {
+  local scenario="$1"
+
+  @real env -i \
+    "PATH=${DONUT_TEST_REAL_PATH}" \
+    "DONUT_TEST_PRE_COMMIT=${DONUT_TEST_PRE_COMMIT}" \
+    "DONUT_TEST_SCENARIO=${scenario}" \
+    "${DONUT_TEST_REAL_BASH}" <<'EOF'
+set -euo pipefail
+
+work="$(mktemp -d)"
+trap 'rm -rf "$work"' EXIT
+
+git -C "$work" init -q
+git -C "$work" config user.email test@example.com
+git -C "$work" config user.name "Test User"
+
+mkdir -p "$work/scripts"
+cat >"$work/scripts/run.sh" <<'RUNNER'
+#!/usr/bin/env bash
+printf 'runner %s\n' "$*"
+exit "${DONUT_TEST_LINT_EXIT:-0}"
+RUNNER
+chmod +x "$work/scripts/run.sh"
+
+printf 'original staged\n' >"$work/staged.txt"
+printf 'original unstaged\n' >"$work/unstaged.txt"
+git -C "$work" add .
+git -C "$work" commit -qm initial
+
+printf 'intended change\n' >"$work/staged.txt"
+git -C "$work" add staged.txt
+printf 'unrelated change\n' >"$work/unstaged.txt"
+printf 'untracked change\n' >"$work/untracked.txt"
+
+before_status="$(git -C "$work" status --short)"
+before_cached="$(git -C "$work" diff --cached --binary)"
+before_worktree="$(git -C "$work" diff --binary)"
+
+assert_repository_unchanged() {
+  [[ "$(git -C "$work" status --short)" == "$before_status" ]]
+  [[ "$(git -C "$work" diff --cached --binary)" == "$before_cached" ]]
+  [[ "$(git -C "$work" diff --binary)" == "$before_worktree" ]]
+}
+
+case "$DONUT_TEST_SCENARIO" in
+  success)
+    output="$(cd "$work" && "$DONUT_TEST_PRE_COMMIT")"
+
+    assert_repository_unchanged
+    printf '%s\nrepository unchanged\n' "$output"
+    ;;
+  lint-failure)
+    cp "$DONUT_TEST_PRE_COMMIT" "$work/.git/hooks/pre-commit"
+    chmod +x "$work/.git/hooks/pre-commit"
+    before_head="$(git -C "$work" rev-parse HEAD)"
+
+    set +e
+    output="$(cd "$work" && DONUT_TEST_LINT_EXIT=37 git commit -qm attempted 2>&1)"
+    commit_status=$?
+    set -e
+
+    [[ "$commit_status" -ne 0 ]]
+    [[ "$(git -C "$work" rev-parse HEAD)" == "$before_head" ]]
+    assert_repository_unchanged
+    printf '%s\ncommit blocked\n' "$output"
+    ;;
+  *)
+    printf 'Unknown scenario: %s\n' "$DONUT_TEST_SCENARIO" >&2
+    exit 1
+    ;;
+esac
+EOF
+}
+
+test-success-lints-without-changing-repository-state() {
+  local output
+  output="$(run-in-temporary-repository success)"
+
+  @assert-equals \
+    $'runner pnpm lint:changed\nrepository unchanged' \
+    "$output"
+}
+
+test-lint-failure-blocks-commit-without-changing-pending-work() {
+  local output
+  output="$(run-in-temporary-repository lint-failure)"
+
+  @assert-equals \
+    $'runner pnpm lint:changed\ncommit blocked' \
+    "$output"
+}
