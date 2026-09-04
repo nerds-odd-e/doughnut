@@ -72,6 +72,7 @@ Assume `pnpm sut` is already running. If unsure, check `CURSOR_DEV=true nix deve
 | Formal milestone | `.planning/phases/NN-slug/*-PLAN.md`, STATE, ROADMAP | `/gsd-plan-phase` → `/gsd-execute-phase` → `/gsd-ship` (+ local wrap-up) |
 | Ad-hoc | `.planning/quick/NNN-slug/PLAN.md` | **slice-planning** + **execute-plan** |
 | Optional refinement | Existing phase/quick PLAN; no new artifact | **slice-plan-refinement** |
+| Completed-plan audit | Git history plus optional follow-up PLAN | **execution-retrospective**; never executes the follow-up |
 | Legacy | `ongoing/*.md` | **execute-plan** only; do not migrate |
 
 Story-decomposition seeds are not executable: select one contained story, then
@@ -80,6 +81,9 @@ complex, sizing confidence is low, or execution overruns; straightforward plans
 may execute directly. **Hard decomposition quality:** one evaluable outcome at the
 current resolution; 3V stories; Behavior/Structure execution leaves —
 `problem-decomposition.mdc`. Plan artifact and lifecycle rules: `planning.mdc`.
+Use execution-retrospective after completion when the plan's aggregate diff,
+goal conformance, or execution process needs review; it reconstructs cleaned-up
+plans from Git history and stops after generating any follow-up PLAN.
 Do not write new flat `.planning/<name>.md` when `phases/` or `quick/` fits.
 **Per-slice wrap-up:** Jidoka → post-change-refactor → API generation when
 needed → fresh **format-changed** agent → update plan → commit → push

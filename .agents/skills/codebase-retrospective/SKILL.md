@@ -5,6 +5,7 @@ description: >-
   Reviews your own session to identify codebase friction and either fixes it
   or proposes improvements.
   Triggers on: slow progress, friction, hard to find, confusing, discoverability.
+  Use execution-retrospective instead to audit a completed plan and its commits.
 ---
 
 <objective>
@@ -115,6 +116,8 @@ Then resume the original task.
 
 <out_of_scope>
 - Do not replan the task (use slice-planning for that).
+- Do not reconstruct or audit a completed plan execution (use
+  execution-retrospective).
 - Do not spend more than 1–2 minutes on the retrospective.
 - Do not add documentation that merely repeats clear code.
 </out_of_scope>
