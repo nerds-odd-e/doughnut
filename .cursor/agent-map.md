@@ -46,8 +46,10 @@ Useful focused checks:
 - E2E single feature: `CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/path/to.feature`
 - Log inspection: `CURSOR_DEV=true nix develop -c pnpm logs:tail backend-e2e` (targets: `sut`, `backend-e2e`, `mountebank`)
 - Diff whitespace: `scripts/check_diff_whitespace.sh` or `scripts/check_diff_whitespace.sh --cached`
-- Format changed working-tree components: `./scripts/run.sh pnpm format:changed`
-- Lint changed staged components: `./scripts/run.sh pnpm lint:changed`
+- Coordinator format of changed working-tree components:
+  `./scripts/run.sh pnpm format:changed`
+- Pre-commit hook lint of changed staged components (not a routine standalone
+  wrap-up command): `./scripts/run.sh pnpm lint:changed`
 - Lint all: `CURSOR_DEV=true nix develop -c pnpm lint:all`
 - Format all: `CURSOR_DEV=true nix develop -c pnpm format:all`
 
@@ -85,8 +87,9 @@ Use execution-retrospective after completion when the plan's aggregate diff,
 goal conformance, or execution process needs review; it reconstructs cleaned-up
 plans from Git history and stops after generating any follow-up PLAN.
 Do not write new flat `.planning/<name>.md` when `phases/` or `quick/` fits.
-**Per-slice wrap-up:** Jidoka → post-change-refactor → API generation when
-needed → fresh **format-changed** agent → update plan → commit → push
-(**execute-plan**). The pre-commit hook lints staged components without
-mutation. Skills emit completion markers (e.g. `## REFACTOR COMPLETE`) for
-handoff.
+**Per-slice wrap-up:** Jidoka → fresh post-change-refactor agent → API generation
+when needed → coordinator runs `./scripts/run.sh pnpm format:changed` once →
+update plan without a second routine formatting pass → commit → push
+(**execute-plan**). The pre-commit hook independently lints staged components
+without mutation. `format-changed` remains an on-demand skill; implementers and
+refactorers run neither that command nor standalone `lint:changed`.

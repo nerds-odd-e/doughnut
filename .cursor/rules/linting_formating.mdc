@@ -58,13 +58,18 @@ This runs:
 
 - **Use `./scripts/run.sh pnpm format:changed`** before staging — it selects
   affected components from staged, unstaged, and nonignored untracked paths,
-  then applies their formatter commands. Agent slice wrap-up delegates this to
-  a fresh agent using the **format-changed** skill.
+  then applies their formatter commands. During slice wrap-up, the coordinator
+  runs it once after refactor/API generation and before the PLAN update; it does
+  not pre-filter paths or spawn a formatting agent. Repeat only after an
+  intervening repair invalidates that preparation. The **format-changed** skill
+  remains available for explicit on-demand use.
 - Use `CURSOR_DEV=true nix develop -c pnpm format:all` only when intentionally
   formatting the entire repository.
 - The pre-commit hook runs `pnpm lint:changed` against affected staged
   components. It is check-only: it does not format files or mutate the Git
-  index.
+  index. Implementers and refactorers do not run `format:changed` or standalone
+  `lint:changed`; the coordinator owns formatting and the hook owns the
+  independent lint check.
 - **Use `CURSOR_DEV=true nix develop -c pnpm lint:all`** for CI/CD validation only — it checks without fixing (plus a few script unit tests that format does not run).
 
 ## OpenAPI Linting
