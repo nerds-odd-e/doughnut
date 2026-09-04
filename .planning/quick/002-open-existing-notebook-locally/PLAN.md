@@ -130,7 +130,7 @@ Execution notes:
 
 ### 5. Fleet cutover backfills every notebook exactly once, safely
 Type: Behavior
-Status: planned
+Status: done
 Proof: A focused backend migration/backfill test starts with multiple pre-cutover notebooks, runs the fleet cutover, and confirms every live compatible notebook has exactly one binding with no duplicate or second commit; re-running the idempotent backfill creates no second binding. `CURSOR_DEV=true nix develop -c pnpm backend:verify` proves the real migration chain.
 
 Behavior: Given the fleet cutover runs once while the application is unavailable for writes, when it processes every existing notebook via the per-notebook step from Slice 4, each notebook ends up with exactly one accepted binding, retrying the migration creates no second binding or commit, and no owner opts in or acquisition-triggers persistence.
@@ -313,6 +313,24 @@ Behavior: Given acquisition cannot safely complete, when the owner invokes the c
   fetching into `notebookExport.NotebookExportRows` (used by both
   `NotebookExportService` and `NotebookGitCutoverService`), so callers no
   longer duplicate that mapping.
+- Slice 5 wires the fleet cutover as a **raw-JDBC** Flyway Java migration
+  (`db.migration.V300000320__CutoverExistingNotebooksToGit`, delegating to
+  `com.odde.donut.services.notebookGit.NotebookGitFleetCutoverBackfill.run(Connection,
+  Instant cutoverTime)`), deliberately NOT a Spring-bean JavaMigration: in this
+  app's test profile, Flyway migration runs before the JPA
+  `EntityManagerFactory` is ready, so a migration needing
+  `FolderRepository`/`NoteRepository`/`NotebookGitBindingRepository` risks a
+  bean-initialization ordering hazard. The backfill re-implements the same
+  folder/live-note queries as `NotebookExportRows`/the JPA repositories in raw
+  SQL (comments in the file point back to the exact JPA queries they must stay
+  in sync with), reuses `NotebookGitCutoverService`'s identity constants, and
+  commits one `notebook_git_binding` insert per notebook
+  (`canExecuteInTransaction() == false`, manual per-notebook
+  `connection.commit()`) so a failed/retried migration only reprocesses
+  notebooks still missing a binding. `pnpm backend:verify` proves the real
+  migration chain. Any later slice that needs another Flyway migration to see
+  JPA-managed data should follow this same raw-JDBC precedent rather than
+  Spring-bean JavaMigrations.
 
 ## Refinement history
 
