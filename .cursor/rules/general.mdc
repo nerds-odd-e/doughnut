@@ -14,6 +14,9 @@ alwaysApply: true
 - Keep changes simple. Do not add defensive layers unless observed behavior requires them.
 - Failure handling: ADR 0006 (`docs/adrs/0006-failure-handling-accepted.md`).
 - Unit tests use the "small test" style (stable boundary, data over mocks, focused assertions, concise `makeMe`) — always-applied `unit-testing.mdc`.
+- Problem, story, and execution-leaf splits must pass the gates in
+  `problem-decomposition.mdc`; planning artifacts and lifecycle use
+  `planning.mdc`.
 - Name permanent artifacts by product capability, not development history (never GSD phase numbers).
 - Do not add comments or docs about past implementations in product code, tests, or permanent docs; code readers care about the current state.
 - **`.planning/` exception:** while a plan is **in progress**, keep enough history in the PLAN file (slice status, brief learnings) to **stop and resume** across sessions. When the plan is **fully executed** into code and permanent docs, **actively clean up** spent planning history (see `planning.mdc`).

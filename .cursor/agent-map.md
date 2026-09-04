@@ -66,10 +66,14 @@ Assume `pnpm sut` is already running. If unsure, check `CURSOR_DEV=true nix deve
 
 | Mode | Artifacts | Orchestrator |
 |------|-----------|--------------|
+| Story shaping | `.planning/seeds/SEED-NNN-slug.md` containing ordered candidate stories | **story-decomposition** |
 | Formal milestone | `.planning/phases/NN-slug/*-PLAN.md`, STATE, ROADMAP | `/gsd-plan-phase` → `/gsd-execute-phase` → `/gsd-ship` (+ local wrap-up) |
 | Ad-hoc | `.planning/quick/NNN-slug/PLAN.md` | **slice-planning** + **execute-plan** |
 | Legacy | `ongoing/*.md` | **execute-plan** only; do not migrate |
 
-**Hard slice quality (both modes):** Behavior vs Structure, stop-safe, one observable behavior — `planning.mdc`.
+Story-decomposition seeds are not executable: select one contained story, then
+use slice-planning. **Hard decomposition quality:** one evaluable outcome at the
+current resolution; 3V stories; Behavior/Structure execution leaves —
+`problem-decomposition.mdc`. Plan artifact and lifecycle rules: `planning.mdc`.
 Do not write new flat `.planning/<name>.md` when `phases/` or `quick/` fits.
 **Per-slice wrap-up:** Jidoka → post-change-refactor → update plan → commit → push (**execute-plan**). Skills emit completion markers (e.g. `## REFACTOR COMPLETE`) for handoff.

@@ -31,9 +31,13 @@ waiting on the developer.
 2. `.planning/quick/NNN-slug/PLAN.md` (or `*-PLAN.md`)
 
 Every executable unit (slice, or GSD plan wave that is one slice) must obey
-**Behavior | Structure**, stop-safe, one observable behavior
-(`.cursor/rules/planning.mdc`). If it does not, stop and re-plan with
+**Behavior | Structure**, stop-safe, one observable behavior or its immediately
+enabling Structure
+(`.cursor/rules/problem-decomposition.mdc`). If it does not, stop and re-plan with
 **slice-planning** before implementing.
+
+Reject a story-decomposition seed as execution input. Require a PLAN for one
+selected story or a GSD phase whose tasks already pass the execution-leaf gate.
 
 **Git does not use the Nix prefix.** All other repo tooling does:
 `CURSOR_DEV=true nix develop -c …` unless on Cloud VM (use **cloud-vm-setup**
@@ -79,6 +83,9 @@ developer's brain.
   to the current change, CI breaks on something external, etc.
 - **Ambiguity** — the slice description is unclear and guessing wrong would
   waste a commit.
+- **Stale story decomposition** — evidence changes the selected story's
+  beneficiary, outcome, evaluation, or boundary; or changes whether/when a
+  sibling story should be delivered.
 
 When stopping: explain **what** you learned, **why** you stopped, and **what
 decision** the developer needs. Then wait.
@@ -148,8 +155,9 @@ The implementer prompt **must** include:
    slice text). Do **not** paste this skill or the full Jidoka list.
 2. **Jidoka:** stop and return on value/design forks, missing credentials,
    undiagnosed unrelated failure, or ambiguity. Do not guess those.
-3. **Implementation rules**: `planning.mdc` (Behavior/Structure, TDD, slice
-   discipline, **time budget** ~5 min fuzzy / >10 min hard finer-decompose,
+3. **Implementation rules**: `problem-decomposition.mdc` (Behavior/Structure,
+   stop-safety, **time budget** ~5 min fuzzy / >10 min hard finer-decompose) and
+   `planning.mdc` (proof, TDD, slice discipline,
    **no commit on red**, **do not deliberately break CI** — unfinished E2E
    stays `@wip`; run tests relevant to the change, not the full CI suite),
    `gsd-coexistence.mdc`. **Naming:** capability/domain, never GSD phase number.
@@ -187,8 +195,14 @@ non-`@wip` CI-safe, uncommitted):
    - Brief learnings that change remaining work.
    - Mark slice **done**; prune obsolete detail from that slice.
    - Adjust future slices when warranted.
+   - If the PLAN links a story-decomposition seed, apply the learning escalation
+     in `problem-decomposition.mdc`. Update leaf-only changes in the PLAN. For a
+     stale story decomposition, add an `awaiting story-decomposition review`
+     note naming the seed/story and affected field; do not alter sibling stories.
 5. **Post-slice Jidoka** — if learnings need developer judgment: commit and push
-   work so far, then return a Jidoka stop (do not silently continue).
+   work so far, then return a Jidoka stop (do not silently continue). For stale
+   story decomposition, report the seed/story, evidence, affected field, and
+   required human decision.
 6. **Commit** — only when the tree would not intentionally break CI: no
    non-`@wip` failing tests from this change; unfinished E2E must stay `@wip`.
    Do **not** run the full CI suite as a pre-commit gate — rely on relevant
@@ -211,14 +225,18 @@ A slice is **too big** when:
 - Changes span many unrelated files with no clear single behavior emerging.
 - Tests are not converging after reasonable effort.
 - Wall-clock for the slice (implementation + test runs) exceeds the
-  **time budget** in `planning.mdc`: scrutinize after **~5 min**; after
+  **time budget** in `problem-decomposition.mdc`: scrutinize after **~5 min**; after
   **>10 min**, finer decompose and retry is **required** unless a good reason
   is stated (and reported to the coordinator / developer).
 
 When this happens:
 
-1. `git checkout .` — revert all uncommitted changes.
-2. `git clean -fd` — remove untracked files from the attempt.
+1. Identify the exact tracked and untracked paths created or changed by this
+   attempt. Preserve every pre-existing developer change.
+2. Safely park or revert only attempt-owned WIP. Never use broad
+   `git checkout .`, `git clean -fd`, or another command that can discard
+   unrelated dirty state. If ownership cannot be isolated, stop for developer
+   judgment.
 3. Invoke **slice-planning** to split into Behavior/Structure slices
    sized for the ~5 minute fuzzy goal (including test execution).
 4. Update the PLAN in the GSD phase or quick dir.
@@ -233,6 +251,7 @@ When this happens:
 - Each slice implemented by a fresh sub-agent (coordinator does not accumulate implementation context)
 - Coordinator owns wrap-up: fresh post-change-refactor Task → `## REFACTOR COMPLETE` → plan update → commit → push (format/lint only if that commit fails)
 - Pre- and post-slice Jidoka checks applied
+- Stale story decomposition stops execution after the current safe wrap-up
 - Parallel waves only when touch sets and PLAN writes do not conflict
 - Spent planning history cleaned when entire plan is done
 - Final output includes `## PLAN EXECUTION COMPLETE` when all slices finish
