@@ -1,6 +1,7 @@
 import { exitCliError } from './cliExit.js'
 import { runUpdate } from './commands/update.js'
 import { formatVersionOutput } from './commands/version.js'
+import { acquireNotebookGitCheckout } from './commands/notebook/notebookAcquisition.js'
 
 /**
  * Handles one-shot CLI paths (version, update, help, invalid flags). Returns `false` when the
@@ -26,9 +27,36 @@ export async function completeNonInteractiveCliIfHandled(
     return true
   }
 
+  if (subcommand === 'notebook') {
+    await completeNotebookSubcommand(
+      args.filter((a) => !a.startsWith('-')).slice(1)
+    )
+    return true
+  }
+
   if (subcommand === 'help') {
     exitCliError('not a terminal (use version or update)')
   }
 
   return false
+}
+
+const NOTEBOOK_CLONE_USAGE =
+  'usage: donut notebook clone <notebook-id> <destination>'
+
+async function completeNotebookSubcommand(
+  notebookArgs: string[]
+): Promise<void> {
+  const [action, notebookIdArg, destination] = notebookArgs
+
+  if (action !== 'clone') {
+    exitCliError(NOTEBOOK_CLONE_USAGE)
+  }
+
+  const notebookId = Number(notebookIdArg)
+  if (!(notebookIdArg && Number.isInteger(notebookId) && destination)) {
+    exitCliError(NOTEBOOK_CLONE_USAGE)
+  }
+
+  await acquireNotebookGitCheckout(notebookId, destination)
 }

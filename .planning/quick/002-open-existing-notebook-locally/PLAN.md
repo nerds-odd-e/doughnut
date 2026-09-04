@@ -217,7 +217,7 @@ Execution notes:
 
 ### 10. CLI clone produces a clean local Git checkout of an existing notebook
 Type: Behavior
-Status: planned
+Status: done
 Proof: CLI `run(args)` tests mock only the external Donut HTTP call (via Slice 8/9's download primitive) and use real Git to assert the resulting checkout: `main` branch, exactly one root commit, same canonical tree as the source notebook.
 
 Behavior: Given a configured owner access token, Git, an automatically backed existing notebook, and a nonexistent destination, when the owner runs `donut notebook clone <notebook-id> <destination>`, the CLI downloads the accepted bundle (Slice 7's endpoint), checks it out at the destination as a clean `main` branch with exactly one root commit, and removes the temporary bundle origin.
@@ -444,6 +444,22 @@ Behavior: Given acquisition cannot safely complete, when the owner invokes the c
   shared helpers. Later CLI slices needing exception-message or Node
   errno-code extraction should import `exceptionText`/`errnoCode` from these
   two files rather than reintroducing local copies.
+- Slice 10 wired `donut notebook clone <notebook-id> <destination>` into
+  `cli/src/nonInteractiveCli.ts`'s existing non-interactive routing: a
+  `notebook` subcommand branch strips the leading `notebook` token, validates
+  action `clone`, an integer notebook id, and a destination (else
+  `exitCliError('usage: donut notebook clone <notebook-id> <destination>')`),
+  then calls Slice 8/9's `acquireNotebookGitCheckout` directly as a black box
+  — no changes to `notebookAcquisition.ts` itself. New
+  `cli/tests/notebookClone.test.ts` builds a real source Git repo and a real
+  `git bundle create` fixture, mocks only global `fetch` to return its bytes,
+  runs `run(['notebook','clone', id, destination])`, and asserts against the
+  real destination via `git` subprocess calls (branch, root-commit count,
+  tree SHA match) — this is the pattern later CLI Git-behavior tests should
+  follow rather than mocking `git` itself. Slice 11 (local Git-config binding
+  + publish-limitation message + dropping the E2E `@wip` tag) and Slice 12
+  (destination-exists/missing-Git/download-failure/invalid-bundle error
+  coverage) remain untouched by this slice, as planned.
 
 ## Refinement history
 
