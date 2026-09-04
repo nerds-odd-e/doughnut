@@ -72,7 +72,7 @@ repository for success and filesystem-safety cases.
 
 ### 1. Canonical Portable-tree snapshot is extracted from notebook export
 Type: Structure
-Status: planned
+Status: done
 Proof: Existing `NotebookExportService`/ZIP export tests remain green; a focused test builds the new snapshot for a fixture notebook and asserts its ordered folder/note entries and bytes exactly match what `NotebookZipBuilder` currently writes.
 
 Internal change: Extract one reusable in-memory canonical Portable-tree snapshot (ordered folder/note records with paths and content) out of `NotebookZipBuilder`'s combined traversal/`ZipOutputStream`-writing pass, so the ZIP builder consumes the snapshot instead of computing structure inline. This changes no user-visible behavior and gives Slice 2 a structure to build a Git commit from instead of re-deriving traversal itself.
@@ -276,6 +276,12 @@ Behavior: Given acquisition cannot safely complete, when the owner invokes the c
 - No binary-download helper exists in the CLI yet; `commands/update.ts` has a
   one-off `fetch`/`arrayBuffer` download used only for self-update. Slice 8
   adds a reusable helper rather than copying that one-off.
+- Slice 1 landed the snapshot as `com.odde.donut.services.notebookExport.PortableTreeSnapshot`
+  (`build(notebookReadmeContent, folders, notes)` → ordered
+  `List<PortableTreeEntry>`), with `PortableTreeEntry(String path, String content)`
+  holding the final relative path and exact file bytes. Slice 2's bundle-building
+  function should consume `PortableTreeSnapshot`/`PortableTreeEntry` directly
+  rather than re-deriving structure from `ExportFolderRow`/`ExportNoteRow`.
 
 ## Refinement history
 
