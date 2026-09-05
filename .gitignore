@@ -16,8 +16,6 @@ ongoing/*-profile-results.json
 .svn/
 .bash_profile
 
-.claude/
-
 # cypress
 e2e_test/tsconfig.tsbuildinfo
 e2e_test/reports/
@@ -143,7 +141,8 @@ mb.pid
 *.jsonl
 
 # AI assistants
-.claude/
+.claude/*
+!.claude/settings.json
 .serena/
 frontend/vitest-test-results/
 frontend/.vitest-attachments/

@@ -13,20 +13,29 @@ pushed revision. Only `main` triggers this repository's push CI; do not discover
 nonexistent runs for other branches. Start one observer per repository/SHA, not
 per agent. Reuse an existing observer across repeated pushes of the same SHA.
 
-Run the bundled script in the background through an available **non-model**
-notification bridge:
-
-```sh
-./scripts/run.sh node .agents/skills/execute-plan/scripts/watch-ci.mjs OWNER/REPO FULL_PUSHED_SHA main
-```
-
-The script polls GitHub every 30 seconds, limits each request to 20 seconds,
+The bundled `scripts/watch-ci.mjs` polls GitHub every 30 seconds, limits each request to 20 seconds,
 allows 10 discovery polls and 120 total polls, and tolerates two consecutive
 run-list errors. These are polling budgets, plus request time. It emits at most
 one JSON event and exits; success is silent only after checking earlier rerun
 attempts for failures. It never dispatches, retries a
 workflow, inspects CD, invokes AI, or changes the checkout. Failed-job names are
 included when available; classify the cause from evidence after notification.
+
+Select the **non-model notification bridge for the current host**:
+
+- **Cursor or Claude Code:** read [ci-notify-hosts.md](ci-notify-hosts.md), run
+  its readiness probe, and use its mailbox launcher. Skip the Codex adapter
+  below; the notification handling and repair protocol remain shared.
+- **Codex:** use the yielded-cell adapter below when those tools are exposed.
+  Otherwise use a documented native async hook, as described below.
+
+Polling is token-free; observer setup and responding to an actionable event
+still use model tokens. A notification is delivered at the host's next safe
+boundary, not by forcibly interrupting a running command. If the host's worker
+tool runs in the foreground, act when it returns. Never stash under a live
+writer to simulate immediate preemption.
+
+## Codex notification adapter
 
 In a Codex runtime exposing `functions.exec`, `yield_control`, `notify`,
 `tools.exec_command`, and `tools.write_stdin`, use one yielded JavaScript cell
@@ -78,7 +87,6 @@ coordinator to handle at the next available boundary. Do not repeatedly call
 `wait`, poll from the model, or spend a sub-agent on watching. Never grant a
 watcher broader network or filesystem permissions than normal tools allow.
 
-On another host, use its documented asynchronous command completion mechanism.
 [Codex async command hooks](https://learn.chatgpt.com/docs/hooks#run-hooks-in-the-background)
 are another supported delivery mechanism in compatible versions: their
 informational output reaches the next safe model request, and does not wake an

@@ -31,7 +31,8 @@ Before executing, also read [delegation.md](references/delegation.md),
 [destructive-later-outcome-check.md](references/destructive-later-outcome-check.md),
 and [wrap-up.md](references/wrap-up.md) in full. Read
 [ci-monitor.md](references/ci-monitor.md) for the background observer and
-pause/stash/repair/resume protocol.
+pause/stash/repair/resume protocol, then only its adapter for your host
+(Codex, Cursor, or Claude Code).
 
 **Plan locations:**
 

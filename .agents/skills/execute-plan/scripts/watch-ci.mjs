@@ -5,9 +5,10 @@ import { setTimeout as pause } from 'node:timers/promises'
 
 const execFileAsync = promisify(execFile)
 
-async function github(args) {
+async function github(args, signal) {
   const { stdout } = await execFileAsync('gh', args, {
     timeout: 20_000,
+    signal,
     maxBuffer: 1024 * 1024,
     env: { ...process.env, GH_PROMPT_DISABLED: '1' },
   })
@@ -19,6 +20,7 @@ export async function watchCi({
   repo,
   sha,
   branch,
+  signal,
   gh = github,
   sleep = pause,
   pollMs = 30_000,
@@ -36,31 +38,35 @@ export async function watchCi({
   const priorAttempts = new Map()
 
   for (let poll = 0; poll < maxPolls; poll += 1) {
+    signal?.throwIfAborted()
     let runs
     try {
-      runs = await gh([
-        'run',
-        'list',
-        '--repo',
-        repo,
-        '--workflow',
-        'ci.yml',
-        '--branch',
-        branch,
-        '--commit',
-        sha,
-        '--event',
-        'push',
-        '--limit',
-        '20',
-        '--json',
-        'databaseId,attempt,headSha,headBranch,workflowName,event,status,conclusion,url',
-      ])
+      runs = await gh(
+        [
+          'run',
+          'list',
+          '--repo',
+          repo,
+          '--workflow',
+          'ci.yml',
+          '--branch',
+          branch,
+          '--commit',
+          sha,
+          '--event',
+          'push',
+          '--limit',
+          '20',
+          '--json',
+          'databaseId,attempt,headSha,headBranch,workflowName,event,status,conclusion,url',
+        ],
+        signal
+      )
       errors = 0
     } catch (error) {
       errors += 1
       if (errors === 3) return unavailable(String(error.message).slice(0, 600))
-      await sleep(pollMs)
+      await sleep(pollMs, undefined, { signal })
       continue
     }
 
@@ -79,17 +85,20 @@ export async function watchCi({
         const key = `${run.databaseId}:${attempt}`
         if (!priorAttempts.has(key)) {
           try {
-            const prior = await gh([
-              'run',
-              'view',
-              String(run.databaseId),
-              '--repo',
-              repo,
-              '--attempt',
-              String(attempt),
-              '--json',
-              'status,conclusion',
-            ])
+            const prior = await gh(
+              [
+                'run',
+                'view',
+                String(run.databaseId),
+                '--repo',
+                repo,
+                '--attempt',
+                String(attempt),
+                '--json',
+                'status,conclusion',
+              ],
+              signal
+            )
             priorAttempts.set(key, { ...run, ...prior, attempt })
           } catch (error) {
             historyError = `Could not inspect earlier CI attempts: ${String(error.message).slice(0, 600)}`
@@ -130,17 +139,20 @@ export async function watchCi({
         }))
       }
       try {
-        const { jobs } = await gh([
-          'run',
-          'view',
-          String(failed.databaseId),
-          '--repo',
-          repo,
-          '--attempt',
-          String(failed.attempt),
-          '--json',
-          'jobs',
-        ])
+        const { jobs } = await gh(
+          [
+            'run',
+            'view',
+            String(failed.databaseId),
+            '--repo',
+            repo,
+            '--attempt',
+            String(failed.attempt),
+            '--json',
+            'jobs',
+          ],
+          signal
+        )
         event.failedJobs = jobs
           .filter(
             (job) =>
@@ -177,7 +189,7 @@ export async function watchCi({
         'No matching push CI run appeared within the discovery window.'
       )
     }
-    await sleep(pollMs)
+    await sleep(pollMs, undefined, { signal })
   }
   return unavailable(
     'CI observation window expired; its result is still unknown.'
