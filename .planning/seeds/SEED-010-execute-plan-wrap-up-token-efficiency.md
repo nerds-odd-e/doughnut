@@ -11,6 +11,7 @@ previously_resolved: 2026-09-04
 previous_resolution: implemented as one five-slice execution-contract change; retained as the execution retrospective by developer request
 reopened: 2026-09-05
 reopened_reason: additional process findings from the completed notebook-publication execution; earlier implemented scope remains complete
+selected_followup_completed: 2026-09-05
 ---
 
 # SEED-010: `execute-plan` wrap-up spends tokens on steps that usually find nothing
@@ -163,13 +164,12 @@ These remain retrospective findings and possible responses, not a story queue.
   keeping each repository's tooling and CI policies intact. Distinguish a
   retrospective replay from prospective execution evidence.
 
-## Selected Follow-up and Deferred Responses
+## Completed Follow-up and Deferred Responses
 
-The developer selected planning of the two correctness improvements above in
-[the proof-coverage plan](../quick/008-preserve-promises-through-execution/PLAN.md).
-No recommendation above was rejected. The async ownership case is a conditional
-application of behavioral proof, not a third improvement project. Implementation
-and evaluation remain pending; the original implemented scope stays complete.
+The two correctness improvements selected in quick/008 are implemented and
+evaluated below; its spent PLAN was removed. The async ownership case is a
+conditional application of behavioral proof, not a third improvement project.
+The original implemented scope stays complete; no recommendation was rejected.
 
 Keep the implemented direct formatter, reusable proof, and independent refactor
 pass. Prefer small additions at the existing instruction owners, without new
@@ -182,3 +182,66 @@ transaction change; establish ownership with a small representative proof before
 repeating migration work. The Vitest suite-extraction technique remains optional
 guidance for a future matching case. These are deferred, not execution leaves.
 All CI-related issues are excluded from the selected work and handled separately.
+
+## Proof-coverage execution evidence (2026-09-05)
+
+Retrospective replay: the original clone contract at `f5bb3b6a9d` promised no
+standard remote in both Current decisions and the clean-checkout leaf. The
+successful CLI test at `48d5dda363` observed branch, commit count, and tree only:
+that handoff is incomplete for the remote-state promise. Correction `cfa5c7483d`
+added the real destination `git remote` empty-output assertion to the successful
+CLI boundary test in `cli/tests/notebookClone.test.ts`. That observation covers
+the same promise without a separate test. These are existing product fixes,
+not corrections made by this workflow execution.
+
+Live instruction trial: the implementer handed off this promise → owning leaf →
+observation mapping, and the coordinator accepted it as the first instruction
+slice's evidence before refactor. Branch/tree-only evidence was rejected in the
+replay; the adequate existing observation was accepted. No claim of a new
+prospective product execution follows from that replay.
+
+Refinement/resume replay used a temporary clone plan, removed after inspection:
+
+| Case | Promise ownership and observation | Resume judgment |
+|---|---|---|
+| Original | `Clone a notebook` owns empty destination `git remote` output | Mapped |
+| Replacement | `Clone an accepted bundle` retains that observation alongside branch/count proof | Ready |
+| Deliberate orphan | Owner becomes `UNASSIGNED`; leaf loses the remote observation while Current decisions retains the promise | Not ready; incomplete |
+| Restored | Replacement leaf again owns empty remote output | Ready |
+
+A completed synthetic `Explain missing input` leaf retained its `usage-proof-A`
+marker throughout. This demonstrates preservation of unaffected evidence, not a
+product test result. The coordinator accepted the replay mapping for the second
+instruction slice; this execution's real PLAN updates also retained its promise
+table and prior evidence.
+
+Publication replay: before `86713e161c`, submission discarded rejection bodies
+and the CLI fell through to the interim refusal. Its correction aligns the
+submission result, CLI caller, fixtures, assertions, and API guidance. The CLI
+boundary now observes accepted-head output, 403 denial, exact 400/409 reasons,
+502 fallback, and unchanged `main`/worktree on the specified rejections.
+`dd1ca6415a` repaired stale installed-CLI clone guidance; that feature was
+inspected, not executed in this run.
+
+Focused proof ran once and passed (2 files, 26 tests, 9.22 seconds):
+`CURSOR_DEV=true nix develop -c pnpm -C cli exec vitest run tests/notebookPublish.test.ts tests/notebookClone.test.ts`.
+It includes `cfa5c7483d`'s remote-state assertion. The coordinator accepted this
+mapped handoff in the live instruction workflow and reused its result.
+
+Telegram scenario replay: an awaited throw alone fails completeness. Evidence
+must name the running session/lifecycle owner, start its background work,
+observe failure while that owner is running, and observe applicable resource
+release after failed work/shutdown. Timing comes from the selected contract;
+unchanged ownership adds no extra proof. No Telegram runtime test was performed.
+
+These replays plus this instruction execution trial do not establish prospective
+product effectiveness or backend correctness. Observe the updated contract in
+the next relevant product run. All three instruction slices and planning cleanup
+share the commit titled `docs(workflow): preserve promised outcomes through execution`
+(locate with `git log --all --fixed-strings --grep='docs(workflow): preserve promised outcomes through execution'`).
+The single-commit delivery and no push follow the developer's explicit request.
+
+Concision follow-up: consolidated repeated execution checklists into mandatory
+instruction owners and shortened proof wording (four files: 476 → 334 lines,
+3,422 → 2,357 words). Independent obligation review and contract replays found
+no loss; existing CLI proof remained valid without rerunning.
