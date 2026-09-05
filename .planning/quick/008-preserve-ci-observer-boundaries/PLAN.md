@@ -136,7 +136,7 @@ without changing the synchronous compatibility entry point.
 
 ### 4. Redeliver an interrupted Claude Code hook event
 Type: Behavior
-Status: planned
+Status: done
 Proof: a real Claude Code hook child process is interrupted after selecting a
 persisted failure but before writing host output; the next owning boundary
 receives it, then successful output advances progress and later boundaries stay
@@ -148,6 +148,10 @@ the event remains eligible for the next owning boundary; a completed output is
 acknowledged once.
 
 Keep the existing Claude Code JSON shape and owner/sub-agent isolation.
+
+Learning: Cursor and Claude Code can share the same real-process interruption
+scenario while retaining host-specific non-owner inputs and output-shape
+assertions.
 
 ### 5. Observe a terminal result despite a missed file notification
 Type: Behavior
