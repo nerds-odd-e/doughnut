@@ -9,301 +9,94 @@ scope: medium
 
 # SEED-011: Detect CI failures without repeated AI coordination
 
-## Why This Matters
+## Problem and evidence
 
-For the developer supervising plan execution, CI observation should detect
-failures promptly with no AI involvement in routine polling, while the
-coordinator attends failures reliably without losing ongoing work or starting
-overlapping repairs.
+The developer needs prompt CI failure attention without repeated AI polling or
+lost work. The notebook-publication execution launched 14 observers for 13
+revisions, spending 5,716 output tokens on launch responses alone. A failed job
+reached the coordinator about 14 minutes late. This demonstrated setup overhead
+and delayed delivery; it did not establish recurring lost failures or overlapping
+repairs. Detection, delivery, and repair start are separate outcomes.
 
-The completed notebook-publication execution exposed both overhead and delayed
-attention. Its coordinator launched 14 observers for 13 revisions, including
-one corrected launch. The model responses issuing those launches consumed
-5,716 output tokens; this excludes SHA discovery, commentary, shutdown,
-investigation, and repair. Ten launches regenerated the notification adapter.
-The last four used ordinary process sessions without its notification bridge.
-The first affected E2E job failed at 14:20:33 Singapore time and reached the
-coordinator at 14:34:55, approximately 14 minutes later. The watcher itself
-also waits for workflow completion before inspecting failed jobs.
-
-Polling already uses no AI calls. The desired improvement is to remove repeated
-model work around that polling and make failure delivery dependable. A known
-failure can be recorded immediately even when handling it waits for ongoing
-work to finish; detection, notification, and repair start are separate moments.
-
-Developer clarification (2026-09-05): immediate interruption is not mandatory.
-Finishing the current ongoing task before attending CI is acceptable if it is
-more reliable for contemporary coding agents. Failures may accumulate under
-either policy. The coordinator must know when a fix is already underway and
-retain later failures for subsequent attention. No broad claim about model
-capabilities is established by this one execution; evaluate the actual host
-and representative agents before adding interruption complexity.
-
-Further discussion (2026-09-05): the developer requests current research to
-recommend the attention boundary. Startup observation must not block other
-agents; the developer suggests inspecting the last finished CI result and
-notifying the coordinator if it failed, while remaining open to refinements.
-Observation must stop when execution ends; persistent monitoring is excluded.
-
-## Selected Goal: One Local Observer Across Supported Agent Hosts (Completed)
-
-Quick 007 completed the selected Story 1 delivery for Codex, Cursor, and Claude
-Code. It eliminates repeated AI watcher setup: one nonblocking local process
-owns CI polling, run discovery, incremental event recording, and lost-coverage
-reporting throughout an execute-plan run. Each host receives the same durable
-records at its supported boundary and explicitly stops the process when
-execution ends.
-
-The three hosts may use different final delivery adapters—Codex foreground
-streaming and native Cursor/Claude hooks—but they share one observer, mailbox,
-event identity, and lifecycle contract. This selection does not require a
-general event broker or a redesign of CI repair coordination.
-
-## Retained Implementation Supporting the Goal
-
-The completed quick-007 implementation provides the cohesive local-observer
-foundation:
-
-- read-only matching of main-branch donut CI, including the newest completed
-  startup run, unfinished runs, pagination, and successive pushes;
-- incremental run/attempt/job failure evidence plus cancellation, fallback,
-  finite-budget, transient-recovery, and explicit lost-coverage outcomes;
-- one nonblocking execution mailbox outside the checkout with append-only event
-  evidence, independent terminal status, unread-evidence recovery, and safe stop;
-- a foreground Codex record stream with partial-chunk and pre-yield handling;
-- native Cursor and Claude hooks bound to one execution observer, with
-  installed-host readiness, incremental delivery, reuse, isolation, and
-  shutdown proof;
-- a shared execute-plan contract that starts observation before the first push,
-  retains it through normal and repair pushes, and stops it at execution end.
-
-The final repository CI-observer wrapper passes 50 tests covering H1–H7. A live
-Codex demonstration delivered two labelled fake-GitHub job failures
-incrementally while coordinator work continued. Installed Cursor 3.19.7 and
-Claude Code probes each produced native readiness, attachment, labelled-event,
-reuse, isolation, and stop evidence. No named external caller used the old
-per-SHA API or CLI, so quick 007 removed it instead of retaining anonymous
-compatibility. These observations establish behavior and host delivery, not a
-production timing benchmark.
-
-## Deferred Repair-policy and Advanced Reliability Observations
-
-Keep the following as future observation/improvement material rather than
-requirements of the selected one-observer story:
-
-- other-session repair applicability and repair-policy changes;
-- durable repair ownership across compaction and accumulated-failure cause
-  equivalence (Story 2);
-- exhaustive cancellation and replacement permutations beyond one safe
-  lifecycle for each supported host;
-- mailbox abstractions broader than the state this observer needs to persist,
-  deliver, and stop safely;
-- agent hosts beyond Codex, Cursor, and Claude Code.
-
-Cursor and Claude Code migration, installed-host validation, and removal of
-superseded per-SHA defaults were completed Story 1 work, not deferred
-observations.
-
-## Alternatives and Decision
-
-1. **Defer:** retain the current observer. Polling remains token-free, but
-   repeated launch/lifecycle work and the demonstrated delivery mistake remain.
-2. **Smaller correction:** consistently use the existing notification bridge
-   and verify its delivery once. This addresses the missing notifications, but
-   leaves per-revision model coordination and workflow-completion latency.
-3. **Manual or existing-tool workflow:** inspect CI at task boundaries. This
-   can be an honest fallback when notification delivery is unavailable, but
-   still needs repeated attention and can miss failures while work continues.
-4. **Recommended direction:** observe the repository's main-branch CI once per
-   execution, discovering relevant runs and their commits without repeated
-   model setup. Deliver actionable failures through a verified notification
-   path, with serialized repair and retained pending failures.
-
-The strongest smaller alternative is a correct existing bridge. Preserve that
-as a possible first implementation choice if it can meet the observable outcome;
-the seed does not mandate a particular process, mailbox, hook, or API design.
-Commit/run/attempt identities remain diagnostic facts even when the coordinator
-no longer supplies a SHA for every launch.
-
-## Story Decomposition
+## Stories
 
 <a id="story-1"></a>
 
 ### 1. Notice relevant CI failures throughout execution with one setup
 
-**Status:** completed by quick 007 on 2026-09-05.
+**Status:** completed by quick 007 on 2026-09-05; lifecycle corrections are
+tracked in quick 008.
 
-- **For / why:** The developer wants Codex, Cursor, and Claude Code to notice
-  failures without paying for repeated AI coordination after every push.
-- **Evaluation:** Across several pushes during one execution, the coordinator
-  establishes observation once. Pending and successful checks require no
-  model turns. A completed failed job is delivered even if other jobs in that
-  workflow still run. Delivery is demonstrated on the actual host, not inferred
-  from a running process. Failed observation is reported once as lost coverage.
-  Startup inspection runs alongside ongoing work. Observation stops at execution
-  end without waiting for unfinished CI; already-recorded failures and pending
-  coverage are handed off explicitly.
-- **Value / learning:** Tests the highest-risk assumption: can this host deliver
-  useful failure information to the ongoing coordinator without model polling?
-  Compare setup/lifecycle model calls and generated tokens with the recorded
-  baseline; separate these from necessary diagnosis and repair costs.
-- **Effort result:** Completed across Codex, Cursor, and Claude Code with one
-  shared wrapper proof and host-native lifecycle evidence.
-- **Depends on:** none.
-- **Safe stopping point:** Failures remain visible with the current repair
-  workflow even if later coordination improvements are cancelled. Track relevant
-  older unfinished runs as newer pushes arrive; watching only the newest run
-  must not hide an older failure. Define a startup baseline to avoid replaying
-  unrelated historical failures. Keep CI distinct from CD.
+**Goal:** Let the developer's Codex, Cursor, or Claude Code coordinator receive
+relevant CI failures across successive pushes with one observer per execution.
+
+**Scope:** Observe main-branch donut CI asynchronously, starting with the newest
+completed run and all unfinished runs, then discovering later pushes. Record
+failures incrementally with run/attempt/job identity and report lost coverage.
+Polling requires no model turns. Stop observation when execution ends, preserving
+recorded evidence and handing off unresolved failures and pending CI without
+waiting for GitHub. CD and persistent monitoring are excluded.
+
+Host delivery was demonstrated on Codex, Cursor, and Claude Code. Durable repair
+ownership and resumption after context resets belong to Story 2; they are not
+prerequisites for Story 1's completion or its lifecycle corrections. Current
+observer behavior and recovery instructions live in
+[ci-monitor.md](../../.agents/skills/execute-plan/references/ci-monitor.md) and
+its linked host adapters.
 
 <a id="story-2"></a>
 
 ### 2. Finish ongoing work and resolve accumulated CI failures one repair at a time
 
-- **For / why:** The developer wants a coding agent to handle CI failures
-  reliably while preserving work and avoiding duplicate or nested repairs.
-- **Evaluation:** A failure arrives during a bounded implementation or refactor
-  task. Under the recommended initial policy, that task reaches its next safe
-  handoff before repair begins. Before another task starts, the coordinator
-  reviews pending failures. Further failures arriving during a fix remain
-  queued; they do not start another repair or another stash cycle. After a fix,
-  pending failures are checked against current code and the fix's focused proof.
-  Distinct causes receive attention; demonstrated repetitions of the repaired
-  cause do not trigger duplicate fixes.
-- **Value / learning:** Tests whether explicit pending/repair-in-progress state
-  makes coordination reliable without requiring immediate interruption across
-  models. Notification latency and time to begin repair are evaluated separately.
-- **Effort hypothesis:** M — medium confidence; assumes tasks already return
-  bounded handoffs and repair ownership can survive a coordinator context reset.
-- **Depends on:** Story 1's reliable delivery within this proposed ordering.
-- **Safe stopping point:** One repair owns the checkout at a time. Do not stash
-  beneath a live writer. Do not lose queued events on compaction or shutdown;
-  report unresolved attention at handoff. Do not dismiss different run failures
-  merely because they share a job name or because a newer run passed. Retain
-  identities and diagnose equivalence from evidence.
+**Status:** valid, narrowed, and deferred by developer discussion on 2026-09-06.
+Medium importance; low immediate urgency.
 
-## Ordering and Scope Reduction
+**Goal:** Keep every reported failure accounted for until it is resolved or
+explicitly handed over, preserving ongoing work across repair and context resets.
 
-First establish dependable low-overhead detection and delivery; then evaluate
-serialized handling under accumulated failures. Story 2 is first to defer if
-scope must shrink, while Story 1 must still preserve observed failure evidence
-and use the existing repair workflow safely.
+**Scope:** Make pending failures, the active repair, and work-restoration state
+explicit and recoverable, reusing existing mailbox evidence and recovery notes
+where sufficient. Current instructions already require safe writer handoffs,
+queued failures, one repair at a time, exact stash recovery, and evidence before
+dismissing duplicates. This story establishes reliable execution of those rules
+across handoffs and context resets. It excludes a general repair scheduler,
+forced interruption, other-session repair-policy changes, and additional hosts.
 
-Immediate interruption is an optional policy to evaluate later, not a required
-third story or a prerequisite for either outcome. The recommended initial
-meaning of "finish the current task" is the currently delegated bounded task
-through its safe handoff, before new task dispatch; it does not mean completing
-the whole remaining plan. The developer has accepted delayed attendance but
-has not selected this exact boundary as a final rule.
+**Key examples:**
 
-## Research and Recommendations (2026-09-05)
+- A failure arrives during bounded implementation or refactoring → the writer
+  reaches a safe handoff → pending failures receive attention before new work
+  starts. Never stash while a writer or its write-capable command is active.
+- Failure B arrives during repair A, then context resets → the coordinator
+  recovers A's repair and restoration state and retains B for later triage,
+  without another repair or nested stash cycle. Shutdown hands over unresolved
+  attention and preserved work.
+- A repair finishes → queued failures are checked against current code and
+  focused proof → distinct causes receive attention; repetitions are dismissed
+  only with evidence of the same repaired cause, not a shared job name or newer
+  passing run.
 
-The reviewed primary sources support receiving background information at safe
-conversation/tool boundaries and preserving explicit handoffs. They do not
-provide a comparative benchmark establishing an optimal CI-repair interruption
-policy across current models. Notification delivery is a host capability;
-reliable diagnosis and resumption still need evaluation with the actual model
-and host. The recommendations below are engineering judgments for this workflow,
-not measured cross-model results.
+**Open decisions:** Finishing the current bounded task before repair is the
+recommended initial boundary; delayed attendance is accepted, but that exact
+boundary is not yet an adopted cross-host rule. Select the smallest recovery
+record and validate implementation/refactor handoffs, failure during repair,
+and context-reset resumption when this story is taken up. These observations
+validate Story 2 only; no optimal cross-model interruption policy is established.
 
-| Primary source | Relevant evidence |
-| --- | --- |
-| [Codex background hooks](https://learn.chatgpt.com/docs/hooks#run-hooks-in-the-background) | Active-turn delivery waits for the current model request and tool calls to finish. Background hooks provide information rather than controlling the triggering operation. Idle sessions wait for a user turn; session end discards undelivered output. |
-| [Claude Code background hooks](https://code.claude.com/docs/en/hooks#run-hooks-in-the-background) | Async command hooks deliver context on the next conversation turn. Ordinary async hooks cannot control the completed operation. `asyncRewake` can wake an idle session on failure, but this is distinct from obtaining a safe checkout handoff. |
-| [Cursor agent steering](https://cursor.com/docs/agent/overview#steer-a-running-agent) and [subagents](https://cursor.com/docs/subagents#foreground-vs-background) | Steering can arrive at the next tool call; foreground delegation blocks until the worker completes, while background delegation returns immediately. Availability differs by surface. |
-| [Anthropic harness research, March 2026](https://www.anthropic.com/engineering/harness-design-long-running-apps) | Tractable work increments and structured handoffs support long executions. Some orchestration needed for an earlier model became unnecessary with a later model; reevaluate complexity as models improve. This study does not compare CI interruption policies. |
+**Effort hypothesis:** M (about 1–2 hours), medium confidence, assuming bounded
+handoffs and reusable recovery state; reassess before planning.
 
-### Attention boundary: recommend the current bounded task's safe handoff
+## Priority and revisit trigger
 
-Record failures as soon as observed and deliver them at the host's next supported
-boundary. Once the coordinator receives an actionable failure, hold new work
-dispatch. Let current implementers/refactorers sharing the checkout finish their
-bounded assignments and hand off; verify their write-capable commands have ended
-before preserving work or starting one repair. A tool response alone does not
-establish that background writers have stopped. Independent read-only diagnosis
-may overlap where the host permits it.
+Finish the demonstrated Story 1 lifecycle defects in quick 008, then continue
+product work. Defer Story 2 until before relying on long unattended execution,
+or revisit sooner if an execution loses track of a failure, repair, or preserved
+work. Story 2 depends on reliable delivery, but does not reopen Story 1's scope.
 
-Review pending failures before dispatching the next implementer or refactorer,
-and before beginning another coordinator wrap-up action. An operation already
-underway reaches its safe completion. This avoids extending the wait through
-an entire implementation/refactor/format/commit/push slice, while retaining the
-existing preservation and repair workflow for unfinished changes. A safe handoff
-need not be a commit. If no writer is active, triage can start immediately.
+## References
 
-Use the repository's existing approximately five-minute task target to keep
-attendance bounded; its ten-minute decomposition rule is not permission to kill
-a process. A supported cooperative pause can remain an optional improvement if
-actual-host evidence shows that waiting for bounded handoffs causes unacceptable
-delay. Do not make forced interruption the default.
-
-Before adopting this as a verified cross-host contract, demonstrate a failure
-during implementation, during refactoring, and during an existing repair, plus
-resumption after compaction. Measure detection, delivery, and repair-start times
-separately, together with lost/duplicate failures, preserved work, and model
-coordination cost. These are focused acceptance observations, not a new story.
-
-### Startup: recommend latest completed CI plus all unfinished CI
-
-Start asynchronously and let already-dispatched work continue. For the selected
-main-branch CI workflow, inspect the newest completed run by run creation order
-and every unfinished run present at startup. Inspect their jobs immediately so
-a failed job inside an unfinished run is already actionable. Using creation
-order prevents an old slow run finishing late from defining the latest baseline.
-Continue tracking those unfinished runs and discover new runs during execution,
-including pushes by another session on the same branch. Do not replay older
-completed runs outside that baseline or any explicitly retained unresolved work.
-
-The unit of startup selection is a workflow run, not one individual job: a
-successful job finishing last can coexist with a failed sibling. Preserve
-run/attempt/job identity and inspect earlier failed attempts within selected
-runs so a rerun does not erase evidence. Cancellation or unavailable status
-does not mean success. Notify known failures once through the same queue and
-attention policy; no CI completion wait gates startup. Observing another
-session's failure does not itself establish that the current checkout can repair
-it; triage establishes its relationship to current code before changing files.
-
-[GitHub run metadata](https://docs.github.com/en/rest/actions/workflow-runs)
-supports branch/workflow selection and run/attempt identity;
-[job metadata](https://docs.github.com/en/rest/actions/workflow-jobs) exposes
-individual job conclusions, completion times, and jobs from earlier executions.
-The recommended baseline is our policy, not a GitHub-prescribed default.
-
-### Shutdown: settled by the developer
-
-Stop observation when execution ends, including cancellation or a stop requiring
-human input. Drain already-recorded events and report unresolved failures and
-still-pending CI at handoff. Do not wait for GitHub to finish, leave a persistent
-watcher, or schedule later monitoring. Confirm local observer shutdown; stopping
-observation does not cancel the GitHub workflow. Execution completion is not a
-claim that pending CI passed.
-
-## Open Decisions
-
-- Story 1 adopted the recommended startup baseline and completed actual-host
-  validation for Codex, Cursor, and Claude Code.
-- Story 2 retains the recommended bounded-task attention boundary for its later
-  plan and validation. No broader repair-coordination implementation is selected.
-
-Observation lifetime is resolved: it ends with execution, with no persistent
-monitoring.
-
-## When to Surface
-
-Story 1 is complete and its spent quick-007 plan was removed after the outcome
-was transferred into the execute-plan skill, tests, and this seed. Surface this
-seed again before planning Story 2, when changing the observer lifecycle, or
-when new host/reliability observations justify another story.
-
-## Breadcrumbs
-
-- Developer's CI-watcher retrospective request and follow-up clarification in
-  the notebook-publication execution task (2026-09-05).
-- Reviewed feature execution through `dd1ca6415a`; observation introduced in
-  `f4ed5cfd6a`, additional host bridges in `6506ecd5da`.
-- `.agents/skills/execute-plan/references/ci-monitor.md` and
-  `.agents/skills/execute-plan/references/ci-notify-hosts.md` — current contracts.
-- `.agents/skills/execute-plan/scripts/watch-ci.mjs` — current observer.
-- [SEED-010](SEED-010-execute-plan-wrap-up-token-efficiency.md) — general context,
-  evidence-handoff, and log-volume improvements; their requirements stay there.
-- Token evidence is launch-response output usage from this task's local session
-  record, not total monitoring spend, billing cost, or a cross-model benchmark.
+- Publication execution through `dd1ca6415a`; Story 1 delivery: `9a5f46f0f2`.
+- [Quick 008](../quick/008-preserve-ci-observer-boundaries/PLAN.md) — active
+  observer lifecycle corrections, separate from Story 2.
+- [SEED-010](SEED-010-execute-plan-wrap-up-token-efficiency.md) — broader
+  execution-efficiency findings; their requirements stay there.
