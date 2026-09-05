@@ -39,18 +39,15 @@ export function expectNoNewStagingDirsSince(before: string[]): void {
 }
 
 /**
- * Shared fixture for "notebook clone (CLI routing, real Git checkout)" tests:
- * a real source Git repo to bundle from, a destination path that does not yet
- * exist, and the console/process spies the CLI's error path relies on.
+ * Shared fixture for notebook CLI routing tests: an isolated config dir (with
+ * a fake auth token), a scratch work directory prefixed with `workDirPrefix`,
+ * and the console.error/process.exit spies every CLI error path relies on.
  */
-export function installNotebookCloneCliTest() {
+export function installNotebookCliRunFixture(workDirPrefix: string) {
   let savedConfigDir: string | undefined
   let configDir: string
   let workDir: string
-  let sourceRepoDir: string
-  let destinationPath: string
   let errorSpy: ReturnType<typeof vi.spyOn>
-  let logSpy: ReturnType<typeof vi.spyOn>
   let exitSpy: ReturnType<typeof vi.spyOn>
 
   beforeEach(() => {
@@ -63,9 +60,44 @@ export function installNotebookCloneCliTest() {
     // fixture's own scratch directory never shows up in stagingDirsUnderTmp()
     // — tests in this file run alongside other test files whose scratch dirs
     // can briefly coexist under the same os.tmpdir().
-    workDir = fs.mkdtempSync(join(tmpdir(), 'donut-cli-clone-test-'))
-    sourceRepoDir = join(workDir, 'source')
-    destinationPath = join(workDir, 'destination')
+    workDir = fs.mkdtempSync(join(tmpdir(), workDirPrefix))
+
+    errorSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined)
+    exitSpy = vi.spyOn(process, 'exit').mockImplementation(((code?: number) => {
+      throw new ProcessExitForTest(code)
+    }) as typeof process.exit)
+  })
+
+  afterEach(() => {
+    if (savedConfigDir === undefined) delete process.env.DONUT_CONFIG_DIR
+    else process.env.DONUT_CONFIG_DIR = savedConfigDir
+    fs.rmSync(configDir, { recursive: true, force: true })
+    fs.rmSync(workDir, { recursive: true, force: true })
+    errorSpy.mockRestore()
+    exitSpy.mockRestore()
+  })
+
+  return {
+    getWorkDir: () => workDir,
+    getErrorSpy: () => errorSpy,
+    getExitSpy: () => exitSpy,
+  }
+}
+
+/**
+ * Shared fixture for "notebook clone (CLI routing, real Git checkout)" tests:
+ * a real source Git repo to bundle from, a destination path that does not yet
+ * exist, and the console/process spies the CLI's error path relies on.
+ */
+export function installNotebookCloneCliTest() {
+  const base = installNotebookCliRunFixture('donut-cli-clone-test-')
+  let sourceRepoDir: string
+  let destinationPath: string
+  let logSpy: ReturnType<typeof vi.spyOn>
+
+  beforeEach(() => {
+    sourceRepoDir = join(base.getWorkDir(), 'source')
+    destinationPath = join(base.getWorkDir(), 'destination')
 
     fs.mkdirSync(sourceRepoDir)
     runGit(['init', '--quiet', '-b', 'main'], sourceRepoDir)
@@ -78,30 +110,20 @@ export function installNotebookCloneCliTest() {
       sourceRepoDir
     )
 
-    errorSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined)
     logSpy = vi.spyOn(console, 'log').mockImplementation(() => undefined)
-    exitSpy = vi.spyOn(process, 'exit').mockImplementation(((code?: number) => {
-      throw new ProcessExitForTest(code)
-    }) as typeof process.exit)
   })
 
   afterEach(() => {
-    if (savedConfigDir === undefined) delete process.env.DONUT_CONFIG_DIR
-    else process.env.DONUT_CONFIG_DIR = savedConfigDir
-    fs.rmSync(configDir, { recursive: true, force: true })
-    fs.rmSync(workDir, { recursive: true, force: true })
     vi.unstubAllGlobals()
-    errorSpy.mockRestore()
     logSpy.mockRestore()
-    exitSpy.mockRestore()
   })
 
   return {
-    getWorkDir: () => workDir,
+    getWorkDir: base.getWorkDir,
     getSourceRepoDir: () => sourceRepoDir,
     getDestinationPath: () => destinationPath,
-    getErrorSpy: () => errorSpy,
+    getErrorSpy: base.getErrorSpy,
     getLogSpy: () => logSpy,
-    getExitSpy: () => exitSpy,
+    getExitSpy: base.getExitSpy,
   }
 }

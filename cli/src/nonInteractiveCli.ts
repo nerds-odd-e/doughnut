@@ -3,6 +3,7 @@ import { exceptionText } from './exceptionText.js'
 import { runUpdate } from './commands/update.js'
 import { formatVersionOutput } from './commands/version.js'
 import { acquireNotebookGitCheckout } from './commands/notebook/notebookAcquisition.js'
+import { resolveNotebookPublishBinding } from './commands/notebook/notebookPublishBinding.js'
 
 /**
  * Handles one-shot CLI paths (version, update, help, invalid flags). Returns `false` when the
@@ -44,10 +45,22 @@ export async function completeNonInteractiveCliIfHandled(
 
 const NOTEBOOK_CLONE_USAGE =
   'usage: donut notebook clone <notebook-id> <destination>'
+const NOTEBOOK_PUBLISH_USAGE = 'usage: donut notebook publish <directory>'
 
 async function completeNotebookSubcommand(
   notebookArgs: string[]
 ): Promise<void> {
+  const [action] = notebookArgs
+
+  if (action === 'publish') {
+    await completeNotebookPublish(notebookArgs)
+    return
+  }
+
+  await completeNotebookClone(notebookArgs)
+}
+
+async function completeNotebookClone(notebookArgs: string[]): Promise<void> {
   const [action, notebookIdArg, destination] = notebookArgs
 
   if (action !== 'clone') {
@@ -66,5 +79,23 @@ async function completeNotebookSubcommand(
   }
   console.log(
     `Cloned notebook ${notebookId} into ${destination}. Open and edit the files there with any ordinary local Git tool (Obsidian, an IDE, plain git); publishing is not available yet — commits stay local.`
+  )
+}
+
+async function completeNotebookPublish(notebookArgs: string[]): Promise<void> {
+  const [, directory] = notebookArgs
+
+  if (!directory) {
+    exitCliError(NOTEBOOK_PUBLISH_USAGE)
+  }
+
+  try {
+    resolveNotebookPublishBinding(directory)
+  } catch (e) {
+    exitCliError(exceptionText(e))
+  }
+
+  exitCliError(
+    'publish is not available yet — uploading local commits to the Donut backend is not implemented'
   )
 }

@@ -150,7 +150,7 @@ Slice 14 replaces that interim refusal with safe publication.
 
 ### 1. Explain a missing or mismatched checkout binding
 Type: Behavior
-Status: planned
+Status: done
 Proof: CLI `run` eligibility cases report the binding problem before HTTP.
 
 Behavior: a directory is not a bound repository or its API origin differs from
@@ -435,3 +435,12 @@ Sizing: about 5 minutes plus backend runtime, medium confidence.
 - Next action: execute from slice 1 in this same PLAN. Every remaining leaf is
   a 3–5 minute hypothesis excluding required test runtime; enforce the actual
   five/ten-minute gate instead of treating these estimates as guarantees.
+- Slice 1 done: added `donut notebook publish <directory>` argv routing
+  (`nonInteractiveCli.ts`) and `cli/src/commands/notebook/notebookPublishBinding.ts`,
+  which reads the existing local `donut.notebook-id`/`donut.api-origin` Git config
+  keys and reports actionable errors for an unbound directory or a mismatched
+  API origin; an eligible request reaches an explicit "not available yet"
+  response. Post-change-refactor extracted shared CLI-run test scaffolding
+  (`installNotebookCliRunFixture`) into `notebookClone.testHelpers.ts`, reused by
+  the new `cli/tests/notebookPublish.test.ts`. No production duplication found;
+  no backend/API changes in this leaf. Next action: execute slice 2.
