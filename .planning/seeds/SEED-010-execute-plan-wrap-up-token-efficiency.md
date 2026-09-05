@@ -1,14 +1,16 @@
 ---
 id: SEED-010
-status: resolved
+status: dormant
 planted: 2026-09-04
 planted_during: execute-plan run of SEED-009's notebook-clone quick plan (slices 1-8), on request for a process retrospective
 trigger_when: when next revising execute-plan's wrap-up.md/delegation.md, the post-change-refactor or format-changed skills, or before running another long multi-slice execute-plan session
 scope: medium
 selected: 2026-09-04
 selected_as: one story covering this seed plus Pygardon SEED-008 stories 1–4 and 6
-resolved: 2026-09-04
-resolution: implemented as one five-slice execution-contract change; retained as the execution retrospective by developer request
+previously_resolved: 2026-09-04
+previous_resolution: implemented as one five-slice execution-contract change; retained as the execution retrospective by developer request
+reopened: 2026-09-05
+reopened_reason: additional process findings from the completed notebook-publication execution; earlier implemented scope remains complete
 ---
 
 # SEED-010: `execute-plan` wrap-up spends tokens on steps that usually find nothing
@@ -33,7 +35,12 @@ Total: ~1.63M subagent tokens across 24 fresh-agent calls for 8 slices. Five con
 
 ## When to Surface
 
-Resolved on 2026-09-04. Retain this retrospective when evaluating future changes to `execute-plan` evidence handoffs or if a later long run suggests that formatter-agent overhead, redundant proof runs, or coordinator-context growth has regressed.
+The original scope was resolved on 2026-09-04. Reopened on 2026-09-05 for the
+unimplemented findings below. Surface when evaluating `execute-plan` evidence
+handoffs, retiring interim behavior, planning transaction-sensitive work, or
+when another long run shows redundant proof runs or coordinator-context growth.
+CI watcher lifecycle and repair scheduling have their own home in
+[SEED-011](SEED-011-efficient-ci-failure-attention.md).
 
 ## Implemented Scope
 
@@ -71,3 +78,113 @@ Source: `execution-retrospective` on the completed SEED-009 Story 1 plan (`.plan
 4. **Pre-delegation research was still done inline rather than forked, despite this same seed's earlier fix.** The Story 2 coordinator read multiple source files directly (via targeted `sed`/offset excerpts, not full dumps) across all 9 slices to build delegation prompts, rather than using a disposable `fork` per `disposable-research.md`'s guidance. The targeted-excerpt discipline limited the damage, but the practice itself persisted across a full session despite being named in this seed's implemented scope (item 3 under "Implemented Scope" above). Lesson: the "fork for one-off research" guidance needs to be more forcing (e.g., stated as a default rather than an encouragement) or it will keep being skipped when a quick inline `sed`/`Read` feels cheaper in the moment.
 5. **A backend full-suite reconfirmation doesn't need to run after every backend-touching slice once a pre-existing-failure baseline is established.** The Story 2 coordinator reran the full `pnpm backend:test_only` suite only twice (after the first and last of six backend-touching slices) rather than after each one, once the exact failure signature (`StructuredResponseCreateParamsSerializerTest`, then later different `QuestionGeneration*` classes — both the same Spring `ApplicationContext` load-failure-cascade signature) was confirmed reproducible and unrelated to the change. Lesson: state this explicitly in `execute-plan`'s verification guidance so it's a documented judgment call, not something each session has to independently decide and justify.
 6. **A useful Vitest file-size-vs-single-file-scheduling technique surfaced but isn't documented anywhere.** A Story 2 CLI test file that had to stay in one Vitest file (fixtures shared a temp-dir-leak assertion sensitive to concurrent file scheduling) but exceeded the 250-line guideline was later resolved (outside the reviewed session, by the developer directly) by extracting per-concept `*.suite.ts` files that each export a `describeXxx()` function, called from one thin runner `.test.ts` file — satisfying the size guideline without risking the concurrency-sensitive split. Lesson: add this pattern to `post-change-refactor`'s file-size guidance so a future refactor pass facing the same tension has a documented option besides reverting the split.
+
+## Merged Findings from Completed Publication Execution (2026-09-05)
+
+Source: the completed 18-slice SEED-009 Story 2 execution through `dd1ca6415a`
+and its execution-retrospective. These are process proposals, not implemented
+changes. The watcher proposal and developer's tolerance for finishing current
+work before CI repair are captured only in SEED-011.
+
+- **Strengthen finding 3: compact prompts also need compact inherited context.**
+  Later implementer and refactor handoffs repeatedly used `fork_turns: "all"`,
+  passing accumulated execution history despite the delegation contract's
+  request for current slice text and compact proof. Short prompt wording alone
+  does not fix that. Evaluate fresh agents receiving only the current outcome,
+  paths, constraints, and exact proof, with resume state read from the plan as
+  needed. Preserve independent refactor judgment and required instruction reads;
+  do not infer that eliminating review is the saving.
+- **Retire an interim behavior across its whole user path.** Slice 16 enabled
+  publishing but missed an installed-CLI clone assertion of the old guidance,
+  causing three CI failures before repair `dd1ca6415a`. The aggregate review
+  also found CLI rejection bodies still discarded in favor of "publishing is
+  not available yet", with fixtures and comments preserving that interim
+  contract. When replacing temporary behavior, check its callers, fixtures,
+  tests, and documentation, and verify the final observable errors as well as
+  success. Do not add historical-only tests merely asserting removal of old
+  code. The actual product correction is separately planned in
+  `../quick/005-report-notebook-publish-rejections/PLAN.md`.
+- **Validate shared transaction-fixture assumptions before broad migration.**
+  Two attempts were reversed after rollback-scoped fixtures conflicted with
+  `REQUIRES_NEW` binding locks. A dedicated committed fixture did not resolve
+  the dependency in the entire existing controller-test family. Establish the
+  transaction ownership of the affected fixture family early, then use the
+  smallest representative proof before repeating production migration work.
+  The lesson is targeted uncertainty resolution, not a generic preparatory
+  architecture phase or more test layers.
+- **Bound diagnostic evidence before it enters coordinator context.** CI
+  investigation returned full job metadata and broad logs, hit truncation,
+  then retrieved the same evidence again. Select failed jobs and meaningful
+  excerpts before returning results to the model, retain provenance and a path
+  to deeper evidence, and expand only when the cause remains uncertain. Useful
+  diagnosis costs tokens; repeated irrelevant metadata does not improve it.
+  This principle also applies outside CI and belongs in this seed.
+
+Finding 5 needs an evidence qualification: later execution identified local
+MySQL connection exhaustion and obtained green full backend runs after a
+runtime capacity adjustment. Earlier changing ApplicationContext failures
+should not become a blanket rule to classify future failures as harmless or
+skip mandatory proof. Distinguish demonstrated baseline issues, diagnosed
+environment limits, and unresolved defects before choosing focused reuse.
+
+## Candidate Follow-up Outcomes
+
+These candidates refine the merged findings without reopening the previously
+delivered formatter/proof-handoff scope. They are not execution leaves.
+
+### 1. Complete an interim-to-final transition without stale user behavior
+
+- **For / why:** The developer wants a finished slice to expose its intended
+  success and rejection behavior across existing clients and tests.
+- **Evaluation:** A representative transition retires interim callers,
+  fixtures, assertions, and guidance before completion; the final user path
+  demonstrates its real outcomes without waiting for CI to reveal stale text.
+- **Value / learning:** Addresses two independently observed omissions from
+  the same replacement slice with one coherent completion practice.
+- **Effort hypothesis:** S — medium confidence; assumes a focused addition to
+  existing slice/refactor review can be evaluated in a representative task.
+- **Depends on:** none.
+
+### 2. Obtain independent review with concise handoffs and usable evidence
+
+- **For / why:** The developer wants to retain meaningful independent review
+  while reducing inherited history and repeated diagnostic material.
+- **Evaluation:** Compare a representative multi-slice run's handoff/context
+  tokens and review findings with the recorded baseline. Reviewers receive the
+  needed current constraints and exact proof; coordinator diagnostics arrive
+  as attributable, bounded evidence that can be expanded when necessary.
+- **Value / learning:** Extends findings 3–4 by measuring the actual transmitted
+  context, not just prompt length or agent count. Preserves evidence needed to
+  catch defects rather than optimizing tokens alone.
+- **Effort hypothesis:** M — medium confidence; assumes the host supports
+  controlled inherited context and observable usage accounting.
+- **Depends on:** none.
+
+### 3. Resolve a shared fixture assumption before repeating failed slices
+
+- **For / why:** The developer wants transaction-sensitive changes to converge
+  without repeating implementation work against incompatible test fixtures.
+- **Evaluation:** In a representative transaction-boundary change, the affected
+  shared fixture ownership is checked early and a small proof resolves the
+  uncertainty before a wider migration. Subsequent execution reuses that
+  evidence without inventing extra layers or broad preparatory work.
+- **Value / learning:** Tests whether a targeted assumption check prevents the
+  two-attempt reversal pattern seen in this execution.
+- **Effort hypothesis:** S — low confidence; depends on availability of a
+  representative future task, not just writing another instruction.
+- **Depends on:** none.
+
+## Follow-up Alternatives, Ordering, and Open Decisions
+
+Keep the implemented direct formatter and independent refactor pass. The
+strongest smaller alternative is more faithful use of existing delegation and
+refactor instructions; try that before adding new agents or mandatory checks.
+The recorded omissions despite repeated checklists mean more checklist wording
+alone is not proven sufficient. Evaluate observable results in actual work.
+
+Order the candidates by immediate correctness benefit, measured context savings,
+then the next applicable transaction task. For scope reduction, defer candidate
+3 first, then candidate 2; each outcome has value on its own. Selection of any
+candidate, the representative evaluation task, and final changes to existing
+rules remain open. No backlog ordering, implementation, or execution is implied
+by merging these findings.
