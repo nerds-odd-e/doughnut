@@ -1,9 +1,7 @@
 # Publish a local content edit to the same Donut note
 
 Source: [SEED-009, Story 2](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-2).
-Status: planned. Planning only; no feature implementation performed.
-Readiness: **ready for execution**, subject to the per-leaf five/ten-minute gate.
-Sizing is a hypothesis, not an execution-time guarantee.
+Status: complete.
 
 ## Story contract
 
@@ -423,7 +421,7 @@ Sizing: 3–4 minutes, medium confidence.
 
 ### 18. Give competing publications one accepted winner
 Type: Behavior
-Status: planned
+Status: done
 Proof: concurrent controller calls with two distinct direct children of one
 accepted head produce one accepted result and one stale rejection; fresh reads
 match the winner's Note content and bundle.
@@ -459,256 +457,19 @@ Sizing: about 5 minutes plus backend runtime, medium confidence.
   and refine this PLAN unless focused verification runtime explains the overrun.
   No red-only commits. Preserve unrelated working-tree changes.
 
-## Learnings and resume
+## Completion record
 
-- Story 1 dependency exists in code; its active plan has already been cleaned up.
-- Current web writes can cause projection drift without advancing Git. Rejecting
-  drift is required for the sequential Story 2 boundary, not permission to make
-  MySQL a second accepted Portable-content authority.
-- Existing permissive web-save validation cannot be assumed to meet strict
-  durable-tree validation. Resolve that inside this story without changing web
-  authoring behavior.
-- Refinement classification: original slice 1 was Refine (binding and local-state
-  checks became 1–2); original 2 was Refine (3–6); original 3 was Refine (7–11);
-  original 4 was Ready and is retained as 13 immediately before its consumer;
-  original 5 was Refine (14–17). No completed slices existed. (Renumbered by
-  one after the execution-retrospective's slice 10 insertion below.)
-- Existing committed-transaction/failure/concurrency helpers and OSIV=false make
-  the transaction test boundary concrete. No product code was run or changed
-  during refinement. No execution overrun or attempt-owned WIP exists.
-- The first successful publish includes strict validation, locks, rollback
-  semantics, exact projection, and unchanged note identity. Later retry/race
-  scenarios do not defer those mechanisms.
-- Next action: execute from slice 1 in this same PLAN. Every remaining leaf is
-  a 3–5 minute hypothesis excluding required test runtime; enforce the actual
-  five/ten-minute gate instead of treating these estimates as guarantees.
-- Slice 1 done: added `donut notebook publish <directory>` argv routing
-  (`nonInteractiveCli.ts`) and `cli/src/commands/notebook/notebookPublishBinding.ts`,
-  which reads the existing local `donut.notebook-id`/`donut.api-origin` Git config
-  keys and reports actionable errors for an unbound directory or a mismatched
-  API origin; an eligible request reaches an explicit "not available yet"
-  response. Post-change-refactor extracted shared CLI-run test scaffolding
-  (`installNotebookCliRunFixture`) into `notebookClone.testHelpers.ts`, reused by
-  the new `cli/tests/notebookPublish.test.ts`. No production duplication found;
-  no backend/API changes in this leaf. Next action: execute slice 2.
-- Slice 2 done: added `cli/src/commands/notebook/notebookPublishReadiness.ts`
-  (`assertLocalMainIsCleanAndCommitted`), wired into `completeNotebookPublish`
-  right after binding resolution — checks HEAD is on `main` and the index/
-  worktree (including untracked files) is completely clean before reaching the
-  interim "not available yet" response. Post-change-refactor hoisted the
-  duplicated `initBoundCheckout` test helper to module scope and renamed an
-  internal `readGitStatus` helper to `readGitOutput` for accuracy; deliberately
-  left the small structural overlap between `readLocalGitConfig` and
-  `readGitOutput` unmerged (different failure-handling shapes, not worth the
-  indirection this early in the plan). No backend/API changes in this leaf.
-  Next action: execute slice 3.
-- Slice 3 done: exported `downloadNotebookGitBundle` from `notebookAcquisition.ts`
-  for reuse, and added `cli/src/commands/notebook/notebookPublishAncestry.ts`
-  (`assertLocalMainFollowsAcceptedHistory`), which downloads the accepted
-  bundle into a command-owned temp dir, imports its `main` into a temporary
-  bare repo (never touching the user's checkout), and requires local `main` to
-  be either identical to or exactly one single-parent commit ahead of the
-  accepted head; anything else (stale, several-ahead, unrelated, merge tip)
-  is rejected. Post-change-refactor extracted a shared `systemGit.ts` primitive
-  (used by acquisition and ancestry, not by binding/readiness — different
-  failure-handling shapes there), consolidated `notebookPublish.test.ts`
-  fixture helpers, and fixed a real fixture bug where two independently-built
-  repos could collide on an identical commit SHA due to same content/timestamp,
-  defeating the unrelated-history test. No backend/API changes in this leaf.
-  Next action: execute slice 4.
-- Slice 4 done: added `POST /{notebook}/git-bundle` (`publishNotebookGitProposal`)
-  with owner-only authorization (denies read-only subscribers) checked before
-  any body parsing, then always throwing `501 NOT_IMPLEMENTED` as an interim
-  placeholder (regenerated OpenAPI/TS client). CLI now builds a full local
-  `main` bundle via system Git and POSTs it with the accepted head as a query
-  param; 401/403 surfaces a distinct permission-denied message, any other
-  non-2xx falls through unchanged to the existing "not available yet" message,
-  and a 200 (test-stub only, unreachable in production until slice 16) renders
-  the accepted head. Post-change-refactor extracted `notebookPublish.testHelpers.ts`
-  for shared fixtures; a full per-`describe` file split was tried and reverted
-  because it broke a temp-dir-leak assertion under Vitest's concurrent file
-  scheduling (all publish checks share a `donut-notebook-publish-ancestry-*`
-  temp prefix) — `notebookPublish.test.ts` stays one file at ~450 lines rather
-  than force an unsafe split or a broader Vitest concurrency config change.
-  Coordinator independently confirmed the required full `pnpm backend:test_only`
-  run has exactly 4 pre-existing, unrelated failures
-  (`StructuredResponseCreateParamsSerializerTest`, a Spring ApplicationContext
-  load cascade) both before and after this slice. Next action: execute slice 5.
-- Slice 5 done: added `NotebookGitProposalImporter.importMainHead(bytes)`
-  (`services/notebookGit/`), importing the proposal via `TransportBundleStream`
-  into a fresh in-memory repository and returning `ImportedProposal(repository,
-  mainHead)`; a missing `refs/heads/main` or any JGit import failure (corrupt/
-  incomplete bundle) becomes `400 BAD_REQUEST` and leaves the accepted binding
-  untouched, while a genuinely valid bundle still reaches the interim
-  `501 NOT_IMPLEMENTED` refusal. No API/DTO signature change, no CLI changes.
-  Post-change-refactor deduplicated the two new rejection tests' assertions
-  and simplified the "no usable main" test fixture to reuse
-  `NotebookGitBundleBuilder`/`NotebookGitBundleWriter` instead of hand-rolling
-  JGit tree/commit construction. Next action: execute slice 6.
-- Slice 6 done: added `NotebookGitProposalAncestry.assertFollowsAcceptedHead`
-  (`services/notebookGit/`), a reusable pure check over a `Repository` and two
-  `ObjectId`s (deliberately reusable for slice 13's locked-transaction recheck).
-  `publishNotebookGitProposal` now loads the binding, rejects a stale
-  `expectedHead` (409) and any ancestry other than identical-heads or a direct
-  single-parent child (409) — merge commits, multi-commit-ahead, and unrelated
-  history are all rejected without advancing main; a valid proposal still
-  reaches the interim refusal. Post-change-refactor extracted a shared
-  `requireGitBinding` helper (was duplicated between GET and POST). No API/DTO
-  or CLI changes. Next action: execute slice 7.
-- Slice 7 done: added `NotebookGitProposalTreeShape.assertSingleModifiedRegularNotePath`
-  (`services/notebookGit/`) — a raw two-tree walk (no rename detection) that
-  rejects added/deleted/moved paths, unsafe paths, non-regular modes, and
-  zero/multiple content changes, requiring exactly one changed `.md` path whose
-  basename isn't `README.md` (index.md/log.md are not forbidden here). Runs
-  only when the proposal isn't an identical-heads no-op (reserved for slice 17).
-  Post-change-refactor moved commit-parsing into the tree-shape class itself
-  (matching `NotebookGitProposalAncestry`'s idiom, removing a duplicated
-  controller helper) and split the growing test file into
-  `NotebookGitBundleControllerTestBase` (shared fixtures) plus a new
-  `NotebookGitProposalTreeShapeControllerTest`, following the existing
-  `*ControllerTestBase` + leaf-classes convention; `NotebookGitBundleControllerTest`
-  itself is still slightly over the 250-line guideline (pre-existing, spans two
-  unrelated concepts — left for a dedicated cleanup, not this slice's scope).
-  No API/DTO or CLI changes. Next action: execute slice 8.
-- Slice 8 done: added `NotebookGitProposalMarkdownFormat.assertValidTypedMarkdown`
-  (`services/notebookGit/`) — walks every `.md` path in the full proposed tree
-  (not just the changed one) requiring strict UTF-8, a `---`-fenced YAML
-  mapping, and a non-blank `type` key; deliberately does NOT restrict `type`
-  to a fixed enum or use the permissive web-save repair path
-  (`ensureTypeKey`/`ensureStoredType`) — unknown types and unknown extra keys
-  are preserved/valid. Runs after slice 7's tree-shape gate, only when not an
-  identical-heads no-op. Post-change-refactor split the new tests into their
-  own `NotebookGitProposalMarkdownFormatControllerTest` (mirroring slice 7's
-  production/test split) to keep `NotebookGitProposalTreeShapeControllerTest`
-  under the file-size guideline. No API/DTO or CLI changes. Next action:
-  execute slice 9.
-- Slice 9 done: added `NotebookGitProposalBlobText.readUtf8` (`services/notebookGit/`)
-  to read the one changed note's already-validated proposed content, then calls
-  the EXISTING `AuthoredNoteContent.assertValidForSave(content)` directly,
-  letting its `ApiException`/`ApiError` (BINDING_ERROR) propagate uncaught —
-  deliberately the same error shape ordinary web content-saves already produce,
-  unlike every other slice-5–8 check (`ResponseStatusException`). Applies only
-  to the one changed note, never the container README. A valid proposal still
-  reaches the interim refusal. Coordinator reconfirmed the full
-  `pnpm backend:test_only` baseline stays at exactly 4 pre-existing failures —
-  this run they landed on different, unrelated `QuestionGeneration*` classes
-  (same `ApplicationContext` load-failure-cascade signature as before),
-  confirming it's full-suite environmental flakiness, not a regression from
-  slices 4-9. No API/DTO or CLI changes.
-- Developer asked to stop after slice 9 (2026-09-05); slices 10-18 remain
-  planned and unexecuted. Next action: resume at slice 10.
-- Execution retrospective (2026-09-05) reviewed commits 754ef00dd6..9192c5ae52
-  (slices 1-9), excluding an interspersed unrelated commit (f4ed5cfd6a, an
-  external CI-observation feature merged into this branch mid-session that
-  touches no notebook-publish files). No bugs or story-boundary drift found;
-  the aggregate `publishNotebookGitProposal` method's five-check sequence is
-  not treated as a size/cohesion defect because decision 8's already-planned
-  dedicated publish service (slice 14's persistence work leads into it) is
-  designed to absorb it. One unresolved missed-refactoring-smell: despite each
-  slice's own concept-bounded refactor correctly declining to touch a concept
-  it didn't introduce, `NotebookGitBundleControllerTest.java` reached 285 lines
-  (35 over the file-size guideline) by spanning three concepts from slices 4-6
-  — corrected by new slice 10 above, inserted immediately after the completed
-  slices and renumbering original 10-16 to 11-17. A parallel CLI-side
-  file-size trade-off (`notebookPublish.test.ts` at ~450 lines, a split
-  deliberately reverted in slice 4 for a Vitest single-file-scheduling reason)
-  was independently resolved by the developer after this session's stop
-  (commit 8bb147f607): per-concept `*.suite.ts` files exporting a
-  `describeXxx()` function each, imported and invoked from one thin
-  `notebookPublish.test.ts` runner — preserves single-Vitest-file scheduling
-  while satisfying the file-size guideline. No new slice needed for that; it
-  is already resolved in the current tree.
-- Slice 10 done: split proposal-import and proposal-ancestry cases from
-  `NotebookGitBundleControllerTest` into capability-named leaf classes sharing
-  `NotebookGitBundleControllerTestBase`; the original class now contains only
-  download and publish authorization/interim-refusal behavior. No production
-  code changed. The required full backend suite passed after raising the local
-  MySQL process's runtime-only `max_connections` setting from 151 to 300 to
-  avoid the previously documented connection-exhaustion cascade. Next action:
-  execute slice 11.
-- Slice 11 done: added `NotebookGitProjection` to rebuild the live canonical
-  Portable tree for each publish request, compare it exactly with accepted
-  `main`, and require the changed Portable path to identify one live Note.
-  Controller tests prove both ordinary web content and structure drift return
-  an actionable conflict without changing the accepted binding; existing valid
-  proposal fixtures now snapshot the real projection instead of inventing a
-  detached baseline. Post-change-refactor removed an unused Note return value
-  and named the one-live-note-at-path invariant explicitly. No API wire change.
-  Next action: execute slice 12.
-- Slice 12's first execution attempt exceeded the ten-minute hard gate and was
-  fully reverted. The disproved sizing assumption was that existing
-  rollback-scoped proposal fixtures could support the new `REQUIRES_NEW`
-  binding lock. They cannot: the lock blocks on the uncommitted binding row,
-  while concurrent controller calls also need request/session scope propagation
-  and committed assertions must reload timestamped entities. Refinement inserted
-  a committed proposal-test Structure leaf as slice 12 and moved the race
-  Behavior to slice 13; later slices were renumbered without changing the
-  selected story. Next action: execute refined slice 12.
-- Refined slice 12 foundation committed: added a dedicated committed
-  proposal-controller test boundary that owns setup/cleanup outside rollback
-  transactions, reloads committed notebook and binding state, and propagates
-  request scope into timeout-bounded worker calls. A valid committed proposal
-  reaches the existing interim refusal without mutating its accepted head.
-  Post-change-refactor removed one redundant committed read. No production or
-  API change.
-- Slice 13's first post-refinement attempt exceeded the ten-minute hard gate and
-  its exact attempt-owned work was restored; the new publisher file was moved
-  to Trash. Compilation showed the production shape is viable, but revealed
-  that every test inheriting `NotebookGitBundleControllerTestBase` holds its
-  binding fixture open in a rollback transaction, so the required binding
-  `FOR UPDATE` lock times out across the family. Slice 12 is reopened and
-  broadened to migrate that one shared fixture family before retrying slice 13.
-  Authorization fixtures must submit valid identical-head bundles because
-  untrusted Git import intentionally happens before database authorization.
-  Next action: finish refined slice 12.
-- Reopened slice 12 done: migrated the entire shared bundle/proposal controller
-  test family to committed, non-rollback fixtures with unique prefix-bounded
-  users and cleanup. Authorization cases now submit the accepted binding's
-  already-valid bundle, preserving authorization outcomes after pre-lock Git
-  import; the dedicated committed test/base were consolidated into the shared
-  base. Post-change-refactor removed redundant identical-head rebundling and
-  kept the shared base at 250 lines. No production or API change. Next action:
-  retry slice 13.
-- Slice 13 done: the HTTP boundary now imports the untrusted proposal before
-  invoking `NotebookGitProposalPublisher`, whose proxied `REQUIRES_NEW`,
-  SERIALIZABLE transaction locks the binding first, loads notebook/folder/note
-  ranges in a fixed order, rechecks authorization and ancestry, and validates
-  the supplied live projection. Committed controller tests prove an overlapping
-  content update and an initially-empty-range folder insertion both commit
-  before validation and produce projection-drift conflict with the binding
-  unchanged. Post-change-refactor centralized Note-to-export-row conversion,
-  removed redundant fixture refresh, and extracted the shared proposal-file
-  test value. Controller/API generation produced no wire diff; OpenAPI lint and
-  all frontend tests passed. Next action: execute slice 14.
-- Slice 14 done: extracted `AuthoredNoteDocumentPersistence` for the cohesive
-  same-Note operation that sets `updatedAt`, replaces the prepared document,
-  saves, removes orphan images, and refreshes derived reference indexes.
-  `TextContentController` retains document preparation, normalization,
-  authorization, and response construction at the web edge. No endpoint/API or
-  observable web-save behavior changed. Next action: execute slice 15.
-- Slice 15 done: a validated proposal now prepares and persists the exact
-  authored document on the existing Note, re-exports the live projection for
-  exact proposal-tree comparison, materializes proposal `main`, and updates the
-  existing binding from `NotebookGitBundleWriter` inside the serializable
-  transaction. The final interim 501 remains inside that boundary, so production
-  still rolls all attempted writes back. A scoped late binding-save failure
-  controller proof confirms Note content, derived references, binding head,
-  bundle, and timestamp remain unchanged in fresh committed reads. No API
-  change. Next action: execute slice 16.
-- Slice 16 done: a valid direct-child proposal now commits the exact authored
-  Markdown onto the existing Note, returns the accepted proposal head, and
-  serves a bundle retaining its submitted tree and parent ancestry. The
-  canonical controller round trip proves preserved Note identity, learning
-  tracker, unknown frontmatter, wiki-link refresh, bytes, and Git history;
-  clone guidance now states the current one-commit/one-existing-note limit.
-  Post-change-refactor removed two narrower success tests subsumed by this
-  boundary proof and simplified brittle fixture documentation. Identical-head
-  publication remains deliberately unavailable for slice 17. No API wire
-  change. Next action: execute slice 17.
-- Slice 17 done: after locked authorization and projection validation, a
-  proposal whose head is already accepted returns that same head before stale
-  expected-head and ancestry checks. A committed controller retry with the
-  original parent as expectedHead proves the binding head/timestamp, Note
-  content/timestamp, and complete learning-tracker state remain unchanged.
-  Post-change-refactor found no concept-bounded cleanup or API change. Next
-  action: execute slice 18.
+All 18 slices are complete. The shipped workflow validates and publishes one
+direct-child commit that edits one existing Portable Markdown note, preserves
+the Note and learning identity, stores the exact Git commit and ancestry, makes
+lost-response retries idempotent, and serializes competing publications so one
+wins and the other receives a stale conflict.
+
+The canonical controller proofs cover validation, projection-drift rejection,
+atomic rollback, exact authored content and derived references, accepted-bundle
+round trips, retry immutability, and real concurrent publication. CLI proofs
+cover checkout eligibility, ancestry, authenticated bundle transport, success
+rendering, and the current one-commit/one-existing-note limitation.
+
+Accepted ADR 0001, ADR 0004, and ADR 0006 remain authoritative. No migration or
+API wire change remains outstanding.
