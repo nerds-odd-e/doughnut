@@ -208,7 +208,7 @@ Sizing: about 5 minutes, medium confidence; one transport boundary proof loop.
 
 ### 5. Reject an unreadable or incomplete Git proposal
 Type: Behavior
-Status: planned
+Status: done
 Proof: controller cases submit corrupt bytes or a bundle without a usable main.
 
 Behavior: authorized input cannot supply a complete main commit → POST →
@@ -487,3 +487,14 @@ Sizing: about 5 minutes plus backend runtime, medium confidence.
   run has exactly 4 pre-existing, unrelated failures
   (`StructuredResponseCreateParamsSerializerTest`, a Spring ApplicationContext
   load cascade) both before and after this slice. Next action: execute slice 5.
+- Slice 5 done: added `NotebookGitProposalImporter.importMainHead(bytes)`
+  (`services/notebookGit/`), importing the proposal via `TransportBundleStream`
+  into a fresh in-memory repository and returning `ImportedProposal(repository,
+  mainHead)`; a missing `refs/heads/main` or any JGit import failure (corrupt/
+  incomplete bundle) becomes `400 BAD_REQUEST` and leaves the accepted binding
+  untouched, while a genuinely valid bundle still reaches the interim
+  `501 NOT_IMPLEMENTED` refusal. No API/DTO signature change, no CLI changes.
+  Post-change-refactor deduplicated the two new rejection tests' assertions
+  and simplified the "no usable main" test fixture to reuse
+  `NotebookGitBundleBuilder`/`NotebookGitBundleWriter` instead of hand-rolling
+  JGit tree/commit construction. Next action: execute slice 6.

@@ -10,10 +10,22 @@ import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookGitBinding;
 import com.odde.donut.entities.User;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
+import com.odde.donut.services.notebookExport.PortableTreeEntry;
+import com.odde.donut.services.notebookGit.NotebookGitBundleBuilder;
+import com.odde.donut.services.notebookGit.NotebookGitBundleWriter;
 import com.odde.donut.testability.GitBundleTestReader;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.time.Instant;
+import java.util.List;
 import org.eclipse.jgit.internal.storage.dfs.DfsRepositoryDescription;
 import org.eclipse.jgit.internal.storage.dfs.InMemoryRepository;
+import org.eclipse.jgit.lib.Constants;
+import org.eclipse.jgit.lib.NullProgressMonitor;
 import org.eclipse.jgit.lib.ObjectId;
+import org.eclipse.jgit.lib.Repository;
+import org.eclipse.jgit.transport.BundleWriter;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -91,11 +103,71 @@ class NotebookGitBundleControllerTest extends NotebookControllerTestBase {
   void ownerSubmittingAProposalStillReceivesTheInterimRefusal() throws Exception {
     Notebook notebook = createGitBackedNotebook();
 
-    assertThrows(
-        ResponseStatusException.class,
-        () ->
-            controller.publishNotebookGitProposal(
-                notebook, "someExpectedHead", "placeholder bundle bytes".getBytes()));
+    ResponseStatusException exception =
+        assertThrows(
+            ResponseStatusException.class,
+            () ->
+                controller.publishNotebookGitProposal(
+                    notebook, "someExpectedHead", validProposalBundleBytes()));
+
+    assertThat(exception.getStatusCode(), equalTo(HttpStatus.NOT_IMPLEMENTED));
+  }
+
+  @Test
+  void rejectsUnreadableBundleBytesWithoutMutatingTheAcceptedBinding() throws Exception {
+    assertProposalRejectedWithoutMutatingBinding(
+        createGitBackedNotebook(), "not a git bundle".getBytes(StandardCharsets.UTF_8));
+  }
+
+  @Test
+  void rejectsBundleWithoutUsableMainWithoutMutatingTheAcceptedBinding() throws Exception {
+    Notebook notebook = createGitBackedNotebook();
+    assertProposalRejectedWithoutMutatingBinding(notebook, bundleBytesWithoutUsableMain());
+  }
+
+  private void assertProposalRejectedWithoutMutatingBinding(Notebook notebook, byte[] bundleBytes)
+      throws UnexpectedNoAccessRightException {
+    NotebookGitBinding before =
+        notebookGitBindingRepository.findByNotebook_Id(notebook.getId()).orElseThrow();
+
+    ResponseStatusException exception =
+        assertThrows(
+            ResponseStatusException.class,
+            () -> controller.publishNotebookGitProposal(notebook, "someExpectedHead", bundleBytes));
+
+    assertThat(exception.getStatusCode(), equalTo(HttpStatus.BAD_REQUEST));
+
+    NotebookGitBinding after =
+        notebookGitBindingRepository.findByNotebook_Id(notebook.getId()).orElseThrow();
+    assertThat(after.getAcceptedGitObjectId(), equalTo(before.getAcceptedGitObjectId()));
+    assertThat(after.getBundleBytes(), equalTo(before.getBundleBytes()));
+    assertThat(after.getUpdatedAt(), equalTo(before.getUpdatedAt()));
+  }
+
+  private byte[] validProposalBundleBytes() {
+    List<PortableTreeEntry> entries = List.of(new PortableTreeEntry("README.md", "proposal"));
+    try (Repository repository =
+        NotebookGitBundleBuilder.build(
+            entries, "Proposer", "proposer@example.com", "Proposal", Instant.now())) {
+      return NotebookGitBundleWriter.write(repository).bundleBytes();
+    }
+  }
+
+  /** A well-formed bundle that advertises {@code refs/heads/other}, not {@code refs/heads/main}. */
+  private byte[] bundleBytesWithoutUsableMain() throws IOException {
+    List<PortableTreeEntry> entries =
+        List.of(new PortableTreeEntry("README.md", "off-main content"));
+    try (Repository repository =
+        NotebookGitBundleBuilder.build(
+            entries, "Proposer", "proposer@example.com", "Off-main commit", Instant.now())) {
+      ObjectId commitId = repository.exactRef(Constants.R_HEADS + "main").getObjectId();
+
+      BundleWriter bundleWriter = new BundleWriter(repository);
+      bundleWriter.include("refs/heads/other", commitId);
+      ByteArrayOutputStream out = new ByteArrayOutputStream();
+      bundleWriter.writeBundle(NullProgressMonitor.INSTANCE, out);
+      return out.toByteArray();
+    }
   }
 
   @Test

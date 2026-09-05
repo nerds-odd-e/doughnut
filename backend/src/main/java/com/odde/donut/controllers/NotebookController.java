@@ -34,6 +34,7 @@ import com.odde.donut.services.NotebookGroupService;
 import com.odde.donut.services.NotebookIndexingService;
 import com.odde.donut.services.NotebookService;
 import com.odde.donut.services.WikidataService;
+import com.odde.donut.services.notebookGit.NotebookGitProposalImporter;
 import com.odde.donut.testability.TestabilitySettings;
 import com.odde.donut.validators.AuthoredNoteContent;
 import io.swagger.v3.oas.annotations.Operation;
@@ -485,6 +486,7 @@ class NotebookController {
       @RequestBody byte[] bundleBytes)
       throws UnexpectedNoAccessRightException {
     authorizationService.assertAuthorization(notebook);
+    NotebookGitProposalImporter.importMainHead(bundleBytes).repository().close();
     throw new ResponseStatusException(
         HttpStatus.NOT_IMPLEMENTED, "Publishing is not available yet.");
   }
