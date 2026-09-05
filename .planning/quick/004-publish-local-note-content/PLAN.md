@@ -236,7 +236,7 @@ Sizing: 3–5 minutes, medium confidence.
 
 ### 7. Limit publication to one unchanged regular note path
 Type: Behavior
-Status: planned
+Status: done
 Proof: controller data variations reject unsupported tree shapes with the
 offending path while a one-file regular modification reaches the next gate.
 
@@ -508,3 +508,18 @@ Sizing: about 5 minutes plus backend runtime, medium confidence.
   reaches the interim refusal. Post-change-refactor extracted a shared
   `requireGitBinding` helper (was duplicated between GET and POST). No API/DTO
   or CLI changes. Next action: execute slice 7.
+- Slice 7 done: added `NotebookGitProposalTreeShape.assertSingleModifiedRegularNotePath`
+  (`services/notebookGit/`) — a raw two-tree walk (no rename detection) that
+  rejects added/deleted/moved paths, unsafe paths, non-regular modes, and
+  zero/multiple content changes, requiring exactly one changed `.md` path whose
+  basename isn't `README.md` (index.md/log.md are not forbidden here). Runs
+  only when the proposal isn't an identical-heads no-op (reserved for slice 15).
+  Post-change-refactor moved commit-parsing into the tree-shape class itself
+  (matching `NotebookGitProposalAncestry`'s idiom, removing a duplicated
+  controller helper) and split the growing test file into
+  `NotebookGitBundleControllerTestBase` (shared fixtures) plus a new
+  `NotebookGitProposalTreeShapeControllerTest`, following the existing
+  `*ControllerTestBase` + leaf-classes convention; `NotebookGitBundleControllerTest`
+  itself is still slightly over the 250-line guideline (pre-existing, spans two
+  unrelated concepts — left for a dedicated cleanup, not this slice's scope).
+  No API/DTO or CLI changes. Next action: execute slice 8.

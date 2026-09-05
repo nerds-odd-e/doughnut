@@ -36,6 +36,7 @@ import com.odde.donut.services.NotebookService;
 import com.odde.donut.services.WikidataService;
 import com.odde.donut.services.notebookGit.NotebookGitProposalAncestry;
 import com.odde.donut.services.notebookGit.NotebookGitProposalImporter;
+import com.odde.donut.services.notebookGit.NotebookGitProposalTreeShape;
 import com.odde.donut.testability.TestabilitySettings;
 import com.odde.donut.validators.AuthoredNoteContent;
 import io.swagger.v3.oas.annotations.Operation;
@@ -494,6 +495,10 @@ class NotebookController {
       ObjectId acceptedHead = ObjectId.fromString(binding.getAcceptedGitObjectId());
       NotebookGitProposalAncestry.assertFollowsAcceptedHead(
           proposal.repository(), proposal.mainHead(), acceptedHead);
+      if (!proposal.mainHead().equals(acceptedHead)) {
+        NotebookGitProposalTreeShape.assertSingleModifiedRegularNotePath(
+            proposal.repository(), acceptedHead, proposal.mainHead());
+      }
     } finally {
       proposal.repository().close();
     }

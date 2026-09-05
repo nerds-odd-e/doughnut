@@ -4,8 +4,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import com.odde.donut.controllers.dto.NotebookCreationRequest;
-import com.odde.donut.controllers.dto.NotebookRealm;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookGitBinding;
 import com.odde.donut.entities.User;
@@ -18,21 +16,12 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
-import java.time.ZoneOffset;
 import java.util.List;
-import org.eclipse.jgit.dircache.DirCache;
-import org.eclipse.jgit.dircache.DirCacheBuilder;
-import org.eclipse.jgit.dircache.DirCacheEntry;
 import org.eclipse.jgit.internal.storage.dfs.DfsRepositoryDescription;
 import org.eclipse.jgit.internal.storage.dfs.InMemoryRepository;
-import org.eclipse.jgit.lib.CommitBuilder;
 import org.eclipse.jgit.lib.Constants;
-import org.eclipse.jgit.lib.FileMode;
 import org.eclipse.jgit.lib.NullProgressMonitor;
 import org.eclipse.jgit.lib.ObjectId;
-import org.eclipse.jgit.lib.ObjectInserter;
-import org.eclipse.jgit.lib.PersonIdent;
-import org.eclipse.jgit.lib.RefUpdate;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.transport.BundleWriter;
 import org.junit.jupiter.api.Test;
@@ -42,14 +31,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.server.ResponseStatusException;
 
-class NotebookGitBundleControllerTest extends NotebookControllerTestBase {
-
-  private Notebook createGitBackedNotebook() throws UnexpectedNoAccessRightException {
-    NotebookCreationRequest request = new NotebookCreationRequest();
-    request.setNewTitle("Git Backed Notebook For Bundle");
-    NotebookRealm response = controller.createNotebook(request);
-    return notebookRepository.findById(response.notebook().getId()).orElseThrow();
-  }
+class NotebookGitBundleControllerTest extends NotebookGitBundleControllerTestBase {
 
   @Test
   void ownerDownloadsAcceptedBundleWithoutMutatingIt() throws Exception {
@@ -106,24 +88,6 @@ class NotebookGitBundleControllerTest extends NotebookControllerTestBase {
     assertThrows(
         UnexpectedNoAccessRightException.class,
         () -> controller.downloadNotebookGitBundle(notebook));
-  }
-
-  @Test
-  void ownerSubmittingAValidChildProposalStillReceivesTheInterimRefusal() throws Exception {
-    Notebook notebook = createGitBackedNotebook();
-    NotebookGitBinding binding =
-        notebookGitBindingRepository.findByNotebook_Id(notebook.getId()).orElseThrow();
-
-    ResponseStatusException exception =
-        assertThrows(
-            ResponseStatusException.class,
-            () ->
-                controller.publishNotebookGitProposal(
-                    notebook,
-                    binding.getAcceptedGitObjectId(),
-                    singleParentChildBundleBytes(binding)));
-
-    assertThat(exception.getStatusCode(), equalTo(HttpStatus.NOT_IMPLEMENTED));
   }
 
   @Test
@@ -213,26 +177,6 @@ class NotebookGitBundleControllerTest extends NotebookControllerTestBase {
         HttpStatus.CONFLICT);
   }
 
-  private void assertProposalRejectedWithoutMutatingBinding(
-      Notebook notebook, String expectedHead, byte[] bundleBytes, HttpStatus expectedStatus)
-      throws UnexpectedNoAccessRightException {
-    NotebookGitBinding before =
-        notebookGitBindingRepository.findByNotebook_Id(notebook.getId()).orElseThrow();
-
-    ResponseStatusException exception =
-        assertThrows(
-            ResponseStatusException.class,
-            () -> controller.publishNotebookGitProposal(notebook, expectedHead, bundleBytes));
-
-    assertThat(exception.getStatusCode(), equalTo(expectedStatus));
-
-    NotebookGitBinding after =
-        notebookGitBindingRepository.findByNotebook_Id(notebook.getId()).orElseThrow();
-    assertThat(after.getAcceptedGitObjectId(), equalTo(before.getAcceptedGitObjectId()));
-    assertThat(after.getBundleBytes(), equalTo(before.getBundleBytes()));
-    assertThat(after.getUpdatedAt(), equalTo(before.getUpdatedAt()));
-  }
-
   /** A well-formed, parentless root commit bundle unrelated to any notebook's accepted history. */
   private byte[] validProposalBundleBytes() {
     List<PortableTreeEntry> entries = List.of(new PortableTreeEntry("README.md", "proposal"));
@@ -311,48 +255,6 @@ class NotebookGitBundleControllerTest extends NotebookControllerTestBase {
               repository, List.of(firstChild), "second.md", "second content", "Second commit");
       return bundleBytesForHead(repository, secondChild);
     }
-  }
-
-  private static ObjectId commitOnTopOf(
-      Repository repository, List<ObjectId> parents, String path, String content, String message)
-      throws IOException {
-    try (ObjectInserter inserter = repository.newObjectInserter()) {
-      ObjectId blobId =
-          inserter.insert(Constants.OBJ_BLOB, content.getBytes(StandardCharsets.UTF_8));
-      DirCache dirCache = DirCache.newInCore();
-      DirCacheBuilder builder = dirCache.builder();
-      DirCacheEntry entry = new DirCacheEntry(path);
-      entry.setFileMode(FileMode.REGULAR_FILE);
-      entry.setObjectId(blobId);
-      builder.add(entry);
-      builder.finish();
-      ObjectId treeId = dirCache.writeTree(inserter);
-
-      PersonIdent author =
-          new PersonIdent("Proposer", "proposer@example.com", Instant.now(), ZoneOffset.UTC);
-      CommitBuilder commitBuilder = new CommitBuilder();
-      commitBuilder.setTreeId(treeId);
-      commitBuilder.setParentIds(parents.toArray(new ObjectId[0]));
-      commitBuilder.setAuthor(author);
-      commitBuilder.setCommitter(author);
-      commitBuilder.setMessage(message);
-      ObjectId commitId = inserter.insert(commitBuilder);
-      inserter.flush();
-      return commitId;
-    }
-  }
-
-  private static byte[] bundleBytesForHead(Repository repository, ObjectId headId)
-      throws IOException {
-    RefUpdate refUpdate = repository.updateRef(Constants.R_HEADS + "main");
-    refUpdate.setNewObjectId(headId);
-    refUpdate.forceUpdate();
-
-    BundleWriter bundleWriter = new BundleWriter(repository);
-    bundleWriter.include(Constants.R_HEADS + "main", headId);
-    ByteArrayOutputStream out = new ByteArrayOutputStream();
-    bundleWriter.writeBundle(NullProgressMonitor.INSTANCE, out);
-    return out.toByteArray();
   }
 
   @Test

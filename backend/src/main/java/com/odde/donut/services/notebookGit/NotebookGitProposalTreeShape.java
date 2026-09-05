@@ -1,0 +1,123 @@
+package com.odde.donut.services.notebookGit;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import org.eclipse.jgit.lib.FileMode;
+import org.eclipse.jgit.lib.ObjectId;
+import org.eclipse.jgit.lib.Repository;
+import org.eclipse.jgit.revwalk.RevCommit;
+import org.eclipse.jgit.revwalk.RevWalk;
+import org.eclipse.jgit.treewalk.TreeWalk;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
+
+/**
+ * Walks the raw two-tree diff (no rename detection) between a proposal's accepted-parent commit and
+ * its proposed commit, and confirms the proposed tree differs from the accepted tree by exactly one
+ * modified, ordinary Markdown note at an unchanged regular file mode - never an added/deleted/moved
+ * path, an unsafe path, a non-regular mode, more than one changed file, or the folder-reserved
+ * {@code README.md}. Callers only invoke this once a proposal's ancestry has already been confirmed
+ * to be a direct single-parent child of the accepted commit.
+ */
+public final class NotebookGitProposalTreeShape {
+
+  private NotebookGitProposalTreeShape() {}
+
+  /**
+   * @return the single modified note's path, once every other constraint holds
+   * @throws ResponseStatusException 400 BAD_REQUEST naming the offending path/reason when the tree
+   *     shape is unsupported, or when either commit cannot be inspected
+   */
+  public static String assertSingleModifiedRegularNotePath(
+      Repository repository, ObjectId acceptedHead, ObjectId proposedHead) {
+    try (RevWalk revWalk = new RevWalk(repository)) {
+      RevCommit acceptedCommit = revWalk.parseCommit(acceptedHead);
+      RevCommit proposedCommit = revWalk.parseCommit(proposedHead);
+      return walkTreeShape(repository, acceptedCommit, proposedCommit);
+    } catch (IOException e) {
+      throw unsupportedTreeShape("proposal tree could not be inspected", e);
+    }
+  }
+
+  private static String walkTreeShape(
+      Repository repository, RevCommit acceptedCommit, RevCommit proposedCommit)
+      throws IOException {
+    try (TreeWalk walk = new TreeWalk(repository)) {
+      walk.addTree(acceptedCommit.getTree());
+      walk.addTree(proposedCommit.getTree());
+      walk.setRecursive(true);
+
+      List<String> changedPaths = new ArrayList<>();
+      while (walk.next()) {
+        String path = walk.getPathString();
+        assertPathIsSafe(path);
+
+        FileMode acceptedMode = walk.getFileMode(0);
+        FileMode proposedMode = walk.getFileMode(1);
+        if (FileMode.MISSING.equals(acceptedMode) || FileMode.MISSING.equals(proposedMode)) {
+          throw unsupportedTreeShape(
+              "path \""
+                  + path
+                  + "\" is added, deleted, or moved (no rename detection is performed)");
+        }
+        if (!FileMode.REGULAR_FILE.equals(acceptedMode)
+            || !FileMode.REGULAR_FILE.equals(proposedMode)) {
+          throw unsupportedTreeShape("path \"" + path + "\" is not a regular file mode");
+        }
+
+        if (!walk.getObjectId(0).equals(walk.getObjectId(1))) {
+          changedPaths.add(path);
+        }
+      }
+
+      return requireExactlyOneAllowedNoteChange(changedPaths);
+    }
+  }
+
+  private static String requireExactlyOneAllowedNoteChange(List<String> changedPaths) {
+    if (changedPaths.isEmpty()) {
+      throw unsupportedTreeShape("proposal contains no changed file");
+    }
+    if (changedPaths.size() > 1) {
+      throw unsupportedTreeShape(
+          "multiple changed files: "
+              + String.join(", ", changedPaths.subList(0, Math.min(2, changedPaths.size()))));
+    }
+
+    String changedPath = changedPaths.get(0);
+    if (!changedPath.endsWith(".md")) {
+      throw unsupportedTreeShape("path \"" + changedPath + "\" is not a Markdown note");
+    }
+    if ("README.md".equals(basename(changedPath))) {
+      throw unsupportedTreeShape(
+          "path \"" + changedPath + "\" is a folder README, which is reserved");
+    }
+    return changedPath;
+  }
+
+  private static void assertPathIsSafe(String path) {
+    if (path.isEmpty() || path.startsWith("/")) {
+      throw unsupportedTreeShape("path \"" + path + "\" is unsafe");
+    }
+    for (String segment : path.split("/")) {
+      if (segment.equals(".") || segment.equals("..")) {
+        throw unsupportedTreeShape("path \"" + path + "\" is unsafe");
+      }
+    }
+  }
+
+  private static String basename(String path) {
+    int lastSlash = path.lastIndexOf('/');
+    return lastSlash < 0 ? path : path.substring(lastSlash + 1);
+  }
+
+  private static ResponseStatusException unsupportedTreeShape(String reason) {
+    return new ResponseStatusException(HttpStatus.BAD_REQUEST, "Unsupported tree shape: " + reason);
+  }
+
+  private static ResponseStatusException unsupportedTreeShape(String reason, Throwable cause) {
+    return new ResponseStatusException(
+        HttpStatus.BAD_REQUEST, "Unsupported tree shape: " + reason, cause);
+  }
+}
