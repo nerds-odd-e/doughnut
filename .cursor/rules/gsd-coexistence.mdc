@@ -40,7 +40,7 @@ These are **hard** in this repo even when GSD workflows omit them:
 | **After-slice plan update** | Every completed slice | Keeps remaining work accurate for resume |
 | **After-slice post-change-refactor** | Every slice before commit | Cohesion / dead code / 250-line discipline |
 | **After-slice selective formatting** | Every slice after refactor/API generation and before the PLAN update/staging | The coordinator runs `./scripts/run.sh pnpm format:changed` once and lets it select affected components (including a planning-only no-op); routine wrap-up does not spawn `format-changed`, and the pre-commit hook remains the independent check-only lint pass |
-| **After-slice commit + push (+ CD when applicable)** | Every closed slice before the next | Deploy gate; remote/CI catch issues early |
+| **After-slice commit + push; asynchronous CI observation** | Every closed slice before the next | Push completes routine wrap-up. `execute-plan` handles CI failures via pause/stash/repair/resume without waiting for CI or CD |
 | **Active history cleanup when the plan is done** | When the last slice is done and outcomes are in code/permanent docs | GSD tends to keep SUMMARYs; we prune spent planning diary |
 | **Nix prefix (`CURSOR_DEV=true nix develop -c`); assume `pnpm sut` running; no restart nag** | All tooling | Env contract GSD does not know |
 | **Stack/domain rules** (backend, frontend, e2e, cli, mcp, db-migration, …) | Matching globs / skills | Product architecture |

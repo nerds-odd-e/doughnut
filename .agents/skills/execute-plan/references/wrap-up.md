@@ -43,4 +43,8 @@ rerunning it; recovered complete proof remains reusable.
    findings directly; stop for semantic/design judgment. Do not run standalone
    `lint:changed`. If a hook repair invalidates preparation, rerun the direct
    formatting command before restaging and retrying.
-8. Push with `git push`.
+8. Push with `git push`. A successful push completes routine wrap-up. Start the
+   nonblocking CI observer for the pushed revision per
+   [ci-monitor.md](ci-monitor.md), then continue the plan. Handle delivered CI
+   failures through its pause/stash/repair/resume protocol; never wait for CI
+   or CD to finish. Apply the same rule after pushing a CI repair.

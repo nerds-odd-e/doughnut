@@ -4,8 +4,8 @@ description: >-
   Autonomously execute a plan under .planning/phases/ or
   .planning/quick/ .
   Applies local wrap-up on every slice: Jidoka, post-change-refactor,
-  selective formatting, plan update, commit, and push. Parallel waves OK when
-  safe.
+  selective formatting, plan update, commit, and push. Observes CI
+  asynchronously and coordinates failure repair. Parallel waves OK when safe.
   Triggers on: execute plan, run plan, execute slices, start plan,
   do .planning, execute .planning, run .planning.
 ---
@@ -29,7 +29,9 @@ waiting on the developer.
 Before executing, also read [delegation.md](references/delegation.md),
 [disposable-research.md](references/disposable-research.md), and
 [destructive-later-outcome-check.md](references/destructive-later-outcome-check.md),
-and [wrap-up.md](references/wrap-up.md) in full.
+and [wrap-up.md](references/wrap-up.md) in full. Read
+[ci-monitor.md](references/ci-monitor.md) for the background observer and
+pause/stash/repair/resume protocol.
 
 **Plan locations:**
 
@@ -90,8 +92,10 @@ developer's brain.
   overall architecture.
 - **Authentication / credentials** — secrets, API keys, login flows, or
   permissions the agent cannot supply.
-- **Unexpected failure you cannot diagnose** — test fails for reasons unrelated
-  to the current change, CI breaks on something external, etc.
+- **Unexpected failure you cannot diagnose** — a focused investigation cannot
+  resolve it. Background CI failures first use the diagnosis/repair protocol
+  in [ci-monitor.md](references/ci-monitor.md); proven CI server failures are
+  ignored for that attempt.
 - **Ambiguity** — the slice description is unclear and guessing wrong would
   waste a commit.
 - **Stale story decomposition** — evidence changes the selected story's
@@ -120,6 +124,7 @@ decision** the developer needs. Then wait.
 <step name="coordinator_loop">
 ```
 1. Read the plan (GSD phase dir PLAN.md / GSD *-PLAN.md / quick PLAN.md)
+   Handle delivered CI events using ci-monitor.md; polling runs without AI.
 2. Find the next slice whose status is NOT "done"
 3. Pre-slice Jidoka + Behavior/Structure + refinement-trigger check; before
    delegating destructive work, run the [named later-outcome check](references/destructive-later-outcome-check.md)
@@ -144,23 +149,12 @@ decision** the developer needs. Then wait.
       otherwise wait for developer judgment.
 6. COORDINATOR WRAP-UP (required — do not skip): follow `<step name="wrap_up">`.
 7. Go to step 1 (next slice)
-8. All slices done → clean up spent plan history (planning.mdc) → report & STOP
+8. All slices done → handle delivered CI events, stop observers without waiting
+   for CI → clean up spent plan history (planning.mdc) → report & STOP
 ```
 
-Recognize slices by headings/status or GSD plan tasks. Typical local section:
-
-```markdown
-### Short capability description
-Type: Behavior | Structure
-Status: planned / in-progress / done
-
-Pre-condition / trigger / post-condition (Behavior)
-— or —
-Structure change + immediate next Behavior it unlocks
-```
-
-When the **entire** plan is complete: actively clean spent planning history per
-`planning.mdc` (keep product/code; drop disposable diary under `.planning/`).
+Recognize slices by headings/status or GSD plan tasks, using the required PLAN
+fields in `planning.mdc`.
 </step>
 
 <step name="delegation">
@@ -206,6 +200,8 @@ When this happens:
   `./scripts/run.sh pnpm format:changed` → plan update without a second routine
   formatting pass → commit (check-only lint hook) → push
 - Pre- and post-slice Jidoka checks applied
+- CI observed asynchronously when a notification bridge is available; delivered
+  defects (including flaky tests) repaired with pause/stash/restore; no CD gate
 - Slice-plan-refinement invoked for coarse/low-confidence leaves and overruns,
   but not required for straightforward commit-sized plans
 - Stale story decomposition stops execution after the current safe wrap-up

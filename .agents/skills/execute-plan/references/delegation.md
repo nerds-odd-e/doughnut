@@ -34,5 +34,11 @@ The implementer prompt must include:
 
    The command must be literal and complete. A placeholder, abbreviation, or
    paraphrase is missing or ambiguous proof.
+8. Cooperate with coordinator CI pauses: stop editing, finish or terminate
+   write-capable commands, and return `## PAUSED FOR CI` with current slice,
+   changed/untracked paths, exact completed proof, incomplete commands, and
+   next action. Stay idle until explicitly resumed. After resume, reread files
+   affected by the repair and rerun only invalidated proof. Other agents share
+   the checkout; never revert their work.
 
 Resume context remains in the plan on disk.
