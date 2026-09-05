@@ -30,6 +30,6 @@ Feature: CLI notebook clone
       | Overview.md       |
       | Recipes/README.md |
       | Recipes/Pasta.md  |
-    And I should see "publishing is not available" in the non-interactive output
+    And I should see "Publishing currently accepts one new commit directly on the accepted main" in the non-interactive output
     When I open the notebook "CLI Clone Notebook" from the notebook catalog
     Then the notebook readme body includes "Notebook landing"
