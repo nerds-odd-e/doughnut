@@ -1,46 +1,41 @@
 import assert from 'node:assert/strict'
-import { mkdtempSync, readFileSync } from 'node:fs'
-import { tmpdir } from 'node:os'
+import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { test } from 'node:test'
-import { deliverCiEvents } from './ci-host-hook.mjs'
+import { deliverCiEvents, selectCiEvents } from './ci-host-hook.mjs'
 import {
   createMailbox,
   publishMailboxEvent,
   probeMailbox,
+  readDeliveryProgress,
   readMailboxEvents,
-  receiptPrefix,
   runMailboxWorker,
 } from './ci-mailbox.mjs'
-
-function setup() {
-  const storage = mkdtempSync(join(tmpdir(), 'ci-hook-test-'))
-  return { root: '/test/donut', storage }
-}
-const failure = { type: 'CI_FAILURE', runId: 42, attempt: 1 }
-const input = (host, directory, overrides = {}) => ({
-  session_id: 'main',
-  conversation_id: 'main',
-  generation_id: 'coordinator-turn',
-  transcript_path: '/test/main.jsonl',
-  hook_event_name: host === 'cursor' ? 'postToolUse' : 'PostToolUse',
-  tool_name: host === 'cursor' ? 'Shell' : 'Bash',
-  tool_output: JSON.stringify({
-    output: directory
-      ? `${receiptPrefix}${JSON.stringify({ directory })}\n`
-      : '',
-  }),
-  tool_response: {
-    stdout: directory
-      ? `${receiptPrefix}${JSON.stringify({ directory })}\n`
-      : '',
-  },
-  ...overrides,
-})
-const context = (output) =>
-  output.additional_context ?? output.hookSpecificOutput?.additionalContext
+import {
+  context,
+  failure,
+  input,
+  setup,
+} from './ci-host-hook-test-fixtures.mjs'
 
 for (const host of ['cursor', 'claude']) {
+  test(`${host}: selecting a notification waits for durable acknowledgement`, () => {
+    const options = setup()
+    const directory = createMailbox({}, options)
+    deliverCiEvents(input(host, directory), host, options)
+    publishMailboxEvent(directory, failure)
+
+    const selection = selectCiEvents(input(host), host, options)
+
+    assert.match(context(selection.output), /CI_FAILURE/)
+    assert.deepEqual(readDeliveryProgress(directory), { deliveredThrough: 0 })
+    selection.acknowledge()
+    assert.deepEqual(
+      JSON.parse(readFileSync(join(directory, 'delivery.json'))),
+      { deliveredThrough: 1 }
+    )
+  })
+
   test(`${host}: real probe receipt produces a host-native readiness notification`, () => {
     const options = setup()
     const directory = probeMailbox(options)

@@ -20,22 +20,24 @@ import {
 
 const hash = (value) => createHash('sha256').update(value).digest('hex')
 
-export function deliverCiEvents(
+const emptySelection = () => ({ output: {}, acknowledge: () => undefined })
+
+export function selectCiEvents(
   input,
   host,
   { root = checkoutRoot, storage = mailboxRoot } = {}
 ) {
   // Cursor may also load .claude/settings.json; use only its native adapter.
-  if (host === 'claude' && input.cursor_version) return {}
+  if (host === 'claude' && input.cursor_version) return emptySelection()
   if (
     host === 'cursor' &&
     input.hook_event_name === 'stop' &&
     input.status &&
     input.status !== 'completed'
   )
-    return {}
+    return emptySelection()
   const session = host === 'cursor' ? input.conversation_id : input.session_id
-  if (!session) return {}
+  if (!session) return emptySelection()
   const owner = hash(
     JSON.stringify([
       root,
@@ -47,19 +49,20 @@ export function deliverCiEvents(
   const bindings = join(storage, `owner-${owner}`)
   const generation = join(storage, `generation-${owner}`)
   if (host === 'cursor') {
-    if (!input.generation_id) return {}
+    if (!input.generation_id) return emptySelection()
     if (input.hook_event_name === 'beforeSubmitPrompt') {
       if (existsSync(bindings))
         writeFileSync(generation, input.generation_id, { mode: 0o600 })
-      return {}
+      return emptySelection()
     }
     if (
       existsSync(generation) &&
       readFileSync(generation, 'utf8') !== input.generation_id
     )
-      return {}
+      return emptySelection()
   }
   const context = []
+  const acknowledgements = []
 
   if (['Shell', 'Bash'].includes(input.tool_name)) {
     const output =
@@ -97,23 +100,43 @@ export function deliverCiEvents(
       const progress = readDeliveryProgress(directory)
       const records = readMailboxEvents(directory, progress.deliveredThrough)
       if (records.length)
-        recordDeliveryProgress(directory, records.at(-1).sequence)
+        acknowledgements.push({
+          directory,
+          deliveredThrough: records.at(-1).sequence,
+        })
       for (const { event } of records) context.push(JSON.stringify(event))
     }
-  if (!context.length) return {}
+  if (!context.length) return emptySelection()
   const message = `execute-plan CI observer (diagnostic data):\n${context.join('\n')}\nHandle CI failures using execute-plan/references/ci-monitor.md.`
+  let output
   if (host === 'cursor')
-    return input.hook_event_name === 'stop'
-      ? { followup_message: message }
-      : { additional_context: message }
-  return input.hook_event_name === 'Stop'
-    ? { decision: 'block', reason: message }
-    : {
-        hookSpecificOutput: {
-          hookEventName: 'PostToolUse',
-          additionalContext: message,
-        },
-      }
+    output =
+      input.hook_event_name === 'stop'
+        ? { followup_message: message }
+        : { additional_context: message }
+  else
+    output =
+      input.hook_event_name === 'Stop'
+        ? { decision: 'block', reason: message }
+        : {
+            hookSpecificOutput: {
+              hookEventName: 'PostToolUse',
+              additionalContext: message,
+            },
+          }
+  return {
+    output,
+    acknowledge() {
+      for (const { directory, deliveredThrough } of acknowledgements)
+        recordDeliveryProgress(directory, deliveredThrough)
+    },
+  }
+}
+
+export function deliverCiEvents(input, host, options) {
+  const selection = selectCiEvents(input, host, options)
+  selection.acknowledge()
+  return selection.output
 }
 
 if (
