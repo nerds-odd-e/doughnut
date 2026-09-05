@@ -8,16 +8,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookGitBinding;
 import com.odde.donut.services.notebookExport.PortableTreeEntry;
-import com.odde.donut.services.notebookGit.NotebookGitBundleBuilder;
-import com.odde.donut.services.notebookGit.NotebookGitBundleWriter;
-import com.odde.donut.testability.GitBundleTestReader;
-import java.time.Instant;
 import java.util.List;
-import org.eclipse.jgit.internal.storage.dfs.DfsRepositoryDescription;
-import org.eclipse.jgit.internal.storage.dfs.InMemoryRepository;
 import org.eclipse.jgit.lib.FileMode;
-import org.eclipse.jgit.lib.ObjectId;
-import org.eclipse.jgit.lib.Repository;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
@@ -31,13 +23,13 @@ class NotebookGitProposalTreeShapeControllerTest extends NotebookGitBundleContro
   @Test
   void ownerSubmittingAValidChildProposalStillReceivesTheInterimRefusal() throws Exception {
     Notebook notebook = createGitBackedNotebook();
-    NotebookGitBinding binding = seedAcceptedBinding(notebook, baselineEntries());
+    NotebookGitBinding binding = seedAcceptedBinding(notebook, validBaselineEntries());
     byte[] bundleBytes =
         proposalBundleBytes(
             binding,
             List.of(
-                new ProposedFile("note.md", "changed content"),
-                new ProposedFile("README.md", "readme original")));
+                new ProposedFile("note.md", "---\ntype: Note\n---\nchanged content"),
+                new ProposedFile("README.md", "---\ntype: Readme\n---\nreadme original")));
 
     ResponseStatusException exception =
         assertThrows(
@@ -56,14 +48,14 @@ class NotebookGitProposalTreeShapeControllerTest extends NotebookGitBundleContro
         seedAcceptedBinding(
             notebook,
             List.of(
-                new PortableTreeEntry("index.md", "original content"),
-                new PortableTreeEntry("README.md", "readme original")));
+                new PortableTreeEntry("index.md", "---\ntype: Note\n---\noriginal content"),
+                new PortableTreeEntry("README.md", "---\ntype: Readme\n---\nreadme original")));
     byte[] bundleBytes =
         proposalBundleBytes(
             binding,
             List.of(
-                new ProposedFile("index.md", "changed content"),
-                new ProposedFile("README.md", "readme original")));
+                new ProposedFile("index.md", "---\ntype: Note\n---\nchanged content"),
+                new ProposedFile("README.md", "---\ntype: Readme\n---\nreadme original")));
 
     ResponseStatusException exception =
         assertThrows(
@@ -177,35 +169,5 @@ class NotebookGitProposalTreeShapeControllerTest extends NotebookGitBundleContro
     return List.of(
         new PortableTreeEntry("note.md", "original content"),
         new PortableTreeEntry("README.md", "readme original"));
-  }
-
-  /**
-   * Testability-only: overwrites {@code notebook}'s accepted Git binding with a fresh root commit
-   * built directly from {@code entries}, so tree-shape tests can control the accepted tree's exact
-   * shape without depending on the notebook's own note/folder content.
-   */
-  private NotebookGitBinding seedAcceptedBinding(
-      Notebook notebook, List<PortableTreeEntry> entries) {
-    NotebookGitBinding binding =
-        notebookGitBindingRepository.findByNotebook_Id(notebook.getId()).orElseThrow();
-    try (Repository repository =
-        NotebookGitBundleBuilder.build(
-            entries, "System", "system@example.com", "Seed content", Instant.now())) {
-      NotebookGitBundleWriter.BundleWriteResult written = NotebookGitBundleWriter.write(repository);
-      binding.setAcceptedGitObjectId(written.headObjectId());
-      binding.setBundleBytes(written.bundleBytes());
-    }
-    return notebookGitBindingRepository.save(binding);
-  }
-
-  /** A bundle whose {@code main} is a single-parent child of {@code binding}'s accepted head. */
-  private byte[] proposalBundleBytes(NotebookGitBinding binding, List<ProposedFile> proposedFiles)
-      throws Exception {
-    try (InMemoryRepository repository = new InMemoryRepository(new DfsRepositoryDescription())) {
-      ObjectId acceptedHead = GitBundleTestReader.fetchHead(repository, binding.getBundleBytes());
-      ObjectId childCommit =
-          commitOnTopOf(repository, List.of(acceptedHead), proposedFiles, "Proposal");
-      return bundleBytesForHead(repository, childCommit);
-    }
   }
 }

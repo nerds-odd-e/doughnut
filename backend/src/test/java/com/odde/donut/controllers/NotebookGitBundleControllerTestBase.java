@@ -9,6 +9,10 @@ import com.odde.donut.controllers.dto.NotebookRealm;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookGitBinding;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
+import com.odde.donut.services.notebookExport.PortableTreeEntry;
+import com.odde.donut.services.notebookGit.NotebookGitBundleBuilder;
+import com.odde.donut.services.notebookGit.NotebookGitBundleWriter;
+import com.odde.donut.testability.GitBundleTestReader;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -19,6 +23,8 @@ import java.util.List;
 import org.eclipse.jgit.dircache.DirCache;
 import org.eclipse.jgit.dircache.DirCacheBuilder;
 import org.eclipse.jgit.dircache.DirCacheEntry;
+import org.eclipse.jgit.internal.storage.dfs.DfsRepositoryDescription;
+import org.eclipse.jgit.internal.storage.dfs.InMemoryRepository;
 import org.eclipse.jgit.lib.CommitBuilder;
 import org.eclipse.jgit.lib.Constants;
 import org.eclipse.jgit.lib.FileMode;
@@ -34,8 +40,9 @@ import org.springframework.web.server.ResponseStatusException;
 
 /**
  * Shared notebook/bundle-crafting fixtures for the notebook Git-bundle download and proposal
- * controller tests ({@link NotebookGitBundleControllerTest} and {@link
- * NotebookGitProposalTreeShapeControllerTest}).
+ * controller tests ({@link NotebookGitBundleControllerTest}, {@link
+ * NotebookGitProposalTreeShapeControllerTest}, and {@link
+ * NotebookGitProposalMarkdownFormatControllerTest}).
  */
 abstract class NotebookGitBundleControllerTestBase extends NotebookControllerTestBase {
 
@@ -67,10 +74,19 @@ abstract class NotebookGitBundleControllerTestBase extends NotebookControllerTes
     return exception;
   }
 
-  /** One file's path, content, and mode within a crafted proposal tree. */
-  record ProposedFile(String path, String content, FileMode mode) {
+  /** One file's path, content bytes, and mode within a crafted proposal tree. */
+  record ProposedFile(String path, byte[] contentBytes, FileMode mode) {
+    ProposedFile(String path, String content, FileMode mode) {
+      this(path, content.getBytes(StandardCharsets.UTF_8), mode);
+    }
+
     ProposedFile(String path, String content) {
       this(path, content, FileMode.REGULAR_FILE);
+    }
+
+    /** For deliberately-invalid byte sequences (e.g. malformed UTF-8) that no String can hold. */
+    ProposedFile(String path, byte[] contentBytes) {
+      this(path, contentBytes, FileMode.REGULAR_FILE);
     }
   }
 
@@ -89,8 +105,7 @@ abstract class NotebookGitBundleControllerTestBase extends NotebookControllerTes
       List<ProposedFile> sortedByPath =
           files.stream().sorted(Comparator.comparing(ProposedFile::path)).toList();
       for (ProposedFile file : sortedByPath) {
-        ObjectId blobId =
-            inserter.insert(Constants.OBJ_BLOB, file.content().getBytes(StandardCharsets.UTF_8));
+        ObjectId blobId = inserter.insert(Constants.OBJ_BLOB, file.contentBytes());
         DirCacheEntry entry = new DirCacheEntry(file.path());
         entry.setFileMode(file.mode());
         entry.setObjectId(blobId);
@@ -123,5 +138,44 @@ abstract class NotebookGitBundleControllerTestBase extends NotebookControllerTes
     ByteArrayOutputStream out = new ByteArrayOutputStream();
     bundleWriter.writeBundle(NullProgressMonitor.INSTANCE, out);
     return out.toByteArray();
+  }
+
+  /**
+   * Testability-only: overwrites {@code notebook}'s accepted Git binding with a fresh root commit
+   * built directly from {@code entries}, so proposal-gating tests can control the accepted tree's
+   * exact shape without depending on the notebook's own note/folder content.
+   */
+  NotebookGitBinding seedAcceptedBinding(Notebook notebook, List<PortableTreeEntry> entries) {
+    NotebookGitBinding binding =
+        notebookGitBindingRepository.findByNotebook_Id(notebook.getId()).orElseThrow();
+    try (Repository repository =
+        NotebookGitBundleBuilder.build(
+            entries, "System", "system@example.com", "Seed content", Instant.now())) {
+      NotebookGitBundleWriter.BundleWriteResult written = NotebookGitBundleWriter.write(repository);
+      binding.setAcceptedGitObjectId(written.headObjectId());
+      binding.setBundleBytes(written.bundleBytes());
+    }
+    return notebookGitBindingRepository.save(binding);
+  }
+
+  /** A bundle whose {@code main} is a single-parent child of {@code binding}'s accepted head. */
+  byte[] proposalBundleBytes(NotebookGitBinding binding, List<ProposedFile> proposedFiles)
+      throws Exception {
+    try (InMemoryRepository repository = new InMemoryRepository(new DfsRepositoryDescription())) {
+      ObjectId acceptedHead = GitBundleTestReader.fetchHead(repository, binding.getBundleBytes());
+      ObjectId childCommit =
+          commitOnTopOf(repository, List.of(acceptedHead), proposedFiles, "Proposal");
+      return bundleBytesForHead(repository, childCommit);
+    }
+  }
+
+  /**
+   * A frontmatter-valid baseline tree: one typed note, one typed README - clears tree-shape and
+   * reaches the typed-Markdown gate, for tests whose proposal must get past both.
+   */
+  static List<PortableTreeEntry> validBaselineEntries() {
+    return List.of(
+        new PortableTreeEntry("note.md", "---\ntype: Note\n---\noriginal content"),
+        new PortableTreeEntry("README.md", "---\ntype: Readme\n---\nreadme original"));
   }
 }

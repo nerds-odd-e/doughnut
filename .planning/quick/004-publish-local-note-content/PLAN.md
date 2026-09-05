@@ -250,7 +250,7 @@ Sizing: about 5 minutes, medium confidence.
 
 ### 8. Require valid typed Markdown without repairing it
 Type: Behavior
-Status: planned
+Status: done
 Proof: controller tree cases reject invalid UTF-8, YAML, non-mapping frontmatter,
 or missing/invalid type; valid unknown type/key content passes this gate verbatim.
 
@@ -523,3 +523,15 @@ Sizing: about 5 minutes plus backend runtime, medium confidence.
   itself is still slightly over the 250-line guideline (pre-existing, spans two
   unrelated concepts — left for a dedicated cleanup, not this slice's scope).
   No API/DTO or CLI changes. Next action: execute slice 8.
+- Slice 8 done: added `NotebookGitProposalMarkdownFormat.assertValidTypedMarkdown`
+  (`services/notebookGit/`) — walks every `.md` path in the full proposed tree
+  (not just the changed one) requiring strict UTF-8, a `---`-fenced YAML
+  mapping, and a non-blank `type` key; deliberately does NOT restrict `type`
+  to a fixed enum or use the permissive web-save repair path
+  (`ensureTypeKey`/`ensureStoredType`) — unknown types and unknown extra keys
+  are preserved/valid. Runs after slice 7's tree-shape gate, only when not an
+  identical-heads no-op. Post-change-refactor split the new tests into their
+  own `NotebookGitProposalMarkdownFormatControllerTest` (mirroring slice 7's
+  production/test split) to keep `NotebookGitProposalTreeShapeControllerTest`
+  under the file-size guideline. No API/DTO or CLI changes. Next action:
+  execute slice 9.
