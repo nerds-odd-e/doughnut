@@ -3,6 +3,7 @@ import {
   readFileSync,
   readdirSync,
   renameSync,
+  rmSync,
   watch,
   writeFileSync,
 } from 'node:fs'
@@ -10,6 +11,9 @@ import { join } from 'node:path'
 
 const eventFilePattern = /^(\d{12})\.json$/
 const terminalResultDeadlineMs = 5_000
+export const terminalResultDeadlineCode = 'CI_OBSERVER_TERMINAL_DEADLINE'
+export const terminalResultDeadlineReason =
+  'CI observer terminal result was not published before its lifecycle deadline'
 
 function publishJson(directory, name, value) {
   const temporary = join(directory, `${name}.tmp`)
@@ -54,19 +58,38 @@ export function readWorkerIdentity(directory) {
   return JSON.parse(readFileSync(join(directory, 'worker.json'), 'utf8'))
 }
 
-function terminalResult(directory, request, status) {
-  if (!(request.mode === 'execution' && status === 'stopped')) return { status }
+function mailboxEvidence(directory) {
   const records = readMailboxEvents(directory)
   const recordedThrough = records.at(-1)?.sequence ?? 0
   const { deliveredThrough } = readDeliveryProgress(directory)
   const unread = records.filter(
     ({ sequence }) => sequence > deliveredThrough
   ).length
+  return { recordedThrough, deliveredThrough, unread }
+}
+
+function terminalResult(directory, request, status) {
+  if (!(request.mode === 'execution' && status === 'stopped')) return { status }
   return {
     status,
     coverage: { state: 'ended', pendingCi: 'unobserved' },
-    evidence: { recordedThrough, deliveredThrough, unread },
+    evidence: mailboxEvidence(directory),
   }
+}
+
+export function recordLostTerminalResult(directory) {
+  const result = {
+    status: 'stopped',
+    coverage: {
+      state: 'lost',
+      pendingCi: 'unobserved',
+      reason: terminalResultDeadlineReason,
+    },
+    evidence: mailboxEvidence(directory),
+  }
+  rmSync(join(directory, 'result.json.tmp'), { force: true })
+  publishJson(directory, 'result.json', result)
+  return result
 }
 
 export async function waitForTerminalResult(
@@ -94,13 +117,12 @@ export async function waitForTerminalResult(
           finished()
           return
         }
-        if (close())
-          reject(
-            new Error(
-              'CI observer terminal result was not published before its lifecycle deadline',
-              { cause: deadline.reason }
-            )
-          )
+        if (!close()) return
+        const error = new Error(terminalResultDeadlineReason, {
+          cause: deadline.reason,
+        })
+        error.code = terminalResultDeadlineCode
+        reject(error)
       }
       deadline.addEventListener('abort', atDeadline, { once: true })
       subscription = watch(directory, finished)

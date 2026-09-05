@@ -12,10 +12,17 @@ import { basename, join, resolve } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 import {
   publishMailboxEvent,
+  readWorkerIdentity,
+  recordLostTerminalResult,
   recordTerminalResult,
   recordWorkerIdentity,
+  terminalResultDeadlineCode,
   waitForTerminalResult,
 } from './ci-mailbox-store.mjs'
+import {
+  mailboxWorkerPath,
+  terminateMailboxWorker,
+} from './ci-mailbox-worker-process.mjs'
 import { executionBudgetMs, watchCiExecution } from './watch-ci-execution.mjs'
 
 export {
@@ -142,6 +149,17 @@ export function requestMailboxStop(directory, options = {}) {
   writeFileSync(join(directory, 'stop'), '', { mode: 0o600 })
 }
 
+async function stopMailbox(directory) {
+  requestMailboxStop(directory)
+  try {
+    return await waitForTerminalResult(directory)
+  } catch (error) {
+    if (error.code !== terminalResultDeadlineCode) throw error
+    await terminateMailboxWorker(readWorkerIdentity(directory), directory)
+    return recordLostTerminalResult(directory)
+  }
+}
+
 async function startMailbox(request) {
   const validRepository = /^[\w.-]+\/[\w.-]+$/.test(request.repo ?? '')
   const validExecution =
@@ -155,7 +173,7 @@ async function startMailbox(request) {
   const directory = createMailbox(request)
   const child = spawn(
     process.execPath,
-    [fileURLToPath(import.meta.url), 'worker', directory],
+    [mailboxWorkerPath, 'worker', directory],
     {
       cwd: checkoutRoot,
       detached: true,
@@ -209,8 +227,7 @@ if (
     )
   } else if (command === 'stop') {
     const directory = args[0]
-    requestMailboxStop(directory)
-    const terminal = await waitForTerminalResult(directory)
+    const terminal = await stopMailbox(directory)
     process.stdout.write(
       `${receiptPrefix}${JSON.stringify({ directory, terminal })}\n`
     )

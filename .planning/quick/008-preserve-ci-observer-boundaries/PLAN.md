@@ -184,12 +184,13 @@ detached mailbox worker. External launch and normal-stop output remain unchanged
 This immediately enables slice 7 to resolve only that worker after a missing
 terminal receipt.
 
-Learning: an atomically published mailbox-local `{ pid }` record is sufficient
-to identify the detached worker without widening the launcher receipt.
+Learning: an atomically published mailbox-local `{ pid }` record supplies the
+worker handle without widening the launcher receipt; slice 7 validates that the
+live PID still runs this mailbox's exact worker command before signaling it.
 
 ### 7. Finish shutdown honestly when terminal publication fails
 Type: Behavior
-Status: planned
+Status: done
 Proof: a real launcher/worker/stop fixture withholds terminal publication;
 shutdown reaches its lifecycle deadline, targets only the retained worker,
 terminates within a finite bound, preserves unread events, and returns explicit
@@ -199,6 +200,11 @@ Behavior: execution ends and the exact observer does not publish a terminal
 receipt after graceful stop → bounded shutdown resolves that worker only → the
 coordinator receives an honest finite result with unread evidence and
 unobserved CI, and no observer process remains.
+
+Learning: PID reuse requires validating the live process's full Node launcher,
+worker command, and exact mailbox path before each signal. The two deadline
+proofs take about ten seconds because they exercise the production lifecycle
+deadline; this is the focused-test runtime sizing exception.
 
 ### 8. Publish the completed observer lifecycle contract
 Type: Behavior
@@ -218,5 +224,6 @@ Update only statements whose truth changed through slices 1–7.
 The original native-delivery and shutdown slices were refined before execution
 into single-proof leaves for shared acknowledgement, each native host, terminal
 notification fallback, exact-worker identity, forced shutdown, and permanent
-guidance. Each remaining leaf is a target-sized hypothesis; no sizing exception
-is currently required.
+guidance. Each remaining leaf is a target-sized hypothesis. Slice 7's focused
+process proof has a runtime exception because two cases each exercise the real
+five-second terminal deadline.
