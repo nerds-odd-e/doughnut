@@ -1,8 +1,16 @@
 import assert from 'node:assert/strict'
-import { existsSync, mkdtempSync, readFileSync, rmSync } from 'node:fs'
+import {
+  existsSync,
+  mkdtempSync,
+  readFileSync,
+  rmSync,
+  symlinkSync,
+  writeFileSync,
+} from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join, resolve } from 'node:path'
 import { test } from 'node:test'
+import { setImmediate } from 'node:timers/promises'
 import {
   checkoutRoot,
   createMailbox,
@@ -13,6 +21,7 @@ import {
   requestMailboxStop,
   runMailboxWorker,
 } from './ci-mailbox.mjs'
+import { waitForTerminalResult } from './ci-mailbox-store.mjs'
 
 function createTestMailbox(t, request = {}) {
   const storage = mkdtempSync(join(tmpdir(), 'ci-mailbox-test-'))
@@ -45,6 +54,34 @@ test('event evidence is appendable and independent of worker status', (t) => {
     { sequence: 2, event: { type: 'CI_INCOMPLETE', runId: 43 } },
   ])
   assert.equal(existsSync(join(directory, 'result.json')), false)
+})
+
+test('terminal result remains observable when its file notification is missed', async (t) => {
+  const { directory, options } = createTestMailbox(t)
+  const terminal = { status: 'stopped' }
+  const terminalRecord = join(options.storage, 'terminal-record.json')
+  symlinkSync(terminalRecord, join(directory, 'result.json'))
+  const lifecycleDeadline = new AbortController()
+  let received
+  const waiting = waitForTerminalResult(directory, {
+    deadline: lifecycleDeadline.signal,
+  }).then((result) => {
+    received = result
+    return result
+  })
+
+  writeFileSync(terminalRecord, JSON.stringify(terminal))
+  lifecycleDeadline.abort()
+  await setImmediate()
+
+  if (!received) {
+    writeFileSync(join(directory, 'notification-wakeup'), '')
+    await waiting
+    assert.fail(
+      'terminal wait did not consult result.json at the lifecycle deadline'
+    )
+  }
+  assert.deepEqual(received, terminal)
 })
 
 test('stopping an active watcher records no failure event', async (t) => {

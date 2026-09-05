@@ -155,7 +155,7 @@ assertions.
 
 ### 5. Observe a terminal result despite a missed file notification
 Type: Behavior
-Status: planned
+Status: done
 Proof: a focused mailbox fixture suppresses the file-watch callback, writes the
 terminal record, and still receives that record through a bounded local fallback;
 existing normal launcher, Codex stream, native lifecycle, and stop output remain
@@ -167,6 +167,10 @@ authoritative record → shutdown receives the normal terminal result without
 hanging.
 
 Use a lifecycle deadline, not an arbitrary proof sleep.
+
+Learning: the file watcher remains the fast path, while a deadline-triggered
+read of authoritative `result.json` closes the missed-notification race without
+changing terminal output.
 
 ### 6. Retain the detached worker's exact identity
 Type: Structure

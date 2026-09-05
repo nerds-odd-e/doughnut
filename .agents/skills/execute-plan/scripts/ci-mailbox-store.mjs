@@ -9,6 +9,7 @@ import {
 import { join } from 'node:path'
 
 const eventFilePattern = /^(\d{12})\.json$/
+const terminalResultDeadlineMs = 5_000
 
 function publishJson(directory, name, value) {
   const temporary = join(directory, `${name}.tmp`)
@@ -60,16 +61,42 @@ function terminalResult(directory, request, status) {
   }
 }
 
-export async function waitForTerminalResult(directory) {
+export async function waitForTerminalResult(
+  directory,
+  { deadline = AbortSignal.timeout(terminalResultDeadlineMs) } = {}
+) {
   const path = join(directory, 'result.json')
   if (!existsSync(path))
-    await new Promise((resolve) => {
+    await new Promise((resolve, reject) => {
+      let subscription
+      let settled = false
+      const close = () => {
+        if (settled) return false
+        settled = true
+        subscription?.close()
+        deadline.removeEventListener('abort', atDeadline)
+        return true
+      }
       const finished = () => {
         if (!existsSync(path)) return
-        subscription.close()
-        resolve()
+        if (close()) resolve()
       }
-      const subscription = watch(directory, finished)
+      const atDeadline = () => {
+        if (existsSync(path)) {
+          finished()
+          return
+        }
+        if (close())
+          reject(
+            new Error(
+              'CI observer terminal result was not published before its lifecycle deadline',
+              { cause: deadline.reason }
+            )
+          )
+      }
+      deadline.addEventListener('abort', atDeadline, { once: true })
+      subscription = watch(directory, finished)
+      if (deadline.aborted) atDeadline()
       finished()
     })
   return JSON.parse(readFileSync(path, 'utf8'))
