@@ -34,6 +34,7 @@ import com.odde.donut.services.NotebookGroupService;
 import com.odde.donut.services.NotebookIndexingService;
 import com.odde.donut.services.NotebookService;
 import com.odde.donut.services.WikidataService;
+import com.odde.donut.services.notebookGit.NotebookGitProposalAncestry;
 import com.odde.donut.services.notebookGit.NotebookGitProposalImporter;
 import com.odde.donut.testability.TestabilitySettings;
 import com.odde.donut.validators.AuthoredNoteContent;
@@ -42,6 +43,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import java.io.IOException;
 import java.util.List;
+import org.eclipse.jgit.lib.ObjectId;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -461,13 +463,7 @@ class NotebookController {
       @PathVariable("notebook") @Schema(type = "integer") Notebook notebook)
       throws UnexpectedNoAccessRightException {
     authorizationService.assertAuthorization(notebook);
-    NotebookGitBinding binding =
-        notebookGitBindingRepository
-            .findByNotebook_Id(notebook.getId())
-            .orElseThrow(
-                () ->
-                    new ResponseStatusException(
-                        HttpStatus.NOT_FOUND, "Notebook has no Git binding."));
+    NotebookGitBinding binding = requireGitBinding(notebook);
     String filename = "notebook-" + notebook.getId() + ".bundle";
     return ResponseEntity.ok()
         .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"")
@@ -486,9 +482,31 @@ class NotebookController {
       @RequestBody byte[] bundleBytes)
       throws UnexpectedNoAccessRightException {
     authorizationService.assertAuthorization(notebook);
-    NotebookGitProposalImporter.importMainHead(bundleBytes).repository().close();
+    NotebookGitProposalImporter.ImportedProposal proposal =
+        NotebookGitProposalImporter.importMainHead(bundleBytes);
+    try {
+      NotebookGitBinding binding = requireGitBinding(notebook);
+      if (!expectedHead.equals(binding.getAcceptedGitObjectId())) {
+        throw new ResponseStatusException(
+            HttpStatus.CONFLICT,
+            "expectedHead no longer matches the notebook's current accepted head.");
+      }
+      ObjectId acceptedHead = ObjectId.fromString(binding.getAcceptedGitObjectId());
+      NotebookGitProposalAncestry.assertFollowsAcceptedHead(
+          proposal.repository(), proposal.mainHead(), acceptedHead);
+    } finally {
+      proposal.repository().close();
+    }
     throw new ResponseStatusException(
         HttpStatus.NOT_IMPLEMENTED, "Publishing is not available yet.");
+  }
+
+  private NotebookGitBinding requireGitBinding(Notebook notebook) {
+    return notebookGitBindingRepository
+        .findByNotebook_Id(notebook.getId())
+        .orElseThrow(
+            () ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND, "Notebook has no Git binding."));
   }
 
   private Notebook resolveDestinationNotebookForFolderMove(FolderMoveRequest request)

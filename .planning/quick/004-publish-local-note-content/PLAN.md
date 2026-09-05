@@ -222,7 +222,7 @@ Sizing: about 5 minutes, medium confidence.
 
 ### 6. Enforce accepted ancestry at the server
 Type: Behavior
-Status: planned
+Status: done
 Proof: controller cases bypass CLI checks and submit stale/merge/multi-commit
 history; assert the ancestry rejection.
 
@@ -498,3 +498,13 @@ Sizing: about 5 minutes plus backend runtime, medium confidence.
   and simplified the "no usable main" test fixture to reuse
   `NotebookGitBundleBuilder`/`NotebookGitBundleWriter` instead of hand-rolling
   JGit tree/commit construction. Next action: execute slice 6.
+- Slice 6 done: added `NotebookGitProposalAncestry.assertFollowsAcceptedHead`
+  (`services/notebookGit/`), a reusable pure check over a `Repository` and two
+  `ObjectId`s (deliberately reusable for slice 11's locked-transaction recheck).
+  `publishNotebookGitProposal` now loads the binding, rejects a stale
+  `expectedHead` (409) and any ancestry other than identical-heads or a direct
+  single-parent child (409) — merge commits, multi-commit-ahead, and unrelated
+  history are all rejected without advancing main; a valid proposal still
+  reaches the interim refusal. Post-change-refactor extracted a shared
+  `requireGitBinding` helper (was duplicated between GET and POST). No API/DTO
+  or CLI changes. Next action: execute slice 7.
