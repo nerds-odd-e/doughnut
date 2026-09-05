@@ -117,7 +117,7 @@ later output-boundary acknowledgement without changing their JSON payloads.
 
 ### 3. Redeliver an interrupted Cursor hook event
 Type: Behavior
-Status: planned
+Status: done
 Proof: a real Cursor hook child process is interrupted after selecting a
 persisted failure but before writing host output; the next owning boundary
 receives it, then successful output advances progress and later boundaries stay
@@ -129,6 +129,10 @@ the event remains eligible for the next owning boundary; a completed output is
 acknowledged once.
 
 Keep the existing Cursor JSON shape and owner/generation/sub-agent isolation.
+
+Learning: a blocked stdout pipe provides a deterministic process-boundary
+handshake for interruption proof; acknowledgement can follow the write callback
+without changing the synchronous compatibility entry point.
 
 ### 4. Redeliver an interrupted Claude Code hook event
 Type: Behavior

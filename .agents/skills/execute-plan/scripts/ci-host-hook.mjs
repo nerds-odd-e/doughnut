@@ -146,9 +146,13 @@ if (
   let raw = ''
   for await (const chunk of process.stdin) raw += chunk
   try {
-    process.stdout.write(
-      `${JSON.stringify(deliverCiEvents(JSON.parse(raw), process.argv[2]))}\n`
+    const selection = selectCiEvents(JSON.parse(raw), process.argv[2])
+    await new Promise((resolve, reject) =>
+      process.stdout.write(`${JSON.stringify(selection.output)}\n`, (error) =>
+        error ? reject(error) : resolve()
+      )
     )
+    selection.acknowledge()
   } catch (error) {
     process.stderr.write(
       `CI notification hook failed: ${String(error).slice(0, 600)}\n`
