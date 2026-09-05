@@ -20,7 +20,6 @@ import com.odde.donut.testability.GitBundleTestReader;
 import jakarta.persistence.EntityManager;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.util.Comparator;
@@ -33,7 +32,6 @@ import org.eclipse.jgit.internal.storage.dfs.DfsRepositoryDescription;
 import org.eclipse.jgit.internal.storage.dfs.InMemoryRepository;
 import org.eclipse.jgit.lib.CommitBuilder;
 import org.eclipse.jgit.lib.Constants;
-import org.eclipse.jgit.lib.FileMode;
 import org.eclipse.jgit.lib.NullProgressMonitor;
 import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.ObjectInserter;
@@ -119,7 +117,8 @@ abstract class NotebookGitBundleControllerTestBase extends NotebookControllerTes
     ResponseStatusException exception =
         assertThrows(
             ResponseStatusException.class,
-            () -> controller.publishNotebookGitProposal(notebook, expectedHead, bundleBytes));
+            () ->
+                controller.publishNotebookGitProposal(notebook.getId(), expectedHead, bundleBytes));
 
     assertThat(exception.getStatusCode(), equalTo(expectedStatus));
 
@@ -131,37 +130,25 @@ abstract class NotebookGitBundleControllerTestBase extends NotebookControllerTes
     return exception;
   }
 
-  /** One file's path, content bytes, and mode within a crafted proposal tree. */
-  record ProposedFile(String path, byte[] contentBytes, FileMode mode) {
-    ProposedFile(String path, String content, FileMode mode) {
-      this(path, content.getBytes(StandardCharsets.UTF_8), mode);
-    }
-
-    ProposedFile(String path, String content) {
-      this(path, content, FileMode.REGULAR_FILE);
-    }
-
-    /** For deliberately-invalid byte sequences (e.g. malformed UTF-8) that no String can hold. */
-    ProposedFile(String path, byte[] contentBytes) {
-      this(path, contentBytes, FileMode.REGULAR_FILE);
-    }
-  }
-
   static ObjectId commitOnTopOf(
       Repository repository, List<ObjectId> parents, String path, String content, String message)
       throws IOException {
-    return commitOnTopOf(repository, parents, List.of(new ProposedFile(path, content)), message);
+    return commitOnTopOf(
+        repository, parents, List.of(new NotebookGitProposalFile(path, content)), message);
   }
 
   static ObjectId commitOnTopOf(
-      Repository repository, List<ObjectId> parents, List<ProposedFile> files, String message)
+      Repository repository,
+      List<ObjectId> parents,
+      List<NotebookGitProposalFile> files,
+      String message)
       throws IOException {
     try (ObjectInserter inserter = repository.newObjectInserter()) {
       DirCache dirCache = DirCache.newInCore();
       DirCacheBuilder builder = dirCache.builder();
-      List<ProposedFile> sortedByPath =
-          files.stream().sorted(Comparator.comparing(ProposedFile::path)).toList();
-      for (ProposedFile file : sortedByPath) {
+      List<NotebookGitProposalFile> sortedByPath =
+          files.stream().sorted(Comparator.comparing(NotebookGitProposalFile::path)).toList();
+      for (NotebookGitProposalFile file : sortedByPath) {
         ObjectId blobId = inserter.insert(Constants.OBJ_BLOB, file.contentBytes());
         DirCacheEntry entry = new DirCacheEntry(file.path());
         entry.setFileMode(file.mode());
@@ -220,8 +207,8 @@ abstract class NotebookGitBundleControllerTestBase extends NotebookControllerTes
   }
 
   /** A bundle whose {@code main} is a single-parent child of {@code binding}'s accepted head. */
-  byte[] proposalBundleBytes(NotebookGitBinding binding, List<ProposedFile> proposedFiles)
-      throws Exception {
+  byte[] proposalBundleBytes(
+      NotebookGitBinding binding, List<NotebookGitProposalFile> proposedFiles) throws Exception {
     try (InMemoryRepository repository = new InMemoryRepository(new DfsRepositoryDescription())) {
       ObjectId acceptedHead = GitBundleTestReader.fetchHead(repository, binding.getBundleBytes());
       ObjectId childCommit =

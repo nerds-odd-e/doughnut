@@ -338,7 +338,7 @@ family has migrated.
 
 ### 13. Reject a web change that races with projection validation
 Type: Behavior
-Status: planned
+Status: done
 Proof: a committed controller transaction test holds a normal note/folder write
 open, starts publish, releases the writer, and observes drift rejection.
 
@@ -669,3 +669,14 @@ Sizing: about 5 minutes plus backend runtime, medium confidence.
   base. Post-change-refactor removed redundant identical-head rebundling and
   kept the shared base at 250 lines. No production or API change. Next action:
   retry slice 13.
+- Slice 13 done: the HTTP boundary now imports the untrusted proposal before
+  invoking `NotebookGitProposalPublisher`, whose proxied `REQUIRES_NEW`,
+  SERIALIZABLE transaction locks the binding first, loads notebook/folder/note
+  ranges in a fixed order, rechecks authorization and ancestry, and validates
+  the supplied live projection. Committed controller tests prove an overlapping
+  content update and an initially-empty-range folder insertion both commit
+  before validation and produce projection-drift conflict with the binding
+  unchanged. Post-change-refactor centralized Note-to-export-row conversion,
+  removed redundant fixture refresh, and extracted the shared proposal-file
+  test value. Controller/API generation produced no wire diff; OpenAPI lint and
+  all frontend tests passed. Next action: execute slice 14.

@@ -88,7 +88,7 @@ class NotebookGitBundleControllerTest extends NotebookGitBundleControllerTestBas
         UnexpectedNoAccessRightException.class,
         () ->
             controller.publishNotebookGitProposal(
-                notebook, binding.getAcceptedGitObjectId(), binding.getBundleBytes()));
+                notebook.getId(), binding.getAcceptedGitObjectId(), binding.getBundleBytes()));
   }
 
   @Test
@@ -104,6 +104,6 @@ class NotebookGitBundleControllerTest extends NotebookGitBundleControllerTestBas
         UnexpectedNoAccessRightException.class,
         () ->
             controller.publishNotebookGitProposal(
-                notebook, binding.getAcceptedGitObjectId(), binding.getBundleBytes()));
+                notebook.getId(), binding.getAcceptedGitObjectId(), binding.getBundleBytes()));
   }
 }

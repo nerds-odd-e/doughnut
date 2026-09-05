@@ -31,15 +31,17 @@ class NotebookGitProposalPropertyValidationControllerTest
         proposalBundleBytes(
             binding,
             List.of(
-                new ProposedFile("note.md", "---\ntype: Note\nnote_level: 7\n---\nchanged content"),
-                new ProposedFile("README.md", "---\ntype: Readme\n---\nreadme original")));
+                new NotebookGitProposalFile(
+                    "note.md", "---\ntype: Note\nnote_level: 7\n---\nchanged content"),
+                new NotebookGitProposalFile(
+                    "README.md", "---\ntype: Readme\n---\nreadme original")));
 
     ApiException exception =
         assertThrows(
             ApiException.class,
             () ->
                 controller.publishNotebookGitProposal(
-                    notebook, binding.getAcceptedGitObjectId(), bundleBytes));
+                    notebook.getId(), binding.getAcceptedGitObjectId(), bundleBytes));
 
     assertThat(exception.getErrorBody().getErrorType(), equalTo(ApiError.ErrorType.BINDING_ERROR));
     assertThat(

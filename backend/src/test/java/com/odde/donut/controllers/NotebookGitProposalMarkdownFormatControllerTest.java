@@ -36,7 +36,7 @@ class NotebookGitProposalMarkdownFormatControllerTest extends NotebookGitBundleC
         proposalBundleBytes(
             binding,
             List.of(
-                new ProposedFile(
+                new NotebookGitProposalFile(
                     "note.md",
                     "---\ntype: SomethingCustom\ncustom_field: hello\n---\nchanged content")));
 
@@ -45,7 +45,7 @@ class NotebookGitProposalMarkdownFormatControllerTest extends NotebookGitBundleC
             ResponseStatusException.class,
             () ->
                 controller.publishNotebookGitProposal(
-                    notebook, binding.getAcceptedGitObjectId(), bundleBytes));
+                    notebook.getId(), binding.getAcceptedGitObjectId(), bundleBytes));
 
     assertThat(exception.getStatusCode(), equalTo(HttpStatus.NOT_IMPLEMENTED));
   }
@@ -58,8 +58,9 @@ class NotebookGitProposalMarkdownFormatControllerTest extends NotebookGitBundleC
         proposalBundleBytes(
             binding,
             List.of(
-                new ProposedFile("note.md", "changed content, no frontmatter at all"),
-                new ProposedFile("README.md", "---\ntype: Readme\n---\nreadme original")));
+                new NotebookGitProposalFile("note.md", "changed content, no frontmatter at all"),
+                new NotebookGitProposalFile(
+                    "README.md", "---\ntype: Readme\n---\nreadme original")));
 
     ResponseStatusException exception =
         assertProposalRejectedWithoutMutatingBinding(
@@ -76,9 +77,10 @@ class NotebookGitProposalMarkdownFormatControllerTest extends NotebookGitBundleC
         proposalBundleBytes(
             binding,
             List.of(
-                new ProposedFile(
+                new NotebookGitProposalFile(
                     "note.md", "---\ntype: [unclosed, \"bracket\n---\nchanged content"),
-                new ProposedFile("README.md", "---\ntype: Readme\n---\nreadme original")));
+                new NotebookGitProposalFile(
+                    "README.md", "---\ntype: Readme\n---\nreadme original")));
 
     ResponseStatusException exception =
         assertProposalRejectedWithoutMutatingBinding(
@@ -95,8 +97,9 @@ class NotebookGitProposalMarkdownFormatControllerTest extends NotebookGitBundleC
         proposalBundleBytes(
             binding,
             List.of(
-                new ProposedFile("note.md", "---\n- a\n- b\n---\nchanged content"),
-                new ProposedFile("README.md", "---\ntype: Readme\n---\nreadme original")));
+                new NotebookGitProposalFile("note.md", "---\n- a\n- b\n---\nchanged content"),
+                new NotebookGitProposalFile(
+                    "README.md", "---\ntype: Readme\n---\nreadme original")));
 
     ResponseStatusException exception =
         assertProposalRejectedWithoutMutatingBinding(
@@ -113,8 +116,10 @@ class NotebookGitProposalMarkdownFormatControllerTest extends NotebookGitBundleC
         proposalBundleBytes(
             binding,
             List.of(
-                new ProposedFile("note.md", "---\ncustom_field: hello\n---\nchanged content"),
-                new ProposedFile("README.md", "---\ntype: Readme\n---\nreadme original")));
+                new NotebookGitProposalFile(
+                    "note.md", "---\ncustom_field: hello\n---\nchanged content"),
+                new NotebookGitProposalFile(
+                    "README.md", "---\ntype: Readme\n---\nreadme original")));
 
     ResponseStatusException exception =
         assertProposalRejectedWithoutMutatingBinding(
@@ -131,8 +136,9 @@ class NotebookGitProposalMarkdownFormatControllerTest extends NotebookGitBundleC
         proposalBundleBytes(
             binding,
             List.of(
-                new ProposedFile("note.md", "---\ntype:\n---\nchanged content"),
-                new ProposedFile("README.md", "---\ntype: Readme\n---\nreadme original")));
+                new NotebookGitProposalFile("note.md", "---\ntype:\n---\nchanged content"),
+                new NotebookGitProposalFile(
+                    "README.md", "---\ntype: Readme\n---\nreadme original")));
 
     ResponseStatusException exception =
         assertProposalRejectedWithoutMutatingBinding(
@@ -150,8 +156,9 @@ class NotebookGitProposalMarkdownFormatControllerTest extends NotebookGitBundleC
         proposalBundleBytes(
             binding,
             List.of(
-                new ProposedFile("note.md", invalidUtf8),
-                new ProposedFile("README.md", "---\ntype: Readme\n---\nreadme original")));
+                new NotebookGitProposalFile("note.md", invalidUtf8),
+                new NotebookGitProposalFile(
+                    "README.md", "---\ntype: Readme\n---\nreadme original")));
 
     ResponseStatusException exception =
         assertProposalRejectedWithoutMutatingBinding(

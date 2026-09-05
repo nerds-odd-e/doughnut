@@ -3,8 +3,6 @@ package com.odde.donut.services.notebookGit;
 import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
-import com.odde.donut.entities.repositories.FolderRepository;
-import com.odde.donut.entities.repositories.NoteRepository;
 import com.odde.donut.services.notebookExport.ExportFolderRow;
 import com.odde.donut.services.notebookExport.NotebookExportRows;
 import com.odde.donut.services.notebookExport.PortableTreeEntry;
@@ -30,23 +28,18 @@ import org.springframework.web.server.ResponseStatusException;
 /** Compares the live MySQL projection with a notebook's accepted Portable tree. */
 @Service
 public class NotebookGitProjection {
-
-  private final FolderRepository folderRepository;
-  private final NoteRepository noteRepository;
-
-  public NotebookGitProjection(FolderRepository folderRepository, NoteRepository noteRepository) {
-    this.folderRepository = folderRepository;
-    this.noteRepository = noteRepository;
-  }
-
   public void requireMatchingAcceptedTreeWithOneLiveNoteAtPath(
-      Notebook notebook, Repository repository, ObjectId acceptedHead, String changedPath) {
-    List<ExportFolderRow> folders =
-        requireMatchingAcceptedTreeAndReturnFolders(notebook, repository, acceptedHead);
+      Notebook notebook,
+      List<ExportFolderRow> folders,
+      List<Note> liveNotes,
+      Repository repository,
+      ObjectId acceptedHead,
+      String changedPath) {
+    requireMatchingAcceptedTree(notebook, folders, liveNotes, repository, acceptedHead);
     Map<Integer, ExportFolderRow> folderById =
         folders.stream().collect(Collectors.toMap(ExportFolderRow::id, Function.identity()));
     List<Note> matches =
-        noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId()).stream()
+        liveNotes.stream()
             .filter(note -> portablePath(note, folderById).equals(changedPath))
             .toList();
     if (matches.size() != 1) {
@@ -56,22 +49,17 @@ public class NotebookGitProjection {
   }
 
   public void requireMatchingAcceptedTree(
-      Notebook notebook, Repository repository, ObjectId acceptedHead) {
-    requireMatchingAcceptedTreeAndReturnFolders(notebook, repository, acceptedHead);
-  }
-
-  private List<ExportFolderRow> requireMatchingAcceptedTreeAndReturnFolders(
-      Notebook notebook, Repository repository, ObjectId acceptedHead) {
-    List<ExportFolderRow> folders = NotebookExportRows.folders(folderRepository, notebook);
+      Notebook notebook,
+      List<ExportFolderRow> folders,
+      List<Note> liveNotes,
+      Repository repository,
+      ObjectId acceptedHead) {
     List<PortableTreeEntry> currentEntries =
         PortableTreeSnapshot.build(
-            notebook.getReadmeContent(),
-            folders,
-            NotebookExportRows.notes(noteRepository, notebook));
+            notebook.getReadmeContent(), folders, NotebookExportRows.notes(liveNotes));
     if (!sorted(currentEntries).equals(sorted(readEntries(repository, acceptedHead)))) {
       throw projectionDrift();
     }
-    return folders;
   }
 
   private static ResponseStatusException projectionDrift() {

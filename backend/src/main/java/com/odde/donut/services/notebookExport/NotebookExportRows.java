@@ -1,5 +1,6 @@
 package com.odde.donut.services.notebookExport;
 
+import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.repositories.FolderRepository;
 import com.odde.donut.entities.repositories.NoteRepository;
@@ -25,7 +26,11 @@ public final class NotebookExportRows {
   }
 
   public static List<ExportNoteRow> notes(NoteRepository noteRepository, Notebook notebook) {
-    return noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId()).stream()
+    return notes(noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId()));
+  }
+
+  public static List<ExportNoteRow> notes(List<Note> notes) {
+    return notes.stream()
         .map(
             n ->
                 new ExportNoteRow(

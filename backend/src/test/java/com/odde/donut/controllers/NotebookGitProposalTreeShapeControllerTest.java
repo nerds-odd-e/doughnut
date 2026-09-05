@@ -32,14 +32,16 @@ class NotebookGitProposalTreeShapeControllerTest extends NotebookGitBundleContro
     NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);
     byte[] bundleBytes =
         proposalBundleBytes(
-            binding, List.of(new ProposedFile("note.md", "---\ntype: Note\n---\nchanged content")));
+            binding,
+            List.of(
+                new NotebookGitProposalFile("note.md", "---\ntype: Note\n---\nchanged content")));
 
     ResponseStatusException exception =
         assertThrows(
             ResponseStatusException.class,
             () ->
                 controller.publishNotebookGitProposal(
-                    notebook, binding.getAcceptedGitObjectId(), bundleBytes));
+                    notebook.getId(), binding.getAcceptedGitObjectId(), bundleBytes));
 
     assertThat(exception.getStatusCode(), equalTo(HttpStatus.NOT_IMPLEMENTED));
   }
@@ -57,14 +59,15 @@ class NotebookGitProposalTreeShapeControllerTest extends NotebookGitBundleContro
     byte[] bundleBytes =
         proposalBundleBytes(
             binding,
-            List.of(new ProposedFile("index.md", "---\ntype: Note\n---\nchanged content")));
+            List.of(
+                new NotebookGitProposalFile("index.md", "---\ntype: Note\n---\nchanged content")));
 
     ResponseStatusException exception =
         assertThrows(
             ResponseStatusException.class,
             () ->
                 controller.publishNotebookGitProposal(
-                    notebook, binding.getAcceptedGitObjectId(), bundleBytes));
+                    notebook.getId(), binding.getAcceptedGitObjectId(), bundleBytes));
 
     assertThat(exception.getStatusCode(), equalTo(HttpStatus.NOT_IMPLEMENTED));
   }
@@ -77,9 +80,9 @@ class NotebookGitProposalTreeShapeControllerTest extends NotebookGitBundleContro
         proposalBundleBytes(
             binding,
             List.of(
-                new ProposedFile("note.md", "original content"),
-                new ProposedFile("README.md", "readme original"),
-                new ProposedFile("extra.md", "extra content")));
+                new NotebookGitProposalFile("note.md", "original content"),
+                new NotebookGitProposalFile("README.md", "readme original"),
+                new NotebookGitProposalFile("extra.md", "extra content")));
 
     ResponseStatusException exception =
         assertProposalRejectedWithoutMutatingBinding(
@@ -93,7 +96,8 @@ class NotebookGitProposalTreeShapeControllerTest extends NotebookGitBundleContro
     Notebook notebook = createGitBackedNotebook();
     NotebookGitBinding binding = seedAcceptedBinding(notebook, baselineEntries());
     byte[] bundleBytes =
-        proposalBundleBytes(binding, List.of(new ProposedFile("README.md", "readme original")));
+        proposalBundleBytes(
+            binding, List.of(new NotebookGitProposalFile("README.md", "readme original")));
 
     ResponseStatusException exception =
         assertProposalRejectedWithoutMutatingBinding(
@@ -110,8 +114,8 @@ class NotebookGitProposalTreeShapeControllerTest extends NotebookGitBundleContro
         proposalBundleBytes(
             binding,
             List.of(
-                new ProposedFile("renamed.md", "original content"),
-                new ProposedFile("README.md", "readme original")));
+                new NotebookGitProposalFile("renamed.md", "original content"),
+                new NotebookGitProposalFile("README.md", "readme original")));
 
     assertProposalRejectedWithoutMutatingBinding(
         notebook, binding.getAcceptedGitObjectId(), bundleBytes, HttpStatus.BAD_REQUEST);
@@ -126,8 +130,8 @@ class NotebookGitProposalTreeShapeControllerTest extends NotebookGitBundleContro
         proposalBundleBytes(
             binding,
             List.of(
-                new ProposedFile("note.md", "original content"),
-                new ProposedFile("README.md", "readme changed")));
+                new NotebookGitProposalFile("note.md", "original content"),
+                new NotebookGitProposalFile("README.md", "readme changed")));
 
     ResponseStatusException exception =
         assertProposalRejectedWithoutMutatingBinding(
@@ -144,8 +148,8 @@ class NotebookGitProposalTreeShapeControllerTest extends NotebookGitBundleContro
         proposalBundleBytes(
             binding,
             List.of(
-                new ProposedFile("note.md", "changed content"),
-                new ProposedFile("README.md", "readme changed")));
+                new NotebookGitProposalFile("note.md", "changed content"),
+                new NotebookGitProposalFile("README.md", "readme changed")));
 
     assertProposalRejectedWithoutMutatingBinding(
         notebook, binding.getAcceptedGitObjectId(), bundleBytes, HttpStatus.BAD_REQUEST);
@@ -159,8 +163,8 @@ class NotebookGitProposalTreeShapeControllerTest extends NotebookGitBundleContro
         proposalBundleBytes(
             binding,
             List.of(
-                new ProposedFile("note.md", "changed content", FileMode.EXECUTABLE_FILE),
-                new ProposedFile("README.md", "readme original")));
+                new NotebookGitProposalFile("note.md", "changed content", FileMode.EXECUTABLE_FILE),
+                new NotebookGitProposalFile("README.md", "readme original")));
 
     assertProposalRejectedWithoutMutatingBinding(
         notebook, binding.getAcceptedGitObjectId(), bundleBytes, HttpStatus.BAD_REQUEST);

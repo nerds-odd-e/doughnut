@@ -34,12 +34,8 @@ import com.odde.donut.services.NotebookGroupService;
 import com.odde.donut.services.NotebookIndexingService;
 import com.odde.donut.services.NotebookService;
 import com.odde.donut.services.WikidataService;
-import com.odde.donut.services.notebookGit.NotebookGitProjection;
-import com.odde.donut.services.notebookGit.NotebookGitProposalAncestry;
-import com.odde.donut.services.notebookGit.NotebookGitProposalBlobText;
 import com.odde.donut.services.notebookGit.NotebookGitProposalImporter;
-import com.odde.donut.services.notebookGit.NotebookGitProposalMarkdownFormat;
-import com.odde.donut.services.notebookGit.NotebookGitProposalTreeShape;
+import com.odde.donut.services.notebookGit.NotebookGitProposalPublisher;
 import com.odde.donut.testability.TestabilitySettings;
 import com.odde.donut.validators.AuthoredNoteContent;
 import io.swagger.v3.oas.annotations.Operation;
@@ -47,7 +43,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import java.io.IOException;
 import java.util.List;
-import org.eclipse.jgit.lib.ObjectId;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -81,7 +76,7 @@ class NotebookController {
   private final FolderRelocationService folderRelocationService;
   private final NotebookExportService notebookExportService;
   private final NotebookGitBindingRepository notebookGitBindingRepository;
-  private final NotebookGitProjection notebookGitProjection;
+  private final NotebookGitProposalPublisher notebookGitProposalPublisher;
 
   public NotebookController(
       EntityPersister entityPersister,
@@ -102,7 +97,7 @@ class NotebookController {
       FolderRelocationService folderRelocationService,
       NotebookExportService notebookExportService,
       NotebookGitBindingRepository notebookGitBindingRepository,
-      NotebookGitProjection notebookGitProjection) {
+      NotebookGitProposalPublisher notebookGitProposalPublisher) {
     this.entityPersister = entityPersister;
     this.testabilitySettings = testabilitySettings;
     this.notebookIndexingService = notebookIndexingService;
@@ -121,7 +116,7 @@ class NotebookController {
     this.folderRelocationService = folderRelocationService;
     this.notebookExportService = notebookExportService;
     this.notebookGitBindingRepository = notebookGitBindingRepository;
-    this.notebookGitProjection = notebookGitProjection;
+    this.notebookGitProposalPublisher = notebookGitProposalPublisher;
   }
 
   @GetMapping("")
@@ -482,41 +477,15 @@ class NotebookController {
       operationId = "publishNotebookGitProposal",
       summary = "Submit a proposal Git bundle to publish onto the notebook's accepted main")
   @PostMapping(value = "/{notebook}/git-bundle", consumes = "application/x-git-bundle")
-  @Transactional
   public String publishNotebookGitProposal(
-      @PathVariable("notebook") @Schema(type = "integer") Notebook notebook,
+      @PathVariable("notebook") @Schema(type = "integer") Integer notebookId,
       @RequestParam("expectedHead") String expectedHead,
       @RequestBody byte[] bundleBytes)
       throws UnexpectedNoAccessRightException {
-    authorizationService.assertAuthorization(notebook);
     NotebookGitProposalImporter.ImportedProposal proposal =
         NotebookGitProposalImporter.importMainHead(bundleBytes);
     try {
-      NotebookGitBinding binding = requireGitBinding(notebook);
-      if (!expectedHead.equals(binding.getAcceptedGitObjectId())) {
-        throw new ResponseStatusException(
-            HttpStatus.CONFLICT,
-            "expectedHead no longer matches the notebook's current accepted head.");
-      }
-      ObjectId acceptedHead = ObjectId.fromString(binding.getAcceptedGitObjectId());
-      NotebookGitProposalAncestry.assertFollowsAcceptedHead(
-          proposal.repository(), proposal.mainHead(), acceptedHead);
-      if (proposal.mainHead().equals(acceptedHead)) {
-        notebookGitProjection.requireMatchingAcceptedTree(
-            notebook, proposal.repository(), acceptedHead);
-      } else {
-        String changedNotePath =
-            NotebookGitProposalTreeShape.assertSingleModifiedRegularNotePath(
-                proposal.repository(), acceptedHead, proposal.mainHead());
-        NotebookGitProposalMarkdownFormat.assertValidTypedMarkdown(
-            proposal.repository(), proposal.mainHead());
-        String changedNoteContent =
-            NotebookGitProposalBlobText.readUtf8(
-                proposal.repository(), proposal.mainHead(), changedNotePath);
-        AuthoredNoteContent.assertValidForSave(changedNoteContent);
-        notebookGitProjection.requireMatchingAcceptedTreeWithOneLiveNoteAtPath(
-            notebook, proposal.repository(), acceptedHead, changedNotePath);
-      }
+      notebookGitProposalPublisher.validateForPublish(notebookId, expectedHead, proposal);
     } finally {
       proposal.repository().close();
     }

@@ -35,7 +35,7 @@ class NotebookGitProposalAncestryControllerTest extends NotebookGitBundleControl
             ResponseStatusException.class,
             () ->
                 controller.publishNotebookGitProposal(
-                    notebook, binding.getAcceptedGitObjectId(), binding.getBundleBytes()));
+                    notebook.getId(), binding.getAcceptedGitObjectId(), binding.getBundleBytes()));
 
     assertThat(exception.getStatusCode(), equalTo(HttpStatus.NOT_IMPLEMENTED));
   }
