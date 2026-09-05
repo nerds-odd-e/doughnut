@@ -59,16 +59,19 @@ delegation and plan execution immediately.
 
 The next coordinator hook invocation after a result is ready adds the event to the owning
 coordinator's context exactly once. Pending polls and successful CI add no
-context. The mailbox is claimed by checkout, host, conversation, and worker
-identity; Cursor additionally binds to the coordinator's `generation_id`
-because its children can share the conversation ID, and `beforeSubmitPrompt`
-updates that binding on a new user message; arbitrary child tool calls cannot
-rebind it, and missing generation identity fails the readiness probe. Claude
-Code isolates instead by `session_id` plus `agent_id`/`subagent_id`, so a
-sub-agent sharing the coordinator's session cannot consume its notification.
-Keep the same coordinator session when resuming; if replacing it, stop the old
-observers using their recorded directories and register new ones in the new
-session.
+context. The native hook selects durable records without advancing delivery
+progress, writes the unchanged host JSON, and acknowledges those records only
+after stdout reports a successful write. If the hook process is interrupted
+before that boundary, the next owning invocation can select the records again.
+The mailbox is claimed by checkout, host, conversation, and worker identity;
+Cursor additionally binds to the coordinator's `generation_id` because its
+children can share the conversation ID, and `beforeSubmitPrompt` updates that
+binding on a new user message; arbitrary child tool calls cannot rebind it, and
+missing generation identity fails the readiness probe. Claude Code isolates
+instead by `session_id` plus `agent_id`/`subagent_id`, so a sub-agent sharing
+the coordinator's session cannot consume its notification. Keep the same
+coordinator session when resuming; if replacing it, stop the old observers
+using their recorded directories and register new ones in the new session.
 
 Mailboxes live outside the checkout under `/tmp/donut-ci-$UID`, not under the
 process `TMPDIR`, so a Nix-wrapped launcher and a native hook share the same
@@ -91,13 +94,18 @@ directory:
 ```
 
 This signals cancellation, including an outstanding GitHub request or polling
-timer. Confirm `result.json` in that directory reaches `stopped` or `finished`;
-this is local process shutdown, not waiting for CI. The hook drains an
-already-finished event even if stop was requested. Unread records remain in the
-mailbox, and a deliberate stop reports pending CI as unobserved. Handle
-delivered failures before claiming completion. Retain these small recovery
-records for interrupted sessions; never kill by a broad process-name pattern.
-A watcher also has the bounded lifetime in the shared contract if its
+timer. Its terminal wait is finite and checks authoritative `result.json` when
+the file notification is missed. If no terminal result arrives by that
+lifecycle deadline, the stop command reads the mailbox's recorded worker PID,
+validates that it still runs the exact Node worker command for this mailbox,
+and targets only that process; it revalidates before escalating the signal.
+The command then returns an explicit lost-coverage terminal result instead of
+hanging or implying success. This is local process shutdown, not waiting for
+CI. The hook drains an already-finished event even if stop was requested. Unread
+records remain in the mailbox, and shutdown reports pending CI as unobserved.
+Handle delivered failures before claiming completion. Retain these small
+recovery records for interrupted sessions; never kill by a broad process-name
+pattern. A watcher also has the bounded lifetime in the shared contract if its
 coordinator disappears without stopping it.
 
 ## Host contracts

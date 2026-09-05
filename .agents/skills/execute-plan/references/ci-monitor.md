@@ -18,11 +18,14 @@ The bundled `scripts/watch-ci.mjs` polls GitHub every 30 seconds, limits each
 request to 20 seconds, has one finite eight-hour default execution budget, and
 tolerates two consecutive observation errors. It inspects the newest completed
 startup run plus all unfinished startup runs, pages beyond the newest runs,
-retains unfinished run identities, and discovers later pushes. It emits failure,
-incomplete, and lost-coverage records incrementally until stopped or its budget
-expires. It never dispatches, retries a workflow, inspects CD, invokes AI, or
-changes the checkout. Failed-job names are included when available; classify
-the cause from evidence after notification.
+retains unfinished run identities, and discovers later pushes. The startup
+snapshot's run/attempt identities define history: a run absent from that
+snapshot, or a later attempt, remains eligible even when GitHub's
+second-precision `createdAt` equals the observer's startup second. It emits
+failure, incomplete, and lost-coverage records incrementally until stopped or
+its budget expires. It never dispatches, retries a workflow, inspects CD,
+invokes AI, or changes the checkout. Failed-job names are included when
+available; classify the cause from evidence after notification.
 
 Select the **non-model notification bridge for the current host**:
 
@@ -37,7 +40,19 @@ Polling is token-free; observer setup and responding to an actionable event
 still use model tokens. A notification is delivered at the host's next safe
 boundary, not by forcibly interrupting a running command. If the host's worker
 tool runs in the foreground, act when it returns. Never stash under a live
-writer to simulate immediate preemption.
+writer to simulate immediate preemption. Cursor and Claude Code select durable
+mailbox events without advancing delivery progress; their hook process
+acknowledges the selection only after writing its host output successfully. An
+interrupted output leaves the event eligible at the next owning boundary.
+
+At execution shutdown, stop the observer through its exact saved handle without
+waiting for pending CI. Terminal publication has a finite local wait and reads
+the authoritative result even if its file notification was missed. If a native
+detached mailbox worker does not publish a terminal result, validate that its
+recorded PID still runs the exact worker command for that mailbox before each
+targeted termination signal; never use a broad process-name kill. Preserve
+unread mailbox evidence, report lost coverage when terminal publication is
+missing, and report `pendingCi: unobserved` rather than implying green CI.
 
 ## Handle a notification
 

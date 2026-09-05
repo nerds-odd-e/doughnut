@@ -1,7 +1,7 @@
 # Preserve CI observer coverage across lifecycle races
 
 Source: retrospective of [SEED-011 Story 1](../../seeds/SEED-011-efficient-ci-failure-attention.md#story-1) and reviewed commit `9a5f46f0f2`.
-Status: planned.
+Status: complete.
 
 ## Outcome and boundaries
 
@@ -208,7 +208,7 @@ deadline; this is the focused-test runtime sizing exception.
 
 ### 8. Publish the completed observer lifecycle contract
 Type: Behavior
-Status: planned
+Status: done
 Proof: `ci-monitor.md`, its host adapters, and SEED-011 consistently distinguish
 the completed one-observer lifecycle from deferred Story 2 repair/compaction
 observations; `./scripts/run.sh bash scripts/test/ci_observer.test` passes.
@@ -218,6 +218,10 @@ reads the permanent observer guidance and Story 1 record → they see the finite
 exact-worker, durable-delivery contract without a stale Story 2 prerequisite.
 
 Update only statements whose truth changed through slices 1–7.
+
+Learning: the condensed SEED already owns the completed Story 1 boundary and
+defers Story 2 explicitly, so permanent lifecycle details belong only in the
+observer references. The clean aggregate passes 59 tests.
 
 ## Readiness
 

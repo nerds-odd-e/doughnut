@@ -123,15 +123,15 @@ Jidoka, or user cancellation. To stop, retain its session handle, mark the saved
 status `stopped`, and send Ctrl-C (`chars: '\u0003'`) with `tools.write_stdin`
 to that exact session. The PTY enables this interruption; do not assume plain
 pipes accept Ctrl-C. The stream translates SIGINT/SIGTERM into a mailbox stop,
-so wait for its terminal result and report its unread-event count and
-`pendingCi: unobserved` coverage rather than treating shutdown as green CI.
-Confirm that the known observer process exited, then let the bridge finish and
-reap its yielded cell. Terminating only the cell does not prove the subprocess
-stopped. Consume already-delivered failures before claiming completion; never
-wait for pending CI. On resume, rearm only absent, `stopped`, or `lost`
-observers after confirming their old process has ended. Keep `watching` and
-terminal `finished` entries deduplicated; do not restart an observer that
-already delivered its result.
+and the terminal receipt is read through the shared finite terminal-result
+wait. Report its unread-event count and `pendingCi: unobserved` coverage rather
+than treating shutdown as green CI. Confirm that the known observer process
+exited, then let the bridge finish and reap its yielded cell. Terminating only
+the cell does not prove the subprocess stopped. Consume already-delivered
+failures before claiming completion; never wait for pending CI. On resume,
+rearm only absent, `stopped`, or `lost` observers after confirming their old
+process has ended. Keep `watching` and terminal `finished` entries
+deduplicated; do not restart an observer that already delivered its result.
 
 After every successful normal or repair push, keep the same key, session ID,
 mailbox directory, process, and yielded cell. The observer discovers that push
