@@ -1,6 +1,6 @@
 # Publish a local content edit to the same Donut note
 
-Source: [SEED-009, Story 2](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#2-publish-a-local-content-edit-to-the-same-donut-note).
+Source: [SEED-009, Story 2](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-2).
 Status: planned. Planning only; no feature implementation performed.
 Readiness: **ready for execution**, subject to the per-leaf five/ten-minute gate.
 Sizing is a hypothesis, not an execution-time guarantee.

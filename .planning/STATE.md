@@ -6,9 +6,9 @@ current_phase: null
 current_phase_name: null
 status: ready
 stopped_at: null
-last_updated: "2026-09-04T00:30:33Z"
-last_activity: 2026-09-04
-last_activity_desc: "reconstructed Proposed ADR 0002 as Git-native Portable notebook synchronization"
+last_updated: "2026-09-05T00:12:00Z"
+last_activity: 2026-09-05
+last_activity_desc: "added ordered product backlog of unfinished story titles"
 progress:
   total_phases: 0
   completed_phases: 0
@@ -35,10 +35,11 @@ Daily probe measurement (not an ADR): [daily-probe-protocol.md](notes/daily-prob
 
 ## Operator Next Steps
 
+- Continue from the ordered queue in [PRODUCT-BACKLOG.md](PRODUCT-BACKLOG.md).
 - Start the next milestone with `/gsd-new-milestone` when ready.
 
-Parked work: SEED-001, SEED-002, SEED-006, SEED-007, SEED-008; Git-native
-Portable notebook tree synchronization proposed in ADR 0002. See
-[ROADMAP.md](ROADMAP.md).
+Parked undecomposed seeds: SEED-001, SEED-002, SEED-006, SEED-007, SEED-008.
+Git-native Portable notebook tree synchronization is proposed in ADR 0002;
+remaining v1 stories live in SEED-009. See [ROADMAP.md](ROADMAP.md).
 
 Recent ad-hoc work: `noteProperty` / **property panel** / `#prop:` wiki (ADR 0001 / ADR 0004 / ADR 0005); E2E named-route honesty and SPA hydrate protocol (E2E helpers, `MainMenu.vue`); daily probe side tap ([daily-probe-protocol.md](notes/daily-probe-protocol.md)); live authored-note-reference resolution; question-generation batch latest-only retry + failed-request purge; recall E2E suite cut (~78% wall time).

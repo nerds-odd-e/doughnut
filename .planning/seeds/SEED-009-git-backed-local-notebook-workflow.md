@@ -61,6 +61,10 @@ cross the automatic Git cutover and arrive as an ordinary local repository
 that the owner can open with their chosen tools. This tests the baseline,
 portability, and user entry workflow before accepting local mutations.
 
+A seed is a story's home, not a feature boundary. Keep each story's
+requirements here and link from related seeds instead of duplicating them.
+Global selection order lives in the [product backlog](../PRODUCT-BACKLOG.md).
+
 ## Alternatives and Decision
 
 1. **Do nothing or defer:** users remain limited to the Donut web application
@@ -86,7 +90,12 @@ handled by `slice-planning` and, when necessary, `slice-plan-refinement`.
 
 ## Story Decomposition
 
+<a id="story-1"></a>
+
 ### 1. Open an existing Donut notebook in Obsidian and an AI IDE
+
+**Status:** delivered. Completed plan removed by `c0b51e1e4f`; recover evidence
+from Git.
 
 - **For / why:** An existing notebook owner wants a normal local directory and
   Git history that their preferred tools can open without first activating or
@@ -108,6 +117,8 @@ handled by `slice-planning` and, when necessary, `slice-plan-refinement`.
   product must clearly say that local publishing is unavailable until Story 2;
   creating the copy must not mutate remote content.
 
+<a id="story-2"></a>
+
 ### 2. Publish a local content edit to the same Donut note
 
 - **For / why:** The owner wants an Obsidian- or AI-assisted refinement to
@@ -125,6 +136,8 @@ handled by `slice-planning` and, when necessary, `slice-plan-refinement`.
 - **Depends on:** Story 1.
 - **Safe stopping point:** A stale or invalid proposal is rejected without
   changing remote `main` or the Donut projection.
+
+<a id="story-3"></a>
 
 ### 3. Receive a Donut web edit in a clean local repository
 
@@ -154,6 +167,8 @@ handled by `slice-planning` and, when necessary, `slice-plan-refinement`.
   through ordinary web edits before cloning/synchronizing, the way this
   story's own workflow does.
 
+<a id="story-4"></a>
+
 ### 4. Create a new note locally
 
 - **For / why:** Local refinement often discovers a new concept that should
@@ -169,6 +184,8 @@ handled by `slice-planning` and, when necessary, `slice-plan-refinement`.
 - **Depends on:** Story 2.
 - **Safe stopping point:** Invalid files and destination collisions reject the
   commit without partially creating remote entities.
+
+<a id="story-5"></a>
 
 ### 5. Delete a note locally without transferring its private data
 
@@ -188,6 +205,8 @@ handled by `slice-planning` and, when necessary, `slice-plan-refinement`.
 - **Safe stopping point:** A delete/add combination whose identity meaning is
   unsafe is rejected rather than guessed.
 
+<a id="story-6"></a>
+
 ### 6. Rename or move a note without losing its learning history
 
 - **For / why:** Obsidian and AI IDE users routinely reorganize files and expect
@@ -206,6 +225,8 @@ handled by `slice-planning` and, when necessary, `slice-plan-refinement`.
 - **Safe stopping point:** Similarity alone never transfers private data; the
   remote remains unchanged when correspondence is ambiguous.
 
+<a id="story-7"></a>
+
 ### 7. Move a folder while preserving descendant identities
 
 - **For / why:** The owner wants to reorganize a group of notes without losing
@@ -222,6 +243,8 @@ handled by `slice-planning` and, when necessary, `slice-plan-refinement`.
 - **Depends on:** Story 6.
 - **Safe stopping point:** Incomplete or multiply plausible descendant
   correspondence rejects the commit atomically.
+
+<a id="story-8"></a>
 
 ### 8. Keep non-overlapping accumulated local and web changes
 
@@ -241,6 +264,8 @@ handled by `slice-planning` and, when necessary, `slice-plan-refinement`.
 - **Safe stopping point:** If rebase cannot complete cleanly, synchronization
   stops without advancing remote `main`.
 
+<a id="story-9"></a>
+
 ### 9. Resolve an overlapping edit with ordinary Git
 
 - **For / why:** The owner needs conflicting local and web refinements to be
@@ -257,6 +282,8 @@ handled by `slice-planning` and, when necessary, `slice-plan-refinement`.
 - **Depends on:** Story 8.
 - **Safe stopping point:** Cancelling or abandoning conflict resolution loses
   neither the accepted remote commit nor the user's original local commit.
+
+<a id="story-10"></a>
 
 ### 10. See one stable commit for one continuous web edit
 
@@ -285,7 +312,8 @@ opposite direction. Stories 4 and 5 complete the basic file lifecycle. Stories
 6 and 7 address the identity-preservation risk unique to Donut. Stories 8 and 9
 then add accumulated divergence and conflict handling on top of two already
 working directions. Story 10 is last because commit batching improves history
-quality but is not required for safe synchronization.
+quality but is not required for safe synchronization. This is the initial
+recommended order; the product backlog owns subsequent reprioritization.
 
 Safe stopping points:
 
@@ -319,7 +347,7 @@ than be approximated.
 
 No open product decision changes the candidate-story order.
 
-Before planning Story 1, reconcile Proposed ADR 0002 with the later human
+Before planning a remaining story, reconcile Proposed ADR 0002 with the later human
 discussion recorded here. The current draft says Donut exposes a standard Git
 remote in v1 and that a CLI is never required; the later v1 boundary defers
 direct standard-Git access and permits a required CLI-assisted acquisition and
@@ -333,10 +361,10 @@ the revision/merge model and adds no Donut metadata to the Portable tree.
 
 ## When to Surface
 
-Surface this seed when the human is ready to select the first ADR-0002 v1
-implementation story. Reconcile the Proposed ADR's v1 CLI boundary, select
-exactly one story—Story 1 is recommended—and invoke `slice-planning`. Do not
-turn the whole seed into one executable plan.
+Story 1 is delivered. Select one remaining story from the
+[product backlog](../PRODUCT-BACKLOG.md) before slice planning. Do not turn
+the whole seed into one executable plan. Reconcile the Proposed ADR's v1 CLI
+boundary as a human-owned advice task; it does not change these story outcomes.
 
 ## Breadcrumbs
 

@@ -54,6 +54,7 @@ next Behavior it enables.
 | `.planning/quick/NNN-slug/PLAN.md` | Ad-hoc executable plan for a selected story |
 | `.planning/codebase/` | Codebase maps |
 | `.planning/{PROJECT,REQUIREMENTS,ROADMAP,STATE}.md` | GSD project memory |
+| `.planning/PRODUCT-BACKLOG.md` | Ordered queue of unfinished story titles; details stay in home seeds |
 
 Do not add new plans under `ongoing/` or as flat files directly under
 `.planning/`. Do not use phase or slice numbers in product code, tests, feature
