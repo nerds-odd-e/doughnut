@@ -145,8 +145,8 @@ test-suite projects. Ordinary regression reruns are not new proof loops.
 All statuses remain planned. Estimates below include implementation, the named
 proof, and slice-local cleanup; required backend runtime is the exception recorded
 under verification. Valid requests remain explicitly unavailable through slice
-13. Each rejection is usable diagnostic progress without remote mutation.
-Slice 14 replaces that interim refusal with safe publication.
+14. Each rejection is usable diagnostic progress without remote mutation.
+Slice 15 replaces that interim refusal with safe publication.
 
 ### 1. Explain a missing or mismatched checkout binding
 Type: Behavior
@@ -201,7 +201,7 @@ Add raw-bundle POST and existing owner authorization at the controller before
 parsing bytes; an owner still receives the interim refusal. Reuse slice 3's
 downloaded head and system Git to create the full main bundle. CLI response
 handling may already render an accepted head returned by the transport stub;
-production cannot return success until slice 14. Regenerate the endpoint API.
+production cannot return success until slice 15. Regenerate the endpoint API.
 Extend the existing notebook ownership regression cases to include the POST
 endpoint, including read-only subscribers, as authorization regression coverage.
 Sizing: about 5 minutes, medium confidence; one transport boundary proof loop.
@@ -231,7 +231,7 @@ Behavior: proposal parent or expected head differs from current accepted head
 
 Check one parent equal to accepted head, never similarity or caller claims.
 Recognize identical proposed/accepted heads but keep the interim refusal until
-slice 15. The transaction work below repeats this check under the binding lock.
+slice 16. The transaction work below repeats this check under the binding lock.
 Sizing: 3–5 minutes, medium confidence.
 
 ### 7. Limit publication to one unchanged regular note path
@@ -275,7 +275,32 @@ property schema or apply note-only property policy to container README. Existing
 warnings remain non-blocking. Valid proposals still reach the interim refusal.
 Sizing: 3–4 minutes, medium confidence.
 
-### 10. Refuse to overwrite a projection that has drifted
+### 10. Keep bundle-endpoint tests navigable by concept
+Type: Structure
+Status: planned
+Proof: `NotebookGitBundleControllerTest` and the two new leaf classes it spawns,
+plus every other existing controller test in this family, stay green.
+
+Internal change: split `NotebookGitBundleControllerTest` (285 lines, spanning
+three unrelated concepts because slices 4-6 each correctly declined to refactor
+a concept its own slice didn't introduce) along its existing seams: keep
+download and publish-authorization/interim-refusal tests in
+`NotebookGitBundleControllerTest`; extract slice 5's corrupt-bytes/no-usable-
+main cases into a new `NotebookGitProposalImportControllerTest`; extract slice
+6's stale-expectedHead/identical-head/single-parent-child/merge-commit/multi-
+commit-ahead cases into a new `NotebookGitProposalAncestryControllerTest`. All
+three share the existing `NotebookGitBundleControllerTestBase`, matching the
+`*ControllerTestBase` + leaf-class pattern already established by slices 7-9.
+No production code changes.
+Unchanged external behavior: every existing test keeps its current assertions
+and passes unchanged.
+Immediately enables: slice 11's new drift-rejection tests get an appropriately
+sized, concept-matched home instead of further inflating an already-oversized
+file.
+Sizing: about 5 minutes, high confidence; purely mechanical, following a
+pattern already proven three times in this same plan.
+
+### 11. Refuse to overwrite a projection that has drifted
 Type: Behavior
 Status: planned
 Proof: controller cases seed accepted content, perform a normal web change,
@@ -290,7 +315,7 @@ mapping nor the snapshot across requests. Content and structure drift are fixtur
 variations of the same comparison. No writes or concurrency changes yet.
 Sizing: about 5 minutes, medium confidence.
 
-### 11. Reject a web change that races with projection validation
+### 12. Reject a web change that races with projection validation
 Type: Behavior
 Status: planned
 Proof: a committed controller transaction test holds a normal note/folder write
@@ -307,7 +332,7 @@ one validation contract. A matching projection still ends at the interim refusal
 Sizing: about 5 minutes plus backend runtime, medium confidence; existing
 committed/concurrent test support removes the previously hidden harness work.
 
-### 12. Share authored-content persistence without changing web saves
+### 13. Share authored-content persistence without changing web saves
 Type: Structure
 Status: planned
 Proof: existing TextContentController update tests stay green.
@@ -316,10 +341,10 @@ Internal change: extract only the same-Note document persistence operation:
 updatedAt, replaceContent, save, orphan-image cleanup, derived-index refresh.
 Keep web normalization and authorization at their existing edge.
 Unchanged external behavior: ordinary content PATCH keeps its current effects.
-Immediately enables: slice 13's transactional rollback of a projected document.
+Immediately enables: slice 14's transactional rollback of a projected document.
 Sizing: 3–5 minutes plus backend runtime, medium confidence.
 
-### 13. Roll back a failed publication as one unit
+### 14. Roll back a failed publication as one unit
 Type: Behavior
 Status: planned
 Proof: committed controller test forces a late binding-persistence failure after
@@ -328,7 +353,7 @@ Note projection and reads both Note and binding in a fresh transaction: unchange
 Behavior: a valid proposal fails after projecting its document → publish →
 neither content/derived rows nor accepted bundle/head is committed.
 
-Inside slice 11's transaction, use slice 12 to persist the exact parsed document,
+Inside slice 12's transaction, use slice 13 to persist the exact parsed document,
 re-export and compare with the proposed tree, and replace the existing binding
 using NotebookGitBundleWriter on the imported repository. Never create another
 Note. Reuse the scoped test failure-injection pattern for the late-save failure;
@@ -340,7 +365,7 @@ exception is removed next.
 Sizing: about 5 minutes, medium confidence; all parsing, mapping, and save work
 already exists from preceding leaves.
 
-### 14. Publish the refinement on the same learned note
+### 15. Publish the refinement on the same learned note
 Type: Behavior
 Status: planned
 Proof: one controller round trip accepts the Git commit, reads the same Note and
@@ -359,7 +384,7 @@ and adjust the existing message expectation as regression maintenance.
 Sizing: 3–5 minutes plus backend runtime, medium confidence; enabling writes
 and the single canonical acceptance proof are the only new work.
 
-### 15. Report an already accepted commit without another write
+### 16. Report an already accepted commit without another write
 Type: Behavior
 Status: planned
 Proof: controller retry of an accepted proposal returns the same head and leaves
@@ -375,7 +400,7 @@ head for this unchanged success. The CLI already sends this case.
 Do not create a retry counter, amend history, or reset local state.
 Sizing: 3–4 minutes, medium confidence.
 
-### 16. Give competing publications one accepted winner
+### 17. Give competing publications one accepted winner
 Type: Behavior
 Status: planned
 Proof: concurrent controller calls with two distinct direct children of one
@@ -386,9 +411,9 @@ Behavior: two owners' sessions publish from the same base concurrently → POSTs
 → exactly one wins and the other cannot overwrite it.
 
 Exercise the production binding lock and the in-transaction ancestry recheck
-already introduced in slice 11. Use committed fixtures and bounded concurrency
+already introduced in slice 12. Use committed fixtures and bounded concurrency
 helpers, not mocks of persistence. This is a new conflict scenario, not a
-test-only layer or permission to ship without locking in slice 14.
+test-only layer or permission to ship without locking in slice 15.
 Sizing: about 5 minutes plus backend runtime, medium confidence.
 
 ## Verification and execution wrap-up
@@ -402,7 +427,7 @@ Sizing: about 5 minutes plus backend runtime, medium confidence.
 - Endpoint changes: use generate-api-client and run
   `CURSOR_DEV=true nix develop -c pnpm generateTypeScript`; never hand-edit
   generated API artifacts. No migration is currently planned.
-- Main workflow: the controller round-trip in slice 14 is the real high-level
+- Main workflow: the controller round-trip in slice 15 is the real high-level
   acceptance signal. No manual test, new Cypress harness, or separate E2E leaf
   is required. Run existing clone regression when its guidance changes.
 - Each execution leaf follows execute-plan: Jidoka, fresh post-change-refactor
@@ -424,8 +449,9 @@ Sizing: about 5 minutes plus backend runtime, medium confidence.
   authoring behavior.
 - Refinement classification: original slice 1 was Refine (binding and local-state
   checks became 1–2); original 2 was Refine (3–6); original 3 was Refine (7–11);
-  original 4 was Ready and is retained as 12 immediately before its consumer;
-  original 5 was Refine (13–16). No completed slices existed.
+  original 4 was Ready and is retained as 13 immediately before its consumer;
+  original 5 was Refine (14–17). No completed slices existed. (Renumbered by
+  one after the execution-retrospective's slice 10 insertion below.)
 - Existing committed-transaction/failure/concurrency helpers and OSIV=false make
   the transaction test boundary concrete. No product code was run or changed
   during refinement. No execution overrun or attempt-owned WIP exists.
@@ -476,7 +502,7 @@ Sizing: about 5 minutes plus backend runtime, medium confidence.
   `main` bundle via system Git and POSTs it with the accepted head as a query
   param; 401/403 surfaces a distinct permission-denied message, any other
   non-2xx falls through unchanged to the existing "not available yet" message,
-  and a 200 (test-stub only, unreachable in production until slice 14) renders
+  and a 200 (test-stub only, unreachable in production until slice 15) renders
   the accepted head. Post-change-refactor extracted `notebookPublish.testHelpers.ts`
   for shared fixtures; a full per-`describe` file split was tried and reverted
   because it broke a temp-dir-leak assertion under Vitest's concurrent file
@@ -500,7 +526,7 @@ Sizing: about 5 minutes plus backend runtime, medium confidence.
   JGit tree/commit construction. Next action: execute slice 6.
 - Slice 6 done: added `NotebookGitProposalAncestry.assertFollowsAcceptedHead`
   (`services/notebookGit/`), a reusable pure check over a `Repository` and two
-  `ObjectId`s (deliberately reusable for slice 11's locked-transaction recheck).
+  `ObjectId`s (deliberately reusable for slice 12's locked-transaction recheck).
   `publishNotebookGitProposal` now loads the binding, rejects a stale
   `expectedHead` (409) and any ancestry other than identical-heads or a direct
   single-parent child (409) — merge commits, multi-commit-ahead, and unrelated
@@ -513,7 +539,7 @@ Sizing: about 5 minutes plus backend runtime, medium confidence.
   rejects added/deleted/moved paths, unsafe paths, non-regular modes, and
   zero/multiple content changes, requiring exactly one changed `.md` path whose
   basename isn't `README.md` (index.md/log.md are not forbidden here). Runs
-  only when the proposal isn't an identical-heads no-op (reserved for slice 15).
+  only when the proposal isn't an identical-heads no-op (reserved for slice 16).
   Post-change-refactor moved commit-parsing into the tree-shape class itself
   (matching `NotebookGitProposalAncestry`'s idiom, removing a duplicated
   controller helper) and split the growing test file into
@@ -548,6 +574,26 @@ Sizing: about 5 minutes plus backend runtime, medium confidence.
   (same `ApplicationContext` load-failure-cascade signature as before),
   confirming it's full-suite environmental flakiness, not a regression from
   slices 4-9. No API/DTO or CLI changes.
-- Developer asked to stop after slice 9 (2026-09-05); slices 10-16 remain
-  planned and unexecuted. Next action: resume at slice 10
-  ("Refuse to overwrite a projection that has drifted") in a future session.
+- Developer asked to stop after slice 9 (2026-09-05); slices 10-17 remain
+  planned and unexecuted. Next action: resume at slice 10.
+- Execution retrospective (2026-09-05) reviewed commits 754ef00dd6..9192c5ae52
+  (slices 1-9), excluding an interspersed unrelated commit (f4ed5cfd6a, an
+  external CI-observation feature merged into this branch mid-session that
+  touches no notebook-publish files). No bugs or story-boundary drift found;
+  the aggregate `publishNotebookGitProposal` method's five-check sequence is
+  not treated as a size/cohesion defect because decision 8's already-planned
+  dedicated publish service (slice 13's persistence work leads into it) is
+  designed to absorb it. One unresolved missed-refactoring-smell: despite each
+  slice's own concept-bounded refactor correctly declining to touch a concept
+  it didn't introduce, `NotebookGitBundleControllerTest.java` reached 285 lines
+  (35 over the file-size guideline) by spanning three concepts from slices 4-6
+  — corrected by new slice 10 above, inserted immediately after the completed
+  slices and renumbering original 10-16 to 11-17. A parallel CLI-side
+  file-size trade-off (`notebookPublish.test.ts` at ~450 lines, a split
+  deliberately reverted in slice 4 for a Vitest single-file-scheduling reason)
+  was independently resolved by the developer after this session's stop
+  (commit 8bb147f607): per-concept `*.suite.ts` files exporting a
+  `describeXxx()` function each, imported and invoked from one thin
+  `notebookPublish.test.ts` runner — preserves single-Vitest-file scheduling
+  while satisfying the file-size guideline. No new slice needed for that; it
+  is already resolved in the current tree.
