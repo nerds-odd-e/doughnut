@@ -315,24 +315,26 @@ mapping nor the snapshot across requests. Content and structure drift are fixtur
 variations of the same comparison. No writes or concurrency changes yet.
 Sizing: about 5 minutes, medium confidence.
 
-### 12. Establish committed proposal transaction fixtures
+### 12. Commit the shared proposal-controller fixture family
 Type: Structure
-Status: done
-Proof: a committed publish-controller fixture reaches the existing interim
-refusal, and the existing proposal controller family stays green.
+Status: planned
+Proof: every existing bundle/proposal controller test keeps its current
+assertions and passes with committed Git-backed notebook fixtures.
 
-Internal change: add a committed proposal-test boundary that creates and cleans
-up Git-backed notebook fixtures outside the ordinary rollback transaction,
-reloads committed entities for assertions, and propagates request/session scope
-into bounded worker calls. Keep the existing rollback-scoped proposal tests on
-their simpler base.
-Unchanged external behavior: an otherwise valid proposal still reaches the
-interim unavailable response.
-Immediately enables: slice 13's serializable overlap proof can acquire the
-binding lock instead of blocking on an uncommitted fixture row.
-Sizing: about 5 minutes plus backend runtime, medium confidence; reuse
-`CommittedTransactionTestSupport`, `CommittedUserCleanup`, and the existing
-request-context concurrency pattern.
+Internal change: move the shared `NotebookGitBundleControllerTestBase` family
+to explicit committed setup and bounded cleanup so no test holds a newly
+created binding row open in a rollback transaction. Give every additional test
+user the fixture prefix. Authorization cases submit a valid identical-head
+bundle because untrusted Git import deliberately precedes database locks and
+authorization; preserve their authorization outcomes.
+Unchanged external behavior: download, authorization, validation, and interim
+refusal controller contracts remain unchanged.
+Immediately enables: slice 13 can acquire the binding `FOR UPDATE` lock across
+the whole controller family instead of timing out behind sibling fixtures.
+Sizing: about 5 minutes plus backend runtime, medium confidence; reuse and
+simplify the already-committed dedicated fixture foundation rather than adding
+a second parallel setup model. The slice remains planned until the whole shared
+family has migrated.
 
 ### 13. Reject a web change that races with projection validation
 Type: Behavior
@@ -348,9 +350,8 @@ above, loading by ID and locking the binding first. Reuse committed transaction
 fixtures and bounded thread coordination. Parameterize note-content and folder
 insertion (initially empty range) cases to cover row and phantom drift in this
 one validation contract. A matching projection still ends at the interim refusal.
-Sizing: about 5 minutes plus backend runtime, medium confidence; existing
-committed/concurrent test support and slice 12's fixture boundary remove the
-previously hidden harness work.
+Sizing: about 5 minutes plus backend runtime, medium confidence; slice 12
+removes the previously hidden committed-fixture and lock-contention work.
 
 ### 14. Share authored-content persistence without changing web saves
 Type: Structure
@@ -643,10 +644,20 @@ Sizing: about 5 minutes plus backend runtime, medium confidence.
   a committed proposal-test Structure leaf as slice 12 and moved the race
   Behavior to slice 13; later slices were renumbered without changing the
   selected story. Next action: execute refined slice 12.
-- Refined slice 12 done: added a committed proposal-controller test boundary
-  that owns setup/cleanup outside rollback transactions, reloads committed
-  notebook and binding state, and propagates request scope into timeout-bounded
-  worker calls. A valid committed proposal reaches the existing interim refusal
-  without mutating its accepted head; rollback-scoped proposal tests remain on
-  their simpler base. Post-change-refactor removed one redundant committed read.
-  No production or API change. Next action: execute slice 13.
+- Refined slice 12 foundation committed: added a dedicated committed
+  proposal-controller test boundary that owns setup/cleanup outside rollback
+  transactions, reloads committed notebook and binding state, and propagates
+  request scope into timeout-bounded worker calls. A valid committed proposal
+  reaches the existing interim refusal without mutating its accepted head.
+  Post-change-refactor removed one redundant committed read. No production or
+  API change.
+- Slice 13's first post-refinement attempt exceeded the ten-minute hard gate and
+  its exact attempt-owned work was restored; the new publisher file was moved
+  to Trash. Compilation showed the production shape is viable, but revealed
+  that every test inheriting `NotebookGitBundleControllerTestBase` holds its
+  binding fixture open in a rollback transaction, so the required binding
+  `FOR UPDATE` lock times out across the family. Slice 12 is reopened and
+  broadened to migrate that one shared fixture family before retrying slice 13.
+  Authorization fixtures must submit valid identical-head bundles because
+  untrusted Git import intentionally happens before database authorization.
+  Next action: finish refined slice 12.
