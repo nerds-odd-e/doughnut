@@ -5,6 +5,7 @@ import { formatVersionOutput } from './commands/version.js'
 import { acquireNotebookGitCheckout } from './commands/notebook/notebookAcquisition.js'
 import { resolveNotebookPublishBinding } from './commands/notebook/notebookPublishBinding.js'
 import { assertLocalMainIsCleanAndCommitted } from './commands/notebook/notebookPublishReadiness.js'
+import { assertLocalMainFollowsAcceptedHistory } from './commands/notebook/notebookPublishAncestry.js'
 
 /**
  * Handles one-shot CLI paths (version, update, help, invalid flags). Returns `false` when the
@@ -91,8 +92,9 @@ async function completeNotebookPublish(notebookArgs: string[]): Promise<void> {
   }
 
   try {
-    resolveNotebookPublishBinding(directory)
+    const { notebookId } = resolveNotebookPublishBinding(directory)
     assertLocalMainIsCleanAndCommitted(directory)
+    await assertLocalMainFollowsAcceptedHistory(directory, Number(notebookId))
   } catch (e) {
     exitCliError(exceptionText(e))
   }

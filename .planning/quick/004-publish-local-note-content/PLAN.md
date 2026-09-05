@@ -175,7 +175,7 @@ Sizing: 3–5 minutes, medium confidence.
 
 ### 3. Explain a local history that cannot follow accepted main
 Type: Behavior
-Status: planned
+Status: done
 Proof: CLI `run` with a real downloaded bundle rejects a local commit whose
 single parent is not the downloaded accepted head.
 
@@ -455,3 +455,17 @@ Sizing: about 5 minutes plus backend runtime, medium confidence.
   `readGitOutput` unmerged (different failure-handling shapes, not worth the
   indirection this early in the plan). No backend/API changes in this leaf.
   Next action: execute slice 3.
+- Slice 3 done: exported `downloadNotebookGitBundle` from `notebookAcquisition.ts`
+  for reuse, and added `cli/src/commands/notebook/notebookPublishAncestry.ts`
+  (`assertLocalMainFollowsAcceptedHistory`), which downloads the accepted
+  bundle into a command-owned temp dir, imports its `main` into a temporary
+  bare repo (never touching the user's checkout), and requires local `main` to
+  be either identical to or exactly one single-parent commit ahead of the
+  accepted head; anything else (stale, several-ahead, unrelated, merge tip)
+  is rejected. Post-change-refactor extracted a shared `systemGit.ts` primitive
+  (used by acquisition and ancestry, not by binding/readiness — different
+  failure-handling shapes there), consolidated `notebookPublish.test.ts`
+  fixture helpers, and fixed a real fixture bug where two independently-built
+  repos could collide on an identical commit SHA due to same content/timestamp,
+  defeating the unrelated-history test. No backend/API changes in this leaf.
+  Next action: execute slice 4.

@@ -1,4 +1,3 @@
-import { spawnSync } from 'node:child_process'
 import * as fs from 'node:fs'
 import * as os from 'node:os'
 import * as path from 'node:path'
@@ -8,6 +7,7 @@ import {
 } from '../../backendApi/donutBackendClient.js'
 import { exceptionText } from '../../exceptionText.js'
 import { errnoCode } from '../../errnoCode.js'
+import { runSystemGitOrThrow } from './systemGit.js'
 
 /**
  * Authenticated GET of the notebook's accepted Git bundle, written to `destinationFile`.
@@ -15,7 +15,7 @@ import { errnoCode } from '../../errnoCode.js'
  * {@link import('../../backendApi/donutBackendClient.js').attachNotebookBookFile}, but a
  * simpler error shape since there's no multipart response body to parse.
  */
-async function downloadNotebookGitBundle(
+export async function downloadNotebookGitBundle(
   notebookId: number,
   destinationFile: string
 ): Promise<{ apiBaseUrl: string }> {
@@ -34,26 +34,6 @@ async function downloadNotebookGitBundle(
 
   fs.writeFileSync(destinationFile, Buffer.from(buffer))
   return { apiBaseUrl }
-}
-
-/**
- * Runs the system `git` executable with `args`, throwing `describeFailure`'s message (given the
- * trimmed stderr, when any, and the exit code) if it exits non-zero, or a "git is required"
- * error if the executable itself could not be spawned.
- */
-function runSystemGitOrThrow(
-  args: readonly string[],
-  describeFailure: (detail: string | undefined, status: number | null) => string
-): void {
-  const result = spawnSync('git', args, { encoding: 'utf8' })
-  if (result.error) {
-    throw new Error(
-      `git is required but could not be run: ${exceptionText(result.error)}`
-    )
-  }
-  if (result.status !== 0) {
-    throw new Error(describeFailure(result.stderr?.trim(), result.status))
-  }
 }
 
 /** Runs the system `git` executable to produce a clean checkout from a local bundle file. */
