@@ -82,8 +82,8 @@ an installed-host probe only if a host-facing JSON shape or binding changes.
 
 ### 1. Observe a post-start run created in the startup second
 Type: Behavior
-Status: planned
-Proof: `watch-ci-execution.test.mjs` replays an empty startup snapshot followed
+Status: done
+Proof: `watch-ci-execution-startup.test.mjs` replays an empty startup snapshot followed
 by a completed failing main push whose `createdAt` shares the observer's startup
 second; its failed job is emitted once and older completed startup history stays
 excluded.
@@ -95,6 +95,9 @@ reported.
 
 Keep bounded pagination and retained unfinished-run behavior green. Do not
 broaden startup replay or change failure classification.
+
+Learning: the startup snapshot's run identities are the reliable boundary;
+provider timestamp precision is unnecessary for later admission.
 
 ### 2. Acknowledge native delivery only after hook output succeeds
 Type: Behavior

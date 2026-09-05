@@ -81,16 +81,13 @@ export async function watchCiExecution({
             startupAttempts.set(run.databaseId, run.attempt)
           matching = startupCiRuns(matching)
         } else {
-          matching = matching.filter((run) => {
-            const createdAt = Date.parse(run.createdAt)
-            return (
+          matching = matching.filter(
+            (run) =>
               observedRunIds.has(run.databaseId) ||
+              !startupAttempts.has(run.databaseId) ||
               run.status !== 'completed' ||
-              !Number.isFinite(createdAt) ||
-              createdAt > startedAt ||
-              run.attempt > (startupAttempts.get(run.databaseId) ?? run.attempt)
-            )
-          })
+              run.attempt > startupAttempts.get(run.databaseId)
+          )
         }
         for (const run of matching) observedRunIds.add(run.databaseId)
         startupDiscovery = false

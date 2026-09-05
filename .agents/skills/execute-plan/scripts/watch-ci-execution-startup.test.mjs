@@ -159,3 +159,47 @@ test('empty startup history is quiet', async () => {
 
   assert.deepEqual(events, [])
 })
+
+test('observes a run created after an empty snapshot in the startup second', async () => {
+  const controller = new AbortController()
+  const events = []
+  let listPoll = 0
+  let jobInspections = 0
+
+  await watchCiExecution({
+    repo: 'example/donut',
+    branch: 'main',
+    signal: controller.signal,
+    now: () => Date.parse('2026-09-05T12:00:00.900Z'),
+    emit: (event) => events.push(event),
+    sleep: async () => {
+      if (listPoll === 3) controller.abort()
+    },
+    gh: async (args) => {
+      if (args[1] === 'list') {
+        listPoll += 1
+        if (listPoll === 1) return []
+        return [
+          run({
+            databaseId: 42,
+            createdAt: '2026-09-05T12:00:00Z',
+            conclusion: 'failure',
+          }),
+        ]
+      }
+      jobInspections += 1
+      return { jobs: [{ name: 'Backend', conclusion: 'failure' }] }
+    },
+  })
+
+  assert.deepEqual(
+    events.map(({ runId, failedJobs }) => ({ runId, failedJobs })),
+    [
+      {
+        runId: 42,
+        failedJobs: [{ name: 'Backend', conclusion: 'failure' }],
+      },
+    ]
+  )
+  assert.equal(jobInspections, 1)
+})
