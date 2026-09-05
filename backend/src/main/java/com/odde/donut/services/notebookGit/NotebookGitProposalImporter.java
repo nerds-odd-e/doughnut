@@ -10,6 +10,7 @@ import org.eclipse.jgit.internal.storage.dfs.InMemoryRepository;
 import org.eclipse.jgit.lib.NullProgressMonitor;
 import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.Ref;
+import org.eclipse.jgit.lib.RefUpdate;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.transport.FetchConnection;
 import org.eclipse.jgit.transport.TransportBundleStream;
@@ -63,6 +64,9 @@ public final class NotebookGitProposalImporter {
             HttpStatus.BAD_REQUEST, "Proposal bundle does not advertise refs/heads/main.");
       }
       fetchConnection.fetch(NullProgressMonitor.INSTANCE, List.of(mainRef), Set.of());
+      RefUpdate localMain = repository.updateRef("refs/heads/main");
+      localMain.setNewObjectId(mainRef.getObjectId());
+      localMain.forceUpdate();
       return mainRef.getObjectId();
     }
   }

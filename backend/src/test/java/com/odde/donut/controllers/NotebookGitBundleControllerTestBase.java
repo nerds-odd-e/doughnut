@@ -55,7 +55,8 @@ import org.springframework.web.server.ResponseStatusException;
  * {@link NotebookGitProposalTreeShapeControllerTest}, {@link
  * NotebookGitProposalMarkdownFormatControllerTest}, and {@link
  * NotebookGitProposalPropertyValidationControllerTest}, and {@link
- * NotebookGitProjectionDriftControllerTest}).
+ * NotebookGitProjectionDriftControllerTest}, and {@link
+ * NotebookGitPublicationAtomicControllerTest}).
  */
 @Transactional(propagation = Propagation.NOT_SUPPORTED)
 abstract class NotebookGitBundleControllerTestBase extends NotebookControllerTestBase {

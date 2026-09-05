@@ -28,7 +28,7 @@ import org.springframework.web.server.ResponseStatusException;
 /** Compares the live MySQL projection with a notebook's accepted Portable tree. */
 @Service
 public class NotebookGitProjection {
-  public void requireMatchingAcceptedTreeWithOneLiveNoteAtPath(
+  public Note requireMatchingAcceptedTreeWithOneLiveNoteAtPath(
       Notebook notebook,
       List<ExportFolderRow> folders,
       List<Note> liveNotes,
@@ -46,6 +46,7 @@ public class NotebookGitProjection {
       throw new IllegalStateException(
           "Expected exactly one live Note at Portable path " + changedPath);
     }
+    return matches.getFirst();
   }
 
   public void requireMatchingAcceptedTree(

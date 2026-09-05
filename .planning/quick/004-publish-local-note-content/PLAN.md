@@ -367,7 +367,7 @@ Sizing: 3–5 minutes plus backend runtime, medium confidence.
 
 ### 15. Roll back a failed publication as one unit
 Type: Behavior
-Status: planned
+Status: done
 Proof: committed controller test forces a late binding-persistence failure after
 Note projection and reads both Note and binding in a fresh transaction: unchanged.
 
@@ -686,3 +686,12 @@ Sizing: about 5 minutes plus backend runtime, medium confidence.
   `TextContentController` retains document preparation, normalization,
   authorization, and response construction at the web edge. No endpoint/API or
   observable web-save behavior changed. Next action: execute slice 15.
+- Slice 15 done: a validated proposal now prepares and persists the exact
+  authored document on the existing Note, re-exports the live projection for
+  exact proposal-tree comparison, materializes proposal `main`, and updates the
+  existing binding from `NotebookGitBundleWriter` inside the serializable
+  transaction. The final interim 501 remains inside that boundary, so production
+  still rolls all attempted writes back. A scoped late binding-save failure
+  controller proof confirms Note content, derived references, binding head,
+  bundle, and timestamp remain unchanged in fresh committed reads. No API
+  change. Next action: execute slice 16.
