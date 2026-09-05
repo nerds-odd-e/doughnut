@@ -24,8 +24,7 @@ import org.springframework.web.server.ResponseStatusException;
 class NotebookGitProposalAncestryControllerTest extends NotebookGitBundleControllerTestBase {
 
   @Test
-  void ownerSubmittingAProposalIdenticalToAcceptedHeadStillReceivesTheInterimRefusal()
-      throws Exception {
+  void ownerCannotRepublishAnAlreadyAcceptedHead() throws Exception {
     Notebook notebook = createGitBackedNotebook();
     NotebookGitBinding binding =
         notebookGitBindingRepository.findByNotebook_Id(notebook.getId()).orElseThrow();

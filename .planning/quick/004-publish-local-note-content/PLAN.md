@@ -388,7 +388,7 @@ already exists from preceding leaves.
 
 ### 16. Publish the refinement on the same learned note
 Type: Behavior
-Status: planned
+Status: done
 Proof: one controller round trip accepts the Git commit, reads the same Note and
 learning records, and downloads the exact commit/tree with its original ancestry.
 
@@ -695,3 +695,13 @@ Sizing: about 5 minutes plus backend runtime, medium confidence.
   controller proof confirms Note content, derived references, binding head,
   bundle, and timestamp remain unchanged in fresh committed reads. No API
   change. Next action: execute slice 16.
+- Slice 16 done: a valid direct-child proposal now commits the exact authored
+  Markdown onto the existing Note, returns the accepted proposal head, and
+  serves a bundle retaining its submitted tree and parent ancestry. The
+  canonical controller round trip proves preserved Note identity, learning
+  tracker, unknown frontmatter, wiki-link refresh, bytes, and Git history;
+  clone guidance now states the current one-commit/one-existing-note limit.
+  Post-change-refactor removed two narrower success tests subsumed by this
+  boundary proof and simplified brittle fixture documentation. Identical-head
+  publication remains deliberately unavailable for slice 17. No API wire
+  change. Next action: execute slice 17.

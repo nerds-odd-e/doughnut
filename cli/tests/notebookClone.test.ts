@@ -71,7 +71,9 @@ describe('notebook clone (CLI routing, real Git checkout)', () => {
     expect(runGit(['remote'], destinationPath)).toBe('')
 
     expect(ctx.getLogSpy()).toHaveBeenCalledWith(
-      expect.stringContaining('publishing is not available')
+      expect.stringContaining(
+        'Publishing currently accepts one new commit directly on the accepted main'
+      )
     )
   })
 

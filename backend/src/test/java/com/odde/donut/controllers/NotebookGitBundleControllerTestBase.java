@@ -48,16 +48,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-/**
- * Shared notebook/bundle-crafting fixtures for the notebook Git-bundle download and proposal
- * controller tests ({@link NotebookGitBundleControllerTest}, {@link
- * NotebookGitProposalImportControllerTest}, {@link NotebookGitProposalAncestryControllerTest},
- * {@link NotebookGitProposalTreeShapeControllerTest}, {@link
- * NotebookGitProposalMarkdownFormatControllerTest}, and {@link
- * NotebookGitProposalPropertyValidationControllerTest}, and {@link
- * NotebookGitProjectionDriftControllerTest}, and {@link
- * NotebookGitPublicationAtomicControllerTest}).
- */
+/** Shared notebook/bundle-crafting fixtures for notebook Git controller tests. */
 @Transactional(propagation = Propagation.NOT_SUPPORTED)
 abstract class NotebookGitBundleControllerTestBase extends NotebookControllerTestBase {
 

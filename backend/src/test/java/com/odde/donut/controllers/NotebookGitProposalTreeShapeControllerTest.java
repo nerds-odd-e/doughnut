@@ -2,8 +2,7 @@ package com.odde.donut.controllers;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.equalTo;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookGitBinding;
@@ -21,33 +20,7 @@ import org.springframework.web.server.ResponseStatusException;
 class NotebookGitProposalTreeShapeControllerTest extends NotebookGitBundleControllerTestBase {
 
   @Test
-  void ownerSubmittingAValidChildProposalStillReceivesTheInterimRefusal() throws Exception {
-    Notebook notebook = createGitBackedNotebook();
-    makeMe
-        .aNote()
-        .notebook(notebook)
-        .title("note")
-        .content("---\ntype: Note\n---\noriginal content")
-        .please();
-    NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);
-    byte[] bundleBytes =
-        proposalBundleBytes(
-            binding,
-            List.of(
-                new NotebookGitProposalFile("note.md", "---\ntype: Note\n---\nchanged content")));
-
-    ResponseStatusException exception =
-        assertThrows(
-            ResponseStatusException.class,
-            () ->
-                controller.publishNotebookGitProposal(
-                    notebook.getId(), binding.getAcceptedGitObjectId(), bundleBytes));
-
-    assertThat(exception.getStatusCode(), equalTo(HttpStatus.NOT_IMPLEMENTED));
-  }
-
-  @Test
-  void ownerChangingIndexMdReachesTheInterimRefusalJustLikeAnyOtherNote() throws Exception {
+  void acceptsAChangeToIndexMdJustLikeAnyOtherNote() throws Exception {
     Notebook notebook = createGitBackedNotebook();
     makeMe
         .aNote()
@@ -62,14 +35,10 @@ class NotebookGitProposalTreeShapeControllerTest extends NotebookGitBundleContro
             List.of(
                 new NotebookGitProposalFile("index.md", "---\ntype: Note\n---\nchanged content")));
 
-    ResponseStatusException exception =
-        assertThrows(
-            ResponseStatusException.class,
-            () ->
-                controller.publishNotebookGitProposal(
-                    notebook.getId(), binding.getAcceptedGitObjectId(), bundleBytes));
-
-    assertThat(exception.getStatusCode(), equalTo(HttpStatus.NOT_IMPLEMENTED));
+    assertDoesNotThrow(
+        () ->
+            controller.publishNotebookGitProposal(
+                notebook.getId(), binding.getAcceptedGitObjectId(), bundleBytes));
   }
 
   @Test

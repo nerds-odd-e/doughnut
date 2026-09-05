@@ -85,7 +85,7 @@ async function completeNotebookClone(notebookArgs: string[]): Promise<void> {
     exitCliError(exceptionText(e))
   }
   console.log(
-    `Cloned notebook ${notebookId} into ${destination}. Open and edit the files there with any ordinary local Git tool (Obsidian, an IDE, plain git); publishing is not available yet — commits stay local.`
+    `Cloned notebook ${notebookId} into ${destination}. Open and edit the files there with any ordinary local Git tool (Obsidian, an IDE, plain git). Publishing currently accepts one new commit directly on the accepted main that changes one existing Markdown note.`
   )
 }
 

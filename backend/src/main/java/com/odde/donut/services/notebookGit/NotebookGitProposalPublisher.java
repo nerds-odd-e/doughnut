@@ -68,7 +68,7 @@ public class NotebookGitProposalPublisher {
       propagation = Propagation.REQUIRES_NEW,
       isolation = Isolation.SERIALIZABLE,
       rollbackFor = Exception.class)
-  public void validateForPublish(
+  public String publish(
       Integer notebookId,
       String expectedHead,
       NotebookGitProposalImporter.ImportedProposal proposal)
@@ -100,7 +100,9 @@ public class NotebookGitProposalPublisher {
     if (proposal.mainHead().equals(acceptedHead)) {
       projection.requireMatchingAcceptedTree(
           notebook, folders, liveNotes, proposal.repository(), acceptedHead);
-      return;
+      throw new ResponseStatusException(
+          HttpStatus.NOT_IMPLEMENTED,
+          "Publishing an already accepted commit is not available yet.");
     }
 
     String changedNotePath =
@@ -129,8 +131,6 @@ public class NotebookGitProposalPublisher {
     binding.setBundleBytes(written.bundleBytes());
     binding.setUpdatedAt(publishedAt);
     entityPersister.save(binding);
-
-    throw new ResponseStatusException(
-        HttpStatus.NOT_IMPLEMENTED, "Publishing is not available yet.");
+    return written.headObjectId();
   }
 }

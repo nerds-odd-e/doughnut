@@ -2,8 +2,6 @@ package com.odde.donut.controllers;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.equalTo;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookGitBinding;
@@ -20,35 +18,6 @@ import org.springframework.web.server.ResponseStatusException;
  * here.
  */
 class NotebookGitProposalMarkdownFormatControllerTest extends NotebookGitBundleControllerTestBase {
-
-  @Test
-  void ownerSubmittingAnUnknownTypeAndUnrecognizedKeyStillReceivesTheInterimRefusal()
-      throws Exception {
-    Notebook notebook = createGitBackedNotebook();
-    makeMe
-        .aNote()
-        .notebook(notebook)
-        .title("note")
-        .content("---\ntype: Note\n---\noriginal content")
-        .please();
-    NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);
-    byte[] bundleBytes =
-        proposalBundleBytes(
-            binding,
-            List.of(
-                new NotebookGitProposalFile(
-                    "note.md",
-                    "---\ntype: SomethingCustom\ncustom_field: hello\n---\nchanged content")));
-
-    ResponseStatusException exception =
-        assertThrows(
-            ResponseStatusException.class,
-            () ->
-                controller.publishNotebookGitProposal(
-                    notebook.getId(), binding.getAcceptedGitObjectId(), bundleBytes));
-
-    assertThat(exception.getStatusCode(), equalTo(HttpStatus.NOT_IMPLEMENTED));
-  }
 
   @Test
   void rejectsNoteWithNoFrontmatterFenceWithoutMutatingTheAcceptedBinding() throws Exception {

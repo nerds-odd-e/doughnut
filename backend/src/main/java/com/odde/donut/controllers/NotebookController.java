@@ -485,12 +485,10 @@ class NotebookController {
     NotebookGitProposalImporter.ImportedProposal proposal =
         NotebookGitProposalImporter.importMainHead(bundleBytes);
     try {
-      notebookGitProposalPublisher.validateForPublish(notebookId, expectedHead, proposal);
+      return notebookGitProposalPublisher.publish(notebookId, expectedHead, proposal);
     } finally {
       proposal.repository().close();
     }
-    throw new ResponseStatusException(
-        HttpStatus.NOT_IMPLEMENTED, "Publishing is not available yet.");
   }
 
   private NotebookGitBinding requireGitBinding(Notebook notebook) {
