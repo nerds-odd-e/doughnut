@@ -1,143 +1,106 @@
 import assert from 'node:assert/strict'
-import { execFile } from 'node:child_process'
-import {
-  existsSync,
-  mkdirSync,
-  mkdtempSync,
-  readFileSync,
-  renameSync,
-  rmSync,
-  watch,
-  writeFileSync,
-} from 'node:fs'
+import { existsSync, mkdtempSync, readFileSync, rmSync } from 'node:fs'
 import { tmpdir } from 'node:os'
-import { join } from 'node:path'
+import { join, resolve } from 'node:path'
 import { test } from 'node:test'
-import { fileURLToPath } from 'node:url'
-import { promisify } from 'node:util'
+import {
+  checkoutRoot,
+  createMailbox,
+  mailboxRoot,
+  publishMailboxEvent,
+  readMailbox,
+  readMailboxEvents,
+  requestMailboxStop,
+  runMailboxWorker,
+} from './ci-mailbox.mjs'
 
-const exec = promisify(execFile)
-const launcher = fileURLToPath(new URL('./ci-mailbox.mjs', import.meta.url))
-const hook = fileURLToPath(new URL('./ci-host-hook.mjs', import.meta.url))
-const sha = 'a'.repeat(40)
-
-async function waitForFile(path) {
-  if (existsSync(path)) return
-  await new Promise((resolve, reject) => {
-    const timer = setTimeout(() => {
-      subscription.close()
-      reject(new Error(`Missing ${path}`))
-    }, 5000)
-    const check = () => {
-      if (!existsSync(path)) return
-      clearTimeout(timer)
-      subscription.close()
-      resolve()
-    }
-    const subscription = watch(join(path, '..'), check)
-    check()
-  })
+function createTestMailbox(t, request = {}) {
+  const storage = mkdtempSync(join(tmpdir(), 'ci-mailbox-test-'))
+  t.after(() => rmSync(storage, { recursive: true, force: true }))
+  const options = { root: '/test/donut', storage }
+  return { directory: createMailbox(request, options), options }
 }
 
-async function setup(t) {
-  const directory = mkdtempSync(join(tmpdir(), 'ci-process-test-'))
-  const bin = join(directory, 'bin')
-  mkdirSync(bin)
-  writeFileSync(
-    join(bin, 'gh'),
-    `#!${process.execPath}
-const fs = require('node:fs');
-const path = require('node:path');
-const root = process.env.CI_TEST_ROOT;
-const release = path.join(root, 'release');
-if (process.argv[3] === 'list') {
-  fs.writeFileSync(path.join(root, 'started'), '');
-  const output = () => {
-    if (!fs.existsSync(release)) return false;
-    process.stdout.write(fs.readFileSync(release));
-    return true;
-  };
-  if (!output()) {
-    const watcher = fs.watch(root, () => { if (output()) watcher.close(); });
-  }
-} else { process.stdout.write(JSON.stringify({jobs: []})); }
-`,
-    { mode: 0o700 }
+test('a mailbox under a process TMPDIR is outside the shared observer directory', (t) => {
+  const nixTmp = mkdtempSync(join(tmpdir(), 'nix-shell-'))
+  t.after(() => rmSync(nixTmp, { recursive: true, force: true }))
+  const directory = createMailbox(
+    { probe: true },
+    { root: checkoutRoot, storage: nixTmp }
   )
-  const env = {
-    ...process.env,
-    TMPDIR: directory,
-    CI_TEST_ROOT: directory,
-    PATH: `${bin}:${process.env.PATH}`,
-  }
-  const { stdout } = await exec(
-    process.execPath,
-    [launcher, 'start', 'owner/repo', sha, 'main'],
-    { env, timeout: 5000 }
+  assert.notEqual(resolve(directory, '..'), resolve(mailboxRoot))
+  assert.throws(
+    () => readMailbox(directory),
+    /CI mailbox is outside the observer directory/
   )
-  const mailbox = JSON.parse(stdout.slice('CI_OBSERVER '.length)).directory
-  t.after(async () => {
-    await exec(process.execPath, [launcher, 'stop', mailbox], { env })
-    await waitForFile(join(mailbox, 'result.json'))
-    rmSync(directory, { recursive: true, force: true })
+})
+
+test('event evidence is appendable and independent of worker status', (t) => {
+  const { directory } = createTestMailbox(t)
+  const failure = { type: 'CI_FAILURE', runId: 42, attempt: 1 }
+  publishMailboxEvent(directory, failure)
+  publishMailboxEvent(directory, { type: 'CI_INCOMPLETE', runId: 43 })
+  assert.deepEqual(readMailboxEvents(directory), [
+    { sequence: 1, event: failure },
+    { sequence: 2, event: { type: 'CI_INCOMPLETE', runId: 43 } },
+  ])
+  assert.equal(existsSync(join(directory, 'result.json')), false)
+})
+
+test('stopping an active watcher records no failure event', async (t) => {
+  const { directory, options } = createTestMailbox(t, { mode: 'execution' })
+  let started
+  const ready = new Promise((resolve) => {
+    started = resolve
   })
-  const deliver = async (host, receipt = '') => {
-    const input = JSON.stringify({
-      session_id: 'process-test',
-      conversation_id: 'process-test',
-      generation_id: 'coordinator-turn',
-      transcript_path: '/test/coordinator.jsonl',
-      hook_event_name: host === 'cursor' ? 'postToolUse' : 'PostToolUse',
-      tool_name: host === 'cursor' ? 'Shell' : 'Bash',
-      tool_output: JSON.stringify({ stdout: receipt }),
-      tool_response: { stdout: receipt },
-    })
-    const result = exec(process.execPath, [hook, host], { env })
-    result.child.stdin.end(input)
-    return JSON.parse((await result).stdout)
-  }
-  return { directory, mailbox, stdout, deliver, env }
-}
-
-for (const host of ['cursor', 'claude'])
-  for (const conclusion of ['failure', 'success']) {
-    test(`${host}: detached CLI watcher delivers ${conclusion} through the actual hook process`, async (t) => {
-      const { directory, mailbox, stdout, deliver } = await setup(t)
-      await waitForFile(join(directory, 'started'))
-      assert.equal(existsSync(join(mailbox, 'result.json')), false)
-      await deliver(host, stdout)
-      assert.deepEqual(await deliver(host), {})
-      writeFileSync(
-        join(directory, 'release.tmp'),
-        JSON.stringify([
-          {
-            databaseId: 42,
-            attempt: 1,
-            headSha: sha,
-            headBranch: 'main',
-            workflowName: 'donut CI',
-            event: 'push',
-            status: 'completed',
-            conclusion,
-          },
-        ])
-      )
-      renameSync(join(directory, 'release.tmp'), join(directory, 'release'))
-      await waitForFile(join(mailbox, 'result.json'))
-      const delivered = await deliver(host)
-      if (conclusion === 'failure')
-        assert.match(JSON.stringify(delivered), /CI_FAILURE/)
-      else assert.deepEqual(delivered, {})
-      assert.deepEqual(await deliver(host), {})
-    })
-  }
-
-test('stop CLI cancels an outstanding GitHub subprocess without waiting for CI', async (t) => {
-  const { directory, mailbox, env } = await setup(t)
-  await waitForFile(join(directory, 'started'))
-  await exec(process.execPath, [launcher, 'stop', mailbox], { env })
-  await waitForFile(join(mailbox, 'result.json'))
-  assert.deepEqual(JSON.parse(readFileSync(join(mailbox, 'result.json'))), {
+  const running = runMailboxWorker(directory, {
+    ...options,
+    observe: ({ signal }) =>
+      new Promise((resolve, reject) => {
+        signal.addEventListener('abort', () => reject(signal.reason), {
+          once: true,
+        })
+        started()
+      }),
+  })
+  await ready
+  requestMailboxStop(directory, options)
+  await running
+  assert.deepEqual(JSON.parse(readFileSync(join(directory, 'result.json'))), {
     status: 'stopped',
+    coverage: { state: 'ended', pendingCi: 'unobserved' },
+    evidence: { recordedThrough: 0, deliveredThrough: 0, unread: 0 },
   })
+  assert.deepEqual(readMailboxEvents(directory), [])
+})
+
+test('a stop requested before worker startup does not start observation', async (t) => {
+  const { directory, options } = createTestMailbox(t, { mode: 'execution' })
+  requestMailboxStop(directory, options)
+  await runMailboxWorker(directory, {
+    ...options,
+    observe: async () => assert.fail('observation should not start'),
+  })
+  assert.deepEqual(JSON.parse(readFileSync(join(directory, 'result.json'))), {
+    status: 'stopped',
+    coverage: { state: 'ended', pendingCi: 'unobserved' },
+    evidence: { recordedThrough: 0, deliveredThrough: 0, unread: 0 },
+  })
+})
+
+test('a worker error records monitoring unavailability', async (t) => {
+  const { directory, options } = createTestMailbox(t)
+  await runMailboxWorker(directory, {
+    ...options,
+    observe: async () => {
+      throw new Error('broken observer')
+    },
+  })
+  assert.deepEqual(JSON.parse(readFileSync(join(directory, 'result.json'))), {
+    status: 'finished',
+  })
+  assert.equal(
+    readMailboxEvents(directory)[0].event.type,
+    'CI_MONITOR_UNAVAILABLE'
+  )
 })

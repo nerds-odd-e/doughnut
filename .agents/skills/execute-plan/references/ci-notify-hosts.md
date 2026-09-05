@@ -3,7 +3,9 @@
 Use this adapter only on Cursor or Claude Code. Both use the same detached
 Node watcher and private temporary mailbox; only their hook JSON differs.
 Follow [ci-monitor.md](ci-monitor.md) for CI selection and failure recovery.
-The coordinator, not a work agent, starts and stops observers.
+The coordinator, not a work agent, starts and stops observers. Cursor and
+Claude Code each own one execution observer for the whole execute-plan run,
+reused across repeated setup, normal pushes, and repair pushes.
 
 ## Verify the host bridge once per execution
 
@@ -36,42 +38,53 @@ standard library only). This is a narrow exception to the repo's Nix wrapper:
 starting Nix on every tool boundary would delay ongoing work. Observer launch
 and test commands still use `./scripts/run.sh` / the usual Nix environment.
 
-## Start and continue immediately
+## Start once and continue immediately
 
-After each successful push to `main`, use the verified push repository and
-full pushed SHA, deduplicated as described in `ci-monitor.md`:
+After readiness succeeds, start observation when execute-plan begins, before
+the first push. Use the repository resolved from the actual `main` push
+remote:
 
 ```sh
-./scripts/run.sh node .agents/skills/execute-plan/scripts/ci-mailbox.mjs start OWNER/REPO FULL_PUSHED_SHA main
+./scripts/run.sh node .agents/skills/execute-plan/scripts/ci-mailbox.mjs start --execution OWNER/REPO main
 ```
 
-This starts a detached non-AI process and returns immediately. Retain the
-directory from its `CI_OBSERVER` receipt for this SHA. The hook confirms that
-the observer is attached to this coordinator; absence of that confirmation
-means observation is not connected. Continue delegation and plan execution.
+This starts a detached non-AI process and returns immediately. Retain the one
+directory from its `CI_OBSERVER` receipt as the coordinator's execution
+handle. The hook must add `CI observer attached to this coordinator`; absence
+of that labelled context means observation is not connected. Re-entering setup,
+including after a normal or repair push, reuses that directory and must not run
+the launcher again. The observer discovers each later `main` push itself, so a
+push changes neither its owner binding nor its process handle. Continue
+delegation and plan execution immediately.
 
 The next coordinator hook invocation after a result is ready adds the event to the owning
 coordinator's context exactly once. Pending polls and successful CI add no
 context. The mailbox is claimed by checkout, host, conversation, and worker
 identity; Cursor additionally binds to the coordinator's `generation_id`
-because its children can share the conversation ID. `beforeSubmitPrompt`
+because its children can share the conversation ID, and `beforeSubmitPrompt`
 updates that binding on a new user message; arbitrary child tool calls cannot
-rebind it. Missing generation identity fails the readiness probe. Keep the same
-coordinator session when resuming; if replacing it, stop the old observers
-using their recorded directories and register new ones in the new session.
+rebind it, and missing generation identity fails the readiness probe. Claude
+Code isolates instead by `session_id` plus `agent_id`/`subagent_id`, so a
+sub-agent sharing the coordinator's session cannot consume its notification.
+Keep the same coordinator session when resuming; if replacing it, stop the old
+observers using their recorded directories and register new ones in the new
+session.
 
-Mailboxes live outside the checkout, so stashing untracked work does not
-remove them. The watcher never modifies Git state, pauses workers, or fixes
-code. On a delivered failure, the coordinator follows the shared protocol:
-classify, obtain quiescent handoffs from all writers, stash, delegate repair,
-wrap up and push, restore, then resume. Use the host's available worker
-message/resume handles. If a worker cannot be paused until its current command
-returns, wait for that safe handoff before touching its working tree.
+Mailboxes live outside the checkout under `/tmp/donut-ci-$UID`, not under the
+process `TMPDIR`, so a Nix-wrapped launcher and a native hook share the same
+observer directory. Stashing untracked work does not remove them. The watcher
+never modifies Git state, pauses workers, or fixes code. On a delivered
+failure, the coordinator follows the shared protocol: classify, obtain
+quiescent handoffs from all writers, stash, delegate repair, wrap up and
+push, restore, then resume. Use the host's available worker message/resume
+handles. If a worker cannot be paused until its current command returns, wait
+for that safe handoff before touching its working tree.
 
 ## Stop without waiting for CI
 
-On completion, Jidoka, cancellation, or coordinator replacement, stop each
-known observer using its saved directory:
+On completion, Jidoka, cancellation, or coordinator replacement, Cursor and
+Claude Code each stop their one execution observer using the exact saved
+directory:
 
 ```sh
 ./scripts/run.sh node .agents/skills/execute-plan/scripts/ci-mailbox.mjs stop /EXACT/RECORDED/MAILBOX
@@ -80,11 +93,12 @@ known observer using its saved directory:
 This signals cancellation, including an outstanding GitHub request or polling
 timer. Confirm `result.json` in that directory reaches `stopped` or `finished`;
 this is local process shutdown, not waiting for CI. The hook drains an
-already-finished event even if stop was requested. Handle delivered failures
-before claiming completion, and report still-pending CI as unobserved. Retain
-these small recovery records for interrupted sessions; never kill by a broad
-process-name pattern. A watcher also has the bounded lifetime in the shared
-contract if its coordinator disappears without stopping it.
+already-finished event even if stop was requested. Unread records remain in the
+mailbox, and a deliberate stop reports pending CI as unobserved. Handle
+delivered failures before claiming completion. Retain these small recovery
+records for interrupted sessions; never kill by a broad process-name pattern.
+A watcher also has the bounded lifetime in the shared contract if its
+coordinator disappears without stopping it.
 
 ## Host contracts
 

@@ -45,8 +45,9 @@ handoff if available. Reuse adequate/recovered proof; never randomly sample it.
    judgment. Do not run standalone
    `lint:changed`. If a hook repair invalidates preparation, rerun the direct
    formatting command before restaging and retrying.
-8. Push with `git push`. A successful push completes routine wrap-up. Start the
-   nonblocking CI observer for the pushed revision per
-   [ci-monitor.md](ci-monitor.md), then continue the plan. Handle delivered CI
-   failures through its pause/stash/repair/resume protocol; never wait for CI
-   or CD to finish. Apply the same rule after pushing a CI repair.
+8. Push with `git push`. A successful push completes routine wrap-up. Keep the
+   execution's existing nonblocking CI observer running per
+   [ci-monitor.md](ci-monitor.md); it discovers this push without new setup.
+   Continue the plan and handle delivered CI failures through the shared
+   pause/stash/repair/resume protocol; never wait for CI or CD to finish. Apply
+   the same rule after pushing a CI repair.

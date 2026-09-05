@@ -1,6 +1,6 @@
 ---
 id: SEED-011
-status: dormant
+status: active
 planted: 2026-09-05
 planted_during: retrospective of SEED-009 Story 2 publication execution, on developer request
 trigger_when: before another long execute-plan run or when revising CI observation and repair coordination
@@ -45,6 +45,65 @@ agents; the developer suggests inspecting the last finished CI result and
 notifying the coordinator if it failed, while remaining open to refinements.
 Observation must stop when execution ends; persistent monitoring is excluded.
 
+## Selected Goal: One Local Observer Across Supported Agent Hosts (Completed)
+
+Quick 007 completed the selected Story 1 delivery for Codex, Cursor, and Claude
+Code. It eliminates repeated AI watcher setup: one nonblocking local process
+owns CI polling, run discovery, incremental event recording, and lost-coverage
+reporting throughout an execute-plan run. Each host receives the same durable
+records at its supported boundary and explicitly stops the process when
+execution ends.
+
+The three hosts may use different final delivery adapters—Codex foreground
+streaming and native Cursor/Claude hooks—but they share one observer, mailbox,
+event identity, and lifecycle contract. This selection does not require a
+general event broker or a redesign of CI repair coordination.
+
+## Retained Implementation Supporting the Goal
+
+The completed quick-007 implementation provides the cohesive local-observer
+foundation:
+
+- read-only matching of main-branch donut CI, including the newest completed
+  startup run, unfinished runs, pagination, and successive pushes;
+- incremental run/attempt/job failure evidence plus cancellation, fallback,
+  finite-budget, transient-recovery, and explicit lost-coverage outcomes;
+- one nonblocking execution mailbox outside the checkout with append-only event
+  evidence, independent terminal status, unread-evidence recovery, and safe stop;
+- a foreground Codex record stream with partial-chunk and pre-yield handling;
+- native Cursor and Claude hooks bound to one execution observer, with
+  installed-host readiness, incremental delivery, reuse, isolation, and
+  shutdown proof;
+- a shared execute-plan contract that starts observation before the first push,
+  retains it through normal and repair pushes, and stops it at execution end.
+
+The final repository CI-observer wrapper passes 50 tests covering H1–H7. A live
+Codex demonstration delivered two labelled fake-GitHub job failures
+incrementally while coordinator work continued. Installed Cursor 3.19.7 and
+Claude Code probes each produced native readiness, attachment, labelled-event,
+reuse, isolation, and stop evidence. No named external caller used the old
+per-SHA API or CLI, so quick 007 removed it instead of retaining anonymous
+compatibility. These observations establish behavior and host delivery, not a
+production timing benchmark.
+
+## Deferred Repair-policy and Advanced Reliability Observations
+
+Keep the following as future observation/improvement material rather than
+requirements of the selected one-observer story:
+
+- other-session repair applicability and repair-policy changes;
+- durable repair ownership across compaction and accumulated-failure cause
+  equivalence (Story 2);
+- exhaustive cancellation and replacement permutations beyond one safe
+  lifecycle for each supported host;
+- mailbox abstractions broader than the state this observer needs to persist,
+  deliver, and stop safely;
+- agent hosts beyond Codex, Cursor, and Claude Code.
+
+Cursor and Claude Code migration, installed-host validation, and removal of
+superseded per-SHA defaults were completed Story 1 work, not deferred
+observations.
+
 ## Alternatives and Decision
 
 1. **Defer:** retain the current observer. Polling remains token-free, but
@@ -72,8 +131,10 @@ no longer supplies a SHA for every launch.
 
 ### 1. Notice relevant CI failures throughout execution with one setup
 
-- **For / why:** The developer wants failures noticed without paying for
-  repeated AI coordination after every push.
+**Status:** completed by quick 007 on 2026-09-05.
+
+- **For / why:** The developer wants Codex, Cursor, and Claude Code to notice
+  failures without paying for repeated AI coordination after every push.
 - **Evaluation:** Across several pushes during one execution, the coordinator
   establishes observation once. Pending and successful checks require no
   model turns. A completed failed job is delivered even if other jobs in that
@@ -86,8 +147,8 @@ no longer supplies a SHA for every launch.
   useful failure information to the ongoing coordinator without model polling?
   Compare setup/lifecycle model calls and generated tokens with the recorded
   baseline; separate these from necessary diagnosis and repair costs.
-- **Effort hypothesis:** M — medium confidence; assumes an available host
-  notification mechanism can be verified and reused.
+- **Effort result:** Completed across Codex, Cursor, and Claude Code with one
+  shared wrapper proof and host-native lifecycle evidence.
 - **Depends on:** none.
 - **Safe stopping point:** Failures remain visible with the current repair
   workflow even if later coordination improvements are cancelled. Track relevant
@@ -218,9 +279,8 @@ claim that pending CI passed.
 
 ## Open Decisions
 
-- Story 1's plan adopts the recommended startup baseline as an execution choice
-  following the developer's request to plan this improvement. Actual-host
-  validation remains part of its proof.
+- Story 1 adopted the recommended startup baseline and completed actual-host
+  validation for Codex, Cursor, and Claude Code.
 - Story 2 retains the recommended bounded-task attention boundary for its later
   plan and validation. No broader repair-coordination implementation is selected.
 
@@ -229,10 +289,10 @@ monitoring.
 
 ## When to Surface
 
-Before the next long multi-slice execution, or when revising observation across
-Codex, Cursor, or Claude Code. On the developer's slice-planning request,
-[Story 1 received an executable plan](../quick/007-observe-ci-once-per-execution/PLAN.md).
-Implementation has not started; Story 2 and backlog priority remain unselected.
+Story 1 is complete and its spent quick-007 plan was removed after the outcome
+was transferred into the execute-plan skill, tests, and this seed. Surface this
+seed again before planning Story 2, when changing the observer lifecycle, or
+when new host/reliability observations justify another story.
 
 ## Breadcrumbs
 

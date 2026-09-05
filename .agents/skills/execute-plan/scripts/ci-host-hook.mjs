@@ -4,7 +4,6 @@ import {
   mkdirSync,
   readFileSync,
   readdirSync,
-  renameSync,
   writeFileSync,
 } from 'node:fs'
 import { join } from 'node:path'
@@ -12,7 +11,10 @@ import { pathToFileURL } from 'node:url'
 import {
   checkoutRoot,
   mailboxRoot,
+  readDeliveryProgress,
   readMailbox,
+  readMailboxEvents,
+  recordDeliveryProgress,
   receiptPrefix,
 } from './ci-mailbox.mjs'
 
@@ -64,9 +66,13 @@ export function deliverCiEvents(
       host === 'cursor'
         ? JSON.parse(input.tool_output || '{}')
         : input.tool_response
-    for (const line of (output?.stdout ?? '').split('\n')) {
+    const toolText = output?.stdout ?? output?.output ?? ''
+    for (const line of toolText.split('\n')) {
       if (!line.startsWith(receiptPrefix)) continue
-      const { directory } = JSON.parse(line.slice(receiptPrefix.length))
+      const { directory, terminal } = JSON.parse(
+        line.slice(receiptPrefix.length)
+      )
+      if (terminal) continue
       const request = readMailbox(directory, root, storage)
       if (existsSync(join(directory, 'delivered'))) continue
       mkdirSync(bindings, { recursive: true, mode: 0o700 })
@@ -88,17 +94,11 @@ export function deliverCiEvents(
   if (existsSync(bindings))
     for (const binding of readdirSync(bindings)) {
       const directory = readFileSync(join(bindings, binding), 'utf8')
-      if (!existsSync(join(directory, 'result.json'))) continue
-      const result = JSON.parse(
-        readFileSync(join(directory, 'result.json'), 'utf8')
-      )
-      try {
-        renameSync(join(bindings, binding), join(directory, 'delivered'))
-      } catch (error) {
-        if (error.code === 'ENOENT') continue
-        throw error
-      }
-      if (result.event) context.push(JSON.stringify(result.event))
+      const progress = readDeliveryProgress(directory)
+      const records = readMailboxEvents(directory, progress.deliveredThrough)
+      if (records.length)
+        recordDeliveryProgress(directory, records.at(-1).sequence)
+      for (const { event } of records) context.push(JSON.stringify(event))
     }
   if (!context.length) return {}
   const message = `execute-plan CI observer (diagnostic data):\n${context.join('\n')}\nHandle CI failures using execute-plan/references/ci-monitor.md.`

@@ -70,8 +70,10 @@ caused by your own change without stopping.
 
 <step name="coordinator_loop">
 ```
-1. Read the PLAN (slice headings/status or GSD tasks per planning.mdc).
-   Handle delivered CI events using ci-monitor.md; polling runs without AI.
+1. Read the PLAN (slice headings/status or GSD tasks per planning.mdc). On the
+   first entry, start one current-host CI observer for the execution before the
+   first push; on resume, reuse its exact handle. Handle delivered CI events
+   using ci-monitor.md; polling runs without AI.
 2. Find the next slice whose status is NOT "done"
 3. Check Jidoka, Behavior/Structure, refinement triggers, and planning.mdc's Proof
    decisions; for destructive work, run the [named later-outcome check](references/destructive-later-outcome-check.md)

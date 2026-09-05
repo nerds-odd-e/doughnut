@@ -6,10 +6,11 @@ import { test } from 'node:test'
 import { deliverCiEvents } from './ci-host-hook.mjs'
 import {
   createMailbox,
+  publishMailboxEvent,
   probeMailbox,
+  readMailboxEvents,
   receiptPrefix,
   runMailboxWorker,
-  stopMailbox,
 } from './ci-mailbox.mjs'
 
 function setup() {
@@ -25,7 +26,7 @@ const input = (host, directory, overrides = {}) => ({
   hook_event_name: host === 'cursor' ? 'postToolUse' : 'PostToolUse',
   tool_name: host === 'cursor' ? 'Shell' : 'Bash',
   tool_output: JSON.stringify({
-    stdout: directory
+    output: directory
       ? `${receiptPrefix}${JSON.stringify({ directory })}\n`
       : '',
   }),
@@ -69,6 +70,46 @@ for (const host of ['cursor', 'claude']) {
     assert.match(
       context(deliverCiEvents(input(host), host, options)),
       /CI_FAILURE/
+    )
+    assert.deepEqual(
+      JSON.parse(readFileSync(join(directory, 'delivery.json'))),
+      { deliveredThrough: 1 }
+    )
+    assert.deepEqual(deliverCiEvents(input(host), host, options), {})
+  })
+
+  test(`${host}: one coordinator binding delivers events published at different times`, () => {
+    const options = setup()
+    const directory = createMailbox({}, options)
+    const laterFailure = { type: 'CI_FAILURE', runId: 43, attempt: 1 }
+    deliverCiEvents(input(host, directory), host, options)
+
+    publishMailboxEvent(directory, failure)
+    assert.match(
+      context(deliverCiEvents(input(host), host, options)),
+      /"runId":42/
+    )
+    publishMailboxEvent(directory, laterFailure)
+
+    for (const overrides of [
+      { conversation_id: 'other', session_id: 'other' },
+      { agent_id: 'worker', subagent_id: 'worker' },
+    ])
+      assert.deepEqual(
+        deliverCiEvents(input(host, undefined, overrides), host, options),
+        {}
+      )
+    assert.deepEqual(readMailboxEvents(directory), [
+      { sequence: 1, event: failure },
+      { sequence: 2, event: laterFailure },
+    ])
+    assert.match(
+      context(deliverCiEvents(input(host), host, options)),
+      /"runId":43/
+    )
+    assert.deepEqual(
+      JSON.parse(readFileSync(join(directory, 'delivery.json'))),
+      { deliveredThrough: 2 }
     )
     assert.deepEqual(deliverCiEvents(input(host), host, options), {})
   })
@@ -200,45 +241,5 @@ test('Cursor cancellation does not auto-continue or consume a waiting failure', 
   assert.match(
     context(deliverCiEvents(input('cursor'), 'cursor', options)),
     /CI_FAILURE/
-  )
-})
-
-test('stopping an active watcher aborts its work and produces no failure notification', async () => {
-  const options = setup()
-  const directory = createMailbox({}, options)
-  let started
-  const ready = new Promise((resolve) => {
-    started = resolve
-  })
-  const running = runMailboxWorker(directory, {
-    ...options,
-    observe: ({ signal }) =>
-      new Promise((resolve, reject) => {
-        signal.addEventListener('abort', () => reject(signal.reason), {
-          once: true,
-        })
-        started()
-      }),
-  })
-  await ready
-  stopMailbox(directory, options)
-  await running
-  assert.deepEqual(JSON.parse(readFileSync(join(directory, 'result.json'))), {
-    status: 'stopped',
-  })
-})
-
-test('a worker process error becomes a monitoring-unavailable event', async () => {
-  const options = setup()
-  const directory = createMailbox({}, options)
-  await runMailboxWorker(directory, {
-    ...options,
-    observe: async () => {
-      throw new Error('broken observer')
-    },
-  })
-  assert.equal(
-    JSON.parse(readFileSync(join(directory, 'result.json'))).event.type,
-    'CI_MONITOR_UNAVAILABLE'
   )
 })
