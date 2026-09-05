@@ -264,7 +264,7 @@ Sizing: about 5 minutes, medium confidence; only the format floor in this leaf.
 
 ### 9. Preserve the existing authored-property validation policy
 Type: Behavior
-Status: planned
+Status: done
 Proof: controller cases reject an invalid aliases/overlaps/note_level value.
 
 Behavior: valid typed Markdown contains a property the existing save contract
@@ -535,3 +535,19 @@ Sizing: about 5 minutes plus backend runtime, medium confidence.
   production/test split) to keep `NotebookGitProposalTreeShapeControllerTest`
   under the file-size guideline. No API/DTO or CLI changes. Next action:
   execute slice 9.
+- Slice 9 done: added `NotebookGitProposalBlobText.readUtf8` (`services/notebookGit/`)
+  to read the one changed note's already-validated proposed content, then calls
+  the EXISTING `AuthoredNoteContent.assertValidForSave(content)` directly,
+  letting its `ApiException`/`ApiError` (BINDING_ERROR) propagate uncaught —
+  deliberately the same error shape ordinary web content-saves already produce,
+  unlike every other slice-5–8 check (`ResponseStatusException`). Applies only
+  to the one changed note, never the container README. A valid proposal still
+  reaches the interim refusal. Coordinator reconfirmed the full
+  `pnpm backend:test_only` baseline stays at exactly 4 pre-existing failures —
+  this run they landed on different, unrelated `QuestionGeneration*` classes
+  (same `ApplicationContext` load-failure-cascade signature as before),
+  confirming it's full-suite environmental flakiness, not a regression from
+  slices 4-9. No API/DTO or CLI changes.
+- Developer asked to stop after slice 9 (2026-09-05); slices 10-16 remain
+  planned and unexecuted. Next action: resume at slice 10
+  ("Refuse to overwrite a projection that has drifted") in a future session.

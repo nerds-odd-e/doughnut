@@ -35,6 +35,7 @@ import com.odde.donut.services.NotebookIndexingService;
 import com.odde.donut.services.NotebookService;
 import com.odde.donut.services.WikidataService;
 import com.odde.donut.services.notebookGit.NotebookGitProposalAncestry;
+import com.odde.donut.services.notebookGit.NotebookGitProposalBlobText;
 import com.odde.donut.services.notebookGit.NotebookGitProposalImporter;
 import com.odde.donut.services.notebookGit.NotebookGitProposalMarkdownFormat;
 import com.odde.donut.services.notebookGit.NotebookGitProposalTreeShape;
@@ -497,10 +498,15 @@ class NotebookController {
       NotebookGitProposalAncestry.assertFollowsAcceptedHead(
           proposal.repository(), proposal.mainHead(), acceptedHead);
       if (!proposal.mainHead().equals(acceptedHead)) {
-        NotebookGitProposalTreeShape.assertSingleModifiedRegularNotePath(
-            proposal.repository(), acceptedHead, proposal.mainHead());
+        String changedNotePath =
+            NotebookGitProposalTreeShape.assertSingleModifiedRegularNotePath(
+                proposal.repository(), acceptedHead, proposal.mainHead());
         NotebookGitProposalMarkdownFormat.assertValidTypedMarkdown(
             proposal.repository(), proposal.mainHead());
+        String changedNoteContent =
+            NotebookGitProposalBlobText.readUtf8(
+                proposal.repository(), proposal.mainHead(), changedNotePath);
+        AuthoredNoteContent.assertValidForSave(changedNoteContent);
       }
     } finally {
       proposal.repository().close();
