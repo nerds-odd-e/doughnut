@@ -317,7 +317,7 @@ Sizing: about 5 minutes, medium confidence.
 
 ### 12. Establish committed proposal transaction fixtures
 Type: Structure
-Status: planned
+Status: done
 Proof: a committed publish-controller fixture reaches the existing interim
 refusal, and the existing proposal controller family stays green.
 
@@ -643,3 +643,10 @@ Sizing: about 5 minutes plus backend runtime, medium confidence.
   a committed proposal-test Structure leaf as slice 12 and moved the race
   Behavior to slice 13; later slices were renumbered without changing the
   selected story. Next action: execute refined slice 12.
+- Refined slice 12 done: added a committed proposal-controller test boundary
+  that owns setup/cleanup outside rollback transactions, reloads committed
+  notebook and binding state, and propagates request scope into timeout-bounded
+  worker calls. A valid committed proposal reaches the existing interim refusal
+  without mutating its accepted head; rollback-scoped proposal tests remain on
+  their simpler base. Post-change-refactor removed one redundant committed read.
+  No production or API change. Next action: execute slice 13.
