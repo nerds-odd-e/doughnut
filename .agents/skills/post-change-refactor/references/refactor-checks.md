@@ -67,7 +67,9 @@ wc -l <path>
 
 (`wc` is a host command — do not start a nix shell just to count lines.)
 
-- Files **over 250 lines** must be split (applies to test code too).
+- Seed files under `.planning/seeds/` and plan files (`PLAN.md` or `*-PLAN.md`)
+  have a **500-line limit**; files over 500 lines must be split.
+- All other files **over 250 lines** must be split (applies to test code too).
 - Split along **cohesive seams** — one concept per module, not arbitrary line
   cuts.
 - Update imports. Keep the public API stable for callers outside the change.

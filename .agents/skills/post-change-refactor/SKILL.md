@@ -150,7 +150,8 @@ the refactor (not the original change), fix it now.
 - Edits are the smallest coherent concept-bounded set, including untouched files
 - No cross-subsystem refactoring without concept-specific human authorization
 - No speculative structure beyond current change / immediate next slice
-- Duplication, naming, shotgun, dead-code, and 250-line checks applied
+- Duplication, naming, shotgun, dead-code, and file-size checks applied
+  (500 lines for seed and plan files; 250 lines for other files)
 - Invalidated handed-off proof (or related focused tests without a handoff)
   green when this skill edited; skipped when triage made no edits
 - Successful and Jidoka handoffs report approximate active elapsed time
