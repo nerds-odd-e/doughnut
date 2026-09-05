@@ -71,6 +71,7 @@ Assume `pnpm sut` is already running. If unsure, check `CURSOR_DEV=true nix deve
 | Mode | Artifacts | Orchestrator |
 |------|-----------|--------------|
 | Story shaping | `.planning/seeds/SEED-NNN-slug.md` containing ordered candidate stories | **story-decomposition** |
+| Story refinement | Goal, scope, and key examples in each story's home seed | **story-refinement** |
 | Product backlog | `.planning/PRODUCT-BACKLOG.md` — ordered unfinished story titles only | **product-backlog** |
 | Formal milestone | `.planning/phases/NN-slug/*-PLAN.md`, STATE, ROADMAP | `/gsd-plan-phase` → `/gsd-execute-phase` → `/gsd-ship` (+ local wrap-up) |
 | Ad-hoc | `.planning/quick/NNN-slug/PLAN.md` | **slice-planning** + **execute-plan** |
@@ -78,9 +79,10 @@ Assume `pnpm sut` is already running. If unsure, check `CURSOR_DEV=true nix deve
 | Completed-plan audit | Git history plus optional follow-up PLAN | **execution-retrospective**; never executes the follow-up |
 | Legacy | `ongoing/*.md` | **execute-plan** only; do not migrate |
 
-Story-decomposition seeds are not executable: select one contained story, then
-use slice-planning. Run slice-plan-refinement only when the resulting PLAN is
-complex, sizing confidence is low, or execution overruns; straightforward plans
+Story-decomposition seeds are not executable: select a story, clarify its goal,
+scope, and examples with story-refinement as needed, then use slice-planning.
+Run slice-plan-refinement only when the resulting PLAN is complex, sizing
+confidence is low, or execution overruns; straightforward plans
 may execute directly. **Hard decomposition quality:** one evaluable outcome at the
 current resolution; 3V stories; Behavior/Structure execution leaves —
 `problem-decomposition.mdc`. Plan artifact and lifecycle rules: `planning.mdc`.
