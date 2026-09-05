@@ -277,7 +277,7 @@ Sizing: 3–4 minutes, medium confidence.
 
 ### 10. Keep bundle-endpoint tests navigable by concept
 Type: Structure
-Status: planned
+Status: done
 Proof: `NotebookGitBundleControllerTest` and the two new leaf classes it spawns,
 plus every other existing controller test in this family, stay green.
 
@@ -597,3 +597,11 @@ Sizing: about 5 minutes plus backend runtime, medium confidence.
   `notebookPublish.test.ts` runner — preserves single-Vitest-file scheduling
   while satisfying the file-size guideline. No new slice needed for that; it
   is already resolved in the current tree.
+- Slice 10 done: split proposal-import and proposal-ancestry cases from
+  `NotebookGitBundleControllerTest` into capability-named leaf classes sharing
+  `NotebookGitBundleControllerTestBase`; the original class now contains only
+  download and publish authorization/interim-refusal behavior. No production
+  code changed. The required full backend suite passed after raising the local
+  MySQL process's runtime-only `max_connections` setting from 151 to 300 to
+  avoid the previously documented connection-exhaustion cascade. Next action:
+  execute slice 11.

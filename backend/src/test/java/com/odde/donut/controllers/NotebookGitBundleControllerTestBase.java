@@ -41,7 +41,8 @@ import org.springframework.web.server.ResponseStatusException;
 /**
  * Shared notebook/bundle-crafting fixtures for the notebook Git-bundle download and proposal
  * controller tests ({@link NotebookGitBundleControllerTest}, {@link
- * NotebookGitProposalTreeShapeControllerTest}, {@link
+ * NotebookGitProposalImportControllerTest}, {@link NotebookGitProposalAncestryControllerTest},
+ * {@link NotebookGitProposalTreeShapeControllerTest}, {@link
  * NotebookGitProposalMarkdownFormatControllerTest}, and {@link
  * NotebookGitProposalPropertyValidationControllerTest}).
  */
