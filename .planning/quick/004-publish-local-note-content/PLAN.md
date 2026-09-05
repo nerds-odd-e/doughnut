@@ -355,7 +355,7 @@ removes the previously hidden committed-fixture and lock-contention work.
 
 ### 14. Share authored-content persistence without changing web saves
 Type: Structure
-Status: planned
+Status: done
 Proof: existing TextContentController update tests stay green.
 
 Internal change: extract only the same-Note document persistence operation:
@@ -680,3 +680,9 @@ Sizing: about 5 minutes plus backend runtime, medium confidence.
   removed redundant fixture refresh, and extracted the shared proposal-file
   test value. Controller/API generation produced no wire diff; OpenAPI lint and
   all frontend tests passed. Next action: execute slice 14.
+- Slice 14 done: extracted `AuthoredNoteDocumentPersistence` for the cohesive
+  same-Note operation that sets `updatedAt`, replaces the prepared document,
+  saves, removes orphan images, and refreshes derived reference indexes.
+  `TextContentController` retains document preparation, normalization,
+  authorization, and response construction at the web edge. No endpoint/API or
+  observable web-save behavior changed. Next action: execute slice 15.
