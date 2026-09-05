@@ -317,7 +317,7 @@ Sizing: about 5 minutes, medium confidence.
 
 ### 12. Commit the shared proposal-controller fixture family
 Type: Structure
-Status: planned
+Status: done
 Proof: every existing bundle/proposal controller test keeps its current
 assertions and passes with committed Git-backed notebook fixtures.
 
@@ -661,3 +661,11 @@ Sizing: about 5 minutes plus backend runtime, medium confidence.
   Authorization fixtures must submit valid identical-head bundles because
   untrusted Git import intentionally happens before database authorization.
   Next action: finish refined slice 12.
+- Reopened slice 12 done: migrated the entire shared bundle/proposal controller
+  test family to committed, non-rollback fixtures with unique prefix-bounded
+  users and cleanup. Authorization cases now submit the accepted binding's
+  already-valid bundle, preserving authorization outcomes after pre-lock Git
+  import; the dedicated committed test/base were consolidated into the shared
+  base. Post-change-refactor removed redundant identical-head rebundling and
+  kept the shared base at 250 lines. No production or API change. Next action:
+  retry slice 13.

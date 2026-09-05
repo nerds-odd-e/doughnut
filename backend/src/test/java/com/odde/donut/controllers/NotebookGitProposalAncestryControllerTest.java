@@ -35,7 +35,7 @@ class NotebookGitProposalAncestryControllerTest extends NotebookGitBundleControl
             ResponseStatusException.class,
             () ->
                 controller.publishNotebookGitProposal(
-                    notebook, binding.getAcceptedGitObjectId(), identicalHeadBundleBytes(binding)));
+                    notebook, binding.getAcceptedGitObjectId(), binding.getBundleBytes()));
 
     assertThat(exception.getStatusCode(), equalTo(HttpStatus.NOT_IMPLEMENTED));
   }
@@ -101,14 +101,6 @@ class NotebookGitProposalAncestryControllerTest extends NotebookGitBundleControl
         NotebookGitBundleBuilder.build(
             entries, "Proposer", "proposer@example.com", "Proposal", Instant.now())) {
       return NotebookGitBundleWriter.write(repository).bundleBytes();
-    }
-  }
-
-  /** A bundle whose {@code main} is the accepted head itself - no new commits. */
-  private byte[] identicalHeadBundleBytes(NotebookGitBinding binding) throws Exception {
-    try (InMemoryRepository repository = new InMemoryRepository(new DfsRepositoryDescription())) {
-      ObjectId acceptedHead = GitBundleTestReader.fetchHead(repository, binding.getBundleBytes());
-      return bundleBytesForHead(repository, acceptedHead);
     }
   }
 

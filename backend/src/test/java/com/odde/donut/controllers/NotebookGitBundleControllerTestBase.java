@@ -1,5 +1,7 @@
 package com.odde.donut.controllers;
 
+import static com.odde.donut.testability.CommittedTransactionTestSupport.inCommittedTransaction;
+import static com.odde.donut.testability.CommittedUserCleanup.deleteByUserExternalIdentifierLike;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -8,12 +10,14 @@ import com.odde.donut.controllers.dto.NotebookCreationRequest;
 import com.odde.donut.controllers.dto.NotebookRealm;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookGitBinding;
+import com.odde.donut.entities.User;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.services.notebookExport.PortableTreeEntry;
 import com.odde.donut.services.notebookGit.NotebookGitBundleBuilder;
 import com.odde.donut.services.notebookGit.NotebookGitBundleWriter;
 import com.odde.donut.services.notebookGit.NotebookGitCutoverService;
 import com.odde.donut.testability.GitBundleTestReader;
+import jakarta.persistence.EntityManager;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -21,6 +25,7 @@ import java.time.Instant;
 import java.time.ZoneOffset;
 import java.util.Comparator;
 import java.util.List;
+import java.util.UUID;
 import org.eclipse.jgit.dircache.DirCache;
 import org.eclipse.jgit.dircache.DirCacheBuilder;
 import org.eclipse.jgit.dircache.DirCacheEntry;
@@ -36,8 +41,13 @@ import org.eclipse.jgit.lib.PersonIdent;
 import org.eclipse.jgit.lib.RefUpdate;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.transport.BundleWriter;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 /**
@@ -49,9 +59,49 @@ import org.springframework.web.server.ResponseStatusException;
  * NotebookGitProposalPropertyValidationControllerTest}, and {@link
  * NotebookGitProjectionDriftControllerTest}).
  */
+@Transactional(propagation = Propagation.NOT_SUPPORTED)
 abstract class NotebookGitBundleControllerTestBase extends NotebookControllerTestBase {
 
+  private static final String FIXTURE_PREFIX = "notebook-git-proposal-committed-";
+
   @Autowired NotebookGitCutoverService notebookGitCutoverService;
+  @Autowired PlatformTransactionManager transactionManager;
+  @Autowired EntityManager entityManager;
+
+  private String testFixturePrefix;
+
+  @BeforeEach
+  void replaceDefaultFixtureWithCommittedUser() {
+    String defaultUserExternalIdentifier = currentUser.getUser().getExternalIdentifier();
+    committed(
+        () -> deleteByUserExternalIdentifierLike(entityManager, defaultUserExternalIdentifier));
+    testFixturePrefix = FIXTURE_PREFIX + UUID.randomUUID() + "-";
+    committed(() -> currentUser.setUser(makeMe.aUser(testFixturePrefix + "owner").please()));
+  }
+
+  @AfterEach
+  void cleanupCommittedFixture() {
+    committed(
+        () -> {
+          String fixtureUsers = testFixturePrefix + "%";
+          entityManager
+              .createNativeQuery(
+                  "DELETE s FROM subscription s "
+                      + "INNER JOIN user subscriber ON s.user_id = subscriber.id "
+                      + "INNER JOIN notebook nb ON s.notebook_id = nb.id "
+                      + "INNER JOIN ownership o ON nb.ownership_id = o.id "
+                      + "INNER JOIN user owner ON o.user_id = owner.id "
+                      + "WHERE subscriber.external_identifier LIKE :like "
+                      + "OR owner.external_identifier LIKE :like")
+              .setParameter("like", fixtureUsers)
+              .executeUpdate();
+          deleteByUserExternalIdentifierLike(entityManager, fixtureUsers);
+        });
+  }
+
+  User createFixtureUser() {
+    return makeMe.aUser(testFixturePrefix + "additional-user").please();
+  }
 
   Notebook createGitBackedNotebook() throws UnexpectedNoAccessRightException {
     NotebookCreationRequest request = new NotebookCreationRequest();
@@ -188,5 +238,13 @@ abstract class NotebookGitBundleControllerTestBase extends NotebookControllerTes
     return List.of(
         new PortableTreeEntry("note.md", "---\ntype: Note\n---\noriginal content"),
         new PortableTreeEntry("README.md", "---\ntype: Readme\n---\nreadme original"));
+  }
+
+  private <T> T committed(java.util.function.Supplier<T> action) {
+    return inCommittedTransaction(transactionManager, action);
+  }
+
+  private void committed(Runnable action) {
+    inCommittedTransaction(transactionManager, action);
   }
 }

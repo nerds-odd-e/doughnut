@@ -58,7 +58,7 @@ class NotebookGitBundleControllerTest extends NotebookGitBundleControllerTestBas
   @Test
   void deniesDownloadForNotebookOwnedByAnotherUser() throws Exception {
     Notebook notebook = createGitBackedNotebook();
-    currentUser.setUser(makeMe.aUser().please());
+    currentUser.setUser(createFixtureUser());
 
     assertThrows(
         UnexpectedNoAccessRightException.class,
@@ -68,7 +68,7 @@ class NotebookGitBundleControllerTest extends NotebookGitBundleControllerTestBas
   @Test
   void deniesDownloadForReadOnlySubscriber() throws Exception {
     Notebook notebook = createGitBackedNotebook();
-    User subscriber = makeMe.aUser().please();
+    User subscriber = createFixtureUser();
     makeMe.aSubscription().forNotebook(notebook).forUser(subscriber).please();
     currentUser.setUser(subscriber);
 
@@ -80,19 +80,23 @@ class NotebookGitBundleControllerTest extends NotebookGitBundleControllerTestBas
   @Test
   void deniesPublishForNotebookOwnedByAnotherUser() throws Exception {
     Notebook notebook = createGitBackedNotebook();
-    currentUser.setUser(makeMe.aUser().please());
+    NotebookGitBinding binding =
+        notebookGitBindingRepository.findByNotebook_Id(notebook.getId()).orElseThrow();
+    currentUser.setUser(createFixtureUser());
 
     assertThrows(
         UnexpectedNoAccessRightException.class,
         () ->
             controller.publishNotebookGitProposal(
-                notebook, "someExpectedHead", "placeholder bundle bytes".getBytes()));
+                notebook, binding.getAcceptedGitObjectId(), binding.getBundleBytes()));
   }
 
   @Test
   void deniesPublishForReadOnlySubscriber() throws Exception {
     Notebook notebook = createGitBackedNotebook();
-    User subscriber = makeMe.aUser().please();
+    NotebookGitBinding binding =
+        notebookGitBindingRepository.findByNotebook_Id(notebook.getId()).orElseThrow();
+    User subscriber = createFixtureUser();
     makeMe.aSubscription().forNotebook(notebook).forUser(subscriber).please();
     currentUser.setUser(subscriber);
 
@@ -100,6 +104,6 @@ class NotebookGitBundleControllerTest extends NotebookGitBundleControllerTestBas
         UnexpectedNoAccessRightException.class,
         () ->
             controller.publishNotebookGitProposal(
-                notebook, "someExpectedHead", "placeholder bundle bytes".getBytes()));
+                notebook, binding.getAcceptedGitObjectId(), binding.getBundleBytes()));
   }
 }
