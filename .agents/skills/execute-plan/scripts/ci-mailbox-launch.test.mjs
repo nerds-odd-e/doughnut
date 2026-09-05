@@ -14,7 +14,11 @@ import { join } from 'node:path'
 import { test } from 'node:test'
 import { fileURLToPath } from 'node:url'
 import { promisify } from 'node:util'
-import { publishMailboxEvent, readMailboxEvents } from './ci-mailbox.mjs'
+import {
+  publishMailboxEvent,
+  readMailboxEvents,
+  readWorkerIdentity,
+} from './ci-mailbox.mjs'
 import { waitForFile } from './watch-ci-test-fixtures.mjs'
 
 const exec = promisify(execFile)
@@ -38,6 +42,7 @@ const root = process.env.CI_TEST_ROOT;
 const release = path.join(root, 'release');
 if (process.argv[3] === 'list') {
   fs.writeFileSync(path.join(root, 'started'), '');
+  fs.writeFileSync(path.join(root, 'worker-pid'), String(process.ppid));
   process.on('SIGTERM', () => {
     fs.writeFileSync(path.join(root, 'request-stopped'), '');
     process.exit(0);
@@ -174,14 +179,21 @@ for (const host of ['cursor', 'claude'])
     })
   }
 
-test('stop CLI cancels an outstanding GitHub subprocess and reports pending coverage', async (t) => {
-  const { directory, mailbox, env } = await setup(t, [
-    '--execution',
-    'owner/repo',
-    'main',
-    '60000',
-  ])
+test('launcher retains its exact worker while receipt and normal stop stay unchanged', async (t) => {
+  const {
+    directory,
+    mailbox,
+    stdout: launchReceipt,
+    env,
+  } = await setup(t, ['--execution', 'owner/repo', 'main', '60000'])
   await waitForFile(join(directory, 'started'))
+  assert.deepEqual(readWorkerIdentity(mailbox), {
+    pid: Number(readFileSync(join(directory, 'worker-pid'))),
+  })
+  assert.equal(
+    launchReceipt,
+    `CI_OBSERVER ${JSON.stringify({ directory: mailbox })}\n`
+  )
   const { stdout } = await exec(process.execPath, [launcher, 'stop', mailbox], {
     env,
   })

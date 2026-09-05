@@ -174,7 +174,7 @@ changing terminal output.
 
 ### 6. Retain the detached worker's exact identity
 Type: Structure
-Status: planned
+Status: done
 Proof: focused launcher and mailbox tests show the receipt remains unchanged
 while the mailbox retains only the identity required to address its own worker;
 normal stop remains green.
@@ -183,6 +183,9 @@ Internal change: store and read one cohesive exact-worker identity for the
 detached mailbox worker. External launch and normal-stop output remain unchanged.
 This immediately enables slice 7 to resolve only that worker after a missing
 terminal receipt.
+
+Learning: an atomically published mailbox-local `{ pid }` record is sufficient
+to identify the detached worker without widening the launcher receipt.
 
 ### 7. Finish shutdown honestly when terminal publication fails
 Type: Behavior

@@ -13,6 +13,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url'
 import {
   publishMailboxEvent,
   recordTerminalResult,
+  recordWorkerIdentity,
   waitForTerminalResult,
 } from './ci-mailbox-store.mjs'
 import { executionBudgetMs, watchCiExecution } from './watch-ci-execution.mjs'
@@ -21,7 +22,9 @@ export {
   publishMailboxEvent,
   readDeliveryProgress,
   readMailboxEvents,
+  readWorkerIdentity,
   recordDeliveryProgress,
+  recordWorkerIdentity,
 } from './ci-mailbox-store.mjs'
 
 export const checkoutRoot = fileURLToPath(
@@ -160,6 +163,7 @@ async function startMailbox(request) {
     }
   )
   await once(child, 'spawn')
+  recordWorkerIdentity(directory, { pid: child.pid })
   child.unref()
   return directory
 }

@@ -18,6 +18,8 @@ import {
   publishMailboxEvent,
   readMailbox,
   readMailboxEvents,
+  readWorkerIdentity,
+  recordWorkerIdentity,
   requestMailboxStop,
   runMailboxWorker,
 } from './ci-mailbox.mjs'
@@ -54,6 +56,12 @@ test('event evidence is appendable and independent of worker status', (t) => {
     { sequence: 2, event: { type: 'CI_INCOMPLETE', runId: 43 } },
   ])
   assert.equal(existsSync(join(directory, 'result.json')), false)
+})
+
+test('worker identity is retained as one cohesive mailbox record', (t) => {
+  const { directory } = createTestMailbox(t)
+  recordWorkerIdentity(directory, { pid: 42 })
+  assert.deepEqual(readWorkerIdentity(directory), { pid: 42 })
 })
 
 test('terminal result remains observable when its file notification is missed', async (t) => {

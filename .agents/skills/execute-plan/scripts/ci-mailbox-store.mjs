@@ -46,6 +46,14 @@ export function recordDeliveryProgress(directory, deliveredThrough) {
   publishJson(directory, 'delivery.json', { deliveredThrough })
 }
 
+export function recordWorkerIdentity(directory, identity) {
+  publishJson(directory, 'worker.json', identity)
+}
+
+export function readWorkerIdentity(directory) {
+  return JSON.parse(readFileSync(join(directory, 'worker.json'), 'utf8'))
+}
+
 function terminalResult(directory, request, status) {
   if (!(request.mode === 'execution' && status === 'stopped')) return { status }
   const records = readMailboxEvents(directory)
