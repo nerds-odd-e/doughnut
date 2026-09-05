@@ -21,6 +21,20 @@ When(
   (notebookName: string) => cli.notebookClone().cloneNotebookInto(notebookName)
 )
 
+When(
+  'I commit the following edit to {string} in the cloned checkout:',
+  (relativePath: string, content: string) =>
+    cli.notebookCloneCheckout().commitEdit(relativePath, content)
+)
+
+When('I publish the cloned checkout using the installed CLI', () =>
+  cli.notebookCloneCheckout().publish()
+)
+
+Then('the installed CLI reports the committed edit as the accepted head', () =>
+  cli.notebookCloneCheckout().expectCommittedHeadAccepted()
+)
+
 Then(
   'the cloned checkout is a clean single-commit checkout on branch {string}',
   (branch: string) =>

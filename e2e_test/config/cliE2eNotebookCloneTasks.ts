@@ -3,7 +3,8 @@
  * temporary destination, and reading back the resulting checkout's file tree.
  */
 
-import { mkdtempSync, readdirSync } from 'node:fs'
+import { execFileSync } from 'node:child_process'
+import { mkdtempSync, readdirSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join, relative } from 'node:path'
 
@@ -26,6 +27,35 @@ export function createCliE2eNotebookCloneTasks() {
     /** Relative file paths of the checkout, excluding `.git`, for canonical-tree assertions. */
     listNotebookCheckoutEntries(checkoutDir: string): string[] {
       return listFilesRecursively(checkoutDir, checkoutDir).sort()
+    },
+    commitCliNotebookCheckoutEdit({
+      checkoutDir,
+      relativePath,
+      content,
+    }: {
+      checkoutDir: string
+      relativePath: string
+      content: string
+    }): string {
+      writeFileSync(join(checkoutDir, relativePath), `${content}\n`)
+      execFileSync(
+        'git',
+        [
+          '-C',
+          checkoutDir,
+          '-c',
+          'user.name=Donut E2E',
+          '-c',
+          'user.email=donut-e2e@example.com',
+          'commit',
+          '-am',
+          'Edit cloned notebook note',
+        ],
+        { encoding: 'utf8' }
+      )
+      return execFileSync('git', ['-C', checkoutDir, 'rev-parse', 'HEAD'], {
+        encoding: 'utf8',
+      }).trim()
     },
   }
 }

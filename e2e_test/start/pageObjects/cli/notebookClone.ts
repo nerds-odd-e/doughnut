@@ -4,6 +4,7 @@
  * `installation()`), and reading back the resulting Git checkout.
  */
 import testability from '../../testability'
+import { nonInteractiveOutput } from './outputAssertions'
 
 function notebookClone() {
   return {
@@ -64,6 +65,42 @@ function notebookClone() {
 
 function notebookCloneCheckout() {
   return {
+    commitEdit(relativePath: string, content: string): Cypress.Chainable<null> {
+      return cy.get<string>('@cliCloneDestination').then((checkoutDir) =>
+        cy
+          .task<string>('commitCliNotebookCheckoutEdit', {
+            checkoutDir,
+            relativePath,
+            content,
+          })
+          .then((head) => {
+            cy.wrap(head).as('cliNotebookPublishHead')
+            return cy.wrap(null)
+          })
+      )
+    },
+    publish(): Cypress.Chainable<null> {
+      return cy.get<string>('@cliCloneDestination').then((checkoutDir) =>
+        cy.get<string>('@donutPath').then((donutPath) =>
+          cy.get<string>('@cliConfigDir').then((configDir) =>
+            cy.task<null>('runInstalledCli', {
+              donutPath,
+              args: ['notebook', 'publish', checkoutDir],
+              env: { DONUT_CONFIG_DIR: configDir },
+            })
+          )
+        )
+      )
+    },
+    expectCommittedHeadAccepted(): Cypress.Chainable<null> {
+      return cy
+        .get<string>('@cliNotebookPublishHead')
+        .then((head) =>
+          nonInteractiveOutput().expectContains(
+            `Published notebook. Accepted head: ${head}`
+          )
+        )
+    },
     /** Uses the system `git` executable (ADR 0002): one branch, one parentless commit, no dirt. */
     expectCleanSingleCommitCheckoutOnBranch(
       branch: string
