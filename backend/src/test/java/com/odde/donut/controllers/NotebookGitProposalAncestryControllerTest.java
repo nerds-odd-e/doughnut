@@ -1,9 +1,5 @@
 package com.odde.donut.controllers;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookGitBinding;
 import com.odde.donut.services.notebookExport.PortableTreeEntry;
@@ -18,26 +14,9 @@ import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.Repository;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.server.ResponseStatusException;
 
 /** Verifies that notebook Git proposals match the accepted head and its required ancestry. */
 class NotebookGitProposalAncestryControllerTest extends NotebookGitBundleControllerTestBase {
-
-  @Test
-  void ownerCannotRepublishAnAlreadyAcceptedHead() throws Exception {
-    Notebook notebook = createGitBackedNotebook();
-    NotebookGitBinding binding =
-        notebookGitBindingRepository.findByNotebook_Id(notebook.getId()).orElseThrow();
-
-    ResponseStatusException exception =
-        assertThrows(
-            ResponseStatusException.class,
-            () ->
-                controller.publishNotebookGitProposal(
-                    notebook.getId(), binding.getAcceptedGitObjectId(), binding.getBundleBytes()));
-
-    assertThat(exception.getStatusCode(), equalTo(HttpStatus.NOT_IMPLEMENTED));
-  }
 
   @Test
   void rejectsStaleExpectedHeadWithoutMutatingTheAcceptedBinding() throws Exception {

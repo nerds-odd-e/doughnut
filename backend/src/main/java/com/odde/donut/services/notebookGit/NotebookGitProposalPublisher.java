@@ -89,21 +89,19 @@ public class NotebookGitProposalPublisher {
     List<Note> liveNotes = noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebookId);
 
     authorizationService.assertAuthorization(notebook);
+    ObjectId acceptedHead = ObjectId.fromString(binding.getAcceptedGitObjectId());
+    if (proposal.mainHead().equals(acceptedHead)) {
+      projection.requireMatchingAcceptedTree(
+          notebook, folders, liveNotes, proposal.repository(), acceptedHead);
+      return binding.getAcceptedGitObjectId();
+    }
     if (!expectedHead.equals(binding.getAcceptedGitObjectId())) {
       throw new ResponseStatusException(
           HttpStatus.CONFLICT,
           "expectedHead no longer matches the notebook's current accepted head.");
     }
-    ObjectId acceptedHead = ObjectId.fromString(binding.getAcceptedGitObjectId());
     NotebookGitProposalAncestry.assertFollowsAcceptedHead(
         proposal.repository(), proposal.mainHead(), acceptedHead);
-    if (proposal.mainHead().equals(acceptedHead)) {
-      projection.requireMatchingAcceptedTree(
-          notebook, folders, liveNotes, proposal.repository(), acceptedHead);
-      throw new ResponseStatusException(
-          HttpStatus.NOT_IMPLEMENTED,
-          "Publishing an already accepted commit is not available yet.");
-    }
 
     String changedNotePath =
         NotebookGitProposalTreeShape.assertSingleModifiedRegularNotePath(

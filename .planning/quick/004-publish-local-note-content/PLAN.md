@@ -407,7 +407,7 @@ and the single canonical acceptance proof are the only new work.
 
 ### 17. Report an already accepted commit without another write
 Type: Behavior
-Status: planned
+Status: done
 Proof: controller retry of an accepted proposal returns the same head and leaves
 binding timestamp, Note timestamp, and learning state unchanged.
 
@@ -705,3 +705,10 @@ Sizing: about 5 minutes plus backend runtime, medium confidence.
   boundary proof and simplified brittle fixture documentation. Identical-head
   publication remains deliberately unavailable for slice 17. No API wire
   change. Next action: execute slice 17.
+- Slice 17 done: after locked authorization and projection validation, a
+  proposal whose head is already accepted returns that same head before stale
+  expected-head and ancestry checks. A committed controller retry with the
+  original parent as expectedHead proves the binding head/timestamp, Note
+  content/timestamp, and complete learning-tracker state remain unchanged.
+  Post-change-refactor found no concept-bounded cleanup or API change. Next
+  action: execute slice 18.

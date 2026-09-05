@@ -10,11 +10,14 @@ import com.odde.donut.controllers.dto.NoteRecallInfo;
 import com.odde.donut.controllers.dto.WikiLink;
 import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.MemoryTracker;
+import com.odde.donut.entities.MemoryTrackerType;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookGitBinding;
+import com.odde.donut.entities.repositories.MemoryTrackerRepository;
 import com.odde.donut.services.notebookGit.NotebookGitProposalBlobText;
 import com.odde.donut.testability.GitBundleTestReader;
+import java.sql.Timestamp;
 import java.util.List;
 import org.eclipse.jgit.internal.storage.dfs.DfsRepositoryDescription;
 import org.eclipse.jgit.internal.storage.dfs.InMemoryRepository;
@@ -39,6 +42,7 @@ class NotebookGitPublicationControllerTest extends NotebookGitBundleControllerTe
           + "Precisely preserved authored bytes linking [[Reference Target|the target]].\n";
 
   @Autowired NoteController noteController;
+  @Autowired MemoryTrackerRepository memoryTrackerRepository;
 
   @Test
   void publishesExactCommitOnTheSameLearnedNoteAndMakesItDownloadable() throws Exception {
@@ -119,4 +123,74 @@ class NotebookGitPublicationControllerTest extends NotebookGitBundleControllerTe
       }
     }
   }
+
+  @Test
+  void reportsAnAlreadyAcceptedCommitWithoutMutatingPublicationOrLearningState() throws Exception {
+    Notebook notebook = createGitBackedNotebook();
+    Note note =
+        makeMe.aNote().notebook(notebook).title("Refined Note").content(ORIGINAL_CONTENT).please();
+    MemoryTracker tracker =
+        inCommittedTransaction(
+            transactionManager,
+            () ->
+                makeMe
+                    .aMemoryTrackerFor(noteRepository.findById(note.getId()).orElseThrow())
+                    .difficulty(7f)
+                    .please());
+    NotebookGitBinding initialBinding = snapshotCurrentPortableTree(notebook);
+    String initialHead = initialBinding.getAcceptedGitObjectId();
+    byte[] proposalBytes =
+        proposalBundleBytes(
+            initialBinding,
+            List.of(new NotebookGitProposalFile("Refined Note.md", PUBLISHED_CONTENT)));
+
+    String publishedHead =
+        controller.publishNotebookGitProposal(notebook.getId(), initialHead, proposalBytes);
+    PublicationState stateAfterPublication = publicationState(notebook, note, tracker);
+
+    String retriedHead =
+        controller.publishNotebookGitProposal(notebook.getId(), initialHead, proposalBytes);
+
+    assertThat(retriedHead, equalTo(publishedHead));
+    assertThat(publicationState(notebook, note, tracker), equalTo(stateAfterPublication));
+  }
+
+  private PublicationState publicationState(Notebook notebook, Note note, MemoryTracker tracker) {
+    return inCommittedTransaction(
+        transactionManager,
+        () -> {
+          NotebookGitBinding binding =
+              notebookGitBindingRepository.findByNotebook_Id(notebook.getId()).orElseThrow();
+          Note reloadedNote = noteRepository.findById(note.getId()).orElseThrow();
+          MemoryTracker reloadedTracker =
+              memoryTrackerRepository.findById(tracker.getId()).orElseThrow();
+          return new PublicationState(
+              binding.getAcceptedGitObjectId(),
+              binding.getUpdatedAt(),
+              reloadedNote.getContent(),
+              reloadedNote.getUpdatedAt(),
+              reloadedTracker.getLastRecalledAt(),
+              reloadedTracker.getNextRecallAt(),
+              reloadedTracker.getAssimilatedAt(),
+              reloadedTracker.getStability(),
+              reloadedTracker.getDifficulty(),
+              reloadedTracker.getRemovedFromTracking(),
+              reloadedTracker.getType(),
+              reloadedTracker.getPropertyKey());
+        });
+  }
+
+  private record PublicationState(
+      String acceptedHead,
+      Timestamp bindingUpdatedAt,
+      String noteContent,
+      Timestamp noteUpdatedAt,
+      Timestamp lastRecalledAt,
+      Timestamp nextRecallAt,
+      Timestamp assimilatedAt,
+      Float stability,
+      Float difficulty,
+      Boolean removedFromTracking,
+      MemoryTrackerType trackerType,
+      String propertyKey) {}
 }
