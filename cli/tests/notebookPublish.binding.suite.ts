@@ -44,17 +44,15 @@ export function describeNotebookPublishBinding(): void {
       expect(ctx.getExitSpy()).toHaveBeenCalledWith(1)
     })
 
-    test('directory bound to the currently configured API origin reaches the not-yet-available response', async () => {
+    test('directory bound to the currently configured API origin reaches submission', async () => {
       const dir = initBoundCheckout(ctx.getWorkDir(), getApiConfig().apiBaseUrl)
-      stubFetchWithAcceptedBundleFrom(dir, ctx.getWorkDir())
+      const fetchMock = stubFetchWithAcceptedBundleFrom(dir, ctx.getWorkDir())
 
-      await expect(run(['notebook', 'publish', dir])).rejects.toThrow(
-        ProcessExitForTest
+      await run(['notebook', 'publish', dir])
+      expect(fetchMock).toHaveBeenCalledWith(
+        expect.anything(),
+        expect.objectContaining({ method: 'POST' })
       )
-      expect(ctx.getErrorSpy()).toHaveBeenCalledWith(
-        expect.stringContaining('not available yet')
-      )
-      expect(ctx.getExitSpy()).toHaveBeenCalledWith(1)
     })
   })
 }

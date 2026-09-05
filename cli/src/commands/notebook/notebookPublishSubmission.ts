@@ -4,17 +4,8 @@ import * as path from 'node:path'
 import { loadAuthenticatedFetchContext } from '../../backendApi/donutBackendClient.js'
 import { runSystemGitOrThrow } from './systemGit.js'
 
-export const PUBLISH_DENIED_MESSAGE =
+const PUBLISH_DENIED_MESSAGE =
   "you don't have permission to publish this notebook — publishing requires the notebook owner's credentials."
-
-export interface NotebookGitProposalSubmission {
-  /** `true` when the endpoint accepted the proposal (only reachable via a test stub today). */
-  accepted: boolean
-  /** The accepted head reported back by the endpoint, when `accepted` is `true`. */
-  acceptedHead?: string
-  /** `true` when the endpoint denied the request as unauthorized (401/403). */
-  denied?: boolean
-}
 
 /** Builds a full `main` bundle (the complete reachable history) from `directory` via system Git. */
 function buildLocalMainBundle(directory: string, bundleFile: string): void {
@@ -28,22 +19,21 @@ function buildLocalMainBundle(directory: string, bundleFile: string): void {
 /**
  * Builds the full local `main` bundle via system Git and POSTs it, as raw
  * `application/x-git-bundle` bytes, to the notebook's owner-authorized Git-bundle endpoint, with
- * `acceptedHead` as the `expectedHead` request parameter. Uses the same authenticated
+ * `expectedHead` as the request parameter. Uses the same authenticated
  * token/API-origin resolution as the bundle download ({@link loadAuthenticatedFetchContext}).
  * Interprets the response:
- * - 401/403 → returns `{ accepted: false, denied: true }` (authorization denial).
- * - 200 → returns `{ accepted: true, acceptedHead }`, reading the response body's text as the
- *   accepted head (only reachable via a test stub today; production always throws first).
- * - any other status → returns `{ accepted: false }`, letting the caller fall through to its own
- *   generic "not available yet" handling.
+ * - 401/403 → throws the explicit authorization-denial message.
+ * - 200 → returns the accepted head from the response body.
+ * - any other status → throws the server's `ApiError.message`, or an HTTP-status fallback when
+ *   the response does not contain one.
  * Never mutates any local ref or file; the built bundle is a command-owned temp file, removed on
  * both success and failure.
  */
 export async function submitNotebookGitProposal(
   directory: string,
   notebookId: number,
-  acceptedHead: string
-): Promise<NotebookGitProposalSubmission> {
+  expectedHead: string
+): Promise<string> {
   const { token, apiBaseUrl } = loadAuthenticatedFetchContext()
 
   const tempDir = fs.mkdtempSync(
@@ -54,7 +44,7 @@ export async function submitNotebookGitProposal(
     buildLocalMainBundle(directory, bundleFile)
     const bundleBytes = fs.readFileSync(bundleFile)
 
-    const url = `${apiBaseUrl}/api/notebooks/${notebookId}/git-bundle?expectedHead=${encodeURIComponent(acceptedHead)}`
+    const url = `${apiBaseUrl}/api/notebooks/${notebookId}/git-bundle?expectedHead=${encodeURIComponent(expectedHead)}`
     const res = await fetch(url, {
       method: 'POST',
       headers: {
@@ -65,15 +55,30 @@ export async function submitNotebookGitProposal(
     })
 
     if (res.status === 401 || res.status === 403) {
-      return { accepted: false, denied: true }
+      throw new Error(PUBLISH_DENIED_MESSAGE)
     }
 
     if (res.ok) {
-      const body = (await res.text()).trim()
-      return { accepted: true, acceptedHead: body }
+      return (await res.text()).trim()
     }
 
-    return { accepted: false }
+    const responseBodyText = await res.text()
+    let responseBody: unknown
+    try {
+      responseBody = JSON.parse(responseBodyText) as unknown
+    } catch {
+      responseBody = undefined
+    }
+    if (
+      typeof responseBody === 'object' &&
+      responseBody !== null &&
+      'message' in responseBody &&
+      typeof responseBody.message === 'string' &&
+      responseBody.message.trim() !== ''
+    ) {
+      throw new Error(responseBody.message)
+    }
+    throw new Error(`notebook publication rejected (HTTP ${res.status})`)
   } finally {
     fs.rmSync(tempDir, { recursive: true, force: true })
   }

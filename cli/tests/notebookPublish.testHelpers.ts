@@ -31,7 +31,7 @@ export function bindNotebookCheckout(dir: string, apiOrigin: string): void {
 }
 
 // Produces a bound checkout that is also clean and committed on `main` — the
-// baseline eligible state for the readiness checks added in this slice.
+// baseline eligible state for publish readiness checks.
 export function initBoundCheckout(workDir: string, apiOrigin: string): string {
   const dir = join(workDir, 'checkout')
   initGitRepoWithInitialNote(dir, 'checkout')
@@ -58,18 +58,15 @@ function bundleGetResponse(bundleFile: string): {
   }
 }
 
-// A generic non-2xx, non-40x submission response, standing in for today's real controller
-// response (HTTP 501 "Publishing is not available yet.") for tests concerned only with the
-// eligibility checks upstream of submission, not the submission response itself.
-function interimRefusalPostResponse(): {
+function successfulPostResponse(): {
   status: number
   ok: boolean
   text: () => Promise<string>
 } {
   return {
-    status: 501,
-    ok: false,
-    text: () => Promise.resolve('Publishing is not available yet.'),
+    status: 200,
+    ok: true,
+    text: () => Promise.resolve('deadbeefcafef00ddeadbeefcafef00ddeadbeef'),
   }
 }
 
@@ -99,11 +96,12 @@ export function stubFetchForSubmission(
 }
 
 // Stubs global fetch to serve the accepted bundle at `bundleFile` for GET (bundle download) and
-// today's real interim-refusal shape for POST (proposal submission) — the eligibility-check
-// tests using this helper only care about reaching that generic response, not exercising its
-// contract in detail (see the dedicated submission-transport test file for that).
-export function stubFetchWithBundleFile(bundleFile: string): void {
-  stubFetchForSubmission(bundleFile, interimRefusalPostResponse())
+// accept the POST (proposal submission). Eligibility-check tests use this helper to prove the
+// request reaches submission; rejection behavior belongs to the submission-transport suite.
+export function stubFetchWithBundleFile(
+  bundleFile: string
+): ReturnType<typeof vi.fn> {
+  return stubFetchForSubmission(bundleFile, successfulPostResponse())
 }
 
 // Stubs global fetch to serve an accepted bundle built from `dir`'s own current state, so
@@ -111,13 +109,13 @@ export function stubFetchWithBundleFile(bundleFile: string): void {
 export function stubFetchWithAcceptedBundleFrom(
   dir: string,
   workDir: string
-): void {
+): ReturnType<typeof vi.fn> {
   const bundleFile = join(
     workDir,
     `accepted-${Date.now()}-${Math.random()}.bundle`
   )
   runGit(['bundle', 'create', bundleFile, 'HEAD', 'main'], dir)
-  stubFetchWithBundleFile(bundleFile)
+  return stubFetchWithBundleFile(bundleFile)
 }
 
 // A real Git source repo used to build the "accepted" bundle served by the mocked fetch, so

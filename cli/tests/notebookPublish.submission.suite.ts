@@ -55,26 +55,51 @@ export function describeNotebookPublishSubmission(): void {
       expect(ctx.getErrorSpy()).toHaveBeenCalledWith(
         expect.stringContaining("don't have permission to publish")
       )
-      expect(ctx.getErrorSpy()).not.toHaveBeenCalledWith(
-        expect.stringContaining('not available yet')
-      )
       expect(runGit(['rev-parse', 'main'], dir)).toBe(headBefore)
       expect(runGit(['status', '--porcelain'], dir)).toBe(statusBefore)
     })
 
-    test('a non-2xx, non-40x submission response (today\'s real "not implemented" response) falls through to the existing generic message', async () => {
+    test.each([
+      [400, 'note.md has invalid YAML frontmatter', 'BINDING_ERROR'],
+      [
+        409,
+        "expectedHead no longer matches the notebook's current accepted head.",
+        'RESOURCE_CONFLICT',
+      ],
+    ])(
+      'a %i ApiError reports the publication rejection reason and leaves local state untouched',
+      async (status, message, errorType) => {
+        const workDir = ctx.getWorkDir()
+        const { dir } = setUpEligibleCheckoutWithPostResponse(workDir, {
+          status,
+          ok: false,
+          text: () => Promise.resolve(JSON.stringify({ message, errorType })),
+        })
+        const headBefore = runGit(['rev-parse', 'main'], dir)
+        const statusBefore = runGit(['status', '--porcelain'], dir)
+
+        await expect(run(['notebook', 'publish', dir])).rejects.toThrow(
+          ProcessExitForTest
+        )
+        expect(ctx.getErrorSpy()).toHaveBeenCalledWith(`donut: ${message}`)
+        expect(runGit(['rev-parse', 'main'], dir)).toBe(headBefore)
+        expect(runGit(['status', '--porcelain'], dir)).toBe(statusBefore)
+      }
+    )
+
+    test('a rejection without an ApiError message reports its HTTP status', async () => {
       const workDir = ctx.getWorkDir()
       const { dir } = setUpEligibleCheckoutWithPostResponse(workDir, {
-        status: 501,
+        status: 502,
         ok: false,
-        text: () => Promise.resolve('Publishing is not available yet.'),
+        text: () => Promise.resolve('<html>upstream failure</html>'),
       })
 
       await expect(run(['notebook', 'publish', dir])).rejects.toThrow(
         ProcessExitForTest
       )
       expect(ctx.getErrorSpy()).toHaveBeenCalledWith(
-        expect.stringContaining('not available yet')
+        'donut: notebook publication rejected (HTTP 502)'
       )
     })
 
@@ -106,16 +131,15 @@ export function describeNotebookPublishSubmission(): void {
       const { dir, fetchMock } = setUpEligibleCheckoutWithPostResponse(
         workDir,
         {
-          status: 501,
-          ok: false,
-          text: () => Promise.resolve(''),
+          status: 200,
+          ok: true,
+          text: () =>
+            Promise.resolve('deadbeefcafef00ddeadbeefcafef00ddeadbeef'),
         }
       )
       const localMain = runGit(['rev-parse', 'main'], dir)
 
-      await expect(run(['notebook', 'publish', dir])).rejects.toThrow(
-        ProcessExitForTest
-      )
+      await run(['notebook', 'publish', dir])
 
       const postCall = fetchMock.mock.calls.find(
         ([, init]: [unknown, { method?: string } | undefined]) =>

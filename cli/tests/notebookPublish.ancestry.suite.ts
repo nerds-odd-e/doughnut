@@ -37,7 +37,7 @@ export function describeNotebookPublishAncestry(): void {
   describe('notebook publish (CLI routing, ancestry checks)', () => {
     const ctx = installNotebookCliRunFixture('donut-cli-publish-ancestry-test-')
 
-    test('local main identical to the accepted head passes through to the not-yet-available response', async () => {
+    test('local main identical to the accepted head reaches submission', async () => {
       const workDir = ctx.getWorkDir()
       const sourceRepoDir = buildSourceRepo(workDir)
       const bundleFile = join(workDir, 'accepted.bundle')
@@ -52,16 +52,11 @@ export function describeNotebookPublishAncestry(): void {
       )
 
       const before = ancestryStagingDirsUnderTmp()
-      await expect(run(['notebook', 'publish', dir])).rejects.toThrow(
-        ProcessExitForTest
-      )
-      expect(ctx.getErrorSpy()).toHaveBeenCalledWith(
-        expect.stringContaining('not available yet')
-      )
+      await run(['notebook', 'publish', dir])
       expect(ancestryStagingDirsUnderTmp()).toEqual(before)
     })
 
-    test('local main exactly one direct commit ahead of the accepted head passes through to the not-yet-available response', async () => {
+    test('local main exactly one direct commit ahead of the accepted head reaches submission', async () => {
       const workDir = ctx.getWorkDir()
       const sourceRepoDir = buildSourceRepo(workDir)
       const bundleFile = join(workDir, 'accepted.bundle')
@@ -76,12 +71,7 @@ export function describeNotebookPublishAncestry(): void {
       )
       commitFileChange(dir, '# hello notebook (edited)\n', 'edit note')
 
-      await expect(run(['notebook', 'publish', dir])).rejects.toThrow(
-        ProcessExitForTest
-      )
-      expect(ctx.getErrorSpy()).toHaveBeenCalledWith(
-        expect.stringContaining('not available yet')
-      )
+      await run(['notebook', 'publish', dir])
     })
 
     test('local main stale (behind the accepted head) is rejected with an ancestry error', async () => {
