@@ -163,7 +163,7 @@ Sizing: 3–5 minutes, medium confidence.
 
 ### 2. Require committed work on local main
 Type: Behavior
-Status: planned
+Status: done
 Proof: CLI `run` cases vary detached/non-main HEAD and dirty index/worktree.
 
 Behavior: a bound repository is not clean on main → publish → explain which
@@ -444,3 +444,14 @@ Sizing: about 5 minutes plus backend runtime, medium confidence.
   (`installNotebookCliRunFixture`) into `notebookClone.testHelpers.ts`, reused by
   the new `cli/tests/notebookPublish.test.ts`. No production duplication found;
   no backend/API changes in this leaf. Next action: execute slice 2.
+- Slice 2 done: added `cli/src/commands/notebook/notebookPublishReadiness.ts`
+  (`assertLocalMainIsCleanAndCommitted`), wired into `completeNotebookPublish`
+  right after binding resolution — checks HEAD is on `main` and the index/
+  worktree (including untracked files) is completely clean before reaching the
+  interim "not available yet" response. Post-change-refactor hoisted the
+  duplicated `initBoundCheckout` test helper to module scope and renamed an
+  internal `readGitStatus` helper to `readGitOutput` for accuracy; deliberately
+  left the small structural overlap between `readLocalGitConfig` and
+  `readGitOutput` unmerged (different failure-handling shapes, not worth the
+  indirection this early in the plan). No backend/API changes in this leaf.
+  Next action: execute slice 3.
