@@ -2147,6 +2147,44 @@ export type FixResponses = {
     200: unknown;
 };
 
+export type DownloadNotebookGitBundleData = {
+    body?: never;
+    path: {
+        notebook: number;
+    };
+    query?: never;
+    url: '/api/notebooks/{notebook}/git-bundle';
+};
+
+export type DownloadNotebookGitBundleResponses = {
+    /**
+     * OK
+     */
+    200: string;
+};
+
+export type DownloadNotebookGitBundleResponse = DownloadNotebookGitBundleResponses[keyof DownloadNotebookGitBundleResponses];
+
+export type PublishNotebookGitProposalData = {
+    body: string;
+    path: {
+        notebook: number;
+    };
+    query: {
+        expectedHead: string;
+    };
+    url: '/api/notebooks/{notebook}/git-bundle';
+};
+
+export type PublishNotebookGitProposalResponses = {
+    /**
+     * OK
+     */
+    200: string;
+};
+
+export type PublishNotebookGitProposalResponse = PublishNotebookGitProposalResponses[keyof PublishNotebookGitProposalResponses];
+
 export type CreateFolderData = {
     body: FolderCreationRequest;
     path: {
@@ -3562,24 +3600,6 @@ export type MyNotebooksResponses = {
 };
 
 export type MyNotebooksResponse = MyNotebooksResponses[keyof MyNotebooksResponses];
-
-export type DownloadNotebookGitBundleData = {
-    body?: never;
-    path: {
-        notebook: number;
-    };
-    query?: never;
-    url: '/api/notebooks/{notebook}/git-bundle';
-};
-
-export type DownloadNotebookGitBundleResponses = {
-    /**
-     * OK
-     */
-    200: string;
-};
-
-export type DownloadNotebookGitBundleResponse = DownloadNotebookGitBundleResponses[keyof DownloadNotebookGitBundleResponses];
 
 export type ListNotebookFolderIndexData = {
     body?: never;

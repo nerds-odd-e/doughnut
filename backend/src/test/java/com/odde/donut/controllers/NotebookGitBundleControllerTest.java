@@ -19,6 +19,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.server.ResponseStatusException;
 
 class NotebookGitBundleControllerTest extends NotebookControllerTestBase {
 
@@ -84,5 +85,42 @@ class NotebookGitBundleControllerTest extends NotebookControllerTestBase {
     assertThrows(
         UnexpectedNoAccessRightException.class,
         () -> controller.downloadNotebookGitBundle(notebook));
+  }
+
+  @Test
+  void ownerSubmittingAProposalStillReceivesTheInterimRefusal() throws Exception {
+    Notebook notebook = createGitBackedNotebook();
+
+    assertThrows(
+        ResponseStatusException.class,
+        () ->
+            controller.publishNotebookGitProposal(
+                notebook, "someExpectedHead", "placeholder bundle bytes".getBytes()));
+  }
+
+  @Test
+  void deniesPublishForNotebookOwnedByAnotherUser() throws Exception {
+    Notebook notebook = createGitBackedNotebook();
+    currentUser.setUser(makeMe.aUser().please());
+
+    assertThrows(
+        UnexpectedNoAccessRightException.class,
+        () ->
+            controller.publishNotebookGitProposal(
+                notebook, "someExpectedHead", "placeholder bundle bytes".getBytes()));
+  }
+
+  @Test
+  void deniesPublishForReadOnlySubscriber() throws Exception {
+    Notebook notebook = createGitBackedNotebook();
+    User subscriber = makeMe.aUser().please();
+    makeMe.aSubscription().forNotebook(notebook).forUser(subscriber).please();
+    currentUser.setUser(subscriber);
+
+    assertThrows(
+        UnexpectedNoAccessRightException.class,
+        () ->
+            controller.publishNotebookGitProposal(
+                notebook, "someExpectedHead", "placeholder bundle bytes".getBytes()));
   }
 }

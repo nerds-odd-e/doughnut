@@ -16,12 +16,13 @@ const ANCESTRY_ERROR =
  * command-owned temporary directory and inspects it inside a temporary bare Git repository —
  * never fetches into or resets any ref in the user's own `directory`. Cleans up all temporary
  * files on both success and failure. Throws an actionable error for any other shape (stale/behind,
- * merge commit tip, unrelated history, or several commits ahead).
+ * merge commit tip, unrelated history, or several commits ahead). Returns the accepted head SHA
+ * so the caller can submit it as the publish request's expected head without re-downloading.
  */
 export async function assertLocalMainFollowsAcceptedHistory(
   directory: string,
   notebookId: number
-): Promise<void> {
+): Promise<string> {
   const tempDir = fs.mkdtempSync(
     path.join(os.tmpdir(), 'donut-notebook-publish-ancestry-')
   )
@@ -60,7 +61,7 @@ export async function assertLocalMainFollowsAcceptedHistory(
         `failed to read local main${detail ? `: ${detail}` : ` (exit code ${status})`}`
     ).trim()
 
-    if (localHead === acceptedHead) return
+    if (localHead === acceptedHead) return acceptedHead
 
     const parents = runSystemGitOrThrow(
       ['-C', directory, 'log', '-1', '--format=%P', localHead],
@@ -71,7 +72,7 @@ export async function assertLocalMainFollowsAcceptedHistory(
       .split(/\s+/)
       .filter((sha) => sha !== '')
 
-    if (parents.length === 1 && parents[0] === acceptedHead) return
+    if (parents.length === 1 && parents[0] === acceptedHead) return acceptedHead
 
     throw new Error(ANCESTRY_ERROR)
   } finally {

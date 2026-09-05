@@ -474,6 +474,21 @@ class NotebookController {
         .body(binding.getBundleBytes());
   }
 
+  @Operation(
+      operationId = "publishNotebookGitProposal",
+      summary = "Submit a proposal Git bundle to publish onto the notebook's accepted main")
+  @PostMapping(value = "/{notebook}/git-bundle", consumes = "application/x-git-bundle")
+  @Transactional
+  public String publishNotebookGitProposal(
+      @PathVariable("notebook") @Schema(type = "integer") Notebook notebook,
+      @RequestParam("expectedHead") String expectedHead,
+      @RequestBody byte[] bundleBytes)
+      throws UnexpectedNoAccessRightException {
+    authorizationService.assertAuthorization(notebook);
+    throw new ResponseStatusException(
+        HttpStatus.NOT_IMPLEMENTED, "Publishing is not available yet.");
+  }
+
   private Notebook resolveDestinationNotebookForFolderMove(FolderMoveRequest request)
       throws UnexpectedNoAccessRightException {
     if (request == null || request.getDestinationNotebookId() == null) {

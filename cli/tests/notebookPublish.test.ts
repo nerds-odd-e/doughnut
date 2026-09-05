@@ -9,70 +9,37 @@ import {
   runGit,
   installNotebookCliRunFixture,
 } from './notebookClone.testHelpers.js'
+import {
+  initBoundCheckout,
+  stubFetchWithBundleFile,
+  stubFetchForSubmission,
+  stubFetchWithAcceptedBundleFrom,
+  buildSourceRepo,
+  bundleMain,
+  cloneAsBoundCheckout,
+} from './notebookPublish.testHelpers.js'
 
-// Sets the test-only Git identity a fresh local repo needs before it can commit.
-function configureTestGitIdentity(dir: string): void {
-  runGit(['config', 'user.email', 'test@example.com'], dir)
-  runGit(['config', 'user.name', 'Test'], dir)
-}
-
-// Initializes a fresh repo on `main` with one committed note.md — the common starting state
-// shared by every checkout and source repo these tests build. `label` is folded into the note
-// content so two independently-created repos never coincidentally commit identical content
-// (which, combined with an identical author/committer timestamp, would produce the same SHA and
-// make an "unrelated history" checkout indistinguishable from the accepted head it should differ
-// from).
-function initGitRepoWithInitialNote(dir: string, label: string): void {
-  fs.mkdirSync(dir)
-  runGit(['init', '--quiet', '-b', 'main'], dir)
-  configureTestGitIdentity(dir)
-  fs.writeFileSync(join(dir, 'note.md'), `# hello notebook (${label})\n`)
+function commitFileChange(
+  dir: string,
+  contents: string,
+  message: string
+): void {
+  fs.writeFileSync(join(dir, 'note.md'), contents)
   runGit(['add', 'note.md'], dir)
-  runGit(['commit', '--quiet', '-m', 'initial notebook commit'], dir)
+  runGit(['commit', '--quiet', '-m', message], dir)
 }
 
-// Records the local-only Git config binding that `notebook clone` would have recorded.
-function bindNotebookCheckout(dir: string, apiOrigin: string): void {
-  runGit(['config', '--local', 'donut.notebook-id', '42'], dir)
-  runGit(['config', '--local', 'donut.api-origin', apiOrigin], dir)
-}
-
-// Produces a bound checkout that is also clean and committed on `main` — the
-// baseline eligible state for the readiness checks added in this slice.
-function initBoundCheckout(workDir: string, apiOrigin: string): string {
-  const dir = join(workDir, 'checkout')
-  initGitRepoWithInitialNote(dir, 'checkout')
-  bindNotebookCheckout(dir, apiOrigin)
-  return dir
-}
-
-// Stubs global fetch to serve the accepted bundle at `bundleFile`.
-function stubFetchWithBundleFile(bundleFile: string): void {
-  const bundleBytes = fs.readFileSync(bundleFile)
-  vi.stubGlobal(
-    'fetch',
-    vi.fn().mockResolvedValue({
-      ok: true,
-      arrayBuffer: () =>
-        Promise.resolve(
-          bundleBytes.buffer.slice(
-            bundleBytes.byteOffset,
-            bundleBytes.byteOffset + bundleBytes.byteLength
-          )
-        ),
-    })
-  )
-}
-
-// Stubs global fetch to serve an accepted bundle built from `dir`'s own current state, so
-// `dir`'s local main is identical to the accepted head — the ancestry check's pass-through case.
-function stubFetchWithAcceptedBundleFrom(dir: string, workDir: string): void {
-  const bundleFile = join(
-    workDir,
-    `accepted-${Date.now()}-${Math.random()}.bundle`
-  )
-  runGit(['bundle', 'create', bundleFile, 'HEAD', 'main'], dir)
-  stubFetchWithBundleFile(bundleFile)
+// Notes are kept single-file (not split across sibling test files) because every publish-flow
+// test — binding, readiness, ancestry, and submission alike — passes through
+// `assertLocalMainFollowsAcceptedHistory`, which stages its own temp directory under this
+// prefix. The ancestry leak-detection assertions below only hold because Vitest runs tests
+// within one file serially; splitting into separate files lets Vitest schedule them onto
+// concurrent workers, so another file's in-flight publish call can leave a same-prefixed
+// directory visible during this file's before/after snapshot, producing a false leak failure.
+function ancestryStagingDirsUnderTmp(): string[] {
+  return fs
+    .readdirSync(tmpdir())
+    .filter((name) => name.startsWith('donut-notebook-publish-ancestry-'))
 }
 
 afterEach(() => {
@@ -207,50 +174,6 @@ describe('notebook publish (CLI routing, local readiness checks)', () => {
     expect(ctx.getExitSpy()).toHaveBeenCalledWith(1)
   })
 })
-
-// A real Git source repo used to build the "accepted" bundle served by the mocked fetch, so
-// the ancestry checks below run against real Git plumbing rather than fakes.
-function buildSourceRepo(workDir: string, name = 'source'): string {
-  const dir = join(workDir, name)
-  initGitRepoWithInitialNote(dir, name)
-  return dir
-}
-
-function bundleMain(sourceRepoDir: string, bundleFile: string): void {
-  runGit(['bundle', 'create', bundleFile, 'HEAD', 'main'], sourceRepoDir)
-}
-
-// Clones `sourceRepoDir` so the checkout's main head is an identical commit object to the
-// accepted bundle built from that same source state, then binds it like `notebook clone` would.
-function cloneAsBoundCheckout(
-  workDir: string,
-  sourceRepoDir: string,
-  apiOrigin: string,
-  name: string
-): string {
-  const dir = join(workDir, name)
-  runGit(['clone', '--quiet', sourceRepoDir, dir], workDir)
-  bindNotebookCheckout(dir, apiOrigin)
-  configureTestGitIdentity(dir)
-  runGit(['remote', 'remove', 'origin'], dir)
-  return dir
-}
-
-function commitFileChange(
-  dir: string,
-  contents: string,
-  message: string
-): void {
-  fs.writeFileSync(join(dir, 'note.md'), contents)
-  runGit(['add', 'note.md'], dir)
-  runGit(['commit', '--quiet', '-m', message], dir)
-}
-
-function ancestryStagingDirsUnderTmp(): string[] {
-  return fs
-    .readdirSync(tmpdir())
-    .filter((name) => name.startsWith('donut-notebook-publish-ancestry-'))
-}
 
 describe('notebook publish (CLI routing, ancestry checks)', () => {
   const ctx = installNotebookCliRunFixture('donut-cli-publish-ancestry-test-')
@@ -397,5 +320,129 @@ describe('notebook publish (CLI routing, ancestry checks)', () => {
     expect(ctx.getErrorSpy()).toHaveBeenCalledWith(
       expect.stringContaining('single direct commit')
     )
+  })
+})
+
+describe('notebook publish (CLI routing, submission transport contract)', () => {
+  const ctx = installNotebookCliRunFixture('donut-cli-publish-submission-test-')
+
+  // Builds an eligible bound checkout (clean, on main, ancestry-valid — identical to accepted
+  // head) and stubs fetch to serve `bundleFile` for the ancestry GET and `postResponse` for the
+  // submission POST. Returns the checkout dir and the fetch mock for call-args assertions.
+  function setUpEligibleCheckoutWithPostResponse(
+    workDir: string,
+    postResponse: { status: number; ok: boolean; text: () => Promise<string> }
+  ): { dir: string; fetchMock: ReturnType<typeof vi.fn> } {
+    const sourceRepoDir = buildSourceRepo(workDir)
+    const bundleFile = join(workDir, 'accepted.bundle')
+    bundleMain(sourceRepoDir, bundleFile)
+    const fetchMock = stubFetchForSubmission(bundleFile, postResponse)
+
+    const dir = cloneAsBoundCheckout(
+      workDir,
+      sourceRepoDir,
+      getApiConfig().apiBaseUrl,
+      'checkout'
+    )
+    return { dir, fetchMock }
+  }
+
+  test('a 401/403 submission response is a distinct permission-denied error, leaving local state untouched', async () => {
+    const workDir = ctx.getWorkDir()
+    const { dir } = setUpEligibleCheckoutWithPostResponse(workDir, {
+      status: 403,
+      ok: false,
+      text: () => Promise.resolve(''),
+    })
+    const headBefore = runGit(['rev-parse', 'main'], dir)
+    const statusBefore = runGit(['status', '--porcelain'], dir)
+
+    await expect(run(['notebook', 'publish', dir])).rejects.toThrow(
+      ProcessExitForTest
+    )
+    expect(ctx.getErrorSpy()).toHaveBeenCalledWith(
+      expect.stringContaining("don't have permission to publish")
+    )
+    expect(ctx.getErrorSpy()).not.toHaveBeenCalledWith(
+      expect.stringContaining('not available yet')
+    )
+    expect(runGit(['rev-parse', 'main'], dir)).toBe(headBefore)
+    expect(runGit(['status', '--porcelain'], dir)).toBe(statusBefore)
+  })
+
+  test('a non-2xx, non-40x submission response (today\'s real "not implemented" response) falls through to the existing generic message', async () => {
+    const workDir = ctx.getWorkDir()
+    const { dir } = setUpEligibleCheckoutWithPostResponse(workDir, {
+      status: 501,
+      ok: false,
+      text: () => Promise.resolve('Publishing is not available yet.'),
+    })
+
+    await expect(run(['notebook', 'publish', dir])).rejects.toThrow(
+      ProcessExitForTest
+    )
+    expect(ctx.getErrorSpy()).toHaveBeenCalledWith(
+      expect.stringContaining('not available yet')
+    )
+  })
+
+  test('a 200 submission response with a stubbed accepted head proves the CLI success-rendering contract', async () => {
+    const workDir = ctx.getWorkDir()
+    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => undefined)
+    try {
+      const { dir } = setUpEligibleCheckoutWithPostResponse(workDir, {
+        status: 200,
+        ok: true,
+        text: () => Promise.resolve('deadbeefcafef00ddeadbeefcafef00ddeadbeef'),
+      })
+
+      await run(['notebook', 'publish', dir])
+
+      expect(logSpy).toHaveBeenCalledWith(
+        expect.stringContaining('deadbeefcafef00ddeadbeefcafef00ddeadbeef')
+      )
+    } finally {
+      logSpy.mockRestore()
+    }
+  })
+
+  test('the POST sends the expected URL, headers, and a real bundle of local main', async () => {
+    const workDir = ctx.getWorkDir()
+    const { dir, fetchMock } = setUpEligibleCheckoutWithPostResponse(workDir, {
+      status: 501,
+      ok: false,
+      text: () => Promise.resolve(''),
+    })
+    const localMain = runGit(['rev-parse', 'main'], dir)
+
+    await expect(run(['notebook', 'publish', dir])).rejects.toThrow(
+      ProcessExitForTest
+    )
+
+    const postCall = fetchMock.mock.calls.find(
+      ([, init]: [unknown, { method?: string } | undefined]) =>
+        init?.method === 'POST'
+    )
+    expect(postCall).toBeDefined()
+    const [url, init] = postCall as [
+      string,
+      {
+        method: string
+        headers: Record<string, string>
+        body: Buffer
+      },
+    ]
+    expect(url).toContain('/notebooks/42/git-bundle?expectedHead=')
+    expect(init.headers.Authorization).toBe('Bearer fake-bearer')
+    expect(init.headers['Content-Type']).toBe('application/x-git-bundle')
+    expect(Buffer.isBuffer(init.body)).toBe(true)
+    expect(init.body.length).toBeGreaterThan(0)
+
+    // Confirm the posted bytes are a real git bundle of local main by cloning them.
+    const postedBundleFile = join(workDir, 'posted.bundle')
+    fs.writeFileSync(postedBundleFile, init.body)
+    const clonedDir = join(workDir, 'posted-clone')
+    runGit(['clone', '--quiet', postedBundleFile, clonedDir], workDir)
+    expect(runGit(['rev-parse', 'main'], clonedDir)).toBe(localMain)
   })
 })

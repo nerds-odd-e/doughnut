@@ -6,6 +6,11 @@ import { acquireNotebookGitCheckout } from './commands/notebook/notebookAcquisit
 import { resolveNotebookPublishBinding } from './commands/notebook/notebookPublishBinding.js'
 import { assertLocalMainIsCleanAndCommitted } from './commands/notebook/notebookPublishReadiness.js'
 import { assertLocalMainFollowsAcceptedHistory } from './commands/notebook/notebookPublishAncestry.js'
+import {
+  submitNotebookGitProposal,
+  PUBLISH_DENIED_MESSAGE,
+  type NotebookGitProposalSubmission,
+} from './commands/notebook/notebookPublishSubmission.js'
 
 /**
  * Handles one-shot CLI paths (version, update, help, invalid flags). Returns `false` when the
@@ -91,12 +96,29 @@ async function completeNotebookPublish(notebookArgs: string[]): Promise<void> {
     exitCliError(NOTEBOOK_PUBLISH_USAGE)
   }
 
+  let submission: NotebookGitProposalSubmission
   try {
     const { notebookId } = resolveNotebookPublishBinding(directory)
     assertLocalMainIsCleanAndCommitted(directory)
-    await assertLocalMainFollowsAcceptedHistory(directory, Number(notebookId))
+    const acceptedHead = await assertLocalMainFollowsAcceptedHistory(
+      directory,
+      Number(notebookId)
+    )
+    submission = await submitNotebookGitProposal(
+      directory,
+      Number(notebookId),
+      acceptedHead
+    )
   } catch (e) {
     exitCliError(exceptionText(e))
+  }
+
+  if (submission.denied) {
+    exitCliError(PUBLISH_DENIED_MESSAGE)
+  }
+  if (submission.accepted) {
+    console.log(`Published notebook. Accepted head: ${submission.acceptedHead}`)
+    return
   }
 
   exitCliError(

@@ -190,7 +190,7 @@ Sizing: about 5 minutes, medium confidence; reuse clone's transport/error patter
 
 ### 4. Submit a proposal with the notebook owner's credentials
 Type: Behavior
-Status: planned
+Status: done
 Proof: CLI `run` transport contract cases capture real bundle bytes, expected
 head, bearer header, and the owner's endpoint response; include denied response.
 
@@ -469,3 +469,21 @@ Sizing: about 5 minutes plus backend runtime, medium confidence.
   repos could collide on an identical commit SHA due to same content/timestamp,
   defeating the unrelated-history test. No backend/API changes in this leaf.
   Next action: execute slice 4.
+- Slice 4 done: added `POST /{notebook}/git-bundle` (`publishNotebookGitProposal`)
+  with owner-only authorization (denies read-only subscribers) checked before
+  any body parsing, then always throwing `501 NOT_IMPLEMENTED` as an interim
+  placeholder (regenerated OpenAPI/TS client). CLI now builds a full local
+  `main` bundle via system Git and POSTs it with the accepted head as a query
+  param; 401/403 surfaces a distinct permission-denied message, any other
+  non-2xx falls through unchanged to the existing "not available yet" message,
+  and a 200 (test-stub only, unreachable in production until slice 14) renders
+  the accepted head. Post-change-refactor extracted `notebookPublish.testHelpers.ts`
+  for shared fixtures; a full per-`describe` file split was tried and reverted
+  because it broke a temp-dir-leak assertion under Vitest's concurrent file
+  scheduling (all publish checks share a `donut-notebook-publish-ancestry-*`
+  temp prefix) — `notebookPublish.test.ts` stays one file at ~450 lines rather
+  than force an unsafe split or a broader Vitest concurrency config change.
+  Coordinator independently confirmed the required full `pnpm backend:test_only`
+  run has exactly 4 pre-existing, unrelated failures
+  (`StructuredResponseCreateParamsSerializerTest`, a Spring ApplicationContext
+  load cascade) both before and after this slice. Next action: execute slice 5.
