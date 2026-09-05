@@ -12,6 +12,7 @@ import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.services.notebookExport.PortableTreeEntry;
 import com.odde.donut.services.notebookGit.NotebookGitBundleBuilder;
 import com.odde.donut.services.notebookGit.NotebookGitBundleWriter;
+import com.odde.donut.services.notebookGit.NotebookGitCutoverService;
 import com.odde.donut.testability.GitBundleTestReader;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -35,6 +36,7 @@ import org.eclipse.jgit.lib.PersonIdent;
 import org.eclipse.jgit.lib.RefUpdate;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.transport.BundleWriter;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -44,9 +46,12 @@ import org.springframework.web.server.ResponseStatusException;
  * NotebookGitProposalImportControllerTest}, {@link NotebookGitProposalAncestryControllerTest},
  * {@link NotebookGitProposalTreeShapeControllerTest}, {@link
  * NotebookGitProposalMarkdownFormatControllerTest}, and {@link
- * NotebookGitProposalPropertyValidationControllerTest}).
+ * NotebookGitProposalPropertyValidationControllerTest}, and {@link
+ * NotebookGitProjectionDriftControllerTest}).
  */
 abstract class NotebookGitBundleControllerTestBase extends NotebookControllerTestBase {
+
+  @Autowired NotebookGitCutoverService notebookGitCutoverService;
 
   Notebook createGitBackedNotebook() throws UnexpectedNoAccessRightException {
     NotebookCreationRequest request = new NotebookCreationRequest();
@@ -158,6 +163,10 @@ abstract class NotebookGitBundleControllerTestBase extends NotebookControllerTes
       binding.setBundleBytes(written.bundleBytes());
     }
     return notebookGitBindingRepository.save(binding);
+  }
+
+  NotebookGitBinding snapshotCurrentPortableTree(Notebook notebook) {
+    return notebookGitCutoverService.resnapshotForTestability(notebook, Instant.now());
   }
 
   /** A bundle whose {@code main} is a single-parent child of {@code binding}'s accepted head. */

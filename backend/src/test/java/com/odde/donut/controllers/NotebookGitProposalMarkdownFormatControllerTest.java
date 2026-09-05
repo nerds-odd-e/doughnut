@@ -25,15 +25,20 @@ class NotebookGitProposalMarkdownFormatControllerTest extends NotebookGitBundleC
   void ownerSubmittingAnUnknownTypeAndUnrecognizedKeyStillReceivesTheInterimRefusal()
       throws Exception {
     Notebook notebook = createGitBackedNotebook();
-    NotebookGitBinding binding = seedAcceptedBinding(notebook, validBaselineEntries());
+    makeMe
+        .aNote()
+        .notebook(notebook)
+        .title("note")
+        .content("---\ntype: Note\n---\noriginal content")
+        .please();
+    NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);
     byte[] bundleBytes =
         proposalBundleBytes(
             binding,
             List.of(
                 new ProposedFile(
                     "note.md",
-                    "---\ntype: SomethingCustom\ncustom_field: hello\n---\nchanged content"),
-                new ProposedFile("README.md", "---\ntype: Readme\n---\nreadme original")));
+                    "---\ntype: SomethingCustom\ncustom_field: hello\n---\nchanged content")));
 
     ResponseStatusException exception =
         assertThrows(

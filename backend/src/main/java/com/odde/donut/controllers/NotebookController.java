@@ -34,6 +34,7 @@ import com.odde.donut.services.NotebookGroupService;
 import com.odde.donut.services.NotebookIndexingService;
 import com.odde.donut.services.NotebookService;
 import com.odde.donut.services.WikidataService;
+import com.odde.donut.services.notebookGit.NotebookGitProjection;
 import com.odde.donut.services.notebookGit.NotebookGitProposalAncestry;
 import com.odde.donut.services.notebookGit.NotebookGitProposalBlobText;
 import com.odde.donut.services.notebookGit.NotebookGitProposalImporter;
@@ -80,6 +81,7 @@ class NotebookController {
   private final FolderRelocationService folderRelocationService;
   private final NotebookExportService notebookExportService;
   private final NotebookGitBindingRepository notebookGitBindingRepository;
+  private final NotebookGitProjection notebookGitProjection;
 
   public NotebookController(
       EntityPersister entityPersister,
@@ -99,7 +101,8 @@ class NotebookController {
       FolderConstructionService folderConstructionService,
       FolderRelocationService folderRelocationService,
       NotebookExportService notebookExportService,
-      NotebookGitBindingRepository notebookGitBindingRepository) {
+      NotebookGitBindingRepository notebookGitBindingRepository,
+      NotebookGitProjection notebookGitProjection) {
     this.entityPersister = entityPersister;
     this.testabilitySettings = testabilitySettings;
     this.notebookIndexingService = notebookIndexingService;
@@ -118,6 +121,7 @@ class NotebookController {
     this.folderRelocationService = folderRelocationService;
     this.notebookExportService = notebookExportService;
     this.notebookGitBindingRepository = notebookGitBindingRepository;
+    this.notebookGitProjection = notebookGitProjection;
   }
 
   @GetMapping("")
@@ -497,7 +501,10 @@ class NotebookController {
       ObjectId acceptedHead = ObjectId.fromString(binding.getAcceptedGitObjectId());
       NotebookGitProposalAncestry.assertFollowsAcceptedHead(
           proposal.repository(), proposal.mainHead(), acceptedHead);
-      if (!proposal.mainHead().equals(acceptedHead)) {
+      if (proposal.mainHead().equals(acceptedHead)) {
+        notebookGitProjection.requireMatchingAcceptedTree(
+            notebook, proposal.repository(), acceptedHead);
+      } else {
         String changedNotePath =
             NotebookGitProposalTreeShape.assertSingleModifiedRegularNotePath(
                 proposal.repository(), acceptedHead, proposal.mainHead());
@@ -507,6 +514,8 @@ class NotebookController {
             NotebookGitProposalBlobText.readUtf8(
                 proposal.repository(), proposal.mainHead(), changedNotePath);
         AuthoredNoteContent.assertValidForSave(changedNoteContent);
+        notebookGitProjection.requireMatchingAcceptedTreeWithOneLiveNoteAtPath(
+            notebook, proposal.repository(), acceptedHead, changedNotePath);
       }
     } finally {
       proposal.repository().close();

@@ -23,13 +23,16 @@ class NotebookGitProposalTreeShapeControllerTest extends NotebookGitBundleContro
   @Test
   void ownerSubmittingAValidChildProposalStillReceivesTheInterimRefusal() throws Exception {
     Notebook notebook = createGitBackedNotebook();
-    NotebookGitBinding binding = seedAcceptedBinding(notebook, validBaselineEntries());
+    makeMe
+        .aNote()
+        .notebook(notebook)
+        .title("note")
+        .content("---\ntype: Note\n---\noriginal content")
+        .please();
+    NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);
     byte[] bundleBytes =
         proposalBundleBytes(
-            binding,
-            List.of(
-                new ProposedFile("note.md", "---\ntype: Note\n---\nchanged content"),
-                new ProposedFile("README.md", "---\ntype: Readme\n---\nreadme original")));
+            binding, List.of(new ProposedFile("note.md", "---\ntype: Note\n---\nchanged content")));
 
     ResponseStatusException exception =
         assertThrows(
@@ -44,18 +47,17 @@ class NotebookGitProposalTreeShapeControllerTest extends NotebookGitBundleContro
   @Test
   void ownerChangingIndexMdReachesTheInterimRefusalJustLikeAnyOtherNote() throws Exception {
     Notebook notebook = createGitBackedNotebook();
-    NotebookGitBinding binding =
-        seedAcceptedBinding(
-            notebook,
-            List.of(
-                new PortableTreeEntry("index.md", "---\ntype: Note\n---\noriginal content"),
-                new PortableTreeEntry("README.md", "---\ntype: Readme\n---\nreadme original")));
+    makeMe
+        .aNote()
+        .notebook(notebook)
+        .title("index")
+        .content("---\ntype: Note\n---\noriginal content")
+        .please();
+    NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);
     byte[] bundleBytes =
         proposalBundleBytes(
             binding,
-            List.of(
-                new ProposedFile("index.md", "---\ntype: Note\n---\nchanged content"),
-                new ProposedFile("README.md", "---\ntype: Readme\n---\nreadme original")));
+            List.of(new ProposedFile("index.md", "---\ntype: Note\n---\nchanged content")));
 
     ResponseStatusException exception =
         assertThrows(

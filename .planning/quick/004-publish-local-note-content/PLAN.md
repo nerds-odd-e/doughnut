@@ -302,7 +302,7 @@ pattern already proven three times in this same plan.
 
 ### 11. Refuse to overwrite a projection that has drifted
 Type: Behavior
-Status: planned
+Status: done
 Proof: controller cases seed accepted content, perform a normal web change,
 then submit a current-parent proposal and observe projection-drift rejection.
 
@@ -605,3 +605,12 @@ Sizing: about 5 minutes plus backend runtime, medium confidence.
   MySQL process's runtime-only `max_connections` setting from 151 to 300 to
   avoid the previously documented connection-exhaustion cascade. Next action:
   execute slice 11.
+- Slice 11 done: added `NotebookGitProjection` to rebuild the live canonical
+  Portable tree for each publish request, compare it exactly with accepted
+  `main`, and require the changed Portable path to identify one live Note.
+  Controller tests prove both ordinary web content and structure drift return
+  an actionable conflict without changing the accepted binding; existing valid
+  proposal fixtures now snapshot the real projection instead of inventing a
+  detached baseline. Post-change-refactor removed an unused Note return value
+  and named the one-live-note-at-path invariant explicitly. No API wire change.
+  Next action: execute slice 12.
