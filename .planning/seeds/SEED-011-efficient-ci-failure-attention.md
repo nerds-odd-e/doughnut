@@ -39,6 +39,12 @@ retain later failures for subsequent attention. No broad claim about model
 capabilities is established by this one execution; evaluate the actual host
 and representative agents before adding interruption complexity.
 
+Further discussion (2026-09-05): the developer requests current research to
+recommend the attention boundary. Startup observation must not block other
+agents; the developer suggests inspecting the last finished CI result and
+notifying the coordinator if it failed, while remaining open to refinements.
+Observation must stop when execution ends; persistent monitoring is excluded.
+
 ## Alternatives and Decision
 
 1. **Defer:** retain the current observer. Polling remains token-free, but
@@ -73,6 +79,9 @@ no longer supplies a SHA for every launch.
   model turns. A completed failed job is delivered even if other jobs in that
   workflow still run. Delivery is demonstrated on the actual host, not inferred
   from a running process. Failed observation is reported once as lost coverage.
+  Startup inspection runs alongside ongoing work. Observation stops at execution
+  end without waiting for unfinished CI; already-recorded failures and pending
+  coverage are handed off explicitly.
 - **Value / learning:** Tests the highest-risk assumption: can this host deliver
   useful failure information to the ongoing coordinator without model polling?
   Compare setup/lifecycle model calls and generated tokens with the recorded
@@ -126,24 +135,104 @@ through its safe handoff, before new task dispatch; it does not mean completing
 the whole remaining plan. The developer has accepted delayed attendance but
 has not selected this exact boundary as a final rule.
 
+## Research and Recommendations (2026-09-05)
+
+The reviewed primary sources support receiving background information at safe
+conversation/tool boundaries and preserving explicit handoffs. They do not
+provide a comparative benchmark establishing an optimal CI-repair interruption
+policy across current models. Notification delivery is a host capability;
+reliable diagnosis and resumption still need evaluation with the actual model
+and host. The recommendations below are engineering judgments for this workflow,
+not measured cross-model results.
+
+| Primary source | Relevant evidence |
+| --- | --- |
+| [Codex background hooks](https://learn.chatgpt.com/docs/hooks#run-hooks-in-the-background) | Active-turn delivery waits for the current model request and tool calls to finish. Background hooks provide information rather than controlling the triggering operation. Idle sessions wait for a user turn; session end discards undelivered output. |
+| [Claude Code background hooks](https://code.claude.com/docs/en/hooks#run-hooks-in-the-background) | Async command hooks deliver context on the next conversation turn. Ordinary async hooks cannot control the completed operation. `asyncRewake` can wake an idle session on failure, but this is distinct from obtaining a safe checkout handoff. |
+| [Cursor agent steering](https://cursor.com/docs/agent/overview#steer-a-running-agent) and [subagents](https://cursor.com/docs/subagents#foreground-vs-background) | Steering can arrive at the next tool call; foreground delegation blocks until the worker completes, while background delegation returns immediately. Availability differs by surface. |
+| [Anthropic harness research, March 2026](https://www.anthropic.com/engineering/harness-design-long-running-apps) | Tractable work increments and structured handoffs support long executions. Some orchestration needed for an earlier model became unnecessary with a later model; reevaluate complexity as models improve. This study does not compare CI interruption policies. |
+
+### Attention boundary: recommend the current bounded task's safe handoff
+
+Record failures as soon as observed and deliver them at the host's next supported
+boundary. Once the coordinator receives an actionable failure, hold new work
+dispatch. Let current implementers/refactorers sharing the checkout finish their
+bounded assignments and hand off; verify their write-capable commands have ended
+before preserving work or starting one repair. A tool response alone does not
+establish that background writers have stopped. Independent read-only diagnosis
+may overlap where the host permits it.
+
+Review pending failures before dispatching the next implementer or refactorer,
+and before beginning another coordinator wrap-up action. An operation already
+underway reaches its safe completion. This avoids extending the wait through
+an entire implementation/refactor/format/commit/push slice, while retaining the
+existing preservation and repair workflow for unfinished changes. A safe handoff
+need not be a commit. If no writer is active, triage can start immediately.
+
+Use the repository's existing approximately five-minute task target to keep
+attendance bounded; its ten-minute decomposition rule is not permission to kill
+a process. A supported cooperative pause can remain an optional improvement if
+actual-host evidence shows that waiting for bounded handoffs causes unacceptable
+delay. Do not make forced interruption the default.
+
+Before adopting this as a verified cross-host contract, demonstrate a failure
+during implementation, during refactoring, and during an existing repair, plus
+resumption after compaction. Measure detection, delivery, and repair-start times
+separately, together with lost/duplicate failures, preserved work, and model
+coordination cost. These are focused acceptance observations, not a new story.
+
+### Startup: recommend latest completed CI plus all unfinished CI
+
+Start asynchronously and let already-dispatched work continue. For the selected
+main-branch CI workflow, inspect the newest completed run by run creation order
+and every unfinished run present at startup. Inspect their jobs immediately so
+a failed job inside an unfinished run is already actionable. Using creation
+order prevents an old slow run finishing late from defining the latest baseline.
+Continue tracking those unfinished runs and discover new runs during execution,
+including pushes by another session on the same branch. Do not replay older
+completed runs outside that baseline or any explicitly retained unresolved work.
+
+The unit of startup selection is a workflow run, not one individual job: a
+successful job finishing last can coexist with a failed sibling. Preserve
+run/attempt/job identity and inspect earlier failed attempts within selected
+runs so a rerun does not erase evidence. Cancellation or unavailable status
+does not mean success. Notify known failures once through the same queue and
+attention policy; no CI completion wait gates startup. Observing another
+session's failure does not itself establish that the current checkout can repair
+it; triage establishes its relationship to current code before changing files.
+
+[GitHub run metadata](https://docs.github.com/en/rest/actions/workflow-runs)
+supports branch/workflow selection and run/attempt identity;
+[job metadata](https://docs.github.com/en/rest/actions/workflow-jobs) exposes
+individual job conclusions, completion times, and jobs from earlier executions.
+The recommended baseline is our policy, not a GitHub-prescribed default.
+
+### Shutdown: settled by the developer
+
+Stop observation when execution ends, including cancellation or a stop requiring
+human input. Drain already-recorded events and report unresolved failures and
+still-pending CI at handoff. Do not wait for GitHub to finish, leave a persistent
+watcher, or schedule later monitoring. Confirm local observer shutdown; stopping
+observation does not cancel the GitHub workflow. Execution completion is not a
+claim that pending CI passed.
+
 ## Open Decisions
 
-- Select the attention boundary: completed current delegated task, completed
-  slice including wrap-up, or a safe pause when supported. Evaluate reliability
-  and time to repair before choosing interruption; hard process termination is
-  not an implied requirement.
-- At startup, which already-running and most recently completed run should be
-  included? Define the scope so current failures are seen without historical
-  replay, including commits pushed by another session to the same branch.
-- Should observation end with the execution and hand off pending work, or remain
-  attached beyond completion? The current workflow stops without waiting for CI;
-  persistent monitoring is not authorized by this capture.
+- Story 1's plan adopts the recommended startup baseline as an execution choice
+  following the developer's request to plan this improvement. Actual-host
+  validation remains part of its proof.
+- Story 2 retains the recommended bounded-task attention boundary for its later
+  plan and validation. No broader repair-coordination implementation is selected.
+
+Observation lifetime is resolved: it ends with execution, with no persistent
+monitoring.
 
 ## When to Surface
 
 Before the next long multi-slice execution, or when revising observation across
-Codex, Cursor, or Claude Code. No implementation, executable plan, or backlog
-priority is selected by this seed.
+Codex, Cursor, or Claude Code. On the developer's slice-planning request,
+[Story 1 received an executable plan](../quick/007-observe-ci-once-per-execution/PLAN.md).
+Implementation has not started; Story 2 and backlog priority remain unselected.
 
 ## Breadcrumbs
 

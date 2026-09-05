@@ -127,64 +127,58 @@ should not become a blanket rule to classify future failures as harmless or
 skip mandatory proof. Distinguish demonstrated baseline issues, diagnosed
 environment limits, and unresolved defects before choosing focused reuse.
 
-## Candidate Follow-up Outcomes
+## Cross-project Retrospective Findings and Possible Responses (2026-09-05)
 
-These candidates refine the merged findings without reopening the previously
-delivered formatter/proof-handoff scope. They are not execution leaves.
+The developer relayed Pygardon's agreement that Doughnut should lead two small,
+transferable correctness improvements. Its independent evidence is retained in
+[Pygardon SEED-008](../../../pygardon/.planning/seeds/SEED-008-efficient-plan-execution-evidence-handoffs.md).
+These remain retrospective findings and possible responses, not a story queue.
 
-### 1. Complete an interim-to-final transition without stale user behavior
+- **Promises can escape proof wherever they are written.** Generalize the
+  dangling-clone-origin finding beyond "Current decisions": connect every
+  checkable final-state promise in the selected contract to a named slice and
+  observable verification. Preserve the connection when refining, replacing,
+  or resuming slices. Existing proof may satisfy several promises; do not
+  manufacture a separate test or slice for each sentence.
+- **A replacement can leave obsolete behavior along the affected user path.**
+  Doughnut retained interim publication refusals; Pygardon independently found
+  obsolete report payloads surviving a replacement. Consider callers, fixtures,
+  assertions, documentation, and final success/rejection behavior together when
+  planning and accepting the replacement. Search results locate affected scope;
+  observable final behavior supplies the proof.
+- **Direct exception propagation does not prove lifecycle ownership.**
+  Pygardon's Telegram retrospective found missing timely observation of failed
+  background work and cleanup skipped after failure. When asynchronous ownership
+  changes, name the owning lifecycle and prove its failure observation and
+  resource release at the appropriate boundary. Apply this conditionally to
+  relevant product work; it is not a requirement for extra propagation tests at
+  every caller, or authorization for CI-related work.
+- **Behavioral proof belongs to planning and execution.** Refactor review can
+  identify incoherence, but its structure-only remit must not become responsible
+  for supplying missing behavior. Route a discovered behavioral gap back to the
+  implementation/proof loop before accepting completion.
+- **Wording alone is not evidence of improvement.** Evaluate the proposed
+  contracts against the original escaped defects and a real execution. Preserve
+  compact, attributable evidence and focused commit IDs for Pygardon to adapt,
+  keeping each repository's tooling and CI policies intact. Distinguish a
+  retrospective replay from prospective execution evidence.
 
-- **For / why:** The developer wants a finished slice to expose its intended
-  success and rejection behavior across existing clients and tests.
-- **Evaluation:** A representative transition retires interim callers,
-  fixtures, assertions, and guidance before completion; the final user path
-  demonstrates its real outcomes without waiting for CI to reveal stale text.
-- **Value / learning:** Addresses two independently observed omissions from
-  the same replacement slice with one coherent completion practice.
-- **Effort hypothesis:** S — medium confidence; assumes a focused addition to
-  existing slice/refactor review can be evaluated in a representative task.
-- **Depends on:** none.
+## Selected Follow-up and Deferred Responses
 
-### 2. Obtain independent review with concise handoffs and usable evidence
+The developer selected planning of the two correctness improvements above in
+[the proof-coverage plan](../quick/008-preserve-promises-through-execution/PLAN.md).
+No recommendation above was rejected. The async ownership case is a conditional
+application of behavioral proof, not a third improvement project. Implementation
+and evaluation remain pending; the original implemented scope stays complete.
 
-- **For / why:** The developer wants to retain meaningful independent review
-  while reducing inherited history and repeated diagnostic material.
-- **Evaluation:** Compare a representative multi-slice run's handoff/context
-  tokens and review findings with the recorded baseline. Reviewers receive the
-  needed current constraints and exact proof; coordinator diagnostics arrive
-  as attributable, bounded evidence that can be expanded when necessary.
-- **Value / learning:** Extends findings 3–4 by measuring the actual transmitted
-  context, not just prompt length or agent count. Preserves evidence needed to
-  catch defects rather than optimizing tokens alone.
-- **Effort hypothesis:** M — medium confidence; assumes the host supports
-  controlled inherited context and observable usage accounting.
-- **Depends on:** none.
+Keep the implemented direct formatter, reusable proof, and independent refactor
+pass. Prefer small additions at the existing instruction owners, without new
+agents, duplicate checklists, or a separate tracking framework.
 
-### 3. Resolve a shared fixture assumption before repeating failed slices
-
-- **For / why:** The developer wants transaction-sensitive changes to converge
-  without repeating implementation work against incompatible test fixtures.
-- **Evaluation:** In a representative transaction-boundary change, the affected
-  shared fixture ownership is checked early and a small proof resolves the
-  uncertainty before a wider migration. Subsequent execution reuses that
-  evidence without inventing extra layers or broad preparatory work.
-- **Value / learning:** Tests whether a targeted assumption check prevents the
-  two-attempt reversal pattern seen in this execution.
-- **Effort hypothesis:** S — low confidence; depends on availability of a
-  representative future task, not just writing another instruction.
-- **Depends on:** none.
-
-## Follow-up Alternatives, Ordering, and Open Decisions
-
-Keep the implemented direct formatter and independent refactor pass. The
-strongest smaller alternative is more faithful use of existing delegation and
-refactor instructions; try that before adding new agents or mandatory checks.
-The recorded omissions despite repeated checklists mean more checklist wording
-alone is not proven sufficient. Evaluate observable results in actual work.
-
-Order the candidates by immediate correctness benefit, measured context savings,
-then the next applicable transaction task. For scope reduction, defer candidate
-3 first, then candidate 2; each outcome has value on its own. Selection of any
-candidate, the representative evaluation task, and final changes to existing
-rules remain open. No backlog ordering, implementation, or execution is implied
-by merging these findings.
+Concise handoffs/inherited context and bounded diagnostics remain possible
+efficiency responses to evaluate against measured context and review quality.
+Shared transaction-fixture checks remain a response for the next applicable
+transaction change; establish ownership with a small representative proof before
+repeating migration work. The Vitest suite-extraction technique remains optional
+guidance for a future matching case. These are deferred, not execution leaves.
+All CI-related issues are excluded from the selected work and handled separately.

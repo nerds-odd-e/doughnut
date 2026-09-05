@@ -121,21 +121,13 @@ from Git.
 
 ### 2. Publish a local content edit to the same Donut note
 
-- **For / why:** The owner wants an Obsidian- or AI-assisted refinement to
-  become the remote truth without copy-paste.
-- **Evaluation:** Starting from current `main`, the owner edits one existing
-  Markdown note locally, commits it with Git, synchronizes through the
-  supported v1 flow, and sees the same Donut note updated while its existing
-  identity-bound learning data remains attached.
-- **Value / learning:** Completes the primary local-refinement payoff for the
-  simplest non-divergent case and tests whether one accepted Git commit can
-  update Donut without creating a second authority.
-- **Effort hypothesis:** L — low confidence; assumes Story 1 establishes an
-  authenticated accepted head and that one-note content replacement is a
-  representative first projection.
-- **Depends on:** Story 1.
-- **Safe stopping point:** A stale or invalid proposal is rejected without
-  changing remote `main` or the Donut projection.
+**Status:** delivered by the completed
+[publication plan](../quick/004-publish-local-note-content/PLAN.md).
+
+The owner can publish one direct-child Git commit that edits one existing
+Portable Markdown note. Donut advances the accepted head and updates that same
+Note while preserving its identity-bound learning data. Invalid, stale,
+structural, or competing proposals do not overwrite the accepted projection.
 
 <a id="story-3"></a>
 
@@ -304,21 +296,18 @@ from Git.
 
 ## Ordering and Scope Reduction
 
-Story 1 comes first because the user named initial local acquisition as the
-first difficulty and because it proves the automatic baseline before Donut
-accepts local mutations. Story 2 follows the user's highest-value workflow:
-refine locally, then publish. Story 3 closes the clean sequential loop in the
-opposite direction. Stories 4 and 5 complete the basic file lifecycle. Stories
-6 and 7 address the identity-preservation risk unique to Donut. Stories 8 and 9
-then add accumulated divergence and conflict handling on top of two already
-working directions. Story 10 is last because commit batching improves history
-quality but is not required for safe synchronization. This is the initial
-recommended order; the product backlog owns subsequent reprioritization.
+Stories 1 and 2 delivered the automatic local baseline and the user's
+highest-value workflow: refine locally, then publish. Story 3 next closes the
+clean sequential loop in the opposite direction. Stories 4 and 5 complete the
+basic file lifecycle. Stories 6 and 7 address the identity-preservation risk
+unique to Donut. Stories 8 and 9 then add accumulated divergence and conflict
+handling on top of two already working directions. Story 10 is last because
+commit batching improves history quality but is not required for safe
+synchronization. This is the initial recommended order; the product backlog
+owns subsequent reprioritization.
 
 Safe stopping points:
 
-- After Story 1: useful local Git snapshot for Obsidian and AI tools, explicitly
-  read-only with respect to Donut.
 - After Story 3: basic sequential two-way editing of existing note content;
   creation, deletion, moves, and divergence remain rejected or unsupported.
 - After Story 5: basic note content lifecycle without structural identity
@@ -361,7 +350,7 @@ the revision/merge model and adds no Donut metadata to the Portable tree.
 
 ## When to Surface
 
-Story 1 is delivered. Select one remaining story from the
+Stories 1 and 2 are delivered. Select one remaining story from the
 [product backlog](../PRODUCT-BACKLOG.md) before slice planning. Do not turn
 the whole seed into one executable plan. Reconcile the Proposed ADR's v1 CLI
 boundary as a human-owned advice task; it does not change these story outcomes.
