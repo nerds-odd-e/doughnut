@@ -1,6 +1,7 @@
 package com.odde.donut.configs;
 
 import com.odde.donut.controllers.dto.ApiError;
+import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import org.hibernate.exception.ConstraintViolationException;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.core.Ordered;
@@ -23,6 +24,11 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @ControllerAdvice()
 public class CustomRestExceptionHandler extends ResponseEntityExceptionHandler {
+  @ExceptionHandler(UnexpectedNoAccessRightException.class)
+  public ResponseEntity<Void> handleNoAccessRight() {
+    return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+  }
+
   @Override
   protected ResponseEntity<Object> handleExceptionInternal(
       final Exception ex,

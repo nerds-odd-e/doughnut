@@ -2,7 +2,7 @@
 
 ## Source and goal
 
-Status: planned; ready for direct execution. Planning only; no implementation yet.
+Status: done; implementation and proof complete, delivery wrap-up recorded below.
 
 The user selected both findings from the 2026-09-06 manual UAT for fixes.
 This plan owns finding 1; [the search plan](../019-close-search-on-result-activation/PLAN.md)
@@ -68,7 +68,7 @@ self-contained and must be recreated with isolated fixtures during execution.
 ### 1. Explain denied notebook access without suggesting a server retry
 
 Type: Behavior
-Status: planned
+Status: done
 Behavior: An authenticated user lacks access to a notebook operation → attempts
 the operation → receives HTTP 403 and permission-specific CLI guidance, with no
 resource data or publication mutation.
@@ -111,6 +111,35 @@ If fixture work exposes a second implementation beat or >10 minutes active work,
 refine this plan in place before continuing; do not widen the story.
 
 ## Promise ownership and wrap-up
+
+Completed proof:
+- `CURSOR_DEV=true nix develop -c pnpm backend:test_only`: 2,213 tests passed,
+  including real MVC read/download/publication 403 and unchanged accepted data.
+- `CURSOR_DEV=true nix develop -c pnpm -C cli exec vitest run tests/notebookClone.failures.test.ts tests/notebookPublish.test.ts tests/notebookPull.test.ts`:
+  50 tests passed, including actual 401/403 cases and 500 server guidance.
+- `CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/cli/cli_notebook_clone.feature`:
+  six scenarios passed; denial scenario enabled after green.
+- `CURSOR_DEV=true nix develop -c python3 /tmp/denial-manual.py`: isolated
+  clone/publish each exited 1 with permission guidance; destination absent;
+  proposal HEAD/refs/status/file and accepted bundle/notebook response unchanged.
+  Evidence: `/tmp/denial-manual.log`.
+- Fresh post-change-refactor completed with no edits; proof reused. Coordinator
+  `./scripts/run.sh pnpm format:changed` passed. No endpoint/DTO signatures changed,
+  so API generation was unnecessary.
+
+Execution learnings: red MVC dispatch exposed the original generic rethrow.
+The publication baseline must be reloaded to compare MySQL timestamp precision;
+the CLI alternate token must not replace the owner browser fixture session.
+Those fixture defects were corrected before green. Cypress uses `exitCode`.
+At roughly ten active minutes, implementation and automated proof were complete;
+continuation was limited to the already-launched final manual check, with no new
+implementation beat. Required test runtime remained the planned exception.
+
+Execution note: CI observer startup exited before creating a mailbox or process
+because Nix could not write `~/.cache/nix/fetcher-cache-v3.sqlite` inside the
+sandbox. No observer remains running (startup cell 4 completed); CI coverage is
+unavailable and pending CI will be reported as unobserved. Coordinator: root-018;
+checkout: `/Users/terryyin/git/doughnut`; repository: `nerds-odd-e/doughnut`, `main`.
 
 | Promise | Evidence owned by slice 1 |
 | --- | --- |

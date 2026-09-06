@@ -28,6 +28,12 @@ Feature: CLI notebook clone
     And the notebook "CLI Clone Notebook"'s Git binding reflects its current content
     And I have a valid Donut Access Token with label "E2E CLI Clone Token"
 
+  Scenario: Denied clone explains the permission problem without creating a checkout
+    Given the installed CLI uses the access token of "another_old_learner"
+    When I clone the notebook "CLI Clone Notebook" expecting rejection from the installed CLI
+    Then I should see "does not have permission" in the non-interactive output
+    And the clone destination does not exist
+
   Scenario: Cloning an owned notebook produces a clean canonical Git checkout
     When I clone the notebook "CLI Clone Notebook" into a temporary destination using the installed CLI
     Then the cloned checkout is a clean single-commit checkout on branch "main"

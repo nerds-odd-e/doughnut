@@ -11,6 +11,12 @@ import {
 import { cli } from '../start/pageObjects/cli'
 
 Given(
+  'the installed CLI uses the access token of {string}',
+  (userIdentifier: string) =>
+    cli.notebookClone().useAccessTokenOf(userIdentifier)
+)
+
+Given(
   "the notebook {string}'s Git binding reflects its current content",
   (notebookName: string) =>
     cli.notebookClone().resnapshotGitBinding(notebookName)
@@ -19,6 +25,16 @@ Given(
 When(
   'I clone the notebook {string} into a temporary destination using the installed CLI',
   (notebookName: string) => cli.notebookClone().cloneNotebookInto(notebookName)
+)
+
+When(
+  'I clone the notebook {string} expecting rejection from the installed CLI',
+  (notebookName: string) =>
+    cli.notebookClone().cloneNotebookExpectingRejection(notebookName)
+)
+
+Then('the clone destination does not exist', () =>
+  cli.notebookClone().expectDestinationAbsent()
 )
 
 When(

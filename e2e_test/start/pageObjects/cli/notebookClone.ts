@@ -7,7 +7,49 @@ import testability from '../../testability'
 import { nonInteractiveOutput } from './outputAssertions'
 
 function notebookClone() {
+  function cloneWithTask(
+    notebookName: string,
+    task: 'runInstalledCli' | 'runInstalledCliExpectingRejection'
+  ): Cypress.Chainable<null> {
+    return testability()
+      .getNotebookIdByName(notebookName)
+      .then((notebookId) =>
+        cy
+          .task<string>('createCliNotebookCloneDestination')
+          .then((destination) => {
+            cy.wrap(destination).as('cliCloneDestination')
+            return cy.get<string>('@donutPath').then((donutPath) =>
+              cy.get<string>('@cliConfigDir').then((configDir) =>
+                cy.get<string>('@savedAccessToken').then((token) =>
+                  cy
+                    .task<null>('writeCliAccessToken', {
+                      configDir,
+                      token,
+                    })
+                    .then(() =>
+                      cy.task<null>(task, {
+                        donutPath,
+                        args: [
+                          'notebook',
+                          'clone',
+                          String(notebookId),
+                          destination,
+                        ],
+                        env: { DONUT_CONFIG_DIR: configDir },
+                      })
+                    )
+                )
+              )
+            )
+          })
+      )
+  }
   return {
+    useAccessTokenOf(userIdentifier: string) {
+      return cy
+        .wrap(`access-token-of-${userIdentifier}`, { log: false })
+        .as('savedAccessToken')
+    },
     /**
      * Test-only setup helper: rebuilds the notebook's `NotebookGitBinding` after a fixture seeds
      * unsupported structural changes such as folders or readmes. It establishes the initial
@@ -25,38 +67,18 @@ function notebookClone() {
      * into a fresh test-owned destination (aliased `@cliCloneDestination`).
      */
     cloneNotebookInto(notebookName: string): Cypress.Chainable<null> {
-      return testability()
-        .getNotebookIdByName(notebookName)
-        .then((notebookId) =>
-          cy
-            .task<string>('createCliNotebookCloneDestination')
-            .then((destination) => {
-              cy.wrap(destination).as('cliCloneDestination')
-              return cy.get<string>('@donutPath').then((donutPath) =>
-                cy.get<string>('@cliConfigDir').then((configDir) =>
-                  cy.get<string>('@savedAccessToken').then((token) =>
-                    cy
-                      .task<null>('writeCliAccessToken', {
-                        configDir,
-                        token,
-                      })
-                      .then(() =>
-                        cy.task<null>('runInstalledCli', {
-                          donutPath,
-                          args: [
-                            'notebook',
-                            'clone',
-                            String(notebookId),
-                            destination,
-                          ],
-                          env: { DONUT_CONFIG_DIR: configDir },
-                        })
-                      )
-                  )
-                )
-              )
-            })
-        )
+      return cloneWithTask(notebookName, 'runInstalledCli')
+    },
+    cloneNotebookExpectingRejection(
+      notebookName: string
+    ): Cypress.Chainable<null> {
+      return cloneWithTask(notebookName, 'runInstalledCliExpectingRejection')
+    },
+    expectDestinationAbsent(): Cypress.Chainable<null> {
+      return cy.get<string>('@cliCloneDestination').then((destination) => {
+        cy.exec(`test ! -e ${destination}`).its('exitCode').should('equal', 0)
+        return cy.wrap(null)
+      })
     },
   }
 }

@@ -39,25 +39,28 @@ export function describeNotebookPublishSubmission(): void {
       return { dir, fetchMock }
     }
 
-    test('a 401/403 submission response is a distinct permission-denied error, leaving local state untouched', async () => {
-      const workDir = ctx.getWorkDir()
-      const { dir } = setUpEligibleCheckoutWithPostResponse(workDir, {
-        status: 403,
-        ok: false,
-        text: () => Promise.resolve(''),
-      })
-      const headBefore = runGit(['rev-parse', 'main'], dir)
-      const statusBefore = runGit(['status', '--porcelain'], dir)
+    test.each([401, 403])(
+      'a %i submission response is a distinct permission-denied error, leaving local state untouched',
+      async (status) => {
+        const workDir = ctx.getWorkDir()
+        const { dir } = setUpEligibleCheckoutWithPostResponse(workDir, {
+          status,
+          ok: false,
+          text: () => Promise.resolve(''),
+        })
+        const headBefore = runGit(['rev-parse', 'main'], dir)
+        const statusBefore = runGit(['status', '--porcelain'], dir)
 
-      await expect(run(['notebook', 'publish', dir])).rejects.toThrow(
-        ProcessExitForTest
-      )
-      expect(ctx.getErrorSpy()).toHaveBeenCalledWith(
-        expect.stringContaining("don't have permission to publish")
-      )
-      expect(runGit(['rev-parse', 'main'], dir)).toBe(headBefore)
-      expect(runGit(['status', '--porcelain'], dir)).toBe(statusBefore)
-    })
+        await expect(run(['notebook', 'publish', dir])).rejects.toThrow(
+          ProcessExitForTest
+        )
+        expect(ctx.getErrorSpy()).toHaveBeenCalledWith(
+          expect.stringContaining("don't have permission to publish")
+        )
+        expect(runGit(['rev-parse', 'main'], dir)).toBe(headBefore)
+        expect(runGit(['status', '--porcelain'], dir)).toBe(statusBefore)
+      }
+    )
 
     test.each([
       [400, 'note.md has invalid YAML frontmatter', 'BINDING_ERROR'],
