@@ -3,7 +3,7 @@
 ## Source and status
 
 - Source: [SEED-009 Story 11](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-11).
-- Status: executing; leaves 1–6 complete, leaf 7 next.
+- Status: executing; leaves 1–7 complete, leaf 8 next.
 - Readiness: remaining leaves ready for direct execution after refinement.
 
 ## Goal and scope
@@ -262,7 +262,11 @@ property-diagnostic work is hidden in this leaf; that belongs to slice 7.
 ### 7. Identify an invalid authored property in a later changed note
 
 Type: Behavior
-Status: planned
+Status: done
+Evidence: `CURSOR_DEV=true nix develop -c pnpm backend:test_only` passed
+(48 seconds): path/field error/type/map/original cause and committed rollback
+inspected. Initial red run failed only on missing path. Independent refactor:
+no edits. About 4 minutes active, 96 seconds total Gradle runtime.
 Proof: A mixed proposal has valid earlier changes and a later note containing
 `note_level: 7` → its path and existing `note_level` field error are reported,
 and all remote state remains at the accepted parent.

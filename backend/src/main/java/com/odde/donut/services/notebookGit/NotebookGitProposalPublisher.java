@@ -8,6 +8,7 @@ import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookGitBinding;
+import com.odde.donut.exceptions.ApiException;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.factoryServices.EntityPersister;
 import com.odde.donut.services.AuthoredNoteDocumentPersistence;
@@ -159,7 +160,21 @@ public class NotebookGitProposalPublisher {
       NotebookGitProposalImporter.ImportedProposal proposal, String path) {
     String content =
         NotebookGitProposalBlobText.readUtf8(proposal.repository(), proposal.mainHead(), path);
-    AuthoredNoteContent.assertValidForSave(content);
+    try {
+      AuthoredNoteContent.assertValidForSave(content);
+    } catch (ApiException exception) {
+      ApiException contextualException =
+          new ApiException(
+              exception.getMessage(),
+              exception.getErrorBody().getErrorType(),
+              "Invalid authored property at path \""
+                  + path
+                  + "\": "
+                  + exception.getErrorBody().getMessage());
+      contextualException.getErrorBody().getErrors().putAll(exception.getErrorBody().getErrors());
+      contextualException.initCause(exception);
+      throw contextualException;
+    }
     return AuthoredNoteDocument.fromContent(content, canonicalDonutOrigin);
   }
 
