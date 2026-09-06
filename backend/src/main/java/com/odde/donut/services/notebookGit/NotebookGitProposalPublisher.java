@@ -4,6 +4,7 @@ import com.odde.donut.algorithms.AuthoredNoteDocument;
 import com.odde.donut.algorithms.CanonicalDonutOrigin;
 import com.odde.donut.controllers.dto.NoteUpdateTitleDTO;
 import com.odde.donut.entities.DisplayName;
+import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookGitBinding;
@@ -112,16 +113,16 @@ public class NotebookGitProposalPublisher {
     List<Note> proposedLiveNotes = liveNotes;
     if (noteChange.kind() == NotebookGitProposalTreeShape.ChangeKind.ADDED) {
       String title = validAdditionTitle(noteChange.path());
-      if (noteChange.path().contains("/")) {
-        throw new ResponseStatusException(
-            HttpStatus.BAD_REQUEST,
-            "Path \""
-                + noteChange.path()
-                + "\" is not at the notebook root; folder note creation is not yet supported.");
-      }
       projection.requireMatchingAcceptedTree(
           notebook, folders, liveNotes, proposal.repository(), acceptedHead);
-      changedNote = noteFactory.create(notebook, null, title);
+      Integer destinationFolderId =
+          projection.requireRepresentedFolderIdForAddition(
+              folders, proposal.repository(), acceptedHead, noteChange.path());
+      Folder destinationFolder =
+          destinationFolderId == null
+              ? null
+              : entityPersister.find(Folder.class, destinationFolderId);
+      changedNote = noteFactory.create(notebook, destinationFolder, title);
       proposedLiveNotes = new ArrayList<>(liveNotes);
       proposedLiveNotes.add(changedNote);
     } else {

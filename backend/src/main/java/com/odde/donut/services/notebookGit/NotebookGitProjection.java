@@ -28,6 +28,32 @@ import org.springframework.web.server.ResponseStatusException;
 /** Compares the live MySQL projection with a notebook's accepted Portable tree. */
 @Service
 public class NotebookGitProjection {
+  public Integer requireRepresentedFolderIdForAddition(
+      List<ExportFolderRow> folders,
+      Repository repository,
+      ObjectId acceptedHead,
+      String addedNotePath) {
+    int folderPathEnd = addedNotePath.lastIndexOf('/');
+    if (folderPathEnd < 0) {
+      return null;
+    }
+
+    String requiredFolderPath = addedNotePath.substring(0, folderPathEnd + 1);
+    Map<Integer, ExportFolderRow> folderById = indexFoldersById(folders);
+    ExportFolderRow folder =
+        folders.stream()
+            .filter(candidate -> folderPath(candidate, folderById).equals(requiredFolderPath))
+            .findFirst()
+            .orElseThrow(() -> unrepresentedParentFolder(addedNotePath));
+    boolean representedInAcceptedContent =
+        readEntries(repository, acceptedHead).stream()
+            .anyMatch(entry -> entry.path().startsWith(requiredFolderPath));
+    if (!representedInAcceptedContent) {
+      throw unrepresentedParentFolder(addedNotePath);
+    }
+    return folder.id();
+  }
+
   public Note requireMatchingAcceptedTreeWithOneLiveNoteAtPath(
       Notebook notebook,
       List<ExportFolderRow> folders,
@@ -36,8 +62,7 @@ public class NotebookGitProjection {
       ObjectId acceptedHead,
       String changedPath) {
     requireMatchingAcceptedTree(notebook, folders, liveNotes, repository, acceptedHead);
-    Map<Integer, ExportFolderRow> folderById =
-        folders.stream().collect(Collectors.toMap(ExportFolderRow::id, Function.identity()));
+    Map<Integer, ExportFolderRow> folderById = indexFoldersById(folders);
     List<Note> matches =
         liveNotes.stream()
             .filter(note -> portablePath(note, folderById).equals(changedPath))
@@ -79,6 +104,15 @@ public class NotebookGitProjection {
             + " before publishing.");
   }
 
+  private static ResponseStatusException unrepresentedParentFolder(String addedNotePath) {
+    return new ResponseStatusException(
+        HttpStatus.BAD_REQUEST,
+        "Parent folder for path \""
+            + addedNotePath
+            + "\" is not represented in accepted Portable content; publish it through an existing"
+            + " note or README.md before adding this note.");
+  }
+
   private static List<PortableTreeEntry> readEntries(Repository repository, ObjectId commitId) {
     try (RevWalk revWalk = new RevWalk(repository)) {
       RevCommit commit = revWalk.parseCommit(commitId);
@@ -108,6 +142,10 @@ public class NotebookGitProjection {
     String folderPath =
         folder == null ? "" : folderPath(folderById.get(folder.getId()), folderById);
     return folderPath + note.getTitle() + ".md";
+  }
+
+  private static Map<Integer, ExportFolderRow> indexFoldersById(List<ExportFolderRow> folders) {
+    return folders.stream().collect(Collectors.toMap(ExportFolderRow::id, Function.identity()));
   }
 
   private static String folderPath(

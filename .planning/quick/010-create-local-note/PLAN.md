@@ -197,7 +197,7 @@ instead of extending this leaf.
 
 ### 4. Place an addition inside an existing Portable folder
 Type: Behavior
-Status: planned
+Status: done
 Proof: Publish/show controller observations place `Physics/Inertia.md` in the
 existing folder; a missing or unrepresented parent rejects without writes.
 
@@ -460,6 +460,9 @@ The broader follow-up commit scope remains outside this plan.
 
 ## Refinement learnings
 
+- Folder additions resolve the full parent Portable path against current
+  folders and require that path to contain accepted Portable content; root,
+  nested, readme-only, and repeated-basename cases share the creation branch.
 - Root additions now validate the accepted projection before calling
   `NoteFactory`, replace the default document with exact Git-authored content,
   and compare the proposed tree against a live-note list containing the new

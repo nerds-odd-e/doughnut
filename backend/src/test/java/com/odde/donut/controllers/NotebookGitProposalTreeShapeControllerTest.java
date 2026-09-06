@@ -2,6 +2,7 @@ package com.odde.donut.controllers;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.empty;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 import com.odde.donut.entities.Notebook;
@@ -42,7 +43,7 @@ class NotebookGitProposalTreeShapeControllerTest extends NotebookGitBundleContro
   }
 
   @Test
-  void rejectsProposalThatAddsANoteOutsideTheNotebookRoot() throws Exception {
+  void rejectsProposalWhoseParentFolderIsMissingFromAcceptedPortableContent() throws Exception {
     Notebook notebook = createGitBackedNotebook();
     NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);
     byte[] bundleBytes =
@@ -57,6 +58,9 @@ class NotebookGitProposalTreeShapeControllerTest extends NotebookGitBundleContro
             notebook, binding.getAcceptedGitObjectId(), bundleBytes, HttpStatus.BAD_REQUEST);
 
     assertThat(exception.getReason(), containsString("Folder/extra.md"));
+    assertThat(
+        exception.getReason(), containsString("not represented in accepted Portable content"));
+    assertThat(noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId()), empty());
   }
 
   @Test
