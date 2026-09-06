@@ -10,7 +10,21 @@ import {
 } from './notebookClone.testHelpers.js'
 import { initBoundCheckout } from './notebookGit.testHelpers.js'
 
-describe('notebook pull (CLI routing and binding checks)', () => {
+function checkoutState(directory: string) {
+  return {
+    head: runGit(['rev-parse', 'HEAD'], directory),
+    branch: runGit(['rev-parse', '--abbrev-ref', 'HEAD'], directory),
+    branches: runGit(
+      ['for-each-ref', '--format=%(refname) %(objectname)', 'refs/heads'],
+      directory
+    ),
+    status: runGit(['status', '--porcelain=v1'], directory),
+    staged: runGit(['diff', '--cached'], directory),
+    unstaged: runGit(['diff'], directory),
+  }
+}
+
+describe('notebook pull (CLI routing and local readiness)', () => {
   const ctx = installNotebookCliRunFixture('donut-cli-pull-test-')
   let fetchMock: ReturnType<typeof vi.fn>
 
@@ -66,6 +80,148 @@ describe('notebook pull (CLI routing and binding checks)', () => {
     )
     expect(runGit(['rev-parse', 'HEAD'], directory)).toBe(headBefore)
     expect(runGit(['status', '--porcelain=v1'], directory)).toBe(statusBefore)
+    expect(fetchMock).not.toHaveBeenCalled()
+  })
+
+  test('detached HEAD is rejected without moving HEAD or branches', async () => {
+    const directory = initBoundCheckout(
+      ctx.getWorkDir(),
+      getApiConfig().apiBaseUrl
+    )
+    runGit(['checkout', '--quiet', '--detach'], directory)
+    const before = checkoutState(directory)
+
+    await expect(run(['notebook', 'pull', directory])).rejects.toThrow(
+      ProcessExitForTest
+    )
+
+    expect(ctx.getErrorSpy()).toHaveBeenCalledWith(
+      expect.stringContaining('Switch to main before receiving')
+    )
+    expect(checkoutState(directory)).toEqual(before)
+    expect(fetchMock).not.toHaveBeenCalled()
+  })
+
+  test('a branch other than main is rejected without losing its unpublished commit', async () => {
+    const directory = initBoundCheckout(
+      ctx.getWorkDir(),
+      getApiConfig().apiBaseUrl
+    )
+    runGit(['checkout', '--quiet', '-b', 'local-work'], directory)
+    fs.writeFileSync(join(directory, 'local.md'), '# unpublished work\n')
+    runGit(['add', 'local.md'], directory)
+    runGit(['commit', '--quiet', '-m', 'local unpublished work'], directory)
+    const before = checkoutState(directory)
+
+    await expect(run(['notebook', 'pull', directory])).rejects.toThrow(
+      ProcessExitForTest
+    )
+
+    expect(ctx.getErrorSpy()).toHaveBeenCalledWith(
+      expect.stringContaining('Switch to main before receiving')
+    )
+    expect(checkoutState(directory)).toEqual(before)
+    expect(fs.readFileSync(join(directory, 'local.md'), 'utf8')).toBe(
+      '# unpublished work\n'
+    )
+    expect(fetchMock).not.toHaveBeenCalled()
+  })
+
+  test('a staged change is rejected without changing the index', async () => {
+    const directory = initBoundCheckout(
+      ctx.getWorkDir(),
+      getApiConfig().apiBaseUrl
+    )
+    fs.writeFileSync(join(directory, 'note.md'), '# staged local edit\n')
+    runGit(['add', 'note.md'], directory)
+    const before = checkoutState(directory)
+
+    await expect(run(['notebook', 'pull', directory])).rejects.toThrow(
+      ProcessExitForTest
+    )
+
+    expect(ctx.getErrorSpy()).toHaveBeenCalledWith(
+      expect.stringContaining('commit or clean them before receiving')
+    )
+    expect(checkoutState(directory)).toEqual(before)
+    expect(fetchMock).not.toHaveBeenCalled()
+  })
+
+  test('an unstaged change is rejected without changing the working tree', async () => {
+    const directory = initBoundCheckout(
+      ctx.getWorkDir(),
+      getApiConfig().apiBaseUrl
+    )
+    fs.writeFileSync(join(directory, 'note.md'), '# unstaged local edit\n')
+    const before = checkoutState(directory)
+
+    await expect(run(['notebook', 'pull', directory])).rejects.toThrow(
+      ProcessExitForTest
+    )
+
+    expect(ctx.getErrorSpy()).toHaveBeenCalledWith(
+      expect.stringContaining('commit or clean them before receiving')
+    )
+    expect(checkoutState(directory)).toEqual(before)
+    expect(fetchMock).not.toHaveBeenCalled()
+  })
+
+  test('an untracked file is rejected without deleting it', async () => {
+    const directory = initBoundCheckout(
+      ctx.getWorkDir(),
+      getApiConfig().apiBaseUrl
+    )
+    fs.writeFileSync(
+      join(directory, 'untracked.md'),
+      '# untracked local work\n'
+    )
+    const before = checkoutState(directory)
+
+    await expect(run(['notebook', 'pull', directory])).rejects.toThrow(
+      ProcessExitForTest
+    )
+
+    expect(ctx.getErrorSpy()).toHaveBeenCalledWith(
+      expect.stringContaining('commit or clean them before receiving')
+    )
+    expect(checkoutState(directory)).toEqual(before)
+    expect(fs.readFileSync(join(directory, 'untracked.md'), 'utf8')).toBe(
+      '# untracked local work\n'
+    )
+    expect(fetchMock).not.toHaveBeenCalled()
+  })
+
+  test('an active merge is rejected even when porcelain status is clean', async () => {
+    const directory = initBoundCheckout(
+      ctx.getWorkDir(),
+      getApiConfig().apiBaseUrl
+    )
+    runGit(['checkout', '--quiet', '-b', 'other-history'], directory)
+    runGit(
+      ['commit', '--quiet', '--allow-empty', '-m', 'other branch commit'],
+      directory
+    )
+    runGit(['checkout', '--quiet', 'main'], directory)
+    runGit(
+      ['commit', '--quiet', '--allow-empty', '-m', 'local main commit'],
+      directory
+    )
+    runGit(['merge', '--no-commit', 'other-history'], directory)
+    expect(runGit(['status', '--porcelain=v1'], directory)).toBe('')
+    const mergeHeadBefore = runGit(['rev-parse', 'MERGE_HEAD'], directory)
+    const before = checkoutState(directory)
+
+    await expect(run(['notebook', 'pull', directory])).rejects.toThrow(
+      ProcessExitForTest
+    )
+
+    expect(ctx.getErrorSpy()).toHaveBeenCalledWith(
+      expect.stringContaining(
+        'Finish or abort the active Git operation before receiving'
+      )
+    )
+    expect(checkoutState(directory)).toEqual(before)
+    expect(runGit(['rev-parse', 'MERGE_HEAD'], directory)).toBe(mergeHeadBefore)
     expect(fetchMock).not.toHaveBeenCalled()
   })
 

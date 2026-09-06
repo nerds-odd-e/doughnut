@@ -175,7 +175,7 @@ unavailable boundary owned by leaf 3.
 
 ### 2. Protect an ineligible working checkout
 Type: Behavior
-Status: planned
+Status: done
 Proof: CLI `run` readiness cases with real staged/unstaged/untracked state,
 detached/non-main HEAD, and an active Git operation with otherwise clean status.
 
@@ -186,6 +186,9 @@ Share the current publish readiness concept with operation-appropriate text;
 keep any new operation-state check bounded to this receive requirement.
 Eligible input still receives the temporary unavailable result.
 Sizing: about 5 minutes, medium confidence; one readiness proof family.
+
+Learning: publish and pull share attached-clean-`main` checks, while pull adds
+read-only detection of active Git operation markers that porcelain can omit.
 
 ### 3. Recognize an already received accepted head
 Type: Behavior

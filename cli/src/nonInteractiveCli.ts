@@ -4,7 +4,10 @@ import { runUpdate } from './commands/update.js'
 import { formatVersionOutput } from './commands/version.js'
 import { acquireNotebookGitCheckout } from './commands/notebook/notebookAcquisition.js'
 import { resolveNotebookBinding } from './commands/notebook/notebookBinding.js'
-import { assertLocalMainIsCleanAndCommitted } from './commands/notebook/notebookPublishReadiness.js'
+import {
+  assertLocalMainIsReadyToPublish,
+  assertLocalMainIsReadyToReceive,
+} from './commands/notebook/notebookCheckoutReadiness.js'
 import { assertLocalMainFollowsAcceptedHistory } from './commands/notebook/notebookPublishAncestry.js'
 import { submitNotebookGitProposal } from './commands/notebook/notebookPublishSubmission.js'
 
@@ -101,7 +104,7 @@ async function completeNotebookPublish(notebookArgs: string[]): Promise<void> {
   let acceptedHead: string
   try {
     const { notebookId } = resolveNotebookBinding(directory)
-    assertLocalMainIsCleanAndCommitted(directory)
+    assertLocalMainIsReadyToPublish(directory)
     const expectedHead = await assertLocalMainFollowsAcceptedHistory(
       directory,
       Number(notebookId)
@@ -127,6 +130,7 @@ function completeNotebookPull(notebookArgs: string[]): never {
 
   try {
     resolveNotebookBinding(directory)
+    assertLocalMainIsReadyToReceive(directory)
   } catch (e) {
     exitCliError(exceptionText(e))
   }
