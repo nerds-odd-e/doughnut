@@ -5,8 +5,8 @@
 Status: planned; ready for direct execution. Planning only; no implementation yet.
 
 The user selected both findings from the 2026-09-06 manual UAT for fixes.
-This plan owns finding 2; [the access-denial plan](../018-report-access-denial-as-forbidden/PLAN.md)
-owns finding 1. Execute after that plan for ordering only; there is no dependency.
+This plan owns finding 2. Finding 1 (access-denial classification) is complete;
+this independent search fix is ready for execution.
 
 As a learner, activating a search result reveals the selected note even when I
 am already viewing it, so I do not have to dismiss the search overlay separately.
