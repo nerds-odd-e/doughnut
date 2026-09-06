@@ -301,7 +301,10 @@ cross-context repair system. No unresolved scope decision blocks planning.
 
 ### 7. Prove uncertain storage assumptions before implementation — conditional P1
 
-**Status:** Refined and planned in [quick 015](../quick/015-enforce-decide-first-refactor-handoffs/PLAN.md).
+**Status:** Installed 2026-09-06. Three supplied readiness replays passed:
+uncertain DDL and transaction visibility require relevant isolated proof; known
+behavior or matching evidence proceeds without a new experiment. Skill word count:
+630 → 536. No database experiment or live effectiveness claim.
 **Trigger:** Apply the readiness check when a proposed transaction/destructive
 migration has a concrete unresolved engine or fixture-ownership assumption.
 

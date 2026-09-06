@@ -1,32 +1,22 @@
 ---
 name: slice-planning
 description: >-
-  Turn one selected story into an executable GSD-aligned plan of stop-safe
-  Behavior/Structure leaves. Use when the story’s value, outcome, and boundaries
-  are clear. The result should be directly executable for straightforward work;
-  use slice-plan-refinement for a complex plan or an execution overrun.
+  Plan one clear, bounded story as executable GSD-aligned, stop-safe
+  Behavior/Structure leaves. Straightforward plans execute directly;
+  use slice-plan-refinement for complex plans or overruns.
 ---
 
 <objective>
-Write an executable PLAN for one selected story. Use
-`.cursor/rules/problem-decomposition.mdc` for slice decisions and
-`.cursor/rules/planning.mdc` for the artifact and lifecycle.
-
-Produce a sufficient one-pass plan for straightforward work. Do not depend on a
-later refinement pass to fix obvious multi-outcome or non-stop-safe slices.
+Write a sufficient one-pass PLAN using `.cursor/rules/problem-decomposition.mdc`
+for slice decisions and `.cursor/rules/planning.mdc` for artifacts and lifecycle.
+Resolve obvious multiple outcomes and unsafe stopping points now.
 </objective>
 
 <input_gate>
-Proceed only when the input names:
-
-- one user or stakeholder outcome;
-- why it matters;
-- key examples showing how the result can be evaluated;
-- boundaries separating it from later stories.
-
-If selected-story detail is unresolved, use **story-refinement**; use
-**story-decomposition** when the parent problem or candidate selection is unclear.
-Never pass a story-decomposition seed directly to execution.
+Require one user or stakeholder outcome, its value, evaluable key examples, and
+boundaries from later stories. Use **story-refinement** for unresolved selected-story
+detail; **story-decomposition** for unclear parent problems or candidate selection.
+Never execute a decomposition seed directly.
 </input_gate>
 
 <locations>
@@ -38,85 +28,69 @@ Never pass a story-decomposition seed directly to execution.
 <process>
 
 <step name="record_the_story_understanding">
-Read the refined story in its home seed when present. Record its source, goal,
-scope, and key examples without enlarging them. Apply scope discipline in
-`planning.mdc`: exclude uncertain additions and report them; clarify decisions
-needed for the stated outcome. Use **story-refinement** for remaining questions.
+Read the home seed's refined story when present; record source, goal, scope, and
+key examples without enlargement. Apply `planning.mdc` scope discipline: report
+excluded uncertain additions; clarify necessary decisions through **story-refinement**.
 </step>
 
 <step name="inspect_execution_context">
-Read only the code, tests, stack rules, and relevant Accepted ADRs needed to
-decide:
+Read only needed code, tests, stack rules, and relevant Accepted ADRs to identify
+the stable outside-in test or demonstration entry point, behavior and tests to
+extend, genuine dependencies, and whether the first Behavior needs preceding
+Structure. Do not slice by file, component, or layer.
 
-- the stable outside-in test or demonstration entry point;
-- existing behavior and tests to extend;
-- genuine dependencies;
-- whether one Structure slice is needed before the first Behavior.
-
-Do not create slices per discovered file, component, or layer.
+For a concrete uncertain storage assumption, name the behavior and critical
+postcondition. Reuse matching evidence first; otherwise require one isolated
+representative proof using the relevant engine and version and transaction
+ownership and visibility semantics before declaring affected work ready. Uncertain
+DDL requires the exact sequence and a representative later parent update;
+uncertain rollback-fixture visibility to `REQUIRES_NEW` requires actual transaction
+ownership with isolated data. Record assumption, engine and version, literal
+command, observed critical postcondition, and result in the existing PLAN. Failed
+proof changes the plan before broad implementation. Routine known behavior and
+matching evidence require no new experiment. Do not invent uncertainty; keep
+experiments off shared and production databases.
 </step>
 
 <step name="cut_and_order_leaves">
-Apply the execution-leaf gate and an initial sizing pass from
-`problem-decomposition.mdc`.
+Apply `problem-decomposition.mdc`'s execution-leaf gate and initial sizing pass.
 
 For every leaf:
 
-1. Choose Behavior or Structure; tie each Behavior to included scope or a key
-   example, and each Structure to the immediate Behavior it enables.
-2. Record the required fields from the gate.
-3. Name focused verification and connect the selected contract's promises to
-   owning leaves and observations under `planning.mdc`'s Proof decisions.
-4. Split if it contains multiple independent post-conditions.
-5. Place Structure immediately before its Behavior.
-6. Order Behaviors by user value, then learning value, then genuine
-   prerequisites.
-7. Split an obvious hard-limit or multi-beat slice before writing the plan.
+1. Record required Behavior/Structure fields; tie Behavior to included scope or key
+   examples and Structure to its immediate next Behavior.
+2. Map contract promises to owning leaves, focused verification, and observations
+   under `planning.mdc`'s Proof decisions.
+3. Split independent postconditions, obvious hard-limit paths, and multi-beat slices.
+4. Place Structure immediately before its Behavior; order Behaviors by user value,
+   learning value, then genuine prerequisites.
 
 Do not end a slice on CI-breaking red; keep a multi-beat E2E `@wip` until green.
 Keep product and test artifacts capability-named.
 </step>
 
 <step name="decide_whether_refinement_is_needed">
-After the initial split, read only the `<refinement_triggers>` gate in
-`.agents/skills/slice-plan-refinement/SKILL.md` and compare every leaf with it.
-Do not run the refinement process unless requested or a later execution workflow
-requires it.
+Compare every leaf with only the `<refinement_triggers>` gate in
+`.agents/skills/slice-plan-refinement/SKILL.md`. Run refinement only when requested
+or required by a later execution workflow.
 
 - If every leaf has one proof loop, a cohesive execution path, meets the target,
   and has no unexplained hard-limit path, report **ready for direct execution**.
 - If any trigger remains, report **refinement recommended** and identify those
   slices. Do not claim an execution-time guarantee.
-
-Refinement is optional for straightforward plans.
 </step>
 
 <step name="write_the_plan">
-Use the required PLAN contents and slice format from `planning.mdc`.
-
-If a GSD plan task bundles multiple Behaviors or speculative Structure, rewrite
-it before execution. Do not implement feature code while planning.
+Use `planning.mdc`'s required contents and slice format. Rewrite GSD tasks bundling
+Behaviors or speculative Structure before execution. Do not implement features.
 </step>
 
 </process>
 
-<success_criteria>
-- Input is one selected and bounded story.
-- Every leaf passes the Behavior/Structure gate and names proof.
-- Obvious oversized slices were split during the initial pass.
-- The response states direct-execution readiness or recommends refinement for
-  named slices.
-- The plan is under `.planning/phases/` or `.planning/quick/`.
-- Final response ends with `## SLICE PLAN WRITTEN`.
-</success_criteria>
-
 <output>
 Report the plan path, ordered leaves, considered-but-excluded additions, and one of:
 `ready for direct execution` or `refinement recommended: <slices>`.
-
-```text
-## SLICE PLAN WRITTEN
-```
+End with `## SLICE PLAN WRITTEN`.
 </output>
 
 <out_of_scope>

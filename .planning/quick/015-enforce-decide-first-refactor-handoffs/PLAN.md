@@ -3,7 +3,7 @@
 ## Source, goal, and status
 
 Sources: [SEED-012 Stories 5–7](../../seeds/SEED-012-priority-execution-process-improvements.md#story-5).
-Status: in progress; quick 014 is committed and the shared file is released.
+Status: all slices done; final delivery and cleanup.
 
 The developer explicitly grouped these distinct stories in quick 015. Keep their
 outcomes separate: consistent refactor handoffs, lost-handle observer shutdown,
@@ -109,7 +109,7 @@ minutes with medium confidence. Broader forced-termination recovery is excluded.
 ### 3. Require a targeted proof only for uncertain storage behavior
 
 Type: Behavior
-Status: planned
+Status: done
 Proof: Apply the amended planning-readiness instruction to the three source
 story examples: uncertain DDL, uncertain transaction-fixture visibility, and
 routine/already-proven behavior. Only unresolved assumptions require new proof.
@@ -153,6 +153,14 @@ stays deferred. Observe natural relevant executions for live effectiveness; add
 no monitor or forced product exercise and do not overstate simulated evidence.
 
 ## Readiness
+
+Slice 3 supplied readiness replays pass: uncertain exact DDL plus later parent
+update and uncertain transaction ownership/visibility require isolated proof;
+known behavior or matching evidence needs no new experiment. Failed evidence
+changes the PLAN before implementation. Required evidence fields and existing
+skill obligations survive full diff review. `CURSOR_DEV=true nix develop -c wc -w .agents/skills/slice-planning/SKILL.md`:
+630 → 536. Independent refactor made no edits and skipped tests; coordinator
+formatting passed. No actual database experiment was needed or performed.
 
 Slice 2: `CURSOR_DEV=true nix develop -c node --test .agents/skills/execute-plan/scripts/ci-codex-lifecycle.test.mjs .agents/skills/execute-plan/scripts/ci-observer-stream.test.mjs`
 passed all 5 tests after refactor. Assertions establish actual receipt PID,
