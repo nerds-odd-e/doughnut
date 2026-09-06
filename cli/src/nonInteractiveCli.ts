@@ -93,7 +93,7 @@ async function completeNotebookClone(notebookArgs: string[]): Promise<void> {
     exitCliError(exceptionText(e))
   }
   console.log(
-    `Cloned notebook ${notebookId} into ${destination}. Open and edit the files there with any ordinary local Git tool (Obsidian, an IDE, plain git). Publishing currently accepts one new commit directly on the accepted main containing one added or edited Markdown note at the notebook root or in an existing folder. Run "donut notebook pull ${destination}" to receive newer accepted history; accepted history may not include all current web content.`
+    `Cloned notebook ${notebookId} into ${destination}. Open and edit the files there with any ordinary local Git tool (Obsidian, an IDE, plain git). Publishing currently accepts one new commit directly on the accepted main containing either one or more added Markdown notes with optional edits, or a single edited Markdown note. Use the notebook root or existing folders represented in accepted history. Run "donut notebook pull ${destination}" to receive newer accepted history; accepted history may not include all current web content.`
   )
 }
 

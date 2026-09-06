@@ -3,7 +3,7 @@
 ## Source and status
 
 - Source: [SEED-009 Story 11](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-11).
-- Status: executing; leaves 1–9 complete, leaf 10 next.
+- Status: executing; leaves 1–10 complete, leaf 11 next.
 - Readiness: remaining leaves ready for direct execution after refinement.
 
 ## Goal and scope
@@ -324,7 +324,11 @@ loop, token or new state-snapshot framework.
 ### 10. Explain the supported commit shapes in CLI guidance
 
 Type: Behavior
-Status: planned
+Status: done
+Evidence: `CURSOR_DEV=true nix develop -c pnpm -C cli exec vitest run tests/notebookClone.test.ts`
+passed (5 tests, 1.82 seconds); direct-child/additions/mixed/single-edit/location
+guidance inspected. E2E assertion aligned for leaf 11. Independent refactor:
+no edits. About 3 minutes active.
 Proof: The existing CLI clone test observes guidance describing additions,
 mixed additions/edits, single-note edits, existing locations and one direct-child
 commit. Align its existing E2E assertion to the same wording.
