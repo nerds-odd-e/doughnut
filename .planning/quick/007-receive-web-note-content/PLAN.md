@@ -1,7 +1,7 @@
 # Receive web note content in a clean local repository
 
 Source: [SEED-009, Story 3](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-3).
-Status: planned; refinement recommended for leaves 6–7 before execution.
+Status: in progress; leaves 1–5 done; backend leaves refined before execution.
 
 ## Goal and scope
 
@@ -140,14 +140,14 @@ by planning.mdc. No manual testing or new Cypress harness is required.
 | No loss of unpublished commits or divergent history; example 4 | 4: ancestry rejection leaves original local work reachable and unchanged |
 | Exact fast-forward, accumulated accepted history, no metadata; examples 1–3 | 5: CLI clean checkout, exact downloaded SHA and tree, retained ancestry/binding |
 | Network/permission/bundle errors and late local edits cannot overwrite checkout; decisions 3–4 | 3–5: request failures, malformed bundle and data-driven download callback mutations |
-| Ordinary accepted web content, root/folder paths, YAML/heading preservation, identity; examples 1–2 | 7: PATCH/read/bundle round trip on crafted notes with learning data |
+| Ordinary accepted web content, root/folder paths, YAML/heading preservation, identity; examples 1–2 | 7–8: committed PATCH/read/bundle round trips on root and folder-contained notes with learning data |
 | No partial accepted save, normal validation/authorization, eligible failure propagates; example 6 | 7: late binding-save failure rolls back note, derived DB state and binding; denied/invalid PATCH makes no Git commit |
 | Pre-existing drift/missing binding keep existing web saves, no repair; example 7 | 7: explicit out-of-scope fixtures keep accepted history unchanged; existing publication drift rejection remains |
-| Unchanged canonical save adds no commit; decision 8 | 8: same accepted SHA and bytes after repeated unchanged save |
+| Unchanged canonical save adds no commit; decision 8 | 9: same accepted SHA and bytes after repeated unchanged save |
 | Web commit identity/message/time and synchronous resource cleanup; decisions 4, 8 | 7: canonical commit metadata assertion; 3–5: temporary-storage cleanup on success/failure; backend repositories use scoped close |
-| Sequential web/publish loop and immutable ancestry; example 5 | 9: web B → ordinary publish C → web D → bundle retains A/B/C/D and same Note |
-| Competing writers serialize safely; decisions 6–9 | 10: controlled committed races assert accepted parentage and same-head projection, stale publish rejection or rolled-back failure |
-| Fixture boundary and limited CLI claims; decision 10 / scope | 7 updates hook wording; 5 supplies accepted-history guidance; existing installed clone/publish feature remains green |
+| Sequential web/publish loop and immutable ancestry; example 5 | 10: web B → ordinary publish C → web D → bundle retains A/B/C/D and same Note |
+| Competing writers serialize safely; decisions 6–9 | 11: controlled committed races assert accepted parentage and same-head projection, stale publish rejection or rolled-back failure |
+| Fixture boundary and limited CLI claims; decision 10 / scope | 7–8 update and regress the hook boundary; 5 supplies accepted-history guidance; existing installed clone/publish feature remains green |
 
 No standalone tests of unhandled internal failures are required by ADR 0006.
 The late-save failure proof tests the business promise of atomic persistence.
@@ -254,48 +254,80 @@ Status: planned
 Proof: existing TextContent save/validation/authorization tests and Git
 publication tests remain green with unchanged external behavior.
 
-Internal change: route the ordinary content PATCH through a cohesive web-save
-entry point that reloads/authorizes the Note and shares the established notebook
-lock order with publication. Keep all existing authored persistence effects.
-This immediately enables leaf 7's atomic accepted web-content revision; no
-other web mutations or shared persistence callers gain Git side effects.
+Internal change: make the ordinary content PATCH delegate its prepared document
+and path-derived IDs to one web-content-save service. The service owns a default-
+propagation SERIALIZABLE transaction with rollback for checked failures; remove
+the controller transaction so real HTTP calls cannot join a weaker transaction.
+Do not use REQUIRES_NEW: ordinary rollback-based controller tests may join their
+test transaction, while committed proofs call the same service without an outer
+transaction.
 
-Resolve transaction propagation and path-converter identity using the concrete
-call sites and test fixtures. Share only the projection/lock concepts actually
-needed by the next leaf. Do not add unused generic transaction abstractions.
-Sizing: target 5 minutes, low confidence because existing rollback-test callers
-and committed publisher transactions differ. Refinement recommended before
-execution; exact propagation/test adaptation is the remaining technical risk.
+For a bound notebook, lock the binding before loading notebook, folders and live
+notes, then select the authoritative Note by ID from that locked notebook state,
+verify its notebook identity and authorize it before persistence. The converted
+Note is only an ID source, never the entity persisted. Missing legacy bindings
+retain the current save path. Keep all `AuthoredNoteDocumentPersistence` effects
+and HTTP wire shapes unchanged. This immediately enables leaf 7; no other web
+mutation or shared persistence caller gains Git behavior.
+Sizing: about 5 minutes, medium confidence after inspecting the concrete
+controller, publisher lock order and rollback/committed test boundaries.
 
-### 7. Accept a supported web save as one atomic Git revision
+### 7. Accept a supported root-note save as one atomic Git revision
 Type: Behavior
 Status: planned
 Proof: committed content-controller → read same Note → bundle tests prove a
-single save, its commit metadata, and its atomic rollback. Data variations cover root/folder paths,
-authored YAML/headings, unauthorized/invalid requests, and pre-existing drift.
+root-note save, its parent and metadata, and atomic rollback after a late binding
+save failure. Existing authorization/validation tests remain green; explicit
+missing-binding and pre-existing-drift fixtures retain web-only saves.
 
-Behavior: the full pre-save projection matches accepted A → ordinary content
-PATCH changes one existing note → accepted B has parent A and exact canonical
-content, with the same Note and learning data, or the whole save rolls back.
+Behavior: the full pre-save projection matches accepted A and the target is an
+existing root Note → ordinary content PATCH changes it → accepted B has parent A
+and the exact canonical root tree with the same Note and learning data, or the
+whole save rolls back.
 
-Import the stored bundle, reuse canonical tree writing to append one commit,
-and persist its binding within leaf 6's transaction. Keep the trusted stored
-bundle error path distinct from client-proposal validation. Close repositories
-and inserters synchronously. Detect pre-existing drift explicitly before save:
-preserve old web-only behavior there without changing the accepted bundle.
-Do not catch a failed eligible Git update and pretend the notebook was drifted.
+Within leaf 6's transaction, compare the full pre-save projection explicitly;
+missing binding or genuine drift selects the existing web-only path without
+repair. For an eligible save, persist through the existing authored-document
+helper, rebuild the canonical tree, import the trusted stored bundle, append one
+commit on accepted A with the Donut system identity/content-edit message/testable
+timestamp, write the reachable bundle, and save the binding. Keep stored-bundle
+corruption distinct from invalid client proposals and let it propagate. Close
+repositories and inserters synchronously. A late binding-save failure must roll
+back Note content, timestamp, derived references/orphan effects and binding; do
+not downgrade a failed eligible update to web-only.
 
 Replace existing tests that expect an ordinary eligible content edit to leave
 Git stale: publication against old A now rejects stale ancestry. Preserve
 structural-drift cases and messages appropriate to the remaining unsupported
 scope. Update the retained test hook's cleanup comment, without changing its
 setup-only behavior or introducing a production call.
-Sizing: target 5 minutes, low confidence. The new append operation and precise
-replacement scope may exceed the target; refinement recommended after leaf 6's
-transaction choice is made. Atomicity is indivisible and must be proven before
-this behavior is considered delivered; do not defer rollback to a later leaf.
+Sizing: target 5–10 minutes, medium confidence because leaf 6 removes the
+transaction uncertainty and this leaf has one committed atomicity proof loop.
+The backend suite runtime is the stated sizing exception; refine again if the
+append implementation itself does not converge. Atomic rollback stays in this
+leaf and may not be deferred.
 
-### 8. Avoid a new revision for unchanged Portable content
+### 8. Preserve folder paths and authored Markdown in web revisions
+Type: Behavior
+Status: planned
+Proof: committed PATCH/read/bundle data variations for a folder-contained Note
+and authored frontmatter/headings assert the exact Portable path/content and
+unchanged Note identity; the retained clone fixture regression remains green.
+
+Behavior: the full pre-save projection matches accepted A and the target Note
+is folder-contained or carries valid authored YAML/headings → ordinary content
+PATCH → accepted B preserves that exact Portable path and canonical authored
+content without recreating the Note.
+
+Exercise leaf 7's real controller and bundle path; do not add a second append or
+revision model. Include both root and folder paths across the compact data set,
+retain learning data/identity, and keep authored metadata out of the Portable
+tree. Update only stale fixture-hook wording and run the named CLI clone feature
+regression because this leaf closes the retained-fixture promise.
+Sizing: 3–5 minutes, medium confidence; one data-variation proof loop plus the
+explicit focused E2E runtime exception.
+
+### 9. Avoid a new revision for unchanged Portable content
 Type: Behavior
 Status: planned
 Proof: content PATCH with unchanged canonical content keeps accepted SHA and
@@ -308,7 +340,7 @@ Compare canonical trees, not raw request bytes, because web validation may
 normalize typed Markdown. Retain existing non-Portable save effects.
 Sizing: 3–5 minutes, medium confidence.
 
-### 9. Continue accepted history across web and local editing
+### 10. Continue accepted history across web and local editing
 Type: Behavior
 Status: planned
 Proof: committed controller round trip A → web B → publish C → web D checks
@@ -323,7 +355,7 @@ manually changed binding. Fix any web-append assumption limited to root-only
 history; share no independent revision model. CLI accumulation is proven in 5.
 Sizing: about 5 minutes, medium confidence; one alternating-history loop.
 
-### 10. Keep competing accepted writers in one linear history
+### 11. Keep competing accepted writers in one linear history
 Type: Behavior
 Status: planned
 Proof: controlled committed races through real content/publish controller
@@ -372,9 +404,8 @@ harness; refine if adapting that harness becomes a separable preparation beat.
 
 ## Readiness
 
-Refinement recommended: leaves 6–7. Each names one immediate structure or
-observable outcome, but the exact transaction entry point and the compact
-Git-append integration still have low sizing confidence. Other leaves have
-one focused proof path using existing seams; timings are hypotheses. Do not
-execute this plan merely because it was written: this request authorizes
-refinement and planning only.
+Ready after in-place refinement. Leaf 6 now names the concrete transaction and
+authoritative-entity boundary; former leaf 7 is split into the indivisible
+root-note atomic save (7) and a separate folder/authored-content variation (8).
+Remaining leaves each have one proof loop; backend and focused E2E runtimes are
+explicit sizing exceptions rather than reasons to enlarge implementation scope.
