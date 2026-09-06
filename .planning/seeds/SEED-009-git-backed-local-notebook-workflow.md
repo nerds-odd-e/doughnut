@@ -187,6 +187,9 @@ and receive again. Existing notes retain their identity and learning data.
 
 ### 4. Create a new note locally
 
+**Status:** delivered. The completed quick plan was removed; implementation and
+proof remain recoverable from Git history.
+
 **Goal**
 
 A notebook owner who discovers a new concept while working in Obsidian or an
@@ -235,47 +238,6 @@ for growing a notebook even if deletion, moves, and divergence are deferred.
   rebase/conflict handling. [Story 11](#story-11) owns multiple additions and
   mixed additions/edits in one commit. Stories 5–9 retain their outcomes.
   Existing single-note content publication remains supported.
-
-**Key examples**
-
-1. **Create and continue editing:** From a clean checkout at accepted `main`,
-   add `Gravity.md` with `type: Note`, an authored `title: My explanation`,
-   and a Markdown body; commit and publish → Donut shows one new note named
-   `Gravity`, preserves the YAML title and body, and accepts that commit.
-   A subsequent supported content edit updates this same new note; another
-   eligible checkout can pull the accepted file.
-2. **Existing folder:** `Physics/` already exists in the accepted tree; add
-   only `Physics/Inertia.md` and publish → the new note appears in that folder.
-   Under this boundary, the same addition with a missing `Physics/`
-   folder is rejected with guidance that folder creation is unsupported.
-3. **Copy has new identity:** An existing learned note remains unchanged; copy
-   its Markdown to a new valid path and publish only the addition → both notes
-   exist, and the original's learning history stays with the original.
-4. **Invalid file:** Add a note with missing `type`, malformed YAML, or an
-   invalid/reserved note name and publish → report the offending path and
-   reason, create no note, and leave both accepted history and local work intact.
-5. **Competing destination:** After the local addition is committed, remote
-   content changes or the destination becomes occupied → publication rejects
-   the stale or conflicting proposal without overwriting a note. The user
-   retains the local commit; automatic reconciliation is deferred.
-6. **Unsupported combination:** Add a note while also editing or deleting an
-   existing file in the same commit → reject the whole proposal with guidance
-   to separate supported changes; do not partially create the new note.
-7. **Repeat publication:** The addition was accepted but the owner repeats
-   publication of the same head → report success with the same accepted head
-   and still exactly one new note.
-
-**Current decisions**
-
-The developer approved this scope, including one added note per commit, and
-identified multiple additions and mixed additions/edits as a follow-up story.
-Creating new parent folders remains excluded.
-
-- **Effort hypothesis:** M — low confidence; assumes the basic publish boundary
-  from Story 2 can distinguish a valid addition from a content update.
-- **Depends on:** Story 2.
-- **Safe stopping point:** One local addition becomes a usable Donut note;
-  unsupported structural changes still reject atomically.
 
 <a id="story-5"></a>
 
