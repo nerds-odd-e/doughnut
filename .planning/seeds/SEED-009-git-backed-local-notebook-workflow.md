@@ -320,15 +320,14 @@ and receive again. Existing notes retain their identity and learning data.
 
 ## Ordering and Scope Reduction
 
-Stories 1 and 2 delivered the automatic local baseline and the user's
-highest-value workflow: refine locally, then publish. Story 3 next closes the
-clean sequential loop in the opposite direction. Stories 4 and 5 complete the
-basic file lifecycle. Stories 6 and 7 address the identity-preservation risk
-unique to Donut. Stories 8 and 9 then add accumulated divergence and conflict
-handling on top of two already working directions. Story 10 is last because
-commit batching improves history quality but is not required for safe
-synchronization. This is the initial recommended order; the product backlog
-owns subsequent reprioritization.
+Stories 1–3 delivered the automatic local baseline, the user's highest-value
+workflow (refine locally, then publish), and the opposite receive loop. Story 4
+next starts the basic file lifecycle with note creation. Stories 5–7 then cover
+deletion and the identity-preservation risk unique to Donut. Stories 8 and 9
+add accumulated divergence and conflict handling on top of two already working
+directions. Story 10 is last because commit batching improves history quality
+but is not required for safe synchronization. This is the initial recommended
+order; the product backlog owns subsequent reprioritization.
 
 Safe stopping points:
 
@@ -374,7 +373,7 @@ the revision/merge model and adds no Donut metadata to the Portable tree.
 
 ## When to Surface
 
-Stories 1 and 2 are delivered. Select one remaining story from the
+Stories 1–3 are delivered. Select one remaining story from the
 [product backlog](../PRODUCT-BACKLOG.md) before slice planning. Do not turn
 the whole seed into one executable plan. Reconcile the Proposed ADR's v1 CLI
 boundary as a human-owned advice task; it does not change these story outcomes.

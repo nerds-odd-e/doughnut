@@ -136,19 +136,23 @@ code change.
 
 ### 4. Describe Story 3 as delivered everywhere it remains referenced
 Type: Behavior
-Status: planned
-Proof: focused repository searches and diff review show Story 3 absent from the
-unfinished product backlog, Story 4 named as the next candidate, and the
-testability snapshot Javadoc limited to unsupported structural fixture setup.
+Status: done
+Proof: repository searches confirm Story 3 absent from the unfinished product
+backlog (Story 4 is item 1), SEED-009 "Ordering" and "When to Surface" name
+Stories 1–3 as delivered, and `resnapshotForTestability` Javadoc describes the
+remaining structural-fixture purpose (Stories 4–7) instead of "Transitional —
+remove once Story 3 ships."
 
 Behavior: a maintainer consults the backlog, SEED-009 ordering, or the retained
 snapshot hook documentation → each surface reports the delivered content-sync
 boundary and remaining structural limitation → no surface instructs them to
 start Story 3 or remove the still-required hook merely because Story 3 shipped.
 
-Update only current-truth wording. Preserve Story 3's delivered Goal/Scope,
-unfinished sibling stories, their anchors, and the snapshot hook's behavior.
-Sizing: 3–5 minutes, high confidence; one documentation/planning truth pass.
+Updated: PRODUCT-BACKLOG.md (Story 3 removed, items renumbered 1–7),
+SEED-009 "Ordering and Scope Reduction" + "When to Surface" (Stories 1–3
+delivered, Story 4 next), `NotebookGitCutoverService.resnapshotForTestability`
+Javadoc (structural-fixture purpose, not transitional). Story 3's delivered
+Goal/Scope, sibling anchors, and hook behavior preserved.
 
 ## Readiness
 

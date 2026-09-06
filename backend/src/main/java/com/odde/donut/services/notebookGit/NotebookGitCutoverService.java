@@ -63,10 +63,11 @@ public class NotebookGitCutoverService {
 
   /**
    * Testability-only: replaces {@code notebook}'s existing accepted Git binding with a fresh
-   * snapshot of its current content, as though cutover had just been re-run. Simulates content
-   * changes that happened after the notebook's real cutover, which nothing in production keeps in
-   * sync yet. Transitional — remove once SEED-009 Story 3 keeps bindings current automatically, and
-   * never call this from a production/user-facing path.
+   * snapshot of its current content, as though cutover had just been re-run. Production now keeps
+   * content bindings current for supported Portable content edits (SEED-009 Story 3), so this hook
+   * remains only for fixture setup involving structural changes that production does not yet keep
+   * in sync (folder moves, renames, and other Stories 4–7 cases). Never call this from a
+   * production/user-facing path.
    */
   public NotebookGitBinding resnapshotForTestability(Notebook notebook, Instant snapshotTime) {
     BundleWriteResult written = buildBundle(notebook, snapshotTime);
