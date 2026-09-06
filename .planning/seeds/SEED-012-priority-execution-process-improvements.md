@@ -202,142 +202,63 @@ sibling P1 changes. Preserve the current independent refactor and check-only hoo
 
 ### 5. Enforce the no-edit refactor handoff — P1, small fix
 
-**Status:** Installed 2026-09-06. Four supplied instruction replays passed;
-`wrap-up.md` shortened from 557 to 547 words. Independent refactor made no edits
-and skipped tests. Live effectiveness is not claimed.
-Execution: [Enforce decide-first refactor handoffs](../quick/015-enforce-decide-first-refactor-handoffs/PLAN.md).
+**Status:** Installed 2026-09-06 in `4253b3b954`. Four supplied instruction
+replays passed; `wrap-up.md` word count 557 → 547. Independent refactor made no
+edits and skipped tests. Live effectiveness is not claimed.
 
 **Goal:** Avoid unnecessary test runs caused by coordinator-generated refactor
 instructions while retaining independent review and proof for refactor edits.
 
-**Evidence:** A no-edit web-note receive refactor reran all 2,180 backend tests
-because its delegation requested no-change confirmation. The existing refactor
-skill already forbids that; the gap is applying it at delegation and return.
-
-**Scope:** In `execute-plan/references/wrap-up.md`, replace the current refactor
-delegation/acceptance wording with one concise source clause: decide first;
-no edits means no tests and `skipped — no refactor edits`; edits mean only
-invalidated focused proof, with a reason for any replacement command. The
-coordinator uses that clause without contradictory additions and checks the
-existing handoff for consistency, not just its completion marker.
-
-Correct a contradictory prompt before dispatch. If an unnecessary run already
-occurred, report the deviation honestly and reuse otherwise valid evidence;
-do not rerun review/tests just to obtain a compliant-looking handoff. Actual
-failures still follow existing diagnosis rules. Explicit developer-requested
-verification remains authoritative; this concerns routine refactor delegation.
-
-Replace repetition so this document becomes shorter under the seed's concision
-constraint. Preserve prior acceptance/staging safeguards and the refactor skill's
-existing policy; no change to `post-change-refactor/SKILL.md` is needed.
-
-**Exclusions:** No prompt generator/parser, new agent, handoff schema, test runner,
-review stage, full-suite policy change, Pygardon rollout, or sibling P1 work.
-Independent refactor, formatting, and hook ownership stay in place.
-
-**Key examples:**
-
-| Situation | Required outcome |
-|---|---|
-| Routine draft prompt adds “run the full suite to confirm a no-change review.” | Remove the contradiction before dispatch; retain the canonical decide-first clause. |
-| Review reports no edits and `skipped — no refactor edits`. | Accept the consistent handoff without running tests. |
-| Refactor edits invalidate proof A but leave B valid. | Rerun A, reuse B; explain a focused replacement if A's boundary moved. |
-| A no-edit review already ran tests unnecessarily. | Record the deviation, preserve valid proof, and correct future delegation; do not claim compliance or repeat the run. |
-
-**Evaluation / ROI:** Replay these four handoffs/prompts without real test runs.
-Report before/after word counts and preserve existing obligations in review.
-Observe the next ordinary refactor for live effectiveness; no dedicated product
-exercise or monitor. No unresolved scope decision blocks slice planning.
+**Scope:** The existing `execute-plan/references/wrap-up.md` delegation and return
+steps enforce decide-first proof, correct contradictory additions, and inspect
+handoff consistency. No edits means no tests; edits rerun only invalidated focused
+proof, explaining replacements. Prior unnecessary runs are reported as deviations
+without repeated verification or concealed failures. Explicit developer verification,
+acceptance, staging, independent refactor, formatting, and hook ownership remain.
+No new agent, schema, runner, review stage, full-suite policy, or Pygardon rollout.
 
 <a id="story-6"></a>
 
 ### 6. Recover observer shutdown after compaction — conditional P1
 
-**Status:** Installed 2026-09-06. Five focused lifecycle/stream tests passed,
-including durable-note recovery, exact cooperative stop, retained failure evidence,
-and an unaffected second observer. Missing identity/evidence instruction replays
-remain unresolved. Adapter word count: 717 → 633. Real compaction is not claimed.
-**Trigger:** Deliver before another long unattended Doughnut execution.
+**Status:** Installed 2026-09-06 in `99870b8e88`. Five focused lifecycle/stream
+tests passed, including saved-note recovery, exact cooperative stop, preserved
+failure evidence, and a live second observer. Missing identity/evidence replays
+require an unresolved report. Adapter word count 717 → 633. Real compaction and
+broader recovery effectiveness are not claimed.
 
 **Goal:** Let the coordinator close its exact CI observer and retain an honest
 coverage receipt when Codex's volatile cell/session handles are unavailable.
 
-**Evidence:** Web-note receive closeout lost its handles; terminating the cell
-left the stream subprocess running and its terminal receipt unavailable. The
-mailbox already persists events/results and supports `stop DIRECTORY`.
-
-**Scope:** Reuse that cooperative stop command. Retain the initial mailbox
-directory and stream PID in the existing execution PLAN, tied to its coordinator
-and checkout. Add PID to the stream's existing startup receipt; create no new
-registry. After handle loss, recover the exact saved directory, validate its
-checkout/request, stop that mailbox, verify the recorded process exits within a
-bounded local wait, and report terminal evidence with `pendingCi: unobserved`.
-Preserve recorded failures; do not start a replacement merely to shut it down.
-
-If identity is missing/mismatched, or completion/exit cannot be established,
-report unresolved shutdown or missing evidence. Do not guess by newest mailbox,
-scan for a process to kill, or infer green CI. The recovered path uses PID only
-for exit confirmation, not termination; keep ordinary saved-handle shutdown.
-
-**Exclusions:** Automatic discovery of older unidentified observers, forced
-termination of stuck streams, repair scheduling/resumption, delivery-acknowledgment
-redesign, other hosts, and new monitoring infrastructure. This selects only the
-shutdown subset of [SEED-011 Story 2](SEED-011-efficient-ci-failure-attention.md#story-2).
-Other repair work stays deferred. Shorten the changed Codex adapter instructions.
-
-**Key examples:** Saved identity plus lost volatile handles → exact mailbox
-stops, process exits, and its persisted failure/coverage receipt remains usable;
-another observer stays running. Missing or mismatched identity → no guessed
-stop. Missing terminal evidence or unconfirmed exit → explicit unresolved result,
-without a replacement observer or broad kill.
-
-**Evaluation:** Extend the existing Codex process-lifecycle proof with real
-local subprocesses and fake GitHub input. Discard the coordinator handle map;
-recover only from the durable note. No live GitHub run or actual context
-compaction is required. This demonstrates recovery mechanics, not a general
-cross-context repair system. No unresolved scope decision blocks planning.
+**Scope:** Stream receipts include PID; the existing PLAN retains directory/PID,
+coordinator, and checkout. Lost-handle shutdown validates that note and request,
+uses the existing cooperative mailbox stop, confirms recorded PID exit within a
+finite wait, and preserves terminal/failure evidence and unobserved CI coverage.
+Missing identity or evidence remains unresolved. Normal saved-handle and other-host
+policies remain. No PID signals on recovery, guessed discovery, replacement launch,
+forced termination, new registry, acknowledgment changes, or repair scheduler.
+Older unidentified observers and SEED-011's remaining repair work stay deferred.
 
 <a id="story-7"></a>
 
 ### 7. Prove uncertain storage assumptions before implementation — conditional P1
 
-**Status:** Installed 2026-09-06. Three supplied readiness replays passed:
-uncertain DDL and transaction visibility require relevant isolated proof; known
-behavior or matching evidence proceeds without a new experiment. Skill word count:
-630 → 536. No database experiment or live effectiveness claim.
-**Trigger:** Apply the readiness check when a proposed transaction/destructive
-migration has a concrete unresolved engine or fixture-ownership assumption.
+**Status:** Installed 2026-09-06 in `f4e9e290e5`. Three supplied readiness replays
+passed: uncertain DDL and transaction visibility require relevant isolated proof;
+known behavior or matching evidence needs no experiment. Skill word count 630 → 536.
+No database experiment or live effectiveness claim.
 
-**Goal:** Avoid an implementation attempt based on an unproved storage behavior
-without charging routine migrations for a generic research phase.
+**Goal:** Avoid implementation based on unproved storage behavior without charging
+routine migrations for generic research.
 
-**Evidence:** Doughnut reversed work involving rollback fixtures and
-`REQUIRES_NEW`; Pygardon tried invalid DuckDB DDL sequences before a small
-experiment identified a viable one.
-
-**Scope:** Tighten `slice-planning`'s existing execution-context check. Name the
-specific uncertain DDL/transaction behavior and critical postcondition. Reuse
-applicable existing evidence first; otherwise obtain one isolated representative
-proof using the relevant engine/version and transaction semantics before calling
-the affected work ready. Keep assumption, literal command, version, observation,
-and result compactly in its existing PLAN. Failed proof informs the plan rather
-than a speculative implementation attempt. Shorten the changed skill document.
-
-**Exclusions:** No current database experiments or migration changes in this
-process improvement; no mandatory spike, new test framework, fixture overhaul,
-exhaustive migration matrix, or shared/production-database manipulation. Routine
-known behavior needs no extra check. Pygardon rollout and sibling changes stay out.
-
-**Key examples:** Uncertain rename/FK semantics without evidence → require a
-throwaway proof of that sequence and a representative later parent update;
-uncertain rollback-fixture visibility to `REQUIRES_NEW` → prove the actual
-transaction ownership with isolated data before broad migration; matching
-existing evidence or routine known behavior → reuse/continue without a new run.
-
-**Evaluation:** Replay those three readiness decisions using supplied evidence.
-Judge live value at the next naturally occurring matching storage change;
-do not manufacture one for this instruction update. No unresolved scope decision
-blocks planning.
+**Scope:** `slice-planning` checks concrete unresolved storage assumptions, reuses
+matching evidence, or requires isolated representative proof before affected work
+is ready. DDL covers the exact sequence and a later parent update; fixture proof
+covers actual transaction ownership/visibility. The existing PLAN records assumption,
+engine/version, literal command, observed critical postcondition, and result.
+Failed proof changes the plan; routine known behavior needs no new run. No invented
+uncertainty, current database experiment, shared/production mutation, mandatory spike,
+fixture overhaul, new framework, Pygardon rollout, or sibling changes.
 
 ## Evaluation and provenance
 
