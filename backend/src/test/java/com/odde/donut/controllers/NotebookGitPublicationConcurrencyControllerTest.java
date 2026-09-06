@@ -4,9 +4,9 @@ import static com.odde.donut.testability.CommittedTransactionTestSupport.inCommi
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasSize;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.hamcrest.Matchers.is;
 
+import com.odde.donut.controllers.dto.NoteRealm;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookGitBinding;
@@ -14,172 +14,171 @@ import com.odde.donut.services.notebookGit.NotebookGitProposalBlobText;
 import com.odde.donut.testability.GitBundleTestReader;
 import java.util.List;
 import java.util.concurrent.Callable;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.CyclicBarrier;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 import org.eclipse.jgit.internal.storage.dfs.DfsRepositoryDescription;
 import org.eclipse.jgit.internal.storage.dfs.InMemoryRepository;
 import org.eclipse.jgit.lib.ObjectId;
+import org.eclipse.jgit.revwalk.RevCommit;
+import org.eclipse.jgit.revwalk.RevWalk;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.TransactionDefinition;
-import org.springframework.transaction.support.TransactionTemplate;
-import org.springframework.web.context.request.RequestAttributes;
-import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.server.ResponseStatusException;
 
-/** Verifies that publications competing from one accepted head cannot overwrite each other. */
-class NotebookGitPublicationConcurrencyControllerTest extends NotebookGitBundleControllerTestBase {
+/** Verifies that web saves and publications share one serialized accepted-writer contract. */
+class NotebookGitPublicationConcurrencyControllerTest
+    extends NotebookGitWebContentControllerTestBase {
 
-  private static final String ACCEPTED_CONTENT = "---\ntype: Note\n---\naccepted content";
-  private static final String FIRST_CONTENT = "---\ntype: Note\n---\nfirst publication";
-  private static final String SECOND_CONTENT = "---\ntype: Note\n---\nsecond publication";
+  private static final String NOTE_PATH = "note.md";
+  private static final String FIRST_WEB_CONTENT = "---\ntype: Note\n---\nfirst web edit";
+  private static final String SECOND_WEB_CONTENT = "---\ntype: Note\n---\nsecond web edit";
+  private static final String PUBLISHED_CONTENT = "---\ntype: Note\n---\npublished edit";
+  private static final String AFTER_PUBLICATION_CONTENT =
+      "---\ntype: Note\n---\nweb edit after publication";
 
   @Test
-  void competingDirectChildrenProduceOneAcceptedWinner() throws Exception {
+  void twoQueuedWebSavesAppendInAcceptedOrder() throws Exception {
+    Fixture fixture = fixture();
+
+    NotebookGitConcurrentWriterTestSupport.Result<NoteRealm, NoteRealm> race =
+        queuedWriters(
+            fixture.notebook().getId(),
+            () -> saveContent(fixture.note().getId(), FIRST_WEB_CONTENT),
+            () -> saveContent(fixture.note().getId(), SECOND_WEB_CONTENT));
+
+    assertThat(race.first().getNote().getContent(), is(FIRST_WEB_CONTENT));
+    assertThat(race.second().getNote().getContent(), is(SECOND_WEB_CONTENT));
+    assertAcceptedHistory(
+        fixture,
+        List.of(SECOND_WEB_CONTENT, FIRST_WEB_CONTENT, ACCEPTED_CONTENT),
+        SECOND_WEB_CONTENT);
+  }
+
+  @Test
+  void webSaveQueuedFirstMakesTheCompetingPublicationStale() throws Exception {
+    Fixture fixture = fixture();
+    Proposal proposal = proposal(fixture.acceptedBinding(), PUBLISHED_CONTENT);
+
+    NotebookGitConcurrentWriterTestSupport.Result<NoteRealm, PublicationAttempt> race =
+        queuedWriters(
+            fixture.notebook().getId(),
+            () -> saveContent(fixture.note().getId(), FIRST_WEB_CONTENT),
+            () -> publish(fixture, proposal));
+
+    assertThat(race.first().getNote().getContent(), is(FIRST_WEB_CONTENT));
+    assertThat(race.second().acceptedHead(), is((String) null));
+    assertThat(race.second().rejection().getStatusCode(), is(HttpStatus.CONFLICT));
+    assertThat(
+        race.second().rejection().getReason(), containsString("expectedHead no longer matches"));
+    assertAcceptedHistory(fixture, List.of(FIRST_WEB_CONTENT, ACCEPTED_CONTENT), FIRST_WEB_CONTENT);
+  }
+
+  @Test
+  void publicationQueuedFirstBecomesTheParentOfTheCompetingWebSave() throws Exception {
+    Fixture fixture = fixture();
+    Proposal proposal = proposal(fixture.acceptedBinding(), PUBLISHED_CONTENT);
+
+    NotebookGitConcurrentWriterTestSupport.Result<PublicationAttempt, NoteRealm> race =
+        queuedWriters(
+            fixture.notebook().getId(),
+            () -> publish(fixture, proposal),
+            () -> saveContent(fixture.note().getId(), AFTER_PUBLICATION_CONTENT));
+
+    assertThat(race.first().rejection(), is((ResponseStatusException) null));
+    assertThat(race.first().acceptedHead(), is(proposal.head().getName()));
+    assertThat(race.second().getNote().getContent(), is(AFTER_PUBLICATION_CONTENT));
+    assertAcceptedHistory(
+        fixture,
+        List.of(AFTER_PUBLICATION_CONTENT, PUBLISHED_CONTENT, ACCEPTED_CONTENT),
+        AFTER_PUBLICATION_CONTENT);
+  }
+
+  private Fixture fixture() throws Exception {
     Notebook notebook = createGitBackedNotebook();
     Note note = makeMe.aNote().notebook(notebook).title("note").content(ACCEPTED_CONTENT).please();
     NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);
-    Proposal first = proposal(binding, FIRST_CONTENT);
-    Proposal second = proposal(binding, SECOND_CONTENT);
-    RequestAttributes requestAttributes = RequestContextHolder.currentRequestAttributes();
-    CountDownLatch bindingLocked = new CountDownLatch(1);
-    CountDownLatch releaseBinding = new CountDownLatch(1);
-    CyclicBarrier startTogether = new CyclicBarrier(2);
-    ExecutorService executor = Executors.newFixedThreadPool(3);
+    return new Fixture(
+        notebook, note, binding, ObjectId.fromString(binding.getAcceptedGitObjectId()));
+  }
 
+  private NoteRealm saveContent(Integer noteId, String content) throws Exception {
+    Note note = noteRepository.findById(noteId).orElseThrow();
+    return textContentController.updateNoteContent(note, contentDto(content));
+  }
+
+  private PublicationAttempt publish(Fixture fixture, Proposal proposal) throws Exception {
     try {
-      Future<?> lockHolder =
-          executor.submit(
-              () -> {
-                TransactionTemplate transaction = new TransactionTemplate(transactionManager);
-                transaction.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
-                transaction.executeWithoutResult(
-                    ignored -> {
-                      notebookGitBindingRepository
-                          .findByNotebookIdForUpdate(notebook.getId())
-                          .orElseThrow();
-                      bindingLocked.countDown();
-                      await(releaseBinding);
-                    });
-              });
-      await(bindingLocked);
-      Future<PublicationAttempt> firstAttempt =
-          executor.submit(
-              publishAfterBarrier(requestAttributes, startTogether, notebook, binding, first));
-      Future<PublicationAttempt> secondAttempt =
-          executor.submit(
-              publishAfterBarrier(requestAttributes, startTogether, notebook, binding, second));
-
-      assertThrows(TimeoutException.class, () -> firstAttempt.get(250, TimeUnit.MILLISECONDS));
-      assertThrows(TimeoutException.class, () -> secondAttempt.get(250, TimeUnit.MILLISECONDS));
-      releaseBinding.countDown();
-      lockHolder.get(10, TimeUnit.SECONDS);
-
-      List<PublicationAttempt> attempts =
-          List.of(firstAttempt.get(10, TimeUnit.SECONDS), secondAttempt.get(10, TimeUnit.SECONDS));
-      List<PublicationAttempt> accepted =
-          attempts.stream().filter(attempt -> attempt.acceptedHead() != null).toList();
-      List<PublicationAttempt> rejected =
-          attempts.stream().filter(attempt -> attempt.rejection() != null).toList();
-
-      assertThat(accepted, hasSize(1));
-      assertThat(rejected, hasSize(1));
-      assertThat(rejected.getFirst().rejection().getStatusCode(), equalTo(HttpStatus.CONFLICT));
-      assertThat(
-          rejected.getFirst().rejection().getReason(),
-          containsString("expectedHead no longer matches"));
-
-      Proposal winner =
-          List.of(first, second).stream()
-              .filter(
-                  proposal -> proposal.head().getName().equals(accepted.getFirst().acceptedHead()))
-              .findFirst()
-              .orElseThrow();
-      PublishedState publishedState =
-          inCommittedTransaction(
-              transactionManager,
-              () -> {
-                NotebookGitBinding reloadedBinding =
-                    notebookGitBindingRepository.findByNotebook_Id(notebook.getId()).orElseThrow();
-                Note reloadedNote = noteRepository.findById(note.getId()).orElseThrow();
-                return new PublishedState(
-                    reloadedBinding.getAcceptedGitObjectId(), reloadedNote.getContent());
-              });
-      assertThat(publishedState.acceptedHead(), equalTo(winner.head().getName()));
-      assertThat(publishedState.noteContent(), equalTo(winner.content()));
-
-      Notebook reloadedNotebook =
-          inCommittedTransaction(
-              transactionManager,
-              () -> notebookRepository.findById(notebook.getId()).orElseThrow());
-      ResponseEntity<byte[]> downloaded = controller.downloadNotebookGitBundle(reloadedNotebook);
-      try (InMemoryRepository readBack = new InMemoryRepository(new DfsRepositoryDescription())) {
-        ObjectId downloadedHead = GitBundleTestReader.fetchHead(readBack, downloaded.getBody());
-        assertThat(downloadedHead, equalTo(winner.head()));
-        assertThat(
-            NotebookGitProposalBlobText.readUtf8(readBack, downloadedHead, "note.md"),
-            equalTo(winner.content()));
-      }
-    } finally {
-      releaseBinding.countDown();
-      executor.shutdownNow();
-      executor.awaitTermination(10, TimeUnit.SECONDS);
+      String head =
+          controller.publishNotebookGitProposal(
+              fixture.notebook().getId(),
+              fixture.acceptedBinding().getAcceptedGitObjectId(),
+              proposal.bundleBytes());
+      return new PublicationAttempt(head, null);
+    } catch (ResponseStatusException rejection) {
+      return new PublicationAttempt(null, rejection);
     }
   }
 
-  private Callable<PublicationAttempt> publishAfterBarrier(
-      RequestAttributes requestAttributes,
-      CyclicBarrier barrier,
-      Notebook notebook,
-      NotebookGitBinding binding,
-      Proposal proposal) {
-    return () -> {
-      RequestContextHolder.setRequestAttributes(requestAttributes);
-      try {
-        barrier.await(10, TimeUnit.SECONDS);
-        try {
-          String publishedHead =
-              controller.publishNotebookGitProposal(
-                  notebook.getId(), binding.getAcceptedGitObjectId(), proposal.bundleBytes());
-          return new PublicationAttempt(publishedHead, null);
-        } catch (ResponseStatusException rejection) {
-          return new PublicationAttempt(null, rejection);
+  private <F, S> NotebookGitConcurrentWriterTestSupport.Result<F, S> queuedWriters(
+      Integer notebookId, Callable<F> firstCall, Callable<S> secondCall) throws Exception {
+    return NotebookGitConcurrentWriterTestSupport.runInQueuedOrder(
+        transactionManager, notebookGitBindingRepository, notebookId, firstCall, secondCall);
+  }
+
+  private void assertAcceptedHistory(
+      Fixture fixture, List<String> newestToOldestContent, String expectedDatabaseContent)
+      throws Exception {
+    AcceptedState state =
+        inCommittedTransaction(
+            transactionManager,
+            () -> {
+              NotebookGitBinding binding =
+                  notebookGitBindingRepository
+                      .findByNotebook_Id(fixture.notebook().getId())
+                      .orElseThrow();
+              Note note = noteRepository.findById(fixture.note().getId()).orElseThrow();
+              return new AcceptedState(
+                  binding.getAcceptedGitObjectId(), binding.getBundleBytes(), note.getContent());
+            });
+    assertThat(state.databaseContent(), is(expectedDatabaseContent));
+
+    try (InMemoryRepository repository = new InMemoryRepository(new DfsRepositoryDescription())) {
+      ObjectId head = GitBundleTestReader.fetchHead(repository, state.bundleBytes());
+      assertThat(head.getName(), is(state.acceptedHead()));
+      try (RevWalk revWalk = new RevWalk(repository)) {
+        RevCommit commit = revWalk.parseCommit(head);
+        for (int index = 0; index < newestToOldestContent.size(); index++) {
+          String expectedContent = newestToOldestContent.get(index);
+          assertThat(
+              NotebookGitProposalBlobText.readUtf8(repository, commit, NOTE_PATH),
+              is(expectedContent));
+          if (index == newestToOldestContent.size() - 1) {
+            assertThat(commit.getId(), equalTo(fixture.acceptedHead()));
+            assertThat(commit.getParentCount(), is(0));
+          } else {
+            assertThat(commit.getParentCount(), is(1));
+            commit = revWalk.parseCommit(commit.getParent(0));
+          }
         }
-      } finally {
-        RequestContextHolder.resetRequestAttributes();
       }
-    };
+      assertThat(
+          NotebookGitProposalBlobText.readUtf8(repository, head, NOTE_PATH),
+          is(state.databaseContent()));
+    }
   }
 
   private Proposal proposal(NotebookGitBinding binding, String content) throws Exception {
     byte[] bundleBytes =
-        proposalBundleBytes(binding, List.of(new NotebookGitProposalFile("note.md", content)));
+        proposalBundleBytes(binding, List.of(new NotebookGitProposalFile(NOTE_PATH, content)));
     try (InMemoryRepository repository = new InMemoryRepository(new DfsRepositoryDescription())) {
-      return new Proposal(
-          bundleBytes, GitBundleTestReader.fetchHead(repository, bundleBytes), content);
+      return new Proposal(bundleBytes, GitBundleTestReader.fetchHead(repository, bundleBytes));
     }
   }
 
-  private static void await(CountDownLatch latch) {
-    try {
-      if (!latch.await(10, TimeUnit.SECONDS)) {
-        throw new AssertionError("Timed out waiting for test coordination");
-      }
-    } catch (InterruptedException exception) {
-      Thread.currentThread().interrupt();
-      throw new RuntimeException(exception);
-    }
-  }
+  private record Fixture(
+      Notebook notebook, Note note, NotebookGitBinding acceptedBinding, ObjectId acceptedHead) {}
 
-  private record Proposal(byte[] bundleBytes, ObjectId head, String content) {}
+  private record Proposal(byte[] bundleBytes, ObjectId head) {}
 
   private record PublicationAttempt(String acceptedHead, ResponseStatusException rejection) {}
 
-  private record PublishedState(String acceptedHead, String noteContent) {}
+  private record AcceptedState(String acceptedHead, byte[] bundleBytes, String databaseContent) {}
 }

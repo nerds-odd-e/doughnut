@@ -378,7 +378,7 @@ each transition.
 
 ### 11. Keep competing accepted writers in one linear history
 Type: Behavior
-Status: planned
+Status: done
 Proof: controlled committed races through real content/publish controller
 boundaries; assert the accepted bundle parent chain and matching DB projection.
 
@@ -394,6 +394,10 @@ history. Keep unsupported structural-race rejection coverage. Any discovered
 atomicity hole must be fixed here, not documented as a passing safety result.
 Sizing: about 5 minutes, medium confidence from the existing committed race
 harness; refine if adapting that harness becomes a separable preparation beat.
+Learning: the existing serialized binding lock already forms one accepted-writer
+contract. Deterministic committed races show two web saves append in queue
+order, web-first makes a competing proposal stale, and publish-first becomes
+the next web save's parent, with the final database projection matching Git.
 
 ## Verification and delivery
 
