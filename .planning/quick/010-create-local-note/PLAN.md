@@ -215,7 +215,7 @@ and focused placement variations. About five minutes, medium confidence.
 
 ### 5. Give copied content a fresh identity
 Type: Behavior
-Status: planned
+Status: done
 Proof: Publication exposes distinct original/copy note IDs; the original keeps
 its tracker, question, and conversation associations and the copy inherits none.
 
@@ -460,6 +460,9 @@ The broader follow-up commit scope remains outside this plan.
 
 ## Refinement learnings
 
+- The existing creation branch already gives copied Markdown a fresh identity;
+  controller proof confirms trackers, MCQs, and conversations remain private
+  to the original note without additional production logic.
 - Folder additions resolve the full parent Portable path against current
   folders and require that path to contain accepted Portable content; root,
   nested, readme-only, and repeated-basename cases share the creation branch.
