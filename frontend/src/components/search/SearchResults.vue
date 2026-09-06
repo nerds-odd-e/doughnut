@@ -28,6 +28,7 @@
           :search-hits="visibleHits"
           :notebook-id="notebookId"
           @keydown="onListKeydown"
+          @navigate="emit('navigate')"
         >
           <template #button="{ searchResult: result }">
             <slot name="button" :note-search-result="result" />
@@ -115,6 +116,7 @@ const allMyNotebooksAndSubscriptions = defineModel<boolean>(
 const allMyCircles = defineModel<boolean>("allMyCircles", { default: false })
 
 const emit = defineEmits<{
+  navigate: []
   keydown: [event: KeyboardEvent]
 }>()
 

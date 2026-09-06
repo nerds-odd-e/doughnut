@@ -111,6 +111,7 @@
       v-model:all-my-notebooks-and-subscriptions="allMyNotebooksAndSubscriptions"
       v-model:all-my-circles="allMyCircles"
       @keydown="onSearchDialogKeydown"
+      @navigate="modalCloser?.()"
     >
       <template v-if="noteId" #button="{ noteSearchResult }">
         <button

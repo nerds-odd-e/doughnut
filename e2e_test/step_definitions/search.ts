@@ -20,6 +20,18 @@ When('I enable semantic search', () => {
   start.assumeNoteTargetSearchDialog().enableSemanticSearch()
 })
 
+When('I search from the current note', () => {
+  start.assumeNotePage().toolbarButton('search note').click()
+})
+
+When('I open the search result {string}', (title: string) => {
+  start.assumeNoteTargetSearchDialog().openResult(title)
+})
+
+Then('the note search dialog should be closed', () => {
+  start.assumeNoteTargetSearchDialog().expectClosed()
+})
+
 Then(
   'I should see {string} as the possible duplicate',
   (noteTopicsAsString: string) => {

@@ -9,6 +9,7 @@
       v-for="searchHit in searchHits"
       :key="relationshipLiteralSearchHitKey(searchHit)"
       v-bind="{ searchHit, notebookId }"
+      @navigate="$emit('navigate')"
     >
       <template
         #button
@@ -65,6 +66,7 @@ defineProps({
 })
 
 defineEmits<{
+  navigate: []
   keydown: [event: KeyboardEvent]
 }>()
 </script>

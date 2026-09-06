@@ -18,6 +18,23 @@ Feature: Search notes
       | Pam        |                 |
 
   @mockBrowserTime
+  Scenario: Opening the current note from Recent reveals its content
+    When I route to the note "Sedation"
+    And I search from the current note
+    And I open the search result "Sedation"
+    Then the note search dialog should be closed
+    And the note content on the current page should be "Put to sleep"
+
+  @mockBrowserTime
+  Scenario: Opening the current note from Matches reveals its content
+    When I route to the note "Sedation"
+    And I search from the current note
+    And I search for "Sedation" in all notebooks
+    And I open the search result "Sedation"
+    Then the note search dialog should be closed
+    And the note content on the current page should be "Put to sleep"
+
+  @mockBrowserTime
   Scenario Outline: Search finds matching note titles
     When I start searching notes
     Then I should see "<targets>" as targets only when searching "<search key>"

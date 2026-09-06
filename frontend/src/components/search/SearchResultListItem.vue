@@ -18,6 +18,7 @@
         <NoteTitleWithLink
           v-if="searchHit.hitKind === 'NOTE' && searchHit.noteSearchResult"
           :note-topology="searchHit.noteSearchResult.noteTopology"
+          @click.capture="onTitleNavigation"
         />
         <router-link
           v-else-if="
@@ -33,6 +34,7 @@
             },
           }"
           class="folder-hit-title no-underline"
+          @click.capture="onTitleNavigation"
         >{{ searchHit.folderName }}</router-link>
         <span
           v-else-if="searchHit.hitKind === 'FOLDER'"
@@ -42,6 +44,7 @@
           v-else-if="searchHit.hitKind === 'NOTEBOOK' && searchHit.notebookId != null"
           :to="{ name: 'notebookPage', params: { notebookId: searchHit.notebookId } }"
           class="notebook-hit-title no-underline"
+          @click.capture="onTitleNavigation"
         >{{ searchHit.notebookName }}</router-link>
       </div>
       <div
@@ -97,6 +100,22 @@ const props = defineProps({
   },
   notebookId: { type: Number, default: undefined },
 })
+
+const emit = defineEmits<{ navigate: [] }>()
+
+function onTitleNavigation(event: MouseEvent) {
+  if (
+    event.defaultPrevented ||
+    event.button !== 0 ||
+    event.metaKey ||
+    event.ctrlKey ||
+    event.shiftKey ||
+    event.altKey ||
+    (event.currentTarget as HTMLAnchorElement).target === "_blank"
+  )
+    return
+  emit("navigate")
+}
 
 const kindIcon = computed((): Component => {
   if (props.searchHit.hitKind === "NOTEBOOK") return BookText

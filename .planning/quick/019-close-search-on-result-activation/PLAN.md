@@ -2,7 +2,22 @@
 
 ## Source and goal
 
-Status: planned; ready for direct execution. Planning only; no implementation yet.
+Status: done; verified and prepared for commit/push.
+
+CI observation: initial launch exited before creating an observer because the
+sandbox could not write Nix's fetcher cache (cell 4 ended without a process or
+terminal receipt). Launch with approved cache access succeeded: Codex cell 16,
+PTY session 96168, coordinator root-search-019, repository
+`nerds-odd-e/doughnut`, branch `main`, checkout `/Users/terryyin/git/doughnut`.
+The live cell retains receipt directory/PID and streams CI events. Startup
+failures for runs 34037897374/1 and 34036927991/1–2 predate this execution;
+triage shows the older Cypress 16 `cy.exec()` failures already repaired by
+`cd21aabe7d` with recorded 6/6 focused proof. Run 34037897374/1 separately failed
+dependency setup (`mcp-server postinstall: syncpack: Permission denied`); that
+setup defect remains unresolved, and that run supplies no E2E proof. Neither
+SHA belongs to this execution's pushed history, so the CI repair eligibility
+gate permits bounded search delivery. A recurrence on this execution's revision
+requires the normal repair flow. Pending CI is unobserved until reported.
 
 The user selected both findings from the 2026-09-06 manual UAT for fixes.
 This plan owns finding 2. Finding 1 (access-denial classification) is complete;
@@ -62,7 +77,7 @@ Matches, including a Unicode title. The original report is
 ### 1. Reveal the selected note when search chooses the current route
 
 Type: Behavior
-Status: planned
+Status: done
 Behavior: Global search is open on a note also present in its results → the user
 activates that note's title → search closes and the same note remains visible,
 without a reload or mutation.
@@ -102,6 +117,29 @@ fixture changes cease to be one cohesive beat, or active work exceeds ten minute
 refine this plan in place under the normal learning-escalation rule.
 
 ## Promise ownership and wrap-up
+
+Final automated proof:
+- `CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/note_view/search_note.feature`: 6/6 passed after both new dismissal cases failed on the original implementation.
+- `CURSOR_DEV=true nix develop -c pnpm frontend:test`: 340 files, 1848 tests passed.
+- Independent post-change-refactor completed with no edits and no redundant test reruns.
+- `./scripts/run.sh pnpm format:changed` passed including Vue type checks. The first pass caught an empty no-op directive body in the new test; replacing it with `undefined` preserved behavior, and preparation was rerun successfully.
+
+Manual verification (2026-09-06): created notebook `Search activation check`
+and Unicode note `当前笔记 Ω` with content `Visible content after search activation.`
+at `/n9`. Recent click, Matches click, and Down/Enter each dismissed search with
+the URL unchanged and content visible. Selecting Sedation navigated to `/n1` and
+revealed its content. `Use this note` retained the choice panel and opened the
+relationship form. Browser error log was empty.
+
+Implementation learning: Recent/Matches regressions failed because the open
+dialog remained after current-note activation; all six focused Cypress cases
+then passed. The ten-minute trigger included Nix/browser runtime; the same
+bounded activation proof remained in progress under a focused-test exception.
+Rendering the existing confirmation popup in a new move test exposed the
+explicitly excluded Modal extraneous-class warning (`Popups` → `Modal`), which
+the test harness rejects. The move regression now observes search remaining
+open without mounting that unrelated renderer; existing action tests retain
+confirmation/API coverage. The existing warning remains outside this fix.
 
 | Promise | Evidence owned by slice 1 |
 | --- | --- |
