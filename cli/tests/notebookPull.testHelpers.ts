@@ -4,10 +4,11 @@ export function checkoutState(directory: string) {
   return {
     head: runGit(['rev-parse', 'HEAD'], directory),
     branch: runGit(['rev-parse', '--abbrev-ref', 'HEAD'], directory),
-    branches: runGit(
-      ['for-each-ref', '--format=%(refname) %(objectname)', 'refs/heads'],
+    refs: runGit(
+      ['for-each-ref', '--format=%(refname) %(objectname)'],
       directory
     ),
+    indexTree: runGit(['write-tree'], directory),
     status: runGit(['status', '--porcelain=v1'], directory),
     staged: runGit(['diff', '--cached'], directory),
     unstaged: runGit(['diff'], directory),

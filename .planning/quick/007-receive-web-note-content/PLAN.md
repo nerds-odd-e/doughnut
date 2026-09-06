@@ -211,7 +211,7 @@ validation, and cleanup; pull compares the resulting accepted SHA with local
 
 ### 4. Preserve unpublished or unrelated local history
 Type: Behavior
-Status: planned
+Status: done
 Proof: CLI `run` real-Git cases for local-ahead, divergent and unrelated roots.
 
 Behavior: local `main` is not an ancestor of accepted `main` → `pull` → refuse
@@ -221,6 +221,10 @@ Inspect ancestry in temporary storage using imported objects from both sides;
 do not infer ancestry from one parent or from file similarity. A valid ancestor
 still reaches the temporary unavailable result. Reuse leaf 3's download loop.
 Sizing: 3–5 minutes, medium confidence.
+
+Learning: pull imports local `main` only into the scoped accepted-history
+repository and uses Git reachability to distinguish an accepted descendant
+from local-ahead, divergent, and unrelated histories.
 
 ### 5. Fast-forward to the downloaded accepted revision
 Type: Behavior

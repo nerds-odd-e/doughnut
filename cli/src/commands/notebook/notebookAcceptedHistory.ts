@@ -14,6 +14,16 @@ function acceptedHistoryFailure(
 export async function downloadAcceptedNotebookHead(
   notebookId: number
 ): Promise<string> {
+  return withDownloadedAcceptedNotebookHistory(
+    notebookId,
+    (_acceptedRepoDir, acceptedHead) => acceptedHead
+  )
+}
+
+export async function withDownloadedAcceptedNotebookHistory<T>(
+  notebookId: number,
+  inspectAcceptedHistory: (acceptedRepoDir: string, acceptedHead: string) => T
+): Promise<T> {
   const tempDir = fs.mkdtempSync(
     path.join(os.tmpdir(), `donut-notebook-accepted-history-${process.pid}-`)
   )
@@ -39,10 +49,11 @@ export async function downloadAcceptedNotebookHead(
       acceptedHistoryFailure
     )
 
-    return runSystemGitOrThrow(
+    const acceptedHead = runSystemGitOrThrow(
       ['-C', acceptedRepoDir, 'rev-parse', 'main'],
       acceptedHistoryFailure
     ).trim()
+    return inspectAcceptedHistory(acceptedRepoDir, acceptedHead)
   } finally {
     fs.rmSync(tempDir, { recursive: true, force: true })
   }
