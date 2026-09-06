@@ -18,6 +18,13 @@ export type ParseNoteContentMarkdownResult =
   | { ok: true; properties: NoteProperties; body: string }
   | {
       ok: false
+      reason: "nested_metadata"
+      message: string
+      body: string
+      prefix: string
+    }
+  | {
+      ok: false
       reason: ParseNoteContentFailureReason
       message: string
     }
@@ -33,17 +40,17 @@ function splitLeadingFrontmatter(
   | { kind: "parsed"; yamlRaw: string; body: string; verbatimPrefix: string }
   | { kind: "invalid"; message: string } {
   const text = stripBom(markdown)
-  const lines = text.split(/\r?\n/)
+  const lines = text.split(/(?<=\n)/)
 
-  if (lines[0] !== "---") {
+  if (lines[0]?.replace(/\r?\n$/, "") !== "---") {
     return { kind: "none" }
   }
 
   for (let i = 1; i < lines.length; i++) {
-    if (lines[i] === "---") {
-      const yamlRaw = lines.slice(1, i).join("\n")
-      const body = lines.slice(i + 1).join("\n")
-      const verbatimPrefix = `---\n${yamlRaw}\n---\n`
+    if (lines[i]?.replace(/\r?\n$/, "") === "---") {
+      const yamlRaw = lines.slice(1, i).join("")
+      const body = lines.slice(i + 1).join("")
+      const verbatimPrefix = markdown.slice(0, markdown.length - body.length)
       return { kind: "parsed", yamlRaw, body, verbatimPrefix }
     }
   }
@@ -111,14 +118,27 @@ export function noteImageScalarsFromMarkdown(markdown: string): {
 const unsupportedFrontmatterValueMessage =
   "Note frontmatter must contain only string, number, boolean, or one-level list values."
 
-function mappingToProperties(
-  map: Record<string, unknown>
-):
+function mappingToProperties(map: Record<string, unknown>):
   | { ok: true; properties: NoteProperties }
-  | Extract<ParseNoteContentMarkdownResult, { ok: false }> {
+  | {
+      ok: false
+      reason: "unsupported_value" | "nested_metadata"
+      message: string
+    } {
   const properties: NoteProperties = {}
+  let hasNestedMetadata = false
   for (const key of Object.keys(map)) {
-    const value = yamlValueToPropertyValue(map[key])
+    const rawValue = map[key]
+    const value = yamlValueToPropertyValue(rawValue)
+    const nested =
+      rawValue !== null &&
+      typeof rawValue === "object" &&
+      (!Array.isArray(rawValue) ||
+        rawValue.some((item) => item !== null && typeof item === "object"))
+    if (nested && !isScalarOnlyStructuralPropertyKey(key)) {
+      hasNestedMetadata = true
+      continue
+    }
     if (
       value === null ||
       (isListPropertyValue(value) && isScalarOnlyStructuralPropertyKey(key))
@@ -130,6 +150,13 @@ function mappingToProperties(
       }
     }
     properties[key] = value
+  }
+  if (hasNestedMetadata) {
+    return {
+      ok: false,
+      reason: "nested_metadata",
+      message: "Nested metadata is edited in Markdown.",
+    }
   }
   return { ok: true, properties }
 }
@@ -192,7 +219,17 @@ export function parseNoteContentMarkdown(
   }
 
   const mapped = mappingToProperties(root as Record<string, unknown>)
-  if (!mapped.ok) return mapped
+  if (!mapped.ok) {
+    if (mapped.reason === "nested_metadata") {
+      return {
+        ...mapped,
+        reason: "nested_metadata",
+        body,
+        prefix: split.verbatimPrefix,
+      }
+    }
+    return { ...mapped, reason: "unsupported_value" }
+  }
 
   return { ok: true, properties: mapped.properties, body }
 }

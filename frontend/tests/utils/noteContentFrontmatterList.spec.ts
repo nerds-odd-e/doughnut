@@ -72,12 +72,12 @@ describe("parseNoteContentMarkdown list values", () => {
     }
   })
 
-  it("rejects nested lists in list items", () => {
+  it("identifies nested lists as metadata outside the Properties model", () => {
     const md = "---\ntags:\n  - [nested]\n---\n"
     const r = parseNoteContentMarkdown(md)
     expect(r.ok).toBe(false)
     if (!r.ok) {
-      expect(r.reason).toBe("unsupported_value")
+      expect(r.reason).toBe("nested_metadata")
     }
   })
 

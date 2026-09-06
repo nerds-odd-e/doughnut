@@ -86,12 +86,12 @@ describe("parseNoteContentMarkdown", () => {
     }
   })
 
-  it("rejects nested mapping values", () => {
+  it("distinguishes nested metadata from invalid frontmatter", () => {
     const md = "---\nouter:\n  inner: x\n---\n"
     const r = parseNoteContentMarkdown(md)
     expect(r.ok).toBe(false)
     if (!r.ok) {
-      expect(r.reason).toBe("unsupported_value")
+      expect(r.reason).toBe("nested_metadata")
     }
   })
 

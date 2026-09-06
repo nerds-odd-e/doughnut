@@ -14,6 +14,9 @@
       @dead-wiki-link-click="$emit('deadWikiLinkClick', $event)"
       @image-upload-state="imageUploadInProgress = $event"
     />
+    <p v-if="hasNestedMetadata" class="mb-3 text-sm">
+      Edit this note in Markdown mode.
+    </p>
     <div
       v-if="frontmatterParseErrorMessage !== null"
       role="alert"
@@ -96,7 +99,12 @@ const parsedContent = computed(() =>
 
 const frontmatterParseErrorMessage = computed(() => {
   const p = parsedContent.value
-  return p.ok ? null : p.message
+  return p.ok || p.reason === "nested_metadata" ? null : p.message
+})
+
+const hasNestedMetadata = computed(() => {
+  const p = parsedContent.value
+  return !p.ok && p.reason === "nested_metadata"
 })
 
 const effectiveReadonly = computed(
@@ -108,7 +116,7 @@ const effectiveReadonly = computed(
 
 const markdownForRichDisplay = computed(() => {
   const p = parsedContent.value
-  if (p.ok) return p.body
+  if (p.ok || p.reason === "nested_metadata") return p.body
   return props.modelValue ?? ""
 })
 

@@ -68,10 +68,17 @@ Body`,
     }
   })
 
-  it("invalid YAML: hides Properties, shows alert, freezes Quill, ignores body edits", async () => {
+  it.each([
+    "bad: [",
+    "author: first\nauthor: second",
+    "custom:\n  source: first\n  source: second",
+    "- item",
+    "custom:\n  source: local\ntype: [Note]",
+    "custom:\n  source: local\nsource:\n  path: target",
+    "custom: null",
+  ])("protects invalid frontmatter: %s", async (yaml) => {
     const markdown = `---
-bad:
-  nested: value
+${yaml}
 ---
 
 Still body`
@@ -81,7 +88,6 @@ Still body`
     const alert = wrapper.find(
       '[data-testid="rich-note-frontmatter-parse-error"]'
     )
-    expect(alert.text()).toContain("string")
     expect(alert.text()).toContain("Markdown mode")
 
     expect(h.quillReadonly()).toBe(true)
@@ -91,6 +97,25 @@ Still body`
       emitCountBefore
     )
   })
+
+  it.each([
+    "custom:\n  source: 'local'",
+    "custom:\n  - source: 'local'",
+    "custom: [[local]]",
+  ])(
+    "renders valid nested metadata separately from the body: %s",
+    async (metadata) => {
+      const wrapper = await h.mountEditor(
+        `---\ntype: Note\n# Author annotation\n${metadata}\n---\nOriginal body.`
+      )
+
+      expect(h.quillEditorEl().textContent).toBe("Original body.")
+      expect(wrapper.text()).toContain("Edit this note in Markdown mode.")
+      expect(wrapper.find('[role="alert"]').exists()).toBe(false)
+      expect(wrapper.find("section").exists()).toBe(false)
+      expect(h.quillReadonly()).toBe(true)
+    }
+  )
 
   it("composes edited body with existing frontmatter when emitting updates", async () => {
     const markdown = `---

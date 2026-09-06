@@ -170,7 +170,7 @@ medium confidence after slice 1 removes the command-observation preparation.
 
 ### 3. Read a valid nested-metadata note as ordinary body content
 Type: Behavior
-Status: in-progress
+Status: done
 Proof: A mounted rich editor given the nested reproduction renders only the
 body, offers Markdown metadata guidance, and does not show a malformed-YAML
 alert. Genuinely invalid YAML retains the protective fallback.
@@ -199,7 +199,7 @@ leaf before introducing a new generalized property representation.
 
 ### 4. Save rich body edits without changing nested metadata
 Type: Behavior
-Status: planned
+Status: in-progress
 Proof: Publish a valid nested note through the installed CLI, edit its body in
 the web rich editor, and observe the saved body plus unchanged metadata after
 reload. Accepted downloaded Markdown retains the metadata and note identity.
@@ -273,6 +273,16 @@ use the repository's `@wip` convention while implementing a multi-beat case.
   alone explains the elapsed time. Record that exception at the time.
 
 ## Readiness
+
+Slice 3: valid nested maps/lists now render only body with accurate Markdown
+editing guidance; Properties remain absent and the interim body is read-only.
+Malformed YAML, duplicates, and structural-value failures remain protected.
+Mounted reproductions failed first, then all 338 frontend files / 1,836 tests
+passed. Independent refactor required no changes; selective formatting and type
+checking passed. Raw prefixes retain authored LF/CRLF/BOM substrings for slice 4.
+Slice 4 now owns replacing interim read-only behavior and exact saved payload
+observations. Slice 3 took approximately seven minutes including suite/startup
+runtime and remained one coherent reading outcome.
 
 Slice 2: strict proposal YAML rejects duplicate keys at any mapping depth.
 Controller rejection observations capture immutable head/bundle/timestamp values;
