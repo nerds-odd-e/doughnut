@@ -29,6 +29,11 @@ whose projection matches its accepted empty tree is an eligible root location.
 
 ## Execution context and decisions
 
+- Active CI observer: coordinator `root`, checkout
+  `/Users/terryyin/git/doughnut`, repository `nerds-odd-e/doughnut`, branch
+  `main`, receipt directory `/tmp/donut-ci-501/watch-wLj96p`, PID `61936`,
+  session `1200`, yielded cell `12`.
+
 - `NotebookController.publishNotebookGitProposal` is the stable backend entry
   point. Extend the existing bundle fixtures and controller test base with real
   Git objects and committed database observations.
@@ -91,7 +96,7 @@ Keep rejection guards effective from the first accepting commit.
 
 ### 1. Explain why a local root-note proposal is invalid
 Type: Behavior
-Status: planned
+Status: done
 Proof: Publish-controller rejection cases identify the offending path and
 reason, preserve the accepted binding, and create no note.
 
@@ -455,6 +460,11 @@ The broader follow-up commit scope remains outside this plan.
 
 ## Refinement learnings
 
+- The proposal tree descriptor now distinguishes one added or modified regular
+  note, while mixed changes name the paths and ask for separate commits.
+- Added-note validation reuses typed-Markdown/content validation, validates a
+  `NoteUpdateTitleDTO` explicitly, and rejects `DisplayName` normalization
+  mismatches before the interim creation-not-supported boundary.
 - `AuthoredNoteContent.prepareDocumentForSave` normalizes stored type; Git
   acceptance already uses exact `AuthoredNoteDocument.fromContent`. Share
   fresh identity creation, not web content preparation.

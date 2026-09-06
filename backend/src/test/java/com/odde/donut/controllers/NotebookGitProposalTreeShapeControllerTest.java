@@ -44,14 +44,14 @@ class NotebookGitProposalTreeShapeControllerTest extends NotebookGitBundleContro
   @Test
   void rejectsProposalThatAddsAFileWithoutMutatingTheAcceptedBinding() throws Exception {
     Notebook notebook = createGitBackedNotebook();
-    NotebookGitBinding binding = seedAcceptedBinding(notebook, baselineEntries());
+    NotebookGitBinding binding = seedAcceptedBinding(notebook, validBaselineEntries());
     byte[] bundleBytes =
         proposalBundleBytes(
             binding,
             List.of(
-                new NotebookGitProposalFile("note.md", "original content"),
-                new NotebookGitProposalFile("README.md", "readme original"),
-                new NotebookGitProposalFile("extra.md", "extra content")));
+                new NotebookGitProposalFile("note.md", "---\ntype: Note\n---\noriginal content"),
+                new NotebookGitProposalFile("README.md", "---\ntype: Readme\n---\nreadme original"),
+                new NotebookGitProposalFile("extra.md", "---\ntype: Note\n---\nextra content")));
 
     ResponseStatusException exception =
         assertProposalRejectedWithoutMutatingBinding(

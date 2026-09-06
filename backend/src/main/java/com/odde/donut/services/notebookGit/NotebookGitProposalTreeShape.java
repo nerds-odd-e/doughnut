@@ -15,21 +15,21 @@ import org.springframework.web.server.ResponseStatusException;
 /**
  * Walks the raw two-tree diff (no rename detection) between a proposal's accepted-parent commit and
  * its proposed commit, and confirms the proposed tree differs from the accepted tree by exactly one
- * modified, ordinary Markdown note at an unchanged regular file mode - never an added/deleted/moved
- * path, an unsafe path, a non-regular mode, more than one changed file, or the folder-reserved
- * {@code README.md}. Callers only invoke this once a proposal's ancestry has already been confirmed
- * to be a direct single-parent child of the accepted commit.
+ * modified or added ordinary Markdown note at a regular file mode - never a deleted/moved path, an
+ * unsafe path, a non-regular mode, more than one changed file, or the folder-reserved {@code
+ * README.md}. Callers only invoke this once a proposal's ancestry has already been confirmed to be
+ * a direct single-parent child of the accepted commit.
  */
 public final class NotebookGitProposalTreeShape {
 
   private NotebookGitProposalTreeShape() {}
 
   /**
-   * @return the single modified note's path, once every other constraint holds
+   * @return the single note change, once every other constraint holds
    * @throws ResponseStatusException 400 BAD_REQUEST naming the offending path/reason when the tree
    *     shape is unsupported, or when either commit cannot be inspected
    */
-  public static String assertSingleModifiedRegularNotePath(
+  public static NoteChange requireSingleRegularNoteChange(
       Repository repository, ObjectId acceptedHead, ObjectId proposedHead) {
     try (RevWalk revWalk = new RevWalk(repository)) {
       RevCommit acceptedCommit = revWalk.parseCommit(acceptedHead);
@@ -40,7 +40,7 @@ public final class NotebookGitProposalTreeShape {
     }
   }
 
-  private static String walkTreeShape(
+  private static NoteChange walkTreeShape(
       Repository repository, RevCommit acceptedCommit, RevCommit proposedCommit)
       throws IOException {
     try (TreeWalk walk = new TreeWalk(repository)) {
@@ -48,18 +48,23 @@ public final class NotebookGitProposalTreeShape {
       walk.addTree(proposedCommit.getTree());
       walk.setRecursive(true);
 
-      List<String> changedPaths = new ArrayList<>();
+      List<NoteChange> changes = new ArrayList<>();
       while (walk.next()) {
         String path = walk.getPathString();
         assertPathIsSafe(path);
 
         FileMode acceptedMode = walk.getFileMode(0);
         FileMode proposedMode = walk.getFileMode(1);
-        if (FileMode.MISSING.equals(acceptedMode) || FileMode.MISSING.equals(proposedMode)) {
+        if (FileMode.MISSING.equals(proposedMode)) {
           throw unsupportedTreeShape(
-              "path \""
-                  + path
-                  + "\" is added, deleted, or moved (no rename detection is performed)");
+              "path \"" + path + "\" is deleted or moved (no rename detection is performed)");
+        }
+        if (FileMode.MISSING.equals(acceptedMode)) {
+          if (!FileMode.REGULAR_FILE.equals(proposedMode)) {
+            throw unsupportedTreeShape("path \"" + path + "\" is not a regular file mode");
+          }
+          changes.add(new NoteChange(path, ChangeKind.ADDED));
+          continue;
         }
         if (!FileMode.REGULAR_FILE.equals(acceptedMode)
             || !FileMode.REGULAR_FILE.equals(proposedMode)) {
@@ -67,25 +72,27 @@ public final class NotebookGitProposalTreeShape {
         }
 
         if (!walk.getObjectId(0).equals(walk.getObjectId(1))) {
-          changedPaths.add(path);
+          changes.add(new NoteChange(path, ChangeKind.MODIFIED));
         }
       }
 
-      return requireExactlyOneAllowedNoteChange(changedPaths);
+      return requireExactlyOneAllowedNoteChange(changes);
     }
   }
 
-  private static String requireExactlyOneAllowedNoteChange(List<String> changedPaths) {
-    if (changedPaths.isEmpty()) {
+  private static NoteChange requireExactlyOneAllowedNoteChange(List<NoteChange> changes) {
+    if (changes.isEmpty()) {
       throw unsupportedTreeShape("proposal contains no changed file");
     }
-    if (changedPaths.size() > 1) {
+    if (changes.size() > 1) {
       throw unsupportedTreeShape(
           "multiple changed files: "
-              + String.join(", ", changedPaths.subList(0, Math.min(2, changedPaths.size()))));
+              + String.join(", ", changes.stream().limit(2).map(NoteChange::path).toList())
+              + ". Publish one note change per commit using separate commits");
     }
 
-    String changedPath = changedPaths.get(0);
+    NoteChange change = changes.getFirst();
+    String changedPath = change.path();
     if (!changedPath.endsWith(".md")) {
       throw unsupportedTreeShape("path \"" + changedPath + "\" is not a Markdown note");
     }
@@ -93,7 +100,7 @@ public final class NotebookGitProposalTreeShape {
       throw unsupportedTreeShape(
           "path \"" + changedPath + "\" is a folder README, which is reserved");
     }
-    return changedPath;
+    return change;
   }
 
   private static void assertPathIsSafe(String path) {
@@ -119,5 +126,12 @@ public final class NotebookGitProposalTreeShape {
   private static ResponseStatusException unsupportedTreeShape(String reason, Throwable cause) {
     return new ResponseStatusException(
         HttpStatus.BAD_REQUEST, "Unsupported tree shape: " + reason, cause);
+  }
+
+  record NoteChange(String path, ChangeKind kind) {}
+
+  enum ChangeKind {
+    ADDED,
+    MODIFIED
   }
 }

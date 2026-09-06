@@ -2,6 +2,8 @@ package com.odde.donut.services.notebookGit;
 
 import com.odde.donut.algorithms.AuthoredNoteDocument;
 import com.odde.donut.algorithms.CanonicalDonutOrigin;
+import com.odde.donut.controllers.dto.NoteUpdateTitleDTO;
+import com.odde.donut.entities.DisplayName;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookGitBinding;
@@ -12,8 +14,11 @@ import com.odde.donut.services.AuthorizationService;
 import com.odde.donut.services.notebookExport.ExportFolderRow;
 import com.odde.donut.testability.TestabilitySettings;
 import com.odde.donut.validators.AuthoredNoteContent;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validator;
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Set;
 import org.eclipse.jgit.lib.ObjectId;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -32,6 +37,7 @@ public class NotebookGitProposalPublisher {
   private final CanonicalDonutOrigin canonicalDonutOrigin;
   private final TestabilitySettings testabilitySettings;
   private final EntityPersister entityPersister;
+  private final Validator validator;
 
   public NotebookGitProposalPublisher(
       NotebookGitStateLoader notebookGitStateLoader,
@@ -40,7 +46,8 @@ public class NotebookGitProposalPublisher {
       AuthoredNoteDocumentPersistence authoredNoteDocumentPersistence,
       CanonicalDonutOrigin canonicalDonutOrigin,
       TestabilitySettings testabilitySettings,
-      EntityPersister entityPersister) {
+      EntityPersister entityPersister,
+      Validator validator) {
     this.notebookGitStateLoader = notebookGitStateLoader;
     this.authorizationService = authorizationService;
     this.projection = projection;
@@ -48,6 +55,7 @@ public class NotebookGitProposalPublisher {
     this.canonicalDonutOrigin = canonicalDonutOrigin;
     this.testabilitySettings = testabilitySettings;
     this.entityPersister = entityPersister;
+    this.validator = validator;
   }
 
   @Transactional(
@@ -86,18 +94,24 @@ public class NotebookGitProposalPublisher {
     NotebookGitProposalAncestry.assertFollowsAcceptedHead(
         proposal.repository(), proposal.mainHead(), acceptedHead);
 
-    String changedNotePath =
-        NotebookGitProposalTreeShape.assertSingleModifiedRegularNotePath(
+    NotebookGitProposalTreeShape.NoteChange noteChange =
+        NotebookGitProposalTreeShape.requireSingleRegularNoteChange(
             proposal.repository(), acceptedHead, proposal.mainHead());
     NotebookGitProposalMarkdownFormat.assertValidTypedMarkdown(
         proposal.repository(), proposal.mainHead());
     String changedNoteContent =
         NotebookGitProposalBlobText.readUtf8(
-            proposal.repository(), proposal.mainHead(), changedNotePath);
+            proposal.repository(), proposal.mainHead(), noteChange.path());
     AuthoredNoteContent.assertValidForSave(changedNoteContent);
+    if (noteChange.kind() == NotebookGitProposalTreeShape.ChangeKind.ADDED) {
+      assertValidAdditionTitle(noteChange.path());
+      throw new ResponseStatusException(
+          HttpStatus.BAD_REQUEST,
+          "Path \"" + noteChange.path() + "\" is valid, but note creation is not yet supported.");
+    }
     Note changedNote =
         projection.requireMatchingAcceptedTreeWithOneLiveNoteAtPath(
-            notebook, folders, liveNotes, proposal.repository(), acceptedHead, changedNotePath);
+            notebook, folders, liveNotes, proposal.repository(), acceptedHead, noteChange.path());
 
     Timestamp publishedAt = testabilitySettings.getCurrentUTCTimestamp();
     AuthoredNoteDocument document =
@@ -113,5 +127,32 @@ public class NotebookGitProposalPublisher {
     binding.setUpdatedAt(publishedAt);
     entityPersister.save(binding);
     return written.headObjectId();
+  }
+
+  private void assertValidAdditionTitle(String path) {
+    String filename = path.substring(path.lastIndexOf('/') + 1);
+    String title = filename.substring(0, filename.length() - ".md".length());
+    NoteUpdateTitleDTO titleDto = new NoteUpdateTitleDTO();
+    titleDto.setNewTitle(title);
+    Set<ConstraintViolation<NoteUpdateTitleDTO>> violations = validator.validate(titleDto);
+    if (!violations.isEmpty()) {
+      String reason =
+          violations.stream()
+              .map(ConstraintViolation::getMessage)
+              .sorted()
+              .findFirst()
+              .orElseThrow();
+      throw invalidAdditionTitle(path, reason);
+    }
+    String normalizedTitle = new DisplayName(title).value();
+    if (!normalizedTitle.equals(title)) {
+      throw invalidAdditionTitle(
+          path, "filename title would be normalized to \"" + normalizedTitle + "\"");
+    }
+  }
+
+  private static ResponseStatusException invalidAdditionTitle(String path, String reason) {
+    return new ResponseStatusException(
+        HttpStatus.BAD_REQUEST, "Invalid note title at path \"" + path + "\": " + reason);
   }
 }
