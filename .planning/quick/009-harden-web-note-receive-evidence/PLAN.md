@@ -4,7 +4,7 @@ Source: retrospective of delivered
 [SEED-009, Story 3](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-3)
 across execution commits `58c852fd59` through `a5278d667f` (the 13 contiguous
 receive-web-note execution and cleanup commits).
-Status: planned; ready for direct execution.
+Status: done.
 
 ## Goal and scope
 
@@ -22,54 +22,6 @@ global test-database lifecycle or remove the structural-fixture snapshot hook.
 
 The current unrelated change in `e2e_test/step_definitions/user.ts` is outside
 scope and must remain untouched.
-
-## Execution context
-
-- `AdminUserControllerTest.listingFor` requests only page 0 with size 10 and
-  explicitly assumes no leftover users. During the reviewed execution, multiple
-  full-suite attempts failed after committed Notebook-Git fixtures left 16–17
-  users visible; the suite passed only after the disposable test database was
-  cleared. A passing rerun does not make that assumption reliable.
-- `NotebookGitBundleControllerTestBase` deliberately commits uniquely prefixed
-  users and cleans them afterward. Tests must tolerate unrelated committed rows
-  from another proof or an interrupted prior run; this follow-up must not use a
-  global database truncation as its solution.
-- `ControllerTestBase` replaces `CurrentUser` with one mutable singleton
-  `@TestBean`. Therefore the fresh `MockHttpServletRequest` objects created by
-  `NotebookGitConcurrentWriterTestSupport` do not isolate authorization state.
-  `NotebookGitProjectionDriftControllerTest` also installs the same
-  `RequestAttributes` in both worker threads and duplicates executor/latch
-  mechanics.
-- Story 3 is still first in `.planning/PRODUCT-BACKLOG.md`, the seed says it is
-  “next,” and `NotebookGitCutoverService.resnapshotForTestability` still says to
-  remove the hook once Story 3 keeps bindings current. Story 3 is delivered;
-  the hook remains only for unsupported structural fixture setup.
-
-## Current decisions
-
-1. Make tests own or tolerate their data. Do not add retry-until-green behavior,
-   truncate the shared test database, or weaken the production pagination
-   contract to accommodate fixtures.
-2. Preserve controller-level, real-database proof. The Admin listing regression
-   must place the target beyond the first page or otherwise demonstrate that
-   unrelated committed users cannot hide it, then clean only its own committed
-   fixtures.
-3. Concurrent Notebook-Git workers may represent the same authorized owner,
-   but they must not read or mutate one shared `CurrentUser` holder. A fresh
-   servlet request alone is insufficient while `ControllerTestBase` supplies a
-   singleton test bean. Use the smallest test-only request/authorization seam;
-   no production authorization change is authorized.
-4. Keep deterministic database-lock/latch coordination and bounded futures;
-   use no sleeps. Consolidate only the worker/request coordination genuinely
-   shared by accepted-writer and projection-drift proofs.
-5. Retain positive controller/JGit observations: exact accepted ancestry,
-   matching database projection, stale publication rejection, and structural
-   drift rejection. Do not replace them with tests of the helper itself.
-6. Planning and comments state current capability truth, not execution history.
-   Remove Story 3 from the unfinished backlog, make Story 4 the next candidate,
-   and describe the snapshot hook's remaining structural-fixture purpose.
-7. Backend changes require `CURSOR_DEV=true nix develop -c pnpm backend:test_only`.
-   No manual, E2E, API generation, or migration proof is needed.
 
 ## Outside-in proof ownership
 
@@ -153,10 +105,3 @@ SEED-009 "Ordering and Scope Reduction" + "When to Surface" (Stories 1–3
 delivered, Story 4 next), `NotebookGitCutoverService.resnapshotForTestability`
 Javadoc (structural-fixture purpose, not transitional). Story 3's delivered
 Goal/Scope, sibling anchors, and hook behavior preserved.
-
-## Readiness
-
-Ready for direct execution. Each Behavior has one proof loop, the sole Structure
-leaf immediately enables leaf 3, and no slice contains an unexplained hard-limit
-path. The full backend-suite runtime is the repository-required verification
-exception, not implementation scope.
