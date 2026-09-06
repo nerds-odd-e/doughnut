@@ -1,16 +1,23 @@
 # Slice Wrap-up
 
 The coordinator first checks coverage under `planning.mdc`'s Proof decisions,
-including applicable replacement/lifecycle obligations. Return behavioral gaps
-to implementation before refactor or acceptance, including gaps refactor finds.
-Require CI-safe uncommitted work: no deliberate red; unfinished E2E stays `@wip`.
-Do not run full CI before commit.
+including applicable replacement/lifecycle obligations. For the promises the
+current slice claims to prove, inspect the relevant assertion and only enough
+setup to identify the exercised boundary; compare that expected result with the
+promise. Do not treat the test name, passing command, or `proof:` summary as
+sufficient. A contradictory or insufficient observation is incomplete
+implementation: name the promise and observation gap and return it to
+implementation before refactor or acceptance. Refactor may report gaps but
+cannot supply missing behavior. Require CI-safe uncommitted work: no deliberate
+red; unfinished E2E stays `@wip`. Do not run full CI before commit.
 
-Accept the `proof:` handoff from `delegation.md` by default. Rerun only for a
-missing/ambiguous handoff, a boundary changed by wrap-up, or a broader integration
-proof the slice closes but the handoff omitted. Placeholders, abbreviations, and
-paraphrases are ambiguous: first recover the literal command from the original
-handoff if available. Reuse adequate/recovered proof; never randomly sample it.
+Accept adequate inspected evidence from the `proof:` handoff by default; add no
+mandatory handoff fields. Reuse an earlier inspection while the promise and
+covered boundary remain unchanged. Rerun only for a missing/ambiguous handoff, a
+boundary changed by wrap-up, or a broader integration proof the slice closes but
+the handoff omitted. Placeholders, abbreviations, and paraphrases are ambiguous:
+first recover the literal command from the original handoff if available. Reuse
+adequate/recovered proof; never randomly sample it.
 
 1. Spawn a fresh general-purpose sub-agent to read and run
    `.agents/skills/post-change-refactor/SKILL.md` end-to-end. Pass only the slice

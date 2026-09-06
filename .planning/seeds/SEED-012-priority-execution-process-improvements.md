@@ -21,34 +21,103 @@ These are proposed improvements, not executable leaves or adopted rule changes.
 P1 means address before the next relevant execution. Items 6–7 have explicit
 triggers. Each item records the minimum evidence, response, and success signal.
 
+<a id="story-1"></a>
+
 ### 1. Reject evidence that contradicts the promised behavior — P1
 
-- **Evidence:** Pygardon Quick 073 accepted raw Stooq diagnostic text, hid a
-  successful Jobs card when another source failed, and advertised deferred
-  functionality despite green proof. Earlier clone/publication and Telegram
-  reviews missed final state, interim replacements, or lifecycle observation.
-  Promise mapping is already installed; recurrence followed two clean runs.
-- **Proposal:** At coordinator acceptance, compare actual assertions with the
-  selected promises and their owning runtime boundaries. Before plan cleanup,
-  check once for obsolete interim behavior and uncovered or contradicted
-  promises. Return missing behavior to implementation; keep refactor structural.
-- **Owners:** `planning.mdc` proof decisions and `execute-plan` acceptance.
-- **Success:** The original inadequate assertions are rejected; the next
-  relevant product run demonstrates final behavior at its owning boundary.
+**Status:** Installed 2026-09-06 in `execute-plan/references/wrap-up.md`.
+Instruction replay: rejected a raw-provider expected value (A) and a
+hidden exception-chain observation (B); reused already-inspected HTTP
+safe-text evidence (C). Live product effectiveness is not claimed.
+
+**Goal:** For the developer relying on autonomous delivery, catch a passing
+assertion that permits behavior forbidden by the selected contract before the
+slice is accepted, reducing later corrective work.
+
+**Scope:** Strengthen the existing Doughnut coordinator acceptance step with one
+bounded comparison: for the promises the current slice claims to prove, inspect
+the relevant assertion and enough setup to identify the exercised boundary.
+Compare the expected result with the promise, rather than accepting the test's
+name or passing command as sufficient. Reuse evidence already inspected unless
+its covered behavior changes. If contradictory or insufficient, name the exact
+promise and observation gap and return it to implementation before acceptance.
+Adequate proof continues through the existing workflow without a rerun.
+
+Keep the addition at the existing acceptance instruction owner
+(`execute-plan/references/wrap-up.md`), referring to `planning.mdc` rather than
+duplicating its promise-mapping or lifecycle rules. This refinement replaces the
+earlier proposal for a separate pre-cleanup aggregate scan.
+
+**Exclusions:** No new review agent, acceptance stage, report format, automated
+validator, exhaustive scenario matrix, whole-plan/repository audit, or automatic
+test rerun. No new product requirements, product fixes, refactor responsibilities,
+or changes to sibling P1s. Pygardon provides evidence; rollout there is separate.
+The check covers selected promises, not an attempt to discover every unstated
+requirement or prevent every behavioral omission.
+
+<a id="story-2"></a>
 
 ### 2. Diagnose failures before accepting a baseline exception — P1
 
-- **Evidence:** Doughnut web-note receive verification passed after retry, then
-  twice repeated `AdminUserControllerTest` failures from committed leftover
-  users. Cleanup restored a green run without resolving test isolation. Earlier
-  changing ApplicationContext failures involved MySQL capacity limits.
-- **Proposal:** Record cause, supporting evidence, and unresolved defects before
-  classifying a failure as baseline noise. Retry or cleanup alone is not a
-  diagnosis. Recurrence triggers focused diagnosis before further acceptance;
-  reuse proof only against a demonstrated baseline. Apply to local tests and CI.
-- **Owner:** `execute-plan` failure diagnosis and proof acceptance.
-- **Success:** A recurring failure stays explicitly unresolved until its cause
-  is addressed or handed over; a later pass cannot silently close it.
+**Status:** Planned on 2026-09-06 for minimum recurring cost; not implemented.
+Execution: [Require evidence for failure exceptions](../quick/012-require-evidence-for-failure-exceptions/PLAN.md).
+
+**Goal:** For the developer relying on autonomous delivery, prevent a transient
+pass or cleanup from concealing an unresolved verification defect, while avoiding
+repeated diagnosis of failures already explained by applicable evidence.
+
+**Evidence:** Doughnut web-note receive verification passed on retry, then twice
+repeated `AdminUserControllerTest` failures. Inspection found committed leftover
+users; cleanup restored a green run without resolving test isolation. Earlier
+ApplicationContext failures involved MySQL capacity, showing that a repeated
+failure label alone does not identify a cause. CI already explicitly prohibits
+rerunning until green as a fix.
+
+**Scope:** Strengthen the existing Doughnut execution decision to discount a
+failure as pre-existing, unrelated, or environmental. Before accepting that
+exception, require bounded evidence connecting the observed failure to its cause
+and explaining which proof is affected. Record the cause, supporting observation,
+and remaining defect or disposition briefly in the existing handoff/active PLAN.
+A passing retry, repeated test name, or successful cleanup alone is insufficient.
+
+Diagnosis need only support the disposition; it does not require an exhaustive
+root-cause investigation. A targeted retry may test a stated explanation, but
+cannot replace it. If the cause remains uncertain after focused diagnosis, use
+the existing Jidoka path. Fix ordinary failures caused by the current change
+through the existing implementation loop without a new approval step.
+
+On recurrence, compare new evidence with the recorded cause and conditions.
+Reuse an applicable diagnosis, but keep an unresolved isolation or other defect
+explicit and apply existing stop/repair rules. Do not normalize recurrence through
+retries or cleanup. A note or an unrelated-failure label does not authorize
+bypassing required proof. Proven infrastructure incidents retain the existing CI
+disposition; concurrent test defects still require attention.
+
+**Instruction owner:** Existing `execute-plan` Jidoka/failure classification,
+linked from acceptance only if needed. Reuse `ci-monitor.md`'s current policy;
+do not create competing local and CI checklists or a new acceptance stage.
+
+**Exclusions:** No baseline suite before every slice, automatic rerun policy,
+new agent, failure registry, metrics system, CI observer/repair-scheduling change,
+or blanket halt on the first test failure. No database cleanup commands, test
+isolation repairs, or other product fixes in this story. Pygardon rollout and
+other P1s remain separate.
+
+**Key examples:**
+
+| Pre-condition | Trigger | Result |
+|---|---|---|
+| A required test fails, passes on retry, and has no causal explanation. | The handoff proposes accepting it as unrelated. | The coordinator rejects that disposition and requests focused diagnosis; if it remains uncertain, use existing Jidoka. The retry is not a fix. |
+| Leftover committed users explain a failure; cleanup restores green proof, but fixture isolation remains unresolved. | The same failure recurs during execution. | Reuse the diagnosis only if current evidence supports it; retain the unresolved defect and route it under existing stop/repair rules. Another cleanup/pass cannot silently close it. |
+| Bounded job evidence establishes a runner disconnection as the cause of every failed job in that attempt. | The coordinator classifies the CI attempt. | Record the proven infrastructure disposition once and continue under existing CI policy; do not repeat suites to reconfirm it or excuse a separate assertion failure. |
+
+**Evaluation / ROI:** Replay these three disposition decisions using supplied
+evidence; no product suites or database manipulation are needed to evaluate the
+instruction. Observe the next naturally occurring relevant failure for live
+effectiveness. Success means unexplained retries and unresolved recurring defects
+cannot disappear from acceptance, while an applicable diagnosed incident adds no
+new agent, tracking artifact, or reconfirmation run. No unresolved scope decision
+blocks slice planning.
 
 ### 3. Escalate repeated overruns to story review — P1
 
