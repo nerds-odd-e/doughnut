@@ -4,24 +4,19 @@ import com.odde.donut.algorithms.AuthoredNoteDocument;
 import com.odde.donut.algorithms.CanonicalDonutOrigin;
 import com.odde.donut.algorithms.NoteContentTitleHeading;
 import com.odde.donut.algorithms.NoteLeadingFrontmatter;
-import com.odde.donut.controllers.dto.ApiError;
 import com.odde.donut.controllers.dto.NoteCreationDTO;
 import com.odde.donut.controllers.dto.NoteRealm;
 import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Note;
-import com.odde.donut.entities.NoteCreator;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.User;
 import com.odde.donut.entities.repositories.FolderRepository;
-import com.odde.donut.exceptions.ApiException;
 import com.odde.donut.factoryServices.EntityPersister;
 import com.odde.donut.services.ai.NoteExtractionResult;
 import com.odde.donut.services.wikidataApis.WikidataIdWithApi;
 import com.odde.donut.testability.TestabilitySettings;
 import com.odde.donut.validators.AuthoredNoteContent;
-import com.odde.donut.validators.ReservedReadmeTitles;
 import java.io.IOException;
-import java.sql.Timestamp;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -37,7 +32,7 @@ public class NoteConstructionService {
   private final NoteRealmService noteRealmService;
   private final NoteReferenceService noteReferenceService;
   private final NoteService noteService;
-  private final NoteTitlePlacementRules noteTitlePlacementRules;
+  private final NoteFactory noteFactory;
   private final CanonicalDonutOrigin canonicalDonutOrigin;
 
   @Autowired
@@ -49,7 +44,7 @@ public class NoteConstructionService {
       NoteRealmService noteRealmService,
       NoteReferenceService noteReferenceService,
       NoteService noteService,
-      NoteTitlePlacementRules noteTitlePlacementRules,
+      NoteFactory noteFactory,
       CanonicalDonutOrigin canonicalDonutOrigin) {
     this.authorizationService = authorizationService;
     this.testabilitySettings = testabilitySettings;
@@ -58,22 +53,8 @@ public class NoteConstructionService {
     this.noteRealmService = noteRealmService;
     this.noteReferenceService = noteReferenceService;
     this.noteService = noteService;
-    this.noteTitlePlacementRules = noteTitlePlacementRules;
+    this.noteFactory = noteFactory;
     this.canonicalDonutOrigin = canonicalDonutOrigin;
-  }
-
-  private Note createNote(Notebook notebook, Folder folderOrNull, String title) {
-    throwIfReservedTitle(title);
-    noteTitlePlacementRules.requireNoSoftDeletedTitleAt(notebook, folderOrNull, title);
-    Note note = new Note();
-    Timestamp ts = testabilitySettings.getCurrentUTCTimestamp();
-    note.initializeNewNote(notebook, ts, title);
-    note.setFolder(folderOrNull);
-    applyContent(note, null);
-    User user = authorizationService.getCurrentUser();
-    entityPersister.save(note);
-    entityPersister.save(NoteCreator.forNoteAndUser(note, user));
-    return note;
   }
 
   private void persistNoteContent(Note note, String content) {
@@ -123,7 +104,7 @@ public class NoteConstructionService {
         throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Folder not in notebook.");
       }
     }
-    Note note = createNote(notebook, folder, noteCreation.getNewTitle());
+    Note note = noteFactory.create(notebook, folder, noteCreation.getNewTitle());
     if (noteCreation.getContent() != null) {
       persistNoteContent(note, noteCreation.getContent());
     }
@@ -131,15 +112,6 @@ public class NoteConstructionService {
     noteService.deleteOrphanImagesForPersistedContent(note);
     noteReferenceService.refreshDerivedIndexesForNote(note);
     return noteRealmService.build(note, user);
-  }
-
-  private void throwIfReservedTitle(String title) {
-    if (ReservedReadmeTitles.isReserved(title)) {
-      ApiError apiError =
-          new ApiError(ReservedReadmeTitles.RESERVED_MESSAGE, ApiError.ErrorType.BINDING_ERROR);
-      apiError.add("newTitle", ReservedReadmeTitles.RESERVED_MESSAGE);
-      throw new ApiException(apiError);
-    }
   }
 
   public NoteRealm createNoteFromExtractedSuggestion(
@@ -151,7 +123,8 @@ public class NoteConstructionService {
             aiResult.newNoteTitle, aiResult.newNoteContent);
 
     Note newNote =
-        createNote(originalNote.getNotebook(), originalNote.getFolder(), aiResult.newNoteTitle);
+        noteFactory.create(
+            originalNote.getNotebook(), originalNote.getFolder(), aiResult.newNoteTitle);
     persistNoteContent(newNote, newNoteContent);
     persistNoteContent(originalNote, aiResult.updatedOriginalNoteContent);
 

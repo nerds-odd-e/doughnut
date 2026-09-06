@@ -129,7 +129,7 @@ database creation or E2E wiring. About five minutes, medium confidence.
 
 ### 2. Share existing fresh-note initialization
 Type: Structure
-Status: planned
+Status: done
 Proof: Existing notebook note-creation and extraction controller tests remain
 green, including creator attribution, default content, and deleted-title rules.
 
@@ -460,6 +460,9 @@ The broader follow-up commit scope remains outside this plan.
 
 ## Refinement learnings
 
+- Fresh-note identity initialization now lives in `NoteFactory`; web creation
+  and extraction retain content preparation and downstream enrichment while
+  sharing title placement, default document, timestamp, and creator setup.
 - The proposal tree descriptor now distinguishes one added or modified regular
   note, while mixed changes name the paths and ask for separate commits.
 - Added-note validation reuses typed-Markdown/content validation, validates a
