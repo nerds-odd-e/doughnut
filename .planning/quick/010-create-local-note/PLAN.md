@@ -232,7 +232,7 @@ About five minutes, medium confidence.
 
 ### 6. Reject a destination reserved by a deleted note
 Type: Behavior
-Status: planned
+Status: done
 Proof: A proposal at a deleted note's title returns the existing restore/
 choose-another-title guidance and leaves the deleted identity and binding intact.
 
@@ -460,6 +460,9 @@ The broader follow-up commit scope remains outside this plan.
 
 ## Refinement learnings
 
+- `NoteFactory` surfaces the existing soft-deleted-title conflict unchanged at
+  publication; committed proof preserves the deleted identity and accepted
+  binding, so no Git-specific recovery policy is needed.
 - The existing creation branch already gives copied Markdown a fresh identity;
   controller proof confirms trackers, MCQs, and conversations remain private
   to the original note without additional production logic.

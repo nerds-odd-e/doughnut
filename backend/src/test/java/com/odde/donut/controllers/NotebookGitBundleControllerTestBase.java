@@ -103,16 +103,25 @@ abstract class NotebookGitBundleControllerTestBase extends NotebookControllerTes
   ResponseStatusException assertProposalRejectedWithoutMutatingBinding(
       Notebook notebook, String expectedHead, byte[] bundleBytes, HttpStatus expectedStatus)
       throws UnexpectedNoAccessRightException {
+    ResponseStatusException exception =
+        assertProposalRejectedWithoutMutatingBinding(
+            notebook, expectedHead, bundleBytes, ResponseStatusException.class);
+
+    assertThat(exception.getStatusCode(), equalTo(expectedStatus));
+    return exception;
+  }
+
+  <T extends RuntimeException> T assertProposalRejectedWithoutMutatingBinding(
+      Notebook notebook, String expectedHead, byte[] bundleBytes, Class<T> exceptionType)
+      throws UnexpectedNoAccessRightException {
     NotebookGitBinding before =
         notebookGitBindingRepository.findByNotebook_Id(notebook.getId()).orElseThrow();
 
-    ResponseStatusException exception =
+    T exception =
         assertThrows(
-            ResponseStatusException.class,
+            exceptionType,
             () ->
                 controller.publishNotebookGitProposal(notebook.getId(), expectedHead, bundleBytes));
-
-    assertThat(exception.getStatusCode(), equalTo(expectedStatus));
 
     NotebookGitBinding after =
         notebookGitBindingRepository.findByNotebook_Id(notebook.getId()).orElseThrow();
