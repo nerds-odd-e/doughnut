@@ -105,36 +105,23 @@ public class NotebookGitProposalPublisher {
             proposal.repository(), acceptedHead, proposal.mainHead());
     NotebookGitProposalMarkdownFormat.assertValidTypedMarkdown(
         proposal.repository(), proposal.mainHead());
-    String changedNoteContent =
-        NotebookGitProposalBlobText.readUtf8(
-            proposal.repository(), proposal.mainHead(), noteChange.path());
-    AuthoredNoteContent.assertValidForSave(changedNoteContent);
-    Note changedNote;
+    Timestamp publishedAt = testabilitySettings.getCurrentUTCTimestamp();
     List<Note> proposedLiveNotes = liveNotes;
     if (noteChange.kind() == NotebookGitProposalTreeShape.ChangeKind.ADDED) {
-      String title = validAdditionTitle(noteChange.path());
       projection.requireMatchingAcceptedTree(
           notebook, folders, liveNotes, proposal.repository(), acceptedHead);
-      Integer destinationFolderId =
-          projection.requireRepresentedFolderIdForAddition(
-              folders, proposal.repository(), acceptedHead, noteChange.path());
-      Folder destinationFolder =
-          destinationFolderId == null
-              ? null
-              : entityPersister.find(Folder.class, destinationFolderId);
-      changedNote = noteFactory.create(notebook, destinationFolder, title);
+      Note addedNote =
+          applyAddition(notebook, folders, proposal, acceptedHead, noteChange.path(), publishedAt);
       proposedLiveNotes = new ArrayList<>(liveNotes);
-      proposedLiveNotes.add(changedNote);
+      proposedLiveNotes.add(addedNote);
     } else {
-      changedNote =
+      AuthoredNoteDocument document = readValidatedDocument(proposal, noteChange.path());
+      Note changedNote =
           projection.requireMatchingAcceptedTreeWithOneLiveNoteAtPath(
               notebook, folders, liveNotes, proposal.repository(), acceptedHead, noteChange.path());
+      authoredNoteDocumentPersistence.persist(changedNote, document, publishedAt);
     }
 
-    Timestamp publishedAt = testabilitySettings.getCurrentUTCTimestamp();
-    AuthoredNoteDocument document =
-        AuthoredNoteDocument.fromContent(changedNoteContent, canonicalDonutOrigin);
-    authoredNoteDocumentPersistence.persist(changedNote, document, publishedAt);
     projection.requireMatchingAcceptedTree(
         notebook, folders, proposedLiveNotes, proposal.repository(), proposal.mainHead());
 
@@ -145,6 +132,35 @@ public class NotebookGitProposalPublisher {
     binding.setUpdatedAt(publishedAt);
     entityPersister.save(binding);
     return written.headObjectId();
+  }
+
+  private Note applyAddition(
+      Notebook notebook,
+      List<ExportFolderRow> folders,
+      NotebookGitProposalImporter.ImportedProposal proposal,
+      ObjectId acceptedHead,
+      String path,
+      Timestamp publishedAt) {
+    AuthoredNoteDocument document = readValidatedDocument(proposal, path);
+    String title = validAdditionTitle(path);
+    Integer destinationFolderId =
+        projection.requireRepresentedFolderIdForAddition(
+            folders, proposal.repository(), acceptedHead, path);
+    Folder destinationFolder =
+        destinationFolderId == null
+            ? null
+            : entityPersister.find(Folder.class, destinationFolderId);
+    Note addedNote = noteFactory.create(notebook, destinationFolder, title);
+    authoredNoteDocumentPersistence.persist(addedNote, document, publishedAt);
+    return addedNote;
+  }
+
+  private AuthoredNoteDocument readValidatedDocument(
+      NotebookGitProposalImporter.ImportedProposal proposal, String path) {
+    String content =
+        NotebookGitProposalBlobText.readUtf8(proposal.repository(), proposal.mainHead(), path);
+    AuthoredNoteContent.assertValidForSave(content);
+    return AuthoredNoteDocument.fromContent(content, canonicalDonutOrigin);
   }
 
   private String validAdditionTitle(String path) {

@@ -3,10 +3,8 @@
 ## Source and status
 
 - Source: [SEED-009 Story 11](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-11).
-- Status: executing; leaf 1 complete, leaf 2 next.
-- Readiness: **ready for direct execution** after refinement in place. All
-  thirteen leaves remain planned; no implementation, product-test execution,
-  commit or push was performed during refinement.
+- Status: executing; leaves 1–2 complete, leaf 3 next.
+- Readiness: remaining leaves ready for direct execution after refinement.
 
 ## Goal and scope
 
@@ -139,7 +137,10 @@ One tree-validation change and one controller proof loop; no projection changes.
 ### 2. Isolate the existing note-addition operation
 
 Type: Structure
-Status: planned
+Status: done
+Evidence: `CURSOR_DEV=true nix develop -c pnpm backend:test_only` passed
+(57 seconds). Retained root/folder creation, validation, identity and late-failure
+observations inspected. Independent refactor: no edits. About 3 minutes active.
 Proof: Existing root/folder additions, title/property rejection and addition
 rollback cases remain green under the backend verification command.
 
