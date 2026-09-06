@@ -93,11 +93,11 @@ export function writeBlockingGithubListCommand(bin) {
 const fs = require('node:fs');
 const path = require('node:path');
 const root = process.env.CI_TEST_ROOT;
-fs.writeFileSync(path.join(root, 'github-request-started'), '');
 process.on('SIGTERM', () => {
   fs.writeFileSync(path.join(root, 'github-request-stopped'), '');
   process.exit(0);
 });
+fs.writeFileSync(path.join(root, 'github-request-started'), '');
 setInterval(() => {}, 1000);
 `,
     { mode: 0o700 }
