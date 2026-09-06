@@ -204,7 +204,10 @@ sibling P1 changes. Preserve the current independent refactor and check-only hoo
 
 **Status:** Installed 2026-09-06 in `4253b3b954`. Four supplied instruction
 replays passed; `wrap-up.md` word count 557 → 547. Independent refactor made no
-edits and skipped tests. Live effectiveness is not claimed.
+edits and skipped tests. The later local-note execution supplied natural evidence:
+its final no-edit review also skipped tests. Agent-capacity exhaustion and a lost
+isolated-review output caused a repeated review, not a recurrence of this
+decide-first/no-test defect; that efficiency finding remains in SEED-010.
 
 **Goal:** Avoid unnecessary test runs caused by coordinator-generated refactor
 instructions while retaining independent review and proof for refactor edits.
@@ -224,8 +227,12 @@ No new agent, schema, runner, review stage, full-suite policy, or Pygardon rollo
 **Status:** Installed 2026-09-06 in `99870b8e88`. Five focused lifecycle/stream
 tests passed, including saved-note recovery, exact cooperative stop, preserved
 failure evidence, and a live second observer. Missing identity/evidence replays
-require an unresolved report. Adapter word count 717 → 633. Real compaction and
-broader recovery effectiveness are not claimed.
+require an unresolved report. Adapter word count 717 → 633. The later local-note
+execution supplied natural compaction evidence: after volatile handles were no
+longer usable, the retained PLAN identity selected the exact mailbox, cooperative
+stop returned `pendingCi: unobserved`, and the recorded PID was confirmed exited.
+Broader recovery effectiveness is not claimed; its startup bridge recovery is a
+separate SEED-010/SEED-011 candidate.
 
 **Goal:** Let the coordinator close its exact CI observer and retain an honest
 coverage receipt when Codex's volatile cell/session handles are unavailable.
@@ -270,6 +277,7 @@ fresh independent refactor review.
 
 Source execution boundaries for recovering detail from Git:
 Doughnut clone/publication through `dd1ca6415a`, web-note receive through
-`a5278d667f`; Pygardon Quick 069 through `4951c03e`, Quick 072 through
-`5d02400cf`, Quick 073 at `7865a330e`. Earlier proof-contract adoption:
-Doughnut `e6ea35d4f97250809ebb8676edfcca9be3e3f2d1`.
+`a5278d667f`, and local-note creation through `d2d8fb9ff5`; Pygardon Quick 069
+through `4951c03e`, Quick 072 through `5d02400cf`, Quick 073 at `7865a330e`.
+Earlier proof-contract adoption: Doughnut
+`e6ea35d4f97250809ebb8676edfcca9be3e3f2d1`.
