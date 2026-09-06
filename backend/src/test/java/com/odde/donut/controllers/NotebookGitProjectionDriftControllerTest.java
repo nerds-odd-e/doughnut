@@ -5,9 +5,10 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.nullValue;
 
+import com.odde.donut.controllers.dto.NoteCreationDTO;
 import com.odde.donut.controllers.dto.NoteUpdateContentDTO;
-import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookGitBinding;
@@ -27,19 +28,13 @@ class NotebookGitProjectionDriftControllerTest extends NotebookGitBundleControll
   private static final String WEB_CONTENT = "---\ntype: Note\n---\nweb content";
 
   @Autowired TextContentController textContentController;
-  @Autowired RelationController relationController;
 
   @Test
   void rejectsAnAdditionBasedOnAnOldParentAfterWebContentAdvancedAcceptedMain() throws Exception {
     Notebook notebook = createGitBackedNotebook();
     Note note = makeMe.aNote().notebook(notebook).title("note").content(ACCEPTED_CONTENT).please();
     NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);
-    byte[] proposal =
-        proposalBundleBytes(
-            binding,
-            List.of(
-                new NotebookGitProposalFile("note.md", ACCEPTED_CONTENT),
-                new NotebookGitProposalFile("addition.md", PROPOSED_CONTENT)));
+    byte[] proposal = additionProposalBundle(binding);
     NoteUpdateContentDTO update = new NoteUpdateContentDTO();
     update.setContent(WEB_CONTENT);
     textContentController.updateNoteContent(note, update);
@@ -61,26 +56,48 @@ class NotebookGitProjectionDriftControllerTest extends NotebookGitBundleControll
   }
 
   @Test
-  void rejectsWhenWebStructureHasDriftedFromAcceptedMain() throws Exception {
+  void rejectsAnAdditionWhenAWebCreationOccupiesItsDestination() throws Exception {
     Notebook notebook = createGitBackedNotebook();
-    Note note = makeMe.aNote().notebook(notebook).title("note").content(ACCEPTED_CONTENT).please();
-    Folder folder = makeMe.aFolder().notebook(notebook).name("folder").please();
+    Note acceptedNote =
+        makeMe.aNote().notebook(notebook).title("note").content(ACCEPTED_CONTENT).please();
     NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);
-    relationController.moveNoteToFolder(note, folder);
+    NoteCreationDTO webCreation = new NoteCreationDTO();
+    webCreation.setNewTitle("addition");
+    webCreation.setContent("web content");
+    Note occupiedDestination =
+        noteRepository
+            .findById(controller.createNoteAtNotebookRoot(notebook, webCreation).getId())
+            .orElseThrow();
 
-    ResponseStatusException exception = submitCurrentParentProposal(notebook, binding);
+    byte[] proposal = additionProposalBundle(binding);
+
+    ResponseStatusException exception =
+        assertProposalRejectedWithoutMutatingBinding(
+            notebook, binding.getAcceptedGitObjectId(), proposal, HttpStatus.CONFLICT);
 
     assertThat(exception.getStatusCode(), equalTo(HttpStatus.CONFLICT));
     assertThat(exception.getReason(), containsString("refresh the checkout before publishing"));
+    assertThat(
+        noteRepository.findById(acceptedNote.getId()).orElseThrow().getContent(),
+        equalTo(ACCEPTED_CONTENT));
+    Note reloadedOccupiedDestination =
+        noteRepository.findById(occupiedDestination.getId()).orElseThrow();
+    assertThat(reloadedOccupiedDestination.getTitle(), equalTo("addition"));
+    assertThat(reloadedOccupiedDestination.getContent(), equalTo(WEB_CONTENT));
+    assertThat(reloadedOccupiedDestination.getFolder(), nullValue());
+    assertThat(
+        noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId()).stream()
+            .map(Note::getId)
+            .toList(),
+        equalTo(List.of(acceptedNote.getId(), occupiedDestination.getId())));
   }
 
-  private ResponseStatusException submitCurrentParentProposal(
-      Notebook notebook, NotebookGitBinding binding) throws Exception {
-    byte[] proposal =
-        proposalBundleBytes(
-            binding, List.of(new NotebookGitProposalFile("note.md", PROPOSED_CONTENT)));
-    return assertProposalRejectedWithoutMutatingBinding(
-        notebook, binding.getAcceptedGitObjectId(), proposal, HttpStatus.CONFLICT);
+  private byte[] additionProposalBundle(NotebookGitBinding binding) throws Exception {
+    return proposalBundleBytes(
+        binding,
+        List.of(
+            new NotebookGitProposalFile("note.md", ACCEPTED_CONTENT),
+            new NotebookGitProposalFile("addition.md", PROPOSED_CONTENT)));
   }
 
   private NotebookGitBinding reloadCommittedBinding(Integer notebookId) {

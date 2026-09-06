@@ -269,7 +269,7 @@ publish boundaries. About five minutes, medium confidence.
 
 ### 8. Reject an addition when current web state has drifted
 Type: Behavior
-Status: planned
+Status: done
 Proof: A web structural change without an accepted Git commit causes addition
 rejection; the occupied destination/current notes and accepted bundle survive.
 
@@ -460,6 +460,9 @@ The broader follow-up commit scope remains outside this plan.
 
 ## Refinement learnings
 
+- The pre-create projection guard rejects an addition when an unsynchronized
+  web-created note already occupies its path, preserving both current notes and
+  the unchanged accepted binding without addition-specific recovery logic.
 - The unchanged expected-head guard rejects an addition authored from an old
   parent after a web save advances `main`; no addition-specific concurrency or
   rebase mechanism is required.
