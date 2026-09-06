@@ -4,9 +4,16 @@
  */
 
 import { execFileSync } from 'node:child_process'
-import { mkdtempSync, readdirSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdtempSync, readdirSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join, relative } from 'node:path'
+
+export interface CliNotebookCheckoutState {
+  head: string
+  branch: string
+  rootCommitCount: string
+  status: string
+}
 
 function listFilesRecursively(dir: string, base: string): string[] {
   return readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
@@ -23,6 +30,23 @@ export function createCliE2eNotebookCloneTasks() {
     createCliNotebookCloneDestination(): string {
       const parent = mkdtempSync(join(tmpdir(), 'cypress-cli-clone-'))
       return join(parent, 'checkout')
+    },
+    cliNotebookCloneDestinationExists(destination: string): boolean {
+      return existsSync(destination)
+    },
+    readCliNotebookCheckoutState(
+      checkoutDir: string
+    ): CliNotebookCheckoutState {
+      const git = (...args: string[]) =>
+        execFileSync('git', ['-C', checkoutDir, ...args], {
+          encoding: 'utf8',
+        }).trim()
+      return {
+        head: git('rev-parse', 'HEAD'),
+        branch: git('rev-parse', '--abbrev-ref', 'HEAD'),
+        rootCommitCount: git('rev-list', '--max-parents=0', '--count', 'HEAD'),
+        status: git('status', '--porcelain'),
+      }
     },
     /** Relative file paths of the checkout, excluding `.git`, for canonical-tree assertions. */
     listNotebookCheckoutEntries(checkoutDir: string): string[] {

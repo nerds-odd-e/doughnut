@@ -3,6 +3,7 @@
  * (non-interactive, installed-binary invocation — same `runInstalledCli` mechanism as
  * `installation()`), and reading back the resulting Git checkout.
  */
+import type { CliNotebookCheckoutState } from '../../../config/cliE2eNotebookCloneTasks'
 import testability from '../../testability'
 import { nonInteractiveOutput } from './outputAssertions'
 
@@ -76,7 +77,10 @@ function notebookClone() {
     },
     expectDestinationAbsent(): Cypress.Chainable<null> {
       return cy.get<string>('@cliCloneDestination').then((destination) => {
-        cy.exec(`test ! -e ${destination}`).its('exitCode').should('equal', 0)
+        cy.task<boolean>(
+          'cliNotebookCloneDestinationExists',
+          destination
+        ).should('equal', false)
         return cy.wrap(null)
       })
     },
@@ -146,18 +150,19 @@ function notebookCloneCheckout() {
     expectProposalRetained(): Cypress.Chainable<null> {
       return cy.get<string>('@cliCloneDestination').then((destination) => {
         cy.get<string>('@cliNotebookPublishHead').then((head) => {
-          cy.exec(`git -C ${destination} rev-parse HEAD`)
-            .its('stdout')
-            .should('equal', head)
+          cy.task<CliNotebookCheckoutState>(
+            'readCliNotebookCheckoutState',
+            destination
+          ).then((state) => {
+            expect(state.head).to.equal(head)
+            expect(state.status).to.equal('')
+          })
         })
         cy.get<{ relativePath: string; content: string }[]>(
           '@cliNotebookProposalFiles'
         ).each(({ relativePath, content }) => {
           cy.readFile(`${destination}/${relativePath}`).should('equal', content)
         })
-        cy.exec(`git -C ${destination} status --porcelain`)
-          .its('stdout')
-          .should('equal', '')
         return cy.wrap(null)
       })
     },
@@ -175,15 +180,14 @@ function notebookCloneCheckout() {
       branch: string
     ): Cypress.Chainable<null> {
       return cy.get<string>('@cliCloneDestination').then((destination) => {
-        cy.exec(`git -C ${destination} rev-parse --abbrev-ref HEAD`)
-          .its('stdout')
-          .should('equal', branch)
-        cy.exec(`git -C ${destination} rev-list --max-parents=0 --count HEAD`)
-          .its('stdout')
-          .should('equal', '1')
-        cy.exec(`git -C ${destination} status --porcelain`)
-          .its('stdout')
-          .should('equal', '')
+        cy.task<CliNotebookCheckoutState>(
+          'readCliNotebookCheckoutState',
+          destination
+        ).then((state) => {
+          expect(state.branch).to.equal(branch)
+          expect(state.rootCommitCount).to.equal('1')
+          expect(state.status).to.equal('')
+        })
         return cy.wrap(null)
       })
     },

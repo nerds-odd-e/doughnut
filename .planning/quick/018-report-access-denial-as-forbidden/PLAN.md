@@ -2,7 +2,7 @@
 
 ## Source and goal
 
-Status: done; implementation and proof complete, delivery wrap-up recorded below.
+Status: done; compatibility repair verified after integrating remote dependency upgrade.
 
 The user selected both findings from the 2026-09-06 manual UAT for fixes.
 This plan owns finding 1; [the search plan](../019-close-search-on-result-activation/PLAN.md)
@@ -111,6 +111,16 @@ If fixture work exposes a second implementation beat or >10 minutes active work,
 refine this plan in place before continuing; do not widen the story.
 
 ## Promise ownership and wrap-up
+
+Push recovery: remote `main` advanced to `8d4355487f`, upgrading Cypress from
+15.21.1 to 16.0.0. Rebase succeeded and locked dependencies installed. Re-running
+the affected CLI feature produced three failures explicitly reporting removed
+`cy.exec()` (`/tmp/denial-cypress-rebased.log`); three other scenarios passed.
+This invalidated only E2E helper compatibility proof. The affected Git and
+filesystem assertions now use Node tasks. The same focused Cypress command passed
+six of six scenarios on Cypress 16 (`/tmp/denial-cypress-compat.log`). A fresh
+refactor review made no edits, and coordinator formatting passed. Existing backend,
+CLI unit, and manual behavior proof remains applicable. No product-scope change.
 
 Completed proof:
 - `CURSOR_DEV=true nix develop -c pnpm backend:test_only`: 2,213 tests passed,
