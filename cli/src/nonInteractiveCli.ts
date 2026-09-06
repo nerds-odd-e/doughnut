@@ -3,7 +3,7 @@ import { exceptionText } from './exceptionText.js'
 import { runUpdate } from './commands/update.js'
 import { formatVersionOutput } from './commands/version.js'
 import { acquireNotebookGitCheckout } from './commands/notebook/notebookAcquisition.js'
-import { resolveNotebookPublishBinding } from './commands/notebook/notebookPublishBinding.js'
+import { resolveNotebookBinding } from './commands/notebook/notebookBinding.js'
 import { assertLocalMainIsCleanAndCommitted } from './commands/notebook/notebookPublishReadiness.js'
 import { assertLocalMainFollowsAcceptedHistory } from './commands/notebook/notebookPublishAncestry.js'
 import { submitNotebookGitProposal } from './commands/notebook/notebookPublishSubmission.js'
@@ -49,6 +49,7 @@ export async function completeNonInteractiveCliIfHandled(
 const NOTEBOOK_CLONE_USAGE =
   'usage: donut notebook clone <notebook-id> <destination>'
 const NOTEBOOK_PUBLISH_USAGE = 'usage: donut notebook publish <directory>'
+const NOTEBOOK_PULL_USAGE = 'usage: donut notebook pull <directory>'
 
 async function completeNotebookSubcommand(
   notebookArgs: string[]
@@ -57,6 +58,11 @@ async function completeNotebookSubcommand(
 
   if (action === 'publish') {
     await completeNotebookPublish(notebookArgs)
+    return
+  }
+
+  if (action === 'pull') {
+    completeNotebookPull(notebookArgs)
     return
   }
 
@@ -94,7 +100,7 @@ async function completeNotebookPublish(notebookArgs: string[]): Promise<void> {
 
   let acceptedHead: string
   try {
-    const { notebookId } = resolveNotebookPublishBinding(directory)
+    const { notebookId } = resolveNotebookBinding(directory)
     assertLocalMainIsCleanAndCommitted(directory)
     const expectedHead = await assertLocalMainFollowsAcceptedHistory(
       directory,
@@ -110,4 +116,20 @@ async function completeNotebookPublish(notebookArgs: string[]): Promise<void> {
   }
 
   console.log(`Published notebook. Accepted head: ${acceptedHead}`)
+}
+
+function completeNotebookPull(notebookArgs: string[]): never {
+  const [, directory] = notebookArgs
+
+  if (!directory) {
+    exitCliError(NOTEBOOK_PULL_USAGE)
+  }
+
+  try {
+    resolveNotebookBinding(directory)
+  } catch (e) {
+    exitCliError(exceptionText(e))
+  }
+
+  exitCliError('Receiving accepted notebook history is not available yet.')
 }

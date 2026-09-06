@@ -9,11 +9,11 @@ import {
   installNotebookCliRunFixture,
   runGit,
 } from './notebookClone.testHelpers.js'
+import { initBoundCheckout } from './notebookGit.testHelpers.js'
 import {
   buildSourceRepo,
   bundleMain,
   cloneAsBoundCheckout,
-  initBoundCheckout,
   stubFetchWithBundleFile,
 } from './notebookPublish.testHelpers.js'
 

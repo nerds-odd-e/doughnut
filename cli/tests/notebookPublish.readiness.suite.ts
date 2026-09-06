@@ -8,10 +8,8 @@ import {
   installNotebookCliRunFixture,
   runGit,
 } from './notebookClone.testHelpers.js'
-import {
-  initBoundCheckout,
-  stubFetchWithAcceptedBundleFrom,
-} from './notebookPublish.testHelpers.js'
+import { initBoundCheckout } from './notebookGit.testHelpers.js'
+import { stubFetchWithAcceptedBundleFrom } from './notebookPublish.testHelpers.js'
 
 export function describeNotebookPublishReadiness(): void {
   describe('notebook publish (CLI routing, local readiness checks)', () => {

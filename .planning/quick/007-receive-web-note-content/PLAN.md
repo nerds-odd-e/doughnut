@@ -159,7 +159,7 @@ mutable CurrentUser across competing threads.
 
 ### 1. Explain an unusable receive binding
 Type: Behavior
-Status: planned
+Status: done
 Proof: CLI `run` cases for missing directory/binding and mismatched API origin.
 
 Behavior: the owner runs `pull` outside a correctly bound checkout → explain
@@ -168,6 +168,10 @@ the binding prerequisite without sending credentials or changing local state.
 Add argv routing and usage; share existing binding checks without duplicating
 them. Until leaf 3, valid input reports receive not yet available, never success.
 Sizing: 3–5 minutes, medium confidence; one CLI entry-point loop.
+
+Learning: publish and pull now share one bound-checkout resolver and common
+real-Git test fixtures; valid pull input deliberately stops at the temporary
+unavailable boundary owned by leaf 3.
 
 ### 2. Protect an ineligible working checkout
 Type: Behavior

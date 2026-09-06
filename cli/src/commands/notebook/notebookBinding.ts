@@ -16,21 +16,16 @@ function readLocalGitConfig(
   return value === '' ? undefined : value
 }
 
-export interface NotebookPublishBinding {
+export interface NotebookBinding {
   notebookId: string
   apiOrigin: string
 }
 
 /**
- * Reads the local-only Git config binding that `notebook clone` records
- * (`recordLocalNotebookBinding` in notebookAcquisition.ts: `donut.notebook-id` and
- * `donut.api-origin`) and confirms it matches the currently configured authenticated API
- * origin. Throws an actionable error when `directory` isn't a bound checkout, or when it's
- * bound to a different Donut server than the one currently configured.
+ * Reads the local-only Git config binding that `notebook clone` records and confirms it matches
+ * the currently configured authenticated API origin before a command sends credentials.
  */
-export function resolveNotebookPublishBinding(
-  directory: string
-): NotebookPublishBinding {
+export function resolveNotebookBinding(directory: string): NotebookBinding {
   const notebookId = readLocalGitConfig(directory, 'donut.notebook-id')
   const apiOrigin = readLocalGitConfig(directory, 'donut.api-origin')
   if (!(notebookId && apiOrigin)) {
@@ -42,7 +37,7 @@ export function resolveNotebookPublishBinding(
   const { apiBaseUrl } = loadAuthenticatedFetchContext()
   if (apiOrigin !== apiBaseUrl) {
     throw new Error(
-      `${directory} was cloned from ${apiOrigin}, but the currently configured Donut server is ${apiBaseUrl}. Publish from a checkout cloned against that server, or reconfigure the CLI to use ${apiOrigin}.`
+      `${directory} was cloned from ${apiOrigin}, but the currently configured Donut server is ${apiBaseUrl}. Use a checkout cloned against that server, or reconfigure the CLI to use ${apiOrigin}.`
     )
   }
 
