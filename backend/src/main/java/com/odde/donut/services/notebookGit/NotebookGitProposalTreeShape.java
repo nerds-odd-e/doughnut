@@ -81,6 +81,9 @@ public final class NotebookGitProposalTreeShape {
   }
 
   private static NoteChange requireExactlyOneAllowedNoteChange(List<NoteChange> changes) {
+    for (NoteChange change : changes) {
+      assertRegularNotePath(change.path());
+    }
     if (changes.isEmpty()) {
       throw unsupportedTreeShape("proposal contains no changed file");
     }
@@ -91,8 +94,10 @@ public final class NotebookGitProposalTreeShape {
               + ". Publish one note change per commit using separate commits");
     }
 
-    NoteChange change = changes.getFirst();
-    String changedPath = change.path();
+    return changes.getFirst();
+  }
+
+  private static void assertRegularNotePath(String changedPath) {
     if (!changedPath.endsWith(".md")) {
       throw unsupportedTreeShape("path \"" + changedPath + "\" is not a Markdown note");
     }
@@ -100,7 +105,6 @@ public final class NotebookGitProposalTreeShape {
       throw unsupportedTreeShape(
           "path \"" + changedPath + "\" is a folder README, which is reserved");
     }
-    return change;
   }
 
   private static void assertPathIsSafe(String path) {

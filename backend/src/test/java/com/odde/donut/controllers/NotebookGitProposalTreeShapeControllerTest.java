@@ -3,8 +3,10 @@ package com.odde.donut.controllers;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
+import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookGitBinding;
 import com.odde.donut.services.notebookExport.PortableTreeEntry;
@@ -113,18 +115,34 @@ class NotebookGitProposalTreeShapeControllerTest extends NotebookGitBundleContro
   }
 
   @Test
-  void rejectsProposalThatChangesTwoFilesWithoutMutatingTheAcceptedBinding() throws Exception {
+  void identifiesAReservedReadmeAmongNoteChangesWithoutMutatingRemoteState() throws Exception {
     Notebook notebook = createGitBackedNotebook();
-    NotebookGitBinding binding = seedAcceptedBinding(notebook, baselineEntries());
+    Folder folder =
+        makeMe
+            .aFolder()
+            .notebook(notebook)
+            .name("Folder")
+            .readmeContent("original readme")
+            .please();
+    NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);
     byte[] bundleBytes =
         proposalBundleBytes(
             binding,
             List.of(
-                new NotebookGitProposalFile("note.md", "changed content"),
-                new NotebookGitProposalFile("README.md", "readme changed")));
+                new NotebookGitProposalFile("Added.md", "---\ntype: Note\n---\nadded content"),
+                new NotebookGitProposalFile(
+                    "Folder/README.md", "---\ntype: Readme\n---\nchanged readme")));
 
-    assertProposalRejectedWithoutMutatingBinding(
-        notebook, binding.getAcceptedGitObjectId(), bundleBytes, HttpStatus.BAD_REQUEST);
+    ResponseStatusException exception =
+        assertProposalRejectedWithoutMutatingBinding(
+            notebook, binding.getAcceptedGitObjectId(), bundleBytes, HttpStatus.BAD_REQUEST);
+
+    assertThat(exception.getReason(), containsString("Folder/README.md"));
+    assertThat(exception.getReason(), containsString("folder README, which is reserved"));
+    assertThat(noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId()), empty());
+    assertThat(
+        entityManager.find(Folder.class, folder.getId()).getReadmeContent(),
+        equalTo("original readme"));
   }
 
   @Test
