@@ -12,6 +12,7 @@ previous_resolution: implemented as one five-slice execution-contract change; re
 reopened: 2026-09-05
 reopened_reason: additional process findings from the completed notebook-publication execution; earlier implemented scope remains complete
 selected_followup_completed: 2026-09-05
+latest_evidence: 2026-09-06
 ---
 
 # SEED-010: `execute-plan` wrap-up spends tokens on steps that usually find nothing
@@ -40,8 +41,9 @@ The original scope was resolved on 2026-09-04. Reopened on 2026-09-05 for the
 unimplemented findings below. Surface when evaluating `execute-plan` evidence
 handoffs, retiring interim behavior, planning transaction-sensitive work, or
 when another long run shows redundant proof runs or coordinator-context growth.
-CI watcher lifecycle and repair scheduling have their own home in
-[SEED-011](SEED-011-efficient-ci-failure-attention.md).
+CI watcher lifecycle and repair scheduling have their implementation home in
+[SEED-011](SEED-011-efficient-ci-failure-attention.md). Cross-cutting evidence
+about execution wrap-up may be summarized here without duplicating that story.
 
 ## Implemented Scope
 
@@ -60,6 +62,7 @@ CI watcher lifecycle and repair scheduling have their own home in
 - `.agents/skills/post-change-refactor/SKILL.md` — contains the "run related tests only when the refactor edits" rule that wasn't reliably followed by fresh agents in this sample.
 - Session transcript executing `.planning/quick/002-open-existing-notebook-locally/PLAN.md` slices 1-8 (2026-09-04) — source of all the token/outcome numbers above.
 - `execution-retrospective` on the same plan's completed 15-slice run (2026-09-05) — source of the Further Process Findings above; also produced follow-up correction `.planning/quick/004-notebook-clone-checkout-cleanup/PLAN.md` (repository bugs, tracked separately from this process seed).
+- `execution-retrospective` on `.planning/quick/007-receive-web-note-content/PLAN.md` (2026-09-06) — source of the web-note receive process findings below; repository corrections are tracked separately in `.planning/quick/009-harden-web-note-receive-evidence/PLAN.md`.
 
 ## Notes
 
@@ -128,6 +131,52 @@ should not become a blanket rule to classify future failures as harmless or
 skip mandatory proof. Distinguish demonstrated baseline issues, diagnosed
 environment limits, and unresolved defects before choosing focused reuse.
 
+## Merged Findings from Web-note Receive Execution (2026-09-06)
+
+Source: the completed 13-commit execution of
+`.planning/quick/007-receive-web-note-content/PLAN.md` through `a5278d667f` and
+its execution-retrospective. These are process proposals, not selected leaves
+or implemented changes.
+
+- **Reopened recurrence — a no-edit refactor pass reran the full backend
+  suite.** The final fresh refactor review made no edits, but its delegation
+  asked for a full backend run "after any change (or to confirm a no-change
+  review)". It consequently ran all 2,180 backend tests. This directly
+  contradicts implemented-scope item 2 above and the current canonical
+  `wrap-up.md` / `post-change-refactor` contract, both of which require
+  `skipped — no refactor edits`. Keep one canonical delegation clause and make
+  the coordinator reject a contradictory refactor prompt or proof handoff
+  rather than treating a no-change suite run as confirmation. The desired
+  finding is not disputed; its 2026-09-04 closure is incomplete at the
+  execution boundary because the same behavior happened again.
+- **Strengthen the existing failure-baseline qualification — a retry is not a
+  diagnosis.** The full backend suite first failed `AdminUserControllerTest`
+  against dirty local database state, immediately passed on retry, then failed
+  the same test in two later refactor proofs. Bounded inspection found
+  transaction-committed leftover users; targeted database cleanup restored a
+  green full run but did not resolve the test family's clean-database
+  assumption. After one unexplained failure, diagnose enough state to establish
+  a causal baseline; recurrence in
+  the same execution is a Jidoka finding, not permission to normalize the
+  failure through retries or cleanup. Cleanup may restore usable proof, but the
+  unresolved isolation defect must remain explicit. This does not dispute
+  finding 5's qualified conclusion that broad reconfirmation can be avoided
+  after a demonstrated baseline; it disputes any looser reading where a repeated
+  signature, a later pass, or the label "unrelated" counts as that demonstration.
+- **The deferred Codex compaction/shutdown gap occurred in a live execution.**
+  At closeout, the yielded-cell observer's saved handle was unavailable after
+  context compaction. Terminating the cell did not stop its exact
+  `ci-mailbox.mjs stream` subprocess; targeted PID inspection and `SIGINT` were
+  required, and the terminal unread-event / pending-CI receipt could no longer
+  be recovered. Evaluate a recoverable shutdown path keyed by the stable
+  execution observer/mailbox identity when volatile Codex cell state is absent:
+  rediscover only the exact observer, stop it without a broad process-name kill,
+  confirm exit, and retrieve or honestly report the missing terminal evidence.
+  This is not a recurrence of quick 008's formally closed scope: that plan
+  explicitly excluded compaction ownership and SEED-011 Story 2 deferred it.
+  It is new live evidence that the deferred boundary is now exercised, while
+  implementation ownership remains in SEED-011.
+
 ## Cross-project Retrospective Findings and Possible Responses (2026-09-05)
 
 The developer relayed Pygardon's agreement that Doughnut should lead two small,
@@ -181,7 +230,9 @@ Shared transaction-fixture checks remain a response for the next applicable
 transaction change; establish ownership with a small representative proof before
 repeating migration work. The Vitest suite-extraction technique remains optional
 guidance for a future matching case. These are deferred, not execution leaves.
-All CI-related issues are excluded from the selected work and handled separately.
+CI implementation changes are excluded from this seed's selected work and
+handled separately in SEED-011; the cross-cutting wrap-up evidence above remains
+here so the execution retrospective is complete.
 
 ## Proof-coverage execution evidence (2026-09-05)
 
