@@ -3,7 +3,7 @@
 ## Source and status
 
 - Source: [SEED-009 Story 11](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-11).
-- Status: executing; leaves 1–5 complete, leaf 6 next.
+- Status: executing; leaves 1–6 complete, leaf 7 next.
 - Readiness: remaining leaves ready for direct execution after refinement.
 
 ## Goal and scope
@@ -238,7 +238,14 @@ reject; no temporary mixed restriction or obsolete split-commit advice survives.
 ### 6. Reject the whole mixed commit when a note lacks its required type
 
 Type: Behavior
-Status: planned
+Status: done
+Evidence: `CURSOR_DEV=true nix develop -c pnpm backend:test_only` passed
+(47 seconds): exact missing-type reason/path and committed unchanged notes/binding
+inspected. Production unchanged. Independent refactor: no edits. About 3 minutes
+active, 95 seconds Gradle across runs before/after strengthening the reason assertion.
+CLI preservation/transport proof also passed and was inspected:
+`CURSOR_DEV=true nix develop -c pnpm -C cli exec vitest run tests/notebookPublish.test.ts`
+(21 tests, 9.94 seconds); reuse for leaves 7–8 while transport stays unchanged.
 Proof: The seed's valid mixed proposal plus a note missing `type` rejects with
 its path/reason; committed state shows no additions, unchanged existing content
 and the original accepted head/bundle.
