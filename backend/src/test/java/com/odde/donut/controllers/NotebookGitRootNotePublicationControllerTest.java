@@ -1,5 +1,6 @@
 package com.odde.donut.controllers;
 
+import static com.odde.donut.testability.CommittedTransactionTestSupport.inCommittedTransaction;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
@@ -11,6 +12,7 @@ import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookGitBinding;
 import com.odde.donut.services.notebookGit.NotebookGitProposalBlobText;
 import com.odde.donut.testability.GitBundleTestReader;
+import java.sql.Timestamp;
 import java.util.List;
 import org.eclipse.jgit.internal.storage.dfs.DfsRepositoryDescription;
 import org.eclipse.jgit.internal.storage.dfs.InMemoryRepository;
@@ -102,4 +104,57 @@ class NotebookGitRootNotePublicationControllerTest extends NotebookGitBundleCont
     Note reloadedExisting = noteRepository.findById(existing.getId()).orElseThrow();
     assertThat(reloadedExisting.getContent(), equalTo(ORIGINAL_CONTENT));
   }
+
+  @Test
+  void retriesAnAcceptedRootNoteAdditionWithoutCreatingAnotherNote() throws Exception {
+    Notebook notebook = createGitBackedNotebook();
+    NotebookGitBinding initialBinding = snapshotCurrentPortableTree(notebook);
+    String initialHead = initialBinding.getAcceptedGitObjectId();
+    byte[] proposalBytes =
+        proposalBundleBytes(
+            initialBinding,
+            List.of(new NotebookGitProposalFile("Created Note.md", CREATED_CONTENT)));
+
+    String publishedHead =
+        controller.publishNotebookGitProposal(notebook.getId(), initialHead, proposalBytes);
+    RootAdditionPublicationState stateAfterPublication = rootAdditionPublicationState(notebook);
+
+    String retriedHead =
+        controller.publishNotebookGitProposal(notebook.getId(), initialHead, proposalBytes);
+
+    assertThat(retriedHead, equalTo(publishedHead));
+    assertThat(rootAdditionPublicationState(notebook), equalTo(stateAfterPublication));
+  }
+
+  private RootAdditionPublicationState rootAdditionPublicationState(Notebook notebook) {
+    return inCommittedTransaction(
+        transactionManager,
+        () -> {
+          NotebookGitBinding binding =
+              notebookGitBindingRepository.findByNotebook_Id(notebook.getId()).orElseThrow();
+          List<Note> notes = noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId());
+          Note createdNote = notes.getFirst();
+          return new RootAdditionPublicationState(
+              binding.getAcceptedGitObjectId(),
+              binding.getUpdatedAt(),
+              notes.size(),
+              createdNote.getId(),
+              createdNote.getTitle(),
+              createdNote.getContent(),
+              createdNote.getCreatedAt(),
+              createdNote.getUpdatedAt(),
+              createdNote.getDeletedAt());
+        });
+  }
+
+  private record RootAdditionPublicationState(
+      String acceptedHead,
+      Timestamp bindingUpdatedAt,
+      int noteCount,
+      Integer noteId,
+      String noteTitle,
+      String noteContent,
+      Timestamp noteCreatedAt,
+      Timestamp noteUpdatedAt,
+      Timestamp noteDeletedAt) {}
 }

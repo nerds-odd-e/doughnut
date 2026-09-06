@@ -305,7 +305,7 @@ About five minutes, medium confidence.
 
 ### 10. Retry an accepted addition without duplication
 Type: Behavior
-Status: planned
+Status: done
 Proof: Repeating the proposal with its original expected head returns the same
 accepted head and preserves note count, identity, and timestamps.
 
@@ -460,6 +460,9 @@ The broader follow-up commit scope remains outside this plan.
 
 ## Refinement learnings
 
+- The existing already-accepted-head branch makes addition retries idempotent;
+  committed proof shows identical head, identity, count, content, and binding/
+  note timestamps without retry-specific state.
 - Existing publication already accepts `index.md` and `log.md` losslessly, and
   the existing notebook-health rule reports their advisory note IDs and labels;
   no warning transport change is needed.
