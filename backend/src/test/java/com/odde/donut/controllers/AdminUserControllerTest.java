@@ -75,18 +75,40 @@ class AdminUserControllerTest extends ControllerTestBase {
       assertThat(secondPage.getPageIndex(), equalTo(1));
     }
 
+    @Test
+    void findsUserListingWhenTargetIsBeyondFirstPage() throws UnexpectedNoAccessRightException {
+      for (int i = 0; i < 10; i++) {
+        makeMe.aUser("aaa-filler-" + i).please();
+      }
+      User target = makeMe.aUser("zzz-target").please();
+
+      UserListingPage firstPage = controller.listUsers(0, 10);
+      assertThat(
+          "target must be beyond page 0 to prove the lookup",
+          firstPage.getUsers().stream().noneMatch(u -> u.getId().equals(target.getId())),
+          equalTo(true));
+
+      UserForListing userListing = listingFor(target);
+
+      assertThat(userListing.getId(), equalTo(target.getId()));
+    }
+
     private UserForListing listingFor(User user) throws UnexpectedNoAccessRightException {
-      UserListingPage page = controller.listUsers(0, 10);
-      return page.getUsers().stream()
-          .filter(u -> u.getId().equals(user.getId()))
-          .findFirst()
-          .orElseThrow(
-              () ->
-                  new AssertionError(
-                      ("Expected user id %s on listing page 0 (page size 10, totalCount %s). "
-                              + "This test assumes the database has no leftover users; "
-                              + "another test may have committed without cleaning up.")
-                          .formatted(user.getId(), page.getTotalCount())));
+      int pageSize = 10;
+      UserListingPage firstPage = controller.listUsers(0, pageSize);
+      int totalPages = firstPage.getTotalPages();
+      for (int pageIndex = 0; pageIndex < totalPages; pageIndex++) {
+        UserListingPage page =
+            pageIndex == 0 ? firstPage : controller.listUsers(pageIndex, pageSize);
+        for (UserForListing candidate : page.getUsers()) {
+          if (candidate.getId().equals(user.getId())) {
+            return candidate;
+          }
+        }
+      }
+      throw new AssertionError(
+          "Expected user id %s across %d pages (totalCount %s)."
+              .formatted(user.getId(), totalPages, firstPage.getTotalCount()));
     }
   }
 }
