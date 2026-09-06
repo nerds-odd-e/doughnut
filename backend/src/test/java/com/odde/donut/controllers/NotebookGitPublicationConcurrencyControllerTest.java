@@ -120,7 +120,13 @@ class NotebookGitPublicationConcurrencyControllerTest
   private <F, S> NotebookGitConcurrentWriterTestSupport.Result<F, S> queuedWriters(
       Integer notebookId, Callable<F> firstCall, Callable<S> secondCall) throws Exception {
     return NotebookGitConcurrentWriterTestSupport.runInQueuedOrder(
-        transactionManager, notebookGitBindingRepository, notebookId, firstCall, secondCall);
+        transactionManager,
+        notebookGitBindingRepository,
+        currentUser,
+        currentUser.getUser(),
+        notebookId,
+        firstCall,
+        secondCall);
   }
 
   private void assertAcceptedHistory(

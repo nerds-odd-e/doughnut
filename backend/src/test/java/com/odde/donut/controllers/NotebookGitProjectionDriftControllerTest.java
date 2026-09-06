@@ -14,6 +14,7 @@ import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookGitBinding;
+import com.odde.donut.entities.User;
 import com.odde.donut.entities.repositories.FolderRepository;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -22,7 +23,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
@@ -30,8 +30,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.support.TransactionTemplate;
-import org.springframework.web.context.request.RequestAttributes;
-import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.server.ResponseStatusException;
 
 /**
@@ -64,7 +62,7 @@ class NotebookGitProjectionDriftControllerTest extends NotebookGitBundleControll
     byte[] proposal =
         proposalBundleBytes(
             binding, List.of(new NotebookGitProposalFile("note.md", PROPOSED_CONTENT)));
-    RequestAttributes requestAttributes = RequestContextHolder.currentRequestAttributes();
+    User owner = currentUser.getUser();
     CountDownLatch writeFlushed = new CountDownLatch(1);
     CountDownLatch releaseWriter = new CountDownLatch(1);
     ExecutorService executor = Executors.newFixedThreadPool(2);
@@ -72,8 +70,9 @@ class NotebookGitProjectionDriftControllerTest extends NotebookGitBundleControll
     try {
       Future<?> writer =
           executor.submit(
-              withRequestContext(
-                  requestAttributes,
+              NotebookGitConcurrentWriterTestSupport.inIsolatedRequest(
+                  currentUser,
+                  owner,
                   () -> {
                     TransactionTemplate transaction = new TransactionTemplate(transactionManager);
                     transaction.setPropagationBehavior(
@@ -83,23 +82,22 @@ class NotebookGitProjectionDriftControllerTest extends NotebookGitBundleControll
                           applyWebChange(webChange, notebook.getId(), note.getId());
                           entityManager.flush();
                           writeFlushed.countDown();
-                          await(releaseWriter);
+                          NotebookGitConcurrentWriterTestSupport.await(releaseWriter);
                         });
                     return null;
                   }));
 
-      if (!writeFlushed.await(10, TimeUnit.SECONDS)) {
-        throw new AssertionError("Web writer did not flush");
-      }
+      NotebookGitConcurrentWriterTestSupport.await(writeFlushed);
       Future<String> publishing =
           executor.submit(
-              withRequestContext(
-                  requestAttributes,
+              NotebookGitConcurrentWriterTestSupport.inIsolatedRequest(
+                  currentUser,
+                  owner,
                   () ->
                       controller.publishNotebookGitProposal(
                           notebook.getId(), binding.getAcceptedGitObjectId(), proposal)));
 
-      assertThrows(TimeoutException.class, () -> publishing.get(250, TimeUnit.MILLISECONDS));
+      NotebookGitConcurrentWriterTestSupport.assertQueued(publishing);
       releaseWriter.countDown();
       writer.get(10, TimeUnit.SECONDS);
 
@@ -214,33 +212,5 @@ class NotebookGitProjectionDriftControllerTest extends NotebookGitBundleControll
     return inCommittedTransaction(
         transactionManager,
         () -> notebookGitBindingRepository.findByNotebook_Id(notebookId).orElseThrow());
-  }
-
-  private static <T> java.util.concurrent.Callable<T> withRequestContext(
-      RequestAttributes requestAttributes, ThrowingSupplier<T> task) {
-    return () -> {
-      RequestContextHolder.setRequestAttributes(requestAttributes);
-      try {
-        return task.get();
-      } finally {
-        RequestContextHolder.resetRequestAttributes();
-      }
-    };
-  }
-
-  @FunctionalInterface
-  private interface ThrowingSupplier<T> {
-    T get() throws Exception;
-  }
-
-  private static void await(CountDownLatch latch) {
-    try {
-      if (!latch.await(10, TimeUnit.SECONDS)) {
-        throw new AssertionError("Timed out waiting for test coordination");
-      }
-    } catch (InterruptedException exception) {
-      Thread.currentThread().interrupt();
-      throw new RuntimeException(exception);
-    }
   }
 }

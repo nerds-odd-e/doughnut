@@ -2,6 +2,8 @@ package com.odde.donut.controllers;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import com.odde.donut.controllers.currentUser.CurrentUser;
+import com.odde.donut.entities.User;
 import com.odde.donut.entities.repositories.NotebookGitBindingRepository;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
@@ -17,6 +19,12 @@ import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+/**
+ * Shared worker lifecycle, bounded coordination, and per-worker request/authorization setup for
+ * concurrent Notebook-Git controller proofs. Each worker receives an independent current-user
+ * holder (via {@link ThreadLocalCurrentUser}) even when it represents the same owner, plus a fresh
+ * servlet request.
+ */
 final class NotebookGitConcurrentWriterTestSupport {
 
   private NotebookGitConcurrentWriterTestSupport() {}
@@ -24,6 +32,8 @@ final class NotebookGitConcurrentWriterTestSupport {
   static <F, S> Result<F, S> runInQueuedOrder(
       PlatformTransactionManager transactionManager,
       NotebookGitBindingRepository bindingRepository,
+      CurrentUser currentUser,
+      User ownerUser,
       Integer notebookId,
       Callable<F> firstCall,
       Callable<S> secondCall)
@@ -49,11 +59,27 @@ final class NotebookGitConcurrentWriterTestSupport {
               });
       await(bindingLocked);
 
-      Future<F> first = executor.submit(inFreshRequest(firstStarted, firstCall));
+      Future<F> first =
+          executor.submit(
+              inIsolatedRequest(
+                  currentUser,
+                  ownerUser,
+                  () -> {
+                    firstStarted.countDown();
+                    return firstCall.call();
+                  }));
       await(firstStarted);
       assertQueued(first);
 
-      Future<S> second = executor.submit(inFreshRequest(secondStarted, secondCall));
+      Future<S> second =
+          executor.submit(
+              inIsolatedRequest(
+                  currentUser,
+                  ownerUser,
+                  () -> {
+                    secondStarted.countDown();
+                    return secondCall.call();
+                  }));
       await(secondStarted);
       assertQueued(second);
 
@@ -67,24 +93,31 @@ final class NotebookGitConcurrentWriterTestSupport {
     }
   }
 
-  private static <T> Callable<T> inFreshRequest(CountDownLatch started, Callable<T> call) {
+  /**
+   * Wraps {@code task} so the worker thread gets a fresh servlet request and its own thread-local
+   * current-user slot set to {@code ownerUser}, then clears both in {@code finally}. Each worker
+   * receives an independent holder even when representing the same owner.
+   */
+  static <T> Callable<T> inIsolatedRequest(
+      CurrentUser currentUser, User ownerUser, Callable<T> task) {
     return () -> {
       RequestContextHolder.setRequestAttributes(
           new ServletRequestAttributes(new MockHttpServletRequest()));
+      currentUser.setUser(ownerUser);
       try {
-        started.countDown();
-        return call.call();
+        return task.call();
       } finally {
         RequestContextHolder.resetRequestAttributes();
+        currentUser.setUser(null);
       }
     };
   }
 
-  private static void assertQueued(Future<?> writer) {
+  static void assertQueued(Future<?> writer) {
     assertThrows(TimeoutException.class, () -> writer.get(250, TimeUnit.MILLISECONDS));
   }
 
-  private static void await(CountDownLatch latch) {
+  static void await(CountDownLatch latch) {
     try {
       if (!latch.await(10, TimeUnit.SECONDS)) {
         throw new AssertionError("Timed out waiting for test coordination");

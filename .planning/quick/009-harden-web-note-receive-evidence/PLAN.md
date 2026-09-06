@@ -101,19 +101,18 @@ automatically). Production pagination unchanged.
 
 ### 2. Give concurrent Notebook-Git proofs isolated worker context
 Type: Structure
-Status: planned
-Proof: existing focused Notebook-Git concurrency and projection-drift tests
-compile and remain green after their shared test support is reshaped.
+Status: done
+Proof: `NotebookGitPublicationConcurrencyControllerTest` and
+`NotebookGitProjectionDriftControllerTest` compile and remain green after the
+shared test support is reshaped; full backend suite green.
 
-Internal change: make one cohesive test support own worker lifecycle, bounded
-coordination, and per-worker request/authorization setup. Each callable receives
-an independent current-user holder or equivalent immutable test context even
-when it represents the same owner. Remove the duplicated executor/await/request
-plumbing from `NotebookGitProjectionDriftControllerTest` where the same concept
-applies. This immediately enables leaf 3's trustworthy race proof; no product
-bean or authorization behavior changes.
-Sizing: 5–10 minutes, medium confidence; the seam is test-only and bounded to
-two existing controller proof families.
+Internal change: `ControllerTestBase.currentUser()` now returns a test-only
+`ThreadLocalCurrentUser` that stores the user in a `ThreadLocal`, so each
+worker thread gets an independent slot. `NotebookGitConcurrentWriterTestSupport`
+owns per-worker fresh request + thread-local user setup via `inIsolatedRequest`,
+and exposes `await`/`assertQueued` as shared helpers. The drift test removed its
+duplicated `withRequestContext`/`ThrowingSupplier`/`await` and no longer shares
+`RequestAttributes` across threads. No production code changed.
 
 ### 3. Reprove accepted-writer and structural-drift races in isolated requests
 Type: Behavior

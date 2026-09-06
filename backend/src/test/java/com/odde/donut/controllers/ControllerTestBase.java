@@ -1,6 +1,7 @@
 package com.odde.donut.controllers;
 
 import com.odde.donut.controllers.currentUser.CurrentUser;
+import com.odde.donut.controllers.currentUser.ThreadLocalCurrentUser;
 import com.odde.donut.entities.Note;
 import com.odde.donut.services.AuthorizationService;
 import com.odde.donut.testability.MakeMe;
@@ -23,7 +24,7 @@ public abstract class ControllerTestBase {
   @TestBean protected CurrentUser currentUser;
 
   static CurrentUser currentUser() {
-    return new CurrentUser();
+    return new ThreadLocalCurrentUser();
   }
 
   @AfterEach
