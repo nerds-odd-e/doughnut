@@ -10,7 +10,7 @@ import {
 
 // Builds a fetch response object serving the bundle bytes at `bundleFile`, as used for the GET
 // accepted-bundle download (both the clone flow and the publish ancestry check).
-function bundleGetResponse(bundleFile: string): {
+export function bundleGetResponse(bundleFile: string): {
   ok: boolean
   arrayBuffer: () => Promise<ArrayBuffer>
 } {

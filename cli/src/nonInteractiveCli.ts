@@ -10,6 +10,7 @@ import {
 } from './commands/notebook/notebookCheckoutReadiness.js'
 import { assertLocalMainFollowsAcceptedHistory } from './commands/notebook/notebookPublishAncestry.js'
 import { submitNotebookGitProposal } from './commands/notebook/notebookPublishSubmission.js'
+import { receiveAcceptedNotebookHead } from './commands/notebook/notebookPull.js'
 
 /**
  * Handles one-shot CLI paths (version, update, help, invalid flags). Returns `false` when the
@@ -65,7 +66,7 @@ async function completeNotebookSubcommand(
   }
 
   if (action === 'pull') {
-    completeNotebookPull(notebookArgs)
+    await completeNotebookPull(notebookArgs)
     return
   }
 
@@ -121,19 +122,24 @@ async function completeNotebookPublish(notebookArgs: string[]): Promise<void> {
   console.log(`Published notebook. Accepted head: ${acceptedHead}`)
 }
 
-function completeNotebookPull(notebookArgs: string[]): never {
+async function completeNotebookPull(notebookArgs: string[]): Promise<void> {
   const [, directory] = notebookArgs
 
   if (!directory) {
     exitCliError(NOTEBOOK_PULL_USAGE)
   }
 
+  let acceptedHead: string
   try {
-    resolveNotebookBinding(directory)
+    const { notebookId } = resolveNotebookBinding(directory)
     assertLocalMainIsReadyToReceive(directory)
+    acceptedHead = await receiveAcceptedNotebookHead(
+      directory,
+      Number(notebookId)
+    )
   } catch (e) {
     exitCliError(exceptionText(e))
   }
 
-  exitCliError('Receiving accepted notebook history is not available yet.')
+  console.log(`Notebook unchanged. Accepted head: ${acceptedHead}`)
 }

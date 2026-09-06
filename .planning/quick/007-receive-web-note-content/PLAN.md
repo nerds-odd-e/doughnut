@@ -192,7 +192,7 @@ read-only detection of active Git operation markers that porcelain can omit.
 
 ### 3. Recognize an already received accepted head
 Type: Behavior
-Status: planned
+Status: done
 Proof: CLI `run` with a downloaded real bundle equal to local HEAD, and HTTP
 denial/malformed-bundle variations before any local mutation.
 
@@ -204,6 +204,10 @@ all exits. Only GET is sent. Keep differing valid heads explicitly unavailable
 until their eligibility and fast-forward are implemented. Existing backend
 download authorization is reused, not replaced by trusting the CLI binding.
 Sizing: about 5 minutes, medium confidence; one download/no-op proof loop.
+
+Learning: pull and publish now share process-scoped accepted-history download,
+validation, and cleanup; pull compares the resulting accepted SHA with local
+`main` without installing refs in the user checkout.
 
 ### 4. Preserve unpublished or unrelated local history
 Type: Behavior

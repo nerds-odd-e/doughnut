@@ -1,5 +1,4 @@
 import * as fs from 'node:fs'
-import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { describe, expect, test } from 'vitest'
 import { getApiConfig } from 'donut-api'
@@ -16,6 +15,7 @@ import {
   cloneAsBoundCheckout,
   stubFetchWithBundleFile,
 } from './notebookPublish.testHelpers.js'
+import { acceptedHistoryStagingDirsUnderTmp } from './notebookAcceptedHistory.testHelpers.js'
 
 function commitFileChange(
   dir: string,
@@ -25,12 +25,6 @@ function commitFileChange(
   fs.writeFileSync(join(dir, 'note.md'), contents)
   runGit(['add', 'note.md'], dir)
   runGit(['commit', '--quiet', '-m', message], dir)
-}
-
-function ancestryStagingDirsUnderTmp(): string[] {
-  return fs
-    .readdirSync(tmpdir())
-    .filter((name) => name.startsWith('donut-notebook-publish-ancestry-'))
 }
 
 export function describeNotebookPublishAncestry(): void {
@@ -51,9 +45,9 @@ export function describeNotebookPublishAncestry(): void {
         'checkout'
       )
 
-      const before = ancestryStagingDirsUnderTmp()
+      const before = acceptedHistoryStagingDirsUnderTmp()
       await run(['notebook', 'publish', dir])
-      expect(ancestryStagingDirsUnderTmp()).toEqual(before)
+      expect(acceptedHistoryStagingDirsUnderTmp()).toEqual(before)
     })
 
     test('local main exactly one direct commit ahead of the accepted head reaches submission', async () => {
@@ -94,14 +88,14 @@ export function describeNotebookPublishAncestry(): void {
       bundleMain(sourceRepoDir, bundleFile)
       stubFetchWithBundleFile(bundleFile)
 
-      const before = ancestryStagingDirsUnderTmp()
+      const before = acceptedHistoryStagingDirsUnderTmp()
       await expect(run(['notebook', 'publish', dir])).rejects.toThrow(
         ProcessExitForTest
       )
       expect(ctx.getErrorSpy()).toHaveBeenCalledWith(
         expect.stringContaining('single direct commit')
       )
-      expect(ancestryStagingDirsUnderTmp()).toEqual(before)
+      expect(acceptedHistoryStagingDirsUnderTmp()).toEqual(before)
     })
 
     test('local main several commits ahead of the accepted head is rejected with an ancestry error', async () => {
