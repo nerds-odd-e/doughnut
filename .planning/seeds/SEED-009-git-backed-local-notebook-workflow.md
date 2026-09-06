@@ -360,26 +360,31 @@ for growing a notebook even if deletion, moves, and divergence are deferred.
 
 ### 11. Publish several note changes in one commit
 
-- **For / why:** A notebook owner refining related concepts locally wants to
-  publish one coherent change without splitting it into artificial single-file
-  commits.
-- **Evaluation:** From the current accepted head, publish one commit containing
-  multiple added notes, or added notes together with edits to existing notes →
-  all changes appear together in Donut at the accepted commit. Added notes get
-  fresh identities; edited notes retain theirs. An invalid member rejects the
-  entire commit without changing any remote note or accepted history.
-- **Scope:** Notes at the root or in existing folders, with the same Portable
-  Markdown rules as Stories 2 and 4. Exclude deletes, renames/moves, new
-  folders, README changes, multiple unpublished commits, and divergence.
-- **Value / learning:** Supports natural local commits for related concepts
-  and tests atomic publication across several notes. Manually splitting work
-  into single-file commits remains a workaround, but cannot publish a related
-  addition and its accompanying edit as one accepted change.
-- **Effort hypothesis:** M — low confidence; assumes single-note edit and
-  creation are delivered and the remaining change is bounded to one commit.
-- **Depends on:** Stories 2 and 4.
-- **Safe stopping point:** Multi-note adds/edits are useful independently of
-  deletion, moves, and accumulated-history synchronization.
+**Status:** completed.
+
+**Goal**
+
+A notebook owner can publish related additions and accompanying edits as one
+authored Git commit and see the complete change in Donut.
+
+**Scope**
+
+- Use the existing publish flow from a clean bound checkout on `main`, exactly
+  one single-parent commit ahead of accepted history. Retain ownership, readiness,
+  stale-head and drift checks; current Portable content must match the parent.
+- Support several additions, optionally with existing-note edits at unchanged
+  paths, plus existing single-note operations. Use root or represented folders
+  under ADR 0004's Markdown/path rules; preserve authored bytes without repair.
+- Accept the exact commit and all changes atomically. Invalid or unsupported
+  members identify their path/reason and reject everything, leaving remote
+  notes/history unchanged and local work available for correction.
+- Give additions fresh identities and retain edited notes' private learning
+  data; copying text transfers no private associations. Accepted retries leave
+  notes and history unchanged. Existing note views and clone/pull expose results.
+- Exclude edits-only batches, deletions, renames/moves, new folders, README changes,
+  attachments, multiple unpublished commits, divergence/rebase/conflicts, web
+  structural synchronization/batching, drift repair, direct Git remotes, bulk-import
+  optimization, preview, partial publication and automatic commit splitting.
 
 ## Ordering and Scope Reduction
 
