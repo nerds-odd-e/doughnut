@@ -359,7 +359,7 @@ About five minutes, medium confidence.
 
 ### 13. Save a web edit to the created note
 Type: Behavior
-Status: planned
+Status: done
 Proof: A content save through `TextContentController` after accepted local
 creation retains the note ID and produces a downloadable child commit with
 the saved content.
@@ -460,6 +460,9 @@ The broader follow-up commit scope remains outside this plan.
 
 ## Refinement learnings
 
+- The existing web content-save path also accepts locally created notes without
+  special handling, preserving their ID while writing an exact accepted child
+  commit.
 - A note created through publication immediately participates in the existing
   local edit path: its ID is stable and the next accepted commit is an exact
   child containing the edited bytes.

@@ -27,15 +27,36 @@ class NotebookGitMixedEditingControllerTest extends NotebookGitWebContentControl
   private static final String SECOND_WEB_CONTENT = "---\ntype: Note\n---\nsecond web edit";
 
   @Test
+  void savesAWebEditOnTheSameLocallyCreatedNote() throws Exception {
+    Notebook notebook = createGitBackedNotebook();
+    String createdHead = publishLocalCreation(notebook);
+    Note createdNote =
+        noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId()).getFirst();
+
+    NoteRealm saved =
+        textContentController.updateNoteContent(createdNote, contentDto(FIRST_WEB_CONTENT));
+
+    assertThat(saved.getId(), is(createdNote.getId()));
+    byte[] downloaded =
+        controller
+            .downloadNotebookGitBundle(notebookRepository.findById(notebook.getId()).orElseThrow())
+            .getBody();
+    try (InMemoryRepository accepted = new InMemoryRepository(new DfsRepositoryDescription())) {
+      ObjectId webEditHead = GitBundleTestReader.fetchHead(accepted, downloaded);
+      try (RevWalk revWalk = new RevWalk(accepted)) {
+        RevCommit webEditCommit = revWalk.parseCommit(webEditHead);
+        assertThat(webEditCommit.getParent(0).getId().getName(), is(createdHead));
+      }
+      assertThat(
+          NotebookGitProposalBlobText.readUtf8(accepted, webEditHead, NOTE_PATH),
+          is(FIRST_WEB_CONTENT));
+    }
+  }
+
+  @Test
   void publishesALaterLocalEditOnTheSameCreatedNote() throws Exception {
     Notebook notebook = createGitBackedNotebook();
-    NotebookGitBinding initialBinding = binding(notebook);
-    byte[] creationProposal =
-        proposalBundleBytes(
-            initialBinding, List.of(new NotebookGitProposalFile(NOTE_PATH, CREATED_CONTENT)));
-    String createdHead =
-        controller.publishNotebookGitProposal(
-            notebook.getId(), initialBinding.getAcceptedGitObjectId(), creationProposal);
+    String createdHead = publishLocalCreation(notebook);
     Integer createdNoteId =
         noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId()).getFirst().getId();
 
@@ -143,5 +164,14 @@ class NotebookGitMixedEditingControllerTest extends NotebookGitWebContentControl
           NotebookGitProposalBlobText.readUtf8(repository, secondWebHead, NOTE_PATH),
           is(SECOND_WEB_CONTENT));
     }
+  }
+
+  private String publishLocalCreation(Notebook notebook) throws Exception {
+    NotebookGitBinding initialBinding = binding(notebook);
+    byte[] creationProposal =
+        proposalBundleBytes(
+            initialBinding, List.of(new NotebookGitProposalFile(NOTE_PATH, CREATED_CONTENT)));
+    return controller.publishNotebookGitProposal(
+        notebook.getId(), initialBinding.getAcceptedGitObjectId(), creationProposal);
   }
 }
