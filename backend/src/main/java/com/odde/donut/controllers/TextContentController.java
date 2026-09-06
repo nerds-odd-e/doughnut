@@ -12,11 +12,11 @@ import com.odde.donut.entities.User;
 import com.odde.donut.exceptions.ApiException;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.factoryServices.EntityPersister;
-import com.odde.donut.services.AuthoredNoteDocumentPersistence;
 import com.odde.donut.services.AuthorizationService;
 import com.odde.donut.services.NoteRealmService;
 import com.odde.donut.services.NoteReferenceService;
 import com.odde.donut.services.WikiLinkRewriteService;
+import com.odde.donut.services.notebookGit.WebNoteContentSaveService;
 import com.odde.donut.testability.TestabilitySettings;
 import com.odde.donut.validators.AuthoredNoteContent;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -37,7 +37,7 @@ class TextContentController {
   private final NoteRealmService noteRealmService;
   private final NoteReferenceService noteReferenceService;
   private final WikiLinkRewriteService wikiLinkRewriteService;
-  private final AuthoredNoteDocumentPersistence authoredNoteDocumentPersistence;
+  private final WebNoteContentSaveService webNoteContentSaveService;
   private final CanonicalDonutOrigin canonicalDonutOrigin;
 
   public TextContentController(
@@ -47,7 +47,7 @@ class TextContentController {
       NoteRealmService noteRealmService,
       NoteReferenceService noteReferenceService,
       WikiLinkRewriteService wikiLinkRewriteService,
-      AuthoredNoteDocumentPersistence authoredNoteDocumentPersistence,
+      WebNoteContentSaveService webNoteContentSaveService,
       CanonicalDonutOrigin canonicalDonutOrigin) {
     this.entityPersister = entityPersister;
     this.testabilitySettings = testabilitySettings;
@@ -55,7 +55,7 @@ class TextContentController {
     this.noteRealmService = noteRealmService;
     this.noteReferenceService = noteReferenceService;
     this.wikiLinkRewriteService = wikiLinkRewriteService;
-    this.authoredNoteDocumentPersistence = authoredNoteDocumentPersistence;
+    this.webNoteContentSaveService = webNoteContentSaveService;
     this.canonicalDonutOrigin = canonicalDonutOrigin;
   }
 
@@ -105,16 +105,18 @@ class TextContentController {
   }
 
   @PatchMapping(path = "/{note}/content")
-  @Transactional
   public NoteRealm updateNoteContent(
       @PathVariable(name = "note") @Schema(type = "integer") Note note,
       @Valid @RequestBody NoteUpdateContentDTO contentDTO)
       throws UnexpectedNoAccessRightException {
     AuthoredNoteDocument document =
         AuthoredNoteContent.prepareDocumentForSave(contentDTO.getContent(), canonicalDonutOrigin);
-    authorizationService.assertAuthorization(note);
-    authoredNoteDocumentPersistence.persist(
-        note, document, testabilitySettings.getCurrentUTCTimestamp());
-    return noteRealmService.build(note, authorizationService.getCurrentUser());
+    Note savedNote =
+        webNoteContentSaveService.save(
+            note.getId(),
+            note.getNotebook().getId(),
+            document,
+            testabilitySettings.getCurrentUTCTimestamp());
+    return noteRealmService.build(savedNote, authorizationService.getCurrentUser());
   }
 }

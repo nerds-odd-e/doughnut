@@ -250,7 +250,7 @@ without implying every current web edit is included.
 
 ### 6. Establish the notebook transaction boundary for a web content save
 Type: Structure
-Status: planned
+Status: done
 Proof: existing TextContent save/validation/authorization tests and Git
 publication tests remain green with unchanged external behavior.
 
@@ -271,6 +271,11 @@ and HTTP wire shapes unchanged. This immediately enables leaf 7; no other web
 mutation or shared persistence caller gains Git behavior.
 Sizing: about 5 minutes, medium confidence after inspecting the concrete
 controller, publisher lock order and rollback/committed test boundaries.
+
+Learning: real HTTP content saves now enter a default-propagation SERIALIZABLE
+service transaction, and publication/web save share one binding-first loader
+for authoritative notebook, folder and live-note state. Rollback-based tests
+continue to join their enclosing transaction without REQUIRES_NEW.
 
 ### 7. Accept a supported root-note save as one atomic Git revision
 Type: Behavior

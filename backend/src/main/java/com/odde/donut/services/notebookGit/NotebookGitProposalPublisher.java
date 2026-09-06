@@ -5,16 +5,11 @@ import com.odde.donut.algorithms.CanonicalDonutOrigin;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookGitBinding;
-import com.odde.donut.entities.repositories.FolderRepository;
-import com.odde.donut.entities.repositories.NoteRepository;
-import com.odde.donut.entities.repositories.NotebookGitBindingRepository;
-import com.odde.donut.entities.repositories.NotebookRepository;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.factoryServices.EntityPersister;
 import com.odde.donut.services.AuthoredNoteDocumentPersistence;
 import com.odde.donut.services.AuthorizationService;
 import com.odde.donut.services.notebookExport.ExportFolderRow;
-import com.odde.donut.services.notebookExport.NotebookExportRows;
 import com.odde.donut.testability.TestabilitySettings;
 import com.odde.donut.validators.AuthoredNoteContent;
 import java.sql.Timestamp;
@@ -30,10 +25,7 @@ import org.springframework.web.server.ResponseStatusException;
 @Service
 public class NotebookGitProposalPublisher {
 
-  private final NotebookGitBindingRepository bindingRepository;
-  private final NotebookRepository notebookRepository;
-  private final FolderRepository folderRepository;
-  private final NoteRepository noteRepository;
+  private final NotebookGitStateLoader notebookGitStateLoader;
   private final AuthorizationService authorizationService;
   private final NotebookGitProjection projection;
   private final AuthoredNoteDocumentPersistence authoredNoteDocumentPersistence;
@@ -42,20 +34,14 @@ public class NotebookGitProposalPublisher {
   private final EntityPersister entityPersister;
 
   public NotebookGitProposalPublisher(
-      NotebookGitBindingRepository bindingRepository,
-      NotebookRepository notebookRepository,
-      FolderRepository folderRepository,
-      NoteRepository noteRepository,
+      NotebookGitStateLoader notebookGitStateLoader,
       AuthorizationService authorizationService,
       NotebookGitProjection projection,
       AuthoredNoteDocumentPersistence authoredNoteDocumentPersistence,
       CanonicalDonutOrigin canonicalDonutOrigin,
       TestabilitySettings testabilitySettings,
       EntityPersister entityPersister) {
-    this.bindingRepository = bindingRepository;
-    this.notebookRepository = notebookRepository;
-    this.folderRepository = folderRepository;
-    this.noteRepository = noteRepository;
+    this.notebookGitStateLoader = notebookGitStateLoader;
     this.authorizationService = authorizationService;
     this.projection = projection;
     this.authoredNoteDocumentPersistence = authoredNoteDocumentPersistence;
@@ -73,20 +59,17 @@ public class NotebookGitProposalPublisher {
       String expectedHead,
       NotebookGitProposalImporter.ImportedProposal proposal)
       throws UnexpectedNoAccessRightException {
-    NotebookGitBinding binding =
-        bindingRepository
+    NotebookGitStateLoader.LockedNotebookState state =
+        notebookGitStateLoader
             .findByNotebookIdForUpdate(notebookId)
             .orElseThrow(
                 () ->
                     new ResponseStatusException(
                         HttpStatus.NOT_FOUND, "Notebook has no Git binding."));
-    Notebook notebook =
-        notebookRepository
-            .findById(notebookId)
-            .orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Notebook not found."));
-    List<ExportFolderRow> folders = NotebookExportRows.folders(folderRepository, notebook);
-    List<Note> liveNotes = noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebookId);
+    NotebookGitBinding binding = state.binding();
+    Notebook notebook = state.notebook();
+    List<ExportFolderRow> folders = state.folders();
+    List<Note> liveNotes = state.liveNotes();
 
     authorizationService.assertAuthorization(notebook);
     ObjectId acceptedHead = ObjectId.fromString(binding.getAcceptedGitObjectId());
