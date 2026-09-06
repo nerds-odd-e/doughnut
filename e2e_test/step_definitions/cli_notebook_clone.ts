@@ -37,6 +37,11 @@ When('I publish the cloned checkout using the installed CLI', () =>
   cli.notebookCloneCheckout().publish()
 )
 
+When(
+  'I publish the cloned checkout expecting rejection from the installed CLI',
+  () => cli.notebookCloneCheckout().publishExpectingRejection()
+)
+
 Then(
   'the installed CLI reports the committed change as the accepted head',
   () => cli.notebookCloneCheckout().expectCommittedHeadAccepted()

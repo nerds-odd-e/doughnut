@@ -6,12 +6,11 @@ import { existsSync, mkdtempSync, unlinkSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { delimiter, dirname, join } from 'node:path'
 import { attachGoogleOAuthSimulation } from './cliE2eGoogleOAuthSimulation'
+import { createCliE2eManagedPty } from './cliE2eManagedPty'
 import {
-  CLI_E2E_MANAGED_PTY_GEOMETRY,
-  NON_INTERACTIVE_CLI_EXIT_TIMEOUT_MS,
-  createCliE2eManagedPty,
-  waitForPtyExit,
-} from './cliE2eManagedPty'
+  runInstalledCliExpectingExit,
+  type RunInstalledCliTask,
+} from './cliE2eInstalledCli'
 import { createCliE2ePluginConfigDirTasks } from './cliE2ePluginConfigDirTasks'
 import { createCliE2eNotebookCloneTasks } from './cliE2eNotebookCloneTasks'
 import {
@@ -20,16 +19,9 @@ import {
   cliRepoSpawnFromRoot,
   runShellCommandSync,
 } from './cliE2eRepo'
-import { cliEnv } from './cliEnv'
-import { startManagedTtySession } from 'tty-assert'
-import type { ManagedTtyAssertInput, ManagedTtySession } from 'tty-assert'
+import type { ManagedTtyAssertInput } from 'tty-assert'
 
 type WithOptionalCliEnv = { env?: NodeJS.ProcessEnv }
-
-type RunInstalledCliTask = WithOptionalCliEnv & {
-  donutPath: string
-  args?: string[]
-}
 
 type RunInstalledCliInteractiveTask = WithOptionalCliEnv & {
   donutPath: string
@@ -137,41 +129,11 @@ export function createCliE2ePluginTasks(
       }
       return donutPath
     },
-    async runInstalledCli({ donutPath, args, env }: RunInstalledCliTask) {
-      if (!donutPath) {
-        throw new Error(
-          `runInstalledCli: donutPath required, got ${JSON.stringify(donutPath)}`
-        )
-      }
-      if (!existsSync(donutPath)) {
-        throw new Error(
-          `runInstalledCli: donut binary not found at ${donutPath}. Ensure prior step "I install the CLI" succeeded.`
-        )
-      }
-      const cwd = dirname(donutPath)
-      pty.dispose()
-      let managed: ManagedTtySession | undefined
-      try {
-        managed = await startManagedTtySession(
-          {
-            command: process.execPath,
-            args: [donutPath, ...(args ?? [])],
-            cwd,
-            env: { ...process.env, ...cliEnv(env) },
-          },
-          CLI_E2E_MANAGED_PTY_GEOMETRY
-        )
-        await waitForPtyExit(
-          managed.session.pty,
-          0,
-          NON_INTERACTIVE_CLI_EXIT_TIMEOUT_MS
-        )
-        pty.setHandle(managed)
-      } catch (e) {
-        managed?.dispose()
-        throw e
-      }
-      return null
+    runInstalledCli(task: RunInstalledCliTask) {
+      return runInstalledCliExpectingExit(pty, task, 0)
+    },
+    runInstalledCliExpectingRejection(task: RunInstalledCliTask) {
+      return runInstalledCliExpectingExit(pty, task, 1)
     },
     async runInstalledCliInteractive({
       donutPath,

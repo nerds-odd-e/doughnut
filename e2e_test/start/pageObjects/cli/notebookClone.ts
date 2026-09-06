@@ -80,6 +80,22 @@ function notebookCloneCheckout() {
     )
   }
 
+  function publishWithTask(
+    task: 'runInstalledCli' | 'runInstalledCliExpectingRejection'
+  ): Cypress.Chainable<null> {
+    return cy.get<string>('@cliCloneDestination').then((checkoutDir) =>
+      cy.get<string>('@donutPath').then((donutPath) =>
+        cy.get<string>('@cliConfigDir').then((configDir) =>
+          cy.task<null>(task, {
+            donutPath,
+            args: ['notebook', 'publish', checkoutDir],
+            env: { DONUT_CONFIG_DIR: configDir },
+          })
+        )
+      )
+    )
+  }
+
   return {
     commitEdit(relativePath: string, content: string): Cypress.Chainable<null> {
       return commitNoteChange(relativePath, content)
@@ -91,17 +107,10 @@ function notebookCloneCheckout() {
       return commitNoteChange(relativePath, content)
     },
     publish(): Cypress.Chainable<null> {
-      return cy.get<string>('@cliCloneDestination').then((checkoutDir) =>
-        cy.get<string>('@donutPath').then((donutPath) =>
-          cy.get<string>('@cliConfigDir').then((configDir) =>
-            cy.task<null>('runInstalledCli', {
-              donutPath,
-              args: ['notebook', 'publish', checkoutDir],
-              env: { DONUT_CONFIG_DIR: configDir },
-            })
-          )
-        )
-      )
+      return publishWithTask('runInstalledCli')
+    },
+    publishExpectingRejection(): Cypress.Chainable<null> {
+      return publishWithTask('runInstalledCliExpectingRejection')
     },
     expectCommittedHeadAccepted(): Cypress.Chainable<null> {
       return cy
