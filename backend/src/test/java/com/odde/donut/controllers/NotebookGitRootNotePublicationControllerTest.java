@@ -108,51 +108,68 @@ class NotebookGitRootNotePublicationControllerTest extends NotebookGitBundleCont
   }
 
   @Test
-  void retriesAnAcceptedRootNoteAdditionWithoutCreatingAnotherNote() throws Exception {
+  void retriesAnAcceptedMixedCommitWithoutChangingNotesOrBinding() throws Exception {
     Notebook notebook = createGitBackedNotebook();
+    makeMe.aNote().notebook(notebook).title("Existing").content(ORIGINAL_CONTENT).please();
     NotebookGitBinding initialBinding = snapshotCurrentPortableTree(notebook);
     String initialHead = initialBinding.getAcceptedGitObjectId();
     byte[] proposalBytes =
         proposalBundleBytes(
             initialBinding,
-            List.of(new NotebookGitProposalFile("Created Note.md", CREATED_CONTENT)));
+            List.of(
+                new NotebookGitProposalFile("Created Note.md", CREATED_CONTENT),
+                new NotebookGitProposalFile(
+                    "Existing.md", "---\ntype: Note\n---\nEdited authored bytes.\n")));
 
     String publishedHead =
         controller.publishNotebookGitProposal(notebook.getId(), initialHead, proposalBytes);
-    RootAdditionPublicationState stateAfterPublication = rootAdditionPublicationState(notebook);
+    PublicationState stateAfterPublication = publicationState(notebook);
+    assertThat(stateAfterPublication.notes(), hasSize(2));
 
     String retriedHead =
         controller.publishNotebookGitProposal(notebook.getId(), initialHead, proposalBytes);
 
     assertThat(retriedHead, equalTo(publishedHead));
-    assertThat(rootAdditionPublicationState(notebook), equalTo(stateAfterPublication));
+    PublicationState stateAfterRetry = publicationState(notebook);
+    assertThat(stateAfterRetry.acceptedHead(), equalTo(stateAfterPublication.acceptedHead()));
+    assertThat(
+        stateAfterRetry.bindingUpdatedAt(), equalTo(stateAfterPublication.bindingUpdatedAt()));
+    assertThat(stateAfterRetry.bundleBytes(), equalTo(stateAfterPublication.bundleBytes()));
+    assertThat(stateAfterRetry.notes(), equalTo(stateAfterPublication.notes()));
   }
 
-  private RootAdditionPublicationState rootAdditionPublicationState(Notebook notebook) {
+  private PublicationState publicationState(Notebook notebook) {
     return inCommittedTransaction(
         transactionManager,
         () -> {
           NotebookGitBinding binding =
               notebookGitBindingRepository.findByNotebook_Id(notebook.getId()).orElseThrow();
           List<Note> notes = noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId());
-          Note createdNote = notes.getFirst();
-          return new RootAdditionPublicationState(
+          return new PublicationState(
               binding.getAcceptedGitObjectId(),
               binding.getUpdatedAt(),
-              notes.size(),
-              createdNote.getId(),
-              createdNote.getTitle(),
-              createdNote.getContent(),
-              createdNote.getCreatedAt(),
-              createdNote.getUpdatedAt(),
-              createdNote.getDeletedAt());
+              binding.getBundleBytes().clone(),
+              notes.stream()
+                  .map(
+                      note ->
+                          new PublishedNoteState(
+                              note.getId(),
+                              note.getTitle(),
+                              note.getContent(),
+                              note.getCreatedAt(),
+                              note.getUpdatedAt(),
+                              note.getDeletedAt()))
+                  .toList());
         });
   }
 
-  private record RootAdditionPublicationState(
+  private record PublicationState(
       String acceptedHead,
       Timestamp bindingUpdatedAt,
-      int noteCount,
+      byte[] bundleBytes,
+      List<PublishedNoteState> notes) {}
+
+  private record PublishedNoteState(
       Integer noteId,
       String noteTitle,
       String noteContent,

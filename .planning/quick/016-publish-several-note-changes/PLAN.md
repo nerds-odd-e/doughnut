@@ -3,7 +3,7 @@
 ## Source and status
 
 - Source: [SEED-009 Story 11](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-11).
-- Status: executing; leaves 1–8 complete, leaf 9 next.
+- Status: executing; leaves 1–9 complete, leaf 10 next.
 - Readiness: remaining leaves ready for direct execution after refinement.
 
 ## Goal and scope
@@ -305,7 +305,11 @@ No folder creation, README authoring or broader drift repair is included.
 ### 9. Retry an accepted multi-note commit without duplicates
 
 Type: Behavior
-Status: planned
+Status: done
+Evidence: `CURSOR_DEV=true nix develop -c pnpm backend:test_only` passed
+(49 seconds). Committed all-note state and saved binding bytes/timestamp unchanged
+on mixed retry inspected. Production unchanged; independent refactor no edits.
+About 3 minutes active work.
 Proof: Publish a small mixed commit, capture committed note IDs/content/timestamps
 and binding, then repeat the proposal → the same returned head and publication
 state, without extra notes or rewritten bundle.
