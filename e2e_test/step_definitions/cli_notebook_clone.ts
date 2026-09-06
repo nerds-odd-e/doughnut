@@ -27,12 +27,19 @@ When(
     cli.notebookCloneCheckout().commitEdit(relativePath, content)
 )
 
+When(
+  'I add and commit the following note at {string} in the cloned checkout:',
+  (relativePath: string, content: string) =>
+    cli.notebookCloneCheckout().commitAddition(relativePath, content)
+)
+
 When('I publish the cloned checkout using the installed CLI', () =>
   cli.notebookCloneCheckout().publish()
 )
 
-Then('the installed CLI reports the committed edit as the accepted head', () =>
-  cli.notebookCloneCheckout().expectCommittedHeadAccepted()
+Then(
+  'the installed CLI reports the committed change as the accepted head',
+  () => cli.notebookCloneCheckout().expectCommittedHeadAccepted()
 )
 
 Then(

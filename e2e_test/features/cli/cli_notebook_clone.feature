@@ -36,7 +36,6 @@ Feature: CLI notebook clone
       | Overview.md       |
       | Recipes/README.md |
       | Recipes/Pasta.md  |
-    And I should see "Publishing currently accepts one new commit directly on the accepted main" in the non-interactive output
     When I open the notebook "CLI Clone Notebook" from the notebook catalog
     Then the notebook readme body includes "Notebook landing"
 
@@ -51,5 +50,19 @@ Feature: CLI notebook clone
       Simmer until al dente
       """
     And I publish the cloned checkout using the installed CLI
-    Then the installed CLI reports the committed edit as the accepted head
+    Then the installed CLI reports the committed change as the accepted head
     And note "Pasta" should have content "Simmer until al dente"
+
+  Scenario: Publishing a committed new note makes it available at its authored path
+    When I clone the notebook "CLI Clone Notebook" into a temporary destination using the installed CLI
+    Then I should see "one added or edited Markdown note at the notebook root or in an existing folder" in the non-interactive output
+    When I add and commit the following note at "Recipes/Pantry Staples.md" in the cloned checkout:
+      """
+      ---
+      type: Note
+      ---
+      Keep semolina pasta stocked.
+      """
+    And I publish the cloned checkout using the installed CLI
+    Then the installed CLI reports the committed change as the accepted head
+    And I should see note "CLI Clone Notebook/Recipes/Pantry Staples" has content "Keep semolina pasta stocked."

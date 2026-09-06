@@ -72,7 +72,7 @@ describe('notebook clone (CLI routing, real Git checkout)', () => {
 
     expect(ctx.getLogSpy()).toHaveBeenCalledWith(
       expect.stringContaining(
-        'Publishing currently accepts one new commit directly on the accepted main'
+        'one added or edited Markdown note at the notebook root or in an existing folder'
       )
     )
     expect(ctx.getLogSpy()).toHaveBeenCalledWith(

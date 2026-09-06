@@ -320,7 +320,7 @@ medium confidence.
 
 ### 11. Publish a new note through the installed CLI
 Type: Behavior
-Status: planned
+Status: done
 Proof: One installed-CLI E2E commits an addition, reports that commit accepted,
 and opens the new note in Donut at its authored path.
 
@@ -460,6 +460,9 @@ The broader follow-up commit scope remains outside this plan.
 
 ## Refinement learnings
 
+- The installed-CLI addition flow reuses clone/publish plumbing but stages the
+  exact changed path for both edits and additions; clone guidance now names the
+  one-change and existing-location boundary.
 - The existing already-accepted-head branch makes addition retries idempotent;
   committed proof shows identical head, identity, count, content, and binding/
   note timestamps without retry-specific state.

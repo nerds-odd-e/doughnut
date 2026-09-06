@@ -28,7 +28,7 @@ export function createCliE2eNotebookCloneTasks() {
     listNotebookCheckoutEntries(checkoutDir: string): string[] {
       return listFilesRecursively(checkoutDir, checkoutDir).sort()
     },
-    commitCliNotebookCheckoutEdit({
+    commitCliNotebookCheckoutNoteChange({
       checkoutDir,
       relativePath,
       content,
@@ -38,6 +38,7 @@ export function createCliE2eNotebookCloneTasks() {
       content: string
     }): string {
       writeFileSync(join(checkoutDir, relativePath), `${content}\n`)
+      execFileSync('git', ['-C', checkoutDir, 'add', '--', relativePath])
       execFileSync(
         'git',
         [
@@ -48,8 +49,8 @@ export function createCliE2eNotebookCloneTasks() {
           '-c',
           'user.email=donut-e2e@example.com',
           'commit',
-          '-am',
-          'Edit cloned notebook note',
+          '-m',
+          'Change cloned notebook note',
         ],
         { encoding: 'utf8' }
       )

@@ -62,20 +62,33 @@ function notebookClone() {
 }
 
 function notebookCloneCheckout() {
+  function commitNoteChange(
+    relativePath: string,
+    content: string
+  ): Cypress.Chainable<null> {
+    return cy.get<string>('@cliCloneDestination').then((checkoutDir) =>
+      cy
+        .task<string>('commitCliNotebookCheckoutNoteChange', {
+          checkoutDir,
+          relativePath,
+          content,
+        })
+        .then((head) => {
+          cy.wrap(head).as('cliNotebookPublishHead')
+          return cy.wrap(null)
+        })
+    )
+  }
+
   return {
     commitEdit(relativePath: string, content: string): Cypress.Chainable<null> {
-      return cy.get<string>('@cliCloneDestination').then((checkoutDir) =>
-        cy
-          .task<string>('commitCliNotebookCheckoutEdit', {
-            checkoutDir,
-            relativePath,
-            content,
-          })
-          .then((head) => {
-            cy.wrap(head).as('cliNotebookPublishHead')
-            return cy.wrap(null)
-          })
-      )
+      return commitNoteChange(relativePath, content)
+    },
+    commitAddition(
+      relativePath: string,
+      content: string
+    ): Cypress.Chainable<null> {
+      return commitNoteChange(relativePath, content)
     },
     publish(): Cypress.Chainable<null> {
       return cy.get<string>('@cliCloneDestination').then((checkoutDir) =>
