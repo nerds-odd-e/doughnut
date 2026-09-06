@@ -377,7 +377,7 @@ About five minutes, medium confidence.
 
 ### 14. Receive the added file into a clean checkout
 Type: Behavior
-Status: planned
+Status: done
 Proof: A `run`-boundary CLI pull test with real Git fast-forwards from the
 accepted parent, produces exact added-file bytes, and leaves a clean canonical
 working tree without metadata additions.
@@ -460,6 +460,8 @@ The broader follow-up commit scope remains outside this plan.
 
 ## Refinement learnings
 
+- The existing real-Git pull path fast-forwards a remotely added note with its
+  exact bytes and leaves a clean canonical checkout without Portable metadata.
 - The existing web content-save path also accepts locally created notes without
   special handling, preserving their ID while writing an exact accepted child
   commit.

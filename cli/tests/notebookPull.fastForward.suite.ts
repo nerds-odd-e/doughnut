@@ -101,6 +101,36 @@ export function describeNotebookPullFastForward(): void {
       }
     )
 
+    test('receives an added note with its exact bytes and no Portable metadata', async () => {
+      const source = buildSourceRepo(ctx.getWorkDir())
+      const directory = cloneAsBoundCheckout(
+        ctx.getWorkDir(),
+        source,
+        getApiConfig().apiBaseUrl,
+        'checkout'
+      )
+      const addedPath = 'Added note.md'
+      const addedBytes = Buffer.from(
+        '---\ntype: Note\nauthored: retained\n---\n# Added note\n\nExact body.\n'
+      )
+      fs.writeFileSync(join(source, addedPath), addedBytes)
+      runGit(['add', addedPath], source)
+      runGit(['commit', '--quiet', '-m', 'accepted note addition'], source)
+      const acceptedHead = runGit(['rev-parse', 'main'], source)
+      const bundleFile = join(ctx.getWorkDir(), 'accepted-addition.bundle')
+      bundleMain(source, bundleFile)
+      ctx.getFetchMock().mockResolvedValue(bundleGetResponse(bundleFile))
+
+      await run(['notebook', 'pull', directory])
+
+      expect(runGit(['rev-parse', 'HEAD'], directory)).toBe(acceptedHead)
+      expect(fs.readFileSync(join(directory, addedPath))).toEqual(addedBytes)
+      expect(runGit(['status', '--porcelain=v1'], directory)).toBe('')
+      expect(
+        runGit(['ls-tree', '-r', '--name-only', 'HEAD'], directory).split('\n')
+      ).toEqual([addedPath, 'note.md'])
+    })
+
     test.each([
       {
         change: 'staged work',
