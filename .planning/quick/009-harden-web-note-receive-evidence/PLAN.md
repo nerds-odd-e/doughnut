@@ -116,20 +116,23 @@ duplicated `withRequestContext`/`ThrowingSupplier`/`await` and no longer shares
 
 ### 3. Reprove accepted-writer and structural-drift races in isolated requests
 Type: Behavior
-Status: planned
-Proof: controller tests with deterministic queued/committed races cover two web
-saves, both web/publish orderings, and publication after content or structural
-drift; exact JGit ancestry and the freshly loaded database projection agree.
+Status: done
+Proof: `NotebookGitPublicationConcurrencyControllerTest` (two web saves, both
+web/publish orderings with exact JGit ancestry via `assertAcceptedHistory`) and
+`NotebookGitProjectionDriftControllerTest` (publication after content drift with
+exact bundle/DB agreement via `assertAcceptedBundleAdvancesFrom`, and structural
+drift rejection) pass under isolated per-worker contexts; full backend suite green.
 
 Behavior: independently authorized request contexts compete on one notebook →
 the database binding lock orders accepted writers and rejects stale/drifted
 publication → the retained bundle is one exact linear history matching the Note
 projection, without cross-thread current-user state or timing sleeps.
 
-Keep authorization behavior outside this race matrix covered by its existing
-dedicated controller tests; this leaf proves isolation plus serialization, not
-a new concurrent-user product policy.
-Sizing: 3–5 minutes, high confidence after leaf 2; one existing race matrix.
+The content-drift race now verifies exact JGit ancestry (new head = binding,
+note.md = freshly loaded DB content, single parent = prior accepted head) via
+`assertAcceptedBundleAdvancesFrom`. The structural-drift race retains its existing
+binding-unchanged assertion. No new concurrent-user product policy or production
+code change.
 
 ### 4. Describe Story 3 as delivered everywhere it remains referenced
 Type: Behavior
