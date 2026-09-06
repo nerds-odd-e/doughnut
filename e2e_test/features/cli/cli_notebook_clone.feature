@@ -53,6 +53,19 @@ Feature: CLI notebook clone
     Then the installed CLI reports the committed change as the accepted head
     And note "Pasta" should have content "Simmer until al dente"
 
+  Scenario: Publishing related additions and an edit updates every Donut note
+    When I clone the notebook "CLI Clone Notebook" into a temporary destination using the installed CLI
+    And I commit the following related additions and edit together in the cloned checkout:
+      | path              | content                                                                                   |
+      | Shopping.md       | ---\ntype: Note\n---\nBuy fresh basil                                                       |
+      | Recipes/Sauce.md  | ---\ntype: Note\n---\nSimmer tomatoes with basil                                            |
+      | Recipes/Pasta.md  | ---\ntype: Note\nauthor: Chef Boyardee\n---\nServe al dente pasta with tomato sauce          |
+    And I publish the cloned checkout using the installed CLI
+    Then the installed CLI reports the committed change as the accepted head
+    And I should see note "CLI Clone Notebook/Shopping" has content "Buy fresh basil"
+    And I should see note "CLI Clone Notebook/Recipes/Sauce" has content "Simmer tomatoes with basil"
+    And I should see note "CLI Clone Notebook/Recipes/Pasta" has content "Serve al dente pasta with tomato sauce"
+
   Scenario: Rejecting duplicate metadata keeps the local proposal available for correction
     When I clone the notebook "CLI Clone Notebook" into a temporary destination using the installed CLI
     And I add and commit the following note at "Duplicate Keys.md" in the cloned checkout:

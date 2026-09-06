@@ -110,6 +110,11 @@ function notebookCloneCheckout() {
     ): Cypress.Chainable<null> {
       return commitNoteChanges([{ relativePath, content }])
     },
+    commitRelatedNoteChanges(
+      files: { relativePath: string; content: string }[]
+    ): Cypress.Chainable<null> {
+      return commitNoteChanges(files)
+    },
     publish(): Cypress.Chainable<null> {
       return publishWithTask('runInstalledCli')
     },

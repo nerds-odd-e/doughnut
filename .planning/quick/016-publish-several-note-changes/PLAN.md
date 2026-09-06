@@ -3,7 +3,7 @@
 ## Source and status
 
 - Source: [SEED-009 Story 11](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-11).
-- Status: executing; leaves 1–11 complete, leaf 12 next.
+- Status: executing; leaves 1–12 complete, leaf 13 next.
 - Readiness: remaining leaves ready for direct execution after refinement.
 
 ## Goal and scope
@@ -363,7 +363,11 @@ do not add unused exports, a PTY, mode flags or a general scenario interpreter.
 ### 12. Publish a related change through the installed CLI
 
 Type: Behavior
-Status: planned
+Status: done
+Evidence: `CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/cli/cli_notebook_clone.feature`
+passed (5 scenarios, 13 seconds). One commit's two additions/edit, exact accepted
+head and three existing note views inspected; snapshot stays Given-only.
+Independent refactor: no edits. About 3 minutes active plus runner/startup.
 Proof: Clone the conformant notebook fixture, make one commit with two additions
 and an existing-note edit, publish using the installed binary → the reported
 head equals the local commit and all authored changes appear in Donut note views.

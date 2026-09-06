@@ -38,6 +38,18 @@ When('I publish the cloned checkout using the installed CLI', () =>
 )
 
 When(
+  'I commit the following related additions and edit together in the cloned checkout:',
+  (data: DataTable) =>
+    cli
+      .notebookCloneCheckout()
+      .commitRelatedNoteChanges(
+        data
+          .hashes()
+          .map(({ path, content }) => ({ relativePath: path, content }))
+      )
+)
+
+When(
   'I publish the cloned checkout expecting rejection from the installed CLI',
   () => cli.notebookCloneCheckout().publishExpectingRejection()
 )
