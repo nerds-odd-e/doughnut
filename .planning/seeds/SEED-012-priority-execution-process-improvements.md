@@ -198,47 +198,138 @@ rewrite, or cleanup of existing mixed commits. No default prohibition of
 `git add -A` when everything is owned. No new review stage, Pygardon rollout, or
 sibling P1 changes. Preserve the current independent refactor and check-only hook.
 
+<a id="story-5"></a>
+
 ### 5. Enforce the no-edit refactor handoff — P1, small fix
 
-- **Evidence:** Doughnut's final web-note receive refactor made no edits but
-  reran all 2,180 backend tests because its prompt requested no-change
-  confirmation, contradicting the installed skill.
-- **Proposal:** Use one canonical delegation clause and reject contradictory
-  prompt additions. No-edit reviews report `skipped — no refactor edits`;
-  changed reviews name and rerun only proof invalidated by their edits. Do not
-  count an unnecessary run as evidence that this process improvement worked.
-- **Owners:** `execute-plan/references/wrap-up.md` and refactor handoff acceptance.
-- **Success:** A live no-edit review runs zero tests; edits still receive the
-  affected focused proof. Independent review remains mandatory.
+**Status:** Refined and planned on 2026-09-06; not implemented.
+Execution: [Enforce decide-first refactor handoffs](../quick/015-enforce-decide-first-refactor-handoffs/PLAN.md).
+
+**Goal:** Avoid unnecessary test runs caused by coordinator-generated refactor
+instructions while retaining independent review and proof for refactor edits.
+
+**Evidence:** A no-edit web-note receive refactor reran all 2,180 backend tests
+because its delegation requested no-change confirmation. The existing refactor
+skill already forbids that; the gap is applying it at delegation and return.
+
+**Scope:** In `execute-plan/references/wrap-up.md`, replace the current refactor
+delegation/acceptance wording with one concise source clause: decide first;
+no edits means no tests and `skipped — no refactor edits`; edits mean only
+invalidated focused proof, with a reason for any replacement command. The
+coordinator uses that clause without contradictory additions and checks the
+existing handoff for consistency, not just its completion marker.
+
+Correct a contradictory prompt before dispatch. If an unnecessary run already
+occurred, report the deviation honestly and reuse otherwise valid evidence;
+do not rerun review/tests just to obtain a compliant-looking handoff. Actual
+failures still follow existing diagnosis rules. Explicit developer-requested
+verification remains authoritative; this concerns routine refactor delegation.
+
+Replace repetition so this document becomes shorter under the seed's concision
+constraint. Preserve prior acceptance/staging safeguards and the refactor skill's
+existing policy; no change to `post-change-refactor/SKILL.md` is needed.
+
+**Exclusions:** No prompt generator/parser, new agent, handoff schema, test runner,
+review stage, full-suite policy change, Pygardon rollout, or sibling P1 work.
+Independent refactor, formatting, and hook ownership stay in place.
+
+**Key examples:**
+
+| Situation | Required outcome |
+|---|---|
+| Routine draft prompt adds “run the full suite to confirm a no-change review.” | Remove the contradiction before dispatch; retain the canonical decide-first clause. |
+| Review reports no edits and `skipped — no refactor edits`. | Accept the consistent handoff without running tests. |
+| Refactor edits invalidate proof A but leave B valid. | Rerun A, reuse B; explain a focused replacement if A's boundary moved. |
+| A no-edit review already ran tests unnecessarily. | Record the deviation, preserve valid proof, and correct future delegation; do not claim compliance or repeat the run. |
+
+**Evaluation / ROI:** Replay these four handoffs/prompts without real test runs.
+Report before/after word counts and preserve existing obligations in review.
+Observe the next ordinary refactor for live effectiveness; no dedicated product
+exercise or monitor. No unresolved scope decision blocks slice planning.
+
+<a id="story-6"></a>
 
 ### 6. Recover observer shutdown after compaction — conditional P1
 
-- **Trigger:** Before another long unattended Doughnut execution.
-- **Evidence:** Web-note receive closeout lost its observer handle after
-  compaction. Terminating the cell left `ci-mailbox.mjs stream` running; exact
-  PID shutdown was needed and terminal evidence could not be recovered.
-- **Proposal:** Recover using stable observer/mailbox identity, stop only the
-  exact observer, confirm exit, and retrieve or explicitly report missing
-  terminal evidence. Avoid broad process-name kills.
-- **Owner:** [SEED-011 Story 2](SEED-011-efficient-ci-failure-attention.md#story-2)
-  and the Codex CI adapter. Revisit this narrow recovery gap without selecting
-  the whole deferred repair scheduler or changing Pygardon's opt-in CI policy.
-- **Success:** Simulated loss of volatile handles still permits exact shutdown
-  and an honest final evidence receipt.
+**Status:** Refined and planned in [quick 015](../quick/015-enforce-decide-first-refactor-handoffs/PLAN.md).
+**Trigger:** Deliver before another long unattended Doughnut execution.
+
+**Goal:** Let the coordinator close its exact CI observer and retain an honest
+coverage receipt when Codex's volatile cell/session handles are unavailable.
+
+**Evidence:** Web-note receive closeout lost its handles; terminating the cell
+left the stream subprocess running and its terminal receipt unavailable. The
+mailbox already persists events/results and supports `stop DIRECTORY`.
+
+**Scope:** Reuse that cooperative stop command. Retain the initial mailbox
+directory and stream PID in the existing execution PLAN, tied to its coordinator
+and checkout. Add PID to the stream's existing startup receipt; create no new
+registry. After handle loss, recover the exact saved directory, validate its
+checkout/request, stop that mailbox, verify the recorded process exits within a
+bounded local wait, and report terminal evidence with `pendingCi: unobserved`.
+Preserve recorded failures; do not start a replacement merely to shut it down.
+
+If identity is missing/mismatched, or completion/exit cannot be established,
+report unresolved shutdown or missing evidence. Do not guess by newest mailbox,
+scan for a process to kill, or infer green CI. The recovered path uses PID only
+for exit confirmation, not termination; keep ordinary saved-handle shutdown.
+
+**Exclusions:** Automatic discovery of older unidentified observers, forced
+termination of stuck streams, repair scheduling/resumption, delivery-acknowledgment
+redesign, other hosts, and new monitoring infrastructure. This selects only the
+shutdown subset of [SEED-011 Story 2](SEED-011-efficient-ci-failure-attention.md#story-2).
+Other repair work stays deferred. Shorten the changed Codex adapter instructions.
+
+**Key examples:** Saved identity plus lost volatile handles → exact mailbox
+stops, process exits, and its persisted failure/coverage receipt remains usable;
+another observer stays running. Missing or mismatched identity → no guessed
+stop. Missing terminal evidence or unconfirmed exit → explicit unresolved result,
+without a replacement observer or broad kill.
+
+**Evaluation:** Extend the existing Codex process-lifecycle proof with real
+local subprocesses and fake GitHub input. Discard the coordinator handle map;
+recover only from the durable note. No live GitHub run or actual context
+compaction is required. This demonstrates recovery mechanics, not a general
+cross-context repair system. No unresolved scope decision blocks planning.
+
+<a id="story-7"></a>
 
 ### 7. Prove uncertain storage assumptions before implementation — conditional P1
 
-- **Trigger:** The next uncertain transaction or destructive migration change.
-- **Evidence:** Doughnut reversed attempts involving rollback fixtures and
-  `REQUIRES_NEW` locks. Pygardon Quick 069 tried two invalid DuckDB DDL sequences
-  before a focused experiment established a viable migration.
-- **Proposal:** Use one ephemeral, representative proof of the exact uncertain
-  DDL or transaction/fixture ownership and critical postcondition. Record engine
-  version, exact command, and result before declaring the affected work ready.
-  Routine migrations do not require a generic research phase.
-- **Owner:** Relevant planning readiness and storage/fixture guidance.
-- **Success:** Implementation starts with demonstrated feasibility and avoids
-  repeating an attempt based on the same untested assumption.
+**Status:** Refined and planned in [quick 015](../quick/015-enforce-decide-first-refactor-handoffs/PLAN.md).
+**Trigger:** Apply the readiness check when a proposed transaction/destructive
+migration has a concrete unresolved engine or fixture-ownership assumption.
+
+**Goal:** Avoid an implementation attempt based on an unproved storage behavior
+without charging routine migrations for a generic research phase.
+
+**Evidence:** Doughnut reversed work involving rollback fixtures and
+`REQUIRES_NEW`; Pygardon tried invalid DuckDB DDL sequences before a small
+experiment identified a viable one.
+
+**Scope:** Tighten `slice-planning`'s existing execution-context check. Name the
+specific uncertain DDL/transaction behavior and critical postcondition. Reuse
+applicable existing evidence first; otherwise obtain one isolated representative
+proof using the relevant engine/version and transaction semantics before calling
+the affected work ready. Keep assumption, literal command, version, observation,
+and result compactly in its existing PLAN. Failed proof informs the plan rather
+than a speculative implementation attempt. Shorten the changed skill document.
+
+**Exclusions:** No current database experiments or migration changes in this
+process improvement; no mandatory spike, new test framework, fixture overhaul,
+exhaustive migration matrix, or shared/production-database manipulation. Routine
+known behavior needs no extra check. Pygardon rollout and sibling changes stay out.
+
+**Key examples:** Uncertain rename/FK semantics without evidence → require a
+throwaway proof of that sequence and a representative later parent update;
+uncertain rollback-fixture visibility to `REQUIRES_NEW` → prove the actual
+transaction ownership with isolated data before broad migration; matching
+existing evidence or routine known behavior → reuse/continue without a new run.
+
+**Evaluation:** Replay those three readiness decisions using supplied evidence.
+Judge live value at the next naturally occurring matching storage change;
+do not manufacture one for this instruction update. No unresolved scope decision
+blocks planning.
 
 ## Evaluation and provenance
 
