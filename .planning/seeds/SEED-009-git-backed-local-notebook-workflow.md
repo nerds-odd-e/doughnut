@@ -133,8 +133,8 @@ structural, or competing proposals do not overwrite the accepted projection.
 
 ### 3. Receive a Donut web edit in a clean local repository
 
-**Refinement status:** Narrow existing-note content scope selected by the
-developer on 2026-09-05; ready for slice planning under the boundaries below.
+**Status:** delivered. The completed quick plan was removed; implementation and
+proof remain recoverable from Git history.
 
 **Goal**
 
@@ -146,34 +146,30 @@ and receive again. Existing notes retain their identity and learning data.
 
 **Scope**
 
-- Supported web change: edit an existing note's Markdown body or
-  valid authored frontmatter at an unchanged Portable path, including notes
-  inside folders. The accepted content follows ADR 0004 and the existing web
-  save contract; synchronization transfers the accepted Portable bytes. Before
-  this save, the notebook's current Portable tree must match accepted `main`.
+- Supported web change: edit an existing note's Markdown body or valid authored
+  frontmatter at an unchanged Portable path, including notes inside folders.
+  Before the save, the notebook's current Portable tree must match accepted
+  `main`.
 - Each durable save that changes supported Portable content appends an
   immutable commit to accepted `main`, retaining its ancestry. A failed save
   must not leave an accepted Git revision and displayed note content that
   disagree. Saving unchanged Portable content need not create a commit.
-- An authenticated owner uses an explicit CLI receive operation on an existing
-  bound checkout. Planning uses `donut notebook pull <directory>` as the
-  explicit receive verb. It downloads accepted history and
-  fast-forwards local `main` and its working tree to the downloaded head.
-  Several sequential accepted saves can be received together.
+- An authenticated owner uses `donut notebook pull <directory>` on an existing
+  bound checkout to download accepted history and fast-forward local `main`
+  and its working tree. Several sequential accepted saves can be received
+  together; identical heads are an unchanged success.
 - A clean eligible checkout is on `main`, has no staged, unstaged, or untracked
   work under the existing CLI readiness policy, and its head equals or is an
   ancestor of accepted `main`. No unpublished local commits may be discarded.
-  Identical heads produce an unchanged success.
 - Dirty work, unpublished commits, divergent history, detached HEAD, or another
   branch stop with actionable guidance and preserve local branches, commits,
-  index, and files. Receiving does not publish, auto-commit, stash, rebase, merge,
-  or resolve conflicts. Stories 8 and 9 own divergence handling.
+  index, and files. Receiving does not publish, auto-commit, stash, rebase,
+  merge, or resolve conflicts. Stories 8 and 9 own divergence handling.
 - Git remains the revision model. Existing checkout binding and authentication
   are reused; no Donut metadata is added to the Portable tree. Direct standard
   Git remote access and a historical-checkout UI remain excluded.
 - Commit batching is deferred to Story 10; one commit per changed durable save
-  is sufficient here. Git author/message presentation is not a new product
-  requirement in this story.
+  is sufficient here.
 - Exclusions: web note creation/deletion/rename/move, folder changes,
   and notebook/folder README edits. Local structural publication remains in
   Stories 4–7. Newly populated notebooks whose accepted tree is still empty,
@@ -183,66 +179,9 @@ and receive again. Existing notes retain their identity and learning data.
 - Conservative handling outside that starting state: retain existing web-save
   behavior, but do not advance accepted Git history or absorb unrelated drift
   into the new content edit. Existing publication drift rejection remains.
-  Receiving returns accepted Git history only; CLI guidance must state this
-  limitation without claiming that unsupported web changes were synchronized.
-  A Git failure during an eligible save must propagate and roll back that save;
-  it must never be treated as the ordinary out-of-scope drift case.
-
-**Key examples**
-
-1. **Receive a body edit:** The clean checkout and accepted `main` both point
-   to A, containing `Recipes/Pasta.md` → the owner saves “Simmer until al dente”
-   in that existing web note and receives locally → accepted commit B has A
-   as parent, local `main` points to that same B, the file contains the accepted
-   Markdown, and the checkout is clean. The Donut note keeps its learning data.
-2. **Preserve authored properties:** A note has valid custom YAML and an
-   authored heading → the owner changes its content through the web save and
-   receives → the local file matches the accepted Portable representation,
-   including preserved authored properties and heading, at the same path.
-3. **Receive accumulated sequential saves:** Local `main` is A with no local
-   changes; accepted saves have produced B then C → receive → local `main`
-   reaches C with A, B, and C retained in history. A repeated receive changes
-   neither files nor history.
-4. **Protect local work:** Remote has B, but the local checkout has an
-   uncommitted edit, an untracked file, or an unpublished commit → receive →
-   explain the blocking local state without overwriting or publishing it.
-5. **Continue the two-way loop:** Receive B → edit one existing note locally,
-   commit C directly on B, and publish under Story 2's existing restrictions →
-   Donut accepts C on the same note. A subsequent supported web save appends D
-   to C, and a clean receive reaches D without replacing earlier commits.
-6. **Do not advertise a partial save:** A supported web save cannot complete
-   its accepted Git update → it does not report success with only the web
-   projection changed; the previous accepted content and head remain intact.
-7. **Leave earlier drift outside synchronization:** Accepted history is A, but
-   the web tree already contains an unsynchronized new note or README change
-   → the owner edits a note's content → the existing web-save behavior remains
-   available, while accepted history stays A. Receiving A must not claim that
-   the current web tree was synchronized; publishing still rejects the drift.
-
-**Decisions and dependencies**
-
-The developer selected existing-note content edits only. The matching-tree
-starting state and retention of existing out-of-scope web behavior keep that
-choice useful without adding a new restriction on ordinary web editing.
-`pull` is a planning choice allowed by the seed's existing CLI-verb discretion.
-There is no remaining product question blocking this narrow plan.
-
-- **Effort hypothesis:** L — low confidence; assumes an individual durable web
-  save may initially produce its own commit before later batching refinement.
-- **Depends on:** Story 1 for receiving; delivered Story 2 establishes the
-  sequential publish/receive loop.
-- **Safe stopping point:** Uncommitted or unpublished local work is never
-  overwritten; this story may stop and instruct the user to resolve their local
-  state rather than attempting divergence.
-- **Fixture cleanup boundary:** Retain Story 1's testability-only snapshot
-  hook solely to establish a simulated pre-cutover baseline after fixture
-  creation of notes, folders, and READMEs. Content-only synchronization cannot
-  replace that setup, so full removal is deferred until those web operations
-  create accepted history. For this story, use the hook only before the
-  workflow under test; subsequent content edits must create commits through
-  ordinary web saves, with no resnapshot. Keep the baseline-only clone's
-  single-root assertion; add history-preserving assertions for clones/pulls
-  after web content edits. Update the hook's cleanup wording to this boundary.
+  Git failures during eligible saves propagate and roll back rather than
+  becoming an out-of-scope drift save. The testability snapshot hook remains
+  only for fixture setup involving unsupported structural changes.
 
 <a id="story-4"></a>
 
