@@ -31,7 +31,7 @@ export function describeNotebookPullReadiness(): void {
       )
 
       expect(ctx.getErrorSpy()).toHaveBeenCalledWith(
-        'donut: usage: donut notebook pull <directory>'
+        'donut: usage: donut notebook pull <directory>\nReceives accepted notebook history by fast-forwarding a clean local main. Accepted history may not include all current web content.'
       )
       expect(fetchMock).not.toHaveBeenCalled()
     })

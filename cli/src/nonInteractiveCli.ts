@@ -53,7 +53,9 @@ export async function completeNonInteractiveCliIfHandled(
 const NOTEBOOK_CLONE_USAGE =
   'usage: donut notebook clone <notebook-id> <destination>'
 const NOTEBOOK_PUBLISH_USAGE = 'usage: donut notebook publish <directory>'
-const NOTEBOOK_PULL_USAGE = 'usage: donut notebook pull <directory>'
+const NOTEBOOK_PULL_USAGE =
+  'usage: donut notebook pull <directory>\n' +
+  'Receives accepted notebook history by fast-forwarding a clean local main. Accepted history may not include all current web content.'
 
 async function completeNotebookSubcommand(
   notebookArgs: string[]
@@ -91,7 +93,7 @@ async function completeNotebookClone(notebookArgs: string[]): Promise<void> {
     exitCliError(exceptionText(e))
   }
   console.log(
-    `Cloned notebook ${notebookId} into ${destination}. Open and edit the files there with any ordinary local Git tool (Obsidian, an IDE, plain git). Publishing currently accepts one new commit directly on the accepted main that changes one existing Markdown note.`
+    `Cloned notebook ${notebookId} into ${destination}. Open and edit the files there with any ordinary local Git tool (Obsidian, an IDE, plain git). Publishing currently accepts one new commit directly on the accepted main that changes one existing Markdown note. Run "donut notebook pull ${destination}" to receive newer accepted history; accepted history may not include all current web content.`
   )
 }
 
@@ -129,17 +131,20 @@ async function completeNotebookPull(notebookArgs: string[]): Promise<void> {
     exitCliError(NOTEBOOK_PULL_USAGE)
   }
 
-  let acceptedHead: string
+  let result: Awaited<ReturnType<typeof receiveAcceptedNotebookHead>>
   try {
     const { notebookId } = resolveNotebookBinding(directory)
     assertLocalMainIsReadyToReceive(directory)
-    acceptedHead = await receiveAcceptedNotebookHead(
-      directory,
-      Number(notebookId)
-    )
+    result = await receiveAcceptedNotebookHead(directory, Number(notebookId))
   } catch (e) {
     exitCliError(exceptionText(e))
   }
 
-  console.log(`Notebook unchanged. Accepted head: ${acceptedHead}`)
+  if (!result.changed) {
+    console.log(`Notebook unchanged. Accepted head: ${result.acceptedHead}`)
+    return
+  }
+  console.log(
+    `Received accepted notebook history. Accepted head: ${result.acceptedHead}. This accepted history may not include all current web content.`
+  )
 }

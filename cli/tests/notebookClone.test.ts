@@ -75,6 +75,11 @@ describe('notebook clone (CLI routing, real Git checkout)', () => {
         'Publishing currently accepts one new commit directly on the accepted main'
       )
     )
+    expect(ctx.getLogSpy()).toHaveBeenCalledWith(
+      expect.stringContaining(
+        `Run "donut notebook pull ${destinationPath}" to receive newer accepted history`
+      )
+    )
   })
 
   test('clone checks out "main" even when the machine defaults to a different branch name', async () => {

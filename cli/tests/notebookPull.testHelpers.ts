@@ -1,4 +1,31 @@
-import { runGit } from './notebookClone.testHelpers.js'
+import { afterEach, beforeEach, vi } from 'vitest'
+import {
+  installNotebookCliRunFixture,
+  runGit,
+} from './notebookClone.testHelpers.js'
+
+export function installNotebookPullAcceptedHistoryTest(workDirPrefix: string) {
+  const base = installNotebookCliRunFixture(workDirPrefix)
+  let fetchMock: ReturnType<typeof vi.fn>
+  let logSpy: ReturnType<typeof vi.spyOn>
+
+  beforeEach(() => {
+    fetchMock = vi.fn()
+    vi.stubGlobal('fetch', fetchMock)
+    logSpy = vi.spyOn(console, 'log').mockImplementation(() => undefined)
+  })
+
+  afterEach(() => {
+    vi.unstubAllGlobals()
+    logSpy.mockRestore()
+  })
+
+  return {
+    ...base,
+    getFetchMock: () => fetchMock,
+    getLogSpy: () => logSpy,
+  }
+}
 
 export function checkoutState(directory: string) {
   return {

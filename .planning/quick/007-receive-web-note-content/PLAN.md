@@ -228,7 +228,7 @@ from local-ahead, divergent, and unrelated histories.
 
 ### 5. Fast-forward to the downloaded accepted revision
 Type: Behavior
-Status: planned
+Status: done
 Proof: CLI `run` receives one or several real commits, asserting exact SHA,
 clean tree, ancestry, unchanged binding and absence of added Portable metadata.
 Vary the download callback to create local work/change HEAD before completion.
@@ -242,6 +242,11 @@ accepted head and the narrow web-content limitation; update command help and
 clone guidance where needed. Receiving accepted local publications already has
 value at this stopping point, before web commits are implemented.
 Sizing: about 5 minutes, medium confidence; one checkout-update proof loop.
+
+Learning: receive imports accepted objects without refs, revalidates the
+captured clean attached `main` after download, and lets `git merge --ff-only`
+perform the synchronous checkout update. User guidance names accepted history
+without implying every current web edit is included.
 
 ### 6. Establish the notebook transaction boundary for a web content save
 Type: Structure
