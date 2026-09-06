@@ -187,19 +187,94 @@ and receive again. Existing notes retain their identity and learning data.
 
 ### 4. Create a new note locally
 
-- **For / why:** Local refinement often discovers a new concept that should
-  become a real Donut note rather than remain a local-only file.
-- **Evaluation:** The owner adds one valid ADR-0004 Markdown note, commits and
-  synchronizes it, and sees one new note at the matching Portable path in
-  Donut.
-- **Value / learning:** Makes local tools useful for growing, not merely editing,
-  a notebook. The capability remains useful even if deletion, moves, and
-  divergence are deferred.
+**Goal**
+
+A notebook owner who discovers a new concept while working in Obsidian or an
+AI IDE can publish it as a new Donut note from the same local Git repository.
+The owner sees the note at its authored Portable path in Donut and can continue
+editing it through the existing local/web loop. This makes local tools useful
+for growing a notebook even if deletion, moves, and divergence are deferred.
+
+**Scope**
+
+- Extend `donut notebook publish <directory>` to accept one direct-child
+  commit of the current accepted `main` that adds exactly one regular `.md`
+  note file and changes no existing files. Reuse the existing bound-checkout,
+  owner authentication, clean working-tree, and `main` readiness rules.
+- Proposed conservative location boundary: the notebook root or an existing
+  folder represented in the accepted tree. Creating parent folders is excluded
+  pending developer feedback; an existing empty notebook may receive its first
+  root note when its current Portable tree matches accepted `main`.
+- The filename without its final `.md` supplies the display name; the parent
+  path supplies the location. Apply existing title, path, reserved-name, and
+  destination-uniqueness rules. Do not silently rename the file, overwrite an
+  existing note, or create a missing parent folder.
+- Follow [Accepted ADR 0004](../../docs/adrs/0004-okf-compatible-notebook-markdown-accepted.md):
+  require valid typed Markdown and preserve the authored body, headings,
+  frontmatter, and links. An authored YAML `title` does not override the
+  filename. Valid unknown types remain allowed; creation introduces no new
+  type-specific behavior. Invalid content is rejected rather than repaired.
+  Advisory names such as `index.md` and `log.md` warn without blocking a valid
+  addition; notebook/folder README authoring is outside this story.
+- Create a fresh Donut note identity, including when the new file copies the
+  contents of an existing note that remains in place. Existing notes and their
+  private data retain their identities. No learning history, questions, or
+  conversations are copied or reassigned based on matching text.
+- Accept the authored commit and new note together, or neither. The notebook's
+  current Portable tree must match the accepted parent before publication.
+  Invalid input, collisions, stale proposals, projection drift, or failed
+  publication leave accepted `main` and remote notes unchanged, preserving
+  the local commit for correction. Retrying an already accepted head succeeds
+  without creating a duplicate note.
+- Once accepted, the new file is part of ordinary clone/pull history and the
+  note supports the existing content-edit flow. No Donut IDs or other metadata
+  are added to the Portable tree.
+- Exclusions: multiple additions or mixed add/edit/delete commits, publishing
+  several unpublished commits together, renames/moves, folder or README
+  authoring, attachments, web structural synchronization, drift repair, and
+  rebase/conflict handling. Stories 5–9 retain their respective outcomes.
+  Existing single-note content publication remains supported.
+
+**Key examples**
+
+1. **Create and continue editing:** From a clean checkout at accepted `main`,
+   add `Gravity.md` with `type: Note`, an authored `title: My explanation`,
+   and a Markdown body; commit and publish → Donut shows one new note named
+   `Gravity`, preserves the YAML title and body, and accepts that commit.
+   A subsequent supported content edit updates this same new note; another
+   eligible checkout can pull the accepted file.
+2. **Existing folder:** `Physics/` already exists in the accepted tree; add
+   only `Physics/Inertia.md` and publish → the new note appears in that folder.
+   Under the proposed boundary, the same addition with a missing `Physics/`
+   folder is rejected with guidance that folder creation is unsupported.
+3. **Copy has new identity:** An existing learned note remains unchanged; copy
+   its Markdown to a new valid path and publish only the addition → both notes
+   exist, and the original's learning history stays with the original.
+4. **Invalid file:** Add a note with missing `type`, malformed YAML, or an
+   invalid/reserved note name and publish → report the offending path and
+   reason, create no note, and leave both accepted history and local work intact.
+5. **Competing destination:** After the local addition is committed, remote
+   content changes or the destination becomes occupied → publication rejects
+   the stale or conflicting proposal without overwriting a note. The user
+   retains the local commit; automatic reconciliation is deferred.
+6. **Unsupported combination:** Add a note while also editing or deleting an
+   existing file in the same commit → reject the whole proposal with guidance
+   to separate supported changes; do not partially create the new note.
+7. **Repeat publication:** The addition was accepted but the owner repeats
+   publication of the same head → report success with the same accepted head
+   and still exactly one new note.
+
+**Refinement assumptions**
+
+The existing-location-only boundary is a proposal, not a recorded developer
+decision. No additional product choice is needed for that conservative scope;
+including new parent folders would require revising its scope and examples.
+
 - **Effort hypothesis:** M — low confidence; assumes the basic publish boundary
   from Story 2 can distinguish a valid addition from a content update.
 - **Depends on:** Story 2.
-- **Safe stopping point:** Invalid files and destination collisions reject the
-  commit without partially creating remote entities.
+- **Safe stopping point:** One local addition becomes a usable Donut note;
+  unsupported structural changes still reject atomically.
 
 <a id="story-5"></a>
 
@@ -359,12 +434,10 @@ than be approximated.
 
 No open product decision changes the candidate-story order.
 
-Before planning a remaining story, reconcile Proposed ADR 0002 with the later human
-discussion recorded here. The current draft says Donut exposes a standard Git
-remote in v1 and that a CLI is never required; the later v1 boundary defers
-direct standard-Git access and permits a required CLI-assisted acquisition and
-synchronization workflow. This is an ADR wording/alignment task owned by the
-human advice process, not permission to treat the Proposed ADR as Accepted.
+ADR 0002 now reflects the later human discussion recorded here: v1 permits a
+required CLI-assisted acquisition and synchronization workflow and defers direct
+standard-Git access. Its status remains Proposed; the recorded product
+constraints above do not turn it into an Accepted ADR.
 
 The exact CLI verbs, authentication presentation, and whether its Git transport
 appears as a dedicated sync command or a Git remote helper do not change these
