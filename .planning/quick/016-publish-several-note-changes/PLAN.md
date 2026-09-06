@@ -3,7 +3,7 @@
 ## Source and status
 
 - Source: [SEED-009 Story 11](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-11).
-- Status: executing; leaves 1–12 complete, leaf 13 next.
+- Status: all 13 leaves complete; completion cleanup next.
 - Readiness: remaining leaves ready for direct execution after refinement.
 
 ## Goal and scope
@@ -386,7 +386,11 @@ beats, keep it `@wip` until green; remove that tag before closing this leaf.
 ### 13. Receive the whole accepted commit in a clean second checkout
 
 Type: Behavior
-Status: planned
+Status: done
+Evidence: `CURSOR_DEV=true nix develop -c pnpm -C cli exec vitest run tests/notebookPull.test.ts`
+passed (23 tests, 23.73 seconds). Exact multi-note head/tree/bytes, clean status
+and metadata-free file list inspected. Independent refactor: no edits.
+About 2 minutes active plus runner/startup.
 Proof: `run(['notebook', 'pull', directory])` against a real Git bundle with one
 accepted multi-note commit yields its exact head/tree/file bytes and a clean
 checkout without Portable metadata.

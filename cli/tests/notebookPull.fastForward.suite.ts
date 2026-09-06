@@ -101,7 +101,7 @@ export function describeNotebookPullFastForward(): void {
       }
     )
 
-    test('receives an added note with its exact bytes and no Portable metadata', async () => {
+    test('receives every note change in one accepted commit with exact bytes and no Portable metadata', async () => {
       const source = buildSourceRepo(ctx.getWorkDir())
       const directory = cloneAsBoundCheckout(
         ctx.getWorkDir(),
@@ -109,26 +109,51 @@ export function describeNotebookPullFastForward(): void {
         getApiConfig().apiBaseUrl,
         'checkout'
       )
-      const addedPath = 'Added note.md'
-      const addedBytes = Buffer.from(
-        '---\ntype: Note\nauthored: retained\n---\n# Added note\n\nExact body.\n'
+      const changedFiles = [
+        {
+          path: 'Added note.md',
+          bytes: Buffer.from(
+            '---\ntype: Note\nauthored: retained\n---\n# Added note\n\nExact body.\n'
+          ),
+        },
+        {
+          path: 'Related note.md',
+          bytes: Buffer.from(
+            '---\ntype: Note\n---\n# Related note\n\nRelated body.\n'
+          ),
+        },
+        {
+          path: 'note.md',
+          bytes: Buffer.from(
+            '---\ntype: Note\nauthored: retained\n---\n# Edited note\n\nUpdated body.\n'
+          ),
+        },
+      ]
+      for (const { path, bytes } of changedFiles) {
+        fs.writeFileSync(join(source, path), bytes)
+      }
+      runGit(['add', ...changedFiles.map(({ path }) => path)], source)
+      runGit(
+        ['commit', '--quiet', '-m', 'accepted related note changes'],
+        source
       )
-      fs.writeFileSync(join(source, addedPath), addedBytes)
-      runGit(['add', addedPath], source)
-      runGit(['commit', '--quiet', '-m', 'accepted note addition'], source)
       const acceptedHead = runGit(['rev-parse', 'main'], source)
-      const bundleFile = join(ctx.getWorkDir(), 'accepted-addition.bundle')
+      const acceptedTree = runGit(['rev-parse', 'main^{tree}'], source)
+      const bundleFile = join(ctx.getWorkDir(), 'accepted-note-changes.bundle')
       bundleMain(source, bundleFile)
       ctx.getFetchMock().mockResolvedValue(bundleGetResponse(bundleFile))
 
       await run(['notebook', 'pull', directory])
 
       expect(runGit(['rev-parse', 'HEAD'], directory)).toBe(acceptedHead)
-      expect(fs.readFileSync(join(directory, addedPath))).toEqual(addedBytes)
+      expect(runGit(['rev-parse', 'HEAD^{tree}'], directory)).toBe(acceptedTree)
+      for (const { path, bytes } of changedFiles) {
+        expect(fs.readFileSync(join(directory, path))).toEqual(bytes)
+      }
       expect(runGit(['status', '--porcelain=v1'], directory)).toBe('')
       expect(
         runGit(['ls-tree', '-r', '--name-only', 'HEAD'], directory).split('\n')
-      ).toEqual([addedPath, 'note.md'])
+      ).toEqual(changedFiles.map(({ path }) => path))
     })
 
     test.each([
