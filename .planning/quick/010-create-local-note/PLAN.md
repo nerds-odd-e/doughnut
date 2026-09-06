@@ -289,7 +289,7 @@ minutes, medium confidence.
 
 ### 9. Accept advisory names with existing health warnings
 Type: Behavior
-Status: planned
+Status: done
 Proof: `index.md`/`log.md` additions succeed with the authored filename and the
 existing notebook-health endpoint reports the advisory issue.
 
@@ -460,6 +460,9 @@ The broader follow-up commit scope remains outside this plan.
 
 ## Refinement learnings
 
+- Existing publication already accepts `index.md` and `log.md` losslessly, and
+  the existing notebook-health rule reports their advisory note IDs and labels;
+  no warning transport change is needed.
 - The pre-create projection guard rejects an addition when an unsynchronized
   web-created note already occupies its path, preserving both current notes and
   the unchanged accepted binding without addition-specific recovery logic.
