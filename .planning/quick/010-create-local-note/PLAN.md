@@ -343,7 +343,7 @@ E2E runtime may dominate the verification exception below.
 
 ### 12. Publish a later local edit to the created note
 Type: Behavior
-Status: planned
+Status: done
 Proof: After a real accepted addition, publishing its next content-edit commit
 preserves the created note ID and advances accepted history with the exact body.
 
@@ -460,6 +460,9 @@ The broader follow-up commit scope remains outside this plan.
 
 ## Refinement learnings
 
+- A note created through publication immediately participates in the existing
+  local edit path: its ID is stable and the next accepted commit is an exact
+  child containing the edited bytes.
 - The installed-CLI addition flow reuses clone/publish plumbing but stages the
   exact changed path for both edits and additions; clone guidance now names the
   one-change and existing-location boundary.

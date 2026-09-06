@@ -21,9 +21,54 @@ import org.junit.jupiter.api.Test;
 class NotebookGitMixedEditingControllerTest extends NotebookGitWebContentControllerTestBase {
 
   private static final String NOTE_PATH = "Mixed Note.md";
+  private static final String CREATED_CONTENT = "---\ntype: Note\n---\ncreated locally";
   private static final String FIRST_WEB_CONTENT = "---\ntype: Note\n---\nfirst web edit";
   private static final String LOCAL_CONTENT = "---\ntype: Note\n---\nlocal edit";
   private static final String SECOND_WEB_CONTENT = "---\ntype: Note\n---\nsecond web edit";
+
+  @Test
+  void publishesALaterLocalEditOnTheSameCreatedNote() throws Exception {
+    Notebook notebook = createGitBackedNotebook();
+    NotebookGitBinding initialBinding = binding(notebook);
+    byte[] creationProposal =
+        proposalBundleBytes(
+            initialBinding, List.of(new NotebookGitProposalFile(NOTE_PATH, CREATED_CONTENT)));
+    String createdHead =
+        controller.publishNotebookGitProposal(
+            notebook.getId(), initialBinding.getAcceptedGitObjectId(), creationProposal);
+    Integer createdNoteId =
+        noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId()).getFirst().getId();
+
+    NotebookGitBinding afterCreation = binding(notebook);
+    byte[] editProposal =
+        proposalBundleBytes(
+            afterCreation, List.of(new NotebookGitProposalFile(NOTE_PATH, LOCAL_CONTENT)));
+    ObjectId localEditHead;
+    try (InMemoryRepository proposal = new InMemoryRepository(new DfsRepositoryDescription())) {
+      localEditHead = GitBundleTestReader.fetchHead(proposal, editProposal);
+    }
+
+    controller.publishNotebookGitProposal(
+        notebook.getId(), afterCreation.getAcceptedGitObjectId(), editProposal);
+
+    Note editedNote =
+        noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId()).getFirst();
+    NotebookGitBinding afterEdit = binding(notebook);
+    assertThat(editedNote.getId(), is(createdNoteId));
+    assertThat(editedNote.getContent(), is(LOCAL_CONTENT));
+    assertThat(afterEdit.getAcceptedGitObjectId(), is(localEditHead.getName()));
+
+    try (InMemoryRepository accepted = new InMemoryRepository(new DfsRepositoryDescription())) {
+      ObjectId acceptedHead = GitBundleTestReader.fetchHead(accepted, afterEdit.getBundleBytes());
+      try (RevWalk revWalk = new RevWalk(accepted)) {
+        RevCommit acceptedCommit = revWalk.parseCommit(acceptedHead);
+        assertThat(acceptedCommit.getParent(0).getId().getName(), is(createdHead));
+      }
+      assertThat(
+          NotebookGitProposalBlobText.readUtf8(accepted, acceptedHead, NOTE_PATH),
+          is(LOCAL_CONTENT));
+    }
+  }
 
   @Test
   void keepsExactAncestryAcrossAlternatingWebAndLocalEditsOnTheSameNote() throws Exception {
