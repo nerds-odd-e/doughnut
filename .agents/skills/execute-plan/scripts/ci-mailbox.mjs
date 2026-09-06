@@ -129,7 +129,9 @@ export async function streamMailboxWorker(request, options = {}) {
     process.once('SIGINT', stopOnSignal)
     process.once('SIGTERM', stopOnSignal)
   }
-  options.write?.(`${receiptPrefix}${JSON.stringify({ directory })}\n`)
+  options.write?.(
+    `${receiptPrefix}${JSON.stringify({ directory, pid: process.pid })}\n`
+  )
   try {
     await runMailboxWorker(directory, {
       ...options,

@@ -2,16 +2,12 @@
 
 Follow [ci-monitor.md](ci-monitor.md) for CI selection and failure recovery.
 
-In a Codex runtime exposing `functions.exec`, `yield_control`, `notify`,
-`tools.exec_command`, and `tools.write_stdin`, use one yielded JavaScript cell
-for the whole execution observer. Start it when execute-plan begins, before the
-first push. Re-entering setup, including after a normal or repair push, must
-reuse the saved `watching` or terminal `finished` entry; it must not launch a
-new process. The foreground mailbox command discovers successive main pushes,
-persists each event before streaming its JSON record, and remains responsible
-until execution shutdown. Replace the command arguments, `workdir`, and owner
-key below with the verified repository, checkout root, and current coordinator
-identity:
+With `functions.exec`, `yield_control`, `notify`, `tools.exec_command`, and
+`tools.write_stdin`, start one yielded observer cell when execution begins,
+before the first push. Reuse `watching` and terminal `finished` entries on
+reentry. If volatile handles are lost, recover the active PLAN's observer note
+before considering replacement. Substitute verified repository, checkout, and
+coordinator below:
 
 ```js
 const key = 'ci-watch-execution:OWNER/REPO:main:COORDINATOR'
@@ -26,6 +22,7 @@ try {
   })
   let tail = ''
   let directory
+  let pid
   let terminal
   const events = []
   const consume = (chunk) => {
@@ -37,7 +34,7 @@ try {
         continue
       }
       if (line.startsWith('CI_OBSERVER ')) {
-        directory = JSON.parse(line.slice('CI_OBSERVER '.length)).directory
+        ;({ directory, pid } = JSON.parse(line.slice('CI_OBSERVER '.length)))
         continue
       }
       if (!line.startsWith('{')) continue
@@ -53,6 +50,7 @@ try {
     status: result.session_id ? 'watching' : 'finished',
     sessionId: result.session_id,
     directory,
+    pid,
     tail,
     terminal,
   })
@@ -78,6 +76,7 @@ try {
           : 'finished',
       sessionId: result.session_id,
       directory,
+      pid,
       tail,
       terminal,
     })
@@ -88,6 +87,7 @@ try {
     status: 'finished',
     sessionId: undefined,
     directory,
+    pid,
     tail,
     terminal,
   })
@@ -98,42 +98,44 @@ try {
 }
 ```
 
-The parser keeps an incomplete final line as `tail` across arbitrary tool-output
-chunks. It consumes the initial `exec_command` output before yielding, then
-delivers those queued complete records after the yield, so an early event is not
-lost. Later complete records are notified after each foreground process read,
-without waiting for observer exit. Keep the cell alive by awaiting its work.
-After the initial yield, continue delegation and plan work; the JavaScript loop,
-including process-output reads, does not require model turns. `notify` injects a
-result for the active coordinator to handle at the next available boundary. Do
-not repeatedly call `wait`, poll from the model, or spend a sub-agent on
-watching. Never grant a watcher broader network or filesystem permissions than
-normal tools allow.
+After startup, save receipt directory/PID, coordinator, and checkout in the
+active PLAN before the first push; retain cell/session handles too. The parser
+retains chunk tails, consumes initial output before yielding, then notifies
+queued events. Subsequent reads notify immediately; awaited work keeps the cell
+alive. Continue delegation after yielding. `notify` delivers at the coordinator's
+next boundary without model polling. Do not repeatedly `wait`, assign a watching
+agent, or broaden ordinary network/filesystem permissions.
 
 [Codex async command hooks](https://learn.chatgpt.com/docs/hooks#run-hooks-in-the-background)
-are another supported delivery mechanism in compatible versions: their
-informational output reaches the next safe model request, and does not wake an
-idle task. A plain background shell process or a file alone is **not** a
-notification mechanism. If no bridge is exposed, report that limitation once
-and continue execution; do not silently substitute recurring AI polling or
-claim that an unconnected watcher can notify the coordinator.
+also deliver at the next safe model request in compatible versions; they cannot
+wake an idle task. A background shell or file alone cannot notify. Without a
+bridge, report that limitation once and continue; never substitute recurring AI
+polling or claim notifications.
 
-Keep observer cell/session handles so they can be stopped at plan completion,
-Jidoka, or user cancellation. To stop, retain its session handle, mark the saved
-status `stopped`, and send Ctrl-C (`chars: '\u0003'`) with `tools.write_stdin`
-to that exact session. The PTY enables this interruption; do not assume plain
-pipes accept Ctrl-C. The stream translates SIGINT/SIGTERM into a mailbox stop,
-and the terminal receipt is read through the shared finite terminal-result
-wait. Report its unread-event count and `pendingCi: unobserved` coverage rather
-than treating shutdown as green CI. Confirm that the known observer process
-exited, then let the bridge finish and reap its yielded cell. Terminating only
-the cell does not prove the subprocess stopped. Consume already-delivered
-failures before claiming completion; never wait for pending CI. On resume,
-rearm only absent, `stopped`, or `lost` observers after confirming their old
-process has ended. Keep `watching` and terminal `finished` entries
-deduplicated; do not restart an observer that already delivered its result.
+Stop at completion, Jidoka, or cancellation:
 
-After every successful normal or repair push, keep the same key, session ID,
-mailbox directory, process, and yielded cell. The observer discovers that push
-on its next local poll; do not run the setup cell again merely because HEAD or
-the pushed SHA changed.
+- With handles, retain the session, mark saved status `stopped`, and send
+  Ctrl-C (`chars: '\u0003'`) through `tools.write_stdin` to that exact PTY;
+  plain pipes do not support this. The stream converts SIGINT/SIGTERM into a
+  mailbox stop and uses the shared finite terminal-result wait. Confirm process
+  exit, let the bridge finish, and reap its cell. Cell termination alone proves
+  no subprocess exit.
+- Without handles, recover the PLAN note. Match coordinator/checkout and validate
+  the saved directory's `request.json` root, repository, branch, and execution
+  mode. Run `./scripts/run.sh node .agents/skills/execute-plan/scripts/ci-mailbox.mjs stop DIRECTORY`
+  from that checkout. Read its terminal receipt and `result.json`; confirm the
+  recorded PID disappears using a finite local `ps` wait. Never signal that PID.
+  Missing/mismatched identity means no guessed stop, newest-mailbox lookup, or
+  replacement launch. Older unidentified observers cannot be recovered. Stop
+  errors, missing terminal evidence, or unconfirmed exit mean unresolved
+  shutdown; never force termination or claim closure.
+
+Preserve recorded failures and report unread events and `pendingCi: unobserved`,
+not green CI. Consume delivered failures before completion; never wait for pending
+CI. Keep acknowledgment and repair semantics unchanged. On resume, rearm only
+absent, `stopped`, or `lost` observers after confirming the old process ended;
+never restart terminal `finished` observers.
+
+Normal and repair pushes retain the key, session, directory, process, and cell.
+The observer discovers successive main pushes, persists events before streaming,
+and owns observation until shutdown. Changed HEAD/SHA never requires setup again.

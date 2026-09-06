@@ -67,7 +67,7 @@ in the existing handoff. No replay harness or additional report format.
 ### 2. Stop the retained Codex observer after volatile handles are lost
 
 Type: Behavior
-Status: planned
+Status: done
 Proof: Extend the existing Codex lifecycle test to lose its saved handle map,
 recover the startup identity from an on-disk note, stop that exact mailbox through
 the real CLI, and observe process exit plus retained terminal/failure evidence.
@@ -153,6 +153,18 @@ stays deferred. Observe natural relevant executions for live effectiveness; add
 no monitor or forced product exercise and do not overstate simulated evidence.
 
 ## Readiness
+
+Slice 2: `CURSOR_DEV=true nix develop -c node --test .agents/skills/execute-plan/scripts/ci-codex-lifecycle.test.mjs .agents/skills/execute-plan/scripts/ci-observer-stream.test.mjs`
+passed all 5 tests after refactor. Assertions establish actual receipt PID,
+cleared handle map, saved-note recovery and request validation, real CLI stop,
+bounded exit, retained failure/terminal evidence, and a live second observer with
+no replacement. Missing/mismatched identity and missing result/exit instruction
+replays remain unresolved without guessing or forced termination.
+`wc -w .agents/skills/execute-plan/references/ci-notify-codex.md`: 717 → 633.
+Formatting expanded the lifecycle file; the independent refactor extracted two
+test helpers into existing `watch-ci-test-fixtures.mjs`, then reran the invalidated
+focused proof. Nix daemon access was denied before tests; authorized access
+resolved that environmental launch failure. No test failure was discounted.
 
 Execution evidence: Slice 1's four supplied replays pass: remove contradictory
 full-suite additions; accept no-edit skip; rerun invalidated A and reuse B with a

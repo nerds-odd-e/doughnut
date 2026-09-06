@@ -253,7 +253,10 @@ exercise or monitor. No unresolved scope decision blocks slice planning.
 
 ### 6. Recover observer shutdown after compaction — conditional P1
 
-**Status:** Refined and planned in [quick 015](../quick/015-enforce-decide-first-refactor-handoffs/PLAN.md).
+**Status:** Installed 2026-09-06. Five focused lifecycle/stream tests passed,
+including durable-note recovery, exact cooperative stop, retained failure evidence,
+and an unaffected second observer. Missing identity/evidence instruction replays
+remain unresolved. Adapter word count: 717 → 633. Real compaction is not claimed.
 **Trigger:** Deliver before another long unattended Doughnut execution.
 
 **Goal:** Let the coordinator close its exact CI observer and retain an honest
