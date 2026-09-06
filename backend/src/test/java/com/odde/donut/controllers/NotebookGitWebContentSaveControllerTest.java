@@ -32,6 +32,52 @@ import org.springframework.web.server.ResponseStatusException;
 class NotebookGitWebContentSaveControllerTest extends NotebookGitWebContentControllerTestBase {
 
   @Test
+  void canonicalNoOpSaveKeepsAcceptedHistoryWhileUpdatingTheNoteTimestamp() throws Exception {
+    Timestamp editedAt = Timestamp.from(Instant.parse("2026-09-06T04:05:06Z"));
+    Notebook notebook = createGitBackedNotebook();
+    Note note =
+        makeMe.aNote().notebook(notebook).title("Root Note").content(ACCEPTED_CONTENT).please();
+    NotebookGitBinding accepted = snapshotCurrentPortableTree(notebook);
+    String acceptedHead = accepted.getAcceptedGitObjectId();
+    byte[] acceptedBundle = accepted.getBundleBytes();
+    testabilitySettings.timeTravelTo(editedAt);
+
+    textContentController.updateNoteContent(
+        note, contentDto("---\ntype: note\n---\naccepted content"));
+
+    Note reloaded = noteRepository.findById(note.getId()).orElseThrow();
+    NotebookGitBinding after = binding(notebook);
+    assertThat(reloaded.getContent(), is(ACCEPTED_CONTENT));
+    assertThat(reloaded.getUpdatedAt(), is(editedAt));
+    assertThat(after.getAcceptedGitObjectId(), is(acceptedHead));
+    assertThat(after.getBundleBytes(), equalTo(acceptedBundle));
+  }
+
+  @Test
+  void repeatedCanonicalNoOpSaveKeepsTheRevisionCreatedByTheChangedSave() throws Exception {
+    Notebook notebook = createGitBackedNotebook();
+    Note note =
+        makeMe.aNote().notebook(notebook).title("Root Note").content(ACCEPTED_CONTENT).please();
+    snapshotCurrentPortableTree(notebook);
+    textContentController.updateNoteContent(note, contentDto(EDITED_CONTENT));
+    NotebookGitBinding changed = binding(notebook);
+    String changedHead = changed.getAcceptedGitObjectId();
+    byte[] changedBundle = changed.getBundleBytes();
+    Timestamp repeatedAt = Timestamp.from(Instant.parse("2026-09-06T05:06:07Z"));
+    testabilitySettings.timeTravelTo(repeatedAt);
+
+    textContentController.updateNoteContent(
+        note, contentDto("---\ntype: note\n---\nedited content"));
+
+    Note reloaded = noteRepository.findById(note.getId()).orElseThrow();
+    NotebookGitBinding after = binding(notebook);
+    assertThat(reloaded.getContent(), is(EDITED_CONTENT));
+    assertThat(reloaded.getUpdatedAt(), is(repeatedAt));
+    assertThat(after.getAcceptedGitObjectId(), is(changedHead));
+    assertThat(after.getBundleBytes(), equalTo(changedBundle));
+  }
+
+  @Test
   void savesARootNoteAsOneAcceptedRevisionWithoutChangingItsLearningIdentity() throws Exception {
     Timestamp editedAt = Timestamp.from(Instant.parse("2026-09-06T03:04:05Z"));
     testabilitySettings.timeTravelTo(editedAt);

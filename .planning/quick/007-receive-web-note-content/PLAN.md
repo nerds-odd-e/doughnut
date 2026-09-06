@@ -342,7 +342,7 @@ now documented solely as setup for unsupported structural fixture changes.
 
 ### 9. Avoid a new revision for unchanged Portable content
 Type: Behavior
-Status: planned
+Status: done
 Proof: content PATCH with unchanged canonical content keeps accepted SHA and
 bundle bytes unchanged, including a repeated save after a changed save.
 
@@ -352,6 +352,10 @@ retain accepted history without an empty Git commit.
 Compare canonical trees, not raw request bytes, because web validation may
 normalize typed Markdown. Retain existing non-Portable save effects.
 Sizing: 3–5 minutes, medium confidence.
+Learning: comparing the accepted tree again after normal authored persistence
+detects canonical no-ops without bypassing timestamp and other non-Portable
+effects. This keeps both initially equivalent saves and repeated saves after a
+real edit on the existing accepted SHA and bundle bytes.
 
 ### 10. Continue accepted history across web and local editing
 Type: Behavior

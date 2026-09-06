@@ -68,15 +68,12 @@ public class WebNoteContentSaveService {
       if (!accepted.mainHead().equals(persistedAcceptedHead)) {
         throw new IllegalStateException("Accepted bundle main does not match its persisted head");
       }
-      boolean acceptedTreeMatches =
-          projection.matchesAcceptedTree(
-              state.notebook(),
-              state.folders(),
-              state.liveNotes(),
-              accepted.repository(),
-              accepted.mainHead());
+      boolean acceptedTreeMatchedBeforeSave = acceptedTreeMatches(state, accepted);
       authoredNoteDocumentPersistence.persist(note, document, updatedAt);
-      if (!acceptedTreeMatches) {
+      if (!acceptedTreeMatchedBeforeSave) {
+        return note;
+      }
+      if (acceptedTreeMatches(state, accepted)) {
         return note;
       }
 
@@ -101,6 +98,17 @@ public class WebNoteContentSaveService {
       entityPersister.save(binding);
     }
     return note;
+  }
+
+  private boolean acceptedTreeMatches(
+      NotebookGitStateLoader.LockedNotebookState state,
+      NotebookGitBundleImporter.ImportedBundle accepted) {
+    return projection.matchesAcceptedTree(
+        state.notebook(),
+        state.folders(),
+        state.liveNotes(),
+        accepted.repository(),
+        accepted.mainHead());
   }
 
   private Note findNote(NotebookGitStateLoader.LockedNotebookState state, Integer noteId) {
