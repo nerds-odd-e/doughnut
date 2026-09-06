@@ -14,22 +14,21 @@ import org.springframework.web.server.ResponseStatusException;
 
 /**
  * Walks the raw two-tree diff (no rename detection) between a proposal's accepted-parent commit and
- * its proposed commit, and confirms the proposed tree differs from the accepted tree by exactly one
- * modified or added ordinary Markdown note at a regular file mode - never a deleted/moved path, an
- * unsafe path, a non-regular mode, more than one changed file, or the folder-reserved {@code
- * README.md}. Callers only invoke this once a proposal's ancestry has already been confirmed to be
- * a direct single-parent child of the accepted commit.
+ * its proposed commit, and permits one modified note or a set of added ordinary Markdown notes at
+ * regular file modes - never deleted/moved paths, unsafe paths, non-regular modes, or the
+ * folder-reserved {@code README.md}. Callers only invoke this once proposal ancestry is confirmed
+ * to be a direct single-parent child of the accepted commit.
  */
 public final class NotebookGitProposalTreeShape {
 
   private NotebookGitProposalTreeShape() {}
 
   /**
-   * @return the single note change, once every other constraint holds
+   * @return the note changes, once every constraint holds
    * @throws ResponseStatusException 400 BAD_REQUEST naming the offending path/reason when the tree
    *     shape is unsupported, or when either commit cannot be inspected
    */
-  public static NoteChange requireSingleRegularNoteChange(
+  public static List<NoteChange> requireRegularNoteChanges(
       Repository repository, ObjectId acceptedHead, ObjectId proposedHead) {
     try (RevWalk revWalk = new RevWalk(repository)) {
       RevCommit acceptedCommit = revWalk.parseCommit(acceptedHead);
@@ -40,7 +39,7 @@ public final class NotebookGitProposalTreeShape {
     }
   }
 
-  private static NoteChange walkTreeShape(
+  private static List<NoteChange> walkTreeShape(
       Repository repository, RevCommit acceptedCommit, RevCommit proposedCommit)
       throws IOException {
     try (TreeWalk walk = new TreeWalk(repository)) {
@@ -76,25 +75,26 @@ public final class NotebookGitProposalTreeShape {
         }
       }
 
-      return requireExactlyOneAllowedNoteChange(changes);
+      return requireAllowedNoteChanges(changes);
     }
   }
 
-  private static NoteChange requireExactlyOneAllowedNoteChange(List<NoteChange> changes) {
+  private static List<NoteChange> requireAllowedNoteChanges(List<NoteChange> changes) {
     for (NoteChange change : changes) {
       assertRegularNotePath(change.path());
     }
     if (changes.isEmpty()) {
       throw unsupportedTreeShape("proposal contains no changed file");
     }
-    if (changes.size() > 1) {
+    if (changes.size() > 1
+        && changes.stream().anyMatch(change -> change.kind() != ChangeKind.ADDED)) {
       throw unsupportedTreeShape(
           "multiple changed files: "
               + String.join(", ", changes.stream().limit(2).map(NoteChange::path).toList())
-              + ". Publish one note change per commit using separate commits");
+              + ". Publish additions together or use separate commits for other note changes");
     }
 
-    return changes.getFirst();
+    return changes;
   }
 
   private static void assertRegularNotePath(String changedPath) {

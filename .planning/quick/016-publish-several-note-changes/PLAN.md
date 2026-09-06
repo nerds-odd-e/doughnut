@@ -3,7 +3,7 @@
 ## Source and status
 
 - Source: [SEED-009 Story 11](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-11).
-- Status: executing; leaves 1–2 complete, leaf 3 next.
+- Status: executing; leaves 1–3 complete, leaf 4 next.
 - Readiness: remaining leaves ready for direct execution after refinement.
 
 ## Goal and scope
@@ -157,7 +157,11 @@ or refactor edited-note lookup yet.
 ### 3. Publish several additions as one atomic commit
 
 Type: Behavior
-Status: planned
+Status: done
+Evidence: `CURSOR_DEV=true nix develop -c pnpm backend:test_only` passed
+(47 seconds). Two-note views/exact downloaded head/tree/parent/bytes, committed
+late-write rollback and conformant edits-only rejection inspected. Independent
+refactor: no edits. About 5 minutes active; 70 seconds runner/startup.
 Proof: One controller atomic-publication loop: a two-addition proposal appears
 in the represented folder at the exact downloaded head/tree/parent; the existing
 late-binding-save failure fixture with two additions leaves no attempted notes,
@@ -408,24 +412,7 @@ survives its replacing leaf.
 
 ## Refinement assessment and readiness
 
-**Ready for direct execution from leaf 1.** This is a planning assessment;
-execution still enforces the time budget. All work remains planned. No execution
-attempt, overrun, completed slice or parked product change preceded refinement.
-The seed's outcome, examples and exclusions are unchanged.
-
-| Original slice | Classification | Replacement/current ownership |
-| --- | --- | --- |
-| 1: accepted-base and per-note extraction | Refine | 2 isolates addition application; 4 handles edited lookup only when mixed publication is next |
-| 2: several additions | Refine | 1 settles per-path validation first; 3 accepts additions using the prepared operation with its existing rollback harness |
-| 3: mixed additions/edits | Refine | 4 supplies the live per-change dispatch; 5 changes only mixed policy and its atomic acceptance examples |
-| 4: invalid Markdown plus conditional property work | Refine | 6 owns missing-type rejection; 7 owns the concrete field-error/path diagnostic |
-| 5: absent parent | Ready | 8 retains the same rejection example with a bounded correction to its unsupported advice |
-| 6: accepted retry | Ready | 9 |
-| 7: CLI guidance | Ready | 10 |
-| 8: installed multi-file publication | Refine | 11 adapts the currently exercised fixture; 12 adds the scenario using that green helper |
-| 9: clean second-checkout receive | Ready | 13 |
-
-All thirteen replacement leaves are **Ready** under the current evidence.
+Remaining leaves are **Ready** under the current evidence.
 Structure leaves 2, 4 and 11 immediately precede their enabling Behaviors 3, 5
 and 12. They retain live callers and existing outside-in proof. No new leaf is
 an unverified implementation step or deferred safety test.

@@ -100,21 +100,24 @@ public class NotebookGitProposalPublisher {
     NotebookGitProposalAncestry.assertFollowsAcceptedHead(
         proposal.repository(), proposal.mainHead(), acceptedHead);
 
-    NotebookGitProposalTreeShape.NoteChange noteChange =
-        NotebookGitProposalTreeShape.requireSingleRegularNoteChange(
+    List<NotebookGitProposalTreeShape.NoteChange> noteChanges =
+        NotebookGitProposalTreeShape.requireRegularNoteChanges(
             proposal.repository(), acceptedHead, proposal.mainHead());
     NotebookGitProposalMarkdownFormat.assertValidTypedMarkdown(
         proposal.repository(), proposal.mainHead());
     Timestamp publishedAt = testabilitySettings.getCurrentUTCTimestamp();
     List<Note> proposedLiveNotes = liveNotes;
-    if (noteChange.kind() == NotebookGitProposalTreeShape.ChangeKind.ADDED) {
+    if (noteChanges.getFirst().kind() == NotebookGitProposalTreeShape.ChangeKind.ADDED) {
       projection.requireMatchingAcceptedTree(
           notebook, folders, liveNotes, proposal.repository(), acceptedHead);
-      Note addedNote =
-          applyAddition(notebook, folders, proposal, acceptedHead, noteChange.path(), publishedAt);
       proposedLiveNotes = new ArrayList<>(liveNotes);
-      proposedLiveNotes.add(addedNote);
+      for (NotebookGitProposalTreeShape.NoteChange noteChange : noteChanges) {
+        proposedLiveNotes.add(
+            applyAddition(
+                notebook, folders, proposal, acceptedHead, noteChange.path(), publishedAt));
+      }
     } else {
+      NotebookGitProposalTreeShape.NoteChange noteChange = noteChanges.getFirst();
       AuthoredNoteDocument document = readValidatedDocument(proposal, noteChange.path());
       Note changedNote =
           projection.requireMatchingAcceptedTreeWithOneLiveNoteAtPath(

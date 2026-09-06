@@ -18,9 +18,36 @@ import org.springframework.web.server.ResponseStatusException;
 
 /**
  * Verifies {@code publishNotebookGitProposal}'s tree-shape gating: a proposal that is not an
- * identical-heads no-op must change exactly one regular Markdown note, and nothing else.
+ * identical-heads no-op must change one regular Markdown note or add several notes.
  */
 class NotebookGitProposalTreeShapeControllerTest extends NotebookGitBundleControllerTestBase {
+
+  @Test
+  void rejectsSeveralExistingNoteEditsWithoutMutatingTheAcceptedBinding() throws Exception {
+    Notebook notebook = createGitBackedNotebook();
+    String original = "---\ntype: Note\n---\noriginal content";
+    makeMe.aNote().notebook(notebook).title("First").content(original).please();
+    makeMe.aNote().notebook(notebook).title("Second").content(original).please();
+    NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);
+    String changed = "---\ntype: Note\n---\nchanged content";
+    byte[] proposal =
+        proposalBundleBytes(
+            binding,
+            List.of(
+                new NotebookGitProposalFile("First.md", changed),
+                new NotebookGitProposalFile("Second.md", changed)));
+
+    ResponseStatusException exception =
+        assertProposalRejectedWithoutMutatingBinding(
+            notebook, binding.getAcceptedGitObjectId(), proposal, HttpStatus.BAD_REQUEST);
+
+    assertThat(exception.getReason(), containsString("multiple changed files"));
+    assertThat(
+        noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId()).stream()
+            .map(note -> note.getContent())
+            .toList(),
+        equalTo(List.of(original, original)));
+  }
 
   @Test
   void acceptsAChangeToIndexMdJustLikeAnyOtherNote() throws Exception {

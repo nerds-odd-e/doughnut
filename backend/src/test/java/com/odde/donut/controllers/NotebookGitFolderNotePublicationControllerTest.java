@@ -13,7 +13,13 @@ import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookGitBinding;
 import com.odde.donut.entities.repositories.FolderRepository;
+import com.odde.donut.services.notebookGit.NotebookGitProposalBlobText;
+import com.odde.donut.testability.GitBundleTestReader;
 import java.util.List;
+import java.util.Map;
+import org.eclipse.jgit.internal.storage.dfs.DfsRepositoryDescription;
+import org.eclipse.jgit.internal.storage.dfs.InMemoryRepository;
+import org.eclipse.jgit.lib.ObjectId;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -24,35 +30,68 @@ class NotebookGitFolderNotePublicationControllerTest extends NotebookGitBundleCo
 
   private static final String EXISTING_CONTENT = "---\ntype: Note\n---\nExisting content.\n";
   private static final String CREATED_CONTENT = "---\ntype: Note\n---\nAuthored inertia content.\n";
+  private static final String SECOND_CONTENT = "---\ntype: Note\n---\nAuthored momentum content.\n";
 
   @Autowired NoteController noteController;
   @Autowired FolderRepository folderRepository;
 
   @Test
-  void publishesANewNoteInsideTheExistingPortableFolder() throws Exception {
+  void publishesSeveralNotesInsideTheExistingPortableFolderAsTheExactAuthoredCommit()
+      throws Exception {
     Notebook notebook = createGitBackedNotebook();
     Folder physics = makeMe.aFolder().notebook(notebook).name("Physics").please();
     makeMe.aNote().folder(physics).title("Motion").content(EXISTING_CONTENT).please();
     NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);
+    ObjectId acceptedHead = ObjectId.fromString(binding.getAcceptedGitObjectId());
     byte[] proposal =
         proposalBundleBytes(
             binding,
             List.of(
                 new NotebookGitProposalFile("Physics/Motion.md", EXISTING_CONTENT),
-                new NotebookGitProposalFile("Physics/Inertia.md", CREATED_CONTENT)));
+                new NotebookGitProposalFile("Physics/Inertia.md", CREATED_CONTENT),
+                new NotebookGitProposalFile("Physics/Momentum.md", SECOND_CONTENT)));
 
-    controller.publishNotebookGitProposal(
-        notebook.getId(), binding.getAcceptedGitObjectId(), proposal);
+    GitBundleTestReader.SingleParentGitCommit proposedCommit;
+    try (InMemoryRepository proposed = new InMemoryRepository(new DfsRepositoryDescription())) {
+      proposedCommit = GitBundleTestReader.fetchSingleParentCommit(proposed, proposal);
+    }
+    String publishedHead =
+        controller.publishNotebookGitProposal(
+            notebook.getId(), binding.getAcceptedGitObjectId(), proposal);
 
     List<Note> notes = noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId());
-    assertThat(notes, hasSize(2));
-    Note created =
-        notes.stream().filter(note -> note.getTitle().equals("Inertia")).findFirst().orElseThrow();
-    NoteRealm shown = noteController.showNote(created);
-    assertThat(
-        shown.getAncestorFolders().stream().map(Folder::getId).toList(), contains(physics.getId()));
-    assertThat(shown.getNote().getContent(), equalTo(CREATED_CONTENT));
+    assertThat(notes, hasSize(3));
+    Map<String, String> additions = Map.of("Inertia", CREATED_CONTENT, "Momentum", SECOND_CONTENT);
+    for (var addition : additions.entrySet()) {
+      Note created =
+          notes.stream()
+              .filter(note -> note.getTitle().equals(addition.getKey()))
+              .findFirst()
+              .orElseThrow();
+      NoteRealm shown = noteController.showNote(created);
+      assertThat(
+          shown.getAncestorFolders().stream().map(Folder::getId).toList(),
+          contains(physics.getId()));
+      assertThat(shown.getNote().getContent(), equalTo(addition.getValue()));
+    }
     assertThat(folderRepository.findByNotebookIdOrderByIdAsc(notebook.getId()), hasSize(1));
+    assertThat(publishedHead, equalTo(proposedCommit.head().getName()));
+
+    Notebook acceptedNotebook = notebookRepository.findById(notebook.getId()).orElseThrow();
+    byte[] downloaded = controller.downloadNotebookGitBundle(acceptedNotebook).getBody();
+    try (InMemoryRepository readBack = new InMemoryRepository(new DfsRepositoryDescription())) {
+      GitBundleTestReader.SingleParentGitCommit downloadedCommit =
+          GitBundleTestReader.fetchSingleParentCommit(readBack, downloaded);
+      assertThat(downloadedCommit.head(), equalTo(proposedCommit.head()));
+      assertThat(downloadedCommit.tree(), equalTo(proposedCommit.tree()));
+      assertThat(downloadedCommit.parent(), equalTo(acceptedHead));
+      for (var addition : additions.entrySet()) {
+        assertThat(
+            NotebookGitProposalBlobText.readUtf8(
+                readBack, downloadedCommit.head(), "Physics/" + addition.getKey() + ".md"),
+            equalTo(addition.getValue()));
+      }
+    }
   }
 
   @Test

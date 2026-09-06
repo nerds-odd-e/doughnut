@@ -41,7 +41,7 @@ class NotebookGitPublicationAtomicControllerTest extends NotebookGitBundleContro
   }
 
   @Test
-  void lateBindingSaveFailureRollsBackCreatedNoteAndAcceptedBinding() throws Exception {
+  void lateBindingSaveFailureRollsBackCreatedNotesAndAcceptedBinding() throws Exception {
     Notebook notebook = createGitBackedNotebook();
     snapshotCurrentPortableTree(notebook);
     NotebookGitBinding binding =
@@ -53,7 +53,10 @@ class NotebookGitPublicationAtomicControllerTest extends NotebookGitBundleContro
     Timestamp bindingUpdatedAt = binding.getUpdatedAt();
     byte[] proposal =
         proposalBundleBytes(
-            binding, List.of(new NotebookGitProposalFile("Created Note.md", PROPOSED_CONTENT)));
+            binding,
+            List.of(
+                new NotebookGitProposalFile("Created Note.md", PROPOSED_CONTENT),
+                new NotebookGitProposalFile("Second Note.md", PROPOSED_CONTENT)));
 
     NotebookGitPublicationAtomicTestSupport.FAIL_ON_BINDING_SAVE.set(true);
 
