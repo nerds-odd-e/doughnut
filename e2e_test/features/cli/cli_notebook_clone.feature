@@ -73,16 +73,27 @@ Feature: CLI notebook clone
       | note-title |
       | Overview   |
 
-  Scenario: Publishing a committed new note makes it available at its authored path
+  Scenario: Publishing a nested-metadata note preserves metadata through a rich body edit
     When I clone the notebook "CLI Clone Notebook" into a temporary destination using the installed CLI
     Then I should see "one added or edited Markdown note at the notebook root or in an existing folder" in the non-interactive output
     When I add and commit the following note at "Recipes/Pantry Staples.md" in the cloned checkout:
       """
       ---
       type: Note
+      # Author annotation
+      custom:
+        source: 'local'
       ---
       Keep semolina pasta stocked.
       """
     And I publish the cloned checkout using the installed CLI
     Then the installed CLI reports the committed change as the accepted head
     And I should see note "CLI Clone Notebook/Recipes/Pantry Staples" has content "Keep semolina pasta stocked."
+    When I view the note content as rich content
+    And I update note "Pantry Staples" content to become "Restock semolina pasta."
+    And I reload the current page for note "Pantry Staples"
+    Then the note content should include "Restock semolina pasta."
+    When I open the note content markdown editor
+    Then the note content markdown source should contain "# Author annotation"
+    And the note content markdown source should contain "custom:"
+    And the note content markdown source should contain "  source: 'local'"

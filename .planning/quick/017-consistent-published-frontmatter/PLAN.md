@@ -199,7 +199,7 @@ leaf before introducing a new generalized property representation.
 
 ### 4. Save rich body edits without changing nested metadata
 Type: Behavior
-Status: in-progress
+Status: done
 Proof: Publish a valid nested note through the installed CLI, edit its body in
 the web rich editor, and observe the saved body plus unchanged metadata after
 reload. Accepted downloaded Markdown retains the metadata and note identity.
@@ -274,6 +274,20 @@ use the repository's `@wip` convention while implementing a multi-beat case.
 
 ## Readiness
 
+Slice 4: typing and paste share exact nested-prefix composition; rich body is
+editable, and guidance now says “Edit metadata in Markdown.” LF/CRLF metadata,
+comments, quotes, and ordering survive; an empty body with a closing fence at
+EOF gains the required separator without discarding its prefix. Cached rich
+HTML follows the same body boundary. Readonly/upload locks remain enforced.
+Mounted and installed-CLI scenarios reproduced the read-only failure first.
+Green: 22 focused mounted tests, 339 frontend files / 1,842 tests, full backend
+suite, and four installed-CLI scenarios. Publish → rich edit → reload retains
+metadata, and controller download verifies same identity and exact CRLF content.
+Independent refactor made no edits. Formatting caught five mechanical template
+literal style issues in the new tests; these were corrected and formatting/type
+checking passed. The approximately nine-minute slice remained bounded, including
+required suite runtime. All selected promises now have inspected green proof.
+
 Slice 3: valid nested maps/lists now render only body with accurate Markdown
 editing guidance; Properties remain absent and the interim body is read-only.
 Malformed YAML, duplicates, and structural-value failures remain protected.
@@ -316,7 +330,7 @@ repository `nerds-odd-e/doughnut`, branch `main`; yielded cell `52`, PTY session
 `64878`. Receipt directory/PID were not exposed at initial yield; retain this
 exact live session for shutdown. Pending CI is not a success assertion.
 
-**Ready for direct execution under the stated nested-metadata assumption.**
+**All four slices verified; final commit/push and spent-plan cleanup remain.**
 The refinement-trigger check found one immediate structural preparation and
 three bounded Behavior leaves; classification is delivered before editing, and
 expected CLI failure capture is delivered before its rejection proof. No product

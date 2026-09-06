@@ -15,7 +15,7 @@
       @image-upload-state="imageUploadInProgress = $event"
     />
     <p v-if="hasNestedMetadata" class="mb-3 text-sm">
-      Edit this note in Markdown mode.
+      Edit metadata in Markdown.
     </p>
     <div
       v-if="frontmatterParseErrorMessage !== null"
@@ -110,7 +110,7 @@ const hasNestedMetadata = computed(() => {
 const effectiveReadonly = computed(
   () =>
     Boolean(props.readonly) ||
-    !parsedContent.value.ok ||
+    frontmatterParseErrorMessage.value !== null ||
     imageUploadInProgress.value
 )
 
@@ -124,20 +124,9 @@ const htmlWithWikiLinks = (html: string) =>
   replaceWikiLinksInHtml(html, props.wikiLinks, props.lastSavedMarkdown)
 
 const htmlValue = computed(() => {
-  const p = parsedContent.value
   if (
     currentIntervalHtml !== undefined &&
-    currentIntervalBodyMarkdown !== undefined &&
-    p.ok &&
-    p.body === currentIntervalBodyMarkdown
-  ) {
-    return htmlWithWikiLinks(currentIntervalHtml)
-  }
-  if (
-    currentIntervalHtml !== undefined &&
-    currentIntervalBodyMarkdown !== undefined &&
-    !p.ok &&
-    (props.modelValue ?? "") === currentIntervalBodyMarkdown
+    currentIntervalBodyMarkdown === markdownForRichDisplay.value
   ) {
     return htmlWithWikiLinks(currentIntervalHtml)
   }
@@ -146,20 +135,32 @@ const htmlValue = computed(() => {
   )
 })
 
-const htmlValueUpdated = (newHtmlValue: string) => {
+const composeBodyMarkdown = (bodyMarkdown: string) => {
   const p = parsedContent.value
-  if (!p.ok) return
+  if (!p.ok && p.reason === "nested_metadata") {
+    const separator =
+      bodyMarkdown && !p.prefix.endsWith("\n")
+        ? p.prefix.includes("\r\n")
+          ? "\r\n"
+          : "\n"
+        : ""
+    return p.prefix + separator + bodyMarkdown
+  }
+  return composeNoteContentFromPropertyRows(
+    frontmatterPropertiesRef.value?.getPropertyRows() ?? [],
+    bodyMarkdown
+  )
+}
+
+const htmlValueUpdated = (newHtmlValue: string) => {
+  if (effectiveReadonly.value) return
 
   const bodyMarkdown = markdownizer.htmlToMarkdown(newHtmlValue)
   currentIntervalBodyMarkdown = bodyMarkdown
   currentIntervalHtml = newHtmlValue
 
-  const prevFull = props.modelValue ?? ""
-  const composed = composeNoteContentFromPropertyRows(
-    frontmatterPropertiesRef.value?.getPropertyRows() ?? [],
-    bodyMarkdown
-  )
-  if (composed === prevFull) return
+  const composed = composeBodyMarkdown(bodyMarkdown)
+  if (composed === (props.modelValue ?? "")) return
   emits("update:modelValue", composed)
 }
 
@@ -180,17 +181,8 @@ const onPropertiesChanged = (rows: PropertyRow[]) => {
 }
 
 const onPasteComplete = (html: string) => {
-  const bodyMarkdown = markdownizer.htmlToMarkdown(html)
-  const p = parsedContent.value
-  if (!p.ok) {
-    emits("pasteComplete", bodyMarkdown)
-    return
-  }
-  const composed = composeNoteContentFromPropertyRows(
-    frontmatterPropertiesRef.value?.getPropertyRows() ?? [],
-    bodyMarkdown
-  )
-  emits("pasteComplete", composed)
+  if (effectiveReadonly.value) return
+  emits("pasteComplete", composeBodyMarkdown(markdownizer.htmlToMarkdown(html)))
 }
 
 function insertMarkdownAtEnd(text: string) {

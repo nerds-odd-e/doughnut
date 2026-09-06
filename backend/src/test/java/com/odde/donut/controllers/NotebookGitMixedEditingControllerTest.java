@@ -21,7 +21,9 @@ import org.junit.jupiter.api.Test;
 class NotebookGitMixedEditingControllerTest extends NotebookGitWebContentControllerTestBase {
 
   private static final String NOTE_PATH = "Mixed Note.md";
-  private static final String CREATED_CONTENT = "---\ntype: Note\n---\ncreated locally";
+  private static final String CREATED_PREFIX =
+      "---\r\ntype: Note\r\n# Author annotation\r\ncustom:\r\n  source: 'local'\r\n---\r\n";
+  private static final String CREATED_CONTENT = CREATED_PREFIX + "created locally";
   private static final String FIRST_WEB_CONTENT = "---\ntype: Note\n---\nfirst web edit";
   private static final String LOCAL_CONTENT = "---\ntype: Note\n---\nlocal edit";
   private static final String SECOND_WEB_CONTENT = "---\ntype: Note\n---\nsecond web edit";
@@ -33,8 +35,9 @@ class NotebookGitMixedEditingControllerTest extends NotebookGitWebContentControl
     Note createdNote =
         noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId()).getFirst();
 
+    String editedContent = CREATED_PREFIX + "first web edit";
     NoteRealm saved =
-        textContentController.updateNoteContent(createdNote, contentDto(FIRST_WEB_CONTENT));
+        textContentController.updateNoteContent(createdNote, contentDto(editedContent));
 
     assertThat(saved.getId(), is(createdNote.getId()));
     byte[] downloaded =
@@ -49,7 +52,7 @@ class NotebookGitMixedEditingControllerTest extends NotebookGitWebContentControl
       }
       assertThat(
           NotebookGitProposalBlobText.readUtf8(accepted, webEditHead, NOTE_PATH),
-          is(FIRST_WEB_CONTENT));
+          is(editedContent));
     }
   }
 

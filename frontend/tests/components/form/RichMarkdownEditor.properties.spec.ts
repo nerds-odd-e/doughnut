@@ -110,10 +110,10 @@ Still body`
       )
 
       expect(h.quillEditorEl().textContent).toBe("Original body.")
-      expect(wrapper.text()).toContain("Edit this note in Markdown mode.")
+      expect(wrapper.text()).toContain("Edit metadata in Markdown.")
       expect(wrapper.find('[role="alert"]').exists()).toBe(false)
       expect(wrapper.find("section").exists()).toBe(false)
-      expect(h.quillReadonly()).toBe(true)
+      expect(h.quillReadonly()).toBe(false)
     }
   )
 
