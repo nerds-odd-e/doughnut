@@ -243,10 +243,8 @@ for growing a notebook even if deletion, moves, and divergence are deferred.
 
 ### 5. Delete a note locally without transferring its private data
 
-**Status:** refined for a small first delivery; not implemented. The prior home
-contained a decomposition outline; no Story 5 execution plan was found in the
-current planning directories or their searched Git history. This refinement
-does not start slice planning or execution.
+**Status:** refined and [slice-planned](../quick/045-publish-local-note-deletion/PLAN.md)
+for a small first delivery; not implemented.
 
 **Goal**
 
