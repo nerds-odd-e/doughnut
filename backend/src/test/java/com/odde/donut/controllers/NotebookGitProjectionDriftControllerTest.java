@@ -5,6 +5,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.not;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.donut.controllers.dto.FolderCreationRequest;
@@ -33,7 +34,9 @@ import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.server.ResponseStatusException;
 
-/** Verifies that a Git proposal cannot overwrite Portable content changed through the web. */
+/**
+ * Verifies that a Git proposal cannot overwrite accepted content or unsupported structural drift.
+ */
 class NotebookGitProjectionDriftControllerTest extends NotebookGitBundleControllerTestBase {
 
   private static final String ACCEPTED_CONTENT = "---\ntype: Note\n---\naccepted content";
@@ -104,13 +107,23 @@ class NotebookGitProjectionDriftControllerTest extends NotebookGitBundleControll
           assertThrows(ExecutionException.class, () -> publishing.get(10, TimeUnit.SECONDS));
       ResponseStatusException rejection = (ResponseStatusException) publishFailure.getCause();
       assertThat(rejection.getStatusCode(), equalTo(HttpStatus.CONFLICT));
-      assertThat(rejection.getReason(), containsString("web changes cannot yet be synchronized"));
+      String expectedReason =
+          webChange == RacingWebChange.NOTE_CONTENT
+              ? "expectedHead no longer matches"
+              : "refresh the checkout before publishing";
+      assertThat(rejection.getReason(), containsString(expectedReason));
       assertCommittedWebChange(webChange, notebook.getId(), note.getId());
 
       NotebookGitBinding bindingAfter = reloadCommittedBinding(notebook.getId());
-      assertThat(bindingAfter.getAcceptedGitObjectId(), equalTo(binding.getAcceptedGitObjectId()));
-      assertThat(bindingAfter.getBundleBytes(), equalTo(binding.getBundleBytes()));
-      assertThat(bindingAfter.getUpdatedAt(), equalTo(binding.getUpdatedAt()));
+      if (webChange == RacingWebChange.NOTE_CONTENT) {
+        assertThat(
+            bindingAfter.getAcceptedGitObjectId(), not(equalTo(binding.getAcceptedGitObjectId())));
+      } else {
+        assertThat(
+            bindingAfter.getAcceptedGitObjectId(), equalTo(binding.getAcceptedGitObjectId()));
+        assertThat(bindingAfter.getBundleBytes(), equalTo(binding.getBundleBytes()));
+        assertThat(bindingAfter.getUpdatedAt(), equalTo(binding.getUpdatedAt()));
+      }
     } finally {
       releaseWriter.countDown();
       executor.shutdownNow();
@@ -119,7 +132,7 @@ class NotebookGitProjectionDriftControllerTest extends NotebookGitBundleControll
   }
 
   @Test
-  void rejectsWhenWebContentHasDriftedFromAcceptedMain() throws Exception {
+  void rejectsAnOldParentAfterWebContentAdvancedAcceptedMain() throws Exception {
     Notebook notebook = createGitBackedNotebook();
     Note note = makeMe.aNote().notebook(notebook).title("note").content(ACCEPTED_CONTENT).please();
     NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);
@@ -130,7 +143,7 @@ class NotebookGitProjectionDriftControllerTest extends NotebookGitBundleControll
     ResponseStatusException exception = submitCurrentParentProposal(notebook, binding);
 
     assertThat(exception.getStatusCode(), equalTo(HttpStatus.CONFLICT));
-    assertThat(exception.getReason(), containsString("web changes cannot yet be synchronized"));
+    assertThat(exception.getReason(), containsString("expectedHead no longer matches"));
     assertThat(
         noteRepository.findById(note.getId()).orElseThrow().getContent(),
         equalTo(update.getContent()));
@@ -147,7 +160,7 @@ class NotebookGitProjectionDriftControllerTest extends NotebookGitBundleControll
     ResponseStatusException exception = submitCurrentParentProposal(notebook, binding);
 
     assertThat(exception.getStatusCode(), equalTo(HttpStatus.CONFLICT));
-    assertThat(exception.getReason(), containsString("web changes cannot yet be synchronized"));
+    assertThat(exception.getReason(), containsString("refresh the checkout before publishing"));
   }
 
   private ResponseStatusException submitCurrentParentProposal(

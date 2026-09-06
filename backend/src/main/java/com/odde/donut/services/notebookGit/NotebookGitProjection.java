@@ -55,20 +55,28 @@ public class NotebookGitProjection {
       List<Note> liveNotes,
       Repository repository,
       ObjectId acceptedHead) {
+    if (!matchesAcceptedTree(notebook, folders, liveNotes, repository, acceptedHead)) {
+      throw projectionDrift();
+    }
+  }
+
+  public boolean matchesAcceptedTree(
+      Notebook notebook,
+      List<ExportFolderRow> folders,
+      List<Note> liveNotes,
+      Repository repository,
+      ObjectId acceptedHead) {
     List<PortableTreeEntry> currentEntries =
         PortableTreeSnapshot.build(
             notebook.getReadmeContent(), folders, NotebookExportRows.notes(liveNotes));
-    if (!sorted(currentEntries).equals(sorted(readEntries(repository, acceptedHead)))) {
-      throw projectionDrift();
-    }
+    return sorted(currentEntries).equals(sorted(readEntries(repository, acceptedHead)));
   }
 
   private static ResponseStatusException projectionDrift() {
     return new ResponseStatusException(
         HttpStatus.CONFLICT,
-        "The notebook's current Portable content differs from accepted main; web changes cannot"
-            + " yet be synchronized. Refresh the checkout after web synchronization is"
-            + " available.");
+        "The notebook's current Portable content differs from accepted main; refresh the checkout"
+            + " before publishing.");
   }
 
   private static List<PortableTreeEntry> readEntries(Repository repository, ObjectId commitId) {

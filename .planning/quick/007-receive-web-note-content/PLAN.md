@@ -279,7 +279,7 @@ continue to join their enclosing transaction without REQUIRES_NEW.
 
 ### 7. Accept a supported root-note save as one atomic Git revision
 Type: Behavior
-Status: planned
+Status: done
 Proof: committed content-controller → read same Note → bundle tests prove a
 root-note save, its parent and metadata, and atomic rollback after a late binding
 save failure. Existing authorization/validation tests remain green; explicit
@@ -304,13 +304,16 @@ not downgrade a failed eligible update to web-only.
 Replace existing tests that expect an ordinary eligible content edit to leave
 Git stale: publication against old A now rejects stale ancestry. Preserve
 structural-drift cases and messages appropriate to the remaining unsupported
-scope. Update the retained test hook's cleanup comment, without changing its
-setup-only behavior or introducing a production call.
+scope. Leaf 8 owns the retained test hook wording and regression.
 Sizing: target 5–10 minutes, medium confidence because leaf 6 removes the
 transaction uncertainty and this leaf has one committed atomicity proof loop.
 The backend suite runtime is the stated sizing exception; refine again if the
 append implementation itself does not converge. Atomic rollback stays in this
 leaf and may not be deferred.
+Learning: eligible root-note saves import trusted accepted history, append one
+canonical parented system commit, and persist Note-derived state plus binding
+inside the serialized transaction. Explicit drift and missing-binding paths
+remain web-only, while a late binding failure rolls back all coupled state.
 
 ### 8. Preserve folder paths and authored Markdown in web revisions
 Type: Behavior

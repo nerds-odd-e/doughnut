@@ -40,18 +40,35 @@ public final class NotebookGitBundleBuilder {
       String message,
       Instant commitTime) {
     InMemoryRepository repository = new InMemoryRepository(new DfsRepositoryDescription());
-    try {
-      ObjectInserter inserter = repository.newObjectInserter();
-      try {
-        ObjectId treeId = writeTree(entries, inserter);
-        ObjectId commitId =
-            writeRootCommit(inserter, treeId, authorName, authorEmail, message, commitTime);
-        inserter.flush();
-        updateMainBranch(repository, commitId);
-      } finally {
-        inserter.close();
-      }
+    try (ObjectInserter inserter = repository.newObjectInserter()) {
+      ObjectId treeId = writeTree(entries, inserter);
+      ObjectId commitId =
+          inserter.insert(commitBuilder(treeId, authorName, authorEmail, message, commitTime));
+      inserter.flush();
+      updateMainBranch(repository, commitId);
       return repository;
+    } catch (IOException e) {
+      throw new UncheckedIOException(e);
+    }
+  }
+
+  public static ObjectId append(
+      Repository repository,
+      ObjectId parent,
+      List<PortableTreeEntry> entries,
+      String authorName,
+      String authorEmail,
+      String message,
+      Instant commitTime) {
+    try (ObjectInserter inserter = repository.newObjectInserter()) {
+      ObjectId treeId = writeTree(entries, inserter);
+      CommitBuilder commitBuilder =
+          commitBuilder(treeId, authorName, authorEmail, message, commitTime);
+      commitBuilder.setParentId(parent);
+      ObjectId commitId = inserter.insert(commitBuilder);
+      inserter.flush();
+      updateMainBranch(repository, commitId);
+      return commitId;
     } catch (IOException e) {
       throw new UncheckedIOException(e);
     }
@@ -77,21 +94,15 @@ public final class NotebookGitBundleBuilder {
     return dirCache.writeTree(inserter);
   }
 
-  private static ObjectId writeRootCommit(
-      ObjectInserter inserter,
-      ObjectId treeId,
-      String authorName,
-      String authorEmail,
-      String message,
-      Instant commitTime)
-      throws IOException {
+  private static CommitBuilder commitBuilder(
+      ObjectId treeId, String authorName, String authorEmail, String message, Instant commitTime) {
     PersonIdent author = new PersonIdent(authorName, authorEmail, commitTime, ZoneOffset.UTC);
     CommitBuilder commitBuilder = new CommitBuilder();
     commitBuilder.setTreeId(treeId);
     commitBuilder.setAuthor(author);
     commitBuilder.setCommitter(author);
     commitBuilder.setMessage(message);
-    return inserter.insert(commitBuilder);
+    return commitBuilder;
   }
 
   private static void updateMainBranch(Repository repository, ObjectId commitId)
@@ -99,7 +110,9 @@ public final class NotebookGitBundleBuilder {
     RefUpdate refUpdate = repository.updateRef(Constants.R_HEADS + "main");
     refUpdate.setNewObjectId(commitId);
     RefUpdate.Result result = refUpdate.update();
-    if (result != RefUpdate.Result.NEW && result != RefUpdate.Result.FORCED) {
+    if (result != RefUpdate.Result.NEW
+        && result != RefUpdate.Result.FORCED
+        && result != RefUpdate.Result.FAST_FORWARD) {
       throw new IllegalStateException("Unexpected ref update result: " + result);
     }
   }
