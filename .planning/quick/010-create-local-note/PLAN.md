@@ -155,7 +155,7 @@ with no product change. About five minutes, medium confidence.
 
 ### 3. Accept a root note and its commit atomically
 Type: Behavior
-Status: planned
+Status: done
 Proof: Publish/show/download controller round trip observes one fresh note and
 the exact proposed commit/tree; the existing forced late-binding-save failure
 case observes no new note, creator/reference residue, or accepted revision.
@@ -460,6 +460,10 @@ The broader follow-up commit scope remains outside this plan.
 
 ## Refinement learnings
 
+- Root additions now validate the accepted projection before calling
+  `NoteFactory`, replace the default document with exact Git-authored content,
+  and compare the proposed tree against a live-note list containing the new
+  identity; the existing publication transaction rolls all derived rows back.
 - Fresh-note identity initialization now lives in `NoteFactory`; web creation
   and extraction retain content preparation and downstream enrichment while
   sharing title placement, default document, timestamp, and creator setup.

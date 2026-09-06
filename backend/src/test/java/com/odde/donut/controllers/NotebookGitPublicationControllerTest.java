@@ -22,8 +22,6 @@ import java.util.List;
 import org.eclipse.jgit.internal.storage.dfs.DfsRepositoryDescription;
 import org.eclipse.jgit.internal.storage.dfs.InMemoryRepository;
 import org.eclipse.jgit.lib.ObjectId;
-import org.eclipse.jgit.revwalk.RevCommit;
-import org.eclipse.jgit.revwalk.RevWalk;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -74,15 +72,10 @@ class NotebookGitPublicationControllerTest extends NotebookGitBundleControllerTe
                 new NotebookGitProposalFile("Reference Target.md", TARGET_CONTENT),
                 new NotebookGitProposalFile("Research/Refined Note.md", PUBLISHED_CONTENT)));
 
-    ObjectId proposedHead;
-    ObjectId proposedTree;
+    GitBundleTestReader.SingleParentGitCommit proposedCommit;
     try (InMemoryRepository proposal = new InMemoryRepository(new DfsRepositoryDescription())) {
-      proposedHead = GitBundleTestReader.fetchHead(proposal, proposalBytes);
-      try (RevWalk revWalk = new RevWalk(proposal)) {
-        RevCommit proposedCommit = revWalk.parseCommit(proposedHead);
-        proposedTree = proposedCommit.getTree().getId();
-        assertThat(proposedCommit.getParent(0).getId(), equalTo(acceptedHead));
-      }
+      proposedCommit = GitBundleTestReader.fetchSingleParentCommit(proposal, proposalBytes);
+      assertThat(proposedCommit.parent(), equalTo(acceptedHead));
     }
 
     String publishedHead =
@@ -92,7 +85,7 @@ class NotebookGitPublicationControllerTest extends NotebookGitBundleControllerTe
     Note reloadedNote = noteRepository.findById(refinedNote.getId()).orElseThrow();
     NoteRealm noteRealm = noteController.showNote(reloadedNote);
     NoteRecallInfo recallInfo = noteController.getNoteInfo(reloadedNote);
-    assertThat(publishedHead, equalTo(proposedHead.getName()));
+    assertThat(publishedHead, equalTo(proposedCommit.head().getName()));
     assertThat(noteRealm.getId(), equalTo(refinedNote.getId()));
     assertThat(noteRealm.getNote().getContent(), equalTo(PUBLISHED_CONTENT));
     assertThat(noteRealm.getWikiLinks(), hasSize(1));
@@ -109,18 +102,15 @@ class NotebookGitPublicationControllerTest extends NotebookGitBundleControllerTe
     Notebook acceptedNotebook = notebookRepository.findById(notebook.getId()).orElseThrow();
     ResponseEntity<byte[]> downloaded = controller.downloadNotebookGitBundle(acceptedNotebook);
     try (InMemoryRepository readBack = new InMemoryRepository(new DfsRepositoryDescription())) {
-      ObjectId downloadedHead = GitBundleTestReader.fetchHead(readBack, downloaded.getBody());
-      assertThat(downloadedHead, equalTo(proposedHead));
+      GitBundleTestReader.SingleParentGitCommit downloadedCommit =
+          GitBundleTestReader.fetchSingleParentCommit(readBack, downloaded.getBody());
+      assertThat(downloadedCommit.head(), equalTo(proposedCommit.head()));
       assertThat(
           NotebookGitProposalBlobText.readUtf8(
-              readBack, downloadedHead, "Research/Refined Note.md"),
+              readBack, downloadedCommit.head(), "Research/Refined Note.md"),
           equalTo(PUBLISHED_CONTENT));
-      try (RevWalk revWalk = new RevWalk(readBack)) {
-        RevCommit downloadedCommit = revWalk.parseCommit(downloadedHead);
-        assertThat(downloadedCommit.getTree().getId(), equalTo(proposedTree));
-        assertThat(downloadedCommit.getParent(0).getId(), equalTo(acceptedHead));
-        assertThat(revWalk.parseCommit(acceptedHead).getId(), equalTo(acceptedHead));
-      }
+      assertThat(downloadedCommit.tree(), equalTo(proposedCommit.tree()));
+      assertThat(downloadedCommit.parent(), equalTo(acceptedHead));
     }
   }
 

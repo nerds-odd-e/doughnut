@@ -73,23 +73,6 @@ class NotebookGitProposalAdditionValidationControllerTest
     assertThat(remainingNotes.getFirst().getId(), equalTo(existing.getId()));
   }
 
-  @Test
-  void explainsThatCreationIsNotYetSupportedAfterAValidAdditionPassesValidation() throws Exception {
-    Notebook notebook = createGitBackedNotebook();
-    NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);
-    byte[] proposal =
-        proposalBundleBytes(
-            binding, List.of(new NotebookGitProposalFile("New note.md", VALID_CONTENT)));
-
-    ResponseStatusException exception =
-        assertProposalRejectedWithoutMutatingBinding(
-            notebook, binding.getAcceptedGitObjectId(), proposal, HttpStatus.BAD_REQUEST);
-
-    assertThat(exception.getReason(), containsString("New note.md"));
-    assertThat(exception.getReason(), containsString("creation is not yet supported"));
-    assertThat(noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId()), empty());
-  }
-
   private static Stream<Arguments> invalidAdditions() {
     return Stream.of(
         Arguments.of("Missing type.md", "---\ncustom: value\n---\nBody.\n", "type"),

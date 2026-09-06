@@ -11,6 +11,8 @@ import org.eclipse.jgit.lib.Constants;
 import org.eclipse.jgit.lib.NullProgressMonitor;
 import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.Ref;
+import org.eclipse.jgit.revwalk.RevCommit;
+import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.transport.FetchConnection;
 import org.eclipse.jgit.transport.TransportBundleStream;
 import org.eclipse.jgit.transport.URIish;
@@ -35,6 +37,17 @@ public final class GitBundleTestReader {
       return mainRef.getObjectId();
     }
   }
+
+  public static SingleParentGitCommit fetchSingleParentCommit(
+      InMemoryRepository target, byte[] bundleBytes) throws IOException, URISyntaxException {
+    ObjectId head = fetchHead(target, bundleBytes);
+    try (RevWalk revWalk = new RevWalk(target)) {
+      RevCommit commit = revWalk.parseCommit(head);
+      return new SingleParentGitCommit(head, commit.getTree().getId(), commit.getParent(0).getId());
+    }
+  }
+
+  public record SingleParentGitCommit(ObjectId head, ObjectId tree, ObjectId parent) {}
 
   /**
    * The bundle's advertised {@code HEAD} object id, or {@code null} if the bundle never included

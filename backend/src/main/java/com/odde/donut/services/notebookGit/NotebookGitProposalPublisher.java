@@ -11,12 +11,14 @@ import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.factoryServices.EntityPersister;
 import com.odde.donut.services.AuthoredNoteDocumentPersistence;
 import com.odde.donut.services.AuthorizationService;
+import com.odde.donut.services.NoteFactory;
 import com.odde.donut.services.notebookExport.ExportFolderRow;
 import com.odde.donut.testability.TestabilitySettings;
 import com.odde.donut.validators.AuthoredNoteContent;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import org.eclipse.jgit.lib.ObjectId;
@@ -38,6 +40,7 @@ public class NotebookGitProposalPublisher {
   private final TestabilitySettings testabilitySettings;
   private final EntityPersister entityPersister;
   private final Validator validator;
+  private final NoteFactory noteFactory;
 
   public NotebookGitProposalPublisher(
       NotebookGitStateLoader notebookGitStateLoader,
@@ -47,7 +50,8 @@ public class NotebookGitProposalPublisher {
       CanonicalDonutOrigin canonicalDonutOrigin,
       TestabilitySettings testabilitySettings,
       EntityPersister entityPersister,
-      Validator validator) {
+      Validator validator,
+      NoteFactory noteFactory) {
     this.notebookGitStateLoader = notebookGitStateLoader;
     this.authorizationService = authorizationService;
     this.projection = projection;
@@ -56,6 +60,7 @@ public class NotebookGitProposalPublisher {
     this.testabilitySettings = testabilitySettings;
     this.entityPersister = entityPersister;
     this.validator = validator;
+    this.noteFactory = noteFactory;
   }
 
   @Transactional(
@@ -103,22 +108,34 @@ public class NotebookGitProposalPublisher {
         NotebookGitProposalBlobText.readUtf8(
             proposal.repository(), proposal.mainHead(), noteChange.path());
     AuthoredNoteContent.assertValidForSave(changedNoteContent);
+    Note changedNote;
+    List<Note> proposedLiveNotes = liveNotes;
     if (noteChange.kind() == NotebookGitProposalTreeShape.ChangeKind.ADDED) {
-      assertValidAdditionTitle(noteChange.path());
-      throw new ResponseStatusException(
-          HttpStatus.BAD_REQUEST,
-          "Path \"" + noteChange.path() + "\" is valid, but note creation is not yet supported.");
+      String title = validAdditionTitle(noteChange.path());
+      if (noteChange.path().contains("/")) {
+        throw new ResponseStatusException(
+            HttpStatus.BAD_REQUEST,
+            "Path \""
+                + noteChange.path()
+                + "\" is not at the notebook root; folder note creation is not yet supported.");
+      }
+      projection.requireMatchingAcceptedTree(
+          notebook, folders, liveNotes, proposal.repository(), acceptedHead);
+      changedNote = noteFactory.create(notebook, null, title);
+      proposedLiveNotes = new ArrayList<>(liveNotes);
+      proposedLiveNotes.add(changedNote);
+    } else {
+      changedNote =
+          projection.requireMatchingAcceptedTreeWithOneLiveNoteAtPath(
+              notebook, folders, liveNotes, proposal.repository(), acceptedHead, noteChange.path());
     }
-    Note changedNote =
-        projection.requireMatchingAcceptedTreeWithOneLiveNoteAtPath(
-            notebook, folders, liveNotes, proposal.repository(), acceptedHead, noteChange.path());
 
     Timestamp publishedAt = testabilitySettings.getCurrentUTCTimestamp();
     AuthoredNoteDocument document =
         AuthoredNoteDocument.fromContent(changedNoteContent, canonicalDonutOrigin);
     authoredNoteDocumentPersistence.persist(changedNote, document, publishedAt);
     projection.requireMatchingAcceptedTree(
-        notebook, folders, liveNotes, proposal.repository(), proposal.mainHead());
+        notebook, folders, proposedLiveNotes, proposal.repository(), proposal.mainHead());
 
     NotebookGitBundleWriter.BundleWriteResult written =
         NotebookGitBundleWriter.write(proposal.repository());
@@ -129,7 +146,7 @@ public class NotebookGitProposalPublisher {
     return written.headObjectId();
   }
 
-  private void assertValidAdditionTitle(String path) {
+  private String validAdditionTitle(String path) {
     String filename = path.substring(path.lastIndexOf('/') + 1);
     String title = filename.substring(0, filename.length() - ".md".length());
     NoteUpdateTitleDTO titleDto = new NoteUpdateTitleDTO();
@@ -149,6 +166,7 @@ public class NotebookGitProposalPublisher {
       throw invalidAdditionTitle(
           path, "filename title would be normalized to \"" + normalizedTitle + "\"");
     }
+    return title;
   }
 
   private static ResponseStatusException invalidAdditionTitle(String path, String reason) {

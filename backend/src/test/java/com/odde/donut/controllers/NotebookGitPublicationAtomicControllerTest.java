@@ -41,9 +41,8 @@ class NotebookGitPublicationAtomicControllerTest extends NotebookGitBundleContro
   }
 
   @Test
-  void lateBindingSaveFailureRollsBackProjectedNoteAndAcceptedBinding() throws Exception {
+  void lateBindingSaveFailureRollsBackCreatedNoteAndAcceptedBinding() throws Exception {
     Notebook notebook = createGitBackedNotebook();
-    Note note = makeMe.aNote().notebook(notebook).title("note").content(ACCEPTED_CONTENT).please();
     snapshotCurrentPortableTree(notebook);
     NotebookGitBinding binding =
         inCommittedTransaction(
@@ -54,7 +53,7 @@ class NotebookGitPublicationAtomicControllerTest extends NotebookGitBundleContro
     Timestamp bindingUpdatedAt = binding.getUpdatedAt();
     byte[] proposal =
         proposalBundleBytes(
-            binding, List.of(new NotebookGitProposalFile("note.md", PROPOSED_CONTENT)));
+            binding, List.of(new NotebookGitProposalFile("Created Note.md", PROPOSED_CONTENT)));
 
     NotebookGitPublicationAtomicTestSupport.FAIL_ON_BINDING_SAVE.set(true);
 
@@ -67,15 +66,32 @@ class NotebookGitPublicationAtomicControllerTest extends NotebookGitBundleContro
     inCommittedTransaction(
         transactionManager,
         () -> {
-          Note reloadedNote = noteRepository.findById(note.getId()).orElseThrow();
           NotebookGitBinding reloadedBinding =
               notebookGitBindingRepository.findByNotebook_Id(notebook.getId()).orElseThrow();
-          assertThat(reloadedNote.getContent(), is(ACCEPTED_CONTENT));
-          assertThat(rowsFor(entityManager, reloadedNote), empty());
+          assertThat(
+              noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId()), empty());
+          assertThat(countRowsForNotebook("note_creator", "note_id", notebook.getId()), is(0L));
+          assertThat(
+              countRowsForNotebook("authored_note_reference", "source_note_id", notebook.getId()),
+              is(0L));
           assertThat(reloadedBinding.getAcceptedGitObjectId(), is(acceptedHead));
           assertThat(reloadedBinding.getBundleBytes(), equalTo(acceptedBundle));
           assertThat(reloadedBinding.getUpdatedAt(), is(bindingUpdatedAt));
         });
+  }
+
+  private long countRowsForNotebook(String table, String noteColumn, Integer notebookId) {
+    return ((Number)
+            entityManager
+                .createNativeQuery(
+                    "SELECT COUNT(*) FROM "
+                        + table
+                        + " child JOIN note n ON child."
+                        + noteColumn
+                        + " = n.id WHERE n.notebook_id = :notebookId")
+                .setParameter("notebookId", notebookId)
+                .getSingleResult())
+        .longValue();
   }
 
   @Test

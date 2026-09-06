@@ -42,22 +42,21 @@ class NotebookGitProposalTreeShapeControllerTest extends NotebookGitBundleContro
   }
 
   @Test
-  void rejectsProposalThatAddsAFileWithoutMutatingTheAcceptedBinding() throws Exception {
+  void rejectsProposalThatAddsANoteOutsideTheNotebookRoot() throws Exception {
     Notebook notebook = createGitBackedNotebook();
-    NotebookGitBinding binding = seedAcceptedBinding(notebook, validBaselineEntries());
+    NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);
     byte[] bundleBytes =
         proposalBundleBytes(
             binding,
             List.of(
-                new NotebookGitProposalFile("note.md", "---\ntype: Note\n---\noriginal content"),
-                new NotebookGitProposalFile("README.md", "---\ntype: Readme\n---\nreadme original"),
-                new NotebookGitProposalFile("extra.md", "---\ntype: Note\n---\nextra content")));
+                new NotebookGitProposalFile(
+                    "Folder/extra.md", "---\ntype: Note\n---\nextra content")));
 
     ResponseStatusException exception =
         assertProposalRejectedWithoutMutatingBinding(
             notebook, binding.getAcceptedGitObjectId(), bundleBytes, HttpStatus.BAD_REQUEST);
 
-    assertThat(exception.getReason(), containsString("extra.md"));
+    assertThat(exception.getReason(), containsString("Folder/extra.md"));
   }
 
   @Test
