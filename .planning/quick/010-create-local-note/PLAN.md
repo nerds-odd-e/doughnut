@@ -250,7 +250,7 @@ minutes, medium confidence.
 
 ### 7. Reject an addition based on an obsolete accepted head
 Type: Behavior
-Status: planned
+Status: done
 Proof: After an accepted remote save advances main, the old addition proposal
 rejects and the winning remote note content/head remain unchanged.
 
@@ -460,6 +460,9 @@ The broader follow-up commit scope remains outside this plan.
 
 ## Refinement learnings
 
+- The unchanged expected-head guard rejects an addition authored from an old
+  parent after a web save advances `main`; no addition-specific concurrency or
+  rebase mechanism is required.
 - `NoteFactory` surfaces the existing soft-deleted-title conflict unchanged at
   publication; committed proof preserves the deleted identity and accepted
   binding, so no Git-specific recovery policy is needed.
