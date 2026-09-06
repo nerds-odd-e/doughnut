@@ -57,8 +57,7 @@ even when tests pass. Stop for:
 - unresolved user-facing value trade-offs or structural choices affecting
   future slices/architecture;
 - missing credentials/permissions or ambiguity that could waste a commit;
-- failures unresolved by focused diagnosis (for CI, first use `ci-monitor.md`;
-  ignore an attempt only when proven to be CI infrastructure failure);
+- failures unresolved by focused diagnosis (for CI, first use `ci-monitor.md`);
 - evidence changing the selected story's beneficiary, outcome, evaluation,
   boundary, or sibling delivery/order.
 
@@ -66,6 +65,21 @@ Explain the finding and required decision, then wait for the developer. At a
 post-slice stop, first deliver safe work as specified in `wrap-up.md`.
 Resolve routine naming/placement/test choices, minor refactoring, and failures
 caused by your own change without stopping.
+
+Discount a failure as pre-existing, unrelated, or environmental only with
+bounded evidence connecting it to a cause and the proof affected. Put a short
+cause, supporting observation, affected proof, and remaining defect or
+disposition in the existing handoff or active PLAN; require no template or
+record for every successful command. A passing retry, repeated test name, or
+successful cleanup does not establish cause or repair. A targeted retry may
+test a stated explanation but cannot replace it. On recurrence, compare current
+observations and conditions with the recorded cause; reuse it when applicable
+without erasing a remaining defect. Stop focused diagnosis once evidence justifies
+a disposition; do not require complete root-cause analysis. Uncertainty after
+that uses this Jidoka stop. A recorded explanation never waives required proof or
+existing stop/repair rules. Proven infrastructure incidents retain `ci-monitor.md`
+policy; that disposition covers only the supported attempt/cause and cannot
+excuse a separate assertion failure.
 </preflight_gate>
 
 <step name="coordinator_loop">

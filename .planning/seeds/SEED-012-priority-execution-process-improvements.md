@@ -59,19 +59,15 @@ requirement or prevent every behavioral omission.
 
 ### 2. Diagnose failures before accepting a baseline exception — P1
 
-**Status:** Planned on 2026-09-06 for minimum recurring cost; not implemented.
-Execution: [Require evidence for failure exceptions](../quick/012-require-evidence-for-failure-exceptions/PLAN.md).
+**Status:** Installed 2026-09-06 in `execute-plan/SKILL.md` Jidoka/failure
+classification. Instruction replay: rejected an unexplained retry as unrelated
+(A); reused leftover-user diagnosis while retaining the isolation defect (B);
+accepted a proven runner-disconnect incident without reconfirmation (C). Live
+effectiveness is not claimed.
 
 **Goal:** For the developer relying on autonomous delivery, prevent a transient
 pass or cleanup from concealing an unresolved verification defect, while avoiding
 repeated diagnosis of failures already explained by applicable evidence.
-
-**Evidence:** Doughnut web-note receive verification passed on retry, then twice
-repeated `AdminUserControllerTest` failures. Inspection found committed leftover
-users; cleanup restored a green run without resolving test isolation. Earlier
-ApplicationContext failures involved MySQL capacity, showing that a repeated
-failure label alone does not identify a cause. CI already explicitly prohibits
-rerunning until green as a fix.
 
 **Scope:** Strengthen the existing Doughnut execution decision to discount a
 failure as pre-existing, unrelated, or environmental. Before accepting that
@@ -93,31 +89,15 @@ retries or cleanup. A note or an unrelated-failure label does not authorize
 bypassing required proof. Proven infrastructure incidents retain the existing CI
 disposition; concurrent test defects still require attention.
 
-**Instruction owner:** Existing `execute-plan` Jidoka/failure classification,
-linked from acceptance only if needed. Reuse `ci-monitor.md`'s current policy;
-do not create competing local and CI checklists or a new acceptance stage.
+Keep the change at the existing `execute-plan` Jidoka/failure classification.
+Reuse `ci-monitor.md`'s current policy; do not create competing local and CI
+checklists or a new acceptance stage.
 
 **Exclusions:** No baseline suite before every slice, automatic rerun policy,
 new agent, failure registry, metrics system, CI observer/repair-scheduling change,
 or blanket halt on the first test failure. No database cleanup commands, test
 isolation repairs, or other product fixes in this story. Pygardon rollout and
 other P1s remain separate.
-
-**Key examples:**
-
-| Pre-condition | Trigger | Result |
-|---|---|---|
-| A required test fails, passes on retry, and has no causal explanation. | The handoff proposes accepting it as unrelated. | The coordinator rejects that disposition and requests focused diagnosis; if it remains uncertain, use existing Jidoka. The retry is not a fix. |
-| Leftover committed users explain a failure; cleanup restores green proof, but fixture isolation remains unresolved. | The same failure recurs during execution. | Reuse the diagnosis only if current evidence supports it; retain the unresolved defect and route it under existing stop/repair rules. Another cleanup/pass cannot silently close it. |
-| Bounded job evidence establishes a runner disconnection as the cause of every failed job in that attempt. | The coordinator classifies the CI attempt. | Record the proven infrastructure disposition once and continue under existing CI policy; do not repeat suites to reconfirm it or excuse a separate assertion failure. |
-
-**Evaluation / ROI:** Replay these three disposition decisions using supplied
-evidence; no product suites or database manipulation are needed to evaluate the
-instruction. Observe the next naturally occurring relevant failure for live
-effectiveness. Success means unexplained retries and unresolved recurring defects
-cannot disappear from acceptance, while an applicable diagnosed incident adds no
-new agent, tracking artifact, or reconfirmation run. No unresolved scope decision
-blocks slice planning.
 
 ### 3. Escalate repeated overruns to story review — P1
 
