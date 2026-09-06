@@ -201,9 +201,9 @@ for growing a notebook even if deletion, moves, and divergence are deferred.
   commit of the current accepted `main` that adds exactly one regular `.md`
   note file and changes no existing files. Reuse the existing bound-checkout,
   owner authentication, clean working-tree, and `main` readiness rules.
-- Proposed conservative location boundary: the notebook root or an existing
+- Approved location boundary: the notebook root or an existing
   folder represented in the accepted tree. Creating parent folders is excluded
-  pending developer feedback; an existing empty notebook may receive its first
+  from this story; an existing empty notebook may receive its first
   root note when its current Portable tree matches accepted `main`.
 - The filename without its final `.md` supplies the display name; the parent
   path supplies the location. Apply existing title, path, reserved-name, and
@@ -232,7 +232,8 @@ for growing a notebook even if deletion, moves, and divergence are deferred.
 - Exclusions: multiple additions or mixed add/edit/delete commits, publishing
   several unpublished commits together, renames/moves, folder or README
   authoring, attachments, web structural synchronization, drift repair, and
-  rebase/conflict handling. Stories 5–9 retain their respective outcomes.
+  rebase/conflict handling. [Story 11](#story-11) owns multiple additions and
+  mixed additions/edits in one commit. Stories 5–9 retain their outcomes.
   Existing single-note content publication remains supported.
 
 **Key examples**
@@ -245,7 +246,7 @@ for growing a notebook even if deletion, moves, and divergence are deferred.
    eligible checkout can pull the accepted file.
 2. **Existing folder:** `Physics/` already exists in the accepted tree; add
    only `Physics/Inertia.md` and publish → the new note appears in that folder.
-   Under the proposed boundary, the same addition with a missing `Physics/`
+   Under this boundary, the same addition with a missing `Physics/`
    folder is rejected with guidance that folder creation is unsupported.
 3. **Copy has new identity:** An existing learned note remains unchanged; copy
    its Markdown to a new valid path and publish only the addition → both notes
@@ -264,11 +265,11 @@ for growing a notebook even if deletion, moves, and divergence are deferred.
    publication of the same head → report success with the same accepted head
    and still exactly one new note.
 
-**Refinement assumptions**
+**Current decisions**
 
-The existing-location-only boundary is a proposal, not a recorded developer
-decision. No additional product choice is needed for that conservative scope;
-including new parent folders would require revising its scope and examples.
+The developer approved this scope, including one added note per commit, and
+identified multiple additions and mixed additions/edits as a follow-up story.
+Creating new parent folders remains excluded.
 
 - **Effort hypothesis:** M — low confidence; assumes the basic publish boundary
   from Story 2 can distinguish a valid addition from a content update.
@@ -393,11 +394,38 @@ including new parent folders would require revising its scope and examples.
 - **Safe stopping point:** Prefer extra immutable commits over amending any
   history already visible to a client.
 
+<a id="story-11"></a>
+
+### 11. Publish several note changes in one commit
+
+- **For / why:** A notebook owner refining related concepts locally wants to
+  publish one coherent change without splitting it into artificial single-file
+  commits.
+- **Evaluation:** From the current accepted head, publish one commit containing
+  multiple added notes, or added notes together with edits to existing notes →
+  all changes appear together in Donut at the accepted commit. Added notes get
+  fresh identities; edited notes retain theirs. An invalid member rejects the
+  entire commit without changing any remote note or accepted history.
+- **Scope:** Notes at the root or in existing folders, with the same Portable
+  Markdown rules as Stories 2 and 4. Exclude deletes, renames/moves, new
+  folders, README changes, multiple unpublished commits, and divergence.
+- **Value / learning:** Supports natural local commits for related concepts
+  and tests atomic publication across several notes. Manually splitting work
+  into single-file commits remains a workaround, but cannot publish a related
+  addition and its accompanying edit as one accepted change.
+- **Effort hypothesis:** M — low confidence; assumes single-note edit and
+  creation are delivered and the remaining change is bounded to one commit.
+- **Depends on:** Stories 2 and 4.
+- **Safe stopping point:** Multi-note adds/edits are useful independently of
+  deletion, moves, and accumulated-history synchronization.
+
 ## Ordering and Scope Reduction
 
 Stories 1–3 delivered the automatic local baseline, the user's highest-value
 workflow (refine locally, then publish), and the opposite receive loop. Story 4
-next starts the basic file lifecycle with note creation. Stories 5–7 then cover
+next starts the basic file lifecycle with note creation. Story 11 follows it
+in the product backlog to support coherent commits containing several note
+additions or additions with edits. Stories 5–7 then cover
 deletion and the identity-preservation risk unique to Donut. Stories 8 and 9
 add accumulated divergence and conflict handling on top of two already working
 directions. Story 10 is last because commit batching improves history quality
@@ -419,12 +447,13 @@ Safe stopping points:
 First-to-drop order when reducing an initial release is:
 
 1. Story 10, accepting extra immutable web commits.
-2. Story 7, rejecting folder moves while retaining note moves.
-3. Story 5, rejecting local deletions while retaining edits and additions.
-4. Story 4, limiting local publication to edits of existing notes.
-5. Stories 8 and 9 together, limiting the product to an explicitly sequential
+2. Story 11, retaining single-note commits as a usable interim workflow.
+3. Story 7, rejecting folder moves while retaining note moves.
+4. Story 5, rejecting local deletions while retaining edits and additions.
+5. Story 4, limiting local publication to edits of existing notes.
+6. Stories 8 and 9 together, limiting the product to an explicitly sequential
    synchronize-before-edit workflow.
-6. Story 6, rejecting all local rename/move operations.
+7. Story 6, rejecting all local rename/move operations.
 
 Dropping any of Stories 4–9 creates an honest interim capability, not complete
 ADR-0002 v1 synchronization. Unsupported operations must fail clearly rather
