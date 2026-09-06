@@ -140,7 +140,7 @@ ownership. If new lifecycle behavior is needed, refine before proceeding.
 
 ### 2. Reject a duplicate-key publication without remote changes
 Type: Behavior
-Status: planned
+Status: done
 Proof: An installed-CLI duplicate-key addition fails with the path and reason,
 the note is absent, and the original local proposal survives. Existing
 controller rejection observations establish unchanged accepted state; an
@@ -170,7 +170,7 @@ medium confidence after slice 1 removes the command-observation preparation.
 
 ### 3. Read a valid nested-metadata note as ordinary body content
 Type: Behavior
-Status: planned
+Status: in-progress
 Proof: A mounted rich editor given the nested reproduction renders only the
 body, offers Markdown metadata guidance, and does not show a malformed-YAML
 alert. Genuinely invalid YAML retains the protective fallback.
@@ -273,6 +273,28 @@ use the repository's `@wip` convention while implementing a multi-beat case.
   alone explains the elapsed time. Record that exception at the time.
 
 ## Readiness
+
+Slice 2: strict proposal YAML rejects duplicate keys at any mapping depth.
+Controller rejection observations capture immutable head/bundle/timestamp values;
+installed CLI verifies actionable path/reason, intact proposal, and absent remote
+note. Full backend suite and four focused CLI scenarios pass after the expected
+red. Independent refactor required no changes; selective formatting passed.
+The active implementation exceeded the five-minute hypothesis (~8–9 minutes);
+required full-suite and E2E runtime plus the CI repair pause explain the longer
+wall time. The behavior and ownership remained bounded.
+
+CI repair: run 34029294495 attempt 1 failed Other Unit Tests because its shared
+fake GitHub process announced readiness before installing SIGTERM handling.
+A forced 500ms scheduling window reproduced the exact missing shutdown marker;
+registering the handler first passed the same test and all six host lifecycle
+tests. Repair af65fb4d5f was independently reviewed, formatted, committed, and
+pushed. All paused work (including pre-existing seed/016 changes) was restored
+and verified, then the exact recovery stash was dropped.
+
+Slices 2 and 3 can be implemented concurrently: slice 2 owns backend/E2E,
+slice 3 owns frontend parsing/rendering and mounted tests; neither depends on
+the other's implementation. Coordinator serializes wrap-up and commits. Slice 4
+waits until both are delivered. Other planning work remains unowned.
 
 Execution evidence: slice 1's installed-CLI clone/add/edit feature passed all
 three scenarios before and after independent refactor. Extracted

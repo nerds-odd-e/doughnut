@@ -31,6 +31,8 @@ class NotebookGitRootNotePublicationControllerTest extends NotebookGitBundleCont
           + "title: Author-owned title\n"
           + "confidence: 7\n"
           + "unknown-key: keep me\n"
+          + "custom:\n  source: local\n"
+          + "tags: [repeat, repeat]\n"
           + "---\n"
           + "# Author heading\n"
           + "Precisely preserved authored bytes linking [[Created Note|itself]].\n";

@@ -42,6 +42,10 @@ When(
   () => cli.notebookCloneCheckout().publishExpectingRejection()
 )
 
+Then('the cloned checkout retains the original committed proposal', () =>
+  cli.notebookCloneCheckout().expectProposalRetained()
+)
+
 Then(
   'the installed CLI reports the committed change as the accepted head',
   () => cli.notebookCloneCheckout().expectCommittedHeadAccepted()

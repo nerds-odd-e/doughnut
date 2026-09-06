@@ -53,6 +53,26 @@ Feature: CLI notebook clone
     Then the installed CLI reports the committed change as the accepted head
     And note "Pasta" should have content "Simmer until al dente"
 
+  Scenario: Rejecting duplicate metadata keeps the local proposal available for correction
+    When I clone the notebook "CLI Clone Notebook" into a temporary destination using the installed CLI
+    And I add and commit the following note at "Duplicate Keys.md" in the cloned checkout:
+      """
+      ---
+      type: Note
+      author: first
+      author: second
+      ---
+      Body.
+      """
+    And I publish the cloned checkout expecting rejection from the installed CLI
+    Then I should see "Duplicate Keys.md" in the non-interactive output
+    And I should see "duplicate" in the non-interactive output
+    And the cloned checkout retains the original committed proposal
+    When I open the notebook "CLI Clone Notebook" from the notebook catalog
+    Then I should see the note tree in the sidebar
+      | note-title |
+      | Overview   |
+
   Scenario: Publishing a committed new note makes it available at its authored path
     When I clone the notebook "CLI Clone Notebook" into a temporary destination using the installed CLI
     Then I should see "one added or edited Markdown note at the notebook root or in an existing folder" in the non-interactive output

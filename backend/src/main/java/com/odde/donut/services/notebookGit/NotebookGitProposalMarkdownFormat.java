@@ -19,7 +19,9 @@ import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.treewalk.TreeWalk;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
+import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.constructor.DuplicateKeyException;
 import org.yaml.snakeyaml.error.YAMLException;
 
 /**
@@ -77,7 +79,12 @@ public final class NotebookGitProposalMarkdownFormat {
     String yamlRaw = verbatim.get().yamlRaw();
     Object loaded;
     try {
-      loaded = new Yaml().load(yamlRaw);
+      LoaderOptions options = new LoaderOptions();
+      options.setAllowDuplicateKeys(false);
+      loaded = new Yaml(options).load(yamlRaw);
+    } catch (DuplicateKeyException e) {
+      throw invalidMarkdown(
+          "path \"" + path + "\" has duplicate frontmatter YAML keys: " + e.getProblem(), e);
     } catch (YAMLException e) {
       throw invalidMarkdown("path \"" + path + "\" has malformed frontmatter YAML", e);
     }

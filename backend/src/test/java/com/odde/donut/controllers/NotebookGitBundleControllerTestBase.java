@@ -116,6 +116,9 @@ abstract class NotebookGitBundleControllerTestBase extends NotebookControllerTes
       throws UnexpectedNoAccessRightException {
     NotebookGitBinding before =
         notebookGitBindingRepository.findByNotebook_Id(notebook.getId()).orElseThrow();
+    String acceptedHeadBefore = before.getAcceptedGitObjectId();
+    byte[] acceptedBundleBefore = before.getBundleBytes().clone();
+    Instant updatedAtBefore = before.getUpdatedAt().toInstant();
 
     T exception =
         assertThrows(
@@ -125,9 +128,9 @@ abstract class NotebookGitBundleControllerTestBase extends NotebookControllerTes
 
     NotebookGitBinding after =
         notebookGitBindingRepository.findByNotebook_Id(notebook.getId()).orElseThrow();
-    assertThat(after.getAcceptedGitObjectId(), equalTo(before.getAcceptedGitObjectId()));
-    assertThat(after.getBundleBytes(), equalTo(before.getBundleBytes()));
-    assertThat(after.getUpdatedAt(), equalTo(before.getUpdatedAt()));
+    assertThat(after.getAcceptedGitObjectId(), equalTo(acceptedHeadBefore));
+    assertThat(after.getBundleBytes(), equalTo(acceptedBundleBefore));
+    assertThat(after.getUpdatedAt().toInstant(), equalTo(updatedAtBefore));
     return exception;
   }
 

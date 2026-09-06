@@ -78,6 +78,14 @@ class NotebookGitProposalAdditionValidationControllerTest
         Arguments.of("Missing type.md", "---\ncustom: value\n---\nBody.\n", "type"),
         Arguments.of("Invalid type.md", "---\ntype: [Note]\n---\nBody.\n", "type"),
         Arguments.of("Invalid YAML.md", "---\ntype: [broken\n---\nBody.\n", "malformed"),
+        Arguments.of(
+            "Duplicate Keys.md",
+            "---\ntype: Note\nauthor: first\nauthor: second\n---\nBody.\n",
+            "duplicate"),
+        Arguments.of(
+            "Nested Duplicate Keys.md",
+            "---\ntype: Note\ncustom:\n  source: first\n  source: second\n---\nBody.\n",
+            "duplicate"),
         Arguments.of("bad:name.md", VALID_CONTENT, "not contain"),
         Arguments.of("readme.md", VALID_CONTENT, "reserved"),
         Arguments.of(" Trimmed .md", VALID_CONTENT, "normalized"));

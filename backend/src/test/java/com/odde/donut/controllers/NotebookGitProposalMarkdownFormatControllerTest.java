@@ -2,7 +2,9 @@ package com.odde.donut.controllers;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.equalTo;
 
+import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookGitBinding;
 import java.util.List;
@@ -18,6 +20,31 @@ import org.springframework.web.server.ResponseStatusException;
  * here.
  */
 class NotebookGitProposalMarkdownFormatControllerTest extends NotebookGitBundleControllerTestBase {
+
+  @Test
+  void rejectsDuplicateKeysInAnEditWithoutChangingTheNoteOrAcceptedBinding() throws Exception {
+    Notebook notebook = createGitBackedNotebook();
+    String originalContent = "---\ntype: Note\n---\nOriginal body.\n";
+    Note note =
+        makeMe.aNote().notebook(notebook).title("Existing").content(originalContent).please();
+    NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);
+    byte[] proposal =
+        proposalBundleBytes(
+            binding,
+            List.of(
+                new NotebookGitProposalFile(
+                    "Existing.md",
+                    "---\ntype: Note\nauthor: first\nauthor: second\n---\nChanged body.\n")));
+
+    ResponseStatusException exception =
+        assertProposalRejectedWithoutMutatingBinding(
+            notebook, binding.getAcceptedGitObjectId(), proposal, HttpStatus.BAD_REQUEST);
+
+    assertThat(exception.getReason(), containsString("Existing.md"));
+    assertThat(exception.getReason(), containsString("duplicate"));
+    assertThat(
+        noteRepository.findById(note.getId()).orElseThrow().getContent(), equalTo(originalContent));
+  }
 
   @Test
   void rejectsNoteWithNoFrontmatterFenceWithoutMutatingTheAcceptedBinding() throws Exception {

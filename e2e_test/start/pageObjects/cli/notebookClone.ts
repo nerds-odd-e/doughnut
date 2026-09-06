@@ -75,6 +75,9 @@ function notebookCloneCheckout() {
         })
         .then((head) => {
           cy.wrap(head).as('cliNotebookPublishHead')
+          cy.wrap({ relativePath, content: `${content}\n` }).as(
+            'cliNotebookProposalFile'
+          )
           return cy.wrap(null)
         })
     )
@@ -111,6 +114,24 @@ function notebookCloneCheckout() {
     },
     publishExpectingRejection(): Cypress.Chainable<null> {
       return publishWithTask('runInstalledCliExpectingRejection')
+    },
+    expectProposalRetained(): Cypress.Chainable<null> {
+      return cy.get<string>('@cliCloneDestination').then((destination) => {
+        cy.get<string>('@cliNotebookPublishHead').then((head) => {
+          cy.exec(`git -C ${destination} rev-parse HEAD`)
+            .its('stdout')
+            .should('equal', head)
+        })
+        cy.get<{ relativePath: string; content: string }>(
+          '@cliNotebookProposalFile'
+        ).then(({ relativePath, content }) => {
+          cy.readFile(`${destination}/${relativePath}`).should('equal', content)
+        })
+        cy.exec(`git -C ${destination} status --porcelain`)
+          .its('stdout')
+          .should('equal', '')
+        return cy.wrap(null)
+      })
     },
     expectCommittedHeadAccepted(): Cypress.Chainable<null> {
       return cy
