@@ -202,7 +202,9 @@ sibling P1 changes. Preserve the current independent refactor and check-only hoo
 
 ### 5. Enforce the no-edit refactor handoff — P1, small fix
 
-**Status:** Refined and planned on 2026-09-06; not implemented.
+**Status:** Installed 2026-09-06. Four supplied instruction replays passed;
+`wrap-up.md` shortened from 557 to 547 words. Independent refactor made no edits
+and skipped tests. Live effectiveness is not claimed.
 Execution: [Enforce decide-first refactor handoffs](../quick/015-enforce-decide-first-refactor-handoffs/PLAN.md).
 
 **Goal:** Avoid unnecessary test runs caused by coordinator-generated refactor

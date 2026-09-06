@@ -3,7 +3,7 @@
 ## Source, goal, and status
 
 Sources: [SEED-012 Stories 5–7](../../seeds/SEED-012-priority-execution-process-improvements.md#story-5).
-Status: planned; ready for direct execution after the shared file is released.
+Status: in progress; quick 014 is committed and the shared file is released.
 
 The developer explicitly grouped these distinct stories in quick 015. Keep their
 outcomes separate: consistent refactor handoffs, lost-handle observer shutdown,
@@ -35,7 +35,7 @@ only to a later change with a concrete unresolved storage assumption.
 ### 1. Keep routine refactor delegation and return consistent with decide-first proof
 
 Type: Behavior
-Status: planned
+Status: done
 Proof: Four read-only prompt/handoff replays below, a smaller word count, and
 ordinary review confirming existing obligations survive the rewrite.
 
@@ -153,6 +153,19 @@ stays deferred. Observe natural relevant executions for live effectiveness; add
 no monitor or forced product exercise and do not overstate simulated evidence.
 
 ## Readiness
+
+Execution evidence: Slice 1's four supplied replays pass: remove contradictory
+full-suite additions; accept no-edit skip; rerun invalidated A and reuse B with a
+reason for any moved-boundary replacement; report prior needless runs without
+repeat or concealed failures. `wc -w .agents/skills/execute-plan/references/wrap-up.md`:
+557 → 547. Full diff preserves obligations; independent refactor made no edits,
+so tests were skipped. Coordinator formatting passed.
+
+Observer: coordinator quick015-01a07594, checkout `/Users/terryyin/git/doughnut`,
+repository nerds-odd-e/doughnut main; yielded cell 7, session 99469.
+The initial Nix launch returned without a session/receipt because its cache was
+read-only; tooling succeeded with cache access and the observer was relaunched.
+This observer predates the PID receipt change; retain its normal session handle.
 
 Three separate Behavior leaves in the developer-requested bundle. Each has one
 outcome and bounded proof loop; the lifecycle slice reuses an existing command
