@@ -3,7 +3,7 @@
 ## Source and status
 
 - Source: [SEED-009 Story 11](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-11).
-- Status: executing; leaves 1–4 complete, leaf 5 next.
+- Status: executing; leaves 1–5 complete, leaf 6 next.
 - Readiness: remaining leaves ready for direct execution after refinement.
 
 ## Goal and scope
@@ -209,7 +209,13 @@ existing edits and additions; all extracted paths have current callers.
 ### 5. Publish a mixed commit while preserving learned-note identity
 
 Type: Behavior
-Status: planned
+Status: done
+Evidence: `CURSOR_DEV=true nix develop -c pnpm backend:test_only` passed
+(46 seconds). Mixed two-edit/addition identity/tracker state and late rollback
+inspected. Rollback setup uses committed `authorReferencingContent`, since raw
+builder content creates no reference rows; final proof includes an existing row.
+Independent refactor corrected one stale Javadoc only, reusing green proof.
+About 5 minutes active, 92 seconds Gradle across initial and corrected-fixture runs.
 Proof: A controller mixed-publication loop observes one new note and two edits
 at unchanged paths, with the learned note's same ID/tracker state. The retained
 late-failure fixture, now also editing an existing note, observes unchanged

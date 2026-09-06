@@ -5,10 +5,12 @@ import static com.odde.donut.testability.CommittedTransactionTestSupport.inCommi
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.donut.controllers.dto.NoteUpdateContentDTO;
+import com.odde.donut.entities.AuthoredNoteReferenceRow;
 import com.odde.donut.entities.Image;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
@@ -41,8 +43,16 @@ class NotebookGitPublicationAtomicControllerTest extends NotebookGitBundleContro
   }
 
   @Test
-  void lateBindingSaveFailureRollsBackCreatedNotesAndAcceptedBinding() throws Exception {
+  void lateBindingSaveFailureRollsBackMixedNotesAndAcceptedBinding() throws Exception {
     Notebook notebook = createGitBackedNotebook();
+    String existingContent = "---\ntype: Note\n---\n[[original reference]]";
+    Note existing =
+        makeMe.aNote().notebook(notebook).title("Existing").content(existingContent).please();
+    inCommittedTransaction(
+        transactionManager,
+        () ->
+            makeMe.authorReferencingContent(
+                noteRepository.findById(existing.getId()).orElseThrow(), existingContent));
     snapshotCurrentPortableTree(notebook);
     NotebookGitBinding binding =
         inCommittedTransaction(
@@ -51,11 +61,29 @@ class NotebookGitPublicationAtomicControllerTest extends NotebookGitBundleContro
     byte[] acceptedBundle = binding.getBundleBytes();
     String acceptedHead = binding.getAcceptedGitObjectId();
     Timestamp bindingUpdatedAt = binding.getUpdatedAt();
+    Timestamp noteUpdatedAt =
+        inCommittedTransaction(
+            transactionManager,
+            () -> noteRepository.findById(existing.getId()).orElseThrow().getUpdatedAt());
+    List<AuthoredNoteReferenceRow> originalReferences =
+        inCommittedTransaction(transactionManager, () -> rowsFor(entityManager, existing));
+    assertThat(originalReferences, hasSize(1));
+    long originalCreatorCount =
+        inCommittedTransaction(
+            transactionManager,
+            () -> countRowsForNotebook("note_creator", "note_id", notebook.getId()));
+    long originalReferenceCount =
+        inCommittedTransaction(
+            transactionManager,
+            () ->
+                countRowsForNotebook(
+                    "authored_note_reference", "source_note_id", notebook.getId()));
     byte[] proposal =
         proposalBundleBytes(
             binding,
             List.of(
                 new NotebookGitProposalFile("Created Note.md", PROPOSED_CONTENT),
+                new NotebookGitProposalFile("Existing.md", PROPOSED_CONTENT),
                 new NotebookGitProposalFile("Second Note.md", PROPOSED_CONTENT)));
 
     NotebookGitPublicationAtomicTestSupport.FAIL_ON_BINDING_SAVE.set(true);
@@ -72,11 +100,26 @@ class NotebookGitPublicationAtomicControllerTest extends NotebookGitBundleContro
           NotebookGitBinding reloadedBinding =
               notebookGitBindingRepository.findByNotebook_Id(notebook.getId()).orElseThrow();
           assertThat(
-              noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId()), empty());
-          assertThat(countRowsForNotebook("note_creator", "note_id", notebook.getId()), is(0L));
+              noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId()), hasSize(1));
+          Note reloadedNote = noteRepository.findById(existing.getId()).orElseThrow();
+          assertThat(reloadedNote.getContent(), is(existingContent));
+          assertThat(reloadedNote.getUpdatedAt(), is(noteUpdatedAt));
+          List<AuthoredNoteReferenceRow> remainingReferences = rowsFor(entityManager, reloadedNote);
+          assertThat(remainingReferences, equalTo(originalReferences));
+          assertThat(
+              remainingReferences.stream()
+                  .map(AuthoredNoteReferenceRow::toDomainReference)
+                  .toList(),
+              equalTo(
+                  originalReferences.stream()
+                      .map(AuthoredNoteReferenceRow::toDomainReference)
+                      .toList()));
+          assertThat(
+              countRowsForNotebook("note_creator", "note_id", notebook.getId()),
+              is(originalCreatorCount));
           assertThat(
               countRowsForNotebook("authored_note_reference", "source_note_id", notebook.getId()),
-              is(0L));
+              is(originalReferenceCount));
           assertThat(reloadedBinding.getAcceptedGitObjectId(), is(acceptedHead));
           assertThat(reloadedBinding.getBundleBytes(), equalTo(acceptedBundle));
           assertThat(reloadedBinding.getUpdatedAt(), is(bindingUpdatedAt));

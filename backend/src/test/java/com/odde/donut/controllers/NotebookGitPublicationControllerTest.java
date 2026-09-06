@@ -43,6 +43,61 @@ class NotebookGitPublicationControllerTest extends NotebookGitBundleControllerTe
   @Autowired MemoryTrackerRepository memoryTrackerRepository;
 
   @Test
+  void publishesAnAdditionBetweenTwoEditsOnTheSameLearnedNotes() throws Exception {
+    Notebook notebook = createGitBackedNotebook();
+    Note first =
+        makeMe.aNote().notebook(notebook).title("First").content(ORIGINAL_CONTENT).please();
+    Note last = makeMe.aNote().notebook(notebook).title("Last").content(ORIGINAL_CONTENT).please();
+    MemoryTracker tracker =
+        inCommittedTransaction(
+            transactionManager,
+            () ->
+                makeMe
+                    .aMemoryTrackerFor(noteRepository.findById(first.getId()).orElseThrow())
+                    .difficulty(7f)
+                    .please());
+    NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);
+    byte[] proposal =
+        proposalBundleBytes(
+            binding,
+            List.of(
+                new NotebookGitProposalFile("First.md", PUBLISHED_CONTENT),
+                new NotebookGitProposalFile("Intermediate.md", TARGET_CONTENT),
+                new NotebookGitProposalFile("Last.md", PUBLISHED_CONTENT)));
+
+    controller.publishNotebookGitProposal(
+        notebook.getId(), binding.getAcceptedGitObjectId(), proposal);
+
+    List<Note> notes = noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId());
+    assertThat(notes, hasSize(3));
+    for (Note edited : List.of(first, last)) {
+      NoteRealm view =
+          noteController.showNote(noteRepository.findById(edited.getId()).orElseThrow());
+      assertThat(view.getId(), equalTo(edited.getId()));
+      assertThat(view.getNote().getContent(), equalTo(PUBLISHED_CONTENT));
+    }
+    Note added =
+        notes.stream()
+            .filter(note -> note.getTitle().equals("Intermediate"))
+            .findFirst()
+            .orElseThrow();
+    assertThat(noteController.showNote(added).getNote().getContent(), equalTo(TARGET_CONTENT));
+    NoteRecallInfo recallInfo =
+        noteController.getNoteInfo(noteRepository.findById(first.getId()).orElseThrow());
+    assertThat(recallInfo.getMemoryTrackers(), hasSize(1));
+    assertThat(recallInfo.getMemoryTrackers().getFirst().getId(), equalTo(tracker.getId()));
+    MemoryTracker retained = memoryTrackerRepository.findById(tracker.getId()).orElseThrow();
+    assertThat(retained.getDifficulty(), equalTo(tracker.getDifficulty()));
+    assertThat(retained.getStability(), equalTo(tracker.getStability()));
+    assertThat(retained.getLastRecalledAt(), equalTo(tracker.getLastRecalledAt()));
+    assertThat(retained.getNextRecallAt(), equalTo(tracker.getNextRecallAt()));
+    assertThat(retained.getAssimilatedAt(), equalTo(tracker.getAssimilatedAt()));
+    assertThat(retained.getRemovedFromTracking(), equalTo(tracker.getRemovedFromTracking()));
+    assertThat(retained.getType(), equalTo(tracker.getType()));
+    assertThat(retained.getPropertyKey(), equalTo(tracker.getPropertyKey()));
+  }
+
+  @Test
   void publishesExactCommitOnTheSameLearnedNoteAndMakesItDownloadable() throws Exception {
     Notebook notebook = createGitBackedNotebook();
     Folder folder = makeMe.aFolder().notebook(notebook).name("Research").please();

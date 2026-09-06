@@ -18,7 +18,8 @@ import org.springframework.web.server.ResponseStatusException;
 
 /**
  * Verifies {@code publishNotebookGitProposal}'s tree-shape gating: a proposal that is not an
- * identical-heads no-op must change one regular Markdown note or add several notes.
+ * identical-heads no-op must change one regular Markdown note or include an addition among several
+ * added or modified notes.
  */
 class NotebookGitProposalTreeShapeControllerTest extends NotebookGitBundleControllerTestBase {
 

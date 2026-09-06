@@ -14,8 +14,8 @@ import org.springframework.web.server.ResponseStatusException;
 
 /**
  * Walks the raw two-tree diff (no rename detection) between a proposal's accepted-parent commit and
- * its proposed commit, and permits one modified note or a set of added ordinary Markdown notes at
- * regular file modes - never deleted/moved paths, unsafe paths, non-regular modes, or the
+ * its proposed commit, and permits one modified note or a set containing added ordinary Markdown
+ * notes at regular file modes - never deleted/moved paths, unsafe paths, non-regular modes, or the
  * folder-reserved {@code README.md}. Callers only invoke this once proposal ancestry is confirmed
  * to be a direct single-parent child of the accepted commit.
  */
@@ -87,11 +87,11 @@ public final class NotebookGitProposalTreeShape {
       throw unsupportedTreeShape("proposal contains no changed file");
     }
     if (changes.size() > 1
-        && changes.stream().anyMatch(change -> change.kind() != ChangeKind.ADDED)) {
+        && changes.stream().noneMatch(change -> change.kind() == ChangeKind.ADDED)) {
       throw unsupportedTreeShape(
           "multiple changed files: "
               + String.join(", ", changes.stream().limit(2).map(NoteChange::path).toList())
-              + ". Publish additions together or use separate commits for other note changes");
+              + ". Edits-only proposals require separate commits for each note");
     }
 
     return changes;
