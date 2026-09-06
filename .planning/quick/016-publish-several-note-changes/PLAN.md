@@ -3,7 +3,7 @@
 ## Source and status
 
 - Source: [SEED-009 Story 11](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-11).
-- Status: executing; leaves 1–3 complete, leaf 4 next.
+- Status: executing; leaves 1–4 complete, leaf 5 next.
 - Readiness: remaining leaves ready for direct execution after refinement.
 
 ## Goal and scope
@@ -189,7 +189,12 @@ README or malformed baseline cannot accidentally supply that rejection.
 ### 4. Separate edited-note lookup from accepted-base validation
 
 Type: Structure
-Status: planned
+Status: done
+Evidence: `CURSOR_DEV=true nix develop -c pnpm backend:test_only` passed
+(47 seconds). First run (46 seconds) exposed the property fixture's Git note
+without a live row; real note plus snapshot now exercises its existing field
+error after the base check. All other assertions retained. No remaining defect.
+Independent refactor: no edits. About 4 minutes active, 93 seconds Gradle total.
 Proof: Existing single-note edits, slice 3's several additions, drift rejection
 and late-failure cases remain green; mixed proposals remain rejected.
 

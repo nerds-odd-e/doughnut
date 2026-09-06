@@ -24,7 +24,13 @@ class NotebookGitProposalPropertyValidationControllerTest
   void rejectsAnInvalidNoteLevelWithTheSameActionablePropertyErrorWithoutMutatingTheBinding()
       throws Exception {
     Notebook notebook = createGitBackedNotebook();
-    NotebookGitBinding binding = seedAcceptedBinding(notebook, validBaselineEntries());
+    makeMe
+        .aNote()
+        .notebook(notebook)
+        .title("note")
+        .content("---\ntype: Note\n---\noriginal content")
+        .please();
+    NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);
     NotebookGitBinding before =
         notebookGitBindingRepository.findByNotebook_Id(notebook.getId()).orElseThrow();
     byte[] bundleBytes =
@@ -32,9 +38,7 @@ class NotebookGitProposalPropertyValidationControllerTest
             binding,
             List.of(
                 new NotebookGitProposalFile(
-                    "note.md", "---\ntype: Note\nnote_level: 7\n---\nchanged content"),
-                new NotebookGitProposalFile(
-                    "README.md", "---\ntype: Readme\n---\nreadme original")));
+                    "note.md", "---\ntype: Note\nnote_level: 7\n---\nchanged content")));
 
     ApiException exception =
         assertThrows(

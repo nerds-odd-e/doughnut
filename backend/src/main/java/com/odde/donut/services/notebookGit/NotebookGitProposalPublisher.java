@@ -105,24 +105,21 @@ public class NotebookGitProposalPublisher {
             proposal.repository(), acceptedHead, proposal.mainHead());
     NotebookGitProposalMarkdownFormat.assertValidTypedMarkdown(
         proposal.repository(), proposal.mainHead());
+    projection.requireMatchingAcceptedTree(
+        notebook, folders, liveNotes, proposal.repository(), acceptedHead);
     Timestamp publishedAt = testabilitySettings.getCurrentUTCTimestamp();
-    List<Note> proposedLiveNotes = liveNotes;
-    if (noteChanges.getFirst().kind() == NotebookGitProposalTreeShape.ChangeKind.ADDED) {
-      projection.requireMatchingAcceptedTree(
-          notebook, folders, liveNotes, proposal.repository(), acceptedHead);
-      proposedLiveNotes = new ArrayList<>(liveNotes);
-      for (NotebookGitProposalTreeShape.NoteChange noteChange : noteChanges) {
+    List<Note> proposedLiveNotes = new ArrayList<>(liveNotes);
+    for (NotebookGitProposalTreeShape.NoteChange noteChange : noteChanges) {
+      if (noteChange.kind() == NotebookGitProposalTreeShape.ChangeKind.ADDED) {
         proposedLiveNotes.add(
             applyAddition(
                 notebook, folders, proposal, acceptedHead, noteChange.path(), publishedAt));
+      } else {
+        AuthoredNoteDocument document = readValidatedDocument(proposal, noteChange.path());
+        Note changedNote =
+            projection.requireOneLiveNoteAtPath(folders, liveNotes, noteChange.path());
+        authoredNoteDocumentPersistence.persist(changedNote, document, publishedAt);
       }
-    } else {
-      NotebookGitProposalTreeShape.NoteChange noteChange = noteChanges.getFirst();
-      AuthoredNoteDocument document = readValidatedDocument(proposal, noteChange.path());
-      Note changedNote =
-          projection.requireMatchingAcceptedTreeWithOneLiveNoteAtPath(
-              notebook, folders, liveNotes, proposal.repository(), acceptedHead, noteChange.path());
-      authoredNoteDocumentPersistence.persist(changedNote, document, publishedAt);
     }
 
     projection.requireMatchingAcceptedTree(

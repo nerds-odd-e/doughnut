@@ -54,14 +54,8 @@ public class NotebookGitProjection {
     return folder.id();
   }
 
-  public Note requireMatchingAcceptedTreeWithOneLiveNoteAtPath(
-      Notebook notebook,
-      List<ExportFolderRow> folders,
-      List<Note> liveNotes,
-      Repository repository,
-      ObjectId acceptedHead,
-      String changedPath) {
-    requireMatchingAcceptedTree(notebook, folders, liveNotes, repository, acceptedHead);
+  public Note requireOneLiveNoteAtPath(
+      List<ExportFolderRow> folders, List<Note> liveNotes, String changedPath) {
     Map<Integer, ExportFolderRow> folderById = indexFoldersById(folders);
     List<Note> matches =
         liveNotes.stream()
