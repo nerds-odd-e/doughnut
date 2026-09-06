@@ -243,21 +243,100 @@ for growing a notebook even if deletion, moves, and divergence are deferred.
 
 ### 5. Delete a note locally without transferring its private data
 
-- **For / why:** The owner wants an intentional Git deletion to remove the
-  corresponding Donut note while keeping its learning history from being
-  attached to some other note.
-- **Evaluation:** The owner deletes one existing note in its own commit and
-  synchronizes it; the note is no longer active in Donut, and its
-  identity-bound data remains with the deleted entity rather than moving to a
-  later addition.
-- **Value / learning:** Completes the basic file lifecycle while proving that
-  absence in the Portable tree does not cause identity corruption.
-- **Effort hypothesis:** M — low confidence; assumes Donut already has a
-  product-visible deletion outcome that can be invoked safely from the accepted
-  commit.
-- **Depends on:** Story 2.
-- **Safe stopping point:** A delete/add combination whose identity meaning is
-  unsafe is rejected rather than guessed.
+**Status:** refined for a small first delivery; not implemented. The prior home
+contained a decomposition outline; no Story 5 execution plan was found in the
+current planning directories or their searched Git history. This refinement
+does not start slice planning or execution.
+
+**Goal**
+
+A notebook owner working in Obsidian or an AI IDE can deliberately remove one
+note locally and publish that deletion to Donut. The note stops being active
+and due for recall, while its learning history and other private associations
+stay with its deleted identity. Learn whether this single-note workflow is
+useful before adding broader deletion or identity-inference behavior.
+
+**Scope**
+
+- Extend the existing `donut notebook publish <directory>` flow to accept one
+  direct-child commit of current accepted `main` that deletes exactly one
+  existing regular Markdown note file and changes nothing else. Reuse owner
+  authentication, bound-checkout, clean working-tree, and `main` readiness
+  rules. The current Donut Portable tree must match the accepted parent.
+- The note may be at the notebook root or inside an existing folder. Apply
+  Donut's existing soft-deletion outcome: retain the deleted note and its
+  private associations, deactivate its memory trackers, and leave other notes'
+  identities and learning data alone. This is not permanent data erasure;
+  earlier accepted Git history still contains the file.
+- Conservative reference policy for this first delivery: leave authored links
+  in other notes unchanged, using the existing leave-dead-links behavior.
+  Deletion does not rewrite referring Markdown, remove properties, or reduce
+  a relationship note to a source property. No reference-policy chooser is
+  needed for this CLI flow.
+- Accept the authored commit and deletion together, or neither. Unsupported
+  shapes, stale proposals, projection drift, or publication failure leave the
+  accepted head and remote note state unchanged, with the local commit
+  available for correction. Retrying an already accepted head is an unchanged
+  success under the existing matching-projection rule.
+- Existing clone/pull exposes the accepted tree without the file. Deleting
+  the last note does not delete its notebook or folder or generate a README.
+  Empty folders can disappear from the Portable files while remaining in
+  Donut, following [Accepted ADR 0004](../../docs/adrs/0004-okf-compatible-notebook-markdown-accepted.md).
+- After publishing the deletion, a separately published addition at a
+  different, available path uses the existing creation flow and gets a fresh
+  identity, even if its content matches the deleted note. No old learning
+  history, questions, or conversations are transferred or restored.
+- Keep the existing deleted-title collision rule: an addition at the same
+  deleted path is rejected. Supporting same-path recreation is deferred;
+  this story does not change title reuse or restoration policy. This is a
+  conservative scope choice for early learning, not a claim that the full
+  delete-and-create ambition in Proposed ADR 0002 is delivered.
+- Exclude multiple deletions, any deletion mixed with additions or edits,
+  rename/move inference, folder or README deletion, attachment cleanup,
+  permanent purge, Git-driven undo/restore, web deletion/restore
+  synchronization, multiple unpublished commits, rebase/conflict handling,
+  drift repair, and new preview or confirmation UI. Existing supported
+  addition/edit publication remains available. Stories 6–10 retain their
+  separate outcomes.
+
+**Key examples**
+
+1. **Delete one learned note:** A clean bound checkout matches accepted
+   `main`; `Biology/Cell.md` has memory trackers and learning history in Donut.
+   The owner removes only that file, commits, and publishes. Donut no longer
+   lists it as active or schedules its trackers for recall; its private data
+   remains attached to the deleted identity. Another eligible checkout pulls
+   the accepted deletion. An unchanged retry has no additional effect.
+2. **Leave references as authored:** Another note links to `Biology/Cell`.
+   Publishing the deletion leaves that note's Markdown untouched and its
+   reference unresolved under existing link behavior. It does not silently
+   turn this into a multi-note content change.
+3. **Do not revive learning through matching text:** After the deletion is
+   accepted, the owner adds identical content as `Biology/Cell basics.md` and
+   publishes that separate commit. It is a new note without the deleted note's
+   private data. Attempting `Biology/Cell.md` instead encounters the existing
+   deleted-title collision and leaves remote state unchanged.
+4. **Keep the boundary explicit:** A commit deletes `Cell.md` and adds
+   `Cell basics.md`, edits another file, or deletes another note. Publication
+   rejects the whole commit with guidance that deletion must be isolated;
+   Donut does not guess a rename or partially publish it. A stale single-note
+   deletion likewise leaves accepted history and notes unchanged.
+
+**Learning checkpoint and sizing**
+
+- Stop after demonstrating one deletion, receiving it in another checkout,
+  and a later separate addition retaining fresh identity. Use that experience
+  to decide whether same-path recreation, reference cleanup, or broader
+  deletion commits deserve subsequent work; none is an automatic follow-on.
+- **Effort hypothesis:** M (about 1–2 hours), low confidence. Assumes existing
+  soft deletion, publication atomicity, and clone/pull can be reused. This is
+  a story-level hypothesis, not an execution estimate; do not expand the scope
+  to address unrelated synchronization gaps discovered during planning.
+- **Depends on:** delivered Stories 2–4 for publishing, receiving, and the
+  later fresh-addition example.
+- **Open decisions:** none blocking this conservative refinement. Leaving
+  links untouched and deferring same-path recreation are proposed defaults
+  from this refinement, not separately confirmed developer decisions.
 
 <a id="story-6"></a>
 
