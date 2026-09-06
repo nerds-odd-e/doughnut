@@ -103,8 +103,8 @@ public class NotebookGitProjection {
         HttpStatus.BAD_REQUEST,
         "Parent folder for path \""
             + addedNotePath
-            + "\" is not represented in accepted Portable content; publish it through an existing"
-            + " note or README.md before adding this note.");
+            + "\" is not represented in accepted Portable content; add this note at the notebook"
+            + " root or inside an existing represented folder.");
   }
 
   private static List<PortableTreeEntry> readEntries(Repository repository, ObjectId commitId) {

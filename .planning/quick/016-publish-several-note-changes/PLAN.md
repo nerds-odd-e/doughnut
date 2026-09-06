@@ -3,7 +3,7 @@
 ## Source and status
 
 - Source: [SEED-009 Story 11](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-11).
-- Status: executing; leaves 1–7 complete, leaf 8 next.
+- Status: executing; leaves 1–8 complete, leaf 9 next.
 - Readiness: remaining leaves ready for direct execution after refinement.
 
 ## Goal and scope
@@ -286,7 +286,10 @@ The single-note property's existing rule remains the same.
 ### 8. Reject an addition whose parent is absent from accepted history
 
 Type: Behavior
-Status: planned
+Status: done
+Evidence: `CURSOR_DEV=true nix develop -c pnpm backend:test_only` passed
+(49 seconds): exact absent-parent message, committed absence of notes/folder and
+unchanged binding inspected. Independent refactor: no edits. About 3 minutes active.
 Proof: A valid root addition followed by `New Folder/Idea.md` rejects with the
 unsupported path/reason; committed reads show no new notes/folder or binding change.
 

@@ -1,5 +1,6 @@
 package com.odde.donut.controllers;
 
+import static com.odde.donut.testability.CommittedTransactionTestSupport.inCommittedTransaction;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsString;
@@ -128,6 +129,36 @@ class NotebookGitFolderNotePublicationControllerTest extends NotebookGitBundleCo
     Note created =
         noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId()).getFirst();
     assertThat(created.getFolder().getId(), equalTo(nestedPhysics.getId()));
+  }
+
+  @Test
+  void rejectsTheWholeProposalWhenALaterAdditionNeedsAnUnrepresentedParent() throws Exception {
+    Notebook notebook = createGitBackedNotebook();
+    NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);
+    byte[] proposal =
+        proposalBundleBytes(
+            binding,
+            List.of(
+                new NotebookGitProposalFile("Added.md", CREATED_CONTENT),
+                new NotebookGitProposalFile("New Folder/Idea.md", SECOND_CONTENT)));
+
+    ResponseStatusException exception =
+        assertProposalRejectedWithoutMutatingBinding(
+            notebook, binding.getAcceptedGitObjectId(), proposal, HttpStatus.BAD_REQUEST);
+
+    assertThat(
+        exception.getReason(),
+        equalTo(
+            "Parent folder for path \"New Folder/Idea.md\" is not represented in accepted Portable"
+                + " content; add this note at the notebook root or inside an existing represented"
+                + " folder."));
+    inCommittedTransaction(
+        transactionManager,
+        () -> {
+          assertThat(
+              noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId()), empty());
+          assertThat(folderRepository.findByNotebookIdOrderByIdAsc(notebook.getId()), empty());
+        });
   }
 
   @Test
