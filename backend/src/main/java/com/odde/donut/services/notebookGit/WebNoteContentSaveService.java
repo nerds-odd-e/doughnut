@@ -55,7 +55,7 @@ public class WebNoteContentSaveService {
       throw noteNotFound();
     }
     authorizationService.assertAuthorization(note);
-    if (lockedState.isEmpty() || note.getFolder() != null) {
+    if (lockedState.isEmpty()) {
       authoredNoteDocumentPersistence.persist(note, document, updatedAt);
       return note;
     }

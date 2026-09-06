@@ -317,7 +317,7 @@ remain web-only, while a late binding failure rolls back all coupled state.
 
 ### 8. Preserve folder paths and authored Markdown in web revisions
 Type: Behavior
-Status: planned
+Status: done
 Proof: committed PATCH/read/bundle data variations for a folder-contained Note
 and authored frontmatter/headings assert the exact Portable path/content and
 unchanged Note identity; the retained clone fixture regression remains green.
@@ -334,6 +334,11 @@ tree. Update only stale fixture-hook wording and run the named CLI clone feature
 regression because this leaf closes the retained-fixture promise.
 Sizing: 3–5 minutes, medium confidence; one data-variation proof loop plus the
 explicit focused E2E runtime exception.
+Learning: the existing canonical snapshot/append path handles nested folders
+without a second revision model. Valid authored frontmatter is canonicalized
+through the normal persistence helper while preserving its remaining YAML,
+leading heading, Note identity and learning data; the retained snapshot hook is
+now documented solely as setup for unsupported structural fixture changes.
 
 ### 9. Avoid a new revision for unchanged Portable content
 Type: Behavior

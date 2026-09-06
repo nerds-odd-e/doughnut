@@ -3,10 +3,10 @@
 import { NotebookGitTestabilityController } from '@generated/donut-backend-api/sdk.gen'
 
 /**
- * Transitional, test-only: rebuilds a notebook's `NotebookGitBinding` from its *current*
- * database content, simulating a genuinely pre-cutover notebook whose binding captured
- * content that already existed at cutover time. Flagged for removal once SEED-009's Story 3
- * keeps bindings in sync with web edits automatically (see plan Slice 13).
+ * Test-only setup helper: rebuilds a notebook's `NotebookGitBinding` from its *current*
+ * database content after a fixture seeds unsupported structural changes such as folders or
+ * readmes. It establishes the fixture's initial accepted baseline; do not use it after the
+ * content edit under test.
  */
 export const notebookGitTestabilityMethods = {
   resnapshotNotebookGitBindingForTestability(notebookName: string) {

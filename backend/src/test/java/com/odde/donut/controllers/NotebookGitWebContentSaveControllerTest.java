@@ -8,7 +8,6 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.donut.controllers.dto.NoteRealm;
-import com.odde.donut.controllers.dto.NoteUpdateContentDTO;
 import com.odde.donut.entities.MemoryTracker;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
@@ -21,25 +20,16 @@ import com.odde.donut.services.notebookGit.NotebookGitProposalBlobText;
 import com.odde.donut.testability.GitBundleTestReader;
 import java.sql.Timestamp;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import org.eclipse.jgit.internal.storage.dfs.DfsRepositoryDescription;
 import org.eclipse.jgit.internal.storage.dfs.InMemoryRepository;
 import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevWalk;
-import org.eclipse.jgit.treewalk.TreeWalk;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.server.ResponseStatusException;
 
-class NotebookGitWebContentSaveControllerTest extends NotebookGitBundleControllerTestBase {
-  private static final String ACCEPTED_CONTENT = "---\ntype: Note\n---\naccepted content";
-  private static final String EDITED_CONTENT = "---\ntype: Note\n---\nedited content";
-
-  @Autowired TextContentController textContentController;
-  @Autowired NoteController noteController;
+class NotebookGitWebContentSaveControllerTest extends NotebookGitWebContentControllerTestBase {
 
   @Test
   void savesARootNoteAsOneAcceptedRevisionWithoutChangingItsLearningIdentity() throws Exception {
@@ -182,29 +172,5 @@ class NotebookGitWebContentSaveControllerTest extends NotebookGitBundleControlle
     assertThat(
         noteRepository.findById(note.getId()).orElseThrow().getContent(), is(ACCEPTED_CONTENT));
     assertThat(binding(notebook).getBundleBytes(), equalTo(corruptBundle));
-  }
-
-  private NotebookGitBinding binding(Notebook notebook) {
-    return notebookGitBindingRepository.findByNotebook_Id(notebook.getId()).orElseThrow();
-  }
-
-  private static NoteUpdateContentDTO contentDto(String content) {
-    NoteUpdateContentDTO dto = new NoteUpdateContentDTO();
-    dto.setContent(content);
-    return dto;
-  }
-
-  private static List<String> portablePaths(InMemoryRepository repository, ObjectId head)
-      throws Exception {
-    try (RevWalk revWalk = new RevWalk(repository);
-        TreeWalk treeWalk = new TreeWalk(repository)) {
-      treeWalk.addTree(revWalk.parseCommit(head).getTree());
-      treeWalk.setRecursive(true);
-      List<String> paths = new ArrayList<>();
-      while (treeWalk.next()) {
-        paths.add(treeWalk.getPathString());
-      }
-      return paths;
-    }
   }
 }

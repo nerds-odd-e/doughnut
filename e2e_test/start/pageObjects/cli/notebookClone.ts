@@ -9,11 +9,9 @@ import { nonInteractiveOutput } from './outputAssertions'
 function notebookClone() {
   return {
     /**
-     * Transitional, test-only (plan Slice 13/14): rebuilds the notebook's `NotebookGitBinding`
-     * from its current database content, simulating a genuinely pre-cutover notebook. Needed
-     * because ordinary content-seeding (readme/folder/note) after notebook creation never
-     * refreshes the binding recorded at creation time. Remove once Story 3 keeps bindings in
-     * sync with web edits automatically.
+     * Test-only setup helper: rebuilds the notebook's `NotebookGitBinding` after a fixture seeds
+     * unsupported structural changes such as folders or readmes. It establishes the initial
+     * accepted baseline; do not use it after the content edit under test.
      */
     resnapshotGitBinding(notebookName: string) {
       return testability().resnapshotNotebookGitBindingForTestability(
