@@ -62,22 +62,23 @@ function notebookClone() {
 }
 
 function notebookCloneCheckout() {
-  function commitNoteChange(
-    relativePath: string,
-    content: string
+  function commitNoteChanges(
+    files: { relativePath: string; content: string }[]
   ): Cypress.Chainable<null> {
     return cy.get<string>('@cliCloneDestination').then((checkoutDir) =>
       cy
         .task<string>('commitCliNotebookCheckoutNoteChange', {
           checkoutDir,
-          relativePath,
-          content,
+          files,
         })
         .then((head) => {
           cy.wrap(head).as('cliNotebookPublishHead')
-          cy.wrap({ relativePath, content: `${content}\n` }).as(
-            'cliNotebookProposalFile'
-          )
+          cy.wrap(
+            files.map(({ relativePath, content }) => ({
+              relativePath,
+              content: `${content}\n`,
+            }))
+          ).as('cliNotebookProposalFiles')
           return cy.wrap(null)
         })
     )
@@ -101,13 +102,13 @@ function notebookCloneCheckout() {
 
   return {
     commitEdit(relativePath: string, content: string): Cypress.Chainable<null> {
-      return commitNoteChange(relativePath, content)
+      return commitNoteChanges([{ relativePath, content }])
     },
     commitAddition(
       relativePath: string,
       content: string
     ): Cypress.Chainable<null> {
-      return commitNoteChange(relativePath, content)
+      return commitNoteChanges([{ relativePath, content }])
     },
     publish(): Cypress.Chainable<null> {
       return publishWithTask('runInstalledCli')
@@ -122,9 +123,9 @@ function notebookCloneCheckout() {
             .its('stdout')
             .should('equal', head)
         })
-        cy.get<{ relativePath: string; content: string }>(
-          '@cliNotebookProposalFile'
-        ).then(({ relativePath, content }) => {
+        cy.get<{ relativePath: string; content: string }[]>(
+          '@cliNotebookProposalFiles'
+        ).each(({ relativePath, content }) => {
           cy.readFile(`${destination}/${relativePath}`).should('equal', content)
         })
         cy.exec(`git -C ${destination} status --porcelain`)

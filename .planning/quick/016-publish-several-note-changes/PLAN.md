@@ -3,7 +3,7 @@
 ## Source and status
 
 - Source: [SEED-009 Story 11](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-11).
-- Status: executing; leaves 1–10 complete, leaf 11 next.
+- Status: executing; leaves 1–11 complete, leaf 12 next.
 - Readiness: remaining leaves ready for direct execution after refinement.
 
 ## Goal and scope
@@ -343,7 +343,13 @@ installed feature is exercised by the immediately following fixture work.
 ### 11. Let the existing checkout fixture commit an explicit list of files
 
 Type: Structure
-Status: planned
+Status: done
+Evidence: `CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/cli/cli_notebook_clone.feature`
+passed (4 scenarios, 12 seconds). Initial run (3 pass/1 fail) printed pre-leaf10
+guidance from version-only cached `cli/dist/e2e-install-donut-cli-0.5.2.bundle.mjs`.
+Parked it at `/tmp/leaf11-stale-e2e-install-donut-cli-0.5.2.bundle.mjs`; rebuilt
+bundle passed. Version-only cache freshness limitation remains unrepaired.
+Independent refactor: no edits. About 5 minutes active plus build/runner waits.
 Proof: The current installed-CLI feature, including its single-note edit/add
 scenarios and revised guidance, stays green using the adapted helper.
 
@@ -452,14 +458,6 @@ an unverified implementation step or deferred safety test.
 
 | Leaves | Sizing hypothesis including local cleanup and focused proof |
 | --- | --- |
-| 1 | About 3–5 minutes: relocate existing changed-path validation and tighten one existing rejection observation. |
-| 2 | About 5 minutes: extract the current addition operation, retaining the single-edit path and current gate. |
-| 3 | About 5 minutes excluding runner time: collect/traverse additions through the prepared operation and adapt the existing positive/failure data. Whole-tree fixtures and rollback observations already exist; no new storage or test harness. |
-| 4 | About 5 minutes: separate base validation from edited lookup and reuse both live paths in the per-change dispatcher, without accepting mixed input. |
-| 5 | About 5 minutes excluding runner time: switch the mixed policy and replace the existing mixed rejection with compact identity/atomicity examples using prepared traversal. |
-| 6–9 | About 3–5 minutes each: one named rejection or retry variation; 7's small path-context enrichment is confined to publication's existing property error. |
-| 10 | Under 5 minutes: existing guidance/assertion update. |
-| 11 | About 5 minutes excluding runner time: one task and its sole caller become list-shaped; existing single-file scenarios prove unchanged behavior. |
 | 12 | About 5 minutes excluding runner time: one explicit multi-file scenario using the already-green helper and existing assertions. |
 | 13 | About 5 minutes excluding runner time: one real-Git receive data variation; no new production path. |
 

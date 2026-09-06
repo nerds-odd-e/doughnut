@@ -30,15 +30,21 @@ export function createCliE2eNotebookCloneTasks() {
     },
     commitCliNotebookCheckoutNoteChange({
       checkoutDir,
-      relativePath,
-      content,
+      files,
     }: {
       checkoutDir: string
-      relativePath: string
-      content: string
+      files: { relativePath: string; content: string }[]
     }): string {
-      writeFileSync(join(checkoutDir, relativePath), `${content}\n`)
-      execFileSync('git', ['-C', checkoutDir, 'add', '--', relativePath])
+      for (const { relativePath, content } of files) {
+        writeFileSync(join(checkoutDir, relativePath), `${content}\n`)
+      }
+      execFileSync('git', [
+        '-C',
+        checkoutDir,
+        'add',
+        '--',
+        ...files.map(({ relativePath }) => relativePath),
+      ])
       execFileSync(
         'git',
         [
