@@ -18,8 +18,7 @@ existing PLAN while it is unfinished; create a follow-up PLAN only after the
 reviewed execution is complete.
 
 When the current conversation contains the execution being reviewed, also review
-the thread for process improvements and overlooked developer decisions. Do not
-implement findings, edit rules or skills, commit, push, or start plan execution.
+the thread for process improvements and overlooked developer decisions.
 </objective>
 
 <context>
@@ -30,14 +29,18 @@ workflow. Read **slice-planning** before adding or updating planned work; apply
 its story and slice gates to both an in-place update and a new follow-up PLAN.
 
 The PLAN may have been removed by normal completed-plan cleanup. A partial
-capability name, surviving conversation context, old path, commit message, or
-distinct story phrase is sufficient input for discovery. Do not require the
-user to supply a deleted file's exact name.
+capability name, conversation context, old path, commit message, or distinct
+story phrase is enough; do not require the deleted file's exact name.
 
 The review is read-only except for amending the unfinished PLAN or creating a
 follow-up PLAN through **slice-planning**. Preserve existing working-tree changes
 when making those planning edits. Do not create a separate retrospective
-artifact unless the user asks.
+artifact unless the user asks. When the task assignment names two authorized
+reviews of the same seed or PLAN, one writer/reconciler incorporates both sets
+of findings against current content once; the other is read-only there.
+Disjoint PLANs or one reviewer continue the existing path without another
+reconciliation step or agent. This does not authorize additional reviewers or
+artifact edits.
 </context>
 
 <process>
@@ -50,8 +53,6 @@ Resolve one plan using evidence in this order:
 3. Git history for renamed or deleted planning paths.
 4. Commit messages and diffs containing distinctive story language.
 
-Useful history operations include:
-
 ```bash
 git log --all --name-status -- .planning/phases .planning/quick
 git log --all --diff-filter=D --summary -- .planning/phases .planning/quick
@@ -61,9 +62,9 @@ git show <revision>:<historical-plan-path>
 ```
 
 Recover the earliest execution-ready plan revision, its source seed/story when
-present, beneficiary, intended outcome, boundaries, and outside-in proof. Also
-record later plan changes that were explicitly approved or supported by new
-evidence; do not misclassify them as drift.
+present, beneficiary, intended outcome, boundaries, and outside-in proof. Record
+later plan changes explicitly approved or supported by new evidence; do not
+misclassify them as drift.
 
 Determine completion from the latest PLAN's slice statuses and execution
 evidence, not the earliest revision or the file's presence alone. Any `planned`
@@ -146,28 +147,27 @@ changing the story outcome or boundaries, or cannot form one bounded outcome,
 stop at slice-planning's input gate and report the required developer choice.
 Do not create a separate plan to bypass an unfinished plan's scope boundary.
 
-If findings remain, apply **slice-planning** according to the reviewed plan's
-current completion state:
+If findings remain, a non-writer returns read-only evidence. The writer applies
+**slice-planning** according to the reviewed plan's current completion state:
 
 - **Unfinished PLAN:** edit that same file in place; create no new PLAN or
   directory. Preserve completed slices, their identifiers, statuses, proof, and
-  resume history. Insert any new corrective slices immediately after the done
-  slices, before the remaining work, with status `planned`. Update affected
-  planned slices to incorporate the findings and changed dependencies; replace
-  obsolete detail and avoid duplicating work already covered by a remaining
-  slice. Adjust remaining numbering and references as needed without renumbering
-  completed slices. Preserve any in-progress slice's status and recorded work.
-  Record a brief learning citing the findings and reviewed commit set.
+  resume history, and any in-progress slice's status and recorded work. Insert
+  any new corrective slices immediately after the done slices, before the
+  remaining work, with status `planned`. Update affected planned slices to
+  incorporate the findings and changed dependencies; replace obsolete detail
+  and avoid duplicating work already covered by a remaining slice. Adjust
+  remaining numbering and references as needed without renumbering completed
+  slices. Record a brief learning citing the findings and reviewed commit set.
 - **Completed execution:** invoke **slice-planning** to write a new PLAN under
   its normal `.planning/phases/` or `.planning/quick/` location. Cite the original
   story and reviewed commit set as its source.
 
 After writing or updating the PLAN, stop planning and report the result. Do not
-invoke **slice-plan-refinement** unless the developer separately requests it;
-the in-place amendments above are part of this retrospective. Never invoke
-**execute-plan**, implement a slice, commit, or push. State whether the PLAN was
-updated in place or newly generated, and that the planned changes were not
-executed.
+invoke **slice-plan-refinement** unless the developer separately requests it.
+Never invoke **execute-plan**, implement a slice, commit, or push. State whether
+the PLAN was updated in place or newly generated, and that the planned changes
+were not executed.
 </step>
 
 <step name="review_the_execution_process_when_available">
@@ -187,9 +187,8 @@ Propose only evidence-backed process improvements in these areas:
 - a specific practice or concept the developer could usefully learn.
 
 Distinguish necessary investigation from avoidable waste. Propose rule or skill
-changes; do not edit them in this skill. Keep repository findings and process
-proposals separate, and do not add planned work for process proposals unless
-the developer later selects one as work.
+changes without editing them. Keep repository findings and process proposals
+separate; do not plan process proposals unless the developer later selects one.
 </step>
 
 <step name="surface_overlooked_developer_attention">
@@ -215,8 +214,8 @@ evidence.
 </process>
 
 <success_criteria>
-- One original plan/story was recovered or an explicit ambiguity was surfaced.
-- Its current completion state and delivered review boundary were established.
+- One original plan/story was recovered or an explicit ambiguity was surfaced,
+  with its completion state and delivered review boundary established.
 - Every included execution commit has a reason; unrelated commits are excluded.
 - The aggregate result was reviewed for bugs, story drift, post-change-refactor
   smells, and consequential improvements.
@@ -227,8 +226,6 @@ evidence.
   PLAN only for a completed execution. No findings means no planning changes.
 - In-place updates preserved completed slices, inserted new corrective slices
   after them, and revised affected planned slices without duplicate work.
-- The PLAN was reported as updated in place or generated, with changes not
-  executed.
 - Process proposals are based on the execution thread when that record exists.
 - Any overlooked developer action appears in the required final banner.
 - Final response includes `## EXECUTION RETROSPECTIVE COMPLETE`.
@@ -241,7 +238,7 @@ Report:
 2. Included commit manifest and aggregate-diff boundary.
 3. Filtered findings, ordered by impact, or `none`.
 4. PLAN path and `updated in place, changes not executed` (with inserted/revised
-   slices), `generated, not executed`, or `no planning changes`.
+   slices), `generated, not executed`, `read-only evidence`, or `no planning changes`.
 5. Process improvement proposals when thread evidence is available.
 6. Evidence limitations.
 
@@ -254,10 +251,10 @@ gate passes.
 </output>
 
 <out_of_scope>
-- Implementing or fixing findings.
-- Starting, executing, committing, or pushing the added or revised planned work;
-  do not run a separate refinement pass unless the developer requests it.
-- Editing rules or skills from process proposals.
+- Implementing or fixing findings; editing rules or skills from process
+  proposals; invoking **execute-plan**, committing, or pushing.
+- Executing the added or revised planned work; do not run a separate refinement
+  pass unless the developer requests it.
 - Reviewing unrelated repository quality.
 - Treating a normal plan cleanup as lost evidence before searching Git history.
 </out_of_scope>

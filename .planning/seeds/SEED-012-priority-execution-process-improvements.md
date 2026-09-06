@@ -151,18 +151,52 @@ work-recovery tooling, retrospective replanning of Pygardon, or sibling P1 work.
 Do not add a stop to ordinary within-budget execution or to justified external
 waiting. Initial instruction rollout is Doughnut only.
 
+<a id="story-4"></a>
+
 ### 4. Preserve artifact ownership through staging — P1
 
-- **Evidence:** Pygardon Quick 072 co-committed another process's skill changes
-  using `git add -A`; explicit staging kept later commits scoped. Quick 073 had
-  overlapping retrospective writers and stale planning references.
-- **Proposal:** Assign one writer per shared seed/PLAN and one reconciliation
-  owner; overlapping reviewers return read-only findings. Inspect status and the
-  staged diff before commit. Stage only owned files or hunks when unrelated work
-  exists; stage everything only after confirming the full diff is owned.
-- **Owners:** Review delegation and coordinator `wrap-up.md`.
-- **Success:** Concurrent work produces one attributable planning diff and
-  scoped commits without lost findings or unrelated staged changes.
+**Status:** Installed 2026-09-06 in `execute-plan/references/wrap-up.md` and
+`execution-retrospective/SKILL.md`. Instruction replay: owned product edit A
+with unstaged skill edit B → stage A only, leave B, no extra approval; separable
+owned/unrelated hunks → stage the owned hunk; unrelated already staged or
+ambiguous hunks → resolve the boundary first, do not co-commit or silently
+alter the other task's index/worktree; all content owned → whole-change staging
+allowed. Two authorized reviews of one PLAN → one writer/reconciler, the other
+read-only; disjoint PLANs or one reviewer → existing path. `wc -w`: wrap-up.md
+558 → 557; execution-retrospective/SKILL.md 1794 → 1792. Observe the next
+natural mixed-worktree or shared-review case; live effectiveness is not claimed.
+
+**Goal:** For the developer reviewing concurrent work, keep each planning edit
+and delivery commit attributable to its intended task, without overwriting or
+co-committing another task's changes.
+
+**Scope:** Two small instruction guards at the existing ownership boundaries:
+
+- **Commit preparation:** Review current status and the complete staged diff
+  against known task-owned work. When unrelated changes exist, stage only owned
+  files or attributable hunks. Staging everything is appropriate only when the
+  full diff is confirmed task-owned. Inspect the final staged content before
+  committing; a shared filename alone does not establish ownership of its edits.
+  If unrelated work is already staged or hunk ownership is ambiguous, resolve
+  the commit boundary with its owner before committing; do not silently include,
+  unstage, reset, or revert that work. Ordinary unrelated unstaged files do not
+  require a stop or permission to commit clearly owned changes.
+- **Shared retrospective artifacts:** Before parallel review activities write
+  a shared seed/PLAN, designate one writer who also reconciles their findings.
+  Other reviewers of that artifact return read-only evidence to the writer.
+  Reconcile against the current artifact once before writing. Disjoint artifacts
+  may have independent writers; a single review needs no additional ceremony.
+
+Use existing task/delegation context for ownership; no registry or new tracking
+artifact. Initial rollout is Doughnut only, in coordinator `wrap-up.md` and the
+existing `execution-retrospective` context. This authorizes neither new parallel
+reviews nor writing artifacts beyond the review's existing authorized scope.
+
+**Exclusions:** No Git hooks, index-management tool, locking system, worktree
+automation, cross-task discovery service, general concurrency protocol, history
+rewrite, or cleanup of existing mixed commits. No default prohibition of
+`git add -A` when everything is owned. No new review stage, Pygardon rollout, or
+sibling P1 changes. Preserve the current independent refactor and check-only hook.
 
 ### 5. Enforce the no-edit refactor handoff — P1, small fix
 
