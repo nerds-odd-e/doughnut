@@ -151,7 +151,12 @@ public class NotebookGitProposalPublisher {
         destinationFolderId == null
             ? null
             : entityPersister.find(Folder.class, destinationFolderId);
-    Note addedNote = noteFactory.create(notebook, destinationFolder, title);
+    Note addedNote;
+    try {
+      addedNote = noteFactory.create(notebook, destinationFolder, title);
+    } catch (ApiException exception) {
+      throw withContext(exception, "Cannot add note at path \"" + path + "\"");
+    }
     authoredNoteDocumentPersistence.persist(addedNote, document, publishedAt);
     return addedNote;
   }
@@ -163,19 +168,20 @@ public class NotebookGitProposalPublisher {
     try {
       AuthoredNoteContent.assertValidForSave(content);
     } catch (ApiException exception) {
-      ApiException contextualException =
-          new ApiException(
-              exception.getMessage(),
-              exception.getErrorBody().getErrorType(),
-              "Invalid authored property at path \""
-                  + path
-                  + "\": "
-                  + exception.getErrorBody().getMessage());
-      contextualException.getErrorBody().getErrors().putAll(exception.getErrorBody().getErrors());
-      contextualException.initCause(exception);
-      throw contextualException;
+      throw withContext(exception, "Invalid authored property at path \"" + path + "\"");
     }
     return AuthoredNoteDocument.fromContent(content, canonicalDonutOrigin);
+  }
+
+  private static ApiException withContext(ApiException exception, String context) {
+    ApiException contextualException =
+        new ApiException(
+            exception.getMessage(),
+            exception.getErrorBody().getErrorType(),
+            context + ": " + exception.getErrorBody().getMessage());
+    contextualException.getErrorBody().getErrors().putAll(exception.getErrorBody().getErrors());
+    contextualException.initCause(exception);
+    return contextualException;
   }
 
   private String validAdditionTitle(String path) {
