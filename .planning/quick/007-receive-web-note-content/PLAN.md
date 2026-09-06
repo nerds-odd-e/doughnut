@@ -359,7 +359,7 @@ real edit on the existing accepted SHA and bundle bytes.
 
 ### 10. Continue accepted history across web and local editing
 Type: Behavior
-Status: planned
+Status: done
 Proof: committed controller round trip A → web B → publish C → web D checks
 the downloaded bundle's parent chain and unchanged Note identity.
 
@@ -371,6 +371,10 @@ Reuse existing publication fixtures and the real publish controller, not a
 manually changed binding. Fix any web-append assumption limited to root-only
 history; share no independent revision model. CLI accumulation is proven in 5.
 Sizing: about 5 minutes, medium confidence; one alternating-history loop.
+Learning: the existing web-save and proposal-publication controllers compose
+without extra coordination: a final downloaded bundle preserves the exact
+D→C→B→A chain and every historical blob while the same Note identity survives
+each transition.
 
 ### 11. Keep competing accepted writers in one linear history
 Type: Behavior
