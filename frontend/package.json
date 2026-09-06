@@ -40,7 +40,7 @@
     "@storybook/vue3-vite": "10.5.10",
     "@tailwindcss/typography": "^0.5.20",
     "@tailwindcss/vite": "^4.3.3",
-    "@testing-library/user-event": "^14.6.6",
+    "@testing-library/user-event": "^14.6.7",
     "@testing-library/vue": "^8.1.0",
     "@types/node": "26.4.0",
     "@types/turndown": "^5.0.6",
