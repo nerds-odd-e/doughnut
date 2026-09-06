@@ -99,21 +99,57 @@ or blanket halt on the first test failure. No database cleanup commands, test
 isolation repairs, or other product fixes in this story. Pygardon rollout and
 other P1s remain separate.
 
+<a id="story-3"></a>
+
 ### 3. Escalate repeated overruns to story review — P1
 
-- **Evidence:** Pygardon Quick 073 reached 39 leaves with repeated 10–18 minute
-  attempts despite independently useful daily-only and daily-plus-hourly
-  outcomes. Earlier refinement discarded verified work and labeled internal
-  preparation as Behavior.
-- **Proposal:** Measure elapsed time during execution; at five minutes assess
-  remaining proof, and at ten stop/refine unless a narrow exception was recorded
-  before crossing. Preserve compatible owned work and proof. After two hard-limit
-  overruns, or when an independently usable vertical outcome is established,
-  reassess the story boundary before another leaf-only refinement. Reapply the
-  Behavior/Structure gate and inspect analogous remaining work together.
-- **Owners:** `problem-decomposition.mdc`, `execute-plan`, `slice-plan-refinement`.
-- **Success:** A real overrun produces timely escalation, retained valid proof,
-  and a useful stopping point rather than repeated reversion and rebuilding.
+**Status:** Installed 2026-09-06 in `problem-decomposition.mdc` Learning
+escalation, with entry points in `execute-plan` and `slice-plan-refinement`.
+Instruction replay: counted a 12- then 13-minute replacement as two attempts and
+sent unresolved scope to story review with parked proof kept (A); presented a
+demonstrated daily-only outcome and remaining archives at story review without
+dropping remainder or auto-running archive leaves (B); treated a recorded
+focused-test exception and a same-boundary E2E checkpoint as non-triggers (C).
+Live effectiveness is not claimed.
+
+**Goal:** For the developer funding autonomous delivery, recognize when a story
+should be narrowed or split before spending another attempt on smaller execution
+leaves, with compatible work and proof available to resume.
+
+**Scope:** At the existing coordinator refinement decision, reassess the story
+boundary before another leaf-only refinement when either condition holds:
+
+- A second non-exempt greater-than-ten-minute implementation/proof attempt
+  occurs in the same selected story. Retries and replacement leaves count;
+  renaming or splitting a leaf does not reset the evidence. An established
+  exception for a focused test or external wait does not count as a sizing
+  failure. Record the reason when handling the trigger, before more work, not
+  retrospectively after finishing the attempt.
+- Evidence already encountered in execution establishes a useful narrower
+  Valuable, Visible, Vertical outcome that changes the assumed story boundary.
+  Merely completing a planned E2E checkpoint does not trigger another review.
+
+Use the existing PLAN's elapsed-time/proof notes to state what was delivered,
+what remains, and whether the problem is leaf sizing or story scope. When a
+boundary change is indicated or unresolved, use the existing `awaiting story
+review` route for developer judgment before continuing. Recommend the smallest
+useful cut; do not autonomously cancel remaining scope or rewrite sibling stories.
+If the evidence supports retaining the story, record the concrete sizing reason
+and continue the existing refinement path; repeating "make leaves smaller" alone
+does not resolve the trigger. Reassess on a further qualifying overrun.
+
+Preserve compatible attempt-owned work safely with its completed proof while
+reconsidering scope. Reuse it when the revised leaf's promise and covered boundary
+still match; it must still pass ordinary review and delivery gates. Discard work
+only for a stated incompatibility or safety reason, not merely to restart a
+timer. Preserve unrelated work under the current ownership rules.
+
+**Exclusions:** No timer service, new reporting cadence, metrics registry,
+additional reviewer, mandatory pre-execution refinement, automatic story split,
+or whole-plan audit. No new sizing bands or Behavior/Structure policy, generic
+work-recovery tooling, retrospective replanning of Pygardon, or sibling P1 work.
+Do not add a stop to ordinary within-budget execution or to justified external
+waiting. Initial instruction rollout is Doughnut only.
 
 ### 4. Preserve artifact ownership through staging — P1
 

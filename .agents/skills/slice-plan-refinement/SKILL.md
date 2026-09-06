@@ -3,9 +3,8 @@ name: slice-plan-refinement
 description: >-
   Refine an existing slice PLAN in place into smaller commit-sized
   Behavior/Structure leaves. Use after slice-planning when slices are complex or
-  sizing confidence is low, and whenever execution overruns the five/ten-minute
-  budget. Creates no new plan. Skip when the existing plan is already simple and
-  plausibly commit-sized.
+  sizing confidence is low, and on overruns after Learning escalation. Creates
+  no new plan. Skip when the plan is already simple and plausibly commit-sized.
 ---
 
 <objective>
@@ -59,7 +58,7 @@ Classify each remaining slice:
 |--------|----------|
 | **Ready** | One Behavior/Structure gate, one proof loop, cohesive change, meets the target |
 | **Refine** | Same story, but the leaf violates its gate, has multiple beats, has low confidence, or could exceed the budget |
-| **Escalate** | A smaller viable cut would change the selected story or sibling-story order |
+| **Escalate** | Learning escalation requires story review |
 
 Route **Escalate** using the input gate above. Refine every **Refine** slice here.
 </step>
@@ -89,7 +88,7 @@ When refinement follows an execution attempt:
 2. Confirm attempt-owned WIP was safely parked or reverted before editing the
    PLAN. Preserve developer changes; if ownership is unclear, stop for human
    judgment.
-3. Return the failed slice to `planned` and replace it with smaller leaves.
+3. Replace with smaller leaves only if Learning escalation allows.
 4. Refine later slices only when the same disproved assumption applies to them.
 5. Keep a stated exception when elapsed time came from one focused test or
    external wait that decomposition cannot reduce.

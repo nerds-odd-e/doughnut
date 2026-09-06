@@ -89,11 +89,10 @@ excuse a separate assertion failure.
    first push; on resume, reuse its exact handle. Handle delivered CI events
    using ci-monitor.md; polling runs without AI.
 2. Find the next slice whose status is NOT "done"
-3. Check Jidoka, Behavior/Structure, refinement triggers, and planning.mdc's Proof
+3. Check Jidoka, Behavior/Structure, Learning escalation, and planning.mdc's Proof
    decisions; for destructive work, run the [named later-outcome check](references/destructive-later-outcome-check.md)
-   → If Jidoka stop condition → report & STOP
-   → If the selected outcome is valid but a refinement trigger applies, invoke
-     slice-plan-refinement on this PLAN, then reread it before continuing
+   → If Jidoka or story-review stop → report & STOP
+   → Else if leaf refinement remains, invoke slice-plan-refinement, then reread
 4. Delegate implementation under references/delegation.md.
 5. When implementer finishes:
    a. If Jidoka stop / REVERT & REFINE → handle as below; do not wrap up
@@ -114,7 +113,7 @@ excuse a separate assertion failure.
 <step name="revert_and_refine">
 A slice is too big when changes lack one coherent behavior, tests fail to
 converge, or it exceeds `problem-decomposition.mdc`'s budget: scrutinize after
-~5 minutes; after >10 minutes, refinement/retry is required unless a reason is
+~5 minutes; after >10 minutes, follow Learning escalation unless a reason is
 stated to the coordinator/developer. Include implementation and test runtime.
 
 When this happens:
@@ -122,7 +121,7 @@ When this happens:
 1. Inventory attempt-owned tracked/untracked paths and safely park or revert
    only that WIP. Preserve pre-existing changes; never use broad `git checkout .`
    or `git clean -fd`. Unclear ownership requires developer judgment.
-2. Invoke **slice-plan-refinement** on the same PLAN for smaller leaves.
+2. Follow Learning escalation; invoke **slice-plan-refinement** only if it allows.
 3. Have the coordinator commit and push the updated PLAN.
 4. Return "reverted and refined" with elapsed time and whether the hard trigger
    applied.

@@ -117,9 +117,8 @@ Estimate comparatively without implementation design or code inspection:
 - After five minutes, check whether the slice has multiple outcomes or hidden
   preparation and split when it does.
 - After ten minutes, stop, preserve the learning, safely park or revert only
-  attempt-owned WIP, and invoke **slice-plan-refinement** on the current PLAN.
-  Continue only with a stated reason such as one focused test itself taking
-  longer.
+  attempt-owned WIP, and follow **Learning escalation**. Continue only with a
+  stated reason such as one focused test itself taking longer.
 
 ## Correct these smells
 
@@ -131,16 +130,29 @@ Estimate comparatively without implementation design or code inspection:
 | Optimize for independent teams | Coordinate inside the shared story and integrate continuously |
 | Large story used as permanent specification | Keep the story as planning input; maintain behavior in executable examples and product documentation |
 | Prototype grows beyond its question | Limit it to the cheapest evidence needed for the uncertainty |
-| Slice grows or tests do not converge | Preserve learning and run slice-plan-refinement on the current PLAN |
+| Slice grows or tests do not converge | Preserve learning; follow Learning escalation |
 | One giant AI task | Use bounded execution leaves with review after each |
 
 ## Learning escalation
 
-After each completed execution slice:
+After a completed slice and before creating more leaves: if evidence changes only
+remaining leaves, update the PLAN and continue. If it changes the story's goal,
+examples, scope, or sibling order, mark awaiting story review, name the
+seed/story, and stop. Use story-refinement for selected-story detail;
+story-decomposition for parent-problem or candidate-ordering. Never cancel
+remaining scope or rewrite sibling stories.
 
-- If evidence changes only the remaining leaves of the selected story, update
-  the active PLAN and continue.
-- If evidence changes the story's goal, examples, scope, or sibling ordering,
-  mark the PLAN as awaiting story review, identify the affected seed/story, and
-  stop for human judgment. Use story-refinement for selected-story detail;
-  story-decomposition for parent-problem or candidate-ordering changes.
+Reassess before another leaf-only refinement when a **second** non-exempt
+>10-minute attempt occurs in this story (retries and replacement leaves count;
+rename/split does not reset) or already-seen narrower 3V evidence changes the
+boundary. Record a focused-test or external-wait exception at the trigger; those
+are not sizing failures. Do not search for extra scope. An E2E checkpoint that
+confirms the same boundary is not a trigger.
+
+Record delivered value, remaining scope, and story-vs-leaf in the PLAN. Keep
+the story only with a concrete sizing reason — not "make leaves smaller" — then
+continue existing refinement and reassess on a later qualifying overrun.
+Unresolved/changed boundary stays at story review. Park compatible work and
+proof; reuse when the revised promise and boundary match; discard only for
+stated incompatibility or safety, not to restart a timer. Preserve unrelated
+work and completed-leaf evidence.
