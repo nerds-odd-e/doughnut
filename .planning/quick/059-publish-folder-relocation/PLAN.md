@@ -3,7 +3,7 @@
 ## Source and status
 
 Source: [SEED-009 Story 7](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-7).
-Status: in progress; slices 1–8 done.
+Status: in progress; slices 1–9 done.
 
 ## Goal and scope
 
@@ -228,9 +228,12 @@ Sizing basis: one existing reference-resolution proof pattern and one fixture.
 
 ### 9. Roll back a folder move when late acceptance fails
 Type: Behavior
-Status: planned
+Status: done
 Proof: Existing late binding-save injection, committed fixture, and fresh read
 transaction show original parent, descendant IDs, head, and bundle after failure.
+`CURSOR_DEV=true nix develop -c pnpm backend:test_only` passed.
+`NotebookGitProposalFolderRelocationRollbackControllerTest` uses the existing
+atomic-test annotation mix.
 
 Behavior: An eligible move fails after parent mutation → publication fails →
 the entire accepted state remains at its old location. Reset failure injection
@@ -342,7 +345,7 @@ feature is promised. No completed evidence exists to migrate.
 
 ## Readiness and learnings
 
-Slices 1–8 done. Remaining leaves are target-sized hypotheses, not time guarantees.
+Slices 1–9 done. Remaining leaves are target-sized hypotheses, not time guarantees.
 No sizing exception is pre-approved; record actual test/external wait runtime
 separately.
 
