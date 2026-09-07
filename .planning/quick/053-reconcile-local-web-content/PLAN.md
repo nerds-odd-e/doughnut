@@ -1,7 +1,7 @@
 # Keep accumulated local and web content edits
 
 Source: [SEED-009 Story 8](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-8).
-Status: in progress. Slices 1–5 done; next is slice 6.
+Status: in progress. Slices 1–6 done; next is slice 7.
 
 ## Goal and scope
 
@@ -201,7 +201,7 @@ Sizing: ~5 minutes, high confidence; one state/result branch and its transitions
 
 ### 6. Protect edits made while divergent history downloads
 Type: Behavior
-Status: planned
+Status: done
 Proof: Extend `notebookPull.concurrentChange.suite.ts` with the eligible
 divergent precondition. Inject changed HEAD, branch, staged/unstaged/untracked
 work or an active operation at download completion; observe the resulting
@@ -337,8 +337,13 @@ preparatory Structure sits immediately before its Behavior.
   `notebookPull.alreadyBased.suite.ts`. Bundle serving lives in
   `notebookPull.testHelpers.ts`; unsupported-local fixtures live in
   `notebookPull.localCandidate.testHelpers.ts`.
+- Post-download `assertCheckoutStillReady` already covers eligible other-note
+  divergence as well as fast-forward: staged, unstaged, untracked, new HEAD,
+  other branch, and active MERGE_HEAD injected at download completion leave
+  the captured checkout and temp dirs unchanged. Proofs live in
+  `notebookPull.concurrentChange.suite.ts`.
 
-Remaining leaves 6–11 are Ready as sizing hypotheses. Target ~5 minutes each
+Remaining leaves 7–11 are Ready as sizing hypotheses. Target ~5 minutes each
 including focused verification and local cleanup; inspect at five minutes and
 stop/finer-decompose at ten non-exempt minutes. A backend/E2E run or external
 wait can justify an exception only when recorded as the actual cause. No
