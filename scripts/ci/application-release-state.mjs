@@ -168,18 +168,56 @@ export async function initializeApplicationReleaseState({
   return { state: 'initialized', record }
 }
 
+export async function checkCompletedApplicationRelease({
+  bucket,
+  tag,
+  refOid,
+  sha,
+  gcsApiBase = process.env.GCS_API_URL || 'https://storage.googleapis.com',
+  token = accessToken(),
+}) {
+  if (!bucket) throw new Error('GCS_BUCKET is required')
+  if (!applicationTag.test(tag)) throw new Error('RELEASE_TAG is invalid')
+  if (!objectId.test(refOid)) throw new Error('RELEASE_REF_OID is invalid')
+  if (!objectId.test(sha)) throw new Error('RELEASE_SHA is invalid')
+
+  const current = await existingState(stateUrls(bucket, gcsApiBase).read, token)
+  if (!current) {
+    throw new Error('Application release state is missing after initialization')
+  }
+  if (
+    current.outcome === 'succeeded' &&
+    current.tag === tag &&
+    current.ref_oid === refOid &&
+    current.sha === sha
+  ) {
+    return { state: 'already-released' }
+  }
+  return { state: 'continue' }
+}
+
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
+  const checkCompleted = process.argv[2] === '--check-completed'
   try {
     writeReleaseOutput(
-      await initializeApplicationReleaseState({
-        bucket: process.env.GCS_BUCKET,
-        repository: process.env.GITHUB_REPOSITORY,
-      })
+      checkCompleted
+        ? await checkCompletedApplicationRelease({
+            bucket: process.env.GCS_BUCKET,
+            tag: process.env.RELEASE_TAG,
+            refOid: process.env.RELEASE_REF_OID,
+            sha: process.env.RELEASE_SHA,
+          })
+        : await initializeApplicationReleaseState({
+            bucket: process.env.GCS_BUCKET,
+            repository: process.env.GITHUB_REPOSITORY,
+          })
     )
   } catch (error) {
     console.error(
-      `Application release tracking initialization failed: ${error.message}. ` +
-        'Identify the published application release (tag, raw refOid, peeled SHA, selected CI run ID and attempt) before retrying.'
+      checkCompleted
+        ? `Application release replay check failed: ${error.message}`
+        : `Application release tracking initialization failed: ${error.message}. ` +
+            'Identify the published application release (tag, raw refOid, peeled SHA, selected CI run ID and attempt) before retrying.'
     )
     process.exitCode = 1
   }

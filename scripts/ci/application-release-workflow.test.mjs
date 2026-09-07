@@ -39,6 +39,7 @@ test('release pins orchestration separately from source and preserves deployment
     (step) => step.run === 'node scripts/ci/application-release-state.mjs'
   )
   const identity = admission.steps.find((step) => step.id === 'identity')
+  const replay = admission.steps.find((step) => step.id === 'replay')
   const ciAdmission = admission.steps.find((step) => step.id === 'ci')
   const artifactDownloads = publication.steps.filter(
     (step) => step.uses === 'actions/download-artifact@v8'
@@ -72,6 +73,23 @@ test('release pins orchestration separately from source and preserves deployment
   )
   assert.ok(
     admission.steps.indexOf(identity) < admission.steps.indexOf(ciAdmission)
+  )
+  assert.ok(admission.steps.indexOf(identity) < admission.steps.indexOf(replay))
+  assert.ok(
+    admission.steps.indexOf(replay) < admission.steps.indexOf(ciAdmission)
+  )
+  assert.deepEqual(replay.env, {
+    RELEASE_TAG: '${{ steps.identity.outputs.tag }}',
+    RELEASE_REF_OID: '${{ steps.identity.outputs.refOid }}',
+    RELEASE_SHA: '${{ steps.identity.outputs.sha }}',
+  })
+  assert.equal(
+    replay.run,
+    'node scripts/ci/application-release-state.mjs --check-completed'
+  )
+  assert.equal(
+    ciAdmission.if,
+    "steps.replay.outputs.state != 'already-released'"
   )
   assert.equal(ciAdmission.run, 'node scripts/ci/application-release-ci.mjs')
   assert.deepEqual(
@@ -148,6 +166,29 @@ test('release pins orchestration separately from source and preserves deployment
     ).with.credentials_json,
     '${{ env.GCP_CREDENTIALS }}'
   )
+})
+
+test('an already-released outcome bypasses CI and every publication operation', () => {
+  const deploy = workflow('deploy')
+  const admission = deploy.jobs['release-admission']
+  const publication = deploy.jobs.Deploy
+  const downloads = publication.steps.filter(
+    (step) => step.uses === 'actions/download-artifact@v8'
+  )
+
+  assert.equal(
+    admission.outputs.deploy,
+    "${{ steps.replay.outputs.state != 'already-released' && steps.ci.outputs.state == 'ready' }}"
+  )
+  assert.equal(
+    publication.if,
+    "needs.release-admission.outputs.deploy == 'true'"
+  )
+  assert.deepEqual(
+    downloads.map((step) => step.id),
+    ['backend_artifact', 'frontend_artifact', 'cli_artifact']
+  )
+  assert.ok(publication.steps.some((step) => step.id === 'publish'))
 })
 
 test('independent CLI tags retain their release trigger', () => {

@@ -30,7 +30,7 @@ jobs:
     timeout-minutes: 70
     outputs:
       control_sha: ${{ steps.control.outputs.sha }}
-      deploy: ${{ steps.ci.outputs.state == 'ready' }}
+      deploy: ${{ steps.replay.outputs.state != 'already-released' && steps.ci.outputs.state == 'ready' }}
       tag: ${{ steps.identity.outputs.tag }}
       sha: ${{ steps.identity.outputs.sha }}
       ref: ${{ steps.identity.outputs.ref }}
@@ -62,8 +62,16 @@ jobs:
         id: identity
         run: |
           node scripts/ci/application-release.mjs
+      - name: Check completed release replay
+        id: replay
+        env:
+          RELEASE_TAG: ${{ steps.identity.outputs.tag }}
+          RELEASE_REF_OID: ${{ steps.identity.outputs.refOid }}
+          RELEASE_SHA: ${{ steps.identity.outputs.sha }}
+        run: node scripts/ci/application-release-state.mjs --check-completed
       - name: Wait for successful CI of selected commit
         id: ci
+        if: steps.replay.outputs.state != 'already-released'
         env:
           RELEASE_SHA: ${{ steps.identity.outputs.sha }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

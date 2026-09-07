@@ -1,6 +1,8 @@
 import { spawn } from 'node:child_process'
+import { readFileSync } from 'node:fs'
 import { createServer } from 'node:http'
 import { fileURLToPath } from 'node:url'
+import { join } from 'node:path'
 import { makeReleaseRepository } from './application-release-fixtures.mjs'
 import { githubRepository } from './application-release-bootstrap-fixtures.mjs'
 
@@ -8,7 +10,7 @@ const command = fileURLToPath(
   new URL('./application-release-state.mjs', import.meta.url)
 )
 
-export async function runStateInitialization(
+export async function runStateCommand(
   t,
   {
     tags = [],
@@ -21,11 +23,14 @@ export async function runStateInitialization(
     currentRunId,
     currentRef,
     unavailable = false,
+    args = [],
+    release,
+    repository,
   } = {}
 ) {
-  const fixture = makeReleaseRepository(t)
-  for (const tag of tags) fixture.tag(tag)
-  fixture.clone()
+  const fixture = repository ? undefined : makeReleaseRepository(t)
+  for (const tag of tags) fixture?.tag(tag)
+  fixture?.clone()
   const requests = []
   const uploads = []
   const server = createServer(async (request, response) => {
@@ -77,8 +82,9 @@ export async function runStateInitialization(
   t.after(() => server.close())
   const apiBase = `http://127.0.0.1:${server.address().port}`
   if (unavailable) await new Promise((resolve) => server.close(resolve))
-  const child = spawn(process.execPath, [command], {
-    cwd: fixture.repository,
+  const outputPath = join(repository || fixture.repository, 'state-output')
+  const child = spawn(process.execPath, [command, ...args], {
+    cwd: repository || fixture.repository,
     env: {
       ...process.env,
       GCS_API_URL: apiBase,
@@ -87,8 +93,16 @@ export async function runStateInitialization(
       GITHUB_API_URL: apiBase,
       GITHUB_REPOSITORY: githubRepository,
       GITHUB_TOKEN: 'github-token',
+      GITHUB_OUTPUT: outputPath,
       ...(currentRunId ? { GITHUB_RUN_ID: currentRunId } : {}),
       ...(currentRef ? { GITHUB_REF: currentRef } : {}),
+      ...(release
+        ? {
+            RELEASE_TAG: release.tag,
+            RELEASE_REF_OID: release.refOid,
+            RELEASE_SHA: release.sha,
+          }
+        : {}),
     },
   })
   let stdout = ''
@@ -99,5 +113,14 @@ export async function runStateInitialization(
     child.on('error', reject)
     child.on('close', resolve)
   })
-  return { status, stdout, stderr, requests, uploads }
+  let output = ''
+  try {
+    output = readFileSync(outputPath, 'utf8')
+  } catch (error) {
+    if (error.code !== 'ENOENT') throw error
+  }
+  return { status, stdout, stderr, requests, uploads, output }
 }
+
+export const runStateInitialization = (t, options) =>
+  runStateCommand(t, options)

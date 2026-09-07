@@ -228,13 +228,18 @@ state initialization and workflow gating are now separate behavior leaves.
 
 ### 3. Make completed-release replays a no-op
 Type: Behavior
-Status: planned
+Status: done
 Proof: Same successful tag/SHA replay performs no artifact download or production
 write, including when old artifacts expired or CLI was independently updated.
 
 Behavior: A completed release is encountered again → report already released.
 Put this successful identity check before artifact admission. No other recovery
 or ordering rule belongs in this leaf.
+
+Learning: after exact tag/refOid/SHA selection, a read-only state check reports
+`already-released`; workflow outputs then skip both CI lookup and the complete
+Deploy job. Expired artifacts and independently updated CLI state are therefore
+outside the replay path.
 
 ### 4. Reject a moved release identity
 Type: Behavior

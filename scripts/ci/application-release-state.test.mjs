@@ -4,7 +4,10 @@ import {
   deployRun,
   releaseJobs,
 } from './application-release-bootstrap-fixtures.mjs'
-import { runStateInitialization } from './application-release-state-fixtures.mjs'
+import {
+  runStateCommand,
+  runStateInitialization,
+} from './application-release-state-fixtures.mjs'
 
 const selectedCiSha = 'b'.repeat(40)
 const publishedRecord = (outcome) => ({
@@ -170,4 +173,41 @@ test('a create-only conflict fails without replacing state', async (t) => {
     result.requests.at(-1).url.searchParams.get('ifGenerationMatch'),
     '0'
   )
+})
+
+test('the exact succeeded release is reported as already released without changing state', async (t) => {
+  const record = publishedRecord('succeeded')
+  const result = await runStateCommand(t, {
+    args: ['--check-completed'],
+    existingBody: JSON.stringify(record),
+    release: {
+      tag: record.tag,
+      refOid: record.ref_oid,
+      sha: record.sha,
+    },
+  })
+
+  assert.equal(result.status, 0, result.stderr)
+  assert.deepEqual(JSON.parse(result.stdout), { state: 'already-released' })
+  assert.equal(result.output, 'state=already-released\n')
+  assert.equal(result.requests.length, 1)
+  assert.equal(result.requests[0].method, 'GET')
+  assert.deepEqual(result.uploads, [])
+})
+
+test('a nonmatching release continues through existing admission', async (t) => {
+  const record = publishedRecord('succeeded')
+  const result = await runStateCommand(t, {
+    args: ['--check-completed'],
+    existingBody: JSON.stringify(record),
+    release: {
+      tag: record.tag,
+      refOid: 'c'.repeat(40),
+      sha: record.sha,
+    },
+  })
+
+  assert.equal(result.status, 0, result.stderr)
+  assert.deepEqual(JSON.parse(result.stdout), { state: 'continue' })
+  assert.deepEqual(result.uploads, [])
 })
