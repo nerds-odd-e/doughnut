@@ -88,6 +88,8 @@ APP_BASE_NAME=${0##*/}
 # Discard cd standard output in case $CDPATH is set (https://github.com/gradle/gradle/issues/25036)
 APP_HOME=$( cd -P "${APP_HOME:-./}" > /dev/null && printf '%s\n' "$PWD" ) || exit
 
+# Donut worktree isolation: scripts/backend-worktree-gradle-route.sh
+[ -z "${DONUT_WORKTREE_HANDOFF:-}" ] && [ -x "${APP_HOME}/scripts/backend-worktree-gradle-route.sh" ] && exec "${APP_HOME}/scripts/backend-worktree-gradle-route.sh" "$@"
 # Use the maximum available, or set MAX_FD != -1 to use that value.
 MAX_FD=maximum
 

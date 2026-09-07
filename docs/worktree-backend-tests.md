@@ -91,11 +91,35 @@ invocation's process has exited without releasing ownership, the next
 invocation reclaims it automatically. Commands in different checkouts remain
 fully independent and may run concurrently.
 
+## Ordinary migration in a configured checkout
+
+When `.worktree.local.json` is already present, the repository Gradle wrapper
+migrates the assigned database and does not run tests:
+
+From the checkout root:
+
+```bash
+unset SPRING_DATASOURCE_URL DB_URL SPRING_FLYWAY_URL
+CURSOR_DEV=true nix develop -c backend/gradlew -p backend migrateTestDB
+```
+
+From `backend/`:
+
+```bash
+unset SPRING_DATASOURCE_URL DB_URL SPRING_FLYWAY_URL
+CURSOR_DEV=true nix develop -c ./gradlew migrateTestDB
+```
+
+These commands reuse the checkout's assigned database and the same exclusive
+invocation lock as `pnpm backend:test:worktree`. They do not allocate a
+first-use environment.
+
 ## Limits
 
-- `pnpm backend:test`, `pnpm backend:test_only`, and direct Gradle `test` /
-  `migrateTestDB` are not automatically isolated; they keep the legacy default
-  (`doughnut_test`).
+- `pnpm backend:test`, `pnpm backend:test_only`, and direct Gradle `test` are
+  not automatically isolated; they keep the legacy default (`doughnut_test`).
+  Configured-checkout `migrateTestDB` through the repository wrapper is isolated
+  as described above.
 - No automatic cleanup, retirement, or orphan removal: a provisioned database
   (and an unreferenced one left behind by a failed or interrupted first use)
   persists until removed manually. There is no machine-wide allocation

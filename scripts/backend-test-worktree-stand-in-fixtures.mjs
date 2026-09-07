@@ -5,16 +5,20 @@ import {
   mkdtempSync,
   readFileSync,
   rmSync,
+  symlinkSync,
   writeFileSync,
 } from 'node:fs'
 import { tmpdir } from 'node:os'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-const launcherSrc = fileURLToPath(
-  new URL('./backend-test-worktree.sh', import.meta.url)
-)
-const repoBackend = fileURLToPath(new URL('../backend', import.meta.url))
+const scriptsSrc = fileURLToPath(new URL('.', import.meta.url))
+const repoRoot = fileURLToPath(new URL('..', import.meta.url))
+const checkoutScriptNames = [
+  'backend-test-worktree.sh',
+  'backend-test-worktree-owner.sh',
+  'backend-worktree-gradle-route.sh',
+]
 
 const jdbcParams =
   'connectionTimeZone=UTC&forceConnectionTimeZoneToSession=true'
@@ -55,20 +59,21 @@ export function makeCheckout(t, { config } = {}) {
   mkdirSync(path.join(root, 'scripts'), { recursive: true })
   mkdirSync(path.join(root, 'backend'), { recursive: true })
 
+  for (const name of checkoutScriptNames) {
+    const dest = path.join(root, 'scripts', name)
+    copyFileSync(path.join(scriptsSrc, name), dest)
+    chmodSync(dest, 0o755)
+  }
   const launcher = path.join(root, 'scripts', 'backend-test-worktree.sh')
-  copyFileSync(launcherSrc, launcher)
-  chmodSync(launcher, 0o755)
 
-  copyFileSync(
-    path.join(repoBackend, 'gradlew'),
-    path.join(root, 'backend', 'gradlew')
-  )
-  chmodSync(path.join(root, 'backend', 'gradlew'), 0o755)
-  const wrapperDir = path.join(root, 'backend', 'gradle', 'wrapper')
+  copyFileSync(path.join(repoRoot, 'gradlew'), path.join(root, 'gradlew'))
+  chmodSync(path.join(root, 'gradlew'), 0o755)
+  symlinkSync('../gradlew', path.join(root, 'backend', 'gradlew'))
+  const wrapperDir = path.join(root, 'gradle', 'wrapper')
   mkdirSync(wrapperDir, { recursive: true })
   for (const name of ['gradle-wrapper.jar', 'gradle-wrapper.properties']) {
     copyFileSync(
-      path.join(repoBackend, 'gradle', 'wrapper', name),
+      path.join(repoRoot, 'gradle', 'wrapper', name),
       path.join(wrapperDir, name)
     )
   }
@@ -87,6 +92,7 @@ export function makeCheckout(t, { config } = {}) {
     '{',
     '  printf \'cwd=%s\\n\' "$PWD"',
     '  printf \'SPRING_DATASOURCE_URL=%s\\n\' "${SPRING_DATASOURCE_URL-}"',
+    '  printf \'DONUT_WORKTREE_HANDOFF=%s\\n\' "${DONUT_WORKTREE_HANDOFF-}"',
     '  for arg in "$@"; do',
     '    printf \'arg:%s\\n\' "$arg"',
     '  done',
@@ -148,10 +154,13 @@ export function readGradleInvocation(checkout) {
   const javaArgs = []
   let cwd
   let url
+  let handoff
   for (const line of text.split('\n')) {
     if (line.startsWith('cwd=')) cwd = line.slice('cwd='.length)
     else if (line.startsWith('SPRING_DATASOURCE_URL=')) {
       url = line.slice('SPRING_DATASOURCE_URL='.length)
+    } else if (line.startsWith('DONUT_WORKTREE_HANDOFF=')) {
+      handoff = line.slice('DONUT_WORKTREE_HANDOFF='.length)
     } else if (line.startsWith('arg:')) javaArgs.push(line.slice('arg:'.length))
   }
   const jarAt = javaArgs.indexOf('-jar')
@@ -160,7 +169,7 @@ export function readGradleInvocation(checkout) {
     ? path.normalize(path.join(path.dirname(jarPath), '..', '..', 'gradlew'))
     : undefined
   const args = jarAt >= 0 ? javaArgs.slice(jarAt + 2) : javaArgs
-  return { wrapper, cwd, url, args, javaArgs }
+  return { wrapper, cwd, url, args, javaArgs, handoff }
 }
 
 export function readMysqlInvocation(checkout) {

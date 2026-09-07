@@ -1,7 +1,7 @@
 # Ordinary backend commands use the owning worktree database
 
 Source: [SEED-015 story 1c](../../seeds/SEED-015-concurrent-worktree-environments.md#story-1c).
-Status: in progress; slice 1 done.
+Status: in progress; slices 1–2 done.
 
 ## Goal and scope
 
@@ -94,7 +94,7 @@ extraction or real Gradle process. This removes hidden preparation from leaf 2.
 
 ### 2. Run ordinary migration in a configured checkout
 Type: Behavior
-Status: planned
+Status: done
 Proof: Real wrapper routing with a stand-in Java/Gradle endpoint observes assigned
 URL and migration-only execution, with no recursive handoff or lock reacquisition.
 Exercise root `-p backend` and backend-directory forms. Extend the usage guide.
@@ -263,6 +263,11 @@ stopping point.
   (Nix sets it). The fixture copies `backend/gradlew` and intercepts that
   Java endpoint; PATH-only `java` would miss it. Reuse this for ordinary-command
   routing in leaf 2.
+- Slice 2: `backend/gradlew` is a symlink to root `gradlew`, so APP_HOME is
+  the checkout root. Isolation policy lives in
+  `scripts/backend-worktree-gradle-route.sh`; an invocation-local
+  `DONUT_WORKTREE_HANDOFF` prevents recursive lock. Configured `migrateTestDB`
+  (not `test`) is the only ordinary form routed so far.
 
 Quick/058 completed during refinement; no remaining lock-fix prerequisite.
 No new storage experiment is needed. Repository-wrapper routing is the remaining

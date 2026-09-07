@@ -9,6 +9,7 @@ function sanitizedChildEnv(env) {
   delete childEnv.SPRING_DATASOURCE_URL
   delete childEnv.DB_URL
   delete childEnv.SPRING_FLYWAY_URL
+  delete childEnv.DONUT_WORKTREE_HANDOFF
   delete childEnv.FAKE_GRADLE_EXIT
   delete childEnv.FAKE_MYSQL_EXIT
   Object.assign(childEnv, env)
@@ -27,12 +28,23 @@ function launcherChildEnv(checkout, env) {
   })
 }
 
+export function runWrapper(
+  checkout,
+  { command, cwd, args = [], env = {} } = {}
+) {
+  return spawnSync(
+    command ?? path.join(checkout.root, 'backend', 'gradlew'),
+    args,
+    {
+      cwd: cwd ?? checkout.root,
+      encoding: 'utf8',
+      env: launcherChildEnv(checkout, env),
+    }
+  )
+}
+
 export function runLauncher(checkout, { env = {}, args = [] } = {}) {
-  return spawnSync(checkout.launcher, args, {
-    cwd: checkout.root,
-    encoding: 'utf8',
-    env: launcherChildEnv(checkout, env),
-  })
+  return runWrapper(checkout, { command: checkout.launcher, args, env })
 }
 
 export function outputOf(result) {
