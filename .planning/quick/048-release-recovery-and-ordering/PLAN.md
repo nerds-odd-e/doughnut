@@ -259,7 +259,7 @@ and replacing an annotated tag object while retaining its peeled commit.
 
 ### 5. Retry an interrupted release with the same tag
 Type: Behavior
-Status: planned
+Status: done
 Proof: External failure after one upload leaves incomplete state; a same-tag/SHA
 retry revalidates CI/artifacts, repeats permitted uploads and records success.
 
@@ -267,6 +267,11 @@ Behavior: A current release failed partway through → retry its immutable ident
 → complete that release. No compensating rollback or cross-service transaction.
 Reuse existing outcome writes; add only interrupted-state admission and its
 same-tag retry runbook example.
+
+Learning: an exact persisted `publishing` identity now returns `retry`. The
+outside-in proof fails after the SPA upload, reselects a newer successful CI
+attempt for the same SHA, republishes its admitted artifacts, and records
+`succeeded` only after the complete publication; the runbook uses workflow rerun.
 
 ### 6. Recover a release whose CI artifacts are unavailable
 Type: Behavior

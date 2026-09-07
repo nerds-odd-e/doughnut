@@ -19,6 +19,11 @@ const publicationCommand = parse(
 ).jobs.Deploy.steps.find((step) => step.id === 'publish').run
 export const hash = (content) =>
   createHash('sha256').update(content).digest('hex')
+export const readApplicationRecords = (path) =>
+  readFileSync(path, 'utf8')
+    .trim()
+    .split('\n')
+    .map((record) => JSON.parse(record))
 
 export function makePublication(t, scenario = 'skip') {
   const fixture = makeReleaseRepository(t)
@@ -82,7 +87,7 @@ export function makePublication(t, scenario = 'skip') {
   for (const runId of [42, 99]) {
     const payload = artifacts(runId)
     mkdirSync(payload.frontend, { recursive: true })
-    const label = runId === 42 ? 'selected' : 'other'
+    const label = runId === 42 ? 'selected' : 'fresh'
     writeFileSync(join(payload.frontend, 'index.html'), `${label} SPA`)
     writeFileSync(payload.cli, `${label} CLI`)
     writeFileSync(payload.jar, `${label} jar`)
@@ -135,7 +140,8 @@ printf 200`
   const trace = join(root, 'trace')
   const publish = (
     release = { sha, ref: 'refs/tags/v1.2.3', refOid },
-    ci = { runId: 42 }
+    ci = { runId: 42, runAttempt: 3 },
+    { failGsutilMatch = '' } = {}
   ) =>
     spawnSync('bash', ['-c', publicationCommand], {
       cwd: repositoryRoot,
@@ -155,7 +161,7 @@ printf 200`
         RELEASE_REF: release.ref,
         RELEASE_REF_OID: release.refOid,
         RELEASE_CI_RUN_ID: String(ci.runId),
-        RELEASE_CI_RUN_ATTEMPT: '3',
+        RELEASE_CI_RUN_ATTEMPT: String(ci.runAttempt),
         CAPTURED_MAP: join(root, 'captured-map'),
         CAPTURED_STARTUP: join(root, 'captured-startup'),
         GCS_BUCKET: 'private-backend',
@@ -167,7 +173,8 @@ printf 200`
         DEPLOY_JAR_PATH: artifacts(ci.runId).jar,
         FORCE_FULL_DEPLOY: '',
         HEALTHCHECK_RETRY_SLEEP_SECONDS: '0',
-        FAIL_GSUTIL_MATCH: scenario === 'failed-frontend' ? 'rsync' : '',
+        FAIL_GSUTIL_MATCH:
+          failGsutilMatch || (scenario === 'failed-frontend' ? 'rsync' : ''),
       },
     })
   return {

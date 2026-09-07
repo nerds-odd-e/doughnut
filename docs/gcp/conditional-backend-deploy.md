@@ -58,12 +58,25 @@ CLI publication and URL-map application still run.
 
 Inspect the reported tag, SHA, CI run/attempt and failure stage. Missing/expired
 artifacts or failed validation stop before uploads. Later publication failure can
-leave a partial frontend/CLI/backend change; this workflow has no automatic
-rollback or durable application release ledger. Do not rerun the old release or
-retarget its tag. Commit a correction or revert on main, test that new commit, then
-release it under the **next patch version**, after the previous workflow has ended.
-There is **no automatic schema rollback**; assess existing production schema and
-migration compatibility when preparing that correction/revert.
+leave a partial frontend/CLI/backend change. The application release record stays
+`publishing`; after the failed workflow has ended, retry that workflow without
+moving or deleting its immutable tag:
+
+```bash
+gh run rerun <DONUT_DEPLOY_RUN_ID>
+```
+
+Admission must report the same tag, raw refOid and SHA. It reselects successful CI
+for that exact SHA, so a newer successful run/attempt can replace the interrupted
+attempt's artifact source. Publication repeats permitted uploads and records
+`succeeded` only after every operation finishes. There is no compensating rollback
+or cross-service transaction.
+
+If the release identity must change or the selected application needs correction,
+commit a correction or revert on main, test that new commit, then release it under
+the **next patch version**, after the previous workflow has ended. Never retarget
+the old tag. There is **no automatic schema rollback**; assess existing production
+schema and migration compatibility when preparing that correction/revert.
 
 ## Last successful deploy record
 

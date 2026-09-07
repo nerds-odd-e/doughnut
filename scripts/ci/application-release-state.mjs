@@ -194,6 +194,7 @@ export async function checkApplicationReleaseState({
     if (current.outcome === 'succeeded') {
       return { state: 'already-released' }
     }
+    return { state: 'retry' }
   }
   return { state: 'continue' }
 }

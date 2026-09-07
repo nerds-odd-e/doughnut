@@ -7,14 +7,10 @@ import { parse } from 'yaml'
 import {
   hash,
   makePublication,
+  readApplicationRecords,
 } from './application-release-publication-fixtures.mjs'
 
 const repositoryRoot = fileURLToPath(new URL('../../', import.meta.url))
-const readApplicationRecords = (path) =>
-  readFileSync(path, 'utf8')
-    .trim()
-    .split('\n')
-    .map((record) => JSON.parse(record))
 
 for (const scenario of [
   'skip',
