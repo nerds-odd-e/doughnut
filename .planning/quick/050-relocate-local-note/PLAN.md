@@ -3,9 +3,9 @@
 Status: planned; story and slice-plan refinement complete on 2026-09-07.
 Source: [SEED-009 Story 12](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-12).
 Prerequisites: Story 6 and the [Plan 52 corrections](../052-clarify-note-rename-publication/PLAN.md)
-are delivered. Ready to execute as the selected parallel candidate alongside
-[Plan 53](../053-reconcile-local-web-content/PLAN.md), using the coordination
-boundary below. This planning request does not start implementation.
+are delivered. Story 8 other-note content rebase is delivered (`cae5ed116f`).
+Ready to execute as the selected relocation candidate. This planning request
+does not start implementation.
 
 ## Goal and scope
 
@@ -97,27 +97,26 @@ not its Donut folder.
 
 ## Parallel execution boundary
 
-Plan 50 and Plan 53 have independent product outcomes, but share some files
-and test infrastructure. Keep separate worktrees and PLAN ownership; separate
-worktrees alone do not isolate MySQL, Redis or the running SUT.
+Story 8 content rebase is delivered. Plan 50 still shares CLI guidance and the
+installed clone feature with that work. Keep separate worktrees and PLAN
+ownership; separate worktrees alone do not isolate MySQL, Redis or the running SUT.
 
 | Area | Coordination |
 | --- | --- |
-| Backend relocation | Plan 50 owns classifier/placement/resolver changes and relocation fixtures. Plan 53 should reuse the publication API; coordinate if its proof uncovers a required backend change. |
-| CLI rebase | Plan 53 owns production pull/readiness/rebase changes. Plan 50 uses existing publish and fast-forward receipt; do not broaden or weaken divergent-history rejection. |
-| Shared CLI guidance | Both plans touch nonInteractiveCli.ts and notebookClone.test.ts. Serialize/integrate these edits: keep relocation guidance and content-only pull guidance together, with neither claiming structural rebase. |
-| Installed feature/harness | Both use cli_notebook_clone.feature and associated page objects/tasks. Plan 50 needs only existing git-mv/publish actions; retain Plan 53's pull observations and scenarios when integrating. |
-| Pull tests | Plan 50 extends notebookPull.fastForward.suite.ts. Plan 53 owns divergent suites/registration. Keep suite registration serialized to preserve temporary-directory leak checks. |
-| Planning | Update only Story 12 and this PLAN from this workstream. Leave Plan 53 and Story 8 to their executor; reconcile the shared seed/backlog at integration. |
+| Backend relocation | Plan 50 owns classifier/placement/resolver changes and relocation fixtures. Reuse the publication API; Story 8 needed no backend production change. |
+| CLI rebase | Story 8 owns production pull/readiness/rebase. Plan 50 uses existing publish and fast-forward receipt; do not broaden or weaken divergent-history rejection. |
+| Shared CLI guidance | Both touch nonInteractiveCli.ts and notebookClone.test.ts. Keep relocation guidance and content-only pull guidance together, with neither claiming structural rebase. |
+| Installed feature/harness | Both use cli_notebook_clone.feature and associated page objects/tasks. Plan 50 needs only existing git-mv/publish actions; retain Story 8's pull observations and scenarios when integrating. |
+| Pull tests | Plan 50 extends notebookPull.fastForward.suite.ts. Divergent suites/registration stay with the delivered Story 8 tests. Keep suite registration serialized to preserve temporary-directory leak checks. |
+| Planning | Update only Story 12 and this PLAN from this workstream. |
 | Verification | Serialize backend/E2E runs against a shared test DB/SUT, or use explicitly separate service instances. Do not run destructive test setup concurrently against the same databases. |
 
-Before merging the second completed change, reconcile shared files and run
-the combined affected CLI suites, backend suite if backend boundaries changed,
-and focused installed feature on the integrated source. Verify sequential
-receipt of relocation remains supported and Plan 53's divergent structural
-history remains rejected. This is integration verification, not another story
-or a requirement that Plan 53 finish before Plan 50's backend work can start.
-Global backlog order remains unchanged.
+Before merging, reconcile shared files and run the combined affected CLI
+suites, backend suite if backend boundaries changed, and focused installed
+feature. Verify sequential receipt of relocation remains supported and
+divergent structural history with unpublished local work remains rejected.
+This is integration verification, not another story. Global backlog order
+remains unchanged.
 
 ## Promise ownership and refinement mapping
 
@@ -295,7 +294,7 @@ Behavior: Owner commits an eligible relocation/rename → installed publish →
 sees the note at its final location. Reuse existing git-mv task/page objects
 and note-view assertions. Snapshot only the initial fixture baseline; never
 resnapshot after the action under test. Coordinate shared feature edits with
-Plan 53; no additional harness or rebase path.
+the delivered Story 8 pull scenarios; no additional harness or rebase path.
 Sizing: ~5 minutes active work, high confidence; existing scenario vocabulary.
 
 ### 11. Explain supported relocation in existing CLI guidance
@@ -307,7 +306,7 @@ the existing installed exact-copy expectation consistently.
 
 Behavior: Owner reads next steps → understands how to publish a relocation
 without being promised folder creation, overwrite or structural rebase.
-Extend the completed Plan 52 wording. Integrate Plan 53's content-only
+Extend the completed Plan 52 wording. Integrate Story 8's content-only
 pull→inspect→publish guidance without replacing it. Run clone tests; run the
 focused installed feature when its expectation changes.
 Sizing: ~5 minutes active work, medium confidence; one guidance loop, with
@@ -335,7 +334,7 @@ accepted head/tree and ancestry, clean main and no Portable metadata.
 Behavior: Another clean eligible checkout pulls accepted history → receives
 the note's final path and later edit without history loss. Extend the existing
 rename receipt fixture in notebookPull.fastForward.suite.ts; keep backend
-acceptance ownership in leaf 12. No production rebase changes. Retain Plan 53's
+acceptance ownership in leaf 12. No production rebase changes. Retain Story 8's
 structural-divergence rejection tests when both changes are integrated.
 Sizing: ~5 minutes active work, high confidence; one fast-forward proof loop.
 

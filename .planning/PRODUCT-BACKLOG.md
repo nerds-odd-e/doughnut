@@ -3,9 +3,10 @@
 ## Near-future direction
 
 Let notebook owners refine notes in Obsidian or an AI IDE and Donut without
-discarding either side's work or losing learning history. Build on the delivered
-sequential Git workflow by next handling concurrent local and web content edits,
-then broader reorganization. This advances the direction in
+discarding either side's work or losing learning history. Non-overlapping
+other-note concurrent edits can already be pulled and then published. Next
+among notebook-sync stories is overlapping same-note handling, then broader
+reorganization. This advances the direction in
 [Proposed ADR 0002](../docs/adrs/0002-git-native-portable-notebook-synchronization.md);
 the selected queue does not cover its complete synchronization contract.
 Worktree test isolation takes immediate priority so concurrent development tasks

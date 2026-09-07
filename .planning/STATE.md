@@ -6,9 +6,9 @@ current_phase: null
 current_phase_name: null
 status: ready
 stopped_at: null
-last_updated: "2026-09-05T00:12:00Z"
-last_activity: 2026-09-05
-last_activity_desc: "added ordered product backlog of unfinished story titles"
+last_updated: "2026-09-07T18:40:00Z"
+last_activity: 2026-09-07
+last_activity_desc: "Story 8 other-note rebase delivered; product backlog revisited"
 progress:
   total_phases: 0
   completed_phases: 0
@@ -40,6 +40,8 @@ Daily probe measurement (not an ADR): [daily-probe-protocol.md](notes/daily-prob
 
 Parked undecomposed seeds: SEED-001, SEED-002, SEED-006, SEED-007, SEED-008.
 Git-native Portable notebook tree synchronization is proposed in ADR 0002;
-remaining v1 stories live in SEED-009. See [ROADMAP.md](ROADMAP.md).
+remaining v1 stories live in SEED-009. Story 8 other-note rebase is delivered;
+Story 9 still needs its overlap-policy decision before slice planning. See
+[ROADMAP.md](ROADMAP.md).
 
 Recent ad-hoc work: `noteProperty` / **property panel** / `#prop:` wiki (ADR 0001 / ADR 0004 / ADR 0005); E2E named-route honesty and SPA hydrate protocol (E2E helpers, `MainMenu.vue`); daily probe side tap ([daily-probe-protocol.md](notes/daily-probe-protocol.md)); live authored-note-reference resolution; question-generation batch latest-only retry + failed-request purge; recall E2E suite cut (~78% wall time).

@@ -20,9 +20,11 @@ Healthy mainline for learning and knowledge work.
 
 Portable content format follows Accepted ADR 0004. The Git workflow in
 [SEED-009](seeds/SEED-009-git-backed-local-notebook-workflow.md) has delivered
-clone, sequential content publish/pull, additions, isolated deletion, and
-same-folder identity-preserving rename. Content divergence/conflict handling
-is next in [the product backlog](PRODUCT-BACKLOG.md). These bounded deliveries
+clone, sequential content publish/pull, additions, isolated deletion,
+same-folder identity-preserving rename, and non-overlapping other-note rebase.
+Overlapping same-note handling is next among notebook-sync stories; worktree
+test isolation currently precedes that in
+[the product backlog](PRODUCT-BACKLOG.md). These bounded deliveries
 advance the direction in Proposed
 [ADR 0002](../docs/adrs/0002-git-native-portable-notebook-synchronization.md);
 they do not establish full v1 synchronization. Catalog ZIP download remains

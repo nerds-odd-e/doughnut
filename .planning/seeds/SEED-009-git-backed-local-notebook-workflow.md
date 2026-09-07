@@ -389,9 +389,9 @@ Donut. This is useful even if moving between folders is deferred indefinitely.
 
 ### 8. Keep non-overlapping accumulated local and web changes
 
-**Status:** delivered on 2026-09-07 through Plan 53
-([`053-reconcile-local-web-content`](../quick/053-reconcile-local-web-content/PLAN.md)).
-Do not mark Story 9 or broader Git synchronization delivered.
+**Status:** delivered on 2026-09-07 (`cae5ed116f`). The completed quick plan
+was removed; recover the last full execution PLAN from `b6915a3cd8`. Do not
+mark Story 9 or broader Git synchronization delivered.
 
 **Goal**
 
@@ -446,19 +446,35 @@ commit batching, or new metadata in the Portable tree.
 
 ### 9. Resolve an overlapping edit with ordinary Git
 
+**Status:** not started. Story 8 is delivered. Same-path overlap currently
+names the path, refuses rebase, and leaves the checkout unchanged — including
+disjoint paragraphs and remote edit-then-restore. This story replaces that
+refusal for overlapping same-note content; it does not reopen other-note
+rebase, structural divergence, or drift repair.
+
 - **For / why:** The owner needs conflicting local and web refinements to be
   detected and resolved without a Donut-specific merge format.
 - **Evaluation:** Local and remote commits overlap in one Markdown file.
-  Synchronization presents an ordinary Git rebase conflict, leaves the accepted
-  remote unchanged, and, after the owner resolves and continues the rebase,
-  accepts the resulting linear history and displays the resolution in Donut.
-- **Scope / examples:** Begin with one unpublished content edit conflicting
-  with an accepted web content edit at the same unchanged path. Resolve and
-  continue → publish the resolved content on the same note identity. Abort →
-  recover the original unpublished work without altering accepted history.
-  Delete/edit and rename/edit conflicts are deferred: a clean text result or
-  conflict resolution must not silently authorize restoration, same-path
+  Synchronization uses ordinary Git rebase (conflict or Git's own auto-merge),
+  leaves the accepted remote unchanged until explicit publish, and, after the
+  owner finishes or aborts, either accepts the resulting linear history in
+  Donut or recovers the original unpublished work.
+- **Scope / examples:** Reuse Story 8's local shape: one unpublished
+  existing-note content commit, clean bound `main`, no active operation.
+  Pull still does not publish; after a clean or continued rebase the owner
+  runs `donut notebook publish`. Abort recovers original L (Story 8 already
+  keeps L in ordinary Git recovery on success; abort must keep that promise
+  without catch-and-reset of user files).
+  First increment: both current tips still differ at that unchanged path.
+  Delete/edit and rename/edit conflicts remain deferred: a clean text result
+  or conflict resolution must not silently authorize restoration, same-path
   recreation, or a change of private identity.
+- **Open for refinement before planning:** Story 8 judged overlap by the
+  accepted *interval* (path touched), not by Git's ability to merge text.
+  Decide whether the first increment starts rebase for every such overlap
+  (disjoint paragraphs and edit-then-restore may auto-merge) or only when
+  current blobs still differ and Git would conflict, leaving auto-mergeable
+  same-path cases on today's refusal.
 - **Rename delivery boundary:** Splitting a rename and edit into local commits
   is not yet sufficient for publication: the rename must first be published
   and accepted. This story does not add publication of a multi-commit range
@@ -466,9 +482,10 @@ commit batching, or new metadata in the Portable tree.
 - **Value / learning:** Completes the safety promise for overlapping
   accumulated changes while validating that standard Git conflict handling is
   understandable in the CLI-assisted v1 workflow.
-- **Effort hypothesis:** M — low confidence; assumes standard text conflict
-  behavior is adequate for the first overlapping Markdown case.
-- **Depends on:** Story 8.
+- **Effort hypothesis:** M — low confidence; Story 8 already owns detection
+  and the one-commit rebase machinery. Remaining risk is conflict/abort UX and
+  the interval-vs-Git-merge policy above.
+- **Depends on:** delivered Story 8.
 - **Safe stopping point:** Cancelling or abandoning conflict resolution loses
   neither the accepted remote commit nor the user's original local commit.
 
@@ -527,9 +544,9 @@ authored Git commit and see the complete change in Donut.
 
 **Status:** re-refined on 2026-09-07 and
 [slice-plan refined](../quick/050-relocate-local-note/PLAN.md); not implemented.
-Story 6 and Plan 52's guidance/diagnostic corrections are delivered. Selected
-for parallel-work planning alongside Story 8; Stories 8 and 9 retain their
-backlog order but are not technical prerequisites. This refinement does not
+Story 6 and Plan 52's guidance/diagnostic corrections are delivered. Story 8
+content rebase is delivered. Stories 9 and 12 retain their backlog order;
+neither is a technical prerequisite of the other. This refinement does not
 start execution.
 
 **Goal**
@@ -625,20 +642,24 @@ learning history again. Renaming in place cannot achieve this outcome.
   Story 6's identity contract remains usable. This is a behavior-level
   hypothesis, not an estimate inferred from implementation size.
 - **Depends on:** Story 6's delivered identity-preserving publication contract.
-  Stories 8 and 9 are higher priorities, not technical prerequisites.
+  Story 9 is a higher product priority, not a technical prerequisite.
 - **Safe stopping point:** Owners can rename and file one note while whole
   folder moves remain unsupported.
 - **Open decisions:** none within existing represented destinations.
-- **Parallel boundary:** Plan 50 owns relocation publication and its proofs;
-  Plan 53 owns content rebase. An accepted relocation remains receivable by a
-  clean checkout, while divergent structural history remains outside Story 8.
-  Coordinate shared CLI guidance and installed-feature edits as recorded in
-  Plan 50; do not expand either story to reconcile moves with concurrent edits.
+- **Parallel boundary:** Plan 50 owns relocation publication and its proofs.
+  Story 8's other-note content rebase is delivered: an accepted relocation
+  remains receivable by a clean checkout; pull still rejects divergent
+  structural history while unpublished local work exists. Do not expand
+  relocation to rebase a local content edit over a move, or a move over local
+  edits. Shared clone/pull guidance and the installed clone feature already
+  include Story 8's pull observations; keep relocation guidance from claiming
+  structural rebase.
 
 ## Ordering and Scope Reduction
 
 Stories 1–6, 8, and 11 are delivered. The [product backlog](../PRODUCT-BACKLOG.md)
-owns the global story order; Story 9 is next among unfinished SEED-009 stories.
+owns the global story order. Among unfinished SEED-009 stories, Story 9 is next;
+SEED-015 worktree isolation currently precedes it in that queue.
 
 ### Learning from the delivered rename story
 
@@ -691,6 +712,26 @@ owns the global story order; Story 9 is next among unfinished SEED-009 stories.
   [reserved-path proof](../../backend/src/test/java/com/odde/donut/controllers/NotebookGitDeletedDestinationControllerTest.java),
   and [container proof](../../backend/src/test/java/com/odde/donut/controllers/NotebookGitDeletionContainerPublicationControllerTest.java).
 
+### Learning from the delivered other-note rebase story
+
+- **Explicit pull then publish is the workflow.** Eligible other-note content
+  rebase uses system Git `--onto`; pull names the unpublished local head
+  separately from accepted head and does not POST. Publication of L′ keeps
+  original note identities and learning data on the existing one-child
+  contract. Repeat pull of an already-based commit is unchanged success.
+- **Same-path is still a refusal, not a Git merge.** Overlap walks every
+  accepted edge with rename inference disabled. Disjoint paragraphs and remote
+  edit-then-restore both name the path and leave the checkout unchanged.
+  Story 9 must choose whether starting ordinary rebase should include
+  auto-mergeable same-path cases or only live blob conflicts.
+- **Structural divergence with unpublished local work stays rejected.** Remote
+  rename, delete/recreate, README, and mode — including a later reversal —
+  stop before rebase. A clean checkout can still fast-forward an accepted
+  rename or deletion. Story 12 must not treat Story 8 as structural rebase.
+- **Drift remains visible, not repaired.** Pull downloads accepted history
+  only; publication still rejects projection mismatch and retains local work.
+  Do not promote drift recovery from this delivery alone.
+
 These are implementation and executable-example findings, not evidence of
 real-user frequency or satisfaction. The removed plan has no reliable completed
 duration summary; do not infer actual effort from commit timestamps or claim
@@ -721,12 +762,12 @@ essential; the split removes folder policy rather than disguising it as tests.
 
 ### Priority and deferred follow-ons
 
-Same-folder renaming has delivered the first identity promise. Content
-divergence and conflict handling remain next because ordinary local/web
-overlap blocks the delivered lifecycle. Single-note relocation follows them,
-then whole-folder moves; this preserves the earlier choice to address broader workflow blockage before
-folder policy. Story 12 depends on Story 6, and Story 7 follows Story 12.
-Batching improves history quality after synchronization works.
+Same-folder renaming has delivered the first identity promise. Non-overlapping
+other-note concurrent edits can be pulled and then published. Overlapping
+same-note handling remains next among notebook-sync stories because that
+refusal still blocks the delivered lifecycle. Single-note relocation follows
+them, then whole-folder moves. Story 12 depends on Story 6, and Story 7 follows
+Story 12. Batching improves history quality after synchronization works.
 
 No new feature story is promoted from the deletion or rename proofs alone.
 Keep these possibilities deferred until the stated learning warrants selecting
@@ -743,6 +784,11 @@ and refining a concrete outcome:
 - **Web structural synchronization or drift recovery:** revisit when web
   creation/deletion/moves interrupt the local workflow. Stories 8 and 9 must
   not claim to repair an uncommitted projection change through Git rebase.
+  Story 8 confirmed pull ignores unsynchronized web content and publish still
+  rejects drift; that is not a new selected story.
+- **Same-path auto-merge and remote edit-then-restore:** Story 8 refuses both.
+  Revisit with Story 9's interval-vs-Git-merge decision; do not enqueue a
+  separate story until that first overlapping-content outcome is chosen.
 - **Delete/edit or rename/edit conflicts and multiple unpublished commits:** revisit after
   the first content divergence/conflict workflow; explicitly settle identity
   intent before broadening conflict resolution to deletion or recreation.
@@ -761,14 +807,13 @@ Safe stopping points:
   identity within its refined correspondence boundary.
 - After Story 10: web-authored history also has the desired editing granularity.
 
-First-to-defer order among unfinished queued stories is:
+First-to-defer order among unfinished queued SEED-009 stories is:
 
 1. Story 10, accepting extra immutable web commits.
 2. Story 7, rejecting folder moves while retaining note relocation.
 3. Story 12, retaining same-folder rename while deferring cross-folder filing.
-4. Story 9, retaining automatic non-conflicting content rebase from Story 8
-   while stopping safely on text conflicts.
-5. Story 8, retaining the explicitly sequential synchronize-before-edit loop.
+4. Story 9, retaining automatic non-conflicting other-note rebase from Story 8
+   while stopping safely on unresolved same-path overlap.
 
 The delivered and queued boundaries still leave parts of Proposed ADR 0002
 uncovered, including web structural synchronization and broader accumulated
@@ -777,9 +822,11 @@ Unsupported operations must fail clearly rather than be approximated.
 
 ## Open Decisions
 
-No open decision blocks the bounded rename and relocation stories. Same-path
-creation, unrepresented empty descendants in folder moves, and structural conflict
-policies need refinement before those capabilities are selected or expanded.
+No open decision blocks the bounded rename and relocation stories. Story 9's
+first increment still needs the interval-vs-Git-merge overlap policy recorded
+in that story before slice planning. Same-path creation, unrepresented empty
+descendants in folder moves, and structural conflict policies need refinement
+before those capabilities are selected or expanded.
 
 ADR 0002 now reflects the later human discussion recorded here: v1 permits a
 required CLI-assisted acquisition and synchronization workflow and defers direct
@@ -793,8 +840,9 @@ the revision/merge model and adds no Donut metadata to the Portable tree.
 
 ## When to Surface
 
-Stories 1–6 and 11 are delivered. Select one remaining story from the
-[product backlog](../PRODUCT-BACKLOG.md) before slice planning. Do not turn
+Stories 1–6, 8, and 11 are delivered. Select one remaining story from the
+[product backlog](../PRODUCT-BACKLOG.md) before slice planning. Story 9 still
+needs the overlap-policy decision above before slice planning. Do not turn
 the whole seed into one executable plan. Reconcile the Proposed ADR's v1 CLI
 boundary as a human-owned advice task; it does not change these story outcomes.
 
