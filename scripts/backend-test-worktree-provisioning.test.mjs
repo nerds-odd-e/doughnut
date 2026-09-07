@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict'
-import { existsSync, readFileSync, rmSync } from 'node:fs'
+import { existsSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { test } from 'node:test'
 import {
   assertRefusedBeforeGradle,
@@ -130,6 +130,27 @@ test('an overlapping command refuses while first-use provisioning is in flight, 
     JSON.parse(readFileSync(configPath, 'utf8')),
     provisionedConfig
   )
+})
+
+test('an identity published by another actor during provisioning is preserved, and the launcher refuses without adopting either database', async (t) => {
+  const checkout = makeCheckout(t)
+  const owner = runLauncherAsync(checkout, { env: { MYSQL_HOLD: '1' } })
+  await owner.waitForMysqlReached()
+
+  // While the launcher's own mysql call is held (after it succeeded, before
+  // the launcher writes its config), another actor publishes a config first.
+  const configPath = `${checkout.root}/.worktree.local.json`
+  const winningConfig = JSON.stringify({ id: 'wt_winner' })
+  writeFileSync(configPath, winningConfig)
+
+  owner.releaseMysql()
+  const result = await owner.waitForExit()
+
+  assertRefusedBeforeGradle(checkout, result)
+  assert.match(outputOf(result), /EEXIST/)
+  // The winning config is untouched, byte-for-byte: not overwritten with the
+  // launcher's own generated id, and not adopted/rewritten either.
+  assert.equal(readFileSync(configPath, 'utf8'), winningConfig)
 })
 
 test('existing configuration skips provisioning entirely', (t) => {

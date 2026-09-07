@@ -34,6 +34,24 @@ function writeStandIn(scriptPath, lines) {
   chmodSync(scriptPath, 0o755)
 }
 
+// Shell lines implementing a stand-in's hold/release protocol: when `envVar`
+// is set, the stand-in announces it has been reached (writing to
+// <root>/<reachedName>) and then blocks until <root>/<releaseName> appears,
+// polling every 50ms. Lets a test pause a stand-in mid-invocation to inject
+// external activity at that exact point. Shared by the gradlew and mysql
+// stand-ins below.
+function holdReleaseLines(envVar, reachedName, releaseName) {
+  return [
+    `if [ -n "\${${envVar}:-}" ]; then`,
+    `  printf 'reached\\n' > "$root/${reachedName}"`,
+    `  release="$root/${releaseName}"`,
+    '  while [ ! -e "$release" ]; do',
+    '    sleep 0.05',
+    '  done',
+    'fi',
+  ]
+}
+
 export function makeCheckout(t, { config } = {}) {
   const root = mkdtempSync(path.join(tmpdir(), 'backend-test-worktree-'))
   t.after(() => rmSync(root, { recursive: true, force: true }))
@@ -61,13 +79,7 @@ export function makeCheckout(t, { config } = {}) {
     '} > "$record"',
     "printf 'GRADLE_STDOUT\\n'",
     "printf 'GRADLE_REACHED\\n' >&2",
-    'printf \'reached\\n\' > "$root/gradle-reached"',
-    'if [ -n "${GRADLE_HOLD:-}" ]; then',
-    '  release="$root/gradle-release"',
-    '  while [ ! -e "$release" ]; do',
-    '    sleep 0.05',
-    '  done',
-    'fi',
+    ...holdReleaseLines('GRADLE_HOLD', 'gradle-reached', 'gradle-release'),
     'exit "${FAKE_GRADLE_EXIT:-0}"',
   ])
 
@@ -85,6 +97,8 @@ export function makeCheckout(t, { config } = {}) {
   mkdirSync(binDir, { recursive: true })
   const mysqlStandIn = path.join(binDir, 'mysql')
   const mysqlInvocation = path.join(root, 'mysql-invocation')
+  const mysqlReached = path.join(root, 'mysql-reached')
+  const mysqlRelease = path.join(root, 'mysql-release')
   writeStandIn(mysqlStandIn, [
     '#!/bin/sh',
     'root="$(CDPATH= cd -- "$(dirname "$0")/.." && pwd)"',
@@ -97,6 +111,7 @@ export function makeCheckout(t, { config } = {}) {
     '    printf \'stdin:%s\\n\' "$(cat)"',
     '  fi',
     '} > "$record"',
+    ...holdReleaseLines('MYSQL_HOLD', 'mysql-reached', 'mysql-release'),
     'exit "${FAKE_MYSQL_EXIT:-0}"',
   ])
 
@@ -109,6 +124,8 @@ export function makeCheckout(t, { config } = {}) {
     binDir,
     mysqlStandIn,
     mysqlInvocation,
+    mysqlReached,
+    mysqlRelease,
   }
 }
 
@@ -191,6 +208,12 @@ export function runLauncherAsync(checkout, { env = {}, args = [] } = {}) {
   return {
     waitForGradleReached: () => waitForFile(checkout.gradleReached),
     release: () => writeFileSync(checkout.gradleRelease, ''),
+    // Waits for the checkout's mysql stand-in to reach and hold
+    // (MYSQL_HOLD), then releases it. Used to inject an external config
+    // writer between MySQL provisioning succeeding and the launcher's own
+    // exclusive config write.
+    waitForMysqlReached: () => waitForFile(checkout.mysqlReached),
+    releaseMysql: () => writeFileSync(checkout.mysqlRelease, ''),
     waitForExit: () => exited,
   }
 }

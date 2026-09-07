@@ -349,12 +349,26 @@ path using slice 3's stand-in.
 
 ### 9. Preserve an identity published during first-use setup
 Type: Behavior
-Status: planned
+Status: done
 Proof: Arrange for an external writer in the command fixture to create a valid
 config after MySQL provisioning but before the launcher's exclusive config
 write. The command exits nonzero, preserves that exact config, never reaches
 Gradle, and does not select either database as fallback. Run
 `node --test scripts/backend-test-worktree.test.mjs`.
+
+Learning: Verified the existing `fs.writeFileSync(path, data, { flag: 'wx' })`
+config write (slice 4) already propagates an EEXIST collision as a script
+failure correctly — no production change was needed. Proved it with a race
+test: extended the slice-1 gradlew hold/release convention to the mysql
+stand-in (`MYSQL_HOLD`/`mysql-reached`/`mysql-release`, now both exposed via
+shared `owner.waitForGradleReached()`/`owner.waitForMysqlReached()` etc. on
+the `runLauncherAsync` handle, deduplicated through a shared
+`holdReleaseLines` helper). While mysql is held "succeeded", an external
+writer publishes a winning config; releasing mysql lets the launcher's write
+collide (EEXIST), exit nonzero, and leave the winning config byte-identical
+and gradle unreached.
+`CURSOR_DEV=true nix develop -c pnpm test:backend-test-worktree` passes
+(23/23).
 
 Behavior: Another actor publishes checkout configuration while first-use setup
 is completing → the launcher loses the exclusive write → the established
