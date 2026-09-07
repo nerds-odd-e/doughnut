@@ -1,17 +1,16 @@
 import * as path from 'node:path'
 import { withDownloadedAcceptedNotebookHistory } from './notebookAcceptedHistory.js'
 import { assertLocalMainIsReadyToReceive } from './notebookCheckoutReadiness.js'
+import { inspectUnpublishedLocalHistory } from './notebookLocalCandidate.js'
 import { runSystemGitOrThrow } from './systemGit.js'
 
-const RECEIVE_ANCESTRY_ERROR =
-  'Local main cannot receive the accepted history because it contains unpublished or unrelated commits. ' +
-  'Publish or reconcile those commits, then try again.'
 const RECEIVE_CHECKOUT_CHANGED =
   'Local main changed while the accepted history was downloading. Try again from the unchanged clean main.'
 
 interface AcceptedNotebookReceiveResult {
+  kind: 'unchanged' | 'already-based' | 'rebased' | 'fast-forward'
   acceptedHead: string
-  changed: boolean
+  localHead: string
 }
 
 function readHead(directory: string): string {
@@ -33,8 +32,10 @@ function assertCheckoutStillReady(
 }
 
 /**
- * Downloads accepted history and advances an unchanged, clean local main with Git's non-forced
- * fast-forward operation. Imported objects do not install a remote or a persistent remote ref.
+ * Downloads accepted history and advances an unchanged, clean local main: equal heads stay
+ * unchanged, an eligible already-based unpublished commit stays unpublished, eligible other-note
+ * divergence rebases, and ancestor checkouts fast-forward. Imported objects do not install a
+ * remote or a persistent remote ref.
  */
 export async function receiveAcceptedNotebookHead(
   directory: string,
@@ -48,7 +49,11 @@ export async function receiveAcceptedNotebookHead(
       assertCheckoutStillReady(directory, capturedHead)
 
       if (capturedHead === acceptedHead) {
-        return { acceptedHead, changed: false }
+        return {
+          kind: 'unchanged',
+          acceptedHead,
+          localHead: capturedHead,
+        }
       }
 
       runSystemGitOrThrow(
@@ -64,22 +69,19 @@ export async function receiveAcceptedNotebookHead(
         (detail, status) =>
           `failed to import local main for ancestry inspection${detail ? `: ${detail}` : ` (exit code ${status})`}`
       )
-      const localCommitOutsideAcceptedHistory = runSystemGitOrThrow(
-        [
-          '-C',
-          acceptedRepoDir,
-          'rev-list',
-          '--max-count=1',
-          capturedHead,
-          '--not',
+      const localHistory = inspectUnpublishedLocalHistory(
+        acceptedRepoDir,
+        capturedHead,
+        acceptedHead
+      )
+      if (localHistory.kind === 'reject') throw new Error(localHistory.message)
+      if (localHistory.kind === 'already-based') {
+        return {
+          kind: 'already-based',
           acceptedHead,
-        ],
-        (detail, status) =>
-          `failed to inspect local main's ancestry${detail ? `: ${detail}` : ` (exit code ${status})`}`
-      ).trim()
-
-      if (localCommitOutsideAcceptedHistory)
-        throw new Error(RECEIVE_ANCESTRY_ERROR)
+          localHead: capturedHead,
+        }
+      }
 
       runSystemGitOrThrow(
         [
@@ -97,13 +99,37 @@ export async function receiveAcceptedNotebookHead(
       )
 
       assertCheckoutStillReady(directory, capturedHead)
+      if (localHistory.kind === 'rebase') {
+        runSystemGitOrThrow(
+          [
+            '-C',
+            directory,
+            'rebase',
+            '--onto',
+            acceptedHead,
+            localHistory.localParent,
+          ],
+          (detail, status) =>
+            `failed to rebase the unpublished local commit onto the accepted head${detail ? `: ${detail}` : ` (exit code ${status})`}`
+        )
+        return {
+          kind: 'rebased',
+          acceptedHead,
+          localHead: readHead(directory),
+        }
+      }
+
       runSystemGitOrThrow(
         ['-C', directory, 'merge', '--quiet', '--ff-only', acceptedHead],
         (detail, status) =>
           `failed to fast-forward local main to the accepted head${detail ? `: ${detail}` : ` (exit code ${status})`}`
       )
 
-      return { acceptedHead, changed: true }
+      return {
+        kind: 'fast-forward',
+        acceptedHead,
+        localHead: acceptedHead,
+      }
     }
   )
 }

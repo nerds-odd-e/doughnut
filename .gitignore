@@ -153,5 +153,8 @@ tt/
 sut.log
 sut.log.*
 sut.pid
+
+# checkout-local worktree identity (opt-in backend tests)
+/.worktree.local.json
 # CocoIndex Code (ccc)
 /.cocoindex_code/

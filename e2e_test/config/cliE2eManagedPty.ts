@@ -64,10 +64,20 @@ async function waitForInteractiveCliTranscriptIdle(
   )
 }
 
+function cliOutputBlock(transcript: string): string {
+  const output = transcript.trim()
+  return `CLI output:\n${output === '' ? '(empty)' : output}`
+}
+
+function errorWithCliOutput(message: string, transcript: string): Error {
+  return new Error(`${message}\n\n${cliOutputBlock(transcript)}`)
+}
+
 export function waitForPtyExit(
   pty: PtyWithOnExit,
   expectCode: number,
-  timeoutMs: number
+  timeoutMs: number,
+  getTranscript: () => string
 ): Promise<void> {
   return new Promise((resolve, reject) => {
     let timeoutId: ReturnType<typeof setTimeout> | undefined
@@ -78,17 +88,20 @@ export function waitForPtyExit(
         resolve()
         return
       }
+      const signalPart = signal != null ? ` (signal ${signal})` : ''
       reject(
-        new Error(
-          `CLI exited with code ${exitCode}${signal != null ? ` (signal ${signal})` : ''}`
+        errorWithCliOutput(
+          `CLI exited with code ${exitCode}${signalPart}`,
+          getTranscript()
         )
       )
     })
     timeoutId = setTimeout(() => {
       sub.dispose()
       reject(
-        new Error(
-          `Timeout after ${timeoutMs}ms waiting for non-interactive CLI to exit`
+        errorWithCliOutput(
+          `Timeout after ${timeoutMs}ms waiting for non-interactive CLI to exit`,
+          getTranscript()
         )
       )
     }, timeoutMs)

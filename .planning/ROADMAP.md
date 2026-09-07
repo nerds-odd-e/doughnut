@@ -17,9 +17,11 @@ Selected unfinished stories: [PRODUCT-BACKLOG.md](PRODUCT-BACKLOG.md).
 
 Parked undecomposed seeds: SEED-001, SEED-002, SEED-006, SEED-007, SEED-008.
 Git-backed notebook work is active through ad-hoc SEED-009 stories, with
-sequential editing and same-folder renaming delivered. The next selected
-outcomes address content divergence and conflicts. Proposed ADR 0002 remains
-the broader direction; completing the current queue will not cover all of it.
+sequential editing, same-folder renaming, identity-preserving note relocation,
+and non-overlapping other-note rebase delivered. Remaining notebook-sync
+stories start with overlapping same-note handling, then folder moves.
+Worktree test isolation currently precedes that in the product backlog. Proposed ADR 0002 remains the broader
+direction; completing the current queue will not cover all of it.
 
 ---
 *Last updated: 2026-09-07*

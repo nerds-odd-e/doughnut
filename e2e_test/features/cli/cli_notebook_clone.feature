@@ -141,3 +141,34 @@ Feature: CLI notebook clone
     Then the note content markdown source should contain "# Author annotation"
     And the note content markdown source should contain "custom:"
     And the note content markdown source should contain "  source: 'local'"
+
+  Scenario: Pulling then publishing keeps a local Pasta edit and a web Overview save
+    When I clone the notebook "CLI Clone Notebook" into a temporary destination using the installed CLI
+    And I commit the following edit to "Recipes/Pasta.md" in the cloned checkout:
+      """
+      ---
+      type: Note
+      author: Chef Boyardee
+      ---
+      Simmer until al dente
+      """
+    And I open the note "Overview" for editing
+    And I view the note content as rich content
+    And I update note "Overview" content to become "Weekly meal plan"
+    When I pull the cloned checkout using the installed CLI
+    Then the cloned checkout is a clean rebased child of the accepted head
+    And the cloned checkout retains the original local commit for "Recipes/Pasta.md"
+    And "Overview.md" in the cloned checkout matches the accepted parent
+    And the cloned checkout file "Recipes/Pasta.md" is:
+      """
+      ---
+      type: Note
+      author: Chef Boyardee
+      ---
+      Simmer until al dente
+      """
+    And note "Pasta" should have content "Boil water"
+    When I publish the cloned checkout using the installed CLI
+    Then the installed CLI reports the rebased local head as the accepted head
+    And I should see note "CLI Clone Notebook/Recipes/Pasta" has content "Simmer until al dente"
+    And I should see note "CLI Clone Notebook/Overview" has content "Weekly meal plan"

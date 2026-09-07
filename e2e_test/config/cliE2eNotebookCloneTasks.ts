@@ -10,9 +10,14 @@ import { join, relative } from 'node:path'
 
 export interface CliNotebookCheckoutState {
   head: string
+  parent: string
   branch: string
   rootCommitCount: string
   status: string
+  author: string
+  message: string
+  blobs: Record<string, string>
+  parentBlobs: Record<string, string>
 }
 
 function listFilesRecursively(dir: string, base: string): string[] {
@@ -44,6 +49,33 @@ function commitCheckout(checkoutDir: string, message: string): string {
   return git(checkoutDir, 'rev-parse', 'HEAD')
 }
 
+function firstParent(checkoutDir: string): string {
+  const parts = git(
+    checkoutDir,
+    'rev-list',
+    '--parents',
+    '-n',
+    '1',
+    'HEAD'
+  ).split(' ')
+  return parts[1] ?? ''
+}
+
+function blobsAt(checkoutDir: string, treeish: string): Record<string, string> {
+  const output = git(checkoutDir, 'ls-tree', '-r', treeish)
+  if (!output) return {}
+  return Object.fromEntries(
+    output.split('\n').map((line) => {
+      const tab = line.indexOf('\t')
+      if (tab < 0) {
+        throw new Error(`unexpected git ls-tree line: ${line}`)
+      }
+      const hash = line.slice(0, tab).split(' ')[2] ?? ''
+      return [line.slice(tab + 1), hash]
+    })
+  )
+}
+
 export function createCliE2eNotebookCloneTasks() {
   return {
     /** A destination path that does not yet exist, inside a fresh test-owned temp dir. */
@@ -57,8 +89,10 @@ export function createCliE2eNotebookCloneTasks() {
     readCliNotebookCheckoutState(
       checkoutDir: string
     ): CliNotebookCheckoutState {
+      const parent = firstParent(checkoutDir)
       return {
         head: git(checkoutDir, 'rev-parse', 'HEAD'),
+        parent,
         branch: git(checkoutDir, 'rev-parse', '--abbrev-ref', 'HEAD'),
         rootCommitCount: git(
           checkoutDir,
@@ -68,6 +102,10 @@ export function createCliE2eNotebookCloneTasks() {
           'HEAD'
         ),
         status: git(checkoutDir, 'status', '--porcelain'),
+        author: git(checkoutDir, 'log', '-1', '--format=%an <%ae>'),
+        message: git(checkoutDir, 'log', '-1', '--format=%s'),
+        blobs: blobsAt(checkoutDir, 'HEAD'),
+        parentBlobs: parent ? blobsAt(checkoutDir, parent) : {},
       }
     },
     /** Relative file paths of the checkout, excluding `.git`, for canonical-tree assertions. */

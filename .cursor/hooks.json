@@ -19,6 +19,18 @@
         "timeout": 5,
         "loop_limit": 5
       }
+    ],
+    "afterFileEdit": [
+      {
+        "command": "node .cursor/hooks/strip-extra-trailing-newlines.mjs",
+        "timeout": 5
+      }
+    ],
+    "afterTabFileEdit": [
+      {
+        "command": "node .cursor/hooks/strip-extra-trailing-newlines.mjs",
+        "timeout": 5
+      }
     ]
   }
 }

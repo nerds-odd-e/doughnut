@@ -46,7 +46,8 @@ export async function runInstalledCliExpectingExit(
     await waitForPtyExit(
       managed.session.pty,
       expectedExitCode,
-      NON_INTERACTIVE_CLI_EXIT_TIMEOUT_MS
+      NON_INTERACTIVE_CLI_EXIT_TIMEOUT_MS,
+      () => managed.session.buf.text
     )
     pty.setHandle(managed)
   } catch (e) {

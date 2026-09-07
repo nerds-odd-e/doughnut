@@ -21,6 +21,10 @@ mysql_nix_prepare_datadir() {
   fi
 }
 
+# One mysqld serves every local database. Concurrent worktree test suites
+# each open many Hikari pools; 1000 is the instance-wide slot count.
+MYSQL_NIX_MAX_CONNECTIONS=1000
+
 mysql_nix_start_mysqld_background() {
   "${MYSQL_BASEDIR}/bin/mysqld" \
     --datadir="${MYSQL_DATADIR}" \
@@ -29,6 +33,7 @@ mysql_nix_start_mysqld_background() {
     --socket="${MYSQL_UNIX_SOCKET}" \
     --mysqlx-socket="${MYSQLX_UNIX_SOCKET}" \
     --mysqlx_port="${MYSQLX_TCP_PORT}" \
+    --max-connections="${MYSQL_NIX_MAX_CONNECTIONS}" \
     --tls-version=TLSv1.2 > "${MYSQL_HOME}/mysql.log" 2>&1 &
 }
 
@@ -41,5 +46,6 @@ mysql_nix_exec_mysqld_foreground() {
     --socket="${MYSQL_UNIX_SOCKET}" \
     --mysqlx-socket="${MYSQLX_UNIX_SOCKET}" \
     --mysqlx_port="${MYSQLX_TCP_PORT}" \
+    --max-connections="${MYSQL_NIX_MAX_CONNECTIONS}" \
     --tls-version=TLSv1.2
 }
