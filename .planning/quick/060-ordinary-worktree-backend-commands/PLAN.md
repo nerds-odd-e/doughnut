@@ -1,7 +1,7 @@
 # Ordinary backend commands use the owning worktree database
 
 Source: [SEED-015 story 1c](../../seeds/SEED-015-concurrent-worktree-environments.md#story-1c).
-Status: in progress; slices 1–8 done.
+Status: in progress; slices 1–9 done.
 
 ## Goal and scope
 
@@ -188,7 +188,7 @@ Sizing: ~5 minutes, medium confidence; extend existing asynchronous fixture.
 
 ### 9. Prove real concurrency through ordinary pnpm commands
 Type: Behavior
-Status: planned
+Status: done
 Proof: Two fresh disposable linked worktrees overlap `pnpm backend:test` and
 `pnpm backend:test_only`. Record executed counts (not cached/skipped), distinct
 DBs/Flyway histories, literal commands, and overlap observations. Observe a
@@ -284,6 +284,15 @@ stopping point.
 - Slice 8: ordinary wrapper and opt-in share `.worktree.local.lock`; held
   migrate refuses overlapping opt-in or ordinary migrate; stale reclaim works
   on both entry points.
+- Slice 9: overlapping `pnpm backend:test` (A) and `pnpm backend:test_only`
+  (B) in linked worktrees
+  `/Users/terryyin/.cursor/worktrees/doughnut/q060-conc-a` and `q060-conc-b`
+  each executed 2263 tests (0 fail/skip) against distinct DBs
+  `doughnut_wt_bc303497f9664f2cb862e5295749a3d2_test` and
+  `doughnut_wt_d7458993b9304d83ab323dd31129a91e_test`. Independent Flyway
+  histories (22 rows, distinct `installed_on`). Shared
+  `doughnut_development` / `doughnut_test` / `doughnut_e2e_test` sentinels
+  unchanged. Leave these two checkouts for leaf 12.
 
 Quick/058 completed during refinement; no remaining lock-fix prerequisite.
 No new storage experiment is needed. Repository-wrapper routing is the remaining
