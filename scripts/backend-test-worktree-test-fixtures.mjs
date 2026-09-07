@@ -141,6 +141,11 @@ export function runLauncherAsync(checkout, { env = {}, args = [] } = {}) {
   }
 }
 
+export function lockPaths(checkout) {
+  const dir = path.join(checkout.root, '.worktree.local.lock')
+  return { dir, ownerFile: path.join(dir, 'owner.pid') }
+}
+
 export function assertRefusedBeforeGradle(checkout, result) {
   assert.equal(result.error, undefined, result.stderr)
   assert.notEqual(result.status, 0)

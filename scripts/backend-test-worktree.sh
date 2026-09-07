@@ -27,6 +27,19 @@ fi
 checkout_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 config_path="${checkout_root}/.worktree.local.json"
 
+lock_dir="${checkout_root}/.worktree.local.lock"
+if mkdir "${lock_dir}" 2>/dev/null; then
+  echo "$$" > "${lock_dir}/owner.pid"
+else
+  owner_pid="$(cat "${lock_dir}/owner.pid" 2>/dev/null || true)"
+  if [[ "${owner_pid}" =~ ^[0-9]+$ ]]; then
+    echo "Backend worktree tests are already running in this checkout (owner pid ${owner_pid}). Refusing to start a second run." >&2
+  else
+    echo "Backend worktree tests are already running in this checkout (owner lock record is invalid). Refusing to start a second run." >&2
+  fi
+  exit 1
+fi
+
 worktree_id="$(
   WORKTREE_CONFIG="${config_path}" node -e '
 const fs = require("fs")

@@ -120,7 +120,7 @@ test command, no production orchestration.
 
 ### 2. Refuse a second test invocation in the same checkout
 Type: Behavior
-Status: planned
+Status: done
 Proof: Start the launcher with valid explicit configuration and hold its Gradle
 stand-in active. A second launcher process exits nonzero with an owner-specific
 message before reading a deliberately malformed replacement config or reaching
@@ -128,6 +128,19 @@ Gradle; a malformed owner record also refuses rather than being reclaimed. A
 command in a different temporary checkout can still reach its own Gradle
 stand-in. Release the owner and observe its original exit signal. Verify with
 `node --test scripts/backend-test-worktree.test.mjs`.
+
+Learning: `backend-test-worktree.sh` now creates
+`<checkout_root>/.worktree.local.lock` with atomic `mkdir` before reading any
+config, recording the launcher's own PID in `owner.pid`. An existing lock
+always refuses (owner-specific message for a numeric PID, "invalid record"
+otherwise) — no liveness check, no reclaim; slice 7 owns reclaiming a stale
+(dead-PID) owner. No trap/cleanup: the lock directory is left behind after the
+run. New lock tests live in `scripts/backend-test-worktree-lock.test.mjs`
+(split out during refactor to keep `backend-test-worktree.test.mjs` at its
+line-count limit); `package.json`'s `test:backend-test-worktree` script now
+runs both files.
+`CURSOR_DEV=true nix develop -c node --test scripts/backend-test-worktree.test.mjs scripts/backend-test-worktree-lock.test.mjs`
+passes (17/17).
 
 Behavior: A configured checkout already has an active worktree test command →
 another command starts in that checkout → the second refuses without sharing
