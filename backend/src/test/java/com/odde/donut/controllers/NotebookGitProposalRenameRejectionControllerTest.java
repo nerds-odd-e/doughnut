@@ -18,10 +18,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
 /**
- * Verifies {@code publishNotebookGitProposal} rejects same-parent rename-shaped proposals whose new
- * filename or raw tree entries violate the existing Portable destination contract: an invalid or
- * normalizable title, the reserved {@code README.md} name, a non-regular file mode on either side,
- * or a destination path already occupied by a different live note's content. Clean rename
+ * Verifies {@code publishNotebookGitProposal} rejects equal-content rename-shaped proposals whose
+ * new filename or raw tree entries violate the existing Portable destination contract: an invalid
+ * or normalizable title, the reserved {@code README.md} name, a non-regular file mode on either
+ * side, or a destination path already occupied by a different live note's content. Clean rename
  * acceptance is covered separately in {@link NotebookGitProposalRenameControllerTest}.
  */
 class NotebookGitProposalRenameRejectionControllerTest extends NotebookGitBundleControllerTestBase {

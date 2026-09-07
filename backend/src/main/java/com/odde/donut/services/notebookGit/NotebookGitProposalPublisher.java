@@ -133,7 +133,7 @@ public class NotebookGitProposalPublisher {
             authorizationService.getCurrentUser());
         proposedLiveNotes.remove(deletedNote);
       } else if (noteChange.kind() == NotebookGitProposalTreeShape.ChangeKind.RENAMED) {
-        applyRename(folders, liveNotes, noteChange, publishedAt);
+        applyRename(notebook, folders, proposal, acceptedHead, liveNotes, noteChange, publishedAt);
       }
     }
 
@@ -158,13 +158,7 @@ public class NotebookGitProposalPublisher {
       Timestamp publishedAt) {
     AuthoredNoteDocument document = readValidatedDocument(proposal, path);
     String title = filenameTitle.requireValid(path);
-    Integer destinationFolderId =
-        projection.requireRepresentedFolderIdForAddition(
-            folders, proposal.repository(), acceptedHead, path);
-    Folder destinationFolder =
-        destinationFolderId == null
-            ? null
-            : entityPersister.find(Folder.class, destinationFolderId);
+    Folder destinationFolder = representedDestinationFolder(folders, proposal, acceptedHead, path);
     Note addedNote;
     try {
       addedNote = noteFactory.create(notebook, destinationFolder, title);
@@ -176,21 +170,38 @@ public class NotebookGitProposalPublisher {
   }
 
   private void applyRename(
+      Notebook notebook,
       List<ExportFolderRow> folders,
+      NotebookGitProposalImporter.ImportedProposal proposal,
+      ObjectId acceptedHead,
       List<Note> liveNotes,
       NotebookGitProposalTreeShape.NoteChange noteChange,
       Timestamp publishedAt) {
     Note note = projection.requireOneLiveNoteAtPath(folders, liveNotes, noteChange.fromPath());
     String newTitle = filenameTitle.requireValid(noteChange.path());
+    Folder destinationFolder =
+        representedDestinationFolder(folders, proposal, acceptedHead, noteChange.path());
     try {
-      noteTitlePlacementRules.requireNoSoftDeletedTitleAt(
-          note.getNotebook(), note.getFolder(), newTitle);
+      noteTitlePlacementRules.requireNoSoftDeletedTitleAt(notebook, destinationFolder, newTitle);
     } catch (ApiException exception) {
       throw withContext(exception, "Cannot rename to path \"" + noteChange.path() + "\"");
     }
     note.setTitle(new DisplayName(newTitle));
+    note.setFolder(destinationFolder);
     note.setUpdatedAt(publishedAt);
     entityPersister.save(note);
+  }
+
+  private Folder representedDestinationFolder(
+      List<ExportFolderRow> folders,
+      NotebookGitProposalImporter.ImportedProposal proposal,
+      ObjectId acceptedHead,
+      String path) {
+    Integer destinationFolderId =
+        projection.requireRepresentedFolderId(folders, proposal.repository(), acceptedHead, path);
+    return destinationFolderId == null
+        ? null
+        : entityPersister.find(Folder.class, destinationFolderId);
   }
 
   private AuthoredNoteDocument readValidatedDocument(

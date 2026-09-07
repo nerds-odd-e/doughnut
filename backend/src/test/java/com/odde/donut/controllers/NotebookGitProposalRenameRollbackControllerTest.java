@@ -21,8 +21,8 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 
 /**
- * Proves the same-parent rename mutation ({@code NotebookGitProposalPublisher#applyRename}) rolls
- * back with the rest of the publish transaction when late binding acceptance fails, reusing {@link
+ * Proves the rename mutation ({@code NotebookGitProposalPublisher#applyRename}) rolls back with the
+ * rest of the publish transaction when late binding acceptance fails, reusing {@link
  * NotebookGitPublicationAtomicTestSupport}'s exact failure injection and reset hook.
  */
 @ActiveProfiles({"test", "notebook-git-publication-atomic-test"})

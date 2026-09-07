@@ -20,8 +20,10 @@ import org.springframework.web.server.ResponseStatusException;
  * Verifies {@code publishNotebookGitProposal}'s tree-shape gating: a proposal that is not an
  * identical-heads no-op must change one regular Markdown note, include an addition among several
  * added or modified notes, delete exactly one ordinary note in isolation, or rename exactly one
- * ordinary note within the same parent folder with unchanged content. Same-parent rename acceptance
- * is covered separately in {@link NotebookGitProposalRenameControllerTest}.
+ * ordinary note with unchanged content (same-parent filename change, or parent change keeping the
+ * filename). Equal-content rename acceptance is covered in {@link
+ * NotebookGitProposalRenameControllerTest}; relocation acceptance in {@link
+ * NotebookGitProposalRelocationControllerTest}.
  */
 class NotebookGitProposalTreeShapeControllerTest extends NotebookGitBundleControllerTestBase {
 
@@ -92,16 +94,18 @@ class NotebookGitProposalTreeShapeControllerTest extends NotebookGitBundleContro
   }
 
   @Test
-  void rejectsProposalThatMovesAFileAcrossParentFoldersWithoutMutatingTheAcceptedBinding()
-      throws Exception {
+  void rejectsACombinedParentAndFilenameChangeWithoutMutatingTheAcceptedBinding() throws Exception {
     Notebook notebook = createGitBackedNotebook();
-    NotebookGitBinding binding = seedAcceptedBinding(notebook, baselineEntries());
+    Folder destination = makeMe.aFolder().notebook(notebook).name("Folder").please();
+    makeMe.aNote().folder(destination).title("keep").content(TYPED_NOTE_CONTENT).please();
+    makeMe.aNote().notebook(notebook).title("note").content(TYPED_NOTE_CONTENT).please();
+    NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);
     byte[] bundleBytes =
         proposalBundleBytes(
             binding,
             List.of(
-                new NotebookGitProposalFile("Folder/note.md", "original content"),
-                new NotebookGitProposalFile("README.md", "readme original")));
+                new NotebookGitProposalFile("Folder/keep.md", TYPED_NOTE_CONTENT),
+                new NotebookGitProposalFile("Folder/renamed.md", TYPED_NOTE_CONTENT)));
 
     ResponseStatusException exception =
         assertProposalRejectedWithoutMutatingBinding(
