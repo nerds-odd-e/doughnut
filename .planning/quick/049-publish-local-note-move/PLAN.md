@@ -215,7 +215,7 @@ cli_notebook_clone.feature stayed green (7/7).
 
 ### 6. Publish a rename through the installed CLI
 Type: Behavior
-Status: planned
+Status: done
 Proof: Installed feature: clone → rename Recipes/Pasta.md to
 Recipes/Pasta basics.md → publish → exact authored accepted head and Donut
 shows the renamed note in Recipes with its unchanged content. Focused E2E.
@@ -223,6 +223,9 @@ shows the renamed note in Recipes with its unchanged content. Focused E2E.
 Behavior: Owner commits a same-folder rename → runs installed publish →
 sees the renamed note in Donut. Use existing note-view/tree assertions.
 Do not resnapshot after the rename; private-data proof stays in leaf 3.
+Learning: Added one scenario reusing leaf 5's rename step and the existing
+full-path content-assertion step; no new step definitions needed. 8/8
+scenarios green.
 
 ### 7. Explain same-folder renaming through existing CLI guidance
 Type: Behavior
