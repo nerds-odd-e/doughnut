@@ -1,8 +1,16 @@
 import assert from 'node:assert/strict'
-import { spawnSync } from 'node:child_process'
+import { execFileSync, spawnSync } from 'node:child_process'
 import { createHash } from 'node:crypto'
-import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
-import { join } from 'node:path'
+import {
+  cpSync,
+  existsSync,
+  mkdirSync,
+  readFileSync,
+  realpathSync,
+  symlinkSync,
+  writeFileSync,
+} from 'node:fs'
+import { dirname, join } from 'node:path'
 import { test } from 'node:test'
 import { fileURLToPath } from 'node:url'
 import { parse } from 'yaml'
@@ -12,14 +20,71 @@ const repositoryRoot = fileURLToPath(new URL('../../', import.meta.url))
 const scripts = join(repositoryRoot, 'infra/gcp/scripts')
 const hash = (content) => createHash('sha256').update(content).digest('hex')
 
-for (const forced of [false, true]) {
-  test(`publication uploads frontend and CLI before ${forced ? 'forced backend rollout' : 'unchanged backend skip'}`, (t) => {
+for (const scenario of [
+  'skip',
+  'forced',
+  'moved',
+  'invalid-routing',
+  'wrong-source',
+]) {
+  test(`selected-source publication: ${scenario}`, (t) => {
     const fixture = makeReleaseRepository(t)
-    const sha = forced
-      ? fixture.commit('Release\n\nforce-deployment: true')
-      : fixture.sha
+    const forced = scenario === 'forced'
+    const origin = join(dirname(fixture.repository), 'origin')
+    for (const path of [
+      'infra/gcp/path-routing',
+      'infra/gcp/url-maps',
+      'scripts/validate-url-map-static-vs-backend-hints.mjs',
+    ]) {
+      cpSync(join(repositoryRoot, path), join(origin, path), {
+        recursive: true,
+      })
+    }
+    const startup = 'echo selected-source-startup\n'
+    mkdirSync(join(origin, 'infra/gcp/scripts'))
+    writeFileSync(
+      join(
+        origin,
+        'infra/gcp/scripts/mig-zulu25-openai-app-instance-startup.sh'
+      ),
+      startup
+    )
+    writeFileSync(
+      join(origin, 'infra/gcp/scripts/publish-application.sh'),
+      'exit 99\n'
+    )
+    const routingPath = join(
+      origin,
+      'infra/gcp/path-routing/doughnut-routing.json'
+    )
+    const routing = JSON.parse(readFileSync(routingPath))
+    routing.backendPathHints.exactPaths.push('/selected-source-only')
+    if (scenario === 'invalid-routing')
+      routing.backendPathHints.exactPaths.push('/index.html')
+    writeFileSync(routingPath, JSON.stringify(routing))
+    fixture.git('add', '.')
+    const sha = fixture.commit(
+      forced ? 'Release\n\nforce-deployment: true' : 'Release'
+    )
+    const refOid = fixture.tag('v1.2.3', true, sha)
+    fixture.commit(
+      forced
+        ? 'New control commit'
+        : 'New control commit\n\nforce-deployment: true'
+    )
     fixture.clone()
-    const root = fixture.repository
+    const root = realpathSync(fixture.repository)
+    execFileSync('git', ['fetch', 'origin', sha], {
+      cwd: root,
+      stdio: 'ignore',
+    })
+    if (scenario !== 'wrong-source')
+      execFileSync('git', ['checkout', sha], { cwd: root, stdio: 'ignore' })
+    if (scenario === 'moved') fixture.git('tag', '-f', 'v1.2.3', 'HEAD')
+    symlinkSync(
+      join(repositoryRoot, 'node_modules'),
+      join(root, 'node_modules')
+    )
     const bin = join(root, 'bin')
     const frontend = join(root, 'frontend')
     mkdirSync(bin)
@@ -34,11 +99,7 @@ for (const forced of [false, true]) {
       record,
       JSON.stringify({
         sha256: hash('selected jar'),
-        startup_script_sha256: hash(
-          readFileSync(
-            join(scripts, 'mig-zulu25-openai-app-instance-startup.sh')
-          )
-        ),
+        startup_script_sha256: hash(startup),
       })
     )
     const fake = (name, body) =>
@@ -56,6 +117,10 @@ if [[ "$1" == cp && "$2" == - ]]; then cat > "$SAVED_RECORD"; fi`
     fake(
       'gcloud',
       `echo "gcloud $*" >> "$TRACE"
+for arg in "$@"; do
+  if [[ "$arg" == --source=* ]]; then cp "\${arg#--source=}" "$CAPTURED_MAP"; fi
+  if [[ "$arg" == startup-script=* ]]; then cp "\${arg#startup-script=}" "$CAPTURED_STARTUP"; fi
+done
 if [[ "$*" == *"managed describe"* ]]; then echo current-template; fi`
     )
     fake(
@@ -79,6 +144,11 @@ printf 200`
           RECORD: record,
           SAVED_RECORD: join(root, 'saved-record'),
           GITHUB_SHA: sha,
+          RELEASE_SOURCE_ROOT: root,
+          RELEASE_REF: 'refs/tags/v1.2.3',
+          RELEASE_REF_OID: refOid,
+          CAPTURED_MAP: join(root, 'captured-map'),
+          CAPTURED_STARTUP: join(root, 'captured-startup'),
           GCS_BUCKET: 'private-backend',
           GCS_FRONTEND_BUCKET: 'public-frontend',
           ARTIFACT: 'donut',
@@ -91,7 +161,24 @@ printf 200`
         },
       }
     )
+    if (['moved', 'invalid-routing', 'wrong-source'].includes(scenario)) {
+      assert.notEqual(result.status, 0)
+      assert.equal(existsSync(trace), false, result.stdout)
+      assert.match(
+        result.stderr,
+        scenario === 'moved'
+          ? /Release ref changed/
+          : scenario === 'wrong-source'
+            ? /does not match selected SHA/
+            : /FAILED/
+      )
+      return
+    }
     assert.equal(result.status, 0, result.stderr)
+    assert.match(
+      readFileSync(join(root, 'captured-map'), 'utf8'),
+      /selected-source-only/
+    )
     const calls = readFileSync(trace, 'utf8').trim().split('\n')
     assert.deepEqual(calls.slice(0, 3), [
       `gsutil -m rsync -r ${frontend} gs://public-frontend/frontend/${sha}/`,
@@ -109,6 +196,15 @@ printf 200`
       assert.equal(
         JSON.parse(readFileSync(join(root, 'saved-record'))).git_sha,
         sha
+      )
+      assert.equal(
+        readFileSync(join(root, 'captured-startup'), 'utf8'),
+        startup
+      )
+      assert.equal(
+        JSON.parse(readFileSync(join(root, 'saved-record')))
+          .startup_script_sha256,
+        hash(startup)
       )
     } else {
       assert.match(result.stdout, /Deploy skipped/)

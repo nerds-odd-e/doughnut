@@ -159,7 +159,8 @@ release-state or general orchestration framework.
 
 ### 7. Publish the selected source with current orchestration
 Type: Behavior
-Status: planned
+Status: done
+Evidence: `CURSOR_DEV=true nix develop -c bash scripts/test/application-release.test` passed 63/63. Current publisher drives annotated A behind B, selected routing/startup bytes+hash/force token; moved ref, invalid routing and wrong checkout make no production calls. `CURSOR_DEV=true nix develop -c bash -c 'bash scripts/test/deploy-backend-jar-to-gcp-mig.sh.test && bash scripts/test/apply-doughnut-app-service-url-map-wiring.test && bash scripts/test/upload-frontend-static-to-gcs.sh.test && bash scripts/test/upload-cli-binary-to-gcs.sh.test'` passed. Independent refactor: no edits.
 Proof: Distinct source/control checkouts show selected SHA, routing/startup bytes
 and force token in the external-operation trace. Existing backend skip/health
 and frontend/CLI upload regressions stay green.

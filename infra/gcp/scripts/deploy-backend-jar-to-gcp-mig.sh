@@ -32,7 +32,8 @@ bash "$SCRIPT_DIR/apply-doughnut-app-service-url-map.sh"
 
 RECORD_URI="gs://${GCS_BUCKET}/deploy/last-successful-deploy.json"
 JAR_DEST="gs://${GCS_BUCKET}/backend_app_jar/${JAR_NAME}"
-STARTUP_SCRIPT_PATH="$SCRIPT_DIR/mig-zulu25-openai-app-instance-startup.sh"
+STARTUP_SCRIPT_PATH="${STARTUP_SCRIPT_PATH:-$SCRIPT_DIR/mig-zulu25-openai-app-instance-startup.sh}"
+export STARTUP_SCRIPT_PATH
 
 new_hash=$(sha256sum "$JAR_PATH" | awk '{print $1}')
 new_startup_script_hash=$(sha256sum "$STARTUP_SCRIPT_PATH" | awk '{print $1}')

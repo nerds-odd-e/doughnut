@@ -66,22 +66,30 @@ jobs:
     if: needs.main-head-guard.outputs.deploy == 'true'
     env:
       GITHUB_SHA: ${{ needs.main-head-guard.outputs.sha }}
+      RELEASE_SOURCE_ROOT: ${{ github.workspace }}/release-source
+      RELEASE_REF: ${{ needs.main-head-guard.outputs.ref }}
+      RELEASE_REF_OID: ${{ needs.main-head-guard.outputs.ref_oid }}
       DEPLOY_JAR_PATH: release-artifacts/backend/donut-0.0.1-SNAPSHOT.jar
       FRONTEND_STATIC_DIR: release-artifacts/frontend
       CLI_BUNDLE_SOURCE: release-artifacts/cli/donut-cli.bundle.mjs
     steps:
       - uses: actions/checkout@v7
         with:
-          ref: ${{ github.event.workflow_run.head_sha }}
+          ref: main
+          fetch-depth: 1
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ needs.main-head-guard.outputs.sha }}
+          path: release-source
           fetch-depth: 1
       - uses: actions/setup-node@v7
         with:
           node-version: ${{ vars.NODE_VERSION }}
       - name: Install yaml for URL map scripts (avoid full monorepo pnpm)
         run: |
-          mkdir -p node_modules
+          mkdir -p "$RELEASE_SOURCE_ROOT/node_modules"
           npm install --prefix "$(pwd)/.ci-urlmap-node-deps" yaml@2.8.3
-          ln -sfn "$(pwd)/.ci-urlmap-node-deps/node_modules/yaml" node_modules/yaml
+          ln -sfn "$(pwd)/.ci-urlmap-node-deps/node_modules/yaml" "$RELEASE_SOURCE_ROOT/node_modules/yaml"
       - name: Download CI artifacts
         uses: actions/download-artifact@v8
         with:

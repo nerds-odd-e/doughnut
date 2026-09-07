@@ -56,7 +56,15 @@ function runApplicationRelease({ event, repository = process.cwd() }) {
   return release
 }
 
-const release = runApplicationRelease({
-  event: JSON.parse(readFileSync(process.env.GITHUB_EVENT_PATH, 'utf8')),
-})
-writeReleaseOutput(release)
+if (process.argv[2] === '--verify-ref') {
+  assertReleaseRef(process.env.RELEASE_SOURCE_ROOT, {
+    ref: process.env.RELEASE_REF,
+    refOid: process.env.RELEASE_REF_OID,
+    tag: process.env.RELEASE_REF,
+  })
+} else {
+  const release = runApplicationRelease({
+    event: JSON.parse(readFileSync(process.env.GITHUB_EVENT_PATH, 'utf8')),
+  })
+  writeReleaseOutput(release)
+}

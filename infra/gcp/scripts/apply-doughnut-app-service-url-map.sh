@@ -10,15 +10,22 @@ REPO_ROOT="${REPO_ROOT:-$(cd "$SCRIPT_DIR/../../.." && pwd)}"
 
 : "${GITHUB_SHA:?GITHUB_SHA is required}"
 
-RENDERED="$(mktemp)"
-trap 'rm -f "$RENDERED"' EXIT
+RENDERED="${PREPARED_URL_MAP:-${2:-}}"
+if [[ -z "$RENDERED" ]]; then
+  RENDERED="$(mktemp)"
+  trap 'rm -f "$RENDERED"' EXIT
+fi
 
+if [[ -z "${PREPARED_URL_MAP:-}" ]]; then
 node "$REPO_ROOT/infra/gcp/url-maps/renderDoughnutAppServiceUrlMap.mjs" \
   --sha "$GITHUB_SHA" \
   --write "$RENDERED"
 
 node "$REPO_ROOT/scripts/validate-url-map-static-vs-backend-hints.mjs" \
   --url-map "$RENDERED"
+fi
+
+if [[ "${1:-}" == --prepare ]]; then exit 0; fi
 
 gcloud compute url-maps import doughnut-app-service-map \
   --source="$RENDERED" \
