@@ -1,7 +1,7 @@
 # Keep accumulated local and web content edits
 
 Source: [SEED-009 Story 8](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-8).
-Status: in progress. Slice 1 done; next is slice 2.
+Status: in progress. Slices 1–2 done; next is slice 3.
 
 ## Goal and scope
 
@@ -141,7 +141,7 @@ Sizing: ~5 minutes, medium confidence; one read-only classification/proof loop.
 
 ### 2. Identify a concurrently edited path
 Type: Behavior
-Status: planned
+Status: done
 Proof: Pull suite fixtures for same-note disjoint paragraphs and remote
 edit→revert; error names the path, original checkout remains unchanged and no
 rebase operation starts.
@@ -314,8 +314,12 @@ preparatory Structure sits immediately before its Behavior.
 - Unsupported-shape pull proofs live in `notebookPull.localCandidate.suite.ts`,
   registered through the accepted-history suite tree so leak checks stay in one
   worker.
+- Same-path overlap walks every accepted parent→child edge from the local
+  parent, with rename inference disabled. Disjoint paragraphs and remote
+  edit→revert both name `note.md` and leave the checkout unchanged. Proofs live
+  in `notebookPull.pathOverlap.suite.ts`.
 
-Remaining leaves 2–11 are Ready as sizing hypotheses. Target ~5 minutes each
+Remaining leaves 3–11 are Ready as sizing hypotheses. Target ~5 minutes each
 including focused verification and local cleanup; inspect at five minutes and
 stop/finer-decompose at ten non-exempt minutes. A backend/E2E run or external
 wait can justify an exception only when recorded as the actual cause. No

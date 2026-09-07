@@ -20,12 +20,20 @@ const LOCAL_NOT_CONTENT_EDIT =
   'Local main cannot receive the accepted history because the unpublished commit is not one existing-note content edit. ' +
   'Recreate it as one unpublished commit that edits one existing ordinary Markdown note at an unchanged path, then try again.'
 
+function samePathOverlapError(changedPath: string): string {
+  return (
+    `Local main cannot receive the accepted history because accepted history also edited "${changedPath}". ` +
+    'Same-note reconciliation is not supported yet.'
+  )
+}
+
 const REGULAR_FILE_MODE = '100644'
 
 /**
  * Returns undefined when local main is already an ancestor of accepted (fast-forward).
- * Otherwise returns specific guidance for an unsupported local history shape, or the
- * receive-gate message when the unpublished work is one existing ordinary-note content edit.
+ * Otherwise returns specific guidance for an unsupported local history shape, same-path
+ * overlap in accepted history, or the receive-gate message when the unpublished work is
+ * one existing ordinary-note content edit of a disjoint path.
  */
 export function unpublishedLocalHistoryRejection(
   acceptedRepoDir: string,
@@ -36,9 +44,10 @@ export function unpublishedLocalHistoryRejection(
     return LOCAL_UNRELATED
   }
 
-  const unpublished = listUnpublishedCommits(
+  const unpublished = listCommits(
     acceptedRepoDir,
     localHead,
+    '--not',
     acceptedHead
   )
   if (unpublished.length === 0) return undefined
@@ -49,10 +58,21 @@ export function unpublishedLocalHistoryRejection(
   if (parent === undefined || candidate.parents.length !== 1) {
     return LOCAL_MERGE
   }
+  const localPath = ordinaryNoteContentEditPath(
+    acceptedRepoDir,
+    parent,
+    candidate.sha
+  )
+  if (localPath === undefined) return LOCAL_NOT_CONTENT_EDIT
   if (
-    !isExistingOrdinaryNoteContentEdit(acceptedRepoDir, parent, candidate.sha)
+    acceptedIntervalTouchesPath(
+      acceptedRepoDir,
+      parent,
+      acceptedHead,
+      localPath
+    )
   ) {
-    return LOCAL_NOT_CONTENT_EDIT
+    return samePathOverlapError(localPath)
   }
   return RECEIVE_ANCESTRY_ERROR
 }
@@ -89,21 +109,12 @@ function historiesAreUnrelated(
   return unionCount === localCount + acceptedCount
 }
 
-function listUnpublishedCommits(
+function listCommits(
   acceptedRepoDir: string,
-  localHead: string,
-  acceptedHead: string
+  ...revListArgs: string[]
 ): { sha: string; parents: string[] }[] {
   const text = runSystemGitOrThrow(
-    [
-      '-C',
-      acceptedRepoDir,
-      'rev-list',
-      '--parents',
-      localHead,
-      '--not',
-      acceptedHead,
-    ],
+    ['-C', acceptedRepoDir, 'rev-list', '--parents', ...revListArgs],
     inspectAncestryFailure
   ).trim()
   if (text === '') return []
@@ -116,11 +127,11 @@ function listUnpublishedCommits(
   })
 }
 
-function isExistingOrdinaryNoteContentEdit(
+function listCommitChanges(
   acceptedRepoDir: string,
   parent: string,
   commit: string
-): boolean {
+): { srcMode: string; dstMode: string; status: string; path: string }[] {
   const raw = runSystemGitOrThrow(
     [
       '-C',
@@ -138,14 +149,46 @@ function isExistingOrdinaryNoteContentEdit(
     ],
     inspectAncestryFailure
   )
-  const changes = parseDiffTreeRawZ(raw)
-  if (changes.length !== 1) return false
+  return parseDiffTreeRawZ(raw)
+}
+
+function ordinaryNoteContentEditPath(
+  acceptedRepoDir: string,
+  parent: string,
+  commit: string
+): string | undefined {
+  const changes = listCommitChanges(acceptedRepoDir, parent, commit)
+  if (changes.length !== 1) return undefined
   const [change] = changes
-  return (
+  if (
     change.status === 'M' &&
     change.srcMode === REGULAR_FILE_MODE &&
     change.dstMode === REGULAR_FILE_MODE &&
     isOrdinaryNotePath(change.path)
+  ) {
+    return change.path
+  }
+  return undefined
+}
+
+function acceptedIntervalTouchesPath(
+  acceptedRepoDir: string,
+  localParent: string,
+  acceptedHead: string,
+  changedPath: string
+): boolean {
+  const interval = listCommits(
+    acceptedRepoDir,
+    acceptedHead,
+    '--not',
+    localParent
+  )
+  return interval.some((commit) =>
+    commit.parents.some((parent) =>
+      listCommitChanges(acceptedRepoDir, parent, commit.sha).some(
+        (change) => change.path === changedPath
+      )
+    )
   )
 }
 

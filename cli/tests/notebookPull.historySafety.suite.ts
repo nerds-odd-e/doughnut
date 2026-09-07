@@ -24,57 +24,46 @@ export function describeNotebookPullHistorySafety(): void {
       'donut-cli-pull-history-safety-test-'
     )
 
-    test.each(['local-ahead', 'divergent'] as const)(
-      'refuses %s local history without changing the checkout or losing its tip',
-      async (historyShape) => {
-        const source = buildSourceRepo(ctx.getWorkDir())
-        const directory = cloneAsBoundCheckout(
-          ctx.getWorkDir(),
-          source,
-          getApiConfig().apiBaseUrl,
-          'checkout'
-        )
+    test('refuses local-ahead history without changing the checkout or losing its tip', async () => {
+      const source = buildSourceRepo(ctx.getWorkDir())
+      const directory = cloneAsBoundCheckout(
+        ctx.getWorkDir(),
+        source,
+        getApiConfig().apiBaseUrl,
+        'checkout'
+      )
 
-        fs.writeFileSync(
-          join(directory, 'note.md'),
-          '# unpublished local edit\n'
-        )
-        runGit(['add', 'note.md'], directory)
-        runGit(['commit', '--quiet', '-m', 'unpublished local edit'], directory)
-        if (historyShape === 'divergent') {
-          fs.writeFileSync(join(source, 'note.md'), '# accepted remote edit\n')
-          runGit(['add', 'note.md'], source)
-          runGit(['commit', '--quiet', '-m', 'accepted remote edit'], source)
-        }
+      fs.writeFileSync(join(directory, 'note.md'), '# unpublished local edit\n')
+      runGit(['add', 'note.md'], directory)
+      runGit(['commit', '--quiet', '-m', 'unpublished local edit'], directory)
 
-        serveAcceptedBundle(ctx, source, historyShape)
-        const localTip = runGit(['rev-parse', 'main'], directory)
-        const noteBefore = fs.readFileSync(join(directory, 'note.md'), 'utf8')
-        const before = checkoutState(directory)
-        const stagingBefore = acceptedHistoryStagingDirsUnderTmp()
+      serveAcceptedBundle(ctx, source, 'local-ahead')
+      const localTip = runGit(['rev-parse', 'main'], directory)
+      const noteBefore = fs.readFileSync(join(directory, 'note.md'), 'utf8')
+      const before = checkoutState(directory)
+      const stagingBefore = acceptedHistoryStagingDirsUnderTmp()
 
-        await expect(run(['notebook', 'pull', directory])).rejects.toThrow(
-          ProcessExitForTest
-        )
+      await expect(run(['notebook', 'pull', directory])).rejects.toThrow(
+        ProcessExitForTest
+      )
 
-        expect(ctx.getErrorSpy()).toHaveBeenCalledWith(
-          `donut: ${RECEIVE_GATE_ERROR}`
-        )
-        expect(ctx.getFetchMock()).toHaveBeenCalledOnce()
-        expect(ctx.getFetchMock()).toHaveBeenCalledWith(
-          `${getApiConfig().apiBaseUrl}/api/notebooks/42/git-bundle`,
-          { headers: { Authorization: 'Bearer fake-bearer' } }
-        )
-        expect(checkoutState(directory)).toEqual(before)
-        expect(fs.readFileSync(join(directory, 'note.md'), 'utf8')).toBe(
-          noteBefore
-        )
-        expect(() =>
-          runGit(['cat-file', '-e', `${localTip}^{commit}`], directory)
-        ).not.toThrow()
-        expect(acceptedHistoryStagingDirsUnderTmp()).toEqual(stagingBefore)
-      }
-    )
+      expect(ctx.getErrorSpy()).toHaveBeenCalledWith(
+        `donut: ${RECEIVE_GATE_ERROR}`
+      )
+      expect(ctx.getFetchMock()).toHaveBeenCalledOnce()
+      expect(ctx.getFetchMock()).toHaveBeenCalledWith(
+        `${getApiConfig().apiBaseUrl}/api/notebooks/42/git-bundle`,
+        { headers: { Authorization: 'Bearer fake-bearer' } }
+      )
+      expect(checkoutState(directory)).toEqual(before)
+      expect(fs.readFileSync(join(directory, 'note.md'), 'utf8')).toBe(
+        noteBefore
+      )
+      expect(() =>
+        runGit(['cat-file', '-e', `${localTip}^{commit}`], directory)
+      ).not.toThrow()
+      expect(acceptedHistoryStagingDirsUnderTmp()).toEqual(stagingBefore)
+    })
 
     test('refuses eligible other-note divergence with the receive-gate error and an unchanged checkout', async () => {
       const source = buildSourceRepo(ctx.getWorkDir())
