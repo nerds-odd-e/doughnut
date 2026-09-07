@@ -1,7 +1,7 @@
 # Keep accumulated local and web content edits
 
 Source: [SEED-009 Story 8](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-8).
-Status: in progress. Slices 1–7 done; next is slice 8.
+Status: in progress. Slices 1–8 done; next is slice 9.
 
 ## Goal and scope
 
@@ -231,7 +231,7 @@ Sizing: ~5 minutes active work, medium confidence; existing controller fixture.
 
 ### 8. Retain rebased work when publication is rejected
 Type: Behavior
-Status: planned
+Status: done
 Proof: CLI run sequence performs a real pull/rebase, then publish with remote
 advance before ancestry download or a stale expected-head response after
 submission, plus an existing drift rejection response. Observe L′/files intact
@@ -347,8 +347,12 @@ preparatory Structure sits immediately before its Behavior.
   remain, B's web bytes remain, and a fresh download matches the proposal
   head and tree. Proofs live in
   `NotebookGitLocalContentOverWebEditPublicationControllerTest`.
+- After a real pull/rebase, rejected publish leaves L′ and files intact and
+  reports the actual reason without retry: stale expected-head after POST,
+  remote advance before ancestry GET, and projection-drift 409. Proofs live in
+  `notebookPublish.rebasedRejection.suite.ts`.
 
-Remaining leaves 8–11 are Ready as sizing hypotheses. Target ~5 minutes each
+Remaining leaves 9–11 are Ready as sizing hypotheses. Target ~5 minutes each
 including focused verification and local cleanup; inspect at five minutes and
 stop/finer-decompose at ten non-exempt minutes. A backend/E2E run or external
 wait can justify an exception only when recorded as the actual cause. No
