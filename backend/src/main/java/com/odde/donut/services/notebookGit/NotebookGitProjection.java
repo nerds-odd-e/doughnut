@@ -43,18 +43,63 @@ public class NotebookGitProjection {
       return null;
     }
 
-    String requiredFolderPath = notePath.substring(0, folderPathEnd + 1);
+    return requireRepresentedFolderPath(
+        folders, repository, acceptedHead, notePath.substring(0, folderPathEnd + 1), notePath);
+  }
+
+  /**
+   * Resolves the source Folder and destination parent of an exact folder relocation against
+   * accepted Portable paths. Notebook root is a valid destination parent. Nested parents must exist
+   * as folder rows and have tracked accepted content under their full path.
+   */
+  void requireRepresentedFolderRelocation(
+      List<ExportFolderRow> folders,
+      Repository repository,
+      ObjectId acceptedHead,
+      NotebookGitProposalFolderShape.FolderRelocation relocation) {
+    requireRepresentedFolderPath(
+        folders,
+        repository,
+        acceptedHead,
+        relocation.sourcePrefix() + "/",
+        relocation.sourcePrefix() + "/README.md");
+    requireRepresentedDestinationParent(folders, repository, acceptedHead, relocation.destPrefix());
+  }
+
+  private Integer requireRepresentedDestinationParent(
+      List<ExportFolderRow> folders,
+      Repository repository,
+      ObjectId acceptedHead,
+      String destPrefix) {
+    int lastSlash = destPrefix.lastIndexOf('/');
+    if (lastSlash < 0) {
+      return null;
+    }
+    return requireRepresentedFolderPath(
+        folders,
+        repository,
+        acceptedHead,
+        destPrefix.substring(0, lastSlash + 1),
+        destPrefix + "/README.md");
+  }
+
+  private Integer requireRepresentedFolderPath(
+      List<ExportFolderRow> folders,
+      Repository repository,
+      ObjectId acceptedHead,
+      String requiredFolderPath,
+      String pathForError) {
     Map<Integer, ExportFolderRow> folderById = indexFoldersById(folders);
     ExportFolderRow folder =
         folders.stream()
             .filter(candidate -> folderPath(candidate, folderById).equals(requiredFolderPath))
             .findFirst()
-            .orElseThrow(() -> unrepresentedParentFolder(notePath));
+            .orElseThrow(() -> unrepresentedParentFolder(pathForError));
     boolean representedInAcceptedContent =
         readEntries(repository, acceptedHead).stream()
             .anyMatch(entry -> entry.path().startsWith(requiredFolderPath));
     if (!representedInAcceptedContent) {
-      throw unrepresentedParentFolder(notePath);
+      throw unrepresentedParentFolder(pathForError);
     }
     return folder.id();
   }

@@ -3,7 +3,7 @@
 ## Source and status
 
 Source: [SEED-009 Story 7](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-7).
-Status: in progress; slices 1–2 done.
+Status: in progress; slices 1–3 done.
 
 ## Goal and scope
 
@@ -32,12 +32,13 @@ operations retain their meanings, including a last-note move leaving its folder.
   REQUIRES_NEW acceptance transaction and binding lock. Retain that ownership,
   owner authorization, ancestry checks, typed Markdown validation, drift checks,
   bundle storage, and idempotent retry. No new endpoint, schema, or transport.
-- `NotebookGitProposalFolderShape.requireExactOrEmpty` returns
-  `Optional<FolderRelocation(sourcePrefix, destPrefix)>` for one complete
-  same-name subtree mapping, or empty when no README is both removed and added.
-  Inexact README relocations throw path-specific `"is not an exact folder
-  relocation"`. Exact candidates still fall through to reserved-README until
-  leaf 6 consumes the mapping.
+- Publisher inspects files, then `requireExactOrEmpty`. Exact `FolderRelocation`
+  is checked with `requireRepresentedFolderRelocation` (source prefix and dest
+  parent via `requireRepresentedFolderPath`) before note classification.
+  Missing/unrepresented dest parents name `{destPrefix}/README.md` with the
+  existing unrepresented-parent wording and create nothing. Root dest parent
+  is null/valid. Exact represented-parent candidates still reserved-README
+  until leaf 6.
 - Use source/destination prefixes and complete relative-path/blob correspondence,
   not independent equal-blob pairing. Require exactly one eligible folder mapping;
   identical note content elsewhere must not affect it. Nested README files belong
@@ -121,9 +122,13 @@ use full subtree sets, not combinations of independent equal-blob note pairs.
 
 ### 3. Reject a destination parent absent from accepted history
 Type: Behavior
-Status: planned
+Status: done
 Proof: Controller proposals to missing and unrepresented parents name the final
 Portable path and leave folders and the binding unchanged.
+`CURSOR_DEV=true nix develop -c pnpm backend:test_only` passed.
+`NotebookGitProposalFolderRelocationDestinationControllerTest` asserts the
+canonical missing-parent reason and folder-id stability; unrepresented is the
+path delta; represented parents still reserved-README.
 
 Behavior: An exact candidate names an unavailable destination parent → publish →
 reject without creating it. Resolve the source Folder and destination parent by
@@ -319,15 +324,15 @@ feature is promised. No completed evidence exists to migrate.
 
 ## Readiness and learnings
 
-Slices 1–2 done. Remaining leaves are target-sized hypotheses, not time guarantees.
+Slices 1–3 done. Remaining leaves are target-sized hypotheses, not time guarantees.
 No sizing exception is pre-approved; record actual test/external wait runtime
 separately. If integration in leaf 6 fails to converge, refine this same plan
 rather than bypass a safety gate or expand the story.
 
-Leaf 2 learning: consume `FolderRelocation` in leaves 3–6 instead of falling
-through to note classification. Nested READMEs collapse to the outermost prefix;
-correspondence is relative path → blob, including leftovers at source. The
-Optional is currently discarded after the inexact-shape check.
+Leaf 3 learning: dest parent is the parent of `destPrefix` (no slash → root).
+Error path is `{destPrefix}/README.md`. Source Folder uses `sourcePrefix + "/"`
+plus accepted content under that prefix. Publisher now consumes `FolderRelocation`
+before note classification. Leaves 4–5 should run on that mapping before reparent.
 
 CI observer delivered a 2026-09-05 E2E failure on `1d846feb` (`cli_notebook_clone`).
 That SHA is not this execution's push; later `main` CI including origin `63dbba7f74`

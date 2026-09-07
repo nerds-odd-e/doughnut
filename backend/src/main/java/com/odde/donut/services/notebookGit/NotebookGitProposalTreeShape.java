@@ -24,22 +24,15 @@ public final class NotebookGitProposalTreeShape {
 
   private NotebookGitProposalTreeShape() {}
 
-  /**
-   * @return the note changes, once every constraint holds
-   * @throws ResponseStatusException 400 BAD_REQUEST naming the offending path/reason when the tree
-   *     shape is unsupported, or when either commit cannot be inspected
-   */
-  public static List<NoteChange> requireRegularNoteChanges(
-      Repository repository, ObjectId acceptedHead, ObjectId proposedHead) {
-    List<InspectedRegularFile> files = inspectRegularFiles(repository, acceptedHead, proposedHead);
-    NotebookGitProposalFolderShape.requireExactOrEmpty(files);
+  static List<NoteChange> requireAllowedNoteChangesFromInspectedFiles(
+      List<InspectedRegularFile> files) {
     return requireAllowedNoteChanges(noteChangesFrom(files));
   }
 
   /**
    * Walks both trees for every safe regular file, including unchanged paths and folder READMEs.
-   * Missing side blobs are {@code null}. Path-safety and regular-file-mode refusals match {@link
-   * #requireRegularNoteChanges}; note-path eligibility is not applied here.
+   * Missing side blobs are {@code null}. Path-safety and regular-file-mode refusals match the note
+   * classification path; note-path eligibility is not applied here.
    */
   static List<InspectedRegularFile> inspectRegularFiles(
       Repository repository, ObjectId acceptedHead, ObjectId proposedHead) {

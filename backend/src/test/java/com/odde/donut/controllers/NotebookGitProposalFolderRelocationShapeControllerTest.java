@@ -122,8 +122,12 @@ class NotebookGitProposalFolderRelocationShapeControllerTest
 
   @Test
   void stillRefusesAnExactFolderRelocationAsAReservedReadme() throws Exception {
+    Notebook notebook = createGitBackedNotebook();
+    makeMe.aFolder().notebook(notebook).name("Topics").readmeContent(README).please();
+    makeMe.aFolder().notebook(notebook).name("Archive").readmeContent(README).please();
     ResponseStatusException exception =
         publishRejected(
+            notebook,
             topicsAndArchive(),
             List.of(
                 new PortableTreeEntry("README.md", README),
@@ -140,7 +144,12 @@ class NotebookGitProposalFolderRelocationShapeControllerTest
 
   private ResponseStatusException publishRejected(
       List<PortableTreeEntry> accepted, List<PortableTreeEntry> proposed) throws Exception {
-    Notebook notebook = createGitBackedNotebook();
+    return publishRejected(createGitBackedNotebook(), accepted, proposed);
+  }
+
+  private ResponseStatusException publishRejected(
+      Notebook notebook, List<PortableTreeEntry> accepted, List<PortableTreeEntry> proposed)
+      throws Exception {
     NotebookGitBinding binding = seedAcceptedBinding(notebook, accepted);
     return assertProposalRejectedWithoutMutatingBinding(
         notebook,

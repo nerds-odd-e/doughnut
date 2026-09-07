@@ -105,9 +105,16 @@ public class NotebookGitProposalPublisher {
     NotebookGitProposalAncestry.assertFollowsAcceptedHead(
         proposal.repository(), proposal.mainHead(), acceptedHead);
 
-    List<NotebookGitProposalTreeShape.NoteChange> noteChanges =
-        NotebookGitProposalTreeShape.requireRegularNoteChanges(
+    List<NotebookGitProposalTreeShape.InspectedRegularFile> files =
+        NotebookGitProposalTreeShape.inspectRegularFiles(
             proposal.repository(), acceptedHead, proposal.mainHead());
+    NotebookGitProposalFolderShape.requireExactOrEmpty(files)
+        .ifPresent(
+            relocation ->
+                projection.requireRepresentedFolderRelocation(
+                    folders, proposal.repository(), acceptedHead, relocation));
+    List<NotebookGitProposalTreeShape.NoteChange> noteChanges =
+        NotebookGitProposalTreeShape.requireAllowedNoteChangesFromInspectedFiles(files);
     NotebookGitProposalMarkdownFormat.assertValidTypedMarkdown(
         proposal.repository(), proposal.mainHead());
     projection.requireMatchingAcceptedTree(
