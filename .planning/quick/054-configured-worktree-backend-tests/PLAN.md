@@ -1,6 +1,6 @@
 # Concurrent backend tests with explicit worktree configuration
 
-Status: resume at leaf 8. Slices 1–7 done and pushed.
+Status: resume at leaf 9. Slices 1–8 done and pushed.
 
 ## Resume (new session)
 
@@ -12,7 +12,7 @@ Work only in this checkout:
 - Skill: `.agents/skills/execute-plan/SKILL.md` (wrap-up per slice; do not write `.planning/STATE.md`)
 - Do not edit `/Users/terryyin/git/doughnut` except the final merge to `main`
 
-Leaf 5 accepted after raising instance `max_connections` to 1000. Leaf 6 missing-database failure stops before tests. Leaf 7: interrupting A leaves B and MySQL usable. Continue leaves 8–9. When the plan is complete: merge the feature branch to `main`, push `main`, delete the feature branch, and drop worktrees `doughnut-wt-054`, `-a`, and `-b`. Do not drop MySQL databases unless this PLAN later says to.
+Leaf 5 accepted after raising instance `max_connections` to 1000. Leaf 6 missing-database failure stops before tests. Leaf 7: interrupting A leaves B and MySQL usable. Leaf 8: A-only next migration stayed off B. Continue leaf 9. When the plan is complete: merge the feature branch to `main`, push `main`, delete the feature branch, and drop worktrees `doughnut-wt-054`, `-a`, and `-b`. Do not drop MySQL databases unless this PLAN later says to.
 
 Disposable proof environments (keep until leaves 6–8 finish):
 
@@ -438,7 +438,7 @@ CURSOR_DEV=true nix develop -c pnpm backend:test:worktree
 
 ### 8. Keep migration history independent on a later invocation
 Type: Behavior
-Status: planned
+Status: done
 Proof: In A's disposable worktree only, add a temporary valid next-version
 migration creating one benign proof table; B retains the previous code. Open
 fresh shells and run both complete suites concurrently. Observe that their
@@ -454,6 +454,25 @@ incompatibility may fail; do not add automatic rollback or destructive repair.
 Sizing: about 5 minutes active work, medium confidence; reuse previous setup.
 Complete-suite runtime is an explicit exception. The ordinary isolated proof
 table is not a production schema change or a new transactional DDL contract.
+
+Recorded later invocation (2026-09-07): uncommitted
+`V300000321__worktree_concurrency_proof.sql` in A only (not in B, not committed).
+Fresh shells:
+
+```
+unset SPRING_DATASOURCE_URL DB_URL SPRING_FLYWAY_URL
+CURSOR_DEV=true nix develop -c pnpm backend:test:worktree
+```
+
+- A 10:09:43Z–10:10:52Z selected `doughnut_wt_054a_test`, `BUILD SUCCESSFUL`
+  1m 7s, 7 executed, 2246/0. Flyway 23; version `300000321` at 18:09:54;
+  table `wt_054_concurrency_proof` present. Config still `{"id":"wt_054a"}`.
+- B 10:09:44Z–10:10:53Z selected `doughnut_wt_054b_test`, `BUILD SUCCESSFUL`
+  1m 8s, 7 executed, 2246/0. Flyway 22; no `300000321`; no proof table.
+- Incidental: `QuestionGenerationBatchMaintenanceConcurrencyTest` hardcodes
+  `doughnut_test`, so Flyway also applied `300000321` there at 18:10:41.
+  Restored `doughnut_test` (drop table, delete that Flyway row → 22 rows).
+  `doughnut_e2e_test` untouched. Temp SQL removed from A after the run.
 
 ### 9. Repeat the supported workflow from its setup instructions
 Type: Behavior
@@ -527,8 +546,9 @@ and `/Users/terryyin/git/doughnut-wt-054-b` (`wt_054b`) with empty utf8mb4
 databases on MySQL 8.4.11; configs ignored; legacy DBs unmodified. Preserve
 them for leaves 5–8.
 
-Slice 7: SIGINT to A's process group stopped A's Test Executor (exit 130);
-B finished BUILD SUCCESSFUL; MySQL stayed up. Next: leaves 8–9.
+Slice 8: A-only V300000321 created `wt_054_concurrency_proof` (Flyway 23);
+B stayed at 22. Both suites passed. doughnut_test incidental write restored.
+Next: leaf 9.
 
 If an actual run contradicts a lifecycle/storage assumption, preserve its
 observations and stop at that leaf for the repository's learning escalation.
