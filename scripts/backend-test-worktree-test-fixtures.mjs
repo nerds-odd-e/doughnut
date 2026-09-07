@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict'
-import { spawnSync } from 'node:child_process'
+import { spawn, spawnSync } from 'node:child_process'
 import {
   chmodSync,
   copyFileSync,
@@ -12,6 +12,7 @@ import {
 } from 'node:fs'
 import { tmpdir } from 'node:os'
 import path from 'node:path'
+import { setTimeout as delay } from 'node:timers/promises'
 import { fileURLToPath } from 'node:url'
 
 const launcherSrc = fileURLToPath(
@@ -36,11 +37,14 @@ export function makeCheckout(t, { config } = {}) {
   chmodSync(launcher, 0o755)
 
   const gradleInvocation = path.join(root, 'gradle-invocation')
+  const gradleReached = path.join(root, 'gradle-reached')
+  const gradleRelease = path.join(root, 'gradle-release')
   writeFileSync(
     path.join(root, 'backend', 'gradlew'),
     [
       '#!/bin/sh',
-      'record="$(CDPATH= cd -- "$(dirname "$0")/.." && pwd)/gradle-invocation"',
+      'root="$(CDPATH= cd -- "$(dirname "$0")/.." && pwd)"',
+      'record="$root/gradle-invocation"',
       '{',
       '  printf \'wrapper=%s\\n\' "$0"',
       '  printf \'cwd=%s\\n\' "$PWD"',
@@ -51,6 +55,13 @@ export function makeCheckout(t, { config } = {}) {
       '} > "$record"',
       "printf 'GRADLE_STDOUT\\n'",
       "printf 'GRADLE_REACHED\\n' >&2",
+      'printf \'reached\\n\' > "$root/gradle-reached"',
+      'if [ -n "${GRADLE_HOLD:-}" ]; then',
+      '  release="$root/gradle-release"',
+      '  while [ ! -e "$release" ]; do',
+      '    sleep 0.05',
+      '  done',
+      'fi',
       'exit "${FAKE_GRADLE_EXIT:-0}"',
       '',
     ].join('\n')
@@ -61,25 +72,73 @@ export function makeCheckout(t, { config } = {}) {
     writeFileSync(path.join(root, '.worktree.local.json'), config)
   }
 
-  return { root, launcher, gradleInvocation }
+  return { root, launcher, gradleInvocation, gradleReached, gradleRelease }
 }
 
-export function runLauncher(checkout, { env = {}, args = [] } = {}) {
+function sanitizedChildEnv(env) {
   const childEnv = { ...process.env }
   delete childEnv.SPRING_DATASOURCE_URL
   delete childEnv.DB_URL
   delete childEnv.SPRING_FLYWAY_URL
   delete childEnv.FAKE_GRADLE_EXIT
   Object.assign(childEnv, env)
+  return childEnv
+}
+
+export function runLauncher(checkout, { env = {}, args = [] } = {}) {
   return spawnSync(checkout.launcher, args, {
     cwd: checkout.root,
     encoding: 'utf8',
-    env: childEnv,
+    env: sanitizedChildEnv(env),
   })
 }
 
 export function outputOf(result) {
   return `${result.stdout}${result.stderr}`
+}
+
+async function waitForFile(
+  filePath,
+  { timeoutMs = 5000, intervalMs = 20 } = {}
+) {
+  const deadline = Date.now() + timeoutMs
+  while (!existsSync(filePath)) {
+    if (Date.now() >= deadline) {
+      throw new Error(`Timed out waiting for ${filePath}`)
+    }
+    await delay(intervalMs)
+  }
+}
+
+// Starts the launcher asynchronously against a foreground Gradle stand-in
+// that reaches GRADLE_REACHED and then blocks until explicitly released.
+// Returns a handle for observing that one active Gradle owner from outside.
+export function runLauncherAsync(checkout, { env = {}, args = [] } = {}) {
+  const child = spawn(checkout.launcher, args, {
+    cwd: checkout.root,
+    env: sanitizedChildEnv({ ...env, GRADLE_HOLD: '1' }),
+  })
+
+  let stdout = ''
+  let stderr = ''
+  child.stdout.on('data', (chunk) => {
+    stdout += chunk
+  })
+  child.stderr.on('data', (chunk) => {
+    stderr += chunk
+  })
+
+  const exited = new Promise((resolve) => {
+    child.on('close', (status) => {
+      resolve({ status, stdout, stderr })
+    })
+  })
+
+  return {
+    waitForGradleReached: () => waitForFile(checkout.gradleReached),
+    release: () => writeFileSync(checkout.gradleRelease, ''),
+    waitForExit: () => exited,
+  }
 }
 
 export function assertRefusedBeforeGradle(checkout, result) {
