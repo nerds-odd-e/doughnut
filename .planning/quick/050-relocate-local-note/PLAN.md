@@ -372,6 +372,7 @@ obsolete pending-correction and wait-for-Story-8/9 instructions.
 ## Learnings
 
 - Leaf 1 extracted `NotebookGitProposalFilenameTitle` as a Spring collaborator; publisher still owns the transaction.
+- Leaf 2 generalized equal-blob parent changes, shared `requireRepresentedFolderId`, and assigns destination folder after the deleted-title check. Filename-preserving relocation tests: `NotebookGitProposalRelocationControllerTest`.
 - Leaf 3 accepts combined parent+filename at the final path only; deleted titles at `Source/renamed.md` or `Dest/note.md` do not block `Dest/renamed.md`. Proof class: `NotebookGitProposalRelocateAndRenameControllerTest`.
 - Observer notified CI failure on `28a87c9836` (prior main docs commit, E2E note_topology shard). That SHA is not this execution's push; superseded by `f199e04832`. Disposition: ignore for Plan 50; do not repair the superseded SHA.
 
