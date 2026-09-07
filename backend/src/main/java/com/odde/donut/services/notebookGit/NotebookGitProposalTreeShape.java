@@ -31,8 +31,9 @@ public final class NotebookGitProposalTreeShape {
    */
   public static List<NoteChange> requireRegularNoteChanges(
       Repository repository, ObjectId acceptedHead, ObjectId proposedHead) {
-    return requireAllowedNoteChanges(
-        noteChangesFrom(inspectRegularFiles(repository, acceptedHead, proposedHead)));
+    List<InspectedRegularFile> files = inspectRegularFiles(repository, acceptedHead, proposedHead);
+    NotebookGitProposalFolderShape.requireExactOrEmpty(files);
+    return requireAllowedNoteChanges(noteChangesFrom(files));
   }
 
   /**
@@ -188,7 +189,7 @@ public final class NotebookGitProposalTreeShape {
     return lastSlash < 0 ? path : path.substring(lastSlash + 1);
   }
 
-  private static ResponseStatusException unsupportedTreeShape(String reason) {
+  static ResponseStatusException unsupportedTreeShape(String reason) {
     return new ResponseStatusException(HttpStatus.BAD_REQUEST, "Unsupported tree shape: " + reason);
   }
 

@@ -3,7 +3,7 @@
 ## Source and status
 
 Source: [SEED-009 Story 7](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-7).
-Status: in progress; slice 1 done.
+Status: in progress; slices 1–2 done.
 
 ## Goal and scope
 
@@ -32,10 +32,12 @@ operations retain their meanings, including a last-note move leaving its folder.
   REQUIRES_NEW acceptance transaction and binding lock. Retain that ownership,
   owner authorization, ancestry checks, typed Markdown validation, drift checks,
   bundle storage, and idempotent retry. No new endpoint, schema, or transport.
-- `NotebookGitProposalTreeShape.inspectRegularFiles` walks every safe regular
-  file (including READMEs and unchanged blobs). `requireRegularNoteChanges`
-  still classifies notes only. Recognize folder relocation as a distinct
-  proposal, not a list of note renames.
+- `NotebookGitProposalFolderShape.requireExactOrEmpty` returns
+  `Optional<FolderRelocation(sourcePrefix, destPrefix)>` for one complete
+  same-name subtree mapping, or empty when no README is both removed and added.
+  Inexact README relocations throw path-specific `"is not an exact folder
+  relocation"`. Exact candidates still fall through to reserved-README until
+  leaf 6 consumes the mapping.
 - Use source/destination prefixes and complete relative-path/blob correspondence,
   not independent equal-blob pairing. Require exactly one eligible folder mapping;
   identical note content elsewhere must not affect it. Nested README files belong
@@ -99,10 +101,13 @@ Sizing basis: mechanical extraction of the existing walk, no new acceptance logi
 
 ### 2. Explain why a proposed folder move is not an exact subtree relocation
 Type: Behavior
-Status: planned
+Status: done
 Proof: Through publishNotebookGitProposal, a table of partial, mixed, multiple,
 renamed, or edited directory proposals receives a path-specific shape refusal;
 the binding and projection remain unchanged.
+`CURSOR_DEV=true nix develop -c pnpm backend:test_only` passed (~53s).
+`NotebookGitProposalFolderRelocationShapeControllerTest` names the breaking
+path; exact nested-README candidates still get reserved-README.
 
 Behavior: A proposal changes a folder README but is not one complete unchanged
 same-name prefix relocation → publish → explain the unsupported shape. Derive
@@ -314,16 +319,15 @@ feature is promised. No completed evidence exists to migrate.
 
 ## Readiness and learnings
 
-Slice 1 done. Remaining leaves are target-sized hypotheses, not time guarantees.
+Slices 1–2 done. Remaining leaves are target-sized hypotheses, not time guarantees.
 No sizing exception is pre-approved; record actual test/external wait runtime
-separately. If correspondence in leaf 2 or integration in leaf 6 fails to
-converge, refine this same plan rather than bypass a safety gate or expand the
-story.
+separately. If integration in leaf 6 fails to converge, refine this same plan
+rather than bypass a safety gate or expand the story.
 
-Leaf 1 learning: call `inspectRegularFiles(repository, acceptedHead, proposedHead)`
-for folder correspondence. `InspectedRegularFile(path, acceptedBlobId, proposedBlobId)`
-keeps READMEs and unchanged files (equal non-null blobs). Do not reuse `NoteChange`
-(it still drops unchanged files). Public note-eligibility errors are unchanged.
+Leaf 2 learning: consume `FolderRelocation` in leaves 3–6 instead of falling
+through to note classification. Nested READMEs collapse to the outermost prefix;
+correspondence is relative path → blob, including leftovers at source. The
+Optional is currently discarded after the inexact-shape check.
 
 CI observer delivered a 2026-09-05 E2E failure on `1d846feb` (`cli_notebook_clone`).
 That SHA is not this execution's push; later `main` CI including origin `63dbba7f74`
