@@ -1,7 +1,9 @@
 package com.odde.donut.configs;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.startsWith;
 
 import jakarta.servlet.http.HttpServlet;
@@ -12,6 +14,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -24,6 +27,8 @@ import org.springframework.boot.tomcat.servlet.TomcatServletWebServerFactory;
 import org.springframework.boot.web.server.WebServer;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Import;
+import org.springframework.core.io.ClassPathResource;
 
 class BadRequestRecoveryTest {
   @TempDir Path serverDirectory;
@@ -56,6 +61,8 @@ class BadRequestRecoveryTest {
                                   response.setStatus(400);
                                   response.setContentType("application/json");
                                   response.getWriter().write("{\"error\":\"invalid input\"}");
+                                } else if (request.getRequestURI().equals("/missing")) {
+                                  response.sendError(404);
                                 } else {
                                   response.getWriter().write("callback reached servlet");
                                 }
@@ -89,6 +96,41 @@ class BadRequestRecoveryTest {
 
     assertThat(response.statusCode(), equalTo(400));
     assertThat(servletRequests.get(), equalTo(0));
+    assertThat(response.body(), containsString("We could not process this request"));
+    assertThat(response.body(), containsString("start a fresh login"));
+    assertThat(response.body(), containsString("Private tab"));
+    assertThat(
+        response.body(),
+        containsString("Settings &gt; Apps &gt; Safari &gt; Advanced &gt; Website Data"));
+    assertThat(response.body(), containsString("only this affected site"));
+    assertThat(response.body(), containsString("sign you out"));
+    assertThat(response.body(), containsString("preferences and local search history"));
+    assertThat(response.body(), containsString("<a href=\"/\">Go to the homepage</a>"));
+    assertThat(
+        response.body(),
+        equalTo(
+            new ClassPathResource("bad-request-recovery.html")
+                .getContentAsString(StandardCharsets.UTF_8)));
+    assertThat(
+        response.headers().firstValue("content-type").orElseThrow(),
+        equalTo("text/html;charset=UTF-8"));
+    assertThat(response.headers().firstValue("location").isEmpty(), equalTo(true));
+    assertThat(response.headers().firstValue("set-cookie").isEmpty(), equalTo(true));
+    for (String forbidden :
+        new String[] {
+          "<script",
+          "http-equiv",
+          "src=",
+          "href=\"http",
+          "<link",
+          "dummy-code",
+          "dummy-state",
+          "dummy-cookie",
+          "searchKeyHistory",
+          "a".repeat(100)
+        }) {
+      assertThat(response.body(), not(containsString(forbidden)));
+    }
   }
 
   @Test
@@ -102,6 +144,15 @@ class BadRequestRecoveryTest {
     assertThat(response.body(), equalTo("{\"error\":\"invalid input\"}"));
   }
 
+  @Test
+  void otherErrorsKeepTheDefaultReport() throws Exception {
+    HttpResponse<String> response = request("/missing", 0);
+
+    assertThat(response.statusCode(), equalTo(404));
+    assertThat(response.body(), containsString("HTTP Status 404"));
+    assertThat(response.body(), not(containsString("Go to the homepage")));
+  }
+
   private HttpResponse<String> callbackWithCookie(int cookieSize) throws Exception {
     return request("/login/oauth2/code/github?code=dummy-code&state=dummy-state", cookieSize);
   }
@@ -111,7 +162,7 @@ class BadRequestRecoveryTest {
       return client.send(
           HttpRequest.newBuilder(URI.create("http://localhost:" + server.getPort() + path))
               .timeout(Duration.ofSeconds(10))
-              .header("Cookie", "searchKeyHistory=" + "a".repeat(cookieSize))
+              .header("Cookie", "searchKeyHistory=dummy-cookie" + "a".repeat(cookieSize))
               .GET()
               .build(),
           HttpResponse.BodyHandlers.ofString());
@@ -119,11 +170,14 @@ class BadRequestRecoveryTest {
   }
 
   @TestConfiguration(proxyBeanMethods = false)
+  @Import(BadRequestRecoveryConfiguration.class)
   static class ServerConfiguration {
     @Bean
-    TomcatServletWebServerFactory webServerFactory(Path serverDirectory) {
+    TomcatServletWebServerFactory webServerFactory(
+        Path serverDirectory, BadRequestRecoveryConfiguration recoveryConfiguration) {
       TomcatServletWebServerFactory factory = new TomcatServletWebServerFactory(0);
       factory.setBaseDirectory(serverDirectory.toFile());
+      recoveryConfiguration.customize(factory);
       return factory;
     }
   }

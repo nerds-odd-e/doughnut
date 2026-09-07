@@ -2,10 +2,10 @@
 
 Source: [SEED-014 Story 1](../../seeds/SEED-014-reliable-login-with-browser-history.md#story-1).
 Status: in progress on `codex/reliable-login-browser-history`.
-Readiness: connector characterization delivered; continue with leaf 2.
+Readiness: connector recovery delivered; continue with leaf 3.
 Execution worktree: `/Users/terryyin/.codex/worktrees/f8d7/doughnut`.
 CI observer: coordinator `047-f8d7`, repository `nerds-odd-e/doughnut`, main;
-cell 10 / PTY session 29699; mailbox `/tmp/donut-ci-501/watch-8lFX2v`.
+cell 10 / PTY session 29699 / PID 65697; mailbox `/tmp/donut-ci-501/watch-8lFX2v`.
 Only main triggers push CI; this branch has no push CI runs.
 
 ## Goal and scope
@@ -154,8 +154,21 @@ Stop-safe: no product behavior changes; no new-behavior red test is committed.
 
 ### 2. Receive actionable recovery in an oversized-request response
 Type: Behavior
-Status: planned
+Status: done
 Proof: One real-HTTP response-contract loop using leaf 1's fixture.
+
+Verified full backend suite (43s), including 4 real HTTP controls (0.187s), with:
+`SPRING_DATASOURCE_URL='jdbc:mysql://127.0.0.1:3309/doughnut_recovery_f8d7_test?connectionTimeZone=UTC&forceConnectionTimeZoneToSession=true' CURSOR_DEV=true nix develop -c pnpm backend:test_only`.
+The new heading assertion failed before implementation. Fresh refactor required
+no edits; coordinator formatting passed. Use this isolated database for leaf 3.
+
+Two shared-database attempts had fixture deadlocks during simultaneous backend
+suites in this worktree and the original checkout. Process observations and
+`/tmp/recovery-innodb-status.txt` show conflicting fixture delete/insert locks in
+`doughnut_test`. Recovery cases passed after implementation; the full required
+proof passed after isolation. Shared-database contention remains; no test defect
+was claimed repaired by retry. Suite/migration/diagnosis time is the external
+runtime exception; response implementation stayed one convergent outcome.
 
 Behavior: A browser's oversized callback cannot reach the application →
 Tomcat reports 400 → that response contains neutral recovery guidance and
