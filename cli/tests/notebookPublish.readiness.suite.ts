@@ -1,6 +1,6 @@
 import * as fs from 'node:fs'
 import { join } from 'node:path'
-import { describe, expect, test } from 'vitest'
+import { describe, expect, test, vi } from 'vitest'
 import { getApiConfig } from 'donut-api'
 import { run } from '../src/run.js'
 import {
@@ -9,6 +9,10 @@ import {
   runGit,
 } from './notebookClone.testHelpers.js'
 import { initBoundCheckout } from './notebookGit.testHelpers.js'
+import {
+  startPausedSameLineRebase,
+  unmergedOperationObservation,
+} from './notebookPull.testHelpers.js'
 import { stubFetchWithAcceptedBundleFrom } from './notebookPublish.testHelpers.js'
 
 export function describeNotebookPublishReadiness(): void {
@@ -85,6 +89,27 @@ export function describeNotebookPublishReadiness(): void {
         expect.stringContaining('uncommitted changes')
       )
       expect(ctx.getExitSpy()).toHaveBeenCalledWith(1)
+    })
+
+    test('an unfinished rebase is rejected without submitting or changing the unmerged checkout', async () => {
+      const dir = initBoundCheckout(ctx.getWorkDir(), getApiConfig().apiBaseUrl)
+      startPausedSameLineRebase(dir)
+      const before = unmergedOperationObservation(dir)
+      expect(before.unmerged).not.toBe('')
+      expect(before.rebaseMerge).toBe(true)
+      const fetchMock = vi.fn()
+      vi.stubGlobal('fetch', fetchMock)
+
+      await expect(run(['notebook', 'publish', dir])).rejects.toThrow(
+        ProcessExitForTest
+      )
+      expect(ctx.getErrorSpy()).toHaveBeenCalledWith(
+        expect.stringContaining(
+          'Finish or abort the active Git operation before publishing'
+        )
+      )
+      expect(unmergedOperationObservation(dir)).toEqual(before)
+      expect(fetchMock).not.toHaveBeenCalled()
     })
 
     test('a clean checkout on main reaches submission', async () => {

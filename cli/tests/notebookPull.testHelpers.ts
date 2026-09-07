@@ -1,3 +1,5 @@
+import { spawnSync } from 'node:child_process'
+import * as fs from 'node:fs'
 import { join } from 'node:path'
 import { afterEach, beforeEach, vi } from 'vitest'
 import {
@@ -49,6 +51,40 @@ export function checkoutState(directory: string) {
       ['config', '--local', '--get', 'donut.api-origin'],
       directory
     ),
+  }
+}
+
+/** Captures a conflicted rebase without `write-tree`, which fails on an unmerged index. */
+export function unmergedOperationObservation(directory: string) {
+  const rebaseMergePath = runGit(
+    ['rev-parse', '--git-path', 'rebase-merge'],
+    directory
+  )
+  return {
+    head: runGit(['rev-parse', 'HEAD'], directory),
+    main: runGit(['rev-parse', 'main'], directory),
+    unmerged: runGit(['ls-files', '-u'], directory),
+    note: fs.readFileSync(join(directory, 'note.md'), 'utf8'),
+    rebaseMerge: fs.existsSync(join(directory, rebaseMergePath)),
+  }
+}
+
+/** Two same-line edits, then `git rebase` left paused with unmerged stages and rebase-merge. */
+export function startPausedSameLineRebase(directory: string): void {
+  fs.writeFileSync(join(directory, 'note.md'), '# local same-line edit\n')
+  runGit(['add', 'note.md'], directory)
+  runGit(['commit', '--quiet', '-m', 'local same-line edit'], directory)
+  runGit(['checkout', '--quiet', '-b', 'accepted', 'HEAD~1'], directory)
+  fs.writeFileSync(join(directory, 'note.md'), '# accepted same-line edit\n')
+  runGit(['add', 'note.md'], directory)
+  runGit(['commit', '--quiet', '-m', 'accepted same-line edit'], directory)
+  runGit(['checkout', '--quiet', 'main'], directory)
+  const rebase = spawnSync('git', ['rebase', 'accepted'], {
+    cwd: directory,
+    encoding: 'utf8',
+  })
+  if (rebase.status === 0) {
+    throw new Error('expected git rebase to pause with unmerged stages')
   }
 }
 

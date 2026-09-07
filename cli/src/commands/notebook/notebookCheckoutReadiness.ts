@@ -63,24 +63,31 @@ function gitOperationIsActive(directory: string): boolean {
   })
 }
 
+/** Refuses active operations first — porcelain may be empty or dirty, and HEAD may be detached. */
+function assertReadyCheckout(
+  directory: string,
+  purpose: CheckoutPurpose
+): void {
+  if (gitOperationIsActive(directory)) {
+    throw new Error(
+      `${directory} has an active Git operation. Finish or abort the active Git operation before ${purpose}.`
+    )
+  }
+  assertAttachedCleanMain(directory, purpose)
+}
+
 /**
  * Confirms the bound checkout is eligible to publish from. Read-only — never touches refs,
  * the index, or files.
  */
 export function assertLocalMainIsReadyToPublish(directory: string): void {
-  assertAttachedCleanMain(directory, 'publishing')
+  assertReadyCheckout(directory, 'publishing')
 }
 
 /**
- * Confirms the bound checkout is eligible to receive into. In addition to the shared clean-main
- * policy, receive refuses active Git operations because their porcelain status may be empty.
- * Read-only — never touches refs, the index, or files.
+ * Confirms the bound checkout is eligible to receive into. Read-only — never touches refs,
+ * the index, or files.
  */
 export function assertLocalMainIsReadyToReceive(directory: string): void {
-  if (gitOperationIsActive(directory)) {
-    throw new Error(
-      `${directory} has an active Git operation. Finish or abort the active Git operation before receiving.`
-    )
-  }
-  assertAttachedCleanMain(directory, 'receiving')
+  assertReadyCheckout(directory, 'receiving')
 }

@@ -9,7 +9,11 @@ import {
   runGit,
 } from './notebookClone.testHelpers.js'
 import { initBoundCheckout } from './notebookGit.testHelpers.js'
-import { checkoutState } from './notebookPull.testHelpers.js'
+import {
+  checkoutState,
+  startPausedSameLineRebase,
+  unmergedOperationObservation,
+} from './notebookPull.testHelpers.js'
 
 export function describeNotebookPullReadiness(): void {
   describe('notebook pull (CLI routing and local readiness)', () => {
@@ -214,6 +218,29 @@ export function describeNotebookPullReadiness(): void {
       expect(runGit(['rev-parse', 'MERGE_HEAD'], directory)).toBe(
         mergeHeadBefore
       )
+      expect(fetchMock).not.toHaveBeenCalled()
+    })
+
+    test('an unfinished rebase is rejected without changing the unmerged checkout', async () => {
+      const directory = initBoundCheckout(
+        ctx.getWorkDir(),
+        getApiConfig().apiBaseUrl
+      )
+      startPausedSameLineRebase(directory)
+      const before = unmergedOperationObservation(directory)
+      expect(before.unmerged).not.toBe('')
+      expect(before.rebaseMerge).toBe(true)
+
+      await expect(run(['notebook', 'pull', directory])).rejects.toThrow(
+        ProcessExitForTest
+      )
+
+      expect(ctx.getErrorSpy()).toHaveBeenCalledWith(
+        expect.stringContaining(
+          'Finish or abort the active Git operation before receiving'
+        )
+      )
+      expect(unmergedOperationObservation(directory)).toEqual(before)
       expect(fetchMock).not.toHaveBeenCalled()
     })
   })

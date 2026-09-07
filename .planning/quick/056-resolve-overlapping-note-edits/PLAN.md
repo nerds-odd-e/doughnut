@@ -1,8 +1,7 @@
 # Resolve overlapping note edits with ordinary Git
 
 Source: [SEED-009 Story 9](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-9), product backlog item 3.
-Status: planned; explicit slice-plan refinement complete; ready for execution.
-Planning only: no implementation, product test run, commit or push performed.
+Status: in progress; slice 1 done.
 
 ## Goal and scope
 
@@ -137,11 +136,8 @@ observation within its owning leaf before marking it complete.
 
 ### 1. Protect unfinished Git work from Donut synchronization
 Type: Behavior
-Status: planned
-Proof: CLI `run` with a real Git conflict prepared in a test-owned repository;
-both pull and publish name the active operation and refuse before HTTP. Capture
-unmerged index, files, HEAD/main and operation state before/after. Pull/publish
-focused suites; no product helper mock or classifier-only assertion.
+Status: done
+Proof: `CURSOR_DEV=true nix develop -c pnpm -C cli exec vitest run tests/notebookPull.test.ts tests/notebookPublish.test.ts` — unfinished rebase fixture; both `run` boundaries name finish-or-abort, refuse before HTTP, and leave unmerged index/files/HEAD/main/rebase-merge unchanged.
 
 Behavior: An ordinary rebase is unfinished → Donut pull/publish → actionable
 finish-or-abort refusal; the operation and user files remain available.
@@ -360,11 +356,21 @@ exceptions when incurred; none has occurred during planning. A second qualifying
 overrun or a changed story boundary triggers the repository's learning escalation
 back to Story 9. Do not disguise a story-sizing problem by renaming leaves.
 
+## Learnings
+
+- Slice 1 shares one read-only `assertReadyCheckout` for pull and publish; later
+  conflict UX (leaf 4) can rely on this gate remaining first.
+- Pre-existing CI on main, not this execution's pushes, fails installed other-note
+  rebase in `cli_notebook_clone.feature` with
+  `failed to rebase ... Rebasing (1/1)` (runs 34112403473 / 34113740661 /
+  34113989993). Leaves 2, 4, 9, and 10 should classify that by Git state rather
+  than treat it as slice-1 breakage. Story 12 (Plan 50) merged on main; do not
+  rescope this plan to relocation.
+
 Readiness relies on existing native Git rebase, object import and publication
 contracts, not an assertion that their new composition has already passed.
 Recheck the current checkout before execution; other tasks may change shared
-CLI guidance and E2E files. Story 12 remains independently owned by Plan 50;
-preserve its current state rather than expanding this plan to structural rebase.
+CLI guidance and E2E files. Do not expand this plan to structural rebase.
 
 Commands for execution, selected at the owning boundary:
 
