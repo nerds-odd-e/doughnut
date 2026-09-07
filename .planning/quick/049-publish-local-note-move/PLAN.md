@@ -201,13 +201,17 @@ no new transaction/context or compensation behavior.
 
 ### 5. Add an explicit same-folder rename to the checkout harness
 Type: Structure
-Status: planned
+Status: done
 Proof: Existing installed-CLI notebook feature remains green. Focused E2E.
 
 Structure: Add one git-mv-and-commit task in cliE2eNotebookCloneTasks.ts, one
 notebookClone.ts page-object action, and one thin cli_notebook_clone.ts step
 for immediately following leaf 6. Reuse commitCheckout and accepted-head alias.
 No new test framework or generic filesystem operation model.
+Learning: Added `commitCliNotebookCheckoutNoteRename` (task), `commitRename`
+(page object), and one step mirroring the existing removal plumbing; new step
+intentionally left unwired from the .feature file for leaf 6. Existing
+cli_notebook_clone.feature stayed green (7/7).
 
 ### 6. Publish a rename through the installed CLI
 Type: Behavior
