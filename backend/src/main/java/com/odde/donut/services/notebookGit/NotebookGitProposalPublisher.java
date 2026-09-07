@@ -115,7 +115,7 @@ public class NotebookGitProposalPublisher {
         proposedLiveNotes.add(
             applyAddition(
                 notebook, folders, proposal, acceptedHead, noteChange.path(), publishedAt));
-      } else {
+      } else if (noteChange.kind() == NotebookGitProposalTreeShape.ChangeKind.MODIFIED) {
         AuthoredNoteDocument document = readValidatedDocument(proposal, noteChange.path());
         Note changedNote =
             projection.requireOneLiveNoteAtPath(folders, liveNotes, noteChange.path());

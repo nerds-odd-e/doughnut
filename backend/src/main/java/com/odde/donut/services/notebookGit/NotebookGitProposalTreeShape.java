@@ -55,8 +55,11 @@ public final class NotebookGitProposalTreeShape {
         FileMode acceptedMode = walk.getFileMode(0);
         FileMode proposedMode = walk.getFileMode(1);
         if (FileMode.MISSING.equals(proposedMode)) {
-          throw unsupportedTreeShape(
-              "path \"" + path + "\" is deleted or moved (no rename detection is performed)");
+          if (!FileMode.REGULAR_FILE.equals(acceptedMode)) {
+            throw unsupportedTreeShape("path \"" + path + "\" is not a regular file mode");
+          }
+          changes.add(new NoteChange(path, ChangeKind.DELETED));
+          continue;
         }
         if (FileMode.MISSING.equals(acceptedMode)) {
           if (!FileMode.REGULAR_FILE.equals(proposedMode)) {
@@ -85,6 +88,14 @@ public final class NotebookGitProposalTreeShape {
     }
     if (changes.isEmpty()) {
       throw unsupportedTreeShape("proposal contains no changed file");
+    }
+    if (changes.stream().anyMatch(change -> change.kind() == ChangeKind.DELETED)) {
+      if (changes.size() > 1) {
+        throw unsupportedTreeShape(
+            "publish each removed note in an isolated deletion commit, without other file changes"
+                + " (no rename detection is performed)");
+      }
+      throw unsupportedTreeShape("path \"" + changes.getFirst().path() + "\" is deleted");
     }
     if (changes.size() > 1
         && changes.stream().noneMatch(change -> change.kind() == ChangeKind.ADDED)) {
@@ -136,6 +147,7 @@ public final class NotebookGitProposalTreeShape {
 
   enum ChangeKind {
     ADDED,
-    MODIFIED
+    MODIFIED,
+    DELETED
   }
 }

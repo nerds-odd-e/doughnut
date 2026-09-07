@@ -1,7 +1,40 @@
 # Publish one local note deletion
 
 Source: [SEED-009 Story 5](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-5).
-Status: planned; no implementation started.
+Status: blocked at slice 1 verification; implementation is uncommitted.
+
+## Execution handoff
+
+Slice 1 implements complete-diff isolation guidance, removed-path/mode checks,
+and explicit modification dispatch; isolated deletion remains rejected.
+Changes are in `NotebookGitProposalTreeShape`, `NotebookGitProposalPublisher`,
+and new `NotebookGitDeletionRejectionControllerTest`. No slice is delivered;
+refactor, formatting, commit, and push have not run.
+
+Required command: `CURSOR_DEV=true nix develop -c pnpm backend:test_only`.
+All nine new rejection cases and eight existing tree-shape cases passed in
+both implementation runs. Initial red proof: 2221 tests, exactly eight expected
+assertion failures, 48 seconds. Implementation runs: 2222 tests, one deadlock in
+52 seconds, then five deadlocks in 48 seconds. No further retry was performed.
+
+Bounded failure evidence: InnoDB at 08:06:34 showed recall fixture `INSERT mcq`
+holding a note lock while waiting for an mcq FK-index gap; concurrent
+`DELETE note ... external_identifier LIKE 'batch-prune-committed-%'` held the
+gap and waited for that note. The cleanup belongs to untouched
+`QuestionGenerationBatchRetentionWithoutTransactionTest`. At 08:08:16,
+committed Git fixture cleanup held a question-generation-batch index gap while
+waiting for a note, and batch insertion held that note while waiting for the
+gap. Retry failures were fixture insert/cleanup `PessimisticLockException`s,
+including existing publication-concurrency cleanup, with no distinct assertion
+failure. The recurring committed-fixture concurrency defect remains unrepaired;
+the required full backend proof is blocked. A passing retry would not repair it.
+
+Next action requires developer scope decision: repair the unrelated committed
+fixture deadlocks, then resume slice 1 verification and normal wrap-up. Preserve
+the existing implementation and unrelated release-planning work. Approximate
+elapsed time: ten minutes; implementation about four minutes, backend runs
+148 seconds plus Nix startup, remainder bounded diagnosis. No commands remain
+running from the implementer.
 
 ## Goal and scope
 
@@ -28,6 +61,14 @@ confirmation UI. Do not create follow-on stories or implement deferred ideas
 as part of this plan.
 
 ## Execution context and current decisions
+
+- CI observation: Codex coordinator `/root`, checkout `/Users/terryyin/git/doughnut`,
+  repository `nerds-odd-e/doughnut`, branch `main`. Sandbox blocked initial Nix
+  startup. Escalated bridge cell 7 failed to publish a receipt/session handle;
+  terminated the bridge after bounded inspection. No exact observer ownership
+  could be recovered, so no guessed process termination or replacement launch.
+  Notification coverage is unavailable; observer shutdown is unconfirmed and
+  pending CI is unobserved.
 
 - `NotebookController.publishNotebookGitProposal` is the stable publication
   boundary. `NotebookGitProposalTreeShape` currently rejects every removed
@@ -63,140 +104,246 @@ as part of this plan.
   failures. The rollback proof below tests the promised unchanged business
   state, not merely that an exception is thrown. ADR 0002 remains Proposed.
 
+## Refinement assessment
+
+No slice has started, so there is no completed execution evidence or overrun
+history to invalidate. This is a sizing correction to the original plan, not
+new story scope. All original promises are retained below.
+
+| Original slice | Assessment | Replacement / reason |
+| --- | --- | --- |
+| 1. Isolated learned-note deletion | Refine | 1–2 separate rejection policy from enabling acceptance; guards remain before mutation |
+| 2. Referring content | Ready | 8 retains its single reference-resolution proof loop |
+| 3. Last note/container | Ready | 9 retains root/folder data variations of the same container-preservation outcome |
+| 4. Atomic failure | Refine | 3, 10, 11 separate late rollback, stale head, and projection drift fixtures |
+| 5. Accepted retry | Ready | 12 retains one repeated-submission proof loop |
+| 6. Later identity | Refine | 13–14 separate successful fresh creation from deleted-path rejection |
+| 7. Installed CLI | Refine | 4–5 isolate immediately enabling harness work; 6 owns guidance independently |
+| 8. Receive deletion | Ready | 7 retains real-Git CLI receive proof and moves earlier for learning |
+
 ## Outside-in proof ownership
 
 | Contract promise / story example | Owning slice | Observable proof |
 | --- | --- | --- |
-| One isolated deletion makes the note inactive and its trackers unavailable for recall; other notes retain identity/data (example 1) | 1 | Publication controller, fresh persisted state and existing recall boundary |
-| Reject mixed/bulk deletion, moves, README and invalid file shapes; keep existing add/edit capability (example 4) | 1 | Controller acceptance/rejection cases plus existing publication regressions |
-| Authored links remain unchanged and the deleted destination becomes unresolved (example 2) | 2 | Read referrer through `NoteController.showNote` after publication |
-| Root/folder placement, last-note deletion, retained containers, exact accepted tree | 3 | Controller cases and downloaded bundle tree/ancestry |
-| Stale, drifted, or failed publication leaves remote state unchanged (example 4) | 4 | Existing rejection gates plus fresh state after late binding-save failure |
-| Accepted retry is unchanged (example 1) | 5 | Same head/bundle and unchanged deletion/tracker timestamps |
-| Later copied content gets new identity; deleted-path reuse stays rejected (example 3) | 6 | Separate accepted deletion/addition commits and private association IDs |
-| Owner uses real local Git and installed CLI; guidance explains the supported deletion; rejected local work is preserved | 7 | Focused existing CLI notebook E2E plus current CLI readiness/submission suites |
-| Another eligible checkout receives exact deletion without Portable metadata or history loss (example 1) | 8 | CLI `run` with real Git checkout and accepted bundle |
+| Reject mixed/bulk deletions and moves with isolation guidance; reject reserved/invalid files before mutation | 1, retained by 2 | Controller rejection matrix; fresh binding and live-note state unchanged |
+| Isolated deletion preserves the authored commit and deactivates only the target and its trackers (example 1) | 2 | Publication controller, exact head/tree and fresh note/tracker state; recall boundary excludes target |
+| Failed publication rolls back deletion (example 4) | 3 | Existing late binding-save failure harness, fresh committed state unchanged |
+| Real installed-CLI publication shows the deletion in Donut | 5 (enabled by 4) | Local Git removal → installed CLI → accepted head and Donut note tree |
+| CLI guidance states the supported deletion and its limitations | 6 | Existing clone output and its exact output assertions |
+| Another eligible checkout receives the deletion without history loss or Portable metadata (example 1) | 7 | CLI `run`, real Git checkout, exact accepted head/tree and absent file |
+| References stay authored and the exact deleted destination is unresolved (example 2) | 8 | Referrer's Markdown and `NoteController.showNote` resolution |
+| Root/folder placement, empty final tree, containers retained, no generated README, parent file retained | 9 | Controller location variants and downloaded bundle/history |
+| Stale proposal cannot delete newer accepted content (example 4) | 10 | New accepted web edit followed by old deletion proposal; winner unchanged |
+| Projection drift prevents deletion without absorbing web changes (example 4) | 11 | Unsupported web creation followed by deletion proposal; current notes and accepted binding unchanged |
+| Accepted retry is unchanged, including timestamps (example 1) | 12 | Original proposal repeated after time advances; same head/bundle and deletion state |
+| Later copied content receives fresh identity, never old private associations (example 3) | 13 | Separate deletion/addition publications; original tracker/question/conversation foreign keys retained |
+| Same-path recreation remains rejected (example 3) | 14 | Deleted-title conflict after accepted deletion; no resurrection or binding change |
+| Existing owner, clean checkout, `main`, ancestry, typed-tree, add/edit and local-preservation rules remain | 1–2, 5, 7 | Existing controller and CLI regression suites; reuse evidence at these boundaries |
 
 ## Ordered slices
 
-### 1. Publish an isolated deletion of a learned note
+Every Behavior keeps its implementation, focused proof, and local cleanup in
+one leaf. Later data-variation leaves should use existing behavior when it
+already works, adding only missing observable evidence and fixing demonstrated
+gaps. Do not manufacture extra production changes for proof-only variations.
+
+### 1. Explain why a deletion must be isolated
+Type: Behavior
+Status: in-progress
+Proof: A parameterized controller rejection case covers deletion+edit,
+deletion+addition (including identical-blob rename), and two deletions; each
+reports isolation guidance and leaves accepted binding and live notes unchanged.
+Run backend verification, retaining existing add/edit, path, mode and README gates.
+
+Behavior: A proposed commit removes a note along with another file change →
+publish → reject the whole proposal with guidance to use an isolated deletion
+commit, without inferring a rename or publishing part of it.
+
+Move removed-path classification into the complete-diff decision so this policy
+can be evaluated before projection. Keep **single deletions rejected** at the
+final tree acceptance gate until slice 2. Do not let a new deletion kind fall
+through the publisher's existing modified-note branch. Keep the accepted-mode
+and ordinary-note-path checks on removals; include removal variants for reserved
+README/non-regular paths in the same rejection suite. The current standalone
+single-deletion rejection remains green here and is replaced in slice 2.
+
+### 2. Publish one learned note's deletion
 Type: Behavior
 Status: planned
-Proof: Controller publication accepts one deletion, removes that note from live
-results and recall, and preserves unrelated note/tracker state; unsupported
-deletion shapes reject before mutation. Run backend verification below.
+Proof: One controller success scenario accepts the authored deletion head/tree,
+soft-deletes the target and its trackers, and excludes it from live notes/recall
+while an unrelated learned note remains active. Run backend verification,
+including slice 1's rejection matrix.
 
-Behavior: A notebook matches accepted `main` and contains a learned root note
-and an unrelated learned note → publish a direct-child commit deleting only
-the target → accept its exact head and soft-delete only that note and its
-trackers. Its private records retain their original identity associations.
+Behavior: A matching notebook contains a learned root note and another learned
+note → publish only the target's deletion → accept that exact commit and
+make only the target inactive, retaining the original note/tracker identities
+and learning values.
 
-Extend the existing tree classifier and publisher together. Replace the obsolete
-blanket-deletion rejection test with a valid matching-projection success case;
-do not let its currently untyped/drifted fixture masquerade as proof of the new
-boundary. In the same acceptance change, keep rejection coverage for two
-deletions, deletion+edit, deletion+addition/move, reserved README, and invalid
-modes/paths. Use data variations for the shared rejection outcome. No preliminary
-Structure slice is needed: the existing fixture can already build these trees.
+Remove slice 1's temporary single-deletion gate and handle deletion explicitly
+in the existing publisher: resolve the accepted path, call `destroy` with
+`LEAVE_DEAD_LINKS`, and remove the note from the proposed live-note collection.
+Do not parse the absent blob. Replace the obsolete rejection fixture with a
+valid typed tree matching actual notes. Leave transaction/ref advertisement
+ownership unchanged. Questions/conversations are covered by slice 13's richer
+fixture rather than making this first success loop build every association.
 
-### 2. Leave referring content unchanged
+### 3. Roll back a deletion when acceptance fails late
+Type: Behavior
+Status: planned
+Proof: One deletion scenario in the existing late-binding-save failure harness
+observes fresh committed note/tracker flags and timestamps, accepted head,
+bundle and binding timestamp all unchanged. Run backend verification.
+
+Behavior: Projection has applied a learned note's deletion but binding save
+fails → publication fails → the note remains active and the accepted revision
+remains unchanged. Reuse committed fixtures and failure injection in
+`NotebookGitPublicationAtomicControllerTest`; no new failure framework,
+compensation, or transaction policy. Stale-head and drift cases belong to 10–11.
+
+### 4. Prepare the existing checkout harness for an explicit removal
+Type: Structure
+Status: planned
+Proof: Existing installed-CLI notebook feature remains green; no product or
+existing test-flow behavior changes. Run focused notebook E2E verification.
+
+Structure: Add only a named single-path removal-and-commit task in
+`cliE2eNotebookCloneTasks.ts`, its `notebookClone.ts` page-object method, and thin
+`cli_notebook_clone.ts` step. Use system `git rm -- <path>` in the test-owned
+checkout and return the new head through the existing accepted-head alias.
+This enables **immediately following slice 5**, with no generic action model,
+new checkout framework, or content-list sentinel for removed files. Do not
+reuse the retained-file assertion that calls `cy.readFile` on every proposal
+path; existing rejection proof remains in the CLI suites.
+
+### 5. Publish the local removal through the installed CLI
+Type: Behavior
+Status: planned
+Proof: One scenario in `e2e_test/features/cli/cli_notebook_clone.feature` clones,
+removes and commits `Recipes/Pasta.md`, publishes, and observes the authored
+accepted head and Donut's remaining note tree. Run the focused notebook E2E.
+
+Behavior: The owner has a clean bound checkout → commits one local removal and
+runs the installed publish command → the CLI reports acceptance and Donut shows
+the deletion. Reuse slice 4's action and existing publish/tree assertions; no
+additional test harness work or product copy changes belong here. This provides
+early end-to-end evidence before later boundary variations. Guidance is slice 6.
+
+### 6. Explain the supported deletion in existing CLI guidance
+Type: Behavior
+Status: planned
+Proof: Existing clone-output assertion includes isolated deletion and its
+leave-links-untouched policy. Run the focused CLI clone test and update/run the
+existing notebook E2E exact-copy assertion if it changes.
+
+Behavior: The owner clones a notebook → reads the existing next-step guidance
+→ learns that one separately committed note deletion can be published, that
+links remain authored, and that mixed deletion and same-path recreation are
+unsupported. Update only existing publication-shape guidance in
+`nonInteractiveCli.ts` and matching assertions; do not add a new help surface,
+preview, chooser, or confirmation flow.
+
+### 7. Receive the accepted deletion in another checkout
+Type: Behavior
+Status: planned
+Proof: `cli/tests/notebookPull.fastForward.suite.ts` drives `run` with real Git:
+checkout at the accepted parent → supply the accepted deletion bundle → pull;
+assert absent file, exact head/tree, clean `main`, retained ancestry, unchanged
+other files and no Portable metadata. Run focused CLI pull tests.
+
+Behavior: A second eligible checkout is at the deletion's parent → pull → its
+working tree receives the deletion without losing history. Slice 2 supplies
+the exact accepted head/tree proof; slice 9 covers empty-tree/parent-file cases.
+Use the existing accepted-bundle transport fixture, not a new multi-checkout
+E2E framework. Do not change pull unless this focused proof exposes a gap.
+
+### 8. Leave referring content unchanged
 Type: Behavior
 Status: planned
 Proof: Publish deletion through the controller, then read a referrer through
-`NoteController.showNote`; its authored body/frontmatter is identical and the
-exact target link is unresolved. Run backend verification.
+`NoteController.showNote`; its authored body/frontmatter remains identical and
+the exact target link is unresolved. Run backend verification.
 
 Behavior: A note contains body and property references to the exact target path
-→ publish only the target's deletion → retain the referrer's Markdown and let
-existing resolution report the missing destination. Reuse existing reference
-fixtures; fix only a demonstrated gap in the selected leave-dead-links flow.
+→ publish only the target's deletion → retain its Markdown and let existing
+resolution report the missing destination. Reuse reference fixtures; fix only a
+demonstrated gap in the selected leave-dead-links flow.
 
-### 3. Delete the last note without deleting its container
+### 9. Delete the last note without deleting its container
 Type: Behavior
 Status: planned
 Proof: Parameterized controller cases for the only root note and the only note
 in an existing folder; downloaded bundle has the exact remaining tree and
-retained parent history, while the notebook/folder still exists. Run backend
-verification.
+parent history while the notebook/folder still exists. Run backend verification.
 
 Behavior: The target is the last note at the root or in a folder → publish its
-isolated deletion → retain the Donut container without adding a README. Include
-an empty final tree. Check the parent commit still contains the deleted file;
-do not add folder lifecycle behavior.
+isolated deletion → retain the Donut container without generating a README.
+Include an empty final tree and confirm the parent commit still contains the
+file. These are data variations of container preservation, not folder deletion.
 
-### 4. Keep failed deletion publication atomic
+### 10. Reject deletion based on a stale accepted head
 Type: Behavior
 Status: planned
-Proof: Extend the existing late-binding-save failure fixture with a learned
-note deletion; observe fresh committed note/tracker deletion flags and
-timestamps, accepted head, bundle, and binding timestamp unchanged. Existing
-stale/drift cases gain deletion proposals as needed. Run backend verification.
+Proof: Adapt the existing accepted-web-edit fixture in
+`NotebookGitProjectionDriftControllerTest`: reject the old deletion proposal
+and observe the winning head/content and active target unchanged. Run backend
+verification.
 
-Behavior: A deletion encounters a stale accepted parent, projection drift, or
-a failure after projection but before binding save → publication fails → no
-part of that deletion becomes accepted or deactivates learning. Keep the
-existing transaction mechanism; do not introduce compensation or catch-and-hide
-behavior. Reuse concurrency regressions rather than build a new race harness.
+Behavior: A web edit advances accepted `main` after the local deletion proposal
+was built → publish that stale proposal → retain the newer accepted content.
+Use sequential accepted writes; existing concurrency coverage supplies the
+unchanged locking policy. No new race harness or rebase behavior.
 
-### 5. Retry an accepted deletion without changing it
+### 11. Reject deletion when the projection has drifted
 Type: Behavior
 Status: planned
-Proof: Controller accepts a deletion, time advances, and the identical head is
-submitted again; head/bundle and note/tracker deletion timestamps remain equal
-to the first acceptance. Run backend verification.
+Proof: Adapt the existing unsupported-web-creation drift fixture: deletion
+fails while accepted binding, live target/tracker state and the unsynchronized
+web addition remain unchanged. Run backend verification.
 
-Behavior: The already accepted deletion still matches the current projection
-→ retry the original proposal → report the existing accepted head without
-another deletion or commit. Retain existing rejection when projection has drifted.
+Behavior: Current Donut content differs from accepted `main` → publish a
+single-deletion child of that accepted head → reject without absorbing the web
+change or deleting the target. No resnapshot or drift repair after setup.
 
-### 6. Keep later additions independent of the deleted identity
+### 12. Retry an accepted deletion without changing it
 Type: Behavior
 Status: planned
-Proof: Controller publishes a deletion, then a separate same-content addition
-at an available path; the new note has a different ID and no inherited tracker,
-question, or conversation associations. A same-deleted-path variant rejects
-without changing remote state. Run backend verification.
+Proof: Controller accepts a deletion, time advances, then the identical head
+is submitted again; head/bundle and note/tracker deletion timestamps remain
+identical to first acceptance. Run backend verification.
+
+Behavior: Accepted deletion still matches the current projection → retry the
+original proposal → report the existing head without another deletion/commit.
+Reuse existing rejection evidence for a retry whose projection has drifted.
+
+### 13. Give a later same-content addition fresh identity
+Type: Behavior
+Status: planned
+Proof: Controller publishes deletion then a separate addition at an available
+path; new ID and no inherited tracker/question/conversation associations, while
+original associations still reference the soft-deleted note. Run backend
+verification.
 
 Behavior: A note with private associations has an accepted deletion → publish
-identical text in a later commit → create fresh identity at a different available
-path, or retain the existing deleted-title conflict at its old path. Use a root
-destination or a still-represented folder; do not turn an emptied, unrepresented
-folder into a new-parent-authoring requirement. Reuse the creation and
-deleted-destination policies without changing them.
+identical text at another available root path → create a fresh note without
+reviving or transferring those associations. Adapt
+`NotebookGitCopyIdentityControllerTest` fixtures/cleanup. Observe the old
+associations through fresh persisted rows: deleted-note view/access filtering
+must not be mistaken for erased history. Use public note views for the new note.
+No empty-folder authoring or same-path collision fixture in this leaf.
 
-### 7. Publish a local deletion through the installed CLI
+### 14. Keep the deleted path reserved after publication
 Type: Behavior
 Status: planned
-Proof: Extend `e2e_test/features/cli/cli_notebook_clone.feature`: clone, commit
-the removal of `Recipes/Pasta.md`, publish, observe the authored accepted head
-and the remaining note tree in Donut. Run the focused E2E and relevant CLI tests.
+Proof: After controller-accepted deletion, a same-path addition produces the
+existing deleted-title conflict and leaves head/bundle, deleted note and
+tracker timestamps unchanged, with no new live note. Run backend verification.
 
-Behavior: The owner has an eligible bound checkout → removes one file with Git,
-commits and runs the existing publish command → Donut displays the deletion
-and the CLI reports its accepted head. Update clone/help guidance that lists
-supported publication shapes to include isolated deletion and leaving links
-untouched; do not imply support for mixed deletion or same-path recreation.
-
-Add only the missing explicit deletion-commit task/page-object/step to the
-existing temporary-checkout harness. Preserve its explicit file selection;
-no generic filesystem-action framework or second PTY harness. Update the
-existing exact guidance assertion with the product copy. Reuse existing
-readiness and rejected-submission tests for preservation of local commits,
-index and files; add a deletion variant only where current proof is insufficient.
-
-### 8. Receive the accepted deletion in another checkout
-Type: Behavior
-Status: planned
-Proof: Extend `cli/tests/notebookPull.fastForward.suite.ts` through `run` with
-real Git: clone at the accepted parent, supply the accepted deletion bundle,
-pull, and observe the absent file, exact head/tree, clean `main`, retained
-ancestry, unchanged other files, and no Portable metadata. Run focused CLI tests.
-
-Behavior: A second clean bound checkout is at the deletion's accepted parent
-→ owner runs `donut notebook pull <directory>` → its working tree receives the
-deletion without losing history. Backend bundle proof in slice 3 supplies the
-server side of this existing transport boundary. No new multi-checkout E2E
-framework or pull implementation is planned unless this proof exposes a gap.
+Behavior: A deleted note still reserves its path → publish a later same-path
+addition → reject without resurrecting the old note or creating another one.
+Adapt `NotebookGitDeletedDestinationControllerTest` to reach this precondition
+through accepted deletion rather than web deletion plus a test resnapshot.
+Keep existing title reuse and restore policy unchanged.
 
 ## Verification and delivery
 
@@ -217,13 +364,26 @@ framework or pull implementation is planned unless this proof exposes a gap.
 
 ## Sizing, readiness, and learning checkpoint
 
-Ready for direct execution. Each leaf owns one behavior or data variation and
-one focused verification loop using inspected existing boundaries. Target about
-five minutes of change and verification per leaf; these are hypotheses, not
-guarantees. Backend suite or focused E2E runtime may exceed that target on its
-own; record actual test-runtime exceptions rather than hiding implementation
-overruns. Slice 1 has two closely coupled production edits; slice 7 adds one
-explicit harness action. Neither needs a speculative preparatory subsystem.
+Ready for direct execution of the revised plan; implementation has not begun.
+Four bundled original slices were replaced; four were retained and reordered.
+The result is 13 Behavior leaves and one immediately enabling Structure leaf.
+No completed proof was discarded and no product scope was added or removed.
+
+Sizing hypothesis: about five minutes per leaf for the bounded edit, its one
+proof loop and local cleanup, with moderate confidence from inspected fixtures.
+Slices 1–2 now separate complete-diff rejection from successful projection;
+3/10/11 each reuse a different existing failure fixture; 4 prepares only 5;
+6 is copy/assertion work; 13 and 14 no longer share a multi-outcome fixture.
+Existing root/folder or body/property data variations remain together because
+they exercise one outcome through the same boundary. No remaining leaf requires
+an unexamined storage mechanism or a new test framework.
+
+Test-runtime exceptions are **conditional**, not pre-granted elapsed-time waivers:
+the required backend suite (backend leaves) or focused Cypress run (4–6) may
+itself exceed five/ten minutes. Record actual runtime if that occurs. A second
+verification command protecting the same changed boundary does not justify
+combining independent behaviors; setup/debugging and wrap-up still count as
+work. No blanket exception covers implementation or fixture overruns.
 
 At five minutes scrutinize hidden outcomes/preparation. At ten minutes of
 non-exempt work, preserve evidence/WIP and finer-decompose in this PLAN under
@@ -236,5 +396,7 @@ Report the observed workflow and remaining restrictions before considering any
 follow-on capability. On completion, remove this spent plan and reduce the home
 story to delivered goal/scope while preserving its anchor and sibling stories.
 
-Planning validation: inspected implementation and existing test fixtures; no
-product tests or storage experiments were run for this documentation-only task.
+Refinement validation: checked replacement ownership against every original
+promise and inspected the affected existing fixtures. No product code was
+changed or tested. This skill invocation edits this PLAN only; no commit or push
+is part of refinement.
