@@ -364,8 +364,11 @@ preparatory Structure sits immediately before its Behavior.
   `cli_notebook_clone.feature`. Checkout file assertion matches the commit
   writer's trailing newline. Local Cypress does not skip `@wip`
   (`expose.tags` is `not @ignore`); the journey scenario is green, not tagged
-  `@wip`. A stale version-keyed E2E install cache can serve pre-rebase CLI;
-  `@bundleCliE2eInstall` rebuilds on a clean tree.
+  `@wip`. CI E2E can restore a version-keyed `e2e-install-donut-cli-*.bundle.mjs`
+  older than CLI sources; reuse now requires the cache to be at least as new
+  as those sources. Unexpected installed-CLI exits include the PTY transcript.
+
+Remaining leaf 11 is Ready as a sizing hypothesis.
 
 Remaining leaf 11 is Ready as a sizing hypothesis. Target ~5 minutes each
 including focused verification and local cleanup; inspect at five minutes and

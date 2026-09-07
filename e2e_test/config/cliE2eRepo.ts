@@ -119,9 +119,7 @@ function maxMtimeMsUnderDir(absDir: string): number {
   return max
 }
 
-/** Rebuild `cli/dist/donut-cli.bundle.mjs` when missing or older than CLI / donut-api sources. */
-export function ensureCliBundleFresh(repoRoot: string): void {
-  const bundlePath = join(repoRoot, CLI_BUNDLE_RELATIVE_PATH)
+function cliBundleInputMaxMtimeMs(repoRoot: string): number {
   let inputMax = maxMtimeMsOfFiles(repoRoot, [
     'cli/package.json',
     'cli/tsconfig.json',
@@ -133,10 +131,27 @@ export function ensureCliBundleFresh(repoRoot: string): void {
       inputMax = Math.max(inputMax, maxMtimeMsUnderDir(d))
     }
   }
-  const stale =
-    !existsSync(bundlePath) ||
-    statSync(bundlePath).mtimeMs < inputMax ||
-    !defaultCliBundleHasGmailE2eClientId(repoRoot)
+  return inputMax
+}
+
+/** True when `bundlePath` exists and is at least as new as CLI / donut-api sources. */
+export function bundleIsAtLeastAsNewAsCliSources(
+  repoRoot: string,
+  bundlePath: string
+): boolean {
+  return (
+    existsSync(bundlePath) &&
+    statSync(bundlePath).mtimeMs >= cliBundleInputMaxMtimeMs(repoRoot)
+  )
+}
+
+/** Rebuild `cli/dist/donut-cli.bundle.mjs` when missing or older than CLI / donut-api sources. */
+export function ensureCliBundleFresh(repoRoot: string): void {
+  const bundlePath = join(repoRoot, CLI_BUNDLE_RELATIVE_PATH)
+  const stale = !(
+    bundleIsAtLeastAsNewAsCliSources(repoRoot, bundlePath) &&
+    defaultCliBundleHasGmailE2eClientId(repoRoot)
+  )
   if (stale) {
     runShellCommandSync('pnpm -C cli bundle', {
       cwd: repoRoot,
@@ -169,7 +184,7 @@ export function bundleCliE2eInstall(repoRoot: string, env?: NodeJS.ProcessEnv) {
     repoRoot,
     cliE2eInstallBundleCacheRelativePath(version)
   )
-  if (existsSync(cacheBundle)) {
+  if (bundleIsAtLeastAsNewAsCliSources(repoRoot, cacheBundle)) {
     copyFileSync(cacheBundle, installBundle)
     return
   }
