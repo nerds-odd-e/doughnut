@@ -1,6 +1,6 @@
 # Publish an identity-preserving note relocation
 
-Status: in progress; leaves 1–10 done. Story and slice-plan refinement complete on 2026-09-07.
+Status: in progress; leaves 1–11 done. Story and slice-plan refinement complete on 2026-09-07.
 Source: [SEED-009 Story 12](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-12).
 Prerequisites: Story 6 and the [Plan 52 corrections](../052-clarify-note-rename-publication/PLAN.md)
 are delivered. Ready to execute as the selected parallel candidate alongside
@@ -353,10 +353,12 @@ Sizing: ~5 minutes active work, high confidence; existing scenario vocabulary.
 
 ### 11. Explain supported relocation in existing CLI guidance
 Type: Behavior
-Status: planned
+Status: done
 Proof: Actual clone output tests describe root/existing represented destinations,
 unchanged bytes/links and relocation acceptance before a later edit. Update
 the existing installed exact-copy expectation consistently.
+`source /workspace/scripts/cloud_agent_setup.sh && pnpm -C cli exec vitest run tests/notebookClone.test.ts`
+and `xvfb-run pnpm cypress run --spec e2e_test/features/cli/cli_notebook_clone.feature`.
 
 Behavior: Owner reads next steps → understands how to publish a relocation
 without being promised folder creation, overwrite or structural rebase.
@@ -395,7 +397,7 @@ Sizing: ~5 minutes active work, high confidence; one fast-forward proof loop.
 ## Refinement result, verification and wrap-up
 
 The original ten Behavior leaves become twelve Behavior leaves plus one
-immediately enabling Structure leaf. Leaves 1–10 are done; remaining leaves are
+immediately enabling Structure leaf. Leaves 1–11 are done; remaining leaves are
 planned. No completed evidence was discarded. Main refinements: separate the concrete title-validation
 extraction and private-state proof from placement, add path-specific reference
 proof, make destination/overwrite/empty-folder boundaries explicit, and remove
@@ -413,6 +415,7 @@ obsolete pending-correction and wait-for-Story-8/9 instructions.
 - Leaf 8: relocating onto a dest-folder title reserved by accepted deletion keeps Plan 52 contextual conflict semantics.
 - Leaf 9: path-qualified `[[Inbox/Cell]]` referrers stay authored after relocation; old path no longer resolves.
 - Leaf 10: installed CLI `git mv Recipes/Pasta.md Pasta basics.md` publishes the same note at the notebook root.
+- Leaf 11: clone guidance describes equal-content folder/filename moves to root or represented folders; content edits remain a later commit. First Cypress run needed a rebuilt e2e-install CLI bundle.
 - Observer notified CI failure on `28a87c9836` (prior main docs commit, E2E note_topology shard). That SHA is not this execution's push; superseded by `f199e04832`. Disposition: ignore for Plan 50; do not repair the superseded SHA.
 
 Ready for execution with the parallel coordination above. Estimates are
