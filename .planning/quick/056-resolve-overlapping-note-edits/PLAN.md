@@ -1,7 +1,7 @@
 # Resolve overlapping note edits with ordinary Git
 
 Source: [SEED-009 Story 9](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-9), product backlog item 3.
-Status: in progress; slices 1–3 done.
+Status: in progress; slices 1–4 done.
 
 ## Goal and scope
 
@@ -185,14 +185,8 @@ the owner's skip/abort choice; never resolve it through a reset.
 
 ### 4. Explain and retain a real text-conflict pause
 Type: Behavior
-Status: planned
-Proof: Real same-line conflict through `run(['notebook','pull',directory])`
-returns nonzero, names the Portable path (include a path with spaces), shows
-usable edit/stage/continue/abort guidance and leaves an active rebase, unmerged
-index and both versions accessible. Assert no POST and removal of command-temp
-downloads. Cover a body-line conflict and a nested-note YAML-key conflict as
-data variations of the same pause; assert the canonical state only once.
-Invoke Donut pull/publish again to reuse leaf 1's no-mutation refusal.
+Status: done
+Proof: `CURSOR_DEV=true nix develop -c pnpm -C cli exec vitest run tests/notebookPull.test.ts` — Donut pull creates a same-line body conflict at a path with spaces: nonzero, quoted path, `git status` / add / `rebase --continue` / `rebase --abort` / later publish, rebase-merge, unmerged stages, both blobs, GET only, temp download gone; nested YAML-key conflict names its path; repeat pull/publish refuse without mutation; a non-pause rebase failure keeps `failed to rebase`.
 
 Behavior: Git cannot merge the eligible content edit → pull → the owner is
 left at an understandable ordinary Git conflict pause. Enrich the current
@@ -363,6 +357,11 @@ back to Story 9. Do not disguise a story-sizing problem by renaming leaves.
   table.
 - Slice 3: Git 2.50 drops an already-present patch and completes at B. Pull
   returns `absorbed` vs `rebased` from resulting HEAD. Do not auto-skip.
+- Slice 4: Classify a paused conflict by rebase-merge/apply plus unmerged
+  `ls-files -u`, then prepend native continue/abort guidance and keep the
+  original rebase cause. A failure with no unmerged stages is not labeled a
+  merge conflict. Leaf 5/6 can continue or abort after CLI return and temp
+  cleanup.
 
 Readiness relies on existing native Git rebase, object import and publication
 contracts, not an assertion that their new composition has already passed.

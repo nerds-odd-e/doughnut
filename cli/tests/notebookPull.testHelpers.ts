@@ -125,21 +125,27 @@ export function serveAcceptedBundle(
 export function cloneWithLocalNoteEdit(
   workDir: string,
   baseBytes: string,
-  localBytes: string
+  localBytes: string,
+  relativePath = 'note.md'
 ): {
   directory: string
   source: string
   localTip: string
 } {
   const source = buildSourceRepo(workDir)
-  commitPortableFile(source, 'note.md', baseBytes, 'portable shared base')
+  commitPortableFile(source, relativePath, baseBytes, 'portable shared base')
   const directory = cloneAsBoundCheckout(
     workDir,
     source,
     getApiConfig().apiBaseUrl,
     'checkout'
   )
-  commitPortableFile(directory, 'note.md', localBytes, 'unpublished note edit')
+  commitPortableFile(
+    directory,
+    relativePath,
+    localBytes,
+    'unpublished note edit'
+  )
   return {
     directory,
     source,

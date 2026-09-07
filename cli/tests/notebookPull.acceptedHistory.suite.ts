@@ -24,6 +24,7 @@ import { describeNotebookPullAbsorbed } from './notebookPull.absorbed.suite.js'
 import { describeNotebookPullPathOverlap } from './notebookPull.pathOverlap.suite.js'
 import { describeNotebookPullStructuralHistory } from './notebookPull.structuralHistory.suite.js'
 import { describeNotebookPullRebase } from './notebookPull.rebase.suite.js'
+import { describeNotebookPullConflict } from './notebookPull.conflict.suite.js'
 
 export function describeNotebookPullAcceptedHistory(): void {
   describe('notebook pull (downloaded accepted history)', () => {
@@ -118,4 +119,5 @@ export function describeNotebookPullAcceptedHistory(): void {
   describeNotebookPullAbsorbed()
   describeNotebookPullStructuralHistory()
   describeNotebookPullRebase()
+  describeNotebookPullConflict()
 }
