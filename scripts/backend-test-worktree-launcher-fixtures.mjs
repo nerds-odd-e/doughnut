@@ -83,6 +83,7 @@ export function runLauncherAsync(checkout, { env = {}, args = [] } = {}) {
   return {
     waitForGradleReached: () => waitForFile(checkout.gradleReached),
     release: () => writeFileSync(checkout.gradleRelease, ''),
+    stop: () => child.kill(),
     // Waits for the checkout's mysql stand-in to reach and hold
     // (MYSQL_HOLD), then releases it. Used to inject an external config
     // writer between MySQL provisioning succeeding and the launcher's own
@@ -98,4 +99,32 @@ export function assertRefusedBeforeGradle(checkout, result) {
   assert.notEqual(result.status, 0)
   assert.equal(existsSync(checkout.gradleInvocation), false)
   assert.doesNotMatch(outputOf(result), /GRADLE_REACHED/)
+}
+
+// Two already-started launchers: one must reach Gradle and keep holding; the
+// other must exit. Does not release the Gradle hold.
+export async function waitForOneOwnerAndOneRefusal(first, second) {
+  const firstExit = first.waitForExit()
+  const secondExit = second.waitForExit()
+  await Promise.race([
+    first.waitForGradleReached(),
+    second.waitForGradleReached(),
+  ])
+  return Promise.race([
+    firstExit.then((refused) => ({
+      refused,
+      owner: second,
+      ownerExit: secondExit,
+    })),
+    secondExit.then((refused) => ({
+      refused,
+      owner: first,
+      ownerExit: firstExit,
+    })),
+    delay(5000).then(() => {
+      throw new Error(
+        'Timed out waiting for the second launcher to refuse before Gradle'
+      )
+    }),
+  ])
 }

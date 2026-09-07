@@ -35,25 +35,20 @@ database_for_worktree() {
 }
 
 lock_dir="${checkout_root}/.worktree.local.lock"
-if mkdir "${lock_dir}" 2>/dev/null; then
-  echo "$$" > "${lock_dir}/owner.pid"
-else
+if ! mkdir "${lock_dir}" 2>/dev/null; then
   owner_pid="$(cat "${lock_dir}/owner.pid" 2>/dev/null || true)"
   if [[ ! "${owner_pid}" =~ ^[0-9]+$ ]]; then
     echo "Backend worktree tests are already running in this checkout (owner lock record is invalid). Refusing to start a second run." >&2
     exit 1
   fi
-  if kill -0 "${owner_pid}" 2>/dev/null; then
+  # Live owner, or another process already reclaimed this dead owner.
+  if kill -0 "${owner_pid}" 2>/dev/null \
+    || ! mkdir "${lock_dir}/reclaimed.${owner_pid}" 2>/dev/null; then
     echo "Backend worktree tests are already running in this checkout (owner pid ${owner_pid}). Refusing to start a second run." >&2
     exit 1
   fi
-  # The recorded owner PID is no longer alive: reclaim the checkout lock by
-  # atomically replacing owner.pid with our own PID (write to a sibling temp
-  # file, then rename it over owner.pid within the same directory/filesystem).
-  owner_pid_tmp="${lock_dir}/owner.pid.$$"
-  echo "$$" > "${owner_pid_tmp}"
-  mv "${owner_pid_tmp}" "${lock_dir}/owner.pid"
 fi
+echo "$$" > "${lock_dir}/owner.pid"
 
 if [[ ! -f "${config_path}" ]]; then
   new_worktree_id="wt_$(node -e 'process.stdout.write(require("crypto").randomUUID().replace(/-/g, ""))')"

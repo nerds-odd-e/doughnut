@@ -12,6 +12,7 @@ import {
   outputOf,
   runLauncher,
   runLauncherAsync,
+  waitForOneOwnerAndOneRefusal,
 } from './backend-test-worktree-launcher-fixtures.mjs'
 import {
   lockPaths,
@@ -89,4 +90,36 @@ test('a stale owner record for an exited process is reclaimed and the launcher r
     readFileSync(lockPaths(checkout).ownerFile, 'utf8').trim(),
     String(result.pid)
   )
+})
+
+test('two overlapping reclaimers of a stale lock leave only one gradle owner', {
+  timeout: 10000,
+}, async (t) => {
+  const checkout = makeCheckout(t, {
+    config: JSON.stringify({ id: 'wt_a7c2' }),
+  })
+  writeStaleOwnerLock(checkout)
+
+  const first = runLauncherAsync(checkout)
+  const second = runLauncherAsync(checkout)
+  t.after(() => {
+    first.stop()
+    second.stop()
+  })
+
+  const { refused, owner, ownerExit } = await waitForOneOwnerAndOneRefusal(
+    first,
+    second
+  )
+  assert.notEqual(refused.status, 0)
+  assert.match(outputOf(refused), /already running/i)
+  assert.doesNotMatch(outputOf(refused), /GRADLE_STDOUT|GRADLE_REACHED/)
+  assert.equal(
+    readGradleInvocation(checkout).url,
+    jdbcUrl('doughnut_wt_a7c2_test')
+  )
+
+  owner.release()
+  const ownerResult = await ownerExit
+  assert.equal(ownerResult.status, 0, outputOf(ownerResult))
 })

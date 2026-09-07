@@ -1,9 +1,9 @@
 # Exclusive worktree checkout lock after first-use
 
-Status: in progress (slice 1 done).
-Source: [SEED-015 story 1b](../../seeds/SEED-015-concurrent-worktree-environments.md#story-1b)
-via completed [quick/057](../057-automatic-worktree-backend-tests/PLAN.md).
-Reviewed commits: `162feeacca`..`987d0fbc52` (first-parent execution set).
+Status: in progress (slices 1–2 done).
+Source: [SEED-015 story 1b](../../seeds/SEED-015-concurrent-worktree-environments.md#story-1b).
+Reviewed first-use commits: `162feeacca`..`987d0fbc52` (recover the completed
+quick/057 PLAN from `fce6bd68f4`).
 
 ## Goal and scope
 
@@ -41,11 +41,12 @@ wait queue or process supervisor.
 ## Execution context
 
 - `scripts/backend-test-worktree.sh` creates `.worktree.local.lock` with
-  `mkdir`, writes `owner.pid`, and on a dead numeric PID writes a sibling temp
-  file then `mv`s it over `owner.pid`.
+  `mkdir` and writes `owner.pid`. A dead numeric PID is reclaimed only by
+  exclusive `mkdir` of `reclaimed.<pid>` inside that lock; a live or already
+  reclaimed owner is an immediate refusal.
 - Command-boundary tests: `scripts/backend-test-worktree-lock.test.mjs` (live
-  owner, malformed record, other checkout, single stale reclaim).
-  `scripts/backend-test-worktree-test-fixtures.mjs` is 277 lines.
+  owner, malformed record, other checkout, single stale reclaim, overlapping
+  reclaimers). Fixtures are stand-in / launcher / lock modules.
 - `.gitignore` has `/.worktree.local.json` only. Slice 12 of quick/057 needed
   `git worktree remove --force` because the leftover lock directory was
   untracked.
@@ -69,7 +70,7 @@ Sizing: about 5 minutes, high confidence; file split and import updates only.
 
 ### 2. Refuse a second reclaimer of a stale checkout lock
 Type: Behavior
-Status: planned
+Status: done
 Proof: Given a valid `.worktree.local.json` and a stale owner PID, start two
 launcher processes without waiting for the first to reach Gradle. One reaches
 Gradle against the configured database; the other exits nonzero with the
@@ -106,10 +107,13 @@ Sizing: about 5 minutes, high confidence; one ignore entry and guide sentence.
 
 Execution retrospective of quick/057 (`162feeacca`–`987d0fbc52`): first-use
 provisioning, reuse, live-owner refusal, and real two-worktree proof stand.
-Remaining gaps are exclusive stale reclaim and gitignore for the lock directory.
+Remaining gap is gitignore for the lock directory.
 
 Slice 1 split `backend-test-worktree-test-fixtures.mjs` into stand-in (153),
 launcher (101), and lock (24) modules. `makeStaleOwnerPid` stays unexported.
+
+Slice 2 reclaims a dead owner with exclusive `mkdir` of `reclaimed.<pid>`;
+two overlapping reclaimers leave one Gradle owner.
 
 ## Considered but excluded
 
