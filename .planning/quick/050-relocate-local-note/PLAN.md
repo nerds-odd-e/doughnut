@@ -1,6 +1,6 @@
 # Publish an identity-preserving note relocation
 
-Status: planned; story and slice-plan refinement complete on 2026-09-07.
+Status: in progress; leaf 1 done. Story and slice-plan refinement complete on 2026-09-07.
 Source: [SEED-009 Story 12](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-12).
 Prerequisites: Story 6 and the [Plan 52 corrections](../052-clarify-note-rename-publication/PLAN.md)
 are delivered. Ready to execute as the selected parallel candidate alongside
@@ -158,9 +158,17 @@ that leaf. Commands passing without the promised observation are insufficient.
 
 ### 1. Keep filename-derived title validation in one place
 Type: Structure
-Status: planned
+Status: done
 Proof: Existing controller invalid/normalizable title, addition and same-parent
-rename behavior remains green. Backend suite.
+rename behavior remains green. Backend suite
+(`source /workspace/scripts/cloud_agent_setup.sh && pnpm backend:test_only`).
+Addition `explainsWhyAnAddedRootNoteIsInvalid` covers `bad:name.md` /
+` Trimmed .md` (normalized); rename
+`rejectsARenameWhoseNewFilenameYieldsAnInvalidTitle` covers `bad:name.md`.
+Same-parent rename acceptance remains in
+`NotebookGitProposalRenameControllerTest`. Extracted
+`NotebookGitProposalFilenameTitle`; both `applyAddition` and `applyRename`
+call `filenameTitle.requireValid`.
 
 Internal change: Extract the existing filename-derived-title validation from
 the 250-line publisher into a focused capability-named collaborator, keeping
@@ -342,11 +350,16 @@ Sizing: ~5 minutes active work, high confidence; one fast-forward proof loop.
 ## Refinement result, verification and wrap-up
 
 The original ten Behavior leaves become twelve Behavior leaves plus one
-immediately enabling Structure leaf. All are planned; no completed evidence
-was discarded. Main refinements: separate the concrete title-validation
+immediately enabling Structure leaf. Leaf 1 is done; remaining leaves are
+planned. No completed evidence was discarded. Main refinements: separate the concrete title-validation
 extraction and private-state proof from placement, add path-specific reference
 proof, make destination/overwrite/empty-folder boundaries explicit, and remove
 obsolete pending-correction and wait-for-Story-8/9 instructions.
+
+## Learnings
+
+- Leaf 1 extracted `NotebookGitProposalFilenameTitle` as a Spring collaborator; publisher is 218 lines and still owns the transaction. Leaf 2 can add destination assignment there.
+- Observer notified CI failure on `28a87c9836` (prior main docs commit, E2E note_topology shard). That SHA is not this execution's push; superseded by `f199e04832` whose CI was already in progress. Disposition: ignore for Plan 50; do not repair the superseded SHA.
 
 Ready for execution with the parallel coordination above. Estimates are
 hypotheses: ~5 minutes including focused verification and local cleanup; at five
