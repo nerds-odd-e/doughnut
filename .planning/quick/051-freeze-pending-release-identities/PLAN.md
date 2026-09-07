@@ -150,7 +150,7 @@ its own payload/publication boundary.
 
 ### 6. Publish the overlapping-release policy consistently
 Type: Behavior
-Status: planned
+Status: done
 Proof: Repository search finds no active instruction to issue application releases
 one at a time or wait inside the release runner. `README.md` and
 `docs/teams/definition_of_done.md` describe increasing immutable tags, highest
@@ -160,6 +160,10 @@ forward correction consistently with `docs/gcp/conditional-backend-deploy.md`.
 Behavior: A maintainer reads either top-level release overview → receives the
 current overlapping-release policy → can submit a newer version or recover the
 same immutable release without obsolete manual serialization advice.
+
+Learning: Both overview surfaces now summarize the same overlapping, event-driven
+policy and defer mechanics to the canonical runbook; repository search finds no
+active instruction to serialize application release requests manually.
 
 ### 7. Guide agents through an application release
 Type: Behavior

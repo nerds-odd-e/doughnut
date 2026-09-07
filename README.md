@@ -135,7 +135,7 @@ Expect the Vue production build under `frontend/dist`. The CLI install URL is se
 
 ### 10. Production environment
 
-- [GCP production notes](./docs/gcp/prod_env.md) — ordinary main pushes run CI only. Increasing immutable `vMAJOR.MINOR.PATCH` tags release an exact tested main commit, one application release at a time; see the [release runbook](./docs/gcp/conditional-backend-deploy.md) for CI waiting, conditional backend deployment and next-patch correction.
+- [GCP production notes](./docs/gcp/prod_env.md) — ordinary main pushes run CI only. Increasing immutable `vMAJOR.MINOR.PATCH` tags release exact tested main commits and may overlap. Stable-tag pushes and completed-CI events wake reconciliation, which selects the highest pending numeric version and releases the runner while CI is unfinished. Retry a recoverable release with the same immutable tag; when its identity must change or historical artifacts are unrecoverable, test the correction or revert on main and release the next patch as a forward correction. See the [release runbook](./docs/gcp/conditional-backend-deploy.md).
 
 ### 11. [Donut source code secrets management](./docs/secrets_management.md)
 
