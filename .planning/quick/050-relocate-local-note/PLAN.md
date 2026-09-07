@@ -1,6 +1,6 @@
 # Publish an identity-preserving note relocation
 
-Status: in progress; leaves 1–12 done. Story and slice-plan refinement complete on 2026-09-07.
+Status: complete; leaves 1–13 done. Story and slice-plan refinement complete on 2026-09-07.
 Source: [SEED-009 Story 12](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-12).
 Prerequisites: Story 6 and the [Plan 52 corrections](../052-clarify-note-rename-publication/PLAN.md)
 are delivered. Ready to execute as the selected parallel candidate alongside
@@ -386,10 +386,15 @@ Sizing: ~5 minutes active work, high confidence; existing continuation fixture.
 
 ### 13. Receive relocation and its later edit in another checkout
 Type: Behavior
-Status: planned
+Status: done
 Proof: Real-Git CLI fast-forward fixture from the relocation parent receives
 the accepted relocation/edit sequence: old path absent, exact final bytes,
 accepted head/tree and ancestry, clean main and no Portable metadata.
+`pnpm -C cli exec vitest run tests/notebookPull.test.ts --testTimeout=30000`
+(26/26). `receives an accepted relocation and a later edit at the final folder path`
+in `notebookPull.fastForward.pathReceipt.ts`: clone at Source/note.md, pull
+isolated Dest/note.md relocation then edit; old path gone, exact edited bytes,
+accepted HEAD/tree, ancestor, clean porcelain, ls-tree `Dest/note.md` only.
 
 Behavior: Another clean eligible checkout pulls accepted history → receives
 the note's final path and later edit without history loss. Extend the existing
@@ -401,8 +406,7 @@ Sizing: ~5 minutes active work, high confidence; one fast-forward proof loop.
 ## Refinement result, verification and wrap-up
 
 The original ten Behavior leaves become twelve Behavior leaves plus one
-immediately enabling Structure leaf. Leaves 1–12 are done; remaining leaves are
-planned. No completed evidence was discarded. Main refinements: separate the concrete title-validation
+immediately enabling Structure leaf. Leaves 1–13 are done. No completed evidence was discarded. Main refinements: separate the concrete title-validation
 extraction and private-state proof from placement, add path-specific reference
 proof, make destination/overwrite/empty-folder boundaries explicit, and remove
 obsolete pending-correction and wait-for-Story-8/9 instructions.
@@ -421,8 +425,10 @@ obsolete pending-correction and wait-for-Story-8/9 instructions.
 - Leaf 10: installed CLI `git mv Recipes/Pasta.md Pasta basics.md` publishes the same note at the notebook root.
 - Leaf 11: clone guidance describes equal-content folder/filename moves to root or represented folders; content edits remain a later commit. First Cypress run needed a rebuilt e2e-install CLI bundle.
 - Leaf 12: sequential Dest/note.md content edit after accepted Source→Dest relocation keeps the original note ID and tracker. No production change.
+- Leaf 13: second checkout fast-forwards Source/note.md → Dest/note.md plus a later edit; proof in `notebookPull.fastForward.pathReceipt.ts`. No production pull change. Default Vitest 5s timed out on this Cloud VM when the whole pull file ran; 26/26 passed with `--testTimeout=30000`.
 - Observer notified CI failure on `28a87c9836` (prior main docs commit, E2E note_topology shard). That SHA is not this execution's push; superseded by `f199e04832`. Disposition: ignore for Plan 50; do not repair the superseded SHA.
 - Observer notified CI failure on `2855618cb0` (`test(e2e): keep local Pasta and web Overview through installed pull then publish`, run 34106310343). SHA is on main, not this branch's pushed history. Disposition: ignore; do not repair.
+- Observer notified CI failure on `b6915a3cd8` (`test(e2e): rebuild stale version-keyed CLI install cache before pull`, run 34109867483) and `cae5ed116f` (`feat(cli): tell owners to pull, inspect, then publish eligible other-note edits`, run 34110299454). Neither SHA is an ancestor of this branch. Disposition: ignore; do not repair.
 
 Ready for execution with the parallel coordination above. Estimates are
 hypotheses: ~5 minutes including focused verification and local cleanup; at five
