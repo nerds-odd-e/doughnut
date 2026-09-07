@@ -52,14 +52,15 @@ Do this **before** the first application release that uses `GCS_FRONTEND_BUCKET`
 **Org constraint:** If your org forbids `allUsers` with IAM **conditions** (`PublicResourceAllowConditionCheck`), you cannot scope “public read only under `frontend/`” on one mixed bucket via conditional bindings; a **dedicated** frontend bucket avoids that.
 
 **Normal release:** Increasing immutable application tags reconcile the highest
-pending version on each tag or completed-CI wakeup. Unfinished CI releases the
-runner and is reconsidered after a later completion. The deploy workflow runs
+pending version on each tag push or explicit rerun. Verify CI and artifacts before
+tagging. Unfinished CI releases the runner; explicitly rerun the release after CI
+succeeds. The Application Release workflow runs
 [`apply-doughnut-app-service-url-map.sh`](../../infra/gcp/scripts/apply-doughnut-app-service-url-map.sh)
 (render from `doughnut-routing.json` + `pnpm validate:path-routing` equivalent +
 `gcloud compute url-maps import`) so the LB serves `frontend/<GITHUB_SHA>/` for
 that selected release. Ordinary main pushes publish nothing. Follow the
 [release runbook](conditional-backend-deploy.md), including the first-release
-requirement that selected source contains the new tag and CI-completion triggers.
+requirement that selected source contains the tag trigger.
 
 **Infrastructure repair / manual import:** To repair routing for the currently selected release, render its commit (40-char SHA) whose tree exists under `gs://<GCS_FRONTEND_BUCKET>/frontend/<SHA>/`, validate, then import:
 

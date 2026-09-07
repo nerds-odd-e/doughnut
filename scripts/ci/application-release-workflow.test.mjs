@@ -15,7 +15,7 @@ const nonTerminalRelease =
   "steps.release_state.outputs.state != 'already-released' && steps.release_state.outputs.state != 'superseded'"
 const selected = (field) => `\${{ steps.reconciliation.outputs.${field} }}`
 
-test('application tags and completed main CI wake the same release reconciliation', () => {
+test('application release starts only on application tags', () => {
   const ci = workflow('ci')
   const deploy = workflow('deploy')
 
@@ -23,12 +23,8 @@ test('application tags and completed main CI wake the same release reconciliatio
   assert.equal(ci.name, 'donut CI')
   assert.deepEqual(deploy.on, {
     push: { tags: ['v*.*.*'] },
-    workflow_run: {
-      workflows: ['donut CI'],
-      branches: ['main'],
-      types: ['completed'],
-    },
   })
+  assert.equal(deploy.name, 'Application Release')
   assert.equal(deploy.jobs['release-admission'].if, undefined)
   assert.equal(deploy.jobs.Deploy.needs, 'release-admission')
   assert.equal(

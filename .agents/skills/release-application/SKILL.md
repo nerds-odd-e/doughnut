@@ -16,7 +16,7 @@ this skill.
 ## Route the request
 
 - An application release publishes the SPA, bundled CLI, routing, and any
-  required backend rollout through the application deploy workflow. A `cli-*`
+  required backend rollout through the Application Release workflow. A `cli-*`
   release is independent. `gsd-ship` delivers a PR; it does not release the
   application.
 - A status-only request is read-only. Inspect existing tags, workflow runs,
@@ -32,7 +32,9 @@ this skill.
 For a requested release, establish the intended unused, increasing stable
 version and the exact tested commit on `main`. Confirm exact-SHA CI success and
 the required artifacts for that commit, then push the immutable tag only when
-authorized. Follow the runbook for the commands and admission rules.
+authorized. CI completion does not start Application Release; if a tag was pushed
+prematurely, an explicit release workflow rerun is needed after CI succeeds.
+Follow the runbook for the commands and admission rules.
 
 After the release request is admitted, inspect the selected tag and SHA, CI run
 and attempt, the actual publication job, and the production smoke-check
@@ -50,7 +52,7 @@ GitHub Release; it is outside this workflow.
 
 State whether the application is deployed; otherwise report the precise state,
 including `waiting`, `blocked`, failed, or publication skipped. Include the tag,
-exact SHA, selected CI run/attempt, deploy run and publication-job result, and
+exact SHA, selected CI run/attempt, Application Release run and publication-job result, and
 production smoke result. Explicitly disclose evidence that could not be
 verified and name the next decision or authorized recovery action rather than
 masking uncertainty.

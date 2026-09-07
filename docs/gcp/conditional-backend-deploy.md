@@ -3,12 +3,12 @@
 **See also:** [prod-frontend-static-lb.md](prod-frontend-static-lb.md) for SPA/CLI buckets, URL map, and frontend publication (Deploy always applies the URL map; jar rollout is what this page describes).
 
 Production is published only by a stable `vMAJOR.MINOR.PATCH` tag through the
-[deploy workflow](../../.github/workflows/deploy.yml). Ordinary `main` pushes run
-CI and publish nothing. A release selects the tag's exact main commit, even when
+[Application Release workflow](../../.github/workflows/deploy.yml). Ordinary `main`
+pushes run CI without starting Application Release. A release selects the tag's exact main commit, even when
 main has advanced. Two-component tags such as `v1.2`, prereleases such as
 `v1.2.3-rc.1` and unrelated tags do not deploy the application.
 The workflow checks that commit's latest applicable `ci.yml` main-push run and
-attempt once per tag or completed-CI wakeup. Missing or unfinished CI reports
+attempt once per tag push or explicit workflow rerun. Missing or unfinished CI reports
 `waiting`; failed or cancelled CI reports `blocked`. Neither substitutes an older
 green run or another commit, and neither keeps a runner in a polling loop.
 
@@ -17,14 +17,15 @@ green run or another commit, and neither keeps a runner in a polling loop.
 1. Choose exact commits on `main` and use increasing, immutable application
    versions. Multiple release tags may overlap. One non-canceling production
    concurrency group lets the active publication finish; a surviving queued tag
-   or completed-CI wakeup then re-evaluates all current tags and selects the
+   or explicit workflow rerun then re-evaluates all current tags and selects the
    highest numeric pending version.
-2. CI and a tag may arrive in either order. A tag with missing or unfinished CI
-   reports `waiting` and releases the runner; completion of `donut CI` wakes the
-   deploy workflow again. Failed or cancelled exact-commit CI reports `blocked`.
-   Rerunning that same CI provides another completion wakeup without moving the
-   tag. An older wakeup never determines the selected version from its own SHA or
-   conclusion.
+2. Confirm successful exact-commit main CI and available backend, frontend and
+   CLI artifacts before pushing the tag. A premature tag with missing or
+   unfinished CI reports `waiting`; failed or cancelled CI reports `blocked`.
+   Both release the runner without publication. CI completion does not start
+   Application Release. Once the same commit's CI succeeds and artifacts are
+   available, explicitly rerun the original Application Release workflow without
+   moving the tag. A rerun still selects the highest pending numeric version.
 3. Confirm the selected source contains the tag-triggered `deploy.yml`. **The first
    release must include this workflow cutover.** Older pre-cutover source does not
    acquire a tag trigger when main changes. Later, a tested earlier main commit
@@ -38,7 +39,7 @@ green run or another commit, and neither keeps a runner in a polling loop.
    git push origin refs/tags/v1.2.3
    ```
 
-5. Inspect **donut deploy** admission outputs for the chosen tag, SHA and CI run/
+5. Inspect **Application Release** admission outputs for the chosen tag, SHA and CI run/
    attempt, then the publication result. All three artifacts must be available
    from that run before any production upload. The tag ref is checked again before
    writes. The selected source supplies routing, startup script and force token;
@@ -74,7 +75,7 @@ The non-canceling concurrency group lets an active release finish before a queue
 retry reconciles current state:
 
 ```bash
-gh run rerun <DONUT_DEPLOY_RUN_ID>
+gh run rerun <APPLICATION_RELEASE_RUN_ID>
 ```
 
 Admission must report the same tag, raw refOid and SHA. It reselects successful CI
@@ -84,13 +85,13 @@ attempt's artifact source. Publication repeats permitted uploads and records
 or cross-service transaction.
 
 When the failure stage is **artifact admission**, rerun the reported CI run for
-the reported exact commit. Its completed workflow automatically wakes release
-reconciliation; manually rerunning the reported donut deploy workflow is also safe:
+the reported exact commit. After CI succeeds and its artifacts are available,
+explicitly rerun the reported Application Release workflow:
 
 ```bash
 gh run rerun <CI_RUN_ID>
-gh run watch <CI_RUN_ID>
-gh run rerun <DONUT_DEPLOY_RUN_ID>
+gh run watch <CI_RUN_ID> --exit-status
+gh run rerun <APPLICATION_RELEASE_RUN_ID>
 ```
 
 Keep the tag, raw refOid and peeled SHA unchanged. The retry may use the newer

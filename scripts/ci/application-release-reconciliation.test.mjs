@@ -4,7 +4,7 @@ import { ciRun } from './application-release-ci-fixtures.mjs'
 import { makeReleaseRepository } from './application-release-fixtures.mjs'
 import { runReconciliationCommand as reconcile } from './application-release-reconciliation-fixtures.mjs'
 
-test('reconciliation keeps the highest numeric pending version across reversed wakeups', async (t) => {
+test('reconciliation keeps the highest numeric pending version across reversed tag requests', async (t) => {
   const fixture = makeReleaseRepository(t)
   const lowerSha = fixture.sha
   fixture.tag('v1.3.9')
@@ -23,12 +23,8 @@ test('reconciliation keeps the highest numeric pending version across reversed w
     ],
   }
 
-  for (const wakeupRef of [
-    'refs/tags/v1.3.10',
-    'refs/tags/v1.3.9',
-    'refs/heads/main',
-  ]) {
-    const result = await reconcile(t, fixture, wakeupRef, runsBySha)
+  for (const requestRef of ['refs/tags/v1.3.10', 'refs/tags/v1.3.9']) {
+    const result = await reconcile(t, fixture, requestRef, runsBySha)
     assert.equal(result.status, 0, result.stderr)
     assert.deepEqual(JSON.parse(result.stdout), {
       state: 'waiting',
@@ -52,7 +48,7 @@ test('reconciliation keeps the highest numeric pending version across reversed w
   }
 })
 
-test('tag-first reconciliation returns waiting and a later CI wakeup selects the same release', async (t) => {
+test('premature tag returns waiting and an explicit retry after CI succeeds selects the same release', async (t) => {
   const fixture = makeReleaseRepository(t)
   const refOid = fixture.tag('v1.2.3', true)
   fixture.clone()
@@ -67,7 +63,7 @@ test('tag-first reconciliation returns waiting and a later CI wakeup selects the
   const ready = await reconcile(
     t,
     fixture,
-    'refs/heads/main',
+    'refs/tags/v1.2.3',
     { [fixture.sha]: [ciRun({ head_sha: fixture.sha })] },
     waiting.uploads[0]
   )

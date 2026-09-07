@@ -1,12 +1,8 @@
-name: donut deploy
+name: Application Release
 
 on:
   push:
     tags: ["v*.*.*"]
-  workflow_run:
-    workflows: ["donut CI"]
-    branches: [main]
-    types: [completed]
 
 concurrency:
   group: deploy-production

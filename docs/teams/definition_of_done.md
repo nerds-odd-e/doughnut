@@ -34,7 +34,7 @@
 **Deployment and User Experience**
 ----------------------------------
 
-* Production releases use increasing immutable `vMAJOR.MINOR.PATCH` tags selecting exact tested main commits; ordinary main pushes publish nothing. Multiple releases may overlap: stable-tag pushes and completed-CI events wake reconciliation to select the highest pending numeric version, and unfinished CI releases the runner. Retry a recoverable release with the same immutable tag; when its identity must change or historical artifacts are unrecoverable, test the correction or revert on main and release the next patch as a forward correction, without automatic schema rollback. Follow the [release runbook](../gcp/conditional-backend-deploy.md).
+* Application Release starts only on increasing immutable `vMAJOR.MINOR.PATCH` tags; confirm exact-commit CI success and artifact availability before tagging. Ordinary main pushes run CI only. Overlapping tags select the highest pending numeric version; after premature tagging, explicitly rerun the release once CI succeeds. Retry a recoverable release with the same immutable tag; when its identity must change or historical artifacts are unrecoverable, test the correction or revert on main and release the next patch as a forward correction, without automatic schema rollback. Follow the [release runbook](../gcp/conditional-backend-deploy.md).
 * Less than 10 second downtime while deploying \*
 * User data integrity and security are assured at all times.
 * The user manual is kept up-to-date, and users are informed of changes.

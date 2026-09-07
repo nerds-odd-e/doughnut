@@ -83,8 +83,10 @@ gcloud sql instances describe doughnut-db-instance \
 
 Ordinary `main` pushes run CI without publishing. Increasing immutable
 `vMAJOR.MINOR.PATCH` tags select exact tested main commits for release. Tags may
-overlap: one active deployment finishes, then a queued tag or completed-CI wakeup
-reconciles the highest numeric pending version. Unfinished CI releases the runner;
+overlap: one active deployment finishes, then a queued tag or explicit rerun
+reconciles the highest numeric pending version. Verify CI and artifacts before
+tagging. Application Release starts only on tags; after premature tagging,
+explicitly rerun the release once CI succeeds. Unfinished CI releases the runner;
 use a tested correction/revert and next patch after an unrecoverable failure. No
 automatic schema rollback is provided. See the [release runbook](conditional-backend-deploy.md).
 
