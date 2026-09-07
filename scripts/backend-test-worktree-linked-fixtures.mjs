@@ -40,12 +40,35 @@ function relocateCheckout(checkout, newRoot) {
   }
 }
 
+function resolvedGitPath(cwd, revParseArg) {
+  const raw = git(cwd, ['rev-parse', revParseArg]).stdout.trim()
+  return path.resolve(cwd, raw)
+}
+
+// Ordinary clone / main worktree: `.git` is a directory and git-dir equals
+// git-common-dir. Isolation is not selected from topology alone.
+export function makePrimaryCheckout(t, options) {
+  const checkout = makeCheckout(t, options)
+  git(checkout.root, ['init'])
+  const gitDir = path.join(checkout.root, '.git')
+  if (!statSync(gitDir).isDirectory()) {
+    throw new Error(`expected primary .git directory at ${gitDir}`)
+  }
+  const resolvedGitDir = resolvedGitPath(checkout.root, '--git-dir')
+  const resolvedCommonDir = resolvedGitPath(checkout.root, '--git-common-dir')
+  if (resolvedGitDir !== resolvedCommonDir) {
+    throw new Error(
+      `expected primary git-dir === git-common-dir, got ${resolvedGitDir} vs ${resolvedCommonDir}`
+    )
+  }
+  return checkout
+}
+
 // Primary git repo plus `git worktree add` linked checkout. Reuses
 // makeCheckout files; overlays JAVA_HOME and mysql intercepts into the
 // linked tree.
 export function makeLinkedWorktreeCheckout(t, options) {
-  const primary = makeCheckout(t, options)
-  git(primary.root, ['init'])
+  const primary = makePrimaryCheckout(t, options)
   git(primary.root, ['add', 'gradlew', 'backend', 'gradle', 'scripts'])
   git(primary.root, ['commit', '-m', 'fixture'])
   const linkedRoot = `${primary.root}-linked`

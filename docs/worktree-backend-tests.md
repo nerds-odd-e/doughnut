@@ -165,12 +165,35 @@ CURSOR_DEV=true nix develop -c backend/gradlew -p backend test
 Later invocations in the same linked checkout skip provisioning and reuse the
 same identity.
 
+## Ordinary commands on a primary checkout
+
+A **primary** checkout is a normal clone or the main worktree: `.git` is a
+directory (`git-dir` equals `git-common-dir`). Topology alone does not isolate
+it.
+
+- **Unconfigured** (no `.worktree.local.json`): repository-wrapper
+  `migrateTestDB` and `test` keep the established default target. They do not
+  allocate an identity, do not create `.worktree.local.json`, and do not take
+  the checkout lock. An explicit `SPRING_DATASOURCE_URL` or `DB_URL` stays as
+  the caller set it. Existing CI-shaped forms such as
+  `backend/gradlew -p backend test -Dspring.profiles.active=test --build-cache --parallel`
+  (`pnpm backend:test_only`) stay on this path.
+- **Configured** (`.worktree.local.json` already present): `migrateTestDB` and
+  `test` use that assigned ID, as in Ordinary migration / Ordinary tests
+  above.
+
+Unrelated wrapper tasks (`spotlessApply`, `help`, `generateOpenAPIDocs`, and
+other non-`test` / non-`migrateTestDB` tasks) never allocate, never set a
+worktree datasource URL, and never take the lock — including in a configured
+primary or a linked worktree.
+
 ## Limits
 
-- `pnpm backend:test` and `pnpm backend:test_only` are not automatically
-  isolated; they keep the legacy default (`doughnut_test`). Configured-checkout
-  and fresh linked-worktree `migrateTestDB` and `test` through the repository
-  wrapper are isolated as described above.
+- An unconfigured primary checkout keeps the established default
+  (`doughnut_test`) and any caller-supplied URL; it does not allocate.
+  `pnpm backend:test` and `pnpm backend:test_only` follow that path.
+  Configured-checkout and fresh linked-worktree `migrateTestDB` and `test`
+  through the repository wrapper are isolated as described above.
 - No automatic cleanup, retirement, or orphan removal: a provisioned database
   (and an unreferenced one left behind by a failed or interrupted first use)
   persists until removed manually. There is no machine-wide allocation
