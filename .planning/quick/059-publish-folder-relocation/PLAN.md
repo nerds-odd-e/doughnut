@@ -3,7 +3,7 @@
 ## Source and status
 
 Source: [SEED-009 Story 7](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-7).
-Status: in progress; slices 1–3 done.
+Status: in progress; slices 1–4 done.
 
 ## Goal and scope
 
@@ -38,7 +38,10 @@ operations retain their meanings, including a last-note move leaving its folder.
   Missing/unrepresented dest parents name `{destPrefix}/README.md` with the
   existing unrepresented-parent wording and create nothing. Root dest parent
   is null/valid. Exact represented-parent candidates still reserved-README
-  until leaf 6.
+  until leaf 6. Placement then uses `NotebookGitProposalFolderPlacement`:
+  collision (`FOLDER_NAME_CONFLICT`) and self/descendant 400, both contextualized
+  as `Cannot move folder to path "{destPrefix}/README.md": …`. Invisible empty
+  same-name destinations collide. No merge.
 - Use source/destination prefixes and complete relative-path/blob correspondence,
   not independent equal-blob pairing. Require exactly one eligible folder mapping;
   identical note content elsewhere must not affect it. Nested README files belong
@@ -139,10 +142,13 @@ Sizing basis: adapt existing full-path resolution, with one refusal proof loop.
 
 ### 4. Reject a folder destination that collides or creates a cycle
 Type: Behavior
-Status: planned
+Status: done
 Proof: Controller data variants for an existing same-name destination (including
 an invisible empty container) and self/descendant destination retain the original
 hierarchy and report the placement reason at the requested path.
+`CURSOR_DEV=true nix develop -c pnpm backend:test_only` passed.
+`NotebookGitProposalFolderRelocationPlacementControllerTest` covers collision
+(canonical), invisible empty (delta), self, and descendant.
 
 Behavior: An exact candidate resolves a parent but violates existing placement
 rules → publish → reject without merging or overwriting. Use
@@ -324,15 +330,15 @@ feature is promised. No completed evidence exists to migrate.
 
 ## Readiness and learnings
 
-Slices 1–3 done. Remaining leaves are target-sized hypotheses, not time guarantees.
+Slices 1–4 done. Remaining leaves are target-sized hypotheses, not time guarantees.
 No sizing exception is pre-approved; record actual test/external wait runtime
 separately. If integration in leaf 6 fails to converge, refine this same plan
 rather than bypass a safety gate or expand the story.
 
-Leaf 3 learning: dest parent is the parent of `destPrefix` (no slash → root).
-Error path is `{destPrefix}/README.md`. Source Folder uses `sourcePrefix + "/"`
-plus accepted content under that prefix. Publisher now consumes `FolderRelocation`
-before note classification. Leaves 4–5 should run on that mapping before reparent.
+Leaf 4 learning: `RepresentedFolderRelocation(sourceFolderId, destParentFolderId)`
+loads Folders via `entityPersister.find`; dest parent null is root. Collision and
+cycle errors are contextualized with `{destPrefix}/README.md`. Empty **source**
+descendants remain leaf 5.
 
 CI observer delivered a 2026-09-05 E2E failure on `1d846feb` (`cli_notebook_clone`).
 That SHA is not this execution's push; later `main` CI including origin `63dbba7f74`

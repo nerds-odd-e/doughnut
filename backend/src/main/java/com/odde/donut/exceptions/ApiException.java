@@ -20,4 +20,15 @@ public class ApiException extends RuntimeException {
   public ApiError getErrorBody() {
     return apiError;
   }
+
+  public ApiException withContext(String context) {
+    ApiException contextualException =
+        new ApiException(
+            getMessage(),
+            getErrorBody().getErrorType(),
+            context + ": " + getErrorBody().getMessage());
+    contextualException.getErrorBody().getErrors().putAll(getErrorBody().getErrors());
+    contextualException.initCause(this);
+    return contextualException;
+  }
 }

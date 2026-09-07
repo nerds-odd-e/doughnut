@@ -47,23 +47,29 @@ public class NotebookGitProjection {
         folders, repository, acceptedHead, notePath.substring(0, folderPathEnd + 1), notePath);
   }
 
+  record RepresentedFolderRelocation(int sourceFolderId, Integer destParentFolderId) {}
+
   /**
    * Resolves the source Folder and destination parent of an exact folder relocation against
    * accepted Portable paths. Notebook root is a valid destination parent. Nested parents must exist
    * as folder rows and have tracked accepted content under their full path.
    */
-  void requireRepresentedFolderRelocation(
+  RepresentedFolderRelocation requireRepresentedFolderRelocation(
       List<ExportFolderRow> folders,
       Repository repository,
       ObjectId acceptedHead,
       NotebookGitProposalFolderShape.FolderRelocation relocation) {
-    requireRepresentedFolderPath(
-        folders,
-        repository,
-        acceptedHead,
-        relocation.sourcePrefix() + "/",
-        relocation.sourcePrefix() + "/README.md");
-    requireRepresentedDestinationParent(folders, repository, acceptedHead, relocation.destPrefix());
+    Integer sourceFolderId =
+        requireRepresentedFolderPath(
+            folders,
+            repository,
+            acceptedHead,
+            relocation.sourcePrefix() + "/",
+            relocation.sourcePrefix() + "/README.md");
+    Integer destParentFolderId =
+        requireRepresentedDestinationParent(
+            folders, repository, acceptedHead, relocation.destPrefix());
+    return new RepresentedFolderRelocation(sourceFolderId, destParentFolderId);
   }
 
   private Integer requireRepresentedDestinationParent(
