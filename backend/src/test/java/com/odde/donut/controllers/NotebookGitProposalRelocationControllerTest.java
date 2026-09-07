@@ -24,7 +24,9 @@ import org.springframework.http.ResponseEntity;
  * the notebook root, keeping filename and identity. Same-parent filename changes are covered in
  * {@link NotebookGitProposalRenameControllerTest}. Combined parent-and-filename pairs are covered
  * in {@link NotebookGitProposalRelocateAndRenameControllerTest}. Private-association retention is
- * covered in {@link NotebookGitProposalRelocationPrivateAssociationControllerTest}.
+ * covered in {@link NotebookGitProposalRelocationPrivateAssociationControllerTest}. Missing and
+ * unrepresented destinations are covered in {@link
+ * NotebookGitProposalRelocationDestinationControllerTest}.
  */
 class NotebookGitProposalRelocationControllerTest extends NotebookGitBundleControllerTestBase {
 

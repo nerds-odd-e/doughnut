@@ -22,8 +22,9 @@ import org.springframework.http.ResponseEntity;
 /**
  * Verifies relocating a folder's last tracked note keeps the Donut source container and does not
  * manufacture a README. Placement is covered in {@link
- * NotebookGitProposalRelocationControllerTest}. Last-note deletion containers are covered in {@link
- * NotebookGitDeletionContainerPublicationControllerTest}.
+ * NotebookGitProposalRelocationControllerTest}. Relocating back into that emptied folder is
+ * rejected in {@link NotebookGitProposalRelocationDestinationControllerTest}. Last-note deletion
+ * containers are covered in {@link NotebookGitDeletionContainerPublicationControllerTest}.
  */
 class NotebookGitProposalRelocationContainerControllerTest
     extends NotebookGitBundleControllerTestBase {
