@@ -1,7 +1,7 @@
 # Publish one local note deletion
 
 Source: [SEED-009 Story 5](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-5).
-Status: slices 1–3 done; next is slice 4.
+Status: slices 1–4 done; next is slice 5.
 
 ## Learnings
 
@@ -25,6 +25,11 @@ the existing `FAIL_ON_BINDING_SAVE` harness in
 `NotebookGitDeletionPublicationAtomicControllerTest` (sibling of the
 193-line add/edit atomic class). Full `pnpm backend:test_only` passed
 (2223 tests). No production change.
+
+Slice 4 added `git rm --` checkout commit harness (`commitCliNotebookCheckoutNoteRemoval` /
+`commitRemoval`) without a new Gherkin scenario. Existing
+`cli_notebook_clone.feature` stayed green (6 scenarios). Git identity/commit
+helpers were collapsed in the clone tasks file.
 
 ## Goal and scope
 
@@ -191,7 +196,7 @@ compensation, or transaction policy. Stale-head and drift cases belong to 10–1
 
 ### 4. Prepare the existing checkout harness for an explicit removal
 Type: Structure
-Status: planned
+Status: done
 Proof: Existing installed-CLI notebook feature remains green; no product or
 existing test-flow behavior changes. Run focused notebook E2E verification.
 
@@ -352,8 +357,9 @@ Keep existing title reuse and restore policy unchanged.
 
 ## Sizing, readiness, and learning checkpoint
 
-Slices 1–3 delivered isolation rejection, isolated-deletion acceptance, and
-late-failure rollback. Remaining leaves execute in order from slice 4.
+Slices 1–4 delivered isolation rejection, isolated-deletion acceptance,
+late-failure rollback, and the E2E removal-commit harness. Remaining leaves
+execute in order from slice 5.
 Four bundled original slices were replaced; four were retained and reordered.
 The result is 13 Behavior leaves and one immediately enabling Structure leaf.
 No completed proof was discarded and no product scope was added or removed.

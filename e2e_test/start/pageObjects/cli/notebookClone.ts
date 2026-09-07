@@ -141,6 +141,19 @@ function notebookCloneCheckout() {
     ): Cypress.Chainable<null> {
       return commitNoteChanges(files)
     },
+    commitRemoval(relativePath: string): Cypress.Chainable<null> {
+      return cy.get<string>('@cliCloneDestination').then((checkoutDir) =>
+        cy
+          .task<string>('commitCliNotebookCheckoutNoteRemoval', {
+            checkoutDir,
+            relativePath,
+          })
+          .then((head) => {
+            cy.wrap(head).as('cliNotebookPublishHead')
+            return cy.wrap(null)
+          })
+      )
+    },
     publish(): Cypress.Chainable<null> {
       return publishWithTask('runInstalledCli')
     },
