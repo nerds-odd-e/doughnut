@@ -88,7 +88,7 @@ export function describeNotebookPullRebase(): void {
       expect(ctx.getFetchMock()).toHaveBeenCalledOnce()
       expect(ctx.getFetchMock().mock.calls[0]?.[0]).toContain('/git-bundle')
       expect(ctx.getLogSpy()).toHaveBeenCalledWith(
-        `Rebased onto the accepted history. Local head: ${localHead}. Accepted head: ${setup.acceptedHead}. Inspect the result with "git status".`
+        `Rebased onto the accepted history. Unpublished local commit: ${localHead}. Accepted head: ${setup.acceptedHead}. Inspect the result, then run "donut notebook publish ${setup.directory}".`
       )
       expect(acceptedHistoryStagingDirsUnderTmp()).toEqual(stagingBefore)
     })

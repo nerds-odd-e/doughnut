@@ -1,7 +1,7 @@
 # Resolve overlapping note edits with ordinary Git
 
 Source: [SEED-009 Story 9](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-9), product backlog item 3.
-Status: in progress; slices 1–2 done.
+Status: in progress; slices 1–3 done.
 
 ## Goal and scope
 
@@ -170,11 +170,8 @@ or preparation framework. Separate outcome policies belong to leaves 3–6.
 
 ### 3. Report when accepted history already contains the local change
 Type: Behavior
-Status: planned
-Proof: Real-Git pull fixture where accepted history independently contains L's
-patch → completed rebase with HEAD=B, clean main, original L recoverable, no
-invented child and no POST. Output says no unpublished change remains; repeat
-pull stays unchanged. A nonempty result still identifies L′ as unpublished.
+Status: done
+Proof: `CURSOR_DEV=true nix develop -c pnpm -C cli exec vitest run tests/notebookPull.test.ts` — absorbed same-note patch: HEAD=B, clean main, ORIG_HEAD/L recoverable, no unpublished copy, repeat pull unchanged, GET only; nonempty rebase names L′ as unpublished.
 
 Behavior: Eligible same-note rebase has no remaining local change → pull →
 the owner receives accepted content without being told an unpublished commit
@@ -363,7 +360,9 @@ back to Story 9. Do not disguise a story-sizing problem by renaming leaves.
   `runSystemGitOrThrow` includes stdout+stderr. Leaves 4/5/9/10 reuse that path.
 - Slice 2 removed `acceptedIntervalTouchesPath` and inlined the remaining
   structural walk. Same-path reversed-rename lives in the structural `test.each`
-  table. Rebase completion is interim-neutral until leaf 3.
+  table.
+- Slice 3: Git 2.50 drops an already-present patch and completes at B. Pull
+  returns `absorbed` vs `rebased` from resulting HEAD. Do not auto-skip.
 
 Readiness relies on existing native Git rebase, object import and publication
 contracts, not an assertion that their new composition has already passed.

@@ -8,7 +8,7 @@ const RECEIVE_CHECKOUT_CHANGED =
   'Local main changed while the accepted history was downloading. Try again from the unchanged clean main.'
 
 interface AcceptedNotebookReceiveResult {
-  kind: 'unchanged' | 'already-based' | 'rebased' | 'fast-forward'
+  kind: 'unchanged' | 'already-based' | 'rebased' | 'absorbed' | 'fast-forward'
   acceptedHead: string
   localHead: string
 }
@@ -78,8 +78,9 @@ function rebaseUnpublishedCommit(
 /**
  * Downloads accepted history and advances an unchanged, clean local main: equal heads stay
  * unchanged, an eligible already-based unpublished commit stays unpublished, eligible
- * content-only divergence rebases, and ancestor checkouts fast-forward. Imported objects do
- * not install a remote or a persistent remote ref.
+ * content-only divergence rebases (an empty remaining patch leaves local main at the accepted
+ * head), and ancestor checkouts fast-forward. Imported objects do not install a remote or a
+ * persistent remote ref.
  */
 export async function receiveAcceptedNotebookHead(
   directory: string,
@@ -149,10 +150,11 @@ export async function receiveAcceptedNotebookHead(
           acceptedHead,
           localHistory.localParent
         )
+        const localHead = readHead(directory)
         return {
-          kind: 'rebased',
+          kind: localHead === acceptedHead ? 'absorbed' : 'rebased',
           acceptedHead,
-          localHead: readHead(directory),
+          localHead,
         }
       }
 

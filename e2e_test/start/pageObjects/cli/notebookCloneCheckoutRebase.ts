@@ -35,7 +35,7 @@ function notebookCloneCheckoutRebaseObservations() {
           'L′ parent B should differ from L’s parent'
         ).to.not.equal(original.parent)
         return nonInteractiveOutput().expectContains(
-          `Local head: ${rebased.head}. Accepted head: ${rebased.parent}.`
+          `Unpublished local commit: ${rebased.head}. Accepted head: ${rebased.parent}.`
         )
       })
     },

@@ -1,12 +1,12 @@
 import * as fs from 'node:fs'
 import { join } from 'node:path'
 import { describe, expect, test } from 'vitest'
-import { getApiConfig } from 'donut-api'
 import { run } from '../src/run.js'
 import { runGit } from './notebookClone.testHelpers.js'
 import { acceptedHistoryStagingDirsUnderTmp } from './notebookAcceptedHistory.testHelpers.js'
 import {
   checkoutState,
+  GIT_BUNDLE_GET,
   installNotebookPullAcceptedHistoryTest,
   serveAcceptedBundle,
 } from './notebookPull.testHelpers.js'
@@ -15,11 +15,6 @@ import {
   LOCAL_NOTE,
   prepareEligibleDivergence,
 } from './notebookPull.rebase.testHelpers.js'
-
-const GIT_BUNDLE_GET = [
-  `${getApiConfig().apiBaseUrl}/api/notebooks/42/git-bundle`,
-  { headers: { Authorization: 'Bearer fake-bearer' } },
-] as const
 
 function alreadyBasedMessage(
   directory: string,
@@ -129,7 +124,7 @@ export function describeNotebookPullAlreadyBased(): void {
         LATER_OTHER_NOTE
       )
       expect(ctx.getLogSpy().mock.calls.at(-1)).toEqual([
-        `Rebased onto the accepted history. Local head: ${laterLocalHead}. Accepted head: ${laterAccepted}. Inspect the result with "git status".`,
+        `Rebased onto the accepted history. Unpublished local commit: ${laterLocalHead}. Accepted head: ${laterAccepted}. Inspect the result, then run "donut notebook publish ${setup.directory}".`,
       ])
     })
   })
