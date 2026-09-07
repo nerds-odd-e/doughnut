@@ -1,6 +1,6 @@
 # Concurrent backend tests with explicit worktree configuration
 
-Status: in progress; slices 1–3 done.
+Status: in progress; slices 1–4 done.
 Source: [SEED-015, story 1a](../../seeds/SEED-015-concurrent-worktree-environments.md#story-1a).
 Stories 1a, 1b, and 1c occupy the first three product-backlog positions.
 This plan covers only 1a. No implementation or database experiment was performed
@@ -179,7 +179,7 @@ Sizing: about 5 minutes, high confidence; one argument-selection proof loop.
 
 ### 4. Prepare the two disposable environments for the real concurrent run
 Type: Structure
-Status: planned
+Status: done
 Proof: Two disposable worktrees contain the implementation and installed normal
 checkout dependencies; each configured database is reachable by the local test
 user and its root config is ignored. Record worktree paths, distinct IDs,
@@ -195,6 +195,70 @@ Sizing: about 5 minutes active setup, medium confidence; dependency installation
 or Nix downloads are external waits, not hidden implementation work. If setup
 requires a new harness, refine this leaf. Preserve these disposable environments
 for subsequent proofs rather than repeating setup or deleting evidence.
+
+Recorded setup (leave these environments in place for leaves 5–8; do not delete):
+
+- Source checkout: `/Users/terryyin/git/doughnut-wt-054` remained on
+  `feat/configured-worktree-backend-tests` at
+  `49d4f305448deecacd7f2527a42656aaf1ed69b4`.
+- Worktree A: `/Users/terryyin/git/doughnut-wt-054-a` (detached HEAD at the same
+  commit). ID `wt_054a` → database `doughnut_wt_054a_test`.
+- Worktree B: `/Users/terryyin/git/doughnut-wt-054-b` (detached HEAD at the same
+  commit). ID `wt_054b` → database `doughnut_wt_054b_test`.
+
+Provisioning commands (from `/Users/terryyin/git/doughnut-wt-054` unless noted):
+
+```
+git worktree add --detach /Users/terryyin/git/doughnut-wt-054-a
+git worktree add --detach /Users/terryyin/git/doughnut-wt-054-b
+```
+
+```
+CURSOR_DEV=true nix develop -c mysql -h127.0.0.1 -P3309 -u root
+```
+
+SQL (new databases only; doughnut password unchanged):
+
+```
+CREATE DATABASE doughnut_wt_054a_test DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE DATABASE doughnut_wt_054b_test DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+GRANT ALL PRIVILEGES ON doughnut_wt_054a_test.* TO 'doughnut'@'localhost';
+GRANT ALL PRIVILEGES ON doughnut_wt_054a_test.* TO 'doughnut'@'127.0.0.1';
+GRANT ALL PRIVILEGES ON doughnut_wt_054b_test.* TO 'doughnut'@'localhost';
+GRANT ALL PRIVILEGES ON doughnut_wt_054b_test.* TO 'doughnut'@'127.0.0.1';
+FLUSH PRIVILEGES;
+```
+
+Root config in each worktree: A `.worktree.local.json` is `{"id":"wt_054a"}`;
+B is `{"id":"wt_054b"}`. `git check-ignore -v .worktree.local.json` in both:
+
+```
+.gitignore:158:/.worktree.local.json	.worktree.local.json
+```
+
+Dependencies (from each worktree; no backend tests run):
+
+```
+CURSOR_DEV=true nix develop -c pnpm install
+```
+
+A finished in 11.1s and B in 10.8s (pnpm v11.26.0; lockfile up to date; 1285
+packages). Each worktree has `scripts/backend-test-worktree.sh`, `backend/`,
+and `node_modules/`. Worktree working trees stayed clean (config ignored).
+
+Engine and initial database state (`SELECT VERSION()` / `SELECT 1` /
+`SHOW DATABASES` as `doughnut` over TCP, selected target = the new DB, never
+a legacy name):
+
+- Engine: MySQL `8.4.11` on `127.0.0.1:3309`.
+- `doughnut_wt_054a_test` and `doughnut_wt_054b_test`: charset `utf8mb4`,
+  collation `utf8mb4_unicode_ci`, `table_count` 0, no
+  `flyway_schema_history` table (empty initial state).
+- Legacy databases unmodified vs pre-setup snapshot:
+  `doughnut_test` 42 tables / 20 flyway rows / `utf8mb4_unicode_ci`;
+  `doughnut_e2e_test` 42 tables / 20 flyway rows / `utf8mb4_0900_ai_ci`;
+  `doughnut_development` 0 tables / `utf8mb4_unicode_ci`. No DROP or writes
+  to those names.
 
 ### 5. Obtain independent full-suite results in two configured worktrees
 Type: Behavior
@@ -338,6 +402,11 @@ gated on the opt-in property. Temporary refusal is gone.
 
 Slice 3: `--tests '<pattern>'` is one Gradle token after `test`; missing values
 and unrelated args refuse before Gradle; unmatched filter keeps child failure.
+
+Slice 4: disposable worktrees `/Users/terryyin/git/doughnut-wt-054-a` (`wt_054a`)
+and `/Users/terryyin/git/doughnut-wt-054-b` (`wt_054b`) with empty utf8mb4
+databases on MySQL 8.4.11; configs ignored; legacy DBs unmodified. Preserve
+them for leaves 5–8.
 
 Ready for execution under the existing workflow; no additional story refinement
 or slice-plan pass is currently required. All leaves have one bounded proof
