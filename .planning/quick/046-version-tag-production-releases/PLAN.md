@@ -102,7 +102,8 @@ already active deployment. Note the temporary pause; leaf 10 removes it.
 
 ### 2. Identify the exact tagged main commit
 Type: Behavior
-Status: planned
+Status: done
+Evidence: `CURSOR_DEV=true nix develop -c bash scripts/test/application-release.test` passed 17/17, including real shallow repositories, lightweight/annotated tags behind main, off-main/invalid/forced/deleted/changed refs and workflow identity outputs. Refactor moved deleted-ref coverage through the command and removed test-only exports; 17/17 remains green. Retained raw refOid must be rechecked before production writes in leaves 7/9.
 Proof: Entry-command fixtures resolve lightweight/annotated stable tags behind
 HEAD and reject invalid shapes/off-main selections.
 

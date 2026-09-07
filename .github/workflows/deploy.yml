@@ -28,29 +28,29 @@ permissions:
 
 jobs:
   main-head-guard:
-    name: Check deploy SHA is still main HEAD
+    name: Identify tagged main commit
     runs-on: ${{ vars.RUNNER }}
     # Application publication is paused until the version-tag release path is enabled.
     if: ${{ false }}
     outputs:
       deploy: ${{ steps.head_guard.outputs.deploy }}
+      tag: ${{ steps.head_guard.outputs.tag }}
+      sha: ${{ steps.head_guard.outputs.sha }}
+      ref: ${{ steps.head_guard.outputs.ref }}
+      ref_oid: ${{ steps.head_guard.outputs.refOid }}
     steps:
       - uses: actions/checkout@v7
         with:
-          ref: ${{ github.event.workflow_run.head_sha }}
-          fetch-depth: 1
-      - name: Skip deploy if main has moved forward
+          ref: main
+          fetch-depth: 0
+      - uses: actions/setup-node@v7
+        with:
+          node-version: ${{ vars.NODE_VERSION }}
+      - name: Identify exact tagged main commit
         id: head_guard
         run: |
-          git fetch origin main --depth=1
-          MAIN_HEAD=$(git rev-parse origin/main)
-          if [ "$MAIN_HEAD" != "$GITHUB_SHA" ]; then
-            echo "Skipping deploy: origin/main is ${MAIN_HEAD}, this run is for ${GITHUB_SHA}"
-            echo "deploy=false" >> "$GITHUB_OUTPUT"
-          else
-            echo "origin/main matches deploy SHA ${GITHUB_SHA}"
-            echo "deploy=true" >> "$GITHUB_OUTPUT"
-          fi
+          node scripts/ci/application-release.mjs
+          echo "deploy=true" >> "$GITHUB_OUTPUT"
 
   Deploy:
     name: GCP deploy (GCS + MIG + health probe)
