@@ -3,7 +3,7 @@
  * temporary destination, and reading back the resulting checkout's file tree.
  */
 
-import { execFileSync } from 'node:child_process'
+import { execFileSync, spawnSync } from 'node:child_process'
 import { existsSync, mkdtempSync, readdirSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join, relative } from 'node:path'
@@ -19,6 +19,23 @@ export interface CliNotebookCheckoutState {
   blobs: Record<string, string>
   parentBlobs: Record<string, string>
 }
+
+export interface CliNotebookCheckoutConflictState {
+  rebaseMerge: boolean
+  unmerged: string
+}
+
+const E2E_GIT_IDENTITY_ARGS = [
+  '-c',
+  'user.name=Donut E2E',
+  '-c',
+  'user.email=donut-e2e@example.com',
+] as const
+
+const TEST_OWNED_REBASE_EDITOR_ENV = {
+  GIT_EDITOR: 'true',
+  GIT_SEQUENCE_EDITOR: 'true',
+} as const
 
 function listFilesRecursively(dir: string, base: string): string[] {
   return readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
@@ -36,17 +53,24 @@ function git(checkoutDir: string, ...args: string[]): string {
 }
 
 function commitCheckout(checkoutDir: string, message: string): string {
-  git(
-    checkoutDir,
-    '-c',
-    'user.name=Donut E2E',
-    '-c',
-    'user.email=donut-e2e@example.com',
-    'commit',
-    '-m',
-    message
-  )
+  git(checkoutDir, ...E2E_GIT_IDENTITY_ARGS, 'commit', '-m', message)
   return git(checkoutDir, 'rev-parse', 'HEAD')
+}
+
+function continueRebaseNoninteractively(checkoutDir: string): void {
+  const result = spawnSync(
+    'git',
+    ['-C', checkoutDir, ...E2E_GIT_IDENTITY_ARGS, 'rebase', '--continue'],
+    {
+      encoding: 'utf8',
+      env: { ...process.env, ...TEST_OWNED_REBASE_EDITOR_ENV },
+    }
+  )
+  if (result.status !== 0) {
+    throw new Error(
+      `git rebase --continue failed:\n${result.stdout}\n${result.stderr}`
+    )
+  }
 }
 
 function firstParent(checkoutDir: string): string {
@@ -111,6 +135,34 @@ export function createCliE2eNotebookCloneTasks() {
     /** Relative file paths of the checkout, excluding `.git`, for canonical-tree assertions. */
     listNotebookCheckoutEntries(checkoutDir: string): string[] {
       return listFilesRecursively(checkoutDir, checkoutDir).sort()
+    },
+    readCliNotebookCheckoutConflictState(
+      checkoutDir: string
+    ): CliNotebookCheckoutConflictState {
+      const rebaseMergePath = git(
+        checkoutDir,
+        'rev-parse',
+        '--git-path',
+        'rebase-merge'
+      )
+      return {
+        rebaseMerge: existsSync(join(checkoutDir, rebaseMergePath)),
+        unmerged: git(checkoutDir, 'ls-files', '-u'),
+      }
+    },
+    continueCliNotebookCheckoutRebaseWithChosenBytes({
+      checkoutDir,
+      relativePath,
+      content,
+    }: {
+      checkoutDir: string
+      relativePath: string
+      content: string
+    }): null {
+      writeFileSync(join(checkoutDir, relativePath), `${content}\n`)
+      git(checkoutDir, 'add', '--', relativePath)
+      continueRebaseNoninteractively(checkoutDir)
+      return null
     },
     commitCliNotebookCheckoutNoteChange({
       checkoutDir,

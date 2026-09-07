@@ -107,6 +107,23 @@ When('I pull the cloned checkout using the installed CLI', () =>
   cli.notebookCloneCheckout().pull()
 )
 
+When(
+  'I pull the cloned checkout expecting rejection from the installed CLI',
+  () => cli.notebookCloneCheckout().pullExpectingRejection()
+)
+
+Then(
+  'the cloned checkout has a paused rebase conflict for {string}',
+  (relativePath: string) =>
+    cli.notebookCloneCheckout().expectPausedRebaseConflictFor(relativePath)
+)
+
+When(
+  'I write, stage, and continue the cloned checkout rebase with the following edit to {string}:',
+  (relativePath: string, content: string) =>
+    cli.notebookCloneCheckout().continueWithChosenEdit(relativePath, content)
+)
+
 Then('the cloned checkout is a clean rebased child of the accepted head', () =>
   cli.notebookCloneCheckout().expectCleanRebasedChildOfAcceptedHead()
 )
@@ -136,4 +153,19 @@ Then(
 Then(
   'the installed CLI reports the rebased local head as the accepted head',
   () => cli.notebookCloneCheckout().expectRebasedHeadAccepted()
+)
+
+Then('the cloned checkout is a clean resolved child of the accepted head', () =>
+  cli.notebookCloneCheckout().expectCleanResolvedChildOfAcceptedHead()
+)
+
+Then(
+  'the cloned checkout retains the original local commit author and message for {string}',
+  (relativePath: string) =>
+    cli.notebookCloneCheckout().expectResolvedLocalCommitFor(relativePath)
+)
+
+Then(
+  'the installed CLI reports the resolved local head as the accepted head',
+  () => cli.notebookCloneCheckout().expectResolvedHeadAccepted()
 )

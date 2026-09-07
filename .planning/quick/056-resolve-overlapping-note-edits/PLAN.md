@@ -1,7 +1,7 @@
 # Resolve overlapping note edits with ordinary Git
 
 Source: [SEED-009 Story 9](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-9), product backlog item 3.
-Status: in progress; slices 1–8 done.
+Status: in progress; slices 1–9 done.
 
 ## Goal and scope
 
@@ -251,9 +251,8 @@ runtime exception, not extra implementation scope.
 
 ### 9. Enable the installed conflict scenario's native Git actions
 Type: Structure
-Status: planned
-Proof: Existing `cli_notebook_clone.feature` remains green. Add no failing
-scenario or generic shell task; the immediate next leaf owns the new journey.
+Status: done
+Proof: `CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/cli/cli_notebook_clone.feature` — 10 passing, no new scenario. Rejected pull, conflict-state, and write-stage-continue are on the existing tasks/steps/page objects.
 
 Internal change: Add thin rejected-pull/conflict-state and write-stage-continue
 actions to the existing installed CLI tasks, steps and notebook checkout page
@@ -354,6 +353,10 @@ back to Story 9. Do not disguise a story-sizing problem by renaming leaves.
   chosen same-note bytes after a web save of that learned note. Canonical
   tracker/private-state shape stays in the other-note sibling; the new case
   asserts same note id, chosen authored frontmatter, and downloaded head/parent.
+- Slice 9: No production change. Rejected pull reuses `runInstalledCliExpectingRejection`
+  and captures original L only. Resolved L′ is `@cliNotebookResolvedCheckout`
+  (not the auto-merge alias). Continue uses spawn-only `GIT_EDITOR`/`GIT_SEQUENCE_EDITOR`
+  plus one-shot `-c` identity; no `git config`. No abort E2E or generic shell task.
 
 Readiness relies on existing native Git rebase, object import and publication
 contracts, not an assertion that their new composition has already passed.
