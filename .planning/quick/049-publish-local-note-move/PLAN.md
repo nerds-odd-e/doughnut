@@ -285,7 +285,7 @@ non-regular-mode fixture (existing `seedAcceptedBinding` can't produce one).
 
 ### 10. Keep a deleted filename reserved
 Type: Behavior
-Status: planned
+Status: done
 Proof: Establish a deleted destination through accepted isolated deletion,
 then rename a different live note into it → existing deleted-title conflict,
 no resurrection and unchanged source, deleted tracker and accepted head.
@@ -294,6 +294,13 @@ Backend; reuse NotebookGitDeletedDestinationControllerTest patterns.
 Behavior: A soft-deleted note reserves the new filename in this same folder →
 publish rename → reject atomically. Leaf 2 must already include this guard;
 this leaf owns the richer persisted identity-boundary proof.
+Learning: Pure proof addition, no production change — leaf 2's
+`applyRename` already calls `NoteTitlePlacementRules.requireNoSoftDeletedTitleAt`
+before mutating the source, unwrapped (unlike `applyAddition`'s
+`withContext`-wrapped exception, a real and confirmed asymmetry). Added a
+second test to NotebookGitDeletedDestinationControllerTest reusing an
+extracted `acceptDeletionReservingTitle` setup helper; proves the rename's
+source note stays completely unmutated on rejection.
 
 ### 11. Edit the same note after its accepted rename
 Type: Behavior
