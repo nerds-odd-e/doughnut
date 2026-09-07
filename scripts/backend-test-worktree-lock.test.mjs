@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict'
-import { mkdirSync, writeFileSync } from 'node:fs'
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import path from 'node:path'
 import { test } from 'node:test'
 import {
@@ -11,6 +11,7 @@ import {
   readGradleInvocation,
   runLauncher,
   runLauncherAsync,
+  writeStaleOwnerLock,
 } from './backend-test-worktree-test-fixtures.mjs'
 
 test('active owner refuses a second launcher before it reads a malformed replacement config or reaches gradle', async (t) => {
@@ -66,4 +67,22 @@ test('a different checkout root reaches its own gradle stand-in while another ch
   owner.release()
   const ownerResult = await owner.waitForExit()
   assert.equal(ownerResult.status, 0)
+})
+
+test('a stale owner record for an exited process is reclaimed and the launcher reaches gradle against the configured database', (t) => {
+  const checkout = makeCheckout(t, {
+    config: JSON.stringify({ id: 'wt_a7c2' }),
+  })
+  writeStaleOwnerLock(checkout)
+
+  const result = runLauncher(checkout)
+  assert.equal(result.status, 0, outputOf(result))
+  assert.equal(
+    readGradleInvocation(checkout).url,
+    jdbcUrl('doughnut_wt_a7c2_test')
+  )
+  assert.equal(
+    readFileSync(lockPaths(checkout).ownerFile, 'utf8').trim(),
+    String(result.pid)
+  )
 })

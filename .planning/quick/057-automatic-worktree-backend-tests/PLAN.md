@@ -289,12 +289,24 @@ focused command-boundary proof loop.
 
 ### 7. Reclaim checkout ownership after its process exits
 Type: Behavior
-Status: planned
+Status: done
 Proof: Leave a PID record for a process that has exited, then invoke the
 configured command. It atomically replaces that stale ownership, selects the
 same database, and reaches Gradle. The active and malformed records covered by
 slice 2 remain refusals. Run
 `node --test scripts/backend-test-worktree.test.mjs`.
+
+Learning: When the lock `mkdir` fails, `backend-test-worktree.sh` reads
+`owner.pid`: non-numeric still refuses (unchanged); a numeric PID is checked
+with `kill -0`; alive still refuses (unchanged, slice 2 preserved); not alive
+is reclaimed by writing the launcher's own PID to a sibling temp file then
+atomically `mv`-ing it over `owner.pid` (no partial-write window), then
+falling through to the normal config/provisioning/gradle path. Fixture gained
+`makeStaleOwnerPid`/`writeStaleOwnerLock` (spawn-and-wait-for-exit for a
+guaranteed-dead PID). No cross-reclaimer arbitration was added beyond this —
+out of scope per the plan's exclusion of wait-queues/supervision.
+`CURSOR_DEV=true nix develop -c pnpm test:backend-test-worktree` passes
+(22/22).
 
 Behavior: A previous launcher owner has exited but its ignored PID record
 remains → a later command starts → it reclaims checkout ownership and reuses the

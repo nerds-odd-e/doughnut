@@ -200,6 +200,25 @@ export function lockPaths(checkout) {
   return { dir, ownerFile: path.join(dir, 'owner.pid') }
 }
 
+// Spawns a short-lived child process, waits for it to exit (spawnSync blocks
+// until completion), then returns its now-dead PID. Used to fabricate a
+// stale owner lock record for a process guaranteed not to be alive.
+export function makeStaleOwnerPid() {
+  const result = spawnSync(process.execPath, ['-e', ''])
+  return result.pid
+}
+
+// Creates the checkout's lock directory with a stale (dead-PID) owner
+// record, as if a previous launcher owned it and then exited without
+// cleanup.
+export function writeStaleOwnerLock(checkout) {
+  const { dir, ownerFile } = lockPaths(checkout)
+  mkdirSync(dir)
+  const pid = makeStaleOwnerPid()
+  writeFileSync(ownerFile, String(pid))
+  return pid
+}
+
 export function assertRefusedBeforeGradle(checkout, result) {
   assert.equal(result.error, undefined, result.stderr)
   assert.notEqual(result.status, 0)
