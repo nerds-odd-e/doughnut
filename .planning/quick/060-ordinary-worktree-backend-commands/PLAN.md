@@ -1,7 +1,7 @@
 # Ordinary backend commands use the owning worktree database
 
 Source: [SEED-015 story 1c](../../seeds/SEED-015-concurrent-worktree-environments.md#story-1c).
-Status: in progress; slices 1–7 done.
+Status: in progress; slices 1–8 done.
 
 ## Goal and scope
 
@@ -176,7 +176,7 @@ dispatch. Update obsolete guide limits with the supported command forms.
 
 ### 8. Refuse competing entry points in one checkout
 Type: Behavior
-Status: planned
+Status: done
 Proof: Hold an ordinary workload; opt-in or ordinary migration/test competitor
 refuses. Reuse stale-reclaimer overlap proof with shared ownership. Another
 checkout remains admissible. Run the command suite.
@@ -281,6 +281,9 @@ stopping point.
 - Slice 7: `pnpm backend:test` always formats then `test_only`; isolated
   checkouts skip the extra migrate step because wrapper `test` already
   migrates once. Isolation predicate is shared (`backend_worktree_isolation_applies`).
+- Slice 8: ordinary wrapper and opt-in share `.worktree.local.lock`; held
+  migrate refuses overlapping opt-in or ordinary migrate; stale reclaim works
+  on both entry points.
 
 Quick/058 completed during refinement; no remaining lock-fix prerequisite.
 No new storage experiment is needed. Repository-wrapper routing is the remaining

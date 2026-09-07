@@ -12,6 +12,8 @@ import {
   outputOf,
   runLauncher,
   runLauncherAsync,
+  runWrapper,
+  runWrapperAsync,
   waitForOneOwnerAndOneRefusal,
 } from './backend-test-worktree-launcher-fixtures.mjs'
 import {
@@ -19,20 +21,59 @@ import {
   writeStaleOwnerLock,
 } from './backend-test-worktree-lock-fixtures.mjs'
 
-test('active owner refuses a second launcher before it reads a malformed replacement config or reaches gradle', async (t) => {
-  const checkout = makeCheckout(t, {
-    config: JSON.stringify({ id: 'wt_a7c2' }),
+function assertRefusedByActiveOwner(result) {
+  assert.notEqual(result.status, 0)
+  assert.match(outputOf(result), /already running/i)
+  assert.doesNotMatch(outputOf(result), /GRADLE_STDOUT|GRADLE_REACHED/)
+}
+
+const configuredId = 'wt_a7c2'
+
+const ordinaryMigrate = {
+  command: 'backend/gradlew',
+  args: ['-p', 'backend', 'migrateTestDB'],
+}
+
+function configuredCheckout(t) {
+  return makeCheckout(t, {
+    config: JSON.stringify({ id: configuredId }),
   })
+}
+
+async function assertHeldOwnerRefusesCompetitor(
+  t,
+  { startOwner, startCompetitor }
+) {
+  const checkout = configuredCheckout(t)
+  const owner = startOwner(checkout)
+  await owner.waitForGradleReached()
+  assertRefusedByActiveOwner(startCompetitor(checkout))
+  owner.release()
+  assert.equal((await owner.waitForExit()).status, 0)
+}
+
+function assertReclaimedConfiguredOwner(checkout, result) {
+  assert.equal(result.status, 0, outputOf(result))
+  assert.equal(
+    readGradleInvocation(checkout).url,
+    jdbcUrl(`doughnut_${configuredId}_test`)
+  )
+  assert.equal(
+    readFileSync(lockPaths(checkout).ownerFile, 'utf8').trim(),
+    String(result.pid)
+  )
+}
+
+test('active owner refuses a second launcher before it reads a malformed replacement config or reaches gradle', async (t) => {
+  const checkout = configuredCheckout(t)
   const owner = runLauncherAsync(checkout, { env: { FAKE_GRADLE_EXIT: '3' } })
   await owner.waitForGradleReached()
 
   writeFileSync(path.join(checkout.root, '.worktree.local.json'), '{"id":')
 
   const second = runLauncher(checkout)
-  assert.notEqual(second.status, 0)
-  assert.match(outputOf(second), /already running/i)
+  assertRefusedByActiveOwner(second)
   assert.doesNotMatch(outputOf(second), /SyntaxError/i)
-  assert.doesNotMatch(outputOf(second), /GRADLE_STDOUT|GRADLE_REACHED/)
 
   owner.release()
   const ownerResult = await owner.waitForExit()
@@ -40,9 +81,7 @@ test('active owner refuses a second launcher before it reads a malformed replace
 })
 
 test('a malformed owner lock record refuses rather than being reclaimed', (t) => {
-  const checkout = makeCheckout(t, {
-    config: JSON.stringify({ id: 'wt_a7c2' }),
-  })
+  const checkout = configuredCheckout(t)
   const { dir, ownerFile } = lockPaths(checkout)
   mkdirSync(dir)
   writeFileSync(ownerFile, 'not-a-pid')
@@ -53,9 +92,7 @@ test('a malformed owner lock record refuses rather than being reclaimed', (t) =>
 })
 
 test('a different checkout root reaches its own gradle stand-in while another checkout is locked', async (t) => {
-  const heldCheckout = makeCheckout(t, {
-    config: JSON.stringify({ id: 'wt_a7c2' }),
-  })
+  const heldCheckout = configuredCheckout(t)
   const owner = runLauncherAsync(heldCheckout)
   await owner.waitForGradleReached()
 
@@ -74,30 +111,43 @@ test('a different checkout root reaches its own gradle stand-in while another ch
   assert.equal(ownerResult.status, 0)
 })
 
-test('a stale owner record for an exited process is reclaimed and the launcher reaches gradle against the configured database', (t) => {
-  const checkout = makeCheckout(t, {
-    config: JSON.stringify({ id: 'wt_a7c2' }),
-  })
-  writeStaleOwnerLock(checkout)
+test('active ordinary migrate refuses an overlapping opt-in launcher before gradle', (t) =>
+  assertHeldOwnerRefusesCompetitor(t, {
+    startOwner: (checkout) => runWrapperAsync(checkout, ordinaryMigrate),
+    startCompetitor: runLauncher,
+  }))
 
-  const result = runLauncher(checkout)
-  assert.equal(result.status, 0, outputOf(result))
-  assert.equal(
-    readGradleInvocation(checkout).url,
-    jdbcUrl('doughnut_wt_a7c2_test')
-  )
-  assert.equal(
-    readFileSync(lockPaths(checkout).ownerFile, 'utf8').trim(),
-    String(result.pid)
+test('active ordinary migrate refuses an overlapping ordinary migrate before gradle', (t) =>
+  assertHeldOwnerRefusesCompetitor(t, {
+    startOwner: (checkout) => runWrapperAsync(checkout, ordinaryMigrate),
+    startCompetitor: (checkout) => runWrapper(checkout, ordinaryMigrate),
+  }))
+
+test('active opt-in launcher refuses an overlapping ordinary migrate before gradle', (t) =>
+  assertHeldOwnerRefusesCompetitor(t, {
+    startOwner: runLauncherAsync,
+    startCompetitor: (checkout) => runWrapper(checkout, ordinaryMigrate),
+  }))
+
+test('a stale owner record for an exited process is reclaimed and the launcher reaches gradle against the configured database', (t) => {
+  const checkout = configuredCheckout(t)
+  writeStaleOwnerLock(checkout)
+  assertReclaimedConfiguredOwner(checkout, runLauncher(checkout))
+})
+
+test('a stale owner record is reclaimed and the ordinary wrapper reaches gradle against the configured database', (t) => {
+  const checkout = configuredCheckout(t)
+  writeStaleOwnerLock(checkout)
+  assertReclaimedConfiguredOwner(
+    checkout,
+    runWrapper(checkout, ordinaryMigrate)
   )
 })
 
 test('two overlapping reclaimers of a stale lock leave only one gradle owner', {
   timeout: 10000,
 }, async (t) => {
-  const checkout = makeCheckout(t, {
-    config: JSON.stringify({ id: 'wt_a7c2' }),
-  })
+  const checkout = configuredCheckout(t)
   writeStaleOwnerLock(checkout)
 
   const first = runLauncherAsync(checkout)
@@ -111,12 +161,10 @@ test('two overlapping reclaimers of a stale lock leave only one gradle owner', {
     first,
     second
   )
-  assert.notEqual(refused.status, 0)
-  assert.match(outputOf(refused), /already running/i)
-  assert.doesNotMatch(outputOf(refused), /GRADLE_STDOUT|GRADLE_REACHED/)
+  assertRefusedByActiveOwner(refused)
   assert.equal(
     readGradleInvocation(checkout).url,
-    jdbcUrl('doughnut_wt_a7c2_test')
+    jdbcUrl(`doughnut_${configuredId}_test`)
   )
 
   owner.release()

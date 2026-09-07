@@ -29,19 +29,18 @@ function launcherChildEnv(checkout, env) {
   })
 }
 
-export function runWrapper(
-  checkout,
-  { command, cwd, args = [], env = {} } = {}
-) {
-  return spawnSync(
-    command ?? path.join(checkout.root, 'backend', 'gradlew'),
+function wrapperProcess(checkout, { command, cwd, args = [], env = {} } = {}) {
+  return {
+    command: command ?? path.join(checkout.root, 'backend', 'gradlew'),
     args,
-    {
-      cwd: cwd ?? checkout.root,
-      encoding: 'utf8',
-      env: launcherChildEnv(checkout, env),
-    }
-  )
+    cwd: cwd ?? checkout.root,
+    env: launcherChildEnv(checkout, env),
+  }
+}
+
+export function runWrapper(checkout, options = {}) {
+  const { command, args, cwd, env } = wrapperProcess(checkout, options)
+  return spawnSync(command, args, { cwd, encoding: 'utf8', env })
 }
 
 export function runLauncher(checkout, { env = {}, args = [] } = {}) {
@@ -65,19 +64,20 @@ async function waitForFile(
   }
 }
 
-// Starts the launcher asynchronously against a foreground Gradle stand-in
+// Starts a command asynchronously against a foreground Gradle stand-in
 // that reaches GRADLE_REACHED and then blocks until explicitly released.
 // Returns a handle for observing that one active Gradle owner from outside.
-export function runLauncherAsync(checkout, { env = {}, args = [] } = {}) {
-  const child = spawn(checkout.launcher, args, {
-    cwd: checkout.root,
-    env: launcherChildEnv(checkout, { ...env, GRADLE_HOLD: '1' }),
+export function runWrapperAsync(checkout, options = {}) {
+  const { command, args, cwd, env } = wrapperProcess(checkout, {
+    ...options,
+    env: { ...options.env, GRADLE_HOLD: '1' },
   })
-  // No input is ever sent. Unlike runLauncher's spawnSync (which closes an
-  // unwritten stdin immediately), async spawn() leaves stdin open until
-  // explicitly ended, so a descendant reading stdin (e.g. the mysql
-  // stand-in's `[ ! -t 0 ]` check during provisioning) would otherwise block
-  // forever waiting for EOF.
+  const child = spawn(command, args, { cwd, env })
+  // No input is ever sent. Unlike spawnSync (which closes an unwritten
+  // stdin immediately), async spawn() leaves stdin open until explicitly
+  // ended, so a descendant reading stdin (e.g. the mysql stand-in's
+  // `[ ! -t 0 ]` check during provisioning) would otherwise block forever
+  // waiting for EOF.
   child.stdin.end()
 
   let stdout = ''
@@ -107,6 +107,10 @@ export function runLauncherAsync(checkout, { env = {}, args = [] } = {}) {
     releaseMysql: () => writeFileSync(checkout.mysqlRelease, ''),
     waitForExit: () => exited,
   }
+}
+
+export function runLauncherAsync(checkout, { env = {}, args = [] } = {}) {
+  return runWrapperAsync(checkout, { command: checkout.launcher, args, env })
 }
 
 export function assertRefusedBeforeGradle(checkout, result) {
