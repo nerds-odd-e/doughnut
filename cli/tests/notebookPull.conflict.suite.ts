@@ -5,52 +5,27 @@ import { run } from '../src/run.js'
 import { ProcessExitForTest, runGit } from './notebookClone.testHelpers.js'
 import { acceptedHistoryStagingDirsUnderTmp } from './notebookAcceptedHistory.testHelpers.js'
 import {
+  BODY_ACCEPTED,
+  BODY_BASE,
+  BODY_LOCAL,
+  NESTED_YAML_PATH,
+  SPACED_NOTE_PATH,
+  YAML_ACCEPTED,
+  YAML_BASE,
+  YAML_LOCAL,
+  prepareConflictingSameNote,
+} from './notebookPull.conflict.testHelpers.js'
+import {
   cloneWithLocalNoteEdit,
   commitPortableFile,
   installNotebookPullAcceptedHistoryTest,
   serveAcceptedBundle,
 } from './notebookPull.testHelpers.js'
 
-const SPACED_NOTE_PATH = 'Topic Folder/My Note.md'
-const BODY_BASE = '---\ntype: Note\n---\n# Note\n\nShared sentence.\n'
-const BODY_LOCAL = '---\ntype: Note\n---\n# Note\n\nLocal sentence.\n'
-const BODY_ACCEPTED = '---\ntype: Note\n---\n# Note\n\nAccepted sentence.\n'
-const NESTED_YAML_PATH = 'Nested/Cell.md'
-const YAML_BASE =
-  '---\ntype: Note\nauthored: original\n---\n# Nested\n\nShared body.\n'
-const YAML_LOCAL =
-  '---\ntype: Note\nauthored: local\n---\n# Nested\n\nShared body.\n'
-const YAML_ACCEPTED =
-  '---\ntype: Note\nauthored: remote\n---\n# Nested\n\nShared body.\n'
 const MERGEABLE_LOCAL =
   '---\ntype: Note\n---\n# Note\n\nLocal opening.\n\nShared closing.\n'
 const MERGEABLE_ACCEPTED =
   '---\ntype: Note\n---\n# Note\n\nShared opening.\n\nRemote closing.\n'
-
-function prepareConflictingSameNote(
-  workDir: string,
-  relativePath: string,
-  baseBytes: string,
-  localBytes: string,
-  acceptedBytes: string
-) {
-  const setup = cloneWithLocalNoteEdit(
-    workDir,
-    baseBytes,
-    localBytes,
-    relativePath
-  )
-  commitPortableFile(
-    setup.source,
-    relativePath,
-    acceptedBytes,
-    'accepted note edit'
-  )
-  return {
-    ...setup,
-    acceptedHead: runGit(['rev-parse', 'main'], setup.source),
-  }
-}
 
 function pullCreatedConflictObservation(
   directory: string,

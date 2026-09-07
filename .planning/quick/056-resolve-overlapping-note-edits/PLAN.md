@@ -1,7 +1,7 @@
 # Resolve overlapping note edits with ordinary Git
 
 Source: [SEED-009 Story 9](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-9), product backlog item 3.
-Status: in progress; slices 1–4 done.
+Status: in progress; slices 1–5 done.
 
 ## Goal and scope
 
@@ -199,16 +199,8 @@ cross-command state machine, stop and revisit that implementation assumption.
 
 ### 5. Continue with the chosen text and submit the resolved commit
 Type: Behavior
-Status: planned
-Proof: Pull creates a real conflict; after CLI return and temporary cleanup,
-write the chosen valid note bytes, `git add` that file, then ordinary
-`git rebase --continue` with a noninteractive editor only in the test fixture.
-Observe clean main, one child L′ of B, chosen bytes and original author/message.
-The frontmatter-conflict variant retains the owner's chosen valid YAML value.
-Repeat pull keeps L′. Explicit CLI publish submits a bundle whose head is L′
-and whose expected head is B; mock only HTTP, with no earlier POST.
-An accepted-side/explicit-skip variant asserts its unique no-child result and
-subsequent truthful pull output rather than repeating the canonical shape.
+Status: done
+Proof: `CURSOR_DEV=true nix develop -c pnpm -C cli exec vitest run tests/notebookPull.test.ts tests/notebookPublish.test.ts` — after conflict pull and temp cleanup, test-owned `git rebase --continue` (GIT_EDITOR only on that spawn) yields clean main, one child L′ of B, chosen bytes and original author/message; nested YAML variant keeps chosen frontmatter; repeat pull keeps L′. Publish POSTs a bundle whose head is L′ and expected head is B, with no earlier POST. Explicit accepted-side `git rebase --skip` ends at B; subsequent pull reports unchanged.
 
 Behavior: Owner resolves and continues a paused rebase → the chosen content
 becomes an ordinary publishable local commit. Native continuation, not a new
@@ -362,6 +354,10 @@ back to Story 9. Do not disguise a story-sizing problem by renaming leaves.
   original rebase cause. A failure with no unmerged stages is not labeled a
   merge conflict. Leaf 5/6 can continue or abort after CLI return and temp
   cleanup.
+- Slice 5: Existing ancestry/submission already accepted L′ as a direct child
+  of B. No production change; native continue/skip after CLI return and temp
+  cleanup is sufficient. Repeat pull is already-based (keeps L′); skip then
+  pull is unchanged (HEAD=B).
 
 Readiness relies on existing native Git rebase, object import and publication
 contracts, not an assertion that their new composition has already passed.
