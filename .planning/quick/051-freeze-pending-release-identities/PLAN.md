@@ -77,7 +77,7 @@ repository file-size limit.
 
 ### 2. Freeze non-ready release identity
 Type: Behavior
-Status: planned
+Status: done
 Proof: Public-command fixtures for absent/in-progress CI and failed/cancelled CI
 persist the highest numeric candidate's tag/refOid/SHA before reporting
 `waiting`/`blocked`. Replacing its lightweight ref, annotated ref object, or peeled
@@ -88,6 +88,11 @@ a late lower event cannot.
 Behavior: Reconciliation first observes a qualifying tag whose CI is not ready →
 freeze that release identity and version ceiling → return immediately without
 holding a runner. Later wakeups may advance only that identity or a higher version.
+
+Learning: Reconciliation admits the current highest tag against durable state
+before querying CI. Waiting and blocked outcomes freeze a new or higher identity;
+an unchanged selected identity retries, while a missing or changed selected tag
+fails before CI lookup and a lower tag is superseded without rewriting state.
 
 ### 3. Freeze ready identity before artifact admission
 Type: Behavior

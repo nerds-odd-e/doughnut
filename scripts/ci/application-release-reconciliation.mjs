@@ -3,6 +3,10 @@ import { pathToFileURL } from 'node:url'
 import { querySelectedCi } from './application-release-ci.mjs'
 import { writeReleaseOutput } from './application-release-output.mjs'
 import {
+  checkApplicationReleaseState,
+  selectApplicationReleaseState,
+} from './application-release-state.mjs'
+import {
   applicationTagFromRef,
   compareApplicationVersionsDescending,
 } from './application-release-version.mjs'
@@ -62,9 +66,34 @@ function releaseOnMain(repository, release) {
   }
 }
 
+async function releaseCiOutcome(githubRepository, release) {
+  try {
+    const ci = await querySelectedCi({
+      repository: githubRepository,
+      sha: release.sha,
+    })
+    const { state, ...identity } = ci
+    return {
+      state: state === 'pending' ? 'waiting' : state,
+      ...release,
+      ...identity,
+    }
+  } catch (error) {
+    if (!error.ci) throw error
+    const { state: _, ...identity } = error.ci
+    return {
+      state: 'blocked',
+      ...release,
+      ...identity,
+      diagnostic: error.message,
+    }
+  }
+}
+
 export async function reconcileApplicationRelease({
   repository,
   githubRepository,
+  bucket = process.env.GCS_BUCKET,
 }) {
   if (!githubRepository) throw new Error('GITHUB_REPOSITORY is required')
   git(
@@ -78,31 +107,23 @@ export async function reconcileApplicationRelease({
     release = releaseOnMain(repository, candidate)
     if (release) break
   }
-  if (!release) return { state: 'none' }
-
-  try {
-    const ci = await querySelectedCi({
-      repository: githubRepository,
-      sha: release.sha,
-    })
-    const { state, ...identity } = ci
-    return {
-      state: state === 'pending' ? 'waiting' : state,
-      ...release,
-      ...identity,
-    }
-  } catch (error) {
-    if (error.ci) {
-      const { state: _, ...identity } = error.ci
-      return {
-        state: 'blocked',
-        ...release,
-        ...identity,
-        diagnostic: error.message,
-      }
-    }
-    throw error
+  const admission = await checkApplicationReleaseState({
+    bucket,
+    ...(release ?? {}),
+  })
+  if (!release) return admission
+  if (['already-released', 'superseded'].includes(admission.state)) {
+    return { state: admission.state, ...release }
   }
+
+  const result = await releaseCiOutcome(githubRepository, release)
+  if (
+    ['waiting', 'blocked'].includes(result.state) &&
+    admission.state === 'continue'
+  ) {
+    await selectApplicationReleaseState({ bucket, ...release })
+  }
+  return result
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
@@ -110,6 +131,7 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
     await reconcileApplicationRelease({
       repository: process.cwd(),
       githubRepository: process.env.GITHUB_REPOSITORY,
+      bucket: process.env.GCS_BUCKET,
     })
   )
 }

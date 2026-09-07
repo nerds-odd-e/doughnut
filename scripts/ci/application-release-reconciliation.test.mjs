@@ -1,69 +1,8 @@
 import assert from 'node:assert/strict'
-import { spawn } from 'node:child_process'
-import { createServer } from 'node:http'
-import { fileURLToPath } from 'node:url'
-import { mkdtempSync, readFileSync, rmSync } from 'node:fs'
-import { tmpdir } from 'node:os'
-import { join } from 'node:path'
 import { test } from 'node:test'
 import { ciRun } from './application-release-ci-fixtures.mjs'
 import { makeReleaseRepository } from './application-release-fixtures.mjs'
-
-const command = fileURLToPath(
-  new URL('./application-release-reconciliation.mjs', import.meta.url)
-)
-
-async function reconcile(t, fixture, wakeupRef, runsBySha) {
-  const root = mkdtempSync(join(tmpdir(), 'release-reconciliation-'))
-  t.after(() => rmSync(root, { recursive: true, force: true }))
-  const output = join(root, 'output')
-  const requests = []
-  const server = createServer((request, response) => {
-    const url = new URL(request.url, 'http://localhost')
-    requests.push(url)
-    const sha = url.searchParams.get('head_sha')
-    const runs = runsBySha[sha] ?? []
-    response.writeHead(200, { 'Content-Type': 'application/json' })
-    response.end(
-      JSON.stringify({ total_count: runs.length, workflow_runs: runs })
-    )
-  })
-  await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve))
-  t.after(() => server.close())
-
-  const child = spawn(process.execPath, [command], {
-    cwd: fixture.repository,
-    env: {
-      ...process.env,
-      GITHUB_API_URL: `http://127.0.0.1:${server.address().port}`,
-      GITHUB_REPOSITORY: 'nerds-odd-e/doughnut',
-      GITHUB_REF: wakeupRef,
-      GITHUB_TOKEN: '',
-      GITHUB_OUTPUT: output,
-    },
-  })
-  let stdout = ''
-  let stderr = ''
-  child.stdout.on('data', (data) => (stdout += data))
-  child.stderr.on('data', (data) => (stderr += data))
-  const status = await new Promise((resolve, reject) => {
-    child.on('error', reject)
-    child.on('close', resolve)
-  })
-  let githubOutput = ''
-  try {
-    githubOutput = readFileSync(output, 'utf8')
-  } catch (error) {
-    if (error.code !== 'ENOENT') throw error
-  }
-  return {
-    status,
-    stdout,
-    stderr,
-    requests,
-    output: githubOutput,
-  }
-}
+import { runReconciliationCommand as reconcile } from './application-release-reconciliation-fixtures.mjs'
 
 test('reconciliation keeps the highest numeric pending version across reversed wakeups', async (t) => {
   const fixture = makeReleaseRepository(t)
@@ -105,7 +44,9 @@ test('reconciliation keeps the highest numeric pending version across reversed w
       `state=waiting\ntag=v1.3.10\nref=refs/tags/v1.3.10\nrefOid=${higherRefOid}\nsha=${higherSha}\nrunId=43\nrunAttempt=1\n`
     )
     assert.deepEqual(
-      result.requests.map((request) => request.searchParams.get('head_sha')),
+      result.requests
+        .filter((request) => request.url.searchParams.has('head_sha'))
+        .map((request) => request.url.searchParams.get('head_sha')),
       [higherSha]
     )
   }
@@ -121,10 +62,15 @@ test('tag-first reconciliation returns waiting and a later CI wakeup selects the
   })
   assert.equal(waiting.status, 0, waiting.stderr)
   assert.equal(JSON.parse(waiting.stdout).state, 'waiting')
+  assert.equal(waiting.uploads.length, 1)
 
-  const ready = await reconcile(t, fixture, 'refs/heads/main', {
-    [fixture.sha]: [ciRun({ head_sha: fixture.sha })],
-  })
+  const ready = await reconcile(
+    t,
+    fixture,
+    'refs/heads/main',
+    { [fixture.sha]: [ciRun({ head_sha: fixture.sha })] },
+    waiting.uploads[0]
+  )
   assert.equal(ready.status, 0, ready.stderr)
   assert.deepEqual(JSON.parse(ready.stdout), {
     state: 'ready',
@@ -155,7 +101,12 @@ test('reconciliation ignores non-stable application tags', async (t) => {
 
   assert.equal(result.status, 0, result.stderr)
   assert.deepEqual(JSON.parse(result.stdout), { state: 'none' })
-  assert.deepEqual(result.requests, [])
+  assert.deepEqual(
+    result.requests.filter((request) =>
+      request.url.pathname.includes('/actions/')
+    ),
+    []
+  )
 })
 
 test('reconciliation ignores a release commit outside main', async (t) => {
@@ -170,7 +121,12 @@ test('reconciliation ignores a release commit outside main', async (t) => {
 
   assert.equal(result.status, 0, result.stderr)
   assert.deepEqual(JSON.parse(result.stdout), { state: 'none' })
-  assert.deepEqual(result.requests, [])
+  assert.deepEqual(
+    result.requests.filter((request) =>
+      request.url.pathname.includes('/actions/')
+    ),
+    []
+  )
 })
 
 test('failed CI blocks the current highest release without failing or selecting an older tag', async (t) => {
@@ -204,7 +160,9 @@ test('failed CI blocks the current highest release without failing or selecting 
     diagnostic: `CI 43 attempt 1 for ${higherSha} finished with failure`,
   })
   assert.deepEqual(
-    result.requests.map((request) => request.searchParams.get('head_sha')),
+    result.requests
+      .filter((request) => request.url.searchParams.has('head_sha'))
+      .map((request) => request.url.searchParams.get('head_sha')),
     [higherSha]
   )
 })

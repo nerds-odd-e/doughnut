@@ -143,10 +143,13 @@ export async function checkApplicationReleaseState({
   token = applicationReleaseAccessToken(),
 }) {
   if (!bucket) throw new Error('GCS_BUCKET is required')
-  if (!isApplicationTag(tag)) throw new Error('RELEASE_TAG is invalid')
-  if (!objectId.test(refOid)) throw new Error('RELEASE_REF_OID is invalid')
-  if (!objectId.test(sha)) throw new Error('RELEASE_SHA is invalid')
-
+  const releaseAbsent =
+    tag === undefined && refOid === undefined && sha === undefined
+  if (!releaseAbsent) {
+    if (!isApplicationTag(tag)) throw new Error('RELEASE_TAG is invalid')
+    if (!objectId.test(refOid)) throw new Error('RELEASE_REF_OID is invalid')
+    if (!objectId.test(sha)) throw new Error('RELEASE_SHA is invalid')
+  }
   const existing = await readApplicationReleaseState({
     bucket,
     apiBase: gcsApiBase,
@@ -155,6 +158,12 @@ export async function checkApplicationReleaseState({
   const current = existing && validateState(existing)
   if (!current) {
     throw new Error('Application release state is missing after initialization')
+  }
+  if (releaseAbsent) {
+    if (['selected', 'publishing'].includes(current.outcome)) {
+      throw new Error(`Selected release tag ${current.tag} is missing`)
+    }
+    return { state: 'none' }
   }
   if (current.tag === tag) {
     if (current.ref_oid !== refOid || current.sha !== sha) {
