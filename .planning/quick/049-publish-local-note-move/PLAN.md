@@ -118,9 +118,13 @@ accepting that change. A green unrelated test is not sufficient evidence.
 
 ### 1. Preserve exact blob identity through raw diff classification
 Type: Structure
-Status: planned
+Status: done
 Proof: Existing controller tree-shape/deletion-rejection/add-edit tests remain
 green with identical accepted and rejected behavior. Backend command.
+Learning: Added `ObjectId blobId` to `NoteChange` in
+NotebookGitProposalTreeShape.java (DELETED→accepted-tree blob, ADDED/MODIFIED→
+proposed-tree blob); no accept/reject logic changed;
+`pnpm backend:test_only` full suite green.
 
 Structure: Carry the relevant raw blob object IDs alongside each removed/added
 path so immediately following leaf 2 can compare the one pair. Keep current

@@ -59,14 +59,14 @@ public final class NotebookGitProposalTreeShape {
           if (!FileMode.REGULAR_FILE.equals(acceptedMode)) {
             throw unsupportedTreeShape("path \"" + path + "\" is not a regular file mode");
           }
-          changes.add(new NoteChange(path, ChangeKind.DELETED));
+          changes.add(new NoteChange(path, ChangeKind.DELETED, walk.getObjectId(0)));
           continue;
         }
         if (FileMode.MISSING.equals(acceptedMode)) {
           if (!FileMode.REGULAR_FILE.equals(proposedMode)) {
             throw unsupportedTreeShape("path \"" + path + "\" is not a regular file mode");
           }
-          changes.add(new NoteChange(path, ChangeKind.ADDED));
+          changes.add(new NoteChange(path, ChangeKind.ADDED, walk.getObjectId(1)));
           continue;
         }
         if (!FileMode.REGULAR_FILE.equals(acceptedMode)
@@ -75,7 +75,7 @@ public final class NotebookGitProposalTreeShape {
         }
 
         if (!walk.getObjectId(0).equals(walk.getObjectId(1))) {
-          changes.add(new NoteChange(path, ChangeKind.MODIFIED));
+          changes.add(new NoteChange(path, ChangeKind.MODIFIED, walk.getObjectId(1)));
         }
       }
 
@@ -142,7 +142,12 @@ public final class NotebookGitProposalTreeShape {
         HttpStatus.BAD_REQUEST, "Unsupported tree shape: " + reason, cause);
   }
 
-  record NoteChange(String path, ChangeKind kind) {}
+  /**
+   * @param blobId the raw blob object id relevant to this change: the added blob (proposed tree)
+   *     for ADDED, the removed blob (accepted tree) for DELETED, and the proposed blob for MODIFIED
+   *     (not meaningfully used by callers today).
+   */
+  record NoteChange(String path, ChangeKind kind, ObjectId blobId) {}
 
   enum ChangeKind {
     ADDED,
