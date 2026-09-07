@@ -49,6 +49,15 @@ jobs:
       - uses: actions/setup-node@v7
         with:
           node-version: ${{ vars.NODE_VERSION }}
+      - name: Authenticate private GCS access
+        uses: ./.github/gcloud_auth_n_sdk
+        with:
+          credentials_json: ${{ env.GCP_CREDENTIALS }}
+          skip_install: ${{ runner.os == 'Linux' && vars.GCP_FORCE_GCLOUD_INSTALL != 'true' }}
+      - name: Initialize application release tracking
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: node scripts/ci/application-release-state.mjs
       - name: Identify exact tagged main commit
         id: identity
         run: |

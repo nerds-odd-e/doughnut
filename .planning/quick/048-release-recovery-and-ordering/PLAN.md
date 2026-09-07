@@ -191,7 +191,7 @@ current run/current stable tag; unrelated incomplete history remains ambiguous.
 
 ### 2c. Gate release admission on initialized tracking
 Type: Behavior
-Status: planned
+Status: done
 Proof: Parsed workflow and controlled command fixtures show private-GCS auth and
 bootstrap complete before release admission. The one workflow-level
 `deploy-production` concurrency group still encloses bootstrap, selection,
@@ -202,6 +202,11 @@ Behavior: A tag-driven application release begins after tracking is introduced
 → authenticate and initialize tracking before admitting or publishing that
 release. Keep the current tag-only adapter and bounded CI wait active; this leaf
 only installs the bootstrap prerequisite that later reconciliation reuses.
+
+Learning: release admission now authenticates private GCS and initializes
+tracking before tag identity and bounded CI selection in the same job. The
+workflow-level concurrency remains the only lock; artifact downloads and the
+selected-SHA publisher invocation are unchanged.
 
 Refinement learning: the first leaf-2 attempt spent about 13 minutes on mandatory
 reading and boundary analysis, made no edits and hit the hard sizing trigger.
