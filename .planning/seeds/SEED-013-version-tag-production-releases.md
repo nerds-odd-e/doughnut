@@ -1,6 +1,6 @@
 ---
 id: SEED-013
-status: dormant
+status: completed
 planted: 2026-09-07
 planted_during: requirement analysis requested by developer
 trigger_when: developer selects version-tag production deployment for implementation
@@ -62,9 +62,11 @@ and scripts/ci/application-release*.mjs tests.
 
 ### 2. Recover and coordinate application releases without manual ordering
 
-**Status:** Implementation complete and pushed on
-`codex/release-recovery-ordering`; parent owns merge and the default-branch
-activation observation retained in the plan.
+**Status:** Complete; merged and pushed to main at f2cb82d6ce. Donut CI run
+34082470708 succeeded and triggered donut deploy run 34083073575, which
+succeeded after initializing and reconciling application release tracking. With
+no eligible release tag, every application publication step was skipped. No
+test release tag was created.
 
 **Goal:** A maintainer can retry a failed release or submit a newer version while
 another release is active, without moving tags or accidentally replacing a newer
@@ -82,26 +84,22 @@ Corrections still require a tested revert/change and a new patch tag. This story
 does not add staging, automatic CI reruns/version bumps, schema rollback, a
 general scheduler, or production-tag verification.
 
-**Plan:** [Quick 048](../quick/048-release-recovery-and-ordering/PLAN.md).
-
 ## Scope Preserved Across Both Stories
 
-The previously accepted final behavior is implemented across these two stories.
+The previously accepted final behavior is implemented across both stories.
 No automatic version bumps, changelog/GitHub Release creation, staging environment,
 application-visible version changes, automatic database rollback, or new CLI
 version ordering are included. Creating tags is an operator action, not an
-agent verification step. Story 1 is merged; Story 2 awaits parent merge and
-default-branch activation observation.
+agent verification step.
 
 ## When to Surface
 
-Story 2 implementation is complete on its pushed feature branch. Its plan now
-contains only the parent-owned merge-time observation. The developer explicitly
-authorized merge/push, main-only observation and branch/worktree cleanup; this
-authorization does not include creating production tags as tests.
+Both stories are complete. Surface this seed again only when release operations
+show a gap in the documented stable-tag, retry, or ordering behavior.
 
 ## Breadcrumbs
 
 - Original developer requirement and accepted tag, CI, CLI and recovery policies.
 - Developer request to decompose the 18-leaf story into two balanced stories.
-- Existing workflow and GCP runbook references are recorded in the remaining plan.
+- Enduring release behavior and operator guidance live in
+  `docs/gcp/conditional-backend-deploy.md` and the release workflow tests.
