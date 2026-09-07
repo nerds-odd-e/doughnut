@@ -248,7 +248,7 @@ delete-and-recreate.
 
 ### 8. Leave referring Markdown authored
 Type: Behavior
-Status: planned
+Status: done
 Proof: Publish rename, then use NoteController.showNote for a referrer with
 body and frontmatter property links to the old exact path; bytes unchanged
 and that exact destination unresolved without an alias. Backend.
@@ -256,6 +256,12 @@ and that exact destination unresolved without an alias. Backend.
 Behavior: Other notes refer to the old name → rename → retain authored
 references and ordinary current-state resolution. Reuse the deletion
 reference fixture pattern; add no implicit link rewrite or hidden alias.
+Learning: Pure proof addition, no production change — added a test to
+NotebookGitProposalRenameControllerTest (now 249 lines, at but not over the
+size ceiling; kept as one file with the rename/private-data/reference proofs
+since they're one cohesive concept) mirroring
+NotebookGitDeletionPublicationControllerTest's reference fixture; confirmed
+no implicit link rewrite or hidden alias exists for the old name.
 
 ### 9. Reject unavailable or invalid ordinary filenames
 Type: Behavior
