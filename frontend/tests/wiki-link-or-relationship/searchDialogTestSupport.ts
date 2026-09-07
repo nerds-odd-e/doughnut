@@ -11,9 +11,9 @@ import { flushPromises } from "@vue/test-utils"
 import MakeMe from "donut-test-fixtures/makeMe"
 import helper, { mockSdkService } from "@tests/helpers"
 import {
-  appendSearchKeyToHistory,
-  clearSearchKeyHistoryCookie,
-} from "@/utils/searchKeyHistoryCookie"
+  seedSearchKeyHistory,
+  resetSearchKeyHistory,
+} from "@tests/helpers/searchKeyHistoryTestSupport"
 import { searchResultItemTestId } from "@/utils/searchDialogKeyboard"
 import { testIdSelector } from "@tests/helpers/searchDialogKeyboardTestSupport"
 import { advanceSearchDebounce } from "@tests/helpers/searchDebounceTestSupport"
@@ -105,12 +105,8 @@ export async function renderSearchWithKeyHistory(
   note: Note,
   keys: string[] = ["older"]
 ) {
-  for (const key of keys) {
-    appendSearchKeyToHistory(key)
-  }
-  helper.component(SearchForm).withCleanStorage().withProps({ note }).render()
-  await flushPromises()
-  return screen.getByPlaceholderText("Search")
+  seedSearchKeyHistory(keys)
+  return renderSearchForm({ note })
 }
 
 export async function openSearchKeyHistoryDropdown() {
@@ -160,9 +156,10 @@ export async function renderSearchFormInModal(note: Note) {
 export function setupSearchDialogTests() {
   beforeEach(() => {
     vi.clearAllMocks()
-    clearSearchKeyHistoryCookie()
+    resetSearchKeyHistory()
     setupSearchFormSdkMocks()
   })
+  afterEach(resetSearchKeyHistory)
 }
 
 export function setupSearchDialogFakeTimers() {

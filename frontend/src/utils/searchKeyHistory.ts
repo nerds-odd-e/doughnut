@@ -65,9 +65,3 @@ export function appendSearchKeyToHistory(rawKey: string): void {
   const next = [key, ...withoutDup].slice(0, MAX_KEYS)
   writeSearchKeyHistory(next)
 }
-
-/** Test helper: remove the history cookie. */
-export function clearSearchKeyHistoryCookie(): void {
-  if (typeof document === "undefined") return
-  document.cookie = `${SEARCH_KEY_HISTORY_COOKIE_NAME}=; Path=/; Max-Age=0; SameSite=Lax`
-}

@@ -2,7 +2,7 @@
 
 Source: [SEED-014 Story 1](../../seeds/SEED-014-reliable-login-with-browser-history.md#story-1).
 Status: in progress on `codex/reliable-login-browser-history`.
-Readiness: server and tablet recovery delivered; continue with leaf 4.
+Readiness: recovery and history boundary consolidation delivered; continue with leaf 5.
 Execution worktree: `/Users/terryyin/.codex/worktrees/f8d7/doughnut`.
 CI observer: coordinator `047-f8d7`, repository `nerds-odd-e/doughnut`, main;
 cell 10 / PTY session 29699 / PID 65697; mailbox `/tmp/donut-ci-501/watch-8lFX2v`.
@@ -241,8 +241,14 @@ no live iPad automation or new browser platform is assumed.
 
 ### 4. Consolidate the existing search-history boundary
 Type: Structure
-Status: planned
+Status: done
 Proof: Existing cookie-based history behavior remains green through SearchForm.
+
+Passed `CI=true CURSOR_DEV=true nix develop -c pnpm frontend:test tests/wiki-link-or-relationship/SearchDialog.searchKeyHistory.spec.ts`
+(13 cases), and `CI=true CURSOR_DEV=true nix develop -c pnpm frontend:test`
+(340 files / 1850 tests, 66.70s). Refactor reused the existing render helper and
+reran the affected 13 cases (3.12s); full-suite proof otherwise unchanged.
+Coordinator formatting passed. Production persistence remains cookie-based.
 
 Internal change: Rename the history owner and fixture helpers by capability,
 update their existing callers, and consolidate overlapping helper-level tests
