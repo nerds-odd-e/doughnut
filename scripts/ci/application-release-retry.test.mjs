@@ -1,16 +1,16 @@
 import assert from 'node:assert/strict'
-import { readFileSync } from 'node:fs'
+import { existsSync, readFileSync } from 'node:fs'
 import { test } from 'node:test'
 import { querySelectedCi } from './application-release-ci.mjs'
 import { ciRun, repository } from './application-release-ci-fixtures.mjs'
-import { makeReleaseRepository } from './application-release-fixtures.mjs'
-import { runPayloadAdmission } from './application-release-payload-fixtures.mjs'
+import { releaseIdentityChanges } from './application-release-fixtures.mjs'
 import {
   hash,
   makePublication,
   readApplicationRecords,
 } from './application-release-publication-fixtures.mjs'
 import { runReconciliationCommand as reconcile } from './application-release-reconciliation-fixtures.mjs'
+import { makeSelectedReleaseWithUnavailableArtifacts } from './application-release-retry-fixtures.mjs'
 import { runStateCommand } from './application-release-state-fixtures.mjs'
 
 async function selectFreshSuccessfulCiAttempt(t, sha) {
@@ -34,6 +34,35 @@ async function selectFreshSuccessfulCiAttempt(t, sha) {
   })
   const ci = await querySelectedCi({ repository, sha })
   return { ci, queries }
+}
+
+async function selectReleaseBeforeArtifactFailure(t, annotated = true) {
+  const { fixture, release, ready, unavailable, publicationTrace } =
+    await makeSelectedReleaseWithUnavailableArtifacts(t, annotated)
+  assert.equal(ready.status, 0, ready.stderr)
+  assert.deepEqual(JSON.parse(ready.stdout), {
+    state: 'ready',
+    ...release,
+    runId: 42,
+    runAttempt: 3,
+  })
+  assert.deepEqual(ready.uploads, [
+    {
+      tag: release.tag,
+      ref_oid: release.refOid,
+      sha: release.sha,
+      outcome: 'selected',
+    },
+  ])
+  assert.equal(unavailable.status, 1)
+  assert.equal(unavailable.publicationReached, false)
+
+  return {
+    fixture,
+    release,
+    selectedRecord: ready.uploads[0],
+    publicationTrace,
+  }
 }
 
 test('an interrupted release retries the same identity with freshly selected CI artifacts', async (t) => {
@@ -110,49 +139,8 @@ test('an interrupted release retries the same identity with freshly selected CI 
 })
 
 test('a selected release resumes with a newer exact-identity CI attempt after artifacts expire', async (t) => {
-  const fixture = makeReleaseRepository(t)
-  const refOid = fixture.tag('v1.2.3', true)
-  const release = fixture.release()
-  fixture.clone()
-  assert.notEqual(refOid, release.sha)
-
-  const ready = await reconcile(t, fixture, release.ref, {
-    [release.sha]: [
-      ciRun({
-        head_sha: release.sha,
-        run_attempt: 3,
-      }),
-    ],
-  })
-  assert.equal(ready.status, 0, ready.stderr)
-  assert.deepEqual(JSON.parse(ready.stdout), {
-    state: 'ready',
-    ...release,
-    runId: 42,
-    runAttempt: 3,
-  })
-  assert.deepEqual(ready.uploads, [
-    {
-      tag: release.tag,
-      ref_oid: refOid,
-      sha: release.sha,
-      outcome: 'selected',
-    },
-  ])
-  const selectedRecord = ready.uploads[0]
-
-  const productionWrites = `${fixture.repository}/production-writes`
-  const missingArtifacts = `${fixture.repository}/release-artifacts`
-
-  const unavailable = runPayloadAdmission({
-    backend: `${missingArtifacts}/backend/donut.jar`,
-    frontend: `${missingArtifacts}/frontend`,
-    cli: `${missingArtifacts}/cli/donut-cli.bundle.mjs`,
-    publicationTrace: productionWrites,
-  })
-
-  assert.equal(unavailable.status, 1)
-  assert.equal(unavailable.publicationReached, false)
+  const { fixture, release, selectedRecord } =
+    await selectReleaseBeforeArtifactFailure(t)
 
   const recovered = await reconcile(
     t,
@@ -186,3 +174,32 @@ test('a selected release resumes with a newer exact-identity CI attempt after ar
     [release.sha]
   )
 })
+
+for (const { scenario, annotated, replace } of releaseIdentityChanges) {
+  test(`${scenario} is rejected after artifact admission fails`, async (t) => {
+    const { fixture, release, selectedRecord, publicationTrace } =
+      await selectReleaseBeforeArtifactFailure(t, annotated)
+    replace(fixture, release)
+
+    const replay = await reconcile(
+      t,
+      fixture,
+      'refs/heads/main',
+      {
+        [release.sha]: [ciRun({ head_sha: release.sha })],
+      },
+      selectedRecord
+    )
+
+    assert.equal(replay.status, 1)
+    assert.match(
+      replay.stderr,
+      /release identity mismatch|selected release tag v1\.2\.3 is missing/i
+    )
+    assert.deepEqual(replay.uploads, [])
+    assert.equal(replay.requests.length, 1)
+    assert.equal(replay.requests[0].method, 'GET')
+    assert.match(replay.requests[0].url.pathname, /^\/storage\/v1\//)
+    assert.equal(existsSync(publicationTrace), false)
+  })
+}

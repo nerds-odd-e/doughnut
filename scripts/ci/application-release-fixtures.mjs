@@ -45,3 +45,49 @@ export function makeReleaseRepository(t) {
     )
   return { git, commit, tag, clone, release, sha, repository }
 }
+
+export const releaseIdentityChanges = [
+  {
+    scenario: 'lightweight tag replacement',
+    annotated: false,
+    replace: (fixture) => {
+      const replacement = fixture.commit('Lightweight replacement')
+      fixture.git('tag', '-f', 'v1.2.3', replacement)
+    },
+  },
+  {
+    scenario: 'annotated tag object replacement on the same commit',
+    annotated: true,
+    replace: (fixture, release) =>
+      fixture.git(
+        'tag',
+        '-f',
+        '-a',
+        '-m',
+        'replacement annotation',
+        'v1.2.3',
+        release.sha
+      ),
+  },
+  {
+    scenario: 'annotated tag replacement on a different commit',
+    annotated: true,
+    replace: (fixture) => {
+      const replacement = fixture.commit('Peeled commit replacement')
+      fixture.git(
+        'tag',
+        '-f',
+        '-a',
+        '-m',
+        'replacement commit',
+        'v1.2.3',
+        replacement
+      )
+    },
+  },
+  {
+    scenario: 'tag deletion',
+    annotated: false,
+    replace: (fixture) => fixture.git('tag', '-d', 'v1.2.3'),
+  },
+]

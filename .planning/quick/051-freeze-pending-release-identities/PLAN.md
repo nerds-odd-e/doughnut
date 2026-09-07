@@ -128,7 +128,7 @@ state rewrite.
 
 ### 5. Reject a replacement after artifact failure
 Type: Behavior
-Status: planned
+Status: done
 Proof: Start from a ready selection whose artifact admission fails, then move or
 recreate its lightweight ref, annotated ref object or peeled commit—or delete the
 tag. The next public reconciliation fails identity admission before CI lookup,
@@ -137,6 +137,10 @@ artifact actions or production writes; the selected record is not overwritten.
 Behavior: Artifact admission leaves a selected release pending → its tag identity
 is changed or removed → a later wakeup rejects the replacement and requires an
 immutable retry or next-patch correction.
+
+Learning: Existing admission already rejects all four identity failures after a
+ready selection and failed payload check. Each replay performs only the durable
+state read; no CI query, state overwrite or publication boundary is reached.
 
 Refinement learning: The original ready-identity slice exceeded the ten-minute
 hard limit and all attempt-owned WIP was reverted after the 97-command/4-entry

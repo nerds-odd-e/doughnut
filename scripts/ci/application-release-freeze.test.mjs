@@ -1,7 +1,10 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
 import { ciRun } from './application-release-ci-fixtures.mjs'
-import { makeReleaseRepository } from './application-release-fixtures.mjs'
+import {
+  makeReleaseRepository,
+  releaseIdentityChanges,
+} from './application-release-fixtures.mjs'
 import { runReconciliationCommand } from './application-release-reconciliation-fixtures.mjs'
 
 const selectedRecord = (release) => ({
@@ -60,24 +63,13 @@ test('ready exact-SHA CI freezes the release before reporting ready', async (t) 
   assert.deepEqual(result.uploads, [selectedRecord(release)])
 })
 
-for (const scenario of ['lightweight ref', 'annotated ref', 'peeled commit']) {
-  test(`a replaced ${scenario} is rejected against its frozen identity`, async (t) => {
+for (const { scenario, annotated, replace } of releaseIdentityChanges) {
+  test(`${scenario} is rejected against its frozen identity`, async (t) => {
     const fixture = makeReleaseRepository(t)
-    const annotated = scenario !== 'lightweight ref'
     fixture.tag('v1.2.3', annotated)
     fixture.clone()
     const persisted = fixture.release()
-    const replacementSha =
-      scenario === 'annotated ref'
-        ? persisted.sha
-        : fixture.commit('Replacement release')
-    fixture.git(
-      'tag',
-      '-f',
-      ...(annotated ? ['-a', '-m', 'replacement'] : []),
-      'v1.2.3',
-      replacementSha
-    )
+    replace(fixture, persisted)
 
     const result = await runReconciliationCommand(
       t,
@@ -88,7 +80,10 @@ for (const scenario of ['lightweight ref', 'annotated ref', 'peeled commit']) {
     )
 
     assert.equal(result.status, 1)
-    assert.match(result.stderr, /release identity mismatch/i)
+    assert.match(
+      result.stderr,
+      /release identity mismatch|selected release tag v1\.2\.3 is missing/i
+    )
     assert.deepEqual(result.uploads, [])
     assert.equal(
       result.requests.some((request) =>
@@ -98,26 +93,6 @@ for (const scenario of ['lightweight ref', 'annotated ref', 'peeled commit']) {
     )
   })
 }
-
-test('a deleted frozen tag is rejected before CI or publication', async (t) => {
-  const fixture = makeReleaseRepository(t)
-  fixture.tag('v1.2.3')
-  fixture.clone()
-  const persisted = fixture.release()
-  fixture.git('tag', '-d', 'v1.2.3')
-
-  const result = await runReconciliationCommand(
-    t,
-    fixture,
-    'refs/heads/main',
-    {},
-    selectedRecord(persisted)
-  )
-
-  assert.equal(result.status, 1)
-  assert.match(result.stderr, /selected release tag v1\.2\.3 is missing/i)
-  assert.deepEqual(result.uploads, [])
-})
 
 test('a higher waiting release replaces the selected numeric ceiling', async (t) => {
   const fixture = makeReleaseRepository(t)
