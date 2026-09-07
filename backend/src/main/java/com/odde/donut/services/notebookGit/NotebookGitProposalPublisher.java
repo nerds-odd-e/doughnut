@@ -94,7 +94,6 @@ public class NotebookGitProposalPublisher {
     Notebook notebook = state.notebook();
     List<ExportFolderRow> folders = state.folders();
     List<Note> liveNotes = state.liveNotes();
-
     authorizationService.assertAuthorization(notebook);
     ObjectId acceptedHead = ObjectId.fromString(binding.getAcceptedGitObjectId());
     if (proposal.mainHead().equals(acceptedHead)) {
@@ -187,8 +186,12 @@ public class NotebookGitProposalPublisher {
       Timestamp publishedAt) {
     Note note = projection.requireOneLiveNoteAtPath(folders, liveNotes, noteChange.fromPath());
     String newTitle = validFilenameDerivedTitle(noteChange.path());
-    noteTitlePlacementRules.requireNoSoftDeletedTitleAt(
-        note.getNotebook(), note.getFolder(), newTitle);
+    try {
+      noteTitlePlacementRules.requireNoSoftDeletedTitleAt(
+          note.getNotebook(), note.getFolder(), newTitle);
+    } catch (ApiException exception) {
+      throw withContext(exception, "Cannot rename to path \"" + noteChange.path() + "\"");
+    }
     note.setTitle(new DisplayName(newTitle));
     note.setUpdatedAt(publishedAt);
     entityPersister.save(note);

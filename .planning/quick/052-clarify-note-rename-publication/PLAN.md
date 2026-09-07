@@ -1,6 +1,6 @@
 # Clarify identity-preserving note rename publication
 
-Status: in progress; slice 1 is delivered.
+Status: complete; both slices are delivered.
 Source: [SEED-009 Story 6](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-6).
 Execution observer: `/root`, checkout `/Users/terryyin/git/doughnut`,
 `nerds-odd-e/doughnut` `main`, mailbox `/tmp/donut-ci-501/watch-goWo0j`, PID `34160`.
@@ -115,7 +115,7 @@ generated cache forced a current-source rebuild; the rerun passed all scenarios.
 
 ### 2. Identify the reserved destination in a rename rejection
 Type: Behavior
-Status: planned
+Status: done
 Proof: Existing public-controller deleted-destination fixture observes the
 requested Portable path alongside the original error semantics and unchanged
 persisted state.
@@ -132,6 +132,10 @@ server message. Keep production files within the 250-line limit through
 cohesive local cleanup if needed; introduce no generic failure framework.
 Execution verification follows the backend rule:
 `CURSOR_DEV=true nix develop -c pnpm backend:test_only`.
+
+Learning: the existing `withContext` path preserves the original error fields
+and cause while adding the requested Portable path. The full backend suite
+passed with the publisher kept at 250 lines.
 
 ## Decisions and readiness
 

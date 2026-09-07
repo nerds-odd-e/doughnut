@@ -25,6 +25,8 @@ class NotebookGitDeletedDestinationControllerTest extends NotebookGitBundleContr
 
   private static final String ORIGINAL_CONTENT = "---\ntype: Note\n---\nOriginal content.\n";
   private static final String PROPOSED_CONTENT = "---\ntype: Note\n---\nProposed content.\n";
+  private static final String RESERVED_TITLE = "Reserved destination";
+  private static final String RESERVED_PATH = RESERVED_TITLE + ".md";
   private static final String SOFT_DELETED_TITLE_REASON =
       "A note with this title already exists here but was deleted. Restore the deleted note"
           + " (Undo delete), or choose another title.";
@@ -43,7 +45,7 @@ class NotebookGitDeletedDestinationControllerTest extends NotebookGitBundleContr
             deletion.afterDeletionBinding(),
             List.of(
                 new NotebookGitProposalFile("Retained.md", ORIGINAL_CONTENT),
-                new NotebookGitProposalFile("Reserved destination.md", PROPOSED_CONTENT)));
+                new NotebookGitProposalFile(RESERVED_PATH, PROPOSED_CONTENT)));
 
     ApiException exception =
         assertProposalRejectedWithoutMutatingBinding(
@@ -52,20 +54,7 @@ class NotebookGitDeletedDestinationControllerTest extends NotebookGitBundleContr
             additionProposal,
             ApiException.class);
 
-    assertThat(exception.getErrorBody().getMessage(), containsString("Reserved destination.md"));
-    assertThat(exception.getErrorBody().getMessage(), containsString(SOFT_DELETED_TITLE_REASON));
-    assertThat(
-        exception.getErrorBody().getErrorType(),
-        is(ApiError.ErrorType.SOFT_DELETED_TITLE_CONFLICT));
-    assertThat(
-        exception.getErrorBody().getErrors().get("deletedNoteId"),
-        equalTo(String.valueOf(deletion.reserved().getId())));
-    assertThat(
-        exception.getErrorBody().getErrors().get("_originalMessage"),
-        equalTo(SOFT_DELETED_TITLE_REASON));
-    ApiException original = assertInstanceOf(ApiException.class, exception.getCause());
-    assertThat(original.getMessage(), equalTo(SOFT_DELETED_TITLE_REASON));
-    assertThat(exception.getErrorBody().getErrors(), equalTo(original.getErrorBody().getErrors()));
+    assertContextualSoftDeletedTitleConflict(exception, deletion.reserved());
 
     PublicationState afterRejection =
         publicationState(notebook, deletion.reserved(), deletion.tracker());
@@ -100,19 +89,13 @@ class NotebookGitDeletedDestinationControllerTest extends NotebookGitBundleContr
     byte[] renameProposal =
         proposalBundleBytes(
             deletion.afterDeletionBinding(),
-            List.of(new NotebookGitProposalFile("Reserved destination.md", ORIGINAL_CONTENT)));
+            List.of(new NotebookGitProposalFile(RESERVED_PATH, ORIGINAL_CONTENT)));
 
     ApiException exception =
         assertProposalRejectedWithoutMutatingBinding(
             notebook, deletion.afterDeletion().acceptedHead(), renameProposal, ApiException.class);
 
-    assertThat(exception.getErrorBody().getMessage(), equalTo(SOFT_DELETED_TITLE_REASON));
-    assertThat(
-        exception.getErrorBody().getErrorType(),
-        is(ApiError.ErrorType.SOFT_DELETED_TITLE_CONFLICT));
-    assertThat(
-        exception.getErrorBody().getErrors().get("deletedNoteId"),
-        equalTo(String.valueOf(deletion.reserved().getId())));
+    assertContextualSoftDeletedTitleConflict(exception, deletion.reserved());
 
     PublicationState afterRejection =
         publicationState(notebook, deletion.reserved(), deletion.tracker());
@@ -132,6 +115,23 @@ class NotebookGitDeletedDestinationControllerTest extends NotebookGitBundleContr
                 contains(renamedSource.getId())));
   }
 
+  private void assertContextualSoftDeletedTitleConflict(ApiException exception, Note reserved) {
+    assertThat(exception.getErrorBody().getMessage(), containsString(RESERVED_PATH));
+    assertThat(exception.getErrorBody().getMessage(), containsString(SOFT_DELETED_TITLE_REASON));
+    assertThat(
+        exception.getErrorBody().getErrorType(),
+        is(ApiError.ErrorType.SOFT_DELETED_TITLE_CONFLICT));
+    assertThat(
+        exception.getErrorBody().getErrors().get("deletedNoteId"),
+        equalTo(String.valueOf(reserved.getId())));
+    assertThat(
+        exception.getErrorBody().getErrors().get("_originalMessage"),
+        equalTo(SOFT_DELETED_TITLE_REASON));
+    ApiException original = assertInstanceOf(ApiException.class, exception.getCause());
+    assertThat(original.getMessage(), equalTo(SOFT_DELETED_TITLE_REASON));
+    assertThat(exception.getErrorBody().getErrors(), equalTo(original.getErrorBody().getErrors()));
+  }
+
   /**
    * Soft-deletes a tracked "Reserved destination" note via an accepted isolated deletion, keeping
    * only {@code survivingNote}'s file in the accepted tree, so the title stays reserved for the
@@ -140,12 +140,7 @@ class NotebookGitDeletedDestinationControllerTest extends NotebookGitBundleContr
   private AcceptedDeletion acceptDeletionReservingTitle(Notebook notebook, Note survivingNote)
       throws Exception {
     Note reserved =
-        makeMe
-            .aNote()
-            .notebook(notebook)
-            .title("Reserved destination")
-            .content(ORIGINAL_CONTENT)
-            .please();
+        makeMe.aNote().notebook(notebook).title(RESERVED_TITLE).content(ORIGINAL_CONTENT).please();
     MemoryTracker tracker =
         inCommittedTransaction(
             transactionManager,
