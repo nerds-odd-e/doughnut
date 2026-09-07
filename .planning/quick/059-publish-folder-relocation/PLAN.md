@@ -3,7 +3,7 @@
 ## Source and status
 
 Source: [SEED-009 Story 7](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-7).
-Status: in progress; slices 1–13 done.
+Status: in progress; slices 1–14 done.
 
 ## Goal and scope
 
@@ -298,9 +298,12 @@ Sizing basis: reuse preceding folder setup and existing single-note edit steps.
 
 ### 14. Explain the supported folder-move boundary in CLI guidance
 Type: Behavior
-Status: planned
-Proof: Drive CLI run to observe clone guidance. Keep the installed-guidance
-assertion consistent in cli_notebook_clone.feature without adding a new scenario.
+Status: done
+Proof: Clone success log names the accepted README, whole-subtree,
+existing-parent, and unchanged bytes/modes/paths boundary; new/unrepresented
+folders, overwrites, and combined relocate/rename+edit stay unsupported.
+`CURSOR_DEV=true nix develop -c pnpm cli:test` passed.
+`CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/cli/cli_notebook_clone.feature` passed (existing nested-metadata assertion; no new scenario).
 
 Behavior: An owner reads clone guidance → they learn the accepted README,
 whole-subtree, existing-parent, unchanged-link and publish-before-edit boundaries.
@@ -352,7 +355,7 @@ feature is promised. No completed evidence exists to migrate.
 
 ## Readiness and learnings
 
-Slices 1–13 done. Remaining: CLI guidance.
+Slices 1–14 done. Remaining: none.
 
 CI observer delivered run 34142166098 on `9f35dbcff2` (slice 9, test-only).
 The only Cypress failure was `record_live_audio_with_real_open_ai_service`
