@@ -162,7 +162,7 @@ rather than reverted/split further.
 
 ### 3. Preserve private associations when the name changes
 Type: Behavior
-Status: planned
+Status: done
 Proof: One controller scenario with committed active/inactive trackers,
 scheduling values, question and conversation, plus an unchanged identical-text
 note; fresh IDs, activation/schedule and association ownership are unchanged.
@@ -172,6 +172,13 @@ Behavior: Distinct learned identities contain matching text → rename only one
 → all private data stays with its original identity and no tracker reactivates.
 Assert the private-data delta here rather than repeating the canonical tree
 assertions from leaf 2. No new persistence mechanism or fixture framework.
+Learning: Pure proof addition, no production change needed — `applyRename`
+already preserves associations by construction. Added one test to
+NotebookGitProposalRenameControllerTest reusing
+NotebookGitCopyIdentityControllerTest's fixture/cleanup pattern (kept
+intentionally local rather than hoisted to the shared base class, since
+`@AfterEach` ordering across the two classes isn't guaranteed for
+same-class hooks). File stayed at 196 lines, no split needed.
 
 ### 4. Roll back a rename when acceptance fails
 Type: Behavior
