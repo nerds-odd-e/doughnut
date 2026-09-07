@@ -167,7 +167,7 @@ active instruction to serialize application release requests manually.
 
 ### 7. Guide agents through an application release
 Type: Behavior
-Status: planned
+Status: done
 Proof: Validate the new skill's frontmatter and links, then walk through simulated
 requests to release an exact tested main commit and to check deployment status.
 The release walkthrough identifies the intended unused increasing version,
@@ -194,6 +194,12 @@ and smoke checks, and disclose any verification that could not be completed.
 
 Sizing: About five minutes for one short skill, its navigation pointer and a
 focused walkthrough; no helper scripts or new release machinery are needed.
+
+Learning: The repository skill stays self-contained and delegates mechanics to
+the runbook. Independent fake-only walkthroughs correctly required actual
+publication and smoke evidence for success, kept status requests read-only and
+reported waiting, blocked, skipped, failed and smoke-unverified outcomes without
+claiming deployment.
 
 ## Verification and wrap-up
 

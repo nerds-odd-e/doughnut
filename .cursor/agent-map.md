@@ -12,6 +12,7 @@ Short navigation index — start here before generated API files or long docs. S
 - CLI behavior: start in `cli/src/`; run focused CLI unit tests from `cli/` rather than broad workspace verification. Style: `unit-testing.mdc`; stack details: `cli.mdc`.
 - MCP server behavior: start in `mcp-server/`; use `.cursor/rules/mcp-server.mdc` only for MCP-specific build/test details. Style: `unit-testing.mdc`.
 - Database schema changes: add a new migration in `backend/src/main/resources/db/migration/`; never edit committed migrations.
+- Application releases or deployment status: use `.agents/skills/release-application/SKILL.md`; it routes to the canonical application runbook and distinguishes `cli-*` releases and `gsd-ship` PR delivery.
 
 ## Generated API
 
