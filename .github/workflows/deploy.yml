@@ -3,6 +3,10 @@ name: donut deploy
 on:
   push:
     tags: ["v*.*.*"]
+  workflow_run:
+    workflows: ["donut CI"]
+    branches: [main]
+    types: [completed]
 
 concurrency:
   group: deploy-production
@@ -30,14 +34,14 @@ jobs:
     timeout-minutes: 70
     outputs:
       control_sha: ${{ steps.control.outputs.sha }}
-      deploy: ${{ steps.release_state.outputs.state != 'already-released' && steps.release_state.outputs.state != 'superseded' && (steps.ci.outputs.state == 'ready' || steps.reconciliation.outputs.state == 'ready') }}
-      tag: ${{ steps.identity.outputs.tag || steps.reconciliation.outputs.tag }}
-      sha: ${{ steps.identity.outputs.sha || steps.reconciliation.outputs.sha }}
-      ref: ${{ steps.identity.outputs.ref || steps.reconciliation.outputs.ref }}
-      ref_oid: ${{ steps.identity.outputs.refOid || steps.reconciliation.outputs.refOid }}
-      run_id: ${{ steps.ci.outputs.runId || steps.reconciliation.outputs.runId }}
-      run_attempt: ${{ steps.ci.outputs.runAttempt || steps.reconciliation.outputs.runAttempt }}
-      failure_stage: ${{ steps.identity.outcome == 'failure' && 'identity' || steps.reconciliation.outcome == 'failure' && 'reconciliation' || 'CI admission' }}
+      deploy: ${{ steps.release_state.outputs.state != 'already-released' && steps.release_state.outputs.state != 'superseded' && steps.reconciliation.outputs.state == 'ready' }}
+      tag: ${{ steps.reconciliation.outputs.tag }}
+      sha: ${{ steps.reconciliation.outputs.sha }}
+      ref: ${{ steps.reconciliation.outputs.ref }}
+      ref_oid: ${{ steps.reconciliation.outputs.refOid }}
+      run_id: ${{ steps.reconciliation.outputs.runId }}
+      run_attempt: ${{ steps.reconciliation.outputs.runAttempt }}
+      failure_stage: ${{ steps.reconciliation.outcome == 'failure' && 'reconciliation' || 'release state admission' }}
     steps:
       - uses: actions/checkout@v7
         with:
@@ -58,32 +62,19 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: node scripts/ci/application-release-state.mjs
-      - name: Identify exact tagged main commit
-        id: identity
-        if: github.event_name == 'push'
-        run: |
-          node scripts/ci/application-release.mjs
       - name: Reconcile current application release
         id: reconciliation
-        if: github.event_name == 'workflow_run'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: node scripts/ci/application-release-reconciliation.mjs
       - name: Check application release state
         id: release_state
-        if: (steps.identity.outputs.tag || steps.reconciliation.outputs.tag) != ''
+        if: steps.reconciliation.outputs.tag != ''
         env:
-          RELEASE_TAG: ${{ steps.identity.outputs.tag || steps.reconciliation.outputs.tag }}
-          RELEASE_REF_OID: ${{ steps.identity.outputs.refOid || steps.reconciliation.outputs.refOid }}
-          RELEASE_SHA: ${{ steps.identity.outputs.sha || steps.reconciliation.outputs.sha }}
+          RELEASE_TAG: ${{ steps.reconciliation.outputs.tag }}
+          RELEASE_REF_OID: ${{ steps.reconciliation.outputs.refOid }}
+          RELEASE_SHA: ${{ steps.reconciliation.outputs.sha }}
         run: node scripts/ci/application-release-state.mjs --check-release
-      - name: Wait for successful CI of selected commit
-        id: ci
-        if: github.event_name == 'push' && steps.release_state.outputs.state != 'already-released' && steps.release_state.outputs.state != 'superseded'
-        env:
-          RELEASE_SHA: ${{ steps.identity.outputs.sha }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: node scripts/ci/application-release-ci.mjs
 
   Deploy:
     name: GCP deploy (GCS + MIG + health probe)

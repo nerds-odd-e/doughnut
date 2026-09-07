@@ -12,7 +12,7 @@ Runbook for production static hosting: one browser-facing hostname, HTTPS load b
 | Admitted application tag **Deploy** ([deploy workflow](../../.github/workflows/deploy.yml)) | Downloads CI artifacts; SPA → `gs://<GCS_FRONTEND_BUCKET>/frontend/<GITHUB_SHA>/`; CLI → same bucket; jar + `deploy/last-successful-deploy.json` → `GCS_BUCKET`. Always runs [`apply-doughnut-app-service-url-map.sh`](../../infra/gcp/scripts/apply-doughnut-app-service-url-map.sh) so the LB serves the selected release’s `frontend/<GITHUB_SHA>/` (including frontend-only commits). |
 | Backend MIG | Jar upload + rolling replace when the jar hash or startup script hash differs from the record — [conditional-backend-deploy.md](conditional-backend-deploy.md). |
 | Routing edits | Change [`doughnut-routing.json`](../../infra/gcp/path-routing/doughnut-routing.json); CI must pass `pnpm validate:path-routing`. |
-| **Release correction** | Test a correction/revert on main and issue the next patch version, one application release at a time; do not rerun old releases or move tags. No automatic schema rollback. See the [release runbook](conditional-backend-deploy.md). |
+| **Release correction** | Retry an immutable interrupted release when its exact CI/artifacts remain recoverable. Otherwise test a correction/revert on main and issue the next patch version; overlapping tags reconcile the highest pending version. Never move tags. No automatic schema rollback. See the [release runbook](conditional-backend-deploy.md). |
 | **Backend record repair** | See [conditional-backend-deploy.md](conditional-backend-deploy.md) for deliberate infrastructure repair; the record is not an application release ledger. |
 
 ---
@@ -51,7 +51,15 @@ Do this **before** the first application release that uses `GCS_FRONTEND_BUCKET`
 
 **Org constraint:** If your org forbids `allUsers` with IAM **conditions** (`PublicResourceAllowConditionCheck`), you cannot scope “public read only under `frontend/`” on one mixed bucket via conditional bindings; a **dedicated** frontend bucket avoids that.
 
-**Normal release:** An increasing immutable application tag waits up to 60 minutes for its exact main commit’s successful CI; the deploy workflow runs [`apply-doughnut-app-service-url-map.sh`](../../infra/gcp/scripts/apply-doughnut-app-service-url-map.sh) (render from `doughnut-routing.json` + `pnpm validate:path-routing` equivalent + `gcloud compute url-maps import`) so the LB serves `frontend/<GITHUB_SHA>/` for that selected release. Ordinary main pushes publish nothing. Follow the [release runbook](conditional-backend-deploy.md), including the first-release requirement that selected source contains the new tag trigger.
+**Normal release:** Increasing immutable application tags reconcile the highest
+pending version on each tag or completed-CI wakeup. Unfinished CI releases the
+runner and is reconsidered after a later completion. The deploy workflow runs
+[`apply-doughnut-app-service-url-map.sh`](../../infra/gcp/scripts/apply-doughnut-app-service-url-map.sh)
+(render from `doughnut-routing.json` + `pnpm validate:path-routing` equivalent +
+`gcloud compute url-maps import`) so the LB serves `frontend/<GITHUB_SHA>/` for
+that selected release. Ordinary main pushes publish nothing. Follow the
+[release runbook](conditional-backend-deploy.md), including the first-release
+requirement that selected source contains the new tag and CI-completion triggers.
 
 **Infrastructure repair / manual import:** To repair routing for the currently selected release, render its commit (40-char SHA) whose tree exists under `gs://<GCS_FRONTEND_BUCKET>/frontend/<SHA>/`, validate, then import:
 

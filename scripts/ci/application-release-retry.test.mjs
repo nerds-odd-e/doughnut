@@ -3,7 +3,7 @@ import { spawnSync } from 'node:child_process'
 import { existsSync, readFileSync, rmSync } from 'node:fs'
 import { test } from 'node:test'
 import { fileURLToPath } from 'node:url'
-import { waitForSelectedCi } from './application-release-ci.mjs'
+import { querySelectedCi } from './application-release-ci.mjs'
 import { ciRun, repository } from './application-release-ci-fixtures.mjs'
 import {
   hash,
@@ -35,18 +35,13 @@ async function selectFreshSuccessfulCiAttempt(t, sha) {
       }),
     }
   })
-  const ci = await waitForSelectedCi({ repository, sha })
+  const ci = await querySelectedCi({ repository, sha })
   return { ci, queries }
 }
 
 test('an interrupted release retries the same identity with freshly selected CI artifacts', async (t) => {
   const fixture = makePublication(t, 'forced')
-  const identity = fixture.fixture.run({
-    ref: 'refs/tags/v1.2.3',
-    after: fixture.refOid,
-  })
-  assert.equal(identity.status, 0, identity.stderr)
-  const release = JSON.parse(identity.stdout)
+  const release = fixture.fixture.release()
 
   const interrupted = fixture.publish(
     release,
@@ -119,12 +114,7 @@ test('an interrupted release retries the same identity with freshly selected CI 
 
 test('missing artifacts stop before writes and a newer exact-SHA CI attempt resumes the same tag', async (t) => {
   const fixture = makePublication(t, 'forced')
-  const identity = fixture.fixture.run({
-    ref: 'refs/tags/v1.2.3',
-    after: fixture.refOid,
-  })
-  assert.equal(identity.status, 0, identity.stderr)
-  const release = JSON.parse(identity.stdout)
+  const release = fixture.fixture.release()
   rmSync(`${fixture.root}/artifacts-42`, { recursive: true })
 
   const unavailable = spawnSync(process.execPath, [payloadCommand], {

@@ -25,7 +25,7 @@ export function ciRun(overrides = {}) {
   }
 }
 
-export async function runCiCommand(t, pages, args = ['--once']) {
+export async function runCiCommand(t, pages, args = []) {
   const root = mkdtempSync(join(tmpdir(), 'release-ci-'))
   t.after(() => rmSync(root, { recursive: true, force: true }))
   const output = join(root, 'output')

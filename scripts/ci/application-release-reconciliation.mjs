@@ -85,9 +85,22 @@ export async function reconcileApplicationRelease({
       repository: githubRepository,
       sha: release.sha,
     })
-    return { state: ci.state, ...release, ...ci }
+    const { state, ...identity } = ci
+    return {
+      state: state === 'pending' ? 'waiting' : state,
+      ...release,
+      ...identity,
+    }
   } catch (error) {
-    if (error.ci) writeReleaseOutput({ ...release, ...error.ci })
+    if (error.ci) {
+      const { state: _, ...identity } = error.ci
+      return {
+        state: 'blocked',
+        ...release,
+        ...identity,
+        diagnostic: error.message,
+      }
+    }
     throw error
   }
 }

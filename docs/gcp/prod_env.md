@@ -81,7 +81,12 @@ gcloud sql instances describe doughnut-db-instance \
 
 ## 5. Version-tag releases and conditional backend deploy
 
-Ordinary `main` pushes run CI without publishing. One increasing immutable `vMAJOR.MINOR.PATCH` tag selects the exact tested main commit for release, with a bounded 60-minute wait if CI is unfinished. Issue one application release at a time; use a tested correction/revert and next patch after failure. No automatic schema rollback is provided. See the [release runbook](conditional-backend-deploy.md).
+Ordinary `main` pushes run CI without publishing. Increasing immutable
+`vMAJOR.MINOR.PATCH` tags select exact tested main commits for release. Tags may
+overlap: one active deployment finishes, then a queued tag or completed-CI wakeup
+reconciles the highest numeric pending version. Unfinished CI releases the runner;
+use a tested correction/revert and next patch after an unrecoverable failure. No
+automatic schema rollback is provided. See the [release runbook](conditional-backend-deploy.md).
 
 A selected release may **skip** GCS jar upload and MIG rollout when the jar hash and startup script hash match the last successful deploy record. To **force** upload + rolling replace anyway, use the commit-message token and merge caveats in [conditional-backend-deploy.md](conditional-backend-deploy.md).
 

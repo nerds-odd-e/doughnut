@@ -159,11 +159,11 @@ test('workflow notifies admission and deployment failures using selected outputs
   )
   assert.match(
     admission.outputs.failure_stage,
-    /steps.identity.outcome == 'failure'.*'identity'.*steps.reconciliation.outcome == 'failure'.*'reconciliation'.*'CI admission'/
+    /steps.reconciliation.outcome == 'failure'.*'reconciliation'.*'release state admission'/
   )
   assert.equal(
     admission.outputs.run_attempt,
-    '${{ steps.ci.outputs.runAttempt || steps.reconciliation.outputs.runAttempt }}'
+    '${{ steps.reconciliation.outputs.runAttempt }}'
   )
   for (const id of [
     'backend_artifact',

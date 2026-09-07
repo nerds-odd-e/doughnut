@@ -13,18 +13,22 @@ const workflow = (name) =>
 
 const nonTerminalRelease =
   "steps.release_state.outputs.state != 'already-released' && steps.release_state.outputs.state != 'superseded'"
-const selected = (field) =>
-  `\${{ steps.identity.outputs.${field} || steps.reconciliation.outputs.${field} }}`
-const selectedCi = (field) =>
-  `\${{ steps.ci.outputs.${field} || steps.reconciliation.outputs.${field} }}`
+const selected = (field) => `\${{ steps.reconciliation.outputs.${field} }}`
 
-test('main CI remains enabled and only application tag pushes trigger publication', () => {
+test('application tags and completed main CI wake the same release reconciliation', () => {
   const ci = workflow('ci')
   const deploy = workflow('deploy')
 
   assert.deepEqual(ci.on.push.branches, ['main'])
   assert.equal(ci.name, 'donut CI')
-  assert.deepEqual(deploy.on, { push: { tags: ['v*.*.*'] } })
+  assert.deepEqual(deploy.on, {
+    push: { tags: ['v*.*.*'] },
+    workflow_run: {
+      workflows: ['donut CI'],
+      branches: ['main'],
+      types: ['completed'],
+    },
+  })
   assert.equal(deploy.jobs['release-admission'].if, undefined)
   assert.equal(deploy.jobs.Deploy.needs, 'release-admission')
   assert.equal(
@@ -45,14 +49,12 @@ test('release pins orchestration separately from source and preserves deployment
   const trackingInitialization = admission.steps.find(
     (step) => step.run === 'node scripts/ci/application-release-state.mjs'
   )
-  const identity = admission.steps.find((step) => step.id === 'identity')
   const reconciliation = admission.steps.find(
     (step) => step.id === 'reconciliation'
   )
   const releaseState = admission.steps.find(
     (step) => step.id === 'release_state'
   )
-  const ciAdmission = admission.steps.find((step) => step.id === 'ci')
   const artifactDownloads = publication.steps.filter(
     (step) => step.uses === 'actions/download-artifact@v8'
   )
@@ -81,42 +83,28 @@ test('release pins orchestration separately from source and preserves deployment
   )
   assert.ok(
     admission.steps.indexOf(trackingInitialization) <
-      admission.steps.indexOf(identity)
+      admission.steps.indexOf(reconciliation)
   )
-  assert.equal(identity.if, "github.event_name == 'push'")
-  assert.equal(reconciliation.if, "github.event_name == 'workflow_run'")
+  assert.equal(reconciliation.if, undefined)
   assert.equal(
     reconciliation.run,
     'node scripts/ci/application-release-reconciliation.mjs'
   )
   assert.equal(reconciliation.env.GITHUB_TOKEN, '${{ secrets.GITHUB_TOKEN }}')
   assert.ok(
-    admission.steps.indexOf(trackingInitialization) <
-      admission.steps.indexOf(reconciliation)
-  )
-  assert.ok(
-    admission.steps.indexOf(identity) < admission.steps.indexOf(ciAdmission)
-  )
-  assert.ok(
-    admission.steps.indexOf(identity) < admission.steps.indexOf(releaseState)
-  )
-  assert.ok(
-    admission.steps.indexOf(releaseState) < admission.steps.indexOf(ciAdmission)
+    admission.steps.indexOf(reconciliation) <
+      admission.steps.indexOf(releaseState)
   )
   assert.deepEqual(releaseState.env, {
     RELEASE_TAG: selected('tag'),
     RELEASE_REF_OID: selected('refOid'),
     RELEASE_SHA: selected('sha'),
   })
-  assert.equal(
-    releaseState.if,
-    "(steps.identity.outputs.tag || steps.reconciliation.outputs.tag) != ''"
-  )
+  assert.equal(releaseState.if, "steps.reconciliation.outputs.tag != ''")
   assert.equal(
     releaseState.run,
     'node scripts/ci/application-release-state.mjs --check-release'
   )
-  assert.equal(ciAdmission.run, 'node scripts/ci/application-release-ci.mjs')
   assert.deepEqual(
     publication.steps.slice(0, 2).map((step) => step.with),
     [
@@ -169,8 +157,16 @@ test('release pins orchestration separately from source and preserves deployment
   assert.equal(publication['timeout-minutes'], 60)
   assert.deepEqual(deploy.permissions, { actions: 'read', contents: 'read' })
   assert.equal(
-    admission.steps.find((step) => step.id === 'ci').env.GITHUB_TOKEN,
-    '${{ secrets.GITHUB_TOKEN }}'
+    admission.steps.some((step) => step.id === 'identity'),
+    false
+  )
+  assert.equal(
+    admission.steps.some((step) => step.id === 'ci'),
+    false
+  )
+  assert.doesNotMatch(
+    JSON.stringify(admission),
+    /github\.event\.workflow_run\.(conclusion|head_sha|run_started_at)/
   )
   assert.ok(
     artifactDownloads.every(
@@ -200,11 +196,7 @@ test('terminal release outcomes bypass CI and every publication operation', () =
 
   assert.equal(
     admission.outputs.deploy,
-    `\${{ ${nonTerminalRelease} && (steps.ci.outputs.state == 'ready' || steps.reconciliation.outputs.state == 'ready') }}`
-  )
-  assert.equal(
-    admission.steps.find((step) => step.id === 'ci').if,
-    `github.event_name == 'push' && ${nonTerminalRelease}`
+    `\${{ ${nonTerminalRelease} && steps.reconciliation.outputs.state == 'ready' }}`
   )
   assert.equal(
     publication.if,
@@ -227,11 +219,12 @@ test('admission exposes the selected release identity using full Git history', (
   assert.equal(admission.outputs.sha, selected('sha'))
   assert.equal(admission.outputs.ref, selected('ref'))
   assert.equal(admission.outputs.ref_oid, selected('refOid'))
-  assert.equal(admission.outputs.run_id, selectedCi('runId'))
-  assert.equal(admission.outputs.run_attempt, selectedCi('runAttempt'))
+  assert.equal(admission.outputs.run_id, selected('runId'))
+  assert.equal(admission.outputs.run_attempt, selected('runAttempt'))
   assert.equal(admission.steps[0].with['fetch-depth'], 0)
-  assert.match(
-    admission.steps.find((step) => step.id === 'identity').run,
-    /node scripts\/ci\/application-release.mjs/
+  assert.equal(
+    admission.steps.find((step) => step.id === 'reconciliation').run,
+    'node scripts/ci/application-release-reconciliation.mjs'
   )
+  assert.doesNotMatch(JSON.stringify(admission), /Wait for successful CI/)
 })

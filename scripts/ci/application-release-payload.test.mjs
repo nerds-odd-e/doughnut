@@ -94,11 +94,16 @@ test('all admitted-run downloads and preflight precede the first production step
   const admission = deploy.jobs['release-admission']
   assert.equal(
     admission.outputs.run_id,
-    '${{ steps.ci.outputs.runId || steps.reconciliation.outputs.runId }}'
+    '${{ steps.reconciliation.outputs.runId }}'
   )
-  const ci = admission.steps.find((step) => step.id === 'ci')
-  assert.equal(ci.env.RELEASE_SHA, '${{ steps.identity.outputs.sha }}')
-  assert.match(ci.run, /node scripts\/ci\/application-release-ci.mjs/)
+  const reconciliation = admission.steps.find(
+    (step) => step.id === 'reconciliation'
+  )
+  assert.equal(reconciliation.env.GITHUB_TOKEN, '${{ secrets.GITHUB_TOKEN }}')
+  assert.match(
+    reconciliation.run,
+    /node scripts\/ci\/application-release-reconciliation.mjs/
+  )
   const { steps, env } = deploy.jobs.Deploy
   const downloads = steps.filter(
     (step) => step.uses === 'actions/download-artifact@v8'

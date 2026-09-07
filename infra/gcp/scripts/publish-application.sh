@@ -22,7 +22,7 @@ PREPARED_URL_MAP="$(mktemp)"
 trap 'rm -f "$PREPARED_URL_MAP"' EXIT
 bash "$SCRIPT_DIR/apply-doughnut-app-service-url-map.sh" --prepare "$PREPARED_URL_MAP"
 export PREPARED_URL_MAP
-node "$CONTROL_ROOT/scripts/ci/application-release.mjs" --verify-ref
+node "$CONTROL_ROOT/scripts/ci/application-release-ref.mjs"
 
 APPLICATION_RELEASE_RECORD_URI="gs://${GCS_BUCKET}/deploy/application-release.json"
 record_application_outcome() {
