@@ -1,263 +1,379 @@
 # Publish an identity-preserving note relocation
 
-Status: planned; Story 6 prerequisite delivered. Stories 8 and 9 remain higher
-product priorities; this plan has not been executed.
+Status: planned; story and slice-plan refinement complete on 2026-09-07.
 Source: [SEED-009 Story 12](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-12).
-Prerequisite: [delivered Story 6](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-6).
-Related corrections: [Plan 52](../052-clarify-note-rename-publication/PLAN.md).
+Prerequisites: Story 6 and the [Plan 52 corrections](../052-clarify-note-rename-publication/PLAN.md)
+are delivered. Ready to execute as the selected parallel candidate alongside
+[Plan 53](../053-reconcile-local-web-content/PLAN.md), using the coordination
+boundary below. This planning request does not start implementation.
 
 ## Goal and scope
 
-An owner moves one learned note between existing represented folders or the
-notebook root using the existing installed CLI, retaining that note's identity
-and learning state. The same isolated commit may also change its filename.
-Another checkout receives the new location and a separately published later
-content edit on the same identity.
+An owner files one learned note in another existing represented folder, or at
+the notebook root, through an ordinary local Git commit and installed CLI
+publication. The filename may change in the same commit. The note retains its
+identity/private data, authored content and links. A separate later content
+publication and receipt in another checkout continue at the new location.
 
-Extend the exact unchanged remove/add pair delivered by Story 6 to a changed
-parent directory. Inherit that story's owner/readiness, single-child ancestry,
-exact authored bytes, private-data preservation, unchanged reference policy,
-atomicity, retry and stale/drift protection. Retain same-parent renaming,
-addition/edit/deletion behavior, and fresh identity after separate deletion
-and creation.
+The proposal is exactly one removed and one added regular Markdown note with
+the same raw blob, and no other changed file, on one direct single-parent
+commit above accepted main. Destination eligibility is based on the accepted
+parent: root, or an existing Donut folder represented by tracked content under
+its full path, including nested/README-only folders and represented ancestors.
+The destination's own README is not required. Validate final folder/title
+together, with no intermediate placement.
 
-Only existing Donut folders represented in accepted parent history qualify.
-Include root, nested folders and README-only destinations. Validate the final
-folder/title together, not an intermediate title/location. Occupied or
-soft-deleted final destinations reject. Retain all container identities,
-including a source folder emptied of tracked files; never generate README.
+The destination path must be absent from the accepted tree and the final
+folder/title must not be reserved by a deleted note. Source and destination
+containers survive, even when source becomes unrepresented after its last
+tracked note moves. Do not create a README; returning to an unrepresented
+source folder is then outside the supported destination boundary.
 
-Exclude new/unrepresented folders, whole-folder or README moves, cross-notebook
-moves, changed content or accompanying reference rewrites, multiple moves,
-restore/deleted-path reuse, multiple unpublished commits, rebase/conflicts,
-drift repair, web structural synchronization, or new commands/UI/metadata.
-This story does not require Stories 8/9 technically; they precede it by product
-priority. Story 7 (whole-folder moves) follows this story.
+Retain same-parent rename, additions/edits/deletion, ownership/readiness,
+expected-head/drift checks, exact accepted commit/tree, atomicity and retry.
+Publish and accept the unchanged relocation before separately committing and
+publishing a content edit. Authored body/property links stay unchanged; exact
+old-path references can stop resolving while shorthand references may remain
+valid. No reference repair or redirect is implied.
 
-## Reused execution context
+Exclude new/unrepresented folders, folder/README moves, changed content or
+accompanying referrer edits, multiple pairs, overwrite/restore/deleted-name
+reuse, cross-notebook moves, multiple unpublished commits, structural rebase,
+drift repair, web move synchronization, new commands, or Portable metadata.
 
-Story 6 is delivered through `980114d23d`. Its implementation classifies one
-raw equal-blob removed/added pair in
-`NotebookGitProposalTreeShape.detectSameParentRename` and mutates the same
-Note in `NotebookGitProposalPublisher.applyRename`. Extend that representation
-and handler instead of creating another identity path. Recheck their current
-form at execution, including any completed Plan 52 corrections.
-The reusable boundaries are:
+An intended overwrite onto an identical live target can appear as an isolated
+deletion because the target's tree entry is unchanged. That existing deletion
+behavior is not relocation and never transfers identity to the target. Do not
+invent intent detection or promise all such filesystem commands are rejected.
+A one-file directory move producing an eligible pair likewise moves the note,
+not its Donut folder.
 
-- NotebookGitProjection.requireRepresentedFolderIdForAddition already resolves
-  a full destination folder path against accepted parent content, including
-  README-only folders. Share/generalize it for relocation when needed.
-- NoteTitlePlacementRules checks a deleted final title at a chosen folder.
-  Resolve and validate the destination first, then assign the final title and
-  folder inside NotebookGitProposalPublisher's existing transaction.
-  Preserve path-specific conflict context from the Story 6 correction; if
-  Plan 52 is still pending when this story is selected, reconcile its error
-  correction with leaf 6 once rather than duplicate the work.
-- NoteMotionService flushes and validates its current title; web movement also
-  rewrites references. Do not sequence those workflows to implement an atomic
-  final placement or accidentally validate an intermediate collision.
-- Keep the existing projection checks, binding lock/save, transaction ownership
-  and failure behavior. Reuse the committed controller fixtures, exact atomic
-  failure profile, and real-Git CLI transport tests from the rename delivery.
-- The rename story supplies the installed git-mv harness. Use it for
-  cross-parent moves; do not create another task framework or second-checkout
-  Cypress infrastructure.
-- Accepted [ADR 0004](../../../docs/adrs/0004-okf-compatible-notebook-markdown-accepted.md)
-  governs representations/references/empty folders; Accepted
-  [ADR 0006](../../../docs/adrs/0006-failure-handling-accepted.md) governs
-  failure handling. ADR 0002 remains Proposed. No DDL/API or transaction
-  change is expected, so the existing storage/rollback evidence applies.
+## Inspection and decisions affecting execution
 
-## Original scope allocation and proof ownership
+- Story 6 delivered exact same-parent correspondence; Plan 52 delivered
+  publication guidance at cc7b053424 and contextual destination errors at
+  6c94b5f802. Reuse both; obsolete pending-Plan-52 branches are removed here.
+- NotebookGitProposalTreeShape.detectSameParentRename recognizes the exact
+  two-entry/equal-blob shape but rejects different parents. Generalize this
+  existing representation/handler; retain full-diff checks, regular modes,
+  Markdown/path constraints, and rejection of changed-content or mixed pairs.
+  No second similarity matcher or identity route.
+- NotebookGitProposalPublisher.applyRename changes the managed original Note.
+  It currently checks a deleted title against note.getFolder(). Resolve the
+  final folder first, then check the final title there, and set folder/title in
+  the existing publication transaction. Reuse withContext for the final path,
+  preserving error type, fields, deletedNoteId and cause.
+- NotebookGitProjection.requireRepresentedFolderIdForAddition already selects
+  full folder paths and checks tracked accepted content beneath them. Share
+  and capability-name that resolver for relocation when needed; keep additions
+  working and avoid duplicate folder lookup. Root resolves to null.
+- Publisher is currently 250 lines. Its reusable filename-title validation is
+  a concrete extraction opportunity before adding placement logic (leaf 1).
+  Keep it one representation across addition and relocation. Do not move the
+  transaction owner or introduce a broad publication framework.
+- NoteMotionService/web movement includes different placement sequencing and
+  reference behavior. Do not call it, delete/recreate notes, flush an
+  intermediate placement, normalize invalid filenames, or rewrite authored
+  links to implement this publication.
+- Reuse controller fixtures in NotebookGitProposalRenameControllerTest,
+  NotebookGitFolderNotePublicationControllerTest,
+  NotebookGitProposalRenameRollbackControllerTest,
+  NotebookGitDeletedDestinationControllerTest,
+  NotebookGitDeletionContainerPublicationControllerTest and
+  NotebookGitRenameThenEditControllerTest. Existing exact transaction/profile
+  and failure reset apply. No DDL, API or transaction change or new storage
+  uncertainty calls for an experiment.
+- The existing rename referrer test changes an unqualified title. A same-title
+  folder move needs an exact old-path fixture; that test alone does not prove
+  the relocation reference promise (new leaf 9).
+- The installed git-mv task accepts source/destination paths already. Reuse it
+  and current note-view assertions. The accepted-history fast-forward suite
+  already contains a rename-then-edit sequence; add cross-parent data there,
+  without changing production pull/rebase behavior.
+- Follow Accepted [ADR 0004](../../../docs/adrs/0004-okf-compatible-notebook-markdown-accepted.md)
+  for representations, authored references and empty folders, and
+  [ADR 0006](../../../docs/adrs/0006-failure-handling-accepted.md) for contextual
+  business errors. ADR 0002 remains Proposed. No new architectural decision.
 
-The original combined plan's relocation leaf 4 is now leaves 1–2; original
-container leaf 9 is leaf 4; original leaf 11's parent-eligibility cases are
-leaf 5. Cross-folder variants of original rollback/deleted-path/CLI/receipt
-obligations belong here. Other original obligations are delivered by the
-rename plan and remain required regressions, not unfinished work delegated
-to a later story.
+## Parallel execution boundary
 
-| Promise | Owner and externally observable evidence |
+Plan 50 and Plan 53 have independent product outcomes, but share some files
+and test infrastructure. Keep separate worktrees and PLAN ownership; separate
+worktrees alone do not isolate MySQL, Redis or the running SUT.
+
+| Area | Coordination |
 | --- | --- |
-| Root/folder/nested/README-only destination with same identity/private state | 1; public note placement and existing private-identity regression extended to a cross-parent fixture |
-| Simultaneous filename change uses only final eligibility | 2; final title/folder accepted despite an occupied hypothetical intermediate location |
-| Exact commit and folder/title rollback on late failure | 3; fresh original placement and accepted binding |
-| Empty source container survives without README | 4; source/destination IDs and exact Portable tree |
-| Missing/unrepresented parent rejects atomically | 5; source, folders and binding unchanged |
-| Occupied/deleted final target rejects without resurrection | 6; final-placement conflict with both identities unchanged |
-| Installed CLI relocation is visible in Donut | 7; authored head and note at new path |
-| Guidance describes the new folder boundary | 8; existing clone/publish output |
-| Later edit retains identity at the new location | 9; public note after a later accepted edit |
-| Another checkout receives the relocation and edit | 10; exact real-Git CLI head/tree/history |
-| Original tracker/question/conversation ownership and unchanged authored links | Rename private-data/reference regressions retained; 1 adds cross-parent placement data without invoking new reference handling |
-| Retry, stale head, drift, owner/readiness, ordinary add/edit/delete safety | Common controller/CLI regression suites retained; shared gates must still precede mutation |
+| Backend relocation | Plan 50 owns classifier/placement/resolver changes and relocation fixtures. Plan 53 should reuse the publication API; coordinate if its proof uncovers a required backend change. |
+| CLI rebase | Plan 53 owns production pull/readiness/rebase changes. Plan 50 uses existing publish and fast-forward receipt; do not broaden or weaken divergent-history rejection. |
+| Shared CLI guidance | Both plans touch nonInteractiveCli.ts and notebookClone.test.ts. Serialize/integrate these edits: keep relocation guidance and content-only pull guidance together, with neither claiming structural rebase. |
+| Installed feature/harness | Both use cli_notebook_clone.feature and associated page objects/tasks. Plan 50 needs only existing git-mv/publish actions; retain Plan 53's pull observations and scenarios when integrating. |
+| Pull tests | Plan 50 extends notebookPull.fastForward.suite.ts. Plan 53 owns divergent suites/registration. Keep suite registration serialized to preserve temporary-directory leak checks. |
+| Planning | Update only Story 12 and this PLAN from this workstream. Leave Plan 53 and Story 8 to their executor; reconcile the shared seed/backlog at integration. |
+| Verification | Serialize backend/E2E runs against a shared test DB/SUT, or use explicitly separate service instances. Do not run destructive test setup concurrently against the same databases. |
 
-If a change invalidates inherited evidence (for example, a new mutation branch
-changes associations or reference handling), add cross-parent proof before
-claiming the affected promise. Do not treat a dependency's historical green
-result as proof of changed behavior.
+Before merging the second completed change, reconcile shared files and run
+the combined affected CLI suites, backend suite if backend boundaries changed,
+and focused installed feature on the integrated source. Verify sequential
+receipt of relocation remains supported and Plan 53's divergent structural
+history remains rejected. This is integration verification, not another story
+or a requirement that Plan 53 finish before Plan 50's backend work can start.
+Global backlog order remains unchanged.
+
+## Promise ownership and refinement mapping
+
+The former ten leaves are retained in scope and mapped below. No slices were
+completed. Original leaf 1 bundled title-validation extraction, placement and
+private-data proof; these are now leaves 1, 2 and 4. The old inherited reference
+claim needs relocation-specific proof in leaf 9. Other leaves are tightened
+around existing boundaries rather than duplicated.
+
+| Promise / original leaf | Current owner and observable proof |
+| --- | --- |
+| One note at root/existing/nested/represented destination; exact commit / old 1 | 1 enables 2; controller note placement and downloaded head/tree |
+| Final folder/title only, including intermediate collisions / old 2 | 3; accepted final location despite either hypothetical intermediate collision |
+| Same identity/private state, untouched identical copy / old 1 | 4; fresh note/tracker/question/conversation relationships |
+| Late-failure rollback / old 3 | 5; fresh original folder/title/timestamps/tracker and accepted binding |
+| Emptied source container retained / old 4 | 6; original folder ID and exact Portable tree, no invented README |
+| Missing/unrepresented destination / old 5 | 7; path-specific rejection with original source/folders/binding |
+| Deleted final destination unavailable / old 6 | 8; final path/error semantics, source and deleted identity intact |
+| Authored links / inherited claim | 9; unchanged body/property bytes and old exact-path resolution |
+| Installed publication / old 7 | 10; accepted authored head and Donut note at the new path |
+| Correct relocation guidance / old 8 | 11; actual clone output and aligned installed expectation |
+| Subsequent edit retains identity / old 9 | 12; same note/tracker with separately accepted new content |
+| Second checkout receives accepted history / old 10 | 13; exact real-Git head/tree/ancestry and clean main |
+| Existing rename, malformed/mixed shapes, occupied-live cases | 2/3/8 retain relevant controller regressions; no new overwrite mechanism |
+| Owner/readiness, retry/stale/drift and ordinary add/edit/delete | Existing controller and CLI proofs; rerun when the owning boundary changes |
+
+A live occupied path cannot be the added side of an eligible pair. A deletion
+plus modification stays rejected by complete-diff rules. An unchanged identical
+target stays its own identity under existing isolated-deletion rules. Leaf 8
+checks those boundaries rather than advertising an unobservable move intent.
+
+Inspected tests are reusable evidence, not fresh green runs. Map new assertions
+to the promise they establish and keep canonical assertions once. If changed
+logic invalidates inherited proof, add the relevant observation before accepting
+that leaf. Commands passing without the promised observation are insufficient.
 
 ## Ordered leaves
 
-### 1. Relocate an unchanged note to an existing folder or root
+### 1. Keep filename-derived title validation in one place
+Type: Structure
+Status: planned
+Proof: Existing controller invalid/normalizable title, addition and same-parent
+rename behavior remains green. Backend suite.
+
+Internal change: Extract the existing filename-derived-title validation from
+the 250-line publisher into a focused capability-named collaborator, keeping
+addition and rename callers on the same validation implementation. Preserve
+messages and normalized-title rejection. Do not move transaction ownership,
+add behavior or duplicate contextual error machinery.
+Immediate next Behavior: leaf 2's destination assignment fits coherently in the
+publisher without hiding a preparatory refactor in that implementation.
+Sizing: ~5 minutes active work, medium confidence; one extraction/proof loop.
+
+### 2. Relocate an unchanged note to an existing folder or root
 Type: Behavior
 Status: planned
-Proof: Controller data variations for root→folder, folder→root, folder→folder
-and nested README-only destination. Public note retains its ID and private
-state at the final folder; downloaded head/tree exactly match the proposal.
-Extend the delivered identity fixture with a cross-parent case. Backend.
+Proof: Controller placement variants root→folder, folder→root, folder→folder,
+and nested README-only destination with duplicate folder basenames. Observe
+original note ID, final ancestor folders, unchanged bytes and exact proposed
+head/tree. Assert full canonical shape once. Backend suite.
 
-Behavior: One eligible equal-blob pair changes parent but keeps filename →
-publish → move the same learned note to the resolved existing destination.
-Remove the rename story's same-parent-only gate for this bounded case.
-Reuse the accepted-parent folder resolver and final deleted-title check;
-assign the folder inside existing publication transaction. Temporarily keep
-combined parent/filename changes rejected until immediately following leaf 2.
-Retain authored content and referrers without web move calls.
+Behavior: An isolated equal-blob pair changes parent, keeping filename →
+publish → put the same note at the full eligible destination.
+Generalize the existing classifier/handler and accepted-parent resolver;
+validate destination eligibility and deleted title before assigning the folder.
+These guards are required now; leaves 7/8 add focused boundary proofs.
+Temporarily reject combined parent/filename changes until leaf 3. Replace the
+old cross-parent-rejection fixture with acceptance; retain mixed/content-changed
+rejections. Rename helper/comments to match actual supported capability.
+Sizing: ~5 minutes active work, medium confidence after leaf 1; existing resolver
+and transaction keep this one placement loop. Scrutinize at five minutes.
 
-### 2. Relocate and rename using the final destination
+### 3. Relocate and rename using only the final destination
 Type: Behavior
 Status: planned
-Proof: Controller accepts a changed parent and filename when the final location
-is free, including a deleted-title collision at either hypothetical intermediate
-location. Observe same note at final title/folder. Backend.
+Proof: Controller variants with a deleted title at the source/new-title or
+destination/old-title hypothetical intermediate; final folder/title is free and
+the original note appears there. Backend suite.
 
-Behavior: An isolated exact pair changes folder and filename → publish →
-validate and accept only the final destination. Remove leaf 1's temporary
-same-filename limit. No intermediate flush, web rename/move sequence, title
-normalization repair, or reference rewriting.
+Behavior: The isolated pair changes folder and filename → publish → accept
+only the final validated placement. Remove leaf 2's temporary filename limit.
+Do not call sequential web rename/move or flush an intermediate state. Update
+any temporary messages/fixtures that still reject this now-supported pair.
+Sizing: ~5 minutes active work, high confidence; same placement path.
 
-### 3. Roll back a failed folder change
+### 4. Retain private associations across the folder change
 Type: Behavior
 Status: planned
-Proof: Add a relocation data variant to the delivered atomic-failure fixture;
-after forced binding-save failure, fresh original title/folder/tracker state
-and accepted head/bundle/timestamps remain. Backend.
+Proof: Extend the delivered private-identity fixture with cross-parent data;
+fresh reads retain original tracker state and note-owned question/conversation
+IDs, while an untouched identical-content note retains its own associations.
+Backend suite.
 
-Behavior: Folder/title mutation occurs but acceptance fails late → publish
-fails → retain original placement and accepted revision. Reuse the exact
-existing profile/configuration and failure reset; no new transaction mechanism.
+Behavior: A learned note is relocated → publish → its private state continues
+to belong to that same note. Reuse committed fixtures and conversation cleanup;
+do not introduce mocks or a new transaction profile. This closes the wider
+private-data proof outside leaf 2's focused placement loop.
+Sizing: ~5 minutes active work, medium confidence; existing fixture variant.
 
-### 4. Retain an emptied source folder
+### 5. Roll back a failed folder change
 Type: Behavior
 Status: planned
-Proof: Move the last tracked note from a folder with no README → source and
-destination container IDs survive and accepted Portable files match the
-authored tree without an invented README. Backend.
+Proof: Relocation-plus-rename variant of the existing late binding-save failure
+fixture. Fresh original folder/title, note timestamp and tracker state, and
+accepted head/bundle/timestamp remain. Backend suite.
 
-Behavior: A note relocation empties its source's tracked content → publish →
-leave the Donut container intact. Use the deletion container fixture pattern;
-this must never be classified as a whole-folder move.
+Behavior: Folder/title mutation occurs but acceptance fails late → publication
+fails → original placement and accepted revision survive. Reuse the exact
+notebook-git-publication-atomic-test profile, failure injection and reset.
+No new transaction or compensating write mechanism.
+Sizing: ~5 minutes active work, high confidence; one rollback fixture variant.
 
-### 5. Reject a destination folder absent from accepted content
+### 6. Retain a source folder after its last tracked note moves
 Type: Behavior
 Status: planned
-Proof: Controller cases for missing Donut folder and existing but unrepresented
-folder; path-specific rejection with source, containers and binding unchanged.
-Backend; reuse represented-parent validation fixtures.
+Proof: Source has no README and contains only the moved note → publish →
+original source/destination folder IDs survive; exact accepted Portable paths
+omit the now-empty source and contain no invented README. Backend suite.
 
-Behavior: Local directories imply an ineligible destination → publish →
-reject without creating/inventing a folder or moving the source. Root and
-represented README-only destinations must retain their successful behavior.
+Behavior: Relocation empties the source's tracked content → publication →
+retain the Donut container. Use the existing deletion-container fixture
+pattern. Do not reinterpret the single note pair as a folder rename.
+Sizing: ~5 minutes active work, high confidence; one container outcome.
 
-### 6. Preserve a conflicting final destination
+### 7. Reject destinations absent from accepted content
 Type: Behavior
 Status: planned
-Proof: For a deleted final path established by accepted deletion, retain the existing
-deleted-title conflict, unchanged source, deleted identity and binding. Backend.
+Proof: Missing Donut folder and existing unrepresented folder, including a
+source emptied by leaf 6's accepted move, yield a path-specific rejection;
+source, containers and accepted binding remain unchanged. Backend suite.
 
-Behavior: Final destination is unavailable → publish → reject atomically.
-Apply the target folder's final title rule, not the source folder's or old
-filename's rule. Reuse the rename collision fixture with target-folder data.
-Retain the existing occupied-live-path rejection regression through the
-complete-diff/tree rules; do not add a separate live-collision mechanism.
+Behavior: Local path implies an ineligible destination → publish → reject
+without creating a folder or manufacturing representation. Also retain a
+successful represented-ancestor variant with tracked content only below a
+descendant: an own README is not a new requirement. Reuse the existing
+represented-parent resolver fixtures and final-placement handler.
+Sizing: ~5 minutes active work, medium confidence; one eligibility policy loop.
 
-### 7. Publish cross-folder relocation through the installed CLI
+### 8. Preserve an unavailable final destination
+Type: Behavior
+Status: planned
+Proof: A prior accepted deletion reserves the target folder/title → relocating
+there returns final Portable path, original conflict type/fields/deletedNoteId
+and cause; source, deleted identity and binding remain unchanged. Backend suite.
+
+Behavior: Final placement is reserved → publish → reject atomically using the
+destination's title rule and the delivered contextual-error behavior.
+Retain live-target mixed-diff rejection and isolated-deletion regressions;
+never add a heuristic that treats an unchanged identical target as a new move.
+Do not resurrect, overwrite or transfer private associations.
+Sizing: ~5 minutes active work, high confidence; deleted-destination fixture.
+
+### 9. Leave exact-path referrers authored across relocation
+Type: Behavior
+Status: planned
+Proof: Controller fixture resolves a source-note Portable path from both body
+and YAML before publication; after moving that note, authored referrer bytes
+remain exact and the old exact path is no longer resolved. Backend suite.
+
+Behavior: Referrers name Inbox/Cell, with target moving to Biology/Cell →
+publish → retain authored links and resolve against current placement.
+Use path-qualified references; the old unqualified-title rename fixture does
+not establish this. Retain existing shorthand resolution behavior without
+asserting that every link must break. No reference rewrite or new alias system.
+Sizing: ~5 minutes active work, medium confidence; one observable reference loop.
+
+### 10. Publish relocation through the installed CLI
 Type: Behavior
 Status: planned
 Proof: Existing installed feature: clone → git mv Recipes/Pasta.md to
-Pasta basics.md → publish → authored accepted head and unchanged-content
-note at root in Donut. Focused notebook E2E.
+Pasta basics.md → publish → authored accepted head and unchanged-content note
+at the notebook root in Donut. Focused installed feature.
 
-Behavior: Owner commits an eligible relocation/rename → runs installed publish
-→ sees the same note at its new path. Reuse the rename story's task, page
-object and existing note-view assertions. No post-action test resnapshot.
+Behavior: Owner commits an eligible relocation/rename → installed publish →
+sees the note at its final location. Reuse existing git-mv task/page objects
+and note-view assertions. Snapshot only the initial fixture baseline; never
+resnapshot after the action under test. Coordinate shared feature edits with
+Plan 53; no additional harness or rebase path.
+Sizing: ~5 minutes active work, high confidence; existing scenario vocabulary.
 
-### 8. Explain existing-folder relocation in CLI guidance
+### 11. Explain supported relocation in existing CLI guidance
 Type: Behavior
 Status: planned
-Proof: Clone-output tests and the existing exact-copy E2E expectation describe
-root/existing represented destinations, unchanged content/links and a separately
-published later edit. CLI clone/publish tests and focused E2E.
+Proof: Actual clone output tests describe root/existing represented destinations,
+unchanged bytes/links and relocation acceptance before a later edit. Update
+the existing installed exact-copy expectation consistently.
 
-Behavior: Owner reads next-step guidance → learns the expanded destination
-boundary without being promised folder creation or mixed moves. Extend the
-same guidance corrected by Plan 52: commit and publish the relocation, wait
-for acceptance, then edit and separately commit/publish. Keep the explanation
-that links remain authored and may stop resolving. If Plan 52 remains pending,
-reconcile its guidance correction here once; no parallel help surface.
+Behavior: Owner reads next steps → understands how to publish a relocation
+without being promised folder creation, overwrite or structural rebase.
+Extend the completed Plan 52 wording. Integrate Plan 53's content-only
+pull→inspect→publish guidance without replacing it. Run clone tests; run the
+focused installed feature when its expectation changes.
+Sizing: ~5 minutes active work, medium confidence; one guidance loop, with
+shared-file coordination treated as an external wait if it blocks progress.
 
-### 9. Edit the same note after its accepted relocation
+### 12. Edit the same note after accepted relocation
 Type: Behavior
 Status: planned
-Proof: Backend sequential-publication fixture accepts relocation then a separate
-content edit at that path on the original ID with its retained tracker. Backend.
+Proof: Sequential controller publication accepts relocation, then a separately
+committed content edit at the final path, updating the original note with its
+retained tracker. Backend suite.
 
-Behavior: Relocation is accepted → separately publish an edit at the new path →
-update the same learned concept. Reuse the rename continuation fixture with
-cross-parent data; do not batch unpublished relocation/edit commits.
+Behavior: Relocation has been accepted → separately publish an edit there →
+update the same learned concept. Reuse NotebookGitRenameThenEditControllerTest
+with cross-parent data; do not batch unpublished relocation and edit commits.
+Sizing: ~5 minutes active work, high confidence; existing continuation fixture.
 
-### 10. Receive the relocation and later edit in another checkout
+### 13. Receive relocation and its later edit in another checkout
 Type: Behavior
 Status: planned
-Proof: Real-Git CLI pull fixture receives the accepted relocation/edit sequence:
-old path absent, new bytes present, exact head/tree, retained ancestry and clean
-main without Portable metadata. CLI pull tests.
+Proof: Real-Git CLI fast-forward fixture from the relocation parent receives
+the accepted relocation/edit sequence: old path absent, exact final bytes,
+accepted head/tree and ancestry, clean main and no Portable metadata.
 
-Behavior: A second eligible checkout is at the relocation's parent → pull →
-receive both accepted commits at the new path without history loss. Reuse the
-rename receipt fixture with cross-parent data; leaf 9 owns backend acceptance.
+Behavior: Another clean eligible checkout pulls accepted history → receives
+the note's final path and later edit without history loss. Extend the existing
+rename receipt fixture in notebookPull.fastForward.suite.ts; keep backend
+acceptance ownership in leaf 12. No production rebase changes. Retain Plan 53's
+structural-divergence rejection tests when both changes are integrated.
+Sizing: ~5 minutes active work, high confidence; one fast-forward proof loop.
 
-## Verification and delivery
+## Refinement result, verification and wrap-up
 
-- Backend: CURSOR_DEV=true nix develop -c pnpm backend:test_only.
-- CLI: CURSOR_DEV=true nix develop -c pnpm -C cli exec vitest run
-  tests/notebookClone.test.ts tests/notebookPublish.test.ts tests/notebookPull.test.ts.
-  Select relevant files per changed boundary.
-- E2E: CURSOR_DEV=true nix develop -c pnpm cypress run --spec
+The original ten Behavior leaves become twelve Behavior leaves plus one
+immediately enabling Structure leaf. All are planned; no completed evidence
+was discarded. Main refinements: separate the concrete title-validation
+extraction and private-state proof from placement, add path-specific reference
+proof, make destination/overwrite/empty-folder boundaries explicit, and remove
+obsolete pending-correction and wait-for-Story-8/9 instructions.
+
+Ready for execution with the parallel coordination above. Estimates are
+hypotheses: ~5 minutes including focused verification and local cleanup; at five
+minutes scrutinize scope, at ten non-exempt minutes stop and finer-decompose.
+Backend/E2E runtime or coordination waits justify an exception only when
+recorded as the actual cause. No timing guarantee. Repeated qualifying overruns
+or changed product boundaries return to Story 12 under learning escalation.
+
+Commands during execution:
+
+- Backend leaves: CURSOR_DEV=true nix develop -c pnpm backend:test_only
+  (all backend unit tests per the backend rule).
+- CLI guidance: CURSOR_DEV=true nix develop -c pnpm -C cli exec vitest run
+  tests/notebookClone.test.ts.
+- CLI receipt: CURSOR_DEV=true nix develop -c pnpm -C cli exec vitest run
+  tests/notebookPull.test.ts. Include notebookPublish.test.ts when integration
+  touches publication behavior; do not run suite fragments independently.
+- Installed: CURSOR_DEV=true nix develop -c pnpm cypress run --spec
   e2e_test/features/cli/cli_notebook_clone.feature.
 - Whitespace: scripts/check_diff_whitespace.sh.
 
-Run the complete backend suite for backend leaves. Reuse common rename,
-atomicity, retry/stale/drift and readiness proofs while their coverage remains
-valid. Keep temporary multi-beat E2E @wip until green; no full E2E, manual or
-mutation run is requested.
-
-At execution use the required execute-plan per-leaf wrap-up: Jidoka → fresh
-post-change-refactor agent → API generation if needed → coordinator
-format:changed once → plan update → commit → push and asynchronous CI
-observation. Preserve unrelated files, and keep slice state here, not STATE.md.
-
-## Readiness and sizing
-
-Story 6's technical prerequisite is met. Select this story through the product
-backlog after the higher-priority content divergence/conflict outcomes;
-Stories 8/9 are not technical dependencies. Target approximately five minutes
-per eventual execution leaf; estimates remain hypotheses. Recheck against
-the delivered rename code and proof when execution is selected.
-
-The split retains 10 Behavior leaves. Backend continuation and CLI receipt
-remain separate proof loops as in the original plan; no verification is bundled
-just to reduce the displayed count. The initial leaves are ready to select
-after the prerequisite is delivered. Reassess leaves 1–2 against that delivered
-rename implementation and use slice-plan-refinement if a trigger appears;
-this request's explicit refinement pass applies only to the top rename plan.
-
-Required test runtime may justify a recorded exception only when it actually
-accounts for elapsed time. At five minutes inspect scope; at ten non-exempt
-minutes stop and refine. Follow story-review escalation for repeated qualifying
-overruns or changed outcome. No implementation/verification of product code,
-commit or push is authorized by this planning request.
+No product tests are run by this planning-only request. At execution use
+Jidoka → fresh post-change-refactor agent → API generation if needed →
+coordinator format:changed once → plan update → commit/push and asynchronous
+CI observation. Preserve other workstreams' edits and keep state in this PLAN,
+not STATE.md. No full E2E, manual or mutation testing is requested.
 
 On completion mark only Story 12 delivered, update Recently done, reduce its
-seed detail, and remove this spent plan. Do not mark Story 7 delivered.
+home detail and remove this spent plan. Story 7 and structural rebase remain
+unfinished. Backlog priority is not changed by selecting parallel execution.
