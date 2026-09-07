@@ -1,6 +1,6 @@
 # Concurrent backend tests with explicit worktree configuration
 
-Status: in progress; slices 1–4 done.
+Status: awaiting story review at leaf 5 (SEED-015 story 1a). Slices 1–4 done.
 Source: [SEED-015, story 1a](../../seeds/SEED-015-concurrent-worktree-environments.md#story-1a).
 Stories 1a, 1b, and 1c occupy the first three product-backlog positions.
 This plan covers only 1a. No implementation or database experiment was performed
@@ -262,7 +262,7 @@ a legacy name):
 
 ### 5. Obtain independent full-suite results in two configured worktrees
 Type: Behavior
-Status: planned
+Status: awaiting story review
 Proof: Overlap complete suite runs in the leaf-4 worktrees, including the same
 fixture names. Capture literal commands, start/end overlap, selected targets,
 active MySQL database connections, per-database Flyway history, and JUnit
@@ -278,6 +278,38 @@ do not serialize runs or skip failing tests to claim isolation.
 Sizing: about 5 minutes active launch/observation, medium confidence. Full-suite
 and cold-build duration is an explicit test-runtime exception. Use the prepared
 worktrees; this leaf does not include their creation or a failure trial.
+
+Recorded overlapping run (2026-09-07; not accepted as leaf completion):
+
+```
+# in each disposable worktree, started within the same second
+unset SPRING_DATASOURCE_URL DB_URL SPRING_FLYWAY_URL
+CURSOR_DEV=true nix develop -c pnpm backend:test:worktree
+```
+
+- A `/Users/terryyin/git/doughnut-wt-054-a` started 2026-09-07T09:09:26Z,
+  selected `doughnut_wt_054a_test`, `migrateTestDB` succeeded, ended
+  09:10:42Z (`BUILD FAILED`, 1m 14s, 7 tasks executed, not cache).
+- B `/Users/terryyin/git/doughnut-wt-054-b` started 2026-09-07T09:09:26Z,
+  selected `doughnut_wt_054b_test`, `migrateTestDB` succeeded, ended
+  09:10:42Z (`BUILD FAILED`, 1m 14s, 7 tasks executed). Runs overlapped
+  for the whole duration.
+- At 09:10:09Z both databases had active `doughnut` sessions (on the order
+  of 90 connections each, including live SELECTs on both).
+- Each run: `2246 tests completed, 4 failed` —
+  `StructuredResponseCreateParamsSerializerTest` context load,
+  Flyway/`entityManagerFactory`, MySQL 1040 `Too many connections`.
+- Server: MySQL 8.4.11 `max_connections=300`. Test profile uses distinct
+  Spring contexts with Hikari pools; two concurrent suites exhausted the
+  shared server.
+- Diagnostic solo rerun on A at 09:12:55Z: same command,
+  `BUILD SUCCESSFUL` in 1m 2s, 7 tasks executed. Flyway history after
+  both overlap migrations: 22 rows on A and on B; legacy `doughnut_test`
+  also 22 (untouched as the selected target).
+
+Schema isolation held far enough to migrate and run most tests against
+distinct databases. Shared connection capacity blocked the promised
+concurrent correct results. Leaves 6–9 are paused.
 
 ### 6. Stop before tests when real database preparation fails
 Type: Behavior
@@ -408,19 +440,15 @@ and `/Users/terryyin/git/doughnut-wt-054-b` (`wt_054b`) with empty utf8mb4
 databases on MySQL 8.4.11; configs ignored; legacy DBs unmodified. Preserve
 them for leaves 5–8.
 
-Ready for execution under the existing workflow; no additional story refinement
-or slice-plan pass is currently required. All leaves have one bounded proof
-loop and a safe stopping point. Sizing includes local edits, focused checks,
-and local cleanup, and remains a hypothesis rather than a time guarantee.
-Explicit exceptions are dependency downloads, cold builds, full-suite runtime,
-and waiting for a real worker; these do not permit extra implementation scope.
-
-Changes from the earlier plan: custom sequential process supervision was
-unnecessary; one exec handoff delegates ordering, failure, and cancellation to
-Gradle. The old broad real-environment leaf hid independent failure/cancellation
-checks; they now have separate ownership. The opt-in task-order property must
-preserve ordinary task ordering and test behavior. No product scope, sibling order, or completed
-slice evidence changed, and no implementation or engine proof was run here.
+**Awaiting story review — SEED-015 story 1a.** Overlapping full suites used
+the correct per-worktree databases and actually executed tests, but both
+failed with MySQL 1040 (`Too many connections`, `max_connections=300`). A
+solo rerun on A passed. This is shared-server capacity, not silent fallback
+to `doughnut_test`. Do not serialize or skip tests to claim the concurrency
+promise. Remaining leaves 6–9 paused until the developer chooses how two
+full suites should fit one MySQL (raise `max_connections`, shrink the
+opt-in Hikari/worker footprint, narrow the concurrency promise, or another
+explicit exception).
 
 If an actual run contradicts a lifecycle/storage assumption, preserve its
 observations and stop at that leaf for the repository's learning escalation.
