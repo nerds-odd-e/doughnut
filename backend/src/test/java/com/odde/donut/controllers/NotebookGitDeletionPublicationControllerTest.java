@@ -19,6 +19,7 @@ import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookGitBinding;
 import com.odde.donut.entities.repositories.MemoryTrackerRepository;
 import com.odde.donut.testability.GitBundleTestReader;
+import java.sql.Timestamp;
 import java.util.List;
 import org.eclipse.jgit.internal.storage.dfs.DfsRepositoryDescription;
 import org.eclipse.jgit.internal.storage.dfs.InMemoryRepository;
@@ -109,6 +110,44 @@ class NotebookGitDeletionPublicationControllerTest extends NotebookGitBundleCont
   }
 
   @Test
+  void retriesAnAcceptedDeletionWithoutChangingHeadOrDeletionTimestamps() throws Exception {
+    Notebook notebook = createGitBackedNotebook();
+    Note target =
+        makeMe.aNote().notebook(notebook).title("Target").content(ORIGINAL_CONTENT).please();
+    makeMe.aNote().notebook(notebook).title("Retained").content(ORIGINAL_CONTENT).please();
+    MemoryTracker targetTracker =
+        inCommittedTransaction(
+            transactionManager,
+            () ->
+                makeMe
+                    .aMemoryTrackerFor(noteRepository.findById(target.getId()).orElseThrow())
+                    .please());
+    NotebookGitBinding initialBinding = snapshotCurrentPortableTree(notebook);
+    String initialHead = initialBinding.getAcceptedGitObjectId();
+    byte[] proposalBytes =
+        proposalBundleBytes(
+            initialBinding, List.of(new NotebookGitProposalFile("Retained.md", ORIGINAL_CONTENT)));
+
+    String publishedHead =
+        controller.publishNotebookGitProposal(notebook.getId(), initialHead, proposalBytes);
+    PublicationState stateAfterPublication = publicationState(notebook, target, targetTracker);
+
+    testabilitySettings.timeTravelTo(Timestamp.valueOf("2020-06-01 00:00:00"));
+    String retriedHead =
+        controller.publishNotebookGitProposal(notebook.getId(), initialHead, proposalBytes);
+
+    assertThat(retriedHead, equalTo(publishedHead));
+    PublicationState stateAfterRetry = publicationState(notebook, target, targetTracker);
+    assertThat(stateAfterRetry.acceptedHead(), equalTo(stateAfterPublication.acceptedHead()));
+    assertThat(
+        stateAfterRetry.bindingUpdatedAt(), equalTo(stateAfterPublication.bindingUpdatedAt()));
+    assertThat(stateAfterRetry.bundleBytes(), equalTo(stateAfterPublication.bundleBytes()));
+    assertThat(stateAfterRetry.noteDeletedAt(), equalTo(stateAfterPublication.noteDeletedAt()));
+    assertThat(
+        stateAfterRetry.trackerDeletedAt(), equalTo(stateAfterPublication.trackerDeletedAt()));
+  }
+
+  @Test
   void leavesReferringBodyAndPropertyLinksAuthoredWhenPublishingTheTargetsDeletion()
       throws Exception {
     Notebook notebook = createGitBackedNotebook();
@@ -145,4 +184,29 @@ class NotebookGitDeletionPublicationControllerTest extends NotebookGitBundleCont
         .map(WikiLink::getResolution)
         .toList();
   }
+
+  private PublicationState publicationState(Notebook notebook, Note note, MemoryTracker tracker) {
+    return inCommittedTransaction(
+        transactionManager,
+        () -> {
+          NotebookGitBinding binding =
+              notebookGitBindingRepository.findByNotebook_Id(notebook.getId()).orElseThrow();
+          Note reloadedNote = noteRepository.findById(note.getId()).orElseThrow();
+          MemoryTracker reloadedTracker =
+              memoryTrackerRepository.findById(tracker.getId()).orElseThrow();
+          return new PublicationState(
+              binding.getAcceptedGitObjectId(),
+              binding.getUpdatedAt(),
+              binding.getBundleBytes().clone(),
+              reloadedNote.getDeletedAt(),
+              reloadedTracker.getDeletedAt());
+        });
+  }
+
+  private record PublicationState(
+      String acceptedHead,
+      Timestamp bindingUpdatedAt,
+      byte[] bundleBytes,
+      Timestamp noteDeletedAt,
+      Timestamp trackerDeletedAt) {}
 }

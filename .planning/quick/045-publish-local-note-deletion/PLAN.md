@@ -1,7 +1,7 @@
 # Publish one local note deletion
 
 Source: [SEED-009 Story 5](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-5).
-Status: slices 1–7 done; next is slice 8.
+Status: slices 1–10, 12–13 done; next is slice 11 then 14.
 
 ## Learnings
 
@@ -43,6 +43,18 @@ disable for CLI tests; E2E install bundle cache can hide source changes.
 Slice 7: `notebook pull` already fast-forwards deletions. Proof added in
 `notebookPull.fastForward.suite.ts`; concurrent-change cases extracted to
 `notebookPull.concurrentChange.suite.ts`. No production change.
+
+Slice 8: referrer Markdown stays authored; `showNote` omits the missing Target.
+Slice 9: last root/folder note deletion keeps the notebook/folder and does not
+generate a README; empty accepted tree; parent commit still has the file.
+Slice 10: stale isolated-deletion proposal after a web edit is CONFLICT on
+expectedHead; target stays active.
+Slice 12: retrying an accepted deletion after time travel keeps head/bundle and
+note/tracker deletedAt.
+Slice 13: later same-content addition at another path gets a fresh identity;
+original tracker/MCQ/conversation FKs stay on the soft-deleted note.
+Full backend suite was connection-saturated when four agents ran in parallel;
+each class passed in isolation.
 
 ## Goal and scope
 
@@ -265,7 +277,7 @@ E2E framework. Do not change pull unless this focused proof exposes a gap.
 
 ### 8. Leave referring content unchanged
 Type: Behavior
-Status: planned
+Status: done
 Proof: Publish deletion through the controller, then read a referrer through
 `NoteController.showNote`; its authored body/frontmatter remains identical and
 the exact target link is unresolved. Run backend verification.
@@ -277,7 +289,7 @@ demonstrated gap in the selected leave-dead-links flow.
 
 ### 9. Delete the last note without deleting its container
 Type: Behavior
-Status: planned
+Status: done
 Proof: Parameterized controller cases for the only root note and the only note
 in an existing folder; downloaded bundle has the exact remaining tree and
 parent history while the notebook/folder still exists. Run backend verification.
@@ -289,7 +301,7 @@ file. These are data variations of container preservation, not folder deletion.
 
 ### 10. Reject deletion based on a stale accepted head
 Type: Behavior
-Status: planned
+Status: done
 Proof: Adapt the existing accepted-web-edit fixture in
 `NotebookGitProjectionDriftControllerTest`: reject the old deletion proposal
 and observe the winning head/content and active target unchanged. Run backend
@@ -313,7 +325,7 @@ change or deleting the target. No resnapshot or drift repair after setup.
 
 ### 12. Retry an accepted deletion without changing it
 Type: Behavior
-Status: planned
+Status: done
 Proof: Controller accepts a deletion, time advances, then the identical head
 is submitted again; head/bundle and note/tracker deletion timestamps remain
 identical to first acceptance. Run backend verification.
@@ -324,7 +336,7 @@ Reuse existing rejection evidence for a retry whose projection has drifted.
 
 ### 13. Give a later same-content addition fresh identity
 Type: Behavior
-Status: planned
+Status: done
 Proof: Controller publishes deletion then a separate addition at an available
 path; new ID and no inherited tracker/question/conversation associations, while
 original associations still reference the soft-deleted note. Run backend

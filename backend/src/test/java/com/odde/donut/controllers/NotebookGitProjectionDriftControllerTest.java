@@ -31,28 +31,15 @@ class NotebookGitProjectionDriftControllerTest extends NotebookGitBundleControll
 
   @Test
   void rejectsAnAdditionBasedOnAnOldParentAfterWebContentAdvancedAcceptedMain() throws Exception {
-    Notebook notebook = createGitBackedNotebook();
-    Note note = makeMe.aNote().notebook(notebook).title("note").content(ACCEPTED_CONTENT).please();
-    NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);
-    byte[] proposal = additionProposalBundle(binding);
-    NoteUpdateContentDTO update = new NoteUpdateContentDTO();
-    update.setContent(WEB_CONTENT);
-    textContentController.updateNoteContent(note, update);
-    NotebookGitBinding winningBinding = reloadCommittedBinding(notebook.getId());
-    assertThat(
-        winningBinding.getAcceptedGitObjectId(), not(equalTo(binding.getAcceptedGitObjectId())));
+    rejectBasedOnAnOldParentAfterWebContentAdvancedAcceptedMain(this::additionProposalBundle);
+  }
 
-    ResponseStatusException exception =
-        assertProposalRejectedWithoutMutatingBinding(
-            notebook, binding.getAcceptedGitObjectId(), proposal, HttpStatus.CONFLICT);
-
-    assertThat(exception.getReason(), containsString("expectedHead no longer matches"));
-    assertThat(
-        noteRepository.findById(note.getId()).orElseThrow().getContent(),
-        equalTo(update.getContent()));
-    assertThat(
-        reloadCommittedBinding(notebook.getId()).getAcceptedGitObjectId(),
-        equalTo(winningBinding.getAcceptedGitObjectId()));
+  @Test
+  void rejectsADeletionBasedOnAnOldParentAfterWebContentAdvancedAcceptedMain() throws Exception {
+    Note remaining =
+        rejectBasedOnAnOldParentAfterWebContentAdvancedAcceptedMain(
+            this::isolatedDeletionProposalBundle);
+    assertThat(remaining.getDeletedAt(), nullValue());
   }
 
   @Test
@@ -92,6 +79,32 @@ class NotebookGitProjectionDriftControllerTest extends NotebookGitBundleControll
         equalTo(List.of(acceptedNote.getId(), occupiedDestination.getId())));
   }
 
+  private Note rejectBasedOnAnOldParentAfterWebContentAdvancedAcceptedMain(
+      ProposalBundleFactory proposalFactory) throws Exception {
+    Notebook notebook = createGitBackedNotebook();
+    Note note = makeMe.aNote().notebook(notebook).title("note").content(ACCEPTED_CONTENT).please();
+    NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);
+    byte[] proposal = proposalFactory.create(binding);
+    NoteUpdateContentDTO update = new NoteUpdateContentDTO();
+    update.setContent(WEB_CONTENT);
+    textContentController.updateNoteContent(note, update);
+    NotebookGitBinding winningBinding = reloadCommittedBinding(notebook.getId());
+    assertThat(
+        winningBinding.getAcceptedGitObjectId(), not(equalTo(binding.getAcceptedGitObjectId())));
+
+    ResponseStatusException exception =
+        assertProposalRejectedWithoutMutatingBinding(
+            notebook, binding.getAcceptedGitObjectId(), proposal, HttpStatus.CONFLICT);
+
+    assertThat(exception.getReason(), containsString("expectedHead no longer matches"));
+    Note reloaded = noteRepository.findById(note.getId()).orElseThrow();
+    assertThat(reloaded.getContent(), equalTo(update.getContent()));
+    assertThat(
+        reloadCommittedBinding(notebook.getId()).getAcceptedGitObjectId(),
+        equalTo(winningBinding.getAcceptedGitObjectId()));
+    return reloaded;
+  }
+
   private byte[] additionProposalBundle(NotebookGitBinding binding) throws Exception {
     return proposalBundleBytes(
         binding,
@@ -100,9 +113,18 @@ class NotebookGitProjectionDriftControllerTest extends NotebookGitBundleControll
             new NotebookGitProposalFile("addition.md", PROPOSED_CONTENT)));
   }
 
+  private byte[] isolatedDeletionProposalBundle(NotebookGitBinding binding) throws Exception {
+    return proposalBundleBytes(binding, List.of());
+  }
+
   private NotebookGitBinding reloadCommittedBinding(Integer notebookId) {
     return inCommittedTransaction(
         transactionManager,
         () -> notebookGitBindingRepository.findByNotebook_Id(notebookId).orElseThrow());
+  }
+
+  @FunctionalInterface
+  private interface ProposalBundleFactory {
+    byte[] create(NotebookGitBinding binding) throws Exception;
   }
 }

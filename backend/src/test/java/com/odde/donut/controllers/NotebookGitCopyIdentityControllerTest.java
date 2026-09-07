@@ -17,6 +17,7 @@ import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookGitBinding;
 import com.odde.donut.entities.repositories.ConversationRepository;
 import com.odde.donut.entities.repositories.McqRepository;
+import com.odde.donut.entities.repositories.MemoryTrackerRepository;
 import java.util.List;
 import java.util.stream.StreamSupport;
 import org.junit.jupiter.api.AfterEach;
@@ -33,6 +34,7 @@ class NotebookGitCopyIdentityControllerTest extends NotebookGitBundleControllerT
   @Autowired ConversationMessageController conversationMessageController;
   @Autowired ConversationRepository conversationRepository;
   @Autowired McqRepository mcqRepository;
+  @Autowired MemoryTrackerRepository memoryTrackerRepository;
 
   private Integer conversationId;
 
@@ -49,22 +51,7 @@ class NotebookGitCopyIdentityControllerTest extends NotebookGitBundleControllerT
     Notebook notebook = createGitBackedNotebook();
     Note original =
         makeMe.aNote().notebook(notebook).title("Original").content(COPIED_CONTENT).please();
-    OriginalAssociations associations =
-        inCommittedTransaction(
-            transactionManager,
-            () -> {
-              Note reloadedOriginal = noteRepository.findById(original.getId()).orElseThrow();
-              MemoryTracker tracker = makeMe.aMemoryTrackerFor(reloadedOriginal).please();
-              Mcq mcq = makeMe.anMcq().forNote(reloadedOriginal).please();
-              Conversation conversation =
-                  makeMe
-                      .aConversation()
-                      .forANote(reloadedOriginal)
-                      .from(currentUser.getUser())
-                      .please();
-              conversationId = conversation.getId();
-              return new OriginalAssociations(tracker.getId(), mcq.getId(), conversation.getId());
-            });
+    OriginalAssociations associations = commitPrivateAssociations(original);
     NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);
     byte[] proposal =
         proposalBundleBytes(
@@ -93,15 +80,82 @@ class NotebookGitCopyIdentityControllerTest extends NotebookGitBundleControllerT
             .map(MemoryTracker::getId)
             .toList(),
         contains(associations.trackerId()));
-    assertThat(noteController.getNoteInfo(copy).getMemoryTrackers(), empty());
     assertThat(mcqIdsForNote(reloadedOriginal), contains(associations.mcqId()));
-    assertThat(mcqIdsForNote(copy), empty());
     assertThat(
         conversationMessageController.getConversationsAboutNote(reloadedOriginal).stream()
             .map(Conversation::getId)
             .toList(),
         contains(associations.conversationId()));
-    assertThat(conversationMessageController.getConversationsAboutNote(copy), empty());
+    assertHasNoPrivateAssociations(copy);
+  }
+
+  @Test
+  void publishesALaterSameContentAdditionWithAFreshIdentityAfterAcceptedDeletion()
+      throws Exception {
+    Notebook notebook = createGitBackedNotebook();
+    Note original =
+        makeMe.aNote().notebook(notebook).title("Original").content(COPIED_CONTENT).please();
+    OriginalAssociations associations = commitPrivateAssociations(original);
+    NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);
+    byte[] deletionProposal = proposalBundleBytes(binding, List.of());
+
+    controller.publishNotebookGitProposal(
+        notebook.getId(), binding.getAcceptedGitObjectId(), deletionProposal);
+
+    NotebookGitBinding afterDeletion =
+        notebookGitBindingRepository.findByNotebook_Id(notebook.getId()).orElseThrow();
+    byte[] additionProposal =
+        proposalBundleBytes(
+            afterDeletion, List.of(new NotebookGitProposalFile("Copy.md", COPIED_CONTENT)));
+
+    controller.publishNotebookGitProposal(
+        notebook.getId(), afterDeletion.getAcceptedGitObjectId(), additionProposal);
+
+    List<Note> liveNotes = noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId());
+    assertThat(liveNotes, hasSize(1));
+    Note copy = liveNotes.getFirst();
+    NoteRealm copyView = noteController.showNote(copy);
+    assertThat(copy.getTitle(), equalTo("Copy"));
+    assertThat(copyView.getId(), not(equalTo(original.getId())));
+    assertThat(copyView.getNote().getContent(), equalTo(COPIED_CONTENT));
+    assertHasNoPrivateAssociations(copy);
+
+    inCommittedTransaction(
+        transactionManager,
+        () -> {
+          MemoryTracker tracker =
+              memoryTrackerRepository.findById(associations.trackerId()).orElseThrow();
+          assertThat(tracker.getNote().getId(), equalTo(original.getId()));
+          Mcq mcq = mcqRepository.findById(associations.mcqId()).orElseThrow();
+          assertThat(mcq.getNote().getId(), equalTo(original.getId()));
+          Conversation conversation =
+              conversationRepository.findById(associations.conversationId()).orElseThrow();
+          assertThat(conversation.getSubject().getNote().getId(), equalTo(original.getId()));
+        });
+  }
+
+  private void assertHasNoPrivateAssociations(Note note) throws Exception {
+    assertThat(noteController.getNoteInfo(note).getMemoryTrackers(), empty());
+    assertThat(mcqIdsForNote(note), empty());
+    assertThat(conversationMessageController.getConversationsAboutNote(note), empty());
+  }
+
+  private OriginalAssociations commitPrivateAssociations(Note original) {
+    return inCommittedTransaction(
+        transactionManager,
+        () -> {
+          Note reloadedOriginal = noteRepository.findById(original.getId()).orElseThrow();
+          MemoryTracker tracker = makeMe.aMemoryTrackerFor(reloadedOriginal).please();
+          Mcq mcq = makeMe.anMcq().forNote(reloadedOriginal).please();
+          Conversation conversation =
+              makeMe
+                  .aConversation()
+                  .forANote(reloadedOriginal)
+                  .from(currentUser.getUser())
+                  .please();
+          conversationId = conversation.getId();
+          return new OriginalAssociations(tracker.getId(), mcq.getId(), conversation.getId());
+        });
   }
 
   private List<Integer> mcqIdsForNote(Note note) {
