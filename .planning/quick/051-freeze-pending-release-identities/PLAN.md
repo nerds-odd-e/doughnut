@@ -57,7 +57,7 @@ The review also found obsolete one-release-at-a-time/CI-waiting instructions in
 
 ### 1. Represent a selected release before publication
 Type: Structure
-Status: planned
+Status: done
 Proof: State tests accept every existing `initialized-empty`, `publishing` and
 `succeeded` record, plus a selected tag/refOid/SHA without requiring a CI run.
 Round trips preserve the exact raw tag object and peeled commit; malformed or
@@ -69,6 +69,11 @@ Internal change: Extend the existing application release state boundary with one
 pre-publication selected outcome and an explicit serialized write operation under
 the current workflow concurrency owner. Do not create a generic state framework
 or change the backend deployment hash record.
+
+Learning: The selected record is the exact tag, raw ref object ID and peeled SHA
+without CI run fields. State transport lives in a cohesive store module so the
+next slice can freeze that identity without growing the state command past the
+repository file-size limit.
 
 ### 2. Freeze non-ready release identity
 Type: Behavior
@@ -142,6 +147,10 @@ Sizing: About five minutes for one short skill, its navigation pointer and a
 focused walkthrough; no helper scripts or new release machinery are needed.
 
 ## Verification and wrap-up
+
+Execution CI observer: coordinator `root-freeze-pending-release-identities`,
+checkout `/Users/terryyin/.codex/worktrees/be43/doughnut`, receipt
+`/tmp/donut-ci-501/watch-3iElkb`, PID `68481`.
 
 Each leaf targets one commit-sized outcome. Use the existing real-Git/fake-GitHub
 and fake-GCS fixtures; no production tag or production payload write is permitted.

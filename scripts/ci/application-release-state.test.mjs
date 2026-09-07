@@ -7,6 +7,7 @@ import {
 import {
   runStateCommand,
   runStateInitialization,
+  selectedReleaseRecord,
 } from './application-release-state-fixtures.mjs'
 
 const selectedCiSha = 'b'.repeat(40)
@@ -34,6 +35,7 @@ const admissionLog = [
 ].join('\n')
 
 for (const record of [
+  selectedReleaseRecord,
   publishedRecord('publishing'),
   publishedRecord('succeeded'),
   { outcome: 'initialized-empty' },

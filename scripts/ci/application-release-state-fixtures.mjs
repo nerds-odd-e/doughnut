@@ -10,6 +10,13 @@ const command = fileURLToPath(
   new URL('./application-release-state.mjs', import.meta.url)
 )
 
+export const selectedReleaseRecord = {
+  tag: 'v1.2.3',
+  ref_oid: 'a'.repeat(40),
+  sha: 'b'.repeat(40),
+  outcome: 'selected',
+}
+
 export async function runStateCommand(
   t,
   {
