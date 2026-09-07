@@ -30,7 +30,8 @@ jobs:
   main-head-guard:
     name: Check deploy SHA is still main HEAD
     runs-on: ${{ vars.RUNNER }}
-    if: github.event.workflow_run.conclusion == 'success'
+    # Application publication is paused until the version-tag release path is enabled.
+    if: ${{ false }}
     outputs:
       deploy: ${{ steps.head_guard.outputs.deploy }}
     steps:
