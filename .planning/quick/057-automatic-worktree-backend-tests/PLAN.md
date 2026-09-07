@@ -155,11 +155,20 @@ process proof loop, with no child supervision or signal cleanup path.
 
 ### 3. Let the launcher fixture observe database provisioning
 Type: Structure
-Status: planned
+Status: done
 Proof: Existing launcher tests remain green after the temporary checkout gains
 a recording MySQL stand-in whose exit status can be selected. Existing
 configured invocations still make no administration call. No production
 behavior changes.
+
+Learning: `makeCheckout` now writes a recording `mysql` CLI stand-in to
+`<root>/mysql-stand-in` (mirrors the existing `gradlew` stand-in, extracted
+through a shared `writeStandIn` helper), recording CLI args and piped stdin to
+`<root>/mysql-invocation` and exiting `${FAKE_MYSQL_EXIT:-0}`. New
+`readMysqlInvocation(checkout)` reads it back. `backend-test-worktree.sh` is
+untouched — nothing invokes the stand-in yet; slice 4 wires it in.
+`CURSOR_DEV=true nix develop -c node --test scripts/backend-test-worktree.test.mjs scripts/backend-test-worktree-lock.test.mjs`
+passes (17/17).
 
 Internal change: Add only the command-boundary fixture capability required to
 observe automatic database creation in slice 4. Keep MySQL behavior controlled

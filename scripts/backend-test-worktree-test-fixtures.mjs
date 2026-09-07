@@ -26,6 +26,14 @@ export function jdbcUrl(database) {
   return `jdbc:mysql://127.0.0.1:3309/${database}?${jdbcParams}`
 }
 
+// Writes a recording stand-in script (e.g. for `gradlew` or `mysql`) and
+// makes it executable. `lines` is the shell script body, one array entry per
+// line.
+function writeStandIn(scriptPath, lines) {
+  writeFileSync(scriptPath, [...lines, ''].join('\n'))
+  chmodSync(scriptPath, 0o755)
+}
+
 export function makeCheckout(t, { config } = {}) {
   const root = mkdtempSync(path.join(tmpdir(), 'backend-test-worktree-'))
   t.after(() => rmSync(root, { recursive: true, force: true }))
@@ -39,40 +47,65 @@ export function makeCheckout(t, { config } = {}) {
   const gradleInvocation = path.join(root, 'gradle-invocation')
   const gradleReached = path.join(root, 'gradle-reached')
   const gradleRelease = path.join(root, 'gradle-release')
-  writeFileSync(
-    path.join(root, 'backend', 'gradlew'),
-    [
-      '#!/bin/sh',
-      'root="$(CDPATH= cd -- "$(dirname "$0")/.." && pwd)"',
-      'record="$root/gradle-invocation"',
-      '{',
-      '  printf \'wrapper=%s\\n\' "$0"',
-      '  printf \'cwd=%s\\n\' "$PWD"',
-      '  printf \'SPRING_DATASOURCE_URL=%s\\n\' "${SPRING_DATASOURCE_URL-}"',
-      '  for arg in "$@"; do',
-      '    printf \'arg:%s\\n\' "$arg"',
-      '  done',
-      '} > "$record"',
-      "printf 'GRADLE_STDOUT\\n'",
-      "printf 'GRADLE_REACHED\\n' >&2",
-      'printf \'reached\\n\' > "$root/gradle-reached"',
-      'if [ -n "${GRADLE_HOLD:-}" ]; then',
-      '  release="$root/gradle-release"',
-      '  while [ ! -e "$release" ]; do',
-      '    sleep 0.05',
-      '  done',
-      'fi',
-      'exit "${FAKE_GRADLE_EXIT:-0}"',
-      '',
-    ].join('\n')
-  )
-  chmodSync(path.join(root, 'backend', 'gradlew'), 0o755)
+  writeStandIn(path.join(root, 'backend', 'gradlew'), [
+    '#!/bin/sh',
+    'root="$(CDPATH= cd -- "$(dirname "$0")/.." && pwd)"',
+    'record="$root/gradle-invocation"',
+    '{',
+    '  printf \'wrapper=%s\\n\' "$0"',
+    '  printf \'cwd=%s\\n\' "$PWD"',
+    '  printf \'SPRING_DATASOURCE_URL=%s\\n\' "${SPRING_DATASOURCE_URL-}"',
+    '  for arg in "$@"; do',
+    '    printf \'arg:%s\\n\' "$arg"',
+    '  done',
+    '} > "$record"',
+    "printf 'GRADLE_STDOUT\\n'",
+    "printf 'GRADLE_REACHED\\n' >&2",
+    'printf \'reached\\n\' > "$root/gradle-reached"',
+    'if [ -n "${GRADLE_HOLD:-}" ]; then',
+    '  release="$root/gradle-release"',
+    '  while [ ! -e "$release" ]; do',
+    '    sleep 0.05',
+    '  done',
+    'fi',
+    'exit "${FAKE_GRADLE_EXIT:-0}"',
+  ])
 
   if (config !== undefined) {
     writeFileSync(path.join(root, '.worktree.local.json'), config)
   }
 
-  return { root, launcher, gradleInvocation, gradleReached, gradleRelease }
+  // A recording stand-in for the `mysql` administration CLI slice 4 will
+  // invoke to create/grant a first-use database. Records every argument and
+  // any piped stdin (e.g. `-e '<SQL>'` or SQL piped in) to mysqlInvocation,
+  // then exits with FAKE_MYSQL_EXIT (default 0). Unused by production code
+  // until backend-test-worktree.sh is wired to invoke it in a later slice.
+  const mysqlStandIn = path.join(root, 'mysql-stand-in')
+  const mysqlInvocation = path.join(root, 'mysql-invocation')
+  writeStandIn(mysqlStandIn, [
+    '#!/bin/sh',
+    'root="$(CDPATH= cd -- "$(dirname "$0")" && pwd)"',
+    'record="$root/mysql-invocation"',
+    '{',
+    '  for arg in "$@"; do',
+    '    printf \'arg:%s\\n\' "$arg"',
+    '  done',
+    '  if [ ! -t 0 ]; then',
+    '    printf \'stdin:%s\\n\' "$(cat)"',
+    '  fi',
+    '} > "$record"',
+    'exit "${FAKE_MYSQL_EXIT:-0}"',
+  ])
+
+  return {
+    root,
+    launcher,
+    gradleInvocation,
+    gradleReached,
+    gradleRelease,
+    mysqlStandIn,
+    mysqlInvocation,
+  }
 }
 
 function sanitizedChildEnv(env) {
@@ -81,6 +114,7 @@ function sanitizedChildEnv(env) {
   delete childEnv.DB_URL
   delete childEnv.SPRING_FLYWAY_URL
   delete childEnv.FAKE_GRADLE_EXIT
+  delete childEnv.FAKE_MYSQL_EXIT
   Object.assign(childEnv, env)
   return childEnv
 }
@@ -167,4 +201,15 @@ export function readGradleInvocation(checkout) {
     } else if (line.startsWith('arg:')) args.push(line.slice('arg:'.length))
   }
   return { wrapper, cwd, url, args }
+}
+
+export function readMysqlInvocation(checkout) {
+  const text = readFileSync(checkout.mysqlInvocation, 'utf8')
+  const args = []
+  let stdin
+  for (const line of text.split('\n')) {
+    if (line.startsWith('arg:')) args.push(line.slice('arg:'.length))
+    else if (line.startsWith('stdin:')) stdin = line.slice('stdin:'.length)
+  }
+  return { args, stdin }
 }
