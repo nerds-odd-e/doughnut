@@ -383,12 +383,21 @@ and focused process proof.
 
 ### 10. Prepare two fresh worktrees for real first-use proof
 Type: Structure
-Status: planned
+Status: done
 Proof: Two disposable Git worktrees at the current implementation commit have
 normal dependencies, neither has `.worktree.local.json`, and neither has a
 preselected target. Record their explicit paths, clean status, MySQL 8.4 version,
 and absence of configuration before testing. Do not create their databases
 manually.
+
+Learning: Created two detached-HEAD worktrees at commit `b948a8e985`
+(this branch's HEAD after slice 9) at `/private/tmp/doughnut-057-proof-1` and
+`/private/tmp/doughnut-057-proof-2` via `git worktree add --detach`. Both are
+clean (`git status --short --branch` shows only `## HEAD (no branch)`),
+neither has `.worktree.local.json`, no datasource env vars are preselected,
+`pnpm install` succeeded in both, and MySQL 8.4.11 is reachable at
+127.0.0.1:3309 (no database created manually). No repo changes were made in
+this worktree.
 
 Internal change: Create only the two isolated local proof environments needed
 immediately by slice 11. Use explicit temporary paths and do not create their
