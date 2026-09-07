@@ -1,7 +1,7 @@
 # Keep accumulated local and web content edits
 
 Source: [SEED-009 Story 8](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-8).
-Status: in progress. Slices 1–9 done; next is slice 10.
+Status: in progress. Slices 1–10 done; next is slice 11.
 
 ## Goal and scope
 
@@ -264,12 +264,11 @@ Sizing: ~5 minutes active work, medium confidence; bounded harness work.
 
 ### 10. Keep both changes through the installed workflow
 Type: Behavior
-Status: planned
-Proof: One scenario in `cli_notebook_clone.feature`: clone baseline → locally
-edit/commit `Recipes/Pasta.md` → ordinary web-save `Overview` → installed pull
-→ both local contents and a rebased child; Donut Pasta is still unchanged →
-installed publish → both contents visible in Donut and accepted L′ reported.
-Run this focused feature and remove this scenario's @wip when green.
+Status: done
+Proof: Scenario in `cli_notebook_clone.feature`: clone → local Pasta commit →
+Overview web-save → installed pull (rebased child, Pasta blob retained,
+Overview matches B, Donut Pasta still Boil water) → publish (both contents,
+L′ accepted head). Focused feature 9 scenarios green.
 
 Behavior: Owner follows the selected two-command workflow → keeps local and
 web changes without manual copying. Use the existing baseline-only snapshot
@@ -357,12 +356,18 @@ preparatory Structure sits immediately before its Behavior.
   reader now includes parent, author, message, blobs, and parentBlobs.
   Original L is `@cliNotebookOriginalCheckout`; observed L′ is
   `@cliNotebookRebasedCheckout`. `@cliNotebookPublishHead` remains L until
-  leaf 10 asserts L′. Page objects: `notebookClone.ts` (clone),
+  publish asserts L′. Page objects: `notebookClone.ts` (clone),
   `notebookCloneCheckout.ts` (commit/publish/pull),
-  `notebookCloneCheckoutRebase.ts` (L vs L′ observations). Steps exist in
-  `cli_notebook_clone.ts` but are unused until leaf 10.
+  `notebookCloneCheckoutRebase.ts` (L vs L′ observations). Installed journey:
+  local Pasta edit plus web Overview save survive pull then publish; Donut
+  Pasta stays `Boil water` until publish. Proof in
+  `cli_notebook_clone.feature`. Checkout file assertion matches the commit
+  writer's trailing newline. Local Cypress does not skip `@wip`
+  (`expose.tags` is `not @ignore`); the journey scenario is green, not tagged
+  `@wip`. A stale version-keyed E2E install cache can serve pre-rebase CLI;
+  `@bundleCliE2eInstall` rebuilds on a clean tree.
 
-Remaining leaves 10–11 are Ready as sizing hypotheses. Target ~5 minutes each
+Remaining leaf 11 is Ready as a sizing hypothesis. Target ~5 minutes each
 including focused verification and local cleanup; inspect at five minutes and
 stop/finer-decompose at ten non-exempt minutes. A backend/E2E run or external
 wait can justify an exception only when recorded as the actual cause. No
