@@ -1,9 +1,12 @@
 # Reliable login with accumulated browser history
 
 Source: [SEED-014 Story 1](../../seeds/SEED-014-reliable-login-with-browser-history.md#story-1).
-Status: planned; no implementation started.
-Readiness: ready for direct execution; all leaves remain planned.
-Refined in place on 2026-09-07. No execution attempt or completed proof exists.
+Status: in progress on `codex/reliable-login-browser-history`.
+Readiness: connector characterization delivered; continue with leaf 2.
+Execution worktree: `/Users/terryyin/.codex/worktrees/f8d7/doughnut`.
+CI observer: coordinator `047-f8d7`, repository `nerds-odd-e/doughnut`, main;
+cell 10 / PTY session 29699; mailbox `/tmp/donut-ci-501/watch-8lFX2v`.
+Only main triggers push CI; this branch has no push CI runs.
 
 ## Goal and scope
 
@@ -121,8 +124,13 @@ production, not arbitrary upstream errors or the whole GitHub login exchange.
 
 ### 1. Expose the current connector rejection boundary
 Type: Structure
-Status: planned
+Status: done
 Proof: Passing HTTP characterization of the existing embedded Tomcat behavior.
+
+Verified `CURSOR_DEV=true nix develop -c pnpm backend:test_only` (54s), including
+3 connector tests (0.461s). Tomcat 11.0.24 logged the expected oversized-header
+diagnostic. Fresh refactor found no edits; coordinator formatting passed.
+Initial Nix cache/daemon sandbox access was resolved through approved escalation.
 
 Internal change: Add a small server-boundary fixture under backend tests using
 Boot's TomcatServletWebServerFactory, random port, and one minimal servlet.
