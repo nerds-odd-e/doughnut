@@ -243,8 +243,8 @@ for growing a notebook even if deletion, moves, and divergence are deferred.
 
 ### 5. Delete a note locally without transferring its private data
 
-**Status:** refined and [slice-planned](../quick/045-publish-local-note-deletion/PLAN.md)
-for a small first delivery; not implemented.
+**Status:** delivered. The completed quick plan was removed; implementation and
+proof remain recoverable from Git history.
 
 **Goal**
 
@@ -296,45 +296,6 @@ useful before adding broader deletion or identity-inference behavior.
   drift repair, and new preview or confirmation UI. Existing supported
   addition/edit publication remains available. Stories 6–10 retain their
   separate outcomes.
-
-**Key examples**
-
-1. **Delete one learned note:** A clean bound checkout matches accepted
-   `main`; `Biology/Cell.md` has memory trackers and learning history in Donut.
-   The owner removes only that file, commits, and publishes. Donut no longer
-   lists it as active or schedules its trackers for recall; its private data
-   remains attached to the deleted identity. Another eligible checkout pulls
-   the accepted deletion. An unchanged retry has no additional effect.
-2. **Leave references as authored:** Another note links to `Biology/Cell`.
-   Publishing the deletion leaves that note's Markdown untouched and its
-   reference unresolved under existing link behavior. It does not silently
-   turn this into a multi-note content change.
-3. **Do not revive learning through matching text:** After the deletion is
-   accepted, the owner adds identical content as `Biology/Cell basics.md` and
-   publishes that separate commit. It is a new note without the deleted note's
-   private data. Attempting `Biology/Cell.md` instead encounters the existing
-   deleted-title collision and leaves remote state unchanged.
-4. **Keep the boundary explicit:** A commit deletes `Cell.md` and adds
-   `Cell basics.md`, edits another file, or deletes another note. Publication
-   rejects the whole commit with guidance that deletion must be isolated;
-   Donut does not guess a rename or partially publish it. A stale single-note
-   deletion likewise leaves accepted history and notes unchanged.
-
-**Learning checkpoint and sizing**
-
-- Stop after demonstrating one deletion, receiving it in another checkout,
-  and a later separate addition retaining fresh identity. Use that experience
-  to decide whether same-path recreation, reference cleanup, or broader
-  deletion commits deserve subsequent work; none is an automatic follow-on.
-- **Effort hypothesis:** M (about 1–2 hours), low confidence. Assumes existing
-  soft deletion, publication atomicity, and clone/pull can be reused. This is
-  a story-level hypothesis, not an execution estimate; do not expand the scope
-  to address unrelated synchronization gaps discovered during planning.
-- **Depends on:** delivered Stories 2–4 for publishing, receiving, and the
-  later fresh-addition example.
-- **Open decisions:** none blocking this conservative refinement. Leaving
-  links untouched and deferring same-path recreation are proposed defaults
-  from this refinement, not separately confirmed developer decisions.
 
 <a id="story-6"></a>
 

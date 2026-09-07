@@ -9,9 +9,11 @@ import static org.hamcrest.Matchers.nullValue;
 
 import com.odde.donut.controllers.dto.NoteCreationDTO;
 import com.odde.donut.controllers.dto.NoteUpdateContentDTO;
+import com.odde.donut.entities.MemoryTracker;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookGitBinding;
+import com.odde.donut.entities.repositories.MemoryTrackerRepository;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +30,7 @@ class NotebookGitProjectionDriftControllerTest extends NotebookGitBundleControll
   private static final String WEB_CONTENT = "---\ntype: Note\n---\nweb content";
 
   @Autowired TextContentController textContentController;
+  @Autowired MemoryTrackerRepository memoryTrackerRepository;
 
   @Test
   void rejectsAnAdditionBasedOnAnOldParentAfterWebContentAdvancedAcceptedMain() throws Exception {
@@ -44,10 +47,32 @@ class NotebookGitProjectionDriftControllerTest extends NotebookGitBundleControll
 
   @Test
   void rejectsAnAdditionWhenAWebCreationOccupiesItsDestination() throws Exception {
+    rejectWhenAWebCreationHasDriftedTheProjection(this::additionProposalBundle);
+  }
+
+  @Test
+  void rejectsADeletionWhenAWebCreationHasDriftedTheProjection() throws Exception {
+    DriftedWebCreation remaining =
+        rejectWhenAWebCreationHasDriftedTheProjection(this::isolatedDeletionProposalBundle);
+    assertThat(remaining.acceptedNote().getDeletedAt(), nullValue());
+    assertThat(
+        memoryTrackerRepository.findById(remaining.tracker().getId()).orElseThrow().getDeletedAt(),
+        nullValue());
+  }
+
+  private DriftedWebCreation rejectWhenAWebCreationHasDriftedTheProjection(
+      ProposalBundleFactory proposalFactory) throws Exception {
     Notebook notebook = createGitBackedNotebook();
     Note acceptedNote =
         makeMe.aNote().notebook(notebook).title("note").content(ACCEPTED_CONTENT).please();
     NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);
+    MemoryTracker tracker =
+        inCommittedTransaction(
+            transactionManager,
+            () ->
+                makeMe
+                    .aMemoryTrackerFor(noteRepository.findById(acceptedNote.getId()).orElseThrow())
+                    .please());
     NoteCreationDTO webCreation = new NoteCreationDTO();
     webCreation.setNewTitle("addition");
     webCreation.setContent("web content");
@@ -56,7 +81,7 @@ class NotebookGitProjectionDriftControllerTest extends NotebookGitBundleControll
             .findById(controller.createNoteAtNotebookRoot(notebook, webCreation).getId())
             .orElseThrow();
 
-    byte[] proposal = additionProposalBundle(binding);
+    byte[] proposal = proposalFactory.create(binding);
 
     ResponseStatusException exception =
         assertProposalRejectedWithoutMutatingBinding(
@@ -64,9 +89,8 @@ class NotebookGitProjectionDriftControllerTest extends NotebookGitBundleControll
 
     assertThat(exception.getStatusCode(), equalTo(HttpStatus.CONFLICT));
     assertThat(exception.getReason(), containsString("refresh the checkout before publishing"));
-    assertThat(
-        noteRepository.findById(acceptedNote.getId()).orElseThrow().getContent(),
-        equalTo(ACCEPTED_CONTENT));
+    Note reloadedAccepted = noteRepository.findById(acceptedNote.getId()).orElseThrow();
+    assertThat(reloadedAccepted.getContent(), equalTo(ACCEPTED_CONTENT));
     Note reloadedOccupiedDestination =
         noteRepository.findById(occupiedDestination.getId()).orElseThrow();
     assertThat(reloadedOccupiedDestination.getTitle(), equalTo("addition"));
@@ -77,6 +101,7 @@ class NotebookGitProjectionDriftControllerTest extends NotebookGitBundleControll
             .map(Note::getId)
             .toList(),
         equalTo(List.of(acceptedNote.getId(), occupiedDestination.getId())));
+    return new DriftedWebCreation(reloadedAccepted, tracker);
   }
 
   private Note rejectBasedOnAnOldParentAfterWebContentAdvancedAcceptedMain(
@@ -127,4 +152,6 @@ class NotebookGitProjectionDriftControllerTest extends NotebookGitBundleControll
   private interface ProposalBundleFactory {
     byte[] create(NotebookGitBinding binding) throws Exception;
   }
+
+  private record DriftedWebCreation(Note acceptedNote, MemoryTracker tracker) {}
 }
