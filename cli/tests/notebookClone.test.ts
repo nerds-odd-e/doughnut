@@ -72,7 +72,7 @@ describe('notebook clone (CLI routing, real Git checkout)', () => {
 
     expect(ctx.getLogSpy()).toHaveBeenCalledWith(
       expect.stringContaining(
-        'one new commit directly on the accepted main containing either one or more added Markdown notes with optional edits, or a single edited Markdown note. Use the notebook root or existing folders represented in accepted history.'
+        'one new commit directly on the accepted main containing either one or more added Markdown notes with optional edits, or a single edited Markdown note, or one isolated Markdown note deletion that leaves existing links authored; mixed deletion and same-path recreation are unsupported. Use the notebook root or existing folders represented in accepted history.'
       )
     )
     expect(ctx.getLogSpy()).toHaveBeenCalledWith(

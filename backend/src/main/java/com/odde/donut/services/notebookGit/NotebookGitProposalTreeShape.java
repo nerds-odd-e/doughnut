@@ -14,10 +14,11 @@ import org.springframework.web.server.ResponseStatusException;
 
 /**
  * Walks the raw two-tree diff (no rename detection) between a proposal's accepted-parent commit and
- * its proposed commit, and permits one modified note or a set containing added ordinary Markdown
- * notes at regular file modes - never deleted/moved paths, unsafe paths, non-regular modes, or the
- * folder-reserved {@code README.md}. Callers only invoke this once proposal ancestry is confirmed
- * to be a direct single-parent child of the accepted commit.
+ * its proposed commit, and permits one modified note, a set containing added ordinary Markdown
+ * notes at regular file modes, or exactly one isolated ordinary-note deletion - never mixed
+ * deletions/moves, unsafe paths, non-regular modes, or the folder-reserved {@code README.md}.
+ * Callers only invoke this once proposal ancestry is confirmed to be a direct single-parent child
+ * of the accepted commit.
  */
 public final class NotebookGitProposalTreeShape {
 
@@ -89,13 +90,11 @@ public final class NotebookGitProposalTreeShape {
     if (changes.isEmpty()) {
       throw unsupportedTreeShape("proposal contains no changed file");
     }
-    if (changes.stream().anyMatch(change -> change.kind() == ChangeKind.DELETED)) {
-      if (changes.size() > 1) {
-        throw unsupportedTreeShape(
-            "publish each removed note in an isolated deletion commit, without other file changes"
-                + " (no rename detection is performed)");
-      }
-      throw unsupportedTreeShape("path \"" + changes.getFirst().path() + "\" is deleted");
+    if (changes.stream().anyMatch(change -> change.kind() == ChangeKind.DELETED)
+        && changes.size() > 1) {
+      throw unsupportedTreeShape(
+          "publish each removed note in an isolated deletion commit, without other file changes"
+              + " (no rename detection is performed)");
     }
     if (changes.size() > 1
         && changes.stream().noneMatch(change -> change.kind() == ChangeKind.ADDED)) {
