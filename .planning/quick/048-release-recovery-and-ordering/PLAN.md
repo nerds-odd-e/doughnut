@@ -7,6 +7,11 @@ and docs/gcp/conditional-backend-deploy.md.
 Readiness: updated from Story 1 implementation and merge observations; ready for
 a fresh execute-plan worktree. Defer only post-merge platform observations to parent.
 
+Active execution: branch `codex/release-recovery-ordering`; checkout
+`/Users/terryyin/.codex/worktrees/8079/doughnut`; CI observer coordinator
+`story2-8079`, yielded cell `16`, PTY session `70450`, PID `46090`, mailbox
+`/tmp/donut-ci-501/watch-BMLO0z`.
+
 ## Goal and scope
 
 Remove the single-release manual coordination rule after tag releases work.
@@ -125,7 +130,7 @@ subprocesses; fake GCS/GitHub/MIG calls only. Do not build a fake Actions schedu
 
 ### 1. Record the complete application publication outcome
 Type: Behavior
-Status: planned
+Status: done
 Proof: Publisher saves admitted identity before uploads and success after all
 commands; a failed command leaves publishing state. Backend-skip data variation
 still records app success without modifying backend hash bookkeeping.
@@ -133,6 +138,11 @@ still records app success without modifying backend hash bookkeeping.
 Behavior: A validated app release publishes → record whether the whole release
 finished. Wrap Story 1's publisher in one application-state boundary; use the
 existing serialized workflow and private bucket. Preserve working tag releases.
+
+Learning: the existing publisher is the cohesive outcome owner after its payload,
+source, routing and ref preflights. Two writes to the private deploy object record
+`publishing` before payload writes and `succeeded` after the complete publisher;
+MIG-skip success leaves backend hash bookkeeping untouched.
 
 ### 2. Recognize the application version already deployed before tracking
 Type: Behavior

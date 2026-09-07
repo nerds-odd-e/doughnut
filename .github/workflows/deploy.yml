@@ -73,6 +73,8 @@ jobs:
       RELEASE_SOURCE_ROOT: ${{ github.workspace }}/release-source
       RELEASE_REF: ${{ needs.release-admission.outputs.ref }}
       RELEASE_REF_OID: ${{ needs.release-admission.outputs.ref_oid }}
+      RELEASE_CI_RUN_ID: ${{ needs.release-admission.outputs.run_id }}
+      RELEASE_CI_RUN_ATTEMPT: ${{ needs.release-admission.outputs.run_attempt }}
       DEPLOY_JAR_PATH: release-artifacts/backend/donut-0.0.1-SNAPSHOT.jar
       FRONTEND_STATIC_DIR: release-artifacts/frontend
       CLI_BUNDLE_SOURCE: release-artifacts/cli/donut-cli.bundle.mjs

@@ -10,6 +10,11 @@ import {
 } from './application-release-publication-fixtures.mjs'
 
 const repositoryRoot = fileURLToPath(new URL('../../', import.meta.url))
+const readApplicationRecords = (path) =>
+  readFileSync(path, 'utf8')
+    .trim()
+    .split('\n')
+    .map((record) => JSON.parse(record))
 
 for (const scenario of [
   'skip',
@@ -19,8 +24,19 @@ for (const scenario of [
   'wrong-source',
 ]) {
   test(`selected-source publication: ${scenario}`, (t) => {
-    const { publish, root, sha, trace, frontend, cli, jar, startup } =
-      makePublication(t, scenario)
+    const {
+      publish,
+      root,
+      sha,
+      refOid,
+      trace,
+      frontend,
+      cli,
+      jar,
+      startup,
+      applicationRecords,
+      backendRecord,
+    } = makePublication(t, scenario)
     const forced = scenario === 'forced'
     const result = publish()
     if (['moved', 'invalid-routing', 'wrong-source'].includes(scenario)) {
@@ -42,12 +58,16 @@ for (const scenario of [
       /selected-source-only/
     )
     const calls = readFileSync(trace, 'utf8').trim().split('\n')
-    assert.deepEqual(calls.slice(0, 3), [
+    assert.equal(
+      calls[0],
+      'gsutil cp - gs://private-backend/deploy/application-release.json'
+    )
+    assert.deepEqual(calls.slice(1, 4), [
       `gsutil -m rsync -r ${frontend} gs://public-frontend/frontend/${sha}/`,
       `gsutil -h Cache-Control:public,max-age=60 cp ${frontend}/index.html gs://public-frontend/frontend/${sha}/index.html`,
       `gsutil cp -a public-read ${cli} gs://public-frontend/doughnut-cli-latest/doughnut`,
     ])
-    assert.match(calls[3], /^gcloud compute url-maps import /)
+    assert.match(calls[4], /^gcloud compute url-maps import /)
     if (forced) {
       assert.ok(
         calls.includes(
@@ -70,10 +90,55 @@ for (const scenario of [
       )
     } else {
       assert.match(result.stdout, /Deploy skipped/)
-      assert.equal(calls.length, 6)
+      assert.equal(calls.length, 8)
+      assert.deepEqual(readApplicationRecords(applicationRecords), [
+        {
+          tag: 'v1.2.3',
+          ref_oid: refOid,
+          sha,
+          ci_run_id: '42',
+          ci_run_attempt: '3',
+          outcome: 'publishing',
+        },
+        {
+          tag: 'v1.2.3',
+          ref_oid: refOid,
+          sha,
+          ci_run_id: '42',
+          ci_run_attempt: '3',
+          outcome: 'succeeded',
+        },
+      ])
+      assert.equal(existsSync(join(root, 'saved-record')), false)
+      assert.deepEqual(JSON.parse(readFileSync(backendRecord)), {
+        sha256: hash('selected jar'),
+        startup_script_sha256: hash(startup),
+      })
     }
   })
 }
+
+test('failed publication leaves the admitted application publishing', (t) => {
+  const { publish, trace, applicationRecords } = makePublication(
+    t,
+    'failed-frontend'
+  )
+
+  const result = publish()
+
+  assert.notEqual(result.status, 0)
+  const calls = readFileSync(trace, 'utf8').trim().split('\n')
+  assert.equal(calls.length, 2)
+  assert.equal(
+    calls[0],
+    'gsutil cp - gs://private-backend/deploy/application-release.json'
+  )
+  assert.match(calls[1], /^gsutil -m rsync/)
+  assert.deepEqual(
+    readApplicationRecords(applicationRecords).map((record) => record.outcome),
+    ['publishing']
+  )
+})
 
 test('workflows share publication commands and retain independent CLI build version', () => {
   const workflow = (name) =>
@@ -85,6 +150,14 @@ test('workflows share publication commands and retain independent CLI build vers
     )
   const application = workflow('deploy').jobs.Deploy.steps
   assert.ok(application.some((step) => step.id === 'publish'))
+  assert.equal(
+    workflow('deploy').jobs.Deploy.env.RELEASE_CI_RUN_ID,
+    '${{ needs.release-admission.outputs.run_id }}'
+  )
+  assert.equal(
+    workflow('deploy').jobs.Deploy.env.RELEASE_CI_RUN_ATTEMPT,
+    '${{ needs.release-admission.outputs.run_attempt }}'
+  )
   const cli = workflow('cli-release')
   assert.deepEqual(cli.on.push.tags, ['cli-*'])
   const steps = cli.jobs['build-and-publish'].steps
