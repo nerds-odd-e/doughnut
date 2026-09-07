@@ -570,12 +570,7 @@ authored Git commit and see the complete change in Donut.
 
 ### 12. Move a note between existing folders without losing its learning history
 
-**Status:** re-refined on 2026-09-07 and
-[slice-plan refined](../quick/050-relocate-local-note/PLAN.md); not implemented.
-Story 6 and Plan 52's guidance/diagnostic corrections are delivered. Selected
-for parallel-work planning alongside Story 8; Stories 8 and 9 retain their
-backlog order but are not technical prerequisites. This refinement does not
-start execution.
+**Status:** delivered.
 
 **Goal**
 
@@ -592,8 +587,8 @@ learning history again. Renaming in place cannot achieve this outcome.
   private-data preservation, unchanged references, retry, and rejection rules.
 - Reuse the delivered raw removed/added blob correspondence and same-note
   mutation; receiving a rename and a later edit already works through ordinary
-  pull. The new learning here is final destination eligibility and container
-  preservation, not a second transport or identity mechanism.
+  pull. Destination eligibility and container preservation use that same
+  identity mechanism.
 - Support root→existing represented folder, folder→root, and folder→folder,
   including nested destinations and folders represented only by a README.
   The destination must exist in Donut and be represented in accepted parent
@@ -635,57 +630,10 @@ learning history again. Renaming in place cannot achieve this outcome.
   README relocation, cross-notebook moves, restore, deleted-path reuse,
   multiple unpublished commits, divergence, drift repair, or new UI/metadata.
 
-**Key examples**
-
-1. Move Inbox/Cell.md to Biology/Cell.md → publish → the same note appears in
-   the existing represented Biology folder; another checkout receives it.
-2. Move Inbox/Cell.md to Biology/Cell basics.md → publish → validate only that
-   final available destination, even if Cell basics is reserved in Inbox or
-   Cell is reserved in Biology. Neither hypothetical intermediate is used.
-3. Move Inbox's only tracked note to the root → publish → Inbox remains a
-   Donut folder, with no generated README. Other identities remain untouched.
-   A later move back into that unrepresented Inbox rejects without inventing
-   content to make the folder eligible.
-4. Target a missing or unrepresented folder, or a reserved final path → reject
-   without changing the source note, containers, or accepted history.
-5. Publish relocation, then separately publish a content edit there → receive
-   both commits in another clean checkout → same learned note, new location
-   and content, original ancestry retained.
-6. Move into Courses/Biology where a different root Biology also exists →
-   publish → choose Courses/Biology by its full represented path. An untouched
-   note with identical content elsewhere keeps its own learning data.
-7. A referrer contains an exact Inbox/Cell link in body and YAML → publish the
-   move to Biology/Cell → authored references stay unchanged and the old exact
-   path no longer resolves; no automatic referrer edits accompany the move.
-8. Accepted main advances after the checkout's base → publish relocation →
-   retain the stale-head rejection and local commit. This story adds no
-   structural rebase, including when Story 8 is installed alongside it.
-
-- **Evaluation:** Installed CLI relocation changes the note's visible folder
-  while preserving its identity and private data; another checkout receives it.
-- **Value / learning:** Delivers filing/reorganization independently of moving
-  a whole folder; tests destination eligibility and container preservation.
-- **Effort hypothesis:** M (about 1–2 hours), low confidence. Assumes exact
-  single-note relocation to already represented folders stays bounded and
-  Story 6's identity contract remains usable. This is a behavior-level
-  hypothesis, not an estimate inferred from implementation size.
-- **Depends on:** Story 6's delivered identity-preserving publication contract.
-  Stories 8 and 9 are higher priorities, not technical prerequisites.
-- **Safe stopping point:** Owners can rename and file one note while whole
-  folder moves remain unsupported.
-- **Open decisions:** none within existing represented destinations.
-- **Parallel boundary:** Plan 50 owns relocation publication and its proofs;
-  Plan 53 owns content rebase. An accepted relocation remains receivable by a
-  clean checkout, while divergent structural history remains outside Story 8.
-  Coordinate shared CLI guidance and installed-feature edits as recorded in
-  Plan 50; do not expand either story to reconcile moves with concurrent edits.
-
 ## Ordering and Scope Reduction
 
-Stories 1–6 and 11 are delivered. The 2026-09-07 review after Plan 49 keeps
-Stories 8 and 9 next, ahead of Story 12, followed by Story 7; Story 10 remains
-last. Complete the bounded Story 6 corrections in Plan 52 before expanding
-the workflow. The [product backlog](../PRODUCT-BACKLOG.md) owns the global
+Stories 1–6, 11, and 12 are delivered. Stories 8 and 9 remain next, followed by
+Story 7; Story 10 remains last. The [product backlog](../PRODUCT-BACKLOG.md) owns the global
 story order; corrective execution leaves remain attached to their home story.
 
 ### Learning from the delivered rename story
