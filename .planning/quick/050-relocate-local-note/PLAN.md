@@ -1,6 +1,6 @@
 # Publish an identity-preserving note relocation
 
-Status: in progress; leaves 1–9 done. Story and slice-plan refinement complete on 2026-09-07.
+Status: in progress; leaves 1–10 done. Story and slice-plan refinement complete on 2026-09-07.
 Source: [SEED-009 Story 12](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-12).
 Prerequisites: Story 6 and the [Plan 52 corrections](../052-clarify-note-rename-publication/PLAN.md)
 are delivered. Ready to execute as the selected parallel candidate alongside
@@ -337,10 +337,12 @@ Sizing: ~5 minutes active work, medium confidence; one observable reference loop
 
 ### 10. Publish relocation through the installed CLI
 Type: Behavior
-Status: planned
+Status: done
 Proof: Existing installed feature: clone → git mv Recipes/Pasta.md to
 Pasta basics.md → publish → authored accepted head and unchanged-content note
-at the notebook root in Donut. Focused installed feature.
+at the notebook root in Donut. Focused installed feature
+(`xvfb-run pnpm cypress run --spec e2e_test/features/cli/cli_notebook_clone.feature`).
+Scenario `Publishing a committed note relocation updates the same Donut note at the notebook root`.
 
 Behavior: Owner commits an eligible relocation/rename → installed publish →
 sees the note at its final location. Reuse existing git-mv task/page objects
@@ -393,7 +395,7 @@ Sizing: ~5 minutes active work, high confidence; one fast-forward proof loop.
 ## Refinement result, verification and wrap-up
 
 The original ten Behavior leaves become twelve Behavior leaves plus one
-immediately enabling Structure leaf. Leaves 1–9 are done; remaining leaves are
+immediately enabling Structure leaf. Leaves 1–10 are done; remaining leaves are
 planned. No completed evidence was discarded. Main refinements: separate the concrete title-validation
 extraction and private-state proof from placement, add path-specific reference
 proof, make destination/overwrite/empty-folder boundaries explicit, and remove
@@ -410,6 +412,7 @@ obsolete pending-correction and wait-for-Story-8/9 instructions.
 - Leaf 7: missing/unrepresented destinations reject with the existing parent-folder message; descendant-only tracked content still represents an ancestor.
 - Leaf 8: relocating onto a dest-folder title reserved by accepted deletion keeps Plan 52 contextual conflict semantics.
 - Leaf 9: path-qualified `[[Inbox/Cell]]` referrers stay authored after relocation; old path no longer resolves.
+- Leaf 10: installed CLI `git mv Recipes/Pasta.md Pasta basics.md` publishes the same note at the notebook root.
 - Observer notified CI failure on `28a87c9836` (prior main docs commit, E2E note_topology shard). That SHA is not this execution's push; superseded by `f199e04832`. Disposition: ignore for Plan 50; do not repair the superseded SHA.
 
 Ready for execution with the parallel coordination above. Estimates are
