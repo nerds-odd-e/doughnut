@@ -3,7 +3,7 @@
 ## Source and status
 
 Source: [SEED-009 Story 7](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-7).
-Status: in progress; slices 1–10 done.
+Status: in progress; slices 1–11 done.
 
 ## Goal and scope
 
@@ -256,10 +256,12 @@ Sizing basis: reuse the existing accepted-head branch and fixture; one retry loo
 
 ### 11. Publish a local directory move through the installed CLI
 Type: Behavior
-Status: planned
+Status: done
 Proof: Extend the active cli_notebook_clone.feature: installed clone, ordinary
 Git directory move/commit, installed publish, then show the same Donut folder/note
 at the accepted new path. Use the existing Recipes README fixture.
+`CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/cli/cli_notebook_clone.feature` passed (12 scenarios).
+Existing `git mv` handled the directory; Kitchen is the represented dest parent.
 
 Behavior: The owner commits an eligible local directory move → installed publish
 → Donut displays the accepted location. Add only a directory move step/task if
@@ -348,7 +350,7 @@ feature is promised. No completed evidence exists to migrate.
 
 ## Readiness and learnings
 
-Slices 1–10 done. Remaining leaves 11–14 are installed CLI/E2E and guidance.
+Slices 1–11 done. Remaining: pull receipt, subsequent edit, CLI guidance.
 
 CI observer delivered run 34142166098 on `9f35dbcff2` (slice 9, test-only).
 The only Cypress failure was `record_live_audio_with_real_open_ai_service`
