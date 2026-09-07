@@ -102,3 +102,38 @@ Then('the cloned checkout contains exactly:', (data: DataTable) =>
     .notebookCloneCheckout()
     .expectCanonicalTreeFor(data.raw().map((row) => row[0] as string))
 )
+
+When('I pull the cloned checkout using the installed CLI', () =>
+  cli.notebookCloneCheckout().pull()
+)
+
+Then('the cloned checkout is a clean rebased child of the accepted head', () =>
+  cli.notebookCloneCheckout().expectCleanRebasedChildOfAcceptedHead()
+)
+
+Then(
+  'the cloned checkout retains the original local commit for {string}',
+  (relativePath: string) =>
+    cli
+      .notebookCloneCheckout()
+      .expectOriginalLocalCommitRetainedFor(relativePath)
+)
+
+Then(
+  '{string} in the cloned checkout matches the accepted parent',
+  (relativePath: string) =>
+    cli
+      .notebookCloneCheckout()
+      .expectCheckoutFileMatchesAcceptedParent(relativePath)
+)
+
+Then(
+  'the cloned checkout file {string} is:',
+  (relativePath: string, content: string) =>
+    cli.notebookCloneCheckout().expectCheckoutFile(relativePath, content)
+)
+
+Then(
+  'the installed CLI reports the rebased local head as the accepted head',
+  () => cli.notebookCloneCheckout().expectRebasedHeadAccepted()
+)

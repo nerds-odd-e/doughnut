@@ -3,7 +3,8 @@ import { installation } from './execution'
 import { backend } from './backend'
 import { interactiveCli } from './interactiveCli'
 import { useNotebook } from './notebookInteractiveCliSession'
-import { notebookClone, notebookCloneCheckout } from './notebookClone'
+import { notebookClone } from './notebookClone'
+import { notebookCloneCheckout } from './notebookCloneCheckout'
 import { ttyAssertTerminal } from './ttyAssertTerminal'
 
 /**

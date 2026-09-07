@@ -1,7 +1,7 @@
 # Keep accumulated local and web content edits
 
 Source: [SEED-009 Story 8](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-8).
-Status: in progress. Slices 1–8 done; next is slice 9.
+Status: in progress. Slices 1–9 done; next is slice 10.
 
 ## Goal and scope
 
@@ -248,9 +248,11 @@ boundary variations, reusing the delivered acceptance gates.
 
 ### 9. Enable the installed rebase journey's observations
 Type: Structure
-Status: planned
-Proof: Existing installed clone/publish feature stays green; new scenario may
-remain @wip until leaf 10. No committed failing scenario.
+Status: done
+Proof: Existing installed clone/publish feature stays green
+(`pnpm cypress run --spec e2e_test/features/cli/cli_notebook_clone.feature`,
+8 scenarios). No new scenario: local `expose.tags` is `not @ignore`, so `@wip`
+would still run. Leaf 10 will add the journey scenario.
 
 Internal change: Add the thin installed `pull` action and checkout observations
 needed immediately by leaf 10, through existing tasks/page objects and step
@@ -351,8 +353,16 @@ preparatory Structure sits immediately before its Behavior.
   reports the actual reason without retry: stale expected-head after POST,
   remote advance before ancestry GET, and projection-drift 409. Proofs live in
   `notebookPublish.rebasedRejection.suite.ts`.
+- Installed pull uses the same `runInstalledCli` path as publish. Checkout
+  reader now includes parent, author, message, blobs, and parentBlobs.
+  Original L is `@cliNotebookOriginalCheckout`; observed L′ is
+  `@cliNotebookRebasedCheckout`. `@cliNotebookPublishHead` remains L until
+  leaf 10 asserts L′. Page objects: `notebookClone.ts` (clone),
+  `notebookCloneCheckout.ts` (commit/publish/pull),
+  `notebookCloneCheckoutRebase.ts` (L vs L′ observations). Steps exist in
+  `cli_notebook_clone.ts` but are unused until leaf 10.
 
-Remaining leaves 9–11 are Ready as sizing hypotheses. Target ~5 minutes each
+Remaining leaves 10–11 are Ready as sizing hypotheses. Target ~5 minutes each
 including focused verification and local cleanup; inspect at five minutes and
 stop/finer-decompose at ten non-exempt minutes. A backend/E2E run or external
 wait can justify an exception only when recorded as the actual cause. No
