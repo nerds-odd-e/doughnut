@@ -34,7 +34,7 @@
 **Deployment and User Experience**
 ----------------------------------
 
-* Production deployment is automatic upon each successful CI build.
+* Production releases use increasing immutable `vMAJOR.MINOR.PATCH` tags selecting an exact tested main commit; ordinary main pushes publish nothing. Issue one application release at a time and recover with a tested correction/revert and next patch, without automatic schema rollback. Follow the [release runbook](../gcp/conditional-backend-deploy.md).
 * Less than 10 second downtime while deploying \*
 * User data integrity and security are assured at all times.
 * The user manual is kept up-to-date, and users are informed of changes.

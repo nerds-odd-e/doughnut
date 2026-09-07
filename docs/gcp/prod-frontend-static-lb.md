@@ -2,18 +2,18 @@
 
 Runbook for production static hosting: one browser-facing hostname, HTTPS load balancer path rules, backend bucket (and optional Cloud CDN) for the Vue build, managed instance group (MIG) for Spring Boot.
 
-**Related:** After green CI on `main`, the [deploy workflow](../../.github/workflows/deploy.yml) uploads each commit’s SPA tree to `gs://<GCS_FRONTEND_BUCKET>/frontend/<GITHUB_SHA>/` and the CLI install binary to `gs://<GCS_FRONTEND_BUCKET>/doughnut-cli-latest/doughnut` ([`upload-frontend-static-to-gcs.sh`](../../infra/gcp/scripts/upload-frontend-static-to-gcs.sh), [`upload-cli-binary-to-gcs.sh`](../../infra/gcp/scripts/upload-cli-binary-to-gcs.sh)). In [`.github/workflows/deploy.yml`](../../.github/workflows/deploy.yml), `GCS_FRONTEND_BUCKET` is the public static bucket (e.g. `dough-frontend-01`); `GCS_BUCKET` is deploy-only (jars, `deploy/`, etc., e.g. `dough-01`).
+**Related:** For a qualifying `vMAJOR.MINOR.PATCH` release with successful exact-SHA main CI, the [deploy workflow](../../.github/workflows/deploy.yml) uploads the selected commit’s SPA tree to `gs://<GCS_FRONTEND_BUCKET>/frontend/<GITHUB_SHA>/` and the CLI install binary to `gs://<GCS_FRONTEND_BUCKET>/doughnut-cli-latest/doughnut` ([`upload-frontend-static-to-gcs.sh`](../../infra/gcp/scripts/upload-frontend-static-to-gcs.sh), [`upload-cli-binary-to-gcs.sh`](../../infra/gcp/scripts/upload-cli-binary-to-gcs.sh)). In [`.github/workflows/deploy.yml`](../../.github/workflows/deploy.yml), `GCS_FRONTEND_BUCKET` is the public static bucket (e.g. `dough-frontend-01`); `GCS_BUCKET` is deploy-only (jars, `deploy/`, etc., e.g. `dough-01`).
 
 ## Release at a glance
 
 | Step | What happens |
 |------|----------------|
 | Green `main` **Package-artifacts** (CI) | Builds SPA, CLI, and fat jar; uploads GitHub Actions artifacts for deploy. |
-| Green `main` **Deploy** ([deploy workflow](../../.github/workflows/deploy.yml)) | Downloads CI artifacts; SPA → `gs://<GCS_FRONTEND_BUCKET>/frontend/<GITHUB_SHA>/`; CLI → same bucket; jar + `deploy/last-successful-deploy.json` → `GCS_BUCKET`. Always runs [`apply-doughnut-app-service-url-map.sh`](../../infra/gcp/scripts/apply-doughnut-app-service-url-map.sh) so the LB serves that pipeline’s `frontend/<GITHUB_SHA>/` (including frontend-only commits). |
+| Admitted application tag **Deploy** ([deploy workflow](../../.github/workflows/deploy.yml)) | Downloads CI artifacts; SPA → `gs://<GCS_FRONTEND_BUCKET>/frontend/<GITHUB_SHA>/`; CLI → same bucket; jar + `deploy/last-successful-deploy.json` → `GCS_BUCKET`. Always runs [`apply-doughnut-app-service-url-map.sh`](../../infra/gcp/scripts/apply-doughnut-app-service-url-map.sh) so the LB serves the selected release’s `frontend/<GITHUB_SHA>/` (including frontend-only commits). |
 | Backend MIG | Jar upload + rolling replace when the jar hash or startup script hash differs from the record — [conditional-backend-deploy.md](conditional-backend-deploy.md). |
 | Routing edits | Change [`doughnut-routing.json`](../../infra/gcp/path-routing/doughnut-routing.json); CI must pass `pnpm validate:path-routing`. |
-| **Frontend rollback** | Render + validate + `gcloud url-maps import` for an older SHA whose `frontend/<SHA>/` still exists (commands under [Recovery / manual import](#cutover-checklist-new-frontend-bucket) below). |
-| **Backend rollback / bad record** | Redeploy a known-good jar, use `force-deployment: true`, or fix `deploy/last-successful-deploy.json` in `GCS_BUCKET` — [conditional-backend-deploy.md](conditional-backend-deploy.md). |
+| **Release correction** | Test a correction/revert on main and issue the next patch version, one application release at a time; do not rerun old releases or move tags. No automatic schema rollback. See the [release runbook](conditional-backend-deploy.md). |
+| **Backend record repair** | See [conditional-backend-deploy.md](conditional-backend-deploy.md) for deliberate infrastructure repair; the record is not an application release ledger. |
 
 ---
 
@@ -34,26 +34,26 @@ Do **not** treat `https://storage.googleapis.com/...` as the primary UI origin: 
 | GCS bucket (public static: SPA + CLI) | `dough-frontend-01` — deploy workflow `GCS_FRONTEND_BUCKET` |
 | GCS bucket (deploy / private ops) | `dough-01` — deploy workflow `GCS_BUCKET` (jars, `deploy/`, etc.; **no** `allUsers` needed for prod UI) |
 | Backend bucket (CDN on) | `doughnut-frontend-backend-bucket` → **`dough-frontend-01`** (not the deploy bucket) |
-| URL map (HTTPS) | `doughnut-app-service-map` — routing source [`infra/gcp/path-routing/doughnut-routing.json`](../../infra/gcp/path-routing/doughnut-routing.json); deploy workflow renders YAML with `GITHUB_SHA` and imports after each green `main` CI run |
+| URL map (HTTPS) | `doughnut-app-service-map` — routing source [`infra/gcp/path-routing/doughnut-routing.json`](../../infra/gcp/path-routing/doughnut-routing.json); deploy workflow renders YAML with `GITHUB_SHA` and imports for each admitted application tag |
 | HTTPS target proxy | `doughnut-app-service-map-target-proxy-2` → above URL map |
 | MIG backend service | `doughnut-app-service` (default path matcher + API traffic) |
 | GCS read for LB + CDN | Prefer **`roles/storage.objectViewer`** on `dough-frontend-01` for `allUsers` **only on this bucket**, or keep the bucket private and grant the default Compute SA, `service-<PROJECT_NUMBER>@compute-system.iam.gserviceaccount.com`, and (with Cloud CDN) `service-<PROJECT_NUMBER>@cloud-cdn-fill.iam.gserviceaccount.com`. With **Cloud CDN** enabled, Google’s docs require the CDN fill SA when the bucket is not publicly readable. |
 
 ### Cutover checklist (new frontend bucket)
 
-Do this **before** the first green `main` run that uses `GCS_FRONTEND_BUCKET`:
+Do this **before** the first application release that uses `GCS_FRONTEND_BUCKET`:
 
 1. Create `gs://dough-frontend-01` (or your chosen name; keep [`.github/workflows/deploy.yml`](../../.github/workflows/deploy.yml) in sync).
 2. Point global backend bucket **`doughnut-frontend-backend-bucket`** at that GCS bucket (replace any attachment to `dough-01` for static serving).
 3. Grant IAM on **that** bucket for LB + CDN as in the table above.
-4. Optionally copy existing `frontend/*` and `doughnut-cli-latest/*` objects from the old bucket if you need rollback SHAs to resolve before the next CI upload.
+4. Optionally copy existing `frontend/*` and `doughnut-cli-latest/*` objects from the old bucket if the currently active SHA must resolve before the next release upload.
 5. Remove **`allUsers`** (and any overly broad read) from **`dough-01`** once nothing public depends on it.
 
 **Org constraint:** If your org forbids `allUsers` with IAM **conditions** (`PublicResourceAllowConditionCheck`), you cannot scope “public read only under `frontend/`” on one mixed bucket via conditional bindings; a **dedicated** frontend bucket avoids that.
 
-**Normal release:** On green `main`, CI runs [`apply-doughnut-app-service-url-map.sh`](../../infra/gcp/scripts/apply-doughnut-app-service-url-map.sh) (render from `doughnut-routing.json` + `pnpm validate:path-routing` equivalent + `gcloud compute url-maps import`) so the LB serves `frontend/<GITHUB_SHA>/` for that pipeline.
+**Normal release:** An increasing immutable application tag waits up to 60 minutes for its exact main commit’s successful CI; the deploy workflow runs [`apply-doughnut-app-service-url-map.sh`](../../infra/gcp/scripts/apply-doughnut-app-service-url-map.sh) (render from `doughnut-routing.json` + `pnpm validate:path-routing` equivalent + `gcloud compute url-maps import`) so the LB serves `frontend/<GITHUB_SHA>/` for that selected release. Ordinary main pushes publish nothing. Follow the [release runbook](conditional-backend-deploy.md), including the first-release requirement that selected source contains the new tag trigger.
 
-**Recovery / manual import:** Render for a known commit (40-char SHA) whose tree exists under `gs://<GCS_FRONTEND_BUCKET>/frontend/<SHA>/`, validate, then import:
+**Infrastructure repair / manual import:** To repair routing for the currently selected release, render its commit (40-char SHA) whose tree exists under `gs://<GCS_FRONTEND_BUCKET>/frontend/<SHA>/`, validate, then import:
 
 ```bash
 gcloud config set project carbon-syntax-298809
@@ -62,7 +62,7 @@ pnpm exec node scripts/validate-url-map-static-vs-backend-hints.mjs --url-map /t
 gcloud compute url-maps import doughnut-app-service-map --source=/tmp/url-map.yaml --global --quiet
 ```
 
-Add entries under `gcpUrlMap.staticPathRules` in [`doughnut-routing.json`](../../infra/gcp/path-routing/doughnut-routing.json) for any **new root-level** static files (same pattern as `odd-e.ico` / `odd-e.png`), merge to `main`, and let CI apply the updated map.
+Add entries under `gcpUrlMap.staticPathRules` in [`doughnut-routing.json`](../../infra/gcp/path-routing/doughnut-routing.json) for any **new root-level** static files (same pattern as `odd-e.ico` / `odd-e.png`), merge to `main`, and release that tested commit with the next application version to apply the updated map.
 
 HTTP forwarding (`doughnut-app-web-map-http`) is unchanged and does not use this map.
 
@@ -70,7 +70,7 @@ HTTP forwarding (`doughnut-app-web-map-http`) is unchanged and does not use this
 
 ## Choosing the **active** frontend revision
 
-CI writes **immutable** prefixes: `frontend/<GITHUB_SHA>/`. See [Release at a glance](#release-at-a-glance) for the automatic path; rollback uses the [manual import](#cutover-checklist-new-frontend-bucket) commands above.
+Application releases write commit-addressed prefixes: `frontend/<GITHUB_SHA>/`. See [Release at a glance](#release-at-a-glance) for the automatic path; corrections use a tested main correction/revert and next patch, as described in the [release runbook](conditional-backend-deploy.md).
 
 **Alternatives (tradeoffs):**
 
@@ -164,7 +164,7 @@ Treat URL map / backend edits as **production infrastructure**: restrict to proj
 
 ### GitHub Actions deploy SA and `url-maps import`
 
-CI runs [`apply-doughnut-app-service-url-map.sh`](../../infra/gcp/scripts/apply-doughnut-app-service-url-map.sh), which calls `gcloud compute url-maps import`. Grant the deploy service account (e.g. `doughnut-ci-gcp-deploy-svc-acc@…`) **`roles/compute.loadBalancerAdmin`** on the **project**: that single role includes **`compute.urlMaps.update`** plus **`compute.backendServices.use`** and **`compute.backendBuckets.use`** on the backends referenced by the map (separate per-resource bindings are not required).
+The deploy workflow runs [`apply-doughnut-app-service-url-map.sh`](../../infra/gcp/scripts/apply-doughnut-app-service-url-map.sh), which calls `gcloud compute url-maps import`. Grant the deploy service account (e.g. `doughnut-ci-gcp-deploy-svc-acc@…`) **`roles/compute.loadBalancerAdmin`** on the **project**: that single role includes **`compute.urlMaps.update`** plus **`compute.backendServices.use`** and **`compute.backendBuckets.use`** on the backends referenced by the map (separate per-resource bindings are not required).
 
 If Deploy returns **403** mentioning `compute.urlMaps.update` or `compute.backendServices.use`, run [`grant-doughnut-ci-deploy-url-map-iam.sh`](../../infra/gcp/scripts/grant-doughnut-ci-deploy-url-map-iam.sh) (or add the same project binding manually). Override SA with `CI_DEPLOY_GCP_SA=…@….iam.gserviceaccount.com` if needed.
 
@@ -188,4 +188,4 @@ Confirm: **HTML/JS** responses are from the **expected** revision (e.g. unique h
 
 ## Spring Boot jar (no SPA or CLI inside)
 
-The **deployable boot jar** does **not** embed `classpath:/static/**` (no SPA, no CLI). **Conditional MIG skip** compares only the **jar** hash to `deploy/last-successful-deploy.json`. Each green **deploy** run uploads **frontend** and **CLI** to **`GCS_FRONTEND_BUCKET`**; jars and the deploy record stay on **`GCS_BUCKET`**.
+The **deployable boot jar** does **not** embed `classpath:/static/**` (no SPA, no CLI). **Conditional MIG skip** compares the **jar** and committed **startup script** hashes to `deploy/last-successful-deploy.json`. Each admitted application release uploads **frontend** and **CLI** to **`GCS_FRONTEND_BUCKET`**; jars and the deploy record stay on **`GCS_BUCKET`**.

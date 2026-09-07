@@ -1,8 +1,8 @@
 # Release one chosen Donut version
 
 Source: [SEED-013 Story 1](../../seeds/SEED-013-version-tag-production-releases.md#story-1).
-Status: planned; no implementation started.
-Readiness: ready for direct execution within the reduced single-release scope.
+Status: branch implementation complete on codex/version-tag-production-releases; post-merge observation pending.
+Readiness: ready for parent merge and platform observation; no code leaf remains unimplemented.
 Continuation: [Story 2 plan](../048-release-recovery-and-ordering/PLAN.md).
 
 ## Goal, scope and stopping point
@@ -91,7 +91,8 @@ scheduler. The clock/sleep boundary is replaceable for bounded-wait proof.
 
 ### 1. Stop publication on ordinary main pushes
 Type: Behavior
-Status: planned
+Status: done
+Evidence: `CURSOR_DEV=true nix develop -c node --test scripts/ci/application-release.test.mjs` passed 2/2; parsed main CI, paused application dependency graph, independent CLI tag trigger. Independent refactor: no edits. Local observation only; default-branch effect awaits merge.
 Proof: Keep main CI and independent CLI tag wiring; application publication is
 unreachable from a normal main CI completion.
 
@@ -101,7 +102,8 @@ already active deployment. Note the temporary pause; leaf 10 removes it.
 
 ### 2. Identify the exact tagged main commit
 Type: Behavior
-Status: planned
+Status: done
+Evidence: `CURSOR_DEV=true nix develop -c bash scripts/test/application-release.test` passed 17/17, including real shallow repositories, lightweight/annotated tags behind main, off-main/invalid/forced/deleted/changed refs and workflow identity outputs. Refactor moved deleted-ref coverage through the command and removed test-only exports; 17/17 remains green. Retained raw refOid must be rechecked before production writes in leaves 7/9.
 Proof: Entry-command fixtures resolve lightweight/annotated stable tags behind
 HEAD and reject invalid shapes/off-main selections.
 
@@ -111,7 +113,8 @@ wrapper. Expose selected identity to the workflow while publication is disabled.
 
 ### 3. Require successful CI for that exact commit
 Type: Behavior
-Status: planned
+Status: done
+Evidence: `CURSOR_DEV=true nix develop -c bash scripts/test/application-release.test` passed 36/36. Actual CI command HTTP fixtures cover exact repo/workflow/main-push/SHA, latest run/attempt, pagination/cap, transport errors and pending/terminal outcomes. GitHub workflow paths may include @ref suffix; covered. Refactor shared JSON/GITHUB_OUTPUT serialization, reran 36/36.
 Proof: Transport fixtures admit only the matching repository/ci.yml/main-push
 run for the selected SHA, with its latest applicable conclusion.
 
@@ -121,7 +124,8 @@ transport errors. No state store or search for another release candidate.
 
 ### 4. Wait for the selected commit's unfinished CI
 Type: Behavior
-Status: planned
+Status: done
+Evidence: `CURSOR_DEV=true nix develop -c bash scripts/test/application-release.test` passed 46/46. Fake-clock selected-CI boundary proves appearance/completion, already-green, newer attempts, terminal fail/cancel, 60-minute deadline including transport, pause/lookup cancellation and timer cleanup; actual default command waits. Independent refactor: no edits.
 Proof: Tag-before-CI, already-green and newer-rerun fixtures converge to the
 correct readiness outcome; fake time proves failure/timeout terminates waiting.
 
@@ -132,7 +136,8 @@ CI. This wait is removed by Story 2's final activation leaf.
 
 ### 5. Stage the validated payload before any publication
 Type: Behavior
-Status: planned
+Status: done
+Evidence: `CURSOR_DEV=true nix develop -c bash scripts/test/application-release.test` passed 57/57. Actual preflight permits complete payload and prevents subsequent write for missing/empty/directory backend, SPA shell or CLI. Parsed downloads retain action/name, admitted run_id and dedicated paths before preflight/publication; expired downloads use action failure propagation (no live download tested). Independent refactor: no edits.
 Proof: Selected-run artifact fixtures stage backend/frontend/CLI in dedicated
 paths; missing or expired content produces no production calls.
 
@@ -142,7 +147,8 @@ Detailed regeneration/resumption support belongs to Story 2; fail loudly here.
 
 ### 6. Give existing publication one shared owner
 Type: Structure
-Status: planned
+Status: done
+Evidence: `CURSOR_DEV=true nix develop -c bash scripts/test/application-release.test` passed 60/60. Actual publisher trace proves frontend → CLI → backend, matching-hash skip and force-token rollout; parsed callers retain independent CLI tag/version/build. Existing regressions passed: `CURSOR_DEV=true nix develop -c bash scripts/test/upload-cli-binary-to-gcs.sh.test`; `CURSOR_DEV=true nix develop -c bash scripts/test/upload-frontend-static-to-gcs.sh.test`; `CURSOR_DEV=true nix develop -c bash scripts/test/deploy-backend-jar-to-gcp-mig.sh.test`. Independent refactor: no edits.
 Proof: Extracted command retains frontend → CLI → backend operation order;
 existing CLI upload tests and independent tag/version wiring remain green.
 
@@ -153,7 +159,8 @@ release-state or general orchestration framework.
 
 ### 7. Publish the selected source with current orchestration
 Type: Behavior
-Status: planned
+Status: done
+Evidence: `CURSOR_DEV=true nix develop -c bash scripts/test/application-release.test` passed 63/63. Current publisher drives annotated A behind B, selected routing/startup bytes+hash/force token; moved ref, invalid routing and wrong checkout make no production calls. `CURSOR_DEV=true nix develop -c bash -c 'bash scripts/test/deploy-backend-jar-to-gcp-mig.sh.test && bash scripts/test/apply-doughnut-app-service-url-map-wiring.test && bash scripts/test/upload-frontend-static-to-gcs.sh.test && bash scripts/test/upload-cli-binary-to-gcs.sh.test'` passed. Independent refactor: no edits.
 Proof: Distinct source/control checkouts show selected SHA, routing/startup bytes
 and force token in the external-operation trace. Existing backend skip/health
 and frontend/CLI upload regressions stay green.
@@ -165,7 +172,8 @@ the selected source. Remote publication remains gated until leaf 10.
 
 ### 8. Identify the failed release in existing diagnostics
 Type: Behavior
-Status: planned
+Status: done
+Evidence: `CURSOR_DEV=true nix develop -c bash scripts/test/application-release.test` passed 70/70. Actual failed CI outputs retain run/attempt and feed selected-release notification; renderer covers early unknown identity, CI/artifact/publication stage and safe JSON. Parsed job dependencies/outcomes include admission failure with skipped Deploy. No Slack sent. Independent refactor: no edits.
 Proof: Early CI/artifact and late publication failure fixtures render selected
 tag/SHA/CI context when known, without claiming main HEAD or sending Slack.
 
@@ -175,7 +183,8 @@ failure coverage for both admission and publication jobs.
 
 ### 9. Wire the single-release path before activating it
 Type: Structure
-Status: planned
+Status: done
+Evidence: `CURSOR_DEV=true nix develop -c bash scripts/test/application-release.test` passed 71/71. Parsed graph pins control SHA and selected source/run/artifacts/auth with one non-canceling group; actual workflow publication command overrides deliberately wrong inherited GITHUB_SHA via RELEASE_SHA. Admission timeout 70 minutes, publication 60. False gate retained for leaf 10. Refactor removed redundant concurrency assertion and re-proved 71/71.
 Proof: Parsed workflow connects tag identity, bounded CI wait, artifact run ID,
 separate source/control checkouts and existing credentials before publication;
 one non-canceling application concurrency group and the false gate remain.
@@ -186,7 +195,10 @@ no new policy, state or diagnostic behavior is added in this wiring leaf.
 
 ### 10. Enable working tag releases with the interim operating rule
 Type: Behavior
-Status: planned
+Status: in-progress
+Implementation: complete on branch; only parent-owned post-merge observation remains.
+Evidence: `CURSOR_DEV=true nix develop -c bash scripts/test/application-release.test` passed 73/73 after activation. Joined tag-first and CI-first replays drive actual identity, real bounded CI query/wait with fake transport/time, and literal workflow publisher; captured SPA/CLI bytes and jar hash belong to the selected run/SHA. Parsed trigger is tag-only with no false gate or workflow_run. All five requested runbook/overview files updated; independent refactor made no edits.
+Combined proof before activation: `CURSOR_DEV=true nix develop -c bash -c 'bash scripts/test/application-release.test && bash scripts/test/deploy-backend-jar-to-gcp-mig.sh.test && bash scripts/test/apply-doughnut-app-service-url-map-wiring.test && bash scripts/test/upload-frontend-static-to-gcs.sh.test && bash scripts/test/upload-cli-binary-to-gcs.sh.test'` passed. Subsequent activation changed only trigger assertions and docs; the full release wrapper was rerun.
 Proof: Tag-first and CI-first entry-point replays publish the selected payload;
 ordinary main push has no publication trigger. Runbook examples match outcomes.
 
@@ -207,10 +219,10 @@ scrutinize; at ten finer-decompose unless an observed focused-test runtime expla
 it. This story has simpler integration work than Story 2's state transitions;
 leaf count is not a time guarantee.
 
-Proposed focused release suite and existing regressions:
+Focused release suite and existing regressions:
 
 ```bash
-CURSOR_DEV=true nix develop -c node --test scripts/ci/application-release.test.mjs
+CURSOR_DEV=true nix develop -c bash scripts/test/application-release.test
 CURSOR_DEV=true nix develop -c bash scripts/test/upload-cli-binary-to-gcs.sh.test
 CURSOR_DEV=true nix develop -c bash scripts/test/upload-frontend-static-to-gcs.sh.test
 CURSOR_DEV=true nix develop -c bash scripts/test/deploy-backend-jar-to-gcp-mig.sh.test
@@ -227,7 +239,7 @@ Execution uses execute-plan: Jidoka → fresh post-change-refactor agent → API
 regeneration only if needed → coordinator format:changed once → update this PLAN
 → commit/push → asynchronous CI observation. Preserve unrelated files. Finish
 and clean up this plan after Story 1 without deleting Story 2 or its requirements;
-reduce only the completed home story's detail. This task is planning only.
+reduce only the completed home story's detail. Execution authorized; main-only actions belong to the parent coordinator.
 
 ## Split provenance
 
@@ -236,3 +248,55 @@ CI reconciliation is replaced here by a bounded single-tag wait. Basic operator
 guidance from former leaf 16 is kept in activation. All former durable state,
 recovery and ordering promises remain in Story 2. No implementation evidence
 existed to invalidate. The user explicitly requested the new two-plan split.
+
+## Execution environment
+
+- Worktree: `/Users/terryyin/.codex/worktrees/c158/doughnut`; coordinator task Story 1 / c158.
+- CI observer attempted before first push via `./scripts/run.sh node .agents/skills/execute-plan/scripts/ci-mailbox.mjs stream --execution nerds-odd-e/doughnut main`. Nix daemon socket returned Operation not permitted before observer startup; cell 6 exited, no mailbox/PID/session created. CI observation unavailable; pendingCi: unobserved. Branch pushes do not trigger this repository's main-only CI.
+- No production tags, settings, deployment calls, or main changes are authorized in this worktree. Post-merge scheduling/first-real-release observation belongs to the parent; local workflow activation remains branch work.
+
+- Final wiring learning: GitHub reserves default GITHUB_* YAML variables. Leaf 9 now carries RELEASE_SHA and invokes the publisher with explicit shell GITHUB_SHA assignment; old YAML override removed.
+
+## Parent handoff and remaining observation
+
+Leaves 1–9 are committed/pushed. Leaf 10 has all implementation, local proof and
+runbook work complete. Its remaining work is **post-merge observation**, not an
+unimplemented code leaf or a disabled activation switch:
+
+1. Parent merges this branch to main; this worktree must not modify main.
+2. Observe normal main CI and absence of application publication after that push.
+   Branch pushes cannot demonstrate this repository's main-only CI scheduling.
+3. Treat the operator's first actual qualifying release as confirmation of GitHub
+   tag scheduling, selected-run artifact download, GCP credentials and production
+   outcome. No release tag was created as a test; no production write, Slack send
+   or GitHub settings change was made by this execution.
+4. After required observation, parent can mark completion, reduce only Story 1's
+   spent seed detail, remove this spent PLAN, and remove the branch/worktree.
+   Keep Quick 048 and Story 2 intact for its separately authorized continuation.
+
+CI observation was unavailable as recorded above; pendingCi: unobserved. All
+implementer/refactor subprocesses and coordinator command sessions have exited;
+the failed observer created no mailbox/process to stop. Every leaf received a
+fresh implementer and independent refactor, coordinator formatting, lint hook,
+commit and branch push. API generation was not needed.
+
+### Lessons for Story 2
+
+- There is no durable application ledger. Backend last-successful-deploy.json
+  still advances only on full jar/startup rollout, so it cannot bootstrap the
+  last frontend-only release. Successful Deploy job evidence and selected
+  tag/SHA/run/attempt diagnostics are available; do not infer app state from the
+  backend record alone or replay an old app bundle over an independent CLI.
+- querySelectedCi owns exact repo/ci.yml/main-push/SHA lookup, optional @ref workflow
+  path handling, latest run/attempt, bounded pagination and transport errors.
+  waitForSelectedCi adds the temporary runner-holding wait; Story 2 can replace
+  that owner with tag/CI-event reconciliation without duplicating CI selection.
+- The first Story 1 source must contain the tag trigger. Historical pre-cutover
+  source reconciliation needs the later default-branch CI-event mechanism.
+- Preserve pinned current orchestration versus selected source and explicit
+  shell GITHUB_SHA assignment from RELEASE_SHA when event ownership changes.
+- Admission downloads all three named artifacts from the selected run; missing
+  or expired artifacts stop before writes. Regeneration/retry, moved identity,
+  duplicate suppression and numeric overlapping-version policy remain Story 2.
+  The current non-canceling concurrency group is only sufficient with the
+  documented one-application-release-at-a-time operating rule.

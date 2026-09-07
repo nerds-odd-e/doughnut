@@ -34,8 +34,20 @@ class NotebookGitDeletionRejectionControllerTest extends NotebookGitBundleContro
             transactionManager,
             () ->
                 List.of(
-                    makeMe.aNote().notebook(notebook).title("First").content(ORIGINAL).please().getId(),
-                    makeMe.aNote().notebook(notebook).title("Second").content(ORIGINAL).please().getId()));
+                    makeMe
+                        .aNote()
+                        .notebook(notebook)
+                        .title("First")
+                        .content(ORIGINAL)
+                        .please()
+                        .getId(),
+                    makeMe
+                        .aNote()
+                        .notebook(notebook)
+                        .title("Second")
+                        .content(ORIGINAL)
+                        .please()
+                        .getId()));
     NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);
 
     ResponseStatusException exception =
@@ -49,31 +61,37 @@ class NotebookGitDeletionRejectionControllerTest extends NotebookGitBundleContro
     inCommittedTransaction(
         transactionManager,
         () -> {
-          List<Note> liveNotes = noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId());
+          List<Note> liveNotes =
+              noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId());
           assertThat(liveNotes.stream().map(Note::getId).toList(), equalTo(originalIds));
-          assertThat(liveNotes.stream().map(Note::getContent).toList(), equalTo(List.of(ORIGINAL, ORIGINAL)));
+          assertThat(
+              liveNotes.stream().map(Note::getContent).toList(),
+              equalTo(List.of(ORIGINAL, ORIGINAL)));
         });
   }
 
   static Stream<Arguments> mixedDeletionProposals() {
     NotebookGitProposalFile second = new NotebookGitProposalFile("Second.md", ORIGINAL);
     return Stream.of(
-        Arguments.of(List.of(new NotebookGitProposalFile("Second.md", "---\ntype: Note\n---\nedited"))),
-        Arguments.of(List.of(second, new NotebookGitProposalFile("Added.md", "---\ntype: Note\n---\nnew"))),
+        Arguments.of(
+            List.of(new NotebookGitProposalFile("Second.md", "---\ntype: Note\n---\nedited"))),
+        Arguments.of(
+            List.of(second, new NotebookGitProposalFile("Added.md", "---\ntype: Note\n---\nnew"))),
         Arguments.of(List.of(second, new NotebookGitProposalFile("Renamed.md", ORIGINAL))),
         Arguments.of(List.of()));
   }
 
   @ParameterizedTest
   @MethodSource("invalidRemovedFiles")
-  void rejectsRemovalOfAReservedOrNonRegularFile(
-      String path, FileMode mode, String reason) throws Exception {
+  void rejectsRemovalOfAReservedOrNonRegularFile(String path, FileMode mode, String reason)
+      throws Exception {
     Notebook notebook = createGitBackedNotebook();
     NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);
     byte[] acceptedBundle =
         proposalBundleBytes(binding, List.of(new NotebookGitProposalFile(path, ORIGINAL, mode)));
     try (InMemoryRepository repository = new InMemoryRepository(new DfsRepositoryDescription())) {
-      binding.setAcceptedGitObjectId(GitBundleTestReader.fetchHead(repository, acceptedBundle).name());
+      binding.setAcceptedGitObjectId(
+          GitBundleTestReader.fetchHead(repository, acceptedBundle).name());
     }
     binding.setBundleBytes(acceptedBundle);
     notebookGitBindingRepository.save(binding);
