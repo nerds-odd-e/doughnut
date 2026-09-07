@@ -146,7 +146,7 @@ MIG-skip success leaves backend hash bookkeeping untouched.
 
 ### 2a. Classify existing application publication evidence
 Type: Behavior
-Status: planned
+Status: done
 Proof: Controlled workflow-history and log fixtures return a published identity
 only when the Deploy publication step succeeded and the admission log supplies
 tag, raw refOid, peeled SHA and selected CI identity. CI-only, CLI-only and
@@ -159,6 +159,11 @@ history and existing admission JSON logs → classify a verified published
 identity, verified empty installation or ambiguous history without writing
 production state. Existing `writeReleaseOutput` JSON is the identity transport;
 the jobs API alone is insufficient because it omits job outputs.
+
+Learning: a read-only public classifier now pairs a successful publication step
+with the same-attempt admission log, preserving tag/refOid/SHA and selected CI
+identity. All relevant incomplete or unverifiable history stays ambiguous; only
+the observed zero-tag/zero-run case classifies as empty.
 
 ### 2b. Initialize application tracking from classified evidence
 Type: Behavior
