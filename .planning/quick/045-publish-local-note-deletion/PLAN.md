@@ -1,7 +1,7 @@
 # Publish one local note deletion
 
 Source: [SEED-009 Story 5](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-5).
-Status: slices 1–6 done; next is slice 7.
+Status: slices 1–7 done; next is slice 8.
 
 ## Learnings
 
@@ -39,6 +39,10 @@ leaves links authored; mixed deletion and same-path recreation unsupported.
 CLI clone/publish/pull tests and `cli_notebook_clone.feature` exact-copy
 passed. Cloud VM git `commit.gpgsign`/`core.fsmonitor` needed process-local
 disable for CLI tests; E2E install bundle cache can hide source changes.
+
+Slice 7: `notebook pull` already fast-forwards deletions. Proof added in
+`notebookPull.fastForward.suite.ts`; concurrent-change cases extracted to
+`notebookPull.concurrentChange.suite.ts`. No production change.
 
 ## Goal and scope
 

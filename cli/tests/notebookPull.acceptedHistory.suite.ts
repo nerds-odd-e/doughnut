@@ -16,6 +16,7 @@ import {
   checkoutState,
   installNotebookPullAcceptedHistoryTest,
 } from './notebookPull.testHelpers.js'
+import { describeNotebookPullConcurrentChange } from './notebookPull.concurrentChange.suite.js'
 import { describeNotebookPullFastForward } from './notebookPull.fastForward.suite.js'
 import { describeNotebookPullHistorySafety } from './notebookPull.historySafety.suite.js'
 
@@ -105,5 +106,6 @@ export function describeNotebookPullAcceptedHistory(): void {
   })
 
   describeNotebookPullFastForward()
+  describeNotebookPullConcurrentChange()
   describeNotebookPullHistorySafety()
 }
