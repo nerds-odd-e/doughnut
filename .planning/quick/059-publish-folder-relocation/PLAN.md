@@ -3,7 +3,7 @@
 ## Source and status
 
 Source: [SEED-009 Story 7](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-7).
-Status: in progress; slices 1–4 done.
+Status: in progress; slices 1–5 done.
 
 ## Goal and scope
 
@@ -159,9 +159,12 @@ Sizing basis: wire existing placement rules and contextual errors in one loop.
 
 ### 5. Reject a source containing an unrepresented empty descendant
 Type: Behavior
-Status: planned
+Status: done
 Proof: Add an empty descendant to an otherwise exact source subtree → controller
 publication names that excluded folder; all parents/IDs and accepted head remain.
+`CURSOR_DEV=true nix develop -c pnpm backend:test_only` passed.
+`NotebookGitProposalFolderRelocationEmptyDescendantControllerTest` names
+`Topics/Empty/`; deeper-content descendants still reserved-README.
 
 Behavior: A represented source has an active descendant folder with no tracked
 accepted content anywhere below it → publish → refuse the whole move. Compare
@@ -330,15 +333,17 @@ feature is promised. No completed evidence exists to migrate.
 
 ## Readiness and learnings
 
-Slices 1–4 done. Remaining leaves are target-sized hypotheses, not time guarantees.
+Slices 1–5 done. Remaining leaves are target-sized hypotheses, not time guarantees.
 No sizing exception is pre-approved; record actual test/external wait runtime
 separately. If integration in leaf 6 fails to converge, refine this same plan
 rather than bypass a safety gate or expand the story.
 
-Leaf 4 learning: `RepresentedFolderRelocation(sourceFolderId, destParentFolderId)`
-loads Folders via `entityPersister.find`; dest parent null is root. Collision and
-cycle errors are contextualized with `{destPrefix}/README.md`. Empty **source**
-descendants remain leaf 5.
+Leaf 5 learning: empty descendants compared as `ExportFolderRow` paths (trailing
+slash) vs accepted file prefixes. Error:
+`Descendant folder "{path}" is not represented in accepted Portable content; every active descendant must have tracked content before the folder can be moved.`
+Publisher `requireEligibleFolderRelocation` owns represented + empty-descendant +
+placement; leaf 6 should reparent after these refusals instead of falling through
+to reserved-README.
 
 CI observer delivered a 2026-09-05 E2E failure on `1d846feb` (`cli_notebook_clone`).
 That SHA is not this execution's push; later `main` CI including origin `63dbba7f74`

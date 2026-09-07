@@ -1,6 +1,5 @@
 package com.odde.donut.controllers;
 
-import static com.odde.donut.testability.CommittedTransactionTestSupport.inCommittedTransaction;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
@@ -13,9 +12,7 @@ import com.odde.donut.entities.repositories.FolderRepository;
 import com.odde.donut.exceptions.ApiException;
 import com.odde.donut.services.FolderSiblingNameValidation;
 import com.odde.donut.services.notebookExport.PortableTreeEntry;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -63,7 +60,8 @@ class NotebookGitProposalFolderRelocationPlacementControllerTest
                 + FolderSiblingNameValidation.DUPLICATE_SIBLING_NAME_HERE));
     assertThat(
         exception.getErrorBody().getErrorType(), equalTo(ApiError.ErrorType.FOLDER_NAME_CONFLICT));
-    assertFolderParentsUnchanged(notebook, archive, existingDest, topics);
+    NotebookGitProposalFolderRelocationParentMap.assertUnchanged(
+        transactionManager, folderRepository, notebook, archive, existingDest, topics);
   }
 
   @Test
@@ -89,7 +87,8 @@ class NotebookGitProposalFolderRelocationPlacementControllerTest
     assertThat(
         exception.getErrorBody().getMessage(),
         containsString(FolderSiblingNameValidation.DUPLICATE_SIBLING_NAME_HERE));
-    assertFolderParentsUnchanged(notebook, archive, emptyDest, topics);
+    NotebookGitProposalFolderRelocationParentMap.assertUnchanged(
+        transactionManager, folderRepository, notebook, archive, emptyDest, topics);
   }
 
   @Test
@@ -112,7 +111,8 @@ class NotebookGitProposalFolderRelocationPlacementControllerTest
     assertThat(exception.getStatusCode(), equalTo(HttpStatus.BAD_REQUEST));
     assertThat(exception.getReason(), containsString("Topics/Topics/README.md"));
     assertThat(exception.getReason(), containsString("Cannot move folder into itself."));
-    assertFolderParentsUnchanged(notebook, topics);
+    NotebookGitProposalFolderRelocationParentMap.assertUnchanged(
+        transactionManager, folderRepository, notebook, topics);
   }
 
   @Test
@@ -142,7 +142,8 @@ class NotebookGitProposalFolderRelocationPlacementControllerTest
             ResponseStatusException.class);
 
     assertThat(exception.getReason(), containsString("Cannot move folder into its descendant."));
-    assertFolderParentsUnchanged(notebook, topics, sub);
+    NotebookGitProposalFolderRelocationParentMap.assertUnchanged(
+        transactionManager, folderRepository, notebook, topics, sub);
   }
 
   private <T extends RuntimeException> T publishRejectedAs(
@@ -156,24 +157,6 @@ class NotebookGitProposalFolderRelocationPlacementControllerTest
         binding.getAcceptedGitObjectId(),
         proposalBundleBytes(binding, asProposal(proposed)),
         exceptionType);
-  }
-
-  private void assertFolderParentsUnchanged(Notebook notebook, Folder... folders) {
-    Map<Integer, Integer> expectedParents = parentById(List.of(folders));
-    inCommittedTransaction(
-        transactionManager,
-        () ->
-            assertThat(
-                parentById(folderRepository.findByNotebookIdOrderByIdAsc(notebook.getId())),
-                equalTo(expectedParents)));
-  }
-
-  private static Map<Integer, Integer> parentById(List<Folder> folders) {
-    Map<Integer, Integer> parents = new HashMap<>();
-    for (Folder folder : folders) {
-      parents.put(folder.getId(), folder.getParentFolderId());
-    }
-    return parents;
   }
 
   private static List<PortableTreeEntry> moveTopicsUnderArchive() {

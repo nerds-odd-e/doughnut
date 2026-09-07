@@ -115,12 +115,7 @@ public class NotebookGitProposalPublisher {
     NotebookGitProposalFolderShape.requireExactOrEmpty(files)
         .ifPresent(
             relocation ->
-                NotebookGitProposalFolderPlacement.requireAllowed(
-                    projection.requireRepresentedFolderRelocation(
-                        folders, proposal.repository(), acceptedHead, relocation),
-                    entityPersister,
-                    folderSiblingNameValidation,
-                    relocation.destPrefix()));
+                requireEligibleFolderRelocation(folders, proposal, acceptedHead, relocation));
     List<NotebookGitProposalTreeShape.NoteChange> noteChanges =
         NotebookGitProposalTreeShape.requireAllowedNoteChangesFromInspectedFiles(files);
     NotebookGitProposalMarkdownFormat.assertValidTypedMarkdown(
@@ -162,6 +157,20 @@ public class NotebookGitProposalPublisher {
     binding.setUpdatedAt(publishedAt);
     entityPersister.save(binding);
     return written.headObjectId();
+  }
+
+  private void requireEligibleFolderRelocation(
+      List<ExportFolderRow> folders,
+      NotebookGitProposalImporter.ImportedProposal proposal,
+      ObjectId acceptedHead,
+      NotebookGitProposalFolderShape.FolderRelocation relocation) {
+    NotebookGitProjection.RepresentedFolderRelocation represented =
+        projection.requireRepresentedFolderRelocation(
+            folders, proposal.repository(), acceptedHead, relocation);
+    projection.requireNoUnrepresentedEmptySourceDescendants(
+        folders, proposal.repository(), acceptedHead, represented.sourceFolderId());
+    NotebookGitProposalFolderPlacement.requireAllowed(
+        represented, entityPersister, folderSiblingNameValidation, relocation.destPrefix());
   }
 
   private Note applyAddition(

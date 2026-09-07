@@ -101,13 +101,29 @@ public class NotebookGitProjection {
             .filter(candidate -> folderPath(candidate, folderById).equals(requiredFolderPath))
             .findFirst()
             .orElseThrow(() -> unrepresentedParentFolder(pathForError));
-    boolean representedInAcceptedContent =
-        readEntries(repository, acceptedHead).stream()
-            .anyMatch(entry -> entry.path().startsWith(requiredFolderPath));
-    if (!representedInAcceptedContent) {
+    if (!representedInAccepted(requiredFolderPath, readEntries(repository, acceptedHead))) {
       throw unrepresentedParentFolder(pathForError);
     }
     return folder.id();
+  }
+
+  void requireNoUnrepresentedEmptySourceDescendants(
+      List<ExportFolderRow> folders,
+      Repository repository,
+      ObjectId acceptedHead,
+      int sourceFolderId) {
+    Map<Integer, ExportFolderRow> folderById = indexFoldersById(folders);
+    String sourcePath = folderPath(folderById.get(sourceFolderId), folderById);
+    List<PortableTreeEntry> accepted = readEntries(repository, acceptedHead);
+    for (ExportFolderRow folder : folders) {
+      String descendantPath = folderPath(folder, folderById);
+      if (descendantPath.equals(sourcePath) || !descendantPath.startsWith(sourcePath)) {
+        continue;
+      }
+      if (!representedInAccepted(descendantPath, accepted)) {
+        throw unrepresentedEmptyDescendant(descendantPath);
+      }
+    }
   }
 
   public Note requireOneLiveNoteAtPath(
@@ -154,6 +170,15 @@ public class NotebookGitProjection {
             + " before publishing.");
   }
 
+  private static ResponseStatusException unrepresentedEmptyDescendant(String descendantPath) {
+    return new ResponseStatusException(
+        HttpStatus.BAD_REQUEST,
+        "Descendant folder \""
+            + descendantPath
+            + "\" is not represented in accepted Portable content; every active descendant must"
+            + " have tracked content before the folder can be moved.");
+  }
+
   private static ResponseStatusException unrepresentedParentFolder(String notePath) {
     return new ResponseStatusException(
         HttpStatus.BAD_REQUEST,
@@ -192,6 +217,11 @@ public class NotebookGitProjection {
     String folderPath =
         folder == null ? "" : folderPath(folderById.get(folder.getId()), folderById);
     return folderPath + note.getTitle() + ".md";
+  }
+
+  private static boolean representedInAccepted(
+      String folderPath, List<PortableTreeEntry> accepted) {
+    return accepted.stream().anyMatch(entry -> entry.path().startsWith(folderPath));
   }
 
   private static Map<Integer, ExportFolderRow> indexFoldersById(List<ExportFolderRow> folders) {
