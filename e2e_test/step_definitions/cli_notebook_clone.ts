@@ -66,6 +66,12 @@ When(
 )
 
 When(
+  'I commit a removal of {string} in the cloned checkout',
+  (relativePath: string) =>
+    cli.notebookCloneCheckout().commitRemoval(relativePath)
+)
+
+When(
   'I publish the cloned checkout expecting rejection from the installed CLI',
   () => cli.notebookCloneCheckout().publishExpectingRejection()
 )

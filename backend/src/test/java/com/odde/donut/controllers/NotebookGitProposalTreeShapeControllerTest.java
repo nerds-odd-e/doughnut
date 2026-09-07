@@ -18,8 +18,8 @@ import org.springframework.web.server.ResponseStatusException;
 
 /**
  * Verifies {@code publishNotebookGitProposal}'s tree-shape gating: a proposal that is not an
- * identical-heads no-op must change one regular Markdown note or include an addition among several
- * added or modified notes.
+ * identical-heads no-op must change one regular Markdown note, include an addition among several
+ * added or modified notes, or delete exactly one ordinary note in isolation.
  */
 class NotebookGitProposalTreeShapeControllerTest extends NotebookGitBundleControllerTestBase {
 
@@ -91,21 +91,6 @@ class NotebookGitProposalTreeShapeControllerTest extends NotebookGitBundleContro
     assertThat(
         exception.getReason(), containsString("not represented in accepted Portable content"));
     assertThat(noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId()), empty());
-  }
-
-  @Test
-  void rejectsProposalThatDeletesAFileWithoutMutatingTheAcceptedBinding() throws Exception {
-    Notebook notebook = createGitBackedNotebook();
-    NotebookGitBinding binding = seedAcceptedBinding(notebook, baselineEntries());
-    byte[] bundleBytes =
-        proposalBundleBytes(
-            binding, List.of(new NotebookGitProposalFile("README.md", "readme original")));
-
-    ResponseStatusException exception =
-        assertProposalRejectedWithoutMutatingBinding(
-            notebook, binding.getAcceptedGitObjectId(), bundleBytes, HttpStatus.BAD_REQUEST);
-
-    assertThat(exception.getReason(), containsString("note.md"));
   }
 
   @Test

@@ -9,9 +9,11 @@ import static org.hamcrest.Matchers.nullValue;
 
 import com.odde.donut.controllers.dto.NoteCreationDTO;
 import com.odde.donut.controllers.dto.NoteUpdateContentDTO;
+import com.odde.donut.entities.MemoryTracker;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookGitBinding;
+import com.odde.donut.entities.repositories.MemoryTrackerRepository;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,13 +30,86 @@ class NotebookGitProjectionDriftControllerTest extends NotebookGitBundleControll
   private static final String WEB_CONTENT = "---\ntype: Note\n---\nweb content";
 
   @Autowired TextContentController textContentController;
+  @Autowired MemoryTrackerRepository memoryTrackerRepository;
 
   @Test
   void rejectsAnAdditionBasedOnAnOldParentAfterWebContentAdvancedAcceptedMain() throws Exception {
+    rejectBasedOnAnOldParentAfterWebContentAdvancedAcceptedMain(this::additionProposalBundle);
+  }
+
+  @Test
+  void rejectsADeletionBasedOnAnOldParentAfterWebContentAdvancedAcceptedMain() throws Exception {
+    Note remaining =
+        rejectBasedOnAnOldParentAfterWebContentAdvancedAcceptedMain(
+            this::isolatedDeletionProposalBundle);
+    assertThat(remaining.getDeletedAt(), nullValue());
+  }
+
+  @Test
+  void rejectsAnAdditionWhenAWebCreationOccupiesItsDestination() throws Exception {
+    rejectWhenAWebCreationHasDriftedTheProjection(this::additionProposalBundle);
+  }
+
+  @Test
+  void rejectsADeletionWhenAWebCreationHasDriftedTheProjection() throws Exception {
+    DriftedWebCreation remaining =
+        rejectWhenAWebCreationHasDriftedTheProjection(this::isolatedDeletionProposalBundle);
+    assertThat(remaining.acceptedNote().getDeletedAt(), nullValue());
+    assertThat(
+        memoryTrackerRepository.findById(remaining.tracker().getId()).orElseThrow().getDeletedAt(),
+        nullValue());
+  }
+
+  private DriftedWebCreation rejectWhenAWebCreationHasDriftedTheProjection(
+      ProposalBundleFactory proposalFactory) throws Exception {
+    Notebook notebook = createGitBackedNotebook();
+    Note acceptedNote =
+        makeMe.aNote().notebook(notebook).title("note").content(ACCEPTED_CONTENT).please();
+    NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);
+    MemoryTracker tracker =
+        inCommittedTransaction(
+            transactionManager,
+            () ->
+                makeMe
+                    .aMemoryTrackerFor(noteRepository.findById(acceptedNote.getId()).orElseThrow())
+                    .please());
+    NoteCreationDTO webCreation = new NoteCreationDTO();
+    webCreation.setNewTitle("addition");
+    webCreation.setContent("web content");
+    Note occupiedDestination =
+        noteRepository
+            .findById(controller.createNoteAtNotebookRoot(notebook, webCreation).getId())
+            .orElseThrow();
+
+    byte[] proposal = proposalFactory.create(binding);
+
+    ResponseStatusException exception =
+        assertProposalRejectedWithoutMutatingBinding(
+            notebook, binding.getAcceptedGitObjectId(), proposal, HttpStatus.CONFLICT);
+
+    assertThat(exception.getStatusCode(), equalTo(HttpStatus.CONFLICT));
+    assertThat(exception.getReason(), containsString("refresh the checkout before publishing"));
+    Note reloadedAccepted = noteRepository.findById(acceptedNote.getId()).orElseThrow();
+    assertThat(reloadedAccepted.getContent(), equalTo(ACCEPTED_CONTENT));
+    Note reloadedOccupiedDestination =
+        noteRepository.findById(occupiedDestination.getId()).orElseThrow();
+    assertThat(reloadedOccupiedDestination.getTitle(), equalTo("addition"));
+    assertThat(reloadedOccupiedDestination.getContent(), equalTo(WEB_CONTENT));
+    assertThat(reloadedOccupiedDestination.getFolder(), nullValue());
+    assertThat(
+        noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId()).stream()
+            .map(Note::getId)
+            .toList(),
+        equalTo(List.of(acceptedNote.getId(), occupiedDestination.getId())));
+    return new DriftedWebCreation(reloadedAccepted, tracker);
+  }
+
+  private Note rejectBasedOnAnOldParentAfterWebContentAdvancedAcceptedMain(
+      ProposalBundleFactory proposalFactory) throws Exception {
     Notebook notebook = createGitBackedNotebook();
     Note note = makeMe.aNote().notebook(notebook).title("note").content(ACCEPTED_CONTENT).please();
     NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);
-    byte[] proposal = additionProposalBundle(binding);
+    byte[] proposal = proposalFactory.create(binding);
     NoteUpdateContentDTO update = new NoteUpdateContentDTO();
     update.setContent(WEB_CONTENT);
     textContentController.updateNoteContent(note, update);
@@ -47,49 +122,12 @@ class NotebookGitProjectionDriftControllerTest extends NotebookGitBundleControll
             notebook, binding.getAcceptedGitObjectId(), proposal, HttpStatus.CONFLICT);
 
     assertThat(exception.getReason(), containsString("expectedHead no longer matches"));
-    assertThat(
-        noteRepository.findById(note.getId()).orElseThrow().getContent(),
-        equalTo(update.getContent()));
+    Note reloaded = noteRepository.findById(note.getId()).orElseThrow();
+    assertThat(reloaded.getContent(), equalTo(update.getContent()));
     assertThat(
         reloadCommittedBinding(notebook.getId()).getAcceptedGitObjectId(),
         equalTo(winningBinding.getAcceptedGitObjectId()));
-  }
-
-  @Test
-  void rejectsAnAdditionWhenAWebCreationOccupiesItsDestination() throws Exception {
-    Notebook notebook = createGitBackedNotebook();
-    Note acceptedNote =
-        makeMe.aNote().notebook(notebook).title("note").content(ACCEPTED_CONTENT).please();
-    NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);
-    NoteCreationDTO webCreation = new NoteCreationDTO();
-    webCreation.setNewTitle("addition");
-    webCreation.setContent("web content");
-    Note occupiedDestination =
-        noteRepository
-            .findById(controller.createNoteAtNotebookRoot(notebook, webCreation).getId())
-            .orElseThrow();
-
-    byte[] proposal = additionProposalBundle(binding);
-
-    ResponseStatusException exception =
-        assertProposalRejectedWithoutMutatingBinding(
-            notebook, binding.getAcceptedGitObjectId(), proposal, HttpStatus.CONFLICT);
-
-    assertThat(exception.getStatusCode(), equalTo(HttpStatus.CONFLICT));
-    assertThat(exception.getReason(), containsString("refresh the checkout before publishing"));
-    assertThat(
-        noteRepository.findById(acceptedNote.getId()).orElseThrow().getContent(),
-        equalTo(ACCEPTED_CONTENT));
-    Note reloadedOccupiedDestination =
-        noteRepository.findById(occupiedDestination.getId()).orElseThrow();
-    assertThat(reloadedOccupiedDestination.getTitle(), equalTo("addition"));
-    assertThat(reloadedOccupiedDestination.getContent(), equalTo(WEB_CONTENT));
-    assertThat(reloadedOccupiedDestination.getFolder(), nullValue());
-    assertThat(
-        noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId()).stream()
-            .map(Note::getId)
-            .toList(),
-        equalTo(List.of(acceptedNote.getId(), occupiedDestination.getId())));
+    return reloaded;
   }
 
   private byte[] additionProposalBundle(NotebookGitBinding binding) throws Exception {
@@ -100,9 +138,20 @@ class NotebookGitProjectionDriftControllerTest extends NotebookGitBundleControll
             new NotebookGitProposalFile("addition.md", PROPOSED_CONTENT)));
   }
 
+  private byte[] isolatedDeletionProposalBundle(NotebookGitBinding binding) throws Exception {
+    return proposalBundleBytes(binding, List.of());
+  }
+
   private NotebookGitBinding reloadCommittedBinding(Integer notebookId) {
     return inCommittedTransaction(
         transactionManager,
         () -> notebookGitBindingRepository.findByNotebook_Id(notebookId).orElseThrow());
   }
+
+  @FunctionalInterface
+  private interface ProposalBundleFactory {
+    byte[] create(NotebookGitBinding binding) throws Exception;
+  }
+
+  private record DriftedWebCreation(Note acceptedNote, MemoryTracker tracker) {}
 }

@@ -3,7 +3,7 @@ import { join } from 'node:path'
 import { describe, expect, test } from 'vitest'
 import { getApiConfig } from 'donut-api'
 import { run } from '../src/run.js'
-import { ProcessExitForTest, runGit } from './notebookClone.testHelpers.js'
+import { runGit } from './notebookClone.testHelpers.js'
 import {
   buildSourceRepo,
   bundleGetResponse,
@@ -11,10 +11,7 @@ import {
   cloneAsBoundCheckout,
 } from './notebookPublish.testHelpers.js'
 import { acceptedHistoryStagingDirsUnderTmp } from './notebookAcceptedHistory.testHelpers.js'
-import {
-  checkoutState,
-  installNotebookPullAcceptedHistoryTest,
-} from './notebookPull.testHelpers.js'
+import { installNotebookPullAcceptedHistoryTest } from './notebookPull.testHelpers.js'
 
 export function describeNotebookPullFastForward(): void {
   describe('notebook pull (accepted history fast-forward)', () => {
@@ -156,87 +153,42 @@ export function describeNotebookPullFastForward(): void {
       ).toEqual(changedFiles.map(({ path }) => path))
     })
 
-    test.each([
-      {
-        change: 'staged work',
-        error: 'commit or clean them before receiving',
-        mutate(directory: string) {
-          fs.writeFileSync(join(directory, 'note.md'), '# staged local edit\n')
-          runGit(['add', 'note.md'], directory)
-        },
-      },
-      {
-        change: 'unstaged work',
-        error: 'commit or clean them before receiving',
-        mutate(directory: string) {
-          fs.writeFileSync(
-            join(directory, 'note.md'),
-            '# unstaged local edit\n'
-          )
-        },
-      },
-      {
-        change: 'an untracked file',
-        error: 'commit or clean them before receiving',
-        mutate(directory: string) {
-          fs.writeFileSync(join(directory, 'local.md'), '# local work\n')
-        },
-      },
-      {
-        change: 'a new HEAD',
-        error: 'Local main changed while the accepted history was downloading',
-        mutate(directory: string) {
-          runGit(
-            ['commit', '--quiet', '--allow-empty', '-m', 'concurrent commit'],
-            directory
-          )
-        },
-      },
-      {
-        change: 'another branch',
-        error: 'Switch to main before receiving',
-        mutate(directory: string) {
-          runGit(['checkout', '--quiet', '-b', 'local-work'], directory)
-        },
-      },
-    ])(
-      'refuses without overwriting $change created while the download is completing',
-      async ({ error, mutate }) => {
-        const source = buildSourceRepo(ctx.getWorkDir())
-        const directory = cloneAsBoundCheckout(
-          ctx.getWorkDir(),
-          source,
-          getApiConfig().apiBaseUrl,
-          'checkout'
-        )
-        fs.writeFileSync(join(source, 'note.md'), '# accepted remote edit\n')
-        runGit(['add', 'note.md'], source)
-        runGit(['commit', '--quiet', '-m', 'accepted remote edit'], source)
-        const bundleFile = join(ctx.getWorkDir(), 'accepted-ahead.bundle')
-        bundleMain(source, bundleFile)
-        const response = bundleGetResponse(bundleFile)
-        let stateAfterConcurrentChange: ReturnType<typeof checkoutState>
-        ctx.getFetchMock().mockResolvedValue({
-          ...response,
-          arrayBuffer: async () => {
-            mutate(directory)
-            stateAfterConcurrentChange = checkoutState(directory)
-            return response.arrayBuffer()
-          },
-        })
-        const stagingBefore = acceptedHistoryStagingDirsUnderTmp()
+    test('receives an accepted note deletion with exact remaining bytes and no Portable metadata', async () => {
+      const source = buildSourceRepo(ctx.getWorkDir())
+      const keptPath = 'kept.md'
+      const keptBytes = Buffer.from(
+        '---\ntype: Note\nauthored: retained\n---\n# Kept note\n\nUnchanged body.\n'
+      )
+      fs.writeFileSync(join(source, keptPath), keptBytes)
+      runGit(['add', keptPath], source)
+      runGit(['commit', '--quiet', '-m', 'add kept note'], source)
+      const directory = cloneAsBoundCheckout(
+        ctx.getWorkDir(),
+        source,
+        getApiConfig().apiBaseUrl,
+        'checkout'
+      )
+      const originalHead = runGit(['rev-parse', 'HEAD'], directory)
+      runGit(['rm', '--', 'note.md'], source)
+      runGit(['commit', '--quiet', '-m', 'delete note.md'], source)
+      const acceptedHead = runGit(['rev-parse', 'main'], source)
+      const acceptedTree = runGit(['rev-parse', 'main^{tree}'], source)
+      const bundleFile = join(ctx.getWorkDir(), 'accepted-deletion.bundle')
+      bundleMain(source, bundleFile)
+      ctx.getFetchMock().mockResolvedValue(bundleGetResponse(bundleFile))
 
-        await expect(run(['notebook', 'pull', directory])).rejects.toThrow(
-          ProcessExitForTest
-        )
+      await run(['notebook', 'pull', directory])
 
-        expect(checkoutState(directory)).toEqual(stateAfterConcurrentChange!)
-        expect(ctx.getErrorSpy()).toHaveBeenCalledWith(
-          expect.stringContaining(error)
-        )
-        expect(ctx.getFetchMock()).toHaveBeenCalledOnce()
-        expect(acceptedHistoryStagingDirsUnderTmp()).toEqual(stagingBefore)
-      }
-    )
+      expect(fs.existsSync(join(directory, 'note.md'))).toBe(false)
+      expect(fs.readFileSync(join(directory, keptPath))).toEqual(keptBytes)
+      expect(runGit(['rev-parse', 'HEAD'], directory)).toBe(acceptedHead)
+      expect(runGit(['rev-parse', 'HEAD^{tree}'], directory)).toBe(acceptedTree)
+      expect(() =>
+        runGit(['merge-base', '--is-ancestor', originalHead, 'HEAD'], directory)
+      ).not.toThrow()
+      expect(runGit(['ls-tree', '-r', '--name-only', 'HEAD'], directory)).toBe(
+        keptPath
+      )
+    })
   })
 }

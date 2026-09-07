@@ -5,7 +5,11 @@
 Implement the Git-native Portable notebook tree synchronization described in
 [ADR 0002](../docs/adrs/0002-git-native-portable-notebook-synchronization.md).
 
+<<<<<<< HEAD
+1. [Return to Donut without browser history blocking login or an unexplained error](seeds/SEED-014-reliable-login-with-browser-history.md#story-1) — SEED-014
+=======
 1. [Delete a note locally without transferring its private data](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-5) — SEED-009
+>>>>>>> origin/main
 2. [Rename or move a note without losing its learning history](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-6) — SEED-009
 3. [Move a folder while preserving descendant identities](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-7) — SEED-009
 4. [Keep non-overlapping accumulated local and web changes](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-8) — SEED-009
@@ -14,7 +18,11 @@ Implement the Git-native Portable notebook tree synchronization described in
 
 ## Recently done
 
+<<<<<<< HEAD
+1. [Delete a note locally without transferring its private data](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-5) — SEED-009
+=======
 1. Return to Donut without browser history blocking login or an unexplained error
+>>>>>>> origin/main
 2. [Publish several note changes in one commit](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-11) — SEED-009
 3. [Create a new note locally](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-4) — SEED-009
 4. [Receive a Donut web edit in a clean local repository](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-3) — SEED-009
