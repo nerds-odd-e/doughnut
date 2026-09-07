@@ -3,7 +3,7 @@
 ## Source and status
 
 Source: [SEED-009 Story 7](../../seeds/SEED-009-git-backed-local-notebook-workflow.md#story-7).
-Status: planned; implementation not authorized by this planning request.
+Status: in progress; slice 1 done.
 
 ## Goal and scope
 
@@ -32,10 +32,10 @@ operations retain their meanings, including a last-note move leaving its folder.
   REQUIRES_NEW acceptance transaction and binding lock. Retain that ownership,
   owner authorization, ancestry checks, typed Markdown validation, drift checks,
   bundle storage, and idempotent retry. No new endpoint, schema, or transport.
-- `NotebookGitProposalTreeShape` currently rejects changed README paths and
-  returns note changes. Separate raw safe regular-file tree inspection from the
-  existing note-only classifier only as needed for the next Behavior. Recognize
-  folder relocation as a distinct proposal, not a list of note renames.
+- `NotebookGitProposalTreeShape.inspectRegularFiles` walks every safe regular
+  file (including READMEs and unchanged blobs). `requireRegularNoteChanges`
+  still classifies notes only. Recognize folder relocation as a distinct
+  proposal, not a list of note renames.
 - Use source/destination prefixes and complete relative-path/blob correspondence,
   not independent equal-blob pairing. Require exactly one eligible folder mapping;
   identical note content elsewhere must not affect it. Nested README files belong
@@ -64,7 +64,7 @@ operations retain their meanings, including a last-note move leaving its folder.
 
 ## Refinement assessment
 
-No execution has started and no completed evidence is being replaced.
+Slice 1 extracted raw inspection; no completed evidence was replaced.
 Original leaves 1, 3, 4, 7, and 8 are Ready, with their dependency/proof references
 updated below. Original 2 is Refine (recognition, placement, and acceptance beats);
 5 is Refine (rollback and retry); 6 is Refine (publication and receipt). None
@@ -87,9 +87,10 @@ additional boundary evidence, not gratuitous production changes.
 
 ### 1. Separate raw proposal inspection from note eligibility
 Type: Structure
-Status: planned
+Status: done
 Proof: Existing tree-shape controller coverage, including README refusal and
 ordinary note operations, remains green with unchanged observable behavior.
+`CURSOR_DEV=true nix develop -c pnpm backend:test_only` passed (~50s).
 
 Structure: Extract the existing raw safe regular-file walk with paths and blob
 IDs, preserving its current caller and errors. Its immediate consumer is leaf 2's
@@ -313,13 +314,20 @@ feature is promised. No completed evidence exists to migrate.
 
 ## Readiness and learnings
 
-Ready for execution when authorized. The remaining leaves are target-sized
-hypotheses based on existing helpers and proof boundaries, not time guarantees.
-No execution overrun or product-code experiment occurred during refinement.
+Slice 1 done. Remaining leaves are target-sized hypotheses, not time guarantees.
 No sizing exception is pre-approved; record actual test/external wait runtime
-separately during execution. If correspondence in leaf 2 or integration in leaf 6
-fails to converge within the limits, refine this same plan under the existing
-learning rules rather than bypass a safety gate or expand the story.
+separately. If correspondence in leaf 2 or integration in leaf 6 fails to
+converge, refine this same plan rather than bypass a safety gate or expand the
+story.
+
+Leaf 1 learning: call `inspectRegularFiles(repository, acceptedHead, proposedHead)`
+for folder correspondence. `InspectedRegularFile(path, acceptedBlobId, proposedBlobId)`
+keeps READMEs and unchanged files (equal non-null blobs). Do not reuse `NoteChange`
+(it still drops unchanged files). Public note-eligibility errors are unchanged.
+
+CI observer delivered a 2026-09-05 E2E failure on `1d846feb` (`cli_notebook_clone`).
+That SHA is not this execution's push; later `main` CI including origin `63dbba7f74`
+succeeded. Disposition: superseded historical failure, no repair.
 
 Refinement learning: useful path-specific rejection allows eligibility work to
 land safely before acceptance; the old plan unnecessarily bundled these outcomes.
